@@ -538,8 +538,9 @@ async function trampaPasoDano(id, dt){
 }
 // Lo aplica (se anuncia sin la vida de un creep: es privada).
 async function trampaPasoDanoAplicar(id, dt){
-  const monto = num(dt.danoMonto);
   const x = tokens.get(dt.tokenId);
+  const agT = typeof aguaRayo === 'function' && x ? aguaRayo(x, dt.elemento, num(dt.danoMonto)) : null;   // 💧 en el agua, el rayo ×1,5 (js/50)
+  const monto = agT ? agT.monto : num(dt.danoMonto);
   let res = null, freno = '', restaFreno = 0;
   if(monto > 0 && x && x.fichaId){
     try{

@@ -697,7 +697,7 @@ const Duelo = (() => {
     if(m.hab && m.hab.dano && m.hab.dano.diferencia){
       const dif = Math.max(0, Math.round(_num(m.contacto && m.contacto.dif)));
       m.dano = {crudo: dif, formula: 'la diferencia', rolls: [], mod: 0, reclamado: '', aplicado: false};
-      m.efectos = normalizarEfectos(m.hab.efectos);
+      m.efectos = aguaParalisis(m, normalizarEfectos(m.hab.efectos));
       entrarDano(m);
       return;
     }
@@ -1042,6 +1042,15 @@ const Duelo = (() => {
   /* Todos los efectos con dado, juntos (2026-10-04, pedido del dueño: «para que pegar con un arma no sea una eternidad»): un solo botón tira un
      dado por cada efecto que lo necesite; la Mesa recibe UNA tirada con todos los dados y una línea con lo que funcionó y lo que no; el cuadro
      muestra el tablero (qué dado va con qué efecto, con qué número funciona, qué salió). */
+  /* 💧 El agua y el rayo (2026-10-17, dueño): quien está parado en un charco (el mapa: `enAgua`, vtt-hexgrid/js/50) tiene el doble de chance
+     de quedar Paralizado. Solo donde la pantalla sabe del mapa; en la ficha suelta o GM Tools queda igual. */
+  function aguaParalisis(m, efs){
+    let t = null;
+    try{ t = typeof enAgua === 'function' && typeof tokens !== 'undefined' && m.defensor ? tokens.get(m.defensor.tokenId) : null; }catch(err){ t = null; }
+    if(!t || !enAgua(t)) return efs;
+    return (efs || []).map(ef => ef && ef.nombre === 'Parálisis' && _num(ef.caras) > _num(ef.exitos)
+      ? {...ef, exitos: Math.min(_num(ef.caras), _num(ef.exitos) * 2), detalle: `${ef.detalle ? ef.detalle + ' ' : ''}(💧 en el agua: el doble de chance.)`.slice(0, 200)} : ef);
+  }
   async function tirarEfectos(id){
     const ref = col().doc(id);
     let publicar = null, anuncio = '';
@@ -1147,7 +1156,7 @@ const Duelo = (() => {
           crudos = crudos.filter(e => !(e && e.danoMagico));
         }
       }
-      m.efectos = normalizarEfectos(crudos);
+      m.efectos = aguaParalisis(m, normalizarEfectos(crudos));
       // «Seguro si es crítico» (2026-10-03): un efecto con porcentaje que, si el golpe fue crítico, entra sin tirar.
       if(m.crit && m.crit.critico) m.efectos = m.efectos.map(ef => ef.seguroCritico ? {...ef, caras: 1, exitos: 1, detalle: `${ef.detalle ? ef.detalle + ' ' : ''}(Fue crítico: entra seguro.)`.slice(0, 200)} : ef);
       // Regla del dueño (2026-10-03), característica del Sangrado: si entra con un golpe CRÍTICO de arma es permanente, aunque diga turnos —

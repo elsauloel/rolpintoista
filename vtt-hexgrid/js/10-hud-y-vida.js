@@ -392,13 +392,7 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
 
 /* La resistencia de un token a un elemento y su Defensa especial (2026-10-04), para restarlas al daño mágico o elemental: personaje (su resumen),
    creep (su parte privada, solo el GM), invocación (sus datos). → {res, armadmg}; con `inv` ya leída, sin volver a leerla. */
-// 💧 Quien está parado en el agua (un charco, js/50) es vulnerable al rayo: su Res. eléctrica baja AGUA_VULN_RAYO (2026-10-17, dueño).
 async function resistenciasDe(t, el, inv){
-  const r = await resistenciasBase(t, el, inv);
-  if(el === 'rayo' && typeof enAgua === 'function' && enAgua(t)) r.res = num(r.res) - AGUA_VULN_RAYO;
-  return r;
-}
-async function resistenciasBase(t, el, inv){
   if(!t) return {res: 0, armadmg: 0};
   if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); return {res: sc && el ? CreepCalculo.resElemental(sc, el) : 0, armadmg: sc ? creepArmadmgMapa(sc) : 0}; }
   if(String(t.fichaId || '').includes(SEP_INVOCACION)){
@@ -523,8 +517,9 @@ async function rayoCadenaAplicar(cadena, o){
   const hubo = [], hechos = [], manual = [];
   let prev = Math.max(0, Math.floor(num(cadena[0] && cadena[0].dano)));
   for(const s of cadena.slice(1)){
-    const dano = Math.floor(prev / 2);
-    if(dano < 1) break;
+    const dano0 = Math.floor(prev / 2);
+    if(dano0 < 1) break;
+    const agua = typeof aguaRayo === 'function' ? aguaRayo(s.t, 'rayo', dano0) : {monto: dano0, txt: ''}, dano = agua.monto;   // 💧 en el agua, ×1,5 (js/50)
     const nombre = s.t.oculto ? 'Alguien' : nombreDe(s.t);
     let ok = false, entro = dano, resTxt = '';
     try{

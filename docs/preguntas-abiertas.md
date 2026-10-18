@@ -1023,8 +1023,8 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   las pasivas de creeps e invocaciones salen del mismo catálogo que las de los personajes, también aparece en «+ Pasiva» de la ficha. Quedó con
   **Job 3, provisorio** (comun/pasivas.js). ¿Se ofrece a los personajes, a qué costo, o es solo de criaturas?
 
-- **P203. El charco de agua: ¿cuánto vulnerable al rayo? — 2026-10-17.** Regla del dueño: el hielo del suelo (Varita de la ventisca) al
-  derretirse deja un charco **permanente** y «cualquier personaje que esté parado en agua tiene debilidad contra rayo». Quedó como
-  **PLACEHOLDER `AGUA_VULN_RAYO` = 2** (vtt-hexgrid/js/50-superficies.js): la Res. eléctrica de quien está en el agua baja 2 (negativa =
-  vulnerable: el rayo le hace 2 más). ¿Es ese número, o «debilidad» es el doble de daño? ¿Vale también para los creeps (hoy sí: a todos)?
-  ¿El fuego seca el charco, el hielo lo vuelve a congelar?
+- ✅ **P203. El charco de agua y el rayo — 2026-10-17; decidida el mismo día (provisorio).** **Decidido (dueño):** vale para cualquiera
+  (personajes, invocaciones, creeps) salvo que levite o vuele; el fuego lo seca; y «si hay algún efecto eléctrico que tiene probabilidad de
+  dejar parálisis, que esa probabilidad aumente y que el daño también aumente, todo en un 50 % o el doble» (escuchaba sugerencias). **Quedó:**
+  el daño de rayo ×1,5 (para arriba, `AGUA_MULT_RAYO`) y la Parálisis con el doble de chance, a quien está parado en el agua
+  (vtt-hexgrid/js/50; comun/duelo.js `aguaParalisis`). Si en la mesa se siente poco, subir a ×2.

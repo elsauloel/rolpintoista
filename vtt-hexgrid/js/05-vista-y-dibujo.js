@@ -202,9 +202,12 @@ function dibujarNieblaVarita(z){
   if(!nb.size) return false;
   const s = performance.now() / 1000;
   ctx.save();
-  ctx.beginPath();
-  nb.forEach(k => { const c = nbUnpack(k), h = hexCentro(c.col, c.fila); trazarHex(h.x, h.y); });
-  ctx.fillStyle = 'rgba(200,205,216,.62)'; ctx.fill();
+  if(typeof nubeDibujar === 'function') nubeDibujar([...nb].map(nbUnpack), NUBE_GRIS, z);   // ☁ con el borde desparejo y borroso (js/50, 2026-10-17)
+  else{
+    ctx.beginPath();
+    nb.forEach(k => { const c = nbUnpack(k), h = hexCentro(c.col, c.fila); trazarHex(h.x, h.y); });
+    ctx.fillStyle = 'rgba(200,205,216,.62)'; ctx.fill();
+  }
   nb.forEach(k => {
     const c = nbUnpack(k), h = hexCentro(c.col, c.fila), f = (Math.sin(s * 0.7 + c.col * 1.3 + c.fila * 0.7) + 1) / 2;
     ctx.beginPath();

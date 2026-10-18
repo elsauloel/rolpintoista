@@ -355,24 +355,25 @@ function zonaIdDe(t){ for(const [id, x] of tokens) if(x === t) return id; return
 let zonaCola = [];      // [{elId, tokenId}] a la espera de mostrarse en esta pantalla
 let zonaBanner = null;  // {elId, tokenId, el, t, resultado} el que se está mostrando ahora
 // `pasos` (el hielo, 2026-10-17): cuántos pasos dio sobre la zona en este movimiento = cuántas tiradas (se suman si ya esperaba).
-function zonaEncolar(el, t, pasos){
+// `pisa` (el hielo): las casillas de esos pasos, en orden, con cuántos pasos dio después (`resto`): si se resbala, queda ahí.
+function zonaEncolar(el, t, pasos, pisa){
   const id = zonaIdDe(t), n = Math.max(0, Math.round(num(pasos)));
   const ya = zonaCola.find(x => x.elId === el.id && x.tokenId === id);
-  if(ya){ if(n) ya.pasos = Math.max(1, ya.pasos || 0) + n; return; }
+  if(ya){ if(n){ ya.pasos = (ya.pasos || 0) + n; ya.pisa = [...(ya.pisa || []), ...(pisa || [])]; } return; }
   if(zonaBanner && zonaBanner.elId === el.id && zonaBanner.tokenId === id && !(n && zonaBanner.resultado)){
-    if(n && !zonaBanner.tirando){ zonaBanner.pasos = Math.max(1, zonaBanner.pasos || 0) + n; renderZonaBanner(); }
+    if(n && !zonaBanner.tirando){ zonaBanner.pasos = (zonaBanner.pasos || 0) + n; zonaBanner.pisa = [...(zonaBanner.pisa || []), ...(pisa || [])]; renderZonaBanner(); }
     return;
   }
-  zonaCola.push({elId: el.id, tokenId: id, pasos: n});
+  zonaCola.push({elId: el.id, tokenId: id, pasos: n, pisa: pisa || null});
   zonaMostrarSiguiente();
 }
 function zonaMostrarSiguiente(){
   if(zonaBanner) return;
   if(!zonaCola.length){ AvisoCombate.cartel('zona', null); return; }   // no queda nada: el cartel se cierra (antes quedaba colgado)
-  const {elId, tokenId, pasos} = zonaCola.shift();
+  const {elId, tokenId, pasos, pisa} = zonaCola.shift();
   const el = elementos.get(elId), t = tokens.get(tokenId);
   if(!el || !el.zona || !t || !zonaLeFalta(el, t)){ zonaMostrarSiguiente(); return; }
-  zonaBanner = {elId, tokenId, el, t, resultado: null, pasos: pasos || 0};
+  zonaBanner = {elId, tokenId, el, t, resultado: null, pasos: pasos || 0, pisa: pisa || null};
   renderZonaBanner();
 }
 /* Del piso, del aire o ambos (2026-10-07, dueño): dónde está el efecto de una zona o una trampa. Levitar salva solo de lo del piso (mientras levita:
@@ -418,9 +419,9 @@ function zonaRevisarEntrada(id, celdas, levita){
     const sup = el.zona && typeof superficieSpec === 'function' ? superficieSpec(el) : null;
     if(!sup || !sup.tiraPaso || !zonaAplicaA(el, t)) return;
     const cs = celdasDeElemento(el), enCelda = c => cs.some(x => x.col === c.col && x.fila === c.fila);
-    let n = 0;
-    for(let i = 1; i < celdas.length; i++) if(enCelda(celdas[i]) && !alAire(el, i)) n++;
-    if(n) zonaEncolar(el, t, n);
+    const pisa = [];
+    for(let i = 1; i < celdas.length; i++) if(enCelda(celdas[i]) && !alAire(el, i)) pisa.push({col: celdas[i].col, fila: celdas[i].fila, resto: celdas.length - 1 - i});
+    if(pisa.length) zonaEncolar(el, t, pisa.length, pisa);
   });
   if(celdas && celdas.length > 1){
     elementos.forEach(el => {
@@ -545,7 +546,21 @@ async function zonaResolverBanner(){
       const pre = veces > 1 ? `paso ${paso}: ` : '';
       partes.push(resistio ? `${pre}resistió (${tuyo} contra ${contraTxt})` : `${pre}no resistió (${tuyo} contra ${contraTxt})`);
     }
-    if(!resistio) break;   // a la primera que falla, ahí le pasa (el hielo: se cae)
+    if(!resistio){   // a la primera que falla, ahí le pasa (el hielo: se cae)
+      // …y se queda donde se resbaló (dueño, 2026-10-17: «se queda donde se resbaló, no se desplaza»): vuelve a esa casilla y se le devuelven los
+      // No2 de los pasos que no llegó a dar (lo de cada casillero; lo gratis o el terreno lento no se recuentan).
+      const c = specZ && specZ.tiraPaso && zonaBanner.pisa ? zonaBanner.pisa[paso - 1] : null;
+      if(c && (t.col !== c.col || t.fila !== c.fila)){
+        try{
+          t.col = c.col; t.fila = c.fila; pedirDibujo();
+          await coleccionTokens().doc(tokenId).update({col: c.col, fila: c.fila});
+          const cm = costoMoverDe(t), devolver = cm && num(cm.porCasillero) > 0 ? num(c.resto) * num(cm.porCasillero) : 0;
+          if(devolver > 0){ if(t.tipo === 'creep') await gastarNitrosCreep(t.fichaId, -devolver); else await gastarNitros(t.fichaId, -devolver); }
+          partes.push(`se resbaló en el paso ${paso}: queda ahí${devolver ? ` (le vuelven ${devolver} No2 de los pasos que no dio)` : ''}`);
+        }catch(err){ console.error('No se pudo dejarlo donde se resbaló:', err); partes.push(`se resbaló en el paso ${paso} (ponelo ahí a mano)`); }
+      }
+      break;
+    }
   }
   // El daño (2026-10-02, regla del dueño): quien resiste no recibe nada — ni el daño ni el estado. Con «la diferencia», el daño es
   // la tirada de quien la creó menos la de quien resiste (en un empate, 0: ni daño ni tirada extra).
@@ -563,6 +578,8 @@ async function zonaResolverBanner(){
     const rz = await resistenciasDe(t, elZ);
     const armadmg = el.zonaIgnoraDef && !el.zonaDirecto && (el.zonaCasteadorRef || elZ) && Combatiente.frenaArmaduraMagica(elZ) ? rz.armadmg : 0;   // la directa (varitas) no la resta   // la Defensa especial: todo el daño especial, también el tóxico (2026-10-07)
     const resEl = (elZ ? rz.res : 0) + (tocaElPiso(el) ? Math.max(0, statPiesDe(t, 'suelagruesa')) : 0);   // + Suela gruesa (pies, 2026-10-06): lo que pisás hace menos — solo lo del piso (2026-10-07)
+    const agZ = monto > 0 && typeof aguaRayo === 'function' ? aguaRayo(t, elZ, monto) : null;   // 💧 en el agua, el rayo ×1,5 (js/50)
+    if(agZ && agZ.txt){ monto = agZ.monto; partes.push(agZ.txt); }
     if(monto > 0){
       try{
         let res = null;

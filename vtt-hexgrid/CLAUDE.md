@@ -1650,5 +1650,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   a la primera que falla aplica el estado); no se anota resuelta ni cuenta en el Mantenimiento. Se dibuja celeste, con bordes de cristal
   irregulares (`trazarHielo`) y una franja de brillo que la cruza (`superficieDibujar`, desde js/05: `superficiesAnimando`). Al irse (el GM la
   borra, js/07) queda un **charco** permanente (`superficieAlIrse`: `superficie: 'agua'`, sin estado ni turnos; dibujado como una mancha
-  ondulada) y quien está parado en el agua tiene la Res. eléctrica −`AGUA_VULN_RAYO` (`resistenciasDe` → `enAgua`, js/10; P203).
+  ondulada). Quien está parado en el agua (sin levitar ni volar, `enAgua`) recibe el rayo ×1,5 (`aguaRayo`: el duelo, el salto, las zonas y
+  las trampas) y la Parálisis con el doble de chance (comun/duelo.js `aguaParalisis`; el salto, js/13); el fuego lo seca (`aguaRevisarFuego`, el GM).
+  Resbalarse en el hielo lo deja en esa casilla y le devuelve los No2 de los pasos que no dio. **Nubes**: una zona de gas (tóxica, o «gas, nube,
+  humo, miasma, pedos, esporas, vapor, niebla» en el nombre) y la niebla de una varita se dibujan como una mancha de borde desparejo y borroso
+  (`nubeColor`, `nubeDibujar`: verde lo tóxico, violeta el resto de los gases, gris la niebla).
 

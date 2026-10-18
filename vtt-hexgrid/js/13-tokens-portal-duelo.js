@@ -1367,6 +1367,8 @@ async function dueloAplicarDano(d){
   if(dn.defensaManual === 'no'){ aplicar = base.mitad ? Math.ceil(golpe / 2) : golpe; ignoraDef = true; }
   else if(dn.defensaManual !== undefined && dn.defensaManual !== null && dn.defensaManual !== ''){ const dmn = Math.max(0, num(dn.defensaManual)); aplicar = base.mitad ? Math.ceil(Math.max(0, golpe - dmn) / 2) : Math.max(0, golpe - dmn); ignoraDef = true; }
   // Bloqueo perdido (mitad del daño): el arma o escudo con el que bloqueó pierde 1 punto de durabilidad (solo personajes: los creeps y las invocaciones no llevan).
+  // 💧 En el agua, el rayo ×1,5 (js/50, 2026-10-17).
+  if(elDano === 'rayo' && typeof aguaRayo === 'function'){ const ag = aguaRayo(t, 'rayo', aplicar); if(ag.txt){ aplicar = ag.monto; freno = [freno, ag.txt].filter(Boolean).join(' · '); } }
   let desgaste = '';
   if(base.mitad && t.tipo === 'pj' && d.defensa && d.defensa.itemId){
     try{ await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: {nombre: 'Desgaste', item: d.defensa.itemId}, origen: `${d.atacante.nombre} · Bloqueo perdido`}); desgaste = d.defensa.itemNombre || 'el objeto'; }
@@ -1385,8 +1387,9 @@ async function dueloAplicarDano(d){
       // elemento (Res. fuego…), como el daño de una habilidad. Con dos elementos juntos («Fuego y Hielo») no se resta ninguna.
       const elMag = String(dn.magico.tipo || '').includes(' y ') ? '' : Combatiente.elementoDe(dn.magico.tipo);
       const resMag = elMag ? (await resistenciasDe(t, elMag, invLeida)).res : 0;
-      const rm = esInv ? await danioInv(t, String(num(dn.magico.total)), true, 0, resMag, {magico: true, reparte: true})
-        : t.tipo === 'creep' ? await danioCreep(t, String(num(dn.magico.total)), true, 0, resMag, {magico: true, reparte: true}) : await danioPj(t, String(num(dn.magico.total)), true, 0, resMag, {magico: true, reparte: true});
+      const agM = typeof aguaRayo === 'function' ? aguaRayo(t, elMag, num(dn.magico.total)) : {monto: num(dn.magico.total), txt: ''};   // 💧 (js/50)
+      const rm = esInv ? await danioInv(t, String(agM.monto), true, 0, resMag, {magico: true, reparte: true})
+        : t.tipo === 'creep' ? await danioCreep(t, String(agM.monto), true, 0, resMag, {magico: true, reparte: true}) : await danioPj(t, String(agM.monto), true, 0, resMag, {magico: true, reparte: true});
       magico = {...dn.magico, recibido: num(rm.r.recibido), hpAntes: num(rm.previo), hpDespues: num(rm.nuevo), ...(resMag ? {resEl: Combatiente.resElementalTxt(elMag, resMag)} : {})};
     }
     // El Espejo: 1/4 de todo el daño especial que le tiraron (el de la habilidad y el elemental del arma), antes de la Defensa especial.
@@ -1440,7 +1443,8 @@ async function dueloCadena(d, entro){
   if(c.efectos){
     for(const s of cadena.slice(1)){
       for(const ef of (d.efectos || []).filter(e => e && !e.cura && Duelo.specDeEfecto(e))){
-        const caras = Math.max(1, Math.round(num(ef.caras)) || 1), exitos = Math.max(1, Math.round(num(ef.exitos)) || 1);
+        const caras = Math.max(1, Math.round(num(ef.caras)) || 1), exitos0 = Math.max(1, Math.round(num(ef.exitos)) || 1);
+        const exitos = ef.nombre === 'Parálisis' && typeof enAgua === 'function' && enAgua(s.t) ? Math.min(caras, exitos0 * 2) : exitos0;   // 💧 el doble de chance (js/50)
         if(Math.floor(Math.random() * caras) >= exitos) continue;
         try{ const r = await dueloAplicarEfecto({...d, defensor: {...d.defensor, tokenId: s.id, nombre: nombreDe(s.t)}}, ef); extra.push(`${s.t.oculto ? 'Alguien' : nombreDe(s.t)}: ${ef.nombre}${r && r.manual ? ' (a mano)' : ''}`); }
         catch(err){ console.error('No se pudo aplicar el efecto del salto:', err); extra.push(`${nombreDe(s.t)}: ${ef.nombre} (a mano)`); }

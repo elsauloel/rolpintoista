@@ -375,6 +375,8 @@ input[type=file]{display:none}
 @media(max-width:820px){.botonera-grid,.botonera-grid-even{grid-template-columns:1fr}}
 .botonera-caja{border:1px solid var(--line-soft);background:rgba(0,0,0,.15);padding:10px 11px;min-width:0}
 .botonera-stats-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.botonera-stats-cols{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;align-items:start}
+.botonera-stats-col{display:flex;flex-direction:column;gap:6px}
 /* Defensa y resistencias a crítico (solo se ven, no se tiran): igual que en la botonera de la ficha, PERO acá
    son 3 hijos (Defensa, Armadura mágica y el bloque de Resistencia a críticos), no 2 — la ficha nunca tiene
    Armadura mágica en esta fila. Con solo 2 columnas declaradas, el 3er hijo (el bloque de crítico, con sus 5

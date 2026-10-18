@@ -26,12 +26,14 @@ const InvBotonera = (() => {
     const cualAtaque = num(inv.ataquesTurno) === 0 ? 'primer ataque del turno (Tipo ÷ 2)' : 'ataque extra (Tipo completo)';
     const titulo = inv.nombre, badge = `No2 ${fmt(num(inv.nitros))}/${fmt(I.nitrosMax(inv))}`;
 
-    const tilesStats = I.INV_STATS_TIRADA_IDS.map(id => `
+    const tileStat = id => `
       <button type="button" class="botonera-tile" data-invtirarstat="${inv.id}:${id}" title="${esc(FichaCalculo.STAT_LABEL[id]||id)}">
         ${lupaBotonHtml(`inv:${inv.id}:stat:${id}`)}
         <span class="bt-label">${esc(FichaCalculo.STAT_LABEL[id]||id)}</span>
         <span class="bt-value">${fmt(I.statValor(inv, id))}</span>
-      </button>`).join('');
+      </button>`;
+    // En columnas, cada atributo con lo suyo debajo, como la Botonera del personaje (2026-10-18).
+    const tilesStats = `<div class="botonera-stats-cols">${Combatiente.columnasStats(I.INV_STATS_TIRADA_IDS).map(col => `<div class="botonera-stats-col">${col.map(tileStat).join('')}</div>`).join('')}</div>`;
 
     const f = v => { const x = formulaParaValor(v); return x ? x.formula : ''; };
     const defInv = I.defensa(inv);
@@ -114,7 +116,7 @@ const InvBotonera = (() => {
         </div>
         <div class="botonera-caja">
           <div class="cat-grouphead" style="margin-top:0"><span>Tiradas de stats</span></div>
-          <div class="botonera-stats-grid">${tilesStats}</div>
+          ${tilesStats}
         </div>
       </div>
       <div class="botonera-caja">

@@ -58,12 +58,14 @@ const CreepBotonera = (() => {
     const sinNitrosAtaque = num(sc.nitros) < costoAtaqueSc;
     const cualAtaque = num(sc.ataquesTurno) === 0 ? 'primer ataque del turno (Tipo ÷ 2)' : 'ataque extra (Tipo completo)';
 
-    const tilesStats = STATS_TIRADA_IDS.map(id => STAT_LOOKUP[id]).map(d => `
+    const tileStat = d => `
     <button type="button" class="botonera-tile" data-tirarstatcreep="${sc.id}:${d.id}" title="${esc(d.label)}">
       ${lupaBotonHtml(`${sc.id}|stat|${d.id}`)}
       <span class="bt-label">${esc(d.label)}</span>
       <span class="bt-value">${fmt(statValor(sc, d.id))}</span>
-    </button>`).join('');
+    </button>`;
+    // En columnas, cada atributo con lo suyo debajo, como la Botonera del personaje (2026-10-18).
+    const tilesStats = `<div class="botonera-stats-cols">${Combatiente.columnasStats(STATS_TIRADA_IDS).map(col => `<div class="botonera-stats-col">${col.map(id => tileStat(STAT_LOOKUP[id])).join('')}</div>`).join('')}</div>`;
 
     const fc = formulasCombate(sc);
     const defCreep = defensa(sc);
@@ -176,7 +178,7 @@ const CreepBotonera = (() => {
       </div>
       <div class="botonera-caja">
         <div class="acciones-grupo-label" style="margin-top:0">Tiradas de stats</div>
-        <div class="botonera-stats-grid">${tilesStats}</div>
+        ${tilesStats}
       </div>
     </div>
     <div class="botonera-caja">

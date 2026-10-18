@@ -8,6 +8,10 @@
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.
+> - [ ] **🎰 Ver en el mapa el rodillo de la Varita del caos** (2026-10-18, dueño: «una vez que esté el rodillo, anotalo en chequear cuando esté
+>   en la compu»): Atacar con la varita → clic en el objetivo → el Anuncio del d20 con el veredicto («¡LO QUE BUSCABAS!» / «¡SE DIO VUELTA!») →
+>   «🎰 Girar el rodillo»: los nombres pasan de abajo hacia arriba y frenan hasta el estado que salió → «¡Salió X!» con su detalle y su duración →
+>   «✔ Aplicar». Con 20, la grilla para elegir; con 1, elige el bando contrario. Probarlo con un personaje y con el Kobold hongero (un creep).
 > - [ ] **🩸 Ver en el mapa la Maldición de la sangre** (2026-10-17): con Maldito, al usar algo que cuesta SP sale «Estás Maldito: … te va a
 >   bajar N de vida (A → B)» con Aceptar / Cancelar; al aceptar baja la vida y queda en la Mesa. Probado por Claude con Xeena (capturas en la
 >   conversación); falta verlo el dueño, y sobre todo Larry con Drenar Vida (costo X) desde su cuenta.

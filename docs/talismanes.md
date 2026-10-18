@@ -104,8 +104,8 @@ Lo que el dueño marcó de la lista, con sus cambios. Lo que no nombró queda af
 | Grimorio gastado | PdG.Esp +1 · SP máximo +2 |
 | Frasco de tormenta | Tus relámpagos saltan una casilla más lejos (el salto eléctrico, de 4 a 5) |
 | Botella con un diablito | Al usar una varita podés destaparla: +1d4 al daño; si el d4 sale 1, no suma y te quema a vos (1d4 de fuego directo) |
-| De sangre | Al matar con una varita, +5 de vida |
-| Mate con termo | Empezás el combate con 1 No2 de más (por encima del máximo; si no lo gastás, se va en la primera recarga) |
+| Relicario de sangre (antes «De sangre») | Al matar con una varita, +5 de vida |
+| Mate listo (antes «Mate con termo») | Empezás el combate con 1 No2 de más (por encima del máximo; si no lo gastás, se va en la primera recarga) |
 | Estandarte chico (4 versiones) | Los aliados al lado tuyo: +1 Res.CC · +2 Res.Mt · +1 Defensa · +1 Defensa especial (una versión cada uno) |
 
 **Con preguntas (P204–P208 en `preguntas-abiertas.md`)**
@@ -114,6 +114,8 @@ Lo que el dueño marcó de la lista, con sus cambios. Lo que no nombró queda af
 
 **Quedan afuera por ahora** (no los eligió): Ruda macho, Huesos de adivinar, Orbe de cuarzo opaco, Orbe cambiante, Orbe que se carga,
 Segunda oportunidad, Amortiguador, Cáscara, Anclaje, Piedra de afilar arcana, Cuerno de toro, De la calma, Guía, Pata de conejo, Bolsa de sal gruesa.
+
+**Cargados al catálogo (2026-10-18):** 34 ítems `tal-*` en `comun/catalogo.js` (con `orbe` y `talisman`: no parrean, van al Bazar arcano); calidades y precios con el OK del dueño. Lo especial no automatizado dice ✋ A mano; la Calavera ya funciona sola. Las Piedras, las Brasas y los Estandartes van uno por elemento o versión.
 
 **Para cargarlos al catálogo (2026-10-18, visto probando la Calavera):** un talismán va en la otra mano, pero **no sirve para parrear**. Probando
 con una Calavera armada como escudo de una mano, el duelo la ofrecía como Parry. Al cargarlos, marcarlos como los orbes (`orbe: true`) o con

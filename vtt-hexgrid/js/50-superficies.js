@@ -71,14 +71,31 @@ function superficieDibujar(el, celdas, z){
     return {anima: true, sinBorde: true};
   }
   if(sup === 'agua'){
-    // Un charco: círculos un poco corridos por casilla, que se tocan y forman una sola mancha (la mayor parte de cada casilla).
-    const circ = (k, escala) => { ctx.beginPath(); celdas.forEach(c => {
-      const p = hexCentro(c.col, c.fila), r = HEX * escala * (0.82 + 0.22 * superficieAzar(c.col, c.fila, k));
-      const dx = (superficieAzar(c.col, c.fila, k + 1) - 0.5) * HEX * 0.3, dy = (superficieAzar(c.col, c.fila, k + 2) - 0.5) * HEX * 0.3;
-      ctx.moveTo(p.x + dx + r, p.y + dy); ctx.arc(p.x + dx, p.y + dy, r, 0, Math.PI * 2);
-    }); };
-    circ(1, 0.95); ctx.fillStyle = 'rgba(52,118,178,.48)'; ctx.fill();
-    circ(7, 0.55); ctx.fillStyle = 'rgba(140,200,240,.16)'; ctx.fill();
+    // Un charco: las casillas enteras (una sola mancha, sin las líneas de adentro) y, en cada lado de afuera, una panza redonda de tamaño
+    // al azar: el borde queda ondulado en vez de hexagonal.
+    const set = new Set(celdas.map(c => c.col + ',' + c.fila));
+    ctx.beginPath(); celdas.forEach(c => { const h = hexCentro(c.col, c.fila); trazarHex(h.x, h.y); });
+    celdas.forEach(c => {
+      const p = hexCentro(c.col, c.fila);
+      for(let i = 0; i < 6; i++){
+        const [ax, ay] = ESQUINAS[i], [bx, by] = ESQUINAS[(i + 1) % 6];
+        const mx = (ax + bx) / 2, my = (ay + by) / 2;
+        const v = mundoAHex(p.x + mx * 2, p.y + my * 2);   // la vecina de ese lado
+        if(v && set.has(v.col + ',' + v.fila)) continue;
+        const u = superficieAzar(c.col, c.fila, 20 + i), w = superficieAzar(c.col, c.fila, 30 + i);
+        const sale = HEX * (-0.05 + 0.18 * w), r = HEX * (0.42 + 0.2 * u), d = Math.hypot(mx, my);
+        const cx = p.x + mx + mx / d * sale, cy = p.y + my + my / d * sale;
+        ctx.moveTo(cx + r, cy); ctx.arc(cx, cy, r, 0, Math.PI * 2);
+      }
+    });
+    ctx.fillStyle = 'rgba(52,118,178,.5)'; ctx.fill();
+    // Algún brillo suelto sobre el agua.
+    ctx.fillStyle = 'rgba(190,225,250,.13)';
+    celdas.forEach(c => {
+      if(superficieAzar(c.col, c.fila, 40) < 0.45) return;
+      const p = hexCentro(c.col, c.fila), dx = (superficieAzar(c.col, c.fila, 41) - 0.5) * HEX * 0.8, dy = (superficieAzar(c.col, c.fila, 42) - 0.5) * HEX * 0.8;
+      ctx.beginPath(); ctx.ellipse(p.x + dx, p.y + dy, HEX * 0.32, HEX * 0.1, -0.35, 0, Math.PI * 2); ctx.fill();
+    });
     return {anima: false, sinBorde: true};
   }
   return null;

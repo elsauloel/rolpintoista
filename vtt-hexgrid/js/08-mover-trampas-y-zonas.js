@@ -483,7 +483,7 @@ function renderZonaBanner(){
   // Con el resultado ya puesto se muestra aunque la zona se haya borrado (2026-10-05: en su último turno se va apenas la resuelven).
   const el = elementos.get(zonaBanner.elId) || (zonaBanner.resultado ? zonaBanner.el : null), t = tokens.get(zonaBanner.tokenId) || (zonaBanner.resultado ? zonaBanner.t : null);
   if(!el || !el.zona || !t){ zonaBanner = null; zonaMostrarSiguiente(); return; }   // se borró la zona o el token mientras esperaba
-  const icono = el.zonaDanoTipo === 'de fuego' || (!el.zonaEstado && !el.zonaDanoTipo) ? '🔥' : '🌫';   // 🔥 solo para el fuego (o una zona vieja de puro daño)
+  const icono = typeof esHielo === 'function' && esHielo(el) ? '🧊' : el.zonaDanoTipo === 'de fuego' || (!el.zonaEstado && !el.zonaDanoTipo) ? '🔥' : '🌫';   // 🔥 solo para el fuego (o una zona vieja de puro daño)
   // Su momento (P146): los demás lo ven en la esquina mientras se resuelve, y el resultado al final.
   if(!zonaBanner.resultado && !zonaBanner.momentoP) zonaBanner.momentoP = momentoAbrir({tipo: 'zona', icono, titulo: `${t.oculto ? 'Alguien' : nombreDe(t)} está en ${el.zonaNombre || 'la zona'}…`, estado: 'tirando', resuelve: fbUsuario.uid, datos: {centro: true}});
   const nombreT = t.oculto ? 'Alguien' : nombreDe(t), nombreZ = el.zonaNombre || 'Zona';
@@ -497,7 +497,7 @@ function renderZonaBanner(){
     const que = [...(spec && spec.nombre ? [EstadosAplicar.texto(spec)] : []), ...(el.zonaDanoDif ? [`el daño (la diferencia de las tiradas${el.zonaDano ? ' + ' + el.zonaDano : ''})`] : el.zonaDano ? [`${el.zonaDano} de daño${el.zonaDanoTipo ? ' ' + el.zonaDanoTipo : ''}`] : [])].join(' y ') || 'lo que deja la zona';
     const pasosZ = Math.max(1, num(zonaBanner.pasos) || 1);   // el hielo: una tirada por paso; a la primera que falla, le pasa
     const porPaso = spec && spec.tiraPaso ? (zonaBanner.pasos ? ` Dio ${pasosZ} paso${pasosZ === 1 ? '' : 's'} sobre ${nombreZ}: ${pasosZ === 1 ? 'una tirada' : `una tirada por paso; a la primera que falla, ${spec.nombre ? 'queda ' + spec.nombre : 'le pasa'}`}.` : ` ${nombreZ} apareció bajo sus pies.`) : '';
-    AvisoCombate.cartel('zona', {icono: spec && spec.superficie === 'hielo' ? '🧊' : icono, titulo: `${nombreT} entró en ${nombreZ}`, texto: `Para resistir: ${que}. Tirá ${stat}: si resiste, no le pasa nada.${porPaso}`,
+    AvisoCombate.cartel('zona', {icono, titulo: `${nombreT} entró en ${nombreZ}`, texto: `Para resistir: ${que}. Tirá ${stat}: si resiste, no le pasa nada.${porPaso}`,
       botones: [{texto: `🎲 Tirar ${stat} para resistir ${spec && spec.nombre ? spec.nombre : 'la zona'}`, id: 'zona-banner-ir', alClic: zonaResolverBanner}]});
   }else{
     AvisoCombate.cartel('zona', {icono, titulo: `${nombreZ}: le toca a ${nombreT}`, texto: 'No hay nada que tirar: se aplica lo que deja la zona.',

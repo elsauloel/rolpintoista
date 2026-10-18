@@ -1619,4 +1619,10 @@ versión parecida en más de una, es candidato a juntar.
   («Res.Mt»…). `Combatiente.inmunidad`: la Inmunidad a CC frena todo control; la **Inmunidad mental** (`inmunidadMental`, preset nuevo) solo los
   mentales. La Ejecución ✨ (al poner un control sin resistencia elegida) y los asistentes de trampas (al elegir el estado) proponen la resistencia
   del grupo; se puede cambiar. **Un control nuevo: sumarlo a su grupo en `GRUPOS_CC`.**
+- **🔮 Talismanes** (2026-10-18, dueño; `../docs/talismanes.md`): ítems `tal-*` de la otra mano (`orbe` + `talisman`: no parrean). Lo que hacen solos:
+  `auraMiedo` (la Calavera, el mapa js/52), `espejito` / `relicario` (el resumen público y `CreepCalculo.talisman(sc, campo)`; el mapa js/53),
+  `alPegarVarita` (`Combatiente.efectosVarita(items)`: `FichaAcciones.habDeArmaEspecial` y `CreepAcciones.habDeEspecialCreep` le suman ese efecto a
+  la varita, con un `detalle` «🔮 …» que el mapa usa para que entre una vez por turno; `efectoDeEjecucion` ahora conserva el `detalle`) y `gauchito`
+  (`Combatiente.conGauchito`: `FichaAcciones.tirarValorStat` agrega un Afortunado a la primera tirada de PdG, PdG.Esp, Evasión o Parry; marca
+  `S.ataquesArma._gauchito`). `afortunado()` acepta `afortunadoStats` en el estado.
 

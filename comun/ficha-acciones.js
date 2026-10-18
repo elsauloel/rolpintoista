@@ -407,7 +407,11 @@ const FichaAcciones = (() => {
     }
     if(sobrepeso === 'penal') extra = num(extra) - num(sobre);
     // La tirada en sí (Afortunado, mitades, Evasión mínimo 1) es la del motor común: comun/combatiente.js.
-    const r = Combatiente.tirarStat(valor, S.efectos, statId, {extra});
+    // 🔮 La Estatuilla del Gauchito Gil: la primera de estas tiradas de la ronda, como Afortunado (Combatiente.conGauchito).
+    const tieneG = (S.inventario || []).some(i => i && i.equipado && i.gauchito && !FichaCalculo.itemRoto(i));
+    const conG = Combatiente.conGauchito(S.efectos, statId, tieneG, num((S.ataquesArma || {})._gauchito));
+    const r = Combatiente.tirarStat(valor, conG || S.efectos, statId, {extra});
+    if(conG && r){ S.ataquesArma = {...(S.ataquesArma || {}), _gauchito: 1}; ui.cambio(['nitros']); }
     if(sobrepeso === 'penal') r.estados.push({n: 'Sobrepeso', p: 'debuff'});
     else if(sobrepeso === 'pagado') r.estados.push({n: 'Sobrepeso (pagó 1 No2)', p: 'otro'});
     ui.registrarTirada(nombre, r);

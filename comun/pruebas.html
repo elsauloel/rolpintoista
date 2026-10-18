@@ -4388,6 +4388,14 @@ prueba('Talismanes (2026-10-18): la Cabeza reducida y el Muñeco vudú le suman 
     [1, 'Maldito', 2, true, 'Maldito', 2, 'Debilitado', 20]);
 });
 
+prueba('Estatuilla del Gauchito Gil (2026-10-18): la primera tirada de PdG, PdG.Esp, Evasión o Parry de la ronda sale como Afortunado', () => {
+  let i = 0; const azar = () => [0.1, 0.9][i++ % 2];
+  const conG = Combatiente.conGauchito([], 'pdgmg', true, 0);
+  const r = Combatiente.tirarStat(6, conG, 'pdgmg', {azar});
+  igual([!!conG, !!r.ventaja, r.estados.some(e => /Gauchito/.test(e.n)), Combatiente.conGauchito([], 'pdg', true, 1), Combatiente.conGauchito([], 'fue', true, 0), Combatiente.conGauchito([], 'eva', false, 0)],
+    [true, true, true, null, null, null]);
+});
+
 prueba('ataque sin arma: tiene daño (provisorio 1d4 + Dmg, P150)', () => {
   igual([FichaCombate.danoSinArmaTxt(3), FichaCombate.danoSinArmaTxt(0), FichaCombate.tipoAtaque(null)], ['1d4 + 3', '1d4', 4]);
 });

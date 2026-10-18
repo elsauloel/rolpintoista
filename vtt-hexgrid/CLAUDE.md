@@ -1671,3 +1671,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   −1 al daño. El aura: quien lleva un ítem con `auraMiedo` (el radio; la ficha lo publica en `resumen.auraMiedo` y `dmgesp`, un creep en su
   tarjeta: `auraMiedo`, `auraEfEsp`) asusta a los rivales que entran: `auraRevisar` (cada 700 ms y al moverse, en combate, para lo que maneja
   esta pantalla) los encola y `auraResolver` abre el Anuncio: Ef.Esp contra Res.Mt (empate: la calavera), Miedo si no llega, Crónica y Mesa.
+- **🔮 Talismanes en el combate** (2026-10-18; `js/53-talismanes.js`): `talismanDe(t, campo)`, `talEspejito(d, entro)` y `talRelicario(d, mato)` (los llama
+  `dueloAplicarDano`, js/13, después del Espejo) y `talismanUnaVez(d, ef)` (`dueloAplicarEfectoBase`: el efecto «🔮 …» de un talismán entra una vez por
+  turno de quien usó la varita, `talismanUsados`).
+

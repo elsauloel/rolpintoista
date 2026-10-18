@@ -117,6 +117,8 @@ Segunda oportunidad, Amortiguador, Cáscara, Anclaje, Piedra de afilar arcana, C
 
 **Cargados al catálogo (2026-10-18):** 34 ítems `tal-*` en `comun/catalogo.js` (con `orbe` y `talisman`: no parrean, van al Bazar arcano); calidades y precios con el OK del dueño. Lo especial no automatizado dice ✋ A mano; la Calavera ya funciona sola. Las Piedras, las Brasas y los Estandartes van uno por elemento o versión.
 
+**Automatizados (2026-10-18):** la Calavera (aura y Miedo, vtt-hexgrid/js/52), el Espejito y el Relicario (en el duelo, vtt-hexgrid/js/53), la Cabeza reducida y el Muñeco vudú (el efecto viaja con cada varita, `Combatiente.efectosVarita`, y entra una vez por turno, js/53) y la Estatuilla del Gauchito (`Combatiente.conGauchito`, en las tiradas de un personaje; un creep, a mano). Más los que solo dan stats fijos. Falta: Bola de cristal, Brújula, Ekeko, Sahumerio, Campana, Bezoar, Matelisto, Estandartes, Contrahechizo, Botella, anillos elementales (+2 al daño) y Anillo de tormenta.
+
 **Para cargarlos al catálogo (2026-10-18, visto probando la Calavera):** un talismán va en la otra mano, pero **no sirve para parrear**. Probando
 con una Calavera armada como escudo de una mano, el duelo la ofrecía como Parry. Al cargarlos, marcarlos como los orbes (`orbe: true`) o con
 una marca propia de talismán que `Combatiente.piezasParaParry` y `armasYEscudosParaParry` dejen afuera.

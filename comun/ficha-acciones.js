@@ -724,15 +724,8 @@ const FichaAcciones = (() => {
   function orbesAlUsar(S, item, it, ui){
     let doble = false;
     (S.inventario || []).filter(o => o && o.equipado && o.orbe && !FichaCalculo.itemRoto(o)).forEach(o => {
-      const k = 'orbe:' + o.id;
-      if(o.orbeResguardo && !num((S.ataquesArma || {})[k])){
-        S.ataquesArma = {...(S.ataquesArma || {}), [k]: 1};
-        S.efectos = Array.isArray(S.efectos) ? S.efectos : [];
-        const r = Combatiente.agregarEstado(S.efectos, estadoDeSpec({nombre: 'Vida extra', turnos: 1, escudoMagico: num(o.orbeResguardo)}, ui.presets || []));
-        ui.mesaHabilidad(o.nombre, r.ok ? `Vida extra ${fmt(num(o.orbeResguardo))} hasta tu próximo turno.` : `No entra la Vida extra (${r.motivo || 'bloqueado'}).`);
-      }
-      // El Orbe salvaje y el del custodio (2026-10-18, dueño) ya no van al usar la varita: el salvaje, con cualquier daño especial; el custodio,
-      // al ganar una tirada de PdG.Esp. Los hace el mapa (vtt-hexgrid/js/53).
+      // El Orbe salvaje, el del custodio y el de resguardo (2026-10-18, dueño) ya no van al usar la varita: el salvaje, con cualquier daño
+      // especial; el custodio y el de resguardo, al ganar una tirada de PdG.Esp. Los hace el mapa (vtt-hexgrid/js/53).
     });
     return doble;
   }

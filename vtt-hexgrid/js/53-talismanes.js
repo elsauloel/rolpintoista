@@ -8,6 +8,8 @@
      mismo daño que entró le entra también a quien atacó (`talSalvajeTirar` antes del daño, `talSalvajePropio` después).
    · Orbe del custodio (`orbeCustodio`; 2026-10-18, dueño): cada vez que quien lo lleva gana una tirada de PdG.Esp, Vida extra N a un aliado al
      lado (`talCustodio`, desde el hook `pdgEspGanado` del duelo, en la pantalla de quien tiró; js/26 orbeCustodioMapa).
+   · Orbe de resguardo (`orbeResguardo`; 2026-10-18, dueño: «al ganar una tirada de probabilidad de golpe especial»): Vida extra N para quien lo
+     lleva hasta su próximo turno, una vez por turno (`talResguardo`, el mismo hook).
    Quién lo lleva: un personaje lo publica en su resumen (`espejito`, `relicario`, `orbeCustodio`, `orbeSalvaje`, `alDanoEsp`); un creep, en su
    equipo (CreepCalculo.talisman, solo el GM). */
 function talismanDe(t, campo){
@@ -108,4 +110,26 @@ function talCustodio(d){
   if(!(n > 0)) return;
   orbeCustodioMapa({fichaId: ta.fichaId, tipo: ta.tipo === 'creep' ? 'creep' : 'pj', n, orbe: nombre, quien: d.atacante.nombre});
 }
-
+// El Orbe de resguardo: ganó una tirada de PdG.Esp → Vida extra N para sí, una vez por turno (por ronda).
+async function talResguardo(d){
+  const ta = tokens.get(d.atacante.tokenId), eq = talEquipoDe(ta);
+  if(!eq) return;
+  let n = 0, nombre = 'Orbe de resguardo';
+  if(eq.creep){ const o = (eq.creep.equipo || []).filter(i => i && num(i.orbeResguardo) > 0).sort((a, b) => num(b.orbeResguardo) - num(a.orbeResguardo))[0]; if(o){ n = num(o.orbeResguardo); nombre = o.nombre; } }
+  else n = num(eq.resumen.orbeResguardo);
+  if(!(n > 0)) return;
+  const k = `resguardo|${d.atacante.tokenId}@${Math.round(num(mantenimientoNumero))}`;
+  if(talismanUsados.has(k)) return;
+  talismanUsados.add(k);
+  const spec = {nombre: 'Vida extra', turnos: 1, escudoMagico: n};
+  try{
+    if(ta.tipo === 'creep') await modificarCreep(ta.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
+    else await EstadosAplicar.encolarPj({fichaId: ta.fichaId, duenoUid: ta.duenoUid, spec, origen: `${d.atacante.nombre} · ${nombre}`});
+    try{ mesaLinea(`🔮 ${nombre}: ${d.atacante.nombre} recibe Vida extra ${n} hasta su próximo turno`, 'recordatorio'); }catch(err){}
+  }catch(err){ console.error('El Orbe de resguardo:', err); }
+}
+// Lo que pasa al ganar una tirada de PdG.Esp (el hook del duelo, en la pantalla de quien tiró).
+function talPdgEspGanado(d){
+  talCustodio(d);
+  talResguardo(d).catch(err => console.error('El Orbe de resguardo:', err));
+}

@@ -128,9 +128,9 @@ una marca propia de talismán que `Combatiente.piezasParaParry` y `armasYEscudos
 - **Orbe salvaje (Común):** con cualquier daño especial (varita, habilidad, flecha elemental), no solo con varita. d6: 1 te hace 1 de daño a vos; 6, doble.
 - **Orbe salvaje domado (Buena):** igual de amplio. d6: 1 te hace 1 de daño a vos; 5 nada; **6, el triple**.
 - **Orbe del custodio:** se activa cuando quien lo lleva gana una tirada de PdG.Esp (su Vida extra 2 a un aliado al lado). Falta confirmar si sigue siendo una vez por turno.
-- **Orbe de resguardo:** sin decidir (propuesta: al usar algo especial —varita, báculo o habilidad con SP—, aunque falle).
+- **Orbe de resguardo (decidido):** al ganar una tirada de PdG.Esp, una vez por turno (dueño: «usar algo especial» abarca los skills de Warrior, que no tienen nada que ver con el caster; el límite tiene que ser claro).
 - **Botella con un diablito:** se rehace — el dueño quiere el diablillo impredecible pero sin una tirada extra que trabe el juego.
 - **Cabeza reducida y Muñeco vudú (decidido):** con el daño especial, una vez por turno. **Maldito en un creep** (mientras no gaste SP): cada habilidad que usa le saca tanta vida como su cooldown.
 - **Orbe salvaje (decidido):** con 1, el daño que le hacés al rival te lo hacés también a vos (los dos).
-- **Programado (2026-10-18):** el salvaje, el domado, el custodio, la Cabeza, el Vudú y el Maldito de los creeps (vtt-hexgrid/js/53, comun/creep-acciones.js). Siguen con la varita: el Orbe de resguardo (sin decidir).
+- **Programado (2026-10-18):** el salvaje, el domado, el custodio, la Cabeza, el Vudú y el Maldito de los creeps (vtt-hexgrid/js/53, comun/creep-acciones.js). El Orbe de resguardo también (al ganar el PdG.Esp).
 

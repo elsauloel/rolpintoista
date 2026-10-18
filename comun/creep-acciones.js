@@ -495,13 +495,8 @@ const CreepAcciones = (() => {
     if(propio && propio.nombre) EstadosAplicar.aplicarACreep(sc, structuredClone(propio));
     const avisos = [];
     (sc.equipo || []).filter(o => o && o.orbe).forEach(o => {
-      const k = 'orbe:' + o.id;
-      if(o.orbeResguardo && !num(sc.usosEspecial[k])){
-        sc.usosEspecial[k] = 1;
-        const r = EstadosAplicar.aplicarACreep(sc, {nombre: 'Vida extra', turnos: 1, escudoMagico: num(o.orbeResguardo)});
-        avisos.push(`${o.nombre}: ${r.ok ? `Vida extra ${fmt(num(o.orbeResguardo))} hasta su próximo turno` : `no entra la Vida extra (${r.motivo || 'bloqueado'})`}`);
-      }
-      // El Orbe salvaje y el del custodio (2026-10-18): ya no al usar la varita — el mapa (vtt-hexgrid/js/53), con el daño especial y el PdG.Esp ganado.
+      // El Orbe salvaje, el del custodio y el de resguardo (2026-10-18): ya no al usar la varita — el mapa (vtt-hexgrid/js/53), con el daño
+      // especial y el PdG.Esp ganado.
     });
     if(vida) avisos.push(`🩸 cuesta vida: −${fmt(vida)} HP (el ${fmt(num(it.especial.spVidaPct))} % de su vida máxima)`);
     p.hab = h; p.avisosOrbe = avisos; p.espera = c.espera;

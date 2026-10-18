@@ -196,4 +196,9 @@ De a uno, de nivel más bajo a más alto; primero el ataque básico y después c
   Ya no para (una varita y un orbe no parrean; con Parry 1d4 igual le convenía esquivar). El báculo queda en el catálogo con los cambios.
   **Granizo de cristal**: 3 No2 fijos (antes «lo de un ataque»: 5 con el bastón) y daño fijo 1d6+2 (no suma Ef.Esp), dueño. Granizo y Cristal
   protector, en la biblioteca como auditadas.
+- Capataz kobold (`6v8wva5`, jefe, cerrado): + pasivas **Puntería** (+1 PdG: 1d6+1 → 1d8) y **Robustez** (vida 55 → 60). La Grapa del cinturón
+  pasó a la habilidad **Trago de grapa** (1 No2, cooldown 4: «Grapa del capataz» 3 turnos) y la Grapa da ahora **+2 PdG** y +2 de daño (también el
+  ítem del catálogo); deja siempre 3 botellas de botín. Nueva pasiva **Bronca acumulada** (mecánica nueva, vtt-hexgrid/js/51): cada golpe que le
+  saca vida suma 1 (anunciado); al 5.º estalla: onda de 2 casillas, su PdG contra la Evasión de cada rival, 3d10+11 y Sentado. ¡A laburar!, Golpe
+  al piso y Trago de grapa, en la biblioteca como auditadas.
 

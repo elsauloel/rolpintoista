@@ -57,7 +57,7 @@
 > - [ ] **🌿 Formas orgánicas para las superficies y zonas (2026-10-17, dueño):** «que no sea estrictamente hexagonal… que haga referencia al
 >   elemento… si es muy complicado, lo dejamos como está». Hecho para el **hielo** (bordes de cristal quebrados) y el **charco** (manchón
 >   ondulado), vtt-hexgrid/js/50. Falta el resto: el humo o las nubes con borde «piloso», el fuego, el veneno…
-> - [ ] **✋ El mundo de los talismanes y demás objetos especiales para la mano libre (2026-10-17, dueño: «después de terminar de auditar
+> - [x] **✋ El mundo de los talismanes y demás objetos especiales para la mano libre (hecho 2026-10-18: 34 en el catálogo, todos automatizados salvo la niebla de la Brújula; hoja: docs/talismanes.md; falta verlos en el mapa: docs/pruebas-en-el-mapa.md) (2026-10-17, dueño: «después de terminar de auditar
 >   los kobolds, quiero pasar al mundo de los talismanes y demás objetos especiales para la mano libre»):** lo siguiente después de cerrar
 >   los kobolds (quedan el tunelero, el chamán del cristal, el capataz y el coraza de cristal).
 > - [ ] **🪤 Aprender trampas: ver una, copiarla y saber armarla (2026-10-17, dueño; también en 🛠 Herramientas de diseño → A desarrollar):**

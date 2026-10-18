@@ -9,6 +9,12 @@
 > capturas. Al probar algo: pasarlo a «Probado» con fecha, qué se vio y si hubo que arreglar algo.
 
 ## Pendientes
+- [ ] **🔮 Talismanes que todavía no vi en el mapa** (2026-10-18; probados ya: Calavera, Cabeza reducida, Espejito, Relicario, Gauchito, Orbe salvaje,
+  Orbe del custodio, Botella, anillos elementales, Campana, Matelisto, Estandartes y Cruz de plata): **Piedra bezoar** (un Veneno ×3 entra ×2),
+  **Bola de cristal** (un creep en sigilo a la vista → «🔮 Bola de cristal» en el inicio del turno), **Sahumerio** (al empezar el turno, 1 en 4 de
+  sacarse un estado malo), **Ekeko** (+20 % en el reparto al finalizar el combate), **Muñeco vudú** (Debilitado con el daño especial, una vez por
+  turno), **Orbe de resguardo** (al ganar un PdG.Esp, una vez por turno), **Anillo de tormenta** (el salto del rayo a 5) y **Brújula** (el primer
+  casillero gratis).
 - [ ] **🃏 Wildcards en el duelo y en el mapa de un jugador** (2026-10-15): desde una cuenta de jugador con wildcards, (1) la cartita 🃏 arriba, en la
   fila de los lentes, girando; (2) en un duelo, después de tirar PdG/Evasión, aparecen «🃏 Wildcard» y «🪙 Moneda» lado a lado (o solo la carta) y
   reabrir con la carta descuenta 1. (Probado ya: el descanso del GM y la ventana de la ficha, ver «Probado».)

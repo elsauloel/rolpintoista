@@ -184,4 +184,59 @@ function talMasDanoElem(d, el){
   if(n > 0) try{ mesaLinea(`💍 El anillo de ${d.atacante.nombre}: +${n} al daño de ${Combatiente.ELEMENTOS && Combatiente.ELEMENTOS[el] ? Combatiente.ELEMENTOS[el].nombre || el : el}`, 'recordatorio'); }catch(err){}
   return n;
 }
+/* 🔔 La Campana de bronce y 🧉 el Matelisto Taragüí (2026-10-18): el botón de la Botonera (data-talisman). La Campana: una vez por combate (la
+   marca `S.meta.campanaUsada`, que se libera al volver a narrativo, js/25), 1 No2; a quien la toca y a sus aliados a 2 o menos les saca Pajaritos
+   y Confusión. El Matelisto: una vez por ronda (`S.meta.mateRonda`), en su turno (fuera de turno avisa y deja seguir): un aliado al lado recibe
+   2 No2 (hasta su máximo). A los personajes les llega por aviso (comun/recibidos.js); a los creeps, directo. */
+const TAL_CAMPANA_SACA = ['Pajaritos', 'Confusión'];
+async function talismanAccion(fichaId, itemId){
+  const S = bn && bn.fichaId === fichaId ? bn.S : null;
+  const it = S && (S.inventario || []).find(i => i && i.id === itemId);
+  const t = [...tokens.values()].find(x => x && x.fichaId === fichaId && x.tipo === 'pj');
+  if(!S || !it){ toast('No se encontró el talismán'); return; }
+  if(!t){ toast(`${it.nombre}: tu token no está en este mapa`); return; }
+  const quien = nombreDe(t);
+  if(it.accionTalisman === 'campana'){
+    if(S.meta && S.meta.campanaUsada && !(await Confirmar.preguntar(`${it.nombre}: ya la tocaste en este combate (es una vez por combate). ¿Tocarla igual? Lo decide la mesa.`, {titulo: 'La campana', icono: '🔔'}))) return;
+    if(num(S.nitros) < 1 && !(await Confirmar.preguntar(`${it.nombre} cuesta 1 No2 y no te quedan. ¿Tocarla igual?`, {titulo: 'La campana', icono: '🔔'}))) return;
+    await editarPersonajeMapa(fichaId, S2 => { S2.nitros = Math.max(0, num(S2.nitros) - 1); S2.meta = {...(S2.meta || {}), campanaUsada: true}; return ['nitros', 'general']; });
+    const lista = [{t}, ...aliadosAlLado(t, 2)];
+    const sacados = [];
+    for(const {t: x} of lista){
+      const est = typeof confusionEstadosDe === 'function' ? confusionEstadosDe(x) : [];
+      const tiene = TAL_CAMPANA_SACA.filter(n => est.some(e => e && e.activo !== false && e.nombre === n));
+      if(!tiene.length) continue;
+      try{
+        if(x.tipo === 'creep') await modificarCreep(x.fichaId, sc => { sc.estados = (sc.estados || []).filter(e => !(e && TAL_CAMPANA_SACA.includes(e.nombre))); return true; });
+        else for(const n of tiene) await EstadosAplicar.encolarPj({fichaId: x.fichaId, duenoUid: x.duenoUid, spec: {nombre: 'Acortar estado', estado: n, stacks: 20}, origen: `${quien} · ${it.nombre}`});
+        sacados.push(`${nombreDe(x)} (${tiene.join(', ')})`);
+      }catch(err){ console.error('La campana:', err); sacados.push(`${nombreDe(x)}: a mano`); }
+    }
+    const txt = sacados.length ? `despierta a ${sacados.join(' · ')}` : 'nadie a 2 casillas tenía Pajaritos ni Confusión';
+    try{ mesaLinea(`🔔 ${quien} toca la ${it.nombre}: ${txt}`, 'recordatorio'); }catch(err){}
+    try{ momentoAbrir({tipo: 'zona-renueva', icono: '🔔', titulo: `${quien} toca la campana`, estado: 'listo', resultado: txt, datos: {}}); }catch(err){}
+    return;
+  }
+  if(it.accionTalisman === 'mate'){
+    const ronda = typeof window.rondaDeCombate === 'function' ? window.rondaDeCombate() : '';
+    if(S.meta && S.meta.mateRonda === ronda && !(await Confirmar.preguntar(`${it.nombre}: ya pasaste el mate en esta ronda. ¿Pasarlo igual? Lo decide la mesa.`, {titulo: 'La ronda de mate', icono: '🧉'}))) return;
+    const tid = idDeToken(t);
+    if(modoMapa === 'combate' && typeof esSuTurno === 'function' && !esSuTurno(tid) && !(await Confirmar.preguntar(`El mate se pasa en tu turno, y no es tu turno. ¿Pasarlo igual?`, {titulo: 'La ronda de mate', icono: '🧉'}))) return;
+    const lista = aliadosAlLado(t, 1);
+    if(!lista.length){ toast('🧉 No hay ningún aliado al lado tuyo para pasarle el mate'); return; }
+    const el = lista.length === 1 ? lista[0] : await new Promise(res => {
+      let listo = false;
+      const fin = x => { if(listo) return; listo = true; AvisoCombate.cerrar(); res(x); };
+      AvisoCombate.mostrar({icono: '🧉', titulo: `${it.nombre}: ¿a quién le pasás el mate?`, texto: 'Recupera 2 No2.',
+        botones: [...lista.map(a => ({texto: nombreDe(a.t), alClic: () => fin(a)})), {texto: 'A nadie', sec: true, alClic: () => fin(null)}], alCerrar: () => fin(null)});
+    });
+    if(!el) return;
+    await editarPersonajeMapa(fichaId, S2 => { S2.meta = {...(S2.meta || {}), mateRonda: ronda}; return ['general']; });
+    try{
+      if(el.t.tipo === 'creep') await modificarCreep(el.t.fichaId, sc => { sc.nitros = Math.min(num(CreepCalculo.nitrosMax ? CreepCalculo.nitrosMax(sc) : sc.nitros + 2), num(sc.nitros) + 2); return true; });
+      else{ const f = fichasPub.get(String(el.t.fichaId).split(SEP_INVOCACION)[0]); await EstadosAplicar.encolarPj({fichaId: el.t.fichaId, duenoUid: (f && f.duenoUid) || el.t.duenoUid, spec: {nombre: 'Gana No2', stacks: 2}, origen: `${quien} · ${it.nombre}`}); }
+      try{ mesaLinea(`🧉 ${quien} le pasa el mate a ${nombreDe(el.t)}: recupera 2 No2`, 'recordatorio'); }catch(err){}
+    }catch(err){ console.error('El mate:', err); toast('🧉 No se pudo pasar el mate: a mano'); }
+  }
+}
 

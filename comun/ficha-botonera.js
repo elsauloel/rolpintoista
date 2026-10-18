@@ -310,6 +310,13 @@ const FichaBotonera = (() => {
       html += `<div class="botonera-caja" style="margin-bottom:8px"><button class="ejecutar-btn${dentro ? ' usada' : ''}${falta ? ' sin-recursos' : ''}" data-sigilo="1" style="width:100%" ${falta ? 'aria-disabled="true" title="No te alcanzan los Nitros"' : ''}>🕶 ${dentro ? 'Salir del sigilo' : `Entrar en sigilo · ${fmt(num(IT2().nitrosSigilo))} No2`}</button></div>`;
     }
 
+    // 🔮 Los talismanes con un botón (2026-10-18): la Campana de bronce y el Matelisto Taragüí. Los hace el mapa (vtt-hexgrid/js/53).
+    const TAL_ACCION = {campana: {icono: '🔔', texto: 'Tocar la campana', costo: '1 No2 · una vez por combate'}, mate: {icono: '🧉', texto: 'Pasar el mate', costo: 'una vez por ronda'}};
+    (S.inventario || []).filter(i => i && i.equipado && TAL_ACCION[i.accionTalisman] && !FichaCalculo.itemRoto(i)).forEach(i => {
+      const t = TAL_ACCION[i.accionTalisman];
+      html += `<div class="botonera-caja" style="margin-bottom:8px"><button type="button" class="ejecutar-btn" data-talisman="${esc(i.id)}" style="width:100%" title="${esc(i.detalle || '')}">${t.icono} ${esc(t.texto)} <span style="opacity:.75;font-size:11px">· ${esc(t.costo)}</span></button></div>`;
+    });
+
     const especiales = typeof FichaAcciones !== 'undefined' && FichaAcciones.armasEspeciales ? FichaAcciones.armasEspeciales(S) : [];   // ✨ armas especiales equipadas
     html += `<div class="botonera-grid botonera-grid-even">
     <div class="botonera-caja">

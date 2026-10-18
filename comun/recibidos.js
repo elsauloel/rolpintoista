@@ -63,6 +63,12 @@ const Recibidos = (() => {
       return {inv};
     }
     if(sp.nombre === 'Revivir'){ ui.toast(`${origen ? origen + ' → ' : ''}${inv.nombre}: revivir una invocación va a mano`); return {}; }
+    if(sp.nombre === 'Gana No2'){   // 🧉 el Matelisto (2026-10-18): hasta su máximo
+      const antes = num(inv.nitros), max = typeof InvCalculo !== 'undefined' ? InvCalculo.nitrosMax(inv) : antes + num(sp.stacks);
+      inv.nitros = Math.max(antes, Math.min(max, antes + Math.max(0, Math.round(num(sp.stacks)))));
+      ui.toast(`${origen ? origen + ' → ' : ''}${inv.nombre}: +${fmt(inv.nitros - antes)} No2`);
+      return {inv};
+    }
     if(sp.nombre === 'Pierde No2'){   // Sonic Boom (2026-10-02): a una invocación
       const n = Math.max(0, Math.round(num(sp.stacks))), antes = num(inv.nitros);
       inv.nitros = Math.max(0, antes - n);

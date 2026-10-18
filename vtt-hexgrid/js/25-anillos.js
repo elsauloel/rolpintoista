@@ -29,7 +29,7 @@ function anillosDatos(t){
   const r = (fichasPub.get(t.fichaId) || {}).resumen || {};
   const v = st => Math.max(0, num(r[st]));
   const rota = (r.estados || []).filter(e => e && e.armaduraRota).reduce((a, e) => a + Math.max(1, num(e.stacks) || 1), 0);
-  return {creep: false, v, dados: !!r.anillosDados, absorbe: !!r.absorbeUsada, rota, conAnillo: (r.estados || []).some(e => e && e.anillo), cargas: !!r.cargasUsadas};
+  return {creep: false, v, dados: !!r.anillosDados, campana: !!r.campanaUsada, absorbe: !!r.absorbeUsada, rota, conAnillo: (r.estados || []).some(e => e && e.anillo), cargas: !!r.cargasUsadas};
 }
 const anillosTiene = d => d && (d.v('cascara') > 0 || d.v('cambiante') > 0 || Object.keys(ANILLO_ATRIB).some(k => d.v(k) > 0));
 // Cambia los datos del token (personaje o creep) con `fn(lista de estados, objeto)` → bool (hubo cambio).
@@ -81,10 +81,11 @@ async function anillosTerminar(id, t){
   try{
     await anillosCambiar(t, (lista, obj) => {
       const cargas = !!(obj.cargasEsp && Object.keys(obj.cargasEsp).length);
-      const hay = lista.some(e => e && e.anillo) || obj.anillosDados || obj.absorbeUsada || obj.primeraSangreUsada || cargas;
+      const hay = lista.some(e => e && e.anillo) || obj.anillosDados || obj.absorbeUsada || obj.primeraSangreUsada || cargas || !!(obj.meta && obj.meta.campanaUsada);
       if(!hay) return false;
       for(let i = lista.length - 1; i >= 0; i--) if(lista[i] && lista[i].anillo) lista.splice(i, 1);
       obj.anillosDados = false; obj.absorbeUsada = false; obj.primeraSangreUsada = false;
+      if(obj.meta && obj.meta.campanaUsada) obj.meta = {...obj.meta, campanaUsada: false};   // 🔔 la Campana de bronce, de nuevo (js/53)
       if(cargas) obj.cargasEsp = {};   // las varitas de cargas se vuelven a llenar
       return true;
     });
@@ -122,7 +123,7 @@ setInterval(() => {
     const antes = anillosRota.get(id);
     anillosRota.set(id, d.rota);
     if(modo !== 'combate'){
-      if(d.dados || d.absorbe || d.conAnillo || d.cargas) anillosTerminar(id, t);   // (y las cargas de las varitas, 2026-10-08)
+      if(d.dados || d.absorbe || d.conAnillo || d.cargas || d.campana) anillosTerminar(id, t);   // (y las cargas de las varitas, 2026-10-08)
       return;
     }
     if(!d.dados && anillosTiene(d)) anillosEmpezar(id, t, d);

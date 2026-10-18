@@ -209,3 +209,9 @@ De a uno, de nivel más bajo a más alto; primero el ataque básico y después c
   contra 9; detectar con su Ef.Esp; 2 No2, cd 3) y **Esporas curativas** (aliado a 5 o menos, cura 2d4+2; 2 No2, cd 2). Las tres, en la biblioteca
   como auditadas. **Los kobolds quedan auditados.**
 
+## Talismanes para los casters (2026-10-18, dueño, de a uno)
+- Kobold farolero: sin cambios (las dos manos ocupadas con el farol y la Varita del aceite; se ofreció el Anillo de brasa y el dueño lo dejó así).
+- Chamán goblin (`pdw2b5i`): el **Machete** (Tipo 6, Rompe armadura ×3 50 %) → **Uñas** (natural, Tipo 6, para emergencias) y en esa mano el
+  **Muñeco vudú** (PdG.Esp +1 → 13; la primera vez en cada turno que hace daño especial, Debilitado 1 turno). Se va el Rompe armadura del machete
+  (casi nunca peleaba cuerpo a cuerpo: Destreza 5). De paso se arregló que GM Tools perdía la mecánica de un talismán al equipárselo a un creep.
+

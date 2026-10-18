@@ -1343,6 +1343,8 @@ const recibidosPend = {estados: [], recompensas: []}, recibidosEnCurso = new Set
 let recibidosCola = Promise.resolve();
 function recibidosEscuchar(){
   ['estados', 'recompensas'].forEach(col => Recibidos.escuchar(col, docs => { recibidosPend[col] = docs; recibidosRevisar(); }));
+  // Cada 5 s otra vez (2026-10-18): si cambió quién maneja a un personaje (el GM tomó el control), sus avisos pendientes se aplican sin esperar uno nuevo.
+  setInterval(() => { if((recibidosPend.estados || []).length || (recibidosPend.recompensas || []).length) recibidosRevisar(); }, 5000);
   Intercambio.iniciar(intercambioHostMapa);   // 🤝 lo que le ofrecen a un personaje y lo que él ofreció (comun/intercambio.js)
 }
 /* 🤝 Pasar cosas entre personajes y 📦 el baúl común (2026-10-05, P157): la regla y las ventanas en comun/intercambio.js; acá, cómo el mapa

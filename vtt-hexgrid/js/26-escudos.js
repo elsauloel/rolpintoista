@@ -9,12 +9,13 @@
 
 const bandoDe = x => x.tipo === 'creep' ? 'creep' : 'pj';
 // Los aliados AL LADO de un token (mismo bando: creeps con creeps; personajes e invocaciones entre sí) → [{id, t}].
-function aliadosAlLado(t){
+// `hasta`: la distancia máxima (1 = al lado; el Orbe del custodio usa el Rango de quien lo lleva, 2026-10-18).
+function aliadosAlLado(t, hasta = 1){
   if(!t || t.col === undefined || t.fila === undefined) return [];
   const out = [];
   tokens.forEach((x, id) => {
     if(!x || x === t || !x.fichaId || x.fichaId === t.fichaId || bandoDe(x) !== bandoDe(t) || x.col === undefined) return;
-    if(distanciaHex({col: t.col, fila: t.fila}, {col: x.col, fila: x.fila}) > 1) return;
+    if(distanciaHex({col: t.col, fila: t.fila}, {col: x.col, fila: x.fila}) > hasta) return;
     out.push({id, t: x});
   });
   return out;
@@ -71,12 +72,13 @@ async function dueloEmpujon(d){
 async function orbeCustodioMapa(o){
   const origen = [...tokens.values()].find(t => t && t.fichaId === o.fichaId && bandoDe(t) === o.tipo);
   if(!origen){ mesaLinea(`🔮 ${o.orbe}: el token no está en este mapa — la Vida extra ${o.n} para un aliado al lado, a mano`); return; }
-  // Quien lo lleva también puede quedarse la Vida extra (dueño, 2026-10-18): primero él, después los aliados al lado.
-  const lista = [{t: origen, yo: true}, ...aliadosAlLado(origen)];
+  // Quien lo lleva también puede quedarse la Vida extra, y vale cualquier aliado dentro de su Rango (dueño, 2026-10-18).
+  const rng = Math.max(1, Math.round(num((rangoDeToken(origen) || {}).rng)) || 1);
+  const lista = [{t: origen, yo: true}, ...aliadosAlLado(origen, rng)];
   const el = lista.length === 1 ? lista[0] : await new Promise(res => {
     let listo = false;
     const fin = x => { if(listo) return; listo = true; AvisoCombate.cerrar(); res(x); };
-    AvisoCombate.mostrar({icono: '🔮', titulo: `${o.orbe}: ¿a quién cubrís?`, texto: `Vida extra ${o.n} hasta su próximo turno: para vos o para un aliado al lado.`,
+    AvisoCombate.mostrar({icono: '🔮', titulo: `${o.orbe}: ¿a quién cubrís?`, texto: `Vida extra ${o.n} hasta su próximo turno: para vos o para un aliado dentro de tu Rango (${rng}).`,
       botones: [...lista.map(a => ({texto: a.yo ? `${nombreDe(a.t)} (vos)` : nombreDe(a.t), alClic: () => fin(a)})), {texto: 'A nadie', sec: true, alClic: () => fin(null)}], alCerrar: () => fin(null)});
   });
   if(!el) return;

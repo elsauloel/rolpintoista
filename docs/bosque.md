@@ -189,7 +189,7 @@ De a uno, de nivel más bajo a más alto; primero el ataque básico y después c
   resto, igual. Las dos habilidades, en la biblioteca como auditadas.
 - Chamán del cristal (`rjj6rhe`, en curso): tenía el Bastón de monje (2 manos) y además la Varita del relámpago → el **Báculo de escarcha**
   (2 manos) y **Uñas** (arma natural de emergencia, Tipo 6). El báculo cambió en el catálogo (dueño): ¼ del Ef.Esp **para arriba** (los seis
-  báculos) y **1 de Escarcha por cada 5 de daño**, que dura **1 turno** (antes 25 %, 2 turnos). Con Ef.Esp 14 pega 1d6+4 de hielo: 82 % a Bizzante, 88 % a Petro, 97 % a Larry,
+  báculos) y **1 de Escarcha por cada 5 de daño**, que dura **1 turno** (antes 25 %, 2 turnos); cuesta **2 No2** el primer uso del turno y 3 el segundo (antes 1 y 2: «muy barato»; en Larry era 16 de daño por turno). Con Ef.Esp 14 pega 1d6+4 de hielo: 82 % a Bizzante, 88 % a Petro, 97 % a Larry,
   7,5 cuando pega y siempre deja Escarcha (2 si saca 10). De paso: un creep ahora para con un báculo de sus manos (y no con un orbe).
   El granizo cuesta «lo de un ataque» = 3 No2 con las Uñas (antes 5 con el bastón); falta decidir si costo fijo y si suma Ef.Esp.
 

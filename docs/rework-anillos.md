@@ -80,6 +80,10 @@ pasa a Buena (150–200).
 |---|---|
 | Anillo de armadura indestructible | Archivado (P196): absorbe la primera Armadura rota de cada combate. Falta decidir si se baja o se saca. |
 
+## Decidido (dueño, 2026-10-18: «de las respuestas 1 a 5 voy a seguir todas tus sugerencias»)
+
+Aplicado en `comun/catalogo.js` y `comun/generador-tiendas.js`: los precios de la tabla (80–120), la Calma a Buena (170), Daño +1 Común a 120, Reserva Ampliada a SP máximo +3 (80) y el Bazar arcano con 10 % de anillos (antes 22). Quedan 34 Comunes y 1 de Buena. Siguiente: la lluvia de ideas de anillos nuevos (`ideas-anillos.md`).
+
 ## Preguntas para el dueño (2026-10-18)
 
 1. **Precio:** ¿subimos los Comunes a 80–120 como en la tabla (por encima de un casco Común)?

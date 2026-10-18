@@ -79,7 +79,7 @@ const GeneradorTiendas = (() => {
       receta: {distancia: 24, arma: 16, torso: 13, cabeza: 6, manos: 6, piernas: 9, pies: 9, cinturon: 9, mochila: 8, carcaj: 5}, familias: [4],
       minimos: {mochila: 1, cinturon: 1}, minimosDesde: 'pueblito'},   // siempre una mochila y un cinturón, desde pueblito (dueño, 2026-10-08)
     bazar: {label: 'Bazar arcano', icono: '✨', detalle: 'lo mágico: consumibles, varitas y báculos, orbes, anillos y piezas de caster',
-      receta: {especial: 34, orbe: 13, anillo: 22, torso: 10, cabeza: 8, manos: 7, cinturon: 6}, minimos: {especial: 2}},
+      receta: {especial: 40, orbe: 16, anillo: 10, torso: 12, cabeza: 9, manos: 7, cinturon: 6}, minimos: {especial: 2}},   // anillos: escasos (P114; 22 → 10, 2026-10-18)
   };
   const SECCIONES_ORDEN = ['herreria', 'talabarteria', 'bazar'];
   // Lo que suma Destreza/Agilidad (la Talabartería) y lo que suma Fuerza/Constitución (la Herrería), para las piezas que podrían ir en las dos.

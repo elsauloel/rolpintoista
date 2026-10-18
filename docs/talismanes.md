@@ -1,6 +1,6 @@
 # Talismanes (la otra mano) — ideas para más adelante
 
-> **Estado (2026-10-18):** en curso. El dueño eligió de la lluvia de ideas (ver «Elegidos», abajo); faltan 5 preguntas (P204–P208) y los
+> **Estado (2026-10-18):** en curso. El dueño eligió de la lluvia de ideas (ver «Elegidos», abajo); faltan 4 preguntas (P205–P208; la P204 ya está) y los
 > números por calidad. Antes (2026-10-07): en espera. El dueño: «muchas ideas me gustan, pero requieren cierta atención y ajuste; vamos de menos a más».
 > Se retoma cuando el dueño diga «sigamos con los talismanes». Mientras tanto, solo se consolidan los **orbes** que ya existen (Defensa
 > especial + resistencias elementales). Ver `docs/rework-defensa.md` («La otra mano»).
@@ -85,6 +85,7 @@ Lo que el dueño marcó de la lista, con sus cambios. Lo que no nombró queda af
 | Talismán | Qué hace |
 |---|---|
 | Farol | Luz portada +2 · Visión +1 |
+| Calavera con vela (P204) | Luz portada +2 · Visión +1 · Defensa especial +2 · quien te elige de objetivo de un ataque o una habilidad (también con varitas) tira una moneda: si sale, tira Res.Mt contra tu Ef.Esp o queda con Miedo 1 turno |
 | Bola de cristal | Te avisa que hay algo oculto dentro de tu campo de visión (un rival en sigilo, una trampa escondida), sin decir dónde ni revelarlo · Percepción +1 |
 | Brújula del baqueano | Iniciativa +1 · la niebla no te tapa la vista (ves a través de una nube de niebla; no la niebla de guerra) |
 | Feto de llama (ofrenda a la Pachamama) | Regeneración de vida +1 · Res. tóxico +1 |
@@ -106,7 +107,6 @@ Lo que el dueño marcó de la lista, con sus cambios. Lo que no nombró queda af
 **Con preguntas (P204–P208 en `preguntas-abiertas.md`)**
 | Talismán | Lo que dijo el dueño |
 |---|---|
-| Calavera con vela (P204) | «me gusta, pero provocar miedo de forma constante y pasiva me parece medio broken. busquémosle la vuelta» |
 | Estampita del Gauchito Gil (P205) | «¿Afortunado para sólo una tirada? ¿O durante N turnos?» · Defensa especial +1 |
 | Muñeco vudú (P206) | «Definir mecánica, turnos, tiradas. Podría ser que siempre que uses la varita contra un rival, quede marcado 1 t» |
 | Atrapasueños (P207) | «Podría ser, habría que imaginar sueño» (el estado Sueño no existe todavía) |

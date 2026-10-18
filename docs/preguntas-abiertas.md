@@ -1029,7 +1029,7 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   el daño de rayo ×1,5 (para arriba, `AGUA_MULT_RAYO`) y la Parálisis con el doble de chance, a quien está parado en el agua
   (vtt-hexgrid/js/50; comun/duelo.js `aguaParalisis`). Si en la mesa se siente poco, subir a ×2.
 
-- **P204. La Calavera con vela (talismán) — 2026-10-18.** El dueño: «me gusta, pero provocar miedo de forma constante y pasiva me parece medio
+- ✅ **P204. La Calavera con vela (talismán) — 2026-10-18; decidida el mismo día.** **Decidido (dueño):** Luz portada +2, Visión +1, Defensa especial +2, y «siempre que te hagan objetivo de un ataque o habilidad, esto incluye los ataques con varitas, tienen que tirar un dado y tienen 50 % de tener miedo. Igual el miedo se resiste con resistencia mental». Quedó: quien te elige de objetivo tira una moneda (2 en d2); si sale, tira Res.Mt contra el Ef.Esp de quien lleva la calavera y, si no llega, queda con Miedo 1 turno (provisorio: la dificultad y la duración las propuso Claude). Pregunta original: El dueño: «me gusta, pero provocar miedo de forma constante y pasiva me parece medio
   broken. busquémosle la vuelta». Opciones: (a) activa: una vez por combate, 1 No2, alzás la calavera y los rivales a 2 casillas que te ven
   tiran Res.Mt o quedan con Miedo 1 turno; (b) una vez por rival: el primero que llega a pegado tuyo tira Res.Mt (una sola vez por combate cada
   uno); (c) de reacción: cuando te pegan cuerpo a cuerpo, 25 % de que quien te pegó tire Res.Mt o Miedo 1 turno. Hoja: docs/talismanes.md.

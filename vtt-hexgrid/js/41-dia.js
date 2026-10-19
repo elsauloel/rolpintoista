@@ -7,6 +7,8 @@
    - **Los topes diarios**: el del talento de reparar (`S.reparadoTalento`; 3 puntos por nivel por día, comun/ficha-equipo.js).
    - **🃏 Wildcards** (2026-10-15, dueño): el GM elige el descanso (`descanso: 'bueno' | 'normal'` en el mismo documento): reparador = cada
      personaje queda con 2 wildcards si tenía menos; normal = el que no tenía recibe 1. Se usan como la Moneda Re-Roll (docs/reroll.md).
+   **☀ El Anuncio del descanso** (2026-10-19, dueño): a cada jugador, lo que se le recargó (vida, SP, No2, wildcards, estados que terminaron,
+   lo del equipo: anillos…) le aparece al centro con «Aceptar» (`diaPasos`, un momento `dia-descanso` con `paraUid`); los demás, en la Crónica.
    El GM además termina los estados con turnos de sus creeps (los que tienen token) y **repone la góndola** de la tienda publicada.
    Cada personaje guarda el día que ya aplicó (`S.diaAplicado`): no se aplica dos veces, y quien no estaba conectado lo recibe al entrar.
    Corregir el número a mano (✎) no renueva nada: solo cambia la cuenta (y todos lo anotan como aplicado).
@@ -38,6 +40,14 @@ function renderDiaBoton(){
 const diaTermina = e => FichaMantenimiento.terminaAlPasarDia(e);
 const DIA_WILDCARDS = {normal: 1, bueno: 2};   // 🃏 cuántas carga cada descanso (dueño, 2026-10-15)
 const diaDescansarPj = (S, descanso) => FichaMantenimiento.descansar(S, {wildcards: DIA_WILDCARDS[descanso] || 1});
+// Un renglón del descanso → un paso del Anuncio, con su título.
+function diaPasos(nombre, lineas){
+  const quien = nombre ? ` · ${nombre}` : '';
+  if(!lineas.length) return [{titulo: `Descanso${quien}`, texto: 'Ya estaba entero: no había nada para recargar.'}];
+  const tit = l => /^vida /.test(l) ? '❤ Vida' : /^SP /.test(l) ? '🔵 SP' : /^No2 /.test(l) ? '🟢 No2' : /^terminaron/.test(l) ? '⏳ Estados'
+    : /^🃏/.test(l) ? '🃏 Wildcards' : /^💍/.test(l) ? '💍 Equipo' : /^sigue caído/.test(l) ? '💀 Caído' : 'Descanso';
+  return lineas.map(l => ({titulo: tit(l) + quien, texto: l.charAt(0).toUpperCase() + l.slice(1)}));
+}
 let diaTrabajando = false;
 async function diaRevisar(antes){
   if(diaTrabajando || !fbUsuario) return;
@@ -45,6 +55,7 @@ async function diaRevisar(antes){
   try{
     if(typeof bnCargarPiezas === 'function') await bnCargarPiezas();
     const dia = diaActual, manual = diaManual, descanso = diaDescanso;
+    const anuncios = new Map();   // uid del dueño → pasos del Anuncio (☀, 2026-10-19)
     // Mis personajes.
     for(const [fichaId] of fichasPub){
       if(typeof bnManejo !== 'function' || !bnManejo(fichaId)) continue;
@@ -63,7 +74,18 @@ async function diaRevisar(antes){
       if(lineas){
         const txt = lineas.length ? lineas.join(' · ') : 'ya estaba entero';
         mesaLinea(`☀ Día ${dia}: ${nombre || 'un personaje'} descansó — ${txt}`, 'recordatorio', nombre);
+        const f = fichasPub.get(fichaId), uid = (f && f.duenoUid) || '';
+        if(uid){ if(!anuncios.has(uid)) anuncios.set(uid, []); anuncios.get(uid).push(...diaPasos(nombre, lineas)); }
       }
+    }
+    // ☀ Lo que se le recargó a cada jugador, en un Anuncio con «Aceptar» (dueño, 2026-10-19: «lo que sea que se recargue… debe aparecerle en
+    // un anuncio»). Le llega a su dueño aunque lo haya aplicado la pantalla del GM (con 🎮 el control); los demás lo ven en la Crónica.
+    for(const [uid, pasos] of anuncios){
+      if(typeof momentoAbrir !== 'function' || !pasos.length) continue;
+      try{ await momentoAbrir({tipo: 'dia-descanso', icono: '☀', titulo: `Día ${dia}: descansaste`, estado: 'listo',
+        resultado: pasos.map(p => p.texto).join(' · ').slice(0, 900),
+        datos: {paraUid: uid, aviso: true, boton: 'Aceptar', pasos: pasos.slice(0, 20)}}); }
+      catch(err){ console.error('Pasar de día: no se pudo mostrar el anuncio', err); }
     }
     // El GM: los estados con turnos de sus creeps terminan, y la góndola de la tienda se repone (una sola vez, desde la pantalla que pasó el día).
     if(soyGM){

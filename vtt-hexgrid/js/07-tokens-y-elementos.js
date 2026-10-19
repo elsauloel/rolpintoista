@@ -1081,8 +1081,12 @@ const casillerosRonda = new Map();   // tokenId → {ronda: casilleros}
 // La ronda: la del orden de turnos si hay (la misma con la que se sabe quién ya jugó; el Mantenimiento llega un instante después); si no, el Mantenimiento.
 const rondaDeCasilleros = () => (iniciativa.orden || []).length ? 'i' + Math.round(num(iniciativa.ronda)) : 'm' + Math.round(num(mantenimientoNumero));
 const rondaAnterior = r => r[0] + (Number(r.slice(1)) - 1);
+const pasoFantasmaCarga = new Map();   // tokenId → casilleros movidos desde la última vez que usó el Paso fantasma (anillo, 2026-10-19)
+window.mapaPasoFantasma = id => (pasoFantasmaCarga.get(id) || 0) >= 3;
+window.mapaPasoFantasmaGastar = id => { pasoFantasmaCarga.set(id, 0); };
 function contarCasilleros(id, pasos){
   if(!(pasos > 0)) return;
+  pasoFantasmaCarga.set(id, (pasoFantasmaCarga.get(id) || 0) + pasos);
   const r = rondaDeCasilleros(), m = casillerosRonda.get(id) || {}, nuevo = {[r]: (m[r] || 0) + pasos};
   if(m[rondaAnterior(r)]) nuevo[rondaAnterior(r)] = m[rondaAnterior(r)];
   casillerosRonda.set(id, nuevo);

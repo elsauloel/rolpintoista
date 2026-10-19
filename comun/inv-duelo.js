@@ -203,7 +203,7 @@ const InvDuelo = (() => {
         const inv = ui.inv(d.defensor);
         if(!inv) return;
         if(modo === 'parry') tirarStat(inv, 'parry');
-        else { const ee = evaEsp(inv, d); publicar(A().tirada(inv, ee.val ? `Evasión (${ee.txt})` : 'Evasión', I().statValor(inv, 'eva') + ee.val, 'eva')); }
+        else { const ee = evaEsp(inv, d); publicar(A().tirada(inv, ee.val ? `Evasión (${ee.txt})` : 'Evasión', I().statValor(inv, 'eva') + ee.val, 'eva')); Combatiente.gastarPasoFantasma(d, ee); }
       },
       // La Fuerza del golpe del atacante contra el Bloqueo del defensor (Fue + peso de su arma).
       fuerza: d => {

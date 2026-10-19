@@ -132,7 +132,7 @@ const FichaCalculo = (() => {
     {id:'calma', label:'Calma', full:'Si no atacaste en tu turno, al terminarlo recuperás esta cantidad de No2'},
     {id:'foco', label:'Foco', full:'PdG.Esp extra si no te moviste en este turno'},
     {id:'pulso', label:'Pulso quieto', full:'PdG extra si no te moviste antes de atacar en este turno'},
-    {id:'pasofantasma', label:'Paso fantasma', full:'Evasión extra si en esta ronda te moviste 3 casilleros o más'},
+    {id:'pasofantasma', label:'Paso fantasma', full:'Evasión extra en tu próxima Evasión después de moverte 3 casilleros o más (una sola tirada)'},
     {id:'cambiante', label:'Cambiante', full:'Al empezar el combate elegís Res. fuego, hielo o eléctrica: suma esta cantidad'},
     {id:'absorbearmadura', label:'Armadura indestructible', full:'La primera Armadura rota de cada combate se absorbe'},
     {id:'impulsofue', label:'Fuerza del Toro', full:'Una vez por combate, +N a tu última tirada de Fuerza (como la Polilla)'},

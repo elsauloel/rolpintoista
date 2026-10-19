@@ -496,7 +496,8 @@ const CreepCalculo = (() => {
       tipoCriatura: tipoDe(sc).slice(0, 30),   // el tipo de criatura (Matabestias de los arcos, 2026-10-11)
       pasosSilenciosos: num(modTotal(sc, 'pasossilenciosos')) > 0,   // 👣 (2026-10-15): el mapa de los jugadores no lo hace oír a 3 casilleros
       // 💀 La Calavera con vela (2026-10-18): el aura y el Ef.Esp con que asusta (lo tira la pantalla del jugador que entra, js/52).
-      ...(auraMiedo(sc) > 0 ? {auraMiedo: auraMiedo(sc), auraEfEsp: (v => Number.isFinite(v) ? Math.round(v) : 0)(statValor(sc, 'dmgesp'))} : {}),
+      // Siempre se escribe (2026-10-19: si no, al sacarle el aura el documento público seguía con la vieja y el creep seguía asustando).
+      auraMiedo: auraMiedo(sc), auraEfEsp: auraMiedo(sc) > 0 ? (v => Number.isFinite(v) ? Math.round(v) : 0)(statValor(sc, 'dmgesp')) : 0,
     };
   }
   // Alcance de su arma, en casilleros: un arma de rango usa su Rango; una de cuerpo a cuerpo, 1 + lo que le sume a Rango.

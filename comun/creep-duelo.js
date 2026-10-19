@@ -220,6 +220,7 @@ const CreepDuelo = (() => {
         }
         const ee = evaEsp(sc, d);
         ui.publicar(sc, A().tirada(`${sc.nombre} · Evasión${ee.val ? ` (${ee.txt})` : ''}`, C().statValor(sc, 'eva') + ee.val, sc, 'eva'));
+        Combatiente.gastarPasoFantasma(d, ee);
       },
       fuerza: d => {
         const sc = deLado(d.atacante);

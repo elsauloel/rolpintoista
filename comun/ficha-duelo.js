@@ -302,14 +302,16 @@ const FichaDuelo = (() => {
           FichaAcciones.tormentaPj(S, pagoDist, 'el Parry a distancia', ui);
           ui.cambio(['nitros', 'vitals']);
           tirarValorStat(`Evasión (Parry a distancia${it ? ' · ' + it.nombre : ''}${ee.val ? ', ' + ee.txt : ''})`, num(compute().final.eva) + ee.val, 'eva');
+          Combatiente.gastarPasoFantasma(d, ee);
         }
         else if(itemId === 'pagado' || itemId === 'penal'){   // Evasión con sobrepeso: la elección ya se hizo en el cuadro del duelo
           const sobre = compute().sobrecarga;
           if(itemId === 'pagado') FichaAcciones.sobrepesoPagar(S, ui);   // sin No2 queda en negativo (2026-10-06)
           const ee = evaEsp(d);
           tirarValorStat(ee.val ? `Evasión (${ee.txt})` : 'Evasión', num(compute().final.eva) + ee.val, 'eva', undefined, itemId === 'pagado' ? 'pagado' : 'penal', sobre);
+          Combatiente.gastarPasoFantasma(d, ee);
         }
-        else { const ee = evaEsp(d); tirarValorStat(ee.val ? `Evasión (${ee.txt})` : 'Evasión', num(compute().final.eva) + ee.val, 'eva'); }
+        else { const ee = evaEsp(d); tirarValorStat(ee.val ? `Evasión (${ee.txt})` : 'Evasión', num(compute().final.eva) + ee.val, 'eva'); Combatiente.gastarPasoFantasma(d, ee); }
       },
       // La Fuerza del golpe del atacante contra el Bloqueo del defensor (Fue + peso de su arma).
       fuerza: d => FichaAcciones.fuerzaGolpeConArma(getS(), armaDelInv(d.ataque.armaId), ui),

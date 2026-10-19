@@ -2034,7 +2034,7 @@ prueba('la 🪪 pública: solo los nombres del arma (también la natural) y del 
   const sc = creepPrueba({notas: '  Huele a pantano.  ', equipo: [{nombre: 'Yelmo', tipoItem: 'cabeza', def: 2, mods: [{stat: 'con', val: 1}]}, {nombre: ''}]});
   const nat = CreepCalculo.tarjetaPublica(creepPrueba({armaNombre: 'Garras', armaNatural: true}));
   igual([CreepCalculo.tarjetaPublica(sc), nat.armaNombre, nat.armaNatural, nat.equipoNombres],
-    [{armaNombre: 'Hacha', armaNatural: false, manosNombres: [], equipoNombres: ['Yelmo'], notas: 'Huele a pantano.', tipoCriatura: '', pasosSilenciosos: false}, 'Garras', true, []]);   // + el tipo de criatura (Matabestias, 2026-10-11)
+    [{armaNombre: 'Hacha', armaNatural: false, manosNombres: [], equipoNombres: ['Yelmo'], notas: 'Huele a pantano.', tipoCriatura: '', pasosSilenciosos: false, auraMiedo: 0, auraEfEsp: 0}, 'Garras', true, []]);   // + el tipo de criatura (Matabestias, 2026-10-11)   // y el aura siempre escrita (2026-10-19)
 });
 prueba('Parry y Bloqueo: con su arma o un escudo; un arma natural sola no alcanza', () => {
   const nat = creepPrueba({armaNatural: true}), conEscudo = creepPrueba({armaNatural: true, equipo: [{nombre: 'Rodela', tipoItem: 'escudo_1m', peso: 3}]});
@@ -2676,12 +2676,12 @@ prueba('Stun (2026-10-06): no le toca los No2; si lo atacan, su Evasión es 1 si
 });
 prueba('anillos Comunes (2026-10-06): los 29 nuevos (la Calma, desde el 2026-10-18, Buena) y los 6 de los talismanes (2026-10-18: brasa, escarcha, chispa, miasma, ácido, tormenta) son los únicos anillos (los de rango y los de calidades altas, afuera); Paso fantasma suma Evasión con 3 casilleros en la ronda; la Cáscara no se recarga; la Calma devuelve No2 si no atacó', () => {
   const com = CATALOGO_BASE.filter(i => i.tipoItem === 'anillos' && i.tier === 'Común');
-  const antes = window.mapaCasillerosRonda;
-  window.mapaCasillerosRonda = id => id === 'lejos' ? 3 : 1;
+  const antes = window.mapaPasoFantasma;
+  window.mapaPasoFantasma = id => id === 'lejos';   // (2026-10-19: la carga del Paso fantasma)
   const val = st => ({pasofantasma: 1})[st] || 0;
   const d = tokenId => ({defensor: {tokenId}, ataque: {tipo: 'normal'}});
   const pf = [Combatiente.evaExtraDuelo(d('lejos'), val).val, Combatiente.evaExtraDuelo(d('cerca'), val).val];
-  window.mapaCasillerosRonda = antes;
+  window.mapaPasoFantasma = antes;
   const est = [{nombre: 'Cáscara protectora', activo: true, escudoMagico: 3, escudoMagicoActual: 1, sinRecarga: true}];
   Combatiente.dispararEstados(est, {hp: 'hpturno', stacks: 'stacksturno'});
   const calma = CATALOGO_BASE.find(i => i.nombre === 'Anillo de la calma');

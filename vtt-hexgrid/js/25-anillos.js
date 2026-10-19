@@ -29,7 +29,7 @@ function anillosDatos(t){
   const r = (fichasPub.get(t.fichaId) || {}).resumen || {};
   const v = st => Math.max(0, num(r[st]));
   const rota = (r.estados || []).filter(e => e && e.armaduraRota).reduce((a, e) => a + Math.max(1, num(e.stacks) || 1), 0);
-  return {creep: false, v, dados: !!r.anillosDados, campana: !!r.campanaUsada, absorbe: !!r.absorbeUsada, rota, conAnillo: (r.estados || []).some(e => e && e.anillo), cargas: !!r.cargasUsadas};
+  return {creep: false, v, dados: !!r.anillosDados, campana: !!r.campanaUsada || !!r.trebolUsado, absorbe: !!r.absorbeUsada, rota, conAnillo: (r.estados || []).some(e => e && e.anillo), cargas: !!r.cargasUsadas};
 }
 const anillosTiene = d => d && (d.v('cascara') > 0 || d.v('cambiante') > 0 || Object.keys(ANILLO_ATRIB).some(k => d.v(k) > 0));
 // Cambia los datos del token (personaje o creep) con `fn(lista de estados, objeto)` → bool (hubo cambio).
@@ -81,11 +81,12 @@ async function anillosTerminar(id, t){
   try{
     await anillosCambiar(t, (lista, obj) => {
       const cargas = !!(obj.cargasEsp && Object.keys(obj.cargasEsp).length);
-      const hay = lista.some(e => e && e.anillo) || obj.anillosDados || obj.absorbeUsada || obj.primeraSangreUsada || cargas || !!(obj.meta && obj.meta.campanaUsada);
+      const hay = lista.some(e => e && e.anillo) || obj.anillosDados || obj.absorbeUsada || obj.primeraSangreUsada || cargas || !!(obj.meta && (obj.meta.campanaUsada || obj.meta.trebolUsado));
       if(!hay) return false;
       for(let i = lista.length - 1; i >= 0; i--) if(lista[i] && lista[i].anillo) lista.splice(i, 1);
       obj.anillosDados = false; obj.absorbeUsada = false; obj.primeraSangreUsada = false;
       if(obj.meta && obj.meta.campanaUsada) obj.meta = {...obj.meta, campanaUsada: false};   // 🔔 la Campana de bronce, de nuevo (js/53)
+      if(obj.meta && obj.meta.trebolUsado) obj.meta = {...obj.meta, trebolUsado: false};   // 🍀 el Anillo del trébol, de nuevo
       if(cargas) obj.cargasEsp = {};   // las varitas de cargas se vuelven a llenar
       return true;
     });
@@ -231,3 +232,47 @@ async function usarImpulso(){
   renderImpulsoBoton();
 }
 setInterval(renderImpulsoBoton, 1500);
+/* 🍀 El Anillo del trébol (2026-10-18, dueño): una vez por combate, el botón pone el estado «🍀 Trébol» (Afortunado en cualquier tirada,
+   `afortunadoTodo`) y la próxima tirada lo gasta (comun/ficha-acciones.js, tirarValorStat). La marca `S.meta.trebolUsado` se libera al volver a
+   narrativo (anillosTerminar). Personajes. */
+function trebolActivo(){
+  if(modoMapa !== 'combate') return null;
+  const t = miTokenPrincipal();
+  if(!t || !t.fichaId || String(t.fichaId).includes(SEP_INVOCACION)) return null;
+  const r = (fichasPub.get(t.fichaId) || {}).resumen || {};
+  if(!(num(r.trebol) > 0) || r.trebolUsado || (r.estados || []).some(e => e && /trébol/i.test(String(e.nombre || '')))) return null;
+  return {t, r};
+}
+function renderTrebolBoton(){
+  const a = trebolActivo();
+  let b = document.getElementById('trebol-flotante');
+  if(!a){ if(b){ b.remove(); if(typeof Flotantes !== 'undefined') Flotantes.apilar(); } return; }
+  if(!b){
+    b = document.createElement('button');
+    b.type = 'button'; b.id = 'trebol-flotante';
+    b.style.cssText = 'position:fixed;left:16px;bottom:74px;z-index:999998;background:#173018;color:#c9f5c0;border:2px solid #4fbf5a;border-radius:16px;padding:10px 16px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 8px 26px rgba(0,0,0,.6)';
+    b.onclick = usarTrebol;
+    document.body.appendChild(b);
+    b.innerHTML = '<div>🍀 Trébol</div><small style="display:block;font-weight:500;font-size:11px;opacity:.9">tu próxima tirada, como Afortunado</small>';
+  }
+  if(typeof Flotantes !== 'undefined') Flotantes.apilar();
+}
+async function usarTrebol(){
+  const a = trebolActivo();
+  if(!a) return;
+  try{
+    await editarPersonajeMapa(a.t.fichaId, S => {
+      if(S.meta && S.meta.trebolUsado) return false;
+      S.meta = {...(S.meta || {}), trebolUsado: true};
+      S.efectos = S.efectos || [];
+      S.efectos.push({id: anillosId(), nombre: '🍀 Trébol', polaridad: 'buff', activo: true, permanente: true, anillo: true, trebol: true, afortunado: true, afortunadoTodo: true,
+        detalle: 'Tu próxima tirada sale como Afortunado: se tira dos veces y vale la mejor. Se va al usarla (Anillo del trébol, una vez por combate).'});
+      return ['efectos', 'general'];
+    });
+  }catch(err){ console.error('El Anillo del trébol:', err); toast('No se pudo usar el trébol'); return; }
+  try{ mesaLinea(`🍀 ${nombreDe(a.t)} toca su Anillo del trébol: su próxima tirada sale como Afortunado`, 'recordatorio'); }catch(err){}
+  toast('🍀 Tu próxima tirada sale como Afortunado');
+  renderTrebolBoton();
+}
+setInterval(renderTrebolBoton, 1500);
+

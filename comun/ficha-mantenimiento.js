@@ -291,6 +291,7 @@ const FichaMantenimiento = (() => {
     const fin = (S.efectos || []).filter(terminaAlPasarDia);
     if(fin.length){ S.efectos = S.efectos.filter(e => !terminaAlPasarDia(e)); lineas.push(`terminaron: ${fin.map(e => e.nombre).join(', ')}`); }
     if(num(S.reparadoTalento) > 0) S.reparadoTalento = 0;
+    if(S.meta && S.meta.ultimoAlientoUsado){ S.meta.ultimoAlientoUsado = false; lineas.push('💍 el Anillo del último aliento se recargó'); }   // (2026-10-18)
     const wc = Math.max(0, Math.round(num(o && o.wildcards)));
     if(wc && S.meta && Math.round(num(S.meta.wildcards)) < wc){ const antes = Math.max(0, Math.round(num(S.meta.wildcards))); S.meta.wildcards = wc; lineas.push(`🃏 ${wc - antes === 1 ? 'una wildcard' : `${wc - antes} wildcards`} (tiene ${wc})`); }
     (S.invocaciones || []).forEach(inv => {

@@ -48,7 +48,7 @@ const Combatiente = (() => {
      ventaja?}) o null si el valor no se puede tirar con dados reales. No publica nada: eso lo hace cada herramienta. */
   const STATS_AFORTUNADO = ['pdg', 'parry', 'eva'];
   // Un estado puede sumar sus propios stats (`afortunadoStats`, la Estatuilla del Gauchito Gil: también el PdG.Esp).
-  function afortunado(estados, statId){ return activos(estados).some(e => e.afortunado && (STATS_AFORTUNADO.includes(statId) || (Array.isArray(e.afortunadoStats) && e.afortunadoStats.includes(statId)))); }
+  function afortunado(estados, statId){ return activos(estados).some(e => e.afortunado && (e.afortunadoTodo || STATS_AFORTUNADO.includes(statId) || (Array.isArray(e.afortunadoStats) && e.afortunadoStats.includes(statId)))); }
   /* 🔮 La Estatuilla del Gauchito Gil (2026-10-18, dueño): la primera tirada de PdG, PdG.Esp, Evasión o Parry de cada ronda sale como Afortunado
      (dos veces, la mejor). `tiene`: la lleva equipada; `usado`: ya la usó (la marca vive en S.ataquesArma._gauchito, que se vacía al empezar su
      turno). Devuelve los estados con un Afortunado de esa tirada, o null si no corresponde. */

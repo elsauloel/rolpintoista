@@ -322,6 +322,9 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     mitiMitiPartir(r, prot);
     const previo = num(datos.hp);
     datos.hp = Math.max(0, previo - r.recibido);
+    // 💍 El Anillo del último aliento (2026-10-18): una vez por día, el golpe que lo dejaría en 0 lo deja en 1 (comun/ficha-acciones.js, fijarHp).
+    let aliento = false;
+    if(previo > 0 && datos.hp <= 0 && num(rs.ultimoAliento) > 0 && !(datos.meta && datos.meta.ultimoAlientoUsado)){ datos.hp = 1; datos.meta = {...(datos.meta || {}), ultimoAlientoUsado: true}; aliento = true; }
     // Orbe de absorción (js/26): el daño mágico o elemental que llegó a la vida devuelve SP, una vez por turno.
     let absorbe = 0;
     if(o && o.magico && r.recibido > 0 && num(rs.orbeAbsorcion) > 0 && !num(datos.ataquesArma._absorbe)){
@@ -333,9 +336,14 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     if(datosEf && JSON.stringify(efectos) !== efectosAntes) tx.set(efectosRef, {json: JSON.stringify(datosEf), actualizado: ts});   // el escudo que bajó, lo que absorbió la Armadura arcana
     // El escudo que bajó también en el resumen público (2026-10-11, probando Shield: el token seguía mostrando 14/14 con el escudo gastado).
     const estPub = datosEf && JSON.stringify(efectos) !== efectosAntes && Array.isArray(rs.estados) ? escudosAlResumen(rs.estados, efectos) : null;
-    tx.update(base, {actualizado: ts, 'resumen.hp': datos.hp, ...(absorbe ? {'resumen.sp': num(rs.sp) + absorbe} : {}), ...(estPub ? {'resumen.estados': estPub} : {})});
-    return {r, previo, nuevo: datos.hp, absorbe};
+    tx.update(base, {actualizado: ts, 'resumen.hp': datos.hp, ...(absorbe ? {'resumen.sp': num(rs.sp) + absorbe} : {}), ...(estPub ? {'resumen.estados': estPub} : {}), ...(aliento ? {'resumen.ultimoAlientoUsado': true} : {})});
+    return {r, previo, nuevo: datos.hp, absorbe, aliento};
   });
+  if(res.aliento){
+    const txt = `${nombreDe(t)} iba a caer, pero el Anillo del último aliento lo sostiene con 1 de vida (una vez por día)`;
+    try{ mesaLinea(`💍 ${txt}`, 'recordatorio'); }catch(err){}
+    try{ momentoAbrir({tipo: 'zona-renueva', icono: '💍', titulo: 'Anillo del último aliento', estado: 'listo', resultado: txt, datos: {}}); }catch(err){}
+  }
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
   if(guarda && golpe > 0) guardianAviso(t, guarda);
   if(muro && golpe > 0) muroAviso(t, muro);

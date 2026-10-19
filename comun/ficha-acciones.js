@@ -137,8 +137,19 @@ const FichaAcciones = (() => {
     const c = FichaCalculo.calcular(S);
     const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
     const tope = hpmax > 0 ? hpmax : Math.max(0, num(valor));
+    const antes = num(S.hp);
     S.hp = Math.max(0, Math.min(tope, num(valor)));
+    if(antes > 0 && S.hp <= 0 && ultimoAlientoListo(S)) ultimoAlientoUsar(S);   // 💍 el Anillo del último aliento (2026-10-18)
     return S.hp;
+  }
+  /* 💍 El Anillo del último aliento (2026-10-18, dueño): una vez por día, cuando un golpe lo dejaría en 0, queda con 1. La marca
+     (`S.meta.ultimoAlientoUsado`) la saca el descanso (FichaMantenimiento.descansar). El daño que aplica el mapa hace lo mismo (js/10, danioPj). */
+  const ultimoAlientoListo = S => !(S.meta && S.meta.ultimoAlientoUsado) && (S.inventario || []).some(i => i && i.equipado && i.ultimoAliento && !FichaCalculo.itemRoto(i));
+  function ultimoAlientoUsar(S){
+    S.hp = 1;
+    S.meta = {...(S.meta || {}), ultimoAlientoUsado: true};
+    const quien = ((S.meta && S.meta.nombre) || 'Tu personaje').trim();
+    try{ if(typeof mesaLinea === 'function') mesaLinea(`💍 ${quien}: el Anillo del último aliento lo sostiene con 1 de vida (una vez por día)`, 'recordatorio'); else if(typeof toast === 'function') toast(`💍 Anillo del último aliento: quedás con 1 de vida`); }catch(err){}
   }
   // Si el HP llega a 0 y hay un Ankh de Reencarnación en el cinturón, se activa solo (en la mochila no). Devuelve su nombre si se activó.
   function revisarAnkh(S){
@@ -278,7 +289,10 @@ const FichaAcciones = (() => {
       if(sale) costo = 0;
     }
     if(key === 'inventario' && num(f.bolsilloext) > 0 && meta.bolsilloTurno !== turno){ costo = Math.max(0, costo - 1); bolsillo = true; }
-    return {costo: Combatiente.conExtenuado(S.efectos, costo), saque, bolsillo};   // + Extenuado
+    // 💍 El Anillo del alquimista (2026-10-18): el primer consumible del turno sacado del cinturón no cuesta No2.
+    let alquimista = false;
+    if(key === 'cinturon' && costo > 0 && meta.alquimistaTurno !== turno && (S.inventario || []).some(i => i && i.equipado && i.alquimista && !FichaCalculo.itemRoto(i))){ costo = 0; alquimista = true; }
+    return {costo: Combatiente.conExtenuado(S.efectos, costo), saque, bolsillo, alquimista};   // + Extenuado
   }
   async function consumir(S, id, forzar, ui, sacado){
     { const it = [...(S.inventario || []), ...(S.cinturon || [])].find(x => x.id === id); if(it && (it.enMesa || it.reservado)){ ui.toast(`Está ofrecido a ${it.reservadoPara || 'otro personaje'}: cancelá la oferta primero (🤝)`); return; } }   // 🤝 comun/intercambio.js
@@ -325,6 +339,7 @@ const FichaAcciones = (() => {
       if(it.aceleradorMapa) ui.acelerador(it);   // ⏩ la Runa aceleradora: se elige la casilla en el mapa
       if(sac.saque) S.meta.saqueTurno = num(S.turno) || 1;   // el primero del turno ya se sacó
       if(sac.bolsillo) S.meta.bolsilloTurno = num(S.turno) || 1;
+      if(sac.alquimista) S.meta.alquimistaTurno = num(S.turno) || 1;   // 💍 el Anillo del alquimista, una vez por turno
 
       const cargaMax = Math.max(1, num(it.cargaMax) || 1);
       let carga = num(it.cargaActual ?? cargaMax);
@@ -369,7 +384,7 @@ const FichaAcciones = (() => {
       const partes = [];
       if(it.curahp) partes.push(`${num(it.curahp)>=0?'+':''}${fmt(num(it.curahp) + boticario)} HP${boticario ? ` (+${fmt(boticario)} de Mano de boticario)` : ''}`);
       if(spRestaurado) partes.push(`+${fmt(spRestaurado)} SP`);
-      partes.push(`-${costoNitros} No2${sac.saque && sac.saque.sale ? ' (Saque rápido)' : sac.bolsillo ? ' (Bolsillo exterior)' : ''}`);
+      partes.push(`-${costoNitros} No2${sac.saque && sac.saque.sale ? ' (Saque rápido)' : sac.bolsillo ? ' (Bolsillo exterior)' : sac.alquimista ? ' (Anillo del alquimista)' : ''}`);
       if(cargaMax > 1) partes.push(gastoUnidad ? 'última carga usada' : `carga ${carga}/${cargaMax}`);
       if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
       if(reparados) partes.push(reparados > 1 ? 'armadura reparada por completo' : 'armadura reparada');
@@ -420,6 +435,8 @@ const FichaAcciones = (() => {
       if(ronda !== null && ronda !== undefined) S.meta = {...(S.meta || {}), gauchitoRonda: ronda};
       ui.cambio(['nitros']);
     }
+    // 🍀 El Anillo del trébol: el estado se gasta con la tirada que hizo Afortunado.
+    if(r && (S.efectos || []).some(e => e && e.trebol && e.activo !== false)){ S.efectos = S.efectos.filter(e => !(e && e.trebol)); ui.cambio(['efectos', 'refresh']); }
     if(sobrepeso === 'penal') r.estados.push({n: 'Sobrepeso', p: 'debuff'});
     else if(sobrepeso === 'pagado') r.estados.push({n: 'Sobrepeso (pagó 1 No2)', p: 'otro'});
     ui.registrarTirada(nombre, r);

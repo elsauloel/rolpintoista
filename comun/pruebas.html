@@ -644,7 +644,7 @@ prueba('Perfora N del arma (2026-10-10): viaja en el ataque, la copia el creep y
     [2, 5, undefined, 2, 2, true, false, false, true, 'virote', false, null]);   // la de guardia quedó con Perfora 2 (revisión, 2026-10-11)
 });
 prueba('rasgos de ballesta (2026-10-10): llega cargada (gratis si no disparó el turno anterior), apuntada y atraviesa escudos viajan al ataque', () => {
-  const tranq = CATALOGO_BASE.find(i => i.id === 'bal-de-tranquera'), guerra = CATALOGO_BASE.find(i => i.id === 'bal-de-guerra'), asedio = CATALOGO_BASE.find(i => i.id === 'bal-de-asedio');
+  const tranq = {...CATALOGO_BASE.find(i => i.id === 'bal-de-tranquera'), cargada: true}, guerra = CATALOGO_BASE.find(i => i.id === 'bal-de-guerra'), asedio = CATALOGO_BASE.find(i => i.id === 'bal-de-asedio');
   const S0 = {ataquesArma: {}}, S1 = {ataquesArma: {[tranq.id]: 1}}, S2 = {ataquesArma: {}, descargadas: {[tranq.id]: true}};
   const creep = {nombre: 'B', armaTipo: 6, armaDeRango: true, armaRasgos: {recarga: 2, cargada: true}, ataquesTurno: 0};
   igual([FichaCombate.costoAtaque(S0, tranq), FichaCombate.costoAtaque(S1, tranq), FichaCombate.costoAtaque(S2, tranq),

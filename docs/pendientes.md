@@ -8,6 +8,13 @@
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.
+> - [ ] **🎯 Ballestas de Buena calidad para arriba, en d4** (2026-10-19, dueño: «de buena calidad para arriba las dejamos pendientes para trabajar
+>   con tiempo cuando esté en la compu»). **Archivadas mientras tanto** (39: 20 Buenas, 9 Raras, 7 Excepcionales, 3 Legendarias): solo están
+>   publicadas las 25 Comunes en d4. **Las Buenas:** pasarlas tal cual a d4 deja 2 en Rara (centinela, ciénaga) y 7 por debajo de Buena (las sin
+>   Perfora: abollacascos, estopa, mira corta, vigía, boyero, rastreador, virotera); las versiones de la «tercera vuelta» (docs/revision-ballestas.md:
+>   2d4 +4…+8 con Perfora 1–2) caen las 19 en Buena (130–170); la tranquera, mejor 2d4 con Perfora 2 (sin «Llega cargada», ~120). **Las Raras para
+>   arriba:** armarlas de cero en d4 (la de guerra, la pesada, la de asedio y la de la frontera hoy dan una calidad más). Revisarlas una por una, por
+>   texto.
 > - [ ] **🎰 Ver en el mapa el rodillo de la Varita del caos** (2026-10-18, dueño: «una vez que esté el rodillo, anotalo en chequear cuando esté
 >   en la compu»): Atacar con la varita → clic en el objetivo → el Anuncio del d20 con el veredicto («¡LO QUE BUSCABAS!» / «¡SE DIO VUELTA!») →
 >   «🎰 Girar el rodillo»: los nombres pasan de abajo hacia arriba y frenan hasta el estado que salió → «¡Salió X!» con su detalle y su duración →

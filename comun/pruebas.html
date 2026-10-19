@@ -2680,7 +2680,8 @@ prueba('anillos Comunes (2026-10-06): los 29 nuevos (la Calma, desde el 2026-10-
   window.mapaPasoFantasma = id => id === 'lejos';   // (2026-10-19: la carga del Paso fantasma)
   const val = st => ({pasofantasma: 1})[st] || 0;
   const d = tokenId => ({defensor: {tokenId}, ataque: {tipo: 'normal'}});
-  const pf = [Combatiente.evaExtraDuelo(d('lejos'), val).val, Combatiente.evaExtraDuelo(d('cerca'), val).val];
+  const pf = [num(Combatiente.evaExtraDuelo(d('lejos'), val).fijo), num(Combatiente.evaExtraDuelo(d('cerca'), val).fijo)];   // (2026-10-19: un fijo, no al dado)
+  const fx = [Combatiente.conFijo('1d6', Combatiente.evaExtraDuelo(d('lejos'), val)), Combatiente.evaExtraDuelo(d('lejos'), val).val];
   window.mapaPasoFantasma = antes;
   const est = [{nombre: 'Cáscara protectora', activo: true, escudoMagico: 3, escudoMagicoActual: 1, sinRecarga: true}];
   Combatiente.dispararEstados(est, {hp: 'hpturno', stacks: 'stacksturno'});
@@ -2694,7 +2695,7 @@ prueba('anillos Comunes (2026-10-06): los 29 nuevos (la Calma, desde el 2026-10-
     inventario: [{...structuredClone(calma), id: 'a1', equipado: true}]}).S);
   S2.nitros = 2; S2.ataquesTurno = 1;
   FichaMantenimiento.finTurno(S2, {fijarHp: v => FichaAcciones.fijarHp(S2, v)}, 'm:5', '', [], 1);
-  igual([com.length, CATALOGO_BASE.filter(i => i.tipoItem === 'anillos').length, pf, est[0].escudoMagicoActual, conCalma, S2.nitros], [36, 46, [1, 0], 1, 3, 2]);   // 36 Comunes (con la defensa y el madrugador, 2026-10-19); 46 en total
+  igual([com.length, CATALOGO_BASE.filter(i => i.tipoItem === 'anillos').length, pf, est[0].escudoMagicoActual, conCalma, S2.nitros, fx], [36, 47, [1, 0], 1, 3, 2, ['1d6+1', 0]]);   // 36 Comunes (con la defensa y el madrugador, 2026-10-19); 47 en total (con el escudo de la mañana)
 });
 prueba('mochilas de Buena calidad (2026-10-06): 10 piezas, todas a 70 y con un efecto propio (ranuras o una mecánica de mochila)', () => {
   const bc = CATALOGO_BASE.filter(i => i.tipoItem === 'mochila' && i.tier === 'Buena Calidad' && !i.soloBotin);
@@ -4465,6 +4466,14 @@ prueba('Anillos (2026-10-19): el Boticario suma a la primera regeneración, no a
   const b = Combatiente.dispararEstados(est, {hp: 'hpturno'}).hp;
   const cat = id => CATALOGO_BASE.find(i => i.id === id);
   igual([a, b, !!cat('anillo-comun-anillo-de-malla-fina').archivo, cat('anillo-del-canalizador').mods.map(m => m.stat + m.val).join(','), cat('anillo-de-defensa').mods[0].val], [5, 2, true, 'dmgesp2,sp-3', 1]);
+});
+
+prueba('Anillo del escudo de la mañana (2026-10-19): cada descanso, un escudo solo contra el daño especial', () => {
+  const S = FichaGuardado.normalizar({}).S; S.efectos = [];
+  S.inventario = [{...structuredClone(CATALOGO_BASE.find(i => i.id === 'anillo-del-escudo-de-la-manana')), id: 'm', equipado: true}];
+  FichaMantenimiento.descansar(S, {wildcards: 1}); FichaMantenimiento.descansar(S, {wildcards: 1});
+  const e = S.efectos.filter(x => x.descansoEscudo);
+  igual([e.length, e[0].escudoMagicoActual, !!e[0].soloEspecial, !!e[0].sinRecarga], [1, 6, true, true]);
 });
 
 prueba('Anillo de la siesta (2026-10-19): cada descanso da Vida extra 10, sin acumularse', () => {

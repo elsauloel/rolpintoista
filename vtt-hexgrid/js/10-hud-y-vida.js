@@ -128,14 +128,15 @@ function creepArmadmgMapa(sc){ return CreepCalculo.armadmgEfectiva(sc); }
 
 // Golpe − Defensa, con Invulnerable y Escudo mágico (mismas reglas que gm-tools
 // con los creeps). Modifica el escudo de `efectos`: pasar una copia para solo mirar.
-function resolverGolpe(golpe, defensa, efectos){
+// o.magico: el golpe es daño especial (mágico o elemental); sin eso, un escudo `soloEspecial` (el Escudo de la mañana, 2026-10-19) no lo toca.
+function resolverGolpe(golpe, defensa, efectos, o){
   const activos = (efectos || []).filter(e => e && e.activo !== false);
   if(activos.some(e => e.invulnerable)) return {recibido: 0, invulnerable: true, defensa, absorbido: 0};
   let recibido = Math.max(0, golpe - defensa);
   let absorbido = 0;
   const ab = Combatiente.absorberPct(activos, recibido);   // Armadura arcana: se queda con el 50 % de lo que llega, hasta 10 (2026-10-10)
   recibido = ab.recibido; absorbido += ab.tomado;
-  const capas = activos.filter(e => (e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) && num(e.escudoMagicoActual ?? e.escudoMagico) > 0)
+  const capas = activos.filter(e => (e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) && num(e.escudoMagicoActual ?? e.escudoMagico) > 0 && !(e.soloEspecial && !(o && o.magico)))
     .sort((a, b) => (a.excedenteVida ? 1 : 0) - (b.excedenteVida ? 1 : 0));   // primero los escudos, al final la vida extra
   capas.forEach(c => {
     if(recibido <= 0) return;
@@ -219,7 +220,7 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     sc.usosEspecial = {...(sc.usosEspecial || {}), _golpe: 1};   // (se vacía en su Mantenimiento)
     const primero = primerGolpeDeRonda(sc, 'golpeRonda', viejoC);   // por ronda (2026-10-19)
     const extra = defExtra(ignoraDef, primero, st => CreepCalculo.modTotal(sc, st), o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0);
-    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : creepDefensaMapa(sc) + extra) + num(restaExtra || 0), sc.estados);
+    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : creepDefensaMapa(sc) + extra) + num(restaExtra || 0), sc.estados, o);
     const previo = num(sc.hp);
     sc.hp = Math.max(0, previo - r.recibido);
     const bronca = typeof broncaSumar === 'function' ? broncaSumar(sc, r) : null;   // 😤 cada golpe que le duele suma (js/51)
@@ -329,7 +330,7 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     datos.meta = datos.meta || {};
     const primero = primerGolpeDeRonda(datos.meta, 'golpeRonda', viejoP);   // por ronda (2026-10-19)
     const extra = defExtra(ignoraDef, primero, st => rs[st], o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0);
-    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : num(rs.def) + extra) + num(restaExtra || 0), efectos);
+    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : num(rs.def) + extra) + num(restaExtra || 0), efectos, o);
     mitiMitiPartir(r, prot);
     const previo = num(datos.hp);
     datos.hp = Math.max(0, previo - r.recibido);
@@ -395,7 +396,7 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     inv.golpeTurno = 1;   // (el Mantenimiento la vacía)
     const primero = primerGolpeDeRonda(inv, 'golpeRonda', viejoI);   // por ronda (2026-10-19)
     const extra = defExtra(ignoraDef, primero, st => FichaResumen.invModTotal(inv, st), o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0);
-    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : defensasDeInv(inv).def + extra) + num(restaExtra || 0), inv.estados);
+    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : defensasDeInv(inv).def + extra) + num(restaExtra || 0), inv.estados, o);
     mitiMitiPartir(r, prot);
     const previo = num(inv.hp);
     inv.hp = Math.max(0, previo - r.recibido);

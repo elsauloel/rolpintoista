@@ -119,7 +119,7 @@ const FichaDuelo = (() => {
           return t.stat ? {formula: f(num(c.final[t.stat]) + num(t.bono), t.stat), ...L('stat:' + t.stat)} : null;
         }
         if(campo === 'contra') return modo ? {formula: f(num(c.final[modo]), modo), ...L('stat:' + modo)} : null;
-        if(campo === 'eva') return {formula: f(num(c.final.eva) + evaEsp(d).val, 'eva'), ...L('stat:eva')};
+        if(campo === 'eva'){ const ee = evaEsp(d); return {formula: Combatiente.conFijo(f(num(c.final.eva) + ee.val, 'eva'), ee), ...L('stat:eva')}; }
         if(campo === 'parry'){ const it = modo ? S.inventario.find(x => x.id === modo) : null; return {formula: f(statParaArma('parry', it), 'parry'), ...L('stat:parry')}; }
         if(campo === 'pdg'){
           const tipo = d.ataque.tipo;
@@ -256,16 +256,16 @@ const FichaDuelo = (() => {
       // Cómo puede defenderse (elige a ciegas): Evasión, o Parry con cada arma o escudo equipado (siempre 1 No2).
       opcionesDefensa: d => {
         const S = getS();
-        const ee = evaEsp(d), evaV = num(compute().final.eva) + ee.val, evaInfo = ee.val ? ` (con ${ee.txt})` : '';
+        const ee = evaEsp(d), evaV = num(compute().final.eva) + ee.val, evaInfo = ee.txt ? ` (con ${ee.txt})` : '';
         // «cuánto tirarías»: la fórmula de dados de cada defensa (con las mitades de Lisiado/Pajaritos/Sentado…) y, para cada Parry, el Bloqueo que tirarías si ganás.
         const fx = (v, statId, estados) => { const f = formulaParaValor(v); if(!f) return fmt(num(v)); const mit = statId ? Combatiente.mitadesDeTirada(estados, statId) : 0; return f.formula + ' ÷2'.repeat(mit); };
         const c = compute();
         const sobre = c.sobrecarga;
         // Con sobrepeso la Evasión pide elegir: pagar 1 No2 para tirar sin penalidad o tirar con −N. Se elige acá, en el cuadro del duelo.
         const ops = sobre > 0
-          ? [{modo: 'evasion', itemId: 'pagado', etiqueta: '🏃 Evasión · pagando 1 No2', costo: 1, motivoNo: '', info: [`Evasión 🎲 ${fx(evaV, 'eva', S.efectos)}${evaInfo}`, `sin la penalidad de sobrepeso (−${fmt(sobre)})`, ...(num(S.nitros) < 1 ? ['⚠ sin No2: quedás en negativo (se descuenta al recargar)'] : [])]},
-             {modo: 'evasion', itemId: 'penal', etiqueta: `🏃 Evasión · con penalidad −${fmt(sobre)}`, motivoNo: '', info: [`Evasión 🎲 ${fx(evaV, 'eva', S.efectos)} −${fmt(sobre)}${evaInfo}`, 'no gastás No2']}]
-          : [{modo: 'evasion', itemId: '', etiqueta: '🏃 Evasión', motivoNo: '', info: [`Evasión 🎲 ${fx(evaV, 'eva', S.efectos)}${evaInfo}`]}];
+          ? [{modo: 'evasion', itemId: 'pagado', etiqueta: '🏃 Evasión · pagando 1 No2', costo: 1, motivoNo: '', info: [`Evasión 🎲 ${Combatiente.conFijo(fx(evaV, 'eva', S.efectos), ee)}${evaInfo}`, `sin la penalidad de sobrepeso (−${fmt(sobre)})`, ...(num(S.nitros) < 1 ? ['⚠ sin No2: quedás en negativo (se descuenta al recargar)'] : [])]},
+             {modo: 'evasion', itemId: 'penal', etiqueta: `🏃 Evasión · con penalidad −${fmt(sobre)}`, motivoNo: '', info: [`Evasión 🎲 ${Combatiente.conFijo(fx(evaV, 'eva', S.efectos), ee)} −${fmt(sobre)}${evaInfo}`, 'no gastás No2']}]
+          : [{modo: 'evasion', itemId: '', etiqueta: '🏃 Evasión', motivoNo: '', info: [`Evasión 🎲 ${Combatiente.conFijo(fx(evaV, 'eva', S.efectos), ee)}${evaInfo}`]}];
         // Sin arma ni escudo equipado no se puede parriar (regla del dueño, 2026-09-28).
         const gratis = Combatiente.parryGratis(st => c.final[st], num((S.ataquesArma || {})._parry));   // Parada fácil (2026-10-06)
         const disparo = Combatiente.contraDisparo(d);   // contra un disparo, Parry solo con escudo (2026-10-09)
@@ -282,7 +282,7 @@ const FichaDuelo = (() => {
           const no2 = FichaCombate.costoAtaque(S, it), sp = Math.max(0, FichaBotonera.spMaximo(S, c) - num(S.spGastado)), arco = Combatiente.esArco(it);
           ops.push({modo: 'parrydist', itemId: it.id, itemNombre: it.nombre, etiqueta: `🏹 Parry a distancia · ${it.nombre}`, costo: no2, arco,
             motivoNo: no2 > num(S.nitros) ? `te faltan No2 (cuesta ${fmt(no2)})` : sp < 2 ? 'te falta SP (cuesta 2)' : '',
-            info: [`Evasión 🎲 ${fx(evaV, 'eva', S.efectos)}${evaInfo}`, `${fmt(no2)} No2 del disparo + 2 SP`,
+            info: [`Evasión 🎲 ${Combatiente.conFijo(fx(evaV, 'eva', S.efectos), ee)}${evaInfo}`, `${fmt(no2)} No2 del disparo + 2 SP`,
               arco ? 'si ganás, cuenta como Parry: para contraatacar, antes el dodge roll (alejarte 1 casillero, pagando sus No2)' : 'si ganás, cuenta como Parry: podés contraatacar']});
         });
         // ⚔ Contraataque (Warrior, 2026-10-13): con la habilidad, si esquiva con la Evasión puede contraatacar (2 SP + un primer ataque).
@@ -301,17 +301,17 @@ const FichaDuelo = (() => {
           S.nitros = num(S.nitros) - pagoDist;
           FichaAcciones.tormentaPj(S, pagoDist, 'el Parry a distancia', ui);
           ui.cambio(['nitros', 'vitals']);
-          tirarValorStat(`Evasión (Parry a distancia${it ? ' · ' + it.nombre : ''}${ee.val ? ', ' + ee.txt : ''})`, num(compute().final.eva) + ee.val, 'eva');
+          tirarValorStat(`Evasión (Parry a distancia${it ? ' · ' + it.nombre : ''}${ee.txt ? ', ' + ee.txt : ''})`, num(compute().final.eva) + ee.val, 'eva', ee.fijo);
           Combatiente.gastarPasoFantasma(d, ee);
         }
         else if(itemId === 'pagado' || itemId === 'penal'){   // Evasión con sobrepeso: la elección ya se hizo en el cuadro del duelo
           const sobre = compute().sobrecarga;
           if(itemId === 'pagado') FichaAcciones.sobrepesoPagar(S, ui);   // sin No2 queda en negativo (2026-10-06)
           const ee = evaEsp(d);
-          tirarValorStat(ee.val ? `Evasión (${ee.txt})` : 'Evasión', num(compute().final.eva) + ee.val, 'eva', undefined, itemId === 'pagado' ? 'pagado' : 'penal', sobre);
+          tirarValorStat(ee.txt ? `Evasión (${ee.txt})` : 'Evasión', num(compute().final.eva) + ee.val, 'eva', ee.fijo, itemId === 'pagado' ? 'pagado' : 'penal', sobre);
           Combatiente.gastarPasoFantasma(d, ee);
         }
-        else { const ee = evaEsp(d); tirarValorStat(ee.val ? `Evasión (${ee.txt})` : 'Evasión', num(compute().final.eva) + ee.val, 'eva'); Combatiente.gastarPasoFantasma(d, ee); }
+        else { const ee = evaEsp(d); tirarValorStat(ee.txt ? `Evasión (${ee.txt})` : 'Evasión', num(compute().final.eva) + ee.val, 'eva', ee.fijo); Combatiente.gastarPasoFantasma(d, ee); }
       },
       // La Fuerza del golpe del atacante contra el Bloqueo del defensor (Fue + peso de su arma).
       fuerza: d => FichaAcciones.fuerzaGolpeConArma(getS(), armaDelInv(d.ataque.armaId), ui),

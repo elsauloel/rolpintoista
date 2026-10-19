@@ -16,8 +16,8 @@ const InvAcciones = (() => {
 
   /* ---------- Tiradas ---------- */
   // La misma tirada que el personaje y los creeps (comun/combatiente.js): con Afortunado también tira dos veces (P100).
-  function tirada(inv, nombre, valor, statId){
-    const r = Combatiente.tirarStat(valor, inv.estados, statId);
+  function tirada(inv, nombre, valor, statId, extra){   // extra: un fijo que se suma después del dado (el Paso fantasma)
+    const r = Combatiente.tirarStat(valor, inv.estados, statId, extra ? {extra} : undefined);
     if(!r) return {error: `${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`};
     return {origen: `${inv.nombre} · ${nombre}`, r};
   }

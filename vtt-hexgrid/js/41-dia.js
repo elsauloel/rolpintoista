@@ -155,9 +155,9 @@ $('#btn-dia-mapa').onclick = () => pasarDeDia();
 // El arranque (js/14, arrancarEnVivo) lo llama; si ya arrancó antes de que cargara este archivo, se empieza acá (2026-10-12: pasaba).
 escucharDia();
 $('#btn-dia-corregir').onclick = () => corregirDia();
-/* 🌞 AMANESE UN NUEBO DIA (2026-10-19, dueño: «una referencia en chiste a esa tía cursi que te manda una tarjeta con Tweety y mensajes
-   motivacionales mal escritos y cursis llenos de rosas y diseño feo»). Al pasar de día, en todas las pantallas, unos segundos al centro: la
-   imagen del sol (`comun/amanecer.png`; si no está, un 🌞 gigante), el texto con faltas a propósito y una lluvia de corazones, chispas, hadas
+/* 🌞 AMANESE QUE NO ES POCO (2026-10-19, dueño: «una referencia en chiste a esa tía cursi que te manda una tarjeta con Tweety y mensajes
+   motivacionales mal escritos y cursis llenos de rosas y diseño feo»). Al pasar de día, en todas las pantallas, unos segundos al centro: un 🌞
+   gigante (dueño: con el emoji, no con una imagen), el texto con faltas a propósito y una lluvia de corazones, chispas, hadas
    y flores. Se va sola o con un clic. Es a propósito fea: no «arreglarla». */
 const AMANECER_EMOJIS = ['💖', '✨', '🧚', '🌸', '🌹', '💕', '🌼', '🦋', '💗', '🌷', '⭐', '🧚‍♀️', '💝', '🌺'];
 function amanecerMostrar(){
@@ -189,9 +189,9 @@ function amanecerMostrar(){
   </style>${lluvia}
   <div class="am-tarjeta">
     <div class="am-fila">${em(9)}</div>
-    <img class="am-sol" src="../comun/amanecer.png" alt="" onerror="this.outerHTML='<div class=&quot;am-solemoji&quot;>🌞</div>'">
+    <div class="am-solemoji">🌞</div>
     <div class="am-fila">${em(6)}</div>
-    <div class="am-texto">${em(3)} AMANESE UN NUEBO DIA ${em(3)}</div>
+    <div class="am-texto">${em(3)} AMANESE QUE NO ES POCO ${em(3)}</div>
     <div class="am-fila">${em(9)}</div>
     <div class="am-firma">BENDISIONES PARA TODOS!!! 🙏🌹 Día ${diaActual}</div>
   </div>`;

@@ -100,7 +100,7 @@ const CreepDuelo = (() => {
           return t.stat ? {formula: formulaDe(A().tirada('', habStat(sc, t.stat) + num(t.bono), sc, t.stat)), ...L('stat|' + t.stat)} : null;
         }
         if(campo === 'contra') return modo ? {formula: formulaDe(A().tirada('', habStat(sc, modo), sc, modo)), ...L('stat|' + modo)} : null;
-        if(campo === 'eva') return {formula: formulaDe(A().tirada('', C().statValor(sc, 'eva') + evaEsp(sc, d).val, sc, 'eva')), ...L('stat|eva')};
+        if(campo === 'eva'){ const ee = evaEsp(sc, d); return {formula: formulaDe(A().tirada('', C().statValor(sc, 'eva') + ee.val, sc, 'eva', ee.fijo)), ...L('stat|eva')}; }
         if(campo === 'parry') return {formula: formulaDe(A().tirada('', C().statValor(sc, 'parry'), sc, 'parry')), ...L('stat|parry')};
         if(campo === 'pdg'){
           const t = d.ataque.tipo === 'habilidad-arma' ? pdgDeArreglos(sc, d.ataque) : A().tiradaAtaque(sc, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo);
@@ -198,7 +198,7 @@ const CreepDuelo = (() => {
         const gratis = Combatiente.parryGratis(st => C().modTotal(sc, st), num((sc.usosEspecial || {})._parry));   // Parada fácil (2026-10-06)
         const c = gratis ? 0 : C().costoParry(sc);
         const ee = evaEsp(sc, d);
-        const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión', info: [`Evasión 🎲 ${fx(C().statValor(sc, 'eva') + ee.val, 'eva')}${ee.val ? ` (con ${ee.txt})` : ''}`]}];
+        const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión', info: [`Evasión 🎲 ${Combatiente.conFijo(fx(C().statValor(sc, 'eva') + ee.val, 'eva'), ee)}${ee.txt ? ` (con ${ee.txt})` : ''}`]}];
         // Parry solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30; un arma natural no alcanza, por ahora).
         const disparo = Combatiente.contraDisparo(d), def = C().defensa(sc, {soloEscudo: disparo});   // contra un disparo, Parry solo con escudo
         if(Combatiente.stuneado(sc.estados)) return [{modo: 'evasion', etiqueta: '🏃 Evasión · Stun: 1', info: ['⚡ Stun: no puede hacer nada; su Evasión es 1']}];   // Stun (2026-10-06)
@@ -219,7 +219,7 @@ const CreepDuelo = (() => {
           });
         }
         const ee = evaEsp(sc, d);
-        ui.publicar(sc, A().tirada(`${sc.nombre} · Evasión${ee.val ? ` (${ee.txt})` : ''}`, C().statValor(sc, 'eva') + ee.val, sc, 'eva'));
+        ui.publicar(sc, A().tirada(`${sc.nombre} · Evasión${ee.txt ? ` (${ee.txt})` : ''}`, C().statValor(sc, 'eva') + ee.val, sc, 'eva', ee.fijo));
         Combatiente.gastarPasoFantasma(d, ee);
       },
       fuerza: d => {

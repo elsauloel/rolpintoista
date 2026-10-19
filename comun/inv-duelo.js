@@ -87,7 +87,7 @@ const InvDuelo = (() => {
           return t.stat ? {formula: F(num(I().statValor(inv, t.stat)) + num(t.bono), t.stat), ...L('stat:' + t.stat)} : null;
         }
         if(campo === 'contra') return modo ? {formula: F(num(I().statValor(inv, modo)), modo), ...L('stat:' + modo)} : null;
-        if(campo === 'eva') return {formula: F(I().statValor(inv, 'eva') + evaEsp(inv, d).val, 'eva'), ...L('stat:eva')};
+        if(campo === 'eva'){ const ee = evaEsp(inv, d); return {formula: Combatiente.conFijo(F(I().statValor(inv, 'eva') + ee.val, 'eva'), ee), ...L('stat:eva')}; }
         if(campo === 'parry') return {formula: F(I().statValor(inv, 'parry'), 'parry'), ...L('stat:parry')};
         if(campo === 'pdg'){
           const t = d.ataque.tipo === 'habilidad-arma'
@@ -191,7 +191,7 @@ const InvDuelo = (() => {
         const gratis = Combatiente.parryGratis(st => I().modTotal(inv, st), num(inv.parryTurno));   // Parada fácil (2026-10-06)
         const c = gratis ? 0 : Combatiente.costoParry();
         const ee = evaEsp(inv, d);
-        const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión', info: [`Evasión 🎲 ${fx(I().statValor(inv, 'eva') + ee.val, 'eva', inv.estados)}${ee.val ? ` (con ${ee.txt})` : ''}`]}];
+        const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión', info: [`Evasión 🎲 ${Combatiente.conFijo(fx(I().statValor(inv, 'eva') + ee.val, 'eva', inv.estados), ee)}${ee.txt ? ` (con ${ee.txt})` : ''}`]}];
         // Parry solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30; un arma natural no alcanza, por ahora).
         const disparo = Combatiente.contraDisparo(d), def = I().defensa(inv, {soloEscudo: disparo});   // contra un disparo, Parry solo con escudo
         if(Combatiente.stuneado(inv.estados)) return [{modo: 'evasion', etiqueta: '🏃 Evasión · Stun: 1', info: ['⚡ Stun: no puede hacer nada; su Evasión es 1']}];   // Stun (2026-10-06)
@@ -203,7 +203,7 @@ const InvDuelo = (() => {
         const inv = ui.inv(d.defensor);
         if(!inv) return;
         if(modo === 'parry') tirarStat(inv, 'parry');
-        else { const ee = evaEsp(inv, d); publicar(A().tirada(inv, ee.val ? `Evasión (${ee.txt})` : 'Evasión', I().statValor(inv, 'eva') + ee.val, 'eva')); Combatiente.gastarPasoFantasma(d, ee); }
+        else { const ee = evaEsp(inv, d); publicar(A().tirada(inv, ee.txt ? `Evasión (${ee.txt})` : 'Evasión', I().statValor(inv, 'eva') + ee.val, 'eva', ee.fijo)); Combatiente.gastarPasoFantasma(d, ee); }
       },
       // La Fuerza del golpe del atacante contra el Bloqueo del defensor (Fue + peso de su arma).
       fuerza: d => {

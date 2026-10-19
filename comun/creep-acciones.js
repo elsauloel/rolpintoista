@@ -16,8 +16,8 @@ const CreepAcciones = (() => {
   /* ---------- Tiradas ---------- */
   // La tirada de un stat del creep es la misma que la de un personaje o una invocación (comun/combatiente.js): Afortunado
   // (dos veces, queda la mejor), mitades y Evasión mínimo 1.
-  function tirada(nombre, valor, sc, statId){
-    const r = Combatiente.tirarStat(valor, sc ? sc.estados : [], statId);
+  function tirada(nombre, valor, sc, statId, extra){   // extra: un fijo que se suma después del dado (el Paso fantasma)
+    const r = Combatiente.tirarStat(valor, sc ? sc.estados : [], statId, extra ? {extra} : undefined);
     if(!r) return {error: `${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`};
     return {origen: nombre, r};
   }

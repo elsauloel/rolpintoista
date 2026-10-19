@@ -217,8 +217,11 @@ Reemplazan a las 72 de antes (24 × menor/normal/mayor). Común / Buena / Rara p
   del lugar: el 📚 del mapa lista estas mismas trampas (sale de `CATALOGO_BASE`) y, al elegir una, pregunta la dificultad arrancando en esa.
 - **La que coloca alguien** (personaje, creep o invocación; de un consumible o de una habilidad): **su Destreza si es mecánica, su Efecto especial
   si es mágica**, más los Guantes de trampero. «Esa es la gracia.»
-- **Mecánicas y mágicas** (`detectarStat` en `trampaDatos`): mágicas = Arena movediza, Trampa de escarcha, Tumba de hielo, Géiser de fuego, Runa de
-  debilidad, Runa de silencio, Succión arcana, Espejo de discordia, Portal cósmico, Muro de piedra, Muralla repentina; el resto (28), mecánicas. En
+- **Mecánicas y mágicas** (`detectarStat` en `trampaDatos`). **El criterio (dueño, 2026-10-19):** mecánica = un mecanismo que uno construye con
+  las manos (por eso se desarma con la Destreza): cepos, redes, cables, aceite, brea, dardos, gases y menjunjes (la Niebla de confusión), minas y
+  explosivos, la Descarga eléctrica. Mágica = un efecto que se invoca, aunque lo que aparezca sea físico (el Pilar de piedra): se disipa con el
+  Efecto especial. Mágicas (13) = Arena movediza, Trampa de escarcha, Tumba de hielo, Géiser de fuego, Runa de debilidad, Runa de silencio, Succión
+  arcana, Espejo de discordia, Portal cósmico, Pilar de piedra, Muro de piedra, Muralla repentina y Derrumbe; el resto (26), mecánicas. En
   los creeps: la Runa explosiva y el Sello explosivo, mágicas; los cepos, minas, redes, zarzas y dardos, mecánicas.
 - **Detectarla: siempre Percepción.** Desarmarla o disiparla: Destreza o Efecto especial según su origen (la trampa colocada guarda `magica`).
 - Por qué: con 1d8 de Percepción, contra 6 hay 38 % (50 % con Percepción aumentada); contra 8, 13 % (30 %); contra 10, 0 (10 %). Las de los creeps

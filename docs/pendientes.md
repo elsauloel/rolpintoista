@@ -75,6 +75,10 @@
 >   con la tirada del talento; las Ganzúas suman +2). **Decidido (dueño, 2026-10-17):** es un talento; se aprende tirando **Destreza**; armar
 >   una copia gasta **loot y tiempo fuera de combate**; las trampas **invocadas** (las de una habilidad, de un creep o de un personaje) también
 >   se pueden copiar, pero **con más dificultad**. «Lo vamos a enseñar en su momento.» Falta: las dificultades y cuánto loot y tiempo.
+>   **Ampliación (dueño, 2026-10-19):** el talento Desarmar trampas pasa a ser algo como **«Conocedor de trampas» / «Inspector de trampas»** (el
+>   nombre, a definir; «experto» no): además de desarmarlas, permite **aprender a replicarlas con una tirada**. «Después inventamos bien el
+>   sistema, tanto del aprender como del craftear.» (Hoy: con el talento, desarmar = Destreza + Ganzúas si la trampa es mecánica; disipar =
+>   Efecto especial si es mágica.)
 > - [x] **🪤 Revisar la dificultad para detectar de las trampas del catálogo (2026-10-17, dueño; decidido y hecho 2026-10-19):** la Percepción de los personajes es baja
 >   (1d8 o menos en El origen). **Las de una habilidad están bien** (dueño: la dificultad sale de la Destreza o el Efecto especial de quien la
 >   coloca, y si es alta, es una trampa difícil de ver); revisar las del catálogo y las que se arman en el mapa (número fijo, una común 8)

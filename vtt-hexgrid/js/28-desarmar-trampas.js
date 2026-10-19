@@ -77,8 +77,9 @@ async function desarmarIntentar(tokenId, trampaId, o){
     catch(err){ console.error('No se pudo sacar la trampa del mapa:', err); return {ok, texto: `${r.total} contra ${dif}: ${ok ? `desarmaste ${nomT} (está en tu mochila)` : `${nomT} se rompió`}, pero no se pudo sacar del mapa (¿faltan pegar las reglas?): borrala a mano.`}; }
   }
   if(o.rompeTxt) return {ok, texto: o.rompeTxt};
-  return {ok, texto: ok ? `${r.total} contra ${dif}: desarmaste ${nomT} y te la guardaste en la mochila.`
-    : o.rompe ? `${r.total} contra ${dif}: ${nomT} se rompió al intentar desarmarla.` : `${r.total} contra ${dif}: no pudiste; ${nomT} sigue armada.`};
+  const mag = trampaEsMagica(el);
+  return {ok, texto: ok ? `${r.total} contra ${dif}: ${mag ? 'disipaste' : 'desarmaste'} ${nomT} y te la guardaste en la mochila.`
+    : o.rompe ? `${r.total} contra ${dif}: ${nomT} se rompió al intentar ${mag ? 'disiparla' : 'desarmarla'}.` : `${r.total} contra ${dif}: no pudiste; ${nomT} sigue armada.`};
 }
 // Al terminar el combate: la Percepción de quien busca contra la dificultad de esa trampa (la misma tirada de «Algo está fuera de lugar»). → {ok, texto}.
 async function desarmarDetectar(tokenId, el){

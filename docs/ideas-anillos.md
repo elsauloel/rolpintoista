@@ -7,6 +7,15 @@
 > Marcas: **⚙** ya se puede armar con lo que existe (un stat o una mecánica que el juego ya hace sola) · **🔧** hay que programar algo ·
 > la calidad es una sugerencia. Los nombres son provisorios (los retoca el dueño).
 
+## ✅ Elegidos por el dueño (2026-10-18, «me gusta»)
+
+- **Anillo del pantano**: tus Venenos entran con 1 stack más (y, como dura tantos turnos como stacks, 1 turno más), venga de un arma, una
+  varita, una habilidad, una zona o una trampa. Propuesta: Buena, 170. 🔧
+- **Anillo del último aliento**: una vez por día, cuando un golpe te dejaría en 0, quedás con 1 (se recarga al pasar de día). Propuesta: Buena,
+  200, o el primer anillo Raro (pregunta al dueño). 🔧
+- **Anillo del trébol**: una vez por combate, un botón 🍀 (como la Polilla) y tu próxima tirada sale como Afortunado. Propuesta: Buena, 160. 🔧
+- Un cuarto «me gusta también» llegó sin el anillo citado: preguntado.
+
 ## A. Bonos que faltan (hoy ningún anillo los da)
 
 | Anillo | Qué hace |

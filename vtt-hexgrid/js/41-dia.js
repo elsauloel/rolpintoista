@@ -83,6 +83,7 @@ async function diaRevisar(antes){
     }
     // ☀ Lo que se le recargó a cada jugador, en un Anuncio con «Aceptar» (dueño, 2026-10-19: «lo que sea que se recargue… debe aparecerle en
     // un anuncio»). Le llega a su dueño aunque lo haya aplicado la pantalla del GM (con 🎮 el control); los demás lo ven en la Crónica.
+    if(anuncios.size) await amanecerEspera();   // primero la tarjeta de la tía; el Anuncio, cuando se va
     for(const [k, pasos] of anuncios){
       if(typeof momentoAbrir !== 'function' || !pasos.length) continue;
       try{ await momentoAbrir({tipo: 'dia-descanso', icono: '☀', titulo: `Día ${dia}: descansaste`, estado: 'listo',
@@ -168,13 +169,13 @@ function amanecerMostrar(){
   el.innerHTML = `<style>
     #amanecer-tia{position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;pointer-events:auto;cursor:pointer;
       background:radial-gradient(circle,rgba(255,182,230,.55),rgba(255,105,180,.25) 60%,transparent);animation:am-entra .6s ease-out, am-va .9s ease-in 7.2s forwards;overflow:hidden}
-    #amanecer-tia .am-tarjeta{position:relative;text-align:center;padding:22px 30px 26px;border:6px dashed #ff2fa8;border-radius:30px;
+    #amanecer-tia .am-tarjeta{position:relative;text-align:center;padding:14px 30px 18px;max-height:94vh;box-sizing:border-box;border:6px dashed #ff2fa8;border-radius:30px;
       background:linear-gradient(135deg,#fff6a8,#ffc4ec 45%,#b8f2ff);box-shadow:0 0 0 6px #fff,0 0 0 12px #8a2be2,0 18px 50px rgba(0,0,0,.45);
       max-width:min(92vw,720px);animation:am-bambolea 2.4s ease-in-out infinite}
-    #amanecer-tia .am-sol{width:min(46vh,340px);height:min(46vh,340px);object-fit:contain;filter:drop-shadow(0 0 28px #ffd400) drop-shadow(0 0 8px #ff8c00);animation:am-late 1.6s ease-in-out infinite}
-    #amanecer-tia .am-solemoji{font-size:min(36vh,260px);line-height:1;filter:drop-shadow(0 0 24px #ffd400);animation:am-late 1.6s ease-in-out infinite}
-    #amanecer-tia .am-fila{font-size:30px;letter-spacing:2px;line-height:1.2}
-    #amanecer-tia .am-texto{font-family:'Comic Sans MS','Comic Sans',cursive;font-weight:900;font-size:clamp(30px,6vw,64px);line-height:1.05;margin:8px 0;
+    #amanecer-tia .am-sol{width:min(34vh,320px);height:min(34vh,320px);object-fit:contain;filter:drop-shadow(0 0 28px #ffd400) drop-shadow(0 0 8px #ff8c00);animation:am-late 1.6s ease-in-out infinite}
+    #amanecer-tia .am-solemoji{font-size:min(28vh,240px);line-height:1;filter:drop-shadow(0 0 24px #ffd400);animation:am-late 1.6s ease-in-out infinite}
+    #amanecer-tia .am-fila{font-size:clamp(18px,4vh,30px);letter-spacing:2px;line-height:1.2}
+    #amanecer-tia .am-texto{font-family:'Comic Sans MS','Comic Sans',cursive;font-weight:900;font-size:clamp(26px,min(6vw,8vh),64px);line-height:1.05;margin:6px 0;
       background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe600,#00d26a,#00a2ff,#a200ff,#ff0080);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
       -webkit-text-stroke:2px #5a0060;text-shadow:3px 3px 0 rgba(255,255,255,.7);animation:am-arcoiris 2.5s linear infinite;transform:rotate(-3deg)}
     #amanecer-tia .am-firma{font-family:'Comic Sans MS',cursive;font-size:17px;color:#c4007a;font-style:italic;margin-top:4px}
@@ -198,4 +199,7 @@ function amanecerMostrar(){
   el.addEventListener('click', cerrar);
   document.body.appendChild(el);
   setTimeout(cerrar, 8200);
+}
+async function amanecerEspera(){
+  for(let i = 0; i < 40 && document.getElementById('amanecer-tia'); i++) await new Promise(r => setTimeout(r, 300));
 }

@@ -21,13 +21,14 @@ function escucharDia(){
   diaEscuchando = true;
   refDia().onSnapshot(doc => {
     const d = doc.exists ? doc.data() || {} : {};
-    const antes = diaActual;
+    const antes = diaActual, yaVisto = diaVisto;
     diaActual = Math.max(0, Math.round(num(d.dia)));
     diaManual = !!d.manual;
     diaDescanso = d.descanso === 'bueno' ? 'bueno' : 'normal';   // 🃏 (2026-10-15): reparador = 2 wildcards, normal = 1
     diaVisto = true;
     if(typeof actualizarCabecera === 'function') actualizarCabecera();
     renderDiaBoton();
+    if(yaVisto && diaActual > antes && !diaManual) amanecerMostrar();   // 🌞 la tarjeta de la tía (no al entrar ni al corregir el número)
     if(diaActual > 0) diaRevisar(antes);
   }, err => console.error('Error escuchando el día:', err));
 }
@@ -153,3 +154,48 @@ $('#btn-dia-mapa').onclick = () => pasarDeDia();
 // El arranque (js/14, arrancarEnVivo) lo llama; si ya arrancó antes de que cargara este archivo, se empieza acá (2026-10-12: pasaba).
 escucharDia();
 $('#btn-dia-corregir').onclick = () => corregirDia();
+/* 🌞 AMANESE UN NUEBO DIA (2026-10-19, dueño: «una referencia en chiste a esa tía cursi que te manda una tarjeta con Tweety y mensajes
+   motivacionales mal escritos y cursis llenos de rosas y diseño feo»). Al pasar de día, en todas las pantallas, unos segundos al centro: la
+   imagen del sol (`comun/amanecer.png`; si no está, un 🌞 gigante), el texto con faltas a propósito y una lluvia de corazones, chispas, hadas
+   y flores. Se va sola o con un clic. Es a propósito fea: no «arreglarla». */
+const AMANECER_EMOJIS = ['💖', '✨', '🧚', '🌸', '🌹', '💕', '🌼', '🦋', '💗', '🌷', '⭐', '🧚‍♀️', '💝', '🌺'];
+function amanecerMostrar(){
+  document.getElementById('amanecer-tia')?.remove();
+  const em = n => Array.from({length: n}, (_, i) => AMANECER_EMOJIS[(i * 5 + Math.floor(Math.random() * 3)) % AMANECER_EMOJIS.length]).join('');
+  const lluvia = Array.from({length: 46}, () => `<span class="am-cae" style="left:${Math.random() * 100}%;animation-delay:${(Math.random() * 2.5).toFixed(2)}s;animation-duration:${(3 + Math.random() * 3).toFixed(2)}s;font-size:${18 + Math.round(Math.random() * 26)}px">${AMANECER_EMOJIS[Math.floor(Math.random() * AMANECER_EMOJIS.length)]}</span>`).join('');
+  const el = document.createElement('div');
+  el.id = 'amanecer-tia';
+  el.innerHTML = `<style>
+    #amanecer-tia{position:fixed;inset:0;z-index:2000;display:flex;align-items:center;justify-content:center;pointer-events:auto;cursor:pointer;
+      background:radial-gradient(circle,rgba(255,182,230,.55),rgba(255,105,180,.25) 60%,transparent);animation:am-entra .6s ease-out, am-va .9s ease-in 7.2s forwards;overflow:hidden}
+    #amanecer-tia .am-tarjeta{position:relative;text-align:center;padding:22px 30px 26px;border:6px dashed #ff2fa8;border-radius:30px;
+      background:linear-gradient(135deg,#fff6a8,#ffc4ec 45%,#b8f2ff);box-shadow:0 0 0 6px #fff,0 0 0 12px #8a2be2,0 18px 50px rgba(0,0,0,.45);
+      max-width:min(92vw,720px);animation:am-bambolea 2.4s ease-in-out infinite}
+    #amanecer-tia .am-sol{width:min(46vh,340px);height:min(46vh,340px);object-fit:contain;filter:drop-shadow(0 0 28px #ffd400) drop-shadow(0 0 8px #ff8c00);animation:am-late 1.6s ease-in-out infinite}
+    #amanecer-tia .am-solemoji{font-size:min(36vh,260px);line-height:1;filter:drop-shadow(0 0 24px #ffd400);animation:am-late 1.6s ease-in-out infinite}
+    #amanecer-tia .am-fila{font-size:30px;letter-spacing:2px;line-height:1.2}
+    #amanecer-tia .am-texto{font-family:'Comic Sans MS','Comic Sans',cursive;font-weight:900;font-size:clamp(30px,6vw,64px);line-height:1.05;margin:8px 0;
+      background:linear-gradient(90deg,#ff0080,#ff8c00,#ffe600,#00d26a,#00a2ff,#a200ff,#ff0080);background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;
+      -webkit-text-stroke:2px #5a0060;text-shadow:3px 3px 0 rgba(255,255,255,.7);animation:am-arcoiris 2.5s linear infinite;transform:rotate(-3deg)}
+    #amanecer-tia .am-firma{font-family:'Comic Sans MS',cursive;font-size:17px;color:#c4007a;font-style:italic;margin-top:4px}
+    #amanecer-tia .am-cae{position:absolute;top:-60px;animation:am-cae linear infinite;pointer-events:none}
+    @keyframes am-entra{from{opacity:0;transform:scale(.6) rotate(-8deg)}to{opacity:1;transform:none}}
+    @keyframes am-va{to{opacity:0;visibility:hidden}}
+    @keyframes am-bambolea{0%,100%{transform:rotate(-2deg) scale(1)}50%{transform:rotate(2deg) scale(1.03)}}
+    @keyframes am-late{0%,100%{transform:scale(1) rotate(0)}50%{transform:scale(1.08) rotate(6deg)}}
+    @keyframes am-arcoiris{to{background-position:300% 0}}
+    @keyframes am-cae{0%{transform:translateY(0) rotate(0)}100%{transform:translateY(115vh) rotate(540deg)}}
+  </style>${lluvia}
+  <div class="am-tarjeta">
+    <div class="am-fila">${em(9)}</div>
+    <img class="am-sol" src="../comun/amanecer.png" alt="" onerror="this.outerHTML='<div class=&quot;am-solemoji&quot;>🌞</div>'">
+    <div class="am-fila">${em(6)}</div>
+    <div class="am-texto">${em(3)} AMANESE UN NUEBO DIA ${em(3)}</div>
+    <div class="am-fila">${em(9)}</div>
+    <div class="am-firma">Bendiciones para todos!!! 🙏🌹 Día ${diaActual}</div>
+  </div>`;
+  const cerrar = () => el.remove();
+  el.addEventListener('click', cerrar);
+  document.body.appendChild(el);
+  setTimeout(cerrar, 8200);
+}

@@ -2,7 +2,8 @@
 /* Quien tiene el talento Desarmar trampas (en sus Talentos, `S.sociales`; la ficha publica su tirada en `resumen.desarmaTrampas`):
    · Detecta trampas como la Percepción aumentada, pero solo trampas (igual que Pisada atenta, js/08): al pasar al lado de una oculta se corta
      el movimiento, «Algo está fuera de lugar…» y tira Percepción (js/16).
-   · Si la encuentra, puede desarmarla: 1 No2 y la tirada del talento contra la dificultad de la trampa (la misma de detectarla: una común, 6).
+   · Si la encuentra, puede desarmarla: 1 No2 y su tirada contra la dificultad de la trampa (la misma de detectarla: una común, 6). La tirada
+     (dueño, 2026-10-19): Destreza + Ganzúas si es mecánica; Efecto especial si es mágica («disiparla»). El talento es lo que deja intentarlo.
      Si llega, se la queda como consumible — también las mágicas (dueño: «se puede, es divertido»). Si no, la trampa sigue ahí.
    · Al terminar el combate (cuando se cierra el botín), si quedaron trampas rivales sin disparar: «¿Querés desarmarlas?» — una tirada por
      trampa, sin No2; la que no desarma, se rompe.
@@ -13,12 +14,18 @@ const DESARMAR_TRAMPA_NO2 = 1;
 const trampaIntentoPerdido = new Set();
 const trampaPerdio = (tokenId, trampaId) => { if(modoMapa === 'combate') trampaIntentoPerdido.add(tokenId + ':' + trampaId); };
 const desarmarDif = el => Math.max(1, Math.round(num(el && el.trampaDetectar)) || 6);
-// La tirada del talento de ese personaje ('' si no lo tiene). Las invocaciones no tienen talentos.
-function tokenDesarmaTrampas(t){
+// La tirada de ese personaje para esa trampa ('' si no tiene el talento). Las invocaciones no tienen talentos. Con `el` (2026-10-19, dueño):
+// una trampa mágica se disipa con el Efecto especial (`resumen.disipaTrampas`); una mecánica, con la Destreza y las Ganzúas.
+function trampaEsMagica(el){
+  try{ return !!(el && (JSON.parse(el.trampaEstado || '{}') || {}).magica); }catch(e){ return false; }
+}
+function tokenDesarmaTrampas(t, el){
   if(!t || t.tipo !== 'pj' || String(t.fichaId || '').includes(SEP_INVOCACION)) return '';
   const v = vinculo(t), r = v && v.resumen;
-  return (r && r.desarmaTrampas) || '';
+  if(!r || !r.desarmaTrampas) return '';
+  return el && trampaEsMagica(el) ? (r.disipaTrampas || r.desarmaTrampas) : r.desarmaTrampas;
 }
+const desarmarVerbo = el => trampaEsMagica(el) ? 'Disipar' : 'Desarmar';
 // La trampa como consumible para la mochila: la del ítem que la colocó (`trampaItem`) o una armada con lo que tiene el elemento.
 function trampaComoItem(el){
   if(el.trampaItem){ try{ const it = JSON.parse(el.trampaItem); if(it && it.nombre) return {...it, unidades: 1}; }catch(e){} }
@@ -37,7 +44,7 @@ async function desarmarIntentar(tokenId, trampaId, o){
   o = o || {};
   const t = tokens.get(tokenId), el = elementos.get(trampaId);
   if(!t || !el || !el.trampa || el.disparada) return {ok: false, texto: 'La trampa ya no está.'};
-  const formula = tokenDesarmaTrampas(t), nombre = nombreDe(t), nomT = el.trampaNombre ? `«${el.trampaNombre}»` : 'la trampa', dif = desarmarDif(el);
+  const formula = tokenDesarmaTrampas(t, el), nombre = nombreDe(t), nomT = el.trampaNombre ? `«${el.trampaNombre}»` : 'la trampa', dif = desarmarDif(el);
   const r = formula ? tirarDados(formula) : null;
   if(!r) return {ok: false, texto: `${nombre} no tiene con qué tirar Desarmar trampas (abrí su ficha una vez para que lo publique).`};
   try{ await bnCargarPiezas(); }catch(err){ console.error(err); }
@@ -47,7 +54,7 @@ async function desarmarIntentar(tokenId, trampaId, o){
       return {ok: false, cancelado: true, texto: 'No lo intentó.'};
     try{ await editarPersonajeMapa(t.fichaId, S => { S.nitros = Math.max(0, num(S.nitros) - DESARMAR_TRAMPA_NO2); return true; }); }catch(err){ console.error('No se pudo cobrar el No2 de desarmar:', err); }
   }
-  try{ mesaPublicar(`${nombre} · Desarmar trampas (${el.trampaNombre || 'trampa'})`, {...r, quien: nombre, ficha: t.fichaId}); }catch(err){}
+  try{ mesaPublicar(`${nombre} · ${desarmarVerbo(el)} trampas (${el.trampaNombre || 'trampa'}: ${trampaEsMagica(el) ? 'Efecto especial' : 'Destreza'})`, {...r, quien: nombre, ficha: t.fichaId}); }catch(err){}
   const ok = r.total >= dif;
   if(ok){
     try{ await editarPersonajeMapa(t.fichaId, S => { Recibidos.devolverTrampas(S, [JSON.stringify(trampaComoItem(el))]); return true; }); }

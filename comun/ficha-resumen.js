@@ -71,15 +71,20 @@ const FichaResumen = (() => {
   /* ---------- El resumen (js/12, fichaResumen) ----------
      o: {control: {uid} | null (🎮 si el GM tiene el control), miniaturaInv(imagen) (la miniatura de una invocación; la
      ficha la calcula aparte y devuelve '' mientras tanto)}. */
-  // La tirada del talento «Desarmar trampas» ('' si no lo tiene): el dado del talento (nivel × 2 caras) + la Inteligencia sin invertir (2026-10-08).
-  function desarmaTrampasDe(S){
+  // La tirada para desarmar una trampa ('' si no tiene el talento «Desarmar trampas», que sigue siendo lo que deja intentarlo). Desde el
+  // 2026-10-19 (dueño): una trampa **mecánica** se desarma con la **Destreza** (+ las Ganzúas: `bonoDesarmar` del mejor ítem en la mochila o el
+  // cinturón); una **mágica** se disipa con el **Efecto especial** (`magica`). Antes: el dado del talento + la Inteligencia sin invertir.
+  function desarmaTrampasDe(S, magica){
     const it = (S.sociales || []).find(x => x && /desarm\w*\s+(de\s+)?trampa/i.test(String(x.nombre || '')));
     if(!it) return '';
-    const caras = Math.max(2, FichaBotonera.dadoCarasSocial(it));   // sin puntos todavía: 1d2
-    // + las Ganzúas que lleve (2026-10-08, dueño: «me encantan»): `bonoDesarmar` del mejor ítem en la mochila o el cinturón.
-    const ganzua = Math.max(0, ...[...(S.inventario || []), ...(S.cinturon || [])].map(x => num(x && x.bonoDesarmar)));
-    const extra = Math.round(num(FichaBotonera.inteligenciaBudget(S).resto)) + ganzua;
-    return `1d${caras}${extra ? (extra > 0 ? '+' : '') + extra : ''}`;
+    const v = num(FichaCalculo.calcular(S).final[magica ? 'dmgesp' : 'des']);
+    const ganzua = magica ? 0 : Math.max(0, ...[...(S.inventario || []), ...(S.cinturon || [])].map(x => num(x && x.bonoDesarmar)));
+    const f = typeof formulaParaValor === 'function' ? formulaParaValor(v) : null;
+    if(!f) return String(Math.max(1, Math.round(v) + ganzua));
+    const cuenta = {};
+    f.combo.forEach(d => { cuenta[d] = (cuenta[d] || 0) + 1; });
+    const mod = num(f.mod) + ganzua;
+    return Object.keys(cuenta).map(Number).sort((a, b) => a - b).map(d => `${cuenta[d]}d${d}`).join('+') + (mod ? (mod > 0 ? '+' : '') + mod : '');
   }
   function resumen(S, o){
     o = o || {};
@@ -138,7 +143,7 @@ const FichaResumen = (() => {
       retirada: n(c.final.retirada),   // Retirada limpia (%): el mapa la tira al alejarse de un rival (js/17)
       // Los pies (2026-10-04): el mapa las tira (js/08, js/19, js/21); Pasos de baile la lee el duelo.
       // Desarmar trampas (talento, 2026-10-08): detecta trampas como Pisada atenta y el mapa le ofrece desarmarlas con la tirada del talento.
-      desarmaTrampas: desarmaTrampasDe(S),
+      desarmaTrampas: desarmaTrampasDe(S), disipaTrampas: desarmaTrampasDe(S, true),   // mecánicas (Destreza) y mágicas (Efecto especial)
       // 🪙 ¿Tiene una Moneda Re-Roll para usar? (2026-10-09: el mapa apaga su botón si no; misma condición que FichaDuelo.monedaReroll)
       // 🫳 Lo que lleva en el cinturón, para un robo (2026-10-14, vtt-hexgrid/js/47): nombre y unidades.
       cinturon: (S.cinturon || []).filter(i => i && n(i.unidades) > 0 && !i.reservado).map(i => ({n: String(i.nombre || '').slice(0, 60), u: Math.min(99, Math.round(n(i.unidades)))})).slice(0, 20),

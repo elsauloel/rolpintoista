@@ -239,7 +239,7 @@ function renderPercepcionBanner(){
     const cerrar = () => { percepcionBanner = null; renderPercepcionBanner(); };
     AvisoCombate.cartel('percepcion', {icono: '🔎', titulo: `${quien}: Percepción`, texto: percepcionBanner.resultado,
       botones: percepcionBanner.desarmar
-        ? [{texto: `🪤 Desarmarla${modoMapa === 'combate' ? ' (1 No2)' : ''}`, id: 'percepcion-banner-desarmar', alClic: desarmarDesdeBanner}, {texto: 'Dejarla', sec: true, alClic: cerrar}]
+        ? [{texto: `${typeof trampaEsMagica === 'function' && trampaEsMagica(elementos.get(percepcionBanner.desarmar)) ? '✨ Disiparla' : '🪤 Desarmarla'}${modoMapa === 'combate' ? ' (1 No2)' : ''}`, id: 'percepcion-banner-desarmar', alClic: desarmarDesdeBanner}, {texto: 'Dejarla', sec: true, alClic: cerrar}]
         : [{texto: 'Listo', id: 'percepcion-banner-ok', alClic: cerrar}]});
   }else if(percepcionBanner.esperando){
     AvisoCombate.cartel('percepcion', {icono: '🔎', titulo: `${quien}: Percepción ${percepcionBanner.total}`, texto: 'Esperando qué pasa…'});
@@ -281,7 +281,7 @@ async function percepcionResolverBanner(){
     catch(err){ console.error('No se pudo marcar la trampa como descubierta (¿faltan publicar las reglas?):', err); }
     pb.resultado = `encontraste algo: ${el.trampaNombre ? `«${el.trampaNombre}», ` : ''}una trampa (${r.total} contra ${dif}).`;
     // Desarmar trampas (talento, 2026-10-08, js/28): si es de un rival, ofrece desarmarla.
-    if(typeof tokenDesarmaTrampas === 'function' && tokenDesarmaTrampas(t) && trampaDispara(t, el)){ pb.desarmar = pb.trampaId; pb.resultado += ' ¿Querés desarmarla?'; }
+    if(typeof tokenDesarmaTrampas === 'function' && tokenDesarmaTrampas(t) && trampaDispara(t, el)){ pb.desarmar = pb.trampaId; pb.resultado += typeof trampaEsMagica === 'function' && trampaEsMagica(el) ? ' Es mágica: ¿querés disiparla (Efecto especial)?' : ' ¿Querés desarmarla (Destreza)?'; }
     momentoActualizar(mid, {estado: 'listo', resultado: `…y encuentra una trampa${el.trampaNombre ? `: «${el.trampaNombre}»` : ''}.`});
   }else{
     pb.resultado = 'Mmm... Puede que estés flasheando.';   // texto del dueño (2026-10-02); la tirada ya está en la Mesa

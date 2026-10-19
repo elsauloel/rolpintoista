@@ -129,5 +129,6 @@ Hecho: **Anillo de la siesta** (Buena, 150): cada descanso, Vida extra 10 (no se
 la moneda; Buena, 160), **Herrero ambulante** (1 punto por cada pieza que lo necesite; Buena, 140) y **Mesa servida** (una Poción de HP por
 descanso; Buena, 150). **No van:** Segunda oportunidad (redundante con las wildcards), Paso de sombra y Faro. **En pregunta:** el Escudo de la mañana
 (una Vida extra solo contra daño especial: hay que programarla). Además, la **Puntería certera** pasó a la regla del Foco: PdG +2 si no te
-moviste ni en esta ronda ni en la anterior.
+moviste ni en esta ronda ni en la anterior. Y el **Paso fantasma** (dueño, 2026-10-19): después de moverte 3 casilleros o más, tu **próxima** Evasión +3 (solo esa tirada; se
+gasta al tirarla y se vuelve a cargar con otros 3 casilleros). Probados en el mapa: los cuatro de «por día», la Puntería certera y el Paso fantasma.
 

@@ -52,8 +52,8 @@ pasa a Buena (150–200).
 | Anillo de la calma | +1 No2 al terminar el turno si no atacaste · 70 → **Buena, 170** (No2 gratis cada turno: muy fuerte) |
 | Anillo del primer golpe | Defensa +1 contra el primer golpe del turno · 60 → **90** |
 | Anillo de Foco Arcano | PdG.Esp +1 si no te moviste · 70 → **90** |
-| Anillo de Puntería Certera | PdG +1 si no te moviste · 70 → **90** |
-| Anillo de Paso Fantasma | Evasión +1 si te moviste 3+ casilleros · 70 → **90** |
+| Anillo de Puntería Certera | PdG +1 si no te moviste · 70 → **90** (2026-10-19: +2 si no te moviste ni en esta ronda ni en la anterior) |
+| Anillo de Paso Fantasma | Evasión +1 si te moviste 3+ casilleros · 70 → **90** (2026-10-19: tu próxima Evasión +3 después de moverte 3+ casilleros, solo esa) |
 | Anillo de cáscara protectora | Vida extra 3 al empezar el combate · 70 → **90** |
 | Anillo de primera sangre | +2 de daño en el primer ataque del combate · 60 → **80** |
 | Anillo de boticario | Cada poción cura 3 más · 50 → **80** |

@@ -8,7 +8,7 @@
    - **🃏 Wildcards** (2026-10-15, dueño): el GM elige el descanso (`descanso: 'bueno' | 'normal'` en el mismo documento): reparador = cada
      personaje queda con 2 wildcards si tenía menos; normal = el que no tenía recibe 1. Se usan como la Moneda Re-Roll (docs/reroll.md).
    **☀ El Anuncio del descanso** (2026-10-19, dueño): a cada jugador, lo que se le recargó (vida, SP, No2, wildcards, estados que terminaron,
-   lo del equipo: anillos…) le aparece al centro con «Aceptar» (`diaPasos`, un momento `dia-descanso` con `paraUid`); los demás, en la Crónica.
+   lo del equipo: anillos…) le aparece al centro con «Aceptar» (`diaPasos`, un momento `dia-descanso` con `paraUids`: su dueño y quien tiene 🎮 el control); los demás, en la Crónica.
    El GM además termina los estados con turnos de sus creeps (los que tienen token) y **repone la góndola** de la tienda publicada.
    Cada personaje guarda el día que ya aplicó (`S.diaAplicado`): no se aplica dos veces, y quien no estaba conectado lo recibe al entrar.
    Corregir el número a mano (✎) no renueva nada: solo cambia la cuenta (y todos lo anotan como aplicado).
@@ -74,17 +74,19 @@ async function diaRevisar(antes){
       if(lineas){
         const txt = lineas.length ? lineas.join(' · ') : 'ya estaba entero';
         mesaLinea(`☀ Día ${dia}: ${nombre || 'un personaje'} descansó — ${txt}`, 'recordatorio', nombre);
-        const f = fichasPub.get(fichaId), uid = (f && f.duenoUid) || '';
-        if(uid){ if(!anuncios.has(uid)) anuncios.set(uid, []); anuncios.get(uid).push(...diaPasos(nombre, lineas)); }
+        // A su dueño y, si el GM lo maneja con 🎮 el control, también a él.
+        const f = fichasPub.get(fichaId), uids = [...new Set([(f && f.duenoUid) || '', (f && f.resumen && f.resumen.control) || ''].filter(Boolean))].sort();
+        const k = uids.join(',');
+        if(k){ if(!anuncios.has(k)) anuncios.set(k, []); anuncios.get(k).push(...diaPasos(nombre, lineas)); }
       }
     }
     // ☀ Lo que se le recargó a cada jugador, en un Anuncio con «Aceptar» (dueño, 2026-10-19: «lo que sea que se recargue… debe aparecerle en
     // un anuncio»). Le llega a su dueño aunque lo haya aplicado la pantalla del GM (con 🎮 el control); los demás lo ven en la Crónica.
-    for(const [uid, pasos] of anuncios){
+    for(const [k, pasos] of anuncios){
       if(typeof momentoAbrir !== 'function' || !pasos.length) continue;
       try{ await momentoAbrir({tipo: 'dia-descanso', icono: '☀', titulo: `Día ${dia}: descansaste`, estado: 'listo',
         resultado: pasos.map(p => p.texto).join(' · ').slice(0, 900),
-        datos: {paraUid: uid, aviso: true, boton: 'Aceptar', pasos: pasos.slice(0, 20)}}); }
+        datos: {paraUids: k.split(','), aviso: true, boton: 'Aceptar', pasos: pasos.slice(0, 20)}}); }
       catch(err){ console.error('Pasar de día: no se pudo mostrar el anuncio', err); }
     }
     // El GM: los estados con turnos de sus creeps terminan, y la góndola de la tienda se repone (una sola vez, desde la pantalla que pasó el día).

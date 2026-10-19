@@ -112,4 +112,12 @@ De la lluvia de ideas (`ideas-anillos.md`), el dueño eligió cuatro y quedaron 
 - Probado en el mapa: el primer golpe (dos golpes de 6 contra Defensa 3: 1 y después 3) y el Boticario (Poción de Regeneración: la primera vez 13).
 - Aclarado el **Levitar** (pregunta del dueño): cubre los primeros N casilleros que te movés en tu turno; con Levitar 2 y 3 casilleros, el 1 y el
   2 van por el aire y el 3 se pisa; si terminás el turno en un casillero que pasaste levitando, al terminarlo tocás el piso (una trampa salta ahí).
+- **Anillo de cuero de troll** (Común, 80; reemplaza a la Armadura indestructible, P196 cerrada): al terminar el combate, una pieza que elegís
+  recupera 1 de durabilidad. **Primera sangre: +5** (antes +2).
+- **Lo de «al terminar el combate» arranca con «Finalizar combate»** (dueño): el GM, al abrirlo, deja un momento `fin-combate`; cada pantalla
+  resuelve el cuero de troll, la piel de troll, la Polilla y Desarmar trampas, y recién después el jugador ve el botín (vtt-hexgrid/js/25).
+- **Anillo de la siesta** (Buena, 150): cada descanso (todo «Pasar de día» es al menos el normal, el de 1 wildcard), Vida extra 10 que no se
+  recarga por turno. Lluvia de ideas de anillos «por día» en `ideas-anillos.md` §E.
+- Probado en el mapa: canalizador y defensa (Botonera «SP 6/6 · Def 4»), Foco (+2 tras dos rondas quieta; sin efecto si se movió la anterior),
+  Primera sangre (+5 en la declaración), cuero de troll (al apretar Finalizar, una sola vez) y las teclas + / −.
 

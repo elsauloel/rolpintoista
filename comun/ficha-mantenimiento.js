@@ -292,6 +292,14 @@ const FichaMantenimiento = (() => {
     if(fin.length){ S.efectos = S.efectos.filter(e => !terminaAlPasarDia(e)); lineas.push(`terminaron: ${fin.map(e => e.nombre).join(', ')}`); }
     if(num(S.reparadoTalento) > 0) S.reparadoTalento = 0;
     if(S.meta && S.meta.ultimoAlientoUsado){ S.meta.ultimoAlientoUsado = false; lineas.push('💍 el Anillo del último aliento se recargó'); }   // (2026-10-18)
+    // 💍 El Anillo de la siesta (2026-10-19, dueño): cada descanso da Vida extra (no se recarga por turno; reemplaza a la que haya quedado del anterior).
+    const veDescanso = (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, num(i.descansoVidaExtra)), 0);
+    if(veDescanso > 0){
+      S.efectos = (S.efectos || []).filter(e => !(e && e.descansoAnillo));
+      S.efectos.push({id: 'siesta' + Date.now().toString(36), nombre: 'Vida extra (Anillo de la siesta)', polaridad: 'buff', activo: true, permanente: true, sinRecarga: true, seGasta: true,
+        descansoAnillo: true, escudoMagico: veDescanso, escudoMagicoActual: veDescanso, detalle: `Vida extra de ${veDescanso}: se gasta antes que tu vida y no se recarga. Vuelve con el próximo descanso (Anillo de la siesta).`});
+      lineas.push(`💍 Vida extra ${veDescanso} (Anillo de la siesta)`);
+    }
     const wc = Math.max(0, Math.round(num(o && o.wildcards)));
     if(wc && S.meta && Math.round(num(S.meta.wildcards)) < wc){ const antes = Math.max(0, Math.round(num(S.meta.wildcards))); S.meta.wildcards = wc; lineas.push(`🃏 ${wc - antes === 1 ? 'una wildcard' : `${wc - antes} wildcards`} (tiene ${wc})`); }
     (S.invocaciones || []).forEach(inv => {

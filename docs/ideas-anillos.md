@@ -108,3 +108,20 @@
 |---|---|
 | Anillos gemelos | Cada uno solo no hace nada; con los dos puestos, PdG +1 y Evasión +1 · Buena 🔧 |
 | Anillo del sol y Anillo de la luna | Cada uno da algo chico (Luz +2 / Visión +2); juntos, además, ves lo oculto a 2 casillas · Buena 🔧 |
+
+## E. Por día (pedido del dueño, 2026-10-19: «anillos que otorguen efectos por día, por ejemplo +6 de maná extra que funcione igual a la vida extra»)
+
+Hecho: **Anillo de la siesta** (Buena, 150): cada descanso, Vida extra 10 (no se recarga por turno; vuelve con el próximo descanso).
+
+| Anillo | Qué hace |
+|---|---|
+| Anillo del mate cocido | Cada descanso, **SP extra 6**: se gasta antes que tu SP y no vuelve hasta el próximo descanso · Buena 🔧 (mecánica nueva: «SP extra», como la Vida extra) |
+| Anillo del madrugador | El primer combate del día arrancás con 2 No2 de más (por encima del máximo; se van en la primera recarga) · Buena 🔧 (como lo de más del Matelisto) |
+| Anillo del curandero | Una vez por día, botón: te sacás un estado malo a elección · Buena 🔧 |
+| Anillo de la segunda oportunidad | Una vez por día, botón: repetís una tirada tuya y te quedás con la mejor (como el 🧚 Re-roll, sin SP) · Buena 🔧 |
+| Anillo del paso de sombra | Una vez por día, te movés hasta 3 casillas sin No2 y sin ataque de oportunidad · Rara 🔧 |
+| Anillo del faro | Una vez por día, botón: una luz en flor de 7 alrededor tuyo que revela lo oculto por 3 turnos (como la Varita de la luz, sin varita) · Buena ⚙/🔧 |
+| Anillo del herrero ambulante | Cada descanso, todas las piezas de tu equipo recuperan 1 de durabilidad · Buena 🔧 |
+| Anillo de la mesa servida | Cada descanso, una Poción de HP chica aparece en tu cinturón (si hay lugar) · Buena 🔧 |
+| Anillo del escudo de la mañana | Cada descanso, Escudo especial 6 (Vida extra solo contra daño especial) · Buena 🔧 |
+

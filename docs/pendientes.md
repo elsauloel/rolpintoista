@@ -137,10 +137,15 @@
 >   dueño: el que usa arco o ballesta tiene chances de dejar **flechas y virotes especiales**; el que hace magia, más chances de **pergaminos y
 >   pociones de SP**; los guerreros, más chances de **pociones de curación y cosas de Fuerza**. A pensar cuando toque: cómo se reconoce el arquetipo
 >   de un creep (sus armas, sus habilidades, una etiqueta), qué grupos hay, cuánto pesa la chance y dónde entra en el botín de hoy.
-> - [ ] **🧮 La calculadora cobra barato el daño fijo de las ballestas (2026-10-11)**: una ballesta Común con solo daño, según la calculadora,
+> - [x] **🧮 La calculadora cobra barato el daño fijo de las ballestas (2026-10-11; revisado 2026-10-19)**: una ballesta Común con solo daño, según la calculadora,
 >   puede llegar a 1d6+6 o 2d6+4; según el simulador de balance (`balance_combate.py --ballesta`, Shooter contra el blanco medio) el techo de la
 >   banda Común (74–106 %) es **1d6+3** (95 %; 1d6+4 = 114 %, 2d6 = 110 %). Ajustarla mueve el precio y la calidad de todas las ballestas: revisarlo
 >   con el dueño antes de tocarla. Mientras tanto, para diseñar: Común sin bonos, como mucho 1d6+3.
+>   **Revisado (2026-10-19):** ya lo había resuelto la planilla medida (`tabla_ballestas.json`, el mismo 2026-10-11): cada ballesta se cobra por lo que
+>   rinde en peleas; 1d6+6 ya cae en Buena. Las 25 Comunes (Tipo 4, un dado) caen todas en Común. Quedaba un hueco: las de **dos dados** se miden contra
+>   el blanco de una Buena y una 2d6+4 caía en Común → ahora **dos dados o más = desde Buena** (`calculadora_armas.py`; no cambia ninguna del catálogo).
+>   **Para el dueño:** 5 ballestas quedan una calidad abajo de lo que dice la calculadora: Tranquera (Buena → Rara: 2d6 Perfora 2), Guerra y Pesada
+>   (Raras → Excepcionales), Asedio y Frontera (Excepcionales → Legendarias). Subirlas de calidad y precio, o bajarles algo.
 > - [ ] **🧪 Rondas de testeo por tipo y tier (dueño, 2026-10-11: «hacer esta misma ronda de testeo con cada uno de los tipos de arma y con cada
 >   uno de los tiers; cuando lo tenga libre te voy a decir cuál toca»).** El método está en `docs/metodo-testeo-armas.md`. Hechas: ✅ cuerpo a cuerpo Tipo 4 Común (2026-10-11, `revision-cuerpo-a-cuerpo-t4.md`), ✅ arcos Comunes (2026-10-11, `revision-arcos.md`), ✅ ballestas
 >   Comunes. Faltan: ballestas Buenas (después de que el dueño filtre la lista), arcos (Común y Buena; después de su rework), cuerpo a cuerpo Tipo 4 /

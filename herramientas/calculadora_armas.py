@@ -281,6 +281,11 @@ def puntaje(arma):
         d['dos manos'] = -DESCUENTO_DOS_MANOS
     if rcb == 2 and rinde_bal is None and sum(d.values()) < BAL_R2_MIN:   # Recarga 2 empieza en Buena (2026-10-11): a nivel 1 dispara dos veces y una 1d6 pelada ya rinde 103 %
         d['recarga 2 (desde Buena)'] = BAL_R2_MIN - sum(d.values())
+    # Dos dados o más, desde Buena (2026-10-19, pendiente «la calculadora cobra barato el daño fijo de las ballestas»): la planilla mide las de dos
+    # dados contra el blanco de una Buena, así que una 2d6+4 que no llega a esa banda caía en Común aunque contra el blanco Común rinde de más
+    # (2d6 pelada ≈ 110 %). Ninguna ballesta de dos dados es Común (la escalera: Común 1 dado, Buena 2 o más).
+    if rinde_bal is not None and peso + amp >= 2 and sum(d.values()) < BAL_R2_MIN:
+        d['dos dados (desde Buena)'] = BAL_R2_MIN - sum(d.values())
     return sum(d.values()), d
 
 

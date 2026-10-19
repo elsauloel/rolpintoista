@@ -79,6 +79,7 @@ const caosHechos = new Set();
 function momentoRecibido(id, d){
   if(d.tipo === 'robo-pedido'){ if(typeof roboMomento === 'function') roboMomento(id, d); return; }
   if(d.tipo === 'estallido' && d.datos && d.datos.explota && typeof explosionEmpezar === 'function') explosionEmpezar(d.datos.explota);   // 😤 la bronca que estalla (js/51)
+  if(d.tipo === 'fin-combate' && typeof finCombateMomento === 'function') finCombateMomento(id);   // 🏁 lo de fin de combate de cada uno (js/25)
   if(d.tipo === 'inicio-turno' && inicioTurnoMomento(id, d)) return;
   if(d.tipo === 'diablito' && typeof diablitoMomento === 'function' && diablitoMomento(id, d)) return;   // 😈 la Botella con un diablito (js/53)   // ▶ Empieza tu turno: al centro de su dueño (js/04)   // 🫳 el robo en sigilo (js/47): solo la víctima y el GM
   if(d.tipo === 'rayo' && d.datos && Array.isArray(d.datos.saltos)) rayoMomento(id, d);

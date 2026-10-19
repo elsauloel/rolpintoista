@@ -132,7 +132,8 @@ setInterval(() => {
   });
   if(modo !== anillosModo){
     if(modo !== 'combate'){ primeraSangreUsadas.clear(); if(typeof emboscadaUsadas !== 'undefined'){ emboscadaUsadas.clear(); primerDisparoUsados.clear(); remachadoraCuenta.clear(); cargadorUsados.clear(); arcoLectura.clear(); } }   // + la Emboscada de los arcos (js/35)
-    if(anillosModo === 'combate' && modo !== 'combate'){ autoRepararAlTerminar(); cueroTrollAlTerminar(); polillaAlTerminar(); if(typeof desarmarAlTerminar === 'function') desarmarAlTerminar(); }   // la piel de troll, la Polilla y Desarmar trampas (2026-10-08)
+    // (Lo de «al terminar el combate» —la piel de troll, el cuero de troll, la Polilla, Desarmar trampas— ya no va acá: lo dispara «Finalizar combate», finCombateMomento.)
+    if(modo === 'combate') finCombateHecho = false;
     anillosModo = modo;
   }
 }, 1000);
@@ -323,5 +324,25 @@ async function cueroTrollAlTerminar(){
     try{ mesaLinea(`💍 ${nombreDe(t)}: el Anillo de cuero de troll repara ${linea}`, 'recordatorio'); }catch(err){}
     momentoAbrir({tipo: 'reparacion', icono: '💍', titulo: `${t.oculto ? 'Alguien' : nombreDe(t)}: Anillo de cuero de troll`, estado: 'listo', datos: {lineas: [linea]}});
   }
+}
+/* 🏁 Lo de «al terminar el combate» (dueño, 2026-10-19: «que se activen cuando el GM apriete Finalizar combate; a los jugadores primero les
+   aparecen los anuncios y, una vez resueltos todos, el botín»). El GM, al abrir «Finalizar combate» (js/18), deja un momento `fin-combate`; cada
+   pantalla (js/16) resuelve en orden lo de los personajes que maneja: el equipo que se repara solo, el Anillo de cuero de troll (elegir pieza),
+   la Polilla que no se usó y Desarmar trampas. El botín de un jugador (js/12) espera a que termine (`esperarFinDeCombate`). Una vez por combate. */
+let finCombateEnCurso = null, finCombateHecho = false;
+const finCombateVistos = new Set();
+function finCombateMomento(id){
+  if(finCombateVistos.has(id) || finCombateHecho) return;
+  finCombateVistos.add(id);
+  finCombateHecho = true;
+  finCombateEnCurso = (async () => {
+    try{ await autoRepararAlTerminar(); }catch(err){ console.error('Fin del combate (reparación):', err); }
+    try{ await cueroTrollAlTerminar(); }catch(err){ console.error('Fin del combate (cuero de troll):', err); }
+    try{ await polillaAlTerminar(); }catch(err){ console.error('Fin del combate (Polilla):', err); }
+    try{ if(typeof desarmarAlTerminar === 'function') await desarmarAlTerminar(true); }catch(err){ console.error('Fin del combate (trampas):', err); }
+  })().finally(() => { finCombateEnCurso = null; });
+}
+async function esperarFinDeCombate(){
+  for(let i = 0; i < 2400 && finCombateEnCurso; i++) await finCombateEnCurso.catch(() => {});
 }
 

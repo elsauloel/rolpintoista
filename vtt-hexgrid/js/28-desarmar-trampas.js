@@ -97,13 +97,16 @@ async function desarmarDesdeBanner(){
 }
 // Al terminar el combate: cuando se cierra el botín, a quien maneja un personaje con el talento le pregunta por las trampas rivales que quedaron.
 let desarmarFinEnCurso = false;
-async function desarmarAlTerminar(){
+// `antesDelBotin` (2026-10-19): lo llama «Finalizar combate» (js/25) antes de abrir el botín: no espera nada.
+async function desarmarAlTerminar(antesDelBotin){
   if(desarmarFinEnCurso) return;
   desarmarFinEnCurso = true;
   try{
-    await new Promise(r => setTimeout(r, 5000));   // el botín se abre solo al terminar: se espera a que se cierre (hasta 20 minutos)
-    for(let i = 0; i < 600 && bn && bn.raiz && bn.raiz.querySelector('#bn-botin.open'); i++) await new Promise(r => setTimeout(r, 2000));
-    if(modoMapa === 'combate') return;   // empezó otro combate mientras tanto
+    if(!antesDelBotin){
+      await new Promise(r => setTimeout(r, 5000));   // el botín se abre solo al terminar: se espera a que se cierre (hasta 20 minutos)
+      for(let i = 0; i < 600 && bn && bn.raiz && bn.raiz.querySelector('#bn-botin.open'); i++) await new Promise(r => setTimeout(r, 2000));
+      if(modoMapa === 'combate') return;   // empezó otro combate mientras tanto
+    }
     for(const [tokenId, t] of tokens){
       if(!tokenDesarmaTrampas(t) || typeof bnManejo !== 'function' || !bnManejo(t.fichaId)) continue;
       const quedan = [...elementos.entries()].filter(([id, el]) => el.trampa && !el.disparada && trampaDispara(t, el) && !trampaIntentoPerdido.has(tokenId + ':' + id)).map(([id]) => id);

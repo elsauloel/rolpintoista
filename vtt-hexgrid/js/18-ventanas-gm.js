@@ -112,6 +112,8 @@ async function abrirBotinEstimadoMapa(mapaId){
 /* --- 🏁 Finalizar combate --- */
 async function abrirFinalizarMapa(){
   if(!soyGM) return;
+  // 🏁 Lo de «al terminar el combate» arranca acá, en todas las pantallas (js/25, finCombateMomento); el botín de los jugadores lo espera.
+  try{ momentoAbrir({tipo: 'fin-combate', icono: '🏁', titulo: 'El GM terminó el combate', estado: 'listo', resultado: 'Primero lo de fin de combate de cada uno; después, el botín.', datos: {}}); }catch(err){ console.error(err); }
   try{ await vgCargar(); }catch(err){ console.error(err); toast('No se pudo abrir el reporte del combate'); return; }
   vgRep = CombateFin.nuevo();
   vgCreeps = [];

@@ -753,7 +753,7 @@ function escucharBotinParaJugador(){
     $('#toolkit-botin').classList.toggle('pendiente', combatePublicado());
     if(!soyGM && nuevo){
       clearTimeout(combateTimer);
-      combateTimer = setTimeout(() => { toast('⚔ Batalla terminada'); abrirBatallaDeJugador(); }, 600);
+      combateTimer = setTimeout(async () => { if(typeof esperarFinDeCombate === 'function') await esperarFinDeCombate(); toast('⚔ Batalla terminada'); abrirBatallaDeJugador(); }, 600);   // 🏁 primero lo de fin de combate (js/25)
     }
     if(cerrada && bnBotinCombateCerrado()) toast('El GM cerró el botín: lo que nadie tomó se convirtió en despojos');
     else if(cerrada && botonera.completa && !$('#botonera-capa').hidden){ cerrarBotonera(); toast('El GM cerró el botín: lo que nadie tomó se convirtió en despojos'); }

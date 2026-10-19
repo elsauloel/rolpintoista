@@ -791,6 +791,12 @@ document.addEventListener('keydown', e => {
     alternarRango();
     return;
   }
+  // + y − (2026-10-19, dueño): acercar y alejar el mapa, como los botones de la barra (el «=» es el «+» sin Shift).
+  if((e.key === '+' || e.key === '=' || e.key === '-') && !e.ctrlKey && !e.altKey && !e.metaKey && !escribiendoEnCampo(e)){
+    e.preventDefault();
+    zoomEn(anchoPx / 2, altoPx / 2, e.key === '-' ? 0.8 : 1.25);
+    return;
+  }
   // C (2026-09-24): centra el mapa en el token seleccionado (un creep, si el GM tiene uno seleccionado); sin selección, en tu token
   // propio (un jugador) o en los tuyos (GM), como el botón Centrar.
   if((e.key === 'c' || e.key === 'C') && !e.ctrlKey && !e.altKey && !e.metaKey && !e.shiftKey && fbMiembro){

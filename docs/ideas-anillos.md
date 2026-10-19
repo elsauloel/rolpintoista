@@ -9,6 +9,8 @@
 
 ## ✅ Elegidos por el dueño (2026-10-18, «me gusta»)
 
+**Cargados y probados en el mapa (2026-10-18):** los cuatro de abajo, en `comun/catalogo.js` (`anillo-del-pantano`, `anillo-del-ultimo-aliento`, `anillo-del-trebol`, `anillo-del-alquimista`). El del último aliento quedó **Raro, 350** (dueño). Mecánica: el pantano es Envenenador +1 (`venenista`); el último aliento, `ultimoAliento` (`FichaAcciones.fijarHp` y el daño del mapa, `danioPj`; se recarga en `FichaMantenimiento.descansar`); el trébol, `trebol` (el botón 🍀 de js/25 pone un estado con `afortunadoTodo` que gasta la próxima tirada de `tirarValorStat`); el alquimista, `alquimista` (`costoDeSacar`).
+
 - **Anillo del pantano**: tus Venenos entran con 1 stack más (y, como dura tantos turnos como stacks, 1 turno más), venga de un arma, una
   varita, una habilidad, una zona o una trampa. Propuesta: Buena, 170. 🔧
 - **Anillo del último aliento**: una vez por día, cuando un golpe te dejaría en 0, quedás con 1 (se recarga al pasar de día). Propuesta: Buena,

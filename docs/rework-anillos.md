@@ -93,3 +93,8 @@ Aplicado en `comun/catalogo.js` y `comun/generador-tiendas.js`: los precios de l
 5. **Reserva Ampliada:** ¿SP máximo +3?
 6. **Buena calidad:** hoy no hay ningún anillo de Buena. ¿Armamos una tanda (efectos mejores o dos efectos juntos) después de cerrar los Comunes?
 7. **Armadura indestructible (P196):** ¿la vemos ahora o sigue en pausa?
+
+## Anillos nuevos (2026-10-18)
+
+De la lluvia de ideas (`ideas-anillos.md`), el dueño eligió cuatro y quedaron cargados y probados: **del pantano** (Buena, 170), **del último aliento** (Raro, 350: el primer anillo Raro), **del trébol** (Buena, 160) y **del alquimista** (Buena, 150). Hoy hay 39 anillos: 34 Comunes, 4 de Buena (con la Calma), 1 Raro y 1 archivado (la armadura indestructible, P196).
+

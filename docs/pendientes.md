@@ -43,6 +43,12 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
+> - [ ] **🌦 Un sistema de climas (2026-10-19, dueño: «déjalo pendiente», diseño futuro):** que **cada día amanezca con un clima distinto**
+>   (encaja con el ⏳ Pasar de día, `vtt-hexgrid/js/41-dia.js`: la tarjeta «AMANESE QUE NO ES POCO» podría decir qué clima tocó). Ejemplos del dueño:
+>   **calor** → más daño de fuego, menos de hielo; **frío intenso** → al revés; **lluvia** → menos daño de fuego, más daño eléctrico y más
+>   conductividad (el rayo corre por el agua: ya existe con los charcos, js/50); **nublado** → menos visibilidad; **niebla** → aún menos (la 💡 Luz
+>   de la escena ya baja la visión, js/02). «Y así»: faltan los demás climas, cuánto suma o resta cada uno, si sale al azar o lo elige el GM, y
+>   si lo ven los jugadores.
 > - [ ] **💔 Un clic antes de recibir daño automatizado, en todo (2026-10-17, dueño):** «en jugadores debería suceder cada vez que un jugador
 >   recibe daño que esté automatizado… si en un ataque pasa el daño, el duelo debe tener la instancia de pasó tanto daño, menos tu armadura,
 >   apretá aplicar daño… tiene que haber una instancia donde el jugador hace un clic antes de recibir daño automatizado». **Hecho** en las

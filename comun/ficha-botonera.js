@@ -138,7 +138,9 @@ const FichaBotonera = (() => {
     if(i.trampaDatos) partes.push('🪤 se coloca en el mapa');
     if(i.curahp) partes.push(`${num(i.curahp)>0?'+':''}${fmt(num(i.curahp))} HP`);
     if(num(i.curaspPct) > 0) partes.push(`${fmt(num(i.curaspPct))}% SP`);
-    partes.push(`-${S ? Combatiente.conExtenuado(S.efectos, costoConsumirNitros(key)) : costoConsumirNitros(key)} No2`);   // + Extenuado
+    // 💍 El Anillo del alquimista (2026-10-18): el primero del turno sacado del cinturón no cuesta No2 (comun/ficha-acciones.js, costoDeSacar).
+    const alq = S && key === 'cinturon' && (S.meta || {}).alquimistaTurno !== (Number(S.turno) || 1) && (S.inventario || []).some(x => x && x.equipado && x.alquimista && !FichaCalculo.itemRoto(x));
+    partes.push(alq ? '0 No2 💍' : `-${S ? Combatiente.conExtenuado(S.efectos, costoConsumirNitros(key)) : costoConsumirNitros(key)} No2`);   // + Extenuado
     const agotado = num(i.unidades) <= 0;
     if(conLupa){
       return `<button class="consume-btn con-lupa${agotado ? " sin-recursos" : ""}" data-consume="${i.id}"${agotado ? ' aria-disabled="true"' : ""}>

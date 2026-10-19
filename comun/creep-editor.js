@@ -279,7 +279,7 @@ const CreepEditor = (() => {
       Biblioteca.abrir({
         tipo: 'trampas', titulo: 'Trampa preconstruida', z: 99600,   // por encima del editor de la habilidad
         base: typeof TRAMPAS_BASE !== 'undefined' ? TRAMPAS_BASE : [],
-        subtitulo: x => (x.nivel ? ` · nivel ${x.nivel}` : '') + (x.datos && x.datos.amiga ? ' · 🔥 daña a aliados en el área' : '') + (x.datos && x.datos.dano ? ` · 💥 ${x.datos.dano}` : ''),
+        subtitulo: x => (x.nivel ? ` · nivel ${x.nivel}` : '') + (x.datos && x.datos.amiga ? ' · 🔥 afecta a aliados en el área' : '') + (x.datos && x.datos.dano ? ` · 💥 ${x.datos.dano}` : ''),
         grupos: [{nombre: 'Efecto', tags: ['daño', 'veneno', 'explosiva', 'fuego', 'inmoviliza', 'debuff', 'control', 'alarma']}, {nombre: 'Origen', tags: ['mecánica', 'mágica', 'natural']}, {nombre: 'Nivel', tags: ['nivel 1', 'nivel 2', 'nivel 3', 'nivel 4', 'nivel 5']}, {nombre: 'Alcance', tags: ['área']}],
         alElegir: async datos => {
           const preguntas = [{clave: 'radio', min: 0, texto: '¿De qué tamaño es? (0 = una casilla · 1 = flor de 7 casillas, diámetro 3 · 2 = 19 casillas, diámetro 5…)'}];

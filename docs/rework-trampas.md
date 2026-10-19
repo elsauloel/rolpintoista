@@ -226,5 +226,12 @@ Reemplazan a las 72 de antes (24 × menor/normal/mayor). Común / Buena / Rara p
 - **Detectarla: siempre Percepción.** Desarmarla o disiparla: Destreza o Efecto especial según su origen (la trampa colocada guarda `magica`).
 - Por qué: con 1d8 de Percepción, contra 6 hay 38 % (50 % con Percepción aumentada); contra 8, 13 % (30 %); contra 10, 0 (10 %). Las de los creeps
   tramperos (Destreza 9–15) son casi invisibles sin una luz que revele lo oculto: a propósito.
-- **Falta decidir**: la Trampa de teleport y la Llamarada (solo estaban en el 📚 del mapa): ¿entran al catálogo o se van?
+- **Quién la dispara (dueño, 2026-10-19; reemplaza a «los aliados nunca» del 2026-09-25):** una **mecánica**, cualquiera que la pise (rivales,
+  aliados y quien la puso); una **mágica**, solo los rivales. **El efecto alcanza a todos los del área**, en las dos (el «fuego amigo» dejó de ser una
+  opción de cada trampa). Los aliados ven las trampas de su equipo. El cartel de arriba a la derecha y la ficha corta lo dicen.
+- **El dodge roll contra una trampa, solo con Reflejos de mangosta** (dueño): ninguna trampa es «esquivable» por sí misma.
+- **La Quemadura no se resiste con una tirada** (dueño): su resistencia es la Res. fuego, que le resta a cada turno. Por eso el Géiser de fuego perdió
+  su Res.Esp contra 11.
+- **La Llamarada entró al catálogo** (Buena, 55, mágica): flor de 7, 2d6 de fuego directo y Quemadura 3 turnos, no se resiste; detectarla, 8.
+- **Falta decidir**: la Trampa de teleport (solo está en el 📚 del mapa, «solo del mapa»): ¿entra al catálogo como «Glifo de teletransporte» o se va?
 

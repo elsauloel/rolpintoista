@@ -149,7 +149,7 @@
      el GM coloca la misma trampa que se compra en la tienda (el mapa le pregunta la dificultad: arranca en la del catálogo, Común 6 · Buena 8 ·
      Rara 10). La lista de arriba quedó solo para las dos que no están en el catálogo («solo del mapa»: falta decidir si entran o se van). Se
      arma al pedirla (el catálogo puede cargarse después que este archivo). */
-  const SOLO_MAPA = new Set(['Trampa de teleport', 'Llamarada']);
+  const SOLO_MAPA = new Set(['Trampa de teleport']);   // (la Llamarada entró al catálogo como Buena: dueño, 2026-10-19)
   const extras = lista.filter(e => SOLO_MAPA.has(e.nombre)).map(e => ({...e, etiquetas: [...e.etiquetas.filter(x => x !== 'auditar'), 'solo del mapa']}));
   const NIVEL = {'Común': 1, 'Buena Calidad': 2, 'Raro': 3, 'Excepcional': 4, 'Legendario': 5};
   function etiquetasDe(it, d){

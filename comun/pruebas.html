@@ -3302,7 +3302,7 @@ prueba('trampas (2026-10-19, dueño): detectar Común 6 · Buena 8 · Rara 10; l
   const delMapa = TRAMPAS_BASE.filter(e => e.datos && e.datos.catalogoId).length, soloMapa = TRAMPAS_BASE.filter(e => e.etiquetas.includes('solo del mapa')).map(e => e.nombre).sort();
   const j = JSON.parse(TokensAuto.estadoJson(null, null, null, null, '', 0, {magica: true}) || '{}');
   igual([malas, dOso, dRuna, delMapa, soloMapa, !!j.magica, TRAMPAS_BASE.find(e => e.nombre === 'Runa de debilidad').etiquetas.includes('mágica')],
-    [[], 10, 5, tr.length, ['Llamarada', 'Trampa de teleport'], true, true]);
+    [[], 10, 5, tr.length, ['Trampa de teleport'], true, true]);   // (la Llamarada entró al catálogo, 2026-10-19)
 });
 
 prueba('cómo se ve un ítem: la trampa en datos cortos (forma, daño, efecto, salvación, detección) y lo técnico solo en «Ver»', () => {
@@ -3313,7 +3313,7 @@ prueba('cómo se ve un ítem: la trampa en datos cortos (forma, daño, efecto, s
   const base = TRAMPAS_BASE.find(t => t.nombre === 'Trampa de oso');
   igual([filas, grilla.includes('⚙'), grilla.includes('Automático'), ver.includes('Detalles técnicos'), ver.includes('⚙ Automático'), ItemCorto.trampaFilas(menor.trampaDatos).find(f => f[0] === 'Detectarla')[1],
     p.hace, p.tecnico.startsWith('⚙'), base.datos.estado, base.datos.detectar, ItemCorto.tecnicoHtml('Solo dice qué hace.')],
-    [['Se dispara: cuando un rival pisa su casilla (una sola)', 'Alcanza: solo a quien la pisa (en el piso)', 'Daño: 2d6 · contempla la armadura', 'Efecto: Inmovilizado · 1 turno', 'Se resiste: no', 'Para salir: 🔓 Soltarse: Fuerza contra 6 · 1 No2', 'Detectarla: Percepción contra la Destreza de quien la coloca (si la pone el GM: 6)', 'Es: mecánica'],
+    [['Se dispara: cuando alguien (también un aliado) pisa su casilla (una sola)', 'Alcanza: solo a quien la pisa (en el piso)', 'Daño: 2d6 · contempla la armadura', 'Efecto: Inmovilizado · 1 turno', 'Se resiste: no', 'Para salir: 🔓 Soltarse: Fuerza contra 6 · 1 No2', 'Detectarla: Percepción contra la Destreza de quien la coloca (si la pone el GM: 6)', 'Es: mecánica (se desarma con la Destreza)'],
      false, false, true, true, 'Percepción contra la Destreza de quien la coloca (si la pone el GM: 8)', 'Da +2 a la Fuerza.', true, 'Inmovilizado', 6, '']);   // (2026-10-19, dueño: una trampa Común se detecta contra 6)
 });
 prueba('trampas automáticas: el estado y la salvación viajan juntos en trampaEstado; 3 turnos (Stun 1); los textos dicen qué va solo y qué a mano', () => {

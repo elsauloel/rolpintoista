@@ -794,7 +794,11 @@ function elementoQueEs(e){
   }
   if(e.portal) return `<b>🌀 PORTAL</b> <span>${de}</span> · <span class="es-libre">lo usan los aliados de quien lo abrió: lleva al otro portal</span>`;
   if(e.trampa){
-    const estado = e.disparada ? '<span class="es-solido">💥 DETONADA</span>' : '<span class="es-trampa">⚠ ARMADA · la disparan los rivales de quien la puso (los aliados no)</span>';
+    // Quién la dispara y a quién alcanza (dueño, 2026-10-19: «al seleccionar una trampa, arriba a la derecha, también se debe aclarar esto»).
+    const mag = trampaEsMagica(e), ef = trampaEfectoDe(e), sola = (ef ? ef.area : (celdasDeElemento(e).length > 1 ? 'trampa' : 'pisador')) === 'pisador';
+    const quien = mag ? '✨ mágica: la disparan solo los rivales de quien la puso' : '⚙ mecánica: la dispara cualquiera que la pise, también los aliados';
+    const estado = e.disparada ? '<span class="es-solido">💥 DETONADA</span>'
+      : `<span class="es-trampa">⚠ ARMADA · ${quien} · ${sola ? 'afecta a quien la pisa' : 'afecta a todos los del área'}</span>`;
     return `<b>🪤 TRAMPA · ${esc(e.trampaNombre || 'sin nombre')}</b> <span>${de}</span> · ${estado}${det(e.trampaDetalle)}`;
   }
   return '';

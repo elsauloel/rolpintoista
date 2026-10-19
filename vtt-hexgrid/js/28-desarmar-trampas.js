@@ -16,9 +16,7 @@ const trampaPerdio = (tokenId, trampaId) => { if(modoMapa === 'combate') trampaI
 const desarmarDif = el => Math.max(1, Math.round(num(el && el.trampaDetectar)) || 6);
 // La tirada de ese personaje para esa trampa ('' si no tiene el talento). Las invocaciones no tienen talentos. Con `el` (2026-10-19, dueño):
 // una trampa mágica se disipa con el Efecto especial (`resumen.disipaTrampas`); una mecánica, con la Destreza y las Ganzúas.
-function trampaEsMagica(el){
-  try{ return !!(el && (JSON.parse(el.trampaEstado || '{}') || {}).magica); }catch(e){ return false; }
-}
+// (trampaEsMagica: js/08.)
 function tokenDesarmaTrampas(t, el){
   if(!t || t.tipo !== 'pj' || String(t.fichaId || '').includes(SEP_INVOCACION)) return '';
   const v = vinculo(t), r = v && v.resumen;
@@ -117,7 +115,7 @@ async function desarmarAlTerminar(antesDelBotin){
     }
     for(const [tokenId, t] of tokens){
       if(!tokenDesarmaTrampas(t) || typeof bnManejo !== 'function' || !bnManejo(t.fichaId)) continue;
-      const quedan = [...elementos.entries()].filter(([id, el]) => el.trampa && !el.disparada && trampaDispara(t, el) && !trampaIntentoPerdido.has(tokenId + ':' + id)).map(([id]) => id);
+      const quedan = [...elementos.entries()].filter(([id, el]) => el.trampa && !el.disparada && trampaEsRival(t, el) && !trampaIntentoPerdido.has(tokenId + ':' + id)).map(([id]) => id);
       if(!quedan.length) continue;
       const nombre = nombreDe(t);
       // Primero hay que encontrarlas (dueño, 2026-10-08): Percepción contra su dificultad; la que encuentra, intenta desarmarla (la que no desarma, se rompe).

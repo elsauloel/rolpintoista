@@ -203,11 +203,21 @@ function nieblaDeshacer(seq0, pend0){
 let trampaPendiente = null;   // {tokenId, tipo: 'pisa' | 'cerca', id, el, celda, desde (la casilla anterior: hacia dónde caminaba)}
 const trampasAvisadas = new Set();   // 'token:trampa:casillero' que ya pidieron la tirada
 
-// Criterio del dueño (2026-09-25): los aliados NUNCA disparan una trampa (solo la activan los rivales de quien la puso). "Fuego amigo"
-// es del EFECTO: si es de área y tiene fuego amigo (lo físico y explosivo), alcanza a todos los de adentro, aliados incluidos; si no
-// (lo mágico), solo a los rivales (`trampaAfectados`).
-function trampaDispara(t, el){
+/* Quién dispara una trampa (dueño, 2026-10-19; reemplaza al criterio del 2026-09-25, «los aliados nunca»):
+   · una MECÁNICA (un mecanismo que se construye con las manos) la dispara **cualquiera que la pise**: rivales, aliados y quien la puso;
+   · una MÁGICA (`magica` en su trampaEstado), **solo los rivales** de quien la puso.
+   El efecto alcanza a **todos los que estén en su área**, en las dos (`trampaAfectados`; el «fuego amigo» ya no es una opción de cada trampa).
+   Los aliados ven las trampas de su equipo (`trampaDeMiBando`). `trampaEsRival` sigue siendo «¿es de un rival?»: lo usan los portales (solo
+   los aliados los usan), desarmar (solo las de los rivales) y la Percepción (no se «descubre» una trampa del propio equipo). */
+function trampaEsMagica(el){
+  try{ return !!(el && (JSON.parse(el.trampaEstado || '{}') || {}).magica); }catch(e){ return false; }
+}
+function trampaEsRival(t, el){
   return trampaEsDelGM(el) ? t.tipo === 'pj' : t.tipo === 'creep';   // (js/07: manda quién la puso)
+}
+function trampaDispara(t, el){
+  if(el && el.trampa && !trampaEsMagica(el)) return true;
+  return trampaEsRival(t, el);
 }
 function tokenPercepcionAumentada(t){
   const v = vinculo(t), r = v && v.resumen;
@@ -230,7 +240,7 @@ function trampasEvaluarRuta(tokId, t, ruta, levita){   // `levita`: los primeros
   elementos.forEach((el, id) => {
     if(el.trampa && !el.disparada && trampaDispara(t, el)) trampas.push({id, el, set: new Set(celdasDeElemento(el).map(c => nbPack(c.col, c.fila)))});
     // Portal (Invocar portal): lo usan solo los ALIADOS de quien lo invocó (los rivales pasan de largo); no se "dispara", queda hasta que venza.
-    else if(el.portal && destinoParsear(el.portalDestino) && !trampaDispara(t, el)) trampas.push({id, el, portal: true, set: new Set(celdasDeElemento(el).map(c => nbPack(c.col, c.fila)))});
+    else if(el.portal && destinoParsear(el.portalDestino) && !trampaEsRival(t, el)) trampas.push({id, el, portal: true, set: new Set(celdasDeElemento(el).map(c => nbPack(c.col, c.fila)))});
   });
   if(!trampas.length) return null;
   const atento = tokenPercepcionAumentada(t) || tokenPisadaAtenta(t);   // Percepción aumentada o Pisada atenta (las trampas)
@@ -241,7 +251,7 @@ function trampasEvaluarRuta(tokId, t, ruta, levita){   // `levita`: los primeros
       const vec = vecinosDeCasilla(ruta[i]).map(v => nbPack(v.col, v.fila));
       const aca = nbPack(ruta[i].col, ruta[i].fila);
       // Solo las que todavía no ve (ni descubierta por su equipo, ni vista por este navegador), y una vez por casillero.
-      const cerca = trampas.find(x => !x.portal && !x.el.descubierta && !trampasVistas.has(x.id) && !trampasAvisadas.has(tokId + ':' + x.id + ':' + aca) && vec.some(k => x.set.has(k))
+      const cerca = trampas.find(x => !x.portal && trampaEsRival(t, x.el) && !x.el.descubierta && !trampasVistas.has(x.id) && !trampasAvisadas.has(tokId + ':' + x.id + ':' + aca) && vec.some(k => x.set.has(k))
         && !(typeof trampaIntentoPerdido !== 'undefined' && trampaIntentoPerdido.has(tokId + ':' + x.id)));   // en combate, ya falló con esta (2026-10-08)
       if(cerca) return {indice: i, tipo: 'cerca', id: cerca.id, el: cerca.el};
     }
@@ -808,7 +818,7 @@ async function trampaResolver(){
         turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n,
         zonaEnMantenimiento: p.el.zonaEnMantenimiento !== false, zonaCadaPaso: !!p.el.zonaCadaPaso,
       };   // (la altura sigue en su trampaEstado: alturaDe la lee de ahí)
-      if(p.el.fuegoAmigo) cambios.zonaAmiga = true;
+      cambios.zonaAmiga = true;   // el efecto alcanza a todos (dueño, 2026-10-19)
       let ej = {}; try{ ej = JSON.parse(p.el.trampaEstado || '{}') || {}; }catch(err){}
       const danoZ = trampaDanoValido(ej.danoZona) ? ej.danoZona : p.el.trampaDano;   // la Mina napalm: el piso quema menos que la explosión
       if(trampaDanoValido(danoZ)){ cambios.zonaDano = danoZ; if(p.el.trampaIgnoraDef) cambios.zonaIgnoraDef = true; }

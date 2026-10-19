@@ -802,7 +802,7 @@ async function abrirCatalogoTrampas(){
     textoCrearDeCero: '+ Crear una trampa custom (paso a paso)',
     alCrearDeCero: () => { elemTrampa = true; elemTrampaBibOrigen = null; abrirAsistenteTrampaPanel(); },
     alElegir: cargarTrampaEnPanel,
-    subtitulo: e => (e.nivel ? ` · nivel ${e.nivel}` : '') + (e.datos && e.datos.amiga ? ' · 🔥 afecta a aliados en el área' : '') + (e.datos && e.datos.dano ? ` · 💥 ${e.datos.dano}` : ''),
+    subtitulo: e => (e.nivel ? ` · nivel ${e.nivel}` : '') + (e.datos && e.datos.detectarStat ? (e.datos.detectarStat === 'dmgesp' ? ' · ✨ mágica' : ' · ⚙ mecánica') : '') + (e.datos && e.datos.dano ? ` · 💥 ${e.datos.dano}` : ''),
     grupos: [
       {nombre: 'Efecto', tags: ['daño', 'veneno', 'explosiva', 'fuego', 'inmoviliza', 'debuff', 'control', 'alarma']},
       {nombre: 'Origen', tags: ['mecánica', 'mágica', 'natural', 'solo del mapa']},

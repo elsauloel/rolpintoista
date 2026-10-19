@@ -59,8 +59,10 @@ const ItemCorto = (() => {
     // Cómo funciona (dueño, 2026-10-08: «al verla tenés que entender que es una trampa y más o menos cómo funciona»): dónde se dispara (la
     // superficie que se pisa) y a quién alcanza (el efecto), por separado.
     const sup = t.tipo === 'linea' ? Math.max(1, tam) : casillas(tam);
-    f.push(['Se dispara', t.tipo === 'linea' ? `cuando un rival pisa cualquiera de sus ${sup} casillas en línea`
-      : tam ? `cuando un rival pisa cualquiera de sus ${sup} casillas (flor de diámetro ${2 * tam + 1})` : 'cuando un rival pisa su casilla (una sola)']);
+    // Quién la dispara (dueño, 2026-10-19): una mágica, solo un rival; una mecánica, cualquiera que la pise (también un aliado).
+    const dispara = t.detectarStat === 'dmgesp' ? 'un rival' : 'alguien (también un aliado)';
+    f.push(['Se dispara', t.tipo === 'linea' ? `cuando ${dispara} pisa cualquiera de sus ${sup} casillas en línea`
+      : tam ? `cuando ${dispara} pisa cualquiera de sus ${sup} casillas (flor de diámetro ${2 * tam + 1})` : `cuando ${dispara} pisa su casilla (una sola)`]);
     const ef = t.efecto || {}, area = ef.area || (sup > 1 ? 'trampa' : 'pisador'), r = Math.max(1, num(ef.radio) || 1);
     const ALTURA = {piso: ' (en el piso)', aire: ' (en el aire)', ambos: ' (en el piso y en el aire)'};
     f.push(['Alcanza', (area === 'flor' ? `una flor de diámetro ${2 * r + 1} (${casillas(r)} casillas) alrededor ${ef.centro === 'trampa' ? 'del centro de la trampa' : 'de donde la pisan'}`
@@ -94,9 +96,9 @@ const ItemCorto = (() => {
     // (2026-10-19, dueño) La pone un personaje, un creep o una invocación: su Destreza (mecánica) o su Efecto especial (mágica). La pone el GM: el número.
     const quien = t.detectarStat ? `${t.detectarStat === 'dmgesp' ? 'el Efecto especial' : 'la Destreza'} de quien la coloca` : '';
     f.push(['Detectarla', quien && num(t.detectar) >= 1 ? `Percepción contra ${quien} (si la pone el GM: ${num(t.detectar)})` : quien ? `Percepción contra ${quien}` : num(t.detectar) >= 1 ? `Percepción contra ${num(t.detectar)}` : 'sin definir']);
-    if(t.detectarStat) f.push(['Es', t.detectarStat === 'dmgesp' ? 'mágica' : 'mecánica']);
+    if(t.detectarStat) f.push(['Es', t.detectarStat === 'dmgesp' ? 'mágica (se disipa con el Efecto especial)' : 'mecánica (se desarma con la Destreza)']);
     if(t.dejaZona) f.push(['Después', `queda como zona ${num(t.zonaTurnos) || 3} turnos`]);
-    if(t.amiga) f.push(['Alcanza', 'también a los aliados del área']);
+    if(t.amiga && !t.detectarStat) f.push(['Alcanza', 'también a los aliados del área']);   // (las del catálogo: el efecto alcanza a todos, siempre)
     return f;
   }
   function filasHtml(filas){

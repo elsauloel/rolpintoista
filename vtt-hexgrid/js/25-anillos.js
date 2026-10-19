@@ -132,7 +132,7 @@ setInterval(() => {
   });
   if(modo !== anillosModo){
     if(modo !== 'combate'){ primeraSangreUsadas.clear(); if(typeof emboscadaUsadas !== 'undefined'){ emboscadaUsadas.clear(); primerDisparoUsados.clear(); remachadoraCuenta.clear(); cargadorUsados.clear(); arcoLectura.clear(); } }   // + la Emboscada de los arcos (js/35)
-    if(anillosModo === 'combate' && modo !== 'combate'){ autoRepararAlTerminar(); polillaAlTerminar(); if(typeof desarmarAlTerminar === 'function') desarmarAlTerminar(); }   // la piel de troll, la Polilla y Desarmar trampas (2026-10-08)
+    if(anillosModo === 'combate' && modo !== 'combate'){ autoRepararAlTerminar(); cueroTrollAlTerminar(); polillaAlTerminar(); if(typeof desarmarAlTerminar === 'function') desarmarAlTerminar(); }   // la piel de troll, la Polilla y Desarmar trampas (2026-10-08)
     anillosModo = modo;
   }
 }, 1000);
@@ -282,4 +282,46 @@ async function usarTrebol(){
   renderTrebolBoton();
 }
 setInterval(renderTrebolBoton, 1500);
+/* 💍 El Anillo de cuero de troll (2026-10-19, dueño; reemplaza a la Armadura indestructible, P196): al terminar el combate, una pieza del equipo que
+   el jugador elige recupera 1 punto de durabilidad (`cueroTroll` = cuántos). Lo pregunta la pantalla que maneja a cada personaje, al ver que el mapa
+   sale del modo combate. Cerrar el cartel sin elegir no repara nada. */
+async function cueroTrollAlTerminar(){
+  for(const [, t] of tokens){
+    if(!t || t.tipo !== 'pj' || !t.fichaId || String(t.fichaId).includes(SEP_INVOCACION)) continue;
+    if(typeof bnManejo !== 'function' || !bnManejo(t.fichaId)) continue;
+    let piezas = null, n = 0;
+    try{
+      await editarPersonajeMapa(t.fichaId, S => {
+        n = (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, Math.round(num(i.cueroTroll))), 0);
+        if(n > 0) piezas = (S.inventario || []).filter(it => it && it.equipado && FichaCalculo.durableItem(it) && FichaCalculo.durActual(it) < FichaCalculo.durMax(it))
+          .map(it => ({id: it.id, nombre: it.nombre, dur: FichaCalculo.durActual(it), max: FichaCalculo.durMax(it)}));
+        return false;   // solo mirar
+      });
+    }catch(err){ console.error('El Anillo de cuero de troll:', err); continue; }
+    if(!(n > 0) || !piezas || !piezas.length) continue;
+    const elegido = await new Promise(res => {
+      let listo = false;
+      const fin = v => { if(listo) return; listo = true; AvisoCombate.cerrar(); res(v); };
+      AvisoCombate.mostrar({clave: 'cuero-troll-' + t.fichaId, icono: '💍', titulo: `${nombreDe(t)}: Anillo de cuero de troll`,
+        pasos: [{titulo: 'Terminó el combate', texto: `Elegí qué pieza de tu equipo recupera ${n} punto${n === 1 ? '' : 's'} de durabilidad.`}],
+        botones: piezas.map(p => ({texto: `${p.nombre} (${p.dur}/${p.max})`, alClic: () => fin(p.id)})), alCerrar: () => fin(null)});
+    });
+    if(!elegido) continue;
+    let linea = '';
+    try{
+      await editarPersonajeMapa(t.fichaId, S => {
+        const it = (S.inventario || []).find(i => i && i.id === elegido);
+        if(!it) return false;
+        const antes = FichaCalculo.durActual(it), max = FichaCalculo.durMax(it);
+        if(antes >= max) return false;
+        it.dur = Math.min(max, antes + n);
+        linea = `${it.nombre}: durabilidad ${antes} → ${it.dur}`;
+        return true;
+      });
+    }catch(err){ console.error('El Anillo de cuero de troll:', err); }
+    if(!linea) continue;
+    try{ mesaLinea(`💍 ${nombreDe(t)}: el Anillo de cuero de troll repara ${linea}`, 'recordatorio'); }catch(err){}
+    momentoAbrir({tipo: 'reparacion', icono: '💍', titulo: `${t.oculto ? 'Alguien' : nombreDe(t)}: Anillo de cuero de troll`, estado: 'listo', datos: {lineas: [linea]}});
+  }
+}
 

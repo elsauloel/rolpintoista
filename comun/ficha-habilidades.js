@@ -98,6 +98,8 @@ const FichaHabilidades = (() => {
     // Lo que se dispara (regeneración, veneno…) pega apenas se lo pone (2026-10-06, P161).
     let c = null;
     try{ c = FichaCalculo.calcular(S); }catch(e){}   // (un personaje a medio armar)
+    // 💍 El Boticario (dueño, 2026-10-19): en una poción de regeneración, lo de más se suma la primera vez que regenera, no en cada turno.
+    if(it && it.consumible && r.estado && n(r.estado.hpturno) > 0 && c && n(c.final.boticario) > 0) r.estado.curaExtraPrimera = n(c.final.boticario);
     const dis = Combatiente.dispararAlAplicar(r, S.efectos, {hp: 'hpturno', resFuego: c ? n(c.final.resfuego) : 0, hpActual: S.hp});
     if(dis.hp){ const hm = c && !Number.isNaN(c.final.hpmax) ? n(c.final.hpmax) : 0; S.hp = Math.max(0, Math.min(hm > 0 ? hm : Infinity, n(S.hp) + dis.hp)); }
     return {ok: true, estado: r.estado, disparo: dis};

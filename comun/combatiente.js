@@ -158,6 +158,7 @@ const Combatiente = (() => {
       }
       const stacks = Math.max(1, n(e.stacks) || 1);
       let d = n(e[c.hp]) * stacks;
+      if(d > 0 && n(e.curaExtraPrimera) > 0){ d += n(e.curaExtraPrimera); delete e.curaExtraPrimera; }   // 💍 el Boticario: solo la primera vez (2026-10-19)
       if(d < 0 && e.esQuemadura && resFuego){ const antes = d; d = Math.min(0, d + resFuego); eventos.push({tipo: 'resfuego', nombre: e.nombre, de: -antes, a: -d, res: resFuego}); }
       if(d < 0 && (invulnerable || (e.esVeneno && sangrePura) || (e.esSangrado && coagulacion))){ eventos.push({tipo: 'inmune', nombre: e.nombre}); d = 0; }
       if(d){ hp += d; eventos.push({tipo: 'hp', nombre: e.nombre, hp: d, stacks}); }

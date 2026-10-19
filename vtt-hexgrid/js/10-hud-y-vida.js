@@ -169,8 +169,8 @@ function golpeTexto(nombre, golpe, r, previo, nuevo){
 // que ignora la Defensa (dueloAplicarDano); todo lo demás (críticos, trampas,
 // fuego, Rayo en cadena) sigue ignorando la Defensa entera, sin cambios.
 // restaExtra (2026-10-04): lo que se resta además (la resistencia al elemento del daño), con o sin Defensa.
-/* La Defensa extra de una pieza (torso blando, 2026-10-06): contra el primer golpe que recibe en el turno (`defprimer`; la marca vive en lo que vacía
-   el Mantenimiento) y contra armas a distancia (`defdist`, con `o.distancia`). Solo cuando la Defensa cuenta (no en un crítico ni en lo que la ignora). */
+/* La Defensa extra de una pieza (torso blando, 2026-10-06): contra el primer golpe que recibe en la RONDA (`defprimer`; dueño, 2026-10-19, con el
+   Anillo del primer golpe; antes era en el turno). La marca es la ronda en que recibió el último golpe (`primerGolpeDeRonda`) y contra armas a distancia (`defdist`, con `o.distancia`). Solo cuando la Defensa cuenta (no en un crítico ni en lo que la ignora). */
 /* La Coraza del guardián (2026-10-06, dueño: automática): un aliado AL LADO (a 1 casillero, del mismo bando: creeps con creeps; personajes e
    invocaciones entre sí) con `guardian` le suma esa Defensa a quien recibe el golpe, solo cuando la Defensa cuenta. No se acumulan: vale el mayor.
    Cada vez que entra, la Crónica lo cuenta a todos y a quien maneja al protegido le aparece un aviso chico (momento con `datos.chico`). */
@@ -200,6 +200,14 @@ function guardianAviso(t, g){
   momentoAbrir({tipo: 'guardian', icono: '🛡', titulo: `${g.nombre} protege a ${nom}`, resultado: `+${g.val} Defensa contra el golpe, por estar al lado de su guardián.`,
     estado: 'listo', datos: {...(t.tipo !== 'creep' && t.duenoUid ? {paraUid: t.duenoUid} : {}), chico: true, aviso: true}});
 }
+// ¿Es el primer golpe que recibe en esta ronda? Anota la ronda en `obj[campo]` (sin el mapa de turnos, la marca de siempre: se vacía en su turno).
+function primerGolpeDeRonda(obj, campo, viejo){
+  const ronda = typeof window.rondaDeCombate === 'function' ? window.rondaDeCombate() : null;
+  if(ronda === null || ronda === undefined) return viejo;
+  const primero = obj[campo] !== ronda;
+  obj[campo] = ronda;
+  return primero;
+}
 const defExtra = (ignoraDef, primero, valor, o) => ignoraDef ? 0 : (primero ? Math.max(0, num(valor('defprimer'))) : 0) + (o && o.distancia ? Math.max(0, num(valor('defdist'))) : 0);
 async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   const golpe = leerGolpe(texto);
@@ -207,8 +215,9 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   const guarda = ignoraDef ? null : guardianDe(t);   // la Coraza del guardián de un aliado al lado
   const muro = ignoraDef ? null : muroDe(t);   // Muro de escudos (js/26): un aliado con escudo al lado
   const res = await modificarCreep(t.fichaId, sc => {
-    const primero = !num((sc.usosEspecial || {})._golpe);
+    const viejoC = !num((sc.usosEspecial || {})._golpe);
     sc.usosEspecial = {...(sc.usosEspecial || {}), _golpe: 1};   // (se vacía en su Mantenimiento)
+    const primero = primerGolpeDeRonda(sc, 'golpeRonda', viejoC);   // por ronda (2026-10-19)
     const extra = defExtra(ignoraDef, primero, st => CreepCalculo.modTotal(sc, st), o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0);
     const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : creepDefensaMapa(sc) + extra) + num(restaExtra || 0), sc.estados);
     const previo = num(sc.hp);
@@ -315,8 +324,10 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     const efectosAntes = JSON.stringify(efectos);
     const rs = ficha.data().resumen || {};
     if(rs.def === undefined) throw new Error('SIN_DEF');
-    const primero = !num((datos.ataquesArma || {})._golpe);
+    const viejoP = !num((datos.ataquesArma || {})._golpe);
     datos.ataquesArma = {...(datos.ataquesArma || {}), _golpe: 1};   // (el Mantenimiento la vacía)
+    datos.meta = datos.meta || {};
+    const primero = primerGolpeDeRonda(datos.meta, 'golpeRonda', viejoP);   // por ronda (2026-10-19)
     const extra = defExtra(ignoraDef, primero, st => rs[st], o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0);
     const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : num(rs.def) + extra) + num(restaExtra || 0), efectos);
     mitiMitiPartir(r, prot);
@@ -380,8 +391,9 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     const inv = (datos.invocaciones || []).find(i => i && i.id === invId);
     if(!inv) throw new Error('La invocación ya no existe');
     if(!Array.isArray(inv.estados)) inv.estados = [];
-    const primero = !num(inv.golpeTurno);
+    const viejoI = !num(inv.golpeTurno);
     inv.golpeTurno = 1;   // (el Mantenimiento la vacía)
+    const primero = primerGolpeDeRonda(inv, 'golpeRonda', viejoI);   // por ronda (2026-10-19)
     const extra = defExtra(ignoraDef, primero, st => FichaResumen.invModTotal(inv, st), o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0);
     const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : defensasDeInv(inv).def + extra) + num(restaExtra || 0), inv.estados);
     mitiMitiPartir(r, prot);

@@ -147,7 +147,7 @@ const FichaCalculo = (() => {
     {id:'bloqueofirme', label:'Bloqueo firme', full:'Bloqueo +N contra el primer golpe que recibís en cada turno'},
     {id:'muroescudos', label:'Muro de escudos', full:'Defensa +N si tenés al lado un aliado con escudo (el mapa la suma sola al aplicarte el daño)'},
     {id:'empujon', label:'Empujón', full:'Si tu Bloqueo frena todo el daño de un golpe cuerpo a cuerpo, el atacante queda con Demora (baja 1 lugar en el orden de turnos)'},
-    {id:'defprimer', label:'Defensa contra el primer golpe', full:'Defensa extra contra el primer golpe que recibís en cada turno'},
+    {id:'defprimer', label:'Defensa contra el primer golpe', full:'Defensa extra contra el primer golpe que recibís en cada ronda'},
     {id:'defdist', label:'Defensa contra armas a distancia', full:'Defensa extra contra los golpes de armas a distancia'},
     {id:'pagarhp', label:'Pagar con vida', full:'Con un arma especial, elegís cada vez si pagás el SP con SP o con vida (1 HP por SP)'},
     {id:'retirada', label:'Retirada limpia (%)', full:'Chance (en %) de alejarte de un rival sin darle ataque de oportunidad: 33 = 5–6 en d6, 50 = 4–6, 100 = siempre'},

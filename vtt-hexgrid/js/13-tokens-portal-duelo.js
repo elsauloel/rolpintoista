@@ -1097,7 +1097,9 @@ function quietoDe(atq, ataque){
   const hab = ataque && ataque.hab;
   if(!hab) return Math.max(0, Math.round(statPiesDe(atq, 'pulso')));
   const tira = hab.tira && (hab.tira.stat || hab.tira);
-  return tira === 'pdgmg' ? Math.max(0, Math.round(statPiesDe(atq, 'foco'))) : 0;
+  if(tira !== 'pdgmg') return 0;
+  // 💍 El Foco (dueño, 2026-10-19): si no se movió ni en esta ronda ni en la anterior (el Pulso quieto sigue siendo de este turno).
+  return seMovioTurnoAnterior(atq.id) ? 0 : Math.max(0, Math.round(statPiesDe(atq, 'foco')));
 }
 const primeraSangreUsadas = new Set();
 function primeraSangreDe(atq, ataque){

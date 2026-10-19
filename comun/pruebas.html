@@ -2694,7 +2694,7 @@ prueba('anillos Comunes (2026-10-06): los 29 nuevos (la Calma, desde el 2026-10-
     inventario: [{...structuredClone(calma), id: 'a1', equipado: true}]}).S);
   S2.nitros = 2; S2.ataquesTurno = 1;
   FichaMantenimiento.finTurno(S2, {fijarHp: v => FichaAcciones.fijarHp(S2, v)}, 'm:5', '', [], 1);
-  igual([com.length, CATALOGO_BASE.filter(i => i.tipoItem === 'anillos').length, pf, est[0].escudoMagicoActual, conCalma, S2.nitros], [34, 39, [1, 0], 1, 3, 2]);   // 34 Comunes: la Calma pasó a Buena; 39 en total con los cuatro nuevos (2026-10-18)
+  igual([com.length, CATALOGO_BASE.filter(i => i.tipoItem === 'anillos').length, pf, est[0].escudoMagicoActual, conCalma, S2.nitros], [35, 41, [1, 0], 1, 3, 2]);   // 35 Comunes (con el de la defensa, 2026-10-19); 41 en total
 });
 prueba('mochilas de Buena calidad (2026-10-06): 10 piezas, todas a 70 y con un efecto propio (ranuras o una mecánica de mochila)', () => {
   const bc = CATALOGO_BASE.filter(i => i.tipoItem === 'mochila' && i.tier === 'Buena Calidad' && !i.soloBotin);
@@ -4457,6 +4457,14 @@ prueba('Anillos nuevos (2026-10-18): el último aliento deja en 1 una vez, el tr
   const tre = Combatiente.afortunado([{nombre: 'Trébol', activo: true, afortunado: true, afortunadoTodo: true}], 'fue');
   const cat = id => CATALOGO_BASE.find(i => i.id === id);
   igual([h1, h2, !!S.meta.ultimoAlientoUsado, tre, (cat('anillo-del-pantano').mods[0] || {}).stat, cat('anillo-del-ultimo-aliento').tier], [1, 0, true, true, 'venenista', 'Raro']);
+});
+
+prueba('Anillos (2026-10-19): el Boticario suma a la primera regeneración, no a todas', () => {
+  const est = [{nombre: 'Regeneración', activo: true, hpturno: 2, turnos: 3, curaExtraPrimera: 3}];
+  const a = Combatiente.dispararEstados(est, {hp: 'hpturno'}).hp; est[0].disparado = false;
+  const b = Combatiente.dispararEstados(est, {hp: 'hpturno'}).hp;
+  const cat = id => CATALOGO_BASE.find(i => i.id === id);
+  igual([a, b, !!cat('anillo-comun-anillo-de-malla-fina').archivo, cat('anillo-del-canalizador').mods.map(m => m.stat + m.val).join(','), cat('anillo-de-defensa').mods[0].val], [5, 2, true, 'dmgesp2,sp-3', 1]);
 });
 
 prueba('ataque sin arma: tiene daño (provisorio 1d4 + Dmg, P150)', () => {

@@ -193,7 +193,7 @@ function amanecerMostrar(){
     <div class="am-fila">${em(6)}</div>
     <div class="am-texto">${em(3)} AMANESE UN NUEBO DIA ${em(3)}</div>
     <div class="am-fila">${em(9)}</div>
-    <div class="am-firma">Bendiciones para todos!!! 🙏🌹 Día ${diaActual}</div>
+    <div class="am-firma">BENDISIONES PARA TODOS!!! 🙏🌹 Día ${diaActual}</div>
   </div>`;
   const cerrar = () => el.remove();
   el.addEventListener('click', cerrar);

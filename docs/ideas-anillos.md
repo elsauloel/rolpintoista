@@ -128,9 +128,9 @@ Hecho: **Anillo de la siesta** (Buena, 150): cada descanso, Vida extra 10 (no se
 **Decidido (dueño, 2026-10-19) y cargado:** **Madrugador** (3 No2, Común, 110), **Curandero** (dos veces por día, con su botón 🩹 junto a la Polilla y
 la moneda; Buena, 160), **Herrero ambulante** (1 punto por cada pieza que lo necesite; Buena, 140) y **Mesa servida** (una Poción de HP por
 descanso; Buena, 150). **No van:** Segunda oportunidad (redundante con las wildcards), Paso de sombra y Faro. **El Escudo de la mañana** (dueño, «hacé esto, sí»): cargado — cada
-descanso, Vida extra 6 solo contra el daño especial (mágico o elemental); **Común, 90**. Y su par, el **Anillo del sereno** (dueño, 2026-10-19):
-Vida extra 6 solo contra el daño físico; Común, 90. Los tres «por descanso»: la siesta (Buena, 10 contra todo), la mañana (Común, 6 especial) y el sereno
-(Común, 6 físico); se pueden llevar juntos. Además, la **Puntería certera** pasó a la regla del Foco: PdG +2 si no te
+descanso, Vida extra **8** solo contra el daño especial (mágico o elemental); **Común, 90**. Y su par, el **Anillo del sereno** (dueño, 2026-10-19):
+Vida extra **8** solo contra el daño físico; Común, 90. Los tres «por descanso»: la siesta (Buena, 10 contra todo), la mañana (Común, 8 especial) y el sereno
+(Común, 8 físico); se pueden llevar juntos. Además, la **Puntería certera** pasó a la regla del Foco: PdG +2 si no te
 moviste ni en esta ronda ni en la anterior. Y el **Paso fantasma** (dueño, 2026-10-19): después de moverte 3 casilleros o más, tu **próxima** Evasión +3 fijo, sumado después del dado (solo esa tirada; se
 gasta al tirarla y se vuelve a cargar con otros 3 casilleros). Probados en el mapa: los cuatro de «por día», la Puntería certera y el Paso fantasma.
 

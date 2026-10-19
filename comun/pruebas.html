@@ -4473,14 +4473,14 @@ prueba('Anillo del escudo de la mañana (2026-10-19): cada descanso, un escudo s
   S.inventario = [{...structuredClone(CATALOGO_BASE.find(i => i.id === 'anillo-del-escudo-de-la-manana')), id: 'm', equipado: true}];
   FichaMantenimiento.descansar(S, {wildcards: 1}); FichaMantenimiento.descansar(S, {wildcards: 1});
   const e = S.efectos.filter(x => x.descansoEscudo);
-  igual([e.length, e[0].escudoMagicoActual, !!e[0].soloEspecial, !!e[0].sinRecarga], [1, 6, true, true]);
+  igual([e.length, e[0].escudoMagicoActual, !!e[0].soloEspecial, !!e[0].sinRecarga], [1, 8, true, true]);
 });
 prueba('Anillo del sereno (2026-10-19): cada descanso, un escudo solo contra el daño físico; con el de la mañana, los dos', () => {
   const S = FichaGuardado.normalizar({}).S; S.efectos = [];
   S.inventario = ['anillo-del-sereno', 'anillo-del-escudo-de-la-manana'].map((id, k) => ({...structuredClone(CATALOGO_BASE.find(i => i.id === id)), id: 'r' + k, equipado: true}));
   FichaMantenimiento.descansar(S, {wildcards: 1}); FichaMantenimiento.descansar(S, {wildcards: 1});
   const f = S.efectos.filter(x => x.descansoEscudoFis), m = S.efectos.filter(x => x.descansoEscudo);
-  igual([f.length, f[0].escudoMagicoActual, !!f[0].soloFisico, m.length, CATALOGO_BASE.find(i => i.id === 'anillo-del-escudo-de-la-manana').tier], [1, 6, true, 1, 'Común']);
+  igual([f.length, f[0].escudoMagicoActual, !!f[0].soloFisico, m.length, CATALOGO_BASE.find(i => i.id === 'anillo-del-escudo-de-la-manana').tier], [1, 8, true, 1, 'Común']);
 });
 
 prueba('Anillo de la siesta (2026-10-19): cada descanso da Vida extra 10, sin acumularse', () => {

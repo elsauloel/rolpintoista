@@ -73,7 +73,48 @@ const Flotantes = (() => {
     div.innerHTML = icono;
   }
   let observado = null;
+  /* ⚔ Durante un duelo (dueño, 2026-10-19: «una columna pegada con todos los triggers posibles que puedan llegar a usarse durante un duelo: la
+     polilla, la moneda de reroll, la wildcard, algunos efectos que te puede dar algún equipo»): el cuadro del duelo los tapaba (van arriba, con la
+     capa 25, y el duelo usa 99000). Mientras el cuadro está abierto (no minimizado), todos los que haya van en una columna pegada a su costado
+     derecho (o al izquierdo, si no entran), por encima del duelo y con su nombre; al cerrarlo o minimizarlo, vuelven a su lugar. */
+  const ETQ = {'reroll-flotante': 'Re-roll', 'enyetar-flotante': 'Enyetar', 'empower-flotante': 'Empower', 'polilla-flotante': 'Polilla', 'impulso-flotante': 'Impulso',
+    'trebol-flotante': 'Trébol', 'curandero-flotante': 'Curandero', 'wildcard-flotante': 'Wildcard', 'moneda-flotante': 'Moneda'};
+  const CSS_DUELO = `
+.flot-duelo{z-index:99010!important;width:auto!important;height:auto!important;min-height:40px;padding:6px 12px!important;gap:8px;justify-content:flex-start!important;
+  bottom:auto!important;right:auto!important;transform:none!important;border-radius:12px!important;font-size:18px!important}
+.flot-etq{display:none}
+.flot-duelo .flot-etq{display:inline;font:800 13px system-ui,sans-serif;letter-spacing:.2px}
+#flot-duelo-tit{position:fixed;z-index:99010;font:800 11px system-ui,sans-serif;letter-spacing:.8px;text-transform:uppercase;color:#9fb0d0;pointer-events:none}`;
+  function cajaDuelo(){
+    const f = document.getElementById('duelo-fondo');
+    if(!f || f.classList.contains('min') || getComputedStyle(f).display === 'none') return null;
+    const c = f.querySelector('.duelo-caja');
+    return c && c.offsetWidth ? c : null;
+  }
+  function columnaDuelo(caja){
+    if(!document.getElementById('flot-duelo-css')){ const st = document.createElement('style'); st.id = 'flot-duelo-css'; st.textContent = CSS_DUELO; document.head.appendChild(st); }
+    const lista = ORDEN.map(id => document.getElementById(id)).filter(Boolean);
+    let tit = document.getElementById('flot-duelo-tit');
+    if(!lista.length){ if(tit) tit.remove(); return; }
+    lista.forEach(b => {
+      b.classList.add('flot-duelo');
+      const div = b.querySelector('div');
+      if(div && div.dataset.soloIcono && !b.querySelector('.flot-etq')){ const e = document.createElement('span'); e.className = 'flot-etq'; e.textContent = ETQ[b.id] || ''; b.appendChild(e); }
+      b.style.width = ''; b.style.height = '';
+    });
+    const rc = caja.getBoundingClientRect(), ancho = Math.max(...lista.map(b => b.offsetWidth || 120));
+    const derecha = rc.right + 10 + ancho <= window.innerWidth - 6;
+    const x = derecha ? rc.right + 10 : Math.max(6, rc.left - 10 - ancho);
+    if(!tit){ tit = document.createElement('div'); tit.id = 'flot-duelo-tit'; tit.textContent = 'Podés usar'; document.body.appendChild(tit); }
+    tit.style.left = Math.round(x) + 'px'; tit.style.top = Math.round(rc.top + 4) + 'px';
+    let y = rc.top + 22;
+    lista.forEach(b => { b.style.left = Math.round(x) + 'px'; b.style.top = Math.round(y) + 'px'; y += (b.offsetHeight || 42) + 8; });
+  }
   function apilar(){
+    const caja = cajaDuelo();
+    if(caja){ columnaDuelo(caja); return; }
+    const titD = document.getElementById('flot-duelo-tit'); if(titD) titD.remove();
+    ORDEN.forEach(id => { const b = document.getElementById(id); if(b) b.classList.remove('flot-duelo'); });
     const barra = document.getElementById('flotantes-mapa');
     const rb = barra && barra.offsetWidth ? barra.getBoundingClientRect() : null;
     if(rb){
@@ -116,6 +157,20 @@ const Flotantes = (() => {
     });
   }
   if(typeof window !== 'undefined') window.addEventListener('resize', () => apilar());
+  // El cuadro del duelo se abre, se minimiza, se cierra o se redibuja: se vuelven a acomodar (en el próximo cuadro, una vez).
+  if(typeof document !== 'undefined' && typeof MutationObserver !== 'undefined'){
+    let pend = false, visto = null;
+    const pedir = () => { if(pend) return; pend = true; requestAnimationFrame(() => { pend = false; apilar(); }); };
+    const mirarFondo = () => {
+      const f = document.getElementById('duelo-fondo');
+      if(f === visto) return;
+      visto = f;
+      if(f) new MutationObserver(pedir).observe(f, {attributes: true, attributeFilter: ['class', 'style'], childList: true});
+      pedir();
+    };
+    const arrancar = () => { new MutationObserver(mirarFondo).observe(document.body, {childList: true}); mirarFondo(); };
+    if(document.body) arrancar(); else document.addEventListener('DOMContentLoaded', arrancar);
+  }
   const CSS = `
 #moneda-flotante{position:fixed;left:16px;bottom:16px;z-index:999997;background:linear-gradient(135deg,#4a3a12,#2e240c);color:#ffe9a8;border:2px solid #e0b84a;
   border-radius:16px;padding:10px 16px;font-size:15px;font-weight:800;cursor:pointer;text-align:left;overflow:hidden;transform-origin:left bottom;

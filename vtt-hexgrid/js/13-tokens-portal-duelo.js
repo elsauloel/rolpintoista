@@ -477,6 +477,7 @@ function elegirCamino(nombre, largo, t, fin){
 // (Varita de los pilares) no son trampas: cada clic levanta un Sólido de 1 casilla con turnos. El portal con destino fijo (Varita del portal):
 // primero la casilla que lo dispara y después adónde lleva. Si la casilla queda fuera del Rango de quien la usa, avisa y deja seguir.
 function trampaDeHabilidad(msg){
+  if(msg.trampa && msg.trampa.portal && msg.trampa.portal.colocador){ colocarGlifo(msg); return; }   // 🌀 el Glifo de teletransporte
   const t = msg.trampa || {}, cant = Math.max(1, Math.min(6, Math.round(num(t.cant)) || 1));
   const pilar = !!t.pilar, portal = t.portal && t.portal.fijo ? Math.max(1, Math.round(num(t.portal.rango)) || 4) : 0;
   // El muro (2026-10-08): `linea` pilares en línea recta (inicio y hacia dónde sigue); los que caen en una casilla ocupada no salen.
@@ -541,6 +542,38 @@ function portalElegirDestino(msg, t, h, rango){
       toast(r.colocadas ? `🌀 ${msg.nombre}: portal colocado (lleva ${distanciaHex(h, d)} casillas más allá)` : `🌀 ${msg.nombre}: no se pudo colocar`);
     }catch(err){ console.error('No se pudo colocar el portal:', err); toast('No se pudo colocar el portal — revisá la consola'); }
   }, `<b>🌀 ${msg.nombre ? esc(msg.nombre) + ': ' : ''}elegí adónde lleva el portal</b> <span>clic en una casilla a ${rango} o menos de la trampa · Esc o clic derecho cancelan</span>`, false);
+}
+/* 🌀 El Glifo de teletransporte (dueño, 2026-10-19: «tanto el trigger como el destino deben estar dentro del rango de quien coloca la trampa;
+   de uso único»): una trampa con `portal.colocador`. Se pide con un clic la casilla del glifo y después la del destino, las dos a su Rango o
+   menos de quien lo coloca (si no, avisa y la vuelve a pedir); el GM, sin token, sin límite. El destino queda fijo (`portal.destino`): quien lo
+   pisa aparece ahí, y el glifo se gasta. msg = {fichaId, tipoToken, nombre, trampa, item (el consumible, JSON)}. → Promise<bool> (false: se
+   canceló; un consumible no se gasta). */
+async function colocarGlifo(msg){
+  const t = msg.trampa || {}, nombre = msg.nombre || t.nombre || 'Glifo';
+  const mio = msg.fichaId ? [...tokens.values()].find(x => x.fichaId === msg.fichaId && x.tipo === (msg.tipoToken || 'pj')) : null;
+  if(msg.fichaId && !mio){ toast(`🌀 ${nombre}: tu personaje no tiene token en el mapa en juego — no se usó`); return false; }
+  const rr = mio && typeof rangoDeToken === 'function' ? rangoDeToken(mio) : null;
+  const rango = rr && num(rr.rng) > 0 ? Math.round(num(rr.rng)) : 0;   // 0: sin límite (lo pone el GM)
+  const dentro = c => !rango || distanciaHex(mio, c) <= rango;
+  const pedir = (texto, libre, ok) => new Promise(res => {
+    const una = () => elegirDestino(c => { if(!ok(c)){ una(); return; } res(c); }, texto, libre, () => res(null));
+    una();
+  });
+  const lim = rango ? `a ${rango} o menos de ${esc(nombreDe(mio))} (su Rango)` : 'clic en el mapa';
+  const fuera = c => { if(dentro(c)) return false; toast(`⚠ Esa casilla queda a ${distanciaHex(mio, c)}: tiene que estar dentro del Rango (${rango})`); return true; };
+  const h = await pedir(`<b>🌀 ${esc(nombre)}: elegí la casilla del glifo</b> <span>${lim} · Esc o clic derecho cancelan</span>`, true, c => !fuera(c));
+  if(!h) return false;
+  const d = await pedir(`<b>🌀 ${esc(nombre)}: elegí adónde manda</b> <span>${lim} · Esc o clic derecho cancelan</span>`, false, c => {
+    if(c.col === h.col && c.fila === h.fila){ toast('El destino no puede ser la misma casilla del glifo'); return false; }
+    return !fuera(c);
+  });
+  if(!d) return false;
+  try{
+    const r = await TokensAuto.colocarTrampas({fichaId: msg.fichaId, tipoToken: msg.tipoToken || 'pj', mapaId: mapaMostrado, celda: {col: h.col, fila: h.fila},
+      trampa: {...t, cant: 1, portal: {rango: Math.max(1, distanciaHex(h, d)), destino: d.col + ',' + d.fila}}, ...(msg.item ? {item: msg.item} : {})});
+    toast(r.colocadas ? `🌀 ${nombre}: colocado (manda ${distanciaHex(h, d)} casillas más allá)` : `🌀 ${nombre}: no se pudo colocar`);
+    return !!r.colocadas;
+  }catch(err){ console.error('No se pudo colocar el glifo:', err); toast('No se pudo colocar el glifo — revisá la consola'); return false; }
 }
 // Habilidad que invoca (2026-10-02): la ficha ya despertó (o copió) la invocación (FichaAcciones.invocarConHab); acá se elige la casilla
 // donde aparece. Si ya tiene token en este mapa (el de cuando se durmió) se mueve ahí; si no, se crea. La mesa se entera por la Crónica.

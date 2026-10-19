@@ -236,7 +236,7 @@ const CreepAcciones = (() => {
   async function colocarTrampaDeItem(creepId, it, sc){
     const d0 = it && it.trampaDatos;
     const d = d0 && sc ? Combatiente.trampaDeHab({nombre: it.nombre, trampaColocar: d0}, st => C().statValor(sc, st)) : d0;
-    if(!d || typeof TokensAuto === 'undefined') return {ok: false, aviso: 'Esta trampa se coloca desde el mapa'};
+    if(!d || typeof TokensAuto === 'undefined' || (d.portal && d.portal.colocador)) return {ok: false, aviso: 'Esta trampa se coloca desde el mapa'};   // (el glifo: dos clics en el mapa)
     try{
       const dano = /^\d{1,2}d\d{1,3}([+-]\d{1,3})?$/i.test(String(d.dano || '').trim()) ? String(d.dano).trim() : '';
       const r = await TokensAuto.colocarTrampas({fichaId: creepId, tipoToken: 'creep', trampa: {...d, nombre: String(d.nombre || it.nombre).slice(0, 40), dano, cant: 1}});

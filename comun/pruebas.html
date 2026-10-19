@@ -3302,7 +3302,16 @@ prueba('trampas (2026-10-19, dueño): detectar Común 6 · Buena 8 · Rara 10; l
   const delMapa = TRAMPAS_BASE.filter(e => e.datos && e.datos.catalogoId).length, soloMapa = TRAMPAS_BASE.filter(e => e.etiquetas.includes('solo del mapa')).map(e => e.nombre).sort();
   const j = JSON.parse(TokensAuto.estadoJson(null, null, null, null, '', 0, {magica: true}) || '{}');
   igual([malas, dOso, dRuna, delMapa, soloMapa, !!j.magica, TRAMPAS_BASE.find(e => e.nombre === 'Runa de debilidad').etiquetas.includes('mágica')],
-    [[], 10, 5, tr.length, ['Trampa de teleport'], true, true]);   // (la Llamarada entró al catálogo, 2026-10-19)
+    [[], 10, 5, tr.length, [], true, true]);   // (la Llamarada y el Glifo de teletransporte entraron al catálogo, 2026-10-19)
+});
+
+prueba('Glifo de teletransporte (2026-10-19, dueño): Buena, mágica, destino fijo que se elige al colocarlo (dos clics en el mapa); sin el mapa no se gasta', async () => {
+  const g = CATALOGO_BASE.find(i => i.id === 'trampa-glifo-de-teletransporte');
+  const filas = ItemCorto.trampaFilas(g.trampaDatos).map(f => f[0]);
+  let aviso = '';
+  const ok = await FichaAcciones.colocarTrampaDeItem('x', g, {toast: t => { aviso = t; }});
+  igual([g.tier, g.trampaDatos.detectarStat, g.trampaDatos.detectar, !!g.trampaDatos.portal.colocador, filas.includes('Teletransporta'), ok, /desde el mapa/.test(aviso)],
+    ['Buena Calidad', 'dmgesp', 8, true, true, false, true]);
 });
 
 prueba('cómo se ve un ítem: la trampa en datos cortos (forma, daño, efecto, salvación, detección) y lo técnico solo en «Ver»', () => {

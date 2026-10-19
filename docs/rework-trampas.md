@@ -233,5 +233,7 @@ Reemplazan a las 72 de antes (24 × menor/normal/mayor). Común / Buena / Rara p
 - **La Quemadura no se resiste con una tirada** (dueño): su resistencia es la Res. fuego, que le resta a cada turno. Por eso el Géiser de fuego perdió
   su Res.Esp contra 11.
 - **La Llamarada entró al catálogo** (Buena, 55, mágica): flor de 7, 2d6 de fuego directo y Quemadura 3 turnos, no se resiste; detectarla, 8.
-- **Falta decidir**: la Trampa de teleport (solo está en el 📚 del mapa, «solo del mapa»): ¿entra al catálogo como «Glifo de teletransporte» o se va?
+- **El Glifo de teletransporte entró al catálogo** (dueño, 2026-10-19; era la vieja «Trampa de teleport» del 📚 del mapa): Buena, 45, mágica, una
+  casilla. Al usarlo se eligen con dos clics la casilla del glifo y su destino, **los dos dentro del Rango de quien lo coloca** (el GM, sin límite);
+  el destino queda fijo. No hace daño ni se resiste; de uso único. Sin el mapa no se usa (y no se gasta). `portal.colocador` → `colocarGlifo` (js/13).
 

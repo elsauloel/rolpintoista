@@ -87,7 +87,8 @@ const ItemCorto = (() => {
     if(t.pierdeSp) f.push(['Efecto', `pierde ${t.pierdeSp} de SP`]);
     if(t.renuevaPaso) f.push(['Al caminarla', 'cada paso sobre ella le vuelve a poner el estado en sus turnos']);
     if(t.requiereDano) f.push(['Si lastima', 'lo que deja solo entra si el daño pasa la Defensa']);
-    if(t.portal && num(t.portal.rango) > 0) f.push(['Teletransporta', `quien la pone elige adónde lo manda, hasta ${num(t.portal.rango)} casillas`]);
+    if(t.portal && t.portal.colocador) f.push(['Teletransporta', 'a un destino fijo: al colocarla elegís la casilla del glifo y adónde manda, las dos dentro de tu Rango; de uso único']);
+    else if(t.portal && num(t.portal.rango) > 0) f.push(['Teletransporta', `quien la pone elige adónde lo manda, hasta ${num(t.portal.rango)} casillas`]);
     if(t.cadena && num(t.cadena.rango) > 0) f.push(['Salta', `al enemigo más cercano a ${num(t.cadena.rango)} casillas o menos, con la mitad del daño (hacia abajo: con 1 ya no salta); una vez por enemigo`]);
     if(t.danoZona) f.push(['Después', `el piso sigue haciendo ${t.danoZona} de daño en cada Mantenimiento`]);
     if(num(t.lento) > 0) f.push(['Terreno', `una vez disparada, cada paso que sale de ella cuesta ${num(t.lento)} No2`]);

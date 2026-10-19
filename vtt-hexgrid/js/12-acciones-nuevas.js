@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261017m', '../comun/creep-botonera.js?v=20261018c', '../comun/creep-acciones.js?v=20261019o', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261019l'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261017m', '../comun/creep-botonera.js?v=20261018c', '../comun/creep-acciones.js?v=20261019z', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261019l'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -150,7 +150,10 @@ async function acConsumir(sc, itemId){
     forzar = true;
   }
   if(it.trampaDatos){
-    const t = await CreepAcciones.colocarTrampaDeItem(ac.creepId, it, sc);
+    const glifo = it.trampaDatos.portal && it.trampaDatos.portal.colocador;   // 🌀 el Glifo de teletransporte: dos clics en el mapa (js/13)
+    const t = glifo ? await (async () => { ac.host.hidden = true; const td = Combatiente.trampaDeHab({nombre: it.nombre, trampaColocar: it.trampaDatos}, st => CreepCalculo.statValor(sc, st));
+        const ok = await colocarGlifo({fichaId: sc.id, tipoToken: 'creep', nombre: it.nombre, trampa: td}); return {ok, aviso: ok ? `🌀 ${it.nombre} colocado` : `🌀 ${it.nombre}: no se usó`}; })()
+      : await CreepAcciones.colocarTrampaDeItem(ac.creepId, it, sc);
     toast(t.aviso);
     if(!t.ok) return;
   }

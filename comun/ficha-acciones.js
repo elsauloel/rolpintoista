@@ -1304,15 +1304,18 @@ const FichaAcciones = (() => {
   }
   // Trampa consumible: coloca en el mapa la trampa del ítem (`trampaDatos`) en la casilla libre al frente de tu token; después la arrastrás a donde quieras
   // (solo la ven vos y el GM, y la disparan los rivales). Devuelve true si se colocó (entonces se gasta la unidad). fichaId: el del personaje.
+  // El consumible en la forma en que se guarda en la trampa (para devolverlo a su dueño si no se dispara).
+  function itemDeTrampa(it){ const c = structuredClone(it); delete c.imagen; delete c.equipado; delete c.enMesa; delete c.reservado; delete c.reservadoPara; delete c.id; c.unidades = 1; c.cargaActual = 1; return JSON.stringify(c); }
   async function colocarTrampaDeItem(fichaId, it, ui){
     const d = it.trampaDatos;
+    if(d && d.portal && d.portal.colocador){ ui.toast(`🌀 ${it.nombre} se coloca desde el mapa (tu Botonera en el mapa): ahí elegís el glifo y su destino`); return false; }
     if(!d || typeof TokensAuto === 'undefined' || !fichaId){ ui.toast('Para colocar la trampa tenés que estar en la mesa, con tu personaje en el mapa'); return false; }
     try{
       const dano = TRAMPA_DANO_RE.test(String(d.dano || '').trim()) ? String(d.dano).trim() : '';
       // Forma única de trampa (P123): el `tamano` de la flor es su radio (tamano 2 = flor de 19 casillas, como dice el ítem).
       const r = await TokensAuto.colocarTrampas({fichaId, tipoToken: 'pj',
         trampa: {...d, nombre: String(d.nombre || it.nombre).slice(0, 40), dano, cant: 1},
-        item: (() => { const c = structuredClone(it); delete c.imagen; delete c.equipado; delete c.enMesa; delete c.reservado; delete c.reservadoPara; delete c.id; c.unidades = 1; c.cargaActual = 1; return JSON.stringify(c); })()});
+        item: itemDeTrampa(it)});
       if(r.colocadas){ ui.toast(`🪤 ${it.nombre} colocada junto a tu token: arrastrala en el mapa a donde la quieras`); return true; }
       ui.toast(r.motivo === 'sin-token' ? `🪤 ${it.nombre}: tu personaje no tiene token en el mapa en juego — no se usó` : `🪤 ${it.nombre}: no hay lugar libre al lado de tu token — no se usó`);
       return false;
@@ -1327,7 +1330,7 @@ const FichaAcciones = (() => {
   }
 
   return {gastarSp, confirmarMaldito, gastoNitrosForzado, tormentaPj, alternarSigilo, levantarse, soltarse, hpRevivir, revivir,
-    tirarSocial, colocarTrampaDeItem, ankhAMano,
+    tirarSocial, colocarTrampaDeItem, itemDeTrampa, ankhAMano,
     TRAMPA_DANO_RE, avisarZonaAlMapa, colocarTrampaDeHab, colocarZonaDeHab, invocacionDeHab, invocarConHab,
     durAviso, desgastarItem, rompeArmaduraAlAzar, estadoDeSpec, aplicarEstadoRecibido, dueloAplicarEfectoPropio, xDeHab, habDueloDatos,
     ataqueDeHabArma, aplicarHabSobreMiDirecto, terminarEjecucionHab,

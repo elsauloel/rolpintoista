@@ -14,7 +14,7 @@
 - **Anillo del último aliento**: una vez por día, cuando un golpe te dejaría en 0, quedás con 1 (se recarga al pasar de día). Propuesta: Buena,
   200, o el primer anillo Raro (pregunta al dueño). 🔧
 - **Anillo del trébol**: una vez por combate, un botón 🍀 (como la Polilla) y tu próxima tirada sale como Afortunado. Propuesta: Buena, 160. 🔧
-- Un cuarto «me gusta también» llegó sin el anillo citado: preguntado.
+- **Anillo del alquimista**: el primer consumible del turno sacado del cinturón no cuesta No2 (el cuarto «me gusta»). Propuesta: Buena, 150. 🔧
 
 ## A. Bonos que faltan (hoy ningún anillo los da)
 

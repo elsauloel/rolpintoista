@@ -322,14 +322,22 @@ const FichaMantenimiento = (() => {
     }
     // 💍 El Anillo del escudo de la mañana (2026-10-19, dueño): cada descanso, Vida extra solo contra el daño especial (`soloEspecial`: el mapa la
     // salta si el golpe no es mágico ni elemental, js/10 resolverGolpe). Como la de la siesta, no se recarga y reemplaza a la que quedó.
-    const veEsp = (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, num(i.descansoEscudoEsp)), 0);
-    if(veEsp > 0){
-      S.efectos = (S.efectos || []).filter(e => !(e && e.descansoEscudo));
-      S.efectos.push({id: 'manana' + Date.now().toString(36), nombre: 'Escudo de la mañana', polaridad: 'buff', activo: true, permanente: true, sinRecarga: true, seGasta: true,
-        descansoEscudo: true, soloEspecial: true, escudoMagico: veEsp, escudoMagicoActual: veEsp,
-        detalle: `Vida extra de ${veEsp} solo contra el daño especial (mágico o elemental): un golpe común no la toca. No se recarga; vuelve con el próximo descanso (Anillo del escudo de la mañana).`});
-      lineas.push(`💍 Escudo de la mañana ${veEsp} (solo contra el daño especial)`);
-    }
+    // 💍 Y el Anillo del sereno (2026-10-19, dueño): lo mismo, solo contra el daño físico (`soloFisico`).
+    const escudosDescanso = [
+      {campo: 'descansoEscudoEsp', marca: 'descansoEscudo', flag: 'soloEspecial', nombre: 'Escudo de la mañana', anillo: 'Anillo del escudo de la mañana',
+        contra: 'el daño especial (mágico o elemental): un golpe común no la toca', corto: 'solo contra el daño especial'},
+      {campo: 'descansoEscudoFis', marca: 'descansoEscudoFis', flag: 'soloFisico', nombre: 'Escudo del sereno', anillo: 'Anillo del sereno',
+        contra: 'el daño físico: el daño especial (mágico o elemental) no la toca', corto: 'solo contra el daño físico'},
+    ];
+    escudosDescanso.forEach(k => {
+      const v = (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, num(i[k.campo])), 0);
+      if(!(v > 0)) return;
+      S.efectos = (S.efectos || []).filter(e => !(e && e[k.marca]));
+      S.efectos.push({id: k.marca + Date.now().toString(36), nombre: k.nombre, polaridad: 'buff', activo: true, permanente: true, sinRecarga: true, seGasta: true,
+        [k.marca]: true, [k.flag]: true, escudoMagico: v, escudoMagicoActual: v,
+        detalle: `Vida extra de ${v} solo contra ${k.contra}. No se recarga; vuelve con el próximo descanso (${k.anillo}).`});
+      lineas.push(`💍 ${k.nombre} ${v} (${k.corto})`);
+    });
     const wc = Math.max(0, Math.round(num(o && o.wildcards)));
     if(wc && S.meta && Math.round(num(S.meta.wildcards)) < wc){ const antes = Math.max(0, Math.round(num(S.meta.wildcards))); S.meta.wildcards = wc; lineas.push(`🃏 ${wc - antes === 1 ? 'una wildcard' : `${wc - antes} wildcards`} (tiene ${wc})`); }
     (S.invocaciones || []).forEach(inv => {

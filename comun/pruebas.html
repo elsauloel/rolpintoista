@@ -2695,7 +2695,7 @@ prueba('anillos Comunes (2026-10-06): los 29 nuevos (la Calma, desde el 2026-10-
     inventario: [{...structuredClone(calma), id: 'a1', equipado: true}]}).S);
   S2.nitros = 2; S2.ataquesTurno = 1;
   FichaMantenimiento.finTurno(S2, {fijarHp: v => FichaAcciones.fijarHp(S2, v)}, 'm:5', '', [], 1);
-  igual([com.length, CATALOGO_BASE.filter(i => i.tipoItem === 'anillos').length, pf, est[0].escudoMagicoActual, conCalma, S2.nitros, fx], [36, 47, [1, 0], 1, 3, 2, ['1d6+1', 0]]);   // 36 Comunes (con la defensa y el madrugador, 2026-10-19); 47 en total (con el escudo de la mañana)
+  igual([com.length, CATALOGO_BASE.filter(i => i.tipoItem === 'anillos').length, pf, est[0].escudoMagicoActual, conCalma, S2.nitros, fx], [38, 48, [1, 0], 1, 3, 2, ['1d6+1', 0]]);   // 38 Comunes (con la defensa, el madrugador, el escudo de la mañana y el sereno, 2026-10-19); 48 en total
 });
 prueba('mochilas de Buena calidad (2026-10-06): 10 piezas, todas a 70 y con un efecto propio (ranuras o una mecánica de mochila)', () => {
   const bc = CATALOGO_BASE.filter(i => i.tipoItem === 'mochila' && i.tier === 'Buena Calidad' && !i.soloBotin);
@@ -4474,6 +4474,13 @@ prueba('Anillo del escudo de la mañana (2026-10-19): cada descanso, un escudo s
   FichaMantenimiento.descansar(S, {wildcards: 1}); FichaMantenimiento.descansar(S, {wildcards: 1});
   const e = S.efectos.filter(x => x.descansoEscudo);
   igual([e.length, e[0].escudoMagicoActual, !!e[0].soloEspecial, !!e[0].sinRecarga], [1, 6, true, true]);
+});
+prueba('Anillo del sereno (2026-10-19): cada descanso, un escudo solo contra el daño físico; con el de la mañana, los dos', () => {
+  const S = FichaGuardado.normalizar({}).S; S.efectos = [];
+  S.inventario = ['anillo-del-sereno', 'anillo-del-escudo-de-la-manana'].map((id, k) => ({...structuredClone(CATALOGO_BASE.find(i => i.id === id)), id: 'r' + k, equipado: true}));
+  FichaMantenimiento.descansar(S, {wildcards: 1}); FichaMantenimiento.descansar(S, {wildcards: 1});
+  const f = S.efectos.filter(x => x.descansoEscudoFis), m = S.efectos.filter(x => x.descansoEscudo);
+  igual([f.length, f[0].escudoMagicoActual, !!f[0].soloFisico, m.length, CATALOGO_BASE.find(i => i.id === 'anillo-del-escudo-de-la-manana').tier], [1, 6, true, 1, 'Común']);
 });
 
 prueba('Anillo de la siesta (2026-10-19): cada descanso da Vida extra 10, sin acumularse', () => {

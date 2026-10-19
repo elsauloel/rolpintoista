@@ -128,7 +128,8 @@ function creepArmadmgMapa(sc){ return CreepCalculo.armadmgEfectiva(sc); }
 
 // Golpe − Defensa, con Invulnerable y Escudo mágico (mismas reglas que gm-tools
 // con los creeps). Modifica el escudo de `efectos`: pasar una copia para solo mirar.
-// o.magico: el golpe es daño especial (mágico o elemental); sin eso, un escudo `soloEspecial` (el Escudo de la mañana, 2026-10-19) no lo toca.
+// o.magico: el golpe es daño especial (mágico o elemental); sin eso, un escudo `soloEspecial` (el Escudo de la mañana, 2026-10-19) no lo toca;
+// con eso, uno `soloFisico` (el Escudo del sereno) tampoco.
 function resolverGolpe(golpe, defensa, efectos, o){
   const activos = (efectos || []).filter(e => e && e.activo !== false);
   if(activos.some(e => e.invulnerable)) return {recibido: 0, invulnerable: true, defensa, absorbido: 0};
@@ -136,7 +137,7 @@ function resolverGolpe(golpe, defensa, efectos, o){
   let absorbido = 0;
   const ab = Combatiente.absorberPct(activos, recibido);   // Armadura arcana: se queda con el 50 % de lo que llega, hasta 10 (2026-10-10)
   recibido = ab.recibido; absorbido += ab.tomado;
-  const capas = activos.filter(e => (e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) && num(e.escudoMagicoActual ?? e.escudoMagico) > 0 && !(e.soloEspecial && !(o && o.magico)))
+  const capas = activos.filter(e => (e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) && num(e.escudoMagicoActual ?? e.escudoMagico) > 0 && !(e.soloEspecial && !(o && o.magico)) && !(e.soloFisico && o && o.magico))
     .sort((a, b) => (a.excedenteVida ? 1 : 0) - (b.excedenteVida ? 1 : 0));   // primero los escudos, al final la vida extra
   capas.forEach(c => {
     if(recibido <= 0) return;

@@ -436,6 +436,20 @@ function zonaPersistenteDeHabilidad(msg){
     elegirCamino(msg.nombre, msg.zonaLargo, t, celdas => crearElementoZona(celdas[0], {...cfg, celdas}));
     return;
   }
+  // Dentro del Rango y a la vista de quien la usa (2026-10-19, la Bombucha de talco: `zonaAlcance: 'rango'`, `zonaSoloVisible`): si no, avisa y la vuelve a pedir.
+  const yoZ = msg.fichaId ? [...tokens.values()].find(x => x.fichaId === msg.fichaId && (x.tipo === 'creep') === (msg.casteadorTipo === 'creep')) : null;
+  const rangoZ = yoZ && msg.zonaAlcance === 'rango' && typeof rangoDeToken === 'function' ? Math.round(num((rangoDeToken(yoZ) || {}).rng)) : 0;
+  const centroOk = h => {
+    if(rangoZ > 0 && distanciaHex(yoZ, h) > rangoZ){ toast(`⚠ Esa casilla queda a ${distanciaHex(yoZ, h)}: tiene que estar dentro de tu Rango (${rangoZ})`); return false; }
+    if(yoZ && msg.zonaSoloVisible && !celdasVisionDe(yoZ).includes(nbPack(h.col, h.fila))){ toast('⚠ Esa casilla no la ves: tiene que estar en tu campo de visión'); return false; }
+    return true;
+  };
+  if(rangoZ > 0 || (yoZ && msg.zonaSoloVisible)){
+    const pedirZ = () => elegirDestino(h => { if(!centroOk(h)){ pedirZ(); return; } crearElementoZona(h, cfg); },
+      `<b>🌫 ${msg.nombre ? esc(msg.nombre) + ': ' : ''}elegí dónde cae</b> <span>${rangoZ > 0 ? `a ${rangoZ} o menos de vos (tu Rango), ` : ''}en una casilla que veas · Esc o clic derecho cancelan</span>`);
+    pedirZ();
+    return;
+  }
   elegirDestino(h => crearElementoZona(h, cfg), `<b>🌫 ${msg.nombre ? esc(msg.nombre) + ': marcá el centro' : 'Elegí el centro de la zona'}</b> <span>clic en el mapa (${Combatiente.areaTxt(radio)}) · Esc o clic derecho cancelan</span>`, true);
 }
 /* Casillas en línea recta (2026-10-08: el muro de fuego, el muro): el primer clic es donde empieza y el segundo, hacia dónde sigue (el lado más

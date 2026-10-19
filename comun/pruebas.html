@@ -3314,6 +3314,13 @@ prueba('Glifo de teletransporte (2026-10-19, dueño): Buena, mágica, destino fi
     ['Buena Calidad', 'dmgesp', 8, true, true, false, true]);
 });
 
+prueba('Bombucha de talco (2026-10-19, dueño): Común, se tira dentro del Rango a una casilla a la vista; flor de 7, revela lo oculto sin alumbrar', () => {
+  const b = CATALOGO_BASE.find(i => i.id === 'nuevo-bombucha-de-talco');
+  const m = Combatiente.zonaDeHab({nombre: b.nombre}, b.zonaUso, {fichaId: 'x', tipo: 'pj'});
+  igual([b.tier, m.radio, m.zonaTurnos, m.zonaAlcance, !!m.zonaSoloVisible, !!m.zonaLuz, m.zonaEstado.revela, m.zonaEstado.sinLuz, !!m.zonaEstado.nombre],
+    ['Común', 1, 1, 'rango', true, true, true, true, false]);
+});
+
 prueba('cómo se ve un ítem: la trampa en datos cortos (forma, daño, efecto, salvación, detección) y lo técnico solo en «Ver»', () => {
   const oso = CATALOGO_BASE.find(i => i.id === 'trampa-trampa-de-oso'), menor = CATALOGO_BASE.find(i => i.id === 'trampa-cepo-reforzado');
   const filas = ItemCorto.trampaFilas(oso.trampaDatos).map(f => f[0] + ': ' + f[1] + (f[2] ? ' (' + f[2] + ')' : ''));
@@ -4031,7 +4038,7 @@ prueba('la góndola (P181): gastables aparte del equipo, N variedades por secci�
     if(!tala.some(i => G.parteDe(i) === 'cinturon')) sinCinturon++;
   }
   igual([malas, consumiblesEnEquipo, sinMochila, sinCinturon, cuantas, G.gondolaDe({nombre: 'Bengala de mano'}), G.gondolaDe({nombre: 'Poción de fuerza'}), G.gondolaDe({nombre: 'Púas', trampaDatos: {}}),
-    G.gastable(CATALOGO_BASE.find(i => i.nombre === 'Vendas'))], [0, 0, 0, 0, 19, 'talabarteria', 'bazar', 'talabarteria', false]);   // 11 al azar + las 4 flechas elementales fijas (2026-10-11) + las 4 luces básicas fijas (2026-10-14)
+    G.gastable(CATALOGO_BASE.find(i => i.nombre === 'Vendas'))], [0, 0, 0, 0, 20, 'talabarteria', 'bazar', 'talabarteria', false]);   // 11 al azar + las 4 flechas elementales fijas (2026-10-11) + las 4 luces básicas fijas (2026-10-14) + la Bombucha de talco (2026-10-19)
   const r2 = G.generar({tamano: 'pueblito', nivel: 1, catalogo: cat});
   igual(['flecha-de-fuego', 'flecha-de-escarcha', 'flecha-relampago', 'flecha-de-acido'].map(id => r2.gondola.includes(id)), [true, true, true, true]);
 });

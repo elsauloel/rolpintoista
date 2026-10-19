@@ -1417,6 +1417,7 @@ const Combatiente = (() => {
       // es una luz (luz flotante: ilumina y deja ver lo oculto mientras dura).
       ...(c.zonaCadaPaso ? {zonaCadaPaso: true} : {}), ...(c.zonaInmediata ? {zonaInmediata: true} : {}), ...(c.zonaLuz ? {zonaLuz: true} : {}),
       ...(c.zonaEnMantenimiento === false ? {zonaEnMantenimiento: false} : {}),   // solo al pisarla (el campo de estática), no por quedarse
+      ...(c.zonaAlcance === 'rango' ? {zonaAlcance: 'rango'} : {}), ...(c.zonaSoloVisible ? {zonaSoloVisible: true} : {}),   // dónde se puede tirar (la Bombucha de talco)
       // La forma (2026-10-08): 'linea' (muro de fuego: inicio y hacia dónde sigue) o 'camino' (chorro de lava: casilla por casilla, cada una pegada
       // a la anterior, la primera a ⅓ de tu Rango), de `zonaLargo` casillas. Sin forma: la flor de siempre.
       ...(['linea', 'camino'].includes(c.zonaForma) ? {zonaForma: c.zonaForma, zonaLargo: Math.max(2, Math.min(8, Math.round(nf(c.zonaLargo)) || 3))} : {})};

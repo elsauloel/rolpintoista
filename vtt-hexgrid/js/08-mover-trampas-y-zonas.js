@@ -356,6 +356,7 @@ function zonaLeFalta(el, t){
   if(sup && sup.tiraPaso) return true;
   if(el.trampa) return !(el.zonaResueltos || []).includes(zonaClave(el, t));
   if(el.zonaDano || el.zonaDanoDif) return true;
+  if(el.zonaLuz && typeof luzSinLuz === 'function' && luzSinLuz(el)){ let e = {}; try{ e = JSON.parse(el.zonaEstado || '{}') || {}; }catch(x){} if(!e.nombre) return false; }   // (la bombucha de talco: solo revela)
   if(el.zonaEstado && !(el.zonaResueltos || []).includes(zonaClave(el, t))) return true;
   return false;
 }

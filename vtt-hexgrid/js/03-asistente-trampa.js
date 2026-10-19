@@ -479,12 +479,14 @@ function celdasVisionDe(t, ignorarSolidos){
 // Solo la que lo dice (`revela` en su zonaEstado, 2026-10-08: la luz flotante sí, la del farol Común no) deja ver lo oculto; todas iluminan.
 let luzPisoCache = {firma: null, set: new Set(), revela: new Set()};
 const luzRevela = el => { try{ return !!(JSON.parse(el.zonaEstado || '{}') || {}).revela; }catch(e){ return false; } };
+// `sinLuz` (2026-10-19, la Bombucha de talco): revela lo oculto de adentro pero no ilumina ni destapa la niebla (solo se ve si ya está a la vista).
+const luzSinLuz = el => { try{ return !!(JSON.parse(el.zonaEstado || '{}') || {}).sinLuz; }catch(e){ return false; } };
 function luzPisoCalcular(){
   let f = '';
   elementos.forEach((el, id) => { if(el.zona && el.zonaLuz) f += `${id}:${el.origen.col},${el.origen.fila};`; });
   if(f === luzPisoCache.firma) return luzPisoCache;
   const set = new Set(), revela = new Set();
-  elementos.forEach(el => { if(el.zona && el.zonaLuz){ const r = luzRevela(el); celdasDeElemento(el).forEach(c => { set.add(nbPack(c.col, c.fila)); if(r) revela.add(nbPack(c.col, c.fila)); }); } });
+  elementos.forEach(el => { if(el.zona && el.zonaLuz){ const r = luzRevela(el), sl = luzSinLuz(el); celdasDeElemento(el).forEach(c => { if(!sl) set.add(nbPack(c.col, c.fila)); if(r) revela.add(nbPack(c.col, c.fila)); }); } });
   luzPisoCache = {firma: f, set, revela};
   return luzPisoCache;
 }

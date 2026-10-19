@@ -98,3 +98,18 @@ Aplicado en `comun/catalogo.js` y `comun/generador-tiendas.js`: los precios de l
 
 De la lluvia de ideas (`ideas-anillos.md`), el dueño eligió cuatro y quedaron cargados y probados: **del pantano** (Buena, 170), **del último aliento** (Raro, 350: el primer anillo Raro), **del trébol** (Buena, 160) y **del alquimista** (Buena, 150). Hoy hay 39 anillos: 34 Comunes, 4 de Buena (con la Calma), 1 Raro y 1 archivado (la armadura indestructible, P196).
 
+## Cambios del dueño (2026-10-19)
+
+- **Nuevo: Anillo del canalizador** (Buena, 150): Ef.Esp +2 · SP máximo −3 (lo que da un punto de Especial: el SP es Especial × 3).
+- **Nuevo: Anillo de la defensa** (Común, 120): Defensa +1.
+- **Anillo de malla fina** (Res. crítico Tipo 4 +1): se quita (archivado: quien ya lo tenga lo conserva).
+- **Anillo del primer golpe**: Defensa +2 contra el primer golpe que recibís en la **ronda** (antes +1 en el turno), 110. La regla de `defprimer`
+  pasó a ser por ronda para todos (personajes, creeps e invocaciones: `primerGolpeDeRonda`, vtt-hexgrid/js/10); hoy solo la usa este anillo.
+- **Anillo de Foco Arcano**: PdG.Esp +2 si no te moviste ni en esta ronda ni en la anterior (antes +1 en este turno). El Pulso quieto (Puntería
+  certera) sigue siendo de este turno.
+- **Anillo de boticario**: en una poción de regeneración, los +3 van en la primera vez que regenera, no en cada turno (`curaExtraPrimera` en el
+  estado; `Combatiente.dispararEstados`).
+- Probado en el mapa: el primer golpe (dos golpes de 6 contra Defensa 3: 1 y después 3) y el Boticario (Poción de Regeneración: la primera vez 13).
+- Aclarado el **Levitar** (pregunta del dueño): cubre los primeros N casilleros que te movés en tu turno; con Levitar 2 y 3 casilleros, el 1 y el
+  2 van por el aire y el 3 se pisa; si terminás el turno en un casillero que pasaste levitando, al terminarlo tocás el piso (una trampa salta ahí).
+

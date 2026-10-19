@@ -72,21 +72,22 @@ const Flotantes = (() => {
     div.dataset.soloIcono = '1';
     div.innerHTML = icono;
   }
+  // Lo que dice el mouse: qué es y qué hace al tocarlo (con el detalle de su línea chica, salvo la moneda y la carta).
+  function ponerTitulo(b){
+    const id = b.id, sub = b.querySelector('small'), det = sub && id !== 'moneda-flotante' && id !== 'wildcard-flotante' ? String(sub.textContent || '').trim() : '';
+    b.title = `${TITULO[id] || ''}. ${det ? det.charAt(0).toUpperCase() + det.slice(1) + ' — ' : ''}${ACCION[id] || ''}.`;
+  }
   let observado = null;
   /* ⚔ Durante un duelo (dueño, 2026-10-19: «una columna pegada con todos los triggers posibles que puedan llegar a usarse durante un duelo: la
      polilla, la moneda de reroll, la wildcard, algunos efectos que te puede dar algún equipo»): el cuadro del duelo los tapaba (van arriba, con la
      capa 25, y el duelo usa 99000). Mientras el cuadro está abierto (no minimizado), todos los que haya van en una columna pegada a su costado
-     derecho (o al izquierdo, si no entran), por encima del duelo y con su nombre; al cerrarlo o minimizarlo, vuelven a su lugar. */
-  const ETQ = {'reroll-flotante': 'Re-roll', 'enyetar-flotante': 'Enyetar', 'empower-flotante': 'Empower', 'polilla-flotante': 'Polilla', 'impulso-flotante': 'Impulso',
-    'trebol-flotante': 'Trébol', 'curandero-flotante': 'Curandero', 'wildcard-flotante': 'Wildcard', 'moneda-flotante': 'Moneda'};
+     derecho (o al izquierdo, si no entran), por encima del duelo; al cerrarlo o minimizarlo, vuelven a su lugar. Como arriba (dueño, el mismo día):
+     solo el emoji, con su animación, y el mouse explica qué es. */
   const CSS_DUELO = `
-.flot-duelo.flot-duelo{z-index:99010!important;width:auto!important;height:auto!important;min-height:40px;padding:6px 12px!important;gap:8px;justify-content:flex-start!important;
-  bottom:auto!important;right:auto!important;transform:none!important;border-radius:12px!important;font-size:18px!important}
-.flot-etq{display:none}
-.flot-duelo:not(.flot-arriba) .wildcard-n{display:none!important}
-.flot-duelo .flot-etq{display:inline;font:800 13px system-ui,sans-serif;letter-spacing:.2px}
+.flot-duelo.flot-duelo{z-index:99010!important;bottom:auto!important;right:auto!important}   /* doble clase: le gana a .flot-arriba (capa 25) aunque su estilo se cargue después */
 #flot-duelo-tit{position:fixed;z-index:99010;font:800 11px system-ui,sans-serif;letter-spacing:.8px;text-transform:uppercase;color:#9fb0d0;pointer-events:none}`;
   function cajaDuelo(){
+    if(!document.getElementById('flotantes-mapa')) return null;   // solo en el mapa: en la ficha suelta van abajo a la izquierda, ya por encima del duelo
     const f = document.getElementById('duelo-fondo');
     if(!f || f.classList.contains('min') || getComputedStyle(f).display === 'none') return null;
     const c = f.querySelector('.duelo-caja');
@@ -97,13 +98,14 @@ const Flotantes = (() => {
     const lista = ORDEN.map(id => document.getElementById(id)).filter(Boolean);
     let tit = document.getElementById('flot-duelo-tit');
     if(!lista.length){ if(tit) tit.remove(); return; }
+    if(!document.getElementById('flot-arriba-css')){ const st = document.createElement('style'); st.id = 'flot-arriba-css'; st.textContent = CSS_ARRIBA; document.head.appendChild(st); }
+    const LADO = 40;
     lista.forEach(b => {
-      b.classList.add('flot-duelo');
-      const div = b.querySelector('div');
-      if(div && div.dataset.soloIcono && !b.querySelector('.flot-etq')){ const e = document.createElement('span'); e.className = 'flot-etq'; e.textContent = ETQ[b.id] || ''; b.appendChild(e); }
-      b.style.width = ''; b.style.height = '';
+      b.classList.add('flot-arriba', 'flot-duelo');   // el mismo aspecto que arriba: cuadrado, solo el emoji, con su animación
+      soloIcono(b); ponerTitulo(b);
+      b.style.width = LADO + 'px'; b.style.height = LADO + 'px';
     });
-    const rc = caja.getBoundingClientRect(), ancho = Math.max(...lista.map(b => b.offsetWidth || 120));
+    const rc = caja.getBoundingClientRect(), ancho = LADO;
     const derecha = rc.right + 10 + ancho <= window.innerWidth - 6;
     const x = derecha ? rc.right + 10 : Math.max(6, rc.left - 10 - ancho);
     if(!tit){ tit = document.createElement('div'); tit.id = 'flot-duelo-tit'; tit.textContent = 'Podés usar'; document.body.appendChild(tit); }
@@ -136,8 +138,7 @@ const Flotantes = (() => {
         if(!b) return;
         b.classList.add('flot-arriba');
         soloIcono(b);
-        const sub = b.querySelector('small'), det = sub && id !== 'moneda-flotante' && id !== 'wildcard-flotante' ? String(sub.textContent || '').trim() : '';
-        b.title = `${TITULO[id] || ''}. ${det ? det.charAt(0).toUpperCase() + det.slice(1) + ' — ' : ''}${ACCION[id] || ''}.`;   // «Tenés una Polilla mística activa. +2 a tu última tirada: … — tocá para…»
+        ponerTitulo(b);   // «Tenés una Polilla mística activa. +2 a tu última tirada: … — tocá para…»
         b.style.top = Math.round(top) + 'px'; b.style.height = Math.round(alto) + 'px'; b.style.width = Math.round(alto) + 'px';
         b.style.right = 'auto'; b.style.left = '0px';
         x -= b.offsetWidth;

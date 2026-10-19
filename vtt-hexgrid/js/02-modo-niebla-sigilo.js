@@ -763,7 +763,7 @@ async function colocarTrampaDelCatalogo(g){
   if(typeof EstadoPreguntas === 'undefined'){ try{ await cargarPiezas(SE_PIEZAS); }catch(err){} }
   const r = typeof EstadoPreguntas !== 'undefined'
     ? await EstadoPreguntas.preguntar({titulo: 'Colocar trampa', nombre: g.nombre},
-        [{clave: 'detectar', min: 1, inicial: base, texto: `¿Qué tan difícil es detectarla? Percepción contra este número (el catálogo dice ${base}).`}], x => x)
+        [{clave: 'detectar', etiqueta: 'Dificultad', min: 1, inicial: base, texto: `¿Qué tan difícil es detectarla? Percepción contra este número (el catálogo dice ${base}).`}], x => x)
     : {detectar: base};
   if(!r) return;
   const t = {...g, detectar: Math.max(1, Math.round(num(r.detectar)) || base)};

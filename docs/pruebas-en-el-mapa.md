@@ -12,6 +12,9 @@
 - [ ] **🃏 Wildcards en el duelo y en el mapa de un jugador** (2026-10-15): desde una cuenta de jugador con wildcards, (1) la cartita 🃏 arriba, en la
   fila de los lentes, girando; (2) en un duelo, después de tirar PdG/Evasión, aparecen «🃏 Wildcard» y «🪙 Moneda» lado a lado (o solo la carta) y
   reabrir con la carta descuenta 1. (Probado ya: el descanso del GM y la ventana de la ficha, ver «Probado».)
+  **2026-10-19, desde la jugadora «Sujeto de pruebas» (el otro perfil de Chrome):** (1) visto: la 🃏 con su 2 arriba. Además, visto desde la
+  jugadora: **la columna «Podés usar» del duelo** (Polilla, wildcard y moneda al costado del cuadro, por encima, con su texto al pasar el mouse) y
+  **el anuncio del descanso** («Día 7: descansaste», al entrar, para Aurelia). Falta (2): reabrir una tirada con la carta dentro del duelo.
 - [ ] **Trampa de red del Goblin trampero con alcance 3** (2026-10-15): en una partida de prueba, un creep con una trampa ✨ con `trampaColocar.alcance: 3` → al
   elegir una casilla a 4+ avisa «la trampa llega hasta 3»; la red se coloca oculta; un personaje que la pisa queda Inmovilizado y le aparece 🔓 Soltarse · Fuerza
   contra 5 · 1 No2. (El cambio de código es solo el aviso: js/13 `trampaAvisarAlcance`.)

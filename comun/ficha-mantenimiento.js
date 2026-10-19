@@ -292,6 +292,26 @@ const FichaMantenimiento = (() => {
     if(fin.length){ S.efectos = S.efectos.filter(e => !terminaAlPasarDia(e)); lineas.push(`terminaron: ${fin.map(e => e.nombre).join(', ')}`); }
     if(num(S.reparadoTalento) > 0) S.reparadoTalento = 0;
     if(S.meta && S.meta.ultimoAlientoUsado){ S.meta.ultimoAlientoUsado = false; lineas.push('💍 el Anillo del último aliento se recargó'); }   // (2026-10-18)
+    // 💍 El Anillo del herrero ambulante y el de la mesa servida (2026-10-19, dueño): al descansar.
+    const eqDescanso = (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i));
+    const herr = eqDescanso.reduce((a, i) => Math.max(a, num(i.herreroDescanso)), 0);
+    if(herr > 0){
+      let k = 0;
+      (S.inventario || []).forEach(it => {
+        if(!it || !it.equipado || !FichaCalculo.durableItem(it)) return;
+        const a = FichaCalculo.durActual(it), m = FichaCalculo.durMax(it);
+        if(a < m){ it.dur = Math.min(m, a + herr); k++; }
+      });
+      if(k) lineas.push(`💍 Anillo del herrero ambulante: ${k} pieza${k === 1 ? '' : 's'} +${herr} de durabilidad`);
+    }
+    const mesaS = eqDescanso.find(i => i.mesaServida);
+    if(mesaS && typeof CATALOGO_BASE !== 'undefined' && typeof FichaEquipo !== 'undefined'){
+      const p = CATALOGO_BASE.find(i => i.id === mesaS.mesaServida);
+      if(p){
+        const r = FichaEquipo.alCinturon(S, {...structuredClone(p), unidades: 1}, 1);
+        lineas.push(r && r.movidas > 0 ? `💍 Anillo de la mesa servida: una ${p.nombre} en el cinturón` : `💍 Anillo de la mesa servida: no hay lugar en el cinturón para la ${p.nombre}`);
+      }
+    }
     // 💍 El Anillo de la siesta (2026-10-19, dueño): cada descanso da Vida extra (no se recarga por turno; reemplaza a la que haya quedado del anterior).
     const veDescanso = (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, num(i.descansoVidaExtra)), 0);
     if(veDescanso > 0){

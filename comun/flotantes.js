@@ -7,7 +7,7 @@
    orden (cada pantalla lo llama después de dibujar o sacar uno). Lo usan el mapa (js/02, js/25) y la ficha suelta (js/03).
    ========================================================= */
 const Flotantes = (() => {
-  const ORDEN = ['reroll-flotante', 'enyetar-flotante', 'empower-flotante', 'polilla-flotante', 'impulso-flotante', 'trebol-flotante', 'wildcard-flotante', 'moneda-flotante'];
+  const ORDEN = ['reroll-flotante', 'enyetar-flotante', 'empower-flotante', 'polilla-flotante', 'impulso-flotante', 'trebol-flotante', 'curandero-flotante', 'wildcard-flotante', 'moneda-flotante'];
   // Dónde van. En el mapa (2026-10-10, dueño: «arriba, al lado de los botones de los lentes, a la misma altura que esa botonera»): en fila,
   // a la izquierda de la barra de arriba (#flotantes-mapa), con la altura de sus botones y en un solo renglón (la línea de ayuda pasa al
   // globo del mouse). Donde no hay esa barra (la ficha suelta): uno arriba del otro, abajo a la izquierda.
@@ -59,9 +59,9 @@ const Flotantes = (() => {
 @keyframes flot-latido{0%{box-shadow:0 2px 8px rgba(0,0,0,.5),0 0 3px var(--flot-glow)}100%{box-shadow:0 2px 8px rgba(0,0,0,.5),0 0 13px var(--flot-glow)}}`;
   // Lo que explica el mouse (dueño: «al hacer hover te explica: tenés una moneda / tenés una polilla activa»).
   const TITULO = {'wildcard-flotante': 'Tenés wildcards', 'reroll-flotante': 'Tenés Re-roll', 'enyetar-flotante': 'Tenés Enyetar', 'empower-flotante': 'Tenés Empower', 'polilla-flotante': 'Tenés una Polilla mística activa', 'moneda-flotante': 'Tenés una Moneda Re-Roll',
-    'impulso-flotante': 'Tenés un anillo de impulso activo', 'trebol-flotante': 'Tenés el Anillo del trébol'};
+    'impulso-flotante': 'Tenés un anillo de impulso activo', 'trebol-flotante': 'Tenés el Anillo del trébol', 'curandero-flotante': 'Tenés el Anillo del curandero'};
   const ACCION = {'wildcard-flotante': 'tocá para repetir una de tus últimas tiradas (se gasta una)', 'reroll-flotante': 'tocá para elegir qué tirada tuya o de un aliado se repite (queda la mejor)', 'enyetar-flotante': 'tocá para elegir a qué tirada de un enemigo le echás la yeta', 'empower-flotante': 'tocá para elegir a qué tirada le sumás +3', 'polilla-flotante': 'tocá para sumarle +2 a tu última tirada', 'moneda-flotante': 'tocá para repetir una de tus últimas tiradas',
-    'impulso-flotante': 'tocá para sumarle su bono a tu última tirada', 'trebol-flotante': 'tocá y tu próxima tirada sale como Afortunado (una vez por combate)'};
+    'impulso-flotante': 'tocá para sumarle su bono a tu última tirada', 'trebol-flotante': 'tocá y tu próxima tirada sale como Afortunado (una vez por combate)', 'curandero-flotante': 'tocá para sacarte un estado malo (dos veces por día)'};
   // Deja solo el ícono (el primer «carácter» del texto; la moneda conserva su cara que gira).
   function soloIcono(b){
     const div = b.querySelector('div');

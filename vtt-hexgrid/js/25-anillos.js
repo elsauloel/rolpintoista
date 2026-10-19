@@ -31,7 +31,7 @@ function anillosDatos(t){
   const rota = (r.estados || []).filter(e => e && e.armaduraRota).reduce((a, e) => a + Math.max(1, num(e.stacks) || 1), 0);
   return {creep: false, v, dados: !!r.anillosDados, campana: !!r.campanaUsada || !!r.trebolUsado, absorbe: !!r.absorbeUsada, rota, conAnillo: (r.estados || []).some(e => e && e.anillo), cargas: !!r.cargasUsadas};
 }
-const anillosTiene = d => d && (d.v('cascara') > 0 || d.v('cambiante') > 0 || Object.keys(ANILLO_ATRIB).some(k => d.v(k) > 0));
+const anillosTiene = d => d && (d.v('cascara') > 0 || d.v('cambiante') > 0 || d.v('madrugador') > 0 || Object.keys(ANILLO_ATRIB).some(k => d.v(k) > 0));
 // Cambia los datos del token (personaje o creep) con `fn(lista de estados, objeto)` → bool (hubo cambio).
 async function anillosCambiar(t, fn){
   if(t.tipo === 'creep') return modificarCreep(t.fichaId, sc => { sc.estados = sc.estados || []; fn(sc.estados, sc); });
@@ -60,6 +60,9 @@ async function anillosEmpezar(id, t, d){
     await anillosCambiar(t, (lista, obj) => {
       if(obj.anillosDados) return false;
       obj.anillosDados = true;
+      // 💍 El Anillo del madrugador (2026-10-19): el primer combate del día, No2 por encima del máximo (la próxima recarga los saca).
+      const mad = d.creep ? 0 : d.v('madrugador'), dia = typeof diaActual !== 'undefined' ? diaActual : 0;
+      if(mad > 0 && (obj.meta || {}).madrugadorDia !== dia){ obj.nitros = num(obj.nitros) + mad; obj.meta = {...(obj.meta || {}), madrugadorDia: dia}; lineas.push(`Madrugador: +${mad} No2 (primer combate del día)`); }
       const c = d.v('cascara');
       if(c > 0){ lista.push({id: anillosId(), nombre: 'Cáscara protectora', polaridad: 'buff', activo: true, permanente: true, anillo: true, sinRecarga: true,
         escudoMagico: c, escudoMagicoActual: c, detalle: `Vida extra de ${c} que no se recarga: dura hasta que termine el combate.`}); lineas.push(`Cáscara protectora: Vida extra ${c}`); }
@@ -345,4 +348,60 @@ function finCombateMomento(id){
 async function esperarFinDeCombate(){
   for(let i = 0; i < 2400 && finCombateEnCurso; i++) await finCombateEnCurso.catch(() => {});
 }
+/* 🩹 El Anillo del curandero (2026-10-19, dueño): dos veces por día, te sacás un estado malo a elección. El botón aparece con los de la Polilla y
+   la moneda (comun/flotantes.js) cuando el personaje que maneja esta pantalla lo tiene, le quedan usos hoy y tiene algún estado malo. Los usos
+   del día viven en S.meta.curanderoDia / curanderoUsos (el día de js/41). */
+function curanderoActivo(){
+  const dia = typeof diaActual !== 'undefined' ? diaActual : 0;
+  for(const t of tokens.values()){
+    if(!t || t.tipo !== 'pj' || !t.fichaId || String(t.fichaId).includes(SEP_INVOCACION)) continue;
+    if(typeof bnManejo === 'function' ? !bnManejo(t.fichaId) : t.duenoUid !== (fbUsuario && fbUsuario.uid)) continue;
+    const r = (fichasPub.get(t.fichaId) || {}).resumen || {};
+    const tope = Math.round(num(r.curandero));
+    if(!(tope > 0)) continue;
+    const quedan = tope - (num(r.curanderoDia) === dia ? Math.round(num(r.curanderoUsos)) : 0);
+    const malos = (r.estados || []).filter(e => e && e.polaridad === 'debuff' && !e.derivado && !e.anillo);
+    if(quedan > 0 && malos.length) return {t, quedan, malos, dia};
+  }
+  return null;
+}
+function renderCuranderoBoton(){
+  const a = curanderoActivo();
+  let b = document.getElementById('curandero-flotante');
+  if(!a){ if(b){ b.remove(); if(typeof Flotantes !== 'undefined') Flotantes.apilar(); } return; }
+  if(!b){
+    b = document.createElement('button');
+    b.type = 'button'; b.id = 'curandero-flotante';
+    b.style.cssText = 'position:fixed;left:16px;bottom:74px;z-index:999998;background:#132a26;color:#bff0e2;border:2px solid #4fbf9a;border-radius:16px;padding:10px 16px;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 8px 26px rgba(0,0,0,.6)';
+    b.onclick = usarCurandero;
+    document.body.appendChild(b);
+  }
+  b.innerHTML = `<div>🩹 Curandero</div><small style="display:block;font-weight:500;font-size:11px;opacity:.9">te quedan ${a.quedan} hoy</small>`;
+  if(typeof Flotantes !== 'undefined') Flotantes.apilar();
+}
+async function usarCurandero(){
+  const a = curanderoActivo();
+  if(!a) return;
+  const v = await Confirmar.elegir(`${nombreDe(a.t)}: ¿qué estado te sacás? (te quedan ${a.quedan} hoy)`, {titulo: 'Anillo del curandero', icono: '🩹', no: 'Cancelar',
+    opciones: a.malos.map(e => ({valor: e.nombre, texto: e.nombre, detalle: e.permanente ? 'sin límite' : num(e.turnos) > 0 ? `${fmt(num(e.turnos))} turno${num(e.turnos) === 1 ? '' : 's'}` : ''}))});
+  if(!v) return;
+  let sacado = '';
+  try{
+    await editarPersonajeMapa(a.t.fichaId, S => {
+      const i = (S.efectos || []).findIndex(e => e && e.nombre === v && e.polaridad === 'debuff' && !e.derivado && !e.origenItem);
+      if(i < 0) return false;
+      sacado = S.efectos[i].nombre;
+      S.efectos.splice(i, 1);
+      const m = S.meta || (S.meta = {});
+      m.curanderoUsos = num(m.curanderoDia) === a.dia ? Math.round(num(m.curanderoUsos)) + 1 : 1;
+      m.curanderoDia = a.dia;
+      return ['efectos', 'general'];
+    });
+  }catch(err){ console.error('El Anillo del curandero:', err); toast('No se pudo usar el curandero'); return; }
+  if(!sacado){ toast('Ese estado ya no está'); return; }
+  try{ mesaLinea(`🩹 ${nombreDe(a.t)} usa su Anillo del curandero: se saca ${sacado}`, 'recordatorio'); }catch(err){}
+  toast(`🩹 Te sacaste ${sacado}`);
+  renderCuranderoBoton();
+}
+setInterval(renderCuranderoBoton, 1500);
 

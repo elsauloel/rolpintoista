@@ -125,3 +125,9 @@ Hecho: **Anillo de la siesta** (Buena, 150): cada descanso, Vida extra 10 (no se
 | Anillo de la mesa servida | Cada descanso, una Poción de HP chica aparece en tu cinturón (si hay lugar) · Buena 🔧 |
 | Anillo del escudo de la mañana | Cada descanso, Escudo especial 6 (Vida extra solo contra daño especial) · Buena 🔧 |
 
+**Decidido (dueño, 2026-10-19) y cargado:** **Madrugador** (3 No2, Común, 110), **Curandero** (dos veces por día, con su botón 🩹 junto a la Polilla y
+la moneda; Buena, 160), **Herrero ambulante** (1 punto por cada pieza que lo necesite; Buena, 140) y **Mesa servida** (una Poción de HP por
+descanso; Buena, 150). **No van:** Segunda oportunidad (redundante con las wildcards), Paso de sombra y Faro. **En pregunta:** el Escudo de la mañana
+(una Vida extra solo contra daño especial: hay que programarla). Además, la **Puntería certera** pasó a la regla del Foco: PdG +2 si no te
+moviste ni en esta ronda ni en la anterior.
+

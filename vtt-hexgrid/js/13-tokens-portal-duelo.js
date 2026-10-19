@@ -1095,10 +1095,10 @@ const embestidaUsadas = new Set();
 function quietoDe(atq, ataque){
   if(!atq || !atq.id || seMovioEsteTurno(atq.id)) return 0;
   const hab = ataque && ataque.hab;
-  if(!hab) return Math.max(0, Math.round(statPiesDe(atq, 'pulso')));
+  if(!hab) return seMovioTurnoAnterior(atq.id) ? 0 : Math.max(0, Math.round(statPiesDe(atq, 'pulso')));   // el Pulso quieto, como el Foco (dueño, 2026-10-19)
   const tira = hab.tira && (hab.tira.stat || hab.tira);
   if(tira !== 'pdgmg') return 0;
-  // 💍 El Foco (dueño, 2026-10-19): si no se movió ni en esta ronda ni en la anterior (el Pulso quieto sigue siendo de este turno).
+  // 💍 El Foco (dueño, 2026-10-19): si no se movió ni en esta ronda ni en la anterior (el Pulso quieto, igual).
   return seMovioTurnoAnterior(atq.id) ? 0 : Math.max(0, Math.round(statPiesDe(atq, 'foco')));
 }
 const primeraSangreUsadas = new Set();

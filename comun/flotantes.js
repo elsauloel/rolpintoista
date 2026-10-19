@@ -80,9 +80,10 @@ const Flotantes = (() => {
   const ETQ = {'reroll-flotante': 'Re-roll', 'enyetar-flotante': 'Enyetar', 'empower-flotante': 'Empower', 'polilla-flotante': 'Polilla', 'impulso-flotante': 'Impulso',
     'trebol-flotante': 'Trébol', 'curandero-flotante': 'Curandero', 'wildcard-flotante': 'Wildcard', 'moneda-flotante': 'Moneda'};
   const CSS_DUELO = `
-.flot-duelo{z-index:99010!important;width:auto!important;height:auto!important;min-height:40px;padding:6px 12px!important;gap:8px;justify-content:flex-start!important;
+.flot-duelo.flot-duelo{z-index:99010!important;width:auto!important;height:auto!important;min-height:40px;padding:6px 12px!important;gap:8px;justify-content:flex-start!important;
   bottom:auto!important;right:auto!important;transform:none!important;border-radius:12px!important;font-size:18px!important}
 .flot-etq{display:none}
+.flot-duelo:not(.flot-arriba) .wildcard-n{display:none!important}
 .flot-duelo .flot-etq{display:inline;font:800 13px system-ui,sans-serif;letter-spacing:.2px}
 #flot-duelo-tit{position:fixed;z-index:99010;font:800 11px system-ui,sans-serif;letter-spacing:.8px;text-transform:uppercase;color:#9fb0d0;pointer-events:none}`;
   function cajaDuelo(){

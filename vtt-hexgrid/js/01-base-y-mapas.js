@@ -267,7 +267,7 @@ let elemTrampaDejaZona = false, elemTrampaZonaTurnos = 3, elemTrampaZonaEnMant =
 let elemTrampaExplota = false;   // 💥 (2026-10-17)
 let elemTrampaAltura = 'piso';   // dónde está el efecto de la trampa que se arma (2026-10-07: Levitar y las Suelas)
 let elemTrampaZonaResistStat = '', elemTrampaZonaResistValor = 12;
-let elemTrampaDetectar = 8;   // dificultad para detectarla con Percepción aumentada (P145; trampa común: 8)
+let elemTrampaDetectar = 6;   // dificultad para detectarla con Percepción aumentada (P145; trampa común: 6)
 let elemTrampaBibOrigen = null;   // de qué trampa de la biblioteca salió la que se está armando (para ⬆ Subir y el aviso 🔔)
 let elegirDestinoCb = null;   // esperando un clic en el mapa para elegir el destino de un teleport
 let elemTurnos = 0;   // Turnos que dura la forma que se crea (0 = sin límite). Al pasar el N-ésimo Mantenimiento la borra el GM. No se recuerda entre sesiones a propósito.

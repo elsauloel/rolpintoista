@@ -2,6 +2,8 @@
    TRAMPAS_BASE tiene el formato de las entradas `base` de comun/biblioteca.js:
    {poolId, nombre, nivel, etiquetas, detalle (lo que se lee en la biblioteca), datos (lo que se carga en el mapa)}.
 
+   (2026-10-19: el 📚 ya no usa esta lista: sale del catálogo de ítems — ver el final del archivo. De acá quedan solo la Trampa de teleport y la
+   Llamarada, que no están en el catálogo.)
    (Trampas creadas automáticamente: TODAS requieren auditar. Las cifras —daño, dificultades, duraciones— son una
    propuesta, no una regla.)
 
@@ -23,35 +25,35 @@
   // Lo que hace cada trampa, automatizado donde se puede (2026-10-02, regla del dueño: 3 turnos; Stun 1; Sentado y Sangrado no vencen solos).
   // estado (+ estadoTurnos, estadoStacks, estadoHp): lo aplica el mapa solo al dispararse. efectoManual: lo que queda a mano. salvacion: la tira
   // el mapa sola por quien la pisa ({stat, etq, dif, que: "todo" la evita entera, "efecto" evita el estado, "mitad" la mitad del daño}).
-  // detectar: 8, una trampa común (P145). Lo usan el mapa (comun/tokens-auto.js, js/08) y la ficha corta del catálogo (comun/item-corto.js).
+  // detectar: 6, una trampa común (P145). Lo usan el mapa (comun/tokens-auto.js, js/08) y la ficha corta del catálogo (comun/item-corto.js).
   const FICHA_TRAMPAS = {
-    "Trampa de oso": {"estado": "Inmovilizado", "estadoTurnos": 3, "efectoManual": "para liberarse: 2 No2 y Fuerza contra 8", "detectar": 8},
-    "Foso con estacas": {"estado": "Sentado", "estadoTurnos": 0, "efectoManual": "pararse cuesta 1 No2", "salvacion": {"stat": "eva", "etq": "Evasión", "dif": 12, "que": "efecto"}, "detectar": 8},
-    "Red de caza": {"estado": "Inmovilizado", "estadoTurnos": 3, "efectoManual": "para liberarse: 2 No2 y Fuerza contra 8", "detectar": 8},
-    "Brea pegajosa": {"estado": "Rengo", "estadoTurnos": 3, "detectar": 8},
-    "Aceite resbaladizo": {"estado": "Sentado", "estadoTurnos": 0, "efectoManual": "−2 Evasión hasta su próximo turno", "salvacion": {"stat": "eva", "etq": "Evasión", "dif": 8, "que": "efecto"}, "detectar": 8},
-    "Dardos envenenados": {"estado": "Veneno", "estadoTurnos": 0, "estadoStacks": 3, "salvacion": {"stat": "eva", "etq": "Evasión", "dif": 10, "que": "todo"}, "detectar": 8},
-    "Cuchillas de guadaña": {"estado": "Sangrado", "estadoTurnos": 0, "salvacion": {"stat": "eva", "etq": "Evasión", "dif": 16, "que": "todo"}, "detectar": 8},
-    "Cable de alarma": {"efectoManual": "suena: alerta a los enemigos a 8 casillas y saca del sigilo a quien la toca", "detectar": 8},
-    "Arena movediza": {"estado": "Inmovilizado", "estadoTurnos": 3, "efectoManual": "salir cuesta 3 No2 (2 si gana Fuerza contra 8)", "detectar": 8},
-    "Derrumbe": {"estado": "Sentado", "estadoTurnos": 0, "salvacion": {"stat": "eva", "etq": "Evasión", "dif": 14, "que": "mitad"}, "detectar": 8},
-    "Nube de veneno": {"estado": "Veneno", "estadoTurnos": 0, "estadoStacks": 2, "salvacion": {"stat": "rescc", "etq": "Res.CC", "dif": 12, "que": "efecto"}, "detectar": 8},
-    "Gas somnífero": {"estado": "Exhausto", "estadoTurnos": 3, "salvacion": {"stat": "rescc", "etq": "Res.CC", "dif": 10, "que": "efecto"}, "detectar": 8},
-    "Bomba de esporas": {"estado": "Veneno", "estadoTurnos": 0, "estadoStacks": 3, "salvacion": {"stat": "rescc", "etq": "Res.CC", "dif": 14, "que": "efecto"}, "detectar": 8},
-    "Mina explosiva": {"salvacion": {"stat": "eva", "etq": "Evasión", "dif": 12, "que": "mitad"}, "detectar": 8},
-    "Barril de pólvora": {"estado": "Pajaritos", "estadoTurnos": 3, "salvacion": {"stat": "eva", "etq": "Evasión", "dif": 14, "que": "mitad"}, "detectar": 8},
-    "Llamarada": {"estado": "Quemadura", "estadoTurnos": 3, "estadoHp": -1, "salvacion": {"stat": "eva", "etq": "Evasión", "dif": 10, "que": "efecto"}, "detectar": 8},
-    "Runa de silencio": {"efectoManual": "no puede usar habilidades con SP 1 turno", "salvacion": {"stat": "resm", "etq": "Res.Mt", "dif": 12, "que": "efecto"}, "detectar": 8},
-    "Runa de debilidad": {"efectoManual": "−2 a todas las tiradas 3 turnos", "salvacion": {"stat": "resm", "etq": "Res.Mt", "dif": 10, "que": "efecto"}, "detectar": 8},
-    "Niebla de confusión": {"efectoManual": "Confusión 3 turnos: antes de cada acción tira 1d4 (1 elige el GM, 2 pierde la acción, 3 al azar, 4 normal)", "salvacion": {"stat": "resm", "etq": "Res.Mt", "dif": 12, "que": "efecto"}, "detectar": 8},
-    "Trampa de escarcha": {"estado": "Escarcha", "estadoTurnos": 3, "salvacion": {"stat": "resmg", "etq": "Res.Esp", "dif": 12, "que": "efecto"}, "detectar": 8},
-    "Descarga eléctrica": {"estado": "Stun", "estadoTurnos": 1, "salvacion": {"stat": "rescc", "etq": "Res.CC", "dif": 12, "que": "efecto"}, "detectar": 8},
-    "Succión arcana": {"efectoManual": "drena 2d6 de SP (la mitad si resiste)", "salvacion": {"stat": "resm", "etq": "Res.Mt", "dif": 12, "que": "efecto"}, "detectar": 8},
-    "Espejo de discordia": {"estado": "Pajaritos", "estadoTurnos": 3, "efectoManual": "ve a sus aliados como enemigos hasta su próximo turno", "salvacion": {"stat": "rescc", "etq": "Res.CC", "dif": 14, "que": "efecto"}, "detectar": 8},
-    "Portal cósmico": {"estado": "Pajaritos", "estadoTurnos": 3, "efectoManual": "lo teletransporta a 10 casillas (elige el GM)", "salvacion": {"stat": "rescc", "etq": "Res.CC", "dif": 16, "que": "efecto"}, "detectar": 8},
-    "Trampa de teleport": {"detectar": 8}
+    "Trampa de oso": {"estado": "Inmovilizado", "estadoTurnos": 3, "efectoManual": "para liberarse: 2 No2 y Fuerza contra 8", "detectar": 6},
+    "Foso con estacas": {"estado": "Sentado", "estadoTurnos": 0, "efectoManual": "pararse cuesta 1 No2", "salvacion": {"stat": "eva", "etq": "Evasión", "dif": 12, "que": "efecto"}, "detectar": 6},
+    "Red de caza": {"estado": "Inmovilizado", "estadoTurnos": 3, "efectoManual": "para liberarse: 2 No2 y Fuerza contra 8", "detectar": 6},
+    "Brea pegajosa": {"estado": "Rengo", "estadoTurnos": 3, "detectar": 6},
+    "Aceite resbaladizo": {"estado": "Sentado", "estadoTurnos": 0, "efectoManual": "−2 Evasión hasta su próximo turno", "salvacion": {"stat": "eva", "etq": "Evasión", "dif": 8, "que": "efecto"}, "detectar": 6},
+    "Dardos envenenados": {"estado": "Veneno", "estadoTurnos": 0, "estadoStacks": 3, "salvacion": {"stat": "eva", "etq": "Evasión", "dif": 10, "que": "todo"}, "detectar": 6},
+    "Cuchillas de guadaña": {"estado": "Sangrado", "estadoTurnos": 0, "salvacion": {"stat": "eva", "etq": "Evasión", "dif": 16, "que": "todo"}, "detectar": 6},
+    "Cable de alarma": {"efectoManual": "suena: alerta a los enemigos a 8 casillas y saca del sigilo a quien la toca", "detectar": 6},
+    "Arena movediza": {"estado": "Inmovilizado", "estadoTurnos": 3, "efectoManual": "salir cuesta 3 No2 (2 si gana Fuerza contra 8)", "detectar": 6},
+    "Derrumbe": {"estado": "Sentado", "estadoTurnos": 0, "salvacion": {"stat": "eva", "etq": "Evasión", "dif": 14, "que": "mitad"}, "detectar": 6},
+    "Nube de veneno": {"estado": "Veneno", "estadoTurnos": 0, "estadoStacks": 2, "salvacion": {"stat": "rescc", "etq": "Res.CC", "dif": 12, "que": "efecto"}, "detectar": 6},
+    "Gas somnífero": {"estado": "Exhausto", "estadoTurnos": 3, "salvacion": {"stat": "rescc", "etq": "Res.CC", "dif": 10, "que": "efecto"}, "detectar": 6},
+    "Bomba de esporas": {"estado": "Veneno", "estadoTurnos": 0, "estadoStacks": 3, "salvacion": {"stat": "rescc", "etq": "Res.CC", "dif": 14, "que": "efecto"}, "detectar": 6},
+    "Mina explosiva": {"salvacion": {"stat": "eva", "etq": "Evasión", "dif": 12, "que": "mitad"}, "detectar": 6},
+    "Barril de pólvora": {"estado": "Pajaritos", "estadoTurnos": 3, "salvacion": {"stat": "eva", "etq": "Evasión", "dif": 14, "que": "mitad"}, "detectar": 6},
+    "Llamarada": {"estado": "Quemadura", "estadoTurnos": 3, "estadoHp": -1, "salvacion": {"stat": "eva", "etq": "Evasión", "dif": 10, "que": "efecto"}, "detectar": 6},
+    "Runa de silencio": {"efectoManual": "no puede usar habilidades con SP 1 turno", "salvacion": {"stat": "resm", "etq": "Res.Mt", "dif": 12, "que": "efecto"}, "detectar": 6},
+    "Runa de debilidad": {"efectoManual": "−2 a todas las tiradas 3 turnos", "salvacion": {"stat": "resm", "etq": "Res.Mt", "dif": 10, "que": "efecto"}, "detectar": 6},
+    "Niebla de confusión": {"efectoManual": "Confusión 3 turnos: antes de cada acción tira 1d4 (1 elige el GM, 2 pierde la acción, 3 al azar, 4 normal)", "salvacion": {"stat": "resm", "etq": "Res.Mt", "dif": 12, "que": "efecto"}, "detectar": 6},
+    "Trampa de escarcha": {"estado": "Escarcha", "estadoTurnos": 3, "salvacion": {"stat": "resmg", "etq": "Res.Esp", "dif": 12, "que": "efecto"}, "detectar": 6},
+    "Descarga eléctrica": {"estado": "Stun", "estadoTurnos": 1, "salvacion": {"stat": "rescc", "etq": "Res.CC", "dif": 12, "que": "efecto"}, "detectar": 6},
+    "Succión arcana": {"efectoManual": "drena 2d6 de SP (la mitad si resiste)", "salvacion": {"stat": "resm", "etq": "Res.Mt", "dif": 12, "que": "efecto"}, "detectar": 6},
+    "Espejo de discordia": {"estado": "Pajaritos", "estadoTurnos": 3, "efectoManual": "ve a sus aliados como enemigos hasta su próximo turno", "salvacion": {"stat": "rescc", "etq": "Res.CC", "dif": 14, "que": "efecto"}, "detectar": 6},
+    "Portal cósmico": {"estado": "Pajaritos", "estadoTurnos": 3, "efectoManual": "lo teletransporta a 10 casillas (elige el GM)", "salvacion": {"stat": "rescc", "etq": "Res.CC", "dif": 16, "que": "efecto"}, "detectar": 6},
+    "Trampa de teleport": {"detectar": 6}
   };
-  const ficha = nombre => FICHA_TRAMPAS[nombre] ? JSON.parse(JSON.stringify(FICHA_TRAMPAS[nombre])) : {detectar: 8};
+  const ficha = nombre => FICHA_TRAMPAS[nombre] ? JSON.parse(JSON.stringify(FICHA_TRAMPAS[nombre])) : {detectar: 6};
   // Lo que hace, en palabras, a partir de sus datos (2026-10-02): lo automático y lo que queda a mano (igual que herramientas/generar_trampas_consumibles.py).
   const QUE = {todo: 'la evita', efecto: 'evita el efecto', mitad: 'le saca la mitad del daño'};
   function textoDe(f, dano, ignoraDef){
@@ -142,5 +144,40 @@
   tr('Portal cósmico', 5, ['control', 'mágica'], 'flor', 2, '#9B5FD0', '',
     'Teletransporta a quien lo pise a un punto al azar a 10 casillas (elige el GM) y lo deja Pajaritos 1 turno (a mano). Res.CC contra 16 lo evita.');
 
-  window.TRAMPAS_BASE = lista;
+  /* El 📚 de trampas sale del CATÁLOGO DE ÍTEMS (dueño, 2026-10-19: «las que arma el GM y las del catálogo deberían estar reflejadas… siempre la
+     regla la va a establecer el catálogo»): una entrada por cada trampa consumible de `CATALOGO_BASE` (con sus datos enteros, `catalogoId`), así
+     el GM coloca la misma trampa que se compra en la tienda (el mapa le pregunta la dificultad: arranca en la del catálogo, Común 6 · Buena 8 ·
+     Rara 10). La lista de arriba quedó solo para las dos que no están en el catálogo («solo del mapa»: falta decidir si entran o se van). Se
+     arma al pedirla (el catálogo puede cargarse después que este archivo). */
+  const SOLO_MAPA = new Set(['Trampa de teleport', 'Llamarada']);
+  const extras = lista.filter(e => SOLO_MAPA.has(e.nombre)).map(e => ({...e, etiquetas: [...e.etiquetas.filter(x => x !== 'auditar'), 'solo del mapa']}));
+  const NIVEL = {'Común': 1, 'Buena Calidad': 2, 'Raro': 3, 'Excepcional': 4, 'Legendario': 5};
+  function etiquetasDe(it, d){
+    const e = new Set([d.detectarStat === 'dmgesp' ? 'mágica' : 'mecánica']);
+    const est = String(d.estado || ''), nom = String(it.nombre || '');
+    if(d.dano) e.add('daño');
+    if(/veneno/i.test(est) || /veneno|dardo|aguja|espina|espora/i.test(nom) || d.elemento === 'toxico') e.add('veneno');
+    if(d.elemento === 'fuego' || /fuego|napalm/i.test(nom)) e.add('fuego');
+    if(/mina|barril|petardo|bomba/i.test(nom)) e.add('explosiva');
+    if(/inmovilizado|rengo/i.test(est)) e.add('inmoviliza');
+    if(/debilidad|silencio|cansado|exhausto|escarcha/i.test(est) || /succi[oó]n/i.test(nom)) e.add('debuff');
+    if(/confusi|stun|pajaritos|sentado/i.test(est) || d.portal || d.muro || d.pilar) e.add('control');
+    if(/cable/i.test(nom)) e.add('alarma');
+    if(Math.round(Number(d.tamano) || 0) > 0 || (d.efecto && d.efecto.area && d.efecto.area !== 'pisador')) e.add('área');
+    return [...e];
+  }
+  function desdeCatalogo(){
+    if(typeof CATALOGO_BASE === 'undefined') return [];
+    return CATALOGO_BASE.filter(it => it && it.trampaDatos && !it.archivo).map(it => {
+      const d = it.trampaDatos, nivel = NIVEL[it.tier] || 1;
+      return {poolId: 'cat-' + it.id, nombre: it.nombre, nivel, etiquetas: [...etiquetasDe(it, d), 'nivel ' + nivel],
+        detalle: it.detalle || '', datos: {...JSON.parse(JSON.stringify(d)), nombre: d.nombre || it.nombre, detalle: String(it.detalle || '').slice(0, 200), catalogoId: it.id}};
+    });
+  }
+  let cache = null, cacheN = -1;
+  Object.defineProperty(window, 'TRAMPAS_BASE', {configurable: true, get(){
+    const n = typeof CATALOGO_BASE !== 'undefined' ? CATALOGO_BASE.length : 0;
+    if(!cache || n !== cacheN){ cache = [...desdeCatalogo(), ...extras]; cacheN = n; }
+    return cache;
+  }});
 })();

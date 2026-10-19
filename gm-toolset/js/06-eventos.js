@@ -221,7 +221,7 @@ document.addEventListener('click', async e => {
         if(!(await Confirmar.preguntar(`${sc.nombre} no tiene los No2 para usar ${it.nombre} (cuesta ${CreepAcciones.costoConsumir()}). ¿Usarlo igual? Gasta los que tenga.`, {titulo: 'Sin No2', icono: '⚡', si: 'Usarlo igual'}))) return;
         forzar = true;
       }
-      if(it.trampaDatos){ const t = await CreepAcciones.colocarTrampaDeItem(sc.id, it); toast(t.aviso); if(!t.ok) return; }
+      if(it.trampaDatos){ const t = await CreepAcciones.colocarTrampaDeItem(sc.id, it, sc); toast(t.aviso); if(!t.ok) return; }
       const res = CreepAcciones.consumir(sc, itemId, ESTADOS_PRESET_GM, forzar);
       if(res.error){ toast(res.error); return; }
       (res.tiradas || []).forEach(t => publicarTiradaCreep(t));

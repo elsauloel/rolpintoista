@@ -154,6 +154,8 @@
       const o = opcionesTrampa(sp);
       h.trampaColocar = {nombre: sp.nombre, detalle: sinEtiqueta(textoHab(sp, n)).slice(0, 200), dano: sp.trampa ? danoTxt(sp.trampa, n) : '', radio: o.radio, cant: o.cant};
       if(aplicaDe(sp)) h.trampaColocar.estado = aplicaDe(sp);
+      // Mágica (runas, sellos, glifos; 2026-10-19, dueño): se esconde —y se desarma o disipa— con el Efecto especial; la mecánica, con la Destreza.
+      if(/runa|sello|glifo|arcan|m[aá]gic/i.test(`${sp.nombre} ${sp.detalle || ''}`)) h.trampaColocar.detectarStat = 'dmgesp';
     }else if(aplicaDe(sp)){
       h.estadoObjetivo = aplicaDe(sp);   // gm-tools deja elegir a quién le pegó y se lo aplica
     }

@@ -2,7 +2,7 @@
 /* Quien tiene el talento Desarmar trampas (en sus Talentos, `S.sociales`; la ficha publica su tirada en `resumen.desarmaTrampas`):
    · Detecta trampas como la Percepción aumentada, pero solo trampas (igual que Pisada atenta, js/08): al pasar al lado de una oculta se corta
      el movimiento, «Algo está fuera de lugar…» y tira Percepción (js/16).
-   · Si la encuentra, puede desarmarla: 1 No2 y la tirada del talento contra la dificultad de la trampa (la misma de detectarla: una común, 8).
+   · Si la encuentra, puede desarmarla: 1 No2 y la tirada del talento contra la dificultad de la trampa (la misma de detectarla: una común, 6).
      Si llega, se la queda como consumible — también las mágicas (dueño: «se puede, es divertido»). Si no, la trampa sigue ahí.
    · Al terminar el combate (cuando se cierra el botín), si quedaron trampas rivales sin disparar: «¿Querés desarmarlas?» — una tirada por
      trampa, sin No2; la que no desarma, se rompe.
@@ -12,7 +12,7 @@ const DESARMAR_TRAMPA_NO2 = 1;
 // No se le vuelve a pedir Percepción por ella ni se le ofrece desarmarla, tampoco al terminar el combate; al terminar el combate se vacía.
 const trampaIntentoPerdido = new Set();
 const trampaPerdio = (tokenId, trampaId) => { if(modoMapa === 'combate') trampaIntentoPerdido.add(tokenId + ':' + trampaId); };
-const desarmarDif = el => Math.max(1, Math.round(num(el && el.trampaDetectar)) || 8);
+const desarmarDif = el => Math.max(1, Math.round(num(el && el.trampaDetectar)) || 6);
 // La tirada del talento de ese personaje ('' si no lo tiene). Las invocaciones no tienen talentos.
 function tokenDesarmaTrampas(t){
   if(!t || t.tipo !== 'pj' || String(t.fichaId || '').includes(SEP_INVOCACION)) return '';
@@ -30,7 +30,7 @@ function trampaComoItem(el){
     trampaDatos: {nombre, detalle: el.trampaDetalle || '', tipo: 'flor', tamano: n >= 19 ? 2 : n >= 7 ? 1 : 0, color: el.color || '#8A8A8A', alfa: num(el.alfa) || 45,
       dano: el.trampaDano || '', ignoraDef: !!el.trampaIgnoraDef, detectar: desarmarDif(el),
       ...(est.nombre ? {estado: est.nombre} : {}), ...(est.turnos ? {estadoTurnos: est.turnos} : {}), ...(est.stacks ? {estadoStacks: est.stacks} : {}),
-      ...(est.salva ? {salvacion: est.salva} : {}), ...(est.elemento ? {elemento: est.elemento} : {})}};
+      ...(est.salva ? {salvacion: est.salva} : {}), ...(est.elemento ? {elemento: est.elemento} : {}), detectarStat: est.magica ? 'dmgesp' : 'des'}};
 }
 // Un intento: la tirada del talento contra la dificultad. o = {conNo2 (en combate: cobra 1 No2), rompe (si falla, se rompe)}. → {ok, texto}.
 async function desarmarIntentar(tokenId, trampaId, o){

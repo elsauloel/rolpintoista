@@ -109,7 +109,7 @@ const AsistenteTrampa = (() => {
       // Dificultad para detectarla (2026-10-02, dueño, P145): con Percepción aumentada se tira contra este número. En el mapa, un número
       // (trampa común: 8; un espacio de diseño: trampas de buena o mala calidad); en una habilidad, sale de quien la coloca (su Destreza
       // —trampas físicas— o su Efecto especial —mágicas—).
-      detectar: Math.max(1, Math.round(num(ini.detectar)) || 8), detectarStat: ini.detectarStat === 'dmgesp' ? 'dmgesp' : 'des',
+      detectar: Math.max(1, Math.round(num(ini.detectar)) || 6), detectarStat: ini.detectarStat === 'dmgesp' ? 'dmgesp' : 'des',
       guardar: false,
     };
     const ZSTATS = [['resmg', 'Res.Esp'], ['resm', 'Res.Mt'], ['eva', 'Evasión'], ['con', 'Constitución'], ['fue', 'Fuerza'], ['agl', 'Agilidad'], ['des', 'Destreza'], ['esp', 'Especial']];

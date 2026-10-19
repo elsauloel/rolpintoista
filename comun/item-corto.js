@@ -91,7 +91,10 @@ const ItemCorto = (() => {
     if(num(t.lento) > 0) f.push(['Terreno', `una vez disparada, cada paso que sale de ella cuesta ${num(t.lento)} No2`]);
     const so = t.soltar && t.soltar.stat ? t.soltar : null;   // salir antes de que venza (el botón 🔓 Soltarse)
     if(so) f.push(['Para salir', `🔓 Soltarse: ${so.etq || so.stat} contra ${num(so.dif)} · ${num(so.no2)} No2${num(so.hunde) ? ` · si falla, se hunde más: +${num(so.hunde)} turno${num(so.hunde) === 1 ? '' : 's'}` : ''}`]);
-    f.push(['Detectarla', t.detectarStat ? `Percepción contra ${t.detectarStat === 'dmgesp' ? 'el Efecto especial' : 'la Destreza'} de quien la pone` : num(t.detectar) >= 1 ? `Percepción contra ${num(t.detectar)}` : 'sin definir']);
+    // (2026-10-19, dueño) La pone un personaje, un creep o una invocación: su Destreza (mecánica) o su Efecto especial (mágica). La pone el GM: el número.
+    const quien = t.detectarStat ? `${t.detectarStat === 'dmgesp' ? 'el Efecto especial' : 'la Destreza'} de quien la coloca` : '';
+    f.push(['Detectarla', quien && num(t.detectar) >= 1 ? `Percepción contra ${quien} (si la pone el GM: ${num(t.detectar)})` : quien ? `Percepción contra ${quien}` : num(t.detectar) >= 1 ? `Percepción contra ${num(t.detectar)}` : 'sin definir']);
+    if(t.detectarStat) f.push(['Es', t.detectarStat === 'dmgesp' ? 'mágica' : 'mecánica']);
     if(t.dejaZona) f.push(['Después', `queda como zona ${num(t.zonaTurnos) || 3} turnos`]);
     if(t.amiga) f.push(['Alcanza', 'también a los aliados del área']);
     return f;

@@ -197,7 +197,7 @@ function nieblaDeshacer(seq0, pend0){
    queda marcada como disparada (visible para todos) y se avisa en rojo en la Mesa. Quien tiene
    la pasiva Percepción aumentada, además, se detiene al quedar justo al lado de una que todavía no ve
    (2026-10-02, P145): «Algo está fuera de lugar… tirá Percepción» — sin decir qué es. Si gana contra la
-   dificultad de la trampa (`trampaDetectar`, 8 si no tiene), la descubre y la ve todo su equipo
+   dificultad de la trampa (`trampaDetectar`, 6 si no tiene), la descubre y la ve todo su equipo
    (`descubierta`); si pierde, sigue libre: pisarla la detona y pasar por OTRO casillero al lado
    vuelve a pedir la tirada (una vez por casillero). */
 let trampaPendiente = null;   // {tokenId, tipo: 'pisa' | 'cerca', id, el, celda, desde (la casilla anterior: hacia dónde caminaba)}

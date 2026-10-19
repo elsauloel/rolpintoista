@@ -2,14 +2,14 @@
 /* Al pisar una trampa, quien tiene Reflejos de mangosta (pies) apuesta, ANTES de que se dispare: el Anuncio dice «pisaste una trampa» sin decir
    cuál (ni qué hace ni hasta dónde llega) y que, por los reflejos, tiene una chance de zafar con un dodge roll:
      1 · la chance de Reflejos (si no es «siempre»);
-     2 · Evasión contra la dificultad de la trampa (la de detectarla, `trampaDetectar`; 8 si no tiene — dueño: «su dificultad siempre»);
+     2 · Evasión contra la dificultad de la trampa (la de detectarla, `trampaDetectar`; 6 si no tiene — dueño: «su dificultad siempre»);
      3 · si llega, el dodge roll: una casilla libre a 1 o 2 (paga el movimiento en No2, como cualquier paso).
    Después se dispara la trampa (js/08, trampaResolver): si al dispararse ya no está dentro de su alcance, zafó; si quedó adentro, le pega igual.
    Si no llega (o no se tira), la trampa se dispara donde está. Lo resuelve la pantalla de quien movió el token (la que lo maneja); la Mesa tiene
    las tiradas y la Crónica lo cuenta (sin nombrar la trampa hasta que se dispara). → {pos} (la casilla adonde se tiró) o null. */
 async function trampaReflejosAntes(tokenId, t, el){
   const quien = t.oculto ? 'Alguien' : nombreDe(t), creep = t.tipo === 'creep';
-  const dif = Math.max(1, Math.round(num(el.trampaDetectar)) || 8);
+  const dif = Math.max(1, Math.round(num(el.trampaDetectar)) || 6);
   const pct = chanceDe(t, 'reflejos'), d = Combatiente.chanceDado(pct);
   const titulo = `${quien} pisó una trampa`;
   const momentoId = await momentoAbrir({tipo: 'reflejos', icono: '🐍', titulo, estado: 'paso', datos: {centro: true, lineas: ['Reflejos de mangosta: intenta zafar…']}});

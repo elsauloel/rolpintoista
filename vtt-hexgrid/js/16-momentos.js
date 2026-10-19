@@ -206,7 +206,7 @@ function dueloPasoCronica(d, nuevos, todos){
 /* ---------- «Algo está fuera de lugar» (Percepción aumentada, P145) ----------
    El cartelito del centro, en la pantalla de quien camina. Dos casos: una trampa oculta al lado (trampaId) o un rival en sigilo en su zona
    de alerta (ocultoId). Tira Percepción (la de la ficha, con el dado un escalón más alto; sale en la Mesa como una Percepción cualquiera).
-   - Trampa: gana si llega a su dificultad (`trampaDetectar`, 8 si no tiene) → `descubierta` (la ve todo el equipo).
+   - Trampa: gana si llega a su dificultad (`trampaDetectar`, 6 si no tiene) → `descubierta` (la ve todo el equipo).
    - Sigilo: la Destreza del creep es privada del GM → el momento pasa a «esperandoGM» y la pantalla del GM la tira (deteccionGMAbrir);
      gana el que detecta si su Percepción es MAYOR (empate: el oculto sigue escondido). Si gana, el GM le saca el Sigilo. */
 let percepcionBanner = null;            // {tokenId, trampaId?, ocultoId?, momentoP, momentoId, resultado, esperando}
@@ -274,7 +274,7 @@ async function percepcionResolverBanner(){
     return;
   }
   const el = elementos.get(pb.trampaId);
-  const dif = el ? Math.max(1, Math.round(num(el.trampaDetectar)) || 8) : Infinity;
+  const dif = el ? Math.max(1, Math.round(num(el.trampaDetectar)) || 6) : Infinity;
   if(el && !el.disparada && r.total >= dif){
     descubrirTrampa(pb.trampaId);   // ya, en esta pantalla
     try{ await coleccionElementos().doc(pb.trampaId).update({descubierta: true}); }   // y para todo su equipo

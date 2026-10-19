@@ -211,3 +211,17 @@ Reemplazan a las 72 de antes (24 × menor/normal/mayor). Común / Buena / Rara p
   **Pero sí (dueño, 2026-10-04): cada paso sobre la brea renueva el Rengo a sus turnos** (construido: `renuevaPaso` en el JSON de la trampa; a quien
   ya lo tiene, cada paso sobre la zona se lo vuelve a poner sin tirar; la tirada para resistir es solo al entrar).
 
+## La dificultad para detectarlas (dueño, 2026-10-19)
+
+- **El catálogo manda**: Común **6**, Buena **8**, Rara **10** (antes 8 / 10 / 12). Es la dificultad cuando la trampa la pone el **GM** como parte
+  del lugar: el 📚 del mapa lista estas mismas trampas (sale de `CATALOGO_BASE`) y, al elegir una, pregunta la dificultad arrancando en esa.
+- **La que coloca alguien** (personaje, creep o invocación; de un consumible o de una habilidad): **su Destreza si es mecánica, su Efecto especial
+  si es mágica**, más los Guantes de trampero. «Esa es la gracia.»
+- **Mecánicas y mágicas** (`detectarStat` en `trampaDatos`): mágicas = Arena movediza, Trampa de escarcha, Tumba de hielo, Géiser de fuego, Runa de
+  debilidad, Runa de silencio, Succión arcana, Espejo de discordia, Portal cósmico, Muro de piedra, Muralla repentina; el resto (28), mecánicas. En
+  los creeps: la Runa explosiva y el Sello explosivo, mágicas; los cepos, minas, redes, zarzas y dardos, mecánicas.
+- **Detectarla: siempre Percepción.** Desarmarla o disiparla: Destreza o Efecto especial según su origen (la trampa colocada guarda `magica`).
+- Por qué: con 1d8 de Percepción, contra 6 hay 38 % (50 % con Percepción aumentada); contra 8, 13 % (30 %); contra 10, 0 (10 %). Las de los creeps
+  tramperos (Destreza 9–15) son casi invisibles sin una luz que revele lo oculto: a propósito.
+- **Falta decidir**: la Trampa de teleport y la Llamarada (solo estaban en el 📚 del mapa): ¿entran al catálogo o se van?
+

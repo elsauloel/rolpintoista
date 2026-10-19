@@ -328,8 +328,11 @@ const FichaAcciones = (() => {
         if(consumiendoTrampa.has(id)) return;
         consumiendoTrampa.add(id);
         let ok = false;
-        const oculta = Math.max(0, Math.round(num(FichaCalculo.calcular(S).final.trampaoculta)));   // Guantes de trampero (2026-10-05)
-        const conOculta = oculta && it.trampaDatos ? {...it, trampaDatos: {...it.trampaDatos, detectar: (num(it.trampaDatos.detectar) || 8) + oculta}} : it;
+        // Quien la coloca le pone la dificultad (dueño, 2026-10-19: «las que coloca un personaje, sea creep, invocación o jugador, van a tener la
+        // dificultad de quien la coloca»): su Destreza si es mecánica, su Efecto especial si es mágica (`detectarStat`), más los Guantes de
+        // trampero. El número del catálogo es para cuando la pone el GM. La misma cuenta que una trampa de habilidad (Combatiente.trampaDeHab).
+        const cS = FichaCalculo.calcular(S);
+        const conOculta = {...it, trampaDatos: Combatiente.trampaDeHab({nombre: it.nombre, trampaColocar: it.trampaDatos}, st => cS.final[st])};
         try{ ok = await ui.colocarTrampa(conOculta); }finally{ consumiendoTrampa.delete(id); }
         if(!ok) return;
       }

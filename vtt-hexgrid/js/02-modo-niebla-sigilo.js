@@ -710,7 +710,7 @@ function abrirAsistenteTrampaPanel(){
       elemTrampaDejaZona = !!res.dejaZona; elemTrampaZonaTurnos = Math.max(1, Math.round(num(res.zonaTurnos)) || 3);
       elemTrampaZonaEnMant = res.zonaEnMant !== false; elemTrampaZonaCadaPaso = !!res.zonaCadaPaso;
       elemTrampaZonaResistStat = res.zonaResistStat || ''; elemTrampaZonaResistValor = Math.round(num(res.zonaResistValor)) || 12;
-      elemTrampaDetectar = Math.max(1, Math.round(num(res.detectar)) || 8);
+      elemTrampaDetectar = Math.max(1, Math.round(num(res.detectar)) || 6);
       if(res.guardar) guardarTrampaRecurrente({nombre: elemTrampaNombre, detalle: elemTrampaDetalle, amiga: elemTrampaAmiga, tipo: elemTipo, tamano: elemTamano, color: elemColor, alfa: elemAlfa,
         dano: elemTrampaDano, ignoraDef: elemTrampaIgnoraDef, estado: elemTrampaEstado, estadoTurnos: elemTrampaEstadoTurnos, detectar: elemTrampaDetectar,
         ...(elemTrampaEstadoStacks ? {estadoStacks: elemTrampaEstadoStacks} : {}), ...(elemTrampaSalva ? {salvacion: elemTrampaSalva} : {})});
@@ -733,7 +733,7 @@ function abrirAsistenteTrampaEditar(id, alCancelar){
     inicial: {nombre: el.trampaNombre || '', descripcion: el.trampaDetalle || '', forma: el.tipo, color: el.color, alfa: el.alfa, amiga: !!el.fuegoAmigo,
       dano: trampaDanoValido(el.trampaDano) ? String(el.trampaDano).trim() : '', contemplaArmadura: !el.trampaIgnoraDef,
       estado: est && est.nombre || '', estadoTurnos: est ? num(est.turnos) : 0, turnos: restan, teleport: !!el.trampaDestino,
-      dejaZona: !!el.trampaDejaZona, zonaTurnos: el.zonaTurnos, zonaEnMant: el.zonaEnMantenimiento, zonaCadaPaso: el.zonaCadaPaso, zonaResistStat: el.zonaResistStat, zonaResistValor: el.zonaResistValor, detectar: el.trampaDetectar || 8,
+      dejaZona: !!el.trampaDejaZona, zonaTurnos: el.zonaTurnos, zonaEnMant: el.zonaEnMantenimiento, zonaCadaPaso: el.zonaCadaPaso, zonaResistStat: el.zonaResistStat, zonaResistValor: el.zonaResistValor, detectar: el.trampaDetectar || 6,
       estadoStacks: est ? num(est.stacks) : 0, salvacion: est && est.salva ? est.salva : null, altura: (est && est.altura) || 'piso', explota: !!(est && est.explota)},
     alTerminar: res => {
       const cambios = {trampa: true, trampaNombre: res.nombre.trim().slice(0, 40), trampaDetalle: AsistenteTrampa.detalleFinal(res), fuegoAmigo: !!res.amiga,
@@ -742,7 +742,7 @@ function abrirAsistenteTrampaEditar(id, alCancelar){
           ...(est && est.nombre === res.estado && est.hp ? {hp: est.hp} : {})} : null, res.salvacion, null, null, '', 0, {altura: res.altura, explota: !!res.explota}),
         trampaDestino: res.teleport ? String(el.trampaDestino || '') : '', color: res.color, alfa: res.alfa,
         trampaDejaZona: !!res.dejaZona, zonaTurnos: Math.max(1, num(res.zonaTurnos) || 3), zonaEnMantenimiento: res.zonaEnMant !== false, zonaCadaPaso: !!res.zonaCadaPaso,
-        zonaResistStat: res.zonaResistStat || '', zonaResistValor: num(res.zonaResistValor) || 12, trampaDetectar: Math.max(1, Math.round(num(res.detectar)) || 8)};
+        zonaResistStat: res.zonaResistStat || '', zonaResistValor: num(res.zonaResistValor) || 12, trampaDetectar: Math.max(1, Math.round(num(res.detectar)) || 6)};
       const n = Math.max(0, Math.min(99, num(res.turnos)));
       Object.assign(cambios, n > 0 ? {turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n} : {turnos: 0, venceMant: null});
       Object.assign(el, cambios);
@@ -755,8 +755,24 @@ function abrirAsistenteTrampaEditar(id, alCancelar){
   });
 }
 // Carga una trampa (guardada o del catálogo) en el panel para colocarla.
+// 🪤 Una trampa del catálogo de ítems (2026-10-19, dueño: el GM la coloca «y le modifica, por ejemplo, la dificultad»): la misma que se compra
+// en la tienda, con todas sus mecánicas (la coloca la pieza común, como una consumible o una de habilidad: TokensAuto.colocarTrampas). Antes
+// pregunta la dificultad para detectarla (arranca en la del catálogo); después, la casilla con un clic.
+async function colocarTrampaDelCatalogo(g){
+  const base = Math.max(1, Math.round(num(g.detectar)) || 6);
+  if(typeof EstadoPreguntas === 'undefined'){ try{ await cargarPiezas(SE_PIEZAS); }catch(err){} }
+  const r = typeof EstadoPreguntas !== 'undefined'
+    ? await EstadoPreguntas.preguntar({titulo: 'Colocar trampa', nombre: g.nombre},
+        [{clave: 'detectar', min: 1, inicial: base, texto: `¿Qué tan difícil es detectarla? Percepción contra este número (el catálogo dice ${base}).`}], x => x)
+    : {detectar: base};
+  if(!r) return;
+  const t = {...g, detectar: Math.max(1, Math.round(num(r.detectar)) || base)};
+  delete t.catalogoId;   // (el `detectarStat` queda: dice si es mágica, para desarmarla; la dificultad la pone el número)
+  trampaDeHabilidad({nombre: g.nombre, trampa: t});
+}
 function cargarTrampaEnPanel(g, meta){
   if(!g) return;
+  if(g.catalogoId){ colocarTrampaDelCatalogo(g); return; }
   elemTrampaBibOrigen = g.bibOrigen || (meta && meta.id ? {tipo: 'trampas', id: meta.id, version: meta.version || 1} : null);
   // "Deja una zona al dispararse" (trampas persistentes): antes no se guardaba en las recurrentes.
   elemTrampaDejaZona = !!g.dejaZona;
@@ -765,7 +781,7 @@ function cargarTrampaEnPanel(g, meta){
     elemTrampaZonaCadaPaso = !!g.zonaCadaPaso; elemTrampaZonaResistStat = g.zonaResistStat || ''; elemTrampaZonaResistValor = Math.round(num(g.zonaResistValor)) || 12;
   }
   elemTrampaTeleport = !!g.teleport; if(!g.teleport) elemTrampaDestino = '';
-  elemTrampaDetectar = Math.max(1, Math.round(num(g.detectar)) || 8);
+  elemTrampaDetectar = Math.max(1, Math.round(num(g.detectar)) || 6);
   elemTrampa = true; elemTrampaNombre = g.nombre || ''; elemTrampaDetalle = g.detalle || ''; elemTrampaAmiga = !!g.amiga; elemTrampaDano = g.dano || ''; elemTrampaIgnoraDef = !!g.ignoraDef; elemTrampaEstado = g.estado || ''; elemTrampaEstadoTurnos = Math.max(0, Math.round(num(g.estadoTurnos)) || 0);
   elemTrampaEstadoStacks = Math.max(0, Math.round(num(g.estadoStacks)) || 0); elemTrampaEstadoHp = Math.round(num(g.estadoHp)) || 0; elemTrampaSalva = g.salvacion || null;
   if(['flor', 'linea', 'libre'].includes(g.tipo)) elemTipo = g.tipo;
@@ -778,7 +794,8 @@ function cargarTrampaEnPanel(g, meta){
   else toast(`Trampa "${g.nombre}" cargada: elegí dónde ponerla`);
 }
 // Catálogo de trampas (comun/biblioteca.js, tipo 'trampas'): las oficiales que aprobó el dueño del proyecto.
-function abrirCatalogoTrampas(){
+async function abrirCatalogoTrampas(){
+  if(typeof CATALOGO_BASE === 'undefined' && typeof bnCargarPiezas === 'function'){ try{ await bnCargarPiezas(); }catch(err){} }   // el 📚 sale del catálogo de ítems
   Biblioteca.abrir({
     tipo: 'trampas', titulo: 'Catálogo de trampas',
     base: typeof TRAMPAS_BASE !== 'undefined' ? TRAMPAS_BASE : [],
@@ -788,7 +805,7 @@ function abrirCatalogoTrampas(){
     subtitulo: e => (e.nivel ? ` · nivel ${e.nivel}` : '') + (e.datos && e.datos.amiga ? ' · 🔥 daña a aliados en el área' : '') + (e.datos && e.datos.dano ? ` · 💥 ${e.datos.dano}` : ''),
     grupos: [
       {nombre: 'Efecto', tags: ['daño', 'veneno', 'explosiva', 'fuego', 'inmoviliza', 'debuff', 'control', 'alarma']},
-      {nombre: 'Origen', tags: ['mecánica', 'mágica', 'natural']},
+      {nombre: 'Origen', tags: ['mecánica', 'mágica', 'natural', 'solo del mapa']},
       {nombre: 'Nivel', tags: ['nivel 1', 'nivel 2', 'nivel 3', 'nivel 4', 'nivel 5']},
       {nombre: 'Alcance', tags: ['área']},
     ],

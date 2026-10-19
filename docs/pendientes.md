@@ -49,20 +49,23 @@
 >   conductividad (el rayo corre por el agua: ya existe con los charcos, js/50); **nublado** → menos visibilidad; **niebla** → aún menos (la 💡 Luz
 >   de la escena ya baja la visión, js/02). «Y así»: faltan los demás climas, cuánto suma o resta cada uno, si sale al azar o lo elige el GM, y
 >   si lo ven los jugadores.
-> - [ ] **💔 Un clic antes de recibir daño automatizado, en todo (2026-10-17, dueño):** «en jugadores debería suceder cada vez que un jugador
+> - [x] **💔 Un clic antes de recibir daño automatizado, en todo (2026-10-17, dueño):** «en jugadores debería suceder cada vez que un jugador
 >   recibe daño que esté automatizado… si en un ataque pasa el daño, el duelo debe tener la instancia de pasó tanto daño, menos tu armadura,
 >   apretá aplicar daño… tiene que haber una instancia donde el jugador hace un clic antes de recibir daño automatizado». **Hecho** en las
 >   trampas y en el **duelo** (2026-10-17: si el que recibe es personaje o invocación, «N de daño, menos tu Defensa» y «💔 Aplicar el daño»; el GM
->   tiene «Aplicar por …»; las áreas son sub-duelos, así que también). Las zonas ya pedían «Aplicar». **Falta:** lo que baja vida al empezar el
->   turno (Veneno, Sangrado, Quemadura): hoy se aplica solo y se anuncia; ¿también con un clic?
+>   tiene «Aplicar por …»; las áreas son sub-duelos, así que también). Las zonas ya pedían «Aplicar». Lo que baja vida al empezar el
+>   turno (Veneno, Sangrado, Quemadura) **no lleva clic** (dueño, 2026-10-19: «con el anuncio de aceptar del principio del turno ya tienen su
+>   momento; no es algo que pasa por la espalda»).
 > - [x] **🎲 Tirar a mano en cada paso del duelo (2026-10-17, dueño; hecho el mismo día: ya estaba en PdG, defensa, Fuerza, Bloqueo y daño; se sumaron el crítico y los efectos):** «aunque estén automatizadas todas las tiradas… en cada una de las
 >   instancias del duelo donde aparezca un botón para una tirada, que aparezca como un checkbox o algo que diga tirar manual y corregir esa
 >   tirada por situaciones circunstanciales específicas que quizás no se pueden programar sobre la marcha… cada uno de los pasos del duelo
 >   deben tener la alternativa de tirarla a mano». (PdG, Evasión, Parry, Bloqueo, Fuerza, crítico, daño, efectos: escribir el resultado o la
 >   fórmula.) **Lo siguiente a hacer.**
-> - [ ] **🌿 Formas orgánicas para las superficies y zonas (2026-10-17, dueño):** «que no sea estrictamente hexagonal… que haga referencia al
+> - [x] **🌿 Formas orgánicas para las superficies y zonas (2026-10-17, dueño):** «que no sea estrictamente hexagonal… que haga referencia al
 >   elemento… si es muy complicado, lo dejamos como está». Hecho para el **hielo** (bordes de cristal quebrados) y el **charco** (manchón
->   ondulado), vtt-hexgrid/js/50. Falta el resto: el humo o las nubes con borde «piloso», el fuego, el veneno…
+>   ondulado), vtt-hexgrid/js/50. **Hecho también (2026-10-17):** las nubes (mancha
+>   de borde borroso) y el fuego (brasas, resplandor y chispas). **Colores (dueño, 2026-10-19):** verde lo que es veneno, violeta lo tóxico en
+>   general y los demás gases, gris oscuro el humo, gris claro la niebla.
 > - [x] **✋ El mundo de los talismanes y demás objetos especiales para la mano libre (hecho 2026-10-18: 34 en el catálogo, todos automatizados salvo la niebla de la Brújula; hoja: docs/talismanes.md; falta verlos en el mapa: docs/pruebas-en-el-mapa.md) (2026-10-17, dueño: «después de terminar de auditar
 >   los kobolds, quiero pasar al mundo de los talismanes y demás objetos especiales para la mano libre»):** lo siguiente después de cerrar
 >   los kobolds (quedan el tunelero, el chamán del cristal, el capataz y el coraza de cristal).
@@ -72,10 +75,15 @@
 >   con la tirada del talento; las Ganzúas suman +2). **Decidido (dueño, 2026-10-17):** es un talento; se aprende tirando **Destreza**; armar
 >   una copia gasta **loot y tiempo fuera de combate**; las trampas **invocadas** (las de una habilidad, de un creep o de un personaje) también
 >   se pueden copiar, pero **con más dificultad**. «Lo vamos a enseñar en su momento.» Falta: las dificultades y cuánto loot y tiempo.
-> - [ ] **🪤 Revisar la dificultad para detectar de las trampas del catálogo (2026-10-17, dueño):** la Percepción de los personajes es baja
+> - [x] **🪤 Revisar la dificultad para detectar de las trampas del catálogo (2026-10-17, dueño; decidido y hecho 2026-10-19):** la Percepción de los personajes es baja
 >   (1d8 o menos en El origen). **Las de una habilidad están bien** (dueño: la dificultad sale de la Destreza o el Efecto especial de quien la
 >   coloca, y si es alta, es una trampa difícil de ver); revisar las del catálogo y las que se arman en el mapa (número fijo, una común 8)
->   contra la Percepción real.
+>   contra la Percepción real. **Decidido (dueño, 2026-10-19):** el catálogo manda — **Común 6 · Buena 8 · Rara 10** es la dificultad cuando la pone
+>   el **GM** (el 📚 del mapa ahora lista las trampas del catálogo de ítems y pregunta la dificultad, arrancando en esa); **la que coloca alguien**
+>   (personaje, creep o invocación, de un consumible o de una habilidad) usa **su Destreza si es mecánica o su Efecto especial si es mágica** (cada
+>   trampa del catálogo dice cuál es: `detectarStat`). **Detectarla, siempre con Percepción**; desarmarla o disiparla, con Destreza o Efecto
+>   especial según su origen (falta definir con el talento: ver la pregunta abierta). Las dos que solo estaban en el mapa (Trampa de teleport y
+>   Llamarada) quedan «solo del mapa» hasta decidir si entran al catálogo.
 > - [ ] **🧪 Más ítems con la mecánica de cargas (2026-10-10, dueño; también en 🛠 Herramientas de diseño → A desarrollar):** la mecánica
 >   ya existe (estado con `cargas` y `golpe`, `Combatiente.gastarCarga`). Los óleos del Bazar ya están (aprobados y cargados 2026-10-10):
 >   Óleo venenoso (Común, 1 carga, +2 y Veneno ×3, 35) y Óleo venenoso concentrado (Buena, 2 cargas, +3 y Veneno ×3, 75) —; después otros

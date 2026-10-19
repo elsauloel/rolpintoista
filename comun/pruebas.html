@@ -3291,6 +3291,20 @@ prueba('trampa de una habilidad: una conocida por tipo (veneno: daño por turno 
     [['Cómo', 'Tipo'], ['Cómo', 'Tipo', 'Tamaño', 'Daño', 'Qué le deja', 'Se evita', 'Nombre', 'Resumen'], 'Veneno', 'Veneno', 4, true, {stat: 'Evasión', dif: 10, que: 'todo'}, '1d6', 'linea',
      ['Cómo', 'Tipo', 'Tamaño', 'Daño', 'Efecto adicional', 'Se evita', 'Nombre', 'Resumen'], '4d6', '', 'Púas y estacas', true]);
 });
+prueba('trampas (2026-10-19, dueño): detectar Común 6 · Buena 8 · Rara 10; la que pone alguien, con su Destreza (mecánica) o su Efecto especial (mágica); el 📚 sale del catálogo', () => {
+  const tr = CATALOGO_BASE.filter(i => i.trampaDatos && !i.archivo);
+  const PORCAL = {'Común': 6, 'Buena Calidad': 8, 'Raro': 10};
+  const malas = tr.filter(i => i.trampaDatos.detectar !== PORCAL[i.tier] || !['des', 'dmgesp'].includes(i.trampaDatos.detectarStat)).map(i => i.nombre);
+  const oso = tr.find(i => i.nombre === 'Trampa de oso'), runa = tr.find(i => i.nombre === 'Runa de debilidad');
+  const val = st => ({des: 9, dmgesp: 4, trampaoculta: 1})[st] || 0;
+  const dOso = Combatiente.trampaDeHab({nombre: oso.nombre, trampaColocar: oso.trampaDatos}, val).detectar;
+  const dRuna = Combatiente.trampaDeHab({nombre: runa.nombre, trampaColocar: runa.trampaDatos}, val).detectar;
+  const delMapa = TRAMPAS_BASE.filter(e => e.datos && e.datos.catalogoId).length, soloMapa = TRAMPAS_BASE.filter(e => e.etiquetas.includes('solo del mapa')).map(e => e.nombre).sort();
+  const j = JSON.parse(TokensAuto.estadoJson(null, null, null, null, '', 0, {magica: true}) || '{}');
+  igual([malas, dOso, dRuna, delMapa, soloMapa, !!j.magica, TRAMPAS_BASE.find(e => e.nombre === 'Runa de debilidad').etiquetas.includes('mágica')],
+    [[], 10, 5, tr.length, ['Llamarada', 'Trampa de teleport'], true, true]);
+});
+
 prueba('cómo se ve un ítem: la trampa en datos cortos (forma, daño, efecto, salvación, detección) y lo técnico solo en «Ver»', () => {
   const oso = CATALOGO_BASE.find(i => i.id === 'trampa-trampa-de-oso'), menor = CATALOGO_BASE.find(i => i.id === 'trampa-cepo-reforzado');
   const filas = ItemCorto.trampaFilas(oso.trampaDatos).map(f => f[0] + ': ' + f[1] + (f[2] ? ' (' + f[2] + ')' : ''));
@@ -3299,8 +3313,8 @@ prueba('cómo se ve un ítem: la trampa en datos cortos (forma, daño, efecto, s
   const base = TRAMPAS_BASE.find(t => t.nombre === 'Trampa de oso');
   igual([filas, grilla.includes('⚙'), grilla.includes('Automático'), ver.includes('Detalles técnicos'), ver.includes('⚙ Automático'), ItemCorto.trampaFilas(menor.trampaDatos).find(f => f[0] === 'Detectarla')[1],
     p.hace, p.tecnico.startsWith('⚙'), base.datos.estado, base.datos.detectar, ItemCorto.tecnicoHtml('Solo dice qué hace.')],
-    [['Se dispara: cuando un rival pisa su casilla (una sola)', 'Alcanza: solo a quien la pisa (en el piso)', 'Daño: 2d6 · contempla la armadura', 'Efecto: Inmovilizado · 1 turno', 'Se resiste: no', 'Para salir: 🔓 Soltarse: Fuerza contra 6 · 1 No2', 'Detectarla: Percepción contra 8'],
-     false, false, true, true, 'Percepción contra 10', 'Da +2 a la Fuerza.', true, 'Inmovilizado', 8, '']);
+    [['Se dispara: cuando un rival pisa su casilla (una sola)', 'Alcanza: solo a quien la pisa (en el piso)', 'Daño: 2d6 · contempla la armadura', 'Efecto: Inmovilizado · 1 turno', 'Se resiste: no', 'Para salir: 🔓 Soltarse: Fuerza contra 6 · 1 No2', 'Detectarla: Percepción contra la Destreza de quien la coloca (si la pone el GM: 6)', 'Es: mecánica'],
+     false, false, true, true, 'Percepción contra la Destreza de quien la coloca (si la pone el GM: 8)', 'Da +2 a la Fuerza.', true, 'Inmovilizado', 6, '']);   // (2026-10-19, dueño: una trampa Común se detecta contra 6)
 });
 prueba('trampas automáticas: el estado y la salvación viajan juntos en trampaEstado; 3 turnos (Stun 1); los textos dicen qué va solo y qué a mano', () => {
   const oso = TRAMPAS_BASE.find(t => t.nombre === 'Trampa de oso').datos, dardos = TRAMPAS_BASE.find(t => t.nombre === 'Dardos envenenados').datos, descarga = TRAMPAS_BASE.find(t => t.nombre === 'Descarga eléctrica').datos;
@@ -3309,9 +3323,11 @@ prueba('trampas automáticas: el estado y la salvación viajan juntos en trampaE
   const filasDardos = ItemCorto.trampaFilas(dardos).map(f => f[0] + ': ' + f[1]);
   igual([oso.estado, oso.estadoTurnos, descarga.estadoTurnos, j, solo, TokensAuto.estadoJson(null, null), filasDardos.filter(f => /^(Efecto|Se evita)/.test(f)), oso.detalle,
     Plantillas.trampa({...dardos}).salvacion],
-    ['Inmovilizado', 3, 1, {nombre: 'Veneno', stacks: 3, salva: {stat: 'eva', etq: 'Evasión', dif: 10, que: 'todo'}}, {salva: {stat: 'eva', etq: 'Evasión', dif: 12, que: 'mitad'}}, '',
-     ['Efecto: Veneno ×3', 'Se evita: Evasión contra 10 → la evita entera'], '2d6 de daño y Inmovilizado 3 turnos (automático). Para liberarse: 2 No2 y Fuerza contra 8 (a mano).',
-     {stat: 'eva', etq: 'Evasión', dif: 10, que: 'todo'}]);
+    // (2026-10-19: el 📚 sale del catálogo de ítems, con los números del rework de trampas: la Trampa de oso deja Inmovilizado 1 turno y los
+    // Dardos se resisten con Res.Esp contra 7.)
+    ['Inmovilizado', 1, 1, {nombre: 'Veneno', stacks: 3, salva: {stat: 'resmg', etq: 'Res.Esp', dif: 7, que: 'efecto', logra: 'el dardo pega, pero el veneno no entra'}},
+     {salva: {stat: 'eva', etq: 'Evasión', dif: 12, que: 'mitad'}}, '', ['Efecto: Veneno ×3'], CATALOGO_BASE.find(i => i.nombre === 'Trampa de oso').detalle.slice(0, 200),
+     {stat: 'resmg', etq: 'Res.Esp', dif: 7, que: 'efecto', logra: 'el dardo pega, pero el veneno no entra'}]);
 });
 prueba('trampa de muro: el muro viaja en trampaEstado (largo 3 o 5, 4 turnos si no dice) y la plantilla lo conserva', () => {
   igual([JSON.parse(TokensAuto.estadoJson(null, null, {largo: 3})), JSON.parse(TokensAuto.estadoJson({nombre: 'Sentado'}, null, {largo: 7, turnos: 2})),

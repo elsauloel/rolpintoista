@@ -232,8 +232,10 @@ const CreepAcciones = (() => {
     return {aviso: `${sc.nombre}: ${it.nombre} salió del cinturón`};
   }
   // Una trampa consumible: se coloca junto al token del creep (como la de un personaje); si no se puede, no se gasta. → {ok, aviso}.
-  async function colocarTrampaDeItem(creepId, it){
-    const d = it && it.trampaDatos;
+  // `sc` (2026-10-19): el creep, para que la dificultad sea la suya (Destreza o Efecto especial, como una trampa de habilidad).
+  async function colocarTrampaDeItem(creepId, it, sc){
+    const d0 = it && it.trampaDatos;
+    const d = d0 && sc ? Combatiente.trampaDeHab({nombre: it.nombre, trampaColocar: d0}, st => C().statValor(sc, st)) : d0;
     if(!d || typeof TokensAuto === 'undefined') return {ok: false, aviso: 'Esta trampa se coloca desde el mapa'};
     try{
       const dano = /^\d{1,2}d\d{1,3}([+-]\d{1,3})?$/i.test(String(d.dano || '').trim()) ? String(d.dano).trim() : '';

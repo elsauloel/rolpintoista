@@ -235,13 +235,20 @@ setInterval(renderImpulsoBoton, 1500);
 /* 🍀 El Anillo del trébol (2026-10-18, dueño): una vez por combate, el botón pone el estado «🍀 Trébol» (Afortunado en cualquier tirada,
    `afortunadoTodo`) y la próxima tirada lo gasta (comun/ficha-acciones.js, tirarValorStat). La marca `S.meta.trebolUsado` se libera al volver a
    narrativo (anillosTerminar). Personajes. */
+// El personaje que maneja esta pantalla (el suyo, o el que el GM controla con 🎮) con el trébol listo.
 function trebolActivo(){
   if(modoMapa !== 'combate') return null;
-  const t = miTokenPrincipal();
-  if(!t || !t.fichaId || String(t.fichaId).includes(SEP_INVOCACION)) return null;
-  const r = (fichasPub.get(t.fichaId) || {}).resumen || {};
-  if(!(num(r.trebol) > 0) || r.trebolUsado || (r.estados || []).some(e => e && /trébol/i.test(String(e.nombre || '')))) return null;
-  return {t, r};
+  const listo = t => {
+    if(!t || t.tipo !== 'pj' || !t.fichaId || String(t.fichaId).includes(SEP_INVOCACION)) return null;
+    if(typeof bnManejo === 'function' ? !bnManejo(t.fichaId) : t.duenoUid !== (fbUsuario && fbUsuario.uid)) return null;
+    const r = (fichasPub.get(t.fichaId) || {}).resumen || {};
+    if(!(num(r.trebol) > 0) || r.trebolUsado || (r.estados || []).some(e => e && /trébol/i.test(String(e.nombre || '')))) return null;
+    return {t, r};
+  };
+  const mio = listo(miTokenPrincipal());
+  if(mio) return mio;
+  for(const t of tokens.values()){ const a = listo(t); if(a) return a; }
+  return null;
 }
 function renderTrebolBoton(){
   const a = trebolActivo();

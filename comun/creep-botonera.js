@@ -197,7 +197,7 @@ const CreepBotonera = (() => {
     const costo = Combatiente.conExtenuado(sc.estados, typeof FichaCalculo !== 'undefined' ? num(FichaCalculo.IT2.nitrosConsumirCinturon) || 1 : 1);   // + Extenuado
     const filas = (sc.cinturon || []).map(it => `
       <div class="accion-row">
-        <div class="accion-nombre">${esc(it.nombre)} <span class="hint">×${fmt(num(it.unidades))}${num(it.curahp) ? ` · ${num(it.curahp) > 0 ? '+' : ''}${fmt(num(it.curahp))} HP` : ''}${it.efectoNombre ? ` · ${esc(it.efectoNombre)}` : ''}</span></div>
+        <div class="accion-nombre"><span${it.detalle ? ` title="${esc(it.detalle)}" style="text-decoration:underline dotted;cursor:help"` : ''}>${esc(it.nombre)}</span>${it.azar ? ' <span title="Su consumible al azar: si lo usa, lo suelta seguro; si no, con la chance de su tipo">🎲</span>' : ''} <span class="hint">×${fmt(num(it.unidades))}${num(it.curahp) ? ` · ${num(it.curahp) > 0 ? '+' : ''}${fmt(num(it.curahp))} HP` : ''}${it.efectoNombre ? ` · ${esc(it.efectoNombre)}` : ''}</span></div>
         <button class="hab-ejecutar" data-cin-consumir="${sc.id}:${it.id}" ${num(sc.nitros) < costo ? 'title="No le alcanzan los No2: pregunta antes"' : ''}>Usar · ${fmt(costo)} No2</button>
         <button class="verbtn" data-cin-quitar="${sc.id}:${it.id}" title="Sacarlo del cinturón">✕</button>
       </div>`).join('');

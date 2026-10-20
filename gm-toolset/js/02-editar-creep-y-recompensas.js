@@ -144,7 +144,8 @@ function recompensasHtml(sc){
       </div>`; })() : ''}
     ${CombateFin.cuantosAlAzar(sc) > 0 || (sc.consumibleAzar || []).length ? `<div class="mini-f" style="margin-top:8px"><label>🎲 Consumible al azar: lo lleva en el cinturón; si lo usa en el combate lo suelta seguro, si no, con la chance de su tipo</label>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px">
-        <b>${(sc.consumibleAzar || []).length ? esc(sc.consumibleAzar.join(', ')) : 'ninguno'}</b>
+        <b>${(sc.consumibleAzar || []).length ? sc.consumibleAzar.map(n => { const c = CATALOGO_BASE.find(i => i.nombre === n && i.tipoItem === 'consumibles');   // qué hace, al pasar el mouse
+          return c && c.detalle ? `<span title="${esc(c.detalle)}" style="text-decoration:underline dotted;cursor:help">${esc(n)}</span>` : esc(n); }).join(', ') : 'ninguno'}</b>
         ${CombateFin.cuantosAlAzar(sc) > 0 ? `<button type="button" class="addhab" data-azar-otro="${sc.id}" style="margin:0">🎲 ${(sc.consumibleAzar || []).length ? 'Otro' : 'Darle uno'}</button>` : ''}
         ${(sc.consumibleAzar || []).length ? `<button type="button" class="addhab" data-azar-quitar="${sc.id}" style="margin:0">✕ Sacar</button>` : ''}
       </div></div>` : ''}

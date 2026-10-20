@@ -221,8 +221,8 @@ $('#veritem-baja').onclick = async () => {
   if(ok){ $('#scrim-ver-item').classList.remove('open'); cargarItemsSubidosGM(); }
 };
 $('#scrim-ver-item').addEventListener('mousedown', e => { if(e.target.id==='scrim-ver-item') $('#scrim-ver-item').classList.remove('open'); });
-$('#equipar-creep-x').onclick = () => { equipandoCreepId = null; $('#scrim-equipar-creep').classList.remove('open'); };
-$('#scrim-equipar-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-equipar-creep'){ equipandoCreepId = null; $('#scrim-equipar-creep').classList.remove('open'); } });
+$('#equipar-creep-x').onclick = () => { equipandoCreepId = null; dropFijoCreepId = null; $('#scrim-equipar-creep').classList.remove('open'); };
+$('#scrim-equipar-creep').addEventListener('mousedown', e => { if(e.target.id==='scrim-equipar-creep'){ equipandoCreepId = null; dropFijoCreepId = null; $('#scrim-equipar-creep').classList.remove('open'); } });
 $('#tablero-x').addEventListener('click', tableroCerrar);
 $('#historial-x').addEventListener('click', () => $('#scrim-historial').classList.remove('open'));
 $('#scrim-historial').addEventListener('mousedown', e => { if(e.target.id === 'scrim-historial') $('#scrim-historial').classList.remove('open'); });

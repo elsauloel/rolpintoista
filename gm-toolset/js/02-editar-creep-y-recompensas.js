@@ -132,8 +132,11 @@ function recompensasHtml(sc){
         <input type="number" min="0" data-rec="trofeoPrecio" data-id="${sc.id}" value="${num(esp.precio) > 0 ? num(esp.precio) : ''}" placeholder="Valor de compra" style="width:120px">
       </div>
     </div>
-    <div class="mini-f" style="margin-top:8px"><label>Drops fijos (opcional): ítems del catálogo que suelta siempre, separados por coma</label>
-      <input type="text" data-rec="dropsFijos" data-id="${sc.id}" value="${esc(CreepCalculo.dropsFijos(sc).join(', '))}" placeholder="Ej.: Grapa del capataz" maxlength="300">
+    <div class="mini-f" style="margin-top:8px"><label>Drops fijos (opcional): ítems del catálogo que suelta siempre</label>
+      <div style="display:flex;gap:6px">
+        <input type="text" data-rec="dropsFijos" data-id="${sc.id}" value="${esc(CreepCalculo.dropsFijos(sc).join(', '))}" placeholder="Elegilos del catálogo (o escribilos, separados por coma)" maxlength="300" style="flex:1">
+        <button type="button" class="addhab" data-dropsfijos-cat="${sc.id}" style="margin:0;white-space:nowrap" title="Abrir el catálogo y sumar ítems a sus drops fijos">📚 Del catálogo</button>
+      </div>
     </div>
     ${['humano', 'humanoide'].includes(CreepCalculo.tipoDe(sc)) ? (() => {
       const act = CreepCalculo.arquetipos(sc), manual = CreepCalculo.arquetiposManual(sc).length > 0, auto = CreepCalculo.arquetiposAuto(sc);
@@ -187,6 +190,10 @@ function consumibleAzarCreep(sc){
   return r.nombres;
 }
 document.addEventListener('click', e => {
+  const dc = e.target.closest('[data-dropsfijos-cat]');
+  if(dc){ abrirDropsFijosCreep(dc.dataset.dropsfijosCat); return; }
+  const df = e.target.closest('[data-dropfijo]');
+  if(df){ sumarDropFijo(Number(df.dataset.dropfijo)); return; }
   const z = e.target.closest('[data-azar-otro], [data-azar-quitar]');
   if(z){
     const sc = S.creeps.find(s => s.id === (z.dataset.azarOtro || z.dataset.azarQuitar));

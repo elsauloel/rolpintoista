@@ -785,3 +785,6 @@ input[type=file]{display:none}
 .desplegable-lista .pj-inactivar:hover{border-color:#5fd08a}
 .desplegable-lista .pj-inactivo a{opacity:.5}
 .desplegable-lista .pj-inactivo .pj-nombre{text-decoration:line-through}
+
+/* 📚 Drops fijos desde el catálogo (2026-10-20): la ventana va por encima del asistente paso a paso (z 79). */
+#scrim-equipar-creep.sobre-asist{z-index:120}

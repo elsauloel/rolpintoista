@@ -78,6 +78,7 @@ const gmHabUi = {
 };
 
 let equipandoCreepId = null;
+let dropFijoCreepId = null;   // 📚 (2026-10-20) el mismo catálogo, para elegir los drops fijos de un creep
 
 const TIER_COLOR = {'Común':'#9A867E', 'Buena Calidad':'#A8C256', 'Raro':'#5B8DBE', 'Excepcional':'#E0A458', 'Legendario':'#9B7BD4', 'A definir':'#D4574E'};
 const STAT_LABEL_GM = CreepCalculo.STAT_LABEL;   // comun/creep-calculo.js
@@ -126,7 +127,8 @@ function equipoItemHtml(item, idx){
       ${item.detalle ? `<div class="cat-detalle">${esc(item.detalle)}</div>` : ''}
     </div>
     <button type="button" class="mini" data-veritem="${idx}">Ver</button>
-    ${equipandoCreepId && !esCons ? `<button type="button" class="cat-btn-equipar" data-equiparitem="${idx}">Equipar</button>` : ''}
+    ${dropFijoCreepId ? `<button type="button" class="cat-btn-equipar" data-dropfijo="${idx}">＋ Drop fijo</button>`
+      : equipandoCreepId && !esCons ? `<button type="button" class="cat-btn-equipar" data-equiparitem="${idx}">Equipar</button>` : ''}
   </div>`;
 }
 
@@ -197,7 +199,31 @@ function renderEquiparCreepLista(){
   $('#equipar-creep-lista').innerHTML = html || `<div class="hint">No hay ítems con esos filtros. Probá sacar alguno (✕ Limpiar todo).</div>`;
 }
 
+/* 📚 Drops fijos desde el catálogo (dueño, 2026-10-20: «recordar los nombres y tipearlos sin error es absurdo»): la misma ventana de
+   «Equipar del fabricante», con «＋ Drop fijo» en cada ítem. Queda abierta para sumar varios. */
+function abrirDropsFijosCreep(scId){
+  equipandoCreepId = null;
+  dropFijoCreepId = scId;
+  const sc = S.creeps.find(s => s.id === scId);
+  $('#scrim-equipar-creep header h3').textContent = `Drops fijos de ${sc ? nombreLimpioCreep(sc) : 'un creep'}: elegí del catálogo`;
+  $('#scrim-equipar-creep').classList.add('sobre-asist');   // (por encima del asistente paso a paso)
+  filtroEquipo().limpiar();
+  renderEquiparCreepLista();
+  $('#scrim-equipar-creep').classList.add('open');
+}
+function sumarDropFijo(idx){
+  const sc = S.creeps.find(s => s.id === dropFijoCreepId), item = CATALOGO_EQUIPO[idx];
+  if(!sc || !item) return;
+  const lista = CreepCalculo.dropsFijos(sc);
+  if(lista.length >= 10){ toast('Ya tiene 10 drops fijos (el máximo)'); return; }
+  sc.dropsFijos = [...lista, item.nombre];
+  renderAll();
+  toast(`${nombreLimpioCreep(sc)}: + ${item.nombre} (drop fijo)`);
+}
 function abrirEquiparCreep(scId){
+  dropFijoCreepId = null;
+  $('#scrim-equipar-creep header h3').textContent = 'Equipar del fabricante';
+  $('#scrim-equipar-creep').classList.remove('sobre-asist');
   equipandoCreepId = scId;
   filtroEquipo().limpiar();
   renderEquiparCreepLista();

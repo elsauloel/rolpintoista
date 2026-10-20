@@ -213,3 +213,6 @@ partida:
 
 `datos/reglas.json` es el borrador viejo del manual (capítulos → secciones):
 queda como archivo histórico, ya no lo lee nada.
+
+- **`auditado`** (2026-10-20, dueño): la fecha en que el ítem pasó por una auditoría con el dueño (la primera: las pociones, P212). Lo que no lo
+  tiene queda para revisar después. Solo informativo: no cambia nada en el juego.

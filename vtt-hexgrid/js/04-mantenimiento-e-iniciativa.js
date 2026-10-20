@@ -717,8 +717,9 @@ async function invocacionAlOrden(tokenId){
   const ok = await guardarIniciativa({orden: [...iniciativa.orden.map(o => o.oculto ? {id: o.id, valor: num(o.valor), oculto: true} : {id: o.id, valor: num(o.valor)}), {id: tokenId, valor: 0}]});
   if(!ok) return;
   const [fichaId, invId] = String(t.fichaId).split(SEP_INVOCACION);
+  const sinMareo = !!((vinculo(t) || {}).resumen || {}).sinMareo;   // 👁 el Ojo de Kicillof entra sin mareo (2026-10-20)
   try{
-    await editarPersonajeMapa(fichaId, S => {
+    if(!sinMareo) await editarPersonajeMapa(fichaId, S => {
       const inv = (S.invocaciones || []).find(x => x && x.id === invId);
       if(!inv) return false;
       const pre = estadosPresetFicha().find(p => p.nombre === 'Mareo de invocación');
@@ -729,7 +730,7 @@ async function invocacionAlOrden(tokenId){
     });
   }catch(err){ console.error('No se pudo marear a la invocación nueva:', err); }
   momentoAbrir({tipo: 'turno', icono: '✨', titulo: `${nombreDe(t)} entra al orden de turnos`, estado: 'listo',
-    datos: {lineas: ['Al final del orden, con Mareo de invocación: su primer turno no hace nada.']}});
+    datos: {lineas: [sinMareo ? 'Al final del orden, sin mareo: actúa en su primer turno.' : 'Al final del orden, con Mareo de invocación: en su primer turno no actúa (reacciona igual).']}});
 }
 
 function renderIniciativa(){

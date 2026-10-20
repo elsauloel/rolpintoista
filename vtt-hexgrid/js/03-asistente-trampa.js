@@ -278,7 +278,11 @@ const sigiloUltimaVista = new Map();   // tokenId -> {col, fila}: dónde lo vi a
 const sigiloFantasmas = new Map();     // tokenId -> {col, fila, hasta}
 // ¿Es un token que YO no veo por estar en sigilo? (jugador: los creeps; GM: los
 // personajes, salvo con su 👁).
+// 👁 Invisible para los rivales (2026-10-20, el Ojo de Kicillof): el GM no lo ve sin su 👁 de revelar.
+const invisibleParaRivales = t => !!(t && t.tipo === 'pj' && ((vinculo(t) || {}).resumen || {}).invisible);
+const ojoDe = t => t && t.tipo === 'pj' ? Math.max(0, Math.round(num(((vinculo(t) || {}).resumen || {}).ojo))) : 0;
 function ocultoPorSigiloParaMi(t){
+  if(invisibleParaRivales(t)) return soyGM && !ojoRevelando;
   if(!enSigilo(t)) return false;
   return soyGM ? (t.tipo === 'pj' && !ojoRevelando) : (t.tipo === 'creep' && !reveladaCasilla(t));   // «Ve lo oculto» de un aliado lo deja ver
 }
@@ -383,7 +387,7 @@ function tokenVisiblePorNiebla(t){
   if(tapadoPorNiebla(t)) return false;   // adentro de la niebla de una varita (2026-10-05)
   if(!t.oculto && marcado(t)) return true;   // Marcado (dueño, 2026-10-05): aunque vuelva la niebla de guerra, se lo sigue viendo
   if(!soyGM && t.tipo === 'creep' && enSigilo(t) && !reveladaCasilla(t)) return false;   // creep en sigilo: los jugadores no lo ven (salvo que un aliado vea lo oculto ahí)
-  if(soyGM && !ojoRevelando && t.tipo === 'pj' && enSigilo(t)) return false;   // personaje en sigilo: el GM no lo ve sin el 👁
+  if(soyGM && !ojoRevelando && t.tipo === 'pj' && (enSigilo(t) || invisibleParaRivales(t))) return false;   // personaje en sigilo (o invisible): el GM no lo ve sin el 👁
   if(!nieblaAplica() || t.tipo === 'pj') return true;
   return nieblaVista.has(nbPack(t.col, t.fila)) || oidoPorJugadores(t);   // o lo oyen (el punto ciego, 2026-10-15)
 }
@@ -450,8 +454,8 @@ function celdasVisionDe(t, ignorarSolidos){
   const nb = nieblaSet(), enNiebla = nb.has(nbPack(t.col, t.fila));
   const solidos = nb.size && !enNiebla ? new Set([...solidos0, ...nb]) : solidos0;
   const conParedes = !ignorarSolidos && hayParedes();   // las paredes de línea fina (js/34)
-  const res = [], ciego = ciegoDe(t);
-  (ciego ? celdasDisco(Combatiente.CEGUERA_VISION) : offsetsVision(k, enNiebla ? 1 : radioVisionDe(t))).forEach(o => {
+  const res = [], ciego = ciegoDe(t), ojo = ojoDe(t);   // 👁 el Ojo: una flor para todos lados
+  (ojo ? celdasDisco(ojo) : ciego ? celdasDisco(Combatiente.CEGUERA_VISION) : offsetsVision(k, enNiebla ? 1 : radioVisionDe(t))).forEach(o => {
     const col = cuboACol(c0.q + o.dq, c0.r + o.dr), fila = cuboAFila(c0.q + o.dq, c0.r + o.dr);
     // Los elementos Sólidos tapan la vista: no se ve lo que queda detrás.
     if((solidos.size || conParedes) && !lineaLibre(origen, {col, fila}, solidos, !conParedes)) return;

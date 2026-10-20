@@ -331,7 +331,7 @@ const FichaAcciones = (() => {
       }
       // Un consumible que deja una zona en el mapa (2026-10-08, las bengalas: `zonaUso`, la misma Ejecución de una zona): se usa desde el mapa;
       // sin el mapa, no se gasta.
-      if((it.zonaUso && !ui.colocarZona) || (it.aceleradorMapa && !ui.acelerador) || (it.duelo && !ui.terminar)){ ui.toast(`${it.nombre} se usa desde el mapa (tu Botonera en el mapa): ahí elegís dónde`); return; }
+      if((it.zonaUso && !ui.colocarZona) || (it.aceleradorMapa && !ui.acelerador) || (it.duelo && !ui.terminar) || (it.invocaTemporal && !ui.invocar)){ ui.toast(`${it.nombre} se usa desde el mapa (tu Botonera en el mapa): ahí elegís dónde`); return; }
       // Trampa consumible (2026-09-25): al usarla se coloca sola junto a tu token; si no se puede, no se gasta.
       if(it.trampaDatos){
         if(consumiendoTrampa.has(id)) return;
@@ -350,6 +350,7 @@ const FichaAcciones = (() => {
       if(it.zonaUso) ui.colocarZona(it);   // la bengala: se elige el centro en el mapa
       if(it.aceleradorMapa) ui.acelerador(it);   // ⏩ la Runa aceleradora: se elige la casilla en el mapa
       if(it.duelo) ui.terminar(Combatiente.habDeConsumible(it), null, 0, 0);   // 📜 su Ejecución: el objetivo y el cuadro del duelo (la Red Nerubian)
+      if(it.invocaTemporal) invocarTemporal(S, it, ui);   // 👁 una invocación de un rato (el Ojo de Kicillof)
       if(sac.saque) S.meta.saqueTurno = num(S.turno) || 1;   // el primero del turno ya se sacó
       if(sac.bolsillo) S.meta.bolsilloTurno = num(S.turno) || 1;
       if(sac.alquimista) S.meta.alquimistaTurno = num(S.turno) || 1;   // 💍 el Anillo del alquimista, una vez por turno
@@ -399,7 +400,7 @@ const FichaAcciones = (() => {
         } else reviveTxt = `✚ ✋ a mano: revivilo con ✚ Revivir en su ficha (${pct} % de su vida); desde el mapa se elige solo`;
       }
       const curadosTxt = curados ? (curados.sacados.length ? `🩹 se le fue: ${curados.sacados.join(', ')}` : '🩹 no tenía nada que curar') : '';
-      ui.cambio([key, ...(efecto || reparados || (curados && curados.sacados.length) ? ['efectos'] : []), 'vitals', 'nitros']);
+      ui.cambio([key, ...(efecto || reparados || (curados && curados.sacados.length) ? ['efectos'] : []), ...(it.invocaTemporal ? ['invocaciones'] : []), 'vitals', 'nitros']);
       const partes = [];
       if(it.curahp) partes.push(`${num(it.curahp)>=0?'+':''}${fmt(num(it.curahp) + boticario)} HP${boticario ? ` (+${fmt(boticario)} de Mano de boticario)` : ''}`);
       if(spRestaurado) partes.push(`+${fmt(spRestaurado)} SP`);
@@ -1296,6 +1297,26 @@ const FichaAcciones = (() => {
     if(num(inv.hpMax) > 0) inv.hp = num(inv.hpMax);
     inv.nitros = InvCalculo.nitrosMax(inv);
     (inv.habilidades || []).forEach(x => { x.cdActual = 0; });
+    return inv;
+  }
+  /* 👁 Un consumible que invoca algo por un rato (2026-10-20, el Ojo de Kicillof): `it.invocaTemporal = {id, nombre, turnos, mov, vision, color}`.
+     Crea (o vuelve a despertar: siempre la misma, `id`, así no se acumulan) una invocación con esos turnos (su cooldown: se duerme al llegar a 0),
+     Movimiento `mov` (sus No2), visión en flor de radio `vision` para todos lados que revela lo oculto, invisible para los rivales y sin mareo; y
+     le pide al mapa dónde aparece (ui.invocar, el mismo aviso que una habilidad que invoca). */
+  function invocarTemporal(S, it, ui){
+    const c = it.invocaTemporal || {}, lista = S.invocaciones = Array.isArray(S.invocaciones) ? S.invocaciones : [];
+    const id = String(c.id || 'temporal'), turnos = Math.max(1, Math.round(num(c.turnos)) || 2), mov = Math.max(1, Math.round(num(c.mov)) || 5), vision = Math.max(1, Math.round(num(c.vision)) || 2);
+    let inv = lista.find(i => i && i.id === id);
+    if(!inv){
+      inv = {id, nombre: String(c.nombre || it.nombre), color: c.color || '#7FD4E8', imagen: '', activa: true, cooldown: turnos, cooldownActual: turnos, hp: 1, hpMax: 1, spd: 0,
+        con: 1, fue: 1, agl: mov, des: 1, esp: 1, armaTipo: 4, armaPeso: 1, armaFijo: 0, armaNatural: true, armaNombre: '', armaDeRango: false, defensa: 0, notas: '',
+        estados: [], habilidades: [], equipo: []};
+      lista.push(inv);
+    }
+    Object.assign(inv, {activa: true, cooldown: turnos, cooldownActual: turnos, agl: mov, estados: [], ojo: vision, veoculto: vision, invisible: true, sinMareo: true, temporal: true});
+    inv.nitros = InvCalculo.nitrosMax(inv);
+    const ref = ui.yo ? (ui.yo() || {}).ref : '';
+    ui.invocar({ref: `${ref}~${inv.id}`, fichaId: ref, nombre: inv.nombre, color: inv.color, quien: (S.meta && S.meta.nombre) || 'Personaje', habilidad: it.nombre, turnos});
     return inv;
   }
   function invocarConHab(S, h, ui){

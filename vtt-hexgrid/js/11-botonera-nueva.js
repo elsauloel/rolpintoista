@@ -112,7 +112,7 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261012zy', '../comun/ficha-botin.js?v=20261008zz4', '../comun/generador-tiendas.js?v=20261018zm', '../comun/filtro-catalogo.js?v=20261009r', '../comun/ficha-tienda.js?v=20261010g', '../comun/ficha-mantenimiento.js?v=20261020n', '../comun/ficha-calculo.js?v=20261019k', '../comun/ficha-combate.js?v=20261015d', '../comun/skills-clase.js?v=20261018h', '../comun/ficha-habilidades.js?v=20261020q',
-  '../comun/catalogo.js?v=20261020zh', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261016c', '../comun/ficha-sesion.js?v=20261010za', '../comun/ficha-botonera.js?v=20261020zb', '../comun/ficha-resumen.js?v=20261020za', '../comun/inv-calculo.js?v=20261020b', '../comun/inv-botonera.js?v=20261020zb', '../comun/inv-acciones.js?v=20261019l', '../comun/inv-duelo.js?v=20261020zd', '../comun/ficha-acciones.js?v=20261020x', '../comun/inv-habilidades.js?v=20261014f', '../comun/inv-lupa.js?v=20261015a',
+  '../comun/catalogo.js?v=20261020zi', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261016c', '../comun/ficha-sesion.js?v=20261010za', '../comun/ficha-botonera.js?v=20261020zb', '../comun/ficha-resumen.js?v=20261020zi', '../comun/inv-calculo.js?v=20261020b', '../comun/inv-botonera.js?v=20261020zb', '../comun/inv-acciones.js?v=20261019l', '../comun/inv-duelo.js?v=20261020zd', '../comun/ficha-acciones.js?v=20261020zi', '../comun/inv-habilidades.js?v=20261014f', '../comun/inv-lupa.js?v=20261015a',
   '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261020zd', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261014e'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -567,6 +567,8 @@ const BN_ACCIONES = {
     acelerador: it => { if(bn) bn.host.hidden = true; aceleradorDeHabilidad({fichaId: bn.fichaId, casteadorTipo: 'pj', turnos: num(it.aceleradorMapa.turnos) || 10, no2: num(it.aceleradorMapa.no2) || 2, nombre: it.nombre}); },
     // La zona de un consumible (2026-10-08, las bengalas): la misma de una habilidad, a nombre del personaje.
     terminar: (h, arma, xSp, xNitros) => FichaAcciones.terminarEjecucionHab(S, h, arma, xSp, xNitros, bnHabUi()),   // 📜 un consumible con Ejecución (2026-10-20)
+    yo: () => ({ref: bn.fichaId, tipo: 'pj', nombre: (S.meta && S.meta.nombre) || 'Personaje'}),
+    invocar: msg => { if(bn) bn.host.hidden = true; invocacionDeHabilidad(msg); },   // 👁 el Ojo de Kicillof: se elige dónde aparece (js/13)
     colocarZona: it => FichaAcciones.colocarZonaDeHab(S, {id: 'zona:' + it.id, nombre: it.nombre, detalle: it.detalle || '', modo: 'auto', duelo: it.zonaUso}, 0, 0,
       {...ui, enMapa: () => true, yo: () => ({ref: bn.fichaId, tipo: 'pj'}), alMapa: (t, m) => bnAlMapa(t, m)}),
     // ✚ Revive (2026-10-06, js/22): elegir al aliado caído antes de gastarlo, y revivirlo.

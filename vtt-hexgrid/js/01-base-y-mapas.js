@@ -548,6 +548,7 @@ function vinculo(t){
       hp: inv.hp, hpMax: inv.hpMax, muerto: num(inv.hp) <= 0, dormida: inv.activa === false,
       nitros: inv.nitros, nitrosMax: inv.nitrosMax, oporCosto: inv.oporCosto, sinOpor: inv.sinOpor === true,
       estados: Array.isArray(inv.estados) ? inv.estados : [],
+      ...(num(inv.ojo) > 0 ? {ojo: num(inv.ojo), veoculto: num(inv.veoculto), invisible: true, sinMareo: true} : {}),   // 👁 el Ojo de Kicillof (js/03)
     },
   };
 }

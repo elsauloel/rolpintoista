@@ -1264,7 +1264,7 @@ prueba('🧪 Escudos de poción y Mano Pesada (2026-10-20): solo físico / espec
   const cat = n => CATALOGO_BASE.find(i => i.nombre === n);
   const S = {catalogo: [], efectos: []};
   const cuero = FichaHabilidades.aplicarEfectoDeConsumo(S, cat('Poción de Cuero Duro'), presetsDePrueba).estado;
-  const ojo = FichaHabilidades.aplicarEfectoDeConsumo(S, cat('Poción contra el Mal de Ojo mayor'), presetsDePrueba).estado;
+  const ojo = FichaHabilidades.aplicarEfectoDeConsumo(S, cat('Poción de Piel de Cristal mayor'), presetsDePrueba).estado;
   const aguante = FichaHabilidades.aplicarEfectoDeConsumo(S, cat('Poción del Aguante'), presetsDePrueba).estado;
   const mano = FichaHabilidades.aplicarEfectoDeConsumo(S, cat('Poción de Mano Pesada superior'), presetsDePrueba).estado;
   const D = {...FichaGuardado.DEFAULT, efectos: S.efectos.slice(), catalogo: []};

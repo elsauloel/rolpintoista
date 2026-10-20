@@ -1313,7 +1313,8 @@ const FichaAcciones = (() => {
         estados: [], habilidades: [], equipo: []};
       lista.push(inv);
     }
-    Object.assign(inv, {activa: true, cooldown: turnos, cooldownActual: turnos, agl: mov, estados: [], ojo: vision, veoculto: vision, invisible: true, sinMareo: true, temporal: true});
+    // La cuenta baja al EMPEZAR cada turno suyo (también el primero): para que actúe `turnos` turnos completos, arranca en turnos + 1 (probado en el mapa).
+    Object.assign(inv, {activa: true, cooldown: turnos + 1, cooldownActual: turnos + 1, agl: mov, estados: [], ojo: vision, veoculto: vision, invisible: true, sinMareo: true, temporal: true});
     inv.nitros = InvCalculo.nitrosMax(inv);
     const ref = ui.yo ? (ui.yo() || {}).ref : '';
     ui.invocar({ref: `${ref}~${inv.id}`, fichaId: ref, nombre: inv.nombre, color: inv.color, quien: (S.meta && S.meta.nombre) || 'Personaje', habilidad: it.nombre, turnos});

@@ -2,7 +2,8 @@
 
 > Pedido del dueño: cuatro arquetipos (choque pesado, choque liviano, caster, rango); cada consumible va al que más le sirve; los universales,
 > a los cuatro (opción A); trampas mecánicas a choque liviano y rango, mágicas a casters; las legacy, sin trato especial. La munición sigue
-> aparte (la decide el arma). Esto es la propuesta para revisar: todavía no se aplicó.
+> aparte (la decide el arma). **Aprobada y aplicada (dueño, 2026-10-20)**: `CombateFin.arquetiposBotin` y `CreepCalculo.arquetipos`.
+> Además: el creep con arco o ballesta nace con una flecha o un virote especial al azar en el cinturón (`sc.municionAzar`), que suelta seguro.
 
 ## Choque pesado — 57 (Común 8, Buena Calidad 22, Raro 17, Excepcional 9, Legendario 1)
 

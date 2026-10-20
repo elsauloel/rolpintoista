@@ -1643,3 +1643,8 @@ versión parecida en más de una, es candidato a juntar.
 - **📜 Consumibles: `efectoFinCombate`** (el estado lleva `finCombate`: se va al «Finalizar combate», vtt-hexgrid/js/25, y al descansar),
   **`efectoParty`** (el mismo estado a los aliados del mapa: `FichaAcciones.consumir` llama `ui.alGrupo(estado, item)`; el mapa, `bnEfectoAlGrupo`)
   y **`efectoRecarga`** (un escudo que se renueva cada turno). 2026-10-19, los pergaminos.
+- **🎁 Arquetipos del botín, versión 2026-10-20** (reemplaza a las familias con pesos): `CreepCalculo.ARQUETIPOS` = pesado, liviano, caster, rango
+  (`arquetiposAuto`: rango si su arma es a distancia; caster si el Especial gana a Fuerza, Destreza y Agilidad o lleva varita o foco; si no,
+  pesado o liviano por Fuerza+Constitución contra Destreza+Agilidad; los nombres viejos se leen). `CombateFin.arquetiposBotin(item)` (o el campo
+  `arquetiposBotin` del ítem) y `dropElegir(cat, tier, arqs)`: uno al azar entre lo de sus arquetipos y lo universal. Lista: docs/botin-arquetipos.md.
+  `sc.municionAzar`: la flecha o el virote con que nace un creep con arco o ballesta (en el cinturón; drop seguro).

@@ -683,19 +683,23 @@ const CreepCalculo = (() => {
   /* 🎁 Arquetipos (2026-10-19, dueño: «puede haber creeps que tengan más de un arquetipo»): qué familias de consumibles suelta más
      (comun/combate-fin.js). Se deducen de sus datos —coloca trampas → trampero; arma de rango → tirador; Especial más alto que Fuerza y Destreza,
      o una varita o un foco → mago; si no es mago ni tirador → guerrero— y el GM los cambia en Recompensas (`sc.arquetipos`; vacío = automático). */
-  const ARQUETIPOS = {guerrero: '⚔ Guerrero', mago: '✨ Mago', tirador: '🏹 Tirador', trampero: '🪤 Trampero'};
+  /* (2026-10-20, dueño: «guerrero hace mucha referencia a la clase»): cuatro arquetipos. Choque pesado (va de frente: Fuerza y Constitución),
+     choque liviano (Destreza y Agilidad), caster (Especial: magos, supports, debuffers) y rango (arma a distancia, física). Se deducen así: arma de
+     rango → rango; Especial más alto que Fuerza, Destreza y Agilidad, o una varita o un foco → caster; si no es ninguno de los dos, cuerpo a
+     cuerpo: pesado si Fuerza + Constitución ≥ Destreza + Agilidad, si no liviano. Los nombres viejos (guerrero, mago, tirador, trampero) se leen. */
+  const ARQUETIPOS = {pesado: '🛡 Choque pesado', liviano: '🗡 Choque liviano', caster: '✨ Caster', rango: '🏹 Rango'};
+  const ARQ_VIEJOS = {guerrero: 'pesado', mago: 'caster', tirador: 'rango', trampero: 'liviano'};
   function arquetiposAuto(sc){
-    if(!sc) return ['guerrero'];
+    if(!sc) return ['pesado'];
     const out = [];
-    const mago = num(sc.esp) > Math.max(num(sc.fue), num(sc.des)) || (sc.equipo || []).some(i => i && (i.especial || /^foco-/.test(String(i.id || ''))));
-    const tirador = !!sc.armaDeRango;
-    if(!mago && !tirador) out.push('guerrero');
-    if(mago) out.push('mago');
-    if(tirador) out.push('tirador');
-    if((sc.habilidades || []).some(h => h && h.trampaColocar) || (sc.cinturon || []).some(i => i && i.trampaDatos)) out.push('trampero');
+    const caster = num(sc.esp) > Math.max(num(sc.fue), num(sc.des), num(sc.agl)) || (sc.equipo || []).some(i => i && (i.especial || /^foco-/.test(String(i.id || ''))));
+    const rango = !!sc.armaDeRango;
+    if(!caster && !rango) out.push(num(sc.fue) + num(sc.con) >= num(sc.des) + num(sc.agl) ? 'pesado' : 'liviano');
+    if(caster) out.push('caster');
+    if(rango) out.push('rango');
     return out;
   }
-  const arquetiposManual = sc => (Array.isArray(sc && sc.arquetipos) ? sc.arquetipos : []).filter(a => ARQUETIPOS[a]);
+  const arquetiposManual = sc => [...new Set((Array.isArray(sc && sc.arquetipos) ? sc.arquetipos : []).map(a => ARQ_VIEJOS[a] || a).filter(a => ARQUETIPOS[a]))];
   function arquetipos(sc){ const m = arquetiposManual(sc); return m.length ? m : arquetiposAuto(sc); }
   const arquetiposTxt = lista => lista.map(a => ARQUETIPOS[a] || a).join(' + ');
   function dropsResumen(sc){
@@ -707,6 +711,7 @@ const CreepCalculo = (() => {
     dropsFijos(sc).forEach(n => partes.push(`${n} (drop fijo)`));
     if(num(sc.oroBase) > 0) partes.push(`${fmt(num(sc.oroBase))} DDE de oro (±20% al final del combate)`);
     if(Array.isArray(sc.consumibleAzar) && sc.consumibleAzar.length) partes.push(`${sc.consumibleAzar.join(', ')} (consumible al azar, en el cinturón: si lo usa, lo suelta seguro; si no, a veces)`);
+    if(sc.municionAzar) partes.push(`${sc.municionAzar} (munición al azar, en el cinturón: la suelta seguro)`);
     else if(['humano', 'humanoide'].includes(tipoDe(sc))) partes.push(`a veces un consumible, según su arquetipo (${arquetiposTxt(arquetipos(sc))})`);
     return partes.length ? partes.join(' · ') : 'nada';
   }

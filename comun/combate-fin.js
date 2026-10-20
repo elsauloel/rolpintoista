@@ -168,21 +168,16 @@ const CombateFin = (() => {
     for(let i = 0; i < t.length; i++){ if(r < t[i]) return DROP_TIERS[i]; r -= t[i]; }
     return DROP_TIERS[0];
   }
-  /* Las familias de consumibles (2026-10-19) y cuánto pesa cada una según el arquetipo. «otros»: lo que no se reconoce (algo subido por el grupo). */
-  const FAMILIAS = {curacion: 'Curación', fisico: 'Potenciadores físicos', proteccion: 'Protección', sp: 'SP', magico: 'Magia',
-    trampas: 'Trampas', luces: 'Luces y visión', arrojadizos: 'Arrojadizos', especiales: 'Especiales', otros: 'Otros'};
-  const FAMILIA_PESOS = {
-    guerrero: {curacion: 35, fisico: 30, proteccion: 15, trampas: 5, luces: 5, arrojadizos: 5, especiales: 3, otros: 2},
-    mago:     {sp: 30, magico: 30, curacion: 15, proteccion: 10, luces: 5, arrojadizos: 5, especiales: 3, otros: 2},
-    tirador:  {fisico: 30, curacion: 25, luces: 15, arrojadizos: 10, proteccion: 10, trampas: 5, especiales: 3, otros: 2},
-    trampero: {trampas: 45, curacion: 15, arrojadizos: 15, luces: 10, fisico: 10, especiales: 3, otros: 2}};
-  // Los pesos de un creep: el promedio de los de sus arquetipos.
-  function pesosDe(sc){
-    const arq = (typeof K.arquetipos === 'function' ? K.arquetipos(sc) : []).filter(a => FAMILIA_PESOS[a]);
-    const lista = arq.length ? arq : ['guerrero'], p = {};
-    lista.forEach(a => Object.entries(FAMILIA_PESOS[a]).forEach(([f, v]) => { p[f] = (p[f] || 0) + v / lista.length; }));
-    return p;
-  }
+  /* 🎁 Los arquetipos del botín (dueño, 2026-10-20; reemplaza a las familias con pesos del 2026-10-19). Cada consumible va al arquetipo al que
+     más le sirve: choque pesado (Fuerza, Constitución, Daño, Bloqueo, Parry, vida máxima, Res.CC), choque liviano (Destreza, Agilidad, Evasión,
+     crítico), caster (SP, magia, defensa especial, pergaminos de hechizo), rango (Puntería, Rango, arrojadizos); las trampas mecánicas a choque
+     liviano y rango, las mágicas a caster; lo de uso universal (curación, curas, luces, No2, Ankh, Revive…) a los cuatro. Un creep suelta lo de
+     su arquetipo (o sus arquetipos) más lo universal, uno al azar dentro de la calidad. Un ítem puede forzarlo con `arquetiposBotin`. La hoja:
+     docs/botin-arquetipos.md. */
+  const ARQ_PES = new Set(['fue', 'con', 'dmg', 'bloqueo', 'parry', 'hpmax', 'rescc', 'def', 'resfis']);
+  const ARQ_LIV = new Set(['des', 'agl', 'eva', 'ini', 'crit', 'critpot', 'sigilo']);
+  const ARQ_CAS = new Set(['esp', 'pdgmg', 'dmgesp', 'resmg', 'armadmg', 'sp', 'spregen', 'spmax', 'resm']);
+  const ARQ_RAN = new Set(['rng', 'pdgdist', 'percepcion', 'vision']);
   // El ítem completo del catálogo de fábrica (el del botín viene recortado: `itemParaCreep`).
   const completos = new Map();
   function completo(c){
@@ -190,45 +185,42 @@ const CombateFin = (() => {
     if(!completos.has(c.nombre)) completos.set(c.nombre, CATALOGO_BASE.find(i => i.nombre === c.nombre && i.tipoItem === 'consumibles') || null);
     return completos.get(c.nombre) || c;
   }
-  const STATS_FIS = new Set(['fue', 'des', 'con', 'agl', 'pdg', 'dmg', 'def', 'eva', 'parry', 'bloqueo', 'ini', 'crit', 'critpot', 'rng', 'pdgdist',
-    'resmt', 'resfis', 'perfora', 'mov', 'accionesmax', 'nitros', 'hp', 'hpmax', 'percepcion', 'sigilo']);
-  const STATS_MAG = new Set(['esp', 'pdgmg', 'dmgesp', 'resmg', 'armadmg', 'resfuego', 'reshielo', 'resrayo', 'restoxico', 'resacido']);
-  function familiaBotin(c){
+  // → ['pesado' | 'liviano' | 'caster' | 'rango' | 'universal', …]
+  function arquetiposBotin(c){
     const it = completo(c) || {}, n = String(it.nombre || '').toLowerCase();
-    if(it.familiaBotin && FAMILIAS[it.familiaBotin]) return it.familiaBotin;
-    const mods = [...(it.efectoMods || []), ...(it.mods || [])].map(m => m && m.stat);
-    if(it.trampaDatos) return 'trampas';
-    if(it.revive || it.rerollMoneda || /ankh|polilla/.test(n)) return 'especiales';
-    if(it.zonaUso || it.aceleradorMapa) return 'arrojadizos';
-    if(mods.some(s => s === 'luz' || s === 'veoculto' || s === 'vision')
-      || /vela|farol|antorcha|bengala|lámpara|cohete|faro|destello|esfera de luz|luz de la verdad|ojo de gato|colirio/.test(n)) return 'luces';
-    if(it.curaspPct || /\bsp\b|reserva/.test(n) || mods.some(s => s === 'sp' || s === 'spregen' || s === 'spmax')) return 'sp';
-    if(num(it.curahp) > 0 || it.curaEstados || it.efectoHpTurno || /regenera|curaci|vendas|antídoto|sifón|\bcura\b/.test(n)) return 'curacion';
-    if(/blindaje|fortuna|coagula|espinas|espejo|hypeado|inmunidad|sangre pura|voluntad|invulnera/.test(n)) return 'proteccion';
-    if(mods.some(s => STATS_MAG.has(s)) || /arcan|especial/.test(n)) return 'magico';
-    if(/óleo|oleo/.test(n) || mods.some(s => STATS_FIS.has(s))) return 'fisico';   // también los pergaminos de bonos físicos (dueño, 2026-10-19)
-    if(/pergamino/.test(n)) return 'magico';   // los pergaminos de hechizos (luz cegadora, red, sombras…)
-    return 'otros';
+    if(Array.isArray(it.arquetiposBotin) && it.arquetiposBotin.length) return it.arquetiposBotin.slice();
+    const mods = new Set([...(it.efectoMods || []), ...(it.mods || [])].map(m => m && m.stat));
+    const hay = set => [...mods].some(x => set.has(x));
+    if(it.trampaDatos) return it.trampaDatos.detectarStat === 'dmgesp' ? ['caster'] : ['liviano', 'rango'];
+    if(it.revive || it.rerollMoneda || /ankh|polilla|f[eé]nix|segundo aire|velo eterno|f[eé]lix|invulnera|inmunidad a cc|coagula|sangre pura|buena fortuna|escudo especial/.test(n)) return ['universal'];
+    if(num(it.curahp) > 0 || it.curaEstados || it.efectoHpTurno || /regenera|vendas|antídoto|sifón|cura plus/.test(n)) return ['universal'];
+    if(it.zonaUso || it.aceleradorMapa) return /humo/.test(n) ? ['liviano'] : ['rango'];
+    if(mods.has('luz') || mods.has('veoculto') || /vela|farol|antorcha|bengala|lámpara|cohete|faro|destello|esfera de luz|luz de la verdad|ojo de gato|colirio|revelaci/.test(n)) return ['universal'];
+    if(it.curaspPct || /\bsp\b|reserva/.test(n)) return ['caster'];
+    if(mods.has('nitros')) return ['universal'];
+    if(/piedra eterna/.test(n)) return ['pesado'];
+    if(/piel de cristal|espejo|escudo arcano|clarividencia|foco arcano|furia arcana/.test(n) || hay(ARQ_CAS)) return ['caster'];
+    if(/pergamino de (luz cegadora|ojo de kicillof|red nerubian|sombras|tentáculo|ventriloquía)/.test(n)) return ['caster'];
+    if(/óleo venenoso/.test(n)) return ['liviano'];
+    if(/óleo reparador|cuero duro|aguante|espinas|blindaje|grapa|sangre de drag/.test(n)) return ['pesado'];
+    if(mods.has('pdg')) return ['pesado', 'liviano', 'rango'];
+    const out = [];
+    if(hay(ARQ_PES)) out.push('pesado');
+    if(hay(ARQ_LIV)) out.push('liviano');
+    if(hay(ARQ_RAN)) out.push('rango');
+    return out.length ? out : ['universal'];   // (lo que no se reconoce: para todos)
   }
-  // De qué familias hay consumibles en ese tier, con su peso para este creep. → [{fam, peso, pool}]
-  function familiasDelTier(cons, tier, pesos){
-    const por = {};
-    cons.filter(c => (c.tier || 'Común') === tier).forEach(c => { const f = familiaBotin(c); (por[f] = por[f] || []).push(c); });
-    return Object.entries(por).map(([fam, pool]) => ({fam, peso: pesos ? (pesos[fam] || 0) : 1, pool}));
-  }
-  // El consumible de ese tier: primero la familia (por los pesos), después uno de esa familia. Si en ese tier no hay ninguno, el tier más
-  // cercano (primero para abajo). Sin pesos (la munición), uno cualquiera.
-  function dropElegir(cat, tier, pesos){
-    const cons = cat.filter(i => i.tipoItem === 'consumibles');
+  const arqsDe = sc => (typeof K.arquetipos === 'function' ? K.arquetipos(sc) : []);
+  const sirveA = (c, arqs) => { const a = arquetiposBotin(c); return a.includes('universal') || a.some(x => arqs.includes(x)); };
+  // El consumible de ese tier, al azar, entre los de los arquetipos del creep (`arqs`) y los universales. Si en ese tier no hay ninguno, el tier
+  // más cercano (primero para abajo). Sin `arqs` (la munición), uno cualquiera.
+  function dropElegir(cat, tier, arqs){
+    const cons = cat.filter(i => i.tipoItem === 'consumibles' && (!arqs || sirveA(i, arqs)));
     const k = DROP_TIERS.indexOf(tier);
     const orden = [k, ...DROP_TIERS.map((_, i) => i).filter(i => i !== k).sort((a, b) => (Math.abs(a - k) - Math.abs(b - k)) || (a - b))];
     for(const i of orden){
-      const fams = familiasDelTier(cons, DROP_TIERS[i], pesos);
-      if(!fams.length) continue;
-      const conPeso = fams.filter(f => f.peso > 0), lista = conPeso.length ? conPeso : fams.map(f => ({...f, peso: 1}));
-      let r = Math.random() * lista.reduce((a, f) => a + f.peso, 0), elegida = lista[lista.length - 1];
-      for(const f of lista){ if(r < f.peso){ elegida = f; break; } r -= f.peso; }
-      return elegida.pool[Math.floor(Math.random() * elegida.pool.length)];
+      const pool = cons.filter(c => (c.tier || 'Común') === DROP_TIERS[i]);
+      if(pool.length) return pool[Math.floor(Math.random() * pool.length)];
     }
     return null;
   }
@@ -261,13 +253,25 @@ const CombateFin = (() => {
      jefe, el primero seguro y el segundo con la chance de su tipo). Reemplaza al sorteo al morir. Las bestias y demás, ninguno. */
   const cuantosAlAzar = sc => !(dropChance(sc) > 0) ? 0 : sc.jefe ? 2 : 1;
   function consumibleAlAzar(sc, cat){
-    const c = dropElegir(poolGeneral(cat), dropTier(num(sc.nivel) + (sc.jefe ? 1 : 0)), pesosDe(sc));
+    const c = dropElegir(poolGeneral(cat), dropTier(num(sc.nivel) + (sc.jefe ? 1 : 0)), arqsDe(sc));
     return c ? plantillaConsumible(c) : null;
   }
   // Le da (o le cambia) sus consumibles al azar: saca los anteriores del cinturón y pone los nuevos. → {nombres, avisos}
   function darConsumiblesAlAzar(sc, cat){
     sc.cinturon = (sc.cinturon || []).filter(x => !(x && x.azar));
     const nombres = [], avisos = [];
+    // 🏹 (dueño, 2026-10-20) el que tiene un arco o una ballesta equipada nace con una flecha o un virote especial al azar para usar; lo suelta seguro.
+    const m = municionDeCreep(sc);
+    delete sc.municionAzar;
+    if(m){
+      const f = dropElegir(poolMunicion(cat, m), dropTier(num(sc.nivel) + (sc.jefe ? 1 : 0)));
+      if(f){
+        const t = plantillaConsumible(f);
+        sc.municionAzar = t.nombre;
+        const r = typeof CreepAcciones !== 'undefined' ? CreepAcciones.alCinturon(sc, {...t, azar: true}, 1) : null;
+        if(r && r.error) avisos.push(r.error);
+      }
+    }
     for(let i = 0; i < cuantosAlAzar(sc); i++){
       const t = consumibleAlAzar(sc, cat);
       if(!t) continue;
@@ -276,11 +280,11 @@ const CombateFin = (() => {
       if(r && r.error) avisos.push(r.error);
     }
     if(nombres.length) sc.consumibleAzar = nombres; else delete sc.consumibleAzar;
-    return {nombres, avisos};
+    return {nombres: [...nombres, ...(sc.municionAzar ? [sc.municionAzar] : [])], avisos};
   }
   function quitarConsumiblesAlAzar(sc){
     sc.cinturon = (sc.cinturon || []).filter(x => !(x && x.azar));
-    delete sc.consumibleAzar;
+    delete sc.consumibleAzar; delete sc.municionAzar;
   }
   function dropDeCreep(rep, cat, sc){
     rep.drops = rep.drops || {};
@@ -296,10 +300,11 @@ const CombateFin = (() => {
         });
       }
       else [dropChance(sc), dropSegundo(sc)].forEach(p => {
-        if(p > 0 && Math.random() < p){ const c = dropElegir(poolGeneral(cat), dropTier(nivel), pesosDe(sc)); if(c) nombres.push(c.nombre); }
+        if(p > 0 && Math.random() < p){ const c = dropElegir(poolGeneral(cat), dropTier(nivel), arqsDe(sc)); if(c) nombres.push(c.nombre); }
       });
       const m = municionDeCreep(sc);
-      if(m){ const f = dropElegir(poolMunicion(cat, m), dropTier(nivel)); if(f) nombres.push(f.nombre); }   // 🏹 siempre una flecha o un virote especial
+      if(sc.municionAzar) nombres.push(sc.municionAzar);   // 🏹 la que lleva desde que lo crearon: seguro (2026-10-20)
+      else if(m){ const f = dropElegir(poolMunicion(cat, m), dropTier(nivel)); if(f) nombres.push(f.nombre); }   // 🏹 (un creep viejo) una al azar
       rep.drops[sc.id] = nombres;
     }
     const lista = [].concat(rep.drops[sc.id] || []).filter(Boolean);   // (uno viejo guardaba un solo nombre)
@@ -317,7 +322,7 @@ const CombateFin = (() => {
     if(!(idx >= 0 && idx < lista.length)) return false;
     const actual = cat.find(x => x.nombre === lista[idx] && x.tipoItem === 'consumibles');
     const nivel = num(sc.nivel) + (sc.jefe ? 1 : 0);
-    const c = esMunicion(actual) ? dropElegir(poolMunicion(cat, actual.flecha.virote ? 'virote' : 'flecha'), dropTier(nivel)) : dropElegir(poolGeneral(cat), dropTier(nivel), pesosDe(sc));
+    const c = esMunicion(actual) ? dropElegir(poolMunicion(cat, actual.flecha.virote ? 'virote' : 'flecha'), dropTier(nivel)) : dropElegir(poolGeneral(cat), dropTier(nivel), arqsDe(sc));
     if(!c) return false;
     lista[idx] = c.nombre;
     rep.drops[sc.id] = lista;
@@ -666,16 +671,14 @@ const CombateFin = (() => {
     const tabla = dropTabla(num(sc.nivel) + (sc.jefe ? 1 : 0));
     const cons = cat.filter(i => i.tipoItem === 'consumibles' && num(i.precioCompra) > 0);
     const prom = pool => pool.reduce((a, c) => a + num(c.precioCompra), 0) / pool.length;
-    // Lo que vale en promedio un consumible de esa lista: por tier y, adentro, por familia con los pesos (como `dropElegir`; sin el tier más cercano).
-    const promedio = (lista, pesos) => { let compra = 0; DROP_TIERS.forEach((t, i) => {
-      const fams = familiasDelTier(lista, t, pesos);
-      if(!fams.length) return;
-      const conPeso = fams.filter(f => f.peso > 0), l = conPeso.length ? conPeso : fams.map(f => ({...f, peso: 1})), tot = l.reduce((a, f) => a + f.peso, 0);
-      compra += tabla[i] / 100 * l.reduce((a, f) => a + f.peso / tot * prom(f.pool), 0);
+    // Lo que vale en promedio un consumible de esa lista para este creep: por tier (como `dropElegir`; sin el tier más cercano).
+    const promedio = (lista, arqs) => { let compra = 0; DROP_TIERS.forEach((t, i) => {
+      const pool = lista.filter(c => (c.tier || 'Común') === t && (!arqs || sirveA(c, arqs)));
+      if(pool.length) compra += tabla[i] / 100 * prom(pool);
     }); return compra; };
     const fijos = Array.isArray(sc.consumibleAzar) ? sc.consumibleAzar.map(n => cons.find(c => c.nombre === n)).filter(Boolean) : null;   // 🎲 el suyo
     const chances = [dropChance(sc), dropSegundo(sc)];   // (sin saber si lo va a usar: con la chance de cuando no lo usa)
-    const compra = (fijos ? fijos.reduce((a, c, i) => a + (chances[i] ?? dropBase(sc)) * num(c.precioCompra), 0) : chance * promedio(poolGeneral(cons), pesosDe(sc))) + (m ? promedio(poolMunicion(cons, m)) : 0);
+    const compra = (fijos ? fijos.reduce((a, c, i) => a + (chances[i] ?? dropBase(sc)) * num(c.precioCompra), 0) : chance * promedio(poolGeneral(cons), arqsDe(sc))) + (m ? (sc.municionAzar && cons.find(c => c.nombre === sc.municionAzar) ? num(cons.find(c => c.nombre === sc.municionAzar).precioCompra) : promedio(poolMunicion(cons, m))) : 0);
     return {chance, venta: Math.round(compra / 2)};
   }
   function estimar(creeps, cat){
@@ -750,7 +753,7 @@ const CombateFin = (() => {
     return {total, cada, n: inc.length};
   }
 
-  return {venderBaul, itemsDeCreep, dropReroll, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, municionDeCreep, cuantosAlAzar, consumibleAlAzar, darConsumiblesAlAzar, quitarConsumiblesAlAzar, DROP_TABLA, FAMILIAS, FAMILIA_PESOS, familiaBotin, pesosDe, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
+  return {venderBaul, itemsDeCreep, dropReroll, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, municionDeCreep, cuantosAlAzar, consumibleAlAzar, darConsumiblesAlAzar, quitarConsumiblesAlAzar, DROP_TABLA, arquetiposBotin, arqsDe, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
     plantillaArmaCreep, plantillaEquipoCreep, plantillaTrofeo, itemsDeCreep, itemsExtra, generar, estadoDeFicha, jugadores, calcularReparto,
     itemsPublicables, vista, cambio, clic, lineaVerde, publicar, nuevoBotin, jugadoresBotin, botinVista, botinCambio, botinItem, despojar};
 })();

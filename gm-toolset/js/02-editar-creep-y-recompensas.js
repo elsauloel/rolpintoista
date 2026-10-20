@@ -145,12 +145,12 @@ function recompensasHtml(sc){
           `<label style="display:flex;gap:5px;align-items:center;text-transform:none;letter-spacing:0"><input type="checkbox" data-rec="arquetipo" data-arq="${k}" data-id="${sc.id}"${act.includes(k) ? ' checked' : ''}><span style="white-space:nowrap">${t}</span></label>`).join('')}</div>
         ${manual ? `<button type="button" class="addhab" data-arq-auto="${sc.id}" style="margin:4px 0 0">Volver al automático (${esc(CreepCalculo.arquetiposTxt(auto))})</button>` : ''}
       </div>`; })() : ''}
-    ${CombateFin.cuantosAlAzar(sc) > 0 || (sc.consumibleAzar || []).length ? `<div class="mini-f" style="margin-top:8px"><label>🎲 Consumible al azar: lo lleva en el cinturón; si lo usa en el combate lo suelta seguro, si no, con la chance de su tipo</label>
+    ${CombateFin.cuantosAlAzar(sc) > 0 || CombateFin.municionDeCreep(sc) || (sc.consumibleAzar || []).length || sc.municionAzar ? `<div class="mini-f" style="margin-top:8px"><label>🎲 Consumible al azar: lo lleva en el cinturón; si lo usa en el combate lo suelta seguro, si no, con la chance de su tipo${CombateFin.municionDeCreep(sc) ? ` · y una ${CombateFin.municionDeCreep(sc) === 'virote' ? 'virote' : 'flecha'} especial, que suelta seguro` : ''}</label>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px">
-        <b>${(sc.consumibleAzar || []).length ? sc.consumibleAzar.map(n => { const c = CATALOGO_BASE.find(i => i.nombre === n && i.tipoItem === 'consumibles');   // qué hace, al pasar el mouse
+        <b>${[...(sc.consumibleAzar || []), ...(sc.municionAzar ? [sc.municionAzar] : [])].length ? [...(sc.consumibleAzar || []), ...(sc.municionAzar ? [sc.municionAzar] : [])].map(n => { const c = CATALOGO_BASE.find(i => i.nombre === n && i.tipoItem === 'consumibles');   // qué hace, al pasar el mouse
           return c && c.detalle ? `<span title="${esc(c.detalle)}" style="text-decoration:underline dotted;cursor:help">${esc(n)}</span>` : esc(n); }).join(', ') : 'ninguno'}</b>
-        ${CombateFin.cuantosAlAzar(sc) > 0 ? `<button type="button" class="addhab" data-azar-otro="${sc.id}" style="margin:0">🎲 ${(sc.consumibleAzar || []).length ? 'Otro' : 'Darle uno'}</button>` : ''}
-        ${(sc.consumibleAzar || []).length ? `<button type="button" class="addhab" data-azar-quitar="${sc.id}" style="margin:0">✕ Sacar</button>` : ''}
+        ${CombateFin.cuantosAlAzar(sc) > 0 || CombateFin.municionDeCreep(sc) ? `<button type="button" class="addhab" data-azar-otro="${sc.id}" style="margin:0">🎲 ${(sc.consumibleAzar || []).length || sc.municionAzar ? 'Otro' : 'Darle uno'}</button>` : ''}
+        ${(sc.consumibleAzar || []).length || sc.municionAzar ? `<button type="button" class="addhab" data-azar-quitar="${sc.id}" style="margin:0">✕ Sacar</button>` : ''}
       </div></div>` : ''}
     <div class="hint" style="margin-top:6px"><b>Al morir suelta:</b> ${esc(dropsResumenCreep(sc))}</div>`;
 }
@@ -271,7 +271,7 @@ function abrirAsistenteCreep(scId){
       const sc = creepAsist();
       if(sc){
         delete sc._creando;
-        const n = !sc.consumibleAzar && CombateFin.cuantosAlAzar(sc) > 0 ? consumibleAzarCreep(sc) : [];   // 🎲 nace con su consumible al azar
+        const n = !sc.consumibleAzar && !sc.municionAzar && (CombateFin.cuantosAlAzar(sc) > 0 || CombateFin.municionDeCreep(sc)) ? consumibleAzarCreep(sc) : [];   // 🎲 nace con su consumible al azar
         toast(`${nombreLimpioCreep(sc)} creado${n.length ? ` · 🎲 ${n.join(', ')} en el cinturón` : ''}`);
       }
       terminarAsistCreep(); if(sc) ofrecerTokenEnMapa(sc);

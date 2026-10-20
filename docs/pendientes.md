@@ -144,6 +144,13 @@
 >   dueño: el que usa arco o ballesta tiene chances de dejar **flechas y virotes especiales**; el que hace magia, más chances de **pergaminos y
 >   pociones de SP**; los guerreros, más chances de **pociones de curación y cosas de Fuerza**. A pensar cuando toque: cómo se reconoce el arquetipo
 >   de un creep (sus armas, sus habilidades, una etiqueta), qué grupos hay, cuánto pesa la chance y dónde entra en el botín de hoy.
+>   **En curso (2026-10-19).** Hecho: **la munición la decide el arma** (dueño: «el mapa debería identificar que el creep está usando esas
+>   armas»): arco → siempre una flecha especial, ballesta → siempre un virote (`CombateFin.municionDeCreep`); flechas y virotes salieron del
+>   consumible al azar. De paso se arregló que la flecha segura de los arqueros nunca salía (`itemParaCreep` perdía la marca `flecha`).
+>   Propuesto, falta decidir: sortear primero la **familia** (curación, SP, potenciadores, trampas, luces, arrojadizos, especiales) con pesos según
+>   el **arquetipo**, que el mapa deduce de los datos (coloca trampas → trampero; Especial más alto que Fuerza y Destreza → mago; si no, guerrero) y
+>   el GM corrige con una etiqueta (quizás dos arquetipos por creep). Preguntas abiertas: bestias y demás (¿siguen con el 15 % o solo trofeo?), la
+>   calidad en niveles bajos (nivel 1: 15 % Rara o mejor, 3 % Excepcional) y si la Cuerda (por metro) sale del botín.
 > - [x] **🧮 La calculadora cobra barato el daño fijo de las ballestas (2026-10-11; revisado 2026-10-19)**: una ballesta Común con solo daño, según la calculadora,
 >   puede llegar a 1d6+6 o 2d6+4; según el simulador de balance (`balance_combate.py --ballesta`, Shooter contra el blanco medio) el techo de la
 >   banda Común (74–106 %) es **1d6+3** (95 %; 1d6+4 = 114 %, 2d6 = 110 %). Ajustarla mueve el precio y la calidad de todas las ballestas: revisarlo

@@ -640,7 +640,8 @@ const CreepCalculo = (() => {
     if(arma) Object.assign(o, Combatiente.rasgosDeItem(it));   // los rasgos del arma (por la espalda, ignora, sin Parry, firmas…)
     if(arma && (it.efectosGolpe || []).length) o.efectosGolpe = structuredClone(it.efectosGolpe);
     Object.assign(o, magiaDeItem(it));   // ✨ arma especial / 🔮 orbe: viaja tal cual (si la saquean, vuelve a costar SP)
-    if(it.tipoItem === 'consumibles'){ o.consumible = true; if(it.curahp) o.curahp = it.curahp; if(it.legacy) o.legacy = true; }
+    if(it.tipoItem === 'consumibles'){ o.consumible = true; if(it.curahp) o.curahp = it.curahp; if(it.legacy) o.legacy = true;
+      if(it.flecha) o.flecha = structuredClone(it.flecha); }   // la munición (2026-10-19): el botín la reconoce (flechas para el arco, virotes para la ballesta)
     const otros = (it.mods || []).filter(m => m.stat !== 'def');
     if(otros.length) o.mods = structuredClone(otros);
     o.detalle = it.detalle || '';

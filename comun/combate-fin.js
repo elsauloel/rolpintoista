@@ -182,16 +182,30 @@ const CombateFin = (() => {
     delete t.id; delete t.imagen; delete t._bib; delete t.equipado;
     return {...t, tipoItem: 'consumibles', consumible: true, unidades: 1, precioCompra: num(t.precioCompra), estimado: false};
   }
-  // 🏹 Todo creep que pelea con arco deja SIEMPRE una flecha especial (dueño, 2026-10-09), del tier que le toque por su nivel.
-  const peleaConArco = sc => !!(sc && sc.armaDeRango && (Combatiente.esArco(Combatiente.armaDeCombatiente(sc)) || /\barco\b/i.test(String(sc.armaNombre || ''))));
+  /* 🏹 La munición la decide el arma (dueño, 2026-10-19: «para definir si dropean flechas o virotes especiales, el mapa debería identificar que
+     el creep está usando esas armas»): el que pelea con arco deja SIEMPRE una flecha especial (2026-10-09) y el que pelea con ballesta, un virote,
+     del tier que le toque por su nivel. Flechas y virotes ya no salen en el consumible al azar: solo los sueltan los que los usan.
+     El arma se reconoce como en el duelo (`Combatiente.municionDe`: arco → flecha, Recarga → virote); los creeps de fábrica no traen esos datos,
+     así que también vale el nombre del arma («Arco…», «Ballesta…»). */
+  function municionDeCreep(sc){
+    if(!sc || !sc.armaDeRango) return '';
+    const m = Combatiente.municionDe(Combatiente.armaDeCombatiente(sc));
+    if(m) return m;
+    const n = String(sc.armaNombre || '');
+    return /\bballesta\b/i.test(n) ? 'virote' : /\barco\b/i.test(n) ? 'flecha' : '';
+  }
+  const esMunicion = i => !!(i && i.flecha);
+  const poolMunicion = (cat, m) => cat.filter(i => esMunicion(i) && (m === 'virote') === !!i.flecha.virote);
+  const poolGeneral = cat => cat.filter(i => !esMunicion(i));
   function dropDeCreep(rep, cat, sc){
     rep.drops = rep.drops || {};
     if(rep.drops[sc.id] === undefined){
       const nombres = [], nivel = num(sc.nivel) + (sc.jefe ? 1 : 0);
       [dropChance(sc), dropSegundo(sc)].forEach(p => {
-        if(p > 0 && Math.random() < p){ const c = dropElegir(cat, dropTier(nivel)); if(c) nombres.push(c.nombre); }
+        if(p > 0 && Math.random() < p){ const c = dropElegir(poolGeneral(cat), dropTier(nivel)); if(c) nombres.push(c.nombre); }
       });
-      if(peleaConArco(sc)){ const f = dropElegir(cat.filter(i => i.flecha), dropTier(nivel)); if(f) nombres.push(f.nombre); }   // 🏹 siempre una flecha especial
+      const m = municionDeCreep(sc);
+      if(m){ const f = dropElegir(poolMunicion(cat, m), dropTier(nivel)); if(f) nombres.push(f.nombre); }   // 🏹 siempre una flecha o un virote especial
       rep.drops[sc.id] = nombres;
     }
     const lista = [].concat(rep.drops[sc.id] || []).filter(Boolean);   // (uno viejo guardaba un solo nombre)
@@ -203,13 +217,13 @@ const CombateFin = (() => {
     }).filter(Boolean);
   }
   /* 🎲 Volver a tirar un consumible soltado al azar (2026-10-14, dueño: «que el master pueda rerrollearlo antes de publicarlo»): otro del
-     tier que salga ahora (una flecha, entre las flechas). Cambia `rep.drops`, así que reabrir el reporte muestra el nuevo. → true si cambió. */
+     tier que salga ahora (una flecha, entre las flechas; un virote, entre los virotes). Cambia `rep.drops`, así que reabrir el reporte muestra el nuevo. → true si cambió. */
   function dropReroll(rep, cat, sc, idx){
     const lista = [].concat((rep.drops || {})[sc.id] || []);
     if(!(idx >= 0 && idx < lista.length)) return false;
     const actual = cat.find(x => x.nombre === lista[idx] && x.tipoItem === 'consumibles');
     const nivel = num(sc.nivel) + (sc.jefe ? 1 : 0);
-    const c = dropElegir(actual && actual.flecha ? cat.filter(i => i.flecha) : cat, dropTier(nivel));
+    const c = dropElegir(esMunicion(actual) ? poolMunicion(cat, actual.flecha.virote ? 'virote' : 'flecha') : poolGeneral(cat), dropTier(nivel));
     if(!c) return false;
     lista[idx] = c.nombre;
     rep.drops[sc.id] = lista;
@@ -553,15 +567,16 @@ const CombateFin = (() => {
   const ventaDe = p => Math.round(num(p) / 2 * 100) / 100;
   function dropEsperado(cat, sc){
     const chance = dropChance(sc) + dropSegundo(sc);   // cuántos suelta en promedio
-    if(!chance) return {chance: 0, venta: 0};
+    const m = municionDeCreep(sc);   // + la flecha o el virote seguro del que la usa
+    if(!chance && !m) return {chance: 0, venta: 0};
     const tabla = dropTabla(num(sc.nivel) + (sc.jefe ? 1 : 0));
     const cons = cat.filter(i => i.tipoItem === 'consumibles' && num(i.precioCompra) > 0);
-    let compra = 0;
-    DROP_TIERS.forEach((t, i) => {
-      const pool = cons.filter(c => (c.tier || 'Común') === t);
+    const promedio = lista => { let compra = 0; DROP_TIERS.forEach((t, i) => {
+      const pool = lista.filter(c => (c.tier || 'Común') === t);
       if(pool.length) compra += tabla[i] / 100 * pool.reduce((a, c) => a + num(c.precioCompra), 0) / pool.length;
-    });
-    return {chance, venta: Math.round(chance * compra / 2)};
+    }); return compra; };
+    const compra = chance * promedio(poolGeneral(cons)) + (m ? promedio(poolMunicion(cons, m)) : 0);
+    return {chance, venta: Math.round(compra / 2)};
   }
   function estimar(creeps, cat){
     const filas = (creeps || []).filter(sc => !sc.recompensado).map(sc => {
@@ -635,7 +650,7 @@ const CombateFin = (() => {
     return {total, cada, n: inc.length};
   }
 
-  return {venderBaul, itemsDeCreep, dropReroll, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
+  return {venderBaul, itemsDeCreep, dropReroll, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, municionDeCreep, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
     plantillaArmaCreep, plantillaEquipoCreep, plantillaTrofeo, itemsDeCreep, itemsExtra, generar, estadoDeFicha, jugadores, calcularReparto,
     itemsPublicables, vista, cambio, clic, lineaVerde, publicar, nuevoBotin, jugadoresBotin, botinVista, botinCambio, botinItem, despojar};
 })();

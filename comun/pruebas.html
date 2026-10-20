@@ -2052,6 +2052,24 @@ prueba('recompensas de un creep: oro sugerido por tipo y nivel (jefe ×2), trofe
     CreepCalculo.trofeo(humano), CreepCalculo.dropsResumen(creepPrueba({oroBase: 10, equipo: [{nombre: 'Yelmo'}]})), CreepCalculo.tipoDe(creepPrueba({tipoCriatura: 'otros', tipoCriaturaOtro: ' Gólem '}))],
     [40, 40, 0, 'Colmillos de Lobo', 50, 13, null, 'Hacha (arma equipable) · Yelmo (equipo) · 10 DDE de oro (±20% al final del combate)', 'gólem']);
 });
+prueba('🏹 la munición la decide el arma (2026-10-19): arco → una flecha, ballesta → un virote; el consumible al azar no trae munición', () => {
+  const cat = CATALOGO_BASE.filter(i => i.tipoItem && !i.archivo).map(CreepCalculo.itemParaCreep);
+  const arquero = {id: 'a', tipoCriatura: 'humano', nivel: 3, armaDeRango: true, armaNombre: 'Arco corto'};
+  const ballestero = {id: 'b', tipoCriatura: 'humano', nivel: 3, armaDeRango: true, armaNombre: 'Ballesta pesada'};
+  const espada = {id: 'c', tipoCriatura: 'humano', nivel: 3, armaNombre: 'Espada corta'};
+  const orig = Math.random; let res = [];
+  try{
+    for(let k = 0; k < 40; k++){
+      Math.random = (() => { let x = (k * 0.618) % 1; return () => (x = (x + 0.37) % 1); })();
+      const a = CombateFin.dropDeCreep(CombateFin.nuevo(), cat, arquero), b = CombateFin.dropDeCreep(CombateFin.nuevo(), cat, ballestero), c = CombateFin.dropDeCreep(CombateFin.nuevo(), cat, espada);
+      const fl = x => x.template.flecha;
+      res.push([a.filter(fl).length === 1 && a.filter(fl).every(x => !x.template.flecha.virote), b.filter(fl).length === 1 && b.filter(fl).every(x => x.template.flecha.virote), c.filter(fl).length === 0]);
+    }
+  }finally{ Math.random = orig; }
+  igual([CombateFin.municionDeCreep(arquero), CombateFin.municionDeCreep(ballestero), CombateFin.municionDeCreep(espada), CombateFin.municionDeCreep({armaNombre: 'Arco largo'}),
+    res.every(r => r[0]), res.every(r => r[1]), res.every(r => r[2]), CombateFin.dropEsperado(cat, {tipoCriatura: 'bestia', nivel: 1, armaDeRango: true, armaNombre: 'Ballesta'}).venta > 0],
+    ['flecha', 'virote', '', '', true, true, true, true]);
+});
 prueba('drop de consumibles (comun/combate-fin.js, P181): humano 60 %, humanoide 45 %, el resto 15 %; un jefe, uno seguro + chance de otro y +1 nivel; mejores tiers con el nivel; se tira una vez', () => {
   const ch = t => CombateFin.dropChance({tipoCriatura: t});
   const t1 = CombateFin.dropTabla(1), t5 = CombateFin.dropTabla(5), t9 = CombateFin.dropTabla(9);

@@ -1626,3 +1626,7 @@ versión parecida en más de una, es candidato a juntar.
   (`Combatiente.conGauchito`: `FichaAcciones.tirarValorStat` agrega un Afortunado a la primera tirada de PdG, PdG.Esp, Evasión o Parry; marca
   `S.ataquesArma._gauchito`). `afortunado()` acepta `afortunadoStats` en el estado.
 
+- **🏹 La munición del botín la decide el arma** (2026-10-19, dueño): `CombateFin.municionDeCreep(sc)` → 'flecha' | 'virote' | '' (`Combatiente.municionDe`
+  del arma, o el nombre «Arco…» / «Ballesta…» en los creeps de fábrica, que no traen esos datos). El que la usa suelta siempre una del tier de su nivel;
+  el consumible al azar ya no trae munición (`poolGeneral`); el 🎲 vuelve a tirar dentro de su tipo. `CreepCalculo.itemParaCreep` conserva `flecha`
+  (antes la perdía, y la flecha segura de los arqueros nunca salía).

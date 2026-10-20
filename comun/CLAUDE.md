@@ -1663,5 +1663,5 @@ versión parecida en más de una, es candidato a juntar.
   `habValor` de FichaDuelo, CreepDuelo e InvDuelo. Todo «Cegado» entra como la Ceguera (`comoCeguera`, dentro de `agregarEstado`).
 - **👁 Un consumible que invoca por un rato** (2026-10-20, el Ojo de Kicillof): `it.invocaTemporal = {id, nombre, turnos, mov, vision, color, imagen}` →
   `FichaAcciones` (invocarTemporal) crea o despierta esa invocación (siempre la misma `id`) con `ojo` (visión en flor para todos lados), `veoculto`,
-  `etereo` (se ve, pero no es objetivo de nada ni pisa trampas o zonas: el mapa, `etereoDe`, js/03) y `sinMareo`; el mapa pide dónde aparece
+  `etereo` (se ve, pero no es objetivo de nada, no pisa trampas o zonas y atraviesa todo, también las paredes: el mapa, `etereoDe`, js/03 y js/06) y `sinMareo`; el mapa pide dónde aparece
   (`ui.invocar` → `invocacionDeHabilidad`). Su `miniatura` viaja en el resumen público.

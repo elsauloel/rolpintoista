@@ -647,13 +647,6 @@ async function guardarElemento(tipo, origen, celdasSet){
 }
 // Si algún elemento sólido (Formas) ocupa esa casilla — cualquiera,
 // invisible o no: lo invisible solo cambia quién lo VE, no si bloquea.
-// 👁 Lo que frena a un etéreo (2026-10-20, dueño: «no colisiona con nada, ni con personajes, ni con objetos sólidos; paredes, sí o no, lo define la
-// mesa»): solo las paredes del mapa (la Colisión del mapa y las figuras cerradas con pared); las de línea las mira paredCorta. Los Sólidos, no.
-function muroEn(col, fila){
-  if(typeof celdaEnFiguraSolida === 'function' && celdaEnFiguraSolida(col, fila)) return true;
-  for(const el of elementos.values()) if(el.solido && el.colision && celdasDeElemento(el).some(c => c.col === col && c.fila === fila)) return true;
-  return false;
-}
 function elementoSolidoEn(col, fila){
   if(typeof celdaEnFiguraSolida === 'function' && celdaEnFiguraSolida(col, fila)) return true;   // ⭕ adentro de una figura cerrada con colisión (js/34)
   for(const el of elementos.values()){

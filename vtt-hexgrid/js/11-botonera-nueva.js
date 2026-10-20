@@ -111,7 +111,7 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261012zy', '../comun/ficha-botin.js?v=20261008zz4', '../comun/generador-tiendas.js?v=20261018zm', '../comun/filtro-catalogo.js?v=20261009r', '../comun/ficha-tienda.js?v=20261010g', '../comun/ficha-mantenimiento.js?v=20261020n', '../comun/ficha-calculo.js?v=20261019k', '../comun/ficha-combate.js?v=20261015d', '../comun/skills-clase.js?v=20261020zr', '../comun/ficha-habilidades.js?v=20261020q',
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261012zy', '../comun/ficha-botin.js?v=20261008zz4', '../comun/generador-tiendas.js?v=20261018zm', '../comun/filtro-catalogo.js?v=20261009r', '../comun/ficha-tienda.js?v=20261010g', '../comun/ficha-mantenimiento.js?v=20261020n', '../comun/ficha-calculo.js?v=20261019k', '../comun/ficha-combate.js?v=20261015d', '../comun/skills-clase.js?v=20261020zw', '../comun/ficha-habilidades.js?v=20261020q',
   '../comun/catalogo.js?v=20261020zr', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261016c', '../comun/ficha-sesion.js?v=20261020zu', '../comun/ficha-botonera.js?v=20261020zb', '../comun/ficha-resumen.js?v=20261020zl', '../comun/inv-calculo.js?v=20261020b', '../comun/inv-botonera.js?v=20261020zb', '../comun/inv-acciones.js?v=20261019l', '../comun/inv-duelo.js?v=20261020zd', '../comun/ficha-acciones.js?v=20261020zt', '../comun/inv-habilidades.js?v=20261014f', '../comun/inv-lupa.js?v=20261015a',
   '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261020zv', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261014e'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
@@ -562,7 +562,9 @@ const BN_ACCIONES = {
     tirarExtra: it => FichaAcciones.tiradasDeItem(S, it).forEach(t => { if(t.error) toast(t.error); else bnPublicar(t.origen, t.r); }),
     colocarTrampa: it => it.trampaDatos && it.trampaDatos.portal && it.trampaDatos.portal.colocador
       ? (bn.host.hidden = true, colocarGlifo({fichaId: bn.fichaId, tipoToken: 'pj', nombre: it.nombre, trampa: it.trampaDatos, item: FichaAcciones.itemDeTrampa(it)}))   // 🌀 el glifo: dos clics
-      : FichaAcciones.colocarTrampaDeItem(bn.fichaId, it, ui),   // la trampa consumible, junto al token
+      : (bn.host.hidden = true, trampaConsumibleEnMapa({fichaId: bn.fichaId, tipoToken: 'pj', nombre: it.nombre, item: FichaAcciones.itemDeTrampa(it),
+          trampa: {...it.trampaDatos, nombre: String((it.trampaDatos && it.trampaDatos.nombre) || it.nombre).slice(0, 40),
+            dano: FichaAcciones.TRAMPA_DANO_RE.test(String((it.trampaDatos && it.trampaDatos.dano) || '').trim()) ? String(it.trampaDatos.dano).trim() : ''}})),   // 🪤 la trampa consumible: un clic, dentro del Rango y a la vista (2026-10-20)
     // ⏩ La Runa aceleradora (2026-10-12): se elige la casilla en el mapa (js/40).
     acelerador: it => { if(bn) bn.host.hidden = true; aceleradorDeHabilidad({fichaId: bn.fichaId, casteadorTipo: 'pj', turnos: num(it.aceleradorMapa.turnos) || 10, no2: num(it.aceleradorMapa.no2) || 2, nombre: it.nombre}); },
     // La zona de un consumible (2026-10-08, las bengalas): la misma de una habilidad, a nombre del personaje.

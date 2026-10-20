@@ -42,6 +42,7 @@
   jugadora: **la columna «Podés usar» del duelo** (Polilla, wildcard y moneda al costado del cuadro, por encima, con su texto al pasar el mouse) y
   **el anuncio del descanso** («Día 7: descansaste», al entrar, para Aurelia). Falta (2): reabrir una tirada con la carta dentro del duelo.
 - [x] **Trampa de red del Goblin trampero con alcance 3** (2026-10-15): en una partida de prueba, un creep con una trampa ✨ con `trampaColocar.alcance: 3` → al
+  **Corregido (dueño, 2026-10-20): el 3 no va.** Toda trampa se coloca dentro del Rango y a la vista de quien la pone; si no, la vuelve a pedir. También las consumibles: ya no aparecen al lado del token para arrastrarlas, se elige la casilla con un clic.
   **Probado el 2026-10-20 (Claude, «Test con claude elsaulo»):** el Goblin trampero ya no está en El origen; se armó la misma trampa en el creep de prueba. A 5 casillas avisa «la trampa llega hasta 3» y la coloca igual; oculta; Silvia la pisa: Anuncio «Inmovilizado (3 turnos)» → «¡CAYÓ EN LA TRAMPA!»; en la Botonera «🔓 Soltarse · Fuerza contra 5 · 1 No2» (sin No2 pregunta y deja seguir; 4 contra 5: sigue atrapada). **Arreglado:** el aviso de alcance lo tapaba enseguida el de «trampa colocada»; ahora van juntos.
   elegir una casilla a 4+ avisa «la trampa llega hasta 3»; la red se coloca oculta; un personaje que la pisa queda Inmovilizado y le aparece 🔓 Soltarse · Fuerza
   contra 5 · 1 No2. (El cambio de código es solo el aviso: js/13 `trampaAvisarAlcance`.)
@@ -109,6 +110,7 @@
   «⚔ … pasa por encima de Silvia Suller · ¿Ataque de oportunidad?», al dejarlo pasar siguió hasta el destino sin un segundo ataque; con un
   rival sin No2 (Sandro) no se ofrece. Falta verlo desde la cuenta de un jugador (las abejas de Bizzante).
 - [x] **¡Tu vieeeja! (provocación de creep) y Tapa de barril** (2026-10-16, Kobold escudero de barril de El origen; no se prueba ahí, hace falta una copia en una partida de prueba): que la Botonera resalte a 3 casilleros, tire Fuerza contra Res.Esp y ponga Provocado 2 turnos; que la Tapa sume +3 Defensa, +3 Armadura mágica y +1 de resistencia a crítico por 1 turno.
+  **Cambiado después (dueño, 2026-10-20: «es la misma skill»):** ahora igual que el Taunt — PdG.Esp +1 contra Res.Mt, dentro de su Rango (no 3), Provocado 2 turnos.
   **Probado el 2026-10-20 (Claude, «Test con claude elsaulo»):** copiadas del Kobold escudero de barril (El origen, solo lectura) al creep de prueba. ¡Tu vieeeja!: resalta solo a los que están a 3 o menos (Xeena a 3, Silvia a 2; Aurelia a 6 no), Fuerza contra Res.Esp, Provocado 2 turnos en la ficha de Silvia. Tapa de barril: Defensa 0 → 3, Defensa especial 0 → 3, resistencia a crítico +1 en los cinco Tipos, 1 turno, 1 No2 y cooldown 2.
 - [x] **📣 Llamar refuerzos** (2026-10-16, «Test con claude elsaulo», GM): una copia de la Rata de alcantarilla con «Plaga en la galería»
   (`refuerzos: {cant: 2}`) → Acciones → Ejecutar: cobra 2 No2 y el cooldown, la Mesa la anuncia, aparece «elegí dónde aparece (1 de 2)», dos

@@ -153,7 +153,13 @@ async function acConsumir(sc, itemId){
     const glifo = it.trampaDatos.portal && it.trampaDatos.portal.colocador;   // 🌀 el Glifo de teletransporte: dos clics en el mapa (js/13)
     const t = glifo ? await (async () => { ac.host.hidden = true; const td = Combatiente.trampaDeHab({nombre: it.nombre, trampaColocar: it.trampaDatos}, st => CreepCalculo.statValor(sc, st));
         const ok = await colocarGlifo({fichaId: sc.id, tipoToken: 'creep', nombre: it.nombre, trampa: td}); return {ok, aviso: ok ? `🌀 ${it.nombre} colocado` : `🌀 ${it.nombre}: no se usó`}; })()
-      : await CreepAcciones.colocarTrampaDeItem(ac.creepId, it, sc);
+      : await (async () => {   // 🪤 la trampa consumible: un clic, dentro del Rango y a la vista (2026-10-20)
+          ac.host.hidden = true;
+          const td = Combatiente.trampaDeHab({nombre: it.nombre, trampaColocar: it.trampaDatos}, st => CreepCalculo.statValor(sc, st));
+          const dano = /^\d{1,2}d\d{1,3}([+-]\d{1,3})?$/i.test(String(td.dano || '').trim()) ? String(td.dano).trim() : '';
+          const ok = await trampaConsumibleEnMapa({fichaId: sc.id, tipoToken: 'creep', nombre: it.nombre, trampa: {...td, nombre: String(td.nombre || it.nombre).slice(0, 40), dano}});
+          return {ok, aviso: ok ? `🪤 ${it.nombre} colocada` : `🪤 ${it.nombre}: no se usó`};
+        })();
     toast(t.aviso);
     if(!t.ok) return;
   }

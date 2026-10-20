@@ -509,8 +509,10 @@ function trampaDeHabilidad(msg){
   const otra = i => {
     const cuenta = cant > 1 ? ` (${i + 1} de ${cant})` : '';
     elegirDestino(async h => {
-      // (2026-10-20: el aviso de alcance va en el mismo cartel que «trampa colocada»; si no, ese lo tapaba enseguida y no se llegaba a leer.)
-      const aviso = trampaAvisarAlcance(msg, h, cant === 1 && !pilar && !portal);
+      // 🪤 Regla general (dueño, 2026-10-20): una trampa se coloca dentro del Rango de quien la pone y en una casilla que vea; si no, la vuelve a
+      // pedir (como el Ojo de Kicillof y la Bombucha). Los pilares y el portal siguen con el aviso de siempre.
+      if(!pilar && !portal){ const no = trampaFueraDeAlcance(msg, h); if(no){ toast(no); otra(i); return; } }
+      else trampaAvisarAlcance(msg, h);
       try{
         if(pilar){
           if(!(await levantarPilar(h, t))){ otra(i); return; }   // casilla ocupada: la vuelve a pedir
@@ -518,27 +520,53 @@ function trampaDeHabilidad(msg){
         else{
           const r = await TokensAuto.colocarTrampas({fichaId: msg.fichaId, tipoToken: msg.tipoToken || 'pj', trampa: {...t, cant: 1}, mapaId: mapaMostrado, celda: {col: h.col, fila: h.fila}});
           if(!r.colocadas){ toast(`🪤 ${msg.nombre}: no se pudo colocar`); return; }
-          if(cant === 1) toast(aviso ? `${aviso} · igual quedó colocada (lo decide la mesa)` : `🪤 ${msg.nombre}: trampa colocada`);
+          if(cant === 1) toast(`🪤 ${msg.nombre}: trampa colocada`);
         }
         puestas++;
       }catch(err){ console.error('No se pudo colocar:', err); toast(pilar ? 'No se pudo levantar el pilar — revisá la consola' : 'No se pudo colocar la trampa — revisá la consola'); return; }
       if(i + 1 < cant) otra(i + 1); else fin();
-    }, `<b>${pilar ? '🧱' : portal ? '🌀' : '🪤'} ${nom}${pilar ? 'elegí dónde sale el pilar' : portal ? 'elegí la casilla que dispara el portal' : 'elegí dónde colocar la trampa'}${cuenta}</b> <span>clic en el mapa · Esc o clic derecho ${i ? 'terminan' : 'cancelan'}</span>`, true, i ? fin : null);
+    }, `<b>${pilar ? '🧱' : portal ? '🌀' : '🪤'} ${nom}${pilar ? 'elegí dónde sale el pilar' : portal ? 'elegí la casilla que dispara el portal' : 'elegí dónde colocar la trampa'}${cuenta}</b> <span>${pilar || portal ? 'clic en el mapa' : 'dentro de tu Rango, en una casilla que veas'} · Esc o clic derecho ${i ? 'terminan' : 'cancelan'}</span>`, true, i ? fin : null);
   };
   otra(0);
 }
-// Si la casilla elegida queda fuera del Rango de quien la usa: avisa (la mesa decide), no bloquea. → el texto del aviso ('' si no hace falta);
-// `callado`: no lo muestra (lo pone quien llama en su propio cartel).
-function trampaAvisarAlcance(msg, h, callado){
+// Una trampa (dueño, 2026-10-20: «las trampas se colocan dentro del rango y dentro del campo visible»): → el motivo si esa casilla no sirve, o ''.
+// Sin el token de quien la pone en el mapa, no se mira nada.
+function trampaFueraDeAlcance(msg, h){
   const mio = [...tokens.values()].find(x => x.fichaId === msg.fichaId && x.tipo === (msg.tipoToken || 'pj'));
-  // Una trampa con alcance propio (`trampa.alcance`, dueño 2026-10-15: la red del Goblin trampero, hasta 3 casilleros): ese manda.
-  const propio = Math.round(num(msg.trampa && msg.trampa.alcance));
-  const rr = mio && !(propio > 0) && typeof rangoDeToken === 'function' ? rangoDeToken(mio) : null;
+  if(!mio) return '';
+  const rr = typeof rangoDeToken === 'function' ? rangoDeToken(mio) : null, rng = rr ? Math.round(num(rr.rng)) : 0, d = distanciaHex(mio, h);
+  if(rng > 0 && d > rng) return `⚠ Esa casilla queda a ${d}: la trampa se coloca dentro de tu Rango (${fmt(rng)})`;
+  if(!celdasVisionDe(mio).includes(nbPack(h.col, h.fila))) return '⚠ Esa casilla no la ves: la trampa se coloca en tu campo de visión';
+  return '';
+}
+/* 🪤 Una trampa consumible (2026-10-20, dueño: la misma regla que todas): se elige la casilla con un clic, dentro del Rango y a la vista de quien
+   la pone; antes quedaba al lado del token y se arrastraba a donde fuera. → Promise<bool>: true si quedó colocada (si se cancela, no se gasta). */
+function trampaConsumibleEnMapa(msg){
+  const nombre = msg.nombre || (msg.trampa && msg.trampa.nombre) || 'Trampa';
+  const mio = [...tokens.values()].find(x => x.fichaId === msg.fichaId && x.tipo === (msg.tipoToken || 'pj'));
+  if(!mio){ toast(`🪤 ${nombre}: ${msg.tipoToken === 'creep' ? 'el creep' : 'tu personaje'} no tiene token en este mapa — no se usó`); return Promise.resolve(false); }
+  return new Promise(res => {
+    const pedir = () => elegirDestino(async h => {
+      const no = trampaFueraDeAlcance(msg, h);
+      if(no){ toast(no); pedir(); return; }
+      try{
+        const r = await TokensAuto.colocarTrampas({fichaId: msg.fichaId, tipoToken: msg.tipoToken || 'pj', trampa: {...msg.trampa, cant: 1},
+          ...(msg.item ? {item: msg.item} : {}), mapaId: mapaMostrado, celda: {col: h.col, fila: h.fila}});
+        if(!r.colocadas){ toast(`🪤 ${nombre}: no se pudo colocar ahí — no se usó`); res(false); return; }
+        toast(`🪤 ${nombre}: trampa colocada`);
+        res(true);
+      }catch(err){ console.error('No se pudo colocar la trampa:', err); toast('No se pudo colocar la trampa — revisá la consola'); res(false); }
+    }, `<b>🪤 ${esc(nombre)}: elegí dónde colocar la trampa</b> <span>dentro de tu Rango, en una casilla que veas · Esc o clic derecho cancelan (no se gasta)</span>`, true,
+    () => { toast(`🪤 ${nombre}: no se colocó — no se gastó`); res(false); });
+    pedir();
+  });
+}
+// Los pilares y el portal: si la casilla queda fuera del Rango de quien la usa, avisa (la mesa decide), no bloquea.
+function trampaAvisarAlcance(msg, h){
+  const mio = [...tokens.values()].find(x => x.fichaId === msg.fichaId && x.tipo === (msg.tipoToken || 'pj'));
+  const rr = mio && typeof rangoDeToken === 'function' ? rangoDeToken(mio) : null;
   const d = mio ? distanciaHex(mio, h) : 0;
-  const aviso = !mio ? '' : propio > 0 ? (d > propio ? `⚠ Esa casilla queda a ${d}: la trampa llega hasta ${propio}` : '')
-    : rr && rr.rng > 0 && d > rr.rng ? `⚠ Esa casilla queda a ${d}: fuera de tu Rango (${fmt(rr.rng)})` : '';
-  if(aviso && !callado) toast(aviso);
-  return aviso;
+  if(rr && rr.rng > 0 && d > rr.rng) toast(`⚠ Esa casilla queda a ${d}: fuera de tu Rango (${fmt(rr.rng)})`);
 }
 // Un pilar de piedra (Varita de los pilares): Sólido de 1 casilla, visible para todos, que se va solo a los `turnos` turnos. → false si no hay lugar.
 async function levantarPilar(h, t){

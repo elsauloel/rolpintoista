@@ -125,7 +125,7 @@ al ocultista (GM Tools → Recompensas).
 De a una, de nivel más bajo a más alto; la simulación usa las fichas reales y las reglas del duelo.
 - Goblin de choque · **Ensartar y sostener**: + Perfora 2 (a Petro le saca 2 por golpe en vez de 0). **Pared de escudos**: queda igual.
 - Goblin arquero · **Flecha a la rodilla**: +1 PdG (de 1d10+1 a 1d12: casi igual, un poco más de crítico; el dueño puede pasarla a +2). **Tiro certero**: igual.
-- Goblin trampero · **Trampa de red**: hasta 3 casilleros (el GM elige la casilla), detectable y con soltarse (Fuerza contra la Fuerza del trampero, 1 No2: Petro 62 %, Bizzante 33 %, Larry 0 %).
+- Goblin trampero · **Trampa de red**: ~~hasta 3 casilleros~~ dentro del Rango y a la vista de quien la pone, como toda trampa (dueño, 2026-10-20) (el GM elige la casilla), detectable y con soltarse (Fuerza contra la Fuerza del trampero, 1 No2: Petro 62 %, Bizzante 33 %, Larry 0 %).
 - Goblin trampero · **Tajo al tendón**: +1d4 de daño (el Lisiado necesita que el golpe haga daño; el cuchillo perfora 1, así que siempre lo hace).
 - Goblin domador · **¡Azuzar!**: el Crítico potente no hacía nada (ningún aliado llega al crítico contra este grupo) → **Azuzado** (+2 PdG, +2 daño, 2 turnos) a un aliado a 4. **Chasquido**: igual.
 - Goblin marcado ×2 · **Tajo frenético**: igual. **No siente el dolor**: de Endurecido a **Vida extra 10, 2 turnos** (absorbe de cualquier fuente).
@@ -167,7 +167,7 @@ De a uno, de nivel más bajo a más alto; primero el ataque básico y después c
 - Rata de alcantarilla ×2 (`7yfjk9q`, `bohj2rz`): el mordisco perfora 1. **Plaga en la galería** automática: 📣 llama 2 ratas (el GM elige en el mapa dónde aparece cada una);
   solo con menos del 50 % de la vida (si tiene más, avisa y pregunta). Sin lenta y sin cooldown (dueño: la condición de la vida ya la frena; solo la limitan los 2 No2).
 - Kobold escudero de barril (`8ah2r2u`): Destreza 3 → 6 (PdG 1d6) y el palo con clavos perfora 1. **Tapa de barril**: +3 Defensa, +3 Armadura mágica y +1 de resistencia a todos los críticos hasta su próximo turno.
-  **Bien agachado** (Blindado, casi no hacía nada) → **¡Tu vieeeja!**: Fuerza contra Res.Esp a 3 casilleros, Provocado 2 turnos (1 No2, cooldown 3; 81 % contra Larry, 75 % Bizzante, 62 % Petro).
+  **Bien agachado** (Blindado, casi no hacía nada) → **¡Tu vieeeja!**: ~~Fuerza contra Res.Esp a 3 casilleros~~ → **igual que el Taunt del Tanque** (dueño, 2026-10-20: «es la misma skill»): PdG.Esp +1 contra Res.Mt, dentro de su Rango, Provocado 2 turnos (1 No2, cooldown 3). Los porcentajes de arriba eran con la Fuerza: hay que rehacerlos.
 - Cerrados (sin «(auditar)» en el nombre; las copias se llaman «(2)») y sus 8 habilidades subidas a la biblioteca como auditadas (etiqueta «minas»).
 - El cooldown empieza a contar al usar la habilidad, no cuando termina el efecto: la Furia (2 turnos, cooldown 3) queda 1 turno sin furia y vuelve.
 - Kobold hondero (`ja9iyyn`): se queda con la honda; Fuerza 4 → 6, Agilidad 8 → 7, Constitución 6 → 5, vida 30 → 25 (daño 1d10+3: 2,5 por tiro a Bizzante, 4,2 a Larry, casi nada a Petro). Piedrazo a la cabeza: igual. Tiro al pie (Lento) pasó al ballestero como «Virote al pie»; a cambio el hondero se quedó con la Demora: «Piedra pesada» (2 No2, cooldown 3). Las tres subidas a la biblioteca como auditadas (Tiro al pie queda ahí como habilidad de honda).

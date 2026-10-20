@@ -16,8 +16,9 @@
   «Hacerlo igual»); Parry y Bloqueo desde su Botonera pasan; en el duelo puede hacer dodge roll. Las pruebas automáticas cubren el estado, no el cartel.
 - [x] **⏸ El cartel de la pausa abajo a la izquierda** (2026-10-20): probado con una pausa de verdad en «Test con claude elsaulo»: el GM y la
   jugadora lo ven abajo a la izquierda, sin tapar la barra de arriba; al reanudar se va.
-- [ ] **🎲 El consumible al azar en un fin de combate real** (2026-10-19): un creep que lo usó lo suelta seguro; uno que no, con su chance; el
-  🎲 del reporte cambia a otro de la misma familia de arquetipo. Probado con las pruebas automáticas, no con «Batalla terminada».
+- [ ] **🎲 El consumible al azar en un fin de combate real** (2026-10-19; regla nueva 2026-10-20: todos van al botín, los usados tildados y los
+  no usados destildados). La ventana paso a paso se probó en el mapa del GM con un creep armado en memoria (sin publicar): los cinco pasos, los
+  consejos, el tildado por defecto y el 📢 Publicar solo al final. Falta: un combate real, con un creep que use su consumible en la pelea.
 - [ ] **🃏 Wildcards en el duelo y en el mapa de un jugador** (2026-10-15): desde una cuenta de jugador con wildcards, (1) la cartita 🃏 arriba, en la
   fila de los lentes, girando; (2) en un duelo, después de tirar PdG/Evasión, aparecen «🃏 Wildcard» y «🪙 Moneda» lado a lado (o solo la carta) y
   reabrir con la carta descuenta 1. (Probado ya: el descanso del GM y la ventana de la ficha, ver «Probado».)

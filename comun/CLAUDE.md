@@ -1648,3 +1648,7 @@ versión parecida en más de una, es candidato a juntar.
   pesado o liviano por Fuerza+Constitución contra Destreza+Agilidad; los nombres viejos se leen). `CombateFin.arquetiposBotin(item)` (o el campo
   `arquetiposBotin` del ítem) y `dropElegir(cat, tier, arqs)`: uno al azar entre lo de sus arquetipos y lo universal. Lista: docs/botin-arquetipos.md.
   `sc.municionAzar`: la flecha o el virote con que nace un creep con arco o ballesta (en el cinturón; drop seguro).
+- **📋 «Batalla terminada», paso a paso** (2026-10-20, dueño): `CombateFin.vista` muestra un paso por vez (`rep.paso`, `PASOS_BOTIN`): Equipo →
+  Consumibles → Doblones → Experiencia → Publicar, cada uno con su consejo para el GM; `data-rep-ir` cambia de paso y el 📢 Publicar aparece recién
+  en el último (`publicar: 'oculto'` antes). `dropDeCreep` pone en el botín **todos** los consumibles del creep (el al azar, su flecha o virote y lo
+  que le quede en el cinturón): los que usó, tildados; los que no, destildados (`rep.quitados`). `rep.drops[scId]` guarda `{nombre, usado}`.

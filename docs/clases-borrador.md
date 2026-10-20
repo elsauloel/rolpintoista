@@ -363,6 +363,10 @@ verifica con 1d20: hasta DES×2 → 7+; hasta DES×3 → 17+; más de DES×3 →
 10. **Adrenalina** [5] — Otorga +1 a Destreza, Fuerza y Agilidad durante 2
     turnos. Acumulable. Lento.
 ~~11. **Afortunado**~~ (nueva el 2026-10-12 y retirada el mismo día: se juntó con Re-roll, ver el 7).
+12. ✅ **Ojo de Kicillof** — **SP:** 5. **No2:** 1. Invocás un ojo volador etéreo que movés vos: Movimiento 5, dura 2 turnos (entra al orden
+    sin mareo) y al cumplirlos desaparece. Ve en una flor de diámetro 5 para todos lados, sin que nada le tape la vista: despeja la niebla y revela lo
+    oculto. Todos lo ven, nadie le puede hacer nada y atraviesa todo. ⚙ Automatizado en el mapa. *(Nueva 2026-10-20, dueño: la del pergamino como
+    skill del Support; `support-ojo-de-kicillof` en comun/skills-clase.js.)*
 
 ## Debuffer ⏳
 

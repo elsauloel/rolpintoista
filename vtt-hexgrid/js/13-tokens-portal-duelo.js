@@ -593,7 +593,11 @@ async function colocarGlifo(msg){
 // donde aparece. Si ya tiene token en este mapa (el de cuando se durmió) se mueve ahí; si no, se crea. La mesa se entera por la Crónica.
 function invocacionDeHabilidad(msg){
   const nombre = String(msg.nombre || 'Invocación').slice(0, 40);
-  elegirDestino(async h => {
+  // 👁 Pegado a quien lo invoca (2026-10-20, dueño, el Ojo de Kicillof): solo una casilla al lado de su token.
+  const dueno = msg.adyacente && msg.fichaId ? [...tokens.values()].find(t => t.tipo === 'pj' && t.fichaId === msg.fichaId) : null;
+  if(msg.adyacente && !dueno){ toast(`${nombre}: tu token no está en este mapa — poné su token a mano, al lado tuyo`); return; }
+  const pedir = () => elegirDestino(async h => {
+    if(dueno && distanciaHex(dueno, h) !== 1){ toast(`${nombre} aparece pegado a vos: elegí una casilla al lado de tu token`); pedir(); return; }
     try{
       let id = null;
       tokens.forEach((t, k) => { if(t.fichaId === msg.ref) id = k; });
@@ -602,8 +606,9 @@ function invocacionDeHabilidad(msg){
       momentoAbrir({tipo: 'invocacion', icono: '🔮', titulo: `${msg.quien || 'Alguien'} invocó a ${nombre}`,
         resultado: `con «${msg.habilidad || 'una habilidad'}»${num(msg.turnos) ? ` · dura ${fmt(num(msg.turnos))} turnos` : ''}`, estado: 'listo'});
     }catch(err){ console.error('No se pudo poner la invocación en el mapa:', err); toast('No se pudo poner la invocación en el mapa — ponela a mano'); }
-  }, `<b>🔮 ${esc(nombre)}: elegí dónde aparece</b> <span>clic en el mapa · Esc o clic derecho cancelan</span>`, true,
+  }, `<b>🔮 ${esc(nombre)}: elegí dónde aparece</b> <span>${dueno ? 'una casilla pegada a tu token' : 'clic en el mapa'} · Esc o clic derecho cancelan</span>`, true,
   () => toast(`${nombre} quedó invocada sin lugar: poné su token a mano`));
+  pedir();
 }
 // 🌫 Zonas con efectos persistentes: el asistente paso a paso (comun/asistente-zona.js, 2026-09-28, pedido del
 // dueño). Cualquier miembro lo puede usar (mismo criterio que Formas libres y Trampas); el casteador queda como

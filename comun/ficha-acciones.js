@@ -1319,7 +1319,7 @@ const FichaAcciones = (() => {
     const ref = ui.yo ? (ui.yo() || {}).ref : '';
     const avisar = ui.invocar || (ui.alMapa && ui.enMapa && ui.enMapa() ? m => ui.alMapa('invocacion-habilidad', m) : null);
     if(!avisar){ ui.toast(`👁 ${inv.nombre} invocado (${fmt(turnos)} turnos) — poné su token en el mapa`); return inv; }
-    avisar({ref: `${ref}~${inv.id}`, fichaId: ref, nombre: inv.nombre, color: inv.color, quien: (S.meta && S.meta.nombre) || 'Personaje', habilidad: it.nombre, turnos});
+    avisar({ref: `${ref}~${inv.id}`, fichaId: ref, adyacente: c.adyacente !== false, nombre: inv.nombre, color: inv.color, quien: (S.meta && S.meta.nombre) || 'Personaje', habilidad: it.nombre, turnos});
     return inv;
   }
   function invocarConHab(S, h, ui){

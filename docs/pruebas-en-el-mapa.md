@@ -9,9 +9,8 @@
 > capturas. Al probar algo: pasarlo a «Probado» con fecha, qué se vio y si hubo que arreglar algo.
 
 ## Pendientes
-- [ ] **⏸ El cartel de la pausa abajo a la izquierda** (2026-10-20): el lugar se vio dibujándolo en la pantalla de la jugadora (abajo a la
-  izquierda, al lado de la columna de botones, sin tapar la barra de arriba). Falta verlo con una pausa de verdad: la cuenta del GM estaba en uso
-  (El origen abierto). Pausar «Test con claude elsaulo» como GM, mirar desde la jugadora, y reanudar (con «Borrar» el registro).
+- [x] **⏸ El cartel de la pausa abajo a la izquierda** (2026-10-20): probado con una pausa de verdad en «Test con claude elsaulo»: el GM y la
+  jugadora lo ven abajo a la izquierda, sin tapar la barra de arriba; al reanudar se va.
 - [ ] **🎲 El consumible al azar en un fin de combate real** (2026-10-19): un creep que lo usó lo suelta seguro; uno que no, con su chance; el
   🎲 del reporte cambia a otro de la misma familia de arquetipo. Probado con las pruebas automáticas, no con «Batalla terminada».
 - [ ] **🃏 Wildcards en el duelo y en el mapa de un jugador** (2026-10-15): desde una cuenta de jugador con wildcards, (1) la cartita 🃏 arriba, en la

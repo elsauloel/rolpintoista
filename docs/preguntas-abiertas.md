@@ -1067,3 +1067,9 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
 - ✅ **P212. Auditoría de las pociones — 2026-10-20; cerrada el mismo día** (todo lo decidido, en la hoja). Hoja completa en [`auditoria-pociones.md`](auditoria-pociones.md): Sangre de
   dragón no termina nunca; Piernas de Viento, Ímpetu, Segundo aire e Hypeado dan No2 baratos; Ojo del Verdugo +3; Buena Fortuna, Inmunidad a CC,
   Blindaje y Escudo Especial caros; Invulnerabilidad barata; las «grandes» de 3 cargas mal de precio; Elixir de Fénix flojo; falta SP Común.
+
+- **P213. Etéreo como estado — 2026-10-20.** El dueño: «podemos definir ya etéreo como un estado para futuros usos». Hoy es una marca propia del
+  Ojo de Kicillof (se ve medio transparente; no es objetivo de nada; atraviesa personajes, Sólidos y paredes; no pisa trampas ni zonas; sin
+  oportunidad). Propuesta de Claude: un estado **Etéreo** por turnos con todo eso, que cualquiera puede poner; el Ojo lo lleva puesto. Tampoco
+  lo pueden elegir los aliados (ni curar ni bufear); la excepción futura sería Dispel Magic. **Falta decidir**: ¿un etéreo puede atacar o usar
+  habilidades sobre otros? Propuesta: no (solo moverse y usar cosas sobre sí mismo); el mapa avisa con «hacerlo igual (lo decide la mesa)».

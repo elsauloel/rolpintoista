@@ -145,6 +145,8 @@ const Pausa = (() => {
       .pausa-cartel{position:fixed;top:54px;left:50%;transform:translateX(-50%);z-index:100015;background:#2a2410;border:1px solid #c9a227;color:#f3e2a0;
         padding:7px 16px;border-radius:8px;font:600 13px/1.35 system-ui,sans-serif;box-shadow:0 4px 14px rgba(0,0,0,.45);text-align:center;max-width:min(560px,92vw)}
       .pausa-cartel small{display:block;font-weight:400;opacity:.85}
+      /* En el mapa, abajo a la izquierda (dueño, 2026-10-20: «que no tape los botones de atrás»): arriba tapaba la barra de los lentes y el modo. */
+      .pausa-cartel.en-mapa{top:auto;bottom:14px;left:64px;transform:none;text-align:left;max-width:min(460px,60vw)}
       /* Con otra ventana abierta (un aviso, un paso a paso, la Botonera…) el cartel se esconde: si no, tapaba su título (2026-10-10). */
       body:has(.scrim.open) .pausa-cartel, body:has(.cfj-fondo) .pausa-cartel, body:has(.pap-fondo) .pausa-cartel, body:has(.pausa-fondo) .pausa-cartel, body:has(#ejd-fondo) .pausa-cartel, body:has(#acciones-nuevas.con-ventana) .pausa-cartel, body:has(#botonera-nueva.con-ventana) .pausa-cartel{display:none}
       .pausa-capa{position:absolute;inset:0;z-index:90;background:rgba(10,10,14,.28);pointer-events:none}
@@ -166,7 +168,7 @@ const Pausa = (() => {
     inyectarCss();
     let c = document.getElementById('pausa-cartel');
     if(activa()){
-      if(!c){ c = document.createElement('div'); c.id = 'pausa-cartel'; c.className = 'pausa-cartel'; document.body.appendChild(c); }
+      if(!c){ c = document.createElement('div'); c.id = 'pausa-cartel'; c.className = 'pausa-cartel' + (donde === 'mapa' ? ' en-mapa' : ''); document.body.appendChild(c); }
       c.innerHTML = esGM() ? '⏸ La partida está en pausa<small>Los jugadores pueden tocar su ficha, pero no el mapa. Reanudala con «▶ Reanudar partida».</small>'
         : `⏸ Partida en pausa hasta la próxima sesión<small>${donde === 'mapa' ? 'Podés mirar el mapa (arrastrarlo y hacer zoom), pero no mover nada. ' : ''}Podés tocar tu ficha: lo que cambies le queda anotado al GM.</small>`;
     }else if(c) c.remove();

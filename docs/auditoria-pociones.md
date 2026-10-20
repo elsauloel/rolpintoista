@@ -35,9 +35,9 @@
 1. ✅ **Regla (dueño, 2026-10-20): una poción dura X turnos; un pergamino, todo el combate o X turnos para todo el grupo.** Sangre de dragón:
    Fuerza +3 y Constitución +2, 3 turnos, Excepcional 300 (era +2/+2 todo el combate, Legendaria 500). Pergamino del Velo Eterno: lo mismo de
    antes (Defensa +5, Def.Esp +5, Evasión +2, 3 turnos) pero para todo el grupo; sigue Legendario a 480.
-2. Piernas de Viento sale; **Ímpetu** (No2 de verdad): +1 Rara 100, +2 Excepcional 200 (la mitad que el pergamino, que dura todo el combate).
-   Segundo aire: el Movimiento +3 pasa a **+2 No2**. **Hypeado**: Excepcional, poción 200 y pergamino 400 (lo mismo que Ímpetu +2), o sacarlo
-   de los consumibles y dejarlo como estado de habilidades.
+2. ✅ (dueño, 2026-10-20) Piernas de Viento, archivadas. **Ímpetu, 3 turnos y +1 No2 por tier**: +1 Común 60, +2 Buena 120, +3 Rara 200,
+   +4 Excepcional 320 («suprema», nueva). Segundo aire: el Movimiento +3 pasó a +2 No2. **Hypeado** (poción y pergamino), archivados: «medio
+   redundante; tenía sentido con las acciones» (el estado queda para habilidades).
 3. Ojo del Verdugo: +1 Buena 60, +2 Rara 90; el +3 sale.
 4. Buena Fortuna, Inmunidad a CC y Blindaje: Buena calidad, 50.
 5. Escudo Especial: Buena, 40 (o un escudo de 15).

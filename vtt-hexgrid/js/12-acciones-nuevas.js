@@ -274,10 +274,46 @@ function acPreguntarTipoAtaque(sc){
   ac.raiz.querySelector('#ac-tipo-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: sc.nombre, arma: Combatiente.armaDeCombatiente(sc), normal, primero, especial, especialOpor, attr: 'data-ac-tipo', ref: sc.id});   // el menú común
   ac.raiz.querySelector('#ac-tipo-ataque').classList.add('open');
 }
-function acAtacar(tipo){
+/* 🏹 La flecha o el virote especial de un creep (dueño, 2026-10-20: «cualquier creep con arco o ballesta debe tener un virote especial al azar
+   disponible para su uso»): lo lleva en el cinturón (comun/combate-fin.js, darConsumiblesAlAzar). Al atacar con el arco o la ballesta, el mismo
+   «¿Qué flecha?» que un personaje; se gasta y cobra su No2 al disparar. */
+function acMunicion(sc){
+  if(!sc || !sc.armaDeRango) return '';
+  const m = Combatiente.municionDe(Combatiente.armaDeCombatiente(sc));
+  if(m) return m;
+  const n = String(sc.armaNombre || '');
+  return /ballesta/i.test(n) ? 'virote' : /arco/i.test(n) ? 'flecha' : '';
+}
+function acFlechas(sc){
+  const m = acMunicion(sc);
+  return m ? (sc.cinturon || []).filter(i => i && i.flecha && num(i.unidades) > 0 && (m === 'virote') === !!i.flecha.virote) : [];
+}
+function acElegirFlecha(sc, flechas, alElegir, abierto){
+  const vir = acMunicion(sc) === 'virote', cosa = vir ? 'virote' : 'flecha', Cosa = vir ? 'Virote' : 'Flecha';
+  const txt = f => typeof FichaEquipo !== 'undefined' && FichaEquipo.flechaTxt ? FichaEquipo.flechaTxt(f) : String(f.detalle || '').slice(0, 90);
+  AvisoCombate.mostrar({clave: 'elegir-flecha', icono: '🏹', titulo: `¿Qué ${cosa}? · ${sc.nombre}`, texto: `Los ${cosa}s comunes no se gastan. Un${vir ? '' : 'a'} especial se gasta al disparar${vir ? 'lo' : 'la'}.`,
+    botones: [{texto: `🏹 ${Cosa} común`, detalle: 'sin costo extra', alClic: () => { AvisoCombate.cerrar(); alElegir(''); }},
+      {texto: `✨ ${Cosa} especial ${abierto ? '▴' : '▾'}`, sec: !!abierto, detalle: `${flechas.length === 1 ? '1 clase' : `${flechas.length} clases`} en el cinturón`, alClic: () => acElegirFlecha(sc, flechas, alElegir, !abierto)},
+      ...(abierto ? flechas.map(f => ({fila: true, texto: `${f.nombre} ×${fmt(num(f.unidades) || 1)}`, detalle: txt(f), alClic: () => { AvisoCombate.cerrar(); alElegir(f.id); }})) : [])]});
+}
+function acDispararFlecha(flechaId){
+  return acCambiar(c => {
+    const f = (c.cinturon || []).find(x => x.id === flechaId);
+    if(!f) return {ok: true};
+    const costo = Math.max(0, num(f.flecha && f.flecha.no2));
+    if(costo) c.nitros = num(c.nitros) - costo;   // (sin No2 queda en negativo: avisa la línea de abajo)
+    f.unidades = num(f.unidades) - 1;
+    if(f.unidades <= 0) c.cinturon = c.cinturon.filter(x => x !== f);
+    return {ok: true, nombre: f.nombre, costo};
+  }).then(x => { if(x && x.nombre) mesaLinea(`🏹 ${acCreep() ? acCreep().nombre : 'El creep'} dispara ${x.nombre}${x.costo ? ` (+${fmt(x.costo)} No2)` : ''}`, 'recordatorio'); });
+}
+function acAtacar(tipo, flechaId){
   const sc = acCreep();
   if(!sc) return;
   const id = ac.creepId;
+  const flechas = tipo === 'normal' ? acFlechas(sc) : [];
+  if(flechaId === undefined && flechas.length && typeof Duelo !== 'undefined' && Duelo.disponible()){ acElegirFlecha(sc, flechas, fid => acAtacar(tipo, fid)); return; }
+  const fl = flechaId ? flechas.find(f => f.id === flechaId) || null : null;
   const hacer = async () => {
     const qs = Combatiente.preguntaSentado(sc.estados, sc.nombre);   // Sentado no puede atacar (cualquier ataque)
     if(qs && !(await AvisoCombate.preguntar(qs, {icono: '⚔', titulo: 'Atacar igual', si: 'Sí, atacar'}))) return;
@@ -295,15 +331,18 @@ function acAtacar(tipo){
   if(typeof Duelo === 'undefined' || !Duelo.disponible()){ hacer(); return; }
   acElegirObjetivo(sc, {tipo, armaId: '', armaNombre: sc.armaNombre || '', tipoDado: num(sc.armaTipo) || 8, rango: !!sc.armaDeRango, alcance: CreepCalculo.alcance(sc),
     ...Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(sc)),   // los rasgos de su arma: por la espalda, sin Parry
-    ...(num((sc.armaRasgos || {}).arcoDuro) > 0 && num(CreepCalculo.statValor(sc, 'fue')) < num(sc.armaRasgos.arcoDuro) ? {arcoDuroPdg: -2} : {})}, hacer);   // Arco duro
+    ...(fl ? {flecha: fl} : {}),   // 🏹 la flecha o el virote especial (2026-10-20)
+    ...(num((sc.armaRasgos || {}).arcoDuro) > 0 && num(CreepCalculo.statValor(sc, 'fue')) < num(sc.armaRasgos.arcoDuro) ? {arcoDuroPdg: -2} : {})}, hacer,
+    fl ? () => acDispararFlecha(fl.id) : null);   // Arco duro
 }
 // Elegir el objetivo (de un ataque o de una habilidad) con un clic en el token: mientras tanto las Acciones nuevas se esconden
 // (tapan el mapa); "Sin objetivo" o cancelar las vuelven a mostrar. `suelto`: lo que se hace sin objetivo.
-function acElegirObjetivo(sc, ataque, suelto){
+function acElegirObjetivo(sc, ataque, suelto, alDisparar){
   const id = ac.creepId;
   const reabrir = () => { if(ac && ac.creepId === id){ ac.host.hidden = false; acUbicar(); acDibujar(); } };
   ac.host.hidden = true;
-  dueloElegirObjetivoMapa({yo: {ref: sc.id, tipo: 'creep', nombre: sc.nombre}, ataque, conSuelto: true, alSuelto: () => { reabrir(); suelto(); }, alCancelar: () => reabrir()});
+  dueloElegirObjetivoMapa({yo: {ref: sc.id, tipo: 'creep', nombre: sc.nombre}, ataque, conSuelto: true, alSuelto: () => { reabrir(); suelto(); }, alCancelar: () => reabrir(),
+    ...(alDisparar ? {alDisparar} : {})});   // 🏹 la flecha especial se gasta al disparar (2026-10-20)
 }
 
 /* Paso 4c (tanda 5): las habilidades. Lo que cambia al creep (cobrar, cura y estado propio, el atajo ✨ «solo sobre sí») va en una

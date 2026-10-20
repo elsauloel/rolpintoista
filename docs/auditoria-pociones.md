@@ -49,7 +49,8 @@
    (3 turnos): Crítico frecuente +1 y potente +1 / +2 / +3, Buena 70 / Buena 130 / Rara 250. Las de Voluntad de Hierro (Res.CC) pasaron a
    llamarse **contra el Mal de Ojo** (dueño).
 6. ✅ (dueño, 2026-10-20) Invulnerabilidad: sigue Rara a 180, dura **2 turnos** (antes 3).
-7. Grandes: HP grande, Buena; HP mayor grande 270 y Regeneración mayor grande 200.
+7. ✅ (dueño, 2026-10-20) **Las de 3 cargas: el precio de 3 sueltas + 5 por carga, y un escalón de calidad arriba de la suelta** (lo que ganan
+   es lugar en el cinturón): HP grande Buena 90, HP mayor grande Excepcional 315, Regeneración grande Buena 90, Regeneración mayor grande Rara 240.
 8. Elixir de Fénix: que reviva (como el Revive: a un aliado caído, o a uno mismo desde el cinturón, como el Ankh) con toda la vida y Titilando.
 9. Una **Poción de SP menor**, Común 15: un cuarto del SP.
 

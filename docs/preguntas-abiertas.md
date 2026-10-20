@@ -1060,7 +1060,7 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   Especial; lo frena una Inmunidad mental nueva): Miedo, Confusión, Provocado, Sueño y quizás Silencio y Ceguera. El estado dice con qué se
   resiste por defecto; la habilidad lo puede cambiar (el asistente lo propone solo).
 
-- ❓ **P211. Auditoría de los pergaminos — 2026-10-19, abierta.** El dueño: «los pergaminos los creé hace siglos: pegate una auditada». Hoja
+- ✅ **P211. Auditoría de los pergaminos — 2026-10-19; cerrada el 2026-10-20** (todo lo decidido, en la hoja; los 69 en uso, auditados). El dueño: «los pergaminos los creé hace siglos: pegate una auditada». Hoja
   completa en [`auditoria-pergaminos.md`](auditoria-pergaminos.md). Lo principal: los «todo el combate» no terminan nunca (error); Piernas de
   Viento e Ímpetu hoy dan No2 (muy baratos); Ojo del Verdugo +3 de Crítico frecuente; Buena Fortuna, Inmunidad a CC y Blindaje fuertes para
   un combate entero a 125; Regeneración y Escudo Especial flojos; los seis «de crafteo» sin efecto definido; Velo Eterno ¿Res.Esp o Def.Esp?

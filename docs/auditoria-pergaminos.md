@@ -31,7 +31,10 @@ u agarra cosas livianas; si agarra a alguien, Fuerza contra tu Efecto especial. 
 Efecto especial para saber de dónde viene. Buena a 30.
 ✅ **Ojo de Kicillof**: invoca un ojo etéreo por 2 turnos (Movimiento 5, entra al orden sin mareo) que ve en una flor de diámetro 5 para todos lados,
 despeja la niebla y revela lo oculto; todos lo ven, pero no es objetivo de nada, no pisa trampas ni zonas y no da ni recibe oportunidad. Con su imagen de
-token. Buena a 30. (`invocaTemporal` en el ítem; vtt-hexgrid/js/03 `etereoDe` / `ojoDe`.) Probado en el mapa. Para eso, un consumible ahora puede tener su Ejecución ✨ (`duelo`
+token. Buena a 30. (`invocaTemporal` en el ítem; vtt-hexgrid/js/03 `etereoDe` / `ojoDe`.) Probado en el mapa.
+Al cumplir sus 2 turnos desaparece (el token y su lugar en el orden: vtt-hexgrid/js/54); etéreo, atraviesa personajes y Sólidos (las paredes lo frenan;
+si la mesa decide otra cosa, 🦶 Mover libre). Lo único que lo podría afectar es un Dispel Magic (en el tintero: docs/pendientes.md).
+**Cierre (2026-10-20):** Espejo y Espinas con el texto al día (se van solos al «Finalizar combate»); los 69 pergaminos en uso, marcados auditados. Para eso, un consumible ahora puede tener su Ejecución ✨ (`duelo`
 en el ítem, `Combatiente.habDeConsumible`): el objetivo se elige en el mapa y va al cuadro del duelo. Probado en el mapa.
 **Pendiente (viejo, ya resuelto arriba):** el ojo de Kicillof como invocación de 3 turnos
 (Movimiento 5, invisible, sin mareo; solo revela y despeja) y automatizar la red y la luz cegadora; ¿algún pergamino Común?

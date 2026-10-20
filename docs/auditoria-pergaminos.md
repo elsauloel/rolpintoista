@@ -28,9 +28,12 @@ todo «Cegado» entra como esta Ceguera. Flecha y Virote cegador, de 35 a 45. Pr
 ✅ **Tentáculo sombrío**: a mano, a criterio de la mesa (narrativo): sale de una superficie dentro de tu Rango, una escena (en combate, 3 turnos), mueve
 u agarra cosas livianas; si agarra a alguien, Fuerza contra tu Efecto especial. Buena a 30.
 ✅ **Ventriloquía**: a mano (narrativo): un sonido o una voz desde un punto dentro de tu Rango, una escena (en combate, 3 turnos); Percepción contra tu
-Efecto especial para saber de dónde viene. Buena a 30. Para eso, un consumible ahora puede tener su Ejecución ✨ (`duelo`
+Efecto especial para saber de dónde viene. Buena a 30.
+✅ **Ojo de Kicillof**: invoca un ojo etéreo por 2 turnos (Movimiento 5, entra al orden sin mareo) que ve en una flor de diámetro 5 para todos lados,
+despeja la niebla y revela lo oculto; todos lo ven, pero no es objetivo de nada, no pisa trampas ni zonas y no da ni recibe oportunidad. Con su imagen de
+token. Buena a 30. (`invocaTemporal` en el ítem; vtt-hexgrid/js/03 `etereoDe` / `ojoDe`.) Probado en el mapa. Para eso, un consumible ahora puede tener su Ejecución ✨ (`duelo`
 en el ítem, `Combatiente.habDeConsumible`): el objetivo se elige en el mapa y va al cuadro del duelo. Probado en el mapa.
-**Pendiente:** el ojo de Kicillof como invocación de 3 turnos
+**Pendiente (viejo, ya resuelto arriba):** el ojo de Kicillof como invocación de 3 turnos
 (Movimiento 5, invisible, sin mareo; solo revela y despeja) y automatizar la red y la luz cegadora; ¿algún pergamino Común?
 
 ## Lo que hay

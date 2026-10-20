@@ -1240,8 +1240,9 @@ prueba('📜 Regeneración y Escudo Especial nuevos, y los pergaminos grupales C
   const grupales = CATALOGO_BASE.filter(i => /^Pergamino grupal de /.test(i.nombre) && !i.archivo);
   const furia = cat('Pergamino grupal de Furia de Combate');
   igual([reg.hpturno, reg.turnos, !!cat('Pergamino de Regeneración').efectoParty, esc.escudoMagico, esc.recarga, esc.finCombate,
-    grupales.length, grupales.every(i => i.tier === 'Común' && i.efectoParty && i.efectoTurnos === 3), furia.efectoMods],
-    [10, 3, true, 3, true, true, 12, true, [{stat: 'dmg', val: 1}]]);
+    grupales.length, grupales.every(i => i.tier === 'Común' && i.efectoParty && i.efectoTurnos === 3), furia.efectoMods,
+    FichaHabilidades.aplicarEfectoDeConsumo({catalogo: [], efectos: []}, cat('Pergamino de Regeneración menor'), presetsDePrueba).estado.hpturno],
+    [10, 3, true, 3, true, true, 12, true, [{stat: 'dmg', val: 1}], 5]);
 });
 prueba('Invulnerable activo bloquea un debuff del consumo (y lo dice)', () => {
   const S = {catalogo: [], efectos: [{nombre: 'Invulnerable', activo: true, invulnerable: true}]};

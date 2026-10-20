@@ -111,15 +111,16 @@ const FichaDuelo = (() => {
       vista: (d, campo, modo) => {
         const S = getS(), c = compute();
         const L = clave => { try{ return typeof FichaLupa !== 'undefined' && typeof lupaFila === 'function' ? FichaLupa.contenido(S, clave) : {titulo: '', html: ''}; }catch(err){ return {titulo: '', html: ''}; } };
-        const f = (valor, st) => { const r = Combatiente.tirarStat(valor, S.efectos, st); return r ? r.formula : fmt(num(valor)); };
+        const f = (valor, st, est) => { const r = Combatiente.tirarStat(valor, est || S.efectos, st); return r ? r.formula : fmt(num(valor)); };
+        const ciegoEva = Combatiente.ciegoContraDistancia(d, S.efectos);   // 🙈 ciego contra un ataque a distancia: la Evasión, a la mitad
         const arma = armaDelInv(d.ataque && d.ataque.armaId);
         if(campo === 'pdg' && d.hab){
           const t = d.hab.tira || {};
           if(t.formula) return {formula: t.formula, titulo: t.etq || '', html: ''};
           return t.stat ? {formula: f(num(c.final[t.stat]) + num(t.bono), t.stat), ...L('stat:' + t.stat)} : null;
         }
-        if(campo === 'contra') return modo ? {formula: f(num(c.final[modo]), modo), ...L('stat:' + modo)} : null;
-        if(campo === 'eva'){ const ee = evaEsp(d); return {formula: Combatiente.conFijo(f(num(c.final.eva) + ee.val, 'eva'), ee), ...L('stat:eva')}; }
+        if(campo === 'contra') return modo ? {formula: f(num(c.final[modo]), modo, modo === 'eva' ? ciegoEva : null), ...L('stat:' + modo)} : null;
+        if(campo === 'eva'){ const ee = evaEsp(d); return {formula: Combatiente.conFijo(f(num(c.final.eva) + ee.val, 'eva', ciegoEva), ee), ...L('stat:eva')}; }
         if(campo === 'parry'){ const it = modo ? S.inventario.find(x => x.id === modo) : null; return {formula: f(statParaArma('parry', it), 'parry'), ...L('stat:parry')}; }
         if(campo === 'pdg'){
           const tipo = d.ataque.tipo;

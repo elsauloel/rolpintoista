@@ -99,8 +99,9 @@ const CreepDuelo = (() => {
           if(t.formula) return {formula: t.formula, titulo: t.etq || '', html: ''};
           return t.stat ? {formula: formulaDe(A().tirada('', habStat(sc, t.stat) + num(t.bono), sc, t.stat)), ...L('stat|' + t.stat)} : null;
         }
-        if(campo === 'contra') return modo ? {formula: formulaDe(A().tirada('', habStat(sc, modo), sc, modo)), ...L('stat|' + modo)} : null;
-        if(campo === 'eva'){ const ee = evaEsp(sc, d); return {formula: formulaDe(A().tirada('', C().statValor(sc, 'eva') + ee.val, sc, 'eva', ee.fijo)), ...L('stat|eva')}; }
+        const scEva = {...sc, estados: Combatiente.ciegoContraDistancia(d, sc.estados)};   // 🙈 ciego contra un ataque a distancia
+        if(campo === 'contra') return modo ? {formula: formulaDe(A().tirada('', habStat(sc, modo), modo === 'eva' ? scEva : sc, modo)), ...L('stat|' + modo)} : null;
+        if(campo === 'eva'){ const ee = evaEsp(sc, d); return {formula: formulaDe(A().tirada('', C().statValor(sc, 'eva') + ee.val, scEva, 'eva', ee.fijo)), ...L('stat|eva')}; }
         if(campo === 'parry') return {formula: formulaDe(A().tirada('', C().statValor(sc, 'parry'), sc, 'parry')), ...L('stat|parry')};
         if(campo === 'pdg'){
           const t = d.ataque.tipo === 'habilidad-arma' ? pdgDeArreglos(sc, d.ataque) : A().tiradaAtaque(sc, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo);

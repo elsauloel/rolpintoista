@@ -80,14 +80,14 @@ const InvDuelo = (() => {
         const inv = ui.inv((campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor);
         if(!inv) return null;
         const L = clave => { try{ return typeof InvLupa !== 'undefined' && typeof lupaFila === 'function' ? InvLupa.contenido(inv, `inv:${inv.id}:${clave}`) : {titulo: '', html: ''}; }catch(err){ return {titulo: '', html: ''}; } };
-        const F = (valor, st) => { const t = A().tirada(inv, '', valor, st); return t && t.r ? t.r.formula : fmt(num(valor)); };
+        const F = (valor, st, ciegoDe) => { const t = A().tirada(ciegoDe ? {...inv, estados: Combatiente.ciegoContraDistancia(d, inv.estados)} : inv, '', valor, st); return t && t.r ? t.r.formula : fmt(num(valor)); };   // 🙈
         if(campo === 'pdg' && d.hab){
           const t = d.hab.tira || {};
           if(t.formula) return {formula: t.formula, titulo: t.etq || '', html: ''};
           return t.stat ? {formula: F(num(I().statValor(inv, t.stat)) + num(t.bono), t.stat), ...L('stat:' + t.stat)} : null;
         }
-        if(campo === 'contra') return modo ? {formula: F(num(I().statValor(inv, modo)), modo), ...L('stat:' + modo)} : null;
-        if(campo === 'eva'){ const ee = evaEsp(inv, d); return {formula: Combatiente.conFijo(F(I().statValor(inv, 'eva') + ee.val, 'eva'), ee), ...L('stat:eva')}; }
+        if(campo === 'contra') return modo ? {formula: F(num(I().statValor(inv, modo)), modo, modo === 'eva'), ...L('stat:' + modo)} : null;
+        if(campo === 'eva'){ const ee = evaEsp(inv, d); return {formula: Combatiente.conFijo(F(I().statValor(inv, 'eva') + ee.val, 'eva', true), ee), ...L('stat:eva')}; }
         if(campo === 'parry') return {formula: F(I().statValor(inv, 'parry'), 'parry'), ...L('stat:parry')};
         if(campo === 'pdg'){
           const t = d.ataque.tipo === 'habilidad-arma'

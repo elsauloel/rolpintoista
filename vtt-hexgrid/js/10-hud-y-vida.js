@@ -345,6 +345,13 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     // 💍 El Anillo del último aliento (2026-10-18): una vez por día, el golpe que lo dejaría en 0 lo deja en 1 (comun/ficha-acciones.js, fijarHp).
     let aliento = false;
     if(previo > 0 && datos.hp <= 0 && num(rs.ultimoAliento) > 0 && !(datos.meta && datos.meta.ultimoAlientoUsado)){ datos.hp = 1; datos.meta = {...(datos.meta || {}), ultimoAlientoUsado: true}; aliento = true; }
+    // 🔥 Llama de Fénix (2026-10-20): el golpe que lo deja en 0 lo hace renacer con toda la vida y todo el SP, Titilando (acá mismo: no depende
+    // de que la pantalla del dueño esté abierta).
+    let fenix = false;
+    if(previo > 0 && datos.hp <= 0){
+      const q = Combatiente.revivirFenix(efectos, typeof estadosPresetFicha === 'function' ? estadosPresetFicha() : []);
+      if(q){ efectos.splice(0, efectos.length, ...q); datos.hp = Math.max(1, num(rs.hpMax) || 1); datos.spGastado = 0; fenix = true; }
+    }
     // Orbe de absorción (js/26): el daño mágico o elemental que llegó a la vida devuelve SP, una vez por turno.
     let absorbe = 0;
     if(o && o.magico && r.recibido > 0 && num(rs.orbeAbsorcion) > 0 && !num(datos.ataquesArma._absorbe)){
@@ -356,8 +363,9 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     if(datosEf && JSON.stringify(efectos) !== efectosAntes) tx.set(efectosRef, {json: JSON.stringify(datosEf), actualizado: ts});   // el escudo que bajó, lo que absorbió la Armadura arcana
     // El escudo que bajó también en el resumen público (2026-10-11, probando Shield: el token seguía mostrando 14/14 con el escudo gastado).
     const estPub = datosEf && JSON.stringify(efectos) !== efectosAntes && Array.isArray(rs.estados) ? escudosAlResumen(rs.estados, efectos) : null;
-    tx.update(base, {actualizado: ts, 'resumen.hp': datos.hp, ...(absorbe ? {'resumen.sp': num(rs.sp) + absorbe} : {}), ...(estPub ? {'resumen.estados': estPub} : {}), ...(aliento ? {'resumen.ultimoAlientoUsado': true} : {})});
-    return {r, previo, nuevo: datos.hp, absorbe, aliento};
+    tx.update(base, {actualizado: ts, 'resumen.hp': datos.hp, ...(absorbe ? {'resumen.sp': num(rs.sp) + absorbe} : {}), ...(estPub ? {'resumen.estados': estPub} : {}), ...(aliento ? {'resumen.ultimoAlientoUsado': true} : {}),
+      ...(fenix ? {'resumen.estados': (estPub || rs.estados || []).filter(x => !(x && /^llama de f[eé]nix/i.test(String(x.nombre || '')))).concat([{nombre: 'Titilando', polaridad: 'buff', invulnerable: true}])} : {})});
+    return {r, previo, nuevo: fenix ? 0 : datos.hp, absorbe, aliento, fenix, hpFenix: datos.hp};
   });
   if(res.aliento){
     const txt = `${nombreDe(t)} iba a caer, pero el Anillo del último aliento lo sostiene con 1 de vida (una vez por día)`;
@@ -367,6 +375,10 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
   if(guarda && golpe > 0) guardianAviso(t, guarda);
   if(muro && golpe > 0) muroAviso(t, muro);
+  if(res.fenix){
+    toast(`🔥 ${nombreDe(t)}: ¡la Llama de Fénix lo levanta! Revive con ${fmt(res.hpFenix)} HP y todo el SP, Titilando.`);
+    try{ momentoAbrir({tipo: 'fenix', icono: '🔥', titulo: `${nombreDe(t)} renace de sus cenizas`, estado: 'listo', resultado: `La Llama de Fénix lo levanta con ${fmt(res.hpFenix)} HP y todo el SP; queda Titilando hasta su próximo turno.`}); }catch(e){}
+  }
   if(res.absorbe) mesaLinea(`🔮 Orbe de absorción: ${nombreDe(t)} recupera ${res.absorbe} SP del daño mágico`);
   await mitiMitiCobrar(t, prot, res);
   await cosechaSiMuere(t, res);

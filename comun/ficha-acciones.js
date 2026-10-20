@@ -155,6 +155,15 @@ const FichaAcciones = (() => {
   function revisarAnkh(S){
     if(num(S.hp) > 0) return null;
     if(S.muerto && S.muerto.definitivo) return null; // muerte definitiva: ya no hay vuelta atrás
+    // 🔥 Llama de Fénix (2026-10-20): revive con toda la vida y todo el SP, Titilando. Va antes que el Ankh (no lo gasta).
+    const conLlama = Combatiente.revivirFenix(S.efectos, typeof estadosPresetFicha === 'function' ? estadosPresetFicha() : []);
+    if(conLlama){
+      S.efectos = conLlama;
+      const cf = FichaCalculo.calcular(S);
+      S.hp = Math.max(1, Number.isNaN(cf.final.hpmax) ? 1 : num(cf.final.hpmax));
+      S.spGastado = 0;
+      return 'Llama de Fénix';
+    }
     const idx = S.cinturon.findIndex(i => i.nombre === 'Ankh de Reencarnación' && num(i.unidades) > 0);
     if(idx < 0) return null;
     return aplicarRevivirConAnkh(S, 'cinturon', S.cinturon[idx].id);

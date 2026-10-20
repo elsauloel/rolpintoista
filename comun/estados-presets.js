@@ -150,6 +150,9 @@ const ESTADOS_PRESET = [
   // Coagulación (2026-10-08, dueño: antes «Coagulación extrema»; la marca interna sigue siendo coagulacionExtrema).
   {nombre:'Coagulación', alias:['Coagulación extrema'], polaridad:'buff', turnos:3, coagulacionExtrema:true,
     detalle:'Inmune a Sangrado: no se le puede aplicar y el que ya tenga puesto no le hace daño mientras dure.'},
+  // 🔥 Llama de Fénix (dueño, 2026-10-20, el Elixir de Fénix): si cae mientras dura, revive con toda la vida (y todo el SP) y queda Titilando.
+  {nombre:'Llama de Fénix', polaridad:'buff', turnos:3, fenix:true,
+    detalle:'Si cae (vida 0) mientras dura, revive con toda la vida y todo el SP, y queda Titilando hasta su próximo turno; la llama se apaga. ⚙ Automatizado.'},
   {nombre:'Blindado', polaridad:'buff', turnos:3, blindado:true,
     detalle:'Inmune a los golpes críticos: un golpe que iba a ser crítico entra como uno normal. ⚙ Automatizado en el duelo (2026-10-20).'},
   {nombre:'Sigilo', polaridad:'buff', turnos:0, permanente:true,

@@ -51,7 +51,8 @@
 6. ✅ (dueño, 2026-10-20) Invulnerabilidad: sigue Rara a 180, dura **2 turnos** (antes 3).
 7. ✅ (dueño, 2026-10-20) **Las de 3 cargas: el precio de 3 sueltas + 5 por carga, y un escalón de calidad arriba de la suelta** (lo que ganan
    es lugar en el cinturón): HP grande Buena 90, HP mayor grande Excepcional 315, Regeneración grande Buena 90, Regeneración mayor grande Rara 240.
-8. Elixir de Fénix: que reviva (como el Revive: a un aliado caído, o a uno mismo desde el cinturón, como el Ankh) con toda la vida y Titilando.
+8. ✅ (dueño, 2026-10-20) Elixir de Fénix: da **Llama de Fénix** 3 turnos: si caés mientras dura, revivís con toda la vida y todo el SP,
+   Titilando (personajes y creeps: «algún jefe en una situación muy singular»). Sigue Legendario a 450.
 9. Una **Poción de SP menor**, Común 15: un cuarto del SP.
 
 ## Lo que está bien

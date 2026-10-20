@@ -1273,6 +1273,17 @@ prueba('🧪 Escudos de poción y Mano Pesada (2026-10-20): solo físico / espec
     mano.mods.map(m => m.stat + m.val).join(), mano.turnos, D.efectos.filter(e => e.finDia).length, !!cat('Poción de Vitalidad Extendida').archivo],
     [15, true, false, true, true, 25, true, 15, false, 'crit1,critpot3', 3, 0, true]);
 });
+prueba('🔥 Llama de Fénix (2026-10-20): un personaje o un creep que cae con la llama revive con toda la vida, Titilando', () => {
+  const S = {...structuredClone(FichaGuardado.DEFAULT), catalogo: [], efectos: [], cinturon: []};
+  FichaHabilidades.aplicarEfectoDeConsumo(S, CATALOGO_BASE.find(i => i.nombre === 'Elixir de Fénix'), presetsDePrueba);
+  const hpmax = FichaCalculo.calcular(S).final.hpmax;
+  S.hp = 0; S.spGastado = 4;
+  const r = FichaAcciones.revisarAnkh(S);
+  const sc = {id: 'c', hp: 0, hpMax: 30, estados: [{nombre: 'Llama de Fénix', activo: true, fenix: true, turnos: 3}]};
+  const rc = CreepAcciones.fenixCreep(sc), sc2 = {id: 'd', hp: 0, hpMax: 30, estados: []};
+  igual([r, S.hp === hpmax, S.spGastado, S.efectos.some(e => e.fenix), S.efectos.some(e => e.titilando), rc, sc.hp, sc.estados.some(e => e.titilando), CreepAcciones.fenixCreep(sc2), sc2.hp],
+    ['Llama de Fénix', true, 0, false, true, true, 30, true, false, 0]);
+});
 prueba('Invulnerable activo bloquea un debuff del consumo (y lo dice)', () => {
   const S = {catalogo: [], efectos: [{nombre: 'Invulnerable', activo: true, invulnerable: true}]};
   const r = FichaHabilidades.aplicarEfectoDeConsumo(S, {efectoNombre: 'Veneno', efectoHpTurno: -2}, presetsDePrueba);

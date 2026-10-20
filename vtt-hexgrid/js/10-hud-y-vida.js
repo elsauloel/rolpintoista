@@ -224,10 +224,17 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : creepDefensaMapa(sc) + extra) + num(restaExtra || 0), sc.estados, o);
     const previo = num(sc.hp);
     sc.hp = Math.max(0, previo - r.recibido);
+    // 🔥 Llama de Fénix (2026-10-20): si cae con la llama, revive con toda la vida y Titilando.
+    let fenix = false;
+    if(sc.hp <= 0){ const q = Combatiente.revivirFenix(sc.estados, typeof estadosPresetCreep === 'function' ? estadosPresetCreep() : []); if(q){ sc.estados = q; sc.hp = Math.max(1, num(sc.hpMax)); fenix = true; } }
     const bronca = typeof broncaSumar === 'function' ? broncaSumar(sc, r) : null;   // 😤 cada golpe que le duele suma (js/51)
-    return {r, previo, nuevo: sc.hp, bronca};
+    return {r, previo, nuevo: fenix ? 0 : sc.hp, bronca, fenix, hpFenix: sc.hp};
   });
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
+  if(res.fenix){
+    toast(`🔥 ${nombreDe(t)}: ¡la Llama de Fénix lo levanta! Revive con ${fmt(res.hpFenix)} HP y queda Titilando.`);
+    try{ momentoAbrir({tipo: 'fenix', icono: '🔥', titulo: `${nombreDe(t)} renace de sus cenizas`, estado: 'listo', resultado: `La Llama de Fénix lo levanta con ${fmt(res.hpFenix)} HP; queda Titilando hasta su próximo turno.`}); }catch(e){}
+  }
   if(res.bronca && typeof broncaAnunciar === 'function') broncaAnunciar(t, res.bronca);
   if(guarda && golpe > 0) guardianAviso(t, guarda);
   if(muro && golpe > 0) muroAviso(t, muro);

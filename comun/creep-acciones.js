@@ -156,7 +156,7 @@ const CreepAcciones = (() => {
      acá (los resuelve cada pantalla antes). */
   const uid = () => Math.random().toString(36).slice(2,9);
   const ATTR_LABELS = {con:'Con', fue:'Fue', agl:'Agi', des:'Des', esp:'Esp'};
-  const FLAGS_ESTADO = ['armaduraRota','silencio','confusion','lisiado','paralisis','esEscarcha','mitadPdgEva','inmovilizado','rengo','lento','cansado','exhausto','hypeado','sentado','excedenteVida','invulnerable','inmunidadCC','inmunidadMental','esMental','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','espejo','desarmado','ceguera','esCC','esVeneno','esSangrado','stun','expuesto','mitadEva','alEmpezarTurno','volador','sangraSp'];
+  const FLAGS_ESTADO = ['fenix', 'armaduraRota','silencio','confusion','lisiado','paralisis','esEscarcha','mitadPdgEva','inmovilizado','rengo','lento','cansado','exhausto','hypeado','sentado','excedenteVida','invulnerable','inmunidadCC','inmunidadMental','esMental','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','espejo','desarmado','ceguera','esCC','esVeneno','esSangrado','stun','expuesto','mitadEva','alEmpezarTurno','volador','sangraSp'];
   const habEtq = stat => (C().STAT_LOOKUP[stat] && C().STAT_LOOKUP[stat].label) || ATTR_LABELS[stat] || stat;
   // La Ejecución de un creep: la misma regla que personajes e invocaciones (comun/combatiente.js, habEjecucion). Sin costo variable.
   function habEjecucion(sc, h){
@@ -540,8 +540,18 @@ const CreepAcciones = (() => {
     const dh = Combatiente.curaQueEntra(sc.hp, d.hp);
     if(d.hp && !dh) rep.push('Caído: la cura de este turno no lo levanta');
     if(dh){ const antes = num(sc.hp); sc.hp = Math.max(0, Math.min(num(sc.hpMax), antes + dh)); rep.push(`HP total: ${antes} → ${sc.hp}`); }
+    if(fenixCreep(sc)) rep.push(`🔥 Llama de Fénix: revive con ${sc.hp} HP y queda Titilando`);
     sc.nitros = Combatiente.recargarNo2(C().nitrosMax(sc), sc.nitros, sc.estados);
     return {rep, enCooldown, hpAplicado: d.eventos.filter(ev => ev.tipo === 'hp').length};
+  }
+  // 🔥 Llama de Fénix (2026-10-20): un creep caído con la llama revive con toda la vida y Titilando. → true si revivió.
+  function fenixCreep(sc){
+    if(!sc || num(sc.hp) > 0) return false;
+    const q = Combatiente.revivirFenix(sc.estados, typeof estadosPresetCreep === 'function' ? estadosPresetCreep() : []);
+    if(!q) return false;
+    sc.estados = q;
+    sc.hp = Math.max(1, num(sc.hpMax));
+    return true;
   }
   function finCreep(sc, mant){
     const k = mant ? Combatiente.contarEstados(sc.estados, {hp: 'hpTurno', stacks: 'stacksTurno'}) : Combatiente.terminarTurnoEstados(sc.estados);
@@ -583,7 +593,7 @@ const CreepAcciones = (() => {
     });
   }
 
-  return {bloqueoFirmeCreep, ESPERA_POR_SP, especialesCreep, costoEspecialCreep, habDeEspecialCreep, usarEspecialCreep, habEspecialParaTerminar, mantenimiento, inicioTurno, finTurno, reclamarMantenimiento, alCinturon, quitarDelCinturon, consumir, faltanNitrosConsumir, costoConsumir, colocarTrampaDeItem, consumiblesDe,
+  return {fenixCreep, bloqueoFirmeCreep, ESPERA_POR_SP, especialesCreep, costoEspecialCreep, habDeEspecialCreep, usarEspecialCreep, habEspecialParaTerminar, mantenimiento, inicioTurno, finTurno, reclamarMantenimiento, alCinturon, quitarDelCinturon, consumir, faltanNitrosConsumir, costoConsumir, colocarTrampaDeItem, consumiblesDe,
     tirada, tiradaStat, esquivar, parry, fuerzaGolpe, bloqueo, dano, levantarse, tiradaSoltarse, aplicarSoltarse, pagarParry, pagarAtaque, tiradaAtaque, NOMBRE_ESPECIAL,
     costoAtaqueDe, devolverAtaque, faltanNitros, preguntaSinNitros, alertaSinNitros,
     FLAGS_ESTADO, habEtq, habEjecucion, ataqueDeHab, habTira, efectoDeHab, sobreSi, confirmarSilencio, preguntaVida, ejecutarHab, terminarHab, tiradaPrimeraHab, tiradaSegundaHab,

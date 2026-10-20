@@ -305,7 +305,7 @@ const FichaBotonera = (() => {
     });
     // Soltarse (2026-10-03): un estado que dejó una trampa de Atrapar; el botón dice qué tira y cuánto cuesta.
     const soltable = Combatiente.estadoSoltable(S.efectos);
-    if(soltable){
+    if(soltable && !Combatiente.soltarNorm(soltable.soltar).alEmpezar){   // (la Red Nerubian: una sola tirada, al empezar el turno; dueño 2026-10-20)
       const s = Combatiente.soltarNorm(soltable.soltar), falta = num(S.nitros) < s.no2;
       html += `<div class="botonera-caja" style="margin-bottom:8px"><button class="ejecutar-btn${falta ? ' sin-recursos' : ''}" data-soltarse="1" style="width:100%" title="${esc(`${soltable.nombre}: tirás ${s.etq} contra ${s.dif}; si llegás, te soltás. Cuesta ${s.no2} No2 aunque no lo logres.`)}"${falta ? ' aria-disabled="true"' : ''}>${esc(Combatiente.textoSoltarse(soltable))}</button></div>`;
     }

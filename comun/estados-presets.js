@@ -116,8 +116,8 @@ const ESTADOS_PRESET = [
   {nombre:'Desarmado', alias:['Desarme'], polaridad:'debuff', permanente:true, turnos:0, desarmado:true, esCC:true,
     detalle:'Se le cayó el arma: no puede atacar con ella hasta levantarla, que cuesta 1 No2 (el botón «Levantar el arma» de la Botonera). ⚙ Automatizado: al atacar, avisa (y deja seguir si la mesa lo decide); en el mapa el arma queda en el piso (🗡 con su nombre) y la levanta cualquiera que esté al lado, desde su Botonera.'},
   // Ceguera (dueño, 2026-10-07, la Varita del eclipse): 1 turno, solo ve a 1 casilla y −2 PdG.
-  {nombre:'Ceguera', polaridad:'debuff', turnos:1, ceguera:true, esCC:true, mods:[{stat:'pdg', val:-2}],
-    detalle:'Ciego: solo ve a 1 casilla alrededor y tiene −2 PdG. ⚙ Automatizado: el −2 y, en el mapa, lo que ve un personaje (1 casilla, ni su propia luz).'},
+  {nombre:'Ceguera', polaridad:'debuff', turnos:1, ceguera:true, esCC:true,
+    detalle:'Ciego: ve solo a 2 casillas alrededor, no puede elegir objetivos más lejos y sus tiradas de PdG y PdG.Esp valen la mitad (para abajo). ⚙ Automatizado: la mitad y, en el mapa, lo que ve (2 casillas, ni su propia luz) y el aviso al elegir un objetivo más lejos.'},   // (2026-10-20, dueño: antes 1 casilla y −2 PdG)
   // Invulnerable = Titilando (2026-10-08, dueño: «son lo mismo»): siempre que alguien es invulnerable, titila. Al revivir se pone Invulnerable
   // hasta su próximo turno (Combatiente.estadoTitilando); `Titilando` queda como otro nombre de lo mismo (los estados ya puestos).
   {nombre:'Invulnerable', alias:['Titilando'], polaridad:'buff', turnos:3, invulnerable:true,

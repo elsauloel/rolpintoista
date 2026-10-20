@@ -918,6 +918,12 @@ prueba('Drops fijos (2026-10-14, la Grapa del capataz): el creep los suelta siem
     garrote.ahorroNitros, garrote.mods, Combatiente.rasgosDeItem(garrote).ahorroNitros],
     [['Grapa del capataz', 'No existe'], true, true, [{stat: 'pdg', val: 2}, {stat: 'dmg', val: 2}], false, true, 1, [{stat: 'parry', val: 1}], 1]);
 });
+prueba('🙈 Ceguera nueva (2026-10-20): la mitad del PdG y del PdG.Esp (no la Evasión), ve a 2 casillas, sin −2; un estado viejo se reconoce por el nombre', () => {
+  const pre = ESTADOS_PRESET.find(p => p.nombre === 'Ceguera'), est = [{nombre: 'Ceguera', ceguera: true, activo: true}];
+  igual([Combatiente.mitadesDeTirada(est, 'pdg'), Combatiente.mitadesDeTirada(est, 'pdgmg'), Combatiente.mitadesDeTirada(est, 'eva'), Combatiente.CEGUERA_VISION,
+    (pre.mods || []).length, Combatiente.ciego([{nombre: 'Ceguera'}]), Combatiente.ciego([{nombre: 'Ceguera', activo: false}]), Combatiente.aplicarMitades(7, Combatiente.mitadesDeTirada(est, 'pdg'))],
+    [1, 1, 0, 2, 0, true, false, 3]);
+});
 prueba('📜 Un consumible con Ejecución (2026-10-20, la Red Nerubian): habilidad automática de un uso; PdG.Esp contra Evasión en tu Rango; Inmovilizado hasta 3, se suelta al empezar el turno con Fuerza contra tu Ef.Esp', () => {
   const red = CATALOGO_BASE.find(i => i.nombre === 'Pergamino de red Nerubian');
   const h = Combatiente.habDeConsumible(red), e = Combatiente.habEjecucion(h, h.duelo, {stat: id => ({rng: 6, dmgesp: 3})[id] || 0});
@@ -2718,19 +2724,19 @@ prueba('varitas Comunes de arena y portal (2026-10-07): la trampa se suelta cont
          purga.especial.no2, !!CATALOGO_BASE.find(x => x.id === 'esp-buena-varita-del-manotazo')],
     [9, 2, true, 'Inmovilizado', 9, 2, '#C2A060', 4, 1, 2, false]);
 });
-prueba('grupo 1 de Buena (2026-10-07): Desarmado (no ataca, levantar el arma 1 No2), Ceguera (−2 PdG), la purga y la cadena con efectos a todos', () => {
+prueba('grupo 1 de Buena (2026-10-07): Desarmado (no ataca, levantar el arma 1 No2), Ceguera (desde el 2026-10-20: la mitad del PdG), la purga y la cadena con efectos a todos', () => {
   const sc = creepPrueba({nitros: 3, habilidades: [{id: 'm', nombre: 'Manotazo', efectoNombre: 'Desarmado'}, {id: 'c', nombre: 'Eclipse', efectoNombre: 'Ceguera'}]});
   CreepAcciones.efectoDeHab(sc, sc.habilidades[0], estadosPresetCreep());
   const q = Combatiente.preguntaSentado(sc.estados, sc.nombre), lv = Combatiente.levantable(sc.estados);
   const r = CreepAcciones.levantarse(sc);
-  EstadosAplicar.aplicarACreep(sc, {nombre: 'Ceguera'});   // como la pone el duelo (la varita): con el −2 del preset
+  EstadosAplicar.aplicarACreep(sc, {nombre: 'Ceguera'});   // como la pone el duelo (la varita)
   const ceg = sc.estados.find(e => e.nombre === 'Ceguera');
   const sent = Combatiente.levantable([{nombre: 'Sentado', sentado: true, activo: true}, {nombre: 'Desarmado', desarmado: true, activo: true}]);
   const purga = Combatiente.habEjecucion({nombre: 'Purga'}, CATALOGO_BASE.find(i => i.nombre === 'Varita de la purga').especial.duelo, {});
   const rel = Combatiente.habEjecucion({nombre: 'Relámpago'}, CATALOGO_BASE.find(i => i.nombre === 'Varita del relámpago').especial.duelo, {});
-  igual([/Desarmado/.test(q), lv.arma, r.aviso && /levantó el arma/.test(r.aviso), sc.nitros, Combatiente.levantable(sc.estados), !!ceg.ceguera, ceg.mods[0].val, sent.arma,
+  igual([/Desarmado/.test(q), lv.arma, r.aviso && /levantó el arma/.test(r.aviso), sc.nitros, Combatiente.levantable(sc.estados), !!ceg.ceguera, Combatiente.mitadesDeTirada(sc.estados, 'pdg'), sent.arma,
     purga.efectos[0].purga, Duelo.specDeEfecto(Duelo.limpiarHab({nombre: 'P', efectos: purga.efectos}).efectos[0]).purga, rel.cadena.efectos, rel.cadena.saltos],
-    [true, true, true, 2, null, true, -2, false, true, true, true, 3]);
+    [true, true, true, 2, null, true, 1, false, true, true, true, 3]);
 });
 prueba('el arma en el piso (2026-10-07): las Botoneras ofrecen levantarla al lado; con su arma en el piso, Desarmado no se levanta sin ir', () => {
   const cerca = {armasCerca: [{id: 'el1', nombre: 'Hacha', propia: true}]};

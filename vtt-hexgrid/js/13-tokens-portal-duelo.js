@@ -716,6 +716,18 @@ function dueloResaltarObjetivos(propio, alcance, esValido, minimo = 0){
 }
 function dueloAvisoObjetivoOcultar(){ const el = $('#duelo-objetivo'); if(el) el.hidden = true; if(objetivosResaltados){ objetivosResaltados = null; pedirDibujo(); } if(typeof tiroTerminar === 'function') tiroTerminar(); }
 
+/* 🙈 Ceguera (dueño, 2026-10-20): «no te permita, por más que uno físicamente vea cosas en el mapa, seleccionar objetivos a más de dos casilleros».
+   Avisa y ofrece «Hacerlo igual (lo decide la mesa)», como el resto de las reglas del mapa. → true si sigue. */
+const cegueraDe = t => !!t && Combatiente.ciego(confusionEstadosDe(t));
+async function cegueraPermite(mio, destino){
+  if(!mio || !destino || !cegueraDe(mio)) return true;
+  const d = distanciaHex(mio, destino);
+  if(d <= Combatiente.CEGUERA_VISION) return true;
+  const si = await AvisoCombate.preguntar(`${nombreDe(mio)} está ciego: no ve más allá de ${Combatiente.CEGUERA_VISION} casillas y eso queda a ${d}. ¿Apuntar igual? (lo decide la mesa)`,
+    {icono: '🙈', titulo: 'Ciego', si: 'Apuntar igual', no: 'Elegir otro'});
+  if(si) mesaLinea(`🙈 ${nombreDe(mio)} apuntó ciego a ${d} casillas (lo decidió la mesa)`, 'alerta-roja');
+  return !!si;
+}
 function dueloElegirObjetivoMapa(msg){
   const yo = msg.yo, ataque = msg.ataque;
   if(ataque && ataque.hab && (ataque.hab.objetivo === 'area' || ataque.hab.objetivo === 'onda' || ataque.hab.objetivo === 'cono' || ataque.hab.objetivo === 'linea')){ dueloElegirAreaMapa(msg); return; }   // hechizo de área: otro flujo (Paso 4/7)
@@ -753,7 +765,9 @@ function dueloElegirObjetivoMapa(msg){
   const mioTiro = ataque && ataque.rango && !ataque.hab ? [...tokens.entries()].map(([id, t]) => ({...t, id})).find(propio) : null;
   let nEnAlcance = 0, nIdeal = 0;
   const resaltar = () => {   // también al volver a elegir (después de «Elegir otro»)
-    nEnAlcance = dueloResaltarObjetivos(propio, ataque && ataque.rango && !ataque.hab ? Combatiente.alcanceMaximo(ataque, ataque.alcance) : ataque && ataque.alcance, esValido, minimo);   // con Largo alcance, más lejos (js/35)
+    const alc0 = ataque && ataque.rango && !ataque.hab ? Combatiente.alcanceMaximo(ataque, ataque.alcance) : ataque && ataque.alcance;
+    const ciegoYo = cegueraDe([...tokens.values()].find(propio));   // 🙈 ciego: brillan solo los que están a 2 o menos
+    nEnAlcance = dueloResaltarObjetivos(propio, ciegoYo ? Math.min(num(alc0) || Combatiente.CEGUERA_VISION, Combatiente.CEGUERA_VISION) : alc0, esValido, minimo);   // con Largo alcance, más lejos (js/35)
     nIdeal = mioTiro ? tiroResaltarIdeal(mioTiro, ataque, esValido) : 0;
     if(mioTiro) tiroPreview = {desde: {col: mioTiro.col, fila: mioTiro.fila}, mioId: mioTiro.id, ataque};
   };
@@ -780,6 +794,7 @@ function dueloElegirObjetivoMapa(msg){
       dueloAvisoObjetivoOcultar();
       try{ t = await dueloVincularSiFalta(t); }catch(err){ console.error('No se pudo vincular el token al creep:', err); }
       const mio = todos.find(propio);
+      if(!(await cegueraPermite(mio, t))){ pedir(); return; }   // 🙈 ciego: no elige objetivos a más de 2 casillas
       if(conArco && mio && Combatiente.arcoMuyCerca(ataque, distanciaHex({col: mio.col, fila: mio.fila}, {col: t.col, fila: t.fila}))){   // avisa y deja seguir: lo decide la mesa
         const si = await AvisoCombate.preguntar(`${nombreDe(t)} está muy cerca para el arco: hace falta al menos ${Combatiente.arcoLibresTxt(ataque)} entre los dos. Con el arco no se pega cuerpo a cuerpo: alejate o cambiá de arma. ¿Disparar igual? (lo decide la mesa)`,
           {icono: '🏹', titulo: 'Muy cerca para el arco', si: 'Disparar igual', no: 'Elegir otro'});
@@ -1280,7 +1295,8 @@ function dueloElegirAreaMapa(msg){
   }
   // El centro, cerca (2026-10-13, Golpe al piso): a `centroAlcance` casillas o menos, y no en la propia casilla.
   const cAlc = Math.round(num(hab.centroAlcance)), mioC = cAlc > 0 ? [...tokens.values()].find(propio) : null;
-  const pedirCentro = () => elegirDestino(h => {
+  const pedirCentro = () => elegirDestino(async h => {
+    if(!(await cegueraPermite([...tokens.values()].find(propio), h))){ pedirCentro(); return; }   // 🙈 ciego
     if(mioC){ const d = distanciaHex(h, mioC); if(d < 1 || d > cAlc){ toast(cAlc === 1 ? 'Tiene que caer en una casilla pegada a quien la usa' : `Tiene que caer a ${cAlc} casillas o menos (no en la propia)`); pedirCentro(); return; } }
     lanzar(h);
   }, `<b>🌀 ${hab && hab.nombre ? esc(hab.nombre) + ': marcá el centro del área' : 'Elegí el centro del área'}</b> <span>clic en el mapa (${Combatiente.areaTxt(radio)}${mioC ? cAlc === 1 ? ', en una casilla pegada' : `, a ${cAlc} o menos` : ''}) · Esc o clic derecho cancelan</span>`, true, cancelado);

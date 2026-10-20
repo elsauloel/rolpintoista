@@ -419,7 +419,7 @@ function statPjDe(t, campo){
   return r && Number.isFinite(r[campo]) && r[campo] > 0 ? Math.min(30, Math.round(r[campo])) : 0;
 }
 const luzPortadaDe = t => statPjDe(t, 'luz'), veOcultoDe = t => statPjDe(t, 'veoculto');
-// Ceguera (2026-10-07, la Varita del eclipse): un personaje ciego ve solo la casilla de alrededor, para todos lados, y ni su propia luz.
+// Ceguera (2026-10-07, la Varita del eclipse): un personaje ciego ve solo alrededor (2 casillas desde el 2026-10-20), para todos lados, y ni su propia luz.
 function ciegoDe(t){
   if(!t || t.tipo !== 'pj') return false;
   const v = vinculo(t), r = v && v.resumen;
@@ -451,7 +451,7 @@ function celdasVisionDe(t, ignorarSolidos){
   const solidos = nb.size && !enNiebla ? new Set([...solidos0, ...nb]) : solidos0;
   const conParedes = !ignorarSolidos && hayParedes();   // las paredes de línea fina (js/34)
   const res = [], ciego = ciegoDe(t);
-  (ciego ? celdasDisco(1) : offsetsVision(k, enNiebla ? 1 : radioVisionDe(t))).forEach(o => {
+  (ciego ? celdasDisco(Combatiente.CEGUERA_VISION) : offsetsVision(k, enNiebla ? 1 : radioVisionDe(t))).forEach(o => {
     const col = cuboACol(c0.q + o.dq, c0.r + o.dr), fila = cuboAFila(c0.q + o.dq, c0.r + o.dr);
     // Los elementos Sólidos tapan la vista: no se ve lo que queda detrás.
     if((solidos.size || conParedes) && !lineaLibre(origen, {col, fila}, solidos, !conParedes)) return;

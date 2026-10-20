@@ -115,7 +115,7 @@ const CreepBotonera = (() => {
       combate.push({nombre: `🤝 Ayudar a soltar a ${a.nombre} · ${a.etq} contra ${a.dif} · ${a.no2} No2`, dado: '', soloTexto: true, sinNitros: sinNo2, motivo: `${sinNo2 ? 'Sin No2 · ' : ''}${a.nombre} está atrapado (${a.est}): tira su ${a.etq} contra ${a.dif}; si llega, lo suelta. Cuesta ${a.no2} No2 aunque no lo logre`, attr: `data-ayudarsoltarcreep="${a.tokenId}"`});
     });
     const soltableCreep = Combatiente.estadoSoltable(sc.estados);
-    if(soltableCreep){
+    if(soltableCreep && !Combatiente.soltarNorm(soltableCreep.soltar).alEmpezar){   // (una sola tirada, al empezar el turno)
       const s = Combatiente.soltarNorm(soltableCreep.soltar), sinNitrosSol = num(sc.nitros) < s.no2;
       combate.push({nombre: Combatiente.textoSoltarse(soltableCreep), dado:'', soloTexto:true, sinNitros: sinNitrosSol, motivo: `${sinNitrosSol ? 'Sin No2 · ' : ''}${soltableCreep.nombre}: tira ${s.etq} contra ${s.dif}; si llega, se suelta. Cuesta ${s.no2} No2 aunque no lo logre`, attr:`data-soltarcreep="${sc.id}"`});
     }

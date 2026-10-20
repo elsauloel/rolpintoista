@@ -2,7 +2,7 @@
    «Una vez que esté colocado el estado, al principio del turno de la persona que está inmovilizada, ahí tiene la tirada de Fuerza contra Efecto
    especial para ver si se zafa o no». Un estado con `soltar.alEmpezar` (Combatiente.soltarNorm lo conserva): cuando empieza el turno de quien lo
    tiene, la pantalla que lo maneja (su dueño, o el GM con 🎮 el control; un creep, el GM) muestra un cartel con la tirada, gratis. Si llega, se
-   saca el estado. El «🔓 Soltarse» de la Botonera sigue para reintentar en el mismo turno (con su costo). La tirada va a la Mesa. Lo llama
+   saca el estado. Es la única tirada por turno (dueño, 2026-10-20: sin el botón de reintentar). La tirada va a la Mesa. Lo llama
    escucharIniciativa (js/04) cada vez que cambia el turno. */
 const soltarAlEmpezarHechos = new Set();   // token@paso: una sola vez por turno
 const soltarAlEmpezarDe = estados => (estados || []).find(e => e && e.activo !== false && e.soltar && e.soltar.alEmpezar && Combatiente.soltarNorm(e.soltar)) || null;

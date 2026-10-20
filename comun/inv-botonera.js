@@ -51,7 +51,7 @@ const InvBotonera = (() => {
     ];
     // Levantarse y Soltarse (2026-10-03): las mismas que un personaje y un creep, con lo que tira y cuesta escrito en el botón.
     const lv0 = Combatiente.levantable(inv.estados), lvInv = lv0 && lv0.arma && o.armaEnElPiso ? null : lv0, sentadaInv = !!lvInv, armaInv = !!(lvInv && lvInv.arma), soltableInv = Combatiente.estadoSoltable(inv.estados);   // (o Desarmado, 2026-10-07)
-    const costoLev = armaInv ? Combatiente.COSTO_LEVANTAR_ARMA : Math.max(0, num(FichaCalculo.IT2.nitrosLevantarse) - num(I.modTotal(inv, 'levantarse'))), sSol = soltableInv && Combatiente.soltarNorm(soltableInv.soltar);
+    const costoLev = armaInv ? Combatiente.COSTO_LEVANTAR_ARMA : Math.max(0, num(FichaCalculo.IT2.nitrosLevantarse) - num(I.modTotal(inv, 'levantarse'))), sSol0 = soltableInv && Combatiente.soltarNorm(soltableInv.soltar), sSol = sSol0 && !sSol0.alEmpezar ? sSol0 : null;   // (una sola tirada, al empezar el turno)
     // Las armas en el piso al lado (el mapa las pasa, 2026-10-07): las levanta cualquiera, 1 No2 cada una.
     const tilesArmas = (o.armasCerca || []).map(a => `
       <button type="button" class="botonera-tile${num(inv.nitros) < Combatiente.COSTO_LEVANTAR_ARMA ? ' bt-sin-nitros' : ''}" data-invlevantararma="${inv.id}:${a.id}" title="Cuesta 1 No2. Si es la suya, vuelve a tenerla; si no, se la queda"><span class="bt-label">🗡️ Levantar ${esc(a.nombre)}${a.propia ? ' (la suya)' : ''} · ${fmt(Combatiente.COSTO_LEVANTAR_ARMA)} No2</span></button>`).join('');

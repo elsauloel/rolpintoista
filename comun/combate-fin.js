@@ -256,8 +256,9 @@ const CombateFin = (() => {
   const poolGeneral = cat => cat.filter(i => !esMunicion(i) && !i.sinBotin && !(completo(i) || {}).sinBotin);   // (la Cuerda: sinBotin)
   /* 🎲 El consumible al azar de un creep (dueño, 2026-10-19: «que venga automáticamente con un consumible al azar, que el GM pueda rerolear
      las veces que quiera; el creep lo puede usar una vez en el combate y después queda como drop»): al crearlo, un humano o un humanoide
-     recibe uno en el cinturón (un jefe, dos), con la calidad de su nivel y las familias de su arquetipo. `sc.consumibleAzar` = sus nombres:
-     son su drop aunque los use (como un drop fijo) y reemplazan al que se sorteaba al morir. Las bestias y demás, ninguno. */
+     recibe uno en el cinturón (un jefe, dos), con la calidad de su nivel y las familias de su arquetipo. `sc.consumibleAzar` = sus nombres.
+     Al morir (dueño, el mismo día): **si lo usó, lo suelta seguro; si no lo usó, con la chance de siempre** (humano 60 %, humanoide 45 %; de un
+     jefe, el primero seguro y el segundo con la chance de su tipo). Reemplaza al sorteo al morir. Las bestias y demás, ninguno. */
   const cuantosAlAzar = sc => !(dropChance(sc) > 0) ? 0 : sc.jefe ? 2 : 1;
   function consumibleAlAzar(sc, cat){
     const c = dropElegir(poolGeneral(cat), dropTier(num(sc.nivel) + (sc.jefe ? 1 : 0)), pesosDe(sc));
@@ -285,7 +286,15 @@ const CombateFin = (() => {
     rep.drops = rep.drops || {};
     if(rep.drops[sc.id] === undefined){
       const nombres = [], nivel = num(sc.nivel) + (sc.jefe ? 1 : 0);
-      if(Array.isArray(sc.consumibleAzar)) nombres.push(...sc.consumibleAzar.filter(Boolean));   // 🎲 el que lleva desde que lo crearon
+      if(Array.isArray(sc.consumibleAzar)){   // 🎲 el que lleva desde que lo crearon: si lo usó, seguro; si no, con su chance
+        const quedan = (sc.cinturon || []).filter(x => x && x.azar && num(x.unidades) > 0).map(x => x.nombre), chances = [dropChance(sc), dropSegundo(sc)];
+        sc.consumibleAzar.filter(Boolean).forEach((n, i) => {
+          const k = quedan.indexOf(n);
+          if(k < 0){ nombres.push(n); return; }   // lo usó
+          quedan.splice(k, 1);
+          if(Math.random() < (chances[i] ?? dropBase(sc))) nombres.push(n);
+        });
+      }
       else [dropChance(sc), dropSegundo(sc)].forEach(p => {
         if(p > 0 && Math.random() < p){ const c = dropElegir(poolGeneral(cat), dropTier(nivel), pesosDe(sc)); if(c) nombres.push(c.nombre); }
       });
@@ -665,8 +674,9 @@ const CombateFin = (() => {
       compra += tabla[i] / 100 * l.reduce((a, f) => a + f.peso / tot * prom(f.pool), 0);
     }); return compra; };
     const fijos = Array.isArray(sc.consumibleAzar) ? sc.consumibleAzar.map(n => cons.find(c => c.nombre === n)).filter(Boolean) : null;   // 🎲 el suyo
-    const compra = (fijos ? fijos.reduce((a, c) => a + num(c.precioCompra), 0) : chance * promedio(poolGeneral(cons), pesosDe(sc))) + (m ? promedio(poolMunicion(cons, m)) : 0);
-    return {chance: fijos ? fijos.length : chance, venta: Math.round(compra / 2)};
+    const chances = [dropChance(sc), dropSegundo(sc)];   // (sin saber si lo va a usar: con la chance de cuando no lo usa)
+    const compra = (fijos ? fijos.reduce((a, c, i) => a + (chances[i] ?? dropBase(sc)) * num(c.precioCompra), 0) : chance * promedio(poolGeneral(cons), pesosDe(sc))) + (m ? promedio(poolMunicion(cons, m)) : 0);
+    return {chance, venta: Math.round(compra / 2)};
   }
   function estimar(creeps, cat){
     const filas = (creeps || []).filter(sc => !sc.recompensado).map(sc => {

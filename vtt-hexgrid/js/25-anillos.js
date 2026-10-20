@@ -149,7 +149,9 @@ setInterval(() => {
    party»): quien lo usa ya lo tiene; a cada aliado de este mapa (personajes e invocaciones) le llega el mismo estado por el aviso de siempre
    (`EstadosAplicar.encolarPj`: lo aplica la pantalla que lo maneja). */
 async function bnEfectoAlGrupo(fichaId, estado, it){
-  const spec = {nombre: String(it.efectoPreset || estado.nombre || '').trim(), turnos: num(it.efectoTurnos) || num(estado.turnos) || 3};
+  const spec = {nombre: String(it.efectoPreset || estado.nombre || '').trim(), turnos: num(it.efectoTurnos) || num(estado.turnos) || 3, polaridad: 'buff',
+    ...((it.efectoMods || []).length ? {mods: it.efectoMods} : {}), ...(num(it.efectoHpTurno) ? {hp: num(it.efectoHpTurno)} : {}),
+    ...(it.efectoDetalle ? {detalle: it.efectoDetalle} : {})};
   if(!spec.nombre) return;
   const vistos = new Set([String(fichaId)]), nombres = [];
   for(const [, t] of tokens){

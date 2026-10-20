@@ -156,7 +156,8 @@
 >   nivel bajo suelta sobre todo curación, luces y arrojadizos. Va con «Revisar los consumibles» (§4).
 >   **Cambio del mismo día (dueño): el consumible al azar nace con el creep.** Al «✔ Crear» un creep humano o humanoide, lleva uno en el cinturón
 >   (un jefe, dos), con su calidad y su arquetipo; el GM lo cambia con 🎲 en Recompensas las veces que quiera (o lo saca). El creep lo puede usar
->   y queda de drop igual (`sc.consumibleAzar`; `CombateFin.darConsumiblesAlAzar`); reemplaza al sorteo al morir (que sigue para los creeps viejos).
+>   (`sc.consumibleAzar`; `CombateFin.darConsumiblesAlAzar`); reemplaza al sorteo al morir (que sigue para los creeps viejos). **Al morir (dueño):
+>   si lo usó, lo suelta seguro; si no, con la chance de su tipo** (humano 60 %, humanoide 45 %; jefe: el primero seguro, el segundo con la chance).
 > - [x] **🧮 La calculadora cobra barato el daño fijo de las ballestas (2026-10-11; revisado 2026-10-19)**: una ballesta Común con solo daño, según la calculadora,
 >   puede llegar a 1d6+6 o 2d6+4; según el simulador de balance (`balance_combate.py --ballesta`, Shooter contra el blanco medio) el techo de la
 >   banda Común (74–106 %) es **1d6+3** (95 %; 1d6+4 = 114 %, 2d6 = 110 %). Ajustarla mueve el precio y la calidad de todas las ballestas: revisarlo

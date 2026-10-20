@@ -1232,6 +1232,17 @@ prueba('📜 los pergaminos (2026-10-19): «hasta el fin del combate» lleva la 
     pocion.estado.inmunidadCC, velo, archivados, cat('Pergamino de Ímpetu').efectoMods[0].stat, /crafteo/.test(cat('Pergamino de ventriloquía').detalle)],
     [true, true, true, 3, false, true, true, 'def,armadmg,eva', [true, true], 'nitros', false]);
 });
+prueba('📜 Regeneración y Escudo Especial nuevos, y los pergaminos grupales Comunes (2026-10-19)', () => {
+  const cat = n => CATALOGO_BASE.find(i => i.nombre === n);
+  const S = {catalogo: [], efectos: []};
+  const reg = FichaHabilidades.aplicarEfectoDeConsumo(S, cat('Pergamino de Regeneración'), presetsDePrueba).estado;
+  const esc = FichaHabilidades.aplicarEfectoDeConsumo(S, cat('Pergamino de Escudo Especial'), presetsDePrueba).estado;
+  const grupales = CATALOGO_BASE.filter(i => /^Pergamino grupal de /.test(i.nombre) && !i.archivo);
+  const furia = cat('Pergamino grupal de Furia de Combate');
+  igual([reg.hpturno, reg.turnos, !!cat('Pergamino de Regeneración').efectoParty, esc.escudoMagico, esc.recarga, esc.finCombate,
+    grupales.length, grupales.every(i => i.tier === 'Común' && i.efectoParty && i.efectoTurnos === 3), furia.efectoMods],
+    [10, 3, true, 3, true, true, 12, true, [{stat: 'dmg', val: 1}]]);
+});
 prueba('Invulnerable activo bloquea un debuff del consumo (y lo dice)', () => {
   const S = {catalogo: [], efectos: [{nombre: 'Invulnerable', activo: true, invulnerable: true}]};
   const r = FichaHabilidades.aplicarEfectoDeConsumo(S, {efectoNombre: 'Veneno', efectoHpTurno: -2}, presetsDePrueba);
@@ -2082,20 +2093,22 @@ prueba('🏹 la munición la decide el arma (2026-10-19): arco → una flecha, b
     res.every(r => r[0]), res.every(r => r[1]), res.every(r => r[2]), CombateFin.dropEsperado(cat, {tipoCriatura: 'bestia', nivel: 1, armaDeRango: true, armaNombre: 'Ballesta'}).venta > 0],
     ['flecha', 'virote', '', '', true, true, true, true]);
 });
-prueba('🎲 el consumible al azar de un creep (2026-10-19): nace en el cinturón, se cambia sin acumular, queda de drop aunque lo use; bestias nada, jefe dos', () => {
+prueba('🎲 el consumible al azar de un creep (2026-10-19): nace en el cinturón, se cambia sin acumular; si lo usa lo suelta seguro, si no con su chance; bestias nada, jefe dos', () => {
   const F = CombateFin, cat = CATALOGO_BASE.filter(i => i.tipoItem && !i.archivo).map(CreepCalculo.itemParaCreep);
   const sc = {id: 'z1', nombre: 'Bandido', tipoCriatura: 'humano', nivel: 3, fue: 6, cinturon: []};
   const r1 = F.darConsumiblesAlAzar(sc, cat), primero = sc.consumibleAzar.slice();
   const enCinturon = sc.cinturon.filter(x => x.azar).length;
   F.darConsumiblesAlAzar(sc, cat);
   const trasOtro = sc.cinturon.filter(x => x.azar).length;
-  sc.cinturon = [];   // lo usó
-  const drop = F.dropDeCreep(F.nuevo(), cat, sc).map(d => d.nombre);
+  const orig = Math.random; let sinUsarNo, sinUsarSi;
+  try{ Math.random = () => 0.99; sinUsarNo = F.dropDeCreep(F.nuevo(), cat, sc).length; Math.random = () => 0.01; sinUsarSi = F.dropDeCreep(F.nuevo(), cat, sc).length; }finally{ Math.random = orig; }
+  sc.cinturon = [];   // lo usó: lo suelta seguro
+  let drop; try{ Math.random = () => 0.99; drop = F.dropDeCreep(F.nuevo(), cat, sc).map(d => d.nombre); }finally{ Math.random = orig; }
   const bestia = {id: 'b1', tipoCriatura: 'bestia', nivel: 3, cinturon: []}, jefe = {id: 'j1', tipoCriatura: 'humanoide', nivel: 3, jefe: true, cinturon: []};
   F.darConsumiblesAlAzar(bestia, cat); F.darConsumiblesAlAzar(jefe, cat);
-  igual([r1.nombres.length, primero.length, enCinturon, trasOtro, drop.join() === sc.consumibleAzar.join(), !!bestia.consumibleAzar, jefe.consumibleAzar.length,
+  igual([r1.nombres.length, primero.length, enCinturon, trasOtro, sinUsarNo, sinUsarSi, drop.join() === sc.consumibleAzar.join(), !!bestia.consumibleAzar, jefe.consumibleAzar.length,
     !!CATALOGO_BASE.find(i => i.nombre === sc.consumibleAzar[0] && i.tipoItem === 'consumibles' && !i.flecha)],
-    [1, 1, 1, 1, true, false, 2, true]);
+    [1, 1, 1, 1, 0, 1, true, false, 2, true]);
 });
 prueba('🎁 familias por arquetipo (2026-10-19): el creep se reconoce por sus datos (o lo elige el GM), los consumibles por lo que hacen; la Cuerda no sale', () => {
   const K = CreepCalculo, F = CombateFin;

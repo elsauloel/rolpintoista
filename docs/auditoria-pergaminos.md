@@ -10,7 +10,12 @@ Fortuna, Inmunidad a CC y Blindaje: 3 turnos **a todo el grupo** (`efectoParty`:
 (7) Velo Eterno: Defensa especial +5 en vez de Res.Esp. Los seis «de crafteo»: sin el texto del crafteo; sombras, ventriloquía y tentáculo,
 ✋ a mano. **De paso:** cinco pergaminos y cinco pociones (Buena Fortuna, Blindaje, Inmunidad a CC, Escudo Especial, Sangre Pura,
 Invulnerabilidad) ponían un estado con nombre propio sin su mecánica (no daban ventaja ni inmunidad): ahora llevan `efectoPreset`.
-**Pendiente:** Regeneración y Escudo Especial (el dueño propone +5 que se recarga cada turno), el ojo de Kicillof como invocación de 3 turnos
+**Segunda tanda (dueño, el mismo día):** Regeneración = 10 por turno, 3 turnos, a todo el grupo. Escudo Especial = 3 que se recarga entero
+cada turno, hasta el fin del combate (`efectoRecarga`). **Pergaminos Comunes:** 12 «Pergamino grupal de …», el +1 de los de Buena calidad
+(Escudo Arcano, Foco Arcano, Furia Arcana, Furia de Combate, Muralla Personal, Paso Fantasma, Puntería Certera, Rango Extendido, Reflejo de
+Acero, Reserva Ampliada, Vitalidad Extendida, Voluntad de Hierro) para todo el grupo durante 3 turnos, a 60 (la equivalencia simple del dueño:
+uno solo todo el combate ≈ todo el grupo 3 turnos).
+**Pendiente:** el ojo de Kicillof como invocación de 3 turnos
 (Movimiento 5, invisible, sin mareo; solo revela y despeja) y automatizar la red y la luz cegadora; ¿algún pergamino Común?
 
 ## Lo que hay

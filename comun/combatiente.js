@@ -1326,7 +1326,7 @@ const Combatiente = (() => {
     const formula = sx(formula0 && sumaEsp > 0 ? `${formula0}+${sumaEsp}` : formula0);   // «Xd4» con la X elegida (Balas de sangre, 2026-10-13)
     return {
       nombre: h.nombre, objetivo: c.objetivo || 'enemigo', ...(h.detalle ? {detalle: String(h.detalle).slice(0, 600)} : {}),   // el texto, para el recuadro del duelo (2026-10-15)
-      alcance: c.objetivo === 'uno mismo' || c.objetivo === 'area' || c.objetivo === 'onda' || c.objetivo === 'cono' || c.objetivo === 'linea' ? 0 : alcanceHab(c, stat, o.stat),
+      alcance: c.objetivo === 'uno mismo' || (c.objetivo === 'area' && c.alcance === undefined) || c.objetivo === 'onda' || c.objetivo === 'cono' || c.objetivo === 'linea' ? 0 : alcanceHab(c, stat, o.stat),   // (un área con `alcance` explícito: hasta dónde va el centro, la Luz cegadora)
       tira: c.tiraFormula ? {formula: sx(c.tiraFormula), etq: c.tiraEtiqueta || 'Tirada'} : (stat ? {stat, etq: etq(stat), bono: nf(c.tiraBono !== undefined ? c.tiraBono : h.tiradaBono)} : null),   // stat + N (2026-10-15)
       contra: contraDeEjecucion(c.contra, etq, sx),
       // Daño «la diferencia» (2026-10-02, Drenar Vida): no se tira, es lo que quien la usa le ganó a la resistencia. «Drena»: quien la
@@ -1344,7 +1344,8 @@ const Combatiente = (() => {
       // Solo a los aliados (2026-10-13, ¡A laburar! del Capataz kobold: un grito que bendice a los suyos y no a los rivales).
       ...((c.objetivo === 'area' || c.objetivo === 'onda') && c.aliados ? {aliados: true} : {}),
       ...(c.objetivo === 'linea' ? {largo: Math.max(1, Math.round(nf(c.largo)) || 4)} : {}),   // línea recta desde quien la usa (2026-10-05, Varita láser)
-      ...((c.objetivo === 'onda' || c.objetivo === 'cono') && c.ondaDodge ? {dodge: true} : {}),   // la onda o el cono que deja dodge roll (Daño en área, Ráfaga arcana)
+      ...((c.objetivo === 'onda' || c.objetivo === 'cono') && c.ondaDodge ? {dodge: true} : {}),
+      ...(c.objetivo === 'area' && c.sinDodge ? {sinDodge: true} : {}),   // un área que no se esquiva corriendo (la Luz cegadora, 2026-10-20: un destello se resiste, no se esquiva)   // la onda o el cono que deja dodge roll (Daño en área, Ráfaga arcana)
       ...(c.objetivo === 'aliado' && c.conmigo ? {conmigo: true} : {}),   // un aliado o uno mismo (Heal del Support, 2026-10-11)
       ...(c.objetivo === 'onda' && c.conVista ? {conVista: true} : {}),
       ...(c.objetivo === 'onda' && c.giro ? {giro: true} : {}),   // Remolino (2026-10-13): antes de pegar, se mueve 1 casilla gratis y alcanza a los de las dos posiciones   // la luz (2026-10-05, Varita de la luz): solo los que ve (los sólidos la tapan)

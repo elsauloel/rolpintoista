@@ -1297,6 +1297,9 @@ function dueloElegirAreaMapa(msg){
   const cAlc = Math.round(num(hab.centroAlcance)), mioC = cAlc > 0 ? [...tokens.values()].find(propio) : null;
   const pedirCentro = () => elegirDestino(async h => {
     if(!(await cegueraPermite([...tokens.values()].find(propio), h))){ pedirCentro(); return; }   // 🙈 ciego
+    // El centro, dentro del alcance de quien la usa (2026-10-20, la Luz cegadora: «el rango del caster»): si queda más lejos, avisa (lo decide la mesa).
+    const alc = Math.round(num(msg.ataque && msg.ataque.alcance)), mioA = alc > 0 ? [...tokens.values()].find(propio) : null;
+    if(mioA && distanciaHex(mioA, h) > alc && !(await AvisoCombate.preguntar(`Ese centro queda a ${distanciaHex(mioA, h)} casillas: fuera de tu alcance (${alc}). ¿Lanzar igual? (lo decide la mesa)`, {icono: '🌀', titulo: 'Fuera de alcance', si: 'Lanzar igual', no: 'Elegir otro'}))){ pedirCentro(); return; }
     if(mioC){ const d = distanciaHex(h, mioC); if(d < 1 || d > cAlc){ toast(cAlc === 1 ? 'Tiene que caer en una casilla pegada a quien la usa' : `Tiene que caer a ${cAlc} casillas o menos (no en la propia)`); pedirCentro(); return; } }
     lanzar(h);
   }, `<b>🌀 ${hab && hab.nombre ? esc(hab.nombre) + ': marcá el centro del área' : 'Elegí el centro del área'}</b> <span>clic en el mapa (${Combatiente.areaTxt(radio)}${mioC ? cAlc === 1 ? ', en una casilla pegada' : `, a ${cAlc} o menos` : ''}) · Esc o clic derecho cancelan</span>`, true, cancelado);

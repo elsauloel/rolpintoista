@@ -11,9 +11,15 @@
 ## Pendientes
 - [x] **🔥 Llama de Fénix** — probado en el mapa el 2026-10-20: Aurelia tomó el elixir desde su Botonera; un golpe de 100 del GM la levantó en el mismo golpe con toda la vida (50) y el SP lleno, Titilando, con el cartel «renace de sus cenizas»; un creep con la llama, igual (5/5).
 - [x] **🧪 Escudos de poción** — probado en el mapa el 2026-10-20: Aurelia tomó la Poción de Cuero Duro (15); un golpe físico de 8 del GM lo absorbió entero (escudo 15 → 7, vida 50) y uno especial de 6 fue a la vida (50 → 44).
-- [ ] **😵 Mareo de invocación nuevo** (2026-10-20, dueño: «tiene nitros, pero no puede usarlos en su turno»): con el orden de turnos armado,
-  invocar algo → entra con el Mareo y sus No2 enteros; en su turno, mover/atacar/habilidad muestra el cartel «recién llega: está mareada» (con
-  «Hacerlo igual»); Parry y Bloqueo desde su Botonera pasan; en el duelo puede hacer dodge roll. Las pruebas automáticas cubren el estado, no el cartel.
+- [x] **😵 Mareo de invocación nuevo** (2026-10-20): probado en «Test con claude elsaulo» con el Lobo de Silvia: entra al final del orden con el
+  Mareo y sus No2 enteros; en su turno, Atacar muestra «recién llega: está mareada» (con «Hacerlo igual»); Esquivar pasa; al empezar su segundo
+  turno el Mareo se va y ataca normal. Se arregló en la prueba: el mapa no lo reconocía (lo publicado no traía la marca). Falta solo el dodge roll.
+- [x] **🏹 Un creep dispara su flecha especial** (2026-10-20): con arco y la Flecha marcadora en el cinturón, Atacar pregunta «¿Qué flecha?»; la
+  elegida va al duelo (declarada), se gasta del cinturón (el Antídoto queda) y, si erra, queda en el piso. Ojo: si después muere, la flecha
+  aparece también en el botín (usada, tildada): el GM la saca en el paso Consumibles.
+- [x] **🛡 Blindado en un duelo real** (2026-10-20): Silvia con Blindado, el creep con PdG 21 contra Evasión 3 → «CRÍTICO ANULADO» y entra como un
+  golpe normal. Se arregló en la prueba: con las tiradas escritas a mano (✍) se perdía el Blindado (y la Resistencia a crítico), y el cartel decía
+  «Evasión está Blindado» en vez del nombre.
 - [x] **⏸ El cartel de la pausa abajo a la izquierda** (2026-10-20): probado con una pausa de verdad en «Test con claude elsaulo»: el GM y la
   jugadora lo ven abajo a la izquierda, sin tapar la barra de arriba; al reanudar se va.
 - [ ] **🎲 El consumible al azar en un fin de combate real** (2026-10-19; regla nueva 2026-10-20: todos van al botín, los usados tildados y los

@@ -1284,6 +1284,11 @@ prueba('🔥 Llama de Fénix (2026-10-20): un personaje o un creep que cae con l
   igual([r, S.hp === hpmax, S.spGastado, S.efectos.some(e => e.fenix), S.efectos.some(e => e.titilando), rc, sc.hp, sc.estados.some(e => e.titilando), CreepAcciones.fenixCreep(sc2), sc2.hp],
     ['Llama de Fénix', true, 0, false, true, true, 30, true, false, 0]);
 });
+prueba('Poción de SP menor (2026-10-20): un tercio del SP máximo, para arriba', () => {
+  const it = CATALOGO_BASE.find(i => i.nombre === 'Poción de SP menor');
+  const conMax = m => { const S = {spGastado: 99}; const orig = FichaBotonera.spMaximo; FichaBotonera.spMaximo = () => m; try{ return FichaAcciones.restaurarSpDeConsumo(S, it); }finally{ FichaBotonera.spMaximo = orig; } };
+  igual([it.tier, it.precioCompra, conMax(9), conMax(10), conMax(12), conMax(3)], ['Común', 20, 3, 4, 4, 1]);
+});
 prueba('Invulnerable activo bloquea un debuff del consumo (y lo dice)', () => {
   const S = {catalogo: [], efectos: [{nombre: 'Invulnerable', activo: true, invulnerable: true}]};
   const r = FichaHabilidades.aplicarEfectoDeConsumo(S, {efectoNombre: 'Veneno', efectoHpTurno: -2}, presetsDePrueba);

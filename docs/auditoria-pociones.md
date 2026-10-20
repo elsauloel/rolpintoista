@@ -53,7 +53,7 @@
    es lugar en el cinturón): HP grande Buena 90, HP mayor grande Excepcional 315, Regeneración grande Buena 90, Regeneración mayor grande Rara 240.
 8. ✅ (dueño, 2026-10-20) Elixir de Fénix: da **Llama de Fénix** 3 turnos: si caés mientras dura, revivís con toda la vida y todo el SP,
    Titilando (personajes y creeps: «algún jefe en una situación muy singular»). Sigue Legendario a 450.
-9. Una **Poción de SP menor**, Común 15: un cuarto del SP.
+9. ✅ (dueño, 2026-10-20) **Poción de SP menor**, Común 20: un tercio del SP máximo (para arriba).
 
 ## Lo que está bien
 Los bonos de 4 turnos (30/60/90 y los de atributo 75/150/225), las curas de estados, la Cura Plus, las de SP, las de HP y Regeneración sueltas,

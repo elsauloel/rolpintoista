@@ -1064,6 +1064,6 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   completa en [`auditoria-pergaminos.md`](auditoria-pergaminos.md). Lo principal: los «todo el combate» no terminan nunca (error); Piernas de
   Viento e Ímpetu hoy dan No2 (muy baratos); Ojo del Verdugo +3 de Crítico frecuente; Buena Fortuna, Inmunidad a CC y Blindaje fuertes para
   un combate entero a 125; Regeneración y Escudo Especial flojos; los seis «de crafteo» sin efecto definido; Velo Eterno ¿Res.Esp o Def.Esp?
-- ❓ **P212. Auditoría de las pociones — 2026-10-20, abierta.** Hoja completa en [`auditoria-pociones.md`](auditoria-pociones.md): Sangre de
+- ✅ **P212. Auditoría de las pociones — 2026-10-20; cerrada el mismo día** (todo lo decidido, en la hoja). Hoja completa en [`auditoria-pociones.md`](auditoria-pociones.md): Sangre de
   dragón no termina nunca; Piernas de Viento, Ímpetu, Segundo aire e Hypeado dan No2 baratos; Ojo del Verdugo +3; Buena Fortuna, Inmunidad a CC,
   Blindaje y Escudo Especial caros; Invulnerabilidad barata; las «grandes» de 3 cargas mal de precio; Elixir de Fénix flojo; falta SP Común.

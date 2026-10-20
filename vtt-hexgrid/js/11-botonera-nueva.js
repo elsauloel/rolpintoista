@@ -113,7 +113,7 @@ function abrirBotoneraPrincipal(){
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261012zy', '../comun/ficha-botin.js?v=20261008zz4', '../comun/generador-tiendas.js?v=20261018zm', '../comun/filtro-catalogo.js?v=20261009r', '../comun/ficha-tienda.js?v=20261010g', '../comun/ficha-mantenimiento.js?v=20261020n', '../comun/ficha-calculo.js?v=20261019k', '../comun/ficha-combate.js?v=20261015d', '../comun/skills-clase.js?v=20261020zr', '../comun/ficha-habilidades.js?v=20261020q',
   '../comun/catalogo.js?v=20261020zr', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261016c', '../comun/ficha-sesion.js?v=20261020zu', '../comun/ficha-botonera.js?v=20261020zb', '../comun/ficha-resumen.js?v=20261020zl', '../comun/inv-calculo.js?v=20261020b', '../comun/inv-botonera.js?v=20261020zb', '../comun/inv-acciones.js?v=20261019l', '../comun/inv-duelo.js?v=20261020zd', '../comun/ficha-acciones.js?v=20261020zt', '../comun/inv-habilidades.js?v=20261014f', '../comun/inv-lupa.js?v=20261015a',
-  '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261020zd', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261014e'];
+  '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261020zv', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261014e'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
    anterior"): en la ficha las columnas se juntan recién con la PANTALLA angosta (@media), pero en el mapa la pantalla es ancha y el panel
@@ -507,7 +507,7 @@ function bnHooksDueloYa(lado){
   if(!bnActiva() || !bnPuedeGuardar()) return null;
   const ui = {...bnCombateUi(),
     soy: l => !!(l && l.tipo === 'pj' && l.ref === bn.fichaId),
-    reabrir: (id, campo) => Duelo.reabrir(id, campo),
+    reabrir: (id, campo, con) => Duelo.reabrir(id, campo, con),
     fijarHp: v => { FichaAcciones.fijarHp(bn.S, v); bnRevisarVida(); },
   };
   return FichaDuelo.hooks(() => bn.S, ui);

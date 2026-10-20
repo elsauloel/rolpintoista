@@ -183,7 +183,7 @@ const dueloInvDe = lado => {
 // la Botonera nueva del mapa. Acá quedan las invocaciones (un lado «fichaId~invId»), que siguen con su código de siempre.
 const dueloUi = {...combateUi,
   soy: lado => !!(lado && lado.tipo === 'pj' && fichaVivo && fichaVivo.id && !fichaVivo.soloLectura && !fichaVivo.editaGM && lado.ref === fichaVivo.id),
-  reabrir: (id, campo) => Duelo.reabrir(id, campo),
+  reabrir: (id, campo, con) => Duelo.reabrir(id, campo, con),
   fijarHp: v => fijarHp(v),
 };
 const dueloPj = FichaDuelo.hooks(() => S, dueloUi);

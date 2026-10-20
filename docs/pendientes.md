@@ -8,6 +8,10 @@
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.
+> - [ ] **🎁 Pedir la lista de qué porcentaje de drop tiene cada tipo de creep** (2026-10-20, dueño, dictado al pasar: «pedir la lista de qué
+>   porcentaje de drop tiene cada tipo de creep»). Armársela en la compu: la chance del consumible al azar por tipo de criatura (hoy humano 60 %,
+>   humanoide 45 %, el resto 0; un jefe: el primero seguro y el segundo con la chance de su tipo), la calidad por nivel y qué sueltan seguro (su
+>   flecha o virote, los drops fijos, el equipo que no es natural). Sale de `comun/combate-fin.js` (`DROP_CHANCE`, `DROP_TABLA`).
 > - [ ] **🎯 Ballestas de Buena calidad para arriba, en d4** (2026-10-19, dueño: «de buena calidad para arriba las dejamos pendientes para trabajar
 >   con tiempo cuando esté en la compu»). **Archivadas mientras tanto** (39: 20 Buenas, 9 Raras, 7 Excepcionales, 3 Legendarias): solo están
 >   publicadas las 25 Comunes en d4. **Las Buenas:** pasarlas tal cual a d4 deja 2 en Rara (centinela, ciénaga) y 7 por debajo de Buena (las sin

@@ -1575,7 +1575,7 @@ const Duelo = (() => {
   // La última tirada que hizo ese lado que todavía se puede reabrir (la más avanzada primero).
   const campoReabrible = (m, lado) => (lado === 'atacante' ? ['critico', 'fuerza', 'pdg'] : ['bloqueo', 'eva']).find(c => puedeReabrir(m, c)) || null;
   const etqCampo = (d, c) => c === 'pdg' ? etqTira(d) : c === 'eva' ? etqContra(d) : c === 'critico' ? 'los d20 del crítico' : ETIQ[c];
-  async function reabrir(id, campo){
+  async function reabrir(id, campo, con){   // `con`: 'wildcard' | 'moneda' (lo que dice la Mesa; 2026-10-20: con la carta decía «Moneda»)
     const ref = col().doc(id);
     let ok = false, anuncio = '';
     await fbDb.runTransaction(async tx => {
@@ -1598,7 +1598,7 @@ const Duelo = (() => {
       if(m.resumido) upd.resumido = false;   // el resumen final se vuelve a publicar cuando termine
       tx.update(ref, upd);
       ok = true;
-      anuncio = `🪙 ${quien} usó una Moneda Re-Roll: vuelve a tirar ${etqCampo(m, campo)}`;
+      anuncio = con === 'wildcard' ? `🃏 ${quien} usó una wildcard: vuelve a tirar ${etqCampo(m, campo)}` : `🪙 ${quien} usó una Moneda Re-Roll: vuelve a tirar ${etqCampo(m, campo)}`;
     });
     if(ok) anunciarMesa(anuncio);
     return ok;

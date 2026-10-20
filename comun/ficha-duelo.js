@@ -215,7 +215,7 @@ const FichaDuelo = (() => {
       rerollUsar: async (d, campo, con) => {
         const S = getS(), que = conQueReroll(S, con), m = monedaReroll(S);
         if(!que){ ui.toast(con === 'wildcard' ? 'No tenés wildcards' : 'No tenés una Moneda Re-Roll'); return false; }
-        const ok = await ui.reabrir(d.id, campo);
+        const ok = await ui.reabrir(d.id, campo, que);
         if(!ok){ ui.toast(`La tirada ya no se puede repetir (no se gastó la ${que === 'wildcard' ? 'wildcard' : 'moneda'})`); return false; }
         if(que === 'wildcard') gastarWildcard(getS(), ui);
         else setTimeout(() => tirarMonedaReroll(getS(), m, ui), 800);

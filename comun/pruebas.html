@@ -2082,6 +2082,21 @@ prueba('🏹 la munición la decide el arma (2026-10-19): arco → una flecha, b
     res.every(r => r[0]), res.every(r => r[1]), res.every(r => r[2]), CombateFin.dropEsperado(cat, {tipoCriatura: 'bestia', nivel: 1, armaDeRango: true, armaNombre: 'Ballesta'}).venta > 0],
     ['flecha', 'virote', '', '', true, true, true, true]);
 });
+prueba('🎲 el consumible al azar de un creep (2026-10-19): nace en el cinturón, se cambia sin acumular, queda de drop aunque lo use; bestias nada, jefe dos', () => {
+  const F = CombateFin, cat = CATALOGO_BASE.filter(i => i.tipoItem && !i.archivo).map(CreepCalculo.itemParaCreep);
+  const sc = {id: 'z1', nombre: 'Bandido', tipoCriatura: 'humano', nivel: 3, fue: 6, cinturon: []};
+  const r1 = F.darConsumiblesAlAzar(sc, cat), primero = sc.consumibleAzar.slice();
+  const enCinturon = sc.cinturon.filter(x => x.azar).length;
+  F.darConsumiblesAlAzar(sc, cat);
+  const trasOtro = sc.cinturon.filter(x => x.azar).length;
+  sc.cinturon = [];   // lo usó
+  const drop = F.dropDeCreep(F.nuevo(), cat, sc).map(d => d.nombre);
+  const bestia = {id: 'b1', tipoCriatura: 'bestia', nivel: 3, cinturon: []}, jefe = {id: 'j1', tipoCriatura: 'humanoide', nivel: 3, jefe: true, cinturon: []};
+  F.darConsumiblesAlAzar(bestia, cat); F.darConsumiblesAlAzar(jefe, cat);
+  igual([r1.nombres.length, primero.length, enCinturon, trasOtro, drop.join() === sc.consumibleAzar.join(), !!bestia.consumibleAzar, jefe.consumibleAzar.length,
+    !!CATALOGO_BASE.find(i => i.nombre === sc.consumibleAzar[0] && i.tipoItem === 'consumibles' && !i.flecha)],
+    [1, 1, 1, 1, true, false, 2, true]);
+});
 prueba('🎁 familias por arquetipo (2026-10-19): el creep se reconoce por sus datos (o lo elige el GM), los consumibles por lo que hacen; la Cuerda no sale', () => {
   const K = CreepCalculo, F = CombateFin;
   const cat = CATALOGO_BASE.filter(i => i.tipoItem && !i.archivo).map(K.itemParaCreep);

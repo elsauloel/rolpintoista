@@ -1636,3 +1636,10 @@ versión parecida en más de una, es candidato a juntar.
   `familiaBotin(item)` (lo que hace el consumible; un ítem puede forzarla con `familiaBotin`). `dropElegir(cat, tier, pesos)`: dentro de la calidad,
   primero la familia y después el ítem. Solo humanos y humanoides sueltan consumible (`DROP_OTROS` = 0). `sinBotin: true` en un ítem: nunca sale
   (la Cuerda). **Un consumible nuevo que no encaje en una familia: darle `familiaBotin`.**
+- **🎲 El consumible al azar nace con el creep** (2026-10-19, dueño): `CombateFin.cuantosAlAzar(sc)` (humano o humanoide 1, jefe 2, el resto 0),
+  `consumibleAlAzar`, `darConsumiblesAlAzar(sc, cat)` (saca los anteriores —`azar: true` en el cinturón— y pone nuevos; `sc.consumibleAzar` = los
+  nombres) y `quitarConsumiblesAlAzar`. Son su drop aunque los use; con `sc.consumibleAzar`, `dropDeCreep` no sortea al morir. GM Tools se lo da al
+  «✔ Crear» del asistente y lo cambia con 🎲 en Recompensas.
+- **📜 Consumibles: `efectoFinCombate`** (el estado lleva `finCombate`: se va al «Finalizar combate», vtt-hexgrid/js/25, y al descansar),
+  **`efectoParty`** (el mismo estado a los aliados del mapa: `FichaAcciones.consumir` llama `ui.alGrupo(estado, item)`; el mapa, `bnEfectoAlGrupo`)
+  y **`efectoRecarga`** (un escudo que se renueva cada turno). 2026-10-19, los pergaminos.

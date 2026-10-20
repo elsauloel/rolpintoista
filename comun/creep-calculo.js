@@ -705,7 +705,8 @@ const CreepCalculo = (() => {
     if(tr) partes.push(`${tr.nombre} (trofeo: compra ${fmt(tr.precioCompra)}, venta ${fmt(tr.precioCompra / 2)}, ${fmt(despojosDePrecio(tr.precioCompra))} despojos)`);
     dropsFijos(sc).forEach(n => partes.push(`${n} (drop fijo)`));
     if(num(sc.oroBase) > 0) partes.push(`${fmt(num(sc.oroBase))} DDE de oro (±20% al final del combate)`);
-    if(['humano', 'humanoide'].includes(tipoDe(sc))) partes.push(`a veces un consumible, según su arquetipo (${arquetiposTxt(arquetipos(sc))})`);
+    if(Array.isArray(sc.consumibleAzar) && sc.consumibleAzar.length) partes.push(`${sc.consumibleAzar.join(', ')} (consumible al azar: lo lleva en el cinturón y queda aunque lo use)`);
+    else if(['humano', 'humanoide'].includes(tipoDe(sc))) partes.push(`a veces un consumible, según su arquetipo (${arquetiposTxt(arquetipos(sc))})`);
     return partes.length ? partes.join(' · ') : 'nada';
   }
 

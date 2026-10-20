@@ -142,6 +142,12 @@ function recompensasHtml(sc){
           `<label style="display:flex;gap:5px;align-items:center;text-transform:none;letter-spacing:0"><input type="checkbox" data-rec="arquetipo" data-arq="${k}" data-id="${sc.id}"${act.includes(k) ? ' checked' : ''}><span style="white-space:nowrap">${t}</span></label>`).join('')}</div>
         ${manual ? `<button type="button" class="addhab" data-arq-auto="${sc.id}" style="margin:4px 0 0">Volver al automático (${esc(CreepCalculo.arquetiposTxt(auto))})</button>` : ''}
       </div>`; })() : ''}
+    ${CombateFin.cuantosAlAzar(sc) > 0 || (sc.consumibleAzar || []).length ? `<div class="mini-f" style="margin-top:8px"><label>🎲 Consumible al azar: lo lleva en el cinturón, lo puede usar en el combate y después queda en el botín</label>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px">
+        <b>${(sc.consumibleAzar || []).length ? esc(sc.consumibleAzar.join(', ')) : 'ninguno'}</b>
+        ${CombateFin.cuantosAlAzar(sc) > 0 ? `<button type="button" class="addhab" data-azar-otro="${sc.id}" style="margin:0">🎲 ${(sc.consumibleAzar || []).length ? 'Otro' : 'Darle uno'}</button>` : ''}
+        ${(sc.consumibleAzar || []).length ? `<button type="button" class="addhab" data-azar-quitar="${sc.id}" style="margin:0">✕ Sacar</button>` : ''}
+      </div></div>` : ''}
     <div class="hint" style="margin-top:6px"><b>Al morir suelta:</b> ${esc(dropsResumenCreep(sc))}</div>`;
 }
 function recompensasVerHtml(sc){ return CreepLupa.recompensasVerHtml(sc); }   // comun/creep-lupa.js
@@ -173,7 +179,22 @@ document.addEventListener('change', e => {
   else if(campo === 'dropsFijos'){ sc.dropsFijos = t.value.split(',').map(x => x.trim()).filter(Boolean).slice(0, 10); if(!sc.dropsFijos.length) delete sc.dropsFijos; }
   renderAll();
 });
+// 🎲 El consumible al azar de un creep (2026-10-19): dárselo, cambiarlo (las veces que quiera el GM) o sacarlo.
+function consumibleAzarCreep(sc){
+  const r = CombateFin.darConsumiblesAlAzar(sc, CATALOGO_EQUIPO);
+  r.avisos.forEach(a => toast(a));
+  return r.nombres;
+}
 document.addEventListener('click', e => {
+  const z = e.target.closest('[data-azar-otro], [data-azar-quitar]');
+  if(z){
+    const sc = S.creeps.find(s => s.id === (z.dataset.azarOtro || z.dataset.azarQuitar));
+    if(!sc) return;
+    if(z.dataset.azarQuitar){ CombateFin.quitarConsumiblesAlAzar(sc); toast(`${nombreLimpioCreep(sc)}: sin consumible al azar`); }
+    else{ const n = consumibleAzarCreep(sc); toast(n.length ? `🎲 ${nombreLimpioCreep(sc)}: ${n.join(', ')}` : 'No salió ninguno'); }
+    renderAll();
+    return;
+  }
   const a = e.target.closest('[data-arq-auto]');
   if(a){ const sc = S.creeps.find(s => s.id === a.dataset.arqAuto); if(sc){ delete sc.arquetipos; renderAll(); } return; }
   const b = e.target.closest('[data-oro-sugerido]');
@@ -238,7 +259,15 @@ function abrirAsistenteCreep(scId){
     confirmarCancelar: () => asist && !asist.nuevo && JSON.stringify(creepAsist()) !== JSON.stringify(asist.copia) ? '¿Descartar los cambios de este creep?'
       : asist && asist.nuevo ? '¿Cancelar? El creep que estás armando se descarta.' : '',
     alClic: e => clicAsistCreep(e), alInput: e => inputAsistCreep(e), alCambio: e => { const t = e.target; if(t.dataset && t.dataset.acRol !== undefined) asist.rol = t.value; },
-    alCrear: () => { const sc = creepAsist(); if(sc){ delete sc._creando; toast(`${nombreLimpioCreep(sc)} creado`); } terminarAsistCreep(); if(sc) ofrecerTokenEnMapa(sc); },
+    alCrear: () => {
+      const sc = creepAsist();
+      if(sc){
+        delete sc._creando;
+        const n = !sc.consumibleAzar && CombateFin.cuantosAlAzar(sc) > 0 ? consumibleAzarCreep(sc) : [];   // 🎲 nace con su consumible al azar
+        toast(`${nombreLimpioCreep(sc)} creado${n.length ? ` · 🎲 ${n.join(', ')} en el cinturón` : ''}`);
+      }
+      terminarAsistCreep(); if(sc) ofrecerTokenEnMapa(sc);
+    },
     alGuardar: () => { const sc = creepAsist(); if(sc) toast(`${nombreLimpioCreep(sc)} guardado`); terminarAsistCreep(); },
     alCancelar: () => {
       if(asist.nuevo) S.creeps = S.creeps.filter(s => s.id !== asist.id);   // el creep no se llegó a terminar

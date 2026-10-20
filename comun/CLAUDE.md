@@ -1658,3 +1658,6 @@ versión parecida en más de una, es candidato a juntar.
   (`efectoDeEjecucion(e, valorDe)`); con `soltar.ayuda`, un aliado pegado puede ayudar (1 No2, su propia tirada). Lo hace el mapa: vtt-hexgrid/js/54.
 - **🙈 Ceguera nueva** (dueño, 2026-10-20): `Combatiente.CEGUERA_VISION` (2 casillas de visión), `ciego(estados)`; la mitad del PdG y del PdG.Esp
   (`mitadesDeTirada`, sin el −2 de antes); el mapa avisa al elegir un objetivo o el centro de un área a más de 2 (`cegueraPermite`, js/13).
+  Contra un ataque a distancia (`Combatiente.aDistancia(d)`: un disparo, o un hechizo dirigido desde más de 1 casilla, con
+  `window.mapaDistanciaTokens`) su Evasión vale la mitad: `ciegoContraDistancia(d, estados)` en `defender`, `habTirar`, `opcionesDefensa`, `vista` y
+  `habValor` de FichaDuelo, CreepDuelo e InvDuelo. Todo «Cegado» entra como la Ceguera (`comoCeguera`, dentro de `agregarEstado`).

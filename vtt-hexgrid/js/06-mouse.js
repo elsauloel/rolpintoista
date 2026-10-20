@@ -540,7 +540,7 @@ function soltar(){
     // Confusión (2026-10-04, js/20): antes de moverse, si es su primera acción del turno, tira; con «Seguir» se mueve por esta misma ruta.
     // El dodge roll es una reacción (2026-10-20): el Mareo de invocación lo deja pasar (el Stun no), y no es «moverse fuera de turno» ni la primera acción (Confusión).
     const reaccion = enDodge(a.id);
-    if(a.movio && !a.libre && stunAntes(a.id, () => rutaSoltada(a, tokens.get(a.id)), {reaccion})){}   // stuneado: no se mueve, salvo que la mesa lo deje (2026-10-06)
+    if(a.movio && !a.libre && stunAntes(a.id, () => rutaSoltada(a, tokens.get(a.id)), {reaccion, mover: true})){}   // stuneado: no se mueve, salvo que la mesa lo deje (2026-10-06)
     else{
       if(a.movio && !a.libre && !reaccion) avisarFueraDeTurno(a.id, null);   // moverse fuera de turno: se avisa, no se frena (2026-10-06)
       if(!(a.movio && !a.libre && !reaccion && confusionAntes(a.id, () => rutaSoltada(a, tokens.get(a.id))))) rutaSoltada(a, t);

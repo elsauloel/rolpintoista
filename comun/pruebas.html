@@ -924,6 +924,11 @@ prueba('🙈 Ceguera nueva (2026-10-20): la mitad del PdG y del PdG.Esp (no la E
     (pre.mods || []).length, Combatiente.ciego([{nombre: 'Ceguera'}]), Combatiente.ciego([{nombre: 'Ceguera', activo: false}]), Combatiente.aplicarMitades(7, Combatiente.mitadesDeTirada(est, 'pdg'))],
     [1, 1, 0, 2, 0, true, false, 3]);
 });
+prueba('👻 Etéreo (2026-10-20): el estado existe y se reconoce por la marca o el nombre (no apagado)', () => {
+  const pre = ESTADOS_PRESET.find(p => p.nombre === 'Etéreo');
+  igual([!!pre, pre && pre.etereo, Combatiente.etereo([{nombre: 'Etéreo'}]), Combatiente.etereo([{nombre: 'etereo'}]), Combatiente.etereo([{nombre: 'X', etereo: true}]),
+    Combatiente.etereo([{nombre: 'Etéreo', activo: false}]), Combatiente.etereo([])], [true, true, true, true, true, false, false]);
+});
 prueba('🙈 Ceguera contra un ataque a distancia (2026-10-20): Evasión a la mitad contra un disparo, normal cuerpo a cuerpo; «Cegado» entra como la Ceguera', () => {
   const ciego = [{nombre: 'Ceguera', ceguera: true, activo: true}];
   const disparo = {ataque: {tipo: 'normal', rango: true}}, melee = {ataque: {tipo: 'normal', rango: false}};

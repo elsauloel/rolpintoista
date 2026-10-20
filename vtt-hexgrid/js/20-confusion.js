@@ -196,6 +196,14 @@ function stunAntes(tokenId, seguir, o){
   const t = tokens.get(tokenId);
   if(!t) return false;
   const est = confusionEstadosDe(t);
+  // 👻 Etéreo (dueño, 2026-10-20): «no puede atacar… solamente puede observar». Moverse sí (observa), y las reacciones no hacen falta (nadie lo ataca).
+  if(!(o && (o.reaccion || o.mover)) && (Combatiente.etereo(est) || etereoDe(t))){
+    AvisoCombate.mostrar({icono: '👻', titulo: `${nombreDe(t)} está etéreo`, pasos: [{titulo: 'Solo puede observar',
+      texto: 'Mientras dure no puede atacar ni usar habilidades o consumibles (y nadie lo puede elegir de objetivo). Puede moverse: atraviesa todo.'}],
+      botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()},
+        {texto: 'Hacerlo igual (lo decide la mesa)', sec: true, alClic: () => { AvisoCombate.cerrar(); stunPase = tokenId; seguir(); }}]});
+    return true;
+  }
   if(!Combatiente.stuneado(est)){
     if(!Combatiente.mareado(est) || (o && o.reaccion)) return false;
     // Mareo de invocación (dueño, 2026-10-20): recién invocada no actúa en su turno; tiene sus No2 y puede reaccionar.

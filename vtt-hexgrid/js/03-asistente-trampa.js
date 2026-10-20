@@ -280,7 +280,12 @@ const sigiloFantasmas = new Map();     // tokenId -> {col, fila, hasta}
 // personajes, salvo con su 👁).
 /* 👁 Etéreo (2026-10-20, el Ojo de Kicillof; dueño: «lo pueden ver, pero no pueden hacerle nada»): se ve (medio transparente) pero no es objetivo de
    nada (ataques, habilidades, áreas, el salto del rayo), no dispara trampas ni zonas y no da ni recibe ataques de oportunidad. */
-const etereoDe = t => !!(t && t.tipo === 'pj' && ((vinculo(t) || {}).resumen || {}).etereo);
+// (2026-10-20: también el estado Etéreo, de cualquiera: lo público de sus estados; el GM, los de un creep en su ficha privada.)
+function etereoDe(t){
+  if(!t) return false;
+  const r = (vinculo(t) || {}).resumen || {};
+  return !!((t.tipo === 'pj' && r.etereo) || Combatiente.etereo(r.estados) || (t.tipo === 'creep' && soyGM && typeof creepPrivadoDe === 'function' && Combatiente.etereo((creepPrivadoDe(t.fichaId) || {}).estados)));
+}
 const invisibleParaRivales = t => !!(t && t.tipo === 'pj' && ((vinculo(t) || {}).resumen || {}).invisible);   // (nada lo publica hoy)
 const ojoDe = t => t && t.tipo === 'pj' ? Math.max(0, Math.round(num(((vinculo(t) || {}).resumen || {}).ojo))) : 0;
 function ocultoPorSigiloParaMi(t){

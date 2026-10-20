@@ -153,6 +153,9 @@ const ESTADOS_PRESET = [
   // 🔥 Llama de Fénix (dueño, 2026-10-20, el Elixir de Fénix): si cae mientras dura, revive con toda la vida (y todo el SP) y queda Titilando.
   {nombre:'Llama de Fénix', polaridad:'buff', turnos:3, fenix:true,
     detalle:'Si cae (vida 0) mientras dura, revive con toda la vida y todo el SP, y queda Titilando hasta su próximo turno; la llama se apaga. ⚙ Automatizado.'},
+  // 👻 Etéreo (dueño, 2026-10-20): como el Ojo de Kicillof, para cualquiera. Lo lee el mapa (Combatiente.etereo).
+  {nombre:'Etéreo', alias:['Etérea'], polaridad:'buff', turnos:2, etereo:true,
+    detalle:'Se vuelve etéreo: todos lo ven (medio transparente), pero no puede ser objetivo de nada (ataques, habilidades, áreas, el salto del rayo) y él tampoco puede atacar ni usar habilidades o consumibles: solo observa (y se mueve) hasta que se le va el estado. Atraviesa personajes, objetos sólidos y paredes; no pisa trampas ni zonas; no da ni recibe ataques de oportunidad. ⚙ Automatizado en el mapa (si igual quiere actuar, el mapa avisa y deja «Hacerlo igual»: lo decide la mesa).'},
   {nombre:'Blindado', polaridad:'buff', turnos:3, blindado:true,
     detalle:'Inmune a los golpes críticos: un golpe que iba a ser crítico entra como uno normal. ⚙ Automatizado en el duelo (2026-10-20).'},
   {nombre:'Sigilo', polaridad:'buff', turnos:0, permanente:true,

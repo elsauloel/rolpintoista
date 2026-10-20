@@ -832,6 +832,7 @@ function dibujarLienzo(){
     // más transparente para acordarse de que los jugadores no lo ven.
     if(t.oculto || enSigilo(t)) ctx.globalAlpha = 0.5;
     if(t.bajoTierra) ctx.globalAlpha = 0.3;   // 🕳 bajo tierra: el GM lo ve transparente, encima del pozo
+    if(etereoDe(t)) ctx.globalAlpha = Math.min(ctx.globalAlpha, 0.55);   // 👁 etéreo: se ve, transparente
     // Titila (2026-10-06, dueño: «como en el Contra»): con cualquier estado que lo hace invulnerable, prende y apaga rápido.
     if(tokenTitila(t)){ if(Math.floor(performance.now() / 260) % 2) ctx.globalAlpha *= 0.2; animando = true; }
 

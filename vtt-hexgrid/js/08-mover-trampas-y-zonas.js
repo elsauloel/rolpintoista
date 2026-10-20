@@ -236,6 +236,7 @@ function vecinosDeCasilla(c){
   return VECINO_LADO.map(([dq, dr]) => ({col: cuboACol(c0.q + dq, c0.r + dr), fila: cuboAFila(c0.q + dq, c0.r + dr)}));
 }
 function trampasEvaluarRuta(tokId, t, ruta, levita){   // `levita`: los primeros casilleros no tocan el piso (Levitar)
+  if(etereoDe(t)) return null;   // 👁 etéreo: no pisa nada
   const trampas = [];
   elementos.forEach((el, id) => {
     if(el.trampa && !el.disparada && trampaDispara(t, el)) trampas.push({id, el, set: new Set(celdasDeElemento(el).map(c => nbPack(c.col, c.fila)))});
@@ -403,7 +404,7 @@ const tocaElPiso = el => alturaDe(el) !== 'aire';
 // chequean acá — solo al caminar (ver zonaRevisarEntrada). `flotando`: terminó el movimiento levitando (las del piso, todavía no);
 // `soloPiso`: al aterrizar, solo las del piso (las del aire ya las vio al moverse).
 function zonaRevisarToken(t, desdeMantenimiento, flotando, soloPiso){
-  if(!t || !zonaEsMia(t)) return;
+  if(!t || !zonaEsMia(t) || etereoDe(t)) return;
   elementos.forEach(el => {
     if(!el.zona || !zonaAplicaA(el, t) || !zonaLeFalta(el, t)) return;
     const sup = typeof superficieSpec === 'function' ? superficieSpec(el) : null;
@@ -421,7 +422,7 @@ function zonaRevisarToken(t, desdeMantenimiento, flotando, soloPiso){
 // `levita`: cuántos casilleros del camino fueron levitando (los primeros): ahí lo del piso no lo toca.
 function zonaRevisarEntrada(id, celdas, levita){
   const t = tokens.get(id);
-  if(!t || !zonaEsMia(t)) return;
+  if(!t || !zonaEsMia(t) || etereoDe(t)) return;   // 👁 etéreo: las zonas no lo tocan
   const lev = Math.max(0, Math.round(num(levita)));
   const alAire = (el, i) => i <= lev && alturaDe(el) === 'piso';   // ese casillero lo cruzó levitando
   // 🧊 El hielo (2026-10-17, dueño: «cada paso que se da dentro de una superficie congelada»): una tirada por cada casillero que pisa adentro

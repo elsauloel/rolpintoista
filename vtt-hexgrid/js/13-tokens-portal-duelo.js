@@ -705,7 +705,7 @@ function dueloResaltarObjetivos(propio, alcance, esValido, minimo = 0){
   if(!mio){ pedirDibujo(); return 0; }
   const set = new Set();
   tokens.forEach((t, id) => {
-    if(propio(t) || (t.oculto && !soyGM) || t.bajoTierra) return;   // 🕳 bajo tierra: no se lo puede elegir (js/46)
+    if(propio(t) || (t.oculto && !soyGM) || t.bajoTierra || etereoDe(t)) return;   // 🕳 bajo tierra / 👁 etéreo: no se lo puede elegir
     if(esValido && !esValido(t)) return;
     const d = distanciaHex({col: mio.col, fila: mio.fila}, {col: t.col, fila: t.fila});
     if(d <= n && d >= minimo) set.add(id);
@@ -784,8 +784,8 @@ function dueloElegirObjetivoMapa(msg){
     elegirDestino(async h => {
       const todos = [...tokens.entries()].map(([id, t]) => ({...t, id}));   // los tokens del mapa no traen su id adentro: es la clave del Map
       const conmigo = !!(ataque && ataque.hab && ataque.hab.objetivo === 'aliado' && ataque.hab.conmigo);   // «un aliado o vos mismo» (Heal, 2026-10-11)
-      const cand = todos.filter(t => t.col === h.col && t.fila === h.fila && (conmigo || !propio(t)) && (!t.oculto || soyGM) && !t.bajoTierra && !tapadoPorNiebla(t));   // la niebla: no se apunta adentro
-      if(!cand.length){ toast('Ahí no hay otro token: hacé clic sobre el que querés atacar'); pedir(); return; }
+      const cand = todos.filter(t => t.col === h.col && t.fila === h.fila && (conmigo || !propio(t)) && (!t.oculto || soyGM) && !t.bajoTierra && !etereoDe(t) && !tapadoPorNiebla(t));   // la niebla: no se apunta adentro
+      if(!cand.length){ toast([...tokens.values()].some(t => t.col === h.col && t.fila === h.fila && etereoDe(t)) ? '👁 Es etéreo: no se le puede hacer nada' : 'Ahí no hay otro token: hacé clic sobre el que querés atacar'); pedir(); return; }
       let t = cand[0];
       if(esValido && !esValido(t)){
         const msg = objetivoTipo === 'aliado' ? `${nombreDe(t)} es un rival, no un aliado. ¿Igual apuntarle con esta habilidad pensada para aliados?` : `${nombreDe(t)} es un aliado, no un rival. ¿Igual atacarlo?`;
@@ -1242,7 +1242,7 @@ function dueloElegirAreaMapa(msg){
     if(hab.despeja) despejarEn(enCono || new Set(celdasFlor(Math.max(1, radio)).map(o => { const c0 = hexACubo(h); return nbPack(cuboACol(c0.q + o.dq, c0.r + o.dr), cuboAFila(c0.q + o.dq, c0.r + o.dr)); })), hab.nombre);   // el vendaval
     const objetivos = todos
       .filter(t => !hab.tormenta || !iniciativaFueraDeJuego(t.id))   // la tormenta no les cae a los caídos
-      .filter(t => !t.oculto && !t.bajoTierra && !propio(t) && (enCono ? enCono.has(nbPack(t.col, t.fila)) : distanciaHex(h, t) <= radio || (h.otro && distanciaHex(h.otro, t) <= radio)))   // (h.otro: la casilla de salida del Remolino)
+      .filter(t => !t.oculto && !t.bajoTierra && !etereoDe(t) && !propio(t) && (enCono ? enCono.has(nbPack(t.col, t.fila)) : distanciaHex(h, t) <= radio || (h.otro && distanciaHex(h.otro, t) <= radio)))   // (h.otro: la casilla de salida del Remolino)
       .filter(t => hab.aliados ? !dueloEsRival(yo, t) : (hab.fuegoAmigo || h.linea || dueloEsRival(yo, t)))   // (la línea tiene fuego amigo: dueño, 2026-10-05; `aliados`: solo los suyos, 2026-10-13)
       .filter(t => !hab.conVista || lineaLibre(h, t, solidosSet()))   // la luz (Varita de la luz): todos los rivales que alcanza a ver, en sigilo o no (dueño, 2026-10-05)
       .sort((a, b) => h.linea ? distanciaHex(h, a) - distanciaHex(h, b) : 0)   // en la línea, del más cercano al más lejano (el láser largo pierde 1 por cada uno)

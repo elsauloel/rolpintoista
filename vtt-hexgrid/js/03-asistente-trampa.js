@@ -278,8 +278,10 @@ const sigiloUltimaVista = new Map();   // tokenId -> {col, fila}: dónde lo vi a
 const sigiloFantasmas = new Map();     // tokenId -> {col, fila, hasta}
 // ¿Es un token que YO no veo por estar en sigilo? (jugador: los creeps; GM: los
 // personajes, salvo con su 👁).
-// 👁 Invisible para los rivales (2026-10-20, el Ojo de Kicillof): el GM no lo ve sin su 👁 de revelar.
-const invisibleParaRivales = t => !!(t && t.tipo === 'pj' && ((vinculo(t) || {}).resumen || {}).invisible);
+/* 👁 Etéreo (2026-10-20, el Ojo de Kicillof; dueño: «lo pueden ver, pero no pueden hacerle nada»): se ve (medio transparente) pero no es objetivo de
+   nada (ataques, habilidades, áreas, el salto del rayo), no dispara trampas ni zonas y no da ni recibe ataques de oportunidad. */
+const etereoDe = t => !!(t && t.tipo === 'pj' && ((vinculo(t) || {}).resumen || {}).etereo);
+const invisibleParaRivales = t => !!(t && t.tipo === 'pj' && ((vinculo(t) || {}).resumen || {}).invisible);   // (nada lo publica hoy)
 const ojoDe = t => t && t.tipo === 'pj' ? Math.max(0, Math.round(num(((vinculo(t) || {}).resumen || {}).ojo))) : 0;
 function ocultoPorSigiloParaMi(t){
   if(invisibleParaRivales(t)) return soyGM && !ojoRevelando;

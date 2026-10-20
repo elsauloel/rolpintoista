@@ -470,7 +470,7 @@ let sigiloFirmaRev = '';
 function oportunidadEvaluarRuta(t, ruta){
   if(modoMapa !== 'combate') return [];
   if(!ruta || ruta.length < 2) return [];
-  if(t.oculto || enSigilo(t)) return [];  // un token oculto no delata su movimiento
+  if(t.oculto || enSigilo(t) || etereoDe(t)) return [];  // un token oculto no delata su movimiento (👁 uno etéreo no da oportunidad)
   const id = rutaTokenId(t);
   if(typeof dodgeLibreDe === 'function' && dodgeLibreDe(id)) return [];   // 🪵 el dodge roll de Tronco de huída: sin oportunidad
   const rivales = new Set(rivalesDe(t));

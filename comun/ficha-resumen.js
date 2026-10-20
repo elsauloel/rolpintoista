@@ -218,13 +218,13 @@ const FichaResumen = (() => {
           costoMover: invCostoMover(inv), extenuado: Combatiente.extenuado(inv.estados), tormenta: Combatiente.tormenta(inv.estados), pasosGratis: num(invModTotal(inv, 'pasosgratis')), retirada: num(invModTotal(inv, 'retirada')),
           inamovible: num(invModTotal(inv, 'inamovible')), recuperarse: num(invModTotal(inv, 'recuperarse')), reflejos: num(invModTotal(inv, 'reflejos')),
           venenista: num(invModTotal(inv, 'venenista')),   // Guantes del envenenador (2026-10-05)
-          ...(num(inv.ojo) > 0 ? {ojo: num(inv.ojo), veoculto: num(inv.veoculto), invisible: true, sinMareo: true} : {}),   // 👁 el Ojo de Kicillof: ve en flor, revela, invisible, sin mareo (2026-10-20)
+          ...(num(inv.ojo) > 0 ? {ojo: num(inv.ojo), veoculto: num(inv.veoculto), etereo: true, sinMareo: true} : {}),   // 👁 el Ojo de Kicillof: ve en flor, revela, invisible, sin mareo (2026-10-20)
           guardian: num(invModTotal(inv, 'guardian')),
           conEscudo: (inv.equipo || []).some(i => Combatiente.esEscudo(i)), muroescudos: num(invModTotal(inv, 'muroescudos')), empujon: num(invModTotal(inv, 'empujon')),   // escudos (2026-10-06)
           levitar: num(invModTotal(inv, 'levitar')), suelagruesa: num(invModTotal(inv, 'suelagruesa')), embestida: num(invModTotal(inv, 'embestida')), pasodoble: num(invModTotal(inv, 'pasodoble')),   // Coraza del guardián (2026-10-06)
           pisadaAtenta: num(invModTotal(inv, 'pisadaatenta')) > 0, ...(typeof InvCalculo !== 'undefined' ? {percepcion: num(InvCalculo.statValor(inv, 'percepcion'))} : {}),
           activa: inv.activa !== false,
-          miniatura: miniaturaInv(inv.imagen),
+          miniatura: miniaturaInv(inv.imagen) || (String(inv.miniatura || '').startsWith('data:image/') && inv.miniatura.length < 20000 ? inv.miniatura : ''),   // (una invocación de un pergamino trae la suya: el Ojo de Kicillof)
           estados: (inv.estados || [])
             .filter(e => e && e.activo !== false && e.nombre)
             .slice(0, 30)

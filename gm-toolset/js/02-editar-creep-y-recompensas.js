@@ -139,7 +139,7 @@ function recompensasHtml(sc){
       const act = CreepCalculo.arquetipos(sc), manual = CreepCalculo.arquetiposManual(sc).length > 0, auto = CreepCalculo.arquetiposAuto(sc);
       return `<div class="mini-f" style="margin-top:8px"><label>Arquetipo: qué consumibles suelta más ${manual ? '(elegido a mano)' : '(automático, por sus datos)'}</label>
         <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px">${Object.entries(CreepCalculo.ARQUETIPOS).map(([k, t]) =>
-          `<label style="display:flex;gap:5px;align-items:center;text-transform:none;letter-spacing:0"><input type="checkbox" data-rec="arquetipo" data-arq="${k}" data-id="${sc.id}"${act.includes(k) ? ' checked' : ''}> ${t}</label>`).join('')}</div>
+          `<label style="display:flex;gap:5px;align-items:center;text-transform:none;letter-spacing:0"><input type="checkbox" data-rec="arquetipo" data-arq="${k}" data-id="${sc.id}"${act.includes(k) ? ' checked' : ''}><span style="white-space:nowrap">${t}</span></label>`).join('')}</div>
         ${manual ? `<button type="button" class="addhab" data-arq-auto="${sc.id}" style="margin:4px 0 0">Volver al automático (${esc(CreepCalculo.arquetiposTxt(auto))})</button>` : ''}
       </div>`; })() : ''}
     <div class="hint" style="margin-top:6px"><b>Al morir suelta:</b> ${esc(dropsResumenCreep(sc))}</div>`;

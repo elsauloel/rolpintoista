@@ -21,3 +21,7 @@ Dos stats nuevos de la ficha (`luz` = «Luz portada» y `veoculto` = «Ve lo ocu
 - **Colirio del vidente:** aplica el estado «Percepción aumentada» (5 turnos); `tienePercepcionAumentada()` ahora también lo cuenta.
 - Las descripciones de los ítems ya dicen ⚙ Automático. Ya no queda nada «a mano» de este bloque.
 **Corrección de un bug:** el importador del catálogo (`STATS_OK` en `catalogo_comun.py`) **descartaba en silencio el stat `vision`**: las 11 piezas de visión (gafas, yelmos, anillos…) se habían publicado sin su Visión. Corregido (`vision`, `luz` y `veoculto` ya se aceptan) y verificado que todas las piezas nuevas conservan sus bonos.
+
+## 2026-10-19: a distancia, y probado en el mapa
+- **Bombucha de talco** (Común, 20): se tira a una casilla a la vista dentro del Rango; nube blanca en flor de 7, 1 turno, revela lo oculto **sin alumbrar ni despejar la niebla** (zona con `zonaEstado: {revela, sinLuz}`, `zonaAlcance: 'rango'`, `zonaSoloVisible`).
+- Probado desde la cuenta de jugadora: la Bombucha y las Gotas de ojo de gato (`veoculto` 2) muestran a un creep en sigilo y una trampa escondida; lo que queda fuera del radio sigue oculto.

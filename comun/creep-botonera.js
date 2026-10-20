@@ -110,6 +110,10 @@ const CreepBotonera = (() => {
         motivo: `${sinArma ? 'Sin No2 · ' : ''}Cuesta 1 No2. Si es la suya, vuelve a tenerla; si no, se la queda`, attr:`data-levantararmacreep="${a.id}"`});
     });
     // Soltarse (2026-10-03): el estado que dejó una trampa de Atrapar dice qué tira y cuánto cuesta.
+    (o.atrapadosCerca || []).forEach(a => {   // 🤝 ayudar a un aliado atrapado al lado (2026-10-20, js/54)
+      const sinNo2 = num(sc.nitros) < a.no2;
+      combate.push({nombre: `🤝 Ayudar a soltar a ${a.nombre} · ${a.etq} contra ${a.dif} · ${a.no2} No2`, dado: '', soloTexto: true, sinNitros: sinNo2, motivo: `${sinNo2 ? 'Sin No2 · ' : ''}${a.nombre} está atrapado (${a.est}): tira su ${a.etq} contra ${a.dif}; si llega, lo suelta. Cuesta ${a.no2} No2 aunque no lo logre`, attr: `data-ayudarsoltarcreep="${a.tokenId}"`});
+    });
     const soltableCreep = Combatiente.estadoSoltable(sc.estados);
     if(soltableCreep){
       const s = Combatiente.soltarNorm(soltableCreep.soltar), sinNitrosSol = num(sc.nitros) < s.no2;

@@ -112,7 +112,7 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261012zy', '../comun/ficha-botin.js?v=20261008zz4', '../comun/generador-tiendas.js?v=20261018zm', '../comun/filtro-catalogo.js?v=20261009r', '../comun/ficha-tienda.js?v=20261010g', '../comun/ficha-mantenimiento.js?v=20261020n', '../comun/ficha-calculo.js?v=20261019k', '../comun/ficha-combate.js?v=20261015d', '../comun/skills-clase.js?v=20261018h', '../comun/ficha-habilidades.js?v=20261020q',
-  '../comun/catalogo.js?v=20261020z', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261016c', '../comun/ficha-sesion.js?v=20261010za', '../comun/ficha-botonera.js?v=20261018zp', '../comun/ficha-resumen.js?v=20261019r', '../comun/inv-calculo.js?v=20261020b', '../comun/inv-botonera.js?v=20261018c', '../comun/inv-acciones.js?v=20261019l', '../comun/inv-duelo.js?v=20261020k', '../comun/ficha-acciones.js?v=20261020x', '../comun/inv-habilidades.js?v=20261014f', '../comun/inv-lupa.js?v=20261015a',
+  '../comun/catalogo.js?v=20261020za', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261016c', '../comun/ficha-sesion.js?v=20261010za', '../comun/ficha-botonera.js?v=20261020za', '../comun/ficha-resumen.js?v=20261020za', '../comun/inv-calculo.js?v=20261020b', '../comun/inv-botonera.js?v=20261020za', '../comun/inv-acciones.js?v=20261019l', '../comun/inv-duelo.js?v=20261020k', '../comun/ficha-acciones.js?v=20261020x', '../comun/inv-habilidades.js?v=20261014f', '../comun/inv-lupa.js?v=20261015a',
   '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261020k', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261014e'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -201,7 +201,7 @@ function bnDibujar(){
   const cuerpo = bn.raiz.querySelector('#bn-contenido');
   if(!bn.S){ cuerpo.innerHTML = '<div class="modal catalogo-modal botonera-modal"><div class="body"><div class="hint">Cargando el personaje…</div></div></div>'; return; }
   if(bn.invId){ bnDibujarInv(cuerpo); return; }
-  const r = FichaBotonera.html(bn.S, {modoMapa, parryArmaPendiente: bn.parryPendiente || null, ...(typeof armasOpciones === 'function' ? armasOpciones(tokenDePj(bn.fichaId)) : {})});
+  const r = FichaBotonera.html(bn.S, {modoMapa, parryArmaPendiente: bn.parryPendiente || null, ...(typeof armasOpciones === 'function' ? armasOpciones(tokenDePj(bn.fichaId)) : {}), ...(typeof atrapadosOpciones === 'function' ? atrapadosOpciones(tokenDePj(bn.fichaId)) : {})});
   const scroll = bn.host.scrollTop;
   cuerpo.innerHTML = `<div class="modal catalogo-modal botonera-modal">
     <header>
@@ -237,7 +237,7 @@ function bnDibujarInv(cuerpo){
       <div style="display:flex;gap:6px;flex:none"><button class="iconbtn" data-bn-cerrar title="Cerrar (B o Esc)">Cerrar</button></div>
     </header>`;
   if(inv.activa === false){ cuerpo.innerHTML = marco(cab(inv.nombre) + `<div class="body"><div class="hint">${esc(inv.nombre)} está dormida — tocá «Invocar» en la ficha para reactivarla.</div></div>`); return; }
-  const r = InvBotonera.html(inv, {parryPendiente: !!(bn.invParry && bn.invParry.has(inv.id)), ...(typeof armasOpciones === 'function' ? armasOpciones(tokenDePj(bn.fichaId + SEP_INVOCACION + inv.id)) : {})});
+  const r = InvBotonera.html(inv, {parryPendiente: !!(bn.invParry && bn.invParry.has(inv.id)), ...(typeof armasOpciones === 'function' ? armasOpciones(tokenDePj(bn.fichaId + SEP_INVOCACION + inv.id)) : {}), ...(typeof atrapadosOpciones === 'function' ? atrapadosOpciones(tokenDePj(bn.fichaId + SEP_INVOCACION + inv.id)) : {})});
   const scroll = bn.host.scrollTop;
   cuerpo.innerHTML = marco(cab(r.titulo, r.badge) + `<div class="body" id="botonerainv-body">${r.html}</div>`);
   bn.host.scrollTop = scroll;
@@ -254,6 +254,7 @@ function bnPublicarInv(inv, t){
   window.dispatchEvent(new CustomEvent('tirada-registrada', {detail: {origen: t.origen, r: t.r}}));
 }
 function bnInvAca(b){
+  if(b.dataset.invayudarsoltar){ const [invId, tokId] = b.dataset.invayudarsoltar.split(':'); ayudarASoltar({tipo: 'inv', invId, tokenId: tokId}); return true; }   // 🤝 (js/54)
   if(b.dataset.invlevantararma){ const [invId, elId] = b.dataset.invlevantararma.split(':'); bnInvLevantarArma(invId, elId); return true; }   // 🗡 (js/27)
   // Tanda 6: el Ver de una habilidad de la invocación, adentro del recuadro (no cambia nada: lo ve cualquiera que la abra).
   if(b.dataset.verhabinv){
@@ -815,6 +816,7 @@ function bnHabUi(){
   return ui;
 }
 function bnAccionAca(b){
+  if(b.dataset.ayudarsoltar){ ayudarASoltar({tipo: 'pj', tokenId: b.dataset.ayudarsoltar}); return true; }   // 🤝 (js/54)
   if(b.dataset.levantararma){ bnLevantarArma(b.dataset.levantararma); return true; }   // 🗡 un arma en el piso (js/27)
   if(bnCombateAca(b)) return true;
   if(b.dataset.danohab){ FichaAcciones.tirarSegundaDeHab(bn.S, b.dataset.danohab, bnHabUi()); return true; }

@@ -923,8 +923,8 @@ prueba('📜 Un consumible con Ejecución (2026-10-20, la Red Nerubian): habilid
   const h = Combatiente.habDeConsumible(red), e = Combatiente.habEjecucion(h, h.duelo, {stat: id => ({rng: 6, dmgesp: 3})[id] || 0});
   const sol = e.efectos[0].spec.soltar;
   igual([h.modo, h.tiradaStat, red.precioCompra, e.objetivo, e.alcance, e.contra.map(x => x.stat || x), e.efectos.map(x => x.nombre + ':' + (x.spec && x.spec.turnos)), Combatiente.habDeConsumible({nombre: 'Poción'}),
-    [sol.stat, sol.dif, Combatiente.soltarNorm(sol).alEmpezar]],
-    ['auto', 'pdgmg', 50, 'enemigo', 6, ['eva'], ['Inmovilizado:3'], null, ['fue', 3, true]]);
+    [sol.stat, sol.dif, Combatiente.soltarNorm(sol).alEmpezar, Combatiente.soltarNorm(sol).ayuda]],
+    ['auto', 'pdgmg', 50, 'enemigo', 6, ['eva'], ['Inmovilizado:3'], null, ['fue', 3, true, true]]);
 });
 prueba('🎲 Volver a tirar el consumible al azar antes de publicar (2026-10-14)', () => {
   const sc = {id: 'j', nombre: 'Jefe', nivel: 3, jefe: true, tipoCriatura: 'humanoide'};

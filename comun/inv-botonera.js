@@ -62,7 +62,9 @@ const InvBotonera = (() => {
     // Atacar es siempre un ataque normal (dueño, 2026-10-06): la oportunidad y el contraataque los ofrece el mapa solo; esto, a mano.
     const tileOtro = `
       <button type="button" class="botonera-tile" data-invotroataque="${inv.id}" title="A mano, por si el mapa no lo detectó: el ataque de oportunidad se ofrece solo cuando un rival se aleja, y el contraataque después de ganar el Parry y el Bloqueo. Atacar es siempre un ataque normal." style="opacity:.75;min-height:0"><span class="bt-label">↪ Oportunidad o contraataque, a mano</span></button>`;
-    const tilesCombate = tilesExtra + tilesArmas + combate.map(c => {
+    const tilesAyuda = (o.atrapadosCerca || []).map(a => `
+      <button type="button" class="botonera-tile${num(inv.nitros) < a.no2 ? ' bt-sin-nitros' : ''}" data-invayudarsoltar="${inv.id}:${a.tokenId}" title="${esc(`${a.nombre} está atrapado (${a.est}): tira su ${a.etq} contra ${a.dif}; si llega, lo suelta. Cuesta ${a.no2} No2 aunque no lo logre`)}"><span class="bt-label">🤝 Ayudar a soltar a ${esc(a.nombre)} · ${fmt(a.no2)} No2</span></button>`).join('');   // 🤝 (2026-10-20, js/54)
+    const tilesCombate = tilesExtra + tilesArmas + tilesAyuda + combate.map(c => {
       const mt = c.stat ? ModTirada.tile(inv.estados, c.stat) : {clase: '', html: '', titulo: ''};
       return `
       <button type="button" class="botonera-tile${c.sinNitros?' bt-sin-nitros':''}${mt.clase}" ${c.attr} title="${esc(c.motivo + mt.titulo)}">

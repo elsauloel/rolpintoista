@@ -85,3 +85,70 @@ async function soltarAlEmpezarPj(clave, fichaId, invId){
   mesaPublicar(`${res.nombre} · Soltarse (${res.est}) · ${res.tt.s.etq} contra ${res.tt.s.dif}`, {...res.tt.r, quien: res.nombre, ficha: fichaId});
   soltarAlEmpezarResultado(clave, res.nombre, res.est, res.tt);
 }
+
+/* ---------- 🤝 Ayudar a soltar a un aliado (2026-10-20, dueño: «un aliado se puede parar de manera adyacente a la red y gastar un nitro en tirar su
+   propia Fuerza contra el Efecto especial para intentar asistir a su colega») ----------
+   Un estado con `soltar.ayuda`: los aliados pegados (a 1 casilla) ven en su Botonera / Acciones «🤝 Ayudar a soltar a …». Pagan 1 No2 (el `no2` del
+   soltar), tiran su propio stat (el del soltar) contra la misma dificultad y, si llegan, el atrapado se suelta: un creep, el GM lo cambia directo; un
+   personaje o una invocación, por aviso a su pantalla («Quitar estado», comun/recibidos.js). Aliados: creep con creep, personaje o invocación con
+   personaje o invocación. */
+function estadoParaAyudar(t){
+  if(!t) return null;
+  const est = t.tipo === 'creep' ? ((creepsPriv.get(String(t.fichaId)) || {}).sc || {}).estados : confusionEstadosDe(t);
+  return (est || []).find(e => e && e.activo !== false && e.soltar && e.soltar.ayuda && Combatiente.soltarNorm(e.soltar)) || null;
+}
+function atrapadosCercaDe(t){
+  if(!t || modoMapa !== 'combate') return [];
+  const out = [];
+  tokens.forEach((x, id) => {
+    if(x === t || (x.tipo === 'creep') !== (t.tipo === 'creep') || (x.oculto && !soyGM) || distanciaHex(t, x) > 1) return;
+    const e = estadoParaAyudar(x);
+    if(!e) return;
+    const s = Combatiente.soltarNorm(e.soltar);
+    out.push({tokenId: id, nombre: nombreDe(x), est: e.nombre, etq: s.etq, dif: s.dif, stat: s.stat, no2: Math.max(1, s.no2 || 1)});
+  });
+  return out;
+}
+function atrapadosOpciones(t){ return {atrapadosCerca: atrapadosCercaDe(t)}; }
+async function ayudarASoltar({tipo, invId, tokenId}){
+  const x = tokens.get(tokenId), e = estadoParaAyudar(x);
+  if(!x || !e){ toast('Ya no está atrapado'); return; }
+  const s = Combatiente.soltarNorm(e.soltar), costo = Math.max(1, s.no2 || 1), atrapado = nombreDe(x);
+  let quien = '', tt = null, ficha = '';
+  // Quien ayuda paga y tira (su propio stat, con lo que le sume Soltarse).
+  if(tipo === 'creep'){
+    const sc = typeof acCreep === 'function' ? acCreep() : null;
+    if(!sc) return;
+    quien = sc.nombre;
+    if(num(sc.nitros) < costo && !(await AvisoCombate.preguntar(`${sc.nombre} no tiene los No2 (cuesta ${costo}). ¿Ayudar igual?`, {icono: '🤝', titulo: 'Sin No2', si: 'Ayudar igual'}))) return;
+    tt = Combatiente.tiradaSoltarse(e, CreepCalculo.statValor(sc, s.stat) + Math.max(0, num(CreepCalculo.modTotal(sc, 'soltarse'))), sc.estados);
+    await acCambiar(c => { c.nitros = num(c.nitros) - costo; return {aviso: ''}; });
+    mesaPublicar(`${quien} · Ayudar a soltar a ${atrapado} · ${s.etq} contra ${s.dif}`, {...tt.r, quien, desde: 'gm'});
+  }else{
+    if(!bn || !bn.S || !bnPuedeGuardar()) return;
+    const S = bn.S, inv = tipo === 'inv' ? (S.invocaciones || []).find(i => i && i.id === invId) : null;
+    if(tipo === 'inv' && !inv) return;
+    quien = inv ? inv.nombre : ((S.meta && S.meta.nombre) || 'Alguien');
+    const tiene = num(inv ? inv.nitros : S.nitros);
+    if(tiene < costo && !(await AvisoCombate.preguntar(`${quien} no tiene los No2 (cuesta ${costo}). ¿Ayudar igual?`, {icono: '🤝', titulo: 'Sin No2', si: 'Ayudar igual'}))) return;
+    const valor = inv ? InvCalculo.statValor(inv, s.stat) + Math.max(0, num(InvCalculo.modTotal(inv, 'soltarse')))
+      : num(FichaCalculo.calcular(S).final[s.stat]) + Math.max(0, num(FichaCalculo.calcular(S).final.soltarse));
+    tt = Combatiente.tiradaSoltarse(e, valor, inv ? inv.estados : S.efectos);
+    if(inv) inv.nitros = num(inv.nitros) - costo; else S.nitros = num(S.nitros) - costo;
+    bnUi(FichaGuardado.partes(S)).cambio();
+    ficha = inv ? bn.fichaId + SEP_INVOCACION + inv.id : bn.fichaId;
+    mesaPublicar(`${quien} · Ayudar a soltar a ${atrapado} · ${s.etq} contra ${s.dif}`, {...tt.r, quien, ficha});
+  }
+  if(!tt || !tt.r) return;
+  // Si llegó, el atrapado se suelta.
+  if(tt.ok){
+    try{
+      if(x.tipo === 'creep') await modificarCreep(String(x.fichaId), c => { c.estados = (c.estados || []).filter(z => !(z && z.nombre === e.nombre && z.soltar)); return {}; });
+      else{ const f = fichasPub.get(String(x.fichaId).split(SEP_INVOCACION)[0]); await EstadosAplicar.encolarPj({fichaId: x.fichaId, duenoUid: (f && f.duenoUid) || x.duenoUid, spec: {nombre: 'Quitar estado', estado: e.nombre}, origen: `${quien} te ayudó a soltarte`}); }
+    }catch(err){ console.error('Ayudar a soltar:', err); toast(`Sacale ${e.nombre} a ${atrapado} a mano`); }
+  }
+  const txt = tt.ok ? `${quien} ayudó a ${atrapado} a soltarse de ${e.nombre} (${tt.r.total} contra ${s.dif}).` : `${quien} intentó ayudar a ${atrapado}, pero no alcanzó (${tt.r.total} contra ${s.dif}): sigue atrapado.`;
+  mesaLinea(`🤝 ${txt} −${costo} No2.`, 'recordatorio');
+  AvisoCombate.mostrar({icono: '🤝', titulo: `Ayudar a soltar a ${atrapado}`, veredicto: {tono: tt.ok ? 'bueno' : 'malo', grande: tt.ok ? '¡LO SOLTÓ!' : 'SIGUE ATRAPADO', chico: txt},
+    botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()}]});
+}

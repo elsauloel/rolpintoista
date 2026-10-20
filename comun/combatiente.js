@@ -412,7 +412,7 @@ const Combatiente = (() => {
     if(!s || !s.stat || !(Number(s.dif) >= 1)) return null;
     const hunde = Math.max(0, Math.min(5, Math.round(Number(s.hunde) || 0)));   // arena movediza (dueño, 2026-10-04): si falla, se hunde más (+N turnos)
     return {stat: String(s.stat), etq: String(s.etq || SOLTAR_ETQ[s.stat] || s.stat).slice(0, 20), dif: Math.round(Number(s.dif)), no2: Math.max(0, Math.round(Number(s.no2) || 0)), ...(hunde ? {hunde} : {}),
-      ...(s.alEmpezar ? {alEmpezar: true} : {})};   // 🔓 la tirada aparece sola al empezar su turno (2026-10-20, la Red Nerubian: vtt-hexgrid/js/54)
+      ...(s.alEmpezar ? {alEmpezar: true} : {}), ...(s.ayuda ? {ayuda: true} : {})};   // 🤝 un aliado pegado puede ayudar a soltarlo (1 No2, su propia tirada)   // 🔓 la tirada aparece sola al empezar su turno (2026-10-20, la Red Nerubian: vtt-hexgrid/js/54)
   }
   const estadoSoltable = estados => (estados || []).find(e => e && e.activo !== false && soltarNorm(e.soltar)) || null;
   const textoSoltarse = e => { const s = soltarNorm(e && e.soltar); return s ? `🔓 Soltarse · ${s.etq} contra ${s.dif} · ${s.no2} No2${s.hunde ? ` · si falla, se hunde: +${s.hunde} turno${s.hunde === 1 ? '' : 's'}` : ''}` : ''; };

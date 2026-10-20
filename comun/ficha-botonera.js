@@ -298,6 +298,11 @@ const FichaBotonera = (() => {
       const falta = num(S.nitros) < Combatiente.COSTO_LEVANTAR_ARMA;
       html += `<div class="botonera-caja" style="margin-bottom:8px"><button class="ejecutar-btn${falta ? ' sin-recursos' : ''}" data-levantararma="${esc(a.id)}" style="width:100%">🗡️ Levantar ${esc(a.nombre)}${a.propia ? ' (la tuya)' : ''} · ${fmt(Combatiente.COSTO_LEVANTAR_ARMA)} No2</button></div>`;
     });
+    // 🤝 Ayudar a un aliado atrapado al lado (2026-10-20, la Red Nerubian): 1 No2 y tu propia tirada (el mapa los pasa, js/54).
+    (o.atrapadosCerca || []).forEach(a => {
+      const falta = num(S.nitros) < a.no2;
+      html += `<div class="botonera-caja" style="margin-bottom:8px"><button class="ejecutar-btn${falta ? ' sin-recursos' : ''}" data-ayudarsoltar="${esc(a.tokenId)}" style="width:100%" title="${esc(`${a.nombre} está atrapado (${a.est}): tirás tu ${a.etq} contra ${a.dif}; si llegás, se suelta. Cuesta ${a.no2} No2 aunque no lo logres.`)}">🤝 Ayudar a soltar a ${esc(a.nombre)} · ${esc(a.etq)} contra ${fmt(a.dif)} · ${fmt(a.no2)} No2</button></div>`;
+    });
     // Soltarse (2026-10-03): un estado que dejó una trampa de Atrapar; el botón dice qué tira y cuánto cuesta.
     const soltable = Combatiente.estadoSoltable(S.efectos);
     if(soltable){

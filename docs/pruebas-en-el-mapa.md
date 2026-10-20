@@ -13,7 +13,9 @@
 - [x] **🧪 Escudos de poción** — probado en el mapa el 2026-10-20: Aurelia tomó la Poción de Cuero Duro (15); un golpe físico de 8 del GM lo absorbió entero (escudo 15 → 7, vida 50) y uno especial de 6 fue a la vida (50 → 44).
 - [x] **😵 Mareo de invocación nuevo** (2026-10-20): probado en «Test con claude elsaulo» con el Lobo de Silvia: entra al final del orden con el
   Mareo y sus No2 enteros; en su turno, Atacar muestra «recién llega: está mareada» (con «Hacerlo igual»); Esquivar pasa; al empezar su segundo
-  turno el Mareo se va y ataca normal. Se arregló en la prueba: el mapa no lo reconocía (lo publicado no traía la marca). Falta solo el dodge roll.
+  turno el Mareo se va y ataca normal. Se arregló en la prueba: el mapa no lo reconocía (lo publicado no traía la marca). **El dodge roll, probado
+  el mismo día**: el Lobo mareado ganó la Evasión de un área del creep, se arrastró 2 casillas fuera y el duelo cerró «esquivó». Se arregló en la
+  prueba: el mapa tomaba ese arrastre como una acción del turno (lo frenaba el Mareo, y podía pedir Confusión o avisar «fuera de turno»).
 - [x] **🏹 Un creep dispara su flecha especial** (2026-10-20): con arco y la Flecha marcadora en el cinturón, Atacar pregunta «¿Qué flecha?»; la
   elegida va al duelo (declarada), se gasta del cinturón (el Antídoto queda) y, si erra, queda en el piso. Ojo: si después muere, la flecha
   aparece también en el botín (usada, tildada): el GM la saca en el paso Consumibles.
@@ -22,9 +24,13 @@
   «Evasión está Blindado» en vez del nombre.
 - [x] **⏸ El cartel de la pausa abajo a la izquierda** (2026-10-20): probado con una pausa de verdad en «Test con claude elsaulo»: el GM y la
   jugadora lo ven abajo a la izquierda, sin tapar la barra de arriba; al reanudar se va.
-- [ ] **🎲 El consumible al azar en un fin de combate real** (2026-10-19; regla nueva 2026-10-20: todos van al botín, los usados tildados y los
-  no usados destildados). La ventana paso a paso se probó en el mapa del GM con un creep armado en memoria (sin publicar): los cinco pasos, los
-  consejos, el tildado por defecto y el 📢 Publicar solo al final. Falta: un combate real, con un creep que use su consumible en la pelea.
+- [x] **🎲 El consumible al azar en un fin de combate real** (2026-10-19; regla nueva 2026-10-20: todos van al botín, los usados tildados y los
+  no usados destildados). **Probado el 2026-10-20** en «Test con claude elsaulo»: un creep jefe humano con tres al azar (pergamino, aguja,
+  flecha) usó el pergamino desde sus Acciones en combate; derrotado, el paso Consumibles mostró el pergamino tildado («lo usó») y los otros dos
+  destildados («no lo usó»). Cerrado sin publicar; el creep, restaurado.
+- [x] **👁 El Ojo de Kicillof etéreo** (2026-10-20): invocado dentro del Rango y a la vista (fuera de rango o donde no ve, no deja). En combate,
+  arrastrado por encima de una trampa y dentro de una zona, al lado de un creep: la trampa no se disparó, la zona no le hizo nada, nadie le pegó
+  de oportunidad; pagó 4 No2 por 4 casillas.
 - [ ] **🃏 Wildcards en el duelo y en el mapa de un jugador** (2026-10-15): desde una cuenta de jugador con wildcards, (1) la cartita 🃏 arriba, en la
   fila de los lentes, girando; (2) en un duelo, después de tirar PdG/Evasión, aparecen «🃏 Wildcard» y «🪙 Moneda» lado a lado (o solo la carta) y
   reabrir con la carta descuenta 1. (Probado ya: el descanso del GM y la ventana de la ficha, ver «Probado».)

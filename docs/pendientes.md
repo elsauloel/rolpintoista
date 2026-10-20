@@ -595,7 +595,7 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   (¿comer entre combates?, ¿qué recupera?, ¿viajes largos?), vuelven al catálogo y al stock fijo de la tienda.
 
 ## 5. Contenido a revisar (números de primer borrador)
-- [ ] Las **321 habilidades de creeps**: daño, cooldowns, bonos, cuáles son rápidas y cuáles lentas.
+- [ ] **Auditar las skills de creep** (dueño, 2026-10-20, lo pidió anotar). Las **321 habilidades de creeps**: daño, cooldowns, bonos, cuáles son rápidas y cuáles lentas.
 - [ ] Los **173 creeps base** (todos dicen "(auditar)") y sus recompensas.
   - [ ] **Después de esta auditoría: la IA del 🔎 Escanear grupo con los creeps reales** (dueño, 2026-10-13: «dejemos la mejora de la ia para
     después de la auditoría de creeps»). Hoy la IA (GM Tools → Escanear grupo → 🤖 Proponer creeps, `comun/escaneo-grupo.js`: `IA_SISTEMA` +
@@ -606,7 +606,7 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
     equipo Común del catálogo. Que proponga entre lo que existe (con el nombre exacto, para buscarlo en «+ Creep»). Ojo con el tamaño: los
     modelos gratuitos aguantan poco texto, de ahí el filtro. Va después de la auditoría para no mandarle números de primer borrador. De paso:
     el texto todavía dice «Armadura mágica» en vez de «Defensa especial».
-- [ ] Las **66 armas naturales**: potencia y porcentajes de los efectos.
+- [ ] **Revisar las armas naturales de los creeps** (dueño, 2026-10-20, lo pidió anotar). Las **66 armas naturales**: potencia y porcentajes de los efectos.
 - [ ] Las **24 trampas base** y su daño.
 - [ ] El pool de **habilidades de clase** (`skills-clase.js`): 62 skills, casi todas todavía "(Sin auditar)".
 

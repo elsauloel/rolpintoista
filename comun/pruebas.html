@@ -921,7 +921,7 @@ prueba('Drops fijos (2026-10-14, la Grapa del capataz): el creep los suelta siem
 prueba('🎲 Volver a tirar el consumible al azar antes de publicar (2026-10-14)', () => {
   const sc = {id: 'j', nombre: 'Jefe', nivel: 3, jefe: true, tipoCriatura: 'humanoide'};
   const rep = {drops: {j: ['Poción de HP']}};
-  const ok = CombateFin.dropReroll(rep, CATALOGO_BASE, sc, 0), nuevo = rep.drops.j[0];
+  const ok = CombateFin.dropReroll(rep, CATALOGO_BASE, sc, 0), nuevo = rep.drops.j[0].nombre;
   const esCons = !!CATALOGO_BASE.find(x => x.nombre === nuevo && x.tipoItem === 'consumibles');
   igual([ok, rep.drops.j.length, esCons, CombateFin.dropReroll(rep, CATALOGO_BASE, sc, 5)], [true, 1, true, false]);
 });
@@ -2155,15 +2155,17 @@ prueba('🎲 el consumible al azar de un creep (2026-10-19): nace en el cinturó
   const enCinturon = sc.cinturon.filter(x => x.azar).length;
   F.darConsumiblesAlAzar(sc, cat);
   const trasOtro = sc.cinturon.filter(x => x.azar).length;
-  const orig = Math.random; let sinUsarNo, sinUsarSi;
-  try{ Math.random = () => 0.99; sinUsarNo = F.dropDeCreep(F.nuevo(), cat, sc).length; Math.random = () => 0.01; sinUsarSi = F.dropDeCreep(F.nuevo(), cat, sc).length; }finally{ Math.random = orig; }
-  sc.cinturon = [];   // lo usó: lo suelta seguro
-  let drop; try{ Math.random = () => 0.99; drop = F.dropDeCreep(F.nuevo(), cat, sc).map(d => d.nombre); }finally{ Math.random = orig; }
+  // (2026-10-20) Todo lo del creep va al botín: lo que no usó, destildado; lo que usó, tildado.
+  const repNo = F.nuevo(), sinUsar = F.dropDeCreep(repNo, cat, sc);
+  const sinUsarNo = sinUsar.filter(d => !repNo.quitados.has(d.clave)).length, sinUsarSi = sinUsar.length;
+  sc.cinturon = [];   // lo usó
+  const repSi = F.nuevo(), usados = F.dropDeCreep(repSi, cat, sc), drop = usados.map(d => d.nombre);
+  const tildados = usados.filter(d => !repSi.quitados.has(d.clave) && d.usado).length;
   const bestia = {id: 'b1', tipoCriatura: 'bestia', nivel: 3, cinturon: []}, jefe = {id: 'j1', tipoCriatura: 'humanoide', nivel: 3, jefe: true, cinturon: []};
   F.darConsumiblesAlAzar(bestia, cat); F.darConsumiblesAlAzar(jefe, cat);
   igual([r1.nombres.length, primero.length, enCinturon, trasOtro, sinUsarNo, sinUsarSi, drop.join() === sc.consumibleAzar.join(), !!bestia.consumibleAzar, jefe.consumibleAzar.length,
-    !!CATALOGO_BASE.find(i => i.nombre === sc.consumibleAzar[0] && i.tipoItem === 'consumibles' && !i.flecha)],
-    [1, 1, 1, 1, 0, 1, true, false, 2, true]);
+    !!CATALOGO_BASE.find(i => i.nombre === sc.consumibleAzar[0] && i.tipoItem === 'consumibles' && !i.flecha), tildados],
+    [1, 1, 1, 1, 0, 1, true, false, 2, true, 1]);
 });
 prueba('🎁 arquetipos del botín (2026-10-20): choque pesado, choque liviano, caster, rango + lo universal; la munición al nacer, segura', () => {
   const K = CreepCalculo, F = CombateFin;
@@ -2224,8 +2226,9 @@ prueba('fin del combate (comun/combate-fin.js): XP por creep (escapado 20%), qui
   const arma = CombateFin.plantillaArmaCreep([], creepPrueba());
   const v = CombateFin.vista(rep, creeps, []);
   igual([CombateFin.xpBasePorNivel(3), r.filas.length, r.xpTotal, rp.porJugador.map(p => p.xp), items.map(i => i.nombre + ' ' + i.precioCompra), r2.xpTotal, rp2.porJugador.map(p => p.xp),
-    CombateFin.itemsPublicables(rep, r2).length, [arma.precioCompra, arma.tier, arma.estimado], v.publicar, v.html.includes('Garras de Orco'), CombateFin.vista(CombateFin.nuevo(), creeps, []).publicar],
-    [150, 2, 98, [49, 12], ['Garras de Orco 30'], 90, [50, 11], 0, [60, 'Común', true], 'activo', true, 'oculto']);
+    CombateFin.itemsPublicables(rep, r2).length, [arma.precioCompra, arma.tier, arma.estimado], v.publicar, v.html.includes('Garras de Orco'), CombateFin.vista(CombateFin.nuevo(), creeps, []).publicar,
+    (CombateFin.clic(rep, {dataset: {repIr: 'publicar'}}), CombateFin.vista(rep, creeps, []).publicar), CombateFin.vista(rep, creeps, []).html.includes('Publicar')],
+    [150, 2, 98, [49, 12], ['Garras de Orco 30'], 90, [50, 11], 0, [60, 'Común', true], 'oculto', true, 'oculto', 'activo', true]);
 });
 prueba('itemParaCreep: un ítem del catálogo en la forma del equipo de un creep (la Defensa aparte, sin id)', () => {
   const o = CreepCalculo.itemParaCreep({id: 'x', nombre: 'Escudo', tipoItem: 'escudo_1m', tier: 'Común', peso: 2, precioCompra: 40, mods: [{stat: 'def', val: 2}, {stat: 'eva', val: -1}]});

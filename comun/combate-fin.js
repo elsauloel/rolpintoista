@@ -40,7 +40,7 @@ const CombateFin = (() => {
   /* ---------- Reporte del combate: XP, oro, ítems y jugadores; se publica a las fichas ----------
      El GM revisa y ajusta (ítems, XP, oro, quién cobra) y publica: cada jugador recibe su XP y su oro solos en la
      ficha (campanas/<id>/recompensas) y los ítems quedan en el botín para tomarlos (campanas/<id>/botin). */
-  function nuevo(){ return {oro: {}, drops: {}, extra: {}, xpPorJugador: null, ddePorJugador: null, quitados: new Set(), extras: [], jugadores: null, cargando: false, publicando: false, enMapa: null, contarEscapados: true}; }
+  function nuevo(){ return {oro: {}, drops: {}, extra: {}, xpPorJugador: null, ddePorJugador: null, quitados: new Set(), extras: [], jugadores: null, cargando: false, publicando: false, enMapa: null, contarEscapados: true, paso: 'equipo'}; }
 
   /* Solo cuentan para la recompensa los creeps que tienen un token vinculado en el MAPA PUBLICADO (el que ven los jugadores):
      puede haber muchos creeps armados de antemano que no están en la pelea. Devuelve el Set de sus ids. */
@@ -286,45 +286,48 @@ const CombateFin = (() => {
     sc.cinturon = (sc.cinturon || []).filter(x => !(x && x.azar));
     delete sc.consumibleAzar; delete sc.municionAzar;
   }
+  /* 🧪 Los consumibles de un creep en el botín (dueño, 2026-10-20: «todos los consumibles que vienen asociados al creep aparecen en el botín y el
+     GM decide cuáles deja»): el que le tocó al azar, su flecha o virote y lo que le quede en el cinturón. Los que USÓ en el combate vienen
+     tildados; los que no usó, destildados (`rep.quitados`), y el GM suma o saca cualquiera. Un creep viejo (sin consumible al azar) tira su
+     chance de siempre y lo que sale viene tildado. Se arma UNA vez por creep (`rep.drops`): reabrir el reporte no lo cambia. */
   function dropDeCreep(rep, cat, sc){
     rep.drops = rep.drops || {};
     if(rep.drops[sc.id] === undefined){
-      const nombres = [], nivel = num(sc.nivel) + (sc.jefe ? 1 : 0);
-      if(Array.isArray(sc.consumibleAzar)){   // 🎲 el que lleva desde que lo crearon: si lo usó, seguro; si no, con su chance
-        const quedan = (sc.cinturon || []).filter(x => x && x.azar && num(x.unidades) > 0).map(x => x.nombre), chances = [dropChance(sc), dropSegundo(sc)];
-        sc.consumibleAzar.filter(Boolean).forEach((n, i) => {
-          const k = quedan.indexOf(n);
-          if(k < 0){ nombres.push(n); return; }   // lo usó
-          quedan.splice(k, 1);
-          if(Math.random() < (chances[i] ?? dropBase(sc))) nombres.push(n);
-        });
-      }
+      const lista = [], nivel = num(sc.nivel) + (sc.jefe ? 1 : 0);
+      const quedan = (sc.cinturon || []).filter(x => x && x.azar && num(x.unidades) > 0).map(x => x.nombre);
+      const lleva = n => { const k = quedan.indexOf(n); if(k < 0) return false; quedan.splice(k, 1); return true; };
+      if(Array.isArray(sc.consumibleAzar)) sc.consumibleAzar.filter(Boolean).forEach(n => lista.push({nombre: n, usado: !lleva(n)}));
       else [dropChance(sc), dropSegundo(sc)].forEach(p => {
-        if(p > 0 && Math.random() < p){ const c = dropElegir(poolGeneral(cat), dropTier(nivel), arqsDe(sc)); if(c) nombres.push(c.nombre); }
+        if(p > 0 && Math.random() < p){ const c = dropElegir(poolGeneral(cat), dropTier(nivel), arqsDe(sc)); if(c) lista.push({nombre: c.nombre, usado: true, azar: true}); }
       });
       const m = municionDeCreep(sc);
-      if(sc.municionAzar) nombres.push(sc.municionAzar);   // 🏹 la que lleva desde que lo crearon: seguro (2026-10-20)
-      else if(m){ const f = dropElegir(poolMunicion(cat, m), dropTier(nivel)); if(f) nombres.push(f.nombre); }   // 🏹 (un creep viejo) una al azar
-      rep.drops[sc.id] = nombres;
+      if(sc.municionAzar) lista.push({nombre: sc.municionAzar, usado: !lleva(sc.municionAzar)});   // 🏹 la que lleva desde que lo crearon
+      else if(m){ const f = dropElegir(poolMunicion(cat, m), dropTier(nivel)); if(f) lista.push({nombre: f.nombre, usado: true, azar: true}); }   // (un creep viejo)
+      // Lo demás que tenga en el cinturón (lo que le puso el GM), sin usar.
+      (sc.cinturon || []).filter(x => x && !x.azar && num(x.unidades) > 0 && (x.consumible || x.tipoItem === 'consumibles'))
+        .forEach(x => { for(let u = 0; u < Math.min(5, num(x.unidades)); u++) lista.push({nombre: x.nombre, usado: false, cinturon: true}); });
+      rep.drops[sc.id] = lista;
+      lista.forEach((e, i) => { if(!e.usado) rep.quitados.add(`${sc.id}:drop${i ? i + 1 : ''}`); });   // los que no usó, destildados
     }
-    const lista = [].concat(rep.drops[sc.id] || []).filter(Boolean);   // (uno viejo guardaba un solo nombre)
-    return lista.map((n, i) => {
-      const c = cat.find(x => x.nombre === n && x.tipoItem === 'consumibles');
+    const lista = [].concat(rep.drops[sc.id] || []).filter(Boolean).map(e => typeof e === 'string' ? {nombre: e, usado: true} : e);   // (uno viejo guardaba nombres)
+    return lista.map((e, i) => {
+      const c = cat.find(x => x.nombre === e.nombre && x.tipoItem === 'consumibles');
       if(!c) return null;
       const t = plantillaConsumible(c);
-      return {clave: `${sc.id}:drop${i ? i + 1 : ''}`, nombre: t.nombre, precioCompra: t.precioCompra, template: t, origen: K.nombreLimpio(sc), drop: true, scId: sc.id, dropIdx: i};
+      return {clave: `${sc.id}:drop${i ? i + 1 : ''}`, nombre: t.nombre, precioCompra: t.precioCompra, template: t, origen: K.nombreLimpio(sc), drop: true, scId: sc.id, dropIdx: i,
+        usado: !!e.usado, ...(e.azar ? {azar: true} : {}), ...(e.cinturon ? {cinturon: true} : {})};
     }).filter(Boolean);
   }
   /* 🎲 Volver a tirar un consumible soltado al azar (2026-10-14, dueño: «que el master pueda rerrollearlo antes de publicarlo»): otro del
      tier que salga ahora (una flecha, entre las flechas; un virote, entre los virotes). Cambia `rep.drops`, así que reabrir el reporte muestra el nuevo. → true si cambió. */
   function dropReroll(rep, cat, sc, idx){
-    const lista = [].concat((rep.drops || {})[sc.id] || []);
+    const lista = [].concat((rep.drops || {})[sc.id] || []).map(e => typeof e === 'string' ? {nombre: e, usado: true} : {...e});
     if(!(idx >= 0 && idx < lista.length)) return false;
-    const actual = cat.find(x => x.nombre === lista[idx] && x.tipoItem === 'consumibles');
+    const actual = cat.find(x => x.nombre === lista[idx].nombre && x.tipoItem === 'consumibles');
     const nivel = num(sc.nivel) + (sc.jefe ? 1 : 0);
     const c = esMunicion(actual) ? dropElegir(poolMunicion(cat, actual.flecha.virote ? 'virote' : 'flecha'), dropTier(nivel)) : dropElegir(poolGeneral(cat), dropTier(nivel), arqsDe(sc));
     if(!c) return false;
-    lista[idx] = c.nombre;
+    lista[idx] = {...lista[idx], nombre: c.nombre};
     rep.drops[sc.id] = lista;
     return true;
   }
@@ -411,68 +414,87 @@ const CombateFin = (() => {
     return todos.filter(i => !rep.quitados.has(i.clave));
   }
 
-  // El cuerpo de la ventana «Batalla terminada». `publicar`: cómo va el botón 📢 Publicar despojos.
+  /* 📋 La ventana «Batalla terminada», paso a paso (dueño, 2026-10-20: «que el GM primero revise todo el equipo, después todos los consumibles,
+     después los doblones, después la experiencia y al final publicar; cada revisión con un pequeño consejo»). `rep.paso`; el botón 📢 Publicar
+     recién aparece en el último paso. */
+  const PASOS_BOTIN = [
+    {id: 'equipo', nombre: 'Equipo', consejo: 'Revisá el equipo con calma: lo que dejes acá les queda a los jugadores por el resto de la partida. Abrí el «Ver» de cada pieza antes de decidir: un arma o una armadura de más cambia las próximas peleas.'},
+    {id: 'consumibles', nombre: 'Consumibles', consejo: 'Los que el creep usó en el combate vienen tildados; los que llevaba y no usó, destildados. Sumá o sacá los que quieras: los consumibles se gastan, así que dar uno de más pesa menos que con el equipo, pero cuidá que no se junten los fuertes.'},
+    {id: 'doblones', nombre: 'Doblones', consejo: 'El oro ya trae su variación de ±20 %. Pensá en qué pueden comprar en la próxima tienda: un poco de más se gasta rápido; mucho de más cambia lo que pueden comprar. Destildá a quien no estuvo en el combate: no cobra.'},
+    {id: 'experiencia', nombre: 'Experiencia', consejo: 'La experiencia los hace subir de nivel: fijate cuánto le falta a cada uno. En pie cobra el 100 %, inconsciente el 25 % y muerto nada; con un extra premiás (o castigás) algo puntual.'},
+    {id: 'publicar', nombre: 'Publicar', consejo: 'Revisá el resumen antes de publicar: a los jugadores se les abre la ventana del botín para elegir. La experiencia y el oro se cargan cuando cierres el botín.'},
+  ];
+  const pasoBotin = rep => PASOS_BOTIN.findIndex(p => p.id === rep.paso) >= 0 ? rep.paso : 'equipo';
+  const esConsumible = i => i && i.template && i.template.tipoItem === 'consumibles';
   function vista(rep, creeps, cat){
     if(rep.enMapa === null) return {html: `<div class="hint">Buscando los creeps que están en el mapa publicado…</div>`, publicar: 'oculto', faltanJugadores: false};
     const r = generar(rep, creeps, cat);
     if(!r.filas.length) return {html: `<div class="hint">No hay creeps para repartir. Solo cuentan los creeps con un <b>token vinculado en el mapa publicado</b> que todavía no se repartieron.</div>`, publicar: 'oculto', faltanJugadores: false};
     const {filas} = r;
     const rp = calcularReparto(rep, r);
+    const paso = pasoBotin(rep), k = PASOS_BOTIN.findIndex(p => p.id === paso), P = PASOS_BOTIN[k];
     const hayEscapados = filas.some(f => !f.derrotado);
-    const filasHtml = filas.map(f => `
-    <div class="reporte-fila${f.cuenta ? '' : ' no-cuenta'}">
-      <span class="reporte-nombre">${esc(f.sc.nombre)}<span class="reporte-nivel">Lv ${fmt(num(f.sc.nivel))}</span></span>
-      <span class="reporte-estado ${f.derrotado ? 'derrotado' : 'escapo'}">${f.derrotado ? 'Derrotado' : 'Escapó'}</span>
-      <span class="reporte-xp" title="${f.cuenta ? '' : 'No se cuenta en el total'}">+${fmt(f.xp)} XP${f.derrotado && f.oro ? ` · ${fmt(f.oro)} DDE` : ''}</span>
-    </div>`).join('');
+    const extras = itemsExtra(rep);
 
     const itemHtml = i => `<label class="reporte-loot-item" style="cursor:pointer;display:inline-flex;gap:5px;align-items:center${rep.quitados.has(i.clave) ? ';opacity:.45' : ''}" title="${i.template.estimado ? 'Precio estimado por comparación con el catálogo' : ''}">
-      <input type="checkbox" data-rep-item="${esc(i.clave)}"${rep.quitados.has(i.clave) ? '' : ' checked'}>${esc(i.nombre)}${i.trofeo ? ' 🏆' : ''}${i.drop ? ` <button type="button" class="iconbtn" data-rep-reroll="${esc(i.clave)}" title="Soltó este consumible al azar: tocá para volver a tirarlo (otro al azar, antes de publicar)" style="padding:0 4px;margin:0">🎲</button>` : ''} <span class="reporte-loot-precio">${fmt(i.precioCompra)} DDE${i.template.estimado ? ' (est.)' : ''}</span><button type="button" class="iconbtn" data-rep-ver="${esc(i.clave)}" style="padding:2px 8px;font-size:11px">Ver</button></label>`;
-    const conItems = filas.filter(f => f.items.length);
-    const extras = itemsExtra(rep);
-    const lootHtml = (conItems.length || extras.length)
-      ? conItems.map(f => `<div class="reporte-loot-creep"><div class="reporte-loot-nombre">${esc(f.sc.nombre)}</div><div class="reporte-loot-items">${f.items.map(itemHtml).join('')}</div></div>`).join('')
-        + (extras.length ? `<div class="reporte-loot-creep"><div class="reporte-loot-nombre">Botín extra</div><div class="reporte-loot-items">${extras.map(itemHtml).join('')}</div></div>` : '')
-      : `<div class="hint">Ningún creep derrotado suelta ítems.</div>`;
-
+      <input type="checkbox" data-rep-item="${esc(i.clave)}"${rep.quitados.has(i.clave) ? '' : ' checked'}>${esc(i.nombre)}${i.trofeo ? ' 🏆' : ''}${i.drop ? ` <span class="hint" style="font-size:11px">(${i.usado ? 'lo usó' : 'no lo usó'})</span> <button type="button" class="iconbtn" data-rep-reroll="${esc(i.clave)}" title="Cambiarlo por otro al azar (de su calidad y su arquetipo)" style="padding:0 4px;margin:0">🎲</button>` : ''} <span class="reporte-loot-precio">${fmt(i.precioCompra)} DDE${i.template.estimado ? ' (est.)' : ''}</span><button type="button" class="iconbtn" data-rep-ver="${esc(i.clave)}" style="padding:2px 8px;font-size:11px">Ver</button></label>`;
+    const porCreep = (filtro, extrasTambien) => {
+      const bloques = filas.filter(f => f.items.some(filtro)).map(f => `<div class="reporte-loot-creep"><div class="reporte-loot-nombre">${esc(f.sc.nombre)}</div><div class="reporte-loot-items">${f.items.filter(filtro).map(itemHtml).join('')}</div></div>`).join('');
+      const ex = extrasTambien && extras.length ? `<div class="reporte-loot-creep"><div class="reporte-loot-nombre">Botín extra</div><div class="reporte-loot-items">${extras.map(itemHtml).join('')}</div></div>` : '';
+      return bloques + ex;
+    };
     const jug = rep.jugadores;
-    const jugHtml = jug === null ? '<div class="hint">Cargando personajes…</div>'
+    const jugadoresHtml = campo => jug === null ? '<div class="hint">Cargando personajes…</div>'
       : jug.length ? jug.map(j => {
           const p = rp.porJugador.find(x => x.j === j);
+          const extra = campo === 'dde'
+            ? `<span class="rep-valor" title="Extra por circunstancias particulares (puede ser negativo)"><span class="hint" style="font-weight:400">extra</span> <input type="number" step="1" class="rep-num${p && p.ddeExtra ? ' editado' : ''}" data-rep-dde="${esc(j.id)}" value="${p ? p.ddeExtra : 0}"> DDE</span><span class="rep-final">= <b>+${fmt(p ? p.dde : 0)}</b> DDE${p && p.ekeko ? ` <span class="hint">(🔮 +${fmt(p.ekeko)})</span>` : ''}</span>`
+            : `<span class="rep-valor" title="Extra por circunstancias particulares (puede ser negativo)"><span class="hint" style="font-weight:400">extra</span> <input type="number" step="1" class="rep-num${p && p.xpExtra ? ' editado' : ''}" data-rep-xp="${esc(j.id)}" value="${p ? p.xpExtra : 0}"> XP</span><span class="rep-final">= <b>+${fmt(p ? p.xp : 0)}</b> XP</span>`;
           return `<label class="reporte-fila${j.incluido ? '' : ' no-cuenta'}" style="cursor:pointer;gap:8px;align-items:center">
-          <input type="checkbox" data-rep-jug="${esc(j.id)}"${j.incluido ? ' checked' : ''}>
+          ${campo === 'dde' ? `<input type="checkbox" data-rep-jug="${esc(j.id)}"${j.incluido ? ' checked' : ''}>` : ''}
           <span class="reporte-nombre">${esc(j.nombre)}${j.dueno ? `<span class="reporte-nivel">${esc(j.dueno)}</span>` : ''}</span>
           <span class="reporte-estado ${j.estado === 'en pie' ? 'escapo' : 'derrotado'}">${esc(j.estado)}</span>
-          ${j.incluido ? `<span class="rep-valor" title="Extra por circunstancias particulares (puede ser negativo)"><span class="hint" style="font-weight:400">extra</span> <input type="number" step="1" class="rep-num${p.xpExtra ? ' editado' : ''}" data-rep-xp="${esc(j.id)}" value="${p.xpExtra}"> XP</span>
-            <span class="rep-valor" title="Extra por circunstancias particulares (puede ser negativo)"><input type="number" step="1" class="rep-num${p.ddeExtra ? ' editado' : ''}" data-rep-dde="${esc(j.id)}" value="${p.ddeExtra}"> DDE</span>
-            <span class="rep-final" title="Lo que va a recibir">= <b>+${fmt(p.xp)}</b> XP · <b>+${fmt(p.dde)}</b> DDE</span>` : '<span class="reporte-xp">sin recompensas</span>'}</label>`;
+          ${j.incluido ? extra : '<span class="reporte-xp">no cobra</span>'}</label>`;
         }).join('')
       : '<div class="hint">Todavía no hay personajes en la partida.</div>';
 
-    const html = `
-    <div>
-      <div class="reporte-seccion-titulo">Lo que recibe cada jugador</div>
-      <div class="rep-por-jugador">
-        <label>Experiencia por jugador <input type="number" min="0" step="1" class="rep-num rep-num-grande${rep.xpPorJugador !== null ? ' editado' : ''}" data-rep-todos="xp" value="${rp.xpValor}"> XP</label>
-        <label>Oro por jugador <input type="number" min="0" step="1" class="rep-num rep-num-grande${rep.ddePorJugador !== null ? ' editado' : ''}" data-rep-todos="dde" value="${rp.ddeValor}"> DDE</label>
-        ${(rep.xpPorJugador !== null || rep.ddePorJugador !== null) ? `<button type="button" class="iconbtn" data-rep-reset title="Volver a lo calculado (${fmt(rp.xpBase)} XP · ${fmt(rp.ddeCada)} DDE)">↺ calculado</button>` : `<span class="hint">calculado: se puede cambiar</span>`}
-      </div>
-      <div class="reporte-lista">${jugHtml}</div>
-      <div class="hint" style="margin-top:4px">Destildá a quien no estuvo en el combate. Cambiá el <b>valor por jugador</b> de arriba y se aplica a todos. Si alguien merece más o menos por una circunstancia particular, ponele un <b>extra</b> (también puede ser negativo). En pie cobra el 100% de la XP, inconsciente el 25% (hacia abajo), muerto nada; el oro es parejo.</div>
-    </div>
-    <div>
-      <div class="reporte-seccion-titulo">Cálculo: experiencia y oro de los creeps</div>
-      <div class="reporte-lista">${filasHtml}</div>
-      ${hayEscapados ? `<label class="reporte-contar-escapados"><input type="checkbox" data-rep-escapados ${rep.contarEscapados ? 'checked' : ''}> Contar la XP de los que escaparon (${fmt(XP_ESCAPO_PCT * 100)}% de lo que darían derrotados)</label>` : ''}
-      <div class="reporte-total">Calculado — XP total: <b>${fmt(rp.xpTotal)}</b> · ${rp.n ? `base por jugador (÷${rp.n}, hacia arriba): <b>${fmt(rp.xpBase)}</b>` : 'elegí al menos un jugador'}</div>
-      <div class="reporte-total">Calculado — oro total: <b>${fmt(rp.oroTotal)} DDE</b> (ya incluye su variación de ±20%, no se vuelve a tirar) · ${rp.n ? `<b>${fmt(rp.ddeCada)}</b> DDE por jugador (hacia arriba)` : ''}</div>
-    </div>
-    <div>
-      <div class="reporte-seccion-titulo">Despojos: equipos, trofeos y consumibles (🎲 = soltado al azar) que los jugadores van a poder elegir</div>
-      <div class="reporte-loot-lista">${lootHtml}</div>
-      <div style="display:flex;gap:6px;margin-top:8px"><input type="text" data-rep-extra-nombre placeholder="Ítem extra (nombre)" style="flex:1"><input type="number" min="0" data-rep-extra-precio placeholder="Precio" style="width:90px"><button type="button" class="btn" data-rep-extra-add>+ Sumar</button></div>
-    </div>`;
-    return {html, publicar: rep.publicando || !rp.n ? 'inactivo' : 'activo', faltanJugadores: rep.jugadores === null && !rep.cargando};
+    let cuerpo = '';
+    if(paso === 'equipo'){
+      const eq = porCreep(i => !esConsumible(i), true);
+      cuerpo = `<div class="reporte-loot-lista">${eq || '<div class="hint">Ningún creep derrotado suelta equipo.</div>'}</div>
+        <div style="display:flex;gap:6px;margin-top:8px"><input type="text" data-rep-extra-nombre placeholder="Ítem extra (nombre)" style="flex:1"><input type="number" min="0" data-rep-extra-precio placeholder="Precio" style="width:90px"><button type="button" class="btn" data-rep-extra-add>+ Sumar</button></div>`;
+    }else if(paso === 'consumibles'){
+      const co = porCreep(esConsumible, false);
+      cuerpo = `<div class="reporte-loot-lista">${co || '<div class="hint">Ningún creep derrotado lleva consumibles.</div>'}</div>`;
+    }else if(paso === 'doblones'){
+      const oroHtml = filas.filter(f => f.derrotado && f.oro).map(f => `<div class="reporte-fila"><span class="reporte-nombre">${esc(f.sc.nombre)}</span><span class="reporte-xp">${fmt(f.oro)} DDE</span></div>`).join('');
+      cuerpo = `<div class="reporte-lista">${oroHtml || '<div class="hint">Ningún creep derrotado llevaba oro.</div>'}</div>
+        <div class="reporte-total">Oro total: <b>${fmt(rp.oroTotal)} DDE</b> (ya incluye su variación de ±20 %) · ${rp.n ? `<b>${fmt(rp.ddeCada)}</b> DDE por jugador (÷${rp.n}, hacia arriba)` : 'elegí al menos un jugador'}</div>
+        <div class="rep-por-jugador"><label>Oro por jugador <input type="number" min="0" step="1" class="rep-num rep-num-grande${rep.ddePorJugador !== null ? ' editado' : ''}" data-rep-todos="dde" value="${rp.ddeValor}"> DDE</label>
+          ${rep.ddePorJugador !== null ? `<button type="button" class="iconbtn" data-rep-reset title="Volver a lo calculado">↺ calculado</button>` : '<span class="hint">calculado: se puede cambiar</span>'}</div>
+        <div class="reporte-seccion-titulo">Quién cobra</div><div class="reporte-lista">${jugadoresHtml('dde')}</div>`;
+    }else if(paso === 'experiencia'){
+      const filasHtml = filas.map(f => `<div class="reporte-fila${f.cuenta ? '' : ' no-cuenta'}"><span class="reporte-nombre">${esc(f.sc.nombre)}<span class="reporte-nivel">Lv ${fmt(num(f.sc.nivel))}</span></span>
+        <span class="reporte-estado ${f.derrotado ? 'derrotado' : 'escapo'}">${f.derrotado ? 'Derrotado' : 'Escapó'}</span><span class="reporte-xp">+${fmt(f.xp)} XP</span></div>`).join('');
+      cuerpo = `<div class="reporte-lista">${filasHtml}</div>
+        ${hayEscapados ? `<label class="reporte-contar-escapados"><input type="checkbox" data-rep-escapados ${rep.contarEscapados ? 'checked' : ''}> Contar la XP de los que escaparon (${fmt(XP_ESCAPO_PCT * 100)} % de lo que darían derrotados)</label>` : ''}
+        <div class="reporte-total">XP total: <b>${fmt(rp.xpTotal)}</b> · ${rp.n ? `por jugador (÷${rp.n}, hacia arriba): <b>${fmt(rp.xpBase)}</b>` : 'elegí al menos un jugador (paso Doblones)'}</div>
+        <div class="rep-por-jugador"><label>Experiencia por jugador <input type="number" min="0" step="1" class="rep-num rep-num-grande${rep.xpPorJugador !== null ? ' editado' : ''}" data-rep-todos="xp" value="${rp.xpValor}"> XP</label>
+          ${rep.xpPorJugador !== null ? `<button type="button" class="iconbtn" data-rep-reset title="Volver a lo calculado">↺ calculado</button>` : '<span class="hint">calculado: se puede cambiar</span>'}</div>
+        <div class="reporte-lista">${jugadoresHtml('xp')}</div>`;
+    }else{
+      const items = itemsPublicables(rep, r), eq = items.filter(i => !esConsumible(i)), co = items.filter(esConsumible);
+      cuerpo = `<div class="reporte-lista">
+        <div class="reporte-fila"><span class="reporte-nombre">🗡 Equipo</span><span class="reporte-xp">${eq.length ? esc(eq.map(i => i.nombre).join(', ')) : 'nada'}</span></div>
+        <div class="reporte-fila"><span class="reporte-nombre">🧪 Consumibles</span><span class="reporte-xp">${co.length ? esc(co.map(i => i.nombre).join(', ')) : 'nada'}</span></div>
+        ${rp.porJugador.map(({j, xp, dde}) => `<div class="reporte-fila"><span class="reporte-nombre">${esc(j.nombre)}</span><span class="reporte-estado ${j.estado === 'en pie' ? 'escapo' : 'derrotado'}">${esc(j.estado)}</span><span class="reporte-xp">+${fmt(xp)} XP · +${fmt(dde)} DDE</span></div>`).join('') || '<div class="hint">Nadie cobra: elegí al menos un jugador (paso Doblones).</div>'}
+      </div>`;
+    }
+    const nav = `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">${PASOS_BOTIN.map((p, i) => `<button type="button" class="iconbtn" data-rep-ir="${p.id}" style="${p.id === paso ? 'font-weight:700;border-color:#c9a227;color:#f3e2a0' : ''}">${i + 1}. ${esc(p.nombre)}</button>`).join('')}</div>`;
+    const consejo = `<div class="hint" style="margin:4px 0 10px;padding:8px 10px;border-left:3px solid #c9a227;background:rgba(201,162,39,.08)">💡 ${esc(P.consejo)}</div>`;
+    const pie = `<div style="display:flex;justify-content:space-between;margin-top:12px">${k > 0 ? `<button type="button" class="btn" data-rep-ir="${PASOS_BOTIN[k - 1].id}">← ${esc(PASOS_BOTIN[k - 1].nombre)}</button>` : '<span></span>'}${k < PASOS_BOTIN.length - 1 ? `<button type="button" class="btn" data-rep-ir="${PASOS_BOTIN[k + 1].id}">${esc(PASOS_BOTIN[k + 1].nombre)} →</button>` : ''}</div>`;
+    const html = `${nav}<div class="reporte-seccion-titulo">${k + 1}. ${esc(P.nombre)}</div>${consejo}${cuerpo}${pie}`;
+    return {html, publicar: paso !== 'publicar' ? 'oculto' : rep.publicando || !rp.n ? 'inactivo' : 'activo', faltanJugadores: rep.jugadores === null && !rep.cargando};
   }
   // Un control de la ventana cambió (evento change): true si hay que redibujar.
   function cambio(rep, t){
@@ -499,7 +521,8 @@ const CombateFin = (() => {
       const it = [...r.filas.flatMap(f => f.items), ...itemsExtra(rep)].find(i => i.clave === d.repVer);
       return it ? {ver: it.template} : null;
     }
-    if(d.repReset !== undefined){ rep.xpPorJugador = null; rep.ddePorJugador = null; return true; }
+    if(d.repIr !== undefined){ rep.paso = d.repIr; return true; }   // 📋 los pasos
+    if(d.repReset !== undefined){ if(rep.paso === 'experiencia') rep.xpPorJugador = null; else if(rep.paso === 'doblones') rep.ddePorJugador = null; else { rep.xpPorJugador = null; rep.ddePorJugador = null; } return true; }
     if(d.repReroll !== undefined){   // 🎲 otro consumible al azar, antes de publicar
       const r = generar(rep, creeps, cat);
       const it = r.filas.flatMap(f => f.items).find(i => i.clave === d.repReroll && i.drop);

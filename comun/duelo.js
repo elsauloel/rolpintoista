@@ -1758,6 +1758,21 @@ const Duelo = (() => {
       .map(([ef, i]) => `<div class="duelo-mcaja"><b>${_esc(ef.nombre)}</b> <button type="button" data-efman="${i}:1">✔ Funcionó</button> <button type="button" class="sec" data-efman="${i}:0">✘ No funcionó</button></div>`).join('');
     return `<div class="duelo-manual">${tg}${filas}<div class="det">Sin tirar el dado. Si el efecto trae daño propio, ese se tira igual.</div></div>`;
   }
+  /* ✍ Una tirada escrita a mano lleva igual los datos del crítico de su lado (2026-10-20, probando el Blindado en el mapa: a mano se perdían):
+     el Crítico frecuente y potente de quien ataca; la Resistencia a crítico y el Blindado de quien defiende. Solo si esta pantalla maneja ese lado. */
+  async function extraManual(d, campo){
+    if(campo !== 'pdg' && campo !== 'eva') return null;
+    const lado = campo === 'pdg' ? d.atacante : d.defensor;
+    let h = null;
+    try{
+      if(cfgEscuchar.hooksLocal){ h = cfgEscuchar.hooksLocal(lado); if(h && typeof h.then === 'function') h = await h; }
+      const H = typeof window !== 'undefined' ? window.DUELO_HOOKS : null;
+      if(!h && H && H.soy && H.soy(lado)) h = H;
+      if(!h) return null;
+      if(campo === 'pdg') return !d.hab && h.statsCritico ? h.statsCritico(d) || null : null;
+      return (!d.hab || d.hab.critTipo) && h.resistenciaCritico ? {resistencia: _num(h.resistenciaCritico(d)), ...(h.blindado && h.blindado(d) ? {blindado: true} : {})} : null;
+    }catch(err){ console.error('Duelo: los datos del crítico de una tirada a mano', err); return null; }
+  }
   async function usarManual(d, campo){
     const k = d.id + ':' + campo;
     const input = document.querySelector(`[data-mtirada="${campo}"]`);
@@ -1785,7 +1800,7 @@ const Duelo = (() => {
       guardarDano(d.id, r, efectos, {defensaManual}).catch(err => { console.error(err); _toast('No se pudo anotar la tirada en el duelo'); });
       return;
     }
-    guardarTiro(d.id, campo, r, defensa).catch(err => { console.error(err); _toast('No se pudo anotar la tirada en el duelo'); });
+    guardarTiro(d.id, campo, r, defensa, await extraManual(d, campo)).catch(err => { console.error(err); _toast('No se pudo anotar la tirada en el duelo'); });
   }
 
   // El «?» que explica Esquivar, Parry y Bloqueo (comun/modificadores-tirada.js; si la página no lo carga, no aparece).
@@ -2174,7 +2189,7 @@ const Duelo = (() => {
     if(!c.critico){
       const anulado = c.nivel > 0 && c.dados <= 0;
       cuerpo = titulo('no', c.blindado ? '🛡 CRÍTICO ANULADO' : '✘ NO ES CRÍTICO')
-        + explica([c.blindado ? `🛡 ${_esc(nombreDef)} está Blindado: el golpe iba a ser crítico, pero entra como uno normal.`
+        + explica([c.blindado ? `🛡 ${(d.defensor && d.defensor.nombre) || 'El defensor'} tiene Blindado: el golpe iba a ser crítico, pero entra como uno normal.`
           : anulado ? `La Resistencia a crítico (${_fmt(c.resistencia)}) del defensor anuló el crítico.` : `La diferencia (${_fmt(c.diferencia)}) no alcanza el rango del crítico (${_fmt(c.rango)}).`, ...lCuenta])
         + viz;
     }else if(!c.d20){
@@ -2570,7 +2585,7 @@ const Duelo = (() => {
   });
 
   // A mano: el GM (o el dueño) escribe el valor del stat y se tira con dados.
-  function tirarPorAusente(d, campo){
+  async function tirarPorAusente(d, campo){
     const input = document.querySelector(`[data-manual="${campo}"]`);
     const valor = Math.round(_num(input ? input.value : manual[campo]));
     const f = typeof formulaParaValor === 'function' ? formulaParaValor(valor) : null;
@@ -2585,7 +2600,7 @@ const Duelo = (() => {
     const etiqueta = campo === 'eva' ? (cHab ? cHab.etq : (modo === 'parry' ? 'Parry' : 'Evasión')) : (campo === 'pdg' && d.hab) ? etqTira(d) : ETIQ[campo];
     const r = {formula: f.formula, rolls, mod: f.mod, total};
     if(campo === 'dano' && typeof mesaPublicar === 'function'){ try{ mesaPublicar(`${lado.nombre} · ${etiqueta} (a mano)`, r); }catch(err){} }   // las tiradas de un par se publican juntas cuando tiran los dos
-    (campo === 'dano' ? guardarDano(d.id, r) : guardarTiro(d.id, campo, r, defensa)).catch(err => { console.error(err); _toast('No se pudo anotar la tirada en el duelo'); });
+    (campo === 'dano' ? guardarDano(d.id, r) : guardarTiro(d.id, campo, r, defensa, await extraManual(d, campo))).catch(err => { console.error(err); _toast('No se pudo anotar la tirada en el duelo'); });
   }
 
   // El daño de una habilidad: la fórmula que dejó la habilidad (ya con lo que suma el que la usa), tirada por quien la usa.

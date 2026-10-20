@@ -331,7 +331,7 @@ const FichaAcciones = (() => {
       }
       // Un consumible que deja una zona en el mapa (2026-10-08, las bengalas: `zonaUso`, la misma Ejecución de una zona): se usa desde el mapa;
       // sin el mapa, no se gasta.
-      if((it.zonaUso && !ui.colocarZona) || (it.aceleradorMapa && !ui.acelerador)){ ui.toast(`${it.nombre} se usa desde el mapa (tu Botonera en el mapa): ahí elegís dónde`); return; }
+      if((it.zonaUso && !ui.colocarZona) || (it.aceleradorMapa && !ui.acelerador) || (it.duelo && !ui.terminar)){ ui.toast(`${it.nombre} se usa desde el mapa (tu Botonera en el mapa): ahí elegís dónde`); return; }
       // Trampa consumible (2026-09-25): al usarla se coloca sola junto a tu token; si no se puede, no se gasta.
       if(it.trampaDatos){
         if(consumiendoTrampa.has(id)) return;
@@ -349,6 +349,7 @@ const FichaAcciones = (() => {
       tormentaPj(S, gastoNitros, `usar ${it.nombre}`, ui);
       if(it.zonaUso) ui.colocarZona(it);   // la bengala: se elige el centro en el mapa
       if(it.aceleradorMapa) ui.acelerador(it);   // ⏩ la Runa aceleradora: se elige la casilla en el mapa
+      if(it.duelo) ui.terminar(Combatiente.habDeConsumible(it), null, 0, 0);   // 📜 su Ejecución: el objetivo y el cuadro del duelo (la Red Nerubian)
       if(sac.saque) S.meta.saqueTurno = num(S.turno) || 1;   // el primero del turno ya se sacó
       if(sac.bolsillo) S.meta.bolsilloTurno = num(S.turno) || 1;
       if(sac.alquimista) S.meta.alquimistaTurno = num(S.turno) || 1;   // 💍 el Anillo del alquimista, una vez por turno

@@ -169,6 +169,7 @@ async function acConsumir(sc, itemId){
     catch(e){ console.error(e); toast(`No se pudo revivir a ${revive.nombre}: ${e.message}`); }
   }
   (res.tiradas || []).forEach(t => acPublicar(sc, t));
+  if(it.duelo){ const sc2 = acCreep() || sc; CreepAcciones.terminarHab(sc2, Combatiente.habDeConsumible(it), {costo: 0, auto: true, nitros: sc2.nitros}, acHabUi()); }   // 📜 su Ejecución (2026-10-20)
   const tok = [...tokens.values()].find(x => x.tipo === 'creep' && x.fichaId === ac.creepId);
   // js/21: Mesa y Crónica. Un creep que los jugadores no ven: solo la Mesa, con su nombre (js/29 decide: «acción incierta» o nada). Una trampa
   // ya la anunció TokensAuto.

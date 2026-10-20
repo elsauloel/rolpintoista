@@ -215,6 +215,7 @@ document.addEventListener('click', async e => {
     const [scId, itemId] = b.dataset.cinConsumir.split(':');
     const sc = S.creeps.find(s => s.id === scId), it = sc && (sc.cinturon || []).find(x => x.id === itemId);
     if(!it) return;
+    if(it.duelo){ toast(`${it.nombre} se usa desde el mapa (⚔ Acciones del creep): ahí elegís a quién`); return; }   // 📜 un consumible con Ejecución (2026-10-20)
     (async () => {
       let forzar = false;
       if(CreepAcciones.faltanNitrosConsumir(sc)){

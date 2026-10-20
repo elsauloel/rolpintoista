@@ -15,8 +15,10 @@ cada turno, hasta el fin del combate (`efectoRecarga`). **Pergaminos Comunes:** 
 (Escudo Arcano, Foco Arcano, Furia Arcana, Furia de Combate, Muralla Personal, Paso Fantasma, Puntería Certera, Rango Extendido, Reflejo de
 Acero, Reserva Ampliada, Vitalidad Extendida, Voluntad de Hierro) para todo el grupo durante 3 turnos, a 60 (la equivalencia simple del dueño:
 uno solo todo el combate ≈ todo el grupo 3 turnos).
-**Tercera tanda (dueño, 2026-10-20), uno por uno:** ✅ **Red Nerubian**: un rival dentro de tu Rango queda Inmovilizado 2 turnos; se resiste
-con Fuerza contra tu Efecto especial; Buena a 50 (como la Flecha de arpón). Para eso, un consumible ahora puede tener su Ejecución ✨ (`duelo`
+**Tercera tanda (dueño, 2026-10-20), uno por uno:** ✅ **Red Nerubian**: a un rival dentro de tu Rango, tu PdG.Esp contra su Evasión; si pega,
+Inmovilizado hasta 3 turnos. Al empezar cada turno del atrapado, la tirada de Fuerza contra tu Efecto especial aparece sola (no cuesta No2;
+`soltar.alEmpezar`, vtt-hexgrid/js/54); un aliado pegado puede ayudarlo con 1 No2 y su propia Fuerza (`soltar.ayuda`: botón en su Botonera o
+Acciones). Buena a 50 (como la Flecha de arpón). Para eso, un consumible ahora puede tener su Ejecución ✨ (`duelo`
 en el ítem, `Combatiente.habDeConsumible`): el objetivo se elige en el mapa y va al cuadro del duelo. Probado en el mapa.
 **Pendiente:** el ojo de Kicillof como invocación de 3 turnos
 (Movimiento 5, invisible, sin mareo; solo revela y despeja) y automatizar la red y la luz cegadora; ¿algún pergamino Común?

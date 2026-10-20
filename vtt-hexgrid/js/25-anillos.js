@@ -164,7 +164,7 @@ async function bnEfectoAlGrupo(fichaId, estado, it){
   if(nombres.length && typeof mesaLinea === 'function') mesaLinea(`📜 ${it.nombre}: ${spec.nombre} ${spec.turnos} turnos también a ${nombres.join(', ')}`);
 }
 // 📜 «Hasta el fin del combate» (dueño, 2026-10-19): los pergaminos de todo el combate se van al «Finalizar combate» (también los viejos, por el nombre).
-const finDelCombate = e => !!e && (e.finCombate || (e.permanente && /\(pergamino\)\s*$/i.test(String(e.nombre || ''))));
+const finDelCombate = e => !!e && (e.finCombate || (e.permanente && /\(pergamino\)\s*$|^Sangre de drag[oó]n/i.test(String(e.nombre || ''))));   // (+ la Sangre de dragón, 2026-10-20)
 async function pergaminosAlTerminar(){
   for(const [, t] of tokens){
     if(!t || t.tipo !== 'pj' || !t.fichaId || String(t.fichaId).includes(SEP_INVOCACION)) continue;

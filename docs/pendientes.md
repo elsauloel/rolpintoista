@@ -158,6 +158,8 @@
 >   (un jefe, dos), con su calidad y su arquetipo; el GM lo cambia con 🎲 en Recompensas las veces que quiera (o lo saca). El creep lo puede usar
 >   (`sc.consumibleAzar`; `CombateFin.darConsumiblesAlAzar`); reemplaza al sorteo al morir (que sigue para los creeps viejos). **Al morir (dueño):
 >   si lo usó, lo suelta seguro; si no, con la chance de su tipo** (humano 60 %, humanoide 45 %; jefe: el primero seguro, el segundo con la chance).
+>   **Para después de la auditoría de las pociones (dueño, 2026-10-20): mirar más de cerca el criterio con que se elige el consumible al azar**
+>   («hay algo que me parece raro, igual son testeos muy por encima»): qué familia sale y con qué peso, por arquetipo y nivel, con ejemplos reales.
 > - [x] **🧮 La calculadora cobra barato el daño fijo de las ballestas (2026-10-11; revisado 2026-10-19)**: una ballesta Común con solo daño, según la calculadora,
 >   puede llegar a 1d6+6 o 2d6+4; según el simulador de balance (`balance_combate.py --ballesta`, Shooter contra el blanco medio) el techo de la
 >   banda Común (74–106 %) es **1d6+3** (95 %; 1d6+4 = 114 %, 2d6 = 110 %). Ajustarla mueve el precio y la calidad de todas las ballestas: revisarlo

@@ -32,7 +32,7 @@
 9. **No hay SP Común**: un mago de nivel bajo no tiene cómo recuperar SP barato (y el botín de los magos en Común no tiene SP).
 
 ## Propuestas
-1. Sangre de dragón: se va al «Finalizar combate».
+1. ✅ Sangre de dragón: se va al «Finalizar combate» (hecho 2026-10-20: `efectoFinCombate`; las ya puestas también, por el nombre).
 2. Piernas de Viento sale; **Ímpetu** (No2 de verdad): +1 Rara 100, +2 Excepcional 200 (la mitad que el pergamino, que dura todo el combate).
    Segundo aire: el Movimiento +3 pasa a **+2 No2**. **Hypeado**: Excepcional, poción 200 y pergamino 400 (lo mismo que Ímpetu +2), o sacarlo
    de los consumibles y dejarlo como estado de habilidades.

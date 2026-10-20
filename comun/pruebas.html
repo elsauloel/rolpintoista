@@ -940,6 +940,11 @@ prueba('💡 Luz cegadora (2026-10-20): área de diámetro 3 en tu Rango, Ef.Esp
     CATALOGO_BASE.find(i => i.nombre === 'Flecha cegadora').precioCompra, CATALOGO_BASE.find(i => i.nombre === 'Virote cegador').precioCompra],
     [50, 'area', 1, 5, ['rescc'], ['Ceguera'], true, true, 45, 45]);
 });
+prueba('👁 Ojo de Kicillof, skill del Support (2026-10-20): 5 SP, 1 No2, la misma invocación que el pergamino (2 turnos, Movimiento 5, flor de diámetro 5)', () => {
+  const h = ((CLASES_SKILLS.find(c => c.id === 'support') || {}).habilidades || []).find(x => x.id === 'support-ojo-de-kicillof'), p = CATALOGO_BASE.find(i => i.id === 'cat-pergamino-ojo');
+  igual([!!h, h && h.costo, h && h.nitrosCosto, h && h.invocaTemporal.turnos, h && h.invocaTemporal.mov, h && h.invocaTemporal.vision, h && h.invocaTemporal.id === p.invocaTemporal.id],
+    [true, '5', 1, 2, 5, 2, true]);
+});
 prueba('📜 Un consumible con Ejecución (2026-10-20, la Red Nerubian): habilidad automática de un uso; PdG.Esp contra Evasión en tu Rango; Inmovilizado hasta 3, se suelta al empezar el turno con Fuerza contra tu Ef.Esp', () => {
   const red = CATALOGO_BASE.find(i => i.nombre === 'Pergamino de red Nerubian');
   const h = Combatiente.habDeConsumible(red), e = Combatiente.habEjecucion(h, h.duelo, {stat: id => ({rng: 6, dmgesp: 3})[id] || 0});

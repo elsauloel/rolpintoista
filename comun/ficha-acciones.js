@@ -1317,10 +1317,13 @@ const FichaAcciones = (() => {
     Object.assign(inv, {activa: true, cooldown: turnos + 1, cooldownActual: turnos + 1, agl: mov, estados: [], ojo: vision, veoculto: vision, etereo: true, sinMareo: true, temporal: true, ...(c.imagen ? {imagen: c.imagen, miniatura: c.imagen} : {})});
     inv.nitros = InvCalculo.nitrosMax(inv);
     const ref = ui.yo ? (ui.yo() || {}).ref : '';
-    ui.invocar({ref: `${ref}~${inv.id}`, fichaId: ref, nombre: inv.nombre, color: inv.color, quien: (S.meta && S.meta.nombre) || 'Personaje', habilidad: it.nombre, turnos});
+    const avisar = ui.invocar || (ui.alMapa && ui.enMapa && ui.enMapa() ? m => ui.alMapa('invocacion-habilidad', m) : null);
+    if(!avisar){ ui.toast(`👁 ${inv.nombre} invocado (${fmt(turnos)} turnos) — poné su token en el mapa`); return inv; }
+    avisar({ref: `${ref}~${inv.id}`, fichaId: ref, nombre: inv.nombre, color: inv.color, quien: (S.meta && S.meta.nombre) || 'Personaje', habilidad: it.nombre, turnos});
     return inv;
   }
   function invocarConHab(S, h, ui){
+    if(h && h.invocaTemporal) return invocarTemporal(S, h, ui);   // 👁 una invocación de un rato (el Ojo de Kicillof del Support)
     const inv = invocacionDeHab(S, h);
     if(!inv) return null;
     if(inv.falta){ ui.toast(`${h.nombre}: la invocación que tenía elegida ya no está en tu ficha — elegí otra en el editor de la habilidad`); return null; }

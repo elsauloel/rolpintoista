@@ -782,13 +782,15 @@ const Duelo = (() => {
     if(typeof Critico !== 'undefined' && m.pdg && m.eva){
       e = Critico.evaluar({pdg: m.pdg.total, eva: m.eva.total, tipo: m.ataque.tipoDado, frecuente, potente, resistencia});
     }
+    // 🛡 Blindado (dueño, 2026-10-20: «la anulación del crítico debería estar automatizada»): un golpe que iba a ser crítico entra como uno normal.
+    if(e && e.critico && dd.blindado) e = {...e, critico: false, blindado: true};
     if(e && e.critico){
       const d20extra = Math.max(0, Math.round(_num(dd.d20)));   // el arma tira N d20 más en el crítico (2026-10-03)
       m.crit = {rango: e.rango, diferencia: e.diferencia, nivel: e.nivel, dados: e.dados + d20extra, critico: true, frecuente, potente, resistencia, d20: null, mejor: 0, mult: 1, ...(d20extra ? {d20extra} : {})};
       m.fase = 'critico';
       m.estado = 'esperando';
     }else{
-      m.crit = e ? {rango: e.rango, diferencia: e.diferencia, nivel: e.nivel, dados: e.dados, critico: false, frecuente, potente, resistencia, d20: null, mejor: 0, mult: 1} : null;
+      m.crit = e ? {rango: e.rango, diferencia: e.diferencia, nivel: e.nivel, dados: e.dados, critico: false, frecuente, potente, resistencia, d20: null, mejor: 0, mult: 1, ...(e.blindado ? {blindado: true} : {})} : null;
       // 🎯 Headshot (Shooter, 2026-10-12): «falla si no es crítico» — pegó, pero sin crítico no hace nada.
       if(m.ataque && m.ataque.soloCritico){ m.crit = {...(m.crit || {}), critico: false, soloCritico: true}; m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; return; }
       entrarDano(m);
@@ -2171,8 +2173,9 @@ const Duelo = (() => {
     const viz = criticoVizHtml(d);
     if(!c.critico){
       const anulado = c.nivel > 0 && c.dados <= 0;
-      cuerpo = titulo('no', '✘ NO ES CRÍTICO')
-        + explica([anulado ? `La Resistencia a crítico (${_fmt(c.resistencia)}) del defensor anuló el crítico.` : `La diferencia (${_fmt(c.diferencia)}) no alcanza el rango del crítico (${_fmt(c.rango)}).`, ...lCuenta])
+      cuerpo = titulo('no', c.blindado ? '🛡 CRÍTICO ANULADO' : '✘ NO ES CRÍTICO')
+        + explica([c.blindado ? `🛡 ${_esc(nombreDef)} está Blindado: el golpe iba a ser crítico, pero entra como uno normal.`
+          : anulado ? `La Resistencia a crítico (${_fmt(c.resistencia)}) del defensor anuló el crítico.` : `La diferencia (${_fmt(c.diferencia)}) no alcanza el rango del crítico (${_fmt(c.rango)}).`, ...lCuenta])
         + viz;
     }else if(!c.d20){
       const puede = esMio(d.atacante) || soyGM();
@@ -2486,7 +2489,8 @@ const Duelo = (() => {
       }
       let extra = null;
       if(!d.hab && campo === 'pdg' && h.statsCritico) extra = h.statsCritico(d) || null;
-      if((!d.hab || d.hab.critTipo) && campo === 'eva' && h.resistenciaCritico) extra = {resistencia: _num(h.resistenciaCritico(d))};   // (una habilidad física con crítico, también)
+      if((!d.hab || d.hab.critTipo) && campo === 'eva' && h.resistenciaCritico) extra = {resistencia: _num(h.resistenciaCritico(d)),
+        ...(h.blindado && h.blindado(d) ? {blindado: true} : {})};   // (una habilidad física con crítico, también) · 🛡 Blindado (2026-10-20)
       // ⚡ Critical Matters (2026-09-29): a esta altura (el daño se tira después del crítico, ver entrarCritico)
       // d.crit ya está resuelto — si el golpe salió crítico, los efectos de duelo.critico.efectos se suman a
       // los de siempre (arma + habilidad), mismo mecanismo de "recordar y tirar" que ya usan efectosArma/efectos.

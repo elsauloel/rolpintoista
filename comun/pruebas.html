@@ -1245,6 +1245,21 @@ prueba('📜 Regeneración y Escudo Especial nuevos, y los pergaminos grupales C
     FichaHabilidades.aplicarEfectoDeConsumo({catalogo: [], efectos: []}, cat('Pergamino de Regeneración menor'), presetsDePrueba).estado.hpturno],
     [10, 3, true, 3, true, true, 12, true, [{stat: 'dmg', val: 1}], 5]);
 });
+prueba('🛡 Blindado anula el crítico en el duelo; Félix Felicis; Ojo del Verdugo 3 turnos (2026-10-20, P212)', () => {
+  const cat = n => CATALOGO_BASE.find(i => i.nombre === n);
+  const S = {catalogo: [], efectos: []};
+  const felix = FichaHabilidades.aplicarEfectoDeConsumo(S, cat('Félix Felicis'), presetsDePrueba).estado;
+  const blind = FichaHabilidades.aplicarEfectoDeConsumo(S, cat('Poción de Blindaje'), presetsDePrueba).estado;
+  const hk = FichaDuelo.hooks(() => S, {toast: () => {}});
+  // El duelo: PdG 20 contra Evasión 2 con un arma de Tipo 6 es crítico; con Blindado, entra como golpe normal.
+  const m0 = () => ({ataque: {tipoDado: 6}, pdg: {total: 20}, eva: {total: 2}, critDatos: {frecuente: 0, potente: 0, resistencia: 0}});
+  const sinB = m0(); Duelo.entrarCritico(sinB);
+  const conB = m0(); conB.critDatos.blindado = true; Duelo.entrarCritico(conB);
+  S.efectos.push({nombre: 'Blindado', activo: true, blindado: true});   // (el estado Blindado: el del pergamino de grupo)
+  igual([felix.afortunado, cat('Félix Felicis').tier, blind.mods.map(m => m.stat + m.val).join(), typeof hk.blindado === 'function' && hk.blindado(), cat('Poción de Ojo del Verdugo superior').efectoTurnos,
+    !!cat('Poción de Buena Fortuna'), sinB.crit.critico, sinB.fase, conB.crit.critico, !!conB.crit.blindado, conB.fase !== 'critico'],
+    [true, 'Buena Calidad', 'tipo11,tipo21,tipo31,tipo41,tipo51', true, 3, false, true, 'critico', false, true, true]);
+});
 prueba('Invulnerable activo bloquea un debuff del consumo (y lo dice)', () => {
   const S = {catalogo: [], efectos: [{nombre: 'Invulnerable', activo: true, invulnerable: true}]};
   const r = FichaHabilidades.aplicarEfectoDeConsumo(S, {efectoNombre: 'Veneno', efectoHpTurno: -2}, presetsDePrueba);

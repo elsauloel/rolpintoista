@@ -181,6 +181,8 @@ const FichaDuelo = (() => {
         const cc = Combatiente.cargaCritico(getS().efectos, d.id);   // Ojo de asesino: el crítico de una carga
         return {frecuente: (Number.isNaN(f) ? 0 : Math.max(0, Math.round(f))) + cc.crit, potente: (Number.isNaN(p) ? 0 : Math.max(0, Math.round(p))) + cc.critpot, ignora: Combatiente.ignoraResistCritArma(conque), d20: Math.max(0, Math.round(num(conque && conque.critD20)))};
       },
+      // 🛡 Blindado (2026-10-20): inmune a los golpes críticos.
+      blindado: () => (getS().efectos || []).some(e => e && e.activo !== false && e.blindado),
       // La Resistencia a crítico del defensor contra el Tipo del arma.
       resistenciaCritico: d => {
         const i = [4, 6, 8, 10, 12].indexOf(num(d.ataque.tipoDado));

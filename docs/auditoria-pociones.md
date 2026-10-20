@@ -39,8 +39,10 @@
    +4 Excepcional 320 («suprema», nueva). Segundo aire: el Movimiento +3 pasó a +2 No2. **Hypeado** (poción y pergamino), archivados: «medio
    redundante; tenía sentido con las acciones» (el estado queda para habilidades).
 3. ✅ (dueño, 2026-10-20) Ojo del Verdugo sin tope (la poción dura turnos; el tope era para el pergamino, que dura todo el combate), con
-   precio no lineal: +1 Buena 40, +2 Buena 100, +3 Rara 300.
-4. Buena Fortuna, Inmunidad a CC y Blindaje: Buena calidad, 50.
+   precio no lineal: +1 Buena 40, +2 Buena 100, +3 Rara 300; duran **3 turnos** (antes 4).
+4. ✅ (dueño, 2026-10-20) Buena Fortuna (ahora **Félix Felicis**), Inmunidad a CC y Blindaje: Buena calidad, 50. **Blindado, automatizado en el
+   duelo**: un golpe que iba a ser crítico entra como uno normal («🛡 CRÍTICO ANULADO»); lo usa el pergamino de grupo. **La Poción de Blindaje**,
+   en cambio (dueño: «más fácil y menos OP»), da **+1 a la resistencia a todos los tipos de crítico**, 3 turnos.
 5. Escudo Especial: Buena, 40 (o un escudo de 15).
 6. Invulnerabilidad: Excepcional, 300 (o 2 turnos).
 7. Grandes: HP grande, Buena; HP mayor grande 270 y Regeneración mayor grande 200.

@@ -132,6 +132,7 @@ const InvDuelo = (() => {
         return {frecuente: (Number.isNaN(f) ? 0 : Math.max(0, Math.round(f))) + cc.crit, potente: (Number.isNaN(p) ? 0 : Math.max(0, Math.round(p))) + cc.critpot,
           ignora: Combatiente.ignoraResistCritArma(Combatiente.armaDeCombatiente(inv)), d20: Math.max(0, Math.round(num(Combatiente.armaDeCombatiente(inv).critD20)))};
       },
+      blindado: d => { const inv = ui.inv(d.defensor); return !!(inv && (inv.estados || []).some(e => e && e.activo !== false && e.blindado)); },   // 🛡 (2026-10-20)
       resistenciaCritico: d => {
         const i = [4, 6, 8, 10, 12].indexOf(num(d.ataque.tipoDado));
         if(i < 0) return 0;

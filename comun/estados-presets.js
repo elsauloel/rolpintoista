@@ -151,7 +151,7 @@ const ESTADOS_PRESET = [
   {nombre:'Coagulación', alias:['Coagulación extrema'], polaridad:'buff', turnos:3, coagulacionExtrema:true,
     detalle:'Inmune a Sangrado: no se le puede aplicar y el que ya tenga puesto no le hace daño mientras dure.'},
   {nombre:'Blindado', polaridad:'buff', turnos:3, blindado:true,
-    detalle:'✋ A mano: inmune a golpes críticos. Cuando le pegan con un crítico, la mesa lo anula (no le hace daño). El estado solo recuerda que está activo y cuántos turnos dura.'},
+    detalle:'Inmune a los golpes críticos: un golpe que iba a ser crítico entra como uno normal. ⚙ Automatizado en el duelo (2026-10-20).'},
   {nombre:'Sigilo', polaridad:'buff', turnos:0, permanente:true,
     detalle:'Oculto: sus rivales no lo ven en el mapa. Se rompe si entra en el cono de detección de un rival o si hace una acción hostil (un ataque o una skill individual sobre un rival). Cada paso dentro de la zona de alerta de un rival pide una tirada de detección (en principio su Destreza contra el Especial del que vigila).'},
   // Marcado (2026-10-05, Varita del rastreador y Varita de la luz): se resiste con Res.Esp (lo tira quien la usa: PdG.Esp contra Res.Esp).

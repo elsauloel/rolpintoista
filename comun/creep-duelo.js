@@ -133,6 +133,7 @@ const CreepDuelo = (() => {
         return sc ? {frecuente: Math.max(0, Math.round(C().modTotal(sc, 'crit'))) + cc.crit, potente: Math.max(0, Math.round(C().modTotal(sc, 'critpot'))) + cc.critpot,
           ignora: Combatiente.ignoraResistCritArma(Combatiente.armaDeCombatiente(sc)), d20: Math.max(0, Math.round(num(Combatiente.armaDeCombatiente(sc).critD20)))} : {frecuente: 0, potente: 0};
       },
+      blindado: d => { const sc = deLado(d.defensor); return !!(sc && (sc.estados || []).some(e => e && e.activo !== false && e.blindado)); },   // 🛡 (2026-10-20)
       resistenciaCritico: d => {
         const sc = deLado(d.defensor);
         const i = [4, 6, 8, 10, 12].indexOf(num(d.ataque.tipoDado));

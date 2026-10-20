@@ -140,26 +140,27 @@ const CombateFin = (() => {
   }
   /* --- El consumible que suelta un creep (2026-10-03, pedido del dueño) ---
      Más seguido desde el 2026-10-08 (P181, dueño: «frecuentes en los drops, para que la gente las use a la ligera y se divierta con la
-     variedad»): humanos 60 %, humanoides 45 %, el resto 15 %. Un jefe suelta uno seguro y tiene la chance de su tipo de soltar un segundo, con la
-     tabla de tiers como si tuviera un nivel más (la calidad de un consumible pesa acá, en los drops, más que en la tienda: dueño, 2026-10-08). Si suelta, se tira el tier —a más nivel, mejores tiers— y sale un consumible al azar de ese tier (trampas incluidas). Se tira
-     UNA sola vez por creep, como el oro (`rep.drops`): reabrir el reporte no lo cambia. Los números, acá abajo, en un solo lugar. */
-  const DROP_CHANCE = {humano: 0.60, humanoide: 0.45}, DROP_OTROS = 0.15;
+     variedad»). Desde el 2026-10-19 (dueño):
+     · lo sueltan los humanos (60 %) y los humanoides (45 %); las bestias y los demás dejan su trofeo y nada más (también un jefe);
+     · un jefe suelta uno seguro y tiene la chance de su tipo de soltar un segundo, con la tabla de calidad como si tuviera un nivel más;
+     · la calidad sale de DROP_TABLA (más baja en los niveles bajos que la del 2026-10-08);
+     · dentro de esa calidad se sortea primero la FAMILIA (curación, SP, magia…) con los pesos del arquetipo del creep (CreepCalculo.arquetipos:
+       guerrero, mago, tirador, trampero; si tiene más de uno, los pesos se promedian) y después un consumible de esa familia;
+     · la munición va aparte, por el arma (abajo); la Cuerda y lo que lleve `sinBotin` no salen nunca.
+     Se tira UNA sola vez por creep, como el oro (`rep.drops`): reabrir el reporte no lo cambia. Los números, acá abajo, en un solo lugar. */
+  const DROP_CHANCE = {humano: 0.60, humanoide: 0.45}, DROP_OTROS = 0;
   const DROP_TIERS = ['Común', 'Buena Calidad', 'Raro', 'Excepcional', 'Legendario'];
-  const DROP_BASE = [50, 35, 12, 3, 0];           // % en nivel 1
-  const DROP_POR_NIVEL = [-6, 2, 2.5, 1, 0.5];    // lo que se mueve por cada nivel de más (Común nunca baja de DROP_COMUN_MIN)
-  const DROP_COMUN_MIN = 10;
+  const DROP_TABLA = [   // % por calidad (Común, Buena, Rara, Excepcional, Legendaria) en los niveles 1 a 10; de ahí para arriba, la última
+    [70, 25, 5, 0, 0], [62, 30, 7, 1, 0], [54, 33, 10, 3, 0], [46, 36, 13, 5, 0], [38, 38, 16, 7, 1],
+    [30, 40, 19, 9, 2], [24, 41, 22, 10, 3], [18, 42, 25, 11, 4], [14, 42, 27, 12, 5], [10, 42, 29, 14, 5]];
   const dropBase = sc => DROP_CHANCE[K.tipoDe(sc)] ?? DROP_OTROS;
-  // La chance del primero (un jefe: seguro) y la del segundo (solo un jefe: la de su tipo).
-  const dropChance = sc => sc.jefe ? 1 : dropBase(sc);
+  // La chance del primero (un jefe que suelta: seguro) y la del segundo (solo un jefe: la de su tipo).
+  const dropChance = sc => sc.jefe && dropBase(sc) > 0 ? 1 : dropBase(sc);
   const dropSegundo = sc => sc.jefe ? dropBase(sc) : 0;
-  // La tabla de tiers de un nivel: % por tier (suma 100).
+  // La tabla de calidad de un nivel: % por tier (suma 100).
   function dropTabla(nivel){
-    const n = Math.max(0, Math.round(num(nivel) || 1) - 1);
-    const w = DROP_BASE.map((b, i) => Math.max(0, b + DROP_POR_NIVEL[i] * n));
-    const comun = Math.max(DROP_COMUN_MIN, w[0]);
-    // Los tiers mejores se reparten lo que deja Común (si se pasan, se achican en proporción): Común nunca baja del piso.
-    const resto = w.slice(1), tot = resto.reduce((a, x) => a + x, 0), lugar = 100 - comun;
-    return [comun, ...resto.map(x => tot ? x * lugar / tot : 0)];
+    const i = Math.min(DROP_TABLA.length, Math.max(1, Math.round(num(nivel) || 1))) - 1;
+    return DROP_TABLA[i].slice();
   }
   function dropTier(nivel, azar){
     const t = dropTabla(nivel);
@@ -167,12 +168,67 @@ const CombateFin = (() => {
     for(let i = 0; i < t.length; i++){ if(r < t[i]) return DROP_TIERS[i]; r -= t[i]; }
     return DROP_TIERS[0];
   }
-  // El consumible de ese tier (si no hay ninguno, el tier más cercano: primero para abajo).
-  function dropElegir(cat, tier){
+  /* Las familias de consumibles (2026-10-19) y cuánto pesa cada una según el arquetipo. «otros»: lo que no se reconoce (algo subido por el grupo). */
+  const FAMILIAS = {curacion: 'Curación', fisico: 'Potenciadores físicos', proteccion: 'Protección', sp: 'SP', magico: 'Magia',
+    trampas: 'Trampas', luces: 'Luces y visión', arrojadizos: 'Arrojadizos', especiales: 'Especiales', otros: 'Otros'};
+  const FAMILIA_PESOS = {
+    guerrero: {curacion: 35, fisico: 30, proteccion: 15, trampas: 5, luces: 5, arrojadizos: 5, especiales: 3, otros: 2},
+    mago:     {sp: 30, magico: 30, curacion: 15, proteccion: 10, luces: 5, arrojadizos: 5, especiales: 3, otros: 2},
+    tirador:  {fisico: 30, curacion: 25, luces: 15, arrojadizos: 10, proteccion: 10, trampas: 5, especiales: 3, otros: 2},
+    trampero: {trampas: 45, curacion: 15, arrojadizos: 15, luces: 10, fisico: 10, especiales: 3, otros: 2}};
+  // Los pesos de un creep: el promedio de los de sus arquetipos.
+  function pesosDe(sc){
+    const arq = (typeof K.arquetipos === 'function' ? K.arquetipos(sc) : []).filter(a => FAMILIA_PESOS[a]);
+    const lista = arq.length ? arq : ['guerrero'], p = {};
+    lista.forEach(a => Object.entries(FAMILIA_PESOS[a]).forEach(([f, v]) => { p[f] = (p[f] || 0) + v / lista.length; }));
+    return p;
+  }
+  // El ítem completo del catálogo de fábrica (el del botín viene recortado: `itemParaCreep`).
+  const completos = new Map();
+  function completo(c){
+    if(!c || typeof CATALOGO_BASE === 'undefined') return c;
+    if(!completos.has(c.nombre)) completos.set(c.nombre, CATALOGO_BASE.find(i => i.nombre === c.nombre && i.tipoItem === 'consumibles') || null);
+    return completos.get(c.nombre) || c;
+  }
+  const STATS_FIS = new Set(['fue', 'des', 'con', 'agl', 'pdg', 'dmg', 'def', 'eva', 'parry', 'bloqueo', 'ini', 'crit', 'critpot', 'rng', 'pdgdist',
+    'resmt', 'resfis', 'perfora', 'mov', 'accionesmax', 'nitros', 'hp', 'hpmax', 'percepcion', 'sigilo']);
+  const STATS_MAG = new Set(['esp', 'pdgmg', 'dmgesp', 'resmg', 'armadmg', 'resfuego', 'reshielo', 'resrayo', 'restoxico', 'resacido']);
+  function familiaBotin(c){
+    const it = completo(c) || {}, n = String(it.nombre || '').toLowerCase();
+    if(it.familiaBotin && FAMILIAS[it.familiaBotin]) return it.familiaBotin;
+    const mods = [...(it.efectoMods || []), ...(it.mods || [])].map(m => m && m.stat);
+    if(it.trampaDatos) return 'trampas';
+    if(it.revive || it.rerollMoneda || /ankh|polilla/.test(n)) return 'especiales';
+    if(it.zonaUso || it.aceleradorMapa) return 'arrojadizos';
+    if(mods.some(s => s === 'luz' || s === 'veoculto' || s === 'vision')
+      || /vela|farol|antorcha|bengala|lámpara|cohete|faro|destello|esfera de luz|luz de la verdad|ojo de gato|colirio/.test(n)) return 'luces';
+    if(it.curaspPct || /\bsp\b|reserva/.test(n) || mods.some(s => s === 'sp' || s === 'spregen' || s === 'spmax')) return 'sp';
+    if(num(it.curahp) > 0 || it.curaEstados || it.efectoHpTurno || /regenera|curaci|vendas|antídoto|sifón|\bcura\b/.test(n)) return 'curacion';
+    if(/blindaje|fortuna|coagula|espinas|espejo|hypeado|inmunidad|sangre pura|voluntad|invulnera/.test(n)) return 'proteccion';
+    if(mods.some(s => STATS_MAG.has(s)) || /arcan|especial|pergamino/.test(n)) return 'magico';
+    if(/óleo|oleo/.test(n) || mods.some(s => STATS_FIS.has(s))) return 'fisico';
+    return 'otros';
+  }
+  // De qué familias hay consumibles en ese tier, con su peso para este creep. → [{fam, peso, pool}]
+  function familiasDelTier(cons, tier, pesos){
+    const por = {};
+    cons.filter(c => (c.tier || 'Común') === tier).forEach(c => { const f = familiaBotin(c); (por[f] = por[f] || []).push(c); });
+    return Object.entries(por).map(([fam, pool]) => ({fam, peso: pesos ? (pesos[fam] || 0) : 1, pool}));
+  }
+  // El consumible de ese tier: primero la familia (por los pesos), después uno de esa familia. Si en ese tier no hay ninguno, el tier más
+  // cercano (primero para abajo). Sin pesos (la munición), uno cualquiera.
+  function dropElegir(cat, tier, pesos){
     const cons = cat.filter(i => i.tipoItem === 'consumibles');
     const k = DROP_TIERS.indexOf(tier);
     const orden = [k, ...DROP_TIERS.map((_, i) => i).filter(i => i !== k).sort((a, b) => (Math.abs(a - k) - Math.abs(b - k)) || (a - b))];
-    for(const i of orden){ const pool = cons.filter(c => (c.tier || 'Común') === DROP_TIERS[i]); if(pool.length) return pool[Math.floor(Math.random() * pool.length)]; }
+    for(const i of orden){
+      const fams = familiasDelTier(cons, DROP_TIERS[i], pesos);
+      if(!fams.length) continue;
+      const conPeso = fams.filter(f => f.peso > 0), lista = conPeso.length ? conPeso : fams.map(f => ({...f, peso: 1}));
+      let r = Math.random() * lista.reduce((a, f) => a + f.peso, 0), elegida = lista[lista.length - 1];
+      for(const f of lista){ if(r < f.peso){ elegida = f; break; } r -= f.peso; }
+      return elegida.pool[Math.floor(Math.random() * elegida.pool.length)];
+    }
     return null;
   }
   // El ítem completo para el botín: el del catálogo de fábrica (con sus efectos y su trampa); si es uno subido por el grupo, lo que llegó.
@@ -196,13 +252,13 @@ const CombateFin = (() => {
   }
   const esMunicion = i => !!(i && i.flecha);
   const poolMunicion = (cat, m) => cat.filter(i => esMunicion(i) && (m === 'virote') === !!i.flecha.virote);
-  const poolGeneral = cat => cat.filter(i => !esMunicion(i));
+  const poolGeneral = cat => cat.filter(i => !esMunicion(i) && !i.sinBotin && !(completo(i) || {}).sinBotin);   // (la Cuerda: sinBotin)
   function dropDeCreep(rep, cat, sc){
     rep.drops = rep.drops || {};
     if(rep.drops[sc.id] === undefined){
       const nombres = [], nivel = num(sc.nivel) + (sc.jefe ? 1 : 0);
       [dropChance(sc), dropSegundo(sc)].forEach(p => {
-        if(p > 0 && Math.random() < p){ const c = dropElegir(poolGeneral(cat), dropTier(nivel)); if(c) nombres.push(c.nombre); }
+        if(p > 0 && Math.random() < p){ const c = dropElegir(poolGeneral(cat), dropTier(nivel), pesosDe(sc)); if(c) nombres.push(c.nombre); }
       });
       const m = municionDeCreep(sc);
       if(m){ const f = dropElegir(poolMunicion(cat, m), dropTier(nivel)); if(f) nombres.push(f.nombre); }   // 🏹 siempre una flecha o un virote especial
@@ -223,7 +279,7 @@ const CombateFin = (() => {
     if(!(idx >= 0 && idx < lista.length)) return false;
     const actual = cat.find(x => x.nombre === lista[idx] && x.tipoItem === 'consumibles');
     const nivel = num(sc.nivel) + (sc.jefe ? 1 : 0);
-    const c = dropElegir(esMunicion(actual) ? poolMunicion(cat, actual.flecha.virote ? 'virote' : 'flecha') : poolGeneral(cat), dropTier(nivel));
+    const c = esMunicion(actual) ? dropElegir(poolMunicion(cat, actual.flecha.virote ? 'virote' : 'flecha'), dropTier(nivel)) : dropElegir(poolGeneral(cat), dropTier(nivel), pesosDe(sc));
     if(!c) return false;
     lista[idx] = c.nombre;
     rep.drops[sc.id] = lista;
@@ -571,11 +627,15 @@ const CombateFin = (() => {
     if(!chance && !m) return {chance: 0, venta: 0};
     const tabla = dropTabla(num(sc.nivel) + (sc.jefe ? 1 : 0));
     const cons = cat.filter(i => i.tipoItem === 'consumibles' && num(i.precioCompra) > 0);
-    const promedio = lista => { let compra = 0; DROP_TIERS.forEach((t, i) => {
-      const pool = lista.filter(c => (c.tier || 'Común') === t);
-      if(pool.length) compra += tabla[i] / 100 * pool.reduce((a, c) => a + num(c.precioCompra), 0) / pool.length;
+    const prom = pool => pool.reduce((a, c) => a + num(c.precioCompra), 0) / pool.length;
+    // Lo que vale en promedio un consumible de esa lista: por tier y, adentro, por familia con los pesos (como `dropElegir`; sin el tier más cercano).
+    const promedio = (lista, pesos) => { let compra = 0; DROP_TIERS.forEach((t, i) => {
+      const fams = familiasDelTier(lista, t, pesos);
+      if(!fams.length) return;
+      const conPeso = fams.filter(f => f.peso > 0), l = conPeso.length ? conPeso : fams.map(f => ({...f, peso: 1})), tot = l.reduce((a, f) => a + f.peso, 0);
+      compra += tabla[i] / 100 * l.reduce((a, f) => a + f.peso / tot * prom(f.pool), 0);
     }); return compra; };
-    const compra = chance * promedio(poolGeneral(cons)) + (m ? promedio(poolMunicion(cons, m)) : 0);
+    const compra = chance * promedio(poolGeneral(cons), pesosDe(sc)) + (m ? promedio(poolMunicion(cons, m)) : 0);
     return {chance, venta: Math.round(compra / 2)};
   }
   function estimar(creeps, cat){
@@ -650,7 +710,7 @@ const CombateFin = (() => {
     return {total, cada, n: inc.length};
   }
 
-  return {venderBaul, itemsDeCreep, dropReroll, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, municionDeCreep, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
+  return {venderBaul, itemsDeCreep, dropReroll, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, municionDeCreep, DROP_TABLA, FAMILIAS, FAMILIA_PESOS, familiaBotin, pesosDe, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
     plantillaArmaCreep, plantillaEquipoCreep, plantillaTrofeo, itemsDeCreep, itemsExtra, generar, estadoDeFicha, jugadores, calcularReparto,
     itemsPublicables, vista, cambio, clic, lineaVerde, publicar, nuevoBotin, jugadoresBotin, botinVista, botinCambio, botinItem, despojar};
 })();

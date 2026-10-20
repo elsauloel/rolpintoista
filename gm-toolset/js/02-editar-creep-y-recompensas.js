@@ -135,6 +135,13 @@ function recompensasHtml(sc){
     <div class="mini-f" style="margin-top:8px"><label>Drops fijos (opcional): ítems del catálogo que suelta siempre, separados por coma</label>
       <input type="text" data-rec="dropsFijos" data-id="${sc.id}" value="${esc(CreepCalculo.dropsFijos(sc).join(', '))}" placeholder="Ej.: Grapa del capataz" maxlength="300">
     </div>
+    ${['humano', 'humanoide'].includes(CreepCalculo.tipoDe(sc)) ? (() => {
+      const act = CreepCalculo.arquetipos(sc), manual = CreepCalculo.arquetiposManual(sc).length > 0, auto = CreepCalculo.arquetiposAuto(sc);
+      return `<div class="mini-f" style="margin-top:8px"><label>Arquetipo: qué consumibles suelta más ${manual ? '(elegido a mano)' : '(automático, por sus datos)'}</label>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px">${Object.entries(CreepCalculo.ARQUETIPOS).map(([k, t]) =>
+          `<label style="display:flex;gap:5px;align-items:center;text-transform:none;letter-spacing:0"><input type="checkbox" data-rec="arquetipo" data-arq="${k}" data-id="${sc.id}"${act.includes(k) ? ' checked' : ''}> ${t}</label>`).join('')}</div>
+        ${manual ? `<button type="button" class="addhab" data-arq-auto="${sc.id}" style="margin:4px 0 0">Volver al automático (${esc(CreepCalculo.arquetiposTxt(auto))})</button>` : ''}
+      </div>`; })() : ''}
     <div class="hint" style="margin-top:6px"><b>Al morir suelta:</b> ${esc(dropsResumenCreep(sc))}</div>`;
 }
 function recompensasVerHtml(sc){ return CreepLupa.recompensasVerHtml(sc); }   // comun/creep-lupa.js
@@ -157,10 +164,18 @@ document.addEventListener('change', e => {
   else if(campo === 'armaNatural'){ sc.armaNatural = t.checked; }
   else if(campo === 'trofeoNombre'){ sc.trofeoEspecial = {...(sc.trofeoEspecial || {}), nombre: t.value.trim()}; }
   else if(campo === 'trofeoPrecio'){ sc.trofeoEspecial = {...(sc.trofeoEspecial || {}), precio: Math.max(0, num(t.value))}; }
+  else if(campo === 'arquetipo'){   // (2026-10-19) los arquetipos a mano; ninguno = vuelve al automático
+    const act = new Set(CreepCalculo.arquetipos(sc));
+    if(t.checked) act.add(t.dataset.arq); else act.delete(t.dataset.arq);
+    sc.arquetipos = [...act];
+    if(!sc.arquetipos.length) delete sc.arquetipos;
+  }
   else if(campo === 'dropsFijos'){ sc.dropsFijos = t.value.split(',').map(x => x.trim()).filter(Boolean).slice(0, 10); if(!sc.dropsFijos.length) delete sc.dropsFijos; }
   renderAll();
 });
 document.addEventListener('click', e => {
+  const a = e.target.closest('[data-arq-auto]');
+  if(a){ const sc = S.creeps.find(s => s.id === a.dataset.arqAuto); if(sc){ delete sc.arquetipos; renderAll(); } return; }
   const b = e.target.closest('[data-oro-sugerido]');
   if(!b) return;
   const sc = S.creeps.find(s => s.id === b.dataset.oroSugerido);

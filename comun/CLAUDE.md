@@ -1630,3 +1630,9 @@ versión parecida en más de una, es candidato a juntar.
   del arma, o el nombre «Arco…» / «Ballesta…» en los creeps de fábrica, que no traen esos datos). El que la usa suelta siempre una del tier de su nivel;
   el consumible al azar ya no trae munición (`poolGeneral`); el 🎲 vuelve a tirar dentro de su tipo. `CreepCalculo.itemParaCreep` conserva `flecha`
   (antes la perdía, y la flecha segura de los arqueros nunca salía).
+- **🎁 El consumible al azar, por familia y arquetipo** (2026-10-19, dueño): `CreepCalculo.ARQUETIPOS` (guerrero, mago, tirador, trampero),
+  `arquetiposAuto(sc)` (de sus datos), `arquetiposManual(sc)` (`sc.arquetipos`, lo elige el GM en Recompensas), `arquetipos(sc)` y `arquetiposTxt`.
+  `CombateFin`: `DROP_TABLA` (la calidad por nivel), `FAMILIAS`, `FAMILIA_PESOS` (por arquetipo; varios se promedian: `pesosDe(sc)`) y
+  `familiaBotin(item)` (lo que hace el consumible; un ítem puede forzarla con `familiaBotin`). `dropElegir(cat, tier, pesos)`: dentro de la calidad,
+  primero la familia y después el ítem. Solo humanos y humanoides sueltan consumible (`DROP_OTROS` = 0). `sinBotin: true` en un ítem: nunca sale
+  (la Cuerda). **Un consumible nuevo que no encaje en una familia: darle `familiaBotin`.**

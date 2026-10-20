@@ -139,7 +139,7 @@
 > - [ ] **⚔ Rework de espadas (Tipo 6), hachas (Tipo 8) y contundentes (Tipo 10) — en pausa (dueño, 2026-10-11: «vamos a tener que dejar en pausa el testeo de espadas, hachas y contundentes»). Hachas medidas: `docs/revision-cuerpo-a-cuerpo-t8.md`. Espadas:** «vi algunos bonos en las espadas que quedaron un
 >   poco fuera de lugar con los últimos reworks». El mismo proceso que arcos y ballestas: ver lo que hay → lluvia de ideas de mecánicas → definir las
 >   mecánicas propias → podar → volver a crear las espadas → ronda de testeo. Lo ya medido (sin aplicar): `docs/revision-cuerpo-a-cuerpo-t6.md`.
-> - [ ] **🎁 Drops de consumibles por arquetipo de creep (2026-10-11, dueño: «proyecto a futuro, lo dejo anotado para no olvidarme; lo veremos con
+> - [x] **🎁 Drops de consumibles por arquetipo de creep (2026-10-11, dueño: «proyecto a futuro, lo dejo anotado para no olvidarme; lo veremos con
 >   tiempo»):** afinar lo que dejan los enemigos, ordenado por temática: **grupos de consumibles vinculados a arquetipos de creeps**. Ejemplos del
 >   dueño: el que usa arco o ballesta tiene chances de dejar **flechas y virotes especiales**; el que hace magia, más chances de **pergaminos y
 >   pociones de SP**; los guerreros, más chances de **pociones de curación y cosas de Fuerza**. A pensar cuando toque: cómo se reconoce el arquetipo
@@ -147,10 +147,13 @@
 >   **En curso (2026-10-19).** Hecho: **la munición la decide el arma** (dueño: «el mapa debería identificar que el creep está usando esas
 >   armas»): arco → siempre una flecha especial, ballesta → siempre un virote (`CombateFin.municionDeCreep`); flechas y virotes salieron del
 >   consumible al azar. De paso se arregló que la flecha segura de los arqueros nunca salía (`itemParaCreep` perdía la marca `flecha`).
->   Propuesto, falta decidir: sortear primero la **familia** (curación, SP, potenciadores, trampas, luces, arrojadizos, especiales) con pesos según
->   el **arquetipo**, que el mapa deduce de los datos (coloca trampas → trampero; Especial más alto que Fuerza y Destreza → mago; si no, guerrero) y
->   el GM corrige con una etiqueta (quizás dos arquetipos por creep). Preguntas abiertas: bestias y demás (¿siguen con el 15 % o solo trofeo?), la
->   calidad en niveles bajos (nivel 1: 15 % Rara o mejor, 3 % Excepcional) y si la Cuerda (por metro) sale del botín.
+>   **Decidido y hecho (dueño, 2026-10-19):** dentro de la calidad se sortea primero la **familia** (curación, potenciadores físicos, protección, SP,
+>   magia, trampas, luces, arrojadizos, especiales) con los pesos del **arquetipo** (guerrero, mago, tirador, trampero; un creep puede tener más de
+>   uno y se promedian): `CreepCalculo.arquetipos` los deduce de los datos y el GM los cambia en Recompensas; `CombateFin.FAMILIA_PESOS`,
+>   `familiaBotin`. **Las bestias y los demás (no humanos ni humanoides) dejan solo su trofeo.** **Calidad más baja en niveles bajos** (`DROP_TABLA`:
+>   nivel 1 = 70/25/5/0/0; Excepcional desde el 2, Legendario desde el 5). **La Cuerda no sale** (`sinBotin`).
+>   Visto al armarlo: en Común casi no hay consumibles de SP, magia ni potenciadores físicos (solo los dos óleos), así que un mago o un guerrero de
+>   nivel bajo suelta sobre todo curación, luces y arrojadizos. Va con «Revisar los consumibles» (§4).
 > - [x] **🧮 La calculadora cobra barato el daño fijo de las ballestas (2026-10-11; revisado 2026-10-19)**: una ballesta Común con solo daño, según la calculadora,
 >   puede llegar a 1d6+6 o 2d6+4; según el simulador de balance (`balance_combate.py --ballesta`, Shooter contra el blanco medio) el techo de la
 >   banda Común (74–106 %) es **1d6+3** (95 %; 1d6+4 = 114 %, 2d6 = 110 %). Ajustarla mueve el precio y la calidad de todas las ballestas: revisarlo

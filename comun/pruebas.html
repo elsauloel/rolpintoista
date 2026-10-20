@@ -2070,7 +2070,29 @@ prueba('🏹 la munición la decide el arma (2026-10-19): arco → una flecha, b
     res.every(r => r[0]), res.every(r => r[1]), res.every(r => r[2]), CombateFin.dropEsperado(cat, {tipoCriatura: 'bestia', nivel: 1, armaDeRango: true, armaNombre: 'Ballesta'}).venta > 0],
     ['flecha', 'virote', '', '', true, true, true, true]);
 });
-prueba('drop de consumibles (comun/combate-fin.js, P181): humano 60 %, humanoide 45 %, el resto 15 %; un jefe, uno seguro + chance de otro y +1 nivel; mejores tiers con el nivel; se tira una vez', () => {
+prueba('🎁 familias por arquetipo (2026-10-19): el creep se reconoce por sus datos (o lo elige el GM), los consumibles por lo que hacen; la Cuerda no sale', () => {
+  const K = CreepCalculo, F = CombateFin;
+  const cat = CATALOGO_BASE.filter(i => i.tipoItem && !i.archivo).map(K.itemParaCreep);
+  const fam = n => F.familiaBotin(cat.find(i => i.nombre === n));
+  const mago = {id: 'm', tipoCriatura: 'humano', nivel: 6, esp: 12, fue: 3, des: 4};
+  const orig = Math.random; let cuerda = false, magia = 0, total = 0;
+  try{
+    for(let k = 0; k < 60; k++){
+      let x = (k * 0.618) % 1; Math.random = () => (x = (x + 0.377) % 1);
+      const it = F.dropDeCreep(F.nuevo(), cat, {...mago, id: 'm' + k});
+      it.forEach(d => { total++; if(['sp', 'magico'].includes(F.familiaBotin(d.template))) magia++; if(/Cuerda/.test(d.nombre)) cuerda = true; });
+      const g = F.dropDeCreep(F.nuevo(), cat, {id: 'g' + k, tipoCriatura: 'humano', nivel: 1, fue: 8, esp: 2});
+      g.forEach(d => { if(/Cuerda/.test(d.nombre)) cuerda = true; });
+    }
+  }finally{ Math.random = orig; }
+  igual([K.arquetipos({fue: 8, esp: 2}), K.arquetipos(mago), K.arquetipos({esp: 9, fue: 2, armaDeRango: true, armaNombre: 'Ballesta pesada'}),
+    K.arquetipos({fue: 6, habilidades: [{trampaColocar: {}}]}), K.arquetipos({fue: 8, arquetipos: ['mago', 'trampero']}), F.pesosDe({esp: 9, armaDeRango: true}).sp,
+    fam('Poción de HP'), fam('Poción de SP'), fam('Pergamino de Furia Arcana'), fam('Trampa de oso'), fam('Vela de sebo'), fam('Pergamino de Blindaje'),
+    fam('Poción de Fuerza del Toro'), fam('Ankh de Reencarnación'), F.dropTabla(1), F.dropTabla(14)[0], cuerda, total > 30 && magia / total > 0.3],
+    [['guerrero'], ['mago'], ['mago', 'tirador'], ['guerrero', 'trampero'], ['mago', 'trampero'], 15,
+    'curacion', 'sp', 'magico', 'trampas', 'luces', 'proteccion', 'fisico', 'especiales', [70, 25, 5, 0, 0], 10, false, true]);
+});
+prueba('drop de consumibles (comun/combate-fin.js, P181; 2026-10-19): humano 60 %, humanoide 45 %, las bestias nada; un jefe, uno seguro + chance de otro y +1 nivel; mejores tiers con el nivel; se tira una vez', () => {
   const ch = t => CombateFin.dropChance({tipoCriatura: t});
   const t1 = CombateFin.dropTabla(1), t5 = CombateFin.dropTabla(5), t9 = CombateFin.dropTabla(9);
   const suma = t => Math.round(t.reduce((a, x) => a + x, 0));
@@ -2085,7 +2107,7 @@ prueba('drop de consumibles (comun/combate-fin.js, P181): humano 60 %, humanoide
   igual([ch('humano'), ch('humanoide'), ch('bestia'), CombateFin.dropChance({tipoCriatura: 'humano', jefe: true}), suma(t1), suma(t9), t5[0] < t1[0], t5[2] > t1[2], t9[0] >= 9.9,
     CombateFin.dropTier(1, 0), CombateFin.dropTier(1, 0.999), items1.length, items2.length && items2[0].nombre === items1[0].nombre, bestia.length, bestia2.length, CombateFin.dropSegundo(humano),
     !!(tpl && tpl.consumible && tpl.tipoItem === 'consumibles' && !tpl.id), !!(full && JSON.stringify(full.trampaDatos || full.efectoNombre || full.curahp || '') === JSON.stringify(tpl.trampaDatos || tpl.efectoNombre || tpl.curahp || ''))],
-    [0.6, 0.45, 0.15, 1, 100, 100, true, true, true, 'Común', 'Excepcional', 2, true, 0, 1, 0.6, true, true]);
+    [0.6, 0.45, 0, 1, 100, 100, true, true, true, 'Común', 'Raro', 2, true, 0, 0, 0.6, true, true]);
 });
 prueba('fin del combate (comun/combate-fin.js): XP por creep (escapado 20%), quién cobra, inconsciente 25%, extras y despojos', () => {
   const rep = CombateFin.nuevo();
@@ -3774,7 +3796,7 @@ prueba('💰 botín estimado de un mapa: el oro de cada creep + lo que suelta a 
   const b = e.filas.find(f => f.nombre === 'Bandido'), l = e.filas.find(f => f.nombre === 'Lobo');
   igual([e.filas.length, b.oro, b.items.length, b.items[0].venta === b.items[0].compra / 2, b.drop.chance, b.drop.venta > 0, l.items.map(i => i.trofeo), l.items[0].venta, l.drop.chance,
     Math.round(e.total) === Math.round(b.total + l.total), Math.round(b.total) === Math.round(b.oro + b.venta + b.drop.venta), /~\d+ DDE/.test(CombateFin.estimadoHtml(e, 'Mapa'))],
-    [2, 20, 1, true, 0.6, true, [true], 15, 0.15, true, true, true]);
+    [2, 20, 1, true, 0.6, true, [true], 15, 0, true, true, true]);
 });
 prueba('arena movediza: si falla al soltarse, se hunde más (+1 turno), en personajes y creeps; el botón lo dice', () => {
   const soltar = {stat: 'fue', dif: 99, no2: 1, hunde: 1};

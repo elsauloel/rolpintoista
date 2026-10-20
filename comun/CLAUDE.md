@@ -1652,3 +1652,9 @@ versión parecida en más de una, es candidato a juntar.
   Consumibles → Doblones → Experiencia → Publicar, cada uno con su consejo para el GM; `data-rep-ir` cambia de paso y el 📢 Publicar aparece recién
   en el último (`publicar: 'oculto'` antes). `dropDeCreep` pone en el botín **todos** los consumibles del creep (el al azar, su flecha o virote y lo
   que le quede en el cinturón): los que usó, tildados; los que no, destildados (`rep.quitados`). `rep.drops[scId]` guarda `{nombre, usado}`.
+- **📜 Consumibles con Ejecución y 🔓 soltarse** (2026-10-20, la Red Nerubian): un consumible con `duelo` arma una habilidad de un uso
+  (`Combatiente.habDeConsumible`) y va al cuadro del duelo como una varita. Un estado con `soltar.alEmpezar`: la tirada para soltarse aparece sola al
+  empezar el turno de quien lo tiene (gratis, una por turno; sin el botón 🔓 de reintentar) y `soltar.difStat` toma el stat de quien lo puso
+  (`efectoDeEjecucion(e, valorDe)`); con `soltar.ayuda`, un aliado pegado puede ayudar (1 No2, su propia tirada). Lo hace el mapa: vtt-hexgrid/js/54.
+- **🙈 Ceguera nueva** (dueño, 2026-10-20): `Combatiente.CEGUERA_VISION` (2 casillas de visión), `ciego(estados)`; la mitad del PdG y del PdG.Esp
+  (`mitadesDeTirada`, sin el −2 de antes); el mapa avisa al elegir un objetivo o el centro de un área a más de 2 (`cegueraPermite`, js/13).

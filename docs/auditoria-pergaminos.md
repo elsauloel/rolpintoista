@@ -18,7 +18,11 @@ uno solo todo el combate ≈ todo el grupo 3 turnos).
 **Tercera tanda (dueño, 2026-10-20), uno por uno:** ✅ **Red Nerubian**: a un rival dentro de tu Rango, tu PdG.Esp contra su Evasión; si pega,
 Inmovilizado hasta 3 turnos. Al empezar cada turno del atrapado, la tirada de Fuerza contra tu Efecto especial aparece sola (no cuesta No2;
 `soltar.alEmpezar`, vtt-hexgrid/js/54); un aliado pegado puede ayudarlo con 1 No2 y su propia Fuerza (`soltar.ayuda`: botón en su Botonera o
-Acciones). Buena a 50 (como la Flecha de arpón). Para eso, un consumible ahora puede tener su Ejecución ✨ (`duelo`
+Acciones). Buena a 50 (como la Flecha de arpón).
+✅ **Luz cegadora**: destello en flor de diámetro 3 con el centro dentro de tu Rango; cada rival adentro tira Res.CC contra tu Efecto especial y el
+que pierde queda con Ceguera 1 turno; quien gana no se ciega (área sin dodge roll: `sinDodge`); los aliados no. Buena a 50. **De paso, la Ceguera
+nueva** (dueño): ve 2 casillas, no apunta más lejos (avisa), la mitad del PdG y del PdG.Esp, y su Evasión a la mitad contra un ataque a distancia;
+todo «Cegado» entra como esta Ceguera. Flecha y Virote cegador, de 35 a 45. Probado en el mapa. Para eso, un consumible ahora puede tener su Ejecución ✨ (`duelo`
 en el ítem, `Combatiente.habDeConsumible`): el objetivo se elige en el mapa y va al cuadro del duelo. Probado en el mapa.
 **Pendiente:** el ojo de Kicillof como invocación de 3 turnos
 (Movimiento 5, invisible, sin mareo; solo revela y despeja) y automatizar la red y la luz cegadora; ¿algún pergamino Común?

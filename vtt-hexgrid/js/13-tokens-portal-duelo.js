@@ -509,7 +509,8 @@ function trampaDeHabilidad(msg){
   const otra = i => {
     const cuenta = cant > 1 ? ` (${i + 1} de ${cant})` : '';
     elegirDestino(async h => {
-      trampaAvisarAlcance(msg, h);
+      // (2026-10-20: el aviso de alcance va en el mismo cartel que «trampa colocada»; si no, ese lo tapaba enseguida y no se llegaba a leer.)
+      const aviso = trampaAvisarAlcance(msg, h, cant === 1 && !pilar && !portal);
       try{
         if(pilar){
           if(!(await levantarPilar(h, t))){ otra(i); return; }   // casilla ocupada: la vuelve a pedir
@@ -517,7 +518,7 @@ function trampaDeHabilidad(msg){
         else{
           const r = await TokensAuto.colocarTrampas({fichaId: msg.fichaId, tipoToken: msg.tipoToken || 'pj', trampa: {...t, cant: 1}, mapaId: mapaMostrado, celda: {col: h.col, fila: h.fila}});
           if(!r.colocadas){ toast(`🪤 ${msg.nombre}: no se pudo colocar`); return; }
-          if(cant === 1) toast(`🪤 ${msg.nombre}: trampa colocada`);
+          if(cant === 1) toast(aviso ? `${aviso} · igual quedó colocada (lo decide la mesa)` : `🪤 ${msg.nombre}: trampa colocada`);
         }
         puestas++;
       }catch(err){ console.error('No se pudo colocar:', err); toast(pilar ? 'No se pudo levantar el pilar — revisá la consola' : 'No se pudo colocar la trampa — revisá la consola'); return; }
@@ -526,14 +527,18 @@ function trampaDeHabilidad(msg){
   };
   otra(0);
 }
-// Si la casilla elegida queda fuera del Rango de quien la usa: avisa (la mesa decide), no bloquea.
-function trampaAvisarAlcance(msg, h){
+// Si la casilla elegida queda fuera del Rango de quien la usa: avisa (la mesa decide), no bloquea. → el texto del aviso ('' si no hace falta);
+// `callado`: no lo muestra (lo pone quien llama en su propio cartel).
+function trampaAvisarAlcance(msg, h, callado){
   const mio = [...tokens.values()].find(x => x.fichaId === msg.fichaId && x.tipo === (msg.tipoToken || 'pj'));
   // Una trampa con alcance propio (`trampa.alcance`, dueño 2026-10-15: la red del Goblin trampero, hasta 3 casilleros): ese manda.
   const propio = Math.round(num(msg.trampa && msg.trampa.alcance));
-  if(mio && propio > 0){ if(distanciaHex(mio, h) > propio) toast(`⚠ Esa casilla queda a ${distanciaHex(mio, h)}: la trampa llega hasta ${propio}`); return; }
-  const rr = mio && typeof rangoDeToken === 'function' ? rangoDeToken(mio) : null;
-  if(rr && rr.rng > 0 && distanciaHex(mio, h) > rr.rng) toast(`⚠ Esa casilla queda a ${distanciaHex(mio, h)}: fuera de tu Rango (${fmt(rr.rng)})`);
+  const rr = mio && !(propio > 0) && typeof rangoDeToken === 'function' ? rangoDeToken(mio) : null;
+  const d = mio ? distanciaHex(mio, h) : 0;
+  const aviso = !mio ? '' : propio > 0 ? (d > propio ? `⚠ Esa casilla queda a ${d}: la trampa llega hasta ${propio}` : '')
+    : rr && rr.rng > 0 && d > rr.rng ? `⚠ Esa casilla queda a ${d}: fuera de tu Rango (${fmt(rr.rng)})` : '';
+  if(aviso && !callado) toast(aviso);
+  return aviso;
 }
 // Un pilar de piedra (Varita de los pilares): Sólido de 1 casilla, visible para todos, que se va solo a los `turnos` turnos. → false si no hay lugar.
 async function levantarPilar(h, t){

@@ -1076,3 +1076,9 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   **Decidido (dueño)**: «un personaje etéreo no puede atacar ni puede ser atacado; solamente puede observar hasta que se pierda el estado».
   Hecho: preset «Etéreo» (2 turnos), `Combatiente.etereo`; en el mapa nadie lo elige de objetivo y atacar, habilidades y consumibles avisan
   con «Hacerlo igual»; moverse sí. El Ojo de Kicillof lo lleva puesto. Probado en el mapa. Nota del manual «Etéreo».
+
+- **P214. El rayo en el charco: ¿salto y corriente, o una sola cosa? — 2026-10-20.** Probado en el mapa (Varita de chispa eléctrica contra
+  Silvia parada en un charco, con el Lobo en el mismo charco): el Lobo recibió **dos veces**, el salto eléctrico (6, la mitad de lo que le
+  entró a Silvia, ×1,5 por el agua) y además la corriente por el agua (9, el golpe entero ×1,5). Hoy las dos reglas se suman. Propuesta de
+  Claude: la corriente le llega a todos los del charco y el salto arranca desde ahí pero **saltea a los que ya recibió el agua** (salta al más
+  cercano que no esté en el charco). Alternativa: dejarlo como está (el agua es muy mala idea con un rayo cerca). **Falta decidir.**

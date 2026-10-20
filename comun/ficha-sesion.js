@@ -40,10 +40,18 @@ const FichaSesion = (() => {
          aplicarParte(parte, datos) — una parte cambió desde otra ventana (datos ya leídos con FichaGuardado.leerParte),
          alCambiar()          — terminó de aplicar partes que cambiaron,
          alErrorPartes(err)} */
+  // El resumen en una forma que no depende del orden de las claves (Firestore las devuelve en otro orden): para comparar.
+  const estable = v => Array.isArray(v) ? '[' + v.map(estable).join(',') + ']'
+    : v && typeof v === 'object' ? '{' + Object.keys(v).sort().filter(k => v[k] !== undefined).map(k => JSON.stringify(k) + ':' + estable(v[k])).join(',') + '}'
+    : JSON.stringify(v === undefined ? null : v);
   function escuchar(f, o){
     const base = o.db.doc(o.ruta);
     f.cortes.push(base.onSnapshot(doc => {
       if(!o.vigente()) return;
+      // Lo que quedó escrito en el servidor (2026-10-20, probado en el mapa): el daño de un duelo escribe el resumen desde afuera
+      // (danioPj); si la sesión solo se acordaba de lo que ELLA escribió, un cambio que volvía a ese valor no se guardaba y el resumen
+      // quedaba viejo (la ficha en 20 de vida, el mapa mostrando 14).
+      if(doc.exists && !doc.metadata.hasPendingWrites){ const d = doc.data() || {}; f.ultimoResumen = estable([d.nombre, d.resumen]); }
       o.alDoc(doc);
     }, err => console.error('Error escuchando el personaje:', err)));
     // Partes: la primera vez arman el personaje entero; después, cada parte que cambia desde otra ventana (o el dueño, si
@@ -136,7 +144,7 @@ const FichaSesion = (() => {
     const cambios = {};
     const nombre = o.nombre();
     const resumen = o.resumen();
-    const resumenJson = JSON.stringify([nombre, resumen]);
+    const resumenJson = estable([nombre, resumen]);
     if(resumenJson !== f.ultimoResumen){ cambios.nombre = nombre; cambios.resumen = resumen; }
     const retrato = listas.find(([parte]) => parte === 'retrato');
     if(retrato) cambios.miniatura = await o.miniatura();

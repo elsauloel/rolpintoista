@@ -1975,9 +1975,12 @@ const Duelo = (() => {
         : `<b class="duelo-dado${nuevo ? ' nuevo' : ''}">${dadoTxt}</b> <span class="no">✘ no funcionó</span>`;
       return `<tr><td>🎲 d${_fmt(ef.caras)}</td><td><b>${_esc(ef.nombre)}</b> <span class="hint">${pctEf(ef)} %</span></td><td>${desde === ef.caras ? _fmt(desde) : `${_fmt(desde)}–${_fmt(ef.caras)}`}</td><td>${res}</td></tr>`;
     };
+    // Mientras el daño espera su «💔 Aplicar el daño» (fase 'dano'), los efectos no se pueden tirar todavía: antes los botones se veían y no
+    // hacían nada (2026-10-20, probado en el mapa). Se avisa en su lugar.
+    const esperaDano = d.fase === 'dano' && faltan.length;
     const tablero = conDado.length ? `<div class="duelo-ef duelo-ef-tablero"><table><thead><tr><th>Dado</th><th>Efecto</th><th>Funciona con</th><th>Salió</th></tr></thead><tbody>${conDado.map(fila).join('')}</tbody></table>
-      ${faltan.length ? (puedeAtq ? `<button type="button" data-ef-tirar-todos>🎲 Tirar ${faltan.length === 1 ? 'el efecto' : 'los efectos'} (${faltan.map(ef => siempreEf(ef) ? _esc(ef.dado) : '1d' + _fmt(ef.caras)).join(' · ')})</button>`
-        : `<div class="espera duelo-nota">esperando que ${_esc(d.atacante.nombre)} tire los efectos…</div>`) : ''}${faltan.length && puedeAtq ? manualEfectosHtml(d, efs) : ''}</div>` : '';
+      ${esperaDano ? `<div class="espera duelo-nota">Primero se aplica el daño (💔 arriba); después se tiran los efectos.</div>` : faltan.length ? (puedeAtq ? `<button type="button" data-ef-tirar-todos>🎲 Tirar ${faltan.length === 1 ? 'el efecto' : 'los efectos'} (${faltan.map(ef => siempreEf(ef) ? _esc(ef.dado) : '1d' + _fmt(ef.caras)).join(' · ')})</button>`
+        : `<div class="espera duelo-nota">esperando que ${_esc(d.atacante.nombre)} tire los efectos…</div>`) : ''}${faltan.length && puedeAtq && !esperaDano ? manualEfectosHtml(d, efs) : ''}</div>` : '';
     const cards = efs.map((ef, i) => {
       if(!siempreEf(ef) && !(ef.res && ef.res.exito && !ef.omitido && !ef.aplicado) && !ef.aplicado) return '';   // en el tablero: sin tirar, falló o no entra
       const clave = d.id + ':ef' + i;
@@ -1988,9 +1991,9 @@ const Duelo = (() => {
       let estado;
       if(ef.omitido) estado = `<div class="duelo-ef-res no">✘ No entra: ${_esc(ef.motivo || 'el golpe no hizo daño')}</div>`;
       else if(ef.aplicado) estado = `<div class="duelo-ef-res ok">✔ Aplicado${ef.nota ? ' · ' + _esc(ef.nota) : ''}</div>`;
-      else if(ef.res && !ef.res.exito) estado = `<div class="duelo-ef-res no${nuevo ? ' nuevo' : ''}">✘ No funcionó <span>(salió ${_fmt(ef.res.dado)} en 1d${_fmt(ef.caras)})</span></div>`;
+      else if(ef.res && !ef.res.exito) estado = `<div class="duelo-ef-res no${nuevo ? ' nuevo' : ''}">✘ No funcionó <span>(${ef.res.manual ? '✍ a mano' : `salió ${_fmt(ef.res.dado)} en 1d${_fmt(ef.caras)}`})</span></div>`;
       else if(ef.res || (!necesitaTiradaEf(ef) && siempreEf(ef))){
-        const cab = ef.res ? `<div class="duelo-ef-res ok${nuevo ? ' nuevo' : ''}">✔ ¡FUNCIONÓ! ${siempreEf(ef) ? '' : `<span>(salió ${_fmt(ef.res.dado)} en 1d${_fmt(ef.caras)})</span>`}${ef.res && ef.res.extra ? ` <span>· ${_esc(ef.dado)} = <b>${_fmt(ef.res.extra.total)}</b></span>` : ''}</div>` : `<div class="duelo-ef-res ok">Entra siempre</div>`;
+        const cab = ef.res ? `<div class="duelo-ef-res ok${nuevo ? ' nuevo' : ''}">✔ ¡FUNCIONÓ! ${siempreEf(ef) ? '' : `<span>(${ef.res.manual ? '✍ a mano' : `salió ${_fmt(ef.res.dado)} en 1d${_fmt(ef.caras)}`})</span>`}${ef.res && ef.res.extra ? ` <span>· ${_esc(ef.dado)} = <b>${_fmt(ef.res.extra.total)}</b></span>` : ''}</div>` : `<div class="duelo-ef-res ok">Entra siempre</div>`;
         let acc;
         if(ef.aplicar === 'pedido' || ef.aplicar === 'en-curso') acc = `<div class="duelo-nota">Aplicando sobre ${_esc(d.defensor.nombre)}…</div>`;
         else if(!puedeAtq) acc = `<div class="duelo-nota">esperando que ${_esc(d.atacante.nombre)} lo aplique…</div>`;

@@ -6,6 +6,10 @@
    la Colisión del mapa), choca: moneda (1d2), 1 se rompe y 2 cae justo antes del obstáculo. Queda en el mapa como un objeto para levantar,
    igual que un arma que vuela (js/27: elemento `arma`, 1 No2).
    ========================================================= */
+// «La flecha» / «El virote» (2026-10-20: la Mesa decía «La Virote de rebote»); y «entera» / «entero».
+const flEsVirote = fl => !!(fl && (fl.virote || /^virote/i.test(String(fl.nombre || ''))));
+const flLa = fl => `${flEsVirote(fl) ? 'El' : 'La'} ${fl.nombre}`;
+const flEntera = fl => flEsVirote(fl) ? 'entero' : 'entera';
 // Las casillas de la línea de `a` hacia `b`, siguiendo de largo hasta `largo` pasos.
 function flechaLinea(a, b, largo){
   const n = Math.max(1, distanciaHex(a, b)), A = hexACubo(a), B = hexACubo(b), res = [];
@@ -33,7 +37,7 @@ async function flechaErrada(d){
   if(!fl) return;
   const quien = (d.atacante && d.atacante.nombre) || 'Alguien';
   const tA = tokens.get(d.atacante.tokenId), tD = tokens.get(d.defensor.tokenId);
-  if(!tA || !tD){ mesaLinea(`🏹 La ${fl.nombre} de ${quien} erró y quedó entera en el piso, al final de su alcance (ponela a mano)`, 'recordatorio'); return; }
+  if(!tA || !tD){ mesaLinea(`🏹 ${flLa(fl)} de ${quien} erró y quedó ${flEntera(fl)} en el piso, al final de su alcance (${flEsVirote(fl) ? 'ponelo' : 'ponela'} a mano)`, 'recordatorio'); return; }
   const dist = distanciaHex(tA, tD);
   let alcance = dist;
   try{ alcance = Math.max(dist, Math.round(num(rangoDeToken(tA).rng)) || dist); }catch(e){}
@@ -52,7 +56,7 @@ async function flechaErrada(d){
   if(choco && fl.recuperable){ choco = false; mesaLinea(`🏹 ${fl.nombre} chocó contra un obstáculo, pero con esa ballesta no se rompe (virote recuperable)`, 'recordatorio'); }   // 2026-10-11
   if(choco){
     const moneda = 1 + Math.floor(Math.random() * 2);
-    if(moneda === 1){ mesaLinea(`🏹 La ${fl.nombre} de ${quien} erró, chocó contra un obstáculo y se rompió (moneda: 1)`, 'recordatorio'); return; }
+    if(moneda === 1){ mesaLinea(`🏹 ${flLa(fl)} de ${quien} erró, chocó contra un obstáculo y se rompió (moneda: 1)`, 'recordatorio'); return; }
   }
   const item = flechaItem(fl);
   try{
@@ -62,10 +66,10 @@ async function flechaErrada(d){
       arma: true, armaNombre: String(fl.nombre).slice(0, 60), armaDe: '', armaItem: JSON.stringify(item).slice(0, 6000),
       duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
     });
-    mesaLinea(`🏹 La ${fl.nombre} de ${quien} erró${choco ? ', chocó contra un obstáculo (moneda: 2)' : ''} y quedó entera en el piso, a ${distanciaHex(tA, celda)} casillas (se puede levantar)`, 'recordatorio');
+    mesaLinea(`🏹 ${flLa(fl)} de ${quien} erró${choco ? ', chocó contra un obstáculo (moneda: 2)' : ''} y quedó ${flEntera(fl)} en el piso, a ${distanciaHex(tA, celda)} casillas (se puede levantar)`, 'recordatorio');
   }catch(err){
     console.error('No se pudo dejar la flecha en el piso:', err);
-    mesaLinea(`🏹 La ${fl.nombre} de ${quien} erró y quedó entera en el piso, al final de su alcance (ponela a mano)`, 'recordatorio');
+    mesaLinea(`🏹 ${flLa(fl)} de ${quien} erró y quedó ${flEntera(fl)} en el piso, al final de su alcance (${flEsVirote(fl) ? 'ponelo' : 'ponela'} a mano)`, 'recordatorio');
   }
 }
 
@@ -83,7 +87,7 @@ async function flechaSalto(d, totalMag){
   const conDano = !!s.dano && num(totalMag) > 1;
   const cadena0 = conDano ? rayoCadena(id, num(totalMag)) : rayoCadena(id, Math.pow(2, n + 1)).map(c => ({...c, dano: 0})).slice(0, 1 + n);
   const cadena = conDano && cadena0.length > 1 ? [cadena0[0], ...(await rayoCadenaAplicar(cadena0, {callado: true}))] : cadena0;
-  if(cadena.length < 2){ mesaLinea(`⚡ La ${fl.nombre} de ${d.atacante.nombre} no tuvo a quién saltar (nadie a 4 casillas o menos${conDano ? ', o no le quedó daño' : ''})`, 'recordatorio'); return; }
+  if(cadena.length < 2){ mesaLinea(`⚡ ${flLa(fl)} de ${d.atacante.nombre} no tuvo a quién saltar (nadie a 4 casillas o menos${conDano ? ', o no le quedó daño' : ''})`, 'recordatorio'); return; }
   const partes = [];
   for(let i = 1; i < cadena.length; i++){
     const c = cadena[i], nom = c.t.oculto ? 'Alguien' : nombreDe(c.t);
@@ -107,7 +111,7 @@ async function flechaSalto(d, totalMag){
   const saltos = cadena.slice(1).map((c, i) => ({desde: cadena[i].id, hacia: c.id}));
   const resultado = partes.join(' → ');
   momentoAbrir({tipo: 'rayo', icono: '⚡', titulo: `${fl.nombre}: salta`, estado: 'listo', datos: {saltos}, resultado});
-  mesaLinea(`⚡ La ${fl.nombre} de ${d.atacante.nombre} saltó: ${resultado}`, 'recordatorio');
+  mesaLinea(`⚡ ${flLa(fl)} de ${d.atacante.nombre} saltó: ${resultado}`, 'recordatorio');
 }
 
 /* 🏹 LOS VIROTES QUE HACEN ALGO EN EL MAPA (2026-10-10, dueño: «la tanda de ballestas que necesita el mapa»; docs/ideas-ballestas.md).

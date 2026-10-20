@@ -22,7 +22,9 @@ Acciones). Buena a 50 (como la Flecha de arpón).
 ✅ **Luz cegadora**: destello en flor de diámetro 3 con el centro dentro de tu Rango; cada rival adentro tira Res.CC contra tu Efecto especial y el
 que pierde queda con Ceguera 1 turno; quien gana no se ciega (área sin dodge roll: `sinDodge`); los aliados no. Buena a 50. **De paso, la Ceguera
 nueva** (dueño): ve 2 casillas, no apunta más lejos (avisa), la mitad del PdG y del PdG.Esp, y su Evasión a la mitad contra un ataque a distancia;
-todo «Cegado» entra como esta Ceguera. Flecha y Virote cegador, de 35 a 45. Probado en el mapa. Para eso, un consumible ahora puede tener su Ejecución ✨ (`duelo`
+todo «Cegado» entra como esta Ceguera. Flecha y Virote cegador, de 35 a 45. Probado en el mapa.
+✅ **Sombras chinescas**: queda a mano (se usa sobre todo en el modo narrativo, dueño): una figura de sombra en una casilla dentro de tu Rango, una escena
+(en combate, 3 turnos), sin daño ni bloqueo; Percepción contra tu Efecto especial para darse cuenta. Buena a 30. Para eso, un consumible ahora puede tener su Ejecución ✨ (`duelo`
 en el ítem, `Combatiente.habDeConsumible`): el objetivo se elige en el mapa y va al cuadro del duelo. Probado en el mapa.
 **Pendiente:** el ojo de Kicillof como invocación de 3 turnos
 (Movimiento 5, invisible, sin mareo; solo revela y despeja) y automatizar la red y la luz cegadora; ¿algún pergamino Común?

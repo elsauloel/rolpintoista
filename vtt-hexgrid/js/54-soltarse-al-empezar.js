@@ -168,7 +168,22 @@ setInterval(() => {
     const ficha = String(t.fichaId).split(SEP_INVOCACION)[0];
     if(!soyGM && !(typeof bnManejo === 'function' && bnManejo(ficha))) return;
     temporalesBorrando.add(id);
-    coleccionTokens().doc(id).delete().then(() => mesaLinea(`👁 ${nombreDe(t)} se desvanece: cumplió sus turnos`, 'recordatorio'))
-      .catch(err => { console.error('No se pudo sacar la invocación temporal:', err); temporalesBorrando.delete(id); });
+    const nombre = nombreDe(t);
+    coleccionTokens().doc(id).delete().then(async () => {
+      mesaLinea(`👁 ${nombre} se desvanece: cumplió sus turnos`, 'recordatorio');
+      if(soyGM) await temporalFueraDelOrden(id);   // (solo el GM cambia el largo del orden)
+    }).catch(err => { console.error('No se pudo sacar la invocación temporal:', err); temporalesBorrando.delete(id); });
   });
 }, 1500);
+// Su lugar en el orden de turnos también se va: si justo era su turno, primero pasa al siguiente (con su inicio de turno).
+async function temporalFueraDelOrden(id){
+  if(!iniciativa.orden.some(o => o.id === id)) return;
+  if(iniciativa.orden[iniciativa.turno] && iniciativa.orden[iniciativa.turno].id === id){ try{ await iniciativaSiguiente(); }catch(e){ console.error(e); } }
+  const i = iniciativa.orden.findIndex(o => o.id === id);
+  if(i < 0) return;
+  let turno = iniciativa.turno;
+  if(i < turno) turno--;
+  const orden = iniciativa.orden.filter(o => o.id !== id).map(o => o.oculto ? {id: o.id, valor: num(o.valor), oculto: true} : {id: o.id, valor: num(o.valor)});
+  if(turno >= orden.length) turno = 0;
+  await guardarIniciativa({orden, turno});
+}

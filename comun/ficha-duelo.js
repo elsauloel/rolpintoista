@@ -105,7 +105,7 @@ const FichaDuelo = (() => {
       if(cg && cg.fijo) formula += ` + ${cg.fijo}`;
       return formula;
     }
-    return {
+    const H = {
       soy: lado => ui.soy(lado),
       // Qué dado tira cada botón del duelo y su 🔍 (2026-10-08, ver «vista» en comun/duelo.js). Sin tirar nada: la misma cuenta que el gancho.
       vista: (d, campo, modo) => {
@@ -245,13 +245,17 @@ const FichaDuelo = (() => {
         if(c.formula){ const r = tirarDados(c.formula); if(r) ui.registrarTirada(nombre, r); else ui.toast(`No se pudo tirar «${c.etq}»: la fórmula «${c.formula}» no es válida (revisá la habilidad)`); return; }
         if(!c.stat) return;
         const v = compute().final[c.stat];
+        // 🙈 Ciego contra un hechizo dirigido de lejos (2026-10-20): su Evasión, a la mitad.
+        const S = getS(), conCiego = quien !== 'atacante' && c.stat === 'eva' ? Combatiente.ciegoContraDistancia(d, S.efectos) : S.efectos;
+        if(conCiego !== S.efectos){ const orig = S.efectos; S.efectos = conCiego; try{ tirarValorStat(nombre, num(v) + num(c.bono), c.stat); }finally{ S.efectos = orig; } return; }
         tirarValorStat(nombre, num(v) + num(c.bono), c.stat);
       },
       // «Cuánto tirarías»: la fórmula de dados de ese stat (para el botón de defensa).
       habValor: (d, quien, stat) => {
         const v = compute().final[stat];
         const f = formulaParaValor(num(v));
-        return f ? f.formula : fmt(num(v));
+        const est = quien !== 'atacante' ? Combatiente.ciegoContraDistancia(d, getS().efectos) : getS().efectos;   // las mitades (Pajaritos, 🙈 ciego de lejos…)
+        return f ? f.formula + ' ÷2'.repeat(Combatiente.mitadesDeTirada(est, stat)) : fmt(num(v));
       },
       // ¿El objetivo de una habilidad dirigida puede parriar ahora? (sin arma ni escudo equipado, no hay Parry.)
       puedeParry: d => armasYEscudosParaParry().length > 0 && !Combatiente.expuesto(getS().efectos),   // Expuesto (Degollar): sin Parry
@@ -259,15 +263,16 @@ const FichaDuelo = (() => {
       opcionesDefensa: d => {
         const S = getS();
         const ee = evaEsp(d), evaV = num(compute().final.eva) + ee.val, evaInfo = ee.txt ? ` (con ${ee.txt})` : '';
+        const estEva = Combatiente.ciegoContraDistancia(d, S.efectos);   // 🙈 ciego contra un ataque a distancia: la Evasión, a la mitad
         // «cuánto tirarías»: la fórmula de dados de cada defensa (con las mitades de Lisiado/Pajaritos/Sentado…) y, para cada Parry, el Bloqueo que tirarías si ganás.
         const fx = (v, statId, estados) => { const f = formulaParaValor(v); if(!f) return fmt(num(v)); const mit = statId ? Combatiente.mitadesDeTirada(estados, statId) : 0; return f.formula + ' ÷2'.repeat(mit); };
         const c = compute();
         const sobre = c.sobrecarga;
         // Con sobrepeso la Evasión pide elegir: pagar 1 No2 para tirar sin penalidad o tirar con −N. Se elige acá, en el cuadro del duelo.
         const ops = sobre > 0
-          ? [{modo: 'evasion', itemId: 'pagado', etiqueta: '🏃 Evasión · pagando 1 No2', costo: 1, motivoNo: '', info: [`Evasión 🎲 ${Combatiente.conFijo(fx(evaV, 'eva', S.efectos), ee)}${evaInfo}`, `sin la penalidad de sobrepeso (−${fmt(sobre)})`, ...(num(S.nitros) < 1 ? ['⚠ sin No2: quedás en negativo (se descuenta al recargar)'] : [])]},
-             {modo: 'evasion', itemId: 'penal', etiqueta: `🏃 Evasión · con penalidad −${fmt(sobre)}`, motivoNo: '', info: [`Evasión 🎲 ${Combatiente.conFijo(fx(evaV, 'eva', S.efectos), ee)} −${fmt(sobre)}${evaInfo}`, 'no gastás No2']}]
-          : [{modo: 'evasion', itemId: '', etiqueta: '🏃 Evasión', motivoNo: '', info: [`Evasión 🎲 ${Combatiente.conFijo(fx(evaV, 'eva', S.efectos), ee)}${evaInfo}`]}];
+          ? [{modo: 'evasion', itemId: 'pagado', etiqueta: '🏃 Evasión · pagando 1 No2', costo: 1, motivoNo: '', info: [`Evasión 🎲 ${Combatiente.conFijo(fx(evaV, 'eva', estEva), ee)}${evaInfo}`, `sin la penalidad de sobrepeso (−${fmt(sobre)})`, ...(num(S.nitros) < 1 ? ['⚠ sin No2: quedás en negativo (se descuenta al recargar)'] : [])]},
+             {modo: 'evasion', itemId: 'penal', etiqueta: `🏃 Evasión · con penalidad −${fmt(sobre)}`, motivoNo: '', info: [`Evasión 🎲 ${Combatiente.conFijo(fx(evaV, 'eva', estEva), ee)} −${fmt(sobre)}${evaInfo}`, 'no gastás No2']}]
+          : [{modo: 'evasion', itemId: '', etiqueta: '🏃 Evasión', motivoNo: '', info: [`Evasión 🎲 ${Combatiente.conFijo(fx(evaV, 'eva', estEva), ee)}${evaInfo}`]}];
         // Sin arma ni escudo equipado no se puede parriar (regla del dueño, 2026-09-28).
         const gratis = Combatiente.parryGratis(st => c.final[st], num((S.ataquesArma || {})._parry));   // Parada fácil (2026-10-06)
         const disparo = Combatiente.contraDisparo(d);   // contra un disparo, Parry solo con escudo (2026-10-09)
@@ -284,7 +289,7 @@ const FichaDuelo = (() => {
           const no2 = FichaCombate.costoAtaque(S, it), sp = Math.max(0, FichaBotonera.spMaximo(S, c) - num(S.spGastado)), arco = Combatiente.esArco(it);
           ops.push({modo: 'parrydist', itemId: it.id, itemNombre: it.nombre, etiqueta: `🏹 Parry a distancia · ${it.nombre}`, costo: no2, arco,
             motivoNo: no2 > num(S.nitros) ? `te faltan No2 (cuesta ${fmt(no2)})` : sp < 2 ? 'te falta SP (cuesta 2)' : '',
-            info: [`Evasión 🎲 ${Combatiente.conFijo(fx(evaV, 'eva', S.efectos), ee)}${evaInfo}`, `${fmt(no2)} No2 del disparo + 2 SP`,
+            info: [`Evasión 🎲 ${Combatiente.conFijo(fx(evaV, 'eva', estEva), ee)}${evaInfo}`, `${fmt(no2)} No2 del disparo + 2 SP`,
               arco ? 'si ganás, cuenta como Parry: para contraatacar, antes el dodge roll (alejarte 1 casillero, pagando sus No2)' : 'si ganás, cuenta como Parry: podés contraatacar']});
         });
         // ⚔ Contraataque (Warrior, 2026-10-13): con la habilidad, si esquiva con la Evasión puede contraatacar (2 SP + un primer ataque).
@@ -294,6 +299,16 @@ const FichaDuelo = (() => {
         return Combatiente.sinReaccionesNo2(ops, S.efectos);   // Expuesto (Degollar): sin Parry
       },
       defender: (d, modo, itemId) => {
+        const S = getS();
+        // 🙈 Ciego contra un ataque a distancia (2026-10-20): mientras se tira esta Evasión, una marca más que la parte a la mitad.
+        if(modo !== 'parry' && Combatiente.ciegoContraDistancia(d, S.efectos) !== S.efectos){
+          const orig = S.efectos;
+          S.efectos = Combatiente.ciegoContraDistancia(d, orig);
+          try{ return H._defender(d, modo, itemId); }finally{ S.efectos = orig; }
+        }
+        return H._defender(d, modo, itemId);
+      },
+      _defender: (d, modo, itemId) => {
         const S = getS();
         if(modo === 'parry') FichaAcciones.parryConArma(S, itemId ? S.inventario.find(x => x.id === itemId) || null : null, undefined, ui);
         else if(modo === 'parrydist'){   // 🏹 Parry a distancia: cobra (2 SP siempre, y el No2 del disparo) y tira la Evasión
@@ -350,6 +365,7 @@ const FichaDuelo = (() => {
         return '';
       },
     };
+    return H;
   }
 
   /* ---------- La ventana de la Moneda Re-Roll (2026-10-02, hoja de ruta A6a: la usan la ficha y el mapa) ----------

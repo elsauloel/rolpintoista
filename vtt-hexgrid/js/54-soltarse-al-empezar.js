@@ -152,3 +152,6 @@ async function ayudarASoltar({tipo, invId, tokenId}){
   AvisoCombate.mostrar({icono: '🤝', titulo: `Ayudar a soltar a ${atrapado}`, veredicto: {tono: tt.ok ? 'bueno' : 'malo', grande: tt.ok ? '¡LO SOLTÓ!' : 'SIGUE ATRAPADO', chico: txt},
     botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()}]});
 }
+
+/* 🙈 Para la Ceguera (comun/combatiente.js, aDistancia): la distancia entre dos tokens del mapa, para saber si un hechizo dirigido viene de lejos. */
+window.mapaDistanciaTokens = (a, b) => { const x = tokens.get(a), y = tokens.get(b); return x && y ? distanciaHex(x, y) : NaN; };

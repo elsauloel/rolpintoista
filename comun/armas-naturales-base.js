@@ -33,7 +33,7 @@
     fuego: p => ef('Prende fuego', p, 'Prende fuego al objetivo: 1d8 de daño por cada stack de fuego (a mano).', '1d8'),
     ignora: p => ef('Ignora armadura', p, 'Si entra, el golpe ignora la Defensa del objetivo.'),
     ign1: p => ef('Ignora 1 de Res. crítico', p, 'Al calcular el crítico, el objetivo tiene 1 menos de resistencia.'),
-    ceguera: p => ef('Ceguera', p, 'El objetivo pierde 3 de Evasión 2 turnos (a mano).'),
+    ceguera: p => ef('Ceguera', p, 'El objetivo queda con Ceguera 1 turno (a mano).'),
   };
 
   const lista = [];

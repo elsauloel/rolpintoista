@@ -176,13 +176,14 @@ const InvDuelo = (() => {
         // Tirada personalizada: la fórmula ya viene resuelta; acá solo se tira y se anuncia.
         if(c.formula){ const r = tirarDados(c.formula); if(r) ui.registrar(nombre, r); else ui.toast(`No se pudo tirar «${c.etq}»: la fórmula «${c.formula}» no es válida (revisá la habilidad)`); return; }
         if(!c.stat) return;
-        publicar(A().tirada(inv, nombre, num(I().statValor(inv, c.stat)) + num(c.bono), c.stat));
+        publicar(A().tirada(quien !== 'atacante' && c.stat === 'eva' ? {...inv, estados: Combatiente.ciegoContraDistancia(d, inv.estados)} : inv, nombre, num(I().statValor(inv, c.stat)) + num(c.bono), c.stat));   // 🙈
       },
       habValor: (d, quien, stat) => {
         const inv = ui.inv(quien === 'atacante' ? d.atacante : d.defensor);
         const v = I().statValor(inv, stat);
         const f = formulaParaValor(num(v));
-        return f ? f.formula : fmt(num(v));
+        const est = inv && quien !== 'atacante' ? Combatiente.ciegoContraDistancia(d, inv.estados) : (inv && inv.estados);   // las mitades (🙈 ciego de lejos…)
+        return f ? f.formula + ' ÷2'.repeat(Combatiente.mitadesDeTirada(est, stat)) : fmt(num(v));
       },
       puedeParry: d => { const inv = ui.inv(d.defensor); return !!I().defensa(inv) && !Combatiente.expuesto(inv && inv.estados); },   // arma de verdad o escudo (2026-09-30)
       // Cómo puede defenderse (elige a ciegas): Evasión, o Parry con su arma o un escudo (siempre 1 No2).
@@ -192,7 +193,7 @@ const InvDuelo = (() => {
         const gratis = Combatiente.parryGratis(st => I().modTotal(inv, st), num(inv.parryTurno));   // Parada fácil (2026-10-06)
         const c = gratis ? 0 : Combatiente.costoParry();
         const ee = evaEsp(inv, d);
-        const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión', info: [`Evasión 🎲 ${Combatiente.conFijo(fx(I().statValor(inv, 'eva') + ee.val, 'eva', inv.estados), ee)}${ee.txt ? ` (con ${ee.txt})` : ''}`]}];
+        const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión', info: [`Evasión 🎲 ${Combatiente.conFijo(fx(I().statValor(inv, 'eva') + ee.val, 'eva', Combatiente.ciegoContraDistancia(d, inv.estados)), ee)}${ee.txt ? ` (con ${ee.txt})` : ''}`]}];
         // Parry solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30; un arma natural no alcanza, por ahora).
         const disparo = Combatiente.contraDisparo(d), def = I().defensa(inv, {soloEscudo: disparo});   // contra un disparo, Parry solo con escudo
         if(Combatiente.stuneado(inv.estados)) return [{modo: 'evasion', etiqueta: '🏃 Evasión · Stun: 1', info: ['⚡ Stun: no puede hacer nada; su Evasión es 1']}];   // Stun (2026-10-06)
@@ -204,7 +205,7 @@ const InvDuelo = (() => {
         const inv = ui.inv(d.defensor);
         if(!inv) return;
         if(modo === 'parry') tirarStat(inv, 'parry');
-        else { const ee = evaEsp(inv, d); publicar(A().tirada(inv, ee.txt ? `Evasión (${ee.txt})` : 'Evasión', I().statValor(inv, 'eva') + ee.val, 'eva', ee.fijo)); Combatiente.gastarPasoFantasma(d, ee); }
+        else { const ee = evaEsp(inv, d); publicar(A().tirada({...inv, estados: Combatiente.ciegoContraDistancia(d, inv.estados)}, ee.txt ? `Evasión (${ee.txt})` : 'Evasión', I().statValor(inv, 'eva') + ee.val, 'eva', ee.fijo)); Combatiente.gastarPasoFantasma(d, ee); }   // 🙈 ciego contra un ataque a distancia: la mitad
       },
       // La Fuerza del golpe del atacante contra el Bloqueo del defensor (Fue + peso de su arma).
       fuerza: d => {

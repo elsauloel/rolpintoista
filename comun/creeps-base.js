@@ -72,12 +72,12 @@
     return o;
   };
   const APLICA = {
-    'Debilitar': A('Debilitado', 3, {dmg: -2}), 'Maldición': A('Maldito', 3, {resmg: -2, def: -1}), 'Ceguera': A('Cegado', 2, {eva: -3}),
+    'Debilitar': A('Debilitado', 3, {dmg: -2}), 'Maldición': A('Maldito', 3, {resmg: -2, def: -1}), 'Ceguera': A('Ceguera', 1),
     'Ralentizar': A('Ralentizado', 1, {nitros: -2}), 'Intimidar': A('Intimidado', 2, {dmg: -1}), 'Romper armadura': A('Armadura dañada', 3, {def: -2}),
     'Veneno': A('Veneno'), 'Pudrición': A('Podrido', 3, {def: -2, dmg: -1}), 'Susurros': A('Susurros', 3, {resm: -2}),
     'Drenar energía': A('Drenado', 1, {nitros: -2}), 'Red': A('Inmovilizado', 1), 'Trampa de raíces': A('Inmovilizado', 2),
     'Hechizo de lentitud': A('Lentitud', 2, {nitros: -1}), 'Quemadura': A('Quemado', 2, {}, -2), 'Escarcha': A('Escarcha', 1, {nitros: -2}),
-    'Oxidar': A('Oxidado', 3, {dmg: -2}), 'Desmoralizar': A('Desmoralizado', 2, {resm: -2, dmg: -1}), 'Polvo revelador': A('Cegado', 2, {eva: -2}),
+    'Oxidar': A('Oxidado', 3, {dmg: -2}), 'Desmoralizar': A('Desmoralizado', 2, {resm: -2, dmg: -1}), 'Polvo revelador': A('Ceguera', 1),
     'Escupitajo ácido': A('Corroído', 2, {def: -1}), 'Lanza de hielo': A('Escarcha', 1, {nitros: -1}), 'Descarga eléctrica': A('Descarga', 1, {nitros: -1}),
     'Golpe de escudo': A('Golpe de escudo', 1, {nitros: -1}), 'Dardo venenoso': A('Veneno'), 'Mordisco venenoso': A('Veneno'),
     'Corte profundo': A('Sangrado'), 'Zarpazo desgarrador': A('Sangrado'), 'Golpe que sangra': A('Sangrado'), 'Herida sangrante': A('Sangrado'),
@@ -88,7 +88,7 @@
     // trampas
     'Cepo': A('Inmovilizado', 2), 'Trampa de veneno': A('Veneno'), 'Trampa de hielo': A('Escarcha', 1, {nitros: -1}), 'Trampa de red': A('Inmovilizado', 1),
     'Trampa sonora': A('Pajaritos', 1), 'Cepo de alma': A('Drenado', 1, {nitros: -2}), 'Trampa de ácido': A('Corroído', 3, {def: -1}),
-    'Zarzal traicionero': A('Rengo'), 'Telaraña oculta': A('Inmovilizado', 1), 'Descarga oculta': A('Descarga', 1, {nitros: -1}), 'Trampa de humo': A('Cegado', 2, {eva: -2}),
+    'Zarzal traicionero': A('Rengo'), 'Telaraña oculta': A('Inmovilizado', 1), 'Descarga oculta': A('Descarga', 1, {nitros: -1}), 'Trampa de humo': A('Ceguera', 1),
     // trampas de creeps concretos
     'Cepo del emboscado': A('Inmovilizado', 2), 'Lazo de caza': A('Rengo'), 'Cepo de dientes': A('Rengo'), 'Cepo en el camino': A('Inmovilizado', 2),
     'Trampa de dardos envenenados': A('Veneno'), 'Red de cazador': A('Inmovilizado', 1),
@@ -862,7 +862,7 @@
   /* ================= TRIBUS Y CLANES (2026-09-21): más variedad de kobolds, goblins y hombres cabra =================
      Cada uno con un rol distinto y mecánicas del juego distintas: sigilo, trampas (con y sin daño), estados propios
      (Espinas, Regeneración, Blindado, Vida extra, Inmunidad a CC, Hypeado, Afortunado) y estados sobre otros que se
-     aplican solos (Veneno, Quemado, Rengo, Cegado, Pajaritos, Inmovilizado, Stun, Armadura rota, Maldito…). */
+     aplican solos (Veneno, Quemado, Rengo, Ceguera, Pajaritos, Inmovilizado, Stun, Armadura rota, Maldito…). */
   // Un ataque o habilidad que además deja un estado sobre el objetivo (se aplica solo al usarla, o al pisar la trampa).
   const ap = (sp, estado) => ({...sp, aplica: estado});
 
@@ -874,7 +874,7 @@
     'Vive en las paredes y solo sale cuando nadie mira.', KB);
   cr('minas', 1, 'Kobold farolero', 'apoyo', 'humanoide', 'Farol de aceite',
     ap(zo('Aceite hirviendo', 'Salpica aceite caliente del farol: daño y el objetivo queda Quemado 2 turnos.', 1, 'L'), A('Quemado', 2, {}, -2)),
-    [ap(ta('Destello de farol', 'Levanta el farol con un fogonazo: el objetivo queda Cegado (-3 Evasión) 2 turnos.', 2), A('Cegado', 2, {eva: -3})), 4],
+    [ap(ta('Destello de farol', 'Levanta el farol con un fogonazo: el objetivo queda con Ceguera 1 turno.', 2), A('Ceguera', 1)), 4],
     'Guía a los suyos por las galerías con una luz que quema.', KB);
   cr('minas', 1, 'Kobold escudero de barril', 'tanque', 'humanoide', 'Palo con clavos',
     bu('Tapa de barril', 'Se cubre con una tapa de barril: +3 Defensa hasta el final de su turno.', 1, {def: 3}, 1),
@@ -1005,7 +1005,7 @@
 
   cr('montañas', 3, 'Hombre cabra vigía de cumbre', 'rango', 'humanoide', 'Arco largo de cuerno',
     at('Flecha del vigía', 'Una flecha larga y certera.', 'M'),
-    [ap(zo('Flecha de humo', 'Flecha con humo: daño y el objetivo queda Cegado (-2 Evasión) 2 turnos.', 2, 'M'), A('Cegado', 2, {eva: -2})), 4],
+    [ap(zo('Flecha de humo', 'Flecha con humo: daño y el objetivo queda con Ceguera 1 turno.', 2, 'M'), A('Ceguera', 1)), 4],
     'Ve todo el valle desde arriba y avisa con un balido.', HC);
   cr('montañas', 3, 'Hombre cabra forjador', 'brutal', 'humanoide', 'Martillo de forja',
     ap(at('Martillo caliente', 'Un martillazo al rojo: daño y el objetivo queda Quemado 2 turnos.', 'M'), A('Quemado', 2, {}, -2)),
@@ -1069,7 +1069,7 @@
     'Siempre acierta, sobre todo cuando predice cosas malas.', TG);
   cr('bosque', 4, 'Goblin invocador de luciérnagas', 'mago', 'humanoide', 'Farol de vidrio',
     at('Luciérnaga ardiente', 'Una luciérnaga que estalla al chocar.', 'M'),
-    [ap(ta('Nube de luciérnagas', 'Una nube de luces: los cercanos quedan Cegados (-3 Evasión) 2 turnos.', 3), A('Cegado', 2, {eva: -3})), 5],
+    [ap(ta('Nube de luciérnagas', 'Una nube de luces: los cercanos quedan con Ceguera 1 turno.', 3), A('Ceguera', 1)), 5],
     'Vive de noche y ve mejor que nadie.', TG);
   cr('bosque', 2, 'Goblin barricada', 'tanque', 'humanoide', 'Tablón claveteado',
     bu('Levantar el tablón', 'Se cubre con un tablón: +3 Defensa hasta el final de su turno.', 1, {def: 3}, 1),
@@ -1080,8 +1080,8 @@
     [es('Carapacho espinoso', 'Se cubre de espinas: devuelve daño en cuerpo a cuerpo (se cobra a mano) y gana +2 Defensa.', 3, 'Espinas', 'buff', 3, {mods: {def: 2}}), 5],
     'Se pasó a la vida lenta y a la armadura de caparazón.', TG);
   cr('bosque', 1, 'Goblin escupidor de ají', 'debuffer', 'humanoide', 'Cuchillo de leña',
-    ap(at('Escupitajo de ají', 'Escupe ají picante: daño y el objetivo queda Cegado (-2 Evasión) 2 turnos.', 'L'), A('Cegado', 2, {eva: -2})),
-    [ap(ta('Polvo de picante', 'Tira polvo picante en la cara: el objetivo queda Cegado (-3 Evasión) 2 turnos.', 1), A('Cegado', 2, {eva: -3})), 4],
+    ap(at('Escupitajo de ají', 'Escupe ají picante: daño y el objetivo queda con Ceguera 1 turno.', 'L'), A('Ceguera', 1)),
+    [ap(ta('Polvo de picante', 'Tira polvo picante en la cara: el objetivo queda con Ceguera 1 turno.', 1), A('Ceguera', 1)), 4],
     'Todas sus armas pican.', TG);
   cr('bosque', 2, 'Goblin leñador', 'brutal', 'humanoide', 'Hacha de leñador',
     at('Hachazo', 'Un hachazo de leñador.', 'M'),
@@ -1098,7 +1098,7 @@
 
   /* ---- Kobolds de las minas (+6): debuffer (había 1) y mágico (había 1) ---- */
   cr('minas', 1, 'Kobold soltador de murciélagos', 'debuffer', 'humanoide', 'Bolsa de murciélagos',
-    ap(at('Murciélago en la cara', 'Le suelta un murciélago: daño y el objetivo queda Cegado (-2 Evasión) 2 turnos.', 'L'), A('Cegado', 2, {eva: -2})),
+    ap(at('Murciélago en la cara', 'Le suelta un murciélago: daño y el objetivo queda con Ceguera 1 turno.', 'L'), A('Ceguera', 1)),
     [ap(ta('Cortina de murciélagos', 'Suelta toda la bolsa: los cercanos quedan Pajaritos hasta el final de su próximo turno.', 2), A('Pajaritos', 1)), 4],
     'Los murciélagos lo quieren: le deben plata.', KB);
   cr('minas', 3, 'Kobold envenenador de galerías', 'debuffer', 'humanoide', 'Aguja de veneno',
@@ -1165,12 +1165,12 @@
     [es('Aullido de la montaña', 'Un aullido que pone a todos de pie: +1 No2 máximo.', 2, 'Hypeado', 'buff', 3), 5],
     'Lleva más años que la nieve que lo cubre.', KM);
   cr('montañas', 1, 'Kobold soplanieve', 'debuffer', 'humanoide', 'Fuelle roto',
-    ap(at('Soplo de nieve', 'Sopla nieve en los ojos: daño y el objetivo queda Cegado (-2 Evasión) 2 turnos.', 'L'), A('Cegado', 2, {eva: -2})),
-    [ap(ta('Ventisquero', 'Levanta una nube de nieve: el objetivo queda Cegado (-3 Evasión) 2 turnos.', 1), A('Cegado', 2, {eva: -3})), 4],
+    ap(at('Soplo de nieve', 'Sopla nieve en los ojos: daño y el objetivo queda con Ceguera 1 turno.', 'L'), A('Ceguera', 1)),
+    [ap(ta('Ventisquero', 'Levanta una nube de nieve: el objetivo queda con Ceguera 1 turno.', 1), A('Ceguera', 1)), 4],
     'Nadie sabe de dónde saca tanta nieve.', KM);
   cr('montañas', 3, 'Kobold tejedor de ventiscas', 'debuffer', 'humanoide', 'Bastón de trapos',
     at('Golpe de viento', 'Una ráfaga que golpea.', 'M'),
-    [ap(ta('Ventisca', 'Envuelve al objetivo en una ventisca: queda Cegado (-3 Evasión) 2 turnos.', 3), A('Cegado', 2, {eva: -3})), 5],
+    [ap(ta('Ventisca', 'Envuelve al objetivo en una ventisca: queda con Ceguera 1 turno.', 3), A('Ceguera', 1)), 5],
     'Amarra el viento en nudos y lo suelta cuando le conviene.', KM);
   cr('montañas', 3, 'Kobold chamán de la tormenta', 'mago', 'humanoide', 'Vara de cobre',
     at('Rayito', 'Un rayo chico desde la vara.', 'M'),
@@ -1262,7 +1262,7 @@
   // mágico
   cr('bosque', 1, 'Luciérnaga chispeante', 'mago', 'bestia', 'Luz de luciérnaga',
     at('Chispa de luz', 'Un chispazo de luz.', 'L'),
-    [ap(ta('Destello cegador', 'Un destello brutal: el objetivo queda Cegado (-3 Evasión) 2 turnos.', 1), A('Cegado', 2, {eva: -3})), 4],
+    [ap(ta('Destello cegador', 'Un destello brutal: el objetivo queda con Ceguera 1 turno.', 1), A('Ceguera', 1)), 4],
     'De noche, encandila; de día, se duerme.', IN);
   cr('bosque', 3, 'Polilla de polvo hipnótico', 'mago', 'bestia', 'Polvo de alas',
     at('Polvo de alas', 'Una nube de polvo que raspa.', 'M'),
@@ -1352,7 +1352,7 @@
     'Duerme sobre carbones y despierta de mal humor.', EF);
   cr('fuego', 3, 'Brasero errante', 'debuffer', 'elemental', 'Carbón candente',
     ap(at('Carbón lanzado', 'Lanza un carbón: daño y el objetivo queda Quemado 2 turnos.', 'M'), A('Quemado', 2, {}, -2)),
-    [ap(ta('Humo asfixiante', 'Una nube de humo: los cercanos quedan Cegados (-2 Evasión) 2 turnos.', 2), A('Cegado', 2, {eva: -2})), 4],
+    [ap(ta('Humo asfixiante', 'Una nube de humo: los cercanos quedan con Ceguera 1 turno.', 2), A('Ceguera', 1)), 4],
     'Un brasero que aprendió a caminar y a molestar.', EF); RASTRO();
   cr('fuego', 3, 'Mago de ceniza', 'mago', 'elemental', 'Bastón de carbón',
     at('Bola de brasas', 'Un proyectil de brasas.', 'M'),
@@ -1382,7 +1382,7 @@
     'Blanco, pesado y con hambre.', EH);
   cr('hielo', 3, 'Susurro de nieve', 'debuffer', 'elemental', 'Aliento gélido',
     at('Aliento gélido', 'Una bocanada de frío.', 'M'),
-    [ap(ta('Ventisca', 'Levanta una ventisca: los cercanos quedan Cegados (-3 Evasión) 2 turnos.', 3), A('Cegado', 2, {eva: -3})), 5],
+    [ap(ta('Ventisca', 'Levanta una ventisca: los cercanos quedan con Ceguera 1 turno.', 3), A('Ceguera', 1)), 5],
     'Se oye antes de verse, y no se oye nada.', EH); ESCARCHA3();
   cr('hielo', 3, 'Bruja de las nevadas', 'mago', 'elemental', 'Vara de cristal helado',
     at('Lanza de hielo', 'Una lanza de hielo.', 'M'),

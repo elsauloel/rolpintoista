@@ -179,13 +179,14 @@ const CreepDuelo = (() => {
         // Tirada personalizada (la fórmula llega lista desde habEjecucion): se tira y se anuncia, como en la ficha.
         if(c.formula){ const r = tirarDados(c.formula); if(r) ui.publicar(sc, {origen: nombre, r}); else ui.toast(`No se pudo tirar «${c.etq}»: la fórmula «${c.formula}» no es válida (revisá la habilidad)`); return; }
         if(!c.stat) return;
-        ui.publicar(sc, A().tirada(nombre, habStat(sc, c.stat) + num(c.bono), sc, c.stat));
+        ui.publicar(sc, A().tirada(nombre, habStat(sc, c.stat) + num(c.bono), quien !== 'atacante' && c.stat === 'eva' ? {...sc, estados: Combatiente.ciegoContraDistancia(d, sc.estados)} : sc, c.stat));   // 🙈
       },
       habValor: (d, quien, stat) => {
         const sc = deLado(quien === 'atacante' ? d.atacante : d.defensor);
         if(!sc) return '';
         const v = habStat(sc, stat), f = formulaParaValor(v);
-        return f ? f.formula : fmt(num(v));
+        const est = quien !== 'atacante' ? Combatiente.ciegoContraDistancia(d, sc.estados) : sc.estados;   // las mitades (🙈 ciego de lejos…)
+        return f ? f.formula + ' ÷2'.repeat(Combatiente.mitadesDeTirada(est, stat)) : fmt(num(v));
       },
       // ¿El creep objetivo de una habilidad dirigida puede parriar ahora? (2026-09-29, misma regla que un ataque
       // normal, P121: sin arma no hay Parry.)
@@ -195,7 +196,7 @@ const CreepDuelo = (() => {
         const sc = deLado(d.defensor);
         if(!sc) return [];
         // «Cuánto tirarías» antes de elegir (2026-09-27, pedido del dueño).
-        const fx = (v, statId) => { const f = formulaParaValor(v); if(!f) return fmt(num(v)); const mit = statId ? Combatiente.mitadesDeTirada(sc.estados, statId) : 0; return f.formula + ' ÷2'.repeat(mit); };
+        const fx = (v, statId) => { const f = formulaParaValor(v); if(!f) return fmt(num(v)); const mit = statId ? Combatiente.mitadesDeTirada(statId === 'eva' ? Combatiente.ciegoContraDistancia(d, sc.estados) : sc.estados, statId) : 0; return f.formula + ' ÷2'.repeat(mit); };   // 🙈 (2026-10-20)
         const gratis = Combatiente.parryGratis(st => C().modTotal(sc, st), num((sc.usosEspecial || {})._parry));   // Parada fácil (2026-10-06)
         const c = gratis ? 0 : C().costoParry(sc);
         const ee = evaEsp(sc, d);
@@ -220,7 +221,7 @@ const CreepDuelo = (() => {
           });
         }
         const ee = evaEsp(sc, d);
-        ui.publicar(sc, A().tirada(`${sc.nombre} · Evasión${ee.txt ? ` (${ee.txt})` : ''}`, C().statValor(sc, 'eva') + ee.val, sc, 'eva', ee.fijo));
+        ui.publicar(sc, A().tirada(`${sc.nombre} · Evasión${ee.txt ? ` (${ee.txt})` : ''}`, C().statValor(sc, 'eva') + ee.val, {...sc, estados: Combatiente.ciegoContraDistancia(d, sc.estados)}, 'eva', ee.fijo));   // 🙈 ciego contra un ataque a distancia: la mitad
         Combatiente.gastarPasoFantasma(d, ee);
       },
       fuerza: d => {

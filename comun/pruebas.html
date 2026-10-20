@@ -924,6 +924,15 @@ prueba('🙈 Ceguera nueva (2026-10-20): la mitad del PdG y del PdG.Esp (no la E
     (pre.mods || []).length, Combatiente.ciego([{nombre: 'Ceguera'}]), Combatiente.ciego([{nombre: 'Ceguera', activo: false}]), Combatiente.aplicarMitades(7, Combatiente.mitadesDeTirada(est, 'pdg'))],
     [1, 1, 0, 2, 0, true, false, 3]);
 });
+prueba('🙈 Ceguera contra un ataque a distancia (2026-10-20): Evasión a la mitad contra un disparo, normal cuerpo a cuerpo; «Cegado» entra como la Ceguera', () => {
+  const ciego = [{nombre: 'Ceguera', ceguera: true, activo: true}];
+  const disparo = {ataque: {tipo: 'normal', rango: true}}, melee = {ataque: {tipo: 'normal', rango: false}};
+  const est = [];
+  const r = Combatiente.agregarEstado(est, {id: 'c', nombre: 'Cegado', turnos: 2, activo: true, mods: [{stat: 'eva', val: -3}]});
+  igual([Combatiente.mitadesDeTirada(Combatiente.ciegoContraDistancia(disparo, ciego), 'eva'), Combatiente.mitadesDeTirada(Combatiente.ciegoContraDistancia(melee, ciego), 'eva'),
+    Combatiente.mitadesDeTirada(Combatiente.ciegoContraDistancia(disparo, []), 'eva'), r.ok, est[0].nombre, est[0].mods.length, est[0].turnos, Combatiente.ciego(est)],
+    [1, 0, 0, true, 'Ceguera', 0, 1, true]);
+});
 prueba('📜 Un consumible con Ejecución (2026-10-20, la Red Nerubian): habilidad automática de un uso; PdG.Esp contra Evasión en tu Rango; Inmovilizado hasta 3, se suelta al empezar el turno con Fuerza contra tu Ef.Esp', () => {
   const red = CATALOGO_BASE.find(i => i.nombre === 'Pergamino de red Nerubian');
   const h = Combatiente.habDeConsumible(red), e = Combatiente.habEjecucion(h, h.duelo, {stat: id => ({rng: 6, dmgesp: 3})[id] || 0});

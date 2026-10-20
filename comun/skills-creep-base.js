@@ -181,7 +181,7 @@
   /* ================= DEBUFF (sobre otros: a mano) ================= */
   H('Debilitar', 'X', 'hdga', 'x', 3, tA('Maldice al objetivo: −2 de Daño 3 turnos (a mano).', 2));
   H('Maldición', 'X', 'dmga', 'gx', 4, tA('El objetivo pierde 2 de Res.Esp y 1 de Defensa 3 turnos (a mano).', 2));
-  H('Ceguera', 'X', 'hdea', 'x', 3, tA('Lanza polvo o luz: el objetivo pierde 3 de Evasión 2 turnos (a mano).', 2));
+  H('Ceguera', 'X', 'hdea', 'x', 3, tA('Lanza polvo o luz: el objetivo queda con Ceguera 1 turno (a mano).', 2));
   H('Ralentizar', 'X', 'hdea', 'x', 3, tA('El objetivo pierde 2 No2 en su próximo turno (a mano).', 2));
   H('Miedo', 'XK', 'bdma', 'x', 4, tA('Si el objetivo falla Res.Mt huye de él 2 turnos (a mano).', 2));
   H('Intimidar', 'X', 'bhd', 'x', 2, tA('Una mirada amenazante: el objetivo pierde 1 de Daño 2 turnos (a mano).', 1));

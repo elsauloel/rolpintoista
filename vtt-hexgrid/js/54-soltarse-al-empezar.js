@@ -155,3 +155,20 @@ async function ayudarASoltar({tipo, invId, tokenId}){
 
 /* 🙈 Para la Ceguera (comun/combatiente.js, aDistancia): la distancia entre dos tokens del mapa, para saber si un hechizo dirigido viene de lejos. */
 window.mapaDistanciaTokens = (a, b) => { const x = tokens.get(a), y = tokens.get(b); return x && y ? distanciaHex(x, y) : NaN; };
+
+/* 👁 Una invocación temporal (el Ojo de Kicillof, 2026-10-20, dueño: «al cumplirse el segundo turno, desaparece»): cuando se duerme (sus turnos
+   llegaron a 0), su token se borra del mapa. Lo hace la pantalla que maneja a su dueño (o el GM). */
+const temporalesBorrando = new Set();
+setInterval(() => {
+  if(typeof tokens === 'undefined' || !fbUsuario) return;
+  tokens.forEach((t, id) => {
+    if(t.tipo !== 'pj' || !String(t.fichaId || '').includes(SEP_INVOCACION) || temporalesBorrando.has(id)) return;
+    const r = (vinculo(t) || {}).resumen || {};
+    if(!r.temporal || !r.dormida) return;
+    const ficha = String(t.fichaId).split(SEP_INVOCACION)[0];
+    if(!soyGM && !(typeof bnManejo === 'function' && bnManejo(ficha))) return;
+    temporalesBorrando.add(id);
+    coleccionTokens().doc(id).delete().then(() => mesaLinea(`👁 ${nombreDe(t)} se desvanece: cumplió sus turnos`, 'recordatorio'))
+      .catch(err => { console.error('No se pudo sacar la invocación temporal:', err); temporalesBorrando.delete(id); });
+  });
+}, 1500);

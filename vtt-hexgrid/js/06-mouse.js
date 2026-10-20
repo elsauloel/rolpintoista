@@ -458,11 +458,12 @@ function extenderRuta(a, casilla){
   const i = ruta.findIndex(c => mismoHex(c, casilla));
   if(i >= 0){ ruta.length = i + 1; return false; }
   let chocado = false;
-  const tapan = a.marcador ? null : (a.tapan || (a.tapan = a.libre ? new Set() : celdasQueTapan(a.id)));   // los rivales (en combate, no con 🦶 Mover libre), una vez por arrastre
+  const eter = !a.marcador && etereoDe(tokens.get(a.id));   // 👁 etéreo: atraviesa personajes y Sólidos (no las paredes)
+  const tapan = a.marcador ? null : (a.tapan || (a.tapan = a.libre || eter ? new Set() : celdasQueTapan(a.id)));   // los rivales (en combate, no con 🦶 Mover libre), una vez por arrastre
   for(const c of lineaHex(ruta[ruta.length - 1], casilla)){
     const j = ruta.findIndex(x => mismoHex(x, c));
     if(j >= 0){ ruta.length = j + 1; continue; }
-    if(!a.marcador && (elementoSolidoEn(c.col, c.fila) || paredCorta(ruta[ruta.length - 1], c) || tapan.has(nbPack(c.col, c.fila)))){ chocado = true; break; }   // un Sólido, una pared de línea (js/34) o un rival
+    if(!a.marcador && ((eter ? muroEn(c.col, c.fila) : elementoSolidoEn(c.col, c.fila)) || paredCorta(ruta[ruta.length - 1], c) || tapan.has(nbPack(c.col, c.fila)))){ chocado = true; break; }   // un Sólido, una pared de línea (js/34) o un rival
     if(ruta.length >= RUTA_MAX_CELDAS) break;
     ruta.push(c);
   }
@@ -612,7 +613,7 @@ function rutaSoltada(a, t){
     }
   }
   // No se termina encima de nadie (dueño, 2026-10-12): en combate, si la última casilla tiene otro token a la vista, el movimiento queda antes.
-  if(!a.libre && a.movio && t && modoMapa === 'combate' && a.ruta.length > 1){
+  if(!a.libre && a.movio && t && modoMapa === 'combate' && a.ruta.length > 1 && !etereoDe(t)){   // (👁 un etéreo puede quedar encima de otro)
     const ocupada = c => [...tokens.entries()].find(([tid, x]) => tid !== a.id && x && x.col === c.col && x.fila === c.fila && !(x.oculto && !soyGM) && tokenVisiblePorNiebla(x) && !ocultoPorSigiloParaMi(x));
     const quien = ocupada(a.ruta[a.ruta.length - 1]);
     if(quien){
@@ -630,7 +631,7 @@ function rutaSoltada(a, t){
       visibles.set(a.id, {x: a.x, y: a.y});
       moverTokenLibre(a.id, fin.col, fin.fila);
     }
-  }else if(a.movio && t && pasos > 0 && a.ruta.slice(1).some((c, i) => elementoSolidoEn(c.col, c.fila) || paredCorta(a.ruta[i], c))){
+  }else if(a.movio && t && pasos > 0 && a.ruta.slice(1).some((c, i) => (etereoDe(t) ? muroEn(c.col, c.fila) : elementoSolidoEn(c.col, c.fila)) || paredCorta(a.ruta[i], c))){
     toast('Ese camino pasa por un obstáculo — no se puede confirmar así');
     visibles.delete(a.id);
   }else if(a.movio && t && pasos > 0){

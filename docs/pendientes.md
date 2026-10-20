@@ -50,6 +50,9 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
+> - [ ] **✨ Dispel Magic (2026-10-20, dueño, «anotar en el tintero»):** un efecto (habilidad o consumible, probablemente en área) que deshace la magia:
+>   lo único que podría afectar al Ojo de Kicillof (etéreo: nada más le hace nada). Falta definir qué disipa (invocaciones temporales, zonas, buffs mágicos,
+>   trampas mágicas…), con qué se tira y su costo.
 > - [ ] **🌦 Un sistema de climas (2026-10-19, dueño: «déjalo pendiente», diseño futuro):** que **cada día amanezca con un clima distinto**
 >   (encaja con el ⏳ Pasar de día, `vtt-hexgrid/js/41-dia.js`: la tarjeta «AMANESE QUE NO ES POCO» podría decir qué clima tocó). Ejemplos del dueño:
 >   **calor** → más daño de fuego, menos de hielo; **frío intenso** → al revés; **lluvia** → menos daño de fuego, más daño eléctrico y más

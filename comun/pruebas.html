@@ -2094,6 +2094,15 @@ prueba('🏹 la munición la decide el arma (2026-10-19): arco → una flecha, b
     res.every(r => r[0]), res.every(r => r[1]), res.every(r => r[2]), CombateFin.dropEsperado(cat, {tipoCriatura: 'bestia', nivel: 1, armaDeRango: true, armaNombre: 'Ballesta'}).venta > 0],
     ['flecha', 'virote', '', '', true, true, true, true]);
 });
+prueba('Crítico frecuente/potente y PdG de oportunidad/contraataque son bonos de regla, no stats de la Destreza (2026-10-20)', () => {
+  const sc = {id: 'k', nombre: 'K', des: 8, fue: 5, esp: 3, con: 8, agl: 9, estados: [], equipo: []};
+  const inv = {id: 'i', nombre: 'I', des: 6, equipo: [], estados: []};
+  const conBono = {...sc, estados: [{nombre: 'Ojo', activo: true, mods: [{stat: 'crit', val: 2}]}]};
+  igual([CreepCalculo.statValor(sc, 'crit'), CreepCalculo.statValor(sc, 'critpot'), CreepCalculo.statValor(conBono, 'crit'), InvCalculo.statValor(inv, 'crit'),
+    CreepCalculo.DERIVADOS_POR_ATTR.des.some(([id]) => id === 'crit'), InvCalculo.INV_DERIVADOS_POR_ATTR.des.some(d => d.id === 'crit'),
+    Combatiente.soloBonoTxt(id => ({crit: 2, critpot: 0, pdgopor: 1})[id] || 0), Combatiente.soloBonoTxt(() => 0)],
+    [0, 0, 2, 0, false, false, 'Bonos al crítico: frecuente +2 · PdG en oportunidad +1', '']);
+});
 prueba('🎲 el consumible al azar de un creep (2026-10-19): nace en el cinturón, se cambia sin acumular; si lo usa lo suelta seguro, si no con su chance; bestias nada, jefe dos', () => {
   const F = CombateFin, cat = CATALOGO_BASE.filter(i => i.tipoItem && !i.archivo).map(CreepCalculo.itemParaCreep);
   const sc = {id: 'z1', nombre: 'Bandido', tipoCriatura: 'humano', nivel: 3, fue: 6, cinturon: []};

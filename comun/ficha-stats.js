@@ -89,8 +89,9 @@ const FichaStats = (() => {
           ${descHtml}
         </div>
       </div>
-      <div class="derived" style="--dcols:${g.derived.length}">
-        ${g.derived.map(d => statTile(d, c)).join('')}
+      <div class="derived" style="--dcols:${g.derived.filter(d => !Combatiente.SOLO_BONO.includes(d.id)).length}">
+        ${g.derived.filter(d => !Combatiente.SOLO_BONO.includes(d.id)).map(d => statTile(d, c)).join('')}
+        ${g.id === 'des' && Combatiente.soloBonoTxt(id => c.final[id]) ? `<div class="hint" style="font-size:11px;grid-column:1/-1">${esc(Combatiente.soloBonoTxt(id => c.final[id]))}</div>` : ''}
         ${(abierto === g.id || g.derived.some(d=>d.id===abierto)) ? desglose(S, abierto, c) : ''}
       </div>
     </div>`;

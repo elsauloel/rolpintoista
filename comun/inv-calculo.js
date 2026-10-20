@@ -20,7 +20,7 @@ const InvCalculo = (() => {
   const ATTR_IDS_INV = ['con','fue','agl','des','esp'];
   // Stats secundarios de una invocación: los mismos que un PJ (GRUPOS),
   // salvo Hp.Max/No2 (ya se ven en las barras) y Crg.Max/SP/SP Regen (no aplican).
-  const INV_STAT_EXCLUIR = ['hpmax','nitros','crgmax','sp','spregen'];
+  const INV_STAT_EXCLUIR = ['hpmax','nitros','crgmax','sp','spregen', ...Combatiente.SOLO_BONO];   // (los bonos de regla no son stats secundarios, 2026-10-20)
   const INV_DERIVADOS_POR_ATTR = Object.fromEntries(GRUPOS.map(g => [g.id, g.derived.filter(d => !INV_STAT_EXCLUIR.includes(d.id))]));
   const INV_STAT_ATTR = Object.fromEntries(GRUPOS.flatMap(g => g.derived.map(d => [d.id, g.id])));
   // Mismo criterio que STATS_CON_TIRADA en la Botonera de la ficha: los 5
@@ -85,6 +85,7 @@ const InvCalculo = (() => {
     return (inv.estados || []).some(e => e.activo !== false && e[flag]);
   }
   function statValor(inv, statId){
+    if(Combatiente.SOLO_BONO.includes(statId)) return modTotal(inv, statId);   // bonos de regla: no salen de la Destreza (2026-10-20; antes el duelo se la sumaba al crítico)
     const attr = INV_STAT_ATTR[statId] || statId;
     let v = num(inv[attr]) + modTotal(inv, attr);
     if(statId !== attr) v += modTotal(inv, statId);

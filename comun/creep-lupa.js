@@ -126,7 +126,7 @@ const CreepLupa = (() => {
     return `<div class="derivados">${K.DERIVADOS_POR_ATTR[attr].map(([id, label]) => `
     <div class="derivado con-tip" data-deriv="${id}" data-tip="${esc(K.statOrigenTxt(sc, id, label))}">
       <span>${label}</span><b>${fmt(K.statValor(sc, id))}</b>
-    </div>`).join('')}</div>`;
+    </div>`).join('')}${attr === 'des' && Combatiente.soloBonoTxt(id => K.statValor(sc, id)) ? `<div class="hint" style="font-size:11px">${esc(Combatiente.soloBonoTxt(id => K.statValor(sc, id)))}</div>` : ''}</div>`;
   }
   function recompensasVerHtml(sc){
     const t = K.tipoDe(sc);

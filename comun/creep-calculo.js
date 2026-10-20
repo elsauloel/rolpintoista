@@ -182,7 +182,7 @@ const CreepCalculo = (() => {
     con: [['resmg', 'Res.Esp'], ['rescc', 'Res.CC']],
     fue: [['dmg', 'Dmg'], ['bloqueo', 'Bloqueo']],
     agl: [['eva', 'Eva'], ['ini', 'Iniciativa']],
-    des: [['rng', 'Rng'], ['pdg', 'PdG'], ['crit', 'Crít.Frec.'], ['critpot', 'Crít.Pot.'], ['parry', 'Parry'], ['percepcion', 'Percep.'], ['sigilo', 'Sigilo']],
+    des: [['rng', 'Rng'], ['pdg', 'PdG'], ['parry', 'Parry'], ['percepcion', 'Percep.'], ['sigilo', 'Sigilo']],   // (crit/critpot: bonos de regla, 2026-10-20)
     esp: [['pdgmg', 'PdG.Esp'], ['dmgesp', 'Ef.Esp'], ['resm', 'Res.Mt']],   // (el Rango de casteo se fue, 2026-10-07: el rango es de la Destreza)
   };
   const ATTR_NOMBRE = {con:'Constitución', fue:'Fuerza', agl:'Agilidad', des:'Destreza', esp:'Especial'};
@@ -209,6 +209,7 @@ const CreepCalculo = (() => {
   function statValor(sc, statId){
     const d = STAT_LOOKUP[statId];
     if(!d) return 0;
+    if(Combatiente.SOLO_BONO.includes(statId)) return modTotal(sc, statId);   // bonos de regla: no salen de la Destreza (2026-10-20)
     // Suma tanto lo que sube el atributo que lo gobierna (fue, des, etc.,
     // que arrastra a todos sus derivados) como lo que apunta directo al
     // derivado (p.ej. un ítem con "bloqueo +N" que no toca Fuerza). Para un

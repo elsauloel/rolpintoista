@@ -602,6 +602,8 @@ const Duelo = (() => {
     // Escudo (2026-09-28, pedido del dueño): un efecto de la habilidad puede dar una vida extra (Blindaje,
     // Barrera…) en vez de (o además de) un debuff — ver EstadosAplicar.BUFFS y el paso «Efectos» del 🎯.
     if(_num(s.escudoMagico)) o.escudoMagico = Math.max(0, Math.round(_num(s.escudoMagico)));
+    // 🔓 Cómo se suelta (2026-10-20, la Red Nerubian: Fuerza contra el Ef.Esp de quien la tiró, al empezar cada turno).
+    if(s.soltar && typeof Combatiente !== 'undefined' && Combatiente.soltarNorm(s.soltar)) o.soltar = Combatiente.soltarNorm(s.soltar);
     return o;
   }
   function limpiarEfectos(lista){

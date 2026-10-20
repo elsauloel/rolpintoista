@@ -261,7 +261,7 @@ function escucharIniciativa(){
     const cambioTurno = iniciativa.turno !== antesTurno || iniciativa.ronda !== antesRonda;
     if(cambioTurno) giroLibre.clear();   // avanzó el turno: acción de otro
     renderIniciativa();
-    if(iniciativaCargada && cambioTurno && iniciativa.orden.length) anunciarTurnoEnMapa();
+    if(iniciativaCargada && cambioTurno && iniciativa.orden.length){ anunciarTurnoEnMapa(); if(typeof soltarAlEmpezarRevisar === 'function') soltarAlEmpezarRevisar(); }   // 🔓 js/54
     iniciativaCargada = true;
   }, err => console.error('Error escuchando la iniciativa:', err));
 }

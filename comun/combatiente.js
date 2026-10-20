@@ -411,7 +411,8 @@ const Combatiente = (() => {
   function soltarNorm(s){
     if(!s || !s.stat || !(Number(s.dif) >= 1)) return null;
     const hunde = Math.max(0, Math.min(5, Math.round(Number(s.hunde) || 0)));   // arena movediza (dueño, 2026-10-04): si falla, se hunde más (+N turnos)
-    return {stat: String(s.stat), etq: String(s.etq || SOLTAR_ETQ[s.stat] || s.stat).slice(0, 20), dif: Math.round(Number(s.dif)), no2: Math.max(0, Math.round(Number(s.no2) || 0)), ...(hunde ? {hunde} : {})};
+    return {stat: String(s.stat), etq: String(s.etq || SOLTAR_ETQ[s.stat] || s.stat).slice(0, 20), dif: Math.round(Number(s.dif)), no2: Math.max(0, Math.round(Number(s.no2) || 0)), ...(hunde ? {hunde} : {}),
+      ...(s.alEmpezar ? {alEmpezar: true} : {})};   // 🔓 la tirada aparece sola al empezar su turno (2026-10-20, la Red Nerubian: vtt-hexgrid/js/54)
   }
   const estadoSoltable = estados => (estados || []).find(e => e && e.activo !== false && soltarNorm(e.soltar)) || null;
   const textoSoltarse = e => { const s = soltarNorm(e && e.soltar); return s ? `🔓 Soltarse · ${s.etq} contra ${s.dif} · ${s.no2} No2${s.hunde ? ` · si falla, se hunde: +${s.hunde} turno${s.hunde === 1 ? '' : 's'}` : ''}` : ''; };
@@ -1256,7 +1257,9 @@ const Combatiente = (() => {
     return (items || []).filter(i => i && i.alDanoEspecial && i.alDanoEspecial.nombre).slice(0, 3)
       .map(i => ({nombre: String(i.alDanoEspecial.nombre), turnos: Math.max(1, Math.round(nf(i.alDanoEspecial.turnos)) || 1), de: String(i.nombre || '').slice(0, 40)}));
   }
-  function efectoDeEjecucion(e){
+  // `valorDe(statId)` (2026-10-20): los stats de quien la usa — un estado que se suelta contra uno de ellos (`soltar.difStat`, la Red Nerubian:
+  // Fuerza contra tu Ef.Esp) lleva ese valor como dificultad.
+  function efectoDeEjecucion(e, valorDe){
     // «Pierde No2» (2026-10-02, Sonic Boom): el objetivo pierde `no2` (+ la diferencia entre las tiradas) No2; en 0, Sentado.
     // La purga (2026-10-07, Varita de la purga): le saca el estado malo más reciente (el mapa elige cuál: js/13 dueloAplicarEfecto).
     if(e && e.purga) return {nombre: 'Purga', caras: 1, exitos: 1, spec: null, purga: true, detalle: 'Le saca el estado malo más reciente.'};
@@ -1268,7 +1271,8 @@ const Combatiente = (() => {
       ...(nf(e.vuela) > 0 ? {vuela: Math.round(nf(e.vuela))} : {}),
       ...(nf(e.empuja) > 0 ? {empuja: Math.round(nf(e.empuja))} : {}),   // lo empuja N casillas, lejos de quien la usa (2026-10-08, ráfaga helada, vendaval)   // el arma vuela N casillas (el Desarmado de la Varita del desarme, 2026-10-07)
       spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: nf(e.val)}] : e.mods,
-        polaridad: e.stat ? (nf(e.val) >= 0 ? 'buff' : 'debuff') : (e.escudo ? 'buff' : undefined), hp: e.hp, stacks: e.stacks, escudoMagico: e.escudo},
+        polaridad: e.stat ? (nf(e.val) >= 0 ? 'buff' : 'debuff') : (e.escudo ? 'buff' : undefined), hp: e.hp, stacks: e.stacks, escudoMagico: e.escudo,
+        ...(e.soltar ? {soltar: {...e.soltar, ...(e.soltar.difStat && typeof valorDe === 'function' && Number.isFinite(Number(valorDe(e.soltar.difStat))) ? {dif: Math.max(1, Math.round(Number(valorDe(e.soltar.difStat))))} : {})}} : {})},
       ...(() => { const t = curaTirada(e.cura); return t ? {cura: t.cura, detalle: `${e.detalle ? e.detalle + ' ' : ''}Cura ${t.formula}: ${t.rolls.length ? '[' + t.rolls.join(', ') + '] = ' : ''}${t.cura}.`.slice(0, 200)} : {cura: nf(e.cura), detalle: e.detalle || ''}; })()};
   }
   /* Lo que el cuadro del duelo necesita para una habilidad dirigida ✨ (y las de área, onda y zona), o null si la
@@ -1303,7 +1307,7 @@ const Combatiente = (() => {
         ...(c.trueDamage ? {trueDamage: true} : c.danoDirecto && tipo !== 'fisico' ? {directo: true} : {}),
         ...(nf(c.danoMult) > 1 ? {mult: nf(c.danoMult)} : {}), ...(porDanoNorm(c.porDano) ? {porDano: porDanoNorm(c.porDano)} : {}), ...(c.carga ? {carga: String(c.carga)} : {}),   // ✨ Carga Elemental (2026-10-13)
         ...(c.danoDiferencia ? {diferencia: true} : {}), ...(c.drena ? {drena: true, drenaTope: Math.max(0, nf(c.drenaTope)), ...(nf(c.drenaPct) > 0 && nf(c.drenaPct) < 100 ? {drenaPct: Math.round(nf(c.drenaPct))} : {})} : {})} : null,   // drenaPct: cura solo ese % (2026-10-07, la Sanguijuela)
-      efectos: (c.efectos || []).map(e => efectoDeEjecucion(conX && e && e.stacks === 'X' ? {...e, stacks: Math.max(1, Math.round(X))} : e)),   // stacks «X» (Apuntar, 2026-10-11)
+      efectos: (c.efectos || []).map(e => efectoDeEjecucion(conX && e && e.stacks === 'X' ? {...e, stacks: Math.max(1, Math.round(X))} : e, o.stat)),   // stacks «X» (Apuntar, 2026-10-11)
       ...(c.objetivo === 'area' || c.objetivo === 'onda' ? {radio: nf(c.radio)} : {}),
       // El centro del área, a `centroAlcance` casillas o menos de quien la usa (2026-10-13, Golpe al piso del Capataz kobold: «le pega al
       // casillero enfrente suyo y hace daño en flor alrededor de donde golpea»; si golpea a alguien, alrededor de él).

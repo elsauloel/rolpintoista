@@ -918,11 +918,13 @@ prueba('Drops fijos (2026-10-14, la Grapa del capataz): el creep los suelta siem
     garrote.ahorroNitros, garrote.mods, Combatiente.rasgosDeItem(garrote).ahorroNitros],
     [['Grapa del capataz', 'No existe'], true, true, [{stat: 'pdg', val: 2}, {stat: 'dmg', val: 2}], false, true, 1, [{stat: 'parry', val: 1}], 1]);
 });
-prueba('📜 Un consumible con Ejecución (2026-10-20, la Red Nerubian): arma una habilidad automática de un uso; rival en tu Rango, Fuerza contra Ef.Esp, Inmovilizado 2', () => {
+prueba('📜 Un consumible con Ejecución (2026-10-20, la Red Nerubian): habilidad automática de un uso; PdG.Esp contra Evasión en tu Rango; Inmovilizado hasta 3, se suelta al empezar el turno con Fuerza contra tu Ef.Esp', () => {
   const red = CATALOGO_BASE.find(i => i.nombre === 'Pergamino de red Nerubian');
   const h = Combatiente.habDeConsumible(red), e = Combatiente.habEjecucion(h, h.duelo, {stat: id => ({rng: 6, dmgesp: 3})[id] || 0});
-  igual([h.modo, h.tiradaStat, red.precioCompra, e.objetivo, e.alcance, e.contra.map(x => x.stat || x), e.efectos.map(x => x.nombre + ':' + (x.spec && x.spec.turnos)), Combatiente.habDeConsumible({nombre: 'Poción'})],
-    ['auto', 'dmgesp', 50, 'enemigo', 6, ['fue'], ['Inmovilizado:2'], null]);
+  const sol = e.efectos[0].spec.soltar;
+  igual([h.modo, h.tiradaStat, red.precioCompra, e.objetivo, e.alcance, e.contra.map(x => x.stat || x), e.efectos.map(x => x.nombre + ':' + (x.spec && x.spec.turnos)), Combatiente.habDeConsumible({nombre: 'Poción'}),
+    [sol.stat, sol.dif, Combatiente.soltarNorm(sol).alEmpezar]],
+    ['auto', 'pdgmg', 50, 'enemigo', 6, ['eva'], ['Inmovilizado:3'], null, ['fue', 3, true]]);
 });
 prueba('🎲 Volver a tirar el consumible al azar antes de publicar (2026-10-14)', () => {
   const sc = {id: 'j', nombre: 'Jefe', nivel: 3, jefe: true, tipoCriatura: 'humanoide'};

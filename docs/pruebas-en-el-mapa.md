@@ -9,11 +9,8 @@
 > capturas. Al probar algo: pasarlo a «Probado» con fecha, qué se vio y si hubo que arreglar algo.
 
 ## Pendientes
-- [ ] **🔥 Llama de Fénix** (2026-10-20, el Elixir de Fénix): un personaje toma el elixir y recibe un golpe que lo deja en 0 → revive con toda la
-  vida y todo el SP, Titilando; lo mismo un creep (con el estado puesto por el GM) → cartel «renace de sus cenizas» en la Crónica. Cubierto por las
-  pruebas automáticas, no en el mapa.
-- [ ] **🧪 Escudos de poción** (2026-10-20): tomar una Poción de Cuero Duro (15, solo físico) y recibir un golpe con arma (lo absorbe) y uno de
-  daño especial (no lo toca); la del Mal de Ojo al revés; al gastarse, el estado se va; al pasar el día, también. Cubierto por las pruebas automáticas.
+- [x] **🔥 Llama de Fénix** — probado en el mapa el 2026-10-20: Aurelia tomó el elixir desde su Botonera; un golpe de 100 del GM la levantó en el mismo golpe con toda la vida (50) y el SP lleno, Titilando, con el cartel «renace de sus cenizas»; un creep con la llama, igual (5/5).
+- [x] **🧪 Escudos de poción** — probado en el mapa el 2026-10-20: Aurelia tomó la Poción de Cuero Duro (15); un golpe físico de 8 del GM lo absorbió entero (escudo 15 → 7, vida 50) y uno especial de 6 fue a la vida (50 → 44).
 - [ ] **😵 Mareo de invocación nuevo** (2026-10-20, dueño: «tiene nitros, pero no puede usarlos en su turno»): con el orden de turnos armado,
   invocar algo → entra con el Mareo y sus No2 enteros; en su turno, mover/atacar/habilidad muestra el cartel «recién llega: está mareada» (con
   «Hacerlo igual»); Parry y Bloqueo desde su Botonera pasan; en el duelo puede hacer dodge roll. Las pruebas automáticas cubren el estado, no el cartel.

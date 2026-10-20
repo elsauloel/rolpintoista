@@ -2640,7 +2640,7 @@ prueba('luces (2026-10-08): el farol Común ilumina 1 turno y marca 2 (no revela
   const beng = cat('nuevo-bengala'), estelar = cat('nuevo-bengala-estelar');
   const mareo = ESTADOS_PRESET.find(p => p.nombre === 'Mareo de invocación');
   // (2026-10-20, dueño): el Mareo no toca los No2 (ya no `forzarNitros: 0`); solo marca `mareado`.
-  igual([mareo.forzarNitros, mareo.mareado, Combatiente.mareado([{nombre: 'Mareo de invocación', activo: true, mareado: true}]), Combatiente.mareado([]), Combatiente.nitrosMax(6, [{nombre: 'Mareo de invocación', activo: true, mareado: true}])], [undefined, true, true, false, 6]);
+  igual([mareo.forzarNitros, mareo.mareado, Combatiente.mareado([{nombre: 'Mareo de invocación', activo: true, mareado: true}]), Combatiente.mareado([]), Combatiente.nitrosMax(6, [{nombre: 'Mareo de invocación', activo: true, mareado: true}]), Combatiente.mareado([{nombre: 'Mareo de invocación'}])], [undefined, true, true, false, 6, true]);
   igual([farol.radio, farol.zonaTurnos, farol.zonaEstado.turnos, !!farol.zonaEstado.revela, flot.radio, flot.zonaTurnos, flot.zonaEstado.turnos, flot.zonaEstado.revela, cat('esp-buena-varita-de-la-luz-flotante').especial.sp,
          beng.consumible, beng.zonaUso.zonaLuz, beng.zonaUso.zonaEstado.turnos, estelar.zonaUso.zonaEstado.revela, estelar.tier, !!mareo.soloSistema, !!EstadosAplicar.presetPorNombre ? !!EstadosAplicar.presetPorNombre('Mareo de invocación') : true],
     [1, 1, 2, false, 1, 2, 3, true, 2, true, true, 2, true, 'Buena Calidad', true, true]);

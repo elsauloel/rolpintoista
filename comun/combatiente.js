@@ -69,8 +69,9 @@ const Combatiente = (() => {
   // Stun (dueño, 2026-10-06): no puede hacer nada; si lo atacan, su Evasión es 1. Un estado viejo sin la marca `stun` se reconoce por el nombre.
   const esStun = e => !!e && e.activo !== false && (!!e.stun || /^stun$/i.test(String(e.nombre || '').trim()));
   const stuneado = estados => (estados || []).some(esStun);
-  // Mareo de invocación (2026-10-20): no actúa en su turno, pero conserva los No2 y reacciona (dodge roll, Parry).
-  const mareado = estados => (estados || []).some(e => !!e && e.activo !== false && !!e.mareado);
+  // Mareo de invocación (2026-10-20): no actúa en su turno, pero conserva los No2 y reacciona (dodge roll, Parry). Lo que publica una ficha de sus
+  // invocaciones no trae la marca: se reconoce también por el nombre (probado en el mapa).
+  const mareado = estados => (estados || []).some(e => !!e && e.activo !== false && (!!e.mareado || /^mareo de invocaci[oó]n$/i.test(String(e.nombre || '').trim())));
   function tirarStat(valor, estados, statId, o){
     o = o || {};
     if(statId === 'eva' && stuneado(estados))   // stuneado: la Evasión es 1, sin tirar

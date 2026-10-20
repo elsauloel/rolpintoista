@@ -93,6 +93,9 @@ const FichaHabilidades = (() => {
     const nuevo = {id: uid(), nombre, imagen: '', turnos, stacks, hpturno, stacksturno: 0, permanente, activo: true,
       popup: false, detalle, mods, ...categorias};
     if(n(nuevo.escudoMagico) > 0) nuevo.escudoMagicoActual = n(nuevo.escudoMagico);
+    // 📜 Hasta el fin del combate (dueño, 2026-10-19, los pergaminos): no vence por turnos y se va solo con «Finalizar combate» (vtt-hexgrid/js/25).
+    if(src.efectoFinCombate) nuevo.finCombate = true;
+    if(src.efectoRecarga) nuevo.recarga = true;   // un escudo que se renueva cada turno
     const r = Combatiente.agregarEstado(S.efectos, nuevo);
     if(!r.ok) return {ok: false, motivo: r.motivo, nombre};
     // Lo que se dispara (regeneración, veneno…) pega apenas se lo pone (2026-10-06, P161).

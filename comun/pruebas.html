@@ -1220,6 +1220,18 @@ prueba('aplicarEfectoDeConsumo arma el estado con las marcas del preset (Veneno,
   const r = FichaHabilidades.aplicarEfectoDeConsumo(S, {nombre: 'Daga', efectoNombre: 'Veneno', efectoHpTurno: -2, efectoStacks: 3, efectoTurnos: 0}, presetsDePrueba);
   igual([r.ok, r.estado.nombre, r.estado.hpturno, r.estado.stacks, r.estado.esVeneno], [true, 'Veneno', -2, 3, true]);
 });
+prueba('📜 los pergaminos (2026-10-19): «hasta el fin del combate» lleva la marca y se va al descansar; los de grupo, 3 turnos con su estado real', () => {
+  const cat = n => CATALOGO_BASE.find(i => i.nombre === n);
+  const S = {catalogo: [], efectos: []};
+  const furia = FichaHabilidades.aplicarEfectoDeConsumo(S, cat('Pergamino de Furia de Combate'), presetsDePrueba);
+  const fortuna = FichaHabilidades.aplicarEfectoDeConsumo(S, cat('Pergamino de Buena Fortuna'), presetsDePrueba);
+  const pocion = FichaHabilidades.aplicarEfectoDeConsumo(S, cat('Poción de Inmunidad a CC'), presetsDePrueba);
+  const velo = cat('Pergamino del Velo Eterno').efectoMods.map(m => m.stat).join(',');
+  const archivados = ['Pergamino de Piernas de Viento', 'Pergamino de Ojo del Verdugo superior'].map(n => !!cat(n).archivo);
+  igual([furia.estado.finCombate, furia.estado.permanente, fortuna.estado.afortunado, fortuna.estado.turnos, fortuna.estado.permanente, !!cat('Pergamino de Buena Fortuna').efectoParty,
+    pocion.estado.inmunidadCC, velo, archivados, cat('Pergamino de Ímpetu').efectoMods[0].stat, /crafteo/.test(cat('Pergamino de ventriloquía').detalle)],
+    [true, true, true, 3, false, true, true, 'def,armadmg,eva', [true, true], 'nitros', false]);
+});
 prueba('Invulnerable activo bloquea un debuff del consumo (y lo dice)', () => {
   const S = {catalogo: [], efectos: [{nombre: 'Invulnerable', activo: true, invulnerable: true}]};
   const r = FichaHabilidades.aplicarEfectoDeConsumo(S, {efectoNombre: 'Veneno', efectoHpTurno: -2}, presetsDePrueba);

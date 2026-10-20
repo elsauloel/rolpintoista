@@ -145,6 +145,41 @@ setInterval(() => {
    cada combate (no saca la Armadura rota). Por turno sería casi indestructible; quizás más adelante, un pulso intermedio. Lo hace la pantalla que
    maneja a cada personaje, al ver que el mapa sale del modo combate. */
 // La Polilla mística que no se usó (dueño, 2026-10-08): al terminar el combate se va y deja su valor en despojos (un cuarto de su precio).
+/* 📜 Lo que un consumible le da a todo el grupo (dueño, 2026-10-19: Buena Fortuna, Inmunidad a CC y Blindaje, «3 turnos, pero a todo el
+   party»): quien lo usa ya lo tiene; a cada aliado de este mapa (personajes e invocaciones) le llega el mismo estado por el aviso de siempre
+   (`EstadosAplicar.encolarPj`: lo aplica la pantalla que lo maneja). */
+async function bnEfectoAlGrupo(fichaId, estado, it){
+  const spec = {nombre: String(it.efectoPreset || estado.nombre || '').trim(), turnos: num(it.efectoTurnos) || num(estado.turnos) || 3};
+  if(!spec.nombre) return;
+  const vistos = new Set([String(fichaId)]), nombres = [];
+  for(const [, t] of tokens){
+    if(!t || t.tipo !== 'pj' || !t.fichaId || vistos.has(String(t.fichaId)) || !t.duenoUid) continue;
+    vistos.add(String(t.fichaId));
+    try{ await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec, origen: it.nombre}); nombres.push(nombreDe(t)); }
+    catch(err){ console.error('No se pudo pasar el estado a un aliado:', err); }
+  }
+  toast(nombres.length ? `📜 ${it.nombre}: también a ${nombres.join(', ')}` : `📜 ${it.nombre}: no hay aliados en el mapa`);
+  if(nombres.length && typeof mesaLinea === 'function') mesaLinea(`📜 ${it.nombre}: ${spec.nombre} ${spec.turnos} turnos también a ${nombres.join(', ')}`);
+}
+// 📜 «Hasta el fin del combate» (dueño, 2026-10-19): los pergaminos de todo el combate se van al «Finalizar combate» (también los viejos, por el nombre).
+const finDelCombate = e => !!e && (e.finCombate || (e.permanente && /\(pergamino\)\s*$/i.test(String(e.nombre || ''))));
+async function pergaminosAlTerminar(){
+  for(const [, t] of tokens){
+    if(!t || t.tipo !== 'pj' || !t.fichaId || String(t.fichaId).includes(SEP_INVOCACION)) continue;
+    if(typeof bnManejo !== 'function' || !bnManejo(t.fichaId)) continue;
+    let fuera = [];
+    try{
+      await editarPersonajeMapa(t.fichaId, S => {
+        const q = (S.efectos || []).filter(finDelCombate);
+        if(!q.length) return false;
+        fuera = q.map(e => e.nombre);
+        S.efectos = S.efectos.filter(e => !q.includes(e));
+        return true;
+      });
+    }catch(err){ console.error('No se pudieron sacar los pergaminos:', err); }
+    if(fuera.length) momentoAbrir({tipo: 'pergaminos', icono: '📜', titulo: `${nombreDe(t)}: terminó lo de sus pergaminos`, estado: 'listo', resultado: fuera.join(', ')});
+  }
+}
 async function polillaAlTerminar(){
   for(const [, t] of tokens){
     if(!t || t.tipo !== 'pj' || !t.fichaId || String(t.fichaId).includes(SEP_INVOCACION)) continue;
@@ -342,6 +377,7 @@ function finCombateMomento(id){
     try{ await autoRepararAlTerminar(); }catch(err){ console.error('Fin del combate (reparación):', err); }
     try{ await cueroTrollAlTerminar(); }catch(err){ console.error('Fin del combate (cuero de troll):', err); }
     try{ await polillaAlTerminar(); }catch(err){ console.error('Fin del combate (Polilla):', err); }
+    try{ await pergaminosAlTerminar(); }catch(err){ console.error('Fin del combate (pergaminos):', err); }
     try{ if(typeof desarmarAlTerminar === 'function') await desarmarAlTerminar(true); }catch(err){ console.error('Fin del combate (trampas):', err); }
   })().finally(() => { finCombateEnCurso = null; });
 }

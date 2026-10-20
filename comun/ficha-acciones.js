@@ -368,6 +368,12 @@ const FichaAcciones = (() => {
         else if(num(it.curahp) > 0) ui.toast(`${it.nombre}: ${Combatiente.CAIDO_TXT}`);
       }
       const efecto = ui.efecto(it);
+      // 📜 A todo el grupo (dueño, 2026-10-19: Buena Fortuna, Inmunidad a CC, Blindaje): el mismo estado a los aliados (el mapa los conoce).
+      const cfgEf = FichaHabilidades.configEfectoDe(S, it);
+      if(efecto && cfgEf && cfgEf.efectoParty){
+        if(ui.alGrupo) ui.alGrupo(efecto, cfgEf);
+        else ui.toast(`${it.nombre}: ✋ a tus aliados, a mano (desde el mapa les llega solo)`);
+      }
       // Cura estados por grupo (P180): Vendas, Antídoto, Té de tilo, Sales aromáticas, Ungüento de la Turca, Mate cebado; el Cura Plus, todos.
       const curados = Combatiente.curaDeItem(it).length ? Combatiente.curarEstados(S.efectos, Combatiente.curaDeItem(it)) : null;
       if(curados && curados.sacados.length) S.efectos = curados.quedan;

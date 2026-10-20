@@ -1,7 +1,17 @@
 # Auditoría de los pergaminos (2026-10-19)
 
 > Pedido del dueño: «los pergaminos los creé hace siglos: pegate una auditada a ver qué te parecen, si hay algo muy fuera de lugar en
-> cuanto a balance y efecto». Hoja de trabajo: lo que hay, lo que está fuera de lugar y las preguntas (P211). Nada se cambió todavía.
+> cuanto a balance y efecto». Hoja de trabajo: lo que hay, lo que está fuera de lugar y las preguntas (P211).
+
+**Decidido y hecho (dueño, 2026-10-19):** (1) los de «todo el combate» se van solos al «Finalizar combate» (`efectoFinCombate` → estado
+`finCombate`; js/25 `pergaminosAlTerminar`; el descanso también los saca). (2) Una sola familia de No2: Ímpetu +1 Rara 200, +2 Excepcional 400
+(stat `nitros`); Piernas de Viento, archivados. (3) Ojo del Verdugo, tope +2 (+1 Rara 120, +2 Excepcional 180; el +3 archivado). (4) Buena
+Fortuna, Inmunidad a CC y Blindaje: 3 turnos **a todo el grupo** (`efectoParty`: el mapa se lo pasa a los aliados, js/25 `bnEfectoAlGrupo`).
+(7) Velo Eterno: Defensa especial +5 en vez de Res.Esp. Los seis «de crafteo»: sin el texto del crafteo; sombras, ventriloquía y tentáculo,
+✋ a mano. **De paso:** cinco pergaminos y cinco pociones (Buena Fortuna, Blindaje, Inmunidad a CC, Escudo Especial, Sangre Pura,
+Invulnerabilidad) ponían un estado con nombre propio sin su mecánica (no daban ventaja ni inmunidad): ahora llevan `efectoPreset`.
+**Pendiente:** Regeneración y Escudo Especial (el dueño propone +5 que se recarga cada turno), el ojo de Kicillof como invocación de 3 turnos
+(Movimiento 5, invisible, sin mareo; solo revela y despeja) y automatizar la red y la luz cegadora; ¿algún pergamino Común?
 
 ## Lo que hay
 

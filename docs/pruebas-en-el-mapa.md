@@ -31,6 +31,9 @@
 - [x] **👁 El Ojo de Kicillof etéreo** (2026-10-20): invocado dentro del Rango y a la vista (fuera de rango o donde no ve, no deja). En combate,
   arrastrado por encima de una trampa y dentro de una zona, al lado de un creep: la trampa no se disparó, la zona no le hizo nada, nadie le pegó
   de oportunidad; pagó 4 No2 por 4 casillas.
+- [x] **👻 El estado Etéreo** (2026-10-20): Silvia con Etéreo, en combate: el creep, al atacar, no la resalta y al hacerle clic «👁 Es etéreo: no se
+  le puede hacer nada» (sí resalta a Xeena); Silvia, al tocar Atacar en su Botonera, «Silvia Suller está etéreo · Solo puede observar» con
+  «Entendido» y «Hacerlo igual».
 - [ ] **🃏 Wildcards en el duelo y en el mapa de un jugador** (2026-10-15): desde una cuenta de jugador con wildcards, (1) la cartita 🃏 arriba, en la
   fila de los lentes, girando; (2) en un duelo, después de tirar PdG/Evasión, aparecen «🃏 Wildcard» y «🪙 Moneda» lado a lado (o solo la carta) y
   reabrir con la carta descuenta 1. (Probado ya: el descanso del GM y la ventana de la ficha, ver «Probado».)

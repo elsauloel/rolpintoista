@@ -467,16 +467,6 @@ Se ve como una barra 🛡 sobre tu token.
 
 
 +++
-
-titulo: Invulnerable
-
-alias: [Inmunidad, Blindado, Inmunidad a CC, Inmune]
-
-tags: [estado]
-
-estado: borrador
-
-+++
 titulo: Maldito
 alias: [Maldición de la sangre, Maldición]
 tags: [estado, debuff, sp]
@@ -489,6 +479,33 @@ estado: confirmado
 - A un creep no le hace nada: los creeps no usan SP.
 
 ⚙ Automatizado.
+
++++
+titulo: Etéreo
+alias: [Etérea, Etereo]
+tags: [estado, buff, mapa]
+estado: confirmado
++++
+**Etéreo** (dueño, 2026-10-20): quien lo tiene **solo observa** hasta que se le va el estado.
+
+- **Nadie le puede hacer nada**: no es objetivo de ataques, habilidades, áreas ni del salto del rayo (tampoco de los aliados: no se lo cura ni se lo bufea).
+- **Él tampoco actúa**: no ataca ni usa habilidades o consumibles. Si lo intenta, el mapa avisa y deja «Hacerlo igual» (lo decide la mesa).
+- **Puede moverse**, y atraviesa todo: personajes, objetos sólidos y paredes. No pisa trampas ni zonas, y no da ni recibe ataques de oportunidad.
+- Todos lo ven, medio transparente.
+
+Lo lleva puesto el **Ojo de Kicillof** (pergamino y habilidad del Support). Lo único que podría afectarlo sería una Disipación de magia, que todavía no existe.
+
+⚙ Automatizado en el mapa.
+
++++
+
+titulo: Invulnerable
+
+alias: [Inmunidad, Blindado, Inmunidad a CC, Inmune]
+
+tags: [estado]
+
+estado: borrador
 
 +++
 

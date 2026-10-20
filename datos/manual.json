@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-10-17T17:56:47Z",
+ "actualizado": "2026-10-20T18:52:32Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -1289,6 +1289,38 @@
    "cuerpo": "Estado que funciona como una **barra de HP secundaria**: absorbe el daño que fuera a recibir —incluso el daño verdadero— **antes de que te toque el HP**.\n\n\n\n| Estado | Cuánto absorbe | Duración |\n\n|---|---|---|\n\n| **Escudo mágico** | 10 (editable) | 3 turnos; se **recarga entero en cada Mantenimiento** mientras dure |\n\n| **Barrera** (el *Blindaje* del [[Tanque]]) | 8 | Hasta el próximo Mantenimiento; si el golpe es mayor, **el resto entra normal** |\n\n\n\nSe ve como una barra 🛡 sobre tu token."
   },
   {
+   "id": "maldito",
+   "titulo": "Maldito",
+   "alias": [
+    "Maldición de la sangre",
+    "Maldición"
+   ],
+   "tags": [
+    "estado",
+    "debuff",
+    "sp"
+   ],
+   "estado": "confirmado",
+   "capitulo": "estados",
+   "cuerpo": "**Maldito** es un debuff de 2 turnos (lo pone la **Maldición de la sangre** del Kobold maldiciente): **cada punto de SP que gastes te saca 1 de vida**, directo, **en el momento de pagar**, antes de que salga el efecto. Puede dejarte caído.\n\n- Antes de pagar te aparece un aviso: «Estás Maldito: usar tal cosa cuesta N SP y te va a bajar N de vida (de A a B)», con **Aceptar** o **Cancelar**. Si cancelás, no se cobra nada.\n- Vale para todo lo que pagás con SP: habilidades (también las de costo X, como Drenar Vida), armas especiales, Flash, Carga Elemental, Empower y Re-roll.\n- A un creep no le hace nada: los creeps no usan SP.\n\n⚙ Automatizado."
+  },
+  {
+   "id": "etereo",
+   "titulo": "Etéreo",
+   "alias": [
+    "Etérea",
+    "Etereo"
+   ],
+   "tags": [
+    "estado",
+    "buff",
+    "mapa"
+   ],
+   "estado": "confirmado",
+   "capitulo": "estados",
+   "cuerpo": "**Etéreo** (dueño, 2026-10-20): quien lo tiene **solo observa** hasta que se le va el estado.\n\n- **Nadie le puede hacer nada**: no es objetivo de ataques, habilidades, áreas ni del salto del rayo (tampoco de los aliados: no se lo cura ni se lo bufea).\n- **Él tampoco actúa**: no ataca ni usa habilidades o consumibles. Si lo intenta, el mapa avisa y deja «Hacerlo igual» (lo decide la mesa).\n- **Puede moverse**, y atraviesa todo: personajes, objetos sólidos y paredes. No pisa trampas ni zonas, y no da ni recibe ataques de oportunidad.\n- Todos lo ven, medio transparente.\n\nLo lleva puesto el **Ojo de Kicillof** (pergamino y habilidad del Support). Lo único que podría afectarlo sería una Disipación de magia, que todavía no existe.\n\n⚙ Automatizado en el mapa."
+  },
+  {
    "id": "invulnerable",
    "titulo": "Invulnerable",
    "alias": [
@@ -1302,7 +1334,7 @@
    ],
    "estado": "borrador",
    "capitulo": "estados",
-   "cuerpo": "titulo: Maldito\nalias: [Maldición de la sangre, Maldición]\ntags: [estado, debuff, sp]\nestado: confirmado"
+   "cuerpo": "**Invulnerable** es un buff: **no recibís daño de ninguna fuente** (golpes, veneno, sangrado…) y no te pueden aplicar ningún debuff.\n\n\n\nParientes más limitados:\n\n- **Blindado:** inmune a [[Golpe crítico|golpes críticos]]. **A mano**: la herramienta solo recuerda que está activo y cuántos turnos dura; el que lleva la mesa anula el crítico.\n\n- **Espinas:** devuelven al atacante **1/4 (25 %) del daño crudo** de cada golpe **cuerpo a cuerpo** (antes de Defensa y escudos, redondeado hacia arriba, directo a la vida). Solo el daño físico. ⚙ El duelo lo aplica solo.\n- **Espejo** (la pareja de las Espinas, 2026-10-07): devuelve al que lo tiró **1/4 del daño especial** que recibís (varita, báculo, habilidad o el daño elemental de un arma), **a cualquier distancia** y también en un área; antes de la Defensa especial, redondeado hacia arriba, directo a la vida. Las zonas que quedan en el piso y los saltos del rayo no cuentan. ⚙ El duelo lo aplica solo.\n\n- **Inmunidad a CC:** inmune a los estados de control: [[Stun]], Exhausto, [[Inmovilizado]], Rengo, Lisiado y Pajaritos (Veneno y Sangrado no cuentan como control).\n\n- **Sangre pura:** inmune a [[Veneno]]. **Coagulación extrema:** inmune a [[Sangrado]].\n\n\n\n> [!info] Inmunidades sin mecanismo\n\n> Algunos ítems dicen \"inmunidad a X\" pero **casi todos son un recordatorio**: el jugador y el GM lo tienen en cuenta a mano. Solo unos pocos están cableados a un estado real."
   },
   {
    "id": "vuela",

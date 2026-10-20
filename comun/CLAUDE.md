@@ -1664,4 +1664,9 @@ versión parecida en más de una, es candidato a juntar.
 - **👁 Un consumible que invoca por un rato** (2026-10-20, el Ojo de Kicillof): `it.invocaTemporal = {id, nombre, turnos, mov, vision, color, imagen}` →
   `FichaAcciones` (invocarTemporal) crea o despierta esa invocación (siempre la misma `id`) con `ojo` (visión en flor para todos lados), `veoculto`,
   `etereo` (se ve, pero no es objetivo de nada, no pisa trampas o zonas y atraviesa todo, también las paredes: el mapa, `etereoDe`, js/03 y js/06) y `sinMareo`; el mapa pide dónde aparece
-  (`ui.invocar` → `invocacionDeHabilidad`). Su `miniatura` viaja en el resumen público.
+  (`ui.invocar` → `invocacionDeHabilidad`). Su `miniatura` viaja en el resumen público. Aparece en una casilla dentro del Rango de quien lo invoca y
+  que esa persona vea (`lugar: 'rango'`).
+- **👻 Etéreo, el estado** (2026-10-20, dueño, P213: «no puede atacar ni puede ser atacado; solamente puede observar»): preset `Etéreo` (`etereo: true`,
+  2 turnos) y `Combatiente.etereo(estados)` (por la marca o el nombre). El mapa (`etereoDe`, js/03) lo mira en lo público de cualquiera (personaje,
+  invocación, creep) además de la marca del Ojo; el freno de actuar es el de Stun y Mareo (`stunAntes`, js/20: `o.mover` deja moverse). El Ojo de
+  Kicillof lo lleva puesto (permanente: se va con el ojo).

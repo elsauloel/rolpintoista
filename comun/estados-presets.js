@@ -157,8 +157,9 @@ const ESTADOS_PRESET = [
   // Marcado (2026-10-05, Varita del rastreador y Varita de la luz): se resiste con Res.Esp (lo tira quien la usa: PdG.Esp contra Res.Esp).
   // Mareo de invocación (2026-10-06, dueño): una invocación nueva entra al final del orden de turnos y su primer turno no hace nada.
   // `soloSistema` (2026-10-08, dueño): no aparece en los menús para elegir un estado (solo lo pone el mapa a una invocación recién llegada).
-  {nombre:'Mareo de invocación', polaridad:'debuff', turnos:1, forzarNitros:0, soloSistema:true,
-    detalle:'Recién invocada: en su primer turno no puede hacer nada (sin No2). ⚙ Automatizado: se lo pone el mapa al sumarla al orden de turnos.'},
+  // (dueño, 2026-10-20: «no es que no tiene nitros»: tiene sus No2 y puede reaccionar —dodge roll, Parry, Evasión—; lo que no puede es actuar en su turno.)
+  {nombre:'Mareo de invocación', polaridad:'debuff', turnos:1, mareado:true, soloSistema:true,
+    detalle:'Recién invocada: en su primer turno no puede actuar (ni moverse, ni atacar, ni usar habilidades o consumibles). Tiene sus No2 y sí puede reaccionar: dodge roll, Parry, Evasión. ⚙ Automatizado: se lo pone el mapa al sumarla al orden de turnos y le frena las acciones de su turno (la mesa puede dejarlas pasar).'},
   // Inamovible (2026-10-06, dueño: «el buff tiene que existir; la armadura simplemente te lo aplica»): la chance de no moverse, en 100 %.
   {nombre:'Inamovible', polaridad:'buff', turnos:2, mods:[{stat:'inamovible', val:100}],
     detalle:'No lo pueden empujar ni atraer (ganchos, muros que empujan, portales). ⚙ Automatizado: el mapa no lo mueve.'},

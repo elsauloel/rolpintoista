@@ -565,7 +565,7 @@ function acCrear(){
       return;
     }
     // Confusión (2026-10-04, js/20): la primera acción del turno tira antes.
-    if(stunEsAccion(b)){ const tid = confusionTokenDe(ac.creepId, 'creep'); if(stunAntes(tid, () => stunReclic(raiz, b, tid))) return; }   // Stun (2026-10-06)
+    if(stunEsAccion(b)){ const tid = confusionTokenDe(ac.creepId, 'creep'); if(stunAntes(tid, () => stunReclic(raiz, b, tid), {reaccion: stunEsReaccion(b)})) return; }   // Stun (2026-10-06); Mareo (2026-10-20)
     if(confusionEsAccion(b)){ const tid = confusionTokenDe(ac.creepId, 'creep'); if(confusionAntes(tid, () => confusionReclic(raiz, b, tid))) return; avisarFueraDeTurno(tid, b); }
     if(acAccionAca(b)) return;
     const datos = {...b.dataset};

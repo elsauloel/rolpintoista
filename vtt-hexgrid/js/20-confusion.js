@@ -187,12 +187,24 @@ function confusionMomento(d){
    «Hacerlo igual» la deja pasar (la mesa decide: las herramientas avisan, no encierran). Lo llaman la Botonera nueva (js/11), las Acciones de
    los creeps (js/12) y el soltar de una ruta (js/06). */
 let stunPase = '';
-const stunEsAccion = b => confusionEsAccion(b) || ['parry', 'bloqueo'].includes(b && b.dataset.botoneraaccion) ||
+const stunEsReaccion = b => ['parry', 'bloqueo'].includes(b && b.dataset.botoneraaccion) ||
   ['parrycreep', 'bloqueocreep'].some(k => b && k in b.dataset) || !!(b && b.dataset.invtirarstat && /:(parry|bloqueo)$/.test(b.dataset.invtirarstat));
-function stunAntes(tokenId, seguir){
+const stunEsAccion = b => confusionEsAccion(b) || stunEsReaccion(b);
+// `o.reaccion`: la acción es una reacción (Parry, Bloqueo): el Mareo de invocación la deja pasar (el Stun no).
+function stunAntes(tokenId, seguir, o){
   if(tokenId && stunPase === tokenId){ stunPase = ''; return false; }
   const t = tokens.get(tokenId);
-  if(!t || !Combatiente.stuneado(confusionEstadosDe(t))) return false;
+  if(!t) return false;
+  const est = confusionEstadosDe(t);
+  if(!Combatiente.stuneado(est)){
+    if(!Combatiente.mareado(est) || (o && o.reaccion)) return false;
+    // Mareo de invocación (dueño, 2026-10-20): recién invocada no actúa en su turno; tiene sus No2 y puede reaccionar.
+    AvisoCombate.mostrar({icono: '😵', titulo: `${nombreDe(t)} recién llega: está mareada`, pasos: [{titulo: 'En su primer turno no actúa',
+      texto: 'Hasta que empiece su próximo turno no puede moverse, atacar ni usar habilidades o consumibles. Tiene sus No2 y sí puede reaccionar: dodge roll, Parry, Evasión.'}],
+      botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()},
+        {texto: 'Hacerlo igual (lo decide la mesa)', sec: true, alClic: () => { AvisoCombate.cerrar(); stunPase = tokenId; seguir(); }}]});
+    return true;
+  }
   AvisoCombate.mostrar({icono: '💫', titulo: `${nombreDe(t)} está stuneado`, pasos: [{titulo: 'No puede hacer nada',
     texto: 'Mientras dura el Stun no puede atacar, moverse, usar habilidades o consumibles, ni hacer Parry. Si lo atacan, su Evasión es 1 (sin tirar).'}],
     botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()},

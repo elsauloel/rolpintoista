@@ -9,6 +9,9 @@
 > capturas. Al probar algo: pasarlo a «Probado» con fecha, qué se vio y si hubo que arreglar algo.
 
 ## Pendientes
+- [ ] **😵 Mareo de invocación nuevo** (2026-10-20, dueño: «tiene nitros, pero no puede usarlos en su turno»): con el orden de turnos armado,
+  invocar algo → entra con el Mareo y sus No2 enteros; en su turno, mover/atacar/habilidad muestra el cartel «recién llega: está mareada» (con
+  «Hacerlo igual»); Parry y Bloqueo desde su Botonera pasan; en el duelo puede hacer dodge roll. Las pruebas automáticas cubren el estado, no el cartel.
 - [x] **⏸ El cartel de la pausa abajo a la izquierda** (2026-10-20): probado con una pausa de verdad en «Test con claude elsaulo»: el GM y la
   jugadora lo ven abajo a la izquierda, sin tapar la barra de arriba; al reanudar se va.
 - [ ] **🎲 El consumible al azar en un fin de combate real** (2026-10-19): un creep que lo usó lo suelta seguro; uno que no, con su chance; el

@@ -38,7 +38,8 @@
 2. ✅ (dueño, 2026-10-20) Piernas de Viento, archivadas. **Ímpetu, 3 turnos y +1 No2 por tier**: +1 Común 60, +2 Buena 120, +3 Rara 200,
    +4 Excepcional 320 («suprema», nueva). Segundo aire: el Movimiento +3 pasó a +2 No2. **Hypeado** (poción y pergamino), archivados: «medio
    redundante; tenía sentido con las acciones» (el estado queda para habilidades).
-3. Ojo del Verdugo: +1 Buena 60, +2 Rara 90; el +3 sale.
+3. ✅ (dueño, 2026-10-20) Ojo del Verdugo sin tope (la poción dura turnos; el tope era para el pergamino, que dura todo el combate), con
+   precio no lineal: +1 Buena 40, +2 Buena 100, +3 Rara 300.
 4. Buena Fortuna, Inmunidad a CC y Blindaje: Buena calidad, 50.
 5. Escudo Especial: Buena, 40 (o un escudo de 15).
 6. Invulnerabilidad: Excepcional, 300 (o 2 turnos).

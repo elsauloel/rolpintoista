@@ -460,7 +460,7 @@ function celdasVisionDe(t, ignorarSolidos){
   (ojo ? celdasDisco(ojo) : ciego ? celdasDisco(Combatiente.CEGUERA_VISION) : offsetsVision(k, enNiebla ? 1 : radioVisionDe(t))).forEach(o => {
     const col = cuboACol(c0.q + o.dq, c0.r + o.dr), fila = cuboAFila(c0.q + o.dq, c0.r + o.dr);
     // Los elementos Sólidos tapan la vista: no se ve lo que queda detrás.
-    if((solidos.size || conParedes) && !lineaLibre(origen, {col, fila}, solidos, !conParedes)) return;
+    if(!ojo && (solidos.size || conParedes) && !lineaLibre(origen, {col, fila}, solidos, !conParedes)) return;   // (👁 el Ojo: nada le tapa la vista, dueño 2026-10-20)
     res.push(nbPack(col, fila));
   });
   // Las luces del piso (luz flotante): se ven desde donde no las tape un Sólido, aunque estén lejos.

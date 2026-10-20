@@ -2088,9 +2088,9 @@ prueba('🎁 familias por arquetipo (2026-10-19): el creep se reconoce por sus d
   igual([K.arquetipos({fue: 8, esp: 2}), K.arquetipos(mago), K.arquetipos({esp: 9, fue: 2, armaDeRango: true, armaNombre: 'Ballesta pesada'}),
     K.arquetipos({fue: 6, habilidades: [{trampaColocar: {}}]}), K.arquetipos({fue: 8, arquetipos: ['mago', 'trampero']}), F.pesosDe({esp: 9, armaDeRango: true}).sp,
     fam('Poción de HP'), fam('Poción de SP'), fam('Pergamino de Furia Arcana'), fam('Trampa de oso'), fam('Vela de sebo'), fam('Pergamino de Blindaje'),
-    fam('Poción de Fuerza del Toro'), fam('Ankh de Reencarnación'), F.dropTabla(1), F.dropTabla(14)[0], cuerda, total > 30 && magia / total > 0.3],
+    fam('Poción de Fuerza del Toro'), fam('Ankh de Reencarnación'), fam('Pergamino de Furia de Combate'), fam('Pergamino de red Nerubian'), F.dropTabla(1), F.dropTabla(14)[0], cuerda, total > 30 && magia / total > 0.3],
     [['guerrero'], ['mago'], ['mago', 'tirador'], ['guerrero', 'trampero'], ['mago', 'trampero'], 15,
-    'curacion', 'sp', 'magico', 'trampas', 'luces', 'proteccion', 'fisico', 'especiales', [70, 25, 5, 0, 0], 10, false, true]);
+    'curacion', 'sp', 'magico', 'trampas', 'luces', 'proteccion', 'fisico', 'especiales', 'fisico', 'magico', [70, 25, 5, 0, 0], 10, false, true]);
 });
 prueba('drop de consumibles (comun/combate-fin.js, P181; 2026-10-19): humano 60 %, humanoide 45 %, las bestias nada; un jefe, uno seguro + chance de otro y +1 nivel; mejores tiers con el nivel; se tira una vez', () => {
   const ch = t => CombateFin.dropChance({tipoCriatura: t});

@@ -205,8 +205,9 @@ const CombateFin = (() => {
     if(it.curaspPct || /\bsp\b|reserva/.test(n) || mods.some(s => s === 'sp' || s === 'spregen' || s === 'spmax')) return 'sp';
     if(num(it.curahp) > 0 || it.curaEstados || it.efectoHpTurno || /regenera|curaci|vendas|antídoto|sifón|\bcura\b/.test(n)) return 'curacion';
     if(/blindaje|fortuna|coagula|espinas|espejo|hypeado|inmunidad|sangre pura|voluntad|invulnera/.test(n)) return 'proteccion';
-    if(mods.some(s => STATS_MAG.has(s)) || /arcan|especial|pergamino/.test(n)) return 'magico';
-    if(/óleo|oleo/.test(n) || mods.some(s => STATS_FIS.has(s))) return 'fisico';
+    if(mods.some(s => STATS_MAG.has(s)) || /arcan|especial/.test(n)) return 'magico';
+    if(/óleo|oleo/.test(n) || mods.some(s => STATS_FIS.has(s))) return 'fisico';   // también los pergaminos de bonos físicos (dueño, 2026-10-19)
+    if(/pergamino/.test(n)) return 'magico';   // los pergaminos de hechizos (luz cegadora, red, sombras…)
     return 'otros';
   }
   // De qué familias hay consumibles en ese tier, con su peso para este creep. → [{fam, peso, pool}]

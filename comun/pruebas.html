@@ -1260,6 +1260,19 @@ prueba('🛡 Blindado anula el crítico en el duelo; Félix Felicis; Ojo del Ver
     !!cat('Poción de Buena Fortuna'), sinB.crit.critico, sinB.fase, conB.crit.critico, !!conB.crit.blindado, conB.fase !== 'critico'],
     [true, 'Buena Calidad', 'tipo11,tipo21,tipo31,tipo41,tipo51', true, 3, false, true, 'critico', false, true, true]);
 });
+prueba('🧪 Escudos de poción y Mano Pesada (2026-10-20): solo físico / especial, se van al gastarse y al pasar el día', () => {
+  const cat = n => CATALOGO_BASE.find(i => i.nombre === n);
+  const S = {catalogo: [], efectos: []};
+  const cuero = FichaHabilidades.aplicarEfectoDeConsumo(S, cat('Poción de Cuero Duro'), presetsDePrueba).estado;
+  const ojo = FichaHabilidades.aplicarEfectoDeConsumo(S, cat('Poción contra el Mal de Ojo mayor'), presetsDePrueba).estado;
+  const aguante = FichaHabilidades.aplicarEfectoDeConsumo(S, cat('Poción del Aguante'), presetsDePrueba).estado;
+  const mano = FichaHabilidades.aplicarEfectoDeConsumo(S, cat('Poción de Mano Pesada superior'), presetsDePrueba).estado;
+  const D = {...FichaGuardado.DEFAULT, efectos: S.efectos.slice(), catalogo: []};
+  FichaMantenimiento.descansar(D);
+  igual([cuero.escudoMagico, cuero.soloFisico, !!cuero.soloEspecial, cuero.seGasta, cuero.finDia, ojo.escudoMagico, ojo.soloEspecial, aguante.escudoMagico, !!aguante.soloFisico,
+    mano.mods.map(m => m.stat + m.val).join(), mano.turnos, D.efectos.filter(e => e.finDia).length, !!cat('Poción de Vitalidad Extendida').archivo],
+    [15, true, false, true, true, 25, true, 15, false, 'crit1,critpot3', 3, 0, true]);
+});
 prueba('Invulnerable activo bloquea un debuff del consumo (y lo dice)', () => {
   const S = {catalogo: [], efectos: [{nombre: 'Invulnerable', activo: true, invulnerable: true}]};
   const r = FichaHabilidades.aplicarEfectoDeConsumo(S, {efectoNombre: 'Veneno', efectoHpTurno: -2}, presetsDePrueba);

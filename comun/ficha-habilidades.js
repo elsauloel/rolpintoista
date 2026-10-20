@@ -96,6 +96,11 @@ const FichaHabilidades = (() => {
     // 📜 Hasta el fin del combate (dueño, 2026-10-19, los pergaminos): no vence por turnos y se va solo con «Finalizar combate» (vtt-hexgrid/js/25).
     if(src.efectoFinCombate) nuevo.finCombate = true;
     if(src.efectoRecarga) nuevo.recarga = true;   // un escudo que se renueva cada turno
+    // 🧪 Los escudos de poción (dueño, 2026-10-20): solo contra lo físico o lo especial (como los anillos), se van al gastarse y al pasar el día.
+    if(src.efectoSoloFisico) nuevo.soloFisico = true;
+    if(src.efectoSoloEspecial) nuevo.soloEspecial = true;
+    if(src.efectoSeGasta){ nuevo.seGasta = true; nuevo.sinRecarga = true; }
+    if(src.efectoFinDia) nuevo.finDia = true;
     const r = Combatiente.agregarEstado(S.efectos, nuevo);
     if(!r.ok) return {ok: false, motivo: r.motivo, nombre};
     // Lo que se dispara (regeneración, veneno…) pega apenas se lo pone (2026-10-06, P161).

@@ -43,7 +43,10 @@
 4. ✅ (dueño, 2026-10-20) Buena Fortuna (ahora **Félix Felicis**), Inmunidad a CC y Blindaje: Buena calidad, 50. **Blindado, automatizado en el
    duelo**: un golpe que iba a ser crítico entra como uno normal («🛡 CRÍTICO ANULADO»); lo usa el pergamino de grupo. **La Poción de Blindaje**,
    en cambio (dueño: «más fácil y menos OP»), da **+1 a la resistencia a todos los tipos de crítico**, 3 turnos.
-5. Escudo Especial: Buena, 40 (o un escudo de 15).
+5. ✅ (dueño, 2026-10-20) Escudo Especial y Vitalidad Extendida, archivadas. En su lugar, **escudos de poción** (vida extra que se va al
+   gastarse o al pasar el día): Cuero Duro (solo físico) 15 Común 20 / 25 Buena 45; contra el Mal de Ojo (solo especial) 15 Común 20 / 25 Buena 45;
+   del Aguante (todo daño) 15 Buena 40 / 25 Rara 90 («gastar un No2 por curarse 10 es poco»: el piso es 15). Nuevo set de crítico, **Mano Pesada**
+   (3 turnos): Crítico frecuente +1 y potente +1 / +2 / +3, Buena 70 / Buena 130 / Rara 250.
 6. Invulnerabilidad: Excepcional, 300 (o 2 turnos).
 7. Grandes: HP grande, Buena; HP mayor grande 270 y Regeneración mayor grande 200.
 8. Elixir de Fénix: que reviva (como el Revive: a un aliado caído, o a uno mismo desde el cinturón, como el Ankh) con toda la vida y Titilando.

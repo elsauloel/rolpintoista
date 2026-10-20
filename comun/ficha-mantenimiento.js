@@ -279,7 +279,7 @@ const FichaMantenimiento = (() => {
      quedan los permanentes, los de un ítem equipado y los derivados. `descansar(S)`: vida, SP y No2 al máximo (un caído no se levanta), los
      estados con turnos terminan, el tope diario del talento de reparar vuelve a 0, carga las 🃏 wildcards del descanso (`o.wildcards`) y lo
      mismo sus invocaciones. Devuelve las líneas del cambio. */
-  const terminaAlPasarDia = e => !!e && (!!e.finCombate || (!e.permanente && !e.origenItem && !e.derivado && !e.anillo));   // (finCombate: un pergamino que quedó)
+  const terminaAlPasarDia = e => !!e && (!!e.finCombate || !!e.finDia || (!e.permanente && !e.origenItem && !e.derivado && !e.anillo));   // (finCombate: un pergamino que quedó; finDia: el escudo de una poción, 2026-10-20)
   // `o.wildcards` (2026-10-15, dueño): el descanso carga wildcards hasta ese número (1 normal, 2 reparador); no se acumulan por encima.
   function descansar(S, o){
     const lineas = [], c = FichaCalculo.calcular(S), hpmax = Number.isNaN(c.final.hpmax) ? 0 : num(c.final.hpmax);

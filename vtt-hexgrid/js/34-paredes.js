@@ -128,7 +128,11 @@ function dibujarParedDebajo(t, z){
   ctx.strokeStyle = t.transparente ? 'rgba(15,12,14,.55)' : 'rgba(15,12,14,.75)';
   ctx.lineWidth = t.transparente ? 2 / z : (t.grosor + 5) / z;
   ctx.lineJoin = 'round'; ctx.lineCap = 'round';
+  // Una irradiación blanca sutil detrás (dueño, 2026-10-20: «para que destaque un poco más» sobre el mapa). shadowBlur va en píxeles de pantalla:
+  // se ve igual con cualquier zoom.
+  ctx.shadowColor = 'rgba(255,255,255,.7)'; ctx.shadowBlur = 7;
   ctx.stroke();
+  ctx.shadowBlur = 0; ctx.shadowColor = 'transparent';
   ctx.restore();
 }
 // Un trazo en rectas va con líneas rectas; uno a mano alzada, suavizado (js/07, trazarSuave).

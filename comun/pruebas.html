@@ -1227,11 +1227,11 @@ prueba('📜 los pergaminos (2026-10-19): «hasta el fin del combate» lleva la 
   const fortuna = FichaHabilidades.aplicarEfectoDeConsumo(S, cat('Pergamino de Buena Fortuna'), presetsDePrueba);
   const pocion = FichaHabilidades.aplicarEfectoDeConsumo(S, cat('Poción de Inmunidad a CC'), presetsDePrueba);
   const velo = cat('Pergamino del Velo Eterno').efectoMods.map(m => m.stat).join(',');
-  const dragon = FichaHabilidades.aplicarEfectoDeConsumo(S, cat('Sangre de dragón'), presetsDePrueba).estado;   // (2026-10-20, P212 punto 1)
+  const dragon = FichaHabilidades.aplicarEfectoDeConsumo(S, cat('Sangre de dragón'), presetsDePrueba).estado;   // (2026-10-20, P212 punto 1: una poción dura turnos)
   const archivados = ['Pergamino de Piernas de Viento', 'Pergamino de Ojo del Verdugo superior'].map(n => !!cat(n).archivo);
   igual([furia.estado.finCombate, furia.estado.permanente, fortuna.estado.afortunado, fortuna.estado.turnos, fortuna.estado.permanente, !!cat('Pergamino de Buena Fortuna').efectoParty,
-    pocion.estado.inmunidadCC, velo, archivados, cat('Pergamino de Ímpetu').efectoMods[0].stat, /crafteo/.test(cat('Pergamino de ventriloquía').detalle), dragon.finCombate && dragon.permanente],
-    [true, true, true, 3, false, true, true, 'def,armadmg,eva', [true, true], 'nitros', false, true]);
+    pocion.estado.inmunidadCC, velo, archivados, cat('Pergamino de Ímpetu').efectoMods[0].stat, /crafteo/.test(cat('Pergamino de ventriloquía').detalle), [dragon.turnos, dragon.permanente, dragon.mods[0].val], !!cat('Pergamino del Velo Eterno').efectoParty],
+    [true, true, true, 3, false, true, true, 'def,armadmg,eva', [true, true], 'nitros', false, [3, false, 3], true]);
 });
 prueba('📜 Regeneración y Escudo Especial nuevos, y los pergaminos grupales Comunes (2026-10-19)', () => {
   const cat = n => CATALOGO_BASE.find(i => i.nombre === n);

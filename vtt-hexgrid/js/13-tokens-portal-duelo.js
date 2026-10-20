@@ -593,11 +593,13 @@ async function colocarGlifo(msg){
 // donde aparece. Si ya tiene token en este mapa (el de cuando se durmió) se mueve ahí; si no, se crea. La mesa se entera por la Crónica.
 function invocacionDeHabilidad(msg){
   const nombre = String(msg.nombre || 'Invocación').slice(0, 40);
-  // 👁 Pegado a quien lo invoca (2026-10-20, dueño, el Ojo de Kicillof): solo una casilla al lado de su token.
-  const dueno = msg.adyacente && msg.fichaId ? [...tokens.values()].find(t => t.tipo === 'pj' && t.fichaId === msg.fichaId) : null;
-  if(msg.adyacente && !dueno){ toast(`${nombre}: tu token no está en este mapa — poné su token a mano, al lado tuyo`); return; }
+  // 👁 Dentro del Rango y a la vista de quien lo invoca (2026-10-20, dueño, el Ojo de Kicillof; lo mismo que la Bombucha de talco).
+  const dueno = msg.lugar === 'rango' && msg.fichaId ? [...tokens.values()].find(t => t.tipo === 'pj' && t.fichaId === msg.fichaId) : null;
+  if(msg.lugar === 'rango' && !dueno){ toast(`${nombre}: tu token no está en este mapa — poné su token a mano, dentro de tu Rango`); return; }
+  const rng = dueno && typeof rangoDeToken === 'function' ? Math.max(1, Math.round(num((rangoDeToken(dueno) || {}).rng))) : 0;
   const pedir = () => elegirDestino(async h => {
-    if(dueno && distanciaHex(dueno, h) !== 1){ toast(`${nombre} aparece pegado a vos: elegí una casilla al lado de tu token`); pedir(); return; }
+    if(dueno && distanciaHex(dueno, h) > rng){ toast(`⚠ Esa casilla queda a ${distanciaHex(dueno, h)}: tiene que estar dentro de tu Rango (${rng})`); pedir(); return; }
+    if(dueno && !celdasVisionDe(dueno).includes(nbPack(h.col, h.fila))){ toast('⚠ Esa casilla no la ves: tiene que estar en tu campo de visión'); pedir(); return; }
     try{
       let id = null;
       tokens.forEach((t, k) => { if(t.fichaId === msg.ref) id = k; });
@@ -606,7 +608,7 @@ function invocacionDeHabilidad(msg){
       momentoAbrir({tipo: 'invocacion', icono: '🔮', titulo: `${msg.quien || 'Alguien'} invocó a ${nombre}`,
         resultado: `con «${msg.habilidad || 'una habilidad'}»${num(msg.turnos) ? ` · dura ${fmt(num(msg.turnos))} turnos` : ''}`, estado: 'listo'});
     }catch(err){ console.error('No se pudo poner la invocación en el mapa:', err); toast('No se pudo poner la invocación en el mapa — ponela a mano'); }
-  }, `<b>🔮 ${esc(nombre)}: elegí dónde aparece</b> <span>${dueno ? 'una casilla pegada a tu token' : 'clic en el mapa'} · Esc o clic derecho cancelan</span>`, true,
+  }, `<b>🔮 ${esc(nombre)}: elegí dónde aparece</b> <span>${dueno ? `a ${rng} o menos de vos (tu Rango), en una casilla que veas` : 'clic en el mapa'} · Esc o clic derecho cancelan</span>`, true,
   () => toast(`${nombre} quedó invocada sin lugar: poné su token a mano`));
   pedir();
 }

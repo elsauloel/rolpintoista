@@ -4,6 +4,7 @@
    frena ahí (`oportunidadCorte`, js/17, con `vigilancia: true`) y quien maneja al vigilante ve «¿Dispara?» (el cartel de la oportunidad): sí → un duelo
    normal con su arma (paga los No2 al tirar el PdG) y se le va la vigilancia; «Dejarlo pasar» → la vigilancia sigue. Si no le alcanzan los No2, avisa y
    el rival sigue su camino. Quien ya estaba adentro: solo si se mueve. Un rival en sigilo que no se ve, no. El alcance se dibuja para todos. */
+const VIGILANCIA_PDG = 2;   // el disparo sale con +2 PdG (dueño, 2026-10-21: «para justificar los 2 SP, asumiendo el riesgo de que nadie entre»)
 // Los rivales de `t` que vigilan (lo público): [{rid, r, alcance}].
 function vigilantesDe(t){
   const rivales = new Set(rivalesDe(t));

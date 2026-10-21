@@ -31,7 +31,7 @@
 - [x] **🦘 Salto / Salto aplastante** — probado el 2026-10-21: saltó 3 casilleros y cayó al lado de Silvia («+1 PdG · Crítico frecuente +1»); con Sólidos en el camino, el cartel «¿Puede saltarlo?» y, con «Sí», saltó; el aplastante: Res.CC 4 contra Fuerza 4 → en pie (empate), y con más Fuerza, 3 contra 14 → Sentado. (2026-10-21): que caiga al lado del objetivo saltando por encima de un token, sin No2 ni oportunidad; el cartel
   «¿puede saltarlo?» al pasar por encima de una pared o un Sólido; los bonos en la declaración; el aplastante: Res.CC contra su Fuerza y el Sentado.
 - [ ] **👁 Vigilancia** (2026-10-21, creep y Shooter): el anuncio y el alcance marcado; un personaje que entra en la mira se frena y el GM ve «¿Dispara?»;
-  sí → duelo y se va la vigilancia; «Dejarlo pasar» → sigue; quien ya estaba adentro, solo si se mueve; sin No2, sigue; el Shooter contra un creep.
+  sí → duelo con +2 PdG («desde la vigilancia») y se va la vigilancia; «Dejarlo pasar» → sigue; quien ya estaba adentro, solo si se mueve; sin No2, sigue; el Shooter contra un creep.
 - [x] **💥 Daño de colisión** — probado el 2026-10-21 (Cornada): contra un Sólido, la Constitución de Silvia (3) − Defensa 3 → 0; contra Xeena, cada uno la del otro (Silvia 1 − 3 → 0, Xeena 1 − 0 → 1). **Arreglado**: «Le faltaron 1 casillero» → «Le faltó». (P178, 2026-10-21): un empujón (la Cornada con carrera, una ráfaga) que choca contra una pared → una Constitución del
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 

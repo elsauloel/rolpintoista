@@ -297,7 +297,7 @@
     [], {salto: 3, aplasta: true}));
   // 👁 Vigilancia (dueño, 2026-10-21; el rango, una sola para bestias y humanoides): 1 No2 y 2 SP (o cooldown 3); es su ataque del turno. Hasta su próximo turno,
   // el primer rival que se mueva dentro del alcance de su arma, a la vista y con línea de tiro, recibe un disparo (vtt-hexgrid/js/58).
-  H('Vigilancia', 'BK', '*', 'r', 3, {detalle: 'Se queda atento con el arma lista (es su ataque del turno): hasta que empiece su próximo turno, el primer rival que se mueva dentro del alcance de su arma, a la vista y con línea de tiro libre, se frena ahí y recibe un disparo (un duelo normal, que paga los No2 de un ataque). Quien ya estaba adentro, solo si se mueve. Un solo disparo; si lo deja pasar, sigue vigilando.',
+  H('Vigilancia', 'BK', '*', 'r', 3, {detalle: 'Se queda atento con el arma lista (es su ataque del turno): hasta que empiece su próximo turno, el primer rival que se mueva dentro del alcance de su arma, a la vista y con línea de tiro libre, se frena ahí y recibe un disparo con +2 a la Probabilidad de Golpe (un duelo normal, que paga los No2 de un ataque). Quien ya estaba adentro, solo si se mueve. Un solo disparo; si lo deja pasar, sigue vigilando.',
     no2: 1, spCosto: 2, auditada: true, efecto: {nombre: 'Vigilancia'}, anuncio: '{nombre} se pone en vigilancia.'});
   // 🛡 Aguante (dueño, 2026-10-21; uno solo para bestias y humanoides): 1 No2 y 1 SP (o cooldown 3); +2 Defensa y +2 Defensa especial hasta su próximo
   // turno; su próximo ataque suma +1 dado del Tipo de su arma por cada golpe que recibió (1 SP por dado; en modo cooldown, +1 turno de cooldown por dado).

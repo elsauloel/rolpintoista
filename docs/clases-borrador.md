@@ -317,7 +317,7 @@ Salvo Carga Elemental, todas son **Hechizo (PG: Esp · Daño: Esp)**.
     2 casillas en una dirección. Cada casilla de desvío cuenta como +1 de
     distancia.
 11. ✅ **Vigilancia** — **SP:** 2. **No2:** 1. Hasta que empiece tu próximo turno, el primer rival que se mueva dentro del alcance de tu arma a
-    distancia, a la vista y con línea de tiro libre, se frena ahí y podés dispararle (un duelo normal, que paga los No2 de un ataque). Quien ya estaba
+    distancia, a la vista y con línea de tiro libre, se frena ahí y podés dispararle con **+2 a la Probabilidad de Golpe** (un duelo normal, que paga los No2 de un ataque). Quien ya estaba
     adentro, solo si se mueve. Un solo disparo; si lo dejás pasar, seguís vigilando. ⚙ Automatizado en el mapa. *(Nueva, 2026-10-21: la Vigilancia
     de los creeps, sumada al Shooter a pedido del dueño.)*
 

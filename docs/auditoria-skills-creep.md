@@ -15,6 +15,9 @@
   puede parrear, 3 SP), Tajear (Asalto: Crítico frecuente +1, Perfora 1 y Sangrado, 3 SP), Lisiar (Asalto: crítico +1/+2 y Lesión, 2 SP).
 - **Cada golpe con su identidad** (dueño, 2026-10-20: «me gusta que les des identidad a cada uno»): los golpes simples que hoy son el mismo con
   otro nombre pasan a tener cada uno su toque.
+- **Habilidades paralelas entre razas** (dueño, 2026-10-21: «no está mal que existan habilidades paralelas entre bestias y humanoides»): la misma
+  mecánica puede estar dos veces, una con sabor de bestia y otra de humanoide (Golpe que sangra ↔ Zarpazo desgarrador). Lo que sí se diferencia es
+  dentro de una misma raza.
 - **SP**: cada receta trae su `spCosto` (lo que cuesta en modo SP, ver «Creeps con SP» en `comun/CLAUDE.md`); el cooldown queda para el modo
   de siempre.
 

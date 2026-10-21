@@ -1116,3 +1116,10 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   cambia todo es entre peleas: hoy el SP también se recarga fuera de combate (cada pelea empieza llena). Si se quita la recarga y el SP vuelve solo
   al descansar o al pasar de día, pasa a ser un recurso del día entero (3 o 4 peleas por día: ~10 a 13 SP por pelea). Opciones: 1) subir el costo de
   las que suman Ef.Esp; 2) reducir la recarga (sola, cambia poco); 3) quitarla y que vuelva al descansar (cambia la forma de jugar); 4) combinar.
+  **Simulación de un día (2026-10-21; 3 peleas, mago de Especial 13 con Toque mágico; usos del Toque por pelea · daño por pelea):**
+  hoy 4/4/4 · 90/90/90; cuesta su Especial 4/4/4 (igual: el SP guardado, Especial × 3, alcanza para todo); cuesta su Especial + SP guardado × 2
+  3/3/3 · 71; cuesta su Especial + recarga a la mitad 3/3/3 · 71; las dos cosas 2/2/2 · 52; barato + sin recarga (SP por día) 4/4/4 (igual);
+  cuesta su Especial + sin recarga, SP por día 3/0/0 · 69/8/8 (se gasta todo en la primera pelea); cuesta su Especial + recarga a la mitad, SP
+  por día 3/1/1 · 71/33/33. Con peleas de 6 turnos: hoy 6 usos, cuesta su Especial 5. **Conclusión: ninguna opción sola cambia una pelea de 4
+  turnos; lo que manda es el SP guardado. Lo que de verdad da matices es combinar el costo con un SP guardado más chico o una recarga menor.**
+  **En pausa (dueño, 2026-10-21): «déjalo pendiente para cuando tenga tiempo de encarar el tema de la recarga».**

@@ -54,6 +54,9 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
+> - [ ] **💧 La recarga de SP y el costo de las que suman Efecto especial (2026-10-21, dueño: «para cuando te diga que tengo el tiempo»):** la P216,
+>   con la simulación de un día ya hecha (ninguna opción sola cambia una pelea de 4 turnos; manda el SP guardado) y la página para la mesa
+>   (https://claude.ai/artifact/C7VPwWPg9BpWfF1L1hUGb6). Falta debatirlo y decidir.
 > - [ ] **🧭 Elegir las habilidades de un creep por rol y mecánica (2026-10-21, dueño):** al crear un creep en GM Tools, el asistente pregunta qué rol
 >   cumple en la batalla (choque pesado, liviano, rango/Hunter, caster) y muestra sus habilidades agrupadas por mecánica («Golpear y alejarse»,
 >   «Atrapar», «Guardia»…), para llegar a cada una sabiendo qué hace sin leer descripción por descripción. **Hecho el primer paso**: las auditadas ya

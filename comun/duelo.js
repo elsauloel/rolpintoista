@@ -491,6 +491,7 @@ const Duelo = (() => {
           // Proyectil perforante (2026-10-13): `perforante` = al terminar, el mapa de quien disparó sigue al que está detrás (js/42);
           // `sinEfectos` = ese segundo golpe, sin los efectos especiales (ni del arma, ni de la flecha, ni del crítico).
           ...(cfg.ataque.perforante ? {perforante: true} : {}), ...(cfg.ataque.sinEfectos ? {sinEfectos: true} : {}),
+          ...(_num(cfg.ataque.rafaga) > 1 ? {rafaga: Math.min(3, Math.round(_num(cfg.ataque.rafaga)))} : {}),   // 🗡 Ráfaga de cortes (2026-10-21)
           ...(cfg.ataque.efectosNota ? {efectosNota: txtCorto(cfg.ataque.efectosNota, 200)} : {}),
           // ⚡ Critical Matters (2026-09-29): efectos/nota que solo cuentan si el golpe es crítico (ver
           // entrarCritico/efectosHtml) — mismo saneo que los de siempre, adentro de un campo aparte.
@@ -518,7 +519,7 @@ const Duelo = (() => {
     // El bono del tiro (2026-10-09, arcos; docs/rework-armas-rango.md): lo calcula el mapa al elegir el objetivo — la distancia ideal del arco
     // (PdG, Crítico frecuente / potente, daño fijo, ignora Resistencia) y el tiro alto (PdG −2). `motivo` es lo que se lee («distancia ideal»).
     // Perfora N del arma (2026-10-10, las ballestas): viaja en el ataque; el mapa la suma a la de la flecha o el virote al aplicar el daño.
-    if(_num(cfg.ataque.perfora) > 0 && !hab) inicial.ataque.perfora = Math.min(5, Math.round(_num(cfg.ataque.perfora)));
+    if(_num(cfg.ataque.perfora) > 0 && !hab) inicial.ataque.perfora = Math.min(15, Math.round(_num(cfg.ataque.perfora) * Math.max(1, Math.min(3, Math.round(_num(cfg.ataque.rafaga)) || 1))));   // una ráfaga, ×N
     if(_num(cfg.ataque.alejarse) > 0 && !hab) inicial.ataque.alejarse = Math.min(4, Math.round(_num(cfg.ataque.alejarse)));   // 💨 Picar y alejarse (2026-10-21)
     if(cfg.ataque.atraviesaEscudos && !hab) inicial.ataque.atraviesaEscudos = true;
     if(cfg.ataque.puntaDiamante && !hab) inicial.ataque.puntaDiamante = true;   // contra Defensa 12 o más, Perfora +2 (el mapa, 2026-10-11)
@@ -589,6 +590,7 @@ const Duelo = (() => {
     if(d.ataque && _num(d.ataque.quieto) > 0) t.push(`💍 ${d.hab ? 'foco' : 'puntería certera'}: +${_fmt(d.ataque.quieto)} ${d.hab ? 'PdG.Esp' : 'PdG'}`);
     if(d.ataque && _num(d.ataque.primeraSangre) > 0) t.push(`💍 primera sangre: +${_fmt(d.ataque.primeraSangre)} de daño si pega`);
     if(d.ataque && d.ataque.tiro) t.push(`🏹 ${d.ataque.tiro.motivo}: ${tiroTxt(d.ataque.tiro)}`);
+    if(d.ataque && _num(d.ataque.rafaga) > 1) t.push(`🗡 ${_fmt(d.ataque.rafaga)} cortes: los efectos del arma se tiran ${_fmt(d.ataque.rafaga)} veces y su Perfora vale ×${_fmt(d.ataque.rafaga)}`);
     if(d.ataque && _num(d.ataque.perfora) > 0) t.push(`perfora ${_fmt(d.ataque.perfora)}`);   // la Perfora del arma y de la habilidad (2026-10-10; sin «(el arma)» desde el 2026-10-21: puede venir de la habilidad); se suma a la del virote
     if(d.ataque && d.ataque.flecha) t.push(`🏹 ${d.ataque.flecha.nombre}${(d.ataque.flecha.efectos || []).length ? ': ' + d.ataque.flecha.efectos.map(e => e.danoMagico ? magCorto(e) : e.nombre).join(', ') : ''}${d.ataque.flecha.perfora ? ` · perfora ${d.ataque.flecha.perfora}` : ''}`);
     return t.join(' · ');
@@ -997,10 +999,16 @@ const Duelo = (() => {
     return null;
   }
 
+  // Los efectos al golpear del arma de quien ataca; en una ráfaga (`ataque.rafaga` = N cortes), N veces, cada uno con su «Corte k».
+  function efectosArmaDe(d, h){
+    const ea = h && h.efectosArma ? (h.efectosArma(d) || []) : [];
+    const n = Math.max(1, Math.min(3, Math.round(_num(d.ataque && d.ataque.rafaga)) || 1));
+    return n === 1 ? ea : Array.from({length: n}, (_, i) => ea.map(e => ({...e, detalle: `Corte ${i + 1}${e.detalle ? ': ' + e.detalle : ''}`.slice(0, 200)}))).flat();
+  }
   // Los efectos que trae el arma, en el formato del duelo (los manda la página del atacante al tirar el daño).
   function normalizarEfectos(lista){
     // «Ignora N de Res. crítico» no es un efecto sobre el golpeado: ya se usó al calcular el crítico (2026-10-03).
-    return (Array.isArray(lista) ? lista : []).filter(e => !(typeof Combatiente !== 'undefined' && Combatiente.esEfectoIgnora(e))).slice(0, 8).map(e => {
+    return (Array.isArray(lista) ? lista : []).filter(e => !(typeof Combatiente !== 'undefined' && Combatiente.esEfectoIgnora(e))).slice(0, 12).map(e => {   // 12: una ráfaga los repite
       let caras = Math.max(1, Math.round(_num(e.caras)) || 1), exitos = Math.min(caras, Math.max(1, Math.round(_num(e.exitos)) || 1));
       if(caras === 3){ caras = 6; exitos *= 2; }   // un d3 se tira con d6 (dueño, 2026-10-05: «tirar d3 es feo»): 33 % = 5 o 6
       const o = {nombre: String(e.nombre || '').trim().slice(0, 40), caras, exitos, dado: String(e.dado || '').trim().slice(0, 20), detalle: String(e.detalle || '').trim().slice(0, 200), stacks: Math.max(0, Math.round(_num(e.stacks)))};
@@ -1807,7 +1815,7 @@ const Duelo = (() => {
       const defensaManual = sel && sel.value === 'no' ? 'no' : sel && sel.value === 'num' ? Math.max(0, Math.round(_num(n && n.value))) : null;
       // Los efectos al golpear del arma (si esta pantalla maneja al atacante) y los de la habilidad, como en el daño de siempre.
       let efectos = [];
-      try{ const h = hooks(); if(!d.hab && h && h.soy && h.soy(d.atacante) && h.efectosArma) efectos = h.efectosArma(d) || []; }catch(err){}
+      try{ const h = hooks(); if(!d.hab && h && h.soy && h.soy(d.atacante) && h.efectosArma) efectos = efectosArmaDe(d, h); }catch(err){}
       if(!d.hab) efectos = [...efectos, ...efectosDeHabilidad(d)];
       if(typeof mesaPublicar === 'function'){ try{ mesaPublicar(`${lado.nombre} · ${etiqueta} (manual)`, r); }catch(err){} }
       guardarDano(d.id, r, efectos, {defensaManual}).catch(err => { console.error(err); _toast('No se pudo anotar la tirada en el duelo'); });
@@ -2525,7 +2533,7 @@ const Duelo = (() => {
       // ⚡ Critical Matters (2026-09-29): a esta altura (el daño se tira después del crítico, ver entrarCritico)
       // d.crit ya está resuelto — si el golpe salió crítico, los efectos de duelo.critico.efectos se suman a
       // los de siempre (arma + habilidad), mismo mecanismo de "recordar y tirar" que ya usan efectosArma/efectos.
-      if(campo === 'dano') extra = {efectos: d.hab ? [] : [...(h.efectosArma ? (h.efectosArma(d) || []) : []), ...efectosDeHabilidad(d)]};
+      if(campo === 'dano') extra = {efectos: d.hab ? [] : [...efectosArmaDe(d, h), ...efectosDeHabilidad(d)]};
       if(campo !== 'dano') retener(true);   // el PdG / Evasión / Parry / Fuerza / Bloqueo se muestran juntos cuando tiran los dos (elegir la defensa es a ciegas)
       let re = campo === 'eva' ? (m.modo === 'parry' ? /parry/i : /evasi/i) : RE_CAMPO[campo];
       if(d.hab && campo === 'pdg') re = new RegExp(escRe(etqTira(d)), 'i');

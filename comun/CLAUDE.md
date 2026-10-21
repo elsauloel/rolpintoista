@@ -1681,6 +1681,8 @@ versión parecida en más de una, es candidato a juntar.
   efecto con `soltar.difStat` toma el stat de quien ataca (`o.valorDe`) y `danoFalla: 'golpe'` el daño de ese mismo golpe (`o.danoGolpe(dados)`;
   `CreepAcciones.ataqueDeHab` los pasa). Presets «Mordido» (grupo Atrapar) y «Mordiendo» (`muerdeA`, `desde`: `EstadosAplicar` los conserva);
   `FichaResumen` publica el `soltar` que trae `de`. Lo hace el mapa: vtt-hexgrid/js/54.
+- **🗡 Ráfaga** (2026-10-21): una Ejecución «con tu arma» con `rafaga: N` (`Combatiente.ataqueConArreglos` → `ataque.rafaga`): `Duelo.crear` multiplica la
+  Perfora ×N y `efectosArmaDe(d, h)` (duelo.js) repite los efectos al golpear del arma N veces («Corte k»); `normalizarEfectos` acepta hasta 12.
 - **🔥 Arma elemental** (2026-10-21, el Support): presets «Arma ígnea / helada / eléctrica / ácida / venenosa» (`estados-presets.js`) con `golpe` y
   **`golpePorTurnos`** (`Combatiente.gastarCarga` los suma a cada golpe mientras duren, sin cargas) y `armaElemental` (`agregarEstado`: una sola a la
   vez). Un efecto de daño mágico puede llevar `mult` (fuego), `porDano` (hielo, ácido, tóxico) y `cadena` (rayo): los conserva `EfectosGolpe.normalizar`,

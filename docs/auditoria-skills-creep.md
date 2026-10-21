@@ -146,6 +146,10 @@
   ataque y **2 SP** (trapera **4 SP**), o cooldown 3 (trapera 4). Junto con esto, la pasiva **Pasos silenciosos** pasó a llamarse **Paso ligero** (dueño).
   **Para probar.**
 
+- ✅ **Ráfaga de cortes** (humanoide) y **Ráfaga de zarpazos** (bestia) (2026-10-21): un solo duelo (dueño: la opción 2, «el golpe vale por tres»): un ataque
+  con su arma con **+2 dados** (la Defensa se resta una vez); **los efectos al golpear del arma se tiran tres veces** y **su Perfora vale el triple** (dueño: «si
+  el arma perfora 1, perforaría 3 veces»). Lo de un ataque y **3 SP**, o cooldown 3. (Se descartó: tres duelos seguidos, con tres Evasiones.) **Para probar.**
+
 ### Rango (desde el 2026-10-21)
 
 - ✅ **Vigilancia** (2026-10-21, dueño; una sola para bestias y humanoides, y sumada al **Shooter** como habilidad de clase): 1 No2 y 2 SP (o cooldown 3);

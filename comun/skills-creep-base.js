@@ -72,7 +72,9 @@
   // el Tajear del Asalto) — +2 PdG, +2 al daño y Crítico frecuente +1; 3 SP (o cooldown 3).
   H('Tajo veloz', 'D', '*', 'me', 3, aA('Un corte rápido y certero: un ataque con su arma con +2 a la Probabilidad de Golpe, +2 al daño y Crítico frecuente +1.', {pdg: 2, fijo: 2, critBono: 1},
     'va al duelo como un ataque (PdG contra Evasión o Parry, Bloqueo y crítico) con +2 PdG, +2 al daño y Crítico frecuente +1', 3));
-  H('Estocada', 'D', 'hd', 'me', 2, aT('Una punzada directa al punto débil.', 'L'));
+  // Auditada (dueño, 2026-10-21): Perfora 2 y +1 al daño, 2 SP (o cooldown 2) — la que atraviesa armadura.
+  H('Estocada', 'D', 'hd', 'me', 2, aA('Una punzada directa al punto débil: un ataque con su arma con Perfora 2 (2 puntos del daño pasan siempre la Defensa) y +1 al daño.', {perfora: 2, fijo: 1},
+    'va al duelo como un ataque (PdG contra Evasión o Parry, Bloqueo y crítico) con Perfora 2 y +1 al daño', 2));
   H('Golpe aplastante', 'D', '*', 'mt', 4, zO('Un golpe devastador que casi no se puede esquivar.', 3, 'H'));
   H('Embestida', 'DK', 'b', 'mt', 3, zO('Carga con todo el cuerpo y empuja al objetivo un casillero (a mano).', 3, 'M'));
   H('Zarpazo', 'D', 'b', 'me', 2, aT('Un zarpazo salvaje.', 'L'));

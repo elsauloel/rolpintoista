@@ -45,6 +45,9 @@ function soltarAlEmpezarCartel(clave, nombre, est, tirar){
     texto: `Empieza su turno atrapado (${est.nombre}). Tira ${s.etq} contra ${s.dif}: si llega, se suelta. Esta tirada no cuesta No2.${s.danoFalla ? ` Si no se suelta, ${s.deNombre ? 'el mordisco de ' + s.deNombre : 'el mordisco'} le vuelve a hacer daño (${s.danoFalla}).` : ''}`,
     botones: [{texto: `🎲 Tirar ${s.etq}`, alClic: tirar}, {texto: 'Ahora no', sec: true, alClic: () => AvisoCombate.cartel('soltar-' + clave, null)}]});
 }
+// Primero los dados, después el resultado (regla del dueño, 2026-09-26): espera a que los dados 3D queden quietos.
+const esperarDadosMapa = () => new Promise(res => typeof Duelo !== 'undefined' && Duelo.esperarDados && !document.hidden ? Duelo.esperarDados(res) : res());
+const soltarTirando = (clave, nombre) => AvisoCombate.cartel('soltar-' + clave, {icono: '🔓', titulo: `${nombre}: ¿se suelta?`, texto: '🎲 Tirando…'});
 function soltarAlEmpezarResultado(clave, nombre, estNombre, tt, extra){
   const txt = (tt.ok ? `${nombre} se soltó de ${estNombre} (${tt.r ? tt.r.total : '—'} contra ${tt.s.dif}).` : `${nombre} no se soltó de ${estNombre} (${tt.r ? tt.r.total : '—'} contra ${tt.s.dif}): sigue atrapado este turno.`) + (extra ? ' ' + extra : '');
   mesaLinea(`🔓 ${txt}`, 'recordatorio');
@@ -57,7 +60,9 @@ async function soltarAlEmpezarCreep(clave, creepId, t){
   if(!tt || !tt.r){ AvisoCombate.cartel('soltar-' + clave, null); return; }
   const gratis = {...tt, s: {...tt.s, no2: 0}};
   const estNombre = ((sc.estados || []).find(e => e.id === tt.estId) || {}).nombre || 'el estado';
+  soltarTirando(clave, sc.nombre);
   mesaPublicar(tt.origen, {...tt.r, quien: sc.nombre, desde: 'gm'});
+  await esperarDadosMapa();
   try{ await modificarCreep(creepId, c => { CreepAcciones.aplicarSoltarse(c, gratis); return {}; }); }catch(err){ console.error(err); toast('No se pudo anotar el resultado: sacá el estado a mano'); }
   const extra = !tt.ok && tt.s.danoFalla ? await mordidaDano(t, sc.nombre, tt.s) : '';
   soltarAlEmpezarResultado(clave, sc.nombre, estNombre, tt, extra);
@@ -84,7 +89,9 @@ async function soltarAlEmpezarPj(clave, fichaId, invId, t){
     return true;
   });
   if(!res){ AvisoCombate.cartel('soltar-' + clave, null); return; }
+  soltarTirando(clave, res.nombre);
   mesaPublicar(`${res.nombre} · Soltarse (${res.est}) · ${res.tt.s.etq} contra ${res.tt.s.dif}`, {...res.tt.r, quien: res.nombre, ficha: fichaId});
+  await esperarDadosMapa();
   const extra = !res.tt.ok && res.tt.s.danoFalla ? await mordidaDano(t, res.nombre, res.tt.s) : '';
   soltarAlEmpezarResultado(clave, res.nombre, res.est, res.tt, extra);
 }
@@ -111,6 +118,7 @@ async function mordidaDano(t, nombre, s){
   if(!t || !r) return `✋ El mordisco le vuelve a hacer daño (${s.danoFalla}): aplicalo a mano.`;
   const quien = s.deNombre || 'La bestia';
   mesaPublicar(`🦷 ${quien} sigue mordiendo a ${nombre} · Daño`, {...r, quien, ...(t.tipo === 'creep' ? {desde: 'gm'} : {})});
+  await esperarDadosMapa();
   let res = null;
   try{
     if(t.tipo === 'creep'){ if(soyGM) res = await danioCreep(t, String(r.total), false, 0, 0); }

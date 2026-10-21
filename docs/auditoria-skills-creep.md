@@ -114,6 +114,12 @@
   del Tipo de su arma por cada golpe recibido**, **1 SP por dado** (si no le alcanza, los que pueda pagar; en modo cooldown, +1 turno de cooldown a
   Aguante por dado) más los No2 del ataque, y se pasa al duelo. Si no ataca en ese turno, lo pierde. `vtt-hexgrid/js/56-aguante.js`. **Para probar.**
 
+- ✅ **Barrido** (humanoide) y **Coletazo** (bestia) (2026-10-21, «barrido»): le pega a todos los rivales de al lado (flor de diámetro 3, sin contarse);
+  su PdG **una vez** contra la **Evasión** de cada uno (solo Evasión: sin Parry, Bloqueo ni Fuerza del golpe) y **el daño de su arma** (dados + Dmg) menos la
+  Defensa a quien no le gana; sin dodge roll. El Coletazo además **empuja 1** (con daño de colisión si choca). Los No2 de un ataque y **2 SP**, o cooldown 3;
+  es su ataque del turno. Es una cascada de duelos (como el Daño en área del Tanque): el daño **se tira en cada duelo** (dueño: «así como está»; la otra
+  opción era un solo daño para todos). **Para probar.**
+
 ### Choque liviano (desde el 2026-10-21)
 
 - ✅ **Hit and run** (2026-10-21, dueño: «picar y alejarse»; nombre en inglés; una sola para bestias y humanoides): un ataque con su arma; pegue o no,

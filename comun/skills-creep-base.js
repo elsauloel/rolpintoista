@@ -33,6 +33,10 @@
   const aE = (estado, que) => ({detalle: `Le encanta el arma a un aliado dentro de su Rango (o la propia): durante 3 turnos de ese aliado, cada golpe con arma que pega suma +1d4 de daño ${que}. Es daño directo: solo lo frena la resistencia a ese elemento. Si ya tenía otra arma elemental, esta la reemplaza. Es su acción de ataque del turno.`,
     no2: 2, spCosto: 2, auditada: true, cuentaComoAtaque: true, ataqueTxt: `${estado} a un aliado (o a sí mismo) 3 turnos: +1d4 ${que.split(/[,(]| y /)[0].trim()} por golpe`,
     duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', dano: false, efectos: [{nombre: estado}]}});
+  // 🌀 Barrido y Coletazo (2026-10-21, choque pesado): la onda alrededor (el Remolino del Warrior, sin moverse): su PdG una vez contra la Evasión de
+  // cada uno, el daño de su arma (dados + Dmg) a quien no le gana; sin dodge roll. Lo de un ataque y 2 SP, o cooldown 3; es su ataque del turno.
+  const oB = (detalle, ataqueTxt, efectos) => ({detalle, no2: 'ATAQUE', spCosto: 2, auditada: true, cuentaComoAtaque: true, ataqueTxt,
+    duelo: {objetivo: 'onda', radio: 1, tira: 'pdg', contra: ['eva'], dano: true, danoArma: true, tipoDano: 'fisico', ignoraDano: false, efectos: efectos || []}});
   const slug = t => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
   // Estado del juego sobre sí mismo (preset de GM Tools: Sigilo, Invulnerable, Espinas…). turnos 0 = hasta que se lo saquen.
@@ -58,6 +62,7 @@
     'Salto': ['choque liviano', 'salto'], 'Salto aplastante': ['choque pesado', 'salto'], 'Vigilancia': ['rango', 'vigilancia'], 'Bola de fuego': ['mago', 'daño en área'], 'Confusión': ['debuffer', 'control mental'],
     'Arma ígnea': ['support', 'arma elemental'], 'Arma helada': ['support', 'arma elemental'], 'Arma eléctrica': ['support', 'arma elemental'],
     'Arma ácida': ['support', 'arma elemental'], 'Arma venenosa': ['support', 'arma elemental'],
+    'Barrido': ['choque pesado', 'barrido'], 'Coletazo': ['choque pesado', 'barrido'],
   };
 
   // fn: función (D T B X C K M I A); mec: mecánicas del juego que usa, separadas por coma (sigilo, trampas, terreno…);
@@ -117,7 +122,10 @@
   H('Cornada', 'D', 'b', 'mt', 2, aA('Embiste con los cuernos: un ataque con su arma con +1 a la Probabilidad de Golpe y +1 al daño; si pega, lo empuja 1 casilla lejos de la bestia. Si la ejecuta de lejos, toma carrera: corre en línea recta hasta quedar al lado (1 No2 por casillero) y suma +1 a la Probabilidad de Golpe, +1 al daño y +1 casilla de empuje por cada casillero que corrió.',
     {pdg: 1, fijo: 1}, 'va al duelo como un ataque con +1 PdG y +1 al daño (más 1 de cada por casillero de carrera); si pega, lo empuja', 2,
     [{nombre: 'Empujón', empuja: 1, detalle: 'Lo empuja 1 casilla, lejos de la bestia.'}], {embestida: true}));
-  H('Coletazo', 'DA', 'bc', 'mt', 3, zO('Un giro de cola que golpea a los adyacentes (a mano).', 3, 'M'));
+  // 🦎 Auditada (dueño, 2026-10-21; choque pesado, «barrido»): el Barrido de las bestias, y además empuja 1.
+  H('Coletazo', 'DA', 'bc', 'mt', 3, oB('Da un giro con la cola y le pega a todos los rivales que tiene al lado (la flor de diámetro 3, 7 casillas, a su alrededor; él no se cuenta). A cada uno que no le gana le hace el daño de su arma (sus dados más su Dmg), menos su Defensa, y lo empuja 1 casillero lejos de él; si choca contra algo, recibe además el daño de colisión. Tira su Probabilidad de Golpe una sola vez, contra la Evasión de cada uno; quien gana su Evasión no recibe nada (sin dodge roll). Cuenta como su ataque del turno.',
+    'su PdG, una vez, contra la Evasión de cada uno al lado; el daño de su arma y empuja 1 a quien no le gana',
+    [{nombre: 'Empujón', empuja: 1, detalle: 'Lo empuja 1 casilla, lejos de la bestia.'}]));
   H('Golpe doble', 'D', '*', 'me', 3, zO('Dos ataques seguidos: se tira el daño dos veces (a mano la segunda).', 3, 'M'));
   H('Remate', 'D', '*', 'me', 4, zO('Un golpe de gracia contra alguien herido: si el objetivo tiene menos de la mitad de HP, +1 dado (a mano).', 3, 'M'));
   H('Puñalada trapera', 'D', 'hd', 'e', 4, zO('Ataca desde un flanco o por la espalda: si el objetivo no lo vio, el daño se duplica (a mano).', 3, 'M'));
@@ -133,7 +141,9 @@
   H('Tajo de carnicero', 'DX', 'hd', 'me', 4, aA('Un tajo de carnicero que abre de lado a lado: un ataque con su arma con Perfora 1 (1 punto del daño pasa siempre la Defensa) y Crítico frecuente +1; si pega, deja un Sangrado fuerte (3 de daño por turno durante 3 turnos; se acumula y, con un golpe crítico, queda permanente).',
     {perfora: 1, critBono: 1}, 'va al duelo como un ataque con Perfora 1 y Crítico frecuente +1; si pega, Sangrado fuerte (3 por turno, 3 turnos)', 4, SGF));
   H('Golpe de escudo', 'DK', 'hdc', 'mt', 3, zO('Golpea con el escudo: el objetivo pierde 1 No2 (a mano).', 2, 'L'));
-  H('Barrido', 'DA', '*', 'mt', 3, zO('Un gran arco que golpea a los adyacentes (a mano).', 3, 'M'));
+  // 🌀 Auditada (dueño, 2026-10-21; choque pesado, «barrido»): castiga a quien lo rodea. El daño se tira en cada duelo de la cascada (dueño: «así como está»).
+  H('Barrido', 'DA', 'hd', 'mt', 3, oB('Gira con su arma y le pega a todos los rivales que tiene al lado (la flor de diámetro 3, 7 casillas, a su alrededor; él no se cuenta). A cada uno que no le gana le hace el daño de su arma (sus dados más su Dmg), menos su Defensa. Tira su Probabilidad de Golpe una sola vez, contra la Evasión de cada uno; quien gana su Evasión no recibe nada (sin dodge roll). Cuenta como su ataque del turno.',
+    'su PdG, una vez, contra la Evasión de cada uno al lado; el daño de su arma a quien no le gana'));
   H('Torbellino de acero', 'DA', 'hd', 'm', 5, zO('Gira sobre sí mismo golpeando a todos los adyacentes (a mano).', 4, 'H'));
   H('Pisotón', 'DAK', 'bc', 'mt', 4, zO('Una pisada que sacude el suelo: los adyacentes caen al piso (a mano).', 3, 'M'));
   // (Golpe de pomo: quitado de la biblioteca en la auditoría, dueño 2026-10-21.)

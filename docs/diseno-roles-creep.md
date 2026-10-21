@@ -33,7 +33,7 @@ Lo que busca cada estilo. ✅ = ya hay habilidad auditada que lo cubre.
    cargado, Golpe aplastante, sin auditar).
 2. **Remate**: pega más fuerte a quien ya está herido (Remate, Golpe de gracia).
 3. **Varios golpes**: dos ataques en uno, con menos puntería cada uno (Golpe doble, Ráfaga de golpes).
-4. **Barrido**: le pega a varios de los que tiene al lado o al frente (Barrido, Torbellino de acero, Coletazo).
+4. ✅ **Barrido**: le pega a varios de los que tiene al lado — **Barrido** y **Coletazo** (2026-10-21); queda **Torbellino de acero** como versión fuerte.
 5. **Furia**: pega más fuerte a cambio de defenderse peor (Furia, Frenesí, Ataque de furia).
 - ✅ **Más daño en un golpe**: Golpe fuerte (+1 dado), Puño de roca (+2 y Demora), Tajo veloz, Estocada, Zarpazo.
 

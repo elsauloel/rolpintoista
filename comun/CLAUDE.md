@@ -1670,3 +1670,9 @@ versión parecida en más de una, es candidato a juntar.
   2 turnos) y `Combatiente.etereo(estados)` (por la marca o el nombre). El mapa (`etereoDe`, js/03) lo mira en lo público de cualquiera (personaje,
   invocación, creep) además de la marca del Ojo; el freno de actuar es el de Stun y Mareo (`stunAntes`, js/20: `o.mover` deja moverse). El Ojo de
   Kicillof lo lleva puesto (permanente: se va con el ojo).
+- **💧 Creeps con SP** (2026-10-20, dueño: «que las skills puedan usar SP en vez de cooldown, con un switch, para probarlas en simultáneo»): `sc.modoSP`
+  (el ⇄ junto a «Habilidades» en las Acciones del mapa y de GM Tools, `data-modosp`; al prenderlo arranca lleno). `CreepCalculo.modoSP/spMax` (Especial × 3 + `sp`)
+  `/spRegen` (la mitad del Especial + `spregen`, **mínimo 1**, dueño) `/spActual` (`sc.sp`; sin dato, lleno) `/costoSpHab` (`h.spCosto`; si no, un número en `h.costo`; si
+  no, su cooldown; sin cooldown, 1). En modo SP `bloqueoHab` no mira el cooldown, `CreepAcciones.ejecutarHab` cobra SP en vez de cooldown (`p.costoSp`),
+  `confirmarSP` pregunta si no alcanza (deja seguir, queda en 0), `inicioCreep` recarga, Pasar de día lo llena (js/41) y las varitas cobran su SP
+  sin espera (`costoEspecialCreep` → `sp`). Maldito: le saca vida igual a su SP.

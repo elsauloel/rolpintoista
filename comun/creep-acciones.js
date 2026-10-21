@@ -407,7 +407,8 @@ const CreepAcciones = (() => {
     if(costoHp > 0) partes.push(`−${fmt(costoHp)} HP`);
     if(num(h.curaHp) > 0) partes.push(`+${fmt(num(h.curaHp))} HP`);
     if(falta) partes.push(`⚠ ${falta}: se ejecutó como semiautomática`);
-    if(h.cd > 0) partes.push(`cooldown ${fmt(num(h.cd))} turno(s)`);
+    if(p.costoSp) partes.push(`−${fmt(p.costoSp)} SP (quedan ${fmt(C().spActual(sc))})`);   // 💧 modo SP
+    else if(h.cd > 0) partes.push(`cooldown ${fmt(num(h.cd))} turno(s)`);
     if(efecto) partes.push(`${efecto.nombre} (${fmt(efecto.turnos)}t)`);
     ui.toast(`${h.nombre||'Habilidad'} ${partes.join(' · ')}`);
   }

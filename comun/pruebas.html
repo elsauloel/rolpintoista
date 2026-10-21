@@ -991,6 +991,13 @@ prueba('👁 Vigilancia (2026-10-21): el estado, la del creep y la del Shooter',
   const e = sc.estados[0], sh = CLASES_SKILLS.find(c => c.id === 'shooter').habilidades.find(x => x.id === 'shooter-vigilancia');
   igual([h.anuncio, h.spCosto, !!e.vigilancia, !!e.alEmpezarTurno, sh.costo, sh.nitrosCosto, sh.duelo.efectos[0].nombre], ['{nombre} se pone en vigilancia.', 2, true, true, '2', '1', 'Vigilancia']);
 });
+prueba('⚡ Cadena de rayos de creep (2026-10-21): 2d4 eléctrico que salta y 20 % de Parálisis', () => {
+  const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Cadena de rayos').datos, 2);
+  const hab = Combatiente.habEjecucion(h, h.duelo, {stat: () => 0, etq: s => s});
+  const e = hab.efectos[0] || {};
+  igual([h.cd, hab.objetivo, hab.dano && hab.dano.formula, hab.dano && hab.dano.tipo, hab.cadena && hab.cadena.rango, hab.cadena && hab.cadena.saltos, e.nombre, e.caras, e.exitos],
+    [3, 'enemigo', '2d4', 'eléctrico', 4, 99, 'Parálisis', 10, 2]);
+});
 prueba('🎯 Tiro a la cabeza (2026-10-21): el estado propio con su bono y que se pierde con daño', () => {
   const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Tiro a la cabeza').datos, 2);
   const sc = {nombre: 'Arquero', nivel: 2, con: 3, esp: 2, nitros: 5, sp: 6, modoSP: true, estados: [], habilidades: [h], cooldowns: {}};

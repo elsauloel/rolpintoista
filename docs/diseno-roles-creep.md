@@ -6,8 +6,9 @@
 ## Forma de trabajo
 
 - **Se rota rol por rol**: una habilidad de un rol, después una del siguiente, y así. No se va estado por estado.
-- **Al entrar a un rol**: un repaso corto de lo que ya hay (qué mecánicas están cubiertas) y una sugerencia para la próxima habilidad, a partir de la
-  lista de ideas de ese rol (abajo). Cada lista se retoma cada vez que se vuelve al rol.
+- **Al entrar a un rol, primero la lista completa de conceptos de ese rol** (dueño, 2026-10-21: «siempre que vayamos a encarar un nuevo rol, primero vemos
+  la lista»): familias, ✦ = acelera la pelea, ✅ = ya cubierto. Si la lista no está completa, se completa acá antes. Después se elige la habilidad. Cada
+  lista se retoma cada vez que se vuelve al rol.
 - Lo que el dueño define («queda así») se programa, pasa las pruebas automáticas, se sube y se anota «para probar»; las pruebas en el mapa se corren
   todas juntas cuando él lo pide.
 - Una habilidad puede servir a más de un rol, y puede tener su versión de bestia y de humanoide (o una sola para los dos).
@@ -26,27 +27,63 @@ Transversal (fases, refuerzos, la furia del jefe): se evalúa cuando haya unos b
 
 ## 1. Choque pesado — las ideas del rol
 
-Lo que busca cada estilo. ✅ = ya hay habilidad auditada que lo cubre.
+**Son conceptos de diseño** (dueño, 2026-10-21): cada vez que toque una habilidad de choque pesado se explora uno y se marca ✅. ✦ = acelera la pelea.
+Sirven al warrior (pegar fuerte), al tanque (aguantar y controlar) o a los dos.
 
-**Warrior (pegar fuerte):**
-1. **Golpe que se anuncia**: un turno carga a la vista de todos y al siguiente pega muy fuerte; los jugadores lo ven venir y reaccionan (Golpe
-   cargado, Golpe aplastante, sin auditar).
-2. **Remate**: pega más fuerte a quien ya está herido (Remate, Golpe de gracia).
-3. **Varios golpes**: dos ataques en uno, con menos puntería cada uno (Golpe doble, Ráfaga de golpes).
-4. ✅ **Barrido**: le pega a varios de los que tiene al lado — **Barrido** y **Coletazo** (2026-10-21); queda **Torbellino de acero** como versión fuerte.
-5. **Furia**: pega más fuerte a cambio de defenderse peor (Furia, Frenesí, Ataque de furia).
-- ✅ **Más daño en un golpe**: Golpe fuerte (+1 dado), Puño de roca (+2 y Demora), Tajo veloz, Estocada, Zarpazo.
+**A. Pegar fuerte** (warrior)
+1. ✅ **Más daño en un golpe**: Golpe fuerte (+1 dado), Puño de roca (+2 y Demora), Zarpazo.
+2. **Golpe que se anuncia** ✦: un turno carga a la vista de todos y al siguiente pega muy fuerte; los jugadores lo ven venir y reaccionan (Golpe cargado,
+   Golpe aplastante).
+3. **Remate** ✦: pega más fuerte a quien ya está herido (Remate, Golpe de gracia).
+4. **Varios golpes**: dos ataques en uno, con menos puntería cada uno (Golpe doble, Ráfaga de golpes).
+5. **Golpe que sigue** ✦: si tumba a alguien, vuelve a atacar a otro de al lado.
+6. **Partir la armadura**: el golpe deja Armadura rota o perfora la Defensa.
+7. **Furia** ✦: pega más fuerte a cambio de defenderse peor (Furia, Frenesí, Ataque de furia).
+8. **Frenesí que crece** ✦: cada golpe que da en el combate le suma daño al siguiente.
 
-**Tanque (aguantar y controlar):**
-6. **Provocar**: obliga a los jugadores a ocuparse de él (¡Tu vieeeja! ya existe en el Bosque).
-7. **Guardia**: se planta y se defiende mejor — ✅ **Aguante** (+2 Defensa y Def.Esp, y devuelve los golpes).
-8. **Proteger a un aliado**: recibe el golpe por otro creep.
-9. **Castigar a quien le pega**: contraataque o espinas — ✅ en parte, **Aguante** (los golpes que recibe vuelven como dados).
-10. **Romper la defensa del rival**: romperle la armadura o desarmarlo (Romper armadura, Desarmar).
-11. **Aguantar**: curarse o volver a levantarse (Segundo aliento, Regeneración rápida, Segunda fase).
-- ✅ **Empujar y reposicionar**: Cornada (empuja, y con carrera más).
-- ✅ **Caer desde arriba**: Salto aplastante (salta hasta 3 casilleros; los de al lado tiran Res.CC o quedan Sentados; +2 al daño).
-- ✅ **Atrapar**: Mordisco feroz, Agarrón, Abrazo aplastante (y las redes, que sirven a otros roles).
+**B. Pegarle a varios**
+9. ✅ **Barrido**: Barrido y Coletazo (todos los de al lado).
+10. **Torbellino de acero**: el barrido fuerte, moviéndose antes (como el Remolino).
+11. **Hendidura**: un golpe en línea que alcanza también al de atrás.
+12. **Pisotón**: una onda alrededor que tira Sentado, sin saltar.
+
+**C. Llegar a la pelea**
+13. ✅ **Empujar y tomar carrera**: Cornada.
+14. ✅ **Caer desde arriba**: Salto aplastante.
+15. **Carga que derriba**: llega corriendo y lo tira Sentado.
+16. **Arrastrar**: lo trae hacia él (una cadena, un gancho, la lengua).
+17. **Lanzar**: agarra a un rival y lo tira dos casilleros (con daño de colisión, también contra otro).
+
+**D. Controlar el frente** (tanque)
+18. **Provocar**: obliga a los jugadores a ocuparse de él (¡Tu vieeeja! ya existe en el Bosque).
+19. **Zona de control**: alejarse de su lado cuesta más No2, o le da una oportunidad de más.
+20. **Muralla**: nadie pasa por las casillas de al lado sin frenarse.
+21. ✅ **Atrapar**: Mordisco feroz, Agarrón, Abrazo aplastante.
+22. **Derribar**: un golpe que deja Sentado.
+23. **Aturdir**: un golpe que deja Pajaritos o Stun.
+
+**E. Aguantar**
+24. ✅ **Guardia**: Aguante (+2 Defensa y Def.Esp, y devuelve los golpes).
+25. **Segundo aliento**: se cura una vez por combate (Segundo aliento, Regeneración rápida).
+26. **Piel de piedra**: resistencia a crítico o a un elemento por unos turnos.
+27. **Inamovible**: no lo empujan ni lo derriban por unos turnos.
+28. **Última resistencia**: al caer, aguanta un turno más en pie (Segunda fase).
+
+**F. Proteger**
+29. **Proteger a un aliado**: recibe el golpe por otro creep.
+30. **Cubrir al de atrás**: los aliados detrás de él ganan Defensa.
+31. **Interponerse**: se mueve gratis para tapar a un aliado al que van a atacar.
+
+**G. Castigar a quien le pega**
+32. ✅ en parte: **Aguante** (los golpes que recibe vuelven como dados).
+33. **Espinas o contraataque**: le devuelve parte del golpe, o pega de vuelta.
+34. **Represalia**: si le pegan a un aliado de al lado, ataca gratis.
+35. **Desarmar**: el arma del rival cae al piso.
+
+**H. Apuestas** ✦
+36. **Todo o nada**: un golpe enorme, pero si falla queda Expuesto.
+37. **Sangre por sangre**: pierde vida para pegar más fuerte.
+38. **Berserker**: con poca vida, pega mucho más.
 
 ## 2. Choque liviano — las ideas del rol
 
@@ -141,7 +178,7 @@ la emboscada, matabestias, la espalda a distancia, la recarga, el proyectil perf
 Ya cubierto al entrar (2026-10-21): ninguna habilidad de caster auditada; en el mapa, los hechizos dirigidos y de área (cascada, dodge roll), conos,
 líneas, zonas, el rayo en cadena y los charcos, los controles mentales.
 
-- **Mago (daño directo):** proyectil mágico, ✅ **Bola de fuego** (2026-10-21), cono de frío, cadena de rayos, muro de fuego.
+- **Mago (daño directo):** proyectil mágico, ✅ **Bola de fuego** (2026-10-21), cono de frío, ✅ **Cadena de rayos** (2026-10-21), muro de fuego.
 - **Debuffer:** familias (2026-10-21): bajar números, quitar No2, **control mental** (✅ **Confusión**; siguen Susurros de locura en área, Grito de
   pánico, Palabra de silencio), daño que dura, los sentidos, contra el sigilo, el orden de turnos, romper la defensa, auras.
 - **Support:** ver el listado completo abajo (§ 5).

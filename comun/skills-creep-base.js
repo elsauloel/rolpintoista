@@ -63,7 +63,7 @@
     'Arma ígnea': ['support', 'arma elemental'], 'Arma helada': ['support', 'arma elemental'], 'Arma eléctrica': ['support', 'arma elemental'],
     'Arma ácida': ['support', 'arma elemental'], 'Arma venenosa': ['support', 'arma elemental'],
     'Barrido': ['choque pesado', 'barrido'], 'Coletazo': ['choque pesado', 'barrido'],
-    'Tiro a la cabeza': ['rango', 'tiro apuntado'],
+    'Tiro a la cabeza': ['rango', 'tiro apuntado'], 'Cadena de rayos': ['mago', 'rayo en cadena'],
     'Puñalada por la espalda': ['choque liviano', 'por la espalda'], 'Mordida a traición': ['choque liviano', 'por la espalda'], 'Puñalada trapera': ['choque liviano', 'por la espalda'],
   };
 
@@ -194,6 +194,12 @@
     duelo: {objetivo: 'area', tira: 'pdgmg', contra: ['eva'], radio: 1, centroAlcance: 'rango', dano: true, danoFormula: '2d6', danoSumaEsp: 0.25, tipoDano: 'fuego',
       efectos: [{nombre: 'Quemadura'}]}});
   H('Rayo', 'D', 'ega', 'g', 3, zO('Un rayo que atraviesa la armadura.', 3, 'M'));
+  // ⚡ Auditada (dueño, 2026-10-21; el Mago): un rayo dirigido que salta (la regla general del rayo: la mitad de lo que entró, sin repetir, hasta llegar a 1)
+  // y 20 % de Parálisis al primero; 2d4 sin el Efecto especial (P216 en pausa). 3 No2 y 3 SP, o cooldown 3.
+  H('Cadena de rayos', 'D', 'ega', 'g', 3, {detalle: 'Lanza un rayo a un rival dentro de su Rango: tira su Probabilidad de Golpe especial contra la Evasión del objetivo. Si pega: 2d4 de daño eléctrico (lo frenan la Defensa especial y la resistencia eléctrica) y 20 % de Parálisis 1 turno. Lo que le entró salta al rival más cercano (4 casillas o menos) con la mitad, sin repetir, hasta llegar a 1; en un charco, corre por el agua.',
+    no2: 3, spCosto: 3, auditada: true, ataqueTxt: 'su PdG.Esp contra la Evasión; 2d4 eléctrico que salta (la mitad cada vez) y 20 % de Parálisis',
+    duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['eva'], alcance: 'rango', dano: true, danoFormula: '2d4', tipoDano: 'eléctrico', cadena: {saltos: 99, rango: 4},
+      efectos: [{nombre: 'Parálisis', turnos: 1, caras: 10, exitos: 2}]}});
   H('Misil arcano', 'D', 'hdga', 'g', 2, aT('Un proyectil mágico que no falla.', 'M'));
   H('Descarga eléctrica', 'DK', 'ea', 'g', 3, zO('Una descarga que deja al objetivo sin aliento: pierde 1 No2 (a mano).', 2, 'M'));
   H('Llamarada', 'DA', 'e', 'g', 4, zO('Una lengua de fuego en línea (a mano).', 3, 'M'));

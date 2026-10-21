@@ -93,6 +93,9 @@ cubierto). Pedido del dueño: arrancar por las que **aceleran la pelea** (que se
 las posibilidades del rol. ✦ = acelera la pelea. Lo que ya existe en el mapa para personajes (Empower, Re-roll, Enyetar, Marcado, Turno libre,
 Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep está auditada; las que hay son casi todas «a mano».
 
+**▶ La próxima vez que toque Support** (dueño, 2026-10-21): un buff que le da a un aliado **Espinas** (devuelve parte del golpe) y otro que le da
+**Espejo** (los dos, como buffs de support). En curso: **Arma elemental** (concepto 3), una por elemento, +1d4 del elemento por golpe 3 turnos.
+
 **A. Potenciar el golpe de los aliados** ✦
 1. **Grito de guerra**: los aliados cercanos pegan más fuerte unos turnos (hoy Aullido de manada, Grito de ánimo, a mano).
 2. **Bendecir el arma**: el próximo golpe de un aliado suma un dado.

@@ -21,6 +21,8 @@
   const zO = (detalle, no2, dano) => ({detalle, no2, dano});
   const RG = [{nombre: 'Rengo', turnos: 2, detalle: 'Rengo 2 turnos: moverse le cuesta 2 No2 por casillero.'}];   // el Rengo de los golpes a las piernas (2026-10-21)
   const SGF = [{nombre: 'Sangrado', turnos: 3, stacks: 3, detalle: 'Sangrado fuerte: 3 de daño por turno durante 3 turnos (se acumula; con crítico, permanente).'}];   // la versión fuerte
+  const AR = n => [{nombre: 'Armadura rota', stacks: n, detalle: n > 1 ? 'Armadura rota doble: 2 acumulaciones.' : 'Armadura rota: 1 acumulación.'}];   // romper armadura (2026-10-21)
+  const AR_NOTA = 'Un golpe crítico no rompe armadura (la esquiva); alcanza con que el golpe pegue, aunque la armadura frene todo el daño. A un personaje le cae en una pieza equipada al azar (pierde Defensa y durabilidad hasta repararla); a un creep, −1 Defensa por acumulación.';
   const SG = [{nombre: 'Sangrado', turnos: 2, detalle: 'Sangrado: 2 de daño por turno durante 2 turnos (se acumula; con crítico, permanente).'}];   // el Sangrado de los golpes que sangran (2026-10-21)
   const tA = (detalle, no2) => ({detalle, no2});
   // Un ataque con su arma, con arreglos (`arma`: los de la Ejecución ✨ — dados, pdg, fijo, perfora, critBono…), que va al duelo como un ataque.
@@ -63,7 +65,9 @@
     'Arma ígnea': ['support', 'arma elemental'], 'Arma helada': ['support', 'arma elemental'], 'Arma eléctrica': ['support', 'arma elemental'],
     'Arma ácida': ['support', 'arma elemental'], 'Arma venenosa': ['support', 'arma elemental'],
     'Barrido': ['choque pesado', 'barrido'], 'Coletazo': ['choque pesado', 'barrido'],
-    'Tiro a la cabeza': ['rango', 'tiro apuntado'], 'Cadena de rayos': ['mago', 'rayo en cadena'],
+    'Tiro a la cabeza': ['rango', 'tiro apuntado'],
+    'Romper armadura': ['choque pesado', 'romper armadura'], 'Arrancar la coraza': ['choque pesado', 'romper armadura'],
+    'Golpe demoledor': ['choque pesado', 'romper armadura'], 'Mandíbula trituradora': ['choque pesado', 'romper armadura'], 'Cadena de rayos': ['mago', 'rayo en cadena'],
     'Puñalada por la espalda': ['choque liviano', 'por la espalda'], 'Mordida a traición': ['choque liviano', 'por la espalda'], 'Puñalada trapera': ['choque liviano', 'por la espalda'],
   };
 
@@ -283,7 +287,15 @@
   H('Ralentizar', 'X', 'hdea', 'x', 3, tA('El objetivo pierde 2 No2 en su próximo turno (a mano).', 2));
   H('Miedo', 'XK', 'bdma', 'x', 4, tA('Si el objetivo falla Res.Mt huye de él 2 turnos (a mano).', 2));
   H('Intimidar', 'X', 'bhd', 'x', 2, tA('Una mirada amenazante: el objetivo pierde 1 de Daño 2 turnos (a mano).', 1));
-  H('Romper armadura', 'X', 'hdbc', 'mx', 3, tA('Un golpe a las juntas: el objetivo pierde 2 de Defensa 3 turnos (a mano).', 2));
+  // 🔨 Auditadas (dueño, 2026-10-21; choque pesado, «partir la armadura»): la común y la fuerte, cada una con su versión de bestia.
+  H('Romper armadura', 'DX', 'hdc', 'mt', 3, aA(`Un golpe a las juntas: un ataque con su arma que, si pega, deja Armadura rota 1. ${AR_NOTA}`,
+    {}, 'un ataque con su arma; si pega, Armadura rota 1', 2, AR(1)));
+  H('Arrancar la coraza', 'DX', 'b', 'mt', 3, aA(`Clava garras o colmillos en la armadura y tira: un ataque con su arma que, si pega, deja Armadura rota 1. ${AR_NOTA}`,
+    {}, 'un ataque con su arma; si pega, Armadura rota 1', 2, AR(1)));
+  H('Golpe demoledor', 'DX', 'hdc', 'mt', 4, aA(`Un golpe con todo el peso: un ataque con su arma con +1 dado de su arma que, si pega, deja Armadura rota doble (2 acumulaciones). ${AR_NOTA}`,
+    {dados: 1}, 'un ataque con su arma con +1 dado; si pega, Armadura rota doble', 4, AR(2)));
+  H('Mandíbula trituradora', 'DX', 'b', 'mt', 4, aA(`Muerde y tritura la armadura: un ataque con su arma con +1 dado de su arma que, si pega, deja Armadura rota doble (2 acumulaciones). ${AR_NOTA}`,
+    {dados: 1}, 'un ataque con su arma con +1 dado; si pega, Armadura rota doble', 4, AR(2)));
   H('Veneno', 'X', 'bpdh', 'x', 3, tA('Envenena al objetivo: pierde 1d4 de vida por turno 3 turnos (a mano).', 2));
   H('Pudrición', 'X', 'pm', 'x', 4, tA('El objetivo queda podrido: −2 de Defensa y −1 de Daño 3 turnos (a mano).', 2));
   // 😵 Auditada (dueño, 2026-10-21; el Debuffer, control mental): su PdG.Esp contra la Res.Mt de un rival en su Rango; si gana, Confusión 1 turno (el mapa la

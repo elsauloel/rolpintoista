@@ -991,6 +991,14 @@ prueba('👁 Vigilancia (2026-10-21): el estado, la del creep y la del Shooter',
   const e = sc.estados[0], sh = CLASES_SKILLS.find(c => c.id === 'shooter').habilidades.find(x => x.id === 'shooter-vigilancia');
   igual([h.anuncio, h.spCosto, !!e.vigilancia, !!e.alEmpezarTurno, sh.costo, sh.nitrosCosto, sh.duelo.efectos[0].nombre], ['{nombre} se pone en vigilancia.', 2, true, true, '2', '1', 'Vigilancia']);
 });
+prueba('🔨 Romper armadura (2026-10-21): las cuatro dejan Armadura rota (1 o doble) y la fuerte suma un dado', () => {
+  const ar = n => armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos, 2);
+  const a = n => { const h = ar(n); return Combatiente.ataqueConArreglos(h, h.duelo, {}); };
+  const r = a('Romper armadura'), b = a('Arrancar la coraza'), g = a('Golpe demoledor'), m = a('Mandíbula trituradora');
+  const ef = x => ((x.efectos || [])[0] || {}), st = x => Math.max(1, (ef(x).spec || {}).stacks || 1);
+  igual([ar('Romper armadura').cd, ar('Golpe demoledor').cd, ef(r).nombre, st(r), st(b), st(g), st(m), (g.mods || {}).dados, (r.mods || {}).dados || 0],
+    [3, 4, 'Armadura rota', 1, 1, 2, 2, 1, 0]);
+});
 prueba('⚡ Cadena de rayos de creep (2026-10-21): 2d4 eléctrico que salta y 20 % de Parálisis', () => {
   const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Cadena de rayos').datos, 2);
   const hab = Combatiente.habEjecucion(h, h.duelo, {stat: () => 0, etq: s => s});

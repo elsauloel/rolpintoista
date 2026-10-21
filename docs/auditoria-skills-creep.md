@@ -120,6 +120,10 @@
   es su ataque del turno. Es una cascada de duelos (como el Daño en área del Tanque): el daño **se tira en cada duelo** (dueño: «así como está»; la otra
   opción era un solo daño para todos). **Para probar.**
 
+- ✅ **Romper armadura** (humanoide) y **Arrancar la coraza** (bestia): un ataque con su arma que, si pega, deja **Armadura rota 1**; lo de un ataque y
+  **2 SP**, o cooldown 3. **Golpe demoledor** (humanoide) y **Mandíbula trituradora** (bestia), la versión fuerte: **+1 dado** y **Armadura rota doble**;
+  **4 SP**, o cooldown 4 (2026-10-21, dueño, «partir la armadura»). Un crítico no rompe armadura; entra aunque la armadura frene todo el daño. **Para probar.**
+
 ### Choque liviano (desde el 2026-10-21)
 
 - ✅ **Hit and run** (2026-10-21, dueño: «picar y alejarse»; nombre en inglés; una sola para bestias y humanoides): un ataque con su arma; pegue o no,

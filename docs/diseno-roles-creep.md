@@ -37,7 +37,7 @@ Sirven al warrior (pegar fuerte), al tanque (aguantar y controlar) o a los dos.
 3. **Remate** ✦: pega más fuerte a quien ya está herido (Remate, Golpe de gracia).
 4. **Varios golpes**: dos ataques en uno, con menos puntería cada uno (Golpe doble, Ráfaga de golpes).
 5. **Golpe que sigue** ✦: si tumba a alguien, vuelve a atacar a otro de al lado.
-6. **Partir la armadura**: el golpe deja Armadura rota o perfora la Defensa.
+6. ✅ **Partir la armadura**: **Romper armadura** / **Arrancar la coraza** y **Golpe demoledor** / **Mandíbula trituradora** (2026-10-21). Queda: perforar.
 7. **Furia** ✦: pega más fuerte a cambio de defenderse peor (Furia, Frenesí, Ataque de furia).
 8. **Frenesí que crece** ✦: cada golpe que da en el combate le suma daño al siguiente.
 

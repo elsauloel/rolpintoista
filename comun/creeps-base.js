@@ -82,8 +82,8 @@
     'Golpe de escudo': A('Golpe de escudo', 1, {nitros: -1}), 'Dardo venenoso': A('Veneno'), 'Mordisco venenoso': A('Veneno'),
     'Herida sangrante': A('Sangrado'),   // (Corte profundo, Zarpazo desgarrador y Golpe que sangra: van al duelo desde la auditoría, 2026-10-21)
     'Sembrar veneno': A('Veneno'), 'Aturdir con estruendo': A('Stun'), 'Aturdir': A('Stun'), 'Congelar': A('Stun'), 'Hipnosis': A('Stun', 1),
-    'Agotar': A('Exhausto'), 'Cansar': A('Cansado'), 'Lisiar': A('Lisiado'), 'Clavar al suelo': A('Inmovilizado'), 'Romper la rodilla': A('Rengo'),
-    'Mordisco que lisia': A('Rengo'), 'Disparo a la rodilla': A('Rengo'), 'Nublar la mente': A('Pajaritos'), 'Golpe atontador': A('Pajaritos'),
+    'Agotar': A('Exhausto'), 'Cansar': A('Cansado'), 'Lisiar': A('Lisiado'), 'Clavar al suelo': A('Inmovilizado'),
+    'Nublar la mente': A('Pajaritos'), 'Golpe atontador': A('Pajaritos'),
     'Corroer el metal': A('Armadura rota'), 'Disolver la armadura': A('Armadura rota'), 'Toxina severa': A('Veneno severo'),
     // trampas
     'Cepo': A('Inmovilizado', 2), 'Trampa de veneno': A('Veneno'), 'Trampa de hielo': A('Escarcha', 1, {nitros: -1}), 'Trampa de red': A('Inmovilizado', 1),

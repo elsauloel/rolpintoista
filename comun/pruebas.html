@@ -948,6 +948,11 @@ prueba('🩸 La versión fuerte del Sangrado: Tajo de carnicero y Destripar (202
     const est = EstadosAplicar.componer(a.efectos[0].spec); return [a.perfora, a.mods.critBono, est.stacks, est.turnos, est.permanente, h.spCosto, h.cd].join('/'); };
   igual(['Tajo de carnicero', 'Destripar'].map(v), ['1/1/3/3/false/4/4', '1/1/3/3/false/4/4']);
 });
+prueba('🦵 El Rengo: Golpe a la rodilla, Tarascón al tobillo y Tiro a la rodilla (2026-10-21)', () => {
+  const v = n => { const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos, 2); const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});
+    const est = EstadosAplicar.componer(a.efectos[0].spec); return [est.nombre, est.turnos, !!est.rengo, h.spCosto, h.cd].join('/'); };
+  igual(['Golpe a la rodilla', 'Tarascón al tobillo', 'Tiro a la rodilla'].map(v), ['Rengo/2/true/2/3', 'Rengo/2/true/2/3', 'Rengo/2/true/2/3']);
+});
 prueba('👊 Puño de roca (2026-10-21): +2 al daño y Demora', () => {
   const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Puño de roca').datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});

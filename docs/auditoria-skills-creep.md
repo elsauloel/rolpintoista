@@ -91,6 +91,13 @@
   (se acumula; con crítico, permanente). Costo de un ataque, más **4 SP** o cooldown 4. **Tajo de carnicero** (humanoides) y **Destripar** (bestias),
   las dos nuevas. **Para probar en el mapa.**
 
+### Movilidad (desde el 2026-10-21)
+
+- ✅ **El Rengo** (2026-10-21, dueño, con sus nombres): un ataque con su arma; si pega, **Rengo 2 turnos** (moverse le cuesta 2 No2 por casillero).
+  Costo de un ataque, más **2 SP** o cooldown 3. **Golpe a la rodilla** (humanoides; antes «Romper la rodilla», que solo ponía el Rengo a mano),
+  **Tarascón al tobillo** (bestias; antes «Mordisco que lisia») y **Tiro a la rodilla** (humanoides, a distancia; antes «Disparo a la rodilla»).
+  **Para probar en el mapa.**
+
 ## Etiquetas
 
 - Cada habilidad ya trae etiquetas de función, velocidad, raza (tipo de criatura), rol, a quién apunta, mecánicas y automatización. Desde el

@@ -19,6 +19,7 @@
   const FN = {D: 'daño', T: 'defensa', B: 'buff', X: 'debuff', C: 'curación', K: 'control', M: 'movilidad', I: 'invocación', A: 'área'};
   const aT = (detalle, dano) => ({detalle, no2: 'ATAQUE', dano});
   const zO = (detalle, no2, dano) => ({detalle, no2, dano});
+  const RG = [{nombre: 'Rengo', turnos: 2, detalle: 'Rengo 2 turnos: moverse le cuesta 2 No2 por casillero.'}];   // el Rengo de los golpes a las piernas (2026-10-21)
   const SGF = [{nombre: 'Sangrado', turnos: 3, stacks: 3, detalle: 'Sangrado fuerte: 3 de daño por turno durante 3 turnos (se acumula; con crítico, permanente).'}];   // la versión fuerte
   const SG = [{nombre: 'Sangrado', turnos: 2, detalle: 'Sangrado: 2 de daño por turno durante 2 turnos (se acumula; con crítico, permanente).'}];   // el Sangrado de los golpes que sangran (2026-10-21)
   const tA = (detalle, no2) => ({detalle, no2});
@@ -443,15 +444,19 @@
   H('Cansar', 'X', '*', 'x', 3, tA('Aplicale al objetivo Cansado: pierde un tercio de sus No2 máximos 3 turnos (a mano).', 1), 'estados alterados');
   H('Lisiar', 'X', 'bhd', 'mx', 4, tA('Aplicale al objetivo Lisiado: su PdG y Parry a la mitad 3 turnos (a mano).', 2), 'estados alterados');
   H('Clavar al suelo', 'K', 'hdb', 'x', 4, tA('Aplicale al objetivo Inmovilizado: su movimiento queda en 0 3 turnos (a mano).', 2), 'estados alterados');
-  H('Romper la rodilla', 'K', 'hdb', 'mx', 3, tA('Aplicale al objetivo Rengo: su movimiento a la mitad 3 turnos (a mano).', 2), 'estados alterados');
+  // 🦵 El Rengo (dueño, 2026-10-21, con sus nombres: «golpe a la rodilla», «tarascón al tobillo», «tiro a la rodilla»): un ataque con su arma que, si pega, deja Rengo 2 turnos.
+  H('Golpe a la rodilla', 'DK', 'hd', 'mx', 3, aA('Un golpe seco a la rodilla: un ataque con su arma; si pega, queda Rengo 2 turnos (moverse le cuesta 2 No2 por casillero).',
+    {}, 'va al duelo como un ataque; si pega, Rengo 2 turnos', 2, RG), 'estados alterados');
   H('Nublar la mente', 'X', 'ma', 'gx', 3, tA('Aplicale al objetivo Pajaritos: PdG y Evasión a la mitad 3 turnos (a mano).', 2), 'estados alterados');
   H('Corroer el metal', 'X', 'ca', 'x', 4, tA('Aplicale al objetivo Armadura rota: −1 Defensa por acumulación, permanente hasta repararla (a mano).', 2), 'estados alterados');
   H('Disolver la armadura', 'X', 'ca', 'x', 6, tA('Aplicale al objetivo Armadura rota (se acumula si ya la tiene) hasta repararla (a mano).', 4), 'estados alterados');
   H('Toxina severa', 'X', 'bp', 'x', 5, tA('Aplicale al objetivo Veneno severo: pierde 1 HP el primer turno y 1 más con cada mantenimiento, sin caducar (a mano).', 3), 'estados alterados');
   H('Golpe que sangra', 'DX', 'hd', 'me', 2, aA('Un golpe que abre la carne: un ataque con su arma; si pega, deja Sangrado (2 de daño por turno durante 2 turnos; se acumula y, con un golpe crítico, queda permanente).',
     {}, 'va al duelo como un ataque; si pega, Sangrado', 1, SG), 'estados alterados');
-  H('Mordisco que lisia', 'DX', 'b', 'me', 3, zO('Muerde una pierna: daño y aplicale al objetivo Rengo (a mano).', 2, 'L'), 'estados alterados');
-  H('Disparo a la rodilla', 'DX', 'hd', 'r', 3, zO('Tira a una pierna: daño y aplicale al objetivo Rengo (a mano).', 2, 'L'), 'estados alterados');
+  H('Tarascón al tobillo', 'DK', 'b', 'me', 3, aA('Un tarascón al tobillo: un ataque con su arma; si pega, queda Rengo 2 turnos (moverse le cuesta 2 No2 por casillero).',
+    {}, 'va al duelo como un ataque; si pega, Rengo 2 turnos', 2, RG), 'estados alterados');
+  H('Tiro a la rodilla', 'DK', 'hd', 'r', 3, aA('Un tiro bajo, a la rodilla: un ataque con su arma; si pega, queda Rengo 2 turnos (moverse le cuesta 2 No2 por casillero).',
+    {}, 'va al duelo como un ataque; si pega, Rengo 2 turnos', 2, RG), 'estados alterados');
   H('Golpe atontador', 'DK', 'hdb', 'm', 4, zO('Un golpe en la cabeza: daño y aplicale al objetivo Pajaritos (a mano).', 3, 'M'), 'estados alterados');
 
   /* ================= ORIENTACIÓN, MOVIMIENTO EN EL MAPA Y ROBO ================= */

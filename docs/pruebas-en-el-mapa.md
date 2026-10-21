@@ -18,19 +18,19 @@
   de trabajo).
 - [x] **👊 Puño de roca** (+2 al daño y Demora) — probado en el mapa el 2026-10-21: la declaración dice «+2 de daño fijo» y la Demora bajó a Silvia
   del 2.º al 3.º lugar del orden de turnos.
-- [ ] **🩸 Las cuatro variantes del Sangrado** (2026-10-21): Golpe que sangra / Zarpazo desgarrador (solo Sangrado, 1 SP), Corte profundo / Colmillos
+- [x] **🩸 Las cuatro variantes del Sangrado** — probado el 2026-10-21: Golpe que sangra contra Silvia → Sangrado 2 stacks, 2 turnos (pega 2 al aplicarse; con un golpe que frena la armadura, no entra, correcto); las declaraciones dicen «perfora 1», «+2 de daño fijo» y «Crítico frecuente +1». Las de bestia comparten el código (no se repitieron). (2026-10-21): Golpe que sangra / Zarpazo desgarrador (solo Sangrado, 1 SP), Corte profundo / Colmillos
   que perforan (Perfora 1), Tajo brutal / Desgarro (+2 al daño), Corte certero / Zarpa certera (Crítico frecuente +1). Mirar la declaración del duelo,
   que el Sangrado entre por 2 turnos y que con crítico quede permanente.
-- [ ] **🩸 Tajo de carnicero / Destripar** (2026-10-21, 4 SP): Perfora 1 y Crítico frecuente +1; si pega, Sangrado fuerte (3 por turno, 3 turnos).
-- [ ] **🦵 Golpe a la rodilla / Tarascón al tobillo / Tiro a la rodilla** (2026-10-21, 2 SP): si pega, Rengo 2 turnos; mirar que moverse le cueste 2 No2.
-- [ ] **🕸 Red / Tela de araña** (2026-10-21): Probabilidad de Golpe contra Evasión; Inmovilizado; soltarse al empezar su turno; la ayuda de un aliado.
-- [ ] **🤼 Agarrón / Abrazo aplastante** (2026-10-21): Agarrado y Agarrando; soltarse; el apretón repite el daño (el Abrazo); suelta al empezar el turno de la bestia.
-- [ ] **🛡 Aguante** (2026-10-21): el anuncio «se pone en modo aguante», +2 Defensa y +2 Def.Esp, que cuente los golpes (también los que frena la armadura),
+- [x] **🩸 Tajo de carnicero / Destripar** — probado el 2026-10-21: crítico ×2 → 4 de daño directo y Sangrado fuerte de 3 stacks, permanente. (2026-10-21, 4 SP): Perfora 1 y Crítico frecuente +1; si pega, Sangrado fuerte (3 por turno, 3 turnos).
+- [x] **🦵 Golpe a la rodilla / Tarascón al tobillo / Tiro a la rodilla** — probado el 2026-10-21 (Golpe a la rodilla): Rengo 2 turnos, moverse le cuesta 2 No2. (2026-10-21, 2 SP): si pega, Rengo 2 turnos; mirar que moverse le cueste 2 No2.
+- [x] **🕸 Red / Tela de araña** — probado el 2026-10-21: Inmovilizado 3 turnos; al empezar el turno de Silvia, el cartel «¿se suelta?» (Fuerza 1 contra 5 → sigue atrapada); la Tela se suelta contra su Ef.Esp (3). **Arreglado**: la Red aplicaba además el estado del sistema viejo («¿A quién le pegó?»). Falta: la ayuda de un aliado (es la misma pieza de la Red Nerubian). (2026-10-21): Probabilidad de Golpe contra Evasión; Inmovilizado; soltarse al empezar su turno; la ayuda de un aliado.
+- [x] **🤼 Agarrón / Abrazo aplastante** — probado el 2026-10-21: Agarrado y Agarrando (la bestia no se suelta sola a los 10 s); Silvia no se soltó (4 contra 5) y el apretón le hizo 9 − 3 = 6; al empezar el turno de la bestia, se fueron los dos estados. El Agarrón, sin daño, igual. **Arreglado**: el cartel decía «el mordisco» en vez de «el apretón». (2026-10-21): Agarrado y Agarrando; soltarse; el apretón repite el daño (el Abrazo); suelta al empezar el turno de la bestia.
+- [x] **🛡 Aguante** — probado el 2026-10-21 (modo cooldown): el anuncio, +2 Defensa y +2 Def.Esp, 1 No2 y cooldown 3; contó 2 golpes (uno que la armadura frenó del todo); con ▶ Siguiente quedó la revancha (2) y se fue el estado; al Atacar, el cartel «Modo aguante» (+2d4, +2 de cooldown) y el duelo con «+2 dados de daño». Falta: el modo SP y que se pierda si no ataca. (2026-10-21): el anuncio «se pone en modo aguante», +2 Defensa y +2 Def.Esp, que cuente los golpes (también los que frena la armadura),
   el cartel al apretar Atacar en su turno con +N dados y su costo (modo SP y modo cooldown), y que se pierda si no ataca.
-- [ ] **💨 Hit and run** (2026-10-21): pegue o no, el cartel «se aleja»; que los primeros 2 casilleros sean gratis y sin oportunidad.
-- [ ] **🦘 Salto / Salto aplastante** (2026-10-21): que caiga al lado del objetivo saltando por encima de un token, sin No2 ni oportunidad; el cartel
+- [x] **💨 Hit and run** — probado el 2026-10-21: el cartel «se aleja» al terminar el duelo; arrastrado 2 casilleros sin cobrar No2 (6 → 6) ni ataque de oportunidad. (2026-10-21): pegue o no, el cartel «se aleja»; que los primeros 2 casilleros sean gratis y sin oportunidad.
+- [x] **🦘 Salto / Salto aplastante** — probado el 2026-10-21: saltó 3 casilleros y cayó al lado de Silvia («+1 PdG · Crítico frecuente +1»); con Sólidos en el camino, el cartel «¿Puede saltarlo?» y, con «Sí», saltó; el aplastante: Res.CC 4 contra Fuerza 4 → en pie (empate), y con más Fuerza, 3 contra 14 → Sentado. (2026-10-21): que caiga al lado del objetivo saltando por encima de un token, sin No2 ni oportunidad; el cartel
   «¿puede saltarlo?» al pasar por encima de una pared o un Sólido; los bonos en la declaración; el aplastante: Res.CC contra su Fuerza y el Sentado.
-- [ ] **💥 Daño de colisión** (P178, 2026-10-21): un empujón (la Cornada con carrera, una ráfaga) que choca contra una pared → una Constitución del
+- [x] **💥 Daño de colisión** — probado el 2026-10-21 (Cornada): contra un Sólido, la Constitución de Silvia (3) − Defensa 3 → 0; contra Xeena, cada uno la del otro (Silvia 1 − 3 → 0, Xeena 1 − 0 → 1). **Arreglado**: «Le faltaron 1 casillero» → «Le faltó». (P178, 2026-10-21): un empujón (la Cornada con carrera, una ráfaga) que choca contra una pared → una Constitución del
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 
 ## Pendientes

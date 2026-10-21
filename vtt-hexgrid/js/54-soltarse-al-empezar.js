@@ -42,7 +42,7 @@ async function soltarAlEmpezarRevisar(){
 function soltarAlEmpezarCartel(clave, nombre, est, tirar){
   const s = Combatiente.soltarNorm(est.soltar);
   AvisoCombate.cartel('soltar-' + clave, {icono: '🔓', titulo: `${nombre}: ¿se suelta?`,
-    texto: `Empieza su turno atrapado (${est.nombre}). Tira ${s.etq} contra ${s.dif}: si llega, se suelta. Esta tirada no cuesta No2.${s.danoFalla ? ` Si no se suelta, ${s.deNombre ? 'el mordisco de ' + s.deNombre : 'el mordisco'} le vuelve a hacer daño (${s.danoFalla}).` : ''}`,
+    texto: `Empieza su turno atrapado (${est.nombre}). Tira ${s.etq} contra ${s.dif}: si llega, se suelta. Esta tirada no cuesta No2.${s.danoFalla ? ` Si no se suelta, ${est.nombre === 'Agarrado' ? 'el apretón' : 'el mordisco'}${s.deNombre ? ' de ' + s.deNombre : ''} le vuelve a hacer daño (${s.danoFalla}).` : ''}`,
     botones: [{texto: `🎲 Tirar ${s.etq}`, alClic: tirar}, {texto: 'Ahora no', sec: true, alClic: () => AvisoCombate.cartel('soltar-' + clave, null)}]});
 }
 // Primero los dados, después el resultado (regla del dueño, 2026-09-26): espera a que los dados 3D queden quietos.

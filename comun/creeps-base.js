@@ -75,7 +75,7 @@
     'Debilitar': A('Debilitado', 3, {dmg: -2}), 'Maldición': A('Maldito', 3, {resmg: -2, def: -1}), 'Ceguera': A('Ceguera', 1),
     'Ralentizar': A('Ralentizado', 1, {nitros: -2}), 'Intimidar': A('Intimidado', 2, {dmg: -1}), 'Romper armadura': A('Armadura dañada', 3, {def: -2}),
     'Veneno': A('Veneno'), 'Pudrición': A('Podrido', 3, {def: -2, dmg: -1}), 'Susurros': A('Susurros', 3, {resm: -2}),
-    'Drenar energía': A('Drenado', 1, {nitros: -2}), 'Red': A('Inmovilizado', 1), 'Trampa de raíces': A('Inmovilizado', 2),
+    'Drenar energía': A('Drenado', 1, {nitros: -2}), 'Trampa de raíces': A('Inmovilizado', 2),
     'Hechizo de lentitud': A('Lentitud', 2, {nitros: -1}), 'Quemadura': A('Quemado', 2, {}, -2), 'Escarcha': A('Escarcha', 1, {nitros: -2}),
     'Oxidar': A('Oxidado', 3, {dmg: -2}), 'Desmoralizar': A('Desmoralizado', 2, {resm: -2, dmg: -1}), 'Polvo revelador': A('Ceguera', 1),
     'Escupitajo ácido': A('Corroído', 2, {def: -1}), 'Lanza de hielo': A('Escarcha', 1, {nitros: -1}), 'Descarga eléctrica': A('Descarga', 1, {nitros: -1}),
@@ -93,7 +93,7 @@
     'Cepo del emboscado': A('Inmovilizado', 2), 'Lazo de caza': A('Rengo'), 'Cepo de dientes': A('Rengo'), 'Cepo en el camino': A('Inmovilizado', 2),
     'Trampa de dardos envenenados': A('Veneno'), 'Red de cazador': A('Inmovilizado', 1),
   };
-  const aplicaDe = sp => sp.aplica || APLICA[sp.nombre] || null;
+  const aplicaDe = sp => sp.duelo ? null : (sp.aplica || APLICA[sp.nombre] || null);   // una auditada que va al duelo pone sus estados ahí (2026-10-21: la Red los aplicaba dos veces)
   // Frases de la descripción: las que se resuelven solas y las que quedan a mano. Con un estado automático sobre otro (o una
   // trampa que se coloca sola) solo queda a mano lo que la descripción marca con "(a mano)" y sea movimiento, área o algo que el
   // programa no maneja; el "(a mano)" de un estado que ahora se aplica solo se descarta.

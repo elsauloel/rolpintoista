@@ -313,6 +313,16 @@
 >   (como GM). El código da bien la fórmula a un personaje nuevo y en «Claude · pruebas» regenera; ninguna parte del código escribe un `0` (la
 >   migración de `ficha-guardado.js` respeta un `0` puesto a mano si ya tienen `spRegenAuto`). Si vuelve a pasar, buscar qué pantalla lo guardó.
 
+## 🧪 De las pruebas en el mapa del 2026-10-21 (auditoría de creeps)
+
+- [ ] **✍ El PdG elegido a mano no gasta las cargas ni el golpe por turnos**: con «Elegir manualmente» en la Probabilidad de Golpe, el ataque no pasa por
+  el gancho que paga y gasta (`atacar` de CreepDuelo / FichaDuelo / InvDuelo), así que no se suma lo de un óleo, un Arma envenenada ni un Arma elemental a ese
+  golpe. Con el botón normal, sí. Decidir si el PdG a mano tiene que gastarlas (probablemente sí).
+- [ ] **Los botones minimizados de los duelos tapan el cartel del dodge roll** en una ventana baja (567 px de alto): «Pegó: …» y «Dodge roll: …» quedan
+  encima de «Ver el duelo» / «No me quiero mover». Subir el cartel o correr los botones cuando se pisan.
+- [ ] **Quedaron sin probar**: Vigilancia con «Dejarlo pasar», sin No2 y la del Shooter; Romper armadura con un crítico; el Coletazo contra una pared;
+  Aguante en modo SP y que se pierda si no ataca; la ayuda de un aliado para soltarse.
+
 ## 0. Hoja de ruta acordada (2026-10-02, a seguir en este orden)
 
 > **Criterio del dueño (2026-10-02): primero prolijar lo estructural, después lo puntual** ("tomándonos el tiempo que haga falta").

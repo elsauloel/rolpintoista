@@ -532,21 +532,36 @@ function hudHpPrevia(t, d, texto){
    más cercanos, con el daño que tendría sin resistencias); `rayoCadenaAplicar` lo recorre de verdad y corta cuando el daño no llega a 1. */
 const RAYO_SALTO_MAX = 4;
 // `mas` (2026-10-18, el Anillo de tormenta): casillas de más para cada salto.
-function rayoCadena(idInicial, dano, mas){
+// 💧 El agua (dueño, 2026-10-20, P214: «el salto no debería repetir objetivo… en el charco tiene que seguir saltando, y cada salto tiene que hacer
+// menos daño que el anterior»): desde alguien parado en un charco, el salto llega a cualquiera de ese charco sin importar la distancia y los
+// recorre primero (el más cercano antes); después sigue afuera con la regla de siempre. A cada mojado, su golpe × 1,5 (rayoCadenaAplicar): en el
+// agua cada salto pega el 75 % del anterior. `o.soloAgua`: solo los del charco (el rayo de un golpe que no salta, que igual corre por el agua).
+function rayoCadena(idInicial, dano, mas, o){
+  o = o || {};
   const t0 = tokens.get(idInicial);
   if(!t0) return [];
+  const mojado = x => typeof enAgua === 'function' && enAgua(x);
+  const charco = x => mojado(x) && typeof charcoCeldas === 'function' ? charcoCeldas(x) : null;
+  const multAgua = typeof AGUA_MULT_RAYO !== 'undefined' ? AGUA_MULT_RAYO : 1.5;
   const cadena = [{id: idInicial, t: t0, dano: Math.max(0, Math.ceil(num(dano)))}];
   const usados = new Set([idInicial]);
   let actual = t0, d = cadena[0].dano;
   for(let i = 0; i < 12; i++){
-    let mejor = null, mejorDist = Infinity;
+    let mejor = null, mejorDist = Infinity, mejorAgua = false;
+    const ch = charco(actual);
     tokens.forEach((x, id) => {
-      if(usados.has(id) || x.tipo !== t0.tipo || !x.fichaId || (x.oculto && !soyGM) || x.bajoTierra || etereoDe(x)) return;   // 🕳 bajo tierra / 👁 etéreo: no le llega
+      if(usados.has(id) || !x.fichaId || (x.oculto && !soyGM) || x.bajoTierra || etereoDe(x)) return;   // 🕳 bajo tierra / 👁 etéreo: no le llega
       const dist = distanciaHex({col: actual.col, fila: actual.fila}, {col: x.col, fila: x.fila});
-      if(dist <= RAYO_SALTO_MAX + Math.max(0, Math.round(num(mas))) && dist < mejorDist){ mejor = {id, x}; mejorDist = dist; }
+      const delCharco = !!(ch && ch.has(x.col + ',' + x.fila) && mojado(x));
+      if(!delCharco && x.tipo !== t0.tipo) return;   // el salto, al mismo bando; el agua conduce a todos los que estén parados en ella
+      if(o.soloAgua && !delCharco) return;
+      if(!delCharco && dist > RAYO_SALTO_MAX + Math.max(0, Math.round(num(mas)))) return;
+      if(delCharco && !mejorAgua){ mejor = {id, x}; mejorDist = dist; mejorAgua = true; return; }   // los del charco, primero
+      if(delCharco === mejorAgua && dist < mejorDist){ mejor = {id, x}; mejorDist = dist; }
     });
     if(!mejor || d <= 1) break;
     d = Math.floor(d / 2);
+    if(mojado(mejor.x)) d = Math.ceil(d * multAgua);
     usados.add(mejor.id);
     cadena.push({id: mejor.id, t: mejor.x, dano: d});
     actual = mejor.x;

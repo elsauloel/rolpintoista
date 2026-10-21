@@ -1660,6 +1660,10 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   **⚡💧 El rayo corre por el agua** (dueño, 2026-10-17): en el duelo, si el golpeado está en un charco, el mismo golpe eléctrico (de una
   habilidad de rayo o el daño eléctrico de un arma) les llega a los demás parados en ese charco (`aguaConduceRayo`, desde `dueloAplicarDano`
   de js/13): ×1,5, menos su Res. eléctrica, y la Parálisis del golpe con el doble de chance. Crónica y Mesa. (Las zonas y trampas de rayo, no.)
+  **Cambiado el 2026-10-20 (P214, dueño: «el salto no repite objetivo y cada salto pega menos»):** ya no les llega el golpe entero a todos. El salto
+  (`rayoCadena`, js/10) desde alguien en un charco llega a todos los de ese charco sin límite de distancia (`charcoCeldas`, js/50), primero a ellos y a
+  cualquier bando; cada salto, la mitad de lo que le entró al anterior y × 1,5 si está mojado (75 %). Un golpe de rayo que no salta usa la misma cadena
+  solo por el charco (`aguaConduceRayo(d, t, entro)`, `{soloAgua: true}`).
 - **😤 Bronca acumulada** (2026-10-18, dueño, el Capataz kobold; `js/51-bronca.js`): un creep con `sc.bronca = {max, radio, dados, cuenta}` suma 1
   por cada golpe que le saca vida (`broncaSumar`, adentro de la transacción de `danioCreep`, js/10); cada golpe se anuncia (Crónica y Mesa) y se ve
   como el estado «Bronca» con sus stacks. Al llegar a `max` estalla (`broncaEstallar`): el momento `estallido` hace la explosión en todas las

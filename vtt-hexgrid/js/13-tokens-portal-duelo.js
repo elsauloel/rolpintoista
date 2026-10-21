@@ -1551,7 +1551,8 @@ async function dueloAplicarDano(d){
     // ⚡💧 El rayo corre por el agua (dueño, 2026-10-17): si el golpeado está en un charco, el mismo golpe eléctrico les llega a todos los que
     // están parados en ese charco, salte o no el Relámpago (js/50, aguaConduceRayo).
     const rayoMag = dn.magico && num(dn.magico.total) > 0 && !String(dn.magico.tipo || '').includes(' y ') && Combatiente.elementoDe(dn.magico.tipo) === 'rayo' ? num(dn.magico.total) : 0;
-    if((golpeRayo || rayoMag) && !res.r.invulnerable && typeof aguaConduceRayo === 'function') await aguaConduceRayo(d, t, golpeRayo || rayoMag).catch(err => console.error('El rayo por el agua:', err));
+    const saltaSolo = !!(d.hab && d.hab.cadena) || !!(!d.hab && d.ataque && d.ataque.flecha && d.ataque.flecha.salto);   // (su cadena ya recorre el charco, P214)
+    if((golpeRayo || rayoMag) && !saltaSolo && !res.r.invulnerable && typeof aguaConduceRayo === 'function') await aguaConduceRayo(d, t, golpeRayo ? num(res.r.recibido) : (magico ? num(magico.recibido) : 0)).catch(err => console.error('El rayo por el agua:', err));
     // El Espejo: 1/4 de todo el daño especial que le tiraron (el de la habilidad y el elemental del arma), antes de la Defensa especial.
     const espejo = res.r.invulnerable ? null : await dueloEspejo(d, (habMagica ? golpe : 0) + (magico ? num(dn.magico.total) : 0));
     // 🔮 Talismanes (js/53): el Espejito (el daño especial que ENTRÓ) y el Relicario (si el daño especial lo dejó en 0).
@@ -1610,9 +1611,11 @@ async function dueloCadena(d, entro){
   const saltos = cadena.slice(1).map((s, i) => ({desde: cadena[i].id, hacia: s.id}));
   // Los efectos del golpe también a cada uno al que salta (`cadena.efectos`, el Relámpago, 2026-10-07): cada uno tira su chance, como en el golpe.
   const extra = [];
-  if(c.efectos){
+  {   // los efectos del golpe a cada uno al que salta (`cadena.efectos`); sin eso, igual la Parálisis a los mojados (el agua, P214)
     for(const s of cadena.slice(1)){
-      for(const ef of (d.efectos || []).filter(e => e && !e.cura && Duelo.specDeEfecto(e))){
+      const mojado = typeof enAgua === 'function' && enAgua(s.t);
+      if(!c.efectos && !mojado) continue;
+      for(const ef of (d.efectos || []).filter(e => e && !e.cura && Duelo.specDeEfecto(e) && (c.efectos || e.nombre === 'Parálisis'))){
         const caras = Math.max(1, Math.round(num(ef.caras)) || 1), exitos0 = Math.max(1, Math.round(num(ef.exitos)) || 1);
         const exitos = ef.nombre === 'Parálisis' && typeof enAgua === 'function' && enAgua(s.t) ? Math.min(caras, exitos0 * 2) : exitos0;   // 💧 el doble de chance (js/50)
         if(Math.floor(Math.random() * caras) >= exitos) continue;

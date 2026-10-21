@@ -245,38 +245,43 @@ setInterval(() => { aguaRevisarFuego().catch(err => console.error(err)); }, 1500
    mismo golpe se transmite por el agua al otro personaje, independientemente de si salta o no el Relámpago»). Lo llama el duelo (js/13) en la
    pantalla que aplica el daño (el GM): a cada uno de los otros que están en ese charco (sin levitar ni volar) le llega el mismo golpe —×1,5
    por estar en el agua, menos su Res. eléctrica— y, si el golpe trae Parálisis, la tira con el doble de chance. A la Crónica y a la Mesa. */
-async function aguaConduceRayo(d, t, golpe){
-  const g = Math.max(0, Math.round(num(golpe)));
-  if(!g || !t || !enAgua(t)) return [];
-  const charcos = [...elementos.values()].filter(e => esAgua(e) && celdasDeElemento(e).some(c => c.col === t.col && c.fila === t.fila));
-  const celdas = new Set(charcos.flatMap(e => celdasDeElemento(e)).map(c => c.col + ',' + c.fila));
-  const tid = d && d.defensor ? d.defensor.tokenId : '';
-  const otros = [...tokens.entries()].filter(([id, x]) => id !== tid && x !== t && x.fichaId && celdas.has(x.col + ',' + x.fila) && enAgua(x)
-    && !(typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(id)));
-  if(!otros.length) return [];
-  const lineas = [];
-  for(const [id, x] of otros){
-    const nombre = x.oculto ? 'Alguien' : nombreDe(x);
-    try{
-      const ag = aguaRayo(x, 'rayo', g), res = (await resistenciasDe(x, 'rayo')).res;
-      const esInv = x.tipo === 'pj' && String(x.fichaId).includes(SEP_INVOCACION);
-      const r = x.tipo === 'creep' ? await danioCreep(x, String(ag.monto), true, 0, res, {magico: true})
-        : esInv ? await danioInv(x, String(ag.monto), true, 0, res, {magico: true}) : await danioPj(x, String(ag.monto), true, 0, res, {magico: true});
-      const entro = r && r.r ? num(r.r.recibido) : Math.max(0, ag.monto - res);
-      let txt = `${nombre}: ${ag.monto}${res ? ` − ${Combatiente.resElementalTxt('rayo', res)}` : ''} → ${entro}`;
-      // La Parálisis del golpe, con el doble de chance (si el golpeado ya la tenía doblada, no se vuelve a doblar).
-      for(const ef of (d.efectos || []).filter(e => e && e.nombre === 'Parálisis' && !e.cura)){
-        const caras = Math.max(1, Math.round(num(ef.caras)) || 1), ex0 = Math.max(1, Math.round(num(ef.exitos)) || 1);
-        const exitos = /💧/.test(String(ef.detalle || '')) ? ex0 : Math.min(caras, ex0 * 2);
-        if(Math.floor(Math.random() * caras) >= exitos) continue;
-        try{ const rr = await dueloAplicarEfecto({...d, defensor: {...d.defensor, tokenId: id, nombre}}, ef); txt += ` · Parálisis${rr && rr.manual ? ' (a mano)' : ''}`; }
-        catch(err){ txt += ' · Parálisis (a mano)'; }
-      }
-      lineas.push(txt);
-    }catch(err){ console.error('No se pudo pasar el rayo por el agua:', err); lineas.push(`${nombre}: ${g} (a mano)`); }
+// Las casillas del charco (o charcos) donde está parado `t`: "col,fila". Lo usa el salto del rayo (js/10, rayoCadena).
+function charcoCeldas(t){
+  const out = new Set();
+  if(!t) return out;
+  for(const el of elementos.values()){
+    if(!esAgua(el)) continue;
+    const cs = celdasDeElemento(el);
+    if(cs.some(c => c.col === t.col && c.fila === t.fila)) cs.forEach(c => out.add(c.col + ',' + c.fila));
   }
-  const resumen = `El golpe eléctrico corre por el agua del charco: ${lineas.join(' · ')}`;
-  try{ momentoAbrir({tipo: 'zona-renueva', icono: '⚡', titulo: 'El rayo corre por el agua', estado: 'listo', resultado: resumen, datos: {}}); }catch(err){}
+  return out;
+}
+/* ⚡💧 El rayo corre por el agua (dueño, 2026-10-17; regla nueva 2026-10-20, P214): un golpe eléctrico que no salta, contra alguien parado en un
+   charco, igual salta por los del charco: cada uno, la mitad de lo que le entró al anterior × 1,5 (decrece), sin repetir. Un golpe que ya salta
+   (Relámpago, varita de chispa, flecha de tormenta) no pasa por acá: su cadena ya recorre el charco. `entro`: lo que le entró al golpeado.
+   La Parálisis del golpe, a cada mojado con el doble de chance. */
+async function aguaConduceRayo(d, t, entro){
+  const tid = d && d.defensor ? d.defensor.tokenId : '';
+  if(!t || !tid || !enAgua(t) || num(entro) <= 1) return [];
+  const cadena = rayoCadena(tid, num(entro), 0, {soloAgua: true});
+  if(cadena.length < 2) return [];
+  const hubo = await rayoCadenaAplicar(cadena, {callado: true});
+  if(!hubo.length) return [];
+  const lineas = [];
+  for(const s of hubo){
+    const nombre = s.t.oculto ? 'Alguien' : nombreDe(s.t);
+    let txt = `${nombre}: ${s.dano}${s.entro !== s.dano ? ` → ${s.entro}` : ''}`;
+    for(const ef of (d.efectos || []).filter(e => e && e.nombre === 'Parálisis' && !e.cura)){
+      const caras = Math.max(1, Math.round(num(ef.caras)) || 1), ex0 = Math.max(1, Math.round(num(ef.exitos)) || 1);
+      const exitos = /💧/.test(String(ef.detalle || '')) ? ex0 : Math.min(caras, ex0 * 2);
+      if(Math.floor(Math.random() * caras) >= exitos) continue;
+      try{ const rr = await dueloAplicarEfecto({...d, defensor: {...d.defensor, tokenId: s.id, nombre}}, ef); txt += ` · Parálisis${rr && rr.manual ? ' (a mano)' : ''}`; }
+      catch(err){ txt += ' · Parálisis (a mano)'; }
+    }
+    lineas.push(txt);
+  }
+  const resumen = `El golpe eléctrico corre por el agua del charco (cada uno, la mitad del anterior × 1,5): ${lineas.join(' → ')}`;
+  try{ momentoAbrir({tipo: 'rayo', icono: '⚡', titulo: 'El rayo corre por el agua', estado: 'listo', resultado: resumen, datos: {saltos: [tid, ...hubo.map(h => h.id)].slice(0, -1).map((de, i) => ({desde: de, hacia: hubo[i].id}))}}); }catch(err){}
   try{ alertaRojaAnonima('⚡💧 El rayo corre por el agua', resumen); }catch(err){}
   return lineas;
 }

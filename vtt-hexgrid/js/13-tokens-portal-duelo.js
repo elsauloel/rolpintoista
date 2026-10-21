@@ -835,6 +835,11 @@ function dueloElegirObjetivoMapa(msg){
       try{ t = await dueloVincularSiFalta(t); }catch(err){ console.error('No se pudo vincular el token al creep:', err); }
       const mio = todos.find(propio);
       if(!(await cegueraPermite(mio, t))){ pedir(); return; }   // 🙈 ciego: no elige objetivos a más de 2 casillas
+      let ataqueCarga = null;   // 🐂 la Cornada toma carrera (js/55): corre hasta quedar al lado y el ataque suma lo que corrió
+      if(ataque && ataque.embestidaHab && mio && typeof cargaEmbestida === 'function'){
+        try{ ataqueCarga = await cargaEmbestida(mio, t, ataque, yo); }catch(err){ console.error('No se pudo tomar carrera:', err); ataqueCarga = ataque; }
+        if(!ataqueCarga){ pedir(); return; }
+      }
       if(conArco && mio && Combatiente.arcoMuyCerca(ataque, distanciaHex({col: mio.col, fila: mio.fila}, {col: t.col, fila: t.fila}))){   // avisa y deja seguir: lo decide la mesa
         const si = await AvisoCombate.preguntar(`${nombreDe(t)} está muy cerca para el arco: hace falta al menos ${Combatiente.arcoLibresTxt(ataque)} entre los dos. Con el arco no se pega cuerpo a cuerpo: alejate o cambiá de arma. ¿Disparar igual? (lo decide la mesa)`,
           {icono: '🏹', titulo: 'Muy cerca para el arco', si: 'Disparar igual', no: 'Elegir otro'});
@@ -878,7 +883,7 @@ function dueloElegirObjetivoMapa(msg){
           ...['humo', 'luz', 'clava', 'rebota'].reduce((o, k) => b[k] ? {...o, [k]: true} : o, {}), ...(b.explota ? {explota: b.explota} : {})};   // virotes con mapa (js/33)
         if(msg.alDisparar){ try{ msg.alDisparar(); }catch(err){ console.error('No se pudo gastar la flecha:', err); } }
       }
-      let ataqueFinal = ataque && ataque.hab && ataque.hab.sagrado && ataque.hab.dano ? sagradoContra(ataque, t) : ataque;   // Smite: el doble contra un no-muerto o un demonio
+      let ataqueFinal = ataque && ataque.hab && ataque.hab.sagrado && ataque.hab.dano ? sagradoContra(ataque, t) : (ataqueCarga || ataque);   // Smite: el doble contra un no-muerto o un demonio
       if(typeof roboBono === 'function') ataqueFinal = roboBono(ataqueFinal, mio, t);   // 🫳 Robar: +2 en sigilo o por la espalda (js/47)
       if(typeof roboSecretoSi === 'function' && roboSecretoSi(ataqueFinal, mio, t)){ roboSecretoIniciar(yo, ataqueFinal, mio, t); return; }   // 🫳 en sigilo: en secreto (js/47)
       let miedo = 0;

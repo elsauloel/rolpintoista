@@ -1534,6 +1534,7 @@ const Combatiente = (() => {
       spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: nf(e.val)}] : e.mods, polaridad: e.stat ? (nf(e.val) >= 0 ? 'buff' : 'debuff') : undefined,
         ...(nf(e.stacks) > 0 ? {stacks: Math.round(nf(e.stacks))} : {}),   // (Sangrado de N: Tajear, 2026-10-10)
         ...(e.soltar ? {soltar: soltarDe(e.soltar)} : {})},
+      ...(nf(e.empuja) > 0 ? {empuja: Math.round(nf(e.empuja))} : {}),   // el empujón (2026-10-21, la Cornada): no es un estado, lo hace el mapa
       cura: nf(e.cura), detalle: e.detalle || ''});
     const critico = c.critico ? {
       ...(c.critico.efectos && c.critico.efectos.length ? {efectos: c.critico.efectos.map(mapEf)} : {}),
@@ -1551,6 +1552,7 @@ const Combatiente = (() => {
       efectos: (c.efectos || []).map(mapEf),
       ...(c.efectosNota ? {efectosNota: sx(c.efectosNota)} : {}),
       ...(critico && Object.keys(critico).length ? {critico} : {}),
+      ...(c.embestida ? {embestidaHab: true} : {}),   // 🐂 toma carrera (la Cornada, 2026-10-21): el mapa la hace al elegir el objetivo (vtt-hexgrid/js/55)
       ...(c.terminaTurno ? {terminaTurno: true} : {}), ...(c.soloCritico ? {soloCritico: true} : {}), ...(c.perforante ? {perforante: true} : {})};   // Proyectil perforante (2026-10-13): sigue al de atrás   // Headshot (2026-10-12): si no es crítico, falla   // Degollar (2026-10-10): al resolverse, termina el turno y pasa al final del orden
   }
   /* ⚡ Flash (P136, regla del dueño 2026-09-30): en el propio turno cuesta lo que dice la habilidad; en turno ajeno, EL DOBLE —

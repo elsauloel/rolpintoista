@@ -21,8 +21,8 @@
   const zO = (detalle, no2, dano) => ({detalle, no2, dano});
   const tA = (detalle, no2) => ({detalle, no2});
   // Un ataque con su arma, con arreglos (`arma`: los de la Ejecución ✨ — dados, pdg, fijo, perfora, critBono…), que va al duelo como un ataque.
-  const aA = (detalle, arma, ataqueTxt, spCosto, efectos) => ({detalle, no2: 'ATAQUE', ataqueTxt, auditada: true, ...(spCosto !== undefined ? {spCosto} : {}),
-    duelo: {modo: 'arma', objetivo: 'enemigo', x: 'nitros', arma: {pdg: 0, dados: 0, fijo: 0, ...arma}, efectos: efectos || []}});
+  const aA = (detalle, arma, ataqueTxt, spCosto, efectos, extra) => ({detalle, no2: 'ATAQUE', ataqueTxt, auditada: true, ...(spCosto !== undefined ? {spCosto} : {}),
+    duelo: {modo: 'arma', objetivo: 'enemigo', x: 'nitros', arma: {pdg: 0, dados: 0, fijo: 0, ...arma}, efectos: efectos || [], ...(extra || {})}});   // `extra`: más datos de la Ejecución (la carrera de la Cornada)
   const bU = (detalle, no2, mods, turnos) => ({detalle, no2, efecto: {mods, turnos}});
   const cU = (detalle, no2, k) => ({detalle, no2, cura: k});
   const dC = (detalle, no2, dano, k) => ({detalle, no2, dano, cura: k});
@@ -87,7 +87,11 @@
     {dados: 1}, 'va al duelo como un ataque con +1 dado del Tipo de su arma; si pega, deja Mordido (se suelta con Fuerza contra su Fuerza; si no, recibe el daño otra vez)', 3,
     [{nombre: 'Mordido', soltar: {stat: 'fue', etq: 'Fuerza', difStat: 'fue', no2: 0, alEmpezar: true, danoFalla: 'golpe'}}]));
   H('Mordisco venenoso', 'DX', 'b', 'ex', 3, zO('Muerde y, si golpea, tirá 1d4: con 1 el objetivo queda Envenenado (a mano).', 2, 'L'));
-  H('Cornada', 'D', 'b', 'mt', 2, aT('Embiste con los cuernos.', 'M'));
+  // Auditada (dueño, 2026-10-21): la que empuja y toma carrera — al lado, +1 PdG, +1 al daño y empuja 1; si se ejecuta de lejos, corre en línea recta
+  // hasta quedar al lado (1 No2 por casillero) y suma +1 a todo eso por cada casillero que corrió (vtt-hexgrid/js/55).
+  H('Cornada', 'D', 'b', 'mt', 2, aA('Embiste con los cuernos: un ataque con su arma con +1 a la Probabilidad de Golpe y +1 al daño; si pega, lo empuja 1 casilla lejos de la bestia. Si la ejecuta de lejos, toma carrera: corre en línea recta hasta quedar al lado (1 No2 por casillero) y suma +1 a la Probabilidad de Golpe, +1 al daño y +1 casilla de empuje por cada casillero que corrió.',
+    {pdg: 1, fijo: 1}, 'va al duelo como un ataque con +1 PdG y +1 al daño (más 1 de cada por casillero de carrera); si pega, lo empuja', 2,
+    [{nombre: 'Empujón', empuja: 1, detalle: 'Lo empuja 1 casilla, lejos de la bestia.'}], {embestida: true}));
   H('Coletazo', 'DA', 'bc', 'mt', 3, zO('Un giro de cola que golpea a los adyacentes (a mano).', 3, 'M'));
   H('Golpe doble', 'D', '*', 'me', 3, zO('Dos ataques seguidos: se tira el daño dos veces (a mano la segunda).', 3, 'M'));
   H('Remate', 'D', '*', 'me', 4, zO('Un golpe de gracia contra alguien herido: si el objetivo tiene menos de la mitad de HP, +1 dado (a mano).', 3, 'M'));

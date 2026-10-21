@@ -110,6 +110,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
 <script src="skills-clase.js"></script>
+<script src="creeps-base.js"></script>
+<script src="skills-creep-base.js"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
 <script>
@@ -928,6 +930,12 @@ prueba('⚔ Golpe fuerte de creep y Golpe brutal (auditados 2026-10-20): +1 dado
   const a = Combatiente.ataqueConArreglos({nombre: 'Golpe fuerte'}, {modo: 'arma', arma: {dados: 1}}, {arma: {tipoDado: 8}});
   const gb = CLASES_SKILLS.find(c => c.id === 'warrior').habilidades.find(h => h.id === 'warrior-golpe-brutal');
   igual([a.mods.dados, gb.efectoNombre, gb.efectoTurnos, gb.efectoMods[0].stat, gb.efectoMods[0].val], [1, 'Guardia baja', 1, 'eva', -2]);
+});
+prueba('🐂 Cornada (2026-10-21): +1 PdG, +1 al daño, empuja 1 y toma carrera', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Cornada');
+  const h = armarHabilidadDeCreep(e.datos, 2);
+  const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});
+  igual([a.mods.pdg, a.mods.fijo, a.efectos[0].empuja, a.embestidaHab, h.spCosto, e.etiquetas.includes('auditada')], [1, 1, 1, true, 2, true]);
 });
 prueba('🦷 Mordisco feroz (2026-10-21): deja Mordido con la Fuerza de la bestia y el mismo daño si no se suelta', () => {
   const c = {modo: 'arma', arma: {dados: 1}, efectos: [{nombre: 'Mordido', soltar: {stat: 'fue', etq: 'Fuerza', difStat: 'fue', no2: 0, alEmpezar: true, danoFalla: 'golpe'}}]};

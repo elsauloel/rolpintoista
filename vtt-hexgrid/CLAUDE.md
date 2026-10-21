@@ -1706,6 +1706,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `CreepCalculo.alcance`, o el arma a distancia del personaje en `FichaResumen`); `oportunidadCorte` (js/17) frena al primer rival que se mueve en la mira
   (`vigilantesDe`, `vigilanciaLoVe`) y el cartel de la oportunidad pregunta «¿Dispara?» (`vigilanciaArmasDe`: su ataque normal; `vigilanciaQuitar` al
   disparar). El alcance se dibuja con `vigilanciaDibujar` (js/05).
+- **⚡ Botones Flash** (2026-10-21, `js/61-botones-flash.js`): Blindaje, Shield, Estoicismo y Shockwave tienen su botón fijo, como el 💪 de Empower
+  (`FLASH_BOTONES`, `resumen.flashBotones` de la ficha, `Flotantes.blindaje/shield/estoicismo/shockwave`); aparece si le alcanza el SP (el de turno ajeno
+  si no es su turno) y `flashBotonUsar` ejecuta la habilidad como desde la Botonera.
 - **🧿 Mal de ojo** (2026-10-21, `js/60-mal-de-ojo.js`): el Enyetar (js/38) para creeps. Un creep con una habilidad `malDeOjo` → el botón fijo del GM
   (`Flotantes.malDeOjo`, `renderMalDeOjoBoton`); `abrirMalDeOjo` lista las tiradas recientes de los personajes (`enyetarCandidatos`) y `malDeOjoUsar` ejecuta la
   habilidad sin marcar (`ac.objetivoFijo`, js/12); en turno ajeno cobra el doble. El efecto «Mal de ojo» → `enyetarAplicar` (js/13).

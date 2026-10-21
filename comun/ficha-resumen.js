@@ -174,6 +174,9 @@ const FichaResumen = (() => {
       extenuado: Combatiente.extenuado(S.efectos), tormenta: Combatiente.tormenta(S.efectos),   // ⛈ Atormentado: el mapa cobra la vida al moverse
       empower: (S.habilidades || []).some(h => h && h.empower),
       enyetar: (S.habilidades || []).some(h => h && h.enyetar),
+      // ⚡ Las habilidades Flash con botón en el mapa (2026-10-21: Blindaje, Shield, Estoicismo, Shockwave; vtt-hexgrid/js/61): su SP y el de turno ajeno.
+      flashBotones: (S.habilidades || []).filter(h => h && ['tanque-blindaje', 'support-shield', 'warrior-estoicismo', 'tanque-shockwave'].includes(h.habClaseId))
+        .map(h => ({clave: h.habClaseId, id: String(h.id), sp: num(h.costo) || 0, spAjeno: num(h.turnoAjenoSp) || 0})),
       reroll: (S.habilidades || []).some(h => h && (h.reroll || h.suerte)),   // 🧚 Re-roll: su botón fijo (una copia vieja de Afortunado, `suerte`, cuenta igual)   // 🧚 Afortunado (2026-10-12): su botón fijo   // 🐈‍⬛ Enyetar (2026-10-12): también con su botón fijo   // 💪 Empower (2026-10-12): el mapa le pone el botón fijo   // Extenuado (2026-10-12): el mapa cobra 1 No2 más cada 2 casillas por stack
       muerto: !!(S.muerto && S.muerto.activo),
       muertoDef: !!(S.muerto && S.muerto.definitivo),   // muerto de verdad (el GM lo usa al repartir la experiencia)

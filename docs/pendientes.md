@@ -323,6 +323,9 @@
 - [x] **✍ El PdG elegido a mano cumple las mismas reglas que el del botón** (2026-10-21, dueño): «Elegir manualmente» y «Tirar a mano» pagan el ataque
   (No2, Sentado, sin No2, el conteo) y gastan lo que suma al golpe (óleos, Arma envenenada, Arma elemental) sin tirar el dado: gancho `pagarManual` de
   FichaDuelo, CreepDuelo e InvDuelo (`comun/duelo.js`, `pagarManual(d)`).
+- [x] **⚡ Botones para las habilidades Flash** (2026-10-21, dueño: «sí a los cuatro»): Blindaje 🛡️, Shield 🫧, Estoicismo 🗿 y Shockwave 💥, arriba o al
+  costado del duelo (vtt-hexgrid/js/61, comun/flotantes.js). Las otras Flash auditadas: Empower, Re-roll y Enyetar ya tenían; Arte de la guerra y Tronco de
+  huída aparecen en el duelo; Sonic Boom y Takle, desde la Botonera; Parry a distancia sigue a mano.
 - Lo de la ventana baja pasó a la sección 🖥; lo que quedó sin probar, a «Auditoría de creeps: para probar» de `docs/pruebas-en-el-mapa.md`.
 
 ## 0. Hoja de ruta acordada (2026-10-02, a seguir en este orden)

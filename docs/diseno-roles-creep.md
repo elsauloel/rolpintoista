@@ -95,7 +95,7 @@ rodilla, Tarascón al tobillo), las redes; y en el mapa, el sigilo, el +1 por la
 **A. Golpes rápidos y precisos**
 1. ✅ **Golpe preciso**: Tajo veloz, Estocada, Zarpazo.
 2. **Dos cortes rápidos** ✦: dos golpes en uno, con menos daño cada uno.
-3. ✅ **Ráfaga de cortes** ✦: **Ráfaga de cortes** y **Ráfaga de zarpazos** (2026-10-21: +2 dados, los efectos del arma ×3 y la Perfora ×3).
+3. ✅ **Ráfaga de cortes** ✦: **Ráfaga de cortes** y **Ráfaga de zarpazos** (2026-10-21: +2 dados, los efectos del arma ×3 y la Perfora en cada corte).
 4. **Punto débil**: perfora parte de la Defensa.
 5. **Buscar el crítico**: Crítico frecuente +2 en ese golpe.
 

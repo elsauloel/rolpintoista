@@ -171,11 +171,11 @@
   H('Destripar', 'DX', 'b', 'me', 4, aA('Garras y dientes que destripan: un ataque con su arma con Perfora 1 (1 punto del daño pasa siempre la Defensa) y Crítico frecuente +1; si pega, deja un Sangrado fuerte (3 de daño por turno durante 3 turnos; se acumula y, con un golpe crítico, queda permanente).',
     {perfora: 1, critBono: 1}, 'va al duelo como un ataque con Perfora 1 y Crítico frecuente +1; si pega, Sangrado fuerte (3 por turno, 3 turnos)', 4, SGF));
   H('Golpe de gracia', 'D', '*', 'm', 6, zO('El golpe más fuerte que sabe dar; nadie sigue igual después.', 4, 'H'));
-  // 🗡 Auditadas (dueño, 2026-10-21; choque liviano, «ráfaga de cortes», la opción del golpe que vale por tres): +2 dados, los efectos del arma ×3 y la Perfora ×3.
-  H('Ráfaga de cortes', 'D', 'hd', 'me', 3, aA('Tres cortes seguidos en un solo ataque con su arma: si pega, suma +2 dados de su arma (los otros dos cortes; la Defensa se resta una sola vez). Los efectos al golpear de su arma se tiran tres veces, uno por corte, y su Perfora vale el triple.',
-    {dados: 2}, 'un ataque con su arma con +2 dados; los efectos del arma ×3 y la Perfora ×3', 3, [], {rafaga: 3}));
-  H('Ráfaga de zarpazos', 'D', 'b', 'me', 3, aA('Tres zarpazos seguidos en un solo ataque con su arma: si pega, suma +2 dados de su arma (los otros dos zarpazos; la Defensa se resta una sola vez). Los efectos al golpear de su arma se tiran tres veces, uno por zarpazo, y su Perfora vale el triple.',
-    {dados: 2}, 'un ataque con su arma con +2 dados; los efectos del arma ×3 y la Perfora ×3', 3, [], {rafaga: 3}));
+  // 🗡 Auditadas (dueño, 2026-10-21; choque liviano, «ráfaga de cortes», la opción del golpe que vale por tres): +2 dados, los efectos del arma ×3 y la Perfora en cada corte.
+  H('Ráfaga de cortes', 'D', 'hd', 'me', 3, aA('Tres cortes seguidos en un solo ataque con su arma: si pega, suma +2 dados de su arma (los otros dos cortes; la Defensa se resta una sola vez). Los efectos al golpear de su arma se tiran tres veces, uno por corte, y su Perfora vale en cada corte (con Perfora 1, pasan al menos 3).',
+    {dados: 2}, 'un ataque con su arma con +2 dados; los efectos del arma ×3 y la Perfora en cada corte', 3, [], {rafaga: 3}));
+  H('Ráfaga de zarpazos', 'D', 'b', 'me', 3, aA('Tres zarpazos seguidos en un solo ataque con su arma: si pega, suma +2 dados de su arma (los otros dos zarpazos; la Defensa se resta una sola vez). Los efectos al golpear de su arma se tiran tres veces, uno por zarpazo, y su Perfora vale en cada corte (con Perfora 1, pasan al menos 3).',
+    {dados: 2}, 'un ataque con su arma con +2 dados; los efectos del arma ×3 y la Perfora en cada corte', 3, [], {rafaga: 3}));
   H('Ráfaga de golpes', 'D', 'hd', 'me', 3, zO('Una lluvia de golpes rápidos (tirá el daño dos veces, a mano la segunda).', 3, 'L'));
   H('Golpe cargado', 'D', '*', 'mt', 4, zO('Junta fuerzas todo un turno y descarga un golpe brutal.', 2, 'H'));
   H('Aplastar', 'D', 'c', 'mt', 3, zO('Aplasta con un brazo de piedra o metal.', 3, 'M'));

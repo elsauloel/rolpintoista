@@ -147,8 +147,8 @@
   **Para probar.**
 
 - ✅ **Ráfaga de cortes** (humanoide) y **Ráfaga de zarpazos** (bestia) (2026-10-21): un solo duelo (dueño: la opción 2, «el golpe vale por tres»): un ataque
-  con su arma con **+2 dados** (la Defensa se resta una vez); **los efectos al golpear del arma se tiran tres veces** y **su Perfora vale el triple** (dueño: «si
-  el arma perfora 1, perforaría 3 veces»). Lo de un ataque y **3 SP**, o cooldown 3. (Se descartó: tres duelos seguidos, con tres Evasiones.) **Para probar.**
+  con su arma con **+2 dados** (la Defensa se resta una vez); **los efectos al golpear del arma se tiran tres veces** y **su Perfora vale en cada corte** (dueño: «perfora
+  cada uno de los tres golpes»: con Perfora 1, cada corte asegura 1 que pasa la Defensa, así que pasan al menos 3). Lo de un ataque y **3 SP**, o cooldown 3. (Se descartó: tres duelos seguidos, con tres Evasiones.) **Para probar.**
 
 ### Rango (desde el 2026-10-21)
 

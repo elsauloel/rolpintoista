@@ -519,7 +519,12 @@ const Duelo = (() => {
     // El bono del tiro (2026-10-09, arcos; docs/rework-armas-rango.md): lo calcula el mapa al elegir el objetivo — la distancia ideal del arco
     // (PdG, Crítico frecuente / potente, daño fijo, ignora Resistencia) y el tiro alto (PdG −2). `motivo` es lo que se lee («distancia ideal»).
     // Perfora N del arma (2026-10-10, las ballestas): viaja en el ataque; el mapa la suma a la de la flecha o el virote al aplicar el daño.
-    if(_num(cfg.ataque.perfora) > 0 && !hab) inicial.ataque.perfora = Math.min(15, Math.round(_num(cfg.ataque.perfora) * Math.max(1, Math.min(3, Math.round(_num(cfg.ataque.rafaga)) || 1))));   // una ráfaga, ×N
+    if(_num(cfg.ataque.perfora) > 0 && !hab){
+      // Una ráfaga (2026-10-21, dueño: «perfora cada uno de los golpes»): cada corte asegura su Perfora, así que pasan al menos N × cortes.
+      const rf = Math.max(1, Math.min(3, Math.round(_num(cfg.ataque.rafaga)) || 1)), pc = Math.min(5, Math.round(_num(cfg.ataque.perfora)));
+      inicial.ataque.perfora = Math.min(15, pc * rf);
+      if(rf > 1) inicial.ataque.perforaCorte = pc;
+    }
     if(_num(cfg.ataque.alejarse) > 0 && !hab) inicial.ataque.alejarse = Math.min(4, Math.round(_num(cfg.ataque.alejarse)));   // 💨 Picar y alejarse (2026-10-21)
     if(cfg.ataque.atraviesaEscudos && !hab) inicial.ataque.atraviesaEscudos = true;
     if(cfg.ataque.puntaDiamante && !hab) inicial.ataque.puntaDiamante = true;   // contra Defensa 12 o más, Perfora +2 (el mapa, 2026-10-11)
@@ -590,8 +595,9 @@ const Duelo = (() => {
     if(d.ataque && _num(d.ataque.quieto) > 0) t.push(`💍 ${d.hab ? 'foco' : 'puntería certera'}: +${_fmt(d.ataque.quieto)} ${d.hab ? 'PdG.Esp' : 'PdG'}`);
     if(d.ataque && _num(d.ataque.primeraSangre) > 0) t.push(`💍 primera sangre: +${_fmt(d.ataque.primeraSangre)} de daño si pega`);
     if(d.ataque && d.ataque.tiro) t.push(`🏹 ${d.ataque.tiro.motivo}: ${tiroTxt(d.ataque.tiro)}`);
-    if(d.ataque && _num(d.ataque.rafaga) > 1) t.push(`🗡 ${_fmt(d.ataque.rafaga)} cortes: los efectos del arma se tiran ${_fmt(d.ataque.rafaga)} veces y su Perfora vale ×${_fmt(d.ataque.rafaga)}`);
-    if(d.ataque && _num(d.ataque.perfora) > 0) t.push(`perfora ${_fmt(d.ataque.perfora)}`);   // la Perfora del arma y de la habilidad (2026-10-10; sin «(el arma)» desde el 2026-10-21: puede venir de la habilidad); se suma a la del virote
+    if(d.ataque && _num(d.ataque.rafaga) > 1) t.push(`🗡 ${_fmt(d.ataque.rafaga)} cortes: los efectos del arma se tiran ${_fmt(d.ataque.rafaga)} veces`);
+    if(d.ataque && _num(d.ataque.perforaCorte) > 0) t.push(`Perfora ${_fmt(d.ataque.perforaCorte)} en cada corte (pasan al menos ${_fmt(d.ataque.perfora)})`);
+    else if(d.ataque && _num(d.ataque.perfora) > 0) t.push(`perfora ${_fmt(d.ataque.perfora)}`);   // la Perfora del arma y de la habilidad (2026-10-10; sin «(el arma)» desde el 2026-10-21: puede venir de la habilidad); se suma a la del virote
     if(d.ataque && d.ataque.flecha) t.push(`🏹 ${d.ataque.flecha.nombre}${(d.ataque.flecha.efectos || []).length ? ': ' + d.ataque.flecha.efectos.map(e => e.danoMagico ? magCorto(e) : e.nombre).join(', ') : ''}${d.ataque.flecha.perfora ? ` · perfora ${d.ataque.flecha.perfora}` : ''}`);
     return t.join(' · ');
   };

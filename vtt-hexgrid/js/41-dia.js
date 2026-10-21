@@ -101,6 +101,7 @@ async function diaRevisar(antes){
           await modificarCreep(creepId, s => {
             if(yaEsta(s)) return false;
             if(!manual) s.estados = (s.estados || []).filter(e => !diaTermina(e));
+            if(!manual && s.modoSP) s.sp = CreepCalculo.spMax(s);   // 💧 descansó: SP lleno
             s.diaAplicado = dia;
             return true;
           });

@@ -134,9 +134,9 @@ const CreepBotonera = (() => {
       const bloqueo = bloqueoHab(sc, h);
       const costo = costoNitrosHab(sc, h);
       const partes = [costoHabTxt(sc, h)];
-      if(num(h.cd) > 0) partes.push(`CD ${fmt(num(h.cd))}`);
+      if(num(h.cd) > 0 && !C().modoSP(sc)) partes.push(`CD ${fmt(num(h.cd))}`);   // (en modo SP no hay cooldown)
       const motivo = bloqueo ? `${bloqueo} · ${partes.join(' · ')}` : partes.join(' · ');
-      return {id: h.id, nombre: h.nombre || 'Sin nombre', disabled: !!bloqueo, motivo, attr:`data-ejecutar="${sc.id}:${h.id}"`, flash: Combatiente.esFlash(h), boton: botonHabTxt(h), segunda: botonSegundaHab(h, sc), cdHtml: cdControlesHtml(sc, h)};
+      return {id: h.id, nombre: h.nombre || 'Sin nombre', disabled: !!bloqueo, motivo, attr:`data-ejecutar="${sc.id}:${h.id}"`, flash: Combatiente.esFlash(h), boton: botonHabTxt(h), segunda: botonSegundaHab(h, sc), cdHtml: C().modoSP(sc) ? '' : cdControlesHtml(sc, h)};
     });
 
     const filaHab = f => `
@@ -186,11 +186,12 @@ const CreepBotonera = (() => {
       </div>
     </div>
     <div class="botonera-caja">
-      <div class="acciones-grupo-label" style="margin-top:0">Habilidades</div>
+      <div class="acciones-grupo-label" style="margin-top:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap">Habilidades
+        <button type="button" class="btn chico" data-modosp="${esc(sc.id)}" title="Probar sus habilidades pagando con SP (sin cooldown) o con cooldown, como siempre">${C().modoSP(sc) ? `💧 Con SP · ${fmt(C().spActual(sc))}/${fmt(C().spMax(sc))} (recarga ${fmt(C().spRegen(sc))})` : '⏱ Con cooldown'} ⇄</button></div>
       <div class="botonera-list-grid">${filasHab.map(filaHab).join('')}</div>
     </div>
     ${cinturonHtml(sc, o)}`;
-    return {titulo: sc.nombre, badge: `No2 ${fmt(num(sc.nitros))}/${fmt(nitrosMax(sc))}`, html: cuerpo + Combatiente.FLASH_CSS};
+    return {titulo: sc.nombre, badge: `No2 ${fmt(num(sc.nitros))}/${fmt(nitrosMax(sc))}${C().modoSP(sc) ? ` · SP ${fmt(C().spActual(sc))}/${fmt(C().spMax(sc))}` : ''}`, html: cuerpo + Combatiente.FLASH_CSS};
   }
 
   /* El cinturón del creep (2026-10-04): 1 ranura = 1 unidad, base 5; usar uno cuesta 1 No2. opts.consumibles = [{id, nombre, tier}] del

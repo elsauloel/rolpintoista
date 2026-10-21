@@ -337,10 +337,18 @@ const CreepAcciones = (() => {
   // 🩸 Maldito en un creep (2026-10-18, dueño, hasta que los creeps gasten SP): cada habilidad que usa le saca tanta vida como su cooldown.
   function malditoCreep(sc, h){
     const mal = (sc.estados || []).some(e => e && e.activo !== false && (e.sangraSp || e.nombre === 'Maldito'));
-    const cd = Math.max(0, Math.round(num(h && h.cd)));
+    const cd = C().modoSP(sc) ? C().costoSpHab(sc, h) : Math.max(0, Math.round(num(h && h.cd)));   // (en modo SP, su SP)
     if(!mal || !cd) return 0;
     sc.hp = Math.max(0, num(sc.hp) - cd);
     return cd;
+  }
+  // 💧 Modo SP (2026-10-20): si no le alcanza el SP, pregunta y deja seguir (queda en 0). → Promise<bool>.
+  async function confirmarSP(sc, h){
+    if(!C().modoSP(sc)) return true;
+    const cuesta = C().costoSpHab(sc, h), tiene = C().spActual(sc);
+    if(tiene >= cuesta) return true;
+    const t = `${sc.nombre} tiene ${fmt(tiene)} de SP y ${h.nombre || 'la habilidad'} cuesta ${fmt(cuesta)}. ¿Usarla igual? (queda en 0)`;
+    return typeof Confirmar !== 'undefined' ? Confirmar.preguntar(t, {titulo: 'No le alcanza el SP', icono: '💧', si: 'Usarla igual', no: 'No'}) : confirm(t);
   }
   function ejecutarHab(sc, h, presets, silencioOk){
     const sil = Combatiente.preguntaSilencio(sc.estados, h, sc.nombre);   // Silencio (2026-10-04): avisa y deja seguir
@@ -352,7 +360,10 @@ const CreepAcciones = (() => {
     const costo = C().costoNitrosHab(sc, h), costoHp = num(h.hpCosto);
     sc.nitros = num(sc.nitros) - costo;
     Combatiente.aplicarTormenta(sc, sc.estados, costo, {motivo: `usar ${h.nombre || 'una habilidad'}`});
-    h.cdActual = num(h.cd);
+    // 💧 En modo SP (2026-10-20): paga su SP y no queda en cooldown. Sin SP suficiente, la pantalla ya preguntó (confirmarSP): queda en 0.
+    let costoSp = 0;
+    if(C().modoSP(sc)){ costoSp = C().costoSpHab(sc, h); sc.sp = Math.max(0, C().spActual(sc) - costoSp); }
+    else h.cdActual = num(h.cd);
     const malditoDano = malditoCreep(sc, h);   // 🩸 Maldito: su cooldown en vida (2026-10-18)
     if(C().habAtaque(h)) sc.ataquesTurno = num(sc.ataquesTurno) + 1;  // cuenta como su ataque
     if(costoHp > 0) sc.hp = num(sc.hp) - costoHp;
@@ -366,7 +377,7 @@ const CreepAcciones = (() => {
     const esZona = auto && h.duelo && typeof h.duelo === 'object' && h.duelo.objetivo === 'zona';
     // ✨ Solo sobre el creep y sin nada que tirar: se aplica directo, sin abrir el cuadro.
     const directo = auto && !h.trampaColocar && !h.refuerzos ? sobreSi(sc, h) : null;
-    return {costo, costoHp, efecto, aviso: [ef.aviso || '', malditoDano ? `🩸 Maldito: usar ${h.nombre || 'la habilidad'} le saca ${fmt(malditoDano)} de vida` : ''].filter(Boolean).join(' · '), falta, auto, esZona, directo, nitros: sc.nitros, malditoDano};
+    return {costo, costoSp, costoHp, efecto, aviso: [ef.aviso || '', malditoDano ? `🩸 Maldito: usar ${h.nombre || 'la habilidad'} le saca ${fmt(malditoDano)} de vida` : ''].filter(Boolean).join(' · '), falta, auto, esZona, directo, nitros: sc.nitros, malditoDano};
   }
   /* Lo que pasa después de cobrar. ui = {mesaHabilidad(sc, h, extra), mesaConTexto(texto), publicar(sc, t), toast(t),
        habDuelo(sc, h) (la Ejecución para el duelo, o null si no hay duelo), lanzarAtaque(sc, h), lanzarDuelo(sc, h, hab),
@@ -460,7 +471,8 @@ const CreepAcciones = (() => {
     const ahorro = usos ? 0 : Math.max(0, Math.round(num(C().modTotal(sc, 'ahorroespsp'))));   // primer conjuro: el SP de menos baja la espera
     // Las cargas (2026-10-08): mientras le queden, no hay espera (el SP de un creep).
     const cargas = Math.max(0, Math.round(num(e.cargas))), conCarga = cargas > 0 && num((sc.cargasEsp || {})[k]) < cargas;
-    return {no2: Combatiente.conExtenuado(sc.estados, Math.max(0, num(e.no2 ?? 1)) + usos * Math.max(0, num(e.sube ?? 1))), espera: conCarga ? 0 : ESPERA_POR_SP(Math.max(0, num(e.sp) - ahorro)), usos, enEspera: num((sc.esperaEspecial || {})[k]),
+    const sp = conCarga || num(e.spVidaPct) > 0 ? 0 : Math.max(0, num(e.sp) - ahorro);   // 💧 su SP de verdad (modo SP)
+    return {sp, no2: Combatiente.conExtenuado(sc.estados, Math.max(0, num(e.no2 ?? 1)) + usos * Math.max(0, num(e.sube ?? 1))), espera: C().modoSP(sc) ? 0 : conCarga ? 0 : ESPERA_POR_SP(Math.max(0, num(e.sp) - ahorro)), usos, enEspera: num((sc.esperaEspecial || {})[k]),
       ...(cargas ? {cargas, cargaUsadas: num((sc.cargasEsp || {})[k])} : {})};
   }
   // 🔮 Los talismanes de su equipo que le suman algo a cada varita (la Cabeza reducida, el Muñeco vudú).
@@ -475,19 +487,19 @@ const CreepAcciones = (() => {
     return {id: 'esp:' + it.id, deItem: it.id, nombre: e.nombre || it.nombre, detalle: it.detalle || '', modo: 'auto', duelo: e.duelo ? structuredClone(e.duelo) : null,
       tiradaStat: (e.duelo && e.duelo.tira) || 'pdgmg', tiradaExtra: dano ? dano + (suma > 0 ? '+' + suma : '') : '',
       ...(e.trampaColocar ? {trampaColocar: structuredClone(e.trampaColocar)} : {}), ...(e.caos ? {caos: structuredClone(e.caos)} : {}),   // la Varita del caos (2026-10-18)
-      nitrosCosto: costoEspecialCreep(sc, it).no2, cd: 0};
+      nitrosCosto: costoEspecialCreep(sc, it).no2, spCosto: costoEspecialCreep(sc, it).sp, cd: 0};
   }
   // Cobra y arma el plan (lo mismo que ejecutarHab, con la espera y los orbes). {error} o el plan, con `hab` (la habilidad de la varita).
   function usarEspecialCreep(sc, itemId, presets, silencioOk){
     const it = especialesCreep(sc).find(x => x.id === itemId);
     if(!it) return {error: `${sc.nombre}: esa arma especial ya no está en su equipo`};
     const c = costoEspecialCreep(sc, it);
-    if(c.enEspera > 0) return {error: `${sc.nombre}: ${it.nombre} está en espera ${fmt(c.enEspera)} turno${c.enEspera === 1 ? '' : 's'} (un creep paga el SP con espera)`};
+    if(c.enEspera > 0 && !C().modoSP(sc)) return {error: `${sc.nombre}: ${it.nombre} está en espera ${fmt(c.enEspera)} turno${c.enEspera === 1 ? '' : 's'} (un creep paga el SP con espera)`};
     const h = habDeEspecialCreep(sc, it);
     const p = ejecutarHab(sc, h, presets, silencioOk);
     if(p.error) return p;
     const kEsp = claveEspCreep(it);
-    sc.esperaEspecial = {...(sc.esperaEspecial || {}), [kEsp]: c.espera};   // en el creep: la varita queda igual (si la saquean, vuelve a costar SP)
+    if(!C().modoSP(sc)) sc.esperaEspecial = {...(sc.esperaEspecial || {}), [kEsp]: c.espera};   // (en modo SP, pagó su SP: sin espera)   // en el creep: la varita queda igual (si la saquean, vuelve a costar SP)
     sc.usosEspecial = {...(sc.usosEspecial || {}), [kEsp]: c.usos + 1};
     if(c.cargas && c.cargaUsadas < c.cargas) sc.cargasEsp = {...(sc.cargasEsp || {}), [kEsp]: c.cargaUsadas + 1};   // una carga menos
     // El báculo de sangre (2026-10-08): el % de su vida máxima en vez de SP (y sin espera).
@@ -542,6 +554,11 @@ const CreepAcciones = (() => {
     if(dh){ const antes = num(sc.hp); sc.hp = Math.max(0, Math.min(num(sc.hpMax), antes + dh)); rep.push(`HP total: ${antes} → ${sc.hp}`); }
     if(fenixCreep(sc)) rep.push(`🔥 Llama de Fénix: revive con ${sc.hp} HP y queda Titilando`);
     sc.nitros = Combatiente.recargarNo2(C().nitrosMax(sc), sc.nitros, sc.estados);
+    if(C().modoSP(sc)){   // 💧 recarga su SP (mínimo 1 por turno)
+      const a = C().spActual(sc), b = Math.min(C().spMax(sc), a + C().spRegen(sc));
+      if(b !== a) rep.push(`SP: ${fmt(a)} → ${fmt(b)}`);
+      sc.sp = b;
+    }
     return {rep, enCooldown, hpAplicado: d.eventos.filter(ev => ev.tipo === 'hp').length};
   }
   // 🔥 Llama de Fénix (2026-10-20): un creep caído con la llama revive con toda la vida y Titilando. → true si revivió.
@@ -593,7 +610,7 @@ const CreepAcciones = (() => {
     });
   }
 
-  return {fenixCreep, bloqueoFirmeCreep, ESPERA_POR_SP, especialesCreep, costoEspecialCreep, habDeEspecialCreep, usarEspecialCreep, habEspecialParaTerminar, mantenimiento, inicioTurno, finTurno, reclamarMantenimiento, alCinturon, quitarDelCinturon, consumir, faltanNitrosConsumir, costoConsumir, colocarTrampaDeItem, consumiblesDe,
+  return {confirmarSP,fenixCreep, bloqueoFirmeCreep, ESPERA_POR_SP, especialesCreep, costoEspecialCreep, habDeEspecialCreep, usarEspecialCreep, habEspecialParaTerminar, mantenimiento, inicioTurno, finTurno, reclamarMantenimiento, alCinturon, quitarDelCinturon, consumir, faltanNitrosConsumir, costoConsumir, colocarTrampaDeItem, consumiblesDe,
     tirada, tiradaStat, esquivar, parry, fuerzaGolpe, bloqueo, dano, levantarse, tiradaSoltarse, aplicarSoltarse, pagarParry, pagarAtaque, tiradaAtaque, NOMBRE_ESPECIAL,
     costoAtaqueDe, devolverAtaque, faltanNitros, preguntaSinNitros, alertaSinNitros,
     FLAGS_ESTADO, habEtq, habEjecucion, ataqueDeHab, habTira, efectoDeHab, sobreSi, confirmarSilencio, preguntaVida, ejecutarHab, terminarHab, tiradaPrimeraHab, tiradaSegundaHab,

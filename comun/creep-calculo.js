@@ -400,9 +400,9 @@ const CreepCalculo = (() => {
     return [p.descripcion, p.mano].filter(Boolean).join(' ');
   }
   function costoHabTxt(sc, h){
-    const n = costoNitrosHab(sc, h);
-    if(habAtaque(h)) return `${fmt(n)} No2 (como un ataque)`;
-    return n ? `${fmt(n)} No2` : "sin costo";
+    const n = costoNitrosHab(sc, h), sp = modoSP(sc) ? `${fmt(costoSpHab(sc, h))} SP · ` : '';   // 💧 en modo SP, también su SP
+    if(habAtaque(h)) return `${sp}${fmt(n)} No2 (como un ataque)`;
+    return n ? `${sp}${fmt(n)} No2` : sp ? sp.replace(/ · $/, '') : "sin costo";
   }
   // Parry y Bloqueo de un creep (2026-09-24, pedido del dueño; igual que en la ficha): el Parry cuesta 1 No2 (2026-09-26; antes el Peso de su arma);
   // el Bloqueo suma su Bloqueo + el Peso del arma y ESA SUMA es el dado.
@@ -511,7 +511,22 @@ const CreepCalculo = (() => {
   /* ---------- Habilidades: modo y si se pueden usar ---------- */
   function modoHab(h){ return Combatiente.modoHab(h, h && h.duelo && typeof h.duelo === 'object' ? h.duelo : null); }   // la regla común
   // ¿Se puede usar ahora? La regla común (P133): cooldown, No2 y vida (una 📣 manual no cobra nada).
-  function bloqueoHab(sc, h){ return Combatiente.bloqueoHab(h, {modo: modoHab(h), nitros: sc.nitros, costo: costoNitrosHab(sc, h), hp: sc.hp}); }
+  function bloqueoHab(sc, h){ return Combatiente.bloqueoHab(modoSP(sc) ? {...h, cdActual: 0} : h, {modo: modoHab(h), nitros: sc.nitros, costo: costoNitrosHab(sc, h), hp: sc.hp}); }   // (en modo SP no hay cooldown)
+  /* 💧 SP para creeps (dueño, 2026-10-20: «que las skills puedan usar SP en vez de cooldown, con un switch, para probar las dos en simultáneo»).
+     `sc.modoSP`: sus habilidades cuestan SP (además de sus No2) y no tienen cooldown. Máximo como un personaje: Especial × 3 (+ lo que sume el
+     equipo o un estado al stat `sp`); recarga al empezar su turno la mitad del Especial, **nunca menos de 1** (dueño). El SP de una habilidad:
+     `h.spCosto` si lo trae; si no, un número en `h.costo`; si no, su cooldown (sin cooldown: 1). `sc.sp` = el que le queda (sin dato: lleno). */
+  const modoSP = sc => !!(sc && sc.modoSP);
+  function spMax(sc){ return Math.max(0, Math.round(num(statValor(sc, 'esp')) * 3 + num(modTotal(sc, 'sp')))); }
+  function spRegen(sc){ return Math.max(1, Math.floor(num(statValor(sc, 'esp')) / 2) + Math.round(num(modTotal(sc, 'spregen')))); }
+  function spActual(sc){ return sc && sc.sp !== undefined && sc.sp !== null && sc.sp !== '' ? Math.max(0, num(sc.sp)) : spMax(sc); }
+  function costoSpHab(sc, h){
+    if(h && h.spCosto !== undefined && h.spCosto !== null && h.spCosto !== '' && Number.isFinite(Number(h.spCosto))) return Math.max(0, Math.round(Number(h.spCosto)));
+    const c = parseInt(String((h && h.costo) || '').trim(), 10);
+    if(Number.isFinite(c) && c > 0) return c;
+    const cd = Math.round(num(h && h.cd));
+    return cd > 0 ? cd : 1;
+  }
 
   /* ---------- Normalizar un creep guardado ---------- */
   // Estados de creeps guardados antes de los No2: los presets que tocaban
@@ -716,7 +731,7 @@ const CreepCalculo = (() => {
     return partes.length ? partes.join(' · ') : 'nada';
   }
 
-  return {talisman, auraMiedo, estandartes, enLasManos, regenPasivas, masDanoElem, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
+  return {modoSP, spMax, spRegen, spActual, costoSpHab,talisman, auraMiedo, estandartes, enLasManos, regenPasivas, masDanoElem, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
     ARQUETIPOS, arquetiposAuto, arquetiposManual, arquetipos, arquetiposTxt, TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TROFEO_PRECIO_NIVEL, TIPOITEM_LABEL, STAT_LABEL, itemParaCreep, magiaDeItem, vaAlEquipo, nombreLimpio, tipoDe, oroSugerido, trofeoPrecioAuto,
     trofeo, despojosDePrecio, dropsResumen, dropsFijos,
     correrTiposTexto, migrarObjTipos, migrarCreepTipos, migrarObjEspecial, migrarHabPdg, migrarCreepEspecial, slotDe,

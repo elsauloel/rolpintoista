@@ -429,6 +429,15 @@ document.addEventListener('click', async e => {
     if(sc){ sc.habilidades = sc.habilidades.filter(h=>h.id!==habId); renderAll(); }
     return;
   }
+  if(b.dataset.modosp){   // 💧 ⇄ cooldown / SP (2026-10-20): al pasar a SP, arranca lleno
+    const sc = S.creeps.find(s => s.id === b.dataset.modosp);
+    if(!sc) return;
+    sc.modoSP = !sc.modoSP;
+    if(sc.modoSP) sc.sp = CreepCalculo.spMax(sc);
+    toast(sc.modoSP ? `💧 ${sc.nombre}: sus habilidades pagan con SP (sin cooldown)` : `⏱ ${sc.nombre}: sus habilidades vuelven a usar cooldown`);
+    renderAll();
+    return;
+  }
   if(b.dataset.cdmod){
     const [scId, habId, accion] = b.dataset.cdmod.split(':');
     const sc = S.creeps.find(s => s.id === scId);
@@ -469,6 +478,7 @@ document.addEventListener('click', async e => {
     // Lo que cambia al creep (cobrar, cura y estado del sistema anterior, el atajo «solo sobre sí») y lo que pasa después (Mesa,
     // duelo, trampa, zona, a quién le pegó, el aviso): comun/creep-acciones.js (paso 4 etapa 4c, tanda 5), con gmHabUi (js/04).
     if(!(await CreepAcciones.confirmarSilencio(sc, h))){ toast(`${sc.nombre}: no usó ${h.nombre || 'la habilidad'}`); return; }   // el cartel del juego, antes de cobrar
+    if(!(await CreepAcciones.confirmarSP(sc, h))){ toast(`${sc.nombre}: no usó ${h.nombre || 'la habilidad'}`); return; }   // 💧 modo SP: no le alcanza
     const p = CreepAcciones.ejecutarHab(sc, h, ESTADOS_PRESET_GM, true);
     if(p.error){ toast(p.error); return; }
     if(p.aviso) toast(p.aviso);

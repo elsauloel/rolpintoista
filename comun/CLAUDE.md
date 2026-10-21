@@ -1676,3 +1676,8 @@ versión parecida en más de una, es candidato a juntar.
   no, su cooldown; sin cooldown, 1). En modo SP `bloqueoHab` no mira el cooldown, `CreepAcciones.ejecutarHab` cobra SP en vez de cooldown (`p.costoSp`),
   `confirmarSP` pregunta si no alcanza (deja seguir, queda en 0), `inicioCreep` recarga, Pasar de día lo llena (js/41) y las varitas cobran su SP
   sin espera (`costoEspecialCreep` → `sp`). Maldito: le saca vida igual a su SP.
+- **🦷 Soltarse con daño y quién lo tiene agarrado** (2026-10-21, el Mordisco feroz): `soltar.danoFalla` (una fórmula: si no se suelta, recibe ese
+  daño) y `soltar.de` / `deNombre` (el token que lo tiene agarrado) — los conserva `Combatiente.soltarNorm`. En una Ejecución «con tu arma», un
+  efecto con `soltar.difStat` toma el stat de quien ataca (`o.valorDe`) y `danoFalla: 'golpe'` el daño de ese mismo golpe (`o.danoGolpe(dados)`;
+  `CreepAcciones.ataqueDeHab` los pasa). Presets «Mordido» (grupo Atrapar) y «Mordiendo» (`muerdeA`, `desde`: `EstadosAplicar` los conserva);
+  `FichaResumen` publica el `soltar` que trae `de`. Lo hace el mapa: vtt-hexgrid/js/54.

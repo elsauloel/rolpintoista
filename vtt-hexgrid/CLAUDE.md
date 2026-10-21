@@ -1679,3 +1679,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `dueloAplicarDano`, js/13, después del Espejo) y `talismanUnaVez(d, ef)` (`dueloAplicarEfectoBase`: el efecto «🔮 …» de un talismán entra una vez por
   turno de quien usó la varita, `talismanUsados`).
 
+- **🦷 Mordisco feroz** (2026-10-21, dueño; en `js/54-soltarse-al-empezar.js`): el efecto «Mordido» de la habilidad (un ataque con el arma) lleva en su
+  `soltar` quién lo tiene agarrado (`de`, el token; lo pone `mordidaEmpezar`, llamado desde `dueloAplicarEfectoBase` de js/13) y el daño que se repite
+  (`danoFalla`, lo resuelve `Combatiente.ataqueConArreglos` con `o.danoGolpe`). La bestia recibe «Mordiendo» (`muerdeA`, `desde`). Al empezar el turno
+  del mordido, el cartel de Soltarse de siempre; si falla, `mordidaDano` le aplica el daño otra vez (con su Defensa; Mesa y Crónica). Al empezar el
+  turno de la bestia, `mordidaSoltar` (el GM) les saca los dos estados; si el mordido se zafa antes, un revisado cada 2 s (el GM, desde los 8 s de
+  morder) le saca «Mordiendo» a la bestia.

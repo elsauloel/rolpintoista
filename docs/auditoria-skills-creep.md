@@ -20,7 +20,7 @@
 
 ## Clasificación: las de choque («melee», 70 de las 321)
 
-- **Golpes simples (8):** Golpe fuerte ✅, Tajo veloz ✅, Estocada ✅, Zarpazo ✅, Mordisco feroz, Cornada, Puño de roca, Golpe de pomo.
+- **Golpes simples (8):** Golpe fuerte ✅, Tajo veloz ✅, Estocada ✅, Zarpazo ✅, Mordisco feroz ✅, Cornada, Puño de roca, Golpe de pomo.
 - **Golpes con efecto (~14):** Golpe que sangra, Mordisco que lisia, Golpe atontador, Corte profundo, Zarpazo desgarrador, Zarpa oxidante, Golpe
   glacial, Toque abrasador, Mordisco vampírico, Golpe vigorizante, Golpe brutal y guardia, Golpe de escudo, Golpe doble, Ráfaga de golpes, Aplastar,
   Golpe de mano.
@@ -53,6 +53,15 @@
   con 5 o más y triple con 16 o más). De paso, la declaración del duelo muestra ahora los arreglos de crítico de cualquier habilidad
   (Crítico frecuente, potente, ignora Res. a crítico).
 
+- ✅ **Mordisco feroz** (bestias, 2026-10-21). Original: «Una mordida profunda.» Antes: 2d6 + nivel fijo, sin arma ni duelo. **Ahora** (dueño: «la
+  que no suelta»): un ataque con su arma con **+1 dado del Tipo de su arma**; costo de un ataque, cooldown 3 o **3 SP**. Si pega, el objetivo queda
+  **Mordido** (no se mueve) y la bestia **Mordiendo** (tampoco se mueve). Al empezar su turno, el mordido tira **Fuerza contra la Fuerza de la
+  bestia**, gratis; si no se suelta, el mordisco le vuelve a hacer **el mismo daño** (su arma + 1 dado, restando la Defensa). La bestia lo suelta
+  **al empezar su siguiente turno** (o antes, si el otro se zafa). Automatizado en el mapa (`vtt-hexgrid/js/54`). Probado en el mapa (Silvia mordida:
+  al empezar su turno, Fuerza 1 contra 6 → sigue atrapada y el mordisco le hace 3d4+6 = 12 − Defensa 3 → 9; al empezar el turno del creep, la
+  suelta y se van los dos estados). De paso: en las habilidades auditadas que van al duelo, la descripción ya no manda a «✋ A mano» lo que el
+  mapa hace solo (`frasesDe` de `comun/creeps-base.js`).
+
 ## Etiquetas
 
 - Cada habilidad ya trae etiquetas de función, velocidad, raza (tipo de criatura), rol, a quién apunta, mecánicas y automatización. Desde el
@@ -61,4 +70,4 @@
 
 ## Sigue
 
-- Mordisco feroz, Cornada, Puño de roca, Golpe de pomo (los golpes simples que quedan).
+- Cornada, Puño de roca, Golpe de pomo (los golpes simples que quedan).

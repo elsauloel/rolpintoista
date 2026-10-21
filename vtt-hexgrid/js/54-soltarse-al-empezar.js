@@ -157,7 +157,8 @@ setInterval(() => {
     const e = confusionEstadosDe(b).find(x => x && x.nombre === 'Mordiendo' && x.muerdeA);
     if(!e || Date.now() - num(e.desde) < 8000) return;
     const v = tokens.get(e.muerdeA);
-    if(v && confusionEstadosDe(v).some(x => x && x.nombre === 'Mordido' && x.soltar && x.soltar.de === bid)) return;
+    const delMismo = de => de === bid || ((tokens.get(de) || {}).fichaId === b.fichaId && (tokens.get(de) || {}).tipo === 'creep');   // (dos tokens del mismo creep)
+    if(v && confusionEstadosDe(v).some(x => x && x.nombre === 'Mordido' && x.soltar && delMismo(x.soltar.de))) return;
     mordidaRevisando.add(bid);
     mordidaQuitar(b, 'Mordiendo', 'Se zafó').then(() => mesaLinea(`🦷 ${nombreDe(b)} ya no tiene agarrado a ${e.muerdeANombre || 'nadie'}: queda libre.`, 'recordatorio'))
       .catch(err => console.error('Mordisco:', err)).finally(() => setTimeout(() => mordidaRevisando.delete(bid), 3000));

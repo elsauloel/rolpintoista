@@ -98,7 +98,7 @@
   // trampa que se coloca sola) solo queda a mano lo que la descripción marca con "(a mano)" y sea movimiento, área o algo que el
   // programa no maneja; el "(a mano)" de un estado que ahora se aplica solo se descarta.
   function frasesDe(sp, n){
-    const ap = aplicaDe(sp), solo = !!ap || sp.trampa !== undefined || !!sp.colocar;
+    const ap = aplicaDe(sp), solo = !!ap || sp.trampa !== undefined || !!sp.colocar || !!sp.duelo;   // (una auditada que va al duelo: solo lo que dice «a mano» es a mano)
     const REAL = /empuj|casillero|salta|se aleja|al piso|derrib|huye|sigilo|revela|repite|suelta|roba|no puede|invoc|entran|llegan|jala|arrastr|vuelve|gana|ganan|sube|baja/i;
     let frases = textoHab(sp, n).split(/(?<=[.!?])\s+/);
     if(ap) frases = frases.map(f => REAL.test(f) ? f : f.replace(/\s*\(a mano\)/g, '').replace(/\(a mano,\s*/g, '(').replace(/,\s*a mano\)/g, ')')).map(f => f.replace(/(A|a)plic[aá]le/g, (m, c) => c + 'plica'));

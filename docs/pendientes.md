@@ -8,6 +8,11 @@
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.
+> - [ ] **⚡ Ver juntos los botones Flash nuevos y el 🧿 Mal de ojo** (2026-10-21, dueño: «anotar esto en revisar cuando esté en la compu»): 🛡️ Blindaje,
+>   🫧 Shield, 🗿 Estoicismo y 💥 Shockwave (personajes) y 🧿 Mal de ojo (el GM, con un creep que lo tenga): arriba, junto a la moneda, y en la columna
+>   «Podés usar» con un duelo abierto; las animaciones (la muestra: https://claude.ai/artifact/HCW4XnbTypFmvGuXPHoBRZ); que aparezcan solo si alcanza el
+>   SP (el doble en turno ajeno) y que al tocarlos se ejecute la habilidad. Ojo: cada personaje con una de estas habilidades tiene que guardar su ficha una
+>   vez para que aparezca su botón.
 > - [ ] **🪟 Los botones minimizados de los duelos tapan el cartel del dodge roll en una ventana baja** (2026-10-21, probando la Bola de fuego en el
 >   Chrome de pruebas, de 567 px de alto; dueño: «en el teléfono no termino de entender el problema»): «Pegó: …» y «Dodge roll: …» (los duelos
 >   minimizados, abajo al centro) quedan encima de «Ver el duelo» / «No me quiero mover» del cartel. Mirarlo juntos en la compu con una ventana baja y

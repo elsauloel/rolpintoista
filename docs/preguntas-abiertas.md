@@ -1124,7 +1124,8 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   turnos; lo que manda es el SP guardado. Lo que de verdad da matices es combinar el costo con un SP guardado más chico o una recarga menor.**
   **En pausa (dueño, 2026-10-21): «déjalo pendiente para cuando tenga tiempo de encarar el tema de la recarga».**
 
-### P217 — ¿Una bestia puede hacer Parry con sus garras? (2026-10-21)
+### P217 — ¿Una bestia puede hacer Parry con sus garras? (2026-10-21) ✅ decidida y hecha el mismo día
+**Decisión (dueño): mecánicamente sí, para todos —si en cada caso tiene sentido lo decide la mesa—; el peso es el del arma (el ítem del catálogo que se le equipa y se marca natural), 1 si no tiene.** El arma natural va última: un arma o un escudo de verdad, primero. Y no se cae al desarmar.
 Contexto: la habilidad **Desarmar** (choque pesado) funciona en el paso del Bloqueo, que solo existe después de un Parry. El dueño dijo que una
 bestia (un oso hormiguero) «puede parrear con sus garras y obligar a desarmar a su rival». Pero hoy un arma natural **no** sirve para Parry
 (`Combatiente.armaParaDefensa`: «un arma natural tampoco, por ahora», regla del 30/9). Mientras tanto, una bestia con Desarmar solo desarma

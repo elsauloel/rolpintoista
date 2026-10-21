@@ -206,7 +206,7 @@ const CreepDuelo = (() => {
       },
       // ¿El creep objetivo de una habilidad dirigida puede parriar ahora? (2026-09-29, misma regla que un ataque
       // normal, P121: sin arma no hay Parry.)
-      puedeParry: d => { const sc = deLado(d.defensor); return !!C().defensa(sc) && !Combatiente.expuesto(sc && sc.estados); },   // arma de verdad o escudo (un arma natural no alcanza, por ahora)
+      puedeParry: d => { const sc = deLado(d.defensor); return !!C().defensa(sc) && !Combatiente.expuesto(sc && sc.estados); },   // un arma (también natural, 2026-10-21) o un escudo ()
       // Cómo puede defenderse el creep (elige el GM, a ciegas): Evasión o Parry con su arma (siempre 1 No2).
       opcionesDefensa: d => {
         const sc = deLado(d.defensor);
@@ -217,7 +217,7 @@ const CreepDuelo = (() => {
         const c = gratis ? 0 : C().costoParry(sc);
         const ee = evaEsp(sc, d);
         const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión', info: [`Evasión 🎲 ${Combatiente.conFijo(fx(C().statValor(sc, 'eva') + ee.val, 'eva'), ee)}${ee.txt ? ` (con ${ee.txt})` : ''}`]}];
-        // Parry solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30; un arma natural no alcanza, por ahora).
+        // Parry con un arma o un escudo (regla del dueño, 2026-09-30); desde el 2026-10-21 también con un arma natural (va última).
         const disparo = Combatiente.contraDisparo(d), def = C().defensa(sc, {soloEscudo: disparo});   // contra un disparo, Parry solo con escudo
         if(Combatiente.stuneado(sc.estados)) return [{modo: 'evasion', etiqueta: '🏃 Evasión · Stun: 1', info: ['⚡ Stun: no puede hacer nada; su Evasión es 1']}];   // Stun (2026-10-06)
         if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, etiqueta: `${def.nombre === sc.armaNombre ? '🗡' : '🛡'} Parry · ${def.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo: c, motivoNo: '',

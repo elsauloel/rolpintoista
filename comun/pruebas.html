@@ -324,7 +324,7 @@ prueba('🛡 Un creep para con un báculo de sus manos, no con un orbe ni una va
   const varita = con([{nombre: 'Varita', tipoItem: 'arma_1m', especial: {sp: 1}}]);
   const disparo = CreepCalculo.defensa({...base, equipo: [{...CreepCalculo.itemParaCreep(b), id: 'b'}]}, {soloEscudo: true});
   const escudo = CreepCalculo.defensa({...base, equipo: [{...CreepCalculo.itemParaCreep(b), id: 'b'}, {nombre: 'Rodela', tipoItem: 'escudo_1m', peso: 1}]}, {soloEscudo: true});
-  igual([conBaculo && conBaculo.nombre, conBaculo && conBaculo.peso, soloOrbe, varita, disparo, escudo && escudo.nombre], ['Báculo de escarcha', 2, null, null, null, 'Rodela']);
+  igual([conBaculo && conBaculo.nombre, conBaculo && conBaculo.peso, soloOrbe && soloOrbe.nombre, varita && varita.nombre, disparo, escudo && escudo.nombre], ['Báculo de escarcha', 2, 'Uñas', 'Uñas', null, 'Rodela']);   // sin otra cosa, sus Uñas naturales (2026-10-21)
 });
 prueba('dos Pajaritos parten una sola vez y el cartel muestra uno', () => {
   const es = [E({nombre: 'Pajaritos', mitadPdgEva: true}), E({nombre: 'Pajaritos 2', mitadPdgEva: true})];
@@ -374,16 +374,17 @@ prueba('la Mesa pinta los mismos estados que parten la tirada', () => {
   igual([Combatiente.estadosQueAfectan(es, 'pdg').map(e => e.n), Combatiente.estadosQueAfectan(es, 'eva').map(e => e.n)], [['Lisiado'], ['Parálisis']]);
 });
 prueba('el Parry cuesta 1 No2', () => igual(Combatiente.costoParry(), 1));
-prueba('Parry y Bloqueo: con arma o escudo; sin nada o con arma natural, no', () => {
+prueba('Parry y Bloqueo: con arma o escudo; el arma natural también, última y con su peso (1 si no tiene)', () => {
   const espada = {nombre: 'Espada', peso: 3}, escudo = {nombre: 'Escudo', peso: 2};
   igual([
     Combatiente.armaParaDefensa({arma: espada}),
     Combatiente.armaParaDefensa({arma: null, escudos: [escudo]}),
-    Combatiente.armaParaDefensa({arma: {nombre: 'Garras', peso: 1}, natural: true}),
+    Combatiente.armaParaDefensa({arma: {nombre: 'Garras', peso: 4}, natural: true}),
     Combatiente.armaParaDefensa({arma: {nombre: 'Garras', peso: 1}, natural: true, escudos: [escudo]}),
     Combatiente.armaParaDefensa({arma: null}),
     Combatiente.armaParaDefensa({arma: {nombre: '', peso: 1}}),
-  ], [espada, escudo, null, escudo, null, null]);
+    Combatiente.armaParaDefensa({arma: {nombre: 'Colmillos'}, natural: true}),
+  ], [espada, escudo, {nombre: 'Garras', peso: 4, natural: true}, escudo, null, null, {nombre: 'Colmillos', peso: 1, natural: true}]);
 });
 prueba('durabilidad: 3 por Peso (mínimo 3); un ítem de diseño puede traer más o menos', () => igual([
   Combatiente.durMax({tipoItem: 'escudo_1m', peso: 3}),
@@ -2344,9 +2345,9 @@ prueba('la 🪪 pública: solo los nombres del arma (también la natural) y del 
   igual([CreepCalculo.tarjetaPublica(sc), nat.armaNombre, nat.armaNatural, nat.equipoNombres],
     [{armaNombre: 'Hacha', armaNatural: false, manosNombres: [], equipoNombres: ['Yelmo'], notas: 'Huele a pantano.', tipoCriatura: '', pasosSilenciosos: false, auraMiedo: 0, auraEfEsp: 0}, 'Garras', true, []]);   // + el tipo de criatura (Matabestias, 2026-10-11)   // y el aura siempre escrita (2026-10-19)
 });
-prueba('Parry y Bloqueo: con su arma o un escudo; un arma natural sola no alcanza', () => {
+prueba('Parry y Bloqueo: con su arma o un escudo; un arma natural también (2026-10-21), después del escudo', () => {
   const nat = creepPrueba({armaNatural: true}), conEscudo = creepPrueba({armaNatural: true, equipo: [{nombre: 'Rodela', tipoItem: 'escudo_1m', peso: 3}]});
-  igual([!!CreepCalculo.defensa(creepPrueba()), CreepCalculo.defensa(nat), CreepCalculo.defensa(conEscudo).nombre, CreepCalculo.bloqueoValor(conEscudo)], [true, null, 'Rodela', 8]);
+  igual([!!CreepCalculo.defensa(creepPrueba()), !!CreepCalculo.defensa(nat), (CreepCalculo.defensa(nat) || {}).natural, CreepCalculo.defensa(conEscudo).nombre, CreepCalculo.bloqueoValor(conEscudo)], [true, true, true, 'Rodela', 8]);
 });
 prueba('normalizar pasa Inteligencia a Especial, corre la escala de Tipos y saca la habilidad Movimiento', () => {
   const sc = CreepCalculo.normalizar({nombre: 'Viejo', int: 3, armaTipo: 6, habilidades: [{nombre: 'Movimiento'}, {nombre: 'Golpe', detalle: 'Crítico 4 y 6', tiradaStat: 'int'}]});

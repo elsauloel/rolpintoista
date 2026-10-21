@@ -866,12 +866,17 @@ const Combatiente = (() => {
      con qué se para (el arma si es de verdad, si no el primer escudo) o null. El Bloqueo suma el peso de eso. */
   /* El arco y los disparos (2026-10-09, dueño): con un arma de rango no se parrea (`o.arco`: desde 2026-10-10, cualquier arma de rango), y un disparo (flecha, virote, bala) solo se para con un
      escudo (`o.soloEscudo`: el ataque es de rango; ver contraDisparo). */
+  /* El arma natural (dueño, 2026-10-21, con el Desarmar): mecánicamente SÍ parrea —si en cada caso tiene sentido lo decide la mesa—, con su
+     propio peso (el del ítem del catálogo que se le equipó y se marcó natural; 1 si no tiene). Va última: un arma o un escudo de verdad, primero. */
   function armaParaDefensa(o){
     o = o || {};
     if(o.arma && o.arma.nombre && !o.natural && !o.arco && !o.soloEscudo) return o.arma;
-    return (o.escudos || []).find(e => e && e.nombre && (!o.soloEscudo || e.escudo !== false)) || null;   // contra un disparo, un báculo no
+    const escudo = (o.escudos || []).find(e => e && e.nombre && (!o.soloEscudo || e.escudo !== false));   // contra un disparo, un báculo no
+    if(escudo) return escudo;
+    if(o.arma && o.arma.nombre && o.natural && !o.arco && !o.soloEscudo) return {...o.arma, peso: Math.max(1, n(o.arma.peso) || 1), natural: true};
+    return null;
   }
-  const SIN_ARMA_DEFENSA = 'Sin un arma o un escudo no hay Parry ni Bloqueo (un arma natural tampoco, por ahora)';
+  const SIN_ARMA_DEFENSA = 'Sin un arma (también natural) o un escudo no hay Parry ni Bloqueo';
   // ¿El ataque del duelo es un disparo? (un arma de rango, no una habilidad): contra eso, Parry solo con escudo (2026-10-09, dueño).
   const contraDisparo = d => !!(d && d.ataque && d.ataque.rango && d.ataque.tipo !== 'habilidad');
   // ¿Sirve este ítem para parrear? Solo un arma cuerpo a cuerpo o un escudo: ninguna de rango (arco, ballesta, pólvora; dueño, 2026-10-10:
@@ -884,9 +889,9 @@ const Combatiente = (() => {
      arma cuerpo a cuerpo; no un orbe, una varita ni un arma de rango); los escudos primero. Antes se miraba solo la ranura de escudo: un orbe
      parreaba y un báculo no. → [{nombre, peso}] para `armaParaDefensa`. */
   function piezasParaParry(equipo, slotDe, pesoDe){
-    const enMano = it => it && it.nombre && !it.natural && ['escudo', 'mano'].includes(slotDe(it.tipoItem)) && sirveParaParry(it, false);
-    const lista = (equipo || []).filter(enMano);
-    return [...lista.filter(esEscudo), ...lista.filter(it => !esEscudo(it))].map(it => ({nombre: it.nombre, peso: pesoDe(it), escudo: esEscudo(it)}));
+    const enMano = it => it && it.nombre && ['escudo', 'mano'].includes(slotDe(it.tipoItem)) && sirveParaParry(it, false);
+    const lista = (equipo || []).filter(enMano), deVerdad = lista.filter(it => !it.natural), nat = lista.filter(it => it.natural);   // lo natural, al final (2026-10-21)
+    return [...deVerdad.filter(esEscudo), ...deVerdad.filter(it => !esEscudo(it)), ...nat].map(it => ({nombre: it.nombre, peso: Math.max(1, n(pesoDe(it)) || 1), escudo: esEscudo(it), ...(it.natural ? {natural: true} : {})}));
   }
   /* El Bloqueo SIEMPRE viene después de un Parry (regla y concepto del dueño, 2026-09-30): cuando te atacan, el Parry
      (Destreza) es interceptar el arma del rival con tu arma o tu escudo; si lo lográs, el Bloqueo (Fuerza + el peso de tu

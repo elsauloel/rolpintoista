@@ -518,7 +518,7 @@ const CreepEditor = (() => {
     {nombre: 'Automatización', tags: ['toda automatizada', 'con parte a mano']},
     {nombre: 'Auditoría', tags: ['auditada', 'sin auditar']},
     {nombre: 'Rol en la batalla', tags: ['choque pesado', 'choque liviano', 'rango', 'hunter', 'debuffer', 'support', 'mago']},   // (2026-10-21: docs/diseno-roles-creep.md)
-    {nombre: 'Mecánica', tags: ['más daño', 'empujar', 'atrapar', 'guardia', 'golpe preciso', 'sangrado', 'trabar', 'golpear y alejarse', 'salto', 'vigilancia', 'daño en área', 'control mental', 'arma elemental', 'barrido', 'por la espalda', 'tiro apuntado', 'rayo en cadena', 'romper armadura', 'ráfaga', 'señalar', 'maleficio']},   // (2026-10-21: docs/auditoria-skills-creep.md)
+    {nombre: 'Mecánica', tags: ['más daño', 'empujar', 'atrapar', 'guardia', 'golpe preciso', 'sangrado', 'trabar', 'golpear y alejarse', 'salto', 'vigilancia', 'daño en área', 'control mental', 'arma elemental', 'barrido', 'por la espalda', 'tiro apuntado', 'rayo en cadena', 'romper armadura', 'ráfaga', 'señalar', 'maleficio', 'desarmar']},   // (2026-10-21: docs/auditoria-skills-creep.md)
   ];
   // ⬆ Sube a la biblioteca una habilidad ya calculada (queda con valores fijos), marcada 🐾 de creep (o 🧙 si ya era de jugador). Si salió
   // de otra (`bibOrigen`), pregunta si es una corrección o algo nuevo (comun/biblioteca.js). alSubir(r, origen): lo que guarda cada

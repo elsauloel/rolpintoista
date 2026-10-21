@@ -53,6 +53,10 @@
 - [x] **🔥 Arma elemental** — probado el 2026-10-21, «Test con claude elsaulo», el GM con el control de Silvia: el creep se puso Arma eléctrica (3 turnos, 2 No2, su ataque del turno); su golpe sumó «1d4 eléctrico» aparte (2) que saltó a Xeena (1) y la chance de Parálisis; Arma helada reemplazó a la eléctrica y su golpe dejó Escarcha ×1. Ojo: con el PdG elegido a mano no suma (ver pendientes). (2026-10-21, Support): (2026-10-21, Support): un creep se la pone a otro creep (y a sí mismo); el estado dura 3 turnos del aliado; cada golpe que pega
   suma +1d4 del elemento aparte (directo, menos su resistencia), sin gastarse; fuego ×1,5; hielo Escarcha y ácido Armadura rota (1 y +1 cada 5); tóxico
   Veneno; rayo salta y 20 % de Parálisis; poner otra la reemplaza; cuenta como su ataque del turno. Las cinco, al menos el rayo y una de «por daño».
+- [ ] **🤺 Desarmar** (2026-10-21, choque pesado): un creep con Desarmar ataca y un personaje le hace Parry → en el Bloqueo, el botón 🤺 al costado del
+  duelo; al tocarlo, la línea en la Mesa y la declaración «intenta desarmar»; si gana, «¡DESARMADO!», la ruleta de casillas en el mapa (todas las pantallas),
+  el arma o el escudo en el piso a 2 casillas (y Desarmado); si pierde, lo de siempre. Un creep que defiende (con escudo) desarmando al atacante. Lo natural
+  no se cae. El cobro (SP o cooldown; el doble en turno ajeno).
 - [ ] **⚡ Botones Flash** (2026-10-21): un personaje con Blindaje, Shield, Estoicismo o Shockwave, en combate: su botón arriba con su animación (y al costado
   del duelo abierto); desaparece si no le alcanza el SP (en turno ajeno, el doble); tocarlo ejecuta la habilidad (Shield pide a quién) y cobra.
 - [ ] **🧿 Mal de ojo** (2026-10-21, Debuffer): con un creep que lo tiene, el botón 🧿 arriba (solo el GM, en combate); con un duelo abierto, en la columna

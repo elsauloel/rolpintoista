@@ -62,7 +62,7 @@ const Duelo = (() => {
   let aplicando = new Set();
   // Un golpe BLOQUEADO (anulado) que esta pantalla vio resolverse (no los que ya estaban al entrar): cfgEscuchar.bloqueado(d), solo el GM
   // (2026-10-06, el Empujón de los escudos). La primera tanda del listener se marca sin avisar.
-  const bloqueadoAvisado = new Set();
+  const bloqueadoAvisado = new Set(), desarmadoAvisado = new Set();
   // Un ataque con «termina el turno» (Degollar, 2026-10-10) que esta pantalla vio resolverse: cfgEscuchar.terminaTurno(d), solo el GM.
   const terminaAvisado = new Set();
   let terminaPrimera = true;
@@ -79,7 +79,7 @@ const Duelo = (() => {
   // 🪵 Un dodge roll de Tronco de huída en un golpe directo (2026-10-10): cfgEscuchar.dodgeLibre(d), en la pantalla de quien esquivó.
   const dodgeLibreAvisado = new Set();
   let dodgeLibrePrimera = true;
-  let bloqueadoPrimera = true;
+  let bloqueadoPrimera = true, desarmadoPrimera = true;
   let grupoAvisado = new Set();   // ids de sub-duelos de área ya avisados a cfgEscuchar.grupoResuelto (no avisar dos veces)
   let dodgeActivos = new Set();   // ids de duelos con fase 'dodge' ya avisados a cfgEscuchar.dodgeEmpieza (para saber cuándo avisar dodgeTermina)
   const retener = on => { window.DUELO_RETENER = !!on; if(on) setTimeout(() => { window.DUELO_RETENER = false; }, 20000); };   // la Mesa no publica la tirada mientras está prendido   // duelos cuyo daño está aplicando esta pestaña (GM)
@@ -592,6 +592,7 @@ const Duelo = (() => {
       t.push(`🗡 por la espalda${pe ? ': ' + pe : ''}`);
     }
     if(d.ataque && _num(d.ataque.presa) > 0) t.push(`🎯 contra la presa: +${_fmt(d.ataque.presa)} al daño`);
+    if(d.desarme) t.push(`🤺 ${d.desarme.quien || ''} intenta desarmar (si gana el Bloqueo, el otro pierde lo que tiene en la mano)`);
     if(d.ataque && _num(d.ataque.miedo) > 0) t.push(`😱 con miedo: −${_fmt(d.ataque.miedo)} PdG y −${_fmt(d.ataque.miedo)} de daño`);
     if(d.ataque && _num(d.ataque.embestida) > 0) t.push(`🐂 embestida: +${_fmt(d.ataque.embestida)} PdG`);
     if(d.ataque && _num(d.ataque.quieto) > 0) t.push(`💍 ${d.hab ? 'foco' : 'puntería certera'}: +${_fmt(d.ataque.quieto)} ${d.hab ? 'PdG.Esp' : 'PdG'}`);
@@ -773,6 +774,9 @@ const Duelo = (() => {
       else{ m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; if(tronco) m.contacto.dodgeLibre = true; }
     }else{
       m.bloq = info;
+      // 🤺 Desarmar (2026-10-21): si gana quien lo activó, el otro pierde lo que tenía en la mano (lo hace el mapa del GM, gancho `desarmado`) y
+      // eso reemplaza el resultado de siempre (sin la mitad del daño ni el contraataque).
+      if(m.desarme && r.gana === m.desarme.lado){ m.resultado = 'desarmado'; m.fase = 'fin'; m.estado = 'resuelto'; return; }
       m.resultado = r.gana === 'defensor' ? 'bloqueado' : 'mitad';
       if(m.resultado === 'mitad') entrarDano(m);
       else{ m.fase = 'fin'; m.estado = 'resuelto'; }
@@ -1265,7 +1269,7 @@ const Duelo = (() => {
       else if(ef.aplicado) L.push(`✔ ${ef.nombre}${siempreEf(ef) ? '' : ' (' + pctEf(ef) + ' %)'}: aplicado${ef.nota ? ' · ' + ef.nota : ''}`);
       else L.push(`? ${ef.nombre}: quedó sin resolver`);
     });
-    const fin = d.hab ? {pego: 'La habilidad funcionó', fallo: 'El objetivo la resistió'}[d.resultado] : {pego: 'El golpe pegó', fallo: 'El golpe falló', bloqueado: 'El golpe fue bloqueado', mitad: 'Pasó la mitad del daño'}[d.resultado];
+    const fin = d.hab ? {pego: 'La habilidad funcionó', fallo: 'El objetivo la resistió'}[d.resultado] : {pego: 'El golpe pegó', fallo: 'El golpe falló', bloqueado: 'El golpe fue bloqueado', mitad: 'Pasó la mitad del daño', desarmado: `${d.desarme && d.desarme.quien ? d.desarme.quien : 'Lo'} desarmó al otro`}[d.resultado];
     if(fin) L.push(`Resultado: ${fin}`);
     return L;
   }
@@ -1789,6 +1793,23 @@ const Duelo = (() => {
       .map(([ef, i]) => `<div class="duelo-mcaja"><b>${_esc(ef.nombre)}</b> <button type="button" data-efman="${i}:1">✔ Funcionó</button> <button type="button" class="sec" data-efman="${i}:0">✘ No funcionó</button></div>`).join('');
     return `<div class="duelo-manual">${tg}${filas}<div class="det">Sin tirar el dado. Si el efecto trae daño propio, ese se tira igual.</div></div>`;
   }
+  /* 🤺 Desarmar (2026-10-21): en el paso del Bloqueo, quien todavía no tiró su parte (el atacante su Fuerza del golpe, el defensor su Bloqueo) lo
+     activa con Flash. La tirada es la misma; si gana, el resultado es «desarmado» (cerrarPar). → true si quedó marcado. */
+  async function marcarDesarme(id, lado, info){
+    const ref = col().doc(id);
+    let ok = false;
+    await fbDb.runTransaction(async tx => {
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(m.estado !== 'esperando' || m.fase !== 'bloqueo' || m.desarme || m.hab) return;
+      if(lado === 'atacante' ? m.fuerza : m.bloqueo) return;
+      m.desarme = {lado: lado === 'atacante' ? 'atacante' : 'defensor', nombre: txtCorto((info && info.nombre) || 'Desarmar', 40), quien: txtCorto((info && info.quien) || '', 40)};
+      tx.update(ref, {desarme: m.desarme});
+      ok = true;
+    });
+    return ok;
+  }
   /* ✍ El PdG a mano cumple las mismas reglas que el del botón (dueño, 2026-10-21): antes de anotarlo, la página de quien ataca paga el ataque
      (No2, Sentado, sin No2, el conteo de ataques) y gasta lo que suma al golpe (óleos, Arma envenenada, Arma elemental), sin tirar el dado:
      el gancho `pagarManual(d)` de FichaDuelo, CreepDuelo e InvDuelo. → false si se canceló (no se anota nada). */
@@ -1964,6 +1985,10 @@ const Duelo = (() => {
       caja = `<div class="duelo-veredicto bloqueado${nuevo}"><div class="grande">🛡 ¡PARADO!</div><div class="chico">${_esc(d.defensor.nombre)} paró el disparo con el escudo: queda anulado</div>${mot}</div>`;
     }else if(d.resultado === 'bloqueado'){
       caja = `<div class="duelo-veredicto bloqueado${nuevo}"><div class="grande">🛡 ¡BLOQUEADO!</div><div class="chico">El golpe queda anulado</div>${mot}</div>`;
+    }else if(d.resultado === 'desarmado'){
+      const ds = d.desarme || {}, quien = ds.lado === 'atacante' ? d.atacante.nombre : d.defensor.nombre, otro = ds.lado === 'atacante' ? d.defensor.nombre : d.atacante.nombre;
+      const obj = ds.lado === 'atacante' ? (d.defensa && d.defensa.itemNombre) || 'lo que tenía en la mano' : (d.ataque && d.ataque.armaNombre) || 'su arma';
+      caja = `<div class="duelo-veredicto bloqueado${nuevo}"><div class="grande">🤺 ¡DESARMADO!</div><div class="chico">${_esc(quien)} le saca ${_esc(obj)} a ${_esc(otro)}: sale volando 2 casillas (lo natural no se cae)</div>${mot}</div>`;
     }else if(d.resultado === 'mitad'){
       caja = `<div class="duelo-veredicto mitad${nuevo}"><div class="grande">⚠ PASA LA MITAD</div><div class="chico">Paró el golpe pero no lo frenó del todo: pasa la mitad del daño (redondeada para arriba)</div>
         <div class="duelo-motivo">🔧 ${_esc(item)} pierde 1 punto de durabilidad${d.dano && d.dano.desgaste ? ' <span style="font-weight:400">(ya se le descontó en su ficha)</span>' : ''}</div>${mot}</div>`;
@@ -2872,6 +2897,14 @@ const Duelo = (() => {
           try{ cfgEscuchar.grupoResuelto(d); }catch(err){ console.error('Duelo: grupoResuelto', err); }
         });
       }
+      if(cfgEscuchar.desarmado && soyGM()){   // 🤺 Desarmar (2026-10-21): el arma o el escudo al piso (el mapa del GM)
+        listaDuelos.forEach(d => {
+          if(d.estado !== 'resuelto' || d.resultado !== 'desarmado' || desarmadoAvisado.has(d.id)) return;
+          desarmadoAvisado.add(d.id);
+          if(!desarmadoPrimera) try{ cfgEscuchar.desarmado(d); }catch(err){ console.error('Duelo: desarmado', err); }
+        });
+      }
+      desarmadoPrimera = false;
       if(cfgEscuchar.bloqueado && soyGM()){
         listaDuelos.forEach(d => {
           if(d.estado !== 'resuelto' || d.resultado !== 'bloqueado' || bloqueadoAvisado.has(d.id)) return;
@@ -3006,5 +3039,5 @@ const Duelo = (() => {
     }catch(e){ /* sin permiso o sin reglas nuevas: no pasa nada */ }
   }
 
-  return {marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
+  return {marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
 })();

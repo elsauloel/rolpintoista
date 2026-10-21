@@ -124,6 +124,12 @@
   **2 SP**, o cooldown 3. **Golpe demoledor** (humanoide) y **Mandíbula trituradora** (bestia), la versión fuerte: **+1 dado** y **Armadura rota doble**;
   **4 SP**, o cooldown 4 (2026-10-21, dueño, «partir la armadura»). Un crítico no rompe armadura; entra aunque la armadura frene todo el daño. **Para probar.**
 
+- ✅ **Desarmar** (2026-10-21, «desarmar», humanoides y bestias): **Flash** en el paso del **Bloqueo** (hubo Parry), atacando (en vez de la Fuerza del
+  golpe) o defendiendo (en vez del Bloqueo). La tirada es la misma; si gana, el otro pierde lo que tenía en la mano (arma o escudo), que **vuela 2 casillas**
+  en una dirección al azar —una **ruleta de casillas** en el mapa— y queda en el piso (el arma: Desarmado hasta levantarla). Reemplaza el resultado de
+  siempre. Lo natural no se cae (dueño: una bestia desarma pero no la desarman). **3 SP** (6 en turno ajeno) o cooldown 3. Botón instantáneo 🤺 del GM.
+  **Para probar.** (Una bestia hoy no hace Parry con sus garras —regla del 30/9—: desarma solo atacando.)
+
 ### Choque liviano (desde el 2026-10-21)
 
 - ✅ **Hit and run** (2026-10-21, dueño: «picar y alejarse»; nombre en inglés; una sola para bestias y humanoides): un ataque con su arma; pegue o no,

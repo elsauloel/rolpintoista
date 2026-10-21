@@ -1041,6 +1041,11 @@ prueba('🌀 Barrido y Coletazo (2026-10-21): la onda alrededor con el daño del
   igual([b.cd, !!b.cuentaComoAtaque, hb.objetivo, hb.radio, !!hb.dodge, hb.dano && hb.dano.formula, hb.contra.map(x => x.modo).join(), hb.efectos.length, (hc.efectos[0] || {}).empuja, c.cd],
     [3, false, 'onda', 1, false, '1d8+2', 'eva', 0, 1, 3]);
 });
+prueba('🤺 Desarmar (2026-10-21): la marca del botón, 3 SP sin No2, Duelo.marcarDesarme existe', () => {
+  const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Desarmar').datos, 2);
+  const sc = {nombre: 'Oso hormiguero', esp: 3, modoSP: true, estados: [], habilidades: [h]};
+  igual([h.desarmar, h.cd, CreepCalculo.costoSpHab(sc, h), typeof Duelo.marcarDesarme], [true, 3, 3, 'function']);
+});
 prueba('⚡ Botones Flash (2026-10-21): el resumen publica Blindaje y Shield con su SP y el de turno ajeno', () => {
   const pool = Object.values(CLASES_SKILLS).flatMap(c => c.skills || c.habilidades || []);
   const toma = id => ({...structuredClone(pool.find(h => h.id === id)), id: 'h-' + id, habClaseId: id});

@@ -32,25 +32,36 @@ function armaComoItem(c, dueno){
     detalle: `El arma que se le cayó a ${dueno}.`};
 }
 // La deja en el piso (lo hace el mapa del GM, al aplicar el Desarmado del duelo). `vuela`: cuántas casillas sale volando (1d6 = la dirección).
-async function armaSoltar(t, vuela){
+// `o` (2026-10-21, 🤺 Desarmar, js/62): `celda` = dónde cae (la eligió la ruleta); `itemId` / `itemNombre` = lo que tenía en la mano en ese cruce (el
+// arma o el escudo con que paró). Lo natural no se cae. → {nota, cayo, escudo}.
+async function armaSoltar(t, vuela, o){
+  o = o || {};
   const quien = nombreDe(t);
   const esInv = t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION);
-  let item = null;
+  let item = null, piezaCreep = null;
   if(t.tipo === 'creep' || esInv){
     const c = t.tipo === 'creep' ? creepPrivadoDe(t.fichaId) : await invDeToken(t);
     if(!c) return {manual: true, nota: 'no se pudo leer su arma: ponela en el piso a mano'};
-    if(c.armaNatural || !String(c.armaNombre || '').trim()) return {nota: 'su arma es natural: no se le cae'};
-    if(armaPropiaEnElPiso(t)) return {nota: 'su arma ya estaba en el piso'};   // (un creep no la pierde de sus datos: que no suelte otra copia)
-    item = armaComoItem(c, quien);
+    const nom = String(o.itemNombre || '').trim();
+    const pieza = t.tipo === 'creep' && nom && nom !== c.armaNombre ? (c.equipo || []).find(e => e && e.nombre === nom) : null;   // paró con un escudo
+    if(pieza){
+      if(pieza.natural) return {nota: `${nom} es natural: no se le cae`};
+      piezaCreep = pieza; item = structuredClone(pieza);
+    }else{
+      if(c.armaNatural || !String(c.armaNombre || '').trim()) return {nota: 'su arma es natural: no se le cae'};
+      if(armaPropiaEnElPiso(t)) return {nota: 'su arma ya estaba en el piso'};   // (un creep no la pierde de sus datos: que no suelte otra copia)
+      item = armaComoItem(c, quien);
+    }
   }else{
     const p = await fbDb.doc(fbRutaCampana(`fichas/${t.fichaId}/partes/inventario`)).get();
     const inv = p.exists ? (JSON.parse(p.data().json || '{}').inventario || []) : [];
-    item = inv.find(x => x && x.equipado && (x.tipoItem === 'arma_1m' || x.tipoItem === 'arma_2m')) || null;
+    item = (o.itemId && inv.find(x => x && x.id === o.itemId)) || (o.itemNombre && inv.find(x => x && x.equipado && x.nombre === o.itemNombre))
+      || inv.find(x => x && x.equipado && (x.tipoItem === 'arma_1m' || x.tipoItem === 'arma_2m')) || null;
     if(!item) return {nota: 'no tenía un arma en la mano'};
   }
-  // Dónde cae: en su casilla, o `vuela` casillas hacia un lado al azar (1d6).
-  let celda = {col: t.col, fila: t.fila}, dir = 0;
-  if(num(vuela) > 0){
+  // Dónde cae: la casilla que le dieron, en su casilla, o `vuela` casillas hacia un lado al azar (1d6).
+  let celda = o.celda ? {col: o.celda.col, fila: o.celda.fila} : {col: t.col, fila: t.fila}, dir = 0;
+  if(!o.celda && num(vuela) > 0){
     dir = Math.floor(Math.random() * 6);
     const c0 = hexACubo(celda), [dq, dr] = VECINO_LADO[dir];
     const q = c0.q + dq * Math.round(num(vuela)), r = c0.r + dr * Math.round(num(vuela));
@@ -71,6 +82,11 @@ async function armaSoltar(t, vuela){
     console.error('No se pudo poner el arma en el piso:', err);
     return {manual: true, nota: `se le cayó ${item.nombre} (ponela en el piso a mano: ¿faltan las reglas nuevas de Firebase?)`};
   }
+  // El escudo de un creep (Desarmar): sale de su equipo.
+  if(piezaCreep){
+    try{ await modificarCreep(String(t.fichaId), c => { const i = (c.equipo || []).findIndex(e => e && (e.id ? e.id === piezaCreep.id : e.nombre === piezaCreep.nombre)); if(i >= 0) c.equipo.splice(i, 1); return {}; }); }
+    catch(err){ console.error('No se pudo sacar el escudo del creep:', err); }
+  }
   // El personaje la pierde de verdad (sale de su inventario); recién ahora, para no perderla si falló lo de arriba.
   if(t.tipo === 'pj' && !esInv){
     const ref = fbDb.doc(fbRutaCampana(`fichas/${t.fichaId}/partes/inventario`));
@@ -84,7 +100,7 @@ async function armaSoltar(t, vuela){
       });
     }catch(err){ console.error('No se pudo sacar el arma del inventario:', err); }
   }
-  return {nota: `se le cayó ${item.nombre}${num(vuela) > 0 ? ` y voló ${Math.round(num(vuela))} casillas` : ''}`};
+  return {cayo: true, escudo: !!(typeof Combatiente !== 'undefined' && Combatiente.esEscudo(item)), nota: `se le cayó ${item.nombre}${o.celda ? ' lejos' : num(vuela) > 0 ? ` y voló ${Math.round(num(vuela))} casillas` : ''}`};
 }
 // Quien la levanta: el elemento se borra primero (si dos la agarran a la vez, gana uno). → {it, propia} o null.
 async function armaTomar(elId, t){

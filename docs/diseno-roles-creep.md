@@ -78,7 +78,7 @@ Sirven al warrior (pegar fuerte), al tanque (aguantar y controlar) o a los dos.
 32. ✅ en parte: **Aguante** (los golpes que recibe vuelven como dados).
 33. **Espinas o contraataque**: le devuelve parte del golpe, o pega de vuelta.
 34. **Represalia**: si le pegan a un aliado de al lado, ataca gratis.
-35. **Desarmar**: el arma del rival cae al piso.
+35. ✅ **Desarmar** (2026-10-21): Flash en el Bloqueo, atacando o defendiendo; el arma o el escudo vuela 2 casillas (con ruleta). Botón instantáneo 🤺.
 
 **H. Apuestas** ✦
 36. **Todo o nada**: un golpe enorme, pero si falla queda Expuesto.

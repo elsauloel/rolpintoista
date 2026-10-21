@@ -1123,3 +1123,10 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   por día 3/1/1 · 71/33/33. Con peleas de 6 turnos: hoy 6 usos, cuesta su Especial 5. **Conclusión: ninguna opción sola cambia una pelea de 4
   turnos; lo que manda es el SP guardado. Lo que de verdad da matices es combinar el costo con un SP guardado más chico o una recarga menor.**
   **En pausa (dueño, 2026-10-21): «déjalo pendiente para cuando tenga tiempo de encarar el tema de la recarga».**
+
+### P217 — ¿Una bestia puede hacer Parry con sus garras? (2026-10-21)
+Contexto: la habilidad **Desarmar** (choque pesado) funciona en el paso del Bloqueo, que solo existe después de un Parry. El dueño dijo que una
+bestia (un oso hormiguero) «puede parrear con sus garras y obligar a desarmar a su rival». Pero hoy un arma natural **no** sirve para Parry
+(`Combatiente.armaParaDefensa`: «un arma natural tampoco, por ahora», regla del 30/9). Mientras tanto, una bestia con Desarmar solo desarma
+**atacando** (cuando el personaje le hace Parry a ella). Pregunta: ¿se permite el Parry con armas naturales (para todos, o solo para bestias)?
+¿Con qué peso para el Bloqueo?

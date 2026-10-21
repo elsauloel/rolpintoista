@@ -66,7 +66,7 @@
     'Arma ígnea': ['support', 'arma elemental'], 'Arma helada': ['support', 'arma elemental'], 'Arma eléctrica': ['support', 'arma elemental'],
     'Arma ácida': ['support', 'arma elemental'], 'Arma venenosa': ['support', 'arma elemental'],
     'Barrido': ['choque pesado', 'barrido'], 'Coletazo': ['choque pesado', 'barrido'],
-    'Tiro a la cabeza': ['rango', 'tiro apuntado'], 'Mal de ojo': ['debuffer', 'maleficio'], 'Disparo señalador': ['rango', 'señalar'], 'Ráfaga de cortes': ['choque liviano', 'ráfaga'], 'Ráfaga de zarpazos': ['choque liviano', 'ráfaga'],
+    'Tiro a la cabeza': ['rango', 'tiro apuntado'], 'Desarmar': ['choque pesado', 'desarmar'], 'Mal de ojo': ['debuffer', 'maleficio'], 'Disparo señalador': ['rango', 'señalar'], 'Ráfaga de cortes': ['choque liviano', 'ráfaga'], 'Ráfaga de zarpazos': ['choque liviano', 'ráfaga'],
     'Romper armadura': ['choque pesado', 'romper armadura'], 'Arrancar la coraza': ['choque pesado', 'romper armadura'],
     'Golpe demoledor': ['choque pesado', 'romper armadura'], 'Mandíbula trituradora': ['choque pesado', 'romper armadura'], 'Cadena de rayos': ['mago', 'rayo en cadena'],
     'Puñalada por la espalda': ['choque liviano', 'por la espalda'], 'Mordida a traición': ['choque liviano', 'por la espalda'], 'Puñalada trapera': ['choque liviano', 'por la espalda'],
@@ -299,6 +299,10 @@
   H('Miedo', 'XK', 'bdma', 'x', 4, tA('Si el objetivo falla Res.Mt huye de él 2 turnos (a mano).', 2));
   H('Intimidar', 'X', 'bhd', 'x', 2, tA('Una mirada amenazante: el objetivo pierde 1 de Daño 2 turnos (a mano).', 1));
   // 🔨 Auditadas (dueño, 2026-10-21; choque pesado, «partir la armadura»): la común y la fuerte, cada una con su versión de bestia.
+  // 🤺 Auditada (dueño, 2026-10-21; choque pesado, «desarmar»): Flash en el paso del Bloqueo (atacando o defendiendo); bestias también (desarman, pero
+  // lo natural no se les cae). Se usa desde el botón instantáneo 🤺 del GM (vtt-hexgrid/js/62). 3 SP (6 en turno ajeno) o cooldown 3.
+  H('Desarmar', 'K', '*', 'mt', 3, {detalle: 'FLASH. En el paso del Bloqueo de un duelo (hubo Parry: arma contra arma o contra escudo), atacando o defendiendo, en vez de su tirada de siempre (la Fuerza del golpe o el Bloqueo): la tirada es la misma, pero si gana, el otro pierde lo que tenía en la mano —su arma, o el arma o el escudo con que paró—, que sale volando 2 casillas en una dirección al azar y queda en el piso. Eso reemplaza el resultado de siempre (sin la mitad del daño, sin contraataque). Si pierde, lo de siempre. Lo natural (garras, colmillos) no se cae. En turno ajeno cuesta el doble. El GM la usa desde el botón 🤺 (al costado del duelo).',
+    no2: 0, spCosto: 3, auditada: true, desarmar: true, ataqueTxt: 'en el Bloqueo: si gana, el otro pierde lo que tiene en la mano (vuela 2 casillas)'});
   H('Romper armadura', 'DX', 'hdc', 'mt', 3, aA(`Un golpe a las juntas: un ataque con su arma que, si pega, deja Armadura rota 1. ${AR_NOTA}`,
     {}, 'un ataque con su arma; si pega, Armadura rota 1', 2, AR(1)));
   H('Arrancar la coraza', 'DX', 'b', 'mt', 3, aA(`Clava garras o colmillos en la armadura y tira: un ataque con su arma que, si pega, deja Armadura rota 1. ${AR_NOTA}`,

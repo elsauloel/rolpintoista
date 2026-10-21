@@ -83,6 +83,7 @@ function momentoRecibido(id, d){
   if(d.tipo === 'inicio-turno' && inicioTurnoMomento(id, d)) return;
   if(d.tipo === 'diablito' && typeof diablitoMomento === 'function' && diablitoMomento(id, d)) return;   // 😈 la Botella con un diablito (js/53)   // ▶ Empieza tu turno: al centro de su dueño (js/04)   // 🫳 el robo en sigilo (js/47): solo la víctima y el GM
   if(d.tipo === 'rayo' && d.datos && Array.isArray(d.datos.saltos)) rayoMomento(id, d);
+  if(d.tipo === 'desarme' && d.datos && typeof desarmeRuleta === 'function') desarmeRuleta(id, d.datos);   // 🤺 la ruleta de casillas (js/62)
   if(d.tipo === 'confusion') confusionMomento(d);   // la tirada de Confusión del turno (js/20)
   oporMomento(id, d);   // el ataque de oportunidad: la pregunta a quien decide y la respuesta a quien se aleja (js/17)
   // Una trampa, paso a paso (js/19): la víctima la resuelve al centro; el resto, en la Crónica.

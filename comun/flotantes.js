@@ -7,7 +7,7 @@
    orden (cada pantalla lo llama después de dibujar o sacar uno). Lo usan el mapa (js/02, js/25) y la ficha suelta (js/03).
    ========================================================= */
 const Flotantes = (() => {
-  const ORDEN = ['shock-flotante', 'estoico-flotante', 'shield-flotante', 'blindaje-flotante', 'reroll-flotante', 'enyetar-flotante', 'maldeojo-flotante', 'empower-flotante', 'polilla-flotante', 'impulso-flotante', 'trebol-flotante', 'curandero-flotante', 'wildcard-flotante', 'moneda-flotante'];
+  const ORDEN = ['desarmar-flotante', 'shock-flotante', 'estoico-flotante', 'shield-flotante', 'blindaje-flotante', 'reroll-flotante', 'enyetar-flotante', 'maldeojo-flotante', 'empower-flotante', 'polilla-flotante', 'impulso-flotante', 'trebol-flotante', 'curandero-flotante', 'wildcard-flotante', 'moneda-flotante'];
   // Dónde van. En el mapa (2026-10-10, dueño: «arriba, al lado de los botones de los lentes, a la misma altura que esa botonera»): en fila,
   // a la izquierda de la barra de arriba (#flotantes-mapa), con la altura de sus botones y en un solo renglón (la línea de ayuda pasa al
   // globo del mouse). Donde no hay esa barra (la ficha suelta): uno arriba del otro, abajo a la izquierda.
@@ -62,6 +62,12 @@ const Flotantes = (() => {
 #shield-flotante.flot-arriba{--flot-glow:rgba(95,224,214,.85);overflow:visible}
 #estoico-flotante.flot-arriba{--flot-glow:rgba(225,195,120,.75);overflow:visible}
 #shock-flotante.flot-arriba{--flot-glow:rgba(255,140,60,.85);overflow:visible}
+#desarmar-flotante.flot-arriba{--flot-glow:rgba(255,215,120,.85);overflow:visible}
+/* 🤺 Desarmar: tira una estocada hacia adelante y vuelve, con un destello de filo. */
+.desarmar-esgrima{display:inline-block;animation:desarmar-estocada 2.4s ease-in-out infinite}
+@keyframes desarmar-estocada{0%,55%,100%{transform:translateX(0) rotate(0)}62%{transform:translateX(5px) rotate(-6deg)}68%{transform:translateX(-2px) rotate(3deg)}76%{transform:translateX(0) rotate(0)}}
+#desarmar-flotante.flot-arriba::after{content:"✦";position:absolute;top:2px;right:3px;font-size:10px;color:#fff2c4;opacity:0;animation:desarmar-filo 2.4s ease-out infinite;pointer-events:none}
+@keyframes desarmar-filo{0%,58%{opacity:0;transform:scale(.4)}64%{opacity:1;transform:scale(1.3)}80%,100%{opacity:0;transform:scale(.6)}}
 .blindaje-escudo{display:inline-block;animation:blindaje-bloquea 2.8s ease-in-out infinite}
 @keyframes blindaje-bloquea{0%,55%,100%{transform:rotate(0) scale(1)}62%{transform:rotate(-14deg) scale(1.12)}68%{transform:rotate(4deg) scale(.96)}76%{transform:rotate(0) scale(1)}}
 #blindaje-flotante.flot-arriba::before{content:"";position:absolute;inset:3px;border-radius:7px;background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.7) 50%,transparent 65%);
@@ -87,13 +93,13 @@ const Flotantes = (() => {
 @keyframes maldeojo-mira{0%,60%,100%{transform:scale(1);filter:none}68%{transform:scale(1.18);filter:drop-shadow(0 0 6px rgba(90,180,255,1))}76%{transform:scale(.96)}84%{transform:scale(1.1);filter:drop-shadow(0 0 4px rgba(90,180,255,.9))}}
 @keyframes flot-latido{0%{box-shadow:0 2px 8px rgba(0,0,0,.5),0 0 3px var(--flot-glow)}100%{box-shadow:0 2px 8px rgba(0,0,0,.5),0 0 13px var(--flot-glow)}}`;
   // Lo que explica el mouse (dueño: «al hacer hover te explica: tenés una moneda / tenés una polilla activa»).
-  const TITULO = {'wildcard-flotante': 'Tenés wildcards', 'reroll-flotante': 'Tenés Re-roll', 'enyetar-flotante': 'Tenés Enyetar', 'maldeojo-flotante': 'Un creep puede echar el Mal de ojo', 'blindaje-flotante': 'Tenés Blindaje', 'shield-flotante': 'Tenés Shield', 'estoico-flotante': 'Tenés Estoicismo', 'shock-flotante': 'Tenés Shockwave', 'empower-flotante': 'Tenés Empower', 'polilla-flotante': 'Tenés una Polilla mística activa', 'moneda-flotante': 'Tenés una Moneda Re-Roll',
+  const TITULO = {'wildcard-flotante': 'Tenés wildcards', 'reroll-flotante': 'Tenés Re-roll', 'enyetar-flotante': 'Tenés Enyetar', 'maldeojo-flotante': 'Un creep puede echar el Mal de ojo', 'blindaje-flotante': 'Tenés Blindaje', 'shield-flotante': 'Tenés Shield', 'estoico-flotante': 'Tenés Estoicismo', 'shock-flotante': 'Tenés Shockwave', 'desarmar-flotante': 'Un creep puede desarmar', 'empower-flotante': 'Tenés Empower', 'polilla-flotante': 'Tenés una Polilla mística activa', 'moneda-flotante': 'Tenés una Moneda Re-Roll',
     'impulso-flotante': 'Tenés un anillo de impulso activo', 'trebol-flotante': 'Tenés el Anillo del trébol', 'curandero-flotante': 'Tenés el Anillo del curandero'};
-  const ACCION = {'wildcard-flotante': 'tocá para repetir una de tus últimas tiradas (se gasta una)', 'reroll-flotante': 'tocá para elegir qué tirada tuya o de un aliado se repite (queda la mejor)', 'enyetar-flotante': 'tocá para elegir a qué tirada de un enemigo le echás la yeta', 'maldeojo-flotante': 'tocá para elegir qué creep se lo echa y a qué tirada de un personaje', 'blindaje-flotante': 'tocá para ponerte el escudo (Flash)', 'shield-flotante': 'tocá para elegir a quién le das el escudo (Flash)', 'estoico-flotante': 'tocá para usarlo (Flash)', 'shock-flotante': 'tocá para soltar la onda (Flash)', 'empower-flotante': 'tocá para elegir a qué tirada le sumás +3', 'polilla-flotante': 'tocá para sumarle +2 a tu última tirada', 'moneda-flotante': 'tocá para repetir una de tus últimas tiradas',
+  const ACCION = {'wildcard-flotante': 'tocá para repetir una de tus últimas tiradas (se gasta una)', 'reroll-flotante': 'tocá para elegir qué tirada tuya o de un aliado se repite (queda la mejor)', 'enyetar-flotante': 'tocá para elegir a qué tirada de un enemigo le echás la yeta', 'maldeojo-flotante': 'tocá para elegir qué creep se lo echa y a qué tirada de un personaje', 'blindaje-flotante': 'tocá para ponerte el escudo (Flash)', 'shield-flotante': 'tocá para elegir a quién le das el escudo (Flash)', 'estoico-flotante': 'tocá para usarlo (Flash)', 'shock-flotante': 'tocá para soltar la onda (Flash)', 'desarmar-flotante': 'tocá para que intente desarmar en este Bloqueo (Flash)', 'empower-flotante': 'tocá para elegir a qué tirada le sumás +3', 'polilla-flotante': 'tocá para sumarle +2 a tu última tirada', 'moneda-flotante': 'tocá para repetir una de tus últimas tiradas',
     'impulso-flotante': 'tocá para sumarle su bono a tu última tirada', 'trebol-flotante': 'tocá y tu próxima tirada sale como Afortunado (una vez por combate)', 'curandero-flotante': 'tocá para sacarte un estado malo (dos veces por día)'};
   // Los íconos animados de los botones Flash (2026-10-21).
   const ICONO_FLASH = {'blindaje-flotante': '<span class="blindaje-escudo">🛡️</span>', 'shield-flotante': '<span class="shield-burbuja">🫧</span>',
-    'estoico-flotante': '<span class="estoico-moai">🗿</span>', 'shock-flotante': '<span class="shock-estallido">💥</span>'};
+    'estoico-flotante': '<span class="estoico-moai">🗿</span>', 'shock-flotante': '<span class="shock-estallido">💥</span>', 'desarmar-flotante': '<span class="desarmar-esgrima">🤺</span>'};
   // Deja solo el ícono (el primer «carácter» del texto; la moneda conserva su cara que gira).
   function soloIcono(b){
     const div = b.querySelector('div');
@@ -229,12 +235,13 @@ const Flotantes = (() => {
 #empower-flotante{position:fixed;left:16px;bottom:16px;z-index:999997;background:linear-gradient(135deg,#5a2412,#34140a);color:#ffdcc4;border:2px solid #ff8a4a;
   border-radius:16px;padding:10px 16px;font-size:15px;font-weight:800;cursor:pointer;text-align:left;transform-origin:left bottom;
   box-shadow:0 8px 26px rgba(0,0,0,.6),0 0 14px rgba(255,120,60,.5);animation:moneda-latido 2.6s ease-in-out infinite alternate}
-#blindaje-flotante, #shield-flotante, #estoico-flotante, #shock-flotante{position:fixed;left:16px;bottom:16px;z-index:999997;border-radius:16px;padding:10px 16px;
+#blindaje-flotante, #shield-flotante, #estoico-flotante, #shock-flotante, #desarmar-flotante{position:fixed;left:16px;bottom:16px;z-index:999997;border-radius:16px;padding:10px 16px;
   font-size:15px;font-weight:800;cursor:pointer;text-align:left;transform-origin:left bottom;border:2px solid;animation:moneda-latido 2.6s ease-in-out infinite alternate}
-#blindaje-flotante small, #shield-flotante small, #estoico-flotante small, #shock-flotante small{display:block;font-weight:500;font-size:11px;opacity:.9}
+#blindaje-flotante small, #shield-flotante small, #estoico-flotante small, #shock-flotante small, #desarmar-flotante small{display:block;font-weight:500;font-size:11px;opacity:.9}
 #blindaje-flotante{background:linear-gradient(135deg,#2b3644,#151c25);color:#e3edf8;border-color:#9fb3c8;box-shadow:0 8px 26px rgba(0,0,0,.6),0 0 14px rgba(190,215,240,.45)}
 #shield-flotante{background:linear-gradient(135deg,#0f3a3e,#082326);color:#d6fffb;border-color:#5fe0d6;box-shadow:0 8px 26px rgba(0,0,0,.6),0 0 14px rgba(95,224,214,.45)}
 #estoico-flotante{background:linear-gradient(135deg,#3a342a,#1f1b14);color:#f3e8cf;border-color:#c9b27a;box-shadow:0 8px 26px rgba(0,0,0,.6),0 0 14px rgba(225,195,120,.4)}
+#desarmar-flotante{background:linear-gradient(135deg,#3a3016,#1f190a);color:#fff2c4;border-color:#e6c06a;box-shadow:0 8px 26px rgba(0,0,0,.6),0 0 14px rgba(255,215,120,.45)}
 #shock-flotante{background:linear-gradient(135deg,#4a2010,#2a1006);color:#ffe2cc;border-color:#ff9a4a;box-shadow:0 8px 26px rgba(0,0,0,.6),0 0 14px rgba(255,140,60,.45)}
 #maldeojo-flotante{position:fixed;left:16px;bottom:16px;z-index:999997;background:linear-gradient(135deg,#0f2a44,#081626);color:#d4ecff;border:2px solid #5aaeff;
   border-radius:16px;padding:10px 16px;font-size:15px;font-weight:800;cursor:pointer;text-align:left;transform-origin:left bottom;
@@ -315,5 +322,6 @@ const Flotantes = (() => {
   const shield = o => fijo('shield-flotante', '<span class="shield-burbuja">🫧</span>', 'Shield', o && {...o, sub: o.sub || 'un escudo a vos o a un aliado'});
   const estoicismo = o => fijo('estoico-flotante', '<span class="estoico-moai">🗿</span>', 'Estoicismo', o && {...o, sub: o.sub || 'más Defensa y Res. a crítico'});
   const shockwave = o => fijo('shock-flotante', '<span class="shock-estallido">💥</span>', 'Shockwave', o && {...o, sub: o.sub || 'una onda alrededor'});
-  return {moneda, wildcard, empower, enyetar, malDeOjo, blindaje, shield, estoicismo, shockwave, reroll, apilar};
+  const desarmar = o => fijo('desarmar-flotante', '<span class="desarmar-esgrima">🤺</span>', 'Desarmar', o && {...o, sub: o.sub || 'en el Bloqueo'});   // 🤺 (los creeps, 2026-10-21, js/62)
+  return {moneda, wildcard, empower, enyetar, malDeOjo, blindaje, shield, estoicismo, shockwave, desarmar, reroll, apilar};
 })();

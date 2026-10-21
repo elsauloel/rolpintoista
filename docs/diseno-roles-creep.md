@@ -67,14 +67,73 @@ rodilla, Tarascón al tobillo), las redes; y en el mapa, el sigilo, el +1 por la
 Ya cubierto al entrar (2026-10-21): Tiro a la rodilla (Rengo), la Red (Hunter); y en el mapa, la línea de tiro, el tiro alto, la distancia ideal, Tensar,
 las flechas especiales y el Marcado.
 
-1. **Tiro apuntado**: usa el turno para apuntar y el próximo disparo va con más puntería y crítico (hoy «Tiro a la cabeza», sin auditar).
-2. **Vigilancia** — ✅ **Vigilancia** (2026-10-21; también habilidad de clase del Shooter).
-3. **Lluvia de flechas**: dispara a un área.
-4. **Disparo doble**: dos disparos con menos puntería cada uno.
-5. **Retroceder y disparar**: se aleja un casillero y dispara.
-6. **Marcar la presa**: bonos contra un solo objetivo.
-7. **Disparos con efecto**: flechas que envenenan, queman o derriban.
-8. **Hunter**: trampas, golpear con el arco y saltar atrás, alguna invocación justificada (un halcón).
+**Son conceptos de diseño** (dueño, 2026-10-21, como los del Support): cada vez que toque una habilidad de rango se explora uno y se marca ✅.
+✦ = acelera la pelea. Lo que ya existe en el mapa se puede reusar: la línea de tiro, el tiro alto, la distancia ideal, el largo alcance, Tensar, Apuntar,
+la emboscada, matabestias, la espalda a distancia, la recarga, el proyectil perforante, la repetición, Marcar, la Vigilancia y las flechas especiales
+(veneno, fuego, salto eléctrico, humo, luz, red, explota, clava).
+
+**A. Puntería y preparación**
+1. **Tiro apuntado** — en curso: **Tiro a la cabeza** (un turno apunta; el próximo disparo +2 PdG y Crítico potente +2; si le pegan antes, lo pierde).
+2. **Tensar al máximo**: si no se movió, el disparo pega más fuerte (el Tensar de los arcos).
+3. **Ojo de halcón**: sin la penalidad del tiro alto, o más alcance por un turno.
+4. **Tiro certero**: ignora parte de la Defensa (Perfora) o de la Resistencia a crítico.
+
+**B. Volumen de fuego** ✦
+5. **Disparo doble**: dos disparos con menos puntería cada uno.
+6. **Ráfaga**: tres disparos, cada uno a un objetivo distinto.
+7. **Lluvia de flechas**: un área (flor) donde caen flechas, con dodge roll.
+8. **Abanico**: un cono de flechas al frente.
+9. **Atravesar**: el disparo sigue de largo y le pega al de atrás (el Proyectil perforante del Shooter).
+
+**C. Distancia y movimiento**
+10. **Retroceder y disparar**: se aleja uno o dos casilleros gratis y dispara.
+11. **Disparar y reposicionarse**: el Hit and run del arquero (dispara y se mueve gratis, sin oportunidad).
+12. **Tiro en carrera**: se mueve y dispara sin perder la puntería.
+13. **Mantener a raya** ✦: el disparo deja Lento o Rengo, para que no lo alcancen.
+
+**D. Control a distancia**
+14. ✅ **Tiro a la rodilla** (Rengo).
+15. **Tiro que derriba**: Sentado.
+16. **Tiro que empuja**: lo corre uno o dos casilleros (con daño de colisión).
+17. **Tiro al arma**: Desarmado (el arma cae al piso).
+18. **Clavar a la pared**: si hay un Sólido o una pared detrás, queda Inmovilizado.
+19. ✅ **Red** y Tela de araña (Inmovilizado).
+20. **Tiro cegador**: Ceguera (una flecha de luz o tierra a los ojos).
+21. **Cortina de humo**: una nube que tapa la vista (para cubrirse o cubrir a los suyos).
+
+**E. Marcar y coordinar** ✦
+22. **Marcar la presa**: bonos propios contra un solo objetivo.
+23. **Señalar para todos**: lo marca y todos los aliados le pegan mejor (el Señalar la presa del Support, en versión de rango).
+24. **Fuego de supresión**: una línea o zona donde quien entra recibe un disparo o pierde No2.
+25. **Fuego de cobertura**: mientras dispara, un aliado se mueve sin dar oportunidad.
+
+**F. Reacciones**
+26. ✅ **Vigilancia**.
+27. **Contradisparo**: cuando un rival le dispara, le responde (Flash).
+28. **Tiro de advertencia**: el objetivo pierde su próximo movimiento o su ataque de oportunidad.
+
+**G. Disparos con efecto** (las flechas especiales, como habilidad del creep)
+29. **Flecha envenenada**: Veneno.
+30. **Flecha incendiaria**: Quemadura o terreno incendiado.
+31. **Flecha eléctrica**: el salto del rayo.
+32. **Flecha explosiva**: un área chica.
+33. **Flecha de hielo**: Escarcha.
+34. **Flecha que sangra**: Sangrado.
+
+**H. Contra lo que se esconde**
+35. **Flecha de luz**: revela a los que están en sigilo en un área.
+36. **Tiro a ciegas**: dispara a una casilla de niebla o a alguien en sigilo, con menos puntería.
+
+**I. Hunter**
+37. **Trampas** (ya hay muchas): colocar una y llevar a los rivales hacia ella.
+38. **Golpe con el arco y salto atrás**: pega cuerpo a cuerpo y se aleja.
+39. **Compañero animal**: un halcón que marca, distrae o pica (una invocación justificada).
+40. **Rastrear**: ve a los que están en sigilo cerca (Ve lo oculto por un rato).
+41. **Cebo**: atrae a un rival a una casilla (a una trampa).
+
+**J. Apuestas** ✦
+42. **A quemarropa**: dispara pegado a un rival sin la penalidad, y con más daño.
+43. **Último disparo**: con poca vida, un disparo con mucho más daño.
 
 ## 4. Casters — las ideas del rol
 

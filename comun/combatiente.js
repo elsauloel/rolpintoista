@@ -1552,7 +1552,8 @@ const Combatiente = (() => {
       efectos: (c.efectos || []).map(mapEf),
       ...(c.efectosNota ? {efectosNota: sx(c.efectosNota)} : {}),
       ...(critico && Object.keys(critico).length ? {critico} : {}),
-      ...(c.embestida ? {embestidaHab: true} : {}),   // 🐂 toma carrera (la Cornada, 2026-10-21): el mapa la hace al elegir el objetivo (vtt-hexgrid/js/55)
+      ...(c.embestida ? {embestidaHab: true} : {}),
+      ...(nf(c.alejarse) > 0 ? {alejarse: Math.min(4, Math.round(nf(c.alejarse)))} : {}),   // 💨 Picar y alejarse (2026-10-21): después del duelo, se aleja N casilleros gratis (vtt-hexgrid/js/57)   // 🐂 toma carrera (la Cornada, 2026-10-21): el mapa la hace al elegir el objetivo (vtt-hexgrid/js/55)
       ...(c.terminaTurno ? {terminaTurno: true} : {}), ...(c.soloCritico ? {soloCritico: true} : {}), ...(c.perforante ? {perforante: true} : {})};   // Proyectil perforante (2026-10-13): sigue al de atrás   // Headshot (2026-10-12): si no es crítico, falla   // Degollar (2026-10-10): al resolverse, termina el turno y pasa al final del orden
   }
   /* ⚡ Flash (P136, regla del dueño 2026-09-30): en el propio turno cuesta lo que dice la habilidad; en turno ajeno, EL DOBLE —

@@ -974,6 +974,11 @@ prueba('🛡 Aguante (2026-10-21): +2 Defensa y +2 Def.Esp; los golpes pasan a s
   igual([h.anuncio, h.spCosto, !!e.aguante, !!e.alEmpezarTurno, mods, sc.aguanteListo, sc.estados.some(x => x.aguante)],
     ['{nombre} se pone en modo aguante.', 1, true, true, 'armadmg2,def2', 3, false]);
 });
+prueba('💨 Picar y alejarse (2026-10-21): el ataque lleva alejarse 2', () => {
+  const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Picar y alejarse').datos, 2);
+  const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});
+  igual([a.alejarse, h.spCosto, h.cd, a.mods.dados], [2, 2, 3, 0]);
+});
 prueba('👊 Puño de roca (2026-10-21): +2 al daño y Demora', () => {
   const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Puño de roca').datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});

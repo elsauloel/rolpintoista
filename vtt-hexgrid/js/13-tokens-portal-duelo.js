@@ -1125,6 +1125,13 @@ function renderDodgeBanner(){
       botones: [{texto: '✋ No contraataco', alClic: () => { dodgeBanner = null; renderDodgeBanner(); }}]});
     return;
   }
+  if(dodgeBanner.libre && dodgeBanner.alejarse){   // 💨 Picar y alejarse (js/57)
+    const n = dodgeBanner.alejarse;
+    AvisoCombate.cartel('dodge', {icono: '💨', titulo: `${dodgeBanner.nombre} se aleja`, posicion: 'abajo',
+      texto: `Arrastrá el token hasta ${n} casillero${n === 1 ? '' : 's'}: gratis y sin ataque de oportunidad.`,
+      botones: [{texto: '✋ Se queda', alClic: () => { dodgeBanner = null; renderDodgeBanner(); }}]});
+    return;
+  }
   if(dodgeBanner.libre && dodgeBanner.robo){   // 🫳 la huida del ladrón (js/47)
     AvisoCombate.cartel('dodge', {icono: '🫳', titulo: `${dodgeBanner.nombre} huye con lo robado`, posicion: 'abajo',
       texto: `Arrastrá el token hasta ${typeof ROBO_HUIDA !== 'undefined' ? ROBO_HUIDA : 3} casilleros (paga sus No2; sin ataque de oportunidad).`,

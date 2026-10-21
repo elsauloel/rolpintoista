@@ -114,6 +114,12 @@
   del Tipo de su arma por cada golpe recibido**, **1 SP por dado** (si no le alcanza, los que pueda pagar; en modo cooldown, +1 turno de cooldown a
   Aguante por dado) más los No2 del ataque, y se pasa al duelo. Si no ataca en ese turno, lo pierde. `vtt-hexgrid/js/56-aguante.js`. **Para probar.**
 
+### Choque liviano (desde el 2026-10-21)
+
+- ✅ **Picar y alejarse** (2026-10-21, dueño; una sola para bestias y humanoides): un ataque con su arma; pegue o no, después se aleja hasta 2
+  casilleros, gratis y sin dar ataque de oportunidad (el cartel del movimiento libre del dodge roll). Costo de un ataque, más 2 SP o cooldown 3.
+  `vtt-hexgrid/js/57-alejarse.js`. **Para probar.**
+
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 
 ## Etiquetas

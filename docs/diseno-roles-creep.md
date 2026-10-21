@@ -20,6 +20,10 @@
    alguna invocación (para un creep tiene que justificarse mucho, para no alargar los combates).
 4. **Casters**: **debuffer**, **support** y **mago** (el del daño más directo).
 
+## Más adelante: el Jefe
+
+Transversal (fases, refuerzos, la furia del jefe): se evalúa cuando haya unos básicos de cada rol (dueño, 2026-10-21).
+
 ## 1. Choque pesado — las ideas del rol
 
 Lo que busca cada estilo. ✅ = ya hay habilidad auditada que lo cubre.
@@ -45,7 +49,16 @@ Lo que busca cada estilo. ✅ = ya hay habilidad auditada que lo cubre.
 
 ## 2. Choque liviano — las ideas del rol
 
-(Se arma al entrar al rol por primera vez.)
+Ya cubierto al entrar (2026-10-21): golpes precisos (Tajo veloz, Estocada, Zarpazo), las variantes del Sangrado y su versión fuerte, el Rengo (Golpe a la
+rodilla, Tarascón al tobillo), las redes; y en el mapa, el sigilo, el +1 por la espalda y Robar.
+
+1. **Golpear y alejarse** — ✅ **Picar y alejarse** (2026-10-21).
+2. **Salto**: salta hasta el objetivo por encima de lo que haya y pega al caer (dueño: «sumémosla también para el Warrior, o la misma skill compartida»).
+3. **Veneno**: golpes que envenenan, con variantes como el sangrado.
+4. **Puñalada**: saca provecho del sigilo y la espalda.
+5. **Esquivar**: reflejos, Evasión extra.
+6. **Golpe sucio**: arena a los ojos (Ceguera) o desarmar.
+7. **Rodear**: más fuerte si un aliado también está pegado al objetivo.
 
 ## 3. Rango y Hunter — las ideas del rol
 

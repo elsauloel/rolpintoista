@@ -519,6 +519,7 @@ const Duelo = (() => {
     // (PdG, Crítico frecuente / potente, daño fijo, ignora Resistencia) y el tiro alto (PdG −2). `motivo` es lo que se lee («distancia ideal»).
     // Perfora N del arma (2026-10-10, las ballestas): viaja en el ataque; el mapa la suma a la de la flecha o el virote al aplicar el daño.
     if(_num(cfg.ataque.perfora) > 0 && !hab) inicial.ataque.perfora = Math.min(5, Math.round(_num(cfg.ataque.perfora)));
+    if(_num(cfg.ataque.alejarse) > 0 && !hab) inicial.ataque.alejarse = Math.min(4, Math.round(_num(cfg.ataque.alejarse)));   // 💨 Picar y alejarse (2026-10-21)
     if(cfg.ataque.atraviesaEscudos && !hab) inicial.ataque.atraviesaEscudos = true;
     if(cfg.ataque.puntaDiamante && !hab) inicial.ataque.puntaDiamante = true;   // contra Defensa 12 o más, Perfora +2 (el mapa, 2026-10-11)
     if(cfg.ataque.remachadora && !hab) inicial.ataque.remachadora = true;   // golpes seguidos al mismo blanco, Perfora +1 cada uno (el mapa del GM)   // si lo paran con escudo, el escudo se abolla (el mapa, js/26)

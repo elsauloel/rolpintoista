@@ -1789,6 +1789,19 @@ const Duelo = (() => {
       .map(([ef, i]) => `<div class="duelo-mcaja"><b>${_esc(ef.nombre)}</b> <button type="button" data-efman="${i}:1">✔ Funcionó</button> <button type="button" class="sec" data-efman="${i}:0">✘ No funcionó</button></div>`).join('');
     return `<div class="duelo-manual">${tg}${filas}<div class="det">Sin tirar el dado. Si el efecto trae daño propio, ese se tira igual.</div></div>`;
   }
+  /* ✍ El PdG a mano cumple las mismas reglas que el del botón (dueño, 2026-10-21): antes de anotarlo, la página de quien ataca paga el ataque
+     (No2, Sentado, sin No2, el conteo de ataques) y gasta lo que suma al golpe (óleos, Arma envenenada, Arma elemental), sin tirar el dado:
+     el gancho `pagarManual(d)` de FichaDuelo, CreepDuelo e InvDuelo. → false si se canceló (no se anota nada). */
+  async function pagarManual(d){
+    let h = null;
+    try{
+      if(cfgEscuchar.hooksLocal){ h = cfgEscuchar.hooksLocal(d.atacante); if(h && typeof h.then === 'function') h = await h; }
+      const H = hooks();
+      if(!h && H && H.soy && H.soy(d.atacante)) h = H;
+      if(h && h.pagarManual) return (await h.pagarManual(d)) !== false;
+    }catch(err){ console.error('Duelo: pagar el PdG a mano', err); }
+    return true;
+  }
   /* ✍ Una tirada escrita a mano lleva igual los datos del crítico de su lado (2026-10-20, probando el Blindado en el mapa: a mano se perdían):
      el Crítico frecuente y potente de quien ataca; la Resistencia a crítico y el Blindado de quien defiende. Solo si esta pantalla maneja ese lado. */
   async function extraManual(d, campo){
@@ -1838,6 +1851,7 @@ const Duelo = (() => {
       guardarDano(d.id, r, efectos, {defensaManual}).catch(err => { console.error(err); _toast('No se pudo anotar la tirada en el duelo'); });
       return;
     }
+    if(campo === 'pdg' && !d.hab && !(await pagarManual(d))) return;   // las mismas reglas que el botón
     guardarTiro(d.id, campo, r, defensa, await extraManual(d, campo)).catch(err => { console.error(err); _toast('No se pudo anotar la tirada en el duelo'); });
   }
 
@@ -2641,6 +2655,7 @@ const Duelo = (() => {
     const etiqueta = campo === 'eva' ? (cHab ? cHab.etq : (modo === 'parry' ? 'Parry' : 'Evasión')) : (campo === 'pdg' && d.hab) ? etqTira(d) : ETIQ[campo];
     const r = {formula: f.formula, rolls, mod: f.mod, total};
     if(campo === 'dano' && typeof mesaPublicar === 'function'){ try{ mesaPublicar(`${lado.nombre} · ${etiqueta} (a mano)`, r); }catch(err){} }   // las tiradas de un par se publican juntas cuando tiran los dos
+    if(campo === 'pdg' && !d.hab && !(await pagarManual(d))) return;   // las mismas reglas que el botón (2026-10-21)
     (campo === 'dano' ? guardarDano(d.id, r) : guardarTiro(d.id, campo, r, defensa, await extraManual(d, campo))).catch(err => { console.error(err); _toast('No se pudo anotar la tirada en el duelo'); });
   }
 

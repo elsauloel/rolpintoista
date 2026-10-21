@@ -565,7 +565,7 @@ const FichaAcciones = (() => {
     const primero = FichaCombate.registrarAtaque(S, arma);   // cuenta el ataque con esa arma (comun/ficha-combate.js)
     if(ui.alPagar) ui.alPagar();   // ya se pagó: un arma envenenada gasta su carga recién acá (2026-10-10)
     ui.cambio(['nitros']);
-    tirarValorStat(S, arma ? `PdG · ${arma.nombre}` : 'PdG', FichaCombate.pdgParaArma(S, arma).valor, 'pdg', undefined, undefined, undefined, ui);
+    if(!ui.sinTirada) tirarValorStat(S, arma ? `PdG · ${arma.nombre}` : 'PdG', FichaCombate.pdgParaArma(S, arma).valor, 'pdg', undefined, undefined, undefined, ui);   // el PdG a mano: paga, no tira (2026-10-21)
     const tipo = FichaCombate.tipoAtaque(arma);
     const impar = primero && tipo % 2 !== 0;
     ui.toast(`${arma ? arma.nombre : 'Sin arma ⚠ (Tipo provisorio)'}: -${fmt(costo)} No2 · ${primero ? 'primer ataque con esta arma' : `ataque ${FichaCombate.ataquesConArma(S, arma)} con esta arma`}${impar ? ' · ⚠ Tipo impar, redondeo provisorio' : ''}`);
@@ -586,7 +586,7 @@ const FichaAcciones = (() => {
     // Solo el contraataque suma el «PdG en contraataque» de la propia arma (los tipos 6 lo traen: +1 a +3, mucho menos valioso que un PdG normal porque es circunstancial);
     // y solo el ataque de oportunidad suma el «PdG en oportunidad» (los tipos 4, mismo criterio).
     const bonoContra = tipo === 'contra' ? FichaCombate.statParaArma(S, 'pdgcontra', arma) : tipo === 'oportunidad' ? FichaCombate.statParaArma(S, 'pdgopor', arma) : 0;
-    tirarValorStat(S, `${nombre} · PdG${arma ? ' · ' + arma.nombre : ''}`, FichaCombate.pdgParaArma(S, arma).valor + (Number.isNaN(bonoContra) ? 0 : bonoContra), 'pdg', undefined, undefined, undefined, ui);
+    if(!ui.sinTirada) tirarValorStat(S, `${nombre} · PdG${arma ? ' · ' + arma.nombre : ''}`, FichaCombate.pdgParaArma(S, arma).valor + (Number.isNaN(bonoContra) ? 0 : bonoContra), 'pdg', undefined, undefined, undefined, ui);   // a mano: sin tirar
     ui.toast(`${nombre}${con}: −${fmt(costo)} No2 (lo de un primer ataque)${bonoContra > 0 ? ` · PdG +${fmt(bonoContra)} por ${tipo === 'contra' ? 'contraataque' : 'oportunidad'}` : ''} · te quedan ${fmt(num(S.nitros))}`);
     ui.cambio(['refresh']);
   }

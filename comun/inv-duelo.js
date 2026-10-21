@@ -54,11 +54,12 @@ const InvDuelo = (() => {
     // Sin No2 suficientes pregunta «¿Atacar igual?» (B-7, 2026-10-02: antes se rechazaba): gasta los que tenga y deja la línea roja.
     // tipo: 'normal', 'oportunidad' o 'contra' (los dos últimos, como los creeps: lo de un primer ataque y el PdG especial de su arma).
     // `ui.confirmar` puede devolver una promesa (el mapa: el cartel del juego; un confirm() nativo congela la pestaña).
-    async function atacarSuelto(inv, tipo, dueloId){
+    // `sinTirada` (2026-10-21): el PdG elegido a mano — paga y gasta lo mismo, sin tirar. → true si pagó.
+    async function atacarSuelto(inv, tipo, dueloId, sinTirada){
       const qs = Combatiente.preguntaSentado(inv.estados, inv.nombre);   // Sentado no puede atacar: avisa y deja seguir
-      if(qs && !(await (ui.confirmar || (t => Confirmar.preguntar(t, {titulo: 'Sentado', si: 'Atacar igual'})))(qs))) return;
+      if(qs && !(await (ui.confirmar || (t => Confirmar.preguntar(t, {titulo: 'Sentado', si: 'Atacar igual'})))(qs))) return false;
       const forzar = A().faltanNitros(inv, tipo);
-      if(forzar && !(await (ui.confirmar || (t => Confirmar.preguntar(t, {titulo: 'Sin No2', si: 'Atacar igual'})))(A().preguntaSinNitros(inv, tipo)))) return;
+      if(forzar && !(await (ui.confirmar || (t => Confirmar.preguntar(t, {titulo: 'Sin No2', si: 'Atacar igual'})))(A().preguntaSinNitros(inv, tipo)))) return false;
       let p;
       ui.cambiar(() => {
         p = A().pagarAtaque(inv, forzar, tipo);
@@ -66,11 +67,12 @@ const InvDuelo = (() => {
         if(dueloId){ const gc = Combatiente.gastarCarga(inv.estados || (inv.estados = []), dueloId); if(gc.carga) p.carga = gc.carga; }   // un arma envenenada: recién pagado
         if(tipo !== 'oportunidad' && tipo !== 'contra') ui.parry.delete(inv.id);   // atacar cierra el Parry que esperaba su Bloqueo
       });
-      if(p.error){ ui.toast(p.error); return; }
+      if(p.error){ ui.toast(p.error); return false; }
       A().alertaSinNitros(inv, p.forzado, tipo);
       if(p.carga) ui.toast(`${inv.nombre} · ${Combatiente.cargaTxt(p.carga)}`);
-      publicar(A().tiradaAtaque(inv, tipo));
+      if(!sinTirada) publicar(A().tiradaAtaque(inv, tipo));
       ui.toast(p.aviso);
+      return true;
     }
     const ladoDe = (d, campo) => (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
     return {
@@ -115,6 +117,16 @@ const InvDuelo = (() => {
         }
         if(d.ataque.tipo === 'habilidad-arma') publicar(A().tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg') + num(d.ataque && d.ataque.mods && d.ataque.mods.pdg) + Combatiente.pdgExtraArma(st => I().modTotal(inv, st), {tipoDado: num(inv.armaTipo), armaDeRango: !!inv.armaDeRango}), 'pdg'));
         else return atacarSuelto(inv, d.ataque.tipo, d.id);
+      },
+      // ✍ El PdG elegido a mano (2026-10-21): paga y gasta lo que suma al golpe, sin tirar. → false si se canceló.
+      pagarManual: async d => {
+        const inv = ui.inv(d.atacante);
+        if(!inv) return true;
+        if(d.ataque.tipo === 'habilidad-arma'){
+          if((inv.estados || []).some(e => e && e.golpe)){ let gc = null; ui.cambiar(() => { gc = Combatiente.gastarCarga(inv.estados, d.id); }); if(gc && gc.carga) ui.toast(`${inv.nombre} · ${Combatiente.cargaTxt(gc.carga)}`); }
+          return true;
+        }
+        return !!(await atacarSuelto(inv, d.ataque.tipo, d.id, true));
       },
       // Un duelo cancelado que no cuenta como ataque (2026-10-15): el conteo y los No2, de vuelta. → los No2 devueltos.
       devolverAtaque: d => {

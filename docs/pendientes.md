@@ -8,6 +8,11 @@
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.
+> - [ ] **🪟 Los botones minimizados de los duelos tapan el cartel del dodge roll en una ventana baja** (2026-10-21, probando la Bola de fuego en el
+>   Chrome de pruebas, de 567 px de alto; dueño: «en el teléfono no termino de entender el problema»): «Pegó: …» y «Dodge roll: …» (los duelos
+>   minimizados, abajo al centro) quedan encima de «Ver el duelo» / «No me quiero mover» del cartel. Mirarlo juntos en la compu con una ventana baja y
+>   decidir: subir el cartel, correr los botones o esconderlos mientras hay un cartel abajo. La captura está en el reporte del 21/10
+>   (https://claude.ai/artifact/J7X3HNdHz7qNU6zyZ4mYiz).
 > - [ ] **🎁 Pedir la lista de qué porcentaje de drop tiene cada tipo de creep** (2026-10-20, dueño, dictado al pasar: «pedir la lista de qué
 >   porcentaje de drop tiene cada tipo de creep»). Armársela en la compu: la chance del consumible al azar por tipo de criatura (hoy humano 60 %,
 >   humanoide 45 %, el resto 0; un jefe: el primero seguro y el segundo con la chance de su tipo), la calidad por nivel y qué sueltan seguro (su
@@ -315,13 +320,10 @@
 
 ## 🧪 De las pruebas en el mapa del 2026-10-21 (auditoría de creeps)
 
-- [ ] **✍ El PdG elegido a mano no gasta las cargas ni el golpe por turnos**: con «Elegir manualmente» en la Probabilidad de Golpe, el ataque no pasa por
-  el gancho que paga y gasta (`atacar` de CreepDuelo / FichaDuelo / InvDuelo), así que no se suma lo de un óleo, un Arma envenenada ni un Arma elemental a ese
-  golpe. Con el botón normal, sí. Decidir si el PdG a mano tiene que gastarlas (probablemente sí).
-- [ ] **Los botones minimizados de los duelos tapan el cartel del dodge roll** en una ventana baja (567 px de alto): «Pegó: …» y «Dodge roll: …» quedan
-  encima de «Ver el duelo» / «No me quiero mover». Subir el cartel o correr los botones cuando se pisan.
-- [ ] **Quedaron sin probar**: Vigilancia con «Dejarlo pasar», sin No2 y la del Shooter; Romper armadura con un crítico; el Coletazo contra una pared;
-  Aguante en modo SP y que se pierda si no ataca; la ayuda de un aliado para soltarse.
+- [x] **✍ El PdG elegido a mano cumple las mismas reglas que el del botón** (2026-10-21, dueño): «Elegir manualmente» y «Tirar a mano» pagan el ataque
+  (No2, Sentado, sin No2, el conteo) y gastan lo que suma al golpe (óleos, Arma envenenada, Arma elemental) sin tirar el dado: gancho `pagarManual` de
+  FichaDuelo, CreepDuelo e InvDuelo (`comun/duelo.js`, `pagarManual(d)`).
+- Lo de la ventana baja pasó a la sección 🖥; lo que quedó sin probar, a «Auditoría de creeps: para probar» de `docs/pruebas-en-el-mapa.md`.
 
 ## 0. Hoja de ruta acordada (2026-10-02, a seguir en este orden)
 

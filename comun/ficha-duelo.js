@@ -162,6 +162,17 @@ const FichaDuelo = (() => {
         }
         if(d.ataque.tipo === 'normal') FichaAcciones.atacarConArma(S, arma, undefined, uiA); else FichaAcciones.ataqueEspecialConArma(S, arma, d.ataque.tipo, undefined, uiA);
       },
+      // ✍ El PdG elegido a mano (2026-10-21, dueño: «las mismas reglas que el botón»): paga (Sentado, sin No2, el conteo) y gasta lo que suma al
+      // golpe, sin tirar (`ui.sinTirada` en FichaAcciones.atacarConArma / ataqueEspecialConArma).
+      pagarManual: async d => {
+        const S = getS();
+        const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : null;
+        const gastar = () => { const gc = Combatiente.gastarCarga(S.efectos, d.id); if(gc.cambio) ui.cambio(['efectos']); if(gc.carga) ui.toast(Combatiente.cargaTxt(gc.carga)); };
+        if(d.ataque.tipo === 'habilidad-arma'){ gastar(); return true; }
+        const uiA = {...ui, alPagar: gastar, sinTirada: true};
+        if(d.ataque.tipo === 'normal') await FichaAcciones.atacarConArma(S, arma, undefined, uiA); else await FichaAcciones.ataqueEspecialConArma(S, arma, d.ataque.tipo, undefined, uiA);
+        return true;
+      },
       // Un duelo cancelado que no cuenta como ataque (2026-10-15, dueño): se descuenta del conteo y se devuelven los No2 que pagó. → los No2 devueltos.
       devolverAtaque: d => {
         const S = getS();

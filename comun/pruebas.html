@@ -953,6 +953,17 @@ prueba('🦵 El Rengo: Golpe a la rodilla, Tarascón al tobillo y Tiro a la rodi
     const est = EstadosAplicar.componer(a.efectos[0].spec); return [est.nombre, est.turnos, !!est.rengo, h.spCosto, h.cd].join('/'); };
   igual(['Golpe a la rodilla', 'Tarascón al tobillo', 'Tiro a la rodilla'].map(v), ['Rengo/2/true/2/3', 'Rengo/2/true/2/3', 'Rengo/2/true/2/3']);
 });
+prueba('🕸 Redes y 🤼 agarres de creep (2026-10-21)', () => {
+  const h = n => armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos, 2);
+  const stat = s => ({des: 4, dmgesp: 5, fue: 6})[s] || 0;
+  const red = Combatiente.habEjecucion(h('Red'), h('Red').duelo, {stat, etq: s => s}), tela = Combatiente.habEjecucion(h('Tela de araña'), h('Tela de araña').duelo, {stat, etq: s => s});
+  const agr = Combatiente.habEjecucion(h('Agarrón'), h('Agarrón').duelo, {stat, etq: s => s});
+  const abr = Combatiente.ataqueConArreglos(h('Abrazo aplastante'), h('Abrazo aplastante').duelo, {arma: {}, valorDe: stat, danoGolpe: x => `${1 + x}d6+2`});
+  const sR = red.efectos[0].spec.soltar, sT = tela.efectos[0].spec.soltar, sA = agr.efectos[0].spec.soltar, sB = Combatiente.soltarNorm(abr.efectos[0].spec.soltar);
+  igual([red.efectos[0].nombre, sR.dif, sR.alEmpezar, sR.ayuda, sT.dif, agr.efectos[0].nombre, sA.dif, abr.efectos[0].spec.nombre, sB.dif, sB.danoFalla,
+    !!EstadosAplicar.componer({nombre: 'Agarrado'}).inmovilizado, Combatiente.grupoCC('Agarrado')],
+    ['Inmovilizado', 4, true, true, 5, 'Agarrado', 6, 'Agarrado', 6, '1d6+2', true, 'atrapar']);
+});
 prueba('👊 Puño de roca (2026-10-21): +2 al daño y Demora', () => {
   const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Puño de roca').datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});

@@ -1174,7 +1174,7 @@ const Combatiente = (() => {
     aturdimiento: {label: 'Aturdimiento', icono: '💫', resiste: 'rescc', estados: ['Stun', 'Pajaritos', 'Parálisis', 'Exhausto']},
     herida: {label: 'Heridas', icono: '🦵', resiste: 'rescc', estados: ['Lisiado', 'Rengo']},
     sentidos: {label: 'Sentidos', icono: '👁', resiste: 'rescc', estados: ['Ceguera']},
-    atrapar: {label: 'Atrapar', icono: '⛓', resiste: 'fue', estados: ['Inmovilizado', 'Lento', 'Mordido']},
+    atrapar: {label: 'Atrapar', icono: '⛓', resiste: 'fue', estados: ['Inmovilizado', 'Lento', 'Mordido', 'Agarrado']},
     equilibrio: {label: 'Equilibrio', icono: '🤸', resiste: 'agl', estados: ['Sentado']},
     desarme: {label: 'Desarme', icono: '✋', resiste: 'fue', estados: ['Desarmado', 'Desarme']},
   };

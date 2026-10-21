@@ -97,6 +97,16 @@
   Costo de un ataque, más **2 SP** o cooldown 3. **Golpe a la rodilla** (humanoides; antes «Romper la rodilla», que solo ponía el Rengo a mano),
   **Tarascón al tobillo** (bestias; antes «Mordisco que lisia») y **Tiro a la rodilla** (humanoides, a distancia; antes «Disparo a la rodilla»).
   **Para probar en el mapa.**
+- ✅ **Las redes** (2026-10-21, dueño: «las redes sí me interesan… alguna criatura puede escupir una red»): tira su Probabilidad de Golpe contra la
+  Evasión, dentro de su Rango; si gana, **Inmovilizado** (hasta 3 turnos). Al empezar su turno tira Fuerza para soltarse, gratis; un aliado pegado
+  puede ayudarlo (1 No2). Cuesta 2 No2 y cooldown 4, o **3 SP**. **Red** (humanoides: Fuerza contra la Destreza de quien la lanzó) y **Tela de
+  araña** (bestias, la escupen: Fuerza contra su Efecto especial). Como la Red Nerubian. **Para probar en el mapa.**
+- ✅ **Los agarres de las bestias** (2026-10-21, dueño: «con y sin daño»): el estado **Agarrado** (no se mueve; quien agarra queda **Agarrando** y
+  tampoco se mueve). Al empezar su turno tira Fuerza contra la Fuerza de quien lo agarra, gratis; lo suelta al empezar el siguiente turno de quien lo
+  agarró, o antes si se zafa. **Agarrón** (sin daño: su Probabilidad de Golpe contra la Evasión, pegado; 2 No2 y cooldown 3, o 2 SP) y **Abrazo
+  aplastante** (con daño: un ataque con su arma; si no se suelta, el apretón le vuelve a hacer el mismo daño; costo de un ataque, más 3 SP o
+  cooldown 3). El mismo mecanismo que el Mordisco feroz (`vtt-hexgrid/js/54`). **Para probar en el mapa.**
+- ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 
 ## Etiquetas
 
@@ -105,6 +115,9 @@
   filtro de la biblioteca: `HABS_CREEP_GRUPOS` en `comun/creep-editor.js`). Una receta auditada lleva `auditada: true` (las `aA` ya la traen).
 
 ## Sigue
+
+- **Desde el 2026-10-21 (dueño):** foco en los de **choque pesado (tanques y warriors)**, explorando las posibilidades de diseño del rol
+  más que estado por estado.
 
 - **Forma de trabajo desde el 2026-10-21:** lo definido se programa y se anota en «Auditoría de creeps: para probar» (`docs/pruebas-en-el-mapa.md`);
   las pruebas en el mapa se corren todas juntas cuando el dueño lo pide.

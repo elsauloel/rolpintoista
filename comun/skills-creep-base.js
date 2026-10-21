@@ -243,7 +243,8 @@
   H('Marca de presa', 'X', 'b', 'ex', 3, tA('Marca al objetivo: recibe +2 de daño de los ataques del creep 3 turnos (a mano).', 2));
   H('Desarmar', 'XK', 'hd', 'mx', 4, tA('Golpea la mano del objetivo: suelta el arma y tarda 1 No2 en recogerla (a mano).', 2));
   H('Hacer tropezar', 'XK', '*', 'ex', 2, tA('Le mete el pie: el objetivo cae al piso si falla Agilidad (a mano).', 1));
-  H('Tela de araña', 'XK', 'b', 'x', 4, tA('Lanza tela pegajosa: el objetivo queda Inmovilizado 1 turno si falla Fuerza (a mano).', 2));
+  // 🕸 Las redes (dueño, 2026-10-21: «las redes sí me interesan… alguna criatura puede escupir una red»): como la Red Nerubian, desde el creep.
+  H('Tela de araña', 'XK', 'b', 'x', 4, {detalle: 'Escupe tela pegajosa: tira su Probabilidad de Golpe contra la Evasión del objetivo, dentro de su Rango; si gana, el objetivo queda Inmovilizado (hasta 3 turnos). Al empezar su turno tira Fuerza contra el Efecto especial de la criatura, gratis: si llega, se suelta. Un aliado pegado puede ayudarlo (1 No2, su propia Fuerza).', no2: 2, auditada: true, spCosto: 3, ataqueTxt: 'su Probabilidad de Golpe contra la Evasión; si gana, Inmovilizado (se suelta con Fuerza al empezar su turno)', duelo: {objetivo: 'enemigo', tira: 'pdg', contra: ['eva'], alcance: 'rango', dano: false, efectos: [{nombre: 'Inmovilizado', turnos: 3, soltar: {stat: 'fue', etq: 'Fuerza', difStat: 'dmgesp', no2: 1, alEmpezar: true, ayuda: true}}]}});
   H('Nube de esporas', 'XA', 'p', 'x', 4, tA('Suelta esporas en flor de diámetro 3 (7 casillas): quienes las respiran pierden 1 de Daño 2 turnos (a mano).', 2));
   H('Rugido aturdidor', 'XK', 'b', 'x', 4, tA('Un rugido ensordecedor: los adyacentes quedan Pajaritos hasta el final de su turno (a mano).', 3));
   H('Hechizo de lentitud', 'X', 'dega', 'gx', 3, tA('Los pies del objetivo pesan: pierde 1 No2 por turno 2 turnos (a mano).', 2));
@@ -264,10 +265,15 @@
   H('Trepar', 'M', 'bp', 'e', 2, tA('Sube por una pared o un árbol sin costo extra (a mano).', 1));
   // Trampa de verdad (2026-09-24): deja una trampa oculta al lado del token y quien la pisa queda Inmovilizado (APLICA en creeps-base.js).
   H('Trampa de raíces', 'K', 'p', 'x', 4, tS('Deja una trampa de raíces en una casilla adyacente: quien la pise queda Inmovilizado 2 turnos.', 2), 'trampas');
-  H('Red', 'K', 'hd', 'x', 4, tA('Lanza una red: el objetivo queda Inmovilizado 1 turno si falla Agilidad (a mano).', 2));
+  // 🕸 Las redes (dueño, 2026-10-21: «las redes sí me interesan… alguna criatura puede escupir una red»): como la Red Nerubian, desde el creep.
+  H('Red', 'K', 'hd', 'x', 4, {detalle: 'Lanza una red: tira su Probabilidad de Golpe contra la Evasión del objetivo, dentro de su Rango; si gana, el objetivo queda Inmovilizado (hasta 3 turnos). Al empezar su turno tira Fuerza contra la Destreza de quien la lanzó, gratis: si llega, se suelta. Un aliado pegado puede ayudarlo (1 No2, su propia Fuerza).', no2: 2, auditada: true, spCosto: 3, ataqueTxt: 'su Probabilidad de Golpe contra la Evasión; si gana, Inmovilizado (se suelta con Fuerza al empezar su turno)', duelo: {objetivo: 'enemigo', tira: 'pdg', contra: ['eva'], alcance: 'rango', dano: false, efectos: [{nombre: 'Inmovilizado', turnos: 3, soltar: {stat: 'fue', etq: 'Fuerza', difStat: 'des', no2: 1, alEmpezar: true, ayuda: true}}]}});
   H('Congelar', 'K', 'e', 'gx', 5, tA('Encierra al objetivo en hielo: pierde su próximo turno si falla Res.Mt (a mano).', 3));
   H('Aturdir', 'K', 'hdb', 'mx', 5, tA('Golpe en la sien: el objetivo queda Stun 1 turno si falla Res.Mt (a mano).', 3));
-  H('Agarrón', 'K', 'bpc', 'mt', 3, tA('Agarra al objetivo: no puede alejarse mientras el creep no se mueva (a mano).', 2));
+  // 🤼 Los agarres de las bestias (dueño, 2026-10-21: «con y sin daño»): como el Mordisco feroz (vtt-hexgrid/js/54), con «Agarrado».
+  H('Agarrón', 'K', 'bpc', 'mt', 3, {detalle: 'Agarra al objetivo sin lastimarlo: tira su Probabilidad de Golpe contra la Evasión; si gana, el objetivo queda Agarrado (no se mueve, y quien lo agarra tampoco). Al empezar su turno tira Fuerza contra la Fuerza de quien lo agarra, gratis; lo suelta al empezar el siguiente turno de quien lo agarró.', no2: 2, auditada: true, spCosto: 2, ataqueTxt: 'su Probabilidad de Golpe contra la Evasión; si gana, Agarrado (se suelta con Fuerza contra su Fuerza)', duelo: {objetivo: 'enemigo', tira: 'pdg', contra: ['eva'], alcance: 1, dano: false, efectos: [{nombre: 'Agarrado', soltar: {stat: 'fue', etq: 'Fuerza', difStat: 'fue', no2: 0, alEmpezar: true}}]}});
+  H('Abrazo aplastante', 'DK', 'b', 'mt', 3, aA('Lo atrapa entre los brazos y aprieta: un ataque con su arma; si pega, el objetivo queda Agarrado (no se mueve, y la bestia tampoco). Al empezar su turno tira Fuerza contra la Fuerza de la bestia, gratis; si no se suelta, el apretón le vuelve a hacer el mismo daño. La bestia lo suelta al empezar su siguiente turno.',
+    {}, 'va al duelo como un ataque; si pega, deja Agarrado (se suelta con Fuerza contra su Fuerza; si no, recibe el daño otra vez)', 3,
+    [{nombre: 'Agarrado', soltar: {stat: 'fue', etq: 'Fuerza', difStat: 'fue', no2: 0, alEmpezar: true, danoFalla: 'golpe'}}]));
   H('Empujón', 'K', '*', 'mt', 2, tA('Empuja al objetivo un casillero (a mano).', 1));
   H('Arrastrar', 'K', 'bpc', 'x', 3, tA('Jala al objetivo hacia el creep hasta 2 casilleros (a mano).', 2));
   H('Onda de choque', 'AK', 'ce', 'g', 5, zO('Una onda que empuja a los adyacentes un casillero (a mano).', 4, 'M'));

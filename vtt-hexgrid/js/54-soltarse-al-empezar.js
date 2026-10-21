@@ -64,7 +64,7 @@ async function soltarAlEmpezarCreep(clave, creepId, t){
   mesaPublicar(tt.origen, {...tt.r, quien: sc.nombre, desde: 'gm'});
   await esperarDadosMapa();
   try{ await modificarCreep(creepId, c => { CreepAcciones.aplicarSoltarse(c, gratis); return {}; }); }catch(err){ console.error(err); toast('No se pudo anotar el resultado: sacá el estado a mano'); }
-  const extra = !tt.ok && tt.s.danoFalla ? await mordidaDano(t, sc.nombre, tt.s) : '';
+  const extra = !tt.ok && tt.s.danoFalla ? await mordidaDano(t, sc.nombre, tt.s, estNombre) : '';
   soltarAlEmpezarResultado(clave, sc.nombre, estNombre, tt, extra);
 }
 async function soltarAlEmpezarPj(clave, fichaId, invId, t){
@@ -92,7 +92,7 @@ async function soltarAlEmpezarPj(clave, fichaId, invId, t){
   soltarTirando(clave, res.nombre);
   mesaPublicar(`${res.nombre} · Soltarse (${res.est}) · ${res.tt.s.etq} contra ${res.tt.s.dif}`, {...res.tt.r, quien: res.nombre, ficha: fichaId});
   await esperarDadosMapa();
-  const extra = !res.tt.ok && res.tt.s.danoFalla ? await mordidaDano(t, res.nombre, res.tt.s) : '';
+  const extra = !res.tt.ok && res.tt.s.danoFalla ? await mordidaDano(t, res.nombre, res.tt.s, res.est) : '';
   soltarAlEmpezarResultado(clave, res.nombre, res.est, res.tt, extra);
 }
 
@@ -102,32 +102,34 @@ async function soltarAlEmpezarPj(clave, fichaId, invId, t){
    «Mordiendo» (`muerdeA`). Si el mordido no se suelta al empezar su turno, `mordidaDano` le aplica ese daño otra vez (con su Defensa). Al empezar el
    turno de la bestia, `mordidaSoltar` (el GM) les saca los dos estados; y si el mordido se zafa antes, el revisado de abajo le saca el «Mordiendo» a
    la bestia. */
+// 🤼 El agarre (2026-10-21) va por el mismo camino: «Agarrado» en quien recibe, «Agarrando» en quien agarra.
+const AGARRES = {Mordido: 'Mordiendo', Agarrado: 'Agarrando'}, AGARRA = Object.values(AGARRES);
 async function mordidaEmpezar(d, spec){
   const ta = tokens.get(d.atacante.tokenId), victima = nombreDe(tokens.get(d.defensor.tokenId)) || d.defensor.nombre || 'alguien';
   if(spec.soltar) spec.soltar = {...spec.soltar, de: d.atacante.tokenId, deNombre: String(d.atacante.nombre || '').slice(0, 40)};
   if(!ta) return;
-  const est = {nombre: 'Mordiendo', muerdeA: d.defensor.tokenId, muerdeANombre: String(victima).slice(0, 40), desde: Date.now()};
+  const est = {nombre: AGARRES[spec.nombre] || 'Mordiendo', muerdeA: d.defensor.tokenId, muerdeANombre: String(victima).slice(0, 40), desde: Date.now()};
   try{
     if(ta.tipo === 'creep') await modificarCreep(String(ta.fichaId), c => { EstadosAplicar.aplicarACreep(c, est); return {}; });
     else{ const f = fichasPub.get(String(ta.fichaId).split(SEP_INVOCACION)[0]); await EstadosAplicar.encolarPj({fichaId: ta.fichaId, duenoUid: (f && f.duenoUid) || ta.duenoUid, spec: est, origen: `${d.atacante.nombre} · mordisco`}); }
-  }catch(err){ console.error('Mordisco: no se pudo trabar a la bestia', err); }
+  }catch(err){ console.error('Agarre: no se pudo trabar a quien agarra', err); }
 }
 // El daño que se repite al no soltarse. → el texto para el cartel.
-async function mordidaDano(t, nombre, s){
+async function mordidaDano(t, nombre, s, estNombre){
   const r = typeof tirarDados === 'function' ? tirarDados(s.danoFalla) : null;
   if(!t || !r) return `✋ El mordisco le vuelve a hacer daño (${s.danoFalla}): aplicalo a mano.`;
-  const quien = s.deNombre || 'La bestia';
-  mesaPublicar(`🦷 ${quien} sigue mordiendo a ${nombre} · Daño`, {...r, quien, ...(t.tipo === 'creep' ? {desde: 'gm'} : {})});
+  const quien = s.deNombre || 'La bestia', sigue = estNombre === 'Agarrado' ? 'sigue apretando' : 'sigue mordiendo', ico = estNombre === 'Agarrado' ? '🤼' : '🦷';
+  mesaPublicar(`${ico} ${quien} ${sigue} a ${nombre} · Daño`, {...r, quien, ...(t.tipo === 'creep' ? {desde: 'gm'} : {})});
   await esperarDadosMapa();
   let res = null;
   try{
     if(t.tipo === 'creep'){ if(soyGM) res = await danioCreep(t, String(r.total), false, 0, 0); }
     else res = await (String(t.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(t, String(r.total), false, 0, 0);
   }catch(err){ console.error('Mordisco: no se pudo aplicar el daño', err); }
-  const txt = res && res.r ? `${quien} sigue mordiendo: ${s.danoFalla} = ${r.total}${res.r.invulnerable ? ' → Invulnerable: no le hizo nada' : ` − Defensa ${fmt(res.r.defensa)} → ${fmt(res.r.recibido)} de daño`}.`
-    : `${quien} sigue mordiendo: ${s.danoFalla} = ${r.total} de daño, menos su Defensa — aplicalo a mano.`;
-  mesaLinea(`🦷 ${txt}`, 'recordatorio');
-  if(typeof momentoAbrir === 'function') momentoAbrir({tipo: 'mordisco', icono: '🦷', titulo: `${quien} sigue mordiendo a ${nombre}`, resultado: txt, estado: 'listo', datos: {chico: true}});
+  const txt = res && res.r ? `${quien} ${sigue}: ${s.danoFalla} = ${r.total}${res.r.invulnerable ? ' → Invulnerable: no le hizo nada' : ` − Defensa ${fmt(res.r.defensa)} → ${fmt(res.r.recibido)} de daño`}.`
+    : `${quien} ${sigue}: ${s.danoFalla} = ${r.total} de daño, menos su Defensa — aplicalo a mano.`;
+  mesaLinea(`${ico} ${txt}`, 'recordatorio');
+  if(typeof momentoAbrir === 'function') momentoAbrir({tipo: 'mordisco', icono: ico, titulo: `${quien} ${sigue} a ${nombre}`, resultado: txt, estado: 'listo', datos: {chico: true}});
   return txt;
 }
 // Le saca un estado a un token (el GM): un creep directo; un personaje o una invocación, por aviso a su pantalla.
@@ -146,10 +148,11 @@ async function mordidaSoltar(tokenId, paso){
   if(!bestia) return;
   const quien = nombreDe(bestia), soltados = [];
   for(const [id, t] of tokens){
-    if(id === tokenId || !confusionEstadosDe(t).some(e => e && e.nombre === 'Mordido' && e.soltar && e.soltar.de === tokenId)) continue;
-    try{ await mordidaQuitar(t, 'Mordido', `${quien} te soltó`); soltados.push(nombreDe(t)); }catch(err){ console.error('Mordisco: no se pudo soltar', err); toast(`Sacale Mordido a ${nombreDe(t)} a mano`); }
+    const e = id === tokenId ? null : confusionEstadosDe(t).find(x => x && AGARRES[x.nombre] && x.soltar && x.soltar.de === tokenId);
+    if(!e) continue;
+    try{ await mordidaQuitar(t, e.nombre, `${quien} te soltó`); soltados.push(nombreDe(t)); }catch(err){ console.error('Agarre: no se pudo soltar', err); toast(`Sacale ${e.nombre} a ${nombreDe(t)} a mano`); }
   }
-  if(confusionEstadosDe(bestia).some(e => e && e.nombre === 'Mordiendo')) try{ await mordidaQuitar(bestia, 'Mordiendo', 'Soltaste'); }catch(err){ console.error(err); }
+  for(const n of AGARRA) if(confusionEstadosDe(bestia).some(e => e && e.nombre === n)) try{ await mordidaQuitar(bestia, n, 'Soltaste'); }catch(err){ console.error(err); }
   if(soltados.length){
     const txt = `${quien} suelta a ${soltados.join(' y ')} al empezar su turno.`;
     mesaLinea(`🦷 ${txt}`, 'recordatorio');
@@ -162,13 +165,13 @@ setInterval(() => {
   if(typeof tokens === 'undefined' || !soyGM) return;
   tokens.forEach((b, bid) => {
     if(b.tipo !== 'creep' || mordidaRevisando.has(bid)) return;
-    const e = confusionEstadosDe(b).find(x => x && x.nombre === 'Mordiendo' && x.muerdeA);
+    const e = confusionEstadosDe(b).find(x => x && AGARRA.includes(x.nombre) && x.muerdeA);
     if(!e || Date.now() - num(e.desde) < 8000) return;
     const v = tokens.get(e.muerdeA);
     const delMismo = de => de === bid || ((tokens.get(de) || {}).fichaId === b.fichaId && (tokens.get(de) || {}).tipo === 'creep');   // (dos tokens del mismo creep)
-    if(v && confusionEstadosDe(v).some(x => x && x.nombre === 'Mordido' && x.soltar && delMismo(x.soltar.de))) return;
+    if(v && confusionEstadosDe(v).some(x => x && AGARRES[x.nombre] === e.nombre && x.soltar && delMismo(x.soltar.de))) return;
     mordidaRevisando.add(bid);
-    mordidaQuitar(b, 'Mordiendo', 'Se zafó').then(() => mesaLinea(`🦷 ${nombreDe(b)} ya no tiene agarrado a ${e.muerdeANombre || 'nadie'}: queda libre.`, 'recordatorio'))
+    mordidaQuitar(b, e.nombre, 'Se zafó').then(() => mesaLinea(`🦷 ${nombreDe(b)} ya no tiene agarrado a ${e.muerdeANombre || 'nadie'}: queda libre.`, 'recordatorio'))
       .catch(err => console.error('Mordisco:', err)).finally(() => setTimeout(() => mordidaRevisando.delete(bid), 3000));
   });
 }, 2000);

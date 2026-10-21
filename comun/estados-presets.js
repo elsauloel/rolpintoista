@@ -56,6 +56,11 @@ const ESTADOS_PRESET = [
   // vuelve a hacer daño. Lo suelta la bestia al empezar su siguiente turno. La bestia queda «Mordiendo» (tampoco se mueve). ⚙ El mapa: js/54.
   {nombre:'Mordido', polaridad:'debuff', turnos:0, permanente:true, inmovilizado:true, esCC:true,
     detalle:'Agarrado de los dientes: no se puede mover. Al empezar su turno tira para soltarse, gratis; si no se suelta, el mordisco le vuelve a hacer daño. Lo suelta la bestia al empezar su siguiente turno. ⚙ Automatizado en el mapa.'},
+  // 🤼 El agarre de las bestias (2026-10-21, dueño: «skills de agarre con y sin daño por parte de bestias»): como el Mordido, sin morder.
+  {nombre:'Agarrado', polaridad:'debuff', turnos:0, permanente:true, inmovilizado:true, esCC:true,
+    detalle:'Agarrado: no se puede mover. Al empezar su turno tira para soltarse, gratis (si el agarre aprieta, cuando no se suelta le vuelve a hacer daño). Lo suelta al empezar el siguiente turno de quien lo agarró. ⚙ Automatizado en el mapa.'},
+  {nombre:'Agarrando', polaridad:'otro', turnos:0, permanente:true, inmovilizado:true,
+    detalle:'Tiene a alguien agarrado: no se mueve. Lo suelta al empezar su próximo turno, o antes si el otro se zafa. ⚙ Automatizado en el mapa.'},
   {nombre:'Mordiendo', polaridad:'otro', turnos:0, permanente:true, inmovilizado:true,
     detalle:'Tiene a alguien agarrado de los dientes: no se mueve. Lo suelta al empezar su próximo turno, o antes si el otro se zafa. ⚙ Automatizado en el mapa.'},
   {nombre:'Rengo', polaridad:'debuff', turnos:3, rengo:true, esCC:true,

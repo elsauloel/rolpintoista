@@ -1690,3 +1690,5 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `lineaHex` hasta quedar al lado (sin Sólidos, paredes ni tokens en el camino; cobra `n × porCasillero` de `costoMoverCreep`), y el ataque suma +n PdG,
   +n al daño y +n al `empuja` de sus efectos (n = casilleros que corrió). Sin línea libre, sin poder moverse o si no es un creep: avisa y deja atacar sin
   la carrera. Mesa y Crónica.
+- **🤼 El agarre** (2026-10-21): «Agarrado» / «Agarrando» van por el mismo camino que el Mordido / Mordiendo (`AGARRES` en js/54: quién agarra, el daño
+  que se repite, se suelta al empezar el turno de quien agarra). Lo usan el Agarrón (sin daño) y el Abrazo aplastante (con daño).

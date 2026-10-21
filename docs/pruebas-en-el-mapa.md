@@ -23,6 +23,8 @@
   que el Sangrado entre por 2 turnos y que con crítico quede permanente.
 - [ ] **🩸 Tajo de carnicero / Destripar** (2026-10-21, 4 SP): Perfora 1 y Crítico frecuente +1; si pega, Sangrado fuerte (3 por turno, 3 turnos).
 - [ ] **🦵 Golpe a la rodilla / Tarascón al tobillo / Tiro a la rodilla** (2026-10-21, 2 SP): si pega, Rengo 2 turnos; mirar que moverse le cueste 2 No2.
+- [ ] **🕸 Red / Tela de araña** (2026-10-21): Probabilidad de Golpe contra Evasión; Inmovilizado; soltarse al empezar su turno; la ayuda de un aliado.
+- [ ] **🤼 Agarrón / Abrazo aplastante** (2026-10-21): Agarrado y Agarrando; soltarse; el apretón repite el daño (el Abrazo); suelta al empezar el turno de la bestia.
 - [ ] **💥 Daño de colisión** (P178, 2026-10-21): un empujón (la Cornada con carrera, una ráfaga) que choca contra una pared → una Constitución del
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 

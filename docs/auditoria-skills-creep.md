@@ -20,7 +20,7 @@
 
 ## Clasificación: las de choque («melee», 70 de las 321)
 
-- **Golpes simples (8):** Golpe fuerte ✅, Tajo veloz ✅, Estocada ✅, Zarpazo ✅, Mordisco feroz ✅, Cornada ✅, Puño de roca, Golpe de pomo.
+- **Golpes simples (8):** Golpe fuerte ✅, Tajo veloz ✅, Estocada ✅, Zarpazo ✅, Mordisco feroz ✅, Cornada ✅, Puño de roca ✅, Golpe de pomo.
 - **Golpes con efecto (~14):** Golpe que sangra, Mordisco que lisia, Golpe atontador, Corte profundo, Zarpazo desgarrador, Zarpa oxidante, Golpe
   glacial, Toque abrasador, Mordisco vampírico, Golpe vigorizante, Golpe brutal y guardia, Golpe de escudo, Golpe doble, Ráfaga de golpes, Aplastar,
   Golpe de mano.
@@ -70,6 +70,10 @@
   Probado en el mapa (corrió 2 casilleros: «+3 PdG · +3 de daño fijo», pegó y empujó a Silvia 3 casilleros). El daño de colisión del empujón sigue
   ✋ a mano (P178, propuesta al dueño: 1d4 por casillero que le faltó, restando la Defensa, y lo mismo a contra quien choca).
 
+- ✅ **Puño de roca** (constructos y elementales, 2026-10-21). Original: «Un puñetazo que rompe huesos.» Antes: 2d6 + nivel fijo, sin arma ni duelo.
+  **Ahora** (dueño: «que sume daño y demora», «+2 al daño»): un ataque con su arma con **+2 al daño; si pega, Demora** (baja 1 lugar en el orden de
+  turnos). Costo de un ataque, cooldown 2 o **2 SP**. Probado en el mapa.
+
 ## Etiquetas
 
 - Cada habilidad ya trae etiquetas de función, velocidad, raza (tipo de criatura), rol, a quién apunta, mecánicas y automatización. Desde el
@@ -78,4 +82,7 @@
 
 ## Sigue
 
-- Puño de roca, Golpe de pomo (los golpes simples que quedan).
+- **Forma de trabajo desde el 2026-10-21:** lo definido se programa y se anota en «Auditoría de creeps: para probar» (`docs/pruebas-en-el-mapa.md`);
+  las pruebas en el mapa se corren todas juntas cuando el dueño lo pide.
+
+- Golpe de pomo (el último de los golpes simples); después, los golpes con efecto.

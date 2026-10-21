@@ -8,6 +8,17 @@
 > Cómo: partida «Claude · pruebas» (`?partida=YWjRbx7eJlqQpL1wtCKH`), las dos cuentas de Chrome (jugador y GM), la Botonera nueva del mapa y
 > capturas. Al probar algo: pasarlo a «Probado» con fecha, qué se vio y si hubo que arreglar algo.
 
+## Auditoría de creeps: para probar
+
+> Forma de trabajo del dueño (2026-10-21): lo que se define en la auditoría de habilidades de creep (`docs/auditoria-skills-creep.md`) se programa,
+> pasa las pruebas automáticas y se sube, **pero no se prueba en el mapa en el momento**: se anota acá. Cuando el dueño lo pida, se corren todas
+> juntas en el mapa, con capturas, y se marcan.
+
+- [x] Golpe fuerte, Tajo veloz, Estocada, Zarpazo, Mordisco feroz y Cornada — probadas en el mapa una por una (2026-10-20/21, antes de esta forma
+  de trabajo).
+- [x] **👊 Puño de roca** (+2 al daño y Demora) — probado en el mapa el 2026-10-21: la declaración dice «+2 de daño fijo» y la Demora bajó a Silvia
+  del 2.º al 3.º lugar del orden de turnos.
+
 ## Pendientes
 - [x] **🔥 Llama de Fénix** — probado en el mapa el 2026-10-20: Aurelia tomó el elixir desde su Botonera; un golpe de 100 del GM la levantó en el mismo golpe con toda la vida (50) y el SP lleno, Titilando, con el cartel «renace de sus cenizas»; un creep con la llama, igual (5/5).
 - [x] **🧪 Escudos de poción** — probado en el mapa el 2026-10-20: Aurelia tomó la Poción de Cuero Duro (15); un golpe físico de 8 del GM lo absorbió entero (escudo 15 → 7, vida 50) y uno especial de 6 fue a la vida (50 → 44).

@@ -52,6 +52,12 @@ const ESTADOS_PRESET = [
     detalle:'PdG y Parry a la mitad (redondeado hacia abajo) mientras dure.'},
   {nombre:'Inmovilizado', polaridad:'debuff', turnos:3, inmovilizado:true, esCC:true,
     detalle:'No se puede mover mientras dure (los Nitros siguen sirviendo para lo demás). ⚠ Regla provisoria.'},
+  // 🦷 Mordisco feroz (2026-10-21, dueño): el mordido no se mueve; al empezar su turno tira para soltarse (gratis) y, si no se suelta, el mordisco le
+  // vuelve a hacer daño. Lo suelta la bestia al empezar su siguiente turno. La bestia queda «Mordiendo» (tampoco se mueve). ⚙ El mapa: js/54.
+  {nombre:'Mordido', polaridad:'debuff', turnos:0, permanente:true, inmovilizado:true, esCC:true,
+    detalle:'Agarrado de los dientes: no se puede mover. Al empezar su turno tira para soltarse, gratis; si no se suelta, el mordisco le vuelve a hacer daño. Lo suelta la bestia al empezar su siguiente turno. ⚙ Automatizado en el mapa.'},
+  {nombre:'Mordiendo', polaridad:'otro', turnos:0, permanente:true, inmovilizado:true,
+    detalle:'Tiene a alguien agarrado de los dientes: no se mueve. Lo suelta al empezar su próximo turno, o antes si el otro se zafa. ⚙ Automatizado en el mapa.'},
   {nombre:'Rengo', polaridad:'debuff', turnos:3, rengo:true, esCC:true,
     detalle:'Moverse cuesta 2 Nitros por casillero mientras dure. ⚠ Valor provisorio (antes Movimiento a la mitad).'},
   // Lento (2026-10-04, dueño, con las mecánicas de los pies): el primer casillero que se mueve en cada turno cuesta el doble. Lo acorta Recuperarse rápido.

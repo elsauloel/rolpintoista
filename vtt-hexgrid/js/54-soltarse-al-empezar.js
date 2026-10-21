@@ -10,6 +10,7 @@ async function soltarAlEmpezarRevisar(){
   const o = iniciativa.orden[iniciativa.turno];
   const t = o && tokens.get(o.id);
   if(!t) return;
+  if(soyGM) mordidaSoltar(o.id, iniciativa.paso);   // 🦷 la bestia suelta al empezar su turno
   const clave = `${o.id}@${iniciativa.paso}`;
   if(soltarAlEmpezarHechos.has(clave)) return;
   const ref = String(t.fichaId || '');
@@ -20,7 +21,7 @@ async function soltarAlEmpezarRevisar(){
       const est = sc && soltarAlEmpezarDe(sc.estados);
       if(!est) return;
       soltarAlEmpezarHechos.add(clave);
-      soltarAlEmpezarCartel(clave, sc.nombre, est, () => soltarAlEmpezarCreep(clave, ref));
+      soltarAlEmpezarCartel(clave, sc.nombre, est, () => soltarAlEmpezarCreep(clave, ref, t));
       return;
     }
     if(!ref) return;
@@ -35,22 +36,22 @@ async function soltarAlEmpezarRevisar(){
     });
     if(!info) return;
     soltarAlEmpezarHechos.add(clave);
-    soltarAlEmpezarCartel(clave, info.nombre, info.est, () => soltarAlEmpezarPj(clave, fichaId, invId));
+    soltarAlEmpezarCartel(clave, info.nombre, info.est, () => soltarAlEmpezarPj(clave, fichaId, invId, t));
   }catch(err){ console.error('Soltarse al empezar el turno:', err); }
 }
 function soltarAlEmpezarCartel(clave, nombre, est, tirar){
   const s = Combatiente.soltarNorm(est.soltar);
   AvisoCombate.cartel('soltar-' + clave, {icono: '🔓', titulo: `${nombre}: ¿se suelta?`,
-    texto: `Empieza su turno atrapado (${est.nombre}). Tira ${s.etq} contra ${s.dif}: si llega, se suelta. Esta tirada no cuesta No2.`,
+    texto: `Empieza su turno atrapado (${est.nombre}). Tira ${s.etq} contra ${s.dif}: si llega, se suelta. Esta tirada no cuesta No2.${s.danoFalla ? ` Si no se suelta, ${s.deNombre ? 'el mordisco de ' + s.deNombre : 'el mordisco'} le vuelve a hacer daño (${s.danoFalla}).` : ''}`,
     botones: [{texto: `🎲 Tirar ${s.etq}`, alClic: tirar}, {texto: 'Ahora no', sec: true, alClic: () => AvisoCombate.cartel('soltar-' + clave, null)}]});
 }
-function soltarAlEmpezarResultado(clave, nombre, estNombre, tt){
-  const txt = tt.ok ? `${nombre} se soltó de ${estNombre} (${tt.r ? tt.r.total : '—'} contra ${tt.s.dif}).` : `${nombre} no se soltó de ${estNombre} (${tt.r ? tt.r.total : '—'} contra ${tt.s.dif}): sigue atrapado este turno.`;
+function soltarAlEmpezarResultado(clave, nombre, estNombre, tt, extra){
+  const txt = (tt.ok ? `${nombre} se soltó de ${estNombre} (${tt.r ? tt.r.total : '—'} contra ${tt.s.dif}).` : `${nombre} no se soltó de ${estNombre} (${tt.r ? tt.r.total : '—'} contra ${tt.s.dif}): sigue atrapado este turno.`) + (extra ? ' ' + extra : '');
   mesaLinea(`🔓 ${txt}`, 'recordatorio');
   AvisoCombate.cartel('soltar-' + clave, {icono: '🔓', titulo: `${nombre}: ¿se suelta?`, veredicto: {tono: tt.ok ? 'bueno' : 'malo', grande: tt.ok ? '¡SE SOLTÓ!' : 'SIGUE ATRAPADO', chico: txt},
     botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cartel('soltar-' + clave, null)}]});
 }
-async function soltarAlEmpezarCreep(clave, creepId){
+async function soltarAlEmpezarCreep(clave, creepId, t){
   const p = creepsPriv.get(creepId), sc = p && p.sc;
   const tt = sc && CreepAcciones.tiradaSoltarse(sc);
   if(!tt || !tt.r){ AvisoCombate.cartel('soltar-' + clave, null); return; }
@@ -58,9 +59,10 @@ async function soltarAlEmpezarCreep(clave, creepId){
   const estNombre = ((sc.estados || []).find(e => e.id === tt.estId) || {}).nombre || 'el estado';
   mesaPublicar(tt.origen, {...tt.r, quien: sc.nombre, desde: 'gm'});
   try{ await modificarCreep(creepId, c => { CreepAcciones.aplicarSoltarse(c, gratis); return {}; }); }catch(err){ console.error(err); toast('No se pudo anotar el resultado: sacá el estado a mano'); }
-  soltarAlEmpezarResultado(clave, sc.nombre, estNombre, tt);
+  const extra = !tt.ok && tt.s.danoFalla ? await mordidaDano(t, sc.nombre, tt.s) : '';
+  soltarAlEmpezarResultado(clave, sc.nombre, estNombre, tt, extra);
 }
-async function soltarAlEmpezarPj(clave, fichaId, invId){
+async function soltarAlEmpezarPj(clave, fichaId, invId, t){
   let res = null;
   await editarPersonajeMapa(fichaId, S => {
     if(invId){
@@ -83,8 +85,84 @@ async function soltarAlEmpezarPj(clave, fichaId, invId){
   });
   if(!res){ AvisoCombate.cartel('soltar-' + clave, null); return; }
   mesaPublicar(`${res.nombre} · Soltarse (${res.est}) · ${res.tt.s.etq} contra ${res.tt.s.dif}`, {...res.tt.r, quien: res.nombre, ficha: fichaId});
-  soltarAlEmpezarResultado(clave, res.nombre, res.est, res.tt);
+  const extra = !res.tt.ok && res.tt.s.danoFalla ? await mordidaDano(t, res.nombre, res.tt.s) : '';
+  soltarAlEmpezarResultado(clave, res.nombre, res.est, res.tt, extra);
 }
+
+/* ---------- 🦷 Mordisco feroz (2026-10-21, dueño: «mientras la bestia me está mordiendo, debería repetir el daño… y si tira para soltarse y no se
+   suelta, debería hacerle daño»; «también queda trabada, y al principio del siguiente turno la bestia se suelta») ----------
+   El estado «Mordido» lleva en su `soltar` quién lo tiene agarrado (`de`, el token) y el daño que se repite (`danoFalla`). Al pegar, la bestia queda
+   «Mordiendo» (`muerdeA`). Si el mordido no se suelta al empezar su turno, `mordidaDano` le aplica ese daño otra vez (con su Defensa). Al empezar el
+   turno de la bestia, `mordidaSoltar` (el GM) les saca los dos estados; y si el mordido se zafa antes, el revisado de abajo le saca el «Mordiendo» a
+   la bestia. */
+async function mordidaEmpezar(d, spec){
+  const ta = tokens.get(d.atacante.tokenId), victima = nombreDe(tokens.get(d.defensor.tokenId)) || d.defensor.nombre || 'alguien';
+  if(spec.soltar) spec.soltar = {...spec.soltar, de: d.atacante.tokenId, deNombre: String(d.atacante.nombre || '').slice(0, 40)};
+  if(!ta) return;
+  const est = {nombre: 'Mordiendo', muerdeA: d.defensor.tokenId, muerdeANombre: String(victima).slice(0, 40), desde: Date.now()};
+  try{
+    if(ta.tipo === 'creep') await modificarCreep(String(ta.fichaId), c => { EstadosAplicar.aplicarACreep(c, est); return {}; });
+    else{ const f = fichasPub.get(String(ta.fichaId).split(SEP_INVOCACION)[0]); await EstadosAplicar.encolarPj({fichaId: ta.fichaId, duenoUid: (f && f.duenoUid) || ta.duenoUid, spec: est, origen: `${d.atacante.nombre} · mordisco`}); }
+  }catch(err){ console.error('Mordisco: no se pudo trabar a la bestia', err); }
+}
+// El daño que se repite al no soltarse. → el texto para el cartel.
+async function mordidaDano(t, nombre, s){
+  const r = typeof tirarDados === 'function' ? tirarDados(s.danoFalla) : null;
+  if(!t || !r) return `✋ El mordisco le vuelve a hacer daño (${s.danoFalla}): aplicalo a mano.`;
+  const quien = s.deNombre || 'La bestia';
+  mesaPublicar(`🦷 ${quien} sigue mordiendo a ${nombre} · Daño`, {...r, quien, ...(t.tipo === 'creep' ? {desde: 'gm'} : {})});
+  let res = null;
+  try{
+    if(t.tipo === 'creep'){ if(soyGM) res = await danioCreep(t, String(r.total), false, 0, 0); }
+    else res = await (String(t.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(t, String(r.total), false, 0, 0);
+  }catch(err){ console.error('Mordisco: no se pudo aplicar el daño', err); }
+  const txt = res && res.r ? `${quien} sigue mordiendo: ${s.danoFalla} = ${r.total}${res.r.invulnerable ? ' → Invulnerable: no le hizo nada' : ` − Defensa ${fmt(res.r.defensa)} → ${fmt(res.r.recibido)} de daño`}.`
+    : `${quien} sigue mordiendo: ${s.danoFalla} = ${r.total} de daño, menos su Defensa — aplicalo a mano.`;
+  mesaLinea(`🦷 ${txt}`, 'recordatorio');
+  if(typeof momentoAbrir === 'function') momentoAbrir({tipo: 'mordisco', icono: '🦷', titulo: `${quien} sigue mordiendo a ${nombre}`, resultado: txt, estado: 'listo', datos: {chico: true}});
+  return txt;
+}
+// Le saca un estado a un token (el GM): un creep directo; un personaje o una invocación, por aviso a su pantalla.
+async function mordidaQuitar(t, nombreEstado, origen){
+  if(!t) return;
+  if(t.tipo === 'creep') return modificarCreep(String(t.fichaId), c => { c.estados = (c.estados || []).filter(z => !(z && z.nombre === nombreEstado)); return {}; });
+  const f = fichasPub.get(String(t.fichaId).split(SEP_INVOCACION)[0]);
+  return EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: (f && f.duenoUid) || t.duenoUid, spec: {nombre: 'Quitar estado', estado: nombreEstado}, origen});
+}
+const mordidaHechos = new Set();   // token@paso: una vez por turno
+async function mordidaSoltar(tokenId, paso){
+  const clave = `${tokenId}@${paso}`;
+  if(mordidaHechos.has(clave)) return;
+  mordidaHechos.add(clave);
+  const bestia = tokens.get(tokenId);
+  if(!bestia) return;
+  const quien = nombreDe(bestia), soltados = [];
+  for(const [id, t] of tokens){
+    if(id === tokenId || !confusionEstadosDe(t).some(e => e && e.nombre === 'Mordido' && e.soltar && e.soltar.de === tokenId)) continue;
+    try{ await mordidaQuitar(t, 'Mordido', `${quien} te soltó`); soltados.push(nombreDe(t)); }catch(err){ console.error('Mordisco: no se pudo soltar', err); toast(`Sacale Mordido a ${nombreDe(t)} a mano`); }
+  }
+  if(confusionEstadosDe(bestia).some(e => e && e.nombre === 'Mordiendo')) try{ await mordidaQuitar(bestia, 'Mordiendo', 'Soltaste'); }catch(err){ console.error(err); }
+  if(soltados.length){
+    const txt = `${quien} suelta a ${soltados.join(' y ')} al empezar su turno.`;
+    mesaLinea(`🦷 ${txt}`, 'recordatorio');
+    if(typeof momentoAbrir === 'function') momentoAbrir({tipo: 'mordisco', icono: '🦷', titulo: `${quien} suelta`, resultado: txt, estado: 'listo', datos: {chico: true}});
+  }
+}
+// Si el mordido se zafó antes (o ya no está), la bestia deja de estar trabada. Solo el GM; desde los 8 s de morder (el estado del mordido tarda en llegar).
+const mordidaRevisando = new Set();
+setInterval(() => {
+  if(typeof tokens === 'undefined' || !soyGM) return;
+  tokens.forEach((b, bid) => {
+    if(b.tipo !== 'creep' || mordidaRevisando.has(bid)) return;
+    const e = confusionEstadosDe(b).find(x => x && x.nombre === 'Mordiendo' && x.muerdeA);
+    if(!e || Date.now() - num(e.desde) < 8000) return;
+    const v = tokens.get(e.muerdeA);
+    if(v && confusionEstadosDe(v).some(x => x && x.nombre === 'Mordido' && x.soltar && x.soltar.de === bid)) return;
+    mordidaRevisando.add(bid);
+    mordidaQuitar(b, 'Mordiendo', 'Se zafó').then(() => mesaLinea(`🦷 ${nombreDe(b)} ya no tiene agarrado a ${e.muerdeANombre || 'nadie'}: queda libre.`, 'recordatorio'))
+      .catch(err => console.error('Mordisco:', err)).finally(() => setTimeout(() => mordidaRevisando.delete(bid), 3000));
+  });
+}, 2000);
 
 /* ---------- 🤝 Ayudar a soltar a un aliado (2026-10-20, dueño: «un aliado se puede parar de manera adyacente a la red y gastar un nitro en tirar su
    propia Fuerza contra el Efecto especial para intentar asistir a su colega») ----------

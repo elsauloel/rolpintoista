@@ -21,8 +21,8 @@
   const zO = (detalle, no2, dano) => ({detalle, no2, dano});
   const tA = (detalle, no2) => ({detalle, no2});
   // Un ataque con su arma, con arreglos (`arma`: los de la Ejecución ✨ — dados, pdg, fijo, perfora, critBono…), que va al duelo como un ataque.
-  const aA = (detalle, arma, ataqueTxt, spCosto) => ({detalle, no2: 'ATAQUE', ataqueTxt, auditada: true, ...(spCosto !== undefined ? {spCosto} : {}),
-    duelo: {modo: 'arma', objetivo: 'enemigo', x: 'nitros', arma: {pdg: 0, dados: 0, fijo: 0, ...arma}, efectos: []}});
+  const aA = (detalle, arma, ataqueTxt, spCosto, efectos) => ({detalle, no2: 'ATAQUE', ataqueTxt, auditada: true, ...(spCosto !== undefined ? {spCosto} : {}),
+    duelo: {modo: 'arma', objetivo: 'enemigo', x: 'nitros', arma: {pdg: 0, dados: 0, fijo: 0, ...arma}, efectos: efectos || []}});
   const bU = (detalle, no2, mods, turnos) => ({detalle, no2, efecto: {mods, turnos}});
   const cU = (detalle, no2, k) => ({detalle, no2, cura: k});
   const dC = (detalle, no2, dano, k) => ({detalle, no2, dano, cura: k});
@@ -81,7 +81,11 @@
   // Auditada (dueño, 2026-10-21): salvaje — Crítico potente +2 y +1 al daño, 2 SP (o cooldown 2), como el Lisiar del Asalto sin la Lesión.
   H('Zarpazo', 'D', 'b', 'me', 2, aA('Un zarpazo salvaje: un ataque con su arma con Crítico potente +2 (si sale el crítico, multiplica más) y +1 al daño.', {critpotBono: 2, fijo: 1},
     'va al duelo como un ataque (PdG contra Evasión o Parry, Bloqueo y crítico) con Crítico potente +2 y +1 al daño', 2));
-  H('Mordisco feroz', 'D', 'b', 'me', 2, aT('Una mordida profunda.', 'M'));
+  // Auditada (dueño, 2026-10-21): la que no suelta — si pega, el mordido y la bestia quedan trabados; al empezar su turno el mordido tira Fuerza contra
+  // la Fuerza de la bestia (gratis) y, si no se suelta, el mordisco le vuelve a hacer daño; la bestia lo suelta al empezar su siguiente turno (js/54).
+  H('Mordisco feroz', 'D', 'b', 'me', 3, aA('Una mordida profunda que no suelta: un ataque con su arma con +1 dado del Tipo de su arma. Si pega, el objetivo queda Mordido (no se mueve, y la bestia tampoco): al empezar su turno tira Fuerza contra la Fuerza de la bestia, gratis; si no se suelta, el mordisco le vuelve a hacer el mismo daño. La bestia lo suelta al empezar su siguiente turno.',
+    {dados: 1}, 'va al duelo como un ataque con +1 dado del Tipo de su arma; si pega, deja Mordido (se suelta con Fuerza contra su Fuerza; si no, recibe el daño otra vez)', 3,
+    [{nombre: 'Mordido', soltar: {stat: 'fue', etq: 'Fuerza', difStat: 'fue', no2: 0, alEmpezar: true, danoFalla: 'golpe'}}]));
   H('Mordisco venenoso', 'DX', 'b', 'ex', 3, zO('Muerde y, si golpea, tirá 1d4: con 1 el objetivo queda Envenenado (a mano).', 2, 'L'));
   H('Cornada', 'D', 'b', 'mt', 2, aT('Embiste con los cuernos.', 'M'));
   H('Coletazo', 'DA', 'bc', 'mt', 3, zO('Un giro de cola que golpea a los adyacentes (a mano).', 3, 'M'));

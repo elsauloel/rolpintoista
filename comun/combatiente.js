@@ -443,7 +443,11 @@ const Combatiente = (() => {
     if(!s || !s.stat || !(Number(s.dif) >= 1)) return null;
     const hunde = Math.max(0, Math.min(5, Math.round(Number(s.hunde) || 0)));   // arena movediza (dueño, 2026-10-04): si falla, se hunde más (+N turnos)
     return {stat: String(s.stat), etq: String(s.etq || SOLTAR_ETQ[s.stat] || s.stat).slice(0, 20), dif: Math.round(Number(s.dif)), no2: Math.max(0, Math.round(Number(s.no2) || 0)), ...(hunde ? {hunde} : {}),
-      ...(s.alEmpezar ? {alEmpezar: true} : {}), ...(s.ayuda ? {ayuda: true} : {})};   // 🤝 un aliado pegado puede ayudar a soltarlo (1 No2, su propia tirada)   // 🔓 la tirada aparece sola al empezar su turno (2026-10-20, la Red Nerubian: vtt-hexgrid/js/54)
+      ...(s.alEmpezar ? {alEmpezar: true} : {}), ...(s.ayuda ? {ayuda: true} : {}),   // 🤝 un aliado pegado puede ayudar a soltarlo (1 No2, su propia tirada)   // 🔓 la tirada aparece sola al empezar su turno (2026-10-20, la Red Nerubian: vtt-hexgrid/js/54)
+      // 🦷 Mordisco feroz (2026-10-21, dueño): si no se suelta, le vuelve a entrar el daño (`danoFalla`, una fórmula); `de` = el token que lo tiene
+      // agarrado (lo suelta al empezar el turno de ese token: vtt-hexgrid/js/54).
+      ...(/^\d{1,2}d\d{1,3}([+-]\d{1,3})?$/i.test(String(s.danoFalla || '').replace(/\s+/g, '')) ? {danoFalla: String(s.danoFalla).replace(/\s+/g, '').toLowerCase()} : {}),
+      ...(s.de ? {de: String(s.de).slice(0, 80), deNombre: String(s.deNombre || '').slice(0, 40)} : {})};
   }
   const estadoSoltable = estados => (estados || []).find(e => e && e.activo !== false && soltarNorm(e.soltar)) || null;
   const textoSoltarse = e => { const s = soltarNorm(e && e.soltar); return s ? `🔓 Soltarse · ${s.etq} contra ${s.dif} · ${s.no2} No2${s.hunde ? ` · si falla, se hunde: +${s.hunde} turno${s.hunde === 1 ? '' : 's'}` : ''}` : ''; };
@@ -1170,7 +1174,7 @@ const Combatiente = (() => {
     aturdimiento: {label: 'Aturdimiento', icono: '💫', resiste: 'rescc', estados: ['Stun', 'Pajaritos', 'Parálisis', 'Exhausto']},
     herida: {label: 'Heridas', icono: '🦵', resiste: 'rescc', estados: ['Lisiado', 'Rengo']},
     sentidos: {label: 'Sentidos', icono: '👁', resiste: 'rescc', estados: ['Ceguera']},
-    atrapar: {label: 'Atrapar', icono: '⛓', resiste: 'fue', estados: ['Inmovilizado', 'Lento']},
+    atrapar: {label: 'Atrapar', icono: '⛓', resiste: 'fue', estados: ['Inmovilizado', 'Lento', 'Mordido']},
     equilibrio: {label: 'Equilibrio', icono: '🤸', resiste: 'agl', estados: ['Sentado']},
     desarme: {label: 'Desarme', icono: '✋', resiste: 'fue', estados: ['Desarmado', 'Desarme']},
   };
@@ -1519,9 +1523,17 @@ const Combatiente = (() => {
     const a = c.arma || {}, arma = o.arma || {}, conX = o.X !== undefined && o.X !== null, X = nf(o.X);
     const sx = t => conX ? sustituirX(t, X) : t;
     // La probabilidad del efecto (`caras`/`exitos`, 2026-10-13: el Mordisco infectado, 25 % = 4 en d4); sin eso, entra siempre.
+    // 🔓 Cómo se suelta (2026-10-21, el Mordisco feroz): `difStat` = el stat de quien ataca (`o.valorDe`); `danoFalla: 'golpe'` = el daño de este
+    // mismo golpe otra vez (`o.danoGolpe(dados)`: el arma con los dados de más de la habilidad, más su daño fijo).
+    const soltarDe = s => {
+      const v = s.difStat && typeof o.valorDe === 'function' ? Number(o.valorDe(s.difStat)) : NaN;
+      const g = s.danoFalla === 'golpe' && typeof o.danoGolpe === 'function' ? String(o.danoGolpe(nf(a.dados)) || '') + (nf(a.fijo) ? `+${nf(a.fijo)}` : '') : s.danoFalla;
+      return {...s, ...(Number.isFinite(v) ? {dif: Math.max(1, Math.round(v))} : {}), ...(g && g !== 'golpe' ? {danoFalla: g} : {})};
+    };
     const mapEf = e => ({nombre: e.nombre || (e.cura ? 'Curación' : ''), caras: Math.max(1, Math.round(nf(e.caras)) || 1), exitos: Math.min(Math.max(1, Math.round(nf(e.caras)) || 1), Math.max(1, Math.round(nf(e.exitos)) || 1)),
       spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: nf(e.val)}] : e.mods, polaridad: e.stat ? (nf(e.val) >= 0 ? 'buff' : 'debuff') : undefined,
-        ...(nf(e.stacks) > 0 ? {stacks: Math.round(nf(e.stacks))} : {})},   // (Sangrado de N: Tajear, 2026-10-10)
+        ...(nf(e.stacks) > 0 ? {stacks: Math.round(nf(e.stacks))} : {}),   // (Sangrado de N: Tajear, 2026-10-10)
+        ...(e.soltar ? {soltar: soltarDe(e.soltar)} : {})},
       cura: nf(e.cura), detalle: e.detalle || ''});
     const critico = c.critico ? {
       ...(c.critico.efectos && c.critico.efectos.length ? {efectos: c.critico.efectos.map(mapEf)} : {}),

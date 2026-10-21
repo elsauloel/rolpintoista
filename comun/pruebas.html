@@ -929,6 +929,14 @@ prueba('⚔ Golpe fuerte de creep y Golpe brutal (auditados 2026-10-20): +1 dado
   const gb = CLASES_SKILLS.find(c => c.id === 'warrior').habilidades.find(h => h.id === 'warrior-golpe-brutal');
   igual([a.mods.dados, gb.efectoNombre, gb.efectoTurnos, gb.efectoMods[0].stat, gb.efectoMods[0].val], [1, 'Guardia baja', 1, 'eva', -2]);
 });
+prueba('🦷 Mordisco feroz (2026-10-21): deja Mordido con la Fuerza de la bestia y el mismo daño si no se suelta', () => {
+  const c = {modo: 'arma', arma: {dados: 1}, efectos: [{nombre: 'Mordido', soltar: {stat: 'fue', etq: 'Fuerza', difStat: 'fue', no2: 0, alEmpezar: true, danoFalla: 'golpe'}}]};
+  const a = Combatiente.ataqueConArreglos({nombre: 'Mordisco feroz'}, c, {arma: {}, valorDe: s => s === 'fue' ? 5 : 0, danoGolpe: extra => `${1 + extra}d4+3`});
+  const s = Combatiente.soltarNorm({...a.efectos[0].spec.soltar, de: 'tok1', deNombre: 'Lobo'});
+  const est = EstadosAplicar.componer({nombre: 'Mordiendo', muerdeA: 'tok2', muerdeANombre: 'Silvia', desde: 5});
+  igual([s.dif, s.danoFalla, s.alEmpezar, s.no2, s.de, Combatiente.grupoCC('Mordido'), !!EstadosAplicar.componer({nombre: 'Mordido'}).inmovilizado, est.inmovilizado, est.muerdeA, Combatiente.inmunidad([{nombre: 'Inmunidad a CC', inmunidadCC: true}], est)],
+    [5, '2d4+3', true, 0, 'tok1', 'atrapar', true, true, 'tok2', false]);
+});
 prueba('💧 La recarga de SP de un personaje nunca baja de 1 (2026-10-20, P215)', () => {
   const S = FichaGuardado.normalizar({attrs: {fue: 3, con: 3, agl: 3, des: 3, esp: 1}}).S;
   const S3 = FichaGuardado.normalizar({attrs: {fue: 3, con: 3, agl: 3, des: 3, esp: 6}}).S;

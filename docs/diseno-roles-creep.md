@@ -88,7 +88,8 @@ líneas, zonas, el rayo en cadena y los charcos, los controles mentales.
 
 ## 5. Support — el listado completo (2026-10-21)
 
-Pedido del dueño: arrancar por las que **aceleran la pelea** (que se resuelva atacando, no aguantando), sin curar ni proteger; y tener a mano todas
+**Son conceptos de diseño** (dueño, 2026-10-21): cada vez que toque una habilidad de support se explora uno de estos (y se marca ✅ el que quede
+cubierto). Pedido del dueño: arrancar por las que **aceleran la pelea** (que se resuelva atacando, no aguantando), sin curar ni proteger; y tener a mano todas
 las posibilidades del rol. ✦ = acelera la pelea. Lo que ya existe en el mapa para personajes (Empower, Re-roll, Enyetar, Marcado, Turno libre,
 Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep está auditada; las que hay son casi todas «a mano».
 

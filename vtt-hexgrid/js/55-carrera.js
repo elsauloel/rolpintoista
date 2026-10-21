@@ -5,6 +5,74 @@
    creep corre en línea recta (`lineaHex`) hasta quedar al lado, pagando lo que cuesta moverse (1 No2 por casillero; Rengo, 2), y el ataque suma +1 PdG,
    +1 al daño y +1 casilla de empuje por cada casillero que corrió. Si no hay línea recta libre (un Sólido, una pared, otro token) o no se puede mover,
    avisa y deja atacar igual sin la carrera. Lo llama `dueloElegirObjetivoMapa` (js/13). → el ataque (con los bonos) o null (elegir otro). */
+/* ---------- 🦘 El Salto (2026-10-21, dueño: «se saltea hasta dos casilleros, es decir, que se desplaza tres»; «un salto de 1,5 metros de altura») ----------
+   Una Ejecución «con tu arma» con `salto` (→ `ataque.saltoHab` = hasta cuántos casilleros se desplaza): al elegir el objetivo, el creep salta por encima de
+   lo que haya hasta una casilla libre pegada al objetivo, a `saltoHab` o menos. Sin No2 y sin ataque de oportunidad. Si el salto pasa por encima de algo
+   con colisión (una pared, un Sólido), pregunta si puede saltarlo (lo decide la mesa). Con `aplasta` (Salto aplastante): al caer, los rivales pegados a
+   donde cayó tiran Res.CC contra su Fuerza; quien no llega queda Sentado. Si ya está al lado, ataca sin saltar; si no llega o no hay dónde caer, avisa y
+   deja atacar igual. → true para seguir, null para elegir otro. */
+async function saltoHab(mio, t, ataque, yo){
+  const n = Math.round(num(ataque.saltoHab)), dist = distanciaHex(mio, t), nom = nombreDe(mio), obj = nombreDe(t);
+  if(dist <= 1){ if(ataque.saltoAplasta) await saltoAplastar(mio, yo); return true; }
+  const ocupada = c => elementoSolidoEn(c.col, c.fila) || [...tokens.entries()].some(([id, x]) => id !== mio.id && x.col === c.col && x.fila === c.fila && !x.bajoTierra);
+  const choca = c => lineaHex(mio, c).some((x, i, l) => elementoSolidoEn(x.col, x.fila) || (typeof paredCorta === 'function' && paredCorta(i ? l[i - 1] : mio, x)));
+  const cand = vecinosDeCasilla(t).filter(c => !ocupada(c) && distanciaHex(mio, c) <= n).sort((a, b) => (choca(a) - choca(b)) || (distanciaHex(mio, a) - distanciaHex(mio, b)));
+  let caer = cand[0];
+  if(!caer){
+    const motivo = dist - 1 > n ? `${obj} está muy lejos para el salto (cae a ${n} casilleros o menos)` : `no hay dónde caer al lado de ${obj}`;
+    const si = await AvisoCombate.preguntar(`${motivo}. ¿Atacar igual sin saltar? (lo decide la mesa)`, {icono: '🦘', titulo: 'Sin salto', si: 'Atacar igual', no: 'Elegir otro'});
+    if(si) mesaLinea(`🦘 ${nom} ataca a ${obj} sin saltar (${motivo}; lo decidió la mesa)`, 'alerta-roja');
+    return si ? true : null;
+  }
+  if(choca(caer)){   // por encima de algo con colisión: lo decide la mesa (dueño, 2026-10-21)
+    mesaLinea(`🦘 ${nom} quiere saltar por encima de algo con colisión (el salto es de 1,5 metros de altura): ¿puede? Lo decide la mesa`, 'alerta-roja');
+    const si = await AvisoCombate.preguntar(`El salto de ${nom} pasa por encima de algo con colisión (una pared, un Sólido). El salto es de 1,5 metros de altura: ¿puede saltarlo? Lo decide la mesa.`,
+      {icono: '🦘', titulo: '¿Puede saltarlo?', si: 'Sí, lo salta', no: 'No puede'});
+    if(!si){
+      const sinSaltar = await AvisoCombate.preguntar(`No lo salta. ¿Atacar a ${obj} igual sin saltar, o elegir otro objetivo?`, {icono: '🦘', titulo: 'Sin salto', si: 'Atacar igual', no: 'Elegir otro'});
+      if(sinSaltar) mesaLinea(`🦘 ${nom} no pudo saltar: ataca a ${obj} sin saltar (lo decidió la mesa)`, 'alerta-roja');
+      return sinSaltar ? true : null;
+    }
+    mesaLinea(`🦘 La mesa decidió que ${nom} sí puede saltarlo`, 'recordatorio');
+  }
+  const k = distanciaHex(mio, caer);
+  await coleccionTokens().doc(mio.id).update({col: caer.col, fila: caer.fila, rotacion: rotacionDePaso(hexCentro(caer.col, caer.fila), hexCentro(t.col, t.fila)), ruta: firebase.firestore.FieldValue.delete()});
+  if(typeof marcarMovido === 'function') marcarMovido(mio.id);
+  mio.col = caer.col; mio.fila = caer.fila;
+  const txt = `${nom} salta ${k} casillero${k === 1 ? '' : 's'} y cae al lado de ${obj}.`;
+  mesaLinea(`🦘 ${txt}`, 'recordatorio');
+  if(typeof momentoAbrir === 'function') momentoAbrir({tipo: 'salto', icono: '🦘', titulo: `${nom} salta`, resultado: txt, estado: 'listo', datos: {chico: true}});
+  if(ataque.saltoAplasta) await saltoAplastar(mio, yo);
+  return true;
+}
+// 💥 El Salto aplastante: los rivales pegados a donde cayó tiran Res.CC contra su Fuerza (una tirada para todos); quien no llega queda Sentado.
+async function saltoAplastar(mio, yo){
+  const sc = mio.tipo === 'creep' ? creepPrivadoDe(mio.fichaId) : null;
+  const vFue = sc ? CreepCalculo.statValor(sc, 'fue') : trampaValorStat(mio, 'fue');
+  const rivales = [...tokens.entries()].map(([id, x]) => ({...x, id})).filter(x => x.id !== mio.id && distanciaHex(x, mio) === 1 && !x.oculto && !x.bajoTierra && !etereoDe(x) && dueloEsRival(yo, x));
+  if(!rivales.length) return;
+  const nom = nombreDe(mio), rf = Combatiente.tirarStat(vFue, sc ? sc.estados : confusionEstadosDe(mio), 'fue');
+  if(!rf) return;
+  mesaPublicar(`💥 ${nom} cae aplastando · Fuerza`, {...rf, quien: nom, ...(mio.tipo === 'creep' ? {desde: 'gm'} : {})});
+  const lineas = [];
+  for(const x of rivales){
+    const rr = Combatiente.tirarStat(trampaValorStat(x, 'rescc'), confusionEstadosDe(x), 'rescc');
+    const n2 = nombreDe(x);
+    if(!rr){ lineas.push(`${n2}: ✋ tirá Res.CC a mano`); continue; }
+    mesaPublicar(`${n2} · Res.CC (para no caer)`, {...rr, quien: n2, ...(x.tipo === 'creep' ? {desde: 'gm'} : {ficha: String(x.fichaId).split(SEP_INVOCACION)[0]})});
+    const cae = rr.total < rf.total;   // empate: no cae (llega)
+    lineas.push(`${n2}: ${rr.total} contra ${rf.total} → ${cae ? 'queda Sentado' : 'se mantiene en pie'}`);
+    if(!cae) continue;
+    try{
+      if(x.tipo === 'creep') await modificarCreep(String(x.fichaId), c => { EstadosAplicar.aplicarACreep(c, {nombre: 'Sentado'}); return {}; });
+      else{ const f = fichasPub.get(String(x.fichaId).split(SEP_INVOCACION)[0]); await EstadosAplicar.encolarPj({fichaId: x.fichaId, duenoUid: (f && f.duenoUid) || x.duenoUid, spec: {nombre: 'Sentado'}, origen: `${nom} · Salto aplastante`}); }
+    }catch(err){ console.error('Salto aplastante: no se pudo sentar', err); lineas[lineas.length - 1] += ' (✋ ponéselo a mano)'; }
+  }
+  if(typeof esperarDadosMapa === 'function') await esperarDadosMapa();
+  const txt = `${nom} cae aplastando (Fuerza ${rf.total}): ${lineas.join(' · ')}.`;
+  mesaLinea(`💥 ${txt}`, 'recordatorio');
+  if(typeof momentoAbrir === 'function') momentoAbrir({tipo: 'salto', icono: '💥', titulo: `${nom} cae aplastando`, resultado: txt, estado: 'listo', datos: {chico: true}});
+}
 async function cargaEmbestida(mio, t, ataque, yo){
   const conBono = n => {
     const a = structuredClone(ataque);

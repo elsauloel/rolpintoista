@@ -1699,3 +1699,6 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
 - **💨 Hit and run** (2026-10-21, «picar y alejarse»; `js/57-alejarse.js`): un ataque con `alejarse` (lo guarda `Duelo.crear`); al resolverse, en la pantalla de quien
   atacó (`disparoResuelto` de js/14) `alejarseResuelto` abre el cartel del movimiento libre (`dodgeBanner.alejarse`): sin oportunidad y los primeros N
   casilleros gratis (js/06).
+- **🦘 El Salto** (2026-10-21, en `js/55-carrera.js`, `saltoHab`): una Ejecución «con tu arma» con `salto` (→ `ataque.saltoHab`); al elegir el objetivo
+  (`dueloElegirObjetivoMapa`, js/13) el creep cae en la casilla libre pegada al objetivo más cercana, a `saltoHab` o menos, por encima de tokens (no de
+  paredes ni Sólidos), sin No2 ni oportunidad. Lo usan Salto y Salto aplastante.

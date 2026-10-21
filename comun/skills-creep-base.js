@@ -51,6 +51,7 @@
     'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'],
     'Red': ['hunter', 'trabar'], 'Tela de araña': ['hunter', 'trabar'],
     'Hit and run': ['choque liviano', 'golpear y alejarse'],
+    'Salto': ['choque liviano', 'salto'], 'Salto aplastante': ['choque pesado', 'salto'],
   };
 
   // fn: función (D T B X C K M I A); mec: mecánicas del juego que usa, separadas por coma (sigilo, trampas, terreno…);
@@ -272,7 +273,7 @@
 
   /* ================= CONTROL / MOVILIDAD ================= */
   H('Cargar', 'M', 'b', 'me', 2, tA('Corre hacia un enemigo hasta 3 casilleros en línea recta (a mano).', 1));
-  H('Salto', 'M', 'bd', 'e', 2, tA('Salta 2 casilleros por encima de lo que haya en medio (a mano).', 1));
+  // (El «Salto» viejo, solo de movimiento y a mano, lo reemplaza el Salto auditado: 2026-10-21.)
   H('Retirada táctica', 'M', 'hd', 'r', 3, tA('Se aleja 2 casilleros sin provocar (a mano).', 1));
   H('Teletransporte corto', 'M', 'ega', 'g', 4, tA('Aparece en un casillero libre a 3 casilleros de distancia (a mano).', 2));
   H('Volar en picada', 'DM', 'b', 'e', 4, zO('Cae desde arriba sobre el objetivo (a mano el movimiento).', 3, 'M'));
@@ -288,6 +289,12 @@
   // gratis (sin No2) y sin oportunidad.
   H('Hit and run', 'DM', '*', 'e', 3, aA('Pica y se aleja: un ataque con su arma; pegue o no, después se aleja hasta 2 casilleros, gratis (sin No2) y sin dar ataque de oportunidad.',
     {}, 'va al duelo como un ataque; después, el cartel para alejarse hasta 2 casilleros gratis y sin ataque de oportunidad', 2, [], {alejarse: 2}));
+  // 🦘 El Salto (dueño, 2026-10-21): salta hasta 3 casilleros (por encima de hasta 2) y cae al lado del objetivo, sin No2 ni ataque de oportunidad.
+  H('Salto', 'DM', '*', 'e', 3, aA('Salta por encima de lo que haya (un salto de 1,5 metros de altura) y cae sobre el objetivo: se desplaza hasta 3 casilleros (salteando hasta 2) hasta quedar al lado, sin No2 ni ataque de oportunidad, y ataca con su arma con +1 a la Probabilidad de Golpe y Crítico frecuente +1. Saltar algo con colisión lo decide la mesa.',
+    {pdg: 1, critBono: 1}, 'salta hasta quedar al lado (el mapa) y va al duelo como un ataque con +1 PdG y Crítico frecuente +1', 2, [], {salto: 3}));
+  H('Salto aplastante', 'DMK', '*', 'mt', 4, aA('Salta y cae con todo el peso (un salto de 1,5 metros de altura): se desplaza hasta 3 casilleros (salteando hasta 2) hasta quedar al lado del objetivo, sin No2 ni ataque de oportunidad. Al caer, los rivales pegados tiran Res.CC contra su Fuerza: quien no llega queda Sentado. Después ataca con su arma con +2 al daño. Saltar algo con colisión lo decide la mesa.',
+    {fijo: 2}, 'salta hasta quedar al lado; los de al lado tiran Res.CC contra su Fuerza o quedan Sentados (el mapa); va al duelo como un ataque con +2 al daño', 3,
+    [], {salto: 3, aplasta: true}));
   // 🛡 Aguante (dueño, 2026-10-21; uno solo para bestias y humanoides): 1 No2 y 1 SP (o cooldown 3); +2 Defensa y +2 Defensa especial hasta su próximo
   // turno; su próximo ataque suma +1 dado del Tipo de su arma por cada golpe que recibió (1 SP por dado; en modo cooldown, +1 turno de cooldown por dado).
   H('Aguante', 'BT', '*', 'mt', 3, {detalle: 'Se planta y se la banca: +2 a la Defensa y +2 a la Defensa especial hasta que empiece su próximo turno, y cuenta cada golpe que le pega. En su próximo turno, al atacar, su ataque suma +1 dado del Tipo de su arma por cada golpe recibido (1 SP por dado; en modo cooldown, +1 turno de cooldown por dado), más los No2 del ataque.',

@@ -840,6 +840,11 @@ function dueloElegirObjetivoMapa(msg){
         try{ ataqueCarga = await cargaEmbestida(mio, t, ataque, yo); }catch(err){ console.error('No se pudo tomar carrera:', err); ataqueCarga = ataque; }
         if(!ataqueCarga){ pedir(); return; }
       }
+      if(ataque && ataque.saltoHab && mio && typeof saltoHab === 'function'){   // 🦘 el Salto (js/55): cae al lado del objetivo
+        let r = null;
+        try{ r = await saltoHab(mio, t, ataque, yo); }catch(err){ console.error('No se pudo saltar:', err); r = true; }
+        if(!r){ pedir(); return; }
+      }
       if(conArco && mio && Combatiente.arcoMuyCerca(ataque, distanciaHex({col: mio.col, fila: mio.fila}, {col: t.col, fila: t.fila}))){   // avisa y deja seguir: lo decide la mesa
         const si = await AvisoCombate.preguntar(`${nombreDe(t)} está muy cerca para el arco: hace falta al menos ${Combatiente.arcoLibresTxt(ataque)} entre los dos. Con el arco no se pega cuerpo a cuerpo: alejate o cambiá de arma. ¿Disparar igual? (lo decide la mesa)`,
           {icono: '🏹', titulo: 'Muy cerca para el arco', si: 'Disparar igual', no: 'Elegir otro'});

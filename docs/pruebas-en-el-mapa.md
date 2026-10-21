@@ -28,6 +28,8 @@
 - [ ] **🛡 Aguante** (2026-10-21): el anuncio «se pone en modo aguante», +2 Defensa y +2 Def.Esp, que cuente los golpes (también los que frena la armadura),
   el cartel al apretar Atacar en su turno con +N dados y su costo (modo SP y modo cooldown), y que se pierda si no ataca.
 - [ ] **💨 Hit and run** (2026-10-21): pegue o no, el cartel «se aleja»; que los primeros 2 casilleros sean gratis y sin oportunidad.
+- [ ] **🦘 Salto / Salto aplastante** (2026-10-21): que caiga al lado del objetivo saltando por encima de un token, sin No2 ni oportunidad; el cartel
+  «¿puede saltarlo?» al pasar por encima de una pared o un Sólido; los bonos en la declaración; el aplastante: Res.CC contra su Fuerza y el Sentado.
 - [ ] **💥 Daño de colisión** (P178, 2026-10-21): un empujón (la Cornada con carrera, una ráfaga) que choca contra una pared → una Constitución del
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 

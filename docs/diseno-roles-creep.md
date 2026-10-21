@@ -45,6 +45,7 @@ Lo que busca cada estilo. ✅ = ya hay habilidad auditada que lo cubre.
 10. **Romper la defensa del rival**: romperle la armadura o desarmarlo (Romper armadura, Desarmar).
 11. **Aguantar**: curarse o volver a levantarse (Segundo aliento, Regeneración rápida, Segunda fase).
 - ✅ **Empujar y reposicionar**: Cornada (empuja, y con carrera más).
+- ✅ **Caer desde arriba**: Salto aplastante (salta hasta 3 casilleros; los de al lado tiran Res.CC o quedan Sentados; +2 al daño).
 - ✅ **Atrapar**: Mordisco feroz, Agarrón, Abrazo aplastante (y las redes, que sirven a otros roles).
 
 ## 2. Choque liviano — las ideas del rol
@@ -53,7 +54,7 @@ Ya cubierto al entrar (2026-10-21): golpes precisos (Tajo veloz, Estocada, Zarpa
 rodilla, Tarascón al tobillo), las redes; y en el mapa, el sigilo, el +1 por la espalda y Robar.
 
 1. **Golpear y alejarse** — ✅ **Hit and run** (2026-10-21).
-2. **Salto**: salta hasta el objetivo por encima de lo que haya y pega al caer (dueño: «sumémosla también para el Warrior, o la misma skill compartida»).
+2. **Salto** — ✅ **Salto** (2026-10-21), con su versión de choque pesado, **Salto aplastante**.
 3. **Veneno**: golpes que envenenan, con variantes como el sangrado.
 4. **Puñalada**: saca provecho del sigilo y la espalda.
 5. **Esquivar**: reflejos, Evasión extra.

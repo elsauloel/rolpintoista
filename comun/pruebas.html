@@ -979,6 +979,11 @@ prueba('💨 Hit and run (2026-10-21): el ataque lleva alejarse 2; etiquetas de 
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});
   igual([a.alejarse, h.spCosto, h.cd, a.mods.dados, e.etiquetas.includes('choque liviano'), e.etiquetas.includes('golpear y alejarse')], [2, 2, 3, 0, true, true]);
 });
+prueba('🦘 Salto y Salto aplastante (2026-10-21)', () => {
+  const v = n => { const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos, 2); const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});
+    return [a.saltoHab, !!a.saltoAplasta, a.mods.pdg, a.mods.critBono, a.mods.fijo, a.efectos.length, h.spCosto].join('/'); };
+  igual(['Salto', 'Salto aplastante'].map(v), ['3/false/1/1/0/0/2', '3/true/0/0/2/0/3']);
+});
 prueba('👊 Puño de roca (2026-10-21): +2 al daño y Demora', () => {
   const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Puño de roca').datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});

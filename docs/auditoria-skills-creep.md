@@ -120,6 +120,15 @@
   después se aleja hasta 2 casilleros, gratis (sin No2) y sin dar ataque de oportunidad (el cartel del movimiento libre del dodge roll). Costo de un ataque, más 2 SP o cooldown 3.
   `vtt-hexgrid/js/57-alejarse.js`. **Para probar.**
 
+- ✅ **Salto** y **Salto aplastante** (2026-10-21, dueño: «se saltea hasta dos casilleros, es decir, que se desplaza tres»): al elegir el objetivo, salta
+  por encima de lo que haya (no paredes ni Sólidos) hasta una casilla libre pegada al objetivo, a 3 casilleros o menos, sin No2 ni ataque de
+  oportunidad, y ataca con su arma. Es un salto de **1,5 metros de altura**: si pasa por encima de algo con colisión, pregunta si puede saltarlo (lo
+  decide la mesa). **Salto** (choque liviano): +1 a la Probabilidad de Golpe y Crítico frecuente +1; costo de un ataque, más 2 SP o cooldown 3.
+  **Salto aplastante** (choque pesado): al caer, los rivales pegados tiran **Res.CC contra su Fuerza** (dueño: «en vez de Agilidad, Res.CC»); quien no
+  llega queda **Sentado**; después, el ataque con **+2 al daño**. Costo de un ataque, más 3 SP o cooldown 4. Si ya está al lado, ataca sin saltar
+  (el aplastante igual sienta a los de al lado); si no llega o no hay dónde caer, avisa y deja atacar igual. `vtt-hexgrid/js/55-carrera.js`
+  (`saltoHab`, `saltoAplastar`). **Para probar.**
+
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 
 ## Etiquetas

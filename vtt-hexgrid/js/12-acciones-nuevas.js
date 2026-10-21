@@ -354,7 +354,9 @@ function acElegirObjetivo(sc, ataque, suelto, alDisparar){
   const id = ac.creepId;
   const reabrir = () => { if(ac && ac.creepId === id){ ac.host.hidden = false; acUbicar(); acDibujar(); } };
   ac.host.hidden = true;
-  dueloElegirObjetivoMapa({yo: {ref: sc.id, tipo: 'creep', nombre: sc.nombre}, ataque, conSuelto: true, alSuelto: () => { reabrir(); suelto(); }, alCancelar: () => reabrir(),
+  const objetivoFijo = ac.objetivoFijo || null;   // 🧿 Mal de ojo: el personaje ya se eligió en su menú (js/60)
+  ac.objetivoFijo = null;
+  dueloElegirObjetivoMapa({yo: {ref: sc.id, tipo: 'creep', nombre: sc.nombre}, ataque, objetivoFijo, conSuelto: true, alSuelto: () => { reabrir(); suelto(); }, alCancelar: () => reabrir(),
     ...(alDisparar ? {alDisparar} : {})});   // 🏹 la flecha especial se gasta al disparar (2026-10-20)
 }
 
@@ -654,9 +656,9 @@ function cerrarAccionesNuevas(){
    El ✎ Editar del Ver de una habilidad se lo pedía a GM Tools escondido. Ahora es el editor común (comun/creep-editor.js: el mismo paso
    a paso, con la trampa y la Ejecución ✨), adentro del recuadro de las Acciones nuevas; guarda con modificarCreep (acCambiarCreep). Los
    estados para la Ejecución, con el selector común (los "Mis presets" del GM no están en la partida: ver pendientes 7b). */
-const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261021zg', '../comun/asistente-duelo-hab.js?v=20261018f'];
+const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261021zk', '../comun/asistente-duelo-hab.js?v=20261018f'];
 // Las recetas de habilidades de fábrica (para ↻ Reemplazar y ⬆ Subir): pesadas, recién cuando hacen falta.
-const ACE_BASE = ['../comun/creeps-base.js?v=20261021x', '../comun/skills-creep-base.js?v=20261021zi'];
+const ACE_BASE = ['../comun/creeps-base.js?v=20261021zk', '../comun/skills-creep-base.js?v=20261021zk'];
 async function acCargarEditor(){ await acCargarPiezas(); await cargarPiezas(SE_PIEZAS); await cargarPiezas(ACE_PIEZAS); }
 // ⬆ Subir una habilidad del creep a la biblioteca compartida (corrección o algo nuevo); su `bibOrigen` nuevo se guarda en el creep.
 async function acSubirHab(creepId, habId){

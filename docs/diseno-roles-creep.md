@@ -356,7 +356,8 @@ Inmovilizado, Rengo, Desarmado; y, de personajes, Enyetar.
 33. **Aura de debilidad**: los de adentro pegan menos.
 
 **J. Maleficios y apuestas** ✦
-34. **Mal de ojo**: su próxima tirada se tira dos veces y queda la peor (el Enyetar de los personajes, para creeps).
+34. ✅ **Mal de ojo** (2026-10-21): después de que tira, su tirada se repite y queda la peor (el Enyetar de los personajes, para creeps), con Flash y el
+    botón 🧿 del GM.
 35. **Maldición del espejo**: parte del daño que hace le vuelve.
 36. **Lazo de dolor**: el debuffer le pasa al objetivo parte del daño que recibe.
 37. **Marca de muerte** ✦: si cae mientras está marcado, el debuffer recupera vida o SP.

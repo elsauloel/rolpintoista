@@ -1706,6 +1706,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `CreepCalculo.alcance`, o el arma a distancia del personaje en `FichaResumen`); `oportunidadCorte` (js/17) frena al primer rival que se mueve en la mira
   (`vigilantesDe`, `vigilanciaLoVe`) y el cartel de la oportunidad pregunta «¿Dispara?» (`vigilanciaArmasDe`: su ataque normal; `vigilanciaQuitar` al
   disparar). El alcance se dibuja con `vigilanciaDibujar` (js/05).
+- **🧿 Mal de ojo** (2026-10-21, `js/60-mal-de-ojo.js`): el Enyetar (js/38) para creeps. Un creep con una habilidad `malDeOjo` → el botón fijo del GM
+  (`Flotantes.malDeOjo`, `renderMalDeOjoBoton`); `abrirMalDeOjo` lista las tiradas recientes de los personajes (`enyetarCandidatos`) y `malDeOjoUsar` ejecuta la
+  habilidad sin marcar (`ac.objetivoFijo`, js/12); en turno ajeno cobra el doble. El efecto «Mal de ojo» → `enyetarAplicar` (js/13).
 - **🎯 La Presa** (2026-10-21, el Disparo señalador): `presaContra(atq, def)` (js/13) da +2 si el defensor tiene el estado Presa y quien ataca es su rival;
   va a `Duelo.crear({presa})` → `ataque.presa` (+2 al daño en `guardarDano`). La Evasión −1 es un mod del estado.
 - **🎯 Tiro a la cabeza** (2026-10-21): un estado de creep con `apunta` ({pdg, crit, critpot}) lo suma `arcoBonos` (js/35, `apuntaCreep`) a su próximo disparo

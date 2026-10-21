@@ -179,6 +179,10 @@
   rival dentro de su Rango; si gana, **Confusión 1 turno** (no los 2 del estado: la mitad de sus resultados son malos). Cuesta **2 No2** y **3 SP**, o
   cooldown 4. La Confusión la tira el mapa (js/20). Siguen en la familia: Susurros de locura (área), Grito de pánico (Miedo alrededor), Palabra de
   silencio. **Para probar.**
+- ✅ **Mal de ojo** (Debuffer, «maleficios», 2026-10-21): el Enyetar de los personajes para creeps: después de que un personaje tira, su PdG.Esp contra la
+  Res.Esp (a su Rango y a la vista); si gana, esa tirada se repite y queda la peor. **Flash** (dueño): en turno ajeno cuesta el doble. **5 SP** sin No2, o
+  cooldown 3 (los números del Enyetar). El GM la usa desde el **botón 🧿** (dueño: «el botoncito arriba donde los jugadores tienen la moneda… y con el duelo
+  abierto, en el menú paralelo»): `vtt-hexgrid/js/60-mal-de-ojo.js`. **Para probar.**
 - ✅ **Cadena de rayos** (Mago, 2026-10-21): PdG.Esp contra la Evasión de un rival a su Rango; **2d4 eléctrico** (sin el Ef.Esp: P216 en pausa; lo frenan la
   Defensa especial y la resistencia eléctrica) que **salta** con la regla general del rayo (al más cercano a 4 o menos, la mitad de lo que entró, sin repetir,
   hasta 1; por el agua en un charco) y **20 % de Parálisis** 1 turno al primero. **3 No2** y **3 SP**, o cooldown 3. **Para probar.**

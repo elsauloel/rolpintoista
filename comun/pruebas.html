@@ -1041,6 +1041,13 @@ prueba('🌀 Barrido y Coletazo (2026-10-21): la onda alrededor con el daño del
   igual([b.cd, !!b.cuentaComoAtaque, hb.objetivo, hb.radio, !!hb.dodge, hb.dano && hb.dano.formula, hb.contra.map(x => x.modo).join(), hb.efectos.length, (hc.efectos[0] || {}).empuja, c.cd],
     [3, false, 'onda', 1, false, '1d8+2', 'eva', 0, 1, 3]);
 });
+prueba('🧿 Mal de ojo (2026-10-21): la marca del botón, 5 SP sin No2, PdG.Esp contra Res.Esp y el efecto que repite', () => {
+  const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Mal de ojo').datos, 2);
+  const hab = Combatiente.habEjecucion(h, h.duelo, {stat: () => 0, etq: s => s});
+  const sc = {nombre: 'Bruja', esp: 4, modoSP: true, estados: [], habilidades: [h]};
+  igual([h.malDeOjo, h.cd, CreepCalculo.costoSpHab(sc, h), hab.tira && hab.tira.stat, hab.contra.map(c => c.modo).join(), (hab.efectos[0] || {}).nombre],
+    [true, 3, 5, 'pdgmg', 'resmg', 'Mal de ojo']);
+});
 prueba('✍ El PdG a mano paga como el botón (2026-10-21): No2, el conteo y el golpe del Arma elemental, sin tirar', async () => {
   let sc = {id: 'c1', nombre: 'Kobold', armaTipo: 4, nitros: 6, ataquesTurno: 0, des: 3, fue: 3, estados: [{...structuredClone(estadosPresetCreep().find(p => p.nombre === 'Arma eléctrica')), id: 'ae', activo: true}]};
   const publicadas = [];

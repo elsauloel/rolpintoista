@@ -1987,7 +1987,7 @@ async function dueloAplicarEfectoBase(d, ef){
   // con el +3 empatado pierde quien lo recibió). Si no, se anuncia sobre su última tirada de la Mesa. Sin límite: se puede apilar.
   if(/^robo$/i.test(String(spec.nombre || '').trim()) && typeof roboAplicar === 'function') return roboAplicar(d, t);   // 🫳 Robar (js/47)
   if(spec.nombre === 'Empower') return empowerAplicar(d, t, Math.round(num(ef.suma)) || 3);
-  if(spec.nombre === 'Enyetar' && typeof enyetarAplicar === 'function') return enyetarAplicar(d, t);   // 🐈‍⬛ Enyetar (Debuffer, 2026-10-12, js/38)
+  if((spec.nombre === 'Enyetar' || spec.nombre === 'Mal de ojo') && typeof enyetarAplicar === 'function') return enyetarAplicar(d, t);   // 🧿 el de los creeps (js/60)   // 🐈‍⬛ Enyetar (Debuffer, 2026-10-12, js/38)
   // La cosecha (2026-10-07, Varita de la cosecha): la marca lleva el nombre de quien la puso («Cosecha de juan»); si muere marcado, ese
   // recupera 2 SP y 2 de vida (js/10 cosechaSiMuere).
   if(spec.nombre === 'Cosecha'){

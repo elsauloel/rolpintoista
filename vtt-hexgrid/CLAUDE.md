@@ -1685,3 +1685,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   del mordido, el cartel de Soltarse de siempre; si falla, `mordidaDano` le aplica el daño otra vez (con su Defensa; Mesa y Crónica). Al empezar el
   turno de la bestia, `mordidaSoltar` (el GM) les saca los dos estados; si el mordido se zafa antes, un revisado cada 2 s (el GM, desde los 8 s de
   morder) le saca «Mordiendo» a la bestia.
+- **🐂 Tomar carrera** (2026-10-21, dueño, la Cornada; `js/55-carrera.js`): una Ejecución «con tu arma» con `embestida` lleva `ataque.embestidaHab`;
+  `dueloElegirObjetivoMapa` (js/13) llama a `cargaEmbestida(mio, t, ataque, yo)` al elegir el objetivo: si no está al lado, el creep corre por
+  `lineaHex` hasta quedar al lado (sin Sólidos, paredes ni tokens en el camino; cobra `n × porCasillero` de `costoMoverCreep`), y el ataque suma +n PdG,
+  +n al daño y +n al `empuja` de sus efectos (n = casilleros que corrió). Sin línea libre, sin poder moverse o si no es un creep: avisa y deja atacar sin
+  la carrera. Mesa y Crónica.

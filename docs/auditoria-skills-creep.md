@@ -20,7 +20,7 @@
 
 ## Clasificación: las de choque («melee», 70 de las 321)
 
-- **Golpes simples (8):** Golpe fuerte ✅, Tajo veloz ✅, Estocada ✅, Zarpazo ✅, Mordisco feroz ✅, Cornada, Puño de roca, Golpe de pomo.
+- **Golpes simples (8):** Golpe fuerte ✅, Tajo veloz ✅, Estocada ✅, Zarpazo ✅, Mordisco feroz ✅, Cornada ✅, Puño de roca, Golpe de pomo.
 - **Golpes con efecto (~14):** Golpe que sangra, Mordisco que lisia, Golpe atontador, Corte profundo, Zarpazo desgarrador, Zarpa oxidante, Golpe
   glacial, Toque abrasador, Mordisco vampírico, Golpe vigorizante, Golpe brutal y guardia, Golpe de escudo, Golpe doble, Ráfaga de golpes, Aplastar,
   Golpe de mano.
@@ -62,6 +62,14 @@
   suelta y se van los dos estados). De paso: en las habilidades auditadas que van al duelo, la descripción ya no manda a «✋ A mano» lo que el
   mapa hace solo (`frasesDe` de `comun/creeps-base.js`).
 
+- ✅ **Cornada** (bestias, 2026-10-21). Original: «Embiste con los cuernos.» Antes: 2d6 + nivel fijo, sin arma ni duelo. **Ahora** (dueño): un ataque
+  con su arma con **+1 a la Probabilidad de Golpe y +1 al daño; si pega, lo empuja 1 casilla** lejos de la bestia. Costo de un ataque, cooldown 2 o
+  **2 SP**. **Toma carrera**: si se ejecuta de lejos, corre en línea recta hasta quedar al lado (lo que cuesta moverse: 1 No2 por casillero) y suma
+  **+1 a la Probabilidad de Golpe, +1 al daño y +1 casilla de empuje por cada casillero que corrió** (al lado +1/+1/1, con uno en el medio +2/+2/2,
+  con dos +3/+3/3…). Sin línea recta libre, avisa y deja atacar igual sin la carrera. Automatizado en el mapa (`vtt-hexgrid/js/55-carrera.js`).
+  Probado en el mapa (corrió 2 casilleros: «+3 PdG · +3 de daño fijo», pegó y empujó a Silvia 3 casilleros). El daño de colisión del empujón sigue
+  ✋ a mano (P178, propuesta al dueño: 1d4 por casillero que le faltó, restando la Defensa, y lo mismo a contra quien choca).
+
 ## Etiquetas
 
 - Cada habilidad ya trae etiquetas de función, velocidad, raza (tipo de criatura), rol, a quién apunta, mecánicas y automatización. Desde el
@@ -70,4 +78,4 @@
 
 ## Sigue
 
-- Cornada, Puño de roca, Golpe de pomo (los golpes simples que quedan).
+- Puño de roca, Golpe de pomo (los golpes simples que quedan).

@@ -94,12 +94,13 @@ las posibilidades del rol. ✦ = acelera la pelea. Lo que ya existe en el mapa p
 Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep está auditada; las que hay son casi todas «a mano».
 
 **▶ La próxima vez que toque Support** (dueño, 2026-10-21): un buff que le da a un aliado **Espinas** (devuelve parte del golpe) y otro que le da
-**Espejo** (los dos, como buffs de support). En curso: **Arma elemental** (concepto 3), una por elemento, +1d4 del elemento por golpe 3 turnos.
+**Espejo** (los dos, como buffs de support). Ya cubierto: ✅ **Arma elemental** (concepto 3, 2026-10-21: Arma ígnea, helada, eléctrica, ácida y venenosa).
 
 **A. Potenciar el golpe de los aliados** ✦
 1. **Grito de guerra**: los aliados cercanos pegan más fuerte unos turnos (hoy Aullido de manada, Grito de ánimo, a mano).
 2. **Bendecir el arma**: el próximo golpe de un aliado suma un dado.
-3. **Arma elemental**: el arma de un aliado pega de fuego, hielo o rayo por unos turnos (con su estado: Quemadura, Escarcha, Parálisis).
+3. ✅ **Arma elemental**: el arma de un aliado pega de fuego, hielo o rayo por unos turnos — **Arma ígnea / helada / eléctrica / ácida / venenosa**
+   (2026-10-21: +1d4 del elemento por golpe, 3 turnos, y lo de la Carga Elemental).
 4. **Filo envenenado / sangrante**: los golpes de un aliado dejan Veneno o Sangrado.
 5. **Ojo certero**: un aliado gana Crítico frecuente o potente.
 6. **Abrir la guardia**: el próximo golpe de los aliados contra un objetivo perfora N de Defensa.

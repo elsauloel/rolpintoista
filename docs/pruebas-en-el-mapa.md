@@ -35,6 +35,9 @@
 - [ ] **🔥 Bola de fuego de creep** (2026-10-21): el área con el centro dentro de su Rango, la cascada con dodge roll, 2d6 + ¼ Ef.Esp de fuego (frenado por la
   Def. especial y la Res. fuego), la Quemadura; en modo SP le cobra su Especial; en modo cooldown, cooldown 2; 4 No2.
 - [ ] **😵 Confusión de creep** (2026-10-21): PdG.Esp contra Res.Mt; la Confusión 1 turno y el 1d4 antes de la primera acción del jugador en su turno.
+- [ ] **🔥 Arma elemental** (2026-10-21, Support): un creep se la pone a otro creep (y a sí mismo); el estado dura 3 turnos del aliado; cada golpe que pega
+  suma +1d4 del elemento aparte (directo, menos su resistencia), sin gastarse; fuego ×1,5; hielo Escarcha y ácido Armadura rota (1 y +1 cada 5); tóxico
+  Veneno; rayo salta y 20 % de Parálisis; poner otra la reemplaza; cuenta como su ataque del turno. Las cinco, al menos el rayo y una de «por daño».
 - [x] **💥 Daño de colisión** — probado el 2026-10-21 (Cornada): contra un Sólido, la Constitución de Silvia (3) − Defensa 3 → 0; contra Xeena, cada uno la del otro (Silvia 1 − 3 → 0, Xeena 1 − 0 → 1). **Arreglado**: «Le faltaron 1 casillero» → «Le faltó». (P178, 2026-10-21): un empujón (la Cornada con carrera, una ráfaga) que choca contra una pared → una Constitución del
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 

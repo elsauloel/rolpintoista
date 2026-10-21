@@ -986,6 +986,7 @@ const Duelo = (() => {
     // o «permanente»; con un golpe crítico, permanente (sangradoPermanente). Con más stacks si el arma lo dice.
     if(n === 'sangrado' || n === 'primera sangre') return {nombre: 'Sangrado', ...(st ? {stacks: st} : {}), ...(ef.permanente ? {} : {turnos: _num(ef.turnos) > 0 ? Math.round(_num(ef.turnos)) : SANGRADO_ARMA_TURNOS})};
     if(n === 'rengo') return {nombre: 'Rengo'};   // Rengo en armas (2026-10-03)
+    if(n === 'parálisis' || n === 'paralisis') return {nombre: 'Parálisis', turnos: 1};   // el Arma eléctrica (2026-10-21)
     if(n === 'envenenar' || n === 'veneno severo') return (n === 'veneno severo' || /severo/i.test(ef.detalle || '')) ? {nombre: 'Veneno severo'} : (st ? {nombre: 'Veneno', stacks: st} : {nombre: 'Veneno'});
     if(n === 'lisiado') return {nombre: 'Lisiado'};
     if(n === 'expuesto') return {nombre: 'Expuesto', turnos: 1};   // Exponer (arcos, 2026-10-11)
@@ -1177,6 +1178,12 @@ const Duelo = (() => {
           const tiros = magicos.map(e => ({e, r: tirarDados(e.dado)})).filter(x => x.r);
           if(tiros.length) m.dano.magico = {tipo: tiros.map(x => String(x.e.nombre || 'mágico').slice(0, 20)).join(' y '), total: tiros.reduce((a, x) => a + Math.max(0, Math.round(_num(x.r.total))), 0),
             formula: tiros.map(x => x.r.formula).join(' + ').slice(0, 60), rolls: tiros.flatMap(x => x.r.rolls || []).slice(0, 12).map(_num)};
+          const ex = magicos.find(e => _num(e.mult) > 1 || (e.porDano && e.porDano.estado) || e.cadena);   // 🔥 lo de su elemento (Arma elemental, 2026-10-21)
+          if(ex){
+            if(_num(ex.mult) > 1) m.dano.magico.mult = Math.min(3, _num(ex.mult));
+            if(ex.porDano && ex.porDano.estado) m.dano.magico.porDano = {estado: String(ex.porDano.estado).slice(0, 40), cada: Math.max(1, Math.round(_num(ex.porDano.cada)) || 1), ...(ex.porDano.mas1 ? {mas1: true} : {})};
+            if(ex.cadena) m.dano.magico.cadena = true;
+          }
           crudos = crudos.filter(e => !(e && e.danoMagico));
         }
       }

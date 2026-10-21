@@ -1706,3 +1706,6 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `CreepCalculo.alcance`, o el arma a distancia del personaje en `FichaResumen`); `oportunidadCorte` (js/17) frena al primer rival que se mueve en la mira
   (`vigilantesDe`, `vigilanciaLoVe`) y el cartel de la oportunidad pregunta «¿Dispara?» (`vigilanciaArmasDe`: su ataque normal; `vigilanciaQuitar` al
   disparar). El alcance se dibuja con `vigilanciaDibujar` (js/05).
+- **🔥 Arma elemental** (2026-10-21): el daño elemental de un arma (`dano.magico`) con `mult` sale ×1,5 (para arriba), con `porDano` deja su estado según
+  lo que entró (`dueloPorDano(d, entro, p)`) y con `cadena` salta como el rayo (`dueloCadena`, ahora también sin habilidad). `vigilanciaActivada` (js/58)
+  cuenta como ataque del turno también una habilidad con `cuentaComoAtaque`.

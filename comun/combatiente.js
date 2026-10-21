@@ -524,16 +524,18 @@ const Combatiente = (() => {
      se va al empezar el ataque siguiente (así el último duelo todavía lo encuentra). Un Re-roll del PdG no gasta otra. */
   // Cada ataque gasta una carga de CADA estado con cargas (2026-10-11: Arma envenenada y Ojo de asesino a la vez). → {cambio, carga (la primera,
   // con `todas` = las que se gastaron, para el aviso)}. Un Re-roll del mismo duelo no gasta otra.
+  const conGolpe = x => !!(x && x.golpe && x.activo !== false && (n(x.cargas) > 0 || x.golpePorTurnos));   // una carga sin gastar, o un golpe que dura por turnos
   function gastarCarga(estados, dueloId){
     if(!Array.isArray(estados) || !dueloId) return {cambio: false, carga: null};
     if(estados.some(e => e && e.golpe && (e.duelos || []).includes(dueloId))) return {cambio: false, carga: null};
     let cambio = false;
-    for(let i = estados.length - 1; i >= 0; i--) if(estados[i] && estados[i].golpe && n(estados[i].cargas) <= 0){ estados.splice(i, 1); cambio = true; }
-    const lista = estados.filter(x => x && x.golpe && x.activo !== false && n(x.cargas) > 0);
+    for(let i = estados.length - 1; i >= 0; i--) if(estados[i] && estados[i].golpe && !estados[i].golpePorTurnos && n(estados[i].cargas) <= 0){ estados.splice(i, 1); cambio = true; }
+    const lista = estados.filter(conGolpe);
     if(!lista.length) return {cambio, carga: null};
     lista.forEach(e => {
-      e.cargas = n(e.cargas) - 1;
       e.duelos = [...(e.duelos || []).slice(-3), String(dueloId)];
+      if(e.golpePorTurnos) return;   // 🔥 Arma elemental (2026-10-21): suma a cada golpe mientras dure, sin cargas
+      e.cargas = n(e.cargas) - 1;
       if(e.cargas <= 0){ e.activo = false; e.agotada = true; }   // gastada (2026-10-10): ya no se ve; se va al próximo ataque o al pasar el turno
     });
     const todas = lista.map(e => ({...e}));
@@ -561,10 +563,10 @@ const Combatiente = (() => {
   // se gastaron, mira las que se van a gastar (las activas con cargas). → {crit, critpot}.
   function cargaCritico(estados, dueloId){
     const ya = cargaDeDuelo(estados, dueloId);
-    const c = ya || sumarCargas((estados || []).filter(x => x && x.golpe && x.activo !== false && n(x.cargas) > 0));
+    const c = ya || sumarCargas((estados || []).filter(conGolpe));
     return {crit: c ? c.crit : 0, critpot: c ? c.critpot : 0};
   }
-  const cargaTxt1 = c => c ? `${c.nombre}: ${n(c.cargas) > 0 ? `le queda${n(c.cargas) > 1 ? 'n' : ''} ${n(c.cargas)} carga${n(c.cargas) > 1 ? 's' : ''}` : 'era la última carga'}` : '';
+  const cargaTxt1 = c => c && c.golpePorTurnos ? `${c.nombre}: suma a este golpe` : c ? `${c.nombre}: ${n(c.cargas) > 0 ? `le queda${n(c.cargas) > 1 ? 'n' : ''} ${n(c.cargas)} carga${n(c.cargas) > 1 ? 's' : ''}` : 'era la última carga'}` : '';
   const cargaTxt = c => c && Array.isArray(c.todas) && c.todas.length > 1 ? c.todas.map(cargaTxt1).join(" · ") : cargaTxt1(c);
   // Perfora N (dueño, 2026-10-10): N puntos del golpe pasan siempre la Defensa. Devuelve cuánto pasa POR la Perfora (N, o el golpe si es menor)
   // cuando la Defensa frenaría más que eso; si no, 0 (el golpe va contra la Defensa como siempre). La usa el mapa al aplicar el daño (js/13).
@@ -1064,6 +1066,8 @@ const Combatiente = (() => {
       if(motivo) return {ok: false, que: 'bloqueado', motivo};
       if(esMarca(nuevo)) for(let i = estados.length - 1; i >= 0; i--) if(esSigilo(estados[i])) estados.splice(i, 1);   // la marca le saca el sigilo
     }
+    // 🔥 Una sola arma elemental a la vez (2026-10-21, dueño): la nueva reemplaza a la de otro elemento (la misma, se renueva como siempre).
+    if(nuevo.armaElemental) for(let i = estados.length - 1; i >= 0; i--) if(estados[i] && estados[i].armaElemental && estados[i].nombre !== nuevo.nombre) estados.splice(i, 1);
     if(nuevo.armaduraRota){
       const ya = estados.find(e => e && e.armaduraRota);
       if(ya){ ya.stacks = Math.max(1, n(ya.stacks) || 1) + Math.max(1, Math.round(n(nuevo.stacks)) || 1); ya.activo = true; return {ok: true, que: 'acumulado', estado: ya}; }   // suma los que trae (2026-10-13)

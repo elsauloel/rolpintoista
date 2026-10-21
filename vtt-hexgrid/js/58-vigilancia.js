@@ -58,6 +58,6 @@ async function vigilanciaQuitar(r){
 }
 // Un creep que se pone en vigilancia: es su acción de ataque del turno.
 async function vigilanciaActivada(sc, h){
-  if(!h || h.efectoNombre !== 'Vigilancia') return;
+  if(!h || !(h.efectoNombre === 'Vigilancia' || h.cuentaComoAtaque)) return;   // y las que dicen «es su acción de ataque» (Arma elemental, 2026-10-21)
   try{ await modificarCreep(String(sc.id), c => { c.ataquesTurno = Math.round(num(c.ataquesTurno)) + 1; return {}; }); }catch(err){ console.error(err); }
 }

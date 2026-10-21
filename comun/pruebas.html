@@ -991,6 +991,21 @@ prueba('👁 Vigilancia (2026-10-21): el estado, la del creep y la del Shooter',
   const e = sc.estados[0], sh = CLASES_SKILLS.find(c => c.id === 'shooter').habilidades.find(x => x.id === 'shooter-vigilancia');
   igual([h.anuncio, h.spCosto, !!e.vigilancia, !!e.alEmpezarTurno, sh.costo, sh.nitrosCosto, sh.duelo.efectos[0].nombre], ['{nombre} se pone en vigilancia.', 2, true, true, '2', '1', 'Vigilancia']);
 });
+prueba('🔥 Arma elemental (2026-10-21): el estado suma a cada golpe por turnos, una sola a la vez, y lo del elemento viaja', () => {
+  const datos = n => HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos;
+  const h = armarHabilidadDeCreep(datos('Arma eléctrica'), 2);
+  const hab = Combatiente.habEjecucion(h, h.duelo, {stat: () => 0, etq: s => s});
+  const P = estadosPresetCreep(), pre = n => structuredClone(P.find(p => p.nombre === n));
+  const est = [];
+  Combatiente.agregarEstado(est, {...pre('Arma ígnea'), id: 'a'});
+  Combatiente.agregarEstado(est, {...pre('Arma eléctrica'), id: 'b'});
+  const g1 = Combatiente.gastarCarga(est, 'd1'), g2 = Combatiente.gastarCarga(est, 'd2');
+  const cg = Combatiente.cargaDeDuelo(est, 'd2'), ef = cg.efectos.map(e => EfectosGolpe.normalizar(e));
+  const hel = EfectosGolpe.normalizar(pre('Arma helada').golpe.efectos[0]);
+  igual([h.cd, h.no2 ?? h.nitrosCosto, h.cuentaComoAtaque, hab.objetivo, hab.conmigo, (hab.efectos[0] || {}).nombre, est.map(e => e.nombre).join(','), est[0].turnos,
+    !!g1.carga, !!g2.carga, ef[0].danoMagico, ef[0].cadena, ef[1].nombre, Duelo.specDeEfecto(ef[1]).nombre, hel.porDano.estado, hel.porDano.mas1, EfectosGolpe.normalizar(pre('Arma ígnea').golpe.efectos[0]).mult],
+    [3, 2, true, 'aliado', true, 'Arma eléctrica', 'Arma eléctrica', 3, true, true, true, true, 'Parálisis', 'Parálisis', 'Escarcha', true, 1.5]);
+});
 prueba('🔥 Bola de fuego de creep (2026-10-21): ¼ del Ef.Esp, cuesta su Especial en SP y 4 No2', () => {
   const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Bola de fuego').datos, 2);
   const sc = {nombre: 'Sacerdote', esp: 15, estados: [], habilidades: [h]};

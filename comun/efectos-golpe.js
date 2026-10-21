@@ -46,6 +46,10 @@ const EfectosGolpe = (() => {
       ...(ef && ef.danoMagico ? {danoMagico: true} : {}),
       ...(ef && typeof ef.requiereDano === 'boolean' ? {requiereDano: ef.requiereDano} : {}),   // si lo dice el efecto: entra o no aunque la armadura pare el golpe (la flecha envenenada, 2026-10-09)         // la tirada extra es daño mágico (rayo, hielo): ignora la Defensa, no se multiplica
       ...(n(ef && ef.drenaPct) > 0 ? {drenaPct: Math.round(n(ef.drenaPct))} : {}),   // Drena vida: % de la vida que le saca de verdad
+      // 🔥 Lo del elemento sobre el daño mágico (Arma elemental, 2026-10-21): ×1,5 (fuego), el estado según lo que entra (hielo, ácido, tóxico), salta (rayo).
+      ...(ef && ef.danoMagico && Number(ef.mult) > 1 ? {mult: Math.min(3, Number(ef.mult))} : {}),
+      ...(ef && ef.danoMagico && ef.porDano && ef.porDano.estado ? {porDano: {estado: String(ef.porDano.estado).slice(0, 40), cada: Math.max(1, n(ef.porDano.cada) || 1), ...(ef.porDano.mas1 ? {mas1: true} : {})}} : {}),
+      ...(ef && ef.danoMagico && ef.cadena ? {cadena: true} : {}),
     };
   }
   const lista = efs => (Array.isArray(efs) ? efs : []).map(normalizar).filter(x => x.nombre);

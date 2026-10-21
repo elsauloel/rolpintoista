@@ -1560,7 +1560,8 @@ async function dueloAplicarDano(d){
       const elMag = String(dn.magico.tipo || '').includes(' y ') ? '' : Combatiente.elementoDe(dn.magico.tipo);
       const resMag = elMag ? (await resistenciasDe(t, elMag, invLeida)).res : 0;
       const anilloMag = elMag && typeof talMasDanoElem === 'function' ? talMasDanoElem(d, elMag) : 0;   // 💍 el anillo de ese elemento
-      const totMag = (num(dn.magico.total) + (habMagica ? 0 : botella) + anilloMag) * (salvaje && !habMagica ? salvaje.mult : 1);   // 🔮 la Botella y el Orbe salvaje (si no los usó ya el daño de la habilidad)
+      const multMag = num(dn.magico.mult) > 1 ? num(dn.magico.mult) : 1;   // 🔥 Arma ígnea (2026-10-21): ×1,5, para arriba
+      const totMag = Math.ceil((num(dn.magico.total) + (habMagica ? 0 : botella) + anilloMag) * (salvaje && !habMagica ? salvaje.mult : 1) * multMag);   // 🔮 la Botella y el Orbe salvaje (si no los usó ya el daño de la habilidad)
       const agM = typeof aguaRayo === 'function' ? aguaRayo(t, elMag, totMag) : {monto: totMag, txt: ''};   // 💧 (js/50)
       const rm = esInv ? await danioInv(t, String(agM.monto), true, 0, resMag, {magico: true, reparte: true})
         : t.tipo === 'creep' ? await danioCreep(t, String(agM.monto), true, 0, resMag, {magico: true, reparte: true}) : await danioPj(t, String(agM.monto), true, 0, resMag, {magico: true, reparte: true});
@@ -1569,7 +1570,7 @@ async function dueloAplicarDano(d){
     // ⚡💧 El rayo corre por el agua (dueño, 2026-10-17): si el golpeado está en un charco, el mismo golpe eléctrico les llega a todos los que
     // están parados en ese charco, salte o no el Relámpago (js/50, aguaConduceRayo).
     const rayoMag = dn.magico && num(dn.magico.total) > 0 && !String(dn.magico.tipo || '').includes(' y ') && Combatiente.elementoDe(dn.magico.tipo) === 'rayo' ? num(dn.magico.total) : 0;
-    const saltaSolo = !!(d.hab && d.hab.cadena) || !!(!d.hab && d.ataque && d.ataque.flecha && d.ataque.flecha.salto);   // (su cadena ya recorre el charco, P214)
+    const saltaSolo = !!(d.hab && d.hab.cadena) || !!(!d.hab && d.ataque && d.ataque.flecha && d.ataque.flecha.salto) || !!(!d.hab && dn.magico && dn.magico.cadena);   // (su cadena ya recorre el charco, P214)
     if((golpeRayo || rayoMag) && !saltaSolo && !res.r.invulnerable && typeof aguaConduceRayo === 'function') await aguaConduceRayo(d, t, golpeRayo ? num(res.r.recibido) : (magico ? num(magico.recibido) : 0)).catch(err => console.error('El rayo por el agua:', err));
     // El Espejo: 1/4 de todo el daño especial que le tiraron (el de la habilidad y el elemental del arma), antes de la Defensa especial.
     const espejo = res.r.invulnerable ? null : await dueloEspejo(d, (habMagica ? golpe : 0) + (magico ? num(dn.magico.total) : 0));
@@ -1589,7 +1590,10 @@ async function dueloAplicarDano(d){
     const drena = d.hab && d.hab.dano && d.hab.dano.drena ? await dueloDrenar(d, num(d.hab.dano.drenaPct) > 0 ? Math.ceil(perdio * num(d.hab.dano.drenaPct) / 100) : perdio)
       : !d.hab && num(dn.drenaPct) > 0 ? await dueloDrenar(d, Math.ceil(perdio * num(dn.drenaPct) / 100)) : null;
     // ✨ El estado según el daño que entró (2026-10-13, Carga Elemental: Escarcha, Veneno, Armadura rota): `hab.dano.porDano`.
-    const porDano = d.hab && d.hab.dano && d.hab.dano.porDano && !res.r.invulnerable ? await dueloPorDano(d, num(res.r.recibido)).catch(err => { console.error('No se pudo aplicar el estado por daño:', err); return null; }) : null;
+    const porDano = d.hab && d.hab.dano && d.hab.dano.porDano && !res.r.invulnerable ? await dueloPorDano(d, num(res.r.recibido)).catch(err => { console.error('No se pudo aplicar el estado por daño:', err); return null; })
+      : !d.hab && magico && dn.magico.porDano && !res.r.invulnerable ? await dueloPorDano(d, num(magico.recibido), dn.magico.porDano).catch(err => { console.error('No se pudo aplicar el estado por daño:', err); return null; }) : null;   // ❄🧪☠ Arma elemental (2026-10-21)
+    // ⚡ Arma eléctrica (2026-10-21): el daño eléctrico del arma salta como el rayo (la mitad de lo que entró).
+    if(!d.hab && magico && dn.magico.cadena && num(magico.recibido) > 1 && !res.r.invulnerable) await dueloCadena(d, num(magico.recibido)).catch(err => console.error('No se pudo hacer saltar el rayo:', err));
     // Rayo en cadena (2026-10-05): el golpe de una habilidad o arma especial de rayo salta (la misma regla de ⚡ Rayo en cadena del token).
     if(d.hab && d.hab.cadena && num(res.r.recibido) > 1 && !res.r.invulnerable) await dueloCadena(d, num(res.r.recibido)).catch(err => console.error('No se pudo hacer saltar el rayo:', err));   // la mitad de lo que entró (2026-10-13)
     // ⚡ La flecha que salta (relámpago, tormenta: js/33): pase o no el daño, salta igual (el golpe entró).
@@ -1608,8 +1612,8 @@ async function dueloAplicarDano(d){
 
 // ✨ El estado según el daño que entró (2026-10-13, Carga Elemental): N stacks (Combatiente.stacksPorDano) del estado al defensor, con el mismo camino
 // que los efectos del duelo (dueloAplicarEfecto: un creep directo, un personaje o una invocación por el aviso de su ficha).
-async function dueloPorDano(d, entro){
-  const p = d.hab.dano.porDano, stacks = Combatiente.stacksPorDano(entro, p);
+async function dueloPorDano(d, entro, p0){
+  const p = p0 || d.hab.dano.porDano, stacks = Combatiente.stacksPorDano(entro, p);
   if(!stacks) return null;
   const r = await dueloAplicarEfecto(d, {nombre: p.estado, spec: {nombre: p.estado, stacks, ...(num(p.turnos) > 0 ? {turnos: num(p.turnos)} : {})}});   // su duración, si la trae
   return {estado: p.estado, stacks, entro: Math.floor(num(entro)), regla: Combatiente.porDanoTxt(p), ...(r && r.nota ? {nota: String(r.nota).slice(0, 120)} : {}), ...(r && r.manual ? {manual: true} : {})};
@@ -1620,7 +1624,7 @@ async function dueloPorDano(d, entro){
 async function dueloCadena(d, entro){
   const id = d.defensor && d.defensor.tokenId;
   if(!id || !tokens.get(id)) return;
-  const c = d.hab.cadena, cadena0 = rayoCadena(id, entro, typeof talismanDe === 'function' ? talismanDe(tokens.get(d.atacante.tokenId), 'saltoMas') : 0);   // 💍 el Anillo de tormenta
+  const c = (d.hab && d.hab.cadena) || {}, cadena0 = rayoCadena(id, entro, typeof talismanDe === 'function' ? talismanDe(tokens.get(d.atacante.tokenId), 'saltoMas') : 0);   // 💍 el Anillo de tormenta
   if(cadena0.length < 2) return;
   const hubo = await rayoCadenaAplicar(cadena0);
   if(!hubo.length) return;
@@ -1642,7 +1646,7 @@ async function dueloCadena(d, entro){
       }
     }
   }
-  momentoAbrir({tipo: 'rayo', icono: '⚡', titulo: `${d.hab.nombre}: el rayo salta`, estado: 'listo', datos: {saltos},
+  momentoAbrir({tipo: 'rayo', icono: '⚡', titulo: `${d.hab ? d.hab.nombre : `El arma de ${d.atacante.nombre}`}: el rayo salta`, estado: 'listo', datos: {saltos},
     resultado: cadena.slice(1).map(s => `${s.t.oculto ? 'Alguien' : nombreDe(s.t)} (${s.dano}${s.entro !== s.dano ? ` → ${s.entro}` : ''})`).join(' → ') + (extra.length ? ` · ${extra.join(' · ')}` : '')});
 }
 

@@ -149,6 +149,13 @@
   rival dentro de su Rango; si gana, **Confusión 1 turno** (no los 2 del estado: la mitad de sus resultados son malos). Cuesta **2 No2** y **3 SP**, o
   cooldown 4. La Confusión la tira el mapa (js/20). Siguen en la familia: Susurros de locura (área), Grito de pánico (Miedo alrededor), Palabra de
   silencio. **Para probar.**
+- ✅ **Arma ígnea, Arma helada, Arma eléctrica, Arma ácida, Arma venenosa** (Support, «arma elemental», 2026-10-21, dueño: «que cada creep tenga
+  uno… y el daño especial se sume al daño habitual del ataque»): le encanta el arma a un aliado a su Rango (o la propia) **3 turnos de ese aliado**: cada
+  golpe con arma que pega suma **+1d4 del elemento**, daño directo (solo lo frena la resistencia a ese elemento; no se multiplica con el crítico), y lo
+  de la Carga Elemental sobre esa parte: fuego ×1,5; hielo Escarcha 1 (+1 cada 5); rayo salta (la mitad de lo que entró) y 20 % de Parálisis 1 turno;
+  ácido Armadura rota 1 (+1 cada 5); tóxico Veneno, 1 stack cada 3 (mínimo 1). **Una sola a la vez** (la nueva reemplaza). Es su acción de ataque del
+  turno (como la Vigilancia). Cuesta **2 No2** y **2 SP**, o cooldown 3. Decidido: 1d4 fijo (no el Ef.Esp: P216 en pausa) y la Escarcha y la Armadura
+  rota en cada golpe (no con probabilidad: son el atractivo del buff). Sirven igual con armas naturales. **Para probar.**
 
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 

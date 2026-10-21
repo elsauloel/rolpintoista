@@ -219,6 +219,19 @@ const ESTADOS_PRESET = [
     detalle:'Su próximo ataque con arma (pegue o no) suma +2 de daño y Veneno ×3 (el veneno entra si el golpe hace daño). ⚙ Automatizado.'},
   {nombre:'Óleo venenoso concentrado', polaridad:'buff', permanente:true, cargas:2, golpe:{fijo:3, efectos:[{nombre:'Envenenar', stacks:3}]},
     detalle:'Sus próximos 2 ataques con arma (peguen o no) suman +3 de daño y Veneno ×3 (el veneno entra si el golpe hace daño). Cada ataque gasta una carga. ⚙ Automatizado.'},
+  // 🔥❄⚡🧪☠ Arma elemental (2026-10-21, dueño, el Support): durante 3 turnos, cada golpe con arma que pega suma +1d4 del elemento (daño directo:
+  // solo lo frena la resistencia a ese elemento; no se multiplica con el crítico) y lo de su elemento (lo de la Carga Elemental, sobre esa parte del
+  // daño). `golpePorTurnos`: suma a cada golpe sin gastar cargas (Combatiente.gastarCarga). `armaElemental`: una sola a la vez (la nueva reemplaza).
+  {nombre:'Arma ígnea', polaridad:'buff', turnos:3, armaElemental:'fuego', golpePorTurnos:true, golpe:{efectos:[{nombre:'Fuego', dado:'1d4', danoMagico:true, mult:1.5}]},
+    detalle:'Su arma arde: cada golpe con arma que pega suma +1d4 de daño de fuego, ×1,5 (para arriba). Es daño directo: solo lo frena la resistencia al fuego. Dura 3 turnos; otra arma elemental la reemplaza. ⚙ Automatizado en el duelo.'},
+  {nombre:'Arma helada', polaridad:'buff', turnos:3, armaElemental:'hielo', golpePorTurnos:true, golpe:{efectos:[{nombre:'Hielo', dado:'1d4', danoMagico:true, porDano:{estado:'Escarcha', cada:5, mas1:true}}]},
+    detalle:'Su arma congela: cada golpe con arma que pega suma +1d4 de daño de hielo y deja Escarcha 1 (y una más cada 5 de daño de hielo que entra). Es daño directo: solo lo frena la resistencia al hielo. Dura 3 turnos; otra arma elemental la reemplaza. ⚙ Automatizado en el duelo.'},
+  {nombre:'Arma eléctrica', polaridad:'buff', turnos:3, armaElemental:'rayo', golpePorTurnos:true, golpe:{efectos:[{nombre:'Eléctrico', dado:'1d4', danoMagico:true, cadena:true}, {nombre:'Parálisis', caras:10, exitos:2, turnos:1}]},
+    detalle:'Su arma chisporrotea: cada golpe con arma que pega suma +1d4 de daño eléctrico, que salta al rival más cercano (4 casillas o menos) con la mitad de lo que entró, sin repetir, y 20 % de Parálisis 1 turno al golpeado. Es daño directo: solo lo frena la resistencia eléctrica. Dura 3 turnos; otra arma elemental la reemplaza. ⚙ Automatizado en el duelo.'},
+  {nombre:'Arma ácida', polaridad:'buff', turnos:3, armaElemental:'acido', golpePorTurnos:true, golpe:{efectos:[{nombre:'Ácido', dado:'1d4', danoMagico:true, porDano:{estado:'Armadura rota', cada:5, mas1:true}}]},
+    detalle:'Su arma corroe: cada golpe con arma que pega suma +1d4 de daño de ácido y deja Armadura rota 1 (y una más cada 5 de daño de ácido que entra). Es daño directo: solo lo frena la resistencia al ácido. Dura 3 turnos; otra arma elemental la reemplaza. ⚙ Automatizado en el duelo.'},
+  {nombre:'Arma venenosa', polaridad:'buff', turnos:3, armaElemental:'toxico', golpePorTurnos:true, golpe:{efectos:[{nombre:'Tóxico', dado:'1d4', danoMagico:true, porDano:{estado:'Veneno', cada:3}}]},
+    detalle:'Su arma gotea veneno: cada golpe con arma que pega suma +1d4 de daño tóxico y deja Veneno, 1 stack cada 3 de daño tóxico que entra (mínimo 1). Es daño directo: solo lo frena la resistencia tóxica. Dura 3 turnos; otra arma elemental la reemplaza. ⚙ Automatizado en el duelo.'},
   {nombre:'Marcado', polaridad:'debuff', turnos:3, marcado:true,
     detalle:'⚙ Automatizado: no puede entrar en sigilo (si estaba, sale) y se lo sigue viendo con un brillo, aunque vuelva la niebla de guerra o esté en una nube de niebla. Se resiste con Res.Esp.'},
 ];

@@ -29,6 +29,10 @@
   const bU = (detalle, no2, mods, turnos) => ({detalle, no2, efecto: {mods, turnos}});
   const cU = (detalle, no2, k) => ({detalle, no2, cura: k});
   const dC = (detalle, no2, dano, k) => ({detalle, no2, dano, cura: k});
+  // 🔥 Arma elemental (2026-10-21, el Support): le pone a un aliado (o a sí mismo) el estado de su elemento, 3 turnos; es su acción de ataque del turno.
+  const aE = (estado, que) => ({detalle: `Le encanta el arma a un aliado dentro de su Rango (o la propia): durante 3 turnos de ese aliado, cada golpe con arma que pega suma +1d4 de daño ${que}. Es daño directo: solo lo frena la resistencia a ese elemento. Si ya tenía otra arma elemental, esta la reemplaza. Es su acción de ataque del turno.`,
+    no2: 2, spCosto: 2, auditada: true, cuentaComoAtaque: true, ataqueTxt: `${estado} a un aliado (o a sí mismo) 3 turnos: +1d4 ${que.split(/[,(]| y /)[0].trim()} por golpe`,
+    duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', dano: false, efectos: [{nombre: estado}]}});
   const slug = t => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
   // Estado del juego sobre sí mismo (preset de GM Tools: Sigilo, Invulnerable, Espinas…). turnos 0 = hasta que se lo saquen.
@@ -52,6 +56,8 @@
     'Red': ['hunter', 'trabar'], 'Tela de araña': ['hunter', 'trabar'],
     'Hit and run': ['choque liviano', 'golpear y alejarse'],
     'Salto': ['choque liviano', 'salto'], 'Salto aplastante': ['choque pesado', 'salto'], 'Vigilancia': ['rango', 'vigilancia'], 'Bola de fuego': ['mago', 'daño en área'], 'Confusión': ['debuffer', 'control mental'],
+    'Arma ígnea': ['support', 'arma elemental'], 'Arma helada': ['support', 'arma elemental'], 'Arma eléctrica': ['support', 'arma elemental'],
+    'Arma ácida': ['support', 'arma elemental'], 'Arma venenosa': ['support', 'arma elemental'],
   };
 
   // fn: función (D T B X C K M I A); mec: mecánicas del juego que usa, separadas por coma (sigilo, trampas, terreno…);
@@ -260,6 +266,13 @@
   H('Pudrición', 'X', 'pm', 'x', 4, tA('El objetivo queda podrido: −2 de Defensa y −1 de Daño 3 turnos (a mano).', 2));
   // 😵 Auditada (dueño, 2026-10-21; el Debuffer, control mental): su PdG.Esp contra la Res.Mt de un rival en su Rango; si gana, Confusión 1 turno (el mapa la
   // tira: js/20). 2 No2 y 3 SP, o cooldown 4.
+  // 🔥❄⚡🧪☠ Auditadas (dueño, 2026-10-21; el Support, «arma elemental»): +1d4 del elemento por golpe 3 turnos y lo de cada elemento (lo de la Carga
+  // Elemental); 2 No2 y 2 SP, o cooldown 3. Una por elemento: cada creep support lleva la suya. Sirven igual con armas naturales.
+  H('Arma ígnea', 'B', '*', 'a', 3, aE('Arma ígnea', 'de fuego, ×1,5 (para arriba)'));
+  H('Arma helada', 'B', '*', 'a', 3, aE('Arma helada', 'de hielo y deja Escarcha 1 (una más cada 5 de daño de hielo que entra)'));
+  H('Arma eléctrica', 'B', '*', 'a', 3, aE('Arma eléctrica', 'eléctrico, que salta al rival más cercano (4 casillas o menos) con la mitad de lo que entró, y 20 % de Parálisis 1 turno al golpeado'));
+  H('Arma ácida', 'B', '*', 'a', 3, aE('Arma ácida', 'de ácido y deja Armadura rota 1 (una más cada 5 de daño de ácido que entra)'));
+  H('Arma venenosa', 'B', '*', 'a', 3, aE('Arma venenosa', 'tóxico y deja Veneno: 1 stack cada 3 de daño tóxico que entra (mínimo 1)'));
   H('Confusión', 'XK', '*', 'gx', 4, {detalle: 'Le enreda la mente: tira su Probabilidad de Golpe especial contra la Resistencia mental de un rival dentro de su Rango; si gana, queda Confundido 1 turno (antes de su primera acción tira 1d4: 1 decide el GM, 2 pierde el turno, 3 actúa contra un objetivo al azar, 4 actúa normal).',
     no2: 2, spCosto: 3, auditada: true, ataqueTxt: 'su PdG.Esp contra la Res.Mt del objetivo; si gana, Confusión 1 turno',
     duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['resm'], alcance: 'rango', dano: false, efectos: [{nombre: 'Confusión', turnos: 1}]}});

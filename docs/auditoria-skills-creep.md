@@ -145,6 +145,10 @@
   el centro dentro de su Rango; su PdG.Esp contra la Evasión de cada uno (dodge roll); **2d6 + ¼ de su Efecto especial** de fuego (lo frenan la Defensa
   especial y la resistencia al fuego; ¼ para abajo, como toda habilidad) y **Quemadura**. Cuesta **tanto SP como su Especial** (`spCosto: 'esp'`,
   P216: uno sí, uno no) o cooldown 2, y **4 No2**. En la simulación: sin Ef.Esp ~6 por lanzamiento, con ¼ ~12, con ½ ~18 (demasiado). **Para probar.**
+- ✅ **Confusión** (Debuffer, control mental, 2026-10-21, dueño: «arrancaría con alguna de las mentales»): su PdG.Esp contra la **Res.Mt** de un
+  rival dentro de su Rango; si gana, **Confusión 1 turno** (no los 2 del estado: la mitad de sus resultados son malos). Cuesta **2 No2** y **3 SP**, o
+  cooldown 4. La Confusión la tira el mapa (js/20). Siguen en la familia: Susurros de locura (área), Grito de pánico (Miedo alrededor), Palabra de
+  silencio. **Para probar.**
 
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 

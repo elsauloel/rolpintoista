@@ -51,7 +51,7 @@
     'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'],
     'Red': ['hunter', 'trabar'], 'Tela de araña': ['hunter', 'trabar'],
     'Hit and run': ['choque liviano', 'golpear y alejarse'],
-    'Salto': ['choque liviano', 'salto'], 'Salto aplastante': ['choque pesado', 'salto'], 'Vigilancia': ['rango', 'vigilancia'], 'Bola de fuego': ['mago', 'daño en área'],
+    'Salto': ['choque liviano', 'salto'], 'Salto aplastante': ['choque pesado', 'salto'], 'Vigilancia': ['rango', 'vigilancia'], 'Bola de fuego': ['mago', 'daño en área'], 'Confusión': ['debuffer', 'control mental'],
   };
 
   // fn: función (D T B X C K M I A); mec: mecánicas del juego que usa, separadas por coma (sigilo, trampas, terreno…);
@@ -258,7 +258,11 @@
   H('Romper armadura', 'X', 'hdbc', 'mx', 3, tA('Un golpe a las juntas: el objetivo pierde 2 de Defensa 3 turnos (a mano).', 2));
   H('Veneno', 'X', 'bpdh', 'x', 3, tA('Envenena al objetivo: pierde 1d4 de vida por turno 3 turnos (a mano).', 2));
   H('Pudrición', 'X', 'pm', 'x', 4, tA('El objetivo queda podrido: −2 de Defensa y −1 de Daño 3 turnos (a mano).', 2));
-  H('Confusión', 'XK', 'a', 'gx', 4, tA('Si el objetivo falla Res.Mt ataca a otro al azar 1 turno (a mano).', 3));
+  // 😵 Auditada (dueño, 2026-10-21; el Debuffer, control mental): su PdG.Esp contra la Res.Mt de un rival en su Rango; si gana, Confusión 1 turno (el mapa la
+  // tira: js/20). 2 No2 y 3 SP, o cooldown 4.
+  H('Confusión', 'XK', '*', 'gx', 4, {detalle: 'Le enreda la mente: tira su Probabilidad de Golpe especial contra la Resistencia mental de un rival dentro de su Rango; si gana, queda Confundido 1 turno (antes de su primera acción tira 1d4: 1 decide el GM, 2 pierde el turno, 3 actúa contra un objetivo al azar, 4 actúa normal).',
+    no2: 2, spCosto: 3, auditada: true, ataqueTxt: 'su PdG.Esp contra la Res.Mt del objetivo; si gana, Confusión 1 turno',
+    duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['resm'], alcance: 'rango', dano: false, efectos: [{nombre: 'Confusión', turnos: 1}]}});
   H('Susurros', 'X', 'ma', 'gx', 3, tA('Voces en su cabeza: el objetivo pierde 2 de Res.Mt 3 turnos (a mano).', 2));
   H('Drenar energía', 'X', 'ma', 'x', 4, tA('El objetivo pierde 2 No2 en su próximo turno y el creep gana 1 (a mano).', 2));
   H('Marca de presa', 'X', 'b', 'ex', 3, tA('Marca al objetivo: recibe +2 de daño de los ataques del creep 3 turnos (a mano).', 2));

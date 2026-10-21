@@ -81,6 +81,7 @@ Ya cubierto al entrar (2026-10-21): ninguna habilidad de caster auditada; en el 
 líneas, zonas, el rayo en cadena y los charcos, los controles mentales.
 
 - **Mago (daño directo):** proyectil mágico, ✅ **Bola de fuego** (2026-10-21), cono de frío, cadena de rayos, muro de fuego.
-- **Debuffer:** maldición (bajar números), miedo, silencio, ceguera, nube venenosa.
+- **Debuffer:** familias (2026-10-21): bajar números, quitar No2, **control mental** (✅ **Confusión**; siguen Susurros de locura en área, Grito de
+  pánico, Palabra de silencio), daño que dura, los sentidos, contra el sigilo, el orden de turnos, romper la defensa, auras.
 - **Support:** curar a un aliado, escudar a un aliado, grito que potencia al grupo, proteger, levantar a un caído.
 - **El costo de las que suman Efecto especial:** P216 (la página para la mesa: https://claude.ai/artifact/C7VPwWPg9BpWfF1L1hUGb6).

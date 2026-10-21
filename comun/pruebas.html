@@ -997,6 +997,12 @@ prueba('🔥 Bola de fuego de creep (2026-10-21): ¼ del Ef.Esp, cuesta su Espec
   const hab = Combatiente.habEjecucion(h, h.duelo, {stat: s => s === 'dmgesp' ? 15 : 0, etq: s => s});
   igual([CreepCalculo.costoSpHab(sc, h), h.cd, h.nitrosCosto ?? h.no2 ?? null, hab.objetivo, hab.radio, hab.dano && hab.dano.formula, hab.dano && hab.dano.tipo, (hab.efectos[0] || {}).nombre], [15, 2, hab ? (h.nitrosCosto ?? h.no2 ?? null) : null, 'area', 1, '2d6+3', 'fuego', 'Quemadura']);
 });
+prueba('😵 Confusión de creep (2026-10-21): PdG.Esp contra Res.Mt, Confusión 1 turno', () => {
+  const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Confusión').datos, 2);
+  const hab = Combatiente.habEjecucion(h, h.duelo, {stat: () => 10, etq: s => s});
+  const est = EstadosAplicar.componer(hab.efectos[0].spec);
+  igual([h.spCosto, h.cd, hab.tira && (hab.tira.stat || hab.tira), hab.contra.map(c => c.stat || c), est.nombre, est.turnos, !!est.confusion], [3, 4, 'pdgmg', ['resm'], 'Confusión', 1, true]);
+});
 prueba('👊 Puño de roca (2026-10-21): +2 al daño y Demora', () => {
   const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Puño de roca').datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});

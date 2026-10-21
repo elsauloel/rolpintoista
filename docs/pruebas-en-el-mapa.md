@@ -18,6 +18,9 @@
   de trabajo).
 - [x] **👊 Puño de roca** (+2 al daño y Demora) — probado en el mapa el 2026-10-21: la declaración dice «+2 de daño fijo» y la Demora bajó a Silvia
   del 2.º al 3.º lugar del orden de turnos.
+- [ ] **🩸 Las cuatro variantes del Sangrado** (2026-10-21): Golpe que sangra / Zarpazo desgarrador (solo Sangrado, 1 SP), Corte profundo / Colmillos
+  que perforan (Perfora 1), Tajo brutal / Desgarro (+2 al daño), Corte certero / Zarpa certera (Crítico frecuente +1). Mirar la declaración del duelo,
+  que el Sangrado entre por 2 turnos y que con crítico quede permanente.
 - [ ] **💥 Daño de colisión** (P178, 2026-10-21): un empujón (la Cornada con carrera, una ráfaga) que choca contra una pared → una Constitución del
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 

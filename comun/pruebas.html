@@ -937,6 +937,12 @@ prueba('🐂 Cornada (2026-10-21): +1 PdG, +1 al daño, empuja 1 y toma carrera'
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});
   igual([a.mods.pdg, a.mods.fijo, a.efectos[0].empuja, a.embestidaHab, h.spCosto, e.etiquetas.includes('auditada')], [1, 1, 1, true, 2, true]);
 });
+prueba('🩸 Las cuatro variantes del Sangrado, humanoide y bestia (2026-10-21)', () => {
+  const v = n => { const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos, 2); const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});
+    return [a.perfora || 0, a.mods.fijo, a.mods.critBono, a.efectos[0].spec.nombre, a.efectos[0].spec.turnos, h.spCosto].join('/'); };
+  igual(['Golpe que sangra', 'Zarpazo desgarrador', 'Corte profundo', 'Colmillos que perforan', 'Tajo brutal', 'Desgarro', 'Corte certero', 'Zarpa certera'].map(v),
+    ['0/0/0/Sangrado/2/1', '0/0/0/Sangrado/2/1', '1/0/0/Sangrado/2/2', '1/0/0/Sangrado/2/2', '0/2/0/Sangrado/2/2', '0/2/0/Sangrado/2/2', '0/0/1/Sangrado/2/2', '0/0/1/Sangrado/2/2']);
+});
 prueba('👊 Puño de roca (2026-10-21): +2 al daño y Demora', () => {
   const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Puño de roca').datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});

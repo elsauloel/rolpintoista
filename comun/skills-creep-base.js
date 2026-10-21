@@ -19,6 +19,7 @@
   const FN = {D: 'daño', T: 'defensa', B: 'buff', X: 'debuff', C: 'curación', K: 'control', M: 'movilidad', I: 'invocación', A: 'área'};
   const aT = (detalle, dano) => ({detalle, no2: 'ATAQUE', dano});
   const zO = (detalle, no2, dano) => ({detalle, no2, dano});
+  const SG = [{nombre: 'Sangrado', turnos: 2, detalle: 'Sangrado: 2 de daño por turno durante 2 turnos (se acumula; con crítico, permanente).'}];   // el Sangrado de los golpes que sangran (2026-10-21)
   const tA = (detalle, no2) => ({detalle, no2});
   // Un ataque con su arma, con arreglos (`arma`: los de la Ejecución ✨ — dados, pdg, fijo, perfora, critBono…), que va al duelo como un ataque.
   const aA = (detalle, arma, ataqueTxt, spCosto, efectos, extra) => ({detalle, no2: 'ATAQUE', ataqueTxt, auditada: true, ...(spCosto !== undefined ? {spCosto} : {}),
@@ -96,7 +97,14 @@
   H('Golpe doble', 'D', '*', 'me', 3, zO('Dos ataques seguidos: se tira el daño dos veces (a mano la segunda).', 3, 'M'));
   H('Remate', 'D', '*', 'me', 4, zO('Un golpe de gracia contra alguien herido: si el objetivo tiene menos de la mitad de HP, +1 dado (a mano).', 3, 'M'));
   H('Puñalada trapera', 'D', 'hd', 'e', 4, zO('Ataca desde un flanco o por la espalda: si el objetivo no lo vio, el daño se duplica (a mano).', 3, 'M'));
-  H('Corte profundo', 'DX', 'hd', 'me', 3, zO('Una herida abierta: el objetivo queda Sangrando 3 turnos (a mano).', 2, 'L'));
+  // 🩸 Las cuatro variantes del Sangrado (dueño, 2026-10-21: «un golpe simple que solamente añade sangrado; uno que añade perfora y sangrado; uno que
+  // añade daño y sangrado; uno que añade crítico frecuente y sangrado»), cada una en versión de humanoide y de bestia («hacé todas»).
+  H('Corte profundo', 'DX', 'hd', 'me', 3, aA('Una herida abierta que llega hondo: un ataque con su arma con Perfora 1 (1 punto del daño pasa siempre la Defensa); si pega, deja Sangrado (2 de daño por turno durante 2 turnos; se acumula y, con un golpe crítico, queda permanente).',
+    {perfora: 1}, 'va al duelo como un ataque con Perfora 1 (1 punto del daño pasa siempre la Defensa); si pega, Sangrado', 2, SG));
+  H('Tajo brutal', 'DX', 'hd', 'me', 3, aA('Un tajo con todo el peso: un ataque con su arma con +2 al daño; si pega, deja Sangrado (2 de daño por turno durante 2 turnos; se acumula y, con un golpe crítico, queda permanente).',
+    {fijo: 2}, 'va al duelo como un ataque con +2 al daño; si pega, Sangrado', 2, SG));
+  H('Corte certero', 'DX', 'hd', 'me', 3, aA('Un corte buscando la arteria: un ataque con su arma con Crítico frecuente +1; si pega, deja Sangrado (2 de daño por turno durante 2 turnos; se acumula y, con un golpe crítico, queda permanente).',
+    {critBono: 1}, 'va al duelo como un ataque con Crítico frecuente +1; si pega, Sangrado', 2, SG));
   H('Golpe de escudo', 'DK', 'hdc', 'mt', 3, zO('Golpea con el escudo: el objetivo pierde 1 No2 (a mano).', 2, 'L'));
   H('Barrido', 'DA', '*', 'mt', 3, zO('Un gran arco que golpea a los adyacentes (a mano).', 3, 'M'));
   H('Torbellino de acero', 'DA', 'hd', 'm', 5, zO('Gira sobre sí mismo golpeando a todos los adyacentes (a mano).', 4, 'H'));
@@ -104,7 +112,16 @@
   // (Golpe de pomo: quitado de la biblioteca en la auditoría, dueño 2026-10-21.)
   H('Ataque de furia', 'D', '*', 'm', 5, zO('Ataca sin pensar en la defensa: daño enorme.', 4, 'H'));
   H('Tackle', 'DK', 'hdb', 'mt', 3, zO('Se lanza contra el objetivo y lo derriba (a mano).', 2, 'L'));
-  H('Zarpazo desgarrador', 'DX', 'b', 'me', 3, zO('Garras que abren la carne: el objetivo queda Sangrando (a mano).', 2, 'M'));
+  // 🩸 Las cuatro variantes del Sangrado (dueño, 2026-10-21: «un golpe simple que solamente añade sangrado; uno que añade perfora y sangrado; uno que
+  // añade daño y sangrado; uno que añade crítico frecuente y sangrado»), cada una en versión de humanoide y de bestia («hacé todas»).
+  H('Zarpazo desgarrador', 'DX', 'b', 'me', 2, aA('Garras que abren la carne: un ataque con su arma; si pega, deja Sangrado (2 de daño por turno durante 2 turnos; se acumula y, con un golpe crítico, queda permanente).',
+    {}, 'va al duelo como un ataque; si pega, Sangrado', 1, SG));
+  H('Colmillos que perforan', 'DX', 'b', 'me', 3, aA('Colmillos que se hunden hondo: un ataque con su arma con Perfora 1 (1 punto del daño pasa siempre la Defensa); si pega, deja Sangrado (2 de daño por turno durante 2 turnos; se acumula y, con un golpe crítico, queda permanente).',
+    {perfora: 1}, 'va al duelo como un ataque con Perfora 1 (1 punto del daño pasa siempre la Defensa); si pega, Sangrado', 2, SG));
+  H('Desgarro', 'DX', 'b', 'me', 3, aA('Arranca un pedazo de carne: un ataque con su arma con +2 al daño; si pega, deja Sangrado (2 de daño por turno durante 2 turnos; se acumula y, con un golpe crítico, queda permanente).',
+    {fijo: 2}, 'va al duelo como un ataque con +2 al daño; si pega, Sangrado', 2, SG));
+  H('Zarpa certera', 'DX', 'b', 'me', 3, aA('Un zarpazo directo a la yugular: un ataque con su arma con Crítico frecuente +1; si pega, deja Sangrado (2 de daño por turno durante 2 turnos; se acumula y, con un golpe crítico, queda permanente).',
+    {critBono: 1}, 'va al duelo como un ataque con Crítico frecuente +1; si pega, Sangrado', 2, SG));
   H('Golpe de gracia', 'D', '*', 'm', 6, zO('El golpe más fuerte que sabe dar; nadie sigue igual después.', 4, 'H'));
   H('Ráfaga de golpes', 'D', 'hd', 'me', 3, zO('Una lluvia de golpes rápidos (tirá el daño dos veces, a mano la segunda).', 3, 'L'));
   H('Golpe cargado', 'D', '*', 'mt', 4, zO('Junta fuerzas todo un turno y descarga un golpe brutal.', 2, 'H'));
@@ -424,7 +441,8 @@
   H('Corroer el metal', 'X', 'ca', 'x', 4, tA('Aplicale al objetivo Armadura rota: −1 Defensa por acumulación, permanente hasta repararla (a mano).', 2), 'estados alterados');
   H('Disolver la armadura', 'X', 'ca', 'x', 6, tA('Aplicale al objetivo Armadura rota (se acumula si ya la tiene) hasta repararla (a mano).', 4), 'estados alterados');
   H('Toxina severa', 'X', 'bp', 'x', 5, tA('Aplicale al objetivo Veneno severo: pierde 1 HP el primer turno y 1 más con cada mantenimiento, sin caducar (a mano).', 3), 'estados alterados');
-  H('Golpe que sangra', 'DX', 'hd', 'me', 3, zO('Daño y aplicale al objetivo Sangrado (a mano).', 3, 'M'), 'estados alterados');
+  H('Golpe que sangra', 'DX', 'hd', 'me', 2, aA('Un golpe que abre la carne: un ataque con su arma; si pega, deja Sangrado (2 de daño por turno durante 2 turnos; se acumula y, con un golpe crítico, queda permanente).',
+    {}, 'va al duelo como un ataque; si pega, Sangrado', 1, SG), 'estados alterados');
   H('Mordisco que lisia', 'DX', 'b', 'me', 3, zO('Muerde una pierna: daño y aplicale al objetivo Rengo (a mano).', 2, 'L'), 'estados alterados');
   H('Disparo a la rodilla', 'DX', 'hd', 'r', 3, zO('Tira a una pierna: daño y aplicale al objetivo Rengo (a mano).', 2, 'L'), 'estados alterados');
   H('Golpe atontador', 'DK', 'hdb', 'm', 4, zO('Un golpe en la cabeza: daño y aplicale al objetivo Pajaritos (a mano).', 3, 'M'), 'estados alterados');

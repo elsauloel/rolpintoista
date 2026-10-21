@@ -78,6 +78,15 @@
   **Ahora** (dueño: «que sume daño y demora», «+2 al daño»): un ataque con su arma con **+2 al daño; si pega, Demora** (baja 1 lugar en el orden de
   turnos). Costo de un ataque, cooldown 2 o **2 SP**. Probado en el mapa.
 
+- ✅ **Las cuatro variantes del Sangrado** (2026-10-21, dueño: «un golpe simple que solamente añade sangrado; uno que añade perfora y sangrado; uno que
+  añade daño y sangrado; uno que añade crítico frecuente y sangrado»; «hacé todas», en versión de humanoide y de bestia). Todas: un ataque con su
+  arma; si pega, **Sangrado** (2 de daño por turno durante 2 turnos; se acumula y, con crítico, queda permanente). Costo de un ataque, más:
+  - Solo Sangrado — 1 SP o cooldown 2: **Golpe que sangra** (humanoides) y **Zarpazo desgarrador** (bestias).
+  - Perfora 1 + Sangrado — 2 SP o cooldown 3: **Corte profundo** (humanoides) y **Colmillos que perforan** (bestias, nueva).
+  - +2 al daño + Sangrado — 2 SP o cooldown 3: **Tajo brutal** (humanoides, nueva) y **Desgarro** (bestias, nueva).
+  - Crítico frecuente +1 + Sangrado — 2 SP o cooldown 3: **Corte certero** (humanoides, nueva) y **Zarpa certera** (bestias, nueva).
+  Antes, las tres que existían tiraban un daño fijo y el Sangrado iba a mano. **Para probar en el mapa.**
+
 ## Etiquetas
 
 - Cada habilidad ya trae etiquetas de función, velocidad, raza (tipo de criatura), rol, a quién apunta, mecánicas y automatización. Desde el

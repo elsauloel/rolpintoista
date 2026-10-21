@@ -90,14 +90,60 @@ Sirven al warrior (pegar fuerte), al tanque (aguantar y controlar) o a los dos.
 Ya cubierto al entrar (2026-10-21): golpes precisos (Tajo veloz, Estocada, Zarpazo), las variantes del Sangrado y su versión fuerte, el Rengo (Golpe a la
 rodilla, Tarascón al tobillo), las redes; y en el mapa, el sigilo, el +1 por la espalda y Robar.
 
-1. **Golpear y alejarse** — ✅ **Hit and run** (2026-10-21).
-2. **Salto** — ✅ **Salto** (2026-10-21), con su versión de choque pesado, **Salto aplastante**.
-3. **Veneno**: golpes que envenenan, con variantes como el sangrado.
-4. ✅ **Puñalada**: saca provecho del sigilo y la espalda — **Puñalada por la espalda**, **Mordida a traición** y **Puñalada trapera** (2026-10-21; con la
-   pasiva **Paso ligero**, ex Pasos silenciosos).
-5. **Esquivar**: reflejos, Evasión extra.
-6. **Golpe sucio**: arena a los ojos (Ceguera) o desarmar.
-7. **Rodear**: más fuerte si un aliado también está pegado al objetivo.
+**Son conceptos de diseño** (dueño, 2026-10-21): cada vez que toque una habilidad de choque liviano se explora uno y se marca ✅. ✦ = acelera la pelea.
+
+**A. Golpes rápidos y precisos**
+1. ✅ **Golpe preciso**: Tajo veloz, Estocada, Zarpazo.
+2. **Dos cortes rápidos** ✦: dos golpes en uno, con menos daño cada uno.
+3. **Ráfaga de cortes** ✦: tres golpes chicos, cada uno con su chance de efecto.
+4. **Punto débil**: perfora parte de la Defensa.
+5. **Buscar el crítico**: Crítico frecuente +2 en ese golpe.
+
+**B. Desangrar y envenenar**
+6. ✅ **Sangrado**: todas sus variantes y la versión fuerte.
+7. **Veneno**: golpes que envenenan, con variantes como el sangrado.
+8. **Veneno que paraliza**: chance de Parálisis.
+9. **Veneno que debilita**: el envenenado pega menos.
+10. **Abrir la herida** ✦: más daño a quien ya sangra o está envenenado.
+
+**C. Moverse y pegar**
+11. ✅ **Golpear y alejarse**: Hit and run.
+12. ✅ **Salto**: Salto (y su versión pesada, Salto aplastante).
+13. **Pasar por al lado**: lo cruza, le pega y queda a su espalda.
+14. **Danza de cuchillas** ✦: se mueve y le pega a dos en el camino.
+15. **Voltereta**: se mueve gratis, sin dar oportunidad.
+
+**D. Sigilo y espalda**
+16. ✅ **Puñalada**: Puñalada por la espalda, Mordida a traición, Puñalada trapera (y la pasiva Paso ligero).
+17. **Desaparecer en la pelea**: vuelve al sigilo a mitad del combate (humo, sombras).
+18. **Golpe desde las sombras**: al salir del sigilo, su primer golpe va con más crítico.
+
+**E. Esquivar y reaccionar**
+19. **Esquivar**: Evasión extra hasta su próximo turno.
+20. **Reflejos**: un dodge roll gratis cuando lo atacan.
+21. **Contraataque al esquivar**: si gana la Evasión, pega de vuelta (como el Warrior).
+22. **Finta**: el rival no puede usar Parry contra su próximo golpe.
+
+**F. Trabar al rival**
+23. ✅ **Rengo**: Golpe a la rodilla, Tarascón al tobillo.
+24. ✅ **Redes**: Red, Tela de araña.
+25. **Golpe a la mano**: Desarmado.
+26. **Tajo a los ojos**: Ceguera.
+27. **Zancadilla**: Sentado.
+
+**G. Jugar sucio**
+28. **Arena a los ojos**: Ceguera breve, sin daño.
+29. ✅ en parte: **Robar** (ya existe en el mapa; falta auditar la habilidad del Ladrón).
+30. **Burla**: lo provoca para que lo persiga (un Provocar liviano).
+
+**H. En grupo** ✦
+31. **Rodear**: pega más fuerte si otro aliado también está pegado al objetivo.
+32. **Manada**: cada aliado al lado del objetivo le suma daño.
+33. **Distraer**: el objetivo pierde su ataque de oportunidad contra los aliados.
+
+**I. Apuestas** ✦
+34. **Todo al ataque**: pega mucho más, sin Evasión hasta su próximo turno.
+35. **Golpe desesperado**: con poca vida, un golpe con mucho más crítico.
 
 ## 3. Rango y Hunter — las ideas del rol
 

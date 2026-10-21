@@ -21,7 +21,7 @@
   const zO = (detalle, no2, dano) => ({detalle, no2, dano});
   const tA = (detalle, no2) => ({detalle, no2});
   // Un ataque con su arma, con arreglos (`arma`: los de la Ejecución ✨ — dados, pdg, fijo, perfora, critBono…), que va al duelo como un ataque.
-  const aA = (detalle, arma, ataqueTxt, spCosto) => ({detalle, no2: 'ATAQUE', ataqueTxt, ...(spCosto !== undefined ? {spCosto} : {}),
+  const aA = (detalle, arma, ataqueTxt, spCosto) => ({detalle, no2: 'ATAQUE', ataqueTxt, auditada: true, ...(spCosto !== undefined ? {spCosto} : {}),
     duelo: {modo: 'arma', objetivo: 'enemigo', x: 'nitros', arma: {pdg: 0, dados: 0, fijo: 0, ...arma}, efectos: []}});
   const bU = (detalle, no2, mods, turnos) => ({detalle, no2, efecto: {mods, turnos}});
   const cU = (detalle, no2, k) => ({detalle, no2, cura: k});
@@ -59,7 +59,8 @@
     if(fn.includes('I')) mecPuras.push('invocación');
     lista.push({
       poolId: 'hab-' + slug(nombre) + '-' + lista.length, nombre,
-      etiquetas: [...new Set([...etiquetas, lenta ? 'lenta' : 'rápida', ...razasTxt, ...rolesTxt, ...objTags, ...mecPuras, aMano ? 'con parte a mano' : 'toda automatizada'])],
+      etiquetas: [...new Set([...etiquetas, lenta ? 'lenta' : 'rápida', ...razasTxt, ...rolesTxt, ...objTags, ...mecPuras, aMano ? 'con parte a mano' : 'toda automatizada',
+        sp.auditada ? 'auditada' : 'sin auditar'])],   // ✅ la auditoría de 2026-10-20 (docs/auditoria-skills-creep.md): para filtrar
       detalle: sp.detalle.replace(/\{T\}/g, '(daño según el nivel)'), datos: {sp, cd, lenta},
     });
   }
@@ -77,7 +78,9 @@
     'va al duelo como un ataque (PdG contra Evasión o Parry, Bloqueo y crítico) con Perfora 2 y +1 al daño', 2));
   H('Golpe aplastante', 'D', '*', 'mt', 4, zO('Un golpe devastador que casi no se puede esquivar.', 3, 'H'));
   H('Embestida', 'DK', 'b', 'mt', 3, zO('Carga con todo el cuerpo y empuja al objetivo un casillero (a mano).', 3, 'M'));
-  H('Zarpazo', 'D', 'b', 'me', 2, aT('Un zarpazo salvaje.', 'L'));
+  // Auditada (dueño, 2026-10-21): salvaje — Crítico potente +2 y +1 al daño, 2 SP (o cooldown 2), como el Lisiar del Asalto sin la Lesión.
+  H('Zarpazo', 'D', 'b', 'me', 2, aA('Un zarpazo salvaje: un ataque con su arma con Crítico potente +2 (si sale el crítico, multiplica más) y +1 al daño.', {critpotBono: 2, fijo: 1},
+    'va al duelo como un ataque (PdG contra Evasión o Parry, Bloqueo y crítico) con Crítico potente +2 y +1 al daño', 2));
   H('Mordisco feroz', 'D', 'b', 'me', 2, aT('Una mordida profunda.', 'M'));
   H('Mordisco venenoso', 'DX', 'b', 'ex', 3, zO('Muerde y, si golpea, tirá 1d4: con 1 el objetivo queda Envenenado (a mano).', 2, 'L'));
   H('Cornada', 'D', 'b', 'mt', 2, aT('Embiste con los cuernos.', 'M'));

@@ -20,7 +20,7 @@
 
 ## Clasificación: las de choque («melee», 70 de las 321)
 
-- **Golpes simples (8):** Golpe fuerte ✅, Tajo veloz ✅, Estocada, Zarpazo, Mordisco feroz, Cornada, Puño de roca, Golpe de pomo.
+- **Golpes simples (8):** Golpe fuerte ✅, Tajo veloz ✅, Estocada ✅, Zarpazo ✅, Mordisco feroz, Cornada, Puño de roca, Golpe de pomo.
 - **Golpes con efecto (~14):** Golpe que sangra, Mordisco que lisia, Golpe atontador, Corte profundo, Zarpazo desgarrador, Zarpa oxidante, Golpe
   glacial, Toque abrasador, Mordisco vampírico, Golpe vigorizante, Golpe brutal y guardia, Golpe de escudo, Golpe doble, Ráfaga de golpes, Aplastar,
   Golpe de mano.
@@ -45,6 +45,17 @@
   versión más afilada»): **+2 PdG, +2 al daño y Crítico frecuente +1**, costo de un ataque, cooldown 3 o **3 SP** (la Carga con X = 2 más el
   crítico del Tajear). Probado en el mapa (PdG 1d1 → 1d3, +2 de daño fijo, rango del crítico 4 → 3).
 
+- ✅ **Estocada** (2026-10-21). Original: «Una punzada directa al punto débil.» **Ahora**: un ataque con su arma con **Perfora 2 y +1 al daño**,
+  costo de un ataque, cooldown 2 o **2 SP** (la que atraviesa armadura). Probado en el mapa (declara «+1 de daño fijo · perfora 2»).
+- ✅ **Zarpazo** (bestias, 2026-10-21). Original: «Un zarpazo salvaje.» **Ahora** (dueño): un ataque con su arma con **Crítico potente +2 y +1 al
+  daño**, costo de un ataque, cooldown 2 o **2 SP** (como el Lisiar del Asalto sin la Lesión). No sangra: eso es del Zarpazo desgarrador.
+
+## Etiquetas
+
+- Cada habilidad ya trae etiquetas de función, velocidad, raza (tipo de criatura), rol, a quién apunta, mecánicas y automatización. Desde el
+  2026-10-21 (dueño: «vamos poniéndoles tags para después poder filtrarlos») también **«auditada» / «sin auditar»** (grupo «Auditoría» del
+  filtro de la biblioteca: `HABS_CREEP_GRUPOS` en `comun/creep-editor.js`). Una receta auditada lleva `auditada: true` (las `aA` ya la traen).
+
 ## Sigue
 
-- Estocada (propuesta en la conversación: Perfora 2, 1 SP).
+- Mordisco feroz, Cornada, Puño de roca, Golpe de pomo (los golpes simples que quedan).

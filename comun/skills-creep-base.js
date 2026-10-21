@@ -63,6 +63,7 @@
     'Arma ígnea': ['support', 'arma elemental'], 'Arma helada': ['support', 'arma elemental'], 'Arma eléctrica': ['support', 'arma elemental'],
     'Arma ácida': ['support', 'arma elemental'], 'Arma venenosa': ['support', 'arma elemental'],
     'Barrido': ['choque pesado', 'barrido'], 'Coletazo': ['choque pesado', 'barrido'],
+    'Puñalada por la espalda': ['choque liviano', 'por la espalda'], 'Mordida a traición': ['choque liviano', 'por la espalda'], 'Puñalada trapera': ['choque liviano', 'por la espalda'],
   };
 
   // fn: función (D T B X C K M I A); mec: mecánicas del juego que usa, separadas por coma (sigilo, trampas, terreno…);
@@ -128,7 +129,9 @@
     [{nombre: 'Empujón', empuja: 1, detalle: 'Lo empuja 1 casilla, lejos de la bestia.'}]));
   H('Golpe doble', 'D', '*', 'me', 3, zO('Dos ataques seguidos: se tira el daño dos veces (a mano la segunda).', 3, 'M'));
   H('Remate', 'D', '*', 'me', 4, zO('Un golpe de gracia contra alguien herido: si el objetivo tiene menos de la mitad de HP, +1 dado (a mano).', 3, 'M'));
-  H('Puñalada trapera', 'D', 'hd', 'e', 4, zO('Ataca desde un flanco o por la espalda: si el objetivo no lo vio, el daño se duplica (a mano).', 3, 'M'));
+  // 🗡 Auditada (dueño, 2026-10-21; choque liviano, «por la espalda»): la versión fuerte de la Puñalada por la espalda.
+  H('Puñalada trapera', 'D', 'hd', 'e', 4, aA('Un ataque con su arma desde el punto ciego del objetivo (su espalda): suma +1 dado de su arma al daño y Crítico frecuente +1, además del +1 a la Probabilidad de Golpe de todo ataque por la espalda. Si además viene en sigilo (el objetivo no lo vio venir), el daño de su arma se duplica (el doble de dados) en lugar del +1 dado. Si no está en la espalda, avisa y deja atacar igual, sin el bono.',
+    {}, 'un ataque con su arma; por la espalda +1 dado y Crítico frecuente +1; en sigilo, el doble de dados', 4, [], {punalada: 'trapera'}));
   // 🩸 Las cuatro variantes del Sangrado (dueño, 2026-10-21: «un golpe simple que solamente añade sangrado; uno que añade perfora y sangrado; uno que
   // añade daño y sangrado; uno que añade crítico frecuente y sangrado»), cada una en versión de humanoide y de bestia («hacé todas»).
   H('Corte profundo', 'DX', 'hd', 'me', 3, aA('Una herida abierta que llega hondo: un ataque con su arma con Perfora 1 (1 punto del daño pasa siempre la Defensa); si pega, deja Sangrado (2 de daño por turno durante 2 turnos; se acumula y, con un golpe crítico, queda permanente).',
@@ -401,7 +404,12 @@
   H('Reptar entre la maleza', 'B', 'bp', 'e', 3, eS('Se arrastra entre la vegetación: entra en sigilo y sus pasos son más seguros.', 2, 'Sigilo', 'buff', 0, {mods: {eva: 1}}), 'sigilo');
   H('Velo de sombras', 'B', 'ma', 'ge', 4, eS('Las sombras lo envuelven: sigilo y −1 Res.Esp mientras dure (la magia lo nota).', 2, 'Sigilo', 'buff', 0, {mods: {resmg: -1}}), 'sigilo');
   H('Ataque desde las sombras', 'D', 'hdb', 'e', 4, zO('Golpe de emboscada: ideal si está en sigilo. Si el objetivo no lo detectó, el daño se duplica (a mano) y al golpear pierde el sigilo (a mano).', 3, 'H'), 'sigilo');
-  H('Puñalada por la espalda', 'D', 'hd', 'e', 4, zO('Ataca al objetivo desde su punto ciego (el lado opuesto a donde mira): +1 dado de daño (a mano).', 3, 'M'), 'sigilo,orientación');
+  // 🗡 Auditadas (dueño, 2026-10-21; choque liviano, «por la espalda»): a la espalda se llega en sigilo, con Paso ligero o con el objetivo flanqueado (si no,
+  // el objetivo se da vuelta: vtt-hexgrid/js/49). La de bestia, la misma: Mordida a traición.
+  H('Puñalada por la espalda', 'D', 'hd', 'e', 3, aA('Un ataque con su arma desde el punto ciego del objetivo (su espalda): suma +1 dado de su arma al daño y Crítico frecuente +1, además del +1 a la Probabilidad de Golpe de todo ataque por la espalda. A la espalda se llega en sigilo, con Paso ligero o con el objetivo flanqueado (si no, el objetivo se da vuelta). Si no está en la espalda, avisa y deja atacar igual, sin el bono.',
+    {}, 'un ataque con su arma; por la espalda, +1 dado y Crítico frecuente +1', 2, [], {punalada: 'espalda'}), 'sigilo,orientación');
+  H('Mordida a traición', 'D', 'b', 'e', 3, aA('Muerde desde el punto ciego del objetivo (su espalda): un ataque con su arma que suma +1 dado de su arma al daño y Crítico frecuente +1, además del +1 a la Probabilidad de Golpe de todo ataque por la espalda. A la espalda se llega en sigilo, con Paso ligero o con el objetivo flanqueado (si no, el objetivo se da vuelta). Si no está en la espalda, avisa y deja atacar igual, sin el bono.',
+    {}, 'un ataque con su arma; por la espalda, +1 dado y Crítico frecuente +1', 2, [], {punalada: 'espalda'}), 'sigilo,orientación');
   H('Cazador invisible', 'DB', 'ba', 'e', 5, zO('Entra en sigilo y ataca en el mismo turno (a mano el sigilo); si el objetivo no lo vio, +4 de daño (a mano).', 4, 'M'), 'sigilo');
   H('Ojo de lince', 'B', 'bhd', 'r', 3, bU('Afina la vista: +3 de Daño y ve mejor lo escondido (a mano: +1 dado a las tiradas de percepción) 3 turnos.', 1, {dmg: 3}, 3), 'percepción');
   H('Olfatear presa', 'X', 'b', 'x', 3, tA('Huele a sus presas: el GM revela a los personajes en sigilo dentro de 3 casilleros del creep (a mano, con 👁 Revelar lo oculto).', 2), 'sigilo,percepción');

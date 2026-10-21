@@ -56,7 +56,8 @@ rodilla, Tarascón al tobillo), las redes; y en el mapa, el sigilo, el +1 por la
 1. **Golpear y alejarse** — ✅ **Hit and run** (2026-10-21).
 2. **Salto** — ✅ **Salto** (2026-10-21), con su versión de choque pesado, **Salto aplastante**.
 3. **Veneno**: golpes que envenenan, con variantes como el sangrado.
-4. **Puñalada**: saca provecho del sigilo y la espalda.
+4. ✅ **Puñalada**: saca provecho del sigilo y la espalda — **Puñalada por la espalda**, **Mordida a traición** y **Puñalada trapera** (2026-10-21; con la
+   pasiva **Paso ligero**, ex Pasos silenciosos).
 5. **Esquivar**: reflejos, Evasión extra.
 6. **Golpe sucio**: arena a los ojos (Ceguera) o desarmar.
 7. **Rodear**: más fuerte si un aliado también está pegado al objetivo.

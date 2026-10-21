@@ -86,7 +86,7 @@ function enSigilo(t){
 function pasosSilenciosos(t){
   if(!t) return false;
   const e = estadoDe(t);
-  if(e && e.estados.some(s => s && s.activo !== false && (s.pasosSilenciosos || String(s.nombre || '').trim().toLowerCase() === 'pasos silenciosos'))) return true;
+  if(e && e.estados.some(s => s && s.activo !== false && (s.pasosSilenciosos || ['pasos silenciosos', 'paso ligero'].includes(String(s.nombre || '').trim().toLowerCase())))) return true;   // (se llama Paso ligero desde el 2026-10-21)
   const v = vinculo(t);
   if(t.tipo === 'creep'){
     if(v && v.pasosSilenciosos) return true;

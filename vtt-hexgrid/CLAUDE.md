@@ -1706,6 +1706,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `CreepCalculo.alcance`, o el arma a distancia del personaje en `FichaResumen`); `oportunidadCorte` (js/17) frena al primer rival que se mueve en la mira
   (`vigilantesDe`, `vigilanciaLoVe`) y el cartel de la oportunidad pregunta «¿Dispara?» (`vigilanciaArmasDe`: su ataque normal; `vigilanciaQuitar` al
   disparar). El alcance se dibuja con `vigilanciaDibujar` (js/05).
+- **🗡 La puñalada** (2026-10-21, `js/59-punalada.js`): un ataque con `punalada` ('espalda' | 'trapera', de `Combatiente.ataqueConArreglos`); al elegir el
+  objetivo, `punaladaBonos` le suma +1 dado y Crítico frecuente +1 (`mods.dados`, `mods.critBono`) si está en la cuña ciega (`enCunaCiega`); la trapera en
+  sigilo, el doble de dados; de frente, avisa y deja seguir. La pasiva «Pasos silenciosos» se llama **Paso ligero** (`pasosSilenciosos` reconoce los dos nombres).
 - **🔥 Arma elemental** (2026-10-21): el daño elemental de un arma (`dano.magico`) con `mult` sale ×1,5 (para arriba), con `porDano` deja su estado según
   lo que entró (`dueloPorDano(d, entro, p)`) y con `cadena` salta como el rayo (`dueloCadena`, ahora también sin habilidad). `vigilanciaActivada` (js/58)
   cuenta como ataque del turno también una habilidad con `cuentaComoAtaque`.

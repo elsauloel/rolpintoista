@@ -57,8 +57,9 @@ const PASIVAS_BASE = [
   {poolId: 'prisa', nombre: 'Prisa', jobCosto: 1, etiquetas: ['utilidad'],
    detalle: 'Vas primero en el orden de turnos: antes que todos los que no tienen Prisa. Si otro también la tiene (un aliado o un creep), entre ustedes decide la tirada de iniciativa. ⚙ Automatizado: el mapa te pone arriba al ordenar los turnos.', mods: [{stat: 'prisa', val: 1}]},
   // 👣 Pasos silenciosos (2026-10-15, dueño: «puede ser una pasiva de job, que además te da un +1 adicional a la pdg»): un sigilo suave.
-  {poolId: 'pasos-silenciosos', nombre: 'Pasos silenciosos', jobCosto: 1, etiquetas: ['utilidad'],
-   detalle: 'Nadie te oye acercarte por la espalda: se te ve recién al quedar pegado, y no le das tiempo a darse vuelta. Atacar por la espalda te suma +1 PdG más (+2 en total). ⚙ Automatizado: el mapa no te hace oír a 3 casilleros y suma el PdG en el duelo.', mods: [{stat: 'pasossilenciosos', val: 1}]},
+  // 2026-10-21 (dueño): se llama «Paso ligero» (el id y el stat siguen igual).
+  {poolId: 'pasos-silenciosos', nombre: 'Paso ligero', jobCosto: 1, etiquetas: ['utilidad'],
+   detalle: 'Nadie te oye acercarte por la espalda (no es sigilo: se te ve): se te ve recién al quedar pegado, y no le das tiempo a darse vuelta. Atacar por la espalda te suma +1 PdG más (+2 en total). ⚙ Automatizado: el mapa no te hace oír a 3 casilleros y suma el PdG en el duelo.', mods: [{stat: 'pasossilenciosos', val: 1}]},
   {poolId: 'impulso', nombre: 'Impulso', jobCosto: 1, etiquetas: ['stat', 'utilidad'],
    detalle: '+1 No2 (nitros). ⚠ De las más fuertes para 1 Job: a revisar.', mods: [{stat: 'nitros', val: 1}]},
   {poolId: 'vista-de-halcon', nombre: 'Vista de halcón', jobCosto: 1, etiquetas: ['stat', 'ofensiva'],

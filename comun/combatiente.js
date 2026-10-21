@@ -1558,6 +1558,7 @@ const Combatiente = (() => {
       ...(critico && Object.keys(critico).length ? {critico} : {}),
       ...(c.embestida ? {embestidaHab: true} : {}),
       ...(nf(c.salto) > 0 ? {saltoHab: Math.min(5, Math.round(nf(c.salto)))} : {}), ...(c.aplasta ? {saltoAplasta: true} : {}),   // 🦘 el Salto (2026-10-21): salta hasta N casilleros y cae al lado del objetivo (vtt-hexgrid/js/55)
+      ...(c.punalada ? {punalada: c.punalada === 'trapera' ? 'trapera' : 'espalda'} : {}),   // 🗡 la puñalada (2026-10-21): el bono si está en la espalda (vtt-hexgrid/js/59)
       ...(nf(c.alejarse) > 0 ? {alejarse: Math.min(4, Math.round(nf(c.alejarse)))} : {}),   // 💨 Picar y alejarse (2026-10-21): después del duelo, se aleja N casilleros gratis (vtt-hexgrid/js/57)   // 🐂 toma carrera (la Cornada, 2026-10-21): el mapa la hace al elegir el objetivo (vtt-hexgrid/js/55)
       ...(c.terminaTurno ? {terminaTurno: true} : {}), ...(c.soloCritico ? {soloCritico: true} : {}), ...(c.perforante ? {perforante: true} : {})};   // Proyectil perforante (2026-10-13): sigue al de atrás   // Headshot (2026-10-12): si no es crítico, falla   // Degollar (2026-10-10): al resolverse, termina el turno y pasa al final del orden
   }

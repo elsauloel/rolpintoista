@@ -135,6 +135,13 @@
   (el aplastante igual sienta a los de al lado); si no llega o no hay dónde caer, avisa y deja atacar igual. `vtt-hexgrid/js/55-carrera.js`
   (`saltoHab`, `saltoAplastar`). **Para probar.**
 
+- ✅ **Puñalada por la espalda** (humanoide), **Mordida a traición** (bestia) y **Puñalada trapera** (la fuerte) (2026-10-21, «por la espalda»): un ataque
+  con su arma; si está en el **punto ciego** del objetivo, **+1 dado de su arma** y **Crítico frecuente +1** (más el +1 PdG de todo ataque por la espalda).
+  La trapera, si además viene **en sigilo**, **duplica los dados del arma** en lugar del +1. A la espalda se llega en sigilo, con **Paso ligero** o con el
+  objetivo **flanqueado** (si no, el objetivo se da vuelta: la regla del oído). Si no está en la espalda, avisa y deja atacar igual, sin el bono. Lo de un
+  ataque y **2 SP** (trapera **4 SP**), o cooldown 3 (trapera 4). Junto con esto, la pasiva **Pasos silenciosos** pasó a llamarse **Paso ligero** (dueño).
+  **Para probar.**
+
 ### Rango (desde el 2026-10-21)
 
 - ✅ **Vigilancia** (2026-10-21, dueño; una sola para bestias y humanoides, y sumada al **Shooter** como habilidad de clase): 1 No2 y 2 SP (o cooldown 3);

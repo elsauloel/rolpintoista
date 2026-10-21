@@ -991,6 +991,14 @@ prueba('👁 Vigilancia (2026-10-21): el estado, la del creep y la del Shooter',
   const e = sc.estados[0], sh = CLASES_SKILLS.find(c => c.id === 'shooter').habilidades.find(x => x.id === 'shooter-vigilancia');
   igual([h.anuncio, h.spCosto, !!e.vigilancia, !!e.alEmpezarTurno, sh.costo, sh.nitrosCosto, sh.duelo.efectos[0].nombre], ['{nombre} se pone en vigilancia.', 2, true, true, '2', '1', 'Vigilancia']);
 });
+prueba('🗡 Puñaladas (2026-10-21): un ataque con su arma que lleva la puñalada; Paso ligero', () => {
+  const ar = n => armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos, 2);
+  const p = ar('Puñalada por la espalda'), m = ar('Mordida a traición'), t = ar('Puñalada trapera');
+  const sc = {nombre: 'Kobold', armaTipo: 6, armaPeso: 1, estados: [], habilidades: [p, m, t]};
+  const ap = Combatiente.ataqueConArreglos(p, p.duelo, {}), at = Combatiente.ataqueConArreglos(t, t.duelo, {});
+  const pl = PASIVAS_BASE.find(x => x.poolId === 'pasos-silenciosos');
+  igual([p.cd, m.cd, t.cd, ap.punalada, at.punalada, (ap.mods || {}).dados || 0, pl.nombre, FichaCalculo.STAT_LABEL.pasossilenciosos], [3, 3, 4, 'espalda', 'trapera', 0, 'Paso ligero', 'Paso ligero']);
+});
 prueba('🌀 Barrido y Coletazo (2026-10-21): la onda alrededor con el daño del arma; el Coletazo empuja 1', () => {
   const ar = n => armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos, 2);
   const b = ar('Barrido'), c = ar('Coletazo');

@@ -20,7 +20,7 @@
 
 ## Clasificación: las de choque («melee», 70 de las 321)
 
-- **Golpes simples (8):** Golpe fuerte ✅, Tajo veloz, Estocada, Zarpazo, Mordisco feroz, Cornada, Puño de roca, Golpe de pomo.
+- **Golpes simples (8):** Golpe fuerte ✅, Tajo veloz ✅, Estocada, Zarpazo, Mordisco feroz, Cornada, Puño de roca, Golpe de pomo.
 - **Golpes con efecto (~14):** Golpe que sangra, Mordisco que lisia, Golpe atontador, Corte profundo, Zarpazo desgarrador, Zarpa oxidante, Golpe
   glacial, Toque abrasador, Mordisco vampírico, Golpe vigorizante, Golpe brutal y guardia, Golpe de escudo, Golpe doble, Ráfaga de golpes, Aplastar,
   Golpe de mano.
@@ -40,6 +40,10 @@
 - De paso, **Golpe brutal** (Warrior, habilidad de clase): el −2 a la Evasión hasta su próximo turno quedó automático (estado «Guardia baja»).
   Probado en el mapa (Silvia: Evasión 6 → 4, 3 SP).
 
+- ✅ **Tajo veloz** (2026-10-20). Original: «Un corte rápido y certero.» Antes: 1d6 + nivel fijo, sin arma ni duelo. **Ahora** (como la Carga del
+  Warrior con X = 1, sin la carrera): un ataque con su arma con **+1 PdG y +1 al daño**; costo de un ataque, cooldown 2 o **1 SP**. Probado en el
+  mapa (PdG 1d1 → 1d2; «Daño · Daga · 2d4 + 1 + 1»).
+
 ## Sigue
 
-- Tajo veloz (propuesta en la conversación: +1 PdG y +1 al daño, 1 SP — como Carga con X = 1, sin la carrera).
+- Estocada (propuesta en la conversación: Perfora 2, 1 SP).

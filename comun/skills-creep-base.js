@@ -51,7 +51,7 @@
     'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'],
     'Red': ['hunter', 'trabar'], 'Tela de araña': ['hunter', 'trabar'],
     'Hit and run': ['choque liviano', 'golpear y alejarse'],
-    'Salto': ['choque liviano', 'salto'], 'Salto aplastante': ['choque pesado', 'salto'], 'Vigilancia': ['rango', 'vigilancia'],
+    'Salto': ['choque liviano', 'salto'], 'Salto aplastante': ['choque pesado', 'salto'], 'Vigilancia': ['rango', 'vigilancia'], 'Bola de fuego': ['mago', 'daño en área'],
   };
 
   // fn: función (D T B X C K M I A); mec: mecánicas del juego que usa, separadas por coma (sigilo, trampas, terreno…);
@@ -165,7 +165,12 @@
   H('Proyectil', 'D', '*', 'r', 2, aT('Lanza lo que tenga a mano.', 'L'));
   H('Lanzar piedra', 'D', 'bcd', 'r', 2, aT('Arroja una roca enorme.', 'M'));
   H('Chispa', 'D', 'eag', 'rg', 2, aT('Una chispa de energía pura.', 'L'));
-  H('Bola de fuego', 'DA', 'ega', 'g', 4, zO('Una explosión en flor de diámetro 3 (7 casillas) (a mano).', 3, 'M'));
+  // 🔥 Auditada (dueño, 2026-10-21; el Mago): 2d6 + ¼ de su Efecto especial de fuego en flor de diámetro 3, Quemadura; cuesta tanto SP como su Especial
+  // (uno sí, uno no: P216) o cooldown 2, y 4 No2. Simulada: con ¼ del Ef.Esp, ~8 por objetivo contra equipo común (½ era demasiado).
+  H('Bola de fuego', 'DA', 'ega', 'g', 2, {detalle: 'Una explosión de fuego en flor de diámetro 3 (7 casillas), con el centro dentro de su Rango: tira su Probabilidad de Golpe especial contra la Evasión de cada uno (quien gana tiene dodge roll para salir del área). Daño: 2d6 más un cuarto de su Efecto especial, de fuego (lo frenan la Defensa especial y la resistencia al fuego), y deja Quemadura.',
+    no2: 4, spCosto: 'esp', auditada: true, ataqueTxt: 'su PdG.Esp contra la Evasión de cada uno en el área; 2d6 + ¼ de su Ef.Esp de fuego y Quemadura',
+    duelo: {objetivo: 'area', tira: 'pdgmg', contra: ['eva'], radio: 1, centroAlcance: 'rango', dano: true, danoFormula: '2d6', danoSumaEsp: 0.25, tipoDano: 'fuego',
+      efectos: [{nombre: 'Quemadura'}]}});
   H('Rayo', 'D', 'ega', 'g', 3, zO('Un rayo que atraviesa la armadura.', 3, 'M'));
   H('Misil arcano', 'D', 'hdga', 'g', 2, aT('Un proyectil mágico que no falla.', 'M'));
   H('Descarga eléctrica', 'DK', 'ea', 'g', 3, zO('Una descarga que deja al objetivo sin aliento: pierde 1 No2 (a mano).', 2, 'M'));

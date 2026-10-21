@@ -77,4 +77,10 @@ las flechas especiales y el Marcado.
 
 ## 4. Casters — las ideas del rol
 
-(Se arma al entrar al rol.)
+Ya cubierto al entrar (2026-10-21): ninguna habilidad de caster auditada; en el mapa, los hechizos dirigidos y de área (cascada, dodge roll), conos,
+líneas, zonas, el rayo en cadena y los charcos, los controles mentales.
+
+- **Mago (daño directo):** proyectil mágico, ✅ **Bola de fuego** (2026-10-21), cono de frío, cadena de rayos, muro de fuego.
+- **Debuffer:** maldición (bajar números), miedo, silencio, ceguera, nube venenosa.
+- **Support:** curar a un aliado, escudar a un aliado, grito que potencia al grupo, proteger, levantar a un caído.
+- **El costo de las que suman Efecto especial:** P216 (la página para la mesa: https://claude.ai/artifact/C7VPwWPg9BpWfF1L1hUGb6).

@@ -1109,4 +1109,5 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   escale sola con el caster, **las que suman Efecto especial cuestan su Especial en SP** (≈ 2R: uno sí, uno no, sea del nivel que sea); en modo
   cooldown, cooldown 2. Las grandes de área, 1,5 × Especial (≈ uno de cada tres). Y quizás bajar el SP máximo de los creeps (Especial × 2) para que
   el arranque no sea tan largo. Falta decidir: el criterio, si vale también para los jugadores (el Toque mágico, el Orbe arcano) y una simulación
-  con el criterio elegido.
+  con el criterio elegido. **La página para debatirla con la mesa:** https://claude.ai/artifact/C7VPwWPg9BpWfF1L1hUGb6 (dueño: «dejemos la pregunta
+  abierta para debatir con mis colegas»). Mientras tanto, la Bola de fuego de creep ya usa «cuesta su Especial en SP», para probarla.

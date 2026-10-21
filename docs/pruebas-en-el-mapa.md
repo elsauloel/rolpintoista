@@ -32,6 +32,8 @@
   «¿puede saltarlo?» al pasar por encima de una pared o un Sólido; los bonos en la declaración; el aplastante: Res.CC contra su Fuerza y el Sentado.
 - [ ] **👁 Vigilancia** (2026-10-21, creep y Shooter): el anuncio y el alcance marcado; un personaje que entra en la mira se frena y el GM ve «¿Dispara?»;
   sí → duelo con +2 PdG («desde la vigilancia») y se va la vigilancia; «Dejarlo pasar» → sigue; quien ya estaba adentro, solo si se mueve; sin No2, sigue; el Shooter contra un creep.
+- [ ] **🔥 Bola de fuego de creep** (2026-10-21): el área con el centro dentro de su Rango, la cascada con dodge roll, 2d6 + ¼ Ef.Esp de fuego (frenado por la
+  Def. especial y la Res. fuego), la Quemadura; en modo SP le cobra su Especial; en modo cooldown, cooldown 2; 4 No2.
 - [x] **💥 Daño de colisión** — probado el 2026-10-21 (Cornada): contra un Sólido, la Constitución de Silvia (3) − Defensa 3 → 0; contra Xeena, cada uno la del otro (Silvia 1 − 3 → 0, Xeena 1 − 0 → 1). **Arreglado**: «Le faltaron 1 casillero» → «Le faltó». (P178, 2026-10-21): un empujón (la Cornada con carrera, una ráfaga) que choca contra una pared → una Constitución del
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 

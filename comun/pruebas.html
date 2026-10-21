@@ -991,6 +991,12 @@ prueba('👁 Vigilancia (2026-10-21): el estado, la del creep y la del Shooter',
   const e = sc.estados[0], sh = CLASES_SKILLS.find(c => c.id === 'shooter').habilidades.find(x => x.id === 'shooter-vigilancia');
   igual([h.anuncio, h.spCosto, !!e.vigilancia, !!e.alEmpezarTurno, sh.costo, sh.nitrosCosto, sh.duelo.efectos[0].nombre], ['{nombre} se pone en vigilancia.', 2, true, true, '2', '1', 'Vigilancia']);
 });
+prueba('🔥 Bola de fuego de creep (2026-10-21): ¼ del Ef.Esp, cuesta su Especial en SP y 4 No2', () => {
+  const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Bola de fuego').datos, 2);
+  const sc = {nombre: 'Sacerdote', esp: 15, estados: [], habilidades: [h]};
+  const hab = Combatiente.habEjecucion(h, h.duelo, {stat: s => s === 'dmgesp' ? 15 : 0, etq: s => s});
+  igual([CreepCalculo.costoSpHab(sc, h), h.cd, h.nitrosCosto ?? h.no2 ?? null, hab.objetivo, hab.radio, hab.dano && hab.dano.formula, hab.dano && hab.dano.tipo, (hab.efectos[0] || {}).nombre], [15, 2, hab ? (h.nitrosCosto ?? h.no2 ?? null) : null, 'area', 1, '2d6+3', 'fuego', 'Quemadura']);
+});
 prueba('👊 Puño de roca (2026-10-21): +2 al daño y Demora', () => {
   const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Puño de roca').datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});

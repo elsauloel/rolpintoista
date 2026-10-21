@@ -139,6 +139,13 @@
   avisa y el rival sigue. Quien ya estaba adentro, solo si se mueve; un rival en sigilo que no se ve, no. El alcance se dibuja en el mapa para todos.
   `vtt-hexgrid/js/58-vigilancia.js` (+ js/17). **Para probar.**
 
+### Casters (desde el 2026-10-21)
+
+- ✅ **Bola de fuego** (Mago, 2026-10-21, dueño, tras una simulación de 20.000 lanzamientos contra un grupo con equipo común): flor de diámetro 3 con
+  el centro dentro de su Rango; su PdG.Esp contra la Evasión de cada uno (dodge roll); **2d6 + ¼ de su Efecto especial** de fuego (lo frenan la Defensa
+  especial y la resistencia al fuego; ¼ para abajo, como toda habilidad) y **Quemadura**. Cuesta **tanto SP como su Especial** (`spCosto: 'esp'`,
+  P216: uno sí, uno no) o cooldown 2, y **4 No2**. En la simulación: sin Ef.Esp ~6 por lanzamiento, con ¼ ~12, con ½ ~18 (demasiado). **Para probar.**
+
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 
 ## Etiquetas

@@ -1111,3 +1111,8 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   el arranque no sea tan largo. Falta decidir: el criterio, si vale también para los jugadores (el Toque mágico, el Orbe arcano) y una simulación
   con el criterio elegido. **La página para debatirla con la mesa:** https://claude.ai/artifact/C7VPwWPg9BpWfF1L1hUGb6 (dueño: «dejemos la pregunta
   abierta para debatir con mis colegas»). Mientras tanto, la Bola de fuego de creep ya usa «cuesta su Especial en SP», para probarla.
+  **Otra posibilidad (dueño, 2026-10-21): reducir la recarga, o quitarla.** La cuenta: en una sola pelea la recarga casi no pesa (el mago de
+  Especial 13 tiene 57 SP con la de hoy, 48 con la mitad, 39 sin recarga: en los tres casos, una habilidad de 3 SP sale todos los turnos); donde
+  cambia todo es entre peleas: hoy el SP también se recarga fuera de combate (cada pelea empieza llena). Si se quita la recarga y el SP vuelve solo
+  al descansar o al pasar de día, pasa a ser un recurso del día entero (3 o 4 peleas por día: ~10 a 13 SP por pelea). Opciones: 1) subir el costo de
+  las que suman Ef.Esp; 2) reducir la recarga (sola, cambia poco); 3) quitarla y que vuelva al descansar (cambia la forma de jugar); 4) combinar.

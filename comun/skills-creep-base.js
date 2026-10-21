@@ -109,7 +109,10 @@
   H('Ráfaga de golpes', 'D', 'hd', 'me', 3, zO('Una lluvia de golpes rápidos (tirá el daño dos veces, a mano la segunda).', 3, 'L'));
   H('Golpe cargado', 'D', '*', 'mt', 4, zO('Junta fuerzas todo un turno y descarga un golpe brutal.', 2, 'H'));
   H('Aplastar', 'D', 'c', 'mt', 3, zO('Aplasta con un brazo de piedra o metal.', 3, 'M'));
-  H('Puño de roca', 'D', 'ce', 'mt', 2, aT('Un puñetazo que rompe huesos.', 'M'));
+  // Auditada (dueño, 2026-10-21: «que sume daño y demora», «+2 al daño»): +2 al daño y, si pega, Demora (baja 1 lugar en el orden de turnos).
+  H('Puño de roca', 'D', 'ce', 'mt', 2, aA('Un puñetazo que rompe huesos: un ataque con su arma con +2 al daño; si pega, el golpe lo atonta y queda con Demora (baja 1 lugar en el orden de turnos).',
+    {fijo: 2}, 'va al duelo como un ataque con +2 al daño; si pega, Demora (baja 1 lugar en el orden de turnos)', 2,
+    [{nombre: 'Demora', detalle: 'Baja 1 lugar en el orden de turnos.'}]));
   H('Aliento gélido', 'DA', 'e', 'rg', 4, zO('Un soplido helado en cono: enfría a los golpeados (a mano).', 3, 'M'));
 
   /* ================= DAÑO A DISTANCIA / MÁGICO ================= */

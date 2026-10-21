@@ -937,6 +937,11 @@ prueba('🐂 Cornada (2026-10-21): +1 PdG, +1 al daño, empuja 1 y toma carrera'
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});
   igual([a.mods.pdg, a.mods.fijo, a.efectos[0].empuja, a.embestidaHab, h.spCosto, e.etiquetas.includes('auditada')], [1, 1, 1, true, 2, true]);
 });
+prueba('👊 Puño de roca (2026-10-21): +2 al daño y Demora', () => {
+  const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Puño de roca').datos, 2);
+  const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});
+  igual([a.mods.fijo, a.mods.pdg, a.efectos[0].spec.nombre, h.spCosto], [2, 0, 'Demora', 2]);
+});
 prueba('🦷 Mordisco feroz (2026-10-21): deja Mordido con la Fuerza de la bestia y el mismo daño si no se suelta', () => {
   const c = {modo: 'arma', arma: {dados: 1}, efectos: [{nombre: 'Mordido', soltar: {stat: 'fue', etq: 'Fuerza', difStat: 'fue', no2: 0, alEmpezar: true, danoFalla: 'golpe'}}]};
   const a = Combatiente.ataqueConArreglos({nombre: 'Mordisco feroz'}, c, {arma: {}, valorDe: s => s === 'fue' ? 5 : 0, danoGolpe: extra => `${1 + extra}d4+3`});

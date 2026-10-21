@@ -49,9 +49,11 @@ function oportunidadCorte(t, id, ruta){
   if(!t || t.oculto || t.bajoTierra || etereoDe(t) || enSigilo(t) || !ruta || ruta.length < 2) return null;   // (👁 etéreo: tampoco)   // 🕳 por abajo de la tierra no da oportunidad
   const rivales = new Set(rivalesDe(t));
   const ids = [...tokens.entries()].filter(([, r]) => rivales.has(r) && !r.bajoTierra && !etereoDe(r) && oporPuede(r)).map(([rid, r]) => ({rid, r, usada: oporUsada(id, rid)}));
-  if(!ids.length) return null;
+  const vig = typeof vigilantesDe === 'function' ? vigilantesDe(t).filter(o => !oportunidadUsadas.has('vig|' + oporClave(id, o.rid))) : [];   // 👁 Vigilancia (js/58)
+  if(!ids.length && !vig.length) return null;
   for(let i = 1; i < ruta.length; i++){
     const antes = ruta[i - 1], despues = ruta[i];
+    for(const o of vig) if(vigilanciaLoVe(o, despues)) return {indice: i, rivalId: o.rid, vigilancia: true};   // se mueve en la mira: se frena ahí
     for(const o of ids){
       const c = {col: o.r.col, fila: o.r.fila};
       // 🕊 Vuela (2026-10-16, dueño): el que cruza por encima de un rival, antes de pasar le da su oportunidad (se frena al lado).
@@ -82,15 +84,16 @@ async function oportunidadResolver(){
   if(!p) return;
   const t = tokens.get(p.tokenId), r = tokens.get(p.rivalId);
   if(!t || !r) return;
-  oporMarcar(p.tokenId, p.rivalId);
-  if(await oporRetirada(t, r, p)) return;   // Retirada limpia: se fue sin darle la oportunidad
+  if(p.vigilancia) oportunidadUsadas.add('vig|' + oporClave(p.tokenId, p.rivalId));   // 👁 la vigilancia: una vez por camino (si lo deja pasar, no vuelve a frenarlo en este turno)
+  else oporMarcar(p.tokenId, p.rivalId);
+  if(!p.vigilancia && await oporRetirada(t, r, p)) return;   // Retirada limpia: se fue sin darle la oportunidad
   const decide = oporDecide(r);
   oporEspera = {...p, momentoId: null, resultado: null};
   const e = oporEspera;
-  oporMesa(`${nombreDe(t)} ${p.cruza ? 'pasa por encima de' : 'se alejó de'} ${nombreDe(r)}: posible ataque de oportunidad`, 'alerta-roja');
+  oporMesa(p.vigilancia ? `👁 ${nombreDe(t)} se mueve en la mira de ${nombreDe(r)}, que está en vigilancia` : `${nombreDe(t)} ${p.cruza ? 'pasa por encima de' : 'se alejó de'} ${nombreDe(r)}: posible ataque de oportunidad`, 'alerta-roja');
   renderOporEspera();
-  e.momentoId = await momentoAbrir({tipo: 'oportunidad', icono: '⚔', titulo: `${nombreDe(t)} ${p.cruza ? 'pasa por encima de' : 'se aleja de'} ${nombreDe(r)}…`, estado: 'esperando', resuelve: decide,
-    datos: {centro: true, moverId: p.tokenId, rivalId: p.rivalId, decide, ...(p.cruza ? {cruza: true} : {})}});   // 🕊 cruza: el que vuela pasa por encima
+  e.momentoId = await momentoAbrir({tipo: 'oportunidad', icono: p.vigilancia ? '👁' : '⚔', titulo: p.vigilancia ? `${nombreDe(t)} se mueve en la mira de ${nombreDe(r)}…` : `${nombreDe(t)} ${p.cruza ? 'pasa por encima de' : 'se aleja de'} ${nombreDe(r)}…`, estado: 'esperando', resuelve: decide,
+    datos: {centro: true, moverId: p.tokenId, rivalId: p.rivalId, decide, ...(p.cruza ? {cruza: true} : {}), ...(p.vigilancia ? {vigilancia: true} : {})}});   // 🕊 cruza: el que vuela pasa por encima
   if(!e.momentoId && oporEspera === e){ oporEspera = null; renderOporEspera(); oporContinuar(e); }   // sin reglas publicadas: sigue como antes
 }
 /* Retirada limpia (2026-10-04, dueño, mecánica de las piernas): quien se aleja tiene una chance de no darle el ataque de oportunidad al
@@ -129,7 +132,7 @@ function renderOporEspera(){
       botones: [{texto: 'Entendido', id: 'opor-espera-ok', alClic: () => { oporEspera = null; renderOporEspera(); }}]});
     return;
   }
-  AvisoCombate.cartel('opor-espera', {icono: '⚔', titulo: `${oporEspera.cruza ? 'Pasás por encima de' : 'Te alejás de'} ${nomR}`, texto: 'Esperando a ver si aprovecha el ataque de oportunidad…',
+  AvisoCombate.cartel('opor-espera', {icono: oporEspera.vigilancia ? '👁' : '⚔', titulo: oporEspera.vigilancia ? `Te movés en la mira de ${nomR}` : `${oporEspera.cruza ? 'Pasás por encima de' : 'Te alejás de'} ${nomR}`, texto: oporEspera.vigilancia ? 'Está en vigilancia: esperando a ver si te dispara…' : 'Esperando a ver si aprovecha el ataque de oportunidad…',
     botones: [{texto: 'Seguir sin esperar', sec: true, id: 'opor-espera-seguir', titulo: 'Si nadie contesta: seguís tu camino como lo marcaste', alClic: () => {
       const e = oporEspera; oporEspera = null; renderOporEspera();
       if(e.momentoId) momentoActualizar(e.momentoId, {estado: 'no', resultado: '…nadie contestó: sigue su camino.'});
@@ -159,7 +162,7 @@ function oporMomento(id, d){
     if(d.estado === 'no'){ const e = oporEspera; oporEspera = null; renderOporEspera(); oporContinuar(e); toast(`⚔ ${d.resultado && /nadie/.test(d.resultado) ? 'Seguís tu camino' : 'Te dejó pasar: seguís tu camino'}`); }
     else if(d.estado === 'si'){
       const r = tokens.get(oporEspera.rivalId);
-      oporEspera.resultado = `${r ? nombreDe(r) : 'El rival'} te ataca de oportunidad: resolvé el duelo y después seguí tu turno como quieras.`;
+      oporEspera.resultado = `${r ? nombreDe(r) : 'El rival'} ${oporEspera.vigilancia ? 'te dispara desde la vigilancia' : 'te ataca de oportunidad'}: resolvé el duelo y después seguí tu turno como quieras.`;
       renderOporEspera();
     }
   }
@@ -171,10 +174,12 @@ function renderOporDecision(){
   const m = tokens.get(dt.moverId), r = tokens.get(dt.rivalId);
   const nomM = m ? nombreDe(m) : 'Alguien', nomR = r ? nombreDe(r) : 'tu personaje';
   if(oporDecision.paso === 'arma'){
-    AvisoCombate.cartel('opor-decision', {icono: '⚔', titulo: `¿Con qué arma ataca ${nomR}?`, texto: 'Ataque de oportunidad: cuesta lo de un primer ataque y no cuenta como ataque del turno.',
+    AvisoCombate.cartel('opor-decision', {icono: dt.vigilancia ? '👁' : '⚔', titulo: `¿Con qué arma ${dt.vigilancia ? 'dispara' : 'ataca'} ${nomR}?`, texto: dt.vigilancia ? 'Disparo desde la vigilancia: cuesta lo de un ataque.' : 'Ataque de oportunidad: cuesta lo de un primer ataque y no cuenta como ataque del turno.',
       botones: [...oporDecision.armas.map(a => ({texto: `${a.nombre} — ${a.costo} No2`, detalle: a.detalle || '', alClic: () => oporAtacar(a)})), {texto: 'Mejor no', sec: true, alClic: () => oporResponder(false)}]});
   }else{
-    AvisoCombate.cartel('opor-decision', {icono: '⚔', titulo: `${nomM} ${dt.cruza ? 'pasa por encima de' : 'se aleja de'} ${nomR}`, texto: '¿Ataque de oportunidad?',
+    AvisoCombate.cartel('opor-decision', dt.vigilancia ? {icono: '👁', titulo: `${nomM} se mueve en la mira de ${nomR}`, texto: `${nomR} está en vigilancia. ¿Dispara? (un solo disparo: después se le va la vigilancia)`,
+      botones: [{texto: 'Sí, disparar', alClic: () => oporResponder(true)}, {texto: 'Dejarlo pasar', sec: true, alClic: () => oporResponder(false)}]}
+    : {icono: '⚔', titulo: `${nomM} ${dt.cruza ? 'pasa por encima de' : 'se aleja de'} ${nomR}`, texto: '¿Ataque de oportunidad?',
       botones: [{texto: 'Sí, atacar', alClic: () => oporResponder(true)}, {texto: 'No, dejarlo pasar', sec: true, alClic: () => oporResponder(false)}]});
   }
 }
@@ -185,14 +190,20 @@ async function oporResponder(si){
     oporDecision = null; renderOporDecision();
     momentoActualizar(od.id, {estado: 'no', resultado: '…y lo deja pasar.'});
     const dt = od.d.datos || {}, m = tokens.get(dt.moverId), r = tokens.get(dt.rivalId);
-    oporMesa(`${r ? nombreDe(r) : 'El rival'} dejó pasar a ${m ? nombreDe(m) : 'quien se alejaba'}: no hubo ataque de oportunidad`);
+    oporMesa(dt.vigilancia ? `👁 ${r ? nombreDe(r) : 'El rival'} dejó pasar a ${m ? nombreDe(m) : 'quien se movía'}: sigue en vigilancia` : `${r ? nombreDe(r) : 'El rival'} dejó pasar a ${m ? nombreDe(m) : 'quien se alejaba'}: no hubo ataque de oportunidad`);
     return;
   }
   // Con qué puede atacar: las armas (o la mano limpia) a las que les alcanzan los No2.
   const dt = od.d.datos || {}, r = tokens.get(dt.rivalId);
   if(!r){ oporDecision = null; renderOporDecision(); return; }
   let armas = [];
-  try{ armas = await oporArmasDe(r); }catch(err){ console.error('No se pudieron leer las armas para el ataque de oportunidad:', err); }
+  try{ armas = dt.vigilancia ? await vigilanciaArmasDe(r) : await oporArmasDe(r); }catch(err){ console.error('No se pudieron leer las armas para el ataque de oportunidad:', err); }
+  if(!armas.length && dt.vigilancia){   // 👁 sin No2 para el disparo: avisa y el rival sigue su camino
+    oporDecision = null; renderOporDecision();
+    momentoActualizar(od.id, {estado: 'no', resultado: '…no le alcanzan los No2 para disparar: sigue su camino.'});
+    oporMesa(`👁 ${nombreDe(r)} no tiene los No2 para disparar desde la vigilancia`, 'alerta-roja');
+    return;
+  }
   if(!armas.length){ toast('No le alcanzan los No2 para un ataque de oportunidad con ninguna mano'); return; }
   if(armas.length === 1){ oporAtacar(armas[0]); return; }
   od.armas = armas; od.paso = 'arma';
@@ -252,8 +263,9 @@ async function oporAtacar(a){
   const dt = od.d.datos || {}, m = tokens.get(dt.moverId), r = tokens.get(dt.rivalId);
   if(!m){ toast('Quien se alejaba ya no está en el mapa'); return; }
   const conArma = a.nombre && a.nombre !== 'sin arma' && a.nombre !== 'su arma' ? ` con ${a.nombre}` : '';
-  await momentoActualizar(od.id, {estado: 'si', resultado: `…y ${r ? nombreDe(r) : 'su rival'} lo ataca de oportunidad${conArma}.`});
-  oporMesa(`${r ? nombreDe(r) : 'El rival'} ataca de oportunidad a ${nombreDe(m)}${conArma}`);
+  await momentoActualizar(od.id, {estado: 'si', resultado: dt.vigilancia ? `…y ${r ? nombreDe(r) : 'su rival'} le dispara desde la vigilancia${conArma}.` : `…y ${r ? nombreDe(r) : 'su rival'} lo ataca de oportunidad${conArma}.`});
+  oporMesa(dt.vigilancia ? `👁 ${r ? nombreDe(r) : 'El rival'} le dispara a ${nombreDe(m)} desde la vigilancia${conArma}` : `${r ? nombreDe(r) : 'El rival'} ataca de oportunidad a ${nombreDe(m)}${conArma}`);
+  if(dt.vigilancia && r && typeof vigilanciaQuitar === 'function') vigilanciaQuitar(r);   // un solo disparo
   try{
     let espaldaPdg = 0;   // 🗡 quien se aleja dándole la espalda (js/13, la regla general del 2026-10-15)
     try{ espaldaPdg = r ? espaldaBono(r, m, a.ataque) : 0; }catch(err){ console.error('No se pudo ver si es por la espalda:', err); }

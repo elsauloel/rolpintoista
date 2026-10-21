@@ -86,6 +86,10 @@ const FichaResumen = (() => {
     const mod = num(f.mod) + ganzua;
     return Object.keys(cuenta).map(Number).sort((a, b) => a - b).map(d => `${cuenta[d]}d${d}`).join('+') + (mod ? (mod > 0 ? '+' : '') + mod : '');
   }
+  // 👁 Vigilancia (2026-10-21): el alcance de la mejor arma a distancia que tenga en mano (sin ninguna, 1).
+  function alcanceVigilancia(S){
+    try{ const a = FichaCombate.armasEquipadasConDano(S).map(x => x.item).filter(x => x && x.armaDeRango); return Math.max(1, ...a.map(x => Math.round(num(FichaCombate.alcanceDeArma(S, x))) || 1)); }catch(e){ return 1; }
+  }
   function resumen(S, o){
     o = o || {};
     const c = FichaCalculo.calcular(S);
@@ -194,6 +198,7 @@ const FichaResumen = (() => {
           ...(e.lento ? {lento: true} : {}),   // Lento: el primer casillero del turno cuesta el doble (el mapa, js/04)
           ...(e.soltar && (e.soltar.ayuda || e.soltar.de) && Combatiente.soltarNorm(e.soltar) ? {soltar: Combatiente.soltarNorm(e.soltar)} : {}),   // 🤝 un aliado pegado lo puede ayudar a soltarse (el mapa, js/54)
           ...(num(e.sprint) > 0 ? {sprint: num(e.sprint)} : {}),   // Sprint (Asalto, 2026-10-13): los casilleros pagos que le quedan
+          ...(e.vigilancia ? {vigilancia: alcanceVigilancia(S)} : {}),   // 👁 Vigilancia (Shooter, 2026-10-21): el alcance de su arma a distancia (el mapa, js/58)
           ...(e.repetir ? {repetir: {quedan: Math.max(0, num(e.stacks)), hechos: num(e.repHechos), arma: String(e.repArma || ''), blanco: String(e.repBlanco || '')}} : {}),   // Repetición (Shooter, 2026-10-13)
           polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
           // Para el globito del mapa al pasar el mouse por el estado.

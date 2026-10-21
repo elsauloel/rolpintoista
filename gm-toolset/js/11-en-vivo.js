@@ -101,6 +101,7 @@ function creepPublico(sc, orden){
           turnos: num(es.turnos),
           permanente: !!es.permanente, ...(es.invulnerable ? {invulnerable: true} : {}),
           ...((es.escudoMagicoActual !== undefined || num(es.escudoMagico) > 0) ? {escudo: num(es.escudoMagicoActual ?? es.escudoMagico), ...(es.excedenteVida ? {excedente: true, ...(es.excedenteTope ? {tope: num(es.excedenteTope)} : {})} : {escudoMax: num(es.escudoMagico)})} : {}), ...(es.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(es.stacks) || 1)} : {}),
+          ...(es.vigilancia ? {vigilancia: Math.max(1, Math.round(num(CreepCalculo.alcance(sc))))} : {}),   // 👁 Vigilancia: el alcance del disparo (el mapa, js/58)
           polaridad: es.polaridad === 'buff' || es.polaridad === 'debuff' ? es.polaridad : '',
           // Para el globito del mapa al pasar el mouse por el estado.
           detalle: String(es.detalle || '').slice(0, 300),

@@ -761,6 +761,7 @@ function dibujarLienzo(){
     });
   }
 
+  if(typeof vigilanciaDibujar === 'function') vigilanciaDibujar(z);   // 👁 el alcance de quien está en vigilancia (js/58)
   // Auras: una superficie de color semitransparente alrededor del token.
   tokens.forEach((t, id) => {
     if(t.oculto && !soyGM) return;

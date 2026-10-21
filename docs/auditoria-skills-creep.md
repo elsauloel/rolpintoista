@@ -129,6 +129,15 @@
   (el aplastante igual sienta a los de al lado); si no llega o no hay dónde caer, avisa y deja atacar igual. `vtt-hexgrid/js/55-carrera.js`
   (`saltoHab`, `saltoAplastar`). **Para probar.**
 
+### Rango (desde el 2026-10-21)
+
+- ✅ **Vigilancia** (2026-10-21, dueño; una sola para bestias y humanoides, y sumada al **Shooter** como habilidad de clase): 1 No2 y 2 SP (o cooldown 3);
+  para un creep es su ataque del turno. Se anuncia «‹creep› se pone en vigilancia». Hasta que empiece su próximo turno, el primer rival que se mueva
+  dentro del alcance de su arma, a la vista y con línea de tiro libre, se frena ahí (como con la oportunidad) y quien maneja al vigilante ve «¿Dispara?»:
+  sí → un duelo normal con su arma (paga los No2 de un ataque) y se le va la vigilancia; «Dejarlo pasar» → sigue vigilando. Sin No2 para el disparo,
+  avisa y el rival sigue. Quien ya estaba adentro, solo si se mueve; un rival en sigilo que no se ve, no. El alcance se dibuja en el mapa para todos.
+  `vtt-hexgrid/js/58-vigilancia.js` (+ js/17). **Para probar.**
+
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 
 ## Etiquetas

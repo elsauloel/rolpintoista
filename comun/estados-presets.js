@@ -56,6 +56,10 @@ const ESTADOS_PRESET = [
   // vuelve a hacer daño. Lo suelta la bestia al empezar su siguiente turno. La bestia queda «Mordiendo» (tampoco se mueve). ⚙ El mapa: js/54.
   {nombre:'Mordido', polaridad:'debuff', turnos:0, permanente:true, inmovilizado:true, esCC:true,
     detalle:'Agarrado de los dientes: no se puede mover. Al empezar su turno tira para soltarse, gratis; si no se suelta, el mordisco le vuelve a hacer daño. Lo suelta la bestia al empezar su siguiente turno. ⚙ Automatizado en el mapa.'},
+  // 👁 Vigilancia (2026-10-21, dueño; creeps y Shooter): hasta que empiece su próximo turno, el primer rival que se mueva dentro del alcance de su arma, a la
+  // vista y con línea de tiro, recibe un disparo (el mapa lo frena, como al ataque de oportunidad: vtt-hexgrid/js/58). Un solo disparo.
+  {nombre:'Vigilancia', polaridad:'buff', turnos:0, permanente:true, alEmpezarTurno:true, vigilancia:true,
+    detalle:'En vigilancia: hasta que empiece su próximo turno, el primer rival que se mueva dentro del alcance de su arma, a la vista y con línea de tiro libre, recibe un disparo (el movimiento se frena ahí). Quien ya estaba adentro, solo si se mueve. Un solo disparo. ⚙ Automatizado en el mapa.'},
   // 🛡 Aguante (2026-10-21, dueño, los creeps de choque pesado): +2 Defensa y +2 Defensa especial hasta que empiece su próximo turno; cuenta los golpes
   // que le pegan (`golpes`) y su próximo ataque suma +1 dado del Tipo de su arma por cada uno (vtt-hexgrid/js/56).
   {nombre:'Aguante', polaridad:'buff', turnos:0, permanente:true, alEmpezarTurno:true, aguante:true, mods:[{stat:'def', val:2}, {stat:'armadmg', val:2}],

@@ -63,7 +63,17 @@ rodilla, Tarascón al tobillo), las redes; y en el mapa, el sigilo, el +1 por la
 
 ## 3. Rango y Hunter — las ideas del rol
 
-(Se arma al entrar al rol.)
+Ya cubierto al entrar (2026-10-21): Tiro a la rodilla (Rengo), la Red (Hunter); y en el mapa, la línea de tiro, el tiro alto, la distancia ideal, Tensar,
+las flechas especiales y el Marcado.
+
+1. **Tiro apuntado**: usa el turno para apuntar y el próximo disparo va con más puntería y crítico (hoy «Tiro a la cabeza», sin auditar).
+2. **Vigilancia** — ✅ **Vigilancia** (2026-10-21; también habilidad de clase del Shooter).
+3. **Lluvia de flechas**: dispara a un área.
+4. **Disparo doble**: dos disparos con menos puntería cada uno.
+5. **Retroceder y disparar**: se aleja un casillero y dispara.
+6. **Marcar la presa**: bonos contra un solo objetivo.
+7. **Disparos con efecto**: flechas que envenenan, queman o derriban.
+8. **Hunter**: trampas, golpear con el arco y saltar atrás, alguna invocación justificada (un halcón).
 
 ## 4. Casters — las ideas del rol
 

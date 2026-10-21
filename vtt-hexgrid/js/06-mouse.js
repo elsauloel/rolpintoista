@@ -595,7 +595,7 @@ function rutaSoltada(a, t){
     // casillero al lado de ese rival y espera la decisión; el resto del camino queda guardado.
     const opor = oportunidadCorte(t, a.id, a.ruta);
     if(opor && (indice < 0 || opor.indice < indice)){
-      oportunidadPendiente = {tokenId: a.id, rivalId: opor.rivalId, resto: a.ruta.slice(opor.indice), ...(opor.cruza ? {cruza: true} : {})};   // 🕊 cruza: pasa por encima (js/17)
+      oportunidadPendiente = {tokenId: a.id, rivalId: opor.rivalId, resto: a.ruta.slice(opor.indice), ...(opor.cruza ? {cruza: true} : {}), ...(opor.vigilancia ? {vigilancia: true} : {})};   // 🕊 cruza: pasa por encima (js/17)   // 👁 en la mira de quien vigila (js/58)
       a.ruta = a.ruta.slice(0, opor.indice + 1);
       const fc = a.ruta[a.ruta.length - 1], pc = hexCentro(fc.col, fc.fila);
       a.x = pc.x; a.y = pc.y;

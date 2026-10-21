@@ -51,7 +51,7 @@
     'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'],
     'Red': ['hunter', 'trabar'], 'Tela de araña': ['hunter', 'trabar'],
     'Hit and run': ['choque liviano', 'golpear y alejarse'],
-    'Salto': ['choque liviano', 'salto'], 'Salto aplastante': ['choque pesado', 'salto'],
+    'Salto': ['choque liviano', 'salto'], 'Salto aplastante': ['choque pesado', 'salto'], 'Vigilancia': ['rango', 'vigilancia'],
   };
 
   // fn: función (D T B X C K M I A); mec: mecánicas del juego que usa, separadas por coma (sigilo, trampas, terreno…);
@@ -295,6 +295,10 @@
   H('Salto aplastante', 'DMK', '*', 'mt', 4, aA('Salta y cae con todo el peso (un salto de 1,5 metros de altura): se desplaza hasta 3 casilleros (salteando hasta 2) hasta quedar al lado del objetivo, sin No2 ni ataque de oportunidad. Al caer, los rivales pegados tiran Res.CC contra su Fuerza: quien no llega queda Sentado. Después ataca con su arma con +2 al daño. Saltar algo con colisión lo decide la mesa.',
     {fijo: 2}, 'salta hasta quedar al lado; los de al lado tiran Res.CC contra su Fuerza o quedan Sentados (el mapa); va al duelo como un ataque con +2 al daño', 3,
     [], {salto: 3, aplasta: true}));
+  // 👁 Vigilancia (dueño, 2026-10-21; el rango, una sola para bestias y humanoides): 1 No2 y 2 SP (o cooldown 3); es su ataque del turno. Hasta su próximo turno,
+  // el primer rival que se mueva dentro del alcance de su arma, a la vista y con línea de tiro, recibe un disparo (vtt-hexgrid/js/58).
+  H('Vigilancia', 'BK', '*', 'r', 3, {detalle: 'Se queda atento con el arma lista (es su ataque del turno): hasta que empiece su próximo turno, el primer rival que se mueva dentro del alcance de su arma, a la vista y con línea de tiro libre, se frena ahí y recibe un disparo (un duelo normal, que paga los No2 de un ataque). Quien ya estaba adentro, solo si se mueve. Un solo disparo; si lo deja pasar, sigue vigilando.',
+    no2: 1, spCosto: 2, auditada: true, efecto: {nombre: 'Vigilancia'}, anuncio: '{nombre} se pone en vigilancia.'});
   // 🛡 Aguante (dueño, 2026-10-21; uno solo para bestias y humanoides): 1 No2 y 1 SP (o cooldown 3); +2 Defensa y +2 Defensa especial hasta su próximo
   // turno; su próximo ataque suma +1 dado del Tipo de su arma por cada golpe que recibió (1 SP por dado; en modo cooldown, +1 turno de cooldown por dado).
   H('Aguante', 'BT', '*', 'mt', 3, {detalle: 'Se planta y se la banca: +2 a la Defensa y +2 a la Defensa especial hasta que empiece su próximo turno, y cuenta cada golpe que le pega. En su próximo turno, al atacar, su ataque suma +1 dado del Tipo de su arma por cada golpe recibido (1 SP por dado; en modo cooldown, +1 turno de cooldown por dado), más los No2 del ataque.',

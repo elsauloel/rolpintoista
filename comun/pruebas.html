@@ -984,6 +984,13 @@ prueba('🦘 Salto y Salto aplastante (2026-10-21)', () => {
     return [a.saltoHab, !!a.saltoAplasta, a.mods.pdg, a.mods.critBono, a.mods.fijo, a.efectos.length, h.spCosto].join('/'); };
   igual(['Salto', 'Salto aplastante'].map(v), ['3/false/1/1/0/0/2', '3/true/0/0/2/0/3']);
 });
+prueba('👁 Vigilancia (2026-10-21): el estado, la del creep y la del Shooter', () => {
+  const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Vigilancia').datos, 2);
+  const sc = {nombre: 'Arquero', estados: [], habilidades: [h], hp: 10, hpMax: 10, nitros: 5};
+  CreepAcciones.efectoDeHab(sc, h, estadosPresetCreep());
+  const e = sc.estados[0], sh = CLASES_SKILLS.find(c => c.id === 'shooter').habilidades.find(x => x.id === 'shooter-vigilancia');
+  igual([h.anuncio, h.spCosto, !!e.vigilancia, !!e.alEmpezarTurno, sh.costo, sh.nitrosCosto, sh.duelo.efectos[0].nombre], ['{nombre} se pone en vigilancia.', 2, true, true, '2', '1', 'Vigilancia']);
+});
 prueba('👊 Puño de roca (2026-10-21): +2 al daño y Demora', () => {
   const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Puño de roca').datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});

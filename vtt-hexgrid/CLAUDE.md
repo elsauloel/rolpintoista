@@ -1702,3 +1702,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
 - **🦘 El Salto** (2026-10-21, en `js/55-carrera.js`, `saltoHab`): una Ejecución «con tu arma» con `salto` (→ `ataque.saltoHab`); al elegir el objetivo
   (`dueloElegirObjetivoMapa`, js/13) el creep cae en la casilla libre pegada al objetivo más cercana, a `saltoHab` o menos, por encima de tokens (no de
   paredes ni Sólidos), sin No2 ni oportunidad. Lo usan Salto y Salto aplastante.
+- **👁 Vigilancia** (2026-10-21, `js/58-vigilancia.js`): el estado `vigilancia` (creep y Shooter) publica en el resumen el alcance del disparo (`vigilancia: N`:
+  `CreepCalculo.alcance`, o el arma a distancia del personaje en `FichaResumen`); `oportunidadCorte` (js/17) frena al primer rival que se mueve en la mira
+  (`vigilantesDe`, `vigilanciaLoVe`) y el cartel de la oportunidad pregunta «¿Dispara?» (`vigilanciaArmasDe`: su ataque normal; `vigilanciaQuitar` al
+  disparar). El alcance se dibuja con `vigilanciaDibujar` (js/05).

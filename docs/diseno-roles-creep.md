@@ -73,7 +73,8 @@ la emboscada, matabestias, la espalda a distancia, la recarga, el proyectil perf
 (veneno, fuego, salto eléctrico, humo, luz, red, explota, clava).
 
 **A. Puntería y preparación**
-1. **Tiro apuntado** — en curso: **Tiro a la cabeza** (un turno apunta; el próximo disparo +2 PdG y Crítico potente +2; si le pegan antes, lo pierde).
+1. ✅ **Tiro apuntado** — **Tiro a la cabeza** (2026-10-21: un turno apunta; el próximo disparo +2 PdG, Crítico frecuente +1 y potente +1; si le hacen daño
+   antes, lo pierde).
 2. **Tensar al máximo**: si no se movió, el disparo pega más fuerte (el Tensar de los arcos).
 3. **Ojo de halcón**: sin la penalidad del tiro alto, o más alcance por un turno.
 4. **Tiro certero**: ignora parte de la Defensa (Perfora) o de la Resistencia a crítico.

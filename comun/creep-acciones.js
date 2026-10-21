@@ -156,7 +156,7 @@ const CreepAcciones = (() => {
      acá (los resuelve cada pantalla antes). */
   const uid = () => Math.random().toString(36).slice(2,9);
   const ATTR_LABELS = {con:'Con', fue:'Fue', agl:'Agi', des:'Des', esp:'Esp'};
-  const FLAGS_ESTADO = ['fenix', 'armaduraRota','silencio','confusion','lisiado','paralisis','esEscarcha','mitadPdgEva','inmovilizado','rengo','lento','cansado','exhausto','hypeado','sentado','excedenteVida','invulnerable','inmunidadCC','inmunidadMental','esMental','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','espejo','desarmado','ceguera','esCC','esVeneno','esSangrado','stun','expuesto','mitadEva','alEmpezarTurno','volador','sangraSp','aguante','vigilancia'];   // aguante: el modo aguante (2026-10-21)
+  const FLAGS_ESTADO = ['fenix', 'pierdeAlDano', 'armaduraRota','silencio','confusion','lisiado','paralisis','esEscarcha','mitadPdgEva','inmovilizado','rengo','lento','cansado','exhausto','hypeado','sentado','excedenteVida','invulnerable','inmunidadCC','inmunidadMental','esMental','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','espejo','desarmado','ceguera','esCC','esVeneno','esSangrado','stun','expuesto','mitadEva','alEmpezarTurno','volador','sangraSp','aguante','vigilancia'];   // aguante: el modo aguante (2026-10-21)
   const habEtq = stat => (C().STAT_LOOKUP[stat] && C().STAT_LOOKUP[stat].label) || ATTR_LABELS[stat] || stat;
   // La Ejecución de un creep: la misma regla que personajes e invocaciones (comun/combatiente.js, habEjecucion). Sin costo variable.
   function habEjecucion(sc, h){
@@ -191,7 +191,8 @@ const CreepAcciones = (() => {
     const categorias = preset ? {esCC:preset.esCC, esVeneno:preset.esVeneno, esSangrado:preset.esSangrado, esQuemadura:preset.esQuemadura,
       stacksTurno: preset.stacksTurno ?? 0, permanente: !!preset.permanente, escudoMagico: preset.escudoMagico ?? 0, forzarNitros: preset.forzarNitros ?? ''} : {};
     if(preset) FLAGS_ESTADO.forEach(f => { categorias[f] = !!preset[f]; });
-    if(preset && preset.golpe){ categorias.golpe = structuredClone(preset.golpe); categorias.cargas = preset.cargas; }   // las cargas (2026-10-10: los óleos)
+    if(preset && preset.golpe){ categorias.golpe = structuredClone(preset.golpe); categorias.cargas = preset.cargas; }
+    if(preset && preset.apunta) categorias.apunta = structuredClone(preset.apunta);   // 🎯 Apuntando a la cabeza (2026-10-21): el bono de su próximo disparo   // las cargas (2026-10-10: los óleos)
     // P137 (2026-10-01): "no vence" lo decide la habilidad si lo marca (como en personajes e invocaciones); si no, el estado.
     const nuevo = {id: uid(), nombre, hpTurno, stacks, turnos, polaridad, detalle, mods, ...categorias, permanente: Combatiente.efectoPermanente(h, preset)};
     if(num(h.efectoEscudo) > 0){   // la habilidad da HP de escudo o de Vida extra (Absorber vida, Coraza de huesos…)

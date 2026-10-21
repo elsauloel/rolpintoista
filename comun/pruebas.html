@@ -991,6 +991,13 @@ prueba('👁 Vigilancia (2026-10-21): el estado, la del creep y la del Shooter',
   const e = sc.estados[0], sh = CLASES_SKILLS.find(c => c.id === 'shooter').habilidades.find(x => x.id === 'shooter-vigilancia');
   igual([h.anuncio, h.spCosto, !!e.vigilancia, !!e.alEmpezarTurno, sh.costo, sh.nitrosCosto, sh.duelo.efectos[0].nombre], ['{nombre} se pone en vigilancia.', 2, true, true, '2', '1', 'Vigilancia']);
 });
+prueba('🎯 Tiro a la cabeza (2026-10-21): el estado propio con su bono y que se pierde con daño', () => {
+  const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Tiro a la cabeza').datos, 2);
+  const sc = {nombre: 'Arquero', nivel: 2, con: 3, esp: 2, nitros: 5, sp: 6, modoSP: true, estados: [], habilidades: [h], cooldowns: {}};
+  const p = CreepAcciones.ejecutarHab(sc, h, estadosPresetCreep(), true);
+  const e = sc.estados.find(x => x.nombre === 'Apuntando a la cabeza') || {};
+  igual([h.cd, h.cuentaComoAtaque, h.anuncio, !p.error, JSON.stringify(e.apunta), e.pierdeAlDano, e.permanente], [3, true, '{nombre} apunta con calma…', true, '{"pdg":2,"crit":1,"critpot":1}', true, true]);
+});
 prueba('🗡 Puñaladas (2026-10-21): un ataque con su arma que lleva la puñalada; Paso ligero', () => {
   const ar = n => armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos, 2);
   const p = ar('Puñalada por la espalda'), m = ar('Mordida a traición'), t = ar('Puñalada trapera');

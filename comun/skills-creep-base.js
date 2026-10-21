@@ -63,6 +63,7 @@
     'Arma ígnea': ['support', 'arma elemental'], 'Arma helada': ['support', 'arma elemental'], 'Arma eléctrica': ['support', 'arma elemental'],
     'Arma ácida': ['support', 'arma elemental'], 'Arma venenosa': ['support', 'arma elemental'],
     'Barrido': ['choque pesado', 'barrido'], 'Coletazo': ['choque pesado', 'barrido'],
+    'Tiro a la cabeza': ['rango', 'tiro apuntado'],
     'Puñalada por la espalda': ['choque liviano', 'por la espalda'], 'Mordida a traición': ['choque liviano', 'por la espalda'], 'Puñalada trapera': ['choque liviano', 'por la espalda'],
   };
 
@@ -179,7 +180,9 @@
   H('Disparo certero', 'D', 'hd', 'r', 2, aT('Un tiro apuntado con calma.', 'M'));
   H('Tiro rápido', 'D', 'hd', 'r', 2, aT('Dispara sin apuntar demasiado.', 'L'));
   H('Lluvia de flechas', 'DA', 'hd', 'r', 4, zO('Dispara al cielo y las flechas caen en flor de diámetro 3 (7 casillas) (a mano).', 3, 'M'));
-  H('Tiro a la cabeza', 'D', 'hd', 'r', 5, zO('Un solo tiro perfecto, lento de preparar.', 3, 'H'));
+  // 🎯 Auditada (dueño, 2026-10-21; rango, «tiro apuntado»): un turno apunta (es su ataque del turno) y el próximo disparo va mejor; si le hacen daño, lo pierde.
+  H('Tiro a la cabeza', 'B', 'hd', 'r', 3, {detalle: 'Apunta con calma: este turno no dispara (es su ataque del turno) y queda Apuntando a la cabeza. Su próximo disparo con un arma a distancia, en este turno o más adelante, suma +2 a la Probabilidad de Golpe, Crítico frecuente +1 y Crítico potente +1; se gasta al disparar. Si antes le hacen daño (que le llegue a la vida), pierde la puntería.',
+    no2: 1, spCosto: 2, auditada: true, cuentaComoAtaque: true, efecto: {nombre: 'Apuntando a la cabeza'}, anuncio: '{nombre} apunta con calma…'});
   H('Escupitajo ácido', 'DX', 'ba', 'r', 3, zO('Escupe ácido: el objetivo pierde 1 punto de Defensa 2 turnos (a mano).', 2, 'L'));
   H('Proyectil', 'D', '*', 'r', 2, aT('Lanza lo que tenga a mano.', 'L'));
   H('Lanzar piedra', 'D', 'bcd', 'r', 2, aT('Arroja una roca enorme.', 'M'));

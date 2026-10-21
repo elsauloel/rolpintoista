@@ -232,6 +232,10 @@ const ESTADOS_PRESET = [
     detalle:'Su arma corroe: cada golpe con arma que pega suma +1d4 de daño de ácido y deja Armadura rota 1 (y una más cada 5 de daño de ácido que entra). Es daño directo: solo lo frena la resistencia al ácido. Dura 3 turnos; otra arma elemental la reemplaza. ⚙ Automatizado en el duelo.'},
   {nombre:'Arma venenosa', polaridad:'buff', turnos:3, armaElemental:'toxico', golpePorTurnos:true, golpe:{efectos:[{nombre:'Tóxico', dado:'1d4', danoMagico:true, porDano:{estado:'Veneno', cada:3}}]},
     detalle:'Su arma gotea veneno: cada golpe con arma que pega suma +1d4 de daño tóxico y deja Veneno, 1 stack cada 3 de daño tóxico que entra (mínimo 1). Es daño directo: solo lo frena la resistencia tóxica. Dura 3 turnos; otra arma elemental la reemplaza. ⚙ Automatizado en el duelo.'},
+  // 🎯 Apuntando a la cabeza (2026-10-21, dueño, el Tiro a la cabeza de los creeps): su próximo disparo +2 PdG, Crítico frecuente +1 y Crítico potente +1
+  // (`apunta`, lo suma el mapa: vtt-hexgrid/js/35); se gasta al disparar y se pierde si le entra daño (`pierdeAlDano`, js/10).
+  {nombre:'Apuntando a la cabeza', polaridad:'buff', turnos:0, permanente:true, apunta:{pdg:2, crit:1, critpot:1}, pierdeAlDano:true,
+    detalle:'Apunta con calma: su próximo disparo con un arma a distancia suma +2 a la Probabilidad de Golpe, Crítico frecuente +1 y Crítico potente +1. Se gasta al disparar; si antes le hacen daño (que le llegue a la vida), pierde la puntería. ⚙ Automatizado en el mapa.'},
   {nombre:'Marcado', polaridad:'debuff', turnos:3, marcado:true,
     detalle:'⚙ Automatizado: no puede entrar en sigilo (si estaba, sale) y se lo sigue viendo con un brillo, aunque vuelva la niebla de guerra o esté en una nube de niebla. Se resiste con Res.Esp.'},
 ];

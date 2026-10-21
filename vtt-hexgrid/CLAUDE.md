@@ -1706,6 +1706,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `CreepCalculo.alcance`, o el arma a distancia del personaje en `FichaResumen`); `oportunidadCorte` (js/17) frena al primer rival que se mueve en la mira
   (`vigilantesDe`, `vigilanciaLoVe`) y el cartel de la oportunidad pregunta «¿Dispara?» (`vigilanciaArmasDe`: su ataque normal; `vigilanciaQuitar` al
   disparar). El alcance se dibuja con `vigilanciaDibujar` (js/05).
+- **🎯 Tiro a la cabeza** (2026-10-21): un estado de creep con `apunta` ({pdg, crit, critpot}) lo suma `arcoBonos` (js/35, `apuntaCreep`) a su próximo disparo
+  y `arcoApuntarGastar` lo saca; con `pierdeAlDano`, `danioCreep` (js/10) se lo saca si le entra daño (Mesa y Crónica).
 - **🗡 La puñalada** (2026-10-21, `js/59-punalada.js`): un ataque con `punalada` ('espalda' | 'trapera', de `Combatiente.ataqueConArreglos`); al elegir el
   objetivo, `punaladaBonos` le suma +1 dado y Crítico frecuente +1 (`mods.dados`, `mods.critBono`) si está en la cuña ciega (`enCunaCiega`); la trapera en
   sigilo, el doble de dados; de frente, avisa y deja seguir. La pasiva «Pasos silenciosos» se llama **Paso ligero** (`pasosSilenciosos` reconoce los dos nombres).

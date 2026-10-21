@@ -35,6 +35,8 @@
 - [ ] **🔥 Bola de fuego de creep** (2026-10-21): el área con el centro dentro de su Rango, la cascada con dodge roll, 2d6 + ¼ Ef.Esp de fuego (frenado por la
   Def. especial y la Res. fuego), la Quemadura; en modo SP le cobra su Especial; en modo cooldown, cooldown 2; 4 No2.
 - [ ] **😵 Confusión de creep** (2026-10-21): PdG.Esp contra Res.Mt; la Confusión 1 turno y el 1d4 antes de la primera acción del jugador en su turno.
+- [ ] **🎯 Tiro a la cabeza** (2026-10-21, rango): el anuncio y el estado; el próximo disparo con +2 PdG y Crítico frecuente y potente +1 (en el cuadro del duelo);
+  se gasta al disparar; un golpe que le saca vida se lo saca (Mesa y Crónica), uno que frena la armadura no.
 - [ ] **🗡 Puñaladas** (2026-10-21, choque liviano): un creep en la espalda de un personaje (en sigilo, con Paso ligero o con el personaje flanqueado) →
   la línea en la Mesa y el duelo con +1 dado y Crítico frecuente +1 (y el +1 PdG por la espalda); la trapera en sigilo, el doble de dados; de frente, el aviso
   «No está por la espalda» con «Atacar igual» / «Elegir otro». Y que la pasiva se vea como «Paso ligero».

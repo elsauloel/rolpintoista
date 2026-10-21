@@ -43,6 +43,8 @@ function arcoBonos(mio, t, ataque, tiro){
   // 🎯 Apuntar (Shooter, 2026-10-11): +X PdG y Crítico potente +X en este disparo; el estado se gasta al disparar (arcoApuntarGastar, js/13).
   const ax = Combatiente.apuntandoX(((vinculo(mio) || {}).resumen || {}).estados);
   if(ax) tiro = arcoSumar(tiro, {pdg: ax, critpot: ax}, `apuntando (+${ax})`);
+  const apc = apuntaCreep(mio);   // 🎯 Tiro a la cabeza de un creep (2026-10-21): +2 PdG, Crítico frecuente +1 y potente +1
+  if(apc) tiro = arcoSumar(tiro, {pdg: num(apc.apunta.pdg), crit: num(apc.apunta.crit), critpot: num(apc.apunta.critpot)}, 'apuntando a la cabeza');
   tiro = repeticionBonos(mio, t, ataque, tiro);   // 🔁 Repetición (Shooter, 2026-10-13)
   const d = distanciaHex({col: mio.col, fila: mio.fila}, {col: t.col, fila: t.fila});
   const la = Combatiente.largoAlcance(ataque, d, ataque.alcance);
@@ -92,7 +94,17 @@ function arcoBonos(mio, t, ataque, tiro){
    personaje o el creep: el costo lo cobra su ficha). Lo actualiza arcoResuelto, con cada duelo que termina (hook disparoResuelto de js/14). */
 const arcoTurno = new Map(), arcoLectura = new Map(), arcoUltimo = new Map();
 // 🎯 Apuntar: el disparo ya salió con el bono; el estado se va (solo un personaje: lo saca de su ficha).
+// El estado de un creep que suma a su próximo disparo (`apunta`: Apuntando a la cabeza), de su ficha privada (lo ve el GM, que es quien lo hace atacar).
+function apuntaCreep(mio){
+  const sc = mio && mio.tipo === 'creep' ? creepPrivadoDe(mio.fichaId) : null;
+  return sc ? (sc.estados || []).find(e => e && e.activo !== false && e.apunta) || null : null;
+}
 async function arcoApuntarGastar(mio, ataque){
+  if(mio && ataque && ataque.rango && !ataque.hab && apuntaCreep(mio)){   // 🎯 el de un creep: se gasta al disparar
+    try{ await modificarCreep(String(mio.fichaId), c => { c.estados = (c.estados || []).filter(e => !(e && e.apunta)); return {}; }); }
+    catch(err){ console.error('No se pudo gastar el apuntado:', err); mesaLinea(`🎯 ${nombreDe(mio)}: sacale «Apuntando a la cabeza» a mano (ya disparó)`); }
+    return;
+  }
   if(!mio || !ataque || !ataque.rango || ataque.hab || mio.tipo !== 'pj' || String(mio.fichaId).includes(SEP_INVOCACION)) return;
   if(!Combatiente.apuntandoX(((vinculo(mio) || {}).resumen || {}).estados)) return;
   try{ await editarPersonajeMapa(mio.fichaId, S => { const antes = (S.efectos || []).length; S.efectos = (S.efectos || []).filter(e => e.nombre !== Combatiente.APUNTANDO); return S.efectos.length !== antes; }); }

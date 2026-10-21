@@ -152,6 +152,11 @@
   avisa y el rival sigue. Quien ya estaba adentro, solo si se mueve; un rival en sigilo que no se ve, no. El alcance se dibuja en el mapa para todos.
   `vtt-hexgrid/js/58-vigilancia.js` (+ js/17). **Para probar.**
 
+- ✅ **Tiro a la cabeza** (2026-10-21, «tiro apuntado»): un turno apunta (anuncio «{nombre} apunta con calma…»; es su ataque del turno) y queda **Apuntando
+  a la cabeza**: su próximo disparo **+2 PdG, Crítico frecuente +1 y Crítico potente +1** (dueño: «+1 a cada uno de los bonos de crítico», en vez de potente
+  +2); se gasta al disparar. **Si le hacen daño** antes (que le llegue a la vida; si la armadura lo frena todo, no), **pierde la puntería**. 1 No2 y 2 SP, o
+  cooldown 3. **Para probar.**
+
 ### Casters (desde el 2026-10-21)
 
 - ✅ **Bola de fuego** (Mago, 2026-10-21, dueño, tras una simulación de 20.000 lanzamientos contra un grupo con equipo común): flor de diámetro 3 con

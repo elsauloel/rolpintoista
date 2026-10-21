@@ -228,7 +228,10 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     let fenix = false;
     if(sc.hp <= 0){ const q = Combatiente.revivirFenix(sc.estados, typeof estadosPresetCreep === 'function' ? estadosPresetCreep() : []); if(q){ sc.estados = q; sc.hp = Math.max(1, num(sc.hpMax)); fenix = true; } }
     const bronca = typeof broncaSumar === 'function' ? broncaSumar(sc, r) : null;   // 😤 cada golpe que le duele suma (js/51)
-    return {r, previo, nuevo: fenix ? 0 : sc.hp, bronca, fenix, hpFenix: sc.hp};
+    // 🎯 Si le entra daño, pierde la puntería (Tiro a la cabeza, 2026-10-21, dueño: «solamente si le hacen daño»).
+    let punteria = '';
+    if(num(r.recibido) > 0){ const i = (sc.estados || []).findIndex(e => e && e.activo !== false && e.pierdeAlDano); if(i >= 0){ punteria = sc.estados[i].nombre; sc.estados.splice(i, 1); } }
+    return {r, previo, nuevo: fenix ? 0 : sc.hp, bronca, fenix, hpFenix: sc.hp, punteria};
   });
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
   if(res.fenix){
@@ -236,6 +239,10 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     try{ momentoAbrir({tipo: 'fenix', icono: '🔥', titulo: `${nombreDe(t)} renace de sus cenizas`, estado: 'listo', resultado: `La Llama de Fénix lo levanta con ${fmt(res.hpFenix)} HP; queda Titilando hasta su próximo turno.`}); }catch(e){}
   }
   if(res.bronca && typeof broncaAnunciar === 'function') broncaAnunciar(t, res.bronca);
+  if(res.punteria){
+    const txt = `🎯 ${nombreDe(t)} recibió daño y pierde la puntería (se le va ${res.punteria})`;
+    try{ mesaLinea(txt, 'recordatorio'); momentoAbrir({tipo: 'punteria', icono: '🎯', titulo: `${nombreDe(t)} pierde la puntería`, estado: 'listo', resultado: txt.slice(3)}); }catch(e){}
+  }
   if(guarda && golpe > 0) guardianAviso(t, guarda);
   if(muro && golpe > 0) muroAviso(t, muro);
   await cosechaSiMuere(t, res);

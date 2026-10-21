@@ -67,8 +67,8 @@
   **2 SP**. **Toma carrera**: si se ejecuta de lejos, corre en línea recta hasta quedar al lado (lo que cuesta moverse: 1 No2 por casillero) y suma
   **+1 a la Probabilidad de Golpe, +1 al daño y +1 casilla de empuje por cada casillero que corrió** (al lado +1/+1/1, con uno en el medio +2/+2/2,
   con dos +3/+3/3…). Sin línea recta libre, avisa y deja atacar igual sin la carrera. Automatizado en el mapa (`vtt-hexgrid/js/55-carrera.js`).
-  Probado en el mapa (corrió 2 casilleros: «+3 PdG · +3 de daño fijo», pegó y empujó a Silvia 3 casilleros). El daño de colisión del empujón sigue
-  ✋ a mano (P178, propuesta al dueño: 1d4 por casillero que le faltó, restando la Defensa, y lo mismo a contra quien choca).
+  Probado en el mapa (corrió 2 casilleros: «+3 PdG · +3 de daño fijo», pegó y empujó a Silvia 3 casilleros). Si el empujón choca: el daño de colisión
+  (P178 ✅: una Constitución por casillero que le faltó, menos la Defensa; contra otro token, cada uno la del otro).
 
 - ✅ **Puño de roca** (constructos y elementales, 2026-10-21). Original: «Un puñetazo que rompe huesos.» Antes: 2d6 + nivel fijo, sin arma ni duelo.
   **Ahora** (dueño: «que sume daño y demora», «+2 al daño»): un ataque con su arma con **+2 al daño; si pega, Demora** (baja 1 lugar en el orden de

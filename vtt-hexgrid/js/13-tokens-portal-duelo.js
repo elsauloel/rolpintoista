@@ -1637,14 +1637,41 @@ async function dueloCadena(d, entro){
    pierde, lo trae hasta `casillas` hacia quien la usó, por casillas libres (Inamovible: su chance de no moverse). Todo a la vista en la Crónica. */
 /* El empujón (2026-10-08, ráfaga helada y vendaval): lejos de quien lo tira, hasta `n` casillas libres (lo frena un Sólido o un token). Inamovible
    (su %) no se mueve. Va a la Crónica. */
-/* El aviso del daño de colisión (dueño, 2026-10-08): al centro, a quien maneja a cada uno de los que chocan (un personaje contra un pilar: a quien lo
-   maneja; dos personajes: a los dos; un creep: al GM). El resto lo ve en la Crónica. Cuánto daño hace, ✋ a mano mientras se define (P178). */
-function avisoColision(t, contra){
+/* 💥 El daño de colisión (P178, dueño 2026-10-21: «Tira Constitución por cada casillero que le faltó recorrer, menos armadura. Y si es contra otro
+   pj, cada uno usa la Constitución del otro»). Si el empujón se frena antes de recorrer todo: por cada casillero que le faltó se tira una Constitución
+   (contra algo sólido, la suya; contra otro token, la de ese otro) y se le resta la Defensa; el otro token recibe lo mismo con la Constitución del
+   empujado. Las tiradas van a la Mesa; el resultado, al centro de quien maneja a cada uno (un creep: el GM) y a la Crónica. Lo aplica la pantalla
+   que resuelve el efecto (el GM). */
+function colisionTirar(de, veces){
+  const v = trampaValorStat(de, 'con'), est = confusionEstadosDe(de), rs = [];
+  for(let i = 0; i < veces; i++){ const r = Combatiente.tirarStat(v, est, 'con'); if(r) rs.push(r); }
+  if(!rs.length) return null;
+  return {total: rs.reduce((a, r) => a + num(r.total), 0), rolls: rs.flatMap(r => r.rolls || []), mod: rs.reduce((a, r) => a + num(r.mod), 0), formula: rs.map(r => r.formula).join(' + ').slice(0, 60)};
+}
+async function colisionAplicar(x, tir, deNombre, veces){
+  mesaPublicar(`💥 Choque: ${nombreDe(x)} · Constitución de ${deNombre} ×${veces}`, {...tir, quien: nombreDe(x), ...(x.tipo === 'creep' ? {desde: 'gm'} : {})});
+  let res = null;
+  try{
+    if(x.tipo === 'creep'){ if(soyGM) res = await danioCreep(x, String(tir.total), false, 0, 0); }
+    else res = await (String(x.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(x, String(tir.total), false, 0, 0);
+  }catch(err){ console.error('No se pudo aplicar el daño de colisión:', err); }
+  return res && res.r ? `${nombreDe(x)}: ${tir.total}${res.r.invulnerable ? ' → Invulnerable: no le hizo nada' : ` − Defensa ${fmt(res.r.defensa)} → ${fmt(res.r.recibido)} de daño`}`
+    : `${nombreDe(x)}: ${tir.total} de daño menos su Defensa — aplicalo a mano`;
+}
+async function avisoColision(t, contra, faltan){
+  const veces = Math.max(1, Math.round(num(faltan)) || 1);
   const uidDe = x => x.tipo === 'creep' ? ((fbPartida && fbPartida.gmUid) || '') : (x.duenoUid || '');
   const uids = [...new Set([t, ...(contra ? [contra] : [])].map(uidDe).filter(Boolean))];
-  const texto = `${nombreDe(t)} salió despedido y chocó contra ${contra ? nombreDe(contra) : 'algo sólido (un pilar, una pared)'}. ✋ El daño de colisión se resuelve a mano: todavía está a definir cuánto${contra ? ' y a quién' : ''}.`;
+  const lineas = [];
+  const t1 = colisionTirar(contra || t, veces);
+  if(t1) lineas.push(await colisionAplicar(t, t1, contra ? nombreDe(contra) : nombreDe(t), veces));
+  if(contra){ const t2 = colisionTirar(t, veces); if(t2) lineas.push(await colisionAplicar(contra, t2, nombreDe(t), veces)); }
+  const cuenta = `Le faltaron ${veces} casillero${veces === 1 ? '' : 's'}: ${veces} Constitución${veces === 1 ? '' : 'es'}${contra ? ' (cada uno, la del otro)' : ''}, menos la Defensa.`;
+  const texto = `${nombreDe(t)} salió despedido y chocó contra ${contra ? nombreDe(contra) : 'algo sólido (un pilar, una pared)'}. ${cuenta} ${lineas.join(' · ') || '✋ Daño de colisión a mano.'}`;
+  mesaLinea(`💥 ${texto}`, 'recordatorio');
   momentoAbrir({tipo: 'colision', icono: '💥', titulo: `Choque: ${nombreDe(t)}${contra ? ' contra ' + nombreDe(contra) : ''}`, resultado: texto, estado: 'listo',
     datos: {paraUids: uids, aviso: true, boton: 'Entendido', pasos: [{titulo: 'Daño de colisión', texto}]}});
+  return lineas.join(' · ');
 }
 async function dueloEmpujar(d, n){
   const t = tokens.get(d.defensor.tokenId), ta = d.atacante && tokens.get(d.atacante.tokenId);
@@ -1662,15 +1689,15 @@ async function dueloEmpujar(d, n){
   }
   // Contra qué chocó (2026-10-08, dueño: el aviso del daño de colisión, a todos los involucrados): el token que tapa el paso o algo sólido.
   const contraQue = () => { const sig = vecinosDeCasilla(c).filter(v => distanciaHex(v, ta) > distanciaHex(c, ta)); return [...tokens.values()].find(y => y !== t && sig.some(v => v.col === y.col && v.fila === y.fila)) || null; };
-  if(!pasos){ const contra = contraQue(); momentoAbrir({tipo: 'empujon', icono: '💨', titulo, resultado: `No hay lugar para empujarlo: choca${contra ? ` contra ${nombreDe(contra)}` : ''} y queda donde está. ✋ Daño de colisión a mano (a definir).`, estado: 'listo'}); avisoColision(t, contra); return {nota: 'chocó sin moverse (✋ daño de colisión a mano)'}; }
+  if(!pasos){ const contra = contraQue(); momentoAbrir({tipo: 'empujon', icono: '💨', titulo, resultado: `No hay lugar para empujarlo: choca${contra ? ` contra ${nombreDe(contra)}` : ''} y queda donde está.`, estado: 'listo'}); const cl = await avisoColision(t, contra, n); return {nota: `chocó sin moverse${cl ? ' · ' + cl : ''}`}; }
   try{ await coleccionTokens().doc(d.defensor.tokenId).update({col: c.col, fila: c.fila, ruta: firebase.firestore.FieldValue.delete()}); }
   catch(err){ console.error('No se pudo empujar:', err); return {manual: true, nota: `empujalo ${pasos} casillas a mano`}; }
-  // Si chocó antes de recorrer todo (un Sólido, un token o el borde): daño de colisión, ✋ a mano mientras se define (dueño, 2026-10-08, P178).
+  // Si chocó antes de recorrer todo (un Sólido, un token o el borde): el daño de colisión (P178, 2026-10-21: Constitución por casillero que le faltó).
   const contra = pasos < n ? contraQue() : null;
-  const choco = pasos < n ? ` Chocó contra ${contra ? nombreDe(contra) : 'algo sólido'}: ✋ daño de colisión a mano (a definir).` : '';
-  if(pasos < n) avisoColision(t, contra);
+  const choco = pasos < n ? ` Chocó contra ${contra ? nombreDe(contra) : 'algo sólido'}.` : '';
+  const cl = pasos < n ? await avisoColision(t, contra, n - pasos) : '';
   momentoAbrir({tipo: 'empujon', icono: '💨', titulo, resultado: `Sale despedido ${pasos} casillero${pasos === 1 ? '' : 's'} lejos de ${d.atacante.nombre || 'quien lo tiró'}.${choco}`, estado: 'listo'});
-  return {nota: `lo empujó ${pasos} casillero${pasos === 1 ? '' : 's'}${choco ? ' y chocó (✋ daño de colisión a mano)' : ''}`};
+  return {nota: `lo empujó ${pasos} casillero${pasos === 1 ? '' : 's'}${choco ? ` y chocó${cl ? ': ' + cl : ''}` : ''}`};
 }
 // El viento que despeja (2026-10-08, vendaval): borra la niebla y el fuego (terreno incendiado o zona de fuego) que tocan esas casillas.
 // (dueño, 2026-10-08): despeja SOLO las casillas que toca — una niebla o un fuego de varias casillas pierde esas y el resto queda (pasa a forma

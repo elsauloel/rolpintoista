@@ -859,8 +859,11 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   el turno de quien lo tiene, antes de que pegue; lo puesto fuera de su turno no descuenta en su primer inicio (le toca el turno entero). Así uno de N
   turnos dura N rondas completas desde que se aplica. El ⟳ Mantenimiento de la ronda (sin orden de turnos) sigue como antes. `Combatiente.empezarTurnoEstados`
   / `terminarTurnoEstados`, la marca `recien` que pone `agregarEstado`.
-- ⏳ **P178. Daño de colisión** (dueño, 2026-10-08, vendaval): si un empujón choca contra algo (un Sólido, un token, el borde) antes de recorrer todo, hay
-  daño de colisión — a definir cuánto y a quién (¿también a aquello contra lo que choca?). Hoy el mapa lo avisa en la Crónica: «✋ daño de colisión a mano».
+- ✅ **P178. Daño de colisión** (dueño, 2026-10-08, vendaval): si un empujón choca contra algo (un Sólido, un token, el borde) antes de recorrer todo, hay
+  daño de colisión — a definir cuánto y a quién (¿también a aquello contra lo que choca?). **Decidido (dueño, 2026-10-21): «Tira Constitución por cada
+  casillero que le faltó recorrer, menos armadura. Y si es contra otro pj, cada uno usa la Constitución del otro».** Contra algo sólido, la Constitución
+  es la del empujado; contra otro token, el empujado recibe la del otro y el otro la del empujado. Automatizado en el empujón del duelo (`avisoColision`,
+  vtt-hexgrid/js/13): Mesa, Crónica y el Anuncio a quien maneja a cada uno.
 - ✅ **P179. Identidad de las tiendas: ¿qué hacemos con Ramos generales?** (dueño, 2026-10-08: «quedó medio borrosa y redundante… quizás quitarla o
   buscarle una vuelta»). Hoy: Herrero (armas cuerpo a cuerpo, escudos, armaduras), Bazar arcano (consumibles, varitas, orbes, anillos, piezas de caster)
   y Ramos (un poco de todo + trampas, mochilas, cinturones y consumibles básicos). Propuesta: reconvertirla en la tienda del **cazador / talabartero**

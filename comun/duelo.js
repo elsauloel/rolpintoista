@@ -1825,7 +1825,14 @@ const Duelo = (() => {
       const defensaManual = sel && sel.value === 'no' ? 'no' : sel && sel.value === 'num' ? Math.max(0, Math.round(_num(n && n.value))) : null;
       // Los efectos al golpear del arma (si esta pantalla maneja al atacante) y los de la habilidad, como en el daño de siempre.
       let efectos = [];
-      try{ const h = hooks(); if(!d.hab && h && h.soy && h.soy(d.atacante) && h.efectosArma) efectos = efectosArmaDe(d, h); }catch(err){}
+      // (2026-10-21, probando la Ráfaga en el mapa: a mano se perdían los efectos del arma de un creep) — los ganchos locales del mapa primero.
+      try{
+        let h = null;
+        if(cfgEscuchar.hooksLocal){ h = cfgEscuchar.hooksLocal(d.atacante); if(h && typeof h.then === 'function') h = await h; }
+        const H = hooks();
+        if(!h && H && H.soy && H.soy(d.atacante)) h = H;
+        if(!d.hab && h && h.efectosArma) efectos = efectosArmaDe(d, h);
+      }catch(err){}
       if(!d.hab) efectos = [...efectos, ...efectosDeHabilidad(d)];
       if(typeof mesaPublicar === 'function'){ try{ mesaPublicar(`${lado.nombre} · ${etiqueta} (manual)`, r); }catch(err){} }
       guardarDano(d.id, r, efectos, {defensaManual}).catch(err => { console.error(err); _toast('No se pudo anotar la tirada en el duelo'); });

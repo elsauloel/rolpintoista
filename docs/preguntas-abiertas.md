@@ -1094,3 +1094,19 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
 - ✅ **P215. ¿La recarga mínima de 1 SP por turno vale también para los personajes? — 2026-10-20; decidida: sí (dueño).** El dueño la fijó para los creeps con SP («aunque
   tenga tres, uno de Especial recarga uno de SP»). Hoy un personaje recarga la mitad de su Especial (`spregen: floor(esp/2)`): con Especial 1, 0 por
   turno. Propuesta: la misma regla para todos (mínimo 1). **Hecho:** `FichaCalculo.calcular` deja el SP Regen final en 1 como mínimo.
+- ⏳ **P216. La economía del SP: ¿las habilidades que suman Efecto especial están baratas? — 2026-10-21 (dueño, con la Bola de fuego de creep).**
+  El dueño: «puede ser que los skills también estén baratos… el sistema de cooldown termina siendo o muy rápido (uno sí, uno no) o muy lento (uno sí,
+  dos no); el SP debería poder tener más matices. Un caster con Especial 15 debería tener una amplia regeneración, pero las habilidades que le suman
+  Efecto especial al daño tienen que costar mucho más».
+  **Los números (2026-10-21):** jugadores y creeps tienen la misma cuenta: SP máximo = Especial × 3 (un caster de Especial 15: 45 SP) y recarga =
+  la mitad del Especial (7 por turno). Una pelea dura 3 a 5 turnos: el caster tiene unos 45 + 4 × 7 ≈ 73 SP para gastar en toda la pelea, así que
+  cualquier habilidad de hasta ~7 SP se puede tirar **todos los turnos** sin agotarse (ya lo había mostrado la simulación del 2026-10-07: «el SP casi
+  no frena»). El freno real por turno es el No2: el Orbe arcano del Mago (1d12+4 directo en área) cuesta 4 SP y **5 No2**, y eso lo deja en uno por
+  turno. Comparación de daño: Orbe arcano ≈ 10 por objetivo (4 SP); Bola de fuego de creep con ¼ del Ef.Esp ≈ 8 por objetivo + Quemadura (3 SP):
+  **la del creep está a la par de la del jugador; las dos están baratas en SP.** El Toque mágico del Mago suma el Ef.Esp entero (3d6 + Ef.Esp) por 3 SP.
+  **Propuesta de Claude — el costo en SP según cada cuánto se quiere que salga:** con la recarga R ≈ la mitad del Especial, una habilidad que cuesta
+  ~R sale todos los turnos; ~2R, uno sí y uno no; ~3R, uno de cada tres; el resto del SP (el máximo) da un arranque fuerte de 2 o 3 usos. Para que
+  escale sola con el caster, **las que suman Efecto especial cuestan su Especial en SP** (≈ 2R: uno sí, uno no, sea del nivel que sea); en modo
+  cooldown, cooldown 2. Las grandes de área, 1,5 × Especial (≈ uno de cada tres). Y quizás bajar el SP máximo de los creeps (Especial × 2) para que
+  el arranque no sea tan largo. Falta decidir: el criterio, si vale también para los jugadores (el Toque mágico, el Orbe arcano) y una simulación
+  con el criterio elegido.

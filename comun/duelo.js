@@ -575,6 +575,9 @@ const Duelo = (() => {
     if(_num(m.dados)) t.push(`+${_fmt(m.dados)} dado${_num(m.dados) === 1 ? '' : 's'} de daño`);
     if(m.dadoExtra) t.push(`+${_esc(m.dadoExtra)} de daño`);
     if(_num(m.fijo)) t.push(`${_num(m.fijo) > 0 ? '+' : ''}${_fmt(m.fijo)} de daño fijo`);
+    if(_num(m.critBono)) t.push(`Crítico frecuente +${_fmt(m.critBono)}`);   // los arreglos de crítico de una habilidad, a la vista (2026-10-21, Zarpazo)
+    if(_num(m.critpotBono)) t.push(`Crítico potente +${_fmt(m.critpotBono)}`);
+    if(_num(m.ignoraResistCrit)) t.push(`ignora ${_fmt(m.ignoraResistCrit)} de Res. a crítico`);
     if(d.ataque && d.ataque.sinParry) t.push('no se puede parrear');
     if(d.ataque && d.ataque.porLaEspalda){
       const pe = [_num(d.ataque.espaldaPdg) > 0 ? `+${_fmt(d.ataque.espaldaPdg)} PdG` : '', d.ataque.espalda ? espaldaTxt(d.ataque.espalda) : ''].filter(Boolean).join(', ');

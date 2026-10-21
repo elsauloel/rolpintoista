@@ -49,6 +49,9 @@
   costo de un ataque, cooldown 2 o **2 SP** (la que atraviesa armadura). Probado en el mapa (declara «+1 de daño fijo · perfora 2»).
 - ✅ **Zarpazo** (bestias, 2026-10-21). Original: «Un zarpazo salvaje.» **Ahora** (dueño): un ataque con su arma con **Crítico potente +2 y +1 al
   daño**, costo de un ataque, cooldown 2 o **2 SP** (como el Lisiar del Asalto sin la Lesión). No sangra: eso es del Zarpazo desgarrador.
+  Probado en el mapa (creep con Garras Tipo 4: la declaración dice «+1 de daño fijo · Crítico potente +2»; con crítico, la tabla baja a doble
+  con 5 o más y triple con 16 o más). De paso, la declaración del duelo muestra ahora los arreglos de crítico de cualquier habilidad
+  (Crítico frecuente, potente, ignora Res. a crítico).
 
 ## Etiquetas
 

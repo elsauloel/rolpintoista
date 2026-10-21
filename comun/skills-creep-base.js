@@ -20,6 +20,9 @@
   const aT = (detalle, dano) => ({detalle, no2: 'ATAQUE', dano});
   const zO = (detalle, no2, dano) => ({detalle, no2, dano});
   const tA = (detalle, no2) => ({detalle, no2});
+  // Un ataque con su arma, con arreglos (`arma`: los de la Ejecución ✨ — dados, pdg, fijo, perfora, critBono…), que va al duelo como un ataque.
+  const aA = (detalle, arma, ataqueTxt, spCosto) => ({detalle, no2: 'ATAQUE', ataqueTxt, ...(spCosto !== undefined ? {spCosto} : {}),
+    duelo: {modo: 'arma', objetivo: 'enemigo', x: 'nitros', arma: {pdg: 0, dados: 0, fijo: 0, ...arma}, efectos: []}});
   const bU = (detalle, no2, mods, turnos) => ({detalle, no2, efecto: {mods, turnos}});
   const cU = (detalle, no2, k) => ({detalle, no2, cura: k});
   const dC = (detalle, no2, dano, k) => ({detalle, no2, dano, cura: k});
@@ -62,7 +65,9 @@
   }
 
   /* ================= DAÑO CUERPO A CUERPO ================= */
-  H('Golpe fuerte', 'D', '*', 'mt', 2, aT('Un golpe cargado con todo el peso.', 'M'));
+  // Auditada (dueño, 2026-10-20): como el Amplificar daño del Warrior con X = 1 — +1 dado del Tipo de su arma, 1 SP (o cooldown 2).
+  H('Golpe fuerte', 'D', '*', 'mt', 2, aA('Un golpe cargado con todo el peso: un ataque con su arma que suma +1 dado del Tipo de su arma al daño.', {dados: 1},
+    'va al duelo como un ataque (PdG contra Evasión o Parry, Bloqueo y crítico) con +1 dado del Tipo de su arma', 1));
   H('Tajo veloz', 'D', '*', 'me', 2, aT('Un corte rápido y certero.', 'L'));
   H('Estocada', 'D', 'hd', 'me', 2, aT('Una punzada directa al punto débil.', 'L'));
   H('Golpe aplastante', 'D', '*', 'mt', 4, zO('Un golpe devastador que casi no se puede esquivar.', 3, 'H'));

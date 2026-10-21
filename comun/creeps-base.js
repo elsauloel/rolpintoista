@@ -113,7 +113,8 @@
   };
   function armarDetalle(sp, n, cd, lenta){
     const auto = [sp.no2 === 'ATAQUE' ? 'cuesta lo mismo que un ataque y cuenta como uno' : `cuesta ${sp.no2} No2`,
-      `cooldown ${cd}${lenta ? ' (habilidad lenta: el combate arranca con el cooldown activo)' : ''}`];
+      `cooldown ${cd}${sp.spCosto !== undefined ? ` (con SP: ${sp.spCosto} SP)` : ''}${lenta ? ' (habilidad lenta: el combate arranca con el cooldown activo)' : ''}`];
+    if(sp.ataqueTxt) auto.push(sp.ataqueTxt);   // un ataque con su arma que va al duelo (2026-10-20)
     if(sp.dano) auto.push(`tira ${danoTxt(sp.dano, n)} de daño`);
     if(sp.cura) auto.push(`se cura ${sp.cura * n} HP sin pasar de su máximo`);
     if(sp.efecto){
@@ -149,6 +150,9 @@
       h.tiradaExtra = danoTxt(sp.dano, n);
       h.tiradaStat = (sp.magico !== undefined ? sp.magico : esHabMagica(sp.nombre, sp.detalle)) ? 'pdgmg' : 'pdg';
     }
+    // Un ataque con su arma, con arreglos, que va al duelo (2026-10-20, auditoría de creeps: el Golpe fuerte como el Amplificar daño del Warrior).
+    if(sp.duelo){ h.duelo = structuredClone(sp.duelo); h.modo = 'auto'; h.tiradaStat = 'pdg'; delete h.tiradaExtra; }
+    if(sp.spCosto !== undefined) h.spCosto = sp.spCosto;   // 💧 su SP en modo SP
     if(sp.cura) h.curaHp = sp.cura * n;
     if(sp.trampa !== undefined || sp.colocar){
       const o = opcionesTrampa(sp);

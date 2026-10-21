@@ -1537,6 +1537,7 @@ async function dueloAplicarDano(d){
     const oD = {distancia: !!(d.ataque && d.ataque.rango), magico: !!(habMagica || elDano), reparte: true};   // reparte: Miti-Miti (js/10)   // magico: el Orbe de absorción (js/26)   // la Defensa extra contra armas a distancia (torso blando, 2026-10-06)
     const res = esInv ? await danioInv(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD)
       : t.tipo === 'creep' ? await danioCreep(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD) : await danioPj(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD);
+    if(t.tipo === 'creep' && typeof aguanteSumar === 'function') aguanteSumar(t);   // 🛡 Aguante (js/56): un golpe más, aunque la armadura lo frene todo
     const espinas = res.r.invulnerable ? null : await dueloEspinas(d, golpe, habMagica);   // el daño inflictido (con el multiplicador del crítico), antes de la Defensa; solo el físico
     // Daño elemental del arma o de la flecha (el daño híbrido): aparte, después del golpe — es DIRECTO (dueño, 2026-10-09): no resta la Defensa
     // ni la Defensa especial, solo la resistencia a su elemento; y no se multiplica con el crítico.

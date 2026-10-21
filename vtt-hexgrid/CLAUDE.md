@@ -1692,3 +1692,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   la carrera. Mesa y Crónica.
 - **🤼 El agarre** (2026-10-21): «Agarrado» / «Agarrando» van por el mismo camino que el Mordido / Mordiendo (`AGARRES` en js/54: quién agarra, el daño
   que se repite, se suelta al empezar el turno de quien agarra). Lo usan el Agarrón (sin daño) y el Abrazo aplastante (con daño).
+- **🛡 Aguante** (2026-10-21, `js/56-aguante.js`): el estado `aguante` cuenta los golpes (`aguanteSumar`, desde `dueloAplicarDano` de js/13); al empezar
+  su turno pasa a `sc.aguanteListo` (`CreepAcciones.inicioCreep`); el Atacar de las Acciones (js/12) llama a `aguanteAtacar`: cartel, cobro (No2 del ataque
+  + 1 SP por dado, o +1 de cooldown a Aguante por dado) y un ataque con arreglos (+N dados) al duelo. `habilidadAnuncio(sc, h)`: el `h.anuncio` de una
+  habilidad de creep (Mesa y Crónica).

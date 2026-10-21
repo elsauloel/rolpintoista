@@ -106,6 +106,14 @@
   agarró, o antes si se zafa. **Agarrón** (sin daño: su Probabilidad de Golpe contra la Evasión, pegado; 2 No2 y cooldown 3, o 2 SP) y **Abrazo
   aplastante** (con daño: un ataque con su arma; si no se suelta, el apretón le vuelve a hacer el mismo daño; costo de un ataque, más 3 SP o
   cooldown 3). El mismo mecanismo que el Mordisco feroz (`vtt-hexgrid/js/54`). **Para probar en el mapa.**
+### Choque pesado (tanques y warriors, desde el 2026-10-21)
+
+- ✅ **Aguante** (2026-10-21, dueño; uno solo para bestias y humanoides): cuesta 1 No2 y 1 SP (o cooldown 3). Se anuncia «‹creep› se pone en modo
+  aguante.» y queda con **+2 a la Defensa y +2 a la Defensa especial** hasta que empiece su próximo turno, contando cada golpe que le pega (aunque la
+  armadura lo frene todo; trampas y zonas no cuentan). En su próximo turno, al apretar Atacar, sale el cartel de modo aguante: su ataque suma **+1 dado
+  del Tipo de su arma por cada golpe recibido**, **1 SP por dado** (si no le alcanza, los que pueda pagar; en modo cooldown, +1 turno de cooldown a
+  Aguante por dado) más los No2 del ataque, y se pasa al duelo. Si no ataca en ese turno, lo pierde. `vtt-hexgrid/js/56-aguante.js`. **Para probar.**
+
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 
 ## Etiquetas

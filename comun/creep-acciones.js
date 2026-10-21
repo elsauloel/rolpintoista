@@ -156,7 +156,7 @@ const CreepAcciones = (() => {
      acá (los resuelve cada pantalla antes). */
   const uid = () => Math.random().toString(36).slice(2,9);
   const ATTR_LABELS = {con:'Con', fue:'Fue', agl:'Agi', des:'Des', esp:'Esp'};
-  const FLAGS_ESTADO = ['fenix', 'armaduraRota','silencio','confusion','lisiado','paralisis','esEscarcha','mitadPdgEva','inmovilizado','rengo','lento','cansado','exhausto','hypeado','sentado','excedenteVida','invulnerable','inmunidadCC','inmunidadMental','esMental','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','espejo','desarmado','ceguera','esCC','esVeneno','esSangrado','stun','expuesto','mitadEva','alEmpezarTurno','volador','sangraSp'];
+  const FLAGS_ESTADO = ['fenix', 'armaduraRota','silencio','confusion','lisiado','paralisis','esEscarcha','mitadPdgEva','inmovilizado','rengo','lento','cansado','exhausto','hypeado','sentado','excedenteVida','invulnerable','inmunidadCC','inmunidadMental','esMental','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','espejo','desarmado','ceguera','esCC','esVeneno','esSangrado','stun','expuesto','mitadEva','alEmpezarTurno','volador','sangraSp','aguante'];   // aguante: el modo aguante (2026-10-21)
   const habEtq = stat => (C().STAT_LOOKUP[stat] && C().STAT_LOOKUP[stat].label) || ATTR_LABELS[stat] || stat;
   // La Ejecución de un creep: la misma regla que personajes e invocaciones (comun/combatiente.js, habEjecucion). Sin costo variable.
   function habEjecucion(sc, h){
@@ -497,7 +497,7 @@ const CreepAcciones = (() => {
     const it = especialesCreep(sc).find(x => x.id === itemId);
     if(!it) return {error: `${sc.nombre}: esa arma especial ya no está en su equipo`};
     const c = costoEspecialCreep(sc, it);
-    if(c.enEspera > 0 && !C().modoSP(sc)) return {error: `${sc.nombre}: ${it.nombre} está en espera ${fmt(c.enEspera)} turno${c.enEspera === 1 ? '' : 's'} (un creep paga el SP con espera)`};
+    if(c.enEspera > 0 && !C().modoSP(sc)) return {error: `${sc.nombre}: ${it.nombre} está en cooldown ${fmt(c.enEspera)} turno${c.enEspera === 1 ? '' : 's'} (en modo cooldown, un creep paga el SP con cooldown)`};
     const h = habDeEspecialCreep(sc, it);
     const p = ejecutarHab(sc, h, presets, silencioOk);
     if(p.error) return p;
@@ -543,6 +543,8 @@ const CreepAcciones = (() => {
     sc.saqueUsado = false;   // Saque rápido: vuelve con el turno (2026-10-05)
     let enCooldown = 0;
     (sc.habilidades || []).forEach(h => { if(num(h.cdActual) > 0){ h.cdActual = Math.max(0, num(h.cdActual) - 1); enCooldown++; } });
+    const ag = (sc.estados || []).find(e => e && e.activo !== false && e.aguante);   // 🛡 Aguante (2026-10-21): los golpes que contó pasan a su ataque de este turno
+    sc.aguanteListo = ag ? Math.max(0, Math.round(num(ag.golpes))) : 0;
     const v = Combatiente.vencerAlEmpezar(sc.estados); sc.estados = v.quedan;   // Titilando se va al empezar su turno
     const d = mant ? Combatiente.dispararEstados(sc.estados, {hp: 'hpTurno', stacks: 'stacksTurno', resFuego: C().resElemental(sc, 'fuego')})
       : Combatiente.empezarTurnoEstados(sc.estados, {hp: 'hpTurno', stacks: 'stacksTurno', resFuego: C().resElemental(sc, 'fuego')});
@@ -574,6 +576,7 @@ const CreepAcciones = (() => {
     return true;
   }
   function finCreep(sc, mant){
+    if(!mant) sc.aguanteListo = 0;   // 🛡 si no atacó en su turno, perdió el aguante
     const k = mant ? Combatiente.contarEstados(sc.estados, {hp: 'hpTurno', stacks: 'stacksTurno'}) : Combatiente.terminarTurnoEstados(sc.estados);
     sc.estados = k.quedan;
     if(k.terminados.some(es => C().modsAfectanHp(es.mods))) C().actualizarHpMaxPorCon(sc);

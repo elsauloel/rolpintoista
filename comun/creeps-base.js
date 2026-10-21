@@ -49,7 +49,7 @@
   const dc = (nombre, detalle, no2, dano, k) => ({nombre, detalle, no2, dano, cura: k});   // tira daño y se cura k × nivel                  // cura k × nivel
 
   function danoTxt(d, n){ return d === 'L' ? `1d6+${n}` : d === 'M' ? `2d6+${n}` : `3d6+${n + 1}`; }
-  const MOD_TXT = {def: 'Defensa', dmg: 'Daño', nitros: 'No2', eva: 'Evasión', resmg: 'Res.Esp', resm: 'Res.Mt'};
+  const MOD_TXT = {armadmg: 'Defensa especial', def: 'Defensa', dmg: 'Daño', nitros: 'No2', eva: 'Evasión', resmg: 'Res.Esp', resm: 'Res.Mt'};
   // Frases de la descripción que la herramienta NO resuelve sola (efectos sobre otros, movimiento, geometría del área).
   const MANUAL_RE = /a mano|casilla|flor de|cono|línea|empuj|salta|se mueve|ignora|todos|adyacent|aliado|el objetivo|los golpeados|los afectados|los que|quedan|queda /i;
   const sinEtiqueta = t => t.replace(/\s*\(a mano\)/g, '').replace(/\(a mano,\s*/g, '(').replace(/,\s*a mano\)/g, ')').replace(/\s+/g, ' ').trim();
@@ -153,6 +153,7 @@
     // Un ataque con su arma, con arreglos, que va al duelo (2026-10-20, auditoría de creeps: el Golpe fuerte como el Amplificar daño del Warrior).
     if(sp.duelo){ h.duelo = structuredClone(sp.duelo); h.modo = 'auto'; h.tiradaStat = 'pdg'; delete h.tiradaExtra; }
     if(sp.spCosto !== undefined) h.spCosto = sp.spCosto;   // 💧 su SP en modo SP
+    if(sp.anuncio) h.anuncio = sp.anuncio;   // 🛡 lo que se anuncia al usarla («{nombre} se pone en modo aguante.», 2026-10-21)
     if(sp.cura) h.curaHp = sp.cura * n;
     if(sp.trampa !== undefined || sp.colocar){
       const o = opcionesTrampa(sp);

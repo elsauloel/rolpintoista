@@ -964,6 +964,16 @@ prueba('🕸 Redes y 🤼 agarres de creep (2026-10-21)', () => {
     !!EstadosAplicar.componer({nombre: 'Agarrado'}).inmovilizado, Combatiente.grupoCC('Agarrado')],
     ['Inmovilizado', 4, true, true, 5, 'Agarrado', 6, 'Agarrado', 6, '1d6+2', true, 'atrapar']);
 });
+prueba('🛡 Aguante (2026-10-21): +2 Defensa y +2 Def.Esp; los golpes pasan a su ataque al empezar su turno', () => {
+  const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Aguante').datos, 2);
+  const sc = {nombre: 'Ogro', estados: [], habilidades: [h], hp: 20, hpMax: 20, nitros: 5, fue: 4, con: 4, agl: 2, des: 2, esp: 1};
+  const r = CreepAcciones.efectoDeHab(sc, h, estadosPresetCreep());
+  const e = sc.estados[0], mods = (e.mods || []).map(m => m.stat + m.val).sort().join(',');
+  e.golpes = 3;
+  CreepAcciones.inicioTurno(sc, 'prueba', 1);
+  igual([h.anuncio, h.spCosto, !!e.aguante, !!e.alEmpezarTurno, mods, sc.aguanteListo, sc.estados.some(x => x.aguante)],
+    ['{nombre} se pone en modo aguante.', 1, true, true, 'armadmg2,def2', 3, false]);
+});
 prueba('👊 Puño de roca (2026-10-21): +2 al daño y Demora', () => {
   const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Puño de roca').datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});
@@ -3919,7 +3929,7 @@ prueba('✨ armas especiales de un creep (2026-10-05): No2 como un personaje, el
   const escudo = sc.estados.find(e => e.nombre === 'Vida extra');
   const r = CreepAcciones.mantenimiento(sc), espera1 = (sc.esperaEspecial || {})[varita.id];
   CreepAcciones.mantenimiento(sc);
-  igual([h.tiradaExtra, h.duelo.objetivo, !!p1.error, sc.nitros < 6, /espera/.test(p2.error || ''), !!escudo, espera1, (sc.esperaEspecial || {})[varita.id], JSON.stringify(varita) === antes, CreepAcciones.ESPERA_POR_SP(1), CreepAcciones.ESPERA_POR_SP(4)],
+  igual([h.tiradaExtra, h.duelo.objetivo, !!p1.error, sc.nitros < 6, /cooldown/.test(p2.error || ''), !!escudo, espera1, (sc.esperaEspecial || {})[varita.id], JSON.stringify(varita) === antes, CreepAcciones.ESPERA_POR_SP(1), CreepAcciones.ESPERA_POR_SP(4)],
     ['1d4', 'enemigo', false, true, true, false, 1, undefined, true, 1, 2]);   // !!escudo: el resguardo ya no va al usar la varita (2026-10-18)
 });
 prueba('✨ armas especiales Comunes (2026-10-05): 36 armas y 3 orbes; cada una automatiza algo o aclara lo que queda a mano', () => {

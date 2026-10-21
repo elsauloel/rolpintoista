@@ -65,7 +65,7 @@
     'Arma ígnea': ['support', 'arma elemental'], 'Arma helada': ['support', 'arma elemental'], 'Arma eléctrica': ['support', 'arma elemental'],
     'Arma ácida': ['support', 'arma elemental'], 'Arma venenosa': ['support', 'arma elemental'],
     'Barrido': ['choque pesado', 'barrido'], 'Coletazo': ['choque pesado', 'barrido'],
-    'Tiro a la cabeza': ['rango', 'tiro apuntado'], 'Ráfaga de cortes': ['choque liviano', 'ráfaga'], 'Ráfaga de zarpazos': ['choque liviano', 'ráfaga'],
+    'Tiro a la cabeza': ['rango', 'tiro apuntado'], 'Disparo señalador': ['rango', 'señalar'], 'Ráfaga de cortes': ['choque liviano', 'ráfaga'], 'Ráfaga de zarpazos': ['choque liviano', 'ráfaga'],
     'Romper armadura': ['choque pesado', 'romper armadura'], 'Arrancar la coraza': ['choque pesado', 'romper armadura'],
     'Golpe demoledor': ['choque pesado', 'romper armadura'], 'Mandíbula trituradora': ['choque pesado', 'romper armadura'], 'Cadena de rayos': ['mago', 'rayo en cadena'],
     'Puñalada por la espalda': ['choque liviano', 'por la espalda'], 'Mordida a traición': ['choque liviano', 'por la espalda'], 'Puñalada trapera': ['choque liviano', 'por la espalda'],
@@ -190,6 +190,11 @@
   H('Tiro rápido', 'D', 'hd', 'r', 2, aT('Dispara sin apuntar demasiado.', 'L'));
   H('Lluvia de flechas', 'DA', 'hd', 'r', 4, zO('Dispara al cielo y las flechas caen en flor de diámetro 3 (7 casillas) (a mano).', 3, 'M'));
   // 🎯 Auditada (dueño, 2026-10-21; rango, «tiro apuntado»): un turno apunta (es su ataque del turno) y el próximo disparo va mejor; si le hacen daño, lo pierde.
+  // 🎯 Auditada (dueño, 2026-10-21; rango, «señalar para todos»): un disparo que, si pega, deja al objetivo Presa (Evasión −1 y +2 al daño de todos sus
+  // rivales; dueño: «menos uno la evasión en vez de más uno la probabilidad de golpe») y Marcado, 2 turnos.
+  H('Disparo señalador', 'DX', 'hd', 'r', 3, aA('Un disparo con su arma que señala a la presa: si pega, además del daño, el objetivo queda Presa 2 turnos (su Evasión baja 1 y todo el que lo ataca le hace +2 de daño) y Marcado (no se puede esconder y se lo ve aunque haya niebla).',
+    {}, 'un ataque con su arma; si pega, Presa (Evasión −1, +2 al daño de todos) y Marcado 2 turnos', 2,
+    [{nombre: 'Presa', turnos: 2}, {nombre: 'Marcado', turnos: 2}]));
   H('Tiro a la cabeza', 'B', 'hd', 'r', 3, {detalle: 'Apunta con calma: este turno no dispara (es su ataque del turno) y queda Apuntando a la cabeza. Su próximo disparo con un arma a distancia, en este turno o más adelante, suma +2 a la Probabilidad de Golpe, Crítico frecuente +1 y Crítico potente +1; se gasta al disparar. Si antes le hacen daño (que le llegue a la vida), pierde la puntería.',
     no2: 1, spCosto: 2, auditada: true, cuentaComoAtaque: true, efecto: {nombre: 'Apuntando a la cabeza'}, anuncio: '{nombre} apunta con calma…'});
   H('Escupitajo ácido', 'DX', 'ba', 'r', 3, zO('Escupe ácido: el objetivo pierde 1 punto de Defensa 2 turnos (a mano).', 2, 'L'));

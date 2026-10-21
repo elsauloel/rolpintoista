@@ -165,6 +165,10 @@
   +2); se gasta al disparar. **Si le hacen daño** antes (que le llegue a la vida; si la armadura lo frena todo, no), **pierde la puntería**. 1 No2 y 2 SP, o
   cooldown 3. **Para probar.**
 
+- ✅ **Disparo señalador** (2026-10-21, «señalar para todos»): un ataque con su arma que, si pega, deja al objetivo **Presa** 2 turnos (**Evasión −1** —dueño:
+  en vez de +1 PdG a cada uno, más fácil y vale contra todo— y **+2 al daño** de todos sus rivales, con arma o habilidad) y **Marcado** 2 turnos. Lo de un
+  ataque y **2 SP**, o cooldown 3. El Support va a reusar la Presa («Señalar la presa»). **Para probar.**
+
 ### Casters (desde el 2026-10-21)
 
 - ✅ **Bola de fuego** (Mago, 2026-10-21, dueño, tras una simulación de 20.000 lanzamientos contra un grupo con equipo común): flor de diámetro 3 con

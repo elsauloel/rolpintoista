@@ -236,6 +236,10 @@ const ESTADOS_PRESET = [
   // (`apunta`, lo suma el mapa: vtt-hexgrid/js/35); se gasta al disparar y se pierde si le entra daño (`pierdeAlDano`, js/10).
   {nombre:'Apuntando a la cabeza', polaridad:'buff', turnos:0, permanente:true, apunta:{pdg:2, crit:1, critpot:1}, pierdeAlDano:true,
     detalle:'Apunta con calma: su próximo disparo con un arma a distancia suma +2 a la Probabilidad de Golpe, Crítico frecuente +1 y Crítico potente +1. Se gasta al disparar; si antes le hacen daño (que le llegue a la vida), pierde la puntería. ⚙ Automatizado en el mapa.'},
+  // 🎯 Presa (2026-10-21, dueño, el Disparo señalador; después, el Señalar la presa del Support): Evasión −1 (un mod: vale contra todo) y +2 al daño de
+  // quien lo ataque siendo su rival (`presa`: lo suma el duelo, comun/duelo.js; lo detecta el mapa, vtt-hexgrid/js/13). Va junto con el Marcado.
+  {nombre:'Presa', polaridad:'debuff', turnos:2, presa:true, mods:[{stat:'eva', val:-1}],
+    detalle:'Lo señalaron: su Evasión baja 1 y todo el que lo ataca le hace +2 de daño (con arma o con una habilidad que haga daño). Dura 2 turnos; volver a señalarlo lo renueva. ⚙ Automatizado en el mapa.'},
   {nombre:'Marcado', polaridad:'debuff', turnos:3, marcado:true,
     detalle:'⚙ Automatizado: no puede entrar en sigilo (si estaba, sale) y se lo sigue viendo con un brillo, aunque vuelva la niebla de guerra o esté en una nube de niebla. Se resiste con Res.Esp.'},
 ];

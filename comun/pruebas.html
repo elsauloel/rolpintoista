@@ -991,6 +991,12 @@ prueba('👁 Vigilancia (2026-10-21): el estado, la del creep y la del Shooter',
   const e = sc.estados[0], sh = CLASES_SKILLS.find(c => c.id === 'shooter').habilidades.find(x => x.id === 'shooter-vigilancia');
   igual([h.anuncio, h.spCosto, !!e.vigilancia, !!e.alEmpezarTurno, sh.costo, sh.nitrosCosto, sh.duelo.efectos[0].nombre], ['{nombre} se pone en vigilancia.', 2, true, true, '2', '1', 'Vigilancia']);
 });
+prueba('🎯 Disparo señalador (2026-10-21): Presa (Evasión −1) y Marcado', () => {
+  const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Disparo señalador').datos, 2);
+  const a = Combatiente.ataqueConArreglos(h, h.duelo, {});
+  const P = estadosPresetCreep().find(p => p.nombre === 'Presa');
+  igual([h.cd, a.efectos.map(e => (e.spec || {}).nombre).join(','), P.turnos, P.presa, JSON.stringify(P.mods)], [3, 'Presa,Marcado', 2, true, '[{"stat":"eva","val":-1}]']);
+});
 prueba('🗡 Ráfaga de cortes (2026-10-21): +2 dados, la ráfaga viaja al ataque', () => {
   const ar = n => armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos, 2);
   const h = ar('Ráfaga de cortes'), z = ar('Ráfaga de zarpazos');

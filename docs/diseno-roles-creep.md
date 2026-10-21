@@ -187,7 +187,7 @@ la emboscada, matabestias, la espalda a distancia, la recarga, el proyectil perf
 
 **E. Marcar y coordinar** ✦
 22. **Marcar la presa**: bonos propios contra un solo objetivo.
-23. **Señalar para todos**: lo marca y todos los aliados le pegan mejor (el Señalar la presa del Support, en versión de rango).
+23. ✅ **Señalar para todos**: **Disparo señalador** (2026-10-21: Presa —Evasión −1 y +2 al daño de todos sus rivales— y Marcado, 2 turnos).
 24. **Fuego de supresión**: una línea o zona donde quien entra recibe un disparo o pierde No2.
 25. **Fuego de cobertura**: mientras dispara, un aliado se mueve sin dar oportunidad.
 
@@ -251,7 +251,8 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
 7. **Empujón de creep** (el Empower de los personajes): +3 a la tirada de un aliado, en el momento, mirando el resultado.
 
 **B. Concentrar el fuego** ✦
-8. **Señalar la presa**: marca a un rival; todos los aliados le pegan más (más puntería y daño) y no se puede esconder (el Marcado ya existe).
+8. **Señalar la presa**: marca a un rival; todos los aliados le pegan más y no se puede esconder — el estado **Presa** ya existe (lo deja el Disparo
+   señalador del rango, 2026-10-21): falta la versión de Support, sin disparo (PdG.Esp contra Res.Esp, a su Rango).
 9. **Sed de sangre**: el aliado que derriba a alguien vuelve a atacar.
 10. **Remate en grupo**: más daño contra un rival herido o que ya recibió un golpe esta ronda.
 

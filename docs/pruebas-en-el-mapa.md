@@ -35,6 +35,8 @@
 - [ ] **🔥 Bola de fuego de creep** (2026-10-21): el área con el centro dentro de su Rango, la cascada con dodge roll, 2d6 + ¼ Ef.Esp de fuego (frenado por la
   Def. especial y la Res. fuego), la Quemadura; en modo SP le cobra su Especial; en modo cooldown, cooldown 2; 4 No2.
 - [ ] **😵 Confusión de creep** (2026-10-21): PdG.Esp contra Res.Mt; la Confusión 1 turno y el 1d4 antes de la primera acción del jugador en su turno.
+- [ ] **🎯 Disparo señalador** (2026-10-21, rango): si pega, Presa y Marcado en el personaje; su Evasión −1 (el botón en rojo); otro creep que lo ataca, «🎯 contra
+  la presa: +2 al daño» en el cuadro; a los 2 turnos se va.
 - [ ] **🗡 Ráfaga de cortes** (2026-10-21, choque liviano): con un creep con un arma con efectos (sangrado al 25 %, perfora 1): la declaración «3 cortes», el
   daño con +2 dados, el tablero de efectos con tres chances («Corte 1, 2, 3») y «Perfora 1 en cada corte (pasan al menos 3)» en la declaración y el daño.
 - [ ] **🔨 Romper armadura** (2026-10-21, choque pesado): contra un personaje, la Armadura rota cae en una pieza equipada (Defensa y durabilidad); contra un

@@ -1706,6 +1706,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `CreepCalculo.alcance`, o el arma a distancia del personaje en `FichaResumen`); `oportunidadCorte` (js/17) frena al primer rival que se mueve en la mira
   (`vigilantesDe`, `vigilanciaLoVe`) y el cartel de la oportunidad pregunta «¿Dispara?» (`vigilanciaArmasDe`: su ataque normal; `vigilanciaQuitar` al
   disparar). El alcance se dibuja con `vigilanciaDibujar` (js/05).
+- **🎯 La Presa** (2026-10-21, el Disparo señalador): `presaContra(atq, def)` (js/13) da +2 si el defensor tiene el estado Presa y quien ataca es su rival;
+  va a `Duelo.crear({presa})` → `ataque.presa` (+2 al daño en `guardarDano`). La Evasión −1 es un mod del estado.
 - **🎯 Tiro a la cabeza** (2026-10-21): un estado de creep con `apunta` ({pdg, crit, critpot}) lo suma `arcoBonos` (js/35, `apuntaCreep`) a su próximo disparo
   y `arcoApuntarGastar` lo saca; con `pierdeAlDano`, `danioCreep` (js/10) se lo saca si le entra daño (Mesa y Crónica).
 - **🗡 La puñalada** (2026-10-21, `js/59-punalada.js`): un ataque con `punalada` ('espalda' | 'trapera', de `Combatiente.ataqueConArreglos`); al elegir el

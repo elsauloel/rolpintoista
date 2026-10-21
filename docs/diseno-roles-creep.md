@@ -225,8 +225,7 @@ Ya cubierto al entrar (2026-10-21): ninguna habilidad de caster auditada; en el 
 líneas, zonas, el rayo en cadena y los charcos, los controles mentales.
 
 - **Mago (daño directo):** proyectil mágico, ✅ **Bola de fuego** (2026-10-21), cono de frío, ✅ **Cadena de rayos** (2026-10-21), muro de fuego.
-- **Debuffer:** familias (2026-10-21): bajar números, quitar No2, **control mental** (✅ **Confusión**; siguen Susurros de locura en área, Grito de
-  pánico, Palabra de silencio), daño que dura, los sentidos, contra el sigilo, el orden de turnos, romper la defensa, auras.
+- **Debuffer:** ver el listado completo abajo (§ 6).
 - **Support:** ver el listado completo abajo (§ 5).
 - **El costo de las que suman Efecto especial:** P216 (la página para la mesa: https://claude.ai/artifact/C7VPwWPg9BpWfF1L1hUGb6).
 
@@ -297,3 +296,68 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
 **I. Llamar y reacomodar**
 36. Llamar refuerzos (ya automatizado), Brotes.
 37. Cambiar de lugar con un aliado, llevarlo al lado de un rival ✦, Señal de retirada.
+
+## 6. Debuffer — el listado completo (2026-10-21)
+
+**Son conceptos de diseño** (dueño, 2026-10-21): cada vez que toque una habilidad de debuffer se explora uno y se marca ✅. ✦ = acelera la pelea (le abre
+la puerta a los demás). Los estados que ya existen y se pueden usar: Debilitado, Extenuado, Atormentado, Maldito, Silencio, Ceguera, Miedo, Pajaritos,
+Lisiado, Expuesto, Marcado, Presa, Lento, Cansado, Exhausto, Escarcha, Armadura rota, Veneno, Sangrado, Quemadura, Confusión, Stun, Parálisis, Demora,
+Inmovilizado, Rengo, Desarmado; y, de personajes, Enyetar.
+
+**A. Bajar números**
+1. **Debilitar**: el objetivo pega menos (Debilitado, que se apila).
+2. **Torpeza**: menos Probabilidad de Golpe.
+3. **Exponer** ✦: la Evasión a la mitad y sin reacciones que cuesten No2 (Expuesto).
+4. **Maldición de la coraza** ✦: menos Defensa y Defensa especial unos turnos.
+5. **Mano temblorosa**: menos Crítico frecuente y potente.
+
+**B. Quitarle recursos**
+6. **Drenar No2**: pierde No2 (y si queda en 0, Sentado, como el Sonic Boom).
+7. **Extenuar**: todo lo que cuesta No2 le cuesta 1 más (Extenuado).
+8. **Drenar SP**: pierde SP, y el debuffer quizás lo gana.
+9. **Atormentar**: cada acción que cuesta No2 le saca vida (Atormentado).
+10. **Maldición de la sangre**: usar algo que cuesta SP le saca vida (Maldito).
+
+**C. Control mental**
+11. ✅ **Confusión** (2026-10-21).
+12. **Susurros de locura**: Confusión en un área.
+13. **Grito de pánico**: Miedo a los que tiene alrededor.
+14. **Palabra de silencio**: no puede usar habilidades (Silencio).
+15. **Sueño**: no actúa hasta que le peguen o pase su turno.
+16. **Dominar**: el GM decide su próxima acción (a mano; muy caro).
+
+**D. Daño que dura**
+17. **Veneno a distancia**: un dardo o un hechizo que envenena.
+18. **Plaga**: un veneno que al empezar su turno contagia al que tiene al lado.
+19. **Maldición que quema**: Quemadura que no se apaga con agua.
+
+**E. Los sentidos**
+20. **Cegar**: Ceguera (ve 2 casillas; su PdG a la mitad).
+21. **Ensordecer**: no oye a los que vienen por la espalda (sin el aviso de darse vuelta).
+22. **Bruma**: una nube que tapa la vista.
+
+**F. Contra el sigilo**
+23. **Revelar**: los que están en sigilo en un área quedan Marcados.
+24. **Aura de silencio**: en el aura no se puede usar sigilo.
+
+**G. El orden de turnos**
+25. **Retrasar**: baja uno o dos lugares en el orden (Demora a distancia).
+26. **Ralentizar**: Lento (el primer casillero doble).
+27. **Robar el turno**: pierde su próximo turno (muy caro).
+
+**H. Romper lo que lo protege** ✦
+28. **Disipar**: le saca un buff o el Escudo especial.
+29. **Corroer**: Armadura rota a distancia (ácido).
+30. **Quebrar la guardia**: no puede hacer Parry ni Bloqueo hasta su turno.
+
+**I. Auras**
+31. **Aura de miedo**: los que entran se asustan.
+32. **Aura de pestilencia**: los de al lado pierden No2 al empezar su turno.
+33. **Aura de debilidad**: los de adentro pegan menos.
+
+**J. Maleficios y apuestas** ✦
+34. **Mal de ojo**: su próxima tirada se tira dos veces y queda la peor (el Enyetar de los personajes, para creeps).
+35. **Maldición del espejo**: parte del daño que hace le vuelve.
+36. **Lazo de dolor**: el debuffer le pasa al objetivo parte del daño que recibe.
+37. **Marca de muerte** ✦: si cae mientras está marcado, el debuffer recupera vida o SP.
+

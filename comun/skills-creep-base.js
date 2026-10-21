@@ -37,7 +37,8 @@
     duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', dano: false, efectos: [{nombre: estado}]}});
   // 🌀 Barrido y Coletazo (2026-10-21, choque pesado): la onda alrededor (el Remolino del Warrior, sin moverse): su PdG una vez contra la Evasión de
   // cada uno, el daño de su arma (dados + Dmg) a quien no le gana; sin dodge roll. Lo de un ataque y 2 SP, o cooldown 3; es su ataque del turno.
-  const oB = (detalle, ataqueTxt, efectos) => ({detalle, no2: 'ATAQUE', spCosto: 2, auditada: true, cuentaComoAtaque: true, ataqueTxt,
+  // (Sin `cuentaComoAtaque`: cobrar «lo de un ataque» ya lo cuenta como su ataque del turno; con las dos, contaba dos. Probado en el mapa, 2026-10-21.)
+  const oB = (detalle, ataqueTxt, efectos) => ({detalle, no2: 'ATAQUE', spCosto: 2, auditada: true, ataqueTxt,
     duelo: {objetivo: 'onda', radio: 1, tira: 'pdg', contra: ['eva'], dano: true, danoArma: true, tipoDano: 'fisico', ignoraDano: false, efectos: efectos || []}});
   const slug = t => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 

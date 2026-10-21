@@ -52,7 +52,7 @@ Lo que busca cada estilo. ✅ = ya hay habilidad auditada que lo cubre.
 Ya cubierto al entrar (2026-10-21): golpes precisos (Tajo veloz, Estocada, Zarpazo), las variantes del Sangrado y su versión fuerte, el Rengo (Golpe a la
 rodilla, Tarascón al tobillo), las redes; y en el mapa, el sigilo, el +1 por la espalda y Robar.
 
-1. **Golpear y alejarse** — ✅ **Picar y alejarse** (2026-10-21).
+1. **Golpear y alejarse** — ✅ **Hit and run** (2026-10-21).
 2. **Salto**: salta hasta el objetivo por encima de lo que haya y pega al caer (dueño: «sumémosla también para el Warrior, o la misma skill compartida»).
 3. **Veneno**: golpes que envenenan, con variantes como el sangrado.
 4. **Puñalada**: saca provecho del sigilo y la espalda.

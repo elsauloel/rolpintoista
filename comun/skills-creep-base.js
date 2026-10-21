@@ -37,6 +37,21 @@
   const tR = (detalle, no2, codigo) => ({detalle, no2, trampa: codigo});
   const tS = (detalle, no2) => ({detalle, no2, colocar: true});   // trampa sin daño (alarma, red, humo…)
   const lista = [];
+  // 🧭 El rol en la batalla y el grupo de mecánica de las auditadas (dueño, 2026-10-21: «que el editor te diga qué rol cumple y te muestre los skills
+  // agrupados por mecánica»; los grupos son los de docs/diseno-roles-creep.md). Se suman a las etiquetas para filtrar la biblioteca.
+  const MECANICA = {
+    'Golpe fuerte': ['choque pesado', 'más daño'], 'Puño de roca': ['choque pesado', 'más daño'], 'Cornada': ['choque pesado', 'empujar'],
+    'Mordisco feroz': ['choque pesado', 'atrapar'], 'Agarrón': ['choque pesado', 'atrapar'], 'Abrazo aplastante': ['choque pesado', 'atrapar'],
+    'Aguante': ['choque pesado', 'guardia'],
+    'Tajo veloz': ['choque liviano', 'golpe preciso'], 'Estocada': ['choque liviano', 'golpe preciso'], 'Zarpazo': ['choque liviano', 'golpe preciso'],
+    'Golpe que sangra': ['choque liviano', 'sangrado'], 'Zarpazo desgarrador': ['choque liviano', 'sangrado'], 'Corte profundo': ['choque liviano', 'sangrado'],
+    'Colmillos que perforan': ['choque liviano', 'sangrado'], 'Tajo brutal': ['choque liviano', 'sangrado'], 'Desgarro': ['choque liviano', 'sangrado'],
+    'Corte certero': ['choque liviano', 'sangrado'], 'Zarpa certera': ['choque liviano', 'sangrado'], 'Tajo de carnicero': ['choque liviano', 'sangrado'],
+    'Destripar': ['choque liviano', 'sangrado'],
+    'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'],
+    'Red': ['hunter', 'trabar'], 'Tela de araña': ['hunter', 'trabar'],
+    'Hit and run': ['choque liviano', 'golpear y alejarse'],
+  };
 
   // fn: función (D T B X C K M I A); mec: mecánicas del juego que usa, separadas por coma (sigilo, trampas, terreno…);
   // el objetivo (sí mismo / un enemigo / zona / aliados / terreno) se deduce de la descripción salvo que se pase en mec.
@@ -63,7 +78,7 @@
     lista.push({
       poolId: 'hab-' + slug(nombre) + '-' + lista.length, nombre,
       etiquetas: [...new Set([...etiquetas, lenta ? 'lenta' : 'rápida', ...razasTxt, ...rolesTxt, ...objTags, ...mecPuras, aMano ? 'con parte a mano' : 'toda automatizada',
-        sp.auditada ? 'auditada' : 'sin auditar'])],   // ✅ la auditoría de 2026-10-20 (docs/auditoria-skills-creep.md): para filtrar
+        sp.auditada ? 'auditada' : 'sin auditar', ...(MECANICA[nombre] || [])])],   // ✅ la auditoría de 2026-10-20 (docs/auditoria-skills-creep.md): para filtrar
       detalle: sp.detalle.replace(/\{T\}/g, '(daño según el nivel)'), datos: {sp, cd, lenta},
     });
   }
@@ -269,8 +284,9 @@
   H('Red', 'K', 'hd', 'x', 4, {detalle: 'Lanza una red: tira su Probabilidad de Golpe contra la Evasión del objetivo, dentro de su Rango; si gana, el objetivo queda Inmovilizado (hasta 3 turnos). Al empezar su turno tira Fuerza contra la Destreza de quien la lanzó, gratis: si llega, se suelta. Un aliado pegado puede ayudarlo (1 No2, su propia Fuerza).', no2: 2, auditada: true, spCosto: 3, ataqueTxt: 'su Probabilidad de Golpe contra la Evasión; si gana, Inmovilizado (se suelta con Fuerza al empezar su turno)', duelo: {objetivo: 'enemigo', tira: 'pdg', contra: ['eva'], alcance: 'rango', dano: false, efectos: [{nombre: 'Inmovilizado', turnos: 3, soltar: {stat: 'fue', etq: 'Fuerza', difStat: 'des', no2: 1, alEmpezar: true, ayuda: true}}]}});
   H('Congelar', 'K', 'e', 'gx', 5, tA('Encierra al objetivo en hielo: pierde su próximo turno si falla Res.Mt (a mano).', 3));
   H('Aturdir', 'K', 'hdb', 'mx', 5, tA('Golpe en la sien: el objetivo queda Stun 1 turno si falla Res.Mt (a mano).', 3));
-  // 💨 Picar y alejarse (dueño, 2026-10-21; el choque liviano, una sola para bestias y humanoides): pega y se aleja hasta 2 casilleros, gratis y sin oportunidad.
-  H('Picar y alejarse', 'DM', '*', 'e', 3, aA('Pica y se aleja: un ataque con su arma; pegue o no, después se aleja hasta 2 casilleros, gratis y sin dar ataque de oportunidad.',
+  // 💨 Hit and run (dueño, 2026-10-21, «picar y alejarse»; el choque liviano, una sola para bestias y humanoides): pega y se aleja hasta 2 casilleros,
+  // gratis (sin No2) y sin oportunidad.
+  H('Hit and run', 'DM', '*', 'e', 3, aA('Pica y se aleja: un ataque con su arma; pegue o no, después se aleja hasta 2 casilleros, gratis (sin No2) y sin dar ataque de oportunidad.',
     {}, 'va al duelo como un ataque; después, el cartel para alejarse hasta 2 casilleros gratis y sin ataque de oportunidad', 2, [], {alejarse: 2}));
   // 🛡 Aguante (dueño, 2026-10-21; uno solo para bestias y humanoides): 1 No2 y 1 SP (o cooldown 3); +2 Defensa y +2 Defensa especial hasta su próximo
   // turno; su próximo ataque suma +1 dado del Tipo de su arma por cada golpe que recibió (1 SP por dado; en modo cooldown, +1 turno de cooldown por dado).

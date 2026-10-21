@@ -27,7 +27,7 @@
 - [ ] **🤼 Agarrón / Abrazo aplastante** (2026-10-21): Agarrado y Agarrando; soltarse; el apretón repite el daño (el Abrazo); suelta al empezar el turno de la bestia.
 - [ ] **🛡 Aguante** (2026-10-21): el anuncio «se pone en modo aguante», +2 Defensa y +2 Def.Esp, que cuente los golpes (también los que frena la armadura),
   el cartel al apretar Atacar en su turno con +N dados y su costo (modo SP y modo cooldown), y que se pierda si no ataca.
-- [ ] **💨 Picar y alejarse** (2026-10-21): pegue o no, el cartel «se aleja»; que los primeros 2 casilleros sean gratis y sin oportunidad.
+- [ ] **💨 Hit and run** (2026-10-21): pegue o no, el cartel «se aleja»; que los primeros 2 casilleros sean gratis y sin oportunidad.
 - [ ] **💥 Daño de colisión** (P178, 2026-10-21): un empujón (la Cornada con carrera, una ráfaga) que choca contra una pared → una Constitución del
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 

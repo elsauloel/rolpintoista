@@ -1,4 +1,4 @@
-/* ---------- 💨 Picar y alejarse (2026-10-21, dueño; el choque liviano) ----------
+/* ---------- 💨 Hit and run («picar y alejarse», 2026-10-21, dueño; el choque liviano) ----------
    Un ataque con `alejarse` (la Ejecución «con tu arma»: `duelo.alejarse` → `ataque.alejarse`, lo guarda Duelo.crear): al resolverse el duelo, pegue o no,
    en la pantalla de quien atacó (el hook `disparoResuelto` de js/14) sale el cartel del movimiento libre (el del dodge roll, `dodgeBanner`): se arrastra
    el token hasta N casilleros, gratis y sin ataque de oportunidad (js/06 no cobra los primeros N; js/02 y js/17 no frenan con `dodgeLibreDe`). */

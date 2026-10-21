@@ -54,6 +54,13 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
+> - [ ] **🧭 Elegir las habilidades de un creep por rol y mecánica (2026-10-21, dueño):** al crear un creep en GM Tools, el asistente pregunta qué rol
+>   cumple en la batalla (choque pesado, liviano, rango/Hunter, caster) y muestra sus habilidades agrupadas por mecánica («Golpear y alejarse»,
+>   «Atrapar», «Guardia»…), para llegar a cada una sabiendo qué hace sin leer descripción por descripción. **Hecho el primer paso**: las auditadas ya
+>   llevan las etiquetas de rol y de mecánica (`MECANICA` en `comun/skills-creep-base.js`; filtros «Rol en la batalla» y «Mecánica» de la biblioteca).
+>   **Además, un «🕸 Ver mapa de nodos»** (dueño: «tipo el mapa conceptual de Obsidian»): puntos y líneas que conectan habilidades, mecánicas y roles,
+>   para ver de un vistazo las variantes (ej.: desde el Warrior, la línea al Salto del choque liviano). El manual ya tiene un mapa así
+>   (`manual-usuario/`), se puede reusar. Pendiente: el paso del asistente y el mapa de nodos.
 > - [ ] **✨ Dispel Magic (2026-10-20, dueño, «anotar en el tintero»):** un efecto (habilidad o consumible, probablemente en área) que deshace la magia:
 >   lo único que podría afectar al Ojo de Kicillof (etéreo: nada más le hace nada). Falta definir qué disipa (invocaciones temporales, zonas, buffs mágicos,
 >   trampas mágicas…), con qué se tira y su costo.

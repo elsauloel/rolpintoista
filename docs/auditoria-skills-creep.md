@@ -86,6 +86,10 @@
   - +2 al daño + Sangrado — 2 SP o cooldown 3: **Tajo brutal** (humanoides, nueva) y **Desgarro** (bestias, nueva).
   - Crítico frecuente +1 + Sangrado — 2 SP o cooldown 3: **Corte certero** (humanoides, nueva) y **Zarpa certera** (bestias, nueva).
   Antes, las tres que existían tiraban un daño fijo y el Sangrado iba a mano. **Para probar en el mapa.**
+- ✅ **La versión fuerte del Sangrado** (2026-10-21, dueño: «una versión fuerte, que salga más cara… con el sangrado como eje identitario, 4 SP»;
+  eligió la B): un ataque con su arma con **Perfora 1 y Crítico frecuente +1**; si pega, **Sangrado fuerte: 3 de daño por turno durante 3 turnos**
+  (se acumula; con crítico, permanente). Costo de un ataque, más **4 SP** o cooldown 4. **Tajo de carnicero** (humanoides) y **Destripar** (bestias),
+  las dos nuevas. **Para probar en el mapa.**
 
 ## Etiquetas
 

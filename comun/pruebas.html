@@ -943,6 +943,11 @@ prueba('🩸 Las cuatro variantes del Sangrado, humanoide y bestia (2026-10-21)'
   igual(['Golpe que sangra', 'Zarpazo desgarrador', 'Corte profundo', 'Colmillos que perforan', 'Tajo brutal', 'Desgarro', 'Corte certero', 'Zarpa certera'].map(v),
     ['0/0/0/Sangrado/2/1', '0/0/0/Sangrado/2/1', '1/0/0/Sangrado/2/2', '1/0/0/Sangrado/2/2', '0/2/0/Sangrado/2/2', '0/2/0/Sangrado/2/2', '0/0/1/Sangrado/2/2', '0/0/1/Sangrado/2/2']);
 });
+prueba('🩸 La versión fuerte del Sangrado: Tajo de carnicero y Destripar (2026-10-21)', () => {
+  const v = n => { const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos, 2); const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});
+    const est = EstadosAplicar.componer(a.efectos[0].spec); return [a.perfora, a.mods.critBono, est.stacks, est.turnos, est.permanente, h.spCosto, h.cd].join('/'); };
+  igual(['Tajo de carnicero', 'Destripar'].map(v), ['1/1/3/3/false/4/4', '1/1/3/3/false/4/4']);
+});
 prueba('👊 Puño de roca (2026-10-21): +2 al daño y Demora', () => {
   const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Puño de roca').datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});

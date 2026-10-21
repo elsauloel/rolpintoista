@@ -21,6 +21,7 @@
 - [ ] **🩸 Las cuatro variantes del Sangrado** (2026-10-21): Golpe que sangra / Zarpazo desgarrador (solo Sangrado, 1 SP), Corte profundo / Colmillos
   que perforan (Perfora 1), Tajo brutal / Desgarro (+2 al daño), Corte certero / Zarpa certera (Crítico frecuente +1). Mirar la declaración del duelo,
   que el Sangrado entre por 2 turnos y que con crítico quede permanente.
+- [ ] **🩸 Tajo de carnicero / Destripar** (2026-10-21, 4 SP): Perfora 1 y Crítico frecuente +1; si pega, Sangrado fuerte (3 por turno, 3 turnos).
 - [ ] **💥 Daño de colisión** (P178, 2026-10-21): un empujón (la Cornada con carrera, una ráfaga) que choca contra una pared → una Constitución del
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 

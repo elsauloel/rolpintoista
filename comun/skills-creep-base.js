@@ -19,6 +19,7 @@
   const FN = {D: 'daño', T: 'defensa', B: 'buff', X: 'debuff', C: 'curación', K: 'control', M: 'movilidad', I: 'invocación', A: 'área'};
   const aT = (detalle, dano) => ({detalle, no2: 'ATAQUE', dano});
   const zO = (detalle, no2, dano) => ({detalle, no2, dano});
+  const SGF = [{nombre: 'Sangrado', turnos: 3, stacks: 3, detalle: 'Sangrado fuerte: 3 de daño por turno durante 3 turnos (se acumula; con crítico, permanente).'}];   // la versión fuerte
   const SG = [{nombre: 'Sangrado', turnos: 2, detalle: 'Sangrado: 2 de daño por turno durante 2 turnos (se acumula; con crítico, permanente).'}];   // el Sangrado de los golpes que sangran (2026-10-21)
   const tA = (detalle, no2) => ({detalle, no2});
   // Un ataque con su arma, con arreglos (`arma`: los de la Ejecución ✨ — dados, pdg, fijo, perfora, critBono…), que va al duelo como un ataque.
@@ -105,6 +106,9 @@
     {fijo: 2}, 'va al duelo como un ataque con +2 al daño; si pega, Sangrado', 2, SG));
   H('Corte certero', 'DX', 'hd', 'me', 3, aA('Un corte buscando la arteria: un ataque con su arma con Crítico frecuente +1; si pega, deja Sangrado (2 de daño por turno durante 2 turnos; se acumula y, con un golpe crítico, queda permanente).',
     {critBono: 1}, 'va al duelo como un ataque con Crítico frecuente +1; si pega, Sangrado', 2, SG));
+  // 🩸 La versión fuerte (dueño, 2026-10-21: «una versión fuerte, que salga más cara… con el sangrado como eje identitario, 4 SP»; elegida la B).
+  H('Tajo de carnicero', 'DX', 'hd', 'me', 4, aA('Un tajo de carnicero que abre de lado a lado: un ataque con su arma con Perfora 1 (1 punto del daño pasa siempre la Defensa) y Crítico frecuente +1; si pega, deja un Sangrado fuerte (3 de daño por turno durante 3 turnos; se acumula y, con un golpe crítico, queda permanente).',
+    {perfora: 1, critBono: 1}, 'va al duelo como un ataque con Perfora 1 y Crítico frecuente +1; si pega, Sangrado fuerte (3 por turno, 3 turnos)', 4, SGF));
   H('Golpe de escudo', 'DK', 'hdc', 'mt', 3, zO('Golpea con el escudo: el objetivo pierde 1 No2 (a mano).', 2, 'L'));
   H('Barrido', 'DA', '*', 'mt', 3, zO('Un gran arco que golpea a los adyacentes (a mano).', 3, 'M'));
   H('Torbellino de acero', 'DA', 'hd', 'm', 5, zO('Gira sobre sí mismo golpeando a todos los adyacentes (a mano).', 4, 'H'));
@@ -122,6 +126,9 @@
     {fijo: 2}, 'va al duelo como un ataque con +2 al daño; si pega, Sangrado', 2, SG));
   H('Zarpa certera', 'DX', 'b', 'me', 3, aA('Un zarpazo directo a la yugular: un ataque con su arma con Crítico frecuente +1; si pega, deja Sangrado (2 de daño por turno durante 2 turnos; se acumula y, con un golpe crítico, queda permanente).',
     {critBono: 1}, 'va al duelo como un ataque con Crítico frecuente +1; si pega, Sangrado', 2, SG));
+  // 🩸 La versión fuerte (dueño, 2026-10-21: «una versión fuerte, que salga más cara… con el sangrado como eje identitario, 4 SP»; elegida la B).
+  H('Destripar', 'DX', 'b', 'me', 4, aA('Garras y dientes que destripan: un ataque con su arma con Perfora 1 (1 punto del daño pasa siempre la Defensa) y Crítico frecuente +1; si pega, deja un Sangrado fuerte (3 de daño por turno durante 3 turnos; se acumula y, con un golpe crítico, queda permanente).',
+    {perfora: 1, critBono: 1}, 'va al duelo como un ataque con Perfora 1 y Crítico frecuente +1; si pega, Sangrado fuerte (3 por turno, 3 turnos)', 4, SGF));
   H('Golpe de gracia', 'D', '*', 'm', 6, zO('El golpe más fuerte que sabe dar; nadie sigue igual después.', 4, 'H'));
   H('Ráfaga de golpes', 'D', 'hd', 'me', 3, zO('Una lluvia de golpes rápidos (tirá el daño dos veces, a mano la segunda).', 3, 'L'));
   H('Golpe cargado', 'D', '*', 'mt', 4, zO('Junta fuerzas todo un turno y descarga un golpe brutal.', 2, 'H'));

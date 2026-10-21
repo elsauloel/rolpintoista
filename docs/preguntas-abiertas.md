@@ -1088,6 +1088,6 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   sigue afuera (4 casillas, al mismo bando). Un golpe de rayo que no salta, contra alguien mojado, igual salta solo por el charco. Se fue el «todos los
   del charco reciben el golpe entero». Ejemplo, 10 a cinco en fila: sin agua 10, 5, 2, 1; todos en el charco 15, 11, 8, 6, 5.
 
-- **P215. ¿La recarga mínima de 1 SP por turno vale también para los personajes? — 2026-10-20.** El dueño la fijó para los creeps con SP («aunque
+- ✅ **P215. ¿La recarga mínima de 1 SP por turno vale también para los personajes? — 2026-10-20; decidida: sí (dueño).** El dueño la fijó para los creeps con SP («aunque
   tenga tres, uno de Especial recarga uno de SP»). Hoy un personaje recarga la mitad de su Especial (`spregen: floor(esp/2)`): con Especial 1, 0 por
-  turno. Propuesta: la misma regla para todos (mínimo 1). **Falta decidir.**
+  turno. Propuesta: la misma regla para todos (mínimo 1). **Hecho:** `FichaCalculo.calcular` deja el SP Regen final en 1 como mínimo.

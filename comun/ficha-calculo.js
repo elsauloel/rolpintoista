@@ -272,6 +272,8 @@ const FichaCalculo = (() => {
     const efectosActivos = (S.efectos || []).filter(e => e.activo !== false);
     // No2 máximo con Cansado, Hypeado, Exhausto y Stun/forzados (topes): regla común de personajes, invocaciones y creeps.
     final.nitros = Combatiente.nitrosMax(final.nitros, efectosActivos);
+    // 💧 La recarga de SP por turno nunca baja de 1 (dueño, 2026-10-20, P215: la misma regla que los creeps con SP).
+    if(!Number.isNaN(final.spregen)) final.spregen = Math.max(1, final.spregen);
     // Pajaritos y Lisiado ya no achican el stat: parten el RESULTADO de la tirada (ver mitadesDeTirada / tirarValorStat).
     // Inmovilizado y Rengo ya no tocan un stat: Movimiento se fundió en
     // Nitros, así que actúan al moverse (ver costoMoverCasillero).

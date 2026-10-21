@@ -924,6 +924,11 @@ prueba('🙈 Ceguera nueva (2026-10-20): la mitad del PdG y del PdG.Esp (no la E
     (pre.mods || []).length, Combatiente.ciego([{nombre: 'Ceguera'}]), Combatiente.ciego([{nombre: 'Ceguera', activo: false}]), Combatiente.aplicarMitades(7, Combatiente.mitadesDeTirada(est, 'pdg'))],
     [1, 1, 0, 2, 0, true, false, 3]);
 });
+prueba('💧 La recarga de SP de un personaje nunca baja de 1 (2026-10-20, P215)', () => {
+  const S = FichaGuardado.normalizar({attrs: {fue: 3, con: 3, agl: 3, des: 3, esp: 1}}).S;
+  const S3 = FichaGuardado.normalizar({attrs: {fue: 3, con: 3, agl: 3, des: 3, esp: 6}}).S;
+  igual([FichaCalculo.calcular(S).final.spregen, FichaCalculo.calcular(S3).final.spregen], [1, 3]);
+});
 prueba('💧 Creeps con SP (2026-10-20): máximo Especial × 3, recarga la mitad (mínimo 1), SP según el cooldown, sin cooldown en modo SP', () => {
   const sc = CreepCalculo.normalizar({nombre: 'Prueba', esp: 1, nitros: 6, habilidades: [{id: 'a', nombre: 'A', cd: 3, cdActual: 2, nitrosCosto: 1, modo: 'semi'}, {id: 'b', nombre: 'B', cd: 0, modo: 'semi'}, {id: 'c', nombre: 'C', cd: 4, spCosto: 2, modo: 'semi'}]});
   sc.id = 'x';

@@ -68,7 +68,9 @@
   // Auditada (dueño, 2026-10-20): como el Amplificar daño del Warrior con X = 1 — +1 dado del Tipo de su arma, 1 SP (o cooldown 2).
   H('Golpe fuerte', 'D', '*', 'mt', 2, aA('Un golpe cargado con todo el peso: un ataque con su arma que suma +1 dado del Tipo de su arma al daño.', {dados: 1},
     'va al duelo como un ataque (PdG contra Evasión o Parry, Bloqueo y crítico) con +1 dado del Tipo de su arma', 1));
-  H('Tajo veloz', 'D', '*', 'me', 2, aT('Un corte rápido y certero.', 'L'));
+  // Auditada (dueño, 2026-10-20): como la Carga del Warrior con X = 1, sin la carrera — +1 PdG y +1 al daño, 1 SP (o cooldown 2).
+  H('Tajo veloz', 'D', '*', 'me', 2, aA('Un corte rápido y certero: un ataque con su arma con +1 a la Probabilidad de Golpe y +1 al daño.', {pdg: 1, fijo: 1},
+    'va al duelo como un ataque (PdG contra Evasión o Parry, Bloqueo y crítico) con +1 PdG y +1 al daño', 1));
   H('Estocada', 'D', 'hd', 'me', 2, aT('Una punzada directa al punto débil.', 'L'));
   H('Golpe aplastante', 'D', '*', 'mt', 4, zO('Un golpe devastador que casi no se puede esquivar.', 3, 'H'));
   H('Embestida', 'DK', 'b', 'mt', 3, zO('Carga con todo el cuerpo y empuja al objetivo un casillero (a mano).', 3, 'M'));

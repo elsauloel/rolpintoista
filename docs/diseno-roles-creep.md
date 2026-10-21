@@ -83,5 +83,67 @@ líneas, zonas, el rayo en cadena y los charcos, los controles mentales.
 - **Mago (daño directo):** proyectil mágico, ✅ **Bola de fuego** (2026-10-21), cono de frío, cadena de rayos, muro de fuego.
 - **Debuffer:** familias (2026-10-21): bajar números, quitar No2, **control mental** (✅ **Confusión**; siguen Susurros de locura en área, Grito de
   pánico, Palabra de silencio), daño que dura, los sentidos, contra el sigilo, el orden de turnos, romper la defensa, auras.
-- **Support:** curar a un aliado, escudar a un aliado, grito que potencia al grupo, proteger, levantar a un caído.
+- **Support:** ver el listado completo abajo (§ 5).
 - **El costo de las que suman Efecto especial:** P216 (la página para la mesa: https://claude.ai/artifact/C7VPwWPg9BpWfF1L1hUGb6).
+
+## 5. Support — el listado completo (2026-10-21)
+
+Pedido del dueño: arrancar por las que **aceleran la pelea** (que se resuelva atacando, no aguantando), sin curar ni proteger; y tener a mano todas
+las posibilidades del rol. ✦ = acelera la pelea. Lo que ya existe en el mapa para personajes (Empower, Re-roll, Enyetar, Marcado, Turno libre,
+Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep está auditada; las que hay son casi todas «a mano».
+
+**A. Potenciar el golpe de los aliados** ✦
+1. **Grito de guerra**: los aliados cercanos pegan más fuerte unos turnos (hoy Aullido de manada, Grito de ánimo, a mano).
+2. **Bendecir el arma**: el próximo golpe de un aliado suma un dado.
+3. **Arma elemental**: el arma de un aliado pega de fuego, hielo o rayo por unos turnos (con su estado: Quemadura, Escarcha, Parálisis).
+4. **Filo envenenado / sangrante**: los golpes de un aliado dejan Veneno o Sangrado.
+5. **Ojo certero**: un aliado gana Crítico frecuente o potente.
+6. **Abrir la guardia**: el próximo golpe de los aliados contra un objetivo perfora N de Defensa.
+7. **Empujón de creep** (el Empower de los personajes): +3 a la tirada de un aliado, en el momento, mirando el resultado.
+
+**B. Concentrar el fuego** ✦
+8. **Señalar la presa**: marca a un rival; todos los aliados le pegan más (más puntería y daño) y no se puede esconder (el Marcado ya existe).
+9. **Sed de sangre**: el aliado que derriba a alguien vuelve a atacar.
+10. **Remate en grupo**: más daño contra un rival herido o que ya recibió un golpe esta ronda.
+
+**C. Más acciones** ✦
+11. **Orden de ataque**: un aliado ataca ya, fuera de su turno (o su próximo ataque no cuesta No2).
+12. **Redoble de tambores**: +No2 a los aliados cercanos.
+13. **Adrenalina**: a un aliado se le baja el cooldown de una habilidad (vuelve a usar la fuerte).
+14. **Canalizar**: le pasa SP a un aliado caster.
+15. **¡Ahora!**: un aliado juega justo después del support en el orden de turnos (sube su iniciativa; hoy Emboscada de manada).
+16. **Prisa**: un aliado se mueve gratis unos casilleros y ataca más barato.
+
+**D. Debilitar para que rematen los otros** ✦
+17. **Exponer**: el objetivo pierde Defensa o Evasión contra todos unos turnos.
+18. **Disipar**: le saca a un rival el Escudo especial o un buff.
+19. **Sin escapatoria**: el objetivo no se puede alejar (Rengo, o la oportunidad le sale a todos).
+
+**E. Apuestas** ✦
+20. **Frenesí inducido**: un aliado pega mucho más pero se defiende peor.
+21. **Pacto de sangre**: un aliado gana daño y pierde vida cada turno.
+22. **Compartir fuerza**: el support da vida, No2 o SP propios a un aliado (hoy, a mano).
+23. **Último aliento**: un aliado que cae hace un último ataque.
+24. **Martirio**: si cae el support, los aliados entran en furia.
+
+**F. Auras, estandartes y tótems**
+25. **Aura de mando**: los aliados cerca del support pegan mejor mientras esté de pie (hoy, a mano) ✦.
+26. **Estandarte de guerra / Tótem**: coloca un objeto que potencia a los aliados cercanos mientras exista; los jugadores lo pueden romper (otro
+    objetivo, y la pelea se apura) ✦.
+27. **Lazo**: cuando un aliado vinculado pega, el support se cura (o al revés).
+
+**G. Reacciones (en el turno del rival)**
+28. **¡Ahora, dale!**: cuando un aliado acierta, el support le suma un dado al daño (Flash) ✦.
+29. **¡Cuidado!**: cuando un aliado es atacado, le suma Evasión.
+
+**H. Curar y proteger** (para más adelante)
+30. Curar a uno, en área o por turno (Curación menor y mayor, Canto revitalizante, Polen sanador, Zona sagrada, Aura sanadora).
+31. Escudo especial a un aliado, Formación, Círculo de protección, Aura de protección.
+32. Recibir el golpe por otro (también es del tanque).
+33. Limpiar estados de un aliado.
+34. Levantar a un caído (con Titilando, como el ✚ Revivir).
+35. Inmunidad a control por un turno.
+
+**I. Llamar y reacomodar**
+36. Llamar refuerzos (ya automatizado), Brotes.
+37. Cambiar de lugar con un aliado, llevarlo al lado de un rival ✦, Señal de retirada.

@@ -43,7 +43,7 @@
 - ✅ **Tajo veloz** (2026-10-20). Original: «Un corte rápido y certero.» Antes: 1d6 + nivel fijo, sin arma ni duelo. **Ahora** (como la Carga del
   Warrior con X = 1, sin la carrera): +1 PdG y +1 al daño, 1 SP (probado en el mapa). **Subido el mismo día** (dueño: «medio poca cosa… la
   versión más afilada»): **+2 PdG, +2 al daño y Crítico frecuente +1**, costo de un ataque, cooldown 3 o **3 SP** (la Carga con X = 2 más el
-  crítico del Tajear).
+  crítico del Tajear). Probado en el mapa (PdG 1d1 → 1d3, +2 de daño fijo, rango del crítico 4 → 3).
 
 ## Sigue
 

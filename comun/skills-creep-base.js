@@ -101,7 +101,7 @@
   H('Barrido', 'DA', '*', 'mt', 3, zO('Un gran arco que golpea a los adyacentes (a mano).', 3, 'M'));
   H('Torbellino de acero', 'DA', 'hd', 'm', 5, zO('Gira sobre sí mismo golpeando a todos los adyacentes (a mano).', 4, 'H'));
   H('Pisotón', 'DAK', 'bc', 'mt', 4, zO('Una pisada que sacude el suelo: los adyacentes caen al piso (a mano).', 3, 'M'));
-  H('Golpe de pomo', 'DK', 'hd', 'mx', 2, aT('Un golpe seco en la cabeza: si el objetivo falla Fuerza queda Pajarito hasta el final de su turno (a mano).', 'L'));
+  // (Golpe de pomo: quitado de la biblioteca en la auditoría, dueño 2026-10-21.)
   H('Ataque de furia', 'D', '*', 'm', 5, zO('Ataca sin pensar en la defensa: daño enorme.', 4, 'H'));
   H('Tackle', 'DK', 'hdb', 'mt', 3, zO('Se lanza contra el objetivo y lo derriba (a mano).', 2, 'L'));
   H('Zarpazo desgarrador', 'DX', 'b', 'me', 3, zO('Garras que abren la carne: el objetivo queda Sangrando (a mano).', 2, 'M'));

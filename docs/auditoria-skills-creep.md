@@ -20,7 +20,8 @@
 
 ## Clasificación: las de choque («melee», 70 de las 321)
 
-- **Golpes simples (8):** Golpe fuerte ✅, Tajo veloz ✅, Estocada ✅, Zarpazo ✅, Mordisco feroz ✅, Cornada ✅, Puño de roca ✅, Golpe de pomo.
+- **Golpes simples (8):** Golpe fuerte ✅, Tajo veloz ✅, Estocada ✅, Zarpazo ✅, Mordisco feroz ✅, Cornada ✅, Puño de roca ✅, ~~Golpe de pomo~~ (quitado,
+  dueño 2026-10-21).
 - **Golpes con efecto (~14):** Golpe que sangra, Mordisco que lisia, Golpe atontador, Corte profundo, Zarpazo desgarrador, Zarpa oxidante, Golpe
   glacial, Toque abrasador, Mordisco vampírico, Golpe vigorizante, Golpe brutal y guardia, Golpe de escudo, Golpe doble, Ráfaga de golpes, Aplastar,
   Golpe de mano.
@@ -85,4 +86,4 @@
 - **Forma de trabajo desde el 2026-10-21:** lo definido se programa y se anota en «Auditoría de creeps: para probar» (`docs/pruebas-en-el-mapa.md`);
   las pruebas en el mapa se corren todas juntas cuando el dueño lo pide.
 
-- Golpe de pomo (el último de los golpes simples); después, los golpes con efecto.
+- Los golpes con efecto (Golpe que sangra, Mordisco que lisia, Golpe atontador…).

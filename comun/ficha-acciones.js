@@ -550,7 +550,7 @@ const FichaAcciones = (() => {
      Ataque de oportunidad y Contraataque (regla a prueba, P139): SIEMPRE Tipo ÷ 2 y NO suman al conteo de ataques. */
   // Sentado: el cartel del juego (no el confirm() nativo). Devuelve true si no hay nada que preguntar, o lo que diga ui.confirmar (bool o
   // promesa). Solo se espera (await) si es una promesa: así, sin pregunta, el ataque sigue en el mismo momento que antes.
-  const confirmarSentado = (S, ui) => { const q = Combatiente.preguntaSentado(S.efectos); return !q || (ui.confirmar || (t => Confirmar.preguntar(t, {titulo: 'Sentado', si: 'Atacar igual'})))(q); };
+  const confirmarSentado = (S, ui) => { const q = Combatiente.preguntaSentado(S.efectos); return !q || (ui.confirmar || (t => Confirmar.preguntar(t, {titulo: /Desarmad/.test(t) ? 'Desarmado' : 'Sentado', si: 'Atacar igual'})))(q); };
   const esperarSiHace = x => x && typeof x.then === 'function' ? x : null;
   async function atacarConArma(S, arma, forzar, ui){
     if(!forzar){ const ok = confirmarSentado(S, ui), p = esperarSiHace(ok); if(!(p ? await p : ok)) return; }   // Sentado no puede atacar: avisa y deja seguir

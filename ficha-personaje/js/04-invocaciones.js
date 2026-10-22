@@ -472,7 +472,7 @@ async function invAtacarSuelto(invId, tipo){
   const inv = S.invocaciones.find(x => x.id === invId);
   if(!inv) return;
   const qs = Combatiente.preguntaSentado(inv.estados, inv.nombre);   // Sentado no puede atacar: avisa y deja seguir
-  if(qs && !(await Confirmar.preguntar(qs, {titulo: 'Sentado', si: 'Atacar igual'}))) return;
+  if(qs && !(await Confirmar.preguntar(qs, {titulo: /Desarmad/.test(qs) ? 'Desarmado' : 'Sentado', si: 'Atacar igual'}))) return;
   // Sin No2 suficientes: «¿Atacar igual?» (B-7, como los creeps): gasta los que tenga y deja la línea roja.
   const forzar = InvAcciones.faltanNitros(inv, tipo);
   if(forzar && !(await Confirmar.preguntar(InvAcciones.preguntaSinNitros(inv, tipo), {titulo: 'Sin No2', si: 'Atacar igual'}))) return;

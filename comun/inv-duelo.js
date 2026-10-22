@@ -57,7 +57,7 @@ const InvDuelo = (() => {
     // `sinTirada` (2026-10-21): el PdG elegido a mano — paga y gasta lo mismo, sin tirar. → true si pagó.
     async function atacarSuelto(inv, tipo, dueloId, sinTirada){
       const qs = Combatiente.preguntaSentado(inv.estados, inv.nombre);   // Sentado no puede atacar: avisa y deja seguir
-      if(qs && !(await (ui.confirmar || (t => Confirmar.preguntar(t, {titulo: 'Sentado', si: 'Atacar igual'})))(qs))) return false;
+      if(qs && !(await (ui.confirmar || (t => Confirmar.preguntar(t, {titulo: /Desarmad/.test(t) ? 'Desarmado' : 'Sentado', si: 'Atacar igual'})))(qs))) return false;
       const forzar = A().faltanNitros(inv, tipo);
       if(forzar && !(await (ui.confirmar || (t => Confirmar.preguntar(t, {titulo: 'Sin No2', si: 'Atacar igual'})))(A().preguntaSinNitros(inv, tipo)))) return false;
       let p;

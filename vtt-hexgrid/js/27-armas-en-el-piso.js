@@ -162,11 +162,15 @@ function armaDibujar(el, z){
    «Si estás en tu turno y te parás en un casillero adyacente a un arma o algún objeto que puedas levantar, debería aparecer titilando… haciendo
    clic sobre el objeto, el mapa te dice: este objeto está en el suelo, ¿querés levantarlo? Sí, no.» Vale para el personaje que maneja esta
    pantalla (su dueño o quien tiene 🎮 su control), parado encima o al lado; en combate, solo en su turno (fuera de combate, siempre). Levantarlo
-   es lo mismo que desde la Botonera (bnLevantarArma: 1 No2; si va en la mano y hay una libre, «¿Querés dejarlo equipado?»). */
-function levantadorPara(el){   // → {id, t} del personaje mío que lo puede levantar ahora, o null
+   es lo mismo que desde la Botonera (bnLevantarArma: 1 No2; si va en la mano y hay una libre, «¿Querés dejarlo equipado?»).
+   Los creeps también (dueño, 2026-10-22, «sumalo»): en la pantalla del GM, el arma de un creep titila cuando ese creep está al lado (en combate,
+   en su turno) y el clic la levanta como el botón de sus Acciones (acLevantarArmaDe: 1 No2, vuelve a tenerla y se le va el Desarmado). */
+function levantadorPara(el){   // → {id, t} del personaje mío (o del creep, si soy el GM) que lo puede levantar ahora, o null
   if(!el || !el.arma || !el.origen || typeof puedoMover !== 'function') return null;
   for(const [id, t] of tokens){
-    if(!t || t.tipo !== 'pj' || String(t.fichaId || '').includes(SEP_INVOCACION) || !puedoMover(t)) continue;
+    const esPj = t && t.tipo === 'pj' && !String(t.fichaId || '').includes(SEP_INVOCACION) && puedoMover(t);
+    const esCreep = t && t.tipo === 'creep' && soyGM && t.fichaId && !((typeof creepPrivadoDe === 'function' && creepPrivadoDe(t.fichaId)) || {}).muerto;
+    if(!esPj && !esCreep) continue;
     if(distanciaHex(t, el.origen) > 1 || !puedeLevantarla(el, t)) continue;   // 🔒 solo su dueño, por ahora
     if(modoMapa === 'combate' && typeof esSuTurno === 'function' && esSuTurno(id) === false) continue;
     return {id, t};
@@ -190,9 +194,10 @@ async function armaLevantarDesdeMapa(elId){
   const el = elementos.get(elId), quien = el && levantadorPara(el);
   if(!quien) return;
   const nombre = el.armaNombre || 'Este objeto';
-  const si = await AvisoCombate.preguntar(`${nombre} está en el suelo.\n¿Querés levantarlo? (cuesta ${fmt(Combatiente.COSTO_LEVANTAR_ARMA)} No2)`,
+  const si = await AvisoCombate.preguntar(`${nombre} está en el suelo.\n¿${quien.t.tipo === 'creep' ? `Lo levanta ${nombreDe(quien.t)}` : 'Querés levantarlo'}? (cuesta ${fmt(Combatiente.COSTO_LEVANTAR_ARMA)} No2)`,
     {icono: /"flecha"\s*:/.test(String(el.armaItem || '')) ? '🏹' : '🗡️', titulo: 'Levantar', si: 'Sí, levantarlo', no: 'No'});
   if(!si) return;
+  if(quien.t.tipo === 'creep'){ await acLevantarArmaDe(quien.t.fichaId, elId); return; }   // 👹 un creep (el GM)
   // La sesión del personaje (la de la Botonera nueva): si no está abierta, se abre escondida, solo para esto.
   const fichaId = quien.t.fichaId, visible = !!(bn && bn.host && !bn.host.hidden && bn.fichaId === fichaId);
   if(!(bn && bn.fichaId === fichaId && bn.S)){ await abrirBotoneraNueva(fichaId, ''); if(bn && !visible) bn.host.hidden = true; }
@@ -308,13 +313,18 @@ async function bnInvLevantarArma(invId, elId){
   mesaLinea(`🗡️ ${inv.nombre} levantó ${x.it.nombre}`);
 }
 async function acLevantarArma(elId){
-  const sc0 = typeof acCreep === 'function' ? acCreep() : null;
+  if(typeof ac === 'undefined' || !ac || !ac.creepId) return;
+  await acLevantarArmaDe(ac.creepId, elId);
+}
+// Un creep levanta un arma del piso (desde sus Acciones o con un clic en el mapa): 1 No2; la suya vuelve a tenerla, la de otro va a su equipo.
+async function acLevantarArmaDe(creepId, elId){
+  const sc0 = typeof creepPrivadoDe === 'function' ? creepPrivadoDe(creepId) : null;
   if(!sc0) return;
   if(num(sc0.nitros) < Combatiente.COSTO_LEVANTAR_ARMA){ toast(`${sc0.nombre}: no le alcanzan los No2 — levantar el arma cuesta 1`); return; }
-  const x = await armaLeer(elId, tokenDeCreep(ac.creepId));
+  const x = await armaLeer(elId, tokenDeCreep(creepId));
   if(!x) return;
   let respaldo = null;
-  await acCambiar(c => {
+  await acCambiarCreep(creepId, c => {
     respaldo = structuredClone({nitros: c.nitros, estados: c.estados || [], equipo: c.equipo || []});
     c.nitros = num(c.nitros) - Combatiente.COSTO_LEVANTAR_ARMA;
     const des = (c.estados || []).find(Combatiente.esDesarmado);
@@ -323,9 +333,10 @@ async function acLevantarArma(elId){
     return {aviso: ''};
   });
   if(!(await armaQuitarDelPiso(elId))){   // se le adelantaron: vuelve todo como estaba
-    if(respaldo) await acCambiar(c => { Object.assign(c, structuredClone(respaldo)); return {aviso: ''}; });
+    if(respaldo) await acCambiarCreep(creepId, c => { Object.assign(c, structuredClone(respaldo)); return {aviso: ''}; });
     toast(`Se te adelantaron: ${x.it.nombre} ya no está en el piso`);
     return;
   }
-  mesaLinea(`🗡️ ${sc0.nombre} levantó ${x.it.nombre}`);
+  mesaLinea(`🗡️ ${sc0.nombre} levantó ${x.it.nombre}`, 'recordatorio', sc0.nombre);
+  if(typeof ac !== 'undefined' && ac && ac.creepId === creepId && ac.host && !ac.host.hidden && typeof acDibujar === 'function') acDibujar();
 }

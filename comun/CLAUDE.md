@@ -1000,6 +1000,10 @@ versión parecida en más de una, es candidato a juntar.
   y **↩ Soltar** (`soltar`). Al cerrar el botín, `CombateFin.despojar` manda lo reclamado en la recompensa de cada personaje (`items`) y
   `Recibidos.recompensa` lo suma a la mochila (`itemsDelBotin`: los trofeos iguales se apilan; si no entra, se suma igual). Una disputa abierta
   se corta y el ítem queda para quien lo reclamó.
+- **`ficha-equipo.js`, Comparar lo que no se compara con números** (2026-10-22, dueño: «una varita con una espada, un talismán con una espada»):
+  `slotOcupado(S, item).equipados` = lo equipado en el mismo LUGAR (primero el mismo tipo, después el resto: una varita de una mano contra la espada de
+  dos manos puesta); `compararHtml` suma debajo de la tabla «Lo que hace cada uno» (`queHaceHtml`: `ItemCorto.grillaHtml` de los dos, lado a lado) y
+  un número que uno de los dos no tiene sale «—» sin flecha; `statsComparables` no inventa «daño promedio» para una varita (arma especial sin Tipo).
 - **`ficha-botin.js`, por grupos y en pilas** (2026-10-22, dueño: «mano, cuerpo y consumibles… lo repetido enlistado, chaleco de cuero ×N, y reclamar uno,
   dos, tres»): `GRUPOS` (mano = armas, escudos, varitas y orbes; cuerpo = lo demás que se equipa; consumibles; trofeos), `grupoDe(item)`, `pilas(lista, yo,
   miUid)` (los iguales juntos: mismo tipo, nombre, calidad, números y efectos; con libres / mías / de otros / en disputa), `tomarVarios(S, lista, ui)` y

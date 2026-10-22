@@ -553,11 +553,13 @@ const FichaEquipo = (() => {
     const pesoEq = num(equipado.peso), pesoNuevo = num(item.peso);
     const pesoCls = pesoNuevo < pesoEq ? 'mejora' : pesoNuevo > pesoEq ? 'empeora' : '';
     const filaPeso = `<tr><td>Peso</td><td>${fmt(pesoEq)}</td><td class="${pesoCls}">${fmt(pesoNuevo)}${pesoNuevo<pesoEq?' ▲':pesoNuevo>pesoEq?' ▼':''}</td></tr>`;
+    // Un número que uno de los dos no tiene (una varita no tiene «daño promedio», un cuchillo no da PdG) se muestra como «—», sin flecha:
+    // no es que sea peor, es que no aplica (dueño, 2026-10-22: comparar una varita con una espada). La flecha va solo cuando los dos lo tienen.
     const filasHtml = filaPeso + claves.map(k => {
-      const ve = statsEq[k] || 0, vn = statsNuevo[k] || 0;
-      const cls = vn > ve ? 'mejora' : vn < ve ? 'empeora' : '';
+      const te = statsEq[k] !== undefined, tn = statsNuevo[k] !== undefined, ve = statsEq[k] || 0, vn = statsNuevo[k] || 0;
+      const cls = te && tn ? (vn > ve ? 'mejora' : vn < ve ? 'empeora' : '') : '';
       const label = STAT_COMPARABLE_LABEL[k] || L()[k] || k;
-      return `<tr><td>${esc(label)}</td><td>${fmt(ve)}</td><td class="${cls}">${fmt(vn)}${vn>ve?' ▲':vn<ve?' ▼':''}</td></tr>`;
+      return `<tr><td>${esc(label)}</td><td>${te ? fmt(ve) : '<span class="hint">—</span>'}</td><td class="${cls}">${tn ? fmt(vn) : '<span class="hint">—</span>'}${te && tn ? (vn>ve?' ▲':vn<ve?' ▼':'') : ''}</td></tr>`;
     }).join('');
     return {equipadoId: equipado.id, html: `
     ${elegirHtml}

@@ -40,6 +40,10 @@
   el mismo tipo exacto: una varita de una mano contra la espada de dos manos puesta); Comparar y «🎒 Mochila y equipo» más visibles; y el Anuncio
   **«🎁 Botín concluido»** (js/11 `recompensaAnuncio`: Experiencia, DDE, Despojos, Ítems reclamados, ✔ Aceptar) cuando llega la recompensa al
   personaje. **Falta probar en vivo** el Anuncio con un cierre real del botín (se vio con datos de muestra) y Comparar sobre un arma del botín.
+  **Tercera vuelta (2026-10-22)**: en «Botín concluido» cada ítem reclamado lleva el globo del glosario (visto en el mapa); **⚖ Comparar** muestra, debajo de
+  la tabla de números, «Lo que hace cada uno» (la ficha corta de los dos, lado a lado: el hechizo de la varita, los efectos al golpear, lo de un
+  talismán) y un número que no aplica a uno de los dos sale «—» sin flecha. Visto en el mapa: Varita arcana contra Cuchillo, Farol contra Tapa de
+  tacho, Hacha contra Cuchillo (capturas enviadas al dueño).
 - [ ] **⭕ El lápiz cierra la figura al terminarla** (reportado por el dueño el 2026-10-22, arreglado en js/07 `guardarTrazo`): con «⭕ Cerrar la
   figura» tildado, en rectas (clic, clic, clic y doble clic o Enter) y a mano alzada (al soltar), el trazo nace con las puntas unidas, sin pasar
   por el ⚙. Y con 🧱 además, lo de adentro queda sólido y sin grilla.

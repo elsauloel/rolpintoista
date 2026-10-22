@@ -138,6 +138,8 @@ const ruletaVistas = new Set();
 function desarmeRuleta(id, datos){
   if(ruletaVistas.has(id) || !datos || !Array.isArray(datos.celdas) || !datos.celdas.length) return;
   ruletaVistas.add(id);
+  // El cuadro del duelo («¡DESARMADO!») tapa el mapa: se minimiza para que se vea la ruleta (probado en el mapa, 2026-10-21).
+  try{ if(typeof Duelo !== 'undefined' && Duelo.minimizar) Duelo.minimizar(); }catch(e){}
   const celdas = datos.celdas.map(([col, fila]) => hexCentro(col, fila)), n = celdas.length, fin = Math.max(0, Math.min(n - 1, num(datos.elegida)));
   // El recorrido: dos vueltas y hasta la elegida; cada paso un poco más lento.
   const pasos = n * 2 + fin + 1, tiempos = [];

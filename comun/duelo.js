@@ -1763,7 +1763,7 @@ const Duelo = (() => {
   /* ✍ Elegir manualmente (2026-10-15, dueño: «el duelo termina siendo un poco encorsetado: en cada instancia, además de los botones automatizados,
      en algún rincón un elegir manualmente con un recuadro para tipear una tirada custom»). En cada paso que esta pantalla puede tirar (la suya, o a
      mano por otro): una fórmula de dados («1d10+3», se tira) o un número (es el resultado). En el daño, además, cuánta Defensa resta: la del
-     defensor, nada u otro número (`dano.defensaManual`, lo usa el mapa al aplicar). No cobra No2 ni cuenta como ataque. */
+     defensor, nada u otro número (`dano.defensaManual`, lo usa el mapa al aplicar). El PdG de un ataque paga lo mismo que el botón (desde el 2026-10-21, `pagarManual`). */
   function manualHtml(d, campo){
     const k = d.id + ':' + campo, abierto = manualAbierto.has(k);
     const tg = `<label class="tg" title="Pasar de lo automático a una tirada que escribís vos"><input type="checkbox" data-mtg="${campo}"${abierto ? ' checked' : ''}> ✍ Elegir manualmente</label>`;
@@ -1774,7 +1774,7 @@ const Duelo = (() => {
       <label><input type="radio" name="mdef-${d.id}" value="no" data-mdef${dm === 'no' ? ' checked' : ''}> no resta</label>
       <label><input type="radio" name="mdef-${d.id}" value="num" data-mdef${dm === 'num' ? ' checked' : ''}> otra: <input type="number" min="0" data-mdefn style="width:64px" value="${_esc(manual['mdefn:' + d.id] || '')}"></label></div>` : '';
     return `<div class="duelo-manual">${tg}<div class="duelo-mcaja">${sel}<input type="text" data-mtirada="${campo}" placeholder="1d10+3 o un número" value="${_esc(manual['m:' + k] || '')}"><button type="button" data-musar="${campo}">✔ Usar esta tirada</button>${def}
-      <div class="det">Una fórmula de dados (se tira) o un número (es el resultado). No cobra No2 ni cuenta como ataque: si corresponde, ajustalo a mano.</div></div></div>`;
+      <div class="det">Una fórmula de dados (se tira) o un número (es el resultado).${campo === 'pdg' && !d.hab && !(d.ataque && d.ataque.tipo === 'habilidad-arma') ? ' Paga el ataque igual que el botón (sus No2).' : ''}</div></div></div>`;
   }
   // El crítico a mano: los d20 que salieron (uno o varios), escritos.
   function manualCriticoHtml(d){

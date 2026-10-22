@@ -247,7 +247,7 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   if(res.golpeCae || res.golpeAcum){   // 🪓 (js/63)
     const txt = res.golpeCae ? `🪓 ${nombreDe(t)} recibió ${fmt(res.golpeAcum)} de daño mientras cargaba: ¡se le cae el golpe!` : `🪓 ${nombreDe(t)} aguanta el golpe cargado: lleva ${fmt(res.golpeAcum)} de daño de ${fmt(res.golpeTope)} (con ${fmt(res.golpeTope)} se le cae)`;
     mesaLinea(txt, 'recordatorio');
-    try{ momentoAbrir({tipo: 'golpe-anunciado', icono: '🪓', titulo: txt, estado: 'listo', datos: {chico: true}}); }catch(e){}
+    try{ momentoAbrir({tipo: 'golpe-anunciado', icono: '🪓', titulo: txt.replace(/^🪓 /, ''), estado: 'listo', datos: {chico: true}}); }catch(e){}
   }
   if(res.punteria){
     const txt = `🎯 ${nombreDe(t)} recibió daño y pierde la puntería (se le va ${res.punteria})`;

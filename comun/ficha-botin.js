@@ -61,7 +61,7 @@ const FichaBotin = (() => {
      cuero ×N, y que uno pueda reclamar uno, dos, tres, lo que quiera»). Mano = lo que va en la mano (armas, escudos, varitas, orbes);
      Cuerpo = lo demás que se equipa; Consumibles; y aparte los trofeos. Una pila junta los ítems iguales (mismo tipo, nombre, calidad y
      números); cada ítem sigue siendo su propio documento del botín: reclamar N reclama N de los libres. */
-  const GRUPOS = [{id: 'mano', titulo: '🗡 Mano', nota: 'armas, escudos, varitas y orbes'}, {id: 'cuerpo', titulo: '🛡 Cuerpo', nota: 'lo que se equipa'},
+  const GRUPOS = [{id: 'mano', titulo: '🗡 Mano', nota: 'armas, escudos, varitas y talismanes'}, {id: 'cuerpo', titulo: '🛡 Cuerpo', nota: 'lo que se equipa'},
     {id: 'consumibles', titulo: '🧪 Consumibles', nota: ''}, {id: 'trofeos', titulo: '🏆 Trofeos', nota: 'se venden o se guardan'}];
   function grupoDe(item){
     if(!item) return 'trofeos';

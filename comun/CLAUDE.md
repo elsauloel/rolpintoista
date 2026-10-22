@@ -1006,7 +1006,7 @@ versión parecida en más de una, es candidato a juntar.
   dos manos puesta); `compararHtml` suma debajo de la tabla «Lo que hace cada uno» (`queHaceHtml`: `ItemCorto.grillaHtml` de los dos, lado a lado) y
   un número que uno de los dos no tiene sale «—» sin flecha; `statsComparables` no inventa «daño promedio» para una varita (arma especial sin Tipo).
 - **`ficha-botin.js`, por grupos y en pilas** (2026-10-22, dueño: «mano, cuerpo y consumibles… lo repetido enlistado, chaleco de cuero ×N, y reclamar uno,
-  dos, tres»): `GRUPOS` (mano = armas, escudos, varitas y orbes; cuerpo = lo demás que se equipa; consumibles; trofeos), `grupoDe(item)`, `pilas(lista, yo,
+  dos, tres»): `GRUPOS` (mano = armas, escudos, varitas y talismanes (los orbes son una variante de talismán); cuerpo = lo demás que se equipa; consumibles; trofeos), `grupoDe(item)`, `pilas(lista, yo,
   miUid)` (los iguales juntos: mismo tipo, nombre, calidad, números y efectos; con libres / mías / de otros / en disputa), `tomarVarios(S, lista, ui)` y
   `idsDeBoton(btn, raiz)` (el botón «Reclamar» lleva los documentos libres de la pila en `data-botin-tomar` y la cantidad sale del `[data-botin-cant]`).
   Cada ítem sigue siendo su documento del botín. Los dos manejadores (mapa js/11 y ficha js/08) usan `idsDeBoton` + `tomarVarios`.

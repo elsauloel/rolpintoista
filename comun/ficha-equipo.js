@@ -185,7 +185,7 @@ const FichaEquipo = (() => {
     const out = {};
     const defVal = defValor(item);
     if(defVal) out.def = defVal;
-    if(FichaCombate.esArma(item.tipoItem)){
+    if(FichaCombate.esArma(item.tipoItem) && !(item.especial && !num(item.tipoDado))){   // una varita (arma especial sin Tipo) no pega con dados (2026-10-22)
       const dados = Math.max(1, num(item.peso) || 1) + Math.max(0, num(item.danoAmplificado)), caras = num(item.tipoDado) || 8, fijo = num(item.danoFijo);
       out.danoprom = Math.round((dados * (caras + 1) / 2 + fijo) * 10) / 10;
     }
@@ -575,8 +575,20 @@ const FichaEquipo = (() => {
       <thead><tr><th>Stat</th><th>Equipado</th><th>Nuevo</th></tr></thead>
       <tbody>${filasHtml}</tbody>
     </table>
+    ${queHaceHtml(equipado, item)}
     ${(S.inventario || []).some(x => x.id === item.id && !x.equipado) ? `<button type="button" class="btn primary" data-reemplazar="${equipado.id}:${item.id}" style="width:100%;margin-top:12px">Reemplazar ${esc(equipado.nombre)}</button>` : ''}
   `};
+  }
+
+  // Lo que hace cada uno, lado a lado (2026-10-22, dueño): la ficha corta de ItemCorto (lo que hace en la grilla: el hechizo de una varita, los
+  // efectos al golpear, lo de un talismán, las resistencias de una pieza), en dos columnas, para comparar lo que no es un número.
+  function queHaceHtml(equipado, item){
+    if(typeof ItemCorto === 'undefined' || !ItemCorto.grillaHtml) return '';
+    const col = (it, etq) => `<div style="flex:1;min-width:0;padding:8px 10px;border:1px solid var(--line, #444);border-radius:8px;background:rgba(255,255,255,.03)">
+      <div class="hint" style="text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">${etq}</div>
+      <div style="font-weight:700;margin-bottom:4px">${esc(it.nombre)}</div>${ItemCorto.grillaHtml(it)}</div>`;
+    return `<div class="hint" style="text-transform:uppercase;letter-spacing:.08em;margin:12px 0 6px">Lo que hace cada uno</div>
+    <div style="display:flex;gap:8px;align-items:stretch">${col(equipado, 'Equipado')}${col(item, 'Nuevo')}</div>`;
   }
 
   return {talentoReparar, topeTalento, restoTalento, repararHtml, repararTalento, usarOleo, repararClic, SLOT_DEFS, TIER_COLOR, veCalidad, STAT_COMPARABLE_LABEL, CATEGORIAS, CATEGORIA_LABEL, ranuras, mochilaUsada, capMochila, BASE_CINTURON, esFlecha, carcajDe, capCarcaj, carcajUsado, flechasDelCarcaj, alCarcaj, delCarcaj, gastarFlecha, flechaTxt, carcajHtml, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, alCinturon, textoAlCinturon, aManoCap, aManoEntra, alternarAMano, slots, slotOcupado, defValor, statsComparables, conCosto, equipar, reemplazar,

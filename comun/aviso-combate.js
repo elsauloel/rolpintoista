@@ -54,7 +54,7 @@ const AvisoCombate = (() => {
     f.innerHTML = `<div class="duelo-caja" role="dialog" aria-modal="true">
       <div class="duelo-cab"><span>${e(o.icono || '⚔')} ${e(o.titulo || '')}</span><div class="bt"><button type="button" data-aviso-x title="Cerrar">✕</button></div></div>
       <div class="duelo-cuerpo">
-        ${pasos.length ? pasos.map((p, i) => `<div class="duelo-paso${p.espera ? ' aviso-espera' : ''}"><h4><span class="n">${i + 1}</span>${e(p.titulo || 'Qué pasó')}</h4><p>${e(p.texto || '')}</p></div>`).join('')
+        ${pasos.length ? pasos.map((p, i) => `<div class="duelo-paso${p.espera ? ' aviso-espera' : ''}"><h4><span class="n">${i + 1}</span>${e(p.titulo || 'Qué pasó')}</h4><p>${p.html ? p.html : e(p.texto || '')}</p></div>`).join('')
           : o.texto ? `<div class="duelo-paso"><p>${e(o.texto)}</p></div>` : ''}
         ${v ? `<div class="duelo-veredicto ${TONO[v.tono] || 'bloqueado'}"><div class="grande">${e(v.grande)}</div>${v.chico ? `<div class="chico">${e(v.chico)}</div>` : ''}</div>` : ''}
         ${o.aMano ? `<div class="aviso-mano">✋ ${e(o.aMano)}</div>` : ''}
@@ -117,7 +117,7 @@ const AvisoCombate = (() => {
     el.innerHTML = `<div class="duelo-caja" role="dialog">
       <div class="duelo-cab"><span>${e(o.icono || '⚔')} ${e(o.titulo || '')}</span></div>
       <div class="duelo-cuerpo">
-        ${pasos.map((p, i) => `<div class="duelo-paso"><h4><span class="n">${i + 1}</span>${e(p.titulo || 'Qué pasó')}</h4><p>${e(p.texto || '')}</p></div>`).join('')}
+        ${pasos.map((p, i) => `<div class="duelo-paso"><h4><span class="n">${i + 1}</span>${e(p.titulo || 'Qué pasó')}</h4><p>${p.html ? p.html : e(p.texto || '')}</p></div>`).join('')}
         ${o.texto ? `<p class="aviso-texto">${e(o.texto)}</p>` : ''}
         ${v ? `<div class="duelo-veredicto ${TONO[v.tono] || 'bloqueado'}"><div class="grande">${e(v.grande)}</div>${v.chico ? `<div class="chico">${e(v.chico)}</div>` : ''}</div>` : ''}
         ${o.aMano ? `<div class="aviso-mano">✋ ${e(o.aMano)}</div>` : ''}

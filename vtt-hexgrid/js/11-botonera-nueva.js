@@ -1424,8 +1424,15 @@ function recompensaAnuncio(S, nombre, d, r, vueltas){
   if(typeof AvisoCombate === 'undefined' || !AvisoCombate.mostrar) return;
   const n = v => Number(v) || 0;
   const items = r && r.items && r.items.length ? r.items : [];
+  // Los ítems con el globo del glosario (comun/glosario.js, data-glo-txt): el resumen de cada uno al pasar el mouse, sin salir del cartel.
+  const objetos = (Array.isArray(d.items) ? d.items : []).map(js => { try{ return JSON.parse(js); }catch(e){ return null; } }).filter(Boolean);
+  const itemsHtml = items.map((nombre, i) => {
+    const it = objetos[i] && objetos[i].nombre === nombre ? objetos[i] : objetos.find(x => x && x.nombre === nombre);
+    const txt = it && typeof FichaBotin !== 'undefined' ? FichaBotin.textoItem(it).split(' · ').join('\n') : '';
+    return txt ? `<span class="glo" tabindex="0" data-glo-txt="${esc(txt)}">${esc(nombre)}</span>` : esc(nombre);
+  }).join(', ');
   const pasos = [{titulo: 'Experiencia', texto: `+${n(d.xp)} XP`}, {titulo: 'DDE', texto: `+${n(d.dde)}`}, {titulo: 'Despojos', texto: `+${n(d.despojos)}`},
-    {titulo: 'Ítems reclamados', texto: items.length ? items.join(', ') + ' (ya están en tu mochila)' : 'ninguno'}];
+    items.length ? {titulo: 'Ítems reclamados', html: itemsHtml + ' <span class="hint">(ya están en tu mochila; pasá el mouse por cada uno para ver qué es)</span>'} : {titulo: 'Ítems reclamados', texto: 'ninguno'}];
   if(vueltas) pasos.push({titulo: 'Trampas', texto: vueltas});
   if(r && r.subio) pasos.push({titulo: '⬆ Subiste de nivel', texto: `Ahora sos nivel ${n(S.meta && S.meta.nivel)}`});
   AvisoCombate.mostrar({clave: 'recompensa:' + Date.now(), icono: '🎁', titulo: `Botín concluido · ${nombre || 'recibiste'}`, texto: 'Recibiste:', pasos,

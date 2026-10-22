@@ -133,7 +133,9 @@ function momentoRecibido(id, d){
   if(delGM) momentosFeed.delete(id);
   if(mio || delGM){ renderMomentosFeed(); return; }
   const ya = momentosFeed.get(id);
-  const largo = d.tipo === 'inicio-turno' && d.estado === 'esperando';   // ▶ el inicio de turno sin aplicar queda (el GM tiene «Aplicar por él»)
+  // ▶ El inicio de turno sin aplicar queda (el GM tiene «Aplicar por él»); 🎲 la tirada extra de una zona, mientras espere algo (el GM tiene
+  // «Tirar por él», «Que se aplique» y «Aplicar»: a los 14 s se borraba y el GM se quedaba sin el botón; 2026-10-22).
+  const largo = (d.tipo === 'inicio-turno' && d.estado === 'esperando') || (d.tipo === 'zona-extra' && ['esperando', 'tirado', 'aplicar'].includes(d.estado));
   momentosFeed.set(id, {d, hasta: Date.now() + (largo ? 30 * 60 * 1000 : MOMENTO_DURA_MS), orden: ya ? ya.orden : ++momentosOrden});   // el más nuevo, arriba
   renderMomentosFeed();
 }

@@ -233,11 +233,10 @@ async function bnLevantarArma(elId){
     cobrar(costo, 'levantó un arma');
     const des = (S.efectos || []).find(Combatiente.esDesarmado);
     if(des) S.efectos = S.efectos.filter(e => e !== des);
-    // Desarmado y con la mano libre: vuelve a tenerla en la mano, sin preguntar. Si no, se elige (si va en la mano).
+    // Si va en la mano, se elige siempre (dueño, 2026-10-22: «si tenés una mano libre, te pregunta: ¿querés dejarlo equipado? Sí, no»; antes,
+    // estando Desarmado y con la mano libre, volvía a la mano sin preguntar).
     let r = {destino: 'mochila', soltar: []};
-    if(FichaCombate.esMano(x.it.tipoItem)){
-      r = des && !FichaEquipo.slotOcupado(S, x.it).ocupado ? {destino: 'mano', soltar: []} : await levantadoElegir(S, x.it, quien);
-    }
+    if(FichaCombate.esMano(x.it.tipoItem)) r = await levantadoElegir(S, x.it, quien);
     if(r.soltar.length){
       cobrar(costo, 'cambió lo que tenía en la mano');
       const ids = new Set(r.soltar.map(i => i.id));

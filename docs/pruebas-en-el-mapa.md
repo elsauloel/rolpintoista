@@ -32,6 +32,7 @@
   personas no («les vuela por encima o por el costado»); en el borde justo entre dos casillas, alcanza con un costado libre. **Visto por Claude
   (2026-10-22, solo en su pantalla, sin tocar nada):** en una casilla con un Sólido al costado y una pared abajo, la ruleta quedó solo en las 5 del
   lado abierto (7 tapadas). El anillo de 2 lleno de tokens no hace falta probarlo (dueño: «muy improbable»).
+- [x] (2026-10-22, Claude, «Claude · pruebas»: el hacha del Goblin 4 en el piso al lado suyo titiló en la pantalla del GM; clic → «¿Lo levanta Goblin de prueba 4? (cuesta 1 No2)» → Sí → se le fue el Desarmado, 3 → 2 No2, el hacha salió del piso, la Mesa lo dijo; restaurado) **🗡️ Un creep levanta su arma con un clic en el mapa** (dueño, 2026-10-22, «sumalo»; js/27 `levantadorPara` / `acLevantarArmaDe`): en la pantalla del GM, como un personaje (en combate, en su turno).
 - [ ] **🤺 Desarmar en cooldown: el botón apagado** (dueño, 2026-10-22, «sí»): en el Bloqueo, «🤺 Desarmar · en cooldown (N turnos)» gris y sin
   poder tocarlo (o «le faltan No2», «te falta SP»); no va en el desplegable de la tirada a mano. Probarlo con el Ladrón recién usado.
 - [ ] **⏳ Una zona de 1 turno hace efecto dos veces**: al tirarla y al pasar la ronda; después se va al empezar el turno de quien la tiró. Con quien

@@ -52,7 +52,7 @@ const AvisoCombate = (() => {
     const f = mismo ? abierto.el : document.createElement('div');
     f.className = 'aviso-combate-fondo';
     f.innerHTML = `<div class="duelo-caja" role="dialog" aria-modal="true">
-      <div class="duelo-cab"><span>${e(o.icono || '⚔')} ${e(o.titulo || '')}</span><div class="bt"><button type="button" data-aviso-x title="Cerrar">✕</button></div></div>
+      <div class="duelo-cab"><span>${e(o.icono || '⚔')} ${e(o.titulo || '')}</span>${o.soloBoton ? '' : '<div class="bt"><button type="button" data-aviso-x title="Cerrar">✕</button></div>'}</div>
       <div class="duelo-cuerpo">
         ${pasos.length ? pasos.map((p, i) => `<div class="duelo-paso${p.espera ? ' aviso-espera' : ''}"><h4><span class="n">${i + 1}</span>${e(p.titulo || 'Qué pasó')}</h4><p>${p.html ? p.html : e(p.texto || '')}</p></div>`).join('')
           : o.texto ? `<div class="duelo-paso"><p>${e(o.texto)}</p></div>` : ''}
@@ -66,14 +66,15 @@ const AvisoCombate = (() => {
     f.onclick = ev => {
       const b = ev.target.closest('[data-aviso-b]');
       if(b){ const x = botones[Number(b.dataset.avisoB)]; if(x && x.alClic && !b.disabled) x.alClic(); return; }
+      if(ev.target === f && o.soloBoton) return;   // `soloBoton` (2026-10-22, dueño): se cierra solo con su botón, no con un clic afuera
       if(ev.target === f || ev.target.closest('[data-aviso-x],[data-aviso-ok]')) cerrar();
     };
     if(!mismo) document.body.appendChild(f);
-    abierto = {el: f, alCerrar: o.alCerrar, clave: o.clave || ''};
+    abierto = {el: f, alCerrar: o.alCerrar, clave: o.clave || '', soloBoton: !!o.soloBoton};
     const ok = f.querySelector('[data-aviso-b]:not([disabled]),[data-aviso-ok]');
     if(ok) ok.focus();
   }
-  document.addEventListener('keydown', ev => { if(abierto && ev.key === 'Escape'){ ev.stopImmediatePropagation(); cerrar(); } }, true);
+  document.addEventListener('keydown', ev => { if(abierto && ev.key === 'Escape'){ ev.stopImmediatePropagation(); if(!abierto.soloBoton) cerrar(); } }, true);
 
   /* Los carteles que piden algo (tirar, decidir, esperar): el mismo marco, pero SIN oscurecer el mapa (hay que poder mirarlo, y en el dodge
      roll mover el token). cartel(clave, o) dibuja o redibuja el de esa clave; cartel(clave, null) lo saca. Varios a la vez se apilan.

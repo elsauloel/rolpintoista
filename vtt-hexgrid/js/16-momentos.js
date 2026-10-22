@@ -146,7 +146,7 @@ function inicioTurnoMomento(id, d){
   if(d.estado === 'esperando'){
     if(inicioMostrados.has(id)) return true;
     inicioMostrados.add(id);
-    AvisoCombate.mostrar({clave: 'inicio-turno:' + id, icono: '▶', titulo: 'Empieza tu turno', pasos: dt.pasos || [],
+    AvisoCombate.mostrar({clave: 'inicio-turno:' + id, icono: '▶', titulo: 'Empieza tu turno', pasos: dt.pasos || [], soloBoton: true,   // solo con «✔ Aplicar» (2026-10-22)
       texto: '', botones: [{texto: '✔ Aplicar', id: 'inicio-turno-aplicar', alClic: () => {
         const b = document.getElementById('inicio-turno-aplicar'); if(b){ b.disabled = true; b.textContent = 'Aplicando…'; }
         inicioTurnoAplicar(id, d, false);
@@ -156,7 +156,7 @@ function inicioTurnoMomento(id, d){
   }
   // Ya aplicado: el mismo cartel, con lo que pasó, y «Entendido».
   if(d.estado === 'listo' && inicioMostrados.has(id) && AvisoCombate.abiertoClave && AvisoCombate.abiertoClave() === 'inicio-turno:' + id){
-    AvisoCombate.mostrar({clave: 'inicio-turno:' + id, icono: '▶', titulo: 'Empieza tu turno', pasos: dt.pasos || [], texto: '',
+    AvisoCombate.mostrar({clave: 'inicio-turno:' + id, icono: '▶', titulo: 'Empieza tu turno', pasos: dt.pasos || [], texto: '', soloBoton: true,
       veredicto: {tono: 'bueno', grande: '✔ YA SE APLICÓ'}, botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()}]});
     return true;
   }

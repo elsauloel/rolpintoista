@@ -2,7 +2,8 @@
    Un turno: levanta el arma (o se para en dos patas) mirando a un rival —es su ataque del turno— y queda «Golpe anunciado» (el estado, con
    `golpeAnunciado`; a quién apunta: `objetivo` = el token, `objetivoNombre`). La Mesa y la Crónica lo anuncian: los jugadores lo ven venir.
    - Cargarlo cuesta 1 No2 y 1 SP (o cooldown 3). Si mientras lo carga le entran 10 de daño o más, sumando, se le cae (`cortaDano`, js/10).
-   - Si el objetivo estaba pegado y se aleja, el golpe sale como su ataque de oportunidad: sin No2, con los 3 SP (js/17: `golpeAnunciadoOpcion`).
+   - Si el objetivo estaba pegado y se aleja, el golpe sale como su ataque de oportunidad: los No2 de una oportunidad y los 3 SP (dueño, 2026-10-21;
+     js/17: `golpeAnunciadoOpcion`).
    - En su próximo turno (`sc.golpeListo`, CreepAcciones.inicioCreep) el Atacar de las Acciones (js/12) lo descarga: puede caminar antes; es un
      ataque con su arma con +3 dados del Tipo, sin Parry (solo se esquiva) y, si pega, lo empuja 2 casillas (`h.golpeAnunciado.duelo`). Paga lo de
      un ataque y 3 SP más (`golpeAnunciado.spGolpe`; en modo cooldown, +3 turnos de cooldown a la habilidad). Si no ataca en ese turno, se pierde
@@ -83,7 +84,8 @@ async function golpeAnunciadoAtacar(sc, tipo){
   return true;
 }
 
-// ⚔ La oportunidad (js/17): si quien se aleja es a quien apunta (o no apuntaba a nadie), el golpe cargado, sin No2. → la opción, o null.
+// ⚔ La oportunidad (js/17): si quien se aleja es a quien apunta (o no apuntaba a nadie), el golpe cargado: los No2 de una oportunidad y los 3 SP
+// (sin los No2, no se ofrece, como cualquier oportunidad). → la opción, o null.
 function golpeAnunciadoOpcion(r, moverId){
   if(!r || r.tipo !== 'creep') return null;
   const sc = creepPrivadoDe(r.fichaId), es = golpeAnunciadoDe(sc);
@@ -92,9 +94,11 @@ function golpeAnunciadoOpcion(r, moverId){
   if(!h) return null;
   const atq = golpeAtaque({...sc, id: r.fichaId}, h);
   if(!atq) return null;
-  const k = golpeCosto(sc, h);
-  return {nombre: `🪓 ${h.nombre}`, costo: 0, yo: {ref: r.fichaId, tipo: 'creep', nombre: nombreDe(r)}, ataque: atq,
-    detalle: `El golpe que venía cargando: +${GA_DADOS(h)} dados, sin Parry, empuja 2 · sin No2, ${k.txt}`,
-    alUsar: () => modificarCreep(String(r.fichaId), c => { c.estados = (c.estados || []).filter(x => !(x && x.golpeAnunciado)); k.cobrar(c); return {}; })
+  const k = golpeCosto(sc, h), no2 = CreepCalculo.costoOportunidad(sc);
+  const tiene = sc.nitros === null || sc.nitros === undefined ? CreepCalculo.nitrosMax(sc) : num(sc.nitros);
+  if(tiene < no2) return null;
+  return {nombre: `🪓 ${h.nombre}`, costo: no2, yo: {ref: r.fichaId, tipo: 'creep', nombre: nombreDe(r)}, ataque: atq,
+    detalle: `El golpe que venía cargando: +${GA_DADOS(h)} dados, sin Parry, empuja 2 · ${fmt(no2)} No2 y ${k.txt}`,
+    alUsar: () => modificarCreep(String(r.fichaId), c => { c.estados = (c.estados || []).filter(x => !(x && x.golpeAnunciado)); c.nitros = num(c.nitros) - no2; k.cobrar(c); return {}; })
       .catch(err => console.error('Golpe anunciado: no se pudo gastar', err))};
 }

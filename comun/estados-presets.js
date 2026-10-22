@@ -236,7 +236,7 @@ const ESTADOS_PRESET = [
   // lo descarga (vtt-hexgrid/js/63). Se va al empezar su turno (pasa a `sc.golpeListo`); se corta si le entran 10 de daño o más mientras lo carga
   // (`cortaDano`, la cuenta en `danoRecibido`: vtt-hexgrid/js/10; dueño, 2026-10-21: «que no se corte con cualquier daño»).
   {nombre:'Golpe anunciado', polaridad:'buff', turnos:0, permanente:true, alEmpezarTurno:true, golpeAnunciado:true, cortaDano:10,
-    detalle:'Carga un golpe a la vista de todos: en su próximo turno descarga un ataque con +3 dados del Tipo de su arma, que no se puede parrear y empuja 2 casillas (cuesta los No2 del ataque y 3 SP). Si su objetivo está pegado y se aleja, se lo come de oportunidad (sin No2, con los 3 SP). Si mientras lo carga le entran 10 de daño o más (sumando los golpes), se le cae el golpe. ⚙ Automatizado en el mapa.'},
+    detalle:'Carga un golpe a la vista de todos: en su próximo turno descarga un ataque con +3 dados del Tipo de su arma, que no se puede parrear y empuja 2 casillas (cuesta los No2 del ataque y 3 SP). Si su objetivo está pegado y se aleja, se lo come de oportunidad (los No2 de una oportunidad y los 3 SP). Si mientras lo carga le entran 10 de daño o más (sumando los golpes), se le cae el golpe. ⚙ Automatizado en el mapa.'},
   // 🎯 Apuntando a la cabeza (2026-10-21, dueño, el Tiro a la cabeza de los creeps): su próximo disparo +2 PdG, Crítico frecuente +1 y Crítico potente +1
   // (`apunta`, lo suma el mapa: vtt-hexgrid/js/35); se gasta al disparar y se pierde si le entra daño (`pierdeAlDano`, js/10).
   {nombre:'Apuntando a la cabeza', polaridad:'buff', turnos:0, permanente:true, apunta:{pdg:2, crit:1, critpot:1}, pierdeAlDano:true,

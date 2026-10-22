@@ -38,7 +38,6 @@ function oporPuede(r){
   if(!rs) return true;
   if(expuestoPub(rs)) return false;
   if(rs.sinOpor) return false;   // solo tiene un arco: con el arco no hay oportunidad (2026-10-09)
-  if(r.tipo === 'creep' && (rs.estados || []).some(e => e && e.nombre === 'Golpe anunciado')) return true;   // 🪓 el golpe cargado sale sin No2 (js/63)
   if(r.tipo === 'creep') return rs.opor !== false;
   if(rs.oporCosto === undefined || rs.nitros === undefined || rs.nitros === null) return true;
   return num(rs.nitros) >= num(rs.oporCosto);

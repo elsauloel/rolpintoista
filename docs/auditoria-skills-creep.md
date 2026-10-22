@@ -127,7 +127,7 @@
 - ✅ **El que avisa no traiciona** (humanoides) / **Zarpazo erguido** (bestias) (2026-10-21, «golpe anunciado»; era el «Golpe cargado» sin auditar): cargarlo, 1 No2 y
   1 SP o cooldown 3; es su ataque del turno. Queda **Golpe anunciado** y el GM marca a quién apunta (la Mesa y la Crónica lo anuncian). En su próximo turno
   (puede caminar antes), el Atacar lo descarga: ataque con su arma +3 dados del Tipo, **sin Parry**, y si pega **empuja 2**; paga los No2 de un ataque y **3 SP más**
-  (en modo cooldown, +3 turnos de cooldown; o «un ataque común» y se pierde). Si el objetivo pegado se aleja, sale **de oportunidad sin No2, con los 3 SP**.
+  (en modo cooldown, +3 turnos de cooldown; o «un ataque común» y se pierde). Si el objetivo pegado se aleja, sale **de oportunidad: los No2 de una oportunidad y los 3 SP** (dueño, 2026-10-21).
   Se le cae si **le entran 10 de daño o más mientras lo carga, sumando** (dueño: «que no se corte con cualquier daño»); si no ataca, se pierde.
   (Dueño: el Crítico potente suelto, sin frecuente, no; en su lugar, el empujón de 2.) **Para probar.**
 - ✅ **Desarmar** (2026-10-21, «desarmar», humanoides y bestias): **Flash** en el paso del **Bloqueo** (hubo Parry), atacando (en vez de la Fuerza del

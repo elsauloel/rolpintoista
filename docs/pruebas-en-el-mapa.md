@@ -17,10 +17,14 @@
   cuadro del duelo, al GM, «Pasa la mitad: (X − su Defensa) ÷ 2» y «💔 Aplicar el daño»; recién ahí se descuenta. (Antes se aplicaba solo.)
 - [ ] **⏳ Una zona de 1 turno hace efecto dos veces**: al tirarla y al pasar la ronda; después se va al empezar el turno de quien la tiró. Con quien
   la tiró primero en el orden, que no se vaya antes de resolver el segundo efecto (`zonasDelQueLaTiro` con el Mantenimiento nuevo).
-- [ ] **🎲→◎ Lo que sale en el d20 de los Pedos se aplica solo, con dos Anuncios** (dueño, 2026-10-22; `js/66`, tabla «según la tirada» en la
-  Ejecución): Larry tira el d20 → su Anuncio dice «Salió 18: a Goblin 1 le toca Stun (1 turno)» con «✔ Que se aplique» / «✋ a mano» → al GM
-  (un creep) o al dueño del personaje le aparece «Te aplican Stun (1 turno)» con «✔ Aceptar» → recién ahí entra; la Mesa y la Crónica lo cuentan.
-  Con 20, «cae»: la vida a 0. El GM puede aceptar o aplicar por otro desde la Crónica. Una zona de un creep con tabla abre directo el «Te aplican».
+- [x] **🎲→◎ Lo que sale en el d20 de los Pedos se aplica solo, con dos Anuncios** (dueño, 2026-10-22; `js/66`, tabla «según la tirada» en la
+  Ejecución). **Probado en «Test con claude elsaulo» (2026-10-22, Claude, una sola pantalla como GM con 🎮 el control de Silvia)**: una zona de
+  prueba de Silvia con la tabla 1+ Pajaritos · 11+ Stun · 20+ cae → el creep entró, el daño pasó, el Anuncio «Tirá 1d20» con la tabla como nota,
+  salió 9 → «Salió 9: le toca Pajaritos (1 turno)» con «✔ Que se aplique» → «Te aplican Pajaritos» del lado del creep → ✔ Aceptar → el estado en el
+  creep, la Mesa («Pedos de prueba → Creep: Pajaritos (1 turno)») y la Crónica. Lo mismo sobre Aurelia (personaje, con el control) → Pajaritos en su
+  ficha. Y «cae» sobre el creep (salió 10 con 1+ cae → «💀 Creep cae» → la vida a 0, `muerto`). La tabla se ve y se edita en el editor de la Ejecución.
+  **Falta probar**: «cae» sobre un personaje (`fijarHp(S, 0)` + `revisarMuerte`), los botones del GM en la Crónica («✔ Que se aplique (por él)» y
+  «◎ Aplicar por él») y una zona de creep con tabla (abre directo el «Te aplican»). Todo restaurado.
 - [ ] **⭕ El lápiz cierra la figura al terminarla** (reportado por el dueño el 2026-10-22, arreglado en js/07 `guardarTrazo`): con «⭕ Cerrar la
   figura» tildado, en rectas (clic, clic, clic y doble clic o Enter) y a mano alzada (al soltar), el trazo nace con las puntas unidas, sin pasar
   por el ⚙. Y con 🧱 además, lo de adentro queda sólido y sin grilla.

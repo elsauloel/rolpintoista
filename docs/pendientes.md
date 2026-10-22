@@ -29,7 +29,7 @@
 >   2d4 +4…+8 con Perfora 1–2) caen las 19 en Buena (130–170); la tranquera, mejor 2d4 con Perfora 2 (sin «Llega cargada», ~120). **Las Raras para
 >   arriba:** armarlas de cero en d4 (la de guerra, la pesada, la de asedio y la de la frontera hoy dan una calidad más). Revisarlas una por una, por
 >   texto.
-> - [ ] **🎰 Ver en el mapa el rodillo de la Varita del caos** (2026-10-18, dueño: «una vez que esté el rodillo, anotalo en chequear cuando esté
+> - [x] (2026-10-22, lo vio el dueño en el mapa, juan sobre Clementino) **🎰 Ver en el mapa el rodillo de la Varita del caos** (2026-10-18, dueño: «una vez que esté el rodillo, anotalo en chequear cuando esté
 >   en la compu»): Atacar con la varita → clic en el objetivo → el Anuncio del d20 con el veredicto («¡LO QUE BUSCABAS!» / «¡SE DIO VUELTA!») →
 >   «🎰 Girar el rodillo»: los nombres pasan de abajo hacia arriba y frenan hasta el estado que salió → «¡Salió X!» con su detalle y su duración →
 >   «✔ Aplicar». Con 20, la grilla para elegir; con 1, elige el bando contrario. Probarlo con un personaje y con el Kobold hongero (un creep).

@@ -111,7 +111,7 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261012zy', '../comun/ficha-botin.js?v=20261022f', '../comun/generador-tiendas.js?v=20261018zm', '../comun/filtro-catalogo.js?v=20261009r', '../comun/ficha-tienda.js?v=20261010g', '../comun/ficha-mantenimiento.js?v=20261020n', '../comun/ficha-calculo.js?v=20261021z', '../comun/ficha-combate.js?v=20261015d', '../comun/skills-clase.js?v=20261021zo', '../comun/ficha-habilidades.js?v=20261020q',
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261022g', '../comun/ficha-botin.js?v=20261022g', '../comun/generador-tiendas.js?v=20261018zm', '../comun/filtro-catalogo.js?v=20261009r', '../comun/ficha-tienda.js?v=20261010g', '../comun/ficha-mantenimiento.js?v=20261020n', '../comun/ficha-calculo.js?v=20261021z', '../comun/ficha-combate.js?v=20261015d', '../comun/skills-clase.js?v=20261021zo', '../comun/ficha-habilidades.js?v=20261020q',
   '../comun/catalogo.js?v=20261020zr', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261016c', '../comun/ficha-sesion.js?v=20261020zu', '../comun/ficha-botonera.js?v=20261020zb', '../comun/ficha-resumen.js?v=20261021zo', '../comun/inv-calculo.js?v=20261020b', '../comun/inv-botonera.js?v=20261020zb', '../comun/inv-acciones.js?v=20261019l', '../comun/inv-duelo.js?v=20261021zn', '../comun/ficha-acciones.js?v=20261021zj', '../comun/inv-habilidades.js?v=20261014f', '../comun/inv-lupa.js?v=20261015a',
   '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261021zj', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261014e'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
@@ -1407,6 +1407,7 @@ async function recibidosAplicar(fichaId){
       if(r.partes.length) aviso(`🎁 ${r.partes.join(' · ')}`);
       const vueltas = Recibidos.textoVueltas(r.vueltas);
       if(vueltas) aviso(vueltas);
+      recompensaAnuncio(S, nombre, d.data() || {}, r, vueltas);
       hubo = true;
     }
     for(const d of de('estados')){
@@ -1416,6 +1417,20 @@ async function recibidosAplicar(fichaId){
     }
     return hubo;
   });
+}
+// 🎁 Botín concluido (dueño, 2026-10-22): cuando el GM cierra el botín y reparte, al jugador le aparece el resumen de lo que recibió, con Aceptar
+// (Experiencia, DDE, despojos y los ítems que reclamó, que ya están en su mochila). Lo mismo para cualquier otra recompensa que le llegue.
+function recompensaAnuncio(S, nombre, d, r, vueltas){
+  if(typeof AvisoCombate === 'undefined' || !AvisoCombate.mostrar) return;
+  const n = v => Number(v) || 0;
+  const items = r && r.items && r.items.length ? r.items : [];
+  const pasos = [{titulo: 'Experiencia', texto: `+${n(d.xp)} XP`}, {titulo: 'DDE', texto: `+${n(d.dde)}`}, {titulo: 'Despojos', texto: `+${n(d.despojos)}`},
+    {titulo: 'Ítems reclamados', texto: items.length ? items.join(', ') + ' (ya están en tu mochila)' : 'ninguno'}];
+  if(vueltas) pasos.push({titulo: 'Trampas', texto: vueltas});
+  if(r && r.subio) pasos.push({titulo: '⬆ Subiste de nivel', texto: `Ahora sos nivel ${n(S.meta && S.meta.nivel)}`});
+  AvisoCombate.mostrar({clave: 'recompensa:' + Date.now(), icono: '🎁', titulo: `Botín concluido · ${nombre || 'recibiste'}`, texto: 'Recibiste:', pasos,
+    veredicto: {tono: 'bueno', grande: `+${n(d.xp)} XP · +${n(d.dde)} DDE`, chico: items.length ? `${items.length} ítem${items.length === 1 ? '' : 's'} a la mochila` : ''},
+    botones: [{texto: '✔ Aceptar', alClic: () => AvisoCombate.cerrar()}]});
 }
 /* Cambiar a un personaje desde el mapa y guardarlo (2026-10-02, A2/A3): con la sesión de la Botonera nueva si ya está abierta en ese
    personaje; si no, con una sesión de un rato (mantSesionTemporal) que se cierra al terminar. cambiar(S, {enBn}) puede ser async y

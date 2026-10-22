@@ -114,7 +114,7 @@ const FichaBotin = (() => {
     <div class="hint" style="margin-bottom:8px">Lo que reclamás queda a tu nombre y llega a tu mochila cuando el GM cierra el botín. Si otro también lo quiere, te lo puede disputar: ✊ piedra, papel o tijera, y el que gana se lo lleva. Lo repetido va en una pila: elegí cuántos reclamás.</div>
     <div class="hint" style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px">
       <span>Mochila: <b>${fmt(usado)}${cap > 0 ? ' / ' + fmt(cap) : ''}</b> ranuras${libres !== null ? ` · <b>${fmt(libres)}</b> libres` : ''}${reclamado ? ` · reclamaste <b>${fmt(reclamado)}</b>` : ''}</span>
-      <button type="button" class="mini" id="botin-loot-mochila">🎒 Abrir mochila</button>
+      <button type="button" class="btn" id="botin-loot-mochila" style="border:1px solid var(--copper, #B87333);color:var(--paper, #EDE3D6);background:rgba(184,115,51,.18);font-weight:700;padding:8px 14px">🎒 Mochila y equipo</button>
     </div>
     ${puede ? '' : '<div class="hint" style="margin-bottom:8px">Abrí tu personaje (con permiso de edición) para reclamar cosas del botín.</div>'}
     ${grupos.length ? grupos.map(g => `<div style="margin:16px 0 4px;padding:6px 10px;border-radius:8px;background:rgba(184,115,51,.16);border-left:4px solid var(--copper, #B87333);display:flex;align-items:baseline;gap:10px"><b style="font-size:17px;letter-spacing:.06em;text-transform:uppercase;color:var(--paper, #EDE3D6)">${g.titulo}</b><span class="hint">${esc(g.nota)}${g.nota ? ' · ' : ''}${g.pilas.reduce((a, p) => a + p.entradas.length, 0)} ${g.pilas.reduce((a, p) => a + p.entradas.length, 0) === 1 ? 'ítem' : 'ítems'}</span></div>
@@ -138,7 +138,7 @@ const FichaBotin = (() => {
           <div class="hint">≈ ${fmt(p.despojos)} despojos${n > 1 ? ' c/u' : ''}${origenes.length ? ' · de ' + esc(origenes.slice(0, 3).join(', ')) + (origenes.length > 3 ? '…' : '') : ''}${info && info.ocupado ? ' · <b style="color:var(--bad, #E05A5A)">slot ocupado</b>' : ''}${estado.length ? ' · ' + estado.join(' · ') : ''}</div>
         </div>
         <button type="button" class="mini" data-view="catalogo:${esc(p.item.id)}">Ver</button>
-        ${comparar ? `<button type="button" class="mini" data-botin-comparar="${esc(p.item.id)}">Comparar</button>` : ''}
+        ${comparar ? `<button type="button" class="btn" data-botin-comparar="${esc(p.item.id)}" style="border:1px solid var(--copper, #B87333);color:var(--copper, #B87333);background:rgba(184,115,51,.10);font-weight:700" title="Lo comparás con lo que tenés puesto en ese lugar">⚖ Comparar</button>` : ''}
         ${acciones(p)}
       </div>`;
     }

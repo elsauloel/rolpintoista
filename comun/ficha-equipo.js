@@ -171,7 +171,10 @@ const FichaEquipo = (() => {
     if(!slotDef) return null;
     const usado = slots(S).find(s => s.id === slotDef.id)?.usado || 0;
     const propio = slotDef.peso ? (slotDef.peso[item.tipoItem] || 1) : 1;
-    const equipados = (S.inventario || []).filter(i => i.equipado && i.tipoItem === item.tipoItem);
+    // Lo equipado en ese lugar (2026-10-22, dueño: Comparar no andaba con las armas): antes solo lo del mismo tipo exacto, así una varita de una mano
+    // no se comparaba con la espada de dos manos que tenías puesta. Primero lo del mismo tipo, después lo demás del mismo lugar.
+    const mismoLugar = (S.inventario || []).filter(i => i.equipado && slotDef.cats.includes(i.tipoItem));
+    const equipados = [...mismoLugar.filter(i => i.tipoItem === item.tipoItem), ...mismoLugar.filter(i => i.tipoItem !== item.tipoItem)];
     return {ocupado: usado + propio > slotDef.max, equipados};
   }
   function defValor(i){

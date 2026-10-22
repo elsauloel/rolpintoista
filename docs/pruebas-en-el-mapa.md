@@ -34,8 +34,12 @@
   botón del dock mientras hay botín publicado; la cabecera con tus XP y DDE en dos recuadros grandes (los demás jugadores en una línea chica);
   los títulos Mano / Cuerpo / Consumibles / Trofeos como banda destacada; el nombre de cada ítem con el globo del glosario (su resumen al pasar el
   mouse, `data-glo-txt`); «slot ocupado» en rojo y siempre con Comparar; la mochila abierta desde el botín vuelve al botín al cerrarse (mapa y ficha
-  suelta); el emoji de Reclamar con su fondo oscuro. **Queda un botín publicado en «Claude · pruebas»** (4 goblins de prueba) para que el dueño lo
-  vea como jugador: al terminar, el GM (la cuenta de Claude) lo cierra o lo borra.
+  suelta); el emoji de Reclamar con su fondo oscuro. El dueño lo vio como jugador (juan) en «Claude · pruebas», reclamó y el botín se cerró ahí
+  (las recompensas de prueba quedaron en Clementino y juan).
+  **Segunda vuelta (2026-10-22)**: Comparar también con las armas (`FichaEquipo.slotOcupado` compara contra lo equipado en el mismo LUGAR, no solo
+  el mismo tipo exacto: una varita de una mano contra la espada de dos manos puesta); Comparar y «🎒 Mochila y equipo» más visibles; y el Anuncio
+  **«🎁 Botín concluido»** (js/11 `recompensaAnuncio`: Experiencia, DDE, Despojos, Ítems reclamados, ✔ Aceptar) cuando llega la recompensa al
+  personaje. **Falta probar en vivo** el Anuncio con un cierre real del botín (se vio con datos de muestra) y Comparar sobre un arma del botín.
 - [ ] **⭕ El lápiz cierra la figura al terminarla** (reportado por el dueño el 2026-10-22, arreglado en js/07 `guardarTrazo`): con «⭕ Cerrar la
   figura» tildado, en rectas (clic, clic, clic y doble clic o Enter) y a mano alzada (al soltar), el trazo nace con las puntas unidas, sin pasar
   por el ⚙. Y con 🧱 además, lo de adentro queda sólido y sin grilla.

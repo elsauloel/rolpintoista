@@ -121,7 +121,7 @@ async function desarmadoResuelto(d){
   const celdas = anillo.length ? anillo : [{col: t.col, fila: t.fila}];
   const elegida = Math.floor(Math.random() * celdas.length);
   try{ momentoAbrir({tipo: 'desarme', icono: '🤺', titulo: `¡${gano} desarma a ${nombreDe(t)}!`, estado: 'listo', resultado: `${itemNombre} sale volando ${DESARME_CASILLAS} casillas`,
-    datos: {celdas: celdas.map(c => [c.col, c.fila]), elegida}}); }catch(err){ console.error('Desarmar: el momento', err); }
+    datos: {celdas: celdas.map(c => ({c: c.col, f: c.fila})), elegida}}); }catch(err){ console.error('Desarmar: el momento', err); }   // (objetos: Firestore no guarda listas dentro de listas)
   await new Promise(r => setTimeout(r, DESARME_RULETA_MS + 300));
   const s = await armaSoltar(t, 0, {celda: celdas[elegida], itemId, itemNombre});
   // Si lo que se cayó es su arma (no un escudo), queda Desarmado (un creep no la pierde de sus datos: el estado lo frena hasta levantarla).
@@ -140,7 +140,7 @@ function desarmeRuleta(id, datos){
   ruletaVistas.add(id);
   // El cuadro del duelo («¡DESARMADO!») tapa el mapa: se minimiza para que se vea la ruleta (probado en el mapa, 2026-10-21).
   try{ if(typeof Duelo !== 'undefined' && Duelo.minimizar) Duelo.minimizar(); }catch(e){}
-  const celdas = datos.celdas.map(([col, fila]) => hexCentro(col, fila)), n = celdas.length, fin = Math.max(0, Math.min(n - 1, num(datos.elegida)));
+  const celdas = datos.celdas.map(x => Array.isArray(x) ? hexCentro(x[0], x[1]) : hexCentro(x.c, x.f)), n = celdas.length, fin = Math.max(0, Math.min(n - 1, num(datos.elegida)));
   // El recorrido: dos vueltas y hasta la elegida; cada paso un poco más lento.
   const pasos = n * 2 + fin + 1, tiempos = [];
   let acc = 0;

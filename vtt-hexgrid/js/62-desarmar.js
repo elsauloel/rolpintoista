@@ -53,12 +53,17 @@ function desarmeAtacanteNatural(d){
   const sc = creepPrivadoDe(d.atacante.ref);
   return !!(sc && sc.armaNatural && (!d.ataque.armaNombre || d.ataque.armaNombre === sc.armaNombre));
 }
-// El gancho de comun/duelo.js (crear): ¿este ataque va con un arma natural? (un creep o una invocación con garras, colmillos…)
-window.dueloArmaNatural = (yo, ataque) => {
+// El gancho de comun/duelo.js (crear): ¿este ataque va con un arma natural? (un creep o una invocación con garras, colmillos…). Una invocación vive
+// en la ficha de su dueño: se lee (invDeToken, js/10) — por eso es async (2026-10-22, dueño: «lo de las invocaciones, ¿no se puede resolver?»).
+window.dueloArmaNatural = async (yo, ataque) => {
   if(!yo || !ataque) return false;
   if(yo.tipo === 'creep' && typeof creepPrivadoDe === 'function'){
     const sc = creepPrivadoDe(yo.ref);
     return !!(sc && sc.armaNatural && (!ataque.armaNombre || ataque.armaNombre === sc.armaNombre));
+  }
+  if(String(yo.ref || '').includes(SEP_INVOCACION) && typeof invDeToken === 'function'){
+    const inv = await invDeToken({fichaId: yo.ref}).catch(() => null);
+    return !!(inv && inv.armaNatural && (!ataque.armaNombre || ataque.armaNombre === inv.armaNombre));
   }
   return false;
 };

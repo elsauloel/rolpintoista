@@ -509,7 +509,7 @@ const Duelo = (() => {
     };
     if(textoAtq && inicial.ataque) inicial.ataque.texto = textoAtq;
     // 🤺 Con un arma natural (garras, colmillos): no se le puede desarmar (dueño, 2026-10-22); lo dice la pantalla que crea el duelo (js/62).
-    try{ if(!hab && inicial.ataque && typeof window.dueloArmaNatural === 'function' && window.dueloArmaNatural(cfg.yo, cfg.ataque)) inicial.ataque.natural = true; }catch(e){}
+    try{ if(!hab && inicial.ataque && typeof window.dueloArmaNatural === 'function' && await window.dueloArmaNatural(cfg.yo, cfg.ataque)) inicial.ataque.natural = true; }catch(e){}   // (una invocación: se lee su ficha)
     // Hechizo de área (dicho por el dueño, 2026-09-27): el casteador tira su PdG.Esp/PdG UNA SOLA VEZ para toda la
     // cascada; cada objetivo tira su Evasión individualmente contra esa MISMA tirada. `cfg.pdgCompartido` (la tirada
     // ya resuelta del primer objetivo) llega precargada acá, así que este sub-duelo arranca con el contacto ya

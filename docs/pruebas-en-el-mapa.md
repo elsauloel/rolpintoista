@@ -19,6 +19,18 @@
   aparecía un aviso genérico con «Entendido» y sin botón para tirar (lo tapaba); y la tarjeta del GM con «Tirar por él» se borraba a los 14 s.
 - [x] (2026-10-22, Claude: Clementino le pegó un crítico al Bosque, 21 de daño; la vida quedó en 60 hasta «💔 Aplicar el daño», después 39) **💔 El daño a un creep espera el clic del GM**: un personaje le pega a un creep (o el creep para y pierde el Bloqueo: pasa la mitad) → en el
   cuadro del duelo, al GM, «Pasa la mitad: (X − su Defensa) ÷ 2» y «💔 Aplicar el daño»; recién ahí se descuenta. (Antes se aplicaba solo.)
+- [ ] **💪 Empower antes de la tirada** (dueño, 2026-10-22: «se aprieta y la siguiente tirada le suma el valor del empower»; js/37, estado Empower
+  en `comun/estados-presets.js`): 💪 → «¿A quién le das Empower?» (vos o un aliado en tu Rango, con lo que sumaría y el costo) → paga → esa persona
+  queda con Empower y su próxima tirada (ataque, defensa, daño, Fuerza del golpe, Percepción…) suma +3 y lo gasta. Dos Empower antes de tirar = +6.
+  **Probado por Claude (2026-10-22, «Claude · pruebas»)**: el cartel de elegir a quién (juan: «juan (vos)» y «Clementino», +3 · 2 SP); la Botonera
+  de Clementino con Empower muestra «Empower +3» debajo de cada tirada (PdG 1d6+1 → 1d10, Evasión 1d12 → 1d6+1d8+1); el motor: la tirada lo suma,
+  la Mesa lo pinta y se gasta (558 pruebas). **Falta**: verlo el dueño desde juan (pagar y tirar en un duelo) y darle a un aliado. **Ojo:** una
+  pantalla con la versión vieja que le aplique el Empower a un aliado lo deja como un estado vacío (pasó con la pestaña del dueño): recargar todas.
+- [ ] **🤺 La ruleta del desarme cae solo en casillas libres** (dueño, 2026-10-22: «si no hay en ese círculo… si hay en el círculo interno,
+  primero ese; si no, en el externo, y así siguiendo para afuera»; js/62): el anillo a 2 casillas sin nadie, sin Sólidos y sin otra arma; lleno →
+  el de 1; después 3, 4… hasta 8. Probarlo con el anillo de 2 lleno de tokens.
+- [ ] **🤺 Desarmar en cooldown: el botón apagado** (dueño, 2026-10-22, «sí»): en el Bloqueo, «🤺 Desarmar · en cooldown (N turnos)» gris y sin
+  poder tocarlo (o «le faltan No2», «te falta SP»); no va en el desplegable de la tirada a mano. Probarlo con el Ladrón recién usado.
 - [ ] **⏳ Una zona de 1 turno hace efecto dos veces**: al tirarla y al pasar la ronda; después se va al empezar el turno de quien la tiró. Con quien
   la tiró primero en el orden, que no se vaya antes de resolver el segundo efecto (`zonasDelQueLaTiro` con el Mantenimiento nuevo).
 - [x] **🎲→◎ Lo que sale en el d20 de los Pedos se aplica solo, con dos Anuncios** (dueño, 2026-10-22; `js/66`, tabla «según la tirada» en la

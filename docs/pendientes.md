@@ -8,7 +8,7 @@
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.
-> - [ ] **⚡ Ver juntos los botones Flash nuevos y el 🧿 Mal de ojo** (2026-10-21, dueño: «anotar esto en revisar cuando esté en la compu»): 🛡️ Blindaje,
+> - [x] (2026-10-22, lo vio el dueño, juan con los cuatro) **⚡ Ver juntos los botones Flash nuevos y el 🧿 Mal de ojo** (2026-10-21, dueño: «anotar esto en revisar cuando esté en la compu»): 🛡️ Blindaje,
 >   🫧 Shield, 🗿 Estoicismo y 💥 Shockwave (personajes) y 🧿 Mal de ojo (el GM, con un creep que lo tenga): arriba, junto a la moneda, y en la columna
 >   «Podés usar» con un duelo abierto; las animaciones (la muestra: https://claude.ai/artifact/HCW4XnbTypFmvGuXPHoBRZ); que aparezcan solo si alcanza el
 >   SP (el doble en turno ajeno) y que al tocarlos se ejecute la habilidad. Ojo: cada personaje con una de estas habilidades tiene que guardar su ficha una
@@ -44,7 +44,7 @@
 >   un creep le pega a un personaje, el cuadro del duelo frena en «N de daño, menos tu Defensa» con el botón **💔 Aplicar el daño** (el jugador) o
 >   **💔 Aplicar por …** (el GM, si el jugador no contesta); recién ahí baja la vida. Probado por Claude (capturas en la conversación); falta verlo
 >   el dueño, y sobre todo desde la cuenta de un jugador (la variante «Aplicar por …» no se pudo ver: en la partida de prueba el GM es dueño de Xeena).
-> - [ ] **💥 Ver en el mapa la trampa que explota y el daño en dos pasos** (2026-10-17, dueño: «anotalo en pendientes cuando esté en la compu,
+> - [x] (2026-10-22, lo vio el dueño, juan sobre el Cartucho enterrado) **💥 Ver en el mapa la trampa que explota y el daño en dos pasos** (2026-10-17, dueño: «anotalo en pendientes cuando esté en la compu,
 >   así yo lo veo efectivamente en el mapa»): una trampa con la casilla **💥 Explota** (asistente de trampas, paso «Daño»; ya la tiene el Cartucho
 >   enterrado del Kobold boom boom): al pisarla el mapa queda quieto 1,5 s con la explosión sobre el área y después el anuncio, con
 >   «🎲 Tirar el daño» y «💔 Aplicar el daño (N)» → «✔ ya se descontó de la vida (A → B)». Probado por Claude en «Test con claude elsaulo»;

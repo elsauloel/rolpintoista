@@ -138,6 +138,9 @@
 
 ### Choque liviano (desde el 2026-10-21)
 
+- ✅ **Patotear** (humanoides) / **Jauría** (bestias) (2026-10-21, «manada»): un ataque con su arma con **+1 dado** del Tipo por cada aliado suyo pegado al
+  objetivo, **hasta +3** (él no se cuenta; tampoco un aliado caído o bajo tierra). Lo de un ataque y 2 SP, o cooldown 3. Sin aliados al lado, avisa y va
+  como un ataque común. **Para probar.**
 - ✅ **Sal en la herida** (humanoides) / **Morder la herida** (bestias) (2026-10-21, «abrir la herida»; dueño: «si no está sangrando, provoca sangrado; y si
   está sangrando, hace más daño y amplifica el sangrado»): un ataque con su arma; si el objetivo ya sangra, **+2 dados** del Tipo; si pega, **Sangrado** (si
   ya sangraba, +1 al daño por turno). Lo de un ataque y 2 SP, o cooldown 3. Solo el Sangrado (el Veneno no cuenta).

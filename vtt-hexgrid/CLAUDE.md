@@ -1706,6 +1706,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `CreepCalculo.alcance`, o el arma a distancia del personaje en `FichaResumen`); `oportunidadCorte` (js/17) frena al primer rival que se mueve en la mira
   (`vigilantesDe`, `vigilanciaLoVe`) y el cartel de la oportunidad pregunta «¿Dispara?» (`vigilanciaArmasDe`: su ataque normal; `vigilanciaQuitar` al
   disparar). El alcance se dibuja con `vigilanciaDibujar` (js/05).
+- **👊 Patotear / Jauría** (2026-10-21, `js/65-patota.js`): un ataque con `manada` (el tope); `patotaBonos` (desde `dueloElegirObjetivoMapa`, js/13, después de
+  la herida) cuenta los aliados del mismo tipo pegados al objetivo (`patotaAliados`: sin caídos ni bajo tierra) y suma +1 dado por cada uno, hasta el tope.
 - **🩸 Sal en la herida / Morder la herida** (2026-10-21, `js/64-herida.js`): un ataque con `abrirHerida`; `heridaBonos` (desde
   `dueloElegirObjetivoMapa`, js/13, después de la puñalada) mira los estados del objetivo (`heridaEstados`) y, si ya sangra, suma +2 dados.
 - **🪓 El que avisa no traiciona / Zarpazo erguido** (2026-10-21, `js/63-golpe-anunciado.js`): la habilidad (`golpeAnunciado`, con la Ejecución del golpe en

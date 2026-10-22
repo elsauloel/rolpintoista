@@ -138,7 +138,7 @@ rodilla, Tarascón al tobillo), las redes; y en el mapa, el sigilo, el +1 por la
 
 **H. En grupo** ✦
 31. **Rodear**: pega más fuerte si otro aliado también está pegado al objetivo.
-32. **Manada**: cada aliado al lado del objetivo le suma daño.
+32. ✅ **Manada** ✦ (2026-10-21): **Patotear** / **Jauría** — +1 dado por cada aliado pegado al objetivo, hasta +3.
 33. **Distraer**: el objetivo pierde su ataque de oportunidad contra los aliados.
 
 **I. Apuestas** ✦

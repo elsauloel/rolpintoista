@@ -857,6 +857,12 @@ function dueloElegirObjetivoMapa(msg){
         if(!r){ pedir(); return; }
         ataqueCarga = r;
       }
+      if(ataque && ataque.manada && mio && typeof patotaBonos === 'function'){   // 👊 Patotear / Jauría (js/65): +1 dado por aliado pegado al objetivo
+        let r = null;
+        try{ r = await patotaBonos(mio, t, ataqueCarga || ataque, yo); }catch(err){ console.error('No se pudo contar la patota:', err); r = ataqueCarga || ataque; }
+        if(!r){ pedir(); return; }
+        ataqueCarga = r;
+      }
       if(conArco && mio && Combatiente.arcoMuyCerca(ataque, distanciaHex({col: mio.col, fila: mio.fila}, {col: t.col, fila: t.fila}))){   // avisa y deja seguir: lo decide la mesa
         const si = await AvisoCombate.preguntar(`${nombreDe(t)} está muy cerca para el arco: hace falta al menos ${Combatiente.arcoLibresTxt(ataque)} entre los dos. Con el arco no se pega cuerpo a cuerpo: alejate o cambiá de arma. ¿Disparar igual? (lo decide la mesa)`,
           {icono: '🏹', titulo: 'Muy cerca para el arco', si: 'Disparar igual', no: 'Elegir otro'});

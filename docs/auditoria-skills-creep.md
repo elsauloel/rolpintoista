@@ -138,6 +138,12 @@
   quien defiende solo desarma si paró con el arma, no con el escudo. Le puede sacar al otro un arma o un escudo. **Una bestia con garras sigue
   desarmando** (dueño: «el mecanismo debe existir como posible; cuándo sí o no lo define la mesa»); lo único, su arma natural no se le cae. La opción se elige **adentro del paso 3 del duelo** («🤺 Desarmar a X», al lado de la tirada: cobra, marca
   y tira); el paso 3 dice «🤺 Desarmar» y qué se le cae a quién. La ruleta gira en círculo alrededor del desarmado y frena parejo (3 vueltas, 4,3 s).
+  **La comunicación (dueño, 2026-10-22):** quien ataca elige «⚔ Pegar: pasar el bloqueo» o «🤺 Desarmar»; quien defiende, «🛡 Bloquear el golpe» o
+  «🤺 Desarmar». Al otro, si todavía no tiró, le aparece «🤺 X intenta desarmarte» / «…intenta quitarte el arma» (solo para que lo sepa; la tirada es
+  la misma: «🛡 Bloquear el desarme» / «⚔ Pegar (contra el desarme)»). Si gana el desarme: el cartel «¡X desarmó a Y!» con **✔ Aceptar** (quien
+  desarmó, o el GM por él; el otro ve «esperando que X acepte…») → el duelo se achica, la ruleta, el duelo vuelve con «¡DESARMADO!» y «Terminar
+  duelo». Si falla: «X intentó desarmar a Y, pero falló» y lo de siempre (atacando: ¡BLOQUEADO!, con contraataque; defendiendo: pasa la mitad y el
+  arma con que paró pierde 1 de durabilidad). Los cuatro caminos, probados en el mapa por Claude (Ladrón contra juan).
   **Para probar.** También es skill de clase del **Warrior** (dueño, 2026-10-21: 3 SP, 6 en turno ajeno, sin No2; el mismo botón 🤺). Desde el mismo día (P217) un arma natural también parrea (con su peso; 1 si no tiene): una bestia desarma atacando o defendiendo.
 
 ### Choque liviano (desde el 2026-10-21)

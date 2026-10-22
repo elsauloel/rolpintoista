@@ -44,6 +44,9 @@
   la tabla de números, «Lo que hace cada uno» (la ficha corta de los dos, lado a lado: el hechizo de la varita, los efectos al golpear, lo de un
   talismán) y un número que no aplica a uno de los dos sale «—» sin flecha. Visto en el mapa: Varita arcana contra Cuchillo, Farol contra Tapa de
   tacho, Hacha contra Cuchillo (capturas enviadas al dueño).
+- [ ] **🤺 Desarmar, ofensivo y defensivo** (dueño, 2026-10-22): probado por Claude en «Claude · pruebas» los cuatro caminos (atacando y
+  defendiendo, gana y falla) con el Ladrón (prueba) y juan; falta que lo vea el dueño: el cartel «¡X desarmó a Y!» con Aceptar, el duelo que se
+  achica, la ruleta en círculo, el duelo que vuelve con «¡DESARMADO!» y «Terminar duelo»; y un Warrior (personaje) desarmando desde su cuenta.
 - [x] **🌫 La Bomba de humo de un creep pide la casilla** (reportado por el dueño el 2026-10-22: «usar» la gastaba sin hacer nada; arreglado en js/12
   `acConsumir`): un consumible de creep con zona (`zonaUso`: Bomba de humo, Bombucha de talco) o Acelerador (`aceleradorMapa`: la Runa) va por el mismo
   camino que el de un personaje: el GM elige la casilla y se arma la zona. Visto en «Claude · pruebas» con Goblin de prueba 1: pidió el centro, dejó la

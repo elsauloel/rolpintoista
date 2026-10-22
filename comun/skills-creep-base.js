@@ -316,9 +316,11 @@
   H('Miedo', 'XK', 'bdma', 'x', 4, tA('Si el objetivo falla Res.Mt huye de él 2 turnos (a mano).', 2));
   H('Intimidar', 'X', 'bhd', 'x', 2, tA('Una mirada amenazante: el objetivo pierde 1 de Daño 2 turnos (a mano).', 1));
   // 🔨 Auditadas (dueño, 2026-10-21; choque pesado, «partir la armadura»): la común y la fuerte, cada una con su versión de bestia.
-  // 🤺 Auditada (dueño, 2026-10-21; choque pesado, «desarmar»): Flash en el paso del Bloqueo (atacando o defendiendo); bestias también (desarman, pero
-  // lo natural no se les cae). Se usa desde el botón instantáneo 🤺 del GM (vtt-hexgrid/js/62). 3 SP (6 en turno ajeno) o cooldown 3.
-  H('Desarmar', 'K', '*', 'mt', 3, {detalle: 'FLASH. En el paso del Bloqueo de un duelo (hubo Parry: arma contra arma o contra escudo), atacando o defendiendo, en vez de su tirada de siempre (la Fuerza del golpe o el Bloqueo): la tirada es la misma, pero si gana, el otro pierde lo que tenía en la mano —su arma, o el arma o el escudo con que paró—, que sale volando 2 casillas en una dirección al azar y queda en el piso. Eso reemplaza el resultado de siempre (sin la mitad del daño, sin contraataque). Si pierde, lo de siempre. Lo natural (garras, colmillos) no se cae. En turno ajeno cuesta el doble. El GM la usa desde el botón 🤺 (al costado del duelo).',
+  // 🤺 Auditada (dueño, 2026-10-21; choque pesado, «desarmar»): Flash en el paso del Bloqueo (atacando o defendiendo). 3 SP (6 en turno ajeno) o
+  // cooldown 3. Desde el 2026-10-22 (dueño): no se declara en el turno; se elige en el Bloqueo que sigue a un Parry ganado, y se desarma CON EL ARMA:
+  // atacando, con un arma (no con garras: una bestia no desarma); defendiendo, solo si paró con el arma, no con el escudo. Le puede sacar al otro un
+  // arma o un escudo. Se elige adentro del paso 3 del duelo (comun/duelo.js, vtt-hexgrid/js/62).
+  H('Desarmar', 'K', '*', 'mt', 3, {detalle: 'FLASH. Le saca al otro lo que tiene en la mano —un arma o un escudo—, que sale volando 2 casillas y queda en el piso. No se declara en el turno: la ocasión se da solo cuando hay un Parry y el Parry gana, en el paso del Bloqueo. Atacando, en vez de la Fuerza del golpe; defendiendo, en vez de bloquear, y solo si paró con el arma (no con el escudo). Se desarma con el arma: con garras o colmillos no. La tirada es la misma; si gana, eso reemplaza el resultado de siempre (sin la mitad del daño, sin contraataque); si pierde, lo de siempre. Lo natural no se cae. En turno ajeno cuesta el doble. ⚙ Automatizado: el botón «🤺 Desarmar» aparece adentro del paso 3 del duelo, al lado de la tirada.',
     no2: 0, spCosto: 3, auditada: true, desarmar: true, ataqueTxt: 'en el Bloqueo: si gana, el otro pierde lo que tiene en la mano (vuela 2 casillas)'});
   H('Romper armadura', 'DX', 'hdc', 'mt', 3, aA(`Un golpe a las juntas: un ataque con su arma que, si pega, deja Armadura rota 1. ${AR_NOTA}`,
     {}, 'un ataque con su arma; si pega, Armadura rota 1', 2, AR(1)));

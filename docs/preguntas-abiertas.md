@@ -1140,3 +1140,6 @@ bestia (un oso hormiguero) «puede parrear con sus garras y obligar a desarmar a
   ✋, o queda como sugerencia editable? (b) **si otro levanta el arma de un creep** (hoy se puede): el creep que la perdió sigue teniéndola en
   sus datos (cuando le sacan el Desarmado vuelve a pegar con ella como si nada) — ¿pasa a pegar «sin arma» hasta conseguir otra? Y el creep
   que la levanta la guarda en su equipo, pero sigue atacando con su arma de siempre — ¿se puede cambiar de arma? *(código, cuando se decida)*
+  **Dirección del dueño (2026-10-22):** «todo lo que tenga manos debería poder usar lo mismo»: un creep humanoide (y una invocación) usa las
+  mismas armas, escudos y talismanes que un jugador, con una especie de inventario: si levanta un arma, guarda la suya y después las cambia.
+  Implica que el arma del creep deje de ser un dato fijo y pase a ser un ítem (como la del jugador): ver el plan, cuando se arme.

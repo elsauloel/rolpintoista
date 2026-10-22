@@ -53,6 +53,8 @@
 - [x] **🔥 Arma elemental** — probado el 2026-10-21, «Test con claude elsaulo», el GM con el control de Silvia: el creep se puso Arma eléctrica (3 turnos, 2 No2, su ataque del turno); su golpe sumó «1d4 eléctrico» aparte (2) que saltó a Xeena (1) y la chance de Parálisis; Arma helada reemplazó a la eléctrica y su golpe dejó Escarcha ×1. Ojo: con el PdG elegido a mano no suma (ver pendientes). (2026-10-21, Support): (2026-10-21, Support): un creep se la pone a otro creep (y a sí mismo); el estado dura 3 turnos del aliado; cada golpe que pega
   suma +1d4 del elemento aparte (directo, menos su resistencia), sin gastarse; fuego ×1,5; hielo Escarcha y ácido Armadura rota (1 y +1 cada 5); tóxico
   Veneno; rayo salta y 20 % de Parálisis; poner otra la reemplaza; cuenta como su ataque del turno. Las cinco, al menos el rayo y una de «por daño».
+- [ ] **🩸 Sal en la herida / Morder la herida** (2026-10-21, choque liviano): contra alguien que sangra → «+2 dados» en la Mesa y la Crónica, el duelo con los
+  dados de más y, si pega, el sangrado sube 1; contra alguien que no sangra → ataque común sin preguntar y, si pega, empieza a sangrar.
 - [ ] **🪓 El que avisa no traiciona / Zarpazo erguido** (2026-10-21, choque pesado): el creep la usa → el clic en el objetivo, la línea en la Mesa y la
   Crónica con a quién apunta, el estado en el token (cobra 1 No2 y 1 SP); recibir 6 → «lleva 6 de 10», recibir 4 más → «se le cae el golpe»; el objetivo pegado se aleja →
   la oportunidad ofrece «🪓 …» sin No2 (cobra 3 SP y se gasta); en su turno, Atacar → «Descargar el golpe» (+3 dados, no deja hacer Parry, empuja 2) o «Un ataque común» (se pierde); si no ataca, se pierde.

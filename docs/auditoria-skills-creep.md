@@ -138,6 +138,11 @@
 
 ### Choque liviano (desde el 2026-10-21)
 
+- ✅ **Sal en la herida** (humanoides) / **Morder la herida** (bestias) (2026-10-21, «abrir la herida»; dueño: «si no está sangrando, provoca sangrado; y si
+  está sangrando, hace más daño y amplifica el sangrado»): un ataque con su arma; si el objetivo ya sangra, **+2 dados** del Tipo; si pega, **Sangrado** (si
+  ya sangraba, +1 al daño por turno). Lo de un ataque y 2 SP, o cooldown 3. Solo el Sangrado (el Veneno no cuenta).
+  **Para probar.**
+
 - ✅ **Hit and run** (2026-10-21, dueño: «picar y alejarse»; nombre en inglés; una sola para bestias y humanoides): un ataque con su arma; pegue o no,
   después se aleja hasta 2 casilleros, gratis (sin No2) y sin dar ataque de oportunidad (el cartel del movimiento libre del dodge roll). Costo de un ataque, más 2 SP o cooldown 3.
   `vtt-hexgrid/js/57-alejarse.js`. **Para probar.**

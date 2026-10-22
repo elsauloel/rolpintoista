@@ -851,6 +851,12 @@ function dueloElegirObjetivoMapa(msg){
         if(!r){ pedir(); return; }
         ataqueCarga = r;
       }
+      if(ataque && ataque.abrirHerida && typeof heridaBonos === 'function'){   // 🩸 Sal en la herida (js/64): +2 dados si ya sangra
+        let r = null;
+        try{ r = await heridaBonos(mio, t, ataqueCarga || ataque, yo); }catch(err){ console.error('No se pudo ver la herida:', err); r = ataqueCarga || ataque; }
+        if(!r){ pedir(); return; }
+        ataqueCarga = r;
+      }
       if(conArco && mio && Combatiente.arcoMuyCerca(ataque, distanciaHex({col: mio.col, fila: mio.fila}, {col: t.col, fila: t.fila}))){   // avisa y deja seguir: lo decide la mesa
         const si = await AvisoCombate.preguntar(`${nombreDe(t)} está muy cerca para el arco: hace falta al menos ${Combatiente.arcoLibresTxt(ataque)} entre los dos. Con el arco no se pega cuerpo a cuerpo: alejate o cambiá de arma. ¿Disparar igual? (lo decide la mesa)`,
           {icono: '🏹', titulo: 'Muy cerca para el arco', si: 'Disparar igual', no: 'Elegir otro'});

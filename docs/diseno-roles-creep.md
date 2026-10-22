@@ -104,7 +104,7 @@ rodilla, Tarascón al tobillo), las redes; y en el mapa, el sigilo, el +1 por la
 7. **Veneno**: golpes que envenenan, con variantes como el sangrado.
 8. **Veneno que paraliza**: chance de Parálisis.
 9. **Veneno que debilita**: el envenenado pega menos.
-10. **Abrir la herida** ✦: más daño a quien ya sangra o está envenenado.
+10. ✅ **Abrir la herida** ✦ (2026-10-21): **Sal en la herida** / **Morder la herida** — si no sangra, lo hace sangrar; si ya sangra, +2 dados y le sube el sangrado.
 
 **C. Moverse y pegar**
 11. ✅ **Golpear y alejarse**: Hit and run.

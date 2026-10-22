@@ -13,7 +13,7 @@
 >   «Podés usar» con un duelo abierto; las animaciones (la muestra: https://claude.ai/artifact/HCW4XnbTypFmvGuXPHoBRZ); que aparezcan solo si alcanza el
 >   SP (el doble en turno ajeno) y que al tocarlos se ejecute la habilidad. Ojo: cada personaje con una de estas habilidades tiene que guardar su ficha una
 >   vez para que aparezca su botón.
-> - [ ] **🪟 Los botones minimizados de los duelos tapan el cartel del dodge roll en una ventana baja** (2026-10-21, probando la Bola de fuego en el
+> - [x] (2026-10-22, dueño: «probemos subiendo el cartel»; hecho y visto por Claude en el mapa: el cartel de abajo se sube lo que ocupan los botones de los duelos minimizados — `--duelo-avisos-alto`, comun/duelo.js y comun/aviso-combate.js — y vuelve a bajar cuando no hay; falta que lo vea el dueño en un dodge roll de verdad) **🪟 Los botones minimizados de los duelos tapan el cartel del dodge roll en una ventana baja** (2026-10-21, probando la Bola de fuego en el
 >   Chrome de pruebas, de 567 px de alto; dueño: «en el teléfono no termino de entender el problema»): «Pegó: …» y «Dodge roll: …» (los duelos
 >   minimizados, abajo al centro) quedan encima de «Ver el duelo» / «No me quiero mover» del cartel. Mirarlo juntos en la compu con una ventana baja y
 >   decidir: subir el cartel, correr los botones o esconderlos mientras hay un cartel abajo. La captura está en el reporte del 21/10

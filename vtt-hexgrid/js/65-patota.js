@@ -8,7 +8,9 @@ const PATOTA_TOPE = 3;
 function patotaAliados(mio, t){
   const out = [];
   for(const [id, x] of tokens){
-    if(!x || x === mio || x === t || !x.fichaId || x.bajoTierra || x.tipo !== mio.tipo) continue;
+    // (quien ataca y el objetivo llegan como copias con su `id`: se comparan por id, o por casilla)
+    const mismo = o => o && (o.id ? o.id === id : (o.col === x.col && o.fila === x.fila));
+    if(!x || mismo(mio) || mismo(t) || !x.fichaId || x.bajoTierra || x.tipo !== mio.tipo) continue;
     if(distanciaHex({col: x.col, fila: x.fila}, {col: t.col, fila: t.fila}) !== 1) continue;
     if(typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(id)) continue;
     out.push(x);

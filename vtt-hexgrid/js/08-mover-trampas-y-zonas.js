@@ -606,7 +606,10 @@ async function zonaResolverBanner(){
   }
   // Si el daño entró: la tirada extra (ej. 1d20) con el texto de qué significa cada resultado, en la Mesa y en el cartelito. Aplicar lo que
   // salga queda a mano.
-  if(danoHecho > 0 && (el.zonaTiraExtra || el.zonaNota)){
+  // 🎲 La de un personaje la tira quien la creó, en su pantalla (2026-10-22, dueño: js/66); las demás, como siempre.
+  const extraDe = danoHecho > 0 && el.zonaTiraExtra && typeof zonaExtraPedir === 'function' ? await zonaExtraPedir(el, quienTxt) : '';
+  if(extraDe) partes.push(`🎲 ${el.zonaTiraExtra}: lo tira ${extraDe}`);
+  else if(danoHecho > 0 && (el.zonaTiraExtra || el.zonaNota)){
     const r = el.zonaTiraExtra ? tirarDados(el.zonaTiraExtra) : null;
     if(r){
       try{ if(el.zonaNota) mesaConTexto(el.zonaNota); mesaPublicar(`${quienTxt} · ${el.zonaNombre || 'Zona'}`, {formula: r.formula || el.zonaTiraExtra, rolls: r.rolls, mod: r.mod, total: r.total}); }catch(err){}

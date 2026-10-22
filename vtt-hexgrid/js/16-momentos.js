@@ -83,7 +83,8 @@ function momentoRecibido(id, d){
   if(d.tipo === 'inicio-turno' && inicioTurnoMomento(id, d)) return;
   if(d.tipo === 'diablito' && typeof diablitoMomento === 'function' && diablitoMomento(id, d)) return;   // 😈 la Botella con un diablito (js/53)   // ▶ Empieza tu turno: al centro de su dueño (js/04)   // 🫳 el robo en sigilo (js/47): solo la víctima y el GM
   if(d.tipo === 'rayo' && d.datos && Array.isArray(d.datos.saltos)) rayoMomento(id, d);
-  if(d.tipo === 'desarme' && d.datos && typeof desarmeRuleta === 'function') desarmeRuleta(id, d.datos);   // 🤺 la ruleta de casillas (js/62)
+  if(d.tipo === 'desarme' && d.datos && typeof desarmeRuleta === 'function') desarmeRuleta(id, d.datos);
+  if(d.tipo === 'zona-extra' && typeof zonaExtraMomento === 'function') zonaExtraMomento(id, d);   // 🎲 la tirada extra de una zona, para quien la creó (js/66)   // 🤺 la ruleta de casillas (js/62)
   if(d.tipo === 'confusion') confusionMomento(d);   // la tirada de Confusión del turno (js/20)
   oporMomento(id, d);   // el ataque de oportunidad: la pregunta a quien decide y la respuesta a quien se aleja (js/17)
   // Una trampa, paso a paso (js/19): la víctima la resuelve al centro; el resto, en la Crónica.
@@ -171,6 +172,7 @@ function renderMomentosFeed(){
     feed.style.cssText = 'position:absolute;right:12px;top:118px;width:min(300px,60vw);z-index:31;display:flex;flex-direction:column;gap:6px;pointer-events:none';
     feed.addEventListener('click', ev => {
       const b = ev.target.closest('[data-trampa-seguir]'); if(b) trampaSeguir(b.dataset.trampaSeguir);
+      const bz = ev.target.closest('[data-zona-extra]'); if(bz){ const v = momentosFeed.get(bz.dataset.zonaExtra); if(v && typeof zonaExtraTirar === 'function'){ bz.disabled = true; zonaExtraTirar(bz.dataset.zonaExtra, v.d, true); } }   // 🎲 (js/66)
       const bi = ev.target.closest('[data-inicio-aplicar]'); if(bi){ const v = momentosFeed.get(bi.dataset.inicioAplicar); if(v){ bi.disabled = true; inicioTurnoAplicar(bi.dataset.inicioAplicar, v.d, true); } }
     });
     caja.appendChild(feed);
@@ -185,6 +187,7 @@ function renderMomentosFeed(){
       ${lineas ? lineas.map((l, i) => `<div style="margin-top:3px;color:${i === lineas.length - 1 ? '#e9ecf4' : '#9aa3b8'}">${esc(l)}</div>`).join('')
         : d.resultado ? `<div style="margin-top:3px;color:#cfd6e6">${esc(d.resultado)}</div>` : (d.estado === 'listo' ? '' : '<div style="margin-top:3px;color:#8d97ad">…</div>')}
       ${d.tipo === 'trampa' && d.datos && d.datos.fase ? trampaBotonFeed(k, d) : ''}
+      ${d.tipo === 'zona-extra' && d.estado === 'esperando' && soyGM && !(d.datos && fbUsuario && d.datos.paraUid === fbUsuario.uid) ? `<div style="margin-top:6px"><button type="button" data-zona-extra="${esc(k)}" style="font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid #6fae7d;background:#1f3a27;color:#e9ecf4;cursor:pointer">🎲 Tirar por él</button></div>` : ''}
       ${d.tipo === 'inicio-turno' && d.estado === 'esperando' && soyGM ? `<div style="margin-top:6px"><button type="button" data-inicio-aplicar="${esc(k)}" style="font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid #6fae7d;background:#1d2a20;color:#bfe8c7;cursor:pointer">▶ Aplicar por él</button></div>` : ''}
     </div>`;
   }).join('');

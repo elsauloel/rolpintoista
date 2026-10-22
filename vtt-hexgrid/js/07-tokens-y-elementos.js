@@ -444,7 +444,10 @@ function colocadorDe(el){
 function colocadorEnOrden(c){
   return !!(c && iniciativa.orden.some(o => { const t = tokens.get(o.id); return t && String(t.fichaId) === c.ref && (t.tipo === 'creep' ? 'creep' : 'pj') === c.tipo; }));
 }
-async function zonasDelQueLaTiro(tokenId){
+// `mantNuevo` (2026-10-22, la sesión del Pedo tóxico): si justo antes se pasó de ronda, la zona que se va todavía tiene que hacer efecto en esa
+// ronda a los que siguen adentro: en vez de borrarla, vence en ese Mantenimiento y la borra elementosVencidosBarrer cuando la resolvieron
+// (zonaEsperaSuFin). Antes, con quien la tiró primero en la ronda, la zona se iba antes de su segundo efecto.
+async function zonasDelQueLaTiro(tokenId, mantNuevo){
   const t = tokens.get(tokenId);
   if(!soyGM || !t || !t.fichaId) return [];
   const tipo = t.tipo === 'creep' ? 'creep' : 'pj', lineas = [];
@@ -453,7 +456,11 @@ async function zonasDelQueLaTiro(tokenId){
     if(!c || c.ref !== String(t.fichaId) || c.tipo !== tipo || elementosVencidosBorrando.has(id)) continue;
     const quedan = Math.round(num(el.turnos)) - 1;
     try{
-      if(quedan <= 0){
+      if(quedan <= 0 && el.zona && !el.portal && el.zonaEnMantenimiento !== false && Number.isFinite(mantNuevo)){
+        await coleccionElementos().doc(id).update({turnos: 0, venceMant: mantNuevo});
+        const txt = `Se va ${el.zonaNombre || 'la zona'} (terminaron sus turnos), después de su efecto de esta ronda.`;
+        if(!lineas.includes(txt)) lineas.push(txt);
+      }else if(quedan <= 0){
         elementosVencidosBorrando.add(id);
         if(typeof superficieAlIrse === 'function') await superficieAlIrse(el);   // 🧊 → 💧 el hielo deja un charco (js/50)
         await borrarElemento(id);

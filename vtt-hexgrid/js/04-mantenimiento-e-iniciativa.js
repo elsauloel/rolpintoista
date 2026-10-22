@@ -182,13 +182,14 @@ document.addEventListener('keydown', e => { if(e.key === 'Escape' && !$('#person
 async function pasarMantenimiento(titulo){
   const ref = fbDb.doc(fbRutaCampana('mapa/mantenimiento'));
   // El turno que se anuncia es el de gm-tools (gm/estado) más uno.
-  const turno = await fbDb.runTransaction(async tx => {
+  const res = await fbDb.runTransaction(async tx => {
     const [doc, estado] = await Promise.all([tx.get(ref), tx.get(fbDb.doc(fbRutaCampana('gm/estado')))]);
     const numero = (doc.exists ? Math.round(num(doc.data().numero)) : 0) + 1;
     tx.set(ref, {numero, cuando: firebase.firestore.FieldValue.serverTimestamp()});
-    return (estado.exists ? Math.round(num(estado.data().turno)) : 0) + 1;
+    return {turno: (estado.exists ? Math.round(num(estado.data().turno)) : 0) + 1, numero};
   });
-  publicarPaseDeTurno(turno, titulo);
+  publicarPaseDeTurno(res.turno, titulo);
+  return res.numero;   // el número del Mantenimiento nuevo (lo usa zonasDelQueLaTiro, js/07)
 }
 // «⟳ Pasar de ronda» (2026-10-12, dueño; antes «⟳ Mantenimiento»): en combate con la lista de turnos armada no aparece (la ronda la pasa sola
 // ▶ Siguiente al dar la vuelta, y apretarlo además le contaba un turno de más a los que no están en la lista). Afuera, es como corre el tiempo.
@@ -448,8 +449,8 @@ async function iniciativaSiguiente(o){
     const ini2 = await inicioDeTurno(id, `${mapaFin}:${pasoFin}:${id}`), fin2 = await finDeTurno(id, `${mapaFin}:${pasoFin}:${id}`);
     lineas.push(...ini2, ...fin2);
   }
-  if(nuevaRonda) await pasarMantenimiento(`Ronda ${ronda}`);   // lo que es de la ronda (P161)
-  const lineasZonas = sig.id ? await zonasDelQueLaTiro(sig.id) : [];   // P172: sus zonas, un turno menos (js/07)
+  const mantNuevo = nuevaRonda ? await pasarMantenimiento(`Ronda ${ronda}`) : null;   // lo que es de la ronda (P161)
+  const lineasZonas = sig.id ? await zonasDelQueLaTiro(sig.id, mantNuevo) : [];   // P172: sus zonas, un turno menos (js/07)
   // ▶ Un personaje o una invocación (2026-10-17, dueño): lo de empezar su turno espera su «✔ Aplicar» (inicioTurnoPendiente); un creep, como siempre.
   const pendiente = sig.id ? await inicioTurnoPendiente(sig.id, `${mapaFin}:${pasoFin + 1}`) : false;
   const lineasInicio = sig.id && !pendiente ? await inicioDeTurno(sig.id, `${mapaFin}:${pasoFin + 1}`) : [];

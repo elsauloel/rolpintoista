@@ -271,6 +271,9 @@
 > - [ ] **🖥 Configurar Chrome para las pruebas** (recordárselo al dueño cuando esté en casa, 2026-10-10): en las dos ventanas de pruebas (GM y
 >   jugador), `chrome://flags` → «Calculate window occlusion on Windows» → **Disabled** y reiniciar Chrome. Así Chrome no deja de dibujar una
 >   ventana tapada por otra y se puede probar con las dos ventanas encimadas, sin maximizar y sin partir la pantalla. Lo cambia el dueño.
+>   (2026-10-22: buscar «occlusion», no «occluded»: «Auto picture in picture on window occluded» es otra cosa, la de los videos. Si la de
+>   «Calculate window occlusion» ya no está en esa versión de Chrome, se hace desde el acceso directo de Chrome: Propiedades → Destino, al final,
+>   ` --disable-features=CalculateNativeWinOcclusion --disable-backgrounding-occluded-windows`; cerrar todo Chrome y abrirlo desde ese acceso.)
 > - [ ] **🔍 Revisión de cerca de ballestas y arcos, sobre todo ballestas** (dueño, 2026-10-10): hacerla juntos, **con el dueño en la compu y con
 >   tiempo** (no es para hacer solo ni desde el celular). Una por una, calidad por calidad: números, nombres, rasgos, el Rango como bono (falta Buena para arriba) y los virotes.
 > - [ ] **🎯 La línea de tiro para todo lo que es a distancia** (dueño, 2026-10-10): el sistema de trayectoria de arcos y ballestas (línea que

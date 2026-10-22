@@ -111,7 +111,7 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261022j', '../comun/ficha-botin.js?v=20261022g', '../comun/generador-tiendas.js?v=20261018zm', '../comun/filtro-catalogo.js?v=20261009r', '../comun/ficha-tienda.js?v=20261010g', '../comun/ficha-mantenimiento.js?v=20261020n', '../comun/ficha-calculo.js?v=20261021z', '../comun/ficha-combate.js?v=20261015d', '../comun/skills-clase.js?v=20261021zo', '../comun/ficha-habilidades.js?v=20261020q',
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261022j', '../comun/ficha-botin.js?v=20261022g', '../comun/generador-tiendas.js?v=20261018zm', '../comun/filtro-catalogo.js?v=20261009r', '../comun/ficha-tienda.js?v=20261022k', '../comun/ficha-mantenimiento.js?v=20261020n', '../comun/ficha-calculo.js?v=20261021z', '../comun/ficha-combate.js?v=20261015d', '../comun/skills-clase.js?v=20261021zo', '../comun/ficha-habilidades.js?v=20261020q',
   '../comun/catalogo.js?v=20261020zr', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261016c', '../comun/ficha-sesion.js?v=20261020zu', '../comun/ficha-botonera.js?v=20261020zb', '../comun/ficha-resumen.js?v=20261021zo', '../comun/inv-calculo.js?v=20261020b', '../comun/inv-botonera.js?v=20261020zb', '../comun/inv-acciones.js?v=20261019l', '../comun/inv-duelo.js?v=20261021zn', '../comun/ficha-acciones.js?v=20261021zj', '../comun/inv-habilidades.js?v=20261014f', '../comun/inv-lupa.js?v=20261015a',
   '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261021zj', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261014e'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
@@ -1865,7 +1865,7 @@ async function abrirTiendaMapa(fichaId){
   let tienda = null;
   try{ await FichaTienda.leerStock(); tienda = FichaTienda.desdeDoc(await fbDb.doc(fbRutaCampana('tienda/publicada')).get()); }   // con lo que queda en stock (2026-10-07)
   catch(err){ console.error('No se pudo mirar la tienda:', err); toast('No se pudo abrir la tienda'); return; }
-  if(!tienda || !tienda.abierta){ toast('Tienda cerrada'); return; }
+  if(!tienda){ toast('El GM todavía no publicó ninguna tienda'); return; }   // cerrada se abre igual, solo para mirar (dueño, 2026-10-22)
   const yaVisible = bn && bn.host && !bn.host.hidden && bn.fichaId === fichaId && !bn.invId;
   if(!yaVisible) await abrirBotoneraNueva(fichaId, '');
   if(!bn) return;
@@ -1875,7 +1875,7 @@ async function abrirTiendaMapa(fichaId){
   bn.raiz.querySelector('#bn-tienda').classList.add('open');
   const fc0 = bnFiltroTienda(); if(fc0) fc0.limpiar();
   bnTiendaDibujar();
-  toast(`${tienda.nombre || 'Tienda'} · ${fmt(tienda.items.length)} ítems`);
+  toast(tienda.abierta ? `${tienda.nombre || 'Tienda'} · ${fmt(tienda.items.length)} ítems` : FichaTienda.CERRADA_MSG);
   bnTiendaEscuchar();
 }
 let bnTiendaStockEscucha = null;
@@ -1893,13 +1893,18 @@ function bnTiendaEscuchar(){
     if(primera){ primera = false; return; }   // es la misma que se acaba de abrir
     if(!bnTiendaSt.tienda){ bnTiendaDejar(); return; }
     const nueva = FichaTienda.desdeDoc(snap);
-    if(!nueva || !nueva.abierta){ bnTiendaCerrar(); toast('El GM cerró la tienda'); return; }
+    if(!nueva){ bnTiendaCerrar(); toast('El GM sacó la tienda'); return; }
+    // Cerrada no se va (dueño, 2026-10-22): queda para mirar, sin carrito; cuando el GM la abre, se avisa.
+    const estaba = !!bnTiendaSt.tienda.abierta;
     bnTiendaSt.tienda = nueva;
     const antes = bnTiendaSt.carrito.length;
-    bnTiendaSt.carrito = bnTiendaSt.carrito.filter(e => nueva.items.includes(e.catId));   // lo que ya no se vende sale del carrito
+    bnTiendaSt.carrito = nueva.abierta ? bnTiendaSt.carrito.filter(e => nueva.items.includes(e.catId)) : [];   // lo que ya no se vende sale del carrito
+    ['#bn-vender', '#bn-reparar', '#bn-aleatorio'].forEach(s => { if(!nueva.abierta) bn.raiz.querySelector(s).classList.remove('open'); });
     bnTiendaDibujar();
     const quitados = antes - bnTiendaSt.carrito.length;
-    toast('El GM cambió la tienda' + (quitados ? ` · ${fmt(quitados)} ítem(s) salieron del carrito` : ''));
+    if(estaba && !nueva.abierta) toast('🔒 El GM cerró la tienda: podés seguir mirando, pero no comprar ni vender' + (quitados ? ` · el carrito se vació` : ''));
+    else if(!estaba && nueva.abierta) toast('🏪 El GM abrió la tienda: ya se puede comprar y vender');
+    else toast('El GM cambió la tienda' + (quitados ? ` · ${fmt(quitados)} ítem(s) salieron del carrito` : ''));
   }, err => console.error('No se pudo escuchar la tienda:', err));
 }
 function bnTiendaDejar(){
@@ -1910,8 +1915,13 @@ function bnTiendaDibujar(){
   if(!bn || !bn.S || !bn.raiz.querySelector('#bn-tienda').classList.contains('open')) return;
   const r = bn.raiz, st = bnTiendaSt, t = st.tienda;
   r.querySelector('#bn-tienda-titulo').textContent = `🏪 ${(t && t.nombre) || 'Tienda'}`;   // (2026-10-08: el título, más claro)
-  r.querySelector('#bn-tienda-badge').textContent = FichaTienda.badge(st);
-  r.querySelector('#bn-tienda-reparar').style.display = t && t.herrero ? '' : 'none';   // solo las tiendas con herrero reparan
+  const cerrada = FichaTienda.cerrada(st);   // 🔒 cerrada: se mira, sin Vender, Reparación, carrito ni Comprar (dueño, 2026-10-22)
+  const badge = r.querySelector('#bn-tienda-badge');
+  badge.textContent = FichaTienda.badge(st);
+  badge.style.cssText = cerrada ? 'color:#F0B860;border-color:#F0B860;font-weight:700' : '';
+  r.querySelector('[data-bn-ti="vender"]').style.display = cerrada ? 'none' : '';
+  r.querySelector('[data-bn-ti="aleatorio"]').style.display = cerrada ? 'none' : '';
+  r.querySelector('#bn-tienda-reparar').style.display = t && t.herrero && !cerrada ? '' : 'none';   // solo las tiendas con herrero reparan
   r.querySelector('#bn-tienda-secciones').innerHTML = FichaTienda.seccionesHtml(bn.S, st);   // las pestañas (antes que el filtro: deciden qué hay)
   const fc = bnFiltroTienda();
   if(fc) fc.actualizar();   // lo que vende pudo cambiar (el GM cambió la tienda, se compró una pieza única)
@@ -1919,7 +1929,7 @@ function bnTiendaDibujar(){
   r.querySelector('#bn-tienda-dde').textContent = fmt(num(bn.S.meta.dde));
   if(typeof Intercambio !== 'undefined') Intercambio.pintarBotonBaul(r.querySelector('[data-bn-ti="baul"]'));   // en combate, apagado y lo dice
   const c = FichaTienda.carrito(bn.S, st);
-  r.querySelector('#bn-carrito-lista').innerHTML = c.html;
+  r.querySelector('#bn-carrito-lista').innerHTML = cerrada ? `<div class="carrito-vacio">${FichaTienda.CERRADA_MSG}</div>` : c.html;
   r.querySelector('#bn-carrito-total').textContent = fmt(c.total);
   const comprar = r.querySelector('#bn-carrito-comprar');
   comprar.disabled = !st.carrito.length || !c.puede;

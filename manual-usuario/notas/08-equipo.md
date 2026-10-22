@@ -281,8 +281,8 @@ estado: borrador
 Los ítems se compran y se venden en **tiendas** que arma y maneja el GM con el [[Generador de tiendas]]:
 
 1. El GM arma la tienda (aleatoria o curada a mano) y la **publica**.
-2. **El GM decide cuándo está abierta.** Con un interruptor la abre o la cierra. Mientras está **cerrada**, tu botón **🏪 Vendedor** aparece desactivado y, al pasar el cursor, dice **"Tienda cerrada"**.
-3. Con la tienda abierta, entrás con **🏪 Vendedor** y ves su stock en vivo. Comprás y el ítem va a tu mochila, con el DDE descontado.
+2. **El GM decide cuándo está abierta.** Con un interruptor la abre o la cierra. Mientras está **cerrada**, la última tienda publicada igual se puede **mirar** (el catálogo con sus precios, Ver y Comparar), pero **no se compra, ni se vende, ni se repara** hasta que el GM la abra: adentro lo dice un cartel 🔒. Si el GM nunca publicó una tienda, el botón **🏪 Vendedor** aparece desactivado.
+3. Con la tienda abierta, entrás con **🏪 Vendedor** y ves su stock en vivo. Comprás y el ítem va a tu mochila, con el DDE descontado. Si el GM la cierra mientras estás adentro, te quedás mirando y el carrito se vacía; cuando la abre, te avisa.
 4. **Vender solo se puede en una tienda.** Dentro del Vendedor, el botón **💰 Vender** abre tu mochila: elegís qué ítems vender (y cuántas unidades) y ves cuánto vas a cobrar. También ahí vendés tus [[Despojos]].
 5. **Cualquier tienda, de cualquier tamaño y tipo, compra de todo:** los ítems de los jugadores y los despojos.
 

@@ -176,6 +176,12 @@ async function acConsumir(sc, itemId){
   }
   (res.tiradas || []).forEach(t => acPublicar(sc, t));
   if(it.duelo){ const sc2 = acCreep() || sc; CreepAcciones.terminarHab(sc2, Combatiente.habDeConsumible(it), {costo: 0, auto: true, nitros: sc2.nitros}, acHabUi()); }   // 📜 su Ejecución (2026-10-20)
+  // 🌫 Un consumible que deja una zona (la Bomba de humo, la Bombucha de talco), un ⏩ Acelerador (la Runa) o una invocación (el Ojo de Kicillof)
+  // (dueño, 2026-10-22: la Bomba de humo de un creep se gastaba sin pedir la casilla y no hacía nada): el mismo camino que un personaje
+  // (js/11, bnConsumirUi): el GM elige la casilla en el mapa. La invocación de un creep no existe todavía: se avisa y se pone a mano.
+  if(it.zonaUso){ const sc2 = acCreep() || sc; acHabUi().colocarZona(sc2, {id: 'zona:' + it.id, nombre: it.nombre, detalle: it.detalle || '', modo: 'auto', duelo: it.zonaUso}); }
+  if(it.aceleradorMapa){ ac.host.hidden = true; aceleradorDeHabilidad({fichaId: sc.id, casteadorTipo: 'creep', turnos: num(it.aceleradorMapa.turnos) || 10, no2: num(it.aceleradorMapa.no2) || 2, nombre: it.nombre}); }
+  if(it.invocaTemporal) toast(`✋ ${it.nombre}: la invocación de un creep se pone a mano (creá su token en el mapa)`);
   const tok = [...tokens.values()].find(x => x.tipo === 'creep' && x.fichaId === ac.creepId);
   // js/21: Mesa y Crónica. Un creep que los jugadores no ven: solo la Mesa, con su nombre (js/29 decide: «acción incierta» o nada). Una trampa
   // ya la anunció TokensAuto.
@@ -826,7 +832,7 @@ function escucharBotinParaJugador(){
 }
 // 🏪 Tienda (2026-09-24, pedido del dueño): abre la tienda que publicó el GM, sin salir del mapa, en la ventana de la ficha del
 // personaje principal (mismo iframe que la Botonera y el botín). Solo con la tienda abierta.
-$('#toolkit-tienda').onclick = async () => {
+$('#toolkit-tienda').onclick = async () => {   // (2026-10-22: con la tienda cerrada también se abre, solo para mirar)
   if(soyGM){ window.open('../gm-toolset/vendor-generator.html?partida=' + encodeURIComponent(FB_CAMPANA), '_blank', 'noopener'); return; }   // el GM arma y abre la tienda en el generador
   const fichaId = fichaPrincipalId();
   if(!fichaId){ toast('Para usar la tienda necesitás un personaje'); return; }

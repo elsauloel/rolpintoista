@@ -167,9 +167,9 @@ const FichaTienda = (() => {
     </div>
     <div class="cat-actions">
       ${quedan !== null ? `<span class="hint" title="Gastable de la góndola: se repone cuando el GM vuelve a publicar la tienda">🧺 ${quedan ? `quedan ${fmt(quedan)}` : 'agotado'}</span>` : ''}
-      <input type="number" class="cat-qty" data-catqty="${item.id}" value="1" min="1"${quedan !== null ? ` max="${Math.max(1, quedan)}"` : ''}${quedan === 0 ? ' disabled' : ''}>
+      ${cerrada(st) ? `<span class="hint" title="${CERRADA_MSG}">🔒 cerrada</span>` : `<input type="number" class="cat-qty" data-catqty="${item.id}" value="1" min="1"${quedan !== null ? ` max="${Math.max(1, quedan)}"` : ''}${quedan === 0 ? ' disabled' : ''}>
       ${st.tienda && st.tienda.agregarGratis ? `<button class="cat-btn add" data-catalogoadd="${item.id}" title="El GM permitió agregar ítems gratis en esta tienda">Agregar a mochila (gratis)</button>` : ''}
-      <button class="cat-btn buy" data-catalogocarrito="${item.id}"${quedan === 0 ? ' disabled' : ''}>+ Carrito</button>
+      <button class="cat-btn buy" data-catalogocarrito="${item.id}"${quedan === 0 ? ' disabled' : ''}>+ Carrito</button>`}
     </div>
     <div class="cat-manage">
       <button data-view="catalogo:${item.id}">Ver</button>
@@ -202,9 +202,16 @@ const FichaTienda = (() => {
     return `<div class="hint">${vacioMsg}</div>`;
   }
   // El cartelito de la tienda (tamaño, ajuste de precio y de venta), o '' sin tienda.
+  /* ---------- Tienda cerrada (dueño, 2026-10-22) ----------
+     La última tienda publicada se puede MIRAR aunque el GM la tenga cerrada (antes el 🏪 directamente no abría): el catálogo con sus precios,
+     Ver y Comparar, pero sin carrito ni compras, sin vender ni reparar, hasta que el GM la abra. `abierta` lo pone desdeDoc (solo `false`
+     cuenta como cerrada: una tienda armada a mano sin esa marca sigue abierta). */
+  const CERRADA_MSG = '🔒 La tienda está cerrada: podés mirar, pero no comprar ni vender hasta que el GM la abra';
+  function cerrada(st){ return !!(st && st.tienda && st.tienda.abierta === false); }
   function badge(st){
     const t = st.tienda;
     if(!t) return '';
+    if(cerrada(st)) return '🔒 Cerrada: podés mirar, no comprar ni vender';
     const pct = Number(t.ajustePrecio) || 0;
     const extra = pct ? ` · ${pct < 0 ? '-' : '+'}${Math.abs(pct)}%` : '';
     const pv = Number(t.ajusteVenta) || 0;
@@ -231,6 +238,7 @@ const FichaTienda = (() => {
     return {html, total, puede: total <= dde, falta: Math.max(0, total - dde)};
   }
   function agregarAlCarrito(S, st, id, cantidad, ui){
+    if(cerrada(st)){ ui.toast(CERRADA_MSG); return; }
     const item = itemCatalogo(S, st, id);
     if(!item) return;
     cantidad = Math.max(1, num(cantidad) || 1);
@@ -298,6 +306,7 @@ const FichaTienda = (() => {
   }
   // Agregar gratis solo si el GM lo permitió en la tienda abierta (por defecto se compra con el carrito).
   function agregarGratis(S, st, id, cantidad, ui){
+    if(cerrada(st)){ ui.toast(CERRADA_MSG); return; }
     if(!(st.tienda && st.tienda.agregarGratis)){ ui.toast('Esta tienda no permite agregar ítems gratis: usá el carrito'); return; }
     const item = itemCatalogo(S, st, id);
     if(!item) return;
@@ -307,6 +316,7 @@ const FichaTienda = (() => {
     ui.toast(`${item.nombre} ×${cantidad} agregado a la mochila (gratis)`);
   }
   async function comprar(S, st, ui){
+    if(cerrada(st)){ ui.toast(CERRADA_MSG); return; }
     if(!st.carrito.length) return;
     let total = 0;
     st.carrito.forEach(ent => { const item = itemCatalogo(S, st, ent.catId); if(item) total += precioDeCompra(st, item) * ent.cantidad; });
@@ -457,7 +467,8 @@ const FichaTienda = (() => {
     }
   }
   function vender(S, st, ui){
-    if(!st.tienda){ ui.toast('La tienda está cerrada'); return false; }
+    if(!st.tienda){ ui.toast('Abrí primero la tienda'); return false; }
+    if(cerrada(st)){ ui.toast(CERRADA_MSG); return false; }
     const total = totalVenta(S, st);
     if(!total){ ui.toast('Elegí qué vender'); return false; }
     const nombres = [];
@@ -503,6 +514,7 @@ const FichaTienda = (() => {
     return {html, totalPts, total: `Reparar todo cuesta: <b>${fmt(totalCosto)} DDE</b> (${fmt(totalPts)} punto${totalPts === 1 ? '' : 's'})`};
   }
   function reparar(S, st, pares, bloqueado, ui){   // pares: [{it, pts}]
+    if(cerrada(st)){ ui.toast(CERRADA_MSG); return; }
     if(bloqueado){ ui.toast('No se puede reparar durante el combate'); return; }
     const p = precioReparacion(st);
     const cuantos = x => Math.min(x.pts, Math.max(0, C().durMax(x.it) - C().durActual(x.it)));
@@ -540,7 +552,7 @@ const FichaTienda = (() => {
     return conStock(t);   // lo que queda en stock (piezas únicas, 2026-10-07)
   }
 
-  return {GRUPO_COMPRA_MAP, GRUPO_COMPRA_LABEL, GRUPO_COMPRA_ORDEN, grupoCompraDe, TIERS_ORDEN, TIERS_OCULTOS, STACK_MAX, stackMaxDe, nueva,
+  return {cerrada, CERRADA_MSG, GRUPO_COMPRA_MAP, GRUPO_COMPRA_LABEL, GRUPO_COMPRA_ORDEN, grupoCompraDe, TIERS_ORDEN, TIERS_OCULTOS, STACK_MAX, stackMaxDe, nueva,
     precioDeCompra, precioVenta, precioHtml, normalizarBusqueda, textoBusqueda, itemCatalogo, danoDe, libre, ctxFiltro, base, conStockYLegacyPrimero,
     visibles, rowHtml, catalogoHtml, badge, carrito, secciones, seccionActual, seccionesHtml, elegirSeccion, agregarAlCarrito, quitarDelCarrito, agregarConsumible,
     crearItems, agregarGratis, comprar, aleatorio, ajusteVenta, precioVentaTienda, vendibles, totalVenta, venderHtml, venderCambio, vender,

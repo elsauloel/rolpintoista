@@ -148,10 +148,13 @@ function renderCabeceraTienda(){
   // El título dice dónde estás (2026-10-08, dueño: «que el título de la tienda se vea más claro»): el nombre de la tienda, o el catálogo.
   if($('#catalogo-titulo')) $('#catalogo-titulo').textContent = tiendaCargada && !verCatalogoCompleto ? `🏪 ${tiendaCargada.nombre || 'Tienda'}` : '📖 Catálogo del fabricante';
   if(tiendaCargada){
+    const cerrada = FichaTienda.cerrada(tiendaSt);   // 🔒 cerrada: se mira, sin Vender, Reparación ni aleatorio (dueño, 2026-10-22)
     badge.textContent = FichaTienda.badge(tiendaSt);
-    if($('#tienda-vender')) $('#tienda-vender').style.display = '';
+    badge.style.cssText = cerrada ? 'color:#F0B860;border-color:#F0B860;font-weight:700' : '';
+    if($('#tienda-vender')) $('#tienda-vender').style.display = cerrada ? 'none' : '';
+    if($('#catalogo-item-aleatorio')) $('#catalogo-item-aleatorio').style.display = cerrada ? 'none' : '';
     if($('#tienda-baul')){ $('#tienda-baul').style.display = ''; Intercambio.pintarBotonBaul($('#tienda-baul')); }   // 📦 el baúl común se abre desde una tienda (P157); en combate, apagado
-    if($('#tienda-reparar')) $('#tienda-reparar').style.display = tiendaCargada.herrero ? '' : 'none';   // solo las tiendas con herrero reparan
+    if($('#tienda-reparar')) $('#tienda-reparar').style.display = tiendaCargada.herrero && !cerrada ? '' : 'none';   // solo las tiendas con herrero reparan
     badge.style.display = '';
     salir.style.display = '';
     if(nuevo) nuevo.style.display = 'none';
@@ -185,19 +188,21 @@ function salirDeLaTienda(){
 function tiendaDesdeDoc(snap){ return FichaTienda.desdeDoc(snap); }
 
 /* ---------- Tienda abierta o cerrada ----------
-   El GM abre y cierra la tienda con un interruptor (vendor-generator). Mientras está cerrada, el botón
-   🏪 queda desactivado y dice "Tienda cerrada". Se escucha siempre, no solo dentro de la tienda. */
-let tiendaAbiertaAhora = false, tiendaEstadoEscucha = null;
+   El GM abre y cierra la tienda con un interruptor (vendor-generator). Cerrada, la última publicada igual se puede MIRAR (dueño,
+   2026-10-22): el 🏪 se prende si hay una tienda publicada, y adentro no se compra, vende ni repara hasta que el GM la abra
+   (comun/ficha-tienda.js, cerrada). Se escucha siempre, no solo dentro de la tienda. */
+let tiendaAbiertaAhora = false, tiendaPublicadaAhora = false, tiendaEstadoEscucha = null;
 function renderBotonTienda(){
   const btn = $('#btn-vendedor');
   if(!btn) return;
-  btn.disabled = !tiendaAbiertaAhora;
-  btn.title = tiendaAbiertaAhora ? 'Abrir la tienda que publicó el GM: comprar y vender' : 'Tienda cerrada';
+  btn.disabled = !tiendaPublicadaAhora;
+  btn.title = tiendaAbiertaAhora ? 'Abrir la tienda que publicó el GM: comprar y vender' : tiendaPublicadaAhora ? 'Tienda cerrada: se puede mirar, pero no comprar ni vender' : 'El GM todavía no publicó ninguna tienda';
 }
 function tiendaEstadoEscuchar(){
   if(tiendaEstadoEscucha || !fbDb || !fbMiembro) return;
   tiendaEstadoEscucha = fbDb.doc(fbRutaCampana('tienda/publicada')).onSnapshot(snap => {
     tiendaAbiertaAhora = snap.exists && snap.data().abierta === true;
+    tiendaPublicadaAhora = snap.exists;
     renderBotonTienda();
   }, err => console.error('No se pudo escuchar el estado de la tienda:', err));
 }
@@ -271,7 +276,7 @@ async function abrirVendedor(){
   try{
     await FichaTienda.leerStock();   // piezas únicas: lo que queda (2026-10-07)
     const tienda = tiendaDesdeDoc(await fbDb.doc(fbRutaCampana('tienda/publicada')).get());
-    if(!tienda || !tienda.abierta){ toast('Tienda cerrada'); return; }
+    if(!tienda){ toast('El GM todavía no publicó ninguna tienda'); return; }   // cerrada se abre igual, solo para mirar (dueño, 2026-10-22)
 
     tiendaCargada = tienda;
     verCatalogoCompleto = false;
@@ -280,7 +285,7 @@ async function abrirVendedor(){
     limpiarFiltrosCatalogo();
     renderCatalogoModal();
     $('#scrim-catalogo').classList.add('open');
-    toast(`${tienda.nombre || 'Tienda'} · ${fmt(tienda.items.length)} ítems`);
+    toast(tienda.abierta ? `${tienda.nombre || 'Tienda'} · ${fmt(tienda.items.length)} ítems` : FichaTienda.CERRADA_MSG);
     escucharTienda();
   }catch(err){
     console.error('Error trayendo la tienda:', err);
@@ -307,21 +312,20 @@ function escucharTienda(){
     if(primera){ primera = false; return; }  // es la misma que se acaba de abrir
     if(!tiendaCargada){ dejarDeEscucharTienda(); return; }
     let nueva = tiendaDesdeDoc(snap);
-    if(nueva && !nueva.abierta){   // el GM la cerró: se sale de la tienda
-      tiendaCargada = null; carritoCatalogo = []; dejarDeEscucharTienda();
-      $('#scrim-catalogo').classList.remove('open'); $('#scrim-vender').classList.remove('open'); $('#scrim-reparar').classList.remove('open');
-      toast('El GM cerró la tienda');
-      return;
-    }
+    // Cerrada no se va (dueño, 2026-10-22): queda para mirar, sin carrito, Vender ni Reparación; cuando el GM la abre, se avisa.
+    const estaba = !!(tiendaCargada && tiendaCargada.abierta);
+    if(nueva && !nueva.abierta){ $('#scrim-vender').classList.remove('open'); $('#scrim-reparar').classList.remove('open'); }
     tiendaCargada = nueva;
     // Lo que ya no se vende sale del carrito.
     const antes = carritoCatalogo.length;
-    carritoCatalogo = nueva ? carritoCatalogo.filter(e => nueva.items.includes(e.catId)) : [];
+    carritoCatalogo = nueva && nueva.abierta ? carritoCatalogo.filter(e => nueva.items.includes(e.catId)) : [];
     if(!nueva) dejarDeEscucharTienda();
     renderCatalogoModal();
     const quitados = antes - carritoCatalogo.length;
-    toast((nueva ? 'El GM cambió la tienda' : 'El GM cerró la tienda')
-      + (quitados ? ` · ${fmt(quitados)} ítem(s) salieron del carrito` : ''));
+    if(!nueva) toast('El GM sacó la tienda');
+    else if(estaba && !nueva.abierta) toast('🔒 El GM cerró la tienda: podés seguir mirando, pero no comprar ni vender' + (quitados ? ' · el carrito se vació' : ''));
+    else if(!estaba && nueva.abierta) toast('🏪 El GM abrió la tienda: ya se puede comprar y vender');
+    else toast('El GM cambió la tienda' + (quitados ? ` · ${fmt(quitados)} ítem(s) salieron del carrito` : ''));
   }, err => console.error('No se pudo escuchar la tienda:', err));
 }
 

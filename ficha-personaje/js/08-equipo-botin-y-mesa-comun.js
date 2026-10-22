@@ -26,7 +26,7 @@ function fichaMapaAbrir(){
   $('#fm-botones').innerHTML =
     boton('stats', '📊 Stats', 'Tus atributos y stats: se pueden modificar desde acá.') +
     boton('habilidades', '✨ Habilidades', 'Todas tus habilidades, para verlas y ejecutarlas.') +
-    (tiendaAbiertaAhora ? boton('tienda', '🏪 Tienda', 'La tienda que publicó el GM: comprar, vender y reparar.') : '') +
+    (tiendaAbiertaAhora ? boton('tienda', '🏪 Tienda', 'La tienda que publicó el GM: comprar, vender y reparar.') : tiendaPublicadaAhora ? boton('tienda', '🏪 Tienda (cerrada)', 'La tienda que publicó el GM está cerrada: se puede mirar, pero no comprar ni vender.') : '') +
     (hayBotin ? boton('botin', '🎁 Botín', 'El botín del último combate.') : '') +
     boton('completa', '📜 Ver ficha completa', 'Abre tu ficha completa en otra pestaña.');
   $('#scrim-ficha-mapa').classList.add('open');

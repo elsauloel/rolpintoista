@@ -773,7 +773,7 @@ function renderPanel(forzar){
   $('#caja-mantenimiento').hidden = !soyGM;
   $('#personajes-caja').hidden = !fbMiembro;
   $('#toolkit-tienda').hidden = !fbMiembro;   // jugadores: comprar y vender; GM: abre el generador de tiendas
-  $('#toolkit-tienda').title = soyGM ? 'Tienda: abrir el generador de tiendas (en otra pestaña) para armar, publicar y abrir o cerrar la tienda' : 'Tienda: abrir la tienda que publicó el GM y comprar o vender (solo se puede con la tienda abierta)';
+  $('#toolkit-tienda').title = soyGM ? 'Tienda: abrir el generador de tiendas (en otra pestaña) para armar, publicar y abrir o cerrar la tienda' : 'Tienda: abrir la tienda que publicó el GM y comprar o vender (cerrada, se puede mirar, pero no comprar ni vender)';
   actualizarBotonMapas();
 
   // Los datos del token se ven en los controles flotantes (HUD): el panel

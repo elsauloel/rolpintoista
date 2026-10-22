@@ -1756,6 +1756,26 @@ prueba('la tienda: precio con ajuste, solo lo del vendedor, comprar del carrito,
      500 - Math.max(1, Math.round(num(arma.precioCompra) * 1.5)) + 1, 500 - Math.max(1, Math.round(num(arma.precioCompra) * 1.5)) + 1 - 2, 4, true, undefined, true]);   // 2 despojos a la mitad = +1; reparar 1 punto a 2 DDE
 });
 
+prueba('tienda cerrada (2026-10-22): se mira (catálogo sin carrito ni «gratis»), pero no se agrega al carrito, ni se compra, vende o repara; sin la marca sigue abierta', async () => {
+  const S = structuredClone(FichaGuardado.normalizar({meta: {dde: 500}, loot: {normal: 2}, inventario: [{id: 'casco', nombre: 'Casco gastado', tipoItem: 'cabeza', peso: 2, precioCompra: 10, equipado: false, dur: 3}]}).S);
+  const arma = CATALOGO_BASE.find(i => i.tipoItem === 'arma_1m' && num(i.precioCompra) >= 4 && num(i.precioCompra) <= 200 && !i.consumible);
+  const st = FichaTienda.nueva();
+  st.tienda = {items: [arma.id], itemsDatos: [], ajustePrecio: 0, ajusteVenta: 0, herrero: true, precioReparacion: 2, agregarGratis: true, abierta: false};
+  const avisos = [], ui = {toast: t => avisos.push(t), cambio: () => {}};
+  const fila = FichaTienda.rowHtml(S, st, arma, {gestion: false});
+  FichaTienda.agregarAlCarrito(S, st, arma.id, 1, ui);
+  FichaTienda.agregarGratis(S, st, arma.id, 1, ui);
+  await FichaTienda.comprar(S, st, ui);
+  st.venderSel = {despojos: 2};
+  const vendio = FichaTienda.vender(S, st, ui);
+  const casco = S.inventario.find(i => i.id === 'casco');
+  FichaTienda.reparar(S, st, [{it: casco, pts: 1}], false, ui);
+  const abierta = FichaTienda.nueva(); abierta.tienda = {...st.tienda, abierta: undefined};
+  igual([FichaTienda.cerrada(st), FichaTienda.cerrada(abierta), fila.includes('data-catalogocarrito'), fila.includes('data-catalogoadd'), fila.includes('🔒'), FichaTienda.badge(st).includes('Cerrada'),
+    st.carrito.length, S.inventario.length, num(S.meta.dde), num(S.loot.normal), vendio, avisos.length, avisos.every(a => a === FichaTienda.CERRADA_MSG), FichaTienda.rowHtml(S, abierta, arma, {gestion: false}).includes('data-catalogocarrito')],
+    [true, false, false, false, true, true, 0, 1, 500, 2, false, 5, true, true]);
+});
+
 grupo('Curar estados por grupo (P180)');
 prueba('cada estado en su grupo; un consumible saca los de su grupo y deja el resto; el Cura Plus, todos; las copias viejas se reconocen por el nombre', () => {
   const C = Combatiente, cat = n => CATALOGO_BASE.find(i => i.nombre === n);

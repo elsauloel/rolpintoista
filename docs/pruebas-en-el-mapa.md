@@ -44,6 +44,22 @@
   la tabla de números, «Lo que hace cada uno» (la ficha corta de los dos, lado a lado: el hechizo de la varita, los efectos al golpear, lo de un
   talismán) y un número que no aplica a uno de los dos sale «—» sin flecha. Visto en el mapa: Varita arcana contra Cuchillo, Farol contra Tapa de
   tacho, Hacha contra Cuchillo (capturas enviadas al dueño).
+- [x] **🌫 La Bomba de humo de un creep pide la casilla** (reportado por el dueño el 2026-10-22: «usar» la gastaba sin hacer nada; arreglado en js/12
+  `acConsumir`): un consumible de creep con zona (`zonaUso`: Bomba de humo, Bombucha de talco) o Acelerador (`aceleradorMapa`: la Runa) va por el mismo
+  camino que el de un personaje: el GM elige la casilla y se arma la zona. Visto en «Claude · pruebas» con Goblin de prueba 1: pidió el centro, dejó la
+  flor de humo de 7 por 2 turnos, gastó 1 unidad y 1 No2. El Ojo de Kicillof en un creep avisa «✋ se pone a mano» (los creeps no invocan todavía).
+- [x] **🏪 La tienda cerrada se puede mirar** (dueño, 2026-10-22): con la tienda cerrada, el 🏪 del mapa y el Vendedor de la ficha abren la última
+  publicada con el cartel «🔒 Cerrada: podés mirar, no comprar ni vender» (sin carrito, Comprar, Vaciar, Vender, Reparación ni ítem aleatorio; Ver
+  y Comparar sí); si el GM la cierra con la ventana abierta, se queda mirando y el carrito se vacía; cuando la abre, «🏪 El GM abrió la tienda».
+  Visto en «Claude · pruebas» (juan, desde el mapa: cerrada y después abierta). **Falta probar** lo mismo en la ficha suelta.
+- [ ] **✅ Terminar mi turno** (dueño, 2026-10-22): en la cabecera del orden de turnos (también achicado), cuando le toca a un token mío, el botón
+  «✅ Terminar mi turno»; al tocarlo queda «⏳ Terminando…», la Crónica dice «Fulano terminó su turno» y la pantalla del GM pasa al siguiente por él
+  («El GM pasó el turno»). Si no hay ninguna pantalla del GM abierta, a los 20 s el botón se vuelve a habilitar. Si el turno ya había pasado, la
+  Crónica lo dice y no pasa nada más.
+- [ ] **👀 Espectadores del piedra, papel o tijera** (dueño, 2026-10-22): a quien no juega le sale abajo «👀 A y B están jugando piedra, papel o
+  tijera · Ver»; con Ver, la misma ventana mirando (las dos manos cerradas con «eligiendo…» / «ya eligió», la revelación de cada ronda, el final con
+  «Gana X»); «Dejar de mirar» o «—» devuelven el botón. Hace falta una tercera cuenta para verlo de verdad (se probó con una pantalla espectadora
+  armada a mano).
 - [ ] **⭕ El lápiz cierra la figura al terminarla** (reportado por el dueño el 2026-10-22, arreglado en js/07 `guardarTrazo`): con «⭕ Cerrar la
   figura» tildado, en rectas (clic, clic, clic y doble clic o Enter) y a mano alzada (al soltar), el trazo nace con las puntas unidas, sin pasar
   por el ⚙. Y con 🧱 además, lo de adentro queda sólido y sin grilla.

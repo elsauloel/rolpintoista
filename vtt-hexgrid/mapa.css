@@ -472,9 +472,10 @@ aside{
 }
 #iniciativa.plegado #iniciativa-cab{border-bottom:none}
 #iniciativa-ronda{margin-left:auto;color:var(--muted);font-size:10.5px;flex:none}
-#iniciativa #ini-fin-turno{flex:none;font-size:10.5px;padding:3px 8px;letter-spacing:.02em;cursor:pointer}   /* ✅ el jugador termina su turno (2026-10-22) */
+#iniciativa #ini-fin-turno{flex:none;font-size:10.5px;padding:3px 7px;letter-spacing:.02em;cursor:pointer;white-space:nowrap}
+#iniciativa:has(#ini-fin-turno:not([hidden])) #iniciativa-ronda{display:none}   /* con el botón, la ronda sobra (ya la dice la lista) */   /* ✅ el jugador termina su turno (2026-10-22) */
 #iniciativa #ini-fin-turno[disabled]{opacity:.6;cursor:default}
-#iniciativa-titulo{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#iniciativa-titulo{min-width:0;flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #iniciativa.plegado #iniciativa-titulo{color:#F2C27A;font-weight:700}
 #iniciativa .ini-plegar{color:var(--muted);font-size:13px;line-height:1;padding:0 2px;cursor:pointer}
 #iniciativa.plegado #iniciativa-cuerpo{display:none}

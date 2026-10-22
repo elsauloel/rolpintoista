@@ -240,6 +240,9 @@ línea que se ejecuta **al cargar** (no adentro de una función) solo puede usar
   libre* = `iniciativa.libre = {id, vuelve}` (turno se mueve sin fin/inicio de turno ni `paso`; ▶ Siguiente pasa a ser «↩ Volver a…» →
   `iniciativaVolverDeLibre`). `guardarIniciativa` conserva `libre` (también cuando escribe un jugador); Ordenar y Limpiar lo terminan. La
   lista muestra arriba al del turno libre (⚡) y gira desde `vuelve`.
+- **✅ Terminar mi turno** (2026-10-22, dueño): un jugador termina el turno de su token desde la cabecera del orden de turnos (se ve también
+  achicado). Como las reglas no le dejan tocar `turno`, publica un momento `turno-fin` {tokenId, paso} y la pantalla del GM lo toma (transacción,
+  una sola) y hace `iniciativaSiguiente()` por él — js/04 `finTurnoMio/finTurnoPedir/finTurnoDelJugador`, js/16 `momentoRecibido`.
 - **Orden de turnos (iniciativa)**: tablero flotante y plegable arriba a la
   izquierda del mapa (`#iniciativa`, estilo "Turn Order" de Roll20) — **de
   siempre** (decidido 2026-09-22: antes visible solo en modo combate y

@@ -771,7 +771,7 @@ function renderIniciativa(){
     finBtn.hidden = !mio;
     const esperando = !!(mio && finTurnoPedido && finTurnoPedido.tokenId === mio.id && Date.now() - finTurnoPedido.t < 20000);
     finBtn.disabled = esperando;
-    finBtn.textContent = esperando ? '⏳ Terminando…' : '✅ Terminar mi turno';
+    finBtn.textContent = esperando ? '⏳ Terminando…' : '✅ Terminar turno';
   }
   if(!visibles.length){
     lista.innerHTML = `<div id="iniciativa-vacio">${soyGM ? 'Sin orden todavía: tocá "Traer tokens" y cargá las tiradas.' : 'El GM todavía no armó el orden.'}</div>`;

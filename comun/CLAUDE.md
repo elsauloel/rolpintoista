@@ -993,6 +993,7 @@ versión parecida en más de una, es candidato a juntar.
   segunda jugada resuelve; empate = otra ronda; si es por el botín, el ítem queda a nombre del ganador en la misma transacción), `rendirse(id)`,
   `ref()`/`docNuevo({a, b, motivo})` (para crearlo dentro de otra transacción), `resultado(a, b)`, `mostrar(id)`, `juega(id)` e `iniciar()`
   (escucha los juegos del usuario y muestra la ventana: las tres manos en triángulo, «Esperando a…», el resultado cuando eligieron los dos;
+  y desde el 2026-10-22 también los juegos ajenos en curso, para **mirar**: el botón «👀 A y B están jugando… · Ver» y la ventana de espectador;
   — oculta, queda un botoncito abajo). El resultado va a la Mesa y a la Crónica del mapa (`momentoAbrir`, si está). La cargan el mapa (botón ✊
   arriba a la derecha), la ficha y GM Tools; adentro de un marco del mapa no se inicia. Colección `ppt` (reglas nuevas).
 - **`ficha-botin.js`, reclamar y disputar** (2026-10-08, pedido del dueño): «Sumar a la mochila» pasó a **🙋 Reclamar** (`tomar`: el ítem queda
@@ -1015,7 +1016,9 @@ versión parecida en más de una, es candidato a juntar.
 - **`ficha-tienda.js`** (`FichaTienda`, 2026-10-02, hoja de ruta A5) — **la tienda vista por un personaje**: los grupos de compra, el
   precio con el ajuste del vendedor, la búsqueda, el orden y los filtros (`visibles`), la fila y el catálogo (`rowHtml`, `catalogoHtml`),
   el carrito y comprar, agregar gratis, crear ítems (las pilas de consumibles), vender (`vendibles`, `venderHtml`, `venderCambio`,
-  `vender`), reparar (`aReparar`, `repararHtml`, `reparar`), el ítem al azar y `desdeDoc` (la tienda publicada). Todo recibe el personaje
+  `vender`), reparar (`aReparar`, `repararHtml`, `reparar`), el ítem al azar y `desdeDoc` (la tienda publicada; `abierta`). Con la tienda
+  **cerrada** (`cerrada(st)`, 2026-10-22) se mira y nada más: la fila sin carrito, y comprar, agregar gratis, vender y reparar avisan
+  `CERRADA_MSG`. Todo recibe el personaje
   (`S`) y el estado de la tienda en pantalla (`st`: tienda, carrito, venderSel, orden, ordenDesc, verCompleto, filtros, extraItem). Lo
   usan la ficha (`tiendaSt`, getters sobre sus variables) y el mapa (`bnTiendaSt`). `ficha-equipo.js` suma `CATEGORIAS`,
   `CATEGORIA_LABEL`, `ranuras`, `mochilaUsada` y `capMochila`; `ficha-calculo.js` ahora exporta `SLOT_LABEL`.

@@ -17,6 +17,9 @@
   cuadro del duelo, al GM, «Pasa la mitad: (X − su Defensa) ÷ 2» y «💔 Aplicar el daño»; recién ahí se descuenta. (Antes se aplicaba solo.)
 - [ ] **⏳ Una zona de 1 turno hace efecto dos veces**: al tirarla y al pasar la ronda; después se va al empezar el turno de quien la tiró. Con quien
   la tiró primero en el orden, que no se vaya antes de resolver el segundo efecto (`zonasDelQueLaTiro` con el Mantenimiento nuevo).
+- [ ] **⭕ El lápiz cierra la figura al terminarla** (reportado por el dueño el 2026-10-22, arreglado en js/07 `guardarTrazo`): con «⭕ Cerrar la
+  figura» tildado, en rectas (clic, clic, clic y doble clic o Enter) y a mano alzada (al soltar), el trazo nace con las puntas unidas, sin pasar
+  por el ⚙. Y con 🧱 además, lo de adentro queda sólido y sin grilla.
 
 ## Auditoría de creeps: para probar
 

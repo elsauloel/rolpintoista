@@ -1,13 +1,13 @@
 /* ---------- 🤺 Desarmar (2026-10-21, dueño; choque pesado) ----------
    Una habilidad Flash (`desarmar`) que se usa en el paso del Bloqueo de un duelo (hubo Parry: arma contra arma o contra escudo), por quien ataca
    (en vez de su Fuerza del golpe) o por quien defiende (en vez de su Bloqueo). La tirada es la misma; cambia el resultado: si gana quien desarma,
-   el otro pierde lo que tenía en la mano en ese cruce (el arma de quien atacaba, o el arma o el escudo con que paró), que sale volando 2 casillas
+   el otro pierde lo que tenía en la mano en ese cruce (el arma de quien atacaba, o el arma o el escudo con que paró), que sale volando 2 casillas (a una libre, si no la más cerca)
    en una dirección al azar —una ruleta de casillas que se ve en todas las pantallas— y queda en el piso (js/27). Eso reemplaza el resultado de
    siempre (sin la mitad del daño, sin contraataque). Si pierde, lo de siempre. Lo natural (garras, colmillos, un caparazón) no se cae.
    El botón instantáneo 🤺 (Flotantes.desarmar) aparece solo en un duelo en el paso del Bloqueo con alguien que la tenga lista y que maneje esta
    pantalla: un creep (el GM; su SP o su cooldown, el doble en turno ajeno) o un personaje con la skill del Warrior (`resumen.desarmar`, su dueño o
    quien tiene 🎮 el control; 3 SP, 6 en turno ajeno, con ConfirmarTurno.flash). Al costado del duelo abierto, o arriba si está minimizado. */
-const DESARME_CASILLAS = 2, DESARME_RULETA_MS = 4300, DESARME_QUIETO_MS = 1300, DESARME_VUELTAS = 3;   // (2026-10-22: más larga, frena de a poco)
+const DESARME_CASILLAS = 2, DESARME_ANILLOS_MAX = 8, DESARME_RULETA_MS = 4300, DESARME_QUIETO_MS = 1300, DESARME_VUELTAS = 3;   // (2026-10-22: más larga, frena de a poco)
 let desarmeDuelos = new Map(), desarmeEscucha = null;
 // Los duelos abiertos (solo el GM: maneja a los creeps).
 function desarmeEscuchar(){
@@ -23,7 +23,9 @@ function desarmeEscuchar(){
    que sigue a un Parry ganado, en vez de la Fuerza del golpe (quien ataca) o de bloquear (quien defiende). Quien defiende, solo si paró con el
    arma, no con el escudo. Lo que le saca al otro puede ser un arma o un escudo. Una bestia con garras también desarma (dueño: «el mecanismo debe
    existir como posible; cuándo sí o no lo define la mesa»); lo único es que su propia arma natural no se le cae (armaSoltar, js/27). → la opción, o null. */
-function desarmeOpcion(id, d, lado){
+// `conApagado` (2026-10-22, dueño: el botón en cooldown se ve apagado, «en cooldown (3 turnos)», en vez de esconderse): si la tiene pero ahora no
+// puede (cooldown, sin No2, sin SP), devuelve la opción con `apagado` = el motivo; sin eso, null como antes.
+function desarmeOpcion(id, d, lado, conApagado){
   if(!d || d.fase !== 'bloqueo' || d.estado !== 'esperando' || (d.ataque && d.ataque.desarme) || d.hab || !d.ataque) return null;
   if(!d.defensa || d.defensa.modo !== 'parry') return null;
   if(lado === 'atacante' ? d.fuerza : d.bloqueo) return null;
@@ -37,7 +39,8 @@ function desarmeOpcion(id, d, lado){
     if(!k || r.muerto) return null;
     const ajeno = typeof esSuTurno === 'function' && esSuTurno(p.tokenId) === false;
     const costo = ajeno ? (num(k.spAjeno) || num(k.sp) * 2) : num(k.sp);
-    return num(r.sp) >= costo ? {d, id, lado, nombre: p.nombre, tokenId: p.tokenId, pj: {fichaId: p.ref, ...k}} : null;
+    const o = {d, id, lado, nombre: p.nombre, tokenId: p.tokenId, pj: {fichaId: p.ref, ...k}};
+    return num(r.sp) >= costo ? o : conApagado ? {...o, apagado: `te falta SP (cuesta ${fmt(costo)}, tenés ${fmt(num(r.sp))})`} : null;
   }
   if(!soyGM || !p || p.tipo !== 'creep') return null;
   const sc = creepPrivadoDe(p.ref);
@@ -45,7 +48,10 @@ function desarmeOpcion(id, d, lado){
   if(!h) return null;
   let motivo = '';
   try{ motivo = CreepCalculo.bloqueoHab(sc, h) || ''; }catch(e){}
-  return motivo ? null : {d, id, lado, nombre: sc.nombre, sc, h, tokenId: p.tokenId};
+  const o = {d, id, lado, nombre: sc.nombre, sc, h, tokenId: p.tokenId};
+  if(!motivo) return o;
+  const cd = Math.round(num(h.cdActual));
+  return conApagado ? {...o, apagado: cd > 0 ? `en cooldown (${cd} turno${cd === 1 ? '' : 's'})` : /No2/.test(motivo) ? 'le faltan No2' : motivo.toLowerCase()} : null;
 }
 // Para los duelos que no traen la marca: si el que ataca es un creep con arma natural (solo lo sabe el GM).
 function desarmeAtacanteNatural(d){
@@ -76,10 +82,10 @@ function desarmeOpciones(){
 // Los ganchos del cuadro del duelo (comun/duelo.js): el botón «🤺 Desarmar» adentro del paso 3, al lado de la tirada.
 window.dueloDesarmeOpcion = (d, lado) => {
   if(!d || !d.id) return null;
-  const o = desarmeOpcion(d.id, d, lado);
+  const o = desarmeOpcion(d.id, d, lado, true);
   if(!o) return null;
   const k = desarmeCosto(o);
-  return {costo: k.txt + (k.ajeno ? ' (turno ajeno: el doble)' : ''), titulo: `En vez de ${lado === 'atacante' ? 'tu Fuerza del golpe' : 'bloquear'}: si ganás, se le cae lo que tiene en la mano`};
+  return {costo: k.txt + (k.ajeno ? ' (turno ajeno: el doble)' : ''), ...(o.apagado ? {apagado: o.apagado} : {}), titulo: `En vez de ${lado === 'atacante' ? 'tu Fuerza del golpe' : 'bloquear'}: si ganás, se le cae lo que tiene en la mano`};
 };
 window.dueloDesarmar = async (id, lado) => {
   const d = desarmeDuelos.get(id) || (await fbDb.collection(fbRutaCampana('duelos')).doc(id).get().then(s => s.exists ? {...s.data(), id} : null).catch(() => null));
@@ -165,15 +171,27 @@ async function desarmadoResuelto(d){
   if(!t){ mesaLinea(`🤺 ${gano} desarmó a ${(v && v.nombre) || 'alguien'}: ✋ dejá su arma en el piso a mano`, 'recordatorio'); return; }
   const itemId = ladoV === 'defensor' ? ((d.defensa && d.defensa.itemId) || '') : ((d.ataque && d.ataque.armaId) || '');
   const itemNombre = ladoV === 'defensor' ? ((d.defensa && d.defensa.itemNombre) || 'lo que tenía en la mano') : ((d.ataque && d.ataque.armaNombre) || 'su arma');
-  // Las casillas a 2 de distancia (sin Sólidos); si no hay ninguna, la suya.
-  const anillo = [];
-  for(let dc = -3; dc <= 3; dc++) for(let df = -3; df <= 3; df++){
-    const c = {col: t.col + dc, fila: t.fila + df};
-    if(distanciaHex(t, c) === DESARME_CASILLAS && !elementoSolidoEn(c.col, c.fila)) anillo.push(c);
+  // Dónde puede caer (dueño, 2026-10-22: «solo sobre casillas libres; si no hay en ese círculo, puede ser en cualquiera de los círculos adyacentes
+  // a ese: si hay en el círculo interno, primero ese; si no, en el externo, y así siguiendo para afuera»): el anillo a 2 casillas, solo las
+  // libres (sin nadie parado, sin Sólidos y sin otra arma en el piso); si está todo ocupado, el de 1; después el de 3, 4… Si no hay ninguna, la suya.
+  const ocupada = c => elementoSolidoEn(c.col, c.fila) || [...tokens.values()].some(x => x.col === c.col && x.fila === c.fila)
+    || [...elementos.values()].some(e => e && e.arma && e.origen && e.origen.col === c.col && e.origen.fila === c.fila);
+  const anilloA = dist => {
+    const out = [];
+    for(let dc = -dist - 1; dc <= dist + 1; dc++) for(let df = -dist - 1; df <= dist + 1; df++){
+      const c = {col: t.col + dc, fila: t.fila + df};
+      if(distanciaHex(t, c) === dist && !ocupada(c)) out.push(c);
+    }
+    return out;
+  };
+  let anillo = [];
+  for(const dist of [DESARME_CASILLAS, ...Array.from({length: DESARME_ANILLOS_MAX}, (_, i) => i + 1).filter(x => x !== DESARME_CASILLAS)]){
+    anillo = anilloA(dist);
+    if(anillo.length) break;
   }
   const celdas = anillo.length ? anillo : [{col: t.col, fila: t.fila}];
   const elegida = Math.floor(Math.random() * celdas.length);
-  try{ momentoAbrir({tipo: 'desarme', icono: '🤺', titulo: `¡${gano} desarma a ${nombreDe(t)}!`, estado: 'listo', resultado: `${itemNombre} sale volando ${DESARME_CASILLAS} casillas`,
+  try{ momentoAbrir({tipo: 'desarme', icono: '🤺', titulo: `¡${gano} desarma a ${nombreDe(t)}!`, estado: 'listo', resultado: `${itemNombre} sale volando`,
     datos: {celdas: celdas.map(c => ({c: c.col, f: c.fila})), elegida, duelo: d.id}}); }catch(err){ console.error('Desarmar: el momento', err); }   // (objetos: Firestore no guarda listas dentro de listas)
   await new Promise(r => setTimeout(r, DESARME_RULETA_MS + 300));
   const s = await armaSoltar(t, 0, {celda: celdas[elegida], itemId, itemNombre});

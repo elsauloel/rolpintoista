@@ -1774,8 +1774,8 @@ const Duelo = (() => {
     const k = d.id + ':' + campo, abierto = manualAbierto.has(k);
     const tg = `<label class="tg" title="Pasar de lo automático a una tirada que escribís vos"><input type="checkbox" data-mtg="${campo}"${abierto ? ' checked' : ''}> ✍ Elegir manualmente</label>`;
     if(!abierto) return `<div class="duelo-manual">${tg}</div>`;
-    const dOpM = (campo === 'fuerza' || campo === 'bloqueo') && !(d.ataque && d.ataque.desarme) && typeof window.dueloDesarmeOpcion === 'function'
-      ? window.dueloDesarmeOpcion(d, campo === 'fuerza' ? 'atacante' : 'defensor') : null;   // 🤺 a mano también se elige si es para desarmar (2026-10-22)
+    const dOpM0 = (campo === 'fuerza' || campo === 'bloqueo') && !(d.ataque && d.ataque.desarme) && typeof window.dueloDesarmeOpcion === 'function'
+      ? window.dueloDesarmeOpcion(d, campo === 'fuerza' ? 'atacante' : 'defensor') : null, dOpM = dOpM0 && !dOpM0.apagado ? dOpM0 : null;   // apagada (cooldown): no va en el desplegable   // 🤺 a mano también se elige si es para desarmar (2026-10-22)
     const sel = campo === 'eva' ? `<select data-mmodo>${selModoHtml(d)}</select>`
       : dOpM ? `<select data-mdesarme>${campo === 'fuerza' ? '<option value="">⚔ Pegar: pasar el bloqueo</option>' : '<option value="">🛡 Bloquear el golpe</option>'}<option value="1">🤺 Desarmar (${_esc(dOpM.costo || '')})</option></select>` : '';
     const dm = manual['mdef:' + d.id] || 'auto';
@@ -1918,7 +1918,8 @@ const Duelo = (() => {
     const quien = _esc(lado.nombre);
     let cuerpo;
     // 🤺 Desarmar (2026-10-22): ¿puedo elegirlo acá? (dOp) ¿o el otro ya lo eligió contra mí? (quiereDesarmarme)
-    const dOp = (campo === 'fuerza' || campo === 'bloqueo') && !(d.ataque && d.ataque.desarme) && typeof window.dueloDesarmeOpcion === 'function' ? window.dueloDesarmeOpcion(d, ladoN) : null;
+    const dOp0 = (campo === 'fuerza' || campo === 'bloqueo') && !(d.ataque && d.ataque.desarme) && typeof window.dueloDesarmeOpcion === 'function' ? window.dueloDesarmeOpcion(d, ladoN) : null;
+    const dOp = dOp0 && !dOp0.apagado ? dOp0 : null, dOpApagado = dOp0 && dOp0.apagado ? dOp0 : null;   // apagada: el botón se ve, sin poder tocarlo (2026-10-22, dueño)
     const quiereDesarmarme = fase === 'bloqueo' && !!(d.ataque && d.ataque.desarme) && d.ataque.desarme.lado !== ladoN;
     if(puedoTirarYo(lado)){
       if(campo === 'eva'){
@@ -1950,6 +1951,7 @@ const Duelo = (() => {
       // 🤺 Desarmar (dueño, 2026-10-22): no se declara en el turno; se elige acá, en el Bloqueo que sigue a un Parry ganado, EN VEZ de pegar
       // (quien ataca) o de bloquear (quien defiende, si paró con el arma). Quién puede y cuánto cuesta lo dice el mapa (js/62); el botón paga, marca y tira.
       if(dOp) cuerpo += `<div class="det" style="margin-top:8px">${campo === 'fuerza' ? 'o, en vez de pegar:' : 'o, en vez de bloquear:'}</div><button type="button" class="sec" data-desarmar="${campo}" title="${_esc(dOp.titulo || '')}">🤺 Desarmar a ${_esc(d[esAtq ? 'defensor' : 'atacante'].nombre)} · ${_esc(dOp.costo || '')}</button>`;
+      else if(dOpApagado) cuerpo += `<div class="det" style="margin-top:8px">${campo === 'fuerza' ? 'o, en vez de pegar:' : 'o, en vez de bloquear:'}</div><button type="button" class="sec" disabled style="opacity:.5;cursor:not-allowed" title="Ahora no se puede: ${_esc(dOpApagado.apagado)}">🤺 Desarmar · ${_esc(dOpApagado.apagado)}</button>`;
       cuerpo += flashHtml(d, campo) + manualHtml(d, campo);
     }else if(puedoAMano(lado)){
       const selModo = campo === 'eva' ? `<select data-manual-modo>${selModoHtml(d)}</select>` : '';

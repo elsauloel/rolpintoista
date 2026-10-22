@@ -174,13 +174,15 @@ async function desarmadoResuelto(d){
   // Dónde puede caer (dueño, 2026-10-22: «solo sobre casillas libres; si no hay en ese círculo, puede ser en cualquiera de los círculos adyacentes
   // a ese: si hay en el círculo interno, primero ese; si no, en el externo, y así siguiendo para afuera»): el anillo a 2 casillas, solo las
   // libres (sin nadie parado, sin Sólidos y sin otra arma en el piso); si está todo ocupado, el de 1; después el de 3, 4… Si no hay ninguna, la suya.
+  // Y que llegue volando (dueño, 2026-10-22: «es como si fuera un lanzamiento»): un Sólido o una pared en el medio la frena —al lado de una pared
+  // o de un pilar no sale para ese lado—; los personajes, los creeps y las invocaciones no («les vuela por encima o por el costado»).
   const ocupada = c => elementoSolidoEn(c.col, c.fila) || [...tokens.values()].some(x => x.col === c.col && x.fila === c.fila)
     || [...elementos.values()].some(e => e && e.arma && e.origen && e.origen.col === c.col && e.origen.fila === c.fila);
   const anilloA = dist => {
     const out = [];
     for(let dc = -dist - 1; dc <= dist + 1; dc++) for(let df = -dist - 1; df <= dist + 1; df++){
       const c = {col: t.col + dc, fila: t.fila + df};
-      if(distanciaHex(t, c) === dist && !ocupada(c)) out.push(c);
+      if(distanciaHex(t, c) === dist && !ocupada(c) && desarmeVuelaHasta(t, c)) out.push(c);
     }
     return out;
   };
@@ -203,6 +205,25 @@ async function desarmadoResuelto(d){
   mesaLinea(`🤺 ${gano} desarmó a ${nombreDe(t)}: ${s && s.nota ? s.nota : itemNombre + ' al piso'}`, 'recordatorio');
 }
 
+// ¿El arma llega volando de `desde` a `hasta`? Ninguna casilla del medio con algo Sólido (ni figura cerrada con colisión) y ninguna pared de línea
+// cortando. Cuando la recta pasa justo por el borde entre dos casillas, alcanza con que uno de los dos costados esté libre (la rodea).
+function desarmeVuelaHasta(desde, hasta){
+  if(typeof paredCorta === 'function' && paredCorta(desde, hasta)) return false;
+  const n = distanciaHex(desde, hasta);
+  if(n <= 1) return true;
+  const A = hexACubo(desde), B = hexACubo(hasta);
+  const recta = eps => {
+    for(let i = 1; i < n; i++){
+      const k = i / n, q = A.q + (B.q - A.q) * k + eps, r = A.r + (B.r - A.r) * k + eps, s3 = -q - r;
+      let rq = Math.round(q), rr = Math.round(r);
+      const rs = Math.round(s3), dq = Math.abs(rq - q), dr = Math.abs(rr - r), ds = Math.abs(rs - s3);
+      if(dq > dr && dq > ds) rq = -rr - rs; else if(dr > ds) rr = -rq - rs;
+      if(elementoSolidoEn(cuboACol(rq, rr), cuboAFila(rq, rr))) return false;
+    }
+    return true;
+  };
+  return recta(1e-6) || recta(-1e-6);
+}
 // 🎡 La ruleta de casillas (en todas las pantallas, desde el momento «desarme», js/16): se iluminan de a una, rápido y frenando hasta la elegida.
 const efectosRuleta = [];
 const ruletaVistas = new Set();

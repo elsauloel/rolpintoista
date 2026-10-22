@@ -33,14 +33,14 @@
 >   en la compu»): Atacar con la varita → clic en el objetivo → el Anuncio del d20 con el veredicto («¡LO QUE BUSCABAS!» / «¡SE DIO VUELTA!») →
 >   «🎰 Girar el rodillo»: los nombres pasan de abajo hacia arriba y frenan hasta el estado que salió → «¡Salió X!» con su detalle y su duración →
 >   «✔ Aplicar». Con 20, la grilla para elegir; con 1, elige el bando contrario. Probarlo con un personaje y con el Kobold hongero (un creep).
-> - [ ] **🩸 Ver en el mapa la Maldición de la sangre** (2026-10-17): con Maldito, al usar algo que cuesta SP sale «Estás Maldito: … te va a
+> - [x] (2026-10-22, lo vio el dueño) **🩸 Ver en el mapa la Maldición de la sangre** (2026-10-17): con Maldito, al usar algo que cuesta SP sale «Estás Maldito: … te va a
 >   bajar N de vida (A → B)» con Aceptar / Cancelar; al aceptar baja la vida y queda en la Mesa. Probado por Claude con Xeena (capturas en la
 >   conversación); falta verlo el dueño, y sobre todo Larry con Drenar Vida (costo X) desde su cuenta.
-> - [ ] **▶ Ver en el mapa el «Empieza tu turno»** (2026-10-17, dueño: «un pequeño anuncio al principio del turno… que la persona ponga
+> - [x] (2026-10-22, lo vio el dueño) **▶ Ver en el mapa el «Empieza tu turno»** (2026-10-17, dueño: «un pequeño anuncio al principio del turno… que la persona ponga
 >   aplicar»): al pasarle el turno a un personaje o invocación, a su dueño le aparece al centro lo que pasa (estados, vida y SP, No2) con
 >   **✔ Aplicar** → «✔ YA SE APLICÓ»; el GM tiene «▶ Aplicar por él» en la Crónica; si el turno pasa sin aplicarlo, se aplica solo. Probado por
 >   Claude con Xeena (capturas en la conversación); falta verlo el dueño y un jugador desde su cuenta.
-> - [ ] **💔 Ver en el mapa el «Aplicar el daño» del duelo** (2026-10-17, dueño: «anotalo también en pendiente para ver en la compu»): cuando
+> - [x] (2026-10-22, lo vio el dueño) **💔 Ver en el mapa el «Aplicar el daño» del duelo** (2026-10-17, dueño: «anotalo también en pendiente para ver en la compu»): cuando
 >   un creep le pega a un personaje, el cuadro del duelo frena en «N de daño, menos tu Defensa» con el botón **💔 Aplicar el daño** (el jugador) o
 >   **💔 Aplicar por …** (el GM, si el jugador no contesta); recién ahí baja la vida. Probado por Claude (capturas en la conversación); falta verlo
 >   el dueño, y sobre todo desde la cuenta de un jugador (la variante «Aplicar por …» no se pudo ver: en la partida de prueba el GM es dueño de Xeena).

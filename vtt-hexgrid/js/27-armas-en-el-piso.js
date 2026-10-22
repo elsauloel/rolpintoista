@@ -102,17 +102,31 @@ async function armaSoltar(t, vuela, o){
   }
   return {cayo: true, escudo: !!(typeof Combatiente !== 'undefined' && Combatiente.esEscudo(item)), nota: `se le cayó ${item.nombre}${o.celda ? ' lejos' : num(vuela) > 0 ? ` y voló ${Math.round(num(vuela))} casillas` : ''}`};
 }
-// Quien la levanta: el elemento se borra primero (si dos la agarran a la vez, gana uno). → {it, propia} o null.
-async function armaTomar(elId, t){
+/* Levantar sin perder nada (dueño, 2026-10-22: el Caronero se perdió cuando la página se recargó en el medio). Antes el arma se borraba del piso
+   primero y después se guardaba en quien la levantaba: si la página se cerraba entre una cosa y la otra, desaparecía. Ahora, en este orden:
+   1) armaLeer: se lee del piso sin sacarla; 2) se guarda en quien la levanta (y se espera a que quede guardado); 3) armaQuitarDelPiso: recién ahí
+   se saca, con una transacción que solo funciona si todavía está (si dos la agarran a la vez, gana uno; el otro deshace lo suyo). Si algo se corta
+   entre 2 y 3, lo peor es que quede en los dos lados (el GM la borra del piso), nunca que se pierda. */
+async function armaLeer(elId, t){   // → {it, propia} o null
   const el = elementos.get(elId);
   if(!el || !el.arma){ toast('Esa arma ya no está en el piso'); return null; }
   if(t && el.origen && distanciaHex(t, el.origen) > 1 && !(await AvisoCombate.preguntar(`${el.armaNombre || 'El arma'} está a ${distanciaHex(t, el.origen)} casillas: hay que estar al lado. ¿Levantarla igual?`, {icono: '🗡', titulo: 'Levantar el arma', si: 'Sí, levantarla'}))) return null;
-  try{ await coleccionElementos().doc(elId).delete(); }
-  catch(err){ console.error('No se pudo levantar el arma:', err); toast('No se pudo levantar el arma (¿faltan las reglas nuevas de Firebase?)'); return null; }
   let it = {};
   try{ it = JSON.parse(el.armaItem || '{}') || {}; }catch(e){}
   it = {...it, nombre: it.nombre || el.armaNombre || 'Arma', id: `arma-${Date.now().toString(36)}`, equipado: false};
   return {it, propia: !!t && el.armaDe === armaRefDe(t)};
+}
+async function armaQuitarDelPiso(elId){   // → true si la sacó; false si ya no estaba (otro se la llevó antes) o no se pudo
+  const ref = coleccionElementos().doc(elId);
+  try{ return await fbDb.runTransaction(async tx => { const x = await tx.get(ref); if(!x.exists) return false; tx.delete(ref); return true; }); }
+  catch(err){ console.error('No se pudo sacar el arma del piso:', err); return false; }
+}
+// Espera a que la Botonera haya guardado lo que cambió (hasta ~10 s). → true si quedó guardado.
+async function bnEsperarGuardado(){
+  if(!bn || !bn.sesion || typeof FichaSesion === 'undefined' || !FichaSesion.pendiente) return true;
+  const f = bn.sesion, pend = () => FichaSesion.pendiente(f, () => FichaGuardado.partes(bn.S));
+  for(let i = 0; i < 20 && pend(); i++) await new Promise(r => setTimeout(r, 500));
+  return !pend();
 }
 // Se dibuja como una ficha REDONDA (dueño, 2026-10-07: lo que no es un personaje ni una criatura va redondo, para distinguirlo de los tokens
 // hexagonales), con el 🗡️ adentro; su nombre sale en el cartel de arriba a la derecha al seleccionarla, como el de un token (js/10
@@ -228,8 +242,10 @@ async function bnLevantarArma(elId){
   const quien = ((S.meta && S.meta.nombre) || 'Alguien').trim();
   const cobrar = (n, que) => { S.nitros = num(S.nitros) - (n > num(S.nitros) ? FichaAcciones.gastoNitrosForzado(S, n, que) : n); };
   const seguir = async () => {
-    const x = await armaTomar(elId, t);
+    const x = await armaLeer(elId, t);
     if(!x) return;
+    // Lo de antes, por si otro se la lleva primero (se deshace todo).
+    const antes = FichaGuardado.partes(S), respaldo = structuredClone({inventario: S.inventario || [], efectos: S.efectos || [], cinturon: S.cinturon || [], nitros: S.nitros});
     cobrar(costo, 'levantó un arma');
     const des = (S.efectos || []).find(Combatiente.esDesarmado);
     if(des) S.efectos = S.efectos.filter(e => e !== des);
@@ -251,7 +267,14 @@ async function bnLevantarArma(elId){
       FichaEquipo.alCarcaj(S, x.it.id, {toast: () => {}, cambio: () => {}, modoCombate: () => false, avisarSinNitros: () => {}});
       alCarcaj = FichaEquipo.flechasDelCarcaj(S).reduce((a, f) => a + num(f.unidades || 1), 0) > antes;
     }
-    bnUi(FichaGuardado.partes(S)).cambio();
+    bnUi(antes).cambio();
+    await bnEsperarGuardado();
+    if(!(await armaQuitarDelPiso(elId))){   // se le adelantaron: vuelve todo como estaba
+      Object.assign(S, structuredClone(respaldo));
+      bnUi(FichaGuardado.partes(S)).cambio();
+      toast(`Se te adelantaron: ${x.it.nombre} ya no está en el piso`);
+      return;
+    }
     mesaLinea(`${x.it.flecha ? '🏹' : '🗡️'} ${quien} levantó ${x.it.nombre}${r.destino === 'mano' ? ' y lo tiene en la mano' : alCarcaj ? ' (al carcaj)' : ' (a la mochila)'}${r.soltar.length ? ` · guardó ${r.soltar.map(i => i.nombre).join(' y ')} (+${fmt(costo)} No2)` : ''}`);
   };
   if(num(S.nitros) < costo) bnSinNitros(costo, 'levantar el arma', () => seguir()); else seguir();
@@ -262,28 +285,42 @@ async function bnInvLevantarArma(invId, elId){
   if(!inv) return;
   if(num(inv.nitros) < Combatiente.COSTO_LEVANTAR_ARMA){ toast(`${inv.nombre}: no le alcanzan los No2 — levantar el arma cuesta 1`); return; }
   const t = tokenDePj(bn.fichaId + SEP_INVOCACION + invId);
-  const x = await armaTomar(elId, t);
+  const x = await armaLeer(elId, t);
   if(!x) return;
-  const ui = bnUi(FichaGuardado.partes(bn.S));
+  const antes = FichaGuardado.partes(bn.S), respaldo = structuredClone({nitros: inv.nitros, estados: inv.estados || [], equipo: inv.equipo || []});
   inv.nitros = num(inv.nitros) - Combatiente.COSTO_LEVANTAR_ARMA;
   const des = (inv.estados || []).find(Combatiente.esDesarmado);
   if(des) inv.estados = inv.estados.filter(e => e !== des);
   if(!x.propia) inv.equipo = [...(inv.equipo || []), x.it];   // la suya ya la tenía (sus datos); la de otro, al equipo
-  ui.cambio();
+  bnUi(antes).cambio();
+  await bnEsperarGuardado();
+  if(!(await armaQuitarDelPiso(elId))){   // se le adelantaron: vuelve todo como estaba
+    Object.assign(inv, structuredClone(respaldo));
+    bnUi(FichaGuardado.partes(bn.S)).cambio();
+    toast(`Se te adelantaron: ${x.it.nombre} ya no está en el piso`);
+    return;
+  }
   mesaLinea(`🗡️ ${inv.nombre} levantó ${x.it.nombre}`);
 }
 async function acLevantarArma(elId){
   const sc0 = typeof acCreep === 'function' ? acCreep() : null;
   if(!sc0) return;
   if(num(sc0.nitros) < Combatiente.COSTO_LEVANTAR_ARMA){ toast(`${sc0.nombre}: no le alcanzan los No2 — levantar el arma cuesta 1`); return; }
-  const x = await armaTomar(elId, tokenDeCreep(ac.creepId));
+  const x = await armaLeer(elId, tokenDeCreep(ac.creepId));
   if(!x) return;
+  let respaldo = null;
   await acCambiar(c => {
+    respaldo = structuredClone({nitros: c.nitros, estados: c.estados || [], equipo: c.equipo || []});
     c.nitros = num(c.nitros) - Combatiente.COSTO_LEVANTAR_ARMA;
     const des = (c.estados || []).find(Combatiente.esDesarmado);
     if(des) c.estados = c.estados.filter(e => e !== des);
     if(!x.propia) c.equipo = [...(c.equipo || []), x.it];
     return {aviso: ''};
   });
+  if(!(await armaQuitarDelPiso(elId))){   // se le adelantaron: vuelve todo como estaba
+    if(respaldo) await acCambiar(c => { Object.assign(c, structuredClone(respaldo)); return {aviso: ''}; });
+    toast(`Se te adelantaron: ${x.it.nombre} ya no está en el piso`);
+    return;
+  }
   mesaLinea(`🗡️ ${sc0.nombre} levantó ${x.it.nombre}`);
 }

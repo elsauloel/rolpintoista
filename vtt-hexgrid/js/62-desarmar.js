@@ -7,7 +7,7 @@
    El botón instantáneo 🤺 (Flotantes.desarmar) aparece solo en un duelo en el paso del Bloqueo con alguien que la tenga lista y que maneje esta
    pantalla: un creep (el GM; su SP o su cooldown, el doble en turno ajeno) o un personaje con la skill del Warrior (`resumen.desarmar`, su dueño o
    quien tiene 🎮 el control; 3 SP, 6 en turno ajeno, con ConfirmarTurno.flash). Al costado del duelo abierto, o arriba si está minimizado. */
-const DESARME_CASILLAS = 2, DESARME_RULETA_MS = 2600, DESARME_QUIETO_MS = 1100;
+const DESARME_CASILLAS = 2, DESARME_RULETA_MS = 4300, DESARME_QUIETO_MS = 1300, DESARME_VUELTAS = 3;   // (2026-10-22: más larga, frena de a poco)
 let desarmeDuelos = new Map(), desarmeEscucha = null;
 // Los duelos abiertos (solo el GM: maneja a los creeps).
 function desarmeEscuchar(){
@@ -140,13 +140,19 @@ function desarmeRuleta(id, datos){
   ruletaVistas.add(id);
   // El cuadro del duelo («¡DESARMADO!») tapa el mapa: se minimiza para que se vea la ruleta (probado en el mapa, 2026-10-21).
   try{ if(typeof Duelo !== 'undefined' && Duelo.minimizar) Duelo.minimizar(); }catch(e){}
-  const celdas = datos.celdas.map(x => Array.isArray(x) ? hexCentro(x[0], x[1]) : hexCentro(x.c, x.f)), n = celdas.length, fin = Math.max(0, Math.min(n - 1, num(datos.elegida)));
-  // El recorrido: dos vueltas y hasta la elegida; cada paso un poco más lento.
-  const pasos = n * 2 + fin + 1, tiempos = [];
-  let acc = 0;
-  for(let i = 0; i < pasos; i++){ tiempos.push(acc); const f = i / Math.max(1, pasos - 1); acc += 35 + 300 * f * f; }
-  const escala = DESARME_RULETA_MS / acc;
-  efectosRuleta.push({celdas, fin, pasos, tiempos: tiempos.map(x => x * escala), desde: Date.now()});
+  const crudas = datos.celdas.map(x => Array.isArray(x) ? hexCentro(x[0], x[1]) : hexCentro(x.c, x.f)), n = crudas.length;
+  const elegida = Math.max(0, Math.min(n - 1, num(datos.elegida)));
+  // Una ruleta de verdad (dueño, 2026-10-22: «que el brillo gire en círculos alrededor del personaje»): las casillas en orden, por el ángulo
+  // alrededor del centro del anillo (el personaje), en el sentido de las agujas del reloj. Antes iban en el orden de la grilla y saltaban.
+  const cx = crudas.reduce((a, p) => a + p.x, 0) / n, cy = crudas.reduce((a, p) => a + p.y, 0) / n;
+  const orden = crudas.map((p, i) => i).sort((a, b) => Math.atan2(crudas[a].y - cy, crudas[a].x - cx) - Math.atan2(crudas[b].y - cy, crudas[b].x - cx));
+  const celdas = orden.map(i => crudas[i]), fin = orden.indexOf(elegida);
+  // El recorrido: tres vueltas y hasta la elegida, frenando parejo como una rueda que pierde velocidad (2026-10-22, dueño: «la desaceleración
+  // un poquito más paulatina»): la posición sigue una curva de frenado constante (cuadrática), así cada paso dura un poco más que el anterior
+  // desde el principio, en vez de ir rápido casi todo el tiempo y frenar de golpe al final.
+  const pasos = n * DESARME_VUELTAS + fin + 1, tiempos = [];
+  for(let i = 0; i < pasos; i++) tiempos.push(DESARME_RULETA_MS * (1 - Math.sqrt(1 - i / pasos)));
+  efectosRuleta.push({celdas, fin, pasos, tiempos, desde: Date.now()});
   pedirDibujo();
 }
 function dibujarEfectosRuleta(){

@@ -18,7 +18,7 @@
 >   minimizados, abajo al centro) quedan encima de «Ver el duelo» / «No me quiero mover» del cartel. Mirarlo juntos en la compu con una ventana baja y
 >   decidir: subir el cartel, correr los botones o esconderlos mientras hay un cartel abajo. La captura está en el reporte del 21/10
 >   (https://claude.ai/artifact/J7X3HNdHz7qNU6zyZ4mYiz).
-> - [ ] **🎁 Pedir la lista de qué porcentaje de drop tiene cada tipo de creep** (2026-10-20, dueño, dictado al pasar: «pedir la lista de qué
+> - [x] (2026-10-22, se la armó Claude en la conversación) **🎁 Pedir la lista de qué porcentaje de drop tiene cada tipo de creep** (2026-10-20, dueño, dictado al pasar: «pedir la lista de qué
 >   porcentaje de drop tiene cada tipo de creep»). Armársela en la compu: la chance del consumible al azar por tipo de criatura (hoy humano 60 %,
 >   humanoide 45 %, el resto 0; un jefe: el primero seguro y el segundo con la chance de su tipo), la calidad por nivel y qué sueltan seguro (su
 >   flecha o virote, los drops fijos, el equipo que no es natural). Sale de `comun/combate-fin.js` (`DROP_CHANCE`, `DROP_TABLA`).

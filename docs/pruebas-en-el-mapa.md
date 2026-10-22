@@ -25,6 +25,11 @@
   ficha. Y «cae» sobre el creep (salió 10 con 1+ cae → «💀 Creep cae» → la vida a 0, `muerto`). La tabla se ve y se edita en el editor de la Ejecución.
   **Falta probar**: «cae» sobre un personaje (`fijarHp(S, 0)` + `revisarMuerte`), los botones del GM en la Crónica («✔ Que se aplique (por él)» y
   «◎ Aplicar por él») y una zona de creep con tabla (abre directo el «Te aplican»). Todo restaurado.
+- [x] **🎁 El botín por grupos y en pilas** (dueño, 2026-10-22; `comun/ficha-botin.js`): Mano (armas, escudos, varitas, orbes) / Cuerpo / Consumibles /
+  Trofeos; los iguales en una pila «×N» con la cantidad a reclamar. **Probado en «Test con claude elsaulo» (2026-10-22, Claude)**: 4 goblins de prueba
+  derrotados con equipo repetido (4 chalecos, 2 lanzas, 2 pociones, varita, escudo, honda, hacha, casco, capucha, botas, bomba, bengala) → Finalizar
+  combate → Publicar → el botín de Silvia (con el control) mostró los grupos y las pilas; reclamar 2 chalecos → «2 libres · 2 tuyos», «↩ Soltar 1» y
+  el aviso «2 × Chaleco de cuero son tuyos». Todo borrado y el combate anterior repuesto. Falta probar: Disputar sobre una pila y Soltar de a uno.
 - [ ] **⭕ El lápiz cierra la figura al terminarla** (reportado por el dueño el 2026-10-22, arreglado en js/07 `guardarTrazo`): con «⭕ Cerrar la
   figura» tildado, en rectas (clic, clic, clic y doble clic o Enter) y a mano alzada (al soltar), el trazo nace con las puntas unidas, sin pasar
   por el ⚙. Y con 🧱 además, lo de adentro queda sólido y sin grilla.

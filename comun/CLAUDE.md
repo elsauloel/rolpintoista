@@ -1000,6 +1000,11 @@ versión parecida en más de una, es candidato a juntar.
   y **↩ Soltar** (`soltar`). Al cerrar el botín, `CombateFin.despojar` manda lo reclamado en la recompensa de cada personaje (`items`) y
   `Recibidos.recompensa` lo suma a la mochila (`itemsDelBotin`: los trofeos iguales se apilan; si no entra, se suma igual). Una disputa abierta
   se corta y el ítem queda para quien lo reclamó.
+- **`ficha-botin.js`, por grupos y en pilas** (2026-10-22, dueño: «mano, cuerpo y consumibles… lo repetido enlistado, chaleco de cuero ×N, y reclamar uno,
+  dos, tres»): `GRUPOS` (mano = armas, escudos, varitas y orbes; cuerpo = lo demás que se equipa; consumibles; trofeos), `grupoDe(item)`, `pilas(lista, yo,
+  miUid)` (los iguales juntos: mismo tipo, nombre, calidad, números y efectos; con libres / mías / de otros / en disputa), `tomarVarios(S, lista, ui)` y
+  `idsDeBoton(btn, raiz)` (el botón «Reclamar» lleva los documentos libres de la pila en `data-botin-tomar` y la cantidad sale del `[data-botin-cant]`).
+  Cada ítem sigue siendo su documento del botín. Los dos manejadores (mapa js/11 y ficha js/08) usan `idsDeBoton` + `tomarVarios`.
 - **`ficha-botin.js`** (`FichaBotin`, 2026-10-02, hoja de ruta A5) — **el botín del combate visto por un jugador**: `loot(snap)` (lo que
   nadie tomó), `textoItem`, `html(S, {combate, loot, puede, fichaId})` (la ventana «Batalla terminada») y `tomar(S, entrada, ui)` («Sumar a
   la mochila», con su transacción y la línea en la Mesa). Lo usan la ficha y el mapa (`abrirBotinMapa`).

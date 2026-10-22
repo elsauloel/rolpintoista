@@ -783,6 +783,22 @@ prueba('Acelerado (Shooter, 2026-10-12): 2 SP +1 por uso seguido; −1 No2 por s
   igual([hab.costo, hab.nitrosCosto, /Sin auditar/.test(hab.detalle), /Acelerado \[1\]/.test(hab.original), base, sp0, dos, trasEspada, trasArco, fin.terminados.map(e => e.nombre), S.efectos.length],
     ['2', 0, false, true, [4, 4], 2, [2, 4, 4, 1, 2], 1, 0, ['Acelerado'], 0]);
 });
+prueba('Empower (Support, rehecho 2026-10-22): +3 a la próxima tirada (+6 con dos), esa tirada lo gasta; Fuerza del golpe también', () => {
+  const presets = estadosPresetFicha();
+  const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
+  const pdg0 = num(FichaCalculo.calcular(S).final.pdg);
+  const tiradas = [], ui = {toast(){}, cambio(){}, preguntarSobrepeso(){}, registrarTirada: (n, r) => tiradas.push({n, r})};
+  Combatiente.agregarEstado(S.efectos, FichaAcciones.estadoDeSpec({nombre: 'Empower'}, presets));
+  Combatiente.agregarEstado(S.efectos, FichaAcciones.estadoDeSpec({nombre: 'Empower'}, presets));
+  const dos = [S.efectos.length, S.efectos[0].stacks, num(FichaCalculo.calcular(S).final.pdg) - pdg0, Combatiente.unaTiradaDe(S.efectos).n];
+  FichaAcciones.tirarValorStat(S, 'PdG', num(FichaCalculo.calcular(S).final.pdg), 'pdg', undefined, undefined, undefined, ui);
+  const tras = [S.efectos.length, tiradas[0].r.estados.some(e => e.n === 'Empower'), num(FichaCalculo.calcular(S).final.pdg) - pdg0];
+  Combatiente.agregarEstado(S.efectos, FichaAcciones.estadoDeSpec({nombre: 'Empower'}, presets));
+  FichaAcciones.tirarValorStat(S, 'Fuerza del golpe', 5, 'fue', undefined, undefined, undefined, ui);
+  const fue = [tiradas[1].r.mod - formulaParaValor(5).mod, S.efectos.length, tiradas[1].r.estados.some(e => e.n === 'Empower')];
+  FichaAcciones.tirarValorStat(S, 'Fuerza del golpe', 5, 'fue', undefined, undefined, undefined, ui);
+  igual([dos, tras, fue, tiradas[2].r.mod - formulaParaValor(5).mod], [[1, 2, 6, 6], [0, true, 0], [3, 0, true], 0]);
+});
 prueba('Enyetar (Debuffer, 2026-10-12): 5 SP (10 en turno ajeno), sin No2, PdG.Esp contra Res.Esp de un enemigo; botón fijo; una vez por tirada', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'debuffer').habilidades.find(h => h.id === 'debuffer-enyetar');
   const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: () => 5, etq: s => s, X: 0});

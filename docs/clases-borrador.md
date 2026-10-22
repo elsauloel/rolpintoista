@@ -329,13 +329,13 @@ verifica con 1d20: hasta DES×2 → 7+; hasta DES×3 → 17+; más de DES×3 →
 
 ## Support ⏳
 
-1. ✅ **Empower** — **SP:** 2 (⚡ Flash: el doble, 4, en turno ajeno). **No2:** 0. **Después de ver la tirada**, a vos o a un aliado a la vista
-   (dentro de tu Rango): **+3 a su última tirada**. En un duelo, el duelo se vuelve a resolver con el número nuevo (como la Polilla: si queda
-   empatado, pierde quien lo recibió). **Sin límite** (se puede apilar), pero **cada Empower más sobre la misma tirada cuesta 1 SP más** que el
-   anterior (3, 4…; en turno ajeno 5, 6…). En combate, quien la tiene ve un **botón fijo 💪** (arriba, como la Polilla y la Moneda; el brazo hace
-   fuerza) para usarla en cualquier momento. ⚙ Automatizado en el duelo; ✋ a mano, lo que cambie una tirada fuera
-   de un duelo (queda anunciada en la Mesa). *(Auditada 2026-10-12 con el dueño; original: «Empower [2] — NO2: (0). +3 a cualquier tirada
-   propia o de un aliado.»)*
+1. ✅ **Empower** — **SP:** 2 (⚡ Flash: el doble, 4, en turno ajeno). **No2:** 0. **Antes de la tirada** (dueño, 2026-10-22: «se aprieta y la
+   siguiente tirada le suma el valor del empower… es sólo para la siguiente tirada después de activarlo»; antes se usaba después de ver la
+   tirada): a vos o a un aliado a la vista (dentro de tu Rango), **+3 a su próxima tirada**, la que sea; esa tirada lo gasta (estado
+   **Empower**). **Sin límite**: otro Empower antes de que tire suma +3 más (un stack) y **cada uno de más cuesta 1 SP más** (3, 4…; en turno
+   ajeno 5, 6…). En combate, quien la tiene ve un **botón fijo 💪** (arriba, como la Polilla y la Moneda; el brazo hace fuerza) para usarla en
+   cualquier momento. ⚙ Automatizado; ✋ a mano, una tirada que no sale de un stat (un dado fijo de una habilidad). *(Auditada 2026-10-12 con el
+   dueño, rehecha el 2026-10-22; original: «Empower [2] — NO2: (0). +3 a cualquier tirada propia o de un aliado.»)*
 2. ✅ **Blessing** — **SP:** 5. **No2:** 1. **A vos o a un aliado a la vista** (dentro de tu Rango): queda **Bendecido** (estado nuevo, el espejo de
    Debilitado) 2 turnos, **+1 a todas sus tiradas**, también defensas y daño. **No se acumula:** otra vez renueva los 2 turnos. ⚙ Automatizado; ✋ a
    mano, la tirada de un atributo pelado. *(Auditada 2026-10-11 con el dueño; original: «Blessing [5] — +1 fijo en todas las tiradas por 2 turnos.»)*

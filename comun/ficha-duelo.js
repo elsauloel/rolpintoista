@@ -216,6 +216,7 @@ const FichaDuelo = (() => {
         // Sin arma: el daño sin arma (provisorio, P150) — antes avisaba y el duelo quedaba esperando.
         const formula = formulaDano(d, arma);
         const r = tirarDados(formula);
+        if(r) FichaAcciones.gastarUnaTirada(S, r, ui, true);   // 💪 Empower: el +3 ya venía en el Daño; esta tirada lo gasta
         if(r) ui.registrarTirada(`Daño · ${arma ? arma.nombre : 'sin arma'}`, r);
       },
       // Moneda Re-Roll o 🃏 wildcard: ¿tengo? / usarla para reabrir una tirada del duelo (`con`: 'moneda' | 'wildcard').

@@ -99,6 +99,8 @@ async function mesaPublicar(origen, r){
   for(const d of intentos){
     try{
       const ref = await fbDb.collection(fbRutaCampana('tiradas')).add({...d, cuando: firebase.firestore.FieldValue.serverTimestamp()});
+      // 💪 Lo que se gasta con una tirada (Empower, 2026-10-22): la pantalla que lo sepa hacer (el mapa, js/37) mira los estados que la afectaron.
+      if(typeof window !== 'undefined' && typeof window.mesaTrasPublicar === 'function'){ try{ window.mesaTrasPublicar({...doc, estados, ficha}, r); }catch(e){ console.error(e); } }
       return ref.id;
     }catch(e){
       err = e;

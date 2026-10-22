@@ -441,6 +441,10 @@ const FichaAcciones = (() => {
       }
     }
     if(sobrepeso === 'penal') extra = num(extra) - num(sobre);
+    // 💪 Empower (2026-10-22): la próxima tirada lleva su +3. Los stats de sus mods ya lo traen en `valor`; los demás (Fuerza del golpe, un
+    // atributo pelado) lo suman acá. Esta tirada lo gasta (abajo, gastarUnaTirada).
+    const emp = Combatiente.unaTiradaDe(S.efectos);
+    if(emp && !emp.cubre.has(statId)) extra = num(extra) + emp.n;
     // La tirada en sí (Afortunado, mitades, Evasión mínimo 1) es la del motor común: comun/combatiente.js.
     // 🔮 La Estatuilla del Gauchito Gil: una sola tirada por RONDA (dueño, 2026-10-18: «una vez por ronda, independientemente de a qué tirada
     // afecte»), la primera de PdG, PdG.Esp, Evasión o Parry, como Afortunado (Combatiente.conGauchito). En el mapa la ronda la dice
@@ -457,9 +461,19 @@ const FichaAcciones = (() => {
     }
     // 🍀 El Anillo del trébol: el estado se gasta con la tirada que hizo Afortunado.
     if(r && (S.efectos || []).some(e => e && e.trebol && e.activo !== false)){ S.efectos = S.efectos.filter(e => !(e && e.trebol)); ui.cambio(['efectos', 'refresh']); }
+    if(r && emp) gastarUnaTirada(S, r, ui, !emp.cubre.has(statId));
     if(sobrepeso === 'penal') r.estados.push({n: 'Sobrepeso', p: 'debuff'});
     else if(sobrepeso === 'pagado') r.estados.push({n: 'Sobrepeso (pagó 1 No2)', p: 'otro'});
     ui.registrarTirada(nombre, r);
+  }
+  // 💪 Lo que dura una sola tirada (Empower, `unaTirada`): esa tirada lo gasta. `marcar`: la Mesa lo pinta entre los estados de la tirada (si el
+  // stat no estaba en sus mods, estadosQueAfectan no lo vio).
+  function gastarUnaTirada(S, r, ui, marcar){
+    const emp = Combatiente.unaTiradaDe(S.efectos);
+    if(!emp || !Combatiente.gastarUnaTirada(S.efectos)) return false;
+    if(r && marcar){ r.estados = r.estados || []; emp.nombres.forEach(nm => { if(!r.estados.some(e => e && e.n === nm)) r.estados.push({n: nm, p: 'buff'}); }); }
+    if(ui && ui.cambio) ui.cambio(['efectos', 'refresh']);
+    return true;
   }
   // El cartel de sobrepeso, "Pagar 1 No2": devuelve false si no alcanzan (y no cierra el cartel).
   function sobrepesoPagar(S, ui){
@@ -530,6 +544,7 @@ const FichaAcciones = (() => {
     const dmg = FichaCalculo.calcular(S).final.dmg;
     const r = tirarDados(FichaCombate.armaDanoTxt(it, dmg));
     if(!r) return;
+    gastarUnaTirada(S, r, ui, true);   // 💪 el +3 ya venía en el Daño
     ui.registrarTirada(it.nombre, r);
     ui.efectosAlPegar(it);
   }
@@ -537,7 +552,7 @@ const FichaAcciones = (() => {
     const armas = FichaCombate.armasEquipadasConDano(S);
     if(!armas.length){   // sin arma: el daño sin arma (provisorio, P150)
       const r = tirarDados(FichaCombate.danoSinArmaTxt(FichaCalculo.calcular(S).final.dmg));
-      if(r) ui.registrarTirada('Sin arma', r);
+      if(r){ gastarUnaTirada(S, r, ui, true); ui.registrarTirada('Sin arma', r); }
       return;
     }
     if(armas.length === 1){ tirarDanoDeArma(S, armas[0].item, ui); return; }
@@ -1378,7 +1393,7 @@ const FichaAcciones = (() => {
     habilidadTira, anunciarHabilidad, tirarPrimeraDeHab, tirarSegundaDeHab, registrarAtaqueDeHabilidad, limiteCostoX,
     ejecutarHabilidad, confirmarCostoVariable, armasEspeciales, costoEspecial, costoEspecialTxt, habDeArmaEspecial, usarArmaEspecial, ataqueEspecialMenu,
     atacarConArma, ataqueEspecialConArma, NOMBRE_ATAQUE_ESPECIAL,
-    tirarValorStat, sobrepesoPagar, parryConArma, bloqueoConArma, fuerzaGolpeValorConArma, fuerzaGolpeConArma, elegirArmaDefensa, armaElegida, tirarDanoDeArma, pedirArmaYTirar,
+    tirarValorStat, gastarUnaTirada, sobrepesoPagar, parryConArma, bloqueoConArma, fuerzaGolpeValorConArma, fuerzaGolpeConArma, elegirArmaDefensa, armaElegida, tirarDanoDeArma, pedirArmaYTirar,
     aplicarRevivirConAnkh, fijarHp, revisarAnkh, revisarMuerte,
     purgarSiAgotado, restaurarSpDeConsumo, repararArmadura, efectoDeConsumo, tiradasDeItem, consumir};
 })();

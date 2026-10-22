@@ -3,8 +3,7 @@
 > Pedido del dueño (2026-10-22): «vamos a encarar la tarea ardua de unificar el tema de las armas: que tanto para personajes como para creeps e
 > invocaciones (con manos), las armas sean un ítem que se agarra, se suelta, la agarra otro… al igual que escudos y talismanes». Antes (mismo día):
 > «todo lo que tenga manos debería poder usar lo mismo… con una especie de inventario: si levanta un arma, guarda la suya y después las cambia».
-> Cierra P217 y la tarea «🗡 Armas e inventario para creeps e invocaciones» de `pendientes.md`. **Plan sin programar: se arranca con el OK del dueño
-> a las decisiones de abajo.**
+> Cierra P217 y la tarea «🗡 Armas e inventario para creeps e invocaciones» de `pendientes.md`. **Decisiones aprobadas el 2026-10-22; en curso: paso 1.**
 
 ## Cómo está hoy (relevamiento del 2026-10-22)
 
@@ -49,7 +48,21 @@ pública del creep, que leen los jugadores), se calculan a partir del ítem en l
    «Guardado», con las mismas piezas del personaje.
 8. **Limpieza:** se borran los datos sueltos y los caminos viejos (incluidas las pruebas que los usan), cuando todo lo anterior ande en una sesión real.
 
-## Decisiones del dueño (antes de programar)
+## Decisiones del dueño ✅ (2026-10-22: «dale con las recomendaciones, me parece bien»)
+
+- **D1 ✅** Desarmado deja de ser un estado: es «no tiene nada en la mano».
+- **D2 ✅** Creeps e invocaciones llevan ítems guardados además de lo de la mano; sin límite por ahora (lo maneja el GM).
+- **D3 ✅** Cualquiera levanta cualquier arma del piso (se saca «solo su dueño»).
+- **D4 ✅** Sin nada en la mano, un creep o una invocación ataca como un personaje sin arma (la regla provisoria de P150).
+- **D5 ✅** Las invocaciones entran desde el principio; las que no tienen manos (bestias) quedan solo con lo natural.
+- **D6 ✅** Al morir, el creep suelta todo lo que lleva (en la mano y guardado), menos lo natural.
+- **D7 ✅ Armas invocadas** (dueño: «la mayoría van a ser bestias, pero puede haber invocaciones con manos, tipo esqueletos, zombies, que pueden
+  tener armas, que van a ser armas invocadas… si el creep se desinvoca, el arma desaparece; el arma de una invocación no aparece en el botín y se
+  puede seguir usando todo el combate»). El arma de una invocación lleva la marca de qué invocación la trajo: se usa (también si la levanta otro)
+  mientras exista su invocación y como mucho hasta el fin del combate; al desinvocarse desaparece de donde esté (en una mano, guardada o en el
+  piso); nunca va al botín. Va en el paso 4 (soltar/levantar) y el 6 (botín).
+
+## Las preguntas que hubo antes de programar
 
 - **D1.** ¿Desarmado deja de ser un estado y pasa a ser «no tiene nada en la mano»? (lo que dijo el 22/10; se confirma acá).
 - **D2.** ¿Los creeps y las invocaciones llevan ítems guardados (una «mochila» chica) además de lo que tienen en la mano? ¿Con límite?

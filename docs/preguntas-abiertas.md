@@ -1140,7 +1140,7 @@ bestia (un oso hormiguero) «puede parrear con sus garras y obligar a desarmar a
 **atacando** (cuando el personaje le hace Parry a ella). Pregunta: ¿se permite el Parry con armas naturales (para todos, o solo para bestias)?
 ¿Con qué peso para el Bloqueo?
 
-- 🔲 **P217. Desarmado deja de ser un estado, y el arma de un creep que levanta otro** (2026-10-22, dueño: «desarmado no debería ser un
+- ✅ (decidida 2026-10-22, «dale con las recomendaciones»: D1–D7 de `docs/plan-inventario-creeps.md`; Desarmado = no tener nada en la mano, sin arma se ataca como en P150, cualquiera levanta cualquier arma, creeps e invocaciones con ítems guardados; en construcción por pasos) **P217. Desarmado deja de ser un estado, y el arma de un creep que levanta otro** (2026-10-22, dueño: «desarmado no debería ser un
   estado: desarmado es no tener un arma equipada»). Contexto: a un **personaje** el arma ya le sale del inventario al caer, así que el estado
   sobra. A un **creep o una invocación** el arma no es un ítem (es parte de sus datos): hoy el estado Desarmado es la forma en que el mapa sabe
   que la perdió; se reemplazaría mirando si su arma está en el piso. Falta decidir: (a) **atacar sin nada en la mano**: hoy hay un provisorio

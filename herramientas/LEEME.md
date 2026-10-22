@@ -31,6 +31,15 @@ Ya no hace falta correr nada para que un cambio del catálogo llegue a las herra
 - **simular_peleas.py** (2026-10-10) — peleas completas 1 vs 1 y 2 vs 2 entre arquetipos con armas del catálogo real; escribe docs/balance-peleas.md.
 - **palancas_peleas.py** (2026-10-10) — prueba palancas de balance con esas peleas (sin cambiar reglas) y agrega la tabla al informe.
 - **rutas.py** — rutas del proyecto.
+- **simulador-encuentro.html** (2026-10-22, no es Python: una página) — simula un encuentro completo «en el aire» entre los personajes
+  reales de una partida y creeps de esa partida, con el motor de reglas de verdad (`comun/ficha-*.js`, `comun/creep-*.js`,
+  `comun/combatiente.js`, `comun/critico.js`): iniciativa, turnos, No2 y SP, duelos (PdG contra Evasión o Parry, Bloqueo, crítico,
+  Perfora), habilidades dirigidas, de área y de onda, zonas (los Pedos Tóxicos), estados, pociones. Se abre por `http://localhost:…`
+  (hace `fetch` de los datos) y se maneja desde la consola: `await Sim.cargar()`, `Sim.narrar(enc)` (una pelea contada paso a paso),
+  `Sim.lote({clave: enc…}, n)` (muchas, en segundo plano; `Sim.LOTE.resultados`), y para armar variantes `Sim.nivelar`, `Sim.ponerArma`,
+  `Sim.ponerEquipo`, `Sim.ponerHab`. Los datos de la partida van en `herramientas/sim-datos/*.json` (exportados a mano de Firebase; **no se
+  suben al repo**: `.gitignore`). Las posiciones son una línea (1-D), la IA es simple y varias mecánicas del mapa no se simulan (ver el
+  reporte `docs/reporte-encuentro-origen-2026-10-22.md`).
 
 ## Sobre los efectos escritos en Detalle
 

@@ -1932,6 +1932,7 @@ function bnTiendaDibujar(){
   r.querySelector('#bn-carrito-lista').innerHTML = cerrada ? `<div class="carrito-vacio">${FichaTienda.CERRADA_MSG}</div>` : c.html;
   r.querySelector('#bn-carrito-total').textContent = fmt(c.total);
   const comprar = r.querySelector('#bn-carrito-comprar');
+  comprar.style.display = r.querySelector('[data-bn-ti="vaciar"]').style.display = cerrada ? 'none' : '';
   comprar.disabled = !st.carrito.length || !c.puede;
   comprar.title = c.falta > 0 ? `Te faltan ${fmt(c.falta)} DDE` : '';
 }

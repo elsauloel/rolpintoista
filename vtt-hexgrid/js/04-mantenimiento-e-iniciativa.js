@@ -763,6 +763,16 @@ function renderIniciativa(){
   const actual = visibles.find(x => x.i === iniciativa.turno), tActual = actual && tokens.get(actual.o.id);
   const titulo = $('#iniciativa-titulo');
   if(titulo){ titulo.textContent = iniciativaPlegada && tActual ? `⚔ Turno: ${nombreDe(tActual)}` : '⚔ Orden de turnos'; titulo.title = titulo.textContent; }
+  // ✅ Terminar mi turno (dueño, 2026-10-22): en la cabecera, así se ve también con la lista achicada. Solo cuando le toca a un token mío.
+  const finBtn = $('#ini-fin-turno');
+  if(finBtn){
+    if(finTurnoPedido && finTurnoPedido.paso !== iniciativa.paso) finTurnoPedido = null;   // el turno ya pasó
+    const mio = finTurnoMio();
+    finBtn.hidden = !mio;
+    const esperando = !!(mio && finTurnoPedido && finTurnoPedido.tokenId === mio.id && Date.now() - finTurnoPedido.t < 20000);
+    finBtn.disabled = esperando;
+    finBtn.textContent = esperando ? '⏳ Terminando…' : '✅ Terminar mi turno';
+  }
   if(!visibles.length){
     lista.innerHTML = `<div id="iniciativa-vacio">${soyGM ? 'Sin orden todavía: tocá "Traer tokens" y cargá las tiradas.' : 'El GM todavía no armó el orden.'}</div>`;
   }else{
@@ -816,8 +826,47 @@ function renderIniciativa(){
   iniciativaEncuadrar();
 }
 
+/* ✅ Terminar mi turno (dueño, 2026-10-22: «que los jugadores puedan terminar su turno… un botón en el menú de iniciativa, visible aun si la
+   tabla está minimizada»). Las reglas de Firestore no dejan que un jugador cambie `turno` (iniciativaPropia): el jugador publica un momento
+   `turno-fin` {tokenId, paso} y la pantalla del GM, al recibirlo, lo toma (una transacción: una sola pantalla del GM) y, si sigue siendo el
+   turno de ese token, hace ▶ Siguiente por él (iniciativaSiguiente: lo mismo que el botón del GM). La Crónica lo cuenta a todos:
+   «Fulano terminó su turno» → «El GM pasó el turno». Si no hay ninguna pantalla del GM abierta, a los 20 s el botón se vuelve a habilitar. */
+let finTurnoPedido = null;   // {tokenId, paso, t}
+function finTurnoMio(){
+  if(soyGM || !fbMiembro || !iniciativa.orden.length) return null;
+  const id = iniciativa.libre ? iniciativa.libre.id : (iniciativa.orden[iniciativa.turno] || {}).id;
+  const t = id && tokens.get(id);
+  return t && t.tipo !== 'creep' && puedoMover(t) ? {id, t} : null;
+}
+async function finTurnoPedir(){
+  const m = finTurnoMio();
+  if(!m || typeof momentoAbrir !== 'function') return;
+  finTurnoPedido = {tokenId: m.id, paso: iniciativa.paso, t: Date.now()};
+  renderIniciativa();
+  setTimeout(renderIniciativa, 20500);
+  const id = await momentoAbrir({tipo: 'turno-fin', icono: '⏭', titulo: `${nombreDe(m.t)} terminó su turno`, estado: 'esperandoGM',
+    datos: {tokenId: m.id, paso: Math.max(0, Math.round(num(iniciativa.paso))), nombre: nombreDe(m.t), centro: true}});
+  if(!id){ finTurnoPedido = null; renderIniciativa(); toast('No se pudo avisar al GM'); return; }
+  toast('Terminaste tu turno: la pantalla del GM pasa al siguiente');
+}
+const finTurnoHechos = new Set();
+async function finTurnoDelJugador(id, d){   // la pantalla del GM (js/16 momentoRecibido)
+  if(!soyGM || finTurnoHechos.has(id)) return;
+  finTurnoHechos.add(id);
+  const dt = d.datos || {}, ref = coleccionMomentos().doc(id);
+  let tomado = false;
+  try{ await fbDb.runTransaction(async tx => { const s = await tx.get(ref); if(!s.exists || s.data().estado !== 'esperandoGM') return; tx.update(ref, {estado: 'pasando'}); tomado = true; }); }
+  catch(err){ console.error('No se pudo tomar el fin de turno:', err); return; }
+  if(!tomado) return;   // otra pantalla del GM ya lo pasó
+  const esperado = iniciativa.libre ? iniciativa.libre.id : (iniciativa.orden[iniciativa.turno] || {}).id;
+  if(esperado !== dt.tokenId || num(dt.paso) !== num(iniciativa.paso)){ momentoActualizar(id, {estado: 'listo', resultado: 'Su turno ya había pasado.'}); return; }
+  try{ await iniciativaSiguiente(); momentoActualizar(id, {estado: 'listo', resultado: 'El GM pasó el turno.'}); }
+  catch(err){ console.error(err); momentoActualizar(id, {estado: 'listo', resultado: 'No se pudo pasar el turno: el GM lo pasa a mano.'}); }
+}
 function conectarIniciativa(){
   const caja = $('#iniciativa');
+  const fin = $('#ini-fin-turno');
+  if(fin) fin.onclick = e => { e.stopPropagation(); finTurnoPedir(); };
   caja.querySelectorAll('[data-ini-fila]').forEach(f => f.onclick = e => {
     if(e.target.closest('input,button')) return;
     // Se selecciona el token igual que si se hubiera hecho clic sobre él (se despliega su menú alrededor), se centra la vista y
@@ -889,7 +938,7 @@ window.addEventListener('resize', iniciativaEncuadrar);
   const caja = $('#iniciativa'), cab = $('#iniciativa-cab'), marco = $('#lienzo-caja');
   let arrastre = null, recienMovida = false;
   cab.addEventListener('pointerdown', e => {
-    if(e.button !== 0 || e.target.closest('input')) return;
+    if(e.button !== 0 || e.target.closest('input, #ini-fin-turno')) return;
     const r = caja.getBoundingClientRect(), m = marco.getBoundingClientRect();
     arrastre = {px: e.clientX, py: e.clientY, x: r.left - m.left, y: r.top - m.top, movio: false};
     cab.setPointerCapture(e.pointerId);
@@ -918,7 +967,7 @@ window.addEventListener('resize', iniciativaEncuadrar);
   // Clic (sin arrastrar): achica o agranda.
   cab.onclick = e => {
     if(recienMovida){ recienMovida = false; return; }
-    if(e.target.closest('input')) return;
+    if(e.target.closest('input, #ini-fin-turno')) return;
     iniciativaPlegada = !iniciativaPlegada;
     try{ localStorage.setItem('mapa-iniciativa-plegada', iniciativaPlegada ? '1' : ''); }catch(e2){}
     renderIniciativa();

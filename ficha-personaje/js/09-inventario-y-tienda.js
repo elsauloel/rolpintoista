@@ -143,6 +143,7 @@ function renderCabeceraTienda(){
   const nuevo = $('#btn-catalogo-nuevo');
   const verCompleto = $('#catalogo-ver-completo');
   if($('#tienda-vender')) $('#tienda-vender').style.display = 'none';
+  ['#carrito-vaciar', '#carrito-comprar'].forEach(s => { if($(s)) $(s).style.display = ''; });   // (con la tienda cerrada se esconden, abajo)
   if($('#tienda-baul')) $('#tienda-baul').style.display = 'none';
   if($('#tienda-reparar')) $('#tienda-reparar').style.display = 'none';
   // El título dice dónde estás (2026-10-08, dueño: «que el título de la tienda se vea más claro»): el nombre de la tienda, o el catálogo.
@@ -152,7 +153,7 @@ function renderCabeceraTienda(){
     badge.textContent = FichaTienda.badge(tiendaSt);
     badge.style.cssText = cerrada ? 'color:#F0B860;border-color:#F0B860;font-weight:700' : '';
     if($('#tienda-vender')) $('#tienda-vender').style.display = cerrada ? 'none' : '';
-    if($('#catalogo-item-aleatorio')) $('#catalogo-item-aleatorio').style.display = cerrada ? 'none' : '';
+    ['#catalogo-item-aleatorio', '#carrito-vaciar', '#carrito-comprar'].forEach(s => { if($(s)) $(s).style.display = cerrada ? 'none' : ''; });
     if($('#tienda-baul')){ $('#tienda-baul').style.display = ''; Intercambio.pintarBotonBaul($('#tienda-baul')); }   // 📦 el baúl común se abre desde una tienda (P157); en combate, apagado
     if($('#tienda-reparar')) $('#tienda-reparar').style.display = tiendaCargada.herrero && !cerrada ? '' : 'none';   // solo las tiendas con herrero reparan
     badge.style.display = '';

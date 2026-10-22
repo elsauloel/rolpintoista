@@ -14,6 +14,8 @@
      queda a su nombre (en la misma transacción). Lo anuncia en la Mesa y en la Crónica del mapa.
    - rendirse(id): gana el otro. mostrar(id): vuelve a abrir la ventana de un juego. juega(id): ¿este usuario juega en ese?
    - iniciar(): escucha los juegos de este usuario y muestra la ventana (no dentro de un marco del mapa: ahí la muestra el mapa).
+   - Espectadores (dueño, 2026-10-22): a los demás les sale abajo un botón «👀 Fulano y Mengano están jugando piedra, papel o tijera · Ver»;
+     con Ver se abre la misma ventana, mirando: las dos manos cerradas («eligiendo…» / «ya eligió»), la revelación de cada ronda y el final.
    Relajado (anotado en «Antes de abrirlo al público»): las dos jugadas viajan en el documento; la pantalla no muestra la del otro hasta que
    eligieron los dos.
    Necesita las globals de sesion.js (Firebase). Usa toast() y momentoAbrir() (la Crónica del mapa) si la página las tiene.
@@ -171,6 +173,9 @@ const PPT = (() => {
 
   /* ---------- La ventana del juego ---------- */
   const juegos = new Map();   // id -> doc (solo los de este usuario)
+  const ajenos = new Map();   // id -> doc: los juegos de otros (para mirar)
+  let escuchaAjenos = null, primeraAjenos = true, mirando = null;   // mirando = el id del juego ajeno abierto
+  const docDe = id => juegos.get(id) || ajenos.get(id);
   const ocultos = new Set();  // los que se minimizaron
   const vistos = new Set();   // `${id}:${ronda}` de los resultados ya revelados acá
   const finales = [];         // los que terminaron mientras esta pantalla estaba abierta (se muestran hasta «Cerrar»)
@@ -205,6 +210,32 @@ const PPT = (() => {
       setTimeout(iniciar, 30000);
     });
     if(typeof fbMiembro !== 'undefined' && fbMiembro && fbMiembro.gm) barrerViejos();
+    escucharAjenos();
+  }
+  // Los juegos de los demás (solo los que están en curso): el botón de abajo y, si se está mirando uno, su ventana.
+  function escucharAjenos(){
+    if(escuchaAjenos) return;
+    escuchaAjenos = col().where('estado', '==', 'jugando').onSnapshot(snap => {
+      snap.docChanges().forEach(ch => {
+        const id = ch.doc.id, d = ch.doc.data();
+        if((d.uids || []).includes(yo())) return;   // los míos los sigue la otra escucha
+        if(ch.type === 'removed'){   // terminó (o lo borraron): si lo estaba mirando, se trae el final para mostrarlo
+          if(mirando === id) ch.doc.ref.get().then(s => {
+            if(s.exists){ ajenos.set(id, s.data()); if(!finales.includes(id)) finales.push(id); }
+            else{ ajenos.delete(id); mirando = null; }
+            dibujar();
+          }).catch(() => { ajenos.delete(id); mirando = null; dibujar(); });
+          else ajenos.delete(id);
+          return;
+        }
+        ajenos.set(id, d);
+        const u = d.ultima, clave = u ? `${id}:${u.ronda}` : '';
+        if(primeraAjenos){ if(clave) vistos.add(clave); return; }
+        if(clave && !vistos.has(clave)){ vistos.add(clave); if(mirando === id) revelar(id, u); }
+      });
+      primeraAjenos = false;
+      dibujar();
+    }, err => { console.error('Error escuchando los juegos ajenos de piedra, papel o tijera (se reintenta en 30 s):', err); escuchaAjenos = null; primeraAjenos = true; setTimeout(escucharAjenos, 30000); });
   }
   // El GM borra los de más de un día al entrar.
   async function barrerViejos(){
@@ -228,23 +259,34 @@ const PPT = (() => {
 
   // Qué juego se ve: el que se está revelando, uno que terminó (hasta cerrarlo) o el más nuevo en juego que no se ocultó.
   function actual(){
-    if(revela && juegos.has(revela.id)) return {id: revela.id, modo: 'revela'};
-    const f = finales.find(id => juegos.has(id) && !ocultos.has(id));
+    if(revela && docDe(revela.id)) return {id: revela.id, modo: 'revela'};
+    const f = finales.find(id => docDe(id) && !ocultos.has(id));
     if(f) return {id: f, modo: 'fin'};
     const enJuego = [...juegos.entries()].filter(([id, d]) => d.estado === 'jugando' && !ocultos.has(id))
       .sort((p, q) => ((q[1].creado && q[1].creado.toMillis ? q[1].creado.toMillis() : Date.now()) - (p[1].creado && p[1].creado.toMillis ? p[1].creado.toMillis() : Date.now())));
-    return enJuego.length ? {id: enJuego[0][0], modo: 'jugar'} : null;
+    if(enJuego.length) return {id: enJuego[0][0], modo: 'jugar'};
+    if(mirando && ajenos.has(mirando) && ajenos.get(mirando).estado === 'jugando') return {id: mirando, modo: 'mirar'};   // 👀 el juego ajeno que se está mirando
+    return null;
   }
 
-  function caraHtml(nombre, jugada, agita, gana){
+  function caraHtml(nombre, jugada, agita, gana, nota){
     const j = JUGADAS[jugada];
     return `<div class="ppt-cara${gana ? ' gana' : ''}"><div class="ppt-mano${agita ? ' agita' : ' pop'}">${agita || !j ? '✊' : j.icono}</div>
-      <div class="ppt-quien">${esc(nombre)}</div><div class="ppt-nota">${agita || !j ? '…' : j.nombre}</div></div>`;
+      <div class="ppt-quien">${esc(nombre)}</div><div class="ppt-nota">${agita || !j ? (nota || '…') : j.nombre}</div></div>`;
   }
-  function cabHtml(d){
+  function cabHtml(d, mirandoAjeno){
     const para = motivoTxt(d);
-    return `<div class="ppt-cab"><b>✊ Piedra, papel o tijera</b><button type="button" class="ppt-x" data-ppt="ocultar" title="Ocultar (sigue abajo)">—</button></div>
+    return `<div class="ppt-cab"><b>✊ Piedra, papel o tijera${mirandoAjeno ? ' <span class="ppt-nota">· estás mirando</span>' : ''}</b><button type="button" class="ppt-x" data-ppt="ocultar" title="${mirandoAjeno ? 'Dejar de mirar (el botón sigue abajo)' : 'Ocultar (sigue abajo)'}">—</button></div>
       ${para ? `<div class="ppt-motivo">${d.motivo.tipo === 'botin' ? '🎁 ' : ''}${esc(para)}</div>` : ''}`;
+  }
+  // Lo que ve un espectador: las dos caras con sus nombres, y quién ganó.
+  const carasAjeno = (d, u, agita) => `<div class="ppt-caras">${caraHtml(d.a.nombre, u ? u.a : '', agita, !!u && !agita && u.res === 'a')}<div class="ppt-vs">contra</div>${caraHtml(d.b.nombre, u ? u.b : '', agita, !!u && !agita && u.res === 'b')}</div>`;
+  function resultadoAjenoHtml(d, res, rendido){
+    if(res === 'empate') return '<div class="ppt-banner empate">Empate: otra vez</div>';
+    if(!d[res]) return '';
+    const premio = d.motivo && d.motivo.tipo === 'botin' ? ` · se lleva ${esc(d.motivo.item)}` : '';
+    const por = rendido && d[rendido] ? `<div class="ppt-nota">${esc(d[rendido].nombre)} se rindió</div>` : '';
+    return `<div class="ppt-banner bien">Gana ${esc(d[res].nombre)}${premio}</div>${por}`;
   }
   function resultadoHtml(d, l, res, rendido){
     if(res === 'empate') return '<div class="ppt-banner empate">Empate: otra vez</div>';
@@ -266,20 +308,40 @@ const PPT = (() => {
       chip.className = falta ? 'late' : '';
       chip.textContent = `✊ Piedra, papel o tijera con ${d[otro(l)].nombre}${ocultosEnJuego.length > 1 ? ` (+${ocultosEnJuego.length - 1})` : ''}${falta ? ' · te toca elegir' : ''}`;
     }else if(chip) chip.remove();
+    // 👀 El botón para mirar un juego ajeno (dueño, 2026-10-22), arriba del otro si los dos están.
+    const paraMirar = [...ajenos.entries()].filter(([id, d]) => d.estado === 'jugando' && id !== mirando);
+    let mirar = document.getElementById('ppt-mirar');
+    if(paraMirar.length && !(a && a.modo === 'mirar')){
+      if(!mirar){ mirar = document.createElement('button'); mirar.type = 'button'; mirar.id = 'ppt-mirar'; document.body.appendChild(mirar); }
+      const [idM, dM] = paraMirar[0];
+      mirar.onclick = () => { mirando = idM; ocultos.clear(); dibujar(); };
+      mirar.textContent = `👀 ${dM.a.nombre} y ${dM.b.nombre} están jugando piedra, papel o tijera${paraMirar.length > 1 ? ` (+${paraMirar.length - 1})` : ''} · Ver`;
+      mirar.style.bottom = chip ? '60px' : '18px';
+    }else if(mirar) mirar.remove();
     if(!a){ if(f) f.remove(); return; }
     if(!f){ f = document.createElement('div'); f.id = 'ppt-fondo'; f.className = 'ppt-fondo'; document.body.appendChild(f); f.addEventListener('click', clic); }
-    const d = juegos.get(a.id), l = ladoDe(d, yo()), o = otro(l);
+    const d = docDe(a.id), l = ladoDe(d, yo()), o = otro(l), ajeno = !l;   // ajeno: lo miro, no juego
     f.dataset.id = a.id;
     let cuerpo;
     if(a.modo === 'revela'){
       const u = revela.ultima, agita = revela.fase === 'agita';
-      cuerpo = `<div class="ppt-caras">${caraHtml('Vos', u[l], agita, !agita && u.res === l)}<div class="ppt-vs">contra</div>${caraHtml(d[o].nombre, u[o], agita, !agita && u.res === o)}</div>
+      cuerpo = ajeno ? `${carasAjeno(d, u, agita)}${agita ? '<div class="ppt-banner">¡Piedra, papel o tijera!</div>' : resultadoAjenoHtml(d, u.res, '')}`
+        : `<div class="ppt-caras">${caraHtml('Vos', u[l], agita, !agita && u.res === l)}<div class="ppt-vs">contra</div>${caraHtml(d[o].nombre, u[o], agita, !agita && u.res === o)}</div>
         ${agita ? '<div class="ppt-banner">¡Piedra, papel o tijera!</div>' : resultadoHtml(d, l, u.res, '')}`;
     }else if(a.modo === 'fin'){
       const u = d.ultima && !d.rendido ? d.ultima : null;
-      cuerpo = `${u ? `<div class="ppt-caras">${caraHtml('Vos', u[l], false, d.ganador === l)}<div class="ppt-vs">contra</div>${caraHtml(d[o].nombre, u[o], false, d.ganador === o)}</div>` : ''}
-        ${d.estado === 'cancelado' ? '<div class="ppt-banner empate">Se cortó el juego (el GM cerró el botín)</div>' : resultadoHtml(d, l, d.ganador, d.rendido)}
+      cuerpo = `${u ? (ajeno ? carasAjeno(d, {...u, res: d.ganador}, false) : `<div class="ppt-caras">${caraHtml('Vos', u[l], false, d.ganador === l)}<div class="ppt-vs">contra</div>${caraHtml(d[o].nombre, u[o], false, d.ganador === o)}</div>`) : ''}
+        ${d.estado === 'cancelado' ? '<div class="ppt-banner empate">Se cortó el juego (el GM cerró el botín)</div>' : ajeno ? resultadoAjenoHtml(d, d.ganador, d.rendido) : resultadoHtml(d, l, d.ganador, d.rendido)}
         <div class="ppt-pie"><button type="button" class="ppt-btn" data-ppt="cerrar">Cerrar</button></div>`;
+    }else if(a.modo === 'mirar'){
+      const j = d.jugadas || {};
+      const empate = d.ultima && d.ultima.res === 'empate' && d.ultima.ronda === (d.ronda || 1) - 1;
+      const nota = k => j[k] ? 'ya eligió' : 'eligiendo…';
+      cuerpo = `<div class="ppt-contra"><b>${esc(d.a.nombre)}</b> contra <b>${esc(d.b.nombre)}</b>${(d.ronda || 1) > 1 ? ` · ronda ${d.ronda}` : ''}</div>
+        ${empate ? `<div class="ppt-banner empate chico">Empate: ${JUGADAS[d.ultima.a].icono} contra ${JUGADAS[d.ultima.b].icono} — otra vez</div>` : ''}
+        <div class="ppt-caras">${caraHtml(d.a.nombre, '', false, false, nota('a'))}<div class="ppt-vs">contra</div>${caraHtml(d.b.nombre, '', false, false, nota('b'))}</div>
+        <div class="ppt-estado">Nadie ve lo elegido hasta que eligen los dos: acá se revela cada ronda.</div>
+        <div class="ppt-pie"><button type="button" class="ppt-btn sec" data-ppt="dejar">Dejar de mirar</button></div>`;
     }else{
       const j = d.jugadas || {}, mia = j[l], suya = !!j[o];
       const empate = d.ultima && d.ultima.res === 'empate' && d.ultima.ronda === (d.ronda || 1) - 1;
@@ -292,7 +354,7 @@ const PPT = (() => {
           : `Elegí. ${suya ? `${esc(d[o].nombre)} ya eligió.` : `${esc(d[o].nombre)} todavía no eligió.`} Nadie ve lo del otro hasta que eligen los dos.`}</div>
         <div class="ppt-pie"><button type="button" class="ppt-btn sec" data-ppt="rendirse" title="Gana ${esc(d[o].nombre)}">🏳 Rendirse</button></div>`;
     }
-    f.innerHTML = `<div class="ppt-caja">${cabHtml(d)}${cuerpo}</div>`;
+    f.innerHTML = `<div class="ppt-caja">${cabHtml(d, ajeno)}${cuerpo}</div>`;
   }
   async function clic(e){
     const f = document.getElementById('ppt-fondo');
@@ -301,7 +363,15 @@ const PPT = (() => {
     if(!id || !b) return;
     if(b.dataset.pptJugada){ elegir(id, b.dataset.pptJugada); return; }
     const q = b.dataset.ppt;
-    if(q === 'ocultar'){
+    const ajeno = !juegos.has(id);   // 👀 uno que miro: al cerrarlo u ocultarlo se deja de mirar (el botón de abajo vuelve si sigue en juego)
+    if(q === 'dejar' || (ajeno && (q === 'ocultar' || q === 'cerrar'))){
+      const i = finales.indexOf(id);
+      if(i >= 0) finales.splice(i, 1);
+      if(revela && revela.id === id) revela = null;
+      if(mirando === id) mirando = null;
+      if(ajenos.has(id) && ajenos.get(id).estado !== 'jugando') ajenos.delete(id);
+      dibujar();
+    }else if(q === 'ocultar'){
       const i = finales.indexOf(id);
       if(i >= 0) finales.splice(i, 1); else ocultos.add(id);
       if(revela && revela.id === id) revela = null;
@@ -363,8 +433,10 @@ const PPT = (() => {
 .ppt-rival{text-align:left;background:#242b3f;border:1px solid #39435c;color:#e8ecf4;border-radius:9px;padding:9px 11px;cursor:pointer;font-size:14px}
 .ppt-rival:hover{border-color:#2d6cdf}
 .ppt-gm{font-size:10px;font-weight:700;letter-spacing:.06em;color:#ffd25a;border:1px solid #ffd25a;border-radius:6px;padding:0 5px;margin-left:6px}
-#ppt-chip{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:99650;background:#1b2030;color:#e8ecf4;border:1px solid #39435c;border-radius:999px;padding:8px 16px;font-size:13px;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.45);font-family:Inter,system-ui,sans-serif}
+#ppt-chip,#ppt-mirar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:99650;background:#1b2030;color:#e8ecf4;border:1px solid #39435c;border-radius:999px;padding:8px 16px;font-size:13px;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.45);font-family:Inter,system-ui,sans-serif}
 #ppt-chip.late{border-color:#ffd25a;animation:ppt-late 1.4s ease-in-out infinite}
+#ppt-mirar{border-color:#6f9ee8;color:#cfe0ff}
+#ppt-mirar:hover{background:#242b3f}
 @keyframes ppt-late{0%,100%{box-shadow:0 0 0 0 rgba(255,210,90,.5)}50%{box-shadow:0 0 0 8px rgba(255,210,90,0)}}`;
     document.head.appendChild(s);
   }

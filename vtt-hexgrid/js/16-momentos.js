@@ -91,6 +91,7 @@ function momentoRecibido(id, d){
   if(d.tipo === 'trampa' && d.datos && d.datos.fase){ trampaMomento(id, d); return; }
   // El pedido de detección al GM (P145): la pantalla del GM tira la Destreza del oculto.
   if(d.tipo === 'sigilo-pedido' && d.estado === 'esperandoGM' && soyGM) deteccionGMAbrir(id, d);
+  if(d.tipo === 'turno-fin' && d.estado === 'esperandoGM' && soyGM && typeof finTurnoDelJugador === 'function') finTurnoDelJugador(id, d);   // ✅ un jugador terminó su turno (js/04, 2026-10-22)
   // La Varita del caos que usó un jugador sobre un creep (o con un arma que vuela): la aplica la pantalla del GM (js/13 caosAplicar).
   if(d.tipo === 'caos' && d.estado === 'esperandoGM' && soyGM && d.datos && d.datos.caos && !caosHechos.has(id)){
     caosHechos.add(id);

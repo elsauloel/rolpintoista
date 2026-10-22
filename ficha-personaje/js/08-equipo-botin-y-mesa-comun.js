@@ -126,11 +126,12 @@ function botinLootCuerpo(){
 }
 const botinUi = () => ({toast: t => toast(t), puede: botinPuedeTomar, fichaId: fichaVivo && fichaVivo.id});
 function botinTomar(docId){ return FichaBotin.tomar(S, botinLoot.find(x => x.docId === docId), botinUi()); }
+function botinTomarBoton(btn){ const ids = FichaBotin.idsDeBoton(btn, $('#botin-loot-body')); return FichaBotin.tomarVarios(S, ids.map(id => botinLoot.find(x => x.docId === id)), botinUi()); }   // uno, o N de una pila (2026-10-22)
 $('#btn-botin-loot').onclick = () => { botinLootCuerpo(); $('#scrim-botin-loot').classList.add('open'); };
 $('#botin-loot-x').onclick = () => $('#scrim-botin-loot').classList.remove('open');
 $('#botin-loot-body').addEventListener('click', e => {
   const t = e.target.closest('[data-botin-tomar]');
-  if(t){ botinTomar(t.dataset.botinTomar); return; }
+  if(t){ botinTomarBoton(t); return; }
   const dp = e.target.closest('[data-botin-disputar]');
   if(dp){ FichaBotin.disputar(S, botinLoot.find(x => x.docId === dp.dataset.botinDisputar), botinUi()); return; }
   const so = e.target.closest('[data-botin-soltar]');

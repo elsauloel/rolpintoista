@@ -1690,9 +1690,31 @@ prueba('reclamar y disputar (2026-10-08): cada ítem muestra Reclamar, Soltar (e
   const lista = FichaBotin.loot(snap);
   const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, caps: {mochila: 10}}).S);
   const html = FichaBotin.html(S, {combate: {numero: 1, estado: 'publicado', jugadores: []}, loot: lista, puede: true, fichaId: 'f1'});
-  igual([lista.length, html.includes('data-botin-tomar="l"'), html.includes('data-botin-soltar="m"'), html.includes('data-botin-disputar="o"'), html.includes('lo reclamó <b>Beto</b>'),
+  igual([lista.length, html.includes('data-botin-tomar="l"'), html.includes('data-botin-soltar="m"'), html.includes('data-botin-disputar="o"'), html.includes('Beto <b>1</b>'),
     html.includes('✊ en disputa'), html.includes('data-botin-disputar="d"'), html.includes('reclamaste <b>1</b>')],
     [4, true, true, true, true, true, false, true]);
+});
+prueba('botín por grupos y pilas (2026-10-22): Mano / Cuerpo / Consumibles / Trofeos, los iguales apilados con ×N y «Reclamar» de a varios', () => {
+  const js = (n, extra) => JSON.stringify({nombre: n, peso: 1, ...extra});
+  const snap = {docs: [
+    {id: 'c1', data: () => ({nombre: 'Chaleco de cuero', json: js('Chaleco de cuero', {tipoItem: 'armadura_blanda', tier: 'Común', mods: [{stat: 'def', val: 1}]}), despojos: 4, origen: 'Goblin 1'})},
+    {id: 'c2', data: () => ({nombre: 'Chaleco de cuero', json: js('Chaleco de cuero', {tipoItem: 'armadura_blanda', tier: 'Común', mods: [{stat: 'def', val: 1}]}), despojos: 4, origen: 'Goblin 2'})},
+    {id: 'c3', data: () => ({nombre: 'Chaleco de cuero', json: js('Chaleco de cuero', {tipoItem: 'armadura_blanda', tier: 'Común', mods: [{stat: 'def', val: 1}]}), despojos: 4, origen: 'Goblin 3', tomadoPor: 'yo', tomadoNombre: 'Silvia', tomadoFicha: 'f1'})},
+    {id: 'l1', data: () => ({nombre: 'Lanza corta', json: js('Lanza corta', {tipoItem: 'arma_1m', tipoDado: 4}), despojos: 5, origen: 'Goblin 1'})},
+    {id: 'e1', data: () => ({nombre: 'Escudo pequeño', json: js('Escudo pequeño', {tipoItem: 'escudo_1m'}), despojos: 3})},
+    {id: 'v1', data: () => ({nombre: 'Varita arcana', json: js('Varita arcana', {tipoItem: 'arma_1m', especial: {sp: 1}}), despojos: 6})},
+    {id: 'p1', data: () => ({nombre: 'Poción de HP', json: js('Poción de HP', {tipoItem: 'consumibles', consumible: true, curahp: 20}), despojos: 2})},
+    {id: 't1', data: () => ({nombre: 'Colmillo', json: js('Colmillo', {trofeo: true}), despojos: 7})}]};
+  const lista = FichaBotin.loot(snap);
+  const S = FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 4, agl: 6, des: 5, esp: 4}, caps: {mochila: 10}}).S);
+  const pilas = FichaBotin.pilas(lista, 'f1', 'yo'), chaleco = pilas.find(p => p.nombre === 'Chaleco de cuero');
+  const html = FichaBotin.html(S, {combate: {numero: 1, estado: 'publicado', jugadores: []}, loot: lista, puede: true, fichaId: 'f1'});
+  const pos = t => html.indexOf(t);
+  igual([pilas.length, chaleco.entradas.length, chaleco.libres.map(b => b.docId), chaleco.mias.length, pilas.map(p => p.grupo),
+    html.includes('×3'), html.includes('data-botin-tomar="c1,c2"'), html.includes('data-botin-cant='), html.includes('data-botin-soltar="c3"'), html.includes('<b>2</b> libres'),
+    pos('🗡 Mano') < pos('🛡 Cuerpo') && pos('🛡 Cuerpo') < pos('🧪 Consumibles') && pos('🧪 Consumibles') < pos('🏆 Trofeos'), html.includes('Goblin 1, Goblin 2, Goblin 3'),
+    FichaBotin.grupoDe({tipoItem: 'escudo_1m', orbe: true}), FichaBotin.grupoDe({tipoItem: 'cabeza'}), FichaBotin.grupoDe({tipoItem: 'anillo'})],
+    [6, 3, ['c1', 'c2'], 1, ['cuerpo', 'mano', 'mano', 'mano', 'consumibles', 'trofeos'], true, true, true, true, true, true, true, 'mano', 'cuerpo', 'cuerpo']);
 });
 prueba('🔎 escaneo del grupo (comun/escaneo-grupo.js): el perfil sale del motor de la ficha, la lectura marca lo flojo y el texto para la IA lleva todo', () => {
   const S1 = FichaGuardado.completar(FichaGuardado.normalizar({escalaTipos: 2, meta: {nombre: 'Ana', nivel: 2}, attrs: {con: 4, fue: 8, agl: 6, des: 5, esp: 3},

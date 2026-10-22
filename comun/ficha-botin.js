@@ -57,6 +57,36 @@ const FichaBotin = (() => {
     return partes.join(' · ');
   }
 
+  /* 🗂 Tres grupos y pilas (2026-10-22, dueño: «mano, cuerpo y consumibles… y si hay ítems repetidos, que aparezcan enlistados: chaleco de
+     cuero ×N, y que uno pueda reclamar uno, dos, tres, lo que quiera»). Mano = lo que va en la mano (armas, escudos, varitas, orbes);
+     Cuerpo = lo demás que se equipa; Consumibles; y aparte los trofeos. Una pila junta los ítems iguales (mismo tipo, nombre, calidad y
+     números); cada ítem sigue siendo su propio documento del botín: reclamar N reclama N de los libres. */
+  const GRUPOS = [{id: 'mano', titulo: '🗡 Mano', nota: 'armas, escudos, varitas y orbes'}, {id: 'cuerpo', titulo: '🛡 Cuerpo', nota: 'lo que se equipa'},
+    {id: 'consumibles', titulo: '🧪 Consumibles', nota: ''}, {id: 'trofeos', titulo: '🏆 Trofeos', nota: 'se venden o se guardan'}];
+  function grupoDe(item){
+    if(!item) return 'trofeos';
+    if(item.trofeo) return 'trofeos';
+    if(item.consumible || item.tipoItem === 'consumibles') return 'consumibles';
+    const slot = FichaCalculo.slotDe(item.tipoItem);
+    return slot === 'mano' || slot === 'escudo' ? 'mano' : 'cuerpo';
+  }
+  const claveDe = b => [b.item.tipoItem || '', b.nombre || '', b.item.tier || '', JSON.stringify(E().statsComparables(b.item)), (b.item.efectosGolpe || []).map(e => e && e.nombre).join(','), !!b.item.trofeo].join('|');
+  function pilas(lista, yo, miUid){
+    const por = new Map();
+    (lista || []).forEach(b => {
+      const k = claveDe(b);
+      if(!por.has(k)) por.set(k, {clave: k, grupo: grupoDe(b.item), nombre: b.nombre, item: b.item, despojos: b.despojos, entradas: [], libres: [], mias: [], otros: new Map(), disputas: [], origenes: new Set()});
+      const p = por.get(k);
+      p.entradas.push(b);
+      if(b.origen) p.origenes.add(b.origen);
+      if(b.disputa) p.disputas.push(b);
+      else if(!b.tomadoPor) p.libres.push(b);
+      else if(b.tomadoFicha === yo) p.mias.push(b);
+      else{ const n = b.tomadoPor === miUid ? '(otro personaje tuyo)' : (b.tomadoNombre || '?'); if(!p.otros.has(n)) p.otros.set(n, []); p.otros.get(n).push(b); }
+    });
+    return [...por.values()];
+  }
+
   function html(S, o){
     const combate = o.combate, lista = o.loot || [];
     const cap = E().capMochila(S), usado = E().mochilaUsada(S);
@@ -75,45 +105,67 @@ const FichaBotin = (() => {
       <div class="hint" style="margin-top:4px">${publicado(combate) ? 'La experiencia, el oro y lo que reclamaste se cargan en las fichas cuando el GM cierra el botín, después de que todos elijan.' : 'La experiencia y el oro ya se cargaron en las fichas.'}</div></div>` : '';
     const cerrado = combate && combate.estado === 'cerrado' && lista.length === 0
       ? '<div class="hint" style="margin-bottom:8px">El botín ya está cerrado: lo que nadie tomó se convirtió en despojos.</div>' : '';
+    const todas = pilas(lista, yo, miUid);
+    const grupos = GRUPOS.map(g => ({...g, pilas: todas.filter(p => p.grupo === g.id)})).filter(g => g.pilas.length);
     return `
     ${recompensas}${cerrado}
     <div class="hint" style="text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Botín: reclamá lo que querés</div>
-    <div class="hint" style="margin-bottom:8px">Lo que reclamás queda a tu nombre y llega a tu mochila cuando el GM cierra el botín. Si otro también lo quiere, te lo puede disputar: ✊ piedra, papel o tijera, y el que gana se lo lleva.</div>
+    <div class="hint" style="margin-bottom:8px">Lo que reclamás queda a tu nombre y llega a tu mochila cuando el GM cierra el botín. Si otro también lo quiere, te lo puede disputar: ✊ piedra, papel o tijera, y el que gana se lo lleva. Lo repetido va en una pila: elegí cuántos reclamás.</div>
     <div class="hint" style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px">
       <span>Mochila: <b>${fmt(usado)}${cap > 0 ? ' / ' + fmt(cap) : ''}</b> ranuras${libres !== null ? ` · <b>${fmt(libres)}</b> libres` : ''}${reclamado ? ` · reclamaste <b>${fmt(reclamado)}</b>` : ''}</span>
       <button type="button" class="mini" id="botin-loot-mochila">🎒 Abrir mochila</button>
     </div>
     ${puede ? '' : '<div class="hint" style="margin-bottom:8px">Abrí tu personaje (con permiso de edición) para reclamar cosas del botín.</div>'}
-    ${lista.length ? lista.map(b => {
-      const info = E().slotOcupado(S, b.item);
+    ${grupos.length ? grupos.map(g => `<div style="margin:12px 0 4px;padding:4px 0;border-bottom:2px solid var(--line, #444);display:flex;align-items:baseline;gap:8px"><b style="font-size:14px">${g.titulo}</b><span class="hint">${esc(g.nota)}${g.nota ? ' · ' : ''}${g.pilas.reduce((a, p) => a + p.entradas.length, 0)} ${g.pilas.reduce((a, p) => a + p.entradas.length, 0) === 1 ? 'ítem' : 'ítems'}</span></div>
+      ${g.pilas.map(p => fila(p)).join('')}`).join('') : '<div class="hint">No hay nada en el botín.</div>'}`;
+    function fila(p){
+      const n = p.entradas.length, info = E().slotOcupado(S, p.item);
       const comparar = info && info.equipados.length;
-      return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line, #444)">
-        <div style="flex:1;min-width:0" title="${esc(textoItem(b.item))}">
-          <div style="font-weight:600">${esc(b.nombre)}${b.item.trofeo ? ' <span class="hint">(trofeo)</span>' : ''}</div>
-          <div class="hint">≈ ${fmt(b.despojos)} despojos${b.origen ? ' · de ' + esc(b.origen) : ''}${info && info.ocupado ? ' · slot ocupado' : ''}${quien(b)}</div>
-        </div>
-        <button type="button" class="mini" data-view="catalogo:${esc(b.item.id)}">Ver</button>
-        ${comparar ? `<button type="button" class="mini" data-botin-comparar="${esc(b.item.id)}">Comparar</button>` : ''}
-        ${accion(b)}
-      </div>`;
-    }).join('') : '<div class="hint">No hay nada en el botín.</div>'}`;
-    function quien(b){
-      if(!b.tomadoPor) return '';
-      if(b.tomadoFicha === yo) return ' · <b style="color:var(--good, #4ec98a)">es tuyo</b>';
-      return ` · lo reclamó <b>${esc(b.tomadoNombre || '?')}</b>`;
-    }
-    function accion(b){
-      const d = esc(b.docId), off = puede ? '' : ' disabled';
-      if(!b.tomadoPor) return `<button type="button" class="btn primary" data-botin-tomar="${d}"${off} title="Queda a tu nombre y llega a tu mochila cuando el GM cierre el botín. Otro te lo puede disputar.">🙋 Reclamar</button>`;
-      if(b.disputa){
-        const juego = typeof PPT !== 'undefined' && PPT.juega(b.disputa);
-        return juego ? `<button type="button" class="btn primary" data-botin-ppt="${esc(b.disputa)}" title="Volver al juego">✊ En disputa: jugar</button>`
-          : '<span class="hint" title="Lo están disputando a piedra, papel o tijera">✊ en disputa</span>';
+      const origenes = [...p.origenes];
+      const estado = [];
+      if(n > 1 || p.mias.length || p.otros.size || p.disputas.length){
+        if(p.libres.length) estado.push(`<b>${p.libres.length}</b> libre${p.libres.length === 1 ? '' : 's'}`);
+        if(p.mias.length) estado.push(`<b style="color:var(--good, #4ec98a)">${p.mias.length === 1 && n === 1 ? 'es tuyo' : p.mias.length + ' tuyo' + (p.mias.length === 1 ? '' : 's')}</b>`);
+        p.otros.forEach((lst, nom) => estado.push(`${esc(nom)} <b>${lst.length}</b>`));
+        if(p.disputas.length) estado.push(`✊ ${p.disputas.length} en disputa`);
       }
-      if(b.tomadoFicha === yo) return `<button type="button" class="mini" data-botin-soltar="${d}"${off} title="Lo devolvés al botín para que lo reclame otro">↩ Soltar</button>`;
-      if(b.tomadoPor === miUid) return '<span class="hint">(lo reclamó otro personaje tuyo)</span>';
-      return `<button type="button" class="btn" data-botin-disputar="${d}"${off} title="Le disputás ${esc(b.nombre)} a ${esc(b.tomadoNombre || '?')} a piedra, papel o tijera: el que gana se lo lleva">⚔ Disputar</button>`;
+      return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line, #444)">
+        <div style="flex:1;min-width:0" title="${esc(textoItem(p.item))}">
+          <div style="font-weight:600">${esc(p.nombre)}${n > 1 ? ` <span style="color:var(--copper, #B87333)">×${n}</span>` : ''}${p.item.trofeo ? ' <span class="hint">(trofeo)</span>' : ''}</div>
+          <div class="hint">≈ ${fmt(p.despojos)} despojos${n > 1 ? ' c/u' : ''}${origenes.length ? ' · de ' + esc(origenes.slice(0, 3).join(', ')) + (origenes.length > 3 ? '…' : '') : ''}${info && info.ocupado ? ' · slot ocupado' : ''}${estado.length ? ' · ' + estado.join(' · ') : ''}</div>
+        </div>
+        <button type="button" class="mini" data-view="catalogo:${esc(p.item.id)}">Ver</button>
+        ${comparar ? `<button type="button" class="mini" data-botin-comparar="${esc(p.item.id)}">Comparar</button>` : ''}
+        ${acciones(p)}
+      </div>`;
     }
+    function acciones(p){
+      const off = puede ? '' : ' disabled', partes = [];
+      // ✊ una disputa en la que juego: volver al juego
+      const juego = p.disputas.find(b => typeof PPT !== 'undefined' && PPT.juega(b.disputa));
+      if(juego) partes.push(`<button type="button" class="btn primary" data-botin-ppt="${esc(juego.disputa)}" title="Volver al juego">✊ En disputa: jugar</button>`);
+      // 🙋 reclamar N de los libres
+      if(p.libres.length){
+        const ids = p.libres.map(b => b.docId).join(',');
+        const cant = p.libres.length > 1 ? `<input type="number" class="mini" min="1" max="${p.libres.length}" value="1" data-botin-cant="${esc(p.clave)}" title="Cuántos reclamás (hay ${p.libres.length} libres)" style="width:52px;padding:4px 6px;text-align:center"${off}>` : '';
+        partes.push(`<span style="display:inline-flex;align-items:center;gap:4px">${cant}<button type="button" class="btn primary" data-botin-tomar="${esc(ids)}" data-botin-cant-de="${esc(p.clave)}"${off} title="Queda a tu nombre y llega a tu mochila cuando el GM cierre el botín. Otro te lo puede disputar.">🙋 Reclamar</button></span>`);
+      }
+      // ↩ soltar uno de los míos
+      if(p.mias.length) partes.push(`<button type="button" class="mini" data-botin-soltar="${esc(p.mias[0].docId)}"${off} title="Devolvés ${p.mias.length > 1 ? 'uno' : 'esto'} al botín para que lo reclame otro">↩ Soltar${p.mias.length > 1 ? ' 1' : ''}</button>`);
+      // ⚔ disputar uno de los de otro (no de otro personaje mío)
+      const ajeno = [...p.otros.entries()].find(([nom]) => nom !== '(otro personaje tuyo)');
+      if(ajeno && !p.libres.length) partes.push(`<button type="button" class="btn" data-botin-disputar="${esc(ajeno[1][0].docId)}"${off} title="Le disputás ${esc(p.nombre)} a ${esc(ajeno[0])} a piedra, papel o tijera: el que gana se lo lleva">⚔ Disputar</button>`);
+      if(!partes.length && p.disputas.length) partes.push('<span class="hint" title="Lo están disputando a piedra, papel o tijera">✊ en disputa</span>');
+      return partes.join('');
+    }
+  }
+  // Los ítems que pide un botón «Reclamar»: su lista de documentos (`data-botin-tomar`) cortada a la cantidad elegida (`data-botin-cant`).
+  function idsDeBoton(btn, raiz){
+    const ids = String(btn.dataset.botinTomar || '').split(',').filter(Boolean);
+    const k = btn.dataset.botinCantDe;
+    let n = 1;
+    if(k){ const inp = (raiz || document).querySelector(`[data-botin-cant="${(window.CSS && CSS.escape) ? CSS.escape(k) : k}"]`); if(inp) n = Math.max(1, Math.min(ids.length, Math.round(num(inp.value)) || 1)); }
+    return ids.slice(0, n);
   }
 
   const yoUid = () => fbUsuario.uid;
@@ -127,10 +179,8 @@ const FichaBotin = (() => {
     }).catch(err => console.error('No se pudo escribir en la Mesa:', err));
   }
 
-  // 🙋 Reclamar: queda a tu nombre (no va a la mochila hasta que el GM cierre el botín).
-  async function tomar(S, b, ui){
-    if(!ui.puede()){ ui.toast('Abrí tu personaje para reclamar cosas del botín'); return; }
-    if(!b) return;
+  // 🙋 Reclamar: queda a tu nombre (no va a la mochila hasta que el GM cierre el botín). Uno, o varios de una pila (2026-10-22).
+  async function tomarUno(S, b, ui){
     let quien = '', ok = false;
     try{
       ok = await fbDb.runTransaction(async tx => {
@@ -140,18 +190,29 @@ const FichaBotin = (() => {
         tx.update(x.ref, {tomadoPor: yoUid(), tomadoNombre: miNombre(S), tomadoFicha: String(ui.fichaId || '')});
         return true;
       });
-    }catch(err){
-      console.error('No se pudo reclamar:', err);
-      ui.toast('No se pudo reclamar' + errorTxt(err));
-      return;
+    }catch(err){ console.error('No se pudo reclamar:', err); return {error: 'No se pudo reclamar' + errorTxt(err)}; }
+    return ok ? {ok: true} : {quien};
+  }
+  async function tomarVarios(S, lista, ui){
+    if(!ui.puede()){ ui.toast('Abrí tu personaje para reclamar cosas del botín'); return; }
+    lista = (lista || []).filter(Boolean);
+    if(!lista.length) return;
+    let hechos = 0, quien = '';
+    for(const b of lista){
+      const r = await tomarUno(S, b, ui);
+      if(r.error){ ui.toast(r.error); break; }
+      if(r.ok) hechos++; else if(r.quien) quien = r.quien;
     }
-    if(!ok){ ui.toast(quien ? `${b.nombre} ya lo reclamó ${quien}: podés disputárselo` : `${b.nombre} ya no está`); return; }
+    const b = lista[0], nombre = b.nombre;
+    if(!hechos){ ui.toast(quien ? `${nombre} ya lo reclamó ${quien}: podés disputárselo` : `${nombre} ya no está`); return; }
     // ¿Va a entrar? (avisa y deja seguir: al llegar se suma igual)
     const cap = E().capMochila(S);
-    const llena = cap > 0 && E().mochilaUsada(S) + E().ranuras(b.item) > cap;
-    ui.toast(`🙋 ${b.nombre} es tuyo: llega a tu mochila cuando el GM cierre el botín${llena ? ' · ojo: tu mochila no da, hacé lugar' : ''}`);
-    mesa(S, `🙋 ${S.meta.nombre || fbMiembro.nombre} reclamó ${b.nombre}`);
+    const llena = cap > 0 && E().mochilaUsada(S) + E().ranuras(b.item) * hechos > cap;
+    const que = hechos > 1 ? `${hechos} × ${nombre} son tuyos` : `${nombre} es tuyo`;
+    ui.toast(`🙋 ${que}: llega${hechos > 1 ? 'n' : ''} a tu mochila cuando el GM cierre el botín${llena ? ' · ojo: tu mochila no da, hacé lugar' : ''}${hechos < lista.length ? ` (${lista.length - hechos} ya no estaban libres)` : ''}`);
+    mesa(S, `🙋 ${S.meta.nombre || fbMiembro.nombre} reclamó ${hechos > 1 ? hechos + ' × ' : ''}${nombre}`);
   }
+  const tomar = (S, b, ui) => tomarVarios(S, [b], ui);
 
   // ⚔ Disputar lo que reclamó otro: el piedra, papel o tijera (comun/ppt.js) se crea en la misma transacción.
   async function disputar(S, b, ui){
@@ -205,5 +266,5 @@ const FichaBotin = (() => {
     mesa(S, `↩ ${S.meta.nombre || fbMiembro.nombre} soltó ${b.nombre}`);
   }
 
-  return {loot, publicado, textoItem, html, tomar, disputar, soltar};
+  return {loot, publicado, textoItem, html, tomar, tomarVarios, idsDeBoton, grupoDe, pilas, GRUPOS, disputar, soltar};
 })();

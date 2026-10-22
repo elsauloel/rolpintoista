@@ -1321,8 +1321,10 @@ const Duelo = (() => {
   /* 💔 Un clic antes de recibir el daño (2026-10-17, dueño: «si en un ataque pasa el daño, el duelo debe tener la instancia de pasó tanto daño,
      menos tu armadura, apretá aplicar daño… tiene que haber una instancia donde el jugador hace un clic antes de recibir daño automatizado»):
      si el que recibe es un personaje o una invocación, el GM no aplica el daño hasta que su dueño (o quien tiene 🎮 su control) toca
-     «💔 Aplicar el daño» (`dano.aceptado`); si el jugador no está, el GM lo hace «por él». A un creep se le aplica como siempre. */
-  const pideAceptar = d => !!(d && d.defensor && d.defensor.tipo !== 'creep');
+     «💔 Aplicar el daño» (`dano.aceptado`); si el jugador no está, el GM lo hace «por él». Desde el 2026-10-22 también a un creep (dueño, después
+     de la sesión en «El origen de las especies»: «como GM, parrié con un creep, el bloqueo falló y pasó la mitad del daño, pero nunca me apareció
+     el anuncio "te entró X daño — aplicar"»): el GM lo aplica con su clic. */
+  const pideAceptar = d => !!(d && d.defensor);
   async function aceptarDano(id){
     const ref = col().doc(id);
     await fbDb.runTransaction(async tx => {

@@ -13,6 +13,8 @@
 - [ ] **🎲 La tirada extra de una zona la tira quien la creó** (Pedos Tóxicos de Larry): cuando el daño de la zona entra a un goblin, el cartel del GM dice
   «🎲 1d20: lo tira Larry» y a la pantalla de Larry le aparece «Tirá para el efecto de Pedos Tóxicos contra Goblin 1» (de a uno si son varios); la
   tirada sale en la Mesa a nombre de Larry, con la nota (7+ Pajaritos · 17+ Stun · 20 desmayo, a mano), y la Crónica lo cuenta; el GM, «🎲 Tirar por él».
+- [ ] **💔 El daño a un creep espera el clic del GM**: un personaje le pega a un creep (o el creep para y pierde el Bloqueo: pasa la mitad) → en el
+  cuadro del duelo, al GM, «Pasa la mitad: (X − su Defensa) ÷ 2» y «💔 Aplicar el daño»; recién ahí se descuenta. (Antes se aplicaba solo.)
 - [ ] **⏳ Una zona de 1 turno hace efecto dos veces**: al tirarla y al pasar la ronda; después se va al empezar el turno de quien la tiró. Con quien
   la tiró primero en el orden, que no se vaya antes de resolver el segundo efecto (`zonasDelQueLaTiro` con el Mantenimiento nuevo).
 

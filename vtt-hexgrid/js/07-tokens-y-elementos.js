@@ -975,7 +975,8 @@ async function guardarTrazo(puntosMundo, permanente, opc){
   try{
     await coleccionTrazos().add({
       puntos, origen, rotacion: 0, color: lapizColor, grosor: 4, permanente: !!permanente,
-      ...(opc.recto ? {recto: true} : {}), ...(opc.colision && soyGM ? {colision: true, fijado: true} : {}),   // una pared nace fijada (📌, 2026-10-14) ...(opc.cerrada && suaves.length >= 3 ? {cerrada: true} : {}),   // ⭕ el final se une con el principio (js/34)
+      ...(opc.recto ? {recto: true} : {}), ...(opc.colision && soyGM ? {colision: true, fijado: true} : {}),   // una pared nace fijada (📌, 2026-10-14)
+      ...(opc.cerrada && suaves.length >= 3 ? {cerrada: true} : {}),   // ⭕ el final se une con el principio (js/34); 2026-10-22: esta línea estaba adentro del comentario de arriba y la figura nunca nacía cerrada
       duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
     });
   }catch(err){

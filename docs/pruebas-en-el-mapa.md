@@ -28,7 +28,10 @@
   pantalla con la versión vieja que le aplique el Empower a un aliado lo deja como un estado vacío (pasó con la pestaña del dueño): recargar todas.
 - [ ] **🤺 La ruleta del desarme cae solo en casillas libres** (dueño, 2026-10-22: «si no hay en ese círculo… si hay en el círculo interno,
   primero ese; si no, en el externo, y así siguiendo para afuera»; js/62): el anillo a 2 casillas sin nadie, sin Sólidos y sin otra arma; lleno →
-  el de 1; después 3, 4… hasta 8. Probarlo con el anillo de 2 lleno de tokens.
+  el de 1; después 3, 4… hasta 8. Y vuela como un lanzamiento (dueño, 2026-10-22): un Sólido o una pared de línea en el medio la frena; las
+  personas no («les vuela por encima o por el costado»); en el borde justo entre dos casillas, alcanza con un costado libre. **Visto por Claude
+  (2026-10-22, solo en su pantalla, sin tocar nada):** en una casilla con un Sólido al costado y una pared abajo, la ruleta quedó solo en las 5 del
+  lado abierto (7 tapadas). Falta: un desarme de verdad al lado de una pared, y con el anillo de 2 lleno de tokens.
 - [ ] **🤺 Desarmar en cooldown: el botón apagado** (dueño, 2026-10-22, «sí»): en el Bloqueo, «🤺 Desarmar · en cooldown (N turnos)» gris y sin
   poder tocarlo (o «le faltan No2», «te falta SP»); no va en el desplegable de la tirada a mano. Probarlo con el Ladrón recién usado.
 - [ ] **⏳ Una zona de 1 turno hace efecto dos veces**: al tirarla y al pasar la ronda; después se va al empezar el turno de quien la tiró. Con quien

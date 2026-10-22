@@ -1887,7 +1887,9 @@ const Duelo = (() => {
     const lado = esAtq ? d.atacante : d.defensor;
     const tiro = d[campo];
     const fase = (campo === 'pdg' || campo === 'eva') ? 'contacto' : 'bloqueo';
-    const etiqueta = campo === 'eva' ? nombreDefensa(d) : (campo === 'pdg' && d.hab) ? etqTira(d) : ETIQ[campo];
+    const ladoN = esAtq ? 'atacante' : 'defensor';
+    const desarma = fase === 'bloqueo' && d.ataque && d.ataque.desarme && d.ataque.desarme.lado === ladoN;   // 🤺 esta tirada vale como Desarmar
+    const etiqueta = campo === 'eva' ? nombreDefensa(d) : (campo === 'pdg' && d.hab) ? etqTira(d) : desarma ? `🤺 Desarmar (${ETIQ[campo]})` : ETIQ[campo];
     const parCompleto = !!(tiro && d[otro]);
     if(parCompleto) return numerosHtml(tiro, esNuevo, etiqueta, lado.nombre);
     if(tiro){
@@ -1913,9 +1915,13 @@ const Duelo = (() => {
           cuerpo = '<div class="espera">cargando tus opciones de defensa… <span class="det">(la primera vez puede tardar unos segundos)</span></div>'; }
         else cuerpo = `<div class="det">Elegí cómo te defendés (antes de ver el PdG):</div><div class="duelo-opc">${ops.map((o, i) => `<button type="button" data-def="${i}"${o.motivoNo ? ' disabled' : ''}>${_esc(o.etiqueta)}${ayudaDefensa(o.modo === 'evasion' ? 'eva' : o.modo)}${o.lupa ? lupaDuelo(d.id + ':op' + i, (vistas[d.id + ':op' + i] = o.lupa)) : ''}${o.costo ? `<small>${_fmt(o.costo)} No2</small>` : ''}${(o.info || []).map(t => `<small class="duelo-info">${_esc(t)}</small>`).join('')}${o.motivoNo ? `<small>${_esc(o.motivoNo)}</small>` : ''}</button>`).join('')}</div>`;
       }else{
-        const txt = campo === 'pdg' ? (d.hab ? `🎲 Tirar ${_esc(etqTira(d))}` : '🎲 Pagar y tirar PdG') : campo === 'fuerza' ? '🎲 Tirar Fuerza del golpe' : `🎲 Tirar Bloqueo${d.defensa && d.defensa.itemNombre ? ' · ' + _esc(d.defensa.itemNombre) : ''}`;
+        const txt = campo === 'pdg' ? (d.hab ? `🎲 Tirar ${_esc(etqTira(d))}` : '🎲 Pagar y tirar PdG') : desarma ? `🎲 Tirar Desarmar (tu ${campo === 'fuerza' ? 'Fuerza del golpe' : 'Bloqueo'})` : campo === 'fuerza' ? '🎲 Tirar Fuerza del golpe' : `🎲 Tirar Bloqueo${d.defensa && d.defensa.itemNombre ? ' · ' + _esc(d.defensa.itemNombre) : ''}`;
         cuerpo = `<button type="button" data-tirar="${campo}">${txt}${d.hab && campo === 'pdg' && d.hab.tira && d.hab.tira.formula ? ` · ${_esc(d.hab.tira.formula)}` : vistaBoton(d, campo)}${campo === 'bloqueo' ? ayudaDefensa('bloqueo') : ''}</button>${campo === 'pdg' && !d.hab ? costoAtaqueHtml(d) : ''}`;
       }
+      // 🤺 Desarmar (dueño, 2026-10-22): no se declara en el turno; se elige acá, en el Bloqueo que sigue a un Parry ganado, EN VEZ de la Fuerza del
+      // golpe (quien ataca) o de bloquear (quien defiende, si paró con el arma). Quién puede y cuánto cuesta lo dice el mapa (js/62); el botón elige y tira.
+      const dOp = (campo === 'fuerza' || campo === 'bloqueo') && !(d.ataque && d.ataque.desarme) && typeof window.dueloDesarmeOpcion === 'function' ? window.dueloDesarmeOpcion(d, ladoN) : null;
+      if(dOp) cuerpo += `<div class="det" style="margin-top:8px">o, en vez de ${campo === 'fuerza' ? 'la Fuerza del golpe' : 'bloquear'}:</div><button type="button" class="sec" data-desarmar="${campo}" title="${_esc(dOp.titulo || '')}">🤺 Desarmar a ${_esc(d[esAtq ? 'defensor' : 'atacante'].nombre)} · ${_esc(dOp.costo || '')}</button>`;
       cuerpo += flashHtml(d, campo) + manualHtml(d, campo);
     }else if(puedoAMano(lado)){
       const selModo = campo === 'eva' ? `<select data-manual-modo>${selModoHtml(d)}</select>` : '';
@@ -1928,6 +1934,14 @@ const Duelo = (() => {
     return `<div class="duelo-tiro"><div class="que">${_esc(etiqueta)} · ${quien}</div>${cuerpo}</div>`;
   }
 
+  // 🤺 El desarme en juego, dicho en el paso 3 (2026-10-22, dueño: «¿se vio en algún lado que la tirada es para un desarme?»).
+  function desarmeAvisoHtml(d){
+    const ds = d.ataque && d.ataque.desarme;
+    if(!ds) return '';
+    const quien = ds.lado === 'atacante' ? d.atacante.nombre : d.defensor.nombre, victima = ds.lado === 'atacante' ? d.defensor.nombre : d.atacante.nombre;
+    const pierde = ds.lado === 'atacante' ? ((d.defensa && d.defensa.itemNombre) || 'lo que tiene en la mano') : (d.ataque.armaNombre || 'su arma');
+    return `<div class="det" style="margin:-2px 0 8px;color:#ffd25a">Si gana ${_esc(quien)}, a ${_esc(victima)} se le cae ${_esc(pierde)} (sale volando 2 casillas). Si no, lo de siempre.</div>`;
+  }
   // Línea corta con quién ganó un par ya resuelto.
   function miniHtml(d, par){
     const info = par === 'contacto' ? d.contacto : d.bloq;
@@ -2370,7 +2384,7 @@ const Duelo = (() => {
           <div class="duelo-tiros">${cajaHtml(d, 'pdg', 'eva', nuevoContacto)}${cajaHtml(d, 'eva', 'pdg', nuevoContacto)}</div>
           ${miniHtml(d, 'contacto')}
         </div>`}
-        ${mostrarBloqueo ? `<div class="duelo-paso"><h4><span class="n">3</span>Bloqueo: Fuerza del golpe contra Bloqueo</h4>
+        ${mostrarBloqueo ? `<div class="duelo-paso"><h4><span class="n">3</span>${d.ataque && d.ataque.desarme ? '🤺 Desarmar: ' : 'Bloqueo: '}Fuerza del golpe contra Bloqueo</h4>${desarmeAvisoHtml(d)}
           <div class="duelo-tiros">${cajaHtml(d, 'fuerza', 'bloqueo', nuevoBloqueo)}${cajaHtml(d, 'bloqueo', 'fuerza', nuevoBloqueo)}</div>
           ${miniHtml(d, 'bloqueo')}
         </div>` : ''}
@@ -2447,6 +2461,15 @@ const Duelo = (() => {
       const campo = b.dataset.tirar;
       b.disabled = true; b.textContent = 'Tirando…';
       enviar(campo === 'pdg' || campo === 'fuerza' ? d.atacante : d.defensor, {tipo: 'duelo-tirar', id: d.id, campo, flash: flashSel[d.id + ':' + campo] || ''});
+      setTimeout(() => { if(actual && actual.dato && !actual.dato[campo]) dibujar(); }, 8000);
+    });
+    f.querySelectorAll('[data-desarmar]').forEach(b => b.onclick = async () => {   // 🤺 elegir Desarmar y tirar (js/62 cobra y lo marca)
+      const campo = b.dataset.desarmar, lado = campo === 'fuerza' ? 'atacante' : 'defensor';
+      f.querySelectorAll('[data-desarmar],[data-tirar]').forEach(x => x.disabled = true);
+      let ok = false;
+      try{ ok = typeof window.dueloDesarmar === 'function' && await window.dueloDesarmar(d.id, lado); }catch(err){ console.error('Desarmar:', err); }
+      if(!ok){ dibujar(); return; }
+      enviar(d[lado], {tipo: 'duelo-tirar', id: d.id, campo, flash: ''});
       setTimeout(() => { if(actual && actual.dato && !actual.dato[campo]) dibujar(); }, 8000);
     });
     f.querySelectorAll('[data-def]').forEach(b => b.onclick = () => {
@@ -2581,7 +2604,7 @@ const Duelo = (() => {
       if(campo === 'eva'){
         const op = (d.hab ? opcionesHab(d, h) : (h.opcionesDefensa ? h.opcionesDefensa(d) : [])).find(o => o.modo === m.modo && (o.itemId || '') === (m.itemId || ''));
         if(!op || op.motivoNo) return;
-        defensa = {modo: op.modo, itemId: op.itemId || '', itemNombre: op.itemNombre || '', costo: _num(op.costo), ...(op.arco ? {arco: true} : {})};
+        defensa = {modo: op.modo, itemId: op.itemId || '', itemNombre: op.itemNombre || '', costo: _num(op.costo), ...(op.arco ? {arco: true} : {}), ...(op.escudo ? {escudo: true} : {})};   // (escudo: para Desarmar, 2026-10-22)
         if(op.contraEsquiva && !d.hab) defensa = {...defensa, contraEsquiva: true, ...(await alcanceContra(d, h))};   // ⚔ Contraataque (Warrior)
       }
       let extra = null;

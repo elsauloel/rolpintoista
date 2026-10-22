@@ -290,7 +290,7 @@ const FichaDuelo = (() => {
         const disparo = Combatiente.contraDisparo(d);   // contra un disparo, Parry solo con escudo (2026-10-09)
         armasYEscudosParaParry().filter(a => Combatiente.sirveParaParry(a.item, disparo)).forEach(a => {
           const costo = gratis ? 0 : Combatiente.costoParry();
-          ops.push({modo: 'parry', itemId: a.item.id, itemNombre: a.item.nombre, etiqueta: `${String(a.item.tipoItem).startsWith('escudo') ? '🛡' : '🗡'} Parry · ${a.item.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo, motivoNo: '',
+          ops.push({modo: 'parry', itemId: a.item.id, itemNombre: a.item.nombre, escudo: String(a.item.tipoItem).startsWith('escudo'), etiqueta: `${String(a.item.tipoItem).startsWith('escudo') ? '🛡' : '🗡'} Parry · ${a.item.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo, motivoNo: '',
             info: [`Parry 🎲 ${fx(statParaArma('parry', a.item), 'parry', S.efectos)}`, disparo ? 'si ganás, el disparo queda parado (sin Bloqueo)' : `si ganás, Bloqueo 🎲 ${fx(FichaCombate.bloqueoValor(S, a.item))}`, ...(costo > num(S.nitros) ? ['⚠ sin No2: quedás en negativo (se descuenta al recargar)'] : [])]});
         });
         // 🏹 Parry a distancia (Shooter, 2026-10-12): con la habilidad y un arma a distancia en mano, contra cualquier ataque: Evasión contra el PdG,

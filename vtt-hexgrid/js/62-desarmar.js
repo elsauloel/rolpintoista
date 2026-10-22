@@ -19,33 +19,52 @@ function desarmeEscuchar(){
 }
 // Las opciones de ahora: [{d, id, lado, nombre, tokenId, sc, h | pj}] (un creep o un personaje con Desarmar en un duelo en el paso del Bloqueo que
 // todavía no tiró su parte).
+/* Quién puede desarmar (dueño, 2026-10-22): no se declara en el turno («como quien tira pegar fuerte»): la ocasión se da solo en el Bloqueo
+   que sigue a un Parry ganado, en vez de la Fuerza del golpe (quien ataca) o de bloquear (quien defiende). Quien desarma lo hace con su ARMA:
+   quien ataca, con un arma (no garras ni una habilidad); quien defiende, solo si paró con el arma, no con el escudo. Lo que le saca al otro
+   puede ser un arma o un escudo. → la opción, o null. */
+function desarmeOpcion(id, d, lado){
+  if(!d || d.fase !== 'bloqueo' || d.estado !== 'esperando' || (d.ataque && d.ataque.desarme) || d.hab || !d.ataque) return null;
+  if(!d.defensa || d.defensa.modo !== 'parry') return null;
+  if(lado === 'atacante' ? d.fuerza : d.bloqueo) return null;
+  if(lado === 'defensor' && d.defensa.escudo) return null;   // paró con el escudo: bloquea, no desarma
+  const p = d[lado];
+  if(p && p.tipo === 'pj' && p.ref && !String(p.ref).includes(SEP_INVOCACION) && bnManejo(p.ref)){   // 🤺 el Warrior (2026-10-21)
+    const r = (fichasPub.get(p.ref) || {}).resumen || {}, k = r.desarmar;
+    if(!k || r.muerto) return null;
+    if(lado === 'atacante' && !d.ataque.armaId) return null;   // ataca sin un arma
+    const ajeno = typeof esSuTurno === 'function' && esSuTurno(p.tokenId) === false;
+    const costo = ajeno ? (num(k.spAjeno) || num(k.sp) * 2) : num(k.sp);
+    return num(r.sp) >= costo ? {d, id, lado, nombre: p.nombre, tokenId: p.tokenId, pj: {fichaId: p.ref, ...k}} : null;
+  }
+  if(!soyGM || !p || p.tipo !== 'creep') return null;
+  const sc = creepPrivadoDe(p.ref);
+  const h = sc && (sc.habilidades || []).find(x => x && x.desarmar);
+  if(!h || sc.armaNatural || !String(sc.armaNombre || '').trim()) return null;   // con garras o colmillos no se desarma a nadie
+  let motivo = '';
+  try{ motivo = CreepCalculo.bloqueoHab(sc, h) || ''; }catch(e){}
+  return motivo ? null : {d, id, lado, nombre: sc.nombre, sc, h, tokenId: p.tokenId};
+}
 function desarmeOpciones(){
   if(modoMapa !== 'combate') return [];
   const out = [];
-  for(const [id, d] of desarmeDuelos){
-    if(!d || d.fase !== 'bloqueo' || (d.ataque && d.ataque.desarme) || d.hab) continue;
-    for(const lado of ['atacante', 'defensor']){
-      if(lado === 'atacante' ? d.fuerza : d.bloqueo) continue;
-      const p = d[lado];
-      if(p && p.tipo === 'pj' && p.ref && !String(p.ref).includes(SEP_INVOCACION) && bnManejo(p.ref)){   // 🤺 el Warrior (2026-10-21)
-        const r = (fichasPub.get(p.ref) || {}).resumen || {}, k = r.desarmar;
-        if(!k || r.muerto) continue;
-        const ajeno = typeof esSuTurno === 'function' && esSuTurno(p.tokenId) === false;
-        const costo = ajeno ? (num(k.spAjeno) || num(k.sp) * 2) : num(k.sp);
-        if(num(r.sp) >= costo) out.push({d, id, lado, nombre: p.nombre, tokenId: p.tokenId, pj: {fichaId: p.ref, ...k}});
-        continue;
-      }
-      if(!soyGM || !p || p.tipo !== 'creep') continue;
-      const sc = creepPrivadoDe(p.ref);
-      const h = sc && (sc.habilidades || []).find(x => x && x.desarmar);
-      if(!h) continue;
-      let motivo = '';
-      try{ motivo = CreepCalculo.bloqueoHab(sc, h) || ''; }catch(e){}
-      if(!motivo) out.push({d, id, lado, nombre: sc.nombre, sc, h, tokenId: p.tokenId});
-    }
-  }
+  for(const [id, d] of desarmeDuelos) for(const lado of ['atacante', 'defensor']){ const o = desarmeOpcion(id, d, lado); if(o) out.push(o); }
   return out;
 }
+// Los ganchos del cuadro del duelo (comun/duelo.js): el botón «🤺 Desarmar» adentro del paso 3, al lado de la tirada.
+window.dueloDesarmeOpcion = (d, lado) => {
+  if(!d || !d.id) return null;
+  const o = desarmeOpcion(d.id, d, lado);
+  if(!o) return null;
+  const k = desarmeCosto(o);
+  return {costo: k.txt + (k.ajeno ? ' (turno ajeno: el doble)' : ''), titulo: `En vez de ${lado === 'atacante' ? 'tu Fuerza del golpe' : 'bloquear'}: si ganás, se le cae lo que tiene en la mano`};
+};
+window.dueloDesarmar = async (id, lado) => {
+  const d = desarmeDuelos.get(id) || (await fbDb.collection(fbRutaCampana('duelos')).doc(id).get().then(s => s.exists ? {...s.data(), id} : null).catch(() => null));
+  const o = desarmeOpcion(id, d, lado);
+  if(!o){ toast('Ya no se puede desarmar en este duelo'); return false; }
+  return await desarmarUsar(o);
+};
 function renderDesarmarBoton(){
   if(typeof Flotantes === 'undefined' || !Flotantes.desarmar) return;
   desarmeEscuchar();
@@ -77,12 +96,12 @@ async function desarmarUsar(o){
   const otro = o.d[o.lado === 'atacante' ? 'defensor' : 'atacante'];
   if(o.pj){   // el Warrior: pregunta el Flash (en turno ajeno, el doble) antes de marcar
     const pago = await ConfirmarTurno.flash('Desarmar', {sp: num(o.pj.sp)}, {quien: o.nombre, spAjeno: num(o.pj.spAjeno) || num(o.pj.sp) * 2, ident: {nombre: o.nombre, ref: o.pj.fichaId}});
-    if(!pago) return;
+    if(!pago) return false;
     k = {...k, sp: num(pago.sp), txt: `${fmt(num(pago.sp))} SP`};
   }
   let ok = false;
   try{ ok = await Duelo.marcarDesarme(o.id, o.lado, {nombre: (o.h && o.h.nombre) || 'Desarmar', quien: o.nombre}); }catch(err){ console.error('Desarmar: no se pudo marcar', err); }
-  if(!ok){ toast('No se pudo: el Bloqueo ya se tiró o alguien ya intenta desarmar'); return; }
+  if(!ok){ toast('No se pudo: el Bloqueo ya se tiró o alguien ya intenta desarmar'); return false; }
   if(o.pj){
     let falta = null;
     const cobro = await editarPersonajeMapa(o.pj.fichaId, async S => {
@@ -102,6 +121,7 @@ async function desarmarUsar(o){
   }catch(err){ console.error('Desarmar: no se pudo cobrar', err); toast(`✋ Cobrale a mano el Desarmar a ${o.nombre} (${k.txt})`); }
   mesaLinea(`🤺 ${o.nombre} intenta desarmar a ${otro.nombre}: ${o.lado === 'atacante' ? 'su Fuerza del golpe' : 'su Bloqueo'} vale como Desarmar · ${k.txt}${k.ajeno ? ' (Flash en turno ajeno: el doble)' : ''}`, 'recordatorio');
   try{ momentoAbrir({tipo: 'desarme-intento', icono: '🤺', titulo: `${o.nombre} intenta desarmar a ${otro.nombre}`, estado: 'listo', resultado: 'Si gana el Bloqueo, el otro pierde lo que tiene en la mano'}); }catch(e){}
+  return true;
 }
 
 /* El duelo terminó «desarmado» (gancho `desarmado` de Duelo.escuchar, js/14; solo el GM): la ruleta de casillas en todas las pantallas (un momento)

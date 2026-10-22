@@ -42,6 +42,9 @@ pública del creep, que leen los jugadores), se calculan a partir del ítem en l
    (`CreepCalculo.normalizar`, `InvCalculo.migrar`, `FichaGuardado`): son el paso 2. Prueba nueva en `comun/pruebas.html` (559 en verde).
    Pendiente para la limpieza: el «ataque con su arma» (`{tipo, armaId: '', armaNombre, tipoDado, rango, alcance, ...ataqueDeArma}`) se arma igual
    en seis lugares (js/12, js/17 ×2, js/58, InvAcciones, GM Tools js/06): juntarlo en una sola pieza.
+   **Probado en el mapa (2026-10-22, «Claude · pruebas»):** Goblin 1 (Lanza corta) contra Goblin 4: las Acciones muestran lo de siempre (daño
+   1d4 + 2, atacar 4 No2), el crítico usa el Tipo 4 de la lanza, «Tirar el daño · Lanza corta · 1d4 + 2» → 3, «💔 Aplicar el daño» → vida 5 → 2;
+   y ahora el duelo muestra el recuadro del arma del creep (antes solo el de los personajes). Todo restaurado.
 2. **Migración automática de los datos:** al cargar un creep o una invocación (`CreepCalculo.normalizar`, `InvCalculo.migrar`), el arma suelta pasa
    a ser un ítem equipado de su lista; los escudos y talismanes del `equipo` pasan a la forma del personaje (la Defensa adentro de `mods`). La puerta
    del paso 1 pasa a leer la lista. Los creeps base, las armas naturales, el esquema de la IA y GM Tools crean directo en la forma nueva.

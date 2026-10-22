@@ -2856,7 +2856,15 @@ const Duelo = (() => {
   function contenedorAvisos(){
     inyectarCss();
     let c = document.getElementById('duelo-avisos');
-    if(!c){ c = document.createElement('div'); c.id = 'duelo-avisos'; document.body.appendChild(c); }
+    if(!c){
+      c = document.createElement('div'); c.id = 'duelo-avisos'; document.body.appendChild(c);
+      // Lo que ocupan los botones de los duelos minimizados, para que el cartel de abajo (el dodge roll…) se suba encima y no quede tapado
+      // (dueño, 2026-10-22: «probemos subiendo el cartel»; comun/aviso-combate.js usa --duelo-avisos-alto).
+      const medir = () => { const h = c.childElementCount ? Math.ceil(c.getBoundingClientRect().height) + 10 : 0; document.documentElement.style.setProperty('--duelo-avisos-alto', h + 'px'); };
+      if(typeof ResizeObserver === 'function') new ResizeObserver(medir).observe(c);
+      new MutationObserver(medir).observe(c, {childList: true});
+      medir();
+    }
     return c;
   }
 

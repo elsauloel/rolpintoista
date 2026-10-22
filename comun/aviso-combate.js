@@ -87,7 +87,7 @@ const AvisoCombate = (() => {
     s.id = 'aviso-cartel-css';
     s.textContent = `.aviso-carteles-col{position:fixed;left:50%;top:40%;transform:translate(-50%,-50%);z-index:78;width:min(520px,94vw);display:flex;flex-direction:column;gap:10px;max-height:88vh;overflow:auto}
       .aviso-carteles-col:empty{display:none}
-      .aviso-combate-cartel.abajo{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:78;width:min(520px,94vw)}
+      .aviso-combate-cartel.abajo{position:fixed;left:50%;bottom:calc(16px + var(--duelo-avisos-alto, 0px));transform:translateX(-50%);z-index:78;width:min(520px,94vw);max-height:calc(100vh - 32px - var(--duelo-avisos-alto, 0px));overflow:auto}
       .aviso-combate-cartel .duelo-caja{width:100%;max-height:70vh}
       .aviso-combate-cartel .duelo-cuerpo{gap:12px}
       .aviso-combate-cartel .duelo-paso p,.aviso-combate-cartel .aviso-texto{margin:0;line-height:1.45}

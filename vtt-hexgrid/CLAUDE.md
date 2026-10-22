@@ -1711,6 +1711,13 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   esa pantalla muestra el Anuncio «🎲 Tirá para el efecto de … contra …» (`zonaExtraMomento`, de a uno) y `zonaExtraTirar` lo publica en la Mesa a
   su nombre; el GM, «🎲 Tirar por él» en la Crónica. Y `zonasDelQueLaTiro(tokenId, mantNuevo)` (js/07): después de un cambio de ronda, la zona que se
   va espera a resolver su efecto de esa ronda (`venceMant` = ese Mantenimiento) en vez de borrarse en el acto.
+  **🎲→◎ Lo que sale se aplica solo, nunca en silencio** (2026-10-22, dueño): si la zona trae la tabla «según la tirada» (`porTirada` adentro del
+  JSON de `zonaEstado`; `Combatiente.porTiradaNorm/efectoPorTirada`; «cae» = la vida a 0), `zonaExtraTirar` muestra «Salió 18 → Stun (1 turno) a
+  X» con «✔ Que se aplique» (el momento pasa a `tirado` → `aplicar`); `zonaExtraAplicarMomento` lo encola en la pantalla que maneja a quien lo recibe
+  (`zonaExtraManejo`: el GM para un creep, `bnManejo` para un personaje) con el Anuncio «Te aplican …» y `zonaExtraAplicar` lo aplica al aceptar
+  (`modificarCreep` + `EstadosAplicar.aplicarACreep`, o `editarPersonajeMapa` + `FichaAcciones.aplicarEstadoRecibido`; «cae»: `sc.hp = 0` /
+  `fijarHp(S, 0)`). Las zonas que tiran solas (js/08) abren el momento directo en `aplicar` (`zonaExtraAplicarDirecto`). El GM, desde la Crónica,
+  «✔ Que se aplique (por él)» y «◎ Aplicar por él».
 - **👊 Patotear / Jauría** (2026-10-21, `js/65-patota.js`): un ataque con `manada` (el tope); `patotaBonos` (desde `dueloElegirObjetivoMapa`, js/13, después de
   la herida) cuenta los aliados del mismo tipo pegados al objetivo (`patotaAliados`: sin caídos ni bajo tierra) y suma +1 dado por cada uno, hasta el tope.
 - **🩸 Sal en la herida / Morder la herida** (2026-10-21, `js/64-herida.js`): un ataque con `abrirHerida`; `heridaBonos` (desde

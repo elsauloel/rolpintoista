@@ -177,6 +177,7 @@ const AsistenteDueloHab = (() => {
       contraOtro: (ini && ini.contraOtro) || '',
       dano: !!(ini && ini.dano), tipoDano: (ini && ini.tipoDano) || 'arcano',
       danoDif: !!(ini && ini.danoDiferencia), danoExtra: (ini && ini.danoExtra) || '',
+      danoExtraEfectos: Array.isArray(ini && ini.danoExtraEfectos) ? structuredClone(ini.danoExtraEfectos) : [],   // 🎲 según la tirada extra (2026-10-22): [{desde, estado} | {desde, caer}]
       danoArma: !!(ini && ini.danoArma),   // el daño del arma de quien la usa (2026-10-02, Daño en área): dirigida, área u onda   // la diferencia: zona y dirigida; la tirada extra: solo zona (2026-10-02)
       drena: !!(ini && ini.drena), drenaTope: ini && ini.drenaTope !== undefined ? Number(ini.drenaTope) || 0 : 50, drenaPct: ini && Number(ini.drenaPct) > 0 ? Number(ini.drenaPct) : 100,   // drena (2026-10-02, Drenar Vida): no en una zona
       // Efecto que no se puede automatizar del todo (2026-09-27, pedido del dueño): texto libre que se muestra
@@ -469,9 +470,26 @@ const AsistenteDueloHab = (() => {
           if(st.drena) h += `<div class="fila"><span>Se cura el</span><input type="number" min="1" max="100" style="width:70px" data-drenapct value="${esc(st.drenaPct)}"><span>% · puede pasar su máximo hasta</span><input type="number" min="0" style="width:70px" data-drenatope value="${esc(st.drenaTope)}"><span>% (como Vida extra)</span></div>`;
         }
         if(esZona) h += `<div class="fila"><span>Si el daño entra, tirar además:</span><input type="text" style="width:90px" data-danoextra placeholder="ej. 1d20" value="${esc(st.danoExtra)}"></div>`;
+        if(esZona && st.danoExtra) h += cuerpoPorTirada();
       }
       h += `<label class="op"><input type="checkbox" data-efectolibre-on ${st.efectoLibreOn ? 'checked' : ''}> ✋ Algo del daño se resuelve a mano</label>`;
       if(st.efectoLibreOn) h += `<textarea data-efectolibre rows="3" placeholder="ej. Drenás la diferencia: sumátela a tu vida.">${esc(st.efectoLibre)}</textarea><p class="nota">El cuadro lo muestra junto al resultado (con la diferencia entre las tiradas), aclarando que es a mano.</p>`;
+      return h;
+    }
+    // 🎲 Según la tirada extra (2026-10-22, dueño, los Pedos Tóxicos): qué estado deja cada resultado, o «cae» (la vida a 0, el desmayo). Vale el
+    // renglón más alto que alcance la tirada. Se aplica solo, pero con su Anuncio (quien tira acepta; quien lo recibe, también).
+    function cuerpoPorTirada(){
+      const filas = st.danoExtraEfectos;
+      let h = `<div class="adh-portirada"><div class="nota" style="margin:6px 0 4px">Según lo que salga, se aplica solo (con su Anuncio): vale el renglón más alto que alcance la tirada.</div>`;
+      filas.forEach((f, i) => {
+        const que = f.caer ? '💀 cae (la vida a 0)' : f.estado && f.estado.nombre ? `◎ ${esc(f.estado.nombre)}${Number(f.estado.turnos) > 0 ? ` · ${f.estado.turnos} turno${Number(f.estado.turnos) === 1 ? '' : 's'}` : f.estado.permanente ? ' · no vence' : ''}${Number(f.estado.stacks) > 0 ? ` ×${f.estado.stacks}` : ''}` : '';
+        h += `<div class="fila"><span>desde</span><input type="number" min="1" style="width:60px" data-pt-desde="${i}" value="${esc(f.desde)}"><span>→</span>`;
+        if(f.caer || (f.estado && f.estado.nombre && f.estado.deCatalogo)) h += `<b>${que}</b>`;
+        else h += `<input type="text" style="width:130px" data-pt-nombre="${i}" placeholder="estado" value="${esc(f.estado ? f.estado.nombre : '')}"><span>turnos</span><input type="number" min="0" style="width:60px" data-pt-turnos="${i}" value="${esc(f.estado ? f.estado.turnos || '' : '')}">`;
+        if(!f.caer) h += `<button type="button" class="sec" data-pt-cambiar="${i}" title="Elegir del catálogo de estados">✎</button>`;
+        h += `<button type="button" class="sec" data-pt-quitar="${i}" title="Sacar">✕</button></div>`;
+      });
+      h += `<div class="fila"><button type="button" class="sec" data-pt-mas="estado">＋ Desde N: un estado</button><button type="button" class="sec" data-pt-mas="caer">＋ Desde N: cae (la vida a 0)</button></div></div>`;
       return h;
     }
 
@@ -580,7 +598,7 @@ const AsistenteDueloHab = (() => {
       // 3 · Daño
       const nD = sinContacto() ? 2 : 3;
       h += paso(nD === 2 ? '·' : 3, 'Daño', !st.dano ? `<button type="button" class="sec ejd-ed ejd-mas" data-ejd-pop="dano">Sin daño · tocá para agregarlo</button>${popHtml('dano')}`
-        : `<button type="button" class="ejd-dano ejd-ed" data-ejd-pop="dano">🎲 Tirar el daño · ${esc(danoTxt())}</button><div class="duelo-mini">${esc(frenoTxt())}${st.drena ? ' · 🩸 drena' : ''}</div>${st.objetivo === 'zona' && st.danoExtra ? `<div class="duelo-mini ejd-ed" data-ejd-pop="dano">🎲 si entra: ${esc(st.danoExtra)}</div>` : ''}${st.efectoLibreOn && st.efectoLibre.trim() ? `<div class="duelo-ef ejd-ed" data-ejd-pop="dano"><div class="duelo-nota">✋ <b>A mano:</b> ${esc(st.efectoLibre.trim())}</div></div>` : ''}${popHtml('dano')}`);
+        : `<button type="button" class="ejd-dano ejd-ed" data-ejd-pop="dano">🎲 Tirar el daño · ${esc(danoTxt())}</button><div class="duelo-mini">${esc(frenoTxt())}${st.drena ? ' · 🩸 drena' : ''}</div>${st.objetivo === 'zona' && st.danoExtra ? `<div class="duelo-mini ejd-ed" data-ejd-pop="dano">🎲 si entra: ${esc(st.danoExtra)}${st.danoExtraEfectos.length && typeof Combatiente !== 'undefined' ? ' → ' + esc(Combatiente.porTiradaTxt(st.danoExtraEfectos)) : ''}</div>` : ''}${st.efectoLibreOn && st.efectoLibre.trim() ? `<div class="duelo-ef ejd-ed" data-ejd-pop="dano"><div class="duelo-nota">✋ <b>A mano:</b> ${esc(st.efectoLibre.trim())}</div></div>` : ''}${popHtml('dano')}`);
       // 4 · Efectos (una zona que solo queda deja lo suyo: está en «La zona que queda»)
       if(st.objetivo !== 'zona') h += efectosHtmlEd('Efectos de la habilidad');
       return h;
@@ -797,6 +815,25 @@ const AsistenteDueloHab = (() => {
       q('[data-drenatope]', e => { st.drenaTope = Math.max(0, Number(e.target.value) || 0); });
       q('[data-drenapct]', e => { st.drenaPct = Math.max(1, Math.min(100, Math.round(Number(e.target.value) || 100))); });
       q('[data-danoextra]', e => { st.danoExtra = e.target.value.trim(); });
+      f.querySelectorAll('[data-danoextra]').forEach(el => el.onchange = () => dibujar());   // 🎲 al terminar de escribir la fórmula aparece la tabla
+      // 🎲 según la tirada extra (2026-10-22)
+      f.querySelectorAll('[data-pt-desde]').forEach(el => el.oninput = () => { const x = st.danoExtraEfectos[Number(el.dataset.ptDesde)]; if(x) x.desde = Math.max(1, Math.round(Number(el.value) || 1)); });
+      f.querySelectorAll('[data-pt-nombre]').forEach(el => el.oninput = () => { const x = st.danoExtraEfectos[Number(el.dataset.ptNombre)]; if(x){ x.estado = x.estado || {}; x.estado.nombre = el.value; } });
+      f.querySelectorAll('[data-pt-turnos]').forEach(el => el.oninput = () => { const x = st.danoExtraEfectos[Number(el.dataset.ptTurnos)]; if(x){ x.estado = x.estado || {}; x.estado.turnos = Math.max(0, Math.round(Number(el.value) || 0)); } });
+      f.querySelectorAll('[data-pt-quitar]').forEach(el => el.onclick = () => { st.danoExtraEfectos.splice(Number(el.dataset.ptQuitar), 1); dibujar(); });
+      const ptElegir = async i => {
+        if(!cfg.elegirEstado){ if(i === null) st.danoExtraEfectos.push({desde: 1, estado: {nombre: '', turnos: 1}}); dibujar(); return; }
+        const r = await cfg.elegirEstado();
+        if(!r) return;
+        const fila = i === null ? {desde: 1} : st.danoExtraEfectos[i];
+        if(r.modo === 'manual') fila.estado = {nombre: '', turnos: 1};
+        else fila.estado = {nombre: r.nombre, deCatalogo: true, ...(r.permanente ? {permanente: true} : Number(r.turnos) > 0 ? {turnos: Number(r.turnos)} : {}), ...(Number(r.stacks) > 0 ? {stacks: Number(r.stacks)} : {})};
+        delete fila.caer;
+        if(i === null) st.danoExtraEfectos.push(fila);
+        dibujar();
+      };
+      f.querySelectorAll('[data-pt-mas]').forEach(el => el.onclick = () => { if(el.dataset.ptMas === 'caer'){ st.danoExtraEfectos.push({desde: 20, caer: true}); dibujar(); } else ptElegir(null); });
+      f.querySelectorAll('[data-pt-cambiar]').forEach(el => el.onclick = () => ptElegir(Number(el.dataset.ptCambiar)));
       q('[data-tipodano]', e => { st.tipoDano = e.target.value; if(st.tipoDano === 'fisico') st.ignoraDano = false; dibujar(); });
       q('[data-ignoradano]', e => { st.ignoraDano = e.target.checked; dibujar(); });
       q('[data-frenoesp]', e => { st.frenoEsp = e.target.value; });
@@ -938,6 +975,10 @@ const AsistenteDueloHab = (() => {
           if(st.danoExtra){
             if(!/^\d*d\d+\s*([+-]\s*\d+)?$/i.test(st.danoExtra)){ alert('La tirada de «si el daño entra» tiene que ser una fórmula de dados, por ejemplo 1d20.'); return false; }
             out.danoExtra = st.danoExtra.replace(/\s+/g, '');
+            // 🎲 según la tirada (2026-10-22): se guarda limpia; un renglón sin estado ni «cae» avisa
+            if(st.danoExtraEfectos.some(x => x && !x.caer && !(x.estado && String(x.estado.nombre || '').trim()))){ alert('Cada renglón de «según la tirada» necesita un estado (o «cae»).'); return false; }
+            const pt = typeof Combatiente !== 'undefined' && Combatiente.porTiradaNorm ? Combatiente.porTiradaNorm(st.danoExtraEfectos) : st.danoExtraEfectos;
+            if(pt.length) out.danoExtraEfectos = pt;
           }
         }
         if(st.efectoLibreOn && st.efectoLibre.trim()) out.efectoLibre = st.efectoLibre.trim();

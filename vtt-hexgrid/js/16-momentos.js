@@ -173,6 +173,8 @@ function renderMomentosFeed(){
     feed.addEventListener('click', ev => {
       const b = ev.target.closest('[data-trampa-seguir]'); if(b) trampaSeguir(b.dataset.trampaSeguir);
       const bz = ev.target.closest('[data-zona-extra]'); if(bz){ const v = momentosFeed.get(bz.dataset.zonaExtra); if(v && typeof zonaExtraTirar === 'function'){ bz.disabled = true; zonaExtraTirar(bz.dataset.zonaExtra, v.d, true); } }   // 🎲 (js/66)
+      const bzo = ev.target.closest('[data-zona-extra-ok]'); if(bzo){ bzo.disabled = true; momentoActualizar(bzo.dataset.zonaExtraOk, {estado: 'aplicar'}); }   // 🎲→◎ el GM acepta por quien tiró (js/66)
+      const bza = ev.target.closest('[data-zona-extra-aplicar]'); if(bza){ const v = momentosFeed.get(bza.dataset.zonaExtraAplicar); if(v && typeof zonaExtraAplicar === 'function'){ bza.disabled = true; zonaExtraAplicar(bza.dataset.zonaExtraAplicar, v.d, true); } }   // 🎲→◎ el GM aplica por quien lo recibe (js/66)
       const bi = ev.target.closest('[data-inicio-aplicar]'); if(bi){ const v = momentosFeed.get(bi.dataset.inicioAplicar); if(v){ bi.disabled = true; inicioTurnoAplicar(bi.dataset.inicioAplicar, v.d, true); } }
     });
     caja.appendChild(feed);
@@ -188,6 +190,8 @@ function renderMomentosFeed(){
         : d.resultado ? `<div style="margin-top:3px;color:#cfd6e6">${esc(d.resultado)}</div>` : (d.estado === 'listo' ? '' : '<div style="margin-top:3px;color:#8d97ad">…</div>')}
       ${d.tipo === 'trampa' && d.datos && d.datos.fase ? trampaBotonFeed(k, d) : ''}
       ${d.tipo === 'zona-extra' && d.estado === 'esperando' && soyGM && !(d.datos && fbUsuario && d.datos.paraUid === fbUsuario.uid) ? `<div style="margin-top:6px"><button type="button" data-zona-extra="${esc(k)}" style="font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid #6fae7d;background:#1f3a27;color:#e9ecf4;cursor:pointer">🎲 Tirar por él</button></div>` : ''}
+      ${d.tipo === 'zona-extra' && d.estado === 'tirado' && soyGM && !(d.datos && fbUsuario && d.datos.paraUid === fbUsuario.uid) ? `<div style="margin-top:6px"><button type="button" data-zona-extra-ok="${esc(k)}" style="font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid #6fae7d;background:#1f3a27;color:#e9ecf4;cursor:pointer">✔ Que se aplique (por él)</button></div>` : ''}
+      ${d.tipo === 'zona-extra' && d.estado === 'aplicar' && soyGM && !(typeof zonaExtraManejo === 'function' && d.datos && zonaExtraManejo(d.datos.objetivo)) ? `<div style="margin-top:6px"><button type="button" data-zona-extra-aplicar="${esc(k)}" style="font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid #6fae7d;background:#1f3a27;color:#e9ecf4;cursor:pointer">◎ Aplicar por él</button></div>` : ''}
       ${d.tipo === 'inicio-turno' && d.estado === 'esperando' && soyGM ? `<div style="margin-top:6px"><button type="button" data-inicio-aplicar="${esc(k)}" style="font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid #6fae7d;background:#1d2a20;color:#bfe8c7;cursor:pointer">▶ Aplicar por él</button></div>` : ''}
     </div>`;
   }).join('');

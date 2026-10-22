@@ -607,13 +607,15 @@ async function zonaResolverBanner(){
   // Si el daño entró: la tirada extra (ej. 1d20) con el texto de qué significa cada resultado, en la Mesa y en el cartelito. Aplicar lo que
   // salga queda a mano.
   // 🎲 La de un personaje la tira quien la creó, en su pantalla (2026-10-22, dueño: js/66); las demás, como siempre.
-  const extraDe = danoHecho > 0 && el.zonaTiraExtra && typeof zonaExtraPedir === 'function' ? await zonaExtraPedir(el, quienTxt) : '';
+  const extraDe = danoHecho > 0 && el.zonaTiraExtra && typeof zonaExtraPedir === 'function' ? await zonaExtraPedir(el, quienTxt, t) : '';
   if(extraDe) partes.push(`🎲 ${el.zonaTiraExtra}: lo tira ${extraDe}`);
   else if(danoHecho > 0 && (el.zonaTiraExtra || el.zonaNota)){
     const r = el.zonaTiraExtra ? tirarDados(el.zonaTiraExtra) : null;
     if(r){
       try{ if(el.zonaNota) mesaConTexto(el.zonaNota); mesaPublicar(`${quienTxt} · ${el.zonaNombre || 'Zona'}`, {formula: r.formula || el.zonaTiraExtra, rolls: r.rolls, mod: r.mod, total: r.total}); }catch(err){}
-      partes.push(`🎲 ${el.zonaTiraExtra}: ${r.total}${el.zonaNota ? ` — ${el.zonaNota}` : ''}`);
+      // 🎲→◎ (2026-10-22, js/66): si la tabla «según la tirada» dice algo, quien lo recibe lo acepta en su pantalla (nunca en silencio)
+      const toca = typeof zonaExtraAplicarDirecto === 'function' ? await zonaExtraAplicarDirecto(el, quienTxt, t, r.total) : '';
+      partes.push(`🎲 ${el.zonaTiraExtra}: ${r.total}${toca ? ` → ${toca} (lo acepta quien lo recibe)` : el.zonaNota ? ` — ${el.zonaNota}` : ''}`);
     }else if(el.zonaNota) partes.push(el.zonaNota);
   }
   if(el.zonaEstado && !resistio){

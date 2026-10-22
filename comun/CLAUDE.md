@@ -1110,6 +1110,11 @@ versión parecida en más de una, es candidato a juntar.
   cada resultado; aplicarlo sigue a mano). Tipo de daño nuevo **Tóxico** (P142). `Combatiente.zonaDeHab` manda `zonaDanoDif`,
   `zonaDanoTipo`, `zonaTiraExtra`, `zonaNota`. **Regla del dueño: resistir una zona evita todo** (antes el daño de fórmula entraba igual).
   Reglas de Firestore nuevas (esos cuatro campos del elemento).
+- **🎲→◎ Según la tirada extra de una zona** (2026-10-22, dueño, los Pedos Tóxicos: «los estados se podrían automatizar después de la tirada de 20»):
+  en el paso «Daño» de la Ejecución (`asistente-duelo-hab.js`, con objetivo zona y «tirar además»), la tabla **«desde N → estado»** / **«desde N → cae
+  (la vida a 0)»** (`danoExtraEfectos`; el estado se elige con el selector real, `cfg.elegirEstado`). `Combatiente.porTiradaNorm`, `efectoPorTirada(tabla,
+  total)` (vale el renglón más alto que alcance), `porTiradaFilaTxt`, `porTiradaTxt`; `zonaDeHab` la manda adentro del JSON de `zonaEstado` (`porTirada`,
+  sin regla nueva de Firestore) y, si no hay texto a mano, la nota de la zona es la tabla. Lo aplica el mapa con dos Anuncios (vtt-hexgrid/js/66).
 - **Daño especial — `dmgesp`, «Dmg.Esp»** (2026-10-02, pedido del dueño): stat secundario nuevo del Especial (fórmula por defecto
   `esp`, como el Dmg de la Fuerza), para tiradas puntuales de "cuánto daño" (ej. Pedos Tóxicos tira Dmg.Esp contra Res.Esp). Está en
   `FichaCalculo.GRUPOS`, `FichaGuardado.DEFAULT.formulas` (una ficha vieja lo recibe sola al mezclarse), `CreepCalculo` (derivados y botón de

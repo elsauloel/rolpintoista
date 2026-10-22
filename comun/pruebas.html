@@ -3855,6 +3855,16 @@ prueba('pies: las chances (33 % = 5–6, 50 % = 4–6, siempre), Lento y los est
     Combatiente.esTraba({nombre: 'Veneno'}), rengo1, S.efectos.some(e => e.nombre === 'Rengo')],
     ['33 % (5–6 en d6)', '50 % (2 en d2)', 'siempre', {caras: 2, exitos: 1}, true, true, false, 1, false]);
 });
+prueba('zona: la tabla «según la tirada extra» (Pedos Tóxicos, 2026-10-22): vale el renglón más alto que alcance, «cae» es la vida a 0, viaja adentro del JSON de zonaEstado y la nota la cuenta', () => {
+  const tabla = [{desde: 17, estado: {nombre: 'Stun', turnos: 1}}, {desde: '7', estado: {nombre: 'Pajaritos', turnos: 1}}, {desde: 20, caer: true}, {desde: 3}, {desde: 5, estado: {nombre: ''}}];
+  const n = Combatiente.porTiradaNorm(tabla);
+  const h = {nombre: 'Pedos', duelo: {objetivo: 'zona', tira: 'dmgesp', contra: ['resmg'], dano: true, tipoDano: 'toxico', danoDiferencia: true, danoExtra: '1d20', danoExtraEfectos: tabla, radio: 2, zonaTurnos: 1}};
+  const z = Combatiente.zonaDeHab(h, h.duelo, {fichaId: 'f1', tipo: 'pj', tiraValor: 19});
+  const sin = Combatiente.zonaDeHab({nombre: 'Nube', duelo: {objetivo: 'zona', dano: true, danoExtra: '1d20'}}, {objetivo: 'zona', dano: true, danoExtra: '1d20'}, {});
+  igual([n.map(f => f.desde), n[2].caer, n[0].estado, Combatiente.efectoPorTirada(tabla, 6), Combatiente.efectoPorTirada(tabla, 7).estado.nombre, Combatiente.efectoPorTirada(tabla, 18).estado.nombre,
+    Combatiente.efectoPorTirada(tabla, 20).caer, Combatiente.porTiradaTxt(tabla), z.zonaEstado && z.zonaEstado.porTirada.length, z.zonaNota, sin.zonaEstado, sin.zonaNota],
+    [[7, 17, 20], true, {nombre: 'Pajaritos', turnos: 1}, null, 'Pajaritos', 'Stun', true, '7+ Pajaritos (1 turno) · 17+ Stun (1 turno) · 20+ cae (la vida a 0)', 3, '7+ Pajaritos (1 turno) · 17+ Stun (1 turno) · 20+ cae (la vida a 0)', null, '']);
+});
 prueba('pies: el resumen del personaje publica Pisada atenta, Inamovible, Recuperarse rápido y Reflejos de mangosta; y el catálogo tiene 32 pies Comunes (con las Zapatillas de pluma y las 4 de Defensa especial del 2026-10-07)', () => {
   const S = FichaGuardado.normalizar({}).S;
   S.inventario = [{id: 'p1', nombre: 'Botas de prueba', tipoItem: 'pies', equipado: true, mods: [{stat: 'pisadaatenta', val: 1}, {stat: 'inamovible', val: 33}, {stat: 'recuperarse', val: 50}, {stat: 'reflejos', val: 33}]}];

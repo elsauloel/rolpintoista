@@ -1473,11 +1473,12 @@ const Combatiente = (() => {
     const dif = !!(c.dano && c.danoDiferencia);
     return {tipo: 'zona-persistente-habilidad', fichaId: o.fichaId, casteadorTipo: o.tipo, nombre: h.nombre,
       radio: Math.max(1, nf(c.radio) || 1), zonaTurnos: Math.max(1, nf(c.zonaTurnos) || 3), zonaAmiga: !!c.zonaAmiga, zonaAltura: c.zonaAltura || '',
-      zonaEstado: zonaEstadoDe(c, o), zonaDano: c.dano && !dif ? formulaDanoHab(h, c, o.X) : (dif && c.danoSuma ? String(c.danoSuma) : ''),   // con «la diferencia», `danoSuma` se le suma (miasma: + 1d4)
+      zonaEstado: zonaEstadoConTirada(c, o), zonaDano: c.dano && !dif ? formulaDanoHab(h, c, o.X) : (dif && c.danoSuma ? String(c.danoSuma) : ''),   // con «la diferencia», `danoSuma` se le suma (miasma: + 1d4)
       zonaIgnoraDef: c.dano ? (c.ignoraDano !== undefined ? !!c.ignoraDano : (c.tipoDano || 'arcano') !== 'fisico') : false,
       zonaDirecto: !!(c.dano && (c.danoDirecto || c.trueDamage) && (c.tipoDano || 'arcano') !== 'fisico'),   // daño directo: no lo frena la Defensa especial (2026-10-07)
       zonaDanoDif: dif, zonaDanoTipo: c.dano ? (TIPO_DANO_NOMBRE[c.tipoDano || 'arcano'] || '') : '',
-      zonaTiraExtra: c.dano && c.danoExtra ? String(c.danoExtra) : '', zonaNota: c.efectoLibre ? (o.X === undefined || o.X === null ? String(c.efectoLibre) : sustituirX(String(c.efectoLibre), o.X)) : '',
+      zonaTiraExtra: c.dano && c.danoExtra ? String(c.danoExtra) : '',
+      zonaNota: c.efectoLibre ? (o.X === undefined || o.X === null ? String(c.efectoLibre) : sustituirX(String(c.efectoLibre), o.X)) : (c.dano && c.danoExtra ? porTiradaTxt(c.danoExtraEfectos) : ''),   // sin texto a mano, lo que dice la tabla
       resistStat: (c.contra && c.contra[0]) || '', resistValor: o.resistValor === undefined ? null : o.resistValor,
       // La tirada de la zona (2026-10-02, P143): el stat de quien la crea y su VALOR en ese momento; el mapa lo tira cada vez que la zona
       // afecta a alguien (antes se tiraba una sola vez al ejecutar: `resistValor`, que sigue valiendo para las zonas viejas).
@@ -1499,6 +1500,12 @@ const Combatiente = (() => {
     const e = c.zonaEstado || null;
     if(!e || !e.soltar || !e.soltar.difStat || e.soltar.difStat !== c.tira || !Number.isFinite(o.tiraValor)) return e;
     return {...e, soltar: {...e.soltar, dif: Math.max(1, Math.round(o.tiraValor))}};
+  }
+  // 🎲 La tabla «según la tirada extra» (2026-10-22) va adentro del JSON de `zonaEstado` (`porTirada`): el mapa la lee al tirar (js/66).
+  function zonaEstadoConTirada(c, o){
+    const e = zonaEstadoDe(c, o);
+    const pt = c.dano && c.danoExtra ? porTiradaNorm(c.danoExtraEfectos) : [];
+    return pt.length ? {...(e || {}), porTirada: pt} : e;
   }
   // La trampa que coloca una habilidad, lista para el mapa: si no trae nombre propio, lleva el de la habilidad.
   // `valorDe(statId)` (2026-10-02, P145): el valor de un stat de quien la coloca — la dificultad para detectarla sale de su Destreza (trampas
@@ -1807,6 +1814,28 @@ const Combatiente = (() => {
   // El texto de lo que cura un ítem: «Heridas (Sangrado, Lisiado, Rengo)».
   const textoCura = grupos => grupos.map(k => `${GRUPOS_CURA[k].label} (${GRUPOS_CURA[k].estados.join(', ')})`).join(' · ');
 
+  /* 🎲 Lo que pasa según la tirada extra de una zona (2026-10-22, dueño, los Pedos Tóxicos: «los estados se podrían automatizar después de la
+     tirada de 20»): `tabla` = [{desde, estado: {nombre, turnos?, stacks?}} | {desde, caer: true}] — «caer» es el desmayo: la vida a 0 (dueño).
+     Vale UN renglón, el más alto que alcance la tirada (con 18: Stun, no Stun más Pajaritos). Nada se aplica en silencio: quien tira ve qué
+     va a pasar y lo acepta; quien lo recibe, también (vtt-hexgrid/js/66). */
+  function porTiradaNorm(tabla){
+    if(!Array.isArray(tabla)) return [];
+    return tabla.map(f => {
+      if(!f || !Number.isFinite(Number(f.desde))) return null;
+      const desde = Math.max(1, Math.round(Number(f.desde)));
+      if(f.caer) return {desde, caer: true};
+      const e = f.estado && typeof f.estado === 'object' ? f.estado : null;
+      if(!e || !String(e.nombre || '').trim()) return null;
+      const estado = {nombre: String(e.nombre).trim().slice(0, 40)};
+      if(nf(e.turnos) > 0) estado.turnos = Math.round(nf(e.turnos));
+      if(nf(e.stacks) > 0) estado.stacks = Math.round(nf(e.stacks));
+      if(e.permanente) estado.permanente = true;
+      return {desde, estado};
+    }).filter(Boolean).sort((a, b) => a.desde - b.desde).slice(0, 6);
+  }
+  const efectoPorTirada = (tabla, total) => porTiradaNorm(tabla).filter(f => f.desde <= nf(total)).pop() || null;
+  const porTiradaFilaTxt = f => f.caer ? 'cae (la vida a 0)' : `${f.estado.nombre}${f.estado.permanente ? ' (no vence)' : nf(f.estado.turnos) > 0 ? ` (${f.estado.turnos} turno${f.estado.turnos === 1 ? '' : 's'})` : ''}${nf(f.estado.stacks) > 0 ? ` ×${f.estado.stacks}` : ''}`;
+  const porTiradaTxt = tabla => porTiradaNorm(tabla).map(f => `${f.desde}+ ${porTiradaFilaTxt(f)}`).join(' · ');
   /* 📜 Un consumible con su Ejecución ✨ (2026-10-20, la Red Nerubian: «habría que modificar sobre el duelo»): `it.duelo` es la misma Ejecución de una
      habilidad o de una varita. Se arma una habilidad de un uso (automática) y sigue el camino de siempre: elegir el objetivo, el cuadro del duelo, los
      efectos. Lo usan FichaAcciones.consumir (personaje) y las Acciones de un creep (vtt-hexgrid/js/12). */
@@ -1816,5 +1845,6 @@ const Combatiente = (() => {
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad, sincronizarEstadosDePasivas, sangraPorSp,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,
-    formulaDanoHab, zonaDeHab, trampaDeHab, ataqueConArreglos, esFlash, FLASH_CSS, flashPara, cdFlash, costoFlash};
+    formulaDanoHab, zonaDeHab, trampaDeHab, ataqueConArreglos, esFlash, FLASH_CSS, flashPara, cdFlash, costoFlash,
+    porTiradaNorm, efectoPorTirada, porTiradaFilaTxt, porTiradaTxt};
 })();

@@ -28,7 +28,8 @@ const FiltroCatalogo = (() => {
   // Qué es / dónde va: en el orden en que se muestran, con su ícono.
   const PARTES = [['arma', '⚔'], ['distancia', '🏹'], ['especial', '✨'], ['escudo', '🛡'], ['orbe', '🔮'], ['torso', '🦺'], ['cabeza', '🪖'], ['manos', '🧤'],
     ['piernas', '👖'], ['pies', '🥾'], ['cinturon', '🎗'], ['mochila', '🎒'], ['carcaj', '🏹'], ['anillo', '💍'], ['consumible', '🧪'], ['trampa', '🪤'], ['otro', '📦']];
-  const PARTE_ETQ = {arma: 'Armas', distancia: 'A distancia', especial: 'Varitas y báculos', escudo: 'Escudos', orbe: 'Orbes', torso: 'Torso', cabeza: 'Cabeza',
+  // (2026-10-22, dueño: «los orbes serían una variante de talismán») la parte «orbe» (it.orbe: orbes y talismanes) se muestra «Talismanes».
+  const PARTE_ETQ = {arma: 'Armas', distancia: 'A distancia', especial: 'Varitas y báculos', escudo: 'Escudos', orbe: 'Talismanes', torso: 'Torso', cabeza: 'Cabeza',
     manos: 'Manos', piernas: 'Piernas', pies: 'Pies', cinturon: 'Cinturón', mochila: 'Mochila', carcaj: 'Carcajes', anillo: 'Anillos', consumible: 'Consumibles', trampa: 'Trampas', otro: 'Otros'};
   const ELEMENTOS = [['fisico', '🗡', 'Físico'], ['arcano', '✨', 'Arcano'], ['fuego', '🔥', 'Fuego'], ['hielo', '❄', 'Hielo'], ['rayo', '⚡', 'Eléctrico'],
     ['toxico', '☠', 'Tóxico'], ['acido', '🧪', 'Ácido']];

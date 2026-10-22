@@ -41,7 +41,7 @@ const GeneradorTiendas = (() => {
   const gondolaDe = it => it.trampaDatos || it.flecha || it.oleoReparador || LUZ_COMUN.test(String(it.nombre || '')) ? 'talabarteria' : 'bazar';   // 🧴 el Óleo reparador también (2026-10-12)   // 🏹 las flechas especiales, en la Talabartería (2026-10-09)
 
   // Las partes (en qué parte de la receta cae cada ítem).
-  const PARTE_LABEL = {arma: 'Armas', distancia: 'Armas a distancia', especial: 'Varitas y báculos', torso: 'Torso', escudo: 'Escudos', orbe: 'Orbes',
+  const PARTE_LABEL = {arma: 'Armas', distancia: 'Armas a distancia', especial: 'Varitas y báculos', torso: 'Torso', escudo: 'Escudos', orbe: 'Talismanes',
     cabeza: 'Cabeza', manos: 'Manos', piernas: 'Piernas', pies: 'Pies', cinturon: 'Cinturón', mochila: 'Mochila', carcaj: 'Carcajes', anillo: 'Anillos',
     trampa: 'Trampas', consumible: 'Consumibles'};
   const DEFENSIVAS = ['torso', 'escudo', 'cabeza', 'manos', 'piernas', 'pies', 'cinturon', 'mochila'];
@@ -78,7 +78,7 @@ const GeneradorTiendas = (() => {
     talabarteria: {label: 'Talabartería', icono: '🧵', detalle: 'cuero, madera y cuerda: armas a distancia y livianas (Tipo 4), cuero, botas, cinturones, mochilas y trampas',
       receta: {distancia: 24, arma: 16, torso: 13, cabeza: 6, manos: 6, piernas: 9, pies: 9, cinturon: 9, mochila: 8, carcaj: 5}, familias: [4],
       minimos: {mochila: 1, cinturon: 1}, minimosDesde: 'pueblito'},   // siempre una mochila y un cinturón, desde pueblito (dueño, 2026-10-08)
-    bazar: {label: 'Bazar arcano', icono: '✨', detalle: 'lo mágico: consumibles, varitas y báculos, orbes, anillos y piezas de caster',
+    bazar: {label: 'Bazar arcano', icono: '✨', detalle: 'lo mágico: consumibles, varitas y báculos, talismanes, anillos y piezas de caster',
       receta: {especial: 40, orbe: 16, anillo: 10, torso: 12, cabeza: 9, manos: 7, cinturon: 6}, minimos: {especial: 2}},   // anillos: escasos (P114; 22 → 10, 2026-10-18)
   };
   const SECCIONES_ORDEN = ['herreria', 'talabarteria', 'bazar'];

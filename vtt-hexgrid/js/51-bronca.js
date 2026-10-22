@@ -43,7 +43,7 @@ async function broncaEstallar(t){
   const quien = t.oculto ? 'Alguien' : nombreDe(t);
   // El daño: el de su arma (con su Fuerza y lo que tenga encima), con `dados` dados.
   const base = String(CreepCalculo.danoTxt(sc, CreepCalculo.statValor(sc, 'dmg')) || '').replace(/\s+/g, '');
-  const formula = /^\d+d/.test(base) ? base.replace(/^\d+d/, `${b.dados}d`) : `${b.dados}d${num(sc.armaTipo) || 8}`;
+  const formula = /^\d+d/.test(base) ? base.replace(/^\d+d/, `${b.dados}d`) : `${b.dados}d${Combatiente.armaEnMano(sc).tipoDado}`;
   const h = {nombre: b.nombre, duelo: {objetivo: 'onda', radio: b.radio, ondaDodge: true, tira: 'pdg', contra: ['eva'], dano: true, tipoDano: 'fisico',
     danoFormula: formula, efectos: [{nombre: 'Sentado'}]}};
   const hab = CreepAcciones.habEjecucion(sc, h);

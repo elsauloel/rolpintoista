@@ -146,14 +146,15 @@ const FichaLite = (() => {
     return (e.mods || []).filter(m => m.stat === 'def').reduce((a, m) => a + num(m.val) * st, 0);
   };
   function manoGuardada(o, danoTxt){
-    if(!o.armaNombre) return {nombre: '', detalle: 'sin arma', lineas: []};
-    const lineas = [{txt: `Daño ${danoTxt}${o.armaDeRango ? ` (${Combatiente.dmgDelArmaTxt(o)})` : ''}`}];
-    if(num(o.armaPeso)) lineas.push({txt: `Peso ${fmt(num(o.armaPeso))}`});
-    const mt = modsTxt(o.armaMods);
+    const a = Combatiente.armaEnMano(o);   // 🗡 la puerta única (docs/plan-inventario-creeps.md)
+    if(!a.nombre) return {nombre: '', detalle: 'sin arma', lineas: []};
+    const lineas = [{txt: `Daño ${danoTxt}${a.armaDeRango ? ` (${Combatiente.dmgDelArmaTxt(a)})` : ''}`}];
+    lineas.push({txt: `Peso ${fmt(a.peso)}`});
+    const mt = modsTxt(a.mods);
     if(mt) lineas.push({txt: mt});
-    if(o.armaNatural) lineas.push({txt: 'Arma natural (no sirve para Parry ni Bloqueo)'});
-    (o.armaEfectos || []).forEach(e => lineas.push({txt: efectoTxt(e)}));
-    return {nombre: o.armaNombre, detalle: `${danoTxt} · Tipo ${fmt(num(o.armaTipo) || 8)}`, lineas};
+    if(a.natural) lineas.push({txt: 'Arma natural (no sirve para Parry ni Bloqueo)'});
+    a.efectosGolpe.forEach(e => lineas.push({txt: efectoTxt(e)}));
+    return {nombre: a.nombre, detalle: `${danoTxt} · Tipo ${fmt(a.tipoDado)}`, lineas};
   }
   // La otra mano de un creep o una invocación (2026-10-17, dueño: varitas, báculos, orbes y escudos son armas, no equipo): el primer escudo, o
   // si no hay, lo primero que va en la mano (una varita).

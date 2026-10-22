@@ -96,19 +96,22 @@ const InvCalculo = (() => {
   // ataque con su arma (Tipo ÷ 2 el primero del turno) y cuenta como ese ataque.
   function habAtaque(h){ return String((h && h.nitrosCosto) ?? '').trim().toUpperCase() === 'ATAQUE'; }
   // Parry y Bloqueo de una invocación (2026-09-24), igual que un creep: el Parry cuesta 1 No2 (2026-09-26); el Bloqueo = su Bloqueo + el Peso de su arma.
-  function pesoArma(inv){ return Math.max(1, num(inv.armaPeso) || 1); }
+  // 🗡 Su arma: por la puerta única (Combatiente.armaEnMano, docs/plan-inventario-creeps.md), nunca por los campos arma* sueltos.
+  const armaDe = inv => Combatiente.armaEnMano(inv);
+  function pesoArma(inv){ return armaDe(inv).peso; }
   // Con qué para la invocación (Parry y Bloqueo): su arma si no es natural, si no un escudo de su equipo; null = no puede
   // (regla del dueño 2026-09-30, comun/combatiente.js — la misma que personajes y creeps). El Bloqueo suma el peso de eso.
   // o.soloEscudo: contra un disparo, solo un escudo (2026-10-09). Con un arco no se parrea.
   function defensa(inv, o){
     if(!inv) return null;
-    return Combatiente.armaParaDefensa({arma: inv.armaNombre ? {nombre: inv.armaNombre, peso: pesoArma(inv)} : null, natural: inv.armaNatural === true,
-      arco: !!inv.armaDeRango, soloEscudo: !!(o && o.soloEscudo),
+    const a = armaDe(inv);
+    return Combatiente.armaParaDefensa({arma: a.nombre ? {nombre: a.nombre, peso: a.peso} : null, natural: a.natural,
+      arco: a.armaDeRango, soloEscudo: !!(o && o.soloEscudo),
       escudos: Combatiente.piezasParaParry(inv.equipo, slotDe, it => num(it.peso))});   // un báculo sí, un orbe no (2026-10-17)
   }
   function bloqueoValor(inv){ const d = defensa(inv); return statValor(inv, 'bloqueo') + (d ? num(d.peso) : 0); }
   function costoAtaque(inv){ return Combatiente.conExtenuado(inv.estados, costoAtaque0(inv)); }   // + Extenuado (2026-10-12)
-  function costoAtaque0(inv){ const a = Combatiente.armaDeCombatiente(inv); if(Combatiente.cargadaGratis(a, inv.ataquesTurno, inv.descargada)) return 0; return Math.max(0, Combatiente.costoConAhorro(Combatiente.costoAtaque(num(inv.armaTipo) || 8, inv.ataquesTurno, a), a, inv.ataquesTurno) - Combatiente.ahorroArco(a, inv.ataquesTurno, inv.descargada, inv.ultimoPego)); }   // regla común (comun/combatiente.js)   // + Flecha en la cuerda / Encadenar (2026-10-11)
+  function costoAtaque0(inv){ const a = armaDe(inv); if(Combatiente.cargadaGratis(a, inv.ataquesTurno, inv.descargada)) return 0; return Math.max(0, Combatiente.costoConAhorro(Combatiente.costoAtaque(a.tipoDado, inv.ataquesTurno, a), a, inv.ataquesTurno) - Combatiente.ahorroArco(a, inv.ataquesTurno, inv.descargada, inv.ultimoPego)); }   // regla común (comun/combatiente.js)   // + Flecha en la cuerda / Encadenar (2026-10-11)
   function costoNitrosHab(inv, h){ const c = Combatiente.costoNitrosHab(h, () => costoAtaque(inv), IT2_INV.nitrosHabilidad); return String((h && h.nitrosCosto) ?? '').trim().toUpperCase() === 'ATAQUE' ? c : Combatiente.conExtenuado(inv.estados, c); }   // + Extenuado
   function costoHabTxt(inv, h){
     const n = costoNitrosHab(inv, h);
@@ -118,9 +121,10 @@ const InvCalculo = (() => {
   // ¿Se puede usar ahora? La regla común (P133): cooldown, No2 y vida (una 📣 manual no cobra nada).
   function bloqueoHab(inv, h){ return Combatiente.bloqueoHab(h, {modo: FichaBotonera.modoHab(h), nitros: inv.nitros, costo: costoNitrosHab(inv, h), hp: inv.hp}); }
   function danoTxt(inv, extra){
-    const dados = Math.max(1, num(inv.armaPeso)||1) + Math.max(0, num(inv.armaAmplificado));
-    const tipo = num(inv.armaTipo)||8;
-    const fijo = num(inv.armaFijo) + Combatiente.dmgDelArma(inv, num(extra));   // cuerpo a cuerpo el Dmg entero; un arco, la mitad; otra de rango, nada
+    const a = armaDe(inv);
+    const dados = a.peso + a.danoAmplificado;
+    const tipo = a.tipoDado;
+    const fijo = a.danoFijo + Combatiente.dmgDelArma(a, num(extra));   // cuerpo a cuerpo el Dmg entero; un arco, la mitad; otra de rango, nada
     return `${dados}d${tipo}${fijo?` + ${fmt(fijo)}`:''}`;
   }
   function ataqueTxt(inv){

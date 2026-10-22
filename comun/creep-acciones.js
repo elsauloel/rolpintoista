@@ -141,7 +141,7 @@ const CreepAcciones = (() => {
       cuando: firebase.firestore.FieldValue.serverTimestamp(),
     }).catch(err => console.error('No se pudo publicar la alerta de No2:', err));
   }
-  const pdgExtraCreep = sc => Combatiente.pdgExtraArma(st => C().modTotal(sc, st), {tipoDado: num(sc.armaTipo), armaDeRango: !!sc.armaDeRango});
+  const pdgExtraCreep = sc => Combatiente.pdgExtraArma(st => C().modTotal(sc, st), {tipoDado: Combatiente.armaEnMano(sc).tipoDado, armaDeRango: Combatiente.armaEnMano(sc).armaDeRango});
   function tiradaAtaque(sc, tipo){
     const extra = pdgExtraCreep(sc);   // guantes: PdG con esa familia de armas o a distancia (2026-10-05)
     if(tipo === 'normal') return tirada(`${sc.nombre} · PdG`, C().statValor(sc, 'pdg') + extra, sc, 'pdg');
@@ -165,10 +165,10 @@ const CreepAcciones = (() => {
   // «Ataque con mi arma, con arreglos» de un creep (Golpe brutal, Carga…; P134): el mismo armado que el personaje, con su arma.
   function ataqueDeHab(sc, h){
     const c = h && h.duelo;
-    return Combatiente.ataqueConArreglos(h, c, {arma: {...Combatiente.armaDeCombatiente(sc), id: '', nombre: sc.armaNombre || '', rango: !!sc.armaDeRango},
+    return Combatiente.ataqueConArreglos(h, c, {arma: {...Combatiente.armaDeCombatiente(sc), id: '', nombre: Combatiente.armaEnMano(sc).nombre || '', rango: Combatiente.armaEnMano(sc).armaDeRango},
       alcance: c && c.alcance !== undefined && c.alcance !== 'auto' ? Combatiente.alcanceHab(c, 'pdg', s => C().statValor(sc, s)) : C().alcance(sc),
       valorDe: s => C().statValor(sc, s),   // 🔓 un estado que se suelta contra un stat suyo (el Mordisco feroz: Fuerza contra su Fuerza)
-      danoGolpe: extra => String(C().danoTxt({...sc, armaAmplificado: num(sc.armaAmplificado) + num(extra)}, C().statValor(sc, 'dmg'))).replace(/\s+/g, '')});   // el daño de este golpe, otra vez
+      danoGolpe: extra => String(C().danoTxt({...sc, armaAmplificado: Combatiente.armaEnMano(sc).danoAmplificado + num(extra)}, C().statValor(sc, 'dmg'))).replace(/\s+/g, '')});   // el daño de este golpe, otra vez
   }
   // ¿Tira algo? El stat vinculado (con su valor del momento) y/o la fórmula.
   function habTira(h){

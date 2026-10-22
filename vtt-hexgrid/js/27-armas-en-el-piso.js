@@ -29,10 +29,11 @@ function armaPropiaEnElPiso(t){
 }
 // El arma de un creep o de una invocación, como ítem (la del catálogo si se llama igual; si no, armada con sus datos).
 function armaComoItem(c, dueno){
-  const cat = typeof CATALOGO_BASE !== 'undefined' ? CATALOGO_BASE.find(i => i && i.nombre === c.armaNombre && /^arma_/.test(i.tipoItem || '')) : null;
+  const a = Combatiente.armaEnMano(c);   // 🗡 la puerta única (docs/plan-inventario-creeps.md)
+  const cat = typeof CATALOGO_BASE !== 'undefined' ? CATALOGO_BASE.find(i => i && i.nombre === a.nombre && /^arma_/.test(i.tipoItem || '')) : null;
   if(cat) return structuredClone(cat);
-  return {nombre: String(c.armaNombre || 'Arma'), tipoItem: 'arma_1m', tier: 'Común', peso: 1, ranuras: 1, precioCompra: 0, consumible: false, curahp: 0,
-    tipoDado: num(c.armaTipo) || 8, danoFijo: num(c.armaFijo), armaDeRango: !!c.armaDeRango, mods: structuredClone(c.armaMods || []),
+  return {nombre: String(a.nombre || 'Arma'), tipoItem: 'arma_1m', tier: 'Común', peso: 1, ranuras: 1, precioCompra: 0, consumible: false, curahp: 0,
+    tipoDado: a.tipoDado, danoFijo: a.danoFijo, armaDeRango: a.armaDeRango, mods: structuredClone(a.mods),
     detalle: `El arma que se le cayó a ${dueno}.`};
 }
 // La deja en el piso (lo hace el mapa del GM, al aplicar el Desarmado del duelo). `vuela`: cuántas casillas sale volando (1d6 = la dirección).
@@ -47,12 +48,12 @@ async function armaSoltar(t, vuela, o){
     const c = t.tipo === 'creep' ? creepPrivadoDe(t.fichaId) : await invDeToken(t);
     if(!c) return {manual: true, nota: 'no se pudo leer su arma: ponela en el piso a mano'};
     const nom = String(o.itemNombre || '').trim();
-    const pieza = t.tipo === 'creep' && nom && nom !== c.armaNombre ? (c.equipo || []).find(e => e && e.nombre === nom) : null;   // paró con un escudo
+    const pieza = t.tipo === 'creep' && nom && nom !== Combatiente.armaEnMano(c).nombre ? (c.equipo || []).find(e => e && e.nombre === nom) : null;   // paró con un escudo
     if(pieza){
       if(pieza.natural) return {nota: `${nom} es natural: no se le cae`};
       piezaCreep = pieza; item = structuredClone(pieza);
     }else{
-      if(c.armaNatural || !String(c.armaNombre || '').trim()) return {nota: 'su arma es natural: no se le cae'};
+      if(Combatiente.armaEnMano(c).natural || !String(Combatiente.armaEnMano(c).nombre || '').trim()) return {nota: 'su arma es natural: no se le cae'};
       if(armaPropiaEnElPiso(t)) return {nota: 'su arma ya estaba en el piso'};   // (un creep no la pierde de sus datos: que no suelte otra copia)
       item = armaComoItem(c, quien);
     }

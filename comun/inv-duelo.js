@@ -93,10 +93,10 @@ const InvDuelo = (() => {
         if(campo === 'parry') return {formula: F(I().statValor(inv, 'parry'), 'parry'), ...L('stat:parry')};
         if(campo === 'pdg'){
           const t = d.ataque.tipo === 'habilidad-arma'
-            ? A().tirada(inv, 'PdG', I().statValor(inv, 'pdg') + num(d.ataque.mods && d.ataque.mods.pdg) + Combatiente.pdgExtraArma(st => I().modTotal(inv, st), {tipoDado: num(inv.armaTipo), armaDeRango: !!inv.armaDeRango}), 'pdg')
+            ? A().tirada(inv, 'PdG', I().statValor(inv, 'pdg') + num(d.ataque.mods && d.ataque.mods.pdg) + Combatiente.pdgExtraArma(st => I().modTotal(inv, st), {tipoDado: Combatiente.armaEnMano(inv).tipoDado, armaDeRango: Combatiente.armaEnMano(inv).armaDeRango}), 'pdg')
             : A().tiradaAtaque(inv, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo);
           const tipo = d.ataque.tipo;
-          return {formula: t && t.r ? t.r.formula : '', ...L('atacar:'), costo: Combatiente.costoAtaqueLineas({tipoArma: num(inv.armaTipo) || 8, arma: Combatiente.armaDeCombatiente(inv), hechos: num(inv.ataquesTurno),
+          return {formula: t && t.r ? t.r.formula : '', ...L('atacar:'), costo: Combatiente.costoAtaqueLineas({tipoArma: Combatiente.armaEnMano(inv).tipoDado, arma: Combatiente.armaDeCombatiente(inv), hechos: num(inv.ataquesTurno),
             costo: tipo === 'habilidad-arma' ? 0 : A().costoAtaqueDe(inv, tipo === 'normal' ? undefined : tipo), tiene: num(inv.nitros), ataque: tipo})};
         }
         if(campo === 'fuerza') return {formula: F(I().statValor(inv, 'fue') + I().pesoArma(inv), 'fue'), ...L('stat:fue'), titulo: `${inv.nombre} · Fuerza del golpe`};
@@ -115,7 +115,7 @@ const InvDuelo = (() => {
           ui.cambiar(() => { gc = Combatiente.gastarCarga(inv.estados, d.id); });
           if(gc && gc.carga) ui.toast(`${inv.nombre} · ${Combatiente.cargaTxt(gc.carga)}`);
         }
-        if(d.ataque.tipo === 'habilidad-arma') publicar(A().tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg') + num(d.ataque && d.ataque.mods && d.ataque.mods.pdg) + Combatiente.pdgExtraArma(st => I().modTotal(inv, st), {tipoDado: num(inv.armaTipo), armaDeRango: !!inv.armaDeRango}), 'pdg'));
+        if(d.ataque.tipo === 'habilidad-arma') publicar(A().tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg') + num(d.ataque && d.ataque.mods && d.ataque.mods.pdg) + Combatiente.pdgExtraArma(st => I().modTotal(inv, st), {tipoDado: Combatiente.armaEnMano(inv).tipoDado, armaDeRango: Combatiente.armaEnMano(inv).armaDeRango}), 'pdg'));
         else return atacarSuelto(inv, d.ataque.tipo, d.id);
       },
       // ✍ El PdG elegido a mano (2026-10-21): paga y gasta lo que suma al golpe, sin tirar. → false si se canceló.
@@ -154,7 +154,7 @@ const InvDuelo = (() => {
       efectosArma: d => {
         const inv = ui.inv(d.atacante);
         const cg = Combatiente.cargaDeDuelo(inv.estados, d.id);   // + los del arma envenenada / el óleo de este golpe
-        return [...(inv.armaEfectos || []), ...(cg ? cg.efectos : [])].map(e => ({...EfectosGolpe.normalizar(e), stacks: num(e.stacks)}));
+        return [...Combatiente.armaEnMano(inv).efectosGolpe, ...(cg ? cg.efectos : [])].map(e => ({...EfectosGolpe.normalizar(e), stacks: num(e.stacks)}));
       },
       // El daño del arma (sin los efectos del golpe: los resuelve el duelo en su paso de efectos).
       dano: d => {
@@ -209,7 +209,7 @@ const InvDuelo = (() => {
         // Parry con un arma o un escudo (regla del dueño, 2026-09-30); desde el 2026-10-21 también con un arma natural (va última).
         const disparo = Combatiente.contraDisparo(d), def = I().defensa(inv, {soloEscudo: disparo});   // contra un disparo, Parry solo con escudo
         if(Combatiente.stuneado(inv.estados)) return [{modo: 'evasion', etiqueta: '🏃 Evasión · Stun: 1', info: ['⚡ Stun: no puede hacer nada; su Evasión es 1']}];   // Stun (2026-10-06)
-        if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, escudo: def.nombre !== inv.armaNombre, natural: def.nombre === inv.armaNombre ? !!inv.armaNatural : !!def.natural, etiqueta: `${def.nombre === inv.armaNombre ? '🗡' : '🛡'} Parry · ${def.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo: c, motivoNo: '',
+        if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, escudo: def.nombre !== Combatiente.armaEnMano(inv).nombre, natural: def.nombre === Combatiente.armaEnMano(inv).nombre ? Combatiente.armaEnMano(inv).natural : !!def.natural, etiqueta: `${def.nombre === Combatiente.armaEnMano(inv).nombre ? '🗡' : '🛡'} Parry · ${def.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo: c, motivoNo: '',
           info: [`Parry 🎲 ${fx(I().statValor(inv, 'parry'), 'parry', inv.estados)}`, disparo ? 'si gana, el disparo queda parado (sin Bloqueo)' : `si ganás, Bloqueo 🎲 ${fx(I().bloqueoValor(inv))}`, ...(c > num(inv.nitros) ? ['⚠ sin No2: queda en negativo (se descuenta al recargar)'] : [])]});
         return Combatiente.sinReaccionesNo2(ops, inv.estados);   // Expuesto (Degollar): sin Parry
       },
@@ -231,7 +231,7 @@ const InvDuelo = (() => {
       },
       armaContra: d => {
         const inv = ui.inv(d.defensor);
-        return {armaId: '', armaNombre: inv.armaNombre || '', tipoDado: num(inv.armaTipo) || 8};
+        return {armaId: '', armaNombre: Combatiente.armaEnMano(inv).nombre || '', tipoDado: Combatiente.armaEnMano(inv).tipoDado};
       },
     };
   }

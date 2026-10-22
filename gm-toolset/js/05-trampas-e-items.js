@@ -128,7 +128,7 @@ function abrirCatalogoArmasNaturales(scId){
     base: typeof ARMAS_NATURALES_BASE !== 'undefined' ? ARMAS_NATURALES_BASE : [],
     subtitulo: e => ` · ${e.etiquetas.includes('pesada') ? 'pesada' : e.etiquetas.includes('ligera') ? 'ligera' : 'media'} · ${e.etiquetas.includes('a distancia') ? 'a distancia' : 'cuerpo a cuerpo'}`,
     alElegir: async datos => {
-      if(sc.armaNombre && !(await Confirmar.preguntar(`${sc.nombre || 'El creep'} ya tiene "${sc.armaNombre}". ¿Reemplazarla por ${datos.nombre}?`, {titulo: 'Reemplazar arma', icono: '🐾', si: 'Reemplazar'}))) return;
+      if(Combatiente.armaEnMano(sc).nombre && !(await Confirmar.preguntar(`${sc.nombre || 'El creep'} ya tiene "${Combatiente.armaEnMano(sc).nombre}". ¿Reemplazarla por ${datos.nombre}?`, {titulo: 'Reemplazar arma', icono: '🐾', si: 'Reemplazar'}))) return;
       Object.assign(sc, armarArmaNatural(datos, sc.nivel));
       renderAll();
       toast(`${datos.nombre} equipada (arma natural, nivel ${sc.nivel || 1})`);
@@ -167,10 +167,10 @@ function cfgItemGM(){
 
 function armaDeCreepComoDraft(sc){
   return {
-    nombre: sc.armaNombre || '', tipoItem: sc.armaManos || 'arma_1m', tipoDado: num(sc.armaTipo) || 8,
-    peso: Math.max(1, num(sc.armaPeso) || 1), danoFijo: num(sc.armaFijo), danoAmplificado: num(sc.armaAmplificado),
-    armaDeRango: !!sc.armaDeRango, mods: structuredClone(sc.armaMods || []), detalle: sc.armaDetalle || '',
-    efectosGolpe: structuredClone(sc.armaEfectos || []), ...Combatiente.rasgosDeItem(Combatiente.armaDeCombatiente(sc)),
+    nombre: Combatiente.armaEnMano(sc).nombre || '', tipoItem: Combatiente.armaEnMano(sc).tipoItem || 'arma_1m', tipoDado: Combatiente.armaEnMano(sc).tipoDado,
+    peso: Combatiente.armaEnMano(sc).peso, danoFijo: Combatiente.armaEnMano(sc).danoFijo, danoAmplificado: Combatiente.armaEnMano(sc).danoAmplificado,
+    armaDeRango: Combatiente.armaEnMano(sc).armaDeRango, mods: structuredClone(Combatiente.armaEnMano(sc).mods || []), detalle: Combatiente.armaEnMano(sc).detalle || '',
+    efectosGolpe: structuredClone(Combatiente.armaEnMano(sc).efectosGolpe), ...Combatiente.rasgosDeItem(Combatiente.armaDeCombatiente(sc)),
   };
 }
 
@@ -270,8 +270,8 @@ function abrirItemCustomGM(){
 // Mesa (y los que dependen de suerte abren el pop-up para tirar).
 function efectosAlPegarCreep(sc){
   EfectosGolpe.alPegar({
-    arma: `${sc.nombre} · ${sc.armaNombre || 'arma'}`,
-    efectos: sc.armaEfectos,
+    arma: `${sc.nombre} · ${Combatiente.armaEnMano(sc).nombre || 'arma'}`,
+    efectos: Combatiente.armaEnMano(sc).efectosGolpe,
     publicar: linea => {
       registrarEvento(`⚠ ${linea.origen}: ${linea.formula.replace(/\n/g, ' · ')}`);
       if(!fbDb || !fbUsuario || !fbMiembro) return;

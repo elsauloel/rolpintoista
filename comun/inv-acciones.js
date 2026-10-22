@@ -51,7 +51,7 @@ const InvAcciones = (() => {
   function dano(inv, mods){
     let formula = I().danoTxt(inv, I().statValor(inv, 'dmg'));
     if(mods){
-      if(num(mods.dados) > 0) formula += ` + ${Math.round(num(mods.dados))}d${num(inv.armaTipo) || 8}`;
+      if(num(mods.dados) > 0) formula += ` + ${Math.round(num(mods.dados))}d${Combatiente.armaEnMano(inv).tipoDado}`;
       if(mods.dadoExtra) formula += ` + ${mods.dadoExtra}`;
       if(num(mods.fijo)) formula += ` ${num(mods.fijo) > 0 ? '+' : '-'} ${fmt(Math.abs(num(mods.fijo)))}`;
     }
@@ -64,8 +64,8 @@ const InvAcciones = (() => {
      turno Tipo ÷ 2, después el Tipo completo; suma al conteo) y tirar el PdG (tiradaAtaque). Atacar cierra el Parry pendiente:
      lo borra cada pantalla. */
   function ataqueDuelo(inv, tipo){
-    return {tipo: tipo === 'oportunidad' || tipo === 'contra' ? tipo : 'normal', armaId: '', armaNombre: inv.armaNombre || '', tipoDado: num(inv.armaTipo) || 8, rango: !!inv.armaDeRango, ...Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(inv)),
-      alcance: inv.armaDeRango ? Combatiente.alcanceArmaRango(Combatiente.armaDeCombatiente(inv), I().statValor(inv, 'rng')) : 1};
+    return {tipo: tipo === 'oportunidad' || tipo === 'contra' ? tipo : 'normal', armaId: '', armaNombre: Combatiente.armaEnMano(inv).nombre || '', tipoDado: Combatiente.armaEnMano(inv).tipoDado, rango: Combatiente.armaEnMano(inv).armaDeRango, ...Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(inv)),
+      alcance: Combatiente.armaEnMano(inv).armaDeRango ? Combatiente.alcanceArmaRango(Combatiente.armaDeCombatiente(inv), I().statValor(inv, 'rng')) : 1};
   }
   /* Sin No2 suficientes (2026-10-02, hoja de ruta B-7, igual que los creeps y los personajes: avisar y dejar seguir): faltanNitros, la
      pregunta «¿Atacar igual?», pagar forzando (gasta los que tenga, hasta 0) y la línea roja de la Mesa (alertaSinNitros). */
@@ -75,7 +75,7 @@ const InvAcciones = (() => {
   // La regla universal (Combatiente.statAtaqueEspecial): el PdG especial venga de su arma, su equipo o sus estados.
   const bonoEspecial = (inv, tipo) => { const st = Combatiente.statAtaqueEspecial(tipo); return st ? I().modTotal(inv, st) : 0; };
   const especial = tipo => tipo === 'oportunidad' || tipo === 'contra';
-  const costoAtaqueDe = (inv, tipo) => especial(tipo) ? Combatiente.conExtenuado(inv.estados, Math.max(0, Combatiente.costoEspecial(num(inv.armaTipo) || 8, Combatiente.armaDeCombatiente(inv), tipo) - Combatiente.ahorroEspecial(tipo, st => I().modTotal(inv, st)))) : I().costoAtaque(inv);
+  const costoAtaqueDe = (inv, tipo) => especial(tipo) ? Combatiente.conExtenuado(inv.estados, Math.max(0, Combatiente.costoEspecial(Combatiente.armaEnMano(inv).tipoDado, Combatiente.armaDeCombatiente(inv), tipo) - Combatiente.ahorroEspecial(tipo, st => I().modTotal(inv, st)))) : I().costoAtaque(inv);
   const faltanNitros = (inv, tipo) => costoAtaqueDe(inv, tipo) > num(inv.nitros);
   // Un duelo cancelado que no cuenta como ataque (2026-10-15): el conteo y los No2, de vuelta. → los No2 devueltos.
   function devolverAtaque(inv, tipo){
@@ -112,7 +112,7 @@ const InvAcciones = (() => {
       cuando: firebase.firestore.FieldValue.serverTimestamp(),
     }).catch(err => console.error('No se pudo publicar la alerta de No2:', err));
   }
-  const pdgExtraInv = inv => Combatiente.pdgExtraArma(st => I().modTotal(inv, st), {tipoDado: num(inv.armaTipo), armaDeRango: !!inv.armaDeRango});   // guantes (2026-10-05)
+  const pdgExtraInv = inv => Combatiente.pdgExtraArma(st => I().modTotal(inv, st), {tipoDado: Combatiente.armaEnMano(inv).tipoDado, armaDeRango: Combatiente.armaEnMano(inv).armaDeRango});   // guantes (2026-10-05)
   const tiradaAtaque = (inv, tipo) => especial(tipo) ? tirada(inv, `${NOMBRE_ESPECIAL[tipo]} (PdG)`, I().statValor(inv, 'pdg') + bonoEspecial(inv, tipo) + pdgExtraInv(inv), 'pdg')
     : tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg') + pdgExtraInv(inv), 'pdg');
 

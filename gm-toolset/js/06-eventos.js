@@ -312,7 +312,7 @@ document.addEventListener('click', async e => {
     // Duelo paso a paso (comun/duelo.js): se elige el token al que ataca; su PdG (y los No2) se tiran adentro del duelo.
     if(typeof Duelo !== 'undefined' && Duelo.disponible()){
       Duelo.elegirObjetivo({yo: {ref: sc.id, tipo: 'creep', nombre: sc.nombre},
-        ataque: {tipo, armaId: '', armaNombre: sc.armaNombre || '', tipoDado: num(sc.armaTipo) || 8, rango: !!sc.armaDeRango, alcance: alcanceDeCreep(sc)}, suelto: hacer});
+        ataque: {tipo, armaId: '', armaNombre: Combatiente.armaEnMano(sc).nombre || '', tipoDado: Combatiente.armaEnMano(sc).tipoDado, rango: Combatiente.armaEnMano(sc).armaDeRango, alcance: alcanceDeCreep(sc)}, suelto: hacer});
     }else hacer();
     return;
   }

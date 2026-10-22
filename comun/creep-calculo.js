@@ -77,7 +77,7 @@ const CreepCalculo = (() => {
       if(sc.esp === undefined) sc.esp = sc.int;
       delete sc.int;
     }
-    (Array.isArray(sc.armaMods) ? sc.armaMods : []).forEach(m => { if(m && m.stat === 'int') m.stat = 'esp'; });
+    (Array.isArray(Combatiente.armaEnMano(sc).mods) ? Combatiente.armaEnMano(sc).mods : []).forEach(m => { if(m && m.stat === 'int') m.stat = 'esp'; });
     ['equipo', 'habilidades', 'estados'].forEach(k => (Array.isArray(sc[k]) ? sc[k] : []).forEach(migrarObjEspecial));
   }
 
@@ -92,16 +92,19 @@ const CreepCalculo = (() => {
   function slotDe(tipoItem){ return SLOT_MAP[tipoItem] || 'otro'; }
 
   /* ---------- Stats ---------- */
+  // 🗡 Su arma: siempre por la puerta única (Combatiente.armaEnMano, docs/plan-inventario-creeps.md), nunca por los campos arma* sueltos.
+  const armaDe = sc => Combatiente.armaEnMano(sc);
   function danoTxt(sc, extra){
-    const dados = Math.max(1, num(sc.armaPeso)||1) + Math.max(0, num(sc.armaAmplificado));
-    const tipo = num(sc.armaTipo)||8;
-    const fijo = num(sc.armaFijo) + Combatiente.dmgDelArma(sc, num(extra));   // cuerpo a cuerpo el Dmg entero; un arco, la mitad; otra de rango, nada
+    const a = armaDe(sc);
+    const dados = a.peso + a.danoAmplificado;
+    const tipo = a.tipoDado;
+    const fijo = a.danoFijo + Combatiente.dmgDelArma(a, num(extra));   // cuerpo a cuerpo el Dmg entero; un arco, la mitad; otra de rango, nada
     return `${dados}d${tipo}${fijo?` + ${fmt(fijo)}`:''}`;
   }
 
-  // Lo que el creep tiene puesto y da bonos: su equipo y su arma (sc.armaMods).
+  // Lo que el creep tiene puesto y da bonos: su equipo y su arma (Combatiente.armaEnMano(sc).mods).
   function fuentesEquipo(sc){
-    const arma = (sc.armaMods || []).length ? [{nombre: sc.armaNombre || 'Arma', mods: sc.armaMods}] : [];
+    const a = armaDe(sc), arma = a.mods.length ? [{nombre: a.nombre || 'Arma', mods: a.mods}] : [];
     return [...(sc.equipo || []), ...arma];
   }
 
@@ -291,10 +294,11 @@ const CreepCalculo = (() => {
   // De dónde sale el Ataque: dados y fijo del arma, Fuerza y lo que la sube,
   // mods directos de Dmg. Un arma de rango no suma Fuerza (ver danoTxt).
   function ataqueOrigenTxt(sc){
-    const dados = Math.max(1, num(sc.armaPeso)||1) + Math.max(0, num(sc.armaAmplificado));
-    const L = [`${dados}d${num(sc.armaTipo)||8} por ${sc.armaNombre || 'el arma'}`];
-    if(num(sc.armaFijo)) L.push(`${conSigno(num(sc.armaFijo))} fijo del arma`);
-    if(sc.armaDeRango){
+    const a = armaDe(sc);
+    const dados = a.peso + a.danoAmplificado;
+    const L = [`${dados}d${a.tipoDado} por ${a.nombre || 'el arma'}`];
+    if(a.danoFijo) L.push(`${conSigno(a.danoFijo)} fijo del arma`);
+    if(a.armaDeRango){
       L.push('Arma de rango: no suma Fuerza');
     }else{
       L.push(`${conSigno(num(sc.fue))} Fuerza base`);
@@ -377,7 +381,7 @@ const CreepCalculo = (() => {
   /* ---------- Costos ---------- */
   // Primer ataque del turno: Tipo ÷ 2 (redondeado para arriba); los demás, Tipo completo.
   function costoAtaque(sc){ return Combatiente.conExtenuado(sc.estados, costoAtaque0(sc)); }   // + Extenuado (2026-10-12)
-  function costoAtaque0(sc){ const a = Combatiente.armaDeCombatiente(sc); if(Combatiente.cargadaGratis(a, sc.ataquesTurno, sc.descargada)) return 0; return Math.max(0, Combatiente.costoConAhorro(Combatiente.costoAtaque(num(sc.armaTipo) || 8, sc.ataquesTurno, a), a, sc.ataquesTurno) - Combatiente.ahorroArco(a, sc.ataquesTurno, sc.descargada, sc.ultimoPego)); }   // regla común (comun/combatiente.js)   // + Flecha en la cuerda / Encadenar (2026-10-11)
+  function costoAtaque0(sc){ const a = armaDe(sc); if(Combatiente.cargadaGratis(a, sc.ataquesTurno, sc.descargada)) return 0; return Math.max(0, Combatiente.costoConAhorro(Combatiente.costoAtaque(a.tipoDado, sc.ataquesTurno, a), a, sc.ataquesTurno) - Combatiente.ahorroArco(a, sc.ataquesTurno, sc.descargada, sc.ultimoPego)); }   // regla común (comun/combatiente.js)   // + Flecha en la cuerda / Encadenar (2026-10-11)
   // Nitros de una habilidad: un número, o "ATAQUE" = lo que le cuesta un
   // ataque con su arma (Tipo ÷ 2 el primero del turno) y cuenta como ese ataque.
   function habAtaque(h){ return String((h && h.nitrosCosto) ?? "").trim().toUpperCase() === "ATAQUE"; }
@@ -406,15 +410,16 @@ const CreepCalculo = (() => {
   }
   // Parry y Bloqueo de un creep (2026-09-24, pedido del dueño; igual que en la ficha): el Parry cuesta 1 No2 (2026-09-26; antes el Peso de su arma);
   // el Bloqueo suma su Bloqueo + el Peso del arma y ESA SUMA es el dado.
-  function pesoArma(sc){ return Math.max(1, num(sc.armaPeso) || 1); }
+  function pesoArma(sc){ return armaDe(sc).peso; }
   function costoParry(sc){ return Combatiente.conExtenuado(sc && sc.estados, Combatiente.costoParry()); }   // + Extenuado   // siempre 1 No2, sin importar el arma (comun/combatiente.js)
   // Con qué para el creep (Parry y Bloqueo): su arma si no es natural, si no un escudo de su equipo; null = no puede
   // (regla del dueño 2026-09-30, comun/combatiente.js). El Bloqueo suma el peso de eso.
   // o.soloEscudo: contra un disparo, solo un escudo (2026-10-09). Con un arco no se parrea.
   function defensa(sc, o){
     if(!sc) return null;
-    return Combatiente.armaParaDefensa({arma: sc.armaNombre ? {nombre: sc.armaNombre, peso: pesoArma(sc)} : null, natural: sc.armaNatural,
-      arco: !!sc.armaDeRango, soloEscudo: !!(o && o.soloEscudo),
+    const a = armaDe(sc);
+    return Combatiente.armaParaDefensa({arma: a.nombre ? {nombre: a.nombre, peso: a.peso} : null, natural: a.natural,
+      arco: a.armaDeRango, soloEscudo: !!(o && o.soloEscudo),
       escudos: Combatiente.piezasParaParry(sc.equipo, slotDe, pesoPieza)});   // un báculo sí, un orbe no (2026-10-17)
   }
   // El peso de una pieza del equipo (2026-10-13): las equipadas antes no lo guardaban; si falta, el del catálogo con ese nombre.
@@ -427,16 +432,16 @@ const CreepCalculo = (() => {
   // Fuerza del golpe (reglas del escudo, 2026-09-26): la tirada del atacante contra el Bloqueo del defensor = su Fuerza (con los estados activos) + el peso de su arma; la SUMA es el dado.
   function fuerzaGolpeValor(sc){ return num(sc.fue) + (sc.estados || []).filter(e => e.activo !== false).reduce((a, e) => a + (e.mods || []).filter(m => m.stat === 'fue').reduce((x, m) => x + num(m.val) * Math.max(1, num(e.stacks) || 1), 0), 0) + pesoArma(sc); }
   // Contraataque (regla a prueba, 2026-09-26): tras un Parry, siempre cuesta lo de un primer ataque y no suma al conteo de ataques del turno.
-  function costoContraataque(sc){ return Combatiente.conExtenuado(sc.estados, Math.max(0, Combatiente.costoPrimerAtaque(num(sc.armaTipo) || 8) - Combatiente.ahorroEspecial('contra', st => modTotal(sc, st)))); }   // regla común (comun/combatiente.js)
+  function costoContraataque(sc){ return Combatiente.conExtenuado(sc.estados, Math.max(0, Combatiente.costoPrimerAtaque(armaDe(sc).tipoDado) - Combatiente.ahorroEspecial('contra', st => modTotal(sc, st)))); }   // regla común (comun/combatiente.js)
   // ¿Le alcanzan los No2 para un ataque de oportunidad (lo de un primer ataque con su arma)? (2026-10-02, pedido del dueño: el mapa solo
   // frena a quien se aleja si el que se queda puede aprovecharlo.) Se publica en su resumen (`opor`): los jugadores no ven sus No2.
   // El ataque de oportunidad: lo de un primer ataque, o nada si su arma es oporGratis.
-  function costoOportunidad(sc){ return Combatiente.conExtenuado(sc.estados, Math.max(0, Combatiente.costoEspecial(num(sc.armaTipo) || 8, Combatiente.armaDeCombatiente(sc), 'oportunidad') - Combatiente.ahorroEspecial('oportunidad', st => modTotal(sc, st)))); }
+  function costoOportunidad(sc){ return Combatiente.conExtenuado(sc.estados, Math.max(0, Combatiente.costoEspecial(armaDe(sc).tipoDado, armaDe(sc), 'oportunidad') - Combatiente.ahorroEspecial('oportunidad', st => modTotal(sc, st)))); }
   // ¿Su arma no sirve de oportunidad? (un arco: 2026-10-09) — lo publica el creep para que el mapa diga el motivo.
-  const sinOportunidad = sc => !Combatiente.sirveDeOportunidad(Combatiente.armaDeCombatiente(sc));
+  const sinOportunidad = sc => !Combatiente.sirveDeOportunidad(armaDe(sc));
   function oportunidadPosible(sc){
     const n = sc.nitros === null || sc.nitros === undefined ? nitrosMax(sc) : num(sc.nitros);
-    return !(num(sc.hp) <= 0) && n >= costoOportunidad(sc) && Combatiente.sirveDeOportunidad(Combatiente.armaDeCombatiente(sc))   // con un arco, no (2026-10-09)
+    return !(num(sc.hp) <= 0) && n >= costoOportunidad(sc) && Combatiente.sirveDeOportunidad(armaDe(sc))   // con un arco, no (2026-10-09)
       && !Combatiente.expuesto(sc.estados);   // Expuesto (Degollar, 2026-10-10): no reacciona con No2
   }
   // Lo que muestra la 🪪 tarjeta del creep en el mapa a cualquier jugador (2026-10-09): solo NOMBRES — el arma (también la natural,
@@ -487,9 +492,10 @@ const CreepCalculo = (() => {
     const nom = x => String(x || '').trim().slice(0, 60);
     const vivo = num(sc.hp) > 0;
     const ver = x => vivo ? nombreGenerico(x) : nom(x);
+    const a = armaDe(sc);
     return {
-      armaNombre: sc.armaNatural === true ? nom(sc.armaNombre) : ver(sc.armaNombre),
-      armaNatural: sc.armaNatural === true,
+      armaNombre: a.natural ? nom(a.nombre) : ver(a.nombre),
+      armaNatural: a.natural,
       // Lo de las manos (además del arma) va aparte del equipo (2026-10-17): una varita, un escudo, un orbe.
       manosNombres: (Array.isArray(sc.equipo) ? sc.equipo : []).filter(enLasManos).map(it => it.natural ? nom(it.nombre) : ver(it.nombre)).filter(Boolean).slice(0, 6),
       equipoNombres: (Array.isArray(sc.equipo) ? sc.equipo : []).filter(it => it && !enLasManos(it)).map(it => it.natural ? nom(it.nombre) : ver(it.nombre)).filter(Boolean).slice(0, 30),   // lo natural se ve con su nombre, como el arma natural
@@ -503,8 +509,9 @@ const CreepCalculo = (() => {
   }
   // Alcance de su arma, en casilleros: un arma de rango usa su Rango; una de cuerpo a cuerpo, 1 + lo que le sume a Rango.
   function alcance(sc){
-    if(sc.armaDeRango){ const v = statValor(sc, 'rng'); return Number.isNaN(v) ? 0 : Combatiente.alcanceArmaRango(Combatiente.armaDeCombatiente(sc), v); }   // la honda, la mitad
-    const bono = (sc.armaMods || []).filter(m => m.stat === 'rng').reduce((a, m) => a + num(m.val), 0);
+    const a = armaDe(sc);
+    if(a.armaDeRango){ const v = statValor(sc, 'rng'); return Number.isNaN(v) ? 0 : Combatiente.alcanceArmaRango(a, v); }   // la honda, la mitad
+    const bono = a.mods.filter(m => m.stat === 'rng').reduce((a, m) => a + num(m.val), 0);
     return 1 + Math.max(0, Math.round(bono));
   }
 
@@ -687,8 +694,9 @@ const CreepCalculo = (() => {
   function trofeo(sc){
     const esp = sc.trofeoEspecial || {};
     const nombreEsp = String(esp.nombre || '').trim();
-    if(!nombreEsp && !sc.armaNatural) return null;
-    const nombre = nombreEsp || `${sc.armaNombre || 'Arma natural'} de ${nombreLimpio(sc)}`;
+    const a = armaDe(sc);
+    if(!nombreEsp && !a.natural) return null;
+    const nombre = nombreEsp || `${a.nombre || 'Arma natural'} de ${nombreLimpio(sc)}`;
     const precio = num(esp.precio) > 0 ? num(esp.precio) : trofeoPrecioAuto(sc);
     return {nombre, precioCompra: precio, especial: !!nombreEsp};
   }
@@ -709,7 +717,7 @@ const CreepCalculo = (() => {
     if(!sc) return ['pesado'];
     const out = [];
     const caster = num(sc.esp) > Math.max(num(sc.fue), num(sc.des), num(sc.agl)) || (sc.equipo || []).some(i => i && (i.especial || /^foco-/.test(String(i.id || ''))));
-    const rango = !!sc.armaDeRango;
+    const rango = armaDe(sc).armaDeRango;
     if(!caster && !rango) out.push(num(sc.fue) + num(sc.con) >= num(sc.des) + num(sc.agl) ? 'pesado' : 'liviano');
     if(caster) out.push('caster');
     if(rango) out.push('rango');
@@ -720,7 +728,8 @@ const CreepCalculo = (() => {
   const arquetiposTxt = lista => lista.map(a => ARQUETIPOS[a] || a).join(' + ');
   function dropsResumen(sc){
     const partes = [];
-    if(sc.armaNombre && !sc.armaNatural) partes.push(`${sc.armaNombre} (arma equipable)`);
+    const a = armaDe(sc);
+    if(a.nombre && !a.natural) partes.push(`${a.nombre} (arma equipable)`);
     (sc.equipo || []).filter(it => !it.natural).forEach(it => partes.push(`${it.nombre} (equipo)`));   // 🐾 lo natural no se suelta (2026-10-14)
     const tr = trofeo(sc);
     if(tr) partes.push(`${tr.nombre} (trofeo: compra ${fmt(tr.precioCompra)}, venta ${fmt(tr.precioCompra / 2)}, ${fmt(despojosDePrecio(tr.precioCompra))} despojos)`);

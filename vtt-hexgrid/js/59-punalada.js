@@ -7,7 +7,7 @@
 // Cuántos dados tiene el arma de quien ataca (un creep: su Peso + amplificado, como CreepCalculo.danoTxt; si no se sabe, 1).
 function punaladaDadosArma(mio){
   const sc = mio && mio.tipo === 'creep' ? creepPrivadoDe(mio.fichaId) : null;
-  return sc ? Math.max(1, num(sc.armaPeso) || 1) + Math.max(0, num(sc.armaAmplificado)) : 1;
+  return sc ? Combatiente.armaEnMano(sc).peso + Combatiente.armaEnMano(sc).danoAmplificado : 1;
 }
 // El ataque con el bono de la puñalada, el mismo si no corresponde, o null si se eligió otro objetivo.
 async function punaladaBonos(mio, t, ataque, yo){

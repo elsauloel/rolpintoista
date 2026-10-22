@@ -323,7 +323,7 @@ function bnInvAca(b){
     if(!t) return true;
     bnPublicarInv(inv, t);
     // Los efectos al golpear de su arma: recordar y tirar, no aplicar (como la ficha).
-    if((inv.armaEfectos || []).length) EfectosGolpe.alPegar({arma: inv.armaNombre || 'el arma', efectos: inv.armaEfectos, publicar: linea => {
+    if(Combatiente.armaEnMano(inv).efectosGolpe.length) EfectosGolpe.alPegar({arma: Combatiente.armaEnMano(inv).nombre || 'el arma', efectos: Combatiente.armaEnMano(inv).efectosGolpe, publicar: linea => {
       if(!fbDb || !fbUsuario || !fbMiembro) return;
       fbDb.collection(fbRutaCampana('tiradas')).add({
         uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: inv.nombre,

@@ -51,10 +51,10 @@ const CreepLupa = (() => {
       return {titulo: `${sc.nombre} · ${titulo}`, html: lupaSeccion('De dónde sale', texto.split('\n').map(l => lupaNota(esc(l))).join('')) + lupaNota(nota)};
     }
     if(tipo === 'atacar'){
-      const tipoArma = num(sc.armaTipo) || 8;
+      const tipoArma = Combatiente.armaEnMano(sc).tipoDado;
       const hechos = num(sc.ataquesTurno);
       const costo = K.costoAtaque(sc);
-      let h = lupaFila(`Tipo del arma${sc.armaNombre ? ` (${esc(sc.armaNombre)})` : ''}: d${fmt(tipoArma)}`, fmt(tipoArma));
+      let h = lupaFila(`Tipo del arma${Combatiente.armaEnMano(sc).nombre ? ` (${esc(Combatiente.armaEnMano(sc).nombre)})` : ''}: d${fmt(tipoArma)}`, fmt(tipoArma));
       h += lupaFila('Ataques este turno', fmt(hechos));
       h += hechos === 0
         ? lupaFila(`Primer ataque: Tipo ÷ 2${tipoArma % 2 ? ', para arriba' : ''}`, `${fmt(costo)} No2`, 'lupa-total')
@@ -65,17 +65,17 @@ const CreepLupa = (() => {
     }
     if(tipo === 'danio'){
       const dmg = K.statValor(sc, 'dmg');
-      let h = lupaFila('Peso del arma (cantidad de dados)', fmt(Math.max(1, num(sc.armaPeso) || 1)));
-      if(num(sc.armaAmplificado) > 0) h += lupaFila('Daño amplificado (dados extra)', lupaSigno(num(sc.armaAmplificado)));
-      h += lupaFila('Tipo (caras del dado)', `d${fmt(num(sc.armaTipo) || 8)}`);
-      if(num(sc.armaFijo)) h += lupaFila('Daño fijo del arma', lupaSigno(num(sc.armaFijo)));
-      h += !sc.armaDeRango ? lupaFila('Dmg (de Fuerza)', lupaSigno(dmg))   // un arco suma la mitad (Combatiente.dmgDelArma); otra de rango, nada
+      let h = lupaFila('Peso del arma (cantidad de dados)', fmt(Combatiente.armaEnMano(sc).peso));
+      if(Combatiente.armaEnMano(sc).danoAmplificado > 0) h += lupaFila('Daño amplificado (dados extra)', lupaSigno(Combatiente.armaEnMano(sc).danoAmplificado));
+      h += lupaFila('Tipo (caras del dado)', `d${fmt(Combatiente.armaEnMano(sc).tipoDado)}`);
+      if(Combatiente.armaEnMano(sc).danoFijo) h += lupaFila('Daño fijo del arma', lupaSigno(Combatiente.armaEnMano(sc).danoFijo));
+      h += !Combatiente.armaEnMano(sc).armaDeRango ? lupaFila('Dmg (de Fuerza)', lupaSigno(dmg))   // un arco suma la mitad (Combatiente.dmgDelArma); otra de rango, nada
         : Combatiente.esArco(sc) ? lupaFila('Dmg <span class="lupa-gris">(arco: la mitad, para arriba)</span>', lupaSigno(Combatiente.dmgDelArma(sc, dmg)))
         : lupaFila('Dmg <span class="lupa-gris">(arma de rango: no suma)</span>', '–', 'lupa-tachado');
       h += lupaFila('Daño', esc(K.danoTxt(sc, dmg)), 'lupa-total');
       let out = lupaSeccion('De dónde sale', h);
-      if(!sc.armaDeRango || Combatiente.esArco(sc)) out += stat(sc, 'dmg', {sinTirada: true}).replace('De dónde sale', 'Dmg (de Fuerza)');
-      return {titulo: `${sc.nombre} · Daño${sc.armaNombre ? ` (${sc.armaNombre})` : ''}`, html: out + sinCosto};
+      if(!Combatiente.armaEnMano(sc).armaDeRango || Combatiente.esArco(sc)) out += stat(sc, 'dmg', {sinTirada: true}).replace('De dónde sale', 'Dmg (de Fuerza)');
+      return {titulo: `${sc.nombre} · Daño${Combatiente.armaEnMano(sc).nombre ? ` (${Combatiente.armaEnMano(sc).nombre})` : ''}`, html: out + sinCosto};
     }
     if(tipo === 'hab'){
       const h0 = (sc.habilidades || []).find(x => x.id === ref);
@@ -167,12 +167,12 @@ const CreepLupa = (() => {
       <div class="equipo-item-meta">${esc(tipo)}</div>
       ${detalle ? `<div class="arma-detalle">${esc(detalle)}</div>` : ''}
     </div>`;
-    const efectos = (sc.armaEfectos || []).length && typeof EfectosGolpe !== 'undefined' ? `Al golpear: ${EfectosGolpe.resumenLista(sc.armaEfectos)}` : '';
+    const efectos = Combatiente.armaEnMano(sc).efectosGolpe.length && typeof EfectosGolpe !== 'undefined' ? `Al golpear: ${EfectosGolpe.resumenLista(Combatiente.armaEnMano(sc).efectosGolpe)}` : '';
     // Las armas (lo que va en las manos: el arma, y una varita, un báculo, un escudo, un orbe) y aparte el equipo (2026-10-17, dueño).
     const pieza = it => equipado(it.nombre || '(sin nombre)', (K.TIPOITEM_LABEL[it.tipoItem] || it.tipoItem || '') + (it.natural ? ' · 🐾 natural (no se suelta)' : ''), `<small>DEF</small>+${fmt(num(it.def))}`, it.detalle);
     const armas = [
-      equipado(sc.armaNombre || 'Arma sin nombre', sc.armaDeRango ? 'Arma de rango' : 'Arma', esc(K.danoTxt(sc)),
-        [sc.armaDetalle, efectos].filter(Boolean).join(' · ')),
+      equipado(Combatiente.armaEnMano(sc).nombre || 'Arma sin nombre', Combatiente.armaEnMano(sc).armaDeRango ? 'Arma de rango' : 'Arma', esc(K.danoTxt(sc)),
+        [Combatiente.armaEnMano(sc).detalle, efectos].filter(Boolean).join(' · ')),
       ...(sc.equipo || []).filter(K.enLasManos).map(pieza),
     ].join('');
     const equipo = (sc.equipo || []).filter(it => !K.enLasManos(it)).map(pieza).join('');

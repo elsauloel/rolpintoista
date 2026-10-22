@@ -74,10 +74,10 @@ function cfgItemInv(){
 }
 function armaDeInvComoDraft(inv){
   return {
-    nombre: inv.armaNombre || '', tipoItem: inv.armaManos || 'arma_1m', tipoDado: num(inv.armaTipo) || 8,
-    peso: Math.max(1, num(inv.armaPeso) || 1), danoFijo: num(inv.armaFijo), danoAmplificado: num(inv.armaAmplificado),
-    armaDeRango: !!inv.armaDeRango, mods: structuredClone(inv.armaMods || []), detalle: inv.armaDetalle || '',
-    efectosGolpe: structuredClone(inv.armaEfectos || []), ...Combatiente.rasgosDeItem(Combatiente.armaDeCombatiente(inv)),
+    nombre: Combatiente.armaEnMano(inv).nombre || '', tipoItem: Combatiente.armaEnMano(inv).tipoItem || 'arma_1m', tipoDado: Combatiente.armaEnMano(inv).tipoDado,
+    peso: Combatiente.armaEnMano(inv).peso, danoFijo: Combatiente.armaEnMano(inv).danoFijo, danoAmplificado: Combatiente.armaEnMano(inv).danoAmplificado,
+    armaDeRango: Combatiente.armaEnMano(inv).armaDeRango, mods: structuredClone(Combatiente.armaEnMano(inv).mods || []), detalle: Combatiente.armaEnMano(inv).detalle || '',
+    efectosGolpe: structuredClone(Combatiente.armaEnMano(inv).efectosGolpe), ...Combatiente.rasgosDeItem(Combatiente.armaDeCombatiente(inv)),
   };
 }
 function ponerArmaEnInv(inv, d){
@@ -301,13 +301,13 @@ function invPasoHtml(id, inv){
   if(id === 'arma') return `
     <div class="inv-arma-compacta">
       <div class="inv-arma-top">
-        <span class="inv-arma-nombre">${inv.armaNombre ? esc(inv.armaNombre) : '<span class="hint">Sin nombre</span>'}</span>
+        <span class="inv-arma-nombre">${Combatiente.armaEnMano(inv).nombre ? esc(Combatiente.armaEnMano(inv).nombre) : '<span class="hint">Sin nombre</span>'}</span>
         <span class="inv-danopreview"><b>${esc(invDanoTxt(inv, invStatValor(inv,'dmg')))}</b></span>
         <button type="button" class="mini" data-editararmainv="${inv.id}">✎ Editar</button>
       </div>
-      ${inv.armaDetalle ? `<div class="hint">${esc(inv.armaDetalle)}</div>` : ''}
-      ${(inv.armaEfectos||[]).length ? `<div class="hint"><b>Al golpear:</b> ${esc(EfectosGolpe.resumenLista(inv.armaEfectos))}</div>` : ''}
-      <label class="hint" style="display:flex;gap:6px;align-items:center;margin-top:4px" title="Un arma natural (garras, colmillos, puños…) no permite Parry ni Bloqueo, por ahora (regla del dueño, 2026-09-30)."><input type="checkbox" data-invf="armaNatural" data-invid="${inv.id}" style="width:auto"${inv.armaNatural ? ' checked' : ''}> Es un arma natural (garras, colmillos…): sin Parry ni Bloqueo</label>
+      ${Combatiente.armaEnMano(inv).detalle ? `<div class="hint">${esc(Combatiente.armaEnMano(inv).detalle)}</div>` : ''}
+      ${Combatiente.armaEnMano(inv).efectosGolpe.length ? `<div class="hint"><b>Al golpear:</b> ${esc(EfectosGolpe.resumenLista(Combatiente.armaEnMano(inv).efectosGolpe))}</div>` : ''}
+      <label class="hint" style="display:flex;gap:6px;align-items:center;margin-top:4px" title="Un arma natural (garras, colmillos, puños…) no permite Parry ni Bloqueo, por ahora (regla del dueño, 2026-09-30)."><input type="checkbox" data-invf="armaNatural" data-invid="${inv.id}" style="width:auto"${Combatiente.armaEnMano(inv).natural ? ' checked' : ''}> Es un arma natural (garras, colmillos…): sin Parry ni Bloqueo</label>
     </div>`;
   if(id === 'defensa') return `
     <div class="inv-row3">
@@ -509,9 +509,9 @@ function invDanio(invId, sinEfectos, mods){   // sinEfectos: el duelo resuelve l
   const t = InvAcciones.dano(inv, mods);   // comun/inv-acciones.js
   if(!t) return;
   registrarTirada(t.origen, t.r);
-  if(!sinEfectos && (inv.armaEfectos||[]).length) EfectosGolpe.alPegar({
-    arma: inv.armaNombre || 'el arma',
-    efectos: inv.armaEfectos,
+  if(!sinEfectos && Combatiente.armaEnMano(inv).efectosGolpe.length) EfectosGolpe.alPegar({
+    arma: Combatiente.armaEnMano(inv).nombre || 'el arma',
+    efectos: Combatiente.armaEnMano(inv).efectosGolpe,
     publicar: linea => {
       registrarEvento(`⚠ ${linea.origen}: ${linea.formula.replace(/\n/g,' · ')}`);
       if(!fbDb || !fbUsuario || !fbMiembro) return;

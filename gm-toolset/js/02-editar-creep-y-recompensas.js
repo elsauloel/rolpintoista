@@ -124,7 +124,7 @@ function recompensasHtml(sc){
       </div>
     </div>
     <div class="mini-f" style="margin-top:8px">
-      <label style="display:flex;gap:6px;align-items:center;font-size:12.5px;text-transform:none;letter-spacing:0"><input type="checkbox" data-rec="armaNatural" data-id="${sc.id}"${sc.armaNatural ? ' checked' : ''}> El arma es parte del cuerpo (arma natural) ${ayudaQ(AYUDA_NATURAL)}</label>
+      <label style="display:flex;gap:6px;align-items:center;font-size:12.5px;text-transform:none;letter-spacing:0"><input type="checkbox" data-rec="armaNatural" data-id="${sc.id}"${Combatiente.armaEnMano(sc).natural ? ' checked' : ''}> El arma es parte del cuerpo (arma natural) ${ayudaQ(AYUDA_NATURAL)}</label>
     </div>
     <div class="mini-f" style="margin-top:8px"><label>Trofeo especial (opcional) ${ayudaQ(AYUDA_TROFEO)}</label>
       <div style="display:flex;gap:6px">
@@ -324,14 +324,14 @@ function htmlPasoAsistCreep(p){
   }
   if(p === 2){
     return `<p class="pap-nota" style="margin:0 0 10px">Rareza sugerida para el nivel ${n}: <b>${RAREZA_ARMA[Math.min(n, 5) - 1]}</b>.</p>
-      <div class="arma-compacta"><div class="arma-compacta-top"><span class="equipado-nombre">${sc.armaNombre ? esc(sc.armaNombre) : '<span class="hint">Sin arma</span>'}</span><span class="valor-caja">${danoTxt(sc)}</span></div>
-        <div class="arma-detalle">${sc.armaDetalle ? esc(sc.armaDetalle) : 'Sin efecto.'}</div></div>
+      <div class="arma-compacta"><div class="arma-compacta-top"><span class="equipado-nombre">${Combatiente.armaEnMano(sc).nombre ? esc(Combatiente.armaEnMano(sc).nombre) : '<span class="hint">Sin arma</span>'}</span><span class="valor-caja">${danoTxt(sc)}</span></div>
+        <div class="arma-detalle">${Combatiente.armaEnMano(sc).detalle ? esc(Combatiente.armaEnMano(sc).detalle) : 'Sin efecto.'}</div></div>
       <div class="pap-fila" style="gap:8px;margin:10px 0">
         <button type="button" class="pap-boton" data-editararma="${sc.id}">✎ Crear o editar el arma (paso a paso)</button>
         <button type="button" class="pap-boton" data-equipardelfabricante="${sc.id}">⚔ Elegir del fabricante</button>
         <button type="button" class="pap-boton" data-armanat="${sc.id}">🐾 Arma natural del catálogo</button>
       </div>
-      ${campo('¿El arma es parte del cuerpo?', `<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-rec="armaNatural" data-id="${sc.id}"${sc.armaNatural ? ' checked' : ''}> Arma natural (colmillo, garra, puño…) ${ayudaQ(AYUDA_NATURAL)}</label>`,
+      ${campo('¿El arma es parte del cuerpo?', `<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-rec="armaNatural" data-id="${sc.id}"${Combatiente.armaEnMano(sc).natural ? ' checked' : ''}> Arma natural (colmillo, garra, puño…) ${ayudaQ(AYUDA_NATURAL)}</label>`,
           'Si es natural, al morir suelta un trofeo en vez del arma y ningún jugador la puede equipar.')}`;
   }
   if(p === 3){

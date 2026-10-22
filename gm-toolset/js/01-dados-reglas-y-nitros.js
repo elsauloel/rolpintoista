@@ -203,7 +203,7 @@ let S = { turno:1, creeps:[] };
 
 function danoTxt(sc, extra){ return CreepCalculo.danoTxt(sc, extra); }
 
-// Lo que el creep tiene puesto y da bonos: su equipo y su arma (sc.armaMods).
+// Lo que el creep tiene puesto y da bonos: su equipo y su arma (Combatiente.armaEnMano(sc).mods).
 function fuentesEquipoCreep(sc){ return CreepCalculo.fuentesEquipo(sc); }
 
 // Suma los modificadores que apuntan a un stat puntual, vengan del equipo

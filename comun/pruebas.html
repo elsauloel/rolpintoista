@@ -799,6 +799,17 @@ prueba('Empower (Support, rehecho 2026-10-22): +3 a la próxima tirada (+6 con d
   FichaAcciones.tirarValorStat(S, 'Fuerza del golpe', 5, 'fue', undefined, undefined, undefined, ui);
   igual([dos, tras, fue, tiradas[2].r.mod - formulaParaValor(5).mod], [[1, 2, 6, 6], [0, true, 0], [3, 0, true], 0]);
 });
+prueba('🗡 La puerta única del arma (docs/plan-inventario-creeps.md, paso 1): Combatiente.armaEnMano da el arma de un creep como un ítem; las cuentas no cambian', () => {
+  const sc = ({nombre: 'Prueba', fue: 3, equipo: [], armaNombre: 'Hacha', armaTipo: 8, armaPeso: 2, armaFijo: 1, armaAmplificado: 1, armaManos: 'arma_2m',
+    armaMods: [{stat: 'pdg', val: 1}], armaEfectos: [{nombre: 'Sangrado', caras: 4, exitos: 1}], armaRasgos: {perfora: 2}, armaDetalle: 'Pesada', estados: []});
+  const a = Combatiente.armaEnMano(sc);
+  const vacio = Combatiente.armaEnMano({});
+  const nat = Combatiente.armaEnMano({armaNombre: 'Garras', armaNatural: true});
+  igual([a.nombre, a.tipoItem, a.tipoDado, a.peso, a.danoFijo, a.danoAmplificado, a.mods.length, a.efectosGolpe.length, a.perfora, a.detalle, a.natural, a.equipado,
+    CreepCalculo.pesoArma(sc), /^3d8/.test(CreepCalculo.danoTxt(sc, 0)), Combatiente.armaDeCombatiente === Combatiente.armaEnMano,
+    [vacio.nombre, vacio.tipoDado, vacio.peso, vacio.natural], nat.natural, CreepCalculo.tarjetaPublica({...sc, hp: 5}).armaNombre],
+    ['Hacha', 'arma_2m', 8, 2, 1, 1, 1, 1, 2, 'Pesada', false, true, 2, true, true, ['', 8, 1, false], true, 'Hacha']);
+});
 prueba('Enyetar (Debuffer, 2026-10-12): 5 SP (10 en turno ajeno), sin No2, PdG.Esp contra Res.Esp de un enemigo; botón fijo; una vez por tirada', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'debuffer').habilidades.find(h => h.id === 'debuffer-enyetar');
   const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: () => 5, etq: s => s, X: 0});

@@ -24,7 +24,7 @@ function habilidadAnuncio(sc, h){
 async function aguanteAtacar(sc){
   const id = sc.id, golpes = Math.round(num(sc.aguanteListo)), enSP = CreepCalculo.modoSP(sc);
   const dados = enSP ? Math.min(golpes, Math.max(0, Math.floor(CreepCalculo.spActual(sc)))) : golpes;
-  const tipoD = num(sc.armaTipo) || 8;
+  const tipoD = Combatiente.armaEnMano(sc).tipoDado;
   const costo = enSP ? `${dados} SP` : `+${dados} turno${dados === 1 ? '' : 's'} de cooldown de Aguante`;
   const texto = `${sc.nombre} está en modo aguante: recibió ${golpes} golpe${golpes === 1 ? '' : 's'}, así que este ataque suma +${dados}d${tipoD}`
     + `${dados < golpes ? ` (el SP le alcanza para ${dados})` : ''}. Cuesta ${costo}, más los No2 del ataque.`;
@@ -48,7 +48,7 @@ async function aguanteAtacar(sc){
   mesaLinea(`🛡 ${txt}`, 'recordatorio');
   if(typeof momentoAbrir === 'function') momentoAbrir({tipo: 'aguante', icono: '🛡', titulo: `${sc.nombre} descarga el aguante`, resultado: txt, estado: 'listo', datos: {chico: true}});
   const atq = Combatiente.ataqueConArreglos({nombre: 'Aguante', detalle: `Modo aguante: +${dados}d${tipoD} por los golpes que recibió.`}, {modo: 'arma', arma: {dados}},
-    {arma: {...Combatiente.armaDeCombatiente(sc), id: '', nombre: sc.armaNombre || '', rango: !!sc.armaDeRango}, alcance: CreepCalculo.alcance(sc)});
+    {arma: {...Combatiente.armaDeCombatiente(sc), id: '', nombre: Combatiente.armaEnMano(sc).nombre || '', rango: Combatiente.armaEnMano(sc).armaDeRango}, alcance: CreepCalculo.alcance(sc)});
   if(atq && typeof Duelo !== 'undefined' && Duelo.disponible()) acElegirObjetivo(sc, atq, () => acPublicar(sc, CreepDuelo.pdgDeArreglos(sc, atq)));
   else acPublicar(sc, CreepDuelo.pdgDeArreglos(sc, atq));
   acDibujar();

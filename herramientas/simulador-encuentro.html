@@ -272,7 +272,7 @@ const Sim = (() => {
     if(atq.abrirHerida && estados(d).some(e => e.activo !== false && /sangra/i.test(e.nombre || ''))){ m.dados = num(m.dados) + 2; notasPrevias.push('ya sangraba: +2 dados'); }
     if(notasPrevias.length) log(`     (${notasPrevias.join(' · ')})`);
     const pdgVal = a.S ? FichaCombate.pdgParaArma(a.S, arma, calc(a)).valor + num(m.pdg)
-      : stat(a, 'pdg') + num(m.pdg) + Combatiente.pdgExtraArma(st => CreepCalculo.modTotal(a.sc, st), {tipoDado: tipo, armaDeRango: !!a.sc.armaDeRango});
+      : stat(a, 'pdg') + num(m.pdg) + Combatiente.pdgExtraArma(st => CreepCalculo.modTotal(a.sc, st), {tipoDado: tipo, armaDeRango: Combatiente.armaEnMano(a.sc).armaDeRango});
     const pdg = tiradaStat(a, pdgVal, 'pdg');
     // Contra un disparo (un arma de rango) el Parry es solo con escudo (dueño, 2026-10-09; Combatiente.contraDisparo / sirveParaParry)
     const pc = paraCon(d, !!atq.rango), evaVal = stat(d, 'eva');
@@ -321,7 +321,7 @@ const Sim = (() => {
     const hizoDano = res.recibido > 0;
     log(`  ${crit ? '💥' : '⚔'} ${que} → ${resultado === 'mitad' ? `Parry; ${bloq} → pasa la MITAD` : 'pegó'}${crit ? ` · CRÍTICO ×${mult} (d20: ${crit.rolls.join(', ')})` : ''} · daño ${formula} = ${crudo}${mult > 1 ? ` ×${mult} = ${golpe}` : ''}${ignoraDef ? (perfora ? ` (Perfora ${perfora})` : ' (sin Defensa)') : ` − Defensa ${def}`} → ${res.recibido} a la vida${res.absorbido ? ` (${res.absorbido} absorbidos)` : ''} · ${nomHp(d)}`);
     // Efectos del golpe: los de la habilidad y los del arma
-    const armaEf = a.S ? (arma ? arma.efectosGolpe || [] : []) : (a.sc.armaEfectosGolpe || []);
+    const armaEf = a.S ? (arma ? arma.efectosGolpe || [] : []) : Combatiente.armaEnMano(a.sc).efectosGolpe;
     const efs = [...(atq.efectos || []), ...armaEf.map(e => ({...EfectosGolpe.normalizar(e), stacks: num(e.stacks)}))].filter(e => e && e.nombre && !e.danoMagico && !Combatiente.esEfectoIgnora(e));
     const notas = efs.map(ef => resolverEfecto(a, d, ef, {hizoDano, crit: !!crit, dif: r.dif})).filter(Boolean);
     if(notas.length) log(`     efectos: ${notas.join(' · ')}`);
@@ -546,7 +546,7 @@ const Sim = (() => {
     if(p.directo){ (p.directo.hechos || []).forEach(x => log(`     ${x}`)); return true; }
     if(c && c.modo === 'arma'){
       const atq = CreepAcciones.ataqueDeHab(u.sc, h);
-      if(atq && obj) duelo(u, obj, {...atq, armaNombre: u.sc.armaNombre || ''});
+      if(atq && obj) duelo(u, obj, {...atq, armaNombre: Combatiente.armaEnMano(u.sc).nombre || ''});
       return true;
     }
     const hab = CreepAcciones.habEjecucion(u.sc, h);
@@ -558,13 +558,13 @@ const Sim = (() => {
   function atacarCreep(u, d){
     const r = CreepAcciones.pagarAtaque(u.sc, 'normal', false);
     if(!r || r.error) return false;
-    duelo(u, d, {tipoDado: num(u.sc.armaTipo) || 8, armaNombre: u.sc.armaNombre || '', mods: {}, rango: !!u.sc.armaDeRango, ...Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(u.sc))});
+    duelo(u, d, {tipoDado: Combatiente.armaEnMano(u.sc).tipoDado, armaNombre: Combatiente.armaEnMano(u.sc).nombre || '', mods: {}, rango: Combatiente.armaEnMano(u.sc).armaDeRango, ...Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(u.sc))});
     return true;
   }
   function turnoCreep(u, todos, ronda){
     const riv = rivalesDe(u, todos), al = todos.filter(x => vivo(x) && x.bando === u.bando);
     if(!riv.length) return;
-    const sc = u.sc, reach = alcance(u), aDist = !!sc.armaDeRango;
+    const sc = u.sc, reach = alcance(u), aDist = Combatiente.armaEnMano(sc).armaDeRango;
     const listas = (sc.habilidades || []).filter(h => h && !CreepCalculo.bloqueoHab(sc, h) && CreepCalculo.modoHab(h) !== 'manual' && !h.trampaColocar && !h.excavar && !h.refuerzos && !h.emerger);
     const tipoDe = h => h.duelo && typeof h.duelo === 'object' ? (h.duelo.modo === 'arma' ? 'arma' : h.duelo.objetivo || 'enemigo') : (h.efectoNombre ? 'propio' : 'otro');
     // 1) Buffs y curas (a aliados, sobre sí): al toque
@@ -580,7 +580,7 @@ const Sim = (() => {
     const aTiro = riv.filter(r => dist(u, r) <= reach);
     if(aTiro.length) obj = masBlando(aTiro);
     if(dist(u, obj) > reach) acercar(u, obj, reach);
-    if(aDist && dist(u, obj) <= 1 && !/honda/i.test(sc.armaNombre || '') && nitros(u) >= 1){ u.x += u.x >= obj.x ? 1 : -1; gastarNo2(u, 1); log(`  🏃 ${u.nombre} se aleja 1 para disparar`); }
+    if(aDist && dist(u, obj) <= 1 && !/honda/i.test(Combatiente.armaEnMano(sc).nombre || '') && nitros(u) >= 1){ u.x += u.x >= obj.x ? 1 : -1; gastarNo2(u, 1); log(`  🏃 ${u.nombre} se aleja 1 para disparar`); }
     if(dist(u, obj) > reach) return;
     // 3) Un área o una onda si agarra a 2 o más
     const area = listas.find(h => ['area', 'onda', 'cono'].includes(tipoDe(h)) && !(h.duelo.aliados));
@@ -612,7 +612,7 @@ const Sim = (() => {
       cuenta[n] = (cuenta[n] || 0) + 1;
       const nombre = cuenta[n] > 1 ? `${n} ${cuenta[n]}` : n;
       const sc0 = JSON.parse(base.json);
-      const u = armarCreep(base.json, nombre, sc0.armaDeRango ? 9 + i : 6 + Math.floor(i / 2));
+      const u = armarCreep(base.json, nombre, Combatiente.armaEnMano(sc0).armaDeRango ? 9 + i : 6 + Math.floor(i / 2));
       if(enc.ajustar) enc.ajustar(u.sc, n);
       creeps.push(u);
     });

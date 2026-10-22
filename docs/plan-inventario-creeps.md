@@ -3,7 +3,7 @@
 > Pedido del dueño (2026-10-22): «vamos a encarar la tarea ardua de unificar el tema de las armas: que tanto para personajes como para creeps e
 > invocaciones (con manos), las armas sean un ítem que se agarra, se suelta, la agarra otro… al igual que escudos y talismanes». Antes (mismo día):
 > «todo lo que tenga manos debería poder usar lo mismo… con una especie de inventario: si levanta un arma, guarda la suya y después las cambia».
-> Cierra P217 y la tarea «🗡 Armas e inventario para creeps e invocaciones» de `pendientes.md`. **Decisiones aprobadas el 2026-10-22; en curso: paso 1.**
+> Cierra P217 y la tarea «🗡 Armas e inventario para creeps e invocaciones» de `pendientes.md`. **Decisiones aprobadas el 2026-10-22; paso 1 hecho, sigue el paso 2.**
 
 ## Cómo está hoy (relevamiento del 2026-10-22)
 
@@ -32,6 +32,16 @@ pública del creep, que leen los jugadores), se calculan a partir del ítem en l
 1. **Una puerta única para «el arma en la mano»** (sin cambiar datos): `Combatiente.manosDe(x)` / `armaEnMano(x)` devuelve los ítems en las manos
    de cualquiera (personaje, creep o invocación). Todos los lugares que leen `armaNombre`, `armaTipo`, `armaPeso`… pasan a preguntarle a esa puerta.
    Por dentro, para el creep sigue leyendo los datos sueltos. Es el paso más largo y no cambia nada a la vista.
+   **Hecho (2026-10-22):** `Combatiente.armaEnMano(x)` (comun/combatiente.js; `armaDeCombatiente` es el mismo) devuelve el arma en la forma de un
+   ítem de personaje (nombre, tipoItem, tipoDado, peso, danoFijo, danoAmplificado, armaDeRango, mods, efectosGolpe, natural, detalle, rasgos,
+   `equipado`). Todas las lecturas pasaron por ahí: CreepCalculo, InvCalculo, CreepDuelo, InvDuelo, CreepAcciones, InvAcciones, InvHabilidades,
+   CreepLupa, InvLupa, FichaLite, FichaResumen, CombateFin, el mapa (js/02, 10, 11, 12, 13, 17, 27, 51, 56, 58, 59, 62), GM Tools (js/01, 02, 03,
+   05, 06), la invocación en la ficha (js/04) y el simulador de encuentros (que leía `armaEfectosGolpe`, un campo que no existe: sus efectos no
+   entraban nunca). Quedan con los campos sueltos, a propósito, **las escrituras** (los editores que cambian el arma: `ponerArmaEnCreep`,
+   `equiparItemEnCreep`, `ponerArmaEnInv`, el formulario del creep, `creeps-base.js`, el simulador al equipar) y las **migraciones**
+   (`CreepCalculo.normalizar`, `InvCalculo.migrar`, `FichaGuardado`): son el paso 2. Prueba nueva en `comun/pruebas.html` (559 en verde).
+   Pendiente para la limpieza: el «ataque con su arma» (`{tipo, armaId: '', armaNombre, tipoDado, rango, alcance, ...ataqueDeArma}`) se arma igual
+   en seis lugares (js/12, js/17 ×2, js/58, InvAcciones, GM Tools js/06): juntarlo en una sola pieza.
 2. **Migración automática de los datos:** al cargar un creep o una invocación (`CreepCalculo.normalizar`, `InvCalculo.migrar`), el arma suelta pasa
    a ser un ítem equipado de su lista; los escudos y talismanes del `equipo` pasan a la forma del personaje (la Defensa adentro de `mods`). La puerta
    del paso 1 pasa a leer la lista. Los creeps base, las armas naturales, el esquema de la IA y GM Tools crean directo en la forma nueva.
@@ -49,6 +59,14 @@ pública del creep, que leen los jugadores), se calculan a partir del ítem en l
 8. **Limpieza:** se borran los datos sueltos y los caminos viejos (incluidas las pruebas que los usan), cuando todo lo anterior ande en una sesión real.
 
 ## Decisiones del dueño ✅ (2026-10-22: «dale con las recomendaciones, me parece bien»)
+
+- **D8 ✅ Armas y armaduras naturales = piezas del catálogo marcadas como naturales** (dueño, 2026-10-22: «no diseñar todo un catálogo de armas y
+  armaduras naturales, sino a una bestia a la hora de diseñarla le cargás las armas que quieras, de acuerdo al efecto que quieras del catálogo, la
+  marcás como natural… le cambiás el nombre, garra de la pignonga, y al morir no deja un arma del catálogo sino la garra… un trofeo»). En el modelo
+  nuevo, cualquier ítem de su lista con `natural: true` y su nombre propio: tiene todos los efectos de esa pieza, no se cae ni lo levanta otro, y al
+  morir deja el trofeo (`CreepCalculo.trofeo`), no la pieza. El catálogo de armas naturales (`armas-naturales-base.js`) queda como atajo, no como
+  requisito; la tarea «revisar las 66 armas naturales» pierde peso.
+
 
 - **D1 ✅** Desarmado deja de ser un estado: es «no tiene nada en la mano».
 - **D2 ✅** Creeps e invocaciones llevan ítems guardados además de lo de la mano; sin límite por ahora (lo maneja el GM).

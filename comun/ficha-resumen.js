@@ -48,7 +48,7 @@ const FichaResumen = (() => {
 
   /* ---------- No2 máximo de una invocación (js/04) ---------- */
   function invFuentesEquipo(inv){
-    const arma = (inv.armaMods || []).length ? [{nombre: inv.armaNombre || 'Arma', mods: inv.armaMods}] : [];
+    const arma = Combatiente.armaEnMano(inv).mods.length ? [{nombre: Combatiente.armaEnMano(inv).nombre || 'Arma', mods: Combatiente.armaEnMano(inv).mods}] : [];
     return [...(inv.equipo || []), ...arma];
   }
   function invModTotal(inv, statId){
@@ -221,7 +221,7 @@ const FichaResumen = (() => {
           // que un PJ o un creep (barra de No2, estados con su detalle).
           nitros: num(inv.nitros),
           nitrosMax: invNitrosMax(inv),
-          oporCosto: Math.max(0, Combatiente.costoEspecial(num(inv.armaTipo) || 8, Combatiente.armaDeCombatiente(inv), 'oportunidad') - Combatiente.ahorroEspecial('oportunidad', st => invModTotal(inv, st))),   // ataque de oportunidad (2026-10-02)
+          oporCosto: Math.max(0, Combatiente.costoEspecial(Combatiente.armaEnMano(inv).tipoDado, Combatiente.armaDeCombatiente(inv), 'oportunidad') - Combatiente.ahorroEspecial('oportunidad', st => invModTotal(inv, st))),   // ataque de oportunidad (2026-10-02)
           sinOpor: !Combatiente.sirveDeOportunidad(Combatiente.armaDeCombatiente(inv)),   // con un arco no hay oportunidad (2026-10-09)
           // Las reglas del mapa, iguales para todos (dueño, 2026-10-04): moverse cuesta No2 (Rengo el doble, Inmovilizado no se mueve), los Pasos
           // gratis, las chances de las piezas (Retirada limpia, Inamovible, Recuperarse rápido, Reflejos de mangosta) y Pisada atenta con su Percepción.

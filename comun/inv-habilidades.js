@@ -52,8 +52,8 @@ const InvHabilidades = (() => {
   // «Ataque con mi arma, con arreglos» de una invocación (P134), con su arma y su alcance (o el que diga la habilidad).
   function ataqueDeHab(inv, h){
     const c = h && h.duelo;
-    return Combatiente.ataqueConArreglos(h, c, {arma: {...Combatiente.armaDeCombatiente(inv), id: '', nombre: inv.armaNombre || '', rango: !!inv.armaDeRango},
-      alcance: c && c.alcance !== undefined && c.alcance !== 'auto' ? alcanceHab(inv, c, 'pdg') : (inv.armaDeRango ? Combatiente.alcanceArmaRango(Combatiente.armaDeCombatiente(inv), I().statValor(inv, 'rng')) : 1)});
+    return Combatiente.ataqueConArreglos(h, c, {arma: {...Combatiente.armaDeCombatiente(inv), id: '', nombre: Combatiente.armaEnMano(inv).nombre || '', rango: Combatiente.armaEnMano(inv).armaDeRango},
+      alcance: c && c.alcance !== undefined && c.alcance !== 'auto' ? alcanceHab(inv, c, 'pdg') : (Combatiente.armaEnMano(inv).armaDeRango ? Combatiente.alcanceArmaRango(Combatiente.armaDeCombatiente(inv), I().statValor(inv, 'rng')) : 1)});
   }
   // El PdG del ataque con arreglos, con lo que le suma la habilidad (los No2 ya los cobró la habilidad).
   const tiradaPdgArreglos = (inv, atq) => A().tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg') + num(atq && atq.mods && atq.mods.pdg), 'pdg');
@@ -76,7 +76,7 @@ const InvHabilidades = (() => {
   // Pone un estado en la invocación con la regla común (inmunidades, acumulación y renovación). Devuelve el texto para la Mesa.
   function ponerEstado(inv, d){
     inv.estados = inv.estados || [];
-    const r = Combatiente.agregarEstado(inv.estados, d, {armaNatural: !!inv.armaNatural});
+    const r = Combatiente.agregarEstado(inv.estados, d, {armaNatural: Combatiente.armaEnMano(inv).natural});
     if(!r.ok) return `${d.nombre}: no le hizo efecto (${r.motivo})`;
     if(r.que === 'yaLoTiene') return `${d.nombre}: ya lo tenía`;
     const e = r.estado;

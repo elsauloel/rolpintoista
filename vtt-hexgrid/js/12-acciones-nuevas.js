@@ -130,7 +130,7 @@ async function acCambiarCreep(creepId, cambiar){
 }
 // Los efectos al golpear de su arma (comun/efectos-golpe.js): recordar y tirar, no aplicar — igual que GM Tools.
 function acEfectosAlPegar(sc){
-  EfectosGolpe.alPegar({arma: `${sc.nombre} · ${sc.armaNombre || 'arma'}`, efectos: sc.armaEfectos, publicar: linea => {
+  EfectosGolpe.alPegar({arma: `${sc.nombre} · ${Combatiente.armaEnMano(sc).nombre || 'arma'}`, efectos: Combatiente.armaEnMano(sc).efectosGolpe, publicar: linea => {
     if(!fbDb || !fbUsuario || !fbMiembro) return;
     fbDb.collection(fbRutaCampana('tiradas')).add({
       uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: String(sc.nombre || '').slice(0, 60),
@@ -296,10 +296,10 @@ function acPreguntarTipoAtaque(sc){
    disponible para su uso»): lo lleva en el cinturón (comun/combate-fin.js, darConsumiblesAlAzar). Al atacar con el arco o la ballesta, el mismo
    «¿Qué flecha?» que un personaje; se gasta y cobra su No2 al disparar. */
 function acMunicion(sc){
-  if(!sc || !sc.armaDeRango) return '';
+  if(!sc || !Combatiente.armaEnMano(sc).armaDeRango) return '';
   const m = Combatiente.municionDe(Combatiente.armaDeCombatiente(sc));
   if(m) return m;
-  const n = String(sc.armaNombre || '');
+  const n = String(Combatiente.armaEnMano(sc).nombre || '');
   return /ballesta/i.test(n) ? 'virote' : /arco/i.test(n) ? 'flecha' : '';
 }
 function acFlechas(sc){
@@ -350,10 +350,10 @@ function acAtacar(tipo, flechaId){
     });
   };
   if(typeof Duelo === 'undefined' || !Duelo.disponible()){ hacer(); return; }
-  acElegirObjetivo(sc, {tipo, armaId: '', armaNombre: sc.armaNombre || '', tipoDado: num(sc.armaTipo) || 8, rango: !!sc.armaDeRango, alcance: CreepCalculo.alcance(sc),
+  acElegirObjetivo(sc, {tipo, armaId: '', armaNombre: Combatiente.armaEnMano(sc).nombre || '', tipoDado: Combatiente.armaEnMano(sc).tipoDado, rango: Combatiente.armaEnMano(sc).armaDeRango, alcance: CreepCalculo.alcance(sc),
     ...Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(sc)),   // los rasgos de su arma: por la espalda, sin Parry
     ...(fl ? {flecha: fl} : {}),   // 🏹 la flecha o el virote especial (2026-10-20)
-    ...(num((sc.armaRasgos || {}).arcoDuro) > 0 && num(CreepCalculo.statValor(sc, 'fue')) < num(sc.armaRasgos.arcoDuro) ? {arcoDuroPdg: -2} : {})}, hacer,
+    ...(num(Combatiente.armaEnMano(sc).arcoDuro) > 0 && num(CreepCalculo.statValor(sc, 'fue')) < num(Combatiente.armaEnMano(sc).arcoDuro) ? {arcoDuroPdg: -2} : {})}, hacer,
     fl ? () => acDispararFlecha(fl.id) : null);   // Arco duro
 }
 // Elegir el objetivo (de un ataque o de una habilidad) con un clic en el token: mientras tanto las Acciones nuevas se esconden

@@ -68,7 +68,7 @@ const CreepDuelo = (() => {
   }
   // El PdG del ataque con arreglos, con lo que le suma la habilidad (los No2 ya los cobró la habilidad).
   function pdgDeArreglos(sc, atq){
-    return A().tirada(`${sc.nombre} · PdG`, C().statValor(sc, 'pdg') + num(atq && atq.mods && atq.mods.pdg) + Combatiente.pdgExtraArma(st => C().modTotal(sc, st), {tipoDado: num(sc.armaTipo), armaDeRango: !!sc.armaDeRango}), sc, 'pdg');
+    return A().tirada(`${sc.nombre} · PdG`, C().statValor(sc, 'pdg') + num(atq && atq.mods && atq.mods.pdg) + Combatiente.pdgExtraArma(st => C().modTotal(sc, st), {tipoDado: Combatiente.armaEnMano(sc).tipoDado, armaDeRango: Combatiente.armaEnMano(sc).armaDeRango}), sc, 'pdg');
   }
 
   function hooks(ui){
@@ -80,7 +80,7 @@ const CreepDuelo = (() => {
       let formula = C().danoTxt(sc, C().statValor(sc, 'dmg'));
       const m = d.ataque.tipo === 'habilidad-arma' ? (d.ataque.mods || {}) : null;   // lo que le suma la habilidad: dados del Tipo del arma y daño fijo
       if(m){
-        if(num(m.dados) > 0) formula += ` + ${Math.round(num(m.dados))}d${num(sc.armaTipo) || 8}`;
+        if(num(m.dados) > 0) formula += ` + ${Math.round(num(m.dados))}d${Combatiente.armaEnMano(sc).tipoDado}`;
         if(m.dadoExtra) formula += ` + ${m.dadoExtra}`;
         if(num(m.fijo)) formula += ` ${num(m.fijo) > 0 ? '+' : '-'} ${fmt(Math.abs(num(m.fijo)))}`;
       }
@@ -108,7 +108,7 @@ const CreepDuelo = (() => {
         if(campo === 'pdg'){
           const t = d.ataque.tipo === 'habilidad-arma' ? pdgDeArreglos(sc, d.ataque) : A().tiradaAtaque(sc, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo);
           const tipo = d.ataque.tipo, costo = tipo === 'oportunidad' ? C().costoOportunidad(sc) : tipo === 'contra' ? C().costoContraataque(sc) : C().costoAtaque(sc);
-          return {formula: formulaDe(t), ...L('atacar|'), costo: Combatiente.costoAtaqueLineas({tipoArma: num(sc.armaTipo) || 8, arma: Combatiente.armaDeCombatiente(sc), hechos: num(sc.ataquesTurno), costo, tiene: num(sc.nitros), ataque: tipo})};
+          return {formula: formulaDe(t), ...L('atacar|'), costo: Combatiente.costoAtaqueLineas({tipoArma: Combatiente.armaEnMano(sc).tipoDado, arma: Combatiente.armaDeCombatiente(sc), hechos: num(sc.ataquesTurno), costo, tiene: num(sc.nitros), ataque: tipo})};
         }
         if(campo === 'fuerza') return {formula: formulaDe(A().tirada('', C().fuerzaGolpeValor(sc))), ...L('stat|fue'), titulo: `${sc.nombre} · Fuerza del golpe`};
         if(campo === 'bloqueo') return {formula: formulaDe(A().tirada('', C().bloqueoValor(sc) + A().bloqueoFirmeCreep(sc), sc, 'bloqueo')), ...L('stat|bloqueo'), titulo: `${sc.nombre} · Bloqueo`};
@@ -159,7 +159,7 @@ const CreepDuelo = (() => {
       efectosArma: d => {
         const sc = deLado(d.atacante);
         const cg = sc ? Combatiente.cargaDeDuelo(sc.estados, d.id) : null;   // + los del arma envenenada / el óleo de este golpe
-        return sc ? [...(sc.armaEfectos || []), ...(cg ? cg.efectos : [])].map(e => ({...EfectosGolpe.normalizar(e), stacks: num(e.stacks)})) : [];
+        return sc ? [...Combatiente.armaEnMano(sc).efectosGolpe, ...(cg ? cg.efectos : [])].map(e => ({...EfectosGolpe.normalizar(e), stacks: num(e.stacks)})) : [];
       },
       // El daño del arma del creep (sin los efectos del golpe: los resuelve el duelo en su paso de efectos).
       dano: d => {
@@ -220,7 +220,7 @@ const CreepDuelo = (() => {
         // Parry con un arma o un escudo (regla del dueño, 2026-09-30); desde el 2026-10-21 también con un arma natural (va última).
         const disparo = Combatiente.contraDisparo(d), def = C().defensa(sc, {soloEscudo: disparo});   // contra un disparo, Parry solo con escudo
         if(Combatiente.stuneado(sc.estados)) return [{modo: 'evasion', etiqueta: '🏃 Evasión · Stun: 1', info: ['⚡ Stun: no puede hacer nada; su Evasión es 1']}];   // Stun (2026-10-06)
-        if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, escudo: def.nombre !== sc.armaNombre, natural: def.nombre === sc.armaNombre ? !!sc.armaNatural : !!def.natural, etiqueta: `${def.nombre === sc.armaNombre ? '🗡' : '🛡'} Parry · ${def.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo: c, motivoNo: '',
+        if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, escudo: def.nombre !== Combatiente.armaEnMano(sc).nombre, natural: def.nombre === Combatiente.armaEnMano(sc).nombre ? Combatiente.armaEnMano(sc).natural : !!def.natural, etiqueta: `${def.nombre === Combatiente.armaEnMano(sc).nombre ? '🗡' : '🛡'} Parry · ${def.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo: c, motivoNo: '',
           info: [`Parry 🎲 ${fx(C().statValor(sc, 'parry'), 'parry')}`, disparo ? 'si gana, el disparo queda parado (sin Bloqueo)' : `si gana, Bloqueo 🎲 ${fx(C().bloqueoValor(sc))}`, ...(c > num(sc.nitros) ? ['⚠ sin No2: queda en negativo (se descuenta al recargar)'] : [])]});
         return Combatiente.sinReaccionesNo2(ops, sc.estados);   // Expuesto (Degollar): sin Parry
       },
@@ -251,7 +251,7 @@ const CreepDuelo = (() => {
       },
       armaContra: d => {
         const sc = deLado(d.defensor);
-        return {armaId: '', armaNombre: (sc && sc.armaNombre) || '', tipoDado: (sc && num(sc.armaTipo)) || 8};
+        return {armaId: '', armaNombre: (sc && Combatiente.armaEnMano(sc).nombre) || '', tipoDado: (sc && Combatiente.armaEnMano(sc).tipoDado) || 8};
       },
     };
   }

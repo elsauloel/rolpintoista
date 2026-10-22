@@ -100,13 +100,13 @@ const CombateFin = (() => {
       efectosGolpe: structuredClone(c.efectosGolpe || []), detalle: c.detalle || '', descripcionNarrativa: c.descripcionNarrativa || '', consumible: false};
   }
   function plantillaArmaCreep(cat, sc){
-    const c = cat.find(i => i.nombre === sc.armaNombre && /^arma_/.test(i.tipoItem));
+    const c = cat.find(i => i.nombre === Combatiente.armaEnMano(sc).nombre && /^arma_/.test(i.tipoItem));
     if(c) return {...plantillaDeCatalogo(c), estimado: false};
-    const d = {tipoDado: num(sc.armaTipo) || 8, peso: Math.max(1, num(sc.armaPeso) || 1), mods: structuredClone(sc.armaMods || []), efectosGolpe: structuredClone(sc.armaEfectos || [])};
+    const d = {tipoDado: Combatiente.armaEnMano(sc).tipoDado, peso: Combatiente.armaEnMano(sc).peso, mods: structuredClone(Combatiente.armaEnMano(sc).mods), efectosGolpe: structuredClone(Combatiente.armaEnMano(sc).efectosGolpe)};
     const precio = precioEstimadoArma(cat, d, sc.nivel);
-    return {nombre: sc.armaNombre, tipoItem: sc.armaManos || 'arma_1m', tier: tierPorPrecio(precio), peso: d.peso, ranuras: 0, precioCompra: precio,
-      tipoDado: d.tipoDado, danoFijo: num(sc.armaFijo), danoAmplificado: num(sc.armaAmplificado), armaDeRango: !!sc.armaDeRango, mods: d.mods, efectosGolpe: d.efectosGolpe,
-      detalle: sc.armaDetalle || '', descripcionNarrativa: `Arma de ${K.nombreLimpio(sc)}.`, consumible: false, estimado: true};
+    return {nombre: Combatiente.armaEnMano(sc).nombre, tipoItem: Combatiente.armaEnMano(sc).tipoItem || 'arma_1m', tier: tierPorPrecio(precio), peso: d.peso, ranuras: 0, precioCompra: precio,
+      tipoDado: d.tipoDado, danoFijo: Combatiente.armaEnMano(sc).danoFijo, danoAmplificado: Combatiente.armaEnMano(sc).danoAmplificado, armaDeRango: Combatiente.armaEnMano(sc).armaDeRango, mods: d.mods, efectosGolpe: d.efectosGolpe,
+      detalle: Combatiente.armaEnMano(sc).detalle || '', descripcionNarrativa: `Arma de ${K.nombreLimpio(sc)}.`, consumible: false, estimado: true};
   }
   function plantillaEquipoCreep(cat, it, nivel){
     const c = cat.find(i => sinAviso(i.nombre) === sinAviso(it.nombre) && i.tipoItem === it.tipoItem);
@@ -125,7 +125,7 @@ const CombateFin = (() => {
   function itemsDeCreep(cat, sc){
     const out = [];
     const nom = K.nombreLimpio(sc);
-    if(sc.armaNombre && !sc.armaNatural){ const t = plantillaArmaCreep(cat, sc); out.push({clave: `${sc.id}:arma`, nombre: t.nombre, precioCompra: t.precioCompra, template: t, origen: nom}); }
+    if(Combatiente.armaEnMano(sc).nombre && !Combatiente.armaEnMano(sc).natural){ const t = plantillaArmaCreep(cat, sc); out.push({clave: `${sc.id}:arma`, nombre: t.nombre, precioCompra: t.precioCompra, template: t, origen: nom}); }
     (sc.equipo || []).filter(it => !it.natural).forEach(it => { const t = plantillaEquipoCreep(cat, it, sc.nivel);   // 🐾 lo natural no se suelta (2026-10-14)
       out.push({clave: `${sc.id}:eq:${it.id}`, nombre: t.nombre, precioCompra: t.precioCompra, template: t, origen: nom}); });
     K.dropsFijos(sc).forEach((n, i) => {   // los drops fijos (2026-10-14): del catálogo, siempre
@@ -237,10 +237,10 @@ const CombateFin = (() => {
      El arma se reconoce como en el duelo (`Combatiente.municionDe`: arco → flecha, Recarga → virote); los creeps de fábrica no traen esos datos,
      así que también vale el nombre del arma («Arco…», «Ballesta…»). */
   function municionDeCreep(sc){
-    if(!sc || !sc.armaDeRango) return '';
+    if(!sc || !Combatiente.armaEnMano(sc).armaDeRango) return '';
     const m = Combatiente.municionDe(Combatiente.armaDeCombatiente(sc));
     if(m) return m;
-    const n = String(sc.armaNombre || '');
+    const n = String(Combatiente.armaEnMano(sc).nombre || '');
     return /\bballesta\b/i.test(n) ? 'virote' : /\barco\b/i.test(n) ? 'flecha' : '';
   }
   const esMunicion = i => !!(i && i.flecha);

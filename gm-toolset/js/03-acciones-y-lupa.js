@@ -124,14 +124,14 @@ function cardHtml(sc){
         <div class="sect-label">Arma</div>
         <div class="arma-compacta" style="margin-top:4px">
           <div class="arma-compacta-top">
-            <span class="equipado-nombre">${sc.armaNombre ? esc(sc.armaNombre) : '<span class="hint">Sin nombre</span>'}</span>
+            <span class="equipado-nombre">${Combatiente.armaEnMano(sc).nombre ? esc(Combatiente.armaEnMano(sc).nombre) : '<span class="hint">Sin nombre</span>'}</span>
             <span class="valor-caja" title="Daño">${danoTxt(sc)}</span>
             <button class="rm" data-armanat="${sc.id}" title="Arma natural del catálogo (garras, colmillos, aguijón…)">🐾</button>
-            ${sc.armaNombre ? `<button class="rm" data-verarmacreep="${sc.id}" title="Ver el arma (y editarla y subirla al catálogo)">👁</button>` : ''}
+            ${Combatiente.armaEnMano(sc).nombre ? `<button class="rm" data-verarmacreep="${sc.id}" title="Ver el arma (y editarla y subirla al catálogo)">👁</button>` : ''}
             <button class="rm" data-editararma="${sc.id}" title="Editar arma">✎</button>
           </div>
-          <div class="arma-detalle">${sc.armaDetalle ? esc(sc.armaDetalle) : 'Sin efecto.'}</div>
-          ${(sc.armaEfectos || []).length ? `<div class="arma-detalle"><b>Al golpear:</b> ${esc(EfectosGolpe.resumenLista(sc.armaEfectos))}</div>` : ''}
+          <div class="arma-detalle">${Combatiente.armaEnMano(sc).detalle ? esc(Combatiente.armaEnMano(sc).detalle) : 'Sin efecto.'}</div>
+          ${Combatiente.armaEnMano(sc).efectosGolpe.length ? `<div class="arma-detalle"><b>Al golpear:</b> ${esc(EfectosGolpe.resumenLista(Combatiente.armaEnMano(sc).efectosGolpe))}</div>` : ''}
         </div>
       </div>
 

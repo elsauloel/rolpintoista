@@ -238,6 +238,8 @@ const Duelo = (() => {
 .duelo-fin{text-align:center;border:2px solid #8db3ff;background:linear-gradient(180deg,#1b2a4a,#131c33);border-radius:14px;padding:16px 14px}
 .duelo-fin .grande{font-size:34px;font-weight:900;letter-spacing:.06em;color:#dbe7ff}
 .duelo-fin .chico{font-size:13px;color:#aab3ca;margin:4px 0 12px}
+.duelo-aceptar{background:#2d6cdf;color:#fff;border:2px solid #8db3ff;border-radius:12px;padding:13px 34px;font-size:18px;font-weight:800;cursor:pointer;animation:duelo-boton 1.2s ease-in-out infinite alternate}   /* 🤺 el Aceptar del desarme (2026-10-22): un botón de verdad, que titila */
+.duelo-aceptar:disabled{animation:none;opacity:.6;cursor:default}
 .duelo-fin button{background:#2d6cdf;color:#fff;border:2px solid #8db3ff;border-radius:12px;padding:13px 30px;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(45,108,223,.5)}
 .duelo-fin.nuevo{animation:duelo-golpe .55s cubic-bezier(.2,1.6,.4,1) both}
 .duelo-tabla{width:100%;border-collapse:collapse;margin:8px 0 0;font-size:14px}
@@ -2402,7 +2404,7 @@ const Duelo = (() => {
       const item = ds.lado === 'atacante' ? ((d.defensa && d.defensa.itemNombre) || 'lo que tenía en la mano') : (d.ataque.armaNombre || 'su arma');
       const puedo = esMio(quien) || soyGM();
       cierre = `<div class="duelo-veredicto bloqueado"><div class="grande">🤺 ¡${_esc(quien.nombre)} desarmó a ${_esc(otro.nombre)}!</div><div class="chico">${_esc(otro.nombre)} pierde ${_esc(item)}: sale volando 2 casillas (lo natural no se cae)</div>
-        ${puedo ? `<div style="margin-top:10px"><button type="button" data-desarme-aceptar>${esMio(quien) ? '✔ Aceptar' : `✔ Aceptar por ${_esc(quien.nombre)}`}</button></div>` : `<div class="chico" style="margin-top:6px">esperando que ${_esc(quien.nombre)} acepte…</div>`}</div>`;
+        ${puedo ? `<div style="margin-top:14px"><button type="button" class="duelo-aceptar" data-desarme-aceptar>${esMio(quien) ? '✔ Aceptar' : `✔ Aceptar por ${_esc(quien.nombre)}`}</button><div class="chico" style="margin-top:6px;opacity:.85">Al aceptar, el arma sale volando (mirá el mapa)</div></div>` : `<div class="chico" style="margin-top:6px">esperando que ${_esc(quien.nombre)} acepte…</div>`}</div>`;
     }
     else if(desarmando) cierre = `<div class="duelo-veredicto bloqueado"><div class="grande">🤺 …</div><div class="chico">Mirá el mapa: ${_esc(d.ataque.desarme.quien || '')} desarma, el arma sale volando</div></div>`;
     else if(d.estado === 'empate' && d.empate) cierre = empateHtml(d, nuevaClave('empate' + d.empate.par));

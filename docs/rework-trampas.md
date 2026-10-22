@@ -166,6 +166,9 @@ Reemplazan a las 72 de antes (24 × menor/normal/mayor). Común / Buena / Rara p
 - **Explosivas ✅ (dueño, 2026-10-04, hecho):** opción 2 — **daño directo, sin tirarse al piso**; lo que dejan (Pajaritos) se resiste con Res.CC.
   Ajuste: Petardo trampa 2d6 y baja a 25; Mina explosiva 3d6 + Pajaritos 2t; Barril de pólvora baja de 5d6 a **4d6** + Pajaritos 2t (era 3t). *Por qué:*
   la regla general de las trampas es «no se esquivan, se resiste el efecto»; tirarse al piso era una excepción que confundía.
+- **Cartucho enterrado ✅ (dueño, 2026-10-22, hecho):** la trampa del Kobold boom boom, ahora también en el catálogo. Buena Calidad, 55: 1 casilla →
+  explota en las 7 de alrededor, **3d6+3 de daño de fuego directo a la vida**, sin estado. *Por qué el precio:* el mismo escalón que la Mina explosiva
+  (3d6 + Pajaritos, 55): cambia el Pajaritos por +3 de daño y fuego (que la Res. fuego puede frenar). Detectarla 8 (Destreza).
 - **Efecto persistente: cuándo se dispara ✅ (dueño, 2026-10-04, hecho):** al **detonar** la trampa, al **entrar** al terreno (viniendo de afuera,
   aunque solo lo cruce) y en cada **Mantenimiento**. Moverse adentro no lo vuelve a disparar: cuenta **una vez por ronda** (también el daño del piso
   ardiendo de la Mina napalm). Quien ya lo sufrió al detonar queda anotado para esa ronda.

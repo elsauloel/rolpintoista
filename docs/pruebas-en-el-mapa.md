@@ -30,6 +30,12 @@
   derrotados con equipo repetido (4 chalecos, 2 lanzas, 2 pociones, varita, escudo, honda, hacha, casco, capucha, botas, bomba, bengala) → Finalizar
   combate → Publicar → el botín de Silvia (con el control) mostró los grupos y las pilas; reclamar 2 chalecos → «2 libres · 2 tuyos», «↩ Soltar 1» y
   el aviso «2 × Chaleco de cuero son tuyos». Todo borrado y el combate anterior repuesto. Falta probar: Disputar sobre una pila y Soltar de a uno.
+  **Retoques del dueño (2026-10-22, mirándolo como jugador en «Claude · pruebas»; probados ahí como GM)**: el cartel «🎁 ¡Botín disponible!» junto al
+  botón del dock mientras hay botín publicado; la cabecera con tus XP y DDE en dos recuadros grandes (los demás jugadores en una línea chica);
+  los títulos Mano / Cuerpo / Consumibles / Trofeos como banda destacada; el nombre de cada ítem con el globo del glosario (su resumen al pasar el
+  mouse, `data-glo-txt`); «slot ocupado» en rojo y siempre con Comparar; la mochila abierta desde el botín vuelve al botín al cerrarse (mapa y ficha
+  suelta); el emoji de Reclamar con su fondo oscuro. **Queda un botín publicado en «Claude · pruebas»** (4 goblins de prueba) para que el dueño lo
+  vea como jugador: al terminar, el GM (la cuenta de Claude) lo cierra o lo borra.
 - [ ] **⭕ El lápiz cierra la figura al terminarla** (reportado por el dueño el 2026-10-22, arreglado en js/07 `guardarTrazo`): con «⭕ Cerrar la
   figura» tildado, en rectas (clic, clic, clic y doble clic o Enter) y a mano alzada (al soltar), el trazo nace con las puntas unidas, sin pasar
   por el ⚙. Y con 🧱 además, lo de adentro queda sólido y sin grilla.

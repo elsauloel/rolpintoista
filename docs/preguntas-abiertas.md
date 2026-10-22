@@ -1131,3 +1131,12 @@ bestia (un oso hormiguero) «puede parrear con sus garras y obligar a desarmar a
 (`Combatiente.armaParaDefensa`: «un arma natural tampoco, por ahora», regla del 30/9). Mientras tanto, una bestia con Desarmar solo desarma
 **atacando** (cuando el personaje le hace Parry a ella). Pregunta: ¿se permite el Parry con armas naturales (para todos, o solo para bestias)?
 ¿Con qué peso para el Bloqueo?
+
+- 🔲 **P217. Desarmado deja de ser un estado, y el arma de un creep que levanta otro** (2026-10-22, dueño: «desarmado no debería ser un
+  estado: desarmado es no tener un arma equipada»). Contexto: a un **personaje** el arma ya le sale del inventario al caer, así que el estado
+  sobra. A un **creep o una invocación** el arma no es un ítem (es parte de sus datos): hoy el estado Desarmado es la forma en que el mapa sabe
+  que la perdió; se reemplazaría mirando si su arma está en el piso. Falta decidir: (a) **atacar sin nada en la mano**: hoy hay un provisorio
+  (P150: 1d4 + Daño); el dueño dijo «se tira a mano y se resuelve en la mesa hasta que definamos» — ¿se saca el 1d4 + Daño y queda un aviso
+  ✋, o queda como sugerencia editable? (b) **si otro levanta el arma de un creep** (hoy se puede): el creep que la perdió sigue teniéndola en
+  sus datos (cuando le sacan el Desarmado vuelve a pegar con ella como si nada) — ¿pasa a pegar «sin arma» hasta conseguir otra? Y el creep
+  que la levanta la guarda en su equipo, pero sigue atacando con su arma de siempre — ¿se puede cambiar de arma? *(código, cuando se decida)*

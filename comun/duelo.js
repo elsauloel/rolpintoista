@@ -1774,7 +1774,10 @@ const Duelo = (() => {
     const k = d.id + ':' + campo, abierto = manualAbierto.has(k);
     const tg = `<label class="tg" title="Pasar de lo automático a una tirada que escribís vos"><input type="checkbox" data-mtg="${campo}"${abierto ? ' checked' : ''}> ✍ Elegir manualmente</label>`;
     if(!abierto) return `<div class="duelo-manual">${tg}</div>`;
-    const sel = campo === 'eva' ? `<select data-mmodo>${selModoHtml(d)}</select>` : '';
+    const dOpM = (campo === 'fuerza' || campo === 'bloqueo') && !(d.ataque && d.ataque.desarme) && typeof window.dueloDesarmeOpcion === 'function'
+      ? window.dueloDesarmeOpcion(d, campo === 'fuerza' ? 'atacante' : 'defensor') : null;   // 🤺 a mano también se elige si es para desarmar (2026-10-22)
+    const sel = campo === 'eva' ? `<select data-mmodo>${selModoHtml(d)}</select>`
+      : dOpM ? `<select data-mdesarme>${campo === 'fuerza' ? '<option value="">⚔ Pegar: pasar el bloqueo</option>' : '<option value="">🛡 Bloquear el golpe</option>'}<option value="1">🤺 Desarmar (${_esc(dOpM.costo || '')})</option></select>` : '';
     const dm = manual['mdef:' + d.id] || 'auto';
     const def = campo === 'dano' ? `<div class="mdef">Defensa: <label><input type="radio" name="mdef-${d.id}" value="auto" data-mdef${dm === 'auto' ? ' checked' : ''}> la del defensor</label>
       <label><input type="radio" name="mdef-${d.id}" value="no" data-mdef${dm === 'no' ? ' checked' : ''}> no resta</label>
@@ -1879,6 +1882,13 @@ const Duelo = (() => {
       return;
     }
     if(campo === 'pdg' && !d.hab && !(await pagarManual(d))) return;   // las mismas reglas que el botón
+    // 🤺 Elegido «Desarmar» en el desplegable: primero se paga y se marca (lo mismo que el botón 🤺), después va la tirada escrita.
+    const selDes = (campo === 'fuerza' || campo === 'bloqueo') ? document.querySelector('[data-mdesarme]') : null;
+    if(selDes && selDes.value === '1'){
+      let ok = false;
+      try{ ok = typeof window.dueloDesarmar === 'function' && await window.dueloDesarmar(d.id, campo === 'fuerza' ? 'atacante' : 'defensor'); }catch(err){ console.error('Desarmar:', err); }
+      if(!ok){ manualAbierto.add(k); dibujar(); return; }
+    }
     guardarTiro(d.id, campo, r, defensa, await extraManual(d, campo)).catch(err => { console.error(err); _toast('No se pudo anotar la tirada en el duelo'); });
   }
 

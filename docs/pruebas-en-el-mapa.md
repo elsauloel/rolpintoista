@@ -10,10 +10,14 @@
 
 ## De la sesión en «El origen de las especies» (2026-10-22)
 
-- [ ] **🎲 La tirada extra de una zona la tira quien la creó** (Pedos Tóxicos de Larry): cuando el daño de la zona entra a un goblin, el cartel del GM dice
+- [x] (2026-10-22, Claude, dos pantallas en «Claude · pruebas»: juan con una copia de los Pedos de Larry contra dos goblins) **🎲 La tirada extra de una zona la tira quien la creó** (Pedos Tóxicos de Larry): cuando el daño de la zona entra a un goblin, el cartel del GM dice
   «🎲 1d20: lo tira Larry» y a la pantalla de Larry le aparece «Tirá para el efecto de Pedos Tóxicos contra Goblin 1» (de a uno si son varios); la
   tirada sale en la Mesa a nombre de Larry, con la nota (7+ Pajaritos · 17+ Stun · 20 desmayo, a mano), y la Crónica lo cuenta; el GM, «🎲 Tirar por él».
-- [ ] **💔 El daño a un creep espera el clic del GM**: un personaje le pega a un creep (o el creep para y pierde el Bloqueo: pasa la mitad) → en el
+  **Probado (2026-10-22):** el cartel del GM «no resistió… · 🎲 1d20: lo tira juan»; a juan «Tirá para el efecto… contra Alguien» con la tabla y
+  «🎲 Tirar 1d20», de a uno; salió 7 → «✔ Que se aplique» → al GM «Aceptar» → el goblin quedó con Pajaritos; «✋ Lo resolvemos a mano» también; el GM
+  «🎲 Tirar por él» desde la Crónica (la Mesa dice «lo tiró el GM»). **Dos errores encontrados y arreglados:** con dos pantallas, a quien tiraba le
+  aparecía un aviso genérico con «Entendido» y sin botón para tirar (lo tapaba); y la tarjeta del GM con «Tirar por él» se borraba a los 14 s.
+- [x] (2026-10-22, Claude: Clementino le pegó un crítico al Bosque, 21 de daño; la vida quedó en 60 hasta «💔 Aplicar el daño», después 39) **💔 El daño a un creep espera el clic del GM**: un personaje le pega a un creep (o el creep para y pierde el Bloqueo: pasa la mitad) → en el
   cuadro del duelo, al GM, «Pasa la mitad: (X − su Defensa) ÷ 2» y «💔 Aplicar el daño»; recién ahí se descuenta. (Antes se aplicaba solo.)
 - [ ] **⏳ Una zona de 1 turno hace efecto dos veces**: al tirarla y al pasar la ronda; después se va al empezar el turno de quien la tiró. Con quien
   la tiró primero en el orden, que no se vaya antes de resolver el segundo efecto (`zonasDelQueLaTiro` con el Mantenimiento nuevo).

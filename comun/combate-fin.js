@@ -485,8 +485,8 @@ const CombateFin = (() => {
     }else{
       const items = itemsPublicables(rep, r), eq = items.filter(i => !esConsumible(i)), co = items.filter(esConsumible);
       cuerpo = `<div class="reporte-lista">
-        <div class="reporte-fila"><span class="reporte-nombre">🗡 Equipo</span><span class="reporte-xp">${eq.length ? esc(eq.map(i => i.nombre).join(', ')) : 'nada'}</span></div>
-        <div class="reporte-fila"><span class="reporte-nombre">🧪 Consumibles</span><span class="reporte-xp">${co.length ? esc(co.map(i => i.nombre).join(', ')) : 'nada'}</span></div>
+        <div class="reporte-fila reporte-fila-lista"><span class="reporte-nombre">🗡 Equipo</span><span class="reporte-xp">${eq.length ? esc(eq.map(i => i.nombre).join(', ')) : 'nada'}</span></div>
+        <div class="reporte-fila reporte-fila-lista"><span class="reporte-nombre">🧪 Consumibles</span><span class="reporte-xp">${co.length ? esc(co.map(i => i.nombre).join(', ')) : 'nada'}</span></div>
         ${rp.porJugador.map(({j, xp, dde}) => `<div class="reporte-fila"><span class="reporte-nombre">${esc(j.nombre)}</span><span class="reporte-estado ${j.estado === 'en pie' ? 'escapo' : 'derrotado'}">${esc(j.estado)}</span><span class="reporte-xp">+${fmt(xp)} XP · +${fmt(dde)} DDE</span></div>`).join('') || '<div class="hint">Nadie cobra: elegí al menos un jugador (paso Doblones).</div>'}
       </div>`;
     }

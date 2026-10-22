@@ -156,6 +156,10 @@ a.btn{text-decoration:none;display:inline-block}
 label.reporte-fila .reporte-nombre{display:flex;flex-direction:column;gap:2px}
 label.reporte-fila .reporte-nombre .reporte-nivel{margin-left:0}
 .reporte-xp.suelto{min-width:96px}
+/* El resumen del paso Publicar (Equipo / Consumibles): la lista larga se corta en renglones, no se sale del cuadro (2026-10-22) */
+.reporte-fila-lista{align-items:flex-start}
+.reporte-fila-lista .reporte-nombre{flex:none}
+.reporte-fila-lista .reporte-xp{flex:1;min-width:0;white-space:normal;overflow-wrap:anywhere;font-weight:400;font-size:13px;line-height:1.4}
 .rep-valor{display:inline-flex;align-items:center;gap:4px;font-family:"Space Mono",monospace;font-weight:700;color:var(--brass);white-space:nowrap}
 .rep-num{width:76px!important;text-align:right;padding:4px 6px!important;font-weight:700}
 .rep-por-jugador{display:flex;flex-wrap:wrap;gap:14px;align-items:center;padding:10px 12px;margin-bottom:8px;border:1px solid var(--brass);background:rgba(184,115,51,.08)}

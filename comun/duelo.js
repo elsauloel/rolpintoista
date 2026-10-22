@@ -508,6 +508,8 @@ const Duelo = (() => {
       creado: firebase.firestore.FieldValue.serverTimestamp(),
     };
     if(textoAtq && inicial.ataque) inicial.ataque.texto = textoAtq;
+    // 🤺 Con un arma natural (garras, colmillos): no se le puede desarmar (dueño, 2026-10-22); lo dice la pantalla que crea el duelo (js/62).
+    try{ if(!hab && inicial.ataque && typeof window.dueloArmaNatural === 'function' && window.dueloArmaNatural(cfg.yo, cfg.ataque)) inicial.ataque.natural = true; }catch(e){}
     // Hechizo de área (dicho por el dueño, 2026-09-27): el casteador tira su PdG.Esp/PdG UNA SOLA VEZ para toda la
     // cascada; cada objetivo tira su Evasión individualmente contra esa MISMA tirada. `cfg.pdgCompartido` (la tirada
     // ya resuelta del primer objetivo) llega precargada acá, así que este sub-duelo arranca con el contacto ya
@@ -2045,7 +2047,7 @@ const Duelo = (() => {
     }else if(d.resultado === 'desarmado'){
       const ds = (d.ataque && d.ataque.desarme) || {}, quien = ds.lado === 'atacante' ? d.atacante.nombre : d.defensor.nombre, otro = ds.lado === 'atacante' ? d.defensor.nombre : d.atacante.nombre;
       const obj = ds.lado === 'atacante' ? (d.defensa && d.defensa.itemNombre) || 'lo que tenía en la mano' : (d.ataque && d.ataque.armaNombre) || 'su arma';
-      caja = `<div class="duelo-veredicto bloqueado${nuevo}"><div class="grande">🤺 ¡DESARMADO!</div><div class="chico">${_esc(quien)} le saca ${_esc(obj)} a ${_esc(otro)}: sale volando 2 casillas (lo natural no se cae)</div>${mot}</div>`;
+      caja = `<div class="duelo-veredicto bloqueado${nuevo}"><div class="grande">🤺 ¡DESARMADO!</div><div class="chico">${_esc(quien)} le saca ${_esc(obj)} a ${_esc(otro)}: sale volando 2 casillas</div>${mot}</div>`;
     }else if(d.resultado === 'mitad'){
       const desFallo = d.ataque && d.ataque.desarme && d.ataque.desarme.lado === 'defensor';   // 🤺 quiso desarmar defendiendo y no le salió
       caja = `<div class="duelo-veredicto mitad${nuevo}">${desFallo ? `<div class="chico" style="color:#ffd25a;font-weight:700;margin-bottom:4px">🤺 ${_esc(d.defensor.nombre)} intentó desarmar a ${_esc(d.atacante.nombre)}, pero falló</div>` : ''}<div class="grande">⚠ PASA LA MITAD</div><div class="chico">${desFallo ? 'No bloqueó el golpe: ' : 'Paró el golpe pero no lo frenó del todo: '}pasa la mitad del daño (redondeada para arriba)</div>
@@ -2403,7 +2405,7 @@ const Duelo = (() => {
       const ds = d.ataque.desarme, quien = d[ds.lado], otro = d[ds.lado === 'atacante' ? 'defensor' : 'atacante'];
       const item = ds.lado === 'atacante' ? ((d.defensa && d.defensa.itemNombre) || 'lo que tenía en la mano') : (d.ataque.armaNombre || 'su arma');
       const puedo = esMio(quien) || soyGM();
-      cierre = `<div class="duelo-veredicto bloqueado"><div class="grande">🤺 ¡${_esc(quien.nombre)} desarmó a ${_esc(otro.nombre)}!</div><div class="chico">${_esc(otro.nombre)} pierde ${_esc(item)}: sale volando 2 casillas (lo natural no se cae)</div>
+      cierre = `<div class="duelo-veredicto bloqueado"><div class="grande">🤺 ¡${_esc(quien.nombre)} desarmó a ${_esc(otro.nombre)}!</div><div class="chico">${_esc(otro.nombre)} pierde ${_esc(item)}: sale volando 2 casillas</div>
         ${puedo ? `<div style="margin-top:14px"><button type="button" class="duelo-aceptar" data-desarme-aceptar>${esMio(quien) ? '✔ Aceptar' : `✔ Aceptar por ${_esc(quien.nombre)}`}</button><div class="chico" style="margin-top:6px;opacity:.85">Al aceptar, el arma sale volando (mirá el mapa)</div></div>` : `<div class="chico" style="margin-top:6px">esperando que ${_esc(quien.nombre)} acepte…</div>`}</div>`;
     }
     else if(desarmando) cierre = `<div class="duelo-veredicto bloqueado"><div class="grande">🤺 …</div><div class="chico">Mirá el mapa: ${_esc(d.ataque.desarme.quien || '')} desarma, el arma sale volando</div></div>`;
@@ -2656,7 +2658,7 @@ const Duelo = (() => {
       if(campo === 'eva'){
         const op = (d.hab ? opcionesHab(d, h) : (h.opcionesDefensa ? h.opcionesDefensa(d) : [])).find(o => o.modo === m.modo && (o.itemId || '') === (m.itemId || ''));
         if(!op || op.motivoNo) return;
-        defensa = {modo: op.modo, itemId: op.itemId || '', itemNombre: op.itemNombre || '', costo: _num(op.costo), ...(op.arco ? {arco: true} : {}), ...(op.escudo ? {escudo: true} : {})};   // (escudo: para Desarmar, 2026-10-22)
+        defensa = {modo: op.modo, itemId: op.itemId || '', itemNombre: op.itemNombre || '', costo: _num(op.costo), ...(op.arco ? {arco: true} : {}), ...(op.escudo ? {escudo: true} : {}), ...(op.natural ? {natural: true} : {})};   // (escudo, natural: para Desarmar, 2026-10-22)
         if(op.contraEsquiva && !d.hab) defensa = {...defensa, contraEsquiva: true, ...(await alcanceContra(d, h))};   // ⚔ Contraataque (Warrior)
       }
       let extra = null;

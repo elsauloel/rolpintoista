@@ -28,6 +28,9 @@ function desarmeOpcion(id, d, lado){
   if(!d.defensa || d.defensa.modo !== 'parry') return null;
   if(lado === 'atacante' ? d.fuerza : d.bloqueo) return null;
   if(lado === 'defensor' && d.defensa.escudo) return null;   // paró con el escudo: bloquea, no desarma
+  // Contra algo natural (garras, colmillos, una coraza natural) no se ofrece: no se le puede caer (dueño, 2026-10-22).
+  if(lado === 'atacante' && d.defensa.natural) return null;
+  if(lado === 'defensor' && (d.ataque.natural || desarmeAtacanteNatural(d))) return null;
   const p = d[lado];
   if(p && p.tipo === 'pj' && p.ref && !String(p.ref).includes(SEP_INVOCACION) && bnManejo(p.ref)){   // 🤺 el Warrior (2026-10-21)
     const r = (fichasPub.get(p.ref) || {}).resumen || {}, k = r.desarmar;
@@ -44,6 +47,21 @@ function desarmeOpcion(id, d, lado){
   try{ motivo = CreepCalculo.bloqueoHab(sc, h) || ''; }catch(e){}
   return motivo ? null : {d, id, lado, nombre: sc.nombre, sc, h, tokenId: p.tokenId};
 }
+// Para los duelos que no traen la marca: si el que ataca es un creep con arma natural (solo lo sabe el GM).
+function desarmeAtacanteNatural(d){
+  if(!d || !d.atacante || d.atacante.tipo !== 'creep' || typeof creepPrivadoDe !== 'function') return false;
+  const sc = creepPrivadoDe(d.atacante.ref);
+  return !!(sc && sc.armaNatural && (!d.ataque.armaNombre || d.ataque.armaNombre === sc.armaNombre));
+}
+// El gancho de comun/duelo.js (crear): ¿este ataque va con un arma natural? (un creep o una invocación con garras, colmillos…)
+window.dueloArmaNatural = (yo, ataque) => {
+  if(!yo || !ataque) return false;
+  if(yo.tipo === 'creep' && typeof creepPrivadoDe === 'function'){
+    const sc = creepPrivadoDe(yo.ref);
+    return !!(sc && sc.armaNatural && (!ataque.armaNombre || ataque.armaNombre === sc.armaNombre));
+  }
+  return false;
+};
 function desarmeOpciones(){
   if(modoMapa !== 'combate') return [];
   const out = [];

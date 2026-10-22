@@ -126,6 +126,17 @@ async function desarmarUsar(o){
 /* El duelo terminó «desarmado» (gancho `desarmado` de Duelo.escuchar, js/14; solo el GM): la ruleta de casillas en todas las pantallas (un momento)
    y, cuando frena, el arma o el escudo al piso (armaSoltar, js/27) y, si era el arma, Desarmado. */
 async function desarmadoResuelto(d){
+  // Primero el cartel «X desarmó a Y» con Aceptar (comun/duelo.js; dueño, 2026-10-22, atacando o defendiendo); la ruleta, recién después.
+  if(d.ataque && d.ataque.desarme && !d.ataque.desarme.aceptado){
+    const ok = await new Promise(fin => {
+      const baja = fbDb.collection(fbRutaCampana('duelos')).doc(d.id).onSnapshot(s => {
+        const x = s.exists ? s.data() : null;
+        if(!x){ baja(); fin(false); return; }
+        if(x.ataque && x.ataque.desarme && x.ataque.desarme.aceptado){ baja(); fin(true); }
+      }, err => { console.error('Desarmar: esperando el Aceptar', err); fin(true); });
+    });
+    if(!ok) return;
+  }
   const ds = (d.ataque && d.ataque.desarme) || {}, ladoV = ds.lado === 'atacante' ? 'defensor' : 'atacante', v = d[ladoV], t = v && tokens.get(v.tokenId);
   const gano = (d[ds.lado] || {}).nombre || 'Alguien';
   if(!t){ mesaLinea(`🤺 ${gano} desarmó a ${(v && v.nombre) || 'alguien'}: ✋ dejá su arma en el piso a mano`, 'recordatorio'); return; }
@@ -140,7 +151,7 @@ async function desarmadoResuelto(d){
   const celdas = anillo.length ? anillo : [{col: t.col, fila: t.fila}];
   const elegida = Math.floor(Math.random() * celdas.length);
   try{ momentoAbrir({tipo: 'desarme', icono: '🤺', titulo: `¡${gano} desarma a ${nombreDe(t)}!`, estado: 'listo', resultado: `${itemNombre} sale volando ${DESARME_CASILLAS} casillas`,
-    datos: {celdas: celdas.map(c => ({c: c.col, f: c.fila})), elegida}}); }catch(err){ console.error('Desarmar: el momento', err); }   // (objetos: Firestore no guarda listas dentro de listas)
+    datos: {celdas: celdas.map(c => ({c: c.col, f: c.fila})), elegida, duelo: d.id}}); }catch(err){ console.error('Desarmar: el momento', err); }   // (objetos: Firestore no guarda listas dentro de listas)
   await new Promise(r => setTimeout(r, DESARME_RULETA_MS + 300));
   const s = await armaSoltar(t, 0, {celda: celdas[elegida], itemId, itemNombre});
   // Si lo que se cayó es su arma (no un escudo), queda Desarmado (un creep no la pierde de sus datos: el estado lo frena hasta levantarla).
@@ -154,11 +165,13 @@ async function desarmadoResuelto(d){
 // 🎡 La ruleta de casillas (en todas las pantallas, desde el momento «desarme», js/16): se iluminan de a una, rápido y frenando hasta la elegida.
 const efectosRuleta = [];
 const ruletaVistas = new Set();
-function desarmeRuleta(id, datos){
+async function desarmeRuleta(id, datos){
   if(ruletaVistas.has(id) || !datos || !Array.isArray(datos.celdas) || !datos.celdas.length) return;
   ruletaVistas.add(id);
-  // El cuadro del duelo («¡DESARMADO!») tapa el mapa: se minimiza para que se vea la ruleta (probado en el mapa, 2026-10-21).
+  // Llega después del Aceptar del cartel «X desarmó a Y» (los dados ya quedaron quietos): el cuadro del duelo se minimiza y gira la ruleta; al
+  // terminar, el cuadro vuelve con el resultado y «Terminar duelo» (dueño, 2026-10-22; Duelo.desarmeListo).
   try{ if(typeof Duelo !== 'undefined' && Duelo.minimizar) Duelo.minimizar(); }catch(e){}
+  if(datos.duelo) setTimeout(() => { try{ if(typeof Duelo !== 'undefined' && Duelo.desarmeListo) Duelo.desarmeListo(datos.duelo); }catch(e){ console.error(e); } }, DESARME_RULETA_MS + DESARME_QUIETO_MS);
   const crudas = datos.celdas.map(x => Array.isArray(x) ? hexCentro(x[0], x[1]) : hexCentro(x.c, x.f)), n = crudas.length;
   const elegida = Math.max(0, Math.min(n - 1, num(datos.elegida)));
   // Una ruleta de verdad (dueño, 2026-10-22: «que el brillo gire en círculos alrededor del personaje»): las casillas en orden, por el ángulo

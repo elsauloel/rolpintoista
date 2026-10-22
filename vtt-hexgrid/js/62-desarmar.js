@@ -20,9 +20,9 @@ function desarmeEscuchar(){
 // Las opciones de ahora: [{d, id, lado, nombre, tokenId, sc, h | pj}] (un creep o un personaje con Desarmar en un duelo en el paso del Bloqueo que
 // todavía no tiró su parte).
 /* Quién puede desarmar (dueño, 2026-10-22): no se declara en el turno («como quien tira pegar fuerte»): la ocasión se da solo en el Bloqueo
-   que sigue a un Parry ganado, en vez de la Fuerza del golpe (quien ataca) o de bloquear (quien defiende). Quien desarma lo hace con su ARMA:
-   quien ataca, con un arma (no garras ni una habilidad); quien defiende, solo si paró con el arma, no con el escudo. Lo que le saca al otro
-   puede ser un arma o un escudo. → la opción, o null. */
+   que sigue a un Parry ganado, en vez de la Fuerza del golpe (quien ataca) o de bloquear (quien defiende). Quien defiende, solo si paró con el
+   arma, no con el escudo. Lo que le saca al otro puede ser un arma o un escudo. Una bestia con garras también desarma (dueño: «el mecanismo debe
+   existir como posible; cuándo sí o no lo define la mesa»); lo único es que su propia arma natural no se le cae (armaSoltar, js/27). → la opción, o null. */
 function desarmeOpcion(id, d, lado){
   if(!d || d.fase !== 'bloqueo' || d.estado !== 'esperando' || (d.ataque && d.ataque.desarme) || d.hab || !d.ataque) return null;
   if(!d.defensa || d.defensa.modo !== 'parry') return null;
@@ -32,7 +32,6 @@ function desarmeOpcion(id, d, lado){
   if(p && p.tipo === 'pj' && p.ref && !String(p.ref).includes(SEP_INVOCACION) && bnManejo(p.ref)){   // 🤺 el Warrior (2026-10-21)
     const r = (fichasPub.get(p.ref) || {}).resumen || {}, k = r.desarmar;
     if(!k || r.muerto) return null;
-    if(lado === 'atacante' && !d.ataque.armaId) return null;   // ataca sin un arma
     const ajeno = typeof esSuTurno === 'function' && esSuTurno(p.tokenId) === false;
     const costo = ajeno ? (num(k.spAjeno) || num(k.sp) * 2) : num(k.sp);
     return num(r.sp) >= costo ? {d, id, lado, nombre: p.nombre, tokenId: p.tokenId, pj: {fichaId: p.ref, ...k}} : null;
@@ -40,7 +39,7 @@ function desarmeOpcion(id, d, lado){
   if(!soyGM || !p || p.tipo !== 'creep') return null;
   const sc = creepPrivadoDe(p.ref);
   const h = sc && (sc.habilidades || []).find(x => x && x.desarmar);
-  if(!h || sc.armaNatural || !String(sc.armaNombre || '').trim()) return null;   // con garras o colmillos no se desarma a nadie
+  if(!h) return null;
   let motivo = '';
   try{ motivo = CreepCalculo.bloqueoHab(sc, h) || ''; }catch(e){}
   return motivo ? null : {d, id, lado, nombre: sc.nombre, sc, h, tokenId: p.tokenId};

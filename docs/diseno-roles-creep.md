@@ -79,8 +79,8 @@ Sirven al warrior (pegar fuerte), al tanque (aguantar y controlar) o a los dos.
 33. **Espinas o contraataque**: le devuelve parte del golpe, o pega de vuelta.
 34. **Represalia**: si le pegan a un aliado de al lado, ataca gratis.
 35. ✅ **Desarmar** (2026-10-21): Flash en el Bloqueo, atacando o defendiendo; el arma o el escudo vuela 2 casillas (con ruleta). Botón instantáneo 🤺.
-    (2026-10-22: solo con un Parry ganado y con el arma —defendiendo, si paró con el arma, no con el escudo—; una bestia con garras ya no desarma;
-    se elige adentro del paso 3 del duelo.)
+    (2026-10-22: solo con un Parry ganado; defendiendo, si paró con el arma, no con el escudo; una bestia también desarma, pero lo natural no se
+    le cae; se elige adentro del paso 3 del duelo.)
 
 **H. Apuestas** ✦
 36. **Todo o nada**: un golpe enorme, pero si falla queda Expuesto.

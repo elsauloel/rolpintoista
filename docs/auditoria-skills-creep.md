@@ -135,9 +135,8 @@
   en una dirección al azar —una **ruleta de casillas** en el mapa— y queda en el piso (el arma: Desarmado hasta levantarla). Reemplaza el resultado de
   siempre. Lo natural no se cae (dueño: una bestia desarma pero no la desarman). **3 SP** (6 en turno ajeno) o cooldown 3. Botón instantáneo 🤺 del GM.
   **Cambio del 2026-10-22 (dueño):** no se declara en el turno («como quien tira pegar fuerte»); la ocasión se da solo con un Parry ganado, y se
-  **desarma con el arma**: atacando, con un arma; defendiendo, solo si paró con el arma, no con el escudo. Le puede sacar al otro un arma o un escudo.
-  Por eso **una bestia con garras ya no desarma** (reemplaza «una bestia desarma»; si se quiere volver atrás, es la condición `armaNatural` de
-  `desarmeOpcion`, vtt-hexgrid/js/62). La opción se elige **adentro del paso 3 del duelo** («🤺 Desarmar a X», al lado de la tirada: cobra, marca
+  quien defiende solo desarma si paró con el arma, no con el escudo. Le puede sacar al otro un arma o un escudo. **Una bestia con garras sigue
+  desarmando** (dueño: «el mecanismo debe existir como posible; cuándo sí o no lo define la mesa»); lo único, su arma natural no se le cae. La opción se elige **adentro del paso 3 del duelo** («🤺 Desarmar a X», al lado de la tirada: cobra, marca
   y tira); el paso 3 dice «🤺 Desarmar» y qué se le cae a quién. La ruleta gira en círculo alrededor del desarmado y frena parejo (3 vueltas, 4,3 s).
   **Para probar.** También es skill de clase del **Warrior** (dueño, 2026-10-21: 3 SP, 6 en turno ajeno, sin No2; el mismo botón 🤺). Desde el mismo día (P217) un arma natural también parrea (con su peso; 1 si no tiene): una bestia desarma atacando o defendiendo.
 

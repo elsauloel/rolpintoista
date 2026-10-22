@@ -124,7 +124,8 @@ function momentoRecibido(id, d){
   if(chicoParaMi && !momentosChicosVistos.has(id)){ momentosChicosVistos.add(id); toast(`${d.icono || ''} ${d.titulo}: ${d.resultado || ''}`.trim()); }
   // `paraUids` (2026-10-08, el choque de un empujón): el mismo aviso al centro para varios (cada involucrado).
   const paraMi = d.datos && ((d.datos.paraUid && d.datos.paraUid === fbUsuario.uid) || (Array.isArray(d.datos.paraUids) && d.datos.paraUids.includes(fbUsuario.uid)));
-  if(!chicoParaMi && paraMi && (d.creadoPor !== fbUsuario.uid || d.datos.aviso)){ momentoAvisoCentro(id, d); return; }
+  // (La tirada extra de una zona tiene su propio cartel, con el botón para tirar — js/66: el aviso genérico lo tapaba. 2026-10-22)
+  if(!chicoParaMi && paraMi && d.tipo !== 'zona-extra' && (d.creadoPor !== fbUsuario.uid || d.datos.aviso)){ momentoAvisoCentro(id, d); return; }
   // La esquina: todo, salvo lo que esta pantalla ya sigue al centro.
   const mio = d.creadoPor === fbUsuario.uid && d.datos && d.datos.centro;
   if(d.tipo === 'oportunidad' && oporSoyDecisor(d)){ momentosFeed.delete(id); renderMomentosFeed(); return; }   // lo decide esta pantalla, al centro

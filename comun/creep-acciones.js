@@ -192,6 +192,7 @@ const CreepAcciones = (() => {
       stacksTurno: preset.stacksTurno ?? 0, permanente: !!preset.permanente, escudoMagico: preset.escudoMagico ?? 0, forzarNitros: preset.forzarNitros ?? ''} : {};
     if(preset) FLAGS_ESTADO.forEach(f => { categorias[f] = !!preset[f]; });
     if(preset && preset.golpe){ categorias.golpe = structuredClone(preset.golpe); categorias.cargas = preset.cargas; }
+    if(preset && num(preset.cortaDano) > 0) categorias.cortaDano = num(preset.cortaDano);   // 🪓 Golpe anunciado (2026-10-21): se corta con N de daño acumulado
     if(preset && preset.apunta) categorias.apunta = structuredClone(preset.apunta);   // 🎯 Apuntando a la cabeza (2026-10-21): el bono de su próximo disparo   // las cargas (2026-10-10: los óleos)
     // P137 (2026-10-01): "no vence" lo decide la habilidad si lo marca (como en personajes e invocaciones); si no, el estado.
     const nuevo = {id: uid(), nombre, hpTurno, stacks, turnos, polaridad, detalle, mods, ...categorias, permanente: Combatiente.efectoPermanente(h, preset)};

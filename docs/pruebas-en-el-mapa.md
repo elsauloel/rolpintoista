@@ -54,8 +54,8 @@
   suma +1d4 del elemento aparte (directo, menos su resistencia), sin gastarse; fuego ×1,5; hielo Escarcha y ácido Armadura rota (1 y +1 cada 5); tóxico
   Veneno; rayo salta y 20 % de Parálisis; poner otra la reemplaza; cuenta como su ataque del turno. Las cinco, al menos el rayo y una de «por daño».
 - [ ] **🪓 El que avisa no traiciona / Zarpazo erguido** (2026-10-21, choque pesado): el creep la usa → el clic en el objetivo, la línea en la Mesa y la
-  Crónica con a quién apunta, el estado en el token; recibir daño → «se le cae el golpe»; el objetivo pegado se aleja → la oportunidad ofrece «🪓 …» sin
-  No2 (y se gasta); en su turno, Atacar → «Descargar el golpe» (+3 dados, no deja hacer Parry, empuja 2) o «Un ataque común» (se pierde); si no ataca, se pierde.
+  Crónica con a quién apunta, el estado en el token (cobra 1 No2 y 1 SP); recibir 6 → «lleva 6 de 10», recibir 4 más → «se le cae el golpe»; el objetivo pegado se aleja →
+  la oportunidad ofrece «🪓 …» sin No2 (cobra 3 SP y se gasta); en su turno, Atacar → «Descargar el golpe» (+3 dados, no deja hacer Parry, empuja 2) o «Un ataque común» (se pierde); si no ataca, se pierde.
 - [ ] **🤺 Desarmar** (2026-10-21, choque pesado): un creep con Desarmar ataca y un personaje le hace Parry → en el Bloqueo, el botón 🤺 al costado del
   duelo; al tocarlo, la línea en la Mesa y la declaración «intenta desarmar»; si gana, «¡DESARMADO!», la ruleta de casillas en el mapa (todas las pantallas),
   el arma o el escudo en el piso a 2 casillas (y Desarmado); si pierde, lo de siempre. Un creep que defiende (con escudo) desarmando al atacante. Lo natural

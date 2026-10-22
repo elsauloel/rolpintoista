@@ -230,9 +230,13 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     const bronca = typeof broncaSumar === 'function' ? broncaSumar(sc, r) : null;   // 😤 cada golpe que le duele suma (js/51)
     // 🎯 Si le entra daño, pierde la puntería (Tiro a la cabeza, 2026-10-21, dueño: «solamente si le hacen daño»).
     let punteria = '';
-    let golpeCae = false;   // 🪓 el golpe anunciado también se cae (js/63)
-    if(num(r.recibido) > 0){ const i = (sc.estados || []).findIndex(e => e && e.activo !== false && e.pierdeAlDano); if(i >= 0){ punteria = sc.estados[i].nombre; golpeCae = !!sc.estados[i].golpeAnunciado; sc.estados.splice(i, 1); } }
-    return {r, previo, nuevo: fenix ? 0 : sc.hp, bronca, fenix, hpFenix: sc.hp, punteria, golpeCae};
+    if(num(r.recibido) > 0){ const i = (sc.estados || []).findIndex(e => e && e.activo !== false && e.pierdeAlDano); if(i >= 0){ punteria = sc.estados[i].nombre; sc.estados.splice(i, 1); } }
+    // 🪓 El golpe anunciado (js/63): se corta con 10 de daño o más, sumando los golpes mientras lo carga (dueño, 2026-10-21).
+    let golpeCae = false, golpeAcum = 0, golpeTope = 0;
+    if(num(r.recibido) > 0){ const j = (sc.estados || []).findIndex(e => e && e.activo !== false && num(e.cortaDano) > 0);
+      if(j >= 0){ const e = sc.estados[j]; e.danoRecibido = num(e.danoRecibido) + num(r.recibido); golpeAcum = e.danoRecibido; golpeTope = num(e.cortaDano);
+        if(golpeAcum >= golpeTope){ golpeCae = true; sc.estados.splice(j, 1); } } }
+    return {r, previo, nuevo: fenix ? 0 : sc.hp, bronca, fenix, hpFenix: sc.hp, punteria, golpeCae, golpeAcum, golpeTope};
   });
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
   if(res.fenix){
@@ -240,8 +244,13 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     try{ momentoAbrir({tipo: 'fenix', icono: '🔥', titulo: `${nombreDe(t)} renace de sus cenizas`, estado: 'listo', resultado: `La Llama de Fénix lo levanta con ${fmt(res.hpFenix)} HP; queda Titilando hasta su próximo turno.`}); }catch(e){}
   }
   if(res.bronca && typeof broncaAnunciar === 'function') broncaAnunciar(t, res.bronca);
+  if(res.golpeCae || res.golpeAcum){   // 🪓 (js/63)
+    const txt = res.golpeCae ? `🪓 ${nombreDe(t)} recibió ${fmt(res.golpeAcum)} de daño mientras cargaba: ¡se le cae el golpe!` : `🪓 ${nombreDe(t)} aguanta el golpe cargado: lleva ${fmt(res.golpeAcum)} de daño de ${fmt(res.golpeTope)} (con ${fmt(res.golpeTope)} se le cae)`;
+    mesaLinea(txt, 'recordatorio');
+    try{ momentoAbrir({tipo: 'golpe-anunciado', icono: '🪓', titulo: txt, estado: 'listo', datos: {chico: true}}); }catch(e){}
+  }
   if(res.punteria){
-    const txt = res.golpeCae ? `🪓 ${nombreDe(t)} recibió daño y se le cae el golpe que venía cargando` : `🎯 ${nombreDe(t)} recibió daño y pierde la puntería (se le va ${res.punteria})`;
+    const txt = `🎯 ${nombreDe(t)} recibió daño y pierde la puntería (se le va ${res.punteria})`;
     try{ mesaLinea(txt, 'recordatorio'); momentoAbrir({tipo: 'punteria', icono: '🎯', titulo: `${nombreDe(t)} pierde la puntería`, estado: 'listo', resultado: txt.slice(3)}); }catch(e){}
   }
   if(guarda && golpe > 0) guardianAviso(t, guarda);

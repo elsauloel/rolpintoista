@@ -1050,7 +1050,7 @@ prueba('🪓 El que avisa no traiciona / Zarpazo erguido (2026-10-21): carga el 
   const es = (sc.estados || []).find(e => e.golpeAnunciado);
   CreepAcciones.inicioTurno(sc, 'prueba:1', 1);
   const atq = CreepAcciones.ataqueDeHab(sc, {nombre: h.nombre, duelo: h.golpeAnunciado.duelo});
-  igual([!p.error, !!es, !!(es && es.pierdeAlDano), !!sc.golpeListo, (sc.estados || []).some(e => e.golpeAnunciado), atq.sinParry, atq.mods.dados, (atq.efectos || []).some(e => e.empuja === 2), !!hb.golpeAnunciado],
+  igual([!p.error, !!es, es && es.cortaDano === 10 && !es.pierdeAlDano, !!sc.golpeListo, (sc.estados || []).some(e => e.golpeAnunciado), atq.sinParry, atq.mods.dados, (atq.efectos || []).some(e => e.empuja === 2), !!hb.golpeAnunciado],
     [true, true, true, true, false, true, 3, true, true]);
 });
 prueba('🤺 Desarmar del Warrior (2026-10-21): la skill de clase, 3 SP (6 en turno ajeno) y el resumen la publica', () => {

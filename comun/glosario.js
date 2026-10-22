@@ -158,7 +158,7 @@ const Glosario = (() => {
   const CSS = `.glo{color:#8FD3F0;text-decoration:underline dotted rgba(143,211,240,.7);text-underline-offset:2px;cursor:help;border-radius:2px}
 .glo:hover,.glo:focus{background:rgba(143,211,240,.14);outline:none}`;
   const CSS_GLOBO = `#glo-pop{position:fixed;z-index:100200;max-width:320px;background:#1d1712;color:#EDE3D6;border:1px solid #8FD3F0;border-radius:8px;
-padding:9px 12px;font:13px/1.45 system-ui,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.55);pointer-events:none;display:none}
+padding:9px 12px;font:13px/1.45 system-ui,sans-serif;box-shadow:0 8px 28px rgba(0,0,0,.55);pointer-events:none;display:none;white-space:pre-line}
 #glo-pop b{display:block;color:#8FD3F0;font-size:12px;letter-spacing:.03em;margin-bottom:3px}`;
   let globo = null, actual = null;
   function iniciar(){
@@ -172,6 +172,18 @@ padding:9px 12px;font:13px/1.45 system-ui,sans-serif;box-shadow:0 8px 28px rgba(
     document.body.appendChild(globo);
     const cual = e => (e.composedPath ? e.composedPath() : [e.target]).find(n => n && n.classList && n.classList.contains('glo'));
     const mostrar = el => {
+      // Un término con su propio texto (2026-10-22, el nombre de un ítem del botín: `data-glo-txt`): el globo muestra ese texto tal cual.
+      if(el.dataset.gloTxt){
+        actual = el;
+        const titulo = (el.textContent || '').trim();
+        globo.innerHTML = `<b>${esc(titulo)}</b>${esc(el.dataset.gloTxt)}`;
+        globo.style.display = 'block';
+        const r = el.getBoundingClientRect(), g = globo.getBoundingClientRect();
+        let x = Math.min(Math.max(8, r.left), innerWidth - g.width - 8), y = r.bottom + 6;
+        if(y + g.height > innerHeight - 8) y = Math.max(8, r.top - g.height - 6);
+        globo.style.left = x + 'px'; globo.style.top = y + 'px';
+        return;
+      }
       const d = def(el.dataset.glo);
       if(!d){ esconder(); return; }
       actual = el;

@@ -315,7 +315,11 @@ aside{
 #toolkit-tokens.activo{color:var(--paper);border-color:var(--copper)}
 /* 🎁 Despojos: arriba de 🎭, del mismo tamaño y forma; apagado hasta que haya botín publicado. */
 #toolkit-botin:disabled{opacity:.35;cursor:not-allowed}
-#toolkit-botin.pendiente{color:var(--paper);border-color:var(--copper);animation:latidoBotin 1.6s ease-in-out infinite}
+#toolkit-botin.pendiente{position:relative;color:var(--paper);border-color:var(--copper);animation:latidoBotin 1.6s ease-in-out infinite}
+/* Con botín publicado, el cartel «¡Botín disponible!» al costado del 🎁 (dueño, 2026-10-22) */
+#toolkit-botin.pendiente::after{content:'🎁 ¡Botín disponible!';position:absolute;left:calc(100% + 10px);top:50%;transform:translateY(-50%);white-space:nowrap;
+  font:700 12px/1 "Space Mono",monospace;letter-spacing:.04em;color:var(--paper);background:rgba(15,12,14,.94);border:1px solid var(--copper);border-radius:8px;padding:7px 10px;
+  box-shadow:4px 4px 14px rgba(0,0,0,.45);pointer-events:none}
 @keyframes latidoBotin{50%{box-shadow:0 0 0 4px rgba(184,115,51,.35)}}
 /* 🗺 Mapas: arriba de 🎁, del mismo tamaño y forma; su menú se despliega al costado (mapas guardados + fondo). */
 #toolkit-mapas[hidden],#toolkit-tienda[hidden]{display:none}

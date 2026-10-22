@@ -140,7 +140,7 @@ $('#botin-loot-body').addEventListener('click', e => {
   if(pj){ if(typeof PPT !== 'undefined') PPT.mostrar(pj.dataset.botinPpt); return; }
   const c = e.target.closest('[data-botin-comparar]');
   if(c){ abrirComparar(c.dataset.botinComparar); return; }
-  if(e.target.closest('#botin-loot-mochila')){ $('#scrim-botin-loot').classList.remove('open'); renderEquipo(); $('#scrim-equipo').classList.add('open'); }
+  if(e.target.closest('#botin-loot-mochila')){ $('#scrim-botin-loot').classList.remove('open'); equipoVolverABotin = true; renderEquipo(); $('#scrim-equipo').classList.add('open'); }   // al cerrar la mochila se vuelve al botín (2026-10-22)
 });
 
 /* ---------- 🤝 Pasarle cosas a otro personaje y 📦 el baúl común (2026-10-05, P157; reemplaza a la mesa común) ----------
@@ -168,6 +168,11 @@ function intercambioIniciar(){ Intercambio.iniciar(intercambioHost); }
 $('#btn-pasar').onclick = () => { if(fichaVivo) Intercambio.abrirDar(fichaVivo.id); else toast('Abrí tu personaje primero'); };
 $('#tienda-baul').onclick = () => { if(fichaVivo) Intercambio.abrirBaul(fichaVivo.id); };
 
-$('#equipo-x').onclick = () => $('#scrim-equipo').classList.remove('open');
-$('#scrim-equipo').addEventListener('mousedown', e => { if(e.target.id === 'scrim-equipo') $('#scrim-equipo').classList.remove('open'); });
+let equipoVolverABotin = false;   // la mochila abierta desde el botín: al cerrarla se vuelve al botín (dueño, 2026-10-22)
+function cerrarEquipoFicha(){
+  $('#scrim-equipo').classList.remove('open');
+  if(equipoVolverABotin){ equipoVolverABotin = false; botinLootCuerpo(); $('#scrim-botin-loot').classList.add('open'); }
+}
+$('#equipo-x').onclick = () => cerrarEquipoFicha();
+$('#scrim-equipo').addEventListener('mousedown', e => { if(e.target.id === 'scrim-equipo') cerrarEquipoFicha(); });
 

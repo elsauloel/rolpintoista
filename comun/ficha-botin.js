@@ -95,13 +95,14 @@ const FichaBotin = (() => {
     const yo = o.fichaId, miUid = (typeof fbUsuario !== 'undefined' && fbUsuario) ? fbUsuario.uid : '';
     const reclamado = lista.filter(b => b.tomadoPor && b.tomadoFicha === yo).reduce((a, b) => a + E().ranuras(b.item), 0);
     const js = (combate && Array.isArray(combate.jugadores)) ? combate.jugadores : [];
+    // Lo tuyo, grande y destacado, cada valor en su recuadro (dueño, 2026-10-22); el resto de la mesa, chico abajo.
+    const mio = js.find(j => j.fichaId === yo), otros = js.filter(j => j.fichaId !== yo);
+    const caja = (num_, etq, nota) => `<div style="flex:1;min-width:120px;padding:12px 14px;border-radius:10px;background:rgba(184,115,51,.14);border:1px solid var(--copper, #B87333);text-align:center">
+        <div style="font-size:30px;font-weight:800;line-height:1.1;color:var(--paper, #EDE3D6)">+${num_}</div><div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--copper, #B87333);margin-top:2px">${etq}</div>${nota ? `<div class="hint" style="margin-top:2px">${nota}</div>` : ''}</div>`;
     const recompensas = js.length ? `<div style="margin-bottom:14px">
-      <div class="hint" style="text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Lo que recibe cada jugador</div>
-      <div style="display:flex;flex-direction:column;gap:4px">${js.map(j => `<div style="display:flex;gap:10px;align-items:center;padding:6px 10px;border-radius:8px;background:rgba(255,255,255,${j.fichaId === yo ? '.10' : '.04'});${j.fichaId === yo ? 'outline:1px solid var(--copper, #B87333)' : ''}">
-        <b style="flex:1">${esc(j.nombre)}${j.fichaId === yo ? ' <span class="hint">(vos)</span>' : ''}</b>
-        <span class="hint">${esc(j.estado || '')}</span>
-        <span style="min-width:90px;text-align:right"><b>+${fmt(num(j.xp))}</b> XP</span>
-        <span style="min-width:90px;text-align:right"><b>+${fmt(num(j.dde))}</b> DDE</span></div>`).join('')}</div>
+      ${mio ? `<div class="hint" style="text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Lo que recibís · ${esc(mio.nombre)} <span class="hint">(vos)</span> · ${esc(mio.estado || '')}</div>
+      <div style="display:flex;gap:10px;margin-bottom:8px">${caja(fmt(num(mio.xp)), 'XP · experiencia', '')}${caja(fmt(num(mio.dde)), 'DDE · doblones', '')}</div>` : ''}
+      ${otros.length ? `<div style="display:flex;flex-wrap:wrap;gap:4px 14px">${otros.map(j => `<span class="hint"><b>${esc(j.nombre)}</b> · ${esc(j.estado || '')} · +${fmt(num(j.xp))} XP · +${fmt(num(j.dde))} DDE</span>`).join('')}</div>` : ''}
       <div class="hint" style="margin-top:4px">${publicado(combate) ? 'La experiencia, el oro y lo que reclamaste se cargan en las fichas cuando el GM cierra el botín, después de que todos elijan.' : 'La experiencia y el oro ya se cargaron en las fichas.'}</div></div>` : '';
     const cerrado = combate && combate.estado === 'cerrado' && lista.length === 0
       ? '<div class="hint" style="margin-bottom:8px">El botín ya está cerrado: lo que nadie tomó se convirtió en despojos.</div>' : '';
@@ -116,11 +117,11 @@ const FichaBotin = (() => {
       <button type="button" class="mini" id="botin-loot-mochila">🎒 Abrir mochila</button>
     </div>
     ${puede ? '' : '<div class="hint" style="margin-bottom:8px">Abrí tu personaje (con permiso de edición) para reclamar cosas del botín.</div>'}
-    ${grupos.length ? grupos.map(g => `<div style="margin:12px 0 4px;padding:4px 0;border-bottom:2px solid var(--line, #444);display:flex;align-items:baseline;gap:8px"><b style="font-size:14px">${g.titulo}</b><span class="hint">${esc(g.nota)}${g.nota ? ' · ' : ''}${g.pilas.reduce((a, p) => a + p.entradas.length, 0)} ${g.pilas.reduce((a, p) => a + p.entradas.length, 0) === 1 ? 'ítem' : 'ítems'}</span></div>
+    ${grupos.length ? grupos.map(g => `<div style="margin:16px 0 4px;padding:6px 10px;border-radius:8px;background:rgba(184,115,51,.16);border-left:4px solid var(--copper, #B87333);display:flex;align-items:baseline;gap:10px"><b style="font-size:17px;letter-spacing:.06em;text-transform:uppercase;color:var(--paper, #EDE3D6)">${g.titulo}</b><span class="hint">${esc(g.nota)}${g.nota ? ' · ' : ''}${g.pilas.reduce((a, p) => a + p.entradas.length, 0)} ${g.pilas.reduce((a, p) => a + p.entradas.length, 0) === 1 ? 'ítem' : 'ítems'}</span></div>
       ${g.pilas.map(p => fila(p)).join('')}`).join('') : '<div class="hint">No hay nada en el botín.</div>'}`;
     function fila(p){
       const n = p.entradas.length, info = E().slotOcupado(S, p.item);
-      const comparar = info && info.equipados.length;
+      const comparar = info && (info.ocupado || info.equipados.length);   // con el slot ocupado, siempre se puede comparar (dueño, 2026-10-22)
       const origenes = [...p.origenes];
       const estado = [];
       if(n > 1 || p.mias.length || p.otros.size || p.disputas.length){
@@ -129,10 +130,12 @@ const FichaBotin = (() => {
         p.otros.forEach((lst, nom) => estado.push(`${esc(nom)} <b>${lst.length}</b>`));
         if(p.disputas.length) estado.push(`✊ ${p.disputas.length} en disputa`);
       }
+      // El nombre con globo al pasar el mouse (el del glosario, con el texto del ítem: comun/glosario.js, data-glo-txt), y «slot ocupado» en rojo (dueño, 2026-10-22).
+      const globo = textoItem(p.item).split(' · ').join('\n');
       return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--line, #444)">
-        <div style="flex:1;min-width:0" title="${esc(textoItem(p.item))}">
-          <div style="font-weight:600">${esc(p.nombre)}${n > 1 ? ` <span style="color:var(--copper, #B87333)">×${n}</span>` : ''}${p.item.trofeo ? ' <span class="hint">(trofeo)</span>' : ''}</div>
-          <div class="hint">≈ ${fmt(p.despojos)} despojos${n > 1 ? ' c/u' : ''}${origenes.length ? ' · de ' + esc(origenes.slice(0, 3).join(', ')) + (origenes.length > 3 ? '…' : '') : ''}${info && info.ocupado ? ' · slot ocupado' : ''}${estado.length ? ' · ' + estado.join(' · ') : ''}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-weight:600"><span class="glo" tabindex="0" data-glo-txt="${esc(globo)}">${esc(p.nombre)}</span>${n > 1 ? ` <span style="color:var(--copper, #B87333)">×${n}</span>` : ''}${p.item.trofeo ? ' <span class="hint">(trofeo)</span>' : ''}</div>
+          <div class="hint">≈ ${fmt(p.despojos)} despojos${n > 1 ? ' c/u' : ''}${origenes.length ? ' · de ' + esc(origenes.slice(0, 3).join(', ')) + (origenes.length > 3 ? '…' : '') : ''}${info && info.ocupado ? ' · <b style="color:var(--bad, #E05A5A)">slot ocupado</b>' : ''}${estado.length ? ' · ' + estado.join(' · ') : ''}</div>
         </div>
         <button type="button" class="mini" data-view="catalogo:${esc(p.item.id)}">Ver</button>
         ${comparar ? `<button type="button" class="mini" data-botin-comparar="${esc(p.item.id)}">Comparar</button>` : ''}
@@ -148,7 +151,7 @@ const FichaBotin = (() => {
       if(p.libres.length){
         const ids = p.libres.map(b => b.docId).join(',');
         const cant = p.libres.length > 1 ? `<input type="number" class="mini" min="1" max="${p.libres.length}" value="1" data-botin-cant="${esc(p.clave)}" title="Cuántos reclamás (hay ${p.libres.length} libres)" style="width:52px;padding:4px 6px;text-align:center"${off}>` : '';
-        partes.push(`<span style="display:inline-flex;align-items:center;gap:4px">${cant}<button type="button" class="btn primary" data-botin-tomar="${esc(ids)}" data-botin-cant-de="${esc(p.clave)}"${off} title="Queda a tu nombre y llega a tu mochila cuando el GM cierre el botín. Otro te lo puede disputar.">🙋 Reclamar</button></span>`);
+        partes.push(`<span style="display:inline-flex;align-items:center;gap:4px">${cant}<button type="button" class="btn primary" data-botin-tomar="${esc(ids)}" data-botin-cant-de="${esc(p.clave)}"${off} title="Queda a tu nombre y llega a tu mochila cuando el GM cierre el botín. Otro te lo puede disputar."><span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:rgba(15,12,14,.8);margin-right:6px;font-size:14px;vertical-align:middle">🙋</span>Reclamar</button></span>`);
       }
       // ↩ soltar uno de los míos
       if(p.mias.length) partes.push(`<button type="button" class="mini" data-botin-soltar="${esc(p.mias[0].docId)}"${off} title="Devolvés ${p.mias.length > 1 ? 'uno' : 'esto'} al botín para que lo reclame otro">↩ Soltar${p.mias.length > 1 ? ' 1' : ''}</button>`);

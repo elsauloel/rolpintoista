@@ -111,6 +111,8 @@ lienzo.addEventListener('pointerdown', e => {
       }
     }
   }else{
+    // ✨ Un arma u objeto en el piso que este personaje puede levantar (titila): el clic pregunta «¿Querés levantarlo?» (js/27, 2026-10-22).
+    if(!herramientaActiva && typeof armaClicLevantar === 'function' && armaClicLevantar(m)){ try{ lienzo.releasePointerCapture(e.pointerId); }catch(err){} return; }
     // Colisión (solo GM): pintar casilleros arrastrando o de a uno; con Shift, borrar. No selecciona nada.
     if(herramientaActiva === 'elemento' && elemTipo === 'colision' && soyGM){
       const cc = mundoAHex(m.x, m.y);

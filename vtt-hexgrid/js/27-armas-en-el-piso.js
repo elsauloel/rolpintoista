@@ -120,6 +120,15 @@ async function armaTomar(elId, t){
 function armaDibujar(el, z){
   const p = hexCentro(el.origen.col, el.origen.fila), R = HEX * 0.62;
   ctx.save();
+  // ✨ Se puede levantar (dueño, 2026-10-22): un anillo dorado que titila alrededor, sin apretar nada (levantadorPara, abajo).
+  if(levantadorPara(el)){
+    const f = 0.5 + 0.5 * Math.sin(performance.now() / 260);
+    ctx.beginPath(); ctx.arc(p.x, p.y, R * (1.22 + 0.12 * f), 0, Math.PI * 2);
+    ctx.lineWidth = (3 + 3 * f) / z; ctx.strokeStyle = `rgba(255,210,90,${0.45 + 0.5 * f})`;
+    ctx.shadowColor = 'rgba(255,210,90,.9)'; ctx.shadowBlur = 18 * f;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
   ctx.beginPath(); ctx.arc(p.x, p.y, R, 0, Math.PI * 2);
   ctx.fillStyle = 'rgba(28,24,26,.92)'; ctx.fill();
   ctx.lineWidth = 3 / z; ctx.strokeStyle = '#C9C9C9'; ctx.stroke();
@@ -128,6 +137,49 @@ function armaDibujar(el, z){
   ctx.fillStyle = '#EDE3D2';   // (si el 🗡️ sale en blanco y negro, que se vea claro sobre el fondo oscuro)
   ctx.fillText(/"flecha"\s*:/.test(String(el.armaItem || '')) ? '🏹' : '🗡️', p.x, p.y + R * 0.06);   // una flecha especial que erró (js/33)
   ctx.restore();
+}
+
+/* ---------- ✨ Levantar con un clic en el mapa (dueño, 2026-10-22) ----------
+   «Si estás en tu turno y te parás en un casillero adyacente a un arma o algún objeto que puedas levantar, debería aparecer titilando… haciendo
+   clic sobre el objeto, el mapa te dice: este objeto está en el suelo, ¿querés levantarlo? Sí, no.» Vale para el personaje que maneja esta
+   pantalla (su dueño o quien tiene 🎮 su control), parado encima o al lado; en combate, solo en su turno (fuera de combate, siempre). Levantarlo
+   es lo mismo que desde la Botonera (bnLevantarArma: 1 No2; si va en la mano y hay una libre, «¿Querés dejarlo equipado?»). */
+function levantadorPara(el){   // → {id, t} del personaje mío que lo puede levantar ahora, o null
+  if(!el || !el.arma || !el.origen || typeof puedoMover !== 'function') return null;
+  for(const [id, t] of tokens){
+    if(!t || t.tipo !== 'pj' || String(t.fichaId || '').includes(SEP_INVOCACION) || !puedoMover(t)) continue;
+    if(distanciaHex(t, el.origen) > 1) continue;
+    if(modoMapa === 'combate' && typeof esSuTurno === 'function' && esSuTurno(id) === false) continue;
+    return {id, t};
+  }
+  return null;
+}
+// ¿Hay algo titilando? (js/05 sigue dibujando mientras sea así)
+function armasTitilan(){
+  for(const el of elementos.values()) if(el.arma && levantadorPara(el)) return true;
+  return false;
+}
+// El clic en el mapa (js/06): si en esa casilla hay algo que este personaje puede levantar, pregunta y lo levanta. → true si era eso.
+function armaClicLevantar(m){
+  const c = mundoAHex(m.x, m.y);
+  const e = [...elementos.entries()].find(([, x]) => x.arma && x.origen && x.origen.col === c.col && x.origen.fila === c.fila && levantadorPara(x));
+  if(!e) return false;
+  armaLevantarDesdeMapa(e[0]);
+  return true;
+}
+async function armaLevantarDesdeMapa(elId){
+  const el = elementos.get(elId), quien = el && levantadorPara(el);
+  if(!quien) return;
+  const nombre = el.armaNombre || 'Este objeto';
+  const si = await AvisoCombate.preguntar(`${nombre} está en el suelo.\n¿Querés levantarlo? (cuesta ${fmt(Combatiente.COSTO_LEVANTAR_ARMA)} No2)`,
+    {icono: /"flecha"\s*:/.test(String(el.armaItem || '')) ? '🏹' : '🗡️', titulo: 'Levantar', si: 'Sí, levantarlo', no: 'No'});
+  if(!si) return;
+  // La sesión del personaje (la de la Botonera nueva): si no está abierta, se abre escondida, solo para esto.
+  const fichaId = quien.t.fichaId, visible = !!(bn && bn.host && !bn.host.hidden && bn.fichaId === fichaId);
+  if(!(bn && bn.fichaId === fichaId && bn.S)){ await abrirBotoneraNueva(fichaId, ''); if(bn && !visible) bn.host.hidden = true; }
+  if(!(await bnSesionLista(fichaId))){ toast('No se pudo leer el personaje'); return; }
+  if(bn && !visible) bn.host.hidden = true;
+  await bnLevantarArma(elId);
 }
 
 // ---------- Levantarla: desde la Botonera de un personaje, de una invocación o desde las Acciones de un creep (1 No2) ----------
@@ -146,13 +198,13 @@ function levantadoElegir(S, it, quien){
     const fin = v => { if(listo) return; listo = true; AvisoCombate.cerrar(); res(v); };
     const extra = Combatiente.COSTO_LEVANTAR_ARMA;
     const dibujar = () => {
-      const botones = libre ? [{texto: '✋ Equiparlo', detalle: 'lo tenés en la mano enseguida', alClic: () => fin({destino: 'mano', soltar: []})}]
+      const botones = libre ? [{texto: '✋ Sí, equiparlo', detalle: 'lo tenés en la mano enseguida', alClic: () => fin({destino: 'mano', soltar: []})}]
         : (/2m$/.test(it.tipoItem) ? [{texto: `🔁 Reemplazar lo que tenés en las manos (+${fmt(extra)} No2)`, detalle: manos.map(m => m.nombre).join(' y ') + ' → a la mochila', alClic: () => fin({destino: 'mano', soltar: manos})}]
           : manos.map(m => ({texto: `🔁 Reemplazar ${m.nombre} (+${fmt(extra)} No2)`, detalle: `${m.nombre} → a la mochila`, alClic: () => fin({destino: 'mano', soltar: [m]})})));
       // Comparar con lo que tiene en la mano (dueño, 2026-10-08): en el mismo cartel, cada número antes → después.
       if(manos.length && !comparando) botones.push({texto: '⚖ Comparar con lo que tenés en la mano', sec: true, alClic: () => { comparando = true; dibujar(); }});
-      botones.push({texto: '🎒 A la mochila', sec: true, alClic: () => fin({destino: 'mochila', soltar: []})});
-      const pasos = [{titulo: libre ? 'Tenés una mano libre' : 'Tenés las manos ocupadas', texto: libre ? '¿Lo equipás o lo guardás?' : `¿Lo cambiás por lo que tenés en la mano (cuesta ${fmt(extra)} No2 más) o lo guardás?`}];
+      botones.push({texto: libre ? '🎒 No, a la mochila' : '🎒 A la mochila', sec: true, alClic: () => fin({destino: 'mochila', soltar: []})});
+      const pasos = [{titulo: libre ? 'Tenés una mano libre' : 'Tenés las manos ocupadas', texto: libre ? '¿Querés dejarlo equipado?' : `¿Lo cambiás por lo que tenés en la mano (cuesta ${fmt(extra)} No2 más) o lo guardás?`}];
       if(comparando) manos.forEach(m => pasos.push({titulo: `${it.nombre} contra ${m.nombre}`, texto: compararTexto(it, m)}));
       AvisoCombate.mostrar({clave: 'levantar', icono: '🗡️', titulo: `${quien} levanta ${it.nombre}`, pasos, botones, alCerrar: () => fin({destino: 'mochila', soltar: []})});
     };

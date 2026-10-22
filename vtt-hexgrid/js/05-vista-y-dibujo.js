@@ -1181,7 +1181,8 @@ function dibujarLienzo(){
   if(typeof dibujarEfectosEmerger === 'function' && dibujarEfectosEmerger(z)) animando = true;   // 🕳 la tierra que salta al salir (js/46)
   if(typeof dibujarEfectosRayo === 'function' && dibujarEfectosRayo()) animando = true;   // la Descarga que salta (js/19)
   if(typeof dibujarEfectosExplosion === 'function' && dibujarEfectosExplosion()) animando = true;
-  if(typeof dibujarEfectosRuleta === 'function' && dibujarEfectosRuleta()) animando = true;   // 🤺 la ruleta del Desarmar (js/62)   // 💥 la trampa que explota (js/19)
+  if(typeof dibujarEfectosRuleta === 'function' && dibujarEfectosRuleta()) animando = true;
+  if(typeof armasTitilan === 'function' && armasTitilan()) animando = true;   // ✨ lo que se puede levantar titila (js/27, 2026-10-22)   // 🤺 la ruleta del Desarmar (js/62)   // 💥 la trampa que explota (js/19)
   if(typeof dibujarConfusionNumeros === 'function') dibujarConfusionNumeros();   // el objetivo al azar de la Confusión (js/20)
 
   // Mientras se arrastra un token en combate, una esferita con los Nitros que le quedarían al llegar a donde está el

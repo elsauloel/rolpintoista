@@ -1123,6 +1123,14 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   por día 3/1/1 · 71/33/33. Con peleas de 6 turnos: hoy 6 usos, cuesta su Especial 5. **Conclusión: ninguna opción sola cambia una pelea de 4
   turnos; lo que manda es el SP guardado. Lo que de verdad da matices es combinar el costo con un SP guardado más chico o una recarga menor.**
   **En pausa (dueño, 2026-10-21): «déjalo pendiente para cuando tenga tiempo de encarar el tema de la recarga».**
+  **Análisis con la recarga (2026-10-22, Claude, a pedido del dueño: «contemplando que existe la regeneración, lo cual hace que el SP sea más
+  barato»).** Simulado con Especial 9 y 15 (arranca lleno, recarga al empezar cada turno, una por turno). Hoy el SP máximo (Especial × 3) son seis
+  turnos de recarga: en una pelea de 4 turnos el de Especial 15 tiene 45 + 3 × 7 = 66 SP y la recarga es solo un tercio; todo lo que cueste hasta
+  su Especial sale todos los turnos, y para «uno sí, uno no» tendría que costar 2 × Especial. **Propuesta:** SP máximo = Especial × 2 (la recarga
+  pasa a ser el 41 % del SP de la pelea) con la recarga igual, y costos por familia: utilidad 2–5 fijos (XXXX); suma Ef.Esp a uno = su Especial
+  (XX·X); suma Ef.Esp en área = 1,5 × (X·X·); las que definen la pelea = 2 × (X···). Da lo mismo con Especial 9 y 15 porque escala sola. Fuera,
+  por ahora: el SP por día (sin recarga entre peleas) y bajar la recarga. **El dueño lo llevó a debatir con sus colegas (2026-10-22): «después lo
+  elaboro con vos».**
 
 ### P217 — ¿Una bestia puede hacer Parry con sus garras? (2026-10-21) ✅ decidida y hecha el mismo día
 **Decisión (dueño): mecánicamente sí, para todos —si en cada caso tiene sentido lo decide la mesa—; el peso es el del arma (el ítem del catálogo que se le equipa y se marca natural), 1 si no tiene.** El arma natural va última: un arma o un escudo de verdad, primero. Y no se cae al desarmar.

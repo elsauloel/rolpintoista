@@ -71,7 +71,7 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
-> - [ ] **💧 La recarga de SP y el costo de las que suman Efecto especial (2026-10-21, dueño: «para cuando te diga que tengo el tiempo»):** la P216,
+> - [ ] **💧 La recarga de SP y el costo de las que suman Efecto especial (2026-10-21, dueño: «para cuando te diga que tengo el tiempo»):** **En debate con los colegas (dueño, 2026-10-22: «ya abrí el debate… después lo elaboro con vos»)**; la propuesta de Claude del 22/10 (SP máximo Especial × 2, la recarga igual, y lo que suma Ef.Esp a 1 × / 1,5 × / 2 × el Especial) quedó en P216. la P216,
 >   con la simulación de un día ya hecha (ninguna opción sola cambia una pelea de 4 turnos; manda el SP guardado) y la página para la mesa
 >   (https://claude.ai/artifact/C7VPwWPg9BpWfF1L1hUGb6). Falta debatirlo y decidir.
 > - [ ] **🧭 Elegir las habilidades de un creep por rol y mecánica (2026-10-21, dueño):** al crear un creep en GM Tools, el asistente pregunta qué rol
@@ -637,7 +637,7 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   ninguna bolsa de calidad (un anillo de Movimiento o de Agilidad, Evasión +3…), sin tienda, solo de botín. A pensar: cómo se marcan en el catálogo
   (¿una calidad aparte, «Artefacto»?), que el generador de tiendas no las ofrezca, cómo las elige el GM para el botín y que haya una sola copia.
 
-- [ ] **Revisar los consumibles** (dueño, 2026-10-07: «los consumibles tendremos que revisarlos»): 16 todavía usan stats viejos que el juego
+- [x] (2026-10-22, revisado: ya no queda ninguno en juego con stats viejos — las 4 de Ímpetu se auditaron el 2026-10-20 con «No2 máximo»; las 6 de Piernas de Viento siguen con Movimiento pero están archivadas, fuera de las tiendas: si vuelven, revisarlas ahí) **Revisar los consumibles** (dueño, 2026-10-07: «los consumibles tendremos que revisarlos»): 16 todavía usan stats viejos que el juego
   convierte solo al cargar (bonos → SP, mov / accionesmax → No2): Pociones y Pergaminos de Reserva Ampliada, Piernas de Viento e Ímpetu. Revisarlos
   enteros (efecto, calidad y precio), no solo el stat. (El Cinturón del explorador, Raro, también lo tiene: se ignora, los Raros se rehacen.)
   **Avance (2026-10-06):** las 8 de «Bonos» pasaron a SP (dueño: «vamos a reemplazar las de bonos por SP»): Poción de SP (mitad del SP

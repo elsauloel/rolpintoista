@@ -32,8 +32,8 @@ Sirven al warrior (pegar fuerte), al tanque (aguantar y controlar) o a los dos.
 
 **A. Pegar fuerte** (warrior)
 1. ✅ **Más daño en un golpe**: Golpe fuerte (+1 dado), Puño de roca (+2 y Demora), Zarpazo.
-2. **Golpe que se anuncia** ✦: un turno carga a la vista de todos y al siguiente pega muy fuerte; los jugadores lo ven venir y reaccionan (Golpe cargado,
-   Golpe aplastante).
+2. ✅ **Golpe que se anuncia** ✦ (2026-10-21): **El que avisa no traiciona** / **Zarpazo erguido** — un turno lo carga a la vista de todos (a quién apunta),
+   al siguiente +3 dados, sin Parry y empuja 2; si el objetivo pegado se aleja, sale de oportunidad; si le hacen daño, se le cae.
 3. **Remate** ✦: pega más fuerte a quien ya está herido (Remate, Golpe de gracia).
 4. **Varios golpes**: dos ataques en uno, con menos puntería cada uno (Golpe doble, Ráfaga de golpes).
 5. **Golpe que sigue** ✦: si tumba a alguien, vuelve a atacar a otro de al lado.

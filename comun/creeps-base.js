@@ -155,6 +155,7 @@
     if(sp.spCosto !== undefined) h.spCosto = sp.spCosto;   // 💧 su SP en modo SP
     if(sp.anuncio) h.anuncio = sp.anuncio;
     if(sp.malDeOjo) h.malDeOjo = true;
+    if(sp.golpeAnunciado) h.golpeAnunciado = JSON.parse(JSON.stringify(sp.golpeAnunciado));   // 🪓 El que avisa no traiciona (2026-10-21): el golpe que descarga (vtt-hexgrid/js/63)
     if(sp.desarmar) h.desarmar = true;   // 🤺 Desarmar (2026-10-21): el botón instantáneo del GM (vtt-hexgrid/js/62)   // 🧿 Mal de ojo (2026-10-21): el botón del GM (vtt-hexgrid/js/60)
     if(sp.cuentaComoAtaque) h.cuentaComoAtaque = true;   // es su acción de ataque del turno (Arma elemental, 2026-10-21)   // 🛡 lo que se anuncia al usarla («{nombre} se pone en modo aguante.», 2026-10-21)
     if(sp.cura) h.curaHp = sp.cura * n;

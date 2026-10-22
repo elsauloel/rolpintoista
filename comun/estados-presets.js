@@ -232,6 +232,10 @@ const ESTADOS_PRESET = [
     detalle:'Su arma corroe: cada golpe con arma que pega suma +1d4 de daño de ácido y deja Armadura rota 1 (y una más cada 5 de daño de ácido que entra). Es daño directo: solo lo frena la resistencia al ácido. Dura 3 turnos; otra arma elemental la reemplaza. ⚙ Automatizado en el duelo.'},
   {nombre:'Arma venenosa', polaridad:'buff', turnos:3, armaElemental:'toxico', golpePorTurnos:true, golpe:{efectos:[{nombre:'Tóxico', dado:'1d4', danoMagico:true, porDano:{estado:'Veneno', cada:3}}]},
     detalle:'Su arma gotea veneno: cada golpe con arma que pega suma +1d4 de daño tóxico y deja Veneno, 1 stack cada 3 de daño tóxico que entra (mínimo 1). Es daño directo: solo lo frena la resistencia tóxica. Dura 3 turnos; otra arma elemental la reemplaza. ⚙ Automatizado en el duelo.'},
+  // 🪓 Golpe anunciado (2026-10-21, dueño: El que avisa no traiciona / Zarpazo erguido): lo carga un turno a la vista de todos; en su próximo turno
+  // lo descarga (vtt-hexgrid/js/63). Se va al empezar su turno (pasa a `sc.golpeListo`) y se pierde si le entra daño.
+  {nombre:'Golpe anunciado', polaridad:'buff', turnos:0, permanente:true, alEmpezarTurno:true, golpeAnunciado:true, pierdeAlDano:true,
+    detalle:'Carga un golpe a la vista de todos: en su próximo turno descarga un ataque con +3 dados del Tipo de su arma, que no se puede parrear y empuja 2 casillas. Si su objetivo está pegado y se aleja, se lo come de oportunidad (sin No2). Si antes le hacen daño (que le llegue a la vida), se le cae el golpe. ⚙ Automatizado en el mapa.'},
   // 🎯 Apuntando a la cabeza (2026-10-21, dueño, el Tiro a la cabeza de los creeps): su próximo disparo +2 PdG, Crítico frecuente +1 y Crítico potente +1
   // (`apunta`, lo suma el mapa: vtt-hexgrid/js/35); se gasta al disparar y se pierde si le entra daño (`pierdeAlDano`, js/10).
   {nombre:'Apuntando a la cabeza', polaridad:'buff', turnos:0, permanente:true, apunta:{pdg:2, crit:1, critpot:1}, pierdeAlDano:true,

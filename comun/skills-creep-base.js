@@ -66,7 +66,7 @@
     'Arma ígnea': ['support', 'arma elemental'], 'Arma helada': ['support', 'arma elemental'], 'Arma eléctrica': ['support', 'arma elemental'],
     'Arma ácida': ['support', 'arma elemental'], 'Arma venenosa': ['support', 'arma elemental'],
     'Barrido': ['choque pesado', 'barrido'], 'Coletazo': ['choque pesado', 'barrido'],
-    'Tiro a la cabeza': ['rango', 'tiro apuntado'], 'Desarmar': ['choque pesado', 'desarmar'], 'Mal de ojo': ['debuffer', 'maleficio'], 'Disparo señalador': ['rango', 'señalar'], 'Ráfaga de cortes': ['choque liviano', 'ráfaga'], 'Ráfaga de zarpazos': ['choque liviano', 'ráfaga'],
+    'Tiro a la cabeza': ['rango', 'tiro apuntado'], 'Desarmar': ['choque pesado', 'desarmar'], 'El que avisa no traiciona': ['choque pesado', 'golpe anunciado'], 'Zarpazo erguido': ['choque pesado', 'golpe anunciado'], 'Mal de ojo': ['debuffer', 'maleficio'], 'Disparo señalador': ['rango', 'señalar'], 'Ráfaga de cortes': ['choque liviano', 'ráfaga'], 'Ráfaga de zarpazos': ['choque liviano', 'ráfaga'],
     'Romper armadura': ['choque pesado', 'romper armadura'], 'Arrancar la coraza': ['choque pesado', 'romper armadura'],
     'Golpe demoledor': ['choque pesado', 'romper armadura'], 'Mandíbula trituradora': ['choque pesado', 'romper armadura'], 'Cadena de rayos': ['mago', 'rayo en cadena'],
     'Puñalada por la espalda': ['choque liviano', 'por la espalda'], 'Mordida a traición': ['choque liviano', 'por la espalda'], 'Puñalada trapera': ['choque liviano', 'por la espalda'],
@@ -178,7 +178,13 @@
   H('Ráfaga de zarpazos', 'D', 'b', 'me', 3, aA('Tres zarpazos seguidos en un solo ataque con su arma: si pega, suma +2 dados de su arma (los otros dos zarpazos; la Defensa se resta una sola vez). Los efectos al golpear de su arma se tiran tres veces, uno por zarpazo, y su Perfora vale en cada corte (con Perfora 1, pasan al menos 3).',
     {dados: 2}, 'un ataque con su arma con +2 dados; los efectos del arma ×3 y la Perfora en cada corte', 3, [], {rafaga: 3}));
   H('Ráfaga de golpes', 'D', 'hd', 'me', 3, zO('Una lluvia de golpes rápidos (tirá el daño dos veces, a mano la segunda).', 3, 'L'));
-  H('Golpe cargado', 'D', '*', 'mt', 4, zO('Junta fuerzas todo un turno y descarga un golpe brutal.', 2, 'H'));
+  // 🪓 Auditada (dueño, 2026-10-21; choque pesado, «golpe que se anuncia»; antes «Golpe cargado»: «Junta fuerzas todo un turno y descarga un golpe
+  // brutal»): un turno lo carga a la vista de todos (a quién apunta), al siguiente lo descarga; si el objetivo pegado se aleja, sale de oportunidad.
+  [['El que avisa no traiciona', 'hd', 'Levanta el arma bien alto mirando a un rival', 'levanta el arma'], ['Zarpazo erguido', 'b', 'Se para en dos patas mirando a un rival, con la garra en alto', 'se para en dos patas']].forEach(([nombre, razas, como, verbo]) =>
+    H(nombre, 'DK', razas, 'mt', 3, {detalle: `${como}: este turno no ataca (es su ataque del turno) y queda Golpe anunciado; la Mesa y la Crónica dicen a quién apunta. En su próximo turno (puede caminar antes) descarga un ataque con su arma con +3 dados del Tipo de su arma, que no se puede parrear (solo esquivar) y, si pega, lo empuja 2 casillas; cuesta lo de un ataque. Si su objetivo está pegado y se aleja, se lo come de oportunidad, sin No2. Si antes le hacen daño (que le llegue a la vida), se le cae el golpe; si no ataca en su turno, se pierde.`,
+      no2: 1, spCosto: 2, auditada: true, cuentaComoAtaque: true, efecto: {nombre: 'Golpe anunciado'},
+      golpeAnunciado: {verbo, detalleGolpe: 'El golpe anunciado: +3 dados del Tipo de su arma, no se puede parrear y, si pega, empuja 2 casillas.',
+        duelo: {modo: 'arma', objetivo: 'enemigo', x: 'nitros', arma: {pdg: 0, dados: 3, fijo: 0, sinParry: true}, efectos: [{nombre: 'Empujón', empuja: 2, detalle: 'Lo empuja 2 casillas, lejos de quien pega.'}]}}}));
   H('Aplastar', 'D', 'c', 'mt', 3, zO('Aplasta con un brazo de piedra o metal.', 3, 'M'));
   // Auditada (dueño, 2026-10-21: «que sume daño y demora», «+2 al daño»): +2 al daño y, si pega, Demora (baja 1 lugar en el orden de turnos).
   H('Puño de roca', 'D', 'ce', 'mt', 2, aA('Un puñetazo que rompe huesos: un ataque con su arma con +2 al daño; si pega, el golpe lo atonta y queda con Demora (baja 1 lugar en el orden de turnos).',

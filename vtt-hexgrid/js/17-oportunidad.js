@@ -38,6 +38,7 @@ function oporPuede(r){
   if(!rs) return true;
   if(expuestoPub(rs)) return false;
   if(rs.sinOpor) return false;   // solo tiene un arco: con el arco no hay oportunidad (2026-10-09)
+  if(r.tipo === 'creep' && (rs.estados || []).some(e => e && e.nombre === 'Golpe anunciado')) return true;   // 🪓 el golpe cargado sale sin No2 (js/63)
   if(r.tipo === 'creep') return rs.opor !== false;
   if(rs.oporCosto === undefined || rs.nitros === undefined || rs.nitros === null) return true;
   return num(rs.nitros) >= num(rs.oporCosto);
@@ -204,6 +205,7 @@ async function oporResponder(si){
     oporMesa(`👁 ${nombreDe(r)} no tiene los No2 para disparar desde la vigilancia`, 'alerta-roja');
     return;
   }
+  if(!dt.vigilancia && typeof golpeAnunciadoOpcion === 'function'){ const g = golpeAnunciadoOpcion(r, dt.moverId); if(g) armas = [g, ...armas]; }   // 🪓 (js/63)
   if(!armas.length){ toast('No le alcanzan los No2 para un ataque de oportunidad con ninguna mano'); return; }
   if(armas.length === 1){ oporAtacar(armas[0]); return; }
   od.armas = armas; od.paso = 'arma';
@@ -266,6 +268,7 @@ async function oporAtacar(a){
   await momentoActualizar(od.id, {estado: 'si', resultado: dt.vigilancia ? `…y ${r ? nombreDe(r) : 'su rival'} le dispara desde la vigilancia${conArma}.` : `…y ${r ? nombreDe(r) : 'su rival'} lo ataca de oportunidad${conArma}.`});
   oporMesa(dt.vigilancia ? `👁 ${r ? nombreDe(r) : 'El rival'} le dispara a ${nombreDe(m)} desde la vigilancia${conArma}` : `${r ? nombreDe(r) : 'El rival'} ataca de oportunidad a ${nombreDe(m)}${conArma}`);
   if(dt.vigilancia && r && typeof vigilanciaQuitar === 'function') vigilanciaQuitar(r);   // un solo disparo
+  if(typeof a.alUsar === 'function') a.alUsar();   // 🪓 el golpe anunciado se gasta (js/63)
   try{
     let espaldaPdg = 0;   // 🗡 quien se aleja dándole la espalda (js/13, la regla general del 2026-10-15)
     try{ espaldaPdg = r ? espaldaBono(r, m, a.ataque) : 0; }catch(err){ console.error('No se pudo ver si es por la espalda:', err); }

@@ -230,8 +230,9 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     const bronca = typeof broncaSumar === 'function' ? broncaSumar(sc, r) : null;   // 😤 cada golpe que le duele suma (js/51)
     // 🎯 Si le entra daño, pierde la puntería (Tiro a la cabeza, 2026-10-21, dueño: «solamente si le hacen daño»).
     let punteria = '';
-    if(num(r.recibido) > 0){ const i = (sc.estados || []).findIndex(e => e && e.activo !== false && e.pierdeAlDano); if(i >= 0){ punteria = sc.estados[i].nombre; sc.estados.splice(i, 1); } }
-    return {r, previo, nuevo: fenix ? 0 : sc.hp, bronca, fenix, hpFenix: sc.hp, punteria};
+    let golpeCae = false;   // 🪓 el golpe anunciado también se cae (js/63)
+    if(num(r.recibido) > 0){ const i = (sc.estados || []).findIndex(e => e && e.activo !== false && e.pierdeAlDano); if(i >= 0){ punteria = sc.estados[i].nombre; golpeCae = !!sc.estados[i].golpeAnunciado; sc.estados.splice(i, 1); } }
+    return {r, previo, nuevo: fenix ? 0 : sc.hp, bronca, fenix, hpFenix: sc.hp, punteria, golpeCae};
   });
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
   if(res.fenix){
@@ -240,7 +241,7 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   }
   if(res.bronca && typeof broncaAnunciar === 'function') broncaAnunciar(t, res.bronca);
   if(res.punteria){
-    const txt = `🎯 ${nombreDe(t)} recibió daño y pierde la puntería (se le va ${res.punteria})`;
+    const txt = res.golpeCae ? `🪓 ${nombreDe(t)} recibió daño y se le cae el golpe que venía cargando` : `🎯 ${nombreDe(t)} recibió daño y pierde la puntería (se le va ${res.punteria})`;
     try{ mesaLinea(txt, 'recordatorio'); momentoAbrir({tipo: 'punteria', icono: '🎯', titulo: `${nombreDe(t)} pierde la puntería`, estado: 'listo', resultado: txt.slice(3)}); }catch(e){}
   }
   if(guarda && golpe > 0) guardianAviso(t, guarda);

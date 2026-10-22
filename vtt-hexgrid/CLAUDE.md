@@ -1706,6 +1706,10 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `CreepCalculo.alcance`, o el arma a distancia del personaje en `FichaResumen`); `oportunidadCorte` (js/17) frena al primer rival que se mueve en la mira
   (`vigilantesDe`, `vigilanciaLoVe`) y el cartel de la oportunidad pregunta «¿Dispara?» (`vigilanciaArmasDe`: su ataque normal; `vigilanciaQuitar` al
   disparar). El alcance se dibuja con `vigilanciaDibujar` (js/05).
+- **🪓 El que avisa no traiciona / Zarpazo erguido** (2026-10-21, `js/63-golpe-anunciado.js`): la habilidad (`golpeAnunciado`, con la Ejecución del golpe en
+  `golpeAnunciado.duelo`) deja el estado «Golpe anunciado» (`alEmpezarTurno`, `pierdeAlDano`); `golpeAnunciadoActivado` (desde js/12) pide a quién apunta y lo
+  anuncia; `CreepAcciones.inicioCreep` lo pasa a `sc.golpeListo` y `acAtacar` (js/12) llama `golpeAnunciadoAtacar` (descargar o ataque común, `golpeSaltear`);
+  la oportunidad (js/17) suma `golpeAnunciadoOpcion` (sin No2, `alUsar` lo gasta) y `oporPuede` deja frenar a un creep con el estado aunque no tenga No2.
 - **🤺 Desarmar** (2026-10-21, `js/62-desarmar.js`): cada pantalla escucha los duelos abiertos (`desarmeEscuchar`) y, en el paso del Bloqueo con un creep con
   `desarmar` (el GM) o un personaje con la skill del Warrior (`resumen.desarmar`, quien lo maneja: `bnManejo`), muestra el botón instantáneo 🤺 (`Flotantes.desarmar`); `desarmarUsar` cobra y marca el duelo (`Duelo.marcarDesarme`). Si gana, el duelo termina
   «desarmado» y el gancho `desarmado` (js/14) llama `desarmadoResuelto`: el momento «desarme» hace la ruleta de casillas en todas las pantallas

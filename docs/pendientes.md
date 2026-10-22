@@ -268,7 +268,10 @@
 >   las combinaciones de bonos en defensas (`herramientas/calculadora_defensa.py`), con el mismo criterio.
 > - [x] (2026-10-10, dueño) **Parry: solo con armas cuerpo a cuerpo** (o escudo): ninguna de rango (arco, ballesta, pólvora), ninguna varita ni
 >   orbe; los báculos sí (son a dos manos: el Báculo de aprendiz pasó a dos manos).
-> - [ ] **🖥 Configurar Chrome para las pruebas** (recordárselo al dueño cuando esté en casa, 2026-10-10): en las dos ventanas de pruebas (GM y
+> - [x] (2026-10-22: hecho con el acceso del escritorio; probado con las dos cuentas tapadas por ventanas maximizadas: la página queda «visible»
+>   y los temporizadores andan a velocidad normal, pero el dibujo de la pantalla baja a ~1 cuadro por segundo mientras está tapada; las capturas
+>   salen bien. Si las animaciones se ven a saltos en una prueba, probar sumando `--disable-renderer-backgrounding` al acceso)
+>   **🖥 Configurar Chrome para las pruebas** (recordárselo al dueño cuando esté en casa, 2026-10-10): en las dos ventanas de pruebas (GM y
 >   jugador), `chrome://flags` → «Calculate window occlusion on Windows» → **Disabled** y reiniciar Chrome. Así Chrome no deja de dibujar una
 >   ventana tapada por otra y se puede probar con las dos ventanas encimadas, sin maximizar y sin partir la pantalla. Lo cambia el dueño.
 >   (2026-10-22: buscar «occlusion», no «occluded»: «Auto picture in picture on window occluded» es otra cosa, la de los videos. Si la de

@@ -26,12 +26,12 @@
   de Clementino con Empower muestra «Empower +3» debajo de cada tirada (PdG 1d6+1 → 1d10, Evasión 1d12 → 1d6+1d8+1); el motor: la tirada lo suma,
   la Mesa lo pinta y se gasta (558 pruebas). **Falta**: verlo el dueño desde juan (pagar y tirar en un duelo) y darle a un aliado. **Ojo:** una
   pantalla con la versión vieja que le aplique el Empower a un aliado lo deja como un estado vacío (pasó con la pestaña del dueño): recargar todas.
-- [ ] **🤺 La ruleta del desarme cae solo en casillas libres** (dueño, 2026-10-22: «si no hay en ese círculo… si hay en el círculo interno,
+- [x] (2026-10-22, Claude, un desarme de verdad en «Claude · pruebas»: Goblin 1 desarmó al Goblin 4 parado al lado de una pared de línea larga con colisión; la ruleta giró solo por las 7 casillas del lado del goblin, ninguna detrás de la pared, y el hacha cayó a 2; capturas en la conversación; todo restaurado) **🤺 La ruleta del desarme cae solo en casillas libres** (dueño, 2026-10-22: «si no hay en ese círculo… si hay en el círculo interno,
   primero ese; si no, en el externo, y así siguiendo para afuera»; js/62): el anillo a 2 casillas sin nadie, sin Sólidos y sin otra arma; lleno →
   el de 1; después 3, 4… hasta 8. Y vuela como un lanzamiento (dueño, 2026-10-22): un Sólido o una pared de línea en el medio la frena; las
   personas no («les vuela por encima o por el costado»); en el borde justo entre dos casillas, alcanza con un costado libre. **Visto por Claude
   (2026-10-22, solo en su pantalla, sin tocar nada):** en una casilla con un Sólido al costado y una pared abajo, la ruleta quedó solo en las 5 del
-  lado abierto (7 tapadas). Falta: un desarme de verdad al lado de una pared, y con el anillo de 2 lleno de tokens.
+  lado abierto (7 tapadas). El anillo de 2 lleno de tokens no hace falta probarlo (dueño: «muy improbable»).
 - [ ] **🤺 Desarmar en cooldown: el botón apagado** (dueño, 2026-10-22, «sí»): en el Bloqueo, «🤺 Desarmar · en cooldown (N turnos)» gris y sin
   poder tocarlo (o «le faltan No2», «te falta SP»); no va en el desplegable de la tirada a mano. Probarlo con el Ladrón recién usado.
 - [ ] **⏳ Una zona de 1 turno hace efecto dos veces**: al tirarla y al pasar la ronda; después se va al empezar el turno de quien la tiró. Con quien

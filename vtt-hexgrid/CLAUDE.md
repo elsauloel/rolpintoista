@@ -1706,8 +1706,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `CreepCalculo.alcance`, o el arma a distancia del personaje en `FichaResumen`); `oportunidadCorte` (js/17) frena al primer rival que se mueve en la mira
   (`vigilantesDe`, `vigilanciaLoVe`) y el cartel de la oportunidad pregunta «¿Dispara?» (`vigilanciaArmasDe`: su ataque normal; `vigilanciaQuitar` al
   disparar). El alcance se dibuja con `vigilanciaDibujar` (js/05).
-- **🤺 Desarmar** (2026-10-21, `js/62-desarmar.js`): el GM escucha los duelos abiertos (`desarmeEscuchar`) y, en el paso del Bloqueo con un creep con
-  `desarmar`, muestra el botón instantáneo 🤺 (`Flotantes.desarmar`); `desarmarUsar` cobra y marca el duelo (`Duelo.marcarDesarme`). Si gana, el duelo termina
+- **🤺 Desarmar** (2026-10-21, `js/62-desarmar.js`): cada pantalla escucha los duelos abiertos (`desarmeEscuchar`) y, en el paso del Bloqueo con un creep con
+  `desarmar` (el GM) o un personaje con la skill del Warrior (`resumen.desarmar`, quien lo maneja: `bnManejo`), muestra el botón instantáneo 🤺 (`Flotantes.desarmar`); `desarmarUsar` cobra y marca el duelo (`Duelo.marcarDesarme`). Si gana, el duelo termina
   «desarmado» y el gancho `desarmado` (js/14) llama `desarmadoResuelto`: el momento «desarme» hace la ruleta de casillas en todas las pantallas
   (`desarmeRuleta`, `dibujarEfectosRuleta`, js/05 y js/16) y `armaSoltar(t, 0, {celda, itemId, itemNombre})` (js/27) deja el arma o el escudo en el piso.
 - **⚡ Botones Flash** (2026-10-21, `js/61-botones-flash.js`): Blindaje, Shield, Estoicismo y Shockwave tienen su botón fijo, como el 💪 de Empower

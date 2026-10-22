@@ -56,7 +56,7 @@
 - [ ] **🤺 Desarmar** (2026-10-21, choque pesado): un creep con Desarmar ataca y un personaje le hace Parry → en el Bloqueo, el botón 🤺 al costado del
   duelo; al tocarlo, la línea en la Mesa y la declaración «intenta desarmar»; si gana, «¡DESARMADO!», la ruleta de casillas en el mapa (todas las pantallas),
   el arma o el escudo en el piso a 2 casillas (y Desarmado); si pierde, lo de siempre. Un creep que defiende (con escudo) desarmando al atacante. Lo natural
-  no se cae. El cobro (SP o cooldown; el doble en turno ajeno).
+  no se cae. El cobro (SP o cooldown; el doble en turno ajeno). **El Warrior** (skill de clase): su jugador ve el 🤺 en el Bloqueo, pregunta el Flash, cobra 3 SP (6 en turno ajeno); el Ejecutar de la Botonera dice dónde se usa. Cada ficha se guarda una vez para publicar la skill.
 - [ ] **⚡ Botones Flash** (2026-10-21): un personaje con Blindaje, Shield, Estoicismo o Shockwave, en combate: su botón arriba con su animación (y al costado
   del duelo abierto); desaparece si no le alcanza el SP (en turno ajeno, el doble); tocarlo ejecuta la habilidad (Shield pide a quién) y cobra.
 - [ ] **🧿 Mal de ojo** (2026-10-21, Debuffer): con un creep que lo tiene, el botón 🧿 arriba (solo el GM, en combate); con un duelo abierto, en la columna

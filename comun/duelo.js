@@ -592,7 +592,7 @@ const Duelo = (() => {
       t.push(`🗡 por la espalda${pe ? ': ' + pe : ''}`);
     }
     if(d.ataque && _num(d.ataque.presa) > 0) t.push(`🎯 contra la presa: +${_fmt(d.ataque.presa)} al daño`);
-    if(d.desarme) t.push(`🤺 ${d.desarme.quien || ''} intenta desarmar (si gana el Bloqueo, el otro pierde lo que tiene en la mano)`);
+    if(d.ataque && d.ataque.desarme) t.push(`🤺 ${d.ataque.desarme.quien || ''} intenta desarmar (si gana el Bloqueo, el otro pierde lo que tiene en la mano)`);
     if(d.ataque && _num(d.ataque.miedo) > 0) t.push(`😱 con miedo: −${_fmt(d.ataque.miedo)} PdG y −${_fmt(d.ataque.miedo)} de daño`);
     if(d.ataque && _num(d.ataque.embestida) > 0) t.push(`🐂 embestida: +${_fmt(d.ataque.embestida)} PdG`);
     if(d.ataque && _num(d.ataque.quieto) > 0) t.push(`💍 ${d.hab ? 'foco' : 'puntería certera'}: +${_fmt(d.ataque.quieto)} ${d.hab ? 'PdG.Esp' : 'PdG'}`);
@@ -776,7 +776,7 @@ const Duelo = (() => {
       m.bloq = info;
       // 🤺 Desarmar (2026-10-21): si gana quien lo activó, el otro pierde lo que tenía en la mano (lo hace el mapa del GM, gancho `desarmado`) y
       // eso reemplaza el resultado de siempre (sin la mitad del daño ni el contraataque).
-      if(m.desarme && r.gana === m.desarme.lado){ m.resultado = 'desarmado'; m.fase = 'fin'; m.estado = 'resuelto'; return; }
+      if(m.ataque && m.ataque.desarme && r.gana === m.ataque.desarme.lado){ m.resultado = 'desarmado'; m.fase = 'fin'; m.estado = 'resuelto'; return; }
       m.resultado = r.gana === 'defensor' ? 'bloqueado' : 'mitad';
       if(m.resultado === 'mitad') entrarDano(m);
       else{ m.fase = 'fin'; m.estado = 'resuelto'; }
@@ -1269,7 +1269,7 @@ const Duelo = (() => {
       else if(ef.aplicado) L.push(`✔ ${ef.nombre}${siempreEf(ef) ? '' : ' (' + pctEf(ef) + ' %)'}: aplicado${ef.nota ? ' · ' + ef.nota : ''}`);
       else L.push(`? ${ef.nombre}: quedó sin resolver`);
     });
-    const fin = d.hab ? {pego: 'La habilidad funcionó', fallo: 'El objetivo la resistió'}[d.resultado] : {pego: 'El golpe pegó', fallo: 'El golpe falló', bloqueado: 'El golpe fue bloqueado', mitad: 'Pasó la mitad del daño', desarmado: `${d.desarme && d.desarme.quien ? d.desarme.quien : 'Lo'} desarmó al otro`}[d.resultado];
+    const fin = d.hab ? {pego: 'La habilidad funcionó', fallo: 'El objetivo la resistió'}[d.resultado] : {pego: 'El golpe pegó', fallo: 'El golpe falló', bloqueado: 'El golpe fue bloqueado', mitad: 'Pasó la mitad del daño', desarmado: `${d.ataque && d.ataque.desarme && d.ataque.desarme.quien ? d.ataque.desarme.quien : 'Lo'} desarmó al otro`}[d.resultado];
     if(fin) L.push(`Resultado: ${fin}`);
     return L;
   }
@@ -1802,10 +1802,10 @@ const Duelo = (() => {
       const doc = await tx.get(ref);
       if(!doc.exists) return;
       const m = {...doc.data()};
-      if(m.estado !== 'esperando' || m.fase !== 'bloqueo' || m.desarme || m.hab) return;
+      if(m.estado !== 'esperando' || m.fase !== 'bloqueo' || (m.ataque && m.ataque.desarme) || m.hab || !m.ataque) return;
       if(lado === 'atacante' ? m.fuerza : m.bloqueo) return;
-      m.desarme = {lado: lado === 'atacante' ? 'atacante' : 'defensor', nombre: txtCorto((info && info.nombre) || 'Desarmar', 40), quien: txtCorto((info && info.quien) || '', 40)};
-      tx.update(ref, {desarme: m.desarme});
+      // adentro de `ataque` (las reglas de Firestore no dejan campos nuevos en el duelo)
+      tx.update(ref, {'ataque.desarme': {lado: lado === 'atacante' ? 'atacante' : 'defensor', nombre: txtCorto((info && info.nombre) || 'Desarmar', 40), quien: txtCorto((info && info.quien) || '', 40)}});
       ok = true;
     });
     return ok;
@@ -1986,7 +1986,7 @@ const Duelo = (() => {
     }else if(d.resultado === 'bloqueado'){
       caja = `<div class="duelo-veredicto bloqueado${nuevo}"><div class="grande">🛡 ¡BLOQUEADO!</div><div class="chico">El golpe queda anulado</div>${mot}</div>`;
     }else if(d.resultado === 'desarmado'){
-      const ds = d.desarme || {}, quien = ds.lado === 'atacante' ? d.atacante.nombre : d.defensor.nombre, otro = ds.lado === 'atacante' ? d.defensor.nombre : d.atacante.nombre;
+      const ds = (d.ataque && d.ataque.desarme) || {}, quien = ds.lado === 'atacante' ? d.atacante.nombre : d.defensor.nombre, otro = ds.lado === 'atacante' ? d.defensor.nombre : d.atacante.nombre;
       const obj = ds.lado === 'atacante' ? (d.defensa && d.defensa.itemNombre) || 'lo que tenía en la mano' : (d.ataque && d.ataque.armaNombre) || 'su arma';
       caja = `<div class="duelo-veredicto bloqueado${nuevo}"><div class="grande">🤺 ¡DESARMADO!</div><div class="chico">${_esc(quien)} le saca ${_esc(obj)} a ${_esc(otro)}: sale volando 2 casillas (lo natural no se cae)</div>${mot}</div>`;
     }else if(d.resultado === 'mitad'){

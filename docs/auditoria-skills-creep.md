@@ -128,7 +128,7 @@
   golpe) o defendiendo (en vez del Bloqueo). La tirada es la misma; si gana, el otro pierde lo que tenía en la mano (arma o escudo), que **vuela 2 casillas**
   en una dirección al azar —una **ruleta de casillas** en el mapa— y queda en el piso (el arma: Desarmado hasta levantarla). Reemplaza el resultado de
   siempre. Lo natural no se cae (dueño: una bestia desarma pero no la desarman). **3 SP** (6 en turno ajeno) o cooldown 3. Botón instantáneo 🤺 del GM.
-  **Para probar.** Desde el mismo día (P217) un arma natural también parrea (con su peso; 1 si no tiene): una bestia desarma atacando o defendiendo.
+  **Para probar.** También es skill de clase del **Warrior** (dueño, 2026-10-21: 3 SP, 6 en turno ajeno, sin No2; el mismo botón 🤺). Desde el mismo día (P217) un arma natural también parrea (con su peso; 1 si no tiene): una bestia desarma atacando o defendiendo.
 
 ### Choque liviano (desde el 2026-10-21)
 

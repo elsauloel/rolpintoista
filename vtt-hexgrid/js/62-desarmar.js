@@ -4,34 +4,44 @@
    el otro pierde lo que tenía en la mano en ese cruce (el arma de quien atacaba, o el arma o el escudo con que paró), que sale volando 2 casillas
    en una dirección al azar —una ruleta de casillas que se ve en todas las pantallas— y queda en el piso (js/27). Eso reemplaza el resultado de
    siempre (sin la mitad del daño, sin contraataque). Si pierde, lo de siempre. Lo natural (garras, colmillos, un caparazón) no se cae.
-   El GM la usa desde su botón instantáneo 🤺 (Flotantes.desarmar), que aparece solo en un duelo en el paso del Bloqueo con un creep que la tenga
-   lista: al costado del duelo abierto, o arriba si está minimizado. Cuesta su SP o su cooldown; en turno ajeno, el doble (Flash). */
+   El botón instantáneo 🤺 (Flotantes.desarmar) aparece solo en un duelo en el paso del Bloqueo con alguien que la tenga lista y que maneje esta
+   pantalla: un creep (el GM; su SP o su cooldown, el doble en turno ajeno) o un personaje con la skill del Warrior (`resumen.desarmar`, su dueño o
+   quien tiene 🎮 el control; 3 SP, 6 en turno ajeno, con ConfirmarTurno.flash). Al costado del duelo abierto, o arriba si está minimizado. */
 const DESARME_CASILLAS = 2, DESARME_RULETA_MS = 2600, DESARME_QUIETO_MS = 1100;
 let desarmeDuelos = new Map(), desarmeEscucha = null;
 // Los duelos abiertos (solo el GM: maneja a los creeps).
 function desarmeEscuchar(){
-  if(desarmeEscucha || !soyGM || !fbDb || typeof fbRutaCampana !== 'function') return;
+  if(desarmeEscucha || !fbDb || !fbUsuario || typeof fbRutaCampana !== 'function') return;
   desarmeEscucha = fbDb.collection(fbRutaCampana('duelos')).where('estado', '==', 'esperando').onSnapshot(q => {
     desarmeDuelos = new Map(q.docs.map(x => [x.id, x.data()]));
     try{ renderDesarmarBoton(); }catch(e){}
   }, err => { console.error('Desarmar: no se pudieron escuchar los duelos', err); desarmeEscucha = null; });
 }
-// Las opciones de ahora: [{d, id, lado, sc, h, tokenId, motivo}] (un creep con Desarmar en un duelo en el paso del Bloqueo que todavía no tiró su parte).
+// Las opciones de ahora: [{d, id, lado, nombre, tokenId, sc, h | pj}] (un creep o un personaje con Desarmar en un duelo en el paso del Bloqueo que
+// todavía no tiró su parte).
 function desarmeOpciones(){
-  if(!soyGM || modoMapa !== 'combate') return [];
+  if(modoMapa !== 'combate') return [];
   const out = [];
   for(const [id, d] of desarmeDuelos){
-    if(!d || d.fase !== 'bloqueo' || d.desarme || d.hab) continue;
+    if(!d || d.fase !== 'bloqueo' || (d.ataque && d.ataque.desarme) || d.hab) continue;
     for(const lado of ['atacante', 'defensor']){
       if(lado === 'atacante' ? d.fuerza : d.bloqueo) continue;
       const p = d[lado];
-      if(!p || p.tipo !== 'creep') continue;
+      if(p && p.tipo === 'pj' && p.ref && !String(p.ref).includes(SEP_INVOCACION) && bnManejo(p.ref)){   // 🤺 el Warrior (2026-10-21)
+        const r = (fichasPub.get(p.ref) || {}).resumen || {}, k = r.desarmar;
+        if(!k || r.muerto) continue;
+        const ajeno = typeof esSuTurno === 'function' && esSuTurno(p.tokenId) === false;
+        const costo = ajeno ? (num(k.spAjeno) || num(k.sp) * 2) : num(k.sp);
+        if(num(r.sp) >= costo) out.push({d, id, lado, nombre: p.nombre, tokenId: p.tokenId, pj: {fichaId: p.ref, ...k}});
+        continue;
+      }
+      if(!soyGM || !p || p.tipo !== 'creep') continue;
       const sc = creepPrivadoDe(p.ref);
       const h = sc && (sc.habilidades || []).find(x => x && x.desarmar);
       if(!h) continue;
       let motivo = '';
       try{ motivo = CreepCalculo.bloqueoHab(sc, h) || ''; }catch(e){}
-      if(!motivo) out.push({d, id, lado, sc, h, tokenId: p.tokenId});
+      if(!motivo) out.push({d, id, lado, nombre: sc.nombre, sc, h, tokenId: p.tokenId});
     }
   }
   return out;
@@ -42,46 +52,62 @@ function renderDesarmarBoton(){
   const ops = desarmeOpciones();
   if(!ops.length){ Flotantes.desarmar(null); return; }
   const o = ops[0], otro = o.d[o.lado === 'atacante' ? 'defensor' : 'atacante'];
-  Flotantes.desarmar({mostrar: true, sub: ops.length === 1 ? `${o.sc.nombre}: desarmar a ${otro.nombre} en el Bloqueo` : `${ops.length} creeps pueden desarmar`, alClic: () => abrirDesarmar()});
+  Flotantes.desarmar({mostrar: true, sub: ops.length === 1 ? `${o.nombre}: desarmar a ${otro.nombre} en el Bloqueo${o.pj ? ` · ${fmt(desarmeCosto(o).sp)} SP` : ''}` : `${ops.length} pueden desarmar`, alClic: () => abrirDesarmar()});
 }
 setInterval(() => { try{ renderDesarmarBoton(); }catch(e){} }, 1500);
 
 function desarmeCosto(o){
   const ajeno = typeof esSuTurno === 'function' && esSuTurno(o.tokenId) === false, k = ajeno ? 2 : 1;
+  if(o.pj){ const sp = ajeno ? (num(o.pj.spAjeno) || num(o.pj.sp) * 2) : num(o.pj.sp); return {ajeno, sp, cd: 0, txt: `${fmt(sp)} SP`}; }
   const sp = CreepCalculo.modoSP(o.sc) ? CreepCalculo.costoSpHab(o.sc, o.h) * k : 0, cd = num(o.h.cd) * k;
   return {ajeno, sp, cd, txt: CreepCalculo.modoSP(o.sc) ? `${fmt(sp)} SP` : `cooldown ${fmt(cd)}`};
 }
 function abrirDesarmar(){
   const ops = desarmeOpciones();
-  if(!ops.length){ toast('Ya no hay un Bloqueo en el que se pueda desarmar'); return; }
+  if(!ops.length){ toast('Desarmar se usa en el paso del Bloqueo de un duelo (después de un Parry): ahí aparece el botón 🤺 al costado del duelo'); return; }
   if(ops.length === 1){ desarmarUsar(ops[0]); return; }
   const botones = ops.slice(0, 6).map(o => { const k = desarmeCosto(o), otro = o.d[o.lado === 'atacante' ? 'defensor' : 'atacante'];
-    return {fila: true, texto: `${o.sc.nombre} desarma a ${otro.nombre}`, detalle: `${o.lado === 'atacante' ? 'en vez de su Fuerza del golpe' : 'en vez de su Bloqueo'} · ${k.txt}${k.ajeno ? ' (Flash en turno ajeno: el doble)' : ''}`,
+    return {fila: true, texto: `${o.nombre} desarma a ${otro.nombre}`, detalle: `${o.lado === 'atacante' ? 'en vez de su Fuerza del golpe' : 'en vez de su Bloqueo'} · ${k.txt}${k.ajeno ? ' (Flash en turno ajeno: el doble)' : ''}`,
       alClic: () => { AvisoCombate.cerrar(); desarmarUsar(o); }}; });
   botones.push({texto: 'Cancelar', sec: true, alClic: () => AvisoCombate.cerrar()});
   AvisoCombate.mostrar({icono: '🤺', titulo: 'Desarmar', botones, texto: '¿Quién intenta desarmar?'});
 }
 async function desarmarUsar(o){
-  const k = desarmeCosto(o), otro = o.d[o.lado === 'atacante' ? 'defensor' : 'atacante'];
+  let k = desarmeCosto(o);
+  const otro = o.d[o.lado === 'atacante' ? 'defensor' : 'atacante'];
+  if(o.pj){   // el Warrior: pregunta el Flash (en turno ajeno, el doble) antes de marcar
+    const pago = await ConfirmarTurno.flash('Desarmar', {sp: num(o.pj.sp)}, {quien: o.nombre, spAjeno: num(o.pj.spAjeno) || num(o.pj.sp) * 2, ident: {nombre: o.nombre, ref: o.pj.fichaId}});
+    if(!pago) return;
+    k = {...k, sp: num(pago.sp), txt: `${fmt(num(pago.sp))} SP`};
+  }
   let ok = false;
-  try{ ok = await Duelo.marcarDesarme(o.id, o.lado, {nombre: o.h.nombre || 'Desarmar', quien: o.sc.nombre}); }catch(err){ console.error('Desarmar: no se pudo marcar', err); }
+  try{ ok = await Duelo.marcarDesarme(o.id, o.lado, {nombre: (o.h && o.h.nombre) || 'Desarmar', quien: o.nombre}); }catch(err){ console.error('Desarmar: no se pudo marcar', err); }
   if(!ok){ toast('No se pudo: el Bloqueo ya se tiró o alguien ya intenta desarmar'); return; }
-  try{
+  if(o.pj){
+    let falta = null;
+    const cobro = await editarPersonajeMapa(o.pj.fichaId, async S => {
+      const disp = Math.max(0, FichaBotonera.spMaximo(S, FichaCalculo.calcular(S)) - num(S.spGastado));
+      if(disp < k.sp){ falta = disp; return false; }
+      FichaAcciones.gastarSp(S, k.sp, {fijarHp: v => mantFijarHp(S, v), toast}, 'Desarmar');   // 🩸 Maldito
+      return true;
+    }).catch(err => { console.error('Desarmar: no se pudo cobrar', err); return false; });
+    if(!cobro) toast(falta !== null ? `✋ No te alcanzaba el SP (tenés ${fmt(falta)}): ajustalo a mano` : `✋ Cobrale a mano el Desarmar a ${o.nombre} (${k.txt})`);
+  }else try{
     await modificarCreep(String(o.sc.id || o.d[o.lado].ref), s => {
       const hh = (s.habilidades || []).find(x => x.id === o.h.id);
       if(CreepCalculo.modoSP(s)) s.sp = Math.max(0, num(CreepCalculo.spActual(s)) - k.sp);
       else if(hh) hh.cdActual = Math.max(num(hh.cdActual), k.cd);
       return {};
     });
-  }catch(err){ console.error('Desarmar: no se pudo cobrar', err); toast(`✋ Cobrale a mano el Desarmar a ${o.sc.nombre} (${k.txt})`); }
-  mesaLinea(`🤺 ${o.sc.nombre} intenta desarmar a ${otro.nombre}: ${o.lado === 'atacante' ? 'su Fuerza del golpe' : 'su Bloqueo'} vale como Desarmar · ${k.txt}${k.ajeno ? ' (Flash en turno ajeno: el doble)' : ''}`, 'recordatorio');
-  try{ momentoAbrir({tipo: 'desarme-intento', icono: '🤺', titulo: `${o.sc.nombre} intenta desarmar a ${otro.nombre}`, estado: 'listo', resultado: 'Si gana el Bloqueo, el otro pierde lo que tiene en la mano'}); }catch(e){}
+  }catch(err){ console.error('Desarmar: no se pudo cobrar', err); toast(`✋ Cobrale a mano el Desarmar a ${o.nombre} (${k.txt})`); }
+  mesaLinea(`🤺 ${o.nombre} intenta desarmar a ${otro.nombre}: ${o.lado === 'atacante' ? 'su Fuerza del golpe' : 'su Bloqueo'} vale como Desarmar · ${k.txt}${k.ajeno ? ' (Flash en turno ajeno: el doble)' : ''}`, 'recordatorio');
+  try{ momentoAbrir({tipo: 'desarme-intento', icono: '🤺', titulo: `${o.nombre} intenta desarmar a ${otro.nombre}`, estado: 'listo', resultado: 'Si gana el Bloqueo, el otro pierde lo que tiene en la mano'}); }catch(e){}
 }
 
 /* El duelo terminó «desarmado» (gancho `desarmado` de Duelo.escuchar, js/14; solo el GM): la ruleta de casillas en todas las pantallas (un momento)
    y, cuando frena, el arma o el escudo al piso (armaSoltar, js/27) y, si era el arma, Desarmado. */
 async function desarmadoResuelto(d){
-  const ds = d.desarme || {}, ladoV = ds.lado === 'atacante' ? 'defensor' : 'atacante', v = d[ladoV], t = v && tokens.get(v.tokenId);
+  const ds = (d.ataque && d.ataque.desarme) || {}, ladoV = ds.lado === 'atacante' ? 'defensor' : 'atacante', v = d[ladoV], t = v && tokens.get(v.tokenId);
   const gano = (d[ds.lado] || {}).nombre || 'Alguien';
   if(!t){ mesaLinea(`🤺 ${gano} desarmó a ${(v && v.nombre) || 'alguien'}: ✋ dejá su arma en el piso a mano`, 'recordatorio'); return; }
   const itemId = ladoV === 'defensor' ? ((d.defensa && d.defensa.itemId) || '') : ((d.ataque && d.ataque.armaId) || '');

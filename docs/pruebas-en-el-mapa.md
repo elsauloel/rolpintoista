@@ -44,6 +44,11 @@
   la tabla de números, «Lo que hace cada uno» (la ficha corta de los dos, lado a lado: el hechizo de la varita, los efectos al golpear, lo de un
   talismán) y un número que no aplica a uno de los dos sale «—» sin flecha. Visto en el mapa: Varita arcana contra Cuchillo, Farol contra Tapa de
   tacho, Hacha contra Cuchillo (capturas enviadas al dueño).
+- [ ] **✨ Levantar con un clic** (dueño, 2026-10-22, js/27 `levantadorPara`/`armaClicLevantar`): un arma u objeto en el piso, encima o al lado
+  de tu personaje, titila con un anillo dorado (en combate, solo en tu turno; fuera de combate, siempre). Clic sobre él → «X está en el suelo.
+  ¿Querés levantarlo? (cuesta 1 No2)» Sí/No; si va en la mano y hay una libre, «¿Querés dejarlo equipado?» Sí (en la mano) / No (a la mochila);
+  con las manos ocupadas, reemplazar o a la mochila. Probado por Claude con juan (titila; la pregunta y levantar; la primera vez, estando
+  Desarmado, se equipó sin preguntar: corregido para que pregunte siempre). Falta verlo el dueño, y en combate (en tu turno y fuera de él).
 - [ ] **🤺 Desarmar, ofensivo y defensivo** (dueño, 2026-10-22): probado por Claude en «Claude · pruebas» los cuatro caminos (atacando y
   defendiendo, gana y falla) con el Ladrón (prueba) y juan; falta que lo vea el dueño: el cartel «¡X desarmó a Y!» con Aceptar, el duelo que se
   achica, la ruleta en círculo, el duelo que vuelve con «¡DESARMADO!» y «Terminar duelo»; y un Warrior (personaje) desarmando desde su cuenta.

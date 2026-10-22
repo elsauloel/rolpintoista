@@ -11,11 +11,15 @@ function armasCercaDe(t){
   if(!t) return [];
   const ref = armaRefDe(t), out = [];
   elementos.forEach((el, id) => {
-    if(!el.arma || !el.origen) return;
+    if(!el.arma || !el.origen || !puedeLevantarla(el, t)) return;
     if(distanciaHex(t, el.origen) <= 1) out.push({id, nombre: el.armaNombre || 'Arma', propia: el.armaDe === ref});
   });
   return out;
 }
+/* 🔒 Por ahora, un arma que se cayó la levanta solo su dueño (dueño, 2026-10-22: «una regla implícita de que solamente el dueño del arma lo puede
+   levantar por ahora, y evitamos narrativamente»). Hasta que los creeps tengan inventario (docs/pendientes.md): hoy el arma de un creep no es un
+   ítem, y si otro se la llevaba el creep la seguía teniendo. Lo que no tiene dueño conocido (una flecha que erró) lo levanta cualquiera. */
+const puedeLevantarla = (el, t) => !el.armaDe || (!!t && el.armaDe === armaRefDe(t));
 // ¿Su arma está en el piso, en algún lado del mapa? (la Botonera no le ofrece «levantarla» sin ir a buscarla)
 function armaPropiaEnElPiso(t){
   const ref = armaRefDe(t);
@@ -110,6 +114,7 @@ async function armaSoltar(t, vuela, o){
 async function armaLeer(elId, t){   // → {it, propia} o null
   const el = elementos.get(elId);
   if(!el || !el.arma){ toast('Esa arma ya no está en el piso'); return null; }
+  if(!puedeLevantarla(el, t)){ toast(`🔒 Por ahora, ${el.armaNombre || 'esa arma'} solo la puede levantar su dueño`); return null; }
   if(t && el.origen && distanciaHex(t, el.origen) > 1 && !(await AvisoCombate.preguntar(`${el.armaNombre || 'El arma'} está a ${distanciaHex(t, el.origen)} casillas: hay que estar al lado. ¿Levantarla igual?`, {icono: '🗡', titulo: 'Levantar el arma', si: 'Sí, levantarla'}))) return null;
   let it = {};
   try{ it = JSON.parse(el.armaItem || '{}') || {}; }catch(e){}
@@ -162,7 +167,7 @@ function levantadorPara(el){   // → {id, t} del personaje mío que lo puede le
   if(!el || !el.arma || !el.origen || typeof puedoMover !== 'function') return null;
   for(const [id, t] of tokens){
     if(!t || t.tipo !== 'pj' || String(t.fichaId || '').includes(SEP_INVOCACION) || !puedoMover(t)) continue;
-    if(distanciaHex(t, el.origen) > 1) continue;
+    if(distanciaHex(t, el.origen) > 1 || !puedeLevantarla(el, t)) continue;   // 🔒 solo su dueño, por ahora
     if(modoMapa === 'combate' && typeof esSuTurno === 'function' && esSuTurno(id) === false) continue;
     return {id, t};
   }

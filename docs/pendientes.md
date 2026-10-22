@@ -274,6 +274,8 @@
 >   (2026-10-22: buscar «occlusion», no «occluded»: «Auto picture in picture on window occluded» es otra cosa, la de los videos. Si la de
 >   «Calculate window occlusion» ya no está en esa versión de Chrome, se hace desde el acceso directo de Chrome: Propiedades → Destino, al final,
 >   ` --disable-features=CalculateNativeWinOcclusion --disable-backgrounding-occluded-windows`; cerrar todo Chrome y abrirlo desde ese acceso.)
+>   (2026-10-22: en Chrome 155 el flag ya no está y el ícono de la barra de tareas no tiene Propiedades: Claude dejó en el escritorio el acceso
+>   **«Chrome (pruebas del mapa)»** con esas dos opciones. Falta que el dueño cierre Chrome del todo — ⋮ → Salir — y lo abra desde ahí.)
 > - [ ] **🔍 Revisión de cerca de ballestas y arcos, sobre todo ballestas** (dueño, 2026-10-10): hacerla juntos, **con el dueño en la compu y con
 >   tiempo** (no es para hacer solo ni desde el celular). Una por una, calidad por calidad: números, nombres, rasgos, el Rango como bono (falta Buena para arriba) y los virotes.
 > - [ ] **🎯 La línea de tiro para todo lo que es a distancia** (dueño, 2026-10-10): el sistema de trayectoria de arcos y ballestas (línea que

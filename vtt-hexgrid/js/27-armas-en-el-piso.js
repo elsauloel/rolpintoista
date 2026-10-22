@@ -18,7 +18,7 @@ function armasCercaDe(t){
 }
 /* 🔒 Por ahora, un arma que se cayó la levanta solo su dueño (dueño, 2026-10-22: «una regla implícita de que solamente el dueño del arma lo puede
    levantar por ahora, y evitamos narrativamente»). Hasta que los creeps tengan inventario (docs/pendientes.md): hoy el arma de un creep no es un
-   ítem, y si otro se la llevaba el creep la seguía teniendo. Lo que no tiene dueño conocido (una flecha que erró) lo levanta cualquiera. */
+   ítem, y si otro se la llevaba el creep la seguía teniendo. Una flecha que erró es de quien la tiró (js/33); lo que no tiene dueño conocido (armas viejas en el piso) lo levanta cualquiera. */
 const puedeLevantarla = (el, t) => !el.armaDe || (!!t && el.armaDe === armaRefDe(t));
 // ¿Su arma está en el piso, en algún lado del mapa? (la Botonera no le ofrece «levantarla» sin ir a buscarla)
 function armaPropiaEnElPiso(t){

@@ -63,7 +63,8 @@ async function flechaErrada(d){
     await coleccionElementos().add({
       tipo: 'flor', origen: celda, celdas: [0, 0], rotacion: 0, color: '#C9C9C9', alfa: 0, solido: false, invisible: false,
       imagen: '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: true,
-      arma: true, armaNombre: String(fl.nombre).slice(0, 60), armaDe: '', armaItem: JSON.stringify(item).slice(0, 6000),
+      arma: true, armaNombre: String(fl.nombre).slice(0, 60), armaItem: JSON.stringify(item).slice(0, 6000),
+      armaDe: typeof armaRefDe === 'function' ? armaRefDe(tA) : '',   // 🔒 de quien la tiró: por ahora solo él la levanta (js/27, 2026-10-22)
       duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
     });
     mesaLinea(`🏹 ${flLa(fl)} de ${quien} erró${choco ? ', chocó contra un obstáculo (moneda: 2)' : ''} y quedó ${flEntera(fl)} en el piso, a ${distanciaHex(tA, celda)} casillas (se puede levantar)`, 'recordatorio');

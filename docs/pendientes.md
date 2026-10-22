@@ -63,8 +63,8 @@
 >   una tarea pendiente y cuando tenga tiempo de programarlo lo hago»). Que un creep humanoide (y una invocación) use las mismas armas, escudos y
 >   talismanes que un jugador, con una especie de inventario: si levanta un arma, guarda la suya y después las cambia. Hoy el arma de un creep son
 >   datos fijos (armaNombre, armaTipo…), no un ítem. Primero el plan por pasos (sin programar): docs/plan-inventario-creeps.md; ver P217.
->   **Mientras tanto (provisorio):** un arma que se cayó la levanta solo su dueño (vtt-hexgrid/js/27, `puedeLevantarla`); lo que no tiene dueño
->   (una flecha que erró) lo levanta cualquiera. Al hacerlo, sacar esa regla.
+>   **Mientras tanto (provisorio):** un arma que se cayó la levanta solo su dueño (vtt-hexgrid/js/27, `puedeLevantarla`), y una flecha que
+>   erró es de quien la tiró; lo que no tiene dueño conocido lo levanta cualquiera. Al hacerlo, sacar esa regla.
 
 > - [ ] **📣 Refuerzos en el editor de creeps** (2026-10-16): la mecánica ya anda (`refuerzos: {cant}`, la Plaga de las ratas), pero el editor
 >   de habilidades de creep no tiene un campo para armarla; hoy se carga el dato. Sumar un paso «¿Llama refuerzos? ¿cuántos?».

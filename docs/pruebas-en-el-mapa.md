@@ -161,6 +161,9 @@
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 
 ## Pendientes
+- [ ] **🎒 Botín con los ítems tal cual** (2026-10-22, paso 6 de `docs/plan-inventario-creeps.md`): en un fin de combate real, que un jugador se
+  lleve una varita o un talismán que tenía un creep y que en su mochila funcione igual que el del catálogo (el poder de la varita, el efecto del
+  talismán). Lo armado ya se revisó con los creeps de «Claude · pruebas», sin publicar el botín.
 - [x] **💀 Invocaciones que desaparecen** — probado en el mapa el 2026-10-22 («Claude · pruebas», desde la cuenta del GM tocando la ficha de
   Clementino): con el Lobo vivo e invocado y una daga suya en el piso, al bajarle la vida a 0 se fue del mapa y del orden con «💀 Lobo de prueba
   desaparece: murió» (una sola línea) y la daga se desvaneció; puesto de nuevo y dormido (turnos en 0), «✨ … desaparece: se terminaron sus turnos».

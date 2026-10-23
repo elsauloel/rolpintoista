@@ -120,6 +120,13 @@ pública del creep, que leen los jugadores), se calculan a partir del ítem en l
    tenerla en la mano (la ✋ se fue). Pruebas: 565 en verde. Queda para la limpieza (paso 8): los botones viejos de «Levantar el arma» por el estado.
 6. **El botín usa los ítems tal cual:** lo que el creep tenía (en la mano y guardado, menos lo natural) cae con todas sus mecánicas (varitas,
    talismanes, rasgos).
+   **Hecho (2026-10-22):** `CombateFin.plantillaPieza` arma cada ítem del botín entero: si está en el catálogo de fábrica, el ítem completo de ahí
+   (el catálogo que reciben el mapa y GM Tools viene en la forma de un creep, recortado: por eso se busca en `CATALOGO_BASE`); si no, la pieza
+   misma del creep en la forma de un ítem de personaje (la Defensa adentro de los mods), con su precio o uno estimado. Se sacan solo las marcas de
+   creep (`id`, `equipado`, `invocada*`…). Los drops fijos también salen enteros. Probado con los creeps reales de «Claude · pruebas» (sin publicar
+   el botín): la Varita arcana del Goblin 3 y la Varita de chispa eléctrica de la Bruja caen con su poder igual al del catálogo (antes llegaban a la
+   mochila sin él); lo guardado de la Bruja (arco, escudos) también aparece. Pruebas: 566 en verde. Lo subido por el grupo que no está
+   en la fábrica sale en la forma de creep (con su magia y sus rasgos, que `itemParaCreep` ya conserva).
 7. **Editores:** GM Tools (equipar/desequipar del creep), la ventana de la invocación en la ficha y el editor común muestran «En las manos» y
    «Guardado», con las mismas piezas del personaje.
 8. **Limpieza:** se borran los datos sueltos y los caminos viejos (incluidas las pruebas que los usan), cuando todo lo anterior ande en una sesión real.

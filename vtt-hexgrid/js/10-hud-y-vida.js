@@ -836,7 +836,7 @@ function elementoQueEs(e){
   // 🗡 El arma en el piso (2026-10-07, js/27): su nombre, de quién era y cómo se levanta (el cartel de arriba a la derecha, como un token).
   if(e.arma){
     const [ref, tipo] = String(e.armaDe || '').split('|'), t = [...tokens.values()].find(x => x.fichaId === ref && (x.tipo === 'creep' ? 'creep' : 'pj') === tipo);
-    return `<b>🗡️ ${esc(e.armaNombre || 'Arma')}</b>${t ? ` <span>(se le cayó a ${esc(nombreDe(t))})</span>` : ''}<div class="que-hace">En el piso: la levanta cualquiera que esté encima o al lado, por 1 No2, desde su Botonera.</div>`;
+    return `<b>${iconoDeElemento(e)} ${esc(e.armaNombre || 'Arma')}</b>${t ? ` <span>(se le cayó a ${esc(nombreDe(t))})</span>` : ''}<div class="que-hace">En el piso: la levanta cualquiera que esté encima o al lado, por 1 No2, desde su Botonera.</div>`;
   }
   if(e.zona){
     const t = num(e.turnos) > 0 && mantenimientoNumero !== null ? Math.max(0, num(e.venceMant) - Math.round(num(mantenimientoNumero))) : 0;

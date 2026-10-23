@@ -109,7 +109,7 @@ async function armaSoltar(t, vuela, o){
 async function armaLeer(elId, t){   // → {it, propia} o null
   const el = elementos.get(elId);
   if(!el || !el.arma){ toast('Esa arma ya no está en el piso'); return null; }
-  if(t && el.origen && distanciaHex(t, el.origen) > 1 && !(await AvisoCombate.preguntar(`${el.armaNombre || 'El arma'} está a ${distanciaHex(t, el.origen)} casillas: hay que estar al lado. ¿Levantarla igual?`, {icono: '🗡', titulo: 'Levantar el arma', si: 'Sí, levantarla'}))) return null;
+  if(t && el.origen && distanciaHex(t, el.origen) > 1 && !(await AvisoCombate.preguntar(`${el.armaNombre || 'El arma'} está a ${distanciaHex(t, el.origen)} casillas: hay que estar al lado. ¿Levantarla igual?`, {icono: iconoDeElemento(el), titulo: 'Levantar el arma', si: 'Sí, levantarla'}))) return null;
   let it = {};
   try{ it = JSON.parse(el.armaItem || '{}') || {}; }catch(e){}
   if(it.invocadaDe) toast(`✨ ${it.nombre || 'Esta arma'} es invocada: dura mientras ${it.invocadaNombre || 'su invocación'} siga en combate`);
@@ -127,6 +127,47 @@ async function bnEsperarGuardado(){
   const f = bn.sesion, pend = () => FichaSesion.pendiente(f, () => FichaGuardado.partes(bn.S));
   for(let i = 0; i < 20 && pend(); i++) await new Promise(r => setTimeout(r, 500));
   return !pend();
+}
+/* El ícono de lo que está en el piso (dueño, 2026-10-23): espadas y dagas (Tipo 4 y 6) 🗡️, hachas (Tipo 8) 🪓, contundentes (Tipo 10) 🔨,
+   Tipo 12 💣, escudos 🛡️, talismanes y orbes 🔮, arcos y ballestas 🏹, flechas y virotes especiales 🪶, varitas y báculos 🪄 (por el
+   Expelliarmus), honda 🪨. Primero lo que es; si no, por el Tipo.
+   Se usa en la ficha redonda del piso, en los carteles de «Levantar», en la Mesa y en la ruleta del desarme (js/62). */
+function iconoDeItem(it){
+  if(!it) return '🗡️';
+  const nom = String(it.nombre || '');
+  if(it.flecha) return '🪶';
+  if(it.orbe || it.talisman) return '🔮';
+  if(it.especial || /^(varita|báculo|baculo)/i.test(nom)) return '🪄';
+  if(Combatiente.esEscudo(it)) return '🛡️';
+  if(Combatiente.esHonda(it) || /^honda/i.test(nom)) return '🪨';
+  if(Combatiente.esArco(it) || Combatiente.recargaDe(it) || /^(arco|ballesta)/i.test(nom)) return '🏹';
+  const tipo = Math.round(num(it.tipoDado));
+  return tipo >= 12 ? '💣' : tipo >= 10 ? '🔨' : tipo >= 8 ? '🪓' : '🗡️';
+}
+const iconosElemento = new Map();   // armaItem (texto) → ícono
+function iconoDeElemento(el){
+  const txt = String((el && el.armaItem) || '');
+  if(!iconosElemento.has(txt)){
+    let it = null;
+    try{ it = JSON.parse(txt || '{}'); }catch(e){}
+    iconosElemento.set(txt, iconoDeItem({nombre: el && el.armaNombre, ...(it || {})}));
+  }
+  return iconosElemento.get(txt);
+}
+// Lo que tiene en la mano un token, por su id o su nombre (para la ruleta del desarme, antes de que caiga): un creep, de su ficha privada; un
+// personaje, de la Botonera si está abierta; si no, del catálogo por el nombre.
+function iconoDeArmaDe(t, itemId, itemNombre){
+  let it = null;
+  try{
+    if(t && t.tipo === 'creep'){
+      const sc = typeof creepPrivadoDe === 'function' && creepPrivadoDe(t.fichaId);
+      if(sc) it = Combatiente.equipoPuesto(sc).find(e => (itemId && e.id === itemId) || e.nombre === itemNombre) || null;
+    }else if(t && bn && bn.S && bn.fichaId === t.fichaId){
+      it = (bn.S.inventario || []).find(e => (itemId && e.id === itemId) || e.nombre === itemNombre) || null;
+    }
+    if(!it && Array.isArray(window.CATALOGO_BASE)) it = window.CATALOGO_BASE.find(e => e.nombre === itemNombre) || null;
+  }catch(e){ console.error(e); }
+  return iconoDeItem(it || {nombre: itemNombre});
 }
 // Se dibuja como una ficha REDONDA (dueño, 2026-10-07: lo que no es un personaje ni una criatura va redondo, para distinguirlo de los tokens
 // hexagonales), con el 🗡️ adentro; su nombre sale en el cartel de arriba a la derecha al seleccionarla, como el de un token (js/10
@@ -149,7 +190,7 @@ function armaDibujar(el, z){
   ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
   ctx.font = `700 ${R * 1.05}px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", system-ui, sans-serif`;
   ctx.fillStyle = '#EDE3D2';   // (si el 🗡️ sale en blanco y negro, que se vea claro sobre el fondo oscuro)
-  ctx.fillText(/"flecha"\s*:/.test(String(el.armaItem || '')) ? '🏹' : '🗡️', p.x, p.y + R * 0.06);   // una flecha especial que erró (js/33)
+  ctx.fillText(iconoDeElemento(el), p.x, p.y + R * 0.06);
   ctx.restore();
 }
 
@@ -190,7 +231,7 @@ async function armaLevantarDesdeMapa(elId){
   if(!quien) return;
   const nombre = el.armaNombre || 'Este objeto';
   const si = await AvisoCombate.preguntar(`${nombre} está en el suelo.\n¿${quien.t.tipo === 'creep' ? `Lo levanta ${nombreDe(quien.t)}` : 'Querés levantarlo'}? (cuesta ${fmt(Combatiente.COSTO_LEVANTAR_ARMA)} No2)`,
-    {icono: /"flecha"\s*:/.test(String(el.armaItem || '')) ? '🏹' : '🗡️', titulo: 'Levantar', si: 'Sí, levantarlo', no: 'No'});
+    {icono: iconoDeElemento(el), titulo: 'Levantar', si: 'Sí, levantarlo', no: 'No'});
   if(!si) return;
   if(quien.t.tipo === 'creep'){ await acLevantarArmaDe(quien.t.fichaId, elId); return; }   // 👹 un creep (el GM)
   // La sesión del personaje (la de la Botonera nueva): si no está abierta, se abre escondida, solo para esto.
@@ -225,7 +266,7 @@ function levantadoElegir(S, it, quien){
       botones.push({texto: libre ? '🎒 No, a la mochila' : '🎒 A la mochila', sec: true, alClic: () => fin({destino: 'mochila', soltar: []})});
       const pasos = [{titulo: libre ? 'Tenés una mano libre' : 'Tenés las manos ocupadas', texto: libre ? '¿Querés dejarlo equipado?' : `¿Lo cambiás por lo que tenés en la mano (cuesta ${fmt(extra)} No2 más) o lo guardás?`}];
       if(comparando) manos.forEach(m => pasos.push({titulo: `${it.nombre} contra ${m.nombre}`, texto: compararTexto(it, m)}));
-      AvisoCombate.mostrar({clave: 'levantar', icono: '🗡️', titulo: `${quien} levanta ${it.nombre}`, pasos, botones, alCerrar: () => fin({destino: 'mochila', soltar: []})});
+      AvisoCombate.mostrar({clave: 'levantar', icono: iconoDeItem(it), titulo: `${quien} levanta ${it.nombre}`, pasos, botones, alCerrar: () => fin({destino: 'mochila', soltar: []})});
     };
     dibujar();
   });
@@ -277,7 +318,7 @@ async function bnLevantarArma(elId){
       toast(`Se te adelantaron: ${x.it.nombre} ya no está en el piso`);
       return;
     }
-    mesaLinea(`${x.it.flecha ? '🏹' : '🗡️'} ${quien} levantó ${x.it.nombre}${r.destino === 'mano' ? ' y lo tiene en la mano' : alCarcaj ? ' (al carcaj)' : ' (a la mochila)'}${r.soltar.length ? ` · guardó ${r.soltar.map(i => i.nombre).join(' y ')} (+${fmt(costo)} No2)` : ''}`);
+    mesaLinea(`${iconoDeItem(x.it)} ${quien} levantó ${x.it.nombre}${r.destino === 'mano' ? ' y lo tiene en la mano' : alCarcaj ? ' (al carcaj)' : ' (a la mochila)'}${r.soltar.length ? ` · guardó ${r.soltar.map(i => i.nombre).join(' y ')} (+${fmt(costo)} No2)` : ''}`);
   };
   if(num(S.nitros) < costo) bnSinNitros(costo, 'levantar el arma', () => seguir()); else seguir();
 }
@@ -295,7 +336,7 @@ function levantadoElegirCombatiente(x, it, quien){
     const botones = libres >= necesita ? [{texto: '✋ Sí, en la mano', alClic: () => fin({equipar: true, soltar: []})}, guardar]
       : [...(necesita === 2 || enManos.length === 1 ? [{texto: `🔁 Reemplazar ${enManos.map(e => e.nombre).join(' y ')} (+${fmt(extra)} No2)`, detalle: 'eso pasa a guardado', alClic: () => fin({equipar: true, soltar: enManos.map(e => e.id)})}]
         : enManos.map(e => ({texto: `🔁 Reemplazar ${e.nombre} (+${fmt(extra)} No2)`, detalle: `${e.nombre} pasa a guardado`, alClic: () => fin({equipar: true, soltar: [e.id]})}))), guardar];
-    AvisoCombate.mostrar({clave: 'levantar', icono: '🗡️', titulo: `${quien} levanta ${it.nombre}`, botones,
+    AvisoCombate.mostrar({clave: 'levantar', icono: iconoDeItem(it), titulo: `${quien} levanta ${it.nombre}`, botones,
       pasos: [{titulo: libres >= necesita ? 'Tiene una mano libre' : 'Tiene las manos ocupadas', texto: libres >= necesita ? '¿Lo deja en la mano?' : `¿Lo cambia por lo que tiene en la mano (cuesta ${fmt(extra)} No2 más) o lo guarda?`}],
       alCerrar: () => fin({equipar: false, soltar: []})});
   });
@@ -331,7 +372,7 @@ async function bnInvLevantarArma(invId, elId){
     toast(`Se te adelantaron: ${x.it.nombre} ya no está en el piso`);
     return;
   }
-  mesaLinea(`🗡️ ${inv.nombre} levantó ${x.it.nombre}${r.equipar ? ' y lo tiene en la mano' : ' (guardado)'}`);
+  mesaLinea(`${iconoDeItem(x.it)} ${inv.nombre} levantó ${x.it.nombre}${r.equipar ? ' y lo tiene en la mano' : ' (guardado)'}`);
 }
 async function acLevantarArma(elId){
   if(typeof ac === 'undefined' || !ac || !ac.creepId) return;
@@ -357,7 +398,7 @@ async function acLevantarArmaDe(creepId, elId){
     toast(`Se te adelantaron: ${x.it.nombre} ya no está en el piso`);
     return;
   }
-  mesaLinea(`🗡️ ${sc0.nombre} levantó ${x.it.nombre}${r.equipar ? ' y lo tiene en la mano' : ' (guardado)'}`, 'recordatorio', sc0.nombre);
+  mesaLinea(`${iconoDeItem(x.it)} ${sc0.nombre} levantó ${x.it.nombre}${r.equipar ? ' y lo tiene en la mano' : ' (guardado)'}`, 'recordatorio', sc0.nombre);
   if(typeof ac !== 'undefined' && ac && ac.creepId === creepId && ac.host && !ac.host.hidden && typeof acDibujar === 'function') acDibujar();
 }
 // ✋ Paso 5 (2026-10-22, D1): sin nada en la mano (lo publicado: `sinArma` del creep, de la invocación o del personaje). El token lo muestra en combate (js/05).

@@ -194,7 +194,7 @@ async function desarmadoResuelto(d){
   const celdas = anillo.length ? anillo : [{col: t.col, fila: t.fila}];
   const elegida = Math.floor(Math.random() * celdas.length);
   try{ momentoAbrir({tipo: 'desarme', icono: '🤺', titulo: `¡${gano} desarma a ${nombreDe(t)}!`, estado: 'listo', resultado: `${itemNombre} sale volando`,
-    datos: {celdas: celdas.map(c => ({c: c.col, f: c.fila})), elegida, duelo: d.id}}); }catch(err){ console.error('Desarmar: el momento', err); }   // (objetos: Firestore no guarda listas dentro de listas)
+    datos: {celdas: celdas.map(c => ({c: c.col, f: c.fila})), elegida, duelo: d.id, icono: iconoDeArmaDe(t, itemId, itemNombre)}}); }catch(err){ console.error('Desarmar: el momento', err); }   // (objetos: Firestore no guarda listas dentro de listas)
   await new Promise(r => setTimeout(r, DESARME_RULETA_MS + 300));
   const s = await armaSoltar(t, 0, {celda: celdas[elegida], itemId, itemNombre});
   // (Desde el paso 5, 2026-10-22, ya no queda Desarmado: lo que se cayó salió de su mano, y sin nada en la mano pega sin arma.)
@@ -242,7 +242,7 @@ async function desarmeRuleta(id, datos){
   // desde el principio, en vez de ir rápido casi todo el tiempo y frenar de golpe al final.
   const pasos = n * DESARME_VUELTAS + fin + 1, tiempos = [];
   for(let i = 0; i < pasos; i++) tiempos.push(DESARME_RULETA_MS * (1 - Math.sqrt(1 - i / pasos)));
-  efectosRuleta.push({celdas, fin, pasos, tiempos, desde: Date.now()});
+  efectosRuleta.push({celdas, fin, pasos, tiempos, desde: Date.now(), icono: String(datos.icono || "🗡️").slice(0, 8)});
   pedirDibujo();
 }
 function dibujarEfectosRuleta(){
@@ -266,7 +266,7 @@ function dibujarEfectosRuleta(){
         ctx.lineWidth = 1.5; ctx.strokeStyle = 'rgba(255,205,90,.45)'; ctx.stroke();
       }
     });
-    if(quieto){ const p = fx.celdas[fx.fin]; ctx.font = `${Math.round(HEX * 0.9)}px system-ui,sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🗡', p.x, p.y); }
+    if(quieto){ const p = fx.celdas[fx.fin]; ctx.font = `${Math.round(HEX * 0.9)}px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", system-ui, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(fx.icono || '🗡️', p.x, p.y); }
     ctx.restore();
     activo = true;
   }

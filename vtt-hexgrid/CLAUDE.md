@@ -1721,6 +1721,10 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   (`modificarCreep` + `EstadosAplicar.aplicarACreep`, o `editarPersonajeMapa` + `FichaAcciones.aplicarEstadoRecibido`; «cae»: `sc.hp = 0` /
   `fijarHp(S, 0)`). Las zonas que tiran solas (js/08) abren el momento directo en `aplicar` (`zonaExtraAplicarDirecto`). El GM, desde la Crónica,
   «✔ Que se aplique (por él)» y «◎ Aplicar por él».
+- **🤝 Zafarse con ayuda, en simultáneo** (2026-10-23, dueño; js/54): al tirar para soltarse al empezar su turno, si el estado lleva `soltar.ayuda` y
+  hay aliados pegados (`aliadosParaZafar`), el momento `soltar-ayuda` le pregunta a la pantalla de cada uno «¿Lo ayudás?» (`soltarAyudaMomento`,
+  js/16); las tiradas se suman (`conAyudaSumada`) y con ayuda paga 1 No2 cada uno (el atrapado también); sola sigue gratis. Ayudar es defensivo:
+  se puede quedar en No2 negativos, no si ya estaba en negativo. `difMin` (comun/combatiente.js): la dificultad de un pergamino nunca baja de eso.
 - **👊 Patotear / Jauría** (2026-10-21, `js/65-patota.js`): un ataque con `manada` (el tope); `patotaBonos` (desde `dueloElegirObjetivoMapa`, js/13, después de
   la herida) cuenta los aliados del mismo tipo pegados al objetivo (`patotaAliados`: sin caídos ni bajo tierra) y suma +1 dado por cada uno, hasta el tope.
 - **🩸 Sal en la herida / Morder la herida** (2026-10-21, `js/64-herida.js`): un ataque con `abrirHerida`; `heridaBonos` (desde

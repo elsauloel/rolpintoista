@@ -111,7 +111,11 @@
   Red atrapó a juan (Inmovilizado, Fuerza contra 1, ayuda sí); Clementino, pegado, vio en su Botonera «🤝 Ayudar a soltar a juan · Fuerza contra 1 · 1
   No2» → Fuerza 3 → «¡LO SOLTÓ!», −1 No2 (10 → 9) y a juan se le fue el Inmovilizado (por aviso a su ficha); (B) entre creeps: juan le tiró el
   Pergamino de red Nerubian al Escarabajo (PdG.Esp 4 contra Evasión 1 → Inmovilizado, Fuerza contra 14); el Goblin, pegado, vio en sus Acciones «🤝
-  Ayudar a soltar a Escarabajo… · Fuerza contra 14 · 1 No2» → 1 contra 14 → «SIGUE ATRAPADO», −1 No2 igual (6 → 5). (2026-10-21): Probabilidad de Golpe contra Evasión; Inmovilizado; soltarse al empezar su turno; la ayuda de un aliado.
+  Ayudar a soltar a Escarabajo… · Fuerza contra 14 · 1 No2» → 1 contra 14 → «SIGUE ATRAPADO», −1 No2 igual (6 → 5).
+  **Zafarse con ayuda en simultáneo (2026-10-23, regla nueva del dueño), probado el mismo día**: al empezar su turno el Escarabajo (atrapado, Fuerza
+  contra 14) vio «Pueden ayudarlo Goblin de prueba 1…»; al tirar, al Goblin le salió «¿Lo ayudás?» y el atrapado «Esperando a…»; Sí → «5 + Goblin 1
+  = 6 contra 14, con ayuda: sigue atrapado», 1 No2 cada uno. Entre personajes: juan (Fuerza contra 5) con Clementino → «3 + Clementino 4 = 7
+  contra 5: ¡SE SOLTÓ!», juan 8 → 7 No2, Clementino 10 → 9, y se le fue el Inmovilizado. (2026-10-21): Probabilidad de Golpe contra Evasión; Inmovilizado; soltarse al empezar su turno; la ayuda de un aliado.
 - [x] **🤼 Agarrón / Abrazo aplastante** — probado el 2026-10-21: Agarrado y Agarrando (la bestia no se suelta sola a los 10 s); Silvia no se soltó (4 contra 5) y el apretón le hizo 9 − 3 = 6; al empezar el turno de la bestia, se fueron los dos estados. El Agarrón, sin daño, igual. **Arreglado**: el cartel decía «el mordisco» en vez de «el apretón». (2026-10-21): Agarrado y Agarrando; soltarse; el apretón repite el daño (el Abrazo); suelta al empezar el turno de la bestia.
 - [x] **🛡 Aguante** — probado el 2026-10-21 (modo cooldown): el anuncio, +2 Defensa y +2 Def.Esp, 1 No2 y cooldown 3; contó 2 golpes (uno que la armadura frenó del todo); con ▶ Siguiente quedó la revancha (2) y se fue el estado; al Atacar, el cartel «Modo aguante» (+2d4, +2 de cooldown) y el duelo con «+2 dados de daño». **Completado el 2026-10-23** («Claude · pruebas»): **modo SP** (el Escarabajo de cobre: 1 No2 + 1 SP, sin cooldown, anuncio con
   el tope); **el tope nivel + 1** (con 4 golpes: «+3d6 (el tope es su nivel + 1: 3). Cuesta 3 SP»); **se pierde si no ataca** (canceló el ataque,

@@ -1158,7 +1158,7 @@ bestia (un oso hormiguero) «puede parrear con sus garras y obligar a desarmar a
   mismas armas, escudos y talismanes que un jugador, con una especie de inventario: si levanta un arma, guarda la suya y después las cambia.
   Implica que el arma del creep deje de ser un dato fijo y pase a ser un ítem (como la del jugador): ver el plan, cuando se arme.
 
-### P218 — Consumibles con dificultad mínima: ¿a cuáles se les aplica? (2026-10-23)
+### P218 — Consumibles con dificultad mínima: ¿a cuáles se les aplica? (2026-10-23) ✅ decidida y hecha el mismo día
 
 **Decidido en parte (dueño, 2026-10-23):** (1) **sí, el mínimo para detectar las trampas compradas, por calidad: Común 6, Buena 8, Rara 10**
 — hecho (`Combatiente.DETECTAR_MIN_TIER` / `detectarMinDe`, `detectarMin` en `trampaDeHab`; personaje y creep); las flechas especiales no dejan
@@ -1167,7 +1167,12 @@ qué quiso decir antes de programarlos.
 **Y el Efecto especial de los pergaminos (dueño, 2026-10-23: «lo mismo el especial para pergaminos que lo requieran: la calidad mínima de algunos
 efectos de consumibles»):** un consumible con Ejecución que usa tu Ef.Esp —para tirar o como dificultad— lo toma como mínimo según su calidad
 (Común 6, Buena 8, Rara 10): `Combatiente.conMinimoDeCalidad` (en `habDeConsumible`), `tira.min` en el duelo. La Red Nerubian (Buena) pasa de
-mínimo 6 a **8**. El PdG.Esp con que se tira la Red no tiene mínimo (no es «el especial»): a confirmar.
+mínimo 6 a **8**. El PdG.Esp con que se tira la Red queda sin mínimo (dueño: «está bien que sea PdG.Esp»).
+**Trampas mágicas (dueño, 2026-10-23, «sí»):** las 9 que se compran con escape (Trampa de escarcha, Runa de debilidad, Arena movediza, Lluvia de
+cascotes, Runa de silencio, Succión arcana, Tumba de hielo, Espejo de discordia, Portal cósmico): evitarlas o soltarse es contra el **Ef.Esp de quien
+la puso, con el número de la tabla como mínimo** (`difStat: 'dmgesp'` + `difMin` en `salvacion` / `soltar`); la Arena movediza (Buena) pasó de 6 a
+8 para entrar en el patrón (evitar: Común 7, Buena 9, Rara 11; soltarse: 6, 8, 10). Las físicas siguen fijas. ✅ P218 cerrada (lo de «los cauces»,
+descartado por el dueño).
 
 Regla del dueño (2026-10-23), ya aplicada al **Pergamino de red Nerubian**: la dificultad para soltarse es el **Efecto especial neto** de quien lo
 usa (su valor, no una tirada), **con un mínimo de 6** («es algo que vos pagaste, es consumible, solo funciona una vez»); si quien lo usa tiene más,

@@ -191,6 +191,8 @@
   oso (Común) y quedó con dificultad para detectarla 6, no 1.
 - [ ] **📜 Mínimo de calidad del Efecto especial de un pergamino (2026-10-23)**: la Red Nerubian (Buena) con un Ef.Esp bajo → para soltarse, Fuerza
   contra 8; el Pergamino de luz cegadora tira como mínimo 8. (Está en las pruebas automáticas; falta verlo en el mapa.)
+- [ ] **🪤 Trampas mágicas: evitarlas o soltarse contra el Ef.Esp de quien la puso (2026-10-23)**: con un Ef.Esp bajo, el número de la tabla (Runa de
+  silencio, Res.Mt contra 9); con uno alto, el suyo. La Arena movediza ahora se suelta contra 8. (En las pruebas automáticas; falta el mapa.)
 - [x] (2026-10-23, Claude, «Claude · pruebas», con 🎮 el control de juan: Finalizar combate con el Goblin 3 caído → Publicar → juan reclamó la Varita arcana → Despojar; le llegó a la mochila con el mismo poder que la del catálogo, +20 XP, +5 DDE y +19 despojos; control devuelto) **🎒 Botín con los ítems tal cual** (2026-10-22, paso 6 de `docs/plan-inventario-creeps.md`): en un fin de combate real, que un jugador se
   lleve una varita o un talismán que tenía un creep y que en su mochila funcione igual que el del catálogo (el poder de la varita, el efecto del
   talismán). Lo armado ya se revisó con los creeps de «Claude · pruebas», sin publicar el botín.

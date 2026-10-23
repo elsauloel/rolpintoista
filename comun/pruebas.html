@@ -4338,10 +4338,10 @@ prueba('Confusión: estado estándar con su marca (la tira el mapa), y la Niebla
   const est = []; Combatiente.agregarEstado(est, structuredClone(p));
   igual([!!p.confusion, p.turnos, !!est[0].confusion, niebla.estado, niebla.efectoManual || '', /1d4/.test(niebla.detalle)], [true, 2, true, 'Confusión', '', true]);
 });
-prueba('arena movediza: Fuerza 6 para zafar (si falla, se hunde) y terreno lento (cada paso que sale de ella cuesta 2 No2)', () => {
+prueba('arena movediza: Fuerza contra el Ef.Esp de quien la puso, mínimo 8, para zafar (si falla, se hunde) y terreno lento (cada paso que sale de ella cuesta 2 No2)', () => {
   const arena = CATALOGO_BASE.find(i => i.nombre === 'Arena movediza').trampaDatos;
   igual([arena.soltar, arena.lento, TokensAuto.estadoJson({nombre: 'Inmovilizado', turnos: 1}, null, null, null, '', 2), ItemCorto.trampaFilas(arena).find(f => f[0] === 'Terreno')[1]],
-    [{stat: 'fue', etq: 'Fuerza', dif: 6, no2: 1, hunde: 1}, 2, '{"nombre":"Inmovilizado","turnos":1,"lento":2}', 'una vez disparada, cada paso que sale de ella cuesta 2 No2']);
+    [{stat: 'fue', etq: 'Fuerza', dif: 8, no2: 1, hunde: 1, difStat: 'dmgesp', difMin: 8}, 2, '{"nombre":"Inmovilizado","turnos":1,"lento":2}', 'una vez disparada, cada paso que sale de ella cuesta 2 No2']);
 });
 prueba('resistencia elemental y Sigilo: el elemento de un daño, los stats nuevos de personajes y creeps, y el elemento de una trampa', () => {
   const S = FichaGuardado.normalizar({}).S;
@@ -4839,6 +4839,12 @@ prueba('pergamino: el mínimo de calidad para el Efecto especial (tirada y dific
   const p = tier => Combatiente.habDeConsumible({nombre: 'P', tier, duelo: {objetivo: 'enemigo', tira: 'dmgesp', contra: ['rescc'], efectos: [{nombre: 'Inmovilizado', soltar: {stat: 'fue', difStat: 'dmgesp', dif: 6}}]}});
   const e = (tier, esp) => Combatiente.habEjecucion(p(tier), p(tier).duelo, {stat: id => ({dmgesp: esp})[id] || 0});
   igual([e('Común', 3).tira.min, e('Raro', 3).tira.min, e('Buena Calidad', 3).efectos[0].spec.soltar.dif, e('Buena Calidad', 11).efectos[0].spec.soltar.dif], [6, 10, 8, 11]);
+});
+prueba('trampas mágicas compradas: evitarlas o soltarse contra el Ef.Esp de quien la puso, con el número de la tabla como mínimo (2026-10-23)', () => {
+  const runa = CATALOGO_BASE.find(i => i.nombre === 'Runa de silencio'), arena = CATALOGO_BASE.find(i => i.nombre === 'Arena movediza');
+  const v = x => st => st === 'trampaoculta' ? 0 : x;
+  const td = (it, x) => Combatiente.trampaDeHab({nombre: it.nombre, trampaColocar: it.trampaDatos}, v(x));
+  igual([td(runa, 5).salvacion.dif, td(runa, 12).salvacion.dif, td(arena, 3).soltar.dif, td(arena, 10).soltar.dif], [9, 12, 8, 10]);
 });
 prueba('trampa comprada: el mínimo para detectarla por calidad (Común 6, Buena 8, Rara 10; 2026-10-23), si quien la coloca tiene menos', () => {
   const td = tier => ({nombre: 'Cepo', trampaColocar: {nombre: 'Cepo', detectarMin: Combatiente.detectarMinDe(tier)}});

@@ -66,6 +66,16 @@
 >   **Mientras tanto (provisorio):** un arma que se cayó la levanta solo su dueño (vtt-hexgrid/js/27, `puedeLevantarla`), y una flecha que
 >   erró es de quien la tiró; lo que no tiene dueño conocido lo levanta cualquiera. Al hacerlo, sacar esa regla.
 
+> - [ ] **🧹 Quitar la lectura de los datos viejos del arma** (2026-10-23, dueño: «anotá como pendiente quitar los datos viejos, para que en
+>   algún tiempo, cuando te diga que queda pendiente, si es un buen momento, se quitan»). **No hacerlo hasta que el dueño lo pida.** Tras el
+>   paso 8 de `docs/plan-inventario-creeps.md` queda a propósito un solo lugar que entiende el arma guardada con los campos sueltos de antes
+>   (armaNombre, armaTipo…): `Combatiente.armaEnMano` (la rama `tieneCamposArma`/`armaCombinada`), `pasarArmaAItem` y `CAMPOS_ARMA`/`ARMA_CAMPO` en
+>   `comun/combatiente.js`, más la conversión de `CreepCalculo.normalizar` e `InvCalculo.migrar`. Sirve para los creeps e invocaciones guardados
+>   antes del 2026-10-22 que todavía no se volvieron a guardar. **Cuando el dueño diga que es buen momento:** (1) revisar con su sesión, partida
+>   por partida (El origen, Claude · pruebas, Test…), que ningún creep (`creeps/{id}/privado/ficha`) ni invocación (parte `invocaciones` de cada
+>   ficha) tenga campos `arma*` sueltos; los que tengan, abrirlos y guardarlos una vez (GM Tools o el mapa los convierte); (2) sacar esas ramas y
+>   las pruebas que las usan; (3) correr `comun/pruebas.html` y probar en el mapa un creep y una invocación.
+
 > - [ ] **📣 Refuerzos en el editor de creeps** (2026-10-16): la mecánica ya anda (`refuerzos: {cant}`, la Plaga de las ratas), pero el editor
 >   de habilidades de creep no tiene un campo para armarla; hoy se carga el dato. Sumar un paso «¿Llama refuerzos? ¿cuántos?».
 

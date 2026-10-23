@@ -161,7 +161,10 @@
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 
 ## Pendientes
-- [ ] **💀 Invocaciones que desaparecen** (2026-10-22, dueño): una invocación con token que muere en combate (vida 0) o a la que se le terminan los
+- [x] **💀 Invocaciones que desaparecen** — probado en el mapa el 2026-10-22 («Claude · pruebas», desde la cuenta del GM tocando la ficha de
+  Clementino): con el Lobo vivo e invocado y una daga suya en el piso, al bajarle la vida a 0 se fue del mapa y del orden con «💀 Lobo de prueba
+  desaparece: murió» (una sola línea) y la daga se desvaneció; puesto de nuevo y dormido (turnos en 0), «✨ … desaparece: se terminaron sus turnos».
+  Se arregló en la prueba: si el mismo token volvía al mapa, la pantalla no lo volvía a vigilar. El Lobo quedó vivo e invocado. (2026-10-22, dueño): una invocación con token que muere en combate (vida 0) o a la que se le terminan los
   turnos (el Mantenimiento la duerme) tiene que irse del mapa, con una sola línea en la Mesa («💀 … desaparece: murió» / «✨ … desaparece: se
   terminaron sus turnos») y fuera del orden de turnos; si tenía un arma invocada en otras manos o en el piso, esa arma se desvanece a los pocos
   segundos. Un token puesto de antemano con la invocación sin invocar no se toca. (Lo de las armas invocadas por sí solo ya se probó el

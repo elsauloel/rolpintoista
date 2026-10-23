@@ -4851,6 +4851,14 @@ prueba('trampa comprada: el mínimo para detectarla por calidad (Común 7, Buena
   const v = x => st => st === 'trampaoculta' ? 0 : x;
   igual([Combatiente.trampaDeHab(td('Común'), v(3)).detectar, Combatiente.trampaDeHab(td('Buena Calidad'), v(3)).detectar, Combatiente.trampaDeHab(td('Raro'), v(3)).detectar, Combatiente.trampaDeHab(td('Raro'), v(12)).detectar, Combatiente.trampaDeHab({nombre: 'h', trampaColocar: {nombre: 'h'}}, v(3)).detectar], [7, 9, 11, 12, 3]);
 });
+prueba('🕸 lo que atrapa, a la vista (2026-10-23): la telaraña o la red viaja en soltar.visual y lo público la lleva como atrapa', () => {
+  const red = CATALOGO_BASE.find(i => i.nombre === 'Pergamino de red Nerubian'), caza = CATALOGO_BASE.find(i => i.nombre === 'Red de caza');
+  const sp = Combatiente.efectoDeEjecucion(red.duelo.efectos[0], () => 3).spec;
+  const est = EstadosAplicar.componer({nombre: 'Inmovilizado', turnos: 1, soltar: caza.trampaDatos.soltar});
+  igual([Combatiente.soltarNorm(sp.soltar).visual, Combatiente.atrapaDe(est), Combatiente.atrapaPub({soltar: {stat: 'fue', dif: 7, visual: 'x'}}),
+    ['Pergamino de red Nerubian', 'Tela de araña', 'Telaraña oculta', 'Red de caza', 'Red', 'Muro de piedra', 'Pared de fuego'].map(Combatiente.atrapaDeNombre)],
+    ['telarana', 'red', {}, ['telarana', 'telarana', 'telarana', 'red', 'red', '', '']]);
+});
 prueba('No2 negativos en una defensa (2026-10-23): se puede quedar en negativo, pero no gastar si ya estás en negativo', () => {
   igual([Combatiente.defensaSinNo2(0, 1), Combatiente.defensaSinNo2(2, 1), Combatiente.defensaSinNo2(-1, 1), Combatiente.defensaSinNo2(-1, 0)], [false, false, true, false]);
 });

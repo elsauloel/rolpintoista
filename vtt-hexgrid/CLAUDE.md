@@ -1761,3 +1761,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   nada en la mano lleva la insignia ✋ (`tokenSinArma`, js/27, con lo publicado `sinArma`) y pega sin arma (1d4 + Daño). **✨ Armas invocadas**
   (`js/67-armas-invocadas.js`): lo de una invocación se desvanece de donde esté cuando ella ya no está; y una invocación que muere o termina sus
   turnos desaparece del mapa (js/54, todas, no solo las temporales).
+- **🕸 Lo que atrapa, a la vista** (2026-10-23, dueño; `js/68-atrapa.js`): un token con un estado cuyo `soltar.visual` es `'telarana'` (Red
+  Nerubian, Tela de araña) o `'red'` (Red de caza, la Red de un creep) lleva encima, mientras dura, una telaraña o una red de soga con pesitos y
+  borde desparejo (solo líneas: el token se ve a través), con un rebote elástico cada ~3,6 s. Lo público lo lleva como `atrapa`
+  (`Combatiente.atrapaPub`, en los seis armadores del resumen); una copia vieja sin el dato se reconoce por el nombre de la habilidad
+  (`dueloAplicarEfectoBase`, js/13, `Combatiente.atrapaDeNombre`). Las trampas armadas de telaraña o de red llevan el mismo dibujo en sus casillas
+  (`atrapaDibujarSuelo`, desde js/05). Solo dibuja.

@@ -199,7 +199,7 @@ const FichaResumen = (() => {
           ...(e.derivado ? {derivado: true} : {}), ...(e.confusion ? {confusion: true} : {}), ...(e.anillo ? {anillo: true} : {}), ...(e.impulso ? {impulso: e.impulso, impulsoVal: num(e.impulsoVal)} : {}),   // la Confusión: el mapa la tira (js/20)
           ...(e.espinas ? {espinas: true} : {}), ...(e.espejo ? {espejo: true} : {}), ...(e.ceguera ? {ceguera: true} : {}), ...(e.desarmado ? {desarmado: true} : {}),   // el mapa devuelve el daño aunque el estado tenga un nombre propio («Espinas (poción)»)
           ...(e.lento ? {lento: true} : {}),   // Lento: el primer casillero del turno cuesta el doble (el mapa, js/04)
-          ...(e.soltar && (e.soltar.ayuda || e.soltar.de) && Combatiente.soltarNorm(e.soltar) ? {soltar: Combatiente.soltarNorm(e.soltar)} : {}),   // 🤝 un aliado pegado lo puede ayudar a soltarse (el mapa, js/54)
+          ...(e.soltar && (e.soltar.ayuda || e.soltar.de) && Combatiente.soltarNorm(e.soltar) ? {soltar: Combatiente.soltarNorm(e.soltar)} : {}), ...Combatiente.atrapaPub(e),   // 🤝 un aliado pegado lo puede ayudar a soltarse (el mapa, js/54)
           ...(num(e.sprint) > 0 ? {sprint: num(e.sprint)} : {}),   // Sprint (Asalto, 2026-10-13): los casilleros pagos que le quedan
           ...(e.vigilancia ? {vigilancia: alcanceVigilancia(S)} : {}),   // 👁 Vigilancia (Shooter, 2026-10-21): el alcance de su arma a distancia (el mapa, js/58)
           ...(e.repetir ? {repetir: {quedan: Math.max(0, num(e.stacks)), hechos: num(e.repHechos), arma: String(e.repArma || ''), blanco: String(e.repBlanco || '')}} : {}),   // Repetición (Shooter, 2026-10-13)
@@ -250,7 +250,7 @@ const FichaResumen = (() => {
           ...(e.miedoDe ? {miedoDe: String(e.miedoDe).slice(0, 80), miedoDeNombre: String(e.miedoDeNombre || '').slice(0, 40)} : {}),   // 😱 Miedo: a quién le tiene miedo (el mapa, js/52)
               ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
               polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '', ...(e.confusion ? {confusion: true} : {}), ...(e.lento ? {lento: true} : {}),
-              ...(e.soltar && (e.soltar.ayuda || e.soltar.de) && Combatiente.soltarNorm(e.soltar) ? {soltar: Combatiente.soltarNorm(e.soltar)} : {}),   // 🤝 (js/54)
+              ...(e.soltar && (e.soltar.ayuda || e.soltar.de) && Combatiente.soltarNorm(e.soltar) ? {soltar: Combatiente.soltarNorm(e.soltar)} : {}), ...Combatiente.atrapaPub(e),   // 🤝 (js/54)
               detalle: String(e.detalle || '').slice(0, 300),
             })),
         })),

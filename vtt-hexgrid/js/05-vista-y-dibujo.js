@@ -413,6 +413,7 @@ function dibujarLienzo(){
       ctx.fillStyle = colorConAlfa(el.color, (el.invisible ? el.alfa / 100 * 0.35 : el.alfa / 100 * 0.7));
       ctx.fill();
     }
+    if(el.trampa && typeof atrapaDibujarSuelo === 'function' && atrapaDibujarSuelo(el, celdas, z)) superficiesAnimando = true;   // 🕸 la telaraña o la red, en el piso (js/68)
     if(!(sup && sup.sinBorde)){   // el charco no lleva el borde de los hexágonos
     bordeCeldas(celdas);
     if(el.invisible){
@@ -873,6 +874,7 @@ function dibujarLienzo(){
       const [fx1, fy1] = puntos[frenteI], [fx2, fy2] = puntos[(frenteI + 1) % 6];
       trazarFrente(fx1, fy1, fx2, fy2, rad, z, x, y);
     }
+    { const at = typeof atrapaDeToken === 'function' ? atrapaDeToken(est) : ''; if(at){ dibujarAtrapa(at, x, y, rad, z, semillaDe(d.id)); animando = true; } }   // 🕸 atrapado en una telaraña o una red (js/68)
     if(polillaRevolotea(est)){ dibujarPolillita(x, y, rad, z, semillaDe(d.id)); animando = true; }   // 🦋 la Polilla, revoloteando
 
     if(seleccion === d.id){

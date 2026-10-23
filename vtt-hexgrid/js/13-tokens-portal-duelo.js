@@ -1951,6 +1951,10 @@ async function dueloAplicarEfectoBase(d, ef){
   if(!t) return {manual: true, nota: 'el token ya no está: aplicalo a mano'};
   if(typeof talismanUnaVez === 'function' && !talismanUnaVez(d, ef)) return {nota: 'el talismán ya lo hizo este turno'};   // 🔮 la Cabeza reducida, el Muñeco vudú (js/53)
   if(spec.nombre === 'Demora') return dueloDemora(d.defensor.tokenId);
+  if(spec.soltar && !spec.soltar.visual){   // 🕸 una copia vieja de la Red Nerubian o de Tela de araña: la telaraña sale del nombre (js/68)
+    const v = Combatiente.atrapaDeNombre((d.hab && d.hab.nombre) || (d.ataque && (d.ataque.habNombre || d.ataque.nombre)) || '');
+    if(v) spec.soltar = {...spec.soltar, visual: v};
+  }
   if(spec.nombre === 'Miedo' && !spec.miedoDe && d.atacante.tokenId){ spec.miedoDe = d.atacante.tokenId; spec.miedoDeNombre = String(d.atacante.nombre || '').slice(0, 40); }   // 😱 a quién le tiene miedo
   if((spec.nombre === 'Mordido' || spec.nombre === 'Agarrado') && d.atacante.tokenId && typeof mordidaEmpezar === 'function') await mordidaEmpezar(d, spec);   // 🦷 quién lo tiene agarrado, y la bestia queda Mordiendo (js/54)
   // 🛡 Miti-Miti (Tanque, 2026-10-11): la marca queda en quien la usa, con a quién protege; el reparto del daño lo hace js/10 (mitiMitiDe).

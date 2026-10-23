@@ -124,16 +124,24 @@ function curaBurbujasEn(x, y, rad, z, semilla, n, fuerza){
   ctx.restore();
 }
 // La zona: un brillo verde que respira y burbujas en cada casilla.
+// (Con resguardo: un adorno que falla no puede cortar el dibujo del mapa — 2026-10-23, la primera versión usaba `trazarCeldas`, que es local de
+// dibujarLienzo, y dejaba el mapa sin tokens.)
 function curaDibujarZona(el, celdas, z){
-  const p = 0.5 + 0.5 * Math.sin(performance.now() / 700);
-  ctx.save(); trazarCeldas(celdas); ctx.fillStyle = `rgba(110,220,140,${0.10 + 0.08 * p})`; ctx.fill(); ctx.restore();
-  celdas.forEach(c => { const q = hexCentro(c.col, c.fila); curaBurbujasEn(q.x, q.y, HEX * 0.9, z, c.col * 13 + c.fila * 7, 3, 1); });
+  try{
+    const p = 0.5 + 0.5 * Math.sin(performance.now() / 700);
+    ctx.save();
+    celdas.forEach(c => { const q = hexCentro(c.col, c.fila); trazarPuntos(verticesHex(q.x, q.y, HEX)); ctx.fillStyle = `rgba(110,220,140,${0.10 + 0.08 * p})`; ctx.fill(); });
+    ctx.restore();
+    celdas.forEach(c => { const q = hexCentro(c.col, c.fila); curaBurbujasEn(q.x, q.y, HEX * 0.9, z, c.col * 13 + c.fila * 7, 3, 1); });
+  }catch(err){ try{ ctx.restore(); }catch(e){} console.error('Las burbujas de la zona:', err); }
 }
 // El aura: burbujas en las casillas alrededor del token (hasta AURA_CURA_RADIO).
 const curaOffsetsAura = (() => { const out = []; for(let dq = -AURA_CURA_RADIO; dq <= AURA_CURA_RADIO; dq++) for(let dr = -AURA_CURA_RADIO; dr <= AURA_CURA_RADIO; dr++) if(Math.max(Math.abs(dq), Math.abs(dr), Math.abs(dq + dr)) <= AURA_CURA_RADIO) out.push([dq, dr]); return out; })();
 function curaDibujarAura(t, z){
-  const c0 = hexACubo({col: t.col, fila: t.fila});
-  curaOffsetsAura.forEach(([dq, dr]) => { const col = cuboACol(c0.q + dq, c0.r + dr), fila = cuboAFila(c0.q + dq, c0.r + dr), q = hexCentro(col, fila); curaBurbujasEn(q.x, q.y, HEX * 0.9, z, col * 13 + fila * 7, 1, 0.8); });
+  try{
+    const c0 = hexACubo({col: t.col, fila: t.fila});
+    curaOffsetsAura.forEach(([dq, dr]) => { const col = cuboACol(c0.q + dq, c0.r + dr), fila = cuboAFila(c0.q + dq, c0.r + dr), q = hexCentro(col, fila); curaBurbujasEn(q.x, q.y, HEX * 0.9, z, col * 13 + fila * 7, 1, 0.8); });
+  }catch(err){ console.error('Las burbujas del aura:', err); }
 }
 const auraCuraEnEstados = est => !!(est && Array.isArray(est.estados) && est.estados.some(e => e && e.activo !== false && e.nombre === AURA_CURA_NOMBRE));
 // Al curar: un ratito de burbujas de más sobre cada uno que se curó (en esta pantalla).

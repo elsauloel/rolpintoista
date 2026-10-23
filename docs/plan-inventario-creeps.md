@@ -58,7 +58,16 @@ pública del creep, que leen los jugadores), se calculan a partir del ítem en l
    la invocación nueva ya sin campos sueltos) y el simulador. Los creeps base y la IA todavía arman los campos sueltos: los convierte la carga
    (limpieza: paso 8). Los bonos del arma cuentan una sola vez (`fuentesEquipo`, `invFuentesEquipo`). El Mordisco feroz ya no reescribe el arma al
    vuelo (`CreepCalculo.danoTxt(sc, extra, dadosMas)`). **Ojo:** una pestaña con la versión anterior ve a un creep ya convertido como «sin arma»:
-   recargar todas. Pruebas: 560 en verde.
+   recargar todas. Pruebas: 561 en verde.
+   **Un error encontrado probando y arreglado (2026-10-22):** GM Tools arma cada creep que lee de Firebase encima de un «creep nuevo»
+   (`creepBaseGuardado`/`nuevoCreep`), que traía los campos sueltos por defecto («sin nombre, Tipo 8»): al combinar, le pisaban el arma (le pasó
+   al Goblin de prueba 1; reparado). El creep nuevo ya no los trae, y unos campos sueltos «sin nombre» encima de un arma con nombre se ignoran
+   (son valores por defecto de una carga vieja). Revisado: «El origen» intacto (39 creeps y 2 invocaciones sin convertir todavía).
+   **Probado (2026-10-22, «Claude · pruebas»):** el Goblin 1 convertido (sin campos sueltos, la lanza en su equipo, 1d4 + 2, alcance 2, Bloqueo
+   1d2, estable); GM Tools carga los 17 creeps con su arma (no guarda al abrir: se convierten al editarlos); «Equipar» un arma del catálogo
+   desde GM Tools la pone en la mano y la guarda como ítem (la tarjeta pública se actualiza); en el «Ver» del creep la lanza aparece en Manos y
+   no repetida en el equipo; el botín la suelta una sola vez; de vuelta el Hacha, igual que antes. La invocación «Lobo de prueba» (Clementino)
+   convertida y guardada: el mismo Arco corto, 1d4 + 1.
 3. **Defensa y Res. a crítico calculadas en vivo** desde lo equipado (como el personaje), en vez de sumarse una vez al equipar. Sin esto, soltar o
    levantar un escudo deja la Defensa mal.
 4. **Soltar y levantar de verdad:** desarmar (o soltar) saca el ítem de la mano y lo pone en el piso; levantarlo lo mete en la lista de quien lo

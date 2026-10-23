@@ -671,12 +671,11 @@ const Sim = (() => {
     Combatiente.ponerArma(sc, {...d, ...Combatiente.rasgosDeItem(it), natural: Combatiente.armaEnMano(sc).natural});   // 🗡 un ítem de su lista (paso 2)
     return sc;
   }
-  // Le suma una pieza de equipo del catálogo (la Defensa aparte, como en GM Tools).
+  // Le suma una pieza de equipo del catálogo (la Defensa aparte, como en GM Tools; se suma en vivo: paso 3).
   function ponerEquipo(sc, nombre){
     const it = itemCat(nombre); if(!it) throw new Error('No está en el catálogo: ' + nombre);
     const d = CreepCalculo.itemParaCreep(it);
     const mods = (it.mods || []).filter(m => m.stat !== 'def');
-    sc.defensa = num(sc.defensa) + num(d.def);
     sc.equipo = sc.equipo || []; sc.equipo.push({id: 'sim' + Math.random().toString(36).slice(2, 7), nombre: d.nombre, tipoItem: d.tipoItem, def: num(d.def), peso: num(d.peso), mods: structuredClone(mods), detalle: d.detalle || ''});
     CreepCalculo.actualizarHpMaxPorCon(sc); sc.hp = sc.hpMax;
     return sc;

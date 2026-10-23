@@ -3,7 +3,7 @@
 > Pedido del dueño (2026-10-22): «vamos a encarar la tarea ardua de unificar el tema de las armas: que tanto para personajes como para creeps e
 > invocaciones (con manos), las armas sean un ítem que se agarra, se suelta, la agarra otro… al igual que escudos y talismanes». Antes (mismo día):
 > «todo lo que tenga manos debería poder usar lo mismo… con una especie de inventario: si levanta un arma, guarda la suya y después las cambia».
-> Cierra P217 y la tarea «🗡 Armas e inventario para creeps e invocaciones» de `pendientes.md`. **Decisiones aprobadas el 2026-10-22; pasos 1 y 2 hechos, sigue el paso 3.**
+> Cierra P217 y la tarea «🗡 Armas e inventario para creeps e invocaciones» de `pendientes.md`. **Decisiones aprobadas el 2026-10-22; pasos 1 a 3 hechos, sigue el paso 4.**
 
 ## Cómo está hoy (relevamiento del 2026-10-22)
 
@@ -70,6 +70,15 @@ pública del creep, que leen los jugadores), se calculan a partir del ítem en l
    convertida y guardada: el mismo Arco corto, 1d4 + 1.
 3. **Defensa y Res. a crítico calculadas en vivo** desde lo equipado (como el personaje), en vez de sumarse una vez al equipar. Sin esto, soltar o
    levantar un escudo deja la Defensa mal.
+   **Hecho (2026-10-22):** `defensa` y `crit` de un creep o una invocación pasan a ser **la base** (lo que se carga a mano) y
+   `CreepCalculo.defensaEfectiva` / `critEfectivo` (e `InvCalculo`) le suman en vivo lo equipado (`Combatiente.defDeEquipo`: el `def` de cada pieza
+   o un mod `def`; `critDeEquipo`: los mods `tipo1`…`tipo5`; solo lo que tiene `equipado !== false`). `Combatiente.pasarEquipoVivo` convierte una
+   vez (marca `equipoVivo`): le resta a lo guardado lo mismo que después suma en vivo, así el total no cambia (la base no baja de 0: un equipo
+   que nunca se había sumado empieza a contar; en «El origen» no hay ninguno así, revisado). Ya no «hornean» al equipar o sacar: GM Tools
+   (`aplicarModsEquipo` solo conserva el viejo «mov»), `ponerEquipoEnCreep`, la invocación (`ponerEquipoEnInv`, `quitarEquipoDeInv`) y el
+   simulador. **Arreglo de paso:** a las invocaciones el equipo nunca les sumaba Res. a crítico; ahora sí (a ellas no se les resta al convertir).
+   «Actualizar desde la biblioteca» con una versión vieja borra la marca para que se convierta de nuevo (si no, contaría el equipo dos veces).
+   GM Tools muestra «Defensa base» con el efectivo al lado, y la Res. a crítico aparece si la base o el total no son 0. Pruebas: 562 en verde.
 4. **Soltar y levantar de verdad:** desarmar (o soltar) saca el ítem de la mano y lo pone en el piso; levantarlo lo mete en la lista de quien lo
    levanta (con la mano libre: «¿Equiparlo?»; con las manos ocupadas: «Reemplazar» o «Guardar», igual que el personaje — el GM elige por el creep).
    Se saca la regla provisoria «solo su dueño». Un creep con su arma guardada y otra en la mano puede cambiarlas (un botón en sus Acciones).

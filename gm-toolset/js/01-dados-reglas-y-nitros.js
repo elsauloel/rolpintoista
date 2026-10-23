@@ -144,6 +144,7 @@ function actualizarCreepDesdeBib(sc, e){
   const combate = {id: sc.id, imagen: sc.imagen, mapa: sc.mapa, color: sc.color, estados: sc.estados, hp: sc.hp, nitros: sc.nitros,
     ataquesTurno: sc.ataquesTurno, recompensado: sc.recompensado};
   Object.assign(sc, d, combate);
+  if(d.equipoVivo === undefined) delete sc.equipoVivo;   // 🛡 una versión vieja trae la Defensa con el equipo sumado: que se convierta al normalizar
   sc.habilidades = (d.habilidades || []).map(h => ({...h, id: uid(), cdActual: h.cdArranca ? num(h.cd) : 0}));
   sc.equipo = (d.equipo || []).map(it => ({...it, id: uid()}));
   sc.hp = Math.min(num(sc.hp), num(sc.hpMax));

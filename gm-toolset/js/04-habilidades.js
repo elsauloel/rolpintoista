@@ -237,15 +237,10 @@ const TIPO_STAT_A_CRIT_IDX = {tipo1:0, tipo2:1, tipo3:2, tipo4:3, tipo5:4};
 // equipo sobre los campos del creep que tienen dónde guardarlos. Bonos/Res.M/
 // Res.CC no tienen campo propio en un creep, así que quedan solo en el
 // detalle del ítem — no se pierden, simplemente no suman a ningún número.
+// 🛡 Paso 3 (2026-10-22, docs/plan-inventario-creeps.md): la Defensa y la Res. a crítico del equipo se calculan en vivo (CreepCalculo.defensaEfectiva /
+// critEfectivo); al equipar o sacar una pieza ya no se le suman ni restan a la base. Queda solo el viejo «mov» (Velocidad), que no tiene cuenta propia.
 function aplicarModsEquipo(sc, mods, signo){
-  (mods||[]).forEach(m => {
-    if(TIPO_STAT_A_CRIT_IDX[m.stat] !== undefined){
-      const i = TIPO_STAT_A_CRIT_IDX[m.stat];
-      sc.crit[i] = num(sc.crit[i]) + signo * num(m.val);
-    }else if(m.stat === 'mov'){
-      sc.spd = num(sc.spd) + signo * num(m.val);
-    }
-  });
+  (mods||[]).forEach(m => { if(m.stat === 'mov') sc.spd = num(sc.spd) + signo * num(m.val); });
 }
 
 // El texto libre de "Armadura" refleja por default lo que hay en sc.equipo
@@ -259,7 +254,6 @@ function quitarEquipoDeCreep(scId, equipoId){
   const sc = S.creeps.find(s => s.id === scId);
   const item = sc && (sc.equipo||[]).find(x => x.id === equipoId);
   if(!sc || !item) return;
-  sc.defensa = Math.max(0, num(sc.defensa) - num(item.def));
   aplicarModsEquipo(sc, item.mods, -1);
   sc.equipo = sc.equipo.filter(x => x.id !== equipoId);
   actualizarArmaduraTipo(sc);
@@ -274,7 +268,6 @@ function equiparItemEnCreep(idx){
   if(!sc || !item) return;
   if(CreepCalculo.vaAlEquipo(item)){   // (un arma especial va al equipo: no le cambia el arma)
     const mods = structuredClone(item.mods || []);
-    sc.defensa = num(sc.defensa) + num(item.def);
     aplicarModsEquipo(sc, mods, 1);
     sc.equipo = sc.equipo || [];
     sc.equipo.push({id: uid(), nombre: item.nombre, tipoItem: item.tipoItem, def: num(item.def), peso: num(item.peso), mods, detalle: item.detalle || '', ...CreepCalculo.magiaDeItem(item)});   // peso: un escudo para con su peso (2026-10-13)

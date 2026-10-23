@@ -307,7 +307,7 @@ function criticoFuentes(){
       const sc = creepPrivadoDe(t.fichaId);
       if(!sc) return;
       lista.push({id, nombre: nombreDe(t) + ' (creep)', tipo: Combatiente.armaEnMano(sc).tipoDado || 0, frecuente: creepModTotalMapa(sc, 'crit'), potente: creepModTotalMapa(sc, 'critpot'),
-        resistencias: [0, 1, 2, 3, 4].map(i => num((sc.crit || [])[i])), defensa: creepDefensaMapa(sc)});
+        resistencias: [0, 1, 2, 3, 4].map(i => CreepCalculo.critEfectivo(sc, i)), defensa: creepDefensaMapa(sc)});
       return;
     }
     const f = fichasPub.get(t.fichaId), r = f && f.resumen;

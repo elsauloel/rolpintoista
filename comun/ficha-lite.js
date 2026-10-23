@@ -132,13 +132,13 @@ const FichaLite = (() => {
   function lineasGuardadas(o, total, base, deItem, deEstado){
     const L = [];
     let items = 0;
-    Combatiente.equipoSinArma(o).forEach(it => { const v = deItem(it); if(v){ items += v; L.push({txt: it.nombre || '(sin nombre)', val: v}); } });
-    const resto = num(base) - items;
+    (o.equipo || []).filter(it => it && it.equipado !== false).forEach(it => { const v = deItem(it); if(v){ items += v; L.push({txt: it.nombre || '(sin nombre)', val: v}); } });
+    const resto = num(o.equipoVivo) >= 1 ? num(base) : num(base) - items;   // 🛡 paso 3: la base ya no trae el equipo sumado
     if(resto) L.unshift({txt: 'Base (cargada a mano)', val: resto});
     (o.estados || []).filter(e => e.activo !== false).forEach(e => { const v = deEstado(e); if(v) L.push({txt: e.nombre || '(sin nombre)', val: v, nota: 'estado'}); });
     return cerrar(L, total);
   }
-  const defItem = it => num(it.def);
+  const defItem = it => Combatiente.defDeItem(it);
   const modDe = stat => it => (it.mods || []).filter(m => m.stat === stat).reduce((a, m) => a + num(m.val), 0);
   const defEstado = e => {
     const st = Math.max(1, num(e.stacks) || 1);

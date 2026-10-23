@@ -186,8 +186,7 @@ function marcarArmaNatural(sc, si){
 function ponerEquipoEnCreep(sc, d){
   const def = (d.mods || []).filter(m => m.stat === 'def').reduce((a, m) => a + num(m.val), 0);
   const mods = (d.mods || []).filter(m => m.stat !== 'def');
-  sc.defensa = num(sc.defensa) + def;
-  aplicarModsEquipo(sc, mods, 1);
+  aplicarModsEquipo(sc, mods, 1);   // (la Defensa se suma en vivo: paso 3)
   sc.equipo = sc.equipo || [];
   sc.equipo.push({id: uid(), nombre: d.nombre, tipoItem: d.tipoItem, def, peso: num(d.peso), mods, detalle: d.detalle || '', ...CreepCalculo.magiaDeItem(d)});   // peso: un escudo para con su peso (2026-10-13)
   actualizarArmaduraTipo(sc);

@@ -154,7 +154,7 @@ const CreepCalculo = (() => {
   }
   function defensaEfectiva(sc){
     const {rota} = estadosArmadura(sc);
-    let v = num(sc.defensa);
+    let v = num(sc.defensa) + (num(sc.equipoVivo) >= 1 ? Combatiente.defDeEquipo(sc) : 0);   // 🛡 la base + lo equipado (paso 3; un creep sin convertir la trae sumada)
     // Bonos de Defensa de los estados (ej. Piel de escoria): se suman por stack.
     (sc.estados || []).forEach(es => { if(es.activo === false) return; const st = Math.max(1, num(es.stacks) || 1); (es.mods || []).forEach(m => { if(m.stat === 'def') v += num(m.val) * st; }); });
     v -= rota;
@@ -174,10 +174,10 @@ const CreepCalculo = (() => {
   function armadmgEfectiva(sc){
     return Math.max(0, num(sc.armadmg) + modTotal(sc, 'armadmg'));
   }
-  // La resistencia a crítico: la cargada (el equipo ya se le sumó al equiparlo) + lo que dan los estados (Endurecido…, 2026-10-12).
+  // La resistencia a crítico: la base + lo equipado (paso 3, en vivo; un creep sin convertir la trae sumada) + los estados (Endurecido…, 2026-10-12).
   const critDeEstados = (estados, i) => (estados || []).filter(e => e && e.activo !== false).reduce((a, e) => a + (e.mods || []).filter(m => m.stat === 'tipo' + (i + 1)).reduce((x, m) => x + num(m.val), 0) * Math.max(1, num(e.stacks) || 1), 0);
   function critEfectivo(sc, i){
-    return num((sc.crit || [])[i]) + critDeEstados(sc.estados, i);
+    return num((sc.crit || [])[i]) + (num(sc.equipoVivo) >= 1 ? Combatiente.critDeEquipo(sc, i) : 0) + critDeEstados(sc.estados, i);
   }
   /* Stats secundarios de los creeps: los mismos que un PJ, cada uno sale de
      su atributo (fórmula base = el atributo) + mods (ver statValor).
@@ -314,12 +314,13 @@ const CreepCalculo = (() => {
   function defensaOrigenTxt(sc){
     const L = [];
     let deItems = 0;
-    (sc.equipo||[]).forEach(it => {
-      if(!num(it.def)) return;
-      deItems += num(it.def);
-      L.push(`${conSigno(num(it.def))} por ${it.nombre || '(sin nombre)'}`);
+    (sc.equipo||[]).filter(it => it && it.equipado !== false).forEach(it => {
+      const v = Combatiente.defDeItem(it);
+      if(!v) return;
+      deItems += v;
+      L.push(`${conSigno(v)} por ${it.nombre || '(sin nombre)'}`);
     });
-    const resto = num(sc.defensa) - deItems;
+    const resto = num(sc.equipoVivo) >= 1 ? num(sc.defensa) : num(sc.defensa) - deItems;   // (la base)
     if(resto || !L.length) L.push(`${conSigno(resto)} base (cargada a mano)`);
     const {rota} = estadosArmadura(sc);
     if(rota) L.push(`Armadura rota: -${rota} de Defensa`);
@@ -333,13 +334,13 @@ const CreepCalculo = (() => {
     const stat = 'tipo' + (i + 1);
     const L = [];
     let deItems = 0;
-    Combatiente.equipoSinArma(sc).forEach(it => {
-      const v = (it.mods||[]).filter(m => m.stat === stat).reduce((a, m) => a + num(m.val), 0);
+    (sc.equipo||[]).filter(it => it && it.equipado !== false).forEach(it => {
+      const v = Combatiente.critDeItem(it, i);
       if(!v) return;
       deItems += v;
       L.push(`${conSigno(v)} por ${it.nombre || '(sin nombre)'}`);
     });
-    const resto = num(sc.crit[i]) - deItems;
+    const resto = num(sc.equipoVivo) >= 1 ? num(sc.crit[i]) : num(sc.crit[i]) - deItems;   // (la base)
     if(resto || !L.length) L.push(`${conSigno(resto)} base (cargada a mano)`);
     const deEst = critDeEstados(sc.estados, i);
     if(deEst) L.push(`${conSigno(deEst)} por estados`);
@@ -573,6 +574,7 @@ const CreepCalculo = (() => {
     migrarCreepEspecial(sc);
     migrarHabPdg(sc);
     Combatiente.pasarArmaAItem(sc);   // 🗡 su arma, un ítem de su lista (docs/plan-inventario-creeps.md, paso 2): los campos arma* sueltos se convierten
+    Combatiente.pasarEquipoVivo(sc);   // 🛡 paso 3: la Defensa y la Res. a crítico del equipo, en vivo (una vez: le resta lo que ya traía sumado)
     // Recompensas (2026-09-20): los creeps viejos no las traen.
     if(typeof sc.mapa !== 'string') sc.mapa = '';   // en qué mapa está (comun/creeps-mapas.js; '' = la Reserva)
     if(sc.tipoCriatura === undefined) sc.tipoCriatura = '';

@@ -100,7 +100,7 @@ function cardHtml(sc){
 
       <div class="row3" style="grid-template-columns:1fr 1fr 1fr">
         <div class="mini-f con-tip" data-tip="${esc(ataqueOrigenTxt(sc))}"><label>Ataque</label><div class="valor-fijo">${esc(ataqueCreepTxt(sc))}</div></div>
-        <div class="mini-f con-tip" data-tip="${esc(defensaOrigenTxt(sc))}"><label>Defensa${creepDefensaEfectiva(sc)!==num(sc.defensa) ? ` <button type="button" class="mod-origen-btn efectivo-badge" data-modorigen="${esc(creepArmaduraOrigenTxt(sc))}">efect. ${fmt(creepDefensaEfectiva(sc))}</button>` : ''}</label><input type="number" data-f="defensa" data-id="${sc.id}" value="${sc.defensa}"></div>
+        <div class="mini-f con-tip" data-tip="${esc(defensaOrigenTxt(sc))}"><label>Defensa base${creepDefensaEfectiva(sc)!==num(sc.defensa) ? ` <button type="button" class="mod-origen-btn efectivo-badge" data-modorigen="${esc(creepArmaduraOrigenTxt(sc))}">efect. ${fmt(creepDefensaEfectiva(sc))}</button>` : ''}</label><input type="number" data-f="defensa" data-id="${sc.id}" value="${sc.defensa}"></div>
         <div class="mini-f con-tip" data-tip="${esc(armadmgOrigenTxt(sc))}" title="Se resta al daño de casteo que ignora la Defensa (Paso 3 del casteo). No sale de ningún atributo: normalmente 0, salvo ítems Raros o mejores."><label>Armad. mágica${creepArmadmgEfectiva(sc)!==num(sc.armadmg) ? ` <span class="mod-origen-btn efectivo-badge">efect. ${fmt(creepArmadmgEfectiva(sc))}</span>` : ''}</label><input type="number" data-f="armadmg" data-id="${sc.id}" value="${sc.armadmg}"></div>
       </div>
       <div class="row3" style="grid-template-columns:repeat(5,1fr)" title="Resistencias elementales (2026-10-04): cada una se resta al daño de su elemento, además de la Defensa especial. Lo que den su equipo y sus estados se suma solo.">
@@ -156,11 +156,11 @@ function cardHtml(sc){
         <button type="button" class="addhab" data-equipardelfabricante="${sc.id}" style="margin-top:6px">⚔ Equipar del fabricante</button>
       </div>
 
-      ${sc.crit.some(v => num(v) !== 0) ? `
+      ${[0, 1, 2, 3, 4].some(i => num(sc.crit[i]) !== 0 || creepCritEfectivo(sc, i) !== 0) ? `
       <div>
         <div class="sect-label">Res. a críticos</div>
         <div class="crit-grid" style="margin-top:4px">
-          ${['Tipo 4','Tipo 6','Tipo 8','Tipo 10','Tipo 12'].map((lbl,i) => num(sc.crit[i]) !== 0
+          ${['Tipo 4','Tipo 6','Tipo 8','Tipo 10','Tipo 12'].map((lbl,i) => num(sc.crit[i]) !== 0 || creepCritEfectivo(sc, i) !== 0   // 🛡 (paso 3: la base y lo que suma el equipo en vivo)
             ? `<div class="crit-cell"><label>${lbl}${creepCritEfectivo(sc,i)!==num(sc.crit[i]) ? ` <button type="button" class="mod-origen-btn efectivo-badge" data-modorigen="${esc(creepArmaduraOrigenTxt(sc))}">${fmt(creepCritEfectivo(sc,i))}</button>` : ''}</label><input type="number" data-crit="${i}" data-id="${sc.id}" value="${sc.crit[i]}"></div>`
             : '').join('')}
         </div>

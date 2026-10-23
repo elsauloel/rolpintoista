@@ -82,7 +82,6 @@ function ponerArmaEnInv(inv, d){
 function ponerEquipoEnInv(inv, d){
   const def = (d.mods || []).filter(m => m.stat === 'def').reduce((a, m) => a + num(m.val), 0);
   const mods = (d.mods || []).filter(m => m.stat !== 'def');
-  inv.defensa = num(inv.defensa) + def;
   inv.equipo = inv.equipo || [];
   inv.equipo.push({id: uid(), nombre: d.nombre, tipoItem: d.tipoItem, def, mods, detalle: d.detalle || '', peso: num(d.peso)});   // peso: el de un escudo suma al Bloqueo
   if(modsAfectanHpInv(mods)) actualizarHpMaxPorConInv(inv);
@@ -162,7 +161,6 @@ function quitarEquipoDeInv(invId, equipoId){
   if(!inv) return;
   const it = inv.equipo.find(x => x.id === equipoId);
   if(!it) return;
-  inv.defensa = num(inv.defensa) - num(it.def);
   inv.equipo = inv.equipo.filter(x => x.id !== equipoId);
   if(modsAfectanHpInv(it.mods)) actualizarHpMaxPorConInv(inv);
   renderInvocaciones();

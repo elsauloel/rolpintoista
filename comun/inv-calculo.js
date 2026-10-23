@@ -65,7 +65,7 @@ const InvCalculo = (() => {
   }
   function defensaEfectiva(inv){
     const {arruinada, rota} = estadosArmadura(inv);
-    let v = num(inv.defensa);
+    let v = num(inv.defensa) + (num(inv.equipoVivo) >= 1 ? Combatiente.defDeEquipo(inv) : 0);   // 🛡 la base + lo equipado (paso 3)
     if(arruinada) v -= aporteArmadura(inv, 'def');
     // Bonos de Defensa de los estados (ej. «−2 Defensa», Piel de escoria): se suman por stack, igual que en los creeps y los
     // personajes (2026-10-01; antes una invocación los ignoraba). Armadura rota no: su −1 ya se cuenta abajo, por acumulación.
@@ -75,7 +75,7 @@ const InvCalculo = (() => {
   }
   function critEfectivo(inv, i){
     const {arruinada} = estadosArmadura(inv);
-    let v = num(inv.crit[i]);
+    let v = num(inv.crit[i]) + (num(inv.equipoVivo) >= 1 ? Combatiente.critDeEquipo(inv, i) : 0);   // 🛡 la base + lo equipado (paso 3; antes el equipo no le sumaba)
     if(arruinada) v -= aporteArmadura(inv, 'tipo'+(i+1));
     // + lo que dan los estados (Endurecido…, 2026-10-12)
     (inv.estados || []).forEach(es => { if(es && es.activo !== false) (es.mods || []).forEach(m => { if(m.stat === 'tipo' + (i + 1)) v += num(m.val) * Math.max(1, num(es.stacks) || 1); }); });
@@ -159,6 +159,7 @@ const InvCalculo = (() => {
     if(typeof estadosPresetFicha === 'function') Combatiente.sincronizarEstadosDePasivas(inv.estados, inv.pasivas, estadosPresetFicha());
     Combatiente.pasarArmaAItem(inv);   // 🗡 su arma, un ítem de su lista (docs/plan-inventario-creeps.md, paso 2): los campos arma* sueltos se convierten
     if(inv.defensa === undefined) inv.defensa = 0;
+    Combatiente.pasarEquipoVivo(inv, {crit: false});   // 🛡 paso 3: la Defensa del equipo en vivo (la Res. a crítico nunca se le había sumado)
     if(inv.notas === undefined) inv.notas = '';
     if(inv.acc !== undefined || inv.accMax !== undefined){
       delete inv.acc; delete inv.accMax; delete inv.nitros;  // arranca lleno, abajo

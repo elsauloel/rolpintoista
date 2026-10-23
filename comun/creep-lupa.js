@@ -143,7 +143,7 @@ const CreepLupa = (() => {
     const seccion = (titulo, contenido) => `<div class="vc-seccion"><div class="sect-label">${esc(titulo)}</div>${contenido}</div>`;
 
     const critLabels = ['Tipo 4','Tipo 6','Tipo 8','Tipo 10','Tipo 12'];
-    const crits = sc.crit.map((v, i) => num(v) ? caja(`Res. ${critLabels[i]}`, K.conSigno(K.critEfectivo(sc, i)), K.critOrigenTxt(sc, i)) : '').join('');
+    const crits = sc.crit.map((v, i) => num(v) || K.critEfectivo(sc, i) ? caja(`Res. ${critLabels[i]}`, K.conSigno(K.critEfectivo(sc, i)), K.critOrigenTxt(sc, i)) : '').join('');
 
     const habilidades = sc.habilidades.map(h => {
       const partes = [];

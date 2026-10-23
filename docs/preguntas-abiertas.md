@@ -695,6 +695,8 @@ resuelven a mano, como el resto de los avisos).
 - 🔲 **P150. El daño de un ataque sin arma** (2026-10-03, apareció probando un duelo: juan atacó sin arma y el duelo quedó «Tirando…» porque no
   había daño definido). **Provisorio:** 1 dado del Tipo sin arma (P22: 4) + Dmg = `1d4 + Dmg` (`FichaCombate.danoSinArmaTxt`), en el duelo y en el
   botón Daño de la Botonera. ¿Así, o los puños pegan distinto (sin Dmg, mitad, un efecto propio)? *(código)*
+  **Desde el 2026-10-22 (D4, paso 5 de `docs/plan-inventario-creeps.md`)** el mismo `1d4 + Dmg` vale también para un creep o una invocación
+  sin nada en la mano. Sigue abierta la pregunta de si los puños pegan distinto.
 
 - ✅ **P151. Qué ve de un duelo ajeno quien lo minimizó** — **Decidido (dueño, 2026-10-03): (c), las dos.** Hecho: el botón dice el
   último paso ya revelado y el mapa arma una tarjeta por duelo en la Crónica con un renglón por paso (`Duelo.pasosDe`, hook `paso` de

@@ -110,6 +110,14 @@ pública del creep, que leen los jugadores), se calculan a partir del ítem en l
    para probar.
 5. **Desarmado deja de ser un estado** (P217): «sin arma en la mano» se ve en el token y en la ficha y se ataca sin arma (el daño sin arma de P150,
    igual para creeps). Lo natural (garras, colmillos) sigue sin caerse ni poder levantarlo otro.
+   **Hecho (2026-10-22):** `Combatiente.armaEnMano` sin nada en la mano da el ataque sin arma (`sinArma: true`, Tipo 4, sin nombre: 1d4 + Daño,
+   como el personaje; `Combatiente.TIPO_SIN_ARMA`, `sinArmaEnMano`). Desarmado ya no se guarda en ningún camino (`agregarEstado`: se mira la
+   inmunidad y no se agrega; lo que hace es que el arma caiga, js/27): el desarme del duelo (js/62), la varita del manotazo (js/13) y el caos (js/13:
+   si no tiene un arma que se le caiga, sale otro debuff). Los Desarmado viejos se borran al cargar un creep o una invocación. En combate, el token
+   sin nada en la mano lleva una ✋ (lo publicado: `sinArma` del creep, de la invocación y del personaje; `tokenSinArma`, js/27); la ficha lite dice
+   «sin arma · 1d4 + N», las Acciones «Daño (sin arma)», la 🔍 y GM Tools «Sin arma». Ningún creep de fábrica queda sin arma. Probado en «Claude ·
+   pruebas»: al Goblin 4 se le cayó el Hacha, quedó sin estado, con la ✋ y «Daño (sin arma) 1d4 + 1»; la levantó desde sus Acciones y volvió a
+   tenerla en la mano (la ✋ se fue). Pruebas: 565 en verde. Queda para la limpieza (paso 8): los botones viejos de «Levantar el arma» por el estado.
 6. **El botín usa los ítems tal cual:** lo que el creep tenía (en la mano y guardado, menos lo natural) cae con todas sus mecánicas (varitas,
    talismanes, rasgos).
 7. **Editores:** GM Tools (equipar/desequipar del creep), la ventana de la invocación en la ficha y el editor común muestran «En las manos» y

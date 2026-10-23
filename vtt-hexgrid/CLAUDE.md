@@ -1749,3 +1749,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
 - **🔥 Arma elemental** (2026-10-21): el daño elemental de un arma (`dano.magico`) con `mult` sale ×1,5 (para arriba), con `porDano` deja su estado según
   lo que entró (`dueloPorDano(d, entro, p)`) y con `cadena` salta como el rayo (`dueloCadena`, ahora también sin habilidad). `vigilanciaActivada` (js/58)
   cuenta como ataque del turno también una habilidad con `cuentaComoAtaque`.
+- **✋ Sin arma en la mano** (2026-10-22, paso 5 de `../docs/plan-inventario-creeps.md`): Desarmado ya no es un estado; en combate, un token sin
+  nada en la mano lleva la insignia ✋ (`tokenSinArma`, js/27, con lo publicado `sinArma`) y pega sin arma (1d4 + Daño). **✨ Armas invocadas**
+  (`js/67-armas-invocadas.js`): lo de una invocación se desvanece de donde esté cuando ella ya no está; y una invocación que muere o termina sus
+  turnos desaparece del mapa (js/54, todas, no solo las temporales).

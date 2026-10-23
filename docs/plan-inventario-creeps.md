@@ -129,6 +129,17 @@ pública del creep, que leen los jugadores), se calculan a partir del ítem en l
    en la fábrica sale en la forma de creep (con su magia y sus rasgos, que `itemParaCreep` ya conserva).
 7. **Editores:** GM Tools (equipar/desequipar del creep), la ventana de la invocación en la ficha y el editor común muestran «En las manos» y
    «Guardado», con las mismas piezas del personaje.
+   **Hecho (2026-10-22):** reglas comunes en `Combatiente`: `gruposDeEquipo` (en las manos / puesto / guardado), `ponerPieza` (al ponerse un arma,
+   la que tenía en la mano se guarda y la nueva queda primera, que es la que usa; si no alcanzan las manos se guarda lo que haga falta; lo que no va
+   en la mano reemplaza a lo de su mismo lugar; lo natural ni ocupa mano ni se guarda), `guardarPieza` y `sacarPieza` (en combate, 1 No2 como
+   equipar a un personaje). GM Tools (el editor del creep) y la ventana de la invocación (paso «Defensa») muestran los tres grupos con 🎒 guardar y
+   ✋ ponérsela; el arma de la mano de GM Tools también tiene 🎒. En la pelea, las Acciones de un creep y la Botonera de una invocación ofrecen
+   «🔁 Sacar X · 1 No2» por cada pieza de mano guardada (lo cuenta la Mesa). Lo que se levanta del piso a la mano, si es un arma, también queda
+   primera. Probado en «Claude · pruebas»: en GM Tools el Goblin 1 guardó la Lanza (quedó «✋ Sin arma», 1d4) y desde sus Acciones en el mapa la
+   volvió a sacar (−1 No2, la ✋ del token se fue; se le devolvió el No2); en la ficha de Clementino, el Lobo guardó y volvió a ponerse el Arco
+   corto (se canceló sin guardar). Pruebas: 567 en verde.
+   Visto de paso: en «Claude · pruebas» el escudo y el chaleco de los goblins de prueba tienen Defensa 0 en sus datos (el catálogo dice +2): es un
+   dato viejo de esa partida, no de este cambio.
 8. **Limpieza:** se borran los datos sueltos y los caminos viejos (incluidas las pruebas que los usan), cuando todo lo anterior ande en una sesión real.
 
 ## Decisiones del dueño ✅ (2026-10-22: «dale con las recomendaciones, me parece bien»)

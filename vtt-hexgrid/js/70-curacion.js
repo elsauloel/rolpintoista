@@ -19,10 +19,12 @@ function zonaCuraDe(el){
 const curaAliados = (ref, tipo) => [...tokens.entries()].filter(([, t]) => t.fichaId && !t.bajoTierra && !etereoDe(t) && (tipo === 'creep' ? t.tipo === 'creep' : t.tipo === 'pj'));
 // El momento de un pulso: el primero al ponerla; después, el comienzo de cada turno de quien la creó (`turno@paso`), o cada ronda si no está en el
 // orden de turnos (`ronda@Mantenimiento`). null = ahora no toca (es el turno de otro).
+// (2026-10-23, probado en el mapa: si se activa en su propio turno, ese pulso ES el de este turno — antes contaba «inicio» y enseguida otro.)
 function curaMomento(hechos, tokenId){
-  if(!hechos.length) return 'inicio';
-  if(tokenId && esSuTurno(tokenId) !== null) return esSuTurno(tokenId) ? 'turno@' + Math.round(num(iniciativa.paso)) : null;
-  return mantenimientoNumero === null ? null : 'ronda@' + Math.round(num(mantenimientoNumero));
+  const enOrden = tokenId && esSuTurno(tokenId) !== null;
+  const ahora = enOrden ? (esSuTurno(tokenId) ? 'turno@' + Math.round(num(iniciativa.paso)) : null)
+    : (mantenimientoNumero === null ? null : 'ronda@' + Math.round(num(mantenimientoNumero)));
+  return hechos.length ? ahora : (ahora || 'inicio');
 }
 const tokenDeRef = (ref, tipo) => { for(const [id, t] of tokens) if(t.fichaId === ref && t.tipo === tipo) return id; return null; };
 // La cura a cada aliado de la lista: un número fijo (o, si la habilidad trae una fórmula, una tirada para todos). Mesa y Crónica.

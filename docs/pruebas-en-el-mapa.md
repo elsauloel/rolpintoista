@@ -700,7 +700,7 @@
 - [x] **💧 La Parálisis al doble en el agua, dentro de un duelo** (2026-10-17): falta verla en un duelo de verdad (un rayo con Parálisis contra
   **Probado el 2026-10-20 (Claude, «Test con claude elsaulo»):** Silvia parada en un charco recibe la Varita de chispa eléctrica: el tablero muestra Parálisis 50 % (el doble del 25 %) y el daño «en el agua: 6 × 1,5 = 9» (20 → 11).
   alguien parado en un charco: el tablero de efectos tiene que mostrar el doble de chance y «💧 en el agua»).
-- [ ] **⚡💧 El rayo corre por el agua, en un duelo de verdad** (2026-10-17): probado llamando a la función con dos personajes en un charco
+- [x] (2026-10-23, Claude, «Claude · pruebas»: dos goblins en un charco; la Bruja les tiró la Varita de chispa eléctrica al Goblin 1: el tablero mostró la Parálisis al 20 % por el agua, el Goblin 1 recibió 1 × 1,5 = 2, el rayo corrió al Goblin 4 y **su Parálisis se aplicó sola** —para verla salir se forzó el azar unos segundos—; duelo cerrado con «Listo, cerrar», charco borrado) **⚡💧 El rayo corre por el agua, en un duelo de verdad** (2026-10-17): probado llamando a la función con dos personajes en un charco
   **Avance el 2026-10-20 (Claude, «Test con claude elsaulo»):** en un duelo real el golpe corrió por el charco hasta el Lobo (9). La Parálisis del Lobo se tiró sola (50 %) y no salió: falta verla salir. Ojo: el Lobo recibió además el salto eléctrico (6): pregunta abierta P214.
   (Xeena recibió 4 × 1,5 = 6, la Crónica y la Mesa lo contaron); falta un duelo real con un rayo con Parálisis, para ver que la Parálisis del
   otro se aplica sola (en la prueba salió «a mano» por el duelo armado a mano).

@@ -457,7 +457,8 @@ async function zonasDelQueLaTiro(tokenId, mantNuevo){
     const quedan = Math.round(num(el.turnos)) - 1;
     try{
       if(quedan <= 0 && el.zona && !el.portal && el.zonaEnMantenimiento !== false && Number.isFinite(mantNuevo)){
-        await coleccionElementos().doc(id).update({turnos: 0, venceMant: mantNuevo});
+        // (Sin `turnos`: las reglas no aceptan 0 —de 1 a 99— y la escritura fallaba callada; la zona se quedaba otra ronda. 2026-10-23.)
+        await coleccionElementos().doc(id).update({turnos: firebase.firestore.FieldValue.delete(), venceMant: mantNuevo});
         const txt = `Se va ${el.zonaNombre || 'la zona'} (terminaron sus turnos), después de su efecto de esta ronda.`;
         if(!lineas.includes(txt)) lineas.push(txt);
       }else if(quedan <= 0){

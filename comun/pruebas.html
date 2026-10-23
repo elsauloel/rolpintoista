@@ -1211,7 +1211,7 @@ prueba('📜 Un consumible con Ejecución (2026-10-20, la Red Nerubian): habilid
   const sol = e.efectos[0].spec.soltar;
   igual([h.modo, h.tiradaStat, red.precioCompra, e.objetivo, e.alcance, e.contra.map(x => x.stat || x), e.efectos.map(x => x.nombre + ':' + (x.spec && x.spec.turnos)), Combatiente.habDeConsumible({nombre: 'Poción'}),
     [sol.stat, sol.dif, Combatiente.soltarNorm(sol).alEmpezar, Combatiente.soltarNorm(sol).ayuda]],
-    ['auto', 'pdgmg', 50, 'enemigo', 6, ['eva'], ['Inmovilizado:3'], null, ['fue', 8, true, true]]);   // su Ef.Esp es 3: el pergamino (Buena calidad) tiene mínimo 8 (2026-10-23)
+    ['auto', 'pdgmg', 50, 'enemigo', 6, ['eva'], ['Inmovilizado:3'], null, ['fue', 9, true, true]]);   // su Ef.Esp es 3: el pergamino (Buena calidad) tiene mínimo 9 (2026-10-23)
 });
 prueba('🎲 Volver a tirar el consumible al azar antes de publicar (2026-10-14)', () => {
   const sc = {id: 'j', nombre: 'Jefe', nivel: 3, jefe: true, tipoCriatura: 'humanoide'};
@@ -3891,9 +3891,9 @@ prueba('trampa de una habilidad: una conocida por tipo (veneno: daño por turno 
     [['Cómo', 'Tipo'], ['Cómo', 'Tipo', 'Tamaño', 'Daño', 'Qué le deja', 'Se evita', 'Nombre', 'Resumen'], 'Veneno', 'Veneno', 4, true, {stat: 'Evasión', dif: 10, que: 'todo'}, '1d6', 'linea',
      ['Cómo', 'Tipo', 'Tamaño', 'Daño', 'Efecto adicional', 'Se evita', 'Nombre', 'Resumen'], '4d6', '', 'Púas y estacas', true]);
 });
-prueba('trampas (2026-10-19, dueño): detectar Común 6 · Buena 8 · Rara 10; la que pone alguien, con su Destreza (mecánica) o su Efecto especial (mágica); el 📚 sale del catálogo', () => {
+prueba('trampas (2026-10-19, dueño; 2026-10-23: 7-9-11): detectar Común 7 · Buena 9 · Rara 11; la que pone alguien, con su Destreza (mecánica) o su Efecto especial (mágica); el 📚 sale del catálogo', () => {
   const tr = CATALOGO_BASE.filter(i => i.trampaDatos && !i.archivo);
-  const PORCAL = {'Común': 6, 'Buena Calidad': 8, 'Raro': 10};
+  const PORCAL = {'Común': 7, 'Buena Calidad': 9, 'Raro': 11};
   const malas = tr.filter(i => i.trampaDatos.detectar !== PORCAL[i.tier] || !['des', 'dmgesp'].includes(i.trampaDatos.detectarStat)).map(i => i.nombre);
   const oso = tr.find(i => i.nombre === 'Trampa de oso'), runa = tr.find(i => i.nombre === 'Runa de debilidad');
   const val = st => ({des: 9, dmgesp: 4, trampaoculta: 1})[st] || 0;
@@ -3911,7 +3911,7 @@ prueba('Glifo de teletransporte (2026-10-19, dueño): Buena, mágica, destino fi
   let aviso = '';
   const ok = await FichaAcciones.colocarTrampaDeItem('x', g, {toast: t => { aviso = t; }});
   igual([g.tier, g.trampaDatos.detectarStat, g.trampaDatos.detectar, !!g.trampaDatos.portal.colocador, filas.includes('Teletransporta'), ok, /desde el mapa/.test(aviso)],
-    ['Buena Calidad', 'dmgesp', 8, true, true, false, true]);
+    ['Buena Calidad', 'dmgesp', 9, true, true, false, true]);
 });
 
 prueba('Bombucha de talco (2026-10-19, dueño): Común, se tira dentro del Rango a una casilla a la vista; flor de 7, revela lo oculto sin alumbrar', () => {
@@ -3929,8 +3929,8 @@ prueba('cómo se ve un ítem: la trampa en datos cortos (forma, daño, efecto, s
   const base = TRAMPAS_BASE.find(t => t.nombre === 'Trampa de oso');
   igual([filas, grilla.includes('⚙'), grilla.includes('Automático'), ver.includes('Detalles técnicos'), ver.includes('⚙ Automático'), ItemCorto.trampaFilas(menor.trampaDatos).find(f => f[0] === 'Detectarla')[1],
     p.hace, p.tecnico.startsWith('⚙'), base.datos.estado, base.datos.detectar, ItemCorto.tecnicoHtml('Solo dice qué hace.')],
-    [['Se dispara: cuando alguien (también un aliado) pisa su casilla (una sola)', 'Alcanza: solo a quien la pisa (en el piso)', 'Daño: 2d6 · contempla la armadura', 'Efecto: Inmovilizado · 1 turno', 'Se resiste: no', 'Para salir: 🔓 Soltarse: Fuerza contra 6 · 1 No2', 'Detectarla: Percepción contra la Destreza de quien la coloca (si la pone el GM: 6)', 'Es: mecánica (se desarma con la Destreza)'],
-     false, false, true, true, 'Percepción contra la Destreza de quien la coloca (si la pone el GM: 8)', 'Da +2 a la Fuerza.', true, 'Inmovilizado', 6, '']);   // (2026-10-19, dueño: una trampa Común se detecta contra 6)
+    [['Se dispara: cuando alguien (también un aliado) pisa su casilla (una sola)', 'Alcanza: solo a quien la pisa (en el piso)', 'Daño: 2d6 · contempla la armadura', 'Efecto: Inmovilizado · 1 turno', 'Se resiste: no', 'Para salir: 🔓 Soltarse: Fuerza contra 7 · 1 No2', 'Detectarla: Percepción contra la Destreza de quien la coloca (si la pone el GM: 7)', 'Es: mecánica (se desarma con la Destreza)'],
+     false, false, true, true, 'Percepción contra la Destreza de quien la coloca (si la pone el GM: 9)', 'Da +2 a la Fuerza.', true, 'Inmovilizado', 7, '']);   // (2026-10-19, dueño: una trampa Común se detecta contra 6; 2026-10-23: contra 7)
 });
 prueba('trampas automáticas: el estado y la salvación viajan juntos en trampaEstado; 3 turnos (Stun 1); los textos dicen qué va solo y qué a mano', () => {
   const oso = TRAMPAS_BASE.find(t => t.nombre === 'Trampa de oso').datos, dardos = TRAMPAS_BASE.find(t => t.nombre === 'Dardos envenenados').datos, descarga = TRAMPAS_BASE.find(t => t.nombre === 'Descarga eléctrica').datos;
@@ -4338,10 +4338,10 @@ prueba('Confusión: estado estándar con su marca (la tira el mapa), y la Niebla
   const est = []; Combatiente.agregarEstado(est, structuredClone(p));
   igual([!!p.confusion, p.turnos, !!est[0].confusion, niebla.estado, niebla.efectoManual || '', /1d4/.test(niebla.detalle)], [true, 2, true, 'Confusión', '', true]);
 });
-prueba('arena movediza: Fuerza contra el Ef.Esp de quien la puso, mínimo 8, para zafar (si falla, se hunde) y terreno lento (cada paso que sale de ella cuesta 2 No2)', () => {
+prueba('arena movediza: Fuerza contra el Ef.Esp de quien la puso, mínimo 9, para zafar (si falla, se hunde) y terreno lento (cada paso que sale de ella cuesta 2 No2)', () => {
   const arena = CATALOGO_BASE.find(i => i.nombre === 'Arena movediza').trampaDatos;
   igual([arena.soltar, arena.lento, TokensAuto.estadoJson({nombre: 'Inmovilizado', turnos: 1}, null, null, null, '', 2), ItemCorto.trampaFilas(arena).find(f => f[0] === 'Terreno')[1]],
-    [{stat: 'fue', etq: 'Fuerza', dif: 8, no2: 1, hunde: 1, difStat: 'dmgesp', difMin: 8}, 2, '{"nombre":"Inmovilizado","turnos":1,"lento":2}', 'una vez disparada, cada paso que sale de ella cuesta 2 No2']);
+    [{stat: 'fue', etq: 'Fuerza', dif: 9, no2: 1, hunde: 1, difStat: 'dmgesp', difMin: 9}, 2, '{"nombre":"Inmovilizado","turnos":1,"lento":2}', 'una vez disparada, cada paso que sale de ella cuesta 2 No2']);
 });
 prueba('resistencia elemental y Sigilo: el elemento de un daño, los stats nuevos de personajes y creeps, y el elemento de una trampa', () => {
   const S = FichaGuardado.normalizar({}).S;
@@ -4835,21 +4835,21 @@ prueba('efecto «seguro si es crítico»: el asistente lo conserva (y los stacks
       [2, true, 'Envenenar (25%, 2 stacks, seguro si es crítico)', [1, 4], [4, 4], true]);
   }finally{ Object.assign(window, antes); }
 }); fbFalsoCola = pp.catch(() => {}); return pp; });
-prueba('pergamino: el mínimo de calidad para el Efecto especial (tirada y dificultad; Común 6, Buena 8, Rara 10; 2026-10-23)', () => {
+prueba('pergamino: el mínimo de calidad para el Efecto especial (tirada y dificultad; Común 7, Buena 9, Rara 11; 2026-10-23)', () => {
   const p = tier => Combatiente.habDeConsumible({nombre: 'P', tier, duelo: {objetivo: 'enemigo', tira: 'dmgesp', contra: ['rescc'], efectos: [{nombre: 'Inmovilizado', soltar: {stat: 'fue', difStat: 'dmgesp', dif: 6}}]}});
   const e = (tier, esp) => Combatiente.habEjecucion(p(tier), p(tier).duelo, {stat: id => ({dmgesp: esp})[id] || 0});
-  igual([e('Común', 3).tira.min, e('Raro', 3).tira.min, e('Buena Calidad', 3).efectos[0].spec.soltar.dif, e('Buena Calidad', 11).efectos[0].spec.soltar.dif], [6, 10, 8, 11]);
+  igual([e('Común', 3).tira.min, e('Raro', 3).tira.min, e('Buena Calidad', 3).efectos[0].spec.soltar.dif, e('Buena Calidad', 11).efectos[0].spec.soltar.dif], [7, 11, 9, 11]);
 });
 prueba('trampas mágicas compradas: evitarlas o soltarse contra el Ef.Esp de quien la puso, con el número de la tabla como mínimo (2026-10-23)', () => {
   const runa = CATALOGO_BASE.find(i => i.nombre === 'Runa de silencio'), arena = CATALOGO_BASE.find(i => i.nombre === 'Arena movediza');
   const v = x => st => st === 'trampaoculta' ? 0 : x;
   const td = (it, x) => Combatiente.trampaDeHab({nombre: it.nombre, trampaColocar: it.trampaDatos}, v(x));
-  igual([td(runa, 5).salvacion.dif, td(runa, 12).salvacion.dif, td(arena, 3).soltar.dif, td(arena, 10).soltar.dif], [9, 12, 8, 10]);
+  igual([td(runa, 5).salvacion.dif, td(runa, 12).salvacion.dif, td(arena, 3).soltar.dif, td(arena, 10).soltar.dif], [9, 12, 9, 10]);
 });
-prueba('trampa comprada: el mínimo para detectarla por calidad (Común 6, Buena 8, Rara 10; 2026-10-23), si quien la coloca tiene menos', () => {
+prueba('trampa comprada: el mínimo para detectarla por calidad (Común 7, Buena 9, Rara 11; 2026-10-23), si quien la coloca tiene menos', () => {
   const td = tier => ({nombre: 'Cepo', trampaColocar: {nombre: 'Cepo', detectarMin: Combatiente.detectarMinDe(tier)}});
   const v = x => st => st === 'trampaoculta' ? 0 : x;
-  igual([Combatiente.trampaDeHab(td('Común'), v(3)).detectar, Combatiente.trampaDeHab(td('Buena Calidad'), v(3)).detectar, Combatiente.trampaDeHab(td('Raro'), v(3)).detectar, Combatiente.trampaDeHab(td('Raro'), v(12)).detectar, Combatiente.trampaDeHab({nombre: 'h', trampaColocar: {nombre: 'h'}}, v(3)).detectar], [6, 8, 10, 12, 3]);
+  igual([Combatiente.trampaDeHab(td('Común'), v(3)).detectar, Combatiente.trampaDeHab(td('Buena Calidad'), v(3)).detectar, Combatiente.trampaDeHab(td('Raro'), v(3)).detectar, Combatiente.trampaDeHab(td('Raro'), v(12)).detectar, Combatiente.trampaDeHab({nombre: 'h', trampaColocar: {nombre: 'h'}}, v(3)).detectar], [7, 9, 11, 12, 3]);
 });
 prueba('No2 negativos en una defensa (2026-10-23): se puede quedar en negativo, pero no gastar si ya estás en negativo', () => {
   igual([Combatiente.defensaSinNo2(0, 1), Combatiente.defensaSinNo2(2, 1), Combatiente.defensaSinNo2(-1, 1), Combatiente.defensaSinNo2(-1, 0)], [false, false, true, false]);

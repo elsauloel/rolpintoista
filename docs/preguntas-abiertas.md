@@ -1173,6 +1173,10 @@ cascotes, Runa de silencio, Succión arcana, Tumba de hielo, Espejo de discordia
 la puso, con el número de la tabla como mínimo** (`difStat: 'dmgesp'` + `difMin` en `salvacion` / `soltar`); la Arena movediza (Buena) pasó de 6 a
 8 para entrar en el patrón (evitar: Común 7, Buena 9, Rara 11; soltarse: 6, 8, 10). Las físicas siguen fijas. ✅ P218 cerrada (lo de «los cauces»,
 descartado por el dueño).
+**Ajuste (dueño, 2026-10-23, el mismo día): todo pasa a 7, 9, 11** («la dificultad en 7 para las comunes, partiendo de ahí»): detectar una
+trampa comprada, el mínimo del Ef.Esp de los pergaminos (la Red Nerubian, mínimo 9) y soltarse de cualquier trampa comprada (Trampa de oso y Red
+de caza 7; Cepo reforzado, Cola de carpintero y Arena movediza 9; Cepo de dientes de sierra, Resina de árbol negro y Tumba de hielo 11). Evitarlas
+ya era 7, 9, 11. Una sola tabla: `Combatiente.DETECTAR_MIN_TIER`.
 
 Regla del dueño (2026-10-23), ya aplicada al **Pergamino de red Nerubian**: la dificultad para soltarse es el **Efecto especial neto** de quien lo
 usa (su valor, no una tirada), **con un mínimo de 6** («es algo que vos pagaste, es consumible, solo funciona una vez»); si quien lo usa tiene más,

@@ -161,7 +161,7 @@
 > - [x] **🪤 Revisar la dificultad para detectar de las trampas del catálogo (2026-10-17, dueño; decidido y hecho 2026-10-19):** la Percepción de los personajes es baja
 >   (1d8 o menos en El origen). **Las de una habilidad están bien** (dueño: la dificultad sale de la Destreza o el Efecto especial de quien la
 >   coloca, y si es alta, es una trampa difícil de ver); revisar las del catálogo y las que se arman en el mapa (número fijo, una común 8)
->   contra la Percepción real. **Decidido (dueño, 2026-10-19):** el catálogo manda — **Común 6 · Buena 8 · Rara 10** es la dificultad cuando la pone
+>   contra la Percepción real. **Decidido (dueño, 2026-10-19):** el catálogo manda — **Común 7 · Buena 9 · Rara 11** (subido de 6-8-10 el 2026-10-23) es la dificultad cuando la pone
 >   el **GM** (el 📚 del mapa ahora lista las trampas del catálogo de ítems y pregunta la dificultad, arrancando en esa); **la que coloca alguien**
 >   (personaje, creep o invocación, de un consumible o de una habilidad) usa **su Destreza si es mecánica o su Efecto especial si es mágica** (cada
 >   trampa del catálogo dice cuál es: `detectarStat`). **Detectarla, siempre con Percepción**; desarmarla o disiparla, con Destreza o Efecto

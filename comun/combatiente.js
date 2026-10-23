@@ -1686,7 +1686,7 @@ const Combatiente = (() => {
   // físicas) o de su Efecto especial (mágicas, `detectarStat: 'dmgesp'`), en el momento de colocarla. Sin `valorDe`, queda la de siempre (6).
   /* El mínimo para detectar una trampa comprada (dueño, 2026-10-23: «es algo que pagaste»): por su calidad. Si quien la coloca tiene más (su
      Destreza o su Efecto especial, más los Guantes de trampero), vale eso. */
-  const DETECTAR_MIN_TIER = {'Común': 6, 'Buena Calidad': 8, 'Raro': 10};
+  const DETECTAR_MIN_TIER = {'Común': 7, 'Buena Calidad': 9, 'Raro': 11};
   const detectarMinDe = tier => DETECTAR_MIN_TIER[String(tier || '').trim()] || 0;
   function trampaDeHab(h, valorDe){
     const t = h && h.trampaColocar;
@@ -2018,7 +2018,7 @@ const Combatiente = (() => {
      habilidad o de una varita. Se arma una habilidad de un uso (automática) y sigue el camino de siempre: elegir el objetivo, el cuadro del duelo, los
      efectos. Lo usan FichaAcciones.consumir (personaje) y las Acciones de un creep (vtt-hexgrid/js/12). */
   /* 📜 El mínimo de calidad (dueño, 2026-10-23: «la calidad mínima de algunos efectos de consumibles»): un consumible que usa tu Efecto especial —para
-     tirar o como dificultad— lo toma como mínimo según su calidad (Común 6, Buena 8, Rara 10, los mismos de las trampas). Si tenés más, vale el tuyo. */
+     tirar o como dificultad— lo toma como mínimo según su calidad (Común 7, Buena 9, Rara 11, los mismos de las trampas; dueño, 2026-10-23: de 6-8-10 a 7-9-11). Si tenés más, vale el tuyo. */
   function conMinimoDeCalidad(duelo, tier){
     const min = detectarMinDe(tier);
     if(!min || !duelo) return duelo;

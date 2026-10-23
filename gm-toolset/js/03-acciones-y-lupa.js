@@ -145,14 +145,15 @@ function cardHtml(sc){
               <div class="equipo-item-info">
                 <div class="equipo-item-top">
                   <span class="equipado-nombre">${esc(it.nombre)}</span>
-                  <span class="valor-caja" title="Defensa que otorga"><small>DEF</small>+${fmt(Combatiente.defDeItem(it))}</span>
+                  ${/^arma_/.test(String(it.tipoItem || '')) && !it.especial ? `<span class="valor-caja" title="Tipo del arma"><small>TIPO</small>${fmt(num(it.tipoDado))}</span>`
+                    : `<span class="valor-caja" title="Defensa que otorga"><small>DEF</small>+${fmt(Combatiente.defDeItem(it))}</span>`}
                   ${titulo === 'Guardado' ? `<button class="rm" data-ponerpieza="${sc.id}:${it.id}" title="Ponérsela (lo que no entre en la mano o en su lugar se guarda)">✋</button>`
                     : it.natural ? '' : `<button class="rm" data-guardarpieza="${sc.id}:${it.id}" title="Guardarla (la lleva encima pero no da bonos)">🎒</button>`}
                   <button class="rm" data-naturalequipo="${sc.id}:${it.id}" title="${it.natural ? 'Natural (parte del cuerpo): no se suelta al morir · tocá para que sea una pieza que se suelta' : 'Tocá para marcarla natural (piel, caparazón…): da sus bonos pero no se suelta al morir'}" style="${it.natural ? 'color:#8EE6A8;border-color:#8EE6A8' : 'opacity:.55'}">🐾</button>
                   <button class="rm" data-verequipocreep="${sc.id}:${it.id}" title="Ver la pieza (y editarla y subirla al catálogo)">👁</button>
                   <button class="rm" data-quitarequipo="${sc.id}:${it.id}" title="Quitar">×</button>
                 </div>
-                <div class="equipo-item-meta">${esc(TIPOITEM_LABEL_GM[it.tipoItem] || it.tipoItem)}${it.natural ? ' · 🐾 natural: no se suelta' : ''}</div>
+                <div class="equipo-item-meta">${esc(TIPOITEM_LABEL_GM[it.tipoItem] || ({arma_1m: 'Arma de 1 mano', arma_2m: 'Arma de 2 manos'})[it.tipoItem] || it.tipoItem)}${it.natural ? ' · 🐾 natural: no se suelta' : ''}</div>
                 ${it.detalle ? `<div class="arma-detalle">${esc(it.detalle)}</div>` : ''}
               </div>
             </div>`).join('') : `<div class="hint">${vacio}</div>`}

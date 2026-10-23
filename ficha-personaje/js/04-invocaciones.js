@@ -296,7 +296,7 @@ function invPasoHtml(id, inv){
   if(id === 'arma') return `
     <div class="inv-arma-compacta">
       <div class="inv-arma-top">
-        <span class="inv-arma-nombre">${Combatiente.armaEnMano(inv).nombre ? esc(Combatiente.armaEnMano(inv).nombre) : '<span class="hint">Sin nombre</span>'}</span>
+        <span class="inv-arma-nombre">${Combatiente.armaEnMano(inv).nombre ? esc(Combatiente.armaEnMano(inv).nombre) : `<span class="hint">${Combatiente.armaEnMano(inv).sinArma ? '✋ Sin arma (nada en la mano)' : 'Sin nombre'}</span>`}</span>
         <span class="inv-danopreview"><b>${esc(invDanoTxt(inv, invStatValor(inv,'dmg')))}</b></span>
         <button type="button" class="mini" data-editararmainv="${inv.id}">✎ Editar</button>
       </div>

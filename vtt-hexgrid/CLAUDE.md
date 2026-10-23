@@ -1733,6 +1733,10 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `desarmar` (el GM) o un personaje con la skill del Warrior (`resumen.desarmar`, quien lo maneja: `bnManejo`), muestra el botón instantáneo 🤺 (`Flotantes.desarmar`); `desarmarUsar` cobra y marca el duelo (`Duelo.marcarDesarme`). Si gana, el duelo termina
   «desarmado» y el gancho `desarmado` (js/14) llama `desarmadoResuelto`: el momento «desarme» hace la ruleta de casillas en todas las pantallas
   (`desarmeRuleta`, `dibujarEfectosRuleta`, js/05 y js/16) y `armaSoltar(t, 0, {celda, itemId, itemNombre})` (js/27) deja el arma o el escudo en el piso.
+  Desde el 2026-10-23 (dueño) la ruleta es `desarmeConRuleta(t, {gano, itemId, itemNombre, dueloId, casillas})`, que usan también la **Expelliarmus** y el
+  Desarmado de la Varita del caos (`desarmeVolando`, desde `dueloAplicarEfecto` y `caosAplicar` de js/13, con el `vuela` del efecto). **El ícono de lo
+  que queda en el piso** sale de `iconoDeItem` / `iconoDeElemento` / `iconoDeArmaDe` (js/27): 🗡️ Tipo 4 y 6 · 🪓 8 · 🔨 10 · 💣 12 · 🛡️ escudo ·
+  🔮 talismán y orbe · 🏹 arco y ballesta · ➹ flecha especial · 🪄 varita y báculo · 🪨 honda.
 - **⚡ Botones Flash** (2026-10-21, `js/61-botones-flash.js`): Blindaje, Shield, Estoicismo y Shockwave tienen su botón fijo, como el 💪 de Empower
   (`FLASH_BOTONES`, `resumen.flashBotones` de la ficha, `Flotantes.blindaje/shield/estoicismo/shockwave`); aparece si le alcanza el SP (el de turno ajeno
   si no es su turno) y `flashBotonUsar` ejecuta la habilidad como desde la Botonera.

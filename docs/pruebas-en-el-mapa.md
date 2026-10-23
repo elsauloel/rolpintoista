@@ -127,7 +127,9 @@
   la presa: +2 al daño» en el cuadro; a los 2 turnos se va.
 - [x] **🗡 Ráfaga de cortes** — probado el 2026-10-21, «Test con claude elsaulo», el GM con el control de Silvia: la declaración «+2 dados · 3 cortes · Perfora 1 en cada corte (pasan al menos 3)», el daño «2d4+2d4+1» y tres chances de Sangrado al 25 % en el tablero (Corte 1, 2, 3; esta vez ninguna entró). **Arreglado**: con el daño elegido a mano, en el mapa se perdían los efectos del arma de un creep. (2026-10-21, choque liviano): (2026-10-21, choque liviano): con un creep con un arma con efectos (sangrado al 25 %, perfora 1): la declaración «3 cortes», el
   daño con +2 dados, el tablero de efectos con tres chances («Corte 1, 2, 3») y «Perfora 1 en cada corte (pasan al menos 3)» en la declaración y el daño.
-- [x] **🔨 Romper armadura** — probado el 2026-10-21, «Test con claude elsaulo», el GM con el control de Silvia: con un golpe que la Defensa frenaba igual se ofreció la Armadura rota (correcto); sin piezas de armadura, nada que romper; con un Peto y una Capucha de prueba, el Golpe demoledor («2d4 + 1 + 1d4») rompió las dos (Defensa 4 → 3). Falta: con un crítico, «no entra». (2026-10-21, choque pesado): (2026-10-21, choque pesado): contra un personaje, la Armadura rota cae en una pieza equipada (Defensa y durabilidad); contra un
+- [x] **🔨 Romper armadura** — probado el 2026-10-21, «Test con claude elsaulo», el GM con el control de Silvia: con un golpe que la Defensa frenaba igual se ofreció la Armadura rota (correcto); sin piezas de armadura, nada que romper; con un Peto y una Capucha de prueba, el Golpe demoledor («2d4 + 1 + 1d4») rompió las dos (Defensa 4 → 3). **Con un crítico (2026-10-23)**: la regla «un crítico no rompe armadura» se borró (dueño) y se probó lo
+  nuevo en «Claude · pruebas»: Goblin de prueba 1 con Romper armadura contra juan, PdG 16 (a mano) contra Evasión 4 → crítico ×2, 10 directo a la
+  vida, «Armadura rota · Entra siempre» → Aplicar: el Peto de tablas pasó de 6/6 a 5/6 con Armadura rota ×1 y la Defensa de juan de 2 a 1. (2026-10-21, choque pesado): (2026-10-21, choque pesado): contra un personaje, la Armadura rota cae en una pieza equipada (Defensa y durabilidad); contra un
   creep, −1 Defensa; el Golpe demoledor con +1 dado y la doble; con un crítico, «no entra».
 - [x] **⚡ Cadena de rayos de creep** — probado el 2026-10-21, «Test con claude elsaulo», el GM con el control de Silvia: a Silvia le entraron 7 (8 − Def. especial 1), saltó a Xeena con 3 y a Aurelia con 1 (en la Crónica); la Parálisis 20 % salió y quedó 1 turno. (2026-10-21, Mago): (2026-10-21, Mago): el duelo dirigido, 2d4 eléctrico, el salto a otros dos o tres personajes (la mitad cada vez, el rayo en
   el mapa y la Crónica) y el 20 % de Parálisis al primero.
@@ -158,7 +160,7 @@
   al costado; el menú con las tiradas recientes de los personajes a su alcance; el duelo PdG.Esp contra Res.Esp sin marcar en el mapa; si gana, la tirada se
   repite y queda la peor (con la animación y el duelo resuelto otra vez); en turno ajeno, el doble (SP o cooldown) y su línea en la Mesa.
 - [ ] **Lo que quedó sin probar el 2026-10-21** (dueño: «déjalo anotado para seguir probando cuando te vuelva a pedir que pruebes cosas»): ~~Vigilancia~~ (probada
-  el 2026-10-23); Romper armadura con un crítico («no entra»); el Coletazo contra una pared (el daño de colisión);
+  el 2026-10-23); ~~Romper armadura con un crítico~~ (2026-10-23: ahora sí rompe, probado); el Coletazo contra una pared (el daño de colisión);
   Aguante en modo SP y que se pierda si no ataca; la ayuda de un aliado para soltarse (Red); y el **PdG a mano** (2026-10-21): que cobre los No2, pregunte si
   está Sentado o sin No2 y sume el Arma elemental o un óleo, igual que el botón. **Probado en parte (2026-10-21)**: el PdG a mano de un ataque común cobró sus No2 (30 → 26) y contó el ataque; el de una habilidad «con tu arma» no cobra de nuevo (ya cobró la habilidad). El texto decía «No cobra No2»: arreglado.
 - [x] **💥 Daño de colisión** — probado el 2026-10-21 (Cornada): contra un Sólido, la Constitución de Silvia (3) − Defensa 3 → 0; contra Xeena, cada uno la del otro (Silvia 1 − 3 → 0, Xeena 1 − 0 → 1). **Arreglado**: «Le faltaron 1 casillero» → «Le faltó». (P178, 2026-10-21): un empujón (la Cornada con carrera, una ráfaga) que choca contra una pared → una Constitución del
@@ -472,7 +474,7 @@
   automáticas.
 - [x] **🛡 Armadura rota: cinco arreglos** (2026-10-12, «Claude · pruebas», el GM con el control de juan, con una Tapa de tacho de basura y un Peto de
   tablas equipados): (1) **Atraviesa escudos** abolla el escudo que paró el disparo (Tapa 3/3 → 2/3, «abollado ×1»; el peto intacto) y lo cuenta
-  la Mesa; (2) **un crítico no rompe armadura**: el efecto queda «no entra · fue crítico» (con la prueba automática; un crítico real con un hacha
+  la Mesa; (2) **un crítico no rompe armadura** (regla borrada el 2026-10-23: ahora sí rompe): el efecto quedaba «no entra · fue crítico» (con la prueba automática; un crítico real con un hacha
   en el mapa **falta**); (3) **Anillo de armadura indestructible**: la primera Armadura rota del combate no tocó ninguna pieza, la segunda sí
   (peto 6/6 → 5/6, ×1); (4) el estado y el manual ya no nombran el Óleo reparador; (5) **Equipo y mochila** (también la del mapa) muestra
   «🔧 5/6 · Armadura rota ×1 (−1 Defensa)» en cada pieza. De paso: los avisos de una pieza rota o a punto de romperse que le llegan a un

@@ -12,6 +12,28 @@
 - Lo que el dueño define («queda así») se programa, pasa las pruebas automáticas, se sube y se anota «para probar»; las pruebas en el mapa se corren
   todas juntas cuando él lo pide.
 - Una habilidad puede servir a más de un rol, y puede tener su versión de bestia y de humanoide (o una sola para los dos).
+- **Emparejar primero (dueño, 2026-10-23)**: antes de seguir la rotación, se priorizan los roles con **menos conceptos cargados** hasta que todos
+  tengan la misma cantidad; recién ahí se vuelve a avanzar uno por uno. Se cuenta por **concepto** (una pareja bestia/humanoide o las variantes de
+  un mismo concepto cuentan una vez), sumando las habilidades ya hechas en los creeps de «El origen de las especies» (ver el conteo abajo).
+
+## Conteo por concepto (2026-10-23) — para emparejar
+
+Cuenta los conceptos con alguna habilidad (de fábrica auditada o de los creeps de «El origen de las especies», que desde el 2026-10-23 están entre las
+de fábrica como «sin auditar», con su rol y su concepto: `ORIGEN` en `comun/skills-creep-base.js`). **Rango y Hunter se cuentan juntos** (dueño: «se van
+a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
+
+- 🛡 **Choque pesado — 18**: más daño, empujar, atrapar, guardia, salto, barrido, desarmar, golpe anunciado, remate, romper armadura · de El origen:
+  furia, pisotón, provocar, segundo aliento, aguantar el daño, cubrir al de al lado, perforar, carga que derriba.
+- 🗡 **Choque liviano — 14**: golpe preciso, sangrado, trabar, golpear y alejarse, salto, abrir la herida, manada, ráfaga, por la espalda · de El origen:
+  robar, sigilo, varios golpes, bajo tierra, veneno.
+- 🏹 **Rango y Hunter — 11**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar · de El origen: área a distancia,
+  atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
+- ✨ **Mago — 4**: daño en área, rayo en cadena · de El origen: proyectil, fuego con quemadura.
+- 🧿 **Debuffer — 5**: control mental, maleficio · de El origen: ceguera, veneno, inmovilizar.
+- 💚 **Support — 4**: arma elemental · de El origen: curación, grito de grupo, escudo a un aliado.
+- 👑 Jefe (aparte): refuerzos (Plaga en la galería).
+
+**Para emparejar, los que van primero**: Mago y Support (4), después Debuffer (5).
 
 ## Los roles
 

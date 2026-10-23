@@ -371,7 +371,7 @@ async function crearElementoZona(centro, cfg){
   };
   if(cfg.amiga) datos.zonaAmiga = true;
   if(cfg.dano){ datos.zonaDano = String(cfg.dano).slice(0, 12); if(cfg.ignoraDef) datos.zonaIgnoraDef = true; }
-  if(cfg.estado && (cfg.estado.nombre || cfg.estado.revela || cfg.estado.porTirada)) datos.zonaEstado = JSON.stringify(cfg.estado).slice(0, 300);   // (o solo revela: la Bombucha de talco, 2026-10-19; o solo la tabla «según la tirada», 2026-10-22)
+  if(cfg.estado && (cfg.estado.nombre || cfg.estado.revela || cfg.estado.porTirada || cfg.estado.cura)) datos.zonaEstado = JSON.stringify(cfg.estado).slice(0, 300);   // (o solo revela: la Bombucha de talco, 2026-10-19; o solo la tabla «según la tirada», 2026-10-22)
   if(cfg.resistStat && Number.isFinite(cfg.resistValor)){ datos.zonaResistStat = String(cfg.resistStat).slice(0, 12); datos.zonaResistValor = Math.round(num(cfg.resistValor)); }
   // La tirada de la zona (2026-10-02, P143): el stat de quien la creó y su valor al crearla; se tira cada vez que afecta a alguien.
   else if(cfg.resistStat && cfg.tiraStat && Number.isFinite(cfg.tiraValor)){

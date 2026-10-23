@@ -30,7 +30,7 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 4**: daño en área, rayo en cadena · de El origen: proyectil, fuego con quemadura.
 - 🧿 **Debuffer — 5**: control mental, maleficio · de El origen: ceguera, veneno, inmovilizar.
-- 💚 **Support — 4**: arma elemental, grito de guerra (¡A la carga! y Arenga, de fábrica desde el 2026-10-23) · de El origen: curación, escudo a un aliado.
+- 💚 **Support — 4**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23 · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
 **Para emparejar, los que van primero**: Mago y Support (4), después Debuffer (5).
@@ -312,7 +312,8 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
 29. **¡Cuidado!**: cuando un aliado es atacado, le suma Evasión.
 
 **H. Curar y proteger** (para más adelante)
-30. Curar a uno, en área o por turno (Curación menor y mayor, Canto revitalizante, Polen sanador, Zona sagrada, Aura sanadora).
+30. ✅ **Curar** (2026-10-23): **Sanar** (1d6+4), **Bálsamo** (Regeneración 4 × 3 turnos), **Círculo de sanación** (zona de diámetro 5, 4 turnos) y
+    **Aura sanadora** (diámetro 11 alrededor de él, 4 turnos); la zona y el aura, 1d6 por ronda a todos sus aliados (una tirada). Síntesis de las de «El origen» y fábrica.
 31. Escudo especial a un aliado, Formación, Círculo de protección, Aura de protección.
 32. Recibir el golpe por otro (también es del tanque).
 33. Limpiar estados de un aliado.

@@ -351,6 +351,7 @@ function zonaAplicaA(el, t){
 // disparar. Cuenta una vez por ronda, también el daño (el piso ardiendo de la Mina napalm).
 const zonaClave = (el, t) => el.trampa ? `${zonaIdDe(t)}@${Math.round(num(mantenimientoNumero))}` : zonaIdDe(t);
 function zonaLeFalta(el, t){
+  if(typeof zonaCuraDe === 'function' && zonaCuraDe(el)) return false;   // 💚 la zona de curación cura por pulsos (js/70), no con el cartel de cada uno
   // 🧊 Superficies (js/50): el agua no tiene efecto propio (nada que resolver); el hielo, cada vez que alguien pisa (no se anota resuelto).
   const sup = typeof superficieSpec === 'function' ? superficieSpec(el) : null;
   if(sup && sup.superficie && !sup.nombre) return false;

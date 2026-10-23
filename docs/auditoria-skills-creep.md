@@ -237,6 +237,17 @@
   copias. **¡A la carga!**: a sus aliados a 4 o menos (no él), +2 a la PdG, PdG.Esp, daño y Ef.Esp, 2 turnos; **2 No2 y 3 SP**, o cooldown 3. **Arenga**:
   Bendecido 3 turnos a los mismos; **1 No2 y 2 SP**, o cooldown 3. No se apilan (otro igual renueva los turnos). Los costos los propuso Claude. **Para probar.**
 
+- ✅ **Sanar**, **Bálsamo**, **Círculo de sanación** y **Aura sanadora** (Support, «curar», 2026-10-23, dueño: «una sea de regeneración y la otra sintetizamos el
+  heal como un heal»; «el área de diámetro 5, durar 4 turnos… se tira el dado de 6 por la zona… se active 4 veces… cura a todos los aliados»; «un aura de
+  curación de diámetro 11 alrededor del propio caster… 4 turnos un dado de 6 por turno»). Síntesis de las de «El origen» (Savia que cierra heridas 2d6,
+  Esporas curativas 2d4+2, Regeneración 5 × 3) y de las de fábrica a mano (Curación menor y mayor, Canto revitalizante, Polen sanador, Zona sagrada, Aura
+  sanadora), que salieron del pool; referencia: el Heal de los personajes (1d6+4). **Sanar**: él o un aliado en su Rango, 1d6+4 (no levanta a un caído);
+  1 No2 y 2 SP, o cooldown 2. **Bálsamo** (no «Regeneración»: ya hay una de fábrica, la del tanque sobre sí): Regeneración 4 por turno, 3 turnos; 1 No2 y
+  2 SP, o cooldown 3. **Círculo de sanación**: zona de diámetro 5 (19 casillas) en su Rango, 4 turnos; al ponerla y en cada ronda nueva (4 veces) una
+  tirada de 1d6 cura a todos sus aliados adentro; 2 No2 y 4 SP, o cooldown 4. **Aura sanadora**: estado de 4 turnos; al activarla y en cada ronda nueva
+  (4 veces), 1d6 a sus aliados a 5 o menos (diámetro 11), él incluido; el token muestra el aura verde; 2 No2 y 4 SP, o cooldown 4. El motor de los
+  pulsos: `vtt-hexgrid/js/70-curacion.js`. Los costos los propuso Claude. **Abierto**: «curan 4» (dueño) — ¿4 pulsos (como quedó) o 4 de vida fija? **Para probar.**
+
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 
 ## Etiquetas

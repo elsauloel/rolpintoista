@@ -313,7 +313,7 @@ Cada vez que se activa, **baja en 1 la [[Defensa]]** del objetivo y es **permane
 
 - **A un personaje** se le daña **una pieza de armadura equipada, elegida al azar**: esa pieza pierde 1 de Defensa y 1 de durabilidad (ver [[Durabilidad]]). El daño queda en la pieza aunque se la saque.
 - **A un creep o una invocación** le queda el estado [[Armadura rota]] (×N).
-- **Un golpe crítico no rompe armadura**, ni el de un arma con Romper armadura: el crítico justamente evita la armadura.
+- **Un golpe crítico también rompe armadura** (desde el 2026-10-23; antes no la rompía).
 
 ## Cómo se repara
 - **Reparando la pieza** (en un personaje): con el herrero de una tienda o con el talento de reparar. Cada punto reparado devuelve 1 de Defensa.
@@ -564,7 +564,7 @@ estado: borrador
 **Regla nueva (ya está en las fichas; reparar todavía es a mano).** Cada arma, escudo y pieza de armadura tiene **durabilidad: 3 puntos por cada punto de Peso** (mínimo 3). **Los creeps y las invocaciones no llevan.**
 
 - **Armas y escudos** pierden **1 punto** cuando su dueño **gana el Parry pero pierde el Bloqueo** con ellos. Ganar el Parry sin perder el Bloqueo no gasta nada.
-- **Las armaduras** pierden durabilidad **solo con el efecto Rompe armadura** (elige **una pieza equipada al azar**, sin distinguir por ninguna característica). Un **golpe crítico no rompe armadura**, ni siquiera el de un arma con Rompe armadura: el crítico justamente evita la armadura.
+- **Las armaduras** pierden durabilidad **solo con el efecto Rompe armadura** (elige **una pieza equipada al azar**, sin distinguir por ninguna característica). Un **golpe crítico también la rompe**, como cualquier golpe que pega.
 - **Armadura rota** es de **cada pieza**, no del personaje: si se saca la armadura, **sigue rota**. Cada punto le baja **1 la Defensa** a esa pieza, y **nunca supera la durabilidad total** de la pieza.
 - **Un escudo abollado** (por ejemplo, un disparo que *atraviesa escudos*) también pierde **1 de Defensa por cada abolladura**, sin pasar de la que da. Un orbe no.
 - Al quedar en **1 punto** se avisa que el arma, el escudo o la armadura **está a punto de romperse**. En **0 queda rota**: ocupa el slot pero **es como si no la tuvieras equipada** (sin efectos).

@@ -22,7 +22,7 @@
   const RG = [{nombre: 'Rengo', turnos: 2, detalle: 'Rengo 2 turnos: moverse le cuesta 2 No2 por casillero.'}];   // el Rengo de los golpes a las piernas (2026-10-21)
   const SGF = [{nombre: 'Sangrado', turnos: 3, stacks: 3, detalle: 'Sangrado fuerte: 3 de daño por turno durante 3 turnos (se acumula; con crítico, permanente).'}];   // la versión fuerte
   const AR = n => [{nombre: 'Armadura rota', stacks: n, detalle: n > 1 ? 'Armadura rota doble: 2 acumulaciones.' : 'Armadura rota: 1 acumulación.'}];   // romper armadura (2026-10-21)
-  const AR_NOTA = 'Un golpe crítico no rompe armadura (la esquiva); alcanza con que el golpe pegue, aunque la armadura frene todo el daño. A un personaje le cae en una pieza equipada al azar (pierde Defensa y durabilidad hasta repararla); a un creep, −1 Defensa por acumulación.';
+  const AR_NOTA = 'Alcanza con que el golpe pegue (también un crítico), aunque la armadura frene todo el daño. A un personaje le cae en una pieza equipada al azar (pierde Defensa y durabilidad hasta repararla); a un creep, −1 Defensa por acumulación.';
   const SG = [{nombre: 'Sangrado', turnos: 2, detalle: 'Sangrado: 2 de daño por turno durante 2 turnos (se acumula; con crítico, permanente).'}];   // el Sangrado de los golpes que sangran (2026-10-21)
   const tA = (detalle, no2) => ({detalle, no2});
   // Un ataque con su arma, con arreglos (`arma`: los de la Ejecución ✨ — dados, pdg, fijo, perfora, critBono…), que va al duelo como un ataque.

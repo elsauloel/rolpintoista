@@ -4835,7 +4835,7 @@ prueba('efecto «seguro si es crítico»: el asistente lo conserva (y los stacks
       [2, true, 'Envenenar (25%, 2 stacks, seguro si es crítico)', [1, 4], [4, 4], true]);
   }finally{ Object.assign(window, antes); }
 }); fbFalsoCola = pp.catch(() => {}); return pp; });
-prueba('un golpe crítico no rompe armadura (regla del dueño, programada 2026-10-12): Rompe armadura queda «no entra»', () => { const pp = fbFalsoCola.then(async () => {
+prueba('un golpe crítico también rompe armadura (2026-10-23, dueño: se borró la regla de que no): Rompe armadura entra con o sin crítico', () => { const pp = fbFalsoCola.then(async () => {
   const docs = {};
   const tx = {get: async r => ({exists: !!docs[r.id], data: () => docs[r.id]}), update: (r, c) => { docs[r.id] = {...docs[r.id], ...c}; }};
   const antes = {fbDb: window.fbDb, fbRutaCampana: window.fbRutaCampana};
@@ -4846,7 +4846,7 @@ prueba('un golpe crítico no rompe armadura (regla del dueño, programada 2026-1
     const efs = [{nombre: 'Rompe armadura', caras: 1, exitos: 1, spec: {nombre: 'Armadura rota', stacks: 1}}, {nombre: 'Sangrado', caras: 4, exitos: 1}];
     await Duelo.guardarDano('c', {total: 3, formula: '1d4', rolls: [3]}, efs);
     await Duelo.guardarDano('s', {total: 3, formula: '1d4', rolls: [3]}, efs);
-    igual([docs.c.efectos.map(e => !!e.omitido), /crítico/.test(docs.c.efectos[0].motivo), docs.s.efectos.map(e => !!e.omitido)], [[true, false], true, [false, false]]);
+    igual([docs.c.efectos.map(e => !!e.omitido), docs.s.efectos.map(e => !!e.omitido)], [[false, false], [false, false]]);
   }finally{ Object.assign(window, antes); }
 }); fbFalsoCola = pp.catch(() => {}); return pp; });
 

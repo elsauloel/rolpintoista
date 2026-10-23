@@ -122,7 +122,7 @@
 
 - ✅ **Romper armadura** (humanoide) y **Arrancar la coraza** (bestia): un ataque con su arma que, si pega, deja **Armadura rota 1**; lo de un ataque y
   **2 SP**, o cooldown 3. **Golpe demoledor** (humanoide) y **Mandíbula trituradora** (bestia), la versión fuerte: **+1 dado** y **Armadura rota doble**;
-  **4 SP**, o cooldown 4 (2026-10-21, dueño, «partir la armadura»). Un crítico no rompe armadura; entra aunque la armadura frene todo el daño. **Para probar.**
+  **4 SP**, o cooldown 4 (2026-10-21, dueño, «partir la armadura»). Un crítico también rompe armadura (2026-10-23, dueño: se borró la regla de que no); entra aunque la armadura frene todo el daño. **Para probar.**
 
 - ✅ **El que avisa no traiciona** (humanoides) / **Zarpazo erguido** (bestias) (2026-10-21, «golpe anunciado»; era el «Golpe cargado» sin auditar): cargarlo, 1 No2 y
   1 SP o cooldown 3; es su ataque del turno. Queda **Golpe anunciado** y el GM marca a quién apunta (la Mesa y la Crónica lo anuncian). En su próximo turno

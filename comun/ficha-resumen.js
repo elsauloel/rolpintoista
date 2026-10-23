@@ -48,8 +48,9 @@ const FichaResumen = (() => {
 
   /* ---------- No2 máximo de una invocación (js/04) ---------- */
   function invFuentesEquipo(inv){
-    const arma = Combatiente.armaEnMano(inv).mods.length ? [{nombre: Combatiente.armaEnMano(inv).nombre || 'Arma', mods: Combatiente.armaEnMano(inv).mods}] : [];
-    return [...(inv.equipo || []), ...arma];
+    if(!Combatiente.tieneCamposArma(inv)) return inv.equipo || [];   // (el arma va en su equipo; una vieja con los campos sueltos, aparte)
+    const a = Combatiente.armaEnMano(inv);
+    return [...Combatiente.equipoSinArma(inv), ...(a.mods.length ? [{nombre: a.nombre || 'Arma', mods: a.mods}] : [])];
   }
   function invModTotal(inv, statId){
     let total = 0;

@@ -126,7 +126,7 @@ const CombateFin = (() => {
     const out = [];
     const nom = K.nombreLimpio(sc);
     if(Combatiente.armaEnMano(sc).nombre && !Combatiente.armaEnMano(sc).natural){ const t = plantillaArmaCreep(cat, sc); out.push({clave: `${sc.id}:arma`, nombre: t.nombre, precioCompra: t.precioCompra, template: t, origen: nom}); }
-    (sc.equipo || []).filter(it => !it.natural).forEach(it => { const t = plantillaEquipoCreep(cat, it, sc.nivel);   // 🐾 lo natural no se suelta (2026-10-14)
+    Combatiente.equipoSinArma(sc).filter(it => !it.natural).forEach(it => { const t = plantillaEquipoCreep(cat, it, sc.nivel);   // 🐾 lo natural no se suelta (2026-10-14)
       out.push({clave: `${sc.id}:eq:${it.id}`, nombre: t.nombre, precioCompra: t.precioCompra, template: t, origen: nom}); });
     K.dropsFijos(sc).forEach((n, i) => {   // los drops fijos (2026-10-14): del catálogo, siempre
       const c = cat.find(x => sinAviso(x.nombre) === sinAviso(n));

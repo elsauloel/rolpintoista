@@ -252,7 +252,7 @@ function aplicarModsEquipo(sc, mods, signo){
 // (nombres separados por coma), tanto si se equipó del catálogo como si el
 // creep es un custom armado a mano con esos mismos ítems.
 function actualizarArmaduraTipo(sc){
-  sc.armaduraTipo = (sc.equipo||[]).map(it => it.nombre).join(', ');
+  sc.armaduraTipo = Combatiente.equipoSinArma(sc).map(it => it.nombre).join(', ');
 }
 
 function quitarEquipoDeCreep(scId, equipoId){
@@ -282,17 +282,7 @@ function equiparItemEnCreep(idx){
     if(modsAfectanHp(mods)) actualizarHpMaxPorCon(sc);
     toast(`${sc.nombre} equipado con ${item.nombre}`);
   }else{
-    sc.armaTipo = item.tipoDado;
-    sc.armaPeso = Math.max(1, item.peso);
-    sc.armaFijo = item.danoFijo;
-    sc.armaAmplificado = num(item.danoAmplificado);
-    sc.armaDeRango = !!item.armaDeRango;
-    sc.armaRasgos = Combatiente.rasgosDeItem(item); delete sc.armaEspalda; delete sc.armaIgnoraResistCrit;   // los rasgos del arma (comun/combatiente.js)
-    sc.armaNombre = item.nombre;
-    sc.armaDetalle = item.detalle || '';
-    sc.armaMods = structuredClone(item.mods || []);
-    sc.armaEfectos = structuredClone(item.efectosGolpe || []);
-    sc.armaManos = item.tipoItem;
+    ponerArmaEnCreep(sc, item);   // 🗡 un ítem de su lista, en la mano (comun/combatiente.js, ponerArma)
     toast(`${sc.nombre} equipado con ${item.nombre}`);
   }
   $('#scrim-equipar-creep').classList.remove('open');

@@ -107,7 +107,7 @@ const InvCalculo = (() => {
     const a = armaDe(inv);
     return Combatiente.armaParaDefensa({arma: a.nombre ? {nombre: a.nombre, peso: a.peso} : null, natural: a.natural,
       arco: a.armaDeRango, soloEscudo: !!(o && o.soloEscudo),
-      escudos: Combatiente.piezasParaParry(inv.equipo, slotDe, it => num(it.peso))});   // un báculo sí, un orbe no (2026-10-17)
+      escudos: Combatiente.piezasParaParry(Combatiente.equipoSinArma(inv), slotDe, it => num(it.peso))});   // un báculo sí, un orbe no (2026-10-17)
   }
   function bloqueoValor(inv){ const d = defensa(inv); return statValor(inv, 'bloqueo') + (d ? num(d.peso) : 0); }
   function costoAtaque(inv){ return Combatiente.conExtenuado(inv.estados, costoAtaque0(inv)); }   // + Extenuado (2026-10-12)
@@ -157,13 +157,7 @@ const InvCalculo = (() => {
     inv.habilidades = Array.isArray(inv.habilidades) ? inv.habilidades : [];
     inv.pasivas = Array.isArray(inv.pasivas) ? inv.pasivas : [];   // (2026-10-16) como las de un creep; la que da un estado lo mantiene puesto
     if(typeof estadosPresetFicha === 'function') Combatiente.sincronizarEstadosDePasivas(inv.estados, inv.pasivas, estadosPresetFicha());
-    inv.armaMods = Array.isArray(inv.armaMods) ? inv.armaMods : [];
-    inv.armaEfectos = Array.isArray(inv.armaEfectos) ? inv.armaEfectos : [];
-    if(inv.armaManos === undefined) inv.armaManos = 'arma_1m';
-    if(inv.armaAmplificado === undefined) inv.armaAmplificado = 0;
-    if(inv.armaDeRango === undefined) inv.armaDeRango = false;
-    if(inv.armaNombre === undefined) inv.armaNombre = '';
-    if(inv.armaDetalle === undefined) inv.armaDetalle = '';
+    Combatiente.pasarArmaAItem(inv);   // 🗡 su arma, un ítem de su lista (docs/plan-inventario-creeps.md, paso 2): los campos arma* sueltos se convierten
     if(inv.defensa === undefined) inv.defensa = 0;
     if(inv.notas === undefined) inv.notas = '';
     if(inv.acc !== undefined || inv.accMax !== undefined){

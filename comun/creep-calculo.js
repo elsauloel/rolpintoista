@@ -94,18 +94,19 @@ const CreepCalculo = (() => {
   /* ---------- Stats ---------- */
   // 🗡 Su arma: siempre por la puerta única (Combatiente.armaEnMano, docs/plan-inventario-creeps.md), nunca por los campos arma* sueltos.
   const armaDe = sc => Combatiente.armaEnMano(sc);
-  function danoTxt(sc, extra){
+  function danoTxt(sc, extra, dadosMas){   // dadosMas: dados del arma de más en este golpe (el Mordisco feroz)
     const a = armaDe(sc);
-    const dados = a.peso + a.danoAmplificado;
+    const dados = a.peso + a.danoAmplificado + Math.max(0, num(dadosMas));
     const tipo = a.tipoDado;
     const fijo = a.danoFijo + Combatiente.dmgDelArma(a, num(extra));   // cuerpo a cuerpo el Dmg entero; un arco, la mitad; otra de rango, nada
     return `${dados}d${tipo}${fijo?` + ${fmt(fijo)}`:''}`;
   }
 
-  // Lo que el creep tiene puesto y da bonos: su equipo y su arma (Combatiente.armaEnMano(sc).mods).
+  // Lo que el creep tiene puesto y da bonos: su equipo (con su arma adentro; una vieja con los campos sueltos, aparte).
   function fuentesEquipo(sc){
-    const a = armaDe(sc), arma = a.mods.length ? [{nombre: a.nombre || 'Arma', mods: a.mods}] : [];
-    return [...(sc.equipo || []), ...arma];
+    if(!Combatiente.tieneCamposArma(sc)) return sc.equipo || [];
+    const a = armaDe(sc);
+    return [...Combatiente.equipoSinArma(sc), ...(a.mods.length ? [{nombre: a.nombre || 'Arma', mods: a.mods}] : [])];
   }
 
   // Suma los modificadores que apuntan a un stat puntual, vengan del equipo
@@ -332,7 +333,7 @@ const CreepCalculo = (() => {
     const stat = 'tipo' + (i + 1);
     const L = [];
     let deItems = 0;
-    (sc.equipo||[]).forEach(it => {
+    Combatiente.equipoSinArma(sc).forEach(it => {
       const v = (it.mods||[]).filter(m => m.stat === stat).reduce((a, m) => a + num(m.val), 0);
       if(!v) return;
       deItems += v;
@@ -420,7 +421,7 @@ const CreepCalculo = (() => {
     const a = armaDe(sc);
     return Combatiente.armaParaDefensa({arma: a.nombre ? {nombre: a.nombre, peso: a.peso} : null, natural: a.natural,
       arco: a.armaDeRango, soloEscudo: !!(o && o.soloEscudo),
-      escudos: Combatiente.piezasParaParry(sc.equipo, slotDe, pesoPieza)});   // un báculo sí, un orbe no (2026-10-17)
+      escudos: Combatiente.piezasParaParry(Combatiente.equipoSinArma(sc), slotDe, pesoPieza)});   // un báculo sí, un orbe no (2026-10-17)
   }
   // El peso de una pieza del equipo (2026-10-13): las equipadas antes no lo guardaban; si falta, el del catálogo con ese nombre.
   function pesoPieza(it){
@@ -497,8 +498,8 @@ const CreepCalculo = (() => {
       armaNombre: a.natural ? nom(a.nombre) : ver(a.nombre),
       armaNatural: a.natural,
       // Lo de las manos (además del arma) va aparte del equipo (2026-10-17): una varita, un escudo, un orbe.
-      manosNombres: (Array.isArray(sc.equipo) ? sc.equipo : []).filter(enLasManos).map(it => it.natural ? nom(it.nombre) : ver(it.nombre)).filter(Boolean).slice(0, 6),
-      equipoNombres: (Array.isArray(sc.equipo) ? sc.equipo : []).filter(it => it && !enLasManos(it)).map(it => it.natural ? nom(it.nombre) : ver(it.nombre)).filter(Boolean).slice(0, 30),   // lo natural se ve con su nombre, como el arma natural
+      manosNombres: Combatiente.equipoSinArma(sc).filter(enLasManos).map(it => it.natural ? nom(it.nombre) : ver(it.nombre)).filter(Boolean).slice(0, 6),
+      equipoNombres: Combatiente.equipoSinArma(sc).filter(it => it && !enLasManos(it)).map(it => it.natural ? nom(it.nombre) : ver(it.nombre)).filter(Boolean).slice(0, 30),   // lo natural se ve con su nombre, como el arma natural
       notas: String(sc.notas || '').trim().slice(0, 600),
       tipoCriatura: tipoDe(sc).slice(0, 30),   // el tipo de criatura (Matabestias de los arcos, 2026-10-11)
       pasosSilenciosos: num(modTotal(sc, 'pasossilenciosos')) > 0,   // 👣 (2026-10-15): el mapa de los jugadores no lo hace oír a 3 casilleros
@@ -567,19 +568,17 @@ const CreepCalculo = (() => {
     sc.habilidades = Array.isArray(sc.habilidades) ? sc.habilidades : [];
     sc.pasivas = Array.isArray(sc.pasivas) ? sc.pasivas : [];   // (2026-10-15)
     if(typeof estadosPresetCreep === 'function') Combatiente.sincronizarEstadosDePasivas(sc.estados, sc.pasivas, estadosPresetCreep());   // la pasiva que da un estado (2026-10-16)
-    sc.armaMods = Array.isArray(sc.armaMods) ? sc.armaMods : [];
-    sc.armaEfectos = Array.isArray(sc.armaEfectos) ? sc.armaEfectos : [];
     sc.cinturon = Array.isArray(sc.cinturon) ? sc.cinturon : [];   // consumibles a mano (2026-10-04)
     migrarCreepTipos(sc);
     migrarCreepEspecial(sc);
     migrarHabPdg(sc);
+    Combatiente.pasarArmaAItem(sc);   // 🗡 su arma, un ítem de su lista (docs/plan-inventario-creeps.md, paso 2): los campos arma* sueltos se convierten
     // Recompensas (2026-09-20): los creeps viejos no las traen.
     if(typeof sc.mapa !== 'string') sc.mapa = '';   // en qué mapa está (comun/creeps-mapas.js; '' = la Reserva)
     if(sc.tipoCriatura === undefined) sc.tipoCriatura = '';
     if(sc.tipoCriaturaOtro === undefined) sc.tipoCriaturaOtro = '';
     sc.jefe = sc.jefe === true;
     sc.oroBase = Math.max(0, num(sc.oroBase));
-    sc.armaNatural = sc.armaNatural === true;
     if(!sc.trofeoEspecial || typeof sc.trofeoEspecial !== 'object') sc.trofeoEspecial = {nombre: '', precio: 0};
     // Acciones → No2.
     if(sc.acc !== undefined || sc.accMax !== undefined){
@@ -730,7 +729,7 @@ const CreepCalculo = (() => {
     const partes = [];
     const a = armaDe(sc);
     if(a.nombre && !a.natural) partes.push(`${a.nombre} (arma equipable)`);
-    (sc.equipo || []).filter(it => !it.natural).forEach(it => partes.push(`${it.nombre} (equipo)`));   // 🐾 lo natural no se suelta (2026-10-14)
+    Combatiente.equipoSinArma(sc).filter(it => !it.natural).forEach(it => partes.push(`${it.nombre} (equipo)`));   // 🐾 lo natural no se suelta (2026-10-14)
     const tr = trofeo(sc);
     if(tr) partes.push(`${tr.nombre} (trofeo: compra ${fmt(tr.precioCompra)}, venta ${fmt(tr.precioCompra / 2)}, ${fmt(despojosDePrecio(tr.precioCompra))} despojos)`);
     dropsFijos(sc).forEach(n => partes.push(`${n} (drop fijo)`));

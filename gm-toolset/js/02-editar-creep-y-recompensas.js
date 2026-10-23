@@ -166,12 +166,12 @@ document.addEventListener('change', e => {
   const seguirSugerido = () => { if(!num(sc.oroBase) || num(sc.oroBase) === sugPrevio) sc.oroBase = oroSugeridoCreep(sc); };
   if(campo === 'tipoCriatura'){
     sc.tipoCriatura = t.value;
-    sc.armaNatural = TIPOS_CON_ARMA_NATURAL.includes(t.value);   // valor sugerido por tipo; se puede cambiar
+    marcarArmaNatural(sc, TIPOS_CON_ARMA_NATURAL.includes(t.value));   // valor sugerido por tipo; se puede cambiar (js/05)
     seguirSugerido();
   }else if(campo === 'tipoCriaturaOtro'){ sc.tipoCriaturaOtro = t.value; }
   else if(campo === 'jefe'){ sc.jefe = t.checked; seguirSugerido(); }
   else if(campo === 'oroBase'){ sc.oroBase = Math.max(0, num(t.value)); }
-  else if(campo === 'armaNatural'){ sc.armaNatural = t.checked; }
+  else if(campo === 'armaNatural'){ marcarArmaNatural(sc, t.checked); }
   else if(campo === 'trofeoNombre'){ sc.trofeoEspecial = {...(sc.trofeoEspecial || {}), nombre: t.value.trim()}; }
   else if(campo === 'trofeoPrecio'){ sc.trofeoEspecial = {...(sc.trofeoEspecial || {}), precio: Math.max(0, num(t.value))}; }
   else if(campo === 'arquetipo'){   // (2026-10-19) los arquetipos a mano; ninguno = vuelve al automático
@@ -336,7 +336,7 @@ function htmlPasoAsistCreep(p){
   }
   if(p === 3){
     return `<p class="pap-nota" style="margin:0 0 10px">Rareza sugerida para el nivel ${n}: <b>${RAREZA_ARMADURA[Math.min(n, 5) - 1]}</b>. Defensa total: <b>${fmt(num(sc.defensa))}</b>.</p>
-      <div class="equipo-list">${sc.equipo.length ? sc.equipo.map(it => `<div class="equipo-item"><div class="equipo-item-info"><div class="equipo-item-top">
+      <div class="equipo-list">${Combatiente.equipoSinArma(sc).length ? Combatiente.equipoSinArma(sc).map(it => `<div class="equipo-item"><div class="equipo-item-info"><div class="equipo-item-top">
         <span class="equipado-nombre">${esc(it.nombre)}</span><span class="valor-caja"><small>DEF</small>+${fmt(num(it.def))}</span>
 <button class="rm" data-naturalequipo="${sc.id}:${it.id}" title="${it.natural ? 'Natural (parte del cuerpo): no se suelta al morir · tocá para que sea una pieza que se suelta' : 'Tocá para marcarla natural (piel, caparazón…): da sus bonos pero no se suelta al morir'}" style="${it.natural ? 'color:#8EE6A8;border-color:#8EE6A8' : 'opacity:.55'}">🐾</button>
         <button class="rm" data-verequipocreep="${sc.id}:${it.id}" title="Ver la pieza (y editarla y subirla al catálogo)">👁</button>

@@ -668,9 +668,7 @@ const Sim = (() => {
   function ponerArma(sc, nombre){
     const it = itemCat(nombre); if(!it) throw new Error('No está en el catálogo: ' + nombre);
     const d = CreepCalculo.itemParaCreep(it);
-    sc.armaNombre = d.nombre; sc.armaManos = d.tipoItem; sc.armaTipo = num(d.tipoDado) || 8; sc.armaPeso = Math.max(1, num(d.peso) || 1); sc.armaFijo = num(d.danoFijo);
-    sc.armaAmplificado = Math.max(0, num(d.danoAmplificado)); sc.armaDeRango = !!d.armaDeRango; sc.armaMods = structuredClone(d.mods || []); sc.armaEfectos = structuredClone(d.efectosGolpe || []);
-    sc.armaRasgos = Combatiente.rasgosDeItem(it); sc.armaDetalle = d.detalle || '';
+    Combatiente.ponerArma(sc, {...d, ...Combatiente.rasgosDeItem(it), natural: Combatiente.armaEnMano(sc).natural});   // 🗡 un ítem de su lista (paso 2)
     return sc;
   }
   // Le suma una pieza de equipo del catálogo (la Defensa aparte, como en GM Tools).

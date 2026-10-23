@@ -168,7 +168,7 @@ const CreepAcciones = (() => {
     return Combatiente.ataqueConArreglos(h, c, {arma: {...Combatiente.armaDeCombatiente(sc), id: '', nombre: Combatiente.armaEnMano(sc).nombre || '', rango: Combatiente.armaEnMano(sc).armaDeRango},
       alcance: c && c.alcance !== undefined && c.alcance !== 'auto' ? Combatiente.alcanceHab(c, 'pdg', s => C().statValor(sc, s)) : C().alcance(sc),
       valorDe: s => C().statValor(sc, s),   // 🔓 un estado que se suelta contra un stat suyo (el Mordisco feroz: Fuerza contra su Fuerza)
-      danoGolpe: extra => String(C().danoTxt({...sc, armaAmplificado: Combatiente.armaEnMano(sc).danoAmplificado + num(extra)}, C().statValor(sc, 'dmg'))).replace(/\s+/g, '')});   // el daño de este golpe, otra vez
+      danoGolpe: extra => String(C().danoTxt(sc, C().statValor(sc, 'dmg'), num(extra))).replace(/\s+/g, '')});   // el daño de este golpe, otra vez
   }
   // ¿Tira algo? El stat vinculado (con su valor del momento) y/o la fórmula.
   function habTira(h){

@@ -64,6 +64,11 @@ document.addEventListener('input', e => {
     if(!inv) return;
     const campo = t.dataset.invf;
     const noNumericos = ['nombre','notas'];
+    if(campo === 'armaNatural'){   // 🗡 la marca va en el ítem del arma (comun/combatiente.js)
+      const a = Combatiente.armaPrincipal(inv);
+      if(a) a.natural = t.checked; else if(t.checked) Combatiente.ponerArma(inv, {nombre: '', natural: true});
+      renderInvocaciones(); return;
+    }
     if(t.type === 'checkbox'){ inv[campo] = t.checked; renderInvocaciones(); return; }
     inv[campo] = noNumericos.includes(campo) ? t.value : num(t.value);
     if(campo === 'cooldown') inv.cooldownActual = Math.min(num(inv.cooldownActual), num(inv.cooldown));

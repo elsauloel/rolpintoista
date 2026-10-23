@@ -138,7 +138,7 @@ function cardHtml(sc){
       <div>
         <div class="sect-label">Armadura</div>
         <div class="equipo-list" style="margin-top:4px">
-          ${sc.equipo.length ? sc.equipo.map(it => `
+          ${Combatiente.equipoSinArma(sc).length ? Combatiente.equipoSinArma(sc).map(it => `
             <div class="equipo-item">
               <div class="equipo-item-info">
                 <div class="equipo-item-top">

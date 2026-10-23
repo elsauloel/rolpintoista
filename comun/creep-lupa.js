@@ -173,7 +173,7 @@ const CreepLupa = (() => {
     const armas = [
       equipado(Combatiente.armaEnMano(sc).nombre || 'Arma sin nombre', Combatiente.armaEnMano(sc).armaDeRango ? 'Arma de rango' : 'Arma', esc(K.danoTxt(sc)),
         [Combatiente.armaEnMano(sc).detalle, efectos].filter(Boolean).join(' · ')),
-      ...(sc.equipo || []).filter(K.enLasManos).map(pieza),
+      ...Combatiente.equipoSinArma(sc).filter(K.enLasManos).map(pieza),
     ].join('');
     const equipo = (sc.equipo || []).filter(it => !K.enLasManos(it)).map(pieza).join('');
 

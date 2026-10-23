@@ -12,8 +12,6 @@ function nuevaInvocacion(){
     hp:5, hpMax:5, spd:5,  // Hp.Max = Con*5
     con:1, fue:1, agl:1, des:1, esp:1,
     ataquesTurno:0,  // inv.nitros lo pone migrarInvocacion: arranca en el máximo
-    armaTipo:8, armaPeso:1, armaFijo:0, armaAmplificado:0, armaDeRango:false, armaNatural:false, armaNombre:'', armaDetalle:'',
-    armaMods:[], armaEfectos:[], armaManos:'arma_1m',
     defensa:0, equipo:[],
     crit:[0,0,0,0,0],
     habilidades:[],
@@ -72,26 +70,14 @@ function cfgItemInv(){
     ejemplos: (tipoItem, t) => (S.catalogo || []).filter(it => ES_ARMA(it.tipoItem) && num(it.tipoDado) === t).map(it => it.nombre),
   };
 }
+// 🗡 El arma de la invocación para el asistente de ítems (una copia del ítem de su lista) y de vuelta a su mano (docs/plan-inventario-creeps.md, paso 2).
 function armaDeInvComoDraft(inv){
-  return {
-    nombre: Combatiente.armaEnMano(inv).nombre || '', tipoItem: Combatiente.armaEnMano(inv).tipoItem || 'arma_1m', tipoDado: Combatiente.armaEnMano(inv).tipoDado,
-    peso: Combatiente.armaEnMano(inv).peso, danoFijo: Combatiente.armaEnMano(inv).danoFijo, danoAmplificado: Combatiente.armaEnMano(inv).danoAmplificado,
-    armaDeRango: Combatiente.armaEnMano(inv).armaDeRango, mods: structuredClone(Combatiente.armaEnMano(inv).mods || []), detalle: Combatiente.armaEnMano(inv).detalle || '',
-    efectosGolpe: structuredClone(Combatiente.armaEnMano(inv).efectosGolpe), ...Combatiente.rasgosDeItem(Combatiente.armaDeCombatiente(inv)),
-  };
+  const {id, equipado, ...d} = structuredClone(Combatiente.armaEnMano(inv));
+  return d;
 }
 function ponerArmaEnInv(inv, d){
-  inv.armaNombre = d.nombre;
-  inv.armaManos = d.tipoItem;
-  inv.armaTipo = num(d.tipoDado) || 8;
-  inv.armaPeso = Math.max(1, num(d.peso) || 1);
-  inv.armaFijo = num(d.danoFijo);
-  inv.armaAmplificado = Math.max(0, num(d.danoAmplificado));
-  inv.armaDeRango = !!d.armaDeRango;
-  inv.armaMods = structuredClone(d.mods || []);
-  inv.armaEfectos = structuredClone(d.efectosGolpe || []);
-  inv.armaRasgos = Combatiente.rasgosDeItem(d); delete inv.armaEspalda; delete inv.armaIgnoraResistCrit;   // los rasgos del arma
-  inv.armaDetalle = d.detalle || '';
+  const antes = Combatiente.armaEnMano(inv);
+  Combatiente.ponerArma(inv, {...d, natural: d.natural !== undefined ? d.natural === true : antes.natural});
 }
 function ponerEquipoEnInv(inv, d){
   const def = (d.mods || []).filter(m => m.stat === 'def').reduce((a, m) => a + num(m.val), 0);
@@ -316,7 +302,7 @@ function invPasoHtml(id, inv){
     </div>
     <div class="inv-editar-separador" style="margin-top:12px"><span>Armadura</span></div>
     <div class="inv-equipo-list">
-      ${inv.equipo.length ? inv.equipo.map(it => `
+      ${Combatiente.equipoSinArma(inv).length ? Combatiente.equipoSinArma(inv).map(it => `
       <div class="inv-equipo-item">
         <span class="inv-equipo-nombre">${esc(it.nombre)}</span>
         <span class="hint">+${fmt(num(it.def))} DEF</span>

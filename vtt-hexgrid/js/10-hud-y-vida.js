@@ -41,8 +41,8 @@ function hudDatos(t){
     // El GM ve los nombres de verdad (de la ficha privada); los jugadores, lo publicado: de un creep vivo, solo qué es (2026-10-13).
     armaNombre: (t.tipo === 'creep' && soyGM && sc ? Combatiente.armaEnMano(sc).nombre : (v && v.armaNombre)) || '',
     armaNatural: !!(v && v.armaNatural),
-    equipoNombres: (t.tipo === 'creep' && soyGM && sc ? (sc.equipo || []).filter(e => e && !CreepCalculo.enLasManos(e)).map(e => e.nombre).filter(Boolean) : (v && v.equipoNombres)) || [],
-    manosNombres: (t.tipo === 'creep' && soyGM && sc ? (sc.equipo || []).filter(e => CreepCalculo.enLasManos(e)).map(e => e.nombre).filter(Boolean) : (v && v.manosNombres)) || [],   // (2026-10-17)
+    equipoNombres: (t.tipo === 'creep' && soyGM && sc ? Combatiente.equipoSinArma(sc).filter(e => e && !CreepCalculo.enLasManos(e)).map(e => e.nombre).filter(Boolean) : (v && v.equipoNombres)) || [],
+    manosNombres: (t.tipo === 'creep' && soyGM && sc ? Combatiente.equipoSinArma(sc).filter(e => CreepCalculo.enLasManos(e)).map(e => e.nombre).filter(Boolean) : (v && v.manosNombres)) || [],   // (2026-10-17)
     equipoVago: t.tipo === 'creep' && !soyGM && !(v && v.resumen && v.resumen.muerto) && num(sc ? sc.hp : 1) > 0,
   };
 }

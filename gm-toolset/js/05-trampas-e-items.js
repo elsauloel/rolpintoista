@@ -129,7 +129,7 @@ function abrirCatalogoArmasNaturales(scId){
     subtitulo: e => ` · ${e.etiquetas.includes('pesada') ? 'pesada' : e.etiquetas.includes('ligera') ? 'ligera' : 'media'} · ${e.etiquetas.includes('a distancia') ? 'a distancia' : 'cuerpo a cuerpo'}`,
     alElegir: async datos => {
       if(Combatiente.armaEnMano(sc).nombre && !(await Confirmar.preguntar(`${sc.nombre || 'El creep'} ya tiene "${Combatiente.armaEnMano(sc).nombre}". ¿Reemplazarla por ${datos.nombre}?`, {titulo: 'Reemplazar arma', icono: '🐾', si: 'Reemplazar'}))) return;
-      Object.assign(sc, armarArmaNatural(datos, sc.nivel));
+      Combatiente.ponerArma(sc, Combatiente.itemDeCamposArma(armarArmaNatural(datos, sc.nivel)));   // 🗡 reemplaza su arma por esta (un ítem de su lista)
       renderAll();
       toast(`${datos.nombre} equipada (arma natural, nivel ${sc.nivel || 1})`);
     },
@@ -165,27 +165,21 @@ function cfgItemGM(){
   };
 }
 
+// 🗡 El arma del creep para el asistente de ítems (una copia del ítem de su lista) y de vuelta a su mano (docs/plan-inventario-creeps.md, paso 2).
 function armaDeCreepComoDraft(sc){
-  return {
-    nombre: Combatiente.armaEnMano(sc).nombre || '', tipoItem: Combatiente.armaEnMano(sc).tipoItem || 'arma_1m', tipoDado: Combatiente.armaEnMano(sc).tipoDado,
-    peso: Combatiente.armaEnMano(sc).peso, danoFijo: Combatiente.armaEnMano(sc).danoFijo, danoAmplificado: Combatiente.armaEnMano(sc).danoAmplificado,
-    armaDeRango: Combatiente.armaEnMano(sc).armaDeRango, mods: structuredClone(Combatiente.armaEnMano(sc).mods || []), detalle: Combatiente.armaEnMano(sc).detalle || '',
-    efectosGolpe: structuredClone(Combatiente.armaEnMano(sc).efectosGolpe), ...Combatiente.rasgosDeItem(Combatiente.armaDeCombatiente(sc)),
-  };
+  const {id, equipado, ...d} = structuredClone(Combatiente.armaEnMano(sc));
+  return d;
 }
 
+// Si no dice si es natural, queda como era la que tenía (antes el arma suelta conservaba esa marca).
 function ponerArmaEnCreep(sc, d){
-  sc.armaNombre = d.nombre;
-  sc.armaManos = d.tipoItem;
-  sc.armaTipo = num(d.tipoDado) || 8;
-  sc.armaPeso = Math.max(1, num(d.peso) || 1);
-  sc.armaFijo = num(d.danoFijo);
-  sc.armaAmplificado = Math.max(0, num(d.danoAmplificado));
-  sc.armaDeRango = !!d.armaDeRango;
-  sc.armaMods = structuredClone(d.mods || []);
-  sc.armaEfectos = structuredClone(d.efectosGolpe || []);
-  sc.armaRasgos = Combatiente.rasgosDeItem(d); delete sc.armaEspalda; delete sc.armaIgnoraResistCrit;   // los rasgos del arma
-  sc.armaDetalle = d.detalle || '';
+  const antes = Combatiente.armaEnMano(sc);
+  Combatiente.ponerArma(sc, {...d, natural: d.natural !== undefined ? d.natural === true : antes.natural});
+}
+// La marca «arma natural» (el formulario del creep): va en el ítem de su mano.
+function marcarArmaNatural(sc, si){
+  const a = Combatiente.armaPrincipal(sc);
+  if(a) a.natural = !!si; else if(si) Combatiente.ponerArma(sc, {nombre: '', natural: true});
 }
 
 // Pieza de equipo (no arma): la Defensa va aparte, como en CATALOGO_EQUIPO.

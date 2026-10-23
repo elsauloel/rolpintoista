@@ -3,7 +3,7 @@
 > Pedido del dueño (2026-10-22): «vamos a encarar la tarea ardua de unificar el tema de las armas: que tanto para personajes como para creeps e
 > invocaciones (con manos), las armas sean un ítem que se agarra, se suelta, la agarra otro… al igual que escudos y talismanes». Antes (mismo día):
 > «todo lo que tenga manos debería poder usar lo mismo… con una especie de inventario: si levanta un arma, guarda la suya y después las cambia».
-> Cierra P217 y la tarea «🗡 Armas e inventario para creeps e invocaciones» de `pendientes.md`. **Decisiones aprobadas el 2026-10-22; paso 1 hecho, sigue el paso 2.**
+> Cierra P217 y la tarea «🗡 Armas e inventario para creeps e invocaciones» de `pendientes.md`. **Decisiones aprobadas el 2026-10-22; pasos 1 y 2 hechos, sigue el paso 3.**
 
 ## Cómo está hoy (relevamiento del 2026-10-22)
 
@@ -48,6 +48,17 @@ pública del creep, que leen los jugadores), se calculan a partir del ítem en l
 2. **Migración automática de los datos:** al cargar un creep o una invocación (`CreepCalculo.normalizar`, `InvCalculo.migrar`), el arma suelta pasa
    a ser un ítem equipado de su lista; los escudos y talismanes del `equipo` pasan a la forma del personaje (la Defensa adentro de `mods`). La puerta
    del paso 1 pasa a leer la lista. Los creeps base, las armas naturales, el esquema de la IA y GM Tools crean directo en la forma nueva.
+   **Hecho (2026-10-22):** el arma vive en `equipo` (la misma lista de escudos, talismanes y armadura): es el primer ítem equipado que sea un arma
+   de verdad (`Combatiente.esArmaDeMano`: arma_*, con su Tipo o natural; no una varita ni la «segunda arma» de los creeps base, que solo trae
+   bonos). `Combatiente.pasarArmaAItem(x)` convierte los campos sueltos al cargar (`CreepCalculo.normalizar`, `InvCalculo.migrar`) y, si algo
+   todavía escribe uno (una pantalla vieja, un formulario que cambia un dato), **se combina** con el ítem que ya tiene (pisa solo ese dato). Piezas
+   nuevas: `armaPrincipal` (el ítem guardado, para cambiarlo), `equipoSinArma` (lo que se muestra como equipo y lo que se suelta como equipo:
+   así el arma no sale dos veces), `ponerArma(x, item)` (reemplaza el arma en su lugar) e `itemDeCamposArma`. Escriben así: GM Tools
+   (`ponerArmaEnCreep`, «Equipar» del catálogo, la marca de arma natural, el catálogo 🐾), la invocación (`ponerArmaEnInv`, la casilla natural,
+   la invocación nueva ya sin campos sueltos) y el simulador. Los creeps base y la IA todavía arman los campos sueltos: los convierte la carga
+   (limpieza: paso 8). Los bonos del arma cuentan una sola vez (`fuentesEquipo`, `invFuentesEquipo`). El Mordisco feroz ya no reescribe el arma al
+   vuelo (`CreepCalculo.danoTxt(sc, extra, dadosMas)`). **Ojo:** una pestaña con la versión anterior ve a un creep ya convertido como «sin arma»:
+   recargar todas. Pruebas: 560 en verde.
 3. **Defensa y Res. a crítico calculadas en vivo** desde lo equipado (como el personaje), en vez de sumarse una vez al equipar. Sin esto, soltar o
    levantar un escudo deja la Defensa mal.
 4. **Soltar y levantar de verdad:** desarmar (o soltar) saca el ítem de la mano y lo pone en el piso; levantarlo lo mete en la lista de quien lo

@@ -2418,6 +2418,32 @@ prueba('el Ankh a mano revive con el 25 % del HP máximo y gasta una unidad', ()
 grupo('Reglas de un creep (paso 4, etapa 4)');
 const creepPrueba = extra => CreepCalculo.normalizar(Object.assign({nombre: 'Orco', con: 4, fue: 5, agl: 3, des: 4, esp: 2, hp: 20, hpMax: 20,
   armaNombre: 'Hacha', armaTipo: 8, armaPeso: 2, armaFijo: 1, defensa: 3, equipo: [], estados: [], habilidades: [], escalaTipos: 2}, extra || {}));
+prueba('🗡 Armas como ítems, paso 2 (docs/plan-inventario-creeps.md): al cargar, el arma suelta de un creep o una invocación pasa a ser un ítem de su equipo; un dato suelto se combina; no cuenta ni se suelta dos veces', () => {
+  const escudo = {id: 'e1', nombre: 'Escudo pequeño', tipoItem: 'escudo_1m', def: 1, peso: 1, mods: [{stat: 'parry', val: 1}]};
+  const sc = creepPrueba({armaMods: [{stat: 'pdg', val: 2}], armaEfectos: [{nombre: 'Sangrado', caras: 4, exitos: 1}], armaRasgos: {perfora: 1}, equipo: [escudo]});
+  const it = Combatiente.armaPrincipal(sc);
+  const convertido = [Combatiente.tieneCamposArma(sc), sc.armaNombre, sc.equipo.length, sc.equipo[0] === escudo, it && it.nombre, it && it.tipoDado, it && it.peso,
+    it && it.danoFijo, it && it.perfora, it && it.equipado, Combatiente.equipoSinArma(sc).map(x => x.nombre)];
+  // los bonos del arma cuentan una sola vez
+  const pdg = CreepCalculo.modTotal(sc, 'pdg');
+  // un formulario viejo cambia un solo dato: se combina con el ítem (no se pierde el resto)
+  sc.armaNatural = true;
+  const comb = Combatiente.armaEnMano(sc);
+  CreepCalculo.normalizar(sc);
+  const trasNorm = [Combatiente.tieneCamposArma(sc), Combatiente.armaPrincipal(sc).natural, Combatiente.armaPrincipal(sc).nombre, Combatiente.armaPrincipal(sc).perfora, sc.equipo.length];
+  // reemplazar el arma: ocupa su lugar
+  Combatiente.ponerArma(sc, {nombre: 'Lanza', tipoItem: 'arma_2m', tipoDado: 6, peso: 3});
+  const trasPoner = [sc.equipo.length, Combatiente.armaEnMano(sc).nombre, Combatiente.armaEnMano(sc).peso, sc.equipo.some(x => x.nombre === 'Hacha')];
+  // el botín: el arma una vez (como arma) y el escudo como equipo
+  const sc2 = creepPrueba({equipo: [structuredClone(escudo)]});
+  const botin = CombateFin.itemsDeCreep(CATALOGO_BASE, sc2).map(x => x.nombre);
+  // la invocación
+  const inv = InvCalculo.migrar({nombre: 'Esqueleto', armaNombre: 'Espada rota', armaTipo: 6, armaPeso: 1, equipo: []});
+  igual([convertido, pdg, [comb.natural, comb.nombre], trasNorm, trasPoner, botin.filter(n => n === 'Hacha').length, botin.includes('Escudo pequeño'),
+    [Combatiente.tieneCamposArma(inv), Combatiente.armaEnMano(inv).nombre, Combatiente.armaEnMano(inv).tipoDado, inv.equipo.length]],
+    [[false, undefined, 2, true, 'Hacha', 8, 2, 1, 1, true, ['Escudo pequeño']], 2, [true, 'Hacha'], [false, true, 'Hacha', 1, 2], [2, 'Lanza', 3, false], 1, true,
+     [false, 'Espada rota', 6, 1]]);
+});
 prueba('Regeneración de vida del equipo (2026-10-07, piel de troll): cura al empezar el turno, en personajes y creeps; no levanta a un caído', () => {
   const chal = {id: 't', nombre: 'Chaleco de piel de troll', tipoItem: 'armadura_blanda', equipado: true, mods: [{stat: 'hpregen', val: 2}]};
   const sc = creepPrueba({equipo: [chal]}); sc.hp = 10;
@@ -2448,7 +2474,7 @@ prueba('Parry y Bloqueo: con su arma o un escudo; un arma natural también (2026
 });
 prueba('normalizar pasa Inteligencia a Especial, corre la escala de Tipos y saca la habilidad Movimiento', () => {
   const sc = CreepCalculo.normalizar({nombre: 'Viejo', int: 3, armaTipo: 6, habilidades: [{nombre: 'Movimiento'}, {nombre: 'Golpe', detalle: 'Crítico 4 y 6', tiradaStat: 'int'}]});
-  igual([sc.esp, sc.int, sc.armaTipo, sc.habilidades.length, sc.habilidades[0].tiradaStat, sc.habilidades[0].detalle, sc.crit], [3, undefined, 8, 1, 'esp', 'Crítico 6 y 8', [0, 0, 0, 0, 0]]);
+  igual([sc.esp, sc.int, Combatiente.armaEnMano(sc).tipoDado, sc.armaTipo, sc.habilidades.length, sc.habilidades[0].tiradaStat, sc.habilidades[0].detalle, sc.crit], [3, undefined, 8, undefined, 1, 'esp', 'Crítico 6 y 8', [0, 0, 0, 0, 0]]);   // (el Tipo corrido queda en el ítem del arma: paso 2)
 });
 prueba('recompensas de un creep: oro sugerido por tipo y nivel (jefe ×2), trofeo del arma natural y lo que suelta', () => {
   const humano = creepPrueba({tipoCriatura: 'humano', nivel: 2}), jefe = creepPrueba({tipoCriatura: 'humanoide', nivel: 2, jefe: true});

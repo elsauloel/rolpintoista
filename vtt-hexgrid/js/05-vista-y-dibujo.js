@@ -413,7 +413,6 @@ function dibujarLienzo(){
       ctx.fillStyle = colorConAlfa(el.color, (el.invisible ? el.alfa / 100 * 0.35 : el.alfa / 100 * 0.7));
       ctx.fill();
     }
-    if(el.trampa && typeof atrapaDibujarSuelo === 'function' && atrapaDibujarSuelo(el, celdas, z)) superficiesAnimando = true;   // 🕸 la telaraña o la red, en el piso (js/68)
     if(!(sup && sup.sinBorde)){   // el charco no lleva el borde de los hexágonos
     bordeCeldas(celdas);
     if(el.invisible){
@@ -475,6 +474,7 @@ function dibujarLienzo(){
       // Su ficha redonda con un cepo (dueño, 2026-10-08), como el arma en el piso: la ve quien ve la trampa.
       const cT = typeof trampaCentro === 'function' ? trampaCentro(el) : celdas[0];
       trampaFichaDibujar(hexCentro(cT.col, cT.fila), z, disp);
+      if(typeof atrapaDibujarSuelo === 'function' && atrapaDibujarSuelo(el, celdas, z)) superficiesAnimando = true;   // 🕸 la telaraña o la red, encima de la ficha: se lee qué trampa es (js/68)
       const dst = destinoParsear(el.trampaDestino) || portalFijoDe(el);   // también el portal de la Varita del portal
       if(dst){   // trampa de teleport: se marca el destino (lo ve quien ve la trampa)
         const pD = hexCentro(dst.col, dst.fila);

@@ -5,7 +5,8 @@
    Con una pequeña animación de elasticidad cada tanto.» Y la Red de caza: «una cuadrícula y pequeñas bolitas que simbolizan el peso al
    final de las líneas, con un cierre irregular».
    - Encima del token: el estado que lo tiene atrapado lleva `soltar.visual` (lo público: `atrapa`; Combatiente.atrapaDe).
-   - En el piso: una trampa armada de telaraña o de red (por su `trampaEstado` o por su nombre: Combatiente.atrapaDeNombre).
+   - En el piso: una trampa armada de telaraña o de red (por su `trampaEstado` o por su nombre: Combatiente.atrapaDeNombre), encima de su
+     ficha redonda, para que se lea qué trampa es.
    - El rebote: cada ~3,6 s el centro baja y vuelve, con un temblor que se apaga; los bordes quedan quietos. Cada uno a su ritmo.
    Solo dibuja: no escribe nada.
    ============================================================ */
@@ -34,7 +35,7 @@ function dibujarAtrapa(tipo, x, y, rad, z, semilla, o = {}){
   const reb = atrapaRebote(semilla) * rad;
   // Cada punto se corre hacia abajo según lo lejos que esté del borde: el centro se mueve, los bordes no.
   const mover = (px, py) => { const d = Math.hypot(px - x, py - y) / rad; return [px, py + reb * Math.max(0, 1 - d)]; };
-  const alfa = o.suelo ? 0.6 : 1;
+  const alfa = o.suelo ? 0.85 : 1;
   ctx.save();
   trazarPuntos(verticesHex(x, y, rad)); ctx.clip();
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';

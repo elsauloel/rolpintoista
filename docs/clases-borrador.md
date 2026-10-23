@@ -200,6 +200,12 @@ Estados que define la clase:
     (queda en el Tanque: «Miti-Miti», con a quién protege) y el reparto del daño en el mapa. *(Auditada 2026-10-11 con el dueño; original:
     «Marca un personaje como protegido. El protegido comparte con el tanque la mitad del daño que recibe. Duración: 1 turno.» Las
     decisiones, publicadas también en 🛠 Herramientas de diseño → Preguntas.)*
+11. ✅ **Aguante** — **SP:** 1. **No2:** 1. *(Nueva, 2026-10-23: el dueño la sumó al pool del Tanque; es el modo aguante de los creeps de
+    choque pesado.)* Sobre uno mismo: +2 a la Defensa y +2 a la Defensa especial hasta que empiece su próximo turno, contando cada golpe que
+    le pega un ataque (aunque la armadura lo frene todo). En su próximo turno, al apretar Atacar, el cartel «Modo aguante»: ese ataque suma
+    +1 dado del Tipo de su arma por golpe, **hasta su nivel + 1 dados** (dueño, 2026-10-23), a **1 SP por dado** (el precio del Golpe fuerte),
+    más los No2 del ataque. Si no ataca en ese turno, lo pierde. ⚙ Automatizado en el mapa (`vtt-hexgrid/js/56-aguante.js`,
+    `aguanteAtacarPj`; los golpes los cuenta la pantalla del GM; la revancha la deja `FichaMantenimiento` al empezar su turno).
 
 ## Mago ⏳
 

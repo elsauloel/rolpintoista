@@ -111,7 +111,7 @@
 - ✅ **Aguante** (2026-10-21, dueño; uno solo para bestias y humanoides): cuesta 1 No2 y 1 SP (o cooldown 3). Se anuncia «‹creep› se pone en modo
   aguante.» y queda con **+2 a la Defensa y +2 a la Defensa especial** hasta que empiece su próximo turno, contando cada golpe que le pega (aunque la
   armadura lo frene todo; trampas y zonas no cuentan). En su próximo turno, al apretar Atacar, sale el cartel de modo aguante: su ataque suma **+1 dado
-  del Tipo de su arma por cada golpe recibido**, **1 SP por dado** (si no le alcanza, los que pueda pagar; en modo cooldown, +1 turno de cooldown a
+  del Tipo de su arma por cada golpe recibido**, **hasta su nivel + 1 dados** (tope, dueño 2026-10-23), **1 SP por dado** (si no le alcanza, los que pueda pagar; en modo cooldown, +1 turno de cooldown a
   Aguante por dado) más los No2 del ataque, y se pasa al duelo. Si no ataca en ese turno, lo pierde. `vtt-hexgrid/js/56-aguante.js`. **Para probar.**
 
 - ✅ **Barrido** (humanoide) y **Coletazo** (bestia) (2026-10-21, «barrido»): le pega a todos los rivales de al lado (flor de diámetro 3, sin contarse);

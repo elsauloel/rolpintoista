@@ -1777,5 +1777,6 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `acDevolver` lo repone (toast y Mesa). Los No2 de «lo de un ataque» se cobran en el duelo. Falta lo mismo para las habilidades de los personajes.
 - **💚 Curación por pulsos** (2026-10-23, `js/70-curacion.js`): la zona de curación (`zonaEstado` = {cura, pulsos}; el motor de siempre la saltea en
   `zonaLeFalta`, js/08) y el estado «Aura sanadora» de un creep: en cada Mantenimiento nuevo, la pantalla de quien la creó tira una vez y cura a todos sus
-  aliados adentro (o a 5 casillas) con `dueloCurar`, hasta 4 pulsos (anotados en `zonaResueltos` «cura@N» o en el estado, `pulsos`). El aura se dibuja
-  en el token (`t.aura`, verde) mientras dura.
+  aliados adentro (o a 5 casillas) con `dueloCurar`, hasta 4 pulsos: al ponerla y al empezar cada turno de quien la creó, o cada ronda (`curaMomento`; anotados
+  en `zonaResueltos` «cura@momento» o en el estado, `pulsos`); cura un número fijo (4). El aura se dibuja en el token (`t.aura`, verde) mientras dura, y las
+  dos llevan burbujitas verdes (`curaDibujarZona` / `curaDibujarAura` desde js/05; `curaBurbujas` sobre cada uno que se cura).

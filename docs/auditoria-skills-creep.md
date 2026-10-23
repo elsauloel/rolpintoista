@@ -246,7 +246,10 @@
   2 SP, o cooldown 3. **Círculo de sanación**: zona de diámetro 5 (19 casillas) en su Rango, 4 turnos; al ponerla y en cada ronda nueva (4 veces) una
   tirada de 1d6 cura a todos sus aliados adentro; 2 No2 y 4 SP, o cooldown 4. **Aura sanadora**: estado de 4 turnos; al activarla y en cada ronda nueva
   (4 veces), 1d6 a sus aliados a 5 o menos (diámetro 11), él incluido; el token muestra el aura verde; 2 No2 y 4 SP, o cooldown 4. El motor de los
-  pulsos: `vtt-hexgrid/js/70-curacion.js`. Los costos los propuso Claude. **Abierto**: «curan 4» (dueño) — ¿4 pulsos (como quedó) o 4 de vida fija? **Para probar.**
+  pulsos: `vtt-hexgrid/js/70-curacion.js`. Los costos los propuso Claude. **Ajuste del dueño (el mismo día)**: «que sea un número fijo en lugar de un dado,
+  para no tener que tirar dados: que al empezar el turno… cure a los que estén ahí» → el Círculo y el Aura curan **4 fijos**, al ponerlos y **al empezar cada
+  turno de quien los creó** (sin orden de turnos, cada ronda), 4 veces; con **burbujitas verdes** mientras duran y sobre cada uno que se cura. Y una quinta,
+  **Oleada sanadora**: el Sanar (1d6+4) a cada aliado de una flor de 7 en su Rango (él incluido), 2 No2 y 4 SP, o cooldown 4. **Para probar.**
 
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 

@@ -413,6 +413,7 @@ function dibujarLienzo(){
       ctx.fillStyle = colorConAlfa(el.color, (el.invisible ? el.alfa / 100 * 0.35 : el.alfa / 100 * 0.7));
       ctx.fill();
     }
+    if(typeof zonaCuraDe === 'function' && zonaCuraDe(el)){ curaDibujarZona(el, celdas, z); superficiesAnimando = true; }   // 🫧 la zona de curación (js/70)
     if(!(sup && sup.sinBorde)){   // el charco no lleva el borde de los hexágonos
     bordeCeldas(celdas);
     if(el.invisible){
@@ -875,6 +876,7 @@ function dibujarLienzo(){
       trazarFrente(fx1, fy1, fx2, fy2, rad, z, x, y);
     }
     { const at = typeof atrapaDeToken === 'function' ? atrapaDeToken(est) : ''; if(at){ dibujarAtrapa(at, x, y, rad, z, semillaDe(d.id)); animando = true; } }   // 🕸 atrapado en una telaraña o una red (js/68)
+    if(typeof auraCuraEnEstados === 'function'){ if(auraCuraEnEstados(est)){ curaDibujarAura(t, z); animando = true; } if(curaDibujarDestello(d.id, x, y, rad, z)) animando = true; }   // 🫧 el aura sanadora y la cura de un pulso (js/70)
     if(polillaRevolotea(est)){ dibujarPolillita(x, y, rad, z, semillaDe(d.id)); animando = true; }   // 🦋 la Polilla, revoloteando
 
     if(seleccion === d.id){

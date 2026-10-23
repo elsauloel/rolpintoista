@@ -64,7 +64,7 @@
     'Hit and run': ['choque liviano', 'golpear y alejarse'],
     'Salto': ['choque liviano', 'salto'], 'Salto aplastante': ['choque pesado', 'salto'], 'Vigilancia': ['rango', 'vigilancia'], 'Bola de fuego': ['mago', 'daño en área'], 'Confusión': ['debuffer', 'control mental'],
     'Arma ígnea': ['support', 'arma elemental'], 'Arma helada': ['support', 'arma elemental'], 'Arma eléctrica': ['support', 'arma elemental'],
-    'Arma ácida': ['support', 'arma elemental'], 'Arma venenosa': ['support', 'arma elemental'], '¡A la carga!': ['support', 'grito de guerra'], 'Arenga': ['support', 'grito de guerra'], 'Sanar': ['support', 'curar'], 'Bálsamo': ['support', 'curar'], 'Círculo de sanación': ['support', 'curar'], 'Aura sanadora': ['support', 'curar'],
+    'Arma ácida': ['support', 'arma elemental'], 'Arma venenosa': ['support', 'arma elemental'], '¡A la carga!': ['support', 'grito de guerra'], 'Arenga': ['support', 'grito de guerra'], 'Sanar': ['support', 'curar'], 'Oleada sanadora': ['support', 'curar'], 'Bálsamo': ['support', 'curar'], 'Círculo de sanación': ['support', 'curar'], 'Aura sanadora': ['support', 'curar'],
     'Barrido': ['choque pesado', 'barrido'], 'Coletazo': ['choque pesado', 'barrido'],
     'Tiro a la cabeza': ['rango', 'tiro apuntado'], 'Desarmar': ['choque pesado', 'desarmar'], 'El que avisa no traiciona': ['choque pesado', 'golpe anunciado'], 'Sal en la herida': ['choque liviano', 'abrir la herida'], 'Remate': ['choque pesado', 'remate'], 'Ir por el herido': ['choque pesado', 'remate'], 'Morder la herida': ['choque liviano', 'abrir la herida'], 'Patotear': ['choque liviano', 'manada'], 'Jauría': ['choque liviano', 'manada'], 'Zarpazo erguido': ['choque pesado', 'golpe anunciado'], 'Mal de ojo': ['debuffer', 'maleficio'], 'Disparo señalador': ['rango', 'señalar'], 'Ráfaga de cortes': ['choque liviano', 'ráfaga'], 'Ráfaga de zarpazos': ['choque liviano', 'ráfaga'],
     'Romper armadura': ['choque pesado', 'romper armadura'], 'Arrancar la coraza': ['choque pesado', 'romper armadura'],
@@ -309,19 +309,23 @@
     duelo: {objetivo: 'onda', radio: 4, aliados: true, tira: '', contra: [], efectos: [{nombre: 'Bendecido', polaridad: 'buff', turnos: 3}]}});
   // 💚 Auditadas (dueño, 2026-10-23; Support, «curar»): la síntesis de las curaciones de los creeps de «El origen» (Savia que cierra heridas, Esporas
   // curativas, Regeneración) y de las de fábrica a mano (Curación menor y mayor, Canto revitalizante, Polen sanador, Zona sagrada, Aura sanadora), que
-  // salieron del pool. Sanar es el Heal de los personajes (1d6+4); la zona y el aura curan por pulsos, una tirada para todos (vtt-hexgrid/js/70).
+  // salieron del pool. Sanar es el Heal de los personajes (1d6+4); la zona y el aura curan 4 fijos por pulso, sin dados (dueño), al ponerlas y al
+  // empezar cada turno de quien las creó, 4 veces (vtt-hexgrid/js/70). Oleada sanadora: el Sanar a todos sus aliados de una flor de 7, más cara.
   H('Sanar', 'C', '*', 'a', 2, {detalle: 'Cierra las heridas de un aliado (o las propias): él o un aliado dentro de su Rango se cura 1d6+4 de vida (sin pasar su máximo). Sobre alguien caído no hace nada.',
     no2: 1, spCosto: 2, auditada: true, ataqueTxt: 'cura 1d6+4 a él o a un aliado en su Rango',
     duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', efectos: [{cura: '1d6+4'}]}});
+  H('Oleada sanadora', 'CA', '*', 'a', 4, {detalle: 'Una oleada que cierra las heridas de todos: elige una flor de diámetro 3 (7 casillas) dentro de su Rango y cada uno de sus aliados adentro (él incluido) se cura 1d6+4, como con Sanar. Sobre alguien caído no hace nada.',
+    no2: 2, spCosto: 4, auditada: true, ataqueTxt: 'cura 1d6+4 a cada aliado de una flor de 7 en su Rango',
+    duelo: {objetivo: 'area', radio: 1, aliados: true, tira: '', contra: [], alcance: 'rango', efectos: [{cura: '1d6+4'}]}});
   H('Bálsamo', 'C', '*', 'a', 3, {detalle: 'Un bálsamo que sigue curando: él o un aliado dentro de su Rango recupera 4 de vida al empezar cada uno de sus próximos 3 turnos (Regeneración). Sobre alguien caído no levanta.',
     no2: 1, spCosto: 2, auditada: true, ataqueTxt: 'Regeneración 4 por turno, 3 turnos, a él o a un aliado en su Rango',
     duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', efectos: [{nombre: 'Regeneración', turnos: 3, hp: 4}]}});
-  H('Círculo de sanación', 'CA', '*', 'a', 4, {detalle: 'Marca en el piso un círculo que cura: una zona de diámetro 5 (19 casillas) dentro de su Rango, que dura 4 turnos. Al ponerla y al empezar cada ronda (4 veces) se tira 1d6 una sola vez y cura eso a todos sus aliados que estén adentro (él incluido).',
-    no2: 2, spCosto: 4, auditada: true, ataqueTxt: 'zona de diámetro 5, 4 turnos: 1d6 a todos sus aliados adentro, una vez por ronda',
-    duelo: {objetivo: 'zona', radio: 2, zonaTurnos: 4, zonaAlcance: 'rango', zonaColor: '#7CD992', tira: '', contra: [], dano: false, zonaEstado: {cura: '1d6', pulsos: 4}}}, 'terreno y formas');
-  H('Aura sanadora', 'CA', '*', 'a', 4, {detalle: 'Se rodea de un aura que cura: durante 4 turnos, al activarla y al empezar cada ronda (4 veces) se tira 1d6 una sola vez y cura eso a todos sus aliados a 5 casillas o menos (diámetro 11), él incluido. El aura se mueve con él.',
-    no2: 2, spCosto: 4, auditada: true, ataqueTxt: 'aura de diámetro 11, 4 turnos: 1d6 a todos sus aliados cerca, una vez por ronda',
-    duelo: {objetivo: 'uno mismo', tira: '', contra: [], efectos: [{nombre: 'Aura sanadora', polaridad: 'buff', turnos: 4, detalle: 'Aura sanadora: al empezar cada ronda, 1d6 de vida a sus aliados a 5 casillas o menos (vtt-hexgrid/js/70).'}]}}, 'aura');
+  H('Círculo de sanación', 'CA', '*', 'a', 4, {detalle: 'Marca en el piso un círculo que cura: una zona de diámetro 5 (19 casillas) dentro de su Rango, que dura 4 turnos. Al ponerla y al empezar cada uno de sus turnos (4 veces en total) cura 4 de vida a todos sus aliados que estén adentro (él incluido), sin tirar dados.',
+    no2: 2, spCosto: 4, auditada: true, ataqueTxt: 'zona de diámetro 5: cura 4 a todos sus aliados adentro, 4 veces (al ponerla y al empezar sus turnos)',
+    duelo: {objetivo: 'zona', radio: 2, zonaTurnos: 4, zonaAlcance: 'rango', zonaColor: '#7CD992', tira: '', contra: [], dano: false, zonaEstado: {cura: '4', pulsos: 4}}}, 'terreno y formas');
+  H('Aura sanadora', 'CA', '*', 'a', 4, {detalle: 'Se rodea de un aura que cura: durante 4 turnos, al activarla y al empezar cada uno de sus turnos (4 veces en total) cura 4 de vida a todos sus aliados a 5 casillas o menos (diámetro 11), él incluido, sin tirar dados. El aura se mueve con él.',
+    no2: 2, spCosto: 4, auditada: true, ataqueTxt: 'aura de diámetro 11: cura 4 a todos sus aliados cerca, 4 veces (al activarla y al empezar sus turnos)',
+    duelo: {objetivo: 'uno mismo', tira: '', contra: [], efectos: [{nombre: 'Aura sanadora', polaridad: 'buff', turnos: 4, detalle: 'Aura sanadora: al empezar cada uno de sus turnos, 4 de vida a sus aliados a 5 casillas o menos (vtt-hexgrid/js/70).'}]}}, 'aura');
   H('Bendición', 'B', 'hd', 'a', 4, tA('Bendice a un aliado: +1 de Daño y +2 de Defensa 3 turnos (a mano).', 2));
   H('Escudar aliado', 'T', 'hdc', 'at', 3, tA('Un aliado adyacente gana +3 de Defensa 2 turnos (a mano).', 2));
   H('Orden de ataque', 'B', 'hd', 'a', 3, tA('Un aliado puede atacar sin gastar No2 este turno (a mano).', 2));

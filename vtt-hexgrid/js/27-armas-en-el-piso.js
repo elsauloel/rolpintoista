@@ -364,3 +364,9 @@ async function acLevantarArmaDe(creepId, elId){
   mesaLinea(`🗡️ ${sc0.nombre} levantó ${x.it.nombre}${r.equipar ? ' y lo tiene en la mano' : ' (guardado)'}`, 'recordatorio', sc0.nombre);
   if(typeof ac !== 'undefined' && ac && ac.creepId === creepId && ac.host && !ac.host.hidden && typeof acDibujar === 'function') acDibujar();
 }
+// ✋ Paso 5 (2026-10-22, D1): sin nada en la mano (lo publicado: `sinArma` del creep, de la invocación o del personaje). El token lo muestra en combate (js/05).
+function tokenSinArma(t){
+  const v = vinculo(t);
+  if(!v) return false;
+  return t.tipo === 'creep' ? v.sinArma === true : !!(v.resumen && v.resumen.sinArma);
+}

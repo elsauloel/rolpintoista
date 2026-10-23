@@ -147,6 +147,7 @@ const FichaLite = (() => {
   };
   function manoGuardada(o, danoTxt){
     const a = Combatiente.armaEnMano(o);   // 🗡 la puerta única (docs/plan-inventario-creeps.md)
+    if(a.sinArma) return {nombre: '', detalle: `sin arma · ${danoTxt}`, lineas: []};   // ✋ pega sin arma (paso 5, P150)
     if(!a.nombre) return {nombre: '', detalle: 'sin arma', lineas: []};
     const lineas = [{txt: `Daño ${danoTxt}${a.armaDeRango ? ` (${Combatiente.dmgDelArmaTxt(a)})` : ''}`}];
     lineas.push({txt: `Peso ${fmt(a.peso)}`});

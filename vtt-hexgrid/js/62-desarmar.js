@@ -197,11 +197,7 @@ async function desarmadoResuelto(d){
     datos: {celdas: celdas.map(c => ({c: c.col, f: c.fila})), elegida, duelo: d.id}}); }catch(err){ console.error('Desarmar: el momento', err); }   // (objetos: Firestore no guarda listas dentro de listas)
   await new Promise(r => setTimeout(r, DESARME_RULETA_MS + 300));
   const s = await armaSoltar(t, 0, {celda: celdas[elegida], itemId, itemNombre});
-  // Si lo que se cayó es su arma (no un escudo), queda Desarmado (un creep no la pierde de sus datos: el estado lo frena hasta levantarla).
-  if(s && s.cayo && !s.escudo){
-    try{ await dueloAplicarEfectoBase({...d, defensor: {...v}}, {nombre: 'Desarmado', caras: 1, exitos: 1, dado: '', detalle: 'Lo desarmaron: su arma está en el piso.', spec: {nombre: 'Desarmado'}}); }
-    catch(err){ console.error('Desarmar: el estado', err); }
-  }
+  // (Desde el paso 5, 2026-10-22, ya no queda Desarmado: lo que se cayó salió de su mano, y sin nada en la mano pega sin arma.)
   mesaLinea(`🤺 ${gano} desarmó a ${nombreDe(t)}: ${s && s.nota ? s.nota : itemNombre + ' al piso'}`, 'recordatorio');
 }
 

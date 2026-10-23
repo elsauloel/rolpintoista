@@ -183,7 +183,7 @@ function blinkDeHabilidad(msg){
    el resto hasta 2: al revés, al azar; 1: al revés y elige cuál el bando contrario (el GM: si no es esta pantalla, se le pide con el momento).
    Los estados y sus turnos: Combatiente.CAOS_ESTADOS (docs/estados-turnos.md). Fuera del Rango: avisa y deja seguir. */
 // Cuánto dura un estado del sorteo, en palabras.
-const CAOS_DUR_SIN_TURNOS = {'Armadura rota': 'permanente (−1 de armadura)', 'Sentado': 'hasta que se levante', 'Sigilo': 'hasta que lo descubran', 'Desarmado': 'el arma vuela 2 casillas; hasta que la levante'};
+const CAOS_DUR_SIN_TURNOS = {'Armadura rota': 'permanente (−1 de armadura)', 'Sentado': 'hasta que se levante', 'Sigilo': 'hasta que lo descubran', 'Desarmado': 'el arma vuela 2 casillas: sin nada en la mano hasta levantarla u otra'};
 const caosDurTxt = s => s.turnos ? `${s.turnos} turno${s.turnos === 1 ? '' : 's'}` : s.stacks ? `${s.stacks} stacks` : CAOS_DUR_SIN_TURNOS[s.nombre] || 'hasta que se le pase';
 // Elegir el estado del caos de una lista (los de esa polaridad). → Promise del estado; cerrar sin elegir = uno al azar.
 function caosElegir(pol, titulo, texto, excluir){
@@ -288,15 +288,19 @@ async function caosAplicar(tokenId, spec, origen){
   let nota = '';
   try{
     let limpio = {...spec}; delete limpio.vuela;
-    // Desarmado no afecta a un arma natural (dueño, 2026-10-08): en el caos, sale otro debuff en su lugar.
-    const natural = dest.tipo === 'creep' ? !!(creepPrivadoDe(dest.fichaId) || {}).armaNatural : String(dest.fichaId).includes(SEP_INVOCACION) ? !!((await invDeToken(dest)) || {}).armaNatural : false;
-    if(natural && Combatiente.esDesarmado(limpio)){
+    // Desarmado no afecta a un arma natural (dueño, 2026-10-08) ni a quien no tiene nada en la mano: en el caos, sale otro debuff en su lugar.
+    const c = dest.tipo === 'creep' ? creepPrivadoDe(dest.fichaId) : String(dest.fichaId).includes(SEP_INVOCACION) ? await invDeToken(dest) : null;
+    const sinQueSoltar = !!c && (() => { const a = Combatiente.armaPrincipal(c); return !a || a.natural === true; })();
+    if(sinQueSoltar && Combatiente.esDesarmado(limpio)){
       spec = Combatiente.caosEstado('debuff', null, ['Desarmado']);
       limpio = {...spec};
-      nota = ` (su arma es natural, no se le cae: le tocó ${spec.nombre} en su lugar)`;
+      nota = ` (no tiene un arma que se le caiga: le tocó ${spec.nombre} en su lugar)`;
     }
-    if(dest.tipo === 'creep') await modificarCreep(dest.fichaId, sc => EstadosAplicar.aplicarACreep(sc, limpio));
-    else await EstadosAplicar.encolarPj({fichaId: dest.fichaId, duenoUid: dest.duenoUid, spec: limpio, origen});
+    // ✋ Desarmado ya no es un estado (paso 5): solo vuela el arma (abajo).
+    if(!Combatiente.esDesarmado(limpio)){
+      if(dest.tipo === 'creep') await modificarCreep(dest.fichaId, sc => EstadosAplicar.aplicarACreep(sc, limpio));
+      else await EstadosAplicar.encolarPj({fichaId: dest.fichaId, duenoUid: dest.duenoUid, spec: limpio, origen});
+    }
     if(spec.vuela && typeof armaSoltar === 'function'){ const s = await armaSoltar(dest, num(spec.vuela)); if(s && s.nota) nota += ` (${s.nota})`; }
   }catch(err){ console.error('No se pudo aplicar el estado del caos:', err); nota = ' ✋ Aplicalo a mano.'; }
   return nota;

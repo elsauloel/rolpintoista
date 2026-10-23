@@ -171,6 +171,7 @@ const FichaResumen = (() => {
       // nitros ≥ esto. Sin armas con daño, a mano limpia. Con el arco no hay oportunidad (2026-10-09): si solo tiene arcos, `sinOpor`.
       oporCosto: (() => { const armas = FichaCombate.armasEquipadasConDano(S).map(x => x.item).filter(Combatiente.sirveDeOportunidad); return Math.min(...(armas.length ? armas : [null]).map(a => FichaCombate.costoAtaqueEspecial(a, 'oportunidad', S))); })(),
       sinOpor: (() => { const armas = FichaCombate.armasEquipadasConDano(S).map(x => x.item); return armas.length > 0 && !armas.some(Combatiente.sirveDeOportunidad); })(),
+      sinArma: FichaCombate.armasEquipadasConDano(S).length === 0,   // ✋ nada en la mano (paso 5): el mapa lo marca en el token
       costoMover: IT2().inmovilizadoBloqueaMover && estadoActivo(S, 'inmovilizado') ? 0 : costoMoverCasillero(S),
       extenuado: Combatiente.extenuado(S.efectos), tormenta: Combatiente.tormenta(S.efectos),   // ⛈ Atormentado: el mapa cobra la vida al moverse
       empower: (S.habilidades || []).some(h => h && h.empower),
@@ -235,6 +236,7 @@ const FichaResumen = (() => {
           levitar: num(invModTotal(inv, 'levitar')), suelagruesa: num(invModTotal(inv, 'suelagruesa')), embestida: num(invModTotal(inv, 'embestida')), pasodoble: num(invModTotal(inv, 'pasodoble')),   // Coraza del guardián (2026-10-06)
           pisadaAtenta: num(invModTotal(inv, 'pisadaatenta')) > 0, ...(typeof InvCalculo !== 'undefined' ? {percepcion: num(InvCalculo.statValor(inv, 'percepcion'))} : {}),
           activa: inv.activa !== false,
+          sinArma: Combatiente.sinArmaEnMano(inv),   // ✋ nada en la mano (paso 5): el mapa lo marca en el token
           miniatura: miniaturaInv(inv.imagen) || (String(inv.miniatura || '').startsWith('data:image/') && inv.miniatura.length < 20000 ? inv.miniatura : ''),   // (una invocación de un pergamino trae la suya: el Ojo de Kicillof)
           estados: (inv.estados || [])
             .filter(e => e && e.activo !== false && e.nombre)

@@ -900,6 +900,7 @@ function dibujarLienzo(){
       const marcas = [];
       if(t.oculto) marcas.push('🙈');
       if(enSigilo(t)) marcas.push('🥷');
+      if(modoMapa === 'combate' && tokenSinArma(t)) marcas.push('✋');   // ✋ nada en la mano (paso 5): pega sin arma
       if(marcas.length){
         const alfaPrevio = ctx.globalAlpha;
         ctx.globalAlpha = 1;

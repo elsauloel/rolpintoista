@@ -230,7 +230,7 @@ async function oporArmasDe(r){
     const costo = CreepCalculo.costoOportunidad(sc);
     const n = sc.nitros === null || sc.nitros === undefined ? CreepCalculo.nitrosMax(sc) : num(sc.nitros);
     if(n < costo || !Combatiente.sirveDeOportunidad(Combatiente.armaDeCombatiente(sc))) return [];   // con un arco no hay oportunidad
-    return [{nombre: Combatiente.armaEnMano(sc).nombre || 'su arma', costo, yo: {ref: r.fichaId, tipo: 'creep', nombre}, detalle: oporDetalle(CreepCalculo.ataqueTxt(sc), sc, Combatiente.armaDeCombatiente(sc)),
+    return [{nombre: Combatiente.armaEnMano(sc).nombre || (Combatiente.armaEnMano(sc).sinArma ? 'sin arma' : 'su arma'), costo, yo: {ref: r.fichaId, tipo: 'creep', nombre}, detalle: oporDetalle(CreepCalculo.ataqueTxt(sc), sc, Combatiente.armaDeCombatiente(sc)),
       ataque: {tipo: 'oportunidad', armaId: '', armaNombre: Combatiente.armaEnMano(sc).nombre || '', tipoDado: Combatiente.armaEnMano(sc).tipoDado, rango: Combatiente.armaEnMano(sc).armaDeRango, alcance: CreepCalculo.alcance(sc), ...Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(sc))}}];
   }
   await bnCargarPiezas();
@@ -243,7 +243,7 @@ async function oporArmasDe(r){
     if(!inv) return [];
     const costo = Math.max(0, Combatiente.costoEspecial(Combatiente.armaEnMano(inv).tipoDado, Combatiente.armaDeCombatiente(inv), 'oportunidad') - Combatiente.ahorroEspecial('oportunidad', st => FichaResumen.invModTotal(inv, st)));
     if(num(inv.nitros) < costo) return [];
-    return [{nombre: Combatiente.armaEnMano(inv).nombre || 'su arma', costo, yo: {ref: r.fichaId, tipo: 'pj', nombre}, detalle: oporDetalle(typeof InvCalculo !== 'undefined' ? InvCalculo.ataqueTxt(inv) : '', inv, Combatiente.armaDeCombatiente(inv)),
+    return [{nombre: Combatiente.armaEnMano(inv).nombre || (Combatiente.armaEnMano(inv).sinArma ? 'sin arma' : 'su arma'), costo, yo: {ref: r.fichaId, tipo: 'pj', nombre}, detalle: oporDetalle(typeof InvCalculo !== 'undefined' ? InvCalculo.ataqueTxt(inv) : '', inv, Combatiente.armaDeCombatiente(inv)),
       ataque: {tipo: 'oportunidad', armaId: '', armaNombre: Combatiente.armaEnMano(inv).nombre || '', tipoDado: Combatiente.armaEnMano(inv).tipoDado, rango: Combatiente.armaEnMano(inv).armaDeRango, alcance: 1, ...Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(inv))}}];
   }
   const calc = FichaCalculo.calcular(S);

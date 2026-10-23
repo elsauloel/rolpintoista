@@ -545,7 +545,7 @@ function vinculo(t){
     deQuien: ficha.nombre,
     invocacion: true,
     resumen: {
-      hp: inv.hp, hpMax: inv.hpMax, muerto: num(inv.hp) <= 0, dormida: inv.activa === false,
+      hp: inv.hp, hpMax: inv.hpMax, muerto: num(inv.hp) <= 0, dormida: inv.activa === false, sinArma: inv.sinArma === true,
       nitros: inv.nitros, nitrosMax: inv.nitrosMax, oporCosto: inv.oporCosto, sinOpor: inv.sinOpor === true,
       estados: Array.isArray(inv.estados) ? inv.estados : [],
       ...(num(inv.ojo) > 0 ? {ojo: num(inv.ojo), veoculto: num(inv.veoculto), etereo: true, sinMareo: true, temporal: !!inv.temporal} : {}),   // 👁 el Ojo de Kicillof (js/03)

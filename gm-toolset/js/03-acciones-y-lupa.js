@@ -124,7 +124,7 @@ function cardHtml(sc){
         <div class="sect-label">Arma</div>
         <div class="arma-compacta" style="margin-top:4px">
           <div class="arma-compacta-top">
-            <span class="equipado-nombre">${Combatiente.armaEnMano(sc).nombre ? esc(Combatiente.armaEnMano(sc).nombre) : '<span class="hint">Sin nombre</span>'}</span>
+            <span class="equipado-nombre">${Combatiente.armaEnMano(sc).nombre ? esc(Combatiente.armaEnMano(sc).nombre) : `<span class="hint">${Combatiente.armaEnMano(sc).sinArma ? '✋ Sin arma (nada en la mano)' : 'Sin nombre'}</span>`}</span>
             <span class="valor-caja" title="Daño">${danoTxt(sc)}</span>
             <button class="rm" data-armanat="${sc.id}" title="Arma natural del catálogo (garras, colmillos, aguijón…)">🐾</button>
             ${Combatiente.armaEnMano(sc).nombre ? `<button class="rm" data-verarmacreep="${sc.id}" title="Ver el arma (y editarla y subirla al catálogo)">👁</button>` : ''}

@@ -171,7 +171,7 @@ const CreepLupa = (() => {
     // Las armas (lo que va en las manos: el arma, y una varita, un báculo, un escudo, un orbe) y aparte el equipo (2026-10-17, dueño).
     const pieza = it => equipado(it.nombre || '(sin nombre)', (K.TIPOITEM_LABEL[it.tipoItem] || it.tipoItem || '') + (it.natural ? ' · 🐾 natural (no se suelta)' : ''), `<small>DEF</small>+${fmt(num(it.def))}`, it.detalle);
     const armas = [
-      equipado(Combatiente.armaEnMano(sc).nombre || 'Arma sin nombre', Combatiente.armaEnMano(sc).armaDeRango ? 'Arma de rango' : 'Arma', esc(K.danoTxt(sc)),
+      equipado(Combatiente.armaEnMano(sc).nombre || (Combatiente.armaEnMano(sc).sinArma ? 'Sin arma (nada en la mano)' : 'Arma sin nombre'), Combatiente.armaEnMano(sc).armaDeRango ? 'Arma de rango' : 'Arma', esc(K.danoTxt(sc)),
         [Combatiente.armaEnMano(sc).detalle, efectos].filter(Boolean).join(' · ')),
       ...Combatiente.equipoSinArma(sc).filter(K.enLasManos).map(pieza),
     ].join('');

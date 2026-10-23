@@ -498,6 +498,7 @@ const CreepCalculo = (() => {
     return {
       armaNombre: a.natural ? nom(a.nombre) : ver(a.nombre),
       armaNatural: a.natural,
+      sinArma: !!a.sinArma,   // ✋ nada en la mano (paso 5): el mapa lo marca en el token
       // Lo de las manos (además del arma) va aparte del equipo (2026-10-17): una varita, un escudo, un orbe.
       manosNombres: Combatiente.puestoSinArma(sc).filter(enLasManos).map(it => it.natural ? nom(it.nombre) : ver(it.nombre)).filter(Boolean).slice(0, 6),
       equipoNombres: Combatiente.puestoSinArma(sc).filter(it => it && !enLasManos(it)).map(it => it.natural ? nom(it.nombre) : ver(it.nombre)).filter(Boolean).slice(0, 30),   // lo natural se ve con su nombre, como el arma natural
@@ -575,6 +576,7 @@ const CreepCalculo = (() => {
     migrarHabPdg(sc);
     Combatiente.pasarArmaAItem(sc);   // 🗡 su arma, un ítem de su lista (docs/plan-inventario-creeps.md, paso 2): los campos arma* sueltos se convierten
     Combatiente.pasarEquipoVivo(sc);   // 🛡 paso 3: la Defensa y la Res. a crítico del equipo, en vivo (una vez: le resta lo que ya traía sumado)
+    if(Array.isArray(sc.estados)) sc.estados = sc.estados.filter(e => !Combatiente.esDesarmado(e));   // ✋ paso 5: Desarmado ya no es un estado (P217)
     // Recompensas (2026-09-20): los creeps viejos no las traen.
     if(typeof sc.mapa !== 'string') sc.mapa = '';   // en qué mapa está (comun/creeps-mapas.js; '' = la Reserva)
     if(sc.tipoCriatura === undefined) sc.tipoCriatura = '';

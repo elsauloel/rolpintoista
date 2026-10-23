@@ -808,7 +808,7 @@ prueba('🗡 La puerta única del arma (docs/plan-inventario-creeps.md, paso 1):
   igual([a.nombre, a.tipoItem, a.tipoDado, a.peso, a.danoFijo, a.danoAmplificado, a.mods.length, a.efectosGolpe.length, a.perfora, a.detalle, a.natural, a.equipado,
     CreepCalculo.pesoArma(sc), /^3d8/.test(CreepCalculo.danoTxt(sc, 0)), Combatiente.armaDeCombatiente === Combatiente.armaEnMano,
     [vacio.nombre, vacio.tipoDado, vacio.peso, vacio.natural], nat.natural, CreepCalculo.tarjetaPublica({...sc, hp: 5}).armaNombre],
-    ['Hacha', 'arma_2m', 8, 2, 1, 1, 1, 1, 2, 'Pesada', false, true, 2, true, true, ['', 8, 1, false], true, 'Hacha']);
+    ['Hacha', 'arma_2m', 8, 2, 1, 1, 1, 1, 2, 'Pesada', false, true, 2, true, true, ['', 4, 1, false], true, 'Hacha']);   // sin arma: Tipo 4 (paso 5)
 });
 prueba('Enyetar (Debuffer, 2026-10-12): 5 SP (10 en turno ajeno), sin No2, PdG.Esp contra Res.Esp de un enemigo; botón fijo; una vez por tirada', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'debuffer').habilidades.find(h => h.id === 'debuffer-enyetar');
@@ -2516,7 +2516,7 @@ prueba('la 🪪 pública: solo los nombres del arma (también la natural) y del 
   const sc = creepPrueba({notas: '  Huele a pantano.  ', equipo: [{nombre: 'Yelmo', tipoItem: 'cabeza', def: 2, mods: [{stat: 'con', val: 1}]}, {nombre: ''}]});
   const nat = CreepCalculo.tarjetaPublica(creepPrueba({armaNombre: 'Garras', armaNatural: true}));
   igual([CreepCalculo.tarjetaPublica(sc), nat.armaNombre, nat.armaNatural, nat.equipoNombres],
-    [{armaNombre: 'Hacha', armaNatural: false, manosNombres: [], equipoNombres: ['Yelmo'], notas: 'Huele a pantano.', tipoCriatura: '', pasosSilenciosos: false, auraMiedo: 0, auraEfEsp: 0}, 'Garras', true, []]);   // + el tipo de criatura (Matabestias, 2026-10-11)   // y el aura siempre escrita (2026-10-19)
+    [{armaNombre: 'Hacha', armaNatural: false, sinArma: false, manosNombres: [], equipoNombres: ['Yelmo'], notas: 'Huele a pantano.', tipoCriatura: '', pasosSilenciosos: false, auraMiedo: 0, auraEfEsp: 0}, 'Garras', true, []]);   // + el tipo de criatura (Matabestias, 2026-10-11)   // y el aura siempre escrita (2026-10-19)
 });
 prueba('Parry y Bloqueo: con su arma o un escudo; un arma natural también (2026-10-21), después del escudo', () => {
   const nat = creepPrueba({armaNatural: true}), conEscudo = creepPrueba({armaNatural: true, equipo: [{nombre: 'Rodela', tipoItem: 'escudo_1m', peso: 3}]});
@@ -3123,19 +3123,30 @@ prueba('varitas Comunes de arena y portal (2026-10-07): la trampa se suelta cont
          purga.especial.no2, !!CATALOGO_BASE.find(x => x.id === 'esp-buena-varita-del-manotazo')],
     [9, 2, true, 'Inmovilizado', 9, 2, '#C2A060', 4, 1, 2, false]);
 });
-prueba('grupo 1 de Buena (2026-10-07): Desarmado (no ataca, levantar el arma 1 No2), Ceguera (desde el 2026-10-20: la mitad del PdG), la purga y la cadena con efectos a todos', () => {
+prueba('grupo 1 de Buena (2026-10-07): el Manotazo ya no deja el estado Desarmado (paso 5: el arma cae al piso, lo hace el mapa), Ceguera (desde el 2026-10-20: la mitad del PdG), la purga y la cadena con efectos a todos', () => {
   const sc = creepPrueba({nitros: 3, habilidades: [{id: 'm', nombre: 'Manotazo', efectoNombre: 'Desarmado'}, {id: 'c', nombre: 'Eclipse', efectoNombre: 'Ceguera'}]});
   CreepAcciones.efectoDeHab(sc, sc.habilidades[0], estadosPresetCreep());
   const q = Combatiente.preguntaSentado(sc.estados, sc.nombre), lv = Combatiente.levantable(sc.estados);
-  const r = CreepAcciones.levantarse(sc);
   EstadosAplicar.aplicarACreep(sc, {nombre: 'Ceguera'});   // como la pone el duelo (la varita)
   const ceg = sc.estados.find(e => e.nombre === 'Ceguera');
-  const sent = Combatiente.levantable([{nombre: 'Sentado', sentado: true, activo: true}, {nombre: 'Desarmado', desarmado: true, activo: true}]);
   const purga = Combatiente.habEjecucion({nombre: 'Purga'}, CATALOGO_BASE.find(i => i.nombre === 'Varita de la purga').especial.duelo, {});
   const rel = Combatiente.habEjecucion({nombre: 'Relámpago'}, CATALOGO_BASE.find(i => i.nombre === 'Varita del relámpago').especial.duelo, {});
-  igual([/Desarmado/.test(q), lv.arma, r.aviso && /levantó el arma/.test(r.aviso), sc.nitros, Combatiente.levantable(sc.estados), !!ceg.ceguera, Combatiente.mitadesDeTirada(sc.estados, 'pdg'), sent.arma,
+  igual([sc.estados.some(Combatiente.esDesarmado), q, lv, sc.nitros, !!ceg.ceguera, Combatiente.mitadesDeTirada(sc.estados, 'pdg'),
     purga.efectos[0].purga, Duelo.specDeEfecto(Duelo.limpiarHab({nombre: 'P', efectos: purga.efectos}).efectos[0]).purga, rel.cadena.efectos, rel.cadena.saltos],
-    [true, true, true, 2, null, true, 1, false, true, true, true, 3]);
+    [false, '', null, 3, true, 1, true, true, true, 3]);
+});
+prueba('✋ Paso 5: sin nada en la mano pega sin arma (1d4 + Daño); Desarmado ya no se guarda (la inmunidad sigue); los viejos se borran al cargar', () => {
+  const sc = creepPrueba({});
+  sc.equipo = sc.equipo.filter(it => !Combatiente.esArmaDeMano(it));   // se le cayó la Hacha
+  const a = Combatiente.armaEnMano(sc), dano = CreepCalculo.danoTxt(sc, 2), pub = CreepCalculo.tarjetaPublica(sc);
+  const est = [];
+  const r = Combatiente.agregarEstado(est, {nombre: 'Desarmado', polaridad: 'debuff', desarmado: true, esCC: true});
+  const inm = Combatiente.agregarEstado([{nombre: 'Invulnerable', invulnerable: true, activo: true}], {nombre: 'Desarmado', polaridad: 'debuff', desarmado: true});
+  const viejo = CreepCalculo.normalizar({nombre: 'X', estados: [{nombre: 'Desarmado', desarmado: true, activo: true}, {nombre: 'Sentado', sentado: true, activo: true}]});
+  const inv = InvCalculo.migrar({nombre: 'Zombi', equipo: [], estados: [{nombre: 'Desarmado', desarmado: true, activo: true}]});
+  igual([a.sinArma, a.tipoDado, a.nombre, dano, pub.sinArma, Combatiente.sinArmaEnMano(creepPrueba({})), r.ok, est.length, inm.ok,
+    (viejo || {}).estados ? viejo.estados.map(e => e.nombre) : 'sin objeto', inv.estados.length, Combatiente.sinArmaEnMano(inv)],
+    [true, 4, '', '1d4 + 2', true, false, true, 0, false, ['Sentado'], 0, true]);
 });
 prueba('el arma en el piso (2026-10-07): las Botoneras ofrecen levantarla al lado; con su arma en el piso, Desarmado no se levanta sin ir', () => {
   const cerca = {armasCerca: [{id: 'el1', nombre: 'Hacha', propia: true}]};

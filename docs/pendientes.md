@@ -96,8 +96,10 @@
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
 > - [ ] **🗡 Íconos distintos para cada arma en el piso (2026-10-23, dueño: «poner íconos distintos para distintas armas cuando se desarma
 >   alguien»):** hoy el arma que queda en el mapa al desarmar se dibuja siempre con 🗡️ (o 🏹 si es una flecha; `armaDibujar`,
->   vtt-hexgrid/js/27). Que el ícono diga qué es: hacha, maza, lanza, arco, ballesta, escudo, varita, báculo… (por el nombre o el tipo del
->   ítem). Mismo ícono en el cartel de «Levantar» y en la línea de la Mesa.
+>   vtt-hexgrid/js/27). Que el ícono diga qué es (dueño, el mismo día): Tipo 4 🗡️ daga · Tipo 6 espada (no hay emoji de una espada sola:
+>   ⚔️ o dibujarla) · Tipo 8 🪓 · Tipo 10 🔨 · escudo 🛡️ · talismán/orbe 🔮 (o 🧿 / 🪬) · arco 🏹 · ballesta (no hay emoji: dibujarla a mano,
+>   como el cepo de las trampas) · varita/báculo 🪄 · honda 🪨 (no hay emoji de honda). Primero lo que es (arco, ballesta, honda, escudo,
+>   talismán, varita) y si no, por el Tipo. Mismo ícono en el cartel de «Levantar» y en la línea de la Mesa.
 > - [ ] **💧 La recarga de SP y el costo de las que suman Efecto especial (2026-10-21, dueño: «para cuando te diga que tengo el tiempo»):** **En debate con los colegas (dueño, 2026-10-22: «ya abrí el debate… después lo elaboro con vos»)**; la propuesta de Claude del 22/10 (SP máximo Especial × 2, la recarga igual, y lo que suma Ef.Esp a 1 × / 1,5 × / 2 × el Especial) quedó en P216. la P216,
 >   con la simulación de un día ya hecha (ninguna opción sola cambia una pelea de 4 turnos; manda el SP guardado) y la página para la mesa
 >   (https://claude.ai/artifact/C7VPwWPg9BpWfF1L1hUGb6). Falta debatirlo y decidir.

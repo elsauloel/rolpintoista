@@ -239,7 +239,7 @@ const CreepAcciones = (() => {
   // `sc` (2026-10-19): el creep, para que la dificultad sea la suya (Destreza o Efecto especial, como una trampa de habilidad).
   async function colocarTrampaDeItem(creepId, it, sc){
     const d0 = it && it.trampaDatos;
-    const d = d0 && sc ? Combatiente.trampaDeHab({nombre: it.nombre, trampaColocar: d0}, st => C().statValor(sc, st)) : d0;
+    const d = d0 && sc ? Combatiente.trampaDeHab({nombre: it.nombre, trampaColocar: {...d0, detectarMin: Combatiente.detectarMinDe(it.tier)}}, st => C().statValor(sc, st)) : d0;   // + el mínimo por calidad (2026-10-23)
     if(!d || typeof TokensAuto === 'undefined' || (d.portal && d.portal.colocador)) return {ok: false, aviso: 'Esta trampa se coloca desde el mapa'};   // (el glifo: dos clics en el mapa)
     try{
       const dano = /^\d{1,2}d\d{1,3}([+-]\d{1,3})?$/i.test(String(d.dano || '').trim()) ? String(d.dano).trim() : '';

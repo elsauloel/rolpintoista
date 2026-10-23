@@ -4835,6 +4835,11 @@ prueba('efecto «seguro si es crítico»: el asistente lo conserva (y los stacks
       [2, true, 'Envenenar (25%, 2 stacks, seguro si es crítico)', [1, 4], [4, 4], true]);
   }finally{ Object.assign(window, antes); }
 }); fbFalsoCola = pp.catch(() => {}); return pp; });
+prueba('trampa comprada: el mínimo para detectarla por calidad (Común 6, Buena 8, Rara 10; 2026-10-23), si quien la coloca tiene menos', () => {
+  const td = tier => ({nombre: 'Cepo', trampaColocar: {nombre: 'Cepo', detectarMin: Combatiente.detectarMinDe(tier)}});
+  const v = x => st => st === 'trampaoculta' ? 0 : x;
+  igual([Combatiente.trampaDeHab(td('Común'), v(3)).detectar, Combatiente.trampaDeHab(td('Buena Calidad'), v(3)).detectar, Combatiente.trampaDeHab(td('Raro'), v(3)).detectar, Combatiente.trampaDeHab(td('Raro'), v(12)).detectar, Combatiente.trampaDeHab({nombre: 'h', trampaColocar: {nombre: 'h'}}, v(3)).detectar], [6, 8, 10, 12, 3]);
+});
 prueba('No2 negativos en una defensa (2026-10-23): se puede quedar en negativo, pero no gastar si ya estás en negativo', () => {
   igual([Combatiente.defensaSinNo2(0, 1), Combatiente.defensaSinNo2(2, 1), Combatiente.defensaSinNo2(-1, 1), Combatiente.defensaSinNo2(-1, 0)], [false, false, true, false]);
 });

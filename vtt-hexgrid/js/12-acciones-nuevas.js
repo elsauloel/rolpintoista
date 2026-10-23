@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261023p5', '../comun/creep-botonera.js?v=20261023p8a', '../comun/creep-acciones.js?v=20261023ng', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261023ng'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261023p5', '../comun/creep-botonera.js?v=20261023p8a', '../comun/creep-acciones.js?v=20261023tm', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261023ng'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -151,11 +151,11 @@ async function acConsumir(sc, itemId){
   }
   if(it.trampaDatos){
     const glifo = it.trampaDatos.portal && it.trampaDatos.portal.colocador;   // 🌀 el Glifo de teletransporte: dos clics en el mapa (js/13)
-    const t = glifo ? await (async () => { ac.host.hidden = true; const td = Combatiente.trampaDeHab({nombre: it.nombre, trampaColocar: it.trampaDatos}, st => CreepCalculo.statValor(sc, st));
+    const t = glifo ? await (async () => { ac.host.hidden = true; const td = Combatiente.trampaDeHab({nombre: it.nombre, trampaColocar: {...it.trampaDatos, detectarMin: Combatiente.detectarMinDe(it.tier)}}, st => CreepCalculo.statValor(sc, st));
         const ok = await colocarGlifo({fichaId: sc.id, tipoToken: 'creep', nombre: it.nombre, trampa: td}); return {ok, aviso: ok ? `🌀 ${it.nombre} colocado` : `🌀 ${it.nombre}: no se usó`}; })()
       : await (async () => {   // 🪤 la trampa consumible: un clic, dentro del Rango y a la vista (2026-10-20)
           ac.host.hidden = true;
-          const td = Combatiente.trampaDeHab({nombre: it.nombre, trampaColocar: it.trampaDatos}, st => CreepCalculo.statValor(sc, st));
+          const td = Combatiente.trampaDeHab({nombre: it.nombre, trampaColocar: {...it.trampaDatos, detectarMin: Combatiente.detectarMinDe(it.tier)}}, st => CreepCalculo.statValor(sc, st));
           const dano = /^\d{1,2}d\d{1,3}([+-]\d{1,3})?$/i.test(String(td.dano || '').trim()) ? String(td.dano).trim() : '';
           const ok = await trampaConsumibleEnMapa({fichaId: sc.id, tipoToken: 'creep', nombre: it.nombre, trampa: {...td, nombre: String(td.nombre || it.nombre).slice(0, 40), dano}});
           return {ok, aviso: ok ? `🪤 ${it.nombre} colocada` : `🪤 ${it.nombre}: no se usó`};
@@ -324,11 +324,19 @@ function acDispararFlecha(flechaId){
     const f = (c.cinturon || []).find(x => x.id === flechaId);
     if(!f) return {ok: true};
     const costo = Math.max(0, num(f.flecha && f.flecha.no2));
-    if(costo) c.nitros = num(c.nitros) - costo;   // (sin No2 queda en negativo: avisa la línea de abajo)
+    // Una flecha especial es ofensiva: no deja en No2 negativos (dueño, 2026-10-23). Sin los No2, gasta los que tenga (hasta 0) y avisa en rojo,
+    // como la del personaje (js/11, gastoNitrosForzado).
+    const tenia = Math.max(0, num(c.nitros)), paga = Math.min(costo, tenia);
+    if(paga) c.nitros = num(c.nitros) - paga;
     f.unidades = num(f.unidades) - 1;
     if(f.unidades <= 0) c.cinturon = c.cinturon.filter(x => x !== f);
-    return {ok: true, nombre: f.nombre, costo};
-  }).then(x => { if(x && x.nombre) mesaLinea(`🏹 ${acCreep() ? acCreep().nombre : 'El creep'} dispara ${x.nombre}${x.costo ? ` (+${fmt(x.costo)} No2)` : ''}`, 'recordatorio'); });
+    return {ok: true, nombre: f.nombre, costo, paga, tenia};
+  }).then(x => {
+    if(!x || !x.nombre) return;
+    const quien = acCreep() ? acCreep().nombre : 'El creep';
+    mesaLinea(`🏹 ${quien} dispara ${x.nombre}${x.costo ? ` (+${fmt(x.paga)} No2)` : ''}`, 'recordatorio');
+    if(x.paga < x.costo) mesaLinea(`⚠ ${quien} disparó ${x.nombre} sin No2 suficientes · costaba ${fmt(x.costo)} y tenía ${fmt(x.tenia)}`, 'alerta-roja');
+  });
 }
 function acAtacar(tipo, flechaId){
   const sc = acCreep();

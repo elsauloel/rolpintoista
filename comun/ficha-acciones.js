@@ -340,7 +340,7 @@ const FichaAcciones = (() => {
         // dificultad de quien la coloca»): su Destreza si es mecánica, su Efecto especial si es mágica (`detectarStat`), más los Guantes de
         // trampero. El número del catálogo es para cuando la pone el GM. La misma cuenta que una trampa de habilidad (Combatiente.trampaDeHab).
         const cS = FichaCalculo.calcular(S);
-        const conOculta = {...it, trampaDatos: Combatiente.trampaDeHab({nombre: it.nombre, trampaColocar: it.trampaDatos}, st => cS.final[st])};
+        const conOculta = {...it, trampaDatos: Combatiente.trampaDeHab({nombre: it.nombre, trampaColocar: {...it.trampaDatos, detectarMin: Combatiente.detectarMinDe(it.tier)}}, st => cS.final[st])};   // + el mínimo por calidad (2026-10-23)
         try{ ok = await ui.colocarTrampa(conOculta); }finally{ consumiendoTrampa.delete(id); }
         if(!ok) return;
       }

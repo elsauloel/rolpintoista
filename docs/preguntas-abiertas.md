@@ -1160,6 +1160,11 @@ bestia (un oso hormiguero) «puede parrear con sus garras y obligar a desarmar a
 
 ### P218 — Consumibles con dificultad mínima: ¿a cuáles se les aplica? (2026-10-23)
 
+**Decidido en parte (dueño, 2026-10-23):** (1) **sí, el mínimo para detectar las trampas compradas, por calidad: Común 6, Buena 8, Rara 10**
+— hecho (`Combatiente.DETECTAR_MIN_TIER` / `detectarMinDe`, `detectarMin` en `trampaDeHab`; personaje y creep); las flechas especiales no dejan
+en No2 negativos (el creep, igual que el personaje: gasta hasta 0 y avisa en rojo). Los puntos 2–4 («los cauces, efectivamente»): a confirmar
+qué quiso decir antes de programarlos.
+
 Regla del dueño (2026-10-23), ya aplicada al **Pergamino de red Nerubian**: la dificultad para soltarse es el **Efecto especial neto** de quien lo
 usa (su valor, no una tirada), **con un mínimo de 6** («es algo que vos pagaste, es consumible, solo funciona una vez»); si quien lo usa tiene más,
 sube. En el código es el dato `difMin` (en `soltar`, `salvacion`, la zona que deja: `Combatiente.efectoDeEjecucion`, `trampaDeHab`,

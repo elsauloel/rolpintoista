@@ -3,7 +3,7 @@
 > Pedido del dueño (2026-10-22): «vamos a encarar la tarea ardua de unificar el tema de las armas: que tanto para personajes como para creeps e
 > invocaciones (con manos), las armas sean un ítem que se agarra, se suelta, la agarra otro… al igual que escudos y talismanes». Antes (mismo día):
 > «todo lo que tenga manos debería poder usar lo mismo… con una especie de inventario: si levanta un arma, guarda la suya y después las cambia».
-> Cierra P217 y la tarea «🗡 Armas e inventario para creeps e invocaciones» de `pendientes.md`. **Decisiones aprobadas el 2026-10-22; pasos 1 a 3 hechos, el 4 en curso (parte A hecha).**
+> Cierra P217 y la tarea «🗡 Armas e inventario para creeps e invocaciones» de `pendientes.md`. **Decisiones aprobadas el 2026-10-22; los ocho pasos hechos y probados (2026-10-22 y 23). Falta verlo en una sesión real (`docs/pruebas-en-el-mapa.md`).**
 
 ## Cómo está hoy (relevamiento del 2026-10-22)
 
@@ -141,6 +141,19 @@ pública del creep, que leen los jugadores), se calculan a partir del ítem en l
    Visto de paso: en «Claude · pruebas» el escudo y el chaleco de los goblins de prueba tienen Defensa 0 en sus datos (el catálogo dice +2): es un
    dato viejo de esa partida, no de este cambio.
 8. **Limpieza:** se borran los datos sueltos y los caminos viejos (incluidas las pruebas que los usan), cuando todo lo anterior ande en una sesión real.
+   **Hecho (2026-10-23, el dueño: «hoy, paso 8»):** (1) sin restos del estado Desarmado: `levantable` es solo Sentado, sin la pregunta «Estás
+   Desarmado», sin los botones «Levantar el arma» por el estado (personaje, creep, invocación), sin `sacarDesarmado` (la ficha borra un Desarmado
+   viejo al cargar, `FichaGuardado.normalizar`). (2) El ataque con su arma, en una sola pieza: `Combatiente.ataqueConSuArma` y `armaParaArreglos`
+   (antes, la misma cuenta en siete archivos) e `InvCalculo.alcance`. De paso se arregló el cartel de la oportunidad de un creep, que leía los
+   campos sueltos y desde el paso 2 decía siempre «Tipo 8» y nunca «a distancia». (3) Lo que arma creeps y armas deja el arma como ítem: los
+   creeps de fábrica (`creeps-base.js`, al final; un id fijo por creep), `armarArmaNatural` y lo que arma la IA (`creepDesdeIA`); la auditoría de
+   creeps lee el ítem. (4) El mapa lee los creeps convertidos (en memoria) y `modificarCreep` guarda convertido; la ficha convierte sus
+   invocaciones al armar el resumen; se sacaron `fuentesEquipo`/`invFuentesEquipo` con el arma suelta y `itemDeCamposArma`. Queda a propósito
+   un solo lugar que entiende los campos sueltos: `armaEnMano` + `pasarArmaAItem` (con un id fijo), para los datos guardados antes que todavía no
+   se convirtieron (una partida real que no se volvió a guardar); cuando todas estén convertidas, se puede sacar. Probado en «Claude · pruebas»:
+   los 13 creeps del mapa se leen con su arma, sin campos sueltos; Daño del Goblin 4 «1d8+1» desde sus Acciones; la oportunidad de la Bruja dice
+   «Tipo 6 · a distancia»; un arma natural del catálogo reemplaza al Hacha; los 269 creeps de fábrica tienen su arma en el equipo (115 naturales).
+   Pruebas: 567 en verde.
 
 ## Decisiones del dueño ✅ (2026-10-22: «dale con las recomendaciones, me parece bien»)
 

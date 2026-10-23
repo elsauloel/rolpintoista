@@ -134,18 +134,28 @@ function curaChispasEn(x, y, rad, z, semilla, n, fuerza){
 }
 /* El borde (dueño, 2026-10-23: «no quiero que se parezca a una nube, pero tampoco exactamente hexagonal: un borde lineal, pero irregular, ondulado,
    que puede tener cierto movimiento hacia afuera y hacia adentro; algo que lo distinga de un veneno»). Las dos son una flor alrededor de un centro: un
-   contorno de línea clara, con ondas lentas que entran y salen, y un relleno verde liso (sin el desenfoque de las nubes). */
+   contorno de línea clara, con ondas lentas que entran y salen, y un relleno verde liso (sin el desenfoque de las nubes).
+   Ajuste (dueño, el mismo día, por el aura de diámetro 11: «no termina de ser claro el límite… más acotado a los límites propios del efecto y achicar
+   un poco la animación»): el borde sigue la forma del área (en cada dirección, hasta donde llega la casilla más alejada: un hexágono redondeado, no un
+   círculo que se pasa en los lados planos) y las ondas tienen un tamaño fijo en casillas, chico, sea grande o chica el área. */
 function curaContorno(celdas, z, semilla){
   if(!celdas.length) return;
   const pts = celdas.map(c => hexCentro(c.col, c.fila));
   const cx = pts.reduce((a, q) => a + q.x, 0) / pts.length, cy = pts.reduce((a, q) => a + q.y, 0) / pts.length;
-  const R0 = Math.max(...pts.map(q => Math.hypot(q.x - cx, q.y - cy))) + HEX * 0.85;
-  const t = performance.now() / 1000, N = 72;
-  const radio = th => R0 * (1 + 0.045 * Math.sin(5 * th + t * 0.9 + semilla) + 0.03 * Math.sin(9 * th - t * 1.4 + semilla * 2) + 0.02 * Math.sin(2 * th + t * 0.5));
-  const trazar = escala => {
+  const t = performance.now() / 1000, N = 96;
+  const borde = [];   // hasta dónde llega el área en cada dirección (el centro de la casilla más alejada en esa dirección + casi media casilla)
+  for(let i = 0; i <= N; i++){
+    const th = (i / N) * Math.PI * 2, ux = Math.cos(th), uy = Math.sin(th);
+    let h = 0;
+    for(const q of pts){ const d = (q.x - cx) * ux + (q.y - cy) * uy; if(d > h) h = d; }
+    borde.push(h + HEX * 0.8);
+  }
+  const R0 = Math.max(...borde), k = Math.max(5, Math.round(R0 / HEX * 1.6));   // más ondas a lo largo de un borde más largo, del mismo ancho
+  const radio = (i, th) => borde[i] + HEX * (0.11 * Math.sin(k * th + t * 0.9 + semilla) + 0.06 * Math.sin((k + 4) * th - t * 1.4 + semilla * 2));
+  const trazar = adentro => {
     ctx.beginPath();
     for(let i = 0; i <= N; i++){
-      const th = (i / N) * Math.PI * 2, r = radio(th) * escala;
+      const th = (i / N) * Math.PI * 2, r = radio(i, th) - adentro;
       const x = cx + Math.cos(th) * r, y = cy + Math.sin(th) * r;
       i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
     }
@@ -153,12 +163,12 @@ function curaContorno(celdas, z, semilla){
   };
   const p = 0.5 + 0.5 * Math.sin(t * 1.2);
   ctx.save();
-  trazar(1); ctx.fillStyle = `rgba(110,225,140,${0.12 + 0.05 * p})`; ctx.fill();
+  trazar(0); ctx.fillStyle = `rgba(110,225,140,${0.12 + 0.05 * p})`; ctx.fill();
   ctx.lineJoin = 'round';
   ctx.shadowColor = 'rgba(140,255,160,.9)'; ctx.shadowBlur = 8 / z;
   ctx.strokeStyle = `rgba(170,255,185,${0.75 + 0.2 * p})`; ctx.lineWidth = 2.4 / z; ctx.stroke();
   ctx.shadowBlur = 0;
-  trazar(0.94); ctx.strokeStyle = `rgba(170,255,185,${0.25 + 0.15 * p})`; ctx.lineWidth = 1.2 / z; ctx.setLineDash([6 / z, 7 / z]); ctx.lineDashOffset = -t * 12 / z; ctx.stroke();
+  trazar(HEX * 0.28); ctx.strokeStyle = `rgba(170,255,185,${0.25 + 0.15 * p})`; ctx.lineWidth = 1.2 / z; ctx.setLineDash([6 / z, 7 / z]); ctx.lineDashOffset = -t * 12 / z; ctx.stroke();
   ctx.restore();
 }
 // La zona (desde js/05, como una superficie: sin el relleno ni el borde de siempre). → {anima, sinBorde}

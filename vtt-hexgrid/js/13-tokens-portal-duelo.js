@@ -785,6 +785,8 @@ function objetivoCalifica(ataque, t){
   for(const f of OBJETIVO_CONDICIONES){ let r = null; try{ r = f(ataque, t); }catch(err){ console.error('Condición de objetivo:', err); } if(r) return r; }
   return null;
 }
+// 💚 ¿Es una curación? (todos sus efectos curan): el caído no brilla, no se elige y el área no lo cuenta.
+function habEsCura(hab){ const ef = (hab && hab.efectos) || []; return ef.length > 0 && ef.every(e => e && e.cura); }
 function dueloElegirObjetivoMapa(msg){
   const yo = msg.yo, ataque = msg.ataque;
   if(ataque && ataque.hab && (ataque.hab.objetivo === 'area' || ataque.hab.objetivo === 'onda' || ataque.hab.objetivo === 'cono' || ataque.hab.objetivo === 'linea')){ dueloElegirAreaMapa(msg); return; }   // hechizo de área: otro flujo (Paso 4/7)
@@ -817,7 +819,9 @@ function dueloElegirObjetivoMapa(msg){
   const objetivoTipo = (ataque && ataque.hab && ataque.hab.objetivo) || 'enemigo';
   const esValido = objetivoTipo === 'aliado' ? t => !dueloEsRival(yo, t) : objetivoTipo === 'enemigo' ? t => dueloEsRival(yo, t) : null;   // «cualquiera» (2026-10-15): no sugiere bando
   const califica = t => { const r = objetivoCalifica(ataque, t); return !r || r.ok; };   // 🎯 una habilidad con condición: brillan solo los que califican
-  const esValidoBrillo = t => (!esValido || esValido(t)) && califica(t);
+  const esCura = habEsCura(ataque && ataque.hab), idDe = t => { for(const [id, x] of tokens) if(x === t || (x.fichaId === t.fichaId && x.tipo === t.tipo && x.col === t.col && x.fila === t.fila)) return id; return t.id; };
+  const caido = t => esCura && iniciativaFueraDeJuego(t.id || idDe(t));   // 💚 una curación: el caído ni brilla ni se puede elegir (dueño, 2026-10-23)
+  const esValidoBrillo = t => (!esValido || esValido(t)) && califica(t) && !caido(t);
   const conArco = !!(ataque && ataque.arco && !ataque.hab);   // el arco: el objetivo, con al menos 2 casilleros libres en el medio (P183)
   const minimo = conArco ? Combatiente.arcoLibres(ataque) + 1 : 0;   // (la Mínima más larga: 2 libres)
   // Un disparo (arma de rango): la línea de tiro se dibuja hasta el mouse y brillan en celeste los que están en la distancia ideal (js/32).
@@ -846,6 +850,7 @@ function dueloElegirObjetivoMapa(msg){
       const cand = todos.filter(t => t.col === h.col && t.fila === h.fila && (conmigo || !propio(t)) && (!t.oculto || soyGM) && !t.bajoTierra && !etereoDe(t) && !tapadoPorNiebla(t));   // la niebla: no se apunta adentro
       if(!cand.length){ toast([...tokens.values()].some(t => t.col === h.col && t.fila === h.fila && etereoDe(t)) ? '👁 Es etéreo: no se le puede hacer nada' : 'Ahí no hay otro token: hacé clic sobre el que querés atacar'); pedir(); return; }
       let t = cand[0];
+      if(caido(t)){ toast(`💚 ${nombreDe(t)} está caído: una curación no lo levanta. Elegí otro.`); pedir(); return; }
       if(esValido && !esValido(t)){
         const msg = objetivoTipo === 'aliado' ? `${nombreDe(t)} es un rival, no un aliado. ¿Igual apuntarle con esta habilidad pensada para aliados?` : `${nombreDe(t)} es un aliado, no un rival. ¿Igual atacarlo?`;
         if(!(await AvisoCombate.preguntar(msg, {icono: '⚔', titulo: objetivoTipo === 'aliado' ? 'Apuntarle a un rival' : 'Atacar a un aliado', si: objetivoTipo === 'aliado' ? 'Sí, apuntarle' : 'Sí, atacarlo', no: 'Elegir otro'}))){ pedir(); return; }
@@ -1356,7 +1361,10 @@ function dueloElegirAreaMapa(msg){
     if(hab.despeja) despejarEn(enCono || new Set(celdasFlor(Math.max(1, radio)).map(o => { const c0 = hexACubo(h); return nbPack(cuboACol(c0.q + o.dq, c0.r + o.dr), cuboAFila(c0.q + o.dq, c0.r + o.dr)); })), hab.nombre);   // el vendaval
     const objetivos = todos
       .filter(t => !hab.tormenta || !iniciativaFueraDeJuego(t.id))   // la tormenta no les cae a los caídos
-      .filter(t => !t.oculto && !t.bajoTierra && !etereoDe(t) && !propio(t) && (enCono ? enCono.has(nbPack(t.col, t.fila)) : distanciaHex(h, t) <= radio || (h.otro && distanciaHex(h.otro, t) <= radio)))   // (h.otro: la casilla de salida del Remolino)
+      // Un área de aliados (2026-10-23, la Oleada sanadora): entran los suyos ocultos (el GM con sus creeps) y él mismo (en un área; la onda, no: los gritos
+      // son «no él»); una curación no les llega a los caídos.
+      .filter(t => (!t.oculto || (hab.aliados && soyGM)) && !t.bajoTierra && !etereoDe(t) && (!propio(t) || (hab.aliados && hab.objetivo === 'area')) && (enCono ? enCono.has(nbPack(t.col, t.fila)) : distanciaHex(h, t) <= radio || (h.otro && distanciaHex(h.otro, t) <= radio)))   // (h.otro: la casilla de salida del Remolino)
+      .filter(t => !habEsCura(hab) || !iniciativaFueraDeJuego(t.id))
       .filter(t => hab.aliados ? !dueloEsRival(yo, t) : (hab.fuegoAmigo || h.linea || dueloEsRival(yo, t)))   // (la línea tiene fuego amigo: dueño, 2026-10-05; `aliados`: solo los suyos, 2026-10-13)
       .filter(t => !hab.conVista || lineaLibre(h, t, solidosSet()))   // la luz (Varita de la luz): todos los rivales que alcanza a ver, en sigilo o no (dueño, 2026-10-05)
       .sort((a, b) => h.linea ? distanciaHex(h, a) - distanciaHex(h, b) : 0)   // en la línea, del más cercano al más lejano (el láser largo pierde 1 por cada uno)

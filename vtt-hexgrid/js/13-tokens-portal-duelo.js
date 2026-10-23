@@ -301,7 +301,11 @@ async function caosAplicar(tokenId, spec, origen){
       if(dest.tipo === 'creep') await modificarCreep(dest.fichaId, sc => EstadosAplicar.aplicarACreep(sc, limpio));
       else await EstadosAplicar.encolarPj({fichaId: dest.fichaId, duenoUid: dest.duenoUid, spec: limpio, origen});
     }
-    if(spec.vuela && typeof armaSoltar === 'function'){ const s = await armaSoltar(dest, num(spec.vuela)); if(s && s.nota) nota += ` (${s.nota})`; }
+    if(spec.vuela && typeof armaSoltar === 'function'){
+      const quien = String(origen || '').split(' · ')[0] || 'La varita';   // 🪄 la misma ruleta que el Desarmar (js/62, 2026-10-23)
+      const s = typeof desarmeVolando === 'function' ? await desarmeVolando(dest, quien, num(spec.vuela)) : await armaSoltar(dest, num(spec.vuela));
+      if(s && s.nota) nota += ` (${s.nota})`;
+    }
   }catch(err){ console.error('No se pudo aplicar el estado del caos:', err); nota = ' ✋ Aplicalo a mano.'; }
   return nota;
 }
@@ -1922,7 +1926,8 @@ async function dueloAplicarEfecto(d, ef){
     const spec = Duelo.specDeEfecto(ef);
     const t = tokens.get(d.defensor.tokenId);
     if(t && spec && /^desarm(ado|e)$/i.test(String(spec.nombre || '').trim()) && r && !r.manual && !/inmune|no entr/i.test(String(r.nota || '')) && typeof armaSoltar === 'function'){
-      const s = await armaSoltar(t, num(ef.vuela));
+      // 🪄 Con `vuela` (la Expelliarmus), la ruleta del Desarmar (js/62, dueño 2026-10-23); sin `vuela`, cae a sus pies.
+      const s = num(ef.vuela) > 0 && typeof desarmeVolando === 'function' ? await desarmeVolando(t, d.atacante.nombre || 'Alguien', num(ef.vuela), d.id) : await armaSoltar(t, num(ef.vuela));
       r.nota = [r.nota, s.nota].filter(Boolean).join(' · ');
       if(s.manual) r.manual = true;
     }

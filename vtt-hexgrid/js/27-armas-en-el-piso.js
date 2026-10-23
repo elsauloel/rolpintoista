@@ -129,13 +129,13 @@ async function bnEsperarGuardado(){
   return !pend();
 }
 /* El ícono de lo que está en el piso (dueño, 2026-10-23): espadas y dagas (Tipo 4 y 6) 🗡️, hachas (Tipo 8) 🪓, contundentes (Tipo 10) 🔨,
-   Tipo 12 💣, escudos 🛡️, talismanes y orbes 🔮, arcos y ballestas 🏹, flechas y virotes especiales 🪶, varitas y báculos 🪄 (por el
+   Tipo 12 💣, escudos 🛡️, talismanes y orbes 🔮, arcos y ballestas 🏹, flechas y virotes especiales ➹ (la flecha simple), varitas y báculos 🪄 (por el
    Expelliarmus), honda 🪨. Primero lo que es; si no, por el Tipo.
    Se usa en la ficha redonda del piso, en los carteles de «Levantar», en la Mesa y en la ruleta del desarme (js/62). */
 function iconoDeItem(it){
   if(!it) return '🗡️';
   const nom = String(it.nombre || '');
-  if(it.flecha) return '🪶';
+  if(it.flecha) return '➹';
   if(it.orbe || it.talisman) return '🔮';
   if(it.especial || /^(varita|báculo|baculo)/i.test(nom)) return '🪄';
   if(Combatiente.esEscudo(it)) return '🛡️';

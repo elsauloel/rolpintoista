@@ -171,6 +171,35 @@ async function desarmadoResuelto(d){
   if(!t){ mesaLinea(`🤺 ${gano} desarmó a ${(v && v.nombre) || 'alguien'}: ✋ dejá su arma en el piso a mano`, 'recordatorio'); return; }
   const itemId = ladoV === 'defensor' ? ((d.defensa && d.defensa.itemId) || '') : ((d.ataque && d.ataque.armaId) || '');
   const itemNombre = ladoV === 'defensor' ? ((d.defensa && d.defensa.itemNombre) || 'lo que tenía en la mano') : ((d.ataque && d.ataque.armaNombre) || 'su arma');
+  const s = await desarmeConRuleta(t, {gano, itemId, itemNombre, dueloId: d.id});
+  // (Desde el paso 5, 2026-10-22, ya no queda Desarmado: lo que se cayó salió de su mano, y sin nada en la mano pega sin arma.)
+  mesaLinea(`🤺 ${gano} desarmó a ${nombreDe(t)}: ${s && s.nota ? s.nota : itemNombre + ' al piso'}`, 'recordatorio');
+}
+/* 🪄 Expelliarmus y el Desarmado de la Varita del caos (dueño, 2026-10-23: «la misma animación y el mismo proceso que el desarmado»): el arma que
+   tiene en la mano sale volando con la ruleta, a `casillas` (el `vuela` del efecto). Sin nada que se le caiga (o un arma natural), armaSoltar da la
+   nota de siempre. → lo que devuelve armaSoltar. */
+async function desarmeVolando(t, gano, casillas, dueloId){
+  let a = null;
+  try{
+    const esInv = t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION);
+    if(t.tipo === 'creep' || esInv){
+      const c = t.tipo === 'creep' ? creepPrivadoDe(t.fichaId) : await invDeToken(t);
+      a = c ? Combatiente.armaPrincipal(c) : null;
+    }else{
+      const p = await fbDb.doc(fbRutaCampana(`fichas/${t.fichaId}/partes/inventario`)).get();
+      const inv = p.exists ? (JSON.parse(p.data().json || '{}').inventario || []) : [];
+      a = inv.find(x => x && x.equipado && (x.tipoItem === 'arma_1m' || x.tipoItem === 'arma_2m')) || null;
+    }
+  }catch(err){ console.error('Desarmar: no se pudo ver qué tiene en la mano', err); }
+  if(!a || !String(a.nombre || '').trim() || a.natural) return armaSoltar(t, num(casillas));
+  return desarmeConRuleta(t, {gano, itemId: a.id || '', itemNombre: a.nombre, dueloId, casillas});
+}
+/* La ruleta y el arma al piso (sacado de desarmadoResuelto el 2026-10-23, dueño: «la Expelliarmus, con la misma animación y el mismo proceso que el
+   desarmado»): lo usan el Desarmar, la Expelliarmus y el Desarmado de la Varita del caos (js/13). Solo el GM. `casillas`: a cuántas sale volando
+   (2 si no dice). → lo que devuelve armaSoltar ({nota, cayo, escudo, manual}). */
+async function desarmeConRuleta(t, o){
+  const {gano, itemId = '', itemNombre = 'su arma', dueloId = ''} = o;
+  const distancia = Math.max(1, Math.round(num(o.casillas)) || DESARME_CASILLAS);
   // Dónde puede caer (dueño, 2026-10-22: «solo sobre casillas libres; si no hay en ese círculo, puede ser en cualquiera de los círculos adyacentes
   // a ese: si hay en el círculo interno, primero ese; si no, en el externo, y así siguiendo para afuera»): el anillo a 2 casillas, solo las
   // libres (sin nadie parado, sin Sólidos y sin otra arma en el piso); si está todo ocupado, el de 1; después el de 3, 4… Si no hay ninguna, la suya.
@@ -187,18 +216,16 @@ async function desarmadoResuelto(d){
     return out;
   };
   let anillo = [];
-  for(const dist of [DESARME_CASILLAS, ...Array.from({length: DESARME_ANILLOS_MAX}, (_, i) => i + 1).filter(x => x !== DESARME_CASILLAS)]){
+  for(const dist of [distancia, ...Array.from({length: DESARME_ANILLOS_MAX}, (_, i) => i + 1).filter(x => x !== distancia)]){
     anillo = anilloA(dist);
     if(anillo.length) break;
   }
   const celdas = anillo.length ? anillo : [{col: t.col, fila: t.fila}];
   const elegida = Math.floor(Math.random() * celdas.length);
   try{ momentoAbrir({tipo: 'desarme', icono: '🤺', titulo: `¡${gano} desarma a ${nombreDe(t)}!`, estado: 'listo', resultado: `${itemNombre} sale volando`,
-    datos: {celdas: celdas.map(c => ({c: c.col, f: c.fila})), elegida, duelo: d.id, icono: iconoDeArmaDe(t, itemId, itemNombre)}}); }catch(err){ console.error('Desarmar: el momento', err); }   // (objetos: Firestore no guarda listas dentro de listas)
+    datos: {celdas: celdas.map(c => ({c: c.col, f: c.fila})), elegida, ...(dueloId ? {duelo: dueloId} : {}), icono: iconoDeArmaDe(t, itemId, itemNombre)}}); }catch(err){ console.error('Desarmar: el momento', err); }   // (objetos: Firestore no guarda listas dentro de listas)
   await new Promise(r => setTimeout(r, DESARME_RULETA_MS + 300));
-  const s = await armaSoltar(t, 0, {celda: celdas[elegida], itemId, itemNombre});
-  // (Desde el paso 5, 2026-10-22, ya no queda Desarmado: lo que se cayó salió de su mano, y sin nada en la mano pega sin arma.)
-  mesaLinea(`🤺 ${gano} desarmó a ${nombreDe(t)}: ${s && s.nota ? s.nota : itemNombre + ' al piso'}`, 'recordatorio');
+  return armaSoltar(t, 0, {celda: celdas[elegida], itemId, itemNombre});
 }
 
 // ¿El arma llega volando de `desde` a `hasta`? Ninguna casilla del medio con algo Sólido (ni figura cerrada con colisión) y ninguna pared de línea

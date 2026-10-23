@@ -651,7 +651,7 @@ const Duelo = (() => {
     if(!h || !h.nombre) return null;
     // Tirada personalizada (2026-09-27): la fórmula ya viene resuelta (X sustituida) desde quien la crea.
     const t = h.tira && h.tira.formula ? {formula: txtCorto(h.tira.formula, 60), etq: txtCorto(h.tira.etq || 'Tirada', 30)}
-      : h.tira && h.tira.stat ? {stat: txtCorto(h.tira.stat, 20), etq: txtCorto(h.tira.etq || h.tira.stat, 30), bono: _num(h.tira.bono)} : null;
+      : h.tira && h.tira.stat ? {stat: txtCorto(h.tira.stat, 20), etq: txtCorto(h.tira.etq || h.tira.stat, 30), bono: _num(h.tira.bono), ...(_num(h.tira.min) > 0 ? {min: _num(h.tira.min)} : {})} : null;   // min: el mínimo de calidad de un pergamino
     const contra = (Array.isArray(h.contra) ? h.contra : []).slice(0, 4)
       .map(c => c && c.formula ? {modo: txtCorto(c.modo || 'f', 20), formula: txtCorto(c.formula, 60), etq: txtCorto(c.etq || 'Resistencia', 30)}   // fórmula propia (2026-10-15)
         : ({modo: txtCorto(c.modo || c.stat, 20), stat: txtCorto(c.stat || c.modo, 20), etq: txtCorto(c.etq || c.stat || c.modo, 30), ...(_num(c.bono) ? {bono: Math.round(_num(c.bono))} : {})})).filter(c => c.stat || c.formula);

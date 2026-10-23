@@ -1211,7 +1211,7 @@ prueba('📜 Un consumible con Ejecución (2026-10-20, la Red Nerubian): habilid
   const sol = e.efectos[0].spec.soltar;
   igual([h.modo, h.tiradaStat, red.precioCompra, e.objetivo, e.alcance, e.contra.map(x => x.stat || x), e.efectos.map(x => x.nombre + ':' + (x.spec && x.spec.turnos)), Combatiente.habDeConsumible({nombre: 'Poción'}),
     [sol.stat, sol.dif, Combatiente.soltarNorm(sol).alEmpezar, Combatiente.soltarNorm(sol).ayuda]],
-    ['auto', 'pdgmg', 50, 'enemigo', 6, ['eva'], ['Inmovilizado:3'], null, ['fue', 6, true, true]]);   // su Ef.Esp es 3, pero el pergamino tiene mínimo 6 (difMin, 2026-10-23)
+    ['auto', 'pdgmg', 50, 'enemigo', 6, ['eva'], ['Inmovilizado:3'], null, ['fue', 8, true, true]]);   // su Ef.Esp es 3: el pergamino (Buena calidad) tiene mínimo 8 (2026-10-23)
 });
 prueba('🎲 Volver a tirar el consumible al azar antes de publicar (2026-10-14)', () => {
   const sc = {id: 'j', nombre: 'Jefe', nivel: 3, jefe: true, tipoCriatura: 'humanoide'};
@@ -4835,6 +4835,11 @@ prueba('efecto «seguro si es crítico»: el asistente lo conserva (y los stacks
       [2, true, 'Envenenar (25%, 2 stacks, seguro si es crítico)', [1, 4], [4, 4], true]);
   }finally{ Object.assign(window, antes); }
 }); fbFalsoCola = pp.catch(() => {}); return pp; });
+prueba('pergamino: el mínimo de calidad para el Efecto especial (tirada y dificultad; Común 6, Buena 8, Rara 10; 2026-10-23)', () => {
+  const p = tier => Combatiente.habDeConsumible({nombre: 'P', tier, duelo: {objetivo: 'enemigo', tira: 'dmgesp', contra: ['rescc'], efectos: [{nombre: 'Inmovilizado', soltar: {stat: 'fue', difStat: 'dmgesp', dif: 6}}]}});
+  const e = (tier, esp) => Combatiente.habEjecucion(p(tier), p(tier).duelo, {stat: id => ({dmgesp: esp})[id] || 0});
+  igual([e('Común', 3).tira.min, e('Raro', 3).tira.min, e('Buena Calidad', 3).efectos[0].spec.soltar.dif, e('Buena Calidad', 11).efectos[0].spec.soltar.dif], [6, 10, 8, 11]);
+});
 prueba('trampa comprada: el mínimo para detectarla por calidad (Común 6, Buena 8, Rara 10; 2026-10-23), si quien la coloca tiene menos', () => {
   const td = tier => ({nombre: 'Cepo', trampaColocar: {nombre: 'Cepo', detectarMin: Combatiente.detectarMinDe(tier)}});
   const v = x => st => st === 'trampaoculta' ? 0 : x;

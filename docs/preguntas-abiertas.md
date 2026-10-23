@@ -1164,6 +1164,10 @@ bestia (un oso hormiguero) «puede parrear con sus garras y obligar a desarmar a
 — hecho (`Combatiente.DETECTAR_MIN_TIER` / `detectarMinDe`, `detectarMin` en `trampaDeHab`; personaje y creep); las flechas especiales no dejan
 en No2 negativos (el creep, igual que el personaje: gasta hasta 0 y avisa en rojo). Los puntos 2–4 («los cauces, efectivamente»): a confirmar
 qué quiso decir antes de programarlos.
+**Y el Efecto especial de los pergaminos (dueño, 2026-10-23: «lo mismo el especial para pergaminos que lo requieran: la calidad mínima de algunos
+efectos de consumibles»):** un consumible con Ejecución que usa tu Ef.Esp —para tirar o como dificultad— lo toma como mínimo según su calidad
+(Común 6, Buena 8, Rara 10): `Combatiente.conMinimoDeCalidad` (en `habDeConsumible`), `tira.min` en el duelo. La Red Nerubian (Buena) pasa de
+mínimo 6 a **8**. El PdG.Esp con que se tira la Red no tiene mínimo (no es «el especial»): a confirmar.
 
 Regla del dueño (2026-10-23), ya aplicada al **Pergamino de red Nerubian**: la dificultad para soltarse es el **Efecto especial neto** de quien lo
 usa (su valor, no una tirada), **con un mínimo de 6** («es algo que vos pagaste, es consumible, solo funciona una vez»); si quien lo usa tiene más,

@@ -257,7 +257,7 @@ const FichaDuelo = (() => {
         // Tirada personalizada: la fórmula ya viene resuelta (X sustituida) desde la habilidad — acá solo se tira y se anuncia.
         if(c.formula){ const r = tirarDados(c.formula); if(r) ui.registrarTirada(nombre, r); else ui.toast(`No se pudo tirar «${c.etq}»: la fórmula «${c.formula}» no es válida (revisá la habilidad)`); return; }
         if(!c.stat) return;
-        const v = compute().final[c.stat];
+        const v = Math.max(num(compute().final[c.stat]), num(c.min));   // 📜 el mínimo de calidad de un pergamino (2026-10-23)
         // 🙈 Ciego contra un hechizo dirigido de lejos (2026-10-20): su Evasión, a la mitad.
         const S = getS(), conCiego = quien !== 'atacante' && c.stat === 'eva' ? Combatiente.ciegoContraDistancia(d, S.efectos) : S.efectos;
         if(conCiego !== S.efectos){ const orig = S.efectos; S.efectos = conCiego; try{ tirarValorStat(nombre, num(v) + num(c.bono), c.stat); }finally{ S.efectos = orig; } return; }
@@ -265,7 +265,7 @@ const FichaDuelo = (() => {
       },
       // «Cuánto tirarías»: la fórmula de dados de ese stat (para el botón de defensa).
       habValor: (d, quien, stat) => {
-        const v = compute().final[stat];
+        const t = quien === 'atacante' && d.hab && d.hab.tira, v = Math.max(num(compute().final[stat]), t && t.stat === stat ? num(t.min) : 0);
         const f = formulaParaValor(num(v));
         const est = quien !== 'atacante' ? Combatiente.ciegoContraDistancia(d, getS().efectos) : getS().efectos;   // las mitades (Pajaritos, 🙈 ciego de lejos…)
         return f ? f.formula + ' ÷2'.repeat(Combatiente.mitadesDeTirada(est, stat)) : fmt(num(v));

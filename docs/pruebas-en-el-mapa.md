@@ -187,6 +187,10 @@
   contraataque, como siempre (no bajan de 0). **Probado en parte el 2026-10-23** («Claude · pruebas»): el Escarabajo con −1 No2 atacado por juan →
   su Parry apagado con «Ya está en No2 negativos: no puede gastar más en una defensa»; con 0 No2 → Parry habilitado con «⚠ sin No2: queda en
   negativo», elegido → −1 No2 y el aviso de la deuda. Falta ver: la Evasión pagando el sobrepeso, el dodge roll y la ayuda para zafar ya en negativo.
+- [x] **🪤 Mínimo para detectar una trampa comprada (2026-10-23)** — probado el mismo día: el Goblin de prueba 1 (Destreza 1) colocó una Trampa de
+  oso (Común) y quedó con dificultad para detectarla 6, no 1.
+- [ ] **📜 Mínimo de calidad del Efecto especial de un pergamino (2026-10-23)**: la Red Nerubian (Buena) con un Ef.Esp bajo → para soltarse, Fuerza
+  contra 8; el Pergamino de luz cegadora tira como mínimo 8. (Está en las pruebas automáticas; falta verlo en el mapa.)
 - [x] (2026-10-23, Claude, «Claude · pruebas», con 🎮 el control de juan: Finalizar combate con el Goblin 3 caído → Publicar → juan reclamó la Varita arcana → Despojar; le llegó a la mochila con el mismo poder que la del catálogo, +20 XP, +5 DDE y +19 despojos; control devuelto) **🎒 Botín con los ítems tal cual** (2026-10-22, paso 6 de `docs/plan-inventario-creeps.md`): en un fin de combate real, que un jugador se
   lleve una varita o un talismán que tenía un creep y que en su mochila funcione igual que el del catálogo (el poder de la varita, el efecto del
   talismán). Lo armado ya se revisó con los creeps de «Claude · pruebas», sin publicar el botín.

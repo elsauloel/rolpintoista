@@ -1351,7 +1351,8 @@ function dueloElegirAreaMapa(msg){
   seleccion = null; hudCerrar(); pedirDibujo();
   const propio = t => t.fichaId === yo.ref && t.tipo === yo.tipo;
   const radio = Math.max(0, Math.round(num(hab.radio)) || 0);
-  const cancelado = () => { try{ MensajesMapa.alMarco($('#botonera-marco'), 'duelo-cancelado'); }catch(e){} };
+  // msg.alCancelar (2026-10-23): las Acciones de un creep reabren su recuadro y devuelven lo cobrado (js/12); si no, el aviso al marco de siempre.
+  const cancelado = () => { if(msg.alCancelar){ msg.alCancelar(); return; } try{ MensajesMapa.alMarco($('#botonera-marco'), 'duelo-cancelado'); }catch(e){} };
   const lanzar = async h => {
     const todos = [...tokens.entries()].map(([id, t]) => ({...t, id}));
     const mio = todos.find(propio);

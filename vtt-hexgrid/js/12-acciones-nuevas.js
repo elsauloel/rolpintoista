@@ -395,8 +395,10 @@ function acElegirObjetivo(sc, ataque, suelto, alDisparar){
   ac.host.hidden = true;
   const objetivoFijo = ac.objetivoFijo || null;   // 🧿 Mal de ojo: el personaje ya se eligió en su menú (js/60)
   ac.objetivoFijo = null;
-  // ↩ Lo cobrado por la habilidad que lanza este ataque (no la de otra: un ataque común no trae `habNombre`).
-  const dev = ac.devolucion && ataque && ataque.habNombre && ac.devolucion.creepId === sc.id && ac.devolucion.habNombre === ataque.habNombre ? ac.devolucion : null;
+  // ↩ Lo cobrado por la habilidad que lanza este ataque (no la de otra: un ataque común no trae `habNombre` ni `hab`). Un ataque con el arma la nombra
+  // en `habNombre`; una habilidad dirigida o de área, en `hab.nombre`.
+  const nomHab = ataque && (ataque.habNombre || (ataque.hab && ataque.hab.nombre));
+  const dev = ac.devolucion && nomHab && ac.devolucion.creepId === sc.id && ac.devolucion.habNombre === nomHab ? ac.devolucion : null;
   ac.devolucion = null;
   dueloElegirObjetivoMapa({yo: {ref: sc.id, tipo: 'creep', nombre: sc.nombre}, ataque, objetivoFijo, conSuelto: true, alSuelto: () => { reabrir(); suelto(); }, alCancelar: () => { reabrir(); acDevolver(dev); },
     ...(alDisparar ? {alDisparar} : {})});   // 🏹 la flecha especial se gasta al disparar (2026-10-20)

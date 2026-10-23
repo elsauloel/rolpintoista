@@ -1767,3 +1767,11 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   (`Combatiente.atrapaPub`, en los seis armadores del resumen); una copia vieja sin el dato se reconoce por el nombre de la habilidad
   (`dueloAplicarEfectoBase`, js/13, `Combatiente.atrapaDeNombre`). Las trampas armadas de telaraña o de red llevan el mismo dibujo en sus casillas
   (`atrapaDibujarSuelo`, desde js/05). Solo dibuja.
+- **🗡 Remate / Ir por el herido** (2026-10-23, `js/69-remate.js`): un ataque con `remate`; al elegir el objetivo (js/13, después de la herida) `remateBonos`
+  mira la vida del objetivo (`remateVida`: la ficha privada del creep para el GM, si no `hpPct`; el resumen de un personaje o de una invocación) y suma
+  `Combatiente.remateDados` (la mitad o menos +2, un cuarto o menos +3). Mesa y Crónica.
+- **🎯 Objetivos que califican y ↩ devolver al cancelar** (2026-10-23, dueño: «que te muestre los objetivos que califican, y si cancelás, se cancela el
+  cooldown y el costo que hayas pagado»): `OBJETIVO_CONDICIONES` / `objetivoCalifica(ataque, t)` (js/13): cada habilidad con condición suma una función
+  (el Remate, js/69); al elegir el objetivo brillan solo los que califican y uno que no califica pregunta «¿Atacarlo igual, como un ataque común?». En
+  las Acciones de un creep (js/12), `acEjecutarHab` deja en `ac.devolucion` lo que cobró (cooldown, SP, No2) y, si se cancela al elegir el objetivo,
+  `acDevolver` lo repone (toast y Mesa). Los No2 de «lo de un ataque» se cobran en el duelo. Falta lo mismo para las habilidades de los personajes.

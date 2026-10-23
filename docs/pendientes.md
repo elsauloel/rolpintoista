@@ -100,6 +100,17 @@
 >   debilidades elementales; los constructos y robots son inmunes a lo tóxico. Hoy ya existen las resistencias elementales (🔥 ❄ ⚡ ☠ 🧪, con
 >   «vulnerable» si es negativa) y el tipo de criatura de un creep (`tipoCriatura`): falta el diseño de qué tipo/efecto resiste o es débil a qué, y
 >   que un efecto (la red, una zona) reaccione a un elemento. Primero diseño con el dueño; después código.
+  **Propuesta de Claude, aceptada en general por el dueño (2026-10-23: «me gustan tus propuestas», lo retoma «en otro momento»):**
+  (1) **Naturaleza de la criatura**, aparte de los números del equipo: Inmune (ni el daño ni los estados del elemento) · Resistente (la mitad) ·
+  Normal · Débil (×1,5, como el rayo en el agua). Por tipo: constructo (robots, golems, «cualquier cosa construida por alguien más») inmune a lo
+  tóxico (ni veneno ni sangrado), débil al rayo **y al ácido** (ajuste del dueño, dictado «débiles al espacio»: entendido como ácido, a confirmar),
+  resiste el hielo · no-muerto inmune a lo tóxico, débil al fuego y a lo sagrado, resiste el hielo · planta débil al fuego, resiste lo tóxico ·
+  insecto / arácnido débil al fuego (los venenosos resisten lo tóxico) · elemental inmune a su elemento, débil al opuesto · demonio resiste el fuego,
+  débil a lo sagrado · humano, humanoide y bestia común, normal. Hace falta una **familia** debajo del tipo (bestia → insecto, arácnido, reptil…).
+  (2) **Elementos sobre el mapa**: el fuego quema redes y telarañas (libera al atrapado, la trampa de red se pierde), derrite el hielo y seca charcos,
+  podría prender nubes de gas; el hielo congela un charco y apaga el terreno incendiado; el ácido corroe redes como el fuego (¿rompe armadura?).
+  (3) **Sobre los estados**: el fuego saca la Escarcha; el hielo o un charco apagan la Quemadura; el fuego sobre un atrapado lo suelta, con el daño.
+  **Preguntas abiertas**: ¿escala multiplicada o en números? · ¿sumar la familia? · liberar con fuego: ¿con o sin daño? · ¿qué elementales y sus opuestos?
 > - [x] **🗡 Íconos distintos para cada arma en el piso (2026-10-23, dueño: «poner íconos distintos para distintas armas cuando se desarma
 >   alguien»): HECHO el mismo día** (`iconoDeItem` en vtt-hexgrid/js/27, probado en el mapa con un desarme real). Quedó: 🗡️ Tipo 4 y 6 ·
 >   🪓 Tipo 8 · 🔨 Tipo 10 · 💣 Tipo 12 · 🛡️ escudos · 🔮 talismanes y orbes · 🏹 arcos y ballestas · ➹ flechas y virotes especiales

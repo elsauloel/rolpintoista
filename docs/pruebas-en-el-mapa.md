@@ -191,6 +191,7 @@
   oso (Común) y quedó con dificultad para detectarla 6, no 1.
 - [ ] **📜 Mínimo de calidad del Efecto especial de un pergamino (2026-10-23)**: la Red Nerubian (Buena) con un Ef.Esp bajo → para soltarse, Fuerza
   contra 8; el Pergamino de luz cegadora tira como mínimo 8. (Está en las pruebas automáticas; falta verlo en el mapa.)
+- [ ] **🗡 Remate / Ir por el herido (2026-10-23)**: un creep con la habilidad contra un personaje sano (ataque común), con la mitad de la vida (+2 dados) y con un cuarto o menos (+3); mirar la Mesa, la Crónica y la fórmula del daño. **Y** (dueño, el mismo día): al elegir el objetivo brillan solo los que califican; uno sano pregunta «¿Atacarlo igual, como un ataque común?»; cancelar le devuelve al creep el cooldown y el SP.
 - [x] **🕸 La telaraña y la red, a la vista (2026-10-23), probado en el mapa con capturas**: la Red (copia vieja de un creep, sin el dato: la
   reconoció por el nombre) dejó la red de soga sobre juan; la Tela de araña, la telaraña sobre Clementino; al soltarse (Fuerza 4 contra 1, al
   empezar su turno) se fue sola. En el piso, la Red de caza y la Telaraña oculta llevan su dibujo encima de la ficha del cepo. El rebote, cada 3,6 s.

@@ -224,6 +224,12 @@
   turno (como la Vigilancia). Cuesta **2 No2** y **2 SP**, o cooldown 3. Decidido: 1d4 fijo (no el Ef.Esp: P216 en pausa) y la Escarcha y la Armadura
   rota en cada golpe (no con probabilidad: son el atractivo del buff). Sirven igual con armas naturales. **Para probar.**
 
+- ✅ **Remate** (humanoides) / **Ir por el herido** (bestias) (2026-10-23, choque pesado, «remate»; dueño: «la versión escalonada» y el nombre de la
+  bestia). Original: «Un golpe de gracia contra alguien herido: si el objetivo tiene menos de la mitad de HP, +1 dado (a mano).» Ahora: un ataque con su
+  arma; al elegir el objetivo el mapa mira su vida (`vtt-hexgrid/js/69-remate.js`, `Combatiente.remateDados`): **la mitad o menos, +2 dados** del Tipo
+  de su arma; **un cuarto o menos, +3**; si no, un ataque común. Mesa y Crónica. Lo de un ataque y **2 SP**, o cooldown 3. **Golpe de gracia** («el golpe
+  más fuerte que sabe dar») queda aparte, a revisar con el concepto 1. **Para probar.**
+
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 
 ## Etiquetas

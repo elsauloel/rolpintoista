@@ -34,7 +34,8 @@ Sirven al warrior (pegar fuerte), al tanque (aguantar y controlar) o a los dos.
 1. ✅ **Más daño en un golpe**: Golpe fuerte (+1 dado), Puño de roca (+2 y Demora), Zarpazo.
 2. ✅ **Golpe que se anuncia** ✦ (2026-10-21): **El que avisa no traiciona** / **Zarpazo erguido** — un turno lo carga a la vista de todos (a quién apunta),
    al siguiente +3 dados, sin Parry y empuja 2; si el objetivo pegado se aleja, sale de oportunidad; si le hacen daño, se le cae.
-3. **Remate** ✦: pega más fuerte a quien ya está herido (Remate, Golpe de gracia).
+3. ✅ **Remate** ✦ (2026-10-23): **Remate** / **Ir por el herido** — un ataque con su arma: +2 dados si el objetivo tiene la mitad de la vida o menos,
+   +3 con un cuarto o menos (escalonado, dueño). Golpe de gracia queda aparte (es del concepto 1, a revisar).
 4. **Varios golpes**: dos ataques en uno, con menos puntería cada uno (Golpe doble, Ráfaga de golpes).
 5. **Golpe que sigue** ✦: si tumba a alguien, vuelve a atacar a otro de al lado.
 6. ✅ **Partir la armadura**: **Romper armadura** / **Arrancar la coraza** y **Golpe demoledor** / **Mandíbula trituradora** (2026-10-21). Queda: perforar.

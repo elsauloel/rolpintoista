@@ -66,7 +66,7 @@
     'Arma ígnea': ['support', 'arma elemental'], 'Arma helada': ['support', 'arma elemental'], 'Arma eléctrica': ['support', 'arma elemental'],
     'Arma ácida': ['support', 'arma elemental'], 'Arma venenosa': ['support', 'arma elemental'],
     'Barrido': ['choque pesado', 'barrido'], 'Coletazo': ['choque pesado', 'barrido'],
-    'Tiro a la cabeza': ['rango', 'tiro apuntado'], 'Desarmar': ['choque pesado', 'desarmar'], 'El que avisa no traiciona': ['choque pesado', 'golpe anunciado'], 'Sal en la herida': ['choque liviano', 'abrir la herida'], 'Morder la herida': ['choque liviano', 'abrir la herida'], 'Patotear': ['choque liviano', 'manada'], 'Jauría': ['choque liviano', 'manada'], 'Zarpazo erguido': ['choque pesado', 'golpe anunciado'], 'Mal de ojo': ['debuffer', 'maleficio'], 'Disparo señalador': ['rango', 'señalar'], 'Ráfaga de cortes': ['choque liviano', 'ráfaga'], 'Ráfaga de zarpazos': ['choque liviano', 'ráfaga'],
+    'Tiro a la cabeza': ['rango', 'tiro apuntado'], 'Desarmar': ['choque pesado', 'desarmar'], 'El que avisa no traiciona': ['choque pesado', 'golpe anunciado'], 'Sal en la herida': ['choque liviano', 'abrir la herida'], 'Remate': ['choque pesado', 'remate'], 'Ir por el herido': ['choque pesado', 'remate'], 'Morder la herida': ['choque liviano', 'abrir la herida'], 'Patotear': ['choque liviano', 'manada'], 'Jauría': ['choque liviano', 'manada'], 'Zarpazo erguido': ['choque pesado', 'golpe anunciado'], 'Mal de ojo': ['debuffer', 'maleficio'], 'Disparo señalador': ['rango', 'señalar'], 'Ráfaga de cortes': ['choque liviano', 'ráfaga'], 'Ráfaga de zarpazos': ['choque liviano', 'ráfaga'],
     'Romper armadura': ['choque pesado', 'romper armadura'], 'Arrancar la coraza': ['choque pesado', 'romper armadura'],
     'Golpe demoledor': ['choque pesado', 'romper armadura'], 'Mandíbula trituradora': ['choque pesado', 'romper armadura'], 'Cadena de rayos': ['mago', 'rayo en cadena'],
     'Puñalada por la espalda': ['choque liviano', 'por la espalda'], 'Mordida a traición': ['choque liviano', 'por la espalda'], 'Puñalada trapera': ['choque liviano', 'por la espalda'],
@@ -134,7 +134,12 @@
     'su PdG, una vez, contra la Evasión de cada uno al lado; el daño de su arma y empuja 1 a quien no le gana',
     [{nombre: 'Empujón', empuja: 1, detalle: 'Lo empuja 1 casilla, lejos de la bestia.'}]));
   H('Golpe doble', 'D', '*', 'me', 3, zO('Dos ataques seguidos: se tira el daño dos veces (a mano la segunda).', 3, 'M'));
-  H('Remate', 'D', '*', 'me', 4, zO('Un golpe de gracia contra alguien herido: si el objetivo tiene menos de la mitad de HP, +1 dado (a mano).', 3, 'M'));
+  // 🗡 Auditada (dueño, 2026-10-23; choque pesado, «remate», escalonado): un ataque con su arma; si el objetivo tiene la mitad de la vida o menos,
+  // +2 dados del Tipo de su arma; un cuarto o menos, +3. Lo de un ataque y 2 SP, o cooldown 3. La vida la mira el mapa al elegir el objetivo (js/69).
+  // Original: «Un golpe de gracia contra alguien herido: si el objetivo tiene menos de la mitad de HP, +1 dado (a mano).»
+  [['Remate', 'hd', 'Un golpe de gracia contra alguien herido'], ['Ir por el herido', 'b', 'Huele la debilidad y va por ella']].forEach(([nombre, razas, como]) =>
+    H(nombre, 'D', razas, 'me', 3, aA(`${como}: un ataque con su arma. Si el objetivo tiene la mitad de la vida o menos, suma +2 dados del Tipo de su arma; si tiene un cuarto o menos, +3. Si está más sano, va como un ataque común.`,
+      {}, 'va al duelo como un ataque: +2 dados si el objetivo tiene la mitad de la vida o menos, +3 si tiene un cuarto o menos', 2, [], {remate: true})));
   // 🗡 Auditada (dueño, 2026-10-21; choque liviano, «por la espalda»): la versión fuerte de la Puñalada por la espalda.
   H('Puñalada trapera', 'D', 'hd', 'e', 4, aA('Un ataque con su arma desde el punto ciego del objetivo (su espalda): suma +1 dado de su arma al daño y Crítico frecuente +1, además del +1 a la Probabilidad de Golpe de todo ataque por la espalda. Si además viene en sigilo (el objetivo no lo vio venir), el daño de su arma se duplica (el doble de dados) en lugar del +1 dado. Si no está en la espalda, avisa y deja atacar igual, sin el bono.',
     {}, 'un ataque con su arma; por la espalda +1 dado y Crítico frecuente +1; en sigilo, el doble de dados', 4, [], {punalada: 'trapera'}));

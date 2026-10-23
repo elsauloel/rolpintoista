@@ -776,6 +776,15 @@ async function cegueraPermite(mio, destino){
   if(si) mesaLinea(`🙈 ${nombreDe(mio)} apuntó ciego a ${d} casillas (lo decidió la mesa)`, 'alerta-roja');
   return !!si;
 }
+/* 🎯 Habilidades que solo rinden contra ciertos objetivos (dueño, 2026-10-23: «que te muestre los objetivos que califican»): cada condición es
+   una función (ataque, t) → null (no le toca a este ataque) | {ok: true} | {ok: false, motivo}. Al elegir el objetivo brillan solo los que
+   califican; uno que no califica se puede elegir igual (avisa y deja seguir: va como un ataque común). La suman los archivos de cada habilidad
+   (el Remate, js/69). */
+const OBJETIVO_CONDICIONES = [];
+function objetivoCalifica(ataque, t){
+  for(const f of OBJETIVO_CONDICIONES){ let r = null; try{ r = f(ataque, t); }catch(err){ console.error('Condición de objetivo:', err); } if(r) return r; }
+  return null;
+}
 function dueloElegirObjetivoMapa(msg){
   const yo = msg.yo, ataque = msg.ataque;
   if(ataque && ataque.hab && (ataque.hab.objetivo === 'area' || ataque.hab.objetivo === 'onda' || ataque.hab.objetivo === 'cono' || ataque.hab.objetivo === 'linea')){ dueloElegirAreaMapa(msg); return; }   // hechizo de área: otro flujo (Paso 4/7)
@@ -807,6 +816,8 @@ function dueloElegirObjetivoMapa(msg){
   // ("avisa y deja seguir", no bloquea — no hay razón mecánica para prohibir un golpe a un aliado a propósito).
   const objetivoTipo = (ataque && ataque.hab && ataque.hab.objetivo) || 'enemigo';
   const esValido = objetivoTipo === 'aliado' ? t => !dueloEsRival(yo, t) : objetivoTipo === 'enemigo' ? t => dueloEsRival(yo, t) : null;   // «cualquiera» (2026-10-15): no sugiere bando
+  const califica = t => { const r = objetivoCalifica(ataque, t); return !r || r.ok; };   // 🎯 una habilidad con condición: brillan solo los que califican
+  const esValidoBrillo = t => (!esValido || esValido(t)) && califica(t);
   const conArco = !!(ataque && ataque.arco && !ataque.hab);   // el arco: el objetivo, con al menos 2 casilleros libres en el medio (P183)
   const minimo = conArco ? Combatiente.arcoLibres(ataque) + 1 : 0;   // (la Mínima más larga: 2 libres)
   // Un disparo (arma de rango): la línea de tiro se dibuja hasta el mouse y brillan en celeste los que están en la distancia ideal (js/32).
@@ -815,7 +826,7 @@ function dueloElegirObjetivoMapa(msg){
   const resaltar = () => {   // también al volver a elegir (después de «Elegir otro»)
     const alc0 = ataque && ataque.rango && !ataque.hab ? Combatiente.alcanceMaximo(ataque, ataque.alcance) : ataque && ataque.alcance;
     const ciegoYo = cegueraDe([...tokens.values()].find(propio));   // 🙈 ciego: brillan solo los que están a 2 o menos
-    nEnAlcance = dueloResaltarObjetivos(propio, ciegoYo ? Math.min(num(alc0) || Combatiente.CEGUERA_VISION, Combatiente.CEGUERA_VISION) : alc0, esValido, minimo);   // con Largo alcance, más lejos (js/35)
+    nEnAlcance = dueloResaltarObjetivos(propio, ciegoYo ? Math.min(num(alc0) || Combatiente.CEGUERA_VISION, Combatiente.CEGUERA_VISION) : alc0, esValidoBrillo, minimo);   // con Largo alcance, más lejos (js/35)
     nIdeal = mioTiro ? tiroResaltarIdeal(mioTiro, ataque, esValido) : 0;
     if(mioTiro) tiroPreview = {desde: {col: mioTiro.col, fila: mioTiro.fila}, mioId: mioTiro.id, ataque};
   };
@@ -838,6 +849,12 @@ function dueloElegirObjetivoMapa(msg){
       if(esValido && !esValido(t)){
         const msg = objetivoTipo === 'aliado' ? `${nombreDe(t)} es un rival, no un aliado. ¿Igual apuntarle con esta habilidad pensada para aliados?` : `${nombreDe(t)} es un aliado, no un rival. ¿Igual atacarlo?`;
         if(!(await AvisoCombate.preguntar(msg, {icono: '⚔', titulo: objetivoTipo === 'aliado' ? 'Apuntarle a un rival' : 'Atacar a un aliado', si: objetivoTipo === 'aliado' ? 'Sí, apuntarle' : 'Sí, atacarlo', no: 'Elegir otro'}))){ pedir(); return; }
+      }
+      const cal = objetivoCalifica(ataque, t);   // 🎯 no califica: avisa y deja seguir (va como un ataque común)
+      if(cal && !cal.ok){
+        const hab = (ataque && ataque.habNombre) || 'Esta habilidad';
+        if(!(await AvisoCombate.preguntar(`${nombreDe(t)} no califica para ${hab}: ${cal.motivo || 'no cumple la condición'}. ¿Atacarlo igual, como un ataque común?`,
+          {icono: '🎯', titulo: 'No califica', si: 'Atacarlo igual', no: 'Elegir otro'}))){ pedir(); return; }
       }
       dueloAvisoObjetivoOcultar();
       try{ t = await dueloVincularSiFalta(t); }catch(err){ console.error('No se pudo vincular el token al creep:', err); }
@@ -862,6 +879,12 @@ function dueloElegirObjetivoMapa(msg){
       if(ataque && ataque.abrirHerida && typeof heridaBonos === 'function'){   // 🩸 Sal en la herida (js/64): +2 dados si ya sangra
         let r = null;
         try{ r = await heridaBonos(mio, t, ataqueCarga || ataque, yo); }catch(err){ console.error('No se pudo ver la herida:', err); r = ataqueCarga || ataque; }
+        if(!r){ pedir(); return; }
+        ataqueCarga = r;
+      }
+      if(ataque && ataque.remate && typeof remateBonos === 'function'){   // 🗡 Remate / Ir por el herido (js/69): +2 o +3 dados según la vida del objetivo
+        let r = null;
+        try{ r = await remateBonos(mio, t, ataqueCarga || ataque, yo); }catch(err){ console.error('No se pudo ver la vida del objetivo:', err); r = ataqueCarga || ataque; }
         if(!r){ pedir(); return; }
         ataqueCarga = r;
       }

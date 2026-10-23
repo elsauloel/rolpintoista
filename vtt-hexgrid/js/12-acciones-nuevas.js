@@ -370,13 +370,35 @@ function acAtacar(tipo, flechaId){
 }
 // Elegir el objetivo (de un ataque o de una habilidad) con un clic en el token: mientras tanto las Acciones nuevas se esconden
 // (tapan el mapa); "Sin objetivo" o cancelar las vuelven a mostrar. `suelto`: lo que se hace sin objetivo.
+/* ↩ Cancelar al elegir el objetivo devuelve lo que cobró la habilidad (dueño, 2026-10-23: «si cancelás, se cancela el cooldown y el costo que hayas
+   pagado»): `acEjecutarHab` deja en `ac.devolucion` lo cobrado (cooldown, SP, No2) y la habilidad; si el objetivo se elige (o se tira suelto) ya está
+   usada; si se cancela, `acDevolver` lo repone. Los No2 de «lo de un ataque» se cobran recién en el duelo: no hay nada que devolver. */
+function acDevolver(dev){
+  if(!dev) return;
+  acCambiarCreep(dev.creepId, c => {
+    if(dev.sp > 0) c.sp = num(c.sp) + dev.sp;
+    if(dev.nitros > 0) c.nitros = num(c.nitros) + dev.nitros;
+    const h = (c.habilidades || []).find(x => x.id === dev.habId);
+    if(h) h.cdActual = dev.cd;
+    return {ok: true};
+  }).then(r => {
+    if(!r) return;
+    const que = [dev.cdTxt, dev.sp > 0 ? `${fmt(dev.sp)} SP` : '', dev.nitros > 0 ? `${fmt(dev.nitros)} No2` : ''].filter(Boolean).join(' y ');
+    const txt = `↩ ${dev.creep}: canceló ${dev.habNombre}${que ? ` — se le devolvió ${que}` : ''}`;
+    toast(txt);
+    try{ mesaLinea(txt, 'recordatorio'); }catch(err){}
+  });
+}
 function acElegirObjetivo(sc, ataque, suelto, alDisparar){
   const id = ac.creepId;
   const reabrir = () => { if(ac && ac.creepId === id){ ac.host.hidden = false; acUbicar(); acDibujar(); } };
   ac.host.hidden = true;
   const objetivoFijo = ac.objetivoFijo || null;   // 🧿 Mal de ojo: el personaje ya se eligió en su menú (js/60)
   ac.objetivoFijo = null;
-  dueloElegirObjetivoMapa({yo: {ref: sc.id, tipo: 'creep', nombre: sc.nombre}, ataque, objetivoFijo, conSuelto: true, alSuelto: () => { reabrir(); suelto(); }, alCancelar: () => reabrir(),
+  // ↩ Lo cobrado por la habilidad que lanza este ataque (no la de otra: un ataque común no trae `habNombre`).
+  const dev = ac.devolucion && ataque && ataque.habNombre && ac.devolucion.creepId === sc.id && ac.devolucion.habNombre === ataque.habNombre ? ac.devolucion : null;
+  ac.devolucion = null;
+  dueloElegirObjetivoMapa({yo: {ref: sc.id, tipo: 'creep', nombre: sc.nombre}, ataque, objetivoFijo, conSuelto: true, alSuelto: () => { reabrir(); suelto(); }, alCancelar: () => { reabrir(); acDevolver(dev); },
     ...(alDisparar ? {alDisparar} : {})});   // 🏹 la flecha especial se gasta al disparar (2026-10-20)
 }
 
@@ -537,12 +559,16 @@ async function acEjecutarHab(sc, habId){
       {titulo: 'No está bajo tierra', icono: '🕳', si: 'Usarla igual'}))) return;
   }
   const id = sc.id;
+  const antes = {sp: num(sc.sp), nitros: num(sc.nitros), cd: num(h.cdActual)};   // ↩ para devolverlo si cancela al elegir el objetivo
   acCambiar(c => {
     const p = CreepAcciones.ejecutarHab(c, (c.habilidades || []).find(x => x.id === habId), estadosPresetCreep(), true);
     if(!p.error) p.creep = c;   // el creep ya cambiado (con el estado propio, si lo hubo), para lo que sigue
     return p;
   }).then(p => {
     if(!p) return;
+    { const c = p.creep, hh = (c.habilidades || []).find(x => x.id === habId), cdNuevo = num(hh && hh.cdActual);
+      ac.devolucion = {creepId: id, habId, habNombre: h.nombre || 'la habilidad', creep: sc.nombre || 'El creep', cd: antes.cd,
+        cdTxt: cdNuevo !== antes.cd ? 'el cooldown' : '', sp: Math.max(0, antes.sp - num(c.sp)), nitros: Math.max(0, antes.nitros - num(c.nitros))}; }
     if(p.aviso) toast(p.aviso);
     if(p.malditoDano) try{ mesaLinea(`🩸 ${p.creep.nombre || 'El creep'} está Maldito: usar una habilidad le saca ${fmt(p.malditoDano)} de vida (${CreepCalculo.modoSP(p.creep) ? 'su SP' : 'su cooldown'})`, 'recordatorio'); }catch(err){}
     const sc2 = Object.assign(p.creep, {id}), h2 = (sc2.habilidades || []).find(x => x.id === habId);
@@ -679,7 +705,7 @@ function cerrarAccionesNuevas(){
    estados para la Ejecución, con el selector común (los "Mis presets" del GM no están en la partida: ver pendientes 7b). */
 const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261021zs', '../comun/asistente-duelo-hab.js?v=20261022d'];
 // Las recetas de habilidades de fábrica (para ↻ Reemplazar y ⬆ Subir): pesadas, recién cuando hacen falta.
-const ACE_BASE = ['../comun/creeps-base.js?v=20261023p8b', '../comun/skills-creep-base.js?v=20261023web'];
+const ACE_BASE = ['../comun/creeps-base.js?v=20261023p8b', '../comun/skills-creep-base.js?v=20261023rem'];
 async function acCargarEditor(){ await acCargarPiezas(); await cargarPiezas(SE_PIEZAS); await cargarPiezas(ACE_PIEZAS); }
 // ⬆ Subir una habilidad del creep a la biblioteca compartida (corrección o algo nuevo); su `bibOrigen` nuevo se guarda en el creep.
 async function acSubirHab(creepId, habId){

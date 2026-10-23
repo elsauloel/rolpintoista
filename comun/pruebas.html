@@ -4859,6 +4859,13 @@ prueba('🕸 lo que atrapa, a la vista (2026-10-23): la telaraña o la red viaja
     ['Pergamino de red Nerubian', 'Tela de araña', 'Telaraña oculta', 'Red de caza', 'Red', 'Muro de piedra', 'Pared de fuego'].map(Combatiente.atrapaDeNombre)],
     ['telarana', 'red', {}, ['telarana', 'telarana', 'telarana', 'red', 'red', '', '']]);
 });
+prueba('🗡 Remate / Ir por el herido (2026-10-23, escalonado): +2 dados con la mitad de la vida o menos, +3 con un cuarto o menos; la habilidad lleva remate al duelo', () => {
+  const arma = d => armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === d).datos, 2);
+  const h = arma('Remate'), b = arma('Ir por el herido');
+  const a = Combatiente.ataqueConArreglos({nombre: 'Remate'}, h.duelo, {arma: {nombre: 'Garrote', tipoDado: 6}, alcance: 1});
+  igual([[1, 0.6, 0.5, 0.3, 0.25, 0.1, 0, null].map(Combatiente.remateDados), !!(a && a.remate), !!b, !!(b && b.duelo && b.duelo.remate), HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Remate').etiquetas.includes('auditada')],
+    [[0, 0, 2, 2, 3, 3, 0, 0], true, true, true, true]);
+});
 prueba('No2 negativos en una defensa (2026-10-23): se puede quedar en negativo, pero no gastar si ya estás en negativo', () => {
   igual([Combatiente.defensaSinNo2(0, 1), Combatiente.defensaSinNo2(2, 1), Combatiente.defensaSinNo2(-1, 1), Combatiente.defensaSinNo2(-1, 0)], [false, false, true, false]);
 });

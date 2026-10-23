@@ -48,7 +48,7 @@ async function aguanteAtacar(sc){
   mesaLinea(`🛡 ${txt}`, 'recordatorio');
   if(typeof momentoAbrir === 'function') momentoAbrir({tipo: 'aguante', icono: '🛡', titulo: `${sc.nombre} descarga el aguante`, resultado: txt, estado: 'listo', datos: {chico: true}});
   const atq = Combatiente.ataqueConArreglos({nombre: 'Aguante', detalle: `Modo aguante: +${dados}d${tipoD} por los golpes que recibió.`}, {modo: 'arma', arma: {dados}},
-    {arma: {...Combatiente.armaDeCombatiente(sc), id: '', nombre: Combatiente.armaEnMano(sc).nombre || '', rango: Combatiente.armaEnMano(sc).armaDeRango}, alcance: CreepCalculo.alcance(sc)});
+    {arma: Combatiente.armaParaArreglos(sc), alcance: CreepCalculo.alcance(sc)});
   if(atq && typeof Duelo !== 'undefined' && Duelo.disponible()) acElegirObjetivo(sc, atq, () => acPublicar(sc, CreepDuelo.pdgDeArreglos(sc, atq)));
   else acPublicar(sc, CreepDuelo.pdgDeArreglos(sc, atq));
   acDibujar();

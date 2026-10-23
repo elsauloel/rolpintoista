@@ -35,7 +35,7 @@ async function vigilanciaArmasDe(r){
     const n = sc.nitros === null || sc.nitros === undefined ? CreepCalculo.nitrosMax(sc) : num(sc.nitros);
     if(n < costo) return [];
     return [{nombre: Combatiente.armaEnMano(sc).nombre || 'su arma', costo, yo: {ref: r.fichaId, tipo: 'creep', nombre}, detalle: oporDetalle(CreepCalculo.ataqueTxt(sc), sc, Combatiente.armaDeCombatiente(sc)),
-      ataque: {tipo: 'normal', armaId: '', armaNombre: Combatiente.armaEnMano(sc).nombre || '', tipoDado: Combatiente.armaEnMano(sc).tipoDado, rango: Combatiente.armaEnMano(sc).armaDeRango, alcance: CreepCalculo.alcance(sc), ...Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(sc))}}];
+      ataque: Combatiente.ataqueConSuArma(sc, 'normal', CreepCalculo.alcance(sc))}];
   }
   await bnCargarPiezas();
   const fichaId = String(r.fichaId).split(SEP_INVOCACION)[0];

@@ -64,8 +64,7 @@ const InvAcciones = (() => {
      turno Tipo ÷ 2, después el Tipo completo; suma al conteo) y tirar el PdG (tiradaAtaque). Atacar cierra el Parry pendiente:
      lo borra cada pantalla. */
   function ataqueDuelo(inv, tipo){
-    return {tipo: tipo === 'oportunidad' || tipo === 'contra' ? tipo : 'normal', armaId: '', armaNombre: Combatiente.armaEnMano(inv).nombre || '', tipoDado: Combatiente.armaEnMano(inv).tipoDado, rango: Combatiente.armaEnMano(inv).armaDeRango, ...Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(inv)),
-      alcance: Combatiente.armaEnMano(inv).armaDeRango ? Combatiente.alcanceArmaRango(Combatiente.armaDeCombatiente(inv), I().statValor(inv, 'rng')) : 1};
+    return Combatiente.ataqueConSuArma(inv, tipo === 'oportunidad' || tipo === 'contra' ? tipo : 'normal', I().alcance(inv));
   }
   /* Sin No2 suficientes (2026-10-02, hoja de ruta B-7, igual que los creeps y los personajes: avisar y dejar seguir): faltanNitros, la
      pregunta «¿Atacar igual?», pagar forzando (gasta los que tenga, hasta 0) y la línea roja de la Mesa (alertaSinNitros). */
@@ -123,16 +122,15 @@ const InvAcciones = (() => {
      por igual». Levantarse cuesta lo mismo que a un personaje (FichaCalculo.IT2.nitrosLevantarse). Soltarse: primero la tirada (una sola
      vez), después aplicarla (cobra y, si salió, saca el estado). → {error} / {aviso}; tiradaSoltarse → {s, r, ok, est, origen} o null. */
   function levantarse(inv){
-    // Primero el cuerpo (Sentado); si no, el arma (Desarmado, 2026-10-07: 1 No2).
     const lv = Combatiente.levantable(inv.estados);
     if(!lv) return null;
     const est = lv.est;
-    const costo = Combatiente.conExtenuado(inv.estados, lv.arma ? Combatiente.COSTO_LEVANTAR_ARMA : Math.max(0, num(FichaCalculo.IT2.nitrosLevantarse) - num(I().modTotal(inv, 'levantarse'))));   // + Extenuado   // Levantarse rápido (2026-10-06)
-    if(num(inv.nitros) < costo) return {error: `${inv.nombre}: no le alcanzan los No2 — ${lv.arma ? 'levantar el arma' : 'levantarse'} cuesta ${costo}`};
+    const costo = Combatiente.conExtenuado(inv.estados, Math.max(0, num(FichaCalculo.IT2.nitrosLevantarse) - num(I().modTotal(inv, 'levantarse'))));   // + Extenuado   // Levantarse rápido (2026-10-06)
+    if(num(inv.nitros) < costo) return {error: `${inv.nombre}: no le alcanzan los No2 — ${'levantarse'} cuesta ${costo}`};
     inv.nitros = num(inv.nitros) - costo;
-    Combatiente.aplicarTormenta(inv, inv.estados, costo, {motivo: lv.arma ? 'levantar el arma' : 'levantarse'});
+    Combatiente.aplicarTormenta(inv, inv.estados, costo, {motivo: 'levantarse'});
     inv.estados = inv.estados.filter(e => e !== est);
-    return {aviso: `${inv.nombre} ${lv.arma ? 'levantó el arma' : 'se levantó'}${costo ? ` · −${fmt(costo)} No2` : ''}`};
+    return {aviso: `${inv.nombre} se levantó${costo ? ` · −${fmt(costo)} No2` : ''}`};
   }
   function tiradaSoltarse(inv){
     const est = Combatiente.estadoSoltable(inv.estados);

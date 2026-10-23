@@ -251,7 +251,8 @@ const CreepDuelo = (() => {
       },
       armaContra: d => {
         const sc = deLado(d.defensor);
-        return {armaId: '', armaNombre: (sc && Combatiente.armaEnMano(sc).nombre) || '', tipoDado: (sc && Combatiente.armaEnMano(sc).tipoDado) || 8};
+        const a = Combatiente.ataqueConSuArma(sc);
+        return {armaId: '', armaNombre: a.armaNombre, tipoDado: a.tipoDado};
       },
     };
   }

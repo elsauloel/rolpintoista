@@ -213,8 +213,8 @@ async function oporResponder(si){
 // Qué hace el arma de un creep o una invocación, en una línea (2026-10-04, dueño: «poder decidir con la información completa» al elegir con qué
 // arma atacar de oportunidad, sin salir del cartel). Un personaje usa la ficha corta del arma (ItemCorto.armaEsencial).
 function oporDetalle(dano, x, arma){
-  const p = [dano ? `Daño ${dano}` : '', `Tipo ${num(x.armaTipo) || 8}`, x.armaDeRango ? 'a distancia' : ''];
-  const r = arma || {};
+  const r = arma || Combatiente.armaEnMano(x) || {};
+  const p = [dano ? `Daño ${dano}` : '', `Tipo ${num(r.tipoDado) || 8}`, r.armaDeRango ? 'a distancia' : ''];
   if(r.sinParry) p.push('No se puede parrear');
   if(r.oporGratis) p.push('Oportunidad sin No2');
   if(num(r.critD20)) p.push(`+${num(r.critD20)} d20 en el crítico`);
@@ -231,7 +231,7 @@ async function oporArmasDe(r){
     const n = sc.nitros === null || sc.nitros === undefined ? CreepCalculo.nitrosMax(sc) : num(sc.nitros);
     if(n < costo || !Combatiente.sirveDeOportunidad(Combatiente.armaDeCombatiente(sc))) return [];   // con un arco no hay oportunidad
     return [{nombre: Combatiente.armaEnMano(sc).nombre || (Combatiente.armaEnMano(sc).sinArma ? 'sin arma' : 'su arma'), costo, yo: {ref: r.fichaId, tipo: 'creep', nombre}, detalle: oporDetalle(CreepCalculo.ataqueTxt(sc), sc, Combatiente.armaDeCombatiente(sc)),
-      ataque: {tipo: 'oportunidad', armaId: '', armaNombre: Combatiente.armaEnMano(sc).nombre || '', tipoDado: Combatiente.armaEnMano(sc).tipoDado, rango: Combatiente.armaEnMano(sc).armaDeRango, alcance: CreepCalculo.alcance(sc), ...Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(sc))}}];
+      ataque: Combatiente.ataqueConSuArma(sc, 'oportunidad', CreepCalculo.alcance(sc))}];
   }
   await bnCargarPiezas();
   const [fichaId, invId] = String(r.fichaId).split(SEP_INVOCACION);
@@ -244,7 +244,7 @@ async function oporArmasDe(r){
     const costo = Math.max(0, Combatiente.costoEspecial(Combatiente.armaEnMano(inv).tipoDado, Combatiente.armaDeCombatiente(inv), 'oportunidad') - Combatiente.ahorroEspecial('oportunidad', st => FichaResumen.invModTotal(inv, st)));
     if(num(inv.nitros) < costo) return [];
     return [{nombre: Combatiente.armaEnMano(inv).nombre || (Combatiente.armaEnMano(inv).sinArma ? 'sin arma' : 'su arma'), costo, yo: {ref: r.fichaId, tipo: 'pj', nombre}, detalle: oporDetalle(typeof InvCalculo !== 'undefined' ? InvCalculo.ataqueTxt(inv) : '', inv, Combatiente.armaDeCombatiente(inv)),
-      ataque: {tipo: 'oportunidad', armaId: '', armaNombre: Combatiente.armaEnMano(inv).nombre || '', tipoDado: Combatiente.armaEnMano(inv).tipoDado, rango: Combatiente.armaEnMano(inv).armaDeRango, alcance: 1, ...Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(inv))}}];
+      ataque: Combatiente.ataqueConSuArma(inv, 'oportunidad', typeof InvCalculo !== 'undefined' ? InvCalculo.alcance(inv) : 1)}];
   }
   const calc = FichaCalculo.calcular(S);
   const disponibles = S.nitros === null || S.nitros === undefined ? num(calc.final.nitros) : num(S.nitros);

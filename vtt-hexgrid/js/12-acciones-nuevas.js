@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261023p5', '../comun/creep-botonera.js?v=20261023p7', '../comun/creep-acciones.js?v=20261021zq', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261022x'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261023p5', '../comun/creep-botonera.js?v=20261023p8a', '../comun/creep-acciones.js?v=20261023p8a', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261023p8a'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -355,8 +355,7 @@ function acAtacar(tipo, flechaId){
     });
   };
   if(typeof Duelo === 'undefined' || !Duelo.disponible()){ hacer(); return; }
-  acElegirObjetivo(sc, {tipo, armaId: '', armaNombre: Combatiente.armaEnMano(sc).nombre || '', tipoDado: Combatiente.armaEnMano(sc).tipoDado, rango: Combatiente.armaEnMano(sc).armaDeRango, alcance: CreepCalculo.alcance(sc),
-    ...Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(sc)),   // los rasgos de su arma: por la espalda, sin Parry
+  acElegirObjetivo(sc, {...Combatiente.ataqueConSuArma(sc, tipo, CreepCalculo.alcance(sc)),   // (con los rasgos de su arma: por la espalda, sin Parry)
     ...(fl ? {flecha: fl} : {}),   // 🏹 la flecha o el virote especial (2026-10-20)
     ...(num(Combatiente.armaEnMano(sc).arcoDuro) > 0 && num(CreepCalculo.statValor(sc, 'fue')) < num(Combatiente.armaEnMano(sc).arcoDuro) ? {arcoDuroPdg: -2} : {})}, hacer,
     fl ? () => acDispararFlecha(fl.id) : null);   // Arco duro

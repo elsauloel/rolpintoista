@@ -49,15 +49,14 @@ const CreepAcciones = (() => {
   /* ---------- Lo que cambia al creep ---------- */
   // Levantarse (Sentado): cuesta 1 No2 y saca el estado.
   function levantarse(sc){
-    // Primero el cuerpo (Sentado); si no, el arma (Desarmado, 2026-10-07: 1 No2).
     const lv = Combatiente.levantable(sc.estados);
     if(!lv) return {error: `${sc.nombre}: no tiene nada que levantar`};
-    const costo = Combatiente.conExtenuado(sc.estados, lv.arma ? Combatiente.COSTO_LEVANTAR_ARMA : Combatiente.costoLevantarse(st => C().modTotal(sc, st)));   // + Extenuado   // Levantarse rápido (2026-10-06)
-    if(num(sc.nitros) < costo) return {error: `${sc.nombre}: no le alcanzan los No2 — ${lv.arma ? 'levantar el arma' : 'levantarse'} cuesta ${costo}`};
+    const costo = Combatiente.conExtenuado(sc.estados, Combatiente.costoLevantarse(st => C().modTotal(sc, st)));   // + Extenuado   // Levantarse rápido (2026-10-06)
+    if(num(sc.nitros) < costo) return {error: `${sc.nombre}: no le alcanzan los No2 — ${'levantarse'} cuesta ${costo}`};
     sc.nitros = num(sc.nitros) - costo;
-    Combatiente.aplicarTormenta(sc, sc.estados, costo, {motivo: lv.arma ? 'levantar el arma' : 'levantarse'});
+    Combatiente.aplicarTormenta(sc, sc.estados, costo, {motivo: 'levantarse'});
     sc.estados = (sc.estados || []).filter(e => e !== lv.est);
-    return {aviso: `${sc.nombre} ${lv.arma ? 'levantó el arma' : 'se levantó'}${costo ? ` · −${fmt(costo)} No2 · quedan ${fmt(sc.nitros)}` : ' (gratis)'}`};
+    return {aviso: `${sc.nombre} se levantó${costo ? ` · −${fmt(costo)} No2 · quedan ${fmt(sc.nitros)}` : ' (gratis)'}`};
   }
   // Soltarse (2026-10-03): primero la tirada (afuera de cualquier transacción: se tira una sola vez) y después aplicarla (cobra y, si salió,
   // saca el estado). tiradaSoltarse → {s, r, ok, estId, origen} o null; aplicarSoltarse → {error} o {aviso}.
@@ -165,7 +164,7 @@ const CreepAcciones = (() => {
   // «Ataque con mi arma, con arreglos» de un creep (Golpe brutal, Carga…; P134): el mismo armado que el personaje, con su arma.
   function ataqueDeHab(sc, h){
     const c = h && h.duelo;
-    return Combatiente.ataqueConArreglos(h, c, {arma: {...Combatiente.armaDeCombatiente(sc), id: '', nombre: Combatiente.armaEnMano(sc).nombre || '', rango: Combatiente.armaEnMano(sc).armaDeRango},
+    return Combatiente.ataqueConArreglos(h, c, {arma: Combatiente.armaParaArreglos(sc),
       alcance: c && c.alcance !== undefined && c.alcance !== 'auto' ? Combatiente.alcanceHab(c, 'pdg', s => C().statValor(sc, s)) : C().alcance(sc),
       valorDe: s => C().statValor(sc, s),   // 🔓 un estado que se suelta contra un stat suyo (el Mordisco feroz: Fuerza contra su Fuerza)
       danoGolpe: extra => String(C().danoTxt(sc, C().statValor(sc, 'dmg'), num(extra))).replace(/\s+/g, '')});   // el daño de este golpe, otra vez

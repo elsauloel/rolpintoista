@@ -252,10 +252,7 @@ async function bnLevantarArma(elId){
     // Lo de antes, por si otro se la lleva primero (se deshace todo).
     const antes = FichaGuardado.partes(S), respaldo = structuredClone({inventario: S.inventario || [], efectos: S.efectos || [], cinturon: S.cinturon || [], nitros: S.nitros});
     cobrar(costo, 'levantó un arma');
-    const des = (S.efectos || []).find(Combatiente.esDesarmado);
-    if(des) S.efectos = S.efectos.filter(e => e !== des);
-    // Si va en la mano, se elige siempre (dueño, 2026-10-22: «si tenés una mano libre, te pregunta: ¿querés dejarlo equipado? Sí, no»; antes,
-    // estando Desarmado y con la mano libre, volvía a la mano sin preguntar).
+    // Si va en la mano, se elige siempre (dueño, 2026-10-22: «si tenés una mano libre, te pregunta: ¿querés dejarlo equipado? Sí, no»).
     let r = {destino: 'mochila', soltar: []};
     if(FichaCombate.esMano(x.it.tipoItem)) r = await levantadoElegir(S, x.it, quien);
     if(r.soltar.length){
@@ -312,7 +309,6 @@ function levantadoAlEquipo(x, it, r, ref){
     if(nuevo.invocadaDe === String(ref)){ delete nuevo.invocadaDe; delete nuevo.invocadaNombre; nuevo.invocada = true; } else nuevo.invocada = false;
   }
   if(nuevo.equipado && /^arma_/.test(String(nuevo.tipoItem || '')) && !nuevo.especial) x.equipo.unshift(nuevo); else x.equipo.push(nuevo);   // un arma en la mano queda primera: es la que usa (paso 7)
-  if(r.equipar && Combatiente.esArmaDeMano({...it, equipado: true})){ const des = (x.estados || []).find(Combatiente.esDesarmado); if(des) x.estados = x.estados.filter(e => e !== des); }
 }
 async function bnInvLevantarArma(invId, elId){
   if(!bn || !bn.S || !bnPuedeGuardar()) return;

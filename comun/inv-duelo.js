@@ -231,7 +231,8 @@ const InvDuelo = (() => {
       },
       armaContra: d => {
         const inv = ui.inv(d.defensor);
-        return {armaId: '', armaNombre: Combatiente.armaEnMano(inv).nombre || '', tipoDado: Combatiente.armaEnMano(inv).tipoDado};
+        const a = Combatiente.ataqueConSuArma(inv);
+        return {armaId: '', armaNombre: a.armaNombre, tipoDado: a.tipoDado};
       },
     };
   }

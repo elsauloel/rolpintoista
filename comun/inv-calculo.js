@@ -120,6 +120,8 @@ const InvCalculo = (() => {
   }
   // ¿Se puede usar ahora? La regla común (P133): cooldown, No2 y vida (una 📣 manual no cobra nada).
   function bloqueoHab(inv, h){ return Combatiente.bloqueoHab(h, {modo: FichaBotonera.modoHab(h), nitros: inv.nitros, costo: costoNitrosHab(inv, h), hp: inv.hp}); }
+  // Hasta dónde llega su ataque: cuerpo a cuerpo, 1; con un arma de rango, su alcance (con el Rango de la invocación).
+  const alcance = inv => Combatiente.armaEnMano(inv).armaDeRango ? Combatiente.alcanceArmaRango(Combatiente.armaEnMano(inv), statValor(inv, 'rng')) : 1;
   function danoTxt(inv, extra){
     const a = armaDe(inv);
     const dados = a.peso + a.danoAmplificado;
@@ -182,6 +184,6 @@ const InvCalculo = (() => {
 
   return {IT2_INV, ATTR_IDS_INV, INV_STAT_EXCLUIR, INV_DERIVADOS_POR_ATTR, INV_STAT_ATTR, INV_STATS_TIRADA_IDS, INV_STATS_HAB,
     fuentesEquipo, modTotal, aportesMod, estadosArmadura, aporteArmadura, defensaEfectiva, critEfectivo, estadoActivo, statValor,
-    nitrosMax, habAtaque, pesoArma, defensa, bloqueoValor, costoAtaque, costoNitrosHab, costoHabTxt, bloqueoHab, danoTxt, ataqueTxt,
+    nitrosMax, habAtaque, pesoArma, defensa, bloqueoValor, costoAtaque, costoNitrosHab, costoHabTxt, bloqueoHab, danoTxt, ataqueTxt, alcance,
     modsAfectanHp, actualizarHpMaxPorCon, migrar, regenPasivas};
 })();

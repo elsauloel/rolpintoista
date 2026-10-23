@@ -3179,14 +3179,14 @@ prueba('✋ Paso 5: sin nada en la mano pega sin arma (1d4 + Daño); Desarmado y
     (viejo || {}).estados ? viejo.estados.map(e => e.nombre) : 'sin objeto', inv.estados.length, Combatiente.sinArmaEnMano(inv)],
     [true, 4, '', '1d4 + 2', true, false, true, 0, false, ['Sentado'], 0, true]);
 });
-prueba('el arma en el piso (2026-10-07): las Botoneras ofrecen levantarla al lado; con su arma en el piso, Desarmado no se levanta sin ir', () => {
+prueba('el arma en el piso (2026-10-07): las Botoneras ofrecen levantarla al lado; un Desarmado viejo ya no da el botón «Levantar el arma» (paso 8)', () => {
   const cerca = {armasCerca: [{id: 'el1', nombre: 'Hacha', propia: true}]};
   const S = fichaBotonera({efectos: [{id: 'd', nombre: 'Desarmado', desarmado: true, activo: true}]});
   const hPj = FichaBotonera.html(S, cerca).html, hPj2 = FichaBotonera.html(S, {armaEnElPiso: true}).html, hPj3 = FichaBotonera.html(S, {}).html;
   const sc = creepPrueba({nitros: 3, estados: [{nombre: 'Desarmado', desarmado: true, activo: true}]});
   const hCr = CreepBotonera.html(sc, cerca).html, hCr2 = CreepBotonera.html(sc, {armaEnElPiso: true}).html;
   igual([/data-levantararma="el1"/.test(hPj), /Hacha \(la tuya\)/.test(hPj), /Levantar el arma/.test(hPj2), /Levantar el arma/.test(hPj3),
-    /data-levantararmacreep="el1"/.test(hCr), /Levantar el arma/.test(hCr2)], [true, true, false, true, true, false]);
+    /data-levantararmacreep="el1"/.test(hCr), /Levantar el arma/.test(hCr2)], [true, true, false, false, true, false]);
 });
 prueba('torso blando: la Túnica de sangre paga el SP de un arma especial con vida (y no dos veces); el resumen lleva la Defensa extra', async () => {
   const {S} = FichaGuardado.normalizar({}, {mezclarCatalogo: false});

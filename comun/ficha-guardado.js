@@ -238,6 +238,7 @@ const FichaGuardado = (() => {
     ['inventario', 'cinturon', 'habilidades', 'pasivas', 'sociales', 'efectos', 'bitacora', 'invocaciones'].forEach(k => {
       next[k] = Array.isArray(data[k]) && data[k].length ? data[k] : fresh[k];
     });
+    if(typeof Combatiente !== 'undefined') next.efectos = next.efectos.filter(e => !Combatiente.esDesarmado(e));   // ✋ Desarmado ya no es un estado (2026-10-22)
     // El catálogo NO es un dato del personaje: es la referencia compartida del juego, así que siempre gana la versión
     // fresca. Lo único que se conserva de `data.catalogo` son los ids que esta versión ni conoce: ítems que en algún
     // momento se agregaron directo al catálogo de esa ficha y nunca se publicaron.

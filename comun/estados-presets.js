@@ -136,7 +136,8 @@ const ESTADOS_PRESET = [
     detalle:'Quedó al descubierto: hasta que empieza su próximo turno, su Evasión se parte a la mitad (al resultado, para abajo) y no puede reaccionar con nada que cueste No2: ni Parry (y por lo tanto ni Bloqueo ni contraataque), ni ataque de oportunidad, ni dodge roll. ⚙ Automatizado: la Evasión, las defensas del duelo, la oportunidad y el dodge roll.'},
   {nombre:'Sentado', polaridad:'debuff', permanente:true, turnos:0, sentado:true, esCC:true,
     detalle:'Está en el piso: su Evasión se parte a la mitad (al resultado de la tirada, redondeado hacia abajo), no puede atacar y no puede hacer dodge roll (✋ a mano). No vence solo: levantarse cuesta 1 No2 (botón Levantarse de la Botonera o de las Acciones del creep).'},
-  // Desarmado (dueño, 2026-10-07, la Varita del manotazo): el arma cae en su casilla y levantarla cuesta 1 No2. Como Sentado: no vence solo.
+  // Desarmado (dueño, 2026-10-07, la Varita del manotazo): el arma cae al piso. Desde el 2026-10-22 no queda como estado (Combatiente.agregarEstado):
+  // es el efecto; se queda acá para la inmunidad (es un control) y para el caos.
   {nombre:'Desarmado', alias:['Desarme'], polaridad:'debuff', permanente:true, turnos:0, desarmado:true, esCC:true,
     detalle:'Se le cayó el arma: no puede atacar con ella hasta levantarla, que cuesta 1 No2 (el botón «Levantar el arma» de la Botonera). ⚙ Automatizado: al atacar, avisa (y deja seguir si la mesa lo decide); en el mapa el arma queda en el piso (🗡 con su nombre) y la levanta cualquiera que esté al lado, desde su Botonera.'},
   // Ceguera (dueño, 2026-10-07, la Varita del eclipse): 1 turno, solo ve a 1 casilla y −2 PdG.

@@ -98,11 +98,6 @@ const CreepBotonera = (() => {
       const sinNitrosLev = num(sc.nitros) < 1;
       combate.push({nombre:`🧍 Levantarse · ${fmt(Combatiente.conExtenuado(sc.estados, Combatiente.costoLevantarse(st => C().modTotal(sc, st))))} No2`, dado:'', soloTexto:true, sinNitros: sinNitrosLev, motivo: `${sinNitrosLev ? 'Sin No2 · ' : ''}Cuesta 1 No2 y saca el estado Sentado`, attr:`data-levantarcreep="${sc.id}"`});
     }
-    // Desarmado (2026-10-07): levantar el arma, 1 No2 (el mismo botón; primero se levanta si está Sentado).
-    else if((sc.estados || []).some(Combatiente.esDesarmado) && !o.armaEnElPiso){   // (si su arma está en el piso del mapa, se levanta desde ahí)
-      const sinNitrosArma = num(sc.nitros) < Combatiente.COSTO_LEVANTAR_ARMA;
-      combate.push({nombre:`🗡️ Levantar el arma · ${fmt(Combatiente.conExtenuado(sc.estados, Combatiente.COSTO_LEVANTAR_ARMA))} No2`, dado:'', soloTexto:true, sinNitros: sinNitrosArma, motivo: `${sinNitrosArma ? 'Sin No2 · ' : ''}Cuesta 1 No2 y saca el estado Desarmado`, attr:`data-levantarcreep="${sc.id}"`});
-    }
     // 🔁 Lo que tiene guardado y va en la mano (paso 7, 2026-10-22): sacarlo cuesta 1 No2 en combate; lo de la mano que no entre se guarda.
     Combatiente.gruposDeEquipo(sc).guardado.filter(Combatiente.vaEnLaMano).forEach(it => {
       const sinNo2 = num(sc.nitros) < Combatiente.COSTO_SACAR_PIEZA;

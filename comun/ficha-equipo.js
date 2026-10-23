@@ -315,20 +315,9 @@ const FichaEquipo = (() => {
     conCosto(S, aMano ? 0 : 1, `${eraEquipado ? 'desequipar' : 'equipar'} ${it.nombre}`, `${eraEquipado ? 'desequipó' : 'equipó'} ${it.nombre}`, () => {
       it.equipado = !it.equipado;
       it.aMano = !it.equipado && aMano;
-      const sinDesarmado = it.equipado && sacarDesarmado(S, it, ui);
-      ui.cambio(['inventario', ...(sinDesarmado ? ['efectos'] : [])]);
+      ui.cambio(['inventario']);
       if(aMano && ui.modoCombate()) ui.toast(`${it.nombre}: ${it.equipado ? 'sale de la vaina' : 'a la vaina'}, sin gastar No2`);
     }, ui);
-    return true;
-  }
-  // Desarmado se va al tener un arma en la mano otra vez (dueño, 2026-10-22: «equipé un arma desde la mochila, y al atacar me dice que estoy
-  // desarmado»): equipar un arma de la mochila lo saca, igual que levantar la que se cayó. → true si lo sacó.
-  function sacarDesarmado(S, it, ui){
-    if(!it || !/^arma_/.test(String(it.tipoItem || '')) || typeof Combatiente === 'undefined' || !Combatiente.esDesarmado) return false;
-    const antes = (S.efectos || []).length;
-    S.efectos = (S.efectos || []).filter(e => !Combatiente.esDesarmado(e));
-    if(S.efectos.length === antes) return false;
-    ui.toast(`${it.nombre} en la mano: ya no estás Desarmado`);
     return true;
   }
   // Saca el equipado y pone el de la mochila. Si el slot igual no alcanza (ej. un arma de dos manos con escudo puesto), avisa.
@@ -353,8 +342,7 @@ const FichaEquipo = (() => {
       nuevo.aMano = false; viejo.aMano = viejoAMano;
       viejo.equipado = false;
       nuevo.equipado = true;
-      const sinDesarmado = sacarDesarmado(S, nuevo, ui);
-      ui.cambio(['inventario', ...(sinDesarmado ? ['efectos'] : [])], {reemplazo: true});
+      ui.cambio(['inventario'], {reemplazo: true});
       ui.toast(`${nuevo.nombre} equipado en lugar de ${viejo.nombre}`);
     }, ui);
   }

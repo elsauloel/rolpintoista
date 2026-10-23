@@ -161,6 +161,11 @@
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 
 ## Pendientes
+- [ ] **💀 Invocaciones que desaparecen** (2026-10-22, dueño): una invocación con token que muere en combate (vida 0) o a la que se le terminan los
+  turnos (el Mantenimiento la duerme) tiene que irse del mapa, con una sola línea en la Mesa («💀 … desaparece: murió» / «✨ … desaparece: se
+  terminaron sus turnos») y fuera del orden de turnos; si tenía un arma invocada en otras manos o en el piso, esa arma se desvanece a los pocos
+  segundos. Un token puesto de antemano con la invocación sin invocar no se toca. (Lo de las armas invocadas por sí solo ya se probó el
+  2026-10-22; falta ver la muerte y el fin de los turnos en una pelea.)
 - [x] **🔥 Llama de Fénix** — probado en el mapa el 2026-10-20: Aurelia tomó el elixir desde su Botonera; un golpe de 100 del GM la levantó en el mismo golpe con toda la vida (50) y el SP lleno, Titilando, con el cartel «renace de sus cenizas»; un creep con la llama, igual (5/5).
 - [x] **🧪 Escudos de poción** — probado en el mapa el 2026-10-20: Aurelia tomó la Poción de Cuero Duro (15); un golpe físico de 8 del GM lo absorbió entero (escudo 15 → 7, vida 50) y uno especial de 6 fue a la vida (50 → 44).
 - [x] **😵 Mareo de invocación nuevo** (2026-10-20): probado en «Test con claude elsaulo» con el Lobo de Silvia: entra al final del orden con el

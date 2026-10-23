@@ -112,7 +112,7 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261023b', '../comun/ficha-botin.js?v=20261022p', '../comun/generador-tiendas.js?v=20261022q', '../comun/filtro-catalogo.js?v=20261022q', '../comun/ficha-tienda.js?v=20261022k', '../comun/ficha-mantenimiento.js?v=20261020n', '../comun/ficha-calculo.js?v=20261021z', '../comun/ficha-combate.js?v=20261015d', '../comun/skills-clase.js?v=20261022u', '../comun/ficha-habilidades.js?v=20261020q',
-  '../comun/catalogo.js?v=20261020zr', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261016c', '../comun/ficha-sesion.js?v=20261020zu', '../comun/ficha-botonera.js?v=20261020zb', '../comun/ficha-resumen.js?v=20261023p5', '../comun/inv-calculo.js?v=20261023p5', '../comun/inv-botonera.js?v=20261020zb', '../comun/inv-acciones.js?v=20261019l', '../comun/inv-duelo.js?v=20261023b', '../comun/ficha-acciones.js?v=20261023b', '../comun/inv-habilidades.js?v=20261014f', '../comun/inv-lupa.js?v=20261015a',
+  '../comun/catalogo.js?v=20261020zr', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261016c', '../comun/ficha-sesion.js?v=20261020zu', '../comun/ficha-botonera.js?v=20261020zb', '../comun/ficha-resumen.js?v=20261023p5', '../comun/inv-calculo.js?v=20261023p5', '../comun/inv-botonera.js?v=20261023p7', '../comun/inv-acciones.js?v=20261019l', '../comun/inv-duelo.js?v=20261023b', '../comun/ficha-acciones.js?v=20261023b', '../comun/inv-habilidades.js?v=20261014f', '../comun/inv-lupa.js?v=20261015a',
   '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261022s', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261014e'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -267,7 +267,7 @@ function bnInvAca(b){
     bn.raiz.querySelector('#bn-verinv').classList.add('open');
     return true;
   }
-  const d = b.dataset, ref = d.invtirarstat || d.invatacar || d.invotroataque || d.invdanio || d.ejecutarhabinv || d.danohabinv || d.invlevantarse || d.invsoltarse;
+  const d = b.dataset, ref = d.invtirarstat || d.invatacar || d.invotroataque || d.invdanio || d.ejecutarhabinv || d.danohabinv || d.invlevantarse || d.invsoltarse || d.invsacarpieza;
   if(!ref || !bnPuedeGuardar()) return false;
   const inv = (bn.S.invocaciones || []).find(x => x && x.id === ref.split(':')[0]);
   if(!inv){ toast('Esa invocación ya no está'); return true; }
@@ -282,6 +282,13 @@ function bnInvAca(b){
     if(p.cambio) ui.cambio(); else if(p.parry) bnDibujar();
     if(p.aviso) toast(p.aviso);
     bnPublicarInv(inv, p.tirada);
+    return true;
+  }
+  if(d.invsacarpieza){   // 🔁 lo guardado a la mano (paso 7)
+    const ui = bnUi(FichaGuardado.partes(bn.S));
+    const x = Combatiente.sacarPieza(inv, d.invsacarpieza.split(':')[1], {combate: modoMapa === 'combate', slotDe: t => FichaCalculo.slotDe(t)});
+    if(x.error){ toast(x.error); return true; }
+    ui.cambio(); toast(x.aviso); mesaLinea(`🔁 ${x.aviso}`, 'recordatorio', inv.nombre);
     return true;
   }
   // Levantarse y Soltarse (2026-10-03, comun/inv-acciones.js): las mismas reglas que el personaje y los creeps.

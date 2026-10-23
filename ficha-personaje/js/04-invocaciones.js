@@ -156,6 +156,17 @@ function quitarPasivaDeInv(invId, pasivaId){
   if(modsAfectanHpInv(p.mods)) actualizarHpMaxPorConInv(inv);
   renderInvocaciones();
 }
+// 🎒 Paso 7 (2026-10-22): ponerse una pieza guardada o guardar una puesta (Combatiente.ponerPieza / guardarPieza: lo guardado no da bonos).
+function cambiarPiezaInv(invId, equipoId, poner){
+  const inv = S.invocaciones.find(x => x.id === invId);
+  const it = inv && (inv.equipo || []).find(x => x.id === equipoId);
+  if(!it) return;
+  const r = poner ? Combatiente.ponerPieza(inv, equipoId, t => FichaCalculo.slotDe(t)) : Combatiente.guardarPieza(inv, equipoId);
+  if(!r){ toast(`${it.nombre} es natural: no se guarda`); return; }
+  if([it, ...r.guardados].some(e => modsAfectanHpInv(e.mods))) actualizarHpMaxPorConInv(inv);
+  renderInvocaciones();
+  toast(poner ? `${it.nombre}: ${Combatiente.vaEnLaMano(it) ? 'en la mano' : 'puesto'}${r.guardados.length ? ` · guardó ${r.guardados.map(e => e.nombre).join(' y ')}` : ''}` : `${it.nombre}: guardado (no da bonos)`);
+}
 function quitarEquipoDeInv(invId, equipoId){
   const inv = S.invocaciones.find(x => x.id === invId);
   if(!inv) return;
@@ -298,15 +309,20 @@ function invPasoHtml(id, inv){
       <div class="inv-minif"><label>Defensa</label><input type="number" data-invf="defensa" data-invid="${inv.id}" value="${inv.defensa}"></div>
       <div></div><div></div>
     </div>
-    <div class="inv-editar-separador" style="margin-top:12px"><span>Armadura</span></div>
+    ${(g => [['En las manos', [...(a => a && a.natural !== true ? [a] : [])(Combatiente.armaPrincipal(inv)), ...g.manos], ''], ['Puesto', g.puesto, 'Sin armadura.'], ['Guardado', g.guardado, '']]
+      .filter(([, l, vacio]) => l.length || vacio).map(([titulo, lista, vacio]) => `
+    <div class="inv-editar-separador" style="margin-top:12px"><span>${titulo}</span></div>
+    ${titulo === 'Guardado' ? '<div class="hint">Lo lleva encima: no da bonos ni para.</div>' : ''}
     <div class="inv-equipo-list">
-      ${Combatiente.equipoSinArma(inv).length ? Combatiente.equipoSinArma(inv).map(it => `
-      <div class="inv-equipo-item">
+      ${lista.length ? lista.map(it => `
+      <div class="inv-equipo-item"${titulo === 'Guardado' ? ' style="opacity:.75"' : ''}>
         <span class="inv-equipo-nombre">${esc(it.nombre)}</span>
-        <span class="hint">+${fmt(num(it.def))} DEF</span>
+        <span class="hint">${/^arma_/.test(it.tipoItem) ? `Tipo ${fmt(num(it.tipoDado))}` : `+${fmt(Combatiente.defDeItem(it))} DEF`}</span>
+        ${titulo === 'Guardado' ? `<button type="button" class="inv-rm" data-ponerpiezainv="${inv.id}:${it.id}" title="Ponérsela (lo que no entre en la mano o en su lugar se guarda)">✋</button>`
+          : it.natural ? '' : `<button type="button" class="inv-rm" data-guardarpiezainv="${inv.id}:${it.id}" title="Guardarla (la lleva encima pero no da bonos)">🎒</button>`}
         <button type="button" class="inv-rm" data-quitarequipoinv="${inv.id}:${it.id}" title="Quitar">×</button>
-      </div>`).join('') : `<div class="hint">Sin armadura.</div>`}
-    </div>
+      </div>`).join('') : `<div class="hint">${vacio}</div>`}
+    </div>`).join(''))(Combatiente.gruposDeEquipo(inv))}
     <button type="button" class="inv-addhab" data-additeminv="${inv.id}" style="margin-top:6px">+ Ítem</button>
     <div class="inv-editar-separador" style="margin-top:12px"><span>Resistencia a críticos</span></div>
     <div class="inv-critgrid">

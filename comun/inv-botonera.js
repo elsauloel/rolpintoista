@@ -64,7 +64,10 @@ const InvBotonera = (() => {
       <button type="button" class="botonera-tile" data-invotroataque="${inv.id}" title="A mano, por si el mapa no lo detectó: el ataque de oportunidad se ofrece solo cuando un rival se aleja, y el contraataque después de ganar el Parry y el Bloqueo. Atacar es siempre un ataque normal." style="opacity:.75;min-height:0"><span class="bt-label">↪ Oportunidad o contraataque, a mano</span></button>`;
     const tilesAyuda = (o.atrapadosCerca || []).map(a => `
       <button type="button" class="botonera-tile${num(inv.nitros) < a.no2 ? ' bt-sin-nitros' : ''}" data-invayudarsoltar="${inv.id}:${a.tokenId}" title="${esc(`${a.nombre} está atrapado (${a.est}): tira su ${a.etq} contra ${a.dif}; si llega, lo suelta. Cuesta ${a.no2} No2 aunque no lo logre`)}"><span class="bt-label">🤝 Ayudar a soltar a ${esc(a.nombre)} · ${fmt(a.no2)} No2</span></button>`).join('');   // 🤝 (2026-10-20, js/54)
-    const tilesCombate = tilesExtra + tilesArmas + tilesAyuda + combate.map(c => {
+    // 🔁 Lo que tiene guardado y va en la mano (paso 7, 2026-10-22): sacarlo cuesta 1 No2 en combate.
+    const tilesSacar = Combatiente.gruposDeEquipo(inv).guardado.filter(Combatiente.vaEnLaMano).map(it => `
+      <button type="button" class="botonera-tile${num(inv.nitros) < Combatiente.COSTO_SACAR_PIEZA ? ' bt-sin-nitros' : ''}" data-invsacarpieza="${inv.id}:${it.id}" title="La tiene guardada: la pone en la mano (en combate, 1 No2); lo que tenga en la mano y no entre se guarda"><span class="bt-label">🔁 Sacar ${esc(it.nombre)} · ${fmt(Combatiente.COSTO_SACAR_PIEZA)} No2</span></button>`).join('');
+    const tilesCombate = tilesExtra + tilesSacar + tilesArmas + tilesAyuda + combate.map(c => {
       const mt = c.stat ? ModTirada.tile(inv.estados, c.stat) : {clase: '', html: '', titulo: ''};
       return `
       <button type="button" class="botonera-tile${c.sinNitros?' bt-sin-nitros':''}${mt.clase}" ${c.attr} title="${esc(c.motivo + mt.titulo)}">

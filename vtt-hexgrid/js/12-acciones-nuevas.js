@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261023p5', '../comun/creep-botonera.js?v=20261023p5', '../comun/creep-acciones.js?v=20261021zq', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261022x'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261023p5', '../comun/creep-botonera.js?v=20261023p7', '../comun/creep-acciones.js?v=20261021zq', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261022x'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -195,6 +195,11 @@ function acAccionAca(b){
   if(d.verhabaccion){ acVerHab(sc, d.verhabaccion); return true; }
   if(d.ayudarsoltarcreep){ ayudarASoltar({tipo: 'creep', tokenId: d.ayudarsoltarcreep}); return true; }   // 🤝 (js/54)
   if(d.levantararmacreep){ acLevantarArma(d.levantararmacreep); return true; }   // 🗡 un arma en el piso (js/27)
+  if(d.sacarpiezacreep){   // 🔁 lo guardado a la mano (paso 7)
+    const itId = d.sacarpiezacreep.split(':')[1];
+    acCambiar(c => Combatiente.sacarPieza(c, itId, {combate: modoMapa === 'combate', slotDe: CreepCalculo.slotDe})).then(x => { if(x && x.aviso){ toast(x.aviso); mesaLinea(`🔁 ${x.aviso}`, 'recordatorio', sc.nombre); } });
+    return true;
+  }
   if(d.tirarstatcreep){ acPublicar(sc, CreepAcciones.tiradaStat(sc, d.tirarstatcreep.split(':')[1])); return true; }
   if(d.esquivarcreep){ acPublicar(sc, CreepAcciones.esquivar(sc)); return true; }
   if(d.fuerzacreep){ acPublicar(sc, CreepAcciones.fuerzaGolpe(sc)); return true; }

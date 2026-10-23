@@ -128,6 +128,7 @@ function cardHtml(sc){
             <span class="valor-caja" title="Daño">${danoTxt(sc)}</span>
             <button class="rm" data-armanat="${sc.id}" title="Arma natural del catálogo (garras, colmillos, aguijón…)">🐾</button>
             ${Combatiente.armaEnMano(sc).nombre ? `<button class="rm" data-verarmacreep="${sc.id}" title="Ver el arma (y editarla y subirla al catálogo)">👁</button>` : ''}
+            ${(a => a && a.natural !== true && a.id ? `<button class="rm" data-guardarpieza="${sc.id}:${a.id}" title="Guardarla (la lleva encima pero no la usa: queda sin arma en la mano)">🎒</button>` : '')(Combatiente.armaPrincipal(sc))}
             <button class="rm" data-editararma="${sc.id}" title="Editar arma">✎</button>
           </div>
           <div class="arma-detalle">${Combatiente.armaEnMano(sc).detalle ? esc(Combatiente.armaEnMano(sc).detalle) : 'Sin efecto.'}</div>
@@ -135,15 +136,18 @@ function cardHtml(sc){
         </div>
       </div>
 
+      ${(g => [['En las manos', g.manos, ''], ['Puesto', g.puesto, 'Sin armadura.'], ['Guardado', g.guardado, '']].filter(([, l, vacio]) => l.length || vacio).map(([titulo, lista, vacio]) => `
       <div>
-        <div class="sect-label">Armadura</div>
+        <div class="sect-label">${titulo}${titulo === 'Guardado' ? ' <span class="hint" style="text-transform:none">· lo lleva encima: no da bonos ni para; se suelta al morir</span>' : ''}</div>
         <div class="equipo-list" style="margin-top:4px">
-          ${Combatiente.equipoSinArma(sc).length ? Combatiente.equipoSinArma(sc).map(it => `
-            <div class="equipo-item">
+          ${lista.length ? lista.map(it => `
+            <div class="equipo-item"${titulo === 'Guardado' ? ' style="opacity:.75"' : ''}>
               <div class="equipo-item-info">
                 <div class="equipo-item-top">
                   <span class="equipado-nombre">${esc(it.nombre)}</span>
-                  <span class="valor-caja" title="Defensa que otorga"><small>DEF</small>+${fmt(num(it.def))}</span>
+                  <span class="valor-caja" title="Defensa que otorga"><small>DEF</small>+${fmt(Combatiente.defDeItem(it))}</span>
+                  ${titulo === 'Guardado' ? `<button class="rm" data-ponerpieza="${sc.id}:${it.id}" title="Ponérsela (lo que no entre en la mano o en su lugar se guarda)">✋</button>`
+                    : it.natural ? '' : `<button class="rm" data-guardarpieza="${sc.id}:${it.id}" title="Guardarla (la lleva encima pero no da bonos)">🎒</button>`}
                   <button class="rm" data-naturalequipo="${sc.id}:${it.id}" title="${it.natural ? 'Natural (parte del cuerpo): no se suelta al morir · tocá para que sea una pieza que se suelta' : 'Tocá para marcarla natural (piel, caparazón…): da sus bonos pero no se suelta al morir'}" style="${it.natural ? 'color:#8EE6A8;border-color:#8EE6A8' : 'opacity:.55'}">🐾</button>
                   <button class="rm" data-verequipocreep="${sc.id}:${it.id}" title="Ver la pieza (y editarla y subirla al catálogo)">👁</button>
                   <button class="rm" data-quitarequipo="${sc.id}:${it.id}" title="Quitar">×</button>
@@ -151,8 +155,10 @@ function cardHtml(sc){
                 <div class="equipo-item-meta">${esc(TIPOITEM_LABEL_GM[it.tipoItem] || it.tipoItem)}${it.natural ? ' · 🐾 natural: no se suelta' : ''}</div>
                 ${it.detalle ? `<div class="arma-detalle">${esc(it.detalle)}</div>` : ''}
               </div>
-            </div>`).join('') : `<div class="hint">Sin armadura.</div>`}
+            </div>`).join('') : `<div class="hint">${vacio}</div>`}
         </div>
+      </div>`).join(''))(Combatiente.gruposDeEquipo(sc))}
+      <div>
         <button type="button" class="addhab" data-equipardelfabricante="${sc.id}" style="margin-top:6px">⚔ Equipar del fabricante</button>
       </div>
 

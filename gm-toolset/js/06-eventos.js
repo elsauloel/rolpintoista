@@ -370,6 +370,11 @@ document.addEventListener('click', async e => {
     toast(it.natural ? `🐾 ${it.nombre}: natural, no se suelta al morir` : `${it.nombre}: se suelta al morir`);
     return;
   }
+  if(b.dataset.ponerpieza || b.dataset.guardarpieza){   // 🎒 paso 7: en las manos / puesto / guardado
+    const [scId, equipoId] = (b.dataset.ponerpieza || b.dataset.guardarpieza).split(':');
+    cambiarPiezaCreep(scId, equipoId, !!b.dataset.ponerpieza);
+    return;
+  }
   if(b.dataset.quitarequipo){
     const [scId, equipoId] = b.dataset.quitarequipo.split(':');
     quitarEquipoDeCreep(scId, equipoId);

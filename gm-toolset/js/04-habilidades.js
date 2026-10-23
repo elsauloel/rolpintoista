@@ -250,6 +250,20 @@ function actualizarArmaduraTipo(sc){
   sc.armaduraTipo = Combatiente.equipoSinArma(sc).map(it => it.nombre).join(', ');
 }
 
+// 🎒 Paso 7 (2026-10-22): ponerse una pieza guardada o guardar una puesta (Combatiente.ponerPieza / guardarPieza: lo guardado no da bonos).
+function cambiarPiezaCreep(scId, equipoId, poner){
+  const sc = S.creeps.find(s => s.id === scId);
+  const it = sc && (sc.equipo || []).find(x => x.id === equipoId);
+  if(!it) return;
+  const r = poner ? Combatiente.ponerPieza(sc, equipoId, CreepCalculo.slotDe) : Combatiente.guardarPieza(sc, equipoId);
+  if(!r){ toast(`${it.nombre} es natural: no se guarda`); return; }
+  // La velocidad que da una pieza se suma a mano (aplicarModsEquipo): sale lo que se guarda, entra lo que se pone.
+  (poner ? r.guardados : [it]).forEach(e => aplicarModsEquipo(sc, e.mods, -1));
+  if(poner) aplicarModsEquipo(sc, it.mods, 1);
+  if([it, ...r.guardados].some(e => modsAfectanHp(e.mods))) actualizarHpMaxPorCon(sc);
+  renderAll();
+  toast(poner ? `${it.nombre}: ${Combatiente.vaEnLaMano(it) ? 'en la mano' : 'puesto'}${r.guardados.length ? ` · guardó ${r.guardados.map(e => e.nombre).join(' y ')}` : ''}` : `${it.nombre}: guardado (no da bonos)`);
+}
 function quitarEquipoDeCreep(scId, equipoId){
   const sc = S.creeps.find(s => s.id === scId);
   const item = sc && (sc.equipo||[]).find(x => x.id === equipoId);

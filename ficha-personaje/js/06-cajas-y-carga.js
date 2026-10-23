@@ -499,6 +499,11 @@ document.addEventListener('click', async e => {
   if(b.dataset.proponerpasiva){ proponerPasiva(b.dataset.proponerpasiva); return; }
   if(b.dataset.versionpasiva){ const p = S.pasivas.find(x => x.id === b.dataset.versionpasiva); if(p) abrirVersionNuevaPasiva(p); return; }
   if(b.dataset.additeminv){ abrirItemNuevoInv(b.dataset.additeminv); return; }
+  if(b.dataset.ponerpiezainv || b.dataset.guardarpiezainv){   // 🎒 paso 7: en las manos / puesto / guardado
+    const [invId, equipoId] = (b.dataset.ponerpiezainv || b.dataset.guardarpiezainv).split(':');
+    cambiarPiezaInv(invId, equipoId, !!b.dataset.ponerpiezainv);
+    return;
+  }
   if(b.dataset.quitarequipoinv){
     const [invId, equipoId] = b.dataset.quitarequipoinv.split(':');
     quitarEquipoDeInv(invId, equipoId);

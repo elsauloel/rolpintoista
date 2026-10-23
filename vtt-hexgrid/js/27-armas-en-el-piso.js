@@ -311,7 +311,7 @@ function levantadoAlEquipo(x, it, r, ref){
   if(ref && String(ref).includes(SEP_INVOCACION)){   // ✨ una invocación: lo suyo vuelve a ser suyo; lo de otro, no (js/67)
     if(nuevo.invocadaDe === String(ref)){ delete nuevo.invocadaDe; delete nuevo.invocadaNombre; nuevo.invocada = true; } else nuevo.invocada = false;
   }
-  x.equipo.push(nuevo);
+  if(nuevo.equipado && /^arma_/.test(String(nuevo.tipoItem || '')) && !nuevo.especial) x.equipo.unshift(nuevo); else x.equipo.push(nuevo);   // un arma en la mano queda primera: es la que usa (paso 7)
   if(r.equipar && Combatiente.esArmaDeMano({...it, equipado: true})){ const des = (x.estados || []).find(Combatiente.esDesarmado); if(des) x.estados = x.estados.filter(e => e !== des); }
 }
 async function bnInvLevantarArma(invId, elId){

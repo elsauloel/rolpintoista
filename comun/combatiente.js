@@ -698,6 +698,57 @@ const Combatiente = (() => {
   const vaEnLaMano = it => /^(arma|escudo)_/.test(String(it && it.tipoItem || ''));
   // Cuántas manos tiene libres (lo natural no ocupa una mano: garras, colmillos).
   const manosLibres = x => Math.max(0, 2 - equipoPuesto(x).filter(it => vaEnLaMano(it) && it.natural !== true).reduce((a, it) => a + (/_2m$/.test(it.tipoItem) ? 2 : 1), 0));
+  /* 🎒 Paso 7 (2026-10-22): lo que lleva un creep o una invocación, en tres grupos para los editores: en las manos (sin el arma de la mano, que se
+     muestra aparte), puesto (armadura, cabeza…: lo que da bonos) y guardado (no da bonos ni para). */
+  function gruposDeEquipo(x){
+    const a = armaPrincipal(x), lista = (Array.isArray(x && x.equipo) ? x.equipo : []).filter(Boolean);
+    return {manos: lista.filter(it => it !== a && puesto(it) && vaEnLaMano(it)), puesto: lista.filter(it => puesto(it) && !vaEnLaMano(it)),
+      guardado: lista.filter(it => !puesto(it))};
+  }
+  /* Ponerse una pieza guardada (`ponerPieza`) o guardar una puesta (`guardarPieza`). Al ponerse un arma, el arma que tenía en la mano se guarda
+     (cambia de arma) y la nueva queda primera en la lista (la que usa); si a la pieza no le alcanzan las manos, se guarda lo de la mano que haga
+     falta. Lo natural no ocupa mano ni se guarda. Lo que no va en la mano reemplaza a lo puesto en su mismo lugar (`slotDe`; 'otro' no choca).
+     → {pieza, guardados} o null. */
+  function ponerPieza(x, id, slotDe){
+    const lista = Array.isArray(x && x.equipo) ? x.equipo : null;
+    const it = lista && lista.find(e => e && e.id === id);
+    if(!it) return null;
+    const guardados = [], guardar = e => { e.equipado = false; guardados.push(e); };
+    const otros = () => lista.filter(e => e && e !== it && puesto(e) && e.natural !== true);
+    const esArma = e => /^arma_/.test(String(e.tipoItem || '')) && !e.especial;
+    if(vaEnLaMano(it)){
+      if(esArma(it)) otros().filter(esArma).forEach(guardar);
+      const manos = e => /_2m$/.test(String(e.tipoItem || '')) ? 2 : 1;
+      for(let enMano = otros().filter(vaEnLaMano); enMano.length && enMano.reduce((s, e) => s + manos(e), 0) + manos(it) > 2; enMano = otros().filter(vaEnLaMano))
+        guardar(enMano[enMano.length - 1]);
+      if(esArma(it)){ lista.splice(lista.indexOf(it), 1); lista.unshift(it); }
+    }else if(slotDe){
+      const s = slotDe(it.tipoItem);
+      if(s && s !== 'otro') otros().filter(e => !vaEnLaMano(e) && slotDe(e.tipoItem) === s).forEach(guardar);
+    }
+    it.equipado = true;
+    return {pieza: it, guardados};
+  }
+  function guardarPieza(x, id){
+    const it = (Array.isArray(x && x.equipo) ? x.equipo : []).find(e => e && e.id === id);
+    if(!it || it.natural === true) return null;
+    it.equipado = false;
+    return {pieza: it, guardados: []};
+  }
+  // 🔁 Sacar una pieza guardada en la pelea (las Acciones de un creep, la Botonera de una invocación): en combate cuesta 1 No2, como equipar a un
+  // personaje (IT2.nitrosEquipar; + Extenuado). → {aviso} o {error}.
+  const COSTO_SACAR_PIEZA = 1;
+  function sacarPieza(x, id, o){
+    o = o || {};
+    const it = (Array.isArray(x && x.equipo) ? x.equipo : []).find(e => e && e.id === id);
+    if(!it || puesto(it)) return {error: 'Ya no la tiene guardada'};
+    const costo = o.combate ? conExtenuado(x.estados, COSTO_SACAR_PIEZA) : 0;
+    if(costo > n(x.nitros)) return {error: `${x.nombre}: sin No2 — sacar ${it.nombre} cuesta ${costo}`};
+    const r = ponerPieza(x, id, o.slotDe);
+    if(!r) return {error: 'No se pudo'};
+    x.nitros = n(x.nitros) - costo;
+    return {aviso: `${x.nombre} saca ${it.nombre}${r.guardados.length ? ` y guarda ${r.guardados.map(e => e.nombre).join(' y ')}` : ''}${costo ? ` (−${costo} No2)` : ''}`};
+  }
   // Una pieza de creep o de invocación en la forma de un ítem de personaje (la Defensa adentro de los mods), para soltarla en el piso.
   function itemComoDePersonaje(it){
     const o = structuredClone(it || {});
@@ -1952,7 +2003,7 @@ const Combatiente = (() => {
      efectos. Lo usan FichaAcciones.consumir (personaje) y las Acciones de un creep (vtt-hexgrid/js/12). */
   const habDeConsumible = it => it && it.duelo ? {id: 'cons:' + (it.id || it.nombre), nombre: it.nombre, detalle: String(it.detalle || '').split(' ⚙')[0].split(' ✋')[0].trim(), modo: 'auto',   // a la Mesa, solo lo que hace
     duelo: structuredClone(it.duelo), tiradaStat: it.duelo.tira || 'dmgesp', tiradaExtra: String(it.dano || '').trim()} : null;
-  return {comoCeguera, CEGUERA_VISION, ciego, aDistancia, ciegoContraDistancia, CIEGO_DISTANCIA, habDeConsumible, fenixActivo, revivirFenix, mareado, etereo, SOLO_BONO, soloBonoTxt, conFijo, gastarPasoFantasma, bezoar, conGauchito, GAUCHITO_STATS, talismanesDanoEsp, GRUPOS_CC, grupoCC, esMental, esControl, resisteCC, resisteCCEtq, columnasStats, piezasParaParry, sumaEspecialDe, sumaEspecialTxt, contraDeEjecucion, esHonda, alcanceHonda, alcanceArmaRango, HONDA_RANGO, porDanoNorm, stacksPorDano, porDanoTxt, CARGAS, cargable, conCarga, tormenta, danoTormenta, danoTormentaMover, golpeDirecto, cobroTormenta, tormentaTxt, avisarTormenta, aplicarTormenta, acelerado, gastarAcelerado, extenuado, conExtenuado, stacksCargaActiva, RASGOS_ARCO, LARGO_ALCANCE_MAX, TENSAR_NO2, largoAlcance, alcanceMaximo, afinidadEfectos, arcoRasgosTxt, lecturaTope, APUNTANDO, apuntandoX, caidaDano, recargaCosto, PUNTA_DIAMANTE_DEF, PUNTA_DIAMANTE_PERFORA, REMACHADORA_MAX, absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, unaTiradaDe, gastarUnaTirada, armaEnMano, TIPO_SIN_ARMA, sinArmaEnMano, armaPrincipal, equipoSinArma, esArmaDeMano, tieneCamposArma, pasarArmaAItem, ponerArma, itemDeCamposArma, CAMPOS_ARMA, defDeItem, critDeItem, defDeEquipo, critDeEquipo, pasarEquipoVivo, equipoPuesto, puestoSinArma, equipoGuardado, vaEnLaMano, manosLibres, itemComoDePersonaje, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoLibres, ahorroArco, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
+  return {comoCeguera, CEGUERA_VISION, ciego, aDistancia, ciegoContraDistancia, CIEGO_DISTANCIA, habDeConsumible, fenixActivo, revivirFenix, mareado, etereo, SOLO_BONO, soloBonoTxt, conFijo, gastarPasoFantasma, bezoar, conGauchito, GAUCHITO_STATS, talismanesDanoEsp, GRUPOS_CC, grupoCC, esMental, esControl, resisteCC, resisteCCEtq, columnasStats, piezasParaParry, sumaEspecialDe, sumaEspecialTxt, contraDeEjecucion, esHonda, alcanceHonda, alcanceArmaRango, HONDA_RANGO, porDanoNorm, stacksPorDano, porDanoTxt, CARGAS, cargable, conCarga, tormenta, danoTormenta, danoTormentaMover, golpeDirecto, cobroTormenta, tormentaTxt, avisarTormenta, aplicarTormenta, acelerado, gastarAcelerado, extenuado, conExtenuado, stacksCargaActiva, RASGOS_ARCO, LARGO_ALCANCE_MAX, TENSAR_NO2, largoAlcance, alcanceMaximo, afinidadEfectos, arcoRasgosTxt, lecturaTope, APUNTANDO, apuntandoX, caidaDano, recargaCosto, PUNTA_DIAMANTE_DEF, PUNTA_DIAMANTE_PERFORA, REMACHADORA_MAX, absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, unaTiradaDe, gastarUnaTirada, armaEnMano, TIPO_SIN_ARMA, sinArmaEnMano, armaPrincipal, equipoSinArma, esArmaDeMano, tieneCamposArma, pasarArmaAItem, ponerArma, itemDeCamposArma, CAMPOS_ARMA, defDeItem, critDeItem, defDeEquipo, critDeEquipo, pasarEquipoVivo, equipoPuesto, puestoSinArma, equipoGuardado, vaEnLaMano, manosLibres, itemComoDePersonaje, gruposDeEquipo, ponerPieza, guardarPieza, sacarPieza, COSTO_SACAR_PIEZA, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoLibres, ahorroArco, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad, sincronizarEstadosDePasivas, sangraPorSp,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

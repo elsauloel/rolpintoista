@@ -2656,6 +2656,24 @@ prueba('🎒 Paso 6: el botín trae los ítems tal cual — la varita del catál
     t ? !!(t.espejito || t.relicario) : true, r.muroescudos, r.mods, r.estimado, r.precioCompra > 0, 'def' in r],
     [true, true, false, undefined, true, 1, [{stat: 'def', val: 2}, {stat: 'parry', val: 1}], true, true, false]);
 });
+prueba('🎒 Paso 7: en las manos / puesto / guardado — cambiar de arma, las manos que no alcanzan, el mismo lugar, lo natural y el No2 de sacar en combate', () => {
+  const x = {nombre: 'Esqueleto', nitros: 3, estados: [], equipo: [
+    {id: 'e', nombre: 'Espada', tipoItem: 'arma_1m', tipoDado: 6, equipado: true},   // (la primera arma de la lista es la que usa)
+    {id: 'g', nombre: 'Garras', tipoItem: 'arma_1m', tipoDado: 4, natural: true, equipado: true},
+    {id: 'r', nombre: 'Rodela', tipoItem: 'escudo_1m', def: 1, equipado: true},
+    {id: 'y', nombre: 'Yelmo', tipoItem: 'cabeza', def: 1, equipado: true},
+    {id: 'm', nombre: 'Mandoble', tipoItem: 'arma_2m', tipoDado: 10, equipado: false},
+    {id: 'c', nombre: 'Capucha', tipoItem: 'cabeza', def: 0, equipado: false}]};
+  const g0 = Combatiente.gruposDeEquipo(x);
+  const nombres = l => l.map(e => e.nombre);
+  const r1 = Combatiente.sacarPieza(x, 'm', {combate: true, slotDe: CreepCalculo.slotDe});   // el mandoble: guarda la espada y la rodela
+  const tras1 = [Combatiente.armaEnMano(x).nombre, x.nitros, nombres(Combatiente.gruposDeEquipo(x).guardado)];
+  const r2 = Combatiente.ponerPieza(x, 'c', CreepCalculo.slotDe);   // la capucha en la cabeza: guarda el yelmo
+  const r3 = Combatiente.guardarPieza(x, 'g'), r4 = Combatiente.sacarPieza({...x, nitros: 0}, 'e', {combate: true});
+  igual([nombres(g0.manos), nombres(g0.puesto), nombres(g0.guardado), nombres(r1.aviso ? [] : [{nombre: r1.error}]), /guarda Espada y Rodela/.test(r1.aviso), tras1,
+    nombres(r2.guardados), r3, !!r4.error],
+    [['Garras', 'Rodela'], ['Yelmo'], ['Mandoble', 'Capucha'], [], true, ['Mandoble', 2, ['Espada', 'Rodela', 'Capucha']], ['Yelmo'], null, true]);
+});
 prueba('itemParaCreep: un ítem del catálogo en la forma del equipo de un creep (la Defensa aparte, sin id)', () => {
   const o = CreepCalculo.itemParaCreep({id: 'x', nombre: 'Escudo', tipoItem: 'escudo_1m', tier: 'Común', peso: 2, precioCompra: 40, mods: [{stat: 'def', val: 2}, {stat: 'eva', val: -1}]});
   const a = CreepCalculo.itemParaCreep({nombre: 'Daga', tipoItem: 'arma_1m', tipoDado: 4, danoFijo: 1, efectosGolpe: [{nombre: 'Sangrado'}], mods: []});

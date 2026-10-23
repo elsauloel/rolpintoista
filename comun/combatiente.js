@@ -653,6 +653,9 @@ const Combatiente = (() => {
   function armaCombinada(x){
     const base = armaPrincipal(x);
     const it = base ? {...base} : {};
+    // Campos sueltos «sin nombre» encima de un arma con nombre: son los valores por defecto de una carga vieja (un creep nuevo de antes, una
+    // pestaña sin recargar), no un cambio: no pisan nada.
+    if(base && base.nombre && x.armaNombre === '') return it;
     Object.entries(ARMA_CAMPO).forEach(([k, c]) => { if(x[k] !== undefined) it[c] = x[k]; });
     if(x.armaRasgos && typeof x.armaRasgos === 'object') Object.assign(it, x.armaRasgos);
     if(x.armaEspalda && !it.espalda) it.espalda = x.armaEspalda;

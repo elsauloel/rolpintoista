@@ -2444,6 +2444,13 @@ prueba('🗡 Armas como ítems, paso 2 (docs/plan-inventario-creeps.md): al carg
     [[false, undefined, 2, true, 'Hacha', 8, 2, 1, 1, true, ['Escudo pequeño']], 2, [true, 'Hacha'], [false, true, 'Hacha', 1, 2], [2, 'Lanza', 3, false], 1, true,
      [false, 'Espada rota', 6, 1]]);
 });
+prueba('🗡 Paso 2: un creep ya convertido armado encima de los valores por defecto viejos («sin nombre, Tipo 8») no pierde su arma', () => {
+  const guardado = creepPrueba({});   // convertido: la Hacha en su equipo
+  const viejo = {armaTipo: 8, armaPeso: 1, armaFijo: 0, armaAmplificado: 0, armaDeRango: false, armaNombre: '', armaDetalle: '', armaMods: [], armaEfectos: [], armaManos: 'arma_1m', armaNatural: false};
+  const sc = CreepCalculo.normalizar(Object.assign(viejo, structuredClone(guardado)));
+  const a = Combatiente.armaEnMano(sc);
+  igual([a.nombre, a.tipoDado, a.peso, a.danoFijo, Combatiente.tieneCamposArma(sc), sc.equipo.filter(Combatiente.esArmaDeMano).length], ['Hacha', 8, 2, 1, false, 1]);
+});
 prueba('Regeneración de vida del equipo (2026-10-07, piel de troll): cura al empezar el turno, en personajes y creeps; no levanta a un caído', () => {
   const chal = {id: 't', nombre: 'Chaleco de piel de troll', tipoItem: 'armadura_blanda', equipado: true, mods: [{stat: 'hpregen', val: 2}]};
   const sc = creepPrueba({equipo: [chal]}); sc.hp = 10;

@@ -99,14 +99,14 @@ function nuevoCreep(){
     hp:5, hpMax:5, spd:5,  // Hp.Max = Con*5
     ataquesTurno:0,  // sc.nitros lo pone normalizarCreep: arranca en el máximo (creepNitrosMax)
     con:1, fue:1, agl:1, des:1, esp:1,
-    armaTipo:8, armaPeso:1, armaFijo:0, armaAmplificado:0, armaDeRango:false, armaNombre:'', armaDetalle:'',
-    armaMods:[], armaEfectos:[], armaManos:'arma_1m',
+    // (sin campos arma* sueltos: el arma es un ítem de su equipo — docs/plan-inventario-creeps.md, paso 2. Si los trajera, al armar un creep
+    //  guardado encima de este se combinarían con su arma y la pisarían con «sin nombre, Tipo 8»)
     defensa:0, armadmg:0, armaduraTipo:'', equipo:[],
     crit:[0,0,0,0,0],
     habilidades:[],
     estados:[],
     notas:'',
-    mapa:'', tipoCriatura:'', tipoCriaturaOtro:'', jefe:false, oroBase:0, armaNatural:false, trofeoEspecial:{nombre:'', precio:0},   // recompensas
+    mapa:'', tipoCriatura:'', tipoCriaturaOtro:'', jefe:false, oroBase:0, trofeoEspecial:{nombre:'', precio:0},   // recompensas
     escalaTipos: ESCALA_TIPOS,
   };
 }

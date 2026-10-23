@@ -1324,8 +1324,8 @@ const FichaAcciones = (() => {
     let inv = lista.find(i => i && i.id === id);
     if(!inv){
       inv = {id, nombre: String(c.nombre || it.nombre), color: c.color || '#7FD4E8', imagen: '', activa: true, cooldown: turnos, cooldownActual: turnos, hp: 1, hpMax: 1, spd: 0,
-        con: 1, fue: 1, agl: mov, des: 1, esp: 1, armaTipo: 4, armaPeso: 1, armaFijo: 0, armaNatural: true, armaNombre: '', armaDeRango: false, defensa: 0, notas: '',
-        estados: [], habilidades: [], equipo: []};
+        con: 1, fue: 1, agl: mov, des: 1, esp: 1, defensa: 0, notas: '',
+        estados: [], habilidades: [], equipo: [{id: 'arma-' + id, nombre: '', tipoItem: 'arma_1m', tipoDado: 4, peso: 1, natural: true, equipado: true}]};   // 🗡 su arma, un ítem (paso 2)
       lista.push(inv);
     }
     // La cuenta baja al EMPEZAR cada turno suyo (también el primero): para que actúe `turnos` turnos completos, arranca en turnos + 1 (probado en el mapa).

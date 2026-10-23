@@ -33,7 +33,7 @@
   (2026-10-22, solo en su pantalla, sin tocar nada):** en una casilla con un Sólido al costado y una pared abajo, la ruleta quedó solo en las 5 del
   lado abierto (7 tapadas). El anillo de 2 lleno de tokens no hace falta probarlo (dueño: «muy improbable»).
 - [x] (2026-10-22, Claude, «Claude · pruebas»: el hacha del Goblin 4 en el piso al lado suyo titiló en la pantalla del GM; clic → «¿Lo levanta Goblin de prueba 4? (cuesta 1 No2)» → Sí → se le fue el Desarmado, 3 → 2 No2, el hacha salió del piso, la Mesa lo dijo; restaurado) **🗡️ Un creep levanta su arma con un clic en el mapa** (dueño, 2026-10-22, «sumalo»; js/27 `levantadorPara` / `acLevantarArmaDe`): en la pantalla del GM, como un personaje (en combate, en su turno).
-- [ ] **🤺 Desarmar en cooldown: el botón apagado** (dueño, 2026-10-22, «sí»): en el Bloqueo, «🤺 Desarmar · en cooldown (N turnos)» gris y sin
+- [x] (2026-10-23, Claude, «Claude · pruebas»: el Goblin 4 atacó al Ladrón, que paró con el Cuchillo; en el Bloqueo, «🤺 Desarmar · en cooldown (2 turnos)» gris; con el Ladrón en modo SP el botón queda encendido con su costo en SP, como corresponde; duelo terminado con su botón) **🤺 Desarmar en cooldown: el botón apagado** (dueño, 2026-10-22, «sí»): en el Bloqueo, «🤺 Desarmar · en cooldown (N turnos)» gris y sin
   poder tocarlo (o «le faltan No2», «te falta SP»); no va en el desplegable de la tirada a mano. Probarlo con el Ladrón recién usado.
 - [ ] **⏳ Una zona de 1 turno hace efecto dos veces**: al tirarla y al pasar la ronda; después se va al empezar el turno de quien la tiró. Con quien
   la tiró primero en el orden, que no se vaya antes de resolver el segundo efecto (`zonasDelQueLaTiro` con el Mantenimiento nuevo).
@@ -213,7 +213,7 @@
 - [ ] **📖 El glosario con globos** (2026-10-09, lo ve el dueño): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados,
   bonos de piezas, mecánicas de armas y flechas) salen subrayados en celeste y al pasar el mouse muestran su explicación; «Detalles técnicos» ya no
   repite eso. Mirar si sobra o falta algún término, y si algún texto del globo conviene reescribirlo.
-- [ ] **🏹 Talabartería: las 4 flechas elementales siempre en la góndola** (2026-10-11): no se pudo ver en el mapa — la tienda abierta
+- [x] (2026-10-23, Claude, «Claude · pruebas»: dos tiendas generadas seguidas traen las 4 elementales —ácido, escarcha, fuego, relámpago— y ninguna la de punta roma; publicada, desde el mapa la Talabartería las muestra con «quedan 3») **🏹 Talabartería: las 4 flechas elementales siempre en la góndola** (2026-10-11): no se pudo ver en el mapa — la tienda abierta
   («Tienda de pueblito») es anterior al cambio y su Talabartería no trae flechas. Hace falta generar una tienda nueva en el Generador de
   tiendas y mirarla desde el 🏪 del mapa (y que no salga la Flecha de punta roma).
 - [ ] **🎯 Virote recuperable**: ninguna ballesta del catálogo trae el rasgo `recuperable`, así que no hay con qué probarlo en el mapa.
@@ -221,7 +221,7 @@
   **Probado el 2026-10-20 (Claude, «Test con claude elsaulo»):** con el Lobo invocado, el Virote de rebote erró contra Silvia y rebotó hacia el Lobo: le llegaron sus opciones de defensa (Evasión 1d1) y el duelo terminó normal; el virote quedó en el piso. **Arreglado:** la Mesa decía «La Virote de rebote»; ahora «El virote» y «entero».
   duelo dijo «No llegaron tus opciones de defensa». Puede ser porque el Lobo está sin invocar; revisarlo con una invocación invocada.
 
-- [ ] **⏩ Acelerador desde Firebase** (2026-10-12): hasta que el dueño pegue las reglas nuevas (`acelerador` en los elementos), crear uno da «faltan
+- [x] (2026-10-23, Claude, «Claude · pruebas», con las reglas ya pegadas: el Goblin 1 marcó un Acelerador al lado; el Goblin 4 lo pisó: 3 No2 − 1 del paso + 2 = 4, la Mesa y la Crónica lo contaron; el círculo con flechitas y «⏳10» se ve; borrado después) **⏩ Acelerador desde Firebase** (2026-10-12): hasta que el dueño pegue las reglas nuevas (`acelerador` en los elementos), crear uno da «faltan
   publicar las reglas nuevas» (se probó: cobra 1 SP y 1 No2 y pide la casilla, pero no se guarda). Después de pegarlas: ejecutar Acelerador (o usar
   una Runa aceleradora del Bazar), elegir la casilla y que los demás la vean.
 - [ ] **🐈‍⬛ La animación «mala» de los dados de Enyetar** (2026-10-12): los datos salen bien (los dos juegos, `destacar: 'malo:idx:…'`), pero no se

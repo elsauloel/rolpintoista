@@ -1835,7 +1835,7 @@ function dueloOpcionesLocal(d){
   const def = defensaCreepMapa(sc), c = Combatiente.costoParry();
   if(Combatiente.stuneado(sc.estados)) return [{modo: 'evasion', etiqueta: '🏃 Evasión · Stun: 1'}];   // Stun (2026-10-06)
   const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión'}];
-  if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, escudo: def.nombre !== Combatiente.armaEnMano(sc).nombre, natural: def.nombre === Combatiente.armaEnMano(sc).nombre ? Combatiente.armaEnMano(sc).natural : !!def.natural, etiqueta: `${def.nombre === Combatiente.armaEnMano(sc).nombre ? '🗡' : '🛡'} Parry · ${def.nombre}`, costo: c, motivoNo: ''});   // sin No2: queda en negativo (2026-10-06)
+  if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, escudo: def.nombre !== Combatiente.armaEnMano(sc).nombre, natural: def.nombre === Combatiente.armaEnMano(sc).nombre ? Combatiente.armaEnMano(sc).natural : !!def.natural, etiqueta: `${def.nombre === Combatiente.armaEnMano(sc).nombre ? '🗡' : '🛡'} Parry · ${def.nombre}`, costo: c, motivoNo: Combatiente.defensaSinNo2(sc.nitros, c) ? 'Ya está en No2 negativos: no puede gastar más en una defensa' : ''});   // sin No2: queda en negativo (2026-10-06), no si ya lo estaba (2026-10-23)
   return Combatiente.sinReaccionesNo2(d.ataque && d.ataque.sinParry ? ops.filter(o => o.modo !== 'parry') : ops, sc.estados);   // Takle y otros ataques que no se pueden parrear; Expuesto (Degollar)
 }
 // ⚡ Flash de un creep (P135): si no tiene ninguno que sirva para esta tirada, el mapa contesta solo ([]) y no hace falta

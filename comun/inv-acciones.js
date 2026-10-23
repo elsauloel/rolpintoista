@@ -35,6 +35,7 @@ const InvAcciones = (() => {
     if(statId === 'parry'){
       const gratis = Combatiente.parryGratis(st => I().modTotal(inv, st), num(inv.parryTurno));   // Parada fácil (2026-10-06)
       const costo = gratis ? 0 : Combatiente.conExtenuado(inv.estados, Combatiente.costoParry());   // el Parry siempre cuesta 1 No2 (+ Extenuado)
+      if(Combatiente.defensaSinNo2(inv.nitros, costo)) return {error: `${inv.nombre} ${Combatiente.YA_NEGATIVO_TXT}`};   // ya en negativo (2026-10-23)
       inv.parryTurno = 1;   // (se vacía al empezar su turno)
       inv.nitros = num(inv.nitros) - costo;   // sin No2 queda en negativo: se descuenta en su próxima recarga (2026-10-06)
       Combatiente.aplicarTormenta(inv, inv.estados, costo, {motivo: 'el Parry'});

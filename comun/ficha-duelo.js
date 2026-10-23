@@ -283,7 +283,7 @@ const FichaDuelo = (() => {
         const sobre = c.sobrecarga;
         // Con sobrepeso la Evasión pide elegir: pagar 1 No2 para tirar sin penalidad o tirar con −N. Se elige acá, en el cuadro del duelo.
         const ops = sobre > 0
-          ? [{modo: 'evasion', itemId: 'pagado', etiqueta: '🏃 Evasión · pagando 1 No2', costo: 1, motivoNo: '', info: [`Evasión 🎲 ${Combatiente.conFijo(fx(evaV, 'eva', estEva), ee)}${evaInfo}`, `sin la penalidad de sobrepeso (−${fmt(sobre)})`, ...(num(S.nitros) < 1 ? ['⚠ sin No2: quedás en negativo (se descuenta al recargar)'] : [])]},
+          ? [{modo: 'evasion', itemId: 'pagado', etiqueta: '🏃 Evasión · pagando 1 No2', costo: 1, motivoNo: Combatiente.defensaSinNo2(S.nitros, 1) ? 'Ya estás en No2 negativos: no podés gastar más en una defensa' : '', info: [`Evasión 🎲 ${Combatiente.conFijo(fx(evaV, 'eva', estEva), ee)}${evaInfo}`, `sin la penalidad de sobrepeso (−${fmt(sobre)})`, ...(num(S.nitros) < 1 && num(S.nitros) >= 0 ? ['⚠ sin No2: quedás en negativo (se descuenta al recargar)'] : [])]},
              {modo: 'evasion', itemId: 'penal', etiqueta: `🏃 Evasión · con penalidad −${fmt(sobre)}`, motivoNo: '', info: [`Evasión 🎲 ${Combatiente.conFijo(fx(evaV, 'eva', estEva), ee)} −${fmt(sobre)}${evaInfo}`, 'no gastás No2']}]
           : [{modo: 'evasion', itemId: '', etiqueta: '🏃 Evasión', motivoNo: '', info: [`Evasión 🎲 ${Combatiente.conFijo(fx(evaV, 'eva', estEva), ee)}${evaInfo}`]}];
         // Sin arma ni escudo equipado no se puede parriar (regla del dueño, 2026-09-28).
@@ -291,8 +291,8 @@ const FichaDuelo = (() => {
         const disparo = Combatiente.contraDisparo(d);   // contra un disparo, Parry solo con escudo (2026-10-09)
         armasYEscudosParaParry().filter(a => Combatiente.sirveParaParry(a.item, disparo)).forEach(a => {
           const costo = gratis ? 0 : Combatiente.costoParry();
-          ops.push({modo: 'parry', itemId: a.item.id, itemNombre: a.item.nombre, escudo: String(a.item.tipoItem).startsWith('escudo'), etiqueta: `${String(a.item.tipoItem).startsWith('escudo') ? '🛡' : '🗡'} Parry · ${a.item.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo, motivoNo: '',
-            info: [`Parry 🎲 ${fx(statParaArma('parry', a.item), 'parry', S.efectos)}`, disparo ? 'si ganás, el disparo queda parado (sin Bloqueo)' : `si ganás, Bloqueo 🎲 ${fx(FichaCombate.bloqueoValor(S, a.item))}`, ...(costo > num(S.nitros) ? ['⚠ sin No2: quedás en negativo (se descuenta al recargar)'] : [])]});
+          ops.push({modo: 'parry', itemId: a.item.id, itemNombre: a.item.nombre, escudo: String(a.item.tipoItem).startsWith('escudo'), etiqueta: `${String(a.item.tipoItem).startsWith('escudo') ? '🛡' : '🗡'} Parry · ${a.item.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo, motivoNo: Combatiente.defensaSinNo2(S.nitros, costo) ? 'Ya estás en No2 negativos: no podés gastar más en una defensa' : '',
+            info: [`Parry 🎲 ${fx(statParaArma('parry', a.item), 'parry', S.efectos)}`, disparo ? 'si ganás, el disparo queda parado (sin Bloqueo)' : `si ganás, Bloqueo 🎲 ${fx(FichaCombate.bloqueoValor(S, a.item))}`, ...(costo > num(S.nitros) && num(S.nitros) >= 0 ? ['⚠ sin No2: quedás en negativo (se descuenta al recargar)'] : [])]});
         });
         // 🏹 Parry a distancia (Shooter, 2026-10-12): con la habilidad y un arma a distancia en mano, contra cualquier ataque: Evasión contra el PdG,
         // siempre 2 SP (dueño: se usa en turno ajeno, así que no es un Flash que cuesta el doble) + el No2 de un disparo; si gana, cuenta como un Parry

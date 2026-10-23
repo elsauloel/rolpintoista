@@ -656,7 +656,9 @@ function rutaSoltada(a, t){
     }
     if(a.costo){
       const costoTotal = costoRuta(a.ruta, a.costo.porCasillero, pasos, num(a.costo.gratis) + alejarseGratis, a.costo.recargo, a.costo.levita, a.costo.ext, a.costo.sprint, a.costo.miedo);   // con el terreno lento (arena movediza), los pasos gratis y Lento
-      const dodge = enDodge(a.id) || (libre && !dodgeArco);   // el dodge roll: se hace aunque no alcancen los No2 (queda en negativo, 2026-10-06); el del arco, no
+      const dodge0 = enDodge(a.id) || (libre && !dodgeArco);   // el dodge roll: se hace aunque no alcancen los No2 (queda en negativo, 2026-10-06); el del arco, no
+      const dodge = dodge0 && !Combatiente.defensaSinNo2(a.costo.disponibles, costoTotal);   // …salvo si ya estaba en negativo (2026-10-23)
+      if(dodge0 && !dodge) toast(`${nombreDe(tokens.get(a.id))} ${Combatiente.YA_NEGATIVO_TXT} (el dodge roll)`);
       rutaPendiente = {id: a.id, celdas: a.ruta, pasos, porCasillero: a.costo.porCasillero, ext: a.costo.ext, miedo: a.costo.miedo, costo: costoTotal, disponibles: a.costo.disponibles, oportunidad,
         gratis: Math.min(pasos, num(a.costo.gratis)), sprint: Math.min(Math.max(0, pasos - num(a.costo.gratis)), num(a.costo.sprint)), lento: num(a.costo.recargo) > 0, dodge, levita: Math.min(pasos, num(a.costo.levita)), avisoFin: a.avisoFin || ''};
       // Solo se pregunta si el movimiento se pasa de los No2 que quedan.

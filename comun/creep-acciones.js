@@ -80,6 +80,7 @@ const CreepAcciones = (() => {
     if(!C().defensa(sc)) return {error: `${sc.nombre}: ${Combatiente.SIN_ARMA_DEFENSA}`};
     const gratis = Combatiente.parryGratis(st => C().modTotal(sc, st), num((sc.usosEspecial || {})._parry));   // Parada fácil (2026-10-06)
     const costo = gratis ? 0 : C().costoParry(sc);
+    if(Combatiente.defensaSinNo2(sc.nitros, costo)) return {error: `${sc.nombre} ${Combatiente.YA_NEGATIVO_TXT}`};   // ya en negativo (2026-10-23)
     sc.usosEspecial = {...(sc.usosEspecial || {}), _parry: 1};   // (se vacía al empezar su turno)
     sc.nitros = num(sc.nitros) - costo;   // sin No2 queda en negativo: se descuenta en su próxima recarga (2026-10-06)
     Combatiente.aplicarTormenta(sc, sc.estados, costo, {motivo: 'el Parry'});

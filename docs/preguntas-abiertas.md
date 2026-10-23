@@ -769,6 +769,10 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   **No aplica al ataque de oportunidad ni al contraataque** (dueño, 2026-10-06): son ataques, siguen sin bajar de 0 (sin No2 avisan y gastan lo
   que haya, con la línea roja, como siempre).
   Subida a 🛠 Herramientas de diseño → Preguntas (2026-10-06) como decisión ya establecida, **sujeta a la aprobación del grupo**.
+  **Ajuste del dueño (2026-10-23):** «se puede siempre y cuando no tengas ya nitros negativos. Una vez que ya estás en nitros negativos, no podés
+  seguir gastando nitros para acciones defensivas». Defensivas: Parry, dodge roll, la Evasión que paga el sobrepeso, ayudar a zafar a alguien.
+  Hecho: `Combatiente.defensaSinNo2` (Parry de personajes, invocaciones y creeps; la Evasión pagando; el dodge roll del mapa; la ayuda para
+  zafar; en el duelo la opción queda apagada con el motivo).
 - ✅ **P164. Reflejos de mangosta: ¿tirada contra la trampa?** (2026-10-06, idea del dueño revisando los pies). Hoy: al pisar una trampa, con la
   chance de Reflejos (las Sandalias de mangosta, siempre) se ofrece un dodge roll (salir a 1–2 casilleros pagando el movimiento). El dueño
   propone que active un anuncio/duelo: la dificultad de la trampa contra tu Evasión (o el dodge). **Propuesta**: con Reflejos, el Anuncio

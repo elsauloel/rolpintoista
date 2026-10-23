@@ -477,6 +477,7 @@ const FichaAcciones = (() => {
   // El cartel de sobrepeso, "Pagar 1 No2": devuelve false si no alcanzan (y no cierra el cartel).
   function sobrepesoPagar(S, ui){
     const pago = Combatiente.conExtenuado(S.efectos, 1);   // + Extenuado
+    if(Combatiente.defensaSinNo2(S.nitros, pago)){ ui.toast(`${((S.meta && S.meta.nombre) || 'Tu personaje').trim()} ${Combatiente.YA_NEGATIVO_TXT}`); return false; }   // ya en negativo (2026-10-23)
     S.nitros = num(S.nitros) - pago;   // una defensa: sin No2 queda en negativo, se descuenta en la próxima recarga (2026-10-06)
     tormentaPj(S, pago, 'esquivar con sobrepeso', ui);
     ui.cambio(['nitros', 'refresh']);
@@ -489,6 +490,7 @@ const FichaAcciones = (() => {
     const fin = FichaCalculo.calcular(S).final;
     const gratis = Combatiente.parryGratis(st => fin[st], num((S.ataquesArma || {})._parry));
     const costo = gratis ? 0 : Combatiente.conExtenuado(S.efectos, Combatiente.costoParry());   // + Extenuado
+    if(Combatiente.defensaSinNo2(S.nitros, costo)){ ui.toast(`${((S.meta && S.meta.nombre) || 'Tu personaje').trim()} ${Combatiente.YA_NEGATIVO_TXT}`); return; }   // ya en negativo (2026-10-23)
     S.ataquesArma = {...(S.ataquesArma || {}), _parry: 1};
     const con = arma ? ' con ' + arma.nombre : '';
     // Una defensa: sin No2 se hace igual y queda en negativo; la deuda se descuenta en la próxima recarga (dueño, 2026-10-06).

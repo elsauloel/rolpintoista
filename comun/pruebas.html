@@ -2643,6 +2643,19 @@ prueba('fin del combate (comun/combate-fin.js): XP por creep (escapado 20%), qui
     (CombateFin.clic(rep, {dataset: {repIr: 'publicar'}}), CombateFin.vista(rep, creeps, []).publicar), CombateFin.vista(rep, creeps, []).html.includes('Publicar')],
     [150, 2, 98, [49, 12], ['Garras de Orco 30'], 90, [50, 11], 0, [60, 'Común', true], 'oculto', true, 'oculto', 'activo', true]);
 });
+prueba('🎒 Paso 6: el botín trae los ítems tal cual — la varita del catálogo con su poder, una pieza propia con sus rasgos, lo guardado también', () => {
+  const varita = CATALOGO_BASE.find(i => i.nombre === 'Varita del relámpago');
+  const tal = CATALOGO_BASE.find(i => i && !i.archivo && (i.espejito || i.relicario));
+  const cat = [varita, tal].filter(Boolean).map(it => CreepCalculo.itemParaCreep(it));
+  const sc = creepPrueba({equipo: [{...CreepCalculo.itemParaCreep(varita), id: 'v', equipado: true},
+    ...(tal ? [{...CreepCalculo.itemParaCreep(tal), id: 't', equipado: false}] : []),
+    {id: 'p', nombre: 'Rodela del jefe', tipoItem: 'escudo_1m', def: 2, peso: 2, mods: [{stat: 'parry', val: 1}], muroescudos: 1, equipado: true}]});
+  const its = CombateFin.itemsDeCreep(cat, sc), por = n => (its.find(x => x.nombre === n) || {}).template || {};
+  const v = por('Varita del relámpago'), r = por('Rodela del jefe'), t = tal ? por(tal.nombre) : null;
+  igual([JSON.stringify(v.especial) === JSON.stringify(varita.especial), v.precioCompra === varita.precioCompra, 'id' in v, v.equipado,
+    t ? !!(t.espejito || t.relicario) : true, r.muroescudos, r.mods, r.estimado, r.precioCompra > 0, 'def' in r],
+    [true, true, false, undefined, true, 1, [{stat: 'def', val: 2}, {stat: 'parry', val: 1}], true, true, false]);
+});
 prueba('itemParaCreep: un ítem del catálogo en la forma del equipo de un creep (la Defensa aparte, sin id)', () => {
   const o = CreepCalculo.itemParaCreep({id: 'x', nombre: 'Escudo', tipoItem: 'escudo_1m', tier: 'Común', peso: 2, precioCompra: 40, mods: [{stat: 'def', val: 2}, {stat: 'eva', val: -1}]});
   const a = CreepCalculo.itemParaCreep({nombre: 'Daga', tipoItem: 'arma_1m', tipoDado: 4, danoFijo: 1, efectosGolpe: [{nombre: 'Sangrado'}], mods: []});

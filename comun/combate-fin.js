@@ -92,31 +92,35 @@ const CombateFin = (() => {
     if(!base) base = Math.max(30, num(d.def) * 25);
     return Math.max(20, Math.round((base + ajustePorEfectos(d.mods, [])) / 5) * 5);
   }
-  function plantillaDeCatalogo(c){
-    const mods = [...(c.mods || [])];
-    if(num(c.def)) mods.unshift({stat: 'def', val: num(c.def)});
-    return {nombre: c.nombre, tipoItem: c.tipoItem, tier: c.tier || 'Común', peso: num(c.peso), ranuras: num(c.ranuras) || 0, precioCompra: num(c.precioCompra),
-      tipoDado: num(c.tipoDado), danoFijo: num(c.danoFijo), danoAmplificado: num(c.danoAmplificado), armaDeRango: !!c.armaDeRango, mods,
-      efectosGolpe: structuredClone(c.efectosGolpe || []), detalle: c.detalle || '', descripcionNarrativa: c.descripcionNarrativa || '', consumible: false};
+  /* 🎒 Paso 6 (2026-10-22, docs/plan-inventario-creeps.md): lo que tenía el creep (en la mano y guardado, menos lo natural y lo invocado) cae TAL
+     CUAL, con todas sus mecánicas: varitas, orbes, talismanes, rasgos, efectos al golpear. Si está en el catálogo de fábrica, el ítem entero de ahí
+     (el `cat` que llega viene en la forma de un creep, recortado); si no, la pieza misma del creep en la forma de un ítem de personaje
+     (Combatiente.itemComoDePersonaje: la Defensa adentro de los mods), con su precio o uno estimado. */
+  const FUERA_DEL_BOTIN = ['id', 'imagen', '_bib', 'equipado', 'invocada', 'invocadaDe', 'invocadaNombre', 'enMesa', 'reservado', 'reservadoPara'];
+  function limpioParaBotin(o){ FUERA_DEL_BOTIN.forEach(k => delete o[k]); return o; }
+  function completoDeFabrica(c){
+    const full = typeof CATALOGO_BASE !== 'undefined' ? CATALOGO_BASE.find(i => sinAviso(i.nombre) === sinAviso(c.nombre) && i.tipoItem === c.tipoItem) : null;
+    return full ? structuredClone(full) : Combatiente.itemComoDePersonaje(c);
   }
-  function plantillaArmaCreep(cat, sc){
-    const c = cat.find(i => i.nombre === Combatiente.armaEnMano(sc).nombre && /^arma_/.test(i.tipoItem));
+  // Los campos que la ficha espera siempre, sin pisar lo que ya trae.
+  const conBase = t => ({...t, tier: t.tier || 'Común', peso: num(t.peso), ranuras: num(t.ranuras) || 0, precioCompra: num(t.precioCompra),
+    mods: Array.isArray(t.mods) ? t.mods : [], efectosGolpe: Array.isArray(t.efectosGolpe) ? t.efectosGolpe : [], detalle: t.detalle || '',
+    descripcionNarrativa: t.descripcionNarrativa || '', consumible: false});
+  function plantillaDeCatalogo(c){ return conBase(limpioParaBotin(completoDeFabrica(c))); }
+  function plantillaPieza(cat, it, sc){
+    const arma = /^arma_/.test(String(it.tipoItem || ''));
+    const c = cat.find(i => sinAviso(i.nombre) === sinAviso(it.nombre) && (arma ? /^arma_/.test(String(i.tipoItem || '')) : i.tipoItem === it.tipoItem));
     if(c) return {...plantillaDeCatalogo(c), estimado: false};
-    const d = {tipoDado: Combatiente.armaEnMano(sc).tipoDado, peso: Combatiente.armaEnMano(sc).peso, mods: structuredClone(Combatiente.armaEnMano(sc).mods), efectosGolpe: structuredClone(Combatiente.armaEnMano(sc).efectosGolpe)};
-    const precio = precioEstimadoArma(cat, d, sc.nivel);
-    return {nombre: Combatiente.armaEnMano(sc).nombre, tipoItem: Combatiente.armaEnMano(sc).tipoItem || 'arma_1m', tier: tierPorPrecio(precio), peso: d.peso, ranuras: 0, precioCompra: precio,
-      tipoDado: d.tipoDado, danoFijo: Combatiente.armaEnMano(sc).danoFijo, danoAmplificado: Combatiente.armaEnMano(sc).danoAmplificado, armaDeRango: Combatiente.armaEnMano(sc).armaDeRango, mods: d.mods, efectosGolpe: d.efectosGolpe,
-      detalle: Combatiente.armaEnMano(sc).detalle || '', descripcionNarrativa: `Arma de ${K.nombreLimpio(sc)}.`, consumible: false, estimado: true};
+    const t = conBase(limpioParaBotin(Combatiente.itemComoDePersonaje(it)));
+    if(t.precioCompra > 0) return {...t, tier: it.tier || tierPorPrecio(t.precioCompra), estimado: false};   // ya trae su precio (uno de personaje que levantó)
+    const precio = arma ? precioEstimadoArma(cat, {tipoDado: num(it.tipoDado), peso: num(it.peso), mods: it.mods || [], efectosGolpe: it.efectosGolpe || []}, sc.nivel)
+      : precioEstimadoEquipo(cat, {tipoItem: it.tipoItem, def: Combatiente.defDeItem(it), mods: (it.mods || []).filter(m => m && m.stat !== 'def')}, sc.nivel);
+    return {...t, tier: tierPorPrecio(precio), precioCompra: precio, peso: arma ? Math.max(1, t.peso) : (t.peso || 1),
+      descripcionNarrativa: t.descripcionNarrativa || (arma ? `Arma de ${K.nombreLimpio(sc)}.` : ''), estimado: true};
   }
-  function plantillaEquipoCreep(cat, it, nivel){
-    const c = cat.find(i => sinAviso(i.nombre) === sinAviso(it.nombre) && i.tipoItem === it.tipoItem);
-    if(c) return {...plantillaDeCatalogo(c), estimado: false};
-    const mods = [...(it.mods || [])];
-    if(num(it.def)) mods.unshift({stat: 'def', val: num(it.def)});
-    const precio = precioEstimadoEquipo(cat, {tipoItem: it.tipoItem, def: it.def, mods: it.mods}, nivel);
-    return {nombre: it.nombre, tipoItem: it.tipoItem, tier: tierPorPrecio(precio), peso: 1, ranuras: 0, precioCompra: precio, tipoDado: 0, danoFijo: 0, danoAmplificado: 0,
-      armaDeRango: false, mods, efectosGolpe: [], detalle: it.detalle || '', descripcionNarrativa: '', consumible: false, estimado: true};
-  }
+  // (Los nombres de antes, para quien los llame.)
+  const plantillaArmaCreep = (cat, sc) => plantillaPieza(cat, Combatiente.armaPrincipal(sc) || Combatiente.armaEnMano(sc), sc);
+  const plantillaEquipoCreep = (cat, it, nivel) => plantillaPieza(cat, it, {nivel, nombre: ''});
   function plantillaTrofeo(tr, sc){
     return {nombre: tr.nombre, tipoItem: 'otros', tier: 'Común', peso: 0, ranuras: 1, precioCompra: tr.precioCompra, tipoDado: 0, danoFijo: 0, danoAmplificado: 0, armaDeRango: false,
       mods: [], efectosGolpe: [], detalle: `Trofeo de ${K.nombreLimpio(sc)}. No se equipa: se vende en una tienda o se convierte en despojos.`,
@@ -126,7 +130,7 @@ const CombateFin = (() => {
     const out = [];
     const nom = K.nombreLimpio(sc);
     if(Combatiente.armaEnMano(sc).nombre && !Combatiente.armaEnMano(sc).natural && !Combatiente.armaEnMano(sc).invocadaDe){ const t = plantillaArmaCreep(cat, sc); out.push({clave: `${sc.id}:arma`, nombre: t.nombre, precioCompra: t.precioCompra, template: t, origen: nom}); }
-    Combatiente.equipoSinArma(sc).filter(it => !it.natural && !it.invocadaDe).forEach(it => { const t = plantillaEquipoCreep(cat, it, sc.nivel);   // 🐾 lo natural no se suelta (2026-10-14); ✨ un arma invocada tampoco (D7)
+    Combatiente.equipoSinArma(sc).filter(it => !it.natural && !it.invocadaDe).forEach(it => { const t = plantillaPieza(cat, it, sc);   // 🐾 lo natural no se suelta (2026-10-14); ✨ un arma invocada tampoco (D7)
       out.push({clave: `${sc.id}:eq:${it.id}`, nombre: t.nombre, precioCompra: t.precioCompra, template: t, origen: nom}); });
     K.dropsFijos(sc).forEach((n, i) => {   // los drops fijos (2026-10-14): del catálogo, siempre
       const c = cat.find(x => sinAviso(x.nombre) === sinAviso(n));

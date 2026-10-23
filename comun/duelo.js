@@ -2959,8 +2959,22 @@ const Duelo = (() => {
     devolviendo.add(d.id);
     try{
       const ref = col().doc(d.id);
-      const ok = await fbDb.runTransaction(async tx => { const s = await tx.get(ref); if(!s.exists || s.data().resultado !== 'devolver') return false; tx.update(ref, {resultado: 'devuelto'}); return true; });
-      if(!ok) return;
+      // La pantalla ve «devolver» antes de que el servidor lo tenga (escritura propia pendiente) y la transacción lee el servidor: si todavía no
+      // llegó, espera y reintenta (2026-10-23: antes devolvía «no» y el duelo quedaba sin devolver para siempre).
+      let ok = false;
+      for(let i = 0; i < 8; i++){
+        const r = await fbDb.runTransaction(async tx => {
+          const s = await tx.get(ref);
+          if(!s.exists) return 'no';
+          const x = s.data().resultado;
+          if(x === 'devolver'){ tx.update(ref, {resultado: 'devuelto'}); return 'si'; }
+          return x === 'devuelto' ? 'no' : 'espera';
+        });
+        if(r === 'si'){ ok = true; break; }
+        if(r === 'no') break;
+        await new Promise(res => setTimeout(res, 600));
+      }
+      if(!ok){ devolviendo.delete(d.id); return; }
       const costo = await hk.devolverAtaque(d);
       const txt = `↩ ${d.atacante.nombre}: el duelo cancelado no cuenta como ataque${Number(costo) ? ` — se le devolvieron ${Number(costo)} No2` : ''}`;
       if(typeof toast === 'function') toast(txt);

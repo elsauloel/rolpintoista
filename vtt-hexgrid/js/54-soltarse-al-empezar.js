@@ -273,6 +273,8 @@ setInterval(() => {
       if(borre) mesaLinea(ahora === 'muerta' ? `💀 ${nombre} desaparece: murió` : r.temporal ? `👁 ${nombre} se desvanece: cumplió sus turnos`
         : `✨ ${nombre} desaparece: se terminaron sus turnos`, 'recordatorio');
       if(soyGM) await temporalFueraDelOrden(id);   // (solo el GM cambia el largo del orden)
+      // Ya se fue: si el mismo token vuelve (lo ponen de nuevo), se lo vigila de cero (cuando llegue, ya no está en `tokens`).
+      setTimeout(() => { temporalesBorrando.delete(id); invocacionPrevia.delete(id); }, 5000);
     }).catch(err => { console.error('No se pudo sacar la invocación del mapa:', err); temporalesBorrando.delete(id); });
   });
 }, 1500);

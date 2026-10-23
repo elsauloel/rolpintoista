@@ -165,7 +165,7 @@ function iconoDeArmaDe(t, itemId, itemNombre){
     }else if(t && bn && bn.S && bn.fichaId === t.fichaId){
       it = (bn.S.inventario || []).find(e => (itemId && e.id === itemId) || e.nombre === itemNombre) || null;
     }
-    if(!it && Array.isArray(window.CATALOGO_BASE)) it = window.CATALOGO_BASE.find(e => e.nombre === itemNombre) || null;
+    if(!it && typeof CATALOGO_BASE !== 'undefined' && Array.isArray(CATALOGO_BASE)) it = CATALOGO_BASE.find(e => e.nombre === itemNombre) || null;
   }catch(e){ console.error(e); }
   return iconoDeItem(it || {nombre: itemNombre});
 }

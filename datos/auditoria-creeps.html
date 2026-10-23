@@ -73,6 +73,7 @@ details summary{cursor:pointer;color:var(--muted);font-size:12.5px}
   <p class="leyenda">Para cada creep: <b>✅ Confirmar</b> (queda como se muestra) · <b>🔧 Reajustar</b> (mismo concepto, corregir algo: escribilo en la nota) · <b>🔄 Reimaginar</b> (cambiar lo que hace) · <b>🗑 Descartar</b>. Se ven <b>todos los creeps base</b> (los del código, con sus pasivas de familia y terceras habilidades del rework). Se guarda solo en este navegador; con <b>💾 Guardar en el proyecto</b> lo sube para que el asistente lo lea.</p>
   <div id="lista"></div>
 </main>
+<script src="../comun/combatiente.js"></script>
 <script src="../comun/creeps-base.js"></script>
 <script src="../comun/skills-creep-base.js"></script>
 <script>
@@ -100,7 +101,7 @@ function construirCreeps(){
     const fac = c.etiquetas.find(e => !ROLES.includes(e) && !/^nivel/.test(e) && e !== 'auditar' && e !== d.tipoCriatura && e !== 'con pasivas') || '';
     const pas = (d.estados || []).filter(e => e.pasiva);
     return {id: c.poolId, nombre: limpio, tier: 'Nivel ' + c.nivel, slot: d.tipoCriatura, origen: fac, rol: c.etiquetas.find(e => ROLES.includes(e)) || '', nivel: c.nivel,
-      atr: {Con: d.con, Fue: d.fue, Agi: d.agl, Des: d.des, Esp: d.esp}, hp: d.hp, def: d.defensa, arma: `${d.armaNombre} (d${d.armaTipo}×${d.armaPeso}+${d.armaFijo}${d.armaDeRango ? ', de rango' : ''})`,
+      atr: {Con: d.con, Fue: d.fue, Agi: d.agl, Des: d.des, Esp: d.esp}, hp: d.hp, def: d.defensa, arma: (a => `${a.nombre} (d${a.tipoDado}×${a.peso}+${a.danoFijo}${a.armaDeRango ? ', de rango' : ''})`)(Combatiente.armaEnMano(d)),
       habs: (d.habilidades || []).map(h => h.nombre + (h.cd ? ' (CD ' + h.cd + ')' : '')), pasivas: pas.map(e => e.nombre + ': ' + (e.detalle || '').replace('Pasiva de familia. ', '')),
       jefe: !!d.jefe, mala: mal.has(c.nombre), equipo: (d.equipo || []).length, notas: c.detalle};
   });

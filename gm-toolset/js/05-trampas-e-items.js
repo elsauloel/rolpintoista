@@ -129,7 +129,7 @@ function abrirCatalogoArmasNaturales(scId){
     subtitulo: e => ` · ${e.etiquetas.includes('pesada') ? 'pesada' : e.etiquetas.includes('ligera') ? 'ligera' : 'media'} · ${e.etiquetas.includes('a distancia') ? 'a distancia' : 'cuerpo a cuerpo'}`,
     alElegir: async datos => {
       if(Combatiente.armaEnMano(sc).nombre && !(await Confirmar.preguntar(`${sc.nombre || 'El creep'} ya tiene "${Combatiente.armaEnMano(sc).nombre}". ¿Reemplazarla por ${datos.nombre}?`, {titulo: 'Reemplazar arma', icono: '🐾', si: 'Reemplazar'}))) return;
-      Combatiente.ponerArma(sc, Combatiente.itemDeCamposArma(armarArmaNatural(datos, sc.nivel)));   // 🗡 reemplaza su arma por esta (un ítem de su lista)
+      Combatiente.ponerArma(sc, armarArmaNatural(datos, sc.nivel));   // 🗡 reemplaza su arma por esta (un ítem de su lista)
       renderAll();
       toast(`${datos.nombre} equipada (arma natural, nivel ${sc.nivel || 1})`);
     },

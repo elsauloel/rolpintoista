@@ -6,9 +6,9 @@
    Cada entrada guarda la receta ({familia, potencia, rango, mods, efectos, detalle}); al elegirla, `armarArmaNatural(datos, nivel)`
    la calcula con el NIVEL del creep (misma escala que las armas de comun/creeps-base.js: dado 4/6/6/8/10, dados 1/1/2/2/2,
    daño fijo nivel÷2) y la potencia la corre un escalón (−2 al dado si es ligera, +2 si es pesada; entre d4 y d12).
-   Los efectos van en `armaEfectos`: al tirar el Daño se recuerdan resaltados en la Mesa y, si tienen porcentaje, se tiran
+   Los efectos van en `efectosGolpe` del arma: al tirar el Daño se recuerdan resaltados en la Mesa y, si tienen porcentaje, se tiran
    en un pop-up (comun/efectos-golpe.js). Aplicarlos sobre el rival sigue siendo a mano, a propósito.
-   Todas marcan al creep como `armaNatural` (al morir suelta un trofeo, nadie la equipa). Son un punto de partida: se editan. */
+   Todas son naturales (`natural: true`: al morir suelta un trofeo, no se cae ni la levanta otro). Son un punto de partida: se editan. */
 (function(){
   const TIPO_ARMA = [4, 6, 6, 8, 10];
   const PESO_ARMA = [1, 1, 2, 2, 2];
@@ -137,10 +137,10 @@
     const n = Math.max(1, Math.round(Number(nivel) || 1));
     const i = Math.min(n, 5) - 1;
     const tipo = Math.max(4, Math.min(12, TIPO_ARMA[i] + 2 * (datos.potencia || 0)));
+    // El arma, en la forma de un ítem de su equipo (paso 8, 2026-10-23): se le pone con Combatiente.ponerArma.
     return {
-      armaNombre: datos.nombre, armaNatural: true, armaTipo: tipo, armaPeso: PESO_ARMA[i], armaFijo: Math.floor(n / 2), armaAmplificado: 0,
-      armaDeRango: !!datos.rango, armaManos: 'arma_1m', armaDetalle: datos.detalle,
-      armaMods: structuredClone(datos.mods || []), armaEfectos: structuredClone(datos.efectos || []),
+      nombre: datos.nombre, natural: true, tipoItem: 'arma_1m', tipoDado: tipo, peso: PESO_ARMA[i], danoFijo: Math.floor(n / 2), danoAmplificado: 0,
+      armaDeRango: !!datos.rango, detalle: datos.detalle, mods: structuredClone(datos.mods || []), efectosGolpe: structuredClone(datos.efectos || []), equipado: true,
     };
   };
 })();

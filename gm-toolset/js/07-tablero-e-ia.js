@@ -448,10 +448,6 @@ function creepDesdeIA(data){
     hp: hpMax, hpMax,
     spd: num(data.spd) || 5,
     con, fue: num(data.fue), agl: num(data.agl), des: num(data.des), esp: num(data.esp),
-    armaTipo: DADOS_ARMA.includes(num(data.armaTipo)) ? num(data.armaTipo) : 8,
-    // armaPeso = cantidad de dados de daño: siempre entero, 1 a 5 (ver armaDanoTxt en ficha.html).
-    armaPeso: Math.min(5, Math.max(1, Math.round(num(data.armaPeso)) || 1)),
-    armaFijo: num(data.armaFijo),
     defensa: num(data.defensa),
     armaduraTipo: (data.armaduraTipo || '').toString(),
     // Resistencia a crítico: la da la armadura, no el bicho — 0 es lo normal, tope 3.
@@ -465,6 +461,9 @@ function creepDesdeIA(data){
     ...habilidades.map(h => ({id:uid(), nombre:(h.nombre||'').toString(), detalle:(h.detalle||'').toString(), cd:num(h.cd), cdActual:0})),
   ];
   creep.estados = [];
+  // 🗡 Su arma, un ítem de su equipo (paso 8, 2026-10-23). armaPeso = cantidad de dados de daño: siempre entero, 1 a 5.
+  Combatiente.ponerArma(creep, {nombre: String(data.armaNombre || 'Arma'), tipoItem: 'arma_1m', tipoDado: DADOS_ARMA.includes(num(data.armaTipo)) ? num(data.armaTipo) : 8,
+    peso: Math.min(5, Math.max(1, Math.round(num(data.armaPeso)) || 1)), danoFijo: num(data.armaFijo), mods: [], efectosGolpe: []});
   return creep;
 }
 

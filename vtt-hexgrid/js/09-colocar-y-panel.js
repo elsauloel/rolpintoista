@@ -602,7 +602,7 @@ async function modificarCreep(creepId, cambiar){
   return fbDb.runTransaction(async tx => {
     const [priv, pub] = await Promise.all([tx.get(privRef), tx.get(base)]);
     if(!priv.exists || !pub.exists) throw new Error('El creep ya no existe');
-    const sc = JSON.parse(priv.data().json || '{}');
+    const sc = CreepCalculo.normalizar(JSON.parse(priv.data().json || '{}'));   // 🗡 convertido (paso 8): lo que se guarda queda en la forma nueva
     const resultado = cambiar(sc);
     const hpMax = num(sc.hpMax);
     const json = JSON.stringify(sc);
@@ -715,6 +715,7 @@ function actualizarEscuchasCreeps(){
     e.cortar = fbDb.doc(fbRutaCampana(`creeps/${id}/privado/ficha`)).onSnapshot(doc => {
       let sc = null;
       try{ sc = doc.exists ? JSON.parse(doc.data().json || '{}') : null; }catch(err){}
+      if(sc) try{ CreepCalculo.normalizar(sc); }catch(err){ console.error('No se pudo leer el creep:', err); }   // 🗡 convertido, como en GM Tools (paso 8)
       e.sc = sc;
       renderPanel();
       if(ac && ac.creepId === id && !ac.host.hidden) acDibujar();   // ⚗ las Acciones nuevas de ese creep, al día

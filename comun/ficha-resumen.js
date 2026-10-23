@@ -47,11 +47,7 @@ const FichaResumen = (() => {
   }
 
   /* ---------- No2 máximo de una invocación (js/04) ---------- */
-  function invFuentesEquipo(inv){
-    if(!Combatiente.tieneCamposArma(inv)) return Combatiente.equipoPuesto(inv);   // (el arma va en su equipo; una vieja con los campos sueltos, aparte)
-    const a = Combatiente.armaEnMano(inv);
-    return [...Combatiente.puestoSinArma(inv), ...(a.mods.length ? [{nombre: a.nombre || 'Arma', mods: a.mods}] : [])];
-  }
+  const invFuentesEquipo = inv => Combatiente.equipoPuesto(inv);   // (el arma va en su equipo; lo guardado no da bonos)
   function invModTotal(inv, statId){
     let total = 0;
     invFuentesEquipo(inv).forEach(it => (it.mods||[]).forEach(m => { if(m.stat === statId) total += num(m.val); }));
@@ -214,6 +210,7 @@ const FichaResumen = (() => {
       invocaciones: (S.invocaciones || [])
         .filter(inv => inv && inv.id)
         .slice(0, 20)
+        .map(inv => typeof InvCalculo !== 'undefined' ? InvCalculo.migrar(structuredClone(inv)) : inv)   // (una vieja, convertida: su arma en su equipo)
         .map(inv => ({
           id: String(inv.id),
           nombre: String(inv.nombre || 'Invocación').slice(0, 60),

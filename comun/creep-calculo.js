@@ -102,12 +102,8 @@ const CreepCalculo = (() => {
     return `${dados}d${tipo}${fijo?` + ${fmt(fijo)}`:''}`;
   }
 
-  // Lo que el creep tiene puesto y da bonos: su equipo (con su arma adentro; una vieja con los campos sueltos, aparte).
-  function fuentesEquipo(sc){
-    if(!Combatiente.tieneCamposArma(sc)) return Combatiente.equipoPuesto(sc);   // (lo guardado no da bonos: paso 4)
-    const a = armaDe(sc);
-    return [...Combatiente.puestoSinArma(sc), ...(a.mods.length ? [{nombre: a.nombre || 'Arma', mods: a.mods}] : [])];
-  }
+  // Lo que el creep tiene puesto y da bonos (su arma adentro; lo guardado no: paso 4).
+  const fuentesEquipo = sc => Combatiente.equipoPuesto(sc);
 
   // Suma los modificadores que apuntan a un stat puntual, vengan del equipo
   // puesto o de estados activos — mismo criterio que collectMods()+modTotal

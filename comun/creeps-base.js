@@ -1649,6 +1649,13 @@
   }
   aplicarEquipo();
 /*EQUIPO_CREEP:FIN*/
+  // 🗡 El arma, un ítem de su equipo (paso 8 de docs/plan-inventario-creeps.md, 2026-10-23): las recetas de arriba la arman con los campos
+  // arma* de siempre y acá pasa a su lista, con un id fijo. (Sin comun/combatiente.js cargado quedan como antes: GM Tools los convierte al cargar.)
+  if(typeof Combatiente !== 'undefined') lista.forEach(c => {
+    Combatiente.pasarArmaAItem(c.datos);
+    const a = Combatiente.armaPrincipal(c.datos);
+    if(a) a.id = 'arma-' + c.poolId;
+  });
 
   window.CREEPS_BASE = lista;
   // Revisa que cada creep de la lista tenga TODOS los puntos de atributo de su nivel (33 + 3 por nivel sobre 1, repartidos entre Con, Fue, Agi, Des y Esp)

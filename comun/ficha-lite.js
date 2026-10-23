@@ -159,7 +159,7 @@ const FichaLite = (() => {
   // La otra mano de un creep o una invocación (2026-10-17, dueño: varitas, báculos, orbes y escudos son armas, no equipo): el primer escudo, o
   // si no hay, lo primero que va en la mano (una varita).
   const enMano = (it, slotDe) => ['escudo', 'mano'].includes(slotDe(it.tipoItem));
-  const otraManoDe = (o, slotDe) => Combatiente.equipoSinArma(o).find(it => slotDe(it.tipoItem) === 'escudo') || Combatiente.equipoSinArma(o).find(it => enMano(it, slotDe)) || null;
+  const otraManoDe = (o, slotDe) => Combatiente.puestoSinArma(o).find(it => slotDe(it.tipoItem) === 'escudo') || Combatiente.puestoSinArma(o).find(it => enMano(it, slotDe)) || null;
   function segundaMano(o, slotDe){
     const esc2 = otraManoDe(o, slotDe);
     if(!esc2) return {nombre: '', detalle: 'vacía', lineas: []};
@@ -173,7 +173,7 @@ const FichaLite = (() => {
   }
   function equipoGuardado(o, slotDe){
     const otra = otraManoDe(o, slotDe);
-    return Combatiente.equipoSinArma(o).filter(it => it !== otra && !(slotDe(it.tipoItem) === 'escudo')).map(it => {
+    return Combatiente.puestoSinArma(o).filter(it => it !== otra && !(slotDe(it.tipoItem) === 'escudo')).map(it => {
       const lineas = [];
       if(num(it.def)) lineas.push({txt: `Defensa ${signo(num(it.def))}`});
       const mt = modsTxt(it.mods);

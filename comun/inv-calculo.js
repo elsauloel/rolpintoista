@@ -60,7 +60,7 @@ const InvCalculo = (() => {
     return {rota: activos.filter(e => e.armaduraRota).reduce((a, e) => a + Math.max(1, num(e.stacks) || 1), 0)};
   }
   function aporteArmadura(inv, statId){
-    return (inv.equipo||[]).filter(it => slotDe(it.tipoItem) === 'armadura')
+    return Combatiente.equipoPuesto(inv).filter(it => slotDe(it.tipoItem) === 'armadura')
       .reduce((a,it) => a + (statId === 'def' ? num(it.def) : (it.mods||[]).filter(m=>m.stat===statId).reduce((s,m)=>s+num(m.val),0)), 0);
   }
   function defensaEfectiva(inv){
@@ -107,7 +107,7 @@ const InvCalculo = (() => {
     const a = armaDe(inv);
     return Combatiente.armaParaDefensa({arma: a.nombre ? {nombre: a.nombre, peso: a.peso} : null, natural: a.natural,
       arco: a.armaDeRango, soloEscudo: !!(o && o.soloEscudo),
-      escudos: Combatiente.piezasParaParry(Combatiente.equipoSinArma(inv), slotDe, it => num(it.peso))});   // un báculo sí, un orbe no (2026-10-17)
+      escudos: Combatiente.piezasParaParry(Combatiente.puestoSinArma(inv), slotDe, it => num(it.peso))});   // un báculo sí, un orbe no (2026-10-17)
   }
   function bloqueoValor(inv){ const d = defensa(inv); return statValor(inv, 'bloqueo') + (d ? num(d.peso) : 0); }
   function costoAtaque(inv){ return Combatiente.conExtenuado(inv.estados, costoAtaque0(inv)); }   // + Extenuado (2026-10-12)

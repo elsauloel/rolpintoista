@@ -22,7 +22,7 @@ function aliadosAlLado(t, hasta = 1){
 }
 // ¿Lleva un escudo de verdad equipado? (creep: su equipo, solo el GM; invocación y personaje: lo que publica la ficha)
 function tieneEscudo(x){
-  if(x.tipo === 'creep'){ const sc = soyGM ? creepPrivadoDe(x.fichaId) : null; return !!sc && (sc.equipo || []).some(i => Combatiente.esEscudo(i)); }
+  if(x.tipo === 'creep'){ const sc = soyGM ? creepPrivadoDe(x.fichaId) : null; return !!sc && Combatiente.equipoPuesto(sc).some(i => Combatiente.esEscudo(i)); }
   const ri = resumenDeInv(x);
   if(ri) return !!ri.conEscudo;
   const f = fichasPub.get(x.fichaId);

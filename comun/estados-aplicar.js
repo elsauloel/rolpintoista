@@ -82,7 +82,7 @@ const EstadosAplicar = (() => {
     sc.estados = Array.isArray(sc.estados) ? sc.estados : [];
     // Inmunidades, acumulación y renovación: la regla común de comun/combatiente.js (agregarEstado).
     const nuevo = componer(spec);
-    if(!Combatiente.bezoar(nuevo, sc.equipo)) return {ok: false, motivo: 'la Piedra bezoar se tragó el Veneno'};   // 🔮 (2026-10-18)
+    if(!Combatiente.bezoar(nuevo, Combatiente.equipoPuesto(sc))) return {ok: false, motivo: 'la Piedra bezoar se tragó el Veneno'};   // 🔮 (2026-10-18)
     const r = Combatiente.agregarEstado(sc.estados, nuevo, sc);
     if(!r.ok) return {ok: false, motivo: r.motivo};
     // Lo que se dispara (veneno, regeneración…) pega apenas se lo ponen (2026-10-06, P161).

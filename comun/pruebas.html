@@ -2475,6 +2475,18 @@ prueba('🛡 Armas como ítems, paso 3: la Defensa y la Res. a crítico del equi
   igual([antes, conv, dos, sinCasco, conEscudo, [inv.defensa, InvCalculo.defensaEfectiva(inv), InvCalculo.critEfectivo(inv, 2)], [sc2.defensa, CreepCalculo.defensaEfectiva(sc2)]],
     [[5, 1], [1, 3, 0, 5, 1], [3, 5], [3, 0], [4, 1], [3, 4, 1], [3, 5]]);
 });
+prueba('🎒 Armas como ítems, paso 4: lo guardado no da bonos ni para; las manos libres; lo que se suelta va en la forma de un personaje', () => {
+  const escudo = {id: 'e', nombre: 'Escudo', tipoItem: 'escudo_1m', def: 2, peso: 1, mods: [{stat: 'parry', val: 1}]};
+  const sc = creepPrueba({equipo: [escudo]});   // la Hacha (1 mano) + el escudo: 0 libres
+  const conEscudo = [Combatiente.manosLibres(sc), CreepCalculo.defensaEfectiva(sc), CreepCalculo.modTotal(sc, 'parry'), !!CreepCalculo.defensa(sc, {soloEscudo: true})];
+  escudo.equipado = false;   // guardado
+  const guardado = [Combatiente.manosLibres(sc), CreepCalculo.defensaEfectiva(sc), CreepCalculo.modTotal(sc, 'parry'), !!CreepCalculo.defensa(sc, {soloEscudo: true}),
+    Combatiente.equipoGuardado(sc).map(x => x.nombre), CreepCalculo.tarjetaPublica({...sc, hp: 5}).manosNombres];
+  const pj = Combatiente.itemComoDePersonaje({id: 'e', nombre: 'Escudo', tipoItem: 'escudo_1m', def: 2, mods: [{stat: 'parry', val: 1}], equipado: true});
+  const garras = creepPrueba({}); Combatiente.ponerArma(garras, {nombre: 'Garras', tipoDado: 6, natural: true});
+  igual([conEscudo, guardado, [pj.def, pj.mods, pj.equipado], Combatiente.manosLibres(garras), Combatiente.vaEnLaMano({tipoItem: 'cabeza'})],
+    [[0, 3, 1, true], [1, 1, 0, false, ['Escudo'], []], [undefined, [{stat: 'def', val: 2}, {stat: 'parry', val: 1}], false], 2, false]);
+});
 prueba('Regeneración de vida del equipo (2026-10-07, piel de troll): cura al empezar el turno, en personajes y creeps; no levanta a un caído', () => {
   const chal = {id: 't', nombre: 'Chaleco de piel de troll', tipoItem: 'armadura_blanda', equipado: true, mods: [{stat: 'hpregen', val: 2}]};
   const sc = creepPrueba({equipo: [chal]}); sc.hp = 10;

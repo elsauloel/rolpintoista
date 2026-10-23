@@ -48,9 +48,9 @@ const FichaResumen = (() => {
 
   /* ---------- No2 máximo de una invocación (js/04) ---------- */
   function invFuentesEquipo(inv){
-    if(!Combatiente.tieneCamposArma(inv)) return inv.equipo || [];   // (el arma va en su equipo; una vieja con los campos sueltos, aparte)
+    if(!Combatiente.tieneCamposArma(inv)) return Combatiente.equipoPuesto(inv);   // (el arma va en su equipo; una vieja con los campos sueltos, aparte)
     const a = Combatiente.armaEnMano(inv);
-    return [...Combatiente.equipoSinArma(inv), ...(a.mods.length ? [{nombre: a.nombre || 'Arma', mods: a.mods}] : [])];
+    return [...Combatiente.puestoSinArma(inv), ...(a.mods.length ? [{nombre: a.nombre || 'Arma', mods: a.mods}] : [])];
   }
   function invModTotal(inv, statId){
     let total = 0;
@@ -231,7 +231,7 @@ const FichaResumen = (() => {
           venenista: num(invModTotal(inv, 'venenista')),   // Guantes del envenenador (2026-10-05)
           ...(num(inv.ojo) > 0 ? {ojo: num(inv.ojo), veoculto: num(inv.veoculto), etereo: true, sinMareo: true, temporal: true} : {}),   // 👁 el Ojo de Kicillof: ve en flor, revela, invisible, sin mareo (2026-10-20)
           guardian: num(invModTotal(inv, 'guardian')),
-          conEscudo: (inv.equipo || []).some(i => Combatiente.esEscudo(i)), muroescudos: num(invModTotal(inv, 'muroescudos')), empujon: num(invModTotal(inv, 'empujon')),   // escudos (2026-10-06)
+          conEscudo: Combatiente.equipoPuesto(inv).some(i => Combatiente.esEscudo(i)), muroescudos: num(invModTotal(inv, 'muroescudos')), empujon: num(invModTotal(inv, 'empujon')),   // escudos (2026-10-06)
           levitar: num(invModTotal(inv, 'levitar')), suelagruesa: num(invModTotal(inv, 'suelagruesa')), embestida: num(invModTotal(inv, 'embestida')), pasodoble: num(invModTotal(inv, 'pasodoble')),   // Coraza del guardián (2026-10-06)
           pisadaAtenta: num(invModTotal(inv, 'pisadaatenta')) > 0, ...(typeof InvCalculo !== 'undefined' ? {percepcion: num(InvCalculo.statValor(inv, 'percepcion'))} : {}),
           activa: inv.activa !== false,

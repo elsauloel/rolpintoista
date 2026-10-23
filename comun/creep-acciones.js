@@ -469,7 +469,7 @@ const CreepAcciones = (() => {
      tienen SP: el SP de la varita se paga con ESPERA (dueño: «adaptar, medio a ojo, SP en CD»; provisorio hasta pasar los creeps a SP, ver la hoja de
      ruta): ESPERA_POR_SP. Los orbes de la otra mano también valen (resguardo: Vida extra; salvaje: 1d6). */
   const ESPERA_POR_SP = sp => sp <= 0 ? 0 : sp <= 2 ? 1 : 2;   // SP 1–2 → 1 turno de espera; SP 3 o más → 2
-  const especialesCreep = sc => Combatiente.especialesConModos((sc.equipo || []).filter(it => it && it.especial));   // (los modos de una varita, 2026-10-08)
+  const especialesCreep = sc => Combatiente.especialesConModos(Combatiente.equipoPuesto(sc).filter(it => it && it.especial));   // (lo guardado no: paso 4)   // (los modos de una varita, 2026-10-08)
   const claveEspCreep = it => it._modoDe || it.id;
   function costoEspecialCreep(sc, it){
     const k = claveEspCreep(it), e = (it && it.especial) || {}, usos = num((sc.usosEspecial || {})[k]);
@@ -513,7 +513,7 @@ const CreepAcciones = (() => {
     const propio = it.especial.estadoPropio;   // lo que se pone quien la usa (la luz)
     if(propio && propio.nombre) EstadosAplicar.aplicarACreep(sc, structuredClone(propio));
     const avisos = [];
-    (sc.equipo || []).filter(o => o && o.orbe).forEach(o => {
+    Combatiente.equipoPuesto(sc).filter(o => o && o.orbe).forEach(o => {
       // El Orbe salvaje, el del custodio y el de resguardo (2026-10-18): ya no al usar la varita — el mapa (vtt-hexgrid/js/53), con el daño
       // especial y el PdG.Esp ganado.
     });

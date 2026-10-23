@@ -104,9 +104,9 @@ const CreepCalculo = (() => {
 
   // Lo que el creep tiene puesto y da bonos: su equipo (con su arma adentro; una vieja con los campos sueltos, aparte).
   function fuentesEquipo(sc){
-    if(!Combatiente.tieneCamposArma(sc)) return sc.equipo || [];
+    if(!Combatiente.tieneCamposArma(sc)) return Combatiente.equipoPuesto(sc);   // (lo guardado no da bonos: paso 4)
     const a = armaDe(sc);
-    return [...Combatiente.equipoSinArma(sc), ...(a.mods.length ? [{nombre: a.nombre || 'Arma', mods: a.mods}] : [])];
+    return [...Combatiente.puestoSinArma(sc), ...(a.mods.length ? [{nombre: a.nombre || 'Arma', mods: a.mods}] : [])];
   }
 
   // Suma los modificadores que apuntan a un stat puntual, vengan del equipo
@@ -136,7 +136,7 @@ const CreepCalculo = (() => {
     const fuentes = [];
     let n = 0;
     const sumar = (x, mult) => { if(x && x.masDanoElem && x.masDanoElem.el === el && num(x.masDanoElem.n)){ n += num(x.masDanoElem.n) * mult; fuentes.push(x.nombre || '?'); } };
-    (sc && sc.equipo || []).forEach(i => sumar(i, 1));
+    Combatiente.equipoPuesto(sc).forEach(i => sumar(i, 1));
     (sc && sc.pasivas || []).forEach(p => sumar(p, pasivaComprasCreep(p)));
     return {n, fuentes};
   }
@@ -149,7 +149,7 @@ const CreepCalculo = (() => {
     };
   }
   function aporteArmadura(sc, statId){
-    return (sc.equipo||[]).filter(it => slotDe(it.tipoItem) === 'armadura')
+    return Combatiente.equipoPuesto(sc).filter(it => slotDe(it.tipoItem) === 'armadura')
       .reduce((a,it) => a + (statId === 'def' ? num(it.def) : (it.mods||[]).filter(m=>m.stat===statId).reduce((s,m)=>s+num(m.val),0)), 0);
   }
   function defensaEfectiva(sc){
@@ -422,7 +422,7 @@ const CreepCalculo = (() => {
     const a = armaDe(sc);
     return Combatiente.armaParaDefensa({arma: a.nombre ? {nombre: a.nombre, peso: a.peso} : null, natural: a.natural,
       arco: a.armaDeRango, soloEscudo: !!(o && o.soloEscudo),
-      escudos: Combatiente.piezasParaParry(Combatiente.equipoSinArma(sc), slotDe, pesoPieza)});   // un báculo sí, un orbe no (2026-10-17)
+      escudos: Combatiente.piezasParaParry(Combatiente.puestoSinArma(sc), slotDe, pesoPieza)});   // un báculo sí, un orbe no (2026-10-17)
   }
   // El peso de una pieza del equipo (2026-10-13): las equipadas antes no lo guardaban; si falta, el del catálogo con ese nombre.
   function pesoPieza(it){
@@ -483,13 +483,13 @@ const CreepCalculo = (() => {
   // 💀 El aura espeluznante (el radio): de la Calavera con vela del equipo o de una pasiva propia con su efecto (dueño 2026-10-18: El ocultista).
   // 🚩 Los estandartes de un creep (los aliados cerca, con el bono): de su equipo y de sus pasivas (dueño 2026-10-18: el Kobold hongero, rango 2).
   // `rango`: hasta cuántas casillas llega (sin él, 1: al lado). → [{stat, val, rango, nombre}].
-  const estandartes = sc => [...(Array.isArray(sc && sc.equipo) ? sc.equipo : []), ...(Array.isArray(sc && sc.pasivas) ? sc.pasivas : [])]
+  const estandartes = sc => [...Combatiente.equipoPuesto(sc), ...(Array.isArray(sc && sc.pasivas) ? sc.pasivas : [])]
     .filter(x => x && x.estandarte && x.estandarte.stat)
     .map(x => ({stat: String(x.estandarte.stat), val: num(x.estandarte.val), rango: Math.max(1, Math.round(num(x.estandarte.rango)) || 1), nombre: String(x.nombre || '').slice(0, 40)}));
-  const auraMiedo = sc => [...(Array.isArray(sc && sc.equipo) ? sc.equipo : []), ...(Array.isArray(sc && sc.pasivas) ? sc.pasivas : [])]
+  const auraMiedo = sc => [...Combatiente.equipoPuesto(sc), ...(Array.isArray(sc && sc.pasivas) ? sc.pasivas : [])]
     .reduce((a, it) => Math.max(a, num(it && it.auraMiedo)), 0);
   // 🔮 Un talismán de su equipo (2026-10-18): lo más grande de ese campo (`espejito`, `relicario`).
-  const talisman = (sc, campo) => (Array.isArray(sc && sc.equipo) ? sc.equipo : []).reduce((a, it) => Math.max(a, num(it && it[campo])), 0);
+  const talisman = (sc, campo) => Combatiente.equipoPuesto(sc).reduce((a, it) => Math.max(a, num(it && it[campo])), 0);
   function tarjetaPublica(sc){
     const nom = x => String(x || '').trim().slice(0, 60);
     const vivo = num(sc.hp) > 0;
@@ -499,8 +499,8 @@ const CreepCalculo = (() => {
       armaNombre: a.natural ? nom(a.nombre) : ver(a.nombre),
       armaNatural: a.natural,
       // Lo de las manos (además del arma) va aparte del equipo (2026-10-17): una varita, un escudo, un orbe.
-      manosNombres: Combatiente.equipoSinArma(sc).filter(enLasManos).map(it => it.natural ? nom(it.nombre) : ver(it.nombre)).filter(Boolean).slice(0, 6),
-      equipoNombres: Combatiente.equipoSinArma(sc).filter(it => it && !enLasManos(it)).map(it => it.natural ? nom(it.nombre) : ver(it.nombre)).filter(Boolean).slice(0, 30),   // lo natural se ve con su nombre, como el arma natural
+      manosNombres: Combatiente.puestoSinArma(sc).filter(enLasManos).map(it => it.natural ? nom(it.nombre) : ver(it.nombre)).filter(Boolean).slice(0, 6),
+      equipoNombres: Combatiente.puestoSinArma(sc).filter(it => it && !enLasManos(it)).map(it => it.natural ? nom(it.nombre) : ver(it.nombre)).filter(Boolean).slice(0, 30),   // lo natural se ve con su nombre, como el arma natural
       notas: String(sc.notas || '').trim().slice(0, 600),
       tipoCriatura: tipoDe(sc).slice(0, 30),   // el tipo de criatura (Matabestias de los arcos, 2026-10-11)
       pasosSilenciosos: num(modTotal(sc, 'pasossilenciosos')) > 0,   // 👣 (2026-10-15): el mapa de los jugadores no lo hace oír a 3 casilleros

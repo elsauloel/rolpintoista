@@ -72,7 +72,7 @@ function talEquipoDe(t){
 async function talAlDanoEspecial(d){
   const ta = tokens.get(d.atacante.tokenId), eq = talEquipoDe(ta);
   if(!eq) return;
-  const lista = eq.creep ? Combatiente.talismanesDanoEsp(eq.creep.equipo) : (eq.resumen.alDanoEsp || []);
+  const lista = eq.creep ? Combatiente.talismanesDanoEsp(Combatiente.equipoPuesto(eq.creep)) : (eq.resumen.alDanoEsp || []);
   for(const x of lista){
     const k = `${x.de}|${d.atacante.tokenId}@${Math.round(num(mantenimientoNumero))}`;
     if(talismanUsados.has(k)) continue;
@@ -86,7 +86,7 @@ async function talSalvajeTirar(d){
   const ta = tokens.get(d.atacante.tokenId), eq = talEquipoDe(ta);
   if(!eq) return null;
   let tipo = null, nombre = '';
-  if(eq.creep){ const o = (eq.creep.equipo || []).find(i => i && i.orbeSalvaje === 'domado') || (eq.creep.equipo || []).find(i => i && i.orbeSalvaje); if(o){ tipo = o.orbeSalvaje; nombre = o.nombre; } }
+  if(eq.creep){ const o = Combatiente.equipoPuesto(eq.creep).find(i => i && i.orbeSalvaje === 'domado') || Combatiente.equipoPuesto(eq.creep).find(i => i && i.orbeSalvaje); if(o){ tipo = o.orbeSalvaje; nombre = o.nombre; } }
   else if(eq.resumen.orbeSalvaje){ tipo = eq.resumen.orbeSalvaje === 'domado' ? 'domado' : true; nombre = eq.resumen.orbeSalvajeNombre || 'Orbe salvaje'; }
   if(!tipo) return null;
   const dado = 1 + Math.floor(Math.random() * 6), x = Combatiente.orbeSalvaje({orbeSalvaje: tipo}, dado);
@@ -109,7 +109,7 @@ function talCustodio(d){
   const ta = tokens.get(d.atacante.tokenId), eq = talEquipoDe(ta);
   if(!eq || typeof orbeCustodioMapa !== 'function') return;
   let n = 0, nombre = 'Orbe del custodio';
-  if(eq.creep){ const o = (eq.creep.equipo || []).find(i => i && num(i.orbeCustodio) > 0); if(o){ n = num(o.orbeCustodio); nombre = o.nombre; } }
+  if(eq.creep){ const o = Combatiente.equipoPuesto(eq.creep).find(i => i && num(i.orbeCustodio) > 0); if(o){ n = num(o.orbeCustodio); nombre = o.nombre; } }
   else n = num(eq.resumen.orbeCustodio);
   if(!(n > 0)) return;
   orbeCustodioMapa({fichaId: ta.fichaId, tipo: ta.tipo === 'creep' ? 'creep' : 'pj', n, orbe: nombre, quien: d.atacante.nombre});
@@ -119,7 +119,7 @@ async function talResguardo(d){
   const ta = tokens.get(d.atacante.tokenId), eq = talEquipoDe(ta);
   if(!eq) return;
   let n = 0, nombre = 'Orbe de resguardo';
-  if(eq.creep){ const o = (eq.creep.equipo || []).filter(i => i && num(i.orbeResguardo) > 0).sort((a, b) => num(b.orbeResguardo) - num(a.orbeResguardo))[0]; if(o){ n = num(o.orbeResguardo); nombre = o.nombre; } }
+  if(eq.creep){ const o = Combatiente.equipoPuesto(eq.creep).filter(i => i && num(i.orbeResguardo) > 0).sort((a, b) => num(b.orbeResguardo) - num(a.orbeResguardo))[0]; if(o){ n = num(o.orbeResguardo); nombre = o.nombre; } }
   else n = num(eq.resumen.orbeResguardo);
   if(!(n > 0)) return;
   const k = `resguardo|${d.atacante.tokenId}@${Math.round(num(mantenimientoNumero))}`;
@@ -307,7 +307,7 @@ setInterval(() => { estandartesRevisar().catch(err => console.error('Los estanda
 async function talContrahechizo(d){
   const ta = tokens.get(d.defensor.tokenId), eq = talEquipoDe(ta);
   if(!eq) return;
-  const tiene = eq.creep ? (eq.creep.equipo || []).some(i => i && i.contrahechizo) : !!eq.resumen.contrahechizo;
+  const tiene = eq.creep ? Combatiente.equipoPuesto(eq.creep).some(i => i && i.contrahechizo) : !!eq.resumen.contrahechizo;
   const contra = (d.hab && Array.isArray(d.hab.contra) ? d.hab.contra : []).map(x => typeof x === 'string' ? x : x && x.stat);
   if(!tiene || !contra.includes('resmg')) return;
   const efs = (d.hab.efectos || []).filter(e => e && e.spec && e.spec.nombre && !(num(e.cura) > 0) && e.no2 === undefined);

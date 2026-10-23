@@ -1,9 +1,9 @@
 /* ---------- 🗡️ El arma en el piso (2026-10-07, dueño) ----------
    Cuando a alguien lo desarman (Varita del manotazo; la Varita del desarme la hace volar 2 casillas en una dirección al azar), su arma
    queda en el mapa como un elemento `arma: true`, con el ícono 🗡️ y su nombre, que ven todos. La puede levantar CUALQUIERA que esté
-   encima o al lado, por 1 No2, desde su Botonera: el que estaba Desarmado vuelve a tener un arma en la mano (la suya o la que levantó);
-   el que no, se la guarda en la mochila. Un creep o una invocación no pierde su arma de verdad (no es un ítem): queda Desarmado, y su
-   arma, hecha ítem, queda en el piso por si otro la levanta (si la levanta él mismo, vuelve a tenerla).
+   encima o al lado, por 1 No2: un personaje desde su Botonera (a la mano o a la mochila), un creep desde sus Acciones o con un clic del GM, una
+   invocación desde la suya (a la mano o guardada; con las manos llenas, reemplazar o guardar). Desde el 2026-10-22 (docs/plan-inventario-creeps.md,
+   paso 4) un creep o una invocación también lo pierde de verdad: sale de su equipo (antes su arma era parte de sus datos y la seguía teniendo).
    El elemento lleva quién era el dueño (`armaDe` = "fichaId|tipo") y el ítem entero (`armaItem`, JSON). */
 const armaRefDe = t => t && t.fichaId ? `${t.fichaId}|${t.tipo === 'creep' ? 'creep' : 'pj'}` : '';
 // Las armas en el piso a 1 casilla o menos del token (o encima): [{id, nombre, propia}].
@@ -11,30 +11,18 @@ function armasCercaDe(t){
   if(!t) return [];
   const ref = armaRefDe(t), out = [];
   elementos.forEach((el, id) => {
-    if(!el.arma || !el.origen || !puedeLevantarla(el, t)) return;
+    if(!el.arma || !el.origen) return;
     if(distanciaHex(t, el.origen) <= 1) out.push({id, nombre: el.armaNombre || 'Arma', propia: el.armaDe === ref});
   });
   return out;
 }
-/* 🔒 Por ahora, un arma que se cayó la levanta solo su dueño (dueño, 2026-10-22: «una regla implícita de que solamente el dueño del arma lo puede
-   levantar por ahora, y evitamos narrativamente»). Hasta que los creeps tengan inventario (docs/pendientes.md): hoy el arma de un creep no es un
-   ítem, y si otro se la llevaba el creep la seguía teniendo. Una flecha que erró es de quien la tiró (js/33); lo que no tiene dueño conocido (armas viejas en el piso) lo levanta cualquiera. */
-const puedeLevantarla = (el, t) => !el.armaDe || (!!t && el.armaDe === armaRefDe(t));
+// (2026-10-22, D3 del plan: cualquiera levanta cualquier arma del piso. Hasta el paso 4, «solo su dueño», porque un creep seguía teniendo la suya.)
 // ¿Su arma está en el piso, en algún lado del mapa? (la Botonera no le ofrece «levantarla» sin ir a buscarla)
 function armaPropiaEnElPiso(t){
   const ref = armaRefDe(t);
   if(!ref) return false;
   for(const el of elementos.values()) if(el.arma && el.armaDe === ref) return true;
   return false;
-}
-// El arma de un creep o de una invocación, como ítem (la del catálogo si se llama igual; si no, armada con sus datos).
-function armaComoItem(c, dueno){
-  const a = Combatiente.armaEnMano(c);   // 🗡 la puerta única (docs/plan-inventario-creeps.md)
-  const cat = typeof CATALOGO_BASE !== 'undefined' ? CATALOGO_BASE.find(i => i && i.nombre === a.nombre && /^arma_/.test(i.tipoItem || '')) : null;
-  if(cat) return structuredClone(cat);
-  return {nombre: String(a.nombre || 'Arma'), tipoItem: 'arma_1m', tier: 'Común', peso: 1, ranuras: 1, precioCompra: 0, consumible: false, curahp: 0,
-    tipoDado: a.tipoDado, danoFijo: a.danoFijo, armaDeRango: a.armaDeRango, mods: structuredClone(a.mods),
-    detalle: `El arma que se le cayó a ${dueno}.`};
 }
 // La deja en el piso (lo hace el mapa del GM, al aplicar el Desarmado del duelo). `vuela`: cuántas casillas sale volando (1d6 = la dirección).
 // `o` (2026-10-21, 🤺 Desarmar, js/62): `celda` = dónde cae (la eligió la ruleta); `itemId` / `itemNombre` = lo que tenía en la mano en ese cruce (el
@@ -45,18 +33,16 @@ async function armaSoltar(t, vuela, o){
   const esInv = t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION);
   let item = null, piezaCreep = null;
   if(t.tipo === 'creep' || esInv){
+    // Lo que tenía en la mano en ese cruce (el arma, o el escudo con que paró), o su arma: sale de su equipo (paso 4), en la forma de un ítem de
+    // personaje (la Defensa adentro de los mods), para que cualquiera la levante.
     const c = t.tipo === 'creep' ? creepPrivadoDe(t.fichaId) : await invDeToken(t);
     if(!c) return {manual: true, nota: 'no se pudo leer su arma: ponela en el piso a mano'};
-    const nom = String(o.itemNombre || '').trim();
-    const pieza = t.tipo === 'creep' && nom && nom !== Combatiente.armaEnMano(c).nombre ? (c.equipo || []).find(e => e && e.nombre === nom) : null;   // paró con un escudo
-    if(pieza){
-      if(pieza.natural) return {nota: `${nom} es natural: no se le cae`};
-      piezaCreep = pieza; item = structuredClone(pieza);
-    }else{
-      if(Combatiente.armaEnMano(c).natural || !String(Combatiente.armaEnMano(c).nombre || '').trim()) return {nota: 'su arma es natural: no se le cae'};
-      if(armaPropiaEnElPiso(t)) return {nota: 'su arma ya estaba en el piso'};   // (un creep no la pierde de sus datos: que no suelte otra copia)
-      item = armaComoItem(c, quien);
-    }
+    const nom = String(o.itemNombre || '').trim(), puestas = Combatiente.equipoPuesto(c);
+    const pieza = (o.itemId && puestas.find(e => e && e.id === o.itemId)) || (nom && puestas.find(e => e && e.nombre === nom && Combatiente.vaEnLaMano(e)))
+      || Combatiente.armaPrincipal(c);
+    if(!pieza || !String(pieza.nombre || '').trim()) return {nota: 'no tenía nada en la mano'};
+    if(pieza.natural) return {nota: `${pieza.nombre} es natural: no se le cae`};
+    piezaCreep = pieza; item = Combatiente.itemComoDePersonaje(pieza);
   }else{
     const p = await fbDb.doc(fbRutaCampana(`fichas/${t.fichaId}/partes/inventario`)).get();
     const inv = p.exists ? (JSON.parse(p.data().json || '{}').inventario || []) : [];
@@ -87,10 +73,16 @@ async function armaSoltar(t, vuela, o){
     console.error('No se pudo poner el arma en el piso:', err);
     return {manual: true, nota: `se le cayó ${item.nombre} (ponela en el piso a mano: ¿faltan las reglas nuevas de Firebase?)`};
   }
-  // El escudo de un creep (Desarmar): sale de su equipo.
+  // Lo que se le cayó a un creep o a una invocación sale de su equipo (recién ahora, para no perderlo si falló lo de arriba).
   if(piezaCreep){
-    try{ await modificarCreep(String(t.fichaId), c => { const i = (c.equipo || []).findIndex(e => e && (e.id ? e.id === piezaCreep.id : e.nombre === piezaCreep.nombre)); if(i >= 0) c.equipo.splice(i, 1); return {}; }); }
-    catch(err){ console.error('No se pudo sacar el escudo del creep:', err); }
+    const sacar = c => { const i = (c.equipo || []).findIndex(e => e && (piezaCreep.id ? e.id === piezaCreep.id : e.nombre === piezaCreep.nombre)); if(i >= 0) c.equipo.splice(i, 1); };
+    try{
+      if(t.tipo === 'creep') await modificarCreep(String(t.fichaId), c => { sacar(c); return {}; });
+      else{
+        const [fichaId, invId] = String(t.fichaId).split(SEP_INVOCACION);
+        await editarPersonajeMapa(fichaId, S => { const inv = (S.invocaciones || []).find(x => x && x.id === invId); if(!inv) return false; sacar(inv); return true; });
+      }
+    }catch(err){ console.error('No se pudo sacar lo que se le cayó de su equipo:', err); }
   }
   // El personaje la pierde de verdad (sale de su inventario); recién ahora, para no perderla si falló lo de arriba.
   if(t.tipo === 'pj' && !esInv){
@@ -115,7 +107,6 @@ async function armaSoltar(t, vuela, o){
 async function armaLeer(elId, t){   // → {it, propia} o null
   const el = elementos.get(elId);
   if(!el || !el.arma){ toast('Esa arma ya no está en el piso'); return null; }
-  if(!puedeLevantarla(el, t)){ toast(`🔒 Por ahora, ${el.armaNombre || 'esa arma'} solo la puede levantar su dueño`); return null; }
   if(t && el.origen && distanciaHex(t, el.origen) > 1 && !(await AvisoCombate.preguntar(`${el.armaNombre || 'El arma'} está a ${distanciaHex(t, el.origen)} casillas: hay que estar al lado. ¿Levantarla igual?`, {icono: '🗡', titulo: 'Levantar el arma', si: 'Sí, levantarla'}))) return null;
   let it = {};
   try{ it = JSON.parse(el.armaItem || '{}') || {}; }catch(e){}
@@ -172,7 +163,7 @@ function levantadorPara(el){   // → {id, t} del personaje mío (o del creep, s
     const esPj = t && t.tipo === 'pj' && !String(t.fichaId || '').includes(SEP_INVOCACION) && puedoMover(t);
     const esCreep = t && t.tipo === 'creep' && soyGM && t.fichaId && !((typeof creepPrivadoDe === 'function' && creepPrivadoDe(t.fichaId)) || {}).muerto;
     if(!esPj && !esCreep) continue;
-    if(distanciaHex(t, el.origen) > 1 || !puedeLevantarla(el, t)) continue;   // 🔒 solo su dueño, por ahora
+    if(distanciaHex(t, el.origen) > 1) continue;
     if(modoMapa === 'combate' && typeof esSuTurno === 'function' && esSuTurno(id) === false) continue;
     return {id, t};
   }
@@ -290,6 +281,32 @@ async function bnLevantarArma(elId){
   };
   if(num(S.nitros) < costo) bnSinNitros(costo, 'levantar el arma', () => seguir()); else seguir();
 }
+/* 🎒 Dónde va lo que levanta un creep o una invocación (paso 4, como el personaje): con la mano libre, «¿En la mano?» (sí o guardarlo); con las manos
+   ocupadas, «Reemplazar …» (eso pasa a guardado, 1 No2 más) o «Guardarlo». Lo que no va en la mano (una armadura), guardado. El GM elige por el creep.
+   → {equipar, soltar: [ids que dejan la mano]}. */
+function levantadoElegirCombatiente(x, it, quien){
+  if(!Combatiente.vaEnLaMano(it)) return Promise.resolve({equipar: false, soltar: []});
+  const necesita = /_2m$/.test(String(it.tipoItem || '')) ? 2 : 1, libres = Combatiente.manosLibres(x), extra = Combatiente.COSTO_LEVANTAR_ARMA;
+  const enManos = Combatiente.equipoPuesto(x).filter(e => Combatiente.vaEnLaMano(e) && e.natural !== true);
+  return new Promise(res => {
+    let listo = false;
+    const fin = v => { if(listo) return; listo = true; AvisoCombate.cerrar(); res(v); };
+    const guardar = {texto: '🎒 Guardarlo', sec: true, detalle: 'lo lleva encima, sin usarlo', alClic: () => fin({equipar: false, soltar: []})};
+    const botones = libres >= necesita ? [{texto: '✋ Sí, en la mano', alClic: () => fin({equipar: true, soltar: []})}, guardar]
+      : [...(necesita === 2 || enManos.length === 1 ? [{texto: `🔁 Reemplazar ${enManos.map(e => e.nombre).join(' y ')} (+${fmt(extra)} No2)`, detalle: 'eso pasa a guardado', alClic: () => fin({equipar: true, soltar: enManos.map(e => e.id)})}]
+        : enManos.map(e => ({texto: `🔁 Reemplazar ${e.nombre} (+${fmt(extra)} No2)`, detalle: `${e.nombre} pasa a guardado`, alClic: () => fin({equipar: true, soltar: [e.id]})}))), guardar];
+    AvisoCombate.mostrar({clave: 'levantar', icono: '🗡️', titulo: `${quien} levanta ${it.nombre}`, botones,
+      pasos: [{titulo: libres >= necesita ? 'Tiene una mano libre' : 'Tiene las manos ocupadas', texto: libres >= necesita ? '¿Lo deja en la mano?' : `¿Lo cambia por lo que tiene en la mano (cuesta ${fmt(extra)} No2 más) o lo guarda?`}],
+      alCerrar: () => fin({equipar: false, soltar: []})});
+  });
+}
+// Lo levantado entra a su equipo: en la mano o guardado; lo que deja la mano, guardado. (Si se puso un arma, ya no está Desarmado.)
+function levantadoAlEquipo(x, it, r){
+  const ids = new Set(r.soltar || []);
+  x.equipo = (Array.isArray(x.equipo) ? x.equipo : []).map(e => e && ids.has(e.id) ? {...e, equipado: false} : e);
+  x.equipo.push({...it, equipado: !!r.equipar});
+  if(r.equipar && Combatiente.esArmaDeMano({...it, equipado: true})){ const des = (x.estados || []).find(Combatiente.esDesarmado); if(des) x.estados = x.estados.filter(e => e !== des); }
+}
 async function bnInvLevantarArma(invId, elId){
   if(!bn || !bn.S || !bnPuedeGuardar()) return;
   const inv = (bn.S.invocaciones || []).find(x => x && x.id === invId);
@@ -298,11 +315,11 @@ async function bnInvLevantarArma(invId, elId){
   const t = tokenDePj(bn.fichaId + SEP_INVOCACION + invId);
   const x = await armaLeer(elId, t);
   if(!x) return;
+  InvCalculo.migrar(inv);   // (con su arma ya hecha ítem, para contar las manos)
+  const r = await levantadoElegirCombatiente(inv, x.it, inv.nombre || 'La invocación');
   const antes = FichaGuardado.partes(bn.S), respaldo = structuredClone({nitros: inv.nitros, estados: inv.estados || [], equipo: inv.equipo || []});
-  inv.nitros = num(inv.nitros) - Combatiente.COSTO_LEVANTAR_ARMA;
-  const des = (inv.estados || []).find(Combatiente.esDesarmado);
-  if(des) inv.estados = inv.estados.filter(e => e !== des);
-  if(!x.propia) inv.equipo = [...(inv.equipo || []), x.it];   // la suya ya la tenía (sus datos); la de otro, al equipo
+  inv.nitros = num(inv.nitros) - Combatiente.COSTO_LEVANTAR_ARMA * (r.soltar.length ? 2 : 1);
+  levantadoAlEquipo(inv, x.it, r);
   bnUi(antes).cambio();
   await bnEsperarGuardado();
   if(!(await armaQuitarDelPiso(elId))){   // se le adelantaron: vuelve todo como estaba
@@ -311,26 +328,25 @@ async function bnInvLevantarArma(invId, elId){
     toast(`Se te adelantaron: ${x.it.nombre} ya no está en el piso`);
     return;
   }
-  mesaLinea(`🗡️ ${inv.nombre} levantó ${x.it.nombre}`);
+  mesaLinea(`🗡️ ${inv.nombre} levantó ${x.it.nombre}${r.equipar ? ' y lo tiene en la mano' : ' (guardado)'}`);
 }
 async function acLevantarArma(elId){
   if(typeof ac === 'undefined' || !ac || !ac.creepId) return;
   await acLevantarArmaDe(ac.creepId, elId);
 }
-// Un creep levanta un arma del piso (desde sus Acciones o con un clic en el mapa): 1 No2; la suya vuelve a tenerla, la de otro va a su equipo.
+// Un creep levanta un arma del piso (desde sus Acciones o con un clic en el mapa): 1 No2 (2 si reemplaza lo que tenía en la mano); a la mano o guardada.
 async function acLevantarArmaDe(creepId, elId){
   const sc0 = typeof creepPrivadoDe === 'function' ? creepPrivadoDe(creepId) : null;
   if(!sc0) return;
   if(num(sc0.nitros) < Combatiente.COSTO_LEVANTAR_ARMA){ toast(`${sc0.nombre}: no le alcanzan los No2 — levantar el arma cuesta 1`); return; }
   const x = await armaLeer(elId, tokenDeCreep(creepId));
   if(!x) return;
+  const r = await levantadoElegirCombatiente(CreepCalculo.normalizar(structuredClone(sc0)), x.it, sc0.nombre || 'El creep');   // (con su arma ya hecha ítem, para contar las manos)
   let respaldo = null;
   await acCambiarCreep(creepId, c => {
     respaldo = structuredClone({nitros: c.nitros, estados: c.estados || [], equipo: c.equipo || []});
-    c.nitros = num(c.nitros) - Combatiente.COSTO_LEVANTAR_ARMA;
-    const des = (c.estados || []).find(Combatiente.esDesarmado);
-    if(des) c.estados = c.estados.filter(e => e !== des);
-    if(!x.propia) c.equipo = [...(c.equipo || []), x.it];
+    c.nitros = num(c.nitros) - Combatiente.COSTO_LEVANTAR_ARMA * (r.soltar.length ? 2 : 1);
+    levantadoAlEquipo(c, x.it, r);
     return {aviso: ''};
   });
   if(!(await armaQuitarDelPiso(elId))){   // se le adelantaron: vuelve todo como estaba
@@ -338,6 +354,6 @@ async function acLevantarArmaDe(creepId, elId){
     toast(`Se te adelantaron: ${x.it.nombre} ya no está en el piso`);
     return;
   }
-  mesaLinea(`🗡️ ${sc0.nombre} levantó ${x.it.nombre}`, 'recordatorio', sc0.nombre);
+  mesaLinea(`🗡️ ${sc0.nombre} levantó ${x.it.nombre}${r.equipar ? ' y lo tiene en la mano' : ' (guardado)'}`, 'recordatorio', sc0.nombre);
   if(typeof ac !== 'undefined' && ac && ac.creepId === creepId && ac.host && !ac.host.hidden && typeof acDibujar === 'function') acDibujar();
 }

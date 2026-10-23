@@ -3,7 +3,7 @@
 > Pedido del dueño (2026-10-22): «vamos a encarar la tarea ardua de unificar el tema de las armas: que tanto para personajes como para creeps e
 > invocaciones (con manos), las armas sean un ítem que se agarra, se suelta, la agarra otro… al igual que escudos y talismanes». Antes (mismo día):
 > «todo lo que tenga manos debería poder usar lo mismo… con una especie de inventario: si levanta un arma, guarda la suya y después las cambia».
-> Cierra P217 y la tarea «🗡 Armas e inventario para creeps e invocaciones» de `pendientes.md`. **Decisiones aprobadas el 2026-10-22; pasos 1 a 3 hechos, sigue el paso 4.**
+> Cierra P217 y la tarea «🗡 Armas e inventario para creeps e invocaciones» de `pendientes.md`. **Decisiones aprobadas el 2026-10-22; pasos 1 a 3 hechos, el 4 en curso (parte A hecha).**
 
 ## Cómo está hoy (relevamiento del 2026-10-22)
 
@@ -85,6 +85,14 @@ pública del creep, que leen los jugadores), se calculan a partir del ítem en l
 4. **Soltar y levantar de verdad:** desarmar (o soltar) saca el ítem de la mano y lo pone en el piso; levantarlo lo mete en la lista de quien lo
    levanta (con la mano libre: «¿Equiparlo?»; con las manos ocupadas: «Reemplazar» o «Guardar», igual que el personaje — el GM elige por el creep).
    Se saca la regla provisoria «solo su dueño». Un creep con su arma guardada y otra en la mano puede cambiarlas (un botón en sus Acciones).
+   **Hecho, parte A (2026-10-22):** desarmar o soltar saca la pieza de verdad del equipo del creep o de la invocación (el arma, o el escudo con
+   que paró: `armaSoltar`, js/27) y la deja en el piso en la forma de un ítem de personaje (`Combatiente.itemComoDePersonaje`: la Defensa adentro
+   de los mods). Cualquiera la levanta (se sacó `puedeLevantarla`, «solo su dueño»). Un creep (el GM) o una invocación eligen dónde va
+   (`levantadoElegirCombatiente`): con la mano libre, «en la mano» o «guardarlo»; con las manos ocupadas, «Reemplazar …» (eso pasa a guardado, 1
+   No2 más) o «guardarlo». Lo guardado (`equipado: false`) no da bonos, no para, no cuenta como talismán ni como varita (`Combatiente.equipoPuesto`,
+   en los bonos, el Parry, los talismanes, las varitas, los orbes, el escudo, la Piedra bezoar), y se suelta igual al morir. Nuevas:
+   `equipoPuesto`, `puestoSinArma`, `equipoGuardado`, `vaEnLaMano`, `manosLibres`, `itemComoDePersonaje`. Falta: el botón para cambiar lo
+   guardado por lo de la mano (paso 7, en los editores) y las armas invocadas (parte B). Pruebas: 563 en verde.
 5. **Desarmado deja de ser un estado** (P217): «sin arma en la mano» se ve en el token y en la ficha y se ataca sin arma (el daño sin arma de P150,
    igual para creeps). Lo natural (garras, colmillos) sigue sin caerse ni poder levantarlo otro.
 6. **El botín usa los ítems tal cual:** lo que el creep tenía (en la mano y guardado, menos lo natural) cae con todas sus mecánicas (varitas,

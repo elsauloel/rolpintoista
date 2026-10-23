@@ -191,6 +191,10 @@
   oso (Común) y quedó con dificultad para detectarla 6, no 1.
 - [ ] **📜 Mínimo de calidad del Efecto especial de un pergamino (2026-10-23)**: la Red Nerubian (Buena) con un Ef.Esp bajo → para soltarse, Fuerza
   contra 8; el Pergamino de luz cegadora tira como mínimo 8. (Está en las pruebas automáticas; falta verlo en el mapa.)
+- [x] **🕸 La telaraña y la red, a la vista (2026-10-23), probado en el mapa con capturas**: la Red (copia vieja de un creep, sin el dato: la
+  reconoció por el nombre) dejó la red de soga sobre juan; la Tela de araña, la telaraña sobre Clementino; al soltarse (Fuerza 4 contra 1, al
+  empezar su turno) se fue sola. En el piso, la Red de caza y la Telaraña oculta llevan su dibujo encima de la ficha del cepo. El rebote, cada 3,6 s.
+  (Ojo: una pantalla abierta con el código viejo aplica el estado sin el dato; se arregla sola al recargar.)
 - [ ] **🪤 Trampas mágicas: evitarlas o soltarse contra el Ef.Esp de quien la puso (2026-10-23)**: con un Ef.Esp bajo, el número de la tabla (Runa de
   silencio, Res.Mt contra 9); con uno alto, el suyo. **Desde el mismo día, todo 7-9-11**: detectar, soltarse y el mínimo de los pergaminos (la Red, 9). La Arena movediza ahora se suelta contra 9. (En las pruebas automáticas; falta el mapa.)
 - [x] (2026-10-23, Claude, «Claude · pruebas», con 🎮 el control de juan: Finalizar combate con el Goblin 3 caído → Publicar → juan reclamó la Varita arcana → Despojar; le llegó a la mochila con el mismo poder que la del catálogo, +20 XP, +5 DDE y +19 despojos; control devuelto) **🎒 Botín con los ítems tal cual** (2026-10-22, paso 6 de `docs/plan-inventario-creeps.md`): en un fin de combate real, que un jugador se

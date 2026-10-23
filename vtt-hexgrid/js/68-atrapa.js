@@ -31,16 +31,20 @@ function atrapaRebote(semilla){
 }
 
 // Dibuja la telaraña o la red centrada en (x, y). `o.suelo`: más tenue (la del piso).
+// Encima del token es un poco más grande que el hexágono y sin recortar (dueño, 2026-10-23: «que no solo cubra el token, sino que lo exceda un
+// poquito, que se vean los bordes»): asoman las puntas de los hilos y el borde desparejo de la red. En el piso queda dentro de su casilla.
+const ATRAPA_EXCEDE = 1.22;
 function dibujarAtrapa(tipo, x, y, rad, z, semilla, o = {}){
+  const R = o.suelo ? rad : rad * ATRAPA_EXCEDE;
   const reb = atrapaRebote(semilla) * rad;
   // Cada punto se corre hacia abajo según lo lejos que esté del borde: el centro se mueve, los bordes no.
-  const mover = (px, py) => { const d = Math.hypot(px - x, py - y) / rad; return [px, py + reb * Math.max(0, 1 - d)]; };
+  const mover = (px, py) => { const d = Math.hypot(px - x, py - y) / R; return [px, py + reb * Math.max(0, 1 - d)]; };
   const alfa = o.suelo ? 0.85 : 1;
   ctx.save();
-  trazarPuntos(verticesHex(x, y, rad)); ctx.clip();
+  if(o.suelo){ trazarPuntos(verticesHex(x, y, rad)); ctx.clip(); }
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-  if(tipo === 'red') redDeSoga(x, y, rad, z, semilla, mover, alfa);
-  else telarana(x, y, rad, z, semilla, mover, alfa);
+  if(tipo === 'red') redDeSoga(x, y, R, z, semilla, mover, alfa);
+  else telarana(x, y, R, z, semilla, mover, alfa, !o.suelo);
   ctx.restore();
 }
 // Un trazo con su contorno oscuro debajo, para que se lea sobre cualquier ilustración.
@@ -50,10 +54,10 @@ function atrapaTrazo(trazar, claro, oscuro, ancho, z){
 }
 
 // 🕸 Telaraña: hilos que salen del centro y anillos que los cruzan, combados hacia adentro.
-function telarana(x, y, rad, z, semilla, mover, alfa){
+function telarana(x, y, rad, z, semilla, mover, alfa, suelta){   // suelta: sin recorte, los hilos terminan a la vista, cada uno a su largo
   const RAYOS = 9, ANILLOS = 5, giro = atrapaAzar(semilla, 1) * Math.PI * 2;
   const ang = [...Array(RAYOS)].map((_, i) => giro + (i + (atrapaAzar(semilla, 10 + i) - 0.5) * 0.35) * Math.PI * 2 / RAYOS);
-  const largo = ang.map((_, i) => rad * (1.05 + 0.15 * atrapaAzar(semilla, 30 + i)));
+  const largo = ang.map((_, i) => rad * (suelta ? 0.86 + 0.16 * atrapaAzar(semilla, 30 + i) : 1.05 + 0.15 * atrapaAzar(semilla, 30 + i)));
   const punto = (i, r) => mover(x + Math.cos(ang[i]) * r, y + Math.sin(ang[i]) * r);
   const [cx, cy] = mover(x, y);
   const claro = `rgba(238,240,248,${0.85 * alfa})`, oscuro = `rgba(20,18,26,${0.32 * alfa})`;

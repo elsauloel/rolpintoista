@@ -325,6 +325,14 @@
 > - [ ] Ballestas, tanda con mapa: rasgos «llega cargada», «apuntada», «a quemarropa» (hoy con la distancia ideal), «atraviesa escudos», ballesta
 >   de muralla; virotes explosivo, de humo, de luz, de clavo y de rebote; el garfio con soga como utilería de la Talabartería
 >   ([`ideas-ballestas.md`](ideas-ballestas.md)). La silenciosa espera al sigilo (P184).
+> - [ ] **☁ Trabajar sin depender de la compu (reevaluar)** (dueño, 2026-10-23: «me gustaría en algún momento reevaluar que todo quede subido
+>   online para no depender de que mi computadora esté desbloqueada… como hoy tengo mi proyecto de Mestiza todo online y puedo tener la
+>   computadora apagada y seguir trabajando desde el teléfono. Todavía no entiendo a fondo las implicancias, si me va a limitar el desarrollo»).
+>   Es el mismo objetivo del plan [`plan-trabajo-remoto.md`](plan-trabajo-remoto.md) y del punto de abajo (🚀). Cuando el dueño lo retome,
+>   antes de empezar explicarle en criollo qué cambia y qué se pierde: hoy las pruebas en el mapa se hacen con Chrome en su compu (la sesión
+>   de Firebase de Claude); en la nube no hay un navegador con su sesión, así que las pruebas en el mapa quedarían para cuando la compu esté
+>   prendida o para un emulador; y los cambios grandes pasarían a ramas con vista previa.
+
 > - [ ] **🚀 Publicar con Firebase Hosting desde GitHub, con vistas previas (dueño, 2026-10-12: «eventualmente voy a querer configurar
 >   publicación automática de Firebase Hosting desde GitHub con `firebase init hosting:github`, con vistas previas para las ramas, y te voy a
 >   pedir que me guíes paso a paso»).** No empezar sin que lo pida; cuando lo pida, guiarlo **de a un paso, sin jerga**. **El plan completo

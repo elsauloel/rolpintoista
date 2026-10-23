@@ -66,6 +66,13 @@
 >   **Mientras tanto (provisorio):** un arma que se cayó la levanta solo su dueño (vtt-hexgrid/js/27, `puedeLevantarla`), y una flecha que
 >   erró es de quien la tiró; lo que no tiene dueño conocido lo levanta cualquiera. Al hacerlo, sacar esa regla.
 
+> - [ ] **🏹 Revisar los arcos Tipo 6** (2026-10-23, dueño: «los arcos tipo 6, dejémoslo como pendiente, a revisar»). Hoy hay dos familias de
+>   arco (decisión del 2026-10-09, `docs/rework-armas-rango.md` §«Arcos Tipo 4 y Tipo 6» y `docs/balance-combate.md`): Tipo 4, el liviano (todos
+>   los Comunes), y Tipo 6, el largo (10 en el catálogo, de Buena Calidad para arriba: Arco largo de tejo, Arco largo de cazador, Arco de la ciénaga,
+>   Arco del rastreador de bestias, Arco de guerra, Arco del ciervo blanco, Arco del cazador de víboras, Arco compuesto élfico, Arco del cazador de
+>   eclipses…). El dueño dudó al ver el arco Tipo 6 de la Bruja («los arcos son tipo 4»). Revisar con él si siguen las dos familias o todos pasan a
+>   Tipo 4 (y entonces rebalancear esos 10 con daño fijo o más dados, como la escalera del Tipo 4).
+
 > - [ ] **🧹 Quitar la lectura de los datos viejos del arma** (2026-10-23, dueño: «anotá como pendiente quitar los datos viejos, para que en
 >   algún tiempo, cuando te diga que queda pendiente, si es un buen momento, se quitan»). **No hacerlo hasta que el dueño lo pida.** Tras el
 >   paso 8 de `docs/plan-inventario-creeps.md` queda a propósito un solo lugar que entiende el arma guardada con los campos sueltos de antes

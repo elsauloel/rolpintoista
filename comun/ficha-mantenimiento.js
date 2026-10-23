@@ -109,6 +109,8 @@ const FichaMantenimiento = (() => {
     const hpAntes = num(S.hp);
     // SP Regen AL PRINCIPIO, con los números de antes de que venza o cambie ningún estado.
     const {spRegen, spRecuperado} = regenerarSp(S, c, rep);
+    // 🛡 Aguante (sin orden de turnos): los golpes pasan a su próximo ataque y el estado se va (como el turno propio).
+    if(aguanteAlEmpezar(S, rep)) S.efectos = (S.efectos || []).filter(e => !(e && e.aguante));
     // Lo que hacen los estados (escudo, daño/cura con inmunidades, stacks, turnos): la regla común de comun/combatiente.js.
     const turnoEst = Combatiente.pasarTurnoEstados(S.efectos, {hp: 'hpturno', stacks: 'stacksturno', resFuego: num(c.final.resfuego)});
     Combatiente.reporteTurno(turnoEst.eventos).forEach(l => { rep.push(l); log.push(esc(l)); });
@@ -190,6 +192,7 @@ const FichaMantenimiento = (() => {
       if(m){ S.spGastado = num(S.spGastado) - m; rep.push(`SP: +${fmt(m)} (Meditar: no se movió)`); }
     }
     if(Number.isFinite(paso)) S.inicioPaso = paso;
+    aguanteAlEmpezar(S, rep);   // 🛡 antes de que el estado se vaya (alEmpezarTurno)
     const v = Combatiente.vencerAlEmpezar(S.efectos); S.efectos = v.quedan;   // Titilando se va al empezar su turno
     // P177: al empezar, primero bajan los turnos de sus estados y después pega lo que sigue (empezarTurnoEstados).
     const d = Combatiente.empezarTurnoEstados(S.efectos, {hp: 'hpturno', stacks: 'stacksturno', resFuego: num(c.final.resfuego)});
@@ -208,6 +211,15 @@ const FichaMantenimiento = (() => {
     (S.invocaciones || []).forEach(inv => { if(inv && inv.activa !== false && !sin.has(inv.id)){ inv.finTurnoEn = turno; invInicio(inv).forEach(l => rep.push(`${inv.nombre}: ${l}`)); } });
     const robos = robosNotar(S);
     return {rep, nombre: ((S.meta && S.meta.nombre) || '').trim(), avisos: (S.efectos || []).filter(e => e.popup && e.activo !== false), ...(robos.length ? {robos} : {})};
+  }
+  /* 🛡 Aguante (Tanque, 2026-10-23; el de los creeps, 2026-10-21): al empezar su turno, los golpes que contó el estado pasan a `S.aguanteListo` (su
+     primer ataque de este turno suma +1 dado por golpe, hasta su nivel + 1: vtt-hexgrid/js/56); al terminar el turno sin atacar, se pierde.
+     → true si tenía el estado. */
+  function aguanteAlEmpezar(S, rep){
+    const ag = (S.efectos || []).find(e => e && e.activo !== false && e.aguante);
+    S.aguanteListo = ag ? Math.max(0, Math.round(num(ag.golpes))) : 0;
+    if(ag) rep.push(S.aguanteListo ? `🛡 Aguante: recibió ${S.aguanteListo} golpe${S.aguanteListo === 1 ? '' : 's'} — su primer ataque de este turno suma dados` : '🛡 Aguante: no recibió golpes');
+    return !!ag;
   }
   // 🫳 Lo que le robaron en sigilo (2026-10-14, dueño): «al principio de su próximo turno siente el cinturón más liviano y se da cuenta de que le
   // falta tal objeto». Devuelve los nombres y los saca de la lista.
@@ -229,6 +241,7 @@ const FichaMantenimiento = (() => {
     S.finTurnoClave = clave; S.finTurnoEn = turno;
     const c = FichaCalculo.calcular(S);
     Combatiente.terminarTurnoEstados(S.efectos);   // P177: los turnos ya no bajan acá (bajan al empezar el próximo); lo recién puesto deja de serlo
+    if(num(S.aguanteListo) > 0) S.aguanteListo = 0;   // 🛡 si no atacó en su turno, perdió el aguante (como los creeps)
     const rep = [];
     (S.invocaciones || []).forEach(inv => { if(inv && inv.activa !== false && !sin.has(inv.id)){ inv.finTurnoEn = turno; invFin(inv).forEach(l => rep.push(`${inv.nombre}: ${l}`)); } });
     // Calma (anillo, 2026-10-06): si no atacó en su turno, al terminarlo recupera No2 (sin pasar del máximo).

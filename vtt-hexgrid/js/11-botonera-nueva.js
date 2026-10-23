@@ -111,7 +111,7 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261023p8a', '../comun/ficha-botin.js?v=20261022p', '../comun/generador-tiendas.js?v=20261022q', '../comun/filtro-catalogo.js?v=20261022q', '../comun/ficha-tienda.js?v=20261022k', '../comun/ficha-mantenimiento.js?v=20261020n', '../comun/ficha-calculo.js?v=20261021z', '../comun/ficha-combate.js?v=20261015d', '../comun/skills-clase.js?v=20261022u', '../comun/ficha-habilidades.js?v=20261020q',
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261023p8a', '../comun/ficha-botin.js?v=20261022p', '../comun/generador-tiendas.js?v=20261022q', '../comun/filtro-catalogo.js?v=20261022q', '../comun/ficha-tienda.js?v=20261022k', '../comun/ficha-mantenimiento.js?v=20261023ag', '../comun/ficha-calculo.js?v=20261021z', '../comun/ficha-combate.js?v=20261015d', '../comun/skills-clase.js?v=20261023ag', '../comun/ficha-habilidades.js?v=20261020q',
   '../comun/catalogo.js?v=20261023ie', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261023p8a', '../comun/ficha-sesion.js?v=20261020zu', '../comun/ficha-botonera.js?v=20261023p8a', '../comun/ficha-resumen.js?v=20261023p8b', '../comun/inv-calculo.js?v=20261023p8a', '../comun/inv-botonera.js?v=20261023p8a', '../comun/inv-acciones.js?v=20261023p8a', '../comun/inv-duelo.js?v=20261023p8a', '../comun/ficha-acciones.js?v=20261023p8a', '../comun/inv-habilidades.js?v=20261023p8a', '../comun/inv-lupa.js?v=20261015a',
   '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261022s', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261014e'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
@@ -689,6 +689,7 @@ function bnTensar(costo){
 }
 function bnAtacar(tipo, armaId, flechaId){
   const S = bn.S, arma = S.inventario.find(x => x.id === armaId) || null;
+  if(tipo === 'normal' && flechaId === undefined && num(S.aguanteListo) > 0 && typeof aguanteAtacarPj === 'function'){ aguanteAtacarPj(arma); return; }   // 🛡 modo aguante (js/56, 2026-10-23)
   // Las flechas (arco) o los virotes (ballesta) del carcaj que le sirven a esta arma (Combatiente.sirveLaMunicion, 2026-10-10).
   const flechas = tipo === 'normal' && Combatiente.municionDe(arma) && typeof FichaEquipo.flechasDelCarcaj === 'function' ? FichaEquipo.flechasDelCarcaj(S).filter(f => Combatiente.sirveLaMunicion(arma, f)) : [];
   if(flechaId === undefined && flechas.length && typeof Duelo !== 'undefined' && Duelo.disponible()){ bnElegirFlecha(arma, flechas, id => bnAtacar(tipo, armaId, id)); return; }

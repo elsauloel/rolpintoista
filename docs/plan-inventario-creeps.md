@@ -92,7 +92,16 @@ pública del creep, que leen los jugadores), se calculan a partir del ítem en l
    No2 más) o «guardarlo». Lo guardado (`equipado: false`) no da bonos, no para, no cuenta como talismán ni como varita (`Combatiente.equipoPuesto`,
    en los bonos, el Parry, los talismanes, las varitas, los orbes, el escudo, la Piedra bezoar), y se suelta igual al morir. Nuevas:
    `equipoPuesto`, `puestoSinArma`, `equipoGuardado`, `vaEnLaMano`, `manosLibres`, `itemComoDePersonaje`. Falta: el botón para cambiar lo
-   guardado por lo de la mano (paso 7, en los editores) y las armas invocadas (parte B). Pruebas: 563 en verde.
+   guardado por lo de la mano (paso 7, en los editores). Pruebas: 563 en verde.
+   **Hecho, parte B (2026-10-22): las armas invocadas (D7).** Lo que una invocación trae puesto es suyo (`invocada: true`, lo marca
+   `InvCalculo.migrar`; lo que levantó del piso, `invocada: false`). Si se le cae (`armaSoltar`), la pieza recuerda de qué invocación es
+   (`invocadaDe` = "fichaId~invId", `invocadaNombre`) y la puede levantar y usar cualquiera; si la levanta su propia invocación, vuelve a ser suya.
+   `vtt-hexgrid/js/67-armas-invocadas.js` revisa cada 3 s: si su invocación ya no está en el mapa, se durmió o terminó el combate (modo
+   narrativo) — con 5 s de margen, para que cargar el mapa no la borre —, se desvanece de donde esté: del piso y de un creep (el GM) o de un
+   personaje y sus invocaciones (quien lo maneja, con su Botonera abierta). Lo anuncia en la Mesa («✨ … se desvanece»). Nunca va al botín
+   (`CombateFin.itemsDeCreep`). Probado en «Claude · pruebas»: la Daga del Lobo (vivo) quedó en el piso; la de una invocación ausente se
+   desvaneció del piso y de las manos del Goblin 2; al pasar a narrativo, se desvaneció la del Lobo. Pruebas: 564 en verde.
+   Ojo: una invocación caída (vida 0) pero no dormida conserva sus armas invocadas mientras siga su token.
 5. **Desarmado deja de ser un estado** (P217): «sin arma en la mano» se ve en el token y en la ficha y se ataca sin arma (el daño sin arma de P150,
    igual para creeps). Lo natural (garras, colmillos) sigue sin caerse ni poder levantarlo otro.
 6. **El botín usa los ítems tal cual:** lo que el creep tenía (en la mano y guardado, menos lo natural) cae con todas sus mecánicas (varitas,

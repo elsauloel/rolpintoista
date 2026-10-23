@@ -94,8 +94,10 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
-> - [ ] **🗡 Íconos distintos para cada arma en el piso (2026-10-23, dueño: «poner íconos distintos para distintas armas cuando se desarma
->   alguien»):** hoy el arma que queda en el mapa al desarmar se dibuja siempre con 🗡️ (o 🏹 si es una flecha; `armaDibujar`,
+> - [x] **🗡 Íconos distintos para cada arma en el piso (2026-10-23, dueño: «poner íconos distintos para distintas armas cuando se desarma
+>   alguien»): HECHO el mismo día** (`iconoDeItem` en vtt-hexgrid/js/27, probado en el mapa con un desarme real). Quedó: 🗡️ Tipo 4 y 6 ·
+>   🪓 Tipo 8 · 🔨 Tipo 10 · 💣 Tipo 12 · 🛡️ escudos · 🔮 talismanes y orbes · 🏹 arcos y ballestas · 🪶 flechas y virotes especiales
+>   (provisorio, el dueño pidió buscar alternativas) · 🪄 varitas y báculos · 🪨 honda. Lo de abajo era la propuesta: hoy el arma que queda en el mapa al desarmar se dibuja siempre con 🗡️ (o 🏹 si es una flecha; `armaDibujar`,
 >   vtt-hexgrid/js/27). Que el ícono diga qué es (dueño, el mismo día): Tipo 4 🗡️ daga · Tipo 6 espada (no hay emoji de una espada sola:
 >   ⚔️ o dibujarla) · Tipo 8 🪓 · Tipo 10 🔨 · escudo 🛡️ · talismán/orbe 🔮 (o 🧿 / 🪬) · arco 🏹 · ballesta (no hay emoji: dibujarla a mano,
 >   como el cepo de las trampas) · varita/báculo 🪄 · honda 🪨 (no hay emoji de honda). Primero lo que es (arco, ballesta, honda, escudo,

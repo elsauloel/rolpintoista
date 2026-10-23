@@ -7,8 +7,8 @@
    - La zona: una zona persistente con `zonaEstado` = {cura: '4', pulsos: 4} (sin campos ni reglas nuevas; `cura`: un número o una fórmula). Cada
      pulso se anota en `zonaResueltos` («cura@<momento>», un renglón: lo deja cualquiera), así no cura dos veces en el mismo momento. El motor de
      siempre la saltea (js/08).
-   - El aura: el estado «Aura sanadora» (radio AURA_CURA_RADIO) de un creep; los pulsos se anotan en el propio estado (`pulsos`). Mientras dura, el
-     token lleva el aura verde dibujada (`t.aura`), y se la saca al terminar. */
+   - El aura: el estado «Aura sanadora» (radio AURA_CURA_RADIO) de un creep; los pulsos se anotan en el propio estado (`pulsos`). Se ve como una mancha
+     verde con chispitas alrededor del token (abajo). */
 const AURA_CURA_NOMBRE = 'Aura sanadora', AURA_CURA_RADIO = 5, AURA_CURA = '4', AURA_CURA_PULSOS = 4, AURA_CURA_COLOR = '#7CD992';
 // La curación de una zona (o null).
 function zonaCuraDe(el){
@@ -73,8 +73,8 @@ async function auraCuraRevisar(tokenId, t){
   const sc = creepPrivadoDe(t.fichaId);
   const est = sc && (sc.estados || []).find(e => e && e.activo !== false && e.nombre === AURA_CURA_NOMBRE);
   const color = t.aura && t.aura.color;
-  if(!est){ if(color === AURA_CURA_COLOR) editarTokenCallado(tokenId, {aura: firebase.firestore.FieldValue.delete()}); return; }
-  if(color !== AURA_CURA_COLOR) editarTokenCallado(tokenId, {aura: {radio: AURA_CURA_RADIO, forma: 'hex', color: AURA_CURA_COLOR}});
+  if(color === AURA_CURA_COLOR) editarTokenCallado(tokenId, {aura: firebase.firestore.FieldValue.delete()});   // (la primera versión la dibujaba con t.aura: se limpia)
+  if(!est) return;
   const hechos = Array.isArray(est.pulsos) ? est.pulsos : [], mant = curaMomento(hechos, tokenId);
   if(!mant || hechos.includes(mant) || hechos.length >= AURA_CURA_PULSOS) return;
   let nro = 0;
@@ -104,55 +104,75 @@ setInterval(async () => {
   curacionRevisando = false;
 }, 1500);
 
-/* 🫧 Las burbujitas verdes (dueño, 2026-10-23: «las curaciones en área por turno pueden tener una animación de algo verde con burbujitas»): la zona
-   de curación y el aura sanadora, mientras duran, tienen burbujas que suben en cada casilla (todas las pantallas; desde js/05). Al curar, sobre cada
-   uno que se curó suben unas cuantas más, un momento (`curaBurbujas`, en la pantalla que cura). */
+/* ✨ Cómo se ve (dueño, 2026-10-23: primero «algo verde con burbujitas»; después «en vez de burbujas, chispitas, como si fueran desde abajo hacia
+   arriba, y que el borde no sea filoso hexagonal, sino un poquito irregular, suave y ondulado»). La zona de curación y el aura sanadora son una mancha
+   verde suave de borde ondulado (`trazarManchon`, js/50, como las nubes; sin el contorno de los hexágonos) con chispitas que suben y se apagan. La zona
+   se dibuja en lugar del relleno de siempre (js/05 la trata como una superficie, sin borde); el aura, debajo de los tokens. Al curar, sobre cada uno que
+   se curó suben unas chispitas de más, un momento (`curaBurbujas`, en la pantalla que cura). */
 const curaRand = (a, b) => { const x = Math.sin(a * 91.7 + b * 37.3) * 43758.5453; return x - Math.floor(x); };
-function curaBurbujasEn(x, y, rad, z, semilla, n, fuerza){
+// Una chispita: una estrellita de cuatro puntas con brillo.
+function curaChispa(x, y, r, a, z){
+  ctx.beginPath();
+  ctx.moveTo(x, y - r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.quadraticCurveTo(x, y, x, y + r); ctx.quadraticCurveTo(x, y, x - r, y); ctx.quadraticCurveTo(x, y, x, y - r);
+  ctx.fillStyle = `rgba(225,255,215,${a})`; ctx.fill();
+  ctx.beginPath(); ctx.arc(x, y, r * 0.45, 0, Math.PI * 2); ctx.fillStyle = `rgba(150,240,160,${a * 0.5})`; ctx.fill();
+}
+// Chispitas que suben desde abajo de la casilla (x, y) hacia arriba, cada una a su ritmo, y se apagan al llegar.
+function curaChispasEn(x, y, rad, z, semilla, n, fuerza){
   const now = performance.now() / 1000;
   ctx.save();
+  ctx.shadowColor = 'rgba(140,255,160,.9)'; ctx.shadowBlur = 6 / z;
   for(let i = 0; i < n; i++){
-    const vel = 0.35 + 0.35 * curaRand(semilla, i), fase = (now * vel + curaRand(semilla, i + 20)) % 1;
-    const bx = x + (curaRand(semilla, i + 40) - 0.5) * rad * 1.4 + Math.sin((now + i) * 2) * rad * 0.05;
-    const by = y + rad * 0.6 - fase * rad * 1.3;
-    const r = rad * (0.05 + 0.06 * curaRand(semilla, i + 60)) * (0.6 + 0.4 * fase);
-    const a = Math.sin(fase * Math.PI) * 0.75 * fuerza;
-    ctx.beginPath(); ctx.arc(bx, by, r, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(140,235,160,${0.25 * a})`; ctx.fill();
-    ctx.strokeStyle = `rgba(190,255,200,${a})`; ctx.lineWidth = 1.1 / z; ctx.stroke();
-    ctx.beginPath(); ctx.arc(bx - r * 0.35, by - r * 0.35, r * 0.25, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(255,255,255,${0.7 * a})`; ctx.fill();
+    const vel = 0.25 + 0.3 * curaRand(semilla, i), fase = (now * vel + curaRand(semilla, i + 20)) % 1;
+    const cx = x + (curaRand(semilla, i + 40) - 0.5) * rad * 1.5 + Math.sin((now + i * 1.7) * 1.6) * rad * 0.06;
+    const cy = y + rad * 0.75 - fase * rad * 1.6;
+    const r = rad * (0.05 + 0.05 * curaRand(semilla, i + 60)) * (1 - 0.4 * fase);
+    const titila = 0.6 + 0.4 * Math.sin(now * 9 + i * 2.3);
+    curaChispa(cx, cy, r, Math.sin(fase * Math.PI) * 0.9 * fuerza * titila, z);
   }
   ctx.restore();
 }
-// La zona: un brillo verde que respira y burbujas en cada casilla.
-// (Con resguardo: un adorno que falla no puede cortar el dibujo del mapa — 2026-10-23, la primera versión usaba `trazarCeldas`, que es local de
-// dibujarLienzo, y dejaba el mapa sin tokens.)
+// La mancha verde suave, de borde ondulado, que respira.
+function curaMancha(celdas){
+  const p = 0.5 + 0.5 * Math.sin(performance.now() / 900);
+  ctx.save();
+  ctx.filter = `blur(${Math.max(1.5, HEX * 0.18 * vista.zoom * (typeof dpr === 'number' ? dpr : 1)).toFixed(1)}px)`;
+  trazarManchon(celdas, {radio: [0.5, 0.35], sale: [0, 0.35]});
+  ctx.fillStyle = `rgba(110,225,140,${0.20 + 0.07 * p})`; ctx.fill();
+  ctx.restore();
+}
+// La zona (desde js/05, como una superficie: sin el relleno ni el borde de siempre). → {anima, sinBorde}
 function curaDibujarZona(el, celdas, z){
   try{
-    const p = 0.5 + 0.5 * Math.sin(performance.now() / 700);
-    ctx.save();
-    celdas.forEach(c => { const q = hexCentro(c.col, c.fila); trazarPuntos(verticesHex(q.x, q.y, HEX)); ctx.fillStyle = `rgba(110,220,140,${0.10 + 0.08 * p})`; ctx.fill(); });
-    ctx.restore();
-    celdas.forEach(c => { const q = hexCentro(c.col, c.fila); curaBurbujasEn(q.x, q.y, HEX * 0.9, z, c.col * 13 + c.fila * 7, 3, 1); });
-  }catch(err){ try{ ctx.restore(); }catch(e){} console.error('Las burbujas de la zona:', err); }
+    curaMancha(celdas);
+    celdas.forEach(c => { const q = hexCentro(c.col, c.fila); curaChispasEn(q.x, q.y, HEX * 0.9, z, c.col * 13 + c.fila * 7, 2, 1); });
+  }catch(err){ try{ ctx.restore(); }catch(e){} console.error('Las chispas de la zona:', err); }
+  return {anima: true, sinBorde: true};
 }
-// El aura: burbujas en las casillas alrededor del token (hasta AURA_CURA_RADIO).
+// El aura: la misma mancha en las casillas alrededor del token (hasta AURA_CURA_RADIO), debajo de los tokens.
 const curaOffsetsAura = (() => { const out = []; for(let dq = -AURA_CURA_RADIO; dq <= AURA_CURA_RADIO; dq++) for(let dr = -AURA_CURA_RADIO; dr <= AURA_CURA_RADIO; dr++) if(Math.max(Math.abs(dq), Math.abs(dr), Math.abs(dq + dr)) <= AURA_CURA_RADIO) out.push([dq, dr]); return out; })();
 function curaDibujarAura(t, z){
   try{
     const c0 = hexACubo({col: t.col, fila: t.fila});
-    curaOffsetsAura.forEach(([dq, dr]) => { const col = cuboACol(c0.q + dq, c0.r + dr), fila = cuboAFila(c0.q + dq, c0.r + dr), q = hexCentro(col, fila); curaBurbujasEn(q.x, q.y, HEX * 0.9, z, col * 13 + fila * 7, 1, 0.8); });
-  }catch(err){ console.error('Las burbujas del aura:', err); }
+    const celdas = curaOffsetsAura.map(([dq, dr]) => ({col: cuboACol(c0.q + dq, c0.r + dr), fila: cuboAFila(c0.q + dq, c0.r + dr)}));
+    curaMancha(celdas);
+    celdas.forEach(c => { const q = hexCentro(c.col, c.fila); curaChispasEn(q.x, q.y, HEX * 0.9, z, c.col * 13 + c.fila * 7, 1, 0.8); });
+  }catch(err){ try{ ctx.restore(); }catch(e){} console.error('Las chispas del aura:', err); }
 }
 const auraCuraEnEstados = est => !!(est && Array.isArray(est.estados) && est.estados.some(e => e && e.activo !== false && e.nombre === AURA_CURA_NOMBRE));
-// Al curar: un ratito de burbujas de más sobre cada uno que se curó (en esta pantalla).
+// Las auras sanadoras que se ven, debajo de los tokens (desde js/05). → true si hay que seguir animando.
+function curaDibujarAuras(z){
+  let hay = false;
+  tokens.forEach(t => { if((t.oculto && !soyGM) || !auraCuraEnEstados(estadoDe(t))) return; curaDibujarAura(t, z); hay = true; });
+  return hay;
+}
+// Al curar: un ratito de chispitas de más sobre cada uno que se curó (en esta pantalla).
 const curaDestellos = new Map();   // tokenId → hasta cuándo
 function curaBurbujas(lista){ const hasta = performance.now() + 1800; (lista || []).forEach(([id]) => curaDestellos.set(id, hasta)); try{ pedirDibujo(); }catch(e){} }
 function curaDibujarDestello(id, x, y, rad, z){
   const h = curaDestellos.get(id);
   if(!h) return false;
   if(performance.now() > h){ curaDestellos.delete(id); return false; }
-  curaBurbujasEn(x, y, rad, z, id.length * 3, 10, 1);
+  curaChispasEn(x, y, rad, z, id.length * 3, 8, 1);
   return true;
 }

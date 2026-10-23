@@ -230,6 +230,13 @@
   de su arma; **un cuarto o menos, +3**; si no, un ataque común. Mesa y Crónica. Lo de un ataque y **2 SP**, o cooldown 3. **Golpe de gracia** («el golpe
   más fuerte que sabe dar») queda aparte, a revisar con el concepto 1. **Para probar.**
 
+- ✅ **¡A la carga!** y **Arenga** (Support, «grito de guerra», 2026-10-23, dueño: «vamos a hacer dos: uno +2 a todo lo ofensivo, cuatro casilleros, dos
+  turnos; y uno +1 a todo, ofensivo y defensivo, como el Bendecido, cuatro casilleros, tres turnos»). Síntesis de los cuatro gritos de los creeps de «El
+  origen» — Aullido de la manada, ¡Por el amo! y ¡A laburar! (los tres: Bendecido 2 turnos a 3 casillas) y Marca del amo (+1 PdG y Crítico frecuente +1, a 4)
+  — y de los dos de fábrica a mano (Aullido de manada, Grito de ánimo: +2 de daño). Los seis salieron del pool; en la partida los creeps conservan sus
+  copias. **¡A la carga!**: a sus aliados a 4 o menos (no él), +2 a la PdG, PdG.Esp, daño y Ef.Esp, 2 turnos; **2 No2 y 3 SP**, o cooldown 3. **Arenga**:
+  Bendecido 3 turnos a los mismos; **1 No2 y 2 SP**, o cooldown 3. No se apilan (otro igual renueva los turnos). Los costos los propuso Claude. **Para probar.**
+
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 
 ## Etiquetas

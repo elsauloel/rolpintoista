@@ -30,7 +30,7 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 4**: daño en área, rayo en cadena · de El origen: proyectil, fuego con quemadura.
 - 🧿 **Debuffer — 5**: control mental, maleficio · de El origen: ceguera, veneno, inmovilizar.
-- 💚 **Support — 4**: arma elemental · de El origen: curación, grito de grupo, escudo a un aliado.
+- 💚 **Support — 4**: arma elemental, grito de guerra (¡A la carga! y Arenga, de fábrica desde el 2026-10-23) · de El origen: curación, escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
 **Para emparejar, los que van primero**: Mago y Support (4), después Debuffer (5).
@@ -265,7 +265,8 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
 **Espejo** (los dos, como buffs de support). Ya cubierto: ✅ **Arma elemental** (concepto 3, 2026-10-21: Arma ígnea, helada, eléctrica, ácida y venenosa).
 
 **A. Potenciar el golpe de los aliados** ✦
-1. **Grito de guerra**: los aliados cercanos pegan más fuerte unos turnos (hoy Aullido de manada, Grito de ánimo, a mano).
+1. ✅ **Grito de guerra** (2026-10-23): **¡A la carga!** (+2 a la PdG, PdG.Esp, daño y Ef.Esp, 2 turnos) y **Arenga** (Bendecido, +1 a todo, 3 turnos),
+   a los aliados a 4 casillas o menos. Síntesis de los cuatro gritos de «El origen» y de los dos de fábrica a mano, que salieron del pool.
 2. **Bendecir el arma**: el próximo golpe de un aliado suma un dado.
 3. ✅ **Arma elemental**: el arma de un aliado pega de fuego, hielo o rayo por unos turnos — **Arma ígnea / helada / eléctrica / ácida / venenosa**
    (2026-10-21: +1d4 del elemento por golpe, 3 turnos, y lo de la Carga Elemental).

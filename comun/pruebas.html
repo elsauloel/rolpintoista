@@ -4866,12 +4866,19 @@ prueba('🗡 Remate / Ir por el herido (2026-10-23, escalonado): +2 dados con la
   igual([[1, 0.6, 0.5, 0.3, 0.25, 0.1, 0, null].map(Combatiente.remateDados), !!(a && a.remate), !!b, !!(b && b.duelo && b.duelo.remate), HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Remate').etiquetas.includes('auditada')],
     [[0, 0, 2, 2, 3, 3, 0, 0], true, true, true, true]);
 });
-prueba('🌱 Las habilidades de los creeps de «El origen» entre las de fábrica (2026-10-23): 60, sin auditar, con su rol y su concepto; se copian tal cual; las que chocan, con «(El origen)»', () => {
+prueba('🌱 Las habilidades de los creeps de «El origen» entre las de fábrica (2026-10-23): 56 (los gritos se sintetizaron), sin auditar, con su rol y su concepto; se copian tal cual; las que chocan, con «(El origen)»', () => {
   const o = HABILIDADES_CREEP_BASE.filter(e => e.etiquetas.includes('de El origen'));
   const h = armarHabilidadDeCreep(o.find(e => e.nombre === '¡Tu vieeeja!').datos, 7);
   igual([o.length, o.every(e => e.etiquetas.includes('sin auditar') && e.rol && e.concepto), h.nombre, !!h.duelo, o.some(e => e.nombre === 'Mal de ojo (El origen)'),
     HABILIDADES_CREEP_BASE.filter(e => e.nombre === 'Mal de ojo').length, new Set(HABILIDADES_CREEP_BASE.map(e => e.poolId)).size === HABILIDADES_CREEP_BASE.length],
-    [60, true, '¡Tu vieeeja!', true, true, 1, true]);
+    [56, true, '¡Tu vieeeja!', true, true, 1, true]);
+});
+prueba('📣 ¡A la carga! y Arenga (Support, 2026-10-23): onda a los aliados a 4; +2 a lo ofensivo 2 turnos / Bendecido 3 turnos; auditadas; los gritos viejos salieron del pool', () => {
+  const e = n => HABILIDADES_CREEP_BASE.find(x => x.nombre === n), a = armarHabilidadDeCreep(e('¡A la carga!').datos, 3), b = armarHabilidadDeCreep(e('Arenga').datos, 3);
+  const ea = a.duelo.efectos[0], eb = b.duelo.efectos[0];
+  igual([a.duelo.objetivo, a.duelo.radio, a.duelo.aliados, ea.turnos, ea.mods.map(m => m.stat + m.val).join(' '), eb.nombre, eb.turnos, b.duelo.radio,
+    e('¡A la carga!').etiquetas.includes('auditada'), e('Arenga').etiquetas.includes('support'), ['Aullido de manada', 'Grito de ánimo', '¡Por el amo!', '¡A laburar!', 'Marca del amo', 'Aullido de la manada'].filter(e).length],
+    ['onda', 4, true, 2, 'pdg2 pdgmg2 dmg2 dmgesp2', 'Bendecido', 3, 4, true, true, 0]);
 });
 prueba('No2 negativos en una defensa (2026-10-23): se puede quedar en negativo, pero no gastar si ya estás en negativo', () => {
   igual([Combatiente.defensaSinNo2(0, 1), Combatiente.defensaSinNo2(2, 1), Combatiente.defensaSinNo2(-1, 1), Combatiente.defensaSinNo2(-1, 0)], [false, false, true, false]);

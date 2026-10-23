@@ -125,8 +125,8 @@ const CombateFin = (() => {
   function itemsDeCreep(cat, sc){
     const out = [];
     const nom = K.nombreLimpio(sc);
-    if(Combatiente.armaEnMano(sc).nombre && !Combatiente.armaEnMano(sc).natural){ const t = plantillaArmaCreep(cat, sc); out.push({clave: `${sc.id}:arma`, nombre: t.nombre, precioCompra: t.precioCompra, template: t, origen: nom}); }
-    Combatiente.equipoSinArma(sc).filter(it => !it.natural).forEach(it => { const t = plantillaEquipoCreep(cat, it, sc.nivel);   // 🐾 lo natural no se suelta (2026-10-14)
+    if(Combatiente.armaEnMano(sc).nombre && !Combatiente.armaEnMano(sc).natural && !Combatiente.armaEnMano(sc).invocadaDe){ const t = plantillaArmaCreep(cat, sc); out.push({clave: `${sc.id}:arma`, nombre: t.nombre, precioCompra: t.precioCompra, template: t, origen: nom}); }
+    Combatiente.equipoSinArma(sc).filter(it => !it.natural && !it.invocadaDe).forEach(it => { const t = plantillaEquipoCreep(cat, it, sc.nivel);   // 🐾 lo natural no se suelta (2026-10-14); ✨ un arma invocada tampoco (D7)
       out.push({clave: `${sc.id}:eq:${it.id}`, nombre: t.nombre, precioCompra: t.precioCompra, template: t, origen: nom}); });
     K.dropsFijos(sc).forEach((n, i) => {   // los drops fijos (2026-10-14): del catálogo, siempre
       const c = cat.find(x => sinAviso(x.nombre) === sinAviso(n));

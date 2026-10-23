@@ -2444,6 +2444,13 @@ prueba('🗡 Armas como ítems, paso 2 (docs/plan-inventario-creeps.md): al carg
     [[false, undefined, 2, true, 'Hacha', 8, 2, 1, 1, true, ['Escudo pequeño']], 2, [true, 'Hacha'], [false, true, 'Hacha', 1, 2], [2, 'Lanza', 3, false], 1, true,
      [false, 'Espada rota', 6, 1]]);
 });
+prueba('✨ Armas invocadas (paso 4B): lo que trae una invocación es suyo; lo levantado no; un arma invocada no va al botín', () => {
+  const inv = InvCalculo.migrar({nombre: 'Esqueleto', equipo: [{id: 'a', nombre: 'Espada rota', tipoItem: 'arma_1m', tipoDado: 6, equipado: true},
+    {id: 'b', nombre: 'Daga', tipoItem: 'arma_1m', tipoDado: 4, invocada: false}, {id: 'c', nombre: 'Hacha', tipoItem: 'arma_1m', tipoDado: 8, invocadaDe: 'f~x'}]});
+  const sc = creepPrueba({equipo: [{id: 'z', nombre: 'Escudo pequeño', tipoItem: 'escudo_1m', def: 1, invocadaDe: 'f~i', equipado: true}]});
+  const botin = CombateFin.itemsDeCreep(CATALOGO_BASE, sc).map(x => x.nombre);
+  igual([inv.equipo.map(x => x.invocada), botin.includes('Escudo pequeño'), botin.includes('Hacha')], [[true, false, undefined], false, true]);
+});
 prueba('🗡 Paso 2: un creep ya convertido armado encima de los valores por defecto viejos («sin nombre, Tipo 8») no pierde su arma', () => {
   const guardado = creepPrueba({});   // convertido: la Hacha en su equipo
   const viejo = {armaTipo: 8, armaPeso: 1, armaFijo: 0, armaAmplificado: 0, armaDeRango: false, armaNombre: '', armaDetalle: '', armaMods: [], armaEfectos: [], armaManos: 'arma_1m', armaNatural: false};

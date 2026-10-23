@@ -43,6 +43,8 @@ async function armaSoltar(t, vuela, o){
     if(!pieza || !String(pieza.nombre || '').trim()) return {nota: 'no tenía nada en la mano'};
     if(pieza.natural) return {nota: `${pieza.nombre} es natural: no se le cae`};
     piezaCreep = pieza; item = Combatiente.itemComoDePersonaje(pieza);
+    if(esInv && pieza.invocada !== false && !item.invocadaDe){ item.invocadaDe = String(t.fichaId); item.invocadaNombre = quien; }   // ✨ un arma invocada (js/67)
+    delete item.invocada;
   }else{
     const p = await fbDb.doc(fbRutaCampana(`fichas/${t.fichaId}/partes/inventario`)).get();
     const inv = p.exists ? (JSON.parse(p.data().json || '{}').inventario || []) : [];
@@ -110,6 +112,7 @@ async function armaLeer(elId, t){   // → {it, propia} o null
   if(t && el.origen && distanciaHex(t, el.origen) > 1 && !(await AvisoCombate.preguntar(`${el.armaNombre || 'El arma'} está a ${distanciaHex(t, el.origen)} casillas: hay que estar al lado. ¿Levantarla igual?`, {icono: '🗡', titulo: 'Levantar el arma', si: 'Sí, levantarla'}))) return null;
   let it = {};
   try{ it = JSON.parse(el.armaItem || '{}') || {}; }catch(e){}
+  if(it.invocadaDe) toast(`✨ ${it.nombre || 'Esta arma'} es invocada: dura mientras ${it.invocadaNombre || 'su invocación'} siga en combate`);
   it = {...it, nombre: it.nombre || el.armaNombre || 'Arma', id: `arma-${Date.now().toString(36)}`, equipado: false};
   return {it, propia: !!t && el.armaDe === armaRefDe(t)};
 }
@@ -301,10 +304,14 @@ function levantadoElegirCombatiente(x, it, quien){
   });
 }
 // Lo levantado entra a su equipo: en la mano o guardado; lo que deja la mano, guardado. (Si se puso un arma, ya no está Desarmado.)
-function levantadoAlEquipo(x, it, r){
+function levantadoAlEquipo(x, it, r, ref){
   const ids = new Set(r.soltar || []);
   x.equipo = (Array.isArray(x.equipo) ? x.equipo : []).map(e => e && ids.has(e.id) ? {...e, equipado: false} : e);
-  x.equipo.push({...it, equipado: !!r.equipar});
+  const nuevo = {...it, equipado: !!r.equipar};
+  if(ref && String(ref).includes(SEP_INVOCACION)){   // ✨ una invocación: lo suyo vuelve a ser suyo; lo de otro, no (js/67)
+    if(nuevo.invocadaDe === String(ref)){ delete nuevo.invocadaDe; delete nuevo.invocadaNombre; nuevo.invocada = true; } else nuevo.invocada = false;
+  }
+  x.equipo.push(nuevo);
   if(r.equipar && Combatiente.esArmaDeMano({...it, equipado: true})){ const des = (x.estados || []).find(Combatiente.esDesarmado); if(des) x.estados = x.estados.filter(e => e !== des); }
 }
 async function bnInvLevantarArma(invId, elId){
@@ -319,7 +326,7 @@ async function bnInvLevantarArma(invId, elId){
   const r = await levantadoElegirCombatiente(inv, x.it, inv.nombre || 'La invocación');
   const antes = FichaGuardado.partes(bn.S), respaldo = structuredClone({nitros: inv.nitros, estados: inv.estados || [], equipo: inv.equipo || []});
   inv.nitros = num(inv.nitros) - Combatiente.COSTO_LEVANTAR_ARMA * (r.soltar.length ? 2 : 1);
-  levantadoAlEquipo(inv, x.it, r);
+  levantadoAlEquipo(inv, x.it, r, bn.fichaId + SEP_INVOCACION + invId);
   bnUi(antes).cambio();
   await bnEsperarGuardado();
   if(!(await armaQuitarDelPiso(elId))){   // se le adelantaron: vuelve todo como estaba

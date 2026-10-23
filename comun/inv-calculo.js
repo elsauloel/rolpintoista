@@ -159,7 +159,10 @@ const InvCalculo = (() => {
     if(typeof estadosPresetFicha === 'function') Combatiente.sincronizarEstadosDePasivas(inv.estados, inv.pasivas, estadosPresetFicha());
     Combatiente.pasarArmaAItem(inv);   // 🗡 su arma, un ítem de su lista (docs/plan-inventario-creeps.md, paso 2): los campos arma* sueltos se convierten
     if(inv.defensa === undefined) inv.defensa = 0;
-    Combatiente.pasarEquipoVivo(inv, {crit: false});   // 🛡 paso 3: la Defensa del equipo en vivo (la Res. a crítico nunca se le había sumado)
+    Combatiente.pasarEquipoVivo(inv, {crit: false});
+    // ✨ Lo que trae es suyo: un arma invocada (D7, vtt-hexgrid/js/67). Lo que levantó del piso viene marcado `invocada: false` (o con de qué otra
+    // invocación es, `invocadaDe`).
+    inv.equipo.forEach(it => { if(it && it.invocada === undefined && !it.invocadaDe) it.invocada = true; });   // 🛡 paso 3: la Defensa del equipo en vivo (la Res. a crítico nunca se le había sumado)
     if(inv.notas === undefined) inv.notas = '';
     if(inv.acc !== undefined || inv.accMax !== undefined){
       delete inv.acc; delete inv.accMax; delete inv.nitros;  // arranca lleno, abajo

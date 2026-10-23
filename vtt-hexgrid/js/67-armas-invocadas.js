@@ -4,7 +4,7 @@
    todo el combate.»
    Lo que una invocación trae puesto es suyo (`invocada: true` en su equipo; InvCalculo.migrar lo marca). Si se le cae (js/27, armaSoltar), la pieza
    lleva de qué invocación es (`invocadaDe` = "fichaId~invId", `invocadaNombre`): la puede levantar y usar cualquiera, MIENTRAS esa invocación siga
-   en el mapa y despierta, y como mucho hasta el fin del combate. Cuando no (se durmió, su token se fue, terminó el combate), se desvanece de donde
+   en el mapa, viva y despierta, y como mucho hasta el fin del combate. Cuando no (murió, se terminaron sus turnos, su token se fue, terminó el combate), se desvanece de donde
    esté: del piso y de los creeps (lo hace la pantalla del GM) y de un personaje (la de quien lo maneja, con la Botonera abierta). Nunca va al botín
    (comun/combate-fin.js). Si la levanta su propia invocación, vuelve a ser suya. */
 function invocadaViva(ref){
@@ -12,7 +12,7 @@ function invocadaViva(ref){
   const t = [...tokens.values()].find(x => x && x.tipo === 'pj' && x.fichaId === ref);
   if(!t) return false;
   const r = (vinculo(t) || {}).resumen || {};
-  return !r.dormida && r.activa !== false;
+  return !r.dormida && !r.muerto && r.activa !== false;   // muerta: desaparece (dueño, 2026-10-22), y sus armas con ella
 }
 // Se desvanece recién si su invocación lleva un rato sin estar (≥ 5 s: que el mapa termine de cargar o de cambiar de modo no la borre).
 const invocadaAusente = new Map();   // ref -> desde cuándo no está

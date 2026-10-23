@@ -246,23 +246,34 @@ async function ayudarASoltar({tipo, invId, tokenId}){
 /* 🙈 Para la Ceguera (comun/combatiente.js, aDistancia): la distancia entre dos tokens del mapa, para saber si un hechizo dirigido viene de lejos. */
 window.mapaDistanciaTokens = (a, b) => { const x = tokens.get(a), y = tokens.get(b); return x && y ? distanciaHex(x, y) : NaN; };
 
-/* 👁 Una invocación temporal (el Ojo de Kicillof, 2026-10-20, dueño: «al cumplirse el segundo turno, desaparece»): cuando se duerme (sus turnos
-   llegaron a 0), su token se borra del mapa. Lo hace la pantalla que maneja a su dueño (o el GM). */
+/* 👁 Una invocación que se va del mapa (2026-10-20, el Ojo de Kicillof: «al cumplirse el segundo turno, desaparece»; 2026-10-22, dueño, para
+   todas: «las invocaciones al morir desaparecen, no se duermen. Y si son invocaciones por X cantidad de turnos también, al terminarse los turnos
+   desaparecen»): su token se borra del mapa cuando muere (vida 0) o cuando se duerme estando invocada (sus turnos llegaron a 0). La temporal, aunque
+   esta pantalla no la haya visto invocada; las demás, solo al verla pasar de invocada y viva a dormida o muerta (un token puesto de antemano, con
+   la invocación todavía sin invocar, no se toca). Lo hace la pantalla que maneja a su dueño o el GM; el borrado va en una transacción, así una sola
+   lo anuncia. Sus armas invocadas se desvanecen solas (js/67). */
 const temporalesBorrando = new Set();
+const invocacionPrevia = new Map();   // tokenId -> 'activa' | 'fuera'
 setInterval(() => {
   if(typeof tokens === 'undefined' || !fbUsuario) return;
   tokens.forEach((t, id) => {
     if(t.tipo !== 'pj' || !String(t.fichaId || '').includes(SEP_INVOCACION) || temporalesBorrando.has(id)) return;
-    const r = (vinculo(t) || {}).resumen || {};
-    if(!r.temporal || !r.dormida) return;
+    const v = vinculo(t);
+    if(!v) return;   // la ficha todavía no llegó
+    const r = v.resumen || {}, ahora = r.muerto ? 'muerta' : r.dormida ? 'dormida' : 'activa';
+    const antes = invocacionPrevia.get(id);
+    invocacionPrevia.set(id, ahora === 'activa' ? 'activa' : 'fuera');
+    const seVa = ahora !== 'activa' && (antes === 'activa' || (r.temporal && r.dormida));
+    if(!seVa) return;
     const ficha = String(t.fichaId).split(SEP_INVOCACION)[0];
     if(!soyGM && !(typeof bnManejo === 'function' && bnManejo(ficha))) return;
     temporalesBorrando.add(id);
-    const nombre = nombreDe(t);
-    coleccionTokens().doc(id).delete().then(async () => {
-      mesaLinea(`👁 ${nombre} se desvanece: cumplió sus turnos`, 'recordatorio');
+    const nombre = nombreDe(t), ref = coleccionTokens().doc(id);
+    fbDb.runTransaction(async tx => { const d = await tx.get(ref); if(!d.exists) return false; tx.delete(ref); return true; }).then(async borre => {
+      if(borre) mesaLinea(ahora === 'muerta' ? `💀 ${nombre} desaparece: murió` : r.temporal ? `👁 ${nombre} se desvanece: cumplió sus turnos`
+        : `✨ ${nombre} desaparece: se terminaron sus turnos`, 'recordatorio');
       if(soyGM) await temporalFueraDelOrden(id);   // (solo el GM cambia el largo del orden)
-    }).catch(err => { console.error('No se pudo sacar la invocación temporal:', err); temporalesBorrando.delete(id); });
+    }).catch(err => { console.error('No se pudo sacar la invocación del mapa:', err); temporalesBorrando.delete(id); });
   });
 }, 1500);
 // Su lugar en el orden de turnos también se va: si justo era su turno, primero pasa al siguiente (con su inicio de turno).

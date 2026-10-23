@@ -101,7 +101,13 @@ pública del creep, que leen los jugadores), se calculan a partir del ítem en l
    personaje y sus invocaciones (quien lo maneja, con su Botonera abierta). Lo anuncia en la Mesa («✨ … se desvanece»). Nunca va al botín
    (`CombateFin.itemsDeCreep`). Probado en «Claude · pruebas»: la Daga del Lobo (vivo) quedó en el piso; la de una invocación ausente se
    desvaneció del piso y de las manos del Goblin 2; al pasar a narrativo, se desvaneció la del Lobo. Pruebas: 564 en verde.
-   Ojo: una invocación caída (vida 0) pero no dormida conserva sus armas invocadas mientras siga su token.
+   **Corrección del dueño (2026-10-22):** «las invocaciones al morir desaparecen, no se duermen. Y si son invocaciones por X cantidad de turnos
+   también, al terminarse los turnos desaparecen, junto con sus armas invocadas». El mapa (js/54) borra el token de cualquier invocación que pasa
+   de invocada y viva a muerta (vida 0) o dormida (se terminaron sus turnos); antes solo lo hacía con las temporales (el Ojo). Un token puesto de
+   antemano, con la invocación sin invocar, no se toca. Una sola pantalla lo anuncia en la Mesa («💀 … desaparece: murió» / «✨ … desaparece: se
+   terminaron sus turnos»). Sus armas invocadas se desvanecen con ella (js/67 ya no cuenta como viva a una invocación muerta).
+   **Recordatorio del dueño:** las bestias no llevan armas; a lo sumo, armas naturales (D5). El Lobo de prueba con un arco y una daga es solo
+   para probar.
 5. **Desarmado deja de ser un estado** (P217): «sin arma en la mano» se ve en el token y en la ficha y se ataca sin arma (el daño sin arma de P150,
    igual para creeps). Lo natural (garras, colmillos) sigue sin caerse ni poder levantarlo otro.
 6. **El botín usa los ítems tal cual:** lo que el creep tenía (en la mano y guardado, menos lo natural) cae con todas sus mecánicas (varitas,

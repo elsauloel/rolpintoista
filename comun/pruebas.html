@@ -1211,7 +1211,7 @@ prueba('📜 Un consumible con Ejecución (2026-10-20, la Red Nerubian): habilid
   const sol = e.efectos[0].spec.soltar;
   igual([h.modo, h.tiradaStat, red.precioCompra, e.objetivo, e.alcance, e.contra.map(x => x.stat || x), e.efectos.map(x => x.nombre + ':' + (x.spec && x.spec.turnos)), Combatiente.habDeConsumible({nombre: 'Poción'}),
     [sol.stat, sol.dif, Combatiente.soltarNorm(sol).alEmpezar, Combatiente.soltarNorm(sol).ayuda]],
-    ['auto', 'pdgmg', 50, 'enemigo', 6, ['eva'], ['Inmovilizado:3'], null, ['fue', 3, true, true]]);
+    ['auto', 'pdgmg', 50, 'enemigo', 6, ['eva'], ['Inmovilizado:3'], null, ['fue', 6, true, true]]);   // su Ef.Esp es 3, pero el pergamino tiene mínimo 6 (difMin, 2026-10-23)
 });
 prueba('🎲 Volver a tirar el consumible al azar antes de publicar (2026-10-14)', () => {
   const sc = {id: 'j', nombre: 'Jefe', nivel: 3, jefe: true, tipoCriatura: 'humanoide'};
@@ -4835,6 +4835,10 @@ prueba('efecto «seguro si es crítico»: el asistente lo conserva (y los stacks
       [2, true, 'Envenenar (25%, 2 stacks, seguro si es crítico)', [1, 4], [4, 4], true]);
   }finally{ Object.assign(window, antes); }
 }); fbFalsoCola = pp.catch(() => {}); return pp; });
+prueba('pergamino de red: la dificultad para soltarse es el Ef.Esp neto de quien lo usa, con un mínimo (difMin, 2026-10-23)', () => {
+  const e = {nombre: 'Inmovilizado', turnos: 3, soltar: {stat: 'fue', etq: 'Fuerza', dif: 6, difStat: 'dmgesp', difMin: 6, no2: 1}};
+  igual([Combatiente.efectoDeEjecucion(e, () => 3).spec.soltar.dif, Combatiente.efectoDeEjecucion(e, () => 9).spec.soltar.dif, Combatiente.efectoDeEjecucion({...e, soltar: {...e.soltar, difMin: 0}}, () => 3).spec.soltar.dif], [6, 9, 3]);
+});
 prueba('un golpe crítico también rompe armadura (2026-10-23, dueño: se borró la regla de que no): Rompe armadura entra con o sin crítico', () => { const pp = fbFalsoCola.then(async () => {
   const docs = {};
   const tx = {get: async r => ({exists: !!docs[r.id], data: () => docs[r.id]}), update: (r, c) => { docs[r.id] = {...docs[r.id], ...c}; }};

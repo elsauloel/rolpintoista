@@ -1153,3 +1153,20 @@ bestia (un oso hormiguero) «puede parrear con sus garras y obligar a desarmar a
   **Dirección del dueño (2026-10-22):** «todo lo que tenga manos debería poder usar lo mismo»: un creep humanoide (y una invocación) usa las
   mismas armas, escudos y talismanes que un jugador, con una especie de inventario: si levanta un arma, guarda la suya y después las cambia.
   Implica que el arma del creep deje de ser un dato fijo y pase a ser un ítem (como la del jugador): ver el plan, cuando se arme.
+
+### P218 — Consumibles con dificultad mínima: ¿a cuáles se les aplica? (2026-10-23)
+
+Regla del dueño (2026-10-23), ya aplicada al **Pergamino de red Nerubian**: la dificultad para soltarse es el **Efecto especial neto** de quien lo
+usa (su valor, no una tirada), **con un mínimo de 6** («es algo que vos pagaste, es consumible, solo funciona una vez»); si quien lo usa tiene más,
+sube. En el código es el dato `difMin` (en `soltar`, `salvacion`, la zona que deja: `Combatiente.efectoDeEjecucion`, `trampaDeHab`,
+`zonaEstadoDe`). Candidatos para la misma regla (propuesta de Claude, a decidir):
+1. **Las ~40 trampas consumibles** (Trampa de oso, Red de caza, Arena movediza, Runas, Portal cósmico…): la **dificultad para detectarlas** hoy es
+   tu Destreza (físicas) o tu Efecto especial (mágicas), **sin mínimo**: con un stat bajo, tu trampa comprada es fácil de ver. Propuesta: mínimo
+   por calidad (Común 6, Buena 7, Rara 8…).
+2. **La salvación / el soltarse de las trampas mágicas** (Arena movediza, Tumba de hielo, Runa de debilidad, Succión arcana, Portal cósmico,
+   Espejo de discordia): hoy es un número fijo (6, 7…). Propuesta: tu Efecto especial neto, **con ese número como mínimo** (como la Red). Las
+   físicas (Trampa de oso: Fuerza contra 6) quedarían fijas: no dependen de quien la arma.
+3. **Los pergaminos que tiran** (Pergamino de luz cegadora: tu Ef.Esp contra su Res.CC; la Red: tu PdG.Esp contra su Evasión): no es una
+   dificultad sino una tirada. Variante de la misma idea: «tirás como si tuvieras al menos 6» (un piso para la tirada).
+4. **Los consumibles de zona** (Bengalas, Bomba de humo, Bombucha de talco): si su zona se resiste contra un stat tuyo, mínimo igual.
+Las pociones y los pergaminos de bono (Furia, Escudo Arcano…) no aplican: su efecto es fijo, no depende de quien los usa.

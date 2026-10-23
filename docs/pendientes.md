@@ -94,6 +94,12 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
+> - [ ] **🔥 Debilidades y resistencias a efectos especiales y elementales (2026-10-23, dueño: «queda pendiente de desarrollar a nivel diseño;
+>   todavía no lo elaboremos»):** que los elementos interactúen con los efectos y con los tipos de criatura. Ejemplos dictados: las redes (la Red
+>   Nerubian, las trampas de red) desaparecen con el fuego; los insectos son débiles al fuego; los elementales tienen su sistema de resistencias y
+>   debilidades elementales; los constructos y robots son inmunes a lo tóxico. Hoy ya existen las resistencias elementales (🔥 ❄ ⚡ ☠ 🧪, con
+>   «vulnerable» si es negativa) y el tipo de criatura de un creep (`tipoCriatura`): falta el diseño de qué tipo/efecto resiste o es débil a qué, y
+>   que un efecto (la red, una zona) reaccione a un elemento. Primero diseño con el dueño; después código.
 > - [x] **🗡 Íconos distintos para cada arma en el piso (2026-10-23, dueño: «poner íconos distintos para distintas armas cuando se desarma
 >   alguien»): HECHO el mismo día** (`iconoDeItem` en vtt-hexgrid/js/27, probado en el mapa con un desarme real). Quedó: 🗡️ Tipo 4 y 6 ·
 >   🪓 Tipo 8 · 🔨 Tipo 10 · 💣 Tipo 12 · 🛡️ escudos · 🔮 talismanes y orbes · 🏹 arcos y ballestas · ➹ flechas y virotes especiales

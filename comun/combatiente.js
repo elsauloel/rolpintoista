@@ -1469,7 +1469,8 @@ const Combatiente = (() => {
       .map(i => ({nombre: String(i.alDanoEspecial.nombre), turnos: Math.max(1, Math.round(nf(i.alDanoEspecial.turnos)) || 1), de: String(i.nombre || '').slice(0, 40)}));
   }
   // `valorDe(statId)` (2026-10-20): los stats de quien la usa — un estado que se suelta contra uno de ellos (`soltar.difStat`, la Red Nerubian:
-  // Fuerza contra tu Ef.Esp) lleva ese valor como dificultad.
+  // Fuerza contra tu Ef.Esp) lleva ese valor como dificultad. `difMin` (2026-10-23, dueño: los pergaminos, «algo que pagaste»): nunca menos que eso
+  // (el Pergamino de red Nerubian: tu Ef.Esp neto, mínimo 6). Vale igual en las zonas, las trampas de una habilidad y el soltarse de un ataque.
   function efectoDeEjecucion(e, valorDe){
     // «Pierde No2» (2026-10-02, Sonic Boom): el objetivo pierde `no2` (+ la diferencia entre las tiradas) No2; en 0, Sentado.
     // La purga (2026-10-07, Varita de la purga): le saca el estado malo más reciente (el mapa elige cuál: js/13 dueloAplicarEfecto).
@@ -1483,7 +1484,7 @@ const Combatiente = (() => {
       ...(nf(e.empuja) > 0 ? {empuja: Math.round(nf(e.empuja))} : {}),   // lo empuja N casillas, lejos de quien la usa (2026-10-08, ráfaga helada, vendaval)   // el arma vuela N casillas (el Desarmado de la Varita del desarme, 2026-10-07)
       spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: nf(e.val)}] : e.mods,
         polaridad: e.stat ? (nf(e.val) >= 0 ? 'buff' : 'debuff') : (e.escudo ? 'buff' : undefined), hp: e.hp, stacks: e.stacks, escudoMagico: e.escudo,
-        ...(e.soltar ? {soltar: {...e.soltar, ...(e.soltar.difStat && typeof valorDe === 'function' && Number.isFinite(Number(valorDe(e.soltar.difStat))) ? {dif: Math.max(1, Math.round(Number(valorDe(e.soltar.difStat))))} : {})}} : {})},
+        ...(e.soltar ? {soltar: {...e.soltar, ...(e.soltar.difStat && typeof valorDe === 'function' && Number.isFinite(Number(valorDe(e.soltar.difStat))) ? {dif: Math.max(1, Math.round(nf(e.soltar.difMin)), Math.round(Number(valorDe(e.soltar.difStat))))} : {})}} : {})},
       ...(() => { const t = curaTirada(e.cura); return t ? {cura: t.cura, detalle: `${e.detalle ? e.detalle + ' ' : ''}Cura ${t.formula}: ${t.rolls.length ? '[' + t.rolls.join(', ') + '] = ' : ''}${t.cura}.`.slice(0, 200)} : {cura: nf(e.cura), detalle: e.detalle || ''}; })()};
   }
   /* Lo que el cuadro del duelo necesita para una habilidad dirigida ✨ (y las de área, onda y zona), o null si la
@@ -1666,7 +1667,7 @@ const Combatiente = (() => {
   function zonaEstadoDe(c, o){
     const e = c.zonaEstado || null;
     if(!e || !e.soltar || !e.soltar.difStat || e.soltar.difStat !== c.tira || !Number.isFinite(o.tiraValor)) return e;
-    return {...e, soltar: {...e.soltar, dif: Math.max(1, Math.round(o.tiraValor))}};
+    return {...e, soltar: {...e.soltar, dif: Math.max(1, Math.round(n(e.soltar.difMin)), Math.round(o.tiraValor))}};
   }
   // 🎲 La tabla «según la tirada extra» (2026-10-22) va adentro del JSON de `zonaEstado` (`porTirada`): el mapa la lee al tirar (js/66).
   function zonaEstadoConTirada(c, o){
@@ -1690,7 +1691,7 @@ const Combatiente = (() => {
       ['salvacion', 'soltar'].forEach(k => {
         if(!t[k] || !t[k].difStat) return;
         const d = Number(valorDe(t[k].difStat));
-        if(Number.isFinite(d)) out[k] = {...t[k], dif: Math.max(1, Math.round(d) + Math.round(n(t[k].difMas)))};   // `difMas`: + N (la trampa portal Buena: tu Ef.Esp + 2)
+        if(Number.isFinite(d)) out[k] = {...t[k], dif: Math.max(1, Math.round(n(t[k].difMin)), Math.round(d) + Math.round(n(t[k].difMas)))};   // `difMas`: + N (la trampa portal Buena: tu Ef.Esp + 2)
       });
     }
     return out;
@@ -1711,7 +1712,7 @@ const Combatiente = (() => {
     const soltarDe = s => {
       const v = s.difStat && typeof o.valorDe === 'function' ? Number(o.valorDe(s.difStat)) : NaN;
       const g = s.danoFalla === 'golpe' && typeof o.danoGolpe === 'function' ? String(o.danoGolpe(nf(a.dados)) || '') + (nf(a.fijo) ? `+${nf(a.fijo)}` : '') : s.danoFalla;
-      return {...s, ...(Number.isFinite(v) ? {dif: Math.max(1, Math.round(v))} : {}), ...(g && g !== 'golpe' ? {danoFalla: g} : {})};
+      return {...s, ...(Number.isFinite(v) ? {dif: Math.max(1, Math.round(nf(s.difMin)), Math.round(v))} : {}), ...(g && g !== 'golpe' ? {danoFalla: g} : {})};
     };
     const mapEf = e => ({nombre: e.nombre || (e.cura ? 'Curación' : ''), caras: Math.max(1, Math.round(nf(e.caras)) || 1), exitos: Math.min(Math.max(1, Math.round(nf(e.caras)) || 1), Math.max(1, Math.round(nf(e.exitos)) || 1)),
       spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: nf(e.val)}] : e.mods, polaridad: e.stat ? (nf(e.val) >= 0 ? 'buff' : 'debuff') : undefined,

@@ -21,7 +21,7 @@ async function soltarAlEmpezarRevisar(){
       const est = sc && soltarAlEmpezarDe(sc.estados);
       if(!est) return;
       soltarAlEmpezarHechos.add(clave);
-      soltarAlEmpezarCartel(clave, sc.nombre, est, () => soltarAlEmpezarCreep(clave, ref, t));
+      soltarAlEmpezarCartel(clave, sc.nombre, est, ayuda => soltarAlEmpezarCreep(clave, ref, t, ayuda), t, num(sc.nitros));
       return;
     }
     if(!ref) return;
@@ -31,34 +31,140 @@ async function soltarAlEmpezarRevisar(){
     await editarPersonajeMapa(fichaId, S => {
       const x = invId ? (S.invocaciones || []).find(i => i && i.id === invId) : null;
       const est = soltarAlEmpezarDe(invId ? (x && x.estados) : S.efectos);
-      if(est) info = {nombre: invId ? x.nombre : ((S.meta && S.meta.nombre) || 'Personaje'), est: {...est}};
+      if(est) info = {nombre: invId ? x.nombre : ((S.meta && S.meta.nombre) || 'Personaje'), est: {...est}, nitros: num(invId ? x.nitros : S.nitros)};
       return false;   // solo mirar
     });
     if(!info) return;
     soltarAlEmpezarHechos.add(clave);
-    soltarAlEmpezarCartel(clave, info.nombre, info.est, () => soltarAlEmpezarPj(clave, fichaId, invId, t));
+    soltarAlEmpezarCartel(clave, info.nombre, info.est, ayuda => soltarAlEmpezarPj(clave, fichaId, invId, t, ayuda), t, info.nitros);
   }catch(err){ console.error('Soltarse al empezar el turno:', err); }
 }
-function soltarAlEmpezarCartel(clave, nombre, est, tirar){
+function soltarAlEmpezarCartel(clave, nombre, est, tirar, t, nitros){
   const s = Combatiente.soltarNorm(est.soltar);
+  // 🤝 Con ayuda (2026-10-23, dueño): si los aliados pegados pueden sumar su tirada, se les pregunta antes de tirar (soltarConAyuda, abajo).
+  const aliados = s.ayuda && t ? aliadosParaZafar(t) : [];
+  const conAyuda = aliados.length > 0 && num(nitros) >= 1;
+  const ayudaTxt = !aliados.length ? '' : conAyuda ? ` Pueden ayudarlo ${aliados.map(a => a.nombre).join(' y ')}: al tirar se les pregunta; los que se suman tiran su ${s.etq} y se suma a la suya (con ayuda, 1 No2 cada uno, también ${nombre}).`
+    : ` (${aliados.map(a => a.nombre).join(' y ')} podría ayudarlo, pero ${nombre} no tiene No2 para tirar en conjunto: tira solo.)`;
   AvisoCombate.cartel('soltar-' + clave, {icono: '🔓', titulo: `${nombre}: ¿se suelta?`,
-    texto: `Empieza su turno atrapado (${est.nombre}). Tira ${s.etq} contra ${s.dif}: si llega, se suelta. Esta tirada no cuesta No2.${s.danoFalla ? ` Si no se suelta, ${est.nombre === 'Agarrado' ? 'el apretón' : 'el mordisco'}${s.deNombre ? ' de ' + s.deNombre : ''} le vuelve a hacer daño (${s.danoFalla}).` : ''}`,
-    botones: [{texto: `🎲 Tirar ${s.etq}`, alClic: tirar}, {texto: 'Ahora no', sec: true, alClic: () => AvisoCombate.cartel('soltar-' + clave, null)}]});
+    texto: `Empieza su turno atrapado (${est.nombre}). Tira ${s.etq} contra ${s.dif}: si llega, se suelta. Sola, esta tirada no cuesta No2.${s.danoFalla ? ` Si no se suelta, ${est.nombre === 'Agarrado' ? 'el apretón' : 'el mordisco'}${s.deNombre ? ' de ' + s.deNombre : ''} le vuelve a hacer daño (${s.danoFalla}).` : ''}${ayudaTxt}`,
+    botones: [{texto: `🎲 Tirar ${s.etq}`, alClic: () => conAyuda ? soltarConAyuda(clave, nombre, est, s, t, aliados, tirar) : tirar(null)}, {texto: 'Ahora no', sec: true, alClic: () => AvisoCombate.cartel('soltar-' + clave, null)}]});
+}
+/* 🤝 Zafarse con ayuda, en simultáneo (2026-10-23, dueño: «que tanto la persona que está en la red como algún aliado adyacente puedan tirar fuerza
+   los dos juntos, siempre y cuando cada uno gaste un nitro… a sus aliados adyacentes les puede aparecer un cartel: Fulanito está intentando zafarse
+   de la red. ¿Lo ayudás?»). Las tiradas SE SUMAN contra la dificultad; con ayuda paga 1 No2 cada uno (el atrapado también); sola sigue gratis.
+   El momento `soltar-ayuda` (js/16) lo ven todas las pantallas: la que maneja a cada aliado le pregunta (soltarAyudaMomento) y anota su tirada en
+   `datos.ayudas`; la del atrapado espera las respuestas (o «Tirar sin esperar») y tira. Ayudar es una acción defensiva: se puede quedar en No2
+   negativos, pero no si ya estaba en negativo (dueño, 2026-10-23). */
+function aliadosParaZafar(t){
+  const out = [];
+  tokens.forEach((x, id) => {
+    if(x === t || (x.tipo === 'creep') !== (t.tipo === 'creep') || x.bajoTierra || distanciaHex(t, x) > 1) return;
+    if(typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(id)) return;   // un caído no ayuda
+    out.push({tokenId: id, nombre: nombreDe(x)});
+  });
+  return out;
+}
+async function soltarConAyuda(clave, nombre, est, s, t, aliados, tirar){
+  const atrapadoId = [...tokens.entries()].find(([, x]) => x === t)?.[0] || '';
+  const id = await momentoAbrir({tipo: 'soltar-ayuda', icono: '🤝', titulo: `${nombre} intenta zafarse de ${est.nombre}`,
+    resultado: `${s.etq} contra ${s.dif}. ${aliados.map(a => a.nombre).join(' y ')} puede${aliados.length > 1 ? 'n' : ''} sumar su ${s.etq} (1 No2 cada uno).`, estado: 'esperando',
+    datos: {atrapado: atrapadoId, nombre, est: est.nombre, etq: s.etq, stat: s.stat, dif: s.dif, aliados: aliados.map(a => a.tokenId), ayudas: {}}});
+  if(!id){ tirar(null); return; }   // sin el momento (reglas), tira solo
+  let listo = false, baja = null;
+  const fin = async ayudas => {
+    if(listo) return;
+    listo = true;
+    if(baja) baja();
+    await momentoActualizar(id, {estado: 'tirado'});
+    const si = Object.values(ayudas || {}).filter(a => a && !a.no && num(a.total) > 0);
+    tirar(si.length ? {total: si.reduce((x, a) => x + num(a.total), 0), nombres: si.map(a => `${a.nombre} ${num(a.total)}`), momento: id} : null);
+  };
+  const esperando = falta => AvisoCombate.cartel('soltar-' + clave, {icono: '🤝', titulo: `${nombre}: ¿se suelta?`,
+    texto: `Esperando a ${falta.join(' y ')}: se les preguntó si ayudan a zafarse.`, botones: [{texto: '🎲 Tirar sin esperar', alClic: () => fin(lastAyudas)}]});
+  let lastAyudas = {};
+  esperando(aliados.map(a => a.nombre));
+  baja = coleccionMomentos().doc(id).onSnapshot(snap => {
+    const d = snap.exists ? snap.data() : null;
+    if(!d || listo) return;
+    lastAyudas = (d.datos && d.datos.ayudas) || {};
+    const falta = aliados.filter(a => !lastAyudas[a.tokenId]);
+    if(!falta.length) fin(lastAyudas); else esperando(falta.map(a => a.nombre));
+  }, err => { console.error('Zafarse con ayuda:', err); fin(lastAyudas); });
+}
+// La pantalla de cada aliado: «¿Lo ayudás?» (un creep, el GM; un personaje o invocación, quien lo maneja).
+const soltarAyudaVistos = new Set();
+function soltarAyudaMomento(id, d){
+  const dt = d.datos || {};
+  (dt.aliados || []).forEach(tid => {
+    const k = `ayuda-${id}-${tid}`;
+    if(d.estado !== 'esperando' || (dt.ayudas || {})[tid]){ if(soltarAyudaVistos.has(k)) AvisoCombate.cartel(k, null); return; }
+    const x = tokens.get(tid);
+    if(!x || soltarAyudaVistos.has(k)) return;
+    const mio = x.tipo === 'creep' ? soyGM : (typeof bnManejo === 'function' && bnManejo(String(x.fichaId).split(SEP_INVOCACION)[0]));
+    if(!mio) return;
+    soltarAyudaVistos.add(k);
+    const responder = v => momentoActualizar(id, {[`datos.ayudas.${tid}`]: v});
+    AvisoCombate.cartel(k, {icono: '🤝', titulo: `${dt.nombre} está intentando zafarse de ${dt.est}. ¿Lo ayudás?`,
+      texto: `${nombreDe(x)} tira su ${dt.etq} y se suma a la de ${dt.nombre} (contra ${dt.dif}). Cuesta 1 No2 a cada uno; ayudar es defensivo: podés quedar en No2 negativos, pero no si ya estás en negativo.`,
+      botones: [{texto: `🤝 Sí, ayudar (${dt.etq}, 1 No2)`, alClic: async () => { AvisoCombate.cartel(k, null); const v = await zafarAyudaTirar(x, dt); responder(v || {no: true, nombre: nombreDe(x)}); }},
+        {texto: 'No', sec: true, alClic: () => { AvisoCombate.cartel(k, null); responder({no: true, nombre: nombreDe(x)}); }}]});
+  });
+}
+// El aliado paga 1 No2 (puede quedar en −1, no si ya estaba en negativo) y tira su stat. → {total, nombre} o null si no pudo.
+async function zafarAyudaTirar(x, dt){
+  const nombre = nombreDe(x), costo = 1;
+  let r = null, negativo = false;
+  try{
+    if(x.tipo === 'creep'){
+      const sc = (creepsPriv.get(String(x.fichaId)) || {}).sc;
+      if(!sc) return null;
+      if(num(sc.nitros) < 0){ negativo = true; }
+      else{
+        r = Combatiente.tirarStat(CreepCalculo.statValor(sc, dt.stat) + Math.max(0, num(CreepCalculo.modTotal(sc, 'soltarse'))), sc.estados, dt.stat);
+        await modificarCreep(String(x.fichaId), c => { c.nitros = num(c.nitros) - costo; return {}; });
+      }
+    }else{
+      const [fichaId, invId] = String(x.fichaId).split(SEP_INVOCACION);
+      await editarPersonajeMapa(fichaId, S => {
+        const inv = invId ? (S.invocaciones || []).find(i => i && i.id === invId) : null;
+        if(invId && !inv) return false;
+        if(num(inv ? inv.nitros : S.nitros) < 0){ negativo = true; return false; }
+        const valor = inv ? InvCalculo.statValor(inv, dt.stat) + Math.max(0, num(InvCalculo.modTotal(inv, 'soltarse')))
+          : num(FichaCalculo.calcular(S).final[dt.stat]) + Math.max(0, num(FichaCalculo.calcular(S).final.soltarse));
+        r = Combatiente.tirarStat(valor, inv ? inv.estados : S.efectos, dt.stat);
+        if(inv) inv.nitros = num(inv.nitros) - costo; else S.nitros = num(S.nitros) - costo;
+        return true;
+      });
+    }
+  }catch(err){ console.error('Ayudar a zafar:', err); }
+  if(negativo){ toast(`${nombre} ya está en No2 negativos: no puede ayudar`); return null; }
+  if(!r) return null;
+  mesaPublicar(`${nombre} · Ayuda a ${dt.nombre} a zafarse · ${dt.etq}`, {...r, quien: nombre, ...(x.tipo === 'creep' ? {desde: 'gm'} : {ficha: x.fichaId})});
+  return {total: num(r.total), nombre};
 }
 // Primero los dados, después el resultado (regla del dueño, 2026-09-26): espera a que los dados 3D queden quietos.
 const esperarDadosMapa = () => new Promise(res => typeof Duelo !== 'undefined' && Duelo.esperarDados && !document.hidden ? Duelo.esperarDados(res) : res());
 const soltarTirando = (clave, nombre) => AvisoCombate.cartel('soltar-' + clave, {icono: '🔓', titulo: `${nombre}: ¿se suelta?`, texto: '🎲 Tirando…'});
+// 🤝 La tirada del atrapado con la ayuda sumada: el total, si llega y el texto de la cuenta («6 + Clementino 9 = 15»).
+function conAyudaSumada(tt, ayuda){
+  if(!ayuda || !tt || !tt.r) return tt;
+  const total = num(tt.r.total) + num(ayuda.total);
+  return {...tt, ok: total >= tt.s.dif, cuenta: `${tt.r.total} + ${ayuda.nombres.join(' + ')} = ${total}`, totalAyuda: total};
+}
 function soltarAlEmpezarResultado(clave, nombre, estNombre, tt, extra){
-  const txt = (tt.ok ? `${nombre} se soltó de ${estNombre} (${tt.r ? tt.r.total : '—'} contra ${tt.s.dif}).` : `${nombre} no se soltó de ${estNombre} (${tt.r ? tt.r.total : '—'} contra ${tt.s.dif}): sigue atrapado este turno.`) + (extra ? ' ' + extra : '');
+  const vs = tt.cuenta ? `${tt.cuenta} contra ${tt.s.dif}, con ayuda` : `${tt.r ? tt.r.total : '—'} contra ${tt.s.dif}`;
+  const txt = (tt.ok ? `${nombre} se soltó de ${estNombre} (${vs}).` : `${nombre} no se soltó de ${estNombre} (${vs}): sigue atrapado este turno.`) + (extra ? ' ' + extra : '');
   mesaLinea(`🔓 ${txt}`, 'recordatorio');
   AvisoCombate.cartel('soltar-' + clave, {icono: '🔓', titulo: `${nombre}: ¿se suelta?`, veredicto: {tono: tt.ok ? 'bueno' : 'malo', grande: tt.ok ? '¡SE SOLTÓ!' : 'SIGUE ATRAPADO', chico: txt},
     botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cartel('soltar-' + clave, null)}]});
 }
-async function soltarAlEmpezarCreep(clave, creepId, t){
+async function soltarAlEmpezarCreep(clave, creepId, t, ayuda){
   const p = creepsPriv.get(creepId), sc = p && p.sc;
-  const tt = sc && CreepAcciones.tiradaSoltarse(sc);
-  if(!tt || !tt.r){ AvisoCombate.cartel('soltar-' + clave, null); return; }
-  const gratis = {...tt, s: {...tt.s, no2: 0}};
+  const tt0 = sc && CreepAcciones.tiradaSoltarse(sc);
+  if(!tt0 || !tt0.r){ AvisoCombate.cartel('soltar-' + clave, null); return; }
+  const tt = conAyudaSumada(tt0, ayuda);
+  const gratis = {...tt, s: {...tt.s, no2: ayuda ? Math.min(1, Math.max(0, num(sc.nitros))) : 0}};   // con ayuda, 1 No2 (2026-10-23)
   const estNombre = ((sc.estados || []).find(e => e.id === tt.estId) || {}).nombre || 'el estado';
   soltarTirando(clave, sc.nombre);
   mesaPublicar(tt.origen, {...tt.r, quien: sc.nombre, desde: 'gm'});
@@ -67,22 +173,24 @@ async function soltarAlEmpezarCreep(clave, creepId, t){
   const extra = !tt.ok && tt.s.danoFalla ? await mordidaDano(t, sc.nombre, tt.s, estNombre) : '';
   soltarAlEmpezarResultado(clave, sc.nombre, estNombre, tt, extra);
 }
-async function soltarAlEmpezarPj(clave, fichaId, invId, t){
+async function soltarAlEmpezarPj(clave, fichaId, invId, t, ayuda){
   let res = null;
   await editarPersonajeMapa(fichaId, S => {
     if(invId){
       const inv = (S.invocaciones || []).find(i => i && i.id === invId);
-      const tt = inv && InvAcciones.tiradaSoltarse(inv);
-      if(!tt || !tt.r) return false;
-      InvAcciones.aplicarSoltarse(inv, {...tt, s: {...tt.s, no2: 0}});
+      const tt0 = inv && InvAcciones.tiradaSoltarse(inv);
+      if(!tt0 || !tt0.r) return false;
+      const tt = conAyudaSumada(tt0, ayuda);
+      InvAcciones.aplicarSoltarse(inv, {...tt, s: {...tt.s, no2: ayuda ? Math.min(1, Math.max(0, num(inv.nitros))) : 0}});   // con ayuda, 1 No2
       res = {tt, nombre: inv.nombre, est: tt.est.nombre};
       return true;
     }
     const est = Combatiente.estadoSoltable(S.efectos);
     if(!est) return false;
     const f = FichaCalculo.calcular(S).final, s = Combatiente.soltarNorm(est.soltar);
-    const tt = Combatiente.tiradaSoltarse(est, num(f[s.stat]) + Math.max(0, num(f.soltarse)), S.efectos);
+    const tt = conAyudaSumada(Combatiente.tiradaSoltarse(est, num(f[s.stat]) + Math.max(0, num(f.soltarse)), S.efectos), ayuda);
     if(!tt || !tt.r) return false;
+    if(ayuda) S.nitros = num(S.nitros) - Math.min(1, Math.max(0, num(S.nitros)));   // con ayuda, 1 No2 (2026-10-23)
     if(tt.ok) S.efectos = S.efectos.filter(e => e !== est);
     else Combatiente.hundirSiFalla(est, tt);
     res = {tt, nombre: (S.meta && S.meta.nombre) || 'Personaje', est: est.nombre};
@@ -210,7 +318,7 @@ async function ayudarASoltar({tipo, invId, tokenId}){
     const sc = typeof acCreep === 'function' ? acCreep() : null;
     if(!sc) return;
     quien = sc.nombre;
-    if(num(sc.nitros) < costo && !(await AvisoCombate.preguntar(`${sc.nombre} no tiene los No2 (cuesta ${costo}). ¿Ayudar igual?`, {icono: '🤝', titulo: 'Sin No2', si: 'Ayudar igual'}))) return;
+    if(num(sc.nitros) < 0){ toast(`${sc.nombre} ya está en No2 negativos: no puede ayudar`); return; }   // defensiva: puede quedar en negativo, no si ya lo estaba (2026-10-23)
     tt = Combatiente.tiradaSoltarse(e, CreepCalculo.statValor(sc, s.stat) + Math.max(0, num(CreepCalculo.modTotal(sc, 'soltarse'))), sc.estados);
     await acCambiar(c => { c.nitros = num(c.nitros) - costo; return {aviso: ''}; });
     mesaPublicar(`${quien} · Ayudar a soltar a ${atrapado} · ${s.etq} contra ${s.dif}`, {...tt.r, quien, desde: 'gm'});
@@ -220,7 +328,7 @@ async function ayudarASoltar({tipo, invId, tokenId}){
     if(tipo === 'inv' && !inv) return;
     quien = inv ? inv.nombre : ((S.meta && S.meta.nombre) || 'Alguien');
     const tiene = num(inv ? inv.nitros : S.nitros);
-    if(tiene < costo && !(await AvisoCombate.preguntar(`${quien} no tiene los No2 (cuesta ${costo}). ¿Ayudar igual?`, {icono: '🤝', titulo: 'Sin No2', si: 'Ayudar igual'}))) return;
+    if(tiene < 0){ toast(`${quien} ya está en No2 negativos: no puede ayudar`); return; }   // defensiva: puede quedar en negativo, no si ya lo estaba (2026-10-23)
     const valor = inv ? InvCalculo.statValor(inv, s.stat) + Math.max(0, num(InvCalculo.modTotal(inv, 'soltarse')))
       : num(FichaCalculo.calcular(S).final[s.stat]) + Math.max(0, num(FichaCalculo.calcular(S).final.soltarse));
     tt = Combatiente.tiradaSoltarse(e, valor, inv ? inv.estados : S.efectos);

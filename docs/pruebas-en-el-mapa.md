@@ -184,7 +184,9 @@
 ## Pendientes
 - [ ] **🛡 No2 negativos en las defensas (2026-10-23, dueño)**: con 0 No2, el Parry se puede (queda en −1, con el aviso); con No2 ya negativos, el
   Parry, la Evasión pagando el sobrepeso, el dodge roll y la ayuda para zafar quedan apagados («ya está en No2 negativos…»). La oportunidad y el
-  contraataque, como siempre (no bajan de 0).
+  contraataque, como siempre (no bajan de 0). **Probado en parte el 2026-10-23** («Claude · pruebas»): el Escarabajo con −1 No2 atacado por juan →
+  su Parry apagado con «Ya está en No2 negativos: no puede gastar más en una defensa»; con 0 No2 → Parry habilitado con «⚠ sin No2: queda en
+  negativo», elegido → −1 No2 y el aviso de la deuda. Falta ver: la Evasión pagando el sobrepeso, el dodge roll y la ayuda para zafar ya en negativo.
 - [x] (2026-10-23, Claude, «Claude · pruebas», con 🎮 el control de juan: Finalizar combate con el Goblin 3 caído → Publicar → juan reclamó la Varita arcana → Despojar; le llegó a la mochila con el mismo poder que la del catálogo, +20 XP, +5 DDE y +19 despojos; control devuelto) **🎒 Botín con los ítems tal cual** (2026-10-22, paso 6 de `docs/plan-inventario-creeps.md`): en un fin de combate real, que un jugador se
   lleve una varita o un talismán que tenía un creep y que en su mochila funcione igual que el del catálogo (el poder de la varita, el efecto del
   talismán). Lo armado ya se revisó con los creeps de «Claude · pruebas», sin publicar el botín.

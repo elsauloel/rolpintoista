@@ -79,6 +79,9 @@ pública del creep, que leen los jugadores), se calculan a partir del ítem en l
    simulador. **Arreglo de paso:** a las invocaciones el equipo nunca les sumaba Res. a crítico; ahora sí (a ellas no se les resta al convertir).
    «Actualizar desde la biblioteca» con una versión vieja borra la marca para que se convierta de nuevo (si no, contaría el equipo dos veces).
    GM Tools muestra «Defensa base» con el efectivo al lado, y la Res. a crítico aparece si la base o el total no son 0. Pruebas: 562 en verde.
+   **Probado (2026-10-22, «Claude · pruebas», 17 creeps antes y después):** 14 iguales; 3 cambiaron (los dos Escarabajos de cobre: Defensa 4 → 6 y
+   Res. Tipo 8 0 → 1; la Bruja del pantano: Defensa 4 → 7) porque su equipo (puesto por un script de auditoría) nunca se les había sumado: ahora
+   cuenta, como estaba previsto. «El origen»: revisados los 39 creeps, ninguno así (los totales no cambian).
 4. **Soltar y levantar de verdad:** desarmar (o soltar) saca el ítem de la mano y lo pone en el piso; levantarlo lo mete en la lista de quien lo
    levanta (con la mano libre: «¿Equiparlo?»; con las manos ocupadas: «Reemplazar» o «Guardar», igual que el personaje — el GM elige por el creep).
    Se saca la regla provisoria «solo su dueño». Un creep con su arma guardada y otra en la mano puede cambiarlas (un botón en sus Acciones).

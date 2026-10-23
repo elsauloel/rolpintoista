@@ -59,7 +59,7 @@
 >   skill (clase, creeps, catálogo de habilidades de creep), el texto principal dice solo qué pasa; los términos con su globo del glosario, sin
 >   re-explicarlos; lo técnico (⚙ / ✋ / cómo se arma) al recuadro. Hecho ya: los 8 Flash de clase («FLASH.» + el turno ajeno en el globo) y Sonic Boom.
 
-> - [ ] **🗡 Armas e inventario para creeps e invocaciones** (2026-10-22, dueño: «todo lo que tenga manos debería poder usar lo mismo… anotalo como
+> - [x] **🗡 Armas e inventario para creeps e invocaciones** — **hecho (2026-10-22/23): los ocho pasos de `docs/plan-inventario-creeps.md`, probados en «Claude · pruebas»; falta verlo en una sesión real.** (2026-10-22, dueño: «todo lo que tenga manos debería poder usar lo mismo… anotalo como
 >   una tarea pendiente y cuando tenga tiempo de programarlo lo hago»). Que un creep humanoide (y una invocación) use las mismas armas, escudos y
 >   talismanes que un jugador, con una especie de inventario: si levanta un arma, guarda la suya y después las cambia. Hoy el arma de un creep son
 >   datos fijos (armaNombre, armaTipo…), no un ítem. Primero el plan por pasos (sin programar): docs/plan-inventario-creeps.md; ver P217. **Plan escrito (2026-10-22, dueño: «vamos a encarar la tarea ardua de unificar el tema de las armas»): 8 pasos y 6 decisiones (D1–D6) para el dueño.**

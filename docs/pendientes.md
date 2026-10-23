@@ -5,6 +5,12 @@
 
 > **En curso (2026-10-02): automatizar las habilidades de los personajes de «El origen de las especies»** → [`automatizar-habilidades-origen.md`](automatizar-habilidades-origen.md) (cuál está hecha, cuál espera y por qué).
 
+> **🎲 Para preparar la próxima sesión de «El origen de las especies»** (2026-10-23, dueño: «cuando me ponga a preparar la próxima sesión,
+> haceme acordar»). Recordárselo apenas diga que se pone a prepararla:
+> - [ ] **Drops para que los jugadores prueben consumibles nuevos: por lo menos una 🦋 Polilla mística y una ⏩ Runa aceleradora (el Acelerador)**
+>   (dueño: «dije como drop, para que prueben los jugadores, de ítems consumibles, una polilla y un acelerador, por lo menos»). Se pueden poner como
+>   drop fijo de un creep (GM Tools → Recompensas → drops fijos) o sumarlos a mano al botín al finalizar el combate («+ Sumar» en el paso Equipo/Consumibles).
+
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.

@@ -106,7 +106,7 @@ setInterval(async () => {
 
 /* ✨ Cómo se ve (dueño, 2026-10-23: primero «algo verde con burbujitas»; después «en vez de burbujas, chispitas, como si fueran desde abajo hacia
    arriba, y que el borde no sea filoso hexagonal, sino un poquito irregular, suave y ondulado»). La zona de curación y el aura sanadora son una mancha
-   verde suave de borde ondulado (`trazarManchon`, js/50, como las nubes; sin el contorno de los hexágonos) con chispitas que suben y se apagan. La zona
+   verde con un contorno de línea ondulada que respira (`curaContorno`; ni nube ni hexágonos) y chispitas que suben y se apagan. La zona
    se dibuja en lugar del relleno de siempre (js/05 la trata como una superficie, sin borde); el aura, debajo de los tokens. Al curar, sobre cada uno que
    se curó suben unas chispitas de más, un momento (`curaBurbujas`, en la pantalla que cura). */
 const curaRand = (a, b) => { const x = Math.sin(a * 91.7 + b * 37.3) * 43758.5453; return x - Math.floor(x); };
@@ -132,19 +132,39 @@ function curaChispasEn(x, y, rad, z, semilla, n, fuerza){
   }
   ctx.restore();
 }
-// La mancha verde suave, de borde ondulado, que respira.
-function curaMancha(celdas){
-  const p = 0.5 + 0.5 * Math.sin(performance.now() / 900);
+/* El borde (dueño, 2026-10-23: «no quiero que se parezca a una nube, pero tampoco exactamente hexagonal: un borde lineal, pero irregular, ondulado,
+   que puede tener cierto movimiento hacia afuera y hacia adentro; algo que lo distinga de un veneno»). Las dos son una flor alrededor de un centro: un
+   contorno de línea clara, con ondas lentas que entran y salen, y un relleno verde liso (sin el desenfoque de las nubes). */
+function curaContorno(celdas, z, semilla){
+  if(!celdas.length) return;
+  const pts = celdas.map(c => hexCentro(c.col, c.fila));
+  const cx = pts.reduce((a, q) => a + q.x, 0) / pts.length, cy = pts.reduce((a, q) => a + q.y, 0) / pts.length;
+  const R0 = Math.max(...pts.map(q => Math.hypot(q.x - cx, q.y - cy))) + HEX * 0.85;
+  const t = performance.now() / 1000, N = 72;
+  const radio = th => R0 * (1 + 0.045 * Math.sin(5 * th + t * 0.9 + semilla) + 0.03 * Math.sin(9 * th - t * 1.4 + semilla * 2) + 0.02 * Math.sin(2 * th + t * 0.5));
+  const trazar = escala => {
+    ctx.beginPath();
+    for(let i = 0; i <= N; i++){
+      const th = (i / N) * Math.PI * 2, r = radio(th) * escala;
+      const x = cx + Math.cos(th) * r, y = cy + Math.sin(th) * r;
+      i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+    }
+    ctx.closePath();
+  };
+  const p = 0.5 + 0.5 * Math.sin(t * 1.2);
   ctx.save();
-  ctx.filter = `blur(${Math.max(1.5, HEX * 0.18 * vista.zoom * (typeof dpr === 'number' ? dpr : 1)).toFixed(1)}px)`;
-  trazarManchon(celdas, {radio: [0.5, 0.35], sale: [0, 0.35]});
-  ctx.fillStyle = `rgba(110,225,140,${0.20 + 0.07 * p})`; ctx.fill();
+  trazar(1); ctx.fillStyle = `rgba(110,225,140,${0.12 + 0.05 * p})`; ctx.fill();
+  ctx.lineJoin = 'round';
+  ctx.shadowColor = 'rgba(140,255,160,.9)'; ctx.shadowBlur = 8 / z;
+  ctx.strokeStyle = `rgba(170,255,185,${0.75 + 0.2 * p})`; ctx.lineWidth = 2.4 / z; ctx.stroke();
+  ctx.shadowBlur = 0;
+  trazar(0.94); ctx.strokeStyle = `rgba(170,255,185,${0.25 + 0.15 * p})`; ctx.lineWidth = 1.2 / z; ctx.setLineDash([6 / z, 7 / z]); ctx.lineDashOffset = -t * 12 / z; ctx.stroke();
   ctx.restore();
 }
 // La zona (desde js/05, como una superficie: sin el relleno ni el borde de siempre). → {anima, sinBorde}
 function curaDibujarZona(el, celdas, z){
   try{
-    curaMancha(celdas);
+    curaContorno(celdas, z, (el.origen ? el.origen.col * 3 + el.origen.fila : 0) % 7);
     celdas.forEach(c => { const q = hexCentro(c.col, c.fila); curaChispasEn(q.x, q.y, HEX * 0.9, z, c.col * 13 + c.fila * 7, 2, 1); });
   }catch(err){ try{ ctx.restore(); }catch(e){} console.error('Las chispas de la zona:', err); }
   return {anima: true, sinBorde: true};
@@ -155,7 +175,7 @@ function curaDibujarAura(t, z){
   try{
     const c0 = hexACubo({col: t.col, fila: t.fila});
     const celdas = curaOffsetsAura.map(([dq, dr]) => ({col: cuboACol(c0.q + dq, c0.r + dr), fila: cuboAFila(c0.q + dq, c0.r + dr)}));
-    curaMancha(celdas);
+    curaContorno(celdas, z, (t.col * 3 + t.fila) % 7);
     celdas.forEach(c => { const q = hexCentro(c.col, c.fila); curaChispasEn(q.x, q.y, HEX * 0.9, z, c.col * 13 + c.fila * 7, 1, 0.8); });
   }catch(err){ try{ ctx.restore(); }catch(e){} console.error('Las chispas del aura:', err); }
 }

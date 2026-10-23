@@ -2946,7 +2946,7 @@ const Duelo = (() => {
     }
     col().doc(d.id).update({estado: 'cancelado', ...(devolver ? {resultado: 'devolver'} : {})}).catch(err => console.error(err));
   }
-  const devolviendo = new Set();
+  const devolviendo = new Set(), devolverIntentos = new Map();
   async function devolverSiToca(d){
     if(devolviendo.has(d.id) || d.resultado !== 'devolver' || !d.atacante) return;
     let hk = null;
@@ -2955,7 +2955,13 @@ const Duelo = (() => {
       const H = typeof window !== 'undefined' ? window.DUELO_HOOKS : null;
       if(!hk && H && H.soy && H.soy(d.atacante)) hk = H;
     }catch(err){ console.error('Duelo: ¿quién devuelve el ataque?', err); }
-    if(!hk || !hk.devolverAtaque) return;
+    if(!hk || !hk.devolverAtaque){
+      // Recién cargada la página, el atacante puede no estar leído todavía (un creep del mapa): se reintenta un rato (2026-10-23).
+      const n = (devolverIntentos.get(d.id) || 0) + 1;
+      devolverIntentos.set(d.id, n);
+      if(n <= 6) setTimeout(() => devolverSiToca(d), 2500);
+      return;
+    }
     devolviendo.add(d.id);
     try{
       const ref = col().doc(d.id);

@@ -68,7 +68,7 @@
     'Barrido': ['choque pesado', 'barrido'], 'Coletazo': ['choque pesado', 'barrido'],
     'Tiro a la cabeza': ['rango', 'tiro apuntado'], 'Desarmar': ['choque pesado', 'desarmar'], 'El que avisa no traiciona': ['choque pesado', 'golpe anunciado'], 'Sal en la herida': ['choque liviano', 'abrir la herida'], 'Remate': ['choque pesado', 'remate'], 'Ir por el herido': ['choque pesado', 'remate'], 'Morder la herida': ['choque liviano', 'abrir la herida'], 'Patotear': ['choque liviano', 'manada'], 'Jauría': ['choque liviano', 'manada'], 'Zarpazo erguido': ['choque pesado', 'golpe anunciado'], 'Mal de ojo': ['debuffer', 'maleficio'], 'Disparo señalador': ['rango', 'señalar'], 'Ráfaga de cortes': ['choque liviano', 'ráfaga'], 'Ráfaga de zarpazos': ['choque liviano', 'ráfaga'],
     'Romper armadura': ['choque pesado', 'romper armadura'], 'Arrancar la coraza': ['choque pesado', 'romper armadura'],
-    'Golpe demoledor': ['choque pesado', 'romper armadura'], 'Mandíbula trituradora': ['choque pesado', 'romper armadura'], 'Cadena de rayos': ['mago', 'rayo en cadena'],
+    'Golpe demoledor': ['choque pesado', 'romper armadura'], 'Mandíbula trituradora': ['choque pesado', 'romper armadura'], 'Cadena de rayos': ['mago', 'rayo en cadena'], 'Hálito polar': ['mago', 'cono de frío'],
     'Puñalada por la espalda': ['choque liviano', 'por la espalda'], 'Mordida a traición': ['choque liviano', 'por la espalda'], 'Puñalada trapera': ['choque liviano', 'por la espalda'],
   };
 
@@ -206,7 +206,6 @@
   H('Puño de roca', 'D', 'ce', 'mt', 2, aA('Un puñetazo que rompe huesos: un ataque con su arma con +2 al daño; si pega, el golpe lo atonta y queda con Demora (baja 1 lugar en el orden de turnos).',
     {fijo: 2}, 'va al duelo como un ataque con +2 al daño; si pega, Demora (baja 1 lugar en el orden de turnos)', 2,
     [{nombre: 'Demora', detalle: 'Baja 1 lugar en el orden de turnos.'}]));
-  H('Aliento gélido', 'DA', 'e', 'rg', 4, zO('Un soplido helado en cono: enfría a los golpeados (a mano).', 3, 'M'));
 
   /* ================= DAÑO A DISTANCIA / MÁGICO ================= */
   H('Disparo certero', 'D', 'hd', 'r', 2, aT('Un tiro apuntado con calma.', 'M'));
@@ -237,6 +236,12 @@
     no2: 3, spCosto: 3, auditada: true, ataqueTxt: 'su PdG.Esp contra la Evasión; 2d4 eléctrico que salta (la mitad cada vez) y 20 % de Parálisis',
     duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['eva'], alcance: 'rango', dano: true, danoFormula: '2d4', tipoDano: 'eléctrico', cadena: {saltos: 99, rango: 4},
       efectos: [{nombre: 'Parálisis', turnos: 1, caras: 10, exitos: 2}]}});
+  // ❄ Auditada (dueño, 2026-10-23; el Mago, «un cono de frío… hálito polar»): reemplaza al viejo Aliento gélido (a mano). El cono de 16 casillas de
+  // siempre (el de Sonic Boom: sin dodge roll, no hay dónde escaparse), por eso pega menos que la Bola de fuego: 2d4 de hielo sin el Efecto especial
+  // (P216 en pausa) y Escarcha (−1 a los No2 máximos, 2 turnos). 3 No2 y 4 SP, o cooldown 3.
+  H('Hálito polar', 'DA', 'ega', 'g', 3, {detalle: 'Exhala un aliento helado en cono al frente (16 casillas): tira su Probabilidad de Golpe especial una vez contra la Evasión de cada rival del cono (no hay dodge roll: el cono no deja dónde escaparse). Al que no le gana: 2d4 de daño de hielo (lo frenan la Defensa especial y la resistencia al hielo) y Escarcha (−1 a sus No2 máximos, 2 turnos).',
+    no2: 3, spCosto: 4, auditada: true, ataqueTxt: 'su PdG.Esp contra la Evasión de cada rival del cono; 2d4 de hielo y Escarcha',
+    duelo: {objetivo: 'cono', tira: 'pdgmg', contra: ['eva'], dano: true, danoFormula: '2d4', tipoDano: 'hielo', efectos: [{nombre: 'Escarcha'}]}});
   H('Misil arcano', 'D', 'hdga', 'g', 2, aT('Un proyectil mágico que no falla.', 'M'));
   H('Descarga eléctrica', 'DK', 'ea', 'g', 3, zO('Una descarga que deja al objetivo sin aliento: pierde 1 No2 (a mano).', 2, 'M'));
   H('Llamarada', 'DA', 'e', 'g', 4, zO('Una lengua de fuego en línea (a mano).', 3, 'M'));
@@ -324,7 +329,7 @@
     no2: 2, spCosto: 4, auditada: true, ataqueTxt: 'zona de diámetro 5: cura 4 a todos sus aliados adentro, 4 veces (al ponerla y al empezar sus turnos)',
     duelo: {objetivo: 'zona', radio: 2, zonaTurnos: 4, zonaAlcance: 'rango', zonaColor: '#7CD992', tira: '', contra: [], dano: false, zonaEstado: {cura: '4', pulsos: 4}}}, 'terreno y formas');
   H('Aura sanadora', 'CA', '*', 'a', 4, {detalle: 'Se rodea de un aura que cura: durante 4 turnos, al activarla y al empezar cada uno de sus turnos (4 veces en total) cura 4 de vida a todos sus aliados a 5 casillas o menos (diámetro 11), él incluido, sin tirar dados. El aura se mueve con él.',
-    no2: 2, spCosto: 4, auditada: true, ataqueTxt: 'aura de diámetro 11: cura 4 a todos sus aliados cerca, 4 veces (al activarla y al empezar sus turnos)',
+    no2: 3, spCosto: 5, auditada: true, ataqueTxt: 'aura de diámetro 11: cura 4 a todos sus aliados cerca, 4 veces (al activarla y al empezar sus turnos)',
     duelo: {objetivo: 'uno mismo', tira: '', contra: [], efectos: [{nombre: 'Aura sanadora', polaridad: 'buff', turnos: 4, detalle: 'Aura sanadora: al empezar cada uno de sus turnos, 4 de vida a sus aliados a 5 casillas o menos (vtt-hexgrid/js/70).'}]}}, 'aura');
   H('Bendición', 'B', 'hd', 'a', 4, tA('Bendice a un aliado: +1 de Daño y +2 de Defensa 3 turnos (a mano).', 2));
   H('Escudar aliado', 'T', 'hdc', 'at', 3, tA('Un aliado adyacente gana +3 de Defensa 2 turnos (a mano).', 2));

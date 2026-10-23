@@ -1117,6 +1117,9 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   el arranque no sea tan largo. Falta decidir: el criterio, si vale también para los jugadores (el Toque mágico, el Orbe arcano) y una simulación
   con el criterio elegido. **La página para debatirla con la mesa:** https://claude.ai/artifact/C7VPwWPg9BpWfF1L1hUGb6 (dueño: «dejemos la pregunta
   abierta para debatir con mis colegas»). Mientras tanto, la Bola de fuego de creep ya usa «cuesta su Especial en SP», para probarla.
+  **Decidido el criterio general (dueño, 2026-10-23):** «cualquier skill que sume Efecto especial en su daño va a tener un costo proporcional al
+  Efecto especial; después afinamos el caso particular». Por ahora, como la Bola de fuego: cuesta su Especial en SP (`spCosto: 'esp'`). Una skill de
+  daño fijo (sin Ef.Esp) lleva un costo fijo. Sigue abierto: la proporción de cada caso, si vale igual para los jugadores, y la recarga.
   **Otra posibilidad (dueño, 2026-10-21): reducir la recarga, o quitarla.** La cuenta: en una sola pelea la recarga casi no pesa (el mago de
   Especial 13 tiene 57 SP con la de hoy, 48 con la mitad, 39 sin recarga: en los tres casos, una habilidad de 3 SP sale todos los turnos); donde
   cambia todo es entre peleas: hoy el SP también se recarga fuera de combate (cada pelea empieza llena). Si se quita la recarga y el SP vuelve solo

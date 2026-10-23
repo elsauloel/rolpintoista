@@ -4880,6 +4880,18 @@ prueba('📣 ¡A la carga! y Arenga (Support, 2026-10-23): onda a los aliados a 
     e('¡A la carga!').etiquetas.includes('auditada'), e('Arenga').etiquetas.includes('support'), ['Aullido de manada', 'Grito de ánimo', '¡Por el amo!', '¡A laburar!', 'Marca del amo', 'Aullido de la manada'].filter(e).length],
     ['onda', 4, true, 2, 'pdg2 pdgmg2 dmg2 dmgesp2', 'Bendecido', 3, 4, true, true, 0]);
 });
+prueba('💚 El Aura sanadora cuesta más que el Círculo (dueño, 2026-10-23): 3 No2 y 5 SP', () => {
+  const e = n => HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos.sp;
+  igual([e('Aura sanadora').no2, e('Aura sanadora').spCosto, e('Círculo de sanación').no2, e('Círculo de sanación').spCosto], [3, 5, 2, 4]);
+});
+prueba('❄ Hálito polar (Mago, 2026-10-23): cono, PdG.Esp contra Evasión, 2d4 de hielo y Escarcha; reemplaza al Aliento gélido', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Hálito polar'), h = armarHabilidadDeCreep(e.datos, 3);
+  const he = Combatiente.habEjecucion(h, h.duelo, {stat: () => 0});
+  igual([he.objetivo, he.tira && he.tira.stat, (he.contra || []).map(c => c.stat || c), he.dano && he.dano.formula, Combatiente.elementoDe(h.duelo.tipoDano),
+    h.duelo.efectos[0].nombre, e.datos.sp.no2, e.datos.sp.spCosto, e.datos.cd, e.etiquetas.includes('cono de frío'),
+    HABILIDADES_CREEP_BASE.filter(x => /soplido helado en cono/.test(x.detalle || '')).length],
+    ['cono', 'pdgmg', ['eva'], '2d4', 'hielo', 'Escarcha', 3, 4, 3, true, 0]);
+});
 prueba('💚 Curar del Support (2026-10-23): Sanar 1d6+4, Bálsamo (Regeneración 4 × 3), Círculo de sanación (zona de diámetro 5, 4 de vida fijos por pulso) y Aura sanadora (4 turnos); las viejas salieron', () => {
   const e = n => HABILIDADES_CREEP_BASE.find(x => x.nombre === n), arm = n => armarHabilidadDeCreep(e(n).datos, 3);
   const s = arm('Sanar'), b = arm('Bálsamo'), c = arm('Círculo de sanación'), a = arm('Aura sanadora'), o = arm('Oleada sanadora'), ho = Combatiente.habEjecucion(o, o.duelo, {stat: () => 0});

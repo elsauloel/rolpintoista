@@ -249,7 +249,15 @@
   pulsos: `vtt-hexgrid/js/70-curacion.js`. Los costos los propuso Claude. **Ajuste del dueño (el mismo día)**: «que sea un número fijo en lugar de un dado,
   para no tener que tirar dados: que al empezar el turno… cure a los que estén ahí» → el Círculo y el Aura curan **4 fijos**, al ponerlos y **al empezar cada
   turno de quien los creó** (sin orden de turnos, cada ronda), 4 veces; con **burbujitas verdes** mientras duran y sobre cada uno que se cura. Y una quinta,
-  **Oleada sanadora**: el Sanar (1d6+4) a cada aliado de una flor de 7 en su Rango (él incluido), 2 No2 y 4 SP, o cooldown 4. **Para probar.**
+  **Oleada sanadora**: el Sanar (1d6+4) a cada aliado de una flor de 7 en su Rango (él incluido), 2 No2 y 4 SP, o cooldown 4. Probadas en el mapa el
+  2026-10-23; las burbujitas pasaron a chispitas con un borde ondulado que sigue el área. **Ajuste del dueño (el mismo día, al ver el reporte)**: el Aura
+  cubría más que el Círculo por lo mismo → **el Aura cuesta 3 No2 y 5 SP** (cooldown 4).
+
+- ✅ **Hálito polar** (Mago, «cono de frío», 2026-10-23, dueño: «un cono de frío… algo así como hálito polar»): reemplaza al viejo **Aliento gélido** del pool
+  (a mano). El cono de 16 casillas al frente (el de Sonic Boom: sin dodge roll); PdG.Esp contra la Evasión de cada rival del cono; **2d4 de hielo** (lo frenan
+  la Defensa especial y la resistencia al hielo) y **Escarcha** (−1 No2 máximos, 2 turnos). 3 No2 y 4 SP, o cooldown 3. Pega menos que la Bola de fuego
+  porque cubre más casillas y no deja esquivar. Daño fijo, sin el Ef.Esp: P216 (2026-10-23, dueño) — una skill que suma el Ef.Esp cuesta en proporción a
+  él; el dueño dejó abierto si el Hálito va fijo o con el Ef.Esp. Costos propuestos por Claude. **Para probar.**
 
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 

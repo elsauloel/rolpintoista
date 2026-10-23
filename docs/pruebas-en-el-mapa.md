@@ -19,7 +19,9 @@
   aparecía un aviso genérico con «Entendido» y sin botón para tirar (lo tapaba); y la tarjeta del GM con «Tirar por él» se borraba a los 14 s.
 - [x] (2026-10-22, Claude: Clementino le pegó un crítico al Bosque, 21 de daño; la vida quedó en 60 hasta «💔 Aplicar el daño», después 39) **💔 El daño a un creep espera el clic del GM**: un personaje le pega a un creep (o el creep para y pierde el Bloqueo: pasa la mitad) → en el
   cuadro del duelo, al GM, «Pasa la mitad: (X − su Defensa) ÷ 2» y «💔 Aplicar el daño»; recién ahí se descuenta. (Antes se aplicaba solo.)
-- [ ] **💪 Empower antes de la tirada** (dueño, 2026-10-22: «se aprieta y la siguiente tirada le suma el valor del empower»; js/37, estado Empower
+- [x] (2026-10-23, Claude, «Claude · pruebas», juan con el control del GM: dos Empower seguidos a sí mismo — el segundo ofrecía «+6 (ya tiene 1
+  Empower esperando) · 3 SP» —, cobró 2 + 3 SP (42 → 37), la Botonera mostró «Empower +6» y la Evasión siguiente lo usó («Afectada por Empower») y
+  el estado se fue) **💪 Empower antes de la tirada** (dueño, 2026-10-22: «se aprieta y la siguiente tirada le suma el valor del empower»; js/37, estado Empower
   en `comun/estados-presets.js`): 💪 → «¿A quién le das Empower?» (vos o un aliado en tu Rango, con lo que sumaría y el costo) → paga → esa persona
   queda con Empower y su próxima tirada (ataque, defensa, daño, Fuerza del golpe, Percepción…) suma +3 y lo gasta. Dos Empower antes de tirar = +6.
   **Probado por Claude (2026-10-22, «Claude · pruebas»)**: el cartel de elegir a quién (juan: «juan (vos)» y «Clementino», +3 · 2 SP); la Botonera
@@ -182,18 +184,25 @@
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 
 ## Pendientes
-- [ ] **🛡 No2 negativos en las defensas (2026-10-23, dueño)**: con 0 No2, el Parry se puede (queda en −1, con el aviso); con No2 ya negativos, el
+- [x] **🛡 No2 negativos en las defensas (2026-10-23, dueño)**: con 0 No2, el Parry se puede (queda en −1, con el aviso); con No2 ya negativos, el
   Parry, la Evasión pagando el sobrepeso, el dodge roll y la ayuda para zafar quedan apagados («ya está en No2 negativos…»). La oportunidad y el
   contraataque, como siempre (no bajan de 0). **Probado en parte el 2026-10-23** («Claude · pruebas»): el Escarabajo con −1 No2 atacado por juan →
   su Parry apagado con «Ya está en No2 negativos: no puede gastar más en una defensa»; con 0 No2 → Parry habilitado con «⚠ sin No2: queda en
-  negativo», elegido → −1 No2 y el aviso de la deuda. Falta ver: la Evasión pagando el sobrepeso, el dodge roll y la ayuda para zafar ya en negativo.
+  negativo», elegido → −1 No2 y el aviso de la deuda. **Lo que faltaba, probado el mismo día** (Clementino con −1 No2): la ayuda para zafar a juan
+  (atrapado en la telaraña) → «Sí, ayudar» avisó que ya está en negativo y juan tiró solo, gratis (3 contra 9; No2 sin cambiar); con sobrepeso, atacado
+  por juan → «Evasión · pagando 1 No2» apagada con «Ya estás en No2 negativos…» (la de con penalidad, habilitada); el dodge roll → «ya está en No2
+  negativos… (el dodge roll)» y el movimiento pidió confirmar como uno común.
 - [x] **🪤 Mínimo para detectar una trampa comprada (2026-10-23)** — probado el mismo día: el Goblin de prueba 1 (Destreza 1) colocó una Trampa de
   oso (Común) y quedó con dificultad para detectarla 6, no 1.
-- [ ] **📜 Mínimo de calidad del Efecto especial de un pergamino (2026-10-23)**: la Red Nerubian (Buena) con un Ef.Esp bajo → para soltarse, Fuerza
+- [x] (2026-10-23, Claude: con las dificultades 7/9/11, el Goblin de prueba 1 —Ef.Esp 4— le tiró el Pergamino de Red Nerubian a juan → para
+  soltarse, Fuerza contra 9, con la telaraña dibujada) **📜 Mínimo de calidad del Efecto especial de un pergamino (2026-10-23)**: la Red Nerubian (Buena) con un Ef.Esp bajo → para soltarse, Fuerza
   contra 8; el Pergamino de luz cegadora tira como mínimo 8. (Está en las pruebas automáticas; falta verlo en el mapa.)
-- [ ] **💚 Sanar, Oleada sanadora, Bálsamo, Círculo de sanación y Aura sanadora (Support, 2026-10-23)**: Sanar a un aliado herido y a uno caído (no lo levanta); la Oleada a los aliados de una flor de 7; Bálsamo deja Regeneración 4 × 3; el Círculo cura 4 a los aliados adentro al ponerlo y al empezar cada turno del creep (a los rivales no), 4 veces, con burbujitas verdes; el Aura igual alrededor del creep, con el aura verde en el token que se va al terminar; Mesa y Crónica.
-- [ ] **📣 ¡A la carga! y Arenga (Support, 2026-10-23)**: un creep con cada una, con aliados a 4 casillas o menos y uno más lejos: ¡A la carga! deja +2 a lo ofensivo 2 turnos, Arenga deja Bendecido 3 turnos; a él no; usarla otra vez renueva los turnos (no apila); el cobro de No2 y SP o el cooldown.
-- [ ] **🗡 Remate / Ir por el herido (2026-10-23)**: un creep con la habilidad contra un personaje sano (ataque común), con la mitad de la vida (+2 dados) y con un cuarto o menos (+3); mirar la Mesa, la Crónica y la fórmula del daño. **Y** (dueño, el mismo día): al elegir el objetivo brillan solo los que califican; uno sano pregunta «¿Atacarlo igual, como un ataque común?»; cancelar le devuelve al creep el cooldown y el SP. **Visto de pasada (2026-10-23)**: con juan sano no brilló nadie, al elegirlo salió «No califica… ¿Atacarlo igual?» y cancelar le devolvió al Escarabajo el cooldown y los 3 No2 (toast y Mesa). **Falta**: el +2 y el +3 con un objetivo herido.
+- [x] (2026-10-23, Claude, el Escarabajo: Sanar a un caído no lo levanta; un caído no brilla y al tocarlo sale «está caído: elegí otro»; la Oleada
+  curó al Goblin y al Escarabajo; Bálsamo, Regeneración 4 × 3; cancelar Sanar devolvió lo cobrado; el Círculo curó al ponerlo y al empezar el turno del
+  creep; el Aura, al activarla y en su turno; la animación pasó a chispitas con un borde ondulado, a pedido del dueño) **💚 Sanar, Oleada sanadora, Bálsamo, Círculo de sanación y Aura sanadora (Support, 2026-10-23)**: Sanar a un aliado herido y a uno caído (no lo levanta); la Oleada a los aliados de una flor de 7; Bálsamo deja Regeneración 4 × 3; el Círculo cura 4 a los aliados adentro al ponerlo y al empezar cada turno del creep (a los rivales no), 4 veces, con burbujitas verdes; el Aura igual alrededor del creep, con el aura verde en el token que se va al terminar; Mesa y Crónica.
+- [x] (2026-10-23, Claude: las dos llegaron a los aliados de cerca y no al creep que las usó) **📣 ¡A la carga! y Arenga (Support, 2026-10-23)**: un creep con cada una, con aliados a 4 casillas o menos y uno más lejos: ¡A la carga! deja +2 a lo ofensivo 2 turnos, Arenga deja Bendecido 3 turnos; a él no; usarla otra vez renueva los turnos (no apila); el cobro de No2 y SP o el cooldown.
+- [x] (2026-10-23, Claude: con un cuarto de vida o menos, +3 dados en el daño, en la Mesa y la Crónica; el +2 sale del mismo escalón y está en las
+  pruebas automáticas) **🗡 Remate / Ir por el herido (2026-10-23)**: un creep con la habilidad contra un personaje sano (ataque común), con la mitad de la vida (+2 dados) y con un cuarto o menos (+3); mirar la Mesa, la Crónica y la fórmula del daño. **Y** (dueño, el mismo día): al elegir el objetivo brillan solo los que califican; uno sano pregunta «¿Atacarlo igual, como un ataque común?»; cancelar le devuelve al creep el cooldown y el SP. **Visto de pasada (2026-10-23)**: con juan sano no brilló nadie, al elegirlo salió «No califica… ¿Atacarlo igual?» y cancelar le devolvió al Escarabajo el cooldown y los 3 No2 (toast y Mesa). **Falta**: el +2 y el +3 con un objetivo herido.
 - [x] **🕸 La telaraña y la red, a la vista (2026-10-23), probado en el mapa con capturas**: la Red (copia vieja de un creep, sin el dato: la
   reconoció por el nombre) dejó la red de soga sobre juan; la Tela de araña, la telaraña sobre Clementino; al soltarse (Fuerza 4 contra 1, al
   empezar su turno) se fue sola. En el piso, la Red de caza y la Telaraña oculta llevan su dibujo encima de la ficha del cepo. El rebote, cada 3,6 s.

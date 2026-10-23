@@ -2993,7 +2993,15 @@ const Duelo = (() => {
     cfgEscuchar = cfg || {};
     col().where('resultado', '==', 'devolver').onSnapshot(snap => snap.docs.forEach(doc => devolverSiToca({id: doc.id, ...doc.data()})),
       err => console.error('Error escuchando los duelos a devolver:', err));
-    escuchando = col().where('estado', 'in', ['esperando', 'empate', 'resuelto']).onSnapshot(snap => {
+    /* Lo primero que llega puede venir de la memoria de la página, con solo los duelos que otra escucha ya había traído (el Desarmar del mapa:
+       los abiertos). Si eso contaba como «lo que ya había pasado», los demás, al llegar del servidor, parecían recién resueltos: al abrir el mapa
+       aparecían todos los duelos del día en botones y en la Crónica, y los avisos de «la primera vez no» (el Empujón, termina el turno, la flecha
+       que erra, el desarme…) podían repetirse con duelos viejos (2026-10-23). Hasta que contesta el servidor, no se toma nada. (Con los cambios
+       de origen: si el servidor confirma lo mismo que la memoria, igual hay que enterarse.) */
+    let servidorVisto = false;
+    escuchando = col().where('estado', 'in', ['esperando', 'empate', 'resuelto']).onSnapshot({includeMetadataChanges: true}, snap => {
+      if(snap.metadata.fromCache && !servidorVisto) return;
+      servidorVisto = true;
       listaDuelos = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
       const ahora = Date.now();
       // Un duelo nuevo se abre solo para todos los conectados; si ya hay otro abierto y sin resolver, queda el botón.

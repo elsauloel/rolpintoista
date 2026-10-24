@@ -251,6 +251,18 @@ líneas, zonas, el rayo en cadena y los charcos, los controles mentales.
 
 - **Mago (daño directo):** proyectil mágico, ✅ **Bola de fuego** (2026-10-21), ✅ **Hálito polar** (cono de frío, 2026-10-23), ✅ **Cadena de rayos** (2026-10-21), ✅ **Muro de fuego** (2026-10-24: largo a elegir, 4 a 8,
   con el costo según el largo).
+- **Mago — ideas nuevas (2026-10-24, la lista que pidió el dueño; ✦ = acelera la pelea):**
+  - **A. Daño concentrado:** 1. **Lanza de luz** ✦ (una línea que atraviesa a todos los que estén en ella). 2. **Andanada arcana** (3 proyectiles que se
+    reparten entre objetivos a elección). 3. **Rayo cargado** ✦ (un turno lo carga a la vista de todos; al siguiente, mucho daño; si le pegan, se le cae).
+  - **B. Áreas que se anuncian y terreno:** 4. **Lluvia de meteoros** ✦ (marca una zona que cae al empezar su próximo turno: los jugadores ven dónde y pueden
+    salir). 5. **Suelo helado** (deja hielo: resbalarse al caminar). 6. **Diluvio** (deja charcos: el rayo corre por el agua, combo con la Cadena de rayos).
+    7. **Nova arcana** (una onda alrededor que empuja).
+  - **C. Control elemental:** 8. **Prisión de hielo** (Inmovilizado, se suelta con Fuerza). 9. **Ráfaga de viento** (cono que empuja y tira al piso).
+    10. **Rayo paralizante** (poco daño y Parálisis segura).
+  - **D. El cuerpo del mago:** 11. **Escudo de maná** (un escudo que se paga con SP). 12. **Parpadeo** (se teletransporta unas casillas, Flash).
+    13. **Contrahechizo** (Flash: al ver una habilidad de un personaje, la frena con su Res.Esp).
+  - **E. Debilidad y sobrecarga:** 14. **Marca elemental** (el objetivo queda vulnerable a un elemento: Res. −2; se cruza con las debilidades por tipo de
+    criatura, pendientes). 15. **Sobrecarga** ✦ (pega mucho más y se lastima o pierde SP). 16. **Robar maná** (le saca SP al objetivo y lo suma).
 - **Debuffer:** ver el listado completo abajo (§ 6).
 - **Support:** ver el listado completo abajo (§ 5).
 - **El costo de las que suman Efecto especial:** P216 (la página para la mesa: https://claude.ai/artifact/C7VPwWPg9BpWfF1L1hUGb6).

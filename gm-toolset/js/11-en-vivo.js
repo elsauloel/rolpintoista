@@ -103,6 +103,7 @@ function creepPublico(sc, orden){
           ...((es.escudoMagicoActual !== undefined || num(es.escudoMagico) > 0) ? {escudo: num(es.escudoMagicoActual ?? es.escudoMagico), ...(es.excedenteVida ? {excedente: true, ...(es.excedenteTope ? {tope: num(es.excedenteTope)} : {})} : {escudoMax: num(es.escudoMagico)})} : {}), ...(es.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(es.stacks) || 1)} : {}),
           ...(es.vigilancia ? {vigilancia: Math.max(1, Math.round(num(CreepCalculo.alcance(sc))))} : {}),   // 👁 Vigilancia: el alcance del disparo (el mapa, js/58)
           ...Combatiente.atrapaPub(es),   // 🕸 la telaraña o la red, encima del token (el mapa, js/68)
+          ...(es.marcado ? {marcado: true} : {}),   // ⚡ brilla y se lo ve en la niebla (el Rayo cargado, 2026-10-24)
           polaridad: es.polaridad === 'buff' || es.polaridad === 'debuff' ? es.polaridad : '',
           // Para el globito del mapa al pasar el mouse por el estado.
           detalle: String(es.detalle || '').slice(0, 300),

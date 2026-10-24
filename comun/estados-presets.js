@@ -254,6 +254,10 @@ const ESTADOS_PRESET = [
   // 🪓 Golpe anunciado (2026-10-21, dueño: El que avisa no traiciona / Zarpazo erguido): lo carga un turno a la vista de todos; en su próximo turno
   // lo descarga (vtt-hexgrid/js/63). Se va al empezar su turno (pasa a `sc.golpeListo`); se corta si le entran 10 de daño o más mientras lo carga
   // (`cortaDano`, la cuenta en `danoRecibido`: vtt-hexgrid/js/10; dueño, 2026-10-21: «que no se corte con cualquier daño»).
+  // Rayo cargado (2026-10-24, dueño: el Mago; «si lo empieza a cargar estando cubierto por la niebla, se revela su ubicación: una luz recubre al creep,
+  // como si quedara marcado»): el golpe anunciado de un hechizo, con `marcado` (brilla y se lo ve a través de la niebla) mientras carga.
+  {nombre:'Rayo cargado', polaridad:'buff', turnos:0, permanente:true, alEmpezarTurno:true, golpeAnunciado:true, cortaDano:10, marcado:true,
+    detalle:'Junta energía a la vista de todos: una luz lo recubre (brilla y se lo ve aunque esté en la niebla, como Marcado) y en su próximo turno descarga el rayo. Si mientras lo carga le entran 10 de daño o más (sumando los golpes), se le corta. ⚙ Automatizado (vtt-hexgrid/js/63).'},
   {nombre:'Golpe anunciado', polaridad:'buff', turnos:0, permanente:true, alEmpezarTurno:true, golpeAnunciado:true, cortaDano:10,
     detalle:'Carga un golpe a la vista de todos: en su próximo turno descarga un ataque con +3 dados del Tipo de su arma, que no se puede parrear y empuja 2 casillas (cuesta los No2 del ataque y 3 SP). Si su objetivo está pegado y se aleja, se lo come de oportunidad (los No2 de una oportunidad y los 3 SP). Si mientras lo carga le entran 10 de daño o más (sumando los golpes), se le cae el golpe. ⚙ Automatizado en el mapa.'},
   // 🎯 Apuntando a la cabeza (2026-10-21, dueño, el Tiro a la cabeza de los creeps): su próximo disparo +2 PdG, Crítico frecuente +1 y Crítico potente +1

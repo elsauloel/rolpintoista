@@ -206,6 +206,9 @@
 - [ ] **❄ Hálito polar (Mago, 2026-10-23)**: un creep lo usa mirando hacia dos rivales y un aliado → el cono de 16 casillas al frente; tira PdG.Esp una vez
   contra la Evasión de cada rival (no del aliado), sin dodge roll; al que no le gana, 2d4 + ¼ del Ef.Esp del creep, de hielo (menos su Defensa especial y su
   resistencia al hielo), y Escarcha (−1 No2 máximos, 2 turnos); el cobro (3 No2 y tanto SP como su Especial, o cooldown 3). **Y** el Aura sanadora cobra ahora 3 No2 y 5 SP.
+- [ ] **⚡ Rayo cargado (Mago, 2026-10-24)**: el creep (en la niebla, para un jugador) lo carga apuntando a un personaje → Mesa y Crónica «junta energía
+  mirando a…», el creep brilla y el jugador lo ve en la niebla; en su próximo turno, Atacar → «Descargar» → el duelo de un hechizo contra ese personaje (su
+  PdG.Esp contra la Evasión, 4d6 eléctrico); cobra 2 No2 y 3 SP; si antes le entran 10 de daño, se le corta.
 - [ ] **🎯 Ojo certero (Support, 2026-10-24)**: un creep se lo da a un aliado en el turno de otro y a sí mismo en el suyo → en los dos casos lo tienen durante sus 2
   turnos completos siguientes y se va al empezar el tercero; Crítico frecuente +2 y potente +2 en el duelo (los cuadraditos del crítico: «F» de más y la tabla
   con el potente); el Anuncio del buff; el cobro (1 No2 y 3 SP, o cooldown 3).

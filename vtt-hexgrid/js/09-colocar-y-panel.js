@@ -624,6 +624,7 @@ async function modificarCreep(creepId, cambiar){
           nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...(e.invulnerable ? {invulnerable: true} : {}), ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
           ...(e.vigilancia ? {vigilancia: Math.max(1, Math.round(num(CreepCalculo.alcance(sc))))} : {}),   // 👁 Vigilancia: el alcance del disparo (js/58)
           ...Combatiente.atrapaPub(e),   // 🕸 la telaraña o la red, encima del token (js/68)
+          ...(e.marcado ? {marcado: true} : {}),   // ⚡ brilla y se lo ve en la niebla (el Rayo cargado, 2026-10-24)
           polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
         })),
       firma: hashGm(json) + '-' + parteImagen,

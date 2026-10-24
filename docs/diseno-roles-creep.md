@@ -28,12 +28,12 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
   robar, sigilo, varios golpes, bajo tierra, veneno.
 - 🏹 **Rango y Hunter — 11**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
-- ✨ **Mago — 6**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego (2026-10-24) · de El origen: proyectil, fuego con quemadura.
+- ✨ **Mago — 7**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, rayo cargado (2026-10-24) · de El origen: proyectil, fuego con quemadura.
 - 🧿 **Debuffer — 7**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24) · de El origen: ceguera, veneno, inmovilizar.
 - 💚 **Support — 7**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
-**Para emparejar**: Mago (6), después Debuffer y Support (7) (2026-10-24); después Rango + Hunter (11).
+**Para emparejar**: Mago, Debuffer y Support empatados en 7 (2026-10-24); después Rango + Hunter (11).
 
 ## Los roles
 
@@ -253,7 +253,8 @@ líneas, zonas, el rayo en cadena y los charcos, los controles mentales.
   con el costo según el largo).
 - **Mago — ideas nuevas (2026-10-24, la lista que pidió el dueño; ✦ = acelera la pelea):**
   - **A. Daño concentrado:** 1. **Lanza de luz** ✦ (una línea que atraviesa a todos los que estén en ella). 2. **Andanada arcana** (3 proyectiles que se
-    reparten entre objetivos a elección). 3. **Rayo cargado** ✦ (un turno lo carga a la vista de todos; al siguiente, mucho daño; si le pegan, se le cae).
+    reparten entre objetivos a elección). 3. ✅ **Rayo cargado** ✦ (2026-10-24: un turno lo carga a la vista de todos y queda Marcado —«una luz lo recubre», se lo ve en la niebla—; al siguiente,
+    4d6 eléctrico; 10 de daño se lo cortan).
   - **B. Áreas que se anuncian y terreno:** 4. **Lluvia de meteoros** ✦ (marca una zona que cae al empezar su próximo turno: los jugadores ven dónde y pueden
     salir). 5. **Suelo helado** (deja hielo: resbalarse al caminar). 6. **Diluvio** (deja charcos: el rayo corre por el agua, combo con la Cadena de rayos).
     7. **Nova arcana** (una onda alrededor que empuja).

@@ -4949,6 +4949,16 @@ prueba('🏜 Maldición de la sequía (Debuffer, 2026-10-24): Sequía corta la r
   igual([he.objetivo, he.tira && he.tira.stat, (he.contra || []).map(c => c.stat || c), Combatiente.sequia(seco.estados), seco.hp, seco.sp, normal.hp, normal.sp > 5],
     ['enemigo', 'pdgmg', ['resmg'], true, 14, 5, 12, true]);
 });
+prueba('⚡ Rayo cargado (Mago, 2026-10-24): carga a la vista y queda Marcado (se lo ve en la niebla); descarga un hechizo PdG.Esp contra Evasión, 4d6 eléctrico', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Rayo cargado'), h = armarHabilidadDeCreep(e.datos, 3);
+  const sc = {nombre: 'Mago', nitros: 6, estados: [], habilidades: [{...h, id: 'r1', cdActual: 0}]};
+  CreepAcciones.ejecutarHab(sc, sc.habilidades[0], estadosPresetCreep(), true);
+  const est = sc.estados.find(x => x.nombre === 'Rayo cargado');
+  const hd = Combatiente.habEjecucion({nombre: h.nombre, duelo: h.golpeAnunciado.duelo}, h.golpeAnunciado.duelo, {stat: () => 0});
+  igual([!!est, !!(est && est.golpeAnunciado), !!(est && est.marcado), Combatiente.marcadoEn(sc.estados), Combatiente.tipoEjecucion(h.golpeAnunciado.duelo) !== 'arma',
+    hd.tira && hd.tira.stat, (hd.contra || []).map(c => c.stat || c), hd.dano && hd.dano.formula, h.golpeAnunciado.no2Golpe, h.golpeAnunciado.spGolpe, sc.nitros, !!h.cuentaComoAtaque],
+    [true, true, true, true, true, 'pdgmg', ['eva'], '4d6', 2, 3, 5, true]);
+});
 prueba('🔥 Muro de fuego (Mago, 2026-10-24): zona en línea de largo a elegir (4 a 8, base 1 No2 y 3 SP), 3d4 de fuego directo y Quemadura; el largo de más se cobra aparte; reemplaza a la Llamarada', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Muro de fuego'), h = armarHabilidadDeCreep(e.datos, 3);
   const z = Combatiente.zonaDeHab(h, {...h.duelo, zonaLargo: 5}, {fichaId: 'x', tipo: 'creep'});

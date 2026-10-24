@@ -300,7 +300,7 @@
   `golpeAnunciado.duelo` puede ser una Ejecución de habilidad; descarga con `no2Golpe` y `spGolpe`; no sale de oportunidad). Un turno junta energía mirando
   a un rival (su ataque del turno, 1 No2 y 2 SP) y queda **Rayo cargado** (estado nuevo, con `marcado`: brilla y se lo ve en la niebla; lo público del creep
   ahora lleva la marca); 10 de daño se lo cortan. En su próximo turno, al apretar Atacar: «Descargar», su PdG.Esp contra la Evasión del que anunció, **4d6
-  eléctrico** (2 No2 y 3 SP). Sin salto en cadena (es un rayo concentrado). Los números los propuso Claude. **Para probar.**
+  arcano** (2 No2 y 3 SP; dueño: «si no va a tener ningún efecto vinculado al eléctrico, que el daño sea arcano»). Los números los propuso Claude. **Para probar.**
 
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 

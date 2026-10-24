@@ -254,7 +254,7 @@ líneas, zonas, el rayo en cadena y los charcos, los controles mentales.
 - **Mago — ideas nuevas (2026-10-24, la lista que pidió el dueño; ✦ = acelera la pelea):**
   - **A. Daño concentrado:** 1. **Lanza de luz** ✦ (una línea que atraviesa a todos los que estén en ella). 2. **Andanada arcana** (3 proyectiles que se
     reparten entre objetivos a elección). 3. ✅ **Rayo cargado** ✦ (2026-10-24: un turno lo carga a la vista de todos y queda Marcado —«una luz lo recubre», se lo ve en la niebla—; al siguiente,
-    4d6 eléctrico; 10 de daño se lo cortan).
+    4d6 arcano; 10 de daño se lo cortan).
   - **B. Áreas que se anuncian y terreno:** 4. **Lluvia de meteoros** ✦ (marca una zona que cae al empezar su próximo turno: los jugadores ven dónde y pueden
     salir). 5. **Suelo helado** (deja hielo: resbalarse al caminar). 6. **Diluvio** (deja charcos: el rayo corre por el agua, combo con la Cadena de rayos).
     7. **Nova arcana** (una onda alrededor que empuja).

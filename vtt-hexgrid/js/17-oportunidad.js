@@ -25,9 +25,16 @@ const oporClave = (m, r) => m + '|' + r;
 const oporAlLado = (m, r) => { const a = tokens.get(m), b = tokens.get(r); return !!(a && b) && distanciaHex({col: a.col, fila: a.fila}, {col: b.col, fila: b.fila}) === 1; };
 const oporUsada = (m, r) => { oporLimpiar(); return oportunidadUsadas.has(oporClave(m, r)); };
 const oporMarcar = (m, r) => oportunidadUsadas.add(oporClave(m, r));
+// 👁 La vigilancia que lo dejó pasar no lo vuelve a frenar en este turno: su marca lleva el número de turno (2026-10-24: antes oporLimpiar
+// la borraba enseguida, porque no son pares pegados, y la Bruja preguntaba en cada paso del mismo camino).
+const vigClave = (m, r) => 'vig|' + oporClave(m, r) + '@' + Math.round(num(mantenimientoNumero));
 // Se olvidan los pares que ya no están pegados (lo llama la llegada de los tokens, js/09: también si se movió el rival).
 function oporLimpiar(){
-  for(const k of [...oportunidadUsadas]){ const [m, r] = k.split('|'); if(!oporAlLado(m, r)) oportunidadUsadas.delete(k); }
+  const turno = '@' + Math.round(num(mantenimientoNumero));
+  for(const k of [...oportunidadUsadas]){
+    if(k.startsWith('vig|')){ if(!k.endsWith(turno)) oportunidadUsadas.delete(k); continue; }
+    const [m, r] = k.split('|'); if(!oporAlLado(m, r)) oportunidadUsadas.delete(k);
+  }
 }
 const rutaTokenId = t => { for(const [id, x] of tokens) if(x === t) return id; return ''; };   // la clave de un token (no la lleva adentro)
 // ¿Le alcanzan los No2? (lo público; sin el dato, sí: mejor preguntar que perderlo)
@@ -49,7 +56,7 @@ function oportunidadCorte(t, id, ruta){
   if(!t || t.oculto || t.bajoTierra || etereoDe(t) || enSigilo(t) || !ruta || ruta.length < 2) return null;   // (👁 etéreo: tampoco)   // 🕳 por abajo de la tierra no da oportunidad
   const rivales = new Set(rivalesDe(t));
   const ids = [...tokens.entries()].filter(([, r]) => rivales.has(r) && !r.bajoTierra && !etereoDe(r) && oporPuede(r)).map(([rid, r]) => ({rid, r, usada: oporUsada(id, rid)}));
-  const vig = typeof vigilantesDe === 'function' ? vigilantesDe(t).filter(o => !oportunidadUsadas.has('vig|' + oporClave(id, o.rid))) : [];   // 👁 Vigilancia (js/58)
+  const vig = typeof vigilantesDe === 'function' ? vigilantesDe(t).filter(o => !oportunidadUsadas.has(vigClave(id, o.rid))) : [];   // 👁 Vigilancia (js/58)
   if(!ids.length && !vig.length) return null;
   for(let i = 1; i < ruta.length; i++){
     const antes = ruta[i - 1], despues = ruta[i];
@@ -84,7 +91,7 @@ async function oportunidadResolver(){
   if(!p) return;
   const t = tokens.get(p.tokenId), r = tokens.get(p.rivalId);
   if(!t || !r) return;
-  if(p.vigilancia) oportunidadUsadas.add('vig|' + oporClave(p.tokenId, p.rivalId));   // 👁 la vigilancia: una vez por camino (si lo deja pasar, no vuelve a frenarlo en este turno)
+  if(p.vigilancia) oportunidadUsadas.add(vigClave(p.tokenId, p.rivalId));   // 👁 la vigilancia: una vez por camino (si lo deja pasar, no vuelve a frenarlo en este turno)
   else oporMarcar(p.tokenId, p.rivalId);
   if(!p.vigilancia && await oporRetirada(t, r, p)) return;   // Retirada limpia: se fue sin darle la oportunidad
   const decide = oporDecide(r);

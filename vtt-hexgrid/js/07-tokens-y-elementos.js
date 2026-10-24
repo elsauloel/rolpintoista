@@ -364,6 +364,7 @@ function escucharElementos(){
         acelerador: Number.isFinite(d.acelerador) ? d.acelerador : 0,   // ⏩ el Acelerador (2026-10-12, js/40): los No2 que da
         zonaInmediata: d.zonaInmediata === true, zonaLuz: d.zonaLuz === true,   // (2026-10-08) enseguida a los de adentro · una luz (js/03)
         zonaAltura: ['piso', 'aire', 'ambos'].includes(d.zonaAltura) ? d.zonaAltura : '',   // dónde está su efecto (2026-10-07, js/08 alturaDe)
+        zonaDirecto: d.zonaDirecto === true,   // daño directo: no lo frena la Defensa especial (2026-10-24: no se copiaba, y la zona la restaba igual)
         zonaDanoDif: d.zonaDanoDif === true,   // el daño es la diferencia entre las tiradas (2026-10-02)
         zonaDanoTipo: typeof d.zonaDanoTipo === 'string' ? d.zonaDanoTipo : '',
         zonaTiraExtra: typeof d.zonaTiraExtra === 'string' ? d.zonaTiraExtra : '',
@@ -374,6 +375,7 @@ function escucharElementos(){
         // a dejar al activarse — ver trampaResolver. `zonaTurnos` es la duración de ESA zona, aparte de `turnos`
         // (que mientras la trampa está dormida puede significar otra cosa: cuándo se borra sola si no la pisan).
         trampaDejaZona: d.trampaDejaZona === true,
+        trampaItem: typeof d.trampaItem === 'string' ? d.trampaItem : '',   // el consumible que la colocó (js/28: desarmarla la devuelve tal cual; 2026-10-24, no se copiaba)
         zonaTurnos: Math.max(1, Math.round(num(d.zonaTurnos)) || 3),
       });
       // Trampa de teleport que se acaba de disparar: pulsos de luz violeta en el punto donde saltó y azul en el destino (2026-09-25).

@@ -5017,10 +5017,10 @@ prueba('💚 El Aura sanadora cuesta más que el Círculo (dueño, 2026-10-23): 
 prueba('❄ Hálito polar (Mago, 2026-10-23): cono, PdG.Esp contra Evasión, 2d4 + ¼ del Ef.Esp de hielo y Escarcha, cuesta su Especial en SP; reemplaza al Aliento gélido', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Hálito polar'), h = armarHabilidadDeCreep(e.datos, 3);
   const he = Combatiente.habEjecucion(h, h.duelo, {stat: s => s === 'dmgesp' ? 8 : 0});
-  igual([he.objetivo, he.tira && he.tira.stat, (he.contra || []).map(c => c.stat || c), he.dano && he.dano.formula, h.duelo.danoSumaEsp, Combatiente.elementoDe(h.duelo.tipoDano),
+  igual([he.objetivo, !!he.dodge, he.tira && he.tira.stat, (he.contra || []).map(c => c.stat || c), he.dano && he.dano.formula, h.duelo.danoSumaEsp, Combatiente.elementoDe(h.duelo.tipoDano),
     h.duelo.efectos[0].nombre, e.datos.sp.no2, e.datos.sp.spCosto, e.datos.cd, e.etiquetas.includes('cono de frío'),
     HABILIDADES_CREEP_BASE.filter(x => /soplido helado en cono/.test(x.detalle || '')).length],
-    ['cono', 'pdgmg', ['eva'], '2d4+2', 0.25, 'hielo', 'Escarcha', 3, 'esp', 3, true, 0]);
+    ['cono', true, 'pdgmg', ['eva'], '2d4+2', 0.25, 'hielo', 'Escarcha', 3, 'esp', 3, true, 0]);
 });
 prueba('💚 Curar del Support (2026-10-23): Sanar 1d6+4, Bálsamo (Regeneración 4 × 3), Círculo de sanación (zona de diámetro 5, 4 de vida fijos por pulso) y Aura sanadora (4 turnos); las viejas salieron', () => {
   const e = n => HABILIDADES_CREEP_BASE.find(x => x.nombre === n), arm = n => armarHabilidadDeCreep(e(n).datos, 3);

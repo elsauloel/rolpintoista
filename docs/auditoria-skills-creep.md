@@ -255,8 +255,8 @@
 
 - ✅ **Hálito polar** (Mago, «cono de frío», 2026-10-23, dueño: «un cono de frío… algo así como hálito polar»): reemplaza al viejo **Aliento gélido** del pool
   (a mano). El cono de 16 casillas al frente (el de Sonic Boom: sin dodge roll); PdG.Esp contra la Evasión de cada rival del cono; **2d4 de hielo** (lo frenan
-  la Defensa especial y la resistencia al hielo) y **Escarcha** (−1 No2 máximos, 2 turnos). Pega menos que la Bola de fuego porque cubre más casillas y no
-  deja esquivar. **Con el Ef.Esp** (dueño, 2026-10-24: «con Ef»): **2d4 + ¼ de su Efecto especial**, y por P216 (2026-10-23: una skill que suma el Ef.Esp
+  la Defensa especial y la resistencia al hielo) y **Escarcha** (−1 No2 máximos, 2 turnos). **Con dodge roll** (dueño, 2026-10-24: «tirar solo Evasión no
+  tiene sentido; sí o sí con dodge roll: hay que salir de la superficie»): quien gana la Evasión puede salir del cono moviéndose; si sigue adentro, le pega. **Con el Ef.Esp** (dueño, 2026-10-24: «con Ef»): **2d4 + ¼ de su Efecto especial**, y por P216 (2026-10-23: una skill que suma el Ef.Esp
   cuesta en proporción a él) **cuesta su Especial en SP**, o cooldown 3; 3 No2. Costos propuestos por Claude. **Para probar.**
 
 - ✅ **Coraza de púas** y **Velo espejado** (Support, «devolver el daño», 2026-10-24, dueño: «un buff que le da a un aliado Espinas y otro que le da

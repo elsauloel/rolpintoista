@@ -237,11 +237,12 @@
     duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['eva'], alcance: 'rango', dano: true, danoFormula: '2d4', tipoDano: 'eléctrico', cadena: {saltos: 99, rango: 4},
       efectos: [{nombre: 'Parálisis', turnos: 1, caras: 10, exitos: 2}]}});
   // ❄ Auditada (dueño, 2026-10-23; el Mago, «un cono de frío… hálito polar»): reemplaza al viejo Aliento gélido (a mano). El cono de 16 casillas de
-  // siempre (el de Sonic Boom: sin dodge roll, no hay dónde escaparse), por eso pega menos que la Bola de fuego: 2d4 de hielo + ¼ de su Efecto especial
+  // siempre (el de Sonic Boom). Con dodge roll (dueño, 2026-10-24: «tirar solo Evasión no tiene sentido; sí o sí con dodge roll: cómo se esquiva un aliento,
+  // hay que salir de la superficie»): quien gana la Evasión gana el derecho a salir del cono moviéndose; si sigue adentro, le pega. Pega menos que la Bola de fuego: 2d4 de hielo + ¼ de su Efecto especial
   // (dueño, 2026-10-24: «con Ef») y Escarcha (−1 a los No2 máximos, 2 turnos). Suma el Ef.Esp → cuesta su Especial en SP (P216), o cooldown 3; 3 No2.
-  H('Hálito polar', 'DA', 'ega', 'g', 3, {detalle: 'Exhala un aliento helado en cono al frente (16 casillas): tira su Probabilidad de Golpe especial una vez contra la Evasión de cada rival del cono (no hay dodge roll: el cono no deja dónde escaparse). Al que no le gana: 2d4 más un cuarto de su Efecto especial, de hielo (lo frenan la Defensa especial y la resistencia al hielo) y Escarcha (−1 a sus No2 máximos, 2 turnos).',
+  H('Hálito polar', 'DA', 'ega', 'g', 3, {detalle: 'Exhala un aliento helado en cono al frente (16 casillas): tira su Probabilidad de Golpe especial una vez contra la Evasión de cada rival del cono; quien le gana tiene un dodge roll: si sale del cono moviéndose, se salva; si sigue adentro, le pega igual. Al que no le gana (o no sale): 2d4 más un cuarto de su Efecto especial, de hielo (lo frenan la Defensa especial y la resistencia al hielo) y Escarcha (−1 a sus No2 máximos, 2 turnos).',
     no2: 3, spCosto: 'esp', auditada: true, ataqueTxt: 'su PdG.Esp contra la Evasión de cada rival del cono; 2d4 + ¼ de su Ef.Esp de hielo y Escarcha',
-    duelo: {objetivo: 'cono', tira: 'pdgmg', contra: ['eva'], dano: true, danoFormula: '2d4', danoSumaEsp: 0.25, tipoDano: 'hielo', efectos: [{nombre: 'Escarcha'}]}});
+    duelo: {objetivo: 'cono', ondaDodge: true, tira: 'pdgmg', contra: ['eva'], dano: true, danoFormula: '2d4', danoSumaEsp: 0.25, tipoDano: 'hielo', efectos: [{nombre: 'Escarcha'}]}});
   H('Misil arcano', 'D', 'hdga', 'g', 2, aT('Un proyectil mágico que no falla.', 'M'));
   H('Descarga eléctrica', 'DK', 'ea', 'g', 3, zO('Una descarga que deja al objetivo sin aliento: pierde 1 No2 (a mano).', 2, 'M'));
   // 🔥 Auditada (dueño, 2026-10-24; el Mago, «muro de fuego»): reemplaza a la vieja Llamarada (a mano). La zona en línea de la Varita del muro de fuego

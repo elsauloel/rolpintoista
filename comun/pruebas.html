@@ -4880,6 +4880,43 @@ prueba('📣 ¡A la carga! y Arenga (Support, 2026-10-23): onda a los aliados a 
     e('¡A la carga!').etiquetas.includes('auditada'), e('Arenga').etiquetas.includes('support'), ['Aullido de manada', 'Grito de ánimo', '¡Por el amo!', '¡A laburar!', 'Marca del amo', 'Aullido de la manada'].filter(e).length],
     ['onda', 4, true, 2, 'pdg2 pdgmg2 dmg2 dmgesp2', 'Bendecido', 3, 4, true, true, 0]);
 });
+prueba('⏱ Turnos completos para los buffs activos (dueño, 2026-10-24): ¡A la carga! dura sus 2 turnos completos aunque se lo den en su turno; un defensivo (Espejo) cuenta desde que se pone', () => {
+  const e = n => HABILIDADES_CREEP_BASE.find(x => x.nombre === n), arm = n => armarHabilidadDeCreep(e(n).datos, 3);
+  const dura = (spec, enSuTurno) => {
+    const sc = {nombre: 'A', estados: []};
+    if(enSuTurno) Combatiente.empezarTurnoEstados(sc.estados);
+    EstadosAplicar.aplicarACreep(sc, spec);
+    if(enSuTurno) Combatiente.terminarTurnoEstados(sc.estados);
+    let completos = 0;
+    for(let i = 0; i < 6; i++){
+      const k = Combatiente.empezarTurnoEstados(sc.estados); sc.estados = k.quedan;
+      if(!sc.estados.some(x => x.nombre === spec.nombre)) break;
+      Combatiente.terminarTurnoEstados(sc.estados); completos++;
+    }
+    return completos;
+  };
+  const carga = Combatiente.efectoDeEjecucion(arm('¡A la carga!').duelo.efectos[0]).spec, espejo = Combatiente.efectoDeEjecucion(arm('Velo espejado').duelo.efectos[0]).spec;
+  igual([carga.polaridad, EstadosAplicar.componer(carga).polaridad, dura(carga, false), dura(carga, true), dura(espejo, false), dura(espejo, true)],
+    ['buff', 'buff', 2, 2, 3, 2]);
+});
+prueba('⏱ Turnos completos también para los debuffs activos (dueño, 2026-10-24): Debilitado y Pajaritos completos; uno pasivo (menos Defensa) desde que se pone', () => {
+  const dura = (spec, enSuTurno) => {
+    const sc = {nombre: 'A', estados: []};
+    if(enSuTurno) Combatiente.empezarTurnoEstados(sc.estados);
+    EstadosAplicar.aplicarACreep(sc, spec);
+    if(enSuTurno) Combatiente.terminarTurnoEstados(sc.estados);
+    let completos = 0;
+    for(let i = 0; i < 6; i++){
+      const k = Combatiente.empezarTurnoEstados(sc.estados); sc.estados = k.quedan;
+      if(!sc.estados.some(x => x.nombre === spec.nombre)) break;
+      Combatiente.terminarTurnoEstados(sc.estados); completos++;
+    }
+    return completos;
+  };
+  igual([dura({nombre: 'Debilitado'}, true), dura({nombre: 'Debilitado'}, false), dura({nombre: 'Pajaritos'}, true), dura({nombre: 'Pasivo de prueba', polaridad: 'debuff', turnos: 2, mods: [{stat: 'def', val: -2}]}, true), dura({nombre: 'Pasivo de prueba', polaridad: 'debuff', turnos: 2, mods: [{stat: 'def', val: -2}]}, false),
+    Combatiente.efectoActivo({nombre: 'Coraza maldita', polaridad: 'debuff', mods: [{stat: 'def', val: -2}]})],
+    [2, 2, 3, 1, 2, false]);
+});
 prueba('🎯 Ojo certero (Support, 2026-10-24): Crítico frecuente +2 y potente +2, dos turnos completos aunque se lo den en su propio turno', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Ojo certero'), h = armarHabilidadDeCreep(e.datos, 3);
   const dura = enSuTurno => {   // cuántos turnos enteros (empieza y termina) lo tiene

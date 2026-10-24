@@ -865,6 +865,13 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   el turno de quien lo tiene, antes de que pegue; lo puesto fuera de su turno no descuenta en su primer inicio (le toca el turno entero). Así uno de N
   turnos dura N rondas completas desde que se aplica. El ⟳ Mantenimiento de la ronda (sin orden de turnos) sigue como antes. `Combatiente.empezarTurnoEstados`
   / `terminarTurnoEstados`, la marca `recien` que pone `agregarEstado`.
+  **Ajuste (dueño, 2026-10-24, con Ojo certero): turnos completos para los efectos ACTIVOS.** «Los buffs relevantes durante las acciones de la persona
+  beneficiada —más daño, más probabilidad de golpe— cuentan turnos completos; los defensivos está bien que resulten desde el momento en que son
+  casteados»; «lo mismo a la inversa: los debuffs relevantes durante acciones activas —menos probabilidad de golpe, menos daño— también completos; los
+  que afectan una variable o un efecto pasivo, como menos Defensa o menos Evasión, no». Un efecto activo (`Combatiente.efectoActivo`: cambia PdG,
+  PdG.Esp, daño, Ef.Esp o crítico; suma a los golpes; o es Pajaritos, Lisiado, Ceguera, Silencio, Confusión, Extenuado, Atormentado, Maldito) no cuenta el
+  turno en que se lo ponen aunque sea el propio: un estado de N turnos se tiene durante N turnos completos. Los pasivos, como antes. Stun y Miedo, con su
+  propia regla.
 - ✅ **P178. Daño de colisión** (dueño, 2026-10-08, vendaval): si un empujón choca contra algo (un Sólido, un token, el borde) antes de recorrer todo, hay
   daño de colisión — a definir cuánto y a quién (¿también a aquello contra lo que choca?). **Decidido (dueño, 2026-10-21): «Tira Constitución por cada
   casillero que le faltó recorrer, menos armadura. Y si es contra otro pj, cada uno usa la Constitución del otro».** Contra algo sólido, la Constitución

@@ -32,7 +32,9 @@ Un **estado alterado** es un efecto **temporal** (o permanente hasta que se cure
 
 - Tienen **turnos restantes** (o son *permanentes*), y a veces **stacks** (acumulaciones).
 
-- En cada [[Mantenimiento]] **bajan los turnos**; los que llegan a 0 se van.
+- En cada [[Mantenimiento]] **bajan los turnos**; los que llegan a 0 se van. Con orden de turnos, bajan **al empezar el turno** de quien los tiene.
+
+- **Turnos completos para lo que pesa en tus acciones.** Un estado que cambia lo que hacés al actuar —más o menos Probabilidad de Golpe, daño, Efecto especial o crítico; algo que se suma a tus golpes; o Pajaritos, Lisiado, Ceguera, Silencio, Confusión, Extenuado, Atormentado, Maldito— te dura **turnos completos**: el turno en que te lo ponen no cuenta, aunque sea el tuyo. Uno de 2 turnos lo tenés durante tus 2 turnos siguientes enteros. Los que cambian algo pasivo (más o menos Defensa, Evasión, resistencias, Espinas…) valen desde que te los ponen y cuentan como siempre.
 
 - Pueden dar bonos o penalidades a stats (por ejemplo, +5 Defensa), o tener reglas propias (por ejemplo, "no podés moverte").
 

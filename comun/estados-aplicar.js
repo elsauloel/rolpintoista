@@ -92,9 +92,23 @@ const EstadosAplicar = (() => {
   }
 
   // Deja el aviso para que la ficha del dueño lo aplique (campanas/<id>/estados).
+  /* Un estado de la lista viaja con sus datos (2026-10-24, la Coraza maldita le llegó vacía a juan: lo aplicó una pantalla con una versión vieja, que no
+     conocía ese estado nuevo): los turnos, los números, la descripción y si es bueno o malo del preset, salvo lo que ya trae. Una pantalla al día lo arma
+     igual (son los mismos números); una vieja, por lo menos con eso. */
+  function conDatosDelPreset(spec){
+    const p = presetPorNombre(spec && spec.nombre);
+    if(!p) return spec;
+    const s = {...spec};
+    if(s.turnos === undefined && !s.stacks && Number(p.turnos) > 0) s.turnos = p.turnos;
+    if(s.permanente === undefined && p.permanente) s.permanente = true;
+    if(!s.mods && Array.isArray(p.mods) && p.mods.length) s.mods = p.mods;
+    if(!s.detalle && p.detalle) s.detalle = String(p.detalle).split(/\s*[⚙✋]/)[0];
+    if(!s.polaridad && p.polaridad) s.polaridad = p.polaridad;
+    return s;
+  }
   async function encolarPj(o){
     await fbDb.collection(fbRutaCampana('estados')).add({
-      fichaId: String(o.fichaId), duenoUid: String(o.duenoUid), spec: JSON.stringify(limpiarSpec(o.spec)).slice(0, 600),
+      fichaId: String(o.fichaId), duenoUid: String(o.duenoUid), spec: JSON.stringify(limpiarSpec(conDatosDelPreset(o.spec))).slice(0, 600),
       origen: String(o.origen || '').slice(0, 80), aplicada: false, creado: firebase.firestore.FieldValue.serverTimestamp(),
     });
   }
@@ -114,5 +128,5 @@ const EstadosAplicar = (() => {
     return s.nombre + (stacks ? ` ×${stacks}` : '') + (extra.length ? ` (${extra.join(', ')})` : '');
   }
 
-  return {DEBUFFS, BUFFS, presetPorNombre, limpiarSpec, esPreset, componer, bloqueadoCreep, aplicarACreep, encolarPj, texto};
+  return {DEBUFFS, BUFFS, presetPorNombre, conDatosDelPreset, limpiarSpec, esPreset, componer, bloqueadoCreep, aplicarACreep, encolarPj, texto};
 })();

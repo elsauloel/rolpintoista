@@ -4949,6 +4949,12 @@ prueba('🏜 Maldición de la sequía (Debuffer, 2026-10-24): Sequía corta la r
   igual([he.objetivo, he.tira && he.tira.stat, (he.contra || []).map(c => c.stat || c), Combatiente.sequia(seco.estados), seco.hp, seco.sp, normal.hp, normal.sp > 5],
     ['enemigo', 'pdgmg', ['resmg'], true, 14, 5, 12, true]);
 });
+prueba('📨 Un estado de la lista viaja con sus datos al personaje (2026-10-24): una pantalla vieja que no lo conoce igual lo pone con sus turnos y números', () => {
+  const s = EstadosAplicar.limpiarSpec(EstadosAplicar.conDatosDelPreset({nombre: 'Coraza maldita'}));
+  const v = EstadosAplicar.limpiarSpec(EstadosAplicar.conDatosDelPreset({nombre: 'Veneno', stacks: 3}));
+  const propio = EstadosAplicar.limpiarSpec(EstadosAplicar.conDatosDelPreset({nombre: 'Cosa propia', turnos: 2}));
+  igual([s.turnos, (s.mods || []).length, s.polaridad, !!s.detalle, v.turnos, v.stacks, propio.turnos, propio.mods], [3, 2, 'debuff', true, undefined, 3, 2, undefined]);
+});
 prueba('⚡ Descarga arcana (Mago, 2026-10-24): carga a la vista y queda Marcado (se lo ve en la niebla); descarga un hechizo PdG.Esp contra Evasión, 4d6 arcano', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Descarga arcana'), h = armarHabilidadDeCreep(e.datos, 3);
   const sc = {nombre: 'Mago', nitros: 6, estados: [], habilidades: [{...h, id: 'r1', cdActual: 0}]};

@@ -66,9 +66,9 @@ async function golpeAnunciadoAtacar(sc, tipo){
   const quien = g.objetivoNombre ? ` contra ${g.objetivoNombre}` : '', k = golpeCosto(sc, h);
   const hechizo = GA_HECHIZO(h), no2H = Math.max(0, Math.round(num(h.golpeAnunciado.no2Golpe)));
   const eleccion = await new Promise(res => AvisoCombate.mostrar({icono: GA_ICONO(h), titulo: h.nombre, texto: hechizo
-      ? `${sc.nombre} tiene ${h.nombre} cargado${quien}: ${h.golpeAnunciado.detalleGolpe || ''} Cuesta ${no2H ? `${fmt(no2H)} No2 y ` : ''}${k.txt}.`
+      ? `${sc.nombre} tiene listo ${h.nombre}${quien}: ${h.golpeAnunciado.detalleGolpe || ''} Cuesta ${no2H ? `${fmt(no2H)} No2 y ` : ''}${k.txt}.`
       : `${sc.nombre} tiene el golpe cargado${quien}: +${GA_DADOS(h)} dados del Tipo de su arma, no se puede parrear y, si pega, lo empuja 2 casillas. Cuesta los No2 de un ataque y ${k.txt}. (Si todavía no está al lado, primero caminá y después apretá Atacar.)`,
-    botones: [{texto: 'Descargar el golpe', alClic: () => { AvisoCombate.cerrar(); res('golpe'); }}, {texto: 'Un ataque común (se pierde el golpe)', sec: true, alClic: () => { AvisoCombate.cerrar(); res('comun'); }}, {texto: 'Cancelar', sec: true, alClic: () => { AvisoCombate.cerrar(); res(''); }}]}));
+    botones: [{texto: hechizo ? `Descargar ${h.nombre}` : 'Descargar el golpe', alClic: () => { AvisoCombate.cerrar(); res('golpe'); }}, {texto: `Un ataque común (se pierde ${hechizo ? 'lo cargado' : 'el golpe'})`, sec: true, alClic: () => { AvisoCombate.cerrar(); res('comun'); }}, {texto: 'Cancelar', sec: true, alClic: () => { AvisoCombate.cerrar(); res(''); }}]}));
   if(!eleccion) return true;
   if(eleccion === 'comun'){
     await acCambiar(c => { c.golpeListo = null; return {}; });

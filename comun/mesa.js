@@ -41,12 +41,19 @@ let mesaTextoPendiente = '';
 // quien (opcional, 2026-10-09): de quién es (un creep: el mapa de cada jugador decide si la ve, ver mesaFiltrar).
 async function mesaLinea(texto, desde, quien){
   if(typeof fbDb === 'undefined' || !fbDb || !fbUsuario || !fbMiembro) return;
+  mesaAntes();
   try{
     await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: String(quien || '').slice(0, 60), origen: String(texto || '').slice(0, 400),
       formula: '', rolls: [], mod: 0, total: 0, desde: desde || 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()});
   }catch(err){ console.error('No se pudo anotar en la Mesa:', err); }
 }
 function mesaConTexto(detalle){ mesaTextoPendiente = String(detalle || '').slice(0, 300); }
+// Lo que la pantalla tenga para escribir ANTES de una línea o tirada propia (2026-10-24, el mapa: el aviso «fuera de turno», que espera a que
+// la acción de verdad ocurra). Va primero porque Firestore ordena por la hora de llegada.
+function mesaAntes(){
+  if(typeof window === 'undefined' || typeof window.mesaAntesDePublicar !== 'function') return;
+  try{ window.mesaAntesDePublicar(); }catch(e){ console.error(e); }
+}
 
 // Devuelve el id de la tirada en la Mesa (o undefined si no se publicó). r.quien: quién tira, si la herramienta no lo sabe por el
 // origen (el mapa, cuando tira por un personaje). La `ficha` del personaje (r.ficha, o mesaFicha(origen) si la herramienta la
@@ -58,6 +65,7 @@ async function mesaPublicar(origen, r){
     if(typeof MESA_AVISAR_SIN_SESION !== 'undefined' && MESA_AVISAR_SIN_SESION) toast('Entrá a la mesa para tirar');
     return;
   }
+  mesaAntes();
   const texto = mesaTextoPendiente;
   mesaTextoPendiente = '';
   const quien = String(r.quien || mesaQuien(origen) || '');

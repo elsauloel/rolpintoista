@@ -685,6 +685,20 @@ window.confirmarTurnoSaber = o => {
 };
 /* Una acción fuera de turno (dueño, 2026-10-06: «no se restringen, pero se comunican»): un toast a quien la hace y una línea en la Mesa para
    todos. No avisan las defensas (no pasan por acá), la oportunidad y el contraataque (son de turno ajeno) ni el ⚡ Flash (avisa ConfirmarTurno). */
+// Un botón (no moverse) queda PENDIENTE hasta que la acción de verdad ocurre (2026-10-24, dueño: cancelar el cartel del Muro de fuego dejaba
+// «actúa fuera de su turno» en la Mesa sin que hubiera pasado nada): se publica justo antes de lo primero que esta pantalla escriba en la
+// Mesa (comun/mesa.js → window.mesaAntesDePublicar). Si se cancela antes, no sale nada; otro botón lo reemplaza; vence a los 5 minutos.
+let fueraDeTurnoPendiente = null;
+function fueraDeTurnoPublicar(p){
+  if(typeof mesaLinea === 'function') mesaLinea(`⏱ ${p.nombre} actúa fuera de su turno: ${p.accion}`);
+  // y en la Crónica, para todos (dueño, 2026-10-06); quien la hizo ya lo vio en el aviso
+  momentoAbrir({tipo: 'fuera-de-turno', icono: '⏱', titulo: `${p.nombre} actúa fuera de su turno`, resultado: p.accion, estado: 'listo', datos: {centro: true}});
+}
+window.mesaAntesDePublicar = () => {
+  const p = fueraDeTurnoPendiente;
+  fueraDeTurnoPendiente = null;
+  if(p && Date.now() - p.hora < 5 * 60e3) fueraDeTurnoPublicar(p);
+};
 function avisarFueraDeTurno(tokenId, b){
   if(modoMapa !== 'combate' || esSuTurno(tokenId) !== false) return;
   if(b && (b.dataset.botoneraaccion === 'otroataque' || b.classList.contains('bt-flash'))) return;
@@ -692,10 +706,10 @@ function avisarFueraDeTurno(tokenId, b){
   if(!t) return;
   const fila = b && b.closest('.bot-fila, .accion-row, .cat-row');
   const accion = !b ? 'se mueve' : ((fila && fila.querySelector('.cat-nombre, .accion-nombre')) || b.querySelector('.bt-label') || b).textContent.trim().replace(/\s+/g, ' ').slice(0, 60);
-  toast(`⏱ No es el turno de ${nombreDe(t)}: se hace igual y queda en la Mesa`);
-  if(typeof mesaLinea === 'function') mesaLinea(`⏱ ${nombreDe(t)} actúa fuera de su turno: ${accion}`);
-  // y en la Crónica, para todos (dueño, 2026-10-06); quien la hizo ya lo vio en el aviso
-  momentoAbrir({tipo: 'fuera-de-turno', icono: '⏱', titulo: `${nombreDe(t)} actúa fuera de su turno`, resultado: accion, estado: 'listo', datos: {centro: true}});
+  toast(`⏱ No es el turno de ${nombreDe(t)}: se puede igual y, si lo hace, queda en la Mesa`);
+  const p = {nombre: nombreDe(t), accion, hora: Date.now()};
+  if(!b) fueraDeTurnoPublicar(p);   // moverse: ya se movió
+  else fueraDeTurnoPendiente = p;
 }
 /* Una defensa sin No2 (2026-10-06, dueño, a probar: Combatiente.avisarDeudaNo2): a quien la hace, un cartel como el Aviso; a los demás, la
    Crónica. La deuda se descuenta en su próxima recarga. */

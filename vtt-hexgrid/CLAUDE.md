@@ -1781,6 +1781,11 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   en `zonaResueltos` «cura@momento» o en el estado, `pulsos`); cura un número fijo (4). Las dos se ven como un contorno de línea verde ondulada que respira (`curaContorno`; ni nube ni
   hexágonos, a pedido del dueño) con chispitas que suben (`curaDibujarZona` desde js/05; el aura, `curaDibujarAuras`, debajo de los tokens);
   `curaBurbujas` suma chispitas un momento sobre cada uno que se cura.
+- **✨ Flash de un creep, con botón instantáneo** (2026-10-24, dueño: «el GM debería tener el botón instantáneo disponible todo el tiempo, también en la
+  columna anexa al menú de duelos»; `js/71-flash-creep.js`): una habilidad de creep con `flash` (Bendecir el arma; no el Mal de ojo ni el Desarmar, que
+  tienen el suyo) se ve en el botón fijo ✨ del GM (`Flotantes.bendecir`, arriba y en «Podés usar» del duelo). Al tocarlo, qué creep y a quién (sus aliados
+  en su Rango; primero el que ataca en el duelo abierto: dásela antes de que pague el PdG) y se ejecuta como desde sus Acciones (`ac.objetivoFijo` +
+  `acEjecutarHab`, que en turno ajeno cobra el doble con `CreepAcciones.ejecutarHab(…, {doble})`).
 - **✨ El Anuncio de un buff** (2026-10-24, dueño: «aunque no se tire nada y se aplique directo, tiene que haber un anuncio»): `dueloBuffMomento` (js/13), desde
   `dueloAplicarEfecto`: un estado con polaridad buff que entró → momento `tipo: 'buff'` con el Anuncio a quien lo recibe (dueño; de un creep, el GM) y la
   Crónica para todos, con los turnos y lo que hace (el `detalle` del preset hasta las notas ⚙/✋). Sobre sí mismo, solo la Crónica. Como `dueloCuraMomento`.

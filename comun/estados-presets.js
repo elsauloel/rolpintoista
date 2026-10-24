@@ -132,6 +132,9 @@ const ESTADOS_PRESET = [
   // Sprint (Asalto, 2026-10-13): los próximos 3 casilleros que camina están pagos (solo paga los recargos: Rengo, terreno lento). Lo descuenta el mapa.
   {nombre:'Sprint', polaridad:'buff', turnos:1, sprint:3, alEmpezarTurno:true,
     detalle:'Los próximos 3 casilleros que camina en este turno ya están pagos: solo paga lo que sumen Rengo o el terreno lento, y alejarse de un rival le da su ataque de oportunidad. Se termina al empezar su próximo turno. ⚙ Automatizado en el mapa.'},
+  // Sequía (2026-10-24, dueño: la Maldición de la sequía del Debuffer, «sólo corta las regeneraciones de SP y HP propias, no las externas»).
+  {nombre:'Sequía', polaridad:'debuff', turnos:3, sequia:true,
+    detalle:'Una maldición que lo seca por dentro: mientras dure no recupera vida ni SP por sí mismo al empezar el turno (sus pasivas de regeneración, la Regeneración de vida de su equipo, su SP Regen). Lo que le dan otros (una cura, la Regeneración de un aliado, una zona de curación) entra igual. ⚙ Automatizado.'},
   // Coraza maldita (2026-10-24, dueño: la Maldición de la coraza del Debuffer): −2 a la Defensa y a la Defensa especial; todos le pegan más.
   {nombre:'Coraza maldita', polaridad:'debuff', turnos:3, mods:[{stat:'def', val:-2}, {stat:'armadmg', val:-2}],
     detalle:'Una maldición le ablanda la armadura: −2 a su Defensa y −2 a su Defensa especial durante 3 turnos, contra todos. Si se la vuelven a poner, no se suma: vuelve a durar 3 turnos. ⚙ Automatizado.'},

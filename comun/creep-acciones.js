@@ -558,15 +558,20 @@ const CreepAcciones = (() => {
     if(d.terminados && d.terminados.length){ sc.estados = d.quedan; if(d.terminados.some(es => C().modsAfectanHp(es.mods))) C().actualizarHpMaxPorCon(sc); }
     const rep = Combatiente.reporteTurno([...v.eventos, ...d.eventos]);
     const rg = Math.max(0, Math.floor(num(C().modTotal(sc, 'hpregen'))));   // Regeneración de vida del equipo (2026-10-07)
-    if(rg > 0 && num(sc.hp) > 0){ d.hp += rg; rep.push(`Regeneración de vida: +${rg} HP`); }
     const rp = Math.max(0, Math.floor(num(C().regenPasivas(sc))));   // sus pasivas (2026-10-15)
-    if(rp > 0 && num(sc.hp) > 0){ d.hp += rp; rep.push(`Pasivas: +${rp} HP`); }
+    const seca = Combatiente.sequia(sc.estados);   // 🏜 la Sequía corta la regeneración propia, de vida y de SP (2026-10-24)
+    if(seca){ if(rg + rp > 0 && num(sc.hp) > 0) rep.push(`🏜 Sequía: no recupera ${rg + rp} de vida propia`); }
+    else{
+      if(rg > 0 && num(sc.hp) > 0){ d.hp += rg; rep.push(`Regeneración de vida: +${rg} HP`); }
+      if(rp > 0 && num(sc.hp) > 0){ d.hp += rp; rep.push(`Pasivas: +${rp} HP`); }
+    }
     const dh = Combatiente.curaQueEntra(sc.hp, d.hp);
     if(d.hp && !dh) rep.push('Caído: la cura de este turno no lo levanta');
     if(dh){ const antes = num(sc.hp); sc.hp = Math.max(0, Math.min(num(sc.hpMax), antes + dh)); rep.push(`HP total: ${antes} → ${sc.hp}`); }
     if(fenixCreep(sc)) rep.push(`🔥 Llama de Fénix: revive con ${sc.hp} HP y queda Titilando`);
     sc.nitros = Combatiente.recargarNo2(C().nitrosMax(sc), sc.nitros, sc.estados);
-    if(C().modoSP(sc)){   // 💧 recarga su SP (mínimo 1 por turno)
+    if(C().modoSP(sc) && seca){ if(C().spActual(sc) < C().spMax(sc)) rep.push(`🏜 Sequía: no recupera SP`); }
+    else if(C().modoSP(sc)){   // 💧 recarga su SP (mínimo 1 por turno)
       const a = C().spActual(sc), b = Math.min(C().spMax(sc), a + C().spRegen(sc));
       if(b !== a) rep.push(`SP: ${fmt(a)} → ${fmt(b)}`);
       sc.sp = b;

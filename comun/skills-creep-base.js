@@ -68,7 +68,7 @@
     'Barrido': ['choque pesado', 'barrido'], 'Coletazo': ['choque pesado', 'barrido'],
     'Tiro a la cabeza': ['rango', 'tiro apuntado'], 'Desarmar': ['choque pesado', 'desarmar'], 'El que avisa no traiciona': ['choque pesado', 'golpe anunciado'], 'Sal en la herida': ['choque liviano', 'abrir la herida'], 'Remate': ['choque pesado', 'remate'], 'Ir por el herido': ['choque pesado', 'remate'], 'Morder la herida': ['choque liviano', 'abrir la herida'], 'Patotear': ['choque liviano', 'manada'], 'Jauría': ['choque liviano', 'manada'], 'Zarpazo erguido': ['choque pesado', 'golpe anunciado'], 'Mal de ojo': ['debuffer', 'maleficio'], 'Disparo señalador': ['rango', 'señalar'], 'Ráfaga de cortes': ['choque liviano', 'ráfaga'], 'Ráfaga de zarpazos': ['choque liviano', 'ráfaga'],
     'Romper armadura': ['choque pesado', 'romper armadura'], 'Arrancar la coraza': ['choque pesado', 'romper armadura'],
-    'Golpe demoledor': ['choque pesado', 'romper armadura'], 'Mandíbula trituradora': ['choque pesado', 'romper armadura'], 'Cadena de rayos': ['mago', 'rayo en cadena'], 'Hálito polar': ['mago', 'cono de frío'], 'Muro de fuego': ['mago', 'muro de fuego'], 'Maldición de la coraza': ['debuffer', 'bajar la armadura'], 'Coraza de púas': ['support', 'devolver el daño'], 'Bendecir el arma': ['support', 'bendecir el arma'], 'Velo espejado': ['support', 'devolver el daño'],
+    'Golpe demoledor': ['choque pesado', 'romper armadura'], 'Mandíbula trituradora': ['choque pesado', 'romper armadura'], 'Cadena de rayos': ['mago', 'rayo en cadena'], 'Hálito polar': ['mago', 'cono de frío'], 'Muro de fuego': ['mago', 'muro de fuego'], 'Maldición de la coraza': ['debuffer', 'bajar la armadura'], 'Maldición de la sequía': ['debuffer', 'cortar la regeneración'], 'Coraza de púas': ['support', 'devolver el daño'], 'Bendecir el arma': ['support', 'bendecir el arma'], 'Velo espejado': ['support', 'devolver el daño'],
     'Puñalada por la espalda': ['choque liviano', 'por la espalda'], 'Mordida a traición': ['choque liviano', 'por la espalda'], 'Puñalada trapera': ['choque liviano', 'por la espalda'],
   };
 
@@ -374,6 +374,11 @@
   H('Maldición de la coraza', 'X', '*', 'gx', 3, {detalle: 'Le maldice la armadura a un rival dentro de su Rango: tira su Probabilidad de Golpe especial contra la Resistencia especial del objetivo; si gana, queda con Coraza maldita (−2 a su Defensa y −2 a su Defensa especial durante 3 turnos, contra todos).',
     no2: 2, spCosto: 3, auditada: true, ataqueTxt: 'su PdG.Esp contra la Res.Esp; si gana, −2 Defensa y −2 Defensa especial 3 turnos',
     duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['resmg'], alcance: 'rango', dano: false, efectos: [{nombre: 'Coraza maldita'}]}});
+  // 🏜 Auditada (dueño, 2026-10-24: «una maldición que anule regeneración de HP y SP»; «se resiste con Resistencia Especial; sólo corta las regeneraciones
+  // propias, no las externas»): su PdG.Esp contra la Res.Esp de un rival en su Rango; si gana, Sequía 3 turnos. Costo como la Maldición de la coraza.
+  H('Maldición de la sequía', 'X', '*', 'gx', 3, {detalle: 'Lo seca por dentro: tira su Probabilidad de Golpe especial contra la Resistencia especial de un rival dentro de su Rango; si gana, queda con Sequía 3 turnos: no recupera vida ni SP por sí mismo al empezar el turno (sus pasivas de regeneración, la de su equipo, su SP Regen). Lo que le dan otros (una cura, la Regeneración de un aliado) entra igual.',
+    no2: 2, spCosto: 3, auditada: true, ataqueTxt: 'su PdG.Esp contra la Res.Esp; si gana, Sequía 3 turnos (no recupera vida ni SP propios)',
+    duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['resmg'], alcance: 'rango', dano: false, efectos: [{nombre: 'Sequía'}]}});
   H('Ceguera', 'X', 'hdea', 'x', 3, tA('Lanza polvo o luz: el objetivo queda con Ceguera 1 turno (a mano).', 2));
   H('Ralentizar', 'X', 'hdea', 'x', 3, tA('El objetivo pierde 2 No2 en su próximo turno (a mano).', 2));
   H('Miedo', 'XK', 'bdma', 'x', 4, tA('Si el objetivo falla Res.Mt huye de él 2 turnos (a mano).', 2));

@@ -11,7 +11,7 @@ const BuscarEstados = (() => {
   const norm = s => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
   // Palabras clave por estado (además de su nombre y su descripción). Si se suma un estado con un nombre que no dice lo que hace, va acá.
   const PALABRAS = {
-    'Regeneración': 'regen cura curar curación vida hp sana por turno',
+    'Regeneración': 'regen cura curar curación vida hp sana por turno', 'Sequía': 'regen regeneración sp hp vida maldición corta seca',
     'Veneno': 'dot daño por turno toxico poison', 'Veneno severo': 'dot daño por turno toxico poison',
     'Sangrado': 'dot daño por turno bleed sangre', 'Quemadura': 'dot daño por turno fuego burn',
     'Escarcha': 'hielo frio no2 nitros', 'Armadura rota': 'defensa rompe armadura',

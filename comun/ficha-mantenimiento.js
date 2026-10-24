@@ -23,6 +23,7 @@ const FichaMantenimiento = (() => {
   // SP Regen: lo que recupera (sin pasar del máximo). Por defecto la mitad del Especial, más lo que sumen habilidades, equipo o estados.
   function regenerarSp(S, c, rep){
     const spRegen = Math.max(0, Number.isNaN(c.final.spregen) ? 0 : Math.floor(c.final.spregen));
+    if(spRegen > 0 && num(S.spGastado) > 0 && Combatiente.sequia(S.efectos)){ rep.push(`🏜 Sequía: no recupera SP (su SP Regen de ${fmt(spRegen)})`); return {spRegen, spRecuperado: 0}; }   // (2026-10-24)
     const spRecuperado = Math.min(spRegen, Math.max(0, num(S.spGastado)));
     if(spRecuperado){ S.spGastado = num(S.spGastado) - spRecuperado; rep.push(`SP: +${fmt(spRecuperado)} (SP Regen)`); }
     return {spRegen, spRecuperado};
@@ -30,6 +31,11 @@ const FichaMantenimiento = (() => {
   // Pasivas de regeneración: recuperan HP en cada turno (por compra).
   function regenPasivas(S, log, rep){
     let hp = 0;
+    if(Combatiente.sequia(S.efectos)){   // 🏜 la Sequía corta la regeneración propia (2026-10-24): pasivas y equipo
+      const propia = (S.pasivas || []).reduce((a, p) => a + num(p.regenHp) * FichaCalculo.pasivaCompras(p), 0) + Math.max(0, Math.floor(num(FichaCalculo.calcular(S).final.hpregen)));
+      if(propia > 0 && num(S.hp) > 0){ log.push(`<b>Sequía</b>: no recupera ${fmt(propia)} HP`); rep.push(`🏜 Sequía: no recupera ${fmt(propia)} de vida propia`); }
+      return 0;
+    }
     (S.pasivas || []).forEach(p => {
       const x = num(p.regenHp) * FichaCalculo.pasivaCompras(p);
       if(x > 0 && num(S.hp) > 0){ hp += x; log.push(`<b>${esc(p.nombre)}</b> <span class="heal">+${fmt(x)} HP</span>`); rep.push(`${p.nombre} (pasiva): +${fmt(x)} HP`); }
@@ -79,9 +85,12 @@ const FichaMantenimiento = (() => {
     if(d.terminados && d.terminados.length) inv.estados = d.quedan;
     const rep = Combatiente.reporteTurno([...v.eventos, ...d.eventos]);
     const rg = Math.max(0, Math.floor(num(InvCalculo.statValor(inv, 'hpregen'))));   // Regeneración de vida (2026-10-07)
-    if(rg > 0 && num(inv.hp) > 0){ d.hp += rg; rep.push(`Regeneración de vida: +${fmt(rg)} HP`); }
     const rp = Math.max(0, Math.floor(num(InvCalculo.regenPasivas(inv))));   // sus pasivas (2026-10-16, como un creep)
-    if(rp > 0 && num(inv.hp) > 0){ d.hp += rp; rep.push(`Pasivas: +${fmt(rp)} HP`); }
+    if(Combatiente.sequia(inv.estados)){ if(rg + rp > 0 && num(inv.hp) > 0) rep.push(`🏜 Sequía: no recupera ${fmt(rg + rp)} de vida propia`); }   // (2026-10-24)
+    else{
+      if(rg > 0 && num(inv.hp) > 0){ d.hp += rg; rep.push(`Regeneración de vida: +${fmt(rg)} HP`); }
+      if(rp > 0 && num(inv.hp) > 0){ d.hp += rp; rep.push(`Pasivas: +${fmt(rp)} HP`); }
+    }
     const dhInv = Combatiente.curaQueEntra(inv.hp, d.hp);
     if(d.hp && !dhInv) rep.push('Caída: la cura de este turno no la levanta');
     if(dhInv){ const antes = num(inv.hp); inv.hp = Math.max(0, Math.min(num(inv.hpMax) || Infinity, antes + dhInv)); rep.push(`HP total: ${fmt(antes)} → ${fmt(inv.hp)}`); }

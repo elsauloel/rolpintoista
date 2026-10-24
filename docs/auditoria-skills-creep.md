@@ -283,6 +283,12 @@
   directo** (no lo frena la Defensa especial; sí la resistencia al fuego). Costo (**ajuste del dueño, 2026-10-24**: «1 No2 por 4 casilleros, y cada casillero adicional +1 No2 y +1 SP»): **4 casillas** (el mínimo), 1 No2 y 3 SP (o
   cooldown 3); cada casilla de más +1 No2 y +1 SP (en modo cooldown, +1 al cooldown cada 2); 8 casillas: 5 No2 y 7 SP. Daño fijo: no suma el Ef.Esp. Los números los propuso Claude. **Para probar.**
 
+- ✅ **Maldición de la sequía** (Debuffer, «cortar la regeneración», 2026-10-24, idea y decisiones del dueño: «una maldición que anule regeneración de HP y
+  SP»; «se resiste con Resistencia Especial; sólo corta las regeneraciones de SP y HP propias, no las externas»): su PdG.Esp contra la Res.Esp de un rival en
+  su Rango; si gana, el estado nuevo **Sequía** 3 turnos (`Combatiente.sequia`): al empezar el turno no recupera la vida de sus pasivas ni la de su equipo, ni
+  su SP Regen (personaje, invocación y creep, también en modo SP); la Regeneración que le da otro, una cura o una zona entran igual. 2 No2 y 3 SP, o cooldown
+  3 (como la Maldición de la coraza). **Para probar.**
+
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 
 ## Etiquetas

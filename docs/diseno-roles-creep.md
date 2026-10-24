@@ -29,11 +29,11 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 - 🏹 **Rango y Hunter — 11**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 6**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego (2026-10-24) · de El origen: proyectil, fuego con quemadura.
-- 🧿 **Debuffer — 6**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24) · de El origen: ceguera, veneno, inmovilizar.
+- 🧿 **Debuffer — 7**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24) · de El origen: ceguera, veneno, inmovilizar.
 - 💚 **Support — 6**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma (2026-10-24) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
-**Para emparejar**: Mago, Debuffer y Support empatados en 6 (2026-10-24); después Rango + Hunter (11).
+**Para emparejar**: Mago y Support (6), después Debuffer (7) (2026-10-24); después Rango + Hunter (11).
 
 ## Los roles
 
@@ -348,7 +348,8 @@ Inmovilizado, Rengo, Desarmado; y, de personajes, Enyetar.
 8. **Drenar SP**: pierde SP, y el debuffer quizás lo gana.
 9. **Atormentar**: cada acción que cuesta No2 le saca vida (Atormentado).
 10. **Maldición de la sangre**: usar algo que cuesta SP le saca vida (Maldito).
-10b. **Maldición de la sequía** (idea del dueño, 2026-10-24: «una maldición que anule regeneración de HP y SP»): mientras dura, no recupera vida ni SP
+10b. ✅ **Maldición de la sequía** (idea del dueño, 2026-10-24; hecha el mismo día: PdG.Esp contra Res.Esp, Sequía 3 turnos, corta solo la
+     regeneración propia —pasivas, equipo, SP Regen—, no la de otros: «una maldición que anule regeneración de HP y SP»): mientras dura, no recupera vida ni SP
      por turno (ni la Regeneración ni el SP Regen; quizás tampoco las curas por pulso del Círculo o el Aura). El nombre es provisorio.
 
 **C. Control mental**

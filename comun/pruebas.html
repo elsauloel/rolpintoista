@@ -4880,6 +4880,17 @@ prueba('📣 ¡A la carga! y Arenga (Support, 2026-10-23): onda a los aliados a 
     e('¡A la carga!').etiquetas.includes('auditada'), e('Arenga').etiquetas.includes('support'), ['Aullido de manada', 'Grito de ánimo', '¡Por el amo!', '¡A laburar!', 'Marca del amo', 'Aullido de la manada'].filter(e).length],
     ['onda', 4, true, 2, 'pdg2 pdgmg2 dmg2 dmgesp2', 'Bendecido', 3, 4, true, true, 0]);
 });
+prueba('🏜 Maldición de la sequía (Debuffer, 2026-10-24): Sequía corta la regeneración propia (pasivas, equipo, SP) y no la Regeneración de otro', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Maldición de la sequía'), h = armarHabilidadDeCreep(e.datos, 3);
+  const he = Combatiente.habEjecucion(h, h.duelo, {stat: () => 0});
+  const seco = {nombre: 'Seco', hp: 10, hpMax: 30, nitros: 2, modoSP: true, sp: 5, esp: 6, habilidades: [], estados: [], pasivas: [{nombre: 'Regen', regenHp: 2}]};
+  EstadosAplicar.aplicarACreep(seco, Combatiente.efectoDeEjecucion(h.duelo.efectos[0]).spec);
+  EstadosAplicar.aplicarACreep(seco, {nombre: 'Regeneración', turnos: 3, hp: 4});   // la de un aliado: entra igual
+  const normal = {nombre: 'Normal', hp: 10, hpMax: 30, nitros: 2, modoSP: true, sp: 5, esp: 6, habilidades: [], estados: [], pasivas: [{nombre: 'Regen', regenHp: 2}]};
+  CreepAcciones.inicioTurno(seco, 'p:1', 1); CreepAcciones.inicioTurno(normal, 'p:1', 1);
+  igual([he.objetivo, he.tira && he.tira.stat, (he.contra || []).map(c => c.stat || c), Combatiente.sequia(seco.estados), seco.hp, seco.sp, normal.hp, normal.sp > 5],
+    ['enemigo', 'pdgmg', ['resmg'], true, 14, 5, 12, true]);
+});
 prueba('🔥 Muro de fuego (Mago, 2026-10-24): zona en línea de largo a elegir (4 a 8, base 1 No2 y 3 SP), 3d4 de fuego directo y Quemadura; el largo de más se cobra aparte; reemplaza a la Llamarada', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Muro de fuego'), h = armarHabilidadDeCreep(e.datos, 3);
   const z = Combatiente.zonaDeHab(h, {...h.duelo, zonaLargo: 5}, {fichaId: 'x', tipo: 'creep'});

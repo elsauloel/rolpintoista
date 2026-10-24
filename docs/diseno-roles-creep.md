@@ -319,7 +319,7 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
 
 **F. Auras, estandartes y tótems**
 25. **Aura de mando**: los aliados cerca del support pegan mejor mientras esté de pie (hoy, a mano) ✦.
-26. ✅ **Estandarte de guerra** ✦ (2026-10-24): clava un estandarte en una casilla pegada; sus aliados a 3 casillas (diámetro 7) suman +3 PdG y +5 al daño
+26. ✅ **Estandarte de guerra** ✦ (2026-10-24): clava un estandarte en una casilla dentro de su Rango; sus aliados a 3 casillas (diámetro 7) suman +3 PdG y +5 al daño
     mientras siga en pie (10 de vida por nivel, sin defensas ni resistencias); dura hasta que lo rompan; uno por creep. Falta el Tótem.
 27. **Lazo**: cuando un aliado vinculado pega, el support se cura (o al revés).
 

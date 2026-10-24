@@ -143,8 +143,9 @@
   const MAGICA_RE = /m[aá]gic|hechiz|arcan|conjur|rel[aá]mpago|rayo|bola de fuego|llamarada|escarcha|hielo|descarga el[eé]ctrica|misil|maldici|sagrad|espectral|ps[ií]quic|[ií]gne|flama|fuego/i;
   const esHabMagica = (nombre, detalle) => MAGICA_RE.test(String(nombre || '') + ' ' + String(detalle || ''));
   function armarHab(sp, n, cd, lenta){
-    const h = {nombre: sp.nombre, detalle: armarDetalle(sp, n, cd, lenta), cd, cdActual: lenta ? cd : 0, costo: '', nitrosCosto: sp.no2};
-    if(lenta) h.cdArranca = true;
+    const arranca = lenta && !sp.disponibleAlInicio;   // (2026-10-24, el Estandarte: «cooldown 4, pero disponible desde el inicio del combate»)
+    const h = {nombre: sp.nombre, detalle: armarDetalle(sp, n, cd, arranca), cd, cdActual: arranca ? cd : 0, costo: '', nitrosCosto: sp.no2};
+    if(arranca) h.cdArranca = true;
     // Con daño: Ejecutar tira primero la probabilidad de golpe (PdG o PdG.Esp) y el daño queda para el botón 🎲 aparte (2026-09-24).
     if(sp.dano){
       h.tiradaExtra = danoTxt(sp.dano, n);

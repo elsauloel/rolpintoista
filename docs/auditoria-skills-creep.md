@@ -309,12 +309,11 @@
   Maldición de la coraza; daño fijo, P216). **Para probar.**
 
 - ✅ **Estandarte de guerra** (Support, «estandarte», 2026-10-24, dueño: «+3 a la probabilidad de golpe, +5 al daño, 10 por nivel de HP, sin ningún tipo
-  de defensa ni resistencia»; «permanente hasta que se rompa»; «el diámetro tiene que ser de 7»; el aura, «algún estilo marcial, después te digo»): clava un
-  estandarte en una casilla libre pegada a él (un creep nuevo de su bando, quieto, sin ataques, con su imagen de bandera; no entra al orden de turnos ni da
+  de defensa ni resistencia»; «permanente hasta que se rompa»; «el diámetro tiene que ser de 7»; el aura, «algún estilo marcial, después te digo»; «en cualquier lugar dentro de su rango»; «con cooldown, de 4 pero
+  disponible desde el inicio del combate»): clava un estandarte en una casilla libre dentro de su Rango (un creep nuevo de su bando, quieto, sin ataques, con su imagen de bandera; no entra al orden de turnos ni da
   experiencia ni botín). Sus aliados a 3 casillas o menos (él incluido) suman **+3 al PdG (o PdG.Esp) y +5 al daño** mientras siga en pie, con arma o con
   habilidad (`cfg.estandarte` del duelo; también en el ataque de oportunidad); con 0 de vida se rompe y se va. Uno por creep. El aura: la línea punteada dorada
-  sobre las casillas, un velo carmesí y, por fuera, un anillo con banderines que flamean (`vtt-hexgrid/js/73`). 2 No2 y 4 SP, o cooldown 4 (lenta: arranca el
-  combate en cooldown). **Para probar.**
+  sobre las casillas, un velo carmesí y, por fuera, un anillo con banderines que flamean (`vtt-hexgrid/js/73`). 2 No2 y 4 SP, o cooldown 4 (sin arrancar el combate en cooldown: `disponibleAlInicio`). El anillo sigue la forma del área con las puntas redondeadas. **Para probar.**
 
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 

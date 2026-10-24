@@ -371,13 +371,14 @@
     no2: 1, spCosto: 3, auditada: true, ataqueTxt: 'Crítico frecuente +2 y Crítico potente +2, 2 turnos completos, a él o a un aliado en su Rango',
     duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', efectos: [{nombre: 'Ojo certero'}]}});
   // 🚩 Auditada (dueño, 2026-10-24; el Support, «Estandarte de guerra»: «+3 a la probabilidad de golpe, +5 al daño, 10 por nivel de HP, sin ningún tipo de
-  // defensa ni resistencia»; «permanente hasta que se rompa»; «el diámetro tiene que ser de 7»): clava un estandarte en una casilla libre pegada a él; sus
+  // defensa ni resistencia»; «permanente hasta que se rompa»; «el diámetro tiene que ser de 7»; «en cualquier lugar dentro de su rango»; «con cooldown, que
+  // sea de 4 pero disponible desde el inicio del combate»): clava un estandarte en una casilla libre dentro de su Rango; sus
   // aliados a 3 casillas o menos (diámetro 7) suman +3 al PdG (y al PdG.Esp) y +5 al daño mientras siga en pie. El estandarte es un token propio (un creep
   // quieto de su bando, sin ataques): se le pega como a cualquier rival; con 0 de vida se rompe y se va. Uno por creep: clavar otro saca el anterior. Lo
   // hace el mapa (vtt-hexgrid/js/73). Costo propuesto por Claude: 2 No2 y 4 SP, o cooldown 4.
-  H('Estandarte de guerra', 'B', '*', 'a', 4, {detalle: 'Clava un estandarte de guerra en una casilla libre pegada a él. Mientras siga en pie, sus aliados a 3 casillas o menos (diámetro 7, él incluido) suman +3 a su Probabilidad de Golpe (también la especial) y +5 al daño. El estandarte tiene 10 de vida por nivel del creep y ninguna defensa ni resistencia (no esquiva): se le pega como a cualquier rival y, al romperse, el bonus se termina. Uno por creep: si clava otro, el anterior se va.',
+  H('Estandarte de guerra', 'B', '*', 'a', 4, {detalle: 'Clava un estandarte de guerra en una casilla libre dentro de su Rango. Mientras siga en pie, sus aliados a 3 casillas o menos (diámetro 7, él incluido) suman +3 a su Probabilidad de Golpe (también la especial) y +5 al daño. El estandarte tiene 10 de vida por nivel del creep y ninguna defensa ni resistencia (no esquiva): se le pega como a cualquier rival y, al romperse, el bonus se termina. Uno por creep: si clava otro, el anterior se va.',
     no2: 2, spCosto: 4, auditada: true, ataqueTxt: 'clava un estandarte: aliados a 3 casillas, +3 PdG y +5 al daño hasta que lo rompan',
-    estandarte: {radio: 3, pdg: 3, dano: 5, vidaPorNivel: 10}});
+    disponibleAlInicio: true, estandarte: {radio: 3, pdg: 3, dano: 5, vidaPorNivel: 10}});   // cooldown 4, pero no arranca el combate en cooldown (dueño)
   H('Bendecir el arma', 'B', '*', 'a', 2, {detalle: 'FLASH (se puede usar en cualquier momento; en turno ajeno cuesta el doble). Bendice el arma de un aliado (o la propia) dentro de su Rango: su próximo ataque con arma suma un dado más del Tipo de su arma al daño (Arma bendecida; si no ataca, se va a los 2 turnos).',
     no2: 0, spCosto: 2, flash: true, auditada: true, ataqueTxt: 'Flash: el próximo ataque con arma de él o de un aliado en su Rango suma +1 dado del Tipo de su arma',
     duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', efectos: [{nombre: 'Arma bendecida'}]}});

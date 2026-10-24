@@ -59,19 +59,21 @@ function estandarteImagen(){
   return cv.toDataURL('image/png');
 }
 
-// Clavarlo: el GM elige la casilla (libre y pegada al creep). Esc o clic derecho: no se clava (lo cobrado ya se cobró, como los refuerzos).
+// Clavarlo: el GM elige la casilla, libre y dentro del Rango del creep (dueño: «en cualquier lugar dentro de su rango»). Esc o clic derecho: no se
+// clava (lo cobrado ya se cobró, como los refuerzos).
 function plantarEstandarte(sc, h){
   const orig = [...tokens.entries()].find(([, t]) => t.tipo === 'creep' && t.fichaId === sc.id);
   if(!orig){ toast(`🚩 ${sc.nombre}: no tiene token en este mapa, así que no puede clavar el estandarte`); return; }
   const [origId, tOrig] = orig;
   const e = h.estandarte || {};
+  const rng = Math.max(1, Math.round(num((rangoDeToken(tOrig) || {}).rng)) || 1);
   const pedir = () => elegirDestino(async c => {
     const ocupada = [...tokens.values()].some(x => x.col === c.col && x.fila === c.fila) || (typeof elementoSolidoEn === 'function' && elementoSolidoEn(c.col, c.fila));
     if(ocupada){ toast('Esa casilla no está libre (hay un token o un Sólido): elegí otra'); pedir(); return; }
-    if(distanciaHex(c, {col: tOrig.col, fila: tOrig.fila}) !== 1){ toast(`El estandarte se clava en una casilla pegada a ${sc.nombre}: elegí otra`); pedir(); return; }
+    if(distanciaHex(c, {col: tOrig.col, fila: tOrig.fila}) > rng){ toast(`Esa casilla queda fuera del Rango de ${sc.nombre} (${rng}): elegí otra más cerca`); pedir(); return; }
     try{ await estandarteCrear(sc, e, c, tOrig, origId); }
     catch(err){ console.error('No se pudo clavar el estandarte:', err); toast('No se pudo clavar el estandarte — mirá la consola'); }
-  }, `<b>🚩 ${esc(h.nombre || 'Estandarte de guerra')}: elegí dónde lo clava</b> <span>una casilla libre pegada a ${esc(sc.nombre)} · Esc o clic derecho cancelan</span>`, true);
+  }, `<b>🚩 ${esc(h.nombre || 'Estandarte de guerra')}: elegí dónde lo clava</b> <span>una casilla libre dentro de su Rango (${rng} casilla${rng === 1 ? '' : 's'}) · Esc o clic derecho cancelan</span>`, true);
   pedir();
 }
 async function estandarteCrear(sc, e, celda, tOrig){
@@ -153,21 +155,38 @@ function estandarteDibujar(z){
     ctx.fillStyle = `rgba(150,24,36,${0.07 + 0.03 * p})`; ctx.fill();
     ctx.restore();
     bordeHexPunteado(celdas, z, 'rgba(235,195,105,.45)');
-    // El anillo y los banderines, por fuera de la grilla.
-    const R = (e.radio + 0.62) * Math.sqrt(3) * HEX;
+    // El anillo y los banderines, por fuera de la grilla, siguiendo la forma del área con las puntas redondeadas (dueño: «que no sea circular exacta, más
+    // aproximada a la forma hexagonal, pero que tampoco sea literalmente hexagonal»): en cada dirección, hasta dónde llega el centro de la casilla más
+    // alejada, más un margen fijo (eso redondea las puntas).
+    const pts = celdas.map(q => hexCentro(q.col, q.fila)), M = 120, borde = [];
+    for(let i = 0; i <= M; i++){
+      const th = (i / M) * Math.PI * 2, ux = Math.cos(th), uy = Math.sin(th);
+      let hmax = 0;
+      for(const q of pts){ const d = (q.x - c.x) * ux + (q.y - c.y) * uy; if(d > hmax) hmax = d; }
+      borde.push(hmax + HEX * 1.15);
+    }
+    const punto = (th, extra) => {
+      const f = ((th % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2) / (Math.PI * 2) * M, i = Math.floor(f), k = f - i;
+      const r = borde[i] * (1 - k) + borde[Math.min(M, i + 1)] * k + (extra || 0);
+      return {x: c.x + Math.cos(th) * r, y: c.y + Math.sin(th) * r};
+    };
+    const trazar = extra => { ctx.beginPath(); for(let i = 0; i <= M; i++){ const q = punto((i / M) * Math.PI * 2, extra); i ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y); } ctx.closePath(); };
     ctx.save();
-    ctx.beginPath(); ctx.arc(c.x, c.y, R, 0, Math.PI * 2);
+    ctx.lineJoin = 'round';
+    trazar(0);
     ctx.strokeStyle = 'rgba(40,10,12,.55)'; ctx.lineWidth = 5 / z; ctx.stroke();
     ctx.strokeStyle = `rgba(179,32,46,${0.75 + 0.2 * p})`; ctx.lineWidth = 3 / z; ctx.stroke();
-    ctx.beginPath(); ctx.arc(c.x, c.y, R - 4 / z, 0, Math.PI * 2);
+    trazar(-4 / z);
     ctx.strokeStyle = 'rgba(227,176,75,.8)'; ctx.lineWidth = 1.2 / z; ctx.stroke();
-    const N = Math.max(12, Math.round(R / HEX * 3)), largo = HEX * 0.42, ancho = HEX * 0.17;
+    const R = Math.max(...borde), N = Math.max(12, Math.round(R / HEX * 3)), largo = HEX * 0.42, ancho = HEX * 0.17;
     for(let i = 0; i < N; i++){
       const th = (i / N) * Math.PI * 2 + 0.12 * Math.sin(t0 * 2.2 + i * 0.9);   // flamean
-      const ux = Math.cos(th), uy = Math.sin(th), bx = c.x + ux * R, by = c.y + uy * R;
+      const b0 = punto(th), b1 = punto(th + 0.02), tx = b1.x - b0.x, ty = b1.y - b0.y, tl = Math.hypot(tx, ty) || 1;
+      const ux = ty / tl, uy = -tx / tl;   // hacia afuera del contorno
+      const vx = tx / tl, vy = ty / tl, bx = b0.x, by = b0.y;
       ctx.beginPath();
-      ctx.moveTo(bx - uy * ancho, by + ux * ancho);
-      ctx.lineTo(bx + uy * ancho, by - ux * ancho);
+      ctx.moveTo(bx - vx * ancho, by - vy * ancho);
+      ctx.lineTo(bx + vx * ancho, by + vy * ancho);
       ctx.lineTo(bx + ux * largo, by + uy * largo);
       ctx.closePath();
       ctx.fillStyle = i % 2 ? ESTANDARTE_ORO : ESTANDARTE_CARMESI; ctx.fill();

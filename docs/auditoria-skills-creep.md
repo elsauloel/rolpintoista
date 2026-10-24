@@ -289,6 +289,12 @@
   su SP Regen (personaje, invocación y creep, también en modo SP); la Regeneración que le da otro, una cura o una zona entran igual. 2 No2 y 3 SP, o cooldown
   3 (como la Maldición de la coraza). **Para probar.**
 
+- ✅ **Ojo certero** (Support, 2026-10-24, dueño: «+2 al crítico potente, +2 al crítico frecuente durante 2 turnos; hacer el conteo de turnos de manera tal
+  que el personaje afectado por el skill inicie y termine 2 turnos completos con ese efecto»): a él o a un aliado en su Rango, sin tirada; el estado nuevo **Ojo
+  certero** (Crítico frecuente +2 y potente +2, 2 turnos) con la marca nueva **`turnosCompletos`** (`Combatiente.terminarTurnoEstados`): el turno en que se lo
+  dan no cuenta nunca. Antes, un estado puesto en el propio turno de quien lo recibe perdía un turno completo (ese turno a medias contaba). 1 No2 y 3 SP, o
+  cooldown 3 (los propuso Claude). **Para probar.**
+
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 
 ## Etiquetas

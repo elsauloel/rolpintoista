@@ -68,7 +68,7 @@
     'Barrido': ['choque pesado', 'barrido'], 'Coletazo': ['choque pesado', 'barrido'],
     'Tiro a la cabeza': ['rango', 'tiro apuntado'], 'Desarmar': ['choque pesado', 'desarmar'], 'El que avisa no traiciona': ['choque pesado', 'golpe anunciado'], 'Sal en la herida': ['choque liviano', 'abrir la herida'], 'Remate': ['choque pesado', 'remate'], 'Ir por el herido': ['choque pesado', 'remate'], 'Morder la herida': ['choque liviano', 'abrir la herida'], 'Patotear': ['choque liviano', 'manada'], 'Jauría': ['choque liviano', 'manada'], 'Zarpazo erguido': ['choque pesado', 'golpe anunciado'], 'Mal de ojo': ['debuffer', 'maleficio'], 'Disparo señalador': ['rango', 'señalar'], 'Ráfaga de cortes': ['choque liviano', 'ráfaga'], 'Ráfaga de zarpazos': ['choque liviano', 'ráfaga'],
     'Romper armadura': ['choque pesado', 'romper armadura'], 'Arrancar la coraza': ['choque pesado', 'romper armadura'],
-    'Golpe demoledor': ['choque pesado', 'romper armadura'], 'Mandíbula trituradora': ['choque pesado', 'romper armadura'], 'Cadena de rayos': ['mago', 'rayo en cadena'], 'Hálito polar': ['mago', 'cono de frío'], 'Muro de fuego': ['mago', 'muro de fuego'], 'Maldición de la coraza': ['debuffer', 'bajar la armadura'], 'Maldición de la sequía': ['debuffer', 'cortar la regeneración'], 'Coraza de púas': ['support', 'devolver el daño'], 'Bendecir el arma': ['support', 'bendecir el arma'], 'Velo espejado': ['support', 'devolver el daño'],
+    'Golpe demoledor': ['choque pesado', 'romper armadura'], 'Mandíbula trituradora': ['choque pesado', 'romper armadura'], 'Cadena de rayos': ['mago', 'rayo en cadena'], 'Hálito polar': ['mago', 'cono de frío'], 'Muro de fuego': ['mago', 'muro de fuego'], 'Maldición de la coraza': ['debuffer', 'bajar la armadura'], 'Maldición de la sequía': ['debuffer', 'cortar la regeneración'], 'Coraza de púas': ['support', 'devolver el daño'], 'Bendecir el arma': ['support', 'bendecir el arma'], 'Ojo certero': ['support', 'ojo certero'], 'Velo espejado': ['support', 'devolver el daño'],
     'Puñalada por la espalda': ['choque liviano', 'por la espalda'], 'Mordida a traición': ['choque liviano', 'por la espalda'], 'Puñalada trapera': ['choque liviano', 'por la espalda'],
   };
 
@@ -354,6 +354,11 @@
   // ✨ Auditada (dueño, 2026-10-24: «vamos con bendecir el arma, que tenga flash»; concepto 2 del Support): Flash — en turno ajeno cuesta el doble
   // (vtt-hexgrid/js/12) — y sin No2 (un Flash no cobra No2, P136). El estado Arma bendecida: la carga del próximo ataque con arma, +1 dado del Tipo
   // de su arma (Combatiente.sumarCargas `dados`). Costos propuestos por Claude: 2 SP o cooldown 2.
+  // 🎯 Auditada (dueño, 2026-10-24: «ojo certero, +2 al crítico potente, +2 al crítico frecuente durante 2 turnos; que el afectado inicie y termine 2 turnos
+  // completos con ese efecto»; concepto 5 del Support): a él o a un aliado en su Rango, sin tirada. Costo propuesto por Claude: 1 No2 y 3 SP, o cooldown 3.
+  H('Ojo certero', 'B', '*', 'a', 3, {detalle: 'Le afina la puntería a un aliado (o a sí mismo) dentro de su Rango: Crítico frecuente +2 y Crítico potente +2 durante sus próximos 2 turnos completos (el turno en que se lo da no cuenta).',
+    no2: 1, spCosto: 3, auditada: true, ataqueTxt: 'Crítico frecuente +2 y Crítico potente +2, 2 turnos completos, a él o a un aliado en su Rango',
+    duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', efectos: [{nombre: 'Ojo certero'}]}});
   H('Bendecir el arma', 'B', '*', 'a', 2, {detalle: 'FLASH (se puede usar en cualquier momento; en turno ajeno cuesta el doble). Bendice el arma de un aliado (o la propia) dentro de su Rango: su próximo ataque con arma suma un dado más del Tipo de su arma al daño (Arma bendecida; si no ataca, se va a los 2 turnos).',
     no2: 0, spCosto: 2, flash: true, auditada: true, ataqueTxt: 'Flash: el próximo ataque con arma de él o de un aliado en su Rango suma +1 dado del Tipo de su arma',
     duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', efectos: [{nombre: 'Arma bendecida'}]}});

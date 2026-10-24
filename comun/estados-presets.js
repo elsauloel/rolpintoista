@@ -132,6 +132,10 @@ const ESTADOS_PRESET = [
   // Sprint (Asalto, 2026-10-13): los próximos 3 casilleros que camina están pagos (solo paga los recargos: Rengo, terreno lento). Lo descuenta el mapa.
   {nombre:'Sprint', polaridad:'buff', turnos:1, sprint:3, alEmpezarTurno:true,
     detalle:'Los próximos 3 casilleros que camina en este turno ya están pagos: solo paga lo que sumen Rengo o el terreno lento, y alejarse de un rival le da su ataque de oportunidad. Se termina al empezar su próximo turno. ⚙ Automatizado en el mapa.'},
+  // Ojo certero (2026-10-24, dueño: el Support de los creeps): Crítico frecuente +2 y Crítico potente +2, dos turnos completos de quien lo recibe
+  // (`turnosCompletos`: el turno en que se lo dan no cuenta, aunque sea el suyo; Combatiente.terminarTurnoEstados).
+  {nombre:'Ojo certero', polaridad:'buff', turnos:2, turnosCompletos:true, mods:[{stat:'crit', val:2}, {stat:'critpot', val:2}],
+    detalle:'Le afinan la puntería: Crítico frecuente +2 y Crítico potente +2 durante sus próximos 2 turnos completos (el turno en que se lo dan no cuenta). Si se lo vuelven a dar, no se suma: vuelve a durar 2 turnos. ⚙ Automatizado.'},
   // Sequía (2026-10-24, dueño: la Maldición de la sequía del Debuffer, «sólo corta las regeneraciones de SP y HP propias, no las externas»).
   {nombre:'Sequía', polaridad:'debuff', turnos:3, sequia:true,
     detalle:'Una maldición que lo seca por dentro: mientras dure no recupera vida ni SP por sí mismo al empezar el turno (sus pasivas de regeneración, la Regeneración de vida de su equipo, su SP Regen). Lo que le dan otros (una cura, la Regeneración de un aliado, una zona de curación) entra igual. ⚙ Automatizado.'},

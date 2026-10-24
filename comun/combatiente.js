@@ -273,7 +273,9 @@ const Combatiente = (() => {
   function terminarTurnoEstados(estados){
     const terminados = [];
     if(Array.isArray(estados)) for(let i = estados.length - 1; i >= 0; i--) if(estados[i] && estados[i].alTerminarTurno){ terminados.unshift(estados[i]); estados.splice(i, 1); }
-    (estados || []).forEach(e => { if(e && e.recien) delete e.recien; });
+    // `turnosCompletos` (2026-10-24, dueño, Ojo certero: «que el afectado inicie y termine N turnos completos con ese efecto»): el turno en que se lo
+    // pusieron no cuenta nunca — tampoco si fue el propio —, así el próximo inicio no descuenta.
+    (estados || []).forEach(e => { if(e && e.recien && !e.turnosCompletos) delete e.recien; });
     return {hp: 0, quedan: estados || [], terminados, eventos: []};
   }
   // El pase de turno de siempre (⟳ Mantenimiento, sin orden de turnos): dispara (lo que no se disparó al aplicarse) y cuenta.

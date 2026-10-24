@@ -346,6 +346,8 @@ Inmovilizado, Rengo, Desarmado; y, de personajes, Enyetar.
 8. **Drenar SP**: pierde SP, y el debuffer quizás lo gana.
 9. **Atormentar**: cada acción que cuesta No2 le saca vida (Atormentado).
 10. **Maldición de la sangre**: usar algo que cuesta SP le saca vida (Maldito).
+10b. **Maldición de la sequía** (idea del dueño, 2026-10-24: «una maldición que anule regeneración de HP y SP»): mientras dura, no recupera vida ni SP
+     por turno (ni la Regeneración ni el SP Regen; quizás tampoco las curas por pulso del Círculo o el Aura). El nombre es provisorio.
 
 **C. Control mental**
 11. ✅ **Confusión** (2026-10-21).

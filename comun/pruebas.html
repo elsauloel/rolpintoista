@@ -4880,17 +4880,17 @@ prueba('📣 ¡A la carga! y Arenga (Support, 2026-10-23): onda a los aliados a 
     e('¡A la carga!').etiquetas.includes('auditada'), e('Arenga').etiquetas.includes('support'), ['Aullido de manada', 'Grito de ánimo', '¡Por el amo!', '¡A laburar!', 'Marca del amo', 'Aullido de la manada'].filter(e).length],
     ['onda', 4, true, 2, 'pdg2 pdgmg2 dmg2 dmgesp2', 'Bendecido', 3, 4, true, true, 0]);
 });
-prueba('🔥 Muro de fuego (Mago, 2026-10-24): zona en línea de largo a elegir (3 a 8), 1d6 de fuego y Quemadura; el largo de más se cobra aparte; reemplaza a la Llamarada', () => {
+prueba('🔥 Muro de fuego (Mago, 2026-10-24): zona en línea de largo a elegir (3 a 8), 3d4 de fuego directo y Quemadura; el largo de más se cobra aparte; reemplaza a la Llamarada', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Muro de fuego'), h = armarHabilidadDeCreep(e.datos, 3);
   const z = Combatiente.zonaDeHab(h, {...h.duelo, zonaLargo: 5}, {fichaId: 'x', tipo: 'creep'});
   const sc = {nombre: 'M', nitros: 6, sp: 20, modoSP: true, esp: 6, habilidades: [{...h, id: 'm1', cdActual: 0}], estados: []};
   const sc2 = {nombre: 'M2', nitros: 6, habilidades: [{...h, id: 'm1', cdActual: 0}], estados: []};
   CreepAcciones.ejecutarHab(sc, sc.habilidades[0], estadosPresetCreep(), true, {extra: {sp: 2, no2: 1, cd: 0}});
   CreepAcciones.ejecutarHab(sc2, sc2.habilidades[0], estadosPresetCreep(), true, {extra: {sp: 0, no2: 1, cd: 1}});
-  igual([h.largoVariable && h.largoVariable.min, h.largoVariable && h.largoVariable.max, z.zonaForma, z.zonaLargo, z.zonaDano || z.dano, Combatiente.elementoDe(h.duelo.tipoDano),
+  igual([h.largoVariable && h.largoVariable.min, h.largoVariable && h.largoVariable.max, z.zonaForma, z.zonaLargo, z.zonaDano || z.dano, !!z.zonaDirecto, Combatiente.elementoDe(h.duelo.tipoDano),
     h.duelo.zonaEstado.nombre, !!h.duelo.zonaCadaPaso, sc.nitros, sc.sp, sc2.nitros, sc2.habilidades[0].cdActual,
     HABILIDADES_CREEP_BASE.filter(x => /Una lengua de fuego en línea \(a mano\)/.test(x.detalle || '')).length],
-    [3, 8, 'linea', 5, '1d6', 'fuego', 'Quemadura', true, 3, 15, 3, 4, 0]);
+    [3, 8, 'linea', 5, '3d4', true, 'fuego', 'Quemadura', true, 3, 15, 3, 4, 0]);
 });
 prueba('✨ Bendecir el arma (Support, 2026-10-24): Flash, Arma bendecida = la carga del próximo ataque, +1 dado; en turno ajeno cuesta el doble', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Bendecir el arma'), h = armarHabilidadDeCreep(e.datos, 3);

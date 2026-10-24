@@ -208,10 +208,11 @@
   resistencia al hielo), y Escarcha (−1 No2 máximos, 2 turnos); el cobro (3 No2 y tanto SP como su Especial, o cooldown 3). **Y** el Aura sanadora cobra ahora 3 No2 y 5 SP.
 - [ ] **🔥 Muro de fuego (Mago, 2026-10-24)**: un creep lo usa → «¿De qué largo?» (3 a 8, cada uno con su costo) → «cuesta…: ¿lo levanta?» → elegir dónde
   empieza (en su Rango) y hacia dónde sigue → el muro del largo elegido, 3 turnos; cobra lo de base más lo del largo (Mesa); un personaje que lo cruza recibe
-  1d6 de fuego y Quemadura; cancelar en el cartel no cobra nada. **Probado en parte (2026-10-24, el Escarabajo, a la vista)**: «¿De qué largo?» con las 6
+  3d4 de fuego directo (sin restar su Defensa especial; sí su resistencia al fuego) y Quemadura; cancelar en el cartel no cobra nada. **Probado en parte (2026-10-24, el Escarabajo, a la vista)**: «¿De qué largo?» con las 6
   opciones y su costo (3: 2 No2 y 3 SP … 8: 4 No2 y 8 SP); 5 casillas → «cuesta 3 No2 y 5 SP. ¿Lo levanta?» → cobró 3 No2 (8 → 5) y 5 SP (40 → 35), la Mesa
   «Muro de fuego de 5 casillas — 3 No2 y 5 SP»; el muro de 5 casillas, 3 turnos, con la textura de fuego. (El aviso decía «−2 No2»: arreglado, ahora el
-  total.) **Falta**: que un personaje lo cruce (1d6 de fuego y Quemadura) y cancelar en el cartel.
+  total.) **Falta**: que un personaje lo cruce (3d4 de fuego directo y Quemadura) y cancelar en el cartel. **Y lo visual (2026-10-24)**: el muro y las zonas y
+  auras de curación llevan la línea punteada que corre sobre el borde exacto de las casillas; la ondulada de la curación, por fuera.
 - [ ] **✨ Bendecir el arma (Support, 2026-10-24)**: el botón late como Flash; en su turno, a un aliado en su Rango → Anuncio y Crónica «le aplicó Arma bendecida»,
   y el próximo ataque con arma de ese aliado suma +1 dado del Tipo de su arma en el daño (se ve en la fórmula del botón); ese ataque la gasta, pegue o no;
   en turno ajeno no avisa «fuera de turno», cobra el doble (cooldown 4, o el doble de SP) y lo dice en la Mesa; no cobra No2. **Y el botón instantáneo ✨**

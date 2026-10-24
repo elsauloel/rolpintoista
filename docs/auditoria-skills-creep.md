@@ -279,7 +279,8 @@
   también un nitro; uno castea muro, te pregunta de qué largo, ahí te confirma el costo y ahí se ejecuta»): reemplaza a la vieja **Llamarada** (a mano). La
   zona en línea de la Varita del muro de fuego, de **3 a 8 casillas** (`largoVariable`; el cartel del largo y la confirmación: `muroLargo`, vtt-hexgrid/js/12;
   lo de más, `CreepAcciones.ejecutarHab(…, {extra})`), empieza dentro de su Rango, dura 3 turnos: **1d6 de fuego y Quemadura** a quien la cruza (cada paso
-  adentro) o empieza su turno adentro. Costo: 3 casillas, 2 No2 y 3 SP (o cooldown 3); cada casilla de más +1 SP; cada 2 de más +1 No2 (en modo
+  adentro) o empieza su turno adentro. **Ajuste del dueño (2026-10-24)**: «1d6 me parece muy poco, sobre todo si se reduce con Def.Esp» → **3d4 de fuego
+  directo** (no lo frena la Defensa especial; sí la resistencia al fuego). Costo: 3 casillas, 2 No2 y 3 SP (o cooldown 3); cada casilla de más +1 SP; cada 2 de más +1 No2 (en modo
   cooldown, +1 al cooldown cada 2). Daño fijo: no suma el Ef.Esp. Los números los propuso Claude. **Para probar.**
 
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.

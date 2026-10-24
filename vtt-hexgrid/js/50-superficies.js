@@ -100,6 +100,31 @@ function superficieDibujar(el, celdas, z){
 /* 🔥 Lo que arde (dueño, 2026-10-17: «para superficies incendiadas, buscate algún tipo de textura»): el terreno incendiado y las zonas de fuego.
    Una mancha de brasas (rojo oscuro, borde desparejo y un poco borroso), encima un resplandor naranja-amarillo por casilla que titila, y
    chispas que suben y se apagan. Todo dibujado (sin imágenes). */
+/* La línea punteada sobre el borde EXACTO de las casillas del efecto (2026-10-24, dueño: «la línea punteada me gusta, pero que delimite claramente los
+   hexágonos donde el efecto sucede; me gusta que las rayitas se desplacen; está bueno el efecto orgánico por fuera de la grilla, pero que esté la línea de
+   puntos que aclare cualquier ambigüedad»): cada lado de una casilla que no toca otra del grupo, con las rayitas corriendo; debajo, una sombra para que se
+   lea sobre cualquier fondo. La usan el fuego (abajo) y las zonas y auras de curación (js/70). */
+function bordeHexPunteado(celdas, z, color){
+  if(!celdas || !celdas.length) return;
+  const set = new Set(celdas.map(c => c.col + ',' + c.fila)), t = performance.now() / 1000;
+  ctx.save();
+  ctx.beginPath();
+  celdas.forEach(c => {
+    const cubo = hexACubo(c), h = hexCentro(c.col, c.fila);
+    VECINO_LADO.forEach(([vq, vr], i) => {
+      const nq = cubo.q + vq, nr = cubo.r + vr;
+      if(set.has(cuboACol(nq, nr) + ',' + cuboAFila(nq, nr))) return;
+      const a = ESQUINAS[i], b = ESQUINAS[(i + 1) % 6];
+      ctx.moveTo(h.x + a[0], h.y + a[1]);
+      ctx.lineTo(h.x + b[0], h.y + b[1]);
+    });
+  });
+  ctx.lineCap = 'round';
+  ctx.setLineDash([7 / z, 6 / z]); ctx.lineDashOffset = -t * 14 / z;
+  ctx.strokeStyle = 'rgba(0,0,0,.45)'; ctx.lineWidth = 3.4 / z; ctx.stroke();
+  ctx.strokeStyle = color; ctx.lineWidth = 1.8 / z; ctx.stroke();
+  ctx.restore();
+}
 function fuegoDibujar(celdas, z){
   const s = performance.now() / 1000, lista = celdas.slice(0, 120);
   ctx.save();
@@ -130,6 +155,7 @@ function fuegoDibujar(celdas, z){
     }
   });
   ctx.restore();
+  bordeHexPunteado(celdas, z, 'rgba(255,200,120,.95)');   // dónde quema exactamente (2026-10-24)
 }
 // La mancha: las casillas enteras más una «panza» redonda en cada lado de afuera (tamaño y salida al azar, fijos por casilla).
 function trazarManchon(celdas, o){

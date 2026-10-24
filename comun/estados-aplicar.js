@@ -114,5 +114,5 @@ const EstadosAplicar = (() => {
     return s.nombre + (stacks ? ` ×${stacks}` : '') + (extra.length ? ` (${extra.join(', ')})` : '');
   }
 
-  return {DEBUFFS, BUFFS, limpiarSpec, esPreset, componer, bloqueadoCreep, aplicarACreep, encolarPj, texto};
+  return {DEBUFFS, BUFFS, presetPorNombre, limpiarSpec, esPreset, componer, bloqueadoCreep, aplicarACreep, encolarPj, texto};
 })();

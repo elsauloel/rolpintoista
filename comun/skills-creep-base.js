@@ -68,7 +68,7 @@
     'Barrido': ['choque pesado', 'barrido'], 'Coletazo': ['choque pesado', 'barrido'],
     'Tiro a la cabeza': ['rango', 'tiro apuntado'], 'Desarmar': ['choque pesado', 'desarmar'], 'El que avisa no traiciona': ['choque pesado', 'golpe anunciado'], 'Sal en la herida': ['choque liviano', 'abrir la herida'], 'Remate': ['choque pesado', 'remate'], 'Ir por el herido': ['choque pesado', 'remate'], 'Morder la herida': ['choque liviano', 'abrir la herida'], 'Patotear': ['choque liviano', 'manada'], 'Jauría': ['choque liviano', 'manada'], 'Zarpazo erguido': ['choque pesado', 'golpe anunciado'], 'Mal de ojo': ['debuffer', 'maleficio'], 'Disparo señalador': ['rango', 'señalar'], 'Ráfaga de cortes': ['choque liviano', 'ráfaga'], 'Ráfaga de zarpazos': ['choque liviano', 'ráfaga'],
     'Romper armadura': ['choque pesado', 'romper armadura'], 'Arrancar la coraza': ['choque pesado', 'romper armadura'],
-    'Golpe demoledor': ['choque pesado', 'romper armadura'], 'Mandíbula trituradora': ['choque pesado', 'romper armadura'], 'Cadena de rayos': ['mago', 'rayo en cadena'], 'Hálito polar': ['mago', 'cono de frío'], 'Maldición de la coraza': ['debuffer', 'bajar la armadura'], 'Coraza de púas': ['support', 'devolver el daño'], 'Bendecir el arma': ['support', 'bendecir el arma'], 'Velo espejado': ['support', 'devolver el daño'],
+    'Golpe demoledor': ['choque pesado', 'romper armadura'], 'Mandíbula trituradora': ['choque pesado', 'romper armadura'], 'Cadena de rayos': ['mago', 'rayo en cadena'], 'Hálito polar': ['mago', 'cono de frío'], 'Muro de fuego': ['mago', 'muro de fuego'], 'Maldición de la coraza': ['debuffer', 'bajar la armadura'], 'Coraza de púas': ['support', 'devolver el daño'], 'Bendecir el arma': ['support', 'bendecir el arma'], 'Velo espejado': ['support', 'devolver el daño'],
     'Puñalada por la espalda': ['choque liviano', 'por la espalda'], 'Mordida a traición': ['choque liviano', 'por la espalda'], 'Puñalada trapera': ['choque liviano', 'por la espalda'],
   };
 
@@ -244,7 +244,15 @@
     duelo: {objetivo: 'cono', tira: 'pdgmg', contra: ['eva'], dano: true, danoFormula: '2d4', danoSumaEsp: 0.25, tipoDano: 'hielo', efectos: [{nombre: 'Escarcha'}]}});
   H('Misil arcano', 'D', 'hdga', 'g', 2, aT('Un proyectil mágico que no falla.', 'M'));
   H('Descarga eléctrica', 'DK', 'ea', 'g', 3, zO('Una descarga que deja al objetivo sin aliento: pierde 1 No2 (a mano).', 2, 'M'));
-  H('Llamarada', 'DA', 'e', 'g', 4, zO('Una lengua de fuego en línea (a mano).', 3, 'M'));
+  // 🔥 Auditada (dueño, 2026-10-24; el Mago, «muro de fuego»): reemplaza a la vieja Llamarada (a mano). La zona en línea de la Varita del muro de fuego
+  // (`zonaForma: 'linea'`), con el largo a elegir al lanzarla (dueño: «un mínimo de 3, que se pueda ampliar por un costo adicional en SP, y cada 2
+  // casilleros también un nitro; uno castea, te pregunta de qué largo, te confirma el costo y se ejecuta»): `largoVariable` (vtt-hexgrid/js/12, muroLargo).
+  // Daño fijo (sin el Ef.Esp: su costo ya sube con el largo): 1d6 de fuego y Quemadura al cruzarla (cada paso adentro) y al empezar el turno adentro.
+  // Costos propuestos por Claude: 3 casillas, 2 No2 y 3 SP (o cooldown 3); cada casilla más, +1 SP; cada 2 de más, +1 No2 (y +1 al cooldown); hasta 8.
+  H('Muro de fuego', 'DA', 'ega', 'g', 3, {detalle: 'Levanta un muro de llamas en línea, que empieza dentro de su Rango: 3 casillas o más (hasta 8: cada casilla de más cuesta 1 SP más, y cada 2, 1 No2 más), durante 3 turnos. Quien lo cruza o empieza su turno adentro recibe 1d6 de daño de fuego (lo frenan la Defensa especial y la resistencia al fuego) y queda con Quemadura.',
+    no2: 2, spCosto: 3, auditada: true, largoVariable: {min: 3, max: 8, sp: 1, no2Cada: 2}, ataqueTxt: 'muro de fuego en línea (3 casillas o más), 3 turnos: 1d6 de fuego y Quemadura a quien lo cruza o se queda',
+    duelo: {objetivo: 'zona', tira: '', contra: [], dano: true, danoFormula: '1d6', tipoDano: 'fuego', zonaTurnos: 3, zonaForma: 'linea', zonaLargo: 3, zonaAltura: 'ambos',
+      zonaColor: '#E8632B', zonaAlcance: 'rango', zonaCadaPaso: true, zonaEstado: {nombre: 'Quemadura'}}}, 'terreno y formas');
   H('Lanza de hielo', 'DX', 'e', 'g', 3, zO('Un carámbano que ralentiza: el objetivo pierde 1 No2 (a mano).', 2, 'M'));
   H('Dardo venenoso', 'DX', 'hdp', 'r', 2, aT('Un dardo cubierto de veneno: tirá 1d4, con 1 el objetivo queda Envenenado (a mano).', 'L'));
   H('Explosión psíquica', 'D', 'a', 'g', 4, zO('Un pulso mental que ignora la armadura.', 3, 'H'));

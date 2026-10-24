@@ -367,9 +367,10 @@ const CreepAcciones = (() => {
     Combatiente.aplicarTormenta(sc, sc.estados, costo, {motivo: `usar ${h.nombre || 'una habilidad'}`});
     // 💧 En modo SP (2026-10-20): paga su SP y no queda en cooldown. Sin SP suficiente, la pantalla ya preguntó (confirmarSP): queda en 0.
     let costoSp = 0;
-    const veces = o.doble ? 2 : 1;
-    if(C().modoSP(sc)){ costoSp = C().costoSpHab(sc, h) * veces; sc.sp = Math.max(0, C().spActual(sc) - costoSp); }
-    else h.cdActual = num(h.cd) * veces;
+    const veces = o.doble ? 2 : 1, ex = o.extra || {};   // `o.extra` (2026-10-24, el largo del Muro de fuego): {sp, no2, cd} de más
+    if(num(ex.no2) > 0) sc.nitros = num(sc.nitros) - num(ex.no2);
+    if(C().modoSP(sc)){ costoSp = C().costoSpHab(sc, h) * veces + Math.max(0, num(ex.sp)); sc.sp = Math.max(0, C().spActual(sc) - costoSp); }
+    else h.cdActual = num(h.cd) * veces + Math.max(0, num(ex.cd));
     const malditoDano = malditoCreep(sc, h);   // 🩸 Maldito: su cooldown en vida (2026-10-18)
     if(C().habAtaque(h)) sc.ataquesTurno = num(sc.ataquesTurno) + 1;  // cuenta como su ataque
     if(costoHp > 0) sc.hp = num(sc.hp) - costoHp;

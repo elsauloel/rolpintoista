@@ -28,12 +28,12 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
   robar, sigilo, varios golpes, bajo tierra, veneno.
 - 🏹 **Rango y Hunter — 11**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
-- ✨ **Mago — 5**: daño en área, rayo en cadena, cono de frío (Hálito polar) · de El origen: proyectil, fuego con quemadura.
+- ✨ **Mago — 6**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego (2026-10-24) · de El origen: proyectil, fuego con quemadura.
 - 🧿 **Debuffer — 6**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24) · de El origen: ceguera, veneno, inmovilizar.
 - 💚 **Support — 6**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma (2026-10-24) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
-**Para emparejar**: Mago (5), después Debuffer y Support (6) (2026-10-24).
+**Para emparejar**: Mago, Debuffer y Support empatados en 6 (2026-10-24); después Rango + Hunter (11).
 
 ## Los roles
 
@@ -249,7 +249,8 @@ la emboscada, matabestias, la espalda a distancia, la recarga, el proyectil perf
 Ya cubierto al entrar (2026-10-21): ninguna habilidad de caster auditada; en el mapa, los hechizos dirigidos y de área (cascada, dodge roll), conos,
 líneas, zonas, el rayo en cadena y los charcos, los controles mentales.
 
-- **Mago (daño directo):** proyectil mágico, ✅ **Bola de fuego** (2026-10-21), ✅ **Hálito polar** (cono de frío, 2026-10-23), ✅ **Cadena de rayos** (2026-10-21), muro de fuego.
+- **Mago (daño directo):** proyectil mágico, ✅ **Bola de fuego** (2026-10-21), ✅ **Hálito polar** (cono de frío, 2026-10-23), ✅ **Cadena de rayos** (2026-10-21), ✅ **Muro de fuego** (2026-10-24: largo a elegir, 3 a 8,
+  con el costo según el largo).
 - **Debuffer:** ver el listado completo abajo (§ 6).
 - **Support:** ver el listado completo abajo (§ 5).
 - **El costo de las que suman Efecto especial:** P216 (la página para la mesa: https://claude.ai/artifact/C7VPwWPg9BpWfF1L1hUGb6).

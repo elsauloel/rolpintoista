@@ -94,6 +94,11 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
+> - [ ] **⌨ Atajos 1–0 para las habilidades (2026-10-24, dueño: «una especie de hotkey para las habilidades del 1 al 0, por lo menos 10; cada personaje
+>   les pueda asignar un número, y que ese glosario de qué número es cada habilidad esté más o menos a mano; el menú lateral izquierdo ya está ocupado:
+>   quizás un botón plegable, flotante o algo por el estilo»):** cada personaje asigna sus habilidades a las teclas 1…0; apretar el número las ejecuta
+>   (como el botón de la Botonera). Falta diseñar: dónde se asigna (la Botonera, el Ver de la habilidad), dónde se ve la lista (un botón plegable o
+>   flotante, fuera del menú de la izquierda), si vale también para el GM con los creeps, y qué pasa con las teclas que ya son atajos del mapa.
 > - [ ] **🔥 Debilidades y resistencias a efectos especiales y elementales (2026-10-23, dueño: «queda pendiente de desarrollar a nivel diseño;
 >   todavía no lo elaboremos»):** que los elementos interactúen con los efectos y con los tipos de criatura. Ejemplos dictados: las redes (la Red
 >   Nerubian, las trampas de red) desaparecen con el fuego; los insectos son débiles al fuego; los elementales tienen su sistema de resistencias y

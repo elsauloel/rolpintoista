@@ -275,6 +275,13 @@
   envenenada) que suma **+1 dado del Tipo de su arma** al daño de su próximo ataque con arma (`golpe.dados`, nuevo en las cargas); si no ataca, se va a los 2
   turnos. 2 SP o cooldown 2 (los propuso Claude). Queda en el pool la **Bendición** vieja (a mano: +1 Daño y +2 Defensa 3 turnos), otra cosa. **Para probar.**
 
+- ✅ **Muro de fuego** (Mago, 2026-10-24, dueño: «que tenga un mínimo de 3, pero que se pueda ampliar por un costo adicional en SP, y cada 2 casilleros
+  también un nitro; uno castea muro, te pregunta de qué largo, ahí te confirma el costo y ahí se ejecuta»): reemplaza a la vieja **Llamarada** (a mano). La
+  zona en línea de la Varita del muro de fuego, de **3 a 8 casillas** (`largoVariable`; el cartel del largo y la confirmación: `muroLargo`, vtt-hexgrid/js/12;
+  lo de más, `CreepAcciones.ejecutarHab(…, {extra})`), empieza dentro de su Rango, dura 3 turnos: **1d6 de fuego y Quemadura** a quien la cruza (cada paso
+  adentro) o empieza su turno adentro. Costo: 3 casillas, 2 No2 y 3 SP (o cooldown 3); cada casilla de más +1 SP; cada 2 de más +1 No2 (en modo
+  cooldown, +1 al cooldown cada 2). Daño fijo: no suma el Ef.Esp. Los números los propuso Claude. **Para probar.**
+
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 
 ## Etiquetas

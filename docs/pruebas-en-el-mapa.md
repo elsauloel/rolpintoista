@@ -206,6 +206,9 @@
 - [ ] **❄ Hálito polar (Mago, 2026-10-23)**: un creep lo usa mirando hacia dos rivales y un aliado → el cono de 16 casillas al frente; tira PdG.Esp una vez
   contra la Evasión de cada rival (no del aliado), sin dodge roll; al que no le gana, 2d4 + ¼ del Ef.Esp del creep, de hielo (menos su Defensa especial y su
   resistencia al hielo), y Escarcha (−1 No2 máximos, 2 turnos); el cobro (3 No2 y tanto SP como su Especial, o cooldown 3). **Y** el Aura sanadora cobra ahora 3 No2 y 5 SP.
+- [ ] **🔥 Muro de fuego (Mago, 2026-10-24)**: un creep lo usa → «¿De qué largo?» (3 a 8, cada uno con su costo) → «cuesta…: ¿lo levanta?» → elegir dónde
+  empieza (en su Rango) y hacia dónde sigue → el muro del largo elegido, 3 turnos; cobra lo de base más lo del largo (Mesa); un personaje que lo cruza recibe
+  1d6 de fuego y Quemadura; cancelar en el cartel no cobra nada.
 - [ ] **✨ Bendecir el arma (Support, 2026-10-24)**: el botón late como Flash; en su turno, a un aliado en su Rango → Anuncio y Crónica «le aplicó Arma bendecida»,
   y el próximo ataque con arma de ese aliado suma +1 dado del Tipo de su arma en el daño (se ve en la fórmula del botón); ese ataque la gasta, pegue o no;
   en turno ajeno no avisa «fuera de turno», cobra el doble (cooldown 4, o el doble de SP) y lo dice en la Mesa; no cobra No2. **Y el botón instantáneo ✨**

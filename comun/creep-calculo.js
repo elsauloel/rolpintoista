@@ -624,7 +624,7 @@ const CreepCalculo = (() => {
   // Etiquetas cortas de los stats de un ítem de creep (antes STAT_LABEL_GM de GM Tools).
   const STAT_LABEL = {
     tipo1:'Tipo 4', tipo2:'Tipo 6', tipo3:'Tipo 8', tipo4:'Tipo 10', tipo5:'Tipo 12',
-    pdg:'PdG', eva:'Eva', ini:'Iniciativa', mov:'Mov', parry:'Parry', crit:'Crítico frecuente', critpot:'Crítico potente',
+    pdg:'PdG', eva:'Evasión', ini:'Iniciativa', mov:'Mov', parry:'Parry', crit:'Crítico frecuente', critpot:'Crítico potente',
     bonos:'Bonos', rangocasteo:'Rango', accionesmax:'Acciones máx.', nitros:'No2',
     resm:'Res.Mt', resmg:'Res.Esp', rescc:'Res.CC',
     con:'Con', fue:'Fue', agl:'Agi', des:'Des', esp:'Esp',

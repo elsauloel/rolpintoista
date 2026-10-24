@@ -416,7 +416,7 @@ const CreepAcciones = (() => {
     if(falta) partes.push(`⚠ ${falta}: se ejecutó como semiautomática`);
     if(p.costoSp) partes.push(`−${fmt(p.costoSp)} SP (quedan ${fmt(C().spActual(sc))})`);   // 💧 modo SP
     else if(h.cd > 0) partes.push(`cooldown ${fmt(num(h.cd))} turno(s)`);
-    if(efecto) partes.push(`${efecto.nombre} (${fmt(efecto.turnos)}t)`);
+    if(efecto) partes.push(efecto.permanente || !num(efecto.turnos) ? `${efecto.nombre} (sin límite)` : `${efecto.nombre} (${fmt(efecto.turnos)}t)`);   // (2026-10-24: Carga arcana decía «0t»)
     ui.toast(`${h.nombre||'Habilidad'} ${partes.join(' · ')}`);
   }
   // 🫳 ¿Es un robo (efecto «Robo» en su Ejecución) y el creep está en sigilo? Entonces es secreto: ni la Mesa ni el duelo a la vista.

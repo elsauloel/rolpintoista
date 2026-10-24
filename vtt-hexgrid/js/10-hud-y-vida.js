@@ -232,11 +232,12 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     let punteria = '';
     if(num(r.recibido) > 0){ const i = (sc.estados || []).findIndex(e => e && e.activo !== false && e.pierdeAlDano); if(i >= 0){ punteria = sc.estados[i].nombre; sc.estados.splice(i, 1); } }
     // 🪓 El golpe anunciado (js/63): se corta con 10 de daño o más, sumando los golpes mientras lo carga (dueño, 2026-10-21).
-    let golpeCae = false, golpeAcum = 0, golpeTope = 0;
+    let golpeCae = false, golpeAcum = 0, golpeTope = 0, golpeHab = null;
     if(num(r.recibido) > 0){ const j = (sc.estados || []).findIndex(e => e && e.activo !== false && num(e.cortaDano) > 0);
       if(j >= 0){ const e = sc.estados[j]; e.danoRecibido = num(e.danoRecibido) + num(r.recibido); golpeAcum = e.danoRecibido; golpeTope = num(e.cortaDano);
+        golpeHab = (sc.habilidades || []).find(h => h && e.hab && h.id === e.hab) || null;   // ⚡ la Descarga arcana: un hechizo cargado se dice distinto
         if(golpeAcum >= golpeTope){ golpeCae = true; sc.estados.splice(j, 1); } } }
-    return {r, previo, nuevo: fenix ? 0 : sc.hp, bronca, fenix, hpFenix: sc.hp, punteria, golpeCae, golpeAcum, golpeTope};
+    return {r, previo, nuevo: fenix ? 0 : sc.hp, bronca, fenix, hpFenix: sc.hp, punteria, golpeCae, golpeAcum, golpeTope, golpeHab};
   });
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
   if(res.fenix){
@@ -245,9 +246,12 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   }
   if(res.bronca && typeof broncaAnunciar === 'function') broncaAnunciar(t, res.bronca);
   if(res.golpeCae || res.golpeAcum){   // 🪓 (js/63)
-    const txt = res.golpeCae ? `🪓 ${nombreDe(t)} recibió ${fmt(res.golpeAcum)} de daño mientras cargaba: ¡se le cae el golpe!` : `🪓 ${nombreDe(t)} aguanta el golpe cargado: lleva ${fmt(res.golpeAcum)} de daño de ${fmt(res.golpeTope)} (con ${fmt(res.golpeTope)} se le cae)`;
-    mesaLinea(txt, 'recordatorio');
-    try{ momentoAbrir({tipo: 'golpe-anunciado', icono: '🪓', titulo: txt.replace(/^🪓 /, ''), estado: 'listo', datos: {chico: true}}); }catch(e){}
+    const h = res.golpeHab, hechizo = typeof GA_HECHIZO === 'function' && GA_HECHIZO(h), ico = typeof GA_ICONO === 'function' ? GA_ICONO(h) : '🪓';
+    const txt = hechizo
+      ? (res.golpeCae ? `${nombreDe(t)} recibió ${fmt(res.golpeAcum)} de daño mientras cargaba: ¡se le corta ${h.nombre} y pierde lo cargado!` : `${nombreDe(t)} sigue cargando ${h.nombre}: lleva ${fmt(res.golpeAcum)} de daño de ${fmt(res.golpeTope)} (con ${fmt(res.golpeTope)} se le corta)`)
+      : (res.golpeCae ? `${nombreDe(t)} recibió ${fmt(res.golpeAcum)} de daño mientras cargaba: ¡se le cae el golpe!` : `${nombreDe(t)} aguanta el golpe cargado: lleva ${fmt(res.golpeAcum)} de daño de ${fmt(res.golpeTope)} (con ${fmt(res.golpeTope)} se le cae)`);
+    mesaLinea(`${ico} ${txt}`, 'recordatorio');
+    try{ momentoAbrir({tipo: 'golpe-anunciado', icono: ico, titulo: txt, estado: 'listo', datos: {chico: true}}); }catch(e){}
   }
   if(res.punteria){
     const txt = `🎯 ${nombreDe(t)} recibió daño y pierde la puntería (se le va ${res.punteria})`;

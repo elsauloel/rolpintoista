@@ -192,6 +192,13 @@ const Duelo = (() => {
 .duelo-danonum.inv{font-size:40px;color:#9ad0ff}
 .duelo-danosub{font-size:14px;color:#cfd6ea;margin-top:4px}
 .duelo-danosub.rojo{font-size:26px;font-weight:900;letter-spacing:.12em;color:#ff4d4d}
+.duelo-danotiro{margin-top:10px;display:flex;align-items:center;justify-content:center;gap:10px 16px;flex-wrap:wrap;padding:10px 14px;border-radius:12px;background:rgba(45,108,223,.12);border:1px solid #2d6cdf}
+.duelo-danotiro .t{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#9fb6e8}
+.duelo-danotiro .n{font-size:46px;font-weight:900;line-height:1;color:#fff;text-shadow:0 0 14px rgba(120,170,255,.45)}
+.duelo-danotiro .dados{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.duelo-dadito{min-width:30px;height:30px;padding:0 6px;border-radius:8px;background:#e8ecf7;color:#14182a;font-weight:900;font-size:16px;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 2px 0 rgba(0,0,0,.4)}
+.duelo-dadito.mod{background:transparent;color:#e8ecf7;border:1px dashed #7d8ab0;box-shadow:none}
+.duelo-danotiro .f{width:100%;text-align:center;font-size:12px;color:#8e98b4;margin-top:-2px}
 #duelo-fondo [data-dano-tirar],#duelo-fondo [data-critico]{background:#2d6cdf;color:#fff;border:2px solid #8db3ff;border-radius:12px;padding:14px 28px;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(45,108,223,.5)}
 #duelo-fondo [data-dano-tirar]:hover,#duelo-fondo [data-critico]:hover{background:#3b7bf0}
 #duelo-fondo .bt-lupa.duelo-lupa{display:inline-flex;position:static;width:auto;height:auto;margin-left:8px;padding:2px 7px;vertical-align:middle;font-size:14px;opacity:1;filter:none;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.5);border-radius:6px}
@@ -2183,16 +2190,21 @@ const Duelo = (() => {
       else cuerpo = `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire el daño…</div>`;
     }else{
       const defMan = dn.defensaManual === 'no' ? ' · ✍ sin restar Defensa' : dn.defensaManual !== undefined && dn.defensaManual !== null ? ` · ✍ Defensa ${_fmt(_num(dn.defensaManual))} (a mano)` : '';
-      const tiro = `<div class="duelo-mini">Daño${arma}${defMan}: <b>${_fmt(dn.crudo)}</b> <span style="opacity:.7">(${_esc(dn.formula || '')}${dn.rolls && dn.rolls.length ? ' → ' + dn.rolls.join(' + ') : ''}${_num(dn.mod) ? ' ' + (_num(dn.mod) > 0 ? '+' : '−') + ' ' + Math.abs(_num(dn.mod)) : ''})</span></div>`;
+      // La tirada, a la vista (2026-10-24, dueño: «en el paso 5 se ve muy poco clara la tirada y el resultado del daño»): el total grande y cada dado.
+      const dados = (dn.rolls || []).map(r => `<span class="duelo-dadito">${_esc(String(r))}</span>`).join('')
+        + (_num(dn.mod) ? `<span class="duelo-dadito mod">${_num(dn.mod) > 0 ? '+' : '−'}${_fmt(Math.abs(_num(dn.mod)))}</span>` : '');
+      const tiro = `<div class="duelo-danotiro"><span class="t">🎲 Daño${arma}${defMan}</span><span class="n">${_fmt(dn.crudo)}</span>${dados ? `<span class="dados">${dados}</span>` : ''}<span class="f">${_esc(dn.formula || '')}</span></div>`;
       if(!dn.aplicado && pideAceptar(d) && !dn.aceptado){
         // 💔 Lo que pasó, antes de descontarlo: «tanto de daño, menos tu Defensa» y el botón (el dueño) o la espera (el resto; el GM, «por él»).
         const ignora = d.hab && d.hab.dano && d.hab.dano.ignoraDef;
         const suyo = esMio(d.defensor), tu = suyo ? 'tu' : 'su';
-        const que = crit ? `Crítico: ${_fmt(dn.crudo)} × ${mult} = <b>${_fmt(dn.crudo * mult)}</b> de daño, derecho a la vida (no se resta ${tu} Defensa).`
-          : ignora ? `<b>${_fmt(dn.crudo)}</b> de daño ${_esc(d.hab.dano.tipo || 'especial')}, derecho a la vida (lo frenan ${tu} Defensa especial y ${tu}s resistencias, ${suyo ? 'si tenés' : 'si tiene'}).`
-          : d.resultado === 'mitad' ? `Pasa la mitad: (<b>${_fmt(dn.crudo)}</b> − ${tu} Defensa) ÷ 2, redondeado para arriba.`
-          : `<b>${_fmt(dn.crudo)}</b> de daño, menos ${tu} Defensa.`;
-        cuerpo = tiro + `<div class="duelo-danobox"><div class="duelo-danosub" style="font-size:14px">${que}</div></div>`
+        // El resultado con el número grande, como después de aplicarlo (2026-10-24, dueño: «destacarlo un poco mejor»).
+        const fuerte = crit || ignora, total = crit ? dn.crudo * mult : dn.crudo;
+        const que = crit ? `Crítico ×${mult} (${_fmt(dn.crudo)} × ${mult}): no se resta ${tu} Defensa.`
+          : ignora ? `de daño ${_esc(d.hab.dano.tipo || 'especial')} (lo frenan ${tu} Defensa especial y ${tu}s resistencias, ${suyo ? 'si tenés' : 'si tiene'}).`
+          : d.resultado === 'mitad' ? `Pasa la mitad: (${_fmt(dn.crudo)} − ${tu} Defensa) ÷ 2, redondeado para arriba.`
+          : `de daño, menos ${tu} Defensa.`;
+        cuerpo = tiro + `<div class="duelo-danobox${fuerte ? ' crit' : ''}"><div class="duelo-danonum${fuerte ? ' rojo' : ''}" style="font-size:72px">${_fmt(total)}</div>${fuerte ? '<div class="duelo-danosub rojo" style="font-size:20px">DERECHO A LA VIDA</div>' : ''}<div class="duelo-danosub" style="font-size:14px">${que}</div></div>`
           + (suyo ? `<div style="text-align:center;margin-top:8px"><button type="button" data-dano-aceptar>💔 Aplicar el daño</button><div class="duelo-nota" style="margin-top:6px">⚙ Al tocarlo se descuenta solo de tu vida (y se ve cómo queda).</div></div>`
             : `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.defensor.nombre)} aplique el daño…</div>${soyGM() ? `<div style="text-align:center;margin-top:6px"><button type="button" class="sec" data-dano-aceptar>💔 Aplicar por ${_esc(d.defensor.nombre)}</button></div>` : ''}`);
       }else if(!dn.aplicado){

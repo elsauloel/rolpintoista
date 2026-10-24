@@ -1968,13 +1968,40 @@ function dueloBuffMomento(d, t, spec){
       pasos: efecto ? [{titulo: 'Qué hace', texto: efecto}] : [],
       veredicto: {tono: 'bueno', grande: spec.nombre, chico: `${quien} ${t.tipo === 'creep' ? `le aplicó a ${a}` : 'te aplicó'} ${spec.nombre} ${dura}`}} : {}});
 }
+/* Una carga que llega en medio de un golpe (2026-10-24, dueño, Bendecir el arma: «se debería poder aplicar en cualquier momento antes de que se tire el
+   dado del arma, inclusive después de tirar probabilidad de golpe»). Las cargas se enganchan al ataque al pagar el PdG (Combatiente.gastarCarga); si
+   quien la recibe está atacando en un duelo abierto que ya pagó el PdG y todavía no tiró el daño, se engancha a ese duelo acá, así ese golpe la usa.
+   Por ahora a un creep (el Support de los creeps bendice a sus aliados); a un personaje le llega por su ficha y vale para el próximo ataque. */
+async function cargaAlGolpeAbierto(t, tokenId, nombre){
+  const preset = (typeof EstadosAplicar.presetPorNombre === 'function' && EstadosAplicar.presetPorNombre(nombre)) || null;
+  if(!t || t.tipo !== 'creep' || !preset || !preset.golpe || !(num(preset.cargas) > 0)) return;
+  const q = await fbDb.collection(fbRutaCampana('duelos')).orderBy('creado', 'desc').limit(8).get();
+  const d = q.docs.map(x => ({id: x.id, ...x.data()})).find(x => !x.hab && (x.estado === 'esperando' || x.estado === 'empate') && x.atacante && x.atacante.tokenId === tokenId && x.pdg && !x.dano);
+  if(!d) return;
+  const ok = await modificarCreep(t.fichaId, sc => {
+    const e = (sc.estados || []).find(x => x && x.nombre === nombre && num(x.cargas) > 0 && !(x.duelos || []).length);
+    if(!e) return false;
+    e.duelos = [String(d.id)];
+    e.cargas = num(e.cargas) - 1;
+    if(e.cargas <= 0){ e.activo = false; e.agotada = true; }
+    return true;
+  });
+  if(ok){
+    const txt = `✨ ${nombre}: vale para el golpe que ${nombreDe(t)} está dando ahora a ${d.defensor ? d.defensor.nombre : 'su objetivo'}`;
+    mesaLinea(txt, 'recordatorio');
+    momentoAbrir({tipo: 'buff', icono: '✨', titulo: `${nombre} llegó a tiempo`, resultado: txt.replace(/^✨ /, ''), estado: 'listo'});
+  }
+}
 // El Desarmado (2026-10-07) deja el arma en el piso (js/27); con `vuela`, lejos (la Varita del desarme).
 async function dueloAplicarEfecto(d, ef){
   if(num(ef && ef.empuja) > 0) return dueloEmpujar(d, num(ef.empuja));   // el empujón no es un estado (2026-10-08)
   const r = await dueloAplicarEfectoBase(d, ef);
   try{
     const spec = Duelo.specDeEfecto(ef), t = tokens.get(d.defensor.tokenId);
-    if(t && spec && spec.nombre && !spec.cura && r && !r.manual && !/^no entró/i.test(String(r.nota || ''))) dueloBuffMomento(d, t, spec);
+    if(t && spec && spec.nombre && !spec.cura && r && !r.manual && !/^no entró/i.test(String(r.nota || ''))){
+      dueloBuffMomento(d, t, spec);
+      await cargaAlGolpeAbierto(t, d.defensor.tokenId, spec.nombre);
+    }
   }catch(err){ console.error('No se pudo anunciar el buff:', err); }
   try{
     const spec = Duelo.specDeEfecto(ef);

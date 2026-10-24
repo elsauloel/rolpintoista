@@ -2,8 +2,8 @@
    «Para este skill el GM debería tener el botón instantáneo disponible no sólo durante el turno del creep sino todo el tiempo, también en la columna
    anexa al menú de duelos». Una habilidad de creep marcada `flash` (Bendecir el arma; el Mal de ojo y el Desarmar tienen el suyo: js/60, js/62) se
    puede usar desde el botón fijo ✨ (Flotantes.bendecir): arriba, con los demás, y en la columna «Podés usar» del duelo abierto (comun/flotantes.js
-   los muda solos). Al tocarlo se elige qué creep y a quién (sus aliados en su Rango; primero el que ataca en el duelo abierto, para que su golpe la
-   use: hay que darla antes de pagar el PdG) y se ejecuta como desde sus Acciones (acEjecutarHab, js/12: en turno ajeno cobra el doble). */
+   los muda solos). Al tocarlo se elige qué creep y a quién (sus aliados en su Rango; primero el que ataca en el duelo abierto, que su golpe la usa si
+   llega antes de tirar el daño, aunque ya haya tirado el PdG: js/13 cargaAlGolpeAbierto) y se ejecuta como desde sus Acciones (acEjecutarHab, js/12: en turno ajeno cobra el doble). */
 // Los creeps del mapa con una habilidad Flash propia lista: [{id (token), t, sc, h}].
 function flashCreepListos(){
   if(!soyGM) return [];
@@ -29,12 +29,12 @@ function renderFlashCreepBoton(){
 }
 setInterval(() => { try{ renderFlashCreepBoton(); }catch(e){} }, 1500);
 
-// Quién ataca en el duelo abierto ahora (el último sin resolver): su golpe usa la bendición si se la dan antes de pagar el PdG.
+// Quién ataca en el duelo abierto ahora (el último sin resolver): su golpe usa la bendición si llega antes de tirar el daño (js/13 cargaAlGolpeAbierto).
 async function flashCreepAtacanteDelDuelo(){
   try{
     const q = await fbDb.collection(fbRutaCampana('duelos')).orderBy('creado', 'desc').limit(5).get();
-    const d = q.docs.map(x => x.data()).find(x => x && (x.estado === 'esperando' || x.estado === 'empate'));
-    return d && d.atacante ? {tokenId: d.atacante.tokenId, pago: !!d.pdg} : null;
+    const d = q.docs.map(x => x.data()).find(x => x && !x.hab && (x.estado === 'esperando' || x.estado === 'empate'));
+    return d && d.atacante ? {tokenId: d.atacante.tokenId, danoTirado: !!d.dano} : null;
   }catch(err){ return null; }
 }
 // Lo que cuesta ahora: lo de la habilidad, el doble en turno ajeno (la regla del Flash).
@@ -65,7 +65,7 @@ async function abrirFlashCreep(){
   const botones = opciones.slice(0, 10).map(({c, o, ataca}) => {
     const k = flashCreepCosto(c);
     return {fila: true, texto: `${nombreDe(c.t)}: ${c.h.nombre} → ${o.mismo ? 'a sí mismo' : nombreDe(o.t)}${ataca ? ' ⚔' : ''}`,
-      detalle: `${ataca ? (duelo.pago ? 'ataca en el duelo abierto, pero ya pagó el PdG: le sirve para su próximo ataque · ' : 'ataca en el duelo abierto: dásela antes de que pague el PdG y la usa en este golpe · ') : ''}${k.txt}${k.ajeno ? ' (Flash en turno ajeno: el doble)' : ''}`,
+      detalle: `${ataca ? (duelo.danoTirado ? 'ataca en el duelo abierto, pero ya tiró el daño: le sirve para su próximo ataque · ' : 'ataca en el duelo abierto: la usa en este golpe (todavía no tiró el daño) · ') : ''}${k.txt}${k.ajeno ? ' (Flash en turno ajeno: el doble)' : ''}`,
       alClic: () => { AvisoCombate.cerrar(); flashCreepUsar(c, o.id); }};
   });
   botones.push({texto: 'Cancelar', sec: true, alClic: () => AvisoCombate.cerrar()});

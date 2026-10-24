@@ -210,7 +210,8 @@
   y el próximo ataque con arma de ese aliado suma +1 dado del Tipo de su arma en el daño (se ve en la fórmula del botón); ese ataque la gasta, pegue o no;
   en turno ajeno no avisa «fuera de turno», cobra el doble (cooldown 4, o el doble de SP) y lo dice en la Mesa; no cobra No2. **Y el botón instantáneo ✨**
   del GM (dueño, el mismo día): arriba siempre que esté lista, y en «Podés usar» con un duelo abierto; elegir creep y aliado; el que ataca en el duelo abierto
-  sale primero, y si se la da antes de pagar el PdG, ese golpe suma el dado.
+  sale primero; dársela en cualquier momento antes de tirar el daño (también después del PdG, dueño) → ese golpe suma el dado (Mesa: «vale para el golpe que…»);
+  después del daño, queda para el próximo ataque.
 - [ ] **🛡💀 Maldición de la coraza (Debuffer, 2026-10-24)**: un creep se la tira a un personaje en su Rango → PdG.Esp contra Res.Esp en el duelo; si gana,
   Coraza maldita 3 turnos: la Defensa y la Defensa especial del personaje bajan 2 (la Botonera y la ficha lite) y un golpe siguiente resta 2 menos; ponérsela
   otra vez renueva los turnos sin sumar; el cobro (2 No2 y 3 SP, o cooldown 3).

@@ -1784,7 +1784,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
 - **✨ Flash de un creep, con botón instantáneo** (2026-10-24, dueño: «el GM debería tener el botón instantáneo disponible todo el tiempo, también en la
   columna anexa al menú de duelos»; `js/71-flash-creep.js`): una habilidad de creep con `flash` (Bendecir el arma; no el Mal de ojo ni el Desarmar, que
   tienen el suyo) se ve en el botón fijo ✨ del GM (`Flotantes.bendecir`, arriba y en «Podés usar» del duelo). Al tocarlo, qué creep y a quién (sus aliados
-  en su Rango; primero el que ataca en el duelo abierto: dásela antes de que pague el PdG) y se ejecuta como desde sus Acciones (`ac.objetivoFijo` +
+  en su Rango; primero el que ataca en el duelo abierto: la usa en ese golpe si llega antes de tirar el daño, aunque ya haya tirado el PdG — `cargaAlGolpeAbierto`, js/13,
+  engancha la carga a ese duelo) y se ejecuta como desde sus Acciones (`ac.objetivoFijo` +
   `acEjecutarHab`, que en turno ajeno cobra el doble con `CreepAcciones.ejecutarHab(…, {doble})`).
 - **✨ El Anuncio de un buff** (2026-10-24, dueño: «aunque no se tire nada y se aplique directo, tiene que haber un anuncio»): `dueloBuffMomento` (js/13), desde
   `dueloAplicarEfecto`: un estado con polaridad buff que entró → momento `tipo: 'buff'` con el Anuncio a quien lo recibe (dueño; de un creep, el GM) y la

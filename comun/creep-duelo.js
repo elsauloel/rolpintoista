@@ -85,6 +85,7 @@ const CreepDuelo = (() => {
         if(num(m.fijo)) formula += ` ${num(m.fijo) > 0 ? '+' : '-'} ${fmt(Math.abs(num(m.fijo)))}`;
       }
       const cg = Combatiente.cargaDeDuelo(sc.estados, d.id);   // lo que suma un arma envenenada / un óleo en este golpe
+      if(cg && cg.dados > 0) formula += ` + ${cg.dados}d${Combatiente.armaEnMano(sc).tipoDado}`;   // ✨ Arma bendecida (2026-10-24)
       if(cg && cg.fijo) formula += ` + ${cg.fijo}`;
       return formula;
     }

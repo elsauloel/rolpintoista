@@ -102,6 +102,7 @@ const FichaDuelo = (() => {
         if(num(m.fijo)) formula += ` ${num(m.fijo) > 0 ? '+' : '−'} ${fmt(Math.abs(num(m.fijo)))}`.replace('−', '-');
       }
       const cg = Combatiente.cargaDeDuelo(getS().efectos, d.id);   // lo que suma un arma envenenada / un óleo en este golpe
+      if(cg && cg.dados > 0) formula += ` + ${cg.dados}d${arma ? FichaCombate.tipoAtaque(arma) : 4}`;   // ✨ Arma bendecida (2026-10-24); sin arma, d4
       if(cg && cg.fijo) formula += ` + ${cg.fijo}`;
       return formula;
     }

@@ -161,8 +161,9 @@ const InvDuelo = (() => {
         const inv = ui.inv(d.atacante);
         if(!inv) return;
         const cg = Combatiente.cargaDeDuelo(inv.estados, d.id);   // lo que suma un arma envenenada / un óleo en este golpe
-        const mods = d.ataque.tipo === 'habilidad-arma' ? {...(d.ataque.mods || {})} : (cg && cg.fijo ? {} : null);
+        const mods = d.ataque.tipo === 'habilidad-arma' ? {...(d.ataque.mods || {})} : (cg && (cg.fijo || cg.dados) ? {} : null);
         if(mods && cg && cg.fijo) mods.fijo = num(mods.fijo) + cg.fijo;
+        if(mods && cg && cg.dados > 0) mods.dados = num(mods.dados) + cg.dados;   // ✨ Arma bendecida (2026-10-24)
         const t = A().dano(inv, mods);
         if(t) ui.registrar(t.origen, t.r);
       },

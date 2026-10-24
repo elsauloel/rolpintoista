@@ -269,6 +269,12 @@
   (`comun/estados-presets.js`): −2 Defensa y −2 Defensa especial durante 3 turnos, contra todos (no se apila: renueva). 2 No2 y 3 SP, o cooldown 3 (los
   propuso Claude). **Para probar.**
 
+- ✅ **Bendecir el arma** (Support, 2026-10-24, dueño: «vamos con bendecir el arma, que tenga flash»): **Flash** — se usa en cualquier momento y en turno
+  ajeno cuesta el doble (el cooldown o el SP; la marca nueva `flash` de una habilidad de creep: `Combatiente.esFlash`, el cobro en `CreepAcciones.ejecutarHab`
+  con `{doble}`, que decide el mapa en js/12) y sin No2 (P136). A él o a un aliado en su Rango, el estado nuevo **Arma bendecida**: una carga (como el Arma
+  envenenada) que suma **+1 dado del Tipo de su arma** al daño de su próximo ataque con arma (`golpe.dados`, nuevo en las cargas); si no ataca, se va a los 2
+  turnos. 2 SP o cooldown 2 (los propuso Claude). Queda en el pool la **Bendición** vieja (a mano: +1 Daño y +2 Defensa 3 turnos), otra cosa. **Para probar.**
+
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 
 ## Etiquetas

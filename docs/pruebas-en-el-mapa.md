@@ -206,6 +206,9 @@
 - [ ] **❄ Hálito polar (Mago, 2026-10-23)**: un creep lo usa mirando hacia dos rivales y un aliado → el cono de 16 casillas al frente; tira PdG.Esp una vez
   contra la Evasión de cada rival (no del aliado), sin dodge roll; al que no le gana, 2d4 + ¼ del Ef.Esp del creep, de hielo (menos su Defensa especial y su
   resistencia al hielo), y Escarcha (−1 No2 máximos, 2 turnos); el cobro (3 No2 y tanto SP como su Especial, o cooldown 3). **Y** el Aura sanadora cobra ahora 3 No2 y 5 SP.
+- [ ] **✨ Bendecir el arma (Support, 2026-10-24)**: el botón late como Flash; en su turno, a un aliado en su Rango → Anuncio y Crónica «le aplicó Arma bendecida»,
+  y el próximo ataque con arma de ese aliado suma +1 dado del Tipo de su arma en el daño (se ve en la fórmula del botón); ese ataque la gasta, pegue o no;
+  en turno ajeno no avisa «fuera de turno», cobra el doble (cooldown 4, o el doble de SP) y lo dice en la Mesa; no cobra No2.
 - [ ] **🛡💀 Maldición de la coraza (Debuffer, 2026-10-24)**: un creep se la tira a un personaje en su Rango → PdG.Esp contra Res.Esp en el duelo; si gana,
   Coraza maldita 3 turnos: la Defensa y la Defensa especial del personaje bajan 2 (la Botonera y la ficha lite) y un golpe siguiente resta 2 menos; ponérsela
   otra vez renueva los turnos sin sumar; el cobro (2 No2 y 3 SP, o cooldown 3).

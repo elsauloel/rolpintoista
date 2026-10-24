@@ -30,10 +30,10 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 5**: daño en área, rayo en cadena, cono de frío (Hálito polar) · de El origen: proyectil, fuego con quemadura.
 - 🧿 **Debuffer — 6**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24) · de El origen: ceguera, veneno, inmovilizar.
-- 💚 **Support — 5**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24) · de El origen: escudo a un aliado.
+- 💚 **Support — 6**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma (2026-10-24) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
-**Para emparejar**: Mago y Support (5), después Debuffer (6) (2026-10-24).
+**Para emparejar**: Mago (5), después Debuffer y Support (6) (2026-10-24).
 
 ## Los roles
 
@@ -267,7 +267,8 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
 **A. Potenciar el golpe de los aliados** ✦
 1. ✅ **Grito de guerra** (2026-10-23): **¡A la carga!** (+2 a la PdG, PdG.Esp, daño y Ef.Esp, 2 turnos) y **Arenga** (Bendecido, +1 a todo, 3 turnos),
    a los aliados a 4 casillas o menos. Síntesis de los cuatro gritos de «El origen» y de los dos de fábrica a mano, que salieron del pool.
-2. **Bendecir el arma**: el próximo golpe de un aliado suma un dado.
+2. ✅ **Bendecir el arma** (2026-10-24, dueño: «que tenga flash»): Flash (en turno ajeno, el doble); a él o a un aliado en su Rango, **Arma bendecida**:
+   su próximo ataque con arma suma un dado del Tipo de su arma (se va a los 2 turnos si no ataca).
 3. ✅ **Arma elemental**: el arma de un aliado pega de fuego, hielo o rayo por unos turnos — **Arma ígnea / helada / eléctrica / ácida / venenosa**
    (2026-10-21: +1d4 del elemento por golpe, 3 turnos, y lo de la Carga Elemental).
 4. **Filo envenenado / sangrante**: los golpes de un aliado dejan Veneno o Sangrado.

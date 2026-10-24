@@ -212,6 +212,9 @@ const ESTADOS_PRESET = [
   // no, gasta una y suma su `golpe` (+3 de daño y Veneno ×3) a ese golpe. Sin cargas, se va. Volver a ponerlo lo deja otra vez en 2.
   {nombre:'Arma envenenada', polaridad:'buff', permanente:true, cargas:2, golpe:{fijo:3, efectos:[{nombre:'Envenenar', stacks:3}]},
     detalle:'Sus próximos 2 ataques con arma (peguen o no) suman +3 de daño y Veneno ×3 (el veneno entra si el golpe hace daño). Cada ataque gasta una carga. ⚙ Automatizado.'},
+  // Arma bendecida (2026-10-24, dueño: Bendecir el arma del Support de los creeps): su próximo ataque con arma suma un dado del Tipo de su arma.
+  {nombre:'Arma bendecida', polaridad:'buff', turnos:2, cargas:1, golpe:{dados:1},
+    detalle:'Su próximo ataque con arma suma un dado más del Tipo de su arma al daño (pegue o no, ese ataque la gasta). Si no ataca, se va a los 2 turnos. ⚙ Automatizado en el duelo.'},
   // Ojo de asesino (2026-10-11, dueño: Asalto, como mecánica de cargas): su próximo ataque con arma de este turno tiene Crítico frecuente +1.
   {nombre:'Ojo de asesino', polaridad:'buff', turnos:1, cargas:1, golpe:{crit:1},
     detalle:'Su próximo ataque con arma de este turno tiene Crítico frecuente +1 (el rango del crítico baja 1; mínimo 2). Lo gasta ese ataque, pegue o no. ⚙ Automatizado.'},

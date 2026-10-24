@@ -68,7 +68,7 @@
     'Barrido': ['choque pesado', 'barrido'], 'Coletazo': ['choque pesado', 'barrido'],
     'Tiro a la cabeza': ['rango', 'tiro apuntado'], 'Desarmar': ['choque pesado', 'desarmar'], 'El que avisa no traiciona': ['choque pesado', 'golpe anunciado'], 'Sal en la herida': ['choque liviano', 'abrir la herida'], 'Remate': ['choque pesado', 'remate'], 'Ir por el herido': ['choque pesado', 'remate'], 'Morder la herida': ['choque liviano', 'abrir la herida'], 'Patotear': ['choque liviano', 'manada'], 'Jauría': ['choque liviano', 'manada'], 'Zarpazo erguido': ['choque pesado', 'golpe anunciado'], 'Mal de ojo': ['debuffer', 'maleficio'], 'Disparo señalador': ['rango', 'señalar'], 'Ráfaga de cortes': ['choque liviano', 'ráfaga'], 'Ráfaga de zarpazos': ['choque liviano', 'ráfaga'],
     'Romper armadura': ['choque pesado', 'romper armadura'], 'Arrancar la coraza': ['choque pesado', 'romper armadura'],
-    'Golpe demoledor': ['choque pesado', 'romper armadura'], 'Mandíbula trituradora': ['choque pesado', 'romper armadura'], 'Cadena de rayos': ['mago', 'rayo en cadena'], 'Hálito polar': ['mago', 'cono de frío'], 'Maldición de la coraza': ['debuffer', 'bajar la armadura'], 'Coraza de púas': ['support', 'devolver el daño'], 'Velo espejado': ['support', 'devolver el daño'],
+    'Golpe demoledor': ['choque pesado', 'romper armadura'], 'Mandíbula trituradora': ['choque pesado', 'romper armadura'], 'Cadena de rayos': ['mago', 'rayo en cadena'], 'Hálito polar': ['mago', 'cono de frío'], 'Maldición de la coraza': ['debuffer', 'bajar la armadura'], 'Coraza de púas': ['support', 'devolver el daño'], 'Bendecir el arma': ['support', 'bendecir el arma'], 'Velo espejado': ['support', 'devolver el daño'],
     'Puñalada por la espalda': ['choque liviano', 'por la espalda'], 'Mordida a traición': ['choque liviano', 'por la espalda'], 'Puñalada trapera': ['choque liviano', 'por la espalda'],
   };
 
@@ -340,6 +340,12 @@
   H('Velo espejado', 'B', '*', 'a', 3, {detalle: 'Envuelve a un aliado (o a sí mismo) dentro de su Rango en un velo que refleja la magia: durante 3 turnos, cada ataque de daño especial que recibe (varita, báculo, habilidad o el daño elemental de un arma, a cualquier distancia) le devuelve al que lo tiró un cuarto de ese daño (redondeado para arriba), directo a la vida (Espejo).',
     no2: 1, spCosto: 2, auditada: true, ataqueTxt: 'Espejo 3 turnos a él o a un aliado en su Rango',
     duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', efectos: [{nombre: 'Espejo', turnos: 3}]}});
+  // ✨ Auditada (dueño, 2026-10-24: «vamos con bendecir el arma, que tenga flash»; concepto 2 del Support): Flash — en turno ajeno cuesta el doble
+  // (vtt-hexgrid/js/12) — y sin No2 (un Flash no cobra No2, P136). El estado Arma bendecida: la carga del próximo ataque con arma, +1 dado del Tipo
+  // de su arma (Combatiente.sumarCargas `dados`). Costos propuestos por Claude: 2 SP o cooldown 2.
+  H('Bendecir el arma', 'B', '*', 'a', 2, {detalle: 'FLASH (se puede usar en cualquier momento; en turno ajeno cuesta el doble). Bendice el arma de un aliado (o la propia) dentro de su Rango: su próximo ataque con arma suma un dado más del Tipo de su arma al daño (Arma bendecida; si no ataca, se va a los 2 turnos).',
+    no2: 0, spCosto: 2, flash: true, auditada: true, ataqueTxt: 'Flash: el próximo ataque con arma de él o de un aliado en su Rango suma +1 dado del Tipo de su arma',
+    duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', efectos: [{nombre: 'Arma bendecida'}]}});
   H('Bendición', 'B', 'hd', 'a', 4, tA('Bendice a un aliado: +1 de Daño y +2 de Defensa 3 turnos (a mano).', 2));
   H('Escudar aliado', 'T', 'hdc', 'at', 3, tA('Un aliado adyacente gana +3 de Defensa 2 turnos (a mano).', 2));
   H('Orden de ataque', 'B', 'hd', 'a', 3, tA('Un aliado puede atacar sin gastar No2 este turno (a mano).', 2));

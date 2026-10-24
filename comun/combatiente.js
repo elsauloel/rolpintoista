@@ -561,7 +561,9 @@ const Combatiente = (() => {
   }
   const estadoVisible = e => !(e && e.agotada);
   // Lo que los estados con cargas le suman al golpe de ESE duelo: {nombre, fijo, efectos, crit, critpot} (sumados) o null.
+  // `dados` (2026-10-24, Arma bendecida): dados de más del Tipo de su arma.
   const sumarCargas = lista => lista.length ? {nombre: lista.map(e => e.nombre).join(' + '), fijo: lista.reduce((t, e) => t + Math.round(n(e.golpe.fijo)), 0),
+    dados: lista.reduce((t, e) => t + Math.round(n(e.golpe.dados)), 0),
     efectos: lista.flatMap(e => Array.isArray(e.golpe.efectos) ? e.golpe.efectos : []), crit: lista.reduce((t, e) => t + Math.round(n(e.golpe.crit)), 0),
     critpot: lista.reduce((t, e) => t + Math.round(n(e.golpe.critpot)), 0)} : null;
   function cargaDeDuelo(estados, dueloId){
@@ -1782,7 +1784,8 @@ const Combatiente = (() => {
      'fuerza' o 'dano'. Sin `modo`, para 'eva' vale si sirve para Evasión o Parry (la lista de opciones); con `modo`, para la
      defensa que se eligió ('parry' o la Evasión). */
   // Una habilidad con ⚡ Flash (se puede usar en turno ajeno, al doble): en las Botoneras late con un brillo (dueño, 2026-10-06).
-  const esFlash = h => !!(h && h.duelo && h.duelo.modo === 'flash');
+  // También una habilidad de creep marcada `flash` (2026-10-24, Bendecir el arma): se usa cuando sea; en turno ajeno, el doble (el mapa, js/12).
+  const esFlash = h => !!(h && (h.flash || (h.duelo && h.duelo.modo === 'flash')));
   const FLASH_CSS = `<style>.bt-flash{animation:bt-flash-late 1.6s ease-in-out infinite;border-color:#ffd25a !important}
 @keyframes bt-flash-late{0%,100%{box-shadow:0 0 0 0 rgba(255,210,90,0)}50%{box-shadow:0 0 12px 3px rgba(255,210,90,.75)}}</style>`;
   function flashPara(c, campo, modo){

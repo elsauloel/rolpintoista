@@ -4880,6 +4880,18 @@ prueba('📣 ¡A la carga! y Arenga (Support, 2026-10-23): onda a los aliados a 
     e('¡A la carga!').etiquetas.includes('auditada'), e('Arenga').etiquetas.includes('support'), ['Aullido de manada', 'Grito de ánimo', '¡Por el amo!', '¡A laburar!', 'Marca del amo', 'Aullido de la manada'].filter(e).length],
     ['onda', 4, true, 2, 'pdg2 pdgmg2 dmg2 dmgesp2', 'Bendecido', 3, 4, true, true, 0]);
 });
+prueba('✨ Bendecir el arma (Support, 2026-10-24): Flash, Arma bendecida = la carga del próximo ataque, +1 dado; en turno ajeno cuesta el doble', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Bendecir el arma'), h = armarHabilidadDeCreep(e.datos, 3);
+  const est = EstadosAplicar.componer(Combatiente.efectoDeEjecucion(h.duelo.efectos[0]).spec);
+  const cargas0 = est.cargas, estados = [est];
+  const g = Combatiente.gastarCarga(estados, 'duelo-1'), cg = Combatiente.cargaDeDuelo(estados, 'duelo-1');
+  const sc1 = {nombre: 'A', nitros: 4, habilidades: [{...h, id: 'b1', cdActual: 0}], estados: []}, sc2 = {nombre: 'B', nitros: 4, habilidades: [{...h, id: 'b1', cdActual: 0}], estados: []};
+  CreepAcciones.ejecutarHab(sc1, sc1.habilidades[0], estadosPresetCreep(), true);
+  CreepAcciones.ejecutarHab(sc2, sc2.habilidades[0], estadosPresetCreep(), true, {doble: true});
+  igual([Combatiente.esFlash(h), h.duelo.objetivo, est.nombre, cargas0, est.turnos, !!g.cambio, cg && cg.dados, sc1.nitros, sc1.habilidades[0].cdActual, sc2.habilidades[0].cdActual,
+    e.datos.sp.spCosto, e.datos.cd],
+    [true, 'aliado', 'Arma bendecida', 1, 2, true, 1, 4, 2, 4, 2, 2]);
+});
 prueba('🛡💀 Maldición de la coraza (Debuffer, 2026-10-24): PdG.Esp contra Res.Esp, Coraza maldita −2 Defensa y −2 Def.Esp 3 turnos; reemplaza a la Maldición vieja', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Maldición de la coraza'), h = armarHabilidadDeCreep(e.datos, 3);
   const he = Combatiente.habEjecucion(h, h.duelo, {stat: () => 0});

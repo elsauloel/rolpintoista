@@ -1648,7 +1648,8 @@ const Combatiente = (() => {
   /* Con qué se resiste (2026-10-15, dueño: «"se resiste con" debe tener "otro stat" y "fórmula propia"»): cada entrada es el id de un stat
      ('eva'), un stat más un número ({stat, bono}: «des + 2») o una fórmula de dados ({formula, etq}: «1d6+2»). Cada una lleva su `modo` (lo
      que elige el objetivo en el duelo). */
-  function contraDeEjecucion(lista, etq, sx){
+  function contraDeEjecucion(lista, etq0, sx){
+    const etq = s => s === 'eva' ? 'Evasión' : etq0(s);   // en el duelo, con todas las letras (2026-10-24: decía «Eva»; la Botonera sigue con la corta)
     return (lista || []).map((x, i) => {
       if(typeof x === 'string') return {modo: x, stat: x, etq: etq(x)};
       if(x && x.formula) return {modo: 'f' + i, formula: sx ? sx(String(x.formula)) : String(x.formula), etq: String(x.etq || 'Resistencia').slice(0, 30)};

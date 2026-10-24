@@ -2201,6 +2201,8 @@ const Duelo = (() => {
         // El resultado con el número grande, como después de aplicarlo (2026-10-24, dueño: «destacarlo un poco mejor»).
         const fuerte = crit || ignora, total = crit ? dn.crudo * mult : dn.crudo;
         const que = crit ? `Crítico ×${mult} (${_fmt(dn.crudo)} × ${mult}): no se resta ${tu} Defensa.`
+          : ignora && d.hab.dano.trueDamage ? `de daño ${_esc(d.hab.dano.tipo || 'especial')}: True Damage, no lo frena nada.`
+          : ignora && d.hab.dano.directo ? `de daño ${_esc(d.hab.dano.tipo || 'especial')}, directo: no lo frena ${tu} Defensa especial (sí ${tu}s resistencias a ese elemento, ${suyo ? 'si tenés' : 'si tiene'}).`   // (2026-10-24: Ráfaga arcana decía que la frenaba)
           : ignora ? `de daño ${_esc(d.hab.dano.tipo || 'especial')} (lo frenan ${tu} Defensa especial y ${tu}s resistencias, ${suyo ? 'si tenés' : 'si tiene'}).`
           : d.resultado === 'mitad' ? `Pasa la mitad: (${_fmt(dn.crudo)} − ${tu} Defensa) ÷ 2, redondeado para arriba.`
           : `de daño, menos ${tu} Defensa.`;

@@ -156,19 +156,15 @@ function estandarteDibujar(z){
     ctx.restore();
     bordeHexPunteado(celdas, z, 'rgba(235,195,105,.45)');
     // El anillo y los banderines, por fuera de la grilla, siguiendo la forma del área con las puntas redondeadas (dueño: «que no sea circular exacta, más
-    // aproximada a la forma hexagonal, pero que tampoco sea literalmente hexagonal»): en cada dirección, hasta dónde llega el centro de la casilla más
-    // alejada, más un margen fijo (eso redondea las puntas).
-    const pts = celdas.map(q => hexCentro(q.col, q.fila)), M = 120, borde = [];
-    for(let i = 0; i <= M; i++){
-      const th = (i / M) * Math.PI * 2, ux = Math.cos(th), uy = Math.sin(th);
-      let hmax = 0;
-      for(const q of pts){ const d = (q.x - c.x) * ux + (q.y - c.y) * uy; if(d > hmax) hmax = d; }
-      borde.push(hmax + HEX * 1.15);
-    }
+    // aproximada a la forma hexagonal, pero que tampoco sea literalmente hexagonal»): en cada dirección, el centro de la casilla más alejada en esa
+    // dirección, corrido un margen fijo hacia afuera (la forma del área con las puntas redondeadas; convexa, sin entradas).
+    const pts = celdas.map(q => hexCentro(q.col, q.fila)), M = 120, MARGEN = HEX * 1.15;
     const punto = (th, extra) => {
-      const f = ((th % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2) / (Math.PI * 2) * M, i = Math.floor(f), k = f - i;
-      const r = borde[i] * (1 - k) + borde[Math.min(M, i + 1)] * k + (extra || 0);
-      return {x: c.x + Math.cos(th) * r, y: c.y + Math.sin(th) * r};
+      const ux = Math.cos(th), uy = Math.sin(th);
+      let mejor = pts[0], hmax = -Infinity;
+      for(const q of pts){ const d = (q.x - c.x) * ux + (q.y - c.y) * uy; if(d > hmax){ hmax = d; mejor = q; } }
+      const m = MARGEN + (extra || 0);
+      return {x: mejor.x + ux * m, y: mejor.y + uy * m};
     };
     const trazar = extra => { ctx.beginPath(); for(let i = 0; i <= M; i++){ const q = punto((i / M) * Math.PI * 2, extra); i ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y); } ctx.closePath(); };
     ctx.save();
@@ -178,12 +174,20 @@ function estandarteDibujar(z){
     ctx.strokeStyle = `rgba(179,32,46,${0.75 + 0.2 * p})`; ctx.lineWidth = 3 / z; ctx.stroke();
     trazar(-4 / z);
     ctx.strokeStyle = 'rgba(227,176,75,.8)'; ctx.lineWidth = 1.2 / z; ctx.stroke();
-    const R = Math.max(...borde), N = Math.max(12, Math.round(R / HEX * 3)), largo = HEX * 0.42, ancho = HEX * 0.17;
+    // Los banderines, a distancias iguales a lo largo del contorno (por ángulo se amontonaban en las puntas); flamean un poquito hacia los costados.
+    const linea = []; for(let i = 0; i <= M; i++) linea.push(punto((i / M) * Math.PI * 2));
+    const tramos = []; let total = 0;
+    for(let i = 0; i < M; i++){ const l = Math.hypot(linea[i + 1].x - linea[i].x, linea[i + 1].y - linea[i].y); tramos.push(l); total += l; }
+    const N = Math.max(12, Math.round(total / HEX * 0.5)), largo = HEX * 0.42, ancho = HEX * 0.17;
     for(let i = 0; i < N; i++){
-      const th = (i / N) * Math.PI * 2 + 0.12 * Math.sin(t0 * 2.2 + i * 0.9);   // flamean
-      const b0 = punto(th), b1 = punto(th + 0.02), tx = b1.x - b0.x, ty = b1.y - b0.y, tl = Math.hypot(tx, ty) || 1;
-      const ux = ty / tl, uy = -tx / tl;   // hacia afuera del contorno
-      const vx = tx / tl, vy = ty / tl, bx = b0.x, by = b0.y;
+      let resto = (i / N) * total, k = 0;
+      while(k < M - 1 && resto > tramos[k]){ resto -= tramos[k]; k++; }
+      const a0 = linea[k], a1 = linea[k + 1], f = tramos[k] ? resto / tramos[k] : 0;
+      const tl = tramos[k] || 1, vx0 = (a1.x - a0.x) / tl, vy0 = (a1.y - a0.y) / tl;
+      const bx = a0.x + (a1.x - a0.x) * f, by = a0.y + (a1.y - a0.y) * f;
+      const sw = 0.25 * Math.sin(t0 * 2.2 + i * 0.9);   // flamean
+      const nx = vy0, ny = -vx0;   // hacia afuera del contorno
+      const ux = nx + vx0 * sw, uy = ny + vy0 * sw, vx = vx0, vy = vy0;
       ctx.beginPath();
       ctx.moveTo(bx - vx * ancho, by - vy * ancho);
       ctx.lineTo(bx + vx * ancho, by + vy * ancho);

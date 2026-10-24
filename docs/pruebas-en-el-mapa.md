@@ -211,7 +211,11 @@
   en turno ajeno no avisa «fuera de turno», cobra el doble (cooldown 4, o el doble de SP) y lo dice en la Mesa; no cobra No2. **Y el botón instantáneo ✨**
   del GM (dueño, el mismo día): arriba siempre que esté lista, y en «Podés usar» con un duelo abierto; elegir creep y aliado; el que ataca en el duelo abierto
   sale primero; dársela en cualquier momento antes de tirar el daño (también después del PdG, dueño) → ese golpe suma el dado (Mesa: «vale para el golpe que…»);
-  después del daño, queda para el próximo ataque.
+  después del daño, queda para el próximo ataque. **Probado en parte (2026-10-24, «Claude · pruebas», el GM)**: el ✨ apareció arriba y en «Podés usar»;
+  el Goblin atacó a juan, tiró el PdG (10) y recién ahí el Escarabajo le dio Arma bendecida desde el ✨ (el Goblin salió primero, con ⚔ y «la usa en este golpe»;
+  4 SP, el doble en turno ajeno); la Mesa: «vale para el golpe que Goblin está dando ahora a juan»; el botón del daño: «1d4 + 4 + 1d4» → 7 (1 + 2 + 4).
+  Un intento anterior que falló gastó la bendición (pegue o no). El Anuncio del buff salió (decía «a alguien» con el token oculto: arreglado, el GM ve el
+  nombre). **Falta**: usarla en el turno propio del creep (sin el doble) y que la Crónica la vea un jugador.
 - [ ] **🛡💀 Maldición de la coraza (Debuffer, 2026-10-24)**: un creep se la tira a un personaje en su Rango → PdG.Esp contra Res.Esp en el duelo; si gana,
   Coraza maldita 3 turnos: la Defensa y la Defensa especial del personaje bajan 2 (la Botonera y la ficha lite) y un golpe siguiente resta 2 menos; ponérsela
   otra vez renueva los turnos sin sumar; el cobro (2 No2 y 3 SP, o cooldown 3).

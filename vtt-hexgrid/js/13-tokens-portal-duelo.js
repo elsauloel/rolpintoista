@@ -1966,7 +1966,7 @@ function dueloBuffMomento(d, t, spec){
     resultado: `${dura[0].toUpperCase()}${dura.slice(1)}${efecto ? `: ${efecto}` : ''}`, estado: 'listo',
     datos: !mismo && para ? {paraUid: para, aviso: true, boton: 'Entendido',
       pasos: efecto ? [{titulo: 'Qué hace', texto: efecto}] : [],
-      veredicto: {tono: 'bueno', grande: spec.nombre, chico: `${quien} ${t.tipo === 'creep' ? `le aplicó a ${a}` : 'te aplicó'} ${spec.nombre} ${dura}`}} : {}});
+      veredicto: {tono: 'bueno', grande: spec.nombre, chico: `${quien} ${t.tipo === 'creep' ? `le aplicó a ${nombreDe(t)}` : 'te aplicó'} ${spec.nombre} ${dura}`}} : {}});   // (el de un creep lo ve solo el GM: con su nombre aunque esté oculto)
 }
 /* Una carga que llega en medio de un golpe (2026-10-24, dueño, Bendecir el arma: «se debería poder aplicar en cualquier momento antes de que se tire el
    dado del arma, inclusive después de tirar probabilidad de golpe»). Las cargas se enganchan al ataque al pagar el PdG (Combatiente.gastarCarga); si

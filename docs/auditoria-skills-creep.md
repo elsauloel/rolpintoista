@@ -302,6 +302,12 @@
   ahora lleva la marca); 10 de daño se lo cortan. En su próximo turno, al apretar Atacar: «Descargar», su PdG.Esp contra la Evasión del que anunció, **4d6
   arcano** (2 No2 y 3 SP; dueño: «si no va a tener ningún efecto vinculado al eléctrico, que el daño sea arcano»). Los números los propuso Claude. **Para probar.**
 
+- ✅ **Aguja del desamparo** (Debuffer, «exponer», 2026-10-24, dueño: «algo de expuesto, pero un proyectil mágico que si pega deja expuesto: un poquito de
+  daño con un poquito de debuff»; «un dado de 6 de daño directo, se esquiva con evasión»; el nombre lo eligió el dueño): su PdG.Esp contra la Evasión de un
+  rival en su Rango; si pega, **1d6 arcano directo** (no lo frena la Defensa especial) y **Expuesto** hasta que empiece el próximo turno del objetivo (el
+  estado de Degollar: Evasión a la mitad, sin reacciones que cuesten No2). Es la primera que se lo pone a un rival. 2 No2 y 3 SP, o cooldown 3 (como la
+  Maldición de la coraza; daño fijo, P216). **Para probar.**
+
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 
 ## Etiquetas

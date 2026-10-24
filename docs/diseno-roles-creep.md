@@ -29,11 +29,11 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 - 🏹 **Rango y Hunter — 11**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 7**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24) · de El origen: proyectil, fuego con quemadura.
-- 🧿 **Debuffer — 7**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24) · de El origen: ceguera, veneno, inmovilizar.
+- 🧿 **Debuffer — 8**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24) · de El origen: ceguera, veneno, inmovilizar.
 - 💚 **Support — 7**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
-**Para emparejar**: Mago, Debuffer y Support empatados en 7 (2026-10-24); después Rango + Hunter (11).
+**Para emparejar**: Mago y Support en 7, Debuffer en 8 (2026-10-24); después Rango + Hunter (11).
 
 ## Los roles
 
@@ -351,7 +351,8 @@ Inmovilizado, Rengo, Desarmado; y, de personajes, Enyetar.
 **A. Bajar números**
 1. **Debilitar**: el objetivo pega menos (Debilitado, que se apila).
 2. **Torpeza**: menos Probabilidad de Golpe.
-3. **Exponer** ✦: la Evasión a la mitad y sin reacciones que cuesten No2 (Expuesto).
+3. ✅ **Exponer** ✦ — **Aguja del desamparo** (2026-10-24): un proyectil, su PdG.Esp contra la Evasión de un rival en su Rango; si pega, 1d6 arcano directo y
+   Expuesto hasta su próximo turno (la Evasión a la mitad y sin reacciones que cuesten No2). 2 No2 y 3 SP, o cooldown 3.
 4. ✅ **Maldición de la coraza** ✦ (2026-10-24): su PdG.Esp contra la Res.Esp de un rival en su Rango; **Coraza maldita**, −2 Defensa y −2 Defensa
    especial 3 turnos. Reemplaza a la vieja Maldición (a mano).
 5. **Mano temblorosa**: menos Crítico frecuente y potente.

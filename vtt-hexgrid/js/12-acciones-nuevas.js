@@ -590,12 +590,13 @@ async function acEjecutarHab(sc, habId){
   });
 }
 /* 🔥 De qué largo (2026-10-24, dueño, el Muro de fuego: «un mínimo de 3, que se pueda ampliar por un costo adicional en SP, y cada 2 casilleros también
-   un nitro; te pregunta de qué largo, ahí te confirma el costo y ahí se ejecuta»). `h.largoVariable` = {min, max, sp (por casilla de más), no2Cada}. En
+   un nitro; te pregunta de qué largo, ahí te confirma el costo y ahí se ejecuta»). `h.largoVariable` = {min, max, sp y no2 (por casilla de más; o no2Cada:
+   1 No2 cada tantas)}. En
    modo cooldown, cada 2 casillas de más suman 1 al cooldown en vez del SP. → {n, extra: {sp, no2, cd}, txt} o null si cancela. */
 async function muroLargo(sc, h){
   const lv = h.largoVariable, min = Math.max(1, num(lv.min) || 3), max = Math.max(min, num(lv.max) || min), modoSP = CreepCalculo.modoSP(sc);
   const costo = n => {
-    const mas = n - min, extra = {sp: modoSP ? mas * Math.max(0, num(lv.sp)) : 0, no2: num(lv.no2Cada) > 0 ? Math.floor(mas / num(lv.no2Cada)) : 0, cd: modoSP ? 0 : Math.floor(mas / 2)};
+    const mas = n - min, extra = {sp: modoSP ? mas * Math.max(0, num(lv.sp)) : 0, no2: lv.no2 !== undefined ? mas * Math.max(0, num(lv.no2)) : num(lv.no2Cada) > 0 ? Math.floor(mas / num(lv.no2Cada)) : 0, cd: modoSP ? 0 : Math.floor(mas / 2)};
     const no2 = CreepCalculo.costoNitrosHab(sc, h) + extra.no2;
     const txt = `${fmt(no2)} No2 y ${modoSP ? `${fmt(CreepCalculo.costoSpHab(sc, h) + extra.sp)} SP` : `cooldown ${fmt(num(h.cd) + extra.cd)}`}`;
     return {n, extra, txt};
@@ -734,7 +735,7 @@ function cerrarAccionesNuevas(){
    estados para la Ejecución, con el selector común (los "Mis presets" del GM no están en la partida: ver pendientes 7b). */
 const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261021zs', '../comun/asistente-duelo-hab.js?v=20261022d'];
 // Las recetas de habilidades de fábrica (para ↻ Reemplazar y ⬆ Subir): pesadas, recién cuando hacen falta.
-const ACE_BASE = ['../comun/creeps-base.js?v=20261024muro', '../comun/skills-creep-base.js?v=20261024borde'];
+const ACE_BASE = ['../comun/creeps-base.js?v=20261024muro', '../comun/skills-creep-base.js?v=20261024costo'];
 async function acCargarEditor(){ await acCargarPiezas(); await cargarPiezas(SE_PIEZAS); await cargarPiezas(ACE_PIEZAS); }
 // ⬆ Subir una habilidad del creep a la biblioteca compartida (corrección o algo nuevo); su `bibOrigen` nuevo se guarda en el creep.
 async function acSubirHab(creepId, habId){

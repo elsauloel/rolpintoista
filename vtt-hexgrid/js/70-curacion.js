@@ -171,7 +171,7 @@ function curaContorno(celdas, z, semilla){
   ctx.strokeStyle = `rgba(170,255,185,${0.75 + 0.2 * p})`; ctx.lineWidth = 2.4 / z; ctx.stroke();
   ctx.shadowBlur = 0;
   ctx.restore();
-  bordeHexPunteado(celdas, z, 'rgba(190,255,200,.95)');   // dónde cura exactamente (2026-10-24)
+  bordeHexPunteado(celdas, z, 'rgba(190,255,200,.4)');   // dónde cura exactamente (2026-10-24)
 }
 // La zona (desde js/05, como una superficie: sin el relleno ni el borde de siempre). → {anima, sinBorde}
 function curaDibujarZona(el, celdas, z){

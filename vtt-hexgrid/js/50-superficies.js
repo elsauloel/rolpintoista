@@ -121,8 +121,8 @@ function bordeHexPunteado(celdas, z, color){
   });
   ctx.lineCap = 'round';
   ctx.setLineDash([7 / z, 6 / z]); ctx.lineDashOffset = -t * 14 / z;
-  ctx.strokeStyle = 'rgba(0,0,0,.45)'; ctx.lineWidth = 3.4 / z; ctx.stroke();
-  ctx.strokeStyle = color; ctx.lineWidth = 1.8 / z; ctx.stroke();
+  ctx.strokeStyle = 'rgba(0,0,0,.22)'; ctx.lineWidth = 3 / z; ctx.stroke();
+  ctx.strokeStyle = color; ctx.lineWidth = 1.4 / z; ctx.stroke();
   ctx.restore();
 }
 function fuegoDibujar(celdas, z){
@@ -155,7 +155,7 @@ function fuegoDibujar(celdas, z){
     }
   });
   ctx.restore();
-  bordeHexPunteado(celdas, z, 'rgba(255,200,120,.95)');   // dónde quema exactamente (2026-10-24)
+  bordeHexPunteado(celdas, z, 'rgba(255,200,120,.42)');   // dónde quema exactamente (2026-10-24)
 }
 // La mancha: las casillas enteras más una «panza» redonda en cada lado de afuera (tamaño y salida al azar, fijos por casilla).
 function trazarManchon(celdas, o){

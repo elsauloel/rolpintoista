@@ -250,10 +250,11 @@
   // Daño fijo (sin el Ef.Esp: su costo ya sube con el largo): 3d4 de fuego DIRECTO (dueño, 2026-10-24: «1d6 me parece muy poco, sobre todo si se reduce
   // con Def.Esp; lo haría de daño directo, 3d4»: no lo frena la Defensa especial, sí la resistencia al fuego) y Quemadura, al cruzarla (cada paso
   // adentro) y al empezar el turno adentro.
-  // Costos propuestos por Claude: 3 casillas, 2 No2 y 3 SP (o cooldown 3); cada casilla más, +1 SP; cada 2 de más, +1 No2 (y +1 al cooldown); hasta 8.
-  H('Muro de fuego', 'DA', 'ega', 'g', 3, {detalle: 'Levanta un muro de llamas en línea, que empieza dentro de su Rango: 3 casillas o más (hasta 8: cada casilla de más cuesta 1 SP más, y cada 2, 1 No2 más), durante 3 turnos. Quien lo cruza o empieza su turno adentro recibe 3d4 de daño de fuego directo (no lo frena la Defensa especial; sí la resistencia al fuego) y queda con Quemadura.',
-    no2: 2, spCosto: 3, auditada: true, largoVariable: {min: 3, max: 8, sp: 1, no2Cada: 2}, ataqueTxt: 'muro de fuego en línea (3 casillas o más), 3 turnos: 3d4 de fuego directo y Quemadura a quien lo cruza o se queda',
-    duelo: {objetivo: 'zona', tira: '', contra: [], dano: true, danoFormula: '3d4', danoDirecto: true, tipoDano: 'fuego', zonaTurnos: 3, zonaForma: 'linea', zonaLargo: 3, zonaAltura: 'ambos',
+  // Costo (dueño, 2026-10-24: «el costo inicial en No2, 1 No2 por 4 casilleros, y cada casillero adicional +1 No2 y +1 SP»): 4 casillas, 1 No2 y 3 SP (o
+  // cooldown 3); cada casilla de más +1 No2 y +1 SP (en modo cooldown, +1 al cooldown cada 2); hasta 8.
+  H('Muro de fuego', 'DA', 'ega', 'g', 3, {detalle: 'Levanta un muro de llamas en línea, que empieza dentro de su Rango: 4 casillas o más (hasta 8: cada casilla de más cuesta 1 No2 y 1 SP más), durante 3 turnos. Quien lo cruza o empieza su turno adentro recibe 3d4 de daño de fuego directo (no lo frena la Defensa especial; sí la resistencia al fuego) y queda con Quemadura.',
+    no2: 1, spCosto: 3, auditada: true, largoVariable: {min: 4, max: 8, sp: 1, no2: 1}, ataqueTxt: 'muro de fuego en línea (4 casillas o más), 3 turnos: 3d4 de fuego directo y Quemadura a quien lo cruza o se queda',
+    duelo: {objetivo: 'zona', tira: '', contra: [], dano: true, danoFormula: '3d4', danoDirecto: true, tipoDano: 'fuego', zonaTurnos: 3, zonaForma: 'linea', zonaLargo: 4, zonaAltura: 'ambos',
       zonaColor: '#E8632B', zonaAlcance: 'rango', zonaCadaPaso: true, zonaEstado: {nombre: 'Quemadura'}}}, 'terreno y formas');
   H('Lanza de hielo', 'DX', 'e', 'g', 3, zO('Un carámbano que ralentiza: el objetivo pierde 1 No2 (a mano).', 2, 'M'));
   H('Dardo venenoso', 'DX', 'hdp', 'r', 2, aT('Un dardo cubierto de veneno: tirá 1d4, con 1 el objetivo queda Envenenado (a mano).', 'L'));

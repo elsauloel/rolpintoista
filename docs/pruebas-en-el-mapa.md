@@ -206,7 +206,7 @@
 - [ ] **❄ Hálito polar (Mago, 2026-10-23)**: un creep lo usa mirando hacia dos rivales y un aliado → el cono de 16 casillas al frente; tira PdG.Esp una vez
   contra la Evasión de cada rival (no del aliado), sin dodge roll; al que no le gana, 2d4 + ¼ del Ef.Esp del creep, de hielo (menos su Defensa especial y su
   resistencia al hielo), y Escarcha (−1 No2 máximos, 2 turnos); el cobro (3 No2 y tanto SP como su Especial, o cooldown 3). **Y** el Aura sanadora cobra ahora 3 No2 y 5 SP.
-- [ ] **🔥 Muro de fuego (Mago, 2026-10-24)**: un creep lo usa → «¿De qué largo?» (3 a 8, cada uno con su costo) → «cuesta…: ¿lo levanta?» → elegir dónde
+- [ ] **🔥 Muro de fuego (Mago, 2026-10-24)**: un creep lo usa → «¿De qué largo?» (4 a 8, cada uno con su costo: 4 = 1 No2 y 3 SP, cada una más +1 No2 y +1 SP) → «cuesta…: ¿lo levanta?» → elegir dónde
   empieza (en su Rango) y hacia dónde sigue → el muro del largo elegido, 3 turnos; cobra lo de base más lo del largo (Mesa); un personaje que lo cruza recibe
   3d4 de fuego directo (sin restar su Defensa especial; sí su resistencia al fuego) y Quemadura; cancelar en el cartel no cobra nada. **Probado en parte (2026-10-24, el Escarabajo, a la vista)**: «¿De qué largo?» con las 6
   opciones y su costo (3: 2 No2 y 3 SP … 8: 4 No2 y 8 SP); 5 casillas → «cuesta 3 No2 y 5 SP. ¿Lo levanta?» → cobró 3 No2 (8 → 5) y 5 SP (40 → 35), la Mesa

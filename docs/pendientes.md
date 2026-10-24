@@ -94,6 +94,13 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
+> - [ ] **🐾 Configurar armas y armaduras naturales de los creeps, al detalle (2026-10-24, dueño: «quiero ir bien al detalle ahí y en este momento no
+>   puedo prestarle atención»):** la idea (D8 de `plan-inventario-creeps.md`): a una bestia se le carga una pieza del catálogo, se la marca natural y se
+>   le cambia el nombre («Garra de la pindonga»): tiene todo lo de la pieza, no se cae ni la levanta otro y al morir deja el trofeo. **Hoy**: el arma sí
+>   (GM Tools → el creep → «✎ Crear o editar el arma» para renombrar + «Arma natural»); las piezas de armadura se marcan naturales con el 🐾 pero **no se
+>   pueden renombrar ni editar en el creep** (el 👁 solo tiene «Editar y subir», una copia para el catálogo). Revisar todo el flujo junto con el dueño:
+>   renombrar y editar cada pieza ahí mismo, qué trofeo deja una armadura natural, cómo se ve en la 🪪 del mapa y en el botín, el atajo 🐾 del catálogo de
+>   armas naturales (`armas-naturales-base.js`), las invocaciones.
 > - [ ] **⌨ Atajos 1–0 para las habilidades (2026-10-24, dueño: «una especie de hotkey para las habilidades del 1 al 0, por lo menos 10; cada personaje
 >   les pueda asignar un número, y que ese glosario de qué número es cada habilidad esté más o menos a mano; el menú lateral izquierdo ya está ocupado:
 >   quizás un botón plegable, flotante o algo por el estilo»):** cada personaje asigna sus habilidades a las teclas 1…0; apretar el número las ejecuta

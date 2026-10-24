@@ -204,8 +204,8 @@
 - [x] (2026-10-23, Claude: con un cuarto de vida o menos, +3 dados en el daño, en la Mesa y la Crónica; el +2 sale del mismo escalón y está en las
   pruebas automáticas) **🗡 Remate / Ir por el herido (2026-10-23)**: un creep con la habilidad contra un personaje sano (ataque común), con la mitad de la vida (+2 dados) y con un cuarto o menos (+3); mirar la Mesa, la Crónica y la fórmula del daño. **Y** (dueño, el mismo día): al elegir el objetivo brillan solo los que califican; uno sano pregunta «¿Atacarlo igual, como un ataque común?»; cancelar le devuelve al creep el cooldown y el SP. **Visto de pasada (2026-10-23)**: con juan sano no brilló nadie, al elegirlo salió «No califica… ¿Atacarlo igual?» y cancelar le devolvió al Escarabajo el cooldown y los 3 No2 (toast y Mesa). **Falta**: el +2 y el +3 con un objetivo herido.
 - [ ] **❄ Hálito polar (Mago, 2026-10-23)**: un creep lo usa mirando hacia dos rivales y un aliado → el cono de 16 casillas al frente; tira PdG.Esp una vez
-  contra la Evasión de cada rival (no del aliado), sin dodge roll; al que no le gana, 2d4 de hielo (menos su Defensa especial y su resistencia al hielo) y
-  Escarcha (−1 No2 máximos, 2 turnos); el cobro (3 No2 y 4 SP, o cooldown 3). **Y** el Aura sanadora cobra ahora 3 No2 y 5 SP.
+  contra la Evasión de cada rival (no del aliado), sin dodge roll; al que no le gana, 2d4 + ¼ del Ef.Esp del creep, de hielo (menos su Defensa especial y su
+  resistencia al hielo), y Escarcha (−1 No2 máximos, 2 turnos); el cobro (3 No2 y tanto SP como su Especial, o cooldown 3). **Y** el Aura sanadora cobra ahora 3 No2 y 5 SP.
 - [x] **🕸 La telaraña y la red, a la vista (2026-10-23), probado en el mapa con capturas**: la Red (copia vieja de un creep, sin el dato: la
   reconoció por el nombre) dejó la red de soga sobre juan; la Tela de araña, la telaraña sobre Clementino; al soltarse (Fuerza 4 contra 1, al
   empezar su turno) se fue sola. En el piso, la Red de caza y la Telaraña oculta llevan su dibujo encima de la ficha del cepo. El rebote, cada 3,6 s.

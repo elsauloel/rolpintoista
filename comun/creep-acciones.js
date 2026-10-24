@@ -384,7 +384,7 @@ const CreepAcciones = (() => {
     const esZona = auto && h.duelo && typeof h.duelo === 'object' && h.duelo.objetivo === 'zona';
     // ✨ Solo sobre el creep y sin nada que tirar: se aplica directo, sin abrir el cuadro.
     const directo = auto && !h.trampaColocar && !h.refuerzos ? sobreSi(sc, h) : null;
-    return {costo, costoSp, costoHp, efecto, aviso: [ef.aviso || '', malditoDano ? `🩸 Maldito: usar ${h.nombre || 'la habilidad'} le saca ${fmt(malditoDano)} de vida` : ''].filter(Boolean).join(' · '), falta, auto, esZona, directo, nitros: sc.nitros, malditoDano};
+    return {costo: costo + Math.max(0, num(ex.no2)), costoSp, costoHp, efecto, aviso: [ef.aviso || '', malditoDano ? `🩸 Maldito: usar ${h.nombre || 'la habilidad'} le saca ${fmt(malditoDano)} de vida` : ''].filter(Boolean).join(' · '), falta, auto, esZona, directo, nitros: sc.nitros, malditoDano};
   }
   /* Lo que pasa después de cobrar. ui = {mesaHabilidad(sc, h, extra), mesaConTexto(texto), publicar(sc, t), toast(t),
        habDuelo(sc, h) (la Ejecución para el duelo, o null si no hay duelo), lanzarAtaque(sc, h), lanzarDuelo(sc, h, hab),

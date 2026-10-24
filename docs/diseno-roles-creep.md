@@ -29,11 +29,11 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 - 🏹 **Rango y Hunter — 11**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 5**: daño en área, rayo en cadena, cono de frío (Hálito polar) · de El origen: proyectil, fuego con quemadura.
-- 🧿 **Debuffer — 5**: control mental, maleficio · de El origen: ceguera, veneno, inmovilizar.
+- 🧿 **Debuffer — 6**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24) · de El origen: ceguera, veneno, inmovilizar.
 - 💚 **Support — 5**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
-**Para emparejar**: Mago, Debuffer y Support empatados en 5 (2026-10-24).
+**Para emparejar**: Mago y Support (5), después Debuffer (6) (2026-10-24).
 
 ## Los roles
 
@@ -336,7 +336,8 @@ Inmovilizado, Rengo, Desarmado; y, de personajes, Enyetar.
 1. **Debilitar**: el objetivo pega menos (Debilitado, que se apila).
 2. **Torpeza**: menos Probabilidad de Golpe.
 3. **Exponer** ✦: la Evasión a la mitad y sin reacciones que cuesten No2 (Expuesto).
-4. **Maldición de la coraza** ✦: menos Defensa y Defensa especial unos turnos.
+4. ✅ **Maldición de la coraza** ✦ (2026-10-24): su PdG.Esp contra la Res.Esp de un rival en su Rango; **Coraza maldita**, −2 Defensa y −2 Defensa
+   especial 3 turnos. Reemplaza a la vieja Maldición (a mano).
 5. **Mano temblorosa**: menos Crítico frecuente y potente.
 
 **B. Quitarle recursos**

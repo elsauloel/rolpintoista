@@ -264,6 +264,11 @@
   Espinas 3 turnos (cada golpe cuerpo a cuerpo que recibe le devuelve al atacante ¼ del golpe, directo a la vida). **Velo espejado**: Espejo 3 turnos (lo
   mismo con el daño especial, a cualquier distancia). 1 No2 y 2 SP, o cooldown 3 (los propuso Claude). **Para probar.**
 
+- ✅ **Maldición de la coraza** (Debuffer, «bajar la armadura», 2026-10-24, dueño: «vamos con el 4»): reemplaza a la vieja **Maldición** del pool (a mano:
+  «pierde 2 de Res.Esp y 1 de Defensa»). Su PdG.Esp contra la Res.Esp de un rival dentro de su Rango; si gana, el estado nuevo **Coraza maldita**
+  (`comun/estados-presets.js`): −2 Defensa y −2 Defensa especial durante 3 turnos, contra todos (no se apila: renueva). 2 No2 y 3 SP, o cooldown 3 (los
+  propuso Claude). **Para probar.**
+
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 
 ## Etiquetas

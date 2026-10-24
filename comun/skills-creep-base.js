@@ -68,7 +68,7 @@
     'Barrido': ['choque pesado', 'barrido'], 'Coletazo': ['choque pesado', 'barrido'],
     'Tiro a la cabeza': ['rango', 'tiro apuntado'], 'Desarmar': ['choque pesado', 'desarmar'], 'El que avisa no traiciona': ['choque pesado', 'golpe anunciado'], 'Sal en la herida': ['choque liviano', 'abrir la herida'], 'Remate': ['choque pesado', 'remate'], 'Ir por el herido': ['choque pesado', 'remate'], 'Morder la herida': ['choque liviano', 'abrir la herida'], 'Patotear': ['choque liviano', 'manada'], 'Jauría': ['choque liviano', 'manada'], 'Zarpazo erguido': ['choque pesado', 'golpe anunciado'], 'Mal de ojo': ['debuffer', 'maleficio'], 'Disparo señalador': ['rango', 'señalar'], 'Ráfaga de cortes': ['choque liviano', 'ráfaga'], 'Ráfaga de zarpazos': ['choque liviano', 'ráfaga'],
     'Romper armadura': ['choque pesado', 'romper armadura'], 'Arrancar la coraza': ['choque pesado', 'romper armadura'],
-    'Golpe demoledor': ['choque pesado', 'romper armadura'], 'Mandíbula trituradora': ['choque pesado', 'romper armadura'], 'Cadena de rayos': ['mago', 'rayo en cadena'], 'Hálito polar': ['mago', 'cono de frío'], 'Coraza de púas': ['support', 'devolver el daño'], 'Velo espejado': ['support', 'devolver el daño'],
+    'Golpe demoledor': ['choque pesado', 'romper armadura'], 'Mandíbula trituradora': ['choque pesado', 'romper armadura'], 'Cadena de rayos': ['mago', 'rayo en cadena'], 'Hálito polar': ['mago', 'cono de frío'], 'Maldición de la coraza': ['debuffer', 'bajar la armadura'], 'Coraza de púas': ['support', 'devolver el daño'], 'Velo espejado': ['support', 'devolver el daño'],
     'Puñalada por la espalda': ['choque liviano', 'por la espalda'], 'Mordida a traición': ['choque liviano', 'por la espalda'], 'Puñalada trapera': ['choque liviano', 'por la espalda'],
   };
 
@@ -352,7 +352,11 @@
 
   /* ================= DEBUFF (sobre otros: a mano) ================= */
   H('Debilitar', 'X', 'hdga', 'x', 3, tA('Maldice al objetivo: −2 de Daño 3 turnos (a mano).', 2));
-  H('Maldición', 'X', 'dmga', 'gx', 4, tA('El objetivo pierde 2 de Res.Esp y 1 de Defensa 3 turnos (a mano).', 2));
+  // 🛡💀 Auditada (dueño, 2026-10-24; el Debuffer, «Maldición de la coraza»): reemplaza a la vieja Maldición (a mano). Su PdG.Esp contra la Res.Esp
+  // de un rival en su Rango; si gana, Coraza maldita (−2 Defensa y −2 Defensa especial, 3 turnos): todos le pegan más. 2 No2 y 3 SP, o cooldown 3.
+  H('Maldición de la coraza', 'X', '*', 'gx', 3, {detalle: 'Le maldice la armadura a un rival dentro de su Rango: tira su Probabilidad de Golpe especial contra la Resistencia especial del objetivo; si gana, queda con Coraza maldita (−2 a su Defensa y −2 a su Defensa especial durante 3 turnos, contra todos).',
+    no2: 2, spCosto: 3, auditada: true, ataqueTxt: 'su PdG.Esp contra la Res.Esp; si gana, −2 Defensa y −2 Defensa especial 3 turnos',
+    duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['resmg'], alcance: 'rango', dano: false, efectos: [{nombre: 'Coraza maldita'}]}});
   H('Ceguera', 'X', 'hdea', 'x', 3, tA('Lanza polvo o luz: el objetivo queda con Ceguera 1 turno (a mano).', 2));
   H('Ralentizar', 'X', 'hdea', 'x', 3, tA('El objetivo pierde 2 No2 en su próximo turno (a mano).', 2));
   H('Miedo', 'XK', 'bdma', 'x', 4, tA('Si el objetivo falla Res.Mt huye de él 2 turnos (a mano).', 2));

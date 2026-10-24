@@ -132,6 +132,9 @@ const ESTADOS_PRESET = [
   // Sprint (Asalto, 2026-10-13): los próximos 3 casilleros que camina están pagos (solo paga los recargos: Rengo, terreno lento). Lo descuenta el mapa.
   {nombre:'Sprint', polaridad:'buff', turnos:1, sprint:3, alEmpezarTurno:true,
     detalle:'Los próximos 3 casilleros que camina en este turno ya están pagos: solo paga lo que sumen Rengo o el terreno lento, y alejarse de un rival le da su ataque de oportunidad. Se termina al empezar su próximo turno. ⚙ Automatizado en el mapa.'},
+  // Coraza maldita (2026-10-24, dueño: la Maldición de la coraza del Debuffer): −2 a la Defensa y a la Defensa especial; todos le pegan más.
+  {nombre:'Coraza maldita', polaridad:'debuff', turnos:3, mods:[{stat:'def', val:-2}, {stat:'armadmg', val:-2}],
+    detalle:'Una maldición le ablanda la armadura: −2 a su Defensa y −2 a su Defensa especial durante 3 turnos, contra todos. Si se la vuelven a poner, no se suma: vuelve a durar 3 turnos. ⚙ Automatizado.'},
   {nombre:'Expuesto', polaridad:'debuff', turnos:1, expuesto:true, mitadEva:true, alEmpezarTurno:true,
     detalle:'Quedó al descubierto: hasta que empieza su próximo turno, su Evasión se parte a la mitad (al resultado, para abajo) y no puede reaccionar con nada que cueste No2: ni Parry (y por lo tanto ni Bloqueo ni contraataque), ni ataque de oportunidad, ni dodge roll. ⚙ Automatizado: la Evasión, las defensas del duelo, la oportunidad y el dodge roll.'},
   {nombre:'Sentado', polaridad:'debuff', permanente:true, turnos:0, sentado:true, esCC:true,

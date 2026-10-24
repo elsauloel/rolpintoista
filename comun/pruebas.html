@@ -4880,6 +4880,19 @@ prueba('📣 ¡A la carga! y Arenga (Support, 2026-10-23): onda a los aliados a 
     e('¡A la carga!').etiquetas.includes('auditada'), e('Arenga').etiquetas.includes('support'), ['Aullido de manada', 'Grito de ánimo', '¡Por el amo!', '¡A laburar!', 'Marca del amo', 'Aullido de la manada'].filter(e).length],
     ['onda', 4, true, 2, 'pdg2 pdgmg2 dmg2 dmgesp2', 'Bendecido', 3, 4, true, true, 0]);
 });
+prueba('🛡💀 Maldición de la coraza (Debuffer, 2026-10-24): PdG.Esp contra Res.Esp, Coraza maldita −2 Defensa y −2 Def.Esp 3 turnos; reemplaza a la Maldición vieja', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Maldición de la coraza'), h = armarHabilidadDeCreep(e.datos, 3);
+  const he = Combatiente.habEjecucion(h, h.duelo, {stat: () => 0});
+  const sc = {nombre: 'Prueba', defensa: 6, armadmg: 3, estados: []};
+  const antes = [CreepCalculo.defensaEfectiva(sc), CreepCalculo.armadmgEfectiva(sc)];
+  EstadosAplicar.aplicarACreep(sc, Combatiente.efectoDeEjecucion(h.duelo.efectos[0]).spec);
+  EstadosAplicar.aplicarACreep(sc, Combatiente.efectoDeEjecucion(h.duelo.efectos[0]).spec);   // otra vez: renueva, no suma
+  const est = sc.estados.find(x => x.nombre === 'Coraza maldita');
+  igual([he.objetivo, he.tira && he.tira.stat, (he.contra || []).map(c => c.stat || c), est && est.polaridad, est && est.turnos, sc.estados.length,
+    antes, [CreepCalculo.defensaEfectiva(sc), CreepCalculo.armadmgEfectiva(sc)], e.datos.sp.no2, e.datos.sp.spCosto, e.datos.cd,
+    HABILIDADES_CREEP_BASE.filter(x => /pierde 2 de Res\.Esp y 1 de Defensa/.test(x.detalle || '')).length],
+    ['enemigo', 'pdgmg', ['resmg'], 'debuff', 3, 1, [6, 3], [4, 1], 2, 3, 3, 0]);
+});
 prueba('🌵🪞 Coraza de púas y Velo espejado (Support, 2026-10-24): Espinas y Espejo 3 turnos, a él o a un aliado en su Rango', () => {
   const e = n => HABILIDADES_CREEP_BASE.find(x => x.nombre === n);
   const r = ['Coraza de púas', 'Velo espejado'].map(n => {

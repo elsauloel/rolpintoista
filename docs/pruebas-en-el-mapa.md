@@ -206,6 +206,9 @@
 - [ ] **❄ Hálito polar (Mago, 2026-10-23)**: un creep lo usa mirando hacia dos rivales y un aliado → el cono de 16 casillas al frente; tira PdG.Esp una vez
   contra la Evasión de cada rival (no del aliado), sin dodge roll; al que no le gana, 2d4 + ¼ del Ef.Esp del creep, de hielo (menos su Defensa especial y su
   resistencia al hielo), y Escarcha (−1 No2 máximos, 2 turnos); el cobro (3 No2 y tanto SP como su Especial, o cooldown 3). **Y** el Aura sanadora cobra ahora 3 No2 y 5 SP.
+- [ ] **🛡💀 Maldición de la coraza (Debuffer, 2026-10-24)**: un creep se la tira a un personaje en su Rango → PdG.Esp contra Res.Esp en el duelo; si gana,
+  Coraza maldita 3 turnos: la Defensa y la Defensa especial del personaje bajan 2 (la Botonera y la ficha lite) y un golpe siguiente resta 2 menos; ponérsela
+  otra vez renueva los turnos sin sumar; el cobro (2 No2 y 3 SP, o cooldown 3).
 - [ ] **🌵🪞 Coraza de púas y Velo espejado (Support, 2026-10-24)**: un creep se las pone a un aliado en su Rango (y a sí mismo); el aliado queda con Espinas
   o Espejo 3 turnos; un personaje le pega cuerpo a cuerpo al de Espinas → recibe ¼ del golpe directo a la vida (Mesa y Crónica); le tira una varita al del
   Espejo → recibe ¼ del daño especial; el cobro (1 No2 y 2 SP, o cooldown 3). **Y el Anuncio** (dueño, 2026-10-24: «aunque no se tire nada, tiene que

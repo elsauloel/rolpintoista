@@ -295,10 +295,10 @@
   dan no cuenta nunca. Antes, un estado puesto en el propio turno de quien lo recibe perdía un turno completo (ese turno a medias contaba). 1 No2 y 3 SP, o
   cooldown 3 (los propuso Claude). **Para probar.**
 
-- ✅ **Rayo cargado** (Mago, 2026-10-24, dueño: «vamos con el rayo cargado, con la añadidura de que si el creep lo empieza a cargar estando cubierto por la
+- ✅ **Descarga arcana** (Mago, 2026-10-24; primero «Rayo cargado», dueño: «vamos con el rayo cargado, con la añadidura de que si el creep lo empieza a cargar estando cubierto por la
   niebla, se revela su ubicación: una luz recubre al creep, como si quedara marcado»): el golpe anunciado (vtt-hexgrid/js/63) con un **hechizo** (lo nuevo:
   `golpeAnunciado.duelo` puede ser una Ejecución de habilidad; descarga con `no2Golpe` y `spGolpe`; no sale de oportunidad). Un turno junta energía mirando
-  a un rival (su ataque del turno, 1 No2 y 2 SP) y queda **Rayo cargado** (estado nuevo, con `marcado`: brilla y se lo ve en la niebla; lo público del creep
+  a un rival (su ataque del turno, 1 No2 y 2 SP) y queda con **Carga arcana** (estado nuevo, con `marcado`: brilla y se lo ve en la niebla; lo público del creep
   ahora lleva la marca); 10 de daño se lo cortan. En su próximo turno, al apretar Atacar: «Descargar», su PdG.Esp contra la Evasión del que anunció, **4d6
   arcano** (2 No2 y 3 SP; dueño: «si no va a tener ningún efecto vinculado al eléctrico, que el daño sea arcano»). Los números los propuso Claude. **Para probar.**
 

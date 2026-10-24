@@ -206,7 +206,7 @@
 - [ ] **❄ Hálito polar (Mago, 2026-10-23)**: un creep lo usa mirando hacia dos rivales y un aliado → el cono de 16 casillas al frente; tira PdG.Esp una vez
   contra la Evasión de cada rival (no del aliado), sin dodge roll; al que no le gana, 2d4 + ¼ del Ef.Esp del creep, de hielo (menos su Defensa especial y su
   resistencia al hielo), y Escarcha (−1 No2 máximos, 2 turnos); el cobro (3 No2 y tanto SP como su Especial, o cooldown 3). **Y** el Aura sanadora cobra ahora 3 No2 y 5 SP.
-- [ ] **⚡ Rayo cargado (Mago, 2026-10-24)**: el creep (en la niebla, para un jugador) lo carga apuntando a un personaje → Mesa y Crónica «junta energía
+- [ ] **⚡ Descarga arcana (Mago, 2026-10-24; antes «Rayo cargado»)**: el creep (en la niebla, para un jugador) lo carga apuntando a un personaje → Mesa y Crónica «junta energía
   mirando a…», el creep brilla y el jugador lo ve en la niebla; en su próximo turno, Atacar → «Descargar» → el duelo de un hechizo contra ese personaje (su
   PdG.Esp contra la Evasión, 4d6 arcano); cobra 2 No2 y 3 SP; si antes le entran 10 de daño, se le corta. **Probado en parte (2026-10-24, el
   Escarabajo a la vista, como GM)**: cargarlo → «¿A quién apunta?» → juan; Mesa y Crónica «⚡ junta energía mirando a juan… ¡Rayo cargado!» con «una luz lo

@@ -1950,10 +1950,32 @@ function dueloCuraMomento(d, t, n, r){
       veredicto: r.caido ? {tono: 'neutro', grande: 'Caído', chico: 'Una cura no levanta a un caído: hace falta revivirlo'}
         : {tono: 'bueno', grande: `+${fmt(n)}`, chico: mismo ? `te curaste ${fmt(n)} de vida (${fmt(r.previo)} → ${fmt(r.nuevo)})` : `${quien} te curó ${fmt(n)} de vida (${fmt(r.previo)} → ${fmt(r.nuevo)})`}} : {}});
 }
+/* Un buff que no pasa desapercibido (2026-10-24, dueño: «aunque no se tire nada y se aplique directo, tiene que haber un anuncio: Fulanito te aplicó
+   Espejo durante X turnos, y el efecto»). Como la cura: a quien lo recibe (el dueño del personaje o de la invocación; de un creep, el GM, que es quien
+   aplica) el Anuncio al centro con Entendido, y la Crónica para todos, con el efecto. Sobre sí mismo, solo la Crónica. Los debuffs ya se ven en el duelo. */
+function dueloBuffMomento(d, t, spec){
+  const preset = (typeof EstadosAplicar.presetPorNombre === 'function' && EstadosAplicar.presetPorNombre(spec.nombre)) || {};
+  if((spec.polaridad || preset.polaridad) !== 'buff') return;
+  const quien = d.atacante && d.atacante.nombre ? d.atacante.nombre : 'Alguien', a = t.oculto ? 'alguien' : nombreDe(t);
+  const mismo = d.atacante && d.atacante.tokenId === d.defensor.tokenId;
+  const turnos = Math.round(num(spec.turnos !== undefined ? spec.turnos : preset.turnos));
+  const dura = turnos > 0 ? `durante ${turnos} turno${turnos === 1 ? '' : 's'}` : 'sin límite de turnos';
+  const efecto = String(spec.detalle || preset.detalle || '').split(/\s*[⚙✋]/)[0].trim();
+  const para = t.tipo === 'creep' ? (fbUsuario && fbUsuario.uid) : t.duenoUid;
+  momentoAbrir({tipo: 'buff', icono: '✨', titulo: mismo ? `${quien} se puso ${spec.nombre}` : `${quien} le aplicó ${spec.nombre} a ${a}`,
+    resultado: `${dura[0].toUpperCase()}${dura.slice(1)}${efecto ? `: ${efecto}` : ''}`, estado: 'listo',
+    datos: !mismo && para ? {paraUid: para, aviso: true, boton: 'Entendido',
+      pasos: efecto ? [{titulo: 'Qué hace', texto: efecto}] : [],
+      veredicto: {tono: 'bueno', grande: spec.nombre, chico: `${quien} ${t.tipo === 'creep' ? `le aplicó a ${a}` : 'te aplicó'} ${spec.nombre} ${dura}`}} : {}});
+}
 // El Desarmado (2026-10-07) deja el arma en el piso (js/27); con `vuela`, lejos (la Varita del desarme).
 async function dueloAplicarEfecto(d, ef){
   if(num(ef && ef.empuja) > 0) return dueloEmpujar(d, num(ef.empuja));   // el empujón no es un estado (2026-10-08)
   const r = await dueloAplicarEfectoBase(d, ef);
+  try{
+    const spec = Duelo.specDeEfecto(ef), t = tokens.get(d.defensor.tokenId);
+    if(t && spec && spec.nombre && !spec.cura && r && !r.manual && !/^no entró/i.test(String(r.nota || ''))) dueloBuffMomento(d, t, spec);
+  }catch(err){ console.error('No se pudo anunciar el buff:', err); }
   try{
     const spec = Duelo.specDeEfecto(ef);
     const t = tokens.get(d.defensor.tokenId);

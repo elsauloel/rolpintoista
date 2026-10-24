@@ -1781,3 +1781,6 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   en `zonaResueltos` «cura@momento» o en el estado, `pulsos`); cura un número fijo (4). Las dos se ven como un contorno de línea verde ondulada que respira (`curaContorno`; ni nube ni
   hexágonos, a pedido del dueño) con chispitas que suben (`curaDibujarZona` desde js/05; el aura, `curaDibujarAuras`, debajo de los tokens);
   `curaBurbujas` suma chispitas un momento sobre cada uno que se cura.
+- **✨ El Anuncio de un buff** (2026-10-24, dueño: «aunque no se tire nada y se aplique directo, tiene que haber un anuncio»): `dueloBuffMomento` (js/13), desde
+  `dueloAplicarEfecto`: un estado con polaridad buff que entró → momento `tipo: 'buff'` con el Anuncio a quien lo recibe (dueño; de un creep, el GM) y la
+  Crónica para todos, con los turnos y lo que hace (el `detalle` del preset hasta las notas ⚙/✋). Sobre sí mismo, solo la Crónica. Como `dueloCuraMomento`.

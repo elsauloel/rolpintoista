@@ -208,7 +208,9 @@
   resistencia al hielo), y Escarcha (−1 No2 máximos, 2 turnos); el cobro (3 No2 y tanto SP como su Especial, o cooldown 3). **Y** el Aura sanadora cobra ahora 3 No2 y 5 SP.
 - [ ] **🌵🪞 Coraza de púas y Velo espejado (Support, 2026-10-24)**: un creep se las pone a un aliado en su Rango (y a sí mismo); el aliado queda con Espinas
   o Espejo 3 turnos; un personaje le pega cuerpo a cuerpo al de Espinas → recibe ¼ del golpe directo a la vida (Mesa y Crónica); le tira una varita al del
-  Espejo → recibe ¼ del daño especial; el cobro (1 No2 y 2 SP, o cooldown 3).
+  Espejo → recibe ¼ del daño especial; el cobro (1 No2 y 2 SP, o cooldown 3). **Y el Anuncio** (dueño, 2026-10-24: «aunque no se tire nada, tiene que
+  haber un anuncio»): al aplicar un buff a otro, a quien lo recibe (el dueño del personaje; de un creep, el GM) «✨ X te aplicó Espejo durante 3 turnos» con
+  lo que hace y Entendido, y la Crónica para todos; sobre sí mismo, solo la Crónica. Vale para cualquier buff del duelo (Arenga, Bálsamo, Arma ígnea…).
 - [x] **🕸 La telaraña y la red, a la vista (2026-10-23), probado en el mapa con capturas**: la Red (copia vieja de un creep, sin el dato: la
   reconoció por el nombre) dejó la red de soga sobre juan; la Tela de araña, la telaraña sobre Clementino; al soltarse (Fuerza 4 contra 1, al
   empezar su turno) se fue sola. En el piso, la Red de caza y la Telaraña oculta llevan su dibujo encima de la ficha del cepo. El rebote, cada 3,6 s.

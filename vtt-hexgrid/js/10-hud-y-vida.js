@@ -235,7 +235,7 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     let golpeCae = false, golpeAcum = 0, golpeTope = 0, golpeHab = null;
     if(num(r.recibido) > 0){ const j = (sc.estados || []).findIndex(e => e && e.activo !== false && num(e.cortaDano) > 0);
       if(j >= 0){ const e = sc.estados[j]; e.danoRecibido = num(e.danoRecibido) + num(r.recibido); golpeAcum = e.danoRecibido; golpeTope = num(e.cortaDano);
-        golpeHab = (sc.habilidades || []).find(h => h && e.hab && h.id === e.hab) || null;   // ⚡ la Descarga arcana: un hechizo cargado se dice distinto
+        golpeHab = (sc.habilidades || []).find(h => h && e.hab && h.golpeAnunciado && (h.nombre === e.hab || h.id === e.hab)) || null;   // (el estado guarda el nombre, js/63)   // ⚡ la Descarga arcana: un hechizo cargado se dice distinto
         if(golpeAcum >= golpeTope){ golpeCae = true; sc.estados.splice(j, 1); } } }
     return {r, previo, nuevo: fenix ? 0 : sc.hp, bronca, fenix, hpFenix: sc.hp, punteria, golpeCae, golpeAcum, golpeTope, golpeHab};
   });

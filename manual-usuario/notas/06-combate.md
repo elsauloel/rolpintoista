@@ -385,6 +385,7 @@ Un personaje o un creep puede **entrar en sigilo desde el mapa**: queda oculto p
 - **Atacar desde el sigilo por la espalda:** ver [[Atacar por la espalda]] (la Evasión del defensor es 1).
 - Es una **habilidad estándar** ("Sigilo") que aplica el estado [[Sigilo (estado)|Sigilo]] sobre uno mismo. Quien la tenga cargada la ve como botón directo en la [[La Botonera|Botonera]].
 - Cuesta **1 No2** (a revisar). Moverte en sigilo cuesta lo mismo que moverte normal.
+- **Esconderse a la vista se anuncia.** Si algún rival te ve en el momento en que entrás en sigilo, la [[La Mesa|Mesa]] y la Crónica lo cuentan («entra en sigilo a la vista»): saben dónde te escondiste. Si no te ve nadie del otro bando (estás detrás de una pared o un objeto, en la niebla, fuera de su visión), no se anuncia nada.
 
 ## Quién ve qué
 | En sigilo | Lo ven | No lo ve |

@@ -1787,6 +1787,10 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   en su Rango; primero el que ataca en el duelo abierto: la usa en ese golpe si llega antes de tirar el daño, aunque ya haya tirado el PdG — `cargaAlGolpeAbierto`, js/13,
   engancha la carga a ese duelo) y se ejecuta como desde sus Acciones (`ac.objetivoFijo` +
   `acEjecutarHab`, que en turno ajeno cobra el doble con `CreepAcciones.ejecutarHab(…, {doble})`).
+- **🥷 Entrar en sigilo a la vista se anuncia** (2026-10-24, regla del dueño; `js/72-sigilo-a-la-vista.js`): cada 700 ms, la pantalla que maneja un token
+  (el GM a un creep; a un personaje o invocación, `bnManejo`) mira si pasó a estar en sigilo; si en ese momento algún rival lo ve (`rivalesDe` +
+  `celdasVisionDe`; un creep con la niebla de guerra apagada, siempre) y no está en el cono de un rival (ahí lo detectan en el acto), Mesa y Crónica
+  «entra en sigilo a la vista». Escondido tras un Sólido, una pared o en la niebla: nada.
 - **✨ El Anuncio de un buff** (2026-10-24, dueño: «aunque no se tire nada y se aplique directo, tiene que haber un anuncio»): `dueloBuffMomento` (js/13), desde
   `dueloAplicarEfecto`: un estado con polaridad buff que entró → momento `tipo: 'buff'` con el Anuncio a quien lo recibe (dueño; de un creep, el GM) y la
   Crónica para todos, con los turnos y lo que hace (el `detalle` del preset hasta las notas ⚙/✋). Sobre sí mismo, solo la Crónica. Como `dueloCuraMomento`.

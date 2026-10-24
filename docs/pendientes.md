@@ -94,6 +94,12 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
+> - [ ] **📈 Habilidades de creep con daño fijo: que el efecto suba con el nivel (2026-10-24, dueño: «los skills que tienen daño fijo, revisarlos para que
+>   tengan un aumento de efecto por nivel»):** repasar las de `comun/skills-creep-base.js` con daño o efecto fijo (la Aguja del desamparo 1d6, el Muro de
+>   fuego 3d4, el Hálito polar 2d4 + ¼ Ef.Esp, la Descarga arcana 4d6, el Estandarte de guerra +3 PdG / +5 daño, las curas fijas como el Aura sanadora 4…) y
+>   darles un aumento por nivel del creep (`armarHabilidadDeCreep(datos, nivel)` ya recibe el nivel: hoy lo usan las recetas viejas con `{sp, cd}` y el daño
+>   de las trampas). Decidir con el dueño la regla (¿+1 dado cada N niveles?, ¿+1 por nivel al fijo?) antes de tocar los números; cuidar la regla P216 (lo que
+>   suma el Ef.Esp ya escala por sí solo).
 > - [ ] **🐾 Configurar armas y armaduras naturales de los creeps, al detalle (2026-10-24, dueño: «quiero ir bien al detalle ahí y en este momento no
 >   puedo prestarle atención»):** la idea (D8 de `plan-inventario-creeps.md`): a una bestia se le carga una pieza del catálogo, se la marca natural y se
 >   le cambia el nombre («Garra de la pindonga»): tiene todo lo de la pieza, no se cae ni la levanta otro y al morir deja el trofeo. **Hoy**: el arma sí

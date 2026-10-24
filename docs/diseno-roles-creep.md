@@ -30,10 +30,10 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 7**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24) · de El origen: proyectil, fuego con quemadura.
 - 🧿 **Debuffer — 8**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24) · de El origen: ceguera, veneno, inmovilizar.
-- 💚 **Support — 7**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24) · de El origen: escudo a un aliado.
+- 💚 **Support — 8**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24), estandarte (Estandarte de guerra, 2026-10-24) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
-**Para emparejar**: Mago y Support en 7, Debuffer en 8 (2026-10-24); después Rango + Hunter (11).
+**Para emparejar**: Mago en 7, Debuffer y Support en 8 (2026-10-24); después Rango + Hunter (11).
 
 ## Los roles
 
@@ -319,8 +319,8 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
 
 **F. Auras, estandartes y tótems**
 25. **Aura de mando**: los aliados cerca del support pegan mejor mientras esté de pie (hoy, a mano) ✦.
-26. **Estandarte de guerra / Tótem**: coloca un objeto que potencia a los aliados cercanos mientras exista; los jugadores lo pueden romper (otro
-    objetivo, y la pelea se apura) ✦.
+26. ✅ **Estandarte de guerra** ✦ (2026-10-24): clava un estandarte en una casilla pegada; sus aliados a 3 casillas (diámetro 7) suman +3 PdG y +5 al daño
+    mientras siga en pie (10 de vida por nivel, sin defensas ni resistencias); dura hasta que lo rompan; uno por creep. Falta el Tótem.
 27. **Lazo**: cuando un aliado vinculado pega, el support se cura (o al revés).
 
 **G. Reacciones (en el turno del rival)**

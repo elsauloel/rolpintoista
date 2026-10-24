@@ -1787,6 +1787,11 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   en su Rango; primero el que ataca en el duelo abierto: la usa en ese golpe si llega antes de tirar el daño, aunque ya haya tirado el PdG — `cargaAlGolpeAbierto`, js/13,
   engancha la carga a ese duelo) y se ejecuta como desde sus Acciones (`ac.objetivoFijo` +
   `acEjecutarHab`, que en turno ajeno cobra el doble con `CreepAcciones.ejecutarHab(…, {doble})`).
+- **🚩 El Estandarte de guerra** (2026-10-24, Support; `js/73-estandarte.js`): `plantarEstandarte(sc, h)` (desde `ui.estandarte` de js/12) pide una casilla libre
+  pegada al creep y crea un creep nuevo (ficha, imagen de bandera dibujada, token; `sc.estandarte = {de, radio, pdg, dano}`, `recompensado`, todo en 1, la vida
+  por un estado con `hpmax`). Lo público lleva `estandarteRadio/Pdg/Dano` (`CreepCalculo.tarjetaPublica`, leído en js/09). `estandarteBonus(mio)` → `{pdg,
+  dano}` para un creep a `radio` o menos de uno en pie; js/13 y js/17 lo pasan a `Duelo.crear({estandarte})`. La pantalla del GM saca los rotos (token y
+  ficha). El aura, `estandarteDibujar(z)` desde js/05.
 - **🥷 Entrar en sigilo a la vista se anuncia** (2026-10-24, regla del dueño; `js/72-sigilo-a-la-vista.js`): cada 700 ms, la pantalla que maneja un token
   (el GM a un creep; a un personaje o invocación, `bnManejo`) mira si pasó a estar en sigilo; si en ese momento algún rival lo ve (`rivalesDe` +
   `celdasVisionDe`; un creep con la niebla de guerra apagada, siempre) y no está en el cono de un rival (ahí lo detectan en el acto), Mesa y Crónica

@@ -566,6 +566,8 @@ const Duelo = (() => {
     // 😱 Miedo (2026-10-18): quien ataca le tiene miedo al defensor: −1 PdG (o PdG.Esp) y −1 al daño, con arma o con habilidad.
     if(_num(cfg.miedo) > 0) inicial.ataque.miedo = Math.min(3, Math.round(_num(cfg.miedo)));
     if(_num(cfg.presa) > 0) inicial.ataque.presa = Math.min(5, Math.round(_num(cfg.presa)));   // 🎯 el defensor es la Presa (2026-10-21): +2 al daño
+    // 🚩 Bajo el estandarte (2026-10-24, el Estandarte de guerra del Support; lo calcula el mapa, vtt-hexgrid/js/73): +N al PdG (o PdG.Esp) y +N al daño.
+    if(cfg.estandarte && (_num(cfg.estandarte.pdg) > 0 || _num(cfg.estandarte.dano) > 0)) inicial.ataque.estandarte = {pdg: Math.min(10, Math.max(0, Math.round(_num(cfg.estandarte.pdg)))), dano: Math.min(20, Math.max(0, Math.round(_num(cfg.estandarte.dano))))};
     if(_num(cfg.espaldaPdg) > 0 && !hab){ inicial.ataque.porLaEspalda = true; inicial.ataque.espaldaPdg = Math.min(5, Math.round(_num(cfg.espaldaPdg))); }
     if(hab){
       inicial.hab = hab;   // (la regla de Firestore tiene que conocer el campo `hab`)
@@ -608,6 +610,7 @@ const Duelo = (() => {
     if(d.ataque && _num(d.ataque.presa) > 0) t.push(`🎯 contra la presa: +${_fmt(d.ataque.presa)} al daño`);
     if(d.ataque && d.ataque.desarme) t.push(`🤺 ${d.ataque.desarme.quien || ''} intenta desarmar (si gana el Bloqueo, el otro pierde lo que tiene en la mano)`);
     if(d.ataque && _num(d.ataque.miedo) > 0) t.push(`😱 con miedo: −${_fmt(d.ataque.miedo)} PdG y −${_fmt(d.ataque.miedo)} de daño`);
+    if(d.ataque && d.ataque.estandarte) t.push(`🚩 bajo el estandarte: +${_fmt(_num(d.ataque.estandarte.pdg))} ${d.hab ? 'PdG.Esp' : 'PdG'} y +${_fmt(_num(d.ataque.estandarte.dano))} de daño`);
     if(d.ataque && _num(d.ataque.embestida) > 0) t.push(`🐂 embestida: +${_fmt(d.ataque.embestida)} PdG`);
     if(d.ataque && _num(d.ataque.quieto) > 0) t.push(`💍 ${d.hab ? 'foco' : 'puntería certera'}: +${_fmt(d.ataque.quieto)} ${d.hab ? 'PdG.Esp' : 'PdG'}`);
     if(d.ataque && _num(d.ataque.primeraSangre) > 0) t.push(`💍 primera sangre: +${_fmt(d.ataque.primeraSangre)} de daño si pega`);
@@ -925,6 +928,8 @@ const Duelo = (() => {
       if(qto > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + qto, mod: p0.mod + qto, formula: `${p0.formula} +${qto} quieto`.slice(0, 60)}; }
       const mie = campo === 'pdg' && m.ataque ? _num(m.ataque.miedo) : 0;   // 😱 le tiene miedo al defensor
       if(mie > 0){ const p0 = m.pdg; m.pdg = {...p0, total: Math.max(0, p0.total - mie), mod: p0.mod - mie, formula: `${p0.formula} −${mie} miedo`.slice(0, 60)}; }
+      const esd = campo === 'pdg' && m.ataque && m.ataque.estandarte ? _num(m.ataque.estandarte.pdg) : 0;   // 🚩 bajo el estandarte
+      if(esd > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + esd, mod: p0.mod + esd, formula: `${p0.formula} +${esd} estandarte`.slice(0, 60)}; }
       const tpd = campo === 'pdg' && m.ataque && m.ataque.tiro ? _num(m.ataque.tiro.pdg) : 0;   // el bono del tiro: distancia ideal (+) o tiro alto (−2)
       if(tpd){ const p0 = m.pdg; m.pdg = {...p0, total: Math.max(0, p0.total + tpd), mod: p0.mod + tpd, formula: `${p0.formula} ${tpd > 0 ? '+' : '−'}${Math.abs(tpd)} ${m.ataque.tiro.motivo}`.slice(0, 60)}; }
       if(campo === 'eva' && defensa) m.defensa = defensa;
@@ -1190,6 +1195,8 @@ const Duelo = (() => {
       if(mied > 0) m.dano = {...m.dano, crudo: Math.max(0, m.dano.crudo - mied), mod: m.dano.mod - mied, formula: `${m.dano.formula} −${mied} miedo`.slice(0, 60)};
       const prs = m.ataque ? _num(m.ataque.presa) : 0;   // 🎯 contra la presa: +2 al daño
       if(prs > 0) m.dano = {...m.dano, crudo: m.dano.crudo + prs, mod: m.dano.mod + prs, formula: `${m.dano.formula} +${prs} presa`.slice(0, 60)};
+      const esdd = m.ataque && m.ataque.estandarte ? _num(m.ataque.estandarte.dano) : 0;   // 🚩 bajo el estandarte: +5 al daño
+      if(esdd > 0) m.dano = {...m.dano, crudo: m.dano.crudo + esdd, mod: m.dano.mod + esdd, formula: `${m.dano.formula} +${esdd} estandarte`.slice(0, 60)};
       const tf = m.ataque && m.ataque.tiro ? _num(m.ataque.tiro.fijo) : 0;   // el bono del tiro: daño fijo de la distancia ideal (o la caída, negativo)
       if(tf) m.dano = {...m.dano, crudo: Math.max(0, m.dano.crudo + tf), mod: m.dano.mod + tf, formula: `${m.dano.formula} ${tf > 0 ? '+' : '−'}${Math.abs(tf)} ${m.ataque.tiro.motivo}`.slice(0, 60)};
       const td = m.ataque && m.ataque.tiro && m.ataque.tiro.dado && typeof tirarDados === 'function' ? tirarDados(m.ataque.tiro.dado) : null;   // el primer disparo del combate: +1 dado

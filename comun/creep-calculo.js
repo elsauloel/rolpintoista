@@ -504,6 +504,10 @@ const CreepCalculo = (() => {
       // 💀 La Calavera con vela (2026-10-18): el aura y el Ef.Esp con que asusta (lo tira la pantalla del jugador que entra, js/52).
       // Siempre se escribe (2026-10-19: si no, al sacarle el aura el documento público seguía con la vieja y el creep seguía asustando).
       auraMiedo: auraMiedo(sc), auraEfEsp: auraMiedo(sc) > 0 ? (v => Number.isFinite(v) ? Math.round(v) : 0)(statValor(sc, 'dmgesp')) : 0,
+      // 🚩 Es un estandarte de guerra (2026-10-24, vtt-hexgrid/js/73): su aura y su bonus, para que todas las pantallas lo dibujen (0 = no lo es).
+      estandarteRadio: sc.estandarte ? Math.max(0, Math.round(num(sc.estandarte.radio))) : 0,
+      estandartePdg: sc.estandarte ? Math.max(0, Math.round(num(sc.estandarte.pdg))) : 0,
+      estandarteDano: sc.estandarte ? Math.max(0, Math.round(num(sc.estandarte.dano))) : 0,
     };
   }
   // Alcance de su arma, en casilleros: un arma de rango usa su Rango; una de cuerpo a cuerpo, 1 + lo que le sume a Rango.

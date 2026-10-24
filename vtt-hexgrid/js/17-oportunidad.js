@@ -281,7 +281,9 @@ async function oporAtacar(a){
     let miedo = 0;
     try{ miedo = r ? miedoContra(r, m) : 0; }catch(err){ console.error('No se pudo ver el miedo:', err); }   // 😱 (js/52)
     const tiro = dt.vigilancia ? {pdg: VIGILANCIA_PDG, motivo: 'desde la vigilancia'} : null;   // 👁 el disparo de la vigilancia: +2 PdG (dueño, 2026-10-21)
-    await Duelo.crear({yo: a.yo, ataque: a.ataque, espaldaPdg, miedo, ...(tiro ? {tiro} : {})}, {id: dt.moverId, nombre: nombreDe(m), tipo: m.tipo, fichaId: m.fichaId, duenoUid: m.duenoUid}, dt.rivalId);
+    let estandarte = null;
+    try{ estandarte = r && typeof estandarteBonus === 'function' ? estandarteBonus(r, a.yo) : null; }catch(err){ console.error('No se pudo ver el estandarte:', err); }   // 🚩 (js/73)
+    await Duelo.crear({yo: a.yo, ataque: a.ataque, espaldaPdg, miedo, ...(tiro ? {tiro} : {}), ...(estandarte ? {estandarte} : {})}, {id: dt.moverId, nombre: nombreDe(m), tipo: m.tipo, fichaId: m.fichaId, duenoUid: m.duenoUid}, dt.rivalId);
   }catch(err){
     console.error('No se pudo abrir el duelo de oportunidad:', err);
     toast('No se pudo abrir el duelo: ' + String((err && err.message) || err).slice(0, 120));

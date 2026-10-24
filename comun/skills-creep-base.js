@@ -68,7 +68,7 @@
     'Barrido': ['choque pesado', 'barrido'], 'Coletazo': ['choque pesado', 'barrido'],
     'Tiro a la cabeza': ['rango', 'tiro apuntado'], 'Desarmar': ['choque pesado', 'desarmar'], 'El que avisa no traiciona': ['choque pesado', 'golpe anunciado'], 'Sal en la herida': ['choque liviano', 'abrir la herida'], 'Remate': ['choque pesado', 'remate'], 'Ir por el herido': ['choque pesado', 'remate'], 'Morder la herida': ['choque liviano', 'abrir la herida'], 'Patotear': ['choque liviano', 'manada'], 'Jauría': ['choque liviano', 'manada'], 'Zarpazo erguido': ['choque pesado', 'golpe anunciado'], 'Mal de ojo': ['debuffer', 'maleficio'], 'Disparo señalador': ['rango', 'señalar'], 'Ráfaga de cortes': ['choque liviano', 'ráfaga'], 'Ráfaga de zarpazos': ['choque liviano', 'ráfaga'],
     'Romper armadura': ['choque pesado', 'romper armadura'], 'Arrancar la coraza': ['choque pesado', 'romper armadura'],
-    'Golpe demoledor': ['choque pesado', 'romper armadura'], 'Mandíbula trituradora': ['choque pesado', 'romper armadura'], 'Cadena de rayos': ['mago', 'rayo en cadena'], 'Hálito polar': ['mago', 'cono de frío'],
+    'Golpe demoledor': ['choque pesado', 'romper armadura'], 'Mandíbula trituradora': ['choque pesado', 'romper armadura'], 'Cadena de rayos': ['mago', 'rayo en cadena'], 'Hálito polar': ['mago', 'cono de frío'], 'Coraza de púas': ['support', 'devolver el daño'], 'Velo espejado': ['support', 'devolver el daño'],
     'Puñalada por la espalda': ['choque liviano', 'por la espalda'], 'Mordida a traición': ['choque liviano', 'por la espalda'], 'Puñalada trapera': ['choque liviano', 'por la espalda'],
   };
 
@@ -331,6 +331,15 @@
   H('Aura sanadora', 'CA', '*', 'a', 4, {detalle: 'Se rodea de un aura que cura: durante 4 turnos, al activarla y al empezar cada uno de sus turnos (4 veces en total) cura 4 de vida a todos sus aliados a 5 casillas o menos (diámetro 11), él incluido, sin tirar dados. El aura se mueve con él.',
     no2: 3, spCosto: 5, auditada: true, ataqueTxt: 'aura de diámetro 11: cura 4 a todos sus aliados cerca, 4 veces (al activarla y al empezar sus turnos)',
     duelo: {objetivo: 'uno mismo', tira: '', contra: [], efectos: [{nombre: 'Aura sanadora', polaridad: 'buff', turnos: 4, detalle: 'Aura sanadora: al empezar cada uno de sus turnos, 4 de vida a sus aliados a 5 casillas o menos (vtt-hexgrid/js/70).'}]}}, 'aura');
+  // 🌵🪞 Auditadas (dueño, 2026-10-24: «un buff que le da a un aliado Espinas y otro que le da Espejo», concepto «devolver el daño» del Support): los
+  // presets de siempre, ya automatizados en el duelo (vtt-hexgrid/js/13: dueloEspinas / dueloEspejo), a él o a un aliado en su Rango, como el Bálsamo.
+  // Costos propuestos por Claude: 1 No2 y 2 SP, o cooldown 3; 3 turnos.
+  H('Coraza de púas', 'B', '*', 'a', 3, {detalle: 'Le cubre la piel de púas a un aliado (o a sí mismo) dentro de su Rango: durante 3 turnos, cada ataque cuerpo a cuerpo que recibe le devuelve al atacante un cuarto del golpe (antes de la Defensa, redondeado para arriba), directo a la vida (Espinas).',
+    no2: 1, spCosto: 2, auditada: true, ataqueTxt: 'Espinas 3 turnos a él o a un aliado en su Rango',
+    duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', efectos: [{nombre: 'Espinas', turnos: 3}]}});
+  H('Velo espejado', 'B', '*', 'a', 3, {detalle: 'Envuelve a un aliado (o a sí mismo) dentro de su Rango en un velo que refleja la magia: durante 3 turnos, cada ataque de daño especial que recibe (varita, báculo, habilidad o el daño elemental de un arma, a cualquier distancia) le devuelve al que lo tiró un cuarto de ese daño (redondeado para arriba), directo a la vida (Espejo).',
+    no2: 1, spCosto: 2, auditada: true, ataqueTxt: 'Espejo 3 turnos a él o a un aliado en su Rango',
+    duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', efectos: [{nombre: 'Espejo', turnos: 3}]}});
   H('Bendición', 'B', 'hd', 'a', 4, tA('Bendice a un aliado: +1 de Daño y +2 de Defensa 3 turnos (a mano).', 2));
   H('Escudar aliado', 'T', 'hdc', 'at', 3, tA('Un aliado adyacente gana +3 de Defensa 2 turnos (a mano).', 2));
   H('Orden de ataque', 'B', 'hd', 'a', 3, tA('Un aliado puede atacar sin gastar No2 este turno (a mano).', 2));

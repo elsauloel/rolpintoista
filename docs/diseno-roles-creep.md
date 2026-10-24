@@ -30,10 +30,10 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 5**: daño en área, rayo en cadena, cono de frío (Hálito polar) · de El origen: proyectil, fuego con quemadura.
 - 🧿 **Debuffer — 5**: control mental, maleficio · de El origen: ceguera, veneno, inmovilizar.
-- 💚 **Support — 4**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23 · de El origen: escudo a un aliado.
+- 💚 **Support — 5**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
-**Para emparejar, los que van primero**: Support (4), después Mago y Debuffer (5).
+**Para emparejar**: Mago, Debuffer y Support empatados en 5 (2026-10-24).
 
 ## Los roles
 
@@ -261,8 +261,8 @@ cubierto). Pedido del dueño: arrancar por las que **aceleran la pelea** (que se
 las posibilidades del rol. ✦ = acelera la pelea. Lo que ya existe en el mapa para personajes (Empower, Re-roll, Enyetar, Marcado, Turno libre,
 Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep está auditada; las que hay son casi todas «a mano».
 
-**▶ La próxima vez que toque Support** (dueño, 2026-10-21): un buff que le da a un aliado **Espinas** (devuelve parte del golpe) y otro que le da
-**Espejo** (los dos, como buffs de support). Ya cubierto: ✅ **Arma elemental** (concepto 3, 2026-10-21: Arma ígnea, helada, eléctrica, ácida y venenosa).
+✅ **Devolver el daño** (dueño, 2026-10-21: «un buff que le da a un aliado Espinas y otro que le da Espejo»; hecho el 2026-10-24): **Coraza de púas**
+(Espinas) y **Velo espejado** (Espejo), a él o a un aliado en su Rango, 3 turnos. Ya cubierto: ✅ **Arma elemental** (concepto 3, 2026-10-21: Arma ígnea, helada, eléctrica, ácida y venenosa).
 
 **A. Potenciar el golpe de los aliados** ✦
 1. ✅ **Grito de guerra** (2026-10-23): **¡A la carga!** (+2 a la PdG, PdG.Esp, daño y Ef.Esp, 2 turnos) y **Arenga** (Bendecido, +1 a todo, 3 turnos),

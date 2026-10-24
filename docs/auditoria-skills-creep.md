@@ -259,6 +259,11 @@
   deja esquivar. **Con el Ef.Esp** (dueño, 2026-10-24: «con Ef»): **2d4 + ¼ de su Efecto especial**, y por P216 (2026-10-23: una skill que suma el Ef.Esp
   cuesta en proporción a él) **cuesta su Especial en SP**, o cooldown 3; 3 No2. Costos propuestos por Claude. **Para probar.**
 
+- ✅ **Coraza de púas** y **Velo espejado** (Support, «devolver el daño», 2026-10-24, dueño: «un buff que le da a un aliado Espinas y otro que le da
+  Espejo»): los presets de siempre, ya automatizados en el duelo, a él o a un aliado dentro de su Rango, sin tirada (como el Bálsamo). **Coraza de púas**:
+  Espinas 3 turnos (cada golpe cuerpo a cuerpo que recibe le devuelve al atacante ¼ del golpe, directo a la vida). **Velo espejado**: Espejo 3 turnos (lo
+  mismo con el daño especial, a cualquier distancia). 1 No2 y 2 SP, o cooldown 3 (los propuso Claude). **Para probar.**
+
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 
 ## Etiquetas

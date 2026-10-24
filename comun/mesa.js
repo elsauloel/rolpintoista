@@ -41,7 +41,7 @@ let mesaTextoPendiente = '';
 // quien (opcional, 2026-10-09): de quién es (un creep: el mapa de cada jugador decide si la ve, ver mesaFiltrar).
 async function mesaLinea(texto, desde, quien){
   if(typeof fbDb === 'undefined' || !fbDb || !fbUsuario || !fbMiembro) return;
-  mesaAntes();
+  mesaAntes(`${quien || ''} ${texto || ''}`);
   try{
     await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: String(quien || '').slice(0, 60), origen: String(texto || '').slice(0, 400),
       formula: '', rolls: [], mod: 0, total: 0, desde: desde || 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()});
@@ -50,9 +50,9 @@ async function mesaLinea(texto, desde, quien){
 function mesaConTexto(detalle){ mesaTextoPendiente = String(detalle || '').slice(0, 300); }
 // Lo que la pantalla tenga para escribir ANTES de una línea o tirada propia (2026-10-24, el mapa: el aviso «fuera de turno», que espera a que
 // la acción de verdad ocurra). Va primero porque Firestore ordena por la hora de llegada.
-function mesaAntes(){
+function mesaAntes(texto){
   if(typeof window === 'undefined' || typeof window.mesaAntesDePublicar !== 'function') return;
-  try{ window.mesaAntesDePublicar(); }catch(e){ console.error(e); }
+  try{ window.mesaAntesDePublicar(String(texto || '')); }catch(e){ console.error(e); }
 }
 
 // Devuelve el id de la tirada en la Mesa (o undefined si no se publicó). r.quien: quién tira, si la herramienta no lo sabe por el
@@ -65,7 +65,7 @@ async function mesaPublicar(origen, r){
     if(typeof MESA_AVISAR_SIN_SESION !== 'undefined' && MESA_AVISAR_SIN_SESION) toast('Entrá a la mesa para tirar');
     return;
   }
-  mesaAntes();
+  mesaAntes(`${r.quien || ''} ${origen || ''}`);
   const texto = mesaTextoPendiente;
   mesaTextoPendiente = '';
   const quien = String(r.quien || mesaQuien(origen) || '');
@@ -323,6 +323,11 @@ function mesaRender(docs){
   if(!primeraVez && typeof mesaAlAccionNueva === 'function'){
     const nuevas = docs.filter(d => nuevasIds.has(d.id));
     if(nuevas.length) mesaAlAccionNueva(nuevas);
+  }
+  // Lo que llegó de esta misma pantalla (2026-10-24: el mapa suelta ahí el aviso «fuera de turno» de una acción que escribió en la Mesa por su cuenta).
+  if(!primeraVez && typeof window !== 'undefined' && typeof window.mesaLlegaronMias === 'function' && fbUsuario){
+    const mias = docs.filter(d => nuevasIds.has(d.id) && d.data().uid === fbUsuario.uid).map(d => d.data());
+    if(mias.length){ try{ window.mesaLlegaronMias(mias); }catch(e){ console.error(e); } }
   }
   // Dados 3D para las tiradas nuevas, de la más vieja a la más nueva.
   if(!primeraVez && typeof dadosAnimarTirada === 'function'){

@@ -687,18 +687,24 @@ window.confirmarTurnoSaber = o => {
    todos. No avisan las defensas (no pasan por acá), la oportunidad y el contraataque (son de turno ajeno) ni el ⚡ Flash (avisa ConfirmarTurno). */
 // Un botón (no moverse) queda PENDIENTE hasta que la acción de verdad ocurre (2026-10-24, dueño: cancelar el cartel del Muro de fuego dejaba
 // «actúa fuera de su turno» en la Mesa sin que hubiera pasado nada): se publica justo antes de lo primero que esta pantalla escriba en la
-// Mesa (comun/mesa.js → window.mesaAntesDePublicar). Si se cancela antes, no sale nada; otro botón lo reemplaza; vence a los 5 minutos.
+// Mesa nombrando a ese token (comun/mesa.js: window.mesaAntesDePublicar, o window.mesaLlegaronMias para lo que se escribe directo).
+// Si se cancela antes, no sale nada; otro botón lo reemplaza; vence a los 3 minutos.
 let fueraDeTurnoPendiente = null;
 function fueraDeTurnoPublicar(p){
   if(typeof mesaLinea === 'function') mesaLinea(`⏱ ${p.nombre} actúa fuera de su turno: ${p.accion}`);
   // y en la Crónica, para todos (dueño, 2026-10-06); quien la hizo ya lo vio en el aviso
   momentoAbrir({tipo: 'fuera-de-turno', icono: '⏱', titulo: `${p.nombre} actúa fuera de su turno`, resultado: p.accion, estado: 'listo', datos: {centro: true}});
 }
-window.mesaAntesDePublicar = () => {
+function fueraDeTurnoSoltar(texto){
   const p = fueraDeTurnoPendiente;
+  if(!p) return;
+  if(Date.now() - p.hora > 3 * 60e3){ fueraDeTurnoPendiente = null; return; }
+  if(!String(texto || '').includes(p.nombre) || /actúa fuera de su turno/.test(texto)) return;
   fueraDeTurnoPendiente = null;
-  if(p && Date.now() - p.hora < 5 * 60e3) fueraDeTurnoPublicar(p);
-};
+  fueraDeTurnoPublicar(p);
+}
+window.mesaAntesDePublicar = texto => fueraDeTurnoSoltar(texto);
+window.mesaLlegaronMias = docs => docs.forEach(t => fueraDeTurnoSoltar(`${t.quien || ''} ${t.origen || ''} ${t.formula || ''}`));
 function avisarFueraDeTurno(tokenId, b){
   if(modoMapa !== 'combate' || esSuTurno(tokenId) !== false) return;
   if(b && (b.dataset.botoneraaccion === 'otroataque' || b.classList.contains('bt-flash'))) return;

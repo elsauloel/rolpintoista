@@ -28,14 +28,14 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
   robar, sigilo, varios golpes, bajo tierra, veneno.
 - 🏹 **Rango y Hunter — 11**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
-- ✨ **Mago — 10**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25) · de El origen: proyectil, fuego con quemadura.
+- ✨ **Mago — 11**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25), lluvia de escarcha (2026-10-25) · de El origen: proyectil, fuego con quemadura.
 - 🧿 **Debuffer — 11**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25), silencio (Tótem de silencio, 2026-10-25) · de El origen: ceguera, veneno, inmovilizar.
 - 💚 **Support — 11**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24), estandarte (Estandarte de guerra, 2026-10-24), señalar la presa (2026-10-25), armas perforantes (2026-10-25), redoble de tambores (2026-10-25) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
 **Para emparejar** (regla del dueño, 2026-10-25: «empezamos a tener en cuenta todos los roles de creep e ir emparejándolos… para que estén todos
-avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-25): Debuffer y Support en 11;
-Mago en 10 → a 11, donde los alcanza Rango + Hunter; después los cuatro juntos hasta Choque liviano (14). El Jefe va aparte.
+avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-25): Mago, Debuffer y Support en 11,
+como Rango + Hunter; después los cuatro juntos hasta Choque liviano (14). El Jefe va aparte.
 
 ## Los roles
 
@@ -258,10 +258,9 @@ líneas, zonas, el rayo en cadena y los charcos, los controles mentales.
     reparten entre objetivos a elección). 3. ✅ **Descarga arcana** ✦ (2026-10-24, ex «Rayo cargado»: un turno lo carga a la vista de todos y queda Marcado —«una luz lo recubre», se lo ve en la niebla—; al siguiente,
     4d6 arcano; 10 de daño se lo cortan).
   - **B. Áreas que se anuncian y terreno:** 4. ✅ **Meteoro** ✦ (2026-10-24: una sombra de diámetro 5 en su Rango; al empezar su próximo turno cae: dodge roll
-    para todos los de adentro —aliados incluidos—, 4d6 físico y 2d6 de fuego directo al que sigue adentro; cooldown 3 que arranca activo). 5. **▶ LA PRÓXIMA del Mago: Lluvia de escarcha** (dueño, 2026-10-25, reemplaza a «Suelo helado»: «una lluvia de escarcha que haga daño de hielo y
-    que deje el piso congelado durante 2 turnos y después deje el charco por tiempo indeterminado»). Ya existe la mecánica: el hielo y el charco de
-    `vtt-hexgrid/js/50-superficies.js` (el «suelo congelado» de la Varita de la ventisca; al irse el hielo queda el charco, que no vence). Falta decidir
-    el área, el daño y el costo. 6. **Diluvio** (deja charcos: el rayo corre por el agua, combo con la Cadena de rayos).
+    para todos los de adentro —aliados incluidos—, 4d6 físico y 2d6 de fuego directo al que sigue adentro; cooldown 3 que arranca activo). 5. ✅ **Lluvia de escarcha** (2026-10-25, reemplaza a «Suelo helado»): área de diámetro 5 en su Rango, PdG.Esp contra Evasión (dodge roll), 2d4 + ¼ Ef.Esp
+    de hielo; el suelo congelado 2 turnos (el de la Varita de la ventisca) y después el charco, que no vence. 4 No2 y su Especial en SP, o cooldown 3.
+    6. **Diluvio** (deja charcos: el rayo corre por el agua, combo con la Cadena de rayos).
     7. **Nova arcana** (una onda alrededor que empuja).
   - **C. Control elemental:** 8. **Prisión de hielo** (Inmovilizado, se suelta con Fuerza). 9. **Ráfaga de viento** (cono que empuja y tira al piso).
     10. ✅ **Zap** (ex «Rayo paralizante», 2026-10-25: no se esquiva; 1d4 eléctrico directo y Parálisis salvo que la resista con Res.Esp; salta con la mitad, 50 % y 25 % de Parálisis).

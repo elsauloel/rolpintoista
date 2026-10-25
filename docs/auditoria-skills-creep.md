@@ -329,7 +329,8 @@
   sus tres estados buenos con la duración y el detalle, se eligió Escudo especial y se lo sacó (la Mesa: «le sacó Escudo especial»). Falta: que lo vea un jugador.
 - ✅ **Señalar la presa** (Support, «concentrar el fuego», 2026-10-25, dueño: «menos 2 a Evasión y más 4 al daño»): su PdG.Esp contra la Res.Esp de un
   rival en su Rango; si gana, **Presa señalada** 2 turnos (preset nuevo: Evasión −2, `presa: 4`; `presaContra` de js/13 suma ese daño a todo el que lo
-  ataca y, con dos Presas encima, vale la más fuerte). 1 No2 y 2 SP, o cooldown 3 (costo propuesto por Claude). **Para probar.**
+  ataca y, con dos Presas encima, vale la más fuerte). 1 No2 y 2 SP, o cooldown 3 (costo propuesto por Claude). Probado en el mapa el 2026-10-25 (GM): ganó contra juan, le llegó la Presa señalada
+  2 turnos, su Evasión pasó de 8 a 6 y el ataque siguiente del Escarabajo declaró «🎯 contra la presa: +4 al daño». Falta: que lo vea un jugador.
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 
 ## Etiquetas

@@ -51,7 +51,7 @@ const FichaResumen = (() => {
   function invModTotal(inv, statId){
     let total = 0;
     invFuentesEquipo(inv).forEach(it => (it.mods||[]).forEach(m => { if(m.stat === statId) total += num(m.val); }));
-    (inv.estados||[]).forEach(es => {
+    (typeof Combatiente !== 'undefined' && Combatiente.sinPresasDebiles ? Combatiente.sinPresasDebiles(inv.estados||[]) : (inv.estados||[])).forEach(es => {   // (dos Presas: solo la más fuerte, 2026-10-25)
       if(es.activo === false) return;
       const stacks = Math.max(1, num(es.stacks)||1);
       (es.mods||[]).forEach(m => { if(m.stat === statId) total += num(m.val) * stacks; });

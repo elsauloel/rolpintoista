@@ -1327,10 +1327,7 @@ function embestidaDe(atq, def){
 function presaContra(atq, def){
   if(!atq || !def || !dueloEsRival(atq, def)) return 0;
   const est = (((vinculo(def) || {}).resumen || {}).estados || []);
-  const cuanto = e => { const p = (typeof ESTADOS_PRESET !== 'undefined' ? ESTADOS_PRESET : []).find(x => x.nombre === e.nombre);
-    const v = Math.round(num(e.presa)) > 1 ? num(e.presa) : p && num(p.presa) > 1 ? num(p.presa) : (e.presa || e.nombre === 'Presa') ? 2 : 0;
-    return Math.round(v); };
-  return est.reduce((m, e) => e && e.activo !== false ? Math.max(m, cuanto(e)) : m, 0);
+  return est.reduce((m, e) => Math.max(m, Combatiente.presaValor(e)), 0);
 }
 function porLaEspalda(atq, def){
   return !!(atq && def && enSigilo(atq) && enCunaCiega(atq, def));

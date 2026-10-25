@@ -1039,6 +1039,15 @@ prueba('🎯 Disparo señalador (2026-10-21): Presa (Evasión −1) y Marcado', 
   const P = estadosPresetCreep().find(p => p.nombre === 'Presa');
   igual([h.cd, a.efectos.map(e => (e.spec || {}).nombre).join(','), P.turnos, P.presa, JSON.stringify(P.mods)], [3, 'Presa,Marcado', 2, 2, '[{"stat":"eva","val":-1}]']);
 });
+prueba('🎯 Dos Presas a la vez (2026-10-25): vale solo la más fuerte, también la Evasión', () => {
+  const P = estadosPresetFicha(), toma = n => ({...JSON.parse(JSON.stringify(P.find(x => x.nombre === n))), activo: true});
+  const S = FichaGuardado.normalizar({}).S; S.efectos = [toma('Presa'), toma('Presa señalada')];
+  const evaAmbas = FichaCalculo.calcular(S).final.eva; S.efectos = [];
+  const evaNada = FichaCalculo.calcular(S).final.eva;
+  const sc = {estados: [toma('Presa'), toma('Presa señalada')]};
+  igual([evaNada - evaAmbas, CreepCalculo.modTotal(sc, 'eva'), Combatiente.sinPresasDebiles(sc.estados).map(e => e.nombre).join(','), Combatiente.presaValor({nombre: 'Presa'})],
+    [2, -2, 'Presa señalada', 2]);
+});
 prueba('✨ Lanza de luz (Mago, 2026-10-25): línea tan larga como su Rango, 3d6 arcano y Deslumbrado (Res.Esp −2, 2 turnos)', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Lanza de luz');
   const h = armarHabilidadDeCreep(e.datos, 2);

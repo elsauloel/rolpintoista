@@ -21,7 +21,7 @@ const ModTirada = (() => {
     // (Parálisis no aparece si ya parte Lisiado o Pajaritos; dos estados con la misma marca parten una sola vez).
     const parten = new Map();
     Combatiente.estadosQueParten(estados, statId).forEach(e => parten.set(e, (parten.get(e) || 0) + 1));
-    (estados || []).filter(e => e && e.activo !== false).forEach(e => {
+    Combatiente.sinPresasDebiles(estados || []).filter(e => e && e.activo !== false).forEach(e => {   // (dos Presas: solo la más fuerte, 2026-10-25)
       const pol = e.polaridad === 'buff' ? 'buff' : e.polaridad === 'debuff' ? 'debuff' : 'otro';
       (e.mods || []).filter(m => m && m.stat === statId && num(m.val)).forEach(m => {
         const v = num(m.val) * Math.max(1, num(e.stacks) || 1);   // los mods se multiplican por los stacks (Debilitado ×2 = −2, 2026-10-11)

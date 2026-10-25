@@ -219,7 +219,7 @@ const FichaCalculo = (() => {
       const compras = pasivaCompras(p);
       (p.mods||[]).forEach(m => push({stat:m.stat, val:num(m.val)*compras}, p.nombre + (compras>1 ? ' ×'+compras : ''), 'pasiva'));
     });
-    (S.efectos || []).filter(e=>e.activo !== false).forEach(e => (e.mods||[]).forEach(m => {
+    (typeof Combatiente !== 'undefined' && Combatiente.sinPresasDebiles ? Combatiente.sinPresasDebiles(S.efectos || []) : (S.efectos || [])).filter(e=>e.activo !== false).forEach(e => (e.mods||[]).forEach(m => {   // (dos Presas: solo la más fuerte, 2026-10-25)
       const stacks = Math.max(1, num(e.stacks) || 1);
       push({stat:m.stat, val:num(m.val)*stacks}, e.nombre + (stacks>1 ? ' ×'+stacks : ''), 'estado alterado');
     }));

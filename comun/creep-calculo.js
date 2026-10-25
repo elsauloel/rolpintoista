@@ -113,7 +113,7 @@ const CreepCalculo = (() => {
     let total = 0;
     // Un «+Rango de casteo» viejo suma al Rango (2026-10-07: el rango lo da la Destreza, siempre).
     fuentesEquipo(sc).forEach(it => (it.mods||[]).forEach(m => { if(m.stat === statId || (statId === 'rng' && m.stat === 'rangocasteo')) total += num(m.val); }));
-    (sc.estados||[]).forEach(es => {
+    (typeof Combatiente !== 'undefined' && Combatiente.sinPresasDebiles ? Combatiente.sinPresasDebiles(sc.estados||[]) : (sc.estados||[])).forEach(es => {   // (dos Presas: solo la más fuerte, 2026-10-25)
       if(es.activo === false) return;
       const stacks = Math.max(1, num(es.stacks)||1);
       (es.mods||[]).forEach(m => { if(m.stat === statId || (statId === 'rng' && m.stat === 'rangocasteo')) total += num(m.val) * stacks; });
@@ -250,7 +250,7 @@ const CreepCalculo = (() => {
     const deEquipo = fuentesEquipo(sc)
       .filter(it => (it.mods||[]).some(m => m.stat === statId))
       .map(it => it.nombre || '(sin nombre)');
-    const deEstados = (sc.estados||[])
+    const deEstados = (typeof Combatiente !== 'undefined' && Combatiente.sinPresasDebiles ? Combatiente.sinPresasDebiles(sc.estados||[]) : (sc.estados||[]))
       .filter(es => es.activo !== false && (es.mods||[]).some(m => m.stat === statId))
       .map(es => es.nombre || '(sin nombre)');
     return [...deEquipo, ...deEstados];

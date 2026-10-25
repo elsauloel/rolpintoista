@@ -59,7 +59,7 @@
     'Colmillos que perforan': ['choque liviano', 'sangrado'], 'Tajo brutal': ['choque liviano', 'sangrado'], 'Desgarro': ['choque liviano', 'sangrado'],
     'Corte certero': ['choque liviano', 'sangrado'], 'Zarpa certera': ['choque liviano', 'sangrado'], 'Tajo de carnicero': ['choque liviano', 'sangrado'],
     'Destripar': ['choque liviano', 'sangrado'],
-    'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'], 'Mantener a raya': ['rango', 'mantener a raya'], 'Extenuar': ['debuffer', 'extenuar'],
+    'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'], 'Mantener a raya': ['rango', 'mantener a raya'], 'Flecha que atraviesa': ['rango', 'atravesar'], 'Extenuar': ['debuffer', 'extenuar'],
     'Red': ['hunter', 'trabar'], 'Tela de araña': ['hunter', 'trabar'],
     'Hit and run': ['choque liviano', 'golpear y alejarse'],
     'Salto': ['choque liviano', 'salto'], 'Salto aplastante': ['choque pesado', 'salto'], 'Vigilancia': ['rango', 'vigilancia'], 'Bola de fuego': ['mago', 'daño en área'], 'Confusión': ['debuffer', 'control mental'],
@@ -788,6 +788,11 @@
     {}, 'va al duelo como un ataque; si pega, Sangrado', 1, SG), 'estados alterados');
   H('Tarascón al tobillo', 'DK', 'b', 'me', 3, aA('Un tarascón al tobillo: un ataque con su arma; si pega, queda Rengo 2 turnos (moverse le cuesta 2 No2 por casillero).',
     {}, 'va al duelo como un ataque; si pega, Rengo 2 turnos', 2, RG), 'estados alterados');
+  // 🏹 Auditada (dueño, 2026-10-25; Rango, «volumen de fuego», el equivalente para creeps del Proyectil perforante del Shooter: «vamos con la que
+  // atraviesa»): un disparo con su arma con +2 al daño (para que se sienta) que, pegue o no al primero, sigue derecho y le pega al primero que haya
+  // detrás en su Rango, contra la misma tirada (`perforante`, vtt-hexgrid/js/42). Costo el del Shooter: el ataque y 2 SP, o cooldown 3.
+  H('Flecha que atraviesa', 'D', 'hd', 'r', 3, aA('Un disparo que atraviesa: un ataque con su arma a distancia con +2 al daño; pegue o no al primero, sigue derecho por la misma línea y le pega al primero que haya detrás dentro de su Rango (aliado incluido; un Sólido o una pared lo frenan). El segundo se defiende contra la misma tirada y recibe el daño entero, sin los efectos especiales.',
+    {fijo: 2}, 'va al duelo como un ataque con +2 al daño; sigue de largo y le pega al de atrás', 2, [], {perforante: true}));
   // 🏹 Auditada (dueño, 2026-10-25; Rango, «mantener a raya»: «bueno para mantener distancia, que es su fuerte»; «y que además sume algo de daño»): un
   // disparo con su arma con +2 al daño; si pega, lo empuja 2 casillas (el Empujón de la Cornada, con su colisión) y queda Lento 2 turnos. Distinta del
   // Tiro a la rodilla (Rengo, sin empujar). El +2 lo propuso Claude; el dueño, el mismo día: «un casillero más de tirar para atrás y un SP más de costo»

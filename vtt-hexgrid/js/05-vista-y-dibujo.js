@@ -793,6 +793,7 @@ function dibujarLienzo(){
 
   if(typeof curaDibujarAuras === 'function' && curaDibujarAuras(z)) animando = true;   // ✨ las auras sanadoras, debajo de los tokens (js/70)
   if(typeof estandarteDibujar === 'function' && estandarteDibujar(z)) animando = true;   // 🚩 el aura de un estandarte de guerra (js/73)
+  if(typeof meteoroDibujar === 'function' && meteoroDibujar(z)) animando = true;   // ☄ la sombra de un meteoro por caer (js/74)
   if(typeof dibujarPozos === 'function') dibujarPozos(z);   // 🕳 el pozo de los que están bajo tierra (js/46)
   // Tokens.
   disposicion = calcularDisposicion();

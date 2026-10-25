@@ -1158,7 +1158,7 @@ function dueloDodgeEmpieza(d){
   Duelo.abrir(d.id);
   Duelo.minimizar();
   seleccionar(d.defensor.tokenId);
-  dodgeBanner = {id: d.id, tokenId: d.defensor.tokenId, nombre: d.defensor.nombre, grupoId: d.grupo && d.grupo.id, ...(d.hab && d.hab.soloDodge ? {tormenta: (d.hab.dano && d.hab.dano.formula) || '?'} : {})};   // (la Tormenta arcana: sin tirada)
+  dodgeBanner = {id: d.id, tokenId: d.defensor.tokenId, nombre: d.defensor.nombre, grupoId: d.grupo && d.grupo.id, ...(d.hab && d.hab.soloDodge ? {tormenta: (d.hab.dano && d.hab.dano.formula) || '?'} : {}), ...(d.hab && d.hab.meteoro ? {meteoro: `${(d.hab.dano && d.hab.dano.formula) || '?'} físico${d.hab.dano && d.hab.dano.extra ? ` + ${d.hab.dano.extra.formula} de ${d.hab.dano.extra.tipo}` : ''}`} : {})};   // (la Tormenta arcana: sin tirada · ☄ el Meteoro)
   renderDodgeBanner();
 }
 function dueloDodgeTermina(d){
@@ -1207,7 +1207,7 @@ function renderDodgeBanner(){
       botones: [{texto: '✋ Me quedo', alClic: () => { dodgeBanner = null; renderDodgeBanner(); }}]});
     return;
   }
-  AvisoCombate.cartel('dodge', {icono: dodgeBanner.tormenta ? '🌩' : '🏃', titulo: dodgeBanner.tormenta ? `Le cae la tormenta a ${dodgeBanner.nombre} (${dodgeBanner.tormenta})` : `${dodgeBanner.nombre} ganó la Evasión`, posicion: 'abajo',
+  AvisoCombate.cartel('dodge', {icono: dodgeBanner.meteoro ? '☄' : dodgeBanner.tormenta ? '🌩' : '🏃', titulo: dodgeBanner.meteoro ? `Le cae el meteoro a ${dodgeBanner.nombre} (${dodgeBanner.meteoro})` : dodgeBanner.tormenta ? `Le cae la tormenta a ${dodgeBanner.nombre} (${dodgeBanner.tormenta})` : `${dodgeBanner.nombre} ganó la Evasión`, posicion: 'abajo',
     texto: 'Arrastrá el token hasta 2 casilleros para intentar salir del área.',
     botones: [{texto: '🔎 Ver el duelo', sec: true, alClic: () => Duelo.abrir(dodgeBanner.id)}, {texto: '✋ No me quiero mover', alClic: () => dodgeDeclinar()}]});
 }
@@ -1363,7 +1363,7 @@ function dueloElegirAreaMapa(msg){
     if(hab.zonaQueda) dueloZonaQueda(hab, h, Math.max(1, radio), yo);   // lo que deja en el suelo (bola de fuego, ventisca)
     if(hab.despeja) despejarEn(enCono || new Set(celdasFlor(Math.max(1, radio)).map(o => { const c0 = hexACubo(h); return nbPack(cuboACol(c0.q + o.dq, c0.r + o.dr), cuboAFila(c0.q + o.dq, c0.r + o.dr)); })), hab.nombre);   // el vendaval
     const objetivos = todos
-      .filter(t => !hab.tormenta || !iniciativaFueraDeJuego(t.id))   // la tormenta no les cae a los caídos
+      .filter(t => !(hab.tormenta || hab.meteoro) || !iniciativaFueraDeJuego(t.id))   // la tormenta y el meteoro no les caen a los caídos
       // Un área de aliados (2026-10-23, la Oleada sanadora): entran los suyos ocultos (el GM con sus creeps) y él mismo (en un área; la onda, no: los gritos
       // son «no él»); una curación no les llega a los caídos.
       .filter(t => (!t.oculto || (hab.aliados && soyGM)) && !t.bajoTierra && !etereoDe(t) && (!propio(t) || (hab.aliados && hab.objetivo === 'area')) && (enCono ? enCono.has(nbPack(t.col, t.fila)) : distanciaHex(h, t) <= radio || (h.otro && distanciaHex(h.otro, t) <= radio)))   // (h.otro: la casilla de salida del Remolino)
@@ -1418,6 +1418,8 @@ function dueloElegirAreaMapa(msg){
     lanzar({col: mio.col, fila: mio.fila});
     return;
   }
+  // El centro ya marcado (2026-10-24, el Meteoro: cae donde se anunció la sombra, js/74).
+  if(msg.centroFijo){ lanzar({col: msg.centroFijo.col, fila: msg.centroFijo.fila}); return; }
   // El centro, cerca (2026-10-13, Golpe al piso): a `centroAlcance` casillas o menos, y no en la propia casilla.
   const cAlc = Math.round(num(hab.centroAlcance)), mioC = cAlc > 0 ? [...tokens.values()].find(propio) : null;
   const pedirCentro = () => elegirDestino(async h => {

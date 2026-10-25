@@ -672,6 +672,7 @@ const Duelo = (() => {
       ...(h.dano.trueDamage ? {trueDamage: true} : h.dano.directo ? {directo: true} : {}),   // dueño, 2026-10-07 (P169)
       ...(_num(h.dano.mult) > 1 ? {mult: Math.min(4, _num(h.dano.mult))} : {}), ...(h.dano.carga ? {carga: txtCorto(h.dano.carga, 20)} : {}),   // ✨ Carga Elemental (2026-10-13)
       ...(h.dano.porDano && typeof Combatiente !== 'undefined' && Combatiente.porDanoNorm(h.dano.porDano) ? {porDano: Combatiente.porDanoNorm(h.dano.porDano)} : {}),
+      ...(h.dano.extra && String(h.dano.extra.formula || '').trim() ? {extra: {formula: txtCorto(h.dano.extra.formula, 20), tipo: txtCorto(h.dano.extra.tipo || 'fuego', 20)}} : {}),   // ☄ un segundo daño de otro tipo (el Meteoro, 2026-10-24: 4d6 físico + 4d6 de fuego)
       ...(h.dano.diferencia ? {diferencia: true} : {}), ...(h.dano.drena ? {drena: true, drenaTope: Math.max(0, Math.round(_num(h.dano.drenaTope))), ...(_num(h.dano.drenaPct) > 0 && _num(h.dano.drenaPct) < 100 ? {drenaPct: Math.round(_num(h.dano.drenaPct))} : {})} : {})} : null;
     const efectos = limpiarEfectos(h.efectos);
     const objetivo = ['enemigo', 'aliado', 'cualquiera', 'uno mismo', 'area', 'onda', 'cono', 'linea'].includes(h.objetivo) ? h.objetivo : 'enemigo';   // cualquiera: aliado o enemigo (2026-10-15)
@@ -691,6 +692,7 @@ const Duelo = (() => {
       ...(h.menosDistancia ? {menosDistancia: true} : {}),   // −1 por casillero después del primero (pelea cercana)
       // Tormenta arcana (2026-10-13): sin tirada, cada sub-duelo arranca en el dodge roll; `cuenta` = cuántos proyectiles le tocaron a cada token.
       ...(h.soloDodge ? {soloDodge: true} : {}), ...(h.sinDodge ? {sinDodge: true} : {}),   // (un área sin dodge roll: la Luz cegadora)
+      ...(h.meteoro ? {meteoro: true} : {}),   // ☄ la Lluvia de meteoros (2026-10-24): cae del cielo, solo se esquiva con el dodge roll
       ...(h.tormenta ? {tormenta: {proyectiles: txtCorto(h.tormenta.proyectiles || '1d20', 12), cada: txtCorto(h.tormenta.cada || '1d4', 12),
         ...(h.tormenta.cuenta && typeof h.tormenta.cuenta === 'object' ? {cuenta: Object.fromEntries(Object.entries(h.tormenta.cuenta).slice(0, 40).map(([k, v]) => [txtCorto(k, 40), Math.max(0, Math.min(40, Math.round(_num(v))))]))} : {}),
         ...(_num(h.tormenta.total) > 0 ? {total: Math.round(_num(h.tormenta.total))} : {})}} : {}),
@@ -1229,6 +1231,10 @@ const Duelo = (() => {
           crudos = crudos.filter(e => !(e && e.danoMagico));
         }
       }
+      // ☄ El segundo daño de una habilidad (el Meteoro: 4d6 de fuego además de los 4d6 físicos): se tira acá y lo aplica el mapa como el daño
+      // elemental de un arma (directo a la vida, menos la resistencia a su elemento).
+      const ext = m.hab && m.hab.dano && m.hab.dano.extra;
+      if(ext && ext.formula && typeof tirarDados === 'function'){ const r2 = tirarDados(ext.formula); if(r2) m.dano.magico = {tipo: String(ext.tipo || 'fuego').slice(0, 20), total: Math.max(0, Math.round(_num(r2.total))), formula: String(r2.formula || ext.formula).slice(0, 60), rolls: (r2.rolls || []).slice(0, 12).map(_num)}; }
       m.efectos = aguaParalisis(m, normalizarEfectos(crudos));
       // «Seguro si es crítico» (2026-10-03): un efecto con porcentaje que, si el golpe fue crítico, entra sin tirar.
       if(m.crit && m.crit.critico) m.efectos = m.efectos.map(ef => ef.seguroCritico ? {...ef, caras: 1, exitos: 1, detalle: `${ef.detalle ? ef.detalle + ' ' : ''}(Fue crítico: entra seguro.)`.slice(0, 200)} : ef);
@@ -2263,9 +2269,11 @@ const Duelo = (() => {
     const puedeMapa = !!(cfgEscuchar && cfgEscuchar.chequearDodge);
     const puedeAMano = esMio(d.defensor) || soyGM();
     const tormenta = d.hab && d.hab.soloDodge;   // Tormenta arcana: no hubo tirada, el dodge roll es la única salida
+    const meteoro = tormenta && d.hab.meteoro;   // ☄ la Lluvia de meteoros
     return `<div class="duelo-veredicto pego${nuevo ? ' nuevo' : ''}">
-      <div class="grande">${tormenta ? '🌩 ¡CAE LA TORMENTA!' : '🏃 ¡GANÓ LA EVASIÓN!'}</div>
-      ${tormenta && d.hab.dano ? `<div class="chico">A ${_esc(d.defensor.nombre)} le tocan <b>${_esc(d.hab.dano.formula)}</b> de daño arcano, directo a la vida, si sigue adentro.</div>` : ''}
+      <div class="grande">${meteoro ? '☄ ¡CAE EL METEORO!' : tormenta ? '🌩 ¡CAE LA TORMENTA!' : '🏃 ¡GANÓ LA EVASIÓN!'}</div>
+      ${meteoro && d.hab.dano ? `<div class="chico">Si ${_esc(d.defensor.nombre)} sigue adentro le tocan <b>${_esc(d.hab.dano.formula)}</b> de daño físico (lo frena la Defensa)${d.hab.dano.extra ? ` y <b>${_esc(d.hab.dano.extra.formula)}</b> de ${_esc(d.hab.dano.extra.tipo)} (directo, menos su resistencia)` : ''}.</div>`
+        : tormenta && d.hab.dano ? `<div class="chico">A ${_esc(d.defensor.nombre)} le tocan <b>${_esc(d.hab.dano.formula)}</b> de daño arcano, directo a la vida, si sigue adentro.</div>` : ''}
       <div class="chico">${_esc(d.defensor.nombre)} tiene derecho a un <b>dodge roll</b>: hasta 2 casilleros, arrastrando el token en el mapa (ya cuesta No2 solo, con Rengo/Inmovilizado de siempre). Si logra salir del área, no recibe nada; si sigue adentro por cualquier motivo, recibe el efecto completo — no hay término medio.</div>
       ${puedeMapa ? '<div class="duelo-contra" style="text-align:center;margin-top:10px"><button type="button" data-dodge-resolver>▶ Ya se movió (o decidió no hacerlo): revisar</button></div>' : ''}
       ${puedeAMano ? `<div class="duelo-nota" style="margin:8px 0 4px">${puedeMapa ? 'O a mano, si ya sabés el resultado:' : 'Se revisa mejor desde el mapa. A mano:'}</div>

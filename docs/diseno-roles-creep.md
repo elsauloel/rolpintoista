@@ -252,7 +252,7 @@ líneas, zonas, el rayo en cadena y los charcos, los controles mentales.
 - **Mago (daño directo):** proyectil mágico, ✅ **Bola de fuego** (2026-10-21), ✅ **Hálito polar** (cono de frío, 2026-10-23), ✅ **Cadena de rayos** (2026-10-21), ✅ **Muro de fuego** (2026-10-24: largo a elegir, 4 a 8,
   con el costo según el largo).
 - **Mago — ideas nuevas (2026-10-24, la lista que pidió el dueño; ✦ = acelera la pelea):**
-  - **A. Daño concentrado:** 1. ✅ **Lanza de luz** ✦ (2026-10-25: línea de 6 desde él, también a sus aliados; su PdG.Esp contra la Evasión de cada uno; 3d6 arcano y **Deslumbrado** —Res.Esp −2— 2 turnos). 2. **Andanada arcana** (3 proyectiles que se
+  - **A. Daño concentrado:** 1. ✅ **Lanza de luz** ✦ (2026-10-25: línea tan larga como su Rango, desde él, también a sus aliados; su PdG.Esp contra la Evasión de cada uno; 3d6 arcano y **Deslumbrado** —Res.Esp −2— 2 turnos). 2. **Andanada arcana** (3 proyectiles que se
     reparten entre objetivos a elección). 3. ✅ **Descarga arcana** ✦ (2026-10-24, ex «Rayo cargado»: un turno lo carga a la vista de todos y queda Marcado —«una luz lo recubre», se lo ve en la niebla—; al siguiente,
     4d6 arcano; 10 de daño se lo cortan).
   - **B. Áreas que se anuncian y terreno:** 4. ✅ **Meteoro** ✦ (2026-10-24: una sombra de diámetro 5 en su Rango; al empezar su próximo turno cae: dodge roll

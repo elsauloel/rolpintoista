@@ -1039,13 +1039,13 @@ prueba('🎯 Disparo señalador (2026-10-21): Presa (Evasión −1) y Marcado', 
   const P = estadosPresetCreep().find(p => p.nombre === 'Presa');
   igual([h.cd, a.efectos.map(e => (e.spec || {}).nombre).join(','), P.turnos, P.presa, JSON.stringify(P.mods)], [3, 'Presa,Marcado', 2, 2, '[{"stat":"eva","val":-1}]']);
 });
-prueba('✨ Lanza de luz (Mago, 2026-10-25): línea de 6, 3d6 arcano y Deslumbrado (Res.Esp −2, 2 turnos)', () => {
+prueba('✨ Lanza de luz (Mago, 2026-10-25): línea tan larga como su Rango, 3d6 arcano y Deslumbrado (Res.Esp −2, 2 turnos)', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Lanza de luz');
   const h = armarHabilidadDeCreep(e.datos, 2);
-  const ej = Combatiente.habEjecucion(h, h.duelo, {stat: () => 3, etq: s => s});
+  const ej = Combatiente.habEjecucion(h, h.duelo, {stat: s => s === 'rng' ? 7 : 3, etq: s => s});
   const lim = Duelo.limpiarHab(ej), est = EstadosAplicar.componer(ej.efectos[0].spec);
   igual([lim.objetivo, lim.largo, lim.dano.formula, lim.dano.tipo, !!lim.dano.ignoraDef, est.nombre, est.turnos, JSON.stringify(est.mods), h.cd, h.spCosto, h.nitrosCosto],
-    ['linea', 6, '3d6', 'arcano', true, 'Deslumbrado', 2, '[{"stat":"resmg","val":-2}]', 3, 4, 2]);
+    ['linea', 7, '3d6', 'arcano', true, 'Deslumbrado', 2, '[{"stat":"resmg","val":-2}]', 3, 4, 2]);
 });
 prueba('🎯 Señalar la presa (Support, 2026-10-25): Presa señalada, Evasión −2 y +4 al daño', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Señalar la presa');

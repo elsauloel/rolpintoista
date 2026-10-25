@@ -1563,7 +1563,7 @@ const Combatiente = (() => {
       ...(c.objetivo === 'area' && (c.centroAlcance === 'rango' ? Math.round(nf(o.stat ? o.stat('rng') : 0)) : Math.round(nf(c.centroAlcance))) > 0 ? {centroAlcance: c.centroAlcance === 'rango' ? Math.max(1, Math.round(nf(o.stat('rng')))) : Math.round(nf(c.centroAlcance))} : {}),
       // Solo a los aliados (2026-10-13, ¡A laburar! del Capataz kobold: un grito que bendice a los suyos y no a los rivales).
       ...((c.objetivo === 'area' || c.objetivo === 'onda') && c.aliados ? {aliados: true} : {}),
-      ...(c.objetivo === 'linea' ? {largo: Math.max(1, Math.round(nf(c.largo)) || 4)} : {}),   // línea recta desde quien la usa (2026-10-05, Varita láser)
+      ...(c.objetivo === 'linea' ? {largo: c.largo === 'rango' ? Math.max(1, alcanceHab({alcance: 'rango'}, stat, o.stat) || 1) : Math.max(1, Math.round(nf(c.largo)) || 4)} : {}),   // línea recta desde quien la usa (2026-10-05, Varita láser); `largo: 'rango'` = todo su Rango (2026-10-25, la Lanza de luz)
       ...((c.objetivo === 'onda' || c.objetivo === 'cono') && c.ondaDodge ? {dodge: true} : {}),
       ...(c.objetivo === 'area' && c.sinDodge ? {sinDodge: true} : {}),   // un área que no se esquiva corriendo (la Luz cegadora, 2026-10-20: un destello se resiste, no se esquiva)   // la onda o el cono que deja dodge roll (Daño en área, Ráfaga arcana)
       ...(c.objetivo === 'aliado' && c.conmigo ? {conmigo: true} : {}),   // un aliado o uno mismo (Heal del Support, 2026-10-11)

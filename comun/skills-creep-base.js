@@ -252,12 +252,12 @@
     no2: 2, spCosto: 5, arrancaEnCooldown: true, auditada: true, cuentaComoAtaque: true, ataqueTxt: 'una sombra en su Rango; en su próximo turno cae: dodge roll, 4d6 físico + 2d6 de fuego directo',
     meteoro: {radio: 2, fisico: '4d6', fuego: '2d6'}});
   // ✨ Auditada (dueño, 2026-10-25; el Mago, «Lanza de luz»: una línea que atraviesa a todos, «y que además deje un estado de −2 a la resistencia especial»,
-  // 2 turnos): una línea recta de 6 casillas desde él hacia donde apunte (la de la Varita láser: le pega a todos los de la línea, también a sus aliados);
+  // 2 turnos; «el largo tiene que ser todo el largo del rango»): una línea recta tan larga como su Rango, desde él hacia donde apunte (la de la Varita láser: le pega a todos los de la línea, también a sus aliados);
   // tira su PdG.Esp una sola vez y cada uno se defiende con su Evasión; al que no esquiva, 3d6 arcano (lo frena la Defensa especial) y Deslumbrado 2 turnos
   // (Res.Esp −2). 2 No2 y 4 SP, o cooldown 3 (costo y daño propuestos por Claude).
-  H('Lanza de luz', 'DA', '*', 'g', 3, {detalle: 'Dispara una lanza de luz en línea recta: 6 casillas desde él hacia donde apunte, y atraviesa a todos los que estén en la línea (también a sus aliados). Tira su Probabilidad de Golpe especial una sola vez y cada uno se defiende con su Evasión; al que no la esquiva le hace 3d6 de daño arcano (lo frena la Defensa especial) y lo deja Deslumbrado 2 turnos: su Resistencia especial baja 2.',
-    no2: 2, spCosto: 4, auditada: true, ataqueTxt: 'una línea de 6 casillas: su PdG.Esp contra la Evasión de cada uno; 3d6 arcano y Deslumbrado (Res.Esp −2) 2 turnos',
-    duelo: {objetivo: 'linea', largo: 6, tira: 'pdgmg', contra: ['eva'], dano: true, danoFormula: '3d6', tipoDano: 'arcano', efectos: [{nombre: 'Deslumbrado'}]}});
+  H('Lanza de luz', 'DA', '*', 'g', 3, {detalle: 'Dispara una lanza de luz en línea recta, tan larga como su Rango, desde él hacia donde apunte, y atraviesa a todos los que estén en la línea (también a sus aliados). Tira su Probabilidad de Golpe especial una sola vez y cada uno se defiende con su Evasión; al que no la esquiva le hace 3d6 de daño arcano (lo frena la Defensa especial) y lo deja Deslumbrado 2 turnos: su Resistencia especial baja 2.',
+    no2: 2, spCosto: 4, auditada: true, ataqueTxt: 'una línea tan larga como su Rango: su PdG.Esp contra la Evasión de cada uno; 3d6 arcano y Deslumbrado (Res.Esp −2) 2 turnos',
+    duelo: {objetivo: 'linea', largo: 'rango', tira: 'pdgmg', contra: ['eva'], dano: true, danoFormula: '3d6', tipoDano: 'arcano', efectos: [{nombre: 'Deslumbrado'}]}});
   H('Misil arcano', 'D', 'hdga', 'g', 2, aT('Un proyectil mágico que no falla.', 'M'));
   H('Descarga eléctrica', 'DK', 'ea', 'g', 3, zO('Una descarga que deja al objetivo sin aliento: pierde 1 No2 (a mano).', 2, 'M'));
   // 🔥 Auditada (dueño, 2026-10-24; el Mago, «muro de fuego»): reemplaza a la vieja Llamarada (a mano). La zona en línea de la Varita del muro de fuego

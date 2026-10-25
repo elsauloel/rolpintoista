@@ -3059,12 +3059,17 @@ const Duelo = (() => {
           try{ cfgEscuchar.grupoResuelto(d); }catch(err){ console.error('Duelo: grupoResuelto', err); }
         });
       }
-      // …y si se canceló (2026-10-25, dueño: «arreglá lo del duelo cancelado y la marca en el mapa»): el mapa cierra lo que faltaba del área.
+      // …y si se canceló (2026-10-25, dueño: «arreglá lo del duelo cancelado y la marca en el mapa»): el mapa cierra lo que faltaba del área. Un duelo
+      // cancelado sale de esta escucha (solo trae los que esperan o se resolvieron): se mira el que se fue y, si era de un área, se lee cómo quedó.
       if(cfgEscuchar.grupoCancelado && soyGM()){
-        listaDuelos.forEach(d => {
-          if(!d.grupo || d.estado !== 'cancelado' || grupoCanceladoAvisado.has(d.id)) return;
-          grupoCanceladoAvisado.add(d.id);
-          try{ cfgEscuchar.grupoCancelado(d); }catch(err){ console.error('Duelo: grupoCancelado', err); }
+        snap.docChanges().forEach(ch => {
+          const x = ch.type === 'removed' ? ch.doc.data() : null;
+          if(!x || !x.grupo || grupoCanceladoAvisado.has(ch.doc.id)) return;
+          col().doc(ch.doc.id).get().then(doc => {
+            if(!doc.exists || doc.data().estado !== 'cancelado' || grupoCanceladoAvisado.has(doc.id)) return;
+            grupoCanceladoAvisado.add(doc.id);
+            cfgEscuchar.grupoCancelado({id: doc.id, ...doc.data()});
+          }).catch(err => console.error('Duelo: grupoCancelado', err));
         });
       }
       if(cfgEscuchar.desarmado && soyGM()){   // 🤺 Desarmar (2026-10-21): el arma o el escudo al piso (el mapa del GM)

@@ -59,7 +59,7 @@
     'Colmillos que perforan': ['choque liviano', 'sangrado'], 'Tajo brutal': ['choque liviano', 'sangrado'], 'Desgarro': ['choque liviano', 'sangrado'],
     'Corte certero': ['choque liviano', 'sangrado'], 'Zarpa certera': ['choque liviano', 'sangrado'], 'Tajo de carnicero': ['choque liviano', 'sangrado'],
     'Destripar': ['choque liviano', 'sangrado'],
-    'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'], 'Mantener a raya': ['rango', 'mantener a raya'], 'Flecha que atraviesa': ['rango', 'atravesar'], 'Extenuar': ['debuffer', 'extenuar'],
+    'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'], 'Mantener a raya': ['rango', 'mantener a raya'], 'Flecha que atraviesa': ['rango', 'atravesar'], 'Extenuar': ['debuffer', 'extenuar'], 'Cegar': ['debuffer', 'cegar'],
     'Red': ['hunter', 'trabar'], 'Tela de araña': ['hunter', 'trabar'],
     'Hit and run': ['choque liviano', 'golpear y alejarse'],
     'Salto': ['choque liviano', 'salto'], 'Salto aplastante': ['choque pesado', 'salto'], 'Vigilancia': ['rango', 'vigilancia'], 'Bola de fuego': ['mago', 'daño en área'], 'Confusión': ['debuffer', 'control mental'],
@@ -500,7 +500,11 @@
   H('Escupitajo ácido', 'DX', 'ba', 'xr', 3, {detalle: 'Le escupe ácido a un rival dentro de su Rango: tira su Probabilidad de Golpe especial contra la Evasión del objetivo; si pega, 2d6 de daño ácido (lo frenan la Defensa especial y la resistencia al ácido) y le carcome la armadura: Armadura rota 1, y una más por cada 5 de daño que le entra.',
     no2: 2, spCosto: 3, auditada: true, ataqueTxt: 'su PdG.Esp contra la Evasión; si pega, 2d6 ácido y Armadura rota (1, y una más cada 5 de daño que entra)',
     duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['eva'], alcance: 'rango', dano: true, danoFormula: '2d6', tipoDano: 'ácido', porDano: {estado: 'Armadura rota', cada: 5, mas1: true}}});
-  H('Ceguera', 'X', 'hdea', 'x', 3, tA('Lanza polvo o luz: el objetivo queda con Ceguera 1 turno (a mano).', 2));
+  // 👁 Auditada (dueño, 2026-10-25; el Debuffer, «los sentidos», Cegar: «vamos con esa»): reemplaza a la vieja Ceguera (a mano; también sacada de `APLICA`
+  // en creeps-base.js). Su PdG.Esp contra la Res.Esp; si gana, 2d4 arcano y Ceguera 1 turno (fuerte: por eso 1). Costo propuesto por Claude.
+  H('Cegar', 'X', 'hdea', 'x', 3, {detalle: 'Le tira polvo o un fogonazo a los ojos a un rival dentro de su Rango: tira su Probabilidad de Golpe especial contra la Resistencia especial del objetivo. Si gana, 2d4 de daño arcano (lo frena la Defensa especial) y queda con Ceguera 1 turno: ve solo a 2 casillas y su Probabilidad de Golpe (también la especial) vale la mitad.',
+    no2: 2, spCosto: 3, auditada: true, ataqueTxt: 'su PdG.Esp contra la Res.Esp; 2d4 arcano y Ceguera 1 turno',
+    duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['resmg'], alcance: 'rango', dano: true, danoFormula: '2d4', tipoDano: 'arcano', efectos: [{nombre: 'Ceguera', turnos: 1}]}});
   H('Ralentizar', 'X', 'hdea', 'x', 3, tA('El objetivo pierde 2 No2 en su próximo turno (a mano).', 2));
   H('Miedo', 'XK', 'bdma', 'x', 4, tA('Si el objetivo falla Res.Mt huye de él 2 turnos (a mano).', 2));
   H('Intimidar', 'X', 'bhd', 'x', 2, tA('Una mirada amenazante: el objetivo pierde 1 de Daño 2 turnos (a mano).', 1));

@@ -1039,6 +1039,11 @@ prueba('🎯 Disparo señalador (2026-10-21): Presa (Evasión −1) y Marcado', 
   const P = estadosPresetCreep().find(p => p.nombre === 'Presa');
   igual([h.cd, a.efectos.map(e => (e.spec || {}).nombre).join(','), P.turnos, P.presa, JSON.stringify(P.mods)], [3, 'Presa,Marcado', 2, 2, '[{"stat":"eva","val":-1}]']);
 });
+prueba('👁 Cegar (Debuffer, 2026-10-25): PdG.Esp contra Res.Esp, 2d4 arcano y Ceguera 1 turno (reemplaza a la Ceguera a mano)', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Cegar');
+  const h = armarHabilidadDeCreep(e.datos, 2);
+  igual([h.duelo.contra.join(','), h.duelo.danoFormula, h.duelo.efectos[0].nombre, h.duelo.efectos[0].turnos, h.cd, !!HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Ceguera')], ['resmg', '2d4', 'Ceguera', 1, 3, false]);
+});
 prueba('🏹 Flecha que atraviesa (Rango, 2026-10-25): un ataque con +2 al daño que sigue al de atrás (perforante)', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Flecha que atraviesa');
   const h = armarHabilidadDeCreep(e.datos, 2);

@@ -72,7 +72,7 @@
     return o;
   };
   const APLICA = {
-    'Debilitar': A('Debilitado', 3, {dmg: -2}), 'Maldición': A('Maldito', 3, {resmg: -2, def: -1}), 'Ceguera': A('Ceguera', 1),
+    'Debilitar': A('Debilitado', 3, {dmg: -2}), 'Maldición': A('Maldito', 3, {resmg: -2, def: -1}),
     'Ralentizar': A('Ralentizado', 1, {nitros: -2}), 'Intimidar': A('Intimidado', 2, {dmg: -1}), 'Romper armadura': A('Armadura dañada', 3, {def: -2}),
     'Veneno': A('Veneno'), 'Pudrición': A('Podrido', 3, {def: -2, dmg: -1}), 'Susurros': A('Susurros', 3, {resm: -2}),
     'Drenar energía': A('Drenado', 1, {nitros: -2}), 'Trampa de raíces': A('Inmovilizado', 2),

@@ -1616,7 +1616,7 @@ async function dueloAplicarDano(d){
   // El elemento del daño de la habilidad (2026-10-04): se resta además la resistencia de quien lo recibe a ese elemento (Res. fuego…).
   const elDano = d.hab && d.hab.dano ? Combatiente.elementoDe(d.hab.dano.tipo) : '';
   const frenaAm = magico && !directo && !trueDmg && Combatiente.frenaArmaduraMagica(elDano);   // la Defensa especial frena todo el daño especial (también el tóxico, 2026-10-07)
-  const restaIgnorando = frenaAm ? armadmg : 0;
+  let restaIgnorando = frenaAm ? armadmg : 0;
   const resEl = elDano && !trueDmg ? (await resistenciasDe(t, elDano, invLeida)).res : 0;
   let freno = [...(menosDist ? [d.hab && d.hab.menosPorOrden ? `${menosDist} por los que tocó antes en la línea` : `la distancia ${menosDist}`] : []), ...(frenaAm && armadmg ? [`Defensa especial ${armadmg}`] : []), ...(resEl ? [Combatiente.resElementalTxt(elDano, resEl)] : [])].join(' − ');
   // 🏹 Perfora N (regla del dueño, 2026-10-10): N puntos del golpe pasan SIEMPRE, sin que los frene la Defensa; el resto va contra la Defensa como
@@ -1624,13 +1624,20 @@ async function dueloAplicarDano(d){
   // (Antes, hasta el 2026-10-10, le restaba N a la Defensa: contra un tanque casi no servía.)
   // 🎯 Punta de diamante (contra Defensa 12 o más, Perfora +2) y Remachadora (golpes seguidos al mismo blanco, js/35), 2026-10-11.
   const perfExtra = d.ataque && !crit ? (d.ataque.puntaDiamante && def >= Combatiente.PUNTA_DIAMANTE_DEF ? Combatiente.PUNTA_DIAMANTE_PERFORA : 0) + remachadoraPerfora(d) : 0;
-  const perfN = !crit && d.ataque ? Math.min(num(d.ataque.flecha && d.ataque.flecha.perfora) + num(d.ataque.perfora) + perfExtra, golpe) : 0;
+  // 🛡 Atraviesa guardias (2026-10-25, el Support): la Perfora que le da un estado a quien ataca, contra la Defensa y contra la Defensa especial.
+  const perfEst = Combatiente.perforaDeEstados((((vinculo(tokens.get(d.atacante && d.atacante.tokenId)) || {}).resumen) || {}).estados);
+  const perfN = !crit && d.ataque ? Math.min(num(d.ataque.flecha && d.ataque.flecha.perfora) + num(d.ataque.perfora) + perfExtra + perfEst.def, golpe) : 0;
   const perfora = Combatiente.perforaPasa(golpe, def, perfN);   // solo cuenta si la Defensa frenaría más que eso
   let aplicar = perfora || golpe, ignoraDef = crit || perfora > 0;
   if(base.mitad){ aplicar = Math.ceil(Math.max(0, golpe - def, perfN) / 2); ignoraDef = true; }
   // ✍ La Defensa elegida a mano en el duelo (2026-10-15): «no resta» o un número, en lugar de la del defensor.
   if(dn.defensaManual === 'no'){ aplicar = base.mitad ? Math.ceil(golpe / 2) : golpe; ignoraDef = true; }
   else if(dn.defensaManual !== undefined && dn.defensaManual !== null && dn.defensaManual !== ''){ const dmn = Math.max(0, num(dn.defensaManual)); aplicar = base.mitad ? Math.ceil(Math.max(0, golpe - dmn) / 2) : Math.max(0, golpe - dmn); ignoraDef = true; }
+  // …y contra la Defensa especial: de lo que llega, esos N pasan siempre; el resto va contra la Defensa especial como siempre.
+  if(frenaAm && perfEst.esp > 0 && armadmg > 0){
+    const resta = Math.min(armadmg, Math.max(0, aplicar - perfEst.esp));
+    if(resta < armadmg){ freno = freno.replace(`Defensa especial ${armadmg}`, `Defensa especial ${armadmg} (pasan ${Math.min(perfEst.esp, aplicar)} por Atraviesa guardias)`); restaIgnorando = resta; }
+  }
   // Bloqueo perdido (mitad del daño): el arma o escudo con el que bloqueó pierde 1 punto de durabilidad (solo personajes: los creeps y las invocaciones no llevan).
   // 💧 En el agua, el rayo ×1,5 (js/50, 2026-10-17).
   const golpeRayo = elDano === 'rayo' ? aplicar : 0;   // ⚡💧 lo que corre por el agua a los demás del charco (js/50), antes del ×1,5

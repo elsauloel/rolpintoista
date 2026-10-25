@@ -14,6 +14,24 @@
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.
+> - [ ] **⚙ Revisar el «auto mode setup»** (2026-10-25, dueño: «cuando te pida los pendientes en la compu, me decís que quedamos en revisar lo
+>   del auto mode setup y me volvés a enviar toda esta explicación porque hay muchos términos que no entendí»). **Al pedir los pendientes en la
+>   compu: decirle que quedó esto y mandarle de nuevo la explicación de abajo, tal cual, para profundizar término por término.**
+>   Explicación que se le dio (2026-10-25):
+>   - Esas preguntas no las hizo Claude: las hizo el asistente de configuración de `/auto-mode-setup`, que corre solo en la terminal. Claude no
+>     puede volver a lanzarlo; hay que escribir `/auto-mode-setup` de nuevo para que repita las preguntas.
+>   - Lo que respondió y lo que salió:
+>     - **Postura → mixta** (`posture=mixed`): un punto medio entre «preguntame todo» y «hacé todo sin preguntar».
+>     - **Alcance → solo este proyecto** (`scope=project`): las reglas valen únicamente para la carpeta `rol-nueva-version`.
+>     - **Profundidad → shell** (`depth=shell`): para armar la propuesta, revisó con comandos de la terminal y las conversaciones de este proyecto.
+>   - **Lo que propuso** (salió como propuesta, con `--propose`; no se sabe si después la aceptó): dejar las reglas de seguridad por defecto y sumar un
+>     solo cuidado: **pedir permiso antes de subir a la rama `main`** (a `main` no se sube nunca; se trabaja en `nueva-version`). Lo demás quedó en
+>     blanco porque el proyecto no tiene nada de eso: nube, dominios internos, servidores de producción.
+>   - **Lo que no cambia:** sigue igual la regla de subir a `nueva-version` apenas algo queda probado, sin preguntar. Esa rama es la que se publica en
+>     el sitio, y la propuesta no la toca.
+>   - **Si duda de algo:** la propuesta dice que no pudo comprobar si el repositorio en GitHub es público o privado, así que lo trata como si pudiera ser
+>     público. Se confirma en la página del repositorio en GitHub.
+>   - Para volver a hacerlo: escribir `/auto-mode-setup`; si alguna pregunta no se entiende, pegársela a Claude y la explica antes de contestar.
 > - [ ] **📖 Ver los globos del glosario** (2026-10-25, dueño: «anotá lo de los globos del glosario para ver en la compu»): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados, mecánicas de armas, bonos) subrayados con su globo al pasar el mouse; está también en `docs/pruebas-en-el-mapa.md` («El glosario con globos», 2026-10-09).
 > - [ ] **🚩 Ver la animación de las banderitas del Estandarte de guerra** (2026-10-24, dueño: «anotá para ver en la compu la animación de las banderitas»):
 >   en «Claude · pruebas» quedó clavado el estandarte del Escarabajo (casilla 8,−4). Mirar el aura en movimiento —los banderines carmesí y dorado que

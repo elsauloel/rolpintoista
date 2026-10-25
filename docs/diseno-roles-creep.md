@@ -30,10 +30,10 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 9**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25) · de El origen: proyectil, fuego con quemadura.
 - 🧿 **Debuffer — 10**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25) · de El origen: ceguera, veneno, inmovilizar.
-- 💚 **Support — 9**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24), estandarte (Estandarte de guerra, 2026-10-24), señalar la presa (2026-10-25) · de El origen: escudo a un aliado.
+- 💚 **Support — 10**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24), estandarte (Estandarte de guerra, 2026-10-24), señalar la presa (2026-10-25), abrir la guardia (2026-10-25) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
-**Para emparejar**: Mago y Support en 9, Debuffer en 10 (2026-10-25); después Rango + Hunter (11).
+**Para emparejar**: Mago en 9, Support y Debuffer en 10 (2026-10-25); después Rango + Hunter (11).
 
 ## Los roles
 
@@ -288,7 +288,8 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
 4. **Filo envenenado / sangrante**: los golpes de un aliado dejan Veneno o Sangrado.
 5. ✅ **Ojo certero** (2026-10-24): a él o a un aliado en su Rango, Crítico frecuente +2 y Crítico potente +2 durante 2 turnos completos de quien lo
    recibe (la marca `turnosCompletos`: el turno en que se lo dan no cuenta, aunque sea el suyo).
-6. **Abrir la guardia**: el próximo golpe de los aliados contra un objetivo perfora N de Defensa.
+6. ✅ **Abrir la guardia** (2026-10-25; dueño: «un skill de support no trabaja sobre rivales, sino sobre aliados»): a él o a un aliado en su Rango,
+   **Atraviesa guardias** 2 turnos completos: en cada golpe que da, 3 puntos pasan siempre la Defensa y 3 la Defensa especial del rival.
 7. **Empujón de creep** (el Empower de los personajes): +3 a la tirada de un aliado, en el momento, mirando el resultado.
 
 **B. Concentrar el fuego** ✦

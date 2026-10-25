@@ -256,6 +256,11 @@ líneas, zonas, el rayo en cadena y los charcos, los controles mentales.
 
 - **Mago (daño directo):** proyectil mágico, ✅ **Bola de fuego** (2026-10-21), ✅ **Hálito polar** (cono de frío, 2026-10-23), ✅ **Cadena de rayos** (2026-10-21), ✅ **Muro de fuego** (2026-10-24: largo a elegir, 4 a 8,
   con el costo según el largo).
+- **▶ LA PRÓXIMA del Mago: Misil elemental** (dueño, 2026-10-25: «para la próxima habilidad de mago vamos a hacer un misil elemental, uno por cada uno
+  de los tipos de daño, que sea un ataque mágico súper claro, que esté atado a la identidad de cada uno de los elementos y que se sienta»). Una versión
+  por tipo de daño (arcano, fuego, hielo, rayo, ácido, tóxico…), cada una con lo que caracteriza a su elemento en la guía de diseno
+  (`docs/guia-de-diseno.md`: el fuego quema, el hielo da Escarcha, el rayo no se esquiva y paraliza —P219—, el ácido rompe armadura, el tóxico envenena,
+  el arcano es puro y directo). Cuenta como un concepto del Mago (o uno por elemento: a decidir con el dueño al hacerlo).
 - **Mago — ideas nuevas (2026-10-24, la lista que pidió el dueño; ✦ = acelera la pelea):**
   - **A. Daño concentrado:** 1. ✅ **Lanza de luz** ✦ (2026-10-25: línea tan larga como su Rango, desde él, también a sus aliados; su PdG.Esp contra la Evasión de cada uno; 3d6 arcano y **Deslumbrado** —Res.Esp −2— 2 turnos). 2. ✅ **Andanada arcana** (2026-10-25: 3 misiles de 1d6 + ¼ Ef.Esp
     arcano, de a uno, al objetivo que elija cada vez). 3. ✅ **Descarga arcana** ✦ (2026-10-24, ex «Rayo cargado»: un turno lo carga a la vista de todos y queda Marcado —«una luz lo recubre», se lo ve en la niebla—; al siguiente,

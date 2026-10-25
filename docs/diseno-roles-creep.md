@@ -33,12 +33,12 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 - 🏹 **Rango y Hunter — 14**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar, mantener a raya (2026-10-25), atravesar (Flecha que atraviesa, 2026-10-25), disparos encadenados (Ráfaga encadenada, 2026-10-25) · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 13**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25), lluvia de escarcha (2026-10-25), andanada arcana (2026-10-25), misiles elementales (2026-10-25) · de El origen: proyectil, fuego con quemadura.
-- 🧿 **Debuffer — 13**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25), silencio (Tótem de silencio, 2026-10-25), extenuar (2026-10-25), cegar (2026-10-25) · de El origen: ceguera, veneno, inmovilizar.
+- 🧿 **Debuffer — 14**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25), silencio (Tótem de silencio, 2026-10-25), extenuar (2026-10-25), cegar (2026-10-25), grito de pánico (2026-10-25) · de El origen: ceguera, veneno, inmovilizar.
 - 💚 **Support — 13**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24), estandarte (Estandarte de guerra, 2026-10-24), señalar la presa (2026-10-25), armas perforantes (2026-10-25), redoble de tambores (2026-10-25), frenesí inducido (2026-10-25), limpiar estados (Purificar, 2026-10-25) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
 **Para emparejar** (regla del dueño, 2026-10-25: «empezamos a tener en cuenta todos los roles de creep e ir emparejándolos… para que estén todos
-avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-25): Mago, Support y Debuffer en 13; Rango + Hunter en 14, como Choque liviano; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
+avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-25): Mago y Support en 13; Debuffer y Rango + Hunter en 14, como Choque liviano; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
 
 ## Los roles
 
@@ -390,7 +390,7 @@ Inmovilizado, Rengo, Desarmado; y, de personajes, Enyetar.
 **C. Control mental**
 11. ✅ **Confusión** (2026-10-21).
 12. **Susurros de locura**: Confusión en un área.
-13. **Grito de pánico**: Miedo a los que tiene alrededor.
+13. ✅ **Grito de pánico** (2026-10-25): onda de 3 casillas a sus rivales; PdG.Esp contra Res.Mt; 1d6 arcano y Miedo hasta su próximo turno.
 14. ✅ **Tótem de silencio** (ex «Palabra de silencio», 2026-10-25; dueño: «un skill tipo el estandarte, pero al revés»): clava un tótem (10 de vida por
     nivel, sin defensas); sus rivales a 3 casillas (diámetro 7) no pueden usar habilidades que cuestan SP mientras siga en pie.
 15. **Sueño**: no actúa hasta que le peguen o pase su turno.

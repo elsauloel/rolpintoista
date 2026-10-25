@@ -59,7 +59,7 @@
     'Colmillos que perforan': ['choque liviano', 'sangrado'], 'Tajo brutal': ['choque liviano', 'sangrado'], 'Desgarro': ['choque liviano', 'sangrado'],
     'Corte certero': ['choque liviano', 'sangrado'], 'Zarpa certera': ['choque liviano', 'sangrado'], 'Tajo de carnicero': ['choque liviano', 'sangrado'],
     'Destripar': ['choque liviano', 'sangrado'],
-    'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'], 'Mantener a raya': ['rango', 'mantener a raya'], 'Flecha que atraviesa': ['rango', 'atravesar'], 'Ráfaga encadenada': ['rango', 'disparos encadenados'], 'Extenuar': ['debuffer', 'extenuar'], 'Cegar': ['debuffer', 'cegar'],
+    'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'], 'Mantener a raya': ['rango', 'mantener a raya'], 'Flecha que atraviesa': ['rango', 'atravesar'], 'Ráfaga encadenada': ['rango', 'disparos encadenados'], 'Extenuar': ['debuffer', 'extenuar'], 'Cegar': ['debuffer', 'cegar'], 'Grito de pánico': ['debuffer', 'grito de pánico'],
     'Red': ['hunter', 'trabar'], 'Tela de araña': ['hunter', 'trabar'],
     'Hit and run': ['choque liviano', 'golpear y alejarse'],
     'Salto': ['choque liviano', 'salto'], 'Salto aplastante': ['choque pesado', 'salto'], 'Vigilancia': ['rango', 'vigilancia'], 'Bola de fuego': ['mago', 'daño en área'], 'Confusión': ['debuffer', 'control mental'],
@@ -542,6 +542,12 @@
     no2: 2, spCosto: 3, auditada: true, ataqueTxt: 'su PdG.Esp contra la Res.Esp; 2d4 arcano y Ceguera 1 turno',
     duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['resmg'], alcance: 'rango', dano: true, danoFormula: '2d4', tipoDano: 'arcano', efectos: [{nombre: 'Ceguera', turnos: 1}]}});
   H('Ralentizar', 'X', 'hdea', 'x', 3, tA('El objetivo pierde 2 No2 en su próximo turno (a mano).', 2));
+  // 😱 Auditada (dueño, 2026-10-25; el Debuffer, «control mental», Grito de pánico: «que sea tres casillas alrededor, y que sea daño arcano»): la onda de
+  // los gritos (radio 3, a sus rivales, no a él), su PdG.Esp contra la Res.Mt de cada uno (es miedo: va contra la mente; no se esquiva); al que pierde,
+  // 1d6 arcano y Miedo hasta su próximo turno (el preset). Costo propuesto por Claude: 2 No2 y 4 SP, o cooldown 3.
+  H('Grito de pánico', 'XA', '*', 'x', 3, {detalle: 'Un grito que hiela la sangre: a sus rivales a 3 casillas o menos (no a sus aliados) les tira su Probabilidad de Golpe especial contra la Resistencia mental de cada uno. Al que pierde, 1d6 de daño arcano (lo frena la Defensa especial) y queda con Miedo hasta que empieza su próximo turno: cada casillero que se mueve hacia él le cuesta 2 No2, y todo lo que haga contra él va con −1 a la probabilidad de golpe y −1 al daño.',
+    no2: 2, spCosto: 4, auditada: true, ataqueTxt: 'onda de 3 casillas: su PdG.Esp contra la Res.Mt de cada rival; 1d6 arcano y Miedo',
+    duelo: {objetivo: 'onda', radio: 3, tira: 'pdgmg', contra: ['resm'], dano: true, danoFormula: '1d6', tipoDano: 'arcano', efectos: [{nombre: 'Miedo'}]}});
   H('Miedo', 'XK', 'bdma', 'x', 4, tA('Si el objetivo falla Res.Mt huye de él 2 turnos (a mano).', 2));
   H('Intimidar', 'X', 'bhd', 'x', 2, tA('Una mirada amenazante: el objetivo pierde 1 de Daño 2 turnos (a mano).', 1));
   // 🔨 Auditadas (dueño, 2026-10-21; choque pesado, «partir la armadura»): la común y la fuerte, cada una con su versión de bestia.

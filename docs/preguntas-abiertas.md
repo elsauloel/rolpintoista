@@ -1221,3 +1221,13 @@ otra categoría, no sé, invocaciones inertes, no sé bien cómo llamarlas». **
 los cuentan; los ataques sí (vtt-hexgrid/js/73 `esInerte`, js/13). En el código se llaman «inertes» por ahora.
 **Falta:** el nombre para el juego (¿inertes? ¿estructuras? ¿objetos invocados?) y si otras cosas entran en la categoría (pilares, muros con vida).
 
+### P221 — ¿Daño de luz y daño siniestro, como contrapuntos? (2026-10-25) ⏳ a evaluar
+
+**El dueño (2026-10-25, al hacer el Grito de pánico arcano):** «vamos a evaluar la posibilidad de que exista el daño de luz y el daño siniestro como
+contrapuntos, pero solo si podemos encontrarle alguna identidad que lo justifique, alguna característica, así como los demás elementos tienen sus propias
+características». Hoy: arcano (puro, directo), fuego (quema; seca el agua), hielo (Escarcha; el suelo resbala), rayo (salta; no se esquiva, P219), ácido
+(rompe armadura), tóxico (envenena).
+**Ideas para evaluar (Claude, a decidir):** *Luz* — revela: lo que golpea queda Marcado (no entra en sigilo, se lo ve en la niebla) o Deslumbrado; pega más
+a no-muertos y sombras; podría curar a un aliado si lo alcanza. *Siniestro* (sombra) — corta la curación del golpeado un turno (la Sequía chica) o le roba
+vida a quien lo lanza; pega más a lo vivo y nada a no-muertos; puede asustar (Miedo). Falta: ver si alcanza para una identidad propia y no pisar al arcano.
+

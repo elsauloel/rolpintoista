@@ -1062,6 +1062,12 @@ prueba('👁 Cegar (Debuffer, 2026-10-25): PdG.Esp contra Res.Esp, 2d4 arcano y 
   const h = armarHabilidadDeCreep(e.datos, 2);
   igual([h.duelo.contra.join(','), h.duelo.danoFormula, h.duelo.efectos[0].nombre, h.duelo.efectos[0].turnos, h.cd, !!HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Ceguera')], ['resmg', '2d4', 'Ceguera', 1, 3, false]);
 });
+prueba('😱 Grito de pánico (Debuffer, 2026-10-25): onda de 3 a los rivales, PdG.Esp contra Res.Mt, 1d6 arcano y Miedo', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Grito de pánico');
+  const h = armarHabilidadDeCreep(e.datos, 2);
+  const ej = Combatiente.habEjecucion(h, h.duelo, {stat: () => 4}) || {};
+  igual([h.duelo.objetivo, h.duelo.radio, !!h.duelo.aliados, h.duelo.contra.join(','), (ej.dano || {}).tipo, h.duelo.efectos[0].nombre, h.cd], ['onda', 3, false, 'resm', 'arcano', 'Miedo', 3]);
+});
 prueba('🔁 Ráfaga encadenada (Rango, 2026-10-25): Repitiendo con 3 disparos en un creep, con su marca', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Ráfaga encadenada');
   const h = armarHabilidadDeCreep(e.datos, 2);

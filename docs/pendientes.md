@@ -7,6 +7,11 @@
 
 > **🎲 Para preparar la próxima sesión de «El origen de las especies»** (2026-10-23, dueño: «cuando me ponga a preparar la próxima sesión,
 > haceme acordar»). Recordárselo apenas diga que se pone a prepararla:
+> - [ ] **🧙 Crear un Chamán elemental** (dueño, 2026-10-25: «crear en El origen de las especies un chamán elemental que tenga la varita de
+>   vendaval, que tenga la escarcha y que tenga el SAP. Entonces combina las 3 cosas, y le sumamos un skill de fuego»). Con la **Varita del vendaval**
+>   (`esp-buena-varita-del-vendaval`), la **Lluvia de escarcha** (la próxima del Mago, falta hacerla: daño de hielo, piso congelado 2 turnos y después
+>   el charco), **SAP** (el rayo en el charco: más daño y el doble de Parálisis) y **una habilidad de fuego** (a elegir; el fuego seca el charco).
+>   Crearlo en la partida «El origen de las especies» cuando esté la Lluvia de escarcha.
 > - [ ] **Drops para que los jugadores prueben consumibles nuevos: por lo menos una 🦋 Polilla mística y una ⏩ Runa aceleradora (el Acelerador)**
 >   (dueño: «dije como drop, para que prueben los jugadores, de ítems consumibles, una polilla y un acelerador, por lo menos»). Se pueden poner como
 >   drop fijo de un creep (GM Tools → Recompensas → drops fijos) o sumarlos a mano al botín al finalizar el combate («+ Sumar» en el paso Equipo/Consumibles).

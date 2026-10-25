@@ -1039,6 +1039,13 @@ prueba('🎯 Disparo señalador (2026-10-21): Presa (Evasión −1) y Marcado', 
   const P = estadosPresetCreep().find(p => p.nombre === 'Presa');
   igual([h.cd, a.efectos.map(e => (e.spec || {}).nombre).join(','), P.turnos, P.presa, JSON.stringify(P.mods)], [3, 'Presa,Marcado', 2, 2, '[{"stat":"eva","val":-1}]']);
 });
+prueba('⚡ SAP (Mago, 2026-10-25): 1d4 eléctrico directo, Parálisis segura y 50 % / 25 % en los saltos', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'SAP');
+  const h = armarHabilidadDeCreep(e.datos, 2);
+  const n = Duelo.limpiarHab({nombre: 'SAP', ...h.duelo}) || {};
+  igual([h.duelo.danoFormula, h.duelo.danoDirecto, h.duelo.tipoDano, h.duelo.efectos[0].nombre, h.duelo.efectos[0].caras, h.duelo.cadena.paralisis.join(','), ((n.cadena || {}).paralisis || []).join(','), Combatiente.chanceDado(50).caras, Combatiente.chanceDado(25).caras, h.cd],
+    ['1d4', true, 'eléctrico', 'Parálisis', undefined, '50,25', '50,25', 2, 4, 3]);
+});
 prueba('🛡 Armas perforantes (Support, 2026-10-25): 3 turnos, Perfora 3 y 3 contra la Defensa especial', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Armas perforantes');
   const h = armarHabilidadDeCreep(e.datos, 2);

@@ -1736,10 +1736,24 @@ async function dueloCadena(d, entro){
   // Los efectos del golpe también a cada uno al que salta (`cadena.efectos`, el Relámpago, 2026-10-07): cada uno tira su chance, como en el golpe.
   const extra = [];
   {   // los efectos del golpe a cada uno al que salta (`cadena.efectos`); sin eso, igual la Parálisis a los mojados (el agua, P214)
-    for(const s of cadena.slice(1)){
+    const pctSalto = Array.isArray(c.paralisis) ? c.paralisis : null;   // ⚡ SAP (2026-10-25): el % de Parálisis de cada salto (el 1.º, el 2.º…)
+    for(const [i, s] of cadena.slice(1).entries()){
       const mojado = typeof enAgua === 'function' && enAgua(s.t);
+      const pct = pctSalto ? num(pctSalto[i]) : 0;
+      if(pct > 0){   // como la flecha de tormenta (js/33): se tira a la vista; en el agua, el doble de chance
+        const dd = Combatiente.chanceDado(pct) || {caras: 1, exitos: 1}, exitos = mojado ? Math.min(dd.caras, dd.exitos * 2) : dd.exitos;
+        const sale = 1 + Math.floor(Math.random() * dd.caras), entra = sale > dd.caras - exitos, nom = s.t.oculto ? 'Alguien' : nombreDe(s.t);
+        let txt = `${nom}: Parálisis ${pct} %${mojado ? ' (×2, en el agua)' : ''} (1d${dd.caras}: ${sale}) → ${entra ? 'paralizado 1 turno' : 'no'}`;
+        if(entra){
+          try{ const r = await dueloAplicarEfecto({...d, defensor: {...d.defensor, tokenId: s.id, nombre: nombreDe(s.t), tipo: s.t.tipo, ref: s.t.fichaId}},
+            {nombre: 'Parálisis', caras: 1, exitos: 1, dado: '', detalle: 'Parálisis 1 turno (el salto del rayo).', spec: {nombre: 'Parálisis', turnos: 1}});
+            if(r && r.manual) txt += ' (aplicala a mano)'; else if(r && /no entró/.test(String(r.nota || ''))) txt += ` (${r.nota})`; }
+          catch(err){ console.error('No se pudo paralizar en el salto:', err); txt += ' (aplicala a mano)'; }
+        }
+        extra.push(txt);
+      }
       if(!c.efectos && !mojado) continue;
-      for(const ef of (d.efectos || []).filter(e => e && !e.cura && Duelo.specDeEfecto(e) && (c.efectos || e.nombre === 'Parálisis'))){
+      for(const ef of (d.efectos || []).filter(e => e && !e.cura && Duelo.specDeEfecto(e) && (c.efectos || e.nombre === 'Parálisis') && !(pctSalto && e.nombre === 'Parálisis'))){
         const caras = Math.max(1, Math.round(num(ef.caras)) || 1), exitos0 = Math.max(1, Math.round(num(ef.exitos)) || 1);
         const exitos = ef.nombre === 'Parálisis' && typeof enAgua === 'function' && enAgua(s.t) ? Math.min(caras, exitos0 * 2) : exitos0;   // 💧 el doble de chance (js/50)
         if(Math.floor(Math.random() * caras) >= exitos) continue;

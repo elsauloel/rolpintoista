@@ -28,12 +28,12 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
   robar, sigilo, varios golpes, bajo tierra, veneno.
 - 🏹 **Rango y Hunter — 11**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
-- ✨ **Mago — 9**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25) · de El origen: proyectil, fuego con quemadura.
+- ✨ **Mago — 10**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (SAP, 2026-10-25) · de El origen: proyectil, fuego con quemadura.
 - 🧿 **Debuffer — 10**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25) · de El origen: ceguera, veneno, inmovilizar.
 - 💚 **Support — 10**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24), estandarte (Estandarte de guerra, 2026-10-24), señalar la presa (2026-10-25), armas perforantes (2026-10-25) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
-**Para emparejar**: Mago en 9, Support y Debuffer en 10 (2026-10-25); después Rango + Hunter (11).
+**Para emparejar**: Mago, Support y Debuffer en 10 (2026-10-25); después Rango + Hunter (11).
 
 ## Los roles
 
@@ -256,10 +256,13 @@ líneas, zonas, el rayo en cadena y los charcos, los controles mentales.
     reparten entre objetivos a elección). 3. ✅ **Descarga arcana** ✦ (2026-10-24, ex «Rayo cargado»: un turno lo carga a la vista de todos y queda Marcado —«una luz lo recubre», se lo ve en la niebla—; al siguiente,
     4d6 arcano; 10 de daño se lo cortan).
   - **B. Áreas que se anuncian y terreno:** 4. ✅ **Meteoro** ✦ (2026-10-24: una sombra de diámetro 5 en su Rango; al empezar su próximo turno cae: dodge roll
-    para todos los de adentro —aliados incluidos—, 4d6 físico y 2d6 de fuego directo al que sigue adentro; cooldown 3 que arranca activo). 5. **Suelo helado** (deja hielo: resbalarse al caminar). 6. **Diluvio** (deja charcos: el rayo corre por el agua, combo con la Cadena de rayos).
+    para todos los de adentro —aliados incluidos—, 4d6 físico y 2d6 de fuego directo al que sigue adentro; cooldown 3 que arranca activo). 5. **▶ LA PRÓXIMA del Mago: Lluvia de escarcha** (dueño, 2026-10-25, reemplaza a «Suelo helado»: «una lluvia de escarcha que haga daño de hielo y
+    que deje el piso congelado durante 2 turnos y después deje el charco por tiempo indeterminado»). Ya existe la mecánica: el hielo y el charco de
+    `vtt-hexgrid/js/50-superficies.js` (el «suelo congelado» de la Varita de la ventisca; al irse el hielo queda el charco, que no vence). Falta decidir
+    el área, el daño y el costo. 6. **Diluvio** (deja charcos: el rayo corre por el agua, combo con la Cadena de rayos).
     7. **Nova arcana** (una onda alrededor que empuja).
   - **C. Control elemental:** 8. **Prisión de hielo** (Inmovilizado, se suelta con Fuerza). 9. **Ráfaga de viento** (cono que empuja y tira al piso).
-    10. **Rayo paralizante** (poco daño y Parálisis segura).
+    10. ✅ **SAP** (ex «Rayo paralizante», 2026-10-25: 1d4 eléctrico directo y Parálisis segura; salta con la mitad, 50 % y 25 % de Parálisis).
   - **D. El cuerpo del mago:** 11. **Escudo de maná** (un escudo que se paga con SP). 12. **Parpadeo** (se teletransporta unas casillas, Flash).
     13. **Contrahechizo** (Flash: al ver una habilidad de un personaje, la frena con su Res.Esp).
   - **E. Debilidad y sobrecarga:** 14. **Marca elemental** (el objetivo queda vulnerable a un elemento: Res. −2; se cruza con las debilidades por tipo de

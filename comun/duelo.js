@@ -704,7 +704,7 @@ const Duelo = (() => {
       ...(h.atrae ? {atrae: {casillas: Math.min(6, Math.max(1, Math.round(_num(h.atrae.casillas)) || 2)), contra: txtCorto(h.atrae.contra || 'fue', 12), tiraValor: _num(h.atrae.tiraValor)}} : {}),   // el gancho
       ...(_num(h.critTipo) ? {critTipo: Math.min(12, Math.max(1, Math.round(_num(h.critTipo))))} : {}),   // lo físico invocado critica como su Tipo
       ...(objetivo === 'linea' ? {largo: Math.min(12, Math.max(1, Math.round(_num(h.largo)) || 4))} : {}),
-      ...(h.cadena ? {cadena: {saltos: Math.min(6, Math.max(1, Math.round(_num(h.cadena.saltos)) || 2)), rango: Math.min(6, Math.max(1, Math.round(_num(h.cadena.rango)) || 3)), ...(h.cadena.efectos ? {efectos: true} : {})}} : {}),   // rayo en cadena (2026-10-05)
+      ...(h.cadena ? {cadena: {saltos: Math.min(6, Math.max(1, Math.round(_num(h.cadena.saltos)) || 2)), rango: Math.min(6, Math.max(1, Math.round(_num(h.cadena.rango)) || 3)), ...(h.cadena.efectos ? {efectos: true} : {}), ...(Array.isArray(h.cadena.paralisis) ? {paralisis: h.cadena.paralisis.slice(0, 6).map(x => Math.max(0, Math.min(100, Math.round(_num(x)) || 0)))} : {})}} : {}),   // rayo en cadena (2026-10-05); `paralisis`: el % de cada salto (SAP, 2026-10-25)
       ...(h.detalle ? {detalle: txtCorto(h.detalle, 600)} : {}),   // el texto de la habilidad (el recuadro de la izquierda, 2026-10-15)
       ...(h.efectoLibre ? {efectoLibre: txtCorto(h.efectoLibre, 200)} : {}),
       ...(h.efectosNota ? {efectosNota: txtCorto(h.efectosNota, 200)} : {}),

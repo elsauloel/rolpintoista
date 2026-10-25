@@ -1626,7 +1626,8 @@ const Combatiente = (() => {
       // Tormenta arcana (Mago, 2026-10-13): `proyectiles` (1d20) que caen al azar, de `cada` (1d4) cada uno; sin tirada: solo se zafa con el dodge roll.
       ...(c.objetivo === 'area' && c.tormenta ? {tormenta: {proyectiles: String(c.tormenta.proyectiles || '1d20'), cada: String(c.tormenta.cada || '1d4')}, soloDodge: true} : {}),   // un área que también agarra a los aliados (2026-10-07, Bola de fuego mayor)
       ...(c.atrae ? {atrae: {casillas: Math.max(1, Math.round(nf(c.atrae.casillas)) || 2), contra: c.atrae.contra || 'fue', ...(o.stat ? {tiraValor: Math.round(nf(o.stat(c.atrae.tira || 'dmgesp')))} : {})}} : {}),
-      ...(c.reparte ? {reparte: {cada: String(c.reparte.cada || '1d4'), total: Math.max(2, Math.round(nf(c.reparte.total)) || 2)}} : {}),
+      // (+ el Ef.Esp de quien la usa, a cada misil: la Andanada arcana del Mago, 2026-10-25; la Varita de misiles no lo suma.)
+      ...(c.reparte ? {reparte: {cada: String(c.reparte.cada || '1d4') + (sumaEsp > 0 ? `+${sumaEsp}` : ''), total: Math.max(2, Math.round(nf(c.reparte.total)) || 2)}} : {}),
       ...(nf(c.critTipo) ? {critTipo: Math.round(nf(c.critTipo))} : {}),   // la luz (2026-10-05, Varita de la luz): solo los rivales en sigilo que alcanza
       // Rayo en cadena (2026-10-05, Varita de chispa eléctrica): si el golpe entra, salta `saltos` veces al más cercano del mismo bando a
       // `rango` casillas o menos, la mitad cada salto (P118: la misma regla de ⚡ Rayo en cadena del token y de la trampa Descarga).

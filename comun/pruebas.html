@@ -1039,13 +1039,13 @@ prueba('🎯 Disparo señalador (2026-10-21): Presa (Evasión −1) y Marcado', 
   const P = estadosPresetCreep().find(p => p.nombre === 'Presa');
   igual([h.cd, a.efectos.map(e => (e.spec || {}).nombre).join(','), P.turnos, P.presa, JSON.stringify(P.mods)], [3, 'Presa,Marcado', 2, 2, '[{"stat":"eva","val":-1}]']);
 });
-prueba('🛡 Abrir la guardia (Support, 2026-10-25): Atraviesa guardias, Perfora 3 y 3 contra la Defensa especial', () => {
-  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Abrir la guardia');
+prueba('🛡 Armas perforantes (Support, 2026-10-25): 3 turnos, Perfora 3 y 3 contra la Defensa especial', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Armas perforantes');
   const h = armarHabilidadDeCreep(e.datos, 2);
-  const P = estadosPresetCreep().find(p => p.nombre === 'Atraviesa guardias');
-  const pe = Combatiente.perforaDeEstados([{nombre: 'Atraviesa guardias'}, {nombre: 'Otro'}]);
+  const P = estadosPresetCreep().find(p => p.nombre === 'Armas perforantes');
+  const pe = Combatiente.perforaDeEstados([{nombre: 'Armas perforantes'}, {nombre: 'Otro'}]);
   igual([h.duelo.objetivo, h.duelo.conmigo, h.duelo.efectos[0].nombre, P.turnos, !!P.turnosCompletos, pe.def, pe.esp, Combatiente.perforaPasa(5, 6, 3), h.cd, h.spCosto],
-    ['aliado', true, 'Atraviesa guardias', 2, true, 3, 3, 3, 3, 3]);
+    ['aliado', true, 'Armas perforantes', 3, true, 3, 3, 3, 3, 3]);
 });
 prueba('🧪 Escupitajo ácido (2026-10-25): la versión bestia de Corroer, con la misma mecánica', () => {
   const c = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Corroer'), e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Escupitajo ácido');

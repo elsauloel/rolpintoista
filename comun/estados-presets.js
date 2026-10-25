@@ -136,10 +136,10 @@ const ESTADOS_PRESET = [
   // (`turnosCompletos`: el turno en que se lo dan no cuenta, aunque sea el suyo; Combatiente.terminarTurnoEstados).
   {nombre:'Ojo certero', polaridad:'buff', turnos:2, turnosCompletos:true, mods:[{stat:'crit', val:2}, {stat:'critpot', val:2}],
     detalle:'Le afinan la puntería: Crítico frecuente +2 y Crítico potente +2 durante sus próximos 2 turnos completos (el turno en que se lo dan no cuenta). Si se lo vuelven a dar, no se suma: vuelve a durar 2 turnos. ⚙ Automatizado.'},
-  // Atraviesa guardias (2026-10-25, dueño: el Support, «Abrir la guardia»: «un estado que le hace perforar 3 de defensa y 3 de defensa especial»): en
+  // Armas perforantes (2026-10-25, dueño: el Support, que la nombró y le dio 3 turnos «porque al poder fallar, prefiero que dure un turno más»; «un estado que le hace perforar 3 de defensa y 3 de defensa especial»): en
   // cada golpe que da, la Perfora de siempre (N puntos pasan siempre) contra la Defensa y contra la Defensa especial (js/13, Combatiente.perforaDeEstados).
-  {nombre:'Atraviesa guardias', polaridad:'buff', turnos:2, turnosCompletos:true, perforaGolpe:3, perforaEsp:3,
-    detalle:'Sus golpes atraviesan la guardia: en cada golpe que da, 3 puntos de daño pasan siempre la Defensa del rival y 3 pasan siempre su Defensa especial (el resto va contra ellas como siempre). Dura sus próximos 2 turnos completos (el turno en que se lo dan no cuenta). ⚙ Automatizado en el mapa.'},
+  {nombre:'Armas perforantes', polaridad:'buff', turnos:3, turnosCompletos:true, perforaGolpe:3, perforaEsp:3,
+    detalle:'Sus golpes atraviesan la guardia: en cada golpe que da, 3 puntos de daño pasan siempre la Defensa del rival y 3 pasan siempre su Defensa especial (el resto va contra ellas como siempre). Dura sus próximos 3 turnos completos (el turno en que se lo dan no cuenta). ⚙ Automatizado en el mapa.'},
   // Sequía (2026-10-24, dueño: la Maldición de la sequía del Debuffer, «sólo corta las regeneraciones de SP y HP propias, no las externas»).
   {nombre:'Sequía', polaridad:'debuff', turnos:3, sequia:true,
     detalle:'Una maldición que lo seca por dentro: mientras dure no recupera vida ni SP por sí mismo al empezar el turno (sus pasivas de regeneración, la Regeneración de vida de su equipo, su SP Regen). Lo que le dan otros (una cura, la Regeneración de un aliado, una zona de curación) entra igual. ⚙ Automatizado.'},

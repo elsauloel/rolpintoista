@@ -1624,7 +1624,7 @@ async function dueloAplicarDano(d){
   // (Antes, hasta el 2026-10-10, le restaba N a la Defensa: contra un tanque casi no servía.)
   // 🎯 Punta de diamante (contra Defensa 12 o más, Perfora +2) y Remachadora (golpes seguidos al mismo blanco, js/35), 2026-10-11.
   const perfExtra = d.ataque && !crit ? (d.ataque.puntaDiamante && def >= Combatiente.PUNTA_DIAMANTE_DEF ? Combatiente.PUNTA_DIAMANTE_PERFORA : 0) + remachadoraPerfora(d) : 0;
-  // 🛡 Atraviesa guardias (2026-10-25, el Support): la Perfora que le da un estado a quien ataca, contra la Defensa y contra la Defensa especial.
+  // 🛡 Armas perforantes (2026-10-25, el Support): la Perfora que le da un estado a quien ataca, contra la Defensa y contra la Defensa especial.
   const perfEst = Combatiente.perforaDeEstados((((vinculo(tokens.get(d.atacante && d.atacante.tokenId)) || {}).resumen) || {}).estados);
   const perfN = !crit && d.ataque ? Math.min(num(d.ataque.flecha && d.ataque.flecha.perfora) + num(d.ataque.perfora) + perfExtra + perfEst.def, golpe) : 0;
   const perfora = Combatiente.perforaPasa(golpe, def, perfN);   // solo cuenta si la Defensa frenaría más que eso
@@ -1636,7 +1636,7 @@ async function dueloAplicarDano(d){
   // …y contra la Defensa especial: de lo que llega, esos N pasan siempre; el resto va contra la Defensa especial como siempre.
   if(frenaAm && perfEst.esp > 0 && armadmg > 0){
     const resta = Math.min(armadmg, Math.max(0, aplicar - perfEst.esp));
-    if(resta < armadmg){ freno = freno.replace(`Defensa especial ${armadmg}`, `Defensa especial ${armadmg} (pasan ${Math.min(perfEst.esp, aplicar)} por Atraviesa guardias)`); restaIgnorando = resta; }
+    if(resta < armadmg){ freno = freno.replace(`Defensa especial ${armadmg}`, `Defensa especial ${armadmg} (pasan ${Math.min(perfEst.esp, aplicar)} por Armas perforantes)`); restaIgnorando = resta; }
   }
   // Bloqueo perdido (mitad del daño): el arma o escudo con el que bloqueó pierde 1 punto de durabilidad (solo personajes: los creeps y las invocaciones no llevan).
   // 💧 En el agua, el rayo ×1,5 (js/50, 2026-10-17).

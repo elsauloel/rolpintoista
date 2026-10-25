@@ -100,7 +100,7 @@
 > pasa las pruebas automáticas y se sube, **pero no se prueba en el mapa en el momento**: se anota acá. Cuando el dueño lo pida, se corren todas
 > juntas en el mapa, con capturas, y se marcan.
 
-- [ ] **🛡 Abrir la guardia (Support, 2026-10-25)**: un creep se lo da a un aliado (o a sí mismo); el aliado queda con Atraviesa guardias 2 turnos completos; su golpe físico contra juan dice «pasa 3 por la Perfora» y uno mágico (o con arma de daño especial) muestra «Defensa especial N (pasan 3 por Atraviesa guardias)».
+- [ ] **🛡 Armas perforantes (Support, 2026-10-25)**: un creep se lo da a un aliado (o a sí mismo); el aliado queda con Armas perforantes 3 turnos completos; su golpe físico contra juan dice «pasa 3 por la Perfora» y uno mágico (o con arma de daño especial) muestra «Defensa especial N (pasan 3 por Armas perforantes)».
 - [x] Golpe fuerte, Tajo veloz, Estocada, Zarpazo, Mordisco feroz y Cornada — probadas en el mapa una por una (2026-10-20/21, antes de esta forma
   de trabajo).
 - [x] **👊 Puño de roca** (+2 al daño y Demora) — probado en el mapa el 2026-10-21: la declaración dice «+2 de daño fijo» y la Demora bajó a Silvia

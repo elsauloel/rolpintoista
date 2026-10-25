@@ -51,7 +51,7 @@ const Combatiente = (() => {
     if(e.nombre === 'Presa señalada') return 4;
     return (e.presa || e.nombre === 'Presa') ? 2 : 0;
   }
-  /* 🛡 La Perfora que dan los estados (2026-10-25, Atraviesa guardias del Support): `perforaGolpe` (contra la Defensa) y `perforaEsp` (contra la
+  /* 🛡 La Perfora que dan los estados (2026-10-25, Armas perforantes del Support): `perforaGolpe` (contra la Defensa) y `perforaEsp` (contra la
      Defensa especial), del estado o de su preset (el resumen público lleva solo el nombre); con dos, vale la más fuerte. → {def, esp}. */
   function perforaDeEstados(estados){
     const presets = typeof ESTADOS_PRESET !== 'undefined' ? ESTADOS_PRESET : [];

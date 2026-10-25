@@ -196,20 +196,43 @@ function estandarteDibujar(z){
     hay = true;
     const celdas = estandarteCeldas({col: t.col, fila: t.fila}, e.radio), c = hexCentro(t.col, t.fila);
     const p = 0.5 + 0.5 * Math.sin(t0 * 1.3);
-    if(e.silencio){   // 🤐 el tótem: un velo violeta que respira, el borde punteado gris y un anillo doble, quieto (es silencio: nada flamea)
+    if(e.silencio){   // 🤐 el tótem (2026-10-25): un velo violeta que respira, el borde punteado gris de las casillas que cuentan y, pegado por fuera,
+      // una costura: un hilo violeta que sigue la forma del área (como el anillo del estandarte, con las puntas redondeadas) cruzado por puntadas
+      // grises, como la boca cosida del tótem. Quieta: es silencio, nada flamea.
       ctx.save();
       ctx.beginPath();
       celdas.forEach(q => { const h = hexCentro(q.col, q.fila); ESQUINAS.forEach((a, i) => i ? ctx.lineTo(h.x + a[0], h.y + a[1]) : ctx.moveTo(h.x + a[0], h.y + a[1])); ctx.closePath(); });
-      ctx.fillStyle = `rgba(70,55,120,${0.10 + 0.05 * p})`; ctx.fill();
+      ctx.fillStyle = `rgba(70,55,120,${0.12 + 0.05 * p})`; ctx.fill();
       ctx.restore();
       bordeHexPunteado(celdas, z, 'rgba(200,192,225,.55)');
-      const R = Math.max(...celdas.map(q => { const h = hexCentro(q.col, q.fila); return Math.hypot(h.x - c.x, h.y - c.y); })) + HEX * 1.15;
+      const pts = celdas.map(q => hexCentro(q.col, q.fila)), M = 120, MARGEN = HEX * 0.95;
+      const punto = th => {
+        const ux = Math.cos(th), uy = Math.sin(th);
+        let mejor = pts[0], hmax = -Infinity;
+        for(const q of pts){ const d = (q.x - c.x) * ux + (q.y - c.y) * uy; if(d > hmax){ hmax = d; mejor = q; } }
+        return {x: mejor.x + ux * MARGEN, y: mejor.y + uy * MARGEN};
+      };
+      const linea = []; for(let i = 0; i <= M; i++) linea.push(punto((i / M) * Math.PI * 2));
       ctx.save();
-      ctx.beginPath(); ctx.arc(c.x, c.y, R, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(20,14,35,.55)'; ctx.lineWidth = 5 / z; ctx.stroke();
-      ctx.strokeStyle = `rgba(110,90,170,${0.7 + 0.2 * p})`; ctx.lineWidth = 3 / z; ctx.stroke();
-      ctx.setLineDash([HEX * 0.25, HEX * 0.18]); ctx.beginPath(); ctx.arc(c.x, c.y, R - 5 / z, 0, Math.PI * 2);
-      ctx.strokeStyle = 'rgba(200,192,225,.7)'; ctx.lineWidth = 1.2 / z; ctx.stroke();
+      ctx.lineJoin = 'round';
+      ctx.beginPath(); linea.forEach((q, i) => i ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y)); ctx.closePath();
+      ctx.strokeStyle = 'rgba(20,14,35,.6)'; ctx.lineWidth = 6 / z; ctx.stroke();
+      ctx.strokeStyle = `rgba(120,96,190,${0.75 + 0.2 * p})`; ctx.lineWidth = 3 / z; ctx.stroke();
+      // Las puntadas, a distancias iguales a lo largo del contorno, cruzando el hilo.
+      const tramos = []; let total = 0;
+      for(let i = 0; i < M; i++){ const l = Math.hypot(linea[i + 1].x - linea[i].x, linea[i + 1].y - linea[i].y); tramos.push(l); total += l; }
+      const N = Math.max(16, Math.round(total / HEX * 0.8)), largo = HEX * 0.44;
+      ctx.lineCap = 'round';
+      for(let i = 0; i < N; i++){
+        let resto = (i / N) * total, k = 0;
+        while(k < M - 1 && resto > tramos[k]){ resto -= tramos[k]; k++; }
+        const a0 = linea[k], a1 = linea[k + 1], f = tramos[k] ? resto / tramos[k] : 0, tl = tramos[k] || 1;
+        const bx = a0.x + (a1.x - a0.x) * f, by = a0.y + (a1.y - a0.y) * f, vx = (a1.x - a0.x) / tl, vy = (a1.y - a0.y) / tl;
+        const nx = vy, ny = -vx, ix = vx * largo * 0.25, iy = vy * largo * 0.25;   // la puntada, un poco inclinada
+        ctx.beginPath(); ctx.moveTo(bx - nx * largo / 2 - ix, by - ny * largo / 2 - iy); ctx.lineTo(bx + nx * largo / 2 + ix, by + ny * largo / 2 + iy);
+        ctx.strokeStyle = 'rgba(20,14,35,.7)'; ctx.lineWidth = 4 / z; ctx.stroke();
+        ctx.strokeStyle = 'rgba(205,198,228,.95)'; ctx.lineWidth = 2 / z; ctx.stroke();
+      }
       ctx.restore();
       return;
     }

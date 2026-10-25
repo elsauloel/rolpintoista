@@ -163,7 +163,7 @@ async function estandarteCrear(sc, e, celda, tOrig){
 }
 // Sacarlo del mapa y borrar su ficha (al romperse, o al clavar otro).
 async function estandarteQuitar(id, t, motivo){
-  const v = vinculo(t), nom = (v && v.nombre) || t.nombre || 'El estandarte';
+  const v = vinculo(t), nom = (v && v.nombre) || t.nombre || 'El estandarte', sil = !!(estandarteInfo(t) || {}).silencio;   // (antes de borrarlo: después ya no se sabe)
   try{ await coleccionTokens().doc(id).delete(); }catch(err){ console.error('No se pudo sacar el token del estandarte:', err); }
   try{
     const base = fbDb.doc(fbRutaCampana(`creeps/${t.fichaId}`));
@@ -171,7 +171,7 @@ async function estandarteQuitar(id, t, motivo){
     await base.delete();
   }catch(err){ console.error('No se pudo borrar la ficha del estandarte:', err); }
   if(motivo === 'roto'){
-    const sil = !!(estandarteInfo(t) || {}).silencio, ic = sil ? '🤐' : '🚩';
+    const ic = sil ? '🤐' : '🚩';
     try{ mesaLinea(`${ic} Rompieron ${nom}: ${sil ? 'se termina el silencio' : 'se termina su bonus'}`, 'recordatorio'); }catch(err){}
     try{ momentoAbrir({tipo: 'estandarte', icono: ic, titulo: `Rompieron ${nom}`, resultado: sil ? 'Sus rivales ya pueden volver a usar habilidades que cuestan SP.' : 'Sus aliados ya no suman el bonus.', estado: 'listo', datos: {centro: true}}); }catch(err){}
   }

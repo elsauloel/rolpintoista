@@ -195,7 +195,8 @@ la emboscada, matabestias, la espalda a distancia, la recarga, el proyectil perf
 **B. Volumen de fuego** ✦
 5. **Disparo doble**: dos disparos con menos puntería cada uno.
 6. **Ráfaga**: tres disparos, cada uno a un objetivo distinto.
-7. **Lluvia de flechas**: un área (flor) donde caen flechas, con dodge roll.
+7. **Lluvia de flechas**: un área (flor) donde caen flechas, con dodge roll. ⏸ Para otro momento (dueño, 2026-10-25). Propuesta guardada: diámetro 3
+   en su Rango, su PdG una vez contra la Evasión de cada uno (dodge roll), el daño de su arma +2; un ataque y 3 SP, o cooldown 3.
 8. **Abanico**: un cono de flechas al frente.
 9. **Atravesar**: el disparo sigue de largo y le pega al de atrás (el Proyectil perforante del Shooter).
 

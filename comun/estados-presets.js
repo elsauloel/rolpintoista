@@ -137,9 +137,10 @@ const ESTADOS_PRESET = [
   {nombre:'Ojo certero', polaridad:'buff', turnos:2, turnosCompletos:true, mods:[{stat:'crit', val:2}, {stat:'critpot', val:2}],
     detalle:'Le afinan la puntería: Crítico frecuente +2 y Crítico potente +2 durante sus próximos 2 turnos completos (el turno en que se lo dan no cuenta). Si se lo vuelven a dar, no se suma: vuelve a durar 2 turnos. ⚙ Automatizado.'},
   // Frenético (2026-10-25, dueño: el Support, «Frenesí inducido»: «+3 a la probabilidad de golpe, +5 al daño», con −2 Evasión y −2 Defensa): 2 turnos
-  // completos de quien lo recibe; y se cura 1d6 al ponérselo y al empezar cada uno de sus turnos (`curaDado`, el dueño, el mismo día).
-  {nombre:'Frenético', polaridad:'buff', turnos:2, turnosCompletos:true, curaDado:'1d6', mods:[{stat:'pdg', val:3}, {stat:'pdgmg', val:3}, {stat:'dmg', val:5}, {stat:'dmgesp', val:5}, {stat:'eva', val:-2}, {stat:'def', val:-2}],
-    detalle:'Frenético: +3 a la Probabilidad de Golpe (también la especial) y +5 al daño (también al Efecto especial), pero −2 a la Evasión y −2 a la Defensa; y se cura 1d6 apenas se lo ponen y otra vez al empezar cada uno de sus turnos. Dura sus próximos 2 turnos completos (el turno en que se lo dan no cuenta). Si se lo vuelven a dar, no se suma: vuelve a durar 2 turnos. ⚙ Automatizado.'},
+  // completos de quien lo recibe; y cura 4 al ponérselo y al empezar cada uno de sus turnos (el dueño, el mismo día: primero 1d6, después «que cure 4,
+  // para no tirar un dado, simplemente suceda»).
+  {nombre:'Frenético', polaridad:'buff', turnos:2, turnosCompletos:true, hpTurno:4, stacksTurno:0, mods:[{stat:'pdg', val:3}, {stat:'pdgmg', val:3}, {stat:'dmg', val:5}, {stat:'dmgesp', val:5}, {stat:'eva', val:-2}, {stat:'def', val:-2}],
+    detalle:'Frenético: +3 a la Probabilidad de Golpe (también la especial) y +5 al daño (también al Efecto especial), pero −2 a la Evasión y −2 a la Defensa; y se cura 4 apenas se lo ponen y otra vez al empezar cada uno de sus turnos. Dura sus próximos 2 turnos completos (el turno en que se lo dan no cuenta). Si se lo vuelven a dar, no se suma: vuelve a durar 2 turnos. ⚙ Automatizado.'},
   // Redoble (2026-10-25, dueño: el Support, «Redoble de tambores»): +2 a los No2 máximos durante su próximo turno completo (el No2 se recarga al
   // máximo al empezar su turno, así que ese turno tiene 2 más).
   {nombre:'Redoble', polaridad:'buff', turnos:1, turnosCompletos:true, mods:[{stat:'nitros', val:2}],

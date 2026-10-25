@@ -321,7 +321,7 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
 19. **Sin escapatoria**: el objetivo no se puede alejar (Rengo, o la oportunidad le sale a todos).
 
 **E. Apuestas** ✦
-20. ✅ **Frenesí inducido** (2026-10-25): a él o a un aliado, Frenético 2 turnos completos (+3 PdG, +5 al daño, −2 Evasión, −2 Defensa) y 1d6 de cura
+20. ✅ **Frenesí inducido** (2026-10-25): a él o a un aliado, Frenético 2 turnos completos (+3 PdG, +5 al daño, −2 Evasión, −2 Defensa) y cura 4
     al ponérselo y al empezar cada uno de sus turnos.
 21. **Pacto de sangre**: un aliado gana daño y pierde vida cada turno.
 22. **Compartir fuerza**: el support da vida, No2 o SP propios a un aliado (hoy, a mano).

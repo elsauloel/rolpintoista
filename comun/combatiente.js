@@ -224,8 +224,8 @@ const Combatiente = (() => {
       }
       const stacks = Math.max(1, n(e.stacks) || 1);
       let d = n(e[c.hp]) * stacks;
-      // 🎲 Una cura con dado por turno (`curaDado`, 2026-10-25, el Frenético del Support: «al inducir el frenesí ya se cura un d6, y después cada turno
-      // completo se vuelve a curar un d6»): se tira cada vez que se dispara (al ponerlo y al empezar cada turno), como la Regeneración.
+      // 🎲 Una cura con dado por turno (`curaDado`, 2026-10-25; la pidió el Frenético del Support y después pasó a una cura fija de 4, pero queda para
+      // otros estados): se tira cada vez que se dispara (al ponerlo y al empezar cada turno), como la Regeneración.
       const tiro = e.curaDado ? curaTirada(String(e.curaDado)) : null;
       if(tiro) d += tiro.cura;
       if(d > 0 && n(e.curaExtraPrimera) > 0){ d += n(e.curaExtraPrimera); delete e.curaExtraPrimera; }   // 💍 el Boticario: solo la primera vez (2026-10-19)

@@ -1039,14 +1039,15 @@ prueba('🎯 Disparo señalador (2026-10-21): Presa (Evasión −1) y Marcado', 
   const P = estadosPresetCreep().find(p => p.nombre === 'Presa');
   igual([h.cd, a.efectos.map(e => (e.spec || {}).nombre).join(','), P.turnos, P.presa, JSON.stringify(P.mods)], [3, 'Presa,Marcado', 2, 2, '[{"stat":"eva","val":-1}]']);
 });
-prueba('🔥 Frenesí inducido (Support, 2026-10-25): cura 1d6 y Frenético 2 turnos (+3 PdG, +5 daño, −2 Eva, −2 Def)', () => {
+prueba('🔥 Frenesí inducido (Support, 2026-10-25): cura 4 por turno y Frenético 2 turnos (+3 PdG, +5 daño, −2 Eva, −2 Def)', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Frenesí inducido');
   const h = armarHabilidadDeCreep(e.datos, 2);
   const P = estadosPresetCreep().find(p => p.nombre === 'Frenético');
   const m = Object.fromEntries(P.mods.map(x => [x.stat, x.val]));
-  const est = [{...structuredClone(P), activo: true}], d = Combatiente.dispararEstados(est, {hp: 'hpTurno', stacks: 'stacksTurno'});   // 🎲 la cura con dado, al dispararse
-  igual([h.duelo.objetivo, h.duelo.conmigo, h.duelo.efectos.length, h.duelo.efectos[0].nombre, P.curaDado, d.hp >= 1 && d.hp <= 6, d.eventos[0].dado, m.pdg, m.pdgmg, m.dmg, m.eva, m.def, P.turnos, !!P.turnosCompletos, h.cd],
-    ['aliado', true, 1, 'Frenético', '1d6', true, '1d6', 3, 3, 5, -2, -2, 2, true, 3]);
+  const est = [{...structuredClone(P), activo: true}], d = Combatiente.dispararEstados(est, {hp: 'hpTurno', stacks: 'stacksTurno'});   // la cura fija, al dispararse
+  const dado = Combatiente.dispararEstados([{nombre: 'X', activo: true, curaDado: '1d6'}], {hp: 'hpTurno'});   // 🎲 `curaDado` sigue disponible para otros estados
+  igual([h.duelo.objetivo, h.duelo.conmigo, h.duelo.efectos.length, h.duelo.efectos[0].nombre, P.hpTurno, d.hp, dado.hp >= 1 && dado.hp <= 6 && dado.eventos[0].dado, m.pdg, m.pdgmg, m.dmg, m.eva, m.def, P.turnos, !!P.turnosCompletos, h.cd],
+    ['aliado', true, 1, 'Frenético', 4, 4, '1d6', 3, 3, 5, -2, -2, 2, true, 3]);
 });
 prueba('🥵 Extenuar (Debuffer, 2026-10-25): PdG.Esp contra Res.Esp, 2d4 arcano y Extenuado 2 turnos', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Extenuar');

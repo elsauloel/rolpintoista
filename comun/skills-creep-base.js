@@ -369,10 +369,10 @@
   // Costo propuesto por Claude: 2 No2 y 3 SP, o cooldown 3.
   // 🔥 Auditada (dueño, 2026-10-25; el Support, «apuestas», Frenesí inducido: «misma penalidad, pero +3 a la probabilidad de golpe, +5 al daño»; «bien» a
   // la cura de 1d6 que propuso Claude, para que se sienta; y «mientras dura, que se cure un d6 cada turno completo»): a él o a un aliado en su Rango, sin
-  // tirada: Frenético 2 turnos completos, que cura 1d6 al ponerlo y al empezar cada uno de sus turnos (`curaDado` del preset).
+  // tirada: Frenético 2 turnos completos, que cura 4 al ponerlo y al empezar cada uno de sus turnos (dueño: «que cure 4, para no tirar un dado»).
   // Costo propuesto por Claude: 1 No2 y 3 SP, o cooldown 3.
-  H('Frenesí inducido', 'B', '*', 'a', 3, {detalle: 'Le enciende la sangre a un aliado (o a sí mismo) dentro de su Rango: queda Frenético durante sus próximos 2 turnos completos (el turno en que se lo da no cuenta): +3 a la Probabilidad de Golpe (también la especial) y +5 al daño, pero −2 a la Evasión y −2 a la Defensa; y se cura 1d6 en el momento y otra vez al empezar cada uno de sus turnos.',
-    no2: 1, spCosto: 3, auditada: true, ataqueTxt: 'a él o a un aliado en su Rango: Frenético 2 turnos (+3 PdG, +5 al daño, −2 Evasión, −2 Defensa) y 1d6 de cura ahora y en cada turno',
+  H('Frenesí inducido', 'B', '*', 'a', 3, {detalle: 'Le enciende la sangre a un aliado (o a sí mismo) dentro de su Rango: queda Frenético durante sus próximos 2 turnos completos (el turno en que se lo da no cuenta): +3 a la Probabilidad de Golpe (también la especial) y +5 al daño, pero −2 a la Evasión y −2 a la Defensa; y se cura 4 en el momento y otra vez al empezar cada uno de sus turnos.',
+    no2: 1, spCosto: 3, auditada: true, ataqueTxt: 'a él o a un aliado en su Rango: Frenético 2 turnos (+3 PdG, +5 al daño, −2 Evasión, −2 Defensa) y cura 4 ahora y en cada turno',
     duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', efectos: [{nombre: 'Frenético'}]}});
   H('Redoble de tambores', 'BA', '*', 'a', 3, {detalle: 'Un redoble que empuja a los suyos: sus aliados a 4 casillas o menos (no él) suman +2 No2 en su próximo turno (Redoble) y, los que trabajan con cooldown (no con SP), bajan en 1 cada cooldown que tengan activo.',
     no2: 2, spCosto: 3, auditada: true, ataqueTxt: 'a sus aliados a 4 o menos: +2 No2 su próximo turno y −1 a sus cooldowns activos',

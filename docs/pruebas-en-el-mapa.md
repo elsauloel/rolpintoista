@@ -100,7 +100,7 @@
 > pasa las pruebas automáticas y se sube, **pero no se prueba en el mapa en el momento**: se anota acá. Cuando el dueño lo pida, se corren todas
 > juntas en el mapa, con capturas, y se marcan.
 
-- [ ] **🔥 Frenesí inducido (Support, 2026-10-25)**: a un aliado creep: se cura 1d6 en el momento y queda Frenético 2 turnos completos (al empezar cada uno de sus turnos, otro 1d6 de cura, con el dado en el reporte); su ataque siguiente con +3 PdG y +5 al daño, y su Evasión y Defensa −2 al defenderse.
+- [ ] **🔥 Frenesí inducido (Support, 2026-10-25)**: a un aliado creep: se cura 4 en el momento y queda Frenético 2 turnos completos (al empezar cada uno de sus turnos, otros 4); su ataque siguiente con +3 PdG y +5 al daño, y su Evasión y Defensa −2 al defenderse.
 - [ ] **🥵 Extenuar (Debuffer, 2026-10-25)**: PdG.Esp contra la Res.Esp de juan; si gana, 2d4 arcano (menos su Defensa especial) y Extenuado 2 turnos: su ataque y el moverse le cuestan 1 No2 más.
 - [ ] **🏹 Mantener a raya (Rango, 2026-10-25)**: un arquero creep contra juan: el ataque declara +2 al daño; si pega, juan se corre 2 casillas lejos del arquero (contra una pared: la colisión) y queda Lento 2 turnos.
 - [ ] **🌨 Lluvia de escarcha (Mago, 2026-10-25)**: el área de diámetro 5 en su Rango; PdG.Esp contra la Evasión de cada uno con dodge roll; 2d4 + ¼ Ef.Esp de hielo; el suelo congelado (celeste, con la franja) 2 turnos, la tirada de Agilidad al aparecer y por cada paso; al irse, el charco. Y la **Varita de la ventisca** con 2d4.

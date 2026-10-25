@@ -1039,6 +1039,17 @@ prueba('🎯 Disparo señalador (2026-10-21): Presa (Evasión −1) y Marcado', 
   const P = estadosPresetCreep().find(p => p.nombre === 'Presa');
   igual([h.cd, a.efectos.map(e => (e.spec || {}).nombre).join(','), P.turnos, P.presa, JSON.stringify(P.mods)], [3, 'Presa,Marcado', 2, 2, '[{"stat":"eva","val":-1}]']);
 });
+prueba('🎆 Misiles elementales (Mago, 2026-10-25): uno por elemento y el Misil elemental, que deja elegir (+1 No2, su Especial + 2 SP)', () => {
+  const N = ['Misil arcano', 'Ascua', 'Carámbano', 'Centella', 'Gota corrosiva', 'Ponzoña'];
+  const hs = N.map(n => armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos, 2));
+  const el = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Misil elemental').datos, 2);
+  const pz = hs[5].duelo.porDano, ce = hs[3].duelo;
+  const sc = {esp: 6, estados: [], equipo: []};
+  igual([hs.map(h => h.duelo.tipoDano).join(','), !!hs[0].duelo.danoDirecto, hs[1].duelo.efectos[0].nombre, hs[2].duelo.porDano.estado,
+    ce.danoSiempre, ce.contra.join(','), ce.danoFormula, !!ce.cadena, ce.efectos[0].caras, hs[4].duelo.porDano.estado,
+    Combatiente.stacksPorDano(12, pz), Combatiente.porDanoTxt(pz), el.variantes.length, el.nitrosCosto, CreepCalculo.costoSpHab(sc, el), CreepCalculo.costoSpHab(sc, hs[1]), !!HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Misil arcano' && /no falla/.test(x.datos.detalle || ''))],
+    ['arcano,fuego,hielo,eléctrico,ácido,tóxico', true, 'Quemadura', 'Escarcha', true, 'resmg', '1d6', true, 2, 'Armadura rota', 4, 'Veneno: 2, y uno más cada 5 de daño', 6, 3, 8, 6, false]);
+});
 prueba('✨ Purificar (Support, 2026-10-25): Flash; a un aliado, la purga y cura 5', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Purificar');
   const h = armarHabilidadDeCreep(e.datos, 2);

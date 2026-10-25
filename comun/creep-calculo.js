@@ -535,6 +535,7 @@ const CreepCalculo = (() => {
   function spActual(sc){ return sc && sc.sp !== undefined && sc.sp !== null && sc.sp !== '' ? Math.max(0, num(sc.sp)) : spMax(sc); }
   function costoSpHab(sc, h){
     if(h && h.spCosto === 'esp') return Math.max(1, Math.round(num(statValor(sc, 'esp'))));   // cuesta tanto SP como su Especial (2026-10-21, la Bola de fuego; P216)
+    { const m = /^esp\+(\d+)$/.exec(String((h && h.spCosto) || '')); if(m) return Math.max(1, Math.round(num(statValor(sc, 'esp')))) + Number(m[1]); }   // su Especial + N (el Misil elemental, 2026-10-25)
     if(h && h.spCosto !== undefined && h.spCosto !== null && h.spCosto !== '' && Number.isFinite(Number(h.spCosto))) return Math.max(0, Math.round(Number(h.spCosto)));
     const c = parseInt(String((h && h.costo) || '').trim(), 10);
     if(Number.isFinite(c) && c > 0) return c;

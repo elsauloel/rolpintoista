@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261023p5', '../comun/creep-botonera.js?v=20261023p8a', '../comun/creep-acciones.js?v=20261025a', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261024bendecir'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261023p5', '../comun/creep-botonera.js?v=20261023p8a', '../comun/creep-acciones.js?v=20261025v', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261024bendecir'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -565,6 +565,9 @@ async function acEjecutarHab(sc, habId){
   // 🔥 El largo a elegir (Muro de fuego, 2026-10-24): de qué largo, el costo y recién ahí se cobra y se ejecuta.
   const largo = h.largoVariable ? await muroLargo(sc, h) : null;
   if(h.largoVariable && !largo){ toast(`${sc.nombre}: no usó ${h.nombre || 'la habilidad'}`); return; }
+  // ✨ El elemento a elegir (el Misil elemental, 2026-10-25): cuál, antes de cobrar; la Ejecución es la de ese elemento.
+  const variante = Array.isArray(h.variantes) && h.variantes.length ? await acElegirVariante(sc, h) : null;
+  if(Array.isArray(h.variantes) && h.variantes.length && !variante){ toast(`${sc.nombre}: no usó ${h.nombre || 'la habilidad'}`); return; }
   const id = sc.id;
   const antes = {sp: num(sc.sp), nitros: num(sc.nitros), cd: num(h.cdActual)};   // ↩ para devolverlo si cancela al elegir el objetivo
   // ⚡ Una habilidad Flash del creep (`h.flash`, 2026-10-24, Bendecir el arma) en turno ajeno cuesta el doble (P136): el cooldown o el SP.
@@ -582,7 +585,9 @@ async function acEjecutarHab(sc, habId){
     if(doble) try{ mesaLinea(`⚡ ${p.creep.nombre || 'El creep'}: ${h.nombre || 'la habilidad'} en turno ajeno (Flash) — cuesta el doble (${CreepCalculo.modoSP(p.creep) ? `${fmt(p.costoSp)} SP` : `cooldown ${fmt(num(h.cd) * 2)}`})`, 'recordatorio'); }catch(err){}
     if(p.malditoDano) try{ mesaLinea(`🩸 ${p.creep.nombre || 'El creep'} está Maldito: usar una habilidad le saca ${fmt(p.malditoDano)} de vida (${CreepCalculo.modoSP(p.creep) ? 'su SP' : 'su cooldown'})`, 'recordatorio'); }catch(err){}
     const sc2 = Object.assign(p.creep, {id}), h1 = (sc2.habilidades || []).find(x => x.id === habId);
-    const h2 = largo && h1 && h1.duelo ? {...h1, duelo: {...h1.duelo, zonaLargo: largo.n}} : h1;   // 🔥 el muro, del largo elegido
+    const h2v = largo && h1 && h1.duelo ? {...h1, duelo: {...h1.duelo, zonaLargo: largo.n}} : h1;   // 🔥 el muro, del largo elegido
+    const h2 = variante && h2v ? {...h2v, nombre: `${h2v.nombre}: ${variante.nombre}`, duelo: JSON.parse(JSON.stringify(variante.duelo))} : h2v;   // ✨ el misil del elemento elegido
+    if(variante) try{ mesaLinea(`${variante.icono || '✨'} ${sc2.nombre}: ${h.nombre}, de ${variante.nombre} (${variante.que})`, 'recordatorio'); }catch(err){}
     if(largo) try{ mesaLinea(`🔥 ${sc2.nombre}: ${h.nombre} de ${largo.n} casillas — ${largo.txt}`, 'recordatorio'); }catch(err){}
     if(typeof habilidadAnuncio === 'function') habilidadAnuncio(sc2, h2);   // 🛡 «… se pone en modo aguante» (js/56)
     if(typeof vigilanciaActivada === 'function') vigilanciaActivada(sc2, h2);   // 👁 es su ataque del turno (js/58)
@@ -590,6 +595,12 @@ async function acEjecutarHab(sc, habId){
     CreepAcciones.terminarHab(sc2, h2, p, acHabUi());
     acDibujar();
   });
+}
+// ✨ ¿De qué elemento? (el Misil elemental, 2026-10-25) → la variante elegida, o null si cancela.
+async function acElegirVariante(sc, h){
+  const clave = await Confirmar.elegir(`${sc.nombre}: ¿de qué elemento es ${h.nombre || 'el misil'}?`, {titulo: h.nombre || 'Elegí el elemento', icono: '✨', no: 'Cancelar',
+    opciones: h.variantes.map(v => ({valor: v.clave, texto: `${v.icono || ''} ${v.nombre}`.trim(), detalle: v.que || ''}))});
+  return clave ? h.variantes.find(v => v.clave === clave) || null : null;
 }
 /* 🔥 De qué largo (2026-10-24, dueño, el Muro de fuego: «un mínimo de 3, que se pueda ampliar por un costo adicional en SP, y cada 2 casilleros también
    un nitro; te pregunta de qué largo, ahí te confirma el costo y ahí se ejecuta»). `h.largoVariable` = {min, max, sp y no2 (por casilla de más; o no2Cada:
@@ -737,7 +748,7 @@ function cerrarAccionesNuevas(){
    estados para la Ejecución, con el selector común (los "Mis presets" del GM no están en la partida: ver pendientes 7b). */
 const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261021zs', '../comun/asistente-duelo-hab.js?v=20261022d'];
 // Las recetas de habilidades de fábrica (para ↻ Reemplazar y ⬆ Subir): pesadas, recién cuando hacen falta.
-const ACE_BASE = ['../comun/creeps-base.js?v=20261025zj', '../comun/skills-creep-base.js?v=20261025zj'];
+const ACE_BASE = ['../comun/creeps-base.js?v=20261025zk', '../comun/skills-creep-base.js?v=20261025zk'];
 async function acCargarEditor(){ await acCargarPiezas(); await cargarPiezas(SE_PIEZAS); await cargarPiezas(ACE_PIEZAS); }
 // ⬆ Subir una habilidad del creep a la biblioteca compartida (corrección o algo nuevo); su `bibOrigen` nuevo se guarda en el creep.
 async function acSubirHab(creepId, habId){

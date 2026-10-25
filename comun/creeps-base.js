@@ -113,7 +113,7 @@
   };
   function armarDetalle(sp, n, cd, lenta){
     const auto = [sp.no2 === 'ATAQUE' ? 'cuesta lo mismo que un ataque y cuenta como uno' : `cuesta ${sp.no2} No2`,
-      `cooldown ${cd}${sp.spCosto !== undefined ? ` (con SP: ${sp.spCosto === 'esp' ? 'tanto SP como su Especial' : sp.spCosto + ' SP'})` : ''}${lenta ? ' (habilidad lenta: el combate arranca con el cooldown activo)' : ''}`];
+      `cooldown ${cd}${sp.spCosto !== undefined ? ` (con SP: ${sp.spCosto === 'esp' ? 'tanto SP como su Especial' : /^esp\+\d+$/.test(String(sp.spCosto)) ? `su Especial + ${String(sp.spCosto).slice(4)} SP` : sp.spCosto + ' SP'})` : ''}${lenta ? ' (habilidad lenta: el combate arranca con el cooldown activo)' : ''}`];
     if(sp.ataqueTxt) auto.push(sp.ataqueTxt);   // un ataque con su arma que va al duelo (2026-10-20)
     if(sp.dano) auto.push(`tira ${danoTxt(sp.dano, n)} de daño`);
     if(sp.cura) auto.push(`se cura ${sp.cura * n} HP sin pasar de su máximo`);
@@ -159,6 +159,7 @@
     if(sp.estandarte){ h.estandarte = {...sp.estandarte}; h.modo = 'auto'; }
     if(sp.meteoro){ h.meteoro = {...sp.meteoro}; h.modo = 'auto'; }   // ☄ el Meteoro (2026-10-24): la marca y la hace caer el mapa (vtt-hexgrid/js/74)   // 🚩 el Estandarte de guerra (2026-10-24): lo clava el mapa (vtt-hexgrid/js/73)
     if(sp.flash) h.flash = true;
+    if(Array.isArray(sp.variantes)) h.variantes = JSON.parse(JSON.stringify(sp.variantes));   // ✨ el elemento a elegir al lanzarla (el Misil elemental, 2026-10-25, vtt-hexgrid/js/12)
     if(sp.largoVariable) h.largoVariable = {...sp.largoVariable};   // 🔥 el largo a elegir al lanzarla (Muro de fuego, 2026-10-24, vtt-hexgrid/js/12)   // ⚡ Flash (2026-10-24, Bendecir el arma): se usa cuando sea; en turno ajeno, el doble (vtt-hexgrid/js/12)
     if(sp.golpeAnunciado) h.golpeAnunciado = JSON.parse(JSON.stringify(sp.golpeAnunciado));   // 🪓 El que avisa no traiciona (2026-10-21): el golpe que descarga (vtt-hexgrid/js/63)
     if(sp.desarmar) h.desarmar = true;   // 🤺 Desarmar (2026-10-21): el botón instantáneo del GM (vtt-hexgrid/js/62)   // 🧿 Mal de ojo (2026-10-21): el botón del GM (vtt-hexgrid/js/60)

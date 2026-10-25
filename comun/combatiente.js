@@ -1655,13 +1655,14 @@ const Combatiente = (() => {
     if(!p || !String(p.estado || '').trim()) return null;
     const desde = Math.max(0, Math.round(nf(p.desde))), tope = Math.max(0, Math.round(nf(p.tope))), turnos = Math.max(0, Math.round(nf(p.turnos)));
     // `turnos`: cuánto dura el estado que deja (2026-10-17, dueño: la Escarcha del Báculo de escarcha, 1 turno); sin él, la del preset.
-    return {estado: String(p.estado).trim().slice(0, 30), cada: Math.max(1, Math.round(nf(p.cada)) || 4), ...(p.mas1 ? {mas1: true} : {}),
+    const base = Math.max(0, Math.round(nf(p.base)));   // `base` (2026-10-25, la Ponzoña: «2 stacks más 1 por cada 5 de daño»): con `mas1`, desde cuántos arranca
+    return {estado: String(p.estado).trim().slice(0, 30), cada: Math.max(1, Math.round(nf(p.cada)) || 4), ...(p.mas1 ? {mas1: true} : {}), ...(base > 1 ? {base} : {}),
       ...(desde > 1 ? {desde} : {}), ...(tope > 0 ? {tope} : {}), ...(turnos > 0 ? {turnos} : {})};
   }
   function stacksPorDano(entro, p){
     const d = Math.max(0, Math.floor(nf(entro))), q = porDanoNorm(p);
     if(!q || d <= 0 || (q.desde && d < q.desde)) return 0;
-    const n = q.mas1 ? 1 + Math.floor(d / q.cada) : Math.max(1, Math.floor(d / q.cada));
+    const n = q.mas1 ? (q.base || 1) + Math.floor(d / q.cada) : Math.max(1, Math.floor(d / q.cada));
     return q.tope ? Math.min(q.tope, n) : n;
   }
   const porDanoTxt = p => {
@@ -1669,7 +1670,7 @@ const Combatiente = (() => {
     if(!q) return '';
     const dura = q.turnos ? ` (${q.turnos} turno${q.turnos === 1 ? '' : 's'})` : '';
     if(q.tope === 1) return `${q.estado}: 1${q.desde ? ` si entran ${q.desde} o más de daño` : ''}${dura}`;
-    const base = q.mas1 ? `${q.estado}: 1, y uno más cada ${q.cada} de daño` : `${q.estado}: 1 stack cada ${q.cada} de daño (mínimo 1)`;
+    const base = q.mas1 ? `${q.estado}: ${q.base || 1}, y uno más cada ${q.cada} de daño` : `${q.estado}: 1 stack cada ${q.cada} de daño (mínimo 1)`;
     return base + (q.desde ? `, si entran ${q.desde} o más` : '') + (q.tope ? `, hasta ${q.tope}` : '') + dura;
   };
   /* ✨ Carga Elemental (Mago, 2026-10-13, dueño): los cinco elementos y lo que le cambian a la Ejecución de la skill de daño. */

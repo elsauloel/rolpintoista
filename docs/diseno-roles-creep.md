@@ -32,13 +32,13 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
   robar, sigilo, varios golpes, bajo tierra, veneno.
 - 🏹 **Rango y Hunter — 13**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar, mantener a raya (2026-10-25), atravesar (Flecha que atraviesa, 2026-10-25) · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
-- ✨ **Mago — 12**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25), lluvia de escarcha (2026-10-25), andanada arcana (2026-10-25) · de El origen: proyectil, fuego con quemadura.
+- ✨ **Mago — 13**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25), lluvia de escarcha (2026-10-25), andanada arcana (2026-10-25), misiles elementales (2026-10-25) · de El origen: proyectil, fuego con quemadura.
 - 🧿 **Debuffer — 13**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25), silencio (Tótem de silencio, 2026-10-25), extenuar (2026-10-25), cegar (2026-10-25) · de El origen: ceguera, veneno, inmovilizar.
 - 💚 **Support — 13**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24), estandarte (Estandarte de guerra, 2026-10-24), señalar la presa (2026-10-25), armas perforantes (2026-10-25), redoble de tambores (2026-10-25), frenesí inducido (2026-10-25), limpiar estados (Purificar, 2026-10-25) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
 **Para emparejar** (regla del dueño, 2026-10-25: «empezamos a tener en cuenta todos los roles de creep e ir emparejándolos… para que estén todos
-avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-25): Mago en 12; Support, Debuffer y Rango + Hunter en 13; después los cuatro juntos hasta Choque liviano (14). El Jefe va aparte.
+avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-25): Mago, Support, Debuffer y Rango + Hunter en 13; después los cuatro juntos hasta Choque liviano (14). El Jefe va aparte.
 
 ## Los roles
 
@@ -258,11 +258,12 @@ líneas, zonas, el rayo en cadena y los charcos, los controles mentales.
 
 - **Mago (daño directo):** proyectil mágico, ✅ **Bola de fuego** (2026-10-21), ✅ **Hálito polar** (cono de frío, 2026-10-23), ✅ **Cadena de rayos** (2026-10-21), ✅ **Muro de fuego** (2026-10-24: largo a elegir, 4 a 8,
   con el costo según el largo).
-- **▶ LA PRÓXIMA del Mago: Misil elemental** (dueño, 2026-10-25: «para la próxima habilidad de mago vamos a hacer un misil elemental, uno por cada uno
-  de los tipos de daño, que sea un ataque mágico súper claro, que esté atado a la identidad de cada uno de los elementos y que se sienta»). Una versión
-  por tipo de daño (arcano, fuego, hielo, rayo, ácido, tóxico…), cada una con lo que caracteriza a su elemento en la guía de diseno
-  (`docs/guia-de-diseno.md`: el fuego quema, el hielo da Escarcha, el rayo no se esquiva y paraliza —P219—, el ácido rompe armadura, el tóxico envenena,
-  el arcano es puro y directo). Cuenta como un concepto del Mago (o uno por elemento: a decidir con el dueño al hacerlo).
+- ✅ **Misiles elementales** (2026-10-25; dueño: «un misil elemental, uno por cada uno de los tipos de daño… atado a la identidad de cada uno de los
+  elementos y que se sienta»; «un skill por cada elemento y un skill que sea misil elemental que te deje elegir, pero que cueste un nitro más y 2 SP más»;
+  «el eléctrico, Centella»): **Misil arcano** (directo), **Ascua** (fuego, Quemadura), **Carámbano** (hielo, Escarcha 1 + 1 cada 5), **Centella** (no se
+  esquiva, 1d6 que salta, 50 % de Parálisis si no la resiste con Res.Esp), **Gota corrosiva** (ácido, Armadura rota 1 + 1 cada 5), **Ponzoña** (tóxico,
+  Veneno 2 + 1 cada 5) y **Misil elemental** (elige el elemento al lanzarlo; 1 No2 y 2 SP más). Base: PdG.Esp contra Evasión, 2d6 + ¼ Ef.Esp; 2 No2 y su
+  Especial en SP, o cooldown 2. Cuentan como un concepto del Mago.
 - **Mago — ideas nuevas (2026-10-24, la lista que pidió el dueño; ✦ = acelera la pelea):**
   - **A. Daño concentrado:** 1. ✅ **Lanza de luz** ✦ (2026-10-25: línea tan larga como su Rango, desde él, también a sus aliados; su PdG.Esp contra la Evasión de cada uno; 3d6 arcano y **Deslumbrado** —Res.Esp −2— 2 turnos). 2. ✅ **Andanada arcana** (2026-10-25: 3 misiles de 1d6 + ¼ Ef.Esp
     arcano, de a uno, al objetivo que elija cada vez). 3. ✅ **Descarga arcana** ✦ (2026-10-24, ex «Rayo cargado»: un turno lo carga a la vista de todos y queda Marcado —«una luz lo recubre», se lo ve en la niebla—; al siguiente,

@@ -100,6 +100,7 @@
 > pasa las pruebas automáticas y se sube, **pero no se prueba en el mapa en el momento**: se anota acá. Cuando el dueño lo pida, se corren todas
 > juntas en el mapa, con capturas, y se marcan.
 
+- [ ] **🎆 Misiles elementales (Mago, 2026-10-25)**: cada uno contra juan (Misil arcano directo; Ascua deja Quemadura; Carámbano, Escarcha según el daño; Centella no se esquiva, salta y paraliza con 50 % si gana la Res.Esp; Gota corrosiva, Armadura rota; Ponzoña, Veneno 2 + 1 cada 5) y el **Misil elemental**: al ejecutarlo, el cartel «¿de qué elemento?» antes de cobrar, la línea en la Mesa y el duelo del elegido; cancelar no cobra.
 - [ ] **✨ Purificar (Support, 2026-10-25)**: a un creep aliado con dos estados malos y herido: le saca el más reciente y lo cura 5; sobre sí mismo también. Es Flash: usarla en el turno de juan y ver que cuesta el doble.
 - [ ] **👁 Cegar (Debuffer, 2026-10-25)**: PdG.Esp contra la Res.Esp de juan; si gana, 2d4 arcano y Ceguera 1 turno: su mapa ve solo 2 casillas y su PdG sale a la mitad.
 - [ ] **🏹 Flecha que atraviesa (Rango, 2026-10-25)**: un arquero creep con juan delante y otro personaje (o un creep aliado) detrás en línea: el disparo declara +2 al daño; al terminar con juan, sigue al de atrás con la misma tirada.

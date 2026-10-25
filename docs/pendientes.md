@@ -19,6 +19,12 @@
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.
+> - [ ] **⬆⬇ Animación al recibir un buff o un debuff (2026-10-25, dueño: «probar una pequeña animación que cuando se coloca un buff, durante un segundo,
+>   el token tenga una animación de flechitas verdes que van para arriba; y lo mismo cuando se coloca un debuff. Para pensar si es posible y buscar el
+>   momento»; el mismo día: «anotalo para ver en la compu»).** Es posible: cada pantalla ya escucha los estados públicos de cada token (`resumen.estados`, js/09); al aparecer un estado nuevo, ~1 s
+>   de flechitas verdes que suben (buff) o rojas que bajan (debuff) sobre el token, en el dibujo del mapa (js/05, como el aura del estandarte). Así la
+>   ven todos y vale para todo lo que pone estados (habilidades, trampas, zonas, a mano), sin tocar cada uno. Cuidados: no animar al cargar el mapa
+>   (solo los cambios), ni delatar tokens ocultos o en la niebla, ni los estados derivados (los del equipo o las pasivas).
 > - [ ] **⚙ Revisar el «auto mode setup»** (2026-10-25, dueño: «cuando te pida los pendientes en la compu, me decís que quedamos en revisar lo
 >   del auto mode setup y me volvés a enviar toda esta explicación porque hay muchos términos que no entendí»). **Al pedir los pendientes en la
 >   compu: decirle que quedó esto y mandarle de nuevo la explicación de abajo, tal cual, para profundizar término por término.**
@@ -122,12 +128,6 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
-> - [ ] **⬆⬇ Animación al recibir un buff o un debuff (2026-10-25, dueño: «probar una pequeña animación que cuando se coloca un buff, durante un segundo,
->   el token tenga una animación de flechitas verdes que van para arriba; y lo mismo cuando se coloca un debuff. Para pensar si es posible y buscar el
->   momento»).** Es posible: cada pantalla ya escucha los estados públicos de cada token (`resumen.estados`, js/09); al aparecer un estado nuevo, ~1 s
->   de flechitas verdes que suben (buff) o rojas que bajan (debuff) sobre el token, en el dibujo del mapa (js/05, como el aura del estandarte). Así la
->   ven todos y vale para todo lo que pone estados (habilidades, trampas, zonas, a mano), sin tocar cada uno. Cuidados: no animar al cargar el mapa
->   (solo los cambios), ni delatar tokens ocultos o en la niebla, ni los estados derivados (los del equipo o las pasivas).
 > - [ ] **🐾 Nombres para las versiones «bestia» de algunas habilidades de creep (2026-10-25, dueño: «anotá en pendientes buscar nombres para las versiones
 >   bestia de algunos skills»):** varias habilidades auditadas tienen una sola versión para todos o solo la humanoide (la Aguja del desamparo, Disipar, Señalar la
 >   presa, la Lanza de luz, el Meteoro…). Repasar cuáles piden una versión bestia con su propio nombre, como ya pasó con Corroer / Escupitajo ácido, Golpe que

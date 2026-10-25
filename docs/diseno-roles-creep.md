@@ -16,6 +16,10 @@
   tengan la misma cantidad; recién ahí se vuelve a avanzar uno por uno. Se cuenta por **concepto** (una pareja bestia/humanoide o las variantes de
   un mismo concepto cuentan una vez), sumando las habilidades ya hechas en los creeps de «El origen de las especies» (ver el conteo abajo).
 
+**Que cada habilidad se sienta** (criterio del dueño, 2026-10-25, con Extenuar: «vamos a hacer que cada acción tenga peso… nivelar un poquito para
+arriba, que todo haga un poquito de más, que hacer una habilidad se sienta»): una habilidad que gasta la acción no puede ser solo un estado chico; si
+pega, suma algo de daño (o algo concreto además del estado). Al diseñar, y al repasar las viejas, preferir que hagan un poco de más.
+
 ## Conteo por concepto (2026-10-23) — para emparejar
 
 Cuenta los conceptos con alguna habilidad (de fábrica auditada o de los creeps de «El origen de las especies», que desde el 2026-10-23 están entre las
@@ -365,7 +369,7 @@ Inmovilizado, Rengo, Desarmado; y, de personajes, Enyetar.
 
 **B. Quitarle recursos**
 6. **Drenar No2**: pierde No2 (y si queda en 0, Sentado, como el Sonic Boom).
-7. ✅ **Extenuar** (2026-10-25): PdG.Esp contra Res.Esp; Extenuado 2 turnos (todo lo que cuesta No2 le cuesta 1 más).
+7. ✅ **Extenuar** (2026-10-25): PdG.Esp contra Res.Esp; 2d4 arcano y Extenuado 2 turnos (todo lo que cuesta No2 le cuesta 1 más).
 8. **Drenar SP**: pierde SP, y el debuffer quizás lo gana.
 9. **Atormentar**: cada acción que cuesta No2 le saca vida (Atormentado).
 10. **Maldición de la sangre**: usar algo que cuesta SP le saca vida (Maldito).

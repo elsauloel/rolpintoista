@@ -756,9 +756,10 @@
   H('Aturdir con estruendo', 'K', 'bcd', 'x', 5, tA('Aplicale al objetivo el estado Stun: se queda sin No2 este turno (a mano).', 3), 'estados alterados');
   // 🥵 Auditada (dueño, 2026-10-25; el Debuffer, «extenuar»: «está bien»): su PdG.Esp contra la Res.Esp de un rival en su Rango; si gana, Extenuado
   // 2 turnos (el preset: +1 No2 a todo lo que cuesta No2, y al moverse 1 más cada 2 casillas). Costo propuesto por Claude: 1 No2 y 3 SP, o cooldown 3.
-  H('Extenuar', 'X', '*', 'x', 3, {detalle: 'Le carga el cuerpo a un rival dentro de su Rango: tira su Probabilidad de Golpe especial contra la Resistencia especial del objetivo. Si gana, queda Extenuado 2 turnos: todo lo que cuesta No2 (atacar, habilidades, Parry, consumir…) le cuesta 1 más, y al moverse, 1 No2 más cada 2 casillas.',
-    no2: 1, spCosto: 3, auditada: true, ataqueTxt: 'su PdG.Esp contra la Res.Esp; Extenuado 2 turnos (+1 No2 a todo)',
-    duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['resmg'], alcance: 'rango', dano: false, efectos: [{nombre: 'Extenuado', turnos: 2}]}});
+  // Y 2d4 arcano (dueño, el mismo día: «sumémosle algo de daño… que cada acción tenga peso; que todo haga un poquito de más, que hacer una habilidad se sienta»).
+  H('Extenuar', 'X', '*', 'x', 3, {detalle: 'Le carga el cuerpo a un rival dentro de su Rango: tira su Probabilidad de Golpe especial contra la Resistencia especial del objetivo. Si gana, 2d4 de daño arcano (lo frena la Defensa especial) y queda Extenuado 2 turnos: todo lo que cuesta No2 (atacar, habilidades, Parry, consumir…) le cuesta 1 más, y al moverse, 1 No2 más cada 2 casillas.',
+    no2: 1, spCosto: 3, auditada: true, ataqueTxt: 'su PdG.Esp contra la Res.Esp; 2d4 arcano y Extenuado 2 turnos (+1 No2 a todo)',
+    duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['resmg'], alcance: 'rango', dano: true, danoFormula: '2d4', tipoDano: 'arcano', efectos: [{nombre: 'Extenuado', turnos: 2}]}});
   H('Agotar', 'X', 'ma', 'x', 4, tA('Aplicale al objetivo Exhausto: como mucho 1 No2 por turno 3 turnos (a mano).', 2), 'estados alterados');
   H('Cansar', 'X', '*', 'x', 3, tA('Aplicale al objetivo Cansado: pierde un tercio de sus No2 máximos 3 turnos (a mano).', 1), 'estados alterados');
   H('Lisiar', 'X', 'bhd', 'mx', 4, tA('Aplicale al objetivo Lisiado: su PdG y Parry a la mitad 3 turnos (a mano).', 2), 'estados alterados');

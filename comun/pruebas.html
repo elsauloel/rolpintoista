@@ -1039,10 +1039,10 @@ prueba('🎯 Disparo señalador (2026-10-21): Presa (Evasión −1) y Marcado', 
   const P = estadosPresetCreep().find(p => p.nombre === 'Presa');
   igual([h.cd, a.efectos.map(e => (e.spec || {}).nombre).join(','), P.turnos, P.presa, JSON.stringify(P.mods)], [3, 'Presa,Marcado', 2, 2, '[{"stat":"eva","val":-1}]']);
 });
-prueba('🥵 Extenuar (Debuffer, 2026-10-25): PdG.Esp contra Res.Esp, Extenuado 2 turnos', () => {
+prueba('🥵 Extenuar (Debuffer, 2026-10-25): PdG.Esp contra Res.Esp, 2d4 arcano y Extenuado 2 turnos', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Extenuar');
   const h = armarHabilidadDeCreep(e.datos, 2);
-  igual([h.duelo.tira, h.duelo.contra.join(','), h.duelo.efectos[0].nombre, h.duelo.efectos[0].turnos, h.nitrosCosto, h.cd], ['pdgmg', 'resmg', 'Extenuado', 2, 1, 3]);
+  igual([h.duelo.tira, h.duelo.contra.join(','), h.duelo.danoFormula, h.duelo.tipoDano, h.duelo.efectos[0].nombre, h.duelo.efectos[0].turnos, h.nitrosCosto, h.cd], ['pdgmg', 'resmg', '2d4', 'arcano', 'Extenuado', 2, 1, 3]);
 });
 prueba('🏹 Mantener a raya (Rango, 2026-10-25): un ataque con +2 al daño; si pega, empuja 2 y Lento 2 turnos', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Mantener a raya');

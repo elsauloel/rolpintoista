@@ -100,7 +100,7 @@
 > pasa las pruebas automáticas y se sube, **pero no se prueba en el mapa en el momento**: se anota acá. Cuando el dueño lo pida, se corren todas
 > juntas en el mapa, con capturas, y se marcan.
 
-- [ ] **🥵 Extenuar (Debuffer, 2026-10-25)**: PdG.Esp contra la Res.Esp de juan; si gana, Extenuado 2 turnos: su ataque y el moverse le cuestan 1 No2 más.
+- [ ] **🥵 Extenuar (Debuffer, 2026-10-25)**: PdG.Esp contra la Res.Esp de juan; si gana, 2d4 arcano (menos su Defensa especial) y Extenuado 2 turnos: su ataque y el moverse le cuestan 1 No2 más.
 - [ ] **🏹 Mantener a raya (Rango, 2026-10-25)**: un arquero creep contra juan: el ataque declara +2 al daño; si pega, juan se corre 2 casillas lejos del arquero (contra una pared: la colisión) y queda Lento 2 turnos.
 - [ ] **🌨 Lluvia de escarcha (Mago, 2026-10-25)**: el área de diámetro 5 en su Rango; PdG.Esp contra la Evasión de cada uno con dodge roll; 2d4 + ¼ Ef.Esp de hielo; el suelo congelado (celeste, con la franja) 2 turnos, la tirada de Agilidad al aparecer y por cada paso; al irse, el charco. Y la **Varita de la ventisca** con 2d4.
 - [ ] **🥁 Redoble de tambores (Support, 2026-10-25)**: un creep con aliados a 4 casillas o menos (uno con una habilidad en cooldown, otro en modo SP y uno lejos): a los de cerca, Redoble (+2 No2 al empezar su próximo turno) y al que trabaja con cooldown, «−1 al cooldown de…» en la Mesa (el de modo SP: «trabaja con SP»); el lejano y él mismo, nada.

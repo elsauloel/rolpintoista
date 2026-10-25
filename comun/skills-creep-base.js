@@ -382,8 +382,9 @@
     duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', efectos: [{nombre: 'Frenético'}]}});
   // ✨ Auditada (dueño, 2026-10-25; el Support, «limpiar estados de un aliado», Purificar: «vamos con esa, me parece bien»): la purga de la Varita de la
   // purga (le saca el estado malo más reciente, js/13) y cura 5 fijos (sin dado, como el Frenético), a él o a un aliado en su Rango. Costo de Claude.
-  H('Purificar', 'C', '*', 'a', 3, {detalle: 'Limpia a un aliado (o a sí mismo) dentro de su Rango: le saca su estado malo más reciente y lo cura 5 de vida (sin pasar su máximo). Sobre alguien caído no cura.',
-    no2: 1, spCosto: 2, auditada: true, ataqueTxt: 'a él o a un aliado en su Rango: le saca el estado malo más reciente y cura 5',
+  // Flash (dueño, el mismo día: «que Purificar tenga flash»): se usa cuando sea, como Bendecir el arma; en turno ajeno cuesta el doble.
+  H('Purificar', 'C', '*', 'a', 3, {detalle: 'FLASH (se puede usar en cualquier momento; en turno ajeno cuesta el doble). Limpia a un aliado (o a sí mismo) dentro de su Rango: le saca su estado malo más reciente y lo cura 5 de vida (sin pasar su máximo). Sobre alguien caído no cura.',
+    no2: 0, spCosto: 2, flash: true, auditada: true, ataqueTxt: 'Flash: a él o a un aliado en su Rango, le saca el estado malo más reciente y cura 5',
     duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', efectos: [{purga: true}, {cura: 5}]}});
   H('Redoble de tambores', 'BA', '*', 'a', 3, {detalle: 'Un redoble que empuja a los suyos: sus aliados a 4 casillas o menos (no él) suman +2 No2 en su próximo turno (Redoble) y, los que trabajan con cooldown (no con SP), bajan en 1 cada cooldown que tengan activo.',
     no2: 2, spCosto: 3, auditada: true, ataqueTxt: 'a sus aliados a 4 o menos: +2 No2 su próximo turno y −1 a sus cooldowns activos',

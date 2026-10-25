@@ -350,7 +350,7 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
     al ponerlas y al empezar cada turno suyo, 4 veces, con burbujitas verdes. Síntesis de las de «El origen» y fábrica.
 31. Escudo especial a un aliado, Formación, Círculo de protección, Aura de protección.
 32. Recibir el golpe por otro (también es del tanque).
-33. ✅ Limpiar estados de un aliado — **Purificar** (2026-10-25): le saca el estado malo más reciente y lo cura 5.
+33. ✅ Limpiar estados de un aliado — **Purificar** (2026-10-25, Flash): le saca el estado malo más reciente y lo cura 5.
 34. Levantar a un caído (con Titilando, como el ✚ Revivir).
 35. Inmunidad a control por un turno.
 

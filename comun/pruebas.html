@@ -1039,12 +1039,12 @@ prueba('🎯 Disparo señalador (2026-10-21): Presa (Evasión −1) y Marcado', 
   const P = estadosPresetCreep().find(p => p.nombre === 'Presa');
   igual([h.cd, a.efectos.map(e => (e.spec || {}).nombre).join(','), P.turnos, P.presa, JSON.stringify(P.mods)], [3, 'Presa,Marcado', 2, 2, '[{"stat":"eva","val":-1}]']);
 });
-prueba('✨ Purificar (Support, 2026-10-25): a un aliado, la purga y cura 5', () => {
+prueba('✨ Purificar (Support, 2026-10-25): Flash; a un aliado, la purga y cura 5', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Purificar');
   const h = armarHabilidadDeCreep(e.datos, 2);
   const ej = Combatiente.habEjecucion(h, h.duelo, {stat: () => 4}) || {};
   const n = Duelo.limpiarHab(ej) || {};
-  igual([h.duelo.objetivo, h.duelo.conmigo, !!(n.efectos || []).find(x => x.purga), ((n.efectos || []).find(x => x.cura) || {}).cura, h.cd], ['aliado', true, true, 5, 3]);
+  igual([h.duelo.objetivo, h.duelo.conmigo, !!(n.efectos || []).find(x => x.purga), ((n.efectos || []).find(x => x.cura) || {}).cura, !!h.flash, h.nitrosCosto, h.cd], ['aliado', true, true, 5, true, 0, 3]);
 });
 prueba('👁 Cegar (Debuffer, 2026-10-25): PdG.Esp contra Res.Esp, 2d4 arcano y Ceguera 1 turno (reemplaza a la Ceguera a mano)', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Cegar');

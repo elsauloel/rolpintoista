@@ -269,6 +269,9 @@ const ESTADOS_PRESET = [
   {nombre:'Presa', polaridad:'debuff', turnos:2, presa:2, mods:[{stat:'eva', val:-1}],
     detalle:'Lo señalaron: su Evasión baja 1 y todo el que lo ataca le hace +2 de daño (con arma o con una habilidad que haga daño). Dura 2 turnos; volver a señalarlo lo renueva. ⚙ Automatizado en el mapa.'},
   // 🎯 La del Support (2026-10-25, Señalar la presa; dueño: «menos 2 a Evasión y más 4 al daño»). `presa` = cuánto daño de más le hacen (js/13 presaContra).
+  // ✨ La Lanza de luz del Mago (2026-10-25, dueño: «que además deje un estado de −2 a la resistencia especial»; 2 turnos).
+  {nombre:'Deslumbrado', polaridad:'debuff', turnos:2, mods:[{stat:'resmg', val:-2}],
+    detalle:'La luz lo dejó encandilado: su Resistencia especial baja 2 (le cuesta más resistir maldiciones, controles y todo lo que se tira contra su Res.Esp). Dura 2 turnos; volver a deslumbrarlo lo renueva. ⚙ Automatizado.'},
   {nombre:'Presa señalada', polaridad:'debuff', turnos:2, presa:4, mods:[{stat:'eva', val:-2}],
     detalle:'Lo señalaron para que todos vayan por él: su Evasión baja 2 y todo el que lo ataca le hace +4 de daño (con arma o con una habilidad que haga daño). Dura 2 turnos; volver a señalarlo lo renueva. Con otra Presa encima, vale la más fuerte. ⚙ Automatizado en el mapa.'},
   {nombre:'Marcado', polaridad:'debuff', turnos:3, marcado:true,

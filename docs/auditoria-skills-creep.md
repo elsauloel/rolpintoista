@@ -332,6 +332,10 @@
   ataca y, con dos Presas encima, vale la más fuerte) y **Marcado** los mismos 2 turnos (dueño, el mismo día: «que quede como marca visible, que no se
   pueda ocultar y que se vea a pesar de la niebla de guerra»). 1 No2 y 2 SP, o cooldown 3 (costo propuesto por Claude). Probado en el mapa el 2026-10-25 (GM): ganó contra juan, le llegó la Presa señalada
   2 turnos, su Evasión pasó de 8 a 6 y el ataque siguiente del Escarabajo declaró «🎯 contra la presa: +4 al daño». Falta: que lo vea un jugador.
+- ✅ **Lanza de luz** (Mago, «daño concentrado», 2026-10-25, dueño: la línea que atraviesa «y que además deje un estado de −2 a la resistencia especial»,
+  2 turnos): línea de 6 casillas desde él (la de la Varita láser, con fuego amigo); tira su PdG.Esp una vez y cada uno se defiende con su Evasión; al que no
+  esquiva, 3d6 arcano (lo frena la Defensa especial) y **Deslumbrado** 2 turnos (preset nuevo: Res.Esp −2). 2 No2 y 4 SP, o cooldown 3 (costo y daño
+  propuestos por Claude). **Para probar.**
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 
 ## Etiquetas

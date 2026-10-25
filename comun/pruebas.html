@@ -959,6 +959,14 @@ prueba('⚔ Golpe fuerte de creep y Golpe brutal (auditados 2026-10-20): +1 dado
   const gb = CLASES_SKILLS.find(c => c.id === 'warrior').habilidades.find(h => h.id === 'warrior-golpe-brutal');
   igual([a.mods.dados, gb.efectoNombre, gb.efectoTurnos, gb.efectoMods[0].stat, gb.efectoMods[0].val], [1, 'Guardia baja', 1, 'eva', -2]);
 });
+prueba('🧿 Disipar (2026-10-25): PdG.Esp contra Res.Esp; el efecto «disipar» llega al duelo y al mapa', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Disipar');
+  const h = armarHabilidadDeCreep(e.datos, 2);
+  const ej = Combatiente.habEjecucion(h, h.duelo, {stat: () => 3, etq: s => s});
+  const limpio = Duelo.limpiarHab(ej);
+  igual([ej.efectos[0].disipar, limpio.efectos[0].disipar, Duelo.specDeEfecto(limpio.efectos[0]).disipar, limpio.contra[0].modo, h.cd, h.spCosto, e.etiquetas.includes('auditada')],
+    [true, true, true, 'resmg', 3, 3, true]);
+});
 prueba('☄ Meteoro (2026-10-24): cooldown 3 que arranca activo, 4d6 físico + 2d6 de fuego', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Meteoro');
   const h = armarHabilidadDeCreep(e.datos, 2);

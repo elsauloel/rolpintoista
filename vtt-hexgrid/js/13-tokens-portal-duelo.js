@@ -2072,6 +2072,22 @@ async function dueloAplicarEfectoBase(d, ef){
     try{ await hudEstadoCambiar(t, idx, 'quitar'); return {nota: `le sacó ${nom}`}; }
     catch(err){ console.error('No se pudo aplicar la purga:', err); return {manual: true, nota: `sacale ${nom} a mano`}; }
   }
+  // 🧿 Disipar (2026-10-25, el Debuffer; dueño: «el usuario de disipar elige cuál quitar»): sus estados buenos (no los que salen solos del equipo o las
+  // pasivas) y quien lo usa elige uno. Lo aplica la pantalla del GM, que maneja a los creeps que hoy lo usan.
+  if(spec.disipar){
+    const buenos = (((vinculo(t) || {}).resumen || {}).estados || []).filter(e => e && e.polaridad === 'buff' && !e.derivado && e.activo !== false);
+    if(!buenos.length) return {nota: 'no tenía ningún estado bueno para sacarle'};
+    const dur = e => (e.permanente ? 'sin límite' : num(e.turnos) > 0 ? `${fmt(num(e.turnos))} turno${num(e.turnos) === 1 ? '' : 's'}` : '')
+      + (e.escudo !== undefined ? ` · escudo ${fmt(num(e.escudo))}` : '');
+    const nom = await Confirmar.elegir(`${d.atacante.nombre} disipa: ¿qué estado bueno le saca a ${nombreDe(t)}?`, {titulo: 'Disipar', icono: '🧿', no: 'Ninguno',
+      opciones: buenos.map(e => ({valor: e.nombre, texto: e.nombre, detalle: [dur(e), String(e.detalle || '').slice(0, 90)].filter(Boolean).join(' — ')}))});
+    if(!nom) return {manual: true, nota: 'no se eligió ninguno: sacalo a mano si corresponde'};
+    const lista = ((vinculo(t) || {}).resumen || {}).estados || [];
+    const idx = lista.findIndex(e => e && e.nombre === nom && e.activo !== false);
+    if(idx < 0) return {nota: `ya no tenía ${nom}`};
+    await hudEstadoCambiar(t, idx, 'quitar');
+    return {nota: `le sacó ${nom}`};
+  }
   // 🎯 Marcar (Shooter, 2026-10-12, decisiones del dueño): el blanco queda con el Marcado de siempre (brilla, no entra en sigilo) sin vencer,
   // con quién lo marcó; quien marca recibe «Marcando» (a quién). El bono contra su marca y el fin de la marca los lleva js/36.
   if(spec.nombre === 'Marcar'){

@@ -644,6 +644,7 @@ const Duelo = (() => {
       detalle: txtCorto(e.detalle, 200), stacks: Math.max(0, Math.round(_num(e.stacks))), spec: limpiarSpec(e.spec), cura: Math.max(0, Math.round(_num(e.cura))),
       ...(e.no2 !== undefined ? {no2: Math.max(0, Math.round(_num(e.no2))), no2Dif: !!e.no2Dif, no2Sentado: !!e.no2Sentado} : {}),
       ...(e.purga ? {purga: true} : {}),   // la purga (2026-10-07)
+      ...(e.disipar ? {disipar: true} : {}),   // 🧿 Disipar (2026-10-25)
       ...(_num(e.vuela) > 0 ? {vuela: Math.min(6, Math.round(_num(e.vuela)))} : {}),   // el arma vuela N casillas (la Varita del desarme)
       ...(_num(e.empuja) > 0 ? {empuja: Math.min(6, Math.round(_num(e.empuja)))} : {}),   // lo empuja N casillas (2026-10-08)
     })).filter(e => e.nombre);
@@ -996,6 +997,7 @@ const Duelo = (() => {
     if(ef.spec && ef.spec.nombre) return ef.spec;   // habilidades: el estado ya viene armado
     if(_num(ef.cura) > 0) return {nombre: 'Curación', cura: Math.round(_num(ef.cura))};   // habilidades: cura sobre el objetivo
     if(ef.no2 !== undefined) return {nombre: 'Pierde No2', no2: Math.max(0, Math.round(_num(ef.no2))), no2Dif: !!ef.no2Dif, no2Sentado: !!ef.no2Sentado};   // Sonic Boom
+    if(ef.disipar) return {nombre: 'Disipar', disipar: true};   // 🧿 Disipar (2026-10-25): quien lo usa elige qué estado bueno le saca
     if(ef.purga) return {nombre: 'Purga', purga: true};   // la purga (2026-10-07): el mapa saca el estado malo más reciente
     const n = String(ef.nombre || '').trim().toLowerCase();
     const st = Math.max(0, Math.round(_num(ef.stacks)));
@@ -1050,6 +1052,7 @@ const Duelo = (() => {
       if(_num(e.cura) > 0) o.cura = Math.round(_num(e.cura));
       if(e.no2 !== undefined){ o.no2 = Math.max(0, Math.round(_num(e.no2))); o.no2Dif = !!e.no2Dif; o.no2Sentado = !!e.no2Sentado; }
       if(e.purga) o.purga = true;   // la purga (2026-10-07)
+      if(e.disipar) o.disipar = true;   // 🧿 Disipar (2026-10-25)
       if(_num(e.vuela) > 0) o.vuela = Math.min(6, Math.round(_num(e.vuela)));   // el arma vuela N casillas (la Expelliarmus, 2026-10-07)
       if(_num(e.empuja) > 0) o.empuja = Math.min(6, Math.round(_num(e.empuja)));   // lo empuja N casillas (2026-10-08)
       if(e.seguroCritico && caras > 1) o.seguroCritico = true;

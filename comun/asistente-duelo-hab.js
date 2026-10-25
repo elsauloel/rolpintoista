@@ -1020,6 +1020,8 @@ const AsistenteDueloHab = (() => {
     // selector real (origen:'preset', con mods/hp/stacks/permanente/detalle) como si se escribió a mano.
     const CONSERVA = ['cadena', 'conVista', 'conmigo', 'niebla', 'aliados', 'menosDistancia', 'atrae', 'reparte', 'critTipo', 'soloSigilo', 'fuegoAmigo', 'soloCritico', 'perforante', 'giro', 'tormenta', 'sagrado'];
     function mapEfectoOut(e){
+      if(e.disipar) return {nombre: e.nombre || 'Disipar', disipar: true};   // 🧿 (2026-10-25) no se edita acá: se conserva
+      if(e.purga) return {nombre: e.nombre || 'Purga', purga: true};
       if(e.no2 !== undefined) return {nombre: 'Pierde No2', no2: e.no2, ...(e.no2Dif ? {no2Dif: true} : {}), ...(e.no2Sentado ? {no2Sentado: true} : {})};
       if(e.cura !== undefined) return {cura: e.cura};
       if(e.nombre === 'Demora') return {nombre: 'Demora', ...(Number(e.caras) > 1 ? {caras: Number(e.caras), exitos: Math.max(1, Number(e.exitos) || 1)} : {})};

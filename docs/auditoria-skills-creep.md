@@ -323,6 +323,9 @@
   sus aliados; no a los caídos. Si él cae antes, la sombra se disipa. Es su ataque del turno. 2 No2 y 5 SP (propuesta de Claude), o **cooldown 3 que arranca
   el combate activo**, como una lenta (`arrancaEnCooldown`). Probado en el mapa el 2026-10-24 (con 4d6 de fuego; falta verlo desde un jugador).
 
+- ✅ **Disipar** (Debuffer, «romper lo que lo protege», 2026-10-25, dueño: «el usuario de disipar elige cuál quitar»): su PdG.Esp contra la Res.Esp de un
+  rival en su Rango; si gana, la pantalla del GM muestra los estados buenos del objetivo (no los que salen del equipo o las pasivas) y elige cuál sacarle
+  (`disipar: true` en el efecto; js/13). Sin estados buenos, no pasa nada. 2 No2 y 3 SP, o cooldown 3 (costo propuesto por Claude, como las maldiciones). **Para probar.**
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 
 ## Etiquetas

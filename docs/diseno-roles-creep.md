@@ -29,11 +29,11 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 - 🏹 **Rango y Hunter — 11**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 8**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24) · de El origen: proyectil, fuego con quemadura.
-- 🧿 **Debuffer — 8**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24) · de El origen: ceguera, veneno, inmovilizar.
+- 🧿 **Debuffer — 9**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25) · de El origen: ceguera, veneno, inmovilizar.
 - 💚 **Support — 8**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24), estandarte (Estandarte de guerra, 2026-10-24) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
-**Para emparejar**: Mago, Debuffer y Support empatados en 8 (2026-10-24); después Rango + Hunter (11).
+**Para emparejar**: Mago y Support en 8, Debuffer en 9 (2026-10-25); después Rango + Hunter (11).
 
 ## Los roles
 
@@ -395,8 +395,8 @@ Inmovilizado, Rengo, Desarmado; y, de personajes, Enyetar.
 27. **Robar el turno**: pierde su próximo turno (muy caro).
 
 **H. Romper lo que lo protege** ✦
-28. **Disipar**: le saca un buff o el Escudo especial.
-29. **Corroer**: Armadura rota a distancia (ácido).
+28. ✅ **Disipar** (2026-10-25; dueño: «el usuario de disipar elige cuál quitar»): su PdG.Esp contra la Res.Esp de un rival en su Rango; si gana, le saca uno de sus estados buenos, el que elija quien lo usa (no lo del equipo ni las pasivas). 2 No2 y 3 SP, o cooldown 3.
+29. **Corroer** ⏭ *la próxima del Debuffer* (dueño, 2026-10-25: «un ataque de daño ácido que rompe armadura»): Armadura rota a distancia (ácido).
 30. **Quebrar la guardia**: no puede hacer Parry ni Bloqueo hasta su turno.
 
 **I. Auras**

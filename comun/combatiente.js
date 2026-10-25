@@ -1510,6 +1510,8 @@ const Combatiente = (() => {
     // «Pierde No2» (2026-10-02, Sonic Boom): el objetivo pierde `no2` (+ la diferencia entre las tiradas) No2; en 0, Sentado.
     // La purga (2026-10-07, Varita de la purga): le saca el estado malo más reciente (el mapa elige cuál: js/13 dueloAplicarEfecto).
     if(e && e.purga) return {nombre: 'Purga', caras: 1, exitos: 1, spec: null, purga: true, detalle: 'Le saca el estado malo más reciente.'};
+    // 🧿 Disipar (2026-10-25, el Debuffer; dueño: «el usuario de disipar elige cuál quitar»): le saca uno de sus estados buenos; cuál, lo elige quien lo usa (js/13).
+    if(e && e.disipar) return {nombre: 'Disipar', caras: 1, exitos: 1, spec: null, disipar: true, detalle: 'Le saca uno de sus estados buenos: lo elige quien lo usa.'};
     if(e && e.no2 !== undefined) return {nombre: 'Pierde No2', caras: 1, exitos: 1, spec: null, no2: Math.max(0, Math.round(nf(e.no2))), no2Dif: !!e.no2Dif, no2Sentado: !!e.no2Sentado,
       detalle: `Pierde ${nf(e.no2)}${e.no2Dif ? ' + la diferencia' : ''} No2${e.no2Sentado ? '; si se queda sin No2, queda Sentado' : ''}.`};
     // Con probabilidad (2026-10-05, armas especiales): `caras`/`exitos` como los efectos de un arma (33 % = 5 o 6 en d6: el duelo tira un d3 como d6); sin eso, entra siempre.

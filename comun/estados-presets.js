@@ -136,6 +136,11 @@ const ESTADOS_PRESET = [
   // (`turnosCompletos`: el turno en que se lo dan no cuenta, aunque sea el suyo; Combatiente.terminarTurnoEstados).
   {nombre:'Ojo certero', polaridad:'buff', turnos:2, turnosCompletos:true, mods:[{stat:'crit', val:2}, {stat:'critpot', val:2}],
     detalle:'Le afinan la puntería: Crítico frecuente +2 y Crítico potente +2 durante sus próximos 2 turnos completos (el turno en que se lo dan no cuenta). Si se lo vuelven a dar, no se suma: vuelve a durar 2 turnos. ⚙ Automatizado.'},
+  // Levitando (2026-10-25, dueño: el Support, «Levitar»: «que esté flotando todo el tiempo mientras tenga el estado», «+3» —leído como Evasión— y «que el
+  // primer casillero de movimiento no le cueste nitros»): `levitar` en 100 como Vuela (nunca toca el piso: ni terreno, ni zonas del suelo, ni trampas;
+  // pasa por encima de los tokens: vtt-hexgrid/js/04), Evasión +3 y Pasos gratis +1. Sin `volador`: sí le entran Sentado y Rengo. 2 turnos completos.
+  {nombre:'Levitando', polaridad:'buff', turnos:2, turnosCompletos:true, mods:[{stat:'levitar', val:100}, {stat:'eva', val:3}, {stat:'pasosgratis', val:1}],
+    detalle:'Flota todo el tiempo: no toca el piso, así que no lo frena el terreno, no pisa ni detecta trampas y no lo tocan las zonas del suelo (las del aire, como gas o humo, sí). Pasa por encima de los tokens, pero no puede terminar encima de nadie. Además, +3 a la Evasión y el primer casillero que mueve en cada turno no le cuesta No2. Dura sus próximos 2 turnos completos (el turno en que se lo dan no cuenta). ⚙ Automatizado en el mapa.'},
   // Frenético (2026-10-25, dueño: el Support, «Frenesí inducido»: «+3 a la probabilidad de golpe, +5 al daño», con −2 Evasión y −2 Defensa): 2 turnos
   // completos de quien lo recibe; y cura 4 al ponérselo y al empezar cada uno de sus turnos (el dueño, el mismo día: primero 1d6, después «que cure 4,
   // para no tirar un dado, simplemente suceda»).

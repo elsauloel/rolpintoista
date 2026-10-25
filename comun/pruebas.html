@@ -1050,6 +1050,15 @@ prueba('🎆 Misiles elementales (Mago, 2026-10-25): uno por elemento y el Misil
     Combatiente.stacksPorDano(12, pz), Combatiente.porDanoTxt(pz), el.variantes.length, el.nitrosCosto, CreepCalculo.costoSpHab(sc, el), CreepCalculo.costoSpHab(sc, hs[1]), !!HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Misil arcano' && /no falla/.test(x.datos.detalle || ''))],
     ['arcano,fuego,hielo,eléctrico,ácido,tóxico', true, 'Quemadura', 'Escarcha', true, 'resmg', '1d6', true, 2, 'Armadura rota', 4, 'Veneno: 2, y uno más cada 5 de daño', 6, 3, 8, 6, false]);
 });
+prueba('🪶 Levitar (Support, 2026-10-25): Levitando 2 turnos completos (levitar 100, +3 Evasión, el primer casillero gratis)', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Levitar');
+  const h = armarHabilidadDeCreep(e.datos, 2);
+  const P = estadosPresetCreep().find(p => p.nombre === 'Levitando');
+  const m = Object.fromEntries(P.mods.map(x => [x.stat, x.val]));
+  const sc = {nombre: 'Prueba', estados: [{...structuredClone(P), activo: true}], equipo: []};
+  igual([h.duelo.objetivo, h.duelo.conmigo, h.duelo.efectos[0].nombre, m.levitar, m.eva, m.pasosgratis, P.turnos, !!P.turnosCompletos, CreepCalculo.modTotal(sc, 'levitar'), h.cd],
+    ['aliado', true, 'Levitando', 100, 3, 1, 2, true, 100, 3]);
+});
 prueba('✨ Purificar (Support, 2026-10-25): Flash; a un aliado, la purga y cura 5', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Purificar');
   const h = armarHabilidadDeCreep(e.datos, 2);

@@ -30,10 +30,10 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 8**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24) · de El origen: proyectil, fuego con quemadura.
 - 🧿 **Debuffer — 9**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25) · de El origen: ceguera, veneno, inmovilizar.
-- 💚 **Support — 8**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24), estandarte (Estandarte de guerra, 2026-10-24) · de El origen: escudo a un aliado.
+- 💚 **Support — 9**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24), estandarte (Estandarte de guerra, 2026-10-24), señalar la presa (2026-10-25) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
-**Para emparejar**: Mago y Support en 8, Debuffer en 9 (2026-10-25); después Rango + Hunter (11).
+**Para emparejar**: Mago en 8, Debuffer y Support en 9 (2026-10-25); después Rango + Hunter (11).
 
 ## Los roles
 
@@ -292,8 +292,8 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
 7. **Empujón de creep** (el Empower de los personajes): +3 a la tirada de un aliado, en el momento, mirando el resultado.
 
 **B. Concentrar el fuego** ✦
-8. **Señalar la presa**: marca a un rival; todos los aliados le pegan más y no se puede esconder — el estado **Presa** ya existe (lo deja el Disparo
-   señalador del rango, 2026-10-21): falta la versión de Support, sin disparo (PdG.Esp contra Res.Esp, a su Rango).
+8. ✅ **Señalar la presa** ✦ (2026-10-25; dueño: «menos 2 a Evasión y más 4 al daño»): su PdG.Esp contra la Res.Esp de un rival en su Rango; si gana,
+   **Presa señalada** 2 turnos (−2 Evasión; todo el que lo ataca le hace +4 de daño). La Presa del Disparo señalador (−1 / +2) sigue aparte. 1 No2 y 2 SP, o cooldown 3.
 9. **Sed de sangre**: el aliado que derriba a alguien vuelve a atacar.
 10. **Remate en grupo**: más daño contra un rival herido o que ya recibió un golpe esta ronda.
 

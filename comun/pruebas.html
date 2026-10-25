@@ -1037,7 +1037,15 @@ prueba('🎯 Disparo señalador (2026-10-21): Presa (Evasión −1) y Marcado', 
   const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Disparo señalador').datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {});
   const P = estadosPresetCreep().find(p => p.nombre === 'Presa');
-  igual([h.cd, a.efectos.map(e => (e.spec || {}).nombre).join(','), P.turnos, P.presa, JSON.stringify(P.mods)], [3, 'Presa,Marcado', 2, true, '[{"stat":"eva","val":-1}]']);
+  igual([h.cd, a.efectos.map(e => (e.spec || {}).nombre).join(','), P.turnos, P.presa, JSON.stringify(P.mods)], [3, 'Presa,Marcado', 2, 2, '[{"stat":"eva","val":-1}]']);
+});
+prueba('🎯 Señalar la presa (Support, 2026-10-25): Presa señalada, Evasión −2 y +4 al daño', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Señalar la presa');
+  const h = armarHabilidadDeCreep(e.datos, 2);
+  const ej = Combatiente.habEjecucion(h, h.duelo, {stat: () => 3, etq: s => s});
+  const P = estadosPresetCreep().find(p => p.nombre === 'Presa señalada');
+  const est = EstadosAplicar.componer(ej.efectos[0].spec);
+  igual([ej.efectos[0].spec.nombre, ej.contra[0].modo, est.turnos, P.presa, JSON.stringify(P.mods), h.cd, h.spCosto, h.nitrosCosto], ['Presa señalada', 'resmg', 2, 4, '[{"stat":"eva","val":-2}]', 3, 2, 1]);
 });
 prueba('🗡 Ráfaga de cortes (2026-10-21): +2 dados, la ráfaga viaja al ataque', () => {
   const ar = n => armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos, 2);

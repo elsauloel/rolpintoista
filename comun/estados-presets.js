@@ -266,8 +266,11 @@ const ESTADOS_PRESET = [
     detalle:'Apunta con calma: su próximo disparo con un arma a distancia suma +2 a la Probabilidad de Golpe, Crítico frecuente +1 y Crítico potente +1. Se gasta al disparar; si antes le hacen daño (que le llegue a la vida), pierde la puntería. ⚙ Automatizado en el mapa.'},
   // 🎯 Presa (2026-10-21, dueño, el Disparo señalador; después, el Señalar la presa del Support): Evasión −1 (un mod: vale contra todo) y +2 al daño de
   // quien lo ataque siendo su rival (`presa`: lo suma el duelo, comun/duelo.js; lo detecta el mapa, vtt-hexgrid/js/13). Va junto con el Marcado.
-  {nombre:'Presa', polaridad:'debuff', turnos:2, presa:true, mods:[{stat:'eva', val:-1}],
+  {nombre:'Presa', polaridad:'debuff', turnos:2, presa:2, mods:[{stat:'eva', val:-1}],
     detalle:'Lo señalaron: su Evasión baja 1 y todo el que lo ataca le hace +2 de daño (con arma o con una habilidad que haga daño). Dura 2 turnos; volver a señalarlo lo renueva. ⚙ Automatizado en el mapa.'},
+  // 🎯 La del Support (2026-10-25, Señalar la presa; dueño: «menos 2 a Evasión y más 4 al daño»). `presa` = cuánto daño de más le hacen (js/13 presaContra).
+  {nombre:'Presa señalada', polaridad:'debuff', turnos:2, presa:4, mods:[{stat:'eva', val:-2}],
+    detalle:'Lo señalaron para que todos vayan por él: su Evasión baja 2 y todo el que lo ataca le hace +4 de daño (con arma o con una habilidad que haga daño). Dura 2 turnos; volver a señalarlo lo renueva. Con otra Presa encima, vale la más fuerte. ⚙ Automatizado en el mapa.'},
   {nombre:'Marcado', polaridad:'debuff', turnos:3, marcado:true,
     detalle:'⚙ Automatizado: no puede entrar en sigilo (si estaba, sale) y se lo sigue viendo con un brillo, aunque vuelva la niebla de guerra o esté en una nube de niebla. Se resiste con Res.Esp.'},
 ];

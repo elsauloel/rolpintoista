@@ -327,6 +327,9 @@
   rival en su Rango; si gana, la pantalla del GM muestra los estados buenos del objetivo (no los que salen del equipo o las pasivas) y elige cuál sacarle
   (`disipar: true` en el efecto; js/13). Sin estados buenos, no pasa nada. 2 No2 y 3 SP, o cooldown 3 (costo propuesto por Claude, como las maldiciones). Probado en el mapa el 2026-10-25 (GM, «Claude · pruebas»): ganó contra juan, el menú mostró
   sus tres estados buenos con la duración y el detalle, se eligió Escudo especial y se lo sacó (la Mesa: «le sacó Escudo especial»). Falta: que lo vea un jugador.
+- ✅ **Señalar la presa** (Support, «concentrar el fuego», 2026-10-25, dueño: «menos 2 a Evasión y más 4 al daño»): su PdG.Esp contra la Res.Esp de un
+  rival en su Rango; si gana, **Presa señalada** 2 turnos (preset nuevo: Evasión −2, `presa: 4`; `presaContra` de js/13 suma ese daño a todo el que lo
+  ataca y, con dos Presas encima, vale la más fuerte). 1 No2 y 2 SP, o cooldown 3 (costo propuesto por Claude). **Para probar.**
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 
 ## Etiquetas

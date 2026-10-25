@@ -1308,10 +1308,14 @@ function embestidaDe(atq, def){
   return igual(p1, p2) && igual(p2, p3) && distanciaHex(atq, def) === 1 ? n : 0;
 }
 // 🎯 La Presa (2026-10-21, el Disparo señalador): si el defensor la tiene y quien ataca es su rival, +2 al daño (la Evasión −1 ya la trae el estado).
+// Cuánto, lo dice el `presa` del estado o de su preset (2026-10-25: la Presa señalada del Support, +4); con dos encima, vale la más fuerte.
 function presaContra(atq, def){
   if(!atq || !def || !dueloEsRival(atq, def)) return 0;
   const est = (((vinculo(def) || {}).resumen || {}).estados || []);
-  return est.some(e => e && e.activo !== false && (e.presa || e.nombre === 'Presa')) ? 2 : 0;
+  const cuanto = e => { const p = (typeof ESTADOS_PRESET !== 'undefined' ? ESTADOS_PRESET : []).find(x => x.nombre === e.nombre);
+    const v = Math.round(num(e.presa)) > 1 ? num(e.presa) : p && num(p.presa) > 1 ? num(p.presa) : (e.presa || e.nombre === 'Presa') ? 2 : 0;
+    return Math.round(v); };
+  return est.reduce((m, e) => e && e.activo !== false ? Math.max(m, cuanto(e)) : m, 0);
 }
 function porLaEspalda(atq, def){
   return !!(atq && def && enSigilo(atq) && enCunaCiega(atq, def));

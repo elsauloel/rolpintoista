@@ -34,12 +34,12 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 11**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25), lluvia de escarcha (2026-10-25) · de El origen: proyectil, fuego con quemadura.
 - 🧿 **Debuffer — 12**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25), silencio (Tótem de silencio, 2026-10-25), extenuar (2026-10-25) · de El origen: ceguera, veneno, inmovilizar.
-- 💚 **Support — 11**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24), estandarte (Estandarte de guerra, 2026-10-24), señalar la presa (2026-10-25), armas perforantes (2026-10-25), redoble de tambores (2026-10-25) · de El origen: escudo a un aliado.
+- 💚 **Support — 12**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24), estandarte (Estandarte de guerra, 2026-10-24), señalar la presa (2026-10-25), armas perforantes (2026-10-25), redoble de tambores (2026-10-25), frenesí inducido (2026-10-25) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
 **Para emparejar** (regla del dueño, 2026-10-25: «empezamos a tener en cuenta todos los roles de creep e ir emparejándolos… para que estén todos
-avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-25): Mago y Support en 11;
-Debuffer y Rango + Hunter en 12; después los cuatro juntos hasta Choque liviano (14). El Jefe va aparte.
+avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-25): Mago en 11;
+Support, Debuffer y Rango + Hunter en 12; después los cuatro juntos hasta Choque liviano (14). El Jefe va aparte.
 
 ## Los roles
 
@@ -321,7 +321,7 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
 19. **Sin escapatoria**: el objetivo no se puede alejar (Rengo, o la oportunidad le sale a todos).
 
 **E. Apuestas** ✦
-20. **Frenesí inducido**: un aliado pega mucho más pero se defiende peor.
+20. ✅ **Frenesí inducido** (2026-10-25): a él o a un aliado, cura 1d6 y Frenético 2 turnos completos (+3 PdG, +5 al daño, −2 Evasión, −2 Defensa).
 21. **Pacto de sangre**: un aliado gana daño y pierde vida cada turno.
 22. **Compartir fuerza**: el support da vida, No2 o SP propios a un aliado (hoy, a mano).
 23. **Último aliento**: un aliado que cae hace un último ataque.

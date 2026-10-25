@@ -1039,6 +1039,14 @@ prueba('🎯 Disparo señalador (2026-10-21): Presa (Evasión −1) y Marcado', 
   const P = estadosPresetCreep().find(p => p.nombre === 'Presa');
   igual([h.cd, a.efectos.map(e => (e.spec || {}).nombre).join(','), P.turnos, P.presa, JSON.stringify(P.mods)], [3, 'Presa,Marcado', 2, 2, '[{"stat":"eva","val":-1}]']);
 });
+prueba('🔥 Frenesí inducido (Support, 2026-10-25): cura 1d6 y Frenético 2 turnos (+3 PdG, +5 daño, −2 Eva, −2 Def)', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Frenesí inducido');
+  const h = armarHabilidadDeCreep(e.datos, 2);
+  const P = estadosPresetCreep().find(p => p.nombre === 'Frenético');
+  const m = Object.fromEntries(P.mods.map(x => [x.stat, x.val]));
+  igual([h.duelo.objetivo, h.duelo.conmigo, h.duelo.efectos[0].nombre, h.duelo.efectos[1].cura, m.pdg, m.pdgmg, m.dmg, m.eva, m.def, P.turnos, !!P.turnosCompletos, h.cd],
+    ['aliado', true, 'Frenético', '1d6', 3, 3, 5, -2, -2, 2, true, 3]);
+});
 prueba('🥵 Extenuar (Debuffer, 2026-10-25): PdG.Esp contra Res.Esp, 2d4 arcano y Extenuado 2 turnos', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Extenuar');
   const h = armarHabilidadDeCreep(e.datos, 2);

@@ -1081,7 +1081,7 @@ async function areaCrearSiguienteSubDuelo(areaId, a){
       if(intento) await new Promise(r => setTimeout(r, 700));
       mia = await fbDb.runTransaction(async tx => {
         const doc = await tx.get(ref);
-        if(!doc.exists) return 'no';
+        if(!doc.exists) return 'tarde';   // (recién lanzada: el servidor todavía no la tiene — 2026-10-25, la Lanza de luz)
         const duelos = (doc.data().duelos || []).slice();
         if(duelos[idx]) return 'no';
         if(num(doc.data().indice) < idx) return 'tarde';

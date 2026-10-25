@@ -157,7 +157,7 @@
     if(sp.anuncio) h.anuncio = sp.anuncio;
     if(sp.malDeOjo) h.malDeOjo = true;
     if(sp.estandarte){ h.estandarte = {...sp.estandarte}; h.modo = 'auto'; }
-    if(sp.meteoro){ h.meteoro = {...sp.meteoro}; h.modo = 'auto'; }   // ☄ la Lluvia de meteoros (2026-10-24): la marca y la hace caer el mapa (vtt-hexgrid/js/74)   // 🚩 el Estandarte de guerra (2026-10-24): lo clava el mapa (vtt-hexgrid/js/73)
+    if(sp.meteoro){ h.meteoro = {...sp.meteoro}; h.modo = 'auto'; }   // ☄ el Meteoro (2026-10-24): la marca y la hace caer el mapa (vtt-hexgrid/js/74)   // 🚩 el Estandarte de guerra (2026-10-24): lo clava el mapa (vtt-hexgrid/js/73)
     if(sp.flash) h.flash = true;
     if(sp.largoVariable) h.largoVariable = {...sp.largoVariable};   // 🔥 el largo a elegir al lanzarla (Muro de fuego, 2026-10-24, vtt-hexgrid/js/12)   // ⚡ Flash (2026-10-24, Bendecir el arma): se usa cuando sea; en turno ajeno, el doble (vtt-hexgrid/js/12)
     if(sp.golpeAnunciado) h.golpeAnunciado = JSON.parse(JSON.stringify(sp.golpeAnunciado));   // 🪓 El que avisa no traiciona (2026-10-21): el golpe que descarga (vtt-hexgrid/js/63)

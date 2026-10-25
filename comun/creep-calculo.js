@@ -508,7 +508,7 @@ const CreepCalculo = (() => {
       estandarteRadio: sc.estandarte ? Math.max(0, Math.round(num(sc.estandarte.radio))) : 0,
       estandartePdg: sc.estandarte ? Math.max(0, Math.round(num(sc.estandarte.pdg))) : 0,
       estandarteDano: sc.estandarte ? Math.max(0, Math.round(num(sc.estandarte.dano))) : 0,
-      // ☄ La sombra de la Lluvia de meteoros que está por caer (2026-10-24, vtt-hexgrid/js/74): dónde y de qué tamaño (radio 0 = ninguna).
+      // ☄ La sombra de el Meteoro que está por caer (2026-10-24, vtt-hexgrid/js/74): dónde y de qué tamaño (radio 0 = ninguna).
       meteoroCol: sc.meteoro ? Math.round(num(sc.meteoro.col)) : 0, meteoroFila: sc.meteoro ? Math.round(num(sc.meteoro.fila)) : 0, meteoroRadio: sc.meteoro ? Math.max(0, Math.round(num(sc.meteoro.radio))) : 0,
     };
   }

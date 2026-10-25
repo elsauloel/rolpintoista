@@ -68,7 +68,7 @@
     'Barrido': ['choque pesado', 'barrido'], 'Coletazo': ['choque pesado', 'barrido'],
     'Tiro a la cabeza': ['rango', 'tiro apuntado'], 'Desarmar': ['choque pesado', 'desarmar'], 'El que avisa no traiciona': ['choque pesado', 'golpe anunciado'], 'Sal en la herida': ['choque liviano', 'abrir la herida'], 'Remate': ['choque pesado', 'remate'], 'Ir por el herido': ['choque pesado', 'remate'], 'Morder la herida': ['choque liviano', 'abrir la herida'], 'Patotear': ['choque liviano', 'manada'], 'Jauría': ['choque liviano', 'manada'], 'Zarpazo erguido': ['choque pesado', 'golpe anunciado'], 'Mal de ojo': ['debuffer', 'maleficio'], 'Disparo señalador': ['rango', 'señalar'], 'Ráfaga de cortes': ['choque liviano', 'ráfaga'], 'Ráfaga de zarpazos': ['choque liviano', 'ráfaga'],
     'Romper armadura': ['choque pesado', 'romper armadura'], 'Arrancar la coraza': ['choque pesado', 'romper armadura'],
-    'Golpe demoledor': ['choque pesado', 'romper armadura'], 'Mandíbula trituradora': ['choque pesado', 'romper armadura'], 'Cadena de rayos': ['mago', 'rayo en cadena'], 'Hálito polar': ['mago', 'cono de frío'], 'Muro de fuego': ['mago', 'muro de fuego'], 'Descarga arcana': ['mago', 'descarga cargada'], 'Maldición de la coraza': ['debuffer', 'bajar la armadura'], 'Maldición de la sequía': ['debuffer', 'cortar la regeneración'], 'Aguja del desamparo': ['debuffer', 'exponer'], 'Estandarte de guerra': ['support', 'estandarte'], 'Lluvia de meteoros': ['mago', 'área anunciada'], 'Coraza de púas': ['support', 'devolver el daño'], 'Bendecir el arma': ['support', 'bendecir el arma'], 'Ojo certero': ['support', 'ojo certero'], 'Velo espejado': ['support', 'devolver el daño'],
+    'Golpe demoledor': ['choque pesado', 'romper armadura'], 'Mandíbula trituradora': ['choque pesado', 'romper armadura'], 'Cadena de rayos': ['mago', 'rayo en cadena'], 'Hálito polar': ['mago', 'cono de frío'], 'Muro de fuego': ['mago', 'muro de fuego'], 'Descarga arcana': ['mago', 'descarga cargada'], 'Maldición de la coraza': ['debuffer', 'bajar la armadura'], 'Maldición de la sequía': ['debuffer', 'cortar la regeneración'], 'Aguja del desamparo': ['debuffer', 'exponer'], 'Estandarte de guerra': ['support', 'estandarte'], 'Meteoro': ['mago', 'área anunciada'], 'Coraza de púas': ['support', 'devolver el daño'], 'Bendecir el arma': ['support', 'bendecir el arma'], 'Ojo certero': ['support', 'ojo certero'], 'Velo espejado': ['support', 'devolver el daño'],
     'Puñalada por la espalda': ['choque liviano', 'por la espalda'], 'Mordida a traición': ['choque liviano', 'por la espalda'], 'Puñalada trapera': ['choque liviano', 'por la espalda'],
   };
 
@@ -77,7 +77,7 @@
   function H(nombre, fn, razas, roles, cd, spBase, mec){
     const sp = {nombre, ...spBase};
     if(sp.magico === undefined && roles.includes('g')) sp.magico = true;   // rol mágico: pega con PdG.Esp
-    const lenta = cd >= 4;
+    const lenta = cd >= 4 || sp.arrancaEnCooldown === true;   // (2026-10-24, el Meteoro: «cooldown 3, pero que empiece activado, tipo lento»)
     const frases = sp.detalle.split(/(?<=[.!?])\s+/);
     const aMano = U.hayManual(sp);
     const etiquetas = [...fn].map(c => FN[c]).filter(Boolean), razasTxt = [...razas].map(c => RZ[c]).filter(Boolean), rolesTxt = [...roles].map(c => RO[c]).filter(Boolean);
@@ -243,14 +243,14 @@
   H('Hálito polar', 'DA', 'ega', 'g', 3, {detalle: 'Exhala un aliento helado en cono al frente (16 casillas): tira su Probabilidad de Golpe especial una vez contra la Evasión de cada rival del cono; quien le gana tiene un dodge roll: si sale del cono moviéndose, se salva; si sigue adentro, le pega igual. Al que no le gana (o no sale): 2d4 más un cuarto de su Efecto especial, de hielo (lo frenan la Defensa especial y la resistencia al hielo) y Escarcha (−1 a sus No2 máximos, 2 turnos).',
     no2: 3, spCosto: 'esp', auditada: true, ataqueTxt: 'su PdG.Esp contra la Evasión de cada rival del cono; 2d4 + ¼ de su Ef.Esp de hielo y Escarcha',
     duelo: {objetivo: 'cono', ondaDodge: true, tira: 'pdgmg', contra: ['eva'], dano: true, danoFormula: '2d4', danoSumaEsp: 0.25, tipoDano: 'hielo', efectos: [{nombre: 'Escarcha'}]}});
-  // ☄ Auditada (dueño, 2026-10-24; el Mago, «Lluvia de meteoros»: «4d6 de daño físico y 4d6 de daño de fuego; se esquiva con dodge roll; se anuncia como una
-  // sombra, viene del cielo»): marca un área (diámetro 5) dentro de su Rango —una sombra que todos ven— y al empezar su próximo turno cae: a todos los que
-  // sigan adentro (aliados incluidos, menos él), un dodge roll sin tirada previa (como la Tormenta arcana); quien no sale recibe 4d6 físicos (los frena la
-  // Defensa) y 4d6 de fuego (directo, menos la resistencia al fuego). Si el mago cae antes, la sombra se disipa. Lo hace el mapa (vtt-hexgrid/js/74).
-  // Es su ataque del turno. Costo propuesto por Claude: 2 No2 y 5 SP, o cooldown 4.
-  H('Lluvia de meteoros', 'DA', 'ega', 'g', 4, {detalle: 'Señala un punto dentro de su Rango: una sombra (diámetro 5) cubre el suelo a la vista de todos y algo cae del cielo. Al empezar su próximo turno, el meteoro cae: todos los que sigan adentro (también sus aliados) tienen un dodge roll para salir; quien sigue adentro recibe 4d6 de daño físico (lo frena la Defensa) y 4d6 de fuego (directo, menos la resistencia al fuego). Es su ataque del turno. Si él cae antes, la sombra se disipa.',
-    no2: 2, spCosto: 5, auditada: true, cuentaComoAtaque: true, ataqueTxt: 'una sombra en su Rango; en su próximo turno cae: dodge roll, 4d6 físico + 4d6 de fuego',
-    meteoro: {radio: 2, fisico: '4d6', fuego: '4d6'}});
+  // ☄ Auditada (dueño, 2026-10-24; el Mago, «área anunciada»: «se esquiva con dodge roll; se anuncia como una sombra, viene del cielo»; ajuste del mismo día:
+  // «cooldown 3, pero que empiece activado el cooldown, tipo lento; 4d6 físicos, 2d6 de fuego directo; de nombre, Meteoro»): marca un área (diámetro 5)
+  // dentro de su Rango —una sombra que todos ven— y al empezar su próximo turno cae: a todos los que sigan adentro (aliados incluidos, menos él), un dodge
+  // roll sin tirada previa (como la Tormenta arcana); quien no sale recibe 4d6 físicos (los frena la Defensa) y 2d6 de fuego (directo, menos la resistencia
+  // al fuego). Si el mago cae antes, la sombra se disipa. Lo hace el mapa (vtt-hexgrid/js/74). Es su ataque del turno. 2 No2 y 5 SP (propuesta de Claude).
+  H('Meteoro', 'DA', 'ega', 'g', 3, {detalle: 'Señala un punto dentro de su Rango: una sombra (diámetro 5) cubre el suelo a la vista de todos y algo cae del cielo. Al empezar su próximo turno, el meteoro cae: todos los que sigan adentro (también sus aliados) tienen un dodge roll para salir; quien sigue adentro recibe 4d6 de daño físico (lo frena la Defensa) y 2d6 de fuego (directo, menos la resistencia al fuego). Es su ataque del turno. Si él cae antes, la sombra se disipa.',
+    no2: 2, spCosto: 5, arrancaEnCooldown: true, auditada: true, cuentaComoAtaque: true, ataqueTxt: 'una sombra en su Rango; en su próximo turno cae: dodge roll, 4d6 físico + 2d6 de fuego directo',
+    meteoro: {radio: 2, fisico: '4d6', fuego: '2d6'}});
   H('Misil arcano', 'D', 'hdga', 'g', 2, aT('Un proyectil mágico que no falla.', 'M'));
   H('Descarga eléctrica', 'DK', 'ea', 'g', 3, zO('Una descarga que deja al objetivo sin aliento: pierde 1 No2 (a mano).', 2, 'M'));
   // 🔥 Auditada (dueño, 2026-10-24; el Mago, «muro de fuego»): reemplaza a la vieja Llamarada (a mano). La zona en línea de la Varita del muro de fuego

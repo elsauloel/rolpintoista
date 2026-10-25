@@ -391,7 +391,7 @@ const CreepAcciones = (() => {
        colocarTrampa(sc, h, auto), colocarZona(sc, h) → bool, elegirObjetivo(sc, h) (el estado sobre el objetivo), excavar(sc, h) (🕳, solo el mapa),
        refuerzos(sc, h) (📣 llamar refuerzos: `h.refuerzos = {cant}`; el GM elige en el mapa dónde aparece cada copia, solo el mapa),
        estandarte(sc, h) (🚩 el Estandarte de guerra: `h.estandarte`; el GM elige en el mapa dónde lo clava, solo el mapa),
-       meteoro(sc, h) (☄ la Lluvia de meteoros: `h.meteoro`; el GM marca la sombra en el mapa, solo el mapa)} */
+       meteoro(sc, h) (☄ el Meteoro: `h.meteoro`; el GM marca la sombra en el mapa, solo el mapa)} */
   function terminarHab(sc, h, p, ui){
     const {costo, costoHp, efecto, falta, auto, esZona, directo} = p;
     if(h.excavar && ui.excavar) ui.excavar(sc, h);   // 🕳 Bajo tierra (2026-10-13): el mapa mete el token bajo tierra (vtt-hexgrid/js/46)

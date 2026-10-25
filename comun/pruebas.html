@@ -959,6 +959,12 @@ prueba('⚔ Golpe fuerte de creep y Golpe brutal (auditados 2026-10-20): +1 dado
   const gb = CLASES_SKILLS.find(c => c.id === 'warrior').habilidades.find(h => h.id === 'warrior-golpe-brutal');
   igual([a.mods.dados, gb.efectoNombre, gb.efectoTurnos, gb.efectoMods[0].stat, gb.efectoMods[0].val], [1, 'Guardia baja', 1, 'eva', -2]);
 });
+prueba('☄ Meteoro (2026-10-24): cooldown 3 que arranca activo, 4d6 físico + 2d6 de fuego', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Meteoro');
+  const h = armarHabilidadDeCreep(e.datos, 2);
+  igual([h.cd, h.cdActual, h.meteoro.fisico, h.meteoro.fuego, h.meteoro.radio, h.spCosto, e.etiquetas.includes('lenta'), !HABILIDADES_CREEP_BASE.some(x => x.nombre === 'Lluvia de meteoros')],
+    [3, 3, '4d6', '2d6', 2, 5, true, true]);
+});
 prueba('🐂 Cornada (2026-10-21): +1 PdG, +1 al daño, empuja 1 y toma carrera', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Cornada');
   const h = armarHabilidadDeCreep(e.datos, 2);

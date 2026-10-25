@@ -315,13 +315,13 @@
   habilidad (`cfg.estandarte` del duelo; también en el ataque de oportunidad); con 0 de vida se rompe y se va. Uno por creep. El aura: la línea punteada dorada
   sobre las casillas, un velo carmesí y, por fuera, un anillo con banderines que flamean (`vtt-hexgrid/js/73`). 2 No2 y 4 SP, o cooldown 4 (sin arrancar el combate en cooldown: `disponibleAlInicio`). El anillo sigue la forma del área con las puntas redondeadas. **Para probar.**
 
-- ✅ **Lluvia de meteoros** (Mago, «área anunciada», 2026-10-24, dueño: «4d6 de daño físico y 4d6 de daño de fuego; se esquiva con dodge roll; se anuncia
-  como una sombra, viene del cielo»): marca el centro dentro de su Rango y queda una **sombra** (diámetro 5) que todos ven, con la Mesa y la Crónica. Al
+- ✅ **Meteoro** (Mago, «área anunciada», 2026-10-24, dueño: «se esquiva con dodge roll; se anuncia como una sombra, viene del cielo»; se llamó Lluvia de
+  meteoros hasta el ajuste del mismo día: «cooldown 3, pero que empiece activado el cooldown, tipo lento; 4d6 físicos, 2d6 de fuego directo; de nombre, Meteoro»): marca el centro dentro de su Rango y queda una **sombra** (diámetro 5) que todos ven, con la Mesa y la Crónica. Al
   empezar su próximo turno (con orden de turnos; sin orden, en el próximo cambio de ronda) cae: la explosión en todas las pantallas y un área con el centro
-  fijo donde **cada uno arranca en el dodge roll** (sin tirada, como la Tormenta arcana); quien no sale recibe **4d6 físico** (lo frena la Defensa) y **4d6
+  fijo donde **cada uno arranca en el dodge roll** (sin tirada, como la Tormenta arcana); quien no sale recibe **4d6 físico** (lo frena la Defensa) y **2d6
   de fuego** (lo nuevo: `hab.dano.extra` → `dano.magico` del duelo; directo, menos la resistencia al fuego). Le cae a todos los de adentro menos él, también a
-  sus aliados; no a los caídos. Si él cae antes, la sombra se disipa. Es su ataque del turno. 2 No2 y 5 SP, o cooldown 4 (lenta: arranca el combate en
-  cooldown); los números de costo los propuso Claude. **Para probar.**
+  sus aliados; no a los caídos. Si él cae antes, la sombra se disipa. Es su ataque del turno. 2 No2 y 5 SP (propuesta de Claude), o **cooldown 3 que arranca
+  el combate activo**, como una lenta (`arrancaEnCooldown`). Probado en el mapa el 2026-10-24 (con 4d6 de fuego; falta verlo desde un jugador).
 
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 

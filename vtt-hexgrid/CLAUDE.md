@@ -1792,7 +1792,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   por un estado con `hpmax`). Lo público lleva `estandarteRadio/Pdg/Dano` (`CreepCalculo.tarjetaPublica`, leído en js/09). `estandarteBonus(mio)` → `{pdg,
   dano}` para un creep a `radio` o menos de uno en pie; js/13 y js/17 lo pasan a `Duelo.crear({estandarte})`. La pantalla del GM saca los rotos (token y
   ficha). El aura, `estandarteDibujar(z)` desde js/05.
-- **☄ La Lluvia de meteoros** (2026-10-24, Mago; `js/74-meteoro.js`): `marcarMeteoro(sc, h)` (desde `ui.meteoro` de js/12) pide el centro dentro del Rango y guarda
+- **☄ El Meteoro** (2026-10-24, Mago; antes «Lluvia de meteoros»; `js/74-meteoro.js`): `marcarMeteoro(sc, h)` (desde `ui.meteoro` de js/12) pide el centro dentro del Rango y guarda
   `sc.meteoro = {col, fila, radio, fisico, fuego, paso, mant}`; lo público lleva `meteoroCol/Fila/Radio` (la sombra, `meteoroDibujar` desde js/05). La pantalla del GM
   la hace caer (`meteoroCaer`) al empezar el próximo turno del creep (o el próximo cambio de ronda sin orden): el momento «estallido» y
   `dueloElegirAreaMapa({centroFijo})` con `soloDodge` y `dano.extra` (el fuego, que el duelo pasa a `dano.magico`).

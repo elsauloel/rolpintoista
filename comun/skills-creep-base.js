@@ -377,10 +377,11 @@
   // completos con ese efecto»; concepto 5 del Support): a él o a un aliado en su Rango, sin tirada. Costo propuesto por Claude: 1 No2 y 3 SP, o cooldown 3.
   // 🎯 Auditada (dueño, 2026-10-25; el Support, «señalar la presa»: «menos 2 a Evasión y más 4 al daño»): su PdG.Esp contra la Res.Esp de un rival en su
   // Rango; si gana, Presa señalada 2 turnos (−2 Evasión; todo el que lo ataca le hace +4 de daño: js/13 presaContra). La versión del Support del Disparo
-  // señalador, sin disparo. 1 No2 y 2 SP, o cooldown 3 (costo propuesto por Claude).
-  H('Señalar la presa', 'X', '*', 'a', 3, {detalle: 'Señala a un rival dentro de su Rango para que todos vayan por él: tira su Probabilidad de Golpe especial contra la Resistencia especial del objetivo; si gana, queda como Presa señalada 2 turnos: su Evasión baja 2 y todo el que lo ataca le hace +4 de daño.',
-    no2: 1, spCosto: 2, auditada: true, ataqueTxt: 'su PdG.Esp contra la Res.Esp; si gana, Presa señalada 2 turnos (−2 Evasión, +4 al daño de todos)',
-    duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['resmg'], alcance: 'rango', dano: false, efectos: [{nombre: 'Presa señalada'}]}});
+  // señalador, sin disparo. Y Marcado los mismos 2 turnos (dueño, el mismo día: «que quede como marca visible, que no se pueda ocultar y que se vea a
+  // pesar de la niebla de guerra»). 1 No2 y 2 SP, o cooldown 3 (costo propuesto por Claude).
+  H('Señalar la presa', 'X', '*', 'a', 3, {detalle: 'Señala a un rival dentro de su Rango para que todos vayan por él: tira su Probabilidad de Golpe especial contra la Resistencia especial del objetivo; si gana, queda como Presa señalada 2 turnos: su Evasión baja 2 y todo el que lo ataca le hace +4 de daño. Y queda Marcado esos mismos 2 turnos: brilla, se lo ve aunque vuelva la niebla y no puede esconderse (si estaba en sigilo, sale).',
+    no2: 1, spCosto: 2, auditada: true, ataqueTxt: 'su PdG.Esp contra la Res.Esp; si gana, Presa señalada y Marcado 2 turnos (−2 Evasión, +4 al daño de todos, no se esconde)',
+    duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['resmg'], alcance: 'rango', dano: false, efectos: [{nombre: 'Presa señalada'}, {nombre: 'Marcado', turnos: 2}]}});
   H('Ojo certero', 'B', '*', 'a', 3, {detalle: 'Le afina la puntería a un aliado (o a sí mismo) dentro de su Rango: Crítico frecuente +2 y Crítico potente +2 durante sus próximos 2 turnos completos (el turno en que se lo da no cuenta).',
     no2: 1, spCosto: 3, auditada: true, ataqueTxt: 'Crítico frecuente +2 y Crítico potente +2, 2 turnos completos, a él o a un aliado en su Rango',
     duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', efectos: [{nombre: 'Ojo certero'}]}});

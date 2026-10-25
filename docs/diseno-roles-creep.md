@@ -293,7 +293,7 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
 
 **B. Concentrar el fuego** ✦
 8. ✅ **Señalar la presa** ✦ (2026-10-25; dueño: «menos 2 a Evasión y más 4 al daño»): su PdG.Esp contra la Res.Esp de un rival en su Rango; si gana,
-   **Presa señalada** 2 turnos (−2 Evasión; todo el que lo ataca le hace +4 de daño). La Presa del Disparo señalador (−1 / +2) sigue aparte. 1 No2 y 2 SP, o cooldown 3.
+   **Presa señalada** y **Marcado** 2 turnos (−2 Evasión; todo el que lo ataca le hace +4 de daño; brilla, se ve a pesar de la niebla y no se esconde). La Presa del Disparo señalador (−1 / +2) sigue aparte. 1 No2 y 2 SP, o cooldown 3.
 9. **Sed de sangre**: el aliado que derriba a alguien vuelve a atacar.
 10. **Remate en grupo**: más daño contra un rival herido o que ya recibió un golpe esta ronda.
 

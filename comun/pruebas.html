@@ -1045,7 +1045,8 @@ prueba('🎯 Señalar la presa (Support, 2026-10-25): Presa señalada, Evasión 
   const ej = Combatiente.habEjecucion(h, h.duelo, {stat: () => 3, etq: s => s});
   const P = estadosPresetCreep().find(p => p.nombre === 'Presa señalada');
   const est = EstadosAplicar.componer(ej.efectos[0].spec);
-  igual([ej.efectos[0].spec.nombre, ej.contra[0].modo, est.turnos, P.presa, JSON.stringify(P.mods), h.cd, h.spCosto, h.nitrosCosto], ['Presa señalada', 'resmg', 2, 4, '[{"stat":"eva","val":-2}]', 3, 2, 1]);
+  const mar = EstadosAplicar.componer(ej.efectos[1].spec);
+  igual([ej.efectos[0].spec.nombre, ej.contra[0].modo, est.turnos, P.presa, JSON.stringify(P.mods), h.cd, h.spCosto, h.nitrosCosto, mar.nombre, mar.turnos, !!mar.marcado], ['Presa señalada', 'resmg', 2, 4, '[{"stat":"eva","val":-2}]', 3, 2, 1, 'Marcado', 2, true]);
 });
 prueba('🗡 Ráfaga de cortes (2026-10-21): +2 dados, la ráfaga viaja al ataque', () => {
   const ar = n => armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos, 2);

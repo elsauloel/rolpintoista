@@ -159,6 +159,7 @@
     if(sp.estandarte){ h.estandarte = {...sp.estandarte}; h.modo = 'auto'; }
     if(sp.meteoro){ h.meteoro = {...sp.meteoro}; h.modo = 'auto'; }   // ☄ el Meteoro (2026-10-24): la marca y la hace caer el mapa (vtt-hexgrid/js/74)   // 🚩 el Estandarte de guerra (2026-10-24): lo clava el mapa (vtt-hexgrid/js/73)
     if(sp.flash) h.flash = true;
+    if(sp.trampaColocar){ h.trampaColocar = JSON.parse(JSON.stringify(sp.trampaColocar)); h.modo = 'auto'; }   // 🌀 la trampa entera, como la de una varita (el Portal trampa, 2026-10-25): la coloca el mapa (trampaDeHabilidad)
     if(Array.isArray(sp.variantes)) h.variantes = JSON.parse(JSON.stringify(sp.variantes));   // ✨ el elemento a elegir al lanzarla (el Misil elemental, 2026-10-25, vtt-hexgrid/js/12)
     if(sp.largoVariable) h.largoVariable = {...sp.largoVariable};   // 🔥 el largo a elegir al lanzarla (Muro de fuego, 2026-10-24, vtt-hexgrid/js/12)   // ⚡ Flash (2026-10-24, Bendecir el arma): se usa cuando sea; en turno ajeno, el doble (vtt-hexgrid/js/12)
     if(sp.golpeAnunciado) h.golpeAnunciado = JSON.parse(JSON.stringify(sp.golpeAnunciado));   // 🪓 El que avisa no traiciona (2026-10-21): el golpe que descarga (vtt-hexgrid/js/63)

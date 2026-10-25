@@ -32,13 +32,13 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
   robar, sigilo, varios golpes, bajo tierra, veneno.
 - 🏹 **Rango y Hunter — 14**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar, mantener a raya (2026-10-25), atravesar (Flecha que atraviesa, 2026-10-25), disparos encadenados (Ráfaga encadenada, 2026-10-25) · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
-- ✨ **Mago — 13**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25), lluvia de escarcha (2026-10-25), andanada arcana (2026-10-25), misiles elementales (2026-10-25) · de El origen: proyectil, fuego con quemadura.
+- ✨ **Mago — 14**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25), lluvia de escarcha (2026-10-25), andanada arcana (2026-10-25), misiles elementales (2026-10-25), portal trampa (2026-10-25) · de El origen: proyectil, fuego con quemadura.
 - 🧿 **Debuffer — 14**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25), silencio (Tótem de silencio, 2026-10-25), extenuar (2026-10-25), cegar (2026-10-25), grito de pánico (2026-10-25) · de El origen: ceguera, veneno, inmovilizar.
 - 💚 **Support — 14**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24), estandarte (Estandarte de guerra, 2026-10-24), señalar la presa (2026-10-25), armas perforantes (2026-10-25), redoble de tambores (2026-10-25), frenesí inducido (2026-10-25), limpiar estados (Purificar, 2026-10-25), levitar (2026-10-25) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
 **Para emparejar** (regla del dueño, 2026-10-25: «empezamos a tener en cuenta todos los roles de creep e ir emparejándolos… para que estén todos
-avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-25): Mago en 13; Support, Debuffer y Rango + Hunter en 14, como Choque liviano; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
+avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-25): Mago, Support, Debuffer y Rango + Hunter en 14, como Choque liviano; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
 
 ## Los roles
 
@@ -289,7 +289,7 @@ líneas, zonas, el rayo en cadena y los charcos, los controles mentales.
     [Varita del campo de estática]. 21. **Camino de lava**: un camino de casillas que arde unos turnos [Varita del chorro de lava].
     22. **Runa explosiva**: una trampa mágica oculta que el mago deja en el piso [Varita de la runa]. 23. **Campo de espinas**: casillas que lastiman al
     pisarlas [Varita de espinas]. 24. **Muro o pilares** ✦: levantar piedra que tapa el paso y la vista (control del terreno) [Varita del muro, Varita de
-    los pilares]. 25. **Portal trampa** ✦: un portal oculto que manda a quien lo pisa a otra casilla, lejos (Res.Esp para aferrarse) [Varita de la trampa
+    los pilares]. 25. ✅ **Portal trampa** ✦ (2026-10-25: sin daño; llega Expuesto): un portal oculto que manda a quien lo pisa a otra casilla, lejos (Res.Esp para aferrarse) [Varita de la trampa
     portal]. 26. **Lazo arcano**: lo atrae unas casillas hacia el mago, salvo que gane con Fuerza [Varita del gancho]. 27. **Desarmar con magia**: el arma
     se le escapa y vuela (Fuerza para aferrarse) [Expelliarmus]. 28. **Sanguijuela**: daño y se cura la mitad [Varita sanguijuela]. 29. **Cosecha**: lo
     marca; si muere marcado, el mago recupera SP y vida [Varita de la cosecha]. 30. **Magia inestable** (variante de la Sobrecarga): más daño, pero si sale

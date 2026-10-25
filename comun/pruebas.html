@@ -1039,6 +1039,12 @@ prueba('🎯 Disparo señalador (2026-10-21): Presa (Evasión −1) y Marcado', 
   const P = estadosPresetCreep().find(p => p.nombre === 'Presa');
   igual([h.cd, a.efectos.map(e => (e.spec || {}).nombre).join(','), P.turnos, P.presa, JSON.stringify(P.mods)], [3, 'Presa,Marcado', 2, 2, '[{"stat":"eva","val":-1}]']);
 });
+prueba('🌀 Portal trampa (Mago, 2026-10-25): la trampa de la varita en un creep (destino fijo a 4, Res.Esp contra su Ef.Esp, llega Expuesto)', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Portal trampa');
+  const h = armarHabilidadDeCreep(e.datos, 2);
+  const t = Combatiente.trampaDeHab(h, st => st === 'dmgesp' ? 9 : 0);
+  igual([h.modo, !!h.trampaColocar.portal.fijo, h.trampaColocar.portal.rango, t.salvacion.dif, t.salvacion.stat, t.detectar, t.estado.nombre, h.cd], ['auto', true, 4, 9, 'resmg', 9, 'Expuesto', 3]);
+});
 prueba('🎆 Misiles elementales (Mago, 2026-10-25): uno por elemento y el Misil elemental, que deja elegir (+1 No2, su Especial + 2 SP)', () => {
   const N = ['Misil arcano', 'Lengua de fuego', 'Dardo helado', 'Centella', 'Mancha corrosiva', 'Ponzoña'];
   const hs = N.map(n => armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos, 2));

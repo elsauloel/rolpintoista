@@ -33,7 +33,9 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 - 💚 **Support — 10**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24), estandarte (Estandarte de guerra, 2026-10-24), señalar la presa (2026-10-25), armas perforantes (2026-10-25) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
-**Para emparejar**: Mago, Support y Debuffer en 10 (2026-10-25); después Rango + Hunter (11).
+**Para emparejar** (regla del dueño, 2026-10-25: «empezamos a tener en cuenta todos los roles de creep e ir emparejándolos… para que estén todos
+avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy: Mago,
+Support y Debuffer en 10 → a 11, donde los alcanza Rango + Hunter; después los cuatro juntos hasta Choque liviano (14). El Jefe va aparte.
 
 ## Los roles
 

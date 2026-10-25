@@ -1039,6 +1039,16 @@ prueba('🎯 Disparo señalador (2026-10-21): Presa (Evasión −1) y Marcado', 
   const P = estadosPresetCreep().find(p => p.nombre === 'Presa');
   igual([h.cd, a.efectos.map(e => (e.spec || {}).nombre).join(','), P.turnos, P.presa, JSON.stringify(P.mods)], [3, 'Presa,Marcado', 2, 2, '[{"stat":"eva","val":-1}]']);
 });
+prueba('🥁 Redoble de tambores (Support, 2026-10-25): +2 No2 su próximo turno y −1 a los cooldowns, radio 4', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Redoble de tambores');
+  const h = armarHabilidadDeCreep(e.datos, 2);
+  const P = estadosPresetCreep().find(p => p.nombre === 'Redoble');
+  const ej = Combatiente.habEjecucion(h, h.duelo, {stat: () => 4}) || {};
+  const n = Duelo.limpiarHab(ej) || {};
+  const baja = (n.efectos || []).find(x => x.bajaCd);
+  igual([h.duelo.objetivo, h.duelo.radio, !!h.duelo.aliados, P.mods[0].stat, P.mods[0].val, P.turnos, !!P.turnosCompletos, baja ? baja.bajaCd : 0, baja ? Duelo.specDeEfecto(baja).bajaCd : 0, h.cd],
+    ['onda', 4, true, 'nitros', 2, 1, true, 1, 1, 3]);
+});
 prueba('🤐 Tótem de silencio (Debuffer, 2026-10-25): el aura avisa solo a los rivales, y con la ficha', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Tótem de silencio');
   const h = armarHabilidadDeCreep(e.datos, 2);

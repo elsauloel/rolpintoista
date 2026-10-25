@@ -2109,6 +2109,21 @@ async function dueloAplicarEfectoBase(d, ef){
     try{ await hudEstadoCambiar(t, idx, 'quitar'); return {nota: `le sacó ${nom}`}; }
     catch(err){ console.error('No se pudo aplicar la purga:', err); return {manual: true, nota: `sacale ${nom} a mano`}; }
   }
+  // 🥁 Baja cooldowns (2026-10-25, el Support, Redoble de tambores; dueño: «si tiene algún aliado alrededor que trabaje con cooldown en lugar de SP, que le
+  // reduzca en uno el valor de todos los cooldowns que estén activos»): solo creeps en modo cooldown; lo aplica la pantalla del GM.
+  if(num(spec.bajaCd) > 0){
+    const n = Math.round(num(spec.bajaCd));
+    if(t.tipo !== 'creep') return {nota: 'no trabaja con cooldowns de creep'};
+    const sc = creepPrivadoDe(t.fichaId);
+    if(!sc || !soyGM) return {manual: true, nota: `bajale ${n} a sus cooldowns activos a mano`};
+    if(CreepCalculo.modoSP(sc)) return {nota: 'trabaja con SP: no tiene cooldowns que bajar'};
+    let bajadas = [];
+    await modificarCreep(t.fichaId, x => {
+      bajadas = [];
+      (x.habilidades || []).forEach(h => { if(num(h.cdActual) > 0){ h.cdActual = Math.max(0, num(h.cdActual) - n); bajadas.push(h.nombre || 'una habilidad'); } });
+    });
+    return {nota: bajadas.length ? `−${n} al cooldown de ${bajadas.join(', ')}` : 'no tenía cooldowns activos'};
+  }
   // 🧿 Disipar (2026-10-25, el Debuffer; dueño: «el usuario de disipar elige cuál quitar»): sus estados buenos (no los que salen solos del equipo o las
   // pasivas) y quien lo usa elige uno. Lo aplica la pantalla del GM, que maneja a los creeps que hoy lo usan.
   if(spec.disipar){

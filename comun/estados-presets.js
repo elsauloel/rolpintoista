@@ -136,6 +136,10 @@ const ESTADOS_PRESET = [
   // (`turnosCompletos`: el turno en que se lo dan no cuenta, aunque sea el suyo; Combatiente.terminarTurnoEstados).
   {nombre:'Ojo certero', polaridad:'buff', turnos:2, turnosCompletos:true, mods:[{stat:'crit', val:2}, {stat:'critpot', val:2}],
     detalle:'Le afinan la puntería: Crítico frecuente +2 y Crítico potente +2 durante sus próximos 2 turnos completos (el turno en que se lo dan no cuenta). Si se lo vuelven a dar, no se suma: vuelve a durar 2 turnos. ⚙ Automatizado.'},
+  // Redoble (2026-10-25, dueño: el Support, «Redoble de tambores»): +2 a los No2 máximos durante su próximo turno completo (el No2 se recarga al
+  // máximo al empezar su turno, así que ese turno tiene 2 más).
+  {nombre:'Redoble', polaridad:'buff', turnos:1, turnosCompletos:true, mods:[{stat:'nitros', val:2}],
+    detalle:'El redoble de tambores lo empuja: +2 No2 en su próximo turno completo (el turno en que se lo dan no cuenta). Si se lo vuelven a dar, no se suma: vuelve a durar 1 turno. ⚙ Automatizado.'},
   // Armas perforantes (2026-10-25, dueño: el Support, que la nombró y le dio 3 turnos «porque al poder fallar, prefiero que dure un turno más»; «un estado que le hace perforar 3 de defensa y 3 de defensa especial»): en
   // cada golpe que da, la Perfora de siempre (N puntos pasan siempre) contra la Defensa y contra la Defensa especial (js/13, Combatiente.perforaDeEstados).
   {nombre:'Armas perforantes', polaridad:'buff', turnos:3, turnosCompletos:true, perforaGolpe:3, perforaEsp:3,

@@ -1099,7 +1099,8 @@ async function areaCrearSiguienteSubDuelo(areaId, a){
     // El casteador tira su PdG.Esp/PdG UNA SOLA VEZ para toda la cascada (dicho por el dueño, 2026-09-27): del 2do
     // objetivo en adelante, `a.pdgCompartido` (capturado del primero al resolverse, ver dueloGrupoResuelto) llega
     // precargado — este sub-duelo solo le pide la Evasión a ESTE objetivo, contra esa misma tirada.
-    dueloId = await Duelo.crear({yo: a.casteador, ataque: {tipo: 'habilidad', hab: tormentaHabDe(a.hab, tokenId), alcance: 0}, grupo: {id: areaId, indice: idx + 1, total: Math.max(objetivos.length, num(a.hab && a.hab.reparte && a.hab.reparte.total))}, pdgCompartido: a.pdgCompartido || null},
+    dueloId = await Duelo.crear({yo: a.casteador, ataque: {tipo: 'habilidad', hab: tormentaHabDe(a.hab, tokenId), alcance: 0}, grupo: {id: areaId, indice: idx + 1, total: Math.max(objetivos.length, num(a.hab && a.hab.reparte && a.hab.reparte.total))}, pdgCompartido: a.pdgCompartido || null,
+      presa: a.hab && a.hab.dano ? (() => { try{ return presaContra(tokens.get(a.casteador.tokenId), t); }catch(err){ return 0; } })() : 0},   // 🎯 la Presa también en un área o una línea (2026-10-25, la Lanza de luz)
       {id: tokenId, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, a.casteador.tokenId, '');
   }catch(err){   // (que se pueda reintentar: se libera la reserva)
     console.error('No se pudo crear el sub-duelo del área:', err); areaSubDueloCreando.delete(clave);

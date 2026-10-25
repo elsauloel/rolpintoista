@@ -335,7 +335,7 @@
 - ✅ **Lanza de luz** (Mago, «daño concentrado», 2026-10-25, dueño: la línea que atraviesa «y que además deje un estado de −2 a la resistencia especial»,
   2 turnos): línea de 6 casillas desde él (la de la Varita láser, con fuego amigo); tira su PdG.Esp una vez y cada uno se defiende con su Evasión; al que no
   esquiva, 3d6 arcano (lo frena la Defensa especial) y **Deslumbrado** 2 turnos (preset nuevo: Res.Esp −2). 2 No2 y 4 SP, o cooldown 3 (costo y daño
-  propuestos por Claude). **Para probar.**
+  propuestos por Claude). Probado en el mapa el 2026-10-25 (GM, contra juan): 13 de daño y Deslumbrado (Res.Esp 6 → 4).
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 
 ## Etiquetas

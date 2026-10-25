@@ -336,6 +336,9 @@
   2 turnos; «el largo tiene que ser todo el largo del rango»): línea tan larga como su Rango (`largo: 'rango'`), desde él (la de la Varita láser, con fuego amigo); tira su PdG.Esp una vez y cada uno se defiende con su Evasión; al que no
   esquiva, 3d6 arcano (lo frena la Defensa especial) y **Deslumbrado** 2 turnos (preset nuevo: Res.Esp −2). 2 No2 y 4 SP, o cooldown 3 (costo y daño
   propuestos por Claude). Probado en el mapa el 2026-10-25 (GM, contra juan): 13 de daño y Deslumbrado (Res.Esp 6 → 4).
+- ✅ **Corroer** (Debuffer, «romper lo que lo protege», 2026-10-25, dueño: «un ataque de daño ácido que rompe armadura»): su PdG.Esp contra la Evasión de
+  un rival en su Rango; si pega, 2d6 ácido (lo frenan la Defensa especial y la resistencia al ácido) y la regla del ácido de siempre (`porDano`: Armadura rota
+  1, y una más cada 5 de daño que entra). 2 No2 y 3 SP, o cooldown 3 (daño y costo propuestos por Claude). Queda aparte el viejo «Escupitajo ácido» (bestias, a mano). **Para probar.**
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 
 ## Etiquetas

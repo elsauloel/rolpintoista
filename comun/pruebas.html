@@ -1039,6 +1039,14 @@ prueba('🎯 Disparo señalador (2026-10-21): Presa (Evasión −1) y Marcado', 
   const P = estadosPresetCreep().find(p => p.nombre === 'Presa');
   igual([h.cd, a.efectos.map(e => (e.spec || {}).nombre).join(','), P.turnos, P.presa, JSON.stringify(P.mods)], [3, 'Presa,Marcado', 2, 2, '[{"stat":"eva","val":-1}]']);
 });
+prueba('🧪 Corroer (Debuffer, 2026-10-25): 2d6 ácido y Armadura rota según el daño', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Corroer');
+  const h = armarHabilidadDeCreep(e.datos, 2);
+  const ej = Combatiente.habEjecucion(h, h.duelo, {stat: () => 3, etq: s => s});
+  const lim = Duelo.limpiarHab(ej);
+  igual([lim.dano.formula, Combatiente.elementoDe(lim.dano.tipo), lim.dano.porDano.estado, Combatiente.stacksPorDano(4, lim.dano.porDano), Combatiente.stacksPorDano(11, lim.dano.porDano), lim.contra[0].modo, h.cd, h.spCosto],
+    ['2d6', 'acido', 'Armadura rota', 1, 3, 'eva', 3, 3]);
+});
 prueba('🎯 Dos Presas a la vez (2026-10-25): vale solo la más fuerte, también la Evasión', () => {
   const P = estadosPresetFicha(), toma = n => ({...JSON.parse(JSON.stringify(P.find(x => x.nombre === n))), activo: true});
   const S = FichaGuardado.normalizar({}).S; S.efectos = [toma('Presa'), toma('Presa señalada')];

@@ -7,11 +7,13 @@
 
 > **🎲 Para preparar la próxima sesión de «El origen de las especies»** (2026-10-23, dueño: «cuando me ponga a preparar la próxima sesión,
 > haceme acordar»). Recordárselo apenas diga que se pone a prepararla:
-> - [ ] **🧙 Crear un Chamán elemental** (dueño, 2026-10-25: «crear en El origen de las especies un chamán elemental que tenga la varita de
->   vendaval, que tenga la escarcha y que tenga el Zap. Entonces combina las 3 cosas, y le sumamos un skill de fuego»). Con la **Varita del vendaval**
->   (`esp-buena-varita-del-vendaval`), la **Lluvia de escarcha** (la próxima del Mago, falta hacerla: daño de hielo, piso congelado 2 turnos y después
->   el charco), **Zap** (el rayo en el charco: más daño y el doble de Parálisis) y **una habilidad de fuego** (a elegir; el fuego seca el charco).
->   Crearlo en la partida «El origen de las especies» cuando esté la Lluvia de escarcha.
+> - [x] **🧙 Chamán elemental, creado en «El origen de las especies»** (2026-10-25, pedido del dueño: «un chamán elemental que tenga la varita de
+>   vendaval, la escarcha y el Zap… y le sumamos un skill de fuego»; «nivel 3»; «buscale algún talismán que sea complementario y poné algún equipo
+>   bueno»). Sale de la base Chamán del rayo (Con 8, Fue 3, Agi 6, Des 6, Esp 16; 40 de vida; 6 No2; con su Aura elemental, +1 Res.Esp). Habilidades:
+>   **Lluvia de escarcha**, **Zap** y **Bola de fuego**. Equipo (todo puesto): **Varita del vendaval**, el talismán **Muñeco vudú** (PdG.Esp +1; el
+>   primer daño especial del turno deja Debilitado), Túnica del archivista, Capucha acolchada de sastre, Guantes para canalizar, Calzas de bordado
+>   rúnico y Sandalias del peregrino. Queda con PdG.Esp 18, Ef.Esp 16, Defensa 2, Defensa especial 6, Res.Esp 13. Sin token en el mapa (lo pone el
+>   GM). Con 6 No2 le alcanza justo para Lluvia + Zap en el mismo turno.
 > - [ ] **Drops para que los jugadores prueben consumibles nuevos: por lo menos una 🦋 Polilla mística y una ⏩ Runa aceleradora (el Acelerador)**
 >   (dueño: «dije como drop, para que prueben los jugadores, de ítems consumibles, una polilla y un acelerador, por lo menos»). Se pueden poner como
 >   drop fijo de un creep (GM Tools → Recompensas → drops fijos) o sumarlos a mano al botín al finalizar el combate («+ Sumar» en el paso Equipo/Consumibles).

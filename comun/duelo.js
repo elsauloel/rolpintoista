@@ -2932,7 +2932,8 @@ const Duelo = (() => {
     mostrar.forEach((d, id) => {
       const ult = pasosRevelados(d).filter(p => p.clave !== 'fin').pop();   // en qué va (lo ya revelado en esta pantalla)
       const txt = d.estado === 'resuelto'
-        ? `${critico(d) ? '💥 ¡CRÍTICO ×' + d.crit.mult + '!' : (RES[d.resultado] || 'Resuelto')}: ${d.atacante.nombre} → ${d.defensor.nombre} · ver`
+        ? (d.hab && d.hab.sinOposicion && d.resultado === 'pego' ? `✨ ${d.atacante.nombre} le dio ${d.hab.nombre} a ${d.defensor.nombre} · ver`   // un buff o una cura (2026-10-25: decía «Pegó»)
+          : `${critico(d) ? '💥 ¡CRÍTICO ×' + d.crit.mult + '!' : (RES[d.resultado] || 'Resuelto')}: ${d.atacante.nombre} → ${d.defensor.nombre} · ver`)
         : d.fase === 'critico' ? `💥 Crítico: ${d.atacante.nombre} → ${d.defensor.nombre} · tirar d20`
         : d.fase === 'dodge' ? `🏃 Dodge roll: ${d.defensor.nombre} vs. ${d.hab ? d.hab.nombre : 'área'}`
         : d.estado === 'empate' ? `⚖ Empate: ${d.atacante.nombre} → ${d.defensor.nombre} · elegir par o impar`

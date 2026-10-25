@@ -1393,6 +1393,7 @@ function dueloElegirAreaMapa(msg){
       // son «no él»); una curación no les llega a los caídos.
       .filter(t => (!t.oculto || (hab.aliados && soyGM)) && !t.bajoTierra && !etereoDe(t) && (!propio(t) || (hab.aliados && hab.objetivo === 'area')) && (enCono ? enCono.has(nbPack(t.col, t.fila)) : distanciaHex(h, t) <= radio || (h.otro && distanciaHex(h.otro, t) <= radio)))   // (h.otro: la casilla de salida del Remolino)
       .filter(t => !habEsCura(hab) || !iniciativaFueraDeJuego(t.id))
+      .filter(t => !hab.aliados || typeof esInerte !== 'function' || !esInerte(t))   // 🪵 al tótem y al estandarte no les llega lo de apoyo (js/73, 2026-10-25)
       .filter(t => hab.aliados ? !dueloEsRival(yo, t) : (hab.fuegoAmigo || h.linea || dueloEsRival(yo, t)))   // (la línea tiene fuego amigo: dueño, 2026-10-05; `aliados`: solo los suyos, 2026-10-13)
       .filter(t => !hab.conVista || lineaLibre(h, t, solidosSet()))   // la luz (Varita de la luz): todos los rivales que alcanza a ver, en sigilo o no (dueño, 2026-10-05)
       .sort((a, b) => h.linea ? distanciaHex(h, a) - distanciaHex(h, b) : 0)   // en la línea, del más cercano al más lejano (el láser largo pierde 1 por cada uno)
@@ -2009,7 +2010,8 @@ function dueloBuffMomento(d, t, spec){
   const quien = d.atacante && d.atacante.nombre ? d.atacante.nombre : 'Alguien', a = t.oculto ? 'alguien' : nombreDe(t);
   const mismo = d.atacante && d.atacante.tokenId === d.defensor.tokenId;
   const turnos = Math.round(num(spec.turnos !== undefined ? spec.turnos : preset.turnos));
-  const dura = turnos > 0 ? `durante ${turnos} turno${turnos === 1 ? '' : 's'}` : 'sin límite de turnos';
+  const cura = Math.round(num(spec.hpTurno !== undefined ? spec.hpTurno : spec.hp !== undefined ? spec.hp : preset.hpTurno));   // 💚 la cura por turno (el Frenético, 2026-10-25)
+  const dura = (turnos > 0 ? `durante ${turnos} turno${turnos === 1 ? '' : 's'}` : 'sin límite de turnos') + (cura > 0 ? `, y se cura ${cura} ahora y al empezar cada uno de sus turnos` : '');
   const efecto = String(spec.detalle || preset.detalle || '').split(/\s*[⚙✋]/)[0].trim();
   const para = t.tipo === 'creep' ? (fbUsuario && fbUsuario.uid) : t.duenoUid;
   momentoAbrir({tipo: 'buff', icono: '✨', titulo: mismo ? `${quien} se puso ${spec.nombre}` : `${quien} le aplicó ${spec.nombre} a ${a}`,

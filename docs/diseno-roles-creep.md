@@ -281,6 +281,19 @@ líneas, zonas, el rayo en cadena y los charcos, los controles mentales.
     13. **Contrahechizo** (Flash: al ver una habilidad de un personaje, la frena con su Res.Esp).
   - **E. Debilidad y sobrecarga:** 14. **Marca elemental** (el objetivo queda vulnerable a un elemento: Res. −2; se cruza con las debilidades por tipo de
     criatura, pendientes). 15. **Sobrecarga** ✦ (pega mucho más y se lastima o pierde SP). 16. **Robar maná** (le saca SP al objetivo y lo suma).
+  - **F. Sacadas de las varitas y báculos** (2026-10-25, a pedido del dueño: «hacé una comparación con las varitas y báculos que diseñamos y fijate si hay alguna idea que no esté en los skills… cosas más de control, por ejemplo portal, y un poco de support, por ejemplo levitar»). Entre corchetes, la varita o el equipo de donde sale.)
+    17. **Proyectil de piedra o hielo físico** ✦: una púa o un canto rodado que se tira con PdG y critica como un arma (Tipo 4 o 10), con Escarcha o Demora
+    [Varita de la púa de hielo, Varita del canto rodado]. 18. **Lluvia de piedras**: un área física que critica, con Sentado [Lluvia de cascotes, Granizo].
+    19. **Toque a quemarropa** ✦: mucho daño pegado al rival, que baja por cada casilla de distancia [Varita de la pelea cercana].
+    20. **Campo de estática**: aparece bajo los pies (no se esquiva) y queda un turno: cada rival que lo pisa, daño eléctrico y chance de Parálisis
+    [Varita del campo de estática]. 21. **Camino de lava**: un camino de casillas que arde unos turnos [Varita del chorro de lava].
+    22. **Runa explosiva**: una trampa mágica oculta que el mago deja en el piso [Varita de la runa]. 23. **Campo de espinas**: casillas que lastiman al
+    pisarlas [Varita de espinas]. 24. **Muro o pilares** ✦: levantar piedra que tapa el paso y la vista (control del terreno) [Varita del muro, Varita de
+    los pilares]. 25. **Portal trampa** ✦: un portal oculto que manda a quien lo pisa a otra casilla, lejos (Res.Esp para aferrarse) [Varita de la trampa
+    portal]. 26. **Lazo arcano**: lo atrae unas casillas hacia el mago, salvo que gane con Fuerza [Varita del gancho]. 27. **Desarmar con magia**: el arma
+    se le escapa y vuela (Fuerza para aferrarse) [Expelliarmus]. 28. **Sanguijuela**: daño y se cura la mitad [Varita sanguijuela]. 29. **Cosecha**: lo
+    marca; si muere marcado, el mago recupera SP y vida [Varita de la cosecha]. 30. **Magia inestable** (variante de la Sobrecarga): más daño, pero si sale
+    un 1 se lastima [Varita inestable, Orbe salvaje].
 - **Debuffer:** ver el listado completo abajo (§ 6).
 - **Support:** ver el listado completo abajo (§ 5).
 - **El costo de las que suman Efecto especial:** P216 (la página para la mesa: https://claude.ai/artifact/C7VPwWPg9BpWfF1L1hUGb6).
@@ -360,6 +373,15 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
 **I. Llamar y reacomodar**
 36. Llamar refuerzos (ya automatizado), Brotes.
 37. Cambiar de lugar con un aliado, llevarlo al lado de un rival ✦, Señal de retirada.
+**J. Sacadas de las varitas y el equipo** (2026-10-25, a pedido del dueño: «hacé una comparación con las varitas y báculos que diseñamos y fijate si hay alguna idea que no esté en los skills… cosas más de control, por ejemplo portal, y un poco de support, por ejemplo levitar»). Entre corchetes, la varita o el equipo de donde sale.)
+38. **Levitar** ✦ (idea del dueño): a un aliado (o a sí mismo) lo hace flotar unos turnos — pasa por encima del terreno, las zonas del piso y las trampas,
+    no lo alcanza lo que está en el suelo — y algo más (por ejemplo +1 Evasión o moverse 1 casilla gratis) [Zapatillas de levitación].
+39. **Portal para los suyos** ✦: dos portales a la vista que usan solo sus aliados, hasta su próximo turno [Varita del portal aliado].
+40. **Teletransportar a un aliado**: lo lleva unas casillas, a una libre (rescatarlo o ponerlo al lado de un rival) [Varita del blink].
+41. **Cobertura**: levanta pilares o un muro para que los suyos se cubran [Varita de los pilares, Varita del muro].
+42. **Luz para los suyos**: una luz que revela lo oculto y deja Marcados a los rivales que toca [Varita de la luz, Varita del farol, Luz flotante].
+43. **Escudo al acertar**: cada vez que gana una tirada de PdG.Esp, Vida extra para él o un aliado [Orbe del custodio, Orbe de resguardo].
+44. **Magia del caos a favor**: tira un dado y, a un aliado, le cae un buff al azar (con riesgo de que salga al revés) [Varita del caos].
 
 ## 6. Debuffer — el listado completo (2026-10-21)
 
@@ -414,6 +436,14 @@ Inmovilizado, Rengo, Desarmado; y, de personajes, Enyetar.
 25. **Retrasar**: baja uno o dos lugares en el orden (Demora a distancia).
 26. **Ralentizar**: Lento (el primer casillero doble).
 27. **Robar el turno**: pierde su próximo turno (muy caro).
+
+**H. Sacadas de las varitas** (2026-10-25, a pedido del dueño: «hacé una comparación con las varitas y báculos que diseñamos y fijate si hay alguna idea que no esté en los skills… cosas más de control, por ejemplo portal, y un poco de support, por ejemplo levitar»). Entre corchetes, la varita o el equipo de donde sale.)
+28. **Nube tóxica** ✦: una nube que queda en el piso y envenena a quien está adentro o entra (aliados incluidos) [Varita de miasma].
+29. **Suelo de aceite**: un área donde se resbala y queda Sentado [Varita del aceite].
+30. **Arena movediza** ✦: un área bajo los pies (no se esquiva) que deja Inmovilizado; soltarse cuesta [Varita de arena movediza].
+31. **Destello**: un área de luz que deja Pajaritos [Varita del destello].
+32. **Portal trampa**: el del Mago, también para el Debuffer (lo saca de la pelea) [Varita de la trampa portal].
+33. **Magia del caos**: a un rival, un debuff al azar, con riesgo de que salga al revés [Varita del caos].
 
 **H. Romper lo que lo protege** ✦
 28. ✅ **Disipar** (2026-10-25; dueño: «el usuario de disipar elige cuál quitar»): su PdG.Esp contra la Res.Esp de un rival en su Rango; si gana, le saca uno de sus estados buenos, el que elija quien lo usa (no lo del equipo ni las pasivas). 2 No2 y 3 SP, o cooldown 3.

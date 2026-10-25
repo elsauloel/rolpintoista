@@ -224,10 +224,14 @@ const Combatiente = (() => {
       }
       const stacks = Math.max(1, n(e.stacks) || 1);
       let d = n(e[c.hp]) * stacks;
+      // 🎲 Una cura con dado por turno (`curaDado`, 2026-10-25, el Frenético del Support: «al inducir el frenesí ya se cura un d6, y después cada turno
+      // completo se vuelve a curar un d6»): se tira cada vez que se dispara (al ponerlo y al empezar cada turno), como la Regeneración.
+      const tiro = e.curaDado ? curaTirada(String(e.curaDado)) : null;
+      if(tiro) d += tiro.cura;
       if(d > 0 && n(e.curaExtraPrimera) > 0){ d += n(e.curaExtraPrimera); delete e.curaExtraPrimera; }   // 💍 el Boticario: solo la primera vez (2026-10-19)
       if(d < 0 && e.esQuemadura && resFuego){ const antes = d; d = Math.min(0, d + resFuego); eventos.push({tipo: 'resfuego', nombre: e.nombre, de: -antes, a: -d, res: resFuego}); }
       if(d < 0 && (invulnerable || (e.esVeneno && sangrePura) || (e.esSangrado && coagulacion))){ eventos.push({tipo: 'inmune', nombre: e.nombre}); d = 0; }
-      if(d){ hp += d; eventos.push({tipo: 'hp', nombre: e.nombre, hp: d, stacks}); }
+      if(d){ hp += d; eventos.push({tipo: 'hp', nombre: e.nombre, hp: d, stacks, ...(tiro ? {dado: tiro.formula, rolls: tiro.rolls} : {})}); }
     });
     return {hp, eventos};
   }
@@ -342,7 +346,7 @@ const Combatiente = (() => {
       if(ev.tipo === 'escudo') return `${ev.nombre}: vida extra ${fmtN(ev.de)} → ${fmtN(ev.a)}`;
       if(ev.tipo === 'inmune') return `${ev.nombre}: no le hizo efecto (inmunidad)`;
       if(ev.tipo === 'resfuego') return `${ev.nombre}: Res. fuego ${fmtN(ev.res)} le saca ${fmtN(ev.de - ev.a)} (de ${fmtN(ev.de)} a ${fmtN(ev.a)})`;
-      if(ev.tipo === 'hp') return `${ev.nombre}: ${ev.hp > 0 ? '+' : '−'}${fmtN(Math.abs(ev.hp))} HP${ev.stacks > 1 ? ` (${fmtN(ev.stacks)} stacks)` : ''}`;
+      if(ev.tipo === 'hp') return `${ev.nombre}: ${ev.hp > 0 ? '+' : '−'}${fmtN(Math.abs(ev.hp))} HP${ev.dado ? ` (${ev.dado}: ${(ev.rolls || []).join('+')})` : ''}${ev.stacks > 1 ? ` (${fmtN(ev.stacks)} stacks)` : ''}`;
       if(ev.tipo === 'stacks') return `${ev.nombre}: stacks ${fmtN(ev.de)} → ${fmtN(ev.a)}`;
       if(ev.tipo === 'turnos') return `${ev.nombre}: ${fmtN(ev.de)} → ${fmtN(ev.a)} turno${ev.a === 1 ? '' : 's'}`;
       if(ev.tipo === 'vence') return `${ev.nombre}: ${fmtN(ev.de)} → 0 turnos, se terminó`;

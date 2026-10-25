@@ -253,8 +253,10 @@ async function fbAlEntrar(){
   mantenimientoEscuchar();
   modoMapaEscuchar();
   tiendaEstadoEscuchar();
-  recompensasEscuchar();
-  estadosEscuchar();
+  // Lo que le llega desde afuera (estados, recompensas) lo aplica el mapa cuando la ficha está adentro (comun/recibidos.js, B-8): si la ficha del
+  // marco también los tomaba, cada pantalla se quedaba con algunos y guardaba su copia, y la última pisaba a la otra (2026-10-25, Corroer: de
+  // tres Armaduras rotas juntas quedaba una).
+  if(window.parent === window){ recompensasEscuchar(); estadosEscuchar(); }
   combateEscuchar();
   botinLootEscuchar();
   intercambioIniciar();   // 🤝 ofrecer a otro personaje y 📦 el baúl común (comun/intercambio.js)

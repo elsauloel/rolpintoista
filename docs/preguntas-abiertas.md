@@ -1202,3 +1202,15 @@ sube. En el código es el dato `difMin` (en `soltar`, `salvacion`, la zona que d
    dificultad sino una tirada. Variante de la misma idea: «tirás como si tuvieras al menos 6» (un piso para la tirada).
 4. **Los consumibles de zona** (Bengalas, Bomba de humo, Bombucha de talco): si su zona se resiste contra un stat tuyo, mínimo igual.
 Las pociones y los pergaminos de bono (Furia, Escudo Arcano…) no aplican: su efecto es fijo, no depende de quien los usa.
+
+### P219 — ¿El daño eléctrico (rayo) se esquiva? (2026-10-25) ⏳ con propuesta del dueño, falta aplicarla
+
+**Contexto:** al armar **Zap** (Mago, creep) el dueño decidió que no se esquiva con la Evasión: el daño pasa siempre y la Res.Esp solo resiste el
+estado (marca `danoSiempre` del duelo, `comun/duelo.js`). Hoy cada rayo lo hace a su manera: la Cadena de rayos, las varitas y las flechas de rayo
+se esquivan con la Evasión; Zap no. Pregunta anotada también en las 🛠 Herramientas de diseño (pestaña Preguntas), a pedido del dueño: si no se
+esquiva, ¿qué pasa cuando suma el Efecto especial?; si se esquiva, ¿cómo?; ¿se resiste el daño, el estado o los dos?
+**Propuesta del dueño (2026-10-25):** «poner como característica del daño de relámpago que no se esquive, y para balancearlo, que haga menos
+daño por costo que el fuego, y que tenga más costo en general, que es más o menos lo mismo».
+**Falta:** confirmar que vale para todo el rayo (habilidades de creep y de clase, varitas, flechas, trampas de descarga) y repasarlos uno por uno
+(el costo o el daño, contra el fuego); decidir qué se tira entonces para sus estados (Zap: PdG.Esp contra Res.Esp) y si suma el Ef.Esp.
+

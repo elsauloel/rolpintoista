@@ -1736,7 +1736,7 @@ async function dueloCadena(d, entro){
   // Los efectos del golpe también a cada uno al que salta (`cadena.efectos`, el Relámpago, 2026-10-07): cada uno tira su chance, como en el golpe.
   const extra = [];
   {   // los efectos del golpe a cada uno al que salta (`cadena.efectos`); sin eso, igual la Parálisis a los mojados (el agua, P214)
-    const pctSalto = Array.isArray(c.paralisis) ? c.paralisis : null;   // ⚡ SAP (2026-10-25): el % de Parálisis de cada salto (el 1.º, el 2.º…)
+    const pctSalto = Array.isArray(c.paralisis) ? c.paralisis : null;   // ⚡ Zap (2026-10-25): el % de Parálisis de cada salto (el 1.º, el 2.º…)
     for(const [i, s] of cadena.slice(1).entries()){
       const mojado = typeof enAgua === 'function' && enAgua(s.t);
       const pct = pctSalto ? num(pctSalto[i]) : 0;

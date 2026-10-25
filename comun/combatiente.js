@@ -1603,6 +1603,7 @@ const Combatiente = (() => {
       // crítico de lo físico invocado (Tipo de su familia: estaca 4, canto rodado 10).
       ...(c.zonaQueda ? {zonaQueda: {...c.zonaQueda, ...(c.zonaQueda.tira && o.stat ? {tiraValor: Math.round(nf(o.stat(c.zonaQueda.tira)))} : {})}} : {}),
       ...(c.menosDistancia ? {menosDistancia: true} : {}),
+      ...(c.danoSiempre ? {danoSiempre: true} : {}),   // ⚡ el daño entra siempre; la tirada es solo para los estados (Zap, 2026-10-25)
       ...(c.menosPorOrden ? {menosPorOrden: true} : {}),   // −1 a cada uno de los siguientes en la línea (2026-10-08, láser largo)
       ...(c.despeja ? {despeja: true} : {}),   // apaga el fuego y despeja la niebla que toca (2026-10-08, vendaval)
       // El riesgo (2026-10-08, Varita inestable): si en los dados del daño sale `si` (un 1), quien la usa se hace `dano`.
@@ -1616,7 +1617,7 @@ const Combatiente = (() => {
       ...(nf(c.critTipo) ? {critTipo: Math.round(nf(c.critTipo))} : {}),   // la luz (2026-10-05, Varita de la luz): solo los rivales en sigilo que alcanza
       // Rayo en cadena (2026-10-05, Varita de chispa eléctrica): si el golpe entra, salta `saltos` veces al más cercano del mismo bando a
       // `rango` casillas o menos, la mitad cada salto (P118: la misma regla de ⚡ Rayo en cadena del token y de la trampa Descarga).
-      ...(c.cadena ? {cadena: {saltos: Math.max(1, Math.round(nf(c.cadena.saltos)) || 2), rango: Math.max(1, Math.round(nf(c.cadena.rango)) || 4), ...(c.cadena.efectos ? {efectos: true} : {})}} : {}),   // efectos: también a los que salta (2026-10-07)
+      ...(c.cadena ? {cadena: {saltos: Math.max(1, Math.round(nf(c.cadena.saltos)) || 2), rango: Math.max(1, Math.round(nf(c.cadena.rango)) || 4), ...(c.cadena.efectos ? {efectos: true} : {}), ...(Array.isArray(c.cadena.paralisis) ? {paralisis: c.cadena.paralisis.map(nf)} : {})}} : {}),   // efectos: también a los que salta (2026-10-07); paralisis: el % de cada salto (Zap, 2026-10-25)
       ...(c.efectoLibre ? {efectoLibre: sx(c.efectoLibre)} : {}),
       ...(c.efectosNota ? {efectosNota: sx(c.efectosNota)} : {}),
       ...(c.contraOtro ? {contraOtro: c.contraOtro} : {}),

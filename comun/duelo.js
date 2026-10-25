@@ -679,6 +679,7 @@ const Duelo = (() => {
     const efectos = limpiarEfectos(h.efectos);
     const objetivo = ['enemigo', 'aliado', 'cualquiera', 'uno mismo', 'area', 'onda', 'cono', 'linea'].includes(h.objetivo) ? h.objetivo : 'enemigo';   // cualquiera: aliado o enemigo (2026-10-15)
     return {nombre: txtCorto(h.nombre, 60), objetivo, tira: t, contra, dano, efectos, sinOposicion: !(t && contra.length),
+      ...(h.danoSiempre && dano && t && contra.length ? {danoSiempre: true} : {}),   // ⚡ el daño entra siempre; la tirada es solo para los estados (Zap)
       ...((objetivo === 'onda' || objetivo === 'cono') && h.dodge ? {dodge: true} : {}),
       ...(objetivo === 'onda' && h.conVista ? {conVista: true} : {}),   // la luz: solo a los que ve (los sólidos la tapan)
       ...(objetivo === 'aliado' && h.conmigo ? {conmigo: true} : {}),   // un aliado o uno mismo (Heal, 2026-10-11)
@@ -704,7 +705,7 @@ const Duelo = (() => {
       ...(h.atrae ? {atrae: {casillas: Math.min(6, Math.max(1, Math.round(_num(h.atrae.casillas)) || 2)), contra: txtCorto(h.atrae.contra || 'fue', 12), tiraValor: _num(h.atrae.tiraValor)}} : {}),   // el gancho
       ...(_num(h.critTipo) ? {critTipo: Math.min(12, Math.max(1, Math.round(_num(h.critTipo))))} : {}),   // lo físico invocado critica como su Tipo
       ...(objetivo === 'linea' ? {largo: Math.min(12, Math.max(1, Math.round(_num(h.largo)) || 4))} : {}),
-      ...(h.cadena ? {cadena: {saltos: Math.min(6, Math.max(1, Math.round(_num(h.cadena.saltos)) || 2)), rango: Math.min(6, Math.max(1, Math.round(_num(h.cadena.rango)) || 3)), ...(h.cadena.efectos ? {efectos: true} : {}), ...(Array.isArray(h.cadena.paralisis) ? {paralisis: h.cadena.paralisis.slice(0, 6).map(x => Math.max(0, Math.min(100, Math.round(_num(x)) || 0)))} : {})}} : {}),   // rayo en cadena (2026-10-05); `paralisis`: el % de cada salto (SAP, 2026-10-25)
+      ...(h.cadena ? {cadena: {saltos: Math.min(6, Math.max(1, Math.round(_num(h.cadena.saltos)) || 2)), rango: Math.min(6, Math.max(1, Math.round(_num(h.cadena.rango)) || 3)), ...(h.cadena.efectos ? {efectos: true} : {}), ...(Array.isArray(h.cadena.paralisis) ? {paralisis: h.cadena.paralisis.slice(0, 6).map(x => Math.max(0, Math.min(100, Math.round(_num(x)) || 0)))} : {})}} : {}),   // rayo en cadena (2026-10-05); `paralisis`: el % de cada salto (Zap, 2026-10-25)
       ...(h.detalle ? {detalle: txtCorto(h.detalle, 600)} : {}),   // el texto de la habilidad (el recuadro de la izquierda, 2026-10-15)
       ...(h.efectoLibre ? {efectoLibre: txtCorto(h.efectoLibre, 200)} : {}),
       ...(h.efectosNota ? {efectosNota: txtCorto(h.efectosNota, 200)} : {}),
@@ -777,6 +778,9 @@ const Duelo = (() => {
     if(par === 'contacto' && m.hab){   // habilidad dirigida: gana quien la usa → sigue; gana el objetivo → se resistió
       m.contacto = info;
       if(r.gana === 'atacante'){ m.resultado = 'pego'; if(m.hab.critTipo && m.hab.dano) entrarCritico(m); else entrarHab(m); }   // lo físico invocado (estaca, canto rodado) critica
+      // ⚡ El daño entra siempre (`danoSiempre`, Zap, 2026-10-25, dueño: «no se esquiva: el daño pasa y se tira resistencia especial para intentar
+      // resistir el estado»): si gana el objetivo, el daño sigue igual y solo se salva de los estados (quedan omitidos al tirar el daño).
+      else if(m.hab.danoSiempre && m.hab.dano){ m.resultado = 'pego'; m.contacto.resistioEstado = true; entrarHab(m); }
       else if(m.grupo && m.hab.objetivo !== 'enemigo' && !m.hab.sinDodge && ((m.hab.objetivo !== 'onda' && m.hab.objetivo !== 'cono') || m.hab.dodge || tronco)){   // (dos misiles repartidos: sin dodge)   // (una onda solo si deja dodge: `hab.dodge`, Daño en área)   // hechizo de área (Paso 4 del casteo): ganar la Evasión no termina el duelo, gana el DERECHO a un dodge roll (la onda alrededor de quien la usa no da dodge: no hay a dónde salir)
         m.fase = 'dodge'; m.estado = 'esperando';
       }
@@ -1240,6 +1244,7 @@ const Duelo = (() => {
       const ext = m.hab && m.hab.dano && m.hab.dano.extra;
       if(ext && ext.formula && typeof tirarDados === 'function'){ const r2 = tirarDados(ext.formula); if(r2) m.dano.magico = {tipo: String(ext.tipo || 'fuego').slice(0, 20), total: Math.max(0, Math.round(_num(r2.total))), formula: String(r2.formula || ext.formula).slice(0, 60), rolls: (r2.rolls || []).slice(0, 12).map(_num)}; }
       m.efectos = aguaParalisis(m, normalizarEfectos(crudos));
+      if(m.hab && m.contacto && m.contacto.resistioEstado) m.efectos = m.efectos.map(ef => ({...ef, omitido: true, motivo: `lo resistió (${etqContra(m)})`}));   // ⚡ danoSiempre: el daño entró, el estado no
       // «Seguro si es crítico» (2026-10-03): un efecto con porcentaje que, si el golpe fue crítico, entra sin tirar.
       if(m.crit && m.crit.critico) m.efectos = m.efectos.map(ef => ef.seguroCritico ? {...ef, caras: 1, exitos: 1, detalle: `${ef.detalle ? ef.detalle + ' ' : ''}(Fue crítico: entra seguro.)`.slice(0, 200)} : ef);
       // Regla del dueño (2026-10-03), característica del Sangrado: si entra con un golpe CRÍTICO de arma es permanente, aunque diga turnos —
@@ -2061,6 +2066,7 @@ const Duelo = (() => {
       ? `<div class="duelo-motivo">✋ ${_esc(d.hab.efectoLibre)}${d.contacto ? ` <b>(diferencia: ${_fmt(Math.abs(_num(d.contacto.dif)))})</b>` : ''}</div>` : '';
     let caja;
     if(d.hab && d.resultado === 'pego' && d.hab.sinOposicion) caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">✨ ${_esc(d.hab.nombre.toUpperCase())}</div><div class="chico">${_esc(d.atacante.nombre)} → ${_esc(d.defensor.nombre)} · no hay nada que resistir: se aplica</div>${efectoLibre}</div>`;
+    else if(d.hab && d.resultado === 'pego' && d.contacto && d.contacto.resistioEstado) caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">⚡ EL DAÑO ENTRA</div><div class="chico">${_esc(d.defensor.nombre)} resistió los estados de ${_esc(d.hab.nombre)} (${_esc(etqContra(d))}), pero no se esquiva: el daño pasa igual</div>${mot}${efectoLibre}</div>`;
     else if(d.hab && d.resultado === 'pego') caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">✨ ¡FUNCIONÓ!</div><div class="chico">${_esc(d.hab.nombre)} de ${_esc(d.atacante.nombre)} venció la ${_esc(etqContra(d))} de ${_esc(d.defensor.nombre)}</div>${mot}${efectoLibre}</div>`;
     else if(d.hab && d.resultado === 'fallo') caja = `<div class="duelo-veredicto fallo${nuevo}"><div class="grande">🛡 SE RESISTIÓ</div><div class="chico">${_esc(d.defensor.nombre)} resistió ${_esc(d.hab.nombre)} (${_esc(etqContra(d))})</div>${mot}</div>`;
     else if(d.resultado === 'pego' && d.crit && d.crit.critico){

@@ -100,7 +100,7 @@
 > pasa las pruebas automáticas y se sube, **pero no se prueba en el mapa en el momento**: se anota acá. Cuando el dueño lo pida, se corren todas
 > juntas en el mapa, con capturas, y se marcan.
 
-- [ ] **⚡ SAP (Mago, 2026-10-25)**: contra juan con otros dos personajes cerca (a 4 casillas o menos): si pega, 1d4 directo y Parálisis segura; con 2 o más de daño salta, y el momento «el rayo salta» muestra «Parálisis 50 % (1d2: …)» y, si llega al tercero, «25 % (1d4: …)».
+- [ ] **⚡ Zap (Mago, 2026-10-25)**: contra juan con otros dos personajes cerca (a 4 casillas o menos): no se esquiva (PdG.Esp contra Res.Esp); el 1d4 directo entra siempre: si juan gana, el cartel dice «⚡ EL DAÑO ENTRA» y la Parálisis queda «lo resistió»; si pierde, Parálisis; con 2 o más de daño salta, y el momento «el rayo salta» muestra «Parálisis 50 % (1d2: …)» y, si llega al tercero, «25 % (1d4: …)».
 - [ ] **🛡 Armas perforantes (Support, 2026-10-25)**: un creep se lo da a un aliado (o a sí mismo); el aliado queda con Armas perforantes 3 turnos completos; su golpe físico contra juan dice «pasa 3 por la Perfora» y uno mágico (o con arma de daño especial) muestra «Defensa especial N (pasan 3 por Armas perforantes)».
 - [x] Golpe fuerte, Tajo veloz, Estocada, Zarpazo, Mordisco feroz y Cornada — probadas en el mapa una por una (2026-10-20/21, antes de esta forma
   de trabajo).

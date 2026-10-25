@@ -315,7 +315,7 @@ function bnInvAca(b){
     if(d.danohabinv){ bnPublicarInv(inv, InvHabilidades.tiradaSegunda(inv, h)); return true; }
     // En Silencio, primero el cartel del juego (async); lo demás sigue igual cuando contesta.
     (async () => {
-      if(!(await InvHabilidades.confirmarSilencio(inv, h))){ toast(`${inv.nombre}: en Silencio, no usó ${h.nombre || 'la habilidad'}`); return; }
+      if(!(await InvHabilidades.confirmarSilencio(inv, h, bn.fichaId + SEP_INVOCACION + inv.id))){ toast(`${inv.nombre}: en Silencio, no usó ${h.nombre || 'la habilidad'}`); return; }
       const ui = bnInvHabUi();   // antes de cobrar: así guarda solo lo que cambió
       const p = InvHabilidades.ejecutar(inv, h, estadosPresetFicha(), ui.dueloDisponible(), true);
       if(p.modo === 'manual'){ ui.mesaHabilidad(inv, h.nombre, h.detalle || h.efectoDetalle || ''); toast(`${h.nombre || 'Habilidad'} anunciada`); return; }

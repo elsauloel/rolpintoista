@@ -671,7 +671,7 @@ const FichaAcciones = (() => {
       return;
     }
     // Silencio (2026-10-04): avisa y deja seguir.
-    const sil = Combatiente.preguntaSilencio(S.efectos, it);
+    const sil = Combatiente.preguntaSilencio(S.efectos, it, '', ui.yo ? (ui.yo() || {}).ref : '');   // (con la ficha: el Tótem de silencio del mapa)
     if(sil && !(await (ui.confirmar || (txt => Confirmar.preguntar(txt, {titulo: 'Silencio', icono: '🤐', si: 'Usarla igual'})))(sil))) return;
     if(Combatiente.tipoEjecucion(FichaBotonera.dueloDe(it)) === 'flash'){ ui.flashFuera(it); return; }   // ⚡ su propia regla de costo (P136)
     // Una vez por turno (2026-10-13, Sprint): avisa y deja seguir (lo decide la mesa). El conteo vive en S.ataquesArma, que vacía el turno.

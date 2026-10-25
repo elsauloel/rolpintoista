@@ -29,13 +29,13 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 - 🏹 **Rango y Hunter — 11**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 10**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25) · de El origen: proyectil, fuego con quemadura.
-- 🧿 **Debuffer — 10**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25) · de El origen: ceguera, veneno, inmovilizar.
+- 🧿 **Debuffer — 11**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25), silencio (Tótem de silencio, 2026-10-25) · de El origen: ceguera, veneno, inmovilizar.
 - 💚 **Support — 10**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24), estandarte (Estandarte de guerra, 2026-10-24), señalar la presa (2026-10-25), armas perforantes (2026-10-25) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
 **Para emparejar** (regla del dueño, 2026-10-25: «empezamos a tener en cuenta todos los roles de creep e ir emparejándolos… para que estén todos
-avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy: Mago,
-Support y Debuffer en 10 → a 11, donde los alcanza Rango + Hunter; después los cuatro juntos hasta Choque liviano (14). El Jefe va aparte.
+avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-25): Debuffer en 11;
+Mago y Support en 10 → a 11, donde los alcanza Rango + Hunter; después los cuatro juntos hasta Choque liviano (14). El Jefe va aparte.
 
 ## Los roles
 
@@ -377,7 +377,8 @@ Inmovilizado, Rengo, Desarmado; y, de personajes, Enyetar.
 11. ✅ **Confusión** (2026-10-21).
 12. **Susurros de locura**: Confusión en un área.
 13. **Grito de pánico**: Miedo a los que tiene alrededor.
-14. **Palabra de silencio**: no puede usar habilidades (Silencio).
+14. ✅ **Tótem de silencio** (ex «Palabra de silencio», 2026-10-25; dueño: «un skill tipo el estandarte, pero al revés»): clava un tótem (10 de vida por
+    nivel, sin defensas); sus rivales a 3 casillas (diámetro 7) no pueden usar habilidades que cuestan SP mientras siga en pie.
 15. **Sueño**: no actúa hasta que le peguen o pase su turno.
 16. **Dominar**: el GM decide su próxima acción (a mano; muy caro).
 

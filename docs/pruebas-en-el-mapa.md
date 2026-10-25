@@ -100,6 +100,7 @@
 > pasa las pruebas automáticas y se sube, **pero no se prueba en el mapa en el momento**: se anota acá. Cuando el dueño lo pida, se corren todas
 > juntas en el mapa, con capturas, y se marcan.
 
+- [ ] **🤐 Tótem de silencio (Debuffer, 2026-10-25)**: un creep lo clava cerca de juan; se ve el tótem y el aura violeta; juan, adentro, quiere usar una habilidad con SP → cartel «dentro del aura de Tótem de silencio de…» (con «Usarla igual»); una sin SP, sin cartel; afuera del aura, sin cartel; un creep aliado adentro, sin cartel. Romperlo (pegarle hasta 0) → se va y la Mesa dice «se termina el silencio».
 - [ ] **⚡ Zap (Mago, 2026-10-25)**: contra juan con otros dos personajes cerca (a 4 casillas o menos): no se esquiva (PdG.Esp contra Res.Esp); el 1d4 directo entra siempre: si juan gana, el cartel dice «⚡ EL DAÑO ENTRA» y la Parálisis queda «lo resistió»; si pierde, Parálisis; con 2 o más de daño salta, y el momento «el rayo salta» muestra «Parálisis 50 % (1d2: …)» y, si llega al tercero, «25 % (1d4: …)».
 - [ ] **🛡 Armas perforantes (Support, 2026-10-25)**: un creep se lo da a un aliado (o a sí mismo); el aliado queda con Armas perforantes 3 turnos completos; su golpe físico contra juan dice «pasa 3 por la Perfora» y uno mágico (o con arma de daño especial) muestra «Defensa especial N (pasan 3 por Armas perforantes)».
 - [x] Golpe fuerte, Tajo veloz, Estocada, Zarpazo, Mordisco feroz y Cornada — probadas en el mapa una por una (2026-10-20/21, antes de esta forma

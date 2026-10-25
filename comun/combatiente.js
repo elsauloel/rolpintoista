@@ -524,8 +524,15 @@ const Combatiente = (() => {
   // se deja seguir. Se pregunta al pagar el ataque. → el texto de la pregunta, o '' si no está Sentado. Sin nombre, en segunda persona.
   // Silencio (2026-10-04): una habilidad que cuesta SP (un número o «X») no se puede usar; se avisa y se deja seguir. → la pregunta, o ''.
   const cuestaSp = h => !!h && (String(h.costo || '').trim().toUpperCase() === 'X' || n(h.costo) > 0);
-  const preguntaSilencio = (estados, h, nombre) => !(estados || []).some(e => e && e.activo !== false && e.silencio) || !cuestaSp(h) ? ''
-    : `${nombre ? nombre + ' está' : 'Estás'} en Silencio: no ${nombre ? 'puede' : 'podés'} usar habilidades que cuestan SP. ¿Usar ${(h && h.nombre) || 'la habilidad'} igual?`;
+  // 🤐 `ref` (2026-10-25, el Tótem de silencio del Debuffer): la ficha de quien la usa (el creep, el personaje o «ficha~invocación»); si el mapa
+  // sabe que está dentro del aura de un tótem rival (`silencioDeLugar`, vtt-hexgrid/js/73), también se pregunta. Fuera del mapa no hay tótem.
+  const preguntaSilencio = (estados, h, nombre, ref) => {
+    if(!cuestaSp(h)) return '';
+    const usar = `¿Usar ${(h && h.nombre) || 'la habilidad'} igual?`;
+    if((estados || []).some(e => e && e.activo !== false && e.silencio)) return `${nombre ? nombre + ' está' : 'Estás'} en Silencio: no ${nombre ? 'puede' : 'podés'} usar habilidades que cuestan SP. ${usar}`;
+    const lugar = ref && typeof silencioDeLugar === 'function' ? silencioDeLugar(ref) : '';
+    return lugar ? `${nombre ? nombre + ' está' : 'Estás'} dentro del aura de ${lugar}: no ${nombre ? 'puede' : 'podés'} usar habilidades que cuestan SP. ${usar}` : '';
+  };
   // Desarmado (2026-10-07) ya no es un estado (paso 5, 2026-10-22): es el efecto que tira el arma al piso (la varita del manotazo, el caos).
   // `esDesarmado` lo reconoce para no guardarlo (agregarEstado) y para borrar los que quedaron guardados de antes.
   const esDesarmado = e => !!e && e.activo !== false && (e.desarmado || /^desarm(ado|e)$/i.test(String(e.nombre || '').trim()));

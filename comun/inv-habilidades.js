@@ -110,8 +110,8 @@ const InvHabilidades = (() => {
      después de cobrar. terminar(inv, h, p, ui) hace lo que sigue.
      Silencio (2026-10-04): avisa y deja seguir. La pregunta la hace quien llama ANTES, con confirmarSilencio (el cartel del juego, no el
      confirm() nativo; async) y pasa `silencioOk` = true si dijo que sí; sin eso, en Silencio no la usa. Así ejecutar sigue siendo sincrónica. */
-  async function confirmarSilencio(inv, h){
-    const sil = Combatiente.preguntaSilencio(inv.estados, h, inv.nombre);
+  async function confirmarSilencio(inv, h, ref){   // `ref`: «ficha~invocación», para el Tótem de silencio del mapa
+    const sil = Combatiente.preguntaSilencio(inv.estados, h, inv.nombre, ref);
     return !sil || !!(await Confirmar.preguntar(sil, {titulo: 'Silencio', icono: '🤐', si: 'Usarla igual'}));
   }
   function ejecutar(inv, h, presets, dueloDisponible, silencioOk){

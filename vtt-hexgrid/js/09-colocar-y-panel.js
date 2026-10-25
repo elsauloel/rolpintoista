@@ -278,7 +278,7 @@ function escucharVinculables(){
         o.tipoCriatura = String(d.tipoCriatura || '').trim();   // Matabestias de los arcos (js/35, 2026-10-11)
         o.pasosSilenciosos = d.pasosSilenciosos === true;   // 👣 Pasos silenciosos (js/02, 2026-10-15)
         o.auraMiedo = num(d.auraMiedo); o.auraEfEsp = num(d.auraEfEsp);   // 💀 la Calavera con vela (js/52, 2026-10-18)
-        o.estandarteRadio = num(d.estandarteRadio); o.estandartePdg = num(d.estandartePdg); o.estandarteDano = num(d.estandarteDano);   // 🚩 el Estandarte de guerra (js/73)
+        o.estandarteRadio = num(d.estandarteRadio); o.estandartePdg = num(d.estandartePdg); o.estandarteDano = num(d.estandarteDano); o.estandarteSilencio = num(d.estandarteSilencio);   // 🚩 el Estandarte de guerra y 🤐 el Tótem de silencio (js/73)
         o.meteoroCol = num(d.meteoroCol); o.meteoroFila = num(d.meteoroFila); o.meteoroRadio = num(d.meteoroRadio);   // ☄ la sombra del meteoro (js/74)
       }
       mapa.set(ch.doc.id, o);

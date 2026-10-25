@@ -333,7 +333,7 @@ const CreepAcciones = (() => {
   async function confirmarSilencio(sc, h){
     const vida = preguntaVida(sc, h);
     if(vida && !(await Confirmar.preguntar(vida, {titulo: h.nombre || 'Habilidad', icono: '❤', si: 'Usarla igual'}))) return false;
-    const sil = Combatiente.preguntaSilencio(sc.estados, h, sc.nombre);
+    const sil = Combatiente.preguntaSilencio(sc.estados, h, sc.nombre, sc.id);
     return !sil || !!(await Confirmar.preguntar(sil, {titulo: 'Silencio', icono: '🤐', si: 'Usarla igual'}));
   }
   // Lo que cambia al ejecutar una 💰 o ✨ (no manual ni Flash): {error} o el plan para terminarHab.
@@ -356,7 +356,7 @@ const CreepAcciones = (() => {
   }
   // `o.doble` (2026-10-24): una habilidad Flash usada en turno ajeno cuesta el doble — el cooldown o el SP (P136; lo decide el mapa, que sabe de quién es el turno).
   function ejecutarHab(sc, h, presets, silencioOk, o = {}){
-    const sil = Combatiente.preguntaSilencio(sc.estados, h, sc.nombre);   // Silencio (2026-10-04): avisa y deja seguir
+    const sil = Combatiente.preguntaSilencio(sc.estados, h, sc.nombre, sc.id);   // Silencio (2026-10-04): avisa y deja seguir (también el Tótem de silencio)
     if(sil && !silencioOk) return {error: `${sc.nombre}: en Silencio, no usó ${h.nombre || 'la habilidad'}`};
     const modo = C().modoHab(h);
     const bloqueo = C().bloqueoHab(sc, h);

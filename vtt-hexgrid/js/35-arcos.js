@@ -166,8 +166,13 @@ async function arcoTensar(ataque, msg, tiro){
 
 /* 🔁 REPETICIÓN (Shooter, 2026-10-13, dueño). El estado «Repitiendo» (`repetir`: quedan, hechos, arma, blanco; lo publica el resumen) encadena
    disparos con la misma arma al mismo blanco: el 2.º suma +1 PdG y +1 dado del Tipo del arma, el 3.º +2 y +2. Cambiar de arma o de blanco corta la
-   cadena (ese disparo, sin bono). Cada disparo paga sus No2 como siempre. Solo personajes. */
+   cadena (ese disparo, sin bono). Cada disparo paga sus No2 como siempre. Personajes y, desde el 2026-10-25, creeps (la Ráfaga encadenada: el estado
+   vive en su ficha privada, que ve el GM, que es quien dispara con ellos). */
 function repeticionDe(mio){
+  if(mio && mio.tipo === 'creep'){
+    const sc = creepPrivadoDe(mio.fichaId), e = sc && (sc.estados || []).find(x => x && x.repetir && x.activo !== false);
+    return e && num(e.stacks) > 0 ? {quedan: num(e.stacks), hechos: num(e.repHechos), arma: String(e.repArma || ''), blanco: String(e.repBlanco || '')} : null;
+  }
   const e = (((vinculo(mio) || {}).resumen || {}).estados || []).find(x => x && x.repetir);
   return e && num(e.repetir.quedan) > 0 ? e.repetir : null;
 }
@@ -182,8 +187,24 @@ function repeticionBonos(mio, t, ataque, tiro){
   return tiro;
 }
 // Después de disparar: cuenta el disparo (o corta la cadena si cambió el arma o el blanco); al usar los X, el estado se va.
+// La cuenta, sobre el estado (el de la ficha del personaje o el del creep): `e` con repHechos/repArma/repBlanco/stacks → {txt, sacar}.
+function repeticionContar(e, mio, t, ataque){
+  const mismo = !num(e.repHechos) || (String(e.repArma || '') === String(ataque.armaId || '') && String(e.repBlanco || '') === t.id);
+  if(!mismo) return {txt: `🔁 ${nombreDe(mio)} cambió de arma o de blanco: se cortó la ${mio.tipo === 'creep' ? 'Ráfaga encadenada' : 'Repetición'}`, sacar: true};
+  e.repHechos = num(e.repHechos) + 1; e.repArma = String(ataque.armaId || ''); e.repBlanco = t.id; e.stacks = Math.max(0, num(e.stacks) - 1);
+  const nom = mio.tipo === 'creep' ? 'la Ráfaga encadenada' : 'la Repetición';
+  return {txt: e.stacks > 0 ? `🔁 ${nombreDe(mio)}: disparo ${e.repHechos} de ${nom} (el próximo, +${e.repHechos} PdG y +${e.repHechos} dado)` : `🔁 ${nombreDe(mio)}: último disparo de ${nom}`, sacar: e.stacks <= 0};
+}
 async function repeticionGastar(mio, t, ataque){
-  if(!mio || !t || !ataque || mio.tipo !== 'pj' || String(mio.fichaId).includes(SEP_INVOCACION) || !repeticionDe(mio)) return;
+  if(!mio || !t || !ataque || String(mio.fichaId).includes(SEP_INVOCACION) || !repeticionDe(mio)) return;
+  if(mio.tipo === 'creep'){   // 🔁 la Ráfaga encadenada de un creep (2026-10-25): en su ficha (la pantalla del GM)
+    let txt = '';
+    try{ await modificarCreep(String(mio.fichaId), c => { const e = (c.estados || []).find(x => x && x.repetir && x.activo !== false); if(!e) return {}; const r = repeticionContar(e, mio, t, ataque); txt = r.txt; if(r.sacar) c.estados = c.estados.filter(x => x !== e); return {}; }); }
+    catch(err){ console.error('No se pudo contar la Ráfaga encadenada:', err); }
+    if(txt) mesaLinea(txt, 'recordatorio');
+    return;
+  }
+  if(mio.tipo !== 'pj') return;
   try{
     let txt = '';
     await editarPersonajeMapa(mio.fichaId, S => {

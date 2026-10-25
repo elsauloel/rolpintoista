@@ -1062,6 +1062,11 @@ prueba('👁 Cegar (Debuffer, 2026-10-25): PdG.Esp contra Res.Esp, 2d4 arcano y 
   const h = armarHabilidadDeCreep(e.datos, 2);
   igual([h.duelo.contra.join(','), h.duelo.danoFormula, h.duelo.efectos[0].nombre, h.duelo.efectos[0].turnos, h.cd, !!HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Ceguera')], ['resmg', '2d4', 'Ceguera', 1, 3, false]);
 });
+prueba('🔁 Ráfaga encadenada (Rango, 2026-10-25): Repitiendo con 3 disparos en un creep, con su marca', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Ráfaga encadenada');
+  const h = armarHabilidadDeCreep(e.datos, 2);
+  igual([h.efectoNombre, h.efectoStacks, h.efectoTurnos, CreepAcciones.FLAGS_ESTADO.includes('repetir'), h.nitrosCosto, h.cd], ['Repitiendo', 3, 1, true, 0, 3]);
+});
 prueba('🏹 Flecha que atraviesa (Rango, 2026-10-25): un ataque con +2 al daño que sigue al de atrás (perforante)', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Flecha que atraviesa');
   const h = armarHabilidadDeCreep(e.datos, 2);

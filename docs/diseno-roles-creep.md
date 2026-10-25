@@ -30,7 +30,7 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
   furia, pisotón, provocar, segundo aliento, aguantar el daño, cubrir al de al lado, perforar, carga que derriba.
 - 🗡 **Choque liviano — 14**: golpe preciso, sangrado, trabar, golpear y alejarse, salto, abrir la herida, manada, ráfaga, por la espalda · de El origen:
   robar, sigilo, varios golpes, bajo tierra, veneno.
-- 🏹 **Rango y Hunter — 13**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar, mantener a raya (2026-10-25), atravesar (Flecha que atraviesa, 2026-10-25) · de El origen: área a distancia,
+- 🏹 **Rango y Hunter — 14**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar, mantener a raya (2026-10-25), atravesar (Flecha que atraviesa, 2026-10-25), disparos encadenados (Ráfaga encadenada, 2026-10-25) · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 13**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25), lluvia de escarcha (2026-10-25), andanada arcana (2026-10-25), misiles elementales (2026-10-25) · de El origen: proyectil, fuego con quemadura.
 - 🧿 **Debuffer — 13**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25), silencio (Tótem de silencio, 2026-10-25), extenuar (2026-10-25), cegar (2026-10-25) · de El origen: ceguera, veneno, inmovilizar.
@@ -38,7 +38,7 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
 **Para emparejar** (regla del dueño, 2026-10-25: «empezamos a tener en cuenta todos los roles de creep e ir emparejándolos… para que estén todos
-avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-25): Mago, Support, Debuffer y Rango + Hunter en 13; después los cuatro juntos hasta Choque liviano (14). El Jefe va aparte.
+avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-25): Mago, Support y Debuffer en 13; Rango + Hunter en 14, como Choque liviano; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
 
 ## Los roles
 
@@ -194,6 +194,8 @@ la emboscada, matabestias, la espalda a distancia, la recarga, el proyectil perf
 
 **B. Volumen de fuego** ✦
 5. **Disparo doble**: dos disparos con menos puntería cada uno.
+5b. ✅ **Ráfaga encadenada** (2026-10-25, la Repetición del Shooter para creeps): sus próximos 3 disparos al mismo blanco van cada vez mejor
+   (el 2.º +1 PdG y +1 dado, el 3.º +2 y +2); cada uno paga sus No2. No gasta su ataque.
 6. **Ráfaga**: tres disparos, cada uno a un objetivo distinto.
 7. **Lluvia de flechas**: un área (flor) donde caen flechas, con dodge roll. ⏸ Para otro momento (dueño, 2026-10-25). Propuesta guardada: diámetro 3
    en su Rango, su PdG una vez contra la Evasión de cada uno (dodge roll), el daño de su arma +2; un ataque y 3 SP, o cooldown 3.

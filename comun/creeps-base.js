@@ -175,7 +175,7 @@
       h.estadoObjetivo = aplicaDe(sp);   // gm-tools deja elegir a quién le pegó y se lo aplica
     }
     if(sp.efecto){
-      h.efectoNombre = sp.efecto.nombre || sp.nombre; h.efectoTurnos = sp.efecto.turnos; h.efectoStacks = 1; h.efectoPolaridad = sp.efecto.polaridad || 'buff';
+      h.efectoNombre = sp.efecto.nombre || sp.nombre; h.efectoTurnos = sp.efecto.turnos; h.efectoStacks = Math.max(1, Math.round(Number(sp.efecto.stacks)) || 1); h.efectoPolaridad = sp.efecto.polaridad || 'buff';   // stacks: los disparos de la Ráfaga encadenada (2026-10-25)
       if(sp.efecto.hp) h.efectoHpTurno = sp.efecto.hp;
       if(sp.efecto.excK) h.efectoEscudo = sp.efecto.excK * n;   // Vida extra: HP que suma (se acumula con el que ya tenga)
       h.efectoDetalle = sinEtiqueta(textoHab(sp, n));

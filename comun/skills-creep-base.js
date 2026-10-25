@@ -59,7 +59,7 @@
     'Colmillos que perforan': ['choque liviano', 'sangrado'], 'Tajo brutal': ['choque liviano', 'sangrado'], 'Desgarro': ['choque liviano', 'sangrado'],
     'Corte certero': ['choque liviano', 'sangrado'], 'Zarpa certera': ['choque liviano', 'sangrado'], 'Tajo de carnicero': ['choque liviano', 'sangrado'],
     'Destripar': ['choque liviano', 'sangrado'],
-    'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'], 'Mantener a raya': ['rango', 'mantener a raya'], 'Flecha que atraviesa': ['rango', 'atravesar'], 'Extenuar': ['debuffer', 'extenuar'], 'Cegar': ['debuffer', 'cegar'],
+    'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'], 'Mantener a raya': ['rango', 'mantener a raya'], 'Flecha que atraviesa': ['rango', 'atravesar'], 'Ráfaga encadenada': ['rango', 'disparos encadenados'], 'Extenuar': ['debuffer', 'extenuar'], 'Cegar': ['debuffer', 'cegar'],
     'Red': ['hunter', 'trabar'], 'Tela de araña': ['hunter', 'trabar'],
     'Hit and run': ['choque liviano', 'golpear y alejarse'],
     'Salto': ['choque liviano', 'salto'], 'Salto aplastante': ['choque pesado', 'salto'], 'Vigilancia': ['rango', 'vigilancia'], 'Bola de fuego': ['mago', 'daño en área'], 'Confusión': ['debuffer', 'control mental'],
@@ -828,6 +828,11 @@
     {}, 'va al duelo como un ataque; si pega, Sangrado', 1, SG), 'estados alterados');
   H('Tarascón al tobillo', 'DK', 'b', 'me', 3, aA('Un tarascón al tobillo: un ataque con su arma; si pega, queda Rengo 2 turnos (moverse le cuesta 2 No2 por casillero).',
     {}, 'va al duelo como un ataque; si pega, Rengo 2 turnos', 2, RG), 'estados alterados');
+  // 🔁 Auditada (dueño, 2026-10-25; Rango, la Repetición del Shooter para creeps: «sí» a la propuesta de Claude): queda Repitiendo con 3 disparos
+  // (el preset del Shooter; el mapa la cuenta: vtt-hexgrid/js/35): con su arma a distancia al mismo blanco, el 2.º +1 PdG y +1 dado, el 3.º +2 y +2;
+  // cada disparo paga sus No2; cambiar de blanco o de arma la corta y se termina al empezar su próximo turno. No es su ataque: 3 SP, o cooldown 3.
+  H('Ráfaga encadenada', 'B', 'hd', 'r', 3, {detalle: 'Se prepara para encadenar disparos: sus próximos 3 disparos con un arma a distancia al mismo blanco, en este turno, van cada vez mejor: el 2.º suma +1 a la Probabilidad de Golpe y un dado más del arma, el 3.º +2 y dos dados más. Cada disparo paga sus No2 como siempre. Si cambia de blanco o de arma se corta, y se termina al empezar su próximo turno. Prepararla no gasta su ataque.',
+    no2: 0, spCosto: 3, auditada: true, ataqueTxt: 'queda encadenando 3 disparos al mismo blanco: el 2.º +1 PdG y +1 dado, el 3.º +2 y +2', efecto: {nombre: 'Repitiendo', stacks: 3, turnos: 1}});
   // 🏹 Auditada (dueño, 2026-10-25; Rango, «volumen de fuego», el equivalente para creeps del Proyectil perforante del Shooter: «vamos con la que
   // atraviesa»): un disparo con su arma con +2 al daño (para que se sienta) que, pegue o no al primero, sigue derecho y le pega al primero que haya
   // detrás en su Rango, contra la misma tirada (`perforante`, vtt-hexgrid/js/42). Costo el del Shooter: el ataque y 2 SP, o cooldown 3.

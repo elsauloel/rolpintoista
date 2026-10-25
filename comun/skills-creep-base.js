@@ -59,7 +59,7 @@
     'Colmillos que perforan': ['choque liviano', 'sangrado'], 'Tajo brutal': ['choque liviano', 'sangrado'], 'Desgarro': ['choque liviano', 'sangrado'],
     'Corte certero': ['choque liviano', 'sangrado'], 'Zarpa certera': ['choque liviano', 'sangrado'], 'Tajo de carnicero': ['choque liviano', 'sangrado'],
     'Destripar': ['choque liviano', 'sangrado'],
-    'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'], 'Mantener a raya': ['rango', 'mantener a raya'], 'Flecha que atraviesa': ['rango', 'atravesar'], 'Ráfaga encadenada': ['rango', 'disparos encadenados'], 'Extenuar': ['debuffer', 'extenuar'], 'Cegar': ['debuffer', 'cegar'], 'Grito de pánico': ['debuffer', 'grito de pánico'],
+    'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'], 'Mantener a raya': ['rango', 'mantener a raya'], 'Flecha que atraviesa': ['rango', 'atravesar'], 'Ráfaga encadenada': ['rango', 'disparos encadenados'], 'Extenuar': ['debuffer', 'extenuar'], 'Cegar': ['debuffer', 'cegar'], 'Hoja envenenada': ['choque liviano', 'veneno'], 'Colmillo venenoso': ['choque liviano', 'veneno'], 'Grito de pánico': ['debuffer', 'grito de pánico'],
     'Red': ['hunter', 'trabar'], 'Tela de araña': ['hunter', 'trabar'],
     'Hit and run': ['choque liviano', 'golpear y alejarse'],
     'Salto': ['choque liviano', 'salto'], 'Salto aplastante': ['choque pesado', 'salto'], 'Vigilancia': ['rango', 'vigilancia'], 'Bola de fuego': ['mago', 'daño en área'], 'Confusión': ['debuffer', 'control mental'],
@@ -145,6 +145,13 @@
     {}, 'un ataque con su arma; por la espalda +1 dado y Crítico frecuente +1; en sigilo, el doble de dados', 4, [], {punalada: 'trapera'}));
   // 🩸 Las cuatro variantes del Sangrado (dueño, 2026-10-21: «un golpe simple que solamente añade sangrado; uno que añade perfora y sangrado; uno que
   // añade daño y sangrado; uno que añade crítico frecuente y sangrado»), cada una en versión de humanoide y de bestia («hacé todas»).
+  // ☠ Auditadas (dueño, 2026-10-25; choque liviano, «veneno»: la propuesta de Claude con «2 perfora en vez de +1 dado»): un ataque con su arma con
+  // Perfora 2; si pega, Veneno 3 stacks (1 de daño por stack al empezar cada turno, y baja uno: 3 + 2 + 1). Humanoide y bestia, como el Sangrado.
+  // Costo de Claude: el ataque y 2 SP, o cooldown 3. (El viejo Golpe envenenado, a mano, queda como estaba.)
+  const VN = [{nombre: 'Veneno', stacks: 3, detalle: 'Veneno 3: al empezar cada uno de sus turnos, 1 de daño por stack, y baja un stack (3 + 2 + 1).'}];
+  [['Hoja envenenada', 'hd', 'Una hoja untada en veneno'], ['Colmillo venenoso', 'b', 'Un mordisco que inyecta veneno']].forEach(([nombre, razas, como]) =>
+    H(nombre, 'DX', razas, 'me', 3, aA(`${como}: un ataque con su arma con Perfora 2 (2 puntos del daño pasan siempre la Defensa); si pega, deja Veneno 3 (al empezar cada uno de sus turnos, 1 de daño por stack, y baja un stack: 3, 2 y 1).`,
+      {perfora: 2}, 'va al duelo como un ataque con Perfora 2; si pega, Veneno 3', 2, VN)));
   H('Corte profundo', 'DX', 'hd', 'me', 3, aA('Una herida abierta que llega hondo: un ataque con su arma con Perfora 1 (1 punto del daño pasa siempre la Defensa); si pega, deja Sangrado (2 de daño por turno durante 2 turnos; se acumula y, con un golpe crítico, queda permanente).',
     {perfora: 1}, 'va al duelo como un ataque con Perfora 1 (1 punto del daño pasa siempre la Defensa); si pega, Sangrado', 2, SG));
   H('Tajo brutal', 'DX', 'hd', 'me', 3, aA('Un tajo con todo el peso: un ataque con su arma con +2 al daño; si pega, deja Sangrado (2 de daño por turno durante 2 turnos; se acumula y, con un golpe crítico, queda permanente).',

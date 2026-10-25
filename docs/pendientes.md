@@ -510,6 +510,7 @@
    - **Con esto, nada de la Botonera ni de las Acciones depende del marco escondido**: la A está terminada salvo la limpieza (A′), que
      espera tres sesiones reales.
    - [ ] Después, la **limpieza** (A′): borrar el marco y lo que quedó sin uso.
+     **Visto el 2026-10-25** (Corroer): el marco con la ficha se sigue cargando solo al abrir el mapa de un jugador, y su ficha tomaba los estados y recompensas que llegan a la vez que el mapa (cada uno guardaba su copia y se pisaban: se perdían Armaduras rotas). Se cortó esa parte (`ficha-personaje/js/13-bitacora.js`); falta averiguar quién carga el marco y, con la limpieza, sacarlo.
 
 **A′. Limpieza: borrar el camino viejo (cuándo y cómo, criterio propuesto por el asistente, 2026-10-02; el dueño lo dejó a su criterio):**
 - **Cuándo** — las tres cosas juntas: (1) **A terminado** (nada de la Botonera ni de las Acciones depende ya del marco); (2) **tres

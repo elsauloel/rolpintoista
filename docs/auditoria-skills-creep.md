@@ -338,7 +338,7 @@
   propuestos por Claude). Probado en el mapa el 2026-10-25 (GM, contra juan): 13 de daño y Deslumbrado (Res.Esp 6 → 4).
 - ✅ **Corroer** (Debuffer, «romper lo que lo protege», 2026-10-25, dueño: «un ataque de daño ácido que rompe armadura»): su PdG.Esp contra la Evasión de
   un rival en su Rango; si pega, 2d6 ácido (lo frenan la Defensa especial y la resistencia al ácido) y la regla del ácido de siempre (`porDano`: Armadura rota
-  1, y una más cada 5 de daño que entra). 2 No2 y 3 SP, o cooldown 3 (daño y costo propuestos por Claude). Queda aparte el viejo «Escupitajo ácido» (bestias, a mano). **Para probar.**
+  1, y una más cada 5 de daño que entra). 2 No2 y 3 SP, o cooldown 3 (daño y costo propuestos por Claude). Queda aparte el viejo «Escupitajo ácido» (bestias, a mano). Probado en el mapa el 2026-10-25: 14 de ácido a juan (2d6 + Estandarte + Presa) y «Armadura rota ×3 (por 14 de daño)»; con una cota puesta (Defensa 5), las roturas bajan la pieza. En el camino apareció que de varias Armaduras rotas juntas se perdían algunas (la ficha escondida dentro del mapa también las tomaba): arreglado.
 - ⏸ **Clavar al suelo** (dueño, 2026-10-21: «no me cierra de forma narrativa»): queda aparte, sin auditar.
 
 ## Etiquetas

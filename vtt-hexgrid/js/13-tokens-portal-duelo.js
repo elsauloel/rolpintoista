@@ -1072,18 +1072,27 @@ async function areaCrearSiguienteSubDuelo(areaId, a){
   }
   // Una sola pantalla del GM crea cada sub-duelo (2026-10-13, probándolo: con dos pantallas del GM abiertas se abrían dos duelos iguales —el
   // «riesgo chico» de antes pasaba siempre—): se reserva el lugar en el área con una transacción; si otra ya lo reservó, esta no hace nada.
+  // (2026-10-24, probando el Meteoro: la pantalla que avanzó el índice lo ve enseguida, pero la transacción podía leer del servidor el índice
+  // viejo → «no es mío» y el segundo objetivo se quedaba sin duelo para siempre. Si el servidor todavía no lo tiene, se reintenta un rato.)
   try{
     const ref = coleccionAreas().doc(areaId);
-    const mia = await fbDb.runTransaction(async tx => {
-      const doc = await tx.get(ref);
-      if(!doc.exists) return false;
-      const duelos = (doc.data().duelos || []).slice();
-      if(duelos[idx] || num(doc.data().indice) !== idx) return false;
-      duelos[idx] = 'reservado:' + fbUsuario.uid;
-      tx.update(ref, {duelos});
-      return true;
-    });
-    if(!mia) return;
+    let mia = 'tarde';
+    for(let intento = 0; intento < 6 && mia === 'tarde'; intento++){
+      if(intento) await new Promise(r => setTimeout(r, 700));
+      mia = await fbDb.runTransaction(async tx => {
+        const doc = await tx.get(ref);
+        if(!doc.exists) return 'no';
+        const duelos = (doc.data().duelos || []).slice();
+        if(duelos[idx]) return 'no';
+        if(num(doc.data().indice) < idx) return 'tarde';
+        if(num(doc.data().indice) !== idx) return 'no';
+        duelos[idx] = 'reservado:' + fbUsuario.uid;
+        tx.update(ref, {duelos});
+        return 'si';
+      });
+    }
+    if(mia === 'tarde') areaSubDueloCreando.delete(clave);   // (que el próximo aviso del área pueda probar de nuevo)
+    if(mia !== 'si') return;
   }catch(err){ console.error('No se pudo reservar el sub-duelo del área:', err); areaSubDueloCreando.delete(clave); return; }
   let dueloId;
   try{

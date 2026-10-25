@@ -1264,11 +1264,11 @@ const Duelo = (() => {
     const arma = d.ataque.armaNombre ? 'con ' + d.ataque.armaNombre : 'sin arma';
     if(d.hab) L.push(`${d.atacante.nombre} → ${d.defensor.nombre} · ✨ ${d.hab.nombre}${d.hab.sinOposicion ? '' : ' (' + etqTira(d) + ' contra ' + etqContra(d) + ')'}`);
     else L.push(`${d.atacante.nombre} → ${d.defensor.nombre} · ${nombreAtq(d)} ${arma} (Tipo ${_fmt(_num(d.ataque.tipoDado))})${modsTxt(d) ? ' · ' + modsTxt(d) : ''}`);
-    const defTxt = d.defensa && d.defensa.modo === 'parry' ? 'Parry' + (d.defensa.itemNombre ? ' con ' + d.defensa.itemNombre : '') : d.defensa && d.defensa.modo === 'parrydist' ? 'Parry a distancia' + (d.defensa.itemNombre ? ' con ' + d.defensa.itemNombre : '') : 'Evasión';
+    const defNom = d.defensa && d.defensa.modo === 'parry' ? 'Parry' + (d.defensa.itemNombre ? ' con ' + d.defensa.itemNombre : '') : d.defensa && d.defensa.modo === 'parrydist' ? 'Parry a distancia' + (d.defensa.itemNombre ? ' con ' + d.defensa.itemNombre : '') : 'Evasión';
     if(d.hab){
       if(d.pdg && d.eva) L.push(`${etqTira(d)} ${d.pdg.total} contra ${etqContra(d)} ${d.eva.total} → ${d.contacto && d.contacto.gana === 'atacante' ? 'funcionó' : 'se resistió'}${d.contacto && d.contacto.desempate ? ' (por desempate)' : ''}`);
     }
-    else if(d.pdg && d.eva) L.push(`Contacto: PdG ${d.pdg.total} contra ${defTxt} ${d.eva.total} → ${d.contacto && d.contacto.gana === 'atacante' ? 'pegó' : 'el defensor ganó'}${d.contacto && d.contacto.desempate ? ' (por desempate)' : ''}`);
+    else if(d.pdg && d.eva) L.push(`Contacto: PdG ${d.pdg.total} contra ${defNom} ${d.eva.total} → ${d.contacto && d.contacto.gana === 'atacante' ? 'pegó' : 'el defensor ganó'}${d.contacto && d.contacto.desempate ? ' (por desempate)' : ''}`);
     if(d.fuerza && d.bloqueo) L.push(`Bloqueo: Fuerza del golpe ${d.fuerza.total} contra Bloqueo ${d.bloqueo.total} → ${d.bloq && d.bloq.gana === 'defensor' ? 'bloqueado' : 'no alcanzó'}${d.bloq && d.bloq.desempate ? ' (por desempate)' : ''}`);
     if(d.crit && d.crit.critico) L.push(`¡Crítico ×${d.crit.mult}!${d.crit.mult > 1 ? '' : ' (el d20 no alcanzó a multiplicar, pero ignora la Defensa)'} (d20: ${(d.crit.d20 || []).join(', ')})`);
     const dn = d.dano;
@@ -2197,7 +2197,7 @@ const Duelo = (() => {
     let cuerpo;
     if(!dn){
       const soyAtq = esMio(d.atacante) && (cfgEscuchar.relay || (hooks() && hooks().soy && hooks().soy(d.atacante)));
-      if(soyAtq) cuerpo = `<div style="text-align:center"><button type="button" data-dano-tirar>🎲 Tirar el daño${arma}${d.hab ? (d.hab.dano && d.hab.dano.formula ? ` · ${_esc(d.hab.dano.formula)}` : '') : vistaBoton(d, 'dano')}</button>${flashHtml(d, 'dano')}<div class="duelo-nota" style="margin-top:6px">${crit ? `Es crítico: todo el daño se multiplica ×${mult} y va derecho a la vida (no se resta la Defensa).` : d.resultado === 'mitad' ? 'Pasa la mitad: (daño − Defensa) ÷ 2, redondeado para arriba.' : (d.hab && d.hab.dano && d.hab.dano.ignoraDef ? `Daño ${_esc(d.hab.dano.tipo)}: ignora la Defensa, no critica y va derecho a la vida.` : 'Se le resta la Defensa del defensor.')}</div></div>${manualHtml(d, 'dano')}`;
+      if(soyAtq) cuerpo = `<div style="text-align:center"><button type="button" data-dano-tirar>🎲 Tirar el daño${arma}${d.hab ? (d.hab.dano && d.hab.dano.formula ? ` · ${_esc(d.hab.dano.formula)}${d.hab.dano.extra && d.hab.dano.extra.formula ? ` + ${_esc(d.hab.dano.extra.formula)} de ${_esc(d.hab.dano.extra.tipo || 'fuego')}` : ''}` : '') : vistaBoton(d, 'dano')}</button>${flashHtml(d, 'dano')}<div class="duelo-nota" style="margin-top:6px">${crit ? `Es crítico: todo el daño se multiplica ×${mult} y va derecho a la vida (no se resta la Defensa).` : d.resultado === 'mitad' ? 'Pasa la mitad: (daño − Defensa) ÷ 2, redondeado para arriba.' : (d.hab && d.hab.dano && d.hab.dano.ignoraDef ? `Daño ${_esc(d.hab.dano.tipo)}: ignora la Defensa, no critica y va derecho a la vida.` : 'Se le resta la Defensa del defensor.')}</div></div>${manualHtml(d, 'dano')}`;
       else if(puedoAMano(d.atacante)) cuerpo = `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire el daño…</div>
         <div class="duelo-man"><input type="number" min="1" data-manual="dano" placeholder="daño" value="${_esc(manual.dano || '')}"><button type="button" class="sec" data-tirarpor="dano">🎲 Tirar a mano</button></div>${manualHtml(d, 'dano')}`;
       else cuerpo = `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire el daño…</div>`;
@@ -2207,6 +2207,8 @@ const Duelo = (() => {
       const dados = (dn.rolls || []).map(r => `<span class="duelo-dadito">${_esc(String(r))}</span>`).join('')
         + (_num(dn.mod) ? `<span class="duelo-dadito mod">${_num(dn.mod) > 0 ? '+' : '−'}${_fmt(Math.abs(_num(dn.mod)))}</span>` : '');
       const tiro = `<div class="duelo-danotiro"><span class="t">🎲 Daño${arma}${defMan}</span><span class="n">${_fmt(dn.crudo)}</span>${dados ? `<span class="dados">${dados}</span>` : ''}<span class="f">${_esc(dn.formula || '')}</span></div>`;
+      // ☄ El segundo daño (el fuego del Meteoro, o el elemental de un arma), a la vista también antes de aplicarlo (2026-10-24: no se veía hasta el final).
+      const mgAntes = dn.magico ? `<div class="duelo-mini" style="color:#9cc7ff">${magIcono(dn.magico.tipo)} ${_esc(magTitulo(dn.magico.tipo))}: <b>${_fmt(dn.magico.total)}</b> (${_esc(dn.magico.formula || '')})${_esc(magMult(dn.magico))} · directo: no lo frena la Defensa ni se multiplica; sí la resistencia a ese elemento</div>` : '';
       if(!dn.aplicado && pideAceptar(d) && !dn.aceptado){
         // 💔 Lo que pasó, antes de descontarlo: «tanto de daño, menos tu Defensa» y el botón (el dueño) o la espera (el resto; el GM, «por él»).
         const ignora = d.hab && d.hab.dano && d.hab.dano.ignoraDef;
@@ -2219,11 +2221,11 @@ const Duelo = (() => {
           : ignora ? `de daño ${_esc(d.hab.dano.tipo || 'especial')} (lo frenan ${tu} Defensa especial y ${tu}s resistencias, ${suyo ? 'si tenés' : 'si tiene'}).`
           : d.resultado === 'mitad' ? `Pasa la mitad: (${_fmt(dn.crudo)} − ${tu} Defensa) ÷ 2, redondeado para arriba.`
           : `de daño, menos ${tu} Defensa.`;
-        cuerpo = tiro + `<div class="duelo-danobox${fuerte ? ' crit' : ''}"><div class="duelo-danonum${fuerte ? ' rojo' : ''}" style="font-size:72px">${_fmt(total)}</div>${fuerte ? '<div class="duelo-danosub rojo" style="font-size:20px">DERECHO A LA VIDA</div>' : ''}<div class="duelo-danosub" style="font-size:14px">${que}</div></div>`
+        cuerpo = tiro + `<div class="duelo-danobox${fuerte ? ' crit' : ''}"><div class="duelo-danonum${fuerte ? ' rojo' : ''}" style="font-size:72px">${_fmt(total)}</div>${fuerte ? '<div class="duelo-danosub rojo" style="font-size:20px">DERECHO A LA VIDA</div>' : ''}<div class="duelo-danosub" style="font-size:14px">${que}</div></div>${mgAntes}`
           + (suyo ? `<div style="text-align:center;margin-top:8px"><button type="button" data-dano-aceptar>💔 Aplicar el daño</button><div class="duelo-nota" style="margin-top:6px">⚙ Al tocarlo se descuenta solo de tu vida (y se ve cómo queda).</div></div>`
             : `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.defensor.nombre)} aplique el daño…</div>${soyGM() ? `<div style="text-align:center;margin-top:6px"><button type="button" class="sec" data-dano-aceptar>💔 Aplicar por ${_esc(d.defensor.nombre)}</button></div>` : ''}`);
       }else if(!dn.aplicado){
-        cuerpo = tiro + `<div class="duelo-mini">${crit ? `×${mult} = <b>${_fmt(dn.crudo * mult)}</b> derecho a la vida…` : 'Calculando lo que pasa con la Defensa…'}</div>
+        cuerpo = tiro + `<div class="duelo-mini">${crit ? `×${mult} = <b>${_fmt(dn.crudo * mult)}</b> derecho a la vida…` : 'Calculando lo que pasa con la Defensa…'}</div>${mgAntes}
           <div class="duelo-nota" style="text-align:center">${soyGM() ? 'Aplicando el daño al HP…' : 'El GM aplica el daño al HP.'}</div>
           ${soyGM() ? `<div class="duelo-man"><input type="number" min="0" data-manual="recibido" placeholder="daño recibido" value="${_esc(manual.recibido || '')}"><button type="button" class="sec" data-aplicar-mano>Ya lo apliqué a mano</button></div>` : ''}`;
       }else{

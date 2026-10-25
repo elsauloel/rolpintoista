@@ -192,7 +192,7 @@ POOL = [
     # — terreno y colocar —
     {'nombre': 'Varita del aceite: flor de aceite, 2 turnos (Sentado al entrar)', 'clase': 'arcano', 'terreno': ('Sentado', 2), 'forma': 'flor1', 'sp': 1},
     {'nombre': 'Varita de telaraña: línea de 3, 2 turnos, como la Brea', 'clase': 'arcano', 'terreno': ('Brea', 2), 'forma': 'linea', 'sp': 1},
-    {'nombre': 'Varita de la ventisca: flor, 1d4 de hielo y el suelo resbala 1 turno', 'clase': 'elemental', 'dado': '1d4', 'forma': 'flor1', 'terreno': ('Sentado', 1), 'directo': True},
+    {'nombre': 'Varita de la ventisca: flor, 2d4 de hielo y el suelo resbala 1 turno (2026-10-25, dueño: 2d4 por el mismo costo)', 'clase': 'elemental', 'dado': '2d4', 'forma': 'flor1', 'terreno': ('Sentado', 1), 'directo': True},
     {'nombre': 'Varita de espinas: línea de 3, 3 turnos, 1d4 al pasar', 'clase': 'arcano', 'terreno': ('Daño 1d4', 3), 'forma': 'linea', 'sp': 1},
     {'nombre': 'Varita de la runa: trampa oculta, 2d4 arcano al pisarla (Evasión contra tu Ef.Esp: la mitad); se detecta con Percepción contra tu Ef.Esp', 'clase': 'arcano', 'dado': '2d4', 'forma': 'trampa', 'directo': True},
     {'nombre': 'Varita de niebla: flor de niebla, 3 turnos (no se ve a través ni se apunta adentro desde afuera; adentro se ve a 1)', 'clase': 'arcano', 'terreno': ('Niebla', 3), 'forma': 'flor1', 'sp': 1},

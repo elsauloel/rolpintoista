@@ -26,7 +26,7 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
   furia, pisotón, provocar, segundo aliento, aguantar el daño, cubrir al de al lado, perforar, carga que derriba.
 - 🗡 **Choque liviano — 14**: golpe preciso, sangrado, trabar, golpear y alejarse, salto, abrir la herida, manada, ráfaga, por la espalda · de El origen:
   robar, sigilo, varios golpes, bajo tierra, veneno.
-- 🏹 **Rango y Hunter — 11**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar · de El origen: área a distancia,
+- 🏹 **Rango y Hunter — 12**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar, mantener a raya (2026-10-25) · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 11**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25), lluvia de escarcha (2026-10-25) · de El origen: proyectil, fuego con quemadura.
 - 🧿 **Debuffer — 11**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25), silencio (Tótem de silencio, 2026-10-25) · de El origen: ceguera, veneno, inmovilizar.
@@ -34,8 +34,8 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
 **Para emparejar** (regla del dueño, 2026-10-25: «empezamos a tener en cuenta todos los roles de creep e ir emparejándolos… para que estén todos
-avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-25): Mago, Debuffer y Support en 11,
-como Rango + Hunter; después los cuatro juntos hasta Choque liviano (14). El Jefe va aparte.
+avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-25): Mago, Debuffer y Support en 11;
+Rango + Hunter en 12; después los cuatro juntos hasta Choque liviano (14). El Jefe va aparte.
 
 ## Los roles
 
@@ -200,7 +200,7 @@ la emboscada, matabestias, la espalda a distancia, la recarga, el proyectil perf
 10. **Retroceder y disparar**: se aleja uno o dos casilleros gratis y dispara.
 11. **Disparar y reposicionarse**: el Hit and run del arquero (dispara y se mueve gratis, sin oportunidad).
 12. **Tiro en carrera**: se mueve y dispara sin perder la puntería.
-13. **Mantener a raya** ✦: el disparo deja Lento o Rengo, para que no lo alcancen.
+13. ✅ **Mantener a raya** ✦ (2026-10-25): un disparo con +2 al daño; si pega, lo empuja 1 casilla y queda Lento 2 turnos.
 
 **D. Control a distancia**
 14. ✅ **Tiro a la rodilla** (Rengo).

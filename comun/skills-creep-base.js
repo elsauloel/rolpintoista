@@ -59,7 +59,7 @@
     'Colmillos que perforan': ['choque liviano', 'sangrado'], 'Tajo brutal': ['choque liviano', 'sangrado'], 'Desgarro': ['choque liviano', 'sangrado'],
     'Corte certero': ['choque liviano', 'sangrado'], 'Zarpa certera': ['choque liviano', 'sangrado'], 'Tajo de carnicero': ['choque liviano', 'sangrado'],
     'Destripar': ['choque liviano', 'sangrado'],
-    'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'],
+    'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'], 'Mantener a raya': ['rango', 'mantener a raya'],
     'Red': ['hunter', 'trabar'], 'Tela de araña': ['hunter', 'trabar'],
     'Hit and run': ['choque liviano', 'golpear y alejarse'],
     'Salto': ['choque liviano', 'salto'], 'Salto aplastante': ['choque pesado', 'salto'], 'Vigilancia': ['rango', 'vigilancia'], 'Bola de fuego': ['mago', 'daño en área'], 'Confusión': ['debuffer', 'control mental'],
@@ -769,6 +769,12 @@
     {}, 'va al duelo como un ataque; si pega, Sangrado', 1, SG), 'estados alterados');
   H('Tarascón al tobillo', 'DK', 'b', 'me', 3, aA('Un tarascón al tobillo: un ataque con su arma; si pega, queda Rengo 2 turnos (moverse le cuesta 2 No2 por casillero).',
     {}, 'va al duelo como un ataque; si pega, Rengo 2 turnos', 2, RG), 'estados alterados');
+  // 🏹 Auditada (dueño, 2026-10-25; Rango, «mantener a raya»: «bueno para mantener distancia, que es su fuerte»; «y que además sume algo de daño»): un
+  // disparo con su arma con +2 al daño; si pega, lo empuja 1 casilla (el Empujón de la Cornada, con su colisión) y queda Lento 2 turnos. Distinta del
+  // Tiro a la rodilla (Rengo, sin empujar). El +2 y el costo los propuso Claude: el ataque y 2 SP, o cooldown 3.
+  H('Mantener a raya', 'DK', 'hd', 'r', 3, aA('Un disparo para que no se acerque: un ataque con su arma con +2 al daño; si pega, lo empuja 1 casilla lejos del tirador (si choca contra algo, el daño de colisión de siempre) y queda Lento 2 turnos (el primer casillero que mueve en cada turno le cuesta el doble de No2).',
+    {fijo: 2}, 'va al duelo como un ataque con +2 al daño; si pega, lo empuja 1 y queda Lento 2 turnos', 2,
+    [{nombre: 'Empujón', empuja: 1, detalle: 'Lo empuja 1 casilla, lejos del tirador.'}, {nombre: 'Lento', turnos: 2, detalle: 'Lento 2 turnos: el primer casillero que mueve en cada turno le cuesta el doble de No2.'}]), 'estados alterados');
   H('Tiro a la rodilla', 'DK', 'hd', 'r', 3, aA('Un tiro bajo, a la rodilla: un ataque con su arma; si pega, queda Rengo 2 turnos (moverse le cuesta 2 No2 por casillero).',
     {}, 'va al duelo como un ataque; si pega, Rengo 2 turnos', 2, RG), 'estados alterados');
   H('Golpe atontador', 'DK', 'hdb', 'm', 4, zO('Un golpe en la cabeza: daño y aplicale al objetivo Pajaritos (a mano).', 3, 'M'), 'estados alterados');

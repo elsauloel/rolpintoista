@@ -260,8 +260,8 @@ líneas, zonas, el rayo en cadena y los charcos, los controles mentales.
   con el costo según el largo).
 - ✅ **Misiles elementales** (2026-10-25; dueño: «un misil elemental, uno por cada uno de los tipos de daño… atado a la identidad de cada uno de los
   elementos y que se sienta»; «un skill por cada elemento y un skill que sea misil elemental que te deje elegir, pero que cueste un nitro más y 2 SP más»;
-  «el eléctrico, Centella»): **Misil arcano** (directo), **Ascua** (fuego, Quemadura), **Carámbano** (hielo, Escarcha 1 + 1 cada 5), **Centella** (no se
-  esquiva, 1d6 que salta, 50 % de Parálisis si no la resiste con Res.Esp), **Gota corrosiva** (ácido, Armadura rota 1 + 1 cada 5), **Ponzoña** (tóxico,
+  «el eléctrico, Centella»): **Misil arcano** (directo), **Lengua de fuego** (fuego, Quemadura), **Dardo helado** (hielo, Escarcha 1 + 1 cada 5), **Centella** (no se
+  esquiva, 1d6 que salta, 50 % de Parálisis si no la resiste con Res.Esp), **Mancha corrosiva** (ácido, Armadura rota 1 + 1 cada 5), **Ponzoña** (tóxico,
   Veneno 2 + 1 cada 5) y **Misil elemental** (elige el elemento al lanzarlo; 1 No2 y 2 SP más). Base: PdG.Esp contra Evasión, 2d6 + ¼ Ef.Esp; 2 No2 y su
   Especial en SP, o cooldown 2. Cuentan como un concepto del Mago.
 - **Mago — ideas nuevas (2026-10-24, la lista que pidió el dueño; ✦ = acelera la pelea):**

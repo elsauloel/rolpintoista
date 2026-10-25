@@ -1115,6 +1115,20 @@ async function areaCrearSiguienteSubDuelo(areaId, a){
   }catch(err){ console.error('No se pudo anotar el sub-duelo en el área:', err); }
 }
 
+// comun/duelo.js avisa (hook grupoCancelado, solo al GM) cuando se cancela el duelo de un área (2026-10-25, dueño: «arreglá lo del duelo cancelado y la
+// marca en el mapa»): se cancela lo que faltaba del área — la marca se va y los objetivos que seguían no reciben su duelo (lo ya resuelto queda).
+function dueloGrupoCancelado(d){
+  const ref = coleccionAreas().doc(d.grupo.id);
+  ref.get().then(doc => {
+    if(!doc.exists) return;
+    const a = doc.data();
+    if(a.estado !== 'en-curso' && a.estado !== 'eligiendo') return;
+    return ref.update({estado: 'terminado'}).then(() => {
+      const quedan = Math.max(0, (a.objetivos || []).length - (num(d.grupo.indice) || 1));
+      try{ mesaLinea(`✖ Se canceló ${(d.hab && d.hab.nombre) || 'el área'}${quedan ? ` (no alcanza a ${quedan === 1 ? 'el objetivo que faltaba' : `los ${quedan} objetivos que faltaban`})` : ''}`, 'recordatorio'); }catch(e){}
+    });
+  }).catch(err => console.error('No se pudo cerrar el área cancelada:', err));
+}
 // comun/duelo.js avisa (hook grupoResuelto, solo al GM) cuando un sub-duelo con `grupo` se resuelve: avanza la cascada.
 // De paso, si es el PRIMER objetivo, guarda su PdG.Esp/PdG en el área: es la tirada compartida que van a usar todos
 // los objetivos siguientes (dicho por el dueño, 2026-09-27 — el casteador tira una sola vez para toda la cascada).

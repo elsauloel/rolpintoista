@@ -81,6 +81,7 @@ const Duelo = (() => {
   let dodgeLibrePrimera = true;
   let bloqueadoPrimera = true, desarmadoPrimera = true;
   let grupoAvisado = new Set();   // ids de sub-duelos de área ya avisados a cfgEscuchar.grupoResuelto (no avisar dos veces)
+  const grupoCanceladoAvisado = new Set();   // …y a cfgEscuchar.grupoCancelado (2026-10-25)
   let dodgeActivos = new Set();   // ids de duelos con fase 'dodge' ya avisados a cfgEscuchar.dodgeEmpieza (para saber cuándo avisar dodgeTermina)
   const retener = on => { window.DUELO_RETENER = !!on; if(on) setTimeout(() => { window.DUELO_RETENER = false; }, 20000); };   // la Mesa no publica la tirada mientras está prendido   // duelos cuyo daño está aplicando esta pestaña (GM)
 
@@ -3056,6 +3057,14 @@ const Duelo = (() => {
           if(!d.grupo || d.estado !== 'resuelto' || grupoAvisado.has(d.id)) return;
           grupoAvisado.add(d.id);
           try{ cfgEscuchar.grupoResuelto(d); }catch(err){ console.error('Duelo: grupoResuelto', err); }
+        });
+      }
+      // …y si se canceló (2026-10-25, dueño: «arreglá lo del duelo cancelado y la marca en el mapa»): el mapa cierra lo que faltaba del área.
+      if(cfgEscuchar.grupoCancelado && soyGM()){
+        listaDuelos.forEach(d => {
+          if(!d.grupo || d.estado !== 'cancelado' || grupoCanceladoAvisado.has(d.id)) return;
+          grupoCanceladoAvisado.add(d.id);
+          try{ cfgEscuchar.grupoCancelado(d); }catch(err){ console.error('Duelo: grupoCancelado', err); }
         });
       }
       if(cfgEscuchar.desarmado && soyGM()){   // 🤺 Desarmar (2026-10-21): el arma o el escudo al piso (el mapa del GM)

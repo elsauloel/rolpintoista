@@ -99,6 +99,10 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
+> - [ ] **🐾 Nombres para las versiones «bestia» de algunas habilidades de creep (2026-10-25, dueño: «anotá en pendientes buscar nombres para las versiones
+>   bestia de algunos skills»):** varias habilidades auditadas tienen una sola versión para todos o solo la humanoide (la Aguja del desamparo, Disipar, Señalar la
+>   presa, la Lanza de luz, el Meteoro…). Repasar cuáles piden una versión bestia con su propio nombre, como ya pasó con Corroer / Escupitajo ácido, Golpe que
+>   sangra / Zarpazo desgarrador, Sal en la herida / Morder la herida. Proponer nombres y que el dueño elija.
 > - [ ] **📈 Habilidades de creep con daño fijo: que el efecto suba con el nivel (2026-10-24, dueño: «los skills que tienen daño fijo, revisarlos para que
 >   tengan un aumento de efecto por nivel»):** repasar las de `comun/skills-creep-base.js` con daño o efecto fijo (la Aguja del desamparo 1d6, el Muro de
 >   fuego 3d4, el Hálito polar 2d4 + ¼ Ef.Esp, la Descarga arcana 4d6, el Estandarte de guerra +3 PdG / +5 daño, las curas fijas como el Aura sanadora 4…) y
@@ -510,7 +514,7 @@
    - **Con esto, nada de la Botonera ni de las Acciones depende del marco escondido**: la A está terminada salvo la limpieza (A′), que
      espera tres sesiones reales.
    - [ ] Después, la **limpieza** (A′): borrar el marco y lo que quedó sin uso.
-     **Visto el 2026-10-25** (Corroer): el marco con la ficha se sigue cargando solo al abrir el mapa de un jugador, y su ficha tomaba los estados y recompensas que llegan a la vez que el mapa (cada uno guardaba su copia y se pisaban: se perdían Armaduras rotas). Se cortó esa parte (`ficha-personaje/js/13-bitacora.js`); falta averiguar quién carga el marco y, con la limpieza, sacarlo.
+     **Visto el 2026-10-25** (Corroer): el marco con la ficha se sigue cargando solo al abrir el mapa de un jugador, y su ficha tomaba los estados y recompensas que llegan a la vez que el mapa (cada uno guardaba su copia y se pisaban: se perdían Armaduras rotas). Se cortó esa parte (`ficha-personaje/js/13-bitacora.js`). Quien lo cargaba era la precarga del mapa al entrar (`setTimeout(precargarMarco, 6000)`, js/14): se sacó; queda el marco como plan B (se carga cuando hace falta) hasta la limpieza.
 
 **A′. Limpieza: borrar el camino viejo (cuándo y cómo, criterio propuesto por el asistente, 2026-10-02; el dueño lo dejó a su criterio):**
 - **Cuándo** — las tres cosas juntas: (1) **A terminado** (nada de la Botonera ni de las Acciones depende ya del marco); (2) **tres

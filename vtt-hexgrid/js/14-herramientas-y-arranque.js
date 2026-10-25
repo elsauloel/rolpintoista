@@ -820,7 +820,9 @@ function arrancarEnVivo(){
   mesaEscuchar();
   mesaHistorialAlEntrar();
   // Duelo paso a paso (comun/duelo.js): el cuadro se abre solo para todos; las tiradas de cada uno se piden al iframe de su ficha (o de las Acciones del creep).
-  setTimeout(precargarMarco, 6000);   // abrir más rápido la primera Botonera o Acciones (paso 4)
+  // (La precarga del marco al entrar —`precargarMarco`, «abrir más rápido la primera Botonera o Acciones», paso 4— se sacó el 2026-10-25: la
+  // Botonera y las Acciones las dibuja el mapa, y la ficha escondida era una segunda copia viva del personaje que pisaba lo que guardaba el
+  // mapa —se perdían Armaduras rotas—. El marco se sigue cargando cuando hace falta: bnAlMarco, dueloRelayMapa, abrirAcciones.)
   Duelo.escuchar({stacksExtra: (d, spec) => /veneno/i.test(String(spec.nombre || '')) ? venenistaDe(d.atacante) : 0,   // el envenenador (js/13)
     relay: dueloRelayMapa, hooksLocal: lado => bnHooksDuelo(lado) || bnHooksDueloInv(lado) || acHooksDuelo(lado), controlDe: lado => {   // 🎮 personaje controlado por el GM: su lado lo maneja el GM
     if(!lado || lado.tipo !== 'pj') return '';

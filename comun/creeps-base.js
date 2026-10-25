@@ -78,7 +78,7 @@
     'Drenar energía': A('Drenado', 1, {nitros: -2}), 'Trampa de raíces': A('Inmovilizado', 2),
     'Hechizo de lentitud': A('Lentitud', 2, {nitros: -1}), 'Quemadura': A('Quemado', 2, {}, -2), 'Escarcha': A('Escarcha', 1, {nitros: -2}),
     'Oxidar': A('Oxidado', 3, {dmg: -2}), 'Desmoralizar': A('Desmoralizado', 2, {resm: -2, dmg: -1}), 'Polvo revelador': A('Ceguera', 1),
-    'Escupitajo ácido': A('Corroído', 2, {def: -1}), 'Lanza de hielo': A('Escarcha', 1, {nitros: -1}), 'Descarga eléctrica': A('Descarga', 1, {nitros: -1}),
+    'Lanza de hielo': A('Escarcha', 1, {nitros: -1}), 'Descarga eléctrica': A('Descarga', 1, {nitros: -1}),
     'Golpe de escudo': A('Golpe de escudo', 1, {nitros: -1}), 'Dardo venenoso': A('Veneno'), 'Mordisco venenoso': A('Veneno'),
     'Herida sangrante': A('Sangrado'),   // (Corte profundo, Zarpazo desgarrador y Golpe que sangra: van al duelo desde la auditoría, 2026-10-21)
     'Sembrar veneno': A('Veneno'), 'Aturdir con estruendo': A('Stun'), 'Aturdir': A('Stun'), 'Congelar': A('Stun'), 'Hipnosis': A('Stun', 1),

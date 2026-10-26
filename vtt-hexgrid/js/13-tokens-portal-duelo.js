@@ -1606,7 +1606,10 @@ async function dueloAplicarDano(d){
   // ☀🌑 La identidad de la luz y de lo siniestro (2026-10-26): ×1,5 la luz a no-muertos y demonios; lo siniestro, nada (Combatiente.identidadElemento).
   const idHab = elHab && t ? Combatiente.identidadElemento(elHab, ((vinculo(t) || {}).tipoCriatura)) : null, multId = idHab ? idHab.mult : 1;
   const mult = critReal ? d.crit.mult : 1, crudo = Math.ceil(Math.max(0, num(dn.crudo) - menosDist + (magico ? botella : 0) + anilloHab) * multHab * multId), golpe = crudo * mult;
-  const base = {crudo, mult, golpe, ignoraDef: crit, mitad: d.resultado === 'mitad', ...(multHab > 1 ? {cargaMult: `${d.hab.dano.carga || 'Carga'}: ${fmt(Math.max(0, num(dn.crudo) - menosDist))} +${Math.round((multHab - 1) * 100)} % = ${fmt(crudo)}`} : {})};
+  // (☀🌑 el ×1,5 de la luz o el ×0 de lo siniestro van con lo que multiplica, no con lo que frena — 2026-10-26: decía «9 − la luz le pega ×1,5 = 9»)
+  const sinId = Math.ceil(Math.max(0, num(dn.crudo) - menosDist + (magico ? botella : 0) + anilloHab) * multHab);
+  const multTxt = [multHab > 1 ? `${d.hab.dano.carga || 'Carga'}: ${fmt(Math.max(0, num(dn.crudo) - menosDist))} +${Math.round((multHab - 1) * 100)} % = ${fmt(sinId)}` : '', idHab && idHab.txt && multId !== 1 ? `${idHab.txt}: ${fmt(sinId)} → ${fmt(crudo)}` : ''].filter(Boolean).join(' · ');
+  const base = {crudo, mult, golpe, ignoraDef: crit, mitad: d.resultado === 'mitad', ...(multTxt ? {cargaMult: multTxt} : {})};
   if(!t) return {...base, manual: true, motivoManual: 'el token ya no está en el mapa'};
   const esInv = t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION);
   let def = 0, armadmg = 0, invLeida = null;
@@ -1628,7 +1631,7 @@ async function dueloAplicarDano(d){
   let restaIgnorando = frenaAm ? armadmg : 0;
   const resEl = elDano && !trueDmg ? (await resistenciasDe(t, elDano, invLeida)).res : 0;
   let freno = [...(menosDist ? [d.hab && d.hab.menosPorOrden ? `${menosDist} por los que tocó antes en la línea` : `la distancia ${menosDist}`] : []), ...(frenaAm && armadmg ? [`Defensa especial ${armadmg}`] : []), ...(resEl ? [Combatiente.resElementalTxt(elDano, resEl)] : [])].join(' − ');
-  if(idHab && idHab.txt) freno = [freno, idHab.txt].filter(Boolean).join(' · ');   // ☀🌑
+  if(idHab && idHab.txt && multId === 1) freno = [freno, idHab.txt].filter(Boolean).join(' · ');   // ☀🌑 (lo que multiplica va en cargaMult)
   // 🏹 Perfora N (regla del dueño, 2026-10-10): N puntos del golpe pasan SIEMPRE, sin que los frene la Defensa; el resto va contra la Defensa como
   // siempre. O sea: recibe lo que pase la Defensa, pero nunca menos de N (ni más que el golpe). Con crítico no hace falta: ya ignora la Defensa entera.
   // (Antes, hasta el 2026-10-10, le restaba N a la Defensa: contra un tanque casi no servía.)

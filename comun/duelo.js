@@ -1293,7 +1293,7 @@ const Duelo = (() => {
     if(dn && dn.aplicado){
       const crit = d.resultado === 'pego' && d.crit && d.crit.critico;
       if(dn.invulnerable) L.push('Daño: era Invulnerable, no hizo nada');
-      else if(d.hab && dn.ignoraDef && !dn.manual) L.push(`Daño ${d.hab.dano ? d.hab.dano.tipo : 'mágico'}: ${dn.golpe} directo a la vida${dn.freno ? ` (lo frenan: ${dn.freno})` : ''} (${dn.hpAntes} → ${dn.hpDespues} HP)`);
+      else if(d.hab && dn.ignoraDef && !dn.manual) L.push(`Daño ${d.hab.dano ? d.hab.dano.tipo : 'mágico'}: ${dn.golpe} directo a la vida${dn.cargaMult ? ` (${dn.cargaMult})` : ''}${dn.freno ? ` (lo frenan: ${dn.freno})` : ''} (${dn.hpAntes} → ${dn.hpDespues} HP)`);
       else if(dn.manual) L.push(`Daño: ${dn.golpe} (se aplicó a mano)`);
       else if(crit) L.push(`Daño: ${dn.crudo} × ${dn.mult} = ${dn.golpe} derecho a la vida (${dn.hpAntes} → ${dn.hpDespues} HP)`);
       else if(dn.mitad) L.push(`Daño: pasó la mitad → ${dn.recibido} (${dn.hpAntes} → ${dn.hpDespues} HP)`);
@@ -1418,7 +1418,7 @@ const Duelo = (() => {
         : crit ? `💥 ${m.atacante.nombre} → ${m.defensor.nombre}: ${dn.golpe} de daño (×${m.crit.mult}) derecho a la vida (${dn.hpAntes} → ${dn.hpDespues} HP)`
         : dn.mitad ? `⚠ ${m.atacante.nombre} → ${m.defensor.nombre}: pasó la mitad: ${dn.recibido} de daño (${dn.hpAntes} → ${dn.hpDespues} HP)`
         // El daño especial (ignora la Defensa): lo que lo frena va en `freno` (Defensa especial, Res. elemental) — no se repite como «Defensa» (2026-10-07).
-        : dn.ignoraDef ? `⚔ ${m.atacante.nombre} → ${m.defensor.nombre}: ${dn.crudo}${dn.freno ? ` − ${dn.freno}` : ''} = ${dn.recibido} de daño, directo a la vida (${dn.hpAntes} → ${dn.hpDespues} HP)`
+        : dn.ignoraDef ? `⚔ ${m.atacante.nombre} → ${m.defensor.nombre}: ${dn.crudo}${dn.cargaMult ? ` (${dn.cargaMult})` : ''}${dn.freno ? ` − ${dn.freno}` : ''} = ${dn.recibido} de daño, directo a la vida (${dn.hpAntes} → ${dn.hpDespues} HP)`
         : `⚔ ${m.atacante.nombre} → ${m.defensor.nombre}: ${dn.crudo} − ${defTxt(dn)}${dn.freno ? ` − ${dn.freno}` : ''} = ${dn.recibido} de daño (${dn.hpAntes} → ${dn.hpDespues} HP)`;
       if(_num(dn.mitiMiti) > 0 && !dn.manual) anuncio += ` · 🛡 ${dn.mitiMitiNombre || 'su protector'} se llevó ${_num(dn.mitiMiti)} (Miti-Miti)`;   // Miti-Miti (Tanque, 2026-10-11): lo que se llevó el protector
     });

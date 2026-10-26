@@ -138,6 +138,11 @@
 > - [x] (2026-10-26, hecha: «Tirar la bronca») **😤 Provocar para un aliado, habilidad de Support para creeps (2026-10-26, idea del dueño):** elige un aliado (el tanque); los rivales alrededor de
 >   ese aliado tiran Res.Mt contra el Ef.Esp del support y, si no la resisten, quedan Provocados por ese aliado N turnos. Detalle en `docs/diseno-roles-creep.md`
 >   (Support, idea 4c). Para automatizarlo, el Provocado tiene que guardar quién provocó (hoy es «a mano»).
+> - [ ] **🎯 «Débil» y «Resistente» en el token (2026-10-26, dueño: «cuando uno ejecuta una habilidad con un daño elemental y alguno de los objetivos tiene
+>   debilidad contra ese daño elemental, que aparezca en el token algún cartel que diga débil o algún tipo de lenguaje visual que lo identifique fácilmente.
+>   Lo mismo a la inversa, pero resistente»):** al elegir el objetivo (o el área) de una habilidad con daño elemental, cada token que le pega de más (la luz a
+>   un no-muerto o demonio, una debilidad a ese elemento) lleva una marca «DÉBIL» y el que lo frena (Res. a ese elemento, lo siniestro contra un no-muerto)
+>   «RESISTENTE», a la vista antes de confirmar. Base: `Combatiente.identidadElemento` y las resistencias elementales (`resistenciasDe`, js/13).
 > - [ ] **🗡🌑 Arma sombría, habilidad de Support para creeps (2026-10-26, dueño: «pensemos para futuro, un encantamiento… algo así como arma sombría, que le
 >   suma el mismo efecto de este skill [la Aguja siniestra] al ataque de un aliado durante X cantidad de turnos… lo vamos a dar al support»):** a un aliado en
 >   su Rango, sus golpes con arma dejan Punto débil (−1 a las resistencias a crítico) durante unos turnos, como las Armas elementales. Detalle en

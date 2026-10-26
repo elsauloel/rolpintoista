@@ -1097,6 +1097,12 @@ prueba('💥 Nova arcana (Mago, 2026-10-26): onda alrededor, PdG.Esp contra Evas
   igual([h.duelo.objetivo, h.duelo.radio, h.duelo.tira, h.duelo.contra.join(','), h.duelo.danoFormula, h.duelo.efectos[0].empuja, !!h.duelo.aliados, h.cd, e.etiquetas.includes('mago')],
     ['onda', 1, 'pdgmg', 'eva', '2d6', 2, false, 3, true]);
 });
+prueba('🏹 Tiro que derriba (Rango, 2026-10-26): un ataque normal; si pega, empuja 1 y Sentado', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Tiro que derriba'), h = armarHabilidadDeCreep(e.datos, 2);
+  const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});
+  igual([h.duelo.arma.fijo, h.duelo.arma.dados, (a.efectos || []).map(x => x.empuja || x.nombre).join(','), h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('rango')],
+    [0, 0, '1,Sentado', 'ATAQUE', 2, 3, true]);
+});
 prueba('✨ Parpadeo (Mago, 2026-10-26): Flash, se teletransporta hasta 3 casillas (solo él)', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Parpadeo'), h = armarHabilidadDeCreep(e.datos, 2);
   igual([!!h.flash, h.blink.distancia, !!h.blink.soloYo, h.modo, h.spCosto, h.cd, e.etiquetas.includes('mago')], [true, 3, true, 'auto', 2, 2, true]);

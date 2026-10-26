@@ -159,30 +159,55 @@ function blinkDeHabilidad(msg){
   if(!yo){ toast(`${msg.nombre || 'Blink'}: ${tipoYo === 'creep' ? 'el creep' : 'tu personaje'} no tiene token en el mapa`); fin(); return; }
   const dist = Math.max(1, Math.round(num(msg.distancia)) || 3), nom = msg.nombre ? esc(msg.nombre) + ': ' : '';
   if(!$('#botonera-capa').hidden) escapeABotonera();
+  // 🎯 ¡Al frente! (2026-10-26, el Support): la casilla de llegada tiene que estar pegada a un rival del que va.
+  const pegadaARival = (h, t) => vecinosDeCasilla(h).some(c => [...tokens.values()].some(x => x !== t && x.col === c.col && x.fila === c.fila && !x.oculto && !x.bajoTierra && dueloEsRival(t, x)));
   const adonde = (id, t) => elegirDestino(async h => {
     if(distanciaHex(h, t) > dist){ toast(`Tiene que ser a ${dist} casillas o menos`); adonde(id, t); return; }
     if(elementoSolidoEn(h.col, h.fila) || [...tokens.values()].some(x => x !== t && x.col === h.col && x.fila === h.fila)){ toast('Esa casilla no está libre: elegí otra'); adonde(id, t); return; }
+    if(msg.alFrente && !pegadaARival(h, t)){ toast('Tiene que ser una casilla pegada a un rival'); adonde(id, t); return; }
     const desde = {col: t.col, fila: t.fila};
     try{
       await coleccionTokens().doc(id).update({col: h.col, fila: h.fila, ruta: firebase.firestore.FieldValue.delete()});
       fin();
+      if(msg.alFrente){ await blinkAlFrente(id, t, msg, desde, h); return; }
       momentoAbrir({tipo: 'blink', icono: '✨', titulo: `${msg.nombre || 'Blink'}: ${nombreDe(t)} salta`, resultado: `De donde estaba aparece ${distanciaHex(desde, h)} casilla${distanciaHex(desde, h) === 1 ? '' : 's'} más allá, en un parpadeo.`, estado: 'listo'});
     }catch(err){
       console.error('No se pudo hacer el blink:', err);
       toast(err && err.code === 'permission-denied' ? `No podés mover a ${nombreDe(t)}: que lo mueva su jugador o el GM (✋ a mano)` : 'No se pudo hacer el blink — revisá la consola');
     }
-  }, `<b>✨ ${nom}¿adónde salta ${esc(nombreDe(t))}?</b> <span>clic en una casilla libre a ${dist} o menos · Esc o clic derecho cancelan</span>`, true, fin);
+  }, `<b>✨ ${nom}¿adónde ${msg.alFrente ? 'va' : 'salta'} ${esc(nombreDe(t))}?</b> <span>clic en una casilla libre a ${dist} o menos${msg.alFrente ? ', pegada a un rival' : ''} · Esc o clic derecho cancelan</span>`, true, fin);
   if(msg.soloYo){ adonde(yo[0], yo[1]); return; }
   elegirDestino(h => {
     const e = [...tokens.entries()].find(([, x]) => x.col === h.col && x.fila === h.fila && !x.oculto);
     if(!e){ toast('Ahí no hay nadie: hacé clic sobre vos o sobre un aliado'); blinkDeHabilidad(msg); return; }
     const [id, t] = e;
+    if(msg.alFrente){   // ¡Al frente!: a un aliado (no a él mismo) dentro de su Rango
+      const rng = num((rangoDeToken(yo[1]) || {}).rng);
+      if(id === yo[0]){ toast('¡Al frente! es para un aliado, no para sí mismo'); blinkDeHabilidad(msg); return; }
+      if(dueloEsRival(yo[1], t)){ toast('Tiene que ser un aliado'); blinkDeHabilidad(msg); return; }
+      if(rng > 0 && distanciaHex(yo[1], t) > rng){ toast(`${nombreDe(t)} está fuera de su Rango (${rng})`); blinkDeHabilidad(msg); return; }
+    }
     if(id !== yo[0]){
       if(dueloEsRival(yo[1], t)){ toast('El blink es para vos o para un aliado'); blinkDeHabilidad(msg); return; }
       if((solidosSet().size || hayParedes()) && !lineaLibre(yo[1], t, solidosSet())){ toast(`No ves a ${nombreDe(t)}: hay algo sólido en el medio`); blinkDeHabilidad(msg); return; }
     }
     adonde(id, t);
   }, `<b>✨ ${nom}¿a quién?</b> <span>clic sobre vos o sobre un aliado que ves · Esc o clic derecho cancelan</span>`, true);
+}
+// 🎯 ¡Al frente! (2026-10-26, el Support): ya en su lugar, el estado del frente (+2 PdG y +2 Evasión hasta el final de su próximo turno), la zona de la
+// casilla de llegada (si es suya, esta pantalla) y el aviso (Crónica y Mesa).
+async function blinkAlFrente(id, t, msg, desde, h){
+  const t1 = tokens.get(id) || t, nom = nombreDe(t1), spec = {nombre: msg.estado || 'Al frente'};
+  let aplicado = '';
+  try{
+    if(t1.tipo === 'creep'){ if(soyGM){ await modificarCreep(t1.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec)); aplicado = spec.nombre; } }
+    else { await EstadosAplicar.encolarPj({fichaId: t1.fichaId, duenoUid: t1.duenoUid, spec, origen: msg.nombre || '¡Al frente!'}); aplicado = spec.nombre; }
+  }catch(err){ console.error('¡Al frente!: no se pudo poner el estado', err); }
+  try{ if(typeof zonaRevisarToken === 'function') zonaRevisarToken(t1, false, false, false, desde); }catch(err){}
+  const k = distanciaHex(desde, h);
+  const txt = `${nom} aparece ${k} casilla${k === 1 ? '' : 's'} más allá, pegado a un rival${aplicado ? `: ${aplicado} (+2 PdG y +2 Evasión hasta el final de su próximo turno)` : ' (el +2 PdG y +2 Evasión, a mano)'}.`;
+  momentoAbrir({tipo: 'blink', icono: '🎯', titulo: `${msg.nombre || '¡Al frente!'}: ${nom} al frente`, resultado: txt, estado: 'listo'});
+  try{ mesaLinea(`🎯 ${msg.nombre || '¡Al frente!'}: ${txt}`, 'recordatorio'); }catch(err){}
 }
 /* La Varita del caos (2026-10-08, dueño, segunda vuelta): se elige a alguien (aliado, rival o uno mismo) y se tira 1d20 (Combatiente.caosResultado):
    lo que se quiere es un buff a un aliado o un debuff a un rival. 20: sale bien y quien la usa elige cuál; Común 10–19 / Buena 8–19: bien, al azar;
@@ -702,6 +727,7 @@ window.addEventListener('message', e => {
   if(e.data.tipo === 'acelerador-habilidad' && typeof aceleradorDeHabilidad === 'function') aceleradorDeHabilidad(e.data);
   if(e.data.tipo === 'transfusion-habilidad' && typeof transfusionDeHabilidad === 'function') transfusionDeHabilidad(e.data);
   if(e.data.tipo === 'blink-habilidad') blinkDeHabilidad(e.data);
+  if(e.data.tipo === 'bomba-humo-habilidad') bombaDeHumo(e.data);   // 💨 (js/57)
   if(e.data.tipo === 'caos-habilidad') caosDeHabilidad(e.data);
   if(e.data.tipo === 'zona-persistente-habilidad') zonaPersistenteDeHabilidad(e.data);
   if(e.data.tipo === 'trampa-habilidad') trampaDeHabilidad(e.data);
@@ -876,9 +902,10 @@ function dueloElegirObjetivoMapa(msg){
         try{ ataqueCarga = await cargaEmbestida(mio, t, ataque, yo); }catch(err){ console.error('No se pudo tomar carrera:', err); ataqueCarga = ataque; }
         if(!ataqueCarga){ pedir(); return; }
       }
-      if(ataque && ataque.saltoHab && mio && typeof saltoHab === 'function'){   // 🦘 el Salto (js/55): cae al lado del objetivo
+      const conSalto = ataque && (ataque.saltoHab ? ataque : ataque.hab && ataque.hab.saltoHab ? ataque.hab : null);   // (una habilidad sin arma: el Takle, 2026-10-26)
+      if(conSalto && mio && typeof saltoHab === 'function'){   // 🦘 el Salto (js/55): cae al lado del objetivo · 💥 el Takle: corre hasta quedar pegado
         let r = null;
-        try{ r = await saltoHab(mio, t, ataque, yo); }catch(err){ console.error('No se pudo saltar:', err); r = true; }
+        try{ r = await saltoHab(mio, t, conSalto, yo); }catch(err){ console.error('No se pudo saltar:', err); r = true; }
         if(!r){ pedir(); return; }
       }
       if(ataque && ataque.punalada && mio && typeof punaladaBonos === 'function'){   // 🗡 la puñalada (js/59): el bono si está en la espalda
@@ -898,6 +925,11 @@ function dueloElegirObjetivoMapa(msg){
         try{ r = await remateBonos(mio, t, ataqueCarga || ataque, yo); }catch(err){ console.error('No se pudo ver la vida del objetivo:', err); r = ataqueCarga || ataque; }
         if(!r){ pedir(); return; }
         ataqueCarga = r;
+      }
+      if(ataque && ataque.desesperado && mio && typeof desesperadoBonos === 'function'){   // 😤 Golpe desesperado (js/69): los bonos según la vida propia
+        let r = null;
+        try{ r = await desesperadoBonos(mio, ataqueCarga || ataque, yo); }catch(err){ console.error('No se pudo ver la vida propia:', err); r = ataqueCarga || ataque; }
+        ataqueCarga = r || ataqueCarga;
       }
       if(ataque && ataque.manada && mio && typeof patotaBonos === 'function'){   // 👊 Patotear / Jauría (js/65): +1 dado por aliado pegado al objetivo
         let r = null;
@@ -2174,6 +2206,8 @@ async function dueloAplicarEfectoBase(d, ef){
   if(!t) return {manual: true, nota: 'el token ya no está: aplicalo a mano'};
   if(typeof talismanUnaVez === 'function' && !talismanUnaVez(d, ef)) return {nota: 'el talismán ya lo hizo este turno'};   // 🔮 la Cabeza reducida, el Muñeco vudú (js/53)
   if(spec.nombre === 'Demora') return dueloDemora(d.defensor.tokenId, spec.stacks);   // (stacks = cuántos lugares: el Cascotazo, Demora 2)
+  if(spec.nombre === 'Al final del orden') return alFinalDelOrden(d.defensor.tokenId, d.defensor.nombre, d.hab && d.hab.nombre);   // 💥 Takle (js/04)
+  if(spec.nombre === 'Sube en el orden') return dueloAdelanto(d.defensor.tokenId, spec.stacks);   // 💨 Envión (2026-10-26)
   if(spec.soltar && !spec.soltar.visual){   // 🕸 una copia vieja de la Red Nerubian o de Tela de araña: la telaraña sale del nombre (js/68)
     const v = Combatiente.atrapaDeNombre((d.hab && d.hab.nombre) || (d.ataque && (d.ataque.habNombre || d.ataque.nombre)) || '');
     if(v) spec.soltar = {...spec.soltar, visual: v};
@@ -2321,6 +2355,25 @@ async function dueloDemora(tokenId, lugares){
   if(!(await guardarIniciativa({orden, turno}))) return {manual: true, nota: 'no se pudo mover en el orden de turnos: a mano'};
   const falta = n - (j - i);
   return {nota: `baja ${txt(j - i)} en el orden de turnos (${i + 1}.º → ${j + 1}.º)${falta > 0 && j < orden.length - 1 ? ` (${txt(falta)} más, a mano, al empezar la próxima ronda)` : ''}`};
+}
+
+/* 💨 Envión (2026-10-26, dueño: «sube en uno en la tabla de iniciativas»): sube `lugares` (1) en el orden de turnos. No pasa por encima del que tiene el
+   turno (si ya es el siguiente, o es el del turno, no sube); si ya actuó esta ronda, sube igual (le sirve para la próxima); el primero no sube. */
+async function dueloAdelanto(tokenId, lugares){
+  const n = Math.max(1, Math.round(num(lugares)) || 1), txt = k => `${k} lugar${k === 1 ? '' : 'es'}`;
+  const orden = iniciativa.orden.slice();
+  const i = orden.findIndex(o => o.id === tokenId);
+  if(i < 0) return {manual: true, nota: 'no está en el orden de turnos: a mano'};
+  if(i === 0) return {nota: 'ya era el primero del orden de turnos'};
+  if(i === iniciativa.turno) return {nota: 'es su turno: no sube'};
+  const piso = i > iniciativa.turno ? iniciativa.turno + 1 : 0;   // no pasa por encima del que tiene el turno
+  const j = Math.max(i - n, piso);
+  if(j >= i) return {nota: 'ya es el siguiente en jugar: no sube más'};
+  const activo = orden[iniciativa.turno] ? orden[iniciativa.turno].id : null;
+  const [x] = orden.splice(i, 1); orden.splice(j, 0, x);
+  const turno = activo ? Math.max(0, orden.findIndex(o => o.id === activo)) : iniciativa.turno;
+  if(!(await guardarIniciativa({orden, turno}))) return {manual: true, nota: 'no se pudo mover en el orden de turnos: a mano'};
+  return {nota: `sube ${txt(i - j)} en el orden de turnos (${i + 1}.º → ${j + 1}.º)${i < iniciativa.turno ? ': ya jugó esta ronda, le sirve para la próxima' : ''}`};
 }
 
 // Le manda un pedido del duelo (opciones de defensa, tirar, contraatacar) al iframe de la ficha o de las Acciones del creep de ese lado, sin mostrarlo.

@@ -1712,3 +1712,10 @@ versión parecida en más de una, es candidato a juntar.
   Con `resetea: true` además (2026-10-26, dueño): al que ya tiene el estado y sigue adentro al pasar de ronda (o vuelve a entrar), sin tirada ni daño,
   el estado vuelve a sus stacks (`Combatiente.acumularVeneno` no suma si el nuevo trae `resetea`; lo conservan `EstadosAplicar` y `FichaAcciones.estadoDeSpec`);
   si ya no lo tiene, le vuelve a tirar.
+- **Habilidades de creep del 2026-10-26 (camino a 20 por rol)**: `Combatiente.desesperadoBonos(frac)` / `desesperadoTxt` (el Golpe desesperado; la Ejecución
+  «con tu arma» con `desesperado`); `habEjecucion` pasa `saltoHab` + `corre` en una dirigida contra un rival (el Takle); presets nuevos **Enfurecido** (la
+  Furia), **Envión** (escudo de 10 que se gasta y se renueva, no se suma) y **Al frente** (+2 PdG y +2 Evasión, `turnosCompletos` 1); `bombaHumo` en una
+  habilidad (creep: `creeps-base.js` la copia y `CreepAcciones.terminarHab` llama `ui.bombaHumo`; personaje: `FichaAcciones.avisarZonaAlMapa` manda
+  `bomba-humo-habilidad`, registrado en `mensajes-mapa.js`). Efectos que aplica el mapa por nombre: «Al final del orden», «Sube en el orden» y la Demora
+  con `stacks` = cuántos lugares.
+

@@ -1819,3 +1819,12 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   invocación va como primer paso de «▶ Empieza tu turno» (js/04 `inicioTurnoPendiente`; al «✔ Aplicar», `inicioTurnoAplicar` hace brillar a quien provoca); el de un
   creep, y el de un inicio aplicado sin ese reporte, es el Anuncio de siempre del Provocado (js/04 `provocadoAvisar`), que dice «Estás provocado por Fulano»; al Aceptar (js/16 `momentoAvisoCentro` →
   `provocadoBrilloPedir`), el momento `provocado-brillo` (js/16 → `provocadoBrilloRecibido`) hace brillar al que provoca en todas las pantallas hasta que pasa el turno (`provocadoDibujar`, js/05).
+- **Las ocho del camino a 20 por rol** (2026-10-26, dueño): **😤 Golpe desesperado** (`desesperadoBonos`, js/69: los bonos según la vida PROPIA, con
+  `Combatiente.desesperadoBonos`); **💥 Takle** (`saltoHab` de js/55 con `corre`: corre hasta quedar pegado, sin pasar paredes; vale también para una
+  habilidad sin arma: `ataque.hab.saltoHab`, js/13; el efecto «Al final del orden» → `alFinalDelOrden`, js/04: se le corta el turno o, si ya era el último,
+  pierde el de esta ronda); **💨 Envión** (el efecto «Sube en el orden» → `dueloAdelanto`, js/13: no pasa por encima del que tiene el turno); **🎯 ¡Al
+  frente!** (`blinkDeHabilidad` con `alFrente`: a un aliado en el Rango, a una casilla pegada a un rival; `blinkAlFrente` pone el estado y revisa la zona de
+  llegada); **💨 Bomba de humo** (`bombaDeHumo`, js/57: `crearNiebla` a sus pies, Sigilo y el cartel del movimiento libre del Hit and run; la usan las
+  Acciones de un creep, `ui.bombaHumo` de js/12, y el Asalto por el aviso `bomba-humo-habilidad`, js/11 y js/13). La `dueloDemora` ahora baja N lugares
+  (el Cascotazo, Demora 2). El botón ✨ de los creeps (js/71) ofrece rivales cuando la habilidad Flash va contra un rival (el Takle).
+

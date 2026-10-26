@@ -40,6 +40,7 @@ const MensajesMapa = (() => {
     'acelerador-habilidad': {de: 'ficha', a: 'mapa', que: 'elegir la casilla de un Acelerador (`turnos`, `no2`)'},
     'transfusion-habilidad': {de: 'ficha', a: 'mapa', que: 'Transfusión sanguínea: elegir quién da, quién recibe y cuánto (`max`)'},
     'blink-habilidad':  {de: 'ficha', a: 'mapa', que: 'el blink: a quién (vos o un aliado que ves) y adónde (`distancia`)'},
+    'bomba-humo-habilidad': {de: 'ficha', a: 'mapa', que: 'la Bomba de humo: la niebla a sus pies, Sigilo y el movimiento libre (`radio`, `turnos`, `mover`)'},
     'caos-habilidad':   {de: 'ficha', a: 'mapa', que: 'la Varita del caos: el objetivo, el d10 y el estado al azar (`caos`)'},
     'zona-persistente-habilidad': {de: 'marco', a: 'mapa', que: 'dejar una zona persistente (lo arma Combatiente.zonaDeHab)'},
     'trampa-habilidad': {de: 'marco', a: 'mapa', que: 'elegir la casilla de una trampa (`trampa`, lo arma Combatiente.trampaDeHab)'},

@@ -146,6 +146,10 @@ const ESTADOS_PRESET = [
   // para no tirar un dado, simplemente suceda»).
   {nombre:'Frenético', polaridad:'buff', turnos:2, turnosCompletos:true, hpTurno:4, stacksTurno:0, mods:[{stat:'pdg', val:3}, {stat:'pdgmg', val:3}, {stat:'dmg', val:5}, {stat:'dmgesp', val:5}, {stat:'eva', val:-2}, {stat:'def', val:-2}],
     detalle:'Frenético: +3 a la Probabilidad de Golpe (también la especial) y +5 al daño (también al Efecto especial), pero −2 a la Evasión y −2 a la Defensa; y se cura 4 apenas se lo ponen y otra vez al empezar cada uno de sus turnos. Dura sus próximos 2 turnos completos (el turno en que se lo dan no cuenta). Si se lo vuelven a dar, no se suma: vuelve a durar 2 turnos. ⚙ Automatizado.'},
+  // Enfurecido (2026-10-26, dueño: la Furia del choque pesado, «más 3 a la probabilidad de golpe y más 4 al daño… 2 turnos completos adicionales al turno
+  // en el que se lo castea»), con −2 Evasión y −2 Defensa.
+  {nombre:'Enfurecido', polaridad:'buff', turnos:2, turnosCompletos:true, mods:[{stat:'pdg', val:3}, {stat:'dmg', val:4}, {stat:'eva', val:-2}, {stat:'def', val:-2}],
+    detalle:'Enfurecido: +3 a la Probabilidad de Golpe y +4 al daño, pero −2 a la Evasión y −2 a la Defensa. Dura el turno en que se lo pone y sus próximos 2 turnos completos. Si se lo vuelve a poner, no se suma: vuelve a durar 2 turnos. ⚙ Automatizado.'},
   // Redoble (2026-10-25, dueño: el Support, «Redoble de tambores»): +2 a los No2 máximos durante su próximo turno completo (el No2 se recarga al
   // máximo al empezar su turno, así que ese turno tiene 2 más).
   {nombre:'Redoble', polaridad:'buff', turnos:1, turnosCompletos:true, mods:[{stat:'nitros', val:2}],
@@ -205,6 +209,14 @@ const ESTADOS_PRESET = [
   // Shield (Support, dueño 2026-10-11): absorbe 14 de daño y dura hasta gastarse — no vence por turnos ni se recarga; gastado, se va (seGasta).
   {nombre:'Shield', polaridad:'buff', permanente:true, turnos:0, escudoMagico:14, sinRecarga:true, seGasta:true,
     detalle:'Shield del Support: absorbe 14 de daño, de un golpe o de varios, como una barra de HP secundaria (🛡). Dura hasta gastarse: no vence por turnos ni se recarga.'},
+  // Envión (2026-10-26, dueño: el Support, «un escudo de 10 de HP que absorbe daño. Del tipo vida extra»; «dura hasta que se gaste. El escudo reemplaza,
+  // no se suma»): como el Shield, absorbe 10 y dura hasta gastarse; otro Envión lo renueva (no se suma, a diferencia de la Vida extra).
+  {nombre:'Envión', polaridad:'buff', permanente:true, turnos:0, escudoMagico:10, sinRecarga:true, seGasta:true,
+    detalle:'Envión del Support: absorbe 10 de daño, de un golpe o de varios, como una barra de HP secundaria (🛡). Dura hasta gastarse: no vence por turnos ni se recarga. Otro Envión lo deja otra vez en 10 (no se suma). ⚙ Automatizado.'},
+  // Al frente (2026-10-26, dueño: el Support, «¡Al frente!»: «que dé más 2 a la probabilidad de golpe y más 2 a la evasión hasta el final de su próximo
+  // turno»): el turno en que se lo dan no cuenta (`turnosCompletos`).
+  {nombre:'Al frente', polaridad:'buff', turnos:1, turnosCompletos:true, mods:[{stat:'pdg', val:2}, {stat:'pdgmg', val:2}, {stat:'eva', val:2}],
+    detalle:'Al frente: +2 a la Probabilidad de Golpe (también la especial) y +2 a la Evasión, hasta el final de su próximo turno. ⚙ Automatizado.'},
   // Barrera (dueño, 2026-10-06): 2 turnos — con el turno propio, la de 1 turno que uno se pone en su turno se iba antes de que lo atacaran.
   {nombre:'Barrera', polaridad:'buff', turnos:2, escudoMagico:8,
     detalle:'Blindaje del Tanque: absorbe daño de la próxima fuente de daño, como una barra de HP secundaria (🛡). Si la fuente hace más, el resto entra normal. Dura 2 turnos de quien la tiene (si se la pone en su turno, lo cubre hasta el final del siguiente).'},

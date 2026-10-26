@@ -46,7 +46,19 @@ function flashCreepCosto(c){
 // 🦶 Una onda o un cono (el Pisotón, 2026-10-26): sale de él, no se le da a nadie.
 const flashCreepAlrededor = h => !!(h && h.duelo && (h.duelo.objetivo === 'onda' || h.duelo.objetivo === 'cono'));
 // A quién se la puede dar: él y sus aliados (creeps vivos, no bajo tierra) dentro de su Rango.
+// 💥 Contra un rival (el Takle, 2026-10-26): los rivales vivos a su alcance (el `alcanceN` fijo de la habilidad, o su Rango).
+function flashCreepRivales(c){
+  const du = c.h.duelo || {}, alc = du.alcance === 'fijo' ? num(du.alcanceN) : num((rangoDeToken(c.t) || {}).rng), out = [];
+  for(const [id, t] of tokens.entries()){
+    if(t.tipo === 'creep' || t.oculto || t.bajoTierra || etereoDe(t) || (typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(id))) continue;
+    if(typeof ocultoPorSigiloParaMi === 'function' && ocultoPorSigiloParaMi(t)) continue;
+    if(alc > 0 && distanciaHex(c.t, t) > alc) continue;
+    out.push({id, t, mismo: false});
+  }
+  return out;
+}
 function flashCreepObjetivos(c){
+  if(c.h.duelo && c.h.duelo.objetivo === 'enemigo') return flashCreepRivales(c);
   const rng = num((rangoDeToken(c.t) || {}).rng), out = [];
   for(const [id, t] of tokens.entries()){
     if(t.tipo !== 'creep' || t.bajoTierra) continue;
@@ -61,7 +73,7 @@ function flashCreepObjetivos(c){
 // objetivo»): primero qué creep y qué habilidad; después, a quién (si hay uno solo posible —sobre sí, una onda—, sin el segundo menú).
 async function abrirFlashCreep(){
   const listos = flashCreepListos().map(c => ({c, objs: flashCreepObjetivos(c)})).filter(x => x.objs.length);
-  if(!listos.length){ AvisoCombate.mostrar({icono: '✨', titulo: 'Flash de un creep', texto: 'Ningún aliado está dentro de su Rango.'}); return; }
+  if(!listos.length){ AvisoCombate.mostrar({icono: '✨', titulo: 'Flash de un creep', texto: 'No hay a quién dársela: ningún aliado dentro de su Rango (ni un rival a su alcance).'}); return; }
   const duelo = await flashCreepAtacanteDelDuelo();
   const botones = listos.slice(0, 10).map(({c, objs}) => {
     const k = flashCreepCosto(c), ataca = !!(duelo && objs.some(o => o.id === duelo.tokenId));

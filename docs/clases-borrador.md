@@ -166,6 +166,10 @@ cuesta 1 por defecto (`jobBudget`, 3 puntos + 3 por nivel).
    el ataque no lo dé (golpe directo, cono, onda). *(Auditada 2026-10-10 con el
    dueño: el «giro» es el dodge roll.)*
 10. **Robar SP** [1] — Gana 2 SP por cada crítico obtenido.
+11. ✅ **Bomba de humo** — **SP:** 3. **No2:** 3. Reventás una bomba a tus pies: una nube de humo de diámetro 3 (7 casillas) por 1 turno, que tapa la vista
+    desde afuera; entrás en **Sigilo** aunque te estén mirando (el que está pegado a vos, adentro del humo, te sigue viendo y te descubre); y te movés
+    **hasta 2 casillas gratis**, sin ataques de oportunidad. ⚙ Automatizado. *(Skill nueva, 2026-10-26: la Bomba de humo de los creeps, que el dueño
+    quiso también para el Asalto; la de clase, 2 casillas en vez de 3.)*
 
 ## Tanque ⏳
 

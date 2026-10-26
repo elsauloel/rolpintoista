@@ -1167,7 +1167,7 @@ const FichaAcciones = (() => {
     if(FichaBotonera.modoHab(it) !== 'auto'){ anunciarHabilidad(S, it, ui); tirarPrimeraDeHab(S, it, ui); return; }
     if(!FichaBotonera.dueloDe(it)){
       if(it.trampaColocar) return;   // una trampa sola: el anuncio y la casilla ya los maneja colocarTrampa
-      if(it.portalMapa || it.blink || it.caos || it.aceleradorMapa || it.transfusionMapa){ ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); return; }   // los portales, el blink, el caos y el Acelerador: se anuncian y se eligen en el mapa
+      if(it.portalMapa || it.blink || it.bombaHumo || it.caos || it.aceleradorMapa || it.transfusionMapa){ ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); return; }   // los portales, el blink, el caos y el Acelerador: se anuncian y se eligen en el mapa
       if(it.invoca && it.invoca.invId){ ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); return; }   // solo invoca: se anuncia (la invocación ya la hizo invocarConHab)
       ui.toast(`${it.nombre}: todavía no tiene armada la ejecución paso a paso (✨) — se ejecutó como semiautomática`); anunciarHabilidad(S, it, ui); tirarPrimeraDeHab(S, it, ui); return;
     }
@@ -1235,6 +1235,12 @@ const FichaAcciones = (() => {
     if(h.caos){
       try{ ui.alMapa('caos-habilidad', {fichaId: ui.yo().ref, casteadorTipo: 'pj', nombre: h.nombre, caos: h.caos}); }
       catch(err){ console.error('No se pudo avisar el caos al mapa:', err); }
+      return;
+    }
+    // 💨 La Bomba de humo (2026-10-26, el Asalto): la niebla a sus pies, Sigilo y el movimiento libre (vtt-hexgrid/js/57).
+    if(h.bombaHumo){
+      try{ ui.alMapa('bomba-humo-habilidad', {fichaId: ui.yo().ref, casteadorTipo: 'pj', nombre: h.nombre, radio: num(h.bombaHumo.radio) || 1, turnos: num(h.bombaHumo.turnos) || 1, mover: num(h.bombaHumo.mover) || 2}); }
+      catch(err){ console.error('No se pudo avisar la Bomba de humo al mapa:', err); }
       return;
     }
     // El blink (2026-10-08): quien la usa (o un aliado que ve) salta hasta `distancia` casillas.

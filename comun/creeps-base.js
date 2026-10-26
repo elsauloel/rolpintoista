@@ -159,6 +159,7 @@
     if(sp.estandarte){ h.estandarte = {...sp.estandarte}; h.modo = 'auto'; }
     if(sp.dash){ h.dash = {...sp.dash}; h.modo = 'auto'; }
     if(sp.blink){ h.blink = {...sp.blink}; h.modo = 'auto'; }
+    if(sp.bombaHumo){ h.bombaHumo = {...sp.bombaHumo}; h.modo = 'auto'; }   // 💨 la Bomba de humo (2026-10-26): la niebla, Sigilo y el movimiento libre (vtt-hexgrid/js/57)
     if(sp.provocarAliado){ h.provocarAliado = {...sp.provocarAliado}; h.modo = 'auto'; }   // 😤 Tirar la bronca (2026-10-26): el aliado y el área los elige el mapa (vtt-hexgrid/js/77)   // ✨ el Parpadeo (2026-10-26): el salto lo hace el mapa (vtt-hexgrid/js/13 blinkDeHabilidad)   // 💨 el Dash (2026-10-26): el camino y el ataque los hace el mapa (vtt-hexgrid/js/76)
     if(sp.meteoro){ h.meteoro = {...sp.meteoro}; h.modo = 'auto'; }   // ☄ el Meteoro (2026-10-24): la marca y la hace caer el mapa (vtt-hexgrid/js/74)   // 🚩 el Estandarte de guerra (2026-10-24): lo clava el mapa (vtt-hexgrid/js/73)
     if(sp.flash) h.flash = true;

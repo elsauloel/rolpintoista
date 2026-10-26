@@ -59,7 +59,7 @@
     'Colmillos que perforan': ['choque liviano', 'sangrado'], 'Tajo brutal': ['choque liviano', 'sangrado'], 'Desgarro': ['choque liviano', 'sangrado'],
     'Corte certero': ['choque liviano', 'sangrado'], 'Zarpa certera': ['choque liviano', 'sangrado'], 'Tajo de carnicero': ['choque liviano', 'sangrado'],
     'Destripar': ['choque liviano', 'sangrado'],
-    'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'], 'Mantener a raya': ['rango', 'mantener a raya'], 'Flecha que atraviesa': ['rango', 'atravesar'], 'Disparo y repliegue': ['rango', 'disparar y replegarse'], 'Nube tóxica': ['debuffer', 'nube tóxica'], 'Empuje': ['support', 'empower'], 'Sanguijuela': ['debuffer', 'sanguijuela'], 'Luz para los suyos': ['support', 'luz para los suyos'], 'Finta': ['choque liviano', 'finta'], 'Dash': ['choque liviano', 'dash'], 'Aguja siniestra': ['debuffer', 'punto débil'], 'Parpadeo': ['mago', 'parpadeo'], 'Tiro que derriba': ['rango', 'tiro que derriba'], 'Ojo de asesino': ['choque liviano', 'buscar el crítico'], 'Pisotón': ['choque pesado', 'aturdir'], 'Tirar la bronca': ['support', 'provocar para un aliado'], 'Nova arcana': ['mago', 'nova arcana'], 'Ráfaga de viento': ['mago', 'ráfaga de viento'], 'Tiro al arma': ['rango', 'tiro al arma'], 'Tiro certero': ['rango', 'tiro certero'], 'Tormenta arcana': ['mago', 'tormenta arcana'], 'Cascotazo': ['mago', 'proyectil de piedra'], 'Abanico': ['rango', 'abanico'], 'Smite': ['support', 'smite'], 'Prisión de hielo': ['mago', 'prisión de hielo'], 'Degollar': ['choque liviano', 'todo al ataque'], 'Clavar a la pared': ['rango', 'clavar a la pared'], 'Maldición debilitante': ['debuffer', 'debilitar'], 'Maldición tormentosa': ['debuffer', 'atormentar'], 'Robar el aliento': ['debuffer', 'drenar no2'], 'Ráfaga encadenada': ['rango', 'disparos encadenados'], 'Extenuar': ['debuffer', 'extenuar'], 'Cegar': ['debuffer', 'cegar'], 'Hoja envenenada': ['choque liviano', 'veneno'], 'Mordisco infectado': ['choque liviano', 'veneno'], 'Grito de pánico': ['debuffer', 'grito de pánico'],
+    'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'], 'Mantener a raya': ['rango', 'mantener a raya'], 'Flecha que atraviesa': ['rango', 'atravesar'], 'Disparo y repliegue': ['rango', 'disparar y replegarse'], 'Nube tóxica': ['debuffer', 'nube tóxica'], 'Empuje': ['support', 'empower'], 'Sanguijuela': ['debuffer', 'sanguijuela'], 'Luz para los suyos': ['support', 'luz para los suyos'], 'Finta': ['choque liviano', 'finta'], 'Dash': ['choque liviano', 'dash'], 'Aguja siniestra': ['debuffer', 'punto débil'], 'Parpadeo': ['mago', 'parpadeo'], 'Tiro que derriba': ['rango', 'tiro que derriba'], 'Ojo de asesino': ['choque liviano', 'buscar el crítico'], 'Pisotón': ['choque pesado', 'aturdir'], 'Tirar la bronca': ['support', 'provocar para un aliado'], 'Nova arcana': ['mago', 'nova arcana'], 'Ráfaga de viento': ['mago', 'ráfaga de viento'], 'Tiro al arma': ['rango', 'tiro al arma'], 'Tiro certero': ['rango', 'tiro certero'], 'Tormenta arcana': ['mago', 'tormenta arcana'], 'Cascotazo': ['mago', 'proyectil de piedra'], 'Abanico': ['rango', 'abanico'], 'Smite': ['support', 'smite'], 'Prisión de hielo': ['mago', 'prisión de hielo'], 'Degollar': ['choque liviano', 'todo al ataque'], 'Clavar a la pared': ['rango', 'clavar a la pared'], 'Maldición debilitante': ['debuffer', 'debilitar'], 'Maldición tormentosa': ['debuffer', 'atormentar'], 'Robar el aliento': ['debuffer', 'drenar no2'], 'Envión': ['support', 'envión'], '¡Al frente!': ['support', 'llevar al lado de un rival'], 'Bomba de humo': ['choque liviano', 'desaparecer en la pelea'], 'Golpe desesperado': ['choque liviano', 'golpe desesperado'], 'Takle': ['choque pesado', 'takle'], 'Furia': ['choque pesado', 'furia'], 'Ráfaga encadenada': ['rango', 'disparos encadenados'], 'Extenuar': ['debuffer', 'extenuar'], 'Cegar': ['debuffer', 'cegar'], 'Hoja envenenada': ['choque liviano', 'veneno'], 'Mordisco infectado': ['choque liviano', 'veneno'], 'Grito de pánico': ['debuffer', 'grito de pánico'],
     'Red': ['hunter', 'trabar'], 'Tela de araña': ['hunter', 'trabar'],
     'Hit and run': ['choque liviano', 'golpear y alejarse'],
     'Salto': ['choque liviano', 'salto'], 'Salto aplastante': ['choque pesado', 'salto'], 'Vigilancia': ['rango', 'vigilancia'], 'Bola de fuego': ['mago', 'daño en área'], 'Confusión': ['debuffer', 'control mental'],
@@ -178,9 +178,18 @@
     no2: 0, spCosto: 3, flash: true, auditada: true, ataqueTxt: 'Flash: onda alrededor; su Fuerza contra la Res.CC o la Evasión de cada rival pegado; la diferencia de daño (directo) y Pajaritos 2 turnos',
     duelo: {objetivo: 'onda', radio: 1, tira: 'fue', contra: ['rescc', 'eva'], dodgeConEva: true, dano: true, danoDiferencia: true, tipoDano: 'fisico', ignoraDano: true, danoDirecto: true,
       efectos: [{nombre: 'Pajaritos', turnos: 2}]}});
+  // 💥 Auditada (dueño, 2026-10-26; Choque pesado, el Takle del Tanque para creeps: «el tackle por definición no usa el arma… el desplazamiento sin coste
+  // de nitros y un efecto bastante similar. El costo… 2 nitros y 3 SP»): Flash; corre hasta 2 casillas, gratis y sin oportunidad, hasta quedar pegado
+  // (js/55, `corre`) y lo embiste: su Constitución +2 contra la Constitución; si gana, pierde 3 No2, lo empuja 2 y se le corta el turno: al final del orden
+  // (si ya era el último, pierde el turno: js/04 alFinalDelOrden). 2 No2 y 3 SP (en turno ajeno, el SP al doble), o cooldown 3.
+  H('Takle', 'K', '*', 'mt', 3, {detalle: 'Flash. Corre hasta 2 casillas (gratis, sin ataques de oportunidad) hasta quedar pegado a un rival y se le tira encima con todo el cuerpo, sin arma: su Constitución +2 contra la Constitución del objetivo. Si gana, el objetivo pierde 3 No2, sale empujado 2 casillas (si choca contra algo, el daño de colisión de siempre) y se le corta el turno: pasa al final del orden de turnos. Si ya era el último, pierde el turno.',
+    no2: 2, spCosto: 3, flash: true, auditada: true, ataqueTxt: 'Flash: corre hasta 2 y embiste — su Con +2 contra la Con; pierde 3 No2, empujado 2 y al final del orden',
+    duelo: {objetivo: 'enemigo', alcance: 'fijo', alcanceN: 3, salto: 2, corre: true, tira: 'con', tiraBono: 2, contra: ['con'], dano: false, efectos: [
+      {nombre: 'Pierde No2', no2: 3}, {nombre: 'Empujón', empuja: 2, detalle: 'Lo empuja 2 casillas, lejos de quien lo embiste.'},
+      {nombre: 'Al final del orden', detalle: 'Se le corta el turno y pasa al final del orden de turnos; si ya era el último, pierde el turno.'}]}});
   // (Golpe de pomo: quitado de la biblioteca en la auditoría, dueño 2026-10-21.)
   H('Ataque de furia', 'D', '*', 'm', 5, zO('Ataca sin pensar en la defensa: daño enorme.', 4, 'H'));
-  H('Tackle', 'DK', 'hdb', 'mt', 3, zO('Se lanza contra el objetivo y lo derriba (a mano).', 2, 'L'));
+  // (Tackle, el viejo a mano: lo reemplaza el Takle, 2026-10-26.)
   // 🩸 Las cuatro variantes del Sangrado (dueño, 2026-10-21: «un golpe simple que solamente añade sangrado; uno que añade perfora y sangrado; uno que
   // añade daño y sangrado; uno que añade crítico frecuente y sangrado»), cada una en versión de humanoide y de bestia («hacé todas»).
   H('Zarpazo desgarrador', 'DX', 'b', 'me', 2, aA('Garras que abren la carne: un ataque con su arma; si pega, deja Sangrado (2 de daño por turno durante 2 turnos; se acumula y, con un golpe crítico, queda permanente).',
@@ -443,7 +452,11 @@
   H('Endurecer', 'T', 'c', 't', 2, bU('Sus juntas se traban: +2 de Defensa 2 turnos.', 1, {def: 2}, 2));
 
   /* ================= BUFF (sobre sí mismo) ================= */
-  H('Furia', 'B', '*', 'm', 3, bU('Se enfurece: +3 de Daño 3 turnos.', 2, {dmg: 3}, 3));
+  // 😡 Auditada (dueño, 2026-10-26; Choque pesado, «furia», reemplaza a la vieja de +3 de daño): Enfurecido —+3 PdG y +4 al daño, −2 Evasión y −2 Defensa—
+  // el turno en que la usa y 2 turnos completos más. 2 No2 y 2 SP, o cooldown 3.
+  H('Furia', 'B', '*', 'm', 3, {detalle: 'Se enfurece: +3 a la Probabilidad de Golpe y +4 al daño, pero −2 a la Evasión y −2 a la Defensa, durante el turno en que la usa y sus próximos 2 turnos completos.',
+    no2: 2, spCosto: 2, auditada: true, ataqueTxt: 'Enfurecido: +3 PdG y +4 al daño, −2 Evasión y −2 Defensa, este turno y 2 completos más',
+    duelo: {objetivo: 'uno mismo', tira: '', contra: [], efectos: [{nombre: 'Enfurecido'}]}});
   H('Grito de guerra', 'B', 'hd', 'ma', 3, bU('Grita y se anima: +2 de Daño y +1 No2 3 turnos.', 2, {dmg: 2, nitros: 1}, 3));
   H('Frenesí', 'B', 'b', 'me', 4, bU('Se vuelve loco de hambre: +4 de Daño y −2 de Defensa 3 turnos.', 2, {dmg: 4, def: -2}, 3));
   H('Concentración', 'B', '*', 'r', 2, bU('Respira hondo antes de tirar: +2 de Daño 2 turnos.', 1, {dmg: 2}, 2));
@@ -578,6 +591,18 @@
   H('Ojo certero', 'B', '*', 'a', 3, {detalle: 'Le afina la puntería a un aliado (o a sí mismo) dentro de su Rango: Crítico frecuente +2 y Crítico potente +2 durante sus próximos 2 turnos completos (el turno en que se lo da no cuenta).',
     no2: 1, spCosto: 3, auditada: true, ataqueTxt: 'Crítico frecuente +2 y Crítico potente +2, 2 turnos completos, a él o a un aliado en su Rango',
     duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', efectos: [{nombre: 'Ojo certero'}]}});
+  // 💨 Auditada (dueño, 2026-10-26; Support: «un poco como el Shield. Otorga un escudo de 10 de HP que absorbe daño. Del tipo vida extra. Y además, sube en
+  // uno en la tabla de iniciativas. Y tiene flash»; «dura hasta que se gaste. El escudo reemplaza, no se suma. Y el nombre envión me gusta»): Flash; a él o a
+  // un aliado en su Rango, el estado Envión (10 que se gastan) y sube 1 lugar en el orden (js/13 dueloAdelanto). 3 SP (6 en turno ajeno), o cooldown 3.
+  H('Envión', 'B', '*', 'a', 3, {detalle: 'Flash. Le da un envión a un aliado (o a sí mismo) dentro de su Rango: un escudo que absorbe 10 de daño, hasta gastarse (otro Envión lo deja otra vez en 10, no se suma), y sube 1 lugar en el orden de turnos (no pasa por encima del que tiene el turno; si ya jugó esta ronda, le sirve para la próxima).',
+    no2: 0, spCosto: 3, flash: true, auditada: true, ataqueTxt: 'Flash: a él o a un aliado, un escudo de 10 (hasta gastarse) y sube 1 lugar en el orden de turnos',
+    duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', efectos: [{nombre: 'Envión'}, {nombre: 'Sube en el orden', stacks: 1, detalle: 'Sube 1 lugar en el orden de turnos.'}]}});
+  // 🎯 Auditada (dueño, 2026-10-26; Support, «llevarlo al lado de un rival» ✦: «4 está bien… que sea siempre al lado de un rival y que dé más 2 a la
+  // probabilidad de golpe y más 2 a la evasión hasta el final de su próximo turno»): a un aliado en su Rango (no él), lo teletransporta a una casilla libre
+  // pegada a un rival, a 4 o menos (el blink, js/13 `alFrente`); al llegar, Al frente. 2 No2 y 3 SP, o cooldown 3; no es Flash.
+  H('¡Al frente!', 'BM', '*', 'a', 3, {detalle: 'Manda a un aliado al frente: a un aliado dentro de su Rango (no a sí mismo) lo teletransporta a una casilla libre pegada a un rival, a 4 casillas o menos de donde estaba (no camina: no da ataques de oportunidad ni pisa nada en el camino; lo de la casilla de llegada sí lo toca). Al llegar: +2 a la Probabilidad de Golpe y +2 a la Evasión hasta el final de su próximo turno.',
+    no2: 2, spCosto: 3, auditada: true, ataqueTxt: 'un aliado en su Rango aparece pegado a un rival (a 4 o menos): +2 PdG y +2 Evasión hasta el final de su próximo turno',
+    blink: {distancia: 4, alFrente: true, estado: 'Al frente'}});
   // 🚩 Auditada (dueño, 2026-10-24; el Support, «Estandarte de guerra»: «+3 a la probabilidad de golpe, +5 al daño, 10 por nivel de HP, sin ningún tipo de
   // defensa ni resistencia»; «permanente hasta que se rompa»; «el diámetro tiene que ser de 7»; «en cualquier lugar dentro de su rango»; «con cooldown, que
   // sea de 4 pero disponible desde el inicio del combate»): clava un estandarte en una casilla libre dentro de su Rango; sus
@@ -778,6 +803,16 @@
   // clase: el ataque y 2 SP, o cooldown 2.
   H('Ojo de asesino', 'D', '*', 'e', 2, aA('Fija la mirada en el punto débil y pega: un ataque con su arma con +1 a la Probabilidad de Golpe, +2 al daño, Crítico frecuente +1 y Crítico potente +1.',
     {pdg: 1, fijo: 2, critBono: 1, critpotBono: 1}, 'va al duelo como un ataque con +1 PdG, +2 al daño y +1 a los dos críticos', 2, []));
+  // 💨 Auditada (dueño, 2026-10-26; Choque liviano, «desaparecer en la pelea»: «me gusta mucho al punto de que la pondría en la clase también. Que se mueva
+  // hasta 3 casillas gratis»; «3 SP y 3 nitros»): la niebla a sus pies (diámetro 3, 1 turno), Sigilo aunque lo vean y hasta 3 casillas gratis sin
+  // oportunidad (vtt-hexgrid/js/57 bombaDeHumo). Cooldown 3.
+  H('Bomba de humo', 'M', 'hd', 'e', 3, {detalle: 'Revienta una bomba de humo a sus pies: una nube de diámetro 3 (7 casillas) por 1 turno, que tapa la vista desde afuera; entra en Sigilo aunque lo estén mirando (el que está pegado, adentro del humo, lo sigue viendo y lo descubre); y se mueve hasta 3 casillas gratis, sin ataques de oportunidad. El combo: en el próximo turno, la puñalada por la espalda.',
+    no2: 3, spCosto: 3, auditada: true, ataqueTxt: 'humo de diámetro 3 a sus pies (1 turno), Sigilo y hasta 3 casillas gratis sin oportunidad', bombaHumo: {radio: 1, turnos: 1, mover: 3}}, 'sigilo,niebla y visión');
+  // 😤 Auditada (dueño, 2026-10-26; Choque liviano, «golpe desesperado», apuestas ✦): un ataque con su arma que crece cuanto menos vida le queda (vtt-hexgrid/js/69):
+  // con más de la mitad, +1 a los dos críticos y +1 al daño; con la mitad o menos, +2, +2 y +3; con un cuarto o menos, además +2 PdG. Lo de un ataque y 3 SP,
+  // o cooldown 2.
+  H('Golpe desesperado', 'D', '*', 'e', 2, aA('Un golpe con lo que le queda: un ataque con su arma que pega más cuanto menos vida tiene. Con más de la mitad de la vida: +1 a Crítico frecuente y a Crítico potente y +1 al daño. Con la mitad o menos: +2 a los dos críticos y +3 al daño. Con un cuarto o menos: además +2 a la Probabilidad de Golpe.',
+    {}, 'va al duelo como un ataque; según su vida, +1/+1/+1, +2/+2/+3 o, con un cuarto o menos, además +2 PdG', 3, [], {desesperado: true}));
   // 🦘 El Salto (dueño, 2026-10-21): salta hasta 3 casilleros (por encima de hasta 2) y cae al lado del objetivo, sin No2 ni ataque de oportunidad.
   H('Salto', 'DM', '*', 'e', 3, aA('Salta por encima de lo que haya (un salto de 1,5 metros de altura) y cae sobre el objetivo: se desplaza hasta 3 casilleros (salteando hasta 2) hasta quedar al lado, sin No2 ni ataque de oportunidad, y ataca con su arma con +1 a la Probabilidad de Golpe y Crítico frecuente +1. Saltar algo con colisión lo decide la mesa.',
     {pdg: 1, critBono: 1}, 'salta hasta quedar al lado (el mapa) y va al duelo como un ataque con +1 PdG y Crítico frecuente +1', 2, [], {salto: 3}));

@@ -515,6 +515,40 @@ async function dueloTerminaTurno(d){
   if(await guardarIniciativa({orden: ordenSerial(orden), turno})) mesaLinea(`⏭ ${nombre} usó ${hab}: pasa al final del orden de turnos`, 'recordatorio');
 }
 
+/* 💥 Takle (2026-10-26, el del Tanque para creeps): al que pierde la embestida se le corta el turno y pasa al final del orden; si ya era el último,
+   pierde el turno (el de esta ronda, si todavía no jugó; si ya jugó, el próximo queda a mano). Lo aplica el mapa del GM (el efecto «Al final del
+   orden», js/13). Devuelve {nota, manual?} para el cuadro del duelo. */
+async function alFinalDelOrden(tokenId, nombre, hab){
+  if(!iniciativa.orden.length) return {manual: true, nota: 'no hay orden de turnos: a mano'};
+  const i = iniciativa.orden.findIndex(o => o.id === tokenId);
+  if(i < 0) return {manual: true, nota: 'no está en el orden de turnos: a mano'};
+  const t = tokens.get(tokenId), quien = t && !t.oculto && !enSigilo(t) ? nombreDe(t) : (nombre || 'Alguien'), por = hab || 'una embestida';
+  const ya = new Set(iniciativa.actuaron || []);
+  if(i === iniciativa.turno){   // era su turno: se le corta
+    const orden = iniciativa.orden.slice(), [fila] = orden.splice(i, 1);
+    orden.push(fila);
+    mesaLinea(`⏭ ${quien} (${por}): se le corta el turno y pasa al final del orden (en esta ronda no le vuelve a tocar)`, 'recordatorio');
+    await iniciativaSiguiente({orden, termina: tokenId, desde: i});
+    return {nota: 'se le cortó el turno: pasa al final del orden'};
+  }
+  if(i === iniciativa.orden.length - 1){
+    if(i > iniciativa.turno && !ya.has(tokenId)){
+      ya.add(tokenId);
+      if(!(await guardarIniciativa({actuaron: [...ya]}))) return {manual: true, nota: 'ya era el último: que pierda su turno (a mano)'};
+      mesaLinea(`⏭ ${quien} (${por}): ya era el último del orden, pierde su turno de esta ronda`, 'recordatorio');
+      return {nota: 'ya era el último: pierde su turno de esta ronda'};
+    }
+    return {manual: true, nota: 'ya era el último y ya jugó esta ronda: que pierda su próximo turno (a mano)'};
+  }
+  const orden = iniciativa.orden.slice(), [fila] = orden.splice(i, 1);
+  orden.push(fila);
+  const activo = iniciativa.orden[iniciativa.turno] ? iniciativa.orden[iniciativa.turno].id : null;
+  const turno = activo ? Math.max(0, orden.findIndex(o => o.id === activo)) : iniciativa.turno;
+  if(!(await guardarIniciativa({orden: ordenSerial(orden), turno}))) return {manual: true, nota: 'no se pudo mover en el orden de turnos: a mano'};
+  mesaLinea(`⏭ ${quien} (${por}): pasa al final del orden de turnos`, 'recordatorio');
+  return {nota: 'pasa al final del orden de turnos'};
+}
+
 // Las invocaciones de un personaje que tienen turno propio (su token está en el orden): las demás van con el personaje.
 function invConTurno(fichaId){
   return iniciativa.orden.map(o => tokens.get(o.id)).filter(t => t && String(t.fichaId || '').startsWith(fichaId + SEP_INVOCACION))

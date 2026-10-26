@@ -38,21 +38,21 @@ Cuenta los conceptos con alguna habilidad (de fábrica auditada o de los creeps 
 de fábrica como «sin auditar», con su rol y su concepto: `ORIGEN` en `comun/skills-creep-base.js`). **Rango y Hunter se cuentan juntos** (dueño: «se van
 a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 
-- 🛡 **Choque pesado — 19**: más daño, empujar, atrapar, guardia, salto, barrido, desarmar, golpe anunciado, remate, romper armadura, aturdir (Pisotón, 2026-10-26) · de El origen:
+- 🛡 **Choque pesado — 21**: takle (2026-10-26), más daño, empujar, atrapar, guardia, salto, barrido, desarmar, golpe anunciado, remate, romper armadura, aturdir (Pisotón, 2026-10-26) · de El origen:
   furia, pisotón, provocar, segundo aliento, aguantar el daño, cubrir al de al lado, perforar, carga que derriba.
-- 🗡 **Choque liviano — 18**: golpe preciso, sangrado, trabar, golpear y alejarse, salto, abrir la herida, manada, ráfaga, por la espalda · de El origen:
+- 🗡 **Choque liviano — 20**: desaparecer en la pelea (Bomba de humo, 2026-10-26), golpe desesperado (2026-10-26), golpe preciso, sangrado, trabar, golpear y alejarse, salto, abrir la herida, manada, ráfaga, por la espalda · de El origen:
   robar, sigilo, varios golpes, bajo tierra, veneno (de fábrica desde el 2026-10-25: Hoja envenenada / Mordisco infectado), todo al ataque (Degollar, 2026-10-26), finta (2026-10-26), dash (2026-10-26), ojo de asesino (2026-10-26).
 - 🏹 **Rango y Hunter — 20**: tiro certero (2026-10-26), abanico (2026-10-26), trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar, mantener a raya (2026-10-25), atravesar (Flecha que atraviesa, 2026-10-25), disparos encadenados (Ráfaga encadenada, 2026-10-25), disparar y replegarse (Disparo y repliegue, 2026-10-26), clavar a la pared (2026-10-26), tiro al arma (2026-10-26), tiro que derriba (2026-10-26) · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 20**: tormenta arcana (2026-10-26), cascotazo (2026-10-26), daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25), lluvia de escarcha (2026-10-25), andanada arcana (2026-10-25), misiles elementales (2026-10-25), portal trampa (2026-10-25), prisión de hielo (2026-10-26), nova arcana (2026-10-26), ráfaga de viento (2026-10-26), parpadeo (2026-10-26) · de El origen: proyectil, fuego con quemadura.
 - 🧿 **Debuffer — 20**: drenar No2 (Robar el aliento, 2026-10-26), atormentar (Maldición tormentosa, 2026-10-26), control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25), silencio (Tótem de silencio, 2026-10-25), extenuar (2026-10-25), cegar (2026-10-25), grito de pánico (2026-10-25), nube tóxica (2026-10-26), debilitar (Maldición debilitante, 2026-10-26), sanguijuela (2026-10-26, del Mago), punto débil (Aguja siniestra, 2026-10-26) · de El origen: ceguera, veneno, inmovilizar.
-- 💚 **Support — 18**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24), estandarte (Estandarte de guerra, 2026-10-24), señalar la presa (2026-10-25), armas perforantes (2026-10-25), redoble de tambores (2026-10-25), frenesí inducido (2026-10-25), limpiar estados (Purificar, 2026-10-25), levitar (2026-10-25), empower (Empuje, 2026-10-26), luz para los suyos (2026-10-26), smite (2026-10-26), provocar para un aliado (Tirar la bronca, 2026-10-26) · de El origen: escudo a un aliado.
+- 💚 **Support — 20**: envión (2026-10-26), llevar al lado de un rival (¡Al frente!, 2026-10-26), arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24), estandarte (Estandarte de guerra, 2026-10-24), señalar la presa (2026-10-25), armas perforantes (2026-10-25), redoble de tambores (2026-10-25), frenesí inducido (2026-10-25), limpiar estados (Purificar, 2026-10-25), levitar (2026-10-25), empower (Empuje, 2026-10-26), luz para los suyos (2026-10-26), smite (2026-10-26), provocar para un aliado (Tirar la bronca, 2026-10-26) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
 **Para emparejar** (regla del dueño, 2026-10-25: «empezamos a tener en cuenta todos los roles de creep e ir emparejándolos… para que estén todos
-avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Support y Choque liviano en 18, Choque pesado en 19, Rango + Hunter, Mago y Debuffer en 20. **Meta del dueño (2026-10-26): llegar a 20 en cada rol.** El Jefe va aparte.
+avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26, la meta del dueño cumplida): todos en 20, Choque pesado en 21. **Meta del dueño (2026-10-26): llegar a 20 en cada rol.** El Jefe va aparte.
 
-## Definidas, sin programar (camino a 20 por rol, desde el 2026-10-26)
+## Definidas antes de programar (camino a 20 por rol, 2026-10-26) — ✅ programadas el mismo día
 
 > Método del dueño (2026-10-26): «pasamos al siguiente rol, elegimos, definimos, ajustamos detalles, reglas, pero no lo programás… una vez que tengamos
 > todo ya definido desde el diseño, yo te digo, bueno, ahora programalos». Cada una queda acá con sus reglas; se programan juntas cuando el dueño lo pida
@@ -124,7 +124,7 @@ Sirven al warrior (pegar fuerte), al tanque (aguantar y controlar) o a los dos.
 4. **Varios golpes**: dos ataques en uno, con menos puntería cada uno (Golpe doble, Ráfaga de golpes).
 5. **Golpe que sigue** ✦: si tumba a alguien, vuelve a atacar a otro de al lado.
 6. ✅ **Partir la armadura**: **Romper armadura** / **Arrancar la coraza** y **Golpe demoledor** / **Mandíbula trituradora** (2026-10-21). Queda: perforar.
-7. **Furia** ✦: pega más fuerte a cambio de defenderse peor (Furia, Frenesí, Ataque de furia).
+7. ✅ **Furia** ✦ (2026-10-26: Enfurecido, +3 PdG y +4 al daño, −2 Evasión y −2 Defensa): pega más fuerte a cambio de defenderse peor (Furia, Frenesí, Ataque de furia).
 8. **Frenesí que crece** ✦: cada golpe que da en el combate le suma daño al siguiente.
 
 **B. Pegarle a varios**
@@ -195,7 +195,7 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
   - **Sonic Boom**: «Sonic Boom [2] — Onda expansiva (Fuerza / Constitución). Flash (SP x 2). Golpea el piso creando una onda de choque en un cono al frente, que hace perder una cantidad de No2 igual a 1 + la diferencia en la tirada. Si perdiera…»
   - **Piel resistente**: «Piel resistente [5] — Otorga una armadura temporal: Defensa 5, Res. Mágica 5, reduce críticos de todo tipo. Duración: 2 turnos.»
   - **Daño en área**: «Daño en área [2] — Ataque con daño en área de flor. No afecta al tanque.»
-  - **Takle**: «Takle [3] — Flash (SP x 2). Se desplaza hasta 2 casillas. Ataque con +1 a PG. Si gana una tirada de Constitución, el objetivo pierde 2 Nitros, lo empuja 2 casillas, interrumpe su turno y lo manda al final de la tabla de…»
+  - ✅ **Takle** → Takle (creep, 2026-10-26: sin arma, Con +2, 3 No2): «Takle [3] — Flash (SP x 2). Se desplaza hasta 2 casillas. Ataque con +1 a PG. Si gana una tirada de Constitución, el objetivo pierde 2 Nitros, lo empuja 2 casillas, interrumpe su turno y lo manda al final de la tabla de…»
   - ✅ **Taunt** → el «provocar» de El origen: «Taunt [1] — Tira Especial + 1 contra Especial para obligar a un enemigo a atacarlo hasta el final de su próximo turno.»
   - **Miti-Miti**: «Miti-Miti [2] — Marca un personaje como protegido. El protegido comparte con el tanque la mitad del daño que recibe. Duración: 1 turno.»
   - ✅ **Aguante** → Aguante: «(Skill nueva, 2026-10-23: la misma del modo aguante de los creeps de choque pesado, sumada al pool del Tanque por el dueño; tope de dados: nivel + 1.)»
@@ -231,7 +231,7 @@ rodilla, Tarascón al tobillo), las redes; y en el mapa, el sigilo, el +1 por la
 
 **D. Sigilo y espalda**
 16. ✅ **Puñalada**: Puñalada por la espalda, Mordida a traición, Puñalada trapera (y la pasiva Paso ligero).
-17. **Desaparecer en la pelea**: vuelve al sigilo a mitad del combate (humo, sombras).
+17. ✅ **Desaparecer en la pelea** — **Bomba de humo** (2026-10-26): vuelve al sigilo a mitad del combate (humo, sombras).
 18. **Golpe desde las sombras**: al salir del sigilo, su primer golpe va con más crítico.
 
 **E. Esquivar y reaccionar**
@@ -259,7 +259,7 @@ rodilla, Tarascón al tobillo), las redes; y en el mapa, el sigilo, el +1 por la
 
 **I. Apuestas** ✦
 34. ✅ **Todo al ataque** — **Degollar** (2026-10-26, el del Asalto: +4 PdG, +7 al daño, +1 a los dos críticos; termina su turno, pasa al final del orden y queda Expuesto): pega mucho más, sin Evasión hasta su próximo turno.
-35. **Golpe desesperado**: con poca vida, un golpe con mucho más crítico.
+35. ✅ **Golpe desesperado** (2026-10-26, escalonado por su vida): con poca vida, un golpe con mucho más crítico.
 
 **Skills de clase, para tener en cuenta** (2026-10-26, dueño: «incorporá a la lista los skills de clase, para tener en cuenta. Eso en todos los
 tipos y clase»): las de Asalto, con el original tal cual (o, si no tiene, lo que hace hoy). ✅ = ya tiene su versión
@@ -470,7 +470,7 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
     que trabajan con cooldown (no con SP).
 13. **Adrenalina**: a un aliado se le baja el cooldown de una habilidad (vuelve a usar la fuerte). ⏸ Para más adelante (dueño, 2026-10-26: «anotala en la lista para trabajar en el futuro»). Propuesta guardada: a un aliado en su Rango, +1 PdG ese turno y, si trabaja con cooldown, −2 a cada cooldown activo; si trabaja con SP, recupera 4 SP (sin pasar su máximo) — o, la variante, su próxima habilidad de este turno le cuesta 3 SP menos. 1 No2 y 2 SP, o cooldown 3.
 14. **Canalizar**: le pasa SP a un aliado caster.
-15. **¡Ahora!**: un aliado juega justo después del support en el orden de turnos (sube su iniciativa; hoy Emboscada de manada).
+15. ≈ **¡Ahora!** → Envión (2026-10-26: sube 1 lugar, con un escudo de 10): un aliado juega justo después del support en el orden de turnos (sube su iniciativa; hoy Emboscada de manada).
 16. **Prisa**: un aliado se mueve gratis unos casilleros y ataca más barato.
 
 **D. Debilitar para que rematen los otros** ✦
@@ -508,7 +508,7 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
 
 **I. Llamar y reacomodar**
 36. Llamar refuerzos (ya automatizado), Brotes.
-37. Cambiar de lugar con un aliado, llevarlo al lado de un rival ✦, Señal de retirada.
+37. Cambiar de lugar con un aliado, ✅ llevarlo al lado de un rival ✦ (**¡Al frente!**, 2026-10-26), Señal de retirada.
 **J. Sacadas de las varitas y el equipo** (2026-10-25, a pedido del dueño: «hacé una comparación con las varitas y báculos que diseñamos y fijate si hay alguna idea que no esté en los skills… cosas más de control, por ejemplo portal, y un poco de support, por ejemplo levitar»). Entre corchetes, la varita o el equipo de donde sale.)
 38. ✅ **Levitar** ✦ (idea del dueño; hecha el 2026-10-25: Levitando 2 turnos completos —flota todo el tiempo, +3 Evasión, el primer casillero gratis—): a un aliado (o a sí mismo) lo hace flotar unos turnos — pasa por encima del terreno, las zonas del piso y las trampas,
     no lo alcanza lo que está en el suelo — y algo más (por ejemplo +1 Evasión o moverse 1 casilla gratis) [Zapatillas de levitación].

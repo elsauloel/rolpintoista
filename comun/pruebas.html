@@ -1187,6 +1187,46 @@ prueba('😮‍💨 Robar el aliento (Debuffer, 2026-10-26): PdG.Esp contra Res.
   igual([x.tira.stat, x.contra.map(c => c.stat || c).join(','), x.dano.formula, x.dano.tipo, ef.nombre, ef.no2, ef.no2Dif, ef.no2Sentado, h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('debuffer')],
     ['pdgmg', 'resmg', '1d6', 'siniestro', 'Pierde No2', 2, true, true, 2, 3, 3, true]);
 });
+prueba('😡 Furia (Choque pesado, 2026-10-26): Enfurecido sobre sí —+3 PdG, +4 al daño, −2 Evasión y −2 Defensa—, 2 turnos completos; 2 No2 y 2 SP', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Furia'), h = armarHabilidadDeCreep(e.datos, 2);
+  const x = Combatiente.habEjecucion(h, h.duelo, {stat: () => 0, etq: s => s});
+  const sc = {estados: []}; EstadosAplicar.aplicarACreep(sc, x.efectos[0].spec); const est = sc.estados[0], m = k => (est.mods.find(o => o.stat === k) || {}).val;
+  igual([Combatiente.sobreSiSinTiradas(x), est.nombre, est.turnos, !!est.turnosCompletos, m('pdg'), m('dmg'), m('eva'), m('def'), h.nitrosCosto, h.spCosto, h.cd, HABILIDADES_CREEP_BASE.filter(y => y.nombre === 'Furia').length],
+    [true, 'Enfurecido', 2, true, 3, 4, -2, -2, 2, 2, 3, 1]);
+});
+prueba('😤 Golpe desesperado (Choque liviano, 2026-10-26): según la vida propia, +1/+1/+1, +2/+2/+3 o además +2 PdG', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Golpe desesperado'), h = armarHabilidadDeCreep(e.datos, 2);
+  const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}}), b = f => { const o = Combatiente.desesperadoBonos(f); return [o.critBono, o.critpotBono, o.fijo, o.pdg].join('/'); };
+  igual([!!a.desesperado, b(0.9), b(0.5), b(0.3), b(0.25), b(0.1), h.nitrosCosto, h.spCosto, h.cd],
+    [true, '1/1/1/0', '2/2/3/0', '2/2/3/0', '2/2/3/2', '2/2/3/2', 'ATAQUE', 3, 2]);
+});
+prueba('💥 Takle (Choque pesado, 2026-10-26): Flash, corre hasta 2 (saltoHab + corre), Con +2 contra Con, pierde 3 No2, empujado 2 y al final del orden', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Takle'), h = armarHabilidadDeCreep(e.datos, 2);
+  const x = Combatiente.habEjecucion(h, h.duelo, {stat: () => 0, etq: s => s});
+  igual([!!h.flash, x.saltoHab, !!x.corre, x.alcance, x.tira.stat, x.tira.bono, x.contra.map(c => c.stat || c).join(','), x.dano, x.efectos.map(f => f.nombre).join(','), x.efectos[0].no2, x.efectos[1].empuja,
+    Duelo.specDeEfecto(x.efectos[2]).nombre, h.nitrosCosto, h.spCosto, h.cd, HABILIDADES_CREEP_BASE.some(y => y.nombre === 'Tackle')],
+    [true, 2, true, 3, 'con', 2, 'con', null, 'Pierde No2,Empujón,Al final del orden', 3, 2, 'Al final del orden', 2, 3, 3, false]);
+});
+prueba('💨 Envión (Support, 2026-10-26): Flash; a él o a un aliado, un escudo de 10 que se gasta (otro lo renueva, no se suma) y sube 1 lugar', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Envión'), h = armarHabilidadDeCreep(e.datos, 2);
+  const x = Combatiente.habEjecucion(h, h.duelo, {stat: s => ({rng: 5})[s] || 0, etq: s => s});
+  const sc = {estados: []}; EstadosAplicar.aplicarACreep(sc, x.efectos[0].spec); sc.estados[0].escudoMagicoActual = 3; EstadosAplicar.aplicarACreep(sc, x.efectos[0].spec);
+  igual([!!h.flash, x.objetivo, !!x.conmigo, sc.estados.length, sc.estados[0].escudoMagico, sc.estados[0].escudoMagicoActual === undefined ? 10 : sc.estados[0].escudoMagicoActual, !!sc.estados[0].seGasta,
+    Duelo.specDeEfecto(x.efectos[1]).nombre, h.spCosto, h.cd],
+    [true, 'aliado', true, 1, 10, 10, true, 'Sube en el orden', 3, 3]);
+});
+prueba('🎯 ¡Al frente! (Support, 2026-10-26): el blink a un aliado, pegado a un rival a 4 o menos; Al frente: +2 PdG y +2 Evasión hasta el final de su próximo turno', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === '¡Al frente!'), h = armarHabilidadDeCreep(e.datos, 2);
+  const p = ESTADOS_PRESET.find(x => x.nombre === 'Al frente'), m = k => (p.mods.find(o => o.stat === k) || {}).val;
+  igual([h.modo, h.blink.distancia, !!h.blink.alFrente, h.blink.estado, p.turnos, !!p.turnosCompletos, m('pdg'), m('eva'), h.nitrosCosto, h.spCosto, h.cd],
+    ['auto', 4, true, 'Al frente', 1, true, 2, 2, 2, 3, 3]);
+});
+prueba('💨 Bomba de humo (Choque liviano y el Asalto, 2026-10-26): humo de diámetro 3, 1 turno, Sigilo y 3 casillas (el Asalto, 2); 3 No2 y 3 SP', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Bomba de humo'), h = armarHabilidadDeCreep(e.datos, 2);
+  const c = CLASES_SKILLS.find(k => k.id === 'asalto').habilidades.find(x => x.id === 'asalto-bomba-de-humo');
+  igual([h.modo, h.bombaHumo.radio, h.bombaHumo.turnos, h.bombaHumo.mover, h.nitrosCosto, h.spCosto, h.cd, c.modo, c.bombaHumo.mover, c.costo, c.nitrosCosto, FichaBotonera.modoHab(c)],
+    ['auto', 1, 1, 3, 3, 3, 3, 'auto', 2, '3', 3, 'auto']);
+});
 prueba('🎯 Tiro certero (Rango, 2026-10-26): +1 PdG, Perfora 3 e ignora 2 de Resistencia a crítico; lo de un ataque y 2 SP, o cooldown 2', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Tiro certero'), h = armarHabilidadDeCreep(e.datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {perfora: 1}});

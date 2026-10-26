@@ -11,13 +11,20 @@
    con colisión (una pared, un Sólido), pregunta si puede saltarlo (lo decide la mesa). Con `aplasta` (Salto aplastante): al caer, los rivales pegados a
    donde cayó tiran Res.CC contra su Fuerza; quien no llega queda Sentado. Si ya está al lado, ataca sin saltar; si no llega o no hay dónde caer, avisa y
    deja atacar igual. → true para seguir, null para elegir otro. */
+// 💥 `ataque.corre` (2026-10-26, el Takle): no salta, corre — no pasa por encima de paredes ni Sólidos (esas casillas no sirven), y los textos dicen «corre».
 async function saltoHab(mio, t, ataque, yo){
-  const n = Math.round(num(ataque.saltoHab)), dist = distanciaHex(mio, t), nom = nombreDe(mio), obj = nombreDe(t);
+  const n = Math.round(num(ataque.saltoHab)), dist = distanciaHex(mio, t), nom = nombreDe(mio), obj = nombreDe(t), corre = !!ataque.corre;
   if(dist <= 1){ if(ataque.saltoAplasta) await saltoAplastar(mio, yo); return true; }
   const ocupada = c => elementoSolidoEn(c.col, c.fila) || [...tokens.entries()].some(([id, x]) => id !== mio.id && x.col === c.col && x.fila === c.fila && !x.bajoTierra);
   const choca = c => lineaHex(mio, c).some((x, i, l) => elementoSolidoEn(x.col, x.fila) || (typeof paredCorta === 'function' && paredCorta(i ? l[i - 1] : mio, x)));
-  const cand = vecinosDeCasilla(t).filter(c => !ocupada(c) && distanciaHex(mio, c) <= n).sort((a, b) => (choca(a) - choca(b)) || (distanciaHex(mio, a) - distanciaHex(mio, b)));
+  const cand = vecinosDeCasilla(t).filter(c => !ocupada(c) && distanciaHex(mio, c) <= n && !(corre && choca(c))).sort((a, b) => (choca(a) - choca(b)) || (distanciaHex(mio, a) - distanciaHex(mio, b)));
   let caer = cand[0];
+  if(!caer && corre){
+    const motivo = dist - 1 > n ? `${obj} está muy lejos para la embestida (corre ${n} casilleros o menos)` : `no hay por dónde llegar al lado de ${obj}`;
+    const si = await AvisoCombate.preguntar(`${motivo}. ¿Embestirlo igual sin correr? (lo decide la mesa)`, {icono: '💥', titulo: 'Sin carrera', si: 'Embestir igual', no: 'Elegir otro'});
+    if(si) mesaLinea(`💥 ${nom} embiste a ${obj} sin correr (${motivo}; lo decidió la mesa)`, 'alerta-roja');
+    return si ? true : null;
+  }
   if(!caer){
     const motivo = dist - 1 > n ? `${obj} está muy lejos para el salto (cae a ${n} casilleros o menos)` : `no hay dónde caer al lado de ${obj}`;
     const si = await AvisoCombate.preguntar(`${motivo}. ¿Atacar igual sin saltar? (lo decide la mesa)`, {icono: '🦘', titulo: 'Sin salto', si: 'Atacar igual', no: 'Elegir otro'});
@@ -39,9 +46,9 @@ async function saltoHab(mio, t, ataque, yo){
   await coleccionTokens().doc(mio.id).update({col: caer.col, fila: caer.fila, rotacion: rotacionDePaso(hexCentro(caer.col, caer.fila), hexCentro(t.col, t.fila)), ruta: firebase.firestore.FieldValue.delete()});
   if(typeof marcarMovido === 'function') marcarMovido(mio.id);
   mio.col = caer.col; mio.fila = caer.fila;
-  const txt = `${nom} salta ${k} casillero${k === 1 ? '' : 's'} y cae al lado de ${obj}.`;
-  mesaLinea(`🦘 ${txt}`, 'recordatorio');
-  if(typeof momentoAbrir === 'function') momentoAbrir({tipo: 'salto', icono: '🦘', titulo: `${nom} salta`, resultado: txt, estado: 'listo', datos: {chico: true}});
+  const txt = corre ? `${nom} corre ${k} casillero${k === 1 ? '' : 's'} (gratis, sin ataques de oportunidad) y se le tira encima a ${obj}.` : `${nom} salta ${k} casillero${k === 1 ? '' : 's'} y cae al lado de ${obj}.`;
+  mesaLinea(`${corre ? '💥' : '🦘'} ${txt}`, 'recordatorio');
+  if(typeof momentoAbrir === 'function') momentoAbrir({tipo: 'salto', icono: corre ? '💥' : '🦘', titulo: `${nom} ${corre ? 'corre' : 'salta'}`, resultado: txt, estado: 'listo', datos: {chico: true}});
   if(ataque.saltoAplasta) await saltoAplastar(mio, yo);
   return true;
 }

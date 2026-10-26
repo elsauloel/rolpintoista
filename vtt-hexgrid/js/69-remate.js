@@ -36,3 +36,20 @@ async function remateBonos(mio, t, ataque, yo){
   try{ momentoAbrir({tipo: 'remate', icono: '🗡', titulo: txt, estado: 'listo', datos: {chico: true}}); }catch(err){}
   return a;
 }
+
+/* ---------- 😤 Golpe desesperado (2026-10-26, dueño; choque liviano, «apuestas», escalonado por la vida PROPIA) ----------
+   Un ataque «con tu arma» con `desesperado` (Combatiente.ataqueConArreglos → `ataque.desesperado`). Al elegir el objetivo: según la vida que le queda a
+   quien ataca (Combatiente.desesperadoBonos): con más de la mitad, +1 a los dos críticos y +1 al daño; con la mitad o menos, +2, +2 y +3; con un cuarto o
+   menos, además +2 PdG (Mesa y Crónica). */
+async function desesperadoBonos(mio, ataque, yo){
+  if(!ataque || !ataque.desesperado || !mio) return ataque;
+  const vida = remateVida(mio), b = Combatiente.desesperadoBonos(vida === null ? 1 : vida);
+  const a = structuredClone(ataque), m = a.mods || {};
+  a.mods = {...m, pdg: num(m.pdg) + b.pdg, fijo: num(m.fijo) + b.fijo, critBono: num(m.critBono) + b.critBono, critpotBono: num(m.critpotBono) + b.critpotBono};
+  const nom = (yo && yo.nombre) || nombreDe(mio), hab = ataque.habNombre || 'Golpe desesperado';
+  const como = vida !== null && vida <= 0.25 ? 'le queda un cuarto de la vida o menos' : vida !== null && vida <= 0.5 ? 'le queda la mitad de la vida o menos' : 'todavía tiene más de la mitad de la vida';
+  const txt = `${hab} de ${nom}: ${como} → ${Combatiente.desesperadoTxt(b)}`;
+  try{ mesaLinea(`😤 ${txt}`, 'recordatorio'); }catch(err){}
+  try{ momentoAbrir({tipo: 'remate', icono: '😤', titulo: txt, estado: 'listo', datos: {chico: true}}); }catch(err){}
+  return a;
+}

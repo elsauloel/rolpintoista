@@ -1227,6 +1227,12 @@ prueba('💨 Bomba de humo (Choque liviano y el Asalto, 2026-10-26): humo de di�
   igual([h.modo, h.bombaHumo.radio, h.bombaHumo.turnos, h.bombaHumo.mover, h.nitrosCosto, h.spCosto, h.cd, c.modo, c.bombaHumo.mover, c.costo, c.nitrosCosto, FichaBotonera.modoHab(c)],
     ['auto', 1, 1, 3, 3, 3, 3, 'auto', 2, '3', 3, 'auto']);
 });
+prueba('📦 Habilidades de creep (2026-10-26): el catálogo son solo las auditadas; las viejas (sin auditar y las de El origen) quedan archivadas', () => {
+  const c = HABILIDADES_CREEP_CATALOGO, a = HABILIDADES_CREEP_ARCHIVO;
+  igual([c.length > 100, c.every(e => e.etiquetas.includes('auditada') && !e.archivada), a.every(e => e.archivada && e.etiquetas.includes('archivada')),
+    c.length + a.length === HABILIDADES_CREEP_BASE.length, a.some(e => e.etiquetas.includes('de El origen')), c.some(e => e.nombre === 'Takle'), a.some(e => e.nombre === 'Tackle')],
+    [true, true, true, true, true, true, false]);
+});
 prueba('🎯 Tiro certero (Rango, 2026-10-26): +1 PdG, Perfora 3 e ignora 2 de Resistencia a crítico; lo de un ataque y 2 SP, o cooldown 2', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Tiro certero'), h = armarHabilidadDeCreep(e.datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {perfora: 1}});

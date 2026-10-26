@@ -146,6 +146,9 @@
 >   Lo mismo a la inversa, pero resistente»):** al elegir el objetivo (o el área) de una habilidad con daño elemental, cada token que le pega de más (la luz a
 >   un no-muerto o demonio, una debilidad a ese elemento) lleva una marca «DÉBIL» y el que lo frena (Res. a ese elemento, lo siniestro contra un no-muerto)
 >   «RESISTENTE», a la vista antes de confirmar. Base: `Combatiente.identidadElemento` y las resistencias elementales (`resistenciasDe`, js/13).
+> - [ ] **🐾 Ampliar el pool de habilidades de creep (2026-10-26, dueño: «si en algún momento quiero expandir el pool… hay algunas ideas que me parecían muy
+>   buenas»):** las propuestas que no se eligieron en el camino a 20, con sus números, en `docs/diseno-roles-creep.md` → «Para ampliar el pool más adelante»;
+>   y lo que no tiene ✅ en la lista de cada rol.
 > - [ ] **💨 El viento disipa gases y nubes (2026-10-26, dueño: «que los efectos de viento disipen gases y nubes»):** una habilidad, varita o zona
 >   de viento (Ráfaga de viento, Varita de la ventisca…) que pasa por una zona de gas o nube (las que dibuja `nubeColor`, vtt-hexgrid/js/50: tóxicas,
 >   humo, niebla, talco…) la saca del mapa en las casillas que toca (o entera). Para el futuro.

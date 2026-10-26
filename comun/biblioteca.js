@@ -85,10 +85,13 @@ const Biblioteca = (() => {
   }
 
   // Entradas incluidas en el código (opts.base): siempre están, aun sin Firebase.
+  // `opts.baseArchivo` (2026-10-26, las habilidades de creep viejas): las de fábrica archivadas — siguen ahí (para comparar o volver a usar), pero
+  // solo se ven en la pestaña «📦 Archivadas».
   function entradasBase(opts){
-    return (opts.base || []).map(b => ({id: `base-${b.poolId}`, nombre: b.nombre, etiquetas: b.etiquetas || [],
+    const armar = (b, archivado) => ({id: `base-${b.poolId}`, nombre: b.nombre, etiquetas: b.etiquetas || [],
       descripcion: b.detalle || '', nivel: b.nivel !== undefined ? b.nivel : b.jobCosto, autorUid: '', autorNombre: '', datos: b.datos || b, base: true,
-      auditado: true, version: 1, reemplaza: ''}));
+      auditado: true, version: 1, reemplaza: '', ...(archivado ? {archivado: true} : {})});
+    return [...(opts.base || []).map(b => armar(b, false)), ...(opts.baseArchivo || []).map(b => armar(b, true))];
   }
 
   // `opts.legado = {tipo, convertir(datos)}`: una colección de antes que se sigue mostrando junto a esta (las habilidades
@@ -113,6 +116,8 @@ const Biblioteca = (() => {
       // Una corrección de un elemento de fábrica (o de una colección vieja) lo tapa: queda solo la versión corregida.
       const tapados = new Set(subidas.map(e => e.reemplaza).filter(Boolean));
       st.oficial = [...base, ...subidas].filter(e => !tapados.has(e.id)).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+      // `opts.archivado(e)` (2026-10-26): lo subido que ya no cuenta (las habilidades de creep de antes) va a la pestaña «📦 Archivadas».
+      if(typeof st.opts.archivado === 'function') st.oficial.forEach(e => { if(!e.base && st.opts.archivado(e)) e.archivado = true; });
       st.propuestas = esDueno() ? [...await leer(`propuestas_${tipo}`).catch(() => []), ...await leerLegado(st.opts, 'propuestas_')] : [];
     }catch(err){
       if(!base.length) throw err;
@@ -266,18 +271,20 @@ const Biblioteca = (() => {
 
   function listaVista(st){
     if(st.vista === 'propuestas') return st.propuestas;
-    if(st.vista === 'sinauditar') return st.oficial.filter(e => !e.auditado);
-    return st.oficial;
+    if(st.vista === 'archivo') return st.oficial.filter(e => e.archivado);
+    if(st.vista === 'sinauditar') return st.oficial.filter(e => !e.auditado && !e.archivado);
+    return st.oficial.filter(e => !e.archivado);
   }
 
   function pintar(){
     const st = estado[actual];
     const q = id => document.getElementById(id);
-    const sinAud = st.oficial.filter(e => !e.auditado).length;
-    // Pestañas: todo / lo que falta auditar (la ven todos) / las propuestas del camino viejo (solo el dueño, si quedan).
-    q('bib-tabs').innerHTML = (sinAud || (esDueno() && st.propuestas.length))
-      ? `<button class="btn ${st.vista === 'oficial' ? 'primary' : ''}" data-bibvista="oficial">Todo (${st.oficial.length})</button>
+    const sinAud = st.oficial.filter(e => !e.auditado && !e.archivado).length, nArch = st.oficial.filter(e => e.archivado).length;
+    // Pestañas: todo / lo que falta auditar (la ven todos) / lo archivado / las propuestas del camino viejo (solo el dueño, si quedan).
+    q('bib-tabs').innerHTML = (sinAud || nArch || (esDueno() && st.propuestas.length))
+      ? `<button class="btn ${st.vista === 'oficial' ? 'primary' : ''}" data-bibvista="oficial">Todo (${st.oficial.length - nArch})</button>
          ${sinAud ? `<button class="btn ${st.vista === 'sinauditar' ? 'primary' : ''}" data-bibvista="sinauditar">🔶 Sin auditar (${sinAud})</button>` : ''}
+         ${nArch ? `<button class="btn ${st.vista === 'archivo' ? 'primary' : ''}" data-bibvista="archivo" title="Lo de antes, que ya no cuenta: se puede mirar y usar igual">📦 Archivadas (${nArch})</button>` : ''}
          ${esDueno() && st.propuestas.length ? `<button class="btn ${st.vista === 'propuestas' ? 'primary' : ''}" data-bibvista="propuestas">Propuestas viejas (${st.propuestas.length})</button>` : ''}`
       : '';
     pintarChips();

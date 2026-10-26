@@ -1207,7 +1207,14 @@
   ORIGEN.forEach(o => lista.push({poolId: 'hab-origen-' + slug(o.habilidad.nombre), nombre: o.habilidad.nombre, etiquetas: o.etiquetas,
     detalle: String(o.habilidad.detalle || '') + ` (De «El origen»: ${o.creeps.join(', ')}, nivel ${o.nivel}.)`, datos: {habilidad: o.habilidad}, rol: o.rol, concepto: o.concepto}));
 
+  /* 📦 El catálogo y el archivo (2026-10-26, dueño: «vamos a dejar estos skills de creep como los que son los de base. Todos los viejos los archivamos, ya no
+     cuentan. Cuando una persona quiere crear un creep y quiere ver los skills prediseñados, tiene que ver estos»): las auditadas son el catálogo
+     (HABILIDADES_CREEP_CATALOGO); las demás (las de fábrica sin auditar y las de «El origen») quedan archivadas (HABILIDADES_CREEP_ARCHIVO, con la
+     etiqueta «archivada»). HABILIDADES_CREEP_BASE sigue con todas (las buscan por nombre las pruebas, la auditoría y el simulador). */
+  lista.forEach(e => { if(!e.etiquetas.includes('auditada')){ e.archivada = true; if(!e.etiquetas.includes('archivada')) e.etiquetas.push('archivada'); } });
   window.HABILIDADES_CREEP_BASE = lista;
+  window.HABILIDADES_CREEP_CATALOGO = lista.filter(e => !e.archivada);
+  window.HABILIDADES_CREEP_ARCHIVO = lista.filter(e => e.archivada);
 
   // Arma la habilidad de un creep del nivel dado a partir de una entrada de la biblioteca.
   // Una versión editada y propuesta a la biblioteca (`datos.habilidad`) ya viene calculada: se copia tal cual, sin escalar con el nivel.

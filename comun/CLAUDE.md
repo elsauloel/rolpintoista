@@ -1718,4 +1718,10 @@ versión parecida en más de una, es candidato a juntar.
   habilidad (creep: `creeps-base.js` la copia y `CreepAcciones.terminarHab` llama `ui.bombaHumo`; personaje: `FichaAcciones.avisarZonaAlMapa` manda
   `bomba-humo-habilidad`, registrado en `mensajes-mapa.js`). Efectos que aplica el mapa por nombre: «Al final del orden», «Sube en el orden» y la Demora
   con `stacks` = cuántos lugares.
+- **📦 El catálogo de habilidades de creep y el archivo** (2026-10-26, dueño: «vamos a dejar estos skills de creep como los de base. Todos los viejos los
+  archivamos, ya no cuentan»): `skills-creep-base.js` exporta `HABILIDADES_CREEP_CATALOGO` (las auditadas) y `HABILIDADES_CREEP_ARCHIVO` (las de fábrica sin
+  auditar y las de «El origen», con la etiqueta «archivada»); `HABILIDADES_CREEP_BASE` sigue con todas (las buscan por nombre las pruebas, la auditoría y el
+  simulador). `Biblioteca.abrir` / `guardar` aceptan `baseArchivo` (de fábrica, archivadas) y `archivado(entrada)` (lo subido que ya no cuenta): eso va a la
+  pestaña «📦 Archivadas» (se puede mirar y usar igual); «Todo» y «Sin auditar» no lo muestran. `creep-editor.js` (el selector de habilidades de un creep y
+  el ⬆ Subir) archiva además lo subido antes del 2026-10-26 y la colección vieja. Un creep que ya tenía una habilidad archivada la conserva.
 

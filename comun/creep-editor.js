@@ -529,7 +529,7 @@ const CreepEditor = (() => {
     h.cdActual = h.cdArranca ? num(h.cd) : 0;
     const o = hab.bibOrigen;
     Biblioteca.guardar({tipo: 'skills', datos: {...h, para: h.para === 'jugador' ? 'jugador' : 'creep'}, nombre: h.nombre, nivel: sc.nivel,
-      grupos: HABS_CREEP_GRUPOS, base: typeof HABILIDADES_CREEP_BASE !== 'undefined' ? HABILIDADES_CREEP_BASE : [], legado: LEGADO_HABS,
+      grupos: HABS_CREEP_GRUPOS, base: catalogoHabs(), baseArchivo: archivoHabs(), archivado: subidaArchivada, legado: LEGADO_HABS,
       basadoEn: o && o.id ? {id: o.id, nombre: h.nombre} : null,
       alSubir: r => { const origen = {tipo: 'skills', id: r.id, version: r.version}; hab.bibOrigen = origen; if(alSubir) alSubir(r, origen); }});
   }
@@ -547,6 +547,11 @@ const CreepEditor = (() => {
   /* El catálogo de habilidades para un creep (comun/skills-creep-base.js + lo subido): se elige una, se calcula con su nivel y se agrega
      o, con reemplazarId (↻ Reemplazar del Ver), pisa esa habilidad. op = {reemplazarId, alElegir(h, viejaId), alCrearDeCero(viejaId),
      alVer(datos, ent)?}. */
+  // 📦 (2026-10-26) Lo de fábrica: el catálogo (las auditadas) y el archivo; lo subido antes del 2026-10-26 (y la colección vieja) también va al archivo.
+  const ARCHIVO_HASTA = new Date(2026, 9, 26).getTime();
+  const catalogoHabs = () => typeof HABILIDADES_CREEP_CATALOGO !== 'undefined' ? HABILIDADES_CREEP_CATALOGO : (typeof HABILIDADES_CREEP_BASE !== 'undefined' ? HABILIDADES_CREEP_BASE : []);
+  const archivoHabs = () => typeof HABILIDADES_CREEP_ARCHIVO !== 'undefined' ? HABILIDADES_CREEP_ARCHIVO : [];
+  const subidaArchivada = e => !!(e.legado || (num(e.fecha) > 0 && num(e.fecha) < ARCHIVO_HASTA));
   function elegirDeBiblioteca(sc, op = {}){
     const vieja = op.reemplazarId ? sc.habilidades.find(x => x.id === op.reemplazarId) : null;
     Biblioteca.abrir({
@@ -554,7 +559,7 @@ const CreepEditor = (() => {
       titulo: vieja ? `Reemplazar «${vieja.nombre || 'habilidad'}» de ${sc.nombre || 'el creep'}` : `Habilidad para ${sc.nombre || 'el creep'}`,
       textoCrearDeCero: vieja ? '✎ Mejor editar la actual (paso a paso)' : '+ Crear de cero (paso a paso)',
       alCrearDeCero: () => op.alCrearDeCero && op.alCrearDeCero(vieja ? vieja.id : null),
-      base: typeof HABILIDADES_CREEP_BASE !== 'undefined' ? HABILIDADES_CREEP_BASE : [],
+      base: catalogoHabs(), baseArchivo: archivoHabs(), archivado: subidaArchivada,   // 📦 las viejas, en «Archivadas»
       // Siempre a la vista para quién es (P122): 🐾 de creep (cooldown) o 🧙 de jugador (SP).
       subtitulo: x => paraDeDatos(x.datos) === 'jugador' ? ` · ${PARA_TXT.jugador}`
         : ` · ${PARA_TXT.creep} · ` + (x.datos.sp ? `${x.etiquetas.includes('lenta') ? 'lenta' : 'rápida'} · escala con el nivel del creep` : `${x.datos.cdArranca ? 'lenta' : 'rápida'} · valores fijos`),

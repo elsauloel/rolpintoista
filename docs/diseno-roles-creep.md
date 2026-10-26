@@ -98,6 +98,55 @@ avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene
   en el que se lo castea»): sobre sí mismo, **+3 PdG y +4 al daño, −2 Evasión y −2 Defensa**, durante **el turno en que la usa y 2 turnos completos más**
   (la marca `turnosCompletos` del Ojo certero). **2 No2 y 2 SP**, o cooldown 3; no es Flash.
 
+## Para ampliar el pool más adelante (ideas guardadas, 2026-10-26)
+
+> Dueño (2026-10-26): «las ideas que quedaron pendientes… déjalas guardadas en algún lado, porque si en algún momento quiero expandir el pool de habilidades
+> de creep, hay algunas ideas que me parecían muy buenas». Además de esto, **cada rol tiene su lista completa de conceptos más abajo**: lo que no tiene ✅
+> sigue disponible (y las «Skills de clase, para tener en cuenta» sin versión de creep). Desde el 2026-10-26 las habilidades de fábrica sin auditar están
+> **archivadas** (no salen en el catálogo; se ven en la pestaña «📦 Archivadas» de la biblioteca), así que lo nuevo se diseña desde acá.
+
+Las propuestas concretas que se ofrecieron en el camino a 20 y no se eligieron (con sus números, para retomarlas tal cual o ajustarlas):
+
+**🏹 Rango y Hunter**
+- **Flecha incendiaria**: un disparo con su arma; si pega, Quemadura.
+- **A quemarropa** ✦: pegado a un rival, dispara sin la penalidad del arco (la distancia mínima) y con +3 al daño.
+- **Enfocado** (de clase, versión creep un escalón arriba): +3 al daño de su próximo ataque (la de clase, +2).
+- **Ráfaga a tres**: tres disparos, cada uno a un objetivo distinto. **Lluvia de flechas** (⏸ guardada): diámetro 3 en su Rango, su PdG una vez contra la
+  Evasión de cada uno (dodge roll), el daño de su arma +2; un ataque y 3 SP, o cooldown 3.
+
+**✨ Mago**
+- **Diluvio**: un aguacero de diámetro 5 en su Rango; PdG.Esp contra la Evasión (dodge roll), 2d4 físico; deja **charco** en todas esas casillas (no vence:
+  el rayo ×1,5 y la Parálisis al doble) — el combo con la Cadena de rayos y el Zap. 3 No2 y 4 SP, o cooldown 3.
+- **Lazo arcano**: lo atrae 3 casillas hacia el mago salvo que gane con Fuerza, y 1d6 arcano.
+- **Magia inestable** ✦: 3d6 arcano; si en los dados sale un 1, el mago se hace 1d6 (el riesgo de la Varita inestable).
+- **Armadura arcana** (de clase): absorbe la mitad del daño que recibe y, al terminar, explota en un área con lo absorbido.
+
+**🧿 Debuffer**
+- **Drenar vida** (de clase): su Ef.Esp + 1d6 contra la Res.Esp; le saca la diferencia y se la cura (lo que pase de su máximo, Vida extra hasta un 50 %).
+- **Retrasar**: PdG.Esp contra Res.Esp, 1d6 siniestro y Demora 2 (la Demora de varios lugares ya existe: el Cascotazo).
+- **Veneno** (de clase, un escalón arriba): PdG.Esp contra Res.Esp; 1d4 tóxico directo y Veneno 4 (la de clase, 3).
+- **Quebrar la guardia** ✦: sin Parry ni Bloqueo hasta su próximo turno (necesita un estado nuevo).
+
+**💚 Support**
+- **Shield** (de clase, versión creep): Flash; un escudo de 16 a él o a un aliado en su Rango, hasta el final del turno. 2 SP (4 en turno ajeno), o cooldown 2.
+- **Orden de ataque** ✦: un aliado en su Rango ataca ya, fuera de su turno, sin No2 y con +1 PdG; no le cuenta como el ataque de su turno. 2 No2 y 3 SP,
+  o cooldown 3.
+- **Endurecimiento** (de clase): a un aliado, +3 Defensa, +3 Defensa especial y +1 a sus resistencias a crítico, 2 turnos.
+- **Sed de sangre** ✦: 2 turnos; un aliado que deja a un rival en 0 vuelve a atacar gratis una vez.
+
+**🗡 Choque liviano**
+- **Danza de cuchillas** ✦: avanza hasta 4 en línea recta (como el Dash) y le pega a hasta 2 rivales en el camino (un duelo por cada uno); si uno lo para
+  con Parry, se queda. Un ataque y 3 SP, o cooldown 3.
+- **Tronco de huída** (de clase, versión creep): Flash, +3 a una Evasión y, si la gana, se mueve 2 casillas gratis.
+- **Zancadilla**: un ataque con su arma; si pega, Sentado.
+
+**🛡 Choque pesado**
+- **Golpe brutal** (Warrior, versión creep): un ataque con su arma con Crítico potente +2 y +2 al daño; queda Guardia baja (−2 Evasión) hasta su próximo
+  turno. Un ataque y 2 SP, o cooldown 2.
+- **Hendidura**: un ataque con su arma que, pegue o no, sigue al que está justo detrás del objetivo, contra la misma tirada.
+- **Golpe que sigue** ✦, **Lanzar**, **Muralla**, **Interponerse**, **Segundo aliento**, **Estoicismo** (de clase: «Estoicismo [2] — NO2: (0). Flash. +2
+  Def por cada enemigo adyacente. +1 Res.Crit.»).
+
 ## Los roles
 
 1. **Choque pesado**: tanque y warrior (muchas habilidades les sirven a uno, al otro o a los dos).

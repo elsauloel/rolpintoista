@@ -86,6 +86,18 @@ avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene
   daño**; **con la mitad o menos, +2 Crítico frecuente, +2 Crítico potente y +3 al daño**; **con un cuarto o menos, además +2 PdG**. **Lo de un ataque y
   3 SP** (confirmado: el «más uno y más uno» es +1 a los dos críticos y +1 al daño). *(A confirmar:)* el cooldown (2).
 
+**🛡 Choque pesado (19 → 21)** (dueño, 2026-10-26: «me gusta el tacle. y la furia»: las dos)
+- **Takle** (la del Tanque en versión creep, un escalón arriba). Original: «Takle [3] — Flash (SP x 2). Se desplaza hasta 2 casillas. Ataque con +1 a PG. Si
+  gana una tirada de Constitución, el objetivo pierde 2 Nitros, lo empuja 2 casillas, interrumpe su turno y lo manda al final de la tabla de iniciativa. Si ya
+  era último en iniciativa, en vez de eso pierde el turno.» Versión creep: **Flash** (en turno ajeno, el doble); se desplaza hasta 2 casillas y ataca con su
+  arma con **+2 PdG**; si después gana la tirada de Constitución, el objetivo **pierde 3 No2**, lo **empuja 2 casillas**, se le **corta el turno** y pasa
+  **al final del orden**; si ya era el último, pierde el turno. *(A confirmar, propuesta de Claude:)* el desplazamiento, gratis y sin ataques de oportunidad;
+  la tirada de Constitución, solo si el ataque pegó (su Constitución contra la del objetivo; empate, la regla general); costo: lo de un ataque y 3 SP (6 en
+  turno ajeno), o cooldown 3.
+- **Furia** ✦ (dueño: «que por esa penalidad sea más 3 a la probabilidad de golpe y más 4 al daño durante 2 turnos. 2 turnos completos adicionales al turno
+  en el que se lo castea»): sobre sí mismo, **+3 PdG y +4 al daño, −2 Evasión y −2 Defensa**, durante **el turno en que la usa y 2 turnos completos más**
+  (la marca `turnosCompletos` del Ojo certero). *(A confirmar:)* costo 2 SP, o cooldown 3; si es Flash (propuesta: no).
+
 ## Los roles
 
 1. **Choque pesado**: tanque y warrior (muchas habilidades les sirven a uno, al otro o a los dos).

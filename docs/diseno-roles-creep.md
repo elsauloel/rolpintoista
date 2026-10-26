@@ -62,9 +62,9 @@ avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene
 - **Envión** (idea del dueño, 2026-10-26: «un poco como el Shield. Otorga un escudo de 10 de HP que absorbe daño. Del tipo vida extra. Y además, sube en
   uno en la tabla de iniciativas. Y tiene flash»): **Flash** (en turno ajeno, el SP al doble). A él o a un aliado en su Rango: **10 de Vida extra** (no se
   recarga) y **sube 1 lugar** en el orden de turnos. Reglas de la iniciativa: no pasa por encima del que tiene el turno (si ya es el siguiente, o es el del
-  turno, no sube); si ya actuó esta ronda, sube igual (le sirve para la próxima); el primero del orden no sube (el escudo vale igual). *(A confirmar:)* la
-  Vida extra dura hasta el final del próximo turno de quien la recibe; un segundo Envión reemplaza al anterior (queda el más alto); costo 3 SP (6 en turno
-  ajeno) o cooldown 3; el nombre.
+  turno, no sube); si ya actuó esta ronda, sube igual (le sirve para la próxima); el primero del orden no sube (el escudo vale igual). **La Vida extra
+  dura hasta que se gaste** (no vence) y **un segundo Envión la reemplaza**, no se suma (dueño, 2026-10-26: «dura hasta que se gaste. El escudo reemplaza,
+  no se suma. Y el nombre envión me gusta»). *(A confirmar:)* costo 3 SP (6 en turno ajeno) o cooldown 3.
 - **¡Al frente!** (de la lista, «llevarlo al lado de un rival» ✦; dueño, 2026-10-26: «la siguiente es esa de llevar al lado de un rival»): a un aliado en
   su Rango (no él): lo teletransporta a una casilla libre **pegada a un rival**, a 4 o menos de donde estaba (el GM marca al aliado y la casilla; solo
   sirven las libres pegadas a un rival); no camina (sin oportunidad, sin pisar trampas ni zonas en el camino, sin No2), lo de la casilla de llegada sí lo

@@ -1821,7 +1821,18 @@ async function avisoColision(t, contra, faltan){
     datos: {paraUids: uids, aviso: true, boton: 'Entendido', pasos: [{titulo: 'Daño de colisión', texto}]}});
   return lineas.join(' · ');
 }
-async function dueloEmpujar(d, n){
+/* 📌 Clavar a la pared (2026-10-26, dueño, el Rango: «si en alguno de esos casilleros hay un objeto sólido, se choca contra el mismo y queda inmovilizado
+   por tres turnos. Puede tirar fuerza contra; la dificultad va a ser la tirada de probabilidad de golpe»): si el empujón se frena contra algo sólido (un
+   Sólido, la colisión del mapa o una pared dibujada; no contra otro token), además del daño de colisión de siempre queda Inmovilizado `clava.turnos`, y se
+   suelta al empezar su turno con Fuerza contra el PdG con que le pegaron (el `soltar` de la Red). */
+async function dueloClavar(d, clava){
+  const dif = Math.max(1, Math.round(num(d.pdg && d.pdg.total)) || 1), turnos = Math.max(1, Math.round(num(clava.turnos)) || 3);
+  const r = await dueloAplicarEfectoBase(d, {nombre: 'Inmovilizado', spec: {nombre: 'Inmovilizado', turnos, soltar: {stat: 'fue', etq: 'Fuerza', dif, alEmpezar: true, ayuda: true}}});
+  const texto = `📌 ${d.defensor.nombre} quedó clavado: Inmovilizado ${turnos} turnos. Al empezar su turno se suelta con Fuerza contra ${dif} (el PdG con que le pegaron).`;
+  try{ mesaLinea(texto, 'recordatorio'); }catch(err){}
+  return r && r.manual ? `${texto} (aplicalo a mano)` : texto;
+}
+async function dueloEmpujar(d, n, clava){
   const t = tokens.get(d.defensor.tokenId), ta = d.atacante && tokens.get(d.atacante.tokenId);
   if(!t) return {manual: true, nota: 'el token ya no está: empujalo a mano'};
   if(!ta) return {manual: true, nota: `empujalo ${n} casillas a mano`};
@@ -1830,22 +1841,24 @@ async function dueloEmpujar(d, n){
   if(im && Math.random() * 100 < im){ momentoAbrir({tipo: 'empujon', icono: '💨', titulo, resultado: `Es Inamovible (${im} %): no se mueve.`, estado: 'listo'}); return {nota: 'Inamovible: no se movió'}; }
   let c = {col: t.col, fila: t.fila}, pasos = 0;
   const ocupada = x => elementoSolidoEn(x.col, x.fila) || [...tokens.values()].some(y => y !== t && y.col === x.col && y.fila === x.fila);
+  const pared = (a, b) => typeof paredCorta === 'function' && paredCorta(a, b);   // una pared dibujada también lo frena (2026-10-26, Clavar a la pared)
   for(let i = 0; i < n; i++){
-    const sig = vecinosDeCasilla(c).filter(v => !ocupada(v) && distanciaHex(v, ta) > distanciaHex(c, ta)).sort((p, q) => distanciaHex(q, ta) - distanciaHex(p, ta))[0];
+    const sig = vecinosDeCasilla(c).filter(v => !ocupada(v) && !pared(c, v) && distanciaHex(v, ta) > distanciaHex(c, ta)).sort((p, q) => distanciaHex(q, ta) - distanciaHex(p, ta))[0];
     if(!sig) break;
     c = sig; pasos++;
   }
   // Contra qué chocó (2026-10-08, dueño: el aviso del daño de colisión, a todos los involucrados): el token que tapa el paso o algo sólido.
   const contraQue = () => { const sig = vecinosDeCasilla(c).filter(v => distanciaHex(v, ta) > distanciaHex(c, ta)); return [...tokens.values()].find(y => y !== t && sig.some(v => v.col === y.col && v.fila === y.fila)) || null; };
-  if(!pasos){ const contra = contraQue(); momentoAbrir({tipo: 'empujon', icono: '💨', titulo, resultado: `No hay lugar para empujarlo: choca${contra ? ` contra ${nombreDe(contra)}` : ''} y queda donde está.`, estado: 'listo'}); const cl = await avisoColision(t, contra, n); return {nota: `chocó sin moverse${cl ? ' · ' + cl : ''}`}; }
+  if(!pasos){ const contra = contraQue(); momentoAbrir({tipo: 'empujon', icono: '💨', titulo, resultado: `No hay lugar para empujarlo: choca${contra ? ` contra ${nombreDe(contra)}` : ''} y queda donde está.`, estado: 'listo'}); const cl = await avisoColision(t, contra, n); const cv = clava && !contra ? await dueloClavar(d, clava) : ''; return {nota: `chocó sin moverse${cl ? ' · ' + cl : ''}${cv ? ' · ' + cv : ''}`}; }
   try{ await coleccionTokens().doc(d.defensor.tokenId).update({col: c.col, fila: c.fila, ruta: firebase.firestore.FieldValue.delete()}); }
   catch(err){ console.error('No se pudo empujar:', err); return {manual: true, nota: `empujalo ${pasos} casillas a mano`}; }
   // Si chocó antes de recorrer todo (un Sólido, un token o el borde): el daño de colisión (P178, 2026-10-21: Constitución por casillero que le faltó).
   const contra = pasos < n ? contraQue() : null;
   const choco = pasos < n ? ` Chocó contra ${contra ? nombreDe(contra) : 'algo sólido'}.` : '';
   const cl = pasos < n ? await avisoColision(t, contra, n - pasos) : '';
-  momentoAbrir({tipo: 'empujon', icono: '💨', titulo, resultado: `Sale despedido ${pasos} casillero${pasos === 1 ? '' : 's'} lejos de ${d.atacante.nombre || 'quien lo tiró'}.${choco}`, estado: 'listo'});
-  return {nota: `lo empujó ${pasos} casillero${pasos === 1 ? '' : 's'}${choco ? ` y chocó${cl ? ': ' + cl : ''}` : ''}`};
+  const cv = clava && pasos < n && !contra ? await dueloClavar(d, clava) : '';   // 📌 contra algo sólido: clavado
+  momentoAbrir({tipo: 'empujon', icono: '💨', titulo, resultado: `Sale despedido ${pasos} casillero${pasos === 1 ? '' : 's'} lejos de ${d.atacante.nombre || 'quien lo tiró'}.${choco}${cv ? ' ' + cv.replace(/^📌 /, '') : ''}`, estado: 'listo'});
+  return {nota: `lo empujó ${pasos} casillero${pasos === 1 ? '' : 's'}${choco ? ` y chocó${cl ? ': ' + cl : ''}` : ''}${cv ? ' · ' + cv : ''}`};
 }
 // El viento que despeja (2026-10-08, vendaval): borra la niebla y el fuego (terreno incendiado o zona de fuego) que tocan esas casillas.
 // (dueño, 2026-10-08): despeja SOLO las casillas que toca — una niebla o un fuego de varias casillas pierde esas y el resto queda (pasa a forma
@@ -2063,7 +2076,7 @@ async function cargaAlGolpeAbierto(t, tokenId, nombre){
 }
 // El Desarmado (2026-10-07) deja el arma en el piso (js/27); con `vuela`, lejos (la Varita del desarme).
 async function dueloAplicarEfecto(d, ef){
-  if(num(ef && ef.empuja) > 0) return dueloEmpujar(d, num(ef.empuja));   // el empujón no es un estado (2026-10-08)
+  if(num(ef && ef.empuja) > 0) return dueloEmpujar(d, num(ef.empuja), ef.clava);   // el empujón no es un estado (2026-10-08)   // 📌 clava: si choca contra algo sólido (2026-10-26)
   const r = await dueloAplicarEfectoBase(d, ef);
   try{
     const spec = Duelo.specDeEfecto(ef), t = tokens.get(d.defensor.tokenId);

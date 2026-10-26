@@ -649,6 +649,7 @@ const Duelo = (() => {
       ...(_num(e.bajaCd) > 0 ? {bajaCd: Math.min(6, Math.round(_num(e.bajaCd)))} : {}),   // 🥁 Redoble de tambores (2026-10-25)
       ...(_num(e.vuela) > 0 ? {vuela: Math.min(6, Math.round(_num(e.vuela)))} : {}),   // el arma vuela N casillas (la Varita del desarme)
       ...(_num(e.empuja) > 0 ? {empuja: Math.min(6, Math.round(_num(e.empuja)))} : {}),   // lo empuja N casillas (2026-10-08)
+      ...(e.clava ? {clava: {turnos: Math.min(6, Math.max(1, Math.round(_num(e.clava.turnos)) || 3))}} : {}),   // 📌 Clavar a la pared (2026-10-26)
     })).filter(e => e.nombre);
   }
   // Grupo de un hechizo de área (Paso 4/7 del casteo): ata este sub-duelo a la cascada de `campanas/<id>/areas/<grupoId>`
@@ -1063,6 +1064,7 @@ const Duelo = (() => {
       if(_num(e.bajaCd) > 0) o.bajaCd = Math.min(6, Math.round(_num(e.bajaCd)));   // 🥁 Redoble de tambores (2026-10-25)
       if(_num(e.vuela) > 0) o.vuela = Math.min(6, Math.round(_num(e.vuela)));   // el arma vuela N casillas (la Expelliarmus, 2026-10-07)
       if(_num(e.empuja) > 0) o.empuja = Math.min(6, Math.round(_num(e.empuja)));   // lo empuja N casillas (2026-10-08)
+      if(e.clava) o.clava = {turnos: Math.min(6, Math.max(1, Math.round(_num(e.clava.turnos)) || 3))};   // 📌 Clavar a la pared (2026-10-26)
       if(e.seguroCritico && caras > 1) o.seguroCritico = true;
       if(e.soloCritico) o.soloCritico = true;
       o.requiereDano = requiereDanoDe(e);

@@ -33,7 +33,7 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
   furia, pisotón, provocar, segundo aliento, aguantar el daño, cubrir al de al lado, perforar, carga que derriba.
 - 🗡 **Choque liviano — 15**: golpe preciso, sangrado, trabar, golpear y alejarse, salto, abrir la herida, manada, ráfaga, por la espalda · de El origen:
   robar, sigilo, varios golpes, bajo tierra, veneno (de fábrica desde el 2026-10-25: Hoja envenenada / Mordisco infectado), todo al ataque (Degollar, 2026-10-26).
-- 🏹 **Rango y Hunter — 15**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar, mantener a raya (2026-10-25), atravesar (Flecha que atraviesa, 2026-10-25), disparos encadenados (Ráfaga encadenada, 2026-10-25), disparar y replegarse (Disparo y repliegue, 2026-10-26) · de El origen: área a distancia,
+- 🏹 **Rango y Hunter — 16**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar, mantener a raya (2026-10-25), atravesar (Flecha que atraviesa, 2026-10-25), disparos encadenados (Ráfaga encadenada, 2026-10-25), disparar y replegarse (Disparo y repliegue, 2026-10-26), clavar a la pared (2026-10-26) · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 15**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25), lluvia de escarcha (2026-10-25), andanada arcana (2026-10-25), misiles elementales (2026-10-25), portal trampa (2026-10-25), sanguijuela (2026-10-26) · de El origen: proyectil, fuego con quemadura.
 - 🧿 **Debuffer — 15**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25), silencio (Tótem de silencio, 2026-10-25), extenuar (2026-10-25), cegar (2026-10-25), grito de pánico (2026-10-25), nube tóxica (2026-10-26) · de El origen: ceguera, veneno, inmovilizar.
@@ -41,7 +41,7 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
 **Para emparejar** (regla del dueño, 2026-10-25: «empezamos a tener en cuenta todos los roles de creep e ir emparejándolos… para que estén todos
-avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Mago, Rango + Hunter, Debuffer, Support y Choque liviano en 15; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
+avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Mago, Debuffer, Support y Choque liviano en 15; Rango + Hunter en 16; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
 
 ## Los roles
 
@@ -260,7 +260,7 @@ la emboscada, matabestias, la espalda a distancia, la recarga, el proyectil perf
 15. **Tiro que derriba**: Sentado.
 16. **Tiro que empuja**: lo corre uno o dos casilleros (con daño de colisión).
 17. **Tiro al arma**: Desarmado (el arma cae al piso).
-18. **Clavar a la pared**: si hay un Sólido o una pared detrás, queda Inmovilizado.
+18. ✅ **Clavar a la pared** (2026-10-26, dueño: +3 PdG; si pega, lo empuja 3 y, si choca contra algo sólido, Inmovilizado 3 turnos —Fuerza contra el PdG con que le pegaron—): si hay un Sólido o una pared detrás, queda Inmovilizado.
 19. ✅ **Red** y Tela de araña (Inmovilizado).
 20. **Tiro cegador**: Ceguera (una flecha de luz o tierra a los ojos).
 21. **Cortina de humo**: una nube que tapa la vista (para cubrirse o cubrir a los suyos).

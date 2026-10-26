@@ -1564,6 +1564,7 @@ const Combatiente = (() => {
     const caras = Math.max(1, Math.round(nf(e.caras)) || 1);
     return {nombre: e.nombre || (e.cura ? 'Curación' : ''), caras, exitos: Math.min(caras, Math.max(1, Math.round(nf(e.exitos)) || 1)), ...(e.detalle ? {detalle: String(e.detalle)} : {}),
       ...(nf(e.vuela) > 0 ? {vuela: Math.round(nf(e.vuela))} : {}),
+      ...(e.clava ? {clava: {turnos: Math.min(6, Math.max(1, Math.round(nf(e.clava.turnos)) || 3))}} : {}),   // 📌 Clavar a la pared (2026-10-26): si choca contra algo sólido, Inmovilizado (vtt-hexgrid/js/13 dueloEmpujar)
       ...(nf(e.empuja) > 0 ? {empuja: Math.round(nf(e.empuja))} : {}),   // lo empuja N casillas, lejos de quien la usa (2026-10-08, ráfaga helada, vendaval)   // el arma vuela N casillas (el Desarmado de la Varita del desarme, 2026-10-07)
       spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: nf(e.val)}] : e.mods,
         polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : e.stat ? (nf(e.val) >= 0 ? 'buff' : 'debuff') : (e.escudo ? 'buff' : undefined), hp: e.hp, stacks: e.stacks, escudoMagico: e.escudo,   // (la polaridad que trae, 2026-10-24: ¡A la carga! quedaba como debuff)
@@ -1809,6 +1810,7 @@ const Combatiente = (() => {
       spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: nf(e.val)}] : e.mods, polaridad: e.stat ? (nf(e.val) >= 0 ? 'buff' : 'debuff') : undefined,
         ...(nf(e.stacks) > 0 ? {stacks: Math.round(nf(e.stacks))} : {}),   // (Sangrado de N: Tajear, 2026-10-10)
         ...(e.soltar ? {soltar: soltarDe(e.soltar)} : {})},
+      ...(e.clava ? {clava: {turnos: Math.min(6, Math.max(1, Math.round(nf(e.clava.turnos)) || 3))}} : {}),   // 📌 Clavar a la pared (2026-10-26): si choca contra algo sólido, Inmovilizado (vtt-hexgrid/js/13 dueloEmpujar)
       ...(nf(e.empuja) > 0 ? {empuja: Math.round(nf(e.empuja))} : {}),   // el empujón (2026-10-21, la Cornada): no es un estado, lo hace el mapa
       cura: nf(e.cura), detalle: e.detalle || ''});
     const critico = c.critico ? {

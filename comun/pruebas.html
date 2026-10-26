@@ -1077,6 +1077,11 @@ prueba('✨ Purificar (Support, 2026-10-25): Flash; a un aliado, la purga y cura
   const n = Duelo.limpiarHab(ej) || {};
   igual([h.duelo.objetivo, h.duelo.conmigo, !!(n.efectos || []).find(x => x.purga), ((n.efectos || []).find(x => x.cura) || {}).cura, !!h.flash, h.nitrosCosto, h.cd], ['aliado', true, true, 5, true, 0, 3]);
 });
+prueba('🎯 Tiro al arma (Rango, 2026-10-26): +2 PdG; si pega, el arma sale volando 2 (Desarmado con vuela)', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Tiro al arma'), h = armarHabilidadDeCreep(e.datos, 2);
+  const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}}), ef = (a.efectos || [])[0] || {};
+  igual([h.duelo.arma.pdg, h.duelo.arma.fijo, ef.nombre, ef.vuela, h.spCosto, h.cd, e.etiquetas.includes('rango')], [2, 0, 'Desarmado', 2, 3, 3, true]);
+});
 prueba('🌬 Ráfaga de viento (Mago, 2026-10-26): cono, PdG.Esp contra Evasión, 1d6 arcano, empuja 3 y Sentado', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Ráfaga de viento'), h = armarHabilidadDeCreep(e.datos, 2);
   igual([h.duelo.objetivo, h.duelo.tira, h.duelo.contra.join(','), h.duelo.danoFormula, h.duelo.efectos[0].empuja, h.duelo.efectos[1].nombre, h.cd, e.etiquetas.includes('mago')],

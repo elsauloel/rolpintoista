@@ -1811,6 +1811,7 @@ const Combatiente = (() => {
         ...(nf(e.stacks) > 0 ? {stacks: Math.round(nf(e.stacks))} : {}),   // (Sangrado de N: Tajear, 2026-10-10)
         ...(e.soltar ? {soltar: soltarDe(e.soltar)} : {})},
       ...(e.clava ? {clava: {turnos: Math.min(6, Math.max(1, Math.round(nf(e.clava.turnos)) || 3))}} : {}),   // 📌 Clavar a la pared (2026-10-26): si choca contra algo sólido, Inmovilizado (vtt-hexgrid/js/13 dueloEmpujar)
+      ...(nf(e.vuela) > 0 ? {vuela: Math.round(nf(e.vuela))} : {}),   // 🎯 el arma vuela N casillas también en un ataque con el arma (el Tiro al arma, 2026-10-26)
       ...(nf(e.empuja) > 0 ? {empuja: Math.round(nf(e.empuja))} : {}),   // el empujón (2026-10-21, la Cornada): no es un estado, lo hace el mapa
       cura: nf(e.cura), detalle: e.detalle || ''});
     const critico = c.critico ? {

@@ -9,6 +9,9 @@
 - **Al entrar a un rol, primero la lista completa de conceptos de ese rol** (dueño, 2026-10-21: «siempre que vayamos a encarar un nuevo rol, primero vemos
   la lista»): familias, ✦ = acelera la pelea, ✅ = ya cubierto. Si la lista no está completa, se completa acá antes. Después se elige la habilidad. Cada
   lista se retoma cada vez que se vuelve al rol.
+- **Las skills de clase también entran en la lista** (dueño, 2026-10-26: «incorporá a la lista los skills de clase, para tener en cuenta. Eso en todos
+  los tipos y clase»): al final de cada rol está el bloque «Skills de clase, para tener en cuenta» (Warrior y Tanque → Choque pesado, Asalto → Choque
+  liviano, Shooter → Rango, Mago → Casters, Support, Debuffer), con el original y si ya tiene versión de creep. Al presentar el rol, se repasan también.
 - Lo que el dueño define («queda así») se programa, pasa las pruebas automáticas, se sube y se anota «para probar»; las pruebas en el mapa se corren
   todas juntas cuando él lo pide.
 - Una habilidad puede servir a más de un rol, y puede tener su versión de bestia y de humanoide (o una sola para los dos).
@@ -115,6 +118,34 @@ Sirven al warrior (pegar fuerte), al tanque (aguantar y controlar) o a los dos.
 37. **Sangre por sangre**: pierde vida para pegar más fuerte.
 38. **Berserker**: con poca vida, pega mucho más.
 
+**Skills de clase, para tener en cuenta** (2026-10-26, dueño: «incorporá a la lista los skills de clase, para tener en cuenta. Eso en todos los
+tipos y clase»): las de Warrior y Tanque, con el original tal cual (o, si no tiene, lo que hace hoy). ✅ = ya tiene su versión
+de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
+- *Warrior*
+  - **Arte de la guerra**: «Arte de la guerra [2] — +2 fijo a una tirada de PG, Parry, Bloqueo o Daño.»
+  - ✅ **Amplificar daño** → Golpe fuerte (con X = 1): «Amplificar daño [X] — Amplifica en X el daño de un ataque. X no puede ser mayor a 3.»
+  - **Sacadito** (en pausa): En pausa, a definir. SP 3. Recibe 10 Nitros que puede usar en ataques consecutivos iguales. Acumulable con otras skills si todos los ataques son idénticos.
+  - **Cañón Vasco**: «Cañón Vasco [2 + X] — X no puede ser mayor a FUE. Salta X casillas a X altura. Si aterriza en un enemigo, lo empuja 1 casillero. Al caer, hace X + FUE (tira) daño de onda expansiva en área. Puede atacar a un objetivo al caer con…»
+  - ≈ **Carga** → Cornada (toma carrera) y Tajo veloz: «Carga [X] — Se desplaza X casilleros en línea recta, gastando los No2 correspondientes. Al finalizar el recorrido, ataca con +X al daño y a la PG.»
+  - **Estoicismo**: «Estoicismo [2] — NO2: (0). Flash. +2 Def por cada enemigo adyacente. +1 Res.Crit.»
+  - ✅ **Remolino** → Barrido y Coletazo (sin moverse): «Remolino [3] — Ataque que daña a todos los objetivos adyacentes. Puede desplazarse una casilla; si lo hace, cuenta las áreas de efecto de ambas posiciones. Repetirlo de inmediato ignora el cooldown del arma.»
+  - **Contraataque**: «Contraataque [2] — Permite realizar un ataque de oportunidad después de esquivar un ataque.»
+  - ✅ **Desarmar** → Desarmar: FLASH. Le sacás al otro lo que tiene en la mano —un arma o un escudo—, que sale volando 2 casillas (a una libre a la que llegue volando: lo sólido la frena, las personas no; si no hay, al anillo de adentro o de afuera) y queda…
+  - **Golpe brutal**: Ataque con Crítico potente ×1 (el doble daño sale con 6+ en el d20, y el triple y el cuádruple un poco antes). A cambio, −2 a tu Evasión hasta tu próximo turno (⚙ automático: te queda el estado «Guardia baja»). Cuenta como un…
+- *Tanque*
+  - **Blindaje**: «Blindaje [1] — Flash (SP x 2). NO2: (0). Otorga un blindaje que absorbe 8 de daño de la próxima fuente de daño este turno.»
+  - **Shockwave**: «Shockwave [4] — Onda expansiva (Fuerza / Constitución). Flash (SP x 2). Todos los personajes adyacentes al tanque quedan en Pajaritos hasta el final de su próximo turno.»
+  - ≈ **Aura de espinas** → Coraza de púas (Espinas, del Support): «Aura de espinas [1] — Devuelve 1/4 del daño del ataque como true damage hasta el comienzo del próximo turno.»
+  - **Recuperación**: «Recuperación [1] — NO2: (2). Recupera 9 HP.»
+  - **Sonic Boom**: «Sonic Boom [2] — Onda expansiva (Fuerza / Constitución). Flash (SP x 2). Golpea el piso creando una onda de choque en un cono al frente, que hace perder una cantidad de No2 igual a 1 + la diferencia en la tirada. Si perdiera…»
+  - **Piel resistente**: «Piel resistente [5] — Otorga una armadura temporal: Defensa 5, Res. Mágica 5, reduce críticos de todo tipo. Duración: 2 turnos.»
+  - **Daño en área**: «Daño en área [2] — Ataque con daño en área de flor. No afecta al tanque.»
+  - **Takle**: «Takle [3] — Flash (SP x 2). Se desplaza hasta 2 casillas. Ataque con +1 a PG. Si gana una tirada de Constitución, el objetivo pierde 2 Nitros, lo empuja 2 casillas, interrumpe su turno y lo manda al final de la tabla de…»
+  - ✅ **Taunt** → el «provocar» de El origen: «Taunt [1] — Tira Especial + 1 contra Especial para obligar a un enemigo a atacarlo hasta el final de su próximo turno.»
+  - **Miti-Miti**: «Miti-Miti [2] — Marca un personaje como protegido. El protegido comparte con el tanque la mitad del daño que recibe. Duración: 1 turno.»
+  - ✅ **Aguante** → Aguante: «(Skill nueva, 2026-10-23: la misma del modo aguante de los creeps de choque pesado, sumada al pool del Tanque por el dueño; tope de dados: nivel + 1.)»
+  - **Temple**: Endurecés el cuerpo: +1 de Resistencia a crítico contra armas de todo Tipo durante 2 turnos (cada punto le quita un nivel al crítico). Solo sobre vos. ⚖ Propuesta a auditar con el grupo (críticos nuevos: Crítico frecuente baja…
+
 ## 2. Choque liviano — las ideas del rol
 
 Ya cubierto al entrar (2026-10-21): golpes precisos (Tajo veloz, Estocada, Zarpazo), las variantes del Sangrado y su versión fuerte, el Rengo (Golpe a la
@@ -174,6 +205,21 @@ rodilla, Tarascón al tobillo), las redes; y en el mapa, el sigilo, el +1 por la
 **I. Apuestas** ✦
 34. **Todo al ataque**: pega mucho más, sin Evasión hasta su próximo turno.
 35. **Golpe desesperado**: con poca vida, un golpe con mucho más crítico.
+
+**Skills de clase, para tener en cuenta** (2026-10-26, dueño: «incorporá a la lista los skills de clase, para tener en cuenta. Eso en todos los
+tipos y clase»): las de Asalto, con el original tal cual (o, si no tiene, lo que hace hoy). ✅ = ya tiene su versión
+de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
+- **Dash**: «Dash [3] — NO2: (1 + Ataque). Avanza 3 casilleros en línea recta atravesando hasta 1 enemigo. Ataca a los enemigos que atraviesa. +2 fijo al parry. Se cancela si pierde una tirada de parry o bloqueo. Si atraviesa un enemigo de…»
+- ✅ **Lisiar** → Zarpazo (sin la Lesión): «Lisiar [2] — Ataque con +1 al crítico. Causa lesión de -1 de PG al objetivo durante 2 turnos. Critical Matters: si es crítico, cambia el efecto a -2 fijo a la PG por 2 turnos.»
+- ≈ **Tajear** → Tajo veloz: «Tajear [3] — Ataque con +1 al crítico. Deja heridas de 3 de daño por 3 turnos. Critical Matters: si es crítico, cambia el efecto a 5 de daño hasta curarse.»
+- **Invi** (en pausa): SP 5. Invisible por Invi × 2 turnos. Se detecta con Percepción (ESP). El rango depende de la velocidad: normal (1 No2 por casillero) flor de diámetro 7 (37 casillas); lenta (2 No2 por casillero) flor de diámetro 5 (19 casillas).
+- ≈ **Envenenar arma** → Arma venenosa (Support) y Hoja envenenada: «Envenenar arma [2] — Mejora el arma con veneno que le otorga +3 fijo al daño y aplica 3 stacks de veneno. Duración: 2 ataques.»
+- **Backstab** (en pausa): SP 2. Únicamente por la espalda. +5 daño fijo. Ignora 1 de resistencia a crítico.
+- **Degollar**: «Degollar [7] — Ataque devastador con +4 de PG, +7 de daño y +1 al crítico. Interrumpe su turno y se pasa al final de la tabla de iniciativa. Hasta su próximo turno pierde 50% de evasión y no puede usar No2 para responder a…»
+- **Sprint**: «Sprint [1] — 2 No2: avanza 3 casillas.»
+- **Tronco de huída**: «Tronco de huída [2] — +2 fijo a una tirada de evasión con giro.»
+- **Robar SP** (en pausa): SP 1. Ganás 2 SP por cada crítico obtenido.
+- **Ojo de asesino**: Tu próximo ataque con arma de este turno tiene Crítico frecuente +1: el rango del crítico baja 1 punto (un arma Tipo 4 hace crítico con diferencia 3; nunca baja de 2). Lo gasta ese ataque, pegue o no (una carga); si no atacás,…
 
 ## 3. Rango y Hunter — las ideas del rol
 
@@ -253,6 +299,21 @@ la emboscada, matabestias, la espalda a distancia, la recarga, el proyectil perf
 42. **A quemarropa**: dispara pegado a un rival sin la penalidad, y con más daño.
 43. **Último disparo**: con poca vida, un disparo con mucho más daño.
 
+**Skills de clase, para tener en cuenta** (2026-10-26, dueño: «incorporá a la lista los skills de clase, para tener en cuenta. Eso en todos los
+tipos y clase»): las de Shooter, con el original tal cual (o, si no tiene, lo que hace hoy). ✅ = ya tiene su versión
+de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
+- ≈ **Apuntar** → Tiro a la cabeza: «Apuntar [X] — X No2: +X a la PG y al crítico en el próximo ataque a distancia (X ≤ 3).»
+- ✅ **Vigilancia** → Vigilancia: «(Nueva, 2026-10-21: la Vigilancia de los creeps, sumada al Shooter a pedido del dueño.)»
+- **Acelerado**: «Acelerado [1] — Reduce el cooldown de un ataque. Repetible (+1 SP por repetición).»
+- **Enfocado**: «Enfocado [1] — +2 de daño al próximo ataque. Repetible (+1 SP por repetición).»
+- **Parry a distancia**: «Parry a distancia [2] — Flash. Realiza un ataque de rango como instantáneo. Si se hace como respuesta a un ataque, tira Agilidad para cancelarlo.»
+- ≈ **Headshot** → Tiro a la cabeza (apunta un turno antes): «Headshot [4] — Ataque con +1 al crítico y crítico mejorado. Daño +5. +2 fijo a PG. Falla si no es crítico.»
+- ✅ **Proyectil perforante** → Flecha que atraviesa: «Proyectil perforante [2] — Ataque que continúa hasta alcanzar un segundo objetivo. Todos los efectos especiales se pierden después del primer objetivo.»
+- ≈ **Marcar** → Disparo señalador (Presa y Marcado): «Marcar [3] — Designa un objetivo como marcado; sigue marcado hasta que ataque a un objetivo diferente. Obtiene +1 PG, +1 Daño y +1 Crítico contra el objetivo marcado.»
+- ✅ **Repetición** → Ráfaga encadenada: «Repetición [X] — Realiza X ataques consecutivos idénticos entre sí (los ataques gastan No2 normalmente). Por cada ataque adicional al primero suma +1 a la PG y amplifica +1 el daño.»
+- **Disparo múltiple** (en pausa): SP X (el doble de objetivos adicionales). Ataca a múltiples objetivos en línea directa en un cono ancho.
+- **Tiro con comba** (en pausa): SP 1. Altera la trayectoria de un ataque de rango para esquivar obstáculos. Desvío máx. 2 casillas; cada una cuenta como +1 de distancia.
+
 ## 4. Casters — las ideas del rol
 
 Ya cubierto al entrar (2026-10-21): ninguna habilidad de caster auditada; en el mapa, los hechizos dirigidos y de área (cascada, dodge roll), conos,
@@ -275,7 +336,7 @@ líneas, zonas, el rayo en cadena y los charcos, los controles mentales.
     de hielo; el suelo congelado 2 turnos (el de la Varita de la ventisca) y después el charco, que no vence. 4 No2 y su Especial en SP, o cooldown 3.
     6. **Diluvio** (deja charcos: el rayo corre por el agua, combo con la Cadena de rayos).
     7. **Nova arcana** (una onda alrededor que empuja).
-  - **C. Control elemental:** 8. **Prisión de hielo** (Inmovilizado, se suelta con Fuerza). 9. **Ráfaga de viento** (cono que empuja y tira al piso).
+  - **C. Control elemental:** 8. **Prisión de hielo** (Inmovilizado, se suelta con Fuerza; ▶ **la próxima del Mago**, dueño 2026-10-26: «la próxima ronda hacemos la prisión de hielo»; propuesta: PdG.Esp contra Evasión, 2d4 de hielo e Inmovilizado hasta 2 turnos, se suelta con Fuerza contra su Ef.Esp, como la Red; 2 No2 y 3 SP, o cooldown 3). 9. **Ráfaga de viento** (cono que empuja y tira al piso).
     10. ✅ **Zap** (ex «Rayo paralizante», 2026-10-25: no se esquiva; 1d4 eléctrico directo y Parálisis salvo que la resista con Res.Esp; salta con la mitad, 50 % y 25 % de Parálisis).
   - **D. El cuerpo del mago:** 11. **Escudo de maná** (un escudo que se paga con SP). 12. **Parpadeo** (se teletransporta unas casillas, Flash).
     13. **Contrahechizo** (Flash: al ver una habilidad de un personaje, la frena con su Res.Esp).
@@ -297,6 +358,21 @@ líneas, zonas, el rayo en cadena y los charcos, los controles mentales.
 - **Debuffer:** ver el listado completo abajo (§ 6).
 - **Support:** ver el listado completo abajo (§ 5).
 - **El costo de las que suman Efecto especial:** P216 (la página para la mesa: https://claude.ai/artifact/C7VPwWPg9BpWfF1L1hUGb6).
+
+**Skills de clase, para tener en cuenta** (2026-10-26, dueño: «incorporá a la lista los skills de clase, para tener en cuenta. Eso en todos los
+tipos y clase»): las de Mago, con el original tal cual (o, si no tiene, lo que hace hoy). ✅ = ya tiene su versión
+de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
+- **Invocar portal**: Invocás DOS portales de teletransporte en dos puntos dentro de tu Rango (transitables a pie). Duran 3 turnos (X, a definir en mesa). Solo los ALIADOS los usan: al pisar uno, aparecen en el otro. ⚙ Automatizado: al ejecutarla el…
+- ≈ **Chispazo** → Misil arcano: «Chispazo [1] — NO2: (1). Dispara un proyectil T6 P1 (1d6) que ignora armadura.»
+- **Rayo Mágico**: «Rayo Mágico [X] — NO2: (5). Ataca con un rayo arcano que hace daño tipo 1. Amplifica el daño en el doble de X. X no puede ser mayor a Especial.»
+- **Orbe arcano**: «Orbe arcano [4] — NO2: (5). Dispara un orbe arcano que hace daño en área tipo 5. Amplifica el daño en 4. Área: flor de 1.»
+- **Tormenta arcana**: «Tormenta arcana [15] — NO2: (5). Provoca una lluvia de 1d20 proyectiles arcanos T4 P1 en flor de 2. Caen aleatoriamente sobre todos los objetivos posibles. Esquivable solo con dodge roll.»
+- **Ráfaga arcana**: «Ráfaga arcana [2] — NO2: (3). Dispara una ráfaga arcana que hace daño en área tipo 3. Área: cono de 3 al frente.»
+- **Toque mágico**: «Toque mágico [3] — NO2: (4). Requiere un toque físico con la mano o el arma, usando PG contra Evasión. No se puede bloquear. A distancia melé, hace 3d T6 + ESP de daño mágico.»
+- ≈ **Carga Elemental** → los Misiles elementales y las Armas elementales: «Carga Elemental [X] — Modifica un skill de daño mágico para que tenga propiedades elementales. Cada nivel en este skill otorga nuevos elementos. X es la mitad del coste del skill. Elementos: Fuego +50% de daño. Frío -1 No2 cada…»
+- **Armadura arcana**: «Armadura Mágica [5] — NO2: (3). Crea una armadura mágica que reduce el daño recibido en un 50% (máximo 10). Cuando termina el efecto, hace daño mágico en área de flor igual al daño absorbido. Duración: 2 turnos.»
+- **Telekinesis** (en pausa): SP 15. No2 3. Hechizo. Mueve y controla un objeto con la mente; puede arrebatar el arma a un enemigo con Esp/Fue y atacar con ella (ESP como PG y como daño). 1 SP por cada No2 que use para atacar o mover el objeto. Controlado el…
+- **Control Mental** (en pausa): SP 7. No2 3. Hechizo. Tira Esp contra (Esp + Res.M) de otro personaje. Si gana, lo controla y lo obliga a cualquier acción que no lo dañe a sí mismo. Pagás 1 SP y 1 No2 por cada No2 que gaste el controlado.
 
 ## 5. Support — el listado completo (2026-10-21)
 
@@ -383,6 +459,22 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
 43. **Escudo al acertar**: cada vez que gana una tirada de PdG.Esp, Vida extra para él o un aliado [Orbe del custodio, Orbe de resguardo].
 44. **Magia del caos a favor**: tira un dado y, a un aliado, le cae un buff al azar (con riesgo de que salga al revés) [Varita del caos].
 
+**Skills de clase, para tener en cuenta** (2026-10-26, dueño: «incorporá a la lista los skills de clase, para tener en cuenta. Eso en todos los
+tipos y clase»): las de Support, con el original tal cual (o, si no tiene, lo que hace hoy). ✅ = ya tiene su versión
+de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
+- ✅ **Empower** → Empuje: «Empower [2] — NO2: (0). +3 a cualquier tirada propia o de un aliado.»
+- ≈ **Blessing** → Arenga (Bendecido): «Blessing [5] — +1 fijo en todas las tiradas por 2 turnos.»
+- ✅ **Heal** → Sanar: «Heal [2] — NO2: (1). Cura 4 + 1d6 HP.»
+- **Shield**: «Shield [2] — Flash (SP x 2). Otorga un blindaje temporal que absorbe 14 de HP hasta el final del turno.»
+- **Acelerador**: «Acelerador [1] — Marca una casilla con flechitas para adelante (>>). Cada aliado que la pisa obtiene +2 No2 (máximo una vez por turno). Duración: 10 turnos.»
+- **Endurecimiento**: «Endurecimiento [5] — Otorga una armadura temporal: Defensa 3, Res. Mágica 3, reduce críticos de todo tipo. Duración: 2 turnos.»
+- **Re-roll**: «SP 2. Flash. Permite rerolear tiradas aliadas. Lento. (2026-10-12: absorbió a Afortunado, una skill nueva del Support que hacía lo mismo y se quedaba con la mejor.)»
+- **Smite**: «Smite [1] — NO2: (1). Rayo de daño holy inesquivable que causa 1d4 de daño.»
+- **Ojo de Kicillof**: Invocás, en una casilla dentro de tu Rango y que veas, un ojo volador etéreo que movés vos: Movimiento 5 y dura 2 turnos (entra al orden sin mareo); al cumplirlos, desaparece. Ve en una flor de diámetro 5 alrededor suyo, para…
+- **Transferir SP** (en pausa): SP 1. Transfiere 1d6 SP entre vos y un aliado.
+- ⏸ **Adrenalina** (en pausa) → Adrenalina, anotada para el futuro (docs/pendientes.md): SP 5. +1 a Destreza, Fuerza y Agilidad durante 2 turnos. Acumulable. Lento.
+- **Marca del cazador** (en pausa): SP 3. No2 1. Un aliado dentro de tu Rango recibe Crítico frecuente ×1 durante 2 turnos (baja 1 el rango de sus críticos; mínimo 2). ✋ A mano: dale el estado \
+
 ## 6. Debuffer — el listado completo (2026-10-21)
 
 **Son conceptos de diseño** (dueño, 2026-10-21): cada vez que toque una habilidad de debuffer se explora uno y se marca ✅. ✦ = acelera la pelea (le abre
@@ -461,4 +553,20 @@ Inmovilizado, Rengo, Desarmado; y, de personajes, Enyetar.
 35. **Maldición del espejo**: parte del daño que hace le vuelve.
 36. **Lazo de dolor**: el debuffer le pasa al objetivo parte del daño que recibe.
 37. **Marca de muerte** ✦: si cae mientras está marcado, el debuffer recupera vida o SP.
+
+**Skills de clase, para tener en cuenta** (2026-10-26, dueño: «incorporá a la lista los skills de clase, para tener en cuenta. Eso en todos los
+tipos y clase»): las de Debuffer, con el original tal cual (o, si no tiene, lo que hace hoy). ✅ = ya tiene su versión
+de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
+- ✅ **Enyetar** → Mal de ojo: «Enyetar [5] — Maldición (Esp / Res.M). Flash. Obliga a repetir una tirada y quedarse con el valor más bajo.»
+- ✅ **Confusión** → Confusión: «Confusión [5] — Maldición (Esp / Res.M). Antes de realizar un ataque o habilidad con objetivo, tira 1d4: 1) el debuffer elige el objetivo; 2) gasta los No2 pero no realiza la acción; 3) elige el objetivo al azar; 4) actúa…»
+- **Maldición debilitante**: «Maldición debilitante [5] — Maldición (Esp / Res.M). -1 a todas las tiradas. Duración: 2 turnos. Acumulable. Lento.»
+- ✅ **Maldición extenuante** → Extenuar: «Maldición extenuante [3] — Maldición (Esp / Res.M). Incrementa en 1 los Nitros de todas las acciones. Debe pagar 1 Nitro para moverse cada 2 casillas. Duración: 1 turno. Acumulable. Lento.»
+- **Maldición tormentosa**: «SP 5. Maldición (Esp / Res.M). Por cada acción recibe daño igual a No2 - 1; paga 1 HP para moverse cada 2 casillas. Dura 3 turnos. Acumulable. Lento.»
+- **Drenar vida**: «Drenar vida [X] — Tira X + 1dX. X no puede ser mayor a ESP. El objetivo tira resistencia mágica. Drena HP igual a la diferencia. El HP obtenido así puede acumularse hasta 50% por encima del máximo.»
+- **Balas de sangre**: «Balas de sangre [1] — Gasta X HP (máximo ESP). Dispara un proyectil tipo 1. El peso del proyectil es igual a la vida gastada.»
+- **Transfusión sanguínea**: «Transfusión sanguínea [1] — Transfiere hasta 20 de HP de un personaje aliado a otro.»
+- **Veneno**: «Veneno [2] — Maldición (Esp / Res.M). Aplica 3 stacks de veneno.»
+- ✅ **Nube tóxica** → Nube tóxica: «Nube tóxica [3] — Crea un área de flor que aplica 3 stacks de veneno al que entre en ella o esté en su interior durante el mantenimiento. Solo aplica 1 stack a personajes ya envenenados. Duración: 3 turnos.»
+- **Punto débil** (en pausa): SP 3. Maldición (Esp / Res.M). El objetivo pierde 1 punto de Resistencia a crítico contra todos los Tipos durante 2 turnos (un doble crítico contra él vuelve a ser doble, un crítico simple deja de anularse). ✋ A mano: ponele un…
+- **Pedos Tóxicos**: Marcás un punto en el mapa y queda una nube tóxica de diámetro 5 (19 casillas) durante 2 turnos (la habilidad no falla: la nube aparece siempre). Cada rival que entra, o que sigue adentro en el Mantenimiento, tira Res.Esp contra…
 

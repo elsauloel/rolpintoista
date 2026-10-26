@@ -79,6 +79,10 @@ avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene
   **4 No2**. El combo: en el próximo turno, la Puñalada por la espalda. *(A confirmar:)* si además lleva SP (o solo los 4 No2) y el cooldown (3).
   **También para la clase (Asalto)**: el dueño la quiere en el pool del Asalto; la versión de clase, una vez cerrada la del creep (según la regla, la del
   creep un escalón arriba: ver la propuesta al programar).
+- **Golpe desesperado** ✦ (de la lista, «apuestas»; dueño, 2026-10-26: «la siguiente que sea golpe desesperado»): un ataque con su arma que solo vale
+  **con la mitad de su vida o menos**: **+2 Crítico frecuente, +2 Crítico potente y +3 al daño**. *(A confirmar, propuesta de Claude:)* con un cuarto de
+  la vida o menos, además +2 PdG; con más de la mitad, avisa y deja usarla como un ataque común (sin los bonos; lo decide la mesa); lo de un ataque y 2 SP,
+  o cooldown 2.
 
 ## Los roles
 

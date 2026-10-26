@@ -43,6 +43,8 @@ function flashCreepCosto(c){
   const sp = CreepCalculo.modoSP(c.sc) ? CreepCalculo.costoSpHab(c.sc, c.h) : 0, cd = num(c.h.cd), k = ajeno ? 2 : 1;
   return {ajeno, txt: CreepCalculo.modoSP(c.sc) ? `${fmt(sp * k)} SP` : `cooldown ${fmt(cd * k)}`};
 }
+// 🦶 Una onda o un cono (el Pisotón, 2026-10-26): sale de él, no se le da a nadie.
+const flashCreepAlrededor = h => !!(h && h.duelo && (h.duelo.objetivo === 'onda' || h.duelo.objetivo === 'cono'));
 // A quién se la puede dar: él y sus aliados (creeps vivos, no bajo tierra) dentro de su Rango.
 function flashCreepObjetivos(c){
   const rng = num((rangoDeToken(c.t) || {}).rng), out = [];
@@ -50,7 +52,7 @@ function flashCreepObjetivos(c){
     if(t.tipo !== 'creep' || t.bajoTierra) continue;
     const sc = id === c.id ? c.sc : creepPrivadoDe(t.fichaId);
     if(!sc || num(sc.hp) <= 0) continue;
-    if(id !== c.id && (distanciaHex(c.t, t) > rng || (c.h.blink && c.h.blink.soloYo))) continue;   // ✨ el Parpadeo: solo él (2026-10-26)
+    if(id !== c.id && (distanciaHex(c.t, t) > rng || (c.h.blink && c.h.blink.soloYo) || flashCreepAlrededor(c.h))) continue;   // ✨ el Parpadeo y 🦶 una onda: solo él (2026-10-26)
     out.push({id, t, mismo: id === c.id});
   }
   return out;
@@ -64,7 +66,7 @@ async function abrirFlashCreep(){
   if(!opciones.length){ AvisoCombate.mostrar({icono: '✨', titulo: 'Flash de un creep', texto: 'Ningún aliado está dentro de su Rango.'}); return; }
   const botones = opciones.slice(0, 10).map(({c, o, ataca}) => {
     const k = flashCreepCosto(c);
-    return {fila: true, texto: `${nombreDe(c.t)}: ${c.h.nombre} → ${o.mismo ? 'a sí mismo' : nombreDe(o.t)}${ataca ? ' ⚔' : ''}`,
+    return {fila: true, texto: `${nombreDe(c.t)}: ${c.h.nombre} → ${flashCreepAlrededor(c.h) ? 'alrededor suyo' : o.mismo ? 'a sí mismo' : nombreDe(o.t)}${ataca ? ' ⚔' : ''}`,
       detalle: `${ataca ? (duelo.danoTirado ? 'ataca en el duelo abierto, pero ya tiró el daño: le sirve para su próximo ataque · ' : 'ataca en el duelo abierto: la usa en este golpe (todavía no tiró el daño) · ') : ''}${k.txt}${k.ajeno ? ' (Flash en turno ajeno: el doble)' : ''}`,
       alClic: () => { AvisoCombate.cerrar(); flashCreepUsar(c, o.id); }};
   });

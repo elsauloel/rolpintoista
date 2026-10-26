@@ -1600,7 +1600,7 @@ const Combatiente = (() => {
       // usa se cura lo que hizo de daño, y puede pasar su vida máxima hasta `drenaTope` % (como Vida extra).
       // Daño directo (ignora la Defensa especial: proyectiles chicos) y True Damage (ignora toda defensa y la Res. elemental): dueño, 2026-10-07.
       dano: c.dano && (formula || c.danoDiferencia) ? {formula: c.danoDiferencia ? '' : formula, tipo, ignoraDef: c.trueDamage ? true : c.ignoraDano !== undefined ? !!c.ignoraDano : tipo !== 'fisico',
-        ...(c.trueDamage ? {trueDamage: true} : c.danoDirecto && tipo !== 'fisico' ? {directo: true} : {}),
+        ...(c.trueDamage ? {trueDamage: true} : c.danoDirecto && (tipo !== 'fisico' || c.ignoraDano) ? {directo: true} : {}),   // (físico directo: el Pisotón, 2026-10-26)
         ...(nf(c.danoMult) > 1 ? {mult: nf(c.danoMult)} : {}), ...(porDanoNorm(c.porDano) ? {porDano: porDanoNorm(c.porDano)} : {}), ...(c.carga ? {carga: String(c.carga)} : {}),   // ✨ Carga Elemental (2026-10-13)
         ...(c.danoDiferencia ? {diferencia: true} : {}), ...(c.drena ? {drena: true, drenaTope: Math.max(0, nf(c.drenaTope)), ...(nf(c.drenaPct) > 0 && nf(c.drenaPct) < 100 ? {drenaPct: Math.round(nf(c.drenaPct))} : {})} : {})} : null,   // drenaPct: cura solo ese % (2026-10-07, la Sanguijuela)
       efectos: (c.efectos || []).map(e => efectoDeEjecucion(conX && e && e.stacks === 'X' ? {...e, stacks: Math.max(1, Math.round(X))} : e, o.stat)),   // stacks «X» (Apuntar, 2026-10-11)
@@ -1612,6 +1612,9 @@ const Combatiente = (() => {
       ...((c.objetivo === 'area' || c.objetivo === 'onda') && c.aliados ? {aliados: true} : {}),
       ...(c.objetivo === 'linea' ? {largo: c.largo === 'rango' ? Math.max(1, alcanceHab({alcance: 'rango'}, stat, o.stat) || 1) : Math.max(1, Math.round(nf(c.largo)) || 4)} : {}),   // línea recta desde quien la usa (2026-10-05, Varita láser); `largo: 'rango'` = todo su Rango (2026-10-25, la Lanza de luz)
       ...((c.objetivo === 'onda' || c.objetivo === 'cono') && c.ondaDodge ? {dodge: true} : {}),
+      // 🦶 Resistir o esquivar (2026-10-26, el Pisotón, dueño: «que pueda elegir dodge roll o resistir»): con `contra` [resistencia, 'eva'], quien se
+      // defiende con la Evasión y la gana tiene que salir con el dodge roll; con la resistencia, ganarla alcanza.
+      ...((c.objetivo === 'onda' || c.objetivo === 'cono') && c.dodgeConEva ? {dodgeConEva: true} : {}),
       ...(c.objetivo === 'area' && c.sinDodge ? {sinDodge: true} : {}),   // un área que no se esquiva corriendo (la Luz cegadora, 2026-10-20: un destello se resiste, no se esquiva)   // la onda o el cono que deja dodge roll (Daño en área, Ráfaga arcana)
       ...(c.objetivo === 'aliado' && c.conmigo ? {conmigo: true} : {}),   // un aliado o uno mismo (Heal del Support, 2026-10-11)
       ...(c.objetivo === 'onda' && c.conVista ? {conVista: true} : {}),

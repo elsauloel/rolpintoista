@@ -684,6 +684,7 @@ const Duelo = (() => {
     return {nombre: txtCorto(h.nombre, 60), objetivo, tira: t, contra, dano, efectos, sinOposicion: !(t && contra.length),
       ...(h.danoSiempre && dano && t && contra.length ? {danoSiempre: true} : {}),   // ⚡ el daño entra siempre; la tirada es solo para los estados (Zap)
       ...((objetivo === 'onda' || objetivo === 'cono') && h.dodge ? {dodge: true} : {}),
+      ...((objetivo === 'onda' || objetivo === 'cono') && h.dodgeConEva ? {dodgeConEva: true} : {}),   // 🦶 el dodge roll solo si se defendió con la Evasión (el Pisotón)
       ...(objetivo === 'onda' && h.conVista ? {conVista: true} : {}),   // la luz: solo a los que ve (los sólidos la tapan)
       ...(objetivo === 'aliado' && h.conmigo ? {conmigo: true} : {}),   // un aliado o uno mismo (Heal, 2026-10-11)
       ...(h.zonaQueda ? {zonaQueda: {turnos: Math.min(6, Math.max(1, Math.round(_num(h.zonaQueda.turnos)) || 1)), nombre: txtCorto(h.zonaQueda.nombre || '', 40),
@@ -784,7 +785,7 @@ const Duelo = (() => {
       // ⚡ El daño entra siempre (`danoSiempre`, Zap, 2026-10-25, dueño: «no se esquiva: el daño pasa y se tira resistencia especial para intentar
       // resistir el estado»): si gana el objetivo, el daño sigue igual y solo se salva de los estados (quedan omitidos al tirar el daño).
       else if(m.hab.danoSiempre && m.hab.dano){ m.resultado = 'pego'; m.contacto.resistioEstado = true; entrarHab(m); }
-      else if(m.grupo && m.hab.objetivo !== 'enemigo' && !m.hab.sinDodge && ((m.hab.objetivo !== 'onda' && m.hab.objetivo !== 'cono') || m.hab.dodge || tronco)){   // (dos misiles repartidos: sin dodge)   // (una onda solo si deja dodge: `hab.dodge`, Daño en área)   // hechizo de área (Paso 4 del casteo): ganar la Evasión no termina el duelo, gana el DERECHO a un dodge roll (la onda alrededor de quien la usa no da dodge: no hay a dónde salir)
+      else if(m.grupo && m.hab.objetivo !== 'enemigo' && !m.hab.sinDodge && ((m.hab.objetivo !== 'onda' && m.hab.objetivo !== 'cono') || m.hab.dodge || tronco || (m.hab.dodgeConEva && m.defensa && m.defensa.modo === 'eva'))){   // (dos misiles repartidos: sin dodge)   // (una onda solo si deja dodge: `hab.dodge`, Daño en área)   // hechizo de área (Paso 4 del casteo): ganar la Evasión no termina el duelo, gana el DERECHO a un dodge roll (la onda alrededor de quien la usa no da dodge: no hay a dónde salir)
         m.fase = 'dodge'; m.estado = 'esperando';
       }
       else{ m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; if(tronco) m.contacto.dodgeLibre = true; }

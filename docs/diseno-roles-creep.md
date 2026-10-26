@@ -38,7 +38,7 @@ Cuenta los conceptos con alguna habilidad (de fábrica auditada o de los creeps 
 de fábrica como «sin auditar», con su rol y su concepto: `ORIGEN` en `comun/skills-creep-base.js`). **Rango y Hunter se cuentan juntos** (dueño: «se van
 a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 
-- 🛡 **Choque pesado — 18**: más daño, empujar, atrapar, guardia, salto, barrido, desarmar, golpe anunciado, remate, romper armadura · de El origen:
+- 🛡 **Choque pesado — 19**: más daño, empujar, atrapar, guardia, salto, barrido, desarmar, golpe anunciado, remate, romper armadura, aturdir (Pisotón, 2026-10-26) · de El origen:
   furia, pisotón, provocar, segundo aliento, aguantar el daño, cubrir al de al lado, perforar, carga que derriba.
 - 🗡 **Choque liviano — 18**: golpe preciso, sangrado, trabar, golpear y alejarse, salto, abrir la herida, manada, ráfaga, por la espalda · de El origen:
   robar, sigilo, varios golpes, bajo tierra, veneno (de fábrica desde el 2026-10-25: Hoja envenenada / Mordisco infectado), todo al ataque (Degollar, 2026-10-26), finta (2026-10-26), dash (2026-10-26), ojo de asesino (2026-10-26).
@@ -50,7 +50,7 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
 **Para emparejar** (regla del dueño, 2026-10-25: «empezamos a tener en cuenta todos los roles de creep e ir emparejándolos… para que estén todos
-avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Mago, Rango + Hunter, Debuffer, Support y Choque liviano en 18; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
+avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Mago, Rango + Hunter, Debuffer, Support y Choque liviano en 18 y Choque pesado en 19; se sigue rotando entre los cinco de 18. El Jefe va aparte.
 
 ## Los roles
 
@@ -100,7 +100,7 @@ Sirven al warrior (pegar fuerte), al tanque (aguantar y controlar) o a los dos.
 20. **Muralla**: nadie pasa por las casillas de al lado sin frenarse.
 21. ✅ **Atrapar**: Mordisco feroz, Agarrón, Abrazo aplastante.
 22. **Derribar**: un golpe que deja Sentado.
-23. **Aturdir**: un golpe que deja Pajaritos o Stun.
+23. ✅ **Aturdir** — **Pisotón** (2026-10-26, el Shockwave del Tanque un escalón arriba: Flash, una onda de Fuerza contra la Res.CC o la Evasión —con dodge roll— de cada rival pegado; la diferencia de daño físico directo y Pajaritos 2 turnos).
 
 **E. Aguantar**
 24. ✅ **Guardia**: Aguante (+2 Defensa y Def.Esp, y devuelve los golpes).
@@ -143,7 +143,7 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
   - **Golpe brutal**: Ataque con Crítico potente ×1 (el doble daño sale con 6+ en el d20, y el triple y el cuádruple un poco antes). A cambio, −2 a tu Evasión hasta tu próximo turno (⚙ automático: te queda el estado «Guardia baja»). Cuenta como un…
 - *Tanque*
   - **Blindaje**: «Blindaje [1] — Flash (SP x 2). NO2: (0). Otorga un blindaje que absorbe 8 de daño de la próxima fuente de daño este turno.»
-  - **Shockwave**: «Shockwave [4] — Onda expansiva (Fuerza / Constitución). Flash (SP x 2). Todos los personajes adyacentes al tanque quedan en Pajaritos hasta el final de su próximo turno.»
+  - ✅ **Shockwave** → Pisotón: «Shockwave [4] — Onda expansiva (Fuerza / Constitución). Flash (SP x 2). Todos los personajes adyacentes al tanque quedan en Pajaritos hasta el final de su próximo turno.»
   - ≈ **Aura de espinas** → Coraza de púas (Espinas, del Support): «Aura de espinas [1] — Devuelve 1/4 del daño del ataque como true damage hasta el comienzo del próximo turno.»
   - **Recuperación**: «Recuperación [1] — NO2: (2). Recupera 9 HP.»
   - **Sonic Boom**: «Sonic Boom [2] — Onda expansiva (Fuerza / Constitución). Flash (SP x 2). Golpea el piso creando una onda de choque en un cono al frente, que hace perder una cantidad de No2 igual a 1 + la diferencia en la tirada. Si perdiera…»

@@ -1140,6 +1140,13 @@ prueba('👁 Ojo de asesino (Asalto y Choque liviano, 2026-10-26): un ataque con
     m.duelo.modo, m.nitrosCosto, m.modo, estadosPresetFicha().some(p => p.nombre === 'Ojo de asesino')],
     ['arma', 1, 2, 1, 1, 'ATAQUE', 2, 2, true, 'arma', 1, 2, 1, 1, 'ATAQUE', 'arma', 'ATAQUE', undefined, false]);
 });
+prueba('🦶 Pisotón (Choque pesado, 2026-10-26): Flash, onda de Fuerza contra Res.CC o Evasión; la diferencia de daño físico directo y Pajaritos 2', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Pisotón'), h = armarHabilidadDeCreep(e.datos, 2);
+  const hab = Combatiente.habEjecucion(h, h.duelo, {etq: s => s});
+  igual([!!hab.dodgeConEva, hab.contra.map(c => c.modo).join(','), !!hab.dano.ignoraDef, !!hab.dano.directo, !!hab.dano.diferencia], [true, 'rescc,eva', true, true, true]);
+  igual([!!h.flash, h.duelo.objetivo, h.duelo.tira, h.duelo.contra.join(','), !!h.duelo.dodgeConEva, !!h.duelo.danoDiferencia, h.duelo.tipoDano, h.duelo.efectos[0].nombre, h.duelo.efectos[0].turnos, h.spCosto, h.cd, e.etiquetas.includes('choque pesado')],
+    [true, 'onda', 'fue', 'rescc,eva', true, true, 'fisico', 'Pajaritos', 2, 3, 3, true]);
+});
 prueba('🤺 Finta (Choque liviano, 2026-10-26): +2 al daño, +1 a los dos críticos y no se puede parar', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Finta'), h = armarHabilidadDeCreep(e.datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});

@@ -291,7 +291,8 @@ const ojoDe = t => t && t.tipo === 'pj' ? Math.max(0, Math.round(num(((vinculo(t
 function ocultoPorSigiloParaMi(t){
   if(invisibleParaRivales(t)) return soyGM && !ojoRevelando;
   if(!enSigilo(t)) return false;
-  return soyGM ? (t.tipo === 'pj' && !ojoRevelando) : (t.tipo === 'creep' && !reveladaCasilla(t));   // «Ve lo oculto» de un aliado lo deja ver
+  // «Ve lo oculto» de un aliado, o una luz que revela (la Luz para los suyos de un creep, 2026-10-26: también del lado del GM), lo deja ver.
+  return soyGM ? (t.tipo === 'pj' && !ojoRevelando && !reveladaCasilla(t)) : (t.tipo === 'creep' && !reveladaCasilla(t));
 }
 function sigiloFantasmasActualizar(){
   tokens.forEach((t, id) => {

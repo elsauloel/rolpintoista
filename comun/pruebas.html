@@ -1039,8 +1039,8 @@ prueba('🎯 Disparo señalador (2026-10-21): Presa (Evasión −1) y Marcado', 
   const P = estadosPresetCreep().find(p => p.nombre === 'Presa');
   igual([h.cd, a.efectos.map(e => (e.spec || {}).nombre).join(','), P.turnos, P.presa, JSON.stringify(P.mods)], [3, 'Presa,Marcado', 2, 2, '[{"stat":"eva","val":-1}]']);
 });
-prueba('☠ Hoja envenenada y Colmillo venenoso (choque liviano, 2026-10-25): ataque con Perfora 2; si pega, Veneno 3', () => {
-  const hs = ['Hoja envenenada', 'Colmillo venenoso'].map(n => armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos, 2));
+prueba('☠ Hoja envenenada y Mordisco infectado (choque liviano, 2026-10-25): ataque con Perfora 2; si pega, Veneno 3', () => {
+  const hs = ['Hoja envenenada', 'Mordisco infectado'].map(n => armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos, 2));
   igual(hs.map(h => [h.duelo.modo, h.duelo.arma.perfora, h.duelo.efectos[0].nombre, h.duelo.efectos[0].stacks, h.nitrosCosto, h.cd]),
     [['arma', 2, 'Veneno', 3, 'ATAQUE', 3], ['arma', 2, 'Veneno', 3, 'ATAQUE', 3]]);
 });
@@ -5064,7 +5064,7 @@ prueba('🌱 Las habilidades de los creeps de «El origen» entre las de fábric
   const h = armarHabilidadDeCreep(o.find(e => e.nombre === '¡Tu vieeeja!').datos, 7);
   igual([o.length, o.every(e => e.etiquetas.includes('sin auditar') && e.rol && e.concepto), h.nombre, !!h.duelo, o.some(e => e.nombre === 'Mal de ojo (El origen)'),
     HABILIDADES_CREEP_BASE.filter(e => e.nombre === 'Mal de ojo').length, new Set(HABILIDADES_CREEP_BASE.map(e => e.poolId)).size === HABILIDADES_CREEP_BASE.length],
-    [51, true, '¡Tu vieeeja!', true, true, 1, true]);   // 51 desde el 2026-10-25: se sacaron el Mordisco que lisia (duplicado) y el Corte profundo viejo
+    [50, true, '¡Tu vieeeja!', true, true, 1, true]);   // 50: y el Mordisco infectado pasó a ser de fábrica   // 51 desde el 2026-10-25: se sacaron el Mordisco que lisia (duplicado) y el Corte profundo viejo
 });
 prueba('📣 ¡A la carga! y Arenga (Support, 2026-10-23): onda a los aliados a 4; +2 a lo ofensivo 2 turnos / Bendecido 3 turnos; auditadas; los gritos viejos salieron del pool', () => {
   const e = n => HABILIDADES_CREEP_BASE.find(x => x.nombre === n), a = armarHabilidadDeCreep(e('¡A la carga!').datos, 3), b = armarHabilidadDeCreep(e('Arenga').datos, 3);

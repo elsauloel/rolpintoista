@@ -29,7 +29,7 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 - 🛡 **Choque pesado — 18**: más daño, empujar, atrapar, guardia, salto, barrido, desarmar, golpe anunciado, remate, romper armadura · de El origen:
   furia, pisotón, provocar, segundo aliento, aguantar el daño, cubrir al de al lado, perforar, carga que derriba.
 - 🗡 **Choque liviano — 14**: golpe preciso, sangrado, trabar, golpear y alejarse, salto, abrir la herida, manada, ráfaga, por la espalda · de El origen:
-  robar, sigilo, varios golpes, bajo tierra, veneno (de fábrica desde el 2026-10-25: Hoja envenenada / Colmillo venenoso).
+  robar, sigilo, varios golpes, bajo tierra, veneno (de fábrica desde el 2026-10-25: Hoja envenenada / Mordisco infectado).
 - 🏹 **Rango y Hunter — 14**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar, mantener a raya (2026-10-25), atravesar (Flecha que atraviesa, 2026-10-25), disparos encadenados (Ráfaga encadenada, 2026-10-25) · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 14**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25), lluvia de escarcha (2026-10-25), andanada arcana (2026-10-25), misiles elementales (2026-10-25), portal trampa (2026-10-25) · de El origen: proyectil, fuego con quemadura.
@@ -131,7 +131,7 @@ rodilla, Tarascón al tobillo), las redes; y en el mapa, el sigilo, el +1 por la
 
 **B. Desangrar y envenenar**
 6. ✅ **Sangrado**: todas sus variantes y la versión fuerte.
-7. ✅ **Veneno** (2026-10-25): **Hoja envenenada** / **Colmillo venenoso** — un ataque con Perfora 2 y Veneno 3. Faltan las variantes (como el sangrado).
+7. ✅ **Veneno** (2026-10-25): **Hoja envenenada** (humanoides: Perfora 2 y Veneno 3) y **Mordisco infectado** (bestias: el mismo, con el nombre de la Rata). Faltan las variantes.
 8. **Veneno que paraliza**: chance de Parálisis.
 9. **Veneno que debilita**: el envenenado pega menos.
 10. ✅ **Abrir la herida** ✦ (2026-10-21): **Sal en la herida** / **Morder la herida** — si no sangra, lo hace sangrar; si ya sangra, +2 dados y le sube el sangrado.

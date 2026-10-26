@@ -1077,6 +1077,18 @@ prueba('✨ Purificar (Support, 2026-10-25): Flash; a un aliado, la purga y cura
   const n = Duelo.limpiarHab(ej) || {};
   igual([h.duelo.objetivo, h.duelo.conmigo, !!(n.efectos || []).find(x => x.purga), ((n.efectos || []).find(x => x.cura) || {}).cura, !!h.flash, h.nitrosCosto, h.cd], ['aliado', true, true, 5, true, 0, 3]);
 });
+prueba('☀ Luz para los suyos (Support, 2026-10-26): zona de luz de diámetro 5, 2 turnos; Ef.Esp contra Res.Esp, 1d8 de luz directo y Marcado 2', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Luz para los suyos'), h = armarHabilidadDeCreep(e.datos, 2);
+  const z = Combatiente.zonaDeHab(h, h.duelo, {fichaId: 'c1', tipo: 'creep', tiraValor: 6});
+  const est = typeof z.zonaEstado === 'string' ? JSON.parse(z.zonaEstado) : z.zonaEstado;
+  igual([z.radio, z.zonaTurnos, z.resistStat, z.tiraStat, z.zonaDano, z.zonaDirecto, !!z.zonaLuz, z.zonaDanoTipo, Combatiente.elementoDe(z.zonaDanoTipo), est.nombre, est.turnos, h.cd, e.etiquetas.includes('support')],
+    [2, 2, 'resmg', 'dmgesp', '1d8', true, true, 'de luz', 'luz', 'Marcado', 2, 3, true]);
+});
+prueba('🧊 Prisión de hielo (Mago, 2026-10-26): PdG.Esp contra Evasión, 2d4 de hielo e Inmovilizado 2 (Fuerza contra su Ef.Esp)', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Prisión de hielo'), h = armarHabilidadDeCreep(e.datos, 2), ef = h.duelo.efectos[0];
+  igual([h.duelo.tira, h.duelo.contra.join(','), h.duelo.danoFormula, h.duelo.tipoDano, ef.nombre, ef.turnos, ef.soltar.stat, ef.soltar.difStat, h.cd, e.etiquetas.includes('mago')],
+    ['pdgmg', 'eva', '2d4', 'hielo', 'Inmovilizado', 2, 'fue', 'dmgesp', 3, true]);
+});
 prueba('🌑 Maldición debilitante (Debuffer, 2026-10-26): PdG.Esp contra Res.Esp, 1d6 siniestro, Debilitado y Lento 2 turnos (reemplaza a Debilitar)', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Maldición debilitante'), h = armarHabilidadDeCreep(e.datos, 2);
   igual([h.duelo.tira, h.duelo.contra.join(','), h.duelo.danoFormula, h.duelo.efectos.map(x => x.nombre).join(','), h.cd, e.etiquetas.includes('debuffer'), !!HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Debilitar')],
@@ -1105,10 +1117,10 @@ prueba('☀🌑 Luz y siniestro (2026-10-26): los elementos nuevos, su identidad
     Combatiente.sinCura([{nombre: 'Sanguijuela'}])],
     ['siniestro', 'luz', '', true, true, 1.5, 'Marcado', 1, 0, null, 1, 'Herida sombría', true, true, 0, 4, -3, true]);
 });
-prueba('🐛 Sanguijuela (Mago, 2026-10-26): PdG.Esp contra Evasión, 2d6 siniestro, se cura la mitad y queda pegada 4 turnos (Fuerza contra Ef.Esp)', () => {
+prueba('🐛 Sanguijuela (Debuffer, 2026-10-26): PdG.Esp contra Evasión, 2d6 siniestro, se cura la mitad y queda pegada 4 turnos (Fuerza contra Ef.Esp)', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Sanguijuela'), h = armarHabilidadDeCreep(e.datos, 2);
   const ef = h.duelo.efectos[0];
-  igual([h.duelo.tira, h.duelo.contra.join(','), h.duelo.danoFormula, h.duelo.tipoDano, !!h.duelo.drena, h.duelo.drenaPct, ef.nombre, ef.turnos, ef.soltar.stat, ef.soltar.difStat, h.cd, e.etiquetas.includes('mago')],
+  igual([h.duelo.tira, h.duelo.contra.join(','), h.duelo.danoFormula, h.duelo.tipoDano, !!h.duelo.drena, h.duelo.drenaPct, ef.nombre, ef.turnos, ef.soltar.stat, ef.soltar.difStat, h.cd, e.etiquetas.includes('debuffer')],
     ['pdgmg', 'eva', '2d6', 'siniestro', true, 50, 'Sanguijuela', 4, 'fue', 'dmgesp', 3, true]);
 });
 prueba('💪 Empuje (Support, 2026-10-26): Flash, Empower a un aliado; la tirada del creep que lo suma lo gasta', () => {

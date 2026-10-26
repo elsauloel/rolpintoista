@@ -19,9 +19,11 @@
   tengan la misma cantidad; recién ahí se vuelve a avanzar uno por uno. Se cuenta por **concepto** (una pareja bestia/humanoide o las variantes de
   un mismo concepto cuentan una vez), sumando las habilidades ya hechas en los creeps de «El origen de las especies» (ver el conteo abajo).
 
-**Los elementos de cada rol** (dueño, 2026-10-26: «que el mago juegue con todos los elementos menos luz y sombra, que el debuffer juegue con sombra y el
-support juegue con luz»): el **Mago** usa arcano, fuego, hielo, rayo, tóxico y ácido (nunca luz ni siniestro); el **Debuffer**, lo **🌑 siniestro**; el
-**Support**, la **☀ luz**. Al diseñar una habilidad con daño especial de esos roles, el elemento sale de acá.
+**Los elementos de cada rol, como estilo general** (dueño, 2026-10-26: «que el mago juegue con todos los elementos menos luz y sombra, que el debuffer
+juegue con sombra y el support juegue con luz»; el mismo día lo aflojó: «quitamos la regla… que pueda aparecer en casos puntuales, pero que su principal
+identidad sean los otros elementos. Inclusive podríamos decir que es tóxico y que tóxico puede también estar más vinculado al debuffer… no lo hacemos tan
+estricta, sino es más una cuestión de estilo general»): el **Mago** juega sobre todo con arcano, fuego, hielo, rayo y ácido (luz o siniestro, en casos
+puntuales); el **Debuffer**, con lo **🌑 siniestro** y lo **☠ tóxico**; el **Support**, con la **☀ luz**. No es una regla: es hacia dónde tiende cada uno.
 
 **Que cada habilidad se sienta** (criterio del dueño, 2026-10-25, con Extenuar: «vamos a hacer que cada acción tenga peso… nivelar un poquito para
 arriba, que todo haga un poquito de más, que hacer una habilidad se sienta»): una habilidad que gasta la acción no puede ser solo un estado chico; si
@@ -39,13 +41,13 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
   robar, sigilo, varios golpes, bajo tierra, veneno (de fábrica desde el 2026-10-25: Hoja envenenada / Mordisco infectado), todo al ataque (Degollar, 2026-10-26).
 - 🏹 **Rango y Hunter — 16**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar, mantener a raya (2026-10-25), atravesar (Flecha que atraviesa, 2026-10-25), disparos encadenados (Ráfaga encadenada, 2026-10-25), disparar y replegarse (Disparo y repliegue, 2026-10-26), clavar a la pared (2026-10-26) · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
-- ✨ **Mago — 15**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25), lluvia de escarcha (2026-10-25), andanada arcana (2026-10-25), misiles elementales (2026-10-25), portal trampa (2026-10-25), sanguijuela (2026-10-26) · de El origen: proyectil, fuego con quemadura.
-- 🧿 **Debuffer — 16**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25), silencio (Tótem de silencio, 2026-10-25), extenuar (2026-10-25), cegar (2026-10-25), grito de pánico (2026-10-25), nube tóxica (2026-10-26), debilitar (Maldición debilitante, 2026-10-26) · de El origen: ceguera, veneno, inmovilizar.
-- 💚 **Support — 15**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24), estandarte (Estandarte de guerra, 2026-10-24), señalar la presa (2026-10-25), armas perforantes (2026-10-25), redoble de tambores (2026-10-25), frenesí inducido (2026-10-25), limpiar estados (Purificar, 2026-10-25), levitar (2026-10-25), empower (Empuje, 2026-10-26) · de El origen: escudo a un aliado.
+- ✨ **Mago — 15**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25), lluvia de escarcha (2026-10-25), andanada arcana (2026-10-25), misiles elementales (2026-10-25), portal trampa (2026-10-25), prisión de hielo (2026-10-26) · de El origen: proyectil, fuego con quemadura.
+- 🧿 **Debuffer — 17**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25), silencio (Tótem de silencio, 2026-10-25), extenuar (2026-10-25), cegar (2026-10-25), grito de pánico (2026-10-25), nube tóxica (2026-10-26), debilitar (Maldición debilitante, 2026-10-26), sanguijuela (2026-10-26, del Mago) · de El origen: ceguera, veneno, inmovilizar.
+- 💚 **Support — 16**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24), estandarte (Estandarte de guerra, 2026-10-24), señalar la presa (2026-10-25), armas perforantes (2026-10-25), redoble de tambores (2026-10-25), frenesí inducido (2026-10-25), limpiar estados (Purificar, 2026-10-25), levitar (2026-10-25), empower (Empuje, 2026-10-26), luz para los suyos (2026-10-26) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
 **Para emparejar** (regla del dueño, 2026-10-25: «empezamos a tener en cuenta todos los roles de creep e ir emparejándolos… para que estén todos
-avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Mago, Support y Choque liviano en 15; Rango + Hunter y Debuffer en 16; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
+avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Mago y Choque liviano en 15; Rango + Hunter y Support en 16; Debuffer en 17; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
 
 ## Los roles
 
@@ -340,7 +342,7 @@ líneas, zonas, el rayo en cadena y los charcos, los controles mentales.
     de hielo; el suelo congelado 2 turnos (el de la Varita de la ventisca) y después el charco, que no vence. 4 No2 y su Especial en SP, o cooldown 3.
     6. **Diluvio** (deja charcos: el rayo corre por el agua, combo con la Cadena de rayos).
     7. **Nova arcana** (una onda alrededor que empuja).
-  - **C. Control elemental:** 8. **Prisión de hielo** (Inmovilizado, se suelta con Fuerza; ▶ **la próxima del Mago**, dueño 2026-10-26: «la próxima ronda hacemos la prisión de hielo»; propuesta: PdG.Esp contra Evasión, 2d4 de hielo e Inmovilizado hasta 2 turnos, se suelta con Fuerza contra su Ef.Esp, como la Red; 2 No2 y 3 SP, o cooldown 3). 9. **Ráfaga de viento** (cono que empuja y tira al piso).
+  - **C. Control elemental:** 8. ✅ **Prisión de hielo** (2026-10-26: PdG.Esp contra Evasión, 2d4 de hielo e Inmovilizado hasta 2 turnos, se suelta con Fuerza contra su Ef.Esp, como la Red; 2 No2 y 3 SP, o cooldown 3). 9. **Ráfaga de viento** (cono que empuja y tira al piso).
     10. ✅ **Zap** (ex «Rayo paralizante», 2026-10-25: no se esquiva; 1d4 eléctrico directo y Parálisis salvo que la resista con Res.Esp; salta con la mitad, 50 % y 25 % de Parálisis).
   - **D. El cuerpo del mago:** 11. **Escudo de maná** (un escudo que se paga con SP). 12. **Parpadeo** (se teletransporta unas casillas, Flash).
     13. **Contrahechizo** (Flash: al ver una habilidad de un personaje, la frena con su Res.Esp).
@@ -356,7 +358,7 @@ líneas, zonas, el rayo en cadena y los charcos, los controles mentales.
     pisarlas [Varita de espinas]. 24. **Muro o pilares** ✦: levantar piedra que tapa el paso y la vista (control del terreno) [Varita del muro, Varita de
     los pilares]. 25. ✅ **Portal trampa** ✦ (2026-10-25: sin daño; llega Expuesto): un portal oculto que manda a quien lo pisa a otra casilla, lejos (Res.Esp para aferrarse) [Varita de la trampa
     portal]. 26. **Lazo arcano**: lo atrae unas casillas hacia el mago, salvo que gane con Fuerza [Varita del gancho]. 27. **Desarmar con magia**: el arma
-    se le escapa y vuela (Fuerza para aferrarse) [Expelliarmus]. 28. ✅ **Sanguijuela** (2026-10-26, dueño: PdG.Esp contra Evasión, 2d6 siniestro, se cura la mitad; queda pegada 4 turnos —no se cura— y se la arranca con Fuerza contra su Ef.Esp): daño y se cura la mitad [Varita sanguijuela]. 29. **Cosecha**: lo
+    se le escapa y vuela (Fuerza para aferrarse) [Expelliarmus]. 28. ➡ **Sanguijuela** (pasó al Debuffer, ver ahí; 2026-10-26, dueño: PdG.Esp contra Evasión, 2d6 siniestro, se cura la mitad; queda pegada 4 turnos —no se cura— y se la arranca con Fuerza contra su Ef.Esp): daño y se cura la mitad [Varita sanguijuela]. 29. **Cosecha**: lo
     marca; si muere marcado, el mago recupera SP y vida [Varita de la cosecha]. 30. **Magia inestable** (variante de la Sobrecarga): más daño, pero si sale
     un 1 se lastima [Varita inestable, Orbe salvaje].
 - **Debuffer:** ver el listado completo abajo (§ 6).
@@ -459,7 +461,7 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
 39. **Portal para los suyos** ✦: dos portales a la vista que usan solo sus aliados, hasta su próximo turno [Varita del portal aliado].
 40. **Teletransportar a un aliado**: lo lleva unas casillas, a una libre (rescatarlo o ponerlo al lado de un rival) [Varita del blink].
 41. **Cobertura**: levanta pilares o un muro para que los suyos se cubran [Varita de los pilares, Varita del muro].
-42. **Luz para los suyos**: una luz que revela lo oculto y deja Marcados a los rivales que toca [Varita de la luz, Varita del farol, Luz flotante].
+42. ✅ **Luz para los suyos** (2026-10-26: zona de luz de diámetro 5, 2 turnos, revela lo oculto; a los rivales, Ef.Esp contra Res.Esp, 1d8 de luz directo y Marcado 2 turnos): una luz que revela lo oculto y deja Marcados a los rivales que toca [Varita de la luz, Varita del farol, Luz flotante].
 43. **Escudo al acertar**: cada vez que gana una tirada de PdG.Esp, Vida extra para él o un aliado [Orbe del custodio, Orbe de resguardo].
 44. **Magia del caos a favor**: tira un dado y, a un aliado, le cae un buff al azar (con riesgo de que salga al revés) [Varita del caos].
 
@@ -540,6 +542,9 @@ Inmovilizado, Rengo, Desarmado; y, de personajes, Enyetar.
 31. **Destello**: un área de luz que deja Pajaritos [Varita del destello].
 32. **Portal trampa**: el del Mago, también para el Debuffer (lo saca de la pelea) [Varita de la trampa portal].
 33. **Magia del caos**: a un rival, un debuff al azar, con riesgo de que salga al revés [Varita del caos].
+
+**I′. Del Mago** (2026-10-26)
+- ✅ **Sanguijuela** (pasó del Mago, dueño: «movemos la sanguijuela al debuffer»): su PdG.Esp contra la Evasión; 2d6 siniestro, se cura la mitad y queda pegada 4 turnos (no se cura; Fuerza contra su Ef.Esp para arrancarla).
 
 **H. Romper lo que lo protege** ✦
 28. ✅ **Disipar** (2026-10-25; dueño: «el usuario de disipar elige cuál quitar»): su PdG.Esp contra la Res.Esp de un rival en su Rango; si gana, le saca uno de sus estados buenos, el que elija quien lo usa (no lo del equipo ni las pasivas). 2 No2 y 3 SP, o cooldown 3.

@@ -98,11 +98,11 @@
   // trampa que se coloca sola) solo queda a mano lo que la descripción marca con "(a mano)" y sea movimiento, área o algo que el
   // programa no maneja; el "(a mano)" de un estado que ahora se aplica solo se descarta.
   function frasesDe(sp, n){
-    const ap = aplicaDe(sp), solo = !!ap || sp.trampa !== undefined || !!sp.colocar || !!sp.duelo;   // (una auditada que va al duelo: solo lo que dice «a mano» es a mano)
+    const ap = aplicaDe(sp), solo = !!ap || sp.trampa !== undefined || !!sp.colocar || !!sp.duelo || !!sp.auditada;   // (una auditada —va al duelo o la hace el mapa: el blink, la bomba de humo, el dash…—: solo lo que dice «a mano» es a mano; 2026-10-26)
     const REAL = /empuj|casillero|salta|se aleja|al piso|derrib|huye|sigilo|revela|repite|suelta|roba|no puede|invoc|entran|llegan|jala|arrastr|vuelve|gana|ganan|sube|baja/i;
     let frases = textoHab(sp, n).split(/(?<=[.!?])\s+/);
     if(ap) frases = frases.map(f => REAL.test(f) ? f : f.replace(/\s*\(a mano\)/g, '').replace(/\(a mano,\s*/g, '(').replace(/,\s*a mano\)/g, ')')).map(f => f.replace(/(A|a)plic[aá]le/g, (m, c) => c + 'plica'));
-    const esManual = f => solo ? /a mano/i.test(f) : MANUAL_RE.test(f);
+    const esManual = f => solo ? /(^|[^a-záéíóúñ])a mano/i.test(f) : MANUAL_RE.test(f);   // («en la mano» no es «a mano»: el Desarmar, 2026-10-26)
     return {propias: frases.filter(f => !esManual(f)).map(sinEtiqueta), manual: frases.filter(f => esManual(f)).map(sinEtiqueta)};
   }
   const hayManual = sp => frasesDe(sp, 1).manual.length > 0;

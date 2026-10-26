@@ -1077,6 +1077,11 @@ prueba('✨ Purificar (Support, 2026-10-25): Flash; a un aliado, la purga y cura
   const n = Duelo.limpiarHab(ej) || {};
   igual([h.duelo.objetivo, h.duelo.conmigo, !!(n.efectos || []).find(x => x.purga), ((n.efectos || []).find(x => x.cura) || {}).cura, !!h.flash, h.nitrosCosto, h.cd], ['aliado', true, true, 5, true, 0, 3]);
 });
+prueba('💥 Nova arcana (Mago, 2026-10-26): onda alrededor, PdG.Esp contra Evasión, 2d6 arcano y empuja 2', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Nova arcana'), h = armarHabilidadDeCreep(e.datos, 2);
+  igual([h.duelo.objetivo, h.duelo.radio, h.duelo.tira, h.duelo.contra.join(','), h.duelo.danoFormula, h.duelo.efectos[0].empuja, !!h.duelo.aliados, h.cd, e.etiquetas.includes('mago')],
+    ['onda', 1, 'pdgmg', 'eva', '2d6', 2, false, 3, true]);
+});
 prueba('🤺 Finta (Choque liviano, 2026-10-26): +2 al daño, +1 a los dos críticos y no se puede parar', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Finta'), h = armarHabilidadDeCreep(e.datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});

@@ -5059,12 +5059,12 @@ prueba('🗡 Remate / Ir por el herido (2026-10-23, escalonado): +2 dados con la
   igual([[1, 0.6, 0.5, 0.3, 0.25, 0.1, 0, null].map(Combatiente.remateDados), !!(a && a.remate), !!b, !!(b && b.duelo && b.duelo.remate), HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Remate').etiquetas.includes('auditada')],
     [[0, 0, 2, 2, 3, 3, 0, 0], true, true, true, true]);
 });
-prueba('🌱 Las habilidades de los creeps de «El origen» entre las de fábrica (2026-10-23): 53 (los gritos y las curaciones se sintetizaron), sin auditar, con su rol y su concepto; se copian tal cual; las que chocan, con «(El origen)»', () => {
+prueba('🌱 Las habilidades de los creeps de «El origen» entre las de fábrica (2026-10-23): 51 (los gritos y las curaciones se sintetizaron), sin auditar, con su rol y su concepto; se copian tal cual; las que chocan, con «(El origen)»', () => {
   const o = HABILIDADES_CREEP_BASE.filter(e => e.etiquetas.includes('de El origen'));
   const h = armarHabilidadDeCreep(o.find(e => e.nombre === '¡Tu vieeeja!').datos, 7);
   igual([o.length, o.every(e => e.etiquetas.includes('sin auditar') && e.rol && e.concepto), h.nombre, !!h.duelo, o.some(e => e.nombre === 'Mal de ojo (El origen)'),
     HABILIDADES_CREEP_BASE.filter(e => e.nombre === 'Mal de ojo').length, new Set(HABILIDADES_CREEP_BASE.map(e => e.poolId)).size === HABILIDADES_CREEP_BASE.length],
-    [53, true, '¡Tu vieeeja!', true, true, 1, true]);
+    [51, true, '¡Tu vieeeja!', true, true, 1, true]);   // 51 desde el 2026-10-25: se sacaron el Mordisco que lisia (duplicado) y el Corte profundo viejo
 });
 prueba('📣 ¡A la carga! y Arenga (Support, 2026-10-23): onda a los aliados a 4; +2 a lo ofensivo 2 turnos / Bendecido 3 turnos; auditadas; los gritos viejos salieron del pool', () => {
   const e = n => HABILIDADES_CREEP_BASE.find(x => x.nombre === n), a = armarHabilidadDeCreep(e('¡A la carga!').datos, 3), b = armarHabilidadDeCreep(e('Arenga').datos, 3);

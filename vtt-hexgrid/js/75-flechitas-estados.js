@@ -50,7 +50,7 @@ function flechitasDibujar(id, x, y, rad, z){
     sigue = true;
     // Tres columnas de flechitas (si llegan las dos cosas juntas, se intercalan), cada una un poco desfasada: entran, recorren el token y se apagan.
     const cols = [-0.48, 0, 0.48].map(c => c + (a.buff !== undefined && a.debuff !== undefined ? (k ? 0.16 : -0.16) : 0));
-    const tam = rad * 0.26;
+    const tam = rad * 0.34;
     ctx.save();
     ctx.lineCap = 'round'; ctx.lineJoin = 'round';
     cols.forEach((c, i) => {
@@ -64,9 +64,11 @@ function flechitasDibujar(id, x, y, rad, z){
         ctx.moveTo(cx - tam, yy - dir * tam * 0.7);
         ctx.lineTo(cx, yy + dir * tam * 0.3);
         ctx.lineTo(cx + tam, yy - dir * tam * 0.7);
-        ctx.globalAlpha = alfa * (j ? 0.65 : 1);
-        ctx.strokeStyle = 'rgba(10,8,12,.85)'; ctx.lineWidth = Math.max(5 / z, tam * 0.55); ctx.stroke();
-        ctx.strokeStyle = color; ctx.lineWidth = Math.max(2.5 / z, tam * 0.3); ctx.stroke();
+        ctx.globalAlpha = alfa * (j ? 0.7 : 1);
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = 'rgba(10,8,12,.9)'; ctx.lineWidth = Math.max(6 / z, tam * 0.62); ctx.stroke();
+        ctx.shadowColor = color; ctx.shadowBlur = 10 / z;   // un brillo del color, para que se lea sobre cualquier fondo
+        ctx.strokeStyle = color; ctx.lineWidth = Math.max(3 / z, tam * 0.36); ctx.stroke();
       }
     });
     ctx.restore();

@@ -158,7 +158,8 @@
     if(sp.malDeOjo) h.malDeOjo = true;
     if(sp.estandarte){ h.estandarte = {...sp.estandarte}; h.modo = 'auto'; }
     if(sp.dash){ h.dash = {...sp.dash}; h.modo = 'auto'; }
-    if(sp.blink){ h.blink = {...sp.blink}; h.modo = 'auto'; }   // ✨ el Parpadeo (2026-10-26): el salto lo hace el mapa (vtt-hexgrid/js/13 blinkDeHabilidad)   // 💨 el Dash (2026-10-26): el camino y el ataque los hace el mapa (vtt-hexgrid/js/76)
+    if(sp.blink){ h.blink = {...sp.blink}; h.modo = 'auto'; }
+    if(sp.provocarAliado){ h.provocarAliado = {...sp.provocarAliado}; h.modo = 'auto'; }   // 😤 Tirar la bronca (2026-10-26): el aliado y el área los elige el mapa (vtt-hexgrid/js/77)   // ✨ el Parpadeo (2026-10-26): el salto lo hace el mapa (vtt-hexgrid/js/13 blinkDeHabilidad)   // 💨 el Dash (2026-10-26): el camino y el ataque los hace el mapa (vtt-hexgrid/js/76)
     if(sp.meteoro){ h.meteoro = {...sp.meteoro}; h.modo = 'auto'; }   // ☄ el Meteoro (2026-10-24): la marca y la hace caer el mapa (vtt-hexgrid/js/74)   // 🚩 el Estandarte de guerra (2026-10-24): lo clava el mapa (vtt-hexgrid/js/73)
     if(sp.flash) h.flash = true;
     if(sp.trampaColocar){ h.trampaColocar = JSON.parse(JSON.stringify(sp.trampaColocar)); h.modo = 'auto'; }   // 🌀 la trampa entera, como la de una varita (el Portal trampa, 2026-10-25): la coloca el mapa (trampaDeHabilidad)

@@ -972,7 +972,8 @@ const FichaAcciones = (() => {
     if(spec.permanente === true) draft.permanente = true;   // «no vence» (Marcar, 2026-10-12)
     if(spec.marca){ draft.marca = spec.marca; draft.marcaNombre = spec.marcaNombre || ''; }   // Marcar (Shooter, 2026-10-12): a quién marcó
     if(spec.marcadoPor){ draft.marcadoPor = spec.marcadoPor; draft.marcadoToken = spec.marcadoToken || ''; }
-    if(spec.miedoDe){ draft.miedoDe = spec.miedoDe; draft.miedoDeNombre = spec.miedoDeNombre || ''; }   // 😱 Miedo (2026-10-18): quién lo asustó
+    if(spec.miedoDe){ draft.miedoDe = spec.miedoDe; draft.miedoDeNombre = spec.miedoDeNombre || ''; }
+    if(spec.provocaDe){ draft.provocaDe = spec.provocaDe; draft.provocaDeNombre = spec.provocaDeNombre || ''; }   // 😤 Provocado por quién (2026-10-26)   // 😱 Miedo (2026-10-18): quién lo asustó
     return draft;
   }
   function aplicarEstadoRecibido(S, spec, origen, ui){

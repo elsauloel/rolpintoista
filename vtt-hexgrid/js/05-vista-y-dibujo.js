@@ -881,7 +881,8 @@ function dibujarLienzo(){
     { const at = typeof atrapaDeToken === 'function' ? atrapaDeToken(est) : ''; if(at){ dibujarAtrapa(at, x, y, rad, z, semillaDe(d.id)); animando = true; } }   // 🕸 atrapado en una telaraña o una red (js/68)
     if(typeof curaDibujarDestello === 'function' && curaDibujarDestello(d.id, x, y, rad, z)) animando = true;   // ✨ la cura de un pulso (js/70)
     if(polillaRevolotea(est)){ dibujarPolillita(x, y, rad, z, semillaDe(d.id)); animando = true; }   // 🦋 la Polilla, revoloteando
-    if(typeof flechitasDibujar === 'function' && flechitasDibujar(d.id, x, y, rad, z)) animando = true;   // ⬆⬇ recibió un buff o un debuff (js/75)
+    if(typeof flechitasDibujar === 'function' && flechitasDibujar(d.id, x, y, rad, z)) animando = true;
+    if(typeof provocadoDibujar === 'function' && provocadoDibujar(d.id, x, y, rad, z)) animando = true;   // 😤 contra quién va un provocado (js/77)   // ⬆⬇ recibió un buff o un debuff (js/75)
 
     if(seleccion === d.id){
       trazarPuntos(verticesHex(x, y, rad + 5 / z));

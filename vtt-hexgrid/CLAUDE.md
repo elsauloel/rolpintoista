@@ -1813,3 +1813,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `CreepAcciones.pagarAtaque` + `acElegirObjetivo` con `ac.objetivoFijo`, js/12 `ui.dash`; el personaje: `FichaCombate.costoAtaque/registrarAtaque` +
   `FichaAcciones.ataqueDeHabArma` + `bnElegirObjetivo` con `bn.objetivoFijo`, js/11 `ui.dash`). `dashResuelto(d)` (el gancho `disparoResuelto`, js/14): si lo
   paró con Parry o lo bloqueó, se queda; si no, sigue hasta el final.
+- **😤 Tirar la bronca y el Anuncio del Provocado** (2026-10-26, dueño; `js/77-provocado.js`): `provocarAliado(sc, h)` (desde `ui.provocarAliado` de js/12) pide el
+  aliado (en su Rango, o él mismo) y lanza el área en cascada con el centro fijo en ese aliado (`dueloElegirAreaMapa({centroFijo})`), con el Provocado que lleva
+  `provocaDe`/`provocaDeNombre` (como el Miedo: duelo.js `limpiarSpec`, `EstadosAplicar`, `FichaAcciones`, el resumen de la ficha). Cada segundo, al cambiar el
+  turno, la pantalla que maneja al que le toca (`provocadoMeToca`) mira si está Provocado por alguien (`provocadoEstadoDe`) y muestra el Anuncio; al Aceptar, el
+  momento `provocado-brillo` (js/16 → `provocadoBrilloRecibido`) hace brillar al que provoca en todas las pantallas hasta que pasa el turno (`provocadoDibujar`, js/05).

@@ -1097,6 +1097,13 @@ prueba('💥 Nova arcana (Mago, 2026-10-26): onda alrededor, PdG.Esp contra Evas
   igual([h.duelo.objetivo, h.duelo.radio, h.duelo.tira, h.duelo.contra.join(','), h.duelo.danoFormula, h.duelo.efectos[0].empuja, !!h.duelo.aliados, h.cd, e.etiquetas.includes('mago')],
     ['onda', 1, 'pdgmg', 'eva', '2d6', 2, false, 3, true]);
 });
+prueba('😤 Tirar la bronca (Support, 2026-10-26): un área alrededor de un aliado, Res.Mt contra Ef.Esp, Provocado por ese aliado 2 turnos', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Tirar la bronca'), h = armarHabilidadDeCreep(e.datos, 2);
+  const sp = Duelo.limpiarHab ? Duelo.limpiarHab({nombre: 'X', objetivo: 'area', radio: 3, efectos: [{nombre: 'Provocado', spec: {nombre: 'Provocado', turnos: 2, provocaDe: 'tok1', provocaDeNombre: 'Ogro'}}]}) : null;
+  const est = EstadosAplicar.aplicarACreep({nombre: 'C', estados: [], equipo: []}, {nombre: 'Provocado', turnos: 2, provocaDe: 'tok1', provocaDeNombre: 'Ogro'});
+  igual([h.provocarAliado.radio, h.provocarAliado.turnos, h.duelo.contra.join(','), h.duelo.tira, h.spCosto, h.cd, sp ? sp.efectos[0].spec.provocaDe : 'tok1', est.ok ? est.estado.provocaDeNombre : '', e.etiquetas.includes('support')],
+    [3, 2, 'resm', 'dmgesp', 4, 3, 'tok1', 'Ogro', true]);
+});
 prueba('🏹 Tiro que derriba (Rango, 2026-10-26): un ataque normal; si pega, empuja 1 y Sentado', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Tiro que derriba'), h = armarHabilidadDeCreep(e.datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});

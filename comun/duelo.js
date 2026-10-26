@@ -637,6 +637,7 @@ const Duelo = (() => {
     if(_num(s.escudoMagico)) o.escudoMagico = Math.max(0, Math.round(_num(s.escudoMagico)));
     // 🔓 Cómo se suelta (2026-10-20, la Red Nerubian: Fuerza contra el Ef.Esp de quien la tiró, al empezar cada turno).
     if(s.soltar && typeof Combatiente !== 'undefined' && Combatiente.soltarNorm(s.soltar)) o.soltar = Combatiente.soltarNorm(s.soltar);
+    if(s.provocaDe){ o.provocaDe = txtCorto(s.provocaDe, 80); o.provocaDeNombre = txtCorto(s.provocaDeNombre, 40); }   // 😤 Provocado por quién (Tirar la bronca, 2026-10-26)
     return o;
   }
   function limpiarEfectos(lista){

@@ -2107,6 +2107,14 @@ async function dueloAplicarEfecto(d, ef){
 // su próxima tirada, y esa tirada lo gasta (js/37). Antes se sumaba a una tirada ya hecha.
 async function empowerAplicar(d, t, n){
   const nom = nombreDe(t), quien = d.atacante.nombre || 'Alguien';
+  // A un creep (el Empuje del Support, 2026-10-26: probándolo en el mapa quedaba «a mano»): el estado directo; su próxima tirada lo gasta (CreepAcciones).
+  if(t && t.tipo === 'creep' && t.fichaId){
+    try{
+      let r = null;
+      await modificarCreep(t.fichaId, sc => { r = EstadosAplicar.aplicarACreep(sc, {nombre: 'Empower'}); });
+      return r && r.ok === false ? {manual: true, nota: `${nom}: ${r.motivo || 'no entró'}`} : {nota: `${nom}: +${n} a su próxima tirada (esa tirada lo gasta)`};
+    }catch(err){ console.error('Empower: no se pudo dar el estado', err); return {manual: true, nota: `sumale +${n} a mano a la próxima tirada de ${nom}`}; }
+  }
   if(!t || t.tipo !== 'pj' || !t.fichaId || String(t.fichaId).includes(SEP_INVOCACION)) return {manual: true, nota: `sumale +${n} a mano a la próxima tirada de ${nom}`};
   try{
     await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: {nombre: 'Empower'}, origen: `${quien} · Empower`});

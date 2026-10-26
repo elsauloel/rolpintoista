@@ -30,7 +30,7 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
   furia, pisotón, provocar, segundo aliento, aguantar el daño, cubrir al de al lado, perforar, carga que derriba.
 - 🗡 **Choque liviano — 14**: golpe preciso, sangrado, trabar, golpear y alejarse, salto, abrir la herida, manada, ráfaga, por la espalda · de El origen:
   robar, sigilo, varios golpes, bajo tierra, veneno (de fábrica desde el 2026-10-25: Hoja envenenada / Mordisco infectado).
-- 🏹 **Rango y Hunter — 14**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar, mantener a raya (2026-10-25), atravesar (Flecha que atraviesa, 2026-10-25), disparos encadenados (Ráfaga encadenada, 2026-10-25) · de El origen: área a distancia,
+- 🏹 **Rango y Hunter — 15**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar, mantener a raya (2026-10-25), atravesar (Flecha que atraviesa, 2026-10-25), disparos encadenados (Ráfaga encadenada, 2026-10-25), disparar y replegarse (Disparo y repliegue, 2026-10-26) · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 14**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25), lluvia de escarcha (2026-10-25), andanada arcana (2026-10-25), misiles elementales (2026-10-25), portal trampa (2026-10-25) · de El origen: proyectil, fuego con quemadura.
 - 🧿 **Debuffer — 14**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25), silencio (Tótem de silencio, 2026-10-25), extenuar (2026-10-25), cegar (2026-10-25), grito de pánico (2026-10-25) · de El origen: ceguera, veneno, inmovilizar.
@@ -38,7 +38,7 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
 **Para emparejar** (regla del dueño, 2026-10-25: «empezamos a tener en cuenta todos los roles de creep e ir emparejándolos… para que estén todos
-avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-25): Mago, Support, Debuffer, Rango + Hunter y Choque liviano en 14; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
+avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Mago, Support, Debuffer y Choque liviano en 14; Rango + Hunter en 15; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
 
 ## Los roles
 
@@ -205,7 +205,7 @@ la emboscada, matabestias, la espalda a distancia, la recarga, el proyectil perf
 
 **C. Distancia y movimiento**
 10. **Retroceder y disparar**: se aleja uno o dos casilleros gratis y dispara.
-11. **Disparar y reposicionarse**: el Hit and run del arquero (dispara y se mueve gratis, sin oportunidad).
+11. ✅ **Disparar y reposicionarse** — **Disparo y repliegue** (2026-10-26): un disparo con +2 al daño y, pegue o no, se aleja hasta 2 casilleros gratis y sin oportunidad.
 12. **Tiro en carrera**: se mueve y dispara sin perder la puntería.
 13. ✅ **Mantener a raya** ✦ (2026-10-25): un disparo con +2 al daño; si pega, lo empuja 2 casillas y queda Lento 2 turnos.
 

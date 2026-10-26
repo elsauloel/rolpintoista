@@ -13,5 +13,5 @@ function alejarseResuelto(d){
   seleccionar(tid);
   dodgeBanner = {id: 'alejarse-' + d.id, tokenId: tid, nombre, libre: true, alejarse: n};
   renderDodgeBanner();
-  mesaLinea(`💨 ${nombre} pica y se aleja: puede moverse hasta ${n} casillero${n === 1 ? '' : 's'}, gratis y sin ataque de oportunidad.`, 'recordatorio');
+  mesaLinea(`💨 ${nombre} se aleja: puede moverse hasta ${n} casillero${n === 1 ? '' : 's'}, gratis y sin ataque de oportunidad.`, 'recordatorio');
 }

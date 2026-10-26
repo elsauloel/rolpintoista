@@ -1093,6 +1093,11 @@ prueba('🔁 Ráfaga encadenada (Rango, 2026-10-25): Repitiendo con 3 disparos e
   const h = armarHabilidadDeCreep(e.datos, 2);
   igual([h.efectoNombre, h.efectoStacks, h.efectoTurnos, CreepAcciones.FLAGS_ESTADO.includes('repetir'), h.nitrosCosto, h.cd], ['Repitiendo', 3, 1, true, 0, 3]);
 });
+prueba('💨 Disparo y repliegue (Rango, 2026-10-26): un ataque con +2 al daño y después alejarse 2 gratis', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Disparo y repliegue'), h = armarHabilidadDeCreep(e.datos, 2);
+  const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});
+  igual([h.duelo.modo, h.duelo.arma.fijo, a.alejarse, h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('rango'), e.etiquetas.includes('disparar y replegarse')], ['arma', 2, 2, 'ATAQUE', 2, 3, true, true]);
+});
 prueba('🏹 Flecha que atraviesa (Rango, 2026-10-25): un ataque con +2 al daño que sigue al de atrás (perforante)', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Flecha que atraviesa');
   const h = armarHabilidadDeCreep(e.datos, 2);

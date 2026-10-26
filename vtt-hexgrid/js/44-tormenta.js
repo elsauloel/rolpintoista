@@ -17,7 +17,9 @@ function tormentaRepartir(hab, objetivos){
 // El daño de un objetivo: sus proyectiles (k × «cada»), directo a la vida.
 function tormentaHabDe(hab, tokenId){
   if(!hab || !hab.tormenta || !hab.tormenta.cuenta) return hab;
-  const k = Math.max(0, Math.round(num(hab.tormenta.cuenta[tokenId]))), m = String(hab.tormenta.cada || '1d4').match(/(\d*)d(\d+)/i);
-  const formula = m ? `${k * (num(m[1]) || 1)}d${m[2]}` : `${k}d4`;
+  // (2026-10-26, la versión creep: «1d4+1» por proyectil → k d4 + k)
+  const k = Math.max(0, Math.round(num(hab.tormenta.cuenta[tokenId]))), m = String(hab.tormenta.cada || '1d4').match(/(\d*)d(\d+)(?:\s*\+\s*(\d+))?/i);
+  const fijo = m && m[3] ? k * num(m[3]) : 0;
+  const formula = m ? `${k * (num(m[1]) || 1)}d${m[2]}${fijo > 0 ? '+' + fijo : ''}` : `${k}d4`;
   return {...hab, dano: {...(hab.dano || {}), formula, tipo: 'arcano', ignoraDef: true, directo: true}};
 }

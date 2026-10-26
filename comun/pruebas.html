@@ -1077,6 +1077,11 @@ prueba('✨ Purificar (Support, 2026-10-25): Flash; a un aliado, la purga y cura
   const n = Duelo.limpiarHab(ej) || {};
   igual([h.duelo.objetivo, h.duelo.conmigo, !!(n.efectos || []).find(x => x.purga), ((n.efectos || []).find(x => x.cura) || {}).cura, !!h.flash, h.nitrosCosto, h.cd], ['aliado', true, true, 5, true, 0, 3]);
 });
+prueba('☀ Smite (Support, 2026-10-26): no se esquiva, 2d4 de luz directo; Marcado si no lo resiste', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Smite'), h = armarHabilidadDeCreep(e.datos, 2);
+  igual([h.duelo.tira, h.duelo.contra.join(','), !!h.duelo.danoSiempre, h.duelo.danoFormula, Combatiente.elementoDe(h.duelo.tipoDano), h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('support')],
+    ['dmgesp', 'resmg', true, '2d4', 'luz', 1, 2, 2, true]);
+});
 prueba('🎯 Tiro al arma (Rango, 2026-10-26): +2 PdG; si pega, el arma sale volando 2 (Desarmado con vuela)', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Tiro al arma'), h = armarHabilidadDeCreep(e.datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}}), ef = (a.efectos || [])[0] || {};

@@ -1700,7 +1700,7 @@ async function dueloAplicarDano(d){
     // ✨ El estado según el daño que entró (2026-10-13, Carga Elemental: Escarcha, Veneno, Armadura rota): `hab.dano.porDano`.
     const porDano = d.hab && d.hab.dano && d.hab.dano.porDano && !res.r.invulnerable ? await dueloPorDano(d, num(res.r.recibido)).catch(err => { console.error('No se pudo aplicar el estado por daño:', err); return null; })
       : !d.hab && magico && dn.magico.porDano && !res.r.invulnerable ? await dueloPorDano(d, num(magico.recibido), dn.magico.porDano).catch(err => { console.error('No se pudo aplicar el estado por daño:', err); return null; }) : null;   // ❄🧪☠ Arma elemental (2026-10-21)
-    if(idHab && idHab.estado && num(res.r.recibido) > 0 && !res.r.invulnerable) await dueloIdentidadEstado(d, elHab, idHab).catch(err => console.error('La identidad del elemento:', err));   // ☀ Marcado · 🌑 Herida sombría
+    if(idHab && idHab.estado && num(res.r.recibido) > 0 && !res.r.invulnerable && !(d.contacto && d.contacto.resistioEstado)) await dueloIdentidadEstado(d, elHab, idHab).catch(err => console.error('La identidad del elemento:', err));   // ☀ Marcado · 🌑 Herida sombría
     // ⚡ Arma eléctrica (2026-10-21): el daño eléctrico del arma salta como el rayo (la mitad de lo que entró).
     if(!d.hab && magico && dn.magico.cadena && num(magico.recibido) > 1 && !res.r.invulnerable) await dueloCadena(d, num(magico.recibido)).catch(err => console.error('No se pudo hacer saltar el rayo:', err));
     // Rayo en cadena (2026-10-05): el golpe de una habilidad o arma especial de rayo salta (la misma regla de ⚡ Rayo en cadena del token).

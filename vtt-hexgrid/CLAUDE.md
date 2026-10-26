@@ -1803,3 +1803,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
 - **✨ El Anuncio de un buff** (2026-10-24, dueño: «aunque no se tire nada y se aplique directo, tiene que haber un anuncio»): `dueloBuffMomento` (js/13), desde
   `dueloAplicarEfecto`: un estado con polaridad buff que entró → momento `tipo: 'buff'` con el Anuncio a quien lo recibe (dueño; de un creep, el GM) y la
   Crónica para todos, con los turnos y lo que hace (el `detalle` del preset hasta las notas ⚙/✋). Sobre sí mismo, solo la Crónica. Como `dueloCuraMomento`.
+- **⬆⬇ Flechitas al recibir un buff o un debuff** (2026-10-25, dueño; `js/75-flechitas-estados.js`): `flechitasRevisar()` (js/05, una vez por dibujo)
+  compara los estados públicos de cada token (`estadoDe`) con los de antes y, por cada estado nuevo con polaridad buff o debuff, `flechitasDibujar` (en el
+  recorrido de los tokens que se ven) dibuja ~1,2 s de chevrones verdes que suben o rojos que bajan. No anima la primera vez que ve un token (al cargar el
+  mapa o al cambiar de vínculo), ni los derivados, ni a un caído; un token oculto o en la niebla no se delata. Solo dibuja.

@@ -21,7 +21,7 @@
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.
-> - [ ] **⬆⬇ Animación al recibir un buff o un debuff (2026-10-25, dueño: «probar una pequeña animación que cuando se coloca un buff, durante un segundo,
+> - [x] (2026-10-25, dueño: «podemos probar esto»; hecha en `vtt-hexgrid/js/75-flechitas-estados.js`, falta que la vea el dueño) **⬆⬇ Animación al recibir un buff o un debuff (2026-10-25, dueño: «probar una pequeña animación que cuando se coloca un buff, durante un segundo,
 >   el token tenga una animación de flechitas verdes que van para arriba; y lo mismo cuando se coloca un debuff. Para pensar si es posible y buscar el
 >   momento»; el mismo día: «anotalo para ver en la compu»).** Es posible: cada pantalla ya escucha los estados públicos de cada token (`resumen.estados`, js/09); al aparecer un estado nuevo, ~1 s
 >   de flechitas verdes que suben (buff) o rojas que bajan (debuff) sobre el token, en el dibujo del mapa (js/05, como el aura del estandarte). Así la
@@ -45,8 +45,8 @@
 >   - **Si duda de algo:** la propuesta dice que no pudo comprobar si el repositorio en GitHub es público o privado, así que lo trata como si pudiera ser
 >     público. Se confirma en la página del repositorio en GitHub.
 >   - Para volver a hacerlo: escribir `/auto-mode-setup`; si alguna pregunta no se entiende, pegársela a Claude y la explica antes de contestar.
-> - [ ] **📖 Ver los globos del glosario** (2026-10-25, dueño: «anotá lo de los globos del glosario para ver en la compu»): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados, mecánicas de armas, bonos) subrayados con su globo al pasar el mouse; está también en `docs/pruebas-en-el-mapa.md` («El glosario con globos», 2026-10-09).
-> - [ ] **🚩 Ver la animación de las banderitas del Estandarte de guerra** (2026-10-24, dueño: «anotá para ver en la compu la animación de las banderitas»):
+> - [x] (2026-10-25, dueño: «se ve bien, se irá viendo con el uso») **📖 Ver los globos del glosario** (2026-10-25, dueño: «anotá lo de los globos del glosario para ver en la compu»): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados, mecánicas de armas, bonos) subrayados con su globo al pasar el mouse; está también en `docs/pruebas-en-el-mapa.md` («El glosario con globos», 2026-10-09).
+> - [x] (2026-10-25, dueño: «esto ya está ok», con la costura del Tótem) **🚩 Ver la animación de las banderitas del Estandarte de guerra** (2026-10-24, dueño: «anotá para ver en la compu la animación de las banderitas»):
 >   en «Claude · pruebas» quedó clavado el estandarte del Escarabajo (casilla 11,−1), y al lado el Tótem de silencio de la Bruja (5,−1, con su costura violeta). Mirar el aura en movimiento —los banderines carmesí y dorado que
 >   flamean a lo largo del contorno, el anillo y el velo— y decidir si queda así (el dueño había dicho «algún estilo marcial, pero después te digo»).
 >   Se ajusta en `vtt-hexgrid/js/73-estandarte.js` (`estandarteDibujar`: cuántos banderines, cuánto flamean, el redondeo de las puntas `MARGEN`).

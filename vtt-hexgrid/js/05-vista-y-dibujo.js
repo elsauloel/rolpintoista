@@ -794,6 +794,7 @@ function dibujarLienzo(){
   if(typeof curaDibujarAuras === 'function' && curaDibujarAuras(z)) animando = true;   // ✨ las auras sanadoras, debajo de los tokens (js/70)
   if(typeof estandarteDibujar === 'function' && estandarteDibujar(z)) animando = true;   // 🚩 el aura de un estandarte de guerra (js/73)
   if(typeof meteoroDibujar === 'function' && meteoroDibujar(z)) animando = true;   // ☄ la sombra de un meteoro por caer (js/74)
+  if(typeof flechitasRevisar === 'function') flechitasRevisar();   // ⬆⬇ los estados nuevos de cada token, para las flechitas (js/75)
   if(typeof dibujarPozos === 'function') dibujarPozos(z);   // 🕳 el pozo de los que están bajo tierra (js/46)
   // Tokens.
   disposicion = calcularDisposicion();
@@ -880,6 +881,7 @@ function dibujarLienzo(){
     { const at = typeof atrapaDeToken === 'function' ? atrapaDeToken(est) : ''; if(at){ dibujarAtrapa(at, x, y, rad, z, semillaDe(d.id)); animando = true; } }   // 🕸 atrapado en una telaraña o una red (js/68)
     if(typeof curaDibujarDestello === 'function' && curaDibujarDestello(d.id, x, y, rad, z)) animando = true;   // ✨ la cura de un pulso (js/70)
     if(polillaRevolotea(est)){ dibujarPolillita(x, y, rad, z, semillaDe(d.id)); animando = true; }   // 🦋 la Polilla, revoloteando
+    if(typeof flechitasDibujar === 'function' && flechitasDibujar(d.id, x, y, rad, z)) animando = true;   // ⬆⬇ recibió un buff o un debuff (js/75)
 
     if(seleccion === d.id){
       trazarPuntos(verticesHex(x, y, rad + 5 / z));

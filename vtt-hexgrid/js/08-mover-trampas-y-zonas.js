@@ -604,7 +604,8 @@ async function zonaResolverBanner(){
         const freno = [...(armadmg > 0 ? [`${armadmg} de Defensa especial`] : []), ...(resEl ? [Combatiente.resElementalTxt(elZ, resEl)] : [])];
         partes.push(`${monto} de daño${tipoTxt}${freno.length ? ` (− ${freno.join(' − ')})` : ''}`);
         danoHecho = res && res.r ? num(res.r.recibido) : monto;   // lo que llegó a la vida (escudos y Defensa especial ya restados)
-        if(idZ && idZ.estado && danoHecho > 0 && !(res && res.r && res.r.invulnerable)){   // ☀ Marcado · 🌑 Herida sombría
+        // (si la zona ya deja ese mismo estado —Luz para los suyos: Marcado—, no se pone dos veces; 2026-10-26, visto en el mapa)
+        if(idZ && idZ.estado && danoHecho > 0 && !(res && res.r && res.r.invulnerable) && !(specZ && String(specZ.nombre || '') === idZ.estado.nombre)){   // ☀ Marcado · 🌑 Herida sombría
           try{
             if(t.tipo === 'creep') await modificarCreep(t.fichaId, sc => EstadosAplicar.aplicarACreep(sc, idZ.estado));
             else await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: idZ.estado, origen: el.zonaNombre || 'Zona'});

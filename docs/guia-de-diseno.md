@@ -121,7 +121,7 @@ Dos estados nuevos, para que todas las skills los apliquen igual: **Crítico fre
 | Skill | Clase | Costo | Qué hace |
 |---|---|---|---|
 | Apuntar (existente) | Shooter | X No2 | +X a la PG y **frecuente ×X** en el próximo ataque a distancia (X ≤ 3) |
-| Ojo de asesino | Asalto | SP 2 · No2 1 | Tu próximo ataque del turno con **frecuente ×1** |
+| Ojo de asesino | Asalto | SP 2 · lo de un ataque | Un ataque con +1 PdG, +2 al daño, **frecuente +1** y **potente +1** (2026-10-26: ya no es un estado) |
 | Lisiar / Tajear (existentes) | Asalto | SP 2 / 3 | Ataque con **frecuente ×1**; si es crítico, el efecto se refuerza |
 | Headshot (existente) | Shooter | SP 4 | **frecuente ×1 + potente ×1**, +5 de daño, falla si no es crítico |
 | Degollar (existente) | Asalto | SP 7 | **frecuente ×1 + potente ×1**, +7 de daño (con su costo de quedar expuesto) |

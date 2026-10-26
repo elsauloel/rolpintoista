@@ -739,12 +739,11 @@
   // humanoides. Costo de Claude: el ataque y 2 SP, o cooldown 2.
   H('Finta', 'D', 'hd', 'e', 2, aA('Amaga para un lado y pega por el otro: un ataque con su arma con +2 al daño, Crítico frecuente +1 y Crítico potente +1, que no se puede parar: el rival no puede usar Parry (ni, por eso, Bloqueo) contra este golpe; solo le queda esquivarlo.',
     {fijo: 2, critBono: 1, critpotBono: 1, sinParry: true}, 'va al duelo como un ataque con +2 al daño y +1 a los dos críticos, que no se puede parar', 2, []));
-  // 👁 Auditada (dueño, 2026-10-26; Choque liviano, «buscar el crítico», el Ojo de asesino del Asalto: «al del creep le sumaría lo mismo que al del asalto»):
-  // sobre sí, una carga para su próximo ataque con arma de este turno: +1 PdG, +2 al daño, Crítico frecuente +1 y potente +1 (el preset de la clase;
-  // la carga la gastan los ganchos del duelo). Costo el de la clase: 1 No2 y 2 SP, o cooldown 2.
-  H('Ojo de asesino', 'B', '*', 'e', 2, {detalle: 'Fija la mirada en el punto débil: su próximo ataque con arma de este turno tiene +1 a la Probabilidad de Golpe, +2 al daño, Crítico frecuente +1 y Crítico potente +1. Lo gasta ese ataque, pegue o no; si no ataca, se va al empezar su próximo turno.',
-    no2: 1, spCosto: 2, auditada: true, ataqueTxt: 'sobre sí: su próximo ataque con +1 PdG, +2 al daño y +1 a los dos críticos',
-    duelo: {objetivo: 'uno mismo', tira: '', contra: [], efectos: [{nombre: 'Ojo de asesino'}]}});
+  // 👁 Auditada (dueño, 2026-10-26; Choque liviano, «buscar el crítico», el Ojo de asesino del Asalto: «al del creep le sumaría lo mismo que al del asalto»;
+  // «no es un estado… es algo que se le suma a un ataque»): un ataque con su arma con +1 PdG, +2 al daño, Crítico frecuente +1 y potente +1. Costo el de la
+  // clase: el ataque y 2 SP, o cooldown 2.
+  H('Ojo de asesino', 'D', '*', 'e', 2, aA('Fija la mirada en el punto débil y pega: un ataque con su arma con +1 a la Probabilidad de Golpe, +2 al daño, Crítico frecuente +1 y Crítico potente +1.',
+    {pdg: 1, fijo: 2, critBono: 1, critpotBono: 1}, 'va al duelo como un ataque con +1 PdG, +2 al daño y +1 a los dos críticos', 2, []));
   // 🦘 El Salto (dueño, 2026-10-21): salta hasta 3 casilleros (por encima de hasta 2) y cae al lado del objetivo, sin No2 ni ataque de oportunidad.
   H('Salto', 'DM', '*', 'e', 3, aA('Salta por encima de lo que haya (un salto de 1,5 metros de altura) y cae sobre el objetivo: se desplaza hasta 3 casilleros (salteando hasta 2) hasta quedar al lado, sin No2 ni ataque de oportunidad, y ataca con su arma con +1 a la Probabilidad de Golpe y Crítico frecuente +1. Saltar algo con colisión lo decide la mesa.',
     {pdg: 1, critBono: 1}, 'salta hasta quedar al lado (el mapa) y va al duelo como un ataque con +1 PdG y Crítico frecuente +1', 2, [], {salto: 3}));

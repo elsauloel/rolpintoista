@@ -281,12 +281,16 @@ const FichaGuardado = (() => {
       ['detalle', 'nitrosCosto', 'efectoNombre', 'efectoTurnos', 'efectoMods', 'efectoDetalle', 'dashMapa', 'duelo', 'modo'].forEach(k => { if(base[k] !== undefined) h[k] = structuredClone(base[k]); else delete h[k]; });
     });
   }
-  // 👁 Ojo de asesino (2026-10-26, dueño: +1 PdG, +2 al daño y +1 a los dos críticos): el efecto sale del preset; acá, el texto de las copias viejas.
+  // 👁 Ojo de asesino (2026-10-26, dueño: «no es un estado… es algo que se le suma a un ataque»): era un buff sobre uno mismo; ahora es un ataque con
+  // +1 PdG, +2 al daño y +1 a los dos críticos. Las copias viejas (sin `duelo.modo` 'arma') se reemplazan por la de clase.
   function migrarOjoDeAsesino(S){
     if(typeof CLASES_SKILLS === 'undefined') return;
     const base = CLASES_SKILLS.flatMap(c => c.habilidades || []).find(x => x.id === 'asalto-ojo-de-asesino');
-    if(!base) return;
-    (S.habilidades || []).forEach(h => { if(h && h.habClaseId === 'asalto-ojo-de-asesino' && !/Probabilidad de Golpe/.test(String(h.detalle || ''))) h.detalle = base.detalle; });
+    if(!base || !base.duelo || base.duelo.modo !== 'arma') return;
+    (S.habilidades || []).forEach(h => {
+      if(!h || h.habClaseId !== 'asalto-ojo-de-asesino' || (h.duelo && h.duelo.modo === 'arma')) return;
+      ['detalle', 'costo', 'nitrosCosto', 'tiradaStat', 'duelo', 'modo', 'efectoNombre', 'efectoTurnos', 'efectoMods', 'efectoDetalle'].forEach(k => { if(base[k] !== undefined) h[k] = structuredClone(base[k]); else delete h[k]; });
+    });
   }
   function completar(S, o){
     o = o || {};

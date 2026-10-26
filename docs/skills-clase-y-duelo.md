@@ -16,7 +16,7 @@
 | **Carga** (Warrior) | Avanza X casilleros en línea recta (1 No2 c/u) y ataca con **+X daño fijo y +X PdG** | Cobra los No2; el ataque a mano | El duelo aplica **+X PdG y +X daño fijo**; el movimiento lo hace el jugador en el mapa | Medio |
 | **Cañón Vasco** (Warrior) | Salta X casillas, empuja 1; onda de X + Fuerza a los adyacentes; puede atacar al caer con +X daño fijo | A mano | Solo la parte **ataque al caer** (+X daño fijo) entra en el duelo; la **onda** es un área (ver 3.3) | Medio (parte) |
 | **Arte de la guerra** (Warrior, Flash) | +2 a **una** tirada de PdG, Parry, Bloqueo o Daño | Cobra 2 SP; el +2 a mano | Botón **«Arte de la guerra +2»** en cada paso de tirada del duelo, **antes de tirar** (justo como manda la regla de Flash) | Medio |
-| **Ojo de asesino** (Asalto) | Crítico frecuente ×1 hasta tu próximo turno | ✅ automático (estado) | ✅ el duelo ya lo usa | — |
+| **Ojo de asesino** (Asalto) | Un ataque con +1 PdG, +2 al daño y +1 a los dos críticos (2026-10-26) | ✅ automático (ataque con arreglos) | ✅ el duelo ya lo usa | — |
 | **Temple** (Tanque) | +1 Resistencia a crítico de todo Tipo, 2 turnos | ✅ automático | ✅ el duelo ya lo usa | — |
 | **Piel resistente** (Tanque) | +5 Def, +5 Res.Esp, +1 Resistencia a crítico, 2 turnos | ✅ automático | ✅ el duelo ya lo usa | — |
 | **Blindaje** (Tanque, Flash) | Escudo especial de 8 | ✅ automático | ✅ absorbe en el daño del duelo | — |

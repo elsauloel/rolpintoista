@@ -167,7 +167,7 @@ rodilla, Tarascón al tobillo), las redes; y en el mapa, el sigilo, el +1 por la
 2. **Dos cortes rápidos** ✦: dos golpes en uno, con menos daño cada uno.
 3. ✅ **Ráfaga de cortes** ✦: **Ráfaga de cortes** y **Ráfaga de zarpazos** (2026-10-21: +2 dados, los efectos del arma ×3 y la Perfora en cada corte).
 4. **Punto débil**: perfora parte de la Defensa.
-5. ✅ **Buscar el crítico** — **Ojo de asesino** (2026-10-26, el de la clase: sobre sí, su próximo ataque con +1 PdG, +2 al daño y +1 a los dos críticos).
+5. ✅ **Buscar el crítico** — **Ojo de asesino** (2026-10-26, el de la clase: un ataque con +1 PdG, +2 al daño y +1 a los dos críticos).
 
 **B. Desangrar y envenenar**
 6. ✅ **Sangrado**: todas sus variantes y la versión fuerte.
@@ -228,7 +228,7 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
 - **Sprint**: «Sprint [1] — 2 No2: avanza 3 casillas.»
 - **Tronco de huída**: «Tronco de huída [2] — +2 fijo a una tirada de evasión con giro.»
 - **Robar SP** (en pausa): SP 1. Ganás 2 SP por cada crítico obtenido.
-- ✅ **Ojo de asesino** → Ojo de asesino (2026-10-26; la de clase también: +1 PdG, +2 al daño, Crítico frecuente +1 y potente +1, una carga para su próximo ataque).
+- ✅ **Ojo de asesino** → Ojo de asesino (2026-10-26; la de clase también: un ataque con +1 PdG, +2 al daño, Crítico frecuente +1 y potente +1; ya no es un estado).
 
 ## 3. Rango y Hunter — las ideas del rol
 

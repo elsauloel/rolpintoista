@@ -252,10 +252,7 @@ const ESTADOS_PRESET = [
   // Arma bendecida (2026-10-24, dueño: Bendecir el arma del Support de los creeps): su próximo ataque con arma suma un dado del Tipo de su arma.
   {nombre:'Arma bendecida', polaridad:'buff', turnos:2, cargas:1, golpe:{dados:1},
     detalle:'Su próximo ataque con arma suma un dado más del Tipo de su arma al daño (pegue o no, ese ataque la gasta). Si no ataca, se va a los 2 turnos. ⚙ Automatizado en el duelo.'},
-  // Ojo de asesino (2026-10-11, dueño: Asalto, como mecánica de cargas): su próximo ataque con arma de este turno tiene Crítico frecuente +1.
-  // (2026-10-26, dueño: «+1 al crítico frecuente y +1 al crítico potente… con +2 al daño y +1 a la probabilidad de golpe también»; el de clase y el de creep.)
-  {nombre:'Ojo de asesino', polaridad:'buff', turnos:1, cargas:1, golpe:{crit:1, critpot:1, fijo:2, pdg:1},
-    detalle:'Su próximo ataque con arma de este turno tiene +1 a la Probabilidad de Golpe, +2 al daño, Crítico frecuente +1 y Crítico potente +1. Lo gasta ese ataque, pegue o no. ⚙ Automatizado.'},
+  // (Ojo de asesino ya no es un estado: desde el 2026-10-26 es un ataque con sus bonos en el mismo golpe; ver comun/skills-clase.js.)
   // Enfocado (2026-10-11, dueño: Shooter): una carga que se APILA (`golpePorStack`, Combatiente.agregarEstado): cada uso suma un stack y +2 de
   // daño a su próximo ataque con arma, aunque sea en otro turno. Lo gasta ese ataque, pegue o no.
   {nombre:'Enfocado', polaridad:'buff', permanente:true, turnos:0, cargas:1, stacks:1, golpePorStack:{fijo:2}, golpe:{fijo:2},

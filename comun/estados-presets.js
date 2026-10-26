@@ -154,6 +154,10 @@ const ESTADOS_PRESET = [
   // cada golpe que da, la Perfora de siempre (N puntos pasan siempre) contra la Defensa y contra la Defensa especial (js/13, Combatiente.perforaDeEstados).
   {nombre:'Armas perforantes', polaridad:'buff', turnos:3, turnosCompletos:true, perforaGolpe:3, perforaEsp:3,
     detalle:'Sus golpes atraviesan la guardia: en cada golpe que da, 3 puntos de daño pasan siempre la Defensa del rival y 3 pasan siempre su Defensa especial (el resto va contra ellas como siempre). Dura sus próximos 3 turnos completos (el turno en que se lo dan no cuenta). ⚙ Automatizado en el mapa.'},
+  // 🎯 Punto débil (2026-10-26, dueño: la Aguja siniestra del Debuffer, el Punto débil de la clase): −1 a la Resistencia a crítico contra todos los Tipos
+  // (un doble crítico contra él vuelve a ser doble, un crítico simple deja de anularse), 2 turnos.
+  {nombre:'Punto débil', polaridad:'debuff', turnos:2, mods:[{stat:'tipo1', val:-1}, {stat:'tipo2', val:-1}, {stat:'tipo3', val:-1}, {stat:'tipo4', val:-1}, {stat:'tipo5', val:-1}],
+    detalle:'−1 a su Resistencia a crítico contra todos los Tipos de arma durante 2 turnos: los críticos le entran más fácil. ⚙ Automatizado.'},
   // 🌑 Herida sombría (2026-10-26, dueño: la identidad del daño siniestro, «un estado de no se puede curar»): no le entra ninguna cura hasta el final de su
   // próximo turno (Combatiente.sinCura → curaQueEntra). La deja todo daño siniestro que entra.
   {nombre:'Herida sombría', polaridad:'debuff', turnos:1, turnosCompletos:true, sinCura:true, mods:[],

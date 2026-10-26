@@ -1097,6 +1097,13 @@ prueba('💥 Nova arcana (Mago, 2026-10-26): onda alrededor, PdG.Esp contra Evas
   igual([h.duelo.objetivo, h.duelo.radio, h.duelo.tira, h.duelo.contra.join(','), h.duelo.danoFormula, h.duelo.efectos[0].empuja, !!h.duelo.aliados, h.cd, e.etiquetas.includes('mago')],
     ['onda', 1, 'pdgmg', 'eva', '2d6', 2, false, 3, true]);
 });
+prueba('🎯 Aguja siniestra (Debuffer, 2026-10-26): PdG.Esp contra Evasión, 1d6 siniestro directo y Punto débil (−1 a las resistencias a crítico)', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Aguja siniestra'), h = armarHabilidadDeCreep(e.datos, 2);
+  const P = estadosPresetCreep().find(p => p.nombre === 'Punto débil');
+  const sc = {nombre: 'X', crit: [2, 2, 2, 2, 2], estados: [{...structuredClone(P), id: 'e1', activo: true}], equipo: []};
+  igual([h.duelo.tira, h.duelo.contra.join(','), h.duelo.danoFormula, !!h.duelo.danoDirecto, Combatiente.elementoDe(h.duelo.tipoDano), h.duelo.efectos[0].nombre, P.turnos, CreepCalculo.critEfectivo(sc, 0), h.cd, e.etiquetas.includes('debuffer')],
+    ['pdgmg', 'eva', '1d6', true, 'siniestro', 'Punto débil', 2, 1, 3, true]);
+});
 prueba('💨 Dash (Choque liviano y Asalto, 2026-10-26): el camino lo hace el mapa; el golpe al que atraviesa, +2 PdG y +1 a la Fuerza del golpe', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Dash'), h = armarHabilidadDeCreep(e.datos, 2);
   const cl = CLASES_SKILLS.find(c => c.id === 'asalto').habilidades.find(x => x.id === 'asalto-dash');

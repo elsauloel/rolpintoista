@@ -42,12 +42,12 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 - 🏹 **Rango y Hunter — 17**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar, mantener a raya (2026-10-25), atravesar (Flecha que atraviesa, 2026-10-25), disparos encadenados (Ráfaga encadenada, 2026-10-25), disparar y replegarse (Disparo y repliegue, 2026-10-26), clavar a la pared (2026-10-26), tiro al arma (2026-10-26) · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 17**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25), lluvia de escarcha (2026-10-25), andanada arcana (2026-10-25), misiles elementales (2026-10-25), portal trampa (2026-10-25), prisión de hielo (2026-10-26), nova arcana (2026-10-26), ráfaga de viento (2026-10-26) · de El origen: proyectil, fuego con quemadura.
-- 🧿 **Debuffer — 17**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25), silencio (Tótem de silencio, 2026-10-25), extenuar (2026-10-25), cegar (2026-10-25), grito de pánico (2026-10-25), nube tóxica (2026-10-26), debilitar (Maldición debilitante, 2026-10-26), sanguijuela (2026-10-26, del Mago) · de El origen: ceguera, veneno, inmovilizar.
+- 🧿 **Debuffer — 18**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25), silencio (Tótem de silencio, 2026-10-25), extenuar (2026-10-25), cegar (2026-10-25), grito de pánico (2026-10-25), nube tóxica (2026-10-26), debilitar (Maldición debilitante, 2026-10-26), sanguijuela (2026-10-26, del Mago), punto débil (Aguja siniestra, 2026-10-26) · de El origen: ceguera, veneno, inmovilizar.
 - 💚 **Support — 17**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24), estandarte (Estandarte de guerra, 2026-10-24), señalar la presa (2026-10-25), armas perforantes (2026-10-25), redoble de tambores (2026-10-25), frenesí inducido (2026-10-25), limpiar estados (Purificar, 2026-10-25), levitar (2026-10-25), empower (Empuje, 2026-10-26), luz para los suyos (2026-10-26), smite (2026-10-26) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
 **Para emparejar** (regla del dueño, 2026-10-25: «empezamos a tener en cuenta todos los roles de creep e ir emparejándolos… para que estén todos
-avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Mago, Rango + Hunter, Debuffer, Support y Choque liviano en 17; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
+avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Mago, Rango + Hunter, Support y Choque liviano en 17; Debuffer en 18; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
 
 ## Los roles
 
@@ -398,6 +398,7 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
 3. ✅ **Arma elemental**: el arma de un aliado pega de fuego, hielo o rayo por unos turnos — **Arma ígnea / helada / eléctrica / ácida / venenosa**
    (2026-10-21: +1d4 del elemento por golpe, 3 turnos, y lo de la Carga Elemental).
 4. **Filo envenenado / sangrante**: los golpes de un aliado dejan Veneno o Sangrado.
+4b. **Arma sombría** ⏸ (para más adelante; dueño, 2026-10-26: «un encantamiento que le puede dar a un arma de un aliado… que le suma el mismo efecto de este skill [la Aguja siniestra] al ataque de un aliado durante X cantidad de turnos… lo vamos a dar al support»): a un aliado en su Rango, sus golpes con arma dejan Punto débil (−1 a las resistencias a crítico) unos turnos, como las Armas elementales.
 5. ✅ **Ojo certero** (2026-10-24): a él o a un aliado en su Rango, Crítico frecuente +2 y Crítico potente +2 durante 2 turnos completos de quien lo
    recibe (la marca `turnosCompletos`: el turno en que se lo dan no cuenta, aunque sea el suyo).
 6. ✅ **Armas perforantes** (ex «Abrir la guardia», 2026-10-25; dueño: «un skill de support no trabaja sobre rivales, sino sobre aliados»): a él o a un aliado en su Rango,
@@ -496,6 +497,7 @@ Inmovilizado, Rengo, Desarmado; y, de personajes, Enyetar.
 4. ✅ **Maldición de la coraza** ✦ (2026-10-24): su PdG.Esp contra la Res.Esp de un rival en su Rango; **Coraza maldita**, −2 Defensa y −2 Defensa
    especial 3 turnos. Reemplaza a la vieja Maldición (a mano).
 5. **Mano temblorosa**: menos Crítico frecuente y potente.
+5b. ✅ **Punto débil** — **Aguja siniestra** (2026-10-26, el Punto débil de la clase: PdG.Esp contra Evasión; 1d6 siniestro directo y −1 a todas las resistencias a crítico 2 turnos).
 
 **B. Quitarle recursos**
 6. **Drenar No2**: pierde No2 (y si queda en 0, Sentado, como el Sonic Boom).
@@ -576,6 +578,6 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
 - **Transfusión sanguínea**: «Transfusión sanguínea [1] — Transfiere hasta 20 de HP de un personaje aliado a otro.»
 - **Veneno**: «Veneno [2] — Maldición (Esp / Res.M). Aplica 3 stacks de veneno.»
 - ✅ **Nube tóxica** → Nube tóxica: «Nube tóxica [3] — Crea un área de flor que aplica 3 stacks de veneno al que entre en ella o esté en su interior durante el mantenimiento. Solo aplica 1 stack a personajes ya envenenados. Duración: 3 turnos.»
-- **Punto débil** (en pausa): SP 3. Maldición (Esp / Res.M). El objetivo pierde 1 punto de Resistencia a crítico contra todos los Tipos durante 2 turnos (un doble crítico contra él vuelve a ser doble, un crítico simple deja de anularse). ✋ A mano: ponele un…
+- ✅ **Punto débil** → Aguja siniestra (en pausa): SP 3. Maldición (Esp / Res.M). El objetivo pierde 1 punto de Resistencia a crítico contra todos los Tipos durante 2 turnos (un doble crítico contra él vuelve a ser doble, un crítico simple deja de anularse). ✋ A mano: ponele un…
 - **Pedos Tóxicos**: Marcás un punto en el mapa y queda una nube tóxica de diámetro 5 (19 casillas) durante 2 turnos (la habilidad no falla: la nube aparece siempre). Cada rival que entra, o que sigue adentro en el Mantenimiento, tira Res.Esp contra…
 

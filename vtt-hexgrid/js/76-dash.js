@@ -63,7 +63,10 @@ function dashEjecutar(tokenId, o){
 // Cuando el duelo del Dash se resuelve (el gancho `disparoResuelto`, js/14): si lo paró con Parry (o lo bloqueó), se queda; si no, sigue hasta el final.
 function dashResuelto(d){
   const id = d && d.atacante && d.atacante.tokenId, p = id && dashPendientes.get(id);
-  if(!p || !d.defensor || d.defensor.tokenId !== p.rivalId) return;
+  if(!p) return;
+  // Solo el duelo del Dash (2026-10-26, visto en el mapa: un Dash cancelado quedaba pendiente y el próximo Degollar de ese creep contra el mismo
+  // rival lo hacía saltar al final del camino). Otro ataque de quien lo tenía pendiente lo descarta.
+  if(!d.defensor || d.defensor.tokenId !== p.rivalId || (d.ataque && d.ataque.habNombre && d.ataque.habNombre !== p.nombre) || (!d.ataque || !d.ataque.habNombre)){ dashPendientes.delete(id); return; }
   dashPendientes.delete(id);
   const paro = d.resultado === 'bloqueado' || d.resultado === 'mitad' || !!(d.defensa && /parry/.test(String(d.defensa.modo || '')) && d.contacto && d.contacto.gana === 'defensor');
   const t = tokens.get(id), nom = t ? nombreDe(t) : (d.atacante.nombre || 'Alguien');

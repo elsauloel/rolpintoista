@@ -334,6 +334,8 @@ const ZONA_STAT_LABEL = {resmg: 'Res.Esp', rescc: 'Res.CC', ini: 'Iniciativa', p
 // ni el +1 de Res.Esp de los jefes.
 function zonaStatCreep(sc, statId){ return CreepCalculo.statValor(sc, statId); }
 function zonaEsMia(t){
+  // (un caído o derrotado no tira nada: 2026-10-26, visto en el mapa — la escarcha le pedía Agilidad a un goblin muerto)
+  if(typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(zonaIdDe(t))) return false;
   if(t.tipo === 'creep') return soyGM;
   return t.tipo === 'pj' && !!t.fichaId && !String(t.fichaId).includes(SEP_INVOCACION) && puedoMover(t);
 }
@@ -398,6 +400,8 @@ function alturaDe(el){
   if(['piso', 'aire', 'ambos'].includes(el.zonaAltura)) return el.zonaAltura;
   try{ const a = (JSON.parse(el.trampaEstado || '{}') || {}).altura; if(['piso', 'aire', 'ambos'].includes(a)) return a; }catch(err){}
   if(el.fuego) return 'piso';
+  // 🧊 Una superficie (hielo, agua) es del piso aunque no lo diga (2026-10-26: el suelo congelado salía «del aire» y Levitar no lo salvaba).
+  { const sup = el.zona && typeof superficieSpec === 'function' ? superficieSpec(el) : null; if(sup && sup.superficie) return 'piso'; }
   return el.trampa && !el.zona ? 'piso' : 'aire';
 }
 const tocaElPiso = el => alturaDe(el) !== 'aire';
@@ -411,7 +415,7 @@ function zonaRevisarToken(t, desdeMantenimiento, flotando, soloPiso){
     const sup = typeof superficieSpec === 'function' ? superficieSpec(el) : null;
     if(sup && sup.tiraPaso) return;   // el hielo: al aparecer y por cada paso (zonaRevisarEntrada), no por estar parado
     if(desdeMantenimiento && el.zonaEnMantenimiento === false) return;
-    if(flotando && alturaDe(el) === 'piso') return;
+    if((flotando || (typeof vuelaToken === 'function' && vuelaToken(t))) && alturaDe(el) === 'piso') return;   // 🕊 quien vuela (Levitando, Vuela) no toca lo del piso, tampoco parado (2026-10-26)
     if(soloPiso && alturaDe(el) !== 'piso') return;
     if(!celdasDeElemento(el).some(c => c.col === t.col && c.fila === t.fila)) return;
     zonaEncolar(el, t);
@@ -487,6 +491,7 @@ function zonaInmediataRevisar(elId){
   const cs = celdasDeElemento(el);
   tokens.forEach(t => {
     if(!zonaEsMia(t) || !zonaAplicaA(el, t) || !zonaLeFalta(el, t)) return;
+    if(alturaDe(el) === 'piso' && typeof vuelaToken === 'function' && vuelaToken(t)) return;   // 🕊 quien vuela: lo del piso no le aparece bajo los pies
     if(!cs.some(c => c.col === t.col && c.fila === t.fila)) return;
     zonaEncolar(el, t);
   });

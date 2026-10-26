@@ -17,8 +17,8 @@ function dashCamino(origen, dir, casillas, tYo){
     if(elementoSolidoEn(c.col, c.fila) || (typeof paredCorta === 'function' && paredCorta(prev, c))) break;
     const ocup = [...tokens.entries()].find(([, x]) => x !== tYo && x.col === c.col && x.fila === c.fila && !x.bajoTierra);
     if(ocup){
-      const [, x] = ocup;
-      const caido = typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(x);
+      const [xid, x] = ocup;
+      const caido = typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(xid);   // (con el id, 2026-10-26)
       if(!rival && !caido && dueloEsRival(tYo, x)){ rival = ocup; antes = {...prev}; max++; celdas.push(c); prev = c; continue; }   // atraviesa a uno: una casilla más
       break;
     }

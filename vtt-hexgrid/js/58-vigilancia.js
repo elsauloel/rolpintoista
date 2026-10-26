@@ -8,7 +8,7 @@ const VIGILANCIA_PDG = 2;   // el disparo sale con +2 PdG (dueño, 2026-10-21: �
 // Los rivales de `t` que vigilan (lo público): [{rid, r, alcance}].
 function vigilantesDe(t){
   const rivales = new Set(rivalesDe(t));
-  return [...tokens.entries()].filter(([, r]) => rivales.has(r) && !r.bajoTierra && !etereoDe(r) && !iniciativaFueraDeJuego(r))
+  return [...tokens.entries()].filter(([rid, r]) => rivales.has(r) && !r.bajoTierra && !etereoDe(r) && !iniciativaFueraDeJuego(rid))   // (con el id: con el token nunca daba caído, 2026-10-26)
     .map(([rid, r]) => { const e = (((vinculo(r) || {}).resumen || {}).estados || []).find(x => x && num(x.vigilancia) > 0); return e ? {rid, r, alcance: num(e.vigilancia)} : null; })
     .filter(Boolean);
 }

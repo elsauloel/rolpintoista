@@ -1549,7 +1549,7 @@ async function dueloDrenar(d, monto){
     if(ta.tipo === 'creep'){
       const r = await modificarCreep(ta.fichaId, sc => {
         const previo = num(sc.hp), max = num(sc.hpMax) > 0 ? num(sc.hpMax) : previo + monto;
-        sc.hp = Math.min(max, previo + monto);
+        sc.hp = Math.min(max, previo + Combatiente.curaQueEntra(previo, monto, sc.estados));   // 🌑 con una herida que no deja curarse, no se cura (2026-10-26)
         const sobra = monto - (sc.hp - previo), tope = Math.floor(max * pct / 100), antes = excedenteDe(sc.estados);
         const exc = sobra > 0 && tope > antes ? Math.min(tope, antes + sobra) - antes : 0;
         if(exc) EstadosAplicar.aplicarACreep(sc, {nombre: 'Vida extra', escudoMagico: exc});
@@ -1597,7 +1597,9 @@ async function dueloAplicarDano(d){
   // 💍 Los anillos elementales (js/53): +N al daño de su elemento (el de la habilidad acá; el elemental del arma, más abajo).
   const elHab = d.hab && d.hab.dano && num(dn.crudo) > 0 ? Combatiente.elementoDe(d.hab.dano.tipo) : '';
   const anilloHab = elHab && typeof talMasDanoElem === 'function' ? talMasDanoElem(d, elHab) : 0;
-  const mult = critReal ? d.crit.mult : 1, crudo = Math.ceil(Math.max(0, num(dn.crudo) - menosDist + (magico ? botella : 0) + anilloHab) * multHab), golpe = crudo * mult;
+  // ☀🌑 La identidad de la luz y de lo siniestro (2026-10-26): ×1,5 la luz a no-muertos y demonios; lo siniestro, nada (Combatiente.identidadElemento).
+  const idHab = elHab && t ? Combatiente.identidadElemento(elHab, ((vinculo(t) || {}).tipoCriatura)) : null, multId = idHab ? idHab.mult : 1;
+  const mult = critReal ? d.crit.mult : 1, crudo = Math.ceil(Math.max(0, num(dn.crudo) - menosDist + (magico ? botella : 0) + anilloHab) * multHab * multId), golpe = crudo * mult;
   const base = {crudo, mult, golpe, ignoraDef: crit, mitad: d.resultado === 'mitad', ...(multHab > 1 ? {cargaMult: `${d.hab.dano.carga || 'Carga'}: ${fmt(Math.max(0, num(dn.crudo) - menosDist))} +${Math.round((multHab - 1) * 100)} % = ${fmt(crudo)}`} : {})};
   if(!t) return {...base, manual: true, motivoManual: 'el token ya no está en el mapa'};
   const esInv = t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION);
@@ -1620,6 +1622,7 @@ async function dueloAplicarDano(d){
   let restaIgnorando = frenaAm ? armadmg : 0;
   const resEl = elDano && !trueDmg ? (await resistenciasDe(t, elDano, invLeida)).res : 0;
   let freno = [...(menosDist ? [d.hab && d.hab.menosPorOrden ? `${menosDist} por los que tocó antes en la línea` : `la distancia ${menosDist}`] : []), ...(frenaAm && armadmg ? [`Defensa especial ${armadmg}`] : []), ...(resEl ? [Combatiente.resElementalTxt(elDano, resEl)] : [])].join(' − ');
+  if(idHab && idHab.txt) freno = [freno, idHab.txt].filter(Boolean).join(' · ');   // ☀🌑
   // 🏹 Perfora N (regla del dueño, 2026-10-10): N puntos del golpe pasan SIEMPRE, sin que los frene la Defensa; el resto va contra la Defensa como
   // siempre. O sea: recibe lo que pase la Defensa, pero nunca menos de N (ni más que el golpe). Con crítico no hace falta: ya ignora la Defensa entera.
   // (Antes, hasta el 2026-10-10, le restaba N a la Defensa: contra un tanque casi no servía.)
@@ -1663,12 +1666,14 @@ async function dueloAplicarDano(d){
       const elMag = String(dn.magico.tipo || '').includes(' y ') ? '' : Combatiente.elementoDe(dn.magico.tipo);
       const resMag = elMag ? (await resistenciasDe(t, elMag, invLeida)).res : 0;
       const anilloMag = elMag && typeof talMasDanoElem === 'function' ? talMasDanoElem(d, elMag) : 0;   // 💍 el anillo de ese elemento
-      const multMag = num(dn.magico.mult) > 1 ? num(dn.magico.mult) : 1;   // 🔥 Arma ígnea (2026-10-21): ×1,5, para arriba
+      const idMag = elMag ? Combatiente.identidadElemento(elMag, ((vinculo(t) || {}).tipoCriatura)) : null;   // ☀🌑 (2026-10-26)
+      const multMag = (num(dn.magico.mult) > 1 ? num(dn.magico.mult) : 1) * (idMag ? idMag.mult : 1);   // 🔥 Arma ígnea (2026-10-21): ×1,5, para arriba
       const totMag = Math.ceil((num(dn.magico.total) + (habMagica ? 0 : botella) + anilloMag) * (salvaje && !habMagica ? salvaje.mult : 1) * multMag);   // 🔮 la Botella y el Orbe salvaje (si no los usó ya el daño de la habilidad)
       const agM = typeof aguaRayo === 'function' ? aguaRayo(t, elMag, totMag) : {monto: totMag, txt: ''};   // 💧 (js/50)
       const rm = esInv ? await danioInv(t, String(agM.monto), true, 0, resMag, {magico: true, reparte: true})
         : t.tipo === 'creep' ? await danioCreep(t, String(agM.monto), true, 0, resMag, {magico: true, reparte: true}) : await danioPj(t, String(agM.monto), true, 0, resMag, {magico: true, reparte: true});
       magico = {...dn.magico, recibido: num(rm.r.recibido), hpAntes: num(rm.previo), hpDespues: num(rm.nuevo), ...(resMag ? {resEl: Combatiente.resElementalTxt(elMag, resMag)} : {})};
+      if(idMag && idMag.estado && num(rm.r.recibido) > 0 && !rm.r.invulnerable) await dueloIdentidadEstado(d, elMag, idMag).catch(err => console.error('La identidad del elemento:', err));
     }
     // ⚡💧 El rayo corre por el agua (dueño, 2026-10-17): si el golpeado está en un charco, el mismo golpe eléctrico les llega a todos los que
     // están parados en ese charco, salte o no el Relámpago (js/50, aguaConduceRayo).
@@ -1695,6 +1700,7 @@ async function dueloAplicarDano(d){
     // ✨ El estado según el daño que entró (2026-10-13, Carga Elemental: Escarcha, Veneno, Armadura rota): `hab.dano.porDano`.
     const porDano = d.hab && d.hab.dano && d.hab.dano.porDano && !res.r.invulnerable ? await dueloPorDano(d, num(res.r.recibido)).catch(err => { console.error('No se pudo aplicar el estado por daño:', err); return null; })
       : !d.hab && magico && dn.magico.porDano && !res.r.invulnerable ? await dueloPorDano(d, num(magico.recibido), dn.magico.porDano).catch(err => { console.error('No se pudo aplicar el estado por daño:', err); return null; }) : null;   // ❄🧪☠ Arma elemental (2026-10-21)
+    if(idHab && idHab.estado && num(res.r.recibido) > 0 && !res.r.invulnerable) await dueloIdentidadEstado(d, elHab, idHab).catch(err => console.error('La identidad del elemento:', err));   // ☀ Marcado · 🌑 Herida sombría
     // ⚡ Arma eléctrica (2026-10-21): el daño eléctrico del arma salta como el rayo (la mitad de lo que entró).
     if(!d.hab && magico && dn.magico.cadena && num(magico.recibido) > 1 && !res.r.invulnerable) await dueloCadena(d, num(magico.recibido)).catch(err => console.error('No se pudo hacer saltar el rayo:', err));
     // Rayo en cadena (2026-10-05): el golpe de una habilidad o arma especial de rayo salta (la misma regla de ⚡ Rayo en cadena del token).
@@ -1713,6 +1719,14 @@ async function dueloAplicarDano(d){
   }
 }
 
+// ☀🌑 Lo que deja la luz (Marcado) o lo siniestro (Herida sombría) cuando el daño entra (2026-10-26, Combatiente.identidadElemento), por el mismo camino
+// que los efectos del duelo, y una línea en la Mesa.
+async function dueloIdentidadEstado(d, el, id){
+  const r = await dueloAplicarEfecto(d, {nombre: id.estado.nombre, spec: id.estado});
+  const ic = (Combatiente.ELEMENTOS[el] || {}).icono || '';
+  try{ mesaLinea(`${ic} ${d.defensor.nombre}: ${el === 'luz' ? 'la luz lo deja Marcado hasta su próximo turno' : 'Herida sombría: no se cura con nada hasta el final de su próximo turno'}${r && r.manual ? ' (aplicalo a mano)' : ''}`, 'recordatorio'); }catch(err){}
+  return r;
+}
 // ✨ El estado según el daño que entró (2026-10-13, Carga Elemental): N stacks (Combatiente.stacksPorDano) del estado al defensor, con el mismo camino
 // que los efectos del duelo (dueloAplicarEfecto: un creep directo, un personaje o una invocación por el aviso de su ficha).
 async function dueloPorDano(d, entro, p0){
@@ -1938,8 +1952,8 @@ async function dueloCurar(t, n){
   n = Math.max(0, Math.round(num(n)));
   if(t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION)) return dueloCurarInv(t, n);
   if(t.tipo === 'creep'){
-    const res = await modificarCreep(t.fichaId, sc => { const previo = num(sc.hp); const tope = num(sc.hpMax) > 0 ? num(sc.hpMax) : previo + n; sc.hp = Math.min(tope, previo + Combatiente.curaQueEntra(previo, n)); return {previo, nuevo: sc.hp}; });
-    return {previo: res.previo, nuevo: res.nuevo, ...(n > 0 && res.previo <= 0 ? {caido: true} : {})};
+    const res = await modificarCreep(t.fichaId, sc => { const previo = num(sc.hp); const tope = num(sc.hpMax) > 0 ? num(sc.hpMax) : previo + n; const sin = n > 0 && previo > 0 && Combatiente.sinCura(sc.estados); sc.hp = Math.min(tope, previo + Combatiente.curaQueEntra(previo, n, sc.estados)); return {previo, nuevo: sc.hp, sin}; });
+    return {previo: res.previo, nuevo: res.nuevo, ...(n > 0 && res.previo <= 0 ? {caido: true} : {}), ...(res.sin ? {sinCura: true} : {})};
   }
   const base = fbDb.doc(fbRutaCampana(`fichas/${t.fichaId}`));
   const parteRef = base.collection('partes').doc('general');
@@ -1951,6 +1965,7 @@ async function dueloCurar(t, n){
     const rs = ficha.data().resumen || {};
     const previo = num(datos.hp), tope = num(rs.hpMax) > 0 ? num(rs.hpMax) : previo + n;
     if(n > 0 && previo <= 0) return {previo, nuevo: previo, caido: true};   // una cura no levanta a un caído (Combatiente.curaQueEntra)
+    if(n > 0 && Combatiente.sinCura(rs.estados)) return {previo, nuevo: previo, sinCura: true};   // 🌑 Herida sombría / Sanguijuela (2026-10-26)
     datos.hp = Math.min(tope, previo + n);
     tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
     tx.update(base, {actualizado: ts, 'resumen.hp': datos.hp});
@@ -1972,6 +1987,7 @@ async function dueloCurarInv(t, n){
     if(!inv) throw new Error('La invocación ya no existe');
     const previo = num(inv.hp), tope = num(inv.hpMax) > 0 ? num(inv.hpMax) : previo + n;
     if(n > 0 && previo <= 0) return {previo, nuevo: previo, caido: true};   // una cura no levanta a un caído
+    if(n > 0 && Combatiente.sinCura(inv.estados)) return {previo, nuevo: previo, sinCura: true};   // 🌑 (2026-10-26)
     inv.hp = Math.min(tope, previo + n);
     const rs = ficha.data().resumen || {};
     tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
@@ -1995,10 +2011,11 @@ function dueloCuraMomento(d, t, n, r){
   const quien = d.atacante && d.atacante.nombre ? d.atacante.nombre : 'Alguien', a = t.oculto ? 'alguien' : nombreDe(t);
   const pj = t.tipo === 'pj', mismo = d.atacante && d.atacante.tokenId === d.defensor.tokenId;
   const titulo = mismo ? `${quien} se curó` : `${quien} curó a ${a}`;
-  const resultado = r.caido ? `No lo levanta: ${a} está caído (hace falta revivirlo)` : `+${fmt(n)} de vida${pj ? ` (${fmt(r.previo)} → ${fmt(r.nuevo)})` : ''}`;
+  const resultado = r.caido ? `No lo levanta: ${a} está caído (hace falta revivirlo)` : r.sinCura ? `No se cura: ${a} tiene una herida que no deja curarse` : `+${fmt(n)} de vida${pj ? ` (${fmt(r.previo)} → ${fmt(r.nuevo)})` : ''}`;
   momentoAbrir({tipo: 'cura', icono: '💚', titulo, resultado, estado: 'listo',
     datos: pj && t.duenoUid ? {paraUid: t.duenoUid, aviso: !mismo, boton: '💚 Aceptar',
       veredicto: r.caido ? {tono: 'neutro', grande: 'Caído', chico: 'Una cura no levanta a un caído: hace falta revivirlo'}
+        : r.sinCura ? {tono: 'neutro', grande: 'Sin cura', chico: 'Tenés una herida que no deja curarse (Herida sombría o Sanguijuela)'}
         : {tono: 'bueno', grande: `+${fmt(n)}`, chico: mismo ? `te curaste ${fmt(n)} de vida (${fmt(r.previo)} → ${fmt(r.nuevo)})` : `${quien} te curó ${fmt(n)} de vida (${fmt(r.previo)} → ${fmt(r.nuevo)})`}} : {}});
 }
 /* Un buff que no pasa desapercibido (2026-10-24, dueño: «aunque no se tire nada y se aplique directo, tiene que haber un anuncio: Fulanito te aplicó
@@ -2182,7 +2199,7 @@ async function dueloAplicarEfectoBase(d, ef){
     try{
       const r = await dueloCurar(t, spec.cura);
       dueloCuraMomento(d, t, spec.cura, r);
-      return {nota: r.caido ? Combatiente.CAIDO_TXT : `+${spec.cura} HP (${fmt(r.previo)} → ${fmt(r.nuevo)})`};
+      return {nota: r.caido ? Combatiente.CAIDO_TXT : r.sinCura ? Combatiente.SIN_CURA_TXT : `+${spec.cura} HP (${fmt(r.previo)} → ${fmt(r.nuevo)})`};
     }
     catch(err){ console.error('No se pudo aplicar la cura del duelo:', err); return {manual: true, nota: 'no se pudo curar solo: aplicalo a mano'}; }
   }

@@ -130,6 +130,11 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
+> - [ ] **⚖ Paridad de elementos en todo el sistema (2026-10-26, dueño: «cuando terminemos con este ciclo, ir para atrás, incorporar elementos de magia,
+>   varitas, báculos, skills, en resistencias de equipo, etcétera, como para que haya cierta paridad de elementos across el sistema»).** Para después del
+>   ciclo de habilidades de creep. Hoy hay siete elementos (arcano, fuego, hielo, rayo, tóxico, ácido y, desde el 2026-10-26, ☀ luz y 🌑 siniestro: P221)
+>   pero el catálogo está muy cargado de arcano y fuego (40 y 13 ítems con ese daño; ácido y tóxico, 2 cada uno; luz y siniestro, ninguno). Repasar varitas,
+>   báculos, orbes, talismanes, skills de clase y de creep, y las resistencias del equipo defensivo, para que cada elemento tenga su lugar (y su contra).
 > - [ ] **💉 Adrenalina, habilidad de Support para creeps (2026-10-26, dueño: «anotala en la lista para trabajar en el futuro»):** a un aliado en su Rango,
 >   +1 PdG ese turno y, si trabaja con cooldown, −2 a cada cooldown activo; si trabaja con SP, recupera 4 SP (o la variante: su próxima habilidad
 >   de este turno le cuesta 3 SP menos). 1 No2 y 2 SP, o cooldown 3. Detalle en `docs/diseno-roles-creep.md` (Support, idea 13).

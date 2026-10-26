@@ -154,6 +154,14 @@ const ESTADOS_PRESET = [
   // cada golpe que da, la Perfora de siempre (N puntos pasan siempre) contra la Defensa y contra la Defensa especial (js/13, Combatiente.perforaDeEstados).
   {nombre:'Armas perforantes', polaridad:'buff', turnos:3, turnosCompletos:true, perforaGolpe:3, perforaEsp:3,
     detalle:'Sus golpes atraviesan la guardia: en cada golpe que da, 3 puntos de daño pasan siempre la Defensa del rival y 3 pasan siempre su Defensa especial (el resto va contra ellas como siempre). Dura sus próximos 3 turnos completos (el turno en que se lo dan no cuenta). ⚙ Automatizado en el mapa.'},
+  // 🌑 Herida sombría (2026-10-26, dueño: la identidad del daño siniestro, «un estado de no se puede curar»): no le entra ninguna cura hasta el final de su
+  // próximo turno (Combatiente.sinCura → curaQueEntra). La deja todo daño siniestro que entra.
+  {nombre:'Herida sombría', polaridad:'debuff', turnos:1, turnosCompletos:true, sinCura:true, mods:[],
+    detalle:'Una herida de sombra que no cierra: no se cura con nada (pociones, habilidades, Regeneración, lo que cura cada turno) hasta el final de su próximo turno. La deja el daño siniestro. ⚙ Automatizado.'},
+  // 🐛 Sanguijuela (2026-10-26, dueño, la Sanguijuela del Mago): pegada 4 turnos; mientras está, no se cura. Se la arranca al empezar su turno con Fuerza
+  // contra el Efecto especial de quien la lanzó (el `soltar` lo trae el efecto de la habilidad).
+  {nombre:'Sanguijuela', polaridad:'debuff', turnos:4, sinCura:true, mods:[],
+    detalle:'Tiene una sanguijuela pegada: mientras esté, no se cura con nada. Dura 4 turnos; al empezar su turno puede arrancársela con Fuerza contra el Efecto especial de quien la lanzó. ⚙ Automatizado.'},
   // Sequía (2026-10-24, dueño: la Maldición de la sequía del Debuffer, «sólo corta las regeneraciones de SP y HP propias, no las externas»).
   {nombre:'Sequía', polaridad:'debuff', turnos:3, sequia:true,
     detalle:'Una maldición que lo seca por dentro: mientras dure no recupera vida ni SP por sí mismo al empezar el turno (sus pasivas de regeneración, la Regeneración de vida de su equipo, su SP Regen). Lo que le dan otros (una cura, la Regeneración de un aliado, una zona de curación) entra igual. ⚙ Automatizado.'},

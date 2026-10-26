@@ -16,7 +16,7 @@ const EscaneoGrupo = (() => {
   const fmt = n => Number.isInteger(n) ? n : Math.round(n * 10) / 10;
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
   const TIPOS = [4, 6, 8, 10, 12];
-  const ELEM = ['fuego', 'hielo', 'rayo', 'toxico', 'acido'];
+  const ELEM = ['fuego', 'hielo', 'rayo', 'toxico', 'acido', 'luz', 'siniestro'];
   const ELEM_TXT = {fuego: '🔥 fuego', hielo: '❄ hielo', rayo: '⚡ eléctrico', toxico: '☠ tóxico', acido: '🧪 ácido'};
   const ATTR = [['con', 'Con'], ['fue', 'Fue'], ['agl', 'Agi'], ['des', 'Des'], ['esp', 'Esp']];
   const DANO_TXT = k => k.startsWith('T') ? `físico Tipo ${k.slice(1)}` : ({arcano: '✨ arcano', fisico: 'físico (habilidad)', ...ELEM_TXT})[k] || k;

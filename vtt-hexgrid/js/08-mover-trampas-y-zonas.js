@@ -591,6 +591,8 @@ async function zonaResolverBanner(){
     const rz = await resistenciasDe(t, elZ);
     const armadmg = el.zonaIgnoraDef && !el.zonaDirecto && (el.zonaCasteadorRef || elZ) && Combatiente.frenaArmaduraMagica(elZ) ? rz.armadmg : 0;   // la directa (varitas) no la resta   // la Defensa especial: todo el daño especial, también el tóxico (2026-10-07)
     const resEl = (elZ ? rz.res : 0) + (tocaElPiso(el) ? Math.max(0, statPiesDe(t, 'suelagruesa')) : 0);   // + Suela gruesa (pies, 2026-10-06): lo que pisás hace menos — solo lo del piso (2026-10-07)
+    const idZ = elZ ? Combatiente.identidadElemento(elZ, ((vinculo(t) || {}).tipoCriatura)) : null;   // ☀🌑 la luz ×1,5 a lo oscuro; lo siniestro, nada (2026-10-26)
+    if(idZ && idZ.mult !== 1 && monto > 0){ monto = Math.ceil(monto * idZ.mult); partes.push(idZ.txt); }
     const agZ = monto > 0 && typeof aguaRayo === 'function' ? aguaRayo(t, elZ, monto) : null;   // 💧 en el agua, el rayo ×1,5 (js/50)
     if(agZ && agZ.txt){ monto = agZ.monto; partes.push(agZ.txt); }
     if(monto > 0){
@@ -602,6 +604,13 @@ async function zonaResolverBanner(){
         const freno = [...(armadmg > 0 ? [`${armadmg} de Defensa especial`] : []), ...(resEl ? [Combatiente.resElementalTxt(elZ, resEl)] : [])];
         partes.push(`${monto} de daño${tipoTxt}${freno.length ? ` (− ${freno.join(' − ')})` : ''}`);
         danoHecho = res && res.r ? num(res.r.recibido) : monto;   // lo que llegó a la vida (escudos y Defensa especial ya restados)
+        if(idZ && idZ.estado && danoHecho > 0 && !(res && res.r && res.r.invulnerable)){   // ☀ Marcado · 🌑 Herida sombría
+          try{
+            if(t.tipo === 'creep') await modificarCreep(t.fichaId, sc => EstadosAplicar.aplicarACreep(sc, idZ.estado));
+            else await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: idZ.estado, origen: el.zonaNombre || 'Zona'});
+            partes.push(idZ.estado.nombre === 'Marcado' ? 'Marcado (la luz)' : 'Herida sombría (no se cura)');
+          }catch(err){ console.error('La identidad del elemento:', err); partes.push(`${idZ.estado.nombre} (aplicalo a mano)`); }
+        }
       }catch(err){ console.error('No se pudo aplicar el daño de la zona:', err); partes.push(`${monto} de daño${tipoTxt} (aplicalo a mano)`); danoHecho = monto; }
     }else if(monto === 0) partes.push('sin daño');
   }

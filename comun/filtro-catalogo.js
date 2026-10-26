@@ -32,7 +32,7 @@ const FiltroCatalogo = (() => {
   const PARTE_ETQ = {arma: 'Armas', distancia: 'A distancia', especial: 'Varitas y báculos', escudo: 'Escudos', orbe: 'Talismanes', torso: 'Torso', cabeza: 'Cabeza',
     manos: 'Manos', piernas: 'Piernas', pies: 'Pies', cinturon: 'Cinturón', mochila: 'Mochila', carcaj: 'Carcajes', anillo: 'Anillos', consumible: 'Consumibles', trampa: 'Trampas', otro: 'Otros'};
   const ELEMENTOS = [['fisico', '🗡', 'Físico'], ['arcano', '✨', 'Arcano'], ['fuego', '🔥', 'Fuego'], ['hielo', '❄', 'Hielo'], ['rayo', '⚡', 'Eléctrico'],
-    ['toxico', '☠', 'Tóxico'], ['acido', '🧪', 'Ácido']];
+    ['toxico', '☠', 'Tóxico'], ['acido', '🧪', 'Ácido'], ['luz', '☀', 'Luz'], ['siniestro', '🌑', 'Siniestro']];
   const TIPOS_ARMA = [4, 6, 8, 10, 12];
   // La resistencia a crítico de cada Tipo (stats tipo1…tipo5): su propio desplegable, para que «Tipo 4» no se confunda con un arma (dueño, 2026-10-08).
   const RES_CRIT = [['tipo1', 4], ['tipo2', 6], ['tipo3', 8], ['tipo4', 10], ['tipo5', 12]];

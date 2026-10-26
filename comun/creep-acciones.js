@@ -163,7 +163,7 @@ const CreepAcciones = (() => {
      acá (los resuelve cada pantalla antes). */
   const uid = () => Math.random().toString(36).slice(2,9);
   const ATTR_LABELS = {con:'Con', fue:'Fue', agl:'Agi', des:'Des', esp:'Esp'};
-  const FLAGS_ESTADO = ['fenix', 'pierdeAlDano', 'armaduraRota','silencio','confusion','lisiado','paralisis','esEscarcha','mitadPdgEva','inmovilizado','rengo','lento','cansado','exhausto','hypeado','sentado','excedenteVida','invulnerable','inmunidadCC','inmunidadMental','esMental','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','espejo','desarmado','ceguera','esCC','esVeneno','esSangrado','stun','expuesto','mitadEva','alEmpezarTurno','volador','sangraSp','aguante','vigilancia','golpeAnunciado','marcado','sequia','repetir'];   // repetir: la Ráfaga encadenada (2026-10-25), la Repetición del Shooter en un creep (vtt-hexgrid/js/35)   // marcado: el Rayo cargado (se lo ve en la niebla, 2026-10-24)   // aguante: el modo aguante (2026-10-21)   // golpeAnunciado: El que avisa no traiciona (2026-10-21)
+  const FLAGS_ESTADO = ['sinCura', 'fenix', 'pierdeAlDano', 'armaduraRota','silencio','confusion','lisiado','paralisis','esEscarcha','mitadPdgEva','inmovilizado','rengo','lento','cansado','exhausto','hypeado','sentado','excedenteVida','invulnerable','inmunidadCC','inmunidadMental','esMental','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','espejo','desarmado','ceguera','esCC','esVeneno','esSangrado','stun','expuesto','mitadEva','alEmpezarTurno','volador','sangraSp','aguante','vigilancia','golpeAnunciado','marcado','sequia','repetir'];   // repetir: la Ráfaga encadenada (2026-10-25), la Repetición del Shooter en un creep (vtt-hexgrid/js/35)   // marcado: el Rayo cargado (se lo ve en la niebla, 2026-10-24)   // aguante: el modo aguante (2026-10-21)   // golpeAnunciado: El que avisa no traiciona (2026-10-21)
   const habEtq = stat => (C().STAT_LOOKUP[stat] && C().STAT_LOOKUP[stat].label) || ATTR_LABELS[stat] || stat;
   // La Ejecución de un creep: la misma regla que personajes e invocaciones (comun/combatiente.js, habEjecucion). Sin costo variable.
   function habEjecucion(sc, h){
@@ -289,7 +289,7 @@ const CreepAcciones = (() => {
     if(num(it.curahp)){
       const boticario = num(it.curahp) > 0 ? num(C().modTotal(sc, 'boticario')) : 0;   // Mano de boticario (2026-10-05)
       const tope = num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, antes = num(sc.hp);
-      sc.hp = Math.max(0, Math.min(tope, antes + num(it.curahp) + boticario));
+      sc.hp = Math.max(0, Math.min(tope, antes + Combatiente.curaQueEntra(antes, num(it.curahp) + boticario, sc.estados)));   // 🌑 con una herida que no deja curarse, la cura no entra
       partes.push(`${num(it.curahp) >= 0 ? '+' : ''}${fmt(num(it.curahp) + boticario)} HP`);
     }
     const ef = efectoDeHab(sc, it, presets);
@@ -576,8 +576,8 @@ const CreepAcciones = (() => {
       if(rg > 0 && num(sc.hp) > 0){ d.hp += rg; rep.push(`Regeneración de vida: +${rg} HP`); }
       if(rp > 0 && num(sc.hp) > 0){ d.hp += rp; rep.push(`Pasivas: +${rp} HP`); }
     }
-    const dh = Combatiente.curaQueEntra(sc.hp, d.hp);
-    if(d.hp && !dh) rep.push('Caído: la cura de este turno no lo levanta');
+    const dh = Combatiente.curaQueEntra(sc.hp, d.hp, sc.estados);
+    if(d.hp > 0 && !dh) rep.push(num(sc.hp) > 0 ? `🌑 ${Combatiente.SIN_CURA_TXT}` : 'Caído: la cura de este turno no lo levanta');
     if(dh){ const antes = num(sc.hp); sc.hp = Math.max(0, Math.min(num(sc.hpMax), antes + dh)); rep.push(`HP total: ${antes} → ${sc.hp}`); }
     if(fenixCreep(sc)) rep.push(`🔥 Llama de Fénix: revive con ${sc.hp} HP y queda Titilando`);
     sc.nitros = Combatiente.recargarNo2(C().nitrosMax(sc), sc.nitros, sc.estados);

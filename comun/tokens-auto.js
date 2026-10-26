@@ -48,7 +48,7 @@ const TokensAuto = (() => {
   const formulaOk = f => /^\d{1,2}d\d{1,3}([+-]\d{1,3})?$/i.test(String(f || '').trim()) ? String(f).trim() : '';
   function estadoJson(estado, salvacion, muro, efecto, elemento, lento, extra){
     const sv = salvaNorm(salvacion), mu = muroNorm(muro), ef = efectoNorm(efecto);
-    const elem = ['fuego', 'hielo', 'rayo', 'toxico', 'acido'].includes(elemento) ? elemento : '';
+    const elem = ['fuego', 'hielo', 'rayo', 'toxico', 'acido', 'luz', 'siniestro'].includes(elemento) ? elemento : '';
     const le = Math.max(0, Math.min(5, Math.round(Number(lento) || 0)));
     const ps = formulaOk(extra && extra.pierdeSp), dz = formulaOk(extra && extra.danoZona);
     const ca = extra && extra.cadena && Number(extra.cadena.rango) >= 1 ? {rango: Math.min(6, Math.round(Number(extra.cadena.rango)))} : null;   // la Descarga: salta de enemigo en enemigo

@@ -1221,7 +1221,10 @@ otra categoría, no sé, invocaciones inertes, no sé bien cómo llamarlas». **
 los cuentan; los ataques sí (vtt-hexgrid/js/73 `esInerte`, js/13). En el código se llaman «inertes» por ahora.
 **Falta:** el nombre para el juego (¿inertes? ¿estructuras? ¿objetos invocados?) y si otras cosas entran en la categoría (pilares, muros con vida).
 
-### P221 — ¿Daño de luz y daño siniestro, como contrapuntos? (2026-10-25) ⏳ a evaluar
+### P221 — ¿Daño de luz y daño siniestro, como contrapuntos? (2026-10-25) ✅ decidida (2026-10-26)
+
+**Decidido (dueño, 2026-10-26: «me gusta esa definición»; «hagamos que el daño oscuro deje eso, un estado de no se puede curar»):** ☀ **Luz** — revela y castiga lo oscuro: si entra daño, **Marcado** hasta su próximo turno; ×1,5 contra no-muertos y demonios. 🌑 **Siniestro** — la herida que no cierra: si entra daño, **Herida sombría** (no se cura con nada hasta el final de su próximo turno); a no-muertos y demonios no les hace nada. Con sus resistencias (Res. luz, Res. siniestro). Hecho en `Combatiente.identidadElemento` / `sinCura` (comun/combatiente.js), el duelo y las zonas (vtt-hexgrid/js/13, js/08). La primera habilidad siniestra: la **Sanguijuela** del Mago.
+
 
 **El dueño (2026-10-25, al hacer el Grito de pánico arcano):** «vamos a evaluar la posibilidad de que exista el daño de luz y el daño siniestro como
 contrapuntos, pero solo si podemos encontrarle alguna identidad que lo justifique, alguna característica, así como los demás elementos tienen sus propias

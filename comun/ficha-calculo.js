@@ -157,6 +157,8 @@ const FichaCalculo = (() => {
     {id:'resrayo', label:'Res. eléctrica', full:'Resistencia eléctrica: se resta a todo daño eléctrico'},
     {id:'restoxico', label:'Res. tóxico', full:'Resistencia a lo tóxico: se resta a todo daño tóxico'},
     {id:'resacido', label:'Res. ácido', full:'Resistencia al ácido: se resta a todo daño de ácido'},
+    {id:'resluz', label:'Res. luz', full:'Resistencia a la luz: se resta a todo daño de luz'},   // ☀🌑 (2026-10-26)
+    {id:'ressiniestro', label:'Res. siniestro', full:'Resistencia a lo siniestro: se resta a todo daño siniestro'},
   ];
   const STAT_LIST = [...GRUPOS.flatMap(g=>g.derived), ...EXTRA];
   const ATTR_LIST = GRUPOS.map(g => ({id:g.id, label:g.label, full:g.full}));

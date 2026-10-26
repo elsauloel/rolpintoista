@@ -112,7 +112,7 @@ const FichaResumen = (() => {
       prisa: n(c.final.prisa),   // 💨 Prisa (2026-10-15): va primero en el orden de turnos
       pasosSilenciosos: n(c.final.pasossilenciosos),   // 👣 Pasos silenciosos (2026-10-15): el mapa no lo hace oír a 3 y suma +1 PdG por la espalda
       // Resistencias elementales (2026-10-04): el mapa las resta al daño de su elemento.
-      resfuego: n(c.final.resfuego), reshielo: n(c.final.reshielo), resrayo: n(c.final.resrayo), restoxico: n(c.final.restoxico), resacido: n(c.final.resacido),
+      resfuego: n(c.final.resfuego), reshielo: n(c.final.reshielo), resrayo: n(c.final.resrayo), restoxico: n(c.final.restoxico), resacido: n(c.final.resacido), resluz: n(c.final.resluz), ressiniestro: n(c.final.ressiniestro),
       rng: n(c.final.rng),               // Rango (de Destreza): el visualizador de rango (📏) y el alcance de todo, también de la magia (2026-10-07)
       luz: n(c.final.luz), veoculto: n(c.final.veoculto),   // luz que lleva encima y radio en el que ve lo oculto: el mapa los lee (farol, bengala, yelmo del ojo que todo lo ve)
       vision: n(c.final.vision),

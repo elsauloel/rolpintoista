@@ -35,13 +35,13 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
   robar, sigilo, varios golpes, bajo tierra, veneno (de fábrica desde el 2026-10-25: Hoja envenenada / Mordisco infectado).
 - 🏹 **Rango y Hunter — 15**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar, mantener a raya (2026-10-25), atravesar (Flecha que atraviesa, 2026-10-25), disparos encadenados (Ráfaga encadenada, 2026-10-25), disparar y replegarse (Disparo y repliegue, 2026-10-26) · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
-- ✨ **Mago — 14**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25), lluvia de escarcha (2026-10-25), andanada arcana (2026-10-25), misiles elementales (2026-10-25), portal trampa (2026-10-25) · de El origen: proyectil, fuego con quemadura.
+- ✨ **Mago — 15**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25), lluvia de escarcha (2026-10-25), andanada arcana (2026-10-25), misiles elementales (2026-10-25), portal trampa (2026-10-25), sanguijuela (2026-10-26) · de El origen: proyectil, fuego con quemadura.
 - 🧿 **Debuffer — 15**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25), silencio (Tótem de silencio, 2026-10-25), extenuar (2026-10-25), cegar (2026-10-25), grito de pánico (2026-10-25), nube tóxica (2026-10-26) · de El origen: ceguera, veneno, inmovilizar.
 - 💚 **Support — 15**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24), estandarte (Estandarte de guerra, 2026-10-24), señalar la presa (2026-10-25), armas perforantes (2026-10-25), redoble de tambores (2026-10-25), frenesí inducido (2026-10-25), limpiar estados (Purificar, 2026-10-25), levitar (2026-10-25), empower (Empuje, 2026-10-26) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
 **Para emparejar** (regla del dueño, 2026-10-25: «empezamos a tener en cuenta todos los roles de creep e ir emparejándolos… para que estén todos
-avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Mago y Choque liviano en 14; Rango + Hunter, Debuffer y Support en 15; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
+avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Choque liviano en 14; Mago, Rango + Hunter, Debuffer y Support en 15; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
 
 ## Los roles
 
@@ -352,7 +352,7 @@ líneas, zonas, el rayo en cadena y los charcos, los controles mentales.
     pisarlas [Varita de espinas]. 24. **Muro o pilares** ✦: levantar piedra que tapa el paso y la vista (control del terreno) [Varita del muro, Varita de
     los pilares]. 25. ✅ **Portal trampa** ✦ (2026-10-25: sin daño; llega Expuesto): un portal oculto que manda a quien lo pisa a otra casilla, lejos (Res.Esp para aferrarse) [Varita de la trampa
     portal]. 26. **Lazo arcano**: lo atrae unas casillas hacia el mago, salvo que gane con Fuerza [Varita del gancho]. 27. **Desarmar con magia**: el arma
-    se le escapa y vuela (Fuerza para aferrarse) [Expelliarmus]. 28. **Sanguijuela**: daño y se cura la mitad [Varita sanguijuela]. 29. **Cosecha**: lo
+    se le escapa y vuela (Fuerza para aferrarse) [Expelliarmus]. 28. ✅ **Sanguijuela** (2026-10-26, dueño: PdG contra Evasión, 2d6 siniestro, se cura la mitad; queda pegada 4 turnos —no se cura— y se la arranca con Fuerza contra su Ef.Esp): daño y se cura la mitad [Varita sanguijuela]. 29. **Cosecha**: lo
     marca; si muere marcado, el mago recupera SP y vida [Varita de la cosecha]. 30. **Magia inestable** (variante de la Sobrecarga): más daño, pero si sale
     un 1 se lastima [Varita inestable, Orbe salvaje].
 - **Debuffer:** ver el listado completo abajo (§ 6).

@@ -80,7 +80,7 @@ const AsistenteDueloHab = (() => {
   const ALCANCES = [['auto', 'Automático (lo especial usa tu Rango, el de la Destreza)'], ['rango', 'Rango (el de la Destreza: armas a distancia y lo especial)'], ['adyacente', 'Cuerpo a cuerpo (casilleros de al lado)'], ['fijo', 'Un número de casilleros'], ['ilimitado', 'Sin límite (no resalta nada)']];
   const BONOS = [['pdg', 'PdG'], ['dmg', 'Daño'], ['eva', 'Evasión'], ['def', 'Defensa'], ['nitros', 'No2'], ['resmg', 'Res.Esp'], ['resm', 'Res.Mt'], ['parry', 'Parry'], ['bloqueo', 'Bloqueo']];
   const BONOS_LABEL = Object.fromEntries(BONOS);
-  const TIPOS = [['arcano', 'Arcano (mágico)'], ['fuego', 'Fuego (mágico)'], ['hielo', 'Hielo (mágico)'], ['rayo', 'Eléctrico (mágico)'], ['toxico', 'Tóxico (veneno, gas)'], ['fisico', 'Físico (respeta la Defensa)']];
+  const TIPOS = [['arcano', 'Arcano (mágico)'], ['fuego', 'Fuego (mágico)'], ['hielo', 'Hielo (mágico)'], ['rayo', 'Eléctrico (mágico)'], ['toxico', 'Tóxico (veneno, gas)'], ['luz', 'Luz (Marcado; ×1,5 a no-muertos y demonios)'], ['siniestro', 'Siniestro (no se puede curar; nada a no-muertos y demonios)'], ['fisico', 'Físico (respeta la Defensa)']];
   const STAT_TXT = Object.fromEntries([...TIRA, ...CONTRA]);
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
 

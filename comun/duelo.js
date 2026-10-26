@@ -472,7 +472,7 @@ const Duelo = (() => {
   const defTxt = dn => _num(dn.perfora) ? `Defensa ${_num(dn.defensa)} (pasa${_num(dn.perfora) > 1 ? 'n' : ''} ${_num(dn.perfora)} por la Perfora)` : `Defensa ${_num(dn.defensa)}`;
   const magTitulo = tipo => esAdjMag(tipo) && !/ y /.test(String(tipo)) ? `Daño ${adjMag(tipo)}` : `Daño de ${tipo}`;
   // El ícono y el «× 1,5» del daño elemental de un arma (2026-10-23, probando el PdG a mano con el Arma ígnea: salía ⚡ en el fuego y «3 → recibió 5» sin explicar).
-  const magIcono = tipo => ({fuego: '🔥', hielo: '❄️', rayo: '⚡', toxico: '☠️', acido: '🧪'})[typeof Combatiente !== 'undefined' && Combatiente.elementoDe ? Combatiente.elementoDe(tipo) : ''] || '✨';
+  const magIcono = tipo => ({fuego: '🔥', hielo: '❄️', rayo: '⚡', toxico: '☠️', acido: '🧪', luz: '☀️', siniestro: '🌑'})[typeof Combatiente !== 'undefined' && Combatiente.elementoDe ? Combatiente.elementoDe(tipo) : ''] || '✨';
   const magMult = m => _num(m && m.mult) > 1 ? ` × ${String(_num(m.mult)).replace('.', ',')}` : '';
   const limpiarEfectosFlecha = lista => (Array.isArray(lista) ? lista : []).filter(e => e && e.nombre).slice(0, 6).map(e => {
     const o = {nombre: txtCorto(e.nombre, 40), caras: Math.max(1, Math.round(_num(e.caras)) || 1), exitos: Math.max(1, Math.round(_num(e.exitos)) || 1), dado: txtCorto(e.dado, 20), detalle: txtCorto(e.detalle, 200)};

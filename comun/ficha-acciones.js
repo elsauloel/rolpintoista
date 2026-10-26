@@ -373,9 +373,9 @@ const FichaAcciones = (() => {
       // Mano de boticario (2026-10-05): suma a lo que cura una poción.
       const boticario = num(it.curahp) > 0 ? num(FichaCalculo.calcular(S).final.boticario) : 0;
       if(num(it.curahp)){
-        const entra = Combatiente.curaQueEntra(S.hp, num(it.curahp) + boticario);
+        const entra = Combatiente.curaQueEntra(S.hp, num(it.curahp) + boticario, S.efectos);
         if(entra) ui.fijarHp(num(S.hp) + entra);
-        else if(num(it.curahp) > 0) ui.toast(`${it.nombre}: ${Combatiente.CAIDO_TXT}`);
+        else if(num(it.curahp) > 0) ui.toast(`${it.nombre}: ${num(S.hp) > 0 ? Combatiente.SIN_CURA_TXT : Combatiente.CAIDO_TXT}`);   // 🌑 Herida sombría / Sanguijuela
       }
       const efecto = ui.efecto(it);
       // 📜 A todo el grupo (dueño, 2026-10-19: Buena Fortuna, Inmunidad a CC, Blindaje): el mismo estado a los aliados (el mapa los conoce).
@@ -1043,7 +1043,7 @@ const FichaAcciones = (() => {
     // caído no lo levanta: Combatiente.curaQueEntra).
     if(spec.nombre === 'Transfusión'){
       const d = Math.round(num(spec.vida !== undefined ? spec.vida : spec.hp)), antes = num(S.hp), max = num(FichaCalculo.calcular(S).final.hpmax);
-      const nuevo = d < 0 ? Math.max(Math.min(antes, 1), antes + d) : Math.min(max > 0 ? max : antes + d, antes + Combatiente.curaQueEntra(antes, d));
+      const nuevo = d < 0 ? Math.max(Math.min(antes, 1), antes + d) : Math.min(max > 0 ? max : antes + d, antes + Combatiente.curaQueEntra(antes, d, S.efectos));
       S.hp = nuevo;
       ui.cambio(['vitals', 'refresh']);
       ui.toast(`🩸 ${origen ? origen + ': ' : ''}${d < 0 ? 'diste' : 'recibiste'} ${fmt(Math.abs(nuevo - antes))} de vida (${fmt(antes)} → ${fmt(nuevo)})`);

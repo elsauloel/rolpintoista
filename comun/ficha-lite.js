@@ -39,8 +39,8 @@ const FichaLite = (() => {
   }
 
   // Los extras de la franja de abajo (2026-10-04): Sigilo, Defensa especial y las resistencias elementales.
-  const ELEM = {resfuego: 'fuego', reshielo: 'hielo', resrayo: 'rayo', restoxico: 'toxico', resacido: 'acido'};
-  const ETQ_EXTRA = {sigilo: '🕶 Sigilo', armadmg: '✨ Defensa especial', resfuego: '🔥 Res. fuego', reshielo: '❄ Res. hielo', resrayo: '⚡ Res. eléctrica', restoxico: '☠ Res. tóxico', resacido: '🧪 Res. ácido'};
+  const ELEM = {resfuego: 'fuego', reshielo: 'hielo', resrayo: 'rayo', restoxico: 'toxico', resacido: 'acido', resluz: 'luz', ressiniestro: 'siniestro'};
+  const ETQ_EXTRA = {sigilo: '🕶 Sigilo', armadmg: '✨ Defensa especial', resfuego: '🔥 Res. fuego', reshielo: '❄ Res. hielo', resrayo: '⚡ Res. eléctrica', restoxico: '☠ Res. tóxico', resacido: '🧪 Res. ácido', resluz: '☀ Res. luz', ressiniestro: '🌑 Res. siniestro'};
 
   /* ---------- Personaje ---------- */
   function lineasFicha(S, c, stat){

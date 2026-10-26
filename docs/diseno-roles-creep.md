@@ -76,7 +76,8 @@ avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene
 - **Bomba de humo** (de la lista, «desaparecer en la pelea»; dueño, 2026-10-26: «me gusta mucho al punto de que la pondría en la clase también. Que se mueva
   hasta 3 casillas gratis y que cueste 4 nitros»): revienta una bomba a sus pies: una **nube de humo de diámetro 3** (7 casillas) por **1 turno** que tapa
   la vista (nadie ve adentro ni a través); **entra en Sigilo aunque lo estén mirando**; y se mueve **hasta 3 casillas gratis**, sin ataques de oportunidad.
-  **4 No2**. El combo: en el próximo turno, la Puñalada por la espalda. *(A confirmar:)* si además lleva SP (o solo los 4 No2) y el cooldown (3).
+  **3 No2 y 3 SP** (dueño, 2026-10-26, corrigiendo los 4 No2: «el costo de la bomba de humo… 3 SP y 3 nitros»). El combo: en el próximo turno, la
+  Puñalada por la espalda. *(A confirmar:)* el cooldown (3).
   **También para la clase (Asalto)**: el dueño la quiere en el pool del Asalto; la versión de clase, una vez cerrada la del creep (según la regla, la del
   creep un escalón arriba: ver la propuesta al programar).
 - **Golpe desesperado** ✦ (de la lista, «apuestas»; dueño, 2026-10-26: «la siguiente que sea golpe desesperado»): un ataque con su arma que solo vale

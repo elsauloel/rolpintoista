@@ -64,6 +64,7 @@ function flashCreepObjetivos(c){
     if(t.tipo !== 'creep' || t.bajoTierra) continue;
     const sc = id === c.id ? c.sc : creepPrivadoDe(t.fichaId);
     if(!sc || num(sc.hp) <= 0) continue;
+    if(id !== c.id && typeof esInerte === 'function' && esInerte(t)) continue;   // 🪵 al tótem y al estandarte no les llega lo de apoyo (2026-10-26, visto en el mapa)
     if(id !== c.id && (distanciaHex(c.t, t) > rng || (c.h.blink && c.h.blink.soloYo) || flashCreepAlrededor(c.h))) continue;   // ✨ el Parpadeo y 🦶 una onda: solo él (2026-10-26)
     out.push({id, t, mismo: id === c.id});
   }

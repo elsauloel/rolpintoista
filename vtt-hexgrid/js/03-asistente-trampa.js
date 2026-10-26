@@ -246,13 +246,15 @@ async function romperSigilo(id, detector, motivo, sinMomento){   // motivo (opci
 // manejar (mi personaje; el GM, sus creeps) quedó dentro de un cono rival, pierde el sigilo.
 function sigiloRevisar(){
   if(!fbUsuario) return;
-  const firma = [...tokens.entries()].map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0},${t.oculto ? 1 : 0},${enSigilo(t) ? 1 : 0}`).join('|') + '#' + solidosFirma();
+  const firma = [...tokens.entries()].map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0},${t.oculto ? 1 : 0},${enSigilo(t) ? 1 : 0}`).join('|') + '#' + solidosFirma() + '#' + nieblaSet().size;
   if(firma === sigiloFirmaRev) return;
   sigiloFirmaRev = firma;
   tokens.forEach((t, id) => {
     if(sigiloRompiendo.has(id) || !puedoCambiarVida(t) || !enSigilo(t)) return;
     const k = nbPack(t.col, t.fila);
-    const det = rivalesDe(t).map(zonasClaves).find(z => z.cono.has(k));
+    // 🌫 Adentro de una niebla (la de una varita, la Bomba de humo: 2026-10-26, visto en el mapa) solo lo ve un rival pegado: el cono de los demás no llega.
+    const enNiebla = nieblaSet().has(k);
+    const det = rivalesDe(t).filter(r => !(enNiebla && distanciaHex(r, t) > 1)).map(zonasClaves).find(z => z.cono.has(k));
     if(det) romperSigilo(id, det.nombre);
   });
 }

@@ -840,8 +840,16 @@ function dueloElegirObjetivoMapa(msg){
   if(msg.objetivoFijo && tokens.get(msg.objetivoFijo)){
     const mio0 = [...tokens.entries()].map(([id, t]) => ({...t, id})).find(propio), t = tokens.get(msg.objetivoFijo);
     if(!mio0){ toast(`${(ataque && ataque.habNombre) || 'Habilidad'}: no encontré tu token en este mapa`); return; }
-    Duelo.crear({yo, ataque}, {id: msg.objetivoFijo, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio0.id)
-      .catch(err => { console.error('No se pudo abrir el duelo:', err); toast('No se pudo abrir el duelo: ' + String((err && err.message) || err)); });
+    (async () => {
+      // 💥 La carrera del Takle (2026-10-26, visto en el mapa: con el botón ✨ el objetivo viene elegido y se salteaba): corre hasta quedar pegado.
+      const conSalto0 = ataque && (ataque.saltoHab ? ataque : ataque.hab && ataque.hab.saltoHab ? ataque.hab : null);
+      if(conSalto0 && typeof saltoHab === 'function'){
+        let r = null;
+        try{ r = await saltoHab(mio0, {...t, id: msg.objetivoFijo}, conSalto0, yo); }catch(err){ console.error('No se pudo correr:', err); r = true; }
+        if(!r){ if(msg.alCancelar) msg.alCancelar(); return; }
+      }
+      await Duelo.crear({yo, ataque}, {id: msg.objetivoFijo, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio0.id);
+    })().catch(err => { console.error('No se pudo abrir el duelo:', err); toast('No se pudo abrir el duelo: ' + String((err && err.message) || err)); });
     return;
   }
   // Objetivo hostil (por defecto, ataques y habilidades sin objetivo explícito) → brillan los rivales; objetivo

@@ -1077,6 +1077,13 @@ prueba('✨ Purificar (Support, 2026-10-25): Flash; a un aliado, la purga y cura
   const n = Duelo.limpiarHab(ej) || {};
   igual([h.duelo.objetivo, h.duelo.conmigo, !!(n.efectos || []).find(x => x.purga), ((n.efectos || []).find(x => x.cura) || {}).cura, !!h.flash, h.nitrosCosto, h.cd], ['aliado', true, true, 5, true, 0, 3]);
 });
+prueba('☠ Nube tóxica (Debuffer, 2026-10-26): zona de diámetro 3, 3 turnos, Ef.Esp contra Res.Esp, 1d4 tóxico directo y Veneno 3', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Nube tóxica'), h = armarHabilidadDeCreep(e.datos, 2);
+  const z = Combatiente.zonaDeHab(h, h.duelo, {fichaId: 'c1', tipo: 'creep', tiraValor: 7});
+  const est = typeof z.zonaEstado === 'string' ? JSON.parse(z.zonaEstado) : z.zonaEstado;
+  igual([h.duelo.objetivo, z.radio, z.zonaTurnos, z.resistStat, z.tiraStat, z.tiraValor, z.zonaDano, z.zonaDirecto, z.zonaAmiga, est.nombre, est.stacks, h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('debuffer')],
+    ['zona', 1, 3, 'resmg', 'dmgesp', 7, '1d4', true, false, 'Veneno', 3, 1, 3, 3, true]);
+});
 prueba('👁 Cegar (Debuffer, 2026-10-25): PdG.Esp contra Res.Esp, 2d4 arcano y Ceguera 1 turno (reemplaza a la Ceguera a mano)', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Cegar');
   const h = armarHabilidadDeCreep(e.datos, 2);

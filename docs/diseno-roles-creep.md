@@ -33,12 +33,12 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 - 🏹 **Rango y Hunter — 15**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar, mantener a raya (2026-10-25), atravesar (Flecha que atraviesa, 2026-10-25), disparos encadenados (Ráfaga encadenada, 2026-10-25), disparar y replegarse (Disparo y repliegue, 2026-10-26) · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 14**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25), lluvia de escarcha (2026-10-25), andanada arcana (2026-10-25), misiles elementales (2026-10-25), portal trampa (2026-10-25) · de El origen: proyectil, fuego con quemadura.
-- 🧿 **Debuffer — 14**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25), silencio (Tótem de silencio, 2026-10-25), extenuar (2026-10-25), cegar (2026-10-25), grito de pánico (2026-10-25) · de El origen: ceguera, veneno, inmovilizar.
+- 🧿 **Debuffer — 15**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25), silencio (Tótem de silencio, 2026-10-25), extenuar (2026-10-25), cegar (2026-10-25), grito de pánico (2026-10-25), nube tóxica (2026-10-26) · de El origen: ceguera, veneno, inmovilizar.
 - 💚 **Support — 14**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24), estandarte (Estandarte de guerra, 2026-10-24), señalar la presa (2026-10-25), armas perforantes (2026-10-25), redoble de tambores (2026-10-25), frenesí inducido (2026-10-25), limpiar estados (Purificar, 2026-10-25), levitar (2026-10-25) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
 **Para emparejar** (regla del dueño, 2026-10-25: «empezamos a tener en cuenta todos los roles de creep e ir emparejándolos… para que estén todos
-avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Mago, Support, Debuffer y Choque liviano en 14; Rango + Hunter en 15; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
+avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Mago, Support y Choque liviano en 14; Rango + Hunter y Debuffer en 15; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
 
 ## Los roles
 
@@ -438,7 +438,7 @@ Inmovilizado, Rengo, Desarmado; y, de personajes, Enyetar.
 27. **Robar el turno**: pierde su próximo turno (muy caro).
 
 **H. Sacadas de las varitas** (2026-10-25, a pedido del dueño: «hacé una comparación con las varitas y báculos que diseñamos y fijate si hay alguna idea que no esté en los skills… cosas más de control, por ejemplo portal, y un poco de support, por ejemplo levitar»). Entre corchetes, la varita o el equipo de donde sale.)
-28. **Nube tóxica** ✦: una nube que queda en el piso y envenena a quien está adentro o entra (aliados incluidos) [Varita de miasma].
+28. ✅ **Nube tóxica** ✦ (2026-10-26: la de clase del Debuffer, con 1d4 tóxico directo; Veneno 3, 3 turnos, solo a sus rivales): una nube que queda en el piso y envenena a quien está adentro o entra [Varita de miasma].
 29. **Suelo de aceite**: un área donde se resbala y queda Sentado [Varita del aceite].
 30. **Arena movediza** ✦: un área bajo los pies (no se esquiva) que deja Inmovilizado; soltarse cuesta [Varita de arena movediza].
 31. **Destello**: un área de luz que deja Pajaritos [Varita del destello].

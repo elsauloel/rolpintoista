@@ -59,7 +59,7 @@
     'Colmillos que perforan': ['choque liviano', 'sangrado'], 'Tajo brutal': ['choque liviano', 'sangrado'], 'Desgarro': ['choque liviano', 'sangrado'],
     'Corte certero': ['choque liviano', 'sangrado'], 'Zarpa certera': ['choque liviano', 'sangrado'], 'Tajo de carnicero': ['choque liviano', 'sangrado'],
     'Destripar': ['choque liviano', 'sangrado'],
-    'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'], 'Mantener a raya': ['rango', 'mantener a raya'], 'Flecha que atraviesa': ['rango', 'atravesar'], 'Disparo y repliegue': ['rango', 'disparar y replegarse'], 'Ráfaga encadenada': ['rango', 'disparos encadenados'], 'Extenuar': ['debuffer', 'extenuar'], 'Cegar': ['debuffer', 'cegar'], 'Hoja envenenada': ['choque liviano', 'veneno'], 'Mordisco infectado': ['choque liviano', 'veneno'], 'Grito de pánico': ['debuffer', 'grito de pánico'],
+    'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'], 'Mantener a raya': ['rango', 'mantener a raya'], 'Flecha que atraviesa': ['rango', 'atravesar'], 'Disparo y repliegue': ['rango', 'disparar y replegarse'], 'Nube tóxica': ['debuffer', 'nube tóxica'], 'Ráfaga encadenada': ['rango', 'disparos encadenados'], 'Extenuar': ['debuffer', 'extenuar'], 'Cegar': ['debuffer', 'cegar'], 'Hoja envenenada': ['choque liviano', 'veneno'], 'Mordisco infectado': ['choque liviano', 'veneno'], 'Grito de pánico': ['debuffer', 'grito de pánico'],
     'Red': ['hunter', 'trabar'], 'Tela de araña': ['hunter', 'trabar'],
     'Hit and run': ['choque liviano', 'golpear y alejarse'],
     'Salto': ['choque liviano', 'salto'], 'Salto aplastante': ['choque pesado', 'salto'], 'Vigilancia': ['rango', 'vigilancia'], 'Bola de fuego': ['mago', 'daño en área'], 'Confusión': ['debuffer', 'control mental'],
@@ -786,7 +786,14 @@
   H('Pantano', 'K', 'pb', 'x', 4, tA('Convierte una flor de diámetro 5 (19 casillas) en barro: costo doble de movimiento (a mano).', 3), 'terreno y formas,terreno');
   H('Maleza alta', 'B', 'p', 'e', 3, tA('Hace crecer maleza en una flor de diámetro 3 (7 casillas): quien esté adentro puede esconderse (sigilo) más fácil (a mano).', 2), 'terreno y formas,sigilo,terreno');
   H('Grieta en el suelo', 'K', 'ce', 'gt', 5, tA('Abre una grieta de 3 casilleros en línea, terreno Sólido que se tiene que rodear (a mano).', 3), 'terreno y formas,terreno');
-  H('Nube tóxica', 'DX', 'bpa', 'x', 4, tA('Una nube en flor de diámetro 3 (7 casillas): quien esté adentro al final de su turno queda Envenenado (a mano).', 3), 'terreno y formas,terreno');
+  // ☠ Auditada (dueño, 2026-10-26; el Debuffer, «nube tóxica», de las varitas: «va como decís»): la Nube tóxica del Debuffer de los jugadores para
+  // creeps, con 1d4 tóxico directo para que se sienta. Reemplaza a la vieja (a mano). Flor de diámetro 3 en su Rango, 3 turnos, solo a sus rivales: la
+  // zona tira su Ef.Esp en cada exposición contra la Res.Esp (como la Varita de miasma y los Pedos Tóxicos); quien no resiste, 1d4 tóxico directo y
+  // Veneno 3 (una vez envenenado, ya no se le vuelve a tirar). Costo el de la clase: 1 No2 y 3 SP, o cooldown 3.
+  H('Nube tóxica', 'DX', 'bpahd', 'x', 3, {detalle: 'Deja una nube tóxica de diámetro 3 (7 casillas) en una casilla dentro de su Rango, durante 3 turnos. A cada rival que está adentro cuando aparece, que entra o que sigue adentro al pasar de ronda, la nube le tira el Efecto especial del creep contra su Resistencia especial: si no resiste, recibe 1d4 de daño tóxico directo (solo lo frena la resistencia al tóxico) y queda con Veneno 3. Una vez envenenado, la nube ya no le vuelve a tirar. No afecta a sus aliados.',
+    no2: 1, spCosto: 3, auditada: true, ataqueTxt: 'nube tóxica de diámetro 3, 3 turnos: Ef.Esp contra Res.Esp; 1d4 tóxico directo y Veneno 3',
+    duelo: {objetivo: 'zona', radio: 1, tira: 'dmgesp', contra: ['resmg'], dano: true, danoFormula: '1d4', danoDirecto: true, tipoDano: 'toxico', zonaTurnos: 3,
+      zonaAlcance: 'rango', zonaInmediata: true, zonaEstado: {nombre: 'Veneno', stacks: 3}}}, 'terreno y formas,terreno');
   H('Tormenta de arena en zona', 'X', 'e', 'x', 5, tA('Arena en flor de diámetro 5 (19 casillas): los de adentro pierden 2 de Evasión y su visión se reduce a 1 casillero (a mano).', 3), 'terreno y formas,niebla y visión,terreno');
   H('Círculo de protección', 'T', 'hdm', 'at', 5, tA('Un círculo en flor de diámetro 3 (7 casillas): los aliados adentro ganan +2 de Defensa mientras se queden (a mano).', 3), 'terreno y formas,terreno');
   H('Árbol caído', 'K', 'p', 'tx', 4, tA('Derriba un árbol en línea de 3 casilleros: elemento Sólido que bloquea el paso (a mano).', 3), 'terreno y formas,terreno');

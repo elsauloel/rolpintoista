@@ -56,7 +56,7 @@ avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene
 
 > Método del dueño (2026-10-26): «pasamos al siguiente rol, elegimos, definimos, ajustamos detalles, reglas, pero no lo programás… una vez que tengamos
 > todo ya definido desde el diseño, yo te digo, bueno, ahora programalos». Cada una queda acá con sus reglas; se programan juntas cuando el dueño lo pida
-> (y entonces pasan a la auditoría y a «para probar»). Lo marcado *(a confirmar)* es lo que propuso Claude y el dueño no contestó todavía.
+> (y entonces pasan a la auditoría y a «para probar»). **Todo definido el 2026-10-26; el dueño: «ya puedes pasar a la programación».**
 
 **💚 Support (18 → 20)**
 - **Envión** (idea del dueño, 2026-10-26: «un poco como el Shield. Otorga un escudo de 10 de HP que absorbe daño. Del tipo vida extra. Y además, sube en
@@ -64,39 +64,39 @@ avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene
   recarga) y **sube 1 lugar** en el orden de turnos. Reglas de la iniciativa: no pasa por encima del que tiene el turno (si ya es el siguiente, o es el del
   turno, no sube); si ya actuó esta ronda, sube igual (le sirve para la próxima); el primero del orden no sube (el escudo vale igual). **La Vida extra
   dura hasta que se gaste** (no vence) y **un segundo Envión la reemplaza**, no se suma (dueño, 2026-10-26: «dura hasta que se gaste. El escudo reemplaza,
-  no se suma. Y el nombre envión me gusta»). *(A confirmar:)* costo 3 SP (6 en turno ajeno) o cooldown 3.
+  no se suma. Y el nombre envión me gusta»). Costo: 3 SP (6 en turno ajeno), o cooldown 3.
 - **¡Al frente!** (de la lista, «llevarlo al lado de un rival» ✦; dueño, 2026-10-26: «la siguiente es esa de llevar al lado de un rival»): a un aliado en
   su Rango (no él): lo teletransporta a una casilla libre **pegada a un rival**, a 4 o menos de donde estaba (el GM marca al aliado y la casilla; solo
   sirven las libres pegadas a un rival); no camina (sin oportunidad, sin pisar trampas ni zonas en el camino, sin No2), lo de la casilla de llegada sí lo
   toca; los pulsos del teleport. **Siempre al lado de un rival, a 4 o menos** (dueño, 2026-10-26: «4 está bien. No, que sea siempre al lado de un rival y
   que dé más 2 a la probabilidad de golpe y más 2 a la evasión hasta el final de su próximo turno»): al llegar, **+2 PdG y +2 Evasión hasta el final de su
-  próximo turno**. 2 No2 y 3 SP, o cooldown 3; no es Flash. *(A confirmar:)* el costo; el nombre.
+  próximo turno**. 2 No2 y 3 SP, o cooldown 3; no es Flash.
 
 **🗡 Choque liviano (18 → 20)**
 - **Bomba de humo** (de la lista, «desaparecer en la pelea»; dueño, 2026-10-26: «me gusta mucho al punto de que la pondría en la clase también. Que se mueva
   hasta 3 casillas gratis y que cueste 4 nitros»): revienta una bomba a sus pies: una **nube de humo de diámetro 3** (7 casillas) por **1 turno** que tapa
   la vista (nadie ve adentro ni a través); **entra en Sigilo aunque lo estén mirando**; y se mueve **hasta 3 casillas gratis**, sin ataques de oportunidad.
   **3 No2 y 3 SP** (dueño, 2026-10-26, corrigiendo los 4 No2: «el costo de la bomba de humo… 3 SP y 3 nitros»). El combo: en el próximo turno, la
-  Puñalada por la espalda. *(A confirmar:)* el cooldown (3).
+  Puñalada por la espalda. Cooldown 3.
   **También para la clase (Asalto)**: igual, pero **2 casillas gratis** en vez de 3 (dueño, 2026-10-26: «la versión de clase está bien, que sean dos
   casillas gratis en vez de tres»).
 - **Golpe desesperado** ✦ (de la lista, «apuestas»; dueño, 2026-10-26: «la siguiente que sea golpe desesperado»; y después: «con más de la mitad de la
   vida, más uno y más uno. Con la mitad de la vida o menos, más dos y más tres… Con un cuarto de la vida o menos, el dos más de probabilidad de golpe… y que
   cueste 3 SP»): un ataque con su arma que crece cuanto menos vida tiene, escalonado (como el Remate): **con más de la mitad, +1 a los dos críticos y +1 al
   daño**; **con la mitad o menos, +2 Crítico frecuente, +2 Crítico potente y +3 al daño**; **con un cuarto o menos, además +2 PdG**. **Lo de un ataque y
-  3 SP** (confirmado: el «más uno y más uno» es +1 a los dos críticos y +1 al daño). *(A confirmar:)* el cooldown (2).
+  3 SP** (confirmado: el «más uno y más uno» es +1 a los dos críticos y +1 al daño). Cooldown 2.
 
 **🛡 Choque pesado (19 → 21)** (dueño, 2026-10-26: «me gusta el tacle. y la furia»: las dos)
 - **Takle** (la del Tanque en versión creep, un escalón arriba). Original: «Takle [3] — Flash (SP x 2). Se desplaza hasta 2 casillas. Ataque con +1 a PG. Si
   gana una tirada de Constitución, el objetivo pierde 2 Nitros, lo empuja 2 casillas, interrumpe su turno y lo manda al final de la tabla de iniciativa. Si ya
-  era último en iniciativa, en vez de eso pierde el turno.» Versión creep: **Flash** (en turno ajeno, el doble); se desplaza hasta 2 casillas y ataca con su
-  arma con **+2 PdG**; si después gana la tirada de Constitución, el objetivo **pierde 3 No2**, lo **empuja 2 casillas**, se le **corta el turno** y pasa
-  **al final del orden**; si ya era el último, pierde el turno. *(A confirmar, propuesta de Claude:)* el desplazamiento, gratis y sin ataques de oportunidad;
-  la tirada de Constitución, solo si el ataque pegó (su Constitución contra la del objetivo; empate, la regla general); costo: lo de un ataque y 3 SP (6 en
-  turno ajeno), o cooldown 3.
+  era último en iniciativa, en vez de eso pierde el turno.» Versión creep (dueño, 2026-10-26: «el tackle por definición no usa el arma… el desplazamiento sin
+  coste de nitros y un efecto bastante similar. El costo… 2 nitros y 3 SP»): **Flash** (en turno ajeno, el SP al doble); se desplaza hasta 2 casillas
+  **gratis** (sin No2 ni ataques de oportunidad) hasta quedar pegado al objetivo y lo embiste: **su Constitución +2 contra la Constitución** del objetivo
+  (sin arma); si gana, el objetivo **pierde 3 No2**, sale **empujado 2 casillas**, se le **corta el turno** y pasa **al final del orden**; si ya era el
+  último, pierde el turno. **2 No2 y 3 SP**, o cooldown 3.
 - **Furia** ✦ (dueño: «que por esa penalidad sea más 3 a la probabilidad de golpe y más 4 al daño durante 2 turnos. 2 turnos completos adicionales al turno
   en el que se lo castea»): sobre sí mismo, **+3 PdG y +4 al daño, −2 Evasión y −2 Defensa**, durante **el turno en que la usa y 2 turnos completos más**
-  (la marca `turnosCompletos` del Ojo certero). *(A confirmar:)* costo 2 SP, o cooldown 3; si es Flash (propuesta: no).
+  (la marca `turnosCompletos` del Ojo certero). **2 No2 y 2 SP**, o cooldown 3; no es Flash.
 
 ## Los roles
 

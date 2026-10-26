@@ -1173,6 +1173,13 @@ prueba('🪨 Cascotazo (Mago, 2026-10-26): PdG contra Evasión, 2d6 + Ef.Esp fí
   igual([x.objetivo, x.tira.stat, x.contra.map(c => c.stat || c).join(','), x.dano.formula, x.dano.tipo, !!x.dano.ignoraDef, x.critTipo, l.critTipo, ef.nombre, ef.spec.stacks, Duelo.specDeEfecto(ef).stacks, h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('mago')],
     ['enemigo', 'pdg', 'eva', '2d6+3', 'fisico', false, 10, 10, 'Demora', 2, 2, 2, 3, 3, true]);
 });
+prueba('⛈ Maldición tormentosa (Debuffer, creep, 2026-10-26): PdG.Esp contra Res.Esp, 1d6 siniestro y Atormentado 3 turnos; 2 No2 y 5 SP, o cooldown 3', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Maldición tormentosa'), h = armarHabilidadDeCreep(e.datos, 2);
+  const x = Combatiente.habEjecucion(h, h.duelo, {stat: s => ({esp: 4, rng: 5})[s] || 0, etq: s => s});
+  const sc = {estados: []}; EstadosAplicar.aplicarACreep(sc, x.efectos[0].spec);
+  igual([x.tira.stat, x.contra.map(c => c.stat || c).join(','), x.dano.formula, x.dano.tipo, x.efectos[0].nombre, sc.estados[0].turnos, !!sc.estados[0].tormenta, h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('debuffer')],
+    ['pdgmg', 'resmg', '1d6', 'siniestro', 'Atormentado', 3, true, 2, 5, 3, true]);
+});
 prueba('🎯 Tiro certero (Rango, 2026-10-26): +1 PdG, Perfora 3 e ignora 2 de Resistencia a crítico; lo de un ataque y 2 SP, o cooldown 2', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Tiro certero'), h = armarHabilidadDeCreep(e.datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {perfora: 1}});

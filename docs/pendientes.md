@@ -146,6 +146,11 @@
 >   Lo mismo a la inversa, pero resistente»):** al elegir el objetivo (o el área) de una habilidad con daño elemental, cada token que le pega de más (la luz a
 >   un no-muerto o demonio, una debilidad a ese elemento) lleva una marca «DÉBIL» y el que lo frena (Res. a ese elemento, lo siniestro contra un no-muerto)
 >   «RESISTENTE», a la vista antes de confirmar. Base: `Combatiente.identidadElemento` y las resistencias elementales (`resistenciasDe`, js/13).
+> - [ ] **⬡ Seleccionar un hexágono libre y ver qué lo afecta (2026-10-26, dueño: «que uno pueda seleccionar un hexágono libre y que donde hoy muestra… el
+>   nombre, que diga hexágono libre… si ese hexágono está siendo afectado por algún efecto público, por ejemplo, algún aura, algún muro, alguna zona… que te
+>   permita ver también los distintos efectos aplicados a ese hexágono. Déjalo en pendientes y después lo desarrollamos»):** un clic en una casilla sin token
+>   la selecciona; el cartel de arriba a la derecha (`#token-etiqueta`, el del token seleccionado) dice «Hexágono libre» y lista lo público que la toca:
+>   auras, zonas (con su estado y turnos), muros y Sólidos, fuego, hielo o agua, la luz, una trampa ya vista… Solo lo que esa pantalla puede ver.
 > - [ ] **🗡🌑 Arma sombría, habilidad de Support para creeps (2026-10-26, dueño: «pensemos para futuro, un encantamiento… algo así como arma sombría, que le
 >   suma el mismo efecto de este skill [la Aguja siniestra] al ataque de un aliado durante X cantidad de turnos… lo vamos a dar al support»):** a un aliado en
 >   su Rango, sus golpes con arma dejan Punto débil (−1 a las resistencias a crítico) durante unos turnos, como las Armas elementales. Detalle en

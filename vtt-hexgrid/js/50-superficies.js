@@ -197,6 +197,22 @@ function nubeDibujar(celdas, color, z){
   trazarManchon(celdas, {radio: [0.5, 0.35], sale: [0, 0.35]});
   ctx.fillStyle = color; ctx.fill();
   ctx.restore();
+  // Una línea punteada tenue con el borde exacto de las casillas (dueño, 2026-10-26): la mancha se puede salir un poco sin que quede en duda
+  // qué casillas toca.
+  ctx.save();
+  ctx.beginPath();
+  const set = new Set(celdas.map(c => c.col + ',' + c.fila));
+  celdas.forEach(c => {
+    const k = hexACubo(c), h = hexCentro(c.col, c.fila);
+    VECINO_LADO.forEach(([vq, vr], i) => {
+      if(set.has(cuboACol(k.q + vq, k.r + vr) + ',' + cuboAFila(k.q + vq, k.r + vr))) return;
+      const a = ESQUINAS[i], b = ESQUINAS[(i + 1) % 6];
+      ctx.moveTo(h.x + a[0], h.y + a[1]); ctx.lineTo(h.x + b[0], h.y + b[1]);
+    });
+  });
+  ctx.setLineDash([6 / z, 5 / z]);
+  ctx.strokeStyle = String(color).replace(/[\d.]+\)\s*$/, '.5)'); ctx.lineWidth = 1.5 / z; ctx.stroke();
+  ctx.restore();
 }
 /* Al irse el hielo (lo borra el GM: js/07), queda el charco en las mismas casillas. **No vence** (dueño, 2026-10-17): queda hasta que el GM lo
    borre. */

@@ -359,6 +359,9 @@ function zonaLeFalta(el, t){
   if(sup && sup.superficie && !sup.nombre) return false;
   if(sup && sup.tiraPaso) return true;
   if(el.trampa) return !(el.zonaResueltos || []).includes(zonaClave(el, t));
+  // `unaVez` (adentro del JSON de zonaEstado; 2026-10-26, la Nube tóxica: «una vez envenenado, la nube ya no le vuelve a tirar»): con el estado
+  // ya puesto, tampoco el daño.
+  if(el.zonaEstado && (el.zonaResueltos || []).includes(zonaClave(el, t))){ let e = {}; try{ e = JSON.parse(el.zonaEstado) || {}; }catch(x){} if(e.unaVez) return false; }
   if(el.zonaDano || el.zonaDanoDif) return true;
   if(el.zonaLuz && typeof luzSinLuz === 'function' && luzSinLuz(el)){ let e = {}; try{ e = JSON.parse(el.zonaEstado || '{}') || {}; }catch(x){} if(!e.nombre) return false; }   // (la bombucha de talco: solo revela)
   if(el.zonaEstado && !(el.zonaResueltos || []).includes(zonaClave(el, t))) return true;

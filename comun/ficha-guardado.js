@@ -281,12 +281,20 @@ const FichaGuardado = (() => {
       ['detalle', 'nitrosCosto', 'efectoNombre', 'efectoTurnos', 'efectoMods', 'efectoDetalle', 'dashMapa', 'duelo', 'modo'].forEach(k => { if(base[k] !== undefined) h[k] = structuredClone(base[k]); else delete h[k]; });
     });
   }
+  // 👁 Ojo de asesino (2026-10-26, dueño: +1 PdG, +2 al daño y +1 a los dos críticos): el efecto sale del preset; acá, el texto de las copias viejas.
+  function migrarOjoDeAsesino(S){
+    if(typeof CLASES_SKILLS === 'undefined') return;
+    const base = CLASES_SKILLS.flatMap(c => c.habilidades || []).find(x => x.id === 'asalto-ojo-de-asesino');
+    if(!base) return;
+    (S.habilidades || []).forEach(h => { if(h && h.habClaseId === 'asalto-ojo-de-asesino' && !/Probabilidad de Golpe/.test(String(h.detalle || ''))) h.detalle = base.detalle; });
+  }
   function completar(S, o){
     o = o || {};
     migrarEstadoIt2(S, o.spPorBono);
     migrarEstadoEspecial(S);
     migrarTextosFlash(S);
     migrarDash(S);
+    migrarOjoDeAsesino(S);
     // Crítico frecuente (dueño, 2026-10-16): desde el 2026-09-25 es solo un bono (receta '0'); las fichas de antes lo sacaban de la Destreza.
     if(S.formulas && String(S.formulas.crit).trim() === 'des') S.formulas.crit = '0';
     if(S.nitros === null || S.nitros === undefined){

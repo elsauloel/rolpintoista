@@ -943,8 +943,10 @@ const Duelo = (() => {
       if(esd > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + esd, mod: p0.mod + esd, formula: `${p0.formula} +${esd} estandarte`.slice(0, 60)}; }
       const tpd = campo === 'pdg' && m.ataque && m.ataque.tiro ? _num(m.ataque.tiro.pdg) : 0;   // el bono del tiro: distancia ideal (+) o tiro alto (−2)
       if(tpd){ const p0 = m.pdg; m.pdg = {...p0, total: Math.max(0, p0.total + tpd), mod: p0.mod + tpd, formula: `${p0.formula} ${tpd > 0 ? '+' : '−'}${Math.abs(tpd)} ${m.ataque.tiro.motivo}`.slice(0, 60)}; }
+      const cpd = campo === 'pdg' && extra ? Math.round(_num(extra.cargaPdg)) : 0;   // 👁 lo que una carga suma a la Probabilidad de Golpe (Ojo de asesino, 2026-10-26)
+      if(cpd > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + cpd, mod: p0.mod + cpd, formula: `${p0.formula} +${cpd} ${extra.cargaPdgNombre || 'carga'}`.slice(0, 60)}; }
       if(campo === 'eva' && defensa) m.defensa = defensa;
-      if(extra && (campo === 'pdg' || campo === 'eva')) m.critDatos = {...(m.critDatos || {}), ...extra};   // Crítico frecuente/potente del atacante; Resistencia a crítico del defensor
+      if(extra && (campo === 'pdg' || campo === 'eva')){ const {cargaPdg, cargaPdgNombre, ...cd} = extra; m.critDatos = {...(m.critDatos || {}), ...cd}; }   // Crítico frecuente/potente del atacante; Resistencia a crítico del defensor
       anuncio = avanzar(m) || '';
       tx.update(ref, cambiosDe(m));
       // Tiraron los dos: las dos tiradas van juntas a la Mesa (con los dados), como cierre del suspenso.

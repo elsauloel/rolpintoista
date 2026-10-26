@@ -624,16 +624,16 @@ const Combatiente = (() => {
   const sumarCargas = lista => lista.length ? {nombre: lista.map(e => e.nombre).join(' + '), fijo: lista.reduce((t, e) => t + Math.round(n(e.golpe.fijo)), 0),
     dados: lista.reduce((t, e) => t + Math.round(n(e.golpe.dados)), 0),
     efectos: lista.flatMap(e => Array.isArray(e.golpe.efectos) ? e.golpe.efectos : []), crit: lista.reduce((t, e) => t + Math.round(n(e.golpe.crit)), 0),
-    critpot: lista.reduce((t, e) => t + Math.round(n(e.golpe.critpot)), 0)} : null;
+    critpot: lista.reduce((t, e) => t + Math.round(n(e.golpe.critpot)), 0), pdg: lista.reduce((t, e) => t + Math.round(n(e.golpe.pdg)), 0)} : null;   // `pdg` (2026-10-26, Ojo de asesino)
   function cargaDeDuelo(estados, dueloId){
     return Array.isArray(estados) && dueloId ? sumarCargas(estados.filter(x => x && x.golpe && (x.duelos || []).includes(String(dueloId)))) : null;
   }
   // El crítico que suman las cargas a este ataque (Ojo de asesino, 2026-10-11): lo pide el duelo ANTES de pagar el ataque, así que si todavía no
-  // se gastaron, mira las que se van a gastar (las activas con cargas). → {crit, critpot}.
+  // se gastaron, mira las que se van a gastar (las activas con cargas). → {crit, critpot, pdg, nombre} (`pdg`: lo que suma a la Probabilidad de Golpe, 2026-10-26).
   function cargaCritico(estados, dueloId){
     const ya = cargaDeDuelo(estados, dueloId);
     const c = ya || sumarCargas((estados || []).filter(conGolpe));
-    return {crit: c ? c.crit : 0, critpot: c ? c.critpot : 0};
+    return {crit: c ? c.crit : 0, critpot: c ? c.critpot : 0, pdg: c ? c.pdg : 0, nombre: c ? c.nombre : ''};
   }
   const cargaTxt1 = c => c && c.golpePorTurnos ? `${c.nombre}: suma a este golpe` : c ? `${c.nombre}: ${n(c.cargas) > 0 ? `le queda${n(c.cargas) > 1 ? 'n' : ''} ${n(c.cargas)} carga${n(c.cargas) > 1 ? 's' : ''}` : 'era la última carga'}` : '';
   const cargaTxt = c => c && Array.isArray(c.todas) && c.todas.length > 1 ? c.todas.map(cargaTxt1).join(" · ") : cargaTxt1(c);

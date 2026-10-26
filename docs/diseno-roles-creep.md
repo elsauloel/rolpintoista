@@ -37,8 +37,8 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 
 - 🛡 **Choque pesado — 18**: más daño, empujar, atrapar, guardia, salto, barrido, desarmar, golpe anunciado, remate, romper armadura · de El origen:
   furia, pisotón, provocar, segundo aliento, aguantar el daño, cubrir al de al lado, perforar, carga que derriba.
-- 🗡 **Choque liviano — 17**: golpe preciso, sangrado, trabar, golpear y alejarse, salto, abrir la herida, manada, ráfaga, por la espalda · de El origen:
-  robar, sigilo, varios golpes, bajo tierra, veneno (de fábrica desde el 2026-10-25: Hoja envenenada / Mordisco infectado), todo al ataque (Degollar, 2026-10-26), finta (2026-10-26), dash (2026-10-26).
+- 🗡 **Choque liviano — 18**: golpe preciso, sangrado, trabar, golpear y alejarse, salto, abrir la herida, manada, ráfaga, por la espalda · de El origen:
+  robar, sigilo, varios golpes, bajo tierra, veneno (de fábrica desde el 2026-10-25: Hoja envenenada / Mordisco infectado), todo al ataque (Degollar, 2026-10-26), finta (2026-10-26), dash (2026-10-26), ojo de asesino (2026-10-26).
 - 🏹 **Rango y Hunter — 18**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar, mantener a raya (2026-10-25), atravesar (Flecha que atraviesa, 2026-10-25), disparos encadenados (Ráfaga encadenada, 2026-10-25), disparar y replegarse (Disparo y repliegue, 2026-10-26), clavar a la pared (2026-10-26), tiro al arma (2026-10-26), tiro que derriba (2026-10-26) · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 18**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25), lluvia de escarcha (2026-10-25), andanada arcana (2026-10-25), misiles elementales (2026-10-25), portal trampa (2026-10-25), prisión de hielo (2026-10-26), nova arcana (2026-10-26), ráfaga de viento (2026-10-26), parpadeo (2026-10-26) · de El origen: proyectil, fuego con quemadura.
@@ -47,7 +47,7 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
 **Para emparejar** (regla del dueño, 2026-10-25: «empezamos a tener en cuenta todos los roles de creep e ir emparejándolos… para que estén todos
-avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Choque liviano en 17; Mago, Rango + Hunter, Debuffer y Support en 18; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
+avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Mago, Rango + Hunter, Debuffer, Support y Choque liviano en 18; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
 
 ## Los roles
 
@@ -164,7 +164,7 @@ rodilla, Tarascón al tobillo), las redes; y en el mapa, el sigilo, el +1 por la
 2. **Dos cortes rápidos** ✦: dos golpes en uno, con menos daño cada uno.
 3. ✅ **Ráfaga de cortes** ✦: **Ráfaga de cortes** y **Ráfaga de zarpazos** (2026-10-21: +2 dados, los efectos del arma ×3 y la Perfora en cada corte).
 4. **Punto débil**: perfora parte de la Defensa.
-5. **Buscar el crítico**: Crítico frecuente +2 en ese golpe.
+5. ✅ **Buscar el crítico** — **Ojo de asesino** (2026-10-26, el de la clase: sobre sí, su próximo ataque con +1 PdG, +2 al daño y +1 a los dos críticos).
 
 **B. Desangrar y envenenar**
 6. ✅ **Sangrado**: todas sus variantes y la versión fuerte.
@@ -225,7 +225,7 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
 - **Sprint**: «Sprint [1] — 2 No2: avanza 3 casillas.»
 - **Tronco de huída**: «Tronco de huída [2] — +2 fijo a una tirada de evasión con giro.»
 - **Robar SP** (en pausa): SP 1. Ganás 2 SP por cada crítico obtenido.
-- **Ojo de asesino**: Tu próximo ataque con arma de este turno tiene Crítico frecuente +1: el rango del crítico baja 1 punto (un arma Tipo 4 hace crítico con diferencia 3; nunca baja de 2). Lo gasta ese ataque, pegue o no (una carga); si no atacás,…
+- ✅ **Ojo de asesino** → Ojo de asesino (2026-10-26; la de clase también: +1 PdG, +2 al daño, Crítico frecuente +1 y potente +1, una carga para su próximo ataque).
 
 ## 3. Rango y Hunter — las ideas del rol
 

@@ -1128,6 +1128,19 @@ prueba('💨 Dash (Choque liviano y Asalto, 2026-10-26): el camino lo hace el ma
   igual([h.dash.casillas, h.duelo.arma.pdg, a.mods.fuerza, !!h.efectoNombre, h.nitrosCosto, h.cd, cl.dashMapa.casillas, cl.duelo.modo, cl.duelo.arma.pdg, cl.duelo.arma.fuerza, !!cl.efectoNombre, cl.nitrosCosto],
     [3, 2, 1, false, 1, 3, 3, 'arma', 2, 1, false, 1]);
 });
+prueba('👁 Ojo de asesino (Asalto y Choque liviano, 2026-10-26): la carga suma +1 PdG, +2 al daño y +1 a los dos críticos', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Ojo de asesino'), h = armarHabilidadDeCreep(e.datos, 2);
+  const clase = CLASES_SKILLS.find(x => x.id === 'asalto').habilidades.find(x => x.id === 'asalto-ojo-de-asesino');
+  const est = [{...structuredClone(estadosPresetCreep().find(p => p.nombre === 'Ojo de asesino')), id: 'o', activo: true}];
+  const antes = Combatiente.cargaCritico(est, 'd1');
+  Combatiente.gastarCarga(est, 'd1');
+  const c = Combatiente.cargaDeDuelo(est, 'd1');
+  const {S} = FichaGuardado.normalizar({attrs: {con: 3, fue: 3, agl: 3, des: 3, esp: 3}, habilidades: [{id: 'oj', nombre: 'Ojo de asesino', habClaseId: 'asalto-ojo-de-asesino', detalle: 'Tu próximo ataque con arma de este turno tiene Crítico frecuente +1: viejo'}]});
+  FichaGuardado.completar(S);
+  igual([antes.pdg, antes.crit, antes.critpot, c.fijo, c.pdg, c.crit, c.critpot, h.duelo.objetivo, h.efectoNombre || h.duelo.efectos[0].nombre, h.nitrosCosto, h.spCosto, h.cd,
+    e.etiquetas.includes('choque liviano'), clase.duelo.efectos[0].nombre, /Probabilidad de Golpe/.test(S.habilidades[0].detalle)],
+    [1, 1, 1, 2, 1, 1, 1, 'uno mismo', 'Ojo de asesino', 1, 2, 2, true, 'Ojo de asesino', true]);
+});
 prueba('🤺 Finta (Choque liviano, 2026-10-26): +2 al daño, +1 a los dos críticos y no se puede parar', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Finta'), h = armarHabilidadDeCreep(e.datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});
@@ -3891,7 +3904,7 @@ prueba('Ojo de asesino como carga (2026-10-11): +1 Crítico frecuente al próxim
   const g2 = Combatiente.gastarCarga(est, 'd2'), c2 = Combatiente.cargaDeDuelo(est, 'd2'), sigue = Combatiente.cargaCritico(est, 'd3');
   igual([ojo.duelo.efectos[0].nombre, antes.crit, g.carga.todas.length, c.crit, c.fijo, c.efectos.length, despues.crit, ojoGastado,
     c2.crit, c2.fijo, sigue.crit, /Ojo de asesino: era la última carga/.test(Combatiente.cargaTxt(g.carga))],
-    ['Ojo de asesino', 1, 2, 1, 3, 1, 1, true, 0, 3, 0, true]);
+    ['Ojo de asesino', 1, 2, 1, 5, 1, 1, true, 0, 3, 0, true]);   // (fijo 5: los +3 del arma envenenada y los +2 del Ojo, desde el 2026-10-26)
 });
 prueba('Cargas: la que gasta la última se apaga y no se ve, su ataque la sigue sumando, y se va al pasar el turno (2026-10-10)', () => {
   const pre = estadosPresetFicha().find(p => p.nombre === 'Arma envenenada');

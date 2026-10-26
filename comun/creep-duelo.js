@@ -147,7 +147,7 @@ const CreepDuelo = (() => {
       statsCritico: d => {
         const sc = deLado(d.atacante);
         const cc = sc ? Combatiente.cargaCritico(sc.estados, d.id) : {crit: 0, critpot: 0};   // Ojo de asesino: el crítico de una carga
-        return sc ? {frecuente: Math.max(0, Math.round(C().modTotal(sc, 'crit'))) + cc.crit, potente: Math.max(0, Math.round(C().modTotal(sc, 'critpot'))) + cc.critpot,
+        return sc ? {frecuente: Math.max(0, Math.round(C().modTotal(sc, 'crit'))) + cc.crit, potente: Math.max(0, Math.round(C().modTotal(sc, 'critpot'))) + cc.critpot, cargaPdg: cc.pdg, cargaPdgNombre: cc.nombre,
           ignora: Combatiente.ignoraResistCritArma(Combatiente.armaDeCombatiente(sc)), d20: Math.max(0, Math.round(num(Combatiente.armaDeCombatiente(sc).critD20)))} : {frecuente: 0, potente: 0};
       },
       blindado: d => { const sc = deLado(d.defensor); return !!(sc && (sc.estados || []).some(e => e && e.activo !== false && e.blindado)); },   // 🛡 (2026-10-20)

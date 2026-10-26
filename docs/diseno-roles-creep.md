@@ -52,6 +52,25 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 **Para emparejar** (regla del dueño, 2026-10-25: «empezamos a tener en cuenta todos los roles de creep e ir emparejándolos… para que estén todos
 avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Support y Choque liviano en 18, Choque pesado en 19, Rango + Hunter, Mago y Debuffer en 20. **Meta del dueño (2026-10-26): llegar a 20 en cada rol.** El Jefe va aparte.
 
+## Definidas, sin programar (camino a 20 por rol, desde el 2026-10-26)
+
+> Método del dueño (2026-10-26): «pasamos al siguiente rol, elegimos, definimos, ajustamos detalles, reglas, pero no lo programás… una vez que tengamos
+> todo ya definido desde el diseño, yo te digo, bueno, ahora programalos». Cada una queda acá con sus reglas; se programan juntas cuando el dueño lo pida
+> (y entonces pasan a la auditoría y a «para probar»). Lo marcado *(a confirmar)* es lo que propuso Claude y el dueño no contestó todavía.
+
+**💚 Support (18 → 20)**
+- **Envión** (idea del dueño, 2026-10-26: «un poco como el Shield. Otorga un escudo de 10 de HP que absorbe daño. Del tipo vida extra. Y además, sube en
+  uno en la tabla de iniciativas. Y tiene flash»): **Flash** (en turno ajeno, el SP al doble). A él o a un aliado en su Rango: **10 de Vida extra** (no se
+  recarga) y **sube 1 lugar** en el orden de turnos. Reglas de la iniciativa: no pasa por encima del que tiene el turno (si ya es el siguiente, o es el del
+  turno, no sube); si ya actuó esta ronda, sube igual (le sirve para la próxima); el primero del orden no sube (el escudo vale igual). *(A confirmar:)* la
+  Vida extra dura hasta el final del próximo turno de quien la recibe; un segundo Envión reemplaza al anterior (queda el más alto); costo 3 SP (6 en turno
+  ajeno) o cooldown 3; el nombre.
+- **¡Al frente!** (de la lista, «llevarlo al lado de un rival» ✦; dueño, 2026-10-26: «la siguiente es esa de llevar al lado de un rival»): a un aliado en
+  su Rango (no él): lo teletransporta a una casilla libre **pegada a un rival**, a 4 o menos de donde estaba (el GM marca al aliado y la casilla; solo
+  sirven las libres pegadas a un rival); no camina (sin oportunidad, sin pisar trampas ni zonas en el camino, sin No2), lo de la casilla de llegada sí lo
+  toca; los pulsos del teleport. Al llegar, **+1 PdG en su próximo ataque** (hasta el final de su próximo turno). 2 No2 y 3 SP, o cooldown 3; no es Flash.
+  *(A confirmar:)* la distancia (4 o su Rango); si también sirve para alejar a un aliado (a cualquier casilla libre, sin el +1); el nombre.
+
 ## Los roles
 
 1. **Choque pesado**: tanque y warrior (muchas habilidades les sirven a uno, al otro o a los dos).

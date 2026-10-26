@@ -134,13 +134,8 @@ lo que el grupo usa.
   `comun/catalogo.js` (`herramientas/catalogo_comun.py`): calculadora de
   armas, equipo de los creeps, reajuste de defensa, publicar ítems del
   rework. No son parte del runtime de ninguna herramienta.
-- **`gestor.html`** (raíz) actualiza el *código* de las herramientas desde
-  GitHub — nunca datos de partida — usando la File System Access API
-  sobre la carpeta que elige el usuario, y apunta a la rama `main`. La
-  plataforma vieja de sync de datos por GitHub (Subir/Bajar datos, Traer
-  última versión de personajes/tablero/tienda) ya no se usa: en
-  `nueva-version` ese código y esas pantallas se sacaron por completo de
-  la ficha y de gm-tools, no solo se desactivaron.
+- **`gestor.html` se retiró** (2026-10-25, dueño: «`main` quedó completamente obsoleto»): actualizaba el código de las herramientas
+  desde `main`. La plataforma vieja de sync por GitHub (Subir/Bajar datos, Traer última versión) tampoco existe en `nueva-version`.
 - **Sitio publicado**: la rama `nueva-version` se publica sola en GitHub
   Pages, en `https://elsauloel.github.io/rolpintoista/` — cada push se
   publica en 1–2 minutos, así que solo se sube lo ya probado.
@@ -174,7 +169,6 @@ lo que el grupo usa.
 | `assets/` | Arte de referencia e insumos del catálogo (no se cargan en runtime) | Sin tocar |
 | `firebase/` | `firestore.rules`, la copia versionada de los permisos | En uso activo |
 | [`preguntas-diseno/`](preguntas-diseno/CLAUDE.md) | "🛠 Herramientas de diseño": log compartido con tres pestañas — Preguntas, A desarrollar (propuestas + resumen de lo incorporado) y Falta testear —, pensado para el celular (excepción a "solo compu") | En uso activo |
-| `gestor.html` (raíz) | Actualiza el código de las herramientas desde `main` | Legado — no toca datos de partida en `nueva-version` |
 
 Esquema de datos de Firebase: [`docs/workflow-firebase.md`](docs/workflow-firebase.md).
 Esquema del catálogo y del respaldo local: [`datos/esquema.md`](datos/esquema.md).

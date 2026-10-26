@@ -4,7 +4,7 @@
 > de ítems dejó de sincronizarse por GitHub: la copia de fábrica es `comun/catalogo.js` y lo que suben jugadores y GM vive
 > en Firebase (`docs/plan-subida-unificada.md`, paso 5). Lo que sigue usando la API de GitHub con token es solo lo del
 > dueño que escribe archivos de fábrica en la rama `nueva-version` (`datos/catalogo-editor.html` → `comun/catalogo.js`,
-> `datos/auditoria-skills.html` → `comun/skills-clase.js`) y `gestor.html`. El patrón de token de abajo sigue valiendo para
+> `datos/auditoria-skills.html` → `comun/skills-clase.js`). `gestor.html` se retiró el 2026-10-25 (la sección de abajo queda como historia). El patrón de token de abajo sigue valiendo para
 > esas herramientas.
 
 Cómo se mantienen sincronizadas las herramientas entre sí y con el repo,

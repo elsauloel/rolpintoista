@@ -109,9 +109,8 @@ su casa:
   solo desactivados (2026-09-17) — el modal "Antes de arrancar…" con
   "Traer última versión" nunca se abría en `nueva-version`, así que se
   sacó entero de la ficha y gm-tools, junto con las funciones que solo
-  servían para eso. `gestor.html` sigue existiendo para actualizar el
-  *código* de las herramientas desde `main` (el catálogo ya no: ver
-  arriba).
+  servían para eso. `gestor.html` (actualizaba el *código* desde `main`) se
+  retiró el 2026-10-25.
   "Guardar ficha"/"Cargar archivo" local se conserva como respaldo.
 
 ## Pasos

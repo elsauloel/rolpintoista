@@ -19,7 +19,7 @@ sistema nuevo; [`workflow-firebase.md`](workflow-firebase.md), cómo está armad
 reglas para personajes, invocaciones y creeps, con la ficha, GM Tools y el mapa como ventanas — por pasos, cuando el dueño lo decida.
 
 Con contenido básico: [`workflow-github.md`](workflow-github.md) documenta
-el patrón de sincronización (token, `gestor.html`, API de contenidos) que
+el patrón de sincronización (token, API de contenidos; `gestor.html` se retiró el 2026-10-25) que
 comparten `ficha-personaje/ficha.html`, `gm-toolset/gm-tools.html`,
 `gm-toolset/vendor-generator.html`, `manual-usuario/manual.html` y
 `datos/catalogo-editor.html`. Se va a ir sumando más a medida que haga

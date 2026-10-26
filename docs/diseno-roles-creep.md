@@ -78,12 +78,13 @@ avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene
   la vista (nadie ve adentro ni a través); **entra en Sigilo aunque lo estén mirando**; y se mueve **hasta 3 casillas gratis**, sin ataques de oportunidad.
   **3 No2 y 3 SP** (dueño, 2026-10-26, corrigiendo los 4 No2: «el costo de la bomba de humo… 3 SP y 3 nitros»). El combo: en el próximo turno, la
   Puñalada por la espalda. *(A confirmar:)* el cooldown (3).
-  **También para la clase (Asalto)**: el dueño la quiere en el pool del Asalto; la versión de clase, una vez cerrada la del creep (según la regla, la del
-  creep un escalón arriba: ver la propuesta al programar).
-- **Golpe desesperado** ✦ (de la lista, «apuestas»; dueño, 2026-10-26: «la siguiente que sea golpe desesperado»): un ataque con su arma que solo vale
-  **con la mitad de su vida o menos**: **+2 Crítico frecuente, +2 Crítico potente y +3 al daño**. *(A confirmar, propuesta de Claude:)* con un cuarto de
-  la vida o menos, además +2 PdG; con más de la mitad, avisa y deja usarla como un ataque común (sin los bonos; lo decide la mesa); lo de un ataque y 2 SP,
-  o cooldown 2.
+  **También para la clase (Asalto)**: igual, pero **2 casillas gratis** en vez de 3 (dueño, 2026-10-26: «la versión de clase está bien, que sean dos
+  casillas gratis en vez de tres»).
+- **Golpe desesperado** ✦ (de la lista, «apuestas»; dueño, 2026-10-26: «la siguiente que sea golpe desesperado»; y después: «con más de la mitad de la
+  vida, más uno y más uno. Con la mitad de la vida o menos, más dos y más tres… Con un cuarto de la vida o menos, el dos más de probabilidad de golpe… y que
+  cueste 3 SP»): un ataque con su arma que crece cuanto menos vida tiene, escalonado (como el Remate): **con más de la mitad, +1 a los dos críticos y +1 al
+  daño**; **con la mitad o menos, +2 Crítico frecuente, +2 Crítico potente y +3 al daño**; **con un cuarto o menos, además +2 PdG**. **Lo de un ataque y
+  3 SP**. *(A confirmar:)* que el «más uno y más uno» sea +1 a los dos críticos y +1 al daño (como el «más dos y más tres»); el cooldown (2).
 
 ## Los roles
 

@@ -138,7 +138,7 @@
 > - [x] (2026-10-26, hecha: «Tirar la bronca») **😤 Provocar para un aliado, habilidad de Support para creeps (2026-10-26, idea del dueño):** elige un aliado (el tanque); los rivales alrededor de
 >   ese aliado tiran Res.Mt contra el Ef.Esp del support y, si no la resisten, quedan Provocados por ese aliado N turnos. Detalle en `docs/diseno-roles-creep.md`
 >   (Support, idea 4c). Para automatizarlo, el Provocado tiene que guardar quién provocó (hoy es «a mano»).
-> - [ ] **🏃 El dodge roll después de moverse (visto en el mapa, 2026-10-26, Claude):** con el cartel «juan ganó la Evasión · Arrastrá el token
+> - [x] (2026-10-26, hecho: el dueño dijo que sí; `dodgeTrasMover`, js/13, desde `moverToken`) **🏃 El dodge roll después de moverse (visto en el mapa, 2026-10-26, Claude):** con el cartel «juan ganó la Evasión · Arrastrá el token
 >   hasta 2 casilleros», una vez que se arrastró el cartel sigue igual («No me quiero mover») y para cerrar hay que abrir el duelo y tocar «▶ Ya se movió:
 >   revisar». Propuesta: al soltar el movimiento, que se revise solo (o que el cartel cambie a «✔ Ya me moví»). Preguntarle al dueño.
 > - [ ] **🎯 «Débil» y «Resistente» en el token (2026-10-26, dueño: «cuando uno ejecuta una habilidad con un daño elemental y alguno de los objetivos tiene

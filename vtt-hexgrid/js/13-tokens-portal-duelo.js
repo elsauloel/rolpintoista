@@ -1238,8 +1238,14 @@ function renderDodgeBanner(){
     return;
   }
   AvisoCombate.cartel('dodge', {icono: dodgeBanner.meteoro ? '☄' : dodgeBanner.tormenta ? '🌩' : '🏃', titulo: dodgeBanner.meteoro ? `Le cae el meteoro a ${dodgeBanner.nombre} (${dodgeBanner.meteoro})` : dodgeBanner.tormenta ? `Le cae la tormenta a ${dodgeBanner.nombre} (${dodgeBanner.tormenta})` : `${dodgeBanner.nombre} ganó la Evasión`, posicion: 'abajo',
-    texto: 'Arrastrá el token hasta 2 casilleros para intentar salir del área.',
+    texto: 'Arrastrá el token hasta 2 casilleros para intentar salir del área: al soltarlo se revisa solo si salió.',
     botones: [{texto: '🔎 Ver el duelo', sec: true, alClic: () => Duelo.abrir(dodgeBanner.id)}, {texto: '✋ No me quiero mover', alClic: () => dodgeDeclinar()}]});
+}
+// 🏃 Al soltar el movimiento del que hace el dodge roll de un área, se revisa solo si salió (2026-10-26, dueño: antes había que abrir el duelo
+// y tocar «Ya se movió: revisar», y el cartel seguía diciendo «Arrastrá…» con «No me quiero mover»).
+function dodgeTrasMover(id){
+  if(!dodgeBanner || dodgeBanner.libre || dodgeBanner.tokenId !== id) return;
+  setTimeout(() => { if(dodgeBanner && !dodgeBanner.libre && dodgeBanner.tokenId === id) dodgeDeclinar(); }, 400);
 }
 async function dodgeDeclinar(){
   if(!dodgeBanner) return;

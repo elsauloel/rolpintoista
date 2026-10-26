@@ -1146,6 +1146,7 @@ async function moverToken(id, col, fila, celdas, levita){
     zonaRevisarEntrada(id, celdas, num(levita));   // las zonas del piso no tocan lo levitado; las del aire, sí (2026-10-07)
     if(typeof aceleradorRevisar === 'function') aceleradorRevisar(id, celdas);   // ⏩ (js/40)
     if(typeof auraRevisar === 'function') auraRevisar();   // 💀 el aura de la Calavera (js/52)
+    if(typeof dodgeTrasMover === 'function') dodgeTrasMover(id);   // 🏃 el dodge roll de un área: se revisa solo al moverse (js/13)
   }catch(err){
     // Reglas de Firestore sin publicar todavía (no conocen "ruta"): se mueve
     // igual, solo que los demás no ven la estela.

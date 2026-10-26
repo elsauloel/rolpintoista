@@ -1077,6 +1077,12 @@ prueba('✨ Purificar (Support, 2026-10-25): Flash; a un aliado, la purga y cura
   const n = Duelo.limpiarHab(ej) || {};
   igual([h.duelo.objetivo, h.duelo.conmigo, !!(n.efectos || []).find(x => x.purga), ((n.efectos || []).find(x => x.cura) || {}).cura, !!h.flash, h.nitrosCosto, h.cd], ['aliado', true, true, 5, true, 0, 3]);
 });
+prueba('🗡 Degollar (Choque liviano, 2026-10-26): +4 PdG, +7 al daño, +1 a los dos críticos; termina el turno y queda Expuesto', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Degollar'), h = armarHabilidadDeCreep(e.datos, 2);
+  const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});
+  igual([h.duelo.modo, h.duelo.arma.pdg, h.duelo.arma.fijo, h.duelo.arma.critBono, h.duelo.arma.critpotBono, !!a.terminaTurno, h.efectoNombre, h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('choque liviano')],
+    ['arma', 4, 7, 1, 1, true, 'Expuesto', 'ATAQUE', 4, 4, true]);
+});
 prueba('☀🌑 Luz y siniestro (2026-10-26): los elementos nuevos, su identidad y la cura que no entra', () => {
   const tl = Combatiente.identidadElemento('luz', 'no-muerto'), tl2 = Combatiente.identidadElemento('luz', 'bestia');
   const ts = Combatiente.identidadElemento('siniestro', 'demonio'), ts2 = Combatiente.identidadElemento('siniestro', 'humano');
@@ -1087,11 +1093,11 @@ prueba('☀🌑 Luz y siniestro (2026-10-26): los elementos nuevos, su identidad
     Combatiente.sinCura([{nombre: 'Sanguijuela'}])],
     ['siniestro', 'luz', '', true, true, 1.5, 'Marcado', 1, 0, null, 1, 'Herida sombría', true, true, 0, 4, -3, true]);
 });
-prueba('🐛 Sanguijuela (Mago, 2026-10-26): PdG contra Evasión, 2d6 siniestro, se cura la mitad y queda pegada 4 turnos (Fuerza contra Ef.Esp)', () => {
+prueba('🐛 Sanguijuela (Mago, 2026-10-26): PdG.Esp contra Evasión, 2d6 siniestro, se cura la mitad y queda pegada 4 turnos (Fuerza contra Ef.Esp)', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Sanguijuela'), h = armarHabilidadDeCreep(e.datos, 2);
   const ef = h.duelo.efectos[0];
   igual([h.duelo.tira, h.duelo.contra.join(','), h.duelo.danoFormula, h.duelo.tipoDano, !!h.duelo.drena, h.duelo.drenaPct, ef.nombre, ef.turnos, ef.soltar.stat, ef.soltar.difStat, h.cd, e.etiquetas.includes('mago')],
-    ['pdg', 'eva', '2d6', 'siniestro', true, 50, 'Sanguijuela', 4, 'fue', 'dmgesp', 3, true]);
+    ['pdgmg', 'eva', '2d6', 'siniestro', true, 50, 'Sanguijuela', 4, 'fue', 'dmgesp', 3, true]);
 });
 prueba('💪 Empuje (Support, 2026-10-26): Flash, Empower a un aliado; la tirada del creep que lo suma lo gasta', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Empuje'), h = armarHabilidadDeCreep(e.datos, 2);

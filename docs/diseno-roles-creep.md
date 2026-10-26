@@ -31,8 +31,8 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 
 - 🛡 **Choque pesado — 18**: más daño, empujar, atrapar, guardia, salto, barrido, desarmar, golpe anunciado, remate, romper armadura · de El origen:
   furia, pisotón, provocar, segundo aliento, aguantar el daño, cubrir al de al lado, perforar, carga que derriba.
-- 🗡 **Choque liviano — 14**: golpe preciso, sangrado, trabar, golpear y alejarse, salto, abrir la herida, manada, ráfaga, por la espalda · de El origen:
-  robar, sigilo, varios golpes, bajo tierra, veneno (de fábrica desde el 2026-10-25: Hoja envenenada / Mordisco infectado).
+- 🗡 **Choque liviano — 15**: golpe preciso, sangrado, trabar, golpear y alejarse, salto, abrir la herida, manada, ráfaga, por la espalda · de El origen:
+  robar, sigilo, varios golpes, bajo tierra, veneno (de fábrica desde el 2026-10-25: Hoja envenenada / Mordisco infectado), todo al ataque (Degollar, 2026-10-26).
 - 🏹 **Rango y Hunter — 15**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar, mantener a raya (2026-10-25), atravesar (Flecha que atraviesa, 2026-10-25), disparos encadenados (Ráfaga encadenada, 2026-10-25), disparar y replegarse (Disparo y repliegue, 2026-10-26) · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 15**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25), lluvia de escarcha (2026-10-25), andanada arcana (2026-10-25), misiles elementales (2026-10-25), portal trampa (2026-10-25), sanguijuela (2026-10-26) · de El origen: proyectil, fuego con quemadura.
@@ -41,7 +41,7 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
 **Para emparejar** (regla del dueño, 2026-10-25: «empezamos a tener en cuenta todos los roles de creep e ir emparejándolos… para que estén todos
-avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Choque liviano en 14; Mago, Rango + Hunter, Debuffer y Support en 15; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
+avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Mago, Rango + Hunter, Debuffer, Support y Choque liviano en 15; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
 
 ## Los roles
 
@@ -203,7 +203,7 @@ rodilla, Tarascón al tobillo), las redes; y en el mapa, el sigilo, el +1 por la
 33. **Distraer**: el objetivo pierde su ataque de oportunidad contra los aliados.
 
 **I. Apuestas** ✦
-34. **Todo al ataque**: pega mucho más, sin Evasión hasta su próximo turno.
+34. ✅ **Todo al ataque** — **Degollar** (2026-10-26, el del Asalto: +4 PdG, +7 al daño, +1 a los dos críticos; termina su turno, pasa al final del orden y queda Expuesto): pega mucho más, sin Evasión hasta su próximo turno.
 35. **Golpe desesperado**: con poca vida, un golpe con mucho más crítico.
 
 **Skills de clase, para tener en cuenta** (2026-10-26, dueño: «incorporá a la lista los skills de clase, para tener en cuenta. Eso en todos los
@@ -215,7 +215,7 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
 - **Invi** (en pausa): SP 5. Invisible por Invi × 2 turnos. Se detecta con Percepción (ESP). El rango depende de la velocidad: normal (1 No2 por casillero) flor de diámetro 7 (37 casillas); lenta (2 No2 por casillero) flor de diámetro 5 (19 casillas).
 - ≈ **Envenenar arma** → Arma venenosa (Support) y Hoja envenenada: «Envenenar arma [2] — Mejora el arma con veneno que le otorga +3 fijo al daño y aplica 3 stacks de veneno. Duración: 2 ataques.»
 - **Backstab** (en pausa): SP 2. Únicamente por la espalda. +5 daño fijo. Ignora 1 de resistencia a crítico.
-- **Degollar**: «Degollar [7] — Ataque devastador con +4 de PG, +7 de daño y +1 al crítico. Interrumpe su turno y se pasa al final de la tabla de iniciativa. Hasta su próximo turno pierde 50% de evasión y no puede usar No2 para responder a…»
+- ✅ **Degollar** → Degollar: «Degollar [7] — Ataque devastador con +4 de PG, +7 de daño y +1 al crítico. Interrumpe su turno y se pasa al final de la tabla de iniciativa. Hasta su próximo turno pierde 50% de evasión y no puede usar No2 para responder a…»
 - **Sprint**: «Sprint [1] — 2 No2: avanza 3 casillas.»
 - **Tronco de huída**: «Tronco de huída [2] — +2 fijo a una tirada de evasión con giro.»
 - **Robar SP** (en pausa): SP 1. Ganás 2 SP por cada crítico obtenido.
@@ -352,7 +352,7 @@ líneas, zonas, el rayo en cadena y los charcos, los controles mentales.
     pisarlas [Varita de espinas]. 24. **Muro o pilares** ✦: levantar piedra que tapa el paso y la vista (control del terreno) [Varita del muro, Varita de
     los pilares]. 25. ✅ **Portal trampa** ✦ (2026-10-25: sin daño; llega Expuesto): un portal oculto que manda a quien lo pisa a otra casilla, lejos (Res.Esp para aferrarse) [Varita de la trampa
     portal]. 26. **Lazo arcano**: lo atrae unas casillas hacia el mago, salvo que gane con Fuerza [Varita del gancho]. 27. **Desarmar con magia**: el arma
-    se le escapa y vuela (Fuerza para aferrarse) [Expelliarmus]. 28. ✅ **Sanguijuela** (2026-10-26, dueño: PdG contra Evasión, 2d6 siniestro, se cura la mitad; queda pegada 4 turnos —no se cura— y se la arranca con Fuerza contra su Ef.Esp): daño y se cura la mitad [Varita sanguijuela]. 29. **Cosecha**: lo
+    se le escapa y vuela (Fuerza para aferrarse) [Expelliarmus]. 28. ✅ **Sanguijuela** (2026-10-26, dueño: PdG.Esp contra Evasión, 2d6 siniestro, se cura la mitad; queda pegada 4 turnos —no se cura— y se la arranca con Fuerza contra su Ef.Esp): daño y se cura la mitad [Varita sanguijuela]. 29. **Cosecha**: lo
     marca; si muere marcado, el mago recupera SP y vida [Varita de la cosecha]. 30. **Magia inestable** (variante de la Sobrecarga): más daño, pero si sale
     un 1 se lastima [Varita inestable, Orbe salvaje].
 - **Debuffer:** ver el listado completo abajo (§ 6).

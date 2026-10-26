@@ -68,8 +68,9 @@ avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene
 - **¡Al frente!** (de la lista, «llevarlo al lado de un rival» ✦; dueño, 2026-10-26: «la siguiente es esa de llevar al lado de un rival»): a un aliado en
   su Rango (no él): lo teletransporta a una casilla libre **pegada a un rival**, a 4 o menos de donde estaba (el GM marca al aliado y la casilla; solo
   sirven las libres pegadas a un rival); no camina (sin oportunidad, sin pisar trampas ni zonas en el camino, sin No2), lo de la casilla de llegada sí lo
-  toca; los pulsos del teleport. Al llegar, **+1 PdG en su próximo ataque** (hasta el final de su próximo turno). 2 No2 y 3 SP, o cooldown 3; no es Flash.
-  *(A confirmar:)* la distancia (4 o su Rango); si también sirve para alejar a un aliado (a cualquier casilla libre, sin el +1); el nombre.
+  toca; los pulsos del teleport. **Siempre al lado de un rival, a 4 o menos** (dueño, 2026-10-26: «4 está bien. No, que sea siempre al lado de un rival y
+  que dé más 2 a la probabilidad de golpe y más 2 a la evasión hasta el final de su próximo turno»): al llegar, **+2 PdG y +2 Evasión hasta el final de su
+  próximo turno**. 2 No2 y 3 SP, o cooldown 3; no es Flash. *(A confirmar:)* el costo; el nombre.
 
 ## Los roles
 

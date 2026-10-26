@@ -545,7 +545,7 @@ Inmovilizado, Rengo, Desarmado; y, de personajes, Enyetar.
 27. **Robar el turno**: pierde su próximo turno (muy caro).
 
 **H. Sacadas de las varitas** (2026-10-25, a pedido del dueño: «hacé una comparación con las varitas y báculos que diseñamos y fijate si hay alguna idea que no esté en los skills… cosas más de control, por ejemplo portal, y un poco de support, por ejemplo levitar»). Entre corchetes, la varita o el equipo de donde sale.)
-28. ✅ **Nube tóxica** ✦ (2026-10-26: la de clase del Debuffer, con 1d4 tóxico directo; Veneno 3, 3 turnos, solo a sus rivales): una nube que queda en el piso y envenena a quien está adentro o entra [Varita de miasma].
+28. ✅ **Nube tóxica** ✦ (2026-10-26, afinada el mismo día: 2d4 tóxico directo y Veneno 3, 4 turnos, solo a sus rivales; quedarse adentro le vuelve el Veneno a 3): una nube que queda en el piso y envenena a quien está adentro o entra [Varita de miasma].
 29. **Suelo de aceite**: un área donde se resbala y queda Sentado [Varita del aceite].
 30. **Arena movediza** ✦: un área bajo los pies (no se esquiva) que deja Inmovilizado; soltarse cuesta [Varita de arena movediza].
 31. **Destello**: un área de luz que deja Pajaritos [Varita del destello].

@@ -1183,7 +1183,8 @@ const Combatiente = (() => {
     const ya = (estados || []).find(e => e.esVeneno && e.nombre === nuevo.nombre);
     if(!ya) return null;
     if(!nuevo.permanente){
-      ya.stacks = Math.max(1, n(ya.stacks) || 1) + Math.max(1, n(nuevo.stacks) || 1);
+      // `resetea` (2026-10-26, la Nube tóxica: quedarse adentro le resetea el Veneno): vuelve a esos stacks si tenía menos, no los suma.
+      ya.stacks = nuevo.resetea ? Math.max(Math.max(1, n(ya.stacks) || 1), Math.max(1, n(nuevo.stacks) || 1)) : Math.max(1, n(ya.stacks) || 1) + Math.max(1, n(nuevo.stacks) || 1);
       ya.turnos = ya.stacks;
       ya.activo = true;
     }

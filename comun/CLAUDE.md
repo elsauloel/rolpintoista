@@ -1709,3 +1709,6 @@ versión parecida en más de una, es candidato a juntar.
 - **Zona que tira una sola vez** (2026-10-26, la Nube tóxica): `unaVez: true` adentro del `zonaEstado` de una zona con daño → una vez que el estado le
   entró a alguien (`zonaResueltos`), la zona ya no le tira ni le hace daño (vtt-hexgrid/js/08 `zonaLeFalta`). Sin la marca, una zona con daño sigue
   revisándose siempre (el fuego).
+  Con `resetea: true` además (2026-10-26, dueño): al que ya tiene el estado y sigue adentro al pasar de ronda (o vuelve a entrar), sin tirada ni daño,
+  el estado vuelve a sus stacks (`Combatiente.acumularVeneno` no suma si el nuevo trae `resetea`; lo conservan `EstadosAplicar` y `FichaAcciones.estadoDeSpec`);
+  si ya no lo tiene, le vuelve a tirar.

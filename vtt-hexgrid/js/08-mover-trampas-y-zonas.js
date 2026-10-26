@@ -361,7 +361,8 @@ function zonaLeFalta(el, t){
   if(el.trampa) return !(el.zonaResueltos || []).includes(zonaClave(el, t));
   // `unaVez` (adentro del JSON de zonaEstado; 2026-10-26, la Nube tóxica: «una vez envenenado, la nube ya no le vuelve a tirar»): con el estado
   // ya puesto, tampoco el daño.
-  if(el.zonaEstado && (el.zonaResueltos || []).includes(zonaClave(el, t))){ let e = {}; try{ e = JSON.parse(el.zonaEstado) || {}; }catch(x){} if(e.unaVez) return false; }
+  // Con `resetea` (2026-10-26, dueño): si ya no tiene el estado (se lo curó, se le terminó), le vuelve a tirar.
+  if(el.zonaEstado && (el.zonaResueltos || []).includes(zonaClave(el, t))){ const e = zonaSpecDe(el); if(e.unaVez && !(e.resetea && !zonaTieneEstado(t, e.nombre))) return false; }
   if(el.zonaDano || el.zonaDanoDif) return true;
   if(el.zonaLuz && typeof luzSinLuz === 'function' && luzSinLuz(el)){ let e = {}; try{ e = JSON.parse(el.zonaEstado || '{}') || {}; }catch(x){} if(!e.nombre) return false; }   // (la bombucha de talco: solo revela)
   if(el.zonaEstado && !(el.zonaResueltos || []).includes(zonaClave(el, t))) return true;
@@ -411,19 +412,31 @@ const tocaElPiso = el => alturaDe(el) !== 'aire';
 // `desdeMantenimiento`: las zonas con zonaEnMantenimiento === false (las púas: "no mientras estás parado") no se
 // chequean acá — solo al caminar (ver zonaRevisarEntrada). `flotando`: terminó el movimiento levitando (las del piso, todavía no);
 // `soloPiso`: al aterrizar, solo las del piso (las del aire ya las vio al moverse).
-function zonaRevisarToken(t, desdeMantenimiento, flotando, soloPiso){
+// `desde`: la casilla de la que salió el movimiento (para saber si ENTRÓ a la zona o ya estaba adentro).
+function zonaRevisarToken(t, desdeMantenimiento, flotando, soloPiso, desde){
   if(!t || !zonaEsMia(t) || etereoDe(t)) return;
   elementos.forEach(el => {
-    if(!el.zona || !zonaAplicaA(el, t) || !zonaLeFalta(el, t)) return;
+    if(!el.zona || !zonaAplicaA(el, t)) return;
     const sup = typeof superficieSpec === 'function' ? superficieSpec(el) : null;
     if(sup && sup.tiraPaso) return;   // el hielo: al aparecer y por cada paso (zonaRevisarEntrada), no por estar parado
     if(desdeMantenimiento && el.zonaEnMantenimiento === false) return;
     if((flotando || (typeof vuelaToken === 'function' && vuelaToken(t))) && alturaDe(el) === 'piso') return;   // 🕊 quien vuela (Levitando, Vuela) no toca lo del piso, tampoco parado (2026-10-26)
     if(soloPiso && alturaDe(el) !== 'piso') return;
-    if(!celdasDeElemento(el).some(c => c.col === t.col && c.fila === t.fila)) return;
+    const cs = celdasDeElemento(el), enZona = c => cs.some(x => x.col === c.col && x.fila === c.fila);
+    if(!enZona(t)) return;
+    // ☠ Resetea (2026-10-26, la Nube tóxica, dueño): al que ya tiene el estado de la zona y sigue adentro al pasar de ronda (o vuelve a entrar),
+    // sin tirada ni daño, el estado vuelve a sus stacks (no se suman).
+    const e = zonaSpecDe(el);
+    if(e.resetea && e.nombre && (el.zonaResueltos || []).includes(zonaClave(el, t)) && zonaTieneEstado(t, e.nombre)){
+      if(desdeMantenimiento || (desde && !enZona(desde))) zonaRenovarEstado(t, {nombre: e.nombre, ...(e.stacks ? {stacks: e.stacks} : {}), ...(e.turnos ? {turnos: e.turnos} : {}), resetea: true}, el, 'resetea');
+      return;
+    }
+    if(!zonaLeFalta(el, t)) return;
     zonaEncolar(el, t);
   });
 }
+const zonaSpecDe = el => { try{ return JSON.parse(el.zonaEstado || '{}') || {}; }catch(x){ return {}; } };
+const zonaTieneEstado = (t, nombre) => (typeof confusionEstadosDe === 'function' ? confusionEstadosDe(t) : []).some(x => x && x.activo !== false && x.nombre === nombre);
 // Al soltar un movimiento: para la mayoría de las zonas alcanza con mirar dónde terminó. Las de zonaCadaPaso
 // (púas: se disparan aunque solo se las cruce, sin quedarse) además cuentan cualquier casillero cruzado que sea
 // suyo y venga de uno que no lo era — mismo conteo que ya usa 🔥, una sola vez por movimiento (no por casillero).
@@ -466,10 +479,11 @@ function zonaRevisarEntrada(id, celdas, levita){
     if(!confusionEstadosDe(t).some(e => e && e.activo !== false && e.nombre === spec.nombre)) return;
     zonaRenovarEstado(t, spec, el);
   });
-  zonaRevisarToken(t, false, !!(celdas && celdas.length > 1 && lev >= celdas.length - 1));   // si todo el camino fue levitando, lo del piso todavía no
+  zonaRevisarToken(t, false, !!(celdas && celdas.length > 1 && lev >= celdas.length - 1), false, celdas && celdas.length > 1 ? celdas[0] : null);   // si todo el camino fue levitando, lo del piso todavía no
 }
-async function zonaRenovarEstado(t, spec, el){
+async function zonaRenovarEstado(t, spec, el, como){
   const nombre = el.zonaNombre || 'la zona';
+  if(como === 'resetea') return zonaResetearEstado(t, spec, el, nombre);
   try{
     if(t.tipo === 'creep') await modificarCreep(t.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
     else await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec, origen: nombre});
@@ -484,6 +498,21 @@ async function zonaRenovarEstado(t, spec, el){
         formula: '', rolls: [], mod: 0, total: 0, desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()});
     }catch(err){}
   }catch(err){ console.error('No se pudo renovar el estado de la zona:', err); }
+}
+// ☠ El estado que la zona le resetea a quien sigue adentro (la Nube tóxica): sin tirada; Crónica y Mesa (un oculto, solo esta pantalla).
+async function zonaResetearEstado(t, spec, el, nombre){
+  try{
+    if(t.tipo === 'creep') await modificarCreep(t.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
+    else await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec, origen: nombre});
+    const vuelve = spec.stacks ? `vuelve a ${spec.stacks} stack${spec.stacks === 1 ? '' : 's'}` : `vuelve a ${spec.turnos || ''} turnos`;
+    if(t.oculto){ toast(`${nombre}: ${spec.nombre} ${vuelve}`); return; }
+    const quien = nombreDe(t);
+    momentoAbrir({tipo: 'zona-renueva', icono: '☠', titulo: `${quien} sigue en ${nombre}`, resultado: `Seguir adentro le resetea el ${spec.nombre}: ${vuelve} (sin tirada).`, estado: 'listo', datos: {}});
+    try{
+      await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '', origen: `☠ ${nombre}: ${quien} sigue adentro — su ${spec.nombre} ${vuelve}`,
+        formula: '', rolls: [], mod: 0, total: 0, desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()});
+    }catch(err){}
+  }catch(err){ console.error('No se pudo resetear el estado de la zona:', err); }
 }
 function zonaRevisarMantenimiento(){ tokens.forEach(t => zonaRevisarToken(t, true)); }
 // Una zona recién puesta que «aparece bajo los pies» (2026-10-08, campo de estática, arena movediza Buena, luz flotante): cada pantalla revisa sus

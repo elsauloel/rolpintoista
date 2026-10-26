@@ -35,6 +35,7 @@ const EstadosAplicar = (() => {
     if(s.item) out.item = String(s.item).slice(0, 64);   // el ítem al que se le da el desgaste (nombre: 'Desgaste')
     if(s.secreto) out.secreto = true;   // 🫳 un robo en sigilo (2026-10-14): se descuenta callado y se avisa al empezar su turno
     if(s.stacks) out.stacks = Math.max(1, Math.min(20, Math.round(Number(s.stacks) || 1)));
+    if(s.resetea) out.resetea = true;   // ☠ vuelve a esos stacks, no los suma (la Nube tóxica, 2026-10-26)
     // Vida extra (2026-09-28): HP de una barra secundaria que absorbe daño antes que el HP real —
     // ver BUFFS. Un valor explícito manda sobre el del preset (se resuelve en `componer`).
     if(s.escudoMagico) out.escudoMagico = Math.max(0, Math.round(Number(s.escudoMagico) || 0));
@@ -73,7 +74,8 @@ const EstadosAplicar = (() => {
       ...(s.permanente ? {permanente: true} : {}), ...(s.marcadoPor ? {marcadoPor: s.marcadoPor, marcadoToken: s.marcadoToken} : {}), ...(s.marca ? {marca: s.marca, marcaNombre: s.marcaNombre} : {}),
       ...(s.miedoDe ? {miedoDe: s.miedoDe, miedoDeNombre: s.miedoDeNombre} : {}),
       ...(s.provocaDe ? {provocaDe: s.provocaDe, provocaDeNombre: s.provocaDeNombre} : {}),
-      ...(s.muerdeA ? {muerdeA: s.muerdeA, muerdeANombre: s.muerdeANombre, desde: s.desde} : {})};
+      ...(s.muerdeA ? {muerdeA: s.muerdeA, muerdeANombre: s.muerdeANombre, desde: s.desde} : {}),
+      ...(s.resetea ? {resetea: true} : {})};
   }
 
   // Inmunidades del que recibe el estado: la regla vive en comun/combatiente.js (la misma para ficha, gm-tools y mapa).

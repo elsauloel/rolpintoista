@@ -976,6 +976,7 @@ const FichaAcciones = (() => {
     if(spec.marcadoPor){ draft.marcadoPor = spec.marcadoPor; draft.marcadoToken = spec.marcadoToken || ''; }
     if(spec.miedoDe){ draft.miedoDe = spec.miedoDe; draft.miedoDeNombre = spec.miedoDeNombre || ''; }
     if(spec.provocaDe){ draft.provocaDe = spec.provocaDe; draft.provocaDeNombre = spec.provocaDeNombre || ''; }   // 😤 Provocado por quién (2026-10-26)   // 😱 Miedo (2026-10-18): quién lo asustó
+    if(spec.resetea) draft.resetea = true;   // ☠ vuelve a esos stacks, no los suma (la Nube tóxica, 2026-10-26)
     return draft;
   }
   function aplicarEstadoRecibido(S, spec, origen, ui){

@@ -135,6 +135,9 @@
 >   ciclo de habilidades de creep. Hoy hay siete elementos (arcano, fuego, hielo, rayo, tóxico, ácido y, desde el 2026-10-26, ☀ luz y 🌑 siniestro: P221)
 >   pero el catálogo está muy cargado de arcano y fuego (40 y 13 ítems con ese daño; ácido y tóxico, 2 cada uno; luz y siniestro, ninguno). Repasar varitas,
 >   báculos, orbes, talismanes, skills de clase y de creep, y las resistencias del equipo defensivo, para que cada elemento tenga su lugar (y su contra).
+> - [ ] **😤 Provocar para un aliado, habilidad de Support para creeps (2026-10-26, idea del dueño):** elige un aliado (el tanque); los rivales alrededor de
+>   ese aliado tiran Res.Mt contra el Ef.Esp del support y, si no la resisten, quedan Provocados por ese aliado N turnos. Detalle en `docs/diseno-roles-creep.md`
+>   (Support, idea 4c). Para automatizarlo, el Provocado tiene que guardar quién provocó (hoy es «a mano»).
 > - [ ] **🗡🌑 Arma sombría, habilidad de Support para creeps (2026-10-26, dueño: «pensemos para futuro, un encantamiento… algo así como arma sombría, que le
 >   suma el mismo efecto de este skill [la Aguja siniestra] al ataque de un aliado durante X cantidad de turnos… lo vamos a dar al support»):** a un aliado en
 >   su Rango, sus golpes con arma dejan Punto débil (−1 a las resistencias a crítico) durante unos turnos, como las Armas elementales. Detalle en

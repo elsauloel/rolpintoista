@@ -398,6 +398,10 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
 3. ✅ **Arma elemental**: el arma de un aliado pega de fuego, hielo o rayo por unos turnos — **Arma ígnea / helada / eléctrica / ácida / venenosa**
    (2026-10-21: +1d4 del elemento por golpe, 3 turnos, y lo de la Carga Elemental).
 4. **Filo envenenado / sangrante**: los golpes de un aliado dejan Veneno o Sangrado.
+4c. **Provocar para un aliado** (idea del dueño, 2026-10-26: «elija algún aliado y hay algún efecto en área alrededor de ese aliado que todos los que son afectados
+    tienen que tirar resistencia mental para no ser provocados por el aliado que selecciona el support, y quedarían provocados durante N cantidad de turnos»):
+    elige un aliado en su Rango (el tanque); los rivales a 2 casillas o menos de él tiran Res.Mt contra el Ef.Esp del support y, si no la resisten, quedan
+    Provocados por ese aliado N turnos. Ojo: hoy el Provocado es «a mano» (no guarda quién provocó); para automatizarlo hace falta que lo sepa.
 4b. **Arma sombría** ⏸ (para más adelante; dueño, 2026-10-26: «un encantamiento que le puede dar a un arma de un aliado… que le suma el mismo efecto de este skill [la Aguja siniestra] al ataque de un aliado durante X cantidad de turnos… lo vamos a dar al support»): a un aliado en su Rango, sus golpes con arma dejan Punto débil (−1 a las resistencias a crítico) unos turnos, como las Armas elementales.
 5. ✅ **Ojo certero** (2026-10-24): a él o a un aliado en su Rango, Crítico frecuente +2 y Crítico potente +2 durante 2 turnos completos de quien lo
    recibe (la marca `turnosCompletos`: el turno en que se lo dan no cuenta, aunque sea el suyo).

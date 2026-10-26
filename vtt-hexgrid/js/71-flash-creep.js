@@ -50,7 +50,7 @@ function flashCreepObjetivos(c){
     if(t.tipo !== 'creep' || t.bajoTierra) continue;
     const sc = id === c.id ? c.sc : creepPrivadoDe(t.fichaId);
     if(!sc || num(sc.hp) <= 0) continue;
-    if(id !== c.id && distanciaHex(c.t, t) > rng) continue;
+    if(id !== c.id && (distanciaHex(c.t, t) > rng || (c.h.blink && c.h.blink.soloYo))) continue;   // ✨ el Parpadeo: solo él (2026-10-26)
     out.push({id, t, mismo: id === c.id});
   }
   return out;

@@ -150,9 +150,13 @@ async function portalDeHabilidad(msg){
 /* El blink (2026-10-08, Varita del blink): quien la usa, o un aliado que ve (nada sólido en el medio), salta hasta `distancia` casillas a una casilla
    libre. Primero se elige a quién (clic sobre el token) y después adónde. Mover el token de otro jugador lo deja hacer el GM o su dueño: si no se
    puede, avisa (✋ a mano). */
+// `msg.casteadorTipo` 'creep' (el Parpadeo del Mago, 2026-10-26): quien lo usa es un creep; con `msg.soloYo`, salta él (sin elegir a quién);
+// `msg.alTerminar`, al terminar o cancelar (reabrir las Acciones).
 function blinkDeHabilidad(msg){
-  const yo = [...tokens.entries()].find(([, x]) => x.fichaId === msg.fichaId && x.tipo === 'pj');
-  if(!yo){ toast(`${msg.nombre || 'Blink'}: tu personaje no tiene token en el mapa`); return; }
+  const tipoYo = msg.casteadorTipo === 'creep' ? 'creep' : 'pj';
+  const yo = [...tokens.entries()].find(([, x]) => x.fichaId === msg.fichaId && x.tipo === tipoYo);
+  const fin = () => { if(typeof msg.alTerminar === 'function') msg.alTerminar(); };
+  if(!yo){ toast(`${msg.nombre || 'Blink'}: ${tipoYo === 'creep' ? 'el creep' : 'tu personaje'} no tiene token en el mapa`); fin(); return; }
   const dist = Math.max(1, Math.round(num(msg.distancia)) || 3), nom = msg.nombre ? esc(msg.nombre) + ': ' : '';
   if(!$('#botonera-capa').hidden) escapeABotonera();
   const adonde = (id, t) => elegirDestino(async h => {
@@ -161,18 +165,20 @@ function blinkDeHabilidad(msg){
     const desde = {col: t.col, fila: t.fila};
     try{
       await coleccionTokens().doc(id).update({col: h.col, fila: h.fila, ruta: firebase.firestore.FieldValue.delete()});
+      fin();
       momentoAbrir({tipo: 'blink', icono: '✨', titulo: `${msg.nombre || 'Blink'}: ${nombreDe(t)} salta`, resultado: `De donde estaba aparece ${distanciaHex(desde, h)} casilla${distanciaHex(desde, h) === 1 ? '' : 's'} más allá, en un parpadeo.`, estado: 'listo'});
     }catch(err){
       console.error('No se pudo hacer el blink:', err);
       toast(err && err.code === 'permission-denied' ? `No podés mover a ${nombreDe(t)}: que lo mueva su jugador o el GM (✋ a mano)` : 'No se pudo hacer el blink — revisá la consola');
     }
-  }, `<b>✨ ${nom}¿adónde salta ${esc(nombreDe(t))}?</b> <span>clic en una casilla libre a ${dist} o menos · Esc o clic derecho cancelan</span>`, true);
+  }, `<b>✨ ${nom}¿adónde salta ${esc(nombreDe(t))}?</b> <span>clic en una casilla libre a ${dist} o menos · Esc o clic derecho cancelan</span>`, true, fin);
+  if(msg.soloYo){ adonde(yo[0], yo[1]); return; }
   elegirDestino(h => {
     const e = [...tokens.entries()].find(([, x]) => x.col === h.col && x.fila === h.fila && !x.oculto);
     if(!e){ toast('Ahí no hay nadie: hacé clic sobre vos o sobre un aliado'); blinkDeHabilidad(msg); return; }
     const [id, t] = e;
     if(id !== yo[0]){
-      if(t.tipo === 'creep'){ toast('El blink es para vos o para un aliado'); blinkDeHabilidad(msg); return; }
+      if(dueloEsRival(yo[1], t)){ toast('El blink es para vos o para un aliado'); blinkDeHabilidad(msg); return; }
       if((solidosSet().size || hayParedes()) && !lineaLibre(yo[1], t, solidosSet())){ toast(`No ves a ${nombreDe(t)}: hay algo sólido en el medio`); blinkDeHabilidad(msg); return; }
     }
     adonde(id, t);

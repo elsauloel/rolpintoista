@@ -1097,6 +1097,10 @@ prueba('💥 Nova arcana (Mago, 2026-10-26): onda alrededor, PdG.Esp contra Evas
   igual([h.duelo.objetivo, h.duelo.radio, h.duelo.tira, h.duelo.contra.join(','), h.duelo.danoFormula, h.duelo.efectos[0].empuja, !!h.duelo.aliados, h.cd, e.etiquetas.includes('mago')],
     ['onda', 1, 'pdgmg', 'eva', '2d6', 2, false, 3, true]);
 });
+prueba('✨ Parpadeo (Mago, 2026-10-26): Flash, se teletransporta hasta 3 casillas (solo él)', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Parpadeo'), h = armarHabilidadDeCreep(e.datos, 2);
+  igual([!!h.flash, h.blink.distancia, !!h.blink.soloYo, h.modo, h.spCosto, h.cd, e.etiquetas.includes('mago')], [true, 3, true, 'auto', 2, 2, true]);
+});
 prueba('🎯 Aguja siniestra (Debuffer, 2026-10-26): PdG.Esp contra Evasión, 1d6 siniestro directo y Punto débil (−1 a las resistencias a crítico)', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Aguja siniestra'), h = armarHabilidadDeCreep(e.datos, 2);
   const P = estadosPresetCreep().find(p => p.nombre === 'Punto débil');

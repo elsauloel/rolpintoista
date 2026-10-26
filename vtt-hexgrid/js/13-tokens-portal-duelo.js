@@ -1820,7 +1820,7 @@ async function avisoColision(t, contra, faltan){
   const t1 = colisionTirar(contra || t, veces);
   if(t1) lineas.push(await colisionAplicar(t, t1, contra ? nombreDe(contra) : nombreDe(t), veces));
   if(contra){ const t2 = colisionTirar(t, veces); if(t2) lineas.push(await colisionAplicar(contra, t2, nombreDe(t), veces)); }
-  const cuenta = `Le falt${veces === 1 ? 'ó' : 'aron'} ${veces} casillero${veces === 1 ? '' : 's'}: ${veces} Constitución${veces === 1 ? '' : 'es'}${contra ? ' (cada uno, la del otro)' : ''}, menos la Defensa.`;
+  const cuenta = `Le falt${veces === 1 ? 'ó' : 'aron'} ${veces} casillero${veces === 1 ? '' : 's'}: ${veces} ${veces === 1 ? 'Constitución' : 'Constituciones'}${contra ? ' (cada uno, la del otro)' : ''}, menos la Defensa.`;
   const texto = `${nombreDe(t)} salió despedido y chocó contra ${contra ? nombreDe(contra) : 'algo sólido (un pilar, una pared)'}. ${cuenta} ${lineas.join(' · ') || '✋ Daño de colisión a mano.'}`;
   mesaLinea(`💥 ${texto}`, 'recordatorio');
   momentoAbrir({tipo: 'colision', icono: '💥', titulo: `Choque: ${nombreDe(t)}${contra ? ' contra ' + nombreDe(contra) : ''}`, resultado: texto, estado: 'listo',

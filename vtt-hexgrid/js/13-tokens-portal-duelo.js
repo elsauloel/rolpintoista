@@ -2124,6 +2124,7 @@ async function dueloAplicarEfectoBase(d, ef){
     const v = Combatiente.atrapaDeNombre((d.hab && d.hab.nombre) || (d.ataque && (d.ataque.habNombre || d.ataque.nombre)) || '');
     if(v) spec.soltar = {...spec.soltar, visual: v};
   }
+  if(spec.nombre === 'Provocado' && !spec.provocaDe && d.atacante.tokenId){ spec.provocaDe = d.atacante.tokenId; spec.provocaDeNombre = String(d.atacante.nombre || '').slice(0, 40); }   // 😤 por quién (el Taunt: quien lo usó; Tirar la bronca ya lo trae, js/77)
   if(spec.nombre === 'Miedo' && !spec.miedoDe && d.atacante.tokenId){ spec.miedoDe = d.atacante.tokenId; spec.miedoDeNombre = String(d.atacante.nombre || '').slice(0, 40); }   // 😱 a quién le tiene miedo
   if((spec.nombre === 'Mordido' || spec.nombre === 'Agarrado') && d.atacante.tokenId && typeof mordidaEmpezar === 'function') await mordidaEmpezar(d, spec);   // 🦷 quién lo tiene agarrado, y la bestia queda Mordiendo (js/54)
   // 🛡 Miti-Miti (Tanque, 2026-10-11): la marca queda en quien la usa, con a quién protege; el reparto del daño lo hace js/10 (mitiMitiDe).

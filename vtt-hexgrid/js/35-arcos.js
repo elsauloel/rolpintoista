@@ -193,7 +193,7 @@ function repeticionContar(e, mio, t, ataque){
   if(!mismo) return {txt: `🔁 ${nombreDe(mio)} cambió de arma o de blanco: se cortó la ${mio.tipo === 'creep' ? 'Ráfaga encadenada' : 'Repetición'}`, sacar: true};
   e.repHechos = num(e.repHechos) + 1; e.repArma = String(ataque.armaId || ''); e.repBlanco = t.id; e.stacks = Math.max(0, num(e.stacks) - 1);
   const nom = mio.tipo === 'creep' ? 'la Ráfaga encadenada' : 'la Repetición';
-  return {txt: e.stacks > 0 ? `🔁 ${nombreDe(mio)}: disparo ${e.repHechos} de ${nom} (el próximo, +${e.repHechos} PdG y +${e.repHechos} dado)` : `🔁 ${nombreDe(mio)}: último disparo de ${nom}`, sacar: e.stacks <= 0};
+  return {txt: e.stacks > 0 ? `🔁 ${nombreDe(mio)}: disparo ${e.repHechos} de ${nom} (el próximo, +${e.repHechos} PdG y +${e.repHechos} dado${e.repHechos === 1 ? '' : 's'})` : `🔁 ${nombreDe(mio)}: último disparo de ${nom}`, sacar: e.stacks <= 0};
 }
 async function repeticionGastar(mio, t, ataque){
   if(!mio || !t || !ataque || String(mio.fichaId).includes(SEP_INVOCACION) || !repeticionDe(mio)) return;
@@ -213,7 +213,7 @@ async function repeticionGastar(mio, t, ataque){
       const mismo = !num(e.repHechos) || (String(e.repArma || '') === String(ataque.armaId || '') && String(e.repBlanco || '') === t.id);
       if(!mismo){ S.efectos = S.efectos.filter(x => x !== e); txt = `🔁 ${nombreDe(mio)} cambió de arma o de blanco: se cortó la Repetición`; return ['efectos']; }
       e.repHechos = num(e.repHechos) + 1; e.repArma = String(ataque.armaId || ''); e.repBlanco = t.id; e.stacks = Math.max(0, num(e.stacks) - 1);
-      txt = e.stacks > 0 ? `🔁 ${nombreDe(mio)}: disparo ${e.repHechos} de la Repetición (el próximo, +${e.repHechos} PdG y +${e.repHechos} dado)` : `🔁 ${nombreDe(mio)}: último disparo de la Repetición`;
+      txt = e.stacks > 0 ? `🔁 ${nombreDe(mio)}: disparo ${e.repHechos} de la Repetición (el próximo, +${e.repHechos} PdG y +${e.repHechos} dado${e.repHechos === 1 ? '' : 's'})` : `🔁 ${nombreDe(mio)}: último disparo de la Repetición`;
       if(e.stacks <= 0) S.efectos = S.efectos.filter(x => x !== e);
       return ['efectos'];
     });

@@ -1815,6 +1815,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   paró con Parry o lo bloqueó, se queda; si no, sigue hasta el final.
 - **😤 Tirar la bronca y el Anuncio del Provocado** (2026-10-26, dueño; `js/77-provocado.js`): `provocarAliado(sc, h)` (desde `ui.provocarAliado` de js/12) pide el
   aliado (en su Rango, o él mismo) y lanza el área en cascada con el centro fijo en ese aliado (`dueloElegirAreaMapa({centroFijo})`), con el Provocado que lleva
-  `provocaDe`/`provocaDeNombre` (como el Miedo: duelo.js `limpiarSpec`, `EstadosAplicar`, `FichaAcciones`, el resumen de la ficha). El Anuncio es el de siempre
-  del Provocado (js/04 `provocadoAvisar`, al empezar su turno), que con `provocaDe` dice «Estás provocado por Fulano»; al Aceptar (js/16 `momentoAvisoCentro` →
+  `provocaDe`/`provocaDeNombre` (como el Miedo: duelo.js `limpiarSpec`, `EstadosAplicar`, `FichaAcciones`, el resumen de la ficha). El aviso de un personaje o una
+  invocación va como primer paso de «▶ Empieza tu turno» (js/04 `inicioTurnoPendiente`; al «✔ Aplicar», `inicioTurnoAplicar` hace brillar a quien provoca); el de un
+  creep, y el de un inicio aplicado sin ese reporte, es el Anuncio de siempre del Provocado (js/04 `provocadoAvisar`), que dice «Estás provocado por Fulano»; al Aceptar (js/16 `momentoAvisoCentro` →
   `provocadoBrilloPedir`), el momento `provocado-brillo` (js/16 → `provocadoBrilloRecibido`) hace brillar al que provoca en todas las pantallas hasta que pasa el turno (`provocadoDibujar`, js/05).

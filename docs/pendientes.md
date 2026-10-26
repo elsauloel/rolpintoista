@@ -146,6 +146,9 @@
 >   Lo mismo a la inversa, pero resistente»):** al elegir el objetivo (o el área) de una habilidad con daño elemental, cada token que le pega de más (la luz a
 >   un no-muerto o demonio, una debilidad a ese elemento) lleva una marca «DÉBIL» y el que lo frena (Res. a ese elemento, lo siniestro contra un no-muerto)
 >   «RESISTENTE», a la vista antes de confirmar. Base: `Combatiente.identidadElemento` y las resistencias elementales (`resistenciasDe`, js/13).
+> - [ ] **💨 El viento disipa gases y nubes (2026-10-26, dueño: «que los efectos de viento disipen gases y nubes»):** una habilidad, varita o zona
+>   de viento (Ráfaga de viento, Varita de la ventisca…) que pasa por una zona de gas o nube (las que dibuja `nubeColor`, vtt-hexgrid/js/50: tóxicas,
+>   humo, niebla, talco…) la saca del mapa en las casillas que toca (o entera). Para el futuro.
 > - [ ] **⬡ Seleccionar un hexágono libre y ver qué lo afecta (2026-10-26, dueño: «que uno pueda seleccionar un hexágono libre y que donde hoy muestra… el
 >   nombre, que diga hexágono libre… si ese hexágono está siendo afectado por algún efecto público, por ejemplo, algún aura, algún muro, alguna zona… que te
 >   permita ver también los distintos efectos aplicados a ese hexágono. Déjalo en pendientes y después lo desarrollamos»):** un clic en una casilla sin token

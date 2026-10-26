@@ -1706,3 +1706,6 @@ versión parecida en más de una, es candidato a juntar.
   vez). Un efecto de daño mágico puede llevar `mult` (fuego), `porDano` (hielo, ácido, tóxico) y `cadena` (rayo): los conserva `EfectosGolpe.normalizar`,
   `Duelo.guardarDano` los pasa a `dano.magico` y el mapa los aplica (js/13). `specArma` reconoce «Parálisis» (1 turno). Una habilidad de creep con
   `cuentaComoAtaque` es su acción de ataque del turno (`armarHab` la copia; el mapa, js/58).
+- **Zona que tira una sola vez** (2026-10-26, la Nube tóxica): `unaVez: true` adentro del `zonaEstado` de una zona con daño → una vez que el estado le
+  entró a alguien (`zonaResueltos`), la zona ya no le tira ni le hace daño (vtt-hexgrid/js/08 `zonaLeFalta`). Sin la marca, una zona con daño sigue
+  revisándose siempre (el fuego).

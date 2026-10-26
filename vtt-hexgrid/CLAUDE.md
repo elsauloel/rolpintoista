@@ -1657,7 +1657,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   las trampas) y la Parálisis con el doble de chance (comun/duelo.js `aguaParalisis`; el salto, js/13); el fuego lo seca (`aguaRevisarFuego`, el GM).
   Resbalarse en el hielo lo deja en esa casilla y le devuelve los No2 de los pasos que no dio. **Nubes**: una zona de gas (tóxica, o «gas, nube,
   humo, miasma, pedos, esporas, vapor, niebla» en el nombre) y la niebla de una varita se dibujan como una mancha de borde desparejo y borroso
-  (`nubeColor`, `nubeDibujar`: verde lo tóxico, violeta el resto de los gases, gris la niebla).
+  (`nubeColor`, `nubeDibujar`: verde lo tóxico, violeta el resto de los gases, gris la niebla). Con una línea punteada tenue en el borde exacto de sus casillas (2026-10-26, dueño: la mancha se puede salir un poco sin dudas de qué toca).
   **Fuego**: el terreno incendiado y las zonas de fuego (`esFuego`, también la zona de una trampa de fuego) se dibujan con una textura propia
   (`fuegoDibujar`: mancha de brasas, resplandor que titila y chispas que suben; reemplaza las llamitas 🔥).
   **⚡💧 El rayo corre por el agua** (dueño, 2026-10-17): en el duelo, si el golpeado está en un charco, el mismo golpe eléctrico (de una

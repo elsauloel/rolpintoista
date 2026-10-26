@@ -289,8 +289,9 @@ const CreepAcciones = (() => {
     if(num(it.curahp)){
       const boticario = num(it.curahp) > 0 ? num(C().modTotal(sc, 'boticario')) : 0;   // Mano de boticario (2026-10-05)
       const tope = num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, antes = num(sc.hp);
-      sc.hp = Math.max(0, Math.min(tope, antes + Combatiente.curaQueEntra(antes, num(it.curahp) + boticario, sc.estados)));   // 🌑 con una herida que no deja curarse, la cura no entra
-      partes.push(`${num(it.curahp) >= 0 ? '+' : ''}${fmt(num(it.curahp) + boticario)} HP`);
+      const entra = Combatiente.curaQueEntra(antes, num(it.curahp) + boticario, sc.estados);
+      sc.hp = Math.max(0, Math.min(tope, antes + entra));   // 🌑 con una herida que no deja curarse, la cura no entra
+      partes.push(num(it.curahp) > 0 && !entra ? `❌ ${antes > 0 ? 'no se cura (Herida sombría o Sanguijuela)' : 'está caído: una cura no lo levanta'}` : `${num(it.curahp) >= 0 ? '+' : ''}${fmt(num(it.curahp) + boticario)} HP`);
     }
     const ef = efectoDeHab(sc, it, presets);
     if(ef.estado){ if(C().modsAfectanHp(ef.estado.mods)) C().actualizarHpMaxPorCon(sc); partes.push(`${ef.estado.nombre}${ef.estado.permanente ? '' : ` (${fmt(ef.estado.turnos)} turnos)`}`); }

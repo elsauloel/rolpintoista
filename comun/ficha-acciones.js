@@ -372,10 +372,11 @@ const FichaAcciones = (() => {
       // abierta hpmax es 0 y eso mataba al personaje de una).
       // Mano de boticario (2026-10-05): suma a lo que cura una poción.
       const boticario = num(it.curahp) > 0 ? num(FichaCalculo.calcular(S).final.boticario) : 0;
+      let curaNo = '';   // 🌑 la cura no entró (2026-10-26, visto en el mapa: con Sanguijuela el aviso decía «+25 HP» y la vida no subía)
       if(num(it.curahp)){
         const entra = Combatiente.curaQueEntra(S.hp, num(it.curahp) + boticario, S.efectos);
         if(entra) ui.fijarHp(num(S.hp) + entra);
-        else if(num(it.curahp) > 0) ui.toast(`${it.nombre}: ${num(S.hp) > 0 ? Combatiente.SIN_CURA_TXT : Combatiente.CAIDO_TXT}`);   // 🌑 Herida sombría / Sanguijuela
+        else if(num(it.curahp) > 0) curaNo = num(S.hp) > 0 ? 'no se cura (Herida sombría o Sanguijuela)' : 'está caído: una cura no lo levanta';   // 🌑 Herida sombría / Sanguijuela
       }
       const efecto = ui.efecto(it);
       // 📜 A todo el grupo (dueño, 2026-10-19: Buena Fortuna, Inmunidad a CC, Blindaje): el mismo estado a los aliados (el mapa los conoce).
@@ -401,7 +402,8 @@ const FichaAcciones = (() => {
       const curadosTxt = curados ? (curados.sacados.length ? `🩹 se le fue: ${curados.sacados.join(', ')}` : '🩹 no tenía nada que curar') : '';
       ui.cambio([key, ...(efecto || reparados || (curados && curados.sacados.length) ? ['efectos'] : []), ...(it.invocaTemporal ? ['invocaciones'] : []), 'vitals', 'nitros']);
       const partes = [];
-      if(it.curahp) partes.push(`${num(it.curahp)>=0?'+':''}${fmt(num(it.curahp) + boticario)} HP${boticario ? ` (+${fmt(boticario)} de Mano de boticario)` : ''}`);
+      if(curaNo) partes.push(`❌ ${curaNo}`);
+      else if(it.curahp) partes.push(`${num(it.curahp)>=0?'+':''}${fmt(num(it.curahp) + boticario)} HP${boticario ? ` (+${fmt(boticario)} de Mano de boticario)` : ''}`);
       if(spRestaurado) partes.push(`+${fmt(spRestaurado)} SP`);
       partes.push(`-${costoNitros} No2${sac.saque && sac.saque.sale ? ' (Saque rápido)' : sac.bolsillo ? ' (Bolsillo exterior)' : sac.alquimista ? ' (Anillo del alquimista)' : ''}`);
       if(cargaMax > 1) partes.push(gastoUnidad ? 'última carga usada' : `carga ${carga}/${cargaMax}`);
@@ -412,7 +414,7 @@ const FichaAcciones = (() => {
       ui.toast(`${it.nombre}: ${partes.join(' · ')}`);
       // El anuncio (dueño, 2026-10-05: «se anuncia en el log y en la crónica»): una línea en la Mesa y, en el mapa, la Crónica para los demás.
       const quien = (S.meta && S.meta.nombre) || 'Alguien';
-      const publicas = [...(it.curahp ? [`${num(it.curahp) >= 0 ? '+' : ''}${fmt(num(it.curahp) + boticario)} HP`] : []), ...(efecto ? [efecto.nombre] : []), ...(revive ? [`✚ revive a ${revive.nombre}`] : []), ...(curados && curados.sacados.length ? [`🩹 se le fue ${curados.sacados.join(', ')}`] : [])];
+      const publicas = [...(curaNo ? [`❌ ${curaNo}`] : it.curahp ? [`${num(it.curahp) >= 0 ? '+' : ''}${fmt(num(it.curahp) + boticario)} HP`] : []), ...(efecto ? [efecto.nombre] : []), ...(revive ? [`✚ revive a ${revive.nombre}`] : []), ...(curados && curados.sacados.length ? [`🩹 se le fue ${curados.sacados.join(', ')}`] : [])];
       const resultado = [publicas.join(' · '), sac.saque ? sac.saque.txt : '', sac.alquimista ? '💍 Anillo del alquimista: no costó No2' : ''].filter(Boolean).join(' · ');
       const anuncio = {titulo: `${quien} usó ${it.nombre}`, resultado, texto: `🧪 ${quien} usó ${it.nombre}${resultado ? ': ' + resultado : ''}`, item: it.nombre, saqueSalio: !!(sac.saque && sac.saque.sale)};
       if(it.trampaDatos){}   // una trampa: ya la anunció TokensAuto (🎭 acción incierta para el rival, 2026-10-09)

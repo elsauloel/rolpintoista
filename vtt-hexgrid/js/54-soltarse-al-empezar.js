@@ -5,7 +5,10 @@
    saca el estado. Es la única tirada por turno (dueño, 2026-10-20: sin el botón de reintentar). La tirada va a la Mesa. Lo llama
    escucharIniciativa (js/04) cada vez que cambia el turno. */
 const soltarAlEmpezarHechos = new Set();   // token@paso: una sola vez por turno
-const soltarAlEmpezarDe = estados => (estados || []).find(e => e && e.activo !== false && e.soltar && e.soltar.alEmpezar && Combatiente.soltarNorm(e.soltar)) || null;
+// (Sin el que se termina en este mismo inicio de turno —le quedaba 1—: no hay de qué soltarse. 2026-10-26, visto en el mapa: con Inmovilizado
+// a 1 y una Sanguijuela, el cartel nombraba el Inmovilizado y la tirada era para la Sanguijuela.)
+const soltarSeVaAhora = e => !e.permanente && Math.round(num(e.turnos)) === 1;
+const soltarAlEmpezarDe = estados => (estados || []).find(e => e && e.activo !== false && e.soltar && e.soltar.alEmpezar && Combatiente.soltarNorm(e.soltar) && !soltarSeVaAhora(e)) || null;
 async function soltarAlEmpezarRevisar(){
   const o = iniciativa.orden[iniciativa.turno];
   const t = o && tokens.get(o.id);

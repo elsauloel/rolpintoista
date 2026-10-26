@@ -271,11 +271,22 @@ const FichaGuardado = (() => {
       if(base && /^FLASH\./.test(String(base.detalle || ''))) h.detalle = base.detalle;
     });
   }
+  // 💨 El Dash del Asalto (2026-10-26): la copia de antes (el movimiento a mano) toma la versión nueva del pool (el camino y el golpe en el mapa).
+  function migrarDash(S){
+    if(typeof CLASES_SKILLS === 'undefined') return;
+    (S.habilidades || []).forEach(h => {
+      if(!h || h.habClaseId !== 'asalto-dash' || h.dashMapa) return;
+      const base = CLASES_SKILLS.flatMap(c => c.habilidades || []).find(x => x.id === 'asalto-dash');
+      if(!base || !base.dashMapa) return;
+      ['detalle', 'nitrosCosto', 'efectoNombre', 'efectoTurnos', 'efectoMods', 'efectoDetalle', 'dashMapa', 'duelo', 'modo'].forEach(k => { if(base[k] !== undefined) h[k] = structuredClone(base[k]); });
+    });
+  }
   function completar(S, o){
     o = o || {};
     migrarEstadoIt2(S, o.spPorBono);
     migrarEstadoEspecial(S);
     migrarTextosFlash(S);
+    migrarDash(S);
     // Crítico frecuente (dueño, 2026-10-16): desde el 2026-09-25 es solo un bono (receta '0'); las fichas de antes lo sacaban de la Destreza.
     if(S.formulas && String(S.formulas.crit).trim() === 'des') S.formulas.crit = '0';
     if(S.nitros === null || S.nitros === undefined){

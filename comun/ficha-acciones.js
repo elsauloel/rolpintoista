@@ -1167,6 +1167,8 @@ const FichaAcciones = (() => {
       if(it.invoca && it.invoca.invId){ ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); return; }   // solo invoca: se anuncia (la invocación ya la hizo invocarConHab)
       ui.toast(`${it.nombre}: todavía no tiene armada la ejecución paso a paso (✨) — se ejecutó como semiautomática`); anunciarHabilidad(S, it, ui); tirarPrimeraDeHab(S, it, ui); return;
     }
+    // 💨 El Dash del Asalto (2026-10-26): el camino y el golpe al que atraviesa los hace el mapa (vtt-hexgrid/js/76).
+    if(it.dashMapa && ui.dash){ ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); ui.dash(it, arma); return; }
     const aArma = ataqueDeHabArma(S, it, arma, xSp, xNitros, ui);
     if(aArma){
       ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || '');

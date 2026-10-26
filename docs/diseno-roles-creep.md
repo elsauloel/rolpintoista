@@ -37,8 +37,8 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 
 - 🛡 **Choque pesado — 18**: más daño, empujar, atrapar, guardia, salto, barrido, desarmar, golpe anunciado, remate, romper armadura · de El origen:
   furia, pisotón, provocar, segundo aliento, aguantar el daño, cubrir al de al lado, perforar, carga que derriba.
-- 🗡 **Choque liviano — 16**: golpe preciso, sangrado, trabar, golpear y alejarse, salto, abrir la herida, manada, ráfaga, por la espalda · de El origen:
-  robar, sigilo, varios golpes, bajo tierra, veneno (de fábrica desde el 2026-10-25: Hoja envenenada / Mordisco infectado), todo al ataque (Degollar, 2026-10-26), finta (2026-10-26).
+- 🗡 **Choque liviano — 17**: golpe preciso, sangrado, trabar, golpear y alejarse, salto, abrir la herida, manada, ráfaga, por la espalda · de El origen:
+  robar, sigilo, varios golpes, bajo tierra, veneno (de fábrica desde el 2026-10-25: Hoja envenenada / Mordisco infectado), todo al ataque (Degollar, 2026-10-26), finta (2026-10-26), dash (2026-10-26).
 - 🏹 **Rango y Hunter — 17**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar, mantener a raya (2026-10-25), atravesar (Flecha que atraviesa, 2026-10-25), disparos encadenados (Ráfaga encadenada, 2026-10-25), disparar y replegarse (Disparo y repliegue, 2026-10-26), clavar a la pared (2026-10-26), tiro al arma (2026-10-26) · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 17**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25), lluvia de escarcha (2026-10-25), andanada arcana (2026-10-25), misiles elementales (2026-10-25), portal trampa (2026-10-25), prisión de hielo (2026-10-26), nova arcana (2026-10-26), ráfaga de viento (2026-10-26) · de El origen: proyectil, fuego con quemadura.
@@ -47,7 +47,7 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
 **Para emparejar** (regla del dueño, 2026-10-25: «empezamos a tener en cuenta todos los roles de creep e ir emparejándolos… para que estén todos
-avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Choque liviano en 16; Mago, Rango + Hunter, Debuffer y Support en 17; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
+avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Mago, Rango + Hunter, Debuffer, Support y Choque liviano en 17; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
 
 ## Los roles
 
@@ -215,7 +215,7 @@ rodilla, Tarascón al tobillo), las redes; y en el mapa, el sigilo, el +1 por la
 **Skills de clase, para tener en cuenta** (2026-10-26, dueño: «incorporá a la lista los skills de clase, para tener en cuenta. Eso en todos los
 tipos y clase»): las de Asalto, con el original tal cual (o, si no tiene, lo que hace hoy). ✅ = ya tiene su versión
 de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
-- **Dash**: «Dash [3] — NO2: (1 + Ataque). Avanza 3 casilleros en línea recta atravesando hasta 1 enemigo. Ataca a los enemigos que atraviesa. +2 fijo al parry. Se cancela si pierde una tirada de parry o bloqueo. Si atraviesa un enemigo de…»
+- ✅ **Dash** → Dash (y el del Asalto, automatizado en el mapa): «Dash [3] — NO2: (1 + Ataque). Avanza 3 casilleros en línea recta atravesando hasta 1 enemigo. Ataca a los enemigos que atraviesa. +2 fijo al parry. Se cancela si pierde una tirada de parry o bloqueo. Si atraviesa un enemigo de…»
 - ✅ **Lisiar** → Zarpazo (sin la Lesión): «Lisiar [2] — Ataque con +1 al crítico. Causa lesión de -1 de PG al objetivo durante 2 turnos. Critical Matters: si es crítico, cambia el efecto a -2 fijo a la PG por 2 turnos.»
 - ≈ **Tajear** → Tajo veloz: «Tajear [3] — Ataque con +1 al crítico. Deja heridas de 3 de daño por 3 turnos. Critical Matters: si es crítico, cambia el efecto a 5 de daño hasta curarse.»
 - **Invi** (en pausa): SP 5. Invisible por Invi × 2 turnos. Se detecta con Percepción (ESP). El rango depende de la velocidad: normal (1 No2 por casillero) flor de diámetro 7 (37 casillas); lenta (2 No2 por casillero) flor de diámetro 5 (19 casillas).

@@ -111,8 +111,8 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261023p8a', '../comun/ficha-botin.js?v=20261022p', '../comun/generador-tiendas.js?v=20261022q', '../comun/filtro-catalogo.js?v=20261026d', '../comun/ficha-tienda.js?v=20261022k', '../comun/ficha-mantenimiento.js?v=20261026d', '../comun/ficha-calculo.js?v=20261026d', '../comun/ficha-combate.js?v=20261015d', '../comun/skills-clase.js?v=20261023ag', '../comun/ficha-habilidades.js?v=20261020q',
-  '../comun/catalogo.js?v=20261023web', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261026d', '../comun/ficha-sesion.js?v=20261020zu', '../comun/ficha-botonera.js?v=20261023p8a', '../comun/ficha-resumen.js?v=20261026d', '../comun/inv-calculo.js?v=20261023p8a', '../comun/inv-botonera.js?v=20261023p8a', '../comun/inv-acciones.js?v=20261023ng', '../comun/inv-duelo.js?v=20261024bendecir', '../comun/ficha-acciones.js?v=20261026d', '../comun/inv-habilidades.js?v=20261023p8a', '../comun/inv-lupa.js?v=20261015a',
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261023p8a', '../comun/ficha-botin.js?v=20261022p', '../comun/generador-tiendas.js?v=20261022q', '../comun/filtro-catalogo.js?v=20261026d', '../comun/ficha-tienda.js?v=20261022k', '../comun/ficha-mantenimiento.js?v=20261026d', '../comun/ficha-calculo.js?v=20261026d', '../comun/ficha-combate.js?v=20261015d', '../comun/skills-clase.js?v=20261026o', '../comun/ficha-habilidades.js?v=20261020q',
+  '../comun/catalogo.js?v=20261023web', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261026o', '../comun/ficha-sesion.js?v=20261020zu', '../comun/ficha-botonera.js?v=20261023p8a', '../comun/ficha-resumen.js?v=20261026d', '../comun/inv-calculo.js?v=20261023p8a', '../comun/inv-botonera.js?v=20261023p8a', '../comun/inv-acciones.js?v=20261023ng', '../comun/inv-duelo.js?v=20261024bendecir', '../comun/ficha-acciones.js?v=20261026o', '../comun/inv-habilidades.js?v=20261023p8a', '../comun/inv-lupa.js?v=20261015a',
   '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261024bendecir', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261014e'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -794,6 +794,28 @@ function bnHabUi(){
     dueloDisponible: () => !!(typeof Duelo !== 'undefined' && Duelo.disponible() && bnPuedeGuardar()),
     puedeEscribir: () => bnPuedeGuardar(),
     elegirObjetivo: cfg => bnElegirObjetivo(cfg),
+    // 💨 el Dash del Asalto (js/76, 2026-10-26): el camino; si atraviesa a un rival, paga lo de un ataque con su arma y le pega (objetivo fijo).
+    dash: (it, arma) => {
+      const fichaId = bn.fichaId, tk = [...tokens.entries()].find(([, x]) => x.tipo === 'pj' && x.fichaId === fichaId);
+      if(!tk){ toast(`${it.nombre}: tu personaje no tiene token en este mapa`); return; }
+      const reabrir = () => { if(bn && bn.fichaId === fichaId){ bn.host.hidden = false; bnUbicar(); bnDibujar(); } };
+      bn.host.hidden = true;
+      dashEjecutar(tk[0], {nombre: it.nombre, casillas: num(it.dashMapa && it.dashMapa.casillas) || 3, alTerminar: reabrir, atacar: async rid => {
+        const a = arma || ((FichaCombate.armasEquipadasConDano(bn.S)[0] || {}).item) || null;
+        await editarPersonajeMapa(fichaId, S => {
+          const c = FichaCombate.costoAtaque(S, a);
+          S.nitros = Math.max(0, num(S.nitros) - c);
+          FichaCombate.registrarAtaque(S, a);
+          toast(`${it.nombre}: le pega al pasar · −${fmt(c)} No2 (lo de un ataque)`);
+          return true;
+        });
+        const ataque = FichaAcciones.ataqueDeHabArma(bn.S, it, a, 0, 0, ui);
+        if(!ataque) return false;
+        bn.objetivoFijo = rid;
+        bnElegirObjetivo({yo: ui.yo(), ataque});
+        return true;
+      }});
+    },
     flashFuera: it => FichaDuelo.usarFlashFueraDelDuelo(bn.S, it, ui),
     elegirArmaHab: (it, opciones) => {
       bn.raiz.querySelector('#bn-arma-lista').innerHTML = `<div class="hint">${esc(it.nombre)}: cuesta lo mismo que un ataque con el arma que elijas, y cuenta como ese ataque.</div>` +

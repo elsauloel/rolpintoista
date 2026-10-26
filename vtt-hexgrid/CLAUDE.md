@@ -1807,3 +1807,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   compara los estados públicos de cada token (`estadoDe`) con los de antes y, por cada estado nuevo con polaridad buff o debuff, `flechitasDibujar` (en el
   recorrido de los tokens que se ven) dibuja ~1,2 s de chevrones verdes que suben o rojos que bajan. No anima la primera vez que ve un token (al cargar el
   mapa o al cambiar de vínculo), ni los derivados, ni a un caído; un token oculto o en la niebla no se delata. Solo dibuja.
+- **💨 El Dash** (2026-10-26, dueño; `js/76-dash.js`): `dashEjecutar(tokenId, {nombre, casillas, atacar, alTerminar})` pide la dirección con `elegirDestino` (el vecino más
+  cercano a la casilla tocada), arma el camino (`dashCamino`: 3 en línea recta; atraviesa a UN rival y suma una casilla; lo frenan Sólidos, paredes y un segundo
+  token) y mueve el token directo (`dashMover`, sin No2 ni oportunidad). Con rival: lo deja antes, guarda `dashPendientes` y llama `atacar(rivalId)` (el creep:
+  `CreepAcciones.pagarAtaque` + `acElegirObjetivo` con `ac.objetivoFijo`, js/12 `ui.dash`; el personaje: `FichaCombate.costoAtaque/registrarAtaque` +
+  `FichaAcciones.ataqueDeHabArma` + `bnElegirObjetivo` con `bn.objetivoFijo`, js/11 `ui.dash`). `dashResuelto(d)` (el gancho `disparoResuelto`, js/14): si lo
+  paró con Parry o lo bloqueó, se queda; si no, sigue hasta el final.

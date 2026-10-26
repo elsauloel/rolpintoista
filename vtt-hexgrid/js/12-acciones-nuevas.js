@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261023p5', '../comun/creep-botonera.js?v=20261023p8a', '../comun/creep-acciones.js?v=20261026d', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261024bendecir'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261023p5', '../comun/creep-botonera.js?v=20261023p8a', '../comun/creep-acciones.js?v=20261026o', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261024bendecir'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -500,6 +500,22 @@ function acHabUi(){
     refuerzos: (sc, h) => { ac.host.hidden = true; llamarRefuerzos(sc, h); },   // 📣 js/31
     estandarte: (sc, h) => { ac.host.hidden = true; plantarEstandarte(sc, h); },   // 🚩 js/73
     meteoro: (sc, h) => { ac.host.hidden = true; marcarMeteoro(sc, h); },   // ☄ js/74
+    // 💨 el Dash (js/76): el camino; si atraviesa a un rival, paga lo de un ataque y le pega (con su objetivo fijo).
+    dash: (sc, h) => {
+      const tk = tokenEntradaCreep(sc.id);
+      if(!tk){ toast(`${h.nombre}: ${sc.nombre} no tiene token en este mapa`); return; }
+      const id = ac && ac.creepId, reabrir = () => { if(ac && ac.creepId === id){ ac.host.hidden = false; acUbicar(); acDibujar(); } };
+      ac.host.hidden = true;
+      dashEjecutar(tk[0], {nombre: h.nombre, casillas: num(h.dash && h.dash.casillas) || 3, alTerminar: reabrir, atacar: async rid => {
+        const r = await acCambiarCreep(sc.id, c => { const p = CreepAcciones.pagarAtaque(c, 'normal', true); return p.error ? p : {aviso: p.aviso}; });
+        if(r && r.aviso) toast(r.aviso);
+        const scN = creepPrivadoDe(sc.id) || sc, atq = CreepAcciones.ataqueDeHab(scN, h);
+        if(!atq) return false;
+        ac.objetivoFijo = rid;
+        acElegirObjetivo(scN, atq, () => acPublicar(scN, CreepDuelo.pdgDeArreglos(scN, atq)));
+        return true;
+      }});
+    },
     colocarTrampa: (sc, h, auto) => { if(auto){ ac.host.hidden = true; trampaDeHabilidad({fichaId: sc.id, tipoToken: 'creep', nombre: h.nombre, trampa: Combatiente.trampaDeHab(h, st => CreepCalculo.statValor(sc, st))}); } else acColocarTrampaJunto(sc, h); },
     colocarZona: (sc, h) => {
       const z = CreepAcciones.zonaDeHab(sc, h);
@@ -750,7 +766,7 @@ function cerrarAccionesNuevas(){
    estados para la Ejecución, con el selector común (los "Mis presets" del GM no están en la partida: ver pendientes 7b). */
 const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261021zs', '../comun/asistente-duelo-hab.js?v=20261026d'];
 // Las recetas de habilidades de fábrica (para ↻ Reemplazar y ⬆ Subir): pesadas, recién cuando hacen falta.
-const ACE_BASE = ['../comun/creeps-base.js?v=20261026g', '../comun/skills-creep-base.js?v=20261026n'];
+const ACE_BASE = ['../comun/creeps-base.js?v=20261026o', '../comun/skills-creep-base.js?v=20261026o'];
 async function acCargarEditor(){ await acCargarPiezas(); await cargarPiezas(SE_PIEZAS); await cargarPiezas(ACE_PIEZAS); }
 // ⬆ Subir una habilidad del creep a la biblioteca compartida (corrección o algo nuevo); su `bibOrigen` nuevo se guarda en el creep.
 async function acSubirHab(creepId, habId){

@@ -2,7 +2,7 @@
    «Para este skill el GM debería tener el botón instantáneo disponible no sólo durante el turno del creep sino todo el tiempo, también en la columna
    anexa al menú de duelos». Una habilidad de creep marcada `flash` (Bendecir el arma; el Mal de ojo y el Desarmar tienen el suyo: js/60, js/62) se
    puede usar desde el botón fijo ✨ (Flotantes.bendecir): arriba, con los demás, y en la columna «Podés usar» del duelo abierto (comun/flotantes.js
-   los muda solos). Al tocarlo se elige qué creep y a quién (sus aliados en su Rango; primero el que ataca en el duelo abierto, que su golpe la usa si
+   los muda solos). Al tocarlo se elige qué creep y qué habilidad y, después, a quién (sus aliados en su Rango; primero el que ataca en el duelo abierto, que su golpe la usa si
    llega antes de tirar el daño, aunque ya haya tirado el PdG: js/13 cargaAlGolpeAbierto) y se ejecuta como desde sus Acciones (acEjecutarHab, js/12: en turno ajeno cobra el doble). */
 // Los creeps del mapa con una habilidad Flash propia lista: [{id (token), t, sc, h}].
 function flashCreepListos(){
@@ -57,21 +57,30 @@ function flashCreepObjetivos(c){
   }
   return out;
 }
+// Dos pasos (dueño, 2026-10-26: «sería más prolijo que fuera un botón para el skill, que abra un menú nuevo o ramificación… para elegir el
+// objetivo»): primero qué creep y qué habilidad; después, a quién (si hay uno solo posible —sobre sí, una onda—, sin el segundo menú).
 async function abrirFlashCreep(){
-  const listos = flashCreepListos();
-  if(!listos.length) return;
-  const duelo = await flashCreepAtacanteDelDuelo(), opciones = [];
-  listos.forEach(c => flashCreepObjetivos(c).forEach(o => opciones.push({c, o, ataca: !!(duelo && duelo.tokenId === o.id)})));
-  opciones.sort((a, b) => (b.ataca - a.ataca) || (a.o.mismo - b.o.mismo));
-  if(!opciones.length){ AvisoCombate.mostrar({icono: '✨', titulo: 'Flash de un creep', texto: 'Ningún aliado está dentro de su Rango.'}); return; }
-  const botones = opciones.slice(0, 10).map(({c, o, ataca}) => {
-    const k = flashCreepCosto(c);
-    return {fila: true, texto: `${nombreDe(c.t)}: ${c.h.nombre} → ${flashCreepAlrededor(c.h) ? 'alrededor suyo' : o.mismo ? 'a sí mismo' : nombreDe(o.t)}${ataca ? ' ⚔' : ''}`,
-      detalle: `${ataca ? (duelo.danoTirado ? 'ataca en el duelo abierto, pero ya tiró el daño: le sirve para su próximo ataque · ' : 'ataca en el duelo abierto: la usa en este golpe (todavía no tiró el daño) · ') : ''}${k.txt}${k.ajeno ? ' (Flash en turno ajeno: el doble)' : ''}`,
-      alClic: () => { AvisoCombate.cerrar(); flashCreepUsar(c, o.id); }};
+  const listos = flashCreepListos().map(c => ({c, objs: flashCreepObjetivos(c)})).filter(x => x.objs.length);
+  if(!listos.length){ AvisoCombate.mostrar({icono: '✨', titulo: 'Flash de un creep', texto: 'Ningún aliado está dentro de su Rango.'}); return; }
+  const duelo = await flashCreepAtacanteDelDuelo();
+  const botones = listos.slice(0, 10).map(({c, objs}) => {
+    const k = flashCreepCosto(c), ataca = !!(duelo && objs.some(o => o.id === duelo.tokenId));
+    const quien = flashCreepAlrededor(c.h) ? 'alrededor suyo' : objs.length === 1 ? (objs[0].mismo ? 'a sí mismo' : nombreDe(objs[0].t)) : `${objs.length} objetivos posibles`;
+    return {fila: true, texto: `${nombreDe(c.t)}: ${c.h.nombre}${ataca ? ' ⚔' : ''}`,
+      detalle: `${quien} · ${k.txt}${k.ajeno ? ' (Flash en turno ajeno: el doble)' : ''}`,
+      alClic: () => { AvisoCombate.cerrar(); if(objs.length === 1) flashCreepUsar(c, objs[0].id); else flashCreepElegirObjetivo(c, objs, duelo); }};
   });
   botones.push({texto: 'Cancelar', sec: true, alClic: () => AvisoCombate.cerrar()});
-  AvisoCombate.mostrar({icono: '✨', titulo: 'Flash de un creep', botones, texto: '¿Qué creep la usa y a quién?'});
+  AvisoCombate.mostrar({icono: '✨', titulo: 'Flash de un creep', botones, texto: '¿Qué creep y qué habilidad?'});
+}
+// El segundo paso: a quién (primero el que ataca en el duelo abierto, después él mismo y sus aliados).
+function flashCreepElegirObjetivo(c, objs, duelo){
+  const ops = objs.map(o => ({o, ataca: !!(duelo && duelo.tokenId === o.id)})).sort((a, b) => (b.ataca - a.ataca) || (b.o.mismo - a.o.mismo));
+  const botones = ops.slice(0, 10).map(({o, ataca}) => ({fila: true, texto: `${o.mismo ? `${nombreDe(o.t)} (él mismo)` : nombreDe(o.t)}${ataca ? ' ⚔' : ''}`,
+    detalle: ataca ? (duelo.danoTirado ? 'ataca en el duelo abierto, pero ya tiró el daño: le sirve para su próximo ataque' : 'ataca en el duelo abierto: la usa en este golpe (todavía no tiró el daño)') : '',
+    alClic: () => { AvisoCombate.cerrar(); flashCreepUsar(c, o.id); }}));
+  botones.push({texto: '← Volver', sec: true, alClic: () => { AvisoCombate.cerrar(); abrirFlashCreep(); }});
+  AvisoCombate.mostrar({icono: '✨', titulo: `${nombreDe(c.t)}: ${c.h.nombre}`, botones, texto: '¿A quién?'});
 }
 // Se ejecuta como desde sus Acciones, con el objetivo ya elegido (ac.objetivoFijo, como el Mal de ojo).
 async function flashCreepUsar(c, objetivoId){

@@ -34,11 +34,11 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 14**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25), lluvia de escarcha (2026-10-25), andanada arcana (2026-10-25), misiles elementales (2026-10-25), portal trampa (2026-10-25) · de El origen: proyectil, fuego con quemadura.
 - 🧿 **Debuffer — 15**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25), silencio (Tótem de silencio, 2026-10-25), extenuar (2026-10-25), cegar (2026-10-25), grito de pánico (2026-10-25), nube tóxica (2026-10-26) · de El origen: ceguera, veneno, inmovilizar.
-- 💚 **Support — 14**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24), estandarte (Estandarte de guerra, 2026-10-24), señalar la presa (2026-10-25), armas perforantes (2026-10-25), redoble de tambores (2026-10-25), frenesí inducido (2026-10-25), limpiar estados (Purificar, 2026-10-25), levitar (2026-10-25) · de El origen: escudo a un aliado.
+- 💚 **Support — 15**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24), estandarte (Estandarte de guerra, 2026-10-24), señalar la presa (2026-10-25), armas perforantes (2026-10-25), redoble de tambores (2026-10-25), frenesí inducido (2026-10-25), limpiar estados (Purificar, 2026-10-25), levitar (2026-10-25), empower (Empuje, 2026-10-26) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
 **Para emparejar** (regla del dueño, 2026-10-25: «empezamos a tener en cuenta todos los roles de creep e ir emparejándolos… para que estén todos
-avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Mago, Support y Choque liviano en 14; Rango + Hunter y Debuffer en 15; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
+avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Mago y Choque liviano en 14; Rango + Hunter, Debuffer y Support en 15; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
 
 ## Los roles
 
@@ -320,7 +320,7 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
    recibe (la marca `turnosCompletos`: el turno en que se lo dan no cuenta, aunque sea el suyo).
 6. ✅ **Armas perforantes** (ex «Abrir la guardia», 2026-10-25; dueño: «un skill de support no trabaja sobre rivales, sino sobre aliados»): a él o a un aliado en su Rango,
    el estado del mismo nombre 3 turnos completos: en cada golpe que da, 3 puntos pasan siempre la Defensa y 3 la Defensa especial del rival.
-7. **Empujón de creep** (el Empower de los personajes): +3 a la tirada de un aliado, en el momento, mirando el resultado.
+7. ✅ **Empujón de creep** — **Empuje** (2026-10-26, el Empower de la clase: Flash, +3 a la próxima tirada de él o de un aliado en su Rango; esa tirada lo gasta).
 
 **B. Concentrar el fuego** ✦
 8. ✅ **Señalar la presa** ✦ (2026-10-25; dueño: «menos 2 a Evasión y más 4 al daño»): su PdG.Esp contra la Res.Esp de un rival en su Rango; si gana,
@@ -332,7 +332,7 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
 11. **Orden de ataque**: un aliado ataca ya, fuera de su turno (o su próximo ataque no cuesta No2).
 12. ✅ **Redoble de tambores** (2026-10-25): a sus aliados a 4 casillas o menos (no a él), +2 No2 su próximo turno y −1 a cada cooldown activo de los
     que trabajan con cooldown (no con SP).
-13. **Adrenalina**: a un aliado se le baja el cooldown de una habilidad (vuelve a usar la fuerte).
+13. **Adrenalina**: a un aliado se le baja el cooldown de una habilidad (vuelve a usar la fuerte). ⏸ Para más adelante (dueño, 2026-10-26: «anotala en la lista para trabajar en el futuro»). Propuesta guardada: a un aliado en su Rango, +1 PdG ese turno y, si trabaja con cooldown, −2 a cada cooldown activo; si trabaja con SP, recupera 4 SP (sin pasar su máximo) — o, la variante, su próxima habilidad de este turno le cuesta 3 SP menos. 1 No2 y 2 SP, o cooldown 3.
 14. **Canalizar**: le pasa SP a un aliado caster.
 15. **¡Ahora!**: un aliado juega justo después del support en el orden de turnos (sube su iniciativa; hoy Emboscada de manada).
 16. **Prisa**: un aliado se mueve gratis unos casilleros y ataca más barato.

@@ -67,7 +67,7 @@ const botonSegundaHabCreep = (h, sc) => CreepBotonera.botonSegundaHab(h, sc);   
 const gmHabUi = {
   mesaHabilidad: (sc, h, extra) => mesaPublicarHabilidadCreep(sc, h, extra),
   mesaConTexto: t => mesaConTexto(t),
-  publicar: (sc, t) => publicarTiradaCreep(t),
+  publicar: (sc, t) => { publicarTiradaCreep(t); if(t && t.r && CreepAcciones.gastarUnaTirada(sc, t.r)) renderAll(); },   // 💪 Empower: la tirada que lo sumó lo gasta
   toast: t => toast(t),
   habDuelo: (sc, h) => habDueloCreep(sc, h),
   lanzarAtaque: (sc, h) => lanzarAtaqueDeHabCreep(sc, h),

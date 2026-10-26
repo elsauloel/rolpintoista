@@ -130,6 +130,9 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
+> - [ ] **💉 Adrenalina, habilidad de Support para creeps (2026-10-26, dueño: «anotala en la lista para trabajar en el futuro»):** a un aliado en su Rango,
+>   +1 PdG ese turno y, si trabaja con cooldown, −2 a cada cooldown activo; si trabaja con SP, recupera 4 SP (o la variante: su próxima habilidad
+>   de este turno le cuesta 3 SP menos). 1 No2 y 2 SP, o cooldown 3. Detalle en `docs/diseno-roles-creep.md` (Support, idea 13).
 > - [ ] **🐾 Nombres para las versiones «bestia» de algunas habilidades de creep (2026-10-25, dueño: «anotá en pendientes buscar nombres para las versiones
 >   bestia de algunos skills»):** varias habilidades auditadas tienen una sola versión para todos o solo la humanoide (la Aguja del desamparo, Disipar, Señalar la
 >   presa, la Lanza de luz, el Meteoro…). Repasar cuáles piden una versión bestia con su propio nombre, como ya pasó con Corroer / Escupitajo ácido, Golpe que

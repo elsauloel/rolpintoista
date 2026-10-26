@@ -30,7 +30,7 @@ const gmDueloUi = {
     renderAll();
     return Promise.resolve(x);
   },
-  publicar: (sc, t) => publicarTiradaCreep(t),
+  publicar: (sc, t) => { publicarTiradaCreep(t); if(t && t.r && CreepAcciones.gastarUnaTirada(sc, t.r)) renderAll(); },   // 💪 Empower: la tirada que lo sumó lo gasta
   toast: t => toast(t),
   confirmar: (t, o) => Confirmar.preguntar(t, o),
   soy: lado => !!(lado && lado.tipo === 'creep' && gmVivo.activo && S.creeps.some(c => c.id === lado.ref)),

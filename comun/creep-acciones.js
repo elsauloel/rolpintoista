@@ -21,6 +21,13 @@ const CreepAcciones = (() => {
     if(!r) return {error: `${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`};
     return {origen: nombre, r};
   }
+  // 💪 Lo que dura una sola tirada (Empower, `unaTirada`; el Empuje del Support, 2026-10-26): la tirada que lo sumó lo gasta, como en un personaje
+  // (FichaAcciones.gastarUnaTirada). `r.estados` dice qué estados entraron en esa tirada. → true si lo gastó (cambia `sc`; guardarlo es de cada pantalla).
+  function usaUnaTirada(sc, r){
+    const emp = sc && Combatiente.unaTiradaDe(sc.estados);
+    return !!(emp && r && (r.estados || []).some(e => e && emp.nombres.includes(e.n)));
+  }
+  const gastarUnaTirada = (sc, r) => usaUnaTirada(sc, r) && Combatiente.gastarUnaTirada(sc.estados);
   // Una de las Tiradas de stats de las Acciones (null si el stat no existe).
   function tiradaStat(sc, statId){
     const d = C().STAT_LOOKUP[statId];
@@ -634,7 +641,7 @@ const CreepAcciones = (() => {
   }
 
   return {confirmarSP,fenixCreep, bloqueoFirmeCreep, ESPERA_POR_SP, especialesCreep, costoEspecialCreep, habDeEspecialCreep, usarEspecialCreep, habEspecialParaTerminar, mantenimiento, inicioTurno, finTurno, reclamarMantenimiento, alCinturon, quitarDelCinturon, consumir, faltanNitrosConsumir, costoConsumir, colocarTrampaDeItem, consumiblesDe,
-    tirada, tiradaStat, esquivar, parry, fuerzaGolpe, bloqueo, dano, levantarse, tiradaSoltarse, aplicarSoltarse, pagarParry, pagarAtaque, tiradaAtaque, NOMBRE_ESPECIAL,
+    tirada, usaUnaTirada, gastarUnaTirada, tiradaStat, esquivar, parry, fuerzaGolpe, bloqueo, dano, levantarse, tiradaSoltarse, aplicarSoltarse, pagarParry, pagarAtaque, tiradaAtaque, NOMBRE_ESPECIAL,
     costoAtaqueDe, devolverAtaque, faltanNitros, preguntaSinNitros, alertaSinNitros,
     FLAGS_ESTADO, habEtq, habEjecucion, ataqueDeHab, habTira, efectoDeHab, sobreSi, confirmarSilencio, preguntaVida, ejecutarHab, terminarHab, tiradaPrimeraHab, tiradaSegundaHab,
     zonaDeHab, cdMod};

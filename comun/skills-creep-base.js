@@ -59,7 +59,7 @@
     'Colmillos que perforan': ['choque liviano', 'sangrado'], 'Tajo brutal': ['choque liviano', 'sangrado'], 'Desgarro': ['choque liviano', 'sangrado'],
     'Corte certero': ['choque liviano', 'sangrado'], 'Zarpa certera': ['choque liviano', 'sangrado'], 'Tajo de carnicero': ['choque liviano', 'sangrado'],
     'Destripar': ['choque liviano', 'sangrado'],
-    'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'], 'Mantener a raya': ['rango', 'mantener a raya'], 'Flecha que atraviesa': ['rango', 'atravesar'], 'Disparo y repliegue': ['rango', 'disparar y replegarse'], 'Nube tóxica': ['debuffer', 'nube tóxica'], 'Ráfaga encadenada': ['rango', 'disparos encadenados'], 'Extenuar': ['debuffer', 'extenuar'], 'Cegar': ['debuffer', 'cegar'], 'Hoja envenenada': ['choque liviano', 'veneno'], 'Mordisco infectado': ['choque liviano', 'veneno'], 'Grito de pánico': ['debuffer', 'grito de pánico'],
+    'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'], 'Mantener a raya': ['rango', 'mantener a raya'], 'Flecha que atraviesa': ['rango', 'atravesar'], 'Disparo y repliegue': ['rango', 'disparar y replegarse'], 'Nube tóxica': ['debuffer', 'nube tóxica'], 'Empuje': ['support', 'empower'], 'Ráfaga encadenada': ['rango', 'disparos encadenados'], 'Extenuar': ['debuffer', 'extenuar'], 'Cegar': ['debuffer', 'cegar'], 'Hoja envenenada': ['choque liviano', 'veneno'], 'Mordisco infectado': ['choque liviano', 'veneno'], 'Grito de pánico': ['debuffer', 'grito de pánico'],
     'Red': ['hunter', 'trabar'], 'Tela de araña': ['hunter', 'trabar'],
     'Hit and run': ['choque liviano', 'golpear y alejarse'],
     'Salto': ['choque liviano', 'salto'], 'Salto aplastante': ['choque pesado', 'salto'], 'Vigilancia': ['rango', 'vigilancia'], 'Bola de fuego': ['mago', 'daño en área'], 'Confusión': ['debuffer', 'control mental'],
@@ -440,6 +440,12 @@
   H('Purificar', 'C', '*', 'a', 3, {detalle: 'FLASH (se puede usar en cualquier momento; en turno ajeno cuesta el doble). Limpia a un aliado (o a sí mismo) dentro de su Rango: le saca su estado malo más reciente y lo cura 5 de vida (sin pasar su máximo). Sobre alguien caído no cura.',
     no2: 0, spCosto: 2, flash: true, auditada: true, ataqueTxt: 'Flash: a él o a un aliado en su Rango, le saca el estado malo más reciente y cura 5',
     duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', efectos: [{purga: true}, {cura: 5}]}});
+  // 💪 Auditada (dueño, 2026-10-26; el Support, «Empujón de creep»: «vamos con Empower»): el Empower de la clase para creeps. Flash (el botón ✨ del GM,
+  // vtt-hexgrid/js/71; en turno ajeno, el doble): a él o a un aliado en su Rango, el estado Empower (+3 a su próxima tirada, la que sea; otro antes de
+  // tirar suma +3 más). La tirada que lo usa lo gasta (CreepAcciones.gastarUnaTirada). No gasta su ataque. Costo el de la clase: 2 SP, o cooldown 2.
+  H('Empuje', 'B', '*', 'a', 2, {detalle: 'FLASH (se puede usar en cualquier momento; en turno ajeno cuesta el doble). A un aliado (o a sí mismo) dentro de su Rango: Empower, +3 a su próxima tirada, la que sea (ataque, defensa, daño, resistencia). Otro Empuje antes de que tire suma +3 más. Esa tirada lo gasta.',
+    no2: 0, spCosto: 2, flash: true, auditada: true, ataqueTxt: 'Flash: a él o a un aliado en su Rango, +3 a su próxima tirada (Empower)',
+    duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', efectos: [{nombre: 'Empower'}]}});
   H('Redoble de tambores', 'BA', '*', 'a', 3, {detalle: 'Un redoble que empuja a los suyos: sus aliados a 4 casillas o menos (no él) suman +2 No2 en su próximo turno (Redoble) y, los que trabajan con cooldown (no con SP), bajan en 1 cada cooldown que tengan activo.',
     no2: 2, spCosto: 3, auditada: true, ataqueTxt: 'a sus aliados a 4 o menos: +2 No2 su próximo turno y −1 a sus cooldowns activos',
     duelo: {objetivo: 'onda', radio: 4, aliados: true, tira: '', contra: [], efectos: [{nombre: 'Redoble'}, {nombre: 'Baja cooldowns', bajaCd: 1}]}});

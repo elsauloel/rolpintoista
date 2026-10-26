@@ -1077,6 +1077,16 @@ prueba('✨ Purificar (Support, 2026-10-25): Flash; a un aliado, la purga y cura
   const n = Duelo.limpiarHab(ej) || {};
   igual([h.duelo.objetivo, h.duelo.conmigo, !!(n.efectos || []).find(x => x.purga), ((n.efectos || []).find(x => x.cura) || {}).cura, !!h.flash, h.nitrosCosto, h.cd], ['aliado', true, true, 5, true, 0, 3]);
 });
+prueba('💪 Empuje (Support, 2026-10-26): Flash, Empower a un aliado; la tirada del creep que lo suma lo gasta', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Empuje'), h = armarHabilidadDeCreep(e.datos, 2);
+  const P = estadosPresetCreep().find(p => p.nombre === 'Empower');
+  const sc = {id: 'c1', nombre: 'Prueba', estados: [{...structuredClone(P), id: 'e1', activo: true}], equipo: []};
+  const r = Combatiente.tirarStat(5, sc.estados, 'pdg');
+  const usa = CreepAcciones.usaUnaTirada(sc, r), gasto = CreepAcciones.gastarUnaTirada(sc, r);
+  const sc2 = {id: 'c2', estados: []}, r2 = Combatiente.tirarStat(5, [], 'pdg');
+  igual([!!h.flash, h.duelo.objetivo, h.duelo.efectos[0].nombre, h.spCosto, h.cd, usa, gasto, sc.estados.length, CreepAcciones.gastarUnaTirada(sc2, r2), e.etiquetas.includes('support')],
+    [true, 'aliado', 'Empower', 2, 2, true, true, 0, false, true]);
+});
 prueba('☠ Nube tóxica (Debuffer, 2026-10-26): zona de diámetro 3, 3 turnos, Ef.Esp contra Res.Esp, 1d4 tóxico directo y Veneno 3', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Nube tóxica'), h = armarHabilidadDeCreep(e.datos, 2);
   const z = Combatiente.zonaDeHab(h, h.duelo, {fichaId: 'c1', tipo: 'creep', tiraValor: 7});

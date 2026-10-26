@@ -1399,6 +1399,7 @@ function dueloElegirAreaMapa(msg){
     const casteador = {ref: String(yo.ref || ''), tipo: yo.tipo, nombre: String(yo.nombre || '').slice(0, 40), uid: (mio && mio.duenoUid) || fbUsuario.uid, tokenId: mio ? mio.id : ''};
     const enCono = h.cono ? conoDeArea(h) : h.linea ? new Set(h.linea) : null;   // el cono (Sonic Boom) o la línea (Varita láser): sus casillas
     if(hab.zonaQueda) dueloZonaQueda(hab, h, Math.max(1, radio), yo);   // lo que deja en el suelo (bola de fuego, ventisca)
+    if(hab.destello) await destelloEn(h, radio, yo, hab, todos.filter(t => !t.oculto && !t.bajoTierra && !etereoDe(t) && !propio(t) && distanciaHex(h, t) <= radio && dueloEsRival(yo, t)));   // ☀ el destello (Luz para los suyos)
     if(hab.despeja) despejarEn(enCono || new Set(celdasFlor(Math.max(1, radio)).map(o => { const c0 = hexACubo(h); return nbPack(cuboACol(c0.q + o.dq, c0.r + o.dr), cuboAFila(c0.q + o.dq, c0.r + o.dr)); })), hab.nombre);   // el vendaval
     const objetivos = todos
       .filter(t => !(hab.tormenta || hab.meteoro) || !iniciativaFueraDeJuego(t.id))   // la tormenta y el meteoro no les caen a los caídos
@@ -1903,6 +1904,41 @@ async function despejarEn(celdas, nombre){
   }
   toast(ok === tareas.length ? `💨 ${nombre || 'El viento'}: despejó ${casillas} casilla${casillas === 1 ? '' : 's'} de niebla o fuego`
     : `💨 ${nombre || 'El viento'}: despejó ${ok} de ${tareas.length} — lo demás, a mano (faltan pegar las reglas)`);
+}
+/* ☀ El destello (2026-10-26, Luz para los suyos, dueño: «un destello, ¡fum!, que sucede y no queda como área… revela los ocultos y los deja marcados
+   a todos, revela las trampas y todo»): el fogonazo en todas las pantallas (el momento «estallido», con tono de luz), el estado (Marcado: saca el
+   sigilo) a cada rival de adentro, sin tirada, y las trampas rivales de adentro, descubiertas para todos. El daño sigue por la cascada (sin dodge). */
+async function destelloEn(h, radio, yo, hab, rivales){
+  const c0 = hexACubo(h);
+  const celdas = celdasFlor(Math.max(0, radio)).map(o => ({col: cuboACol(c0.q + o.dq, c0.r + o.dr), fila: cuboAFila(c0.q + o.dq, c0.r + o.dr)}));
+  const enArea = new Set(celdas.map(c => nbPack(c.col, c.fila)));
+  const spec = {nombre: hab.destello.nombre || 'Marcado', turnos: hab.destello.turnos || 2};
+  const marcados = [], aMano = [];
+  for(const t of rivales){
+    const nom = nombreDe(tokens.get(t.id) || t);
+    try{
+      if(t.tipo === 'creep'){
+        if(!soyGM){ aMano.push(nom); continue; }
+        await modificarCreep(t.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
+      }else await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec, origen: hab.nombre || 'Destello'});
+      marcados.push(nom);
+    }catch(err){ console.error('El destello (estado):', err); aMano.push(nom); }
+  }
+  // Las trampas del otro bando (las de un jugador, si el destello es de un creep; las del GM, si es de un personaje).
+  const rival = el => yo.tipo === 'creep' ? !trampaEsDelGM(el) : trampaEsDelGM(el);
+  let trampas = 0;
+  for(const [id, el] of [...elementos.entries()]){
+    if(!el.trampa || el.disparada || el.descubierta || !rival(el) || !celdasDeElemento(el).some(c => enArea.has(nbPack(c.col, c.fila)))) continue;
+    try{ await coleccionElementos().doc(id).update({descubierta: true}); trampas++; }catch(err){ console.error('El destello (trampa):', err); }
+  }
+  const quien = yo.nombre || 'Alguien', turnos = `${spec.turnos} turno${spec.turnos === 1 ? '' : 's'}`;
+  const partes = [marcados.length ? `${marcados.join(', ')} ${marcados.length === 1 ? 'queda' : 'quedan'} ${spec.nombre} (${turnos})` : 'no había rivales adentro',
+    ...(aMano.length ? [`${spec.nombre} a mano: ${aMano.join(', ')}`] : []), ...(trampas ? [`${trampas} trampa${trampas === 1 ? '' : 's'} a la vista`] : [])];
+  const resultado = `Todo lo oculto adentro queda a la vista: ${partes.join(' · ')}.`;
+  const explota = {clave: 'destello:' + Date.now() + ':' + Math.random().toString(36).slice(2, 6), celdas: celdas.flatMap(c => [c.col, c.fila]), tono: 'luz'};
+  try{ await momentoAbrir({tipo: 'estallido', icono: '☀', titulo: `¡${hab.nombre || 'Destello'} de ${quien}!`, estado: 'listo', resultado, datos: {explota}}); }catch(err){}
+  try{ mesaLinea(`☀ ${hab.nombre || 'Destello'} de ${quien}: ${resultado}`, 'recordatorio'); }catch(err){}
+  if(typeof explosionEmpezar === 'function') explosionEmpezar(explota);
 }
 // El riesgo (2026-10-08, Varita inestable): salió el número en los dados del daño → quien la usó se hace su daño (directo, sin Defensa).
 async function dueloRiesgo(d){

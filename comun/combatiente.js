@@ -1627,6 +1627,9 @@ const Combatiente = (() => {
       ...(c.danoSiempre ? {danoSiempre: true} : {}),   // ⚡ el daño entra siempre; la tirada es solo para los estados (Zap, 2026-10-25)
       ...(c.menosPorOrden ? {menosPorOrden: true} : {}),   // −1 a cada uno de los siguientes en la línea (2026-10-08, láser largo)
       ...(c.despeja ? {despeja: true} : {}),   // apaga el fuego y despeja la niebla que toca (2026-10-08, vendaval)
+      // ☀ El destello (2026-10-26, Luz para los suyos, dueño: «un destello, ¡fum!, que sucede y no queda como área»): al lanzarse, a todos los rivales
+      // de adentro el estado (Marcado: les saca el sigilo) sin tirada, y las trampas rivales de adentro quedan a la vista. Lo hace el mapa (js/13).
+      ...(c.objetivo === 'area' && c.destello ? {destello: {nombre: String(c.destello.nombre || 'Marcado'), turnos: Math.max(1, Math.round(nf(c.destello.turnos)) || 2)}} : {}),
       // El riesgo (2026-10-08, Varita inestable): si en los dados del daño sale `si` (un 1), quien la usa se hace `dano`.
       ...(c.riesgo ? {riesgo: {si: Math.max(1, Math.round(nf(c.riesgo.si)) || 1), dano: String(c.riesgo.dano || '2d4'), ...(c.riesgo.porCada ? {porCada: true} : {})}} : {}),
       ...(c.fuegoAmigo ? {fuegoAmigo: true} : {}),

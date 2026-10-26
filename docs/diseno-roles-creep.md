@@ -469,7 +469,7 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
 39. **Portal para los suyos** ✦: dos portales a la vista que usan solo sus aliados, hasta su próximo turno [Varita del portal aliado].
 40. **Teletransportar a un aliado**: lo lleva unas casillas, a una libre (rescatarlo o ponerlo al lado de un rival) [Varita del blink].
 41. **Cobertura**: levanta pilares o un muro para que los suyos se cubran [Varita de los pilares, Varita del muro].
-42. ✅ **Luz para los suyos** (2026-10-26: zona de luz de diámetro 5, 2 turnos, revela lo oculto; a los rivales, Ef.Esp contra Res.Esp, 1d8 de luz directo y Marcado 2 turnos): una luz que revela lo oculto y deja Marcados a los rivales que toca [Varita de la luz, Varita del farol, Luz flotante].
+42. ✅ **Luz para los suyos** (2026-10-26, rehecha el mismo día: un destello instantáneo de diámetro 5, sin zona; a los rivales de adentro, Marcado 2 turnos sin tirada y sus trampas a la vista; Ef.Esp contra Res.Esp, 1d8 de luz directo, sin dodge): una luz que revela lo oculto y deja Marcados a los rivales que toca [Varita de la luz, Varita del farol, Luz flotante].
 43. **Escudo al acertar**: cada vez que gana una tirada de PdG.Esp, Vida extra para él o un aliado [Orbe del custodio, Orbe de resguardo].
 44. **Magia del caos a favor**: tira un dado y, a un aliado, le cae un buff al azar (con riesgo de que salga al revés) [Varita del caos].
 

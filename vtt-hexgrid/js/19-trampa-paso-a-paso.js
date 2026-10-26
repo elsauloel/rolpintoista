@@ -256,7 +256,7 @@ function explosionEmpezar(ex){
     if(cs.length){
       const cx = cs.reduce((a, p) => a + p.x, 0) / cs.length, cy = cs.reduce((a, p) => a + p.y, 0) / cs.length;
       const r = Math.max(HEX, ...cs.map(p => Math.hypot(p.x - cx, p.y - cy) + HEX));
-      efectosExplosion.push({cs, cx, cy, r, desde: Date.now(), chispas: Array.from({length: 26}, () => ({ang: Math.random() * 2 * Math.PI, vel: 0.5 + Math.random() * 0.8}))});
+      efectosExplosion.push({cs, cx, cy, r, desde: Date.now(), luz: ex.tono === 'luz', chispas: Array.from({length: 26}, () => ({ang: Math.random() * 2 * Math.PI, vel: 0.5 + Math.random() * 0.8}))});
       pedirDibujo();
     }
     explosionCongelar(EXPLOSION_MS);
@@ -280,19 +280,21 @@ function dibujarEfectosExplosion(){
     const t = edad / EXPLOSION_MS, apagar = t < 0.6 ? 1 : Math.max(0, 1 - (t - 0.6) / 0.4);
     ctx.save();
     // Las casillas: un fogonazo blanco-amarillo que pasa a naranja y se apaga.
-    const col = t < 0.15 ? `rgba(255,248,210,${0.85 * apagar})` : t < 0.45 ? `rgba(255,170,40,${0.7 * apagar})` : `rgba(200,60,20,${0.55 * apagar})`;
+    // ☀ El destello (fx.luz, 2026-10-26): blanco que pasa a dorado claro y se apaga, sin el naranja del fuego.
+    const col = fx.luz ? (t < 0.2 ? `rgba(255,255,245,${0.95 * apagar})` : `rgba(255,238,160,${(0.75 - 0.4 * t) * apagar})`)
+      : t < 0.15 ? `rgba(255,248,210,${0.85 * apagar})` : t < 0.45 ? `rgba(255,170,40,${0.7 * apagar})` : `rgba(200,60,20,${0.55 * apagar})`;
     fx.cs.forEach(p => { ctx.beginPath(); trazarHex(p.x, p.y); ctx.fillStyle = col; ctx.fill(); });
     // La onda: dos anillos que se agrandan desde el centro.
     [[0, 9], [0.18, 5]].forEach(([retraso, ancho]) => {
       const u = Math.max(0, Math.min(1, (t - retraso) / 0.55));
       if(u <= 0 || u >= 1) return;
       ctx.beginPath(); ctx.arc(fx.cx, fx.cy, fx.r * (0.2 + 1.1 * u), 0, 2 * Math.PI);
-      ctx.strokeStyle = `rgba(255,${Math.round(220 - 120 * u)},60,${(1 - u) * apagar})`; ctx.lineWidth = ancho / vista.zoom; ctx.stroke();
+      ctx.strokeStyle = fx.luz ? `rgba(255,250,${Math.round(220 - 60 * u)},${(1 - u) * apagar})` : `rgba(255,${Math.round(220 - 120 * u)},60,${(1 - u) * apagar})`; ctx.lineWidth = ancho / vista.zoom; ctx.stroke();
     });
     // Las chispas: salen disparadas y se apagan.
     fx.chispas.forEach(c => {
       const d = fx.r * c.vel * Math.min(1, t * 1.6), x = fx.cx + Math.cos(c.ang) * d, y = fx.cy + Math.sin(c.ang) * d;
-      ctx.beginPath(); ctx.arc(x, y, (3 + 3 * (1 - t)) / vista.zoom, 0, 2 * Math.PI); ctx.fillStyle = `rgba(255,${Math.round(200 - 100 * t)},70,${apagar})`; ctx.fill();
+      ctx.beginPath(); ctx.arc(x, y, (3 + 3 * (1 - t)) / vista.zoom, 0, 2 * Math.PI); ctx.fillStyle = fx.luz ? `rgba(255,252,${Math.round(230 - 80 * t)},${apagar})` : `rgba(255,${Math.round(200 - 100 * t)},70,${apagar})`; ctx.fill();
     });
     ctx.restore();
     activo = true;

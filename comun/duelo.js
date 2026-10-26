@@ -705,6 +705,7 @@ const Duelo = (() => {
         ...(_num(h.tormenta.total) > 0 ? {total: Math.round(_num(h.tormenta.total))} : {})}} : {}),
       ...(h.reparte ? {reparte: {cada: txtCorto(h.reparte.cada || '1d4', 12), total: Math.min(6, Math.max(2, Math.round(_num(h.reparte.total)) || 2))}} : {}),   // misiles de a uno (Varita de misiles)
       ...(h.menosPorOrden ? {menosPorOrden: true} : {}), ...(h.despeja ? {despeja: true} : {}),   // el láser largo · el vendaval
+      ...(h.destello ? {destello: {nombre: txtCorto(h.destello.nombre || 'Marcado', 30), turnos: Math.min(9, Math.max(1, Math.round(_num(h.destello.turnos)) || 2))}} : {}),   // ☀ el destello (Luz para los suyos, 2026-10-26)
       ...(h.riesgo ? {riesgo: {si: Math.min(20, Math.max(1, Math.round(_num(h.riesgo.si)) || 1)), dano: txtCorto(h.riesgo.dano || '2d4', 12), ...(h.riesgo.porCada ? {porCada: true} : {})}} : {}),   // la inestable
       ...(h.atrae ? {atrae: {casillas: Math.min(6, Math.max(1, Math.round(_num(h.atrae.casillas)) || 2)), contra: txtCorto(h.atrae.contra || 'fue', 12), tiraValor: _num(h.atrae.tiraValor)}} : {}),   // el gancho
       ...(_num(h.critTipo) ? {critTipo: Math.min(12, Math.max(1, Math.round(_num(h.critTipo))))} : {}),   // lo físico invocado critica como su Tipo

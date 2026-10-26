@@ -1077,6 +1077,11 @@ prueba('✨ Purificar (Support, 2026-10-25): Flash; a un aliado, la purga y cura
   const n = Duelo.limpiarHab(ej) || {};
   igual([h.duelo.objetivo, h.duelo.conmigo, !!(n.efectos || []).find(x => x.purga), ((n.efectos || []).find(x => x.cura) || {}).cura, !!h.flash, h.nitrosCosto, h.cd], ['aliado', true, true, 5, true, 0, 3]);
 });
+prueba('🌑 Maldición debilitante (Debuffer, 2026-10-26): PdG.Esp contra Res.Esp, 1d6 siniestro, Debilitado y Lento 2 turnos (reemplaza a Debilitar)', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Maldición debilitante'), h = armarHabilidadDeCreep(e.datos, 2);
+  igual([h.duelo.tira, h.duelo.contra.join(','), h.duelo.danoFormula, h.duelo.efectos.map(x => x.nombre).join(','), h.cd, e.etiquetas.includes('debuffer'), !!HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Debilitar')],
+    ['pdgmg', 'resmg', '1d6', 'Debilitado,Lento', 3, true, false]);
+});
 prueba('📌 Clavar a la pared (Rango, 2026-10-26): +3 PdG; si pega, empuja 3 y, si choca contra algo sólido, Inmovilizado 3 (Fuerza contra el PdG)', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Clavar a la pared'), h = armarHabilidadDeCreep(e.datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});

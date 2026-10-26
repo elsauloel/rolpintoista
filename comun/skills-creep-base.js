@@ -59,7 +59,7 @@
     'Colmillos que perforan': ['choque liviano', 'sangrado'], 'Tajo brutal': ['choque liviano', 'sangrado'], 'Desgarro': ['choque liviano', 'sangrado'],
     'Corte certero': ['choque liviano', 'sangrado'], 'Zarpa certera': ['choque liviano', 'sangrado'], 'Tajo de carnicero': ['choque liviano', 'sangrado'],
     'Destripar': ['choque liviano', 'sangrado'],
-    'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'], 'Mantener a raya': ['rango', 'mantener a raya'], 'Flecha que atraviesa': ['rango', 'atravesar'], 'Disparo y repliegue': ['rango', 'disparar y replegarse'], 'Nube tóxica': ['debuffer', 'nube tóxica'], 'Empuje': ['support', 'empower'], 'Sanguijuela': ['mago', 'sanguijuela'], 'Degollar': ['choque liviano', 'todo al ataque'], 'Clavar a la pared': ['rango', 'clavar a la pared'], 'Ráfaga encadenada': ['rango', 'disparos encadenados'], 'Extenuar': ['debuffer', 'extenuar'], 'Cegar': ['debuffer', 'cegar'], 'Hoja envenenada': ['choque liviano', 'veneno'], 'Mordisco infectado': ['choque liviano', 'veneno'], 'Grito de pánico': ['debuffer', 'grito de pánico'],
+    'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'], 'Mantener a raya': ['rango', 'mantener a raya'], 'Flecha que atraviesa': ['rango', 'atravesar'], 'Disparo y repliegue': ['rango', 'disparar y replegarse'], 'Nube tóxica': ['debuffer', 'nube tóxica'], 'Empuje': ['support', 'empower'], 'Sanguijuela': ['mago', 'sanguijuela'], 'Degollar': ['choque liviano', 'todo al ataque'], 'Clavar a la pared': ['rango', 'clavar a la pared'], 'Maldición debilitante': ['debuffer', 'debilitar'], 'Ráfaga encadenada': ['rango', 'disparos encadenados'], 'Extenuar': ['debuffer', 'extenuar'], 'Cegar': ['debuffer', 'cegar'], 'Hoja envenenada': ['choque liviano', 'veneno'], 'Mordisco infectado': ['choque liviano', 'veneno'], 'Grito de pánico': ['debuffer', 'grito de pánico'],
     'Red': ['hunter', 'trabar'], 'Tela de araña': ['hunter', 'trabar'],
     'Hit and run': ['choque liviano', 'golpear y alejarse'],
     'Salto': ['choque liviano', 'salto'], 'Salto aplastante': ['choque pesado', 'salto'], 'Vigilancia': ['rango', 'vigilancia'], 'Bola de fuego': ['mago', 'daño en área'], 'Confusión': ['debuffer', 'control mental'],
@@ -533,7 +533,13 @@
   H('Alarma', 'B', 'bhd', 'a', 2, tA('Da la alarma: los aliados cercanos se ponen en guardia (a mano).', 1));
 
   /* ================= DEBUFF (sobre otros: a mano) ================= */
-  H('Debilitar', 'X', 'hdga', 'x', 3, tA('Maldice al objetivo: −2 de Daño 3 turnos (a mano).', 2));
+  // 🌑 Auditada (dueño, 2026-10-26; el Debuffer, «debilitar», la Maldición debilitante de la clase: «vamos con la maldición debilitante»): reemplaza a la
+  // vieja Debilitar (a mano; también sacada de `APLICA` en creeps-base.js). Su PdG.Esp contra la Res.Esp de un rival en su Rango; si gana, 1d6 siniestro
+  // (el elemento del Debuffer: deja Herida sombría), Debilitado 2 turnos (−1 a todas sus tiradas, acumulable) y Lento 2 turnos. Costo de Claude.
+  H('Maldición debilitante', 'X', '*', 'x', 3, {detalle: 'Le echa una maldición que lo debilita a un rival dentro de su Rango: tira su Probabilidad de Golpe especial contra la Resistencia especial del objetivo. Si gana, 1d6 de daño siniestro (lo frenan la Defensa especial y la Res. siniestro; si entra, Herida sombría: no se cura hasta el final de su próximo turno), queda Debilitado 2 turnos (−1 a todas sus tiradas; otra vez, −1 más) y Lento 2 turnos (el primer casillero que mueve en cada turno le cuesta el doble de No2).',
+    no2: 2, spCosto: 3, auditada: true, ataqueTxt: 'su PdG.Esp contra la Res.Esp; 1d6 siniestro, Debilitado 2 turnos (−1 a todo, acumulable) y Lento 2 turnos',
+    duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['resmg'], alcance: 'rango', dano: true, danoFormula: '1d6', tipoDano: 'siniestro',
+      efectos: [{nombre: 'Debilitado'}, {nombre: 'Lento', turnos: 2}]}});
   // 🛡💀 Auditada (dueño, 2026-10-24; el Debuffer, «Maldición de la coraza»): reemplaza a la vieja Maldición (a mano). Su PdG.Esp contra la Res.Esp
   // de un rival en su Rango; si gana, Coraza maldita (−2 Defensa y −2 Defensa especial, 3 turnos): todos le pegan más. 2 No2 y 3 SP, o cooldown 3.
   H('Maldición de la coraza', 'X', '*', 'gx', 3, {detalle: 'Le maldice la armadura a un rival dentro de su Rango: tira su Probabilidad de Golpe especial contra la Resistencia especial del objetivo; si gana, queda con Coraza maldita (−2 a su Defensa y −2 a su Defensa especial durante 3 turnos, contra todos).',

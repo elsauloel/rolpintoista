@@ -19,6 +19,10 @@
   tengan la misma cantidad; recién ahí se vuelve a avanzar uno por uno. Se cuenta por **concepto** (una pareja bestia/humanoide o las variantes de
   un mismo concepto cuentan una vez), sumando las habilidades ya hechas en los creeps de «El origen de las especies» (ver el conteo abajo).
 
+**Los elementos de cada rol** (dueño, 2026-10-26: «que el mago juegue con todos los elementos menos luz y sombra, que el debuffer juegue con sombra y el
+support juegue con luz»): el **Mago** usa arcano, fuego, hielo, rayo, tóxico y ácido (nunca luz ni siniestro); el **Debuffer**, lo **🌑 siniestro**; el
+**Support**, la **☀ luz**. Al diseñar una habilidad con daño especial de esos roles, el elemento sale de acá.
+
 **Que cada habilidad se sienta** (criterio del dueño, 2026-10-25, con Extenuar: «vamos a hacer que cada acción tenga peso… nivelar un poquito para
 arriba, que todo haga un poquito de más, que hacer una habilidad se sienta»): una habilidad que gasta la acción no puede ser solo un estado chico; si
 pega, suma algo de daño (o algo concreto además del estado). Al diseñar, y al repasar las viejas, preferir que hagan un poco de más.
@@ -36,12 +40,12 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 - 🏹 **Rango y Hunter — 16**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar, mantener a raya (2026-10-25), atravesar (Flecha que atraviesa, 2026-10-25), disparos encadenados (Ráfaga encadenada, 2026-10-25), disparar y replegarse (Disparo y repliegue, 2026-10-26), clavar a la pared (2026-10-26) · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 15**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25), lluvia de escarcha (2026-10-25), andanada arcana (2026-10-25), misiles elementales (2026-10-25), portal trampa (2026-10-25), sanguijuela (2026-10-26) · de El origen: proyectil, fuego con quemadura.
-- 🧿 **Debuffer — 15**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25), silencio (Tótem de silencio, 2026-10-25), extenuar (2026-10-25), cegar (2026-10-25), grito de pánico (2026-10-25), nube tóxica (2026-10-26) · de El origen: ceguera, veneno, inmovilizar.
+- 🧿 **Debuffer — 16**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25), silencio (Tótem de silencio, 2026-10-25), extenuar (2026-10-25), cegar (2026-10-25), grito de pánico (2026-10-25), nube tóxica (2026-10-26), debilitar (Maldición debilitante, 2026-10-26) · de El origen: ceguera, veneno, inmovilizar.
 - 💚 **Support — 15**: arma elemental, grito de guerra (¡A la carga! y Arenga), curar (Sanar, Oleada sanadora, Bálsamo, Círculo de sanación, Aura sanadora) — de fábrica desde el 2026-10-23, devolver el daño (Coraza de púas y Velo espejado, 2026-10-24), bendecir el arma, ojo certero (2026-10-24), estandarte (Estandarte de guerra, 2026-10-24), señalar la presa (2026-10-25), armas perforantes (2026-10-25), redoble de tambores (2026-10-25), frenesí inducido (2026-10-25), limpiar estados (Purificar, 2026-10-25), levitar (2026-10-25), empower (Empuje, 2026-10-26) · de El origen: escudo a un aliado.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
 **Para emparejar** (regla del dueño, 2026-10-25: «empezamos a tener en cuenta todos los roles de creep e ir emparejándolos… para que estén todos
-avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Mago, Debuffer, Support y Choque liviano en 15; Rango + Hunter en 16; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
+avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Mago, Support y Choque liviano en 15; Rango + Hunter y Debuffer en 16; después los cinco juntos hasta Choque pesado (18). El Jefe va aparte.
 
 ## Los roles
 
@@ -483,7 +487,7 @@ Lisiado, Expuesto, Marcado, Presa, Lento, Cansado, Exhausto, Escarcha, Armadura 
 Inmovilizado, Rengo, Desarmado; y, de personajes, Enyetar.
 
 **A. Bajar números**
-1. **Debilitar**: el objetivo pega menos (Debilitado, que se apila).
+1. ✅ **Debilitar** — **Maldición debilitante** (2026-10-26, la de la clase: PdG.Esp contra Res.Esp; 1d6 siniestro, Debilitado 2 turnos y Lento 2 turnos; reemplaza a la vieja Debilitar a mano): el objetivo pega menos (Debilitado, que se apila).
 2. **Torpeza**: menos Probabilidad de Golpe.
 3. ✅ **Exponer** ✦ — **Aguja del desamparo** (2026-10-24): un proyectil, su PdG.Esp contra la Evasión de un rival en su Rango; si pega, 1d6 arcano directo y
    Expuesto hasta su próximo turno (la Evasión a la mitad y sin reacciones que cuesten No2). 2 No2 y 3 SP, o cooldown 3.
@@ -559,7 +563,7 @@ tipos y clase»): las de Debuffer, con el original tal cual (o, si no tiene, lo 
 de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
 - ✅ **Enyetar** → Mal de ojo: «Enyetar [5] — Maldición (Esp / Res.M). Flash. Obliga a repetir una tirada y quedarse con el valor más bajo.»
 - ✅ **Confusión** → Confusión: «Confusión [5] — Maldición (Esp / Res.M). Antes de realizar un ataque o habilidad con objetivo, tira 1d4: 1) el debuffer elige el objetivo; 2) gasta los No2 pero no realiza la acción; 3) elige el objetivo al azar; 4) actúa…»
-- **Maldición debilitante**: «Maldición debilitante [5] — Maldición (Esp / Res.M). -1 a todas las tiradas. Duración: 2 turnos. Acumulable. Lento.»
+- ✅ **Maldición debilitante** → Maldición debilitante: «Maldición debilitante [5] — Maldición (Esp / Res.M). -1 a todas las tiradas. Duración: 2 turnos. Acumulable. Lento.»
 - ✅ **Maldición extenuante** → Extenuar: «Maldición extenuante [3] — Maldición (Esp / Res.M). Incrementa en 1 los Nitros de todas las acciones. Debe pagar 1 Nitro para moverse cada 2 casillas. Duración: 1 turno. Acumulable. Lento.»
 - **Maldición tormentosa**: «SP 5. Maldición (Esp / Res.M). Por cada acción recibe daño igual a No2 - 1; paga 1 HP para moverse cada 2 casillas. Dura 3 turnos. Acumulable. Lento.»
 - **Drenar vida**: «Drenar vida [X] — Tira X + 1dX. X no puede ser mayor a ESP. El objetivo tira resistencia mágica. Drena HP igual a la diferencia. El HP obtenido así puede acumularse hasta 50% por encima del máximo.»

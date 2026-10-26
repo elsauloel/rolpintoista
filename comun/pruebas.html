@@ -1180,6 +1180,13 @@ prueba('⛈ Maldición tormentosa (Debuffer, creep, 2026-10-26): PdG.Esp contra 
   igual([x.tira.stat, x.contra.map(c => c.stat || c).join(','), x.dano.formula, x.dano.tipo, x.efectos[0].nombre, sc.estados[0].turnos, !!sc.estados[0].tormenta, h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('debuffer')],
     ['pdgmg', 'resmg', '1d6', 'siniestro', 'Atormentado', 3, true, 2, 5, 3, true]);
 });
+prueba('😮‍💨 Robar el aliento (Debuffer, 2026-10-26): PdG.Esp contra Res.Esp, 1d6 siniestro y pierde 2 No2 + la diferencia (en 0, Sentado)', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Robar el aliento'), h = armarHabilidadDeCreep(e.datos, 2);
+  const x = Combatiente.habEjecucion(h, h.duelo, {stat: s => ({esp: 4, rng: 5})[s] || 0, etq: s => s});
+  const ef = x.efectos[0];
+  igual([x.tira.stat, x.contra.map(c => c.stat || c).join(','), x.dano.formula, x.dano.tipo, ef.nombre, ef.no2, ef.no2Dif, ef.no2Sentado, h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('debuffer')],
+    ['pdgmg', 'resmg', '1d6', 'siniestro', 'Pierde No2', 2, true, true, 2, 3, 3, true]);
+});
 prueba('🎯 Tiro certero (Rango, 2026-10-26): +1 PdG, Perfora 3 e ignora 2 de Resistencia a crítico; lo de un ataque y 2 SP, o cooldown 2', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Tiro certero'), h = armarHabilidadDeCreep(e.datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {perfora: 1}});

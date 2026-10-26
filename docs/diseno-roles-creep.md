@@ -12,6 +12,9 @@
 - **Las skills de clase también entran en la lista** (dueño, 2026-10-26: «incorporá a la lista los skills de clase, para tener en cuenta. Eso en todos
   los tipos y clase»): al final de cada rol está el bloque «Skills de clase, para tener en cuenta» (Warrior y Tanque → Choque pesado, Asalto → Choque
   liviano, Shooter → Rango, Mago → Casters, Support, Debuffer), con el original y si ya tiene versión de creep. Al presentar el rol, se repasan también.
+- **La versión creep de una skill de clase, un poco más potente** (dueño, 2026-10-26: «siempre tirala un poquito más agresiva o un poquito más potente,
+  porque los creeps tienen menos posibilidad de combear. En general, tienen menos skills»): al proponerla, ya un escalón arriba de la de clase (un +1
+  más, un dado más, un turno más, más alcance o más barata), diciendo qué se le subió. Si el dueño pide «lo mismo que la de clase», queda igual.
 - Lo que el dueño define («queda así») se programa, pasa las pruebas automáticas, se sube y se anota «para probar»; las pruebas en el mapa se corren
   todas juntas cuando él lo pide.
 - Una habilidad puede servir a más de un rol, y puede tener su versión de bestia y de humanoide (o una sola para los dos).

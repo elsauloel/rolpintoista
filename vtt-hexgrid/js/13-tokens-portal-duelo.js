@@ -2173,7 +2173,7 @@ async function dueloAplicarEfectoBase(d, ef){
   const t = tokens.get(d.defensor.tokenId);
   if(!t) return {manual: true, nota: 'el token ya no está: aplicalo a mano'};
   if(typeof talismanUnaVez === 'function' && !talismanUnaVez(d, ef)) return {nota: 'el talismán ya lo hizo este turno'};   // 🔮 la Cabeza reducida, el Muñeco vudú (js/53)
-  if(spec.nombre === 'Demora') return dueloDemora(d.defensor.tokenId);
+  if(spec.nombre === 'Demora') return dueloDemora(d.defensor.tokenId, spec.stacks);   // (stacks = cuántos lugares: el Cascotazo, Demora 2)
   if(spec.soltar && !spec.soltar.visual){   // 🕸 una copia vieja de la Red Nerubian o de Tela de araña: la telaraña sale del nombre (js/68)
     const v = Combatiente.atrapaDeNombre((d.hab && d.hab.nombre) || (d.ataque && (d.ataque.habNombre || d.ataque.nombre)) || '');
     if(v) spec.soltar = {...spec.soltar, visual: v};
@@ -2303,18 +2303,24 @@ async function dueloAplicarEfectoBase(d, ef){
 // Demora (Tipo 10, dueño 2026-10-03): baja al golpeado 1 lugar en el orden de turnos, definitivo (como el ▼ del GM: el turno sigue con quien
 // lo tenía). Dos casos quedan a mano, porque moverlo solo rompería la ronda: si ya actuó y quedaría después de quien tiene el turno (actuaría
 // dos veces), o si es su propio turno (el de abajo perdería el suyo).
-async function dueloDemora(tokenId){
+// `lugares` (2026-10-26, el Cascotazo: Demora 2): cuántos lugares baja. Si ya actuó esta ronda, no pasa del que tiene el turno (no vuelve a actuar);
+// lo que no pudo bajar queda a mano.
+async function dueloDemora(tokenId, lugares){
+  const n = Math.max(1, Math.round(num(lugares)) || 1), txt = k => `${k} lugar${k === 1 ? '' : 'es'}`;
   const orden = iniciativa.orden.slice();
   const i = orden.findIndex(o => o.id === tokenId);
   if(i < 0) return {manual: true, nota: 'no está en el orden de turnos: a mano'};
   if(i === orden.length - 1) return {nota: 'ya era el último del orden de turnos'};
-  if(i === iniciativa.turno) return {manual: true, nota: 'es su turno: bajalo 1 lugar (▼) cuando termine'};
-  if(i + 1 === iniciativa.turno) return {manual: true, nota: 'ya actuó esta ronda: bajalo 1 lugar (▼) al empezar la próxima'};
+  if(i === iniciativa.turno) return {manual: true, nota: `es su turno: bajalo ${txt(n)} (▼) cuando termine`};
+  const tope = i < iniciativa.turno ? iniciativa.turno - 1 : orden.length - 1;   // ya actuó: hasta justo antes del que tiene el turno
+  const j = Math.min(i + n, tope);
+  if(j <= i) return {manual: true, nota: `ya actuó esta ronda: bajalo ${txt(n)} (▼) al empezar la próxima`};
   const activo = orden[iniciativa.turno] ? orden[iniciativa.turno].id : null;
-  [orden[i], orden[i + 1]] = [orden[i + 1], orden[i]];
+  const [x] = orden.splice(i, 1); orden.splice(j, 0, x);
   const turno = activo ? Math.max(0, orden.findIndex(o => o.id === activo)) : iniciativa.turno;
   if(!(await guardarIniciativa({orden, turno}))) return {manual: true, nota: 'no se pudo mover en el orden de turnos: a mano'};
-  return {nota: `baja 1 lugar en el orden de turnos (${i + 1}.º → ${i + 2}.º)`};
+  const falta = n - (j - i);
+  return {nota: `baja ${txt(j - i)} en el orden de turnos (${i + 1}.º → ${j + 1}.º)${falta > 0 && j < orden.length - 1 ? ` (${txt(falta)} más, a mano, al empezar la próxima ronda)` : ''}`};
 }
 
 // Le manda un pedido del duelo (opciones de defensa, tirar, contraatacar) al iframe de la ficha o de las Acciones del creep de ese lado, sin mostrarlo.

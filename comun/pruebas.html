@@ -1166,6 +1166,13 @@ prueba('🌩 Tormenta arcana (Mago, creep, 2026-10-26): 1d20 proyectiles de 1d4+
   igual([x.objetivo, x.radio, !!x.fuegoAmigo, !!x.soloDodge, x.tormenta.proyectiles, x.tormenta.cada, l.tormenta.cada, x.tira, x.alcance > 0, h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('mago')],
     ['area', 2, true, true, '1d20', '1d4+1', '1d4+1', null, true, 5, 15, 4, true]);
 });
+prueba('🪨 Cascotazo (Mago, 2026-10-26): PdG contra Evasión, 2d6 + Ef.Esp físico que critica como Tipo 10, Demora 2', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Cascotazo'), h = armarHabilidadDeCreep(e.datos, 2);
+  const x = Combatiente.habEjecucion(h, h.duelo, {stat: s => ({dmgesp: 3, rng: 5})[s] || 0, etq: s => s});
+  const l = Duelo.limpiarHab(x), ef = x.efectos[0];
+  igual([x.objetivo, x.tira.stat, x.contra.map(c => c.stat || c).join(','), x.dano.formula, x.dano.tipo, !!x.dano.ignoraDef, x.critTipo, l.critTipo, ef.nombre, ef.spec.stacks, Duelo.specDeEfecto(ef).stacks, h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('mago')],
+    ['enemigo', 'pdg', 'eva', '2d6+3', 'fisico', false, 10, 10, 'Demora', 2, 2, 2, 3, 3, true]);
+});
 prueba('🎯 Tiro certero (Rango, 2026-10-26): +1 PdG, Perfora 3 e ignora 2 de Resistencia a crítico; lo de un ataque y 2 SP, o cooldown 2', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Tiro certero'), h = armarHabilidadDeCreep(e.datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {perfora: 1}});

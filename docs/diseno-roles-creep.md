@@ -42,7 +42,7 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
   furia, pisotón, provocar, segundo aliento, aguantar el daño, cubrir al de al lado, perforar, carga que derriba.
 - 🗡 **Choque liviano — 18**: golpe preciso, sangrado, trabar, golpear y alejarse, salto, abrir la herida, manada, ráfaga, por la espalda · de El origen:
   robar, sigilo, varios golpes, bajo tierra, veneno (de fábrica desde el 2026-10-25: Hoja envenenada / Mordisco infectado), todo al ataque (Degollar, 2026-10-26), finta (2026-10-26), dash (2026-10-26), ojo de asesino (2026-10-26).
-- 🏹 **Rango y Hunter — 18**: trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar, mantener a raya (2026-10-25), atravesar (Flecha que atraviesa, 2026-10-25), disparos encadenados (Ráfaga encadenada, 2026-10-25), disparar y replegarse (Disparo y repliegue, 2026-10-26), clavar a la pared (2026-10-26), tiro al arma (2026-10-26), tiro que derriba (2026-10-26) · de El origen: área a distancia,
+- 🏹 **Rango y Hunter — 19**: tiro certero (2026-10-26), trabar (Red, Tela de araña, Tiro a la rodilla), vigilancia, tiro apuntado, señalar, mantener a raya (2026-10-25), atravesar (Flecha que atraviesa, 2026-10-25), disparos encadenados (Ráfaga encadenada, 2026-10-25), disparar y replegarse (Disparo y repliegue, 2026-10-26), clavar a la pared (2026-10-26), tiro al arma (2026-10-26), tiro que derriba (2026-10-26) · de El origen: área a distancia,
   atravesar armadura, crítico, flecha con veneno, empujar a distancia, trampas, domador.
 - ✨ **Mago — 18**: daño en área, rayo en cadena, cono de frío (Hálito polar), muro de fuego, descarga cargada (Descarga arcana, 2026-10-24), área anunciada (Meteoro, 2026-10-24), línea que atraviesa (Lanza de luz, 2026-10-25), rayo paralizante (Zap, 2026-10-25), lluvia de escarcha (2026-10-25), andanada arcana (2026-10-25), misiles elementales (2026-10-25), portal trampa (2026-10-25), prisión de hielo (2026-10-26), nova arcana (2026-10-26), ráfaga de viento (2026-10-26), parpadeo (2026-10-26) · de El origen: proyectil, fuego con quemadura.
 - 🧿 **Debuffer — 18**: control mental, maleficio, bajar la armadura (Maldición de la coraza, 2026-10-24), cortar la regeneración (Maldición de la sequía, 2026-10-24), exponer (Aguja del desamparo, 2026-10-24), disipar (Disipar, 2026-10-25), corroer (Corroer, 2026-10-25), silencio (Tótem de silencio, 2026-10-25), extenuar (2026-10-25), cegar (2026-10-25), grito de pánico (2026-10-25), nube tóxica (2026-10-26), debilitar (Maldición debilitante, 2026-10-26), sanguijuela (2026-10-26, del Mago), punto débil (Aguja siniestra, 2026-10-26) · de El origen: ceguera, veneno, inmovilizar.
@@ -50,7 +50,7 @@ a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 - 👑 Jefe (aparte): refuerzos (Plaga en la galería).
 
 **Para emparejar** (regla del dueño, 2026-10-25: «empezamos a tener en cuenta todos los roles de creep e ir emparejándolos… para que estén todos
-avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Mago, Rango + Hunter, Debuffer, Support y Choque liviano en 18 y Choque pesado en 19; se sigue rotando entre los cinco de 18. El Jefe va aparte.
+avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene** (con empate, rotando entre ellos), de a una habilidad. Hoy (2026-10-26): Mago, Debuffer, Support y Choque liviano en 18, Rango + Hunter y Choque pesado en 19. **Meta del dueño (2026-10-26): llegar a 20 en cada rol.** El Jefe va aparte.
 
 ## Los roles
 
@@ -245,7 +245,7 @@ la emboscada, matabestias, la espalda a distancia, la recarga, el proyectil perf
    antes, lo pierde).
 2. **Tensar al máximo**: si no se movió, el disparo pega más fuerte (el Tensar de los arcos).
 3. **Ojo de halcón**: sin la penalidad del tiro alto, o más alcance por un turno.
-4. **Tiro certero**: ignora parte de la Defensa (Perfora) o de la Resistencia a crítico.
+4. ✅ **Tiro certero** (2026-10-26: +1 PdG, Perfora 3 e ignora 2 de Resistencia a crítico): ignora parte de la Defensa (Perfora) o de la Resistencia a crítico.
 
 **B. Volumen de fuego** ✦
 5. **Disparo doble**: dos disparos con menos puntería cada uno.

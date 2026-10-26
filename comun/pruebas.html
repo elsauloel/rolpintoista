@@ -1153,6 +1153,12 @@ prueba('🤺 Finta (Choque liviano, 2026-10-26): +2 al daño, +1 a los dos crít
   igual([h.duelo.arma.fijo, h.duelo.arma.critBono, h.duelo.arma.critpotBono, !!a.sinParry, h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('choque liviano')],
     [2, 1, 1, true, 'ATAQUE', 2, 2, true]);
 });
+prueba('🎯 Tiro certero (Rango, 2026-10-26): +1 PdG, Perfora 3 e ignora 2 de Resistencia a crítico; lo de un ataque y 2 SP, o cooldown 2', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Tiro certero'), h = armarHabilidadDeCreep(e.datos, 2);
+  const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {perfora: 1}});
+  igual([a.mods.pdg, a.perfora, a.mods.ignoraResistCrit, h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('rango'), e.etiquetas.includes('tiro certero')],
+    [1, 4, 2, 'ATAQUE', 2, 2, true, true]);
+});
 prueba('☀ Luz para los suyos (Support, 2026-10-26, rehecha: un destello): área de diámetro 5 sin dodge; Marcado 2 sin tirada; Ef.Esp contra Res.Esp, 1d8 de luz directo', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Luz para los suyos'), h = armarHabilidadDeCreep(e.datos, 2);
   const x = Combatiente.habEjecucion(h, h.duelo, {stat: s => ({rng: 5, dmgesp: 6})[s] || 0, etq: s => s});

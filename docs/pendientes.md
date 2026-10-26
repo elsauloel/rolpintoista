@@ -47,7 +47,7 @@
 >   - Para volver a hacerlo: escribir `/auto-mode-setup`; si alguna pregunta no se entiende, pegársela a Claude y la explica antes de contestar.
 > - [ ] **📖 Ver los globos del glosario** (2026-10-25, dueño: «anotá lo de los globos del glosario para ver en la compu»): en la tienda, el catálogo, la mochila y el «Ver» de un ítem, los términos (estados, mecánicas de armas, bonos) subrayados con su globo al pasar el mouse; está también en `docs/pruebas-en-el-mapa.md` («El glosario con globos», 2026-10-09).
 > - [ ] **🚩 Ver la animación de las banderitas del Estandarte de guerra** (2026-10-24, dueño: «anotá para ver en la compu la animación de las banderitas»):
->   en «Claude · pruebas» quedó clavado el estandarte del Escarabajo (casilla 8,−4). Mirar el aura en movimiento —los banderines carmesí y dorado que
+>   en «Claude · pruebas» quedó clavado el estandarte del Escarabajo (casilla 11,−1), y al lado el Tótem de silencio de la Bruja (5,−1, con su costura violeta). Mirar el aura en movimiento —los banderines carmesí y dorado que
 >   flamean a lo largo del contorno, el anillo y el velo— y decidir si queda así (el dueño había dicho «algún estilo marcial, pero después te digo»).
 >   Se ajusta en `vtt-hexgrid/js/73-estandarte.js` (`estandarteDibujar`: cuántos banderines, cuánto flamean, el redondeo de las puntas `MARGEN`).
 > - [x] (2026-10-22, lo vio el dueño, juan con los cuatro) **⚡ Ver juntos los botones Flash nuevos y el 🧿 Mal de ojo** (2026-10-21, dueño: «anotar esto en revisar cuando esté en la compu»): 🛡️ Blindaje,

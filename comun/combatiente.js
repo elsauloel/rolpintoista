@@ -1824,7 +1824,7 @@ const Combatiente = (() => {
     const perfora = Math.min(5, Math.round(nf(arma.perfora) + nf(a.perfora)));   // Perfora: la del arma + la de la habilidad (Tajear, 2026-10-10)
     return {tipo: 'habilidad-arma', habNombre: h.nombre, ...(h.detalle ? {habDetalle: String(h.detalle).slice(0, 600)} : {}), armaId: arma.id || '', armaNombre: arma.nombre || '', tipoDado: arma.tipoDado, rango: !!arma.rango,
       alcance: o.alcance, sinParry: !!a.sinParry || !!arma.sinParry, ...(Object.keys(esp).length ? {espalda: esp} : {}), ...(perfora > 0 ? {perfora} : {}),
-      mods: {pdg: nf(a.pdg) + nf(a.pdgPorX) * X, dados: nf(a.dados) + nf(a.dadosPorX) * X,   // `dados`: fijos, del Tipo del arma (2026-10-20, Golpe fuerte de creep)
+      mods: {pdg: nf(a.pdg) + nf(a.pdgPorX) * X, fuerza: nf(a.fuerza), dados: nf(a.dados) + nf(a.dadosPorX) * X,   // `dados`: fijos, del Tipo del arma (2026-10-20, Golpe fuerte de creep)
         fijo: nf(a.fijo) + nf(a.fijoPorX) * X, ignoraResistCrit: nf(a.ignoraResistCrit), critBono: nf(a.critBono), critpotBono: nf(a.critpotBono),
         ...(/^\d{1,2}d\d{1,3}$/i.test(String(a.dadoExtra || '')) ? {dadoExtra: String(a.dadoExtra).toLowerCase()} : {})},   // +1d6 de otro tamaño que el arma (2026-10-13)
       efectos: (c.efectos || []).map(mapEf),

@@ -345,7 +345,7 @@ const FichaDuelo = (() => {
         else { const ee = evaEsp(d); tirarValorStat(ee.txt ? `Evasión (${ee.txt})` : 'Evasión', num(compute().final.eva) + ee.val, 'eva', ee.fijo); Combatiente.gastarPasoFantasma(d, ee); }
       },
       // La Fuerza del golpe del atacante contra el Bloqueo del defensor (Fue + peso de su arma).
-      fuerza: d => FichaAcciones.fuerzaGolpeConArma(getS(), armaDelInv(d.ataque.armaId), ui),
+      fuerza: d => FichaAcciones.fuerzaGolpeConArma(getS(), armaDelInv(d.ataque.armaId), ui, num(d.ataque.mods && d.ataque.mods.fuerza)),   // + lo de la habilidad (el Dash, 2026-10-26)
       // El Bloqueo del defensor con el mismo arma o escudo con el que hizo Parry.
       bloquear: d => {
         const it = d.defensa && d.defensa.itemId ? getS().inventario.find(x => x.id === d.defensa.itemId) || null : null;

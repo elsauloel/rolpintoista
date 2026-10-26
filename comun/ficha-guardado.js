@@ -275,10 +275,10 @@ const FichaGuardado = (() => {
   function migrarDash(S){
     if(typeof CLASES_SKILLS === 'undefined') return;
     (S.habilidades || []).forEach(h => {
-      if(!h || h.habClaseId !== 'asalto-dash' || h.dashMapa) return;
       const base = CLASES_SKILLS.flatMap(c => c.habilidades || []).find(x => x.id === 'asalto-dash');
-      if(!base || !base.dashMapa) return;
-      ['detalle', 'nitrosCosto', 'efectoNombre', 'efectoTurnos', 'efectoMods', 'efectoDetalle', 'dashMapa', 'duelo', 'modo'].forEach(k => { if(base[k] !== undefined) h[k] = structuredClone(base[k]); });
+      if(!h || h.habClaseId !== 'asalto-dash' || !base || !base.dashMapa || (h.dashMapa && h.dashMapa.v === base.dashMapa.v)) return;
+      // (la versión 2, el mismo día: +2 PdG y +1 a la Fuerza del golpe, sin el +2 al Parry)
+      ['detalle', 'nitrosCosto', 'efectoNombre', 'efectoTurnos', 'efectoMods', 'efectoDetalle', 'dashMapa', 'duelo', 'modo'].forEach(k => { if(base[k] !== undefined) h[k] = structuredClone(base[k]); else delete h[k]; });
     });
   }
   function completar(S, o){

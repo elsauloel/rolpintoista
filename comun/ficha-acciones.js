@@ -514,8 +514,8 @@ const FichaAcciones = (() => {
   function fuerzaGolpeValorConArma(S, arma){
     return FichaCombate.statParaArma(S, 'fue', arma) + (arma ? num(arma.peso) : 0);
   }
-  function fuerzaGolpeConArma(S, arma, ui){
-    tirarValorStat(S, arma ? `Fuerza del golpe · ${arma.nombre}` : 'Fuerza del golpe', fuerzaGolpeValorConArma(S, arma), 'fue', undefined, undefined, undefined, ui);
+  function fuerzaGolpeConArma(S, arma, ui, extra){   // `extra`: lo que suma la habilidad del ataque (el Dash, 2026-10-26)
+    tirarValorStat(S, arma ? `Fuerza del golpe · ${arma.nombre}` : 'Fuerza del golpe', fuerzaGolpeValorConArma(S, arma) + num(extra), 'fue', undefined, undefined, undefined, ui);
   }
   // Botones Parry, Bloqueo y Fuerza del golpe: con dos o más armas equipadas se elige con cuál.
   function elegirArmaDefensa(S, tipo, ui){

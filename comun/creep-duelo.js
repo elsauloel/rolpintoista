@@ -243,7 +243,7 @@ const CreepDuelo = (() => {
       },
       fuerza: d => {
         const sc = deLado(d.atacante);
-        if(sc) ui.publicar(sc, A().tirada(`${sc.nombre} · Fuerza del golpe`, C().fuerzaGolpeValor(sc)));
+        if(sc) ui.publicar(sc, A().tirada(`${sc.nombre} · Fuerza del golpe`, C().fuerzaGolpeValor(sc) + num(d.ataque && d.ataque.mods && d.ataque.mods.fuerza)));   // + lo de la habilidad (el Dash, 2026-10-26)
       },
       bloquear: d => {
         const sc = deLado(d.defensor);

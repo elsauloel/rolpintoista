@@ -708,12 +708,13 @@
     efecto: {nombre: 'Expuesto', turnos: 1, polaridad: 'debuff'}});
   // 💨 Auditada (dueño, 2026-10-26; Choque liviano, el Dash del Asalto: «el costo de nitros de ataque solo se cobra si el dash incluye un ataque… +2 al daño
   // al golpe… que atraviese un solo objetivo… si el ataque del dash es parreado o bloqueado con éxito, se interrumpe el movimiento: se queda en el casillero
-  // anterior al objetivo»): el camino y el golpe los hace el mapa (`dash`, vtt-hexgrid/js/76); +2 al Parry hasta su próximo turno. 1 No2 (+ lo de un ataque si
+  // anterior al objetivo»; el mismo día: «el parry se tira de manera defensiva… cambiarle el +2 al daño por un +2 a la probabilidad de golpe… y +1 al bloqueo»): el
+  // camino y el golpe los hace el mapa (`dash`, vtt-hexgrid/js/76); el golpe, +2 PdG y +1 a la Fuerza del golpe (contra el Bloqueo). 1 No2 (+ lo de un ataque si
   // le pega a alguien) y 3 SP, o cooldown 3.
-  H('Dash', 'DM', 'hd', 'e', 3, {detalle: 'Avanza 3 casillas en línea recta, gratis y sin dar ataques de oportunidad. Puede atravesar a un rival: avanza una casilla más y le pega al pasar (un ataque con su arma con +2 al daño, que cuesta lo de un ataque). Si el rival lo para con Parry o lo bloquea, el Dash se corta: se queda en la casilla de antes de él. Además, +2 a su Parry hasta su próximo turno. Lo frenan los Sólidos, las paredes y un segundo token.',
-    no2: 1, spCosto: 3, auditada: true, ataqueTxt: 'avanza 3 en línea recta; atraviesa a un rival, le pega con +2 al daño y sigue una casilla más (si lo para, se queda antes); +2 Parry',
-    dash: {casillas: 3}, efecto: {nombre: 'Dash', turnos: 1, polaridad: 'buff', mods: {parry: 2}},
-    duelo: {modo: 'arma', objetivo: 'enemigo', x: 'nitros', arma: {pdg: 0, dados: 0, fijo: 2}, efectos: []}});
+  H('Dash', 'DM', 'hd', 'e', 3, {detalle: 'Avanza 3 casillas en línea recta, gratis y sin dar ataques de oportunidad. Puede atravesar a un rival: avanza una casilla más y le pega al pasar (un ataque con su arma con +2 a la Probabilidad de Golpe y +1 a la Fuerza del golpe contra el Bloqueo; cuesta lo de un ataque). Si el rival lo para con Parry o lo bloquea, el Dash se corta: se queda en la casilla de antes de él. Lo frenan los Sólidos, las paredes y un segundo token.',
+    no2: 1, spCosto: 3, auditada: true, ataqueTxt: 'avanza 3 en línea recta; atraviesa a un rival y le pega con +2 PdG y +1 a la Fuerza del golpe, y sigue una casilla más (si lo para, se queda antes)',
+    dash: {casillas: 3},
+    duelo: {modo: 'arma', objetivo: 'enemigo', x: 'nitros', arma: {pdg: 2, dados: 0, fijo: 0, fuerza: 1}, efectos: []}});
   // 🤺 Auditada (dueño, 2026-10-26; Choque liviano, «finta»: la propuesta de Claude, «y además ponerle +1 al crítico frecuente y +1 al potente»): un ataque
   // con su arma con +2 al daño, Crítico frecuente +1 y potente +1, que no se puede parar (`sinParry`: ni Parry ni, por eso, Bloqueo; solo esquivar). Para
   // humanoides. Costo de Claude: el ataque y 2 SP, o cooldown 2.

@@ -375,5 +375,9 @@ function momentoAvisoCentro(id, d){
   AvisoCombate.mostrar({icono: d.icono || '•', titulo: d.titulo || '', pasos: Array.isArray(dt.pasos) ? dt.pasos : [],
     texto: Array.isArray(dt.pasos) && dt.pasos.length ? '' : (d.resultado || ''), veredicto: dt.veredicto || null, aMano: dt.aMano || '',
     ...(dt.boton ? {boton: String(dt.boton).slice(0, 30)} : {}),   // ej. «💚 Aceptar» de una cura (2026-10-07)
-    alCerrar: () => { avisoCentro = null; }});
+    alCerrar: () => {
+      avisoCentro = null;
+      // 😤 Provocado por alguien (js/04 provocadoAvisar): al aceptarlo, quien provoca brilla en todas las pantallas hasta que pasa el turno (js/77).
+      if(d.tipo === 'provocado' && dt.provocaDe && typeof provocadoBrilloPedir === 'function') provocadoBrilloPedir(dt.provocaDe, dt.provocaDeNombre, dt.provocadoNombre);
+    }});
 }

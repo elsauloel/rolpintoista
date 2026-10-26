@@ -1,10 +1,11 @@
-// js/77-provocado.js — 😤 Tirar la bronca y el Anuncio del Provocado (2026-10-26, dueño).
+// js/77-provocado.js — 😤 Tirar la bronca y el brillo del que provoca (2026-10-26, dueño).
 // «Tirar la bronca» (Support, creep): elige un aliado en su Rango (o a sí mismo) y, alrededor de ese aliado (radio 3), los rivales tiran Res.Mt contra
 // el Ef.Esp del support; el que no resiste queda Provocado por ESE aliado 2 turnos (el área en cascada de siempre, `dueloElegirAreaMapa` con el
 // centro fijo; el estado lleva `provocaDe` / `provocaDeNombre`, como el Miedo lleva `miedoDe`).
-// El Anuncio: al empezar el turno de alguien Provocado por alguien, la pantalla que lo maneja (el GM para un creep; su dueño, o quien tiene 🎮 el control,
-// para un personaje) muestra «Estás provocado por Fulano» con lo que implica; al tocar Aceptar, Fulano brilla con un anillo rojo que late hasta que
-// pasa ese turno, en todas las pantallas (el momento `provocado-brillo`, js/16).
+// El Anuncio: es el de siempre del Provocado (js/04 provocadoAvisar, al empezar su turno, a quien lo maneja), que con `provocaDe` dice «Estás
+// provocado por Fulano»; al tocar Aceptar (js/16 momentoAvisoCentro → provocadoBrilloPedir), Fulano brilla con un anillo rojo que late hasta que
+// pasa ese turno, en todas las pantallas (el momento `provocado-brillo`, js/16). (Hasta el 2026-10-26 había un Anuncio propio acá que se pisaba con
+// ese y con «Empieza tu turno»: probándolo en el mapa no llegaba.)
 
 // ---------- Tirar la bronca ----------
 function provocarAliado(sc, h, alTerminar){
@@ -30,41 +31,17 @@ function provocarAliado(sc, h, alTerminar){
   }, `<b>😤 ${esc(h.nombre)}: ¿sobre qué aliado?</b> <span>clic sobre un aliado en su Rango (${rng}) o sobre el mismo creep · los rivales a ${radio} de él quedan provocados por él · Esc o clic derecho cancelan</span>`, true, fin);
 }
 
-// ---------- El Anuncio al empezar el turno ----------
-let provocadoTurnoVisto = '';
+// ---------- El brillo del que provoca ----------
 const provocadoBrillos = new Map();   // tokenId del que provoca → la clave del turno en que brilla
-function provocadoEstadoDe(t){
-  const lista = t.tipo === 'creep' ? ((creepPrivadoDe(t.fichaId) || {}).estados || []) : ((estadoDe(t) || {}).estados || []);
-  return lista.find(e => e && e.activo !== false && String(e.nombre || '') === 'Provocado' && e.provocaDe) || null;
+const provocadoClave = () => `${iniciativa.ronda}:${iniciativa.turno}:${num(iniciativa.paso)}`;
+// Al aceptar el Anuncio (js/16): brilla acá y en las demás pantallas (el momento), hasta que pasa el turno.
+function provocadoBrilloPedir(provocaDe, quien, nom){
+  if(!provocaDe || !tokens.has(provocaDe)) return;
+  const clave = provocadoClave();
+  provocadoBrillos.set(provocaDe, clave); pedirDibujo();
+  try{ momentoAbrir({tipo: 'provocado-brillo', icono: '😤', titulo: `${nom || 'Alguien'} va contra ${quien || 'quien lo provocó'}`, resultado: `Está provocado por ${quien || 'él'}: este turno es para ir contra él.`, estado: 'listo', datos: {provocaDe, clave}}); }catch(err){}
 }
-function provocadoMeToca(t){
-  if(t.tipo === 'creep') return soyGM;
-  if(t.tipo !== 'pj' || !t.fichaId) return false;
-  const ficha = String(t.fichaId).split(SEP_INVOCACION)[0];
-  return typeof bnManejo === 'function' ? !!bnManejo(ficha) : (t.duenoUid === (fbUsuario && fbUsuario.uid));
-}
-setInterval(() => {
-  try{
-    if(modoMapa !== 'combate' || !iniciativa.orden.length) return;
-    const clave = `${iniciativa.ronda}:${iniciativa.turno}:${num(iniciativa.paso)}`;
-    if(clave === provocadoTurnoVisto) return;
-    provocadoTurnoVisto = clave;
-    const id = (iniciativa.orden[iniciativa.turno] || {}).id, t = id && tokens.get(id);
-    if(!t || !provocadoMeToca(t)) return;
-    const e = provocadoEstadoDe(t);
-    if(!e) return;
-    const quien = e.provocaDeNombre || 'alguien', nom = nombreDe(t), n = Math.max(0, Math.round(num(e.turnos)));
-    const vos = t.tipo !== 'creep';
-    AvisoCombate.mostrar({icono: '😤', titulo: vos ? `Estás provocado por ${quien}` : `${nom} está provocado por ${quien}`,
-      texto: `${quien} ${vos ? 'te tiene enfurecido' : 'lo tiene enfurecido'}: este turno es para ir contra él. ${vos ? 'Atacalo o usá contra él una habilidad hostil; si no llegás, acercate todo lo que puedas. No te curás, no te protegés ni hacés otra cosa en lugar de eso.' : 'Que lo ataque o use contra él una habilidad hostil; si no llega, que se acerque todo lo que pueda. No se cura, no se protege ni hace otra cosa en lugar de eso.'}${n ? ` ${vos ? 'Te queda' : 'Le queda'}${n === 1 ? '' : 'n'} ${n} turno${n === 1 ? '' : 's'} provocado.` : ''}`,
-      botones: [{texto: 'Aceptar', alClic: () => {
-        AvisoCombate.cerrar();
-        provocadoBrillos.set(e.provocaDe, clave); pedirDibujo();
-        try{ momentoAbrir({tipo: 'provocado-brillo', icono: '😤', titulo: `${nom} va contra ${quien}`, resultado: `Está provocado por ${quien}: este turno es para ir contra él.`, estado: 'listo', datos: {provocaDe: e.provocaDe, clave}}); }catch(err){}
-      }}]});
-  }catch(err){ console.error('Provocado:', err); }
-}, 1000);
-// El momento que llega a todas las pantallas (js/16): el que provoca brilla durante ese turno.
+// El momento que llega a todas las pantallas (js/16).
 function provocadoBrilloRecibido(d){
   if(d && d.datos && d.datos.provocaDe) { provocadoBrillos.set(d.datos.provocaDe, d.datos.clave); pedirDibujo(); }
 }
@@ -72,7 +49,7 @@ function provocadoBrilloRecibido(d){
 function provocadoDibujar(id, x, y, rad, z){
   const clave = provocadoBrillos.get(id);
   if(!clave) return false;
-  if(clave !== `${iniciativa.ronda}:${iniciativa.turno}:${num(iniciativa.paso)}`){ provocadoBrillos.delete(id); return false; }
+  if(clave !== provocadoClave()){ provocadoBrillos.delete(id); return false; }
   const p = 0.5 + 0.5 * Math.sin(performance.now() / 220);
   ctx.save();
   trazarPuntos(verticesHex(x, y, rad * (1.16 + 0.12 * p)));

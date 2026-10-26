@@ -84,7 +84,7 @@ avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene
   vida, más uno y más uno. Con la mitad de la vida o menos, más dos y más tres… Con un cuarto de la vida o menos, el dos más de probabilidad de golpe… y que
   cueste 3 SP»): un ataque con su arma que crece cuanto menos vida tiene, escalonado (como el Remate): **con más de la mitad, +1 a los dos críticos y +1 al
   daño**; **con la mitad o menos, +2 Crítico frecuente, +2 Crítico potente y +3 al daño**; **con un cuarto o menos, además +2 PdG**. **Lo de un ataque y
-  3 SP**. *(A confirmar:)* que el «más uno y más uno» sea +1 a los dos críticos y +1 al daño (como el «más dos y más tres»); el cooldown (2).
+  3 SP** (confirmado: el «más uno y más uno» es +1 a los dos críticos y +1 al daño). *(A confirmar:)* el cooldown (2).
 
 ## Los roles
 

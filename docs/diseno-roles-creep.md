@@ -598,6 +598,8 @@ Propuesta (2026-10-27):
   N puntos del golpe pasan siempre la Defensa (dueño, 2026-10-27: «un punto de daño, si perfora uno, pasa ignorando la armadura»; así está programado
   desde el 2026-10-10, `Combatiente.perforaPasa`). Con Perfora 1, cada aguja deja al menos 1 de daño → **el veneno entra siempre** (salvo que lo resista
   con la Res.Esp). *Mecánica nueva:* una trampa con Perfora (hoy no existe).
+  **Sin resistencia** (dueño, 2026-10-27: «si la aguja lastima, el veneno entra siempre»): la Aguja (la del catálogo y la de creep) no tiene tirada para
+  el veneno; con Perfora siempre lastima, salvo que el golpe lo absorba entero un escudo (P227).
   **Detectarla** (aclaración al dueño): solo tiran quienes tienen Percepción aumentada, Pisada atenta o Desarmar trampas (al pasar al lado), o con una
   luz que revela; el resto no tira.
 - 🏹 **H4. Mina del cazador**: al pisarla, flor de 7, 3d6 directo y Pajaritos 2 turnos.

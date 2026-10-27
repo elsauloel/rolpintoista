@@ -1276,3 +1276,18 @@ sigilo. Hecho: el **cono azul** no sirve (avisa y la vuelve a pedir). La **zona 
 Percepción) por ahora **sí sirve**. **A decidir:** ¿se deja así, se prohíbe también, o se puede pero el rival tira Percepción para verla colocar?
 
 **Decidido (dueño, 2026-10-27):** «la zona naranja no dispara nada de detección de trampas»: queda como está (se puede, sin tirada).
+
+### P227 — Escudo y Vida extra: ¿lo que absorbe cuenta como daño? (2026-10-27) — regla decidida, falta clasificar
+
+**Dueño (2026-10-27):** «el escudo especial… a fines prácticos funciona como si fuera una barra de vida extra, que al consumirse se consumió el
+escudo. Pero eso no cuenta como daño, cuenta como el escudo… una trampa que perfora uno a alguien que tiene un escudo especial, no le aplica el
+veneno. Por otro lado, la vida extra de Larry sí, porque no es un escudo, es vida extra… solamente se llena cuando está full vida… me gustaría
+distinguir que los escudos especiales que funcionan como una barra de HP sí frenan los efectos que solo aplican al pasar algo de daño».
+
+**Cómo está hoy:** desde el 2026-10-07 (P170) el Escudo especial y el Excedente de vida son un solo estado, **Vida extra** (los alias se juntaron);
+aparte están Shield, Envión y Barrera. Y las dos cuentas no coinciden: en el **duelo**, lo que absorbe cualquiera de ellos **cuenta** como daño (el
+veneno de un arma entra); en las **trampas**, lo que absorbe cualquiera **no cuenta** (el Dardo no envenena).
+
+**Regla nueva:** dos clases. **Escudo** (Shield, Envión, Barrera/Blindaje, Escudo especial…): lo que absorbe no es daño; si se come todo el golpe,
+no entra nada de lo que pide lastimar. **Vida extra** (lo que sobra de una cura o un drenaje, como el de Larry): es vida; lo que absorbe sí es daño.
+La misma cuenta en el duelo, las trampas y las zonas. **Falta:** confirmar qué va en cada clase (los ~20 ítems y habilidades que hoy dan «Vida extra»).

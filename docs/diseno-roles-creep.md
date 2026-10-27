@@ -324,6 +324,13 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
      finalizar el recorrido, ataca con +X al daño y a la PG.»; dueño, 2026-10-27: «va así»): avanza **hasta 4 en línea recta** (paga los No2 del
      movimiento) y ataca con su arma con **+X PdG y +X al daño** (X = casillas recorridas); si pega y corrió **3 o más**, tira **Fuerza + X contra
      la Res.CC**: si gana, **Sentado**. Un ataque, los No2 del movimiento y 2 SP, o cooldown 2.
+  9. ⚔ **Contraataque** (de clase: «Contraataque [2] — Permite realizar un ataque de oportunidad después de esquivar un ataque.»; dueño,
+     2026-10-27: «el de creep igual que decís vos, pero que no ataque gratis sin nitros, que gaste los nitros de un primer ataque»): **Flash**
+     (botón instantáneo en el duelo, solo si **ganó la Evasión o el Parry** contra un ataque cuerpo a cuerpo): ataca con su arma al que le pegó,
+     con **+1 PdG**, pagando **los No2 de un primer ataque**. 2 SP (4 en turno ajeno), o cooldown 2. Se decide después de ver el resultado (reacciona
+     a haber esquivado; no cambia ningún dado). Combina con Desarmar (del mismo Parry) y con Arte de la guerra.
+     **También cambia el de clase** (`comun/skills-clase.js`; dueño: «el de clase también debería tener flash y costar 1, cosa que al usarlo con
+     flash cueste 2»): **Flash, 1 SP** (2 en turno ajeno). Se programa con la tanda.
 - Ya cubiertas por una de fábrica: Amplificar daño (Golpe fuerte), Remolino (Barrido), Shockwave (Pisotón), Takle, Desarmar, Aguante; Cañón Vasco ≈
   Salto aplastante; Daño en área (tanque) ≈ Barrido. Sacadito sigue en pausa.
 

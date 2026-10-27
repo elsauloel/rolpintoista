@@ -101,24 +101,11 @@ function paredCorta(a, b){
   if(!a || !b || (a.col === b.col && a.fila === b.fila) || !paredesSegs().length) return false;
   return paredEntrePuntos(hexCentro(a.col, a.fila), hexCentro(b.col, b.fila));
 }
-// Las paredes se ven: un borde oscuro debajo del dibujo y, encima, una línea cortada del color de la Colisión (lo llama js/05).
-// Sin relleno (`transparente`, 2026-10-14, dueño: «cuando las uso para marcar la colisión, rompe la naturalidad del mapa»): no se pinta el color
-// ni el borde grueso; queda una línea oscura finita y la línea cortada roja solo la ve el GM.
-function dibujarParedEncima(t, z){
-  if(t.transparente && !soyGM) return;
-  ctx.save();
-  ctx.translate(t.origen.x, t.origen.y);
-  ctx.rotate(t.rotacion * Math.PI / 180);
-  ctx.beginPath();
-  trazarTrazo(ctx, t);
-  ctx.setLineDash([7 / z, 5 / z]);
-  ctx.strokeStyle = 'rgba(216,82,75,.95)';
-  ctx.lineWidth = 2 / z;
-  ctx.lineJoin = 'round'; ctx.lineCap = 'round';
-  ctx.stroke();
-  ctx.setLineDash([]);
-  ctx.restore();
-}
+// Las paredes se ven: un borde oscuro debajo del dibujo (lo llama js/05). Sin relleno (`transparente`, 2026-10-14, dueño: «cuando las uso para marcar la
+// colisión, rompe la naturalidad del mapa»): no se pinta el color ni el borde grueso; queda una línea oscura finita.
+// La línea cortada roja de encima se sacó (dueño, 2026-10-27: «tiene unas rayitas rojas dentro, no son necesarias; con los bordes negros de contraste
+// alcanza»): `dibujarParedEncima` queda sin dibujar nada (js/05 la sigue llamando).
+function dibujarParedEncima(t, z){}
 function dibujarParedDebajo(t, z){
   ctx.save();
   ctx.translate(t.origen.x, t.origen.y);

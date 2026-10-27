@@ -1514,7 +1514,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   rotar). Una pared no ocupa casilleros: corta el paso y la vista **entre** casilleros — `paredCorta(a, b)` mira si la línea entre sus centros la
   cruza. La usan `lineaLibre` (la vista, conos, rango, visión: `sinParedes` para la visión «sin sólidos» de los creeps), `extenderRuta` y el soltar
   del arrastre (el token se choca), `lineaDeTiro` (js/32) y el vuelo de una flecha (js/33). `solidosFirma()` incluye `paredesFirma()` para que los
-  cachés de la visión se rehagan. Se ve con un borde oscuro y una línea roja cortada. Reglas nuevas (`recto`, `colision` en `trazoValido`; la colisión
+  cachés de la visión se rehagan. Se ve con un borde oscuro (la línea roja cortada de encima se sacó el 2026-10-27, dueño: «con los bordes negros de contraste alcanza»). Reglas nuevas (`recto`, `colision` en `trazoValido`; la colisión
   la crea o la cambia solo el GM): hay que pegarlas.
 
 - **🏹 Flechas especiales** (2026-10-09, dueño): atacar con un arco con flechas en el carcaj abre «¿Qué flecha?» (`bnElegirFlecha`, js/11); la

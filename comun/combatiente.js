@@ -1522,6 +1522,7 @@ const Combatiente = (() => {
   function bloqueoHab(h, o){
     o = o || {};
     if(o.modo === 'manual') return '';
+    if(h && h.unaVez && h.unaVezUsada) return 'Ya la usó en este combate (una vez por combate)';   // 💨 Segundo aliento (2026-10-27)
     if(nf(h && h.cdActual) > 0) return `Cooldown · ${nf(h.cdActual)} turno(s)`;
     if(o.nitros !== undefined && nf(o.nitros) < nf(o.costo)) return 'Sin No2';
     if(o.hp !== undefined && nf(h && h.hpCosto) > 0 && nf(o.hp) <= nf(h.hpCosto)) return 'Sin vida';
@@ -1604,7 +1605,8 @@ const Combatiente = (() => {
     return {
       nombre: h.nombre, objetivo: c.objetivo || 'enemigo', ...(h.detalle ? {detalle: String(h.detalle).slice(0, 600)} : {}),   // el texto, para el recuadro del duelo (2026-10-15)
       alcance: c.objetivo === 'uno mismo' || (c.objetivo === 'area' && c.alcance === undefined) || c.objetivo === 'onda' || c.objetivo === 'cono' || c.objetivo === 'linea' ? 0 : alcanceHab(c, stat, o.stat),   // (un área con `alcance` explícito: hasta dónde va el centro, la Luz cegadora)
-      tira: c.tiraFormula ? {formula: sx(c.tiraFormula), etq: c.tiraEtiqueta || 'Tirada'} : (stat ? {stat, etq: etq(stat), bono: nf(c.tiraBono !== undefined ? c.tiraBono : h.tiradaBono), ...(nf(c.tiraMin) > 0 ? {min: nf(c.tiraMin)} : {})} : null),   // `min`: el mínimo de calidad de un pergamino (2026-10-23)   // stat + N (2026-10-15)
+      // `tiraBonoNivel` (2026-10-27, dueño: el Taunt y el Provocar, «PdG especial más nivel»): + el nivel de quien la usa (`o.nivel`).
+      tira: c.tiraFormula ? {formula: sx(c.tiraFormula), etq: c.tiraEtiqueta || 'Tirada'} : (stat ? {stat, etq: etq(stat), bono: nf(c.tiraBono !== undefined ? c.tiraBono : h.tiradaBono) + (c.tiraBonoNivel ? Math.max(0, Math.round(nf(o.nivel))) : 0), ...(nf(c.tiraMin) > 0 ? {min: nf(c.tiraMin)} : {})} : null),   // `min`: el mínimo de calidad de un pergamino (2026-10-23)   // stat + N (2026-10-15)
       contra: contraDeEjecucion(c.contra, etq, sx),
       // Daño «la diferencia» (2026-10-02, Drenar Vida): no se tira, es lo que quien la usa le ganó a la resistencia. «Drena»: quien la
       // usa se cura lo que hizo de daño, y puede pasar su vida máxima hasta `drenaTope` % (como Vida extra).
@@ -1830,6 +1832,7 @@ const Combatiente = (() => {
       ...(e.clava ? {clava: {turnos: Math.min(6, Math.max(1, Math.round(nf(e.clava.turnos)) || 3))}} : {}),   // 📌 Clavar a la pared (2026-10-26): si choca contra algo sólido, Inmovilizado (vtt-hexgrid/js/13 dueloEmpujar)
       ...(nf(e.vuela) > 0 ? {vuela: Math.round(nf(e.vuela))} : {}),   // 🎯 el arma vuela N casillas también en un ataque con el arma (el Tiro al arma, 2026-10-26)
       ...(nf(e.empuja) > 0 ? {empuja: Math.round(nf(e.empuja))} : {}),   // el empujón (2026-10-21, la Cornada): no es un estado, lo hace el mapa
+      ...(typeof e.requiereDano === 'boolean' ? {requiereDano: e.requiereDano} : {}),   // 🛡 solo si el golpe hizo daño (el Golpe de escudo, 2026-10-27)
       cura: nf(e.cura), detalle: e.detalle || ''});
     const critico = c.critico ? {
       ...(c.critico.efectos && c.critico.efectos.length ? {efectos: c.critico.efectos.map(mapEf)} : {}),
@@ -1854,6 +1857,11 @@ const Combatiente = (() => {
       ...(c.abrirHerida ? {abrirHerida: true} : {}), ...(c.remate ? {remate: true} : {}), ...(c.desesperado ? {desesperado: true} : {}),   // 🗡 Remate / Ir por el herido (2026-10-23): +dados según la vida del objetivo (vtt-hexgrid/js/69)
       ...(nf(c.manada) > 0 ? {manada: Math.min(5, Math.round(nf(c.manada)))} : {}),   // 👊 Patotear / Jauría (2026-10-21): +1 dado por aliado pegado al objetivo, hasta N (vtt-hexgrid/js/65)   // 🩸 Sal en la herida (2026-10-21): +2 dados si el objetivo ya sangra (vtt-hexgrid/js/64)   // 🗡 la puñalada (2026-10-21): el bono si está en la espalda (vtt-hexgrid/js/59)
       ...(nf(c.alejarse) > 0 ? {alejarse: Math.min(4, Math.round(nf(c.alejarse)))} : {}),   // 💨 Picar y alejarse (2026-10-21): después del duelo, se aleja N casilleros gratis (vtt-hexgrid/js/57)   // 🐂 toma carrera (la Cornada, 2026-10-21): el mapa la hace al elegir el objetivo (vtt-hexgrid/js/55)
+      // ⚔🛡 La tanda del Choque pesado (2026-10-27; vtt-hexgrid/js/78): `sigue` (Golpe que sigue: si lo deja en 0, ataca a otro pegado), `arrastra` (Arrastrar:
+      // si pega, lo trae hasta quedar pegado), `cargaDerriba` (Carga que derriba: la carrera de hasta N; desde 3, Fuerza + X contra la Res.CC) y `escudoGolpe`
+      // (Golpe de escudo: pega con el escudo como un arma contundente, 1d10 + su peso + el Dmg).
+      ...(c.sigue ? {sigue: true} : {}), ...(nf(c.arrastra) > 0 ? {arrastra: Math.min(5, Math.round(nf(c.arrastra)))} : {}),
+      ...(nf(c.cargaDerriba) > 0 ? {cargaDerriba: Math.min(6, Math.round(nf(c.cargaDerriba)))} : {}), ...(c.escudoGolpe ? {escudoGolpe: true} : {}),
       ...(c.terminaTurno ? {terminaTurno: true} : {}), ...(c.soloCritico ? {soloCritico: true} : {}), ...(c.perforante ? {perforante: true} : {})};   // Proyectil perforante (2026-10-13): sigue al de atrás   // Headshot (2026-10-12): si no es crítico, falla   // Degollar (2026-10-10): al resolverse, termina el turno y pasa al final del orden
   }
   /* ⚡ Flash (P136, regla del dueño 2026-09-30): en el propio turno cuesta lo que dice la habilidad; en turno ajeno, EL DOBLE —

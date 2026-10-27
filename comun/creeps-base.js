@@ -123,6 +123,7 @@
       const dur = ef.turnos ? ` durante ${ef.turnos} turno${ef.turnos === 1 ? '' : 's'}` : ' hasta que se lo saquen';
       const hp = ef.hp ? `; ${ef.hp > 0 ? 'recupera' : 'pierde'} ${Math.abs(ef.hp)} HP por turno` : '';
       if(ef.excK) auto.push(`gana ${ef.excK * n} HP de Vida extra (HP sobre el máximo, sin tope ni recarga; se acumula)`);
+      else if(ef.escudo) auto.push(`gana ${ef.escudo} HP de Vida extra (lo primero que se gasta de lo que le llega)`);   // 🛡 fijo (el Escudo humano, 2026-10-27)
       else auto.push(ef.nombre ? `queda con el estado ${ef.nombre}${m ? ' (' + m + ')' : ''}${dur}${hp}` : `se aplica a sí mismo ${m}${dur}`);
     }
     if(sp.trampa !== undefined || sp.colocar){
@@ -170,6 +171,13 @@
     if(sp.desarmar) h.desarmar = true;   // 🤺 Desarmar (2026-10-21): el botón instantáneo del GM (vtt-hexgrid/js/62)   // 🧿 Mal de ojo (2026-10-21): el botón del GM (vtt-hexgrid/js/60)
     if(sp.cuentaComoAtaque) h.cuentaComoAtaque = true;   // es su acción de ataque del turno (Arma elemental, 2026-10-21)   // 🛡 lo que se anuncia al usarla («{nombre} se pone en modo aguante.», 2026-10-21)
     if(sp.cura) h.curaHp = sp.cura * n;
+    // ⚔🛡 La tanda del Choque pesado (2026-10-27): el Contraataque (al ganar la Evasión o el Parry), el Segundo aliento (se cura N + su Constitución, le saca
+    // un debuff a elección y una sola vez por combate) e Interponerse (el botón ✨ en el duelo de un aliado atacado, vtt-hexgrid/js/78).
+    if(sp.contraEsquiva){ h.contraEsquiva = true; h.modo = 'manual'; }   // (una reacción del duelo: desde sus Acciones solo se anuncia)
+    if(Number(sp.curaMasCon) > 0) h.curaMasCon = Number(sp.curaMasCon);
+    if(sp.quitaDebuff) h.quitaDebuff = true;
+    if(sp.unaVez) h.unaVez = true;
+    if(sp.interponerse) h.interponerse = {...sp.interponerse};   // (no se ejecuta desde las Acciones: la usa el botón ✨)
     if(sp.trampa !== undefined || sp.colocar){
       const o = opcionesTrampa(sp);
       h.trampaColocar = {nombre: sp.nombre, detalle: sinEtiqueta(textoHab(sp, n)).slice(0, 200), dano: sp.trampa ? danoTxt(sp.trampa, n) : '', radio: o.radio, cant: o.cant};
@@ -183,7 +191,8 @@
       h.efectoNombre = sp.efecto.nombre || sp.nombre; h.efectoTurnos = sp.efecto.turnos; h.efectoStacks = Math.max(1, Math.round(Number(sp.efecto.stacks)) || 1); h.efectoPolaridad = sp.efecto.polaridad || 'buff';   // stacks: los disparos de la Ráfaga encadenada (2026-10-25)
       if(sp.efecto.hp) h.efectoHpTurno = sp.efecto.hp;
       if(sp.efecto.excK) h.efectoEscudo = sp.efecto.excK * n;   // Vida extra: HP que suma (se acumula con el que ya tenga)
-      h.efectoDetalle = sinEtiqueta(textoHab(sp, n));
+      else if(Number(sp.efecto.escudo) > 0) h.efectoEscudo = Number(sp.efecto.escudo);   // 🛡 un número fijo, sin el nivel (el Escudo humano, 2026-10-27)
+      h.efectoDetalle = sp.efecto.detalle || sinEtiqueta(textoHab(sp, n));   // (2026-10-27: el estado con su propio texto, no el de toda la habilidad)
       h.efectoMods = Object.keys(sp.efecto.mods || {}).map(stat => ({stat, val: sp.efecto.mods[stat]}));
     }
     return h;

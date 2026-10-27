@@ -14,6 +14,7 @@ function flashCreepListos(){
     if(!sc || num(sc.hp) <= 0) continue;
     (sc.habilidades || []).forEach(h => {
       if(!h || !h.flash || h.malDeOjo || h.desarmar) return;
+      if(h.interponerse && !(typeof interponerObjetivos === 'function' && interponerObjetivos({id, t, sc, h}).length)) return;   // 🛡 solo con un aliado atacado cerca (js/78)
       let motivo = '';
       try{ motivo = CreepCalculo.bloqueoHab(sc, h) || ''; }catch(e){}
       if(!motivo) out.push({id, t, sc, h});
@@ -58,7 +59,9 @@ function flashCreepRivales(c){
   return out;
 }
 function flashCreepObjetivos(c){
+  if(c.h.interponerse && typeof interponerObjetivos === 'function') return interponerObjetivos(c);   // 🛡 Interponerse (2026-10-27): los aliados atacados en un duelo abierto (js/78)
   if(c.h.duelo && c.h.duelo.objetivo === 'enemigo') return flashCreepRivales(c);
+  if(c.h.duelo && c.h.duelo.objetivo === 'uno mismo') return [{id: c.id, t: c.t, mismo: true}];   // 🛡 el Blindaje (2026-10-27): solo sobre sí
   const rng = num((rangoDeToken(c.t) || {}).rng), out = [];
   for(const [id, t] of tokens.entries()){
     if(t.tipo !== 'creep' || t.bajoTierra) continue;
@@ -97,10 +100,11 @@ function flashCreepElegirObjetivo(c, objs, duelo){
 }
 // Se ejecuta como desde sus Acciones, con el objetivo ya elegido (ac.objetivoFijo, como el Mal de ojo).
 async function flashCreepUsar(c, objetivoId){
+  if(c.h.interponerse && typeof interponerseUsar === 'function') return interponerseUsar(c, objetivoId);   // 🛡 (js/78)
   const fichaId = String(c.t.fichaId);
   abrirAcciones(fichaId);
   for(let i = 0; i < 40 && !(ac && ac.creepId === fichaId); i++) await new Promise(r => setTimeout(r, 150));
   if(!(ac && ac.creepId === fichaId)){ toast(`${c.h.nombre}: no se pudieron abrir las Acciones del creep`); return; }
-  ac.objetivoFijo = objetivoId;
+  ac.objetivoFijo = c.h.duelo && c.h.duelo.objetivo === 'uno mismo' ? null : objetivoId;   // (sobre sí: no queda un objetivo fijo para lo que siga)
   await acEjecutarHab(creepPrivadoDe(fichaId) || c.sc, c.h.id);
 }

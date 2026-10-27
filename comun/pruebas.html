@@ -5822,6 +5822,77 @@ prueba('🗡→🧰 Lo que el GM destilda del equipo de un creep se convierte en
   igual([antes, rp.despojosEquipo, rp.oroTotal, rp.porJugador.map(p => p.despojos), CombateFin.itemsPublicables(rep, r).filter(i => /:(arma|eq:)/.test(i.clave)).length, /Equipo que no se ofrece/.test(html), sin.despojosEquipo, sin.porJugador[0].despojos],
     [0, esperado, 0, [Math.ceil(esperado / 2), Math.ceil(esperado / 2)], 0, true, 0, 0]);
 });
+/* ---------- ⚔🛡 La tanda del Choque pesado (2026-10-27): 10 warrior · 10 tanque · 10 ambiguas ---------- */
+const chp = (nombre, nivel) => { const e = HABILIDADES_CREEP_CATALOGO.find(x => x.nombre === nombre); return e ? {...armarHabilidadDeCreep(e.datos, nivel || 1), id: 'h-' + nombre} : null; };
+prueba('⚔🛡 Las 14 del Choque pesado (2026-10-27) están en el catálogo, auditadas y del Choque pesado; las viejas del mismo nombre no', () => {
+  const N = ['Golpe brutal', 'Arte de la guerra', 'Contraataque', 'Golpe que sigue', 'Provocar', 'Piel de hierro', 'Blindaje', 'Segundo aliento', 'Escudo humano', 'Interponerse',
+    'Golpe de escudo', 'Carga que derriba', 'Sonic Boom', 'Arrastrar'];
+  const mal = N.filter(n => { const e = HABILIDADES_CREEP_CATALOGO.filter(x => x.nombre === n); return e.length !== 1 || !e[0].etiquetas.includes('auditada') || !e[0].etiquetas.includes('choque pesado'); });
+  igual(mal, []);
+});
+prueba('⚔ Golpe brutal (2026-10-27): el de creep +1 frecuente, +2 potente, +3 al daño y Guardia baja; el de clase +1, +1 y +2', () => {
+  const h = chp('Golpe brutal'), a = h.duelo.arma;
+  const gb = CLASES_SKILLS.find(c => c.id === 'warrior').habilidades.find(x => x.id === 'warrior-golpe-brutal').duelo.arma;
+  igual([a.critBono, a.critpotBono, a.fijo, h.efectoNombre, h.efectoTurnos, h.efectoMods[0].stat, h.efectoMods[0].val, h.efectoPolaridad, gb.critBono, gb.critpotBono, gb.fijo],
+    [1, 2, 3, 'Guardia baja', 1, 'eva', -2, 'debuff', 1, 1, 2]);
+});
+prueba('😤 Provocar de creep y Taunt de clase (2026-10-27): PdG.Esp + el nivel contra la Res.Mt; el creep queda Desafiante (+2 Defensa y +2 Def. especial)', () => {
+  const h = chp('Provocar', 3), sc = creepPrueba({nivel: 3});
+  const ej = CreepAcciones.habEjecucion(sc, h);
+  const taunt = CLASES_SKILLS.find(c => c.id === 'tanque').habilidades.find(x => x.id === 'tanque-taunt');
+  const tj = Combatiente.habEjecucion(taunt, taunt.duelo, {stat: () => 4, etq: s => s, nivel: 2});
+  const des = ESTADOS_PRESET.find(p => p.nombre === 'Desafiante');
+  igual([ej.tira.stat, ej.tira.bono, ej.contra.map(c => c.modo), ej.efectos.map(e => e.nombre), tj.tira.stat, tj.tira.bono, des.turnos, des.mods.map(m => `${m.stat}${m.val}`)],
+    ['pdgmg', 3, ['resm'], ['Provocado', 'Desafiante'], 'pdgmg', 2, 2, ['def2', 'armadmg2']]);
+});
+prueba('⚔ Contraataque de creep (2026-10-27): marca la Evasión y el Parry; con la habilidad, su contraataque suma +1 PdG; el de clase es Flash y cuesta 1', () => {
+  const h = chp('Contraataque'), sc = creepPrueba({id: 'c1', habilidades: [h]}), sin = creepPrueba({id: 'c2'});
+  const hk = CreepDuelo.hooks({creep: () => sc, cambiar: async () => ({}), publicar: () => {}, toast: () => {}, confirmar: () => true, soy: () => true, borrarParry: () => {}});
+  const ops = hk.opcionesDefensa({id: 'd', defensor: {ref: 'c1'}, ataque: {tipo: 'normal'}});
+  const t1 = CreepAcciones.tiradaAtaque(sc, 'contra'), t0 = CreepAcciones.tiradaAtaque(sin, 'contra');
+  const cl = CLASES_SKILLS.find(c => c.id === 'warrior').habilidades.find(x => x.id === 'warrior-contraataque');
+  igual([h.contraEsquiva, h.modo, ops.every(o => o.contraEsquiva), t1.r.formula !== t0.r.formula, cl.costo, cl.turnoAjenoSp, /FLASH/.test(cl.detalle)],
+    [true, 'manual', true, true, '1', '2', true]);
+});
+prueba('💨 Segundo aliento (2026-10-27): se cura 6 + su Constitución, le saca el debuff elegido y es una vez por combate', () => {
+  const h = chp('Segundo aliento'), sc = creepPrueba({hp: 5, hpMax: 40, habilidades: [h], estados: [{id: 'r', nombre: 'Rengo', polaridad: 'debuff', turnos: 2, activo: true, mods: []}]});
+  const con = CreepCalculo.statValor(sc, 'con');
+  const p = CreepAcciones.ejecutarHab(sc, sc.habilidades[0], ESTADOS_PRESET, true, {quitar: 'Rengo'});
+  igual([p.error || '', sc.hp, p.curaCon, p.quitado, sc.estados.some(e => e.nombre === 'Rengo'), sc.habilidades[0].unaVezUsada, /una vez/i.test(CreepCalculo.bloqueoHab(sc, sc.habilidades[0]))],
+    ['', 5 + 6 + con, 6 + con, 'Rengo', false, true, true]);
+});
+prueba('🛡 Golpe de escudo (2026-10-27): pega con el escudo (Tipo 10, sin Parry), 1d10 + su peso + el Dmg; Sentado y Demora 1 solo si hizo daño', () => {
+  const h = chp('Golpe de escudo'), sc = creepPrueba({id: 'g1', equipo: [{id: 'e', nombre: 'Rodela de tablas', tipoItem: 'escudo_1m', def: 1, peso: 3, equipado: true}]});
+  const atq = CreepAcciones.ataqueDeHab(sc, h);
+  const hk = CreepDuelo.hooks({creep: () => sc, cambiar: async () => ({}), publicar: () => {}, toast: () => {}, confirmar: () => true, soy: () => true, borrarParry: () => {}});
+  const v = hk.vista({id: 'd', atacante: {ref: 'g1'}, ataque: atq}, 'dano');
+  const sinEscudo = CreepAcciones.ataqueDeHab(creepPrueba(), h);
+  igual([atq.escudoGolpe.nombre, atq.escudoGolpe.peso, atq.tipoDado, atq.sinParry, atq.armaNombre, String(v && v.formula).replace(/\s+/g, '').startsWith(`1d10+3+${CreepCalculo.statValor(sc, 'dmg')}`),
+    atq.efectos.map(e => `${e.nombre}${e.requiereDano ? '*' : ''}`), sinEscudo.escudoGolpe.peso],
+    ['Rodela de tablas', 3, 10, true, 'Rodela de tablas', true, ['Sentado*', 'Demora*'], 0]);
+});
+prueba('⚖ Carga que derriba, Arrastrar y Golpe que sigue (2026-10-27): lo que lleva el ataque al duelo', () => {
+  const sc = creepPrueba();
+  const c = CreepAcciones.ataqueDeHab(sc, chp('Carga que derriba')), a = CreepAcciones.ataqueDeHab(sc, chp('Arrastrar')), g = CreepAcciones.ataqueDeHab(sc, chp('Golpe que sigue'));
+  igual([c.embestidaHab, c.cargaDerriba, c.mods.pdg, a.arrastra, a.alcance, a.mods.pdg, g.sigue, g.mods.fijo], [true, 4, 0, 3, 3, 2, true, 2]);
+});
+prueba('⚖ Sonic Boom de creep (2026-10-27): cono, Fuerza +2 contra la Constitución, la diferencia de daño directo y «Pierde No2»', () => {
+  const h = chp('Sonic Boom'), ej = CreepAcciones.habEjecucion(creepPrueba(), h);
+  igual([h.flash, ej.objetivo, ej.tira.stat, ej.tira.bono, ej.contra.map(x => x.modo), ej.dano && ej.dano.diferencia, ej.efectos[0].nombre, ej.efectos[0].no2Dif, ej.efectos[0].no2Sentado],
+    [true, 'cono', 'fue', 2, ['con'], true, 'Pierde No2', true, true]);
+});
+prueba('🛡 Blindaje, Piel de hierro, Escudo humano, Interponerse y Arte de la guerra de creep (2026-10-27)', () => {
+  const bl = chp('Blindaje'), sc = creepPrueba({habilidades: [bl]});
+  const r = CreepAcciones.sobreSi(sc, bl), barrera = sc.estados.find(e => e.nombre === 'Barrera');
+  const ph = chp('Piel de hierro'), sc2 = creepPrueba({habilidades: [ph]}), def0 = CreepCalculo.modTotal(sc2, 'def');
+  CreepAcciones.ejecutarHab(sc2, sc2.habilidades[0], ESTADOS_PRESET, true);
+  const eh = chp('Escudo humano'), ej = CreepAcciones.habEjecucion(creepPrueba(), eh);
+  const ip = chp('Interponerse'), ag = chp('Arte de la guerra');
+  igual([!!r, barrera && (barrera.escudoMagico), CreepCalculo.modTotal(sc2, 'def') - def0, CreepCalculo.modTotal(sc2, 'armadmg'), CreepCalculo.critEfectivo(sc2, 2) - CreepCalculo.critEfectivo(creepPrueba(), 2),
+    eh.efectoEscudo, ej.alcance, ej.efectos[0].nombre, ej.efectos[0].spec.turnos, ip.flash, ip.interponerse.distancia, Combatiente.flashPara(ag.duelo, 'pdg'), Combatiente.flashPara(ag.duelo, 'eva', 'parry'), ag.duelo.flash.bono,
+    ESTADOS_PRESET.find(p => p.nombre === 'Interpuesto').unGolpe],
+    [true, 12, 6, 6, 1, 5, 3, 'Miti-Miti', 2, true, 2, true, true, 3, true]);
+});
 /* ---------- Resultado ---------- */
 Promise.all(pendientes).then(() => {
 const malas = resultados.filter(r => !r.ok);

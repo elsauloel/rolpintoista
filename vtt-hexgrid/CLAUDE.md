@@ -1819,6 +1819,13 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   invocación va como primer paso de «▶ Empieza tu turno» (js/04 `inicioTurnoPendiente`; al «✔ Aplicar», `inicioTurnoAplicar` hace brillar a quien provoca); el de un
   creep, y el de un inicio aplicado sin ese reporte, es el Anuncio de siempre del Provocado (js/04 `provocadoAvisar`), que dice «Estás provocado por Fulano»; al Aceptar (js/16 `momentoAvisoCentro` →
   `provocadoBrilloPedir`), el momento `provocado-brillo` (js/16 → `provocadoBrilloRecibido`) hace brillar al que provoca en todas las pantallas hasta que pasa el turno (`provocadoDibujar`, js/05).
+- **⚔🛡 La tanda del Choque pesado** (2026-10-27, dueño; `js/78-choque-pesado.js`): **🛡 Interponerse** (el botón ✨ de los Flash de creep, js/71: aparece
+  solo cuando un aliado creep es atacado a 2 o menos y todavía no eligió cómo defenderse; `interponerObjetivos` escucha los duelos abiertos;
+  `interponerseUsar` cobra, le pone Interpuesto, lo mueve al lado del aliado y cambia el `defensor` del duelo) · **⚔ Golpe que sigue**, **⚖ Arrastrar** y el
+  derribo de la **Carga que derriba** (`choquePesadoResuelto`, desde el gancho `disparoResuelto` de js/14). La carrera de la Carga (hasta 4, +X, sin
+  empuje) es una variante de `cargaEmbestida` (js/55, `ataque.cargaDerriba`). El **Escudo humano** de los creeps es el Miti-Miti entre creeps
+  (`mitiMitiDe` y `danioCreep` en js/10; la marca la pone `dueloAplicarEfectoBase`, js/13, a 3 casillas o menos); **Desafiante** (el del Provocar) va a quien
+  provoca (js/13). El ✨ de un Flash «sobre sí» (el Blindaje) no ofrece aliados (js/71). El Segundo aliento pregunta qué debuff saca antes de cobrar (js/12).
 - **Las ocho del camino a 20 por rol** (2026-10-26, dueño): **😤 Golpe desesperado** (`desesperadoBonos`, js/69: los bonos según la vida PROPIA, con
   `Combatiente.desesperadoBonos`); **💥 Takle** (`saltoHab` de js/55 con `corre`: corre hasta quedar pegado, sin pasar paredes; vale también para una
   habilidad sin arma: `ataque.hab.saltoHab`, js/13; el efecto «Al final del orden» → `alFinalDelOrden`, js/04: se le corta el turno o, si ya era el último,

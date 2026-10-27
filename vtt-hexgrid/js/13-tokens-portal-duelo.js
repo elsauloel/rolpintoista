@@ -2172,7 +2172,7 @@ async function dueloAplicarEfecto(d, ef){
   const r = await dueloAplicarEfectoBase(d, ef);
   try{
     const spec = Duelo.specDeEfecto(ef), t = tokens.get(d.defensor.tokenId);
-    if(t && spec && spec.nombre && !spec.cura && r && !r.manual && !/^no entró/i.test(String(r.nota || ''))){
+    if(t && spec && spec.nombre && spec.nombre !== 'Desafiante' && !spec.cura && r && !r.manual && !/^no entró/i.test(String(r.nota || ''))){   // (el Desafiante es de quien provoca: se anuncia él)
       dueloBuffMomento(d, t, spec);
       await cargaAlGolpeAbierto(t, d.defensor.tokenId, spec.nombre);
     }
@@ -2224,6 +2224,30 @@ async function dueloAplicarEfectoBase(d, ef){
   if(spec.nombre === 'Miedo' && !spec.miedoDe && d.atacante.tokenId){ spec.miedoDe = d.atacante.tokenId; spec.miedoDeNombre = String(d.atacante.nombre || '').slice(0, 40); }   // 😱 a quién le tiene miedo
   if((spec.nombre === 'Mordido' || spec.nombre === 'Agarrado') && d.atacante.tokenId && typeof mordidaEmpezar === 'function') await mordidaEmpezar(d, spec);   // 🦷 quién lo tiene agarrado, y la bestia queda Mordiendo (js/54)
   // 🛡 Miti-Miti (Tanque, 2026-10-11): la marca queda en quien la usa, con a quién protege; el reparto del daño lo hace js/10 (mitiMitiDe).
+  // 😤 Desafiante (2026-10-27, el Provocar de creep): es para quien provoca, no para el provocado — +2 a la Defensa y a la Defensa especial mientras dure.
+  if(spec.nombre === 'Desafiante'){
+    const ta = tokens.get(d.atacante.tokenId);
+    if(!ta || ta.tipo !== 'creep' || !ta.fichaId) return {manual: true, nota: `${d.atacante.nombre}: ponele Desafiante a mano (+2 Defensa y +2 Defensa especial, 2 turnos)`};
+    let r = null;
+    await modificarCreep(ta.fichaId, sc => { r = EstadosAplicar.aplicarACreep(sc, {nombre: 'Desafiante'}); return {}; });
+    if(r && r.ok) try{ momentoAbrir({tipo: 'buff', icono: '😤', titulo: `${d.atacante.nombre} queda Desafiante`, resultado: `Provocó a ${d.defensor.nombre} y lo espera plantado: +2 a la Defensa y +2 a la Defensa especial, 2 turnos.`, estado: 'listo', datos: {chico: true}}); }catch(e){}
+    return r && r.ok ? {nota: `${d.atacante.nombre} queda Desafiante: +2 Defensa y +2 Defensa especial, 2 turnos`} : {manual: true, nota: `${d.atacante.nombre}: Desafiante no entró (${(r && r.motivo) || '¿?'})`};
+  }
+  // 🛡 El Escudo humano (2026-10-27, el Miti-Miti de creep, 2 turnos): la marca queda en el creep que la usa; el reparto lo hace js/10 (a 3 casillas o menos).
+  if(spec.nombre === 'Miti-Miti' && d.atacante.tipo === 'creep'){
+    const ta = tokens.get(d.atacante.tokenId);
+    if(!ta || !ta.fichaId || t.tipo !== 'creep') return {manual: true, nota: 'el Escudo humano de un creep protege a otro creep: aplicalo a mano'};
+    if(ta.fichaId === t.fichaId) return {manual: true, nota: 'el Escudo humano es para un aliado, no para él'};
+    const nom = nombreDe(t), turnos = Math.max(1, Math.round(num(spec.turnos)) || 2);
+    let r = null;
+    await modificarCreep(ta.fichaId, sc => {
+      sc.estados = (sc.estados || []).filter(e => !(e && e.nombre === 'Miti-Miti'));   // un protegido por vez
+      r = EstadosAplicar.aplicarACreep(sc, {nombre: 'Miti-Miti', turnos, polaridad: 'buff', protege: t.fichaId, protegeNombre: nom,
+        detalle: `Escudo humano: protege a ${nom} — de cada golpe o área que lo daña se lleva la mitad (para arriba), directo a la vida, ${turnos} turnos, mientras esté a ${ESCUDO_HUMANO_DIST} casillas o menos.`});
+      return {};
+    });
+    return r && r.ok ? {nota: `${nom} queda protegido: ${d.atacante.nombre} se lleva la mitad de su daño, ${turnos} turnos (a ${ESCUDO_HUMANO_DIST} casillas o menos)`} : {manual: true, nota: `no entró: ${(r && r.motivo) || '¿?'}`};
+  }
   if(spec.nombre === 'Miti-Miti'){
     const ta = tokens.get(d.atacante.tokenId);
     if(!ta || ta.tipo !== 'pj' || String(ta.fichaId).includes(SEP_INVOCACION)) return {manual: true, nota: 'Miti-Miti la usa un personaje: aplicalo a mano'};

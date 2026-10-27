@@ -24,20 +24,34 @@ const CreepDuelo = (() => {
   function costoFlashTxt(h){ return ConfirmarTurno.textoFlash(costoFlash(h)); }
   // «¿Es el turno del creep?» (P136, regla del dueño): en su turno el Flash cuesta lo que dice la habilidad (cooldown y vida);
   // en turno ajeno, el doble. Nunca No2. Pregunta, revisa la vida y cobra; null = no se usó.
+  // 💧 En modo SP (2026-10-27, el Arte de la guerra de creep): su SP en vez del cooldown (el doble en turno ajeno), como desde sus Acciones.
+  const costoFlashDe = (sc, h) => C().modoSP(sc) ? {sp: C().costoSpHab(sc, h), hp: num(h.hpCosto)} : costoFlash(h);
   async function pagarFlash(ui, ref, habId){
     const sc = ui.creep(ref), h = sc && (sc.habilidades || []).find(x => x.id === habId);
     if(!h) return null;
-    const motivo = Combatiente.bloqueoHab(h, {hp: sc.hp});
-    if(motivo){ ui.toast(`${sc.nombre}: ${h.nombre || 'Habilidad'} no se puede usar — ${motivo}`); return null; }
-    const p = await ConfirmarTurno.flash(`⚡ ${h.nombre || 'Flash'}`, costoFlash(h), {quien: sc.nombre, ident: {nombre: sc.nombre, ref: sc.id}});
+    const motivo = C().bloqueoHab(sc, {...h, modo: 'auto'});
+    if(motivo && !/No2/.test(motivo)){ ui.toast(`${sc.nombre}: ${h.nombre || 'Habilidad'} no se puede usar — ${motivo}`); return null; }   // (un Flash no gasta No2)
+    const sp = C().modoSP(sc);
+    if(sp && C().spActual(sc) < C().costoSpHab(sc, h)){ ui.toast(`${sc.nombre}: no le alcanza el SP para ${h.nombre || 'el Flash'} (cuesta ${fmt(C().costoSpHab(sc, h))}, tiene ${fmt(C().spActual(sc))})`); return null; }
+    const p = await ConfirmarTurno.flash(`⚡ ${h.nombre || 'Flash'}`, costoFlashDe(sc, h), {quien: sc.nombre, ident: {nombre: sc.nombre, ref: sc.id}});
     if(!p) return null;
     return ui.cambiar(ref, c => {
       const hh = (c.habilidades || []).find(x => x.id === habId);
       if(p.hp > 0 && num(c.hp) <= p.hp) return {error: `${c.nombre}: no le alcanza la vida para ${h.nombre} (${fmt(p.hp)} HP)`};
-      if(hh) hh.cdActual = p.cd;
+      if(sp){ if(C().spActual(c) < num(p.sp)) return {error: `${c.nombre}: no le alcanza el SP para ${h.nombre} (cuesta ${fmt(num(p.sp))})`}; c.sp = Math.max(0, C().spActual(c) - num(p.sp)); }
+      else if(hh) hh.cdActual = p.cd;
       if(p.hp > 0) c.hp = num(c.hp) - p.hp;
       return p;
     });
+  }
+  // ⚔ El Contraataque del creep (2026-10-27, dueño: «si ganó la Evasión o el Parry… que gaste los nitros de un primer ataque»): la habilidad, si la tiene
+  // y le alcanza (su SP o su cooldown: es Flash, en turno ajeno el doble; los No2 de un primer ataque los cobra el duelo nuevo al tirar el PdG).
+  const contraHab = sc => sc && (sc.habilidades || []).find(h => h && h.contraEsquiva) || null;
+  function contraListo(sc){
+    const h = contraHab(sc);
+    if(!h) return {h: null, motivo: 'no tiene la habilidad Contraataque'};
+    if(C().modoSP(sc)){ const k = C().costoSpHab(sc, h) * 2; return {h, motivo: C().spActual(sc) < k ? `le falta SP (cuesta ${fmt(k)}, tiene ${fmt(C().spActual(sc))})` : ''}; }
+    return {h, motivo: num(h.cdActual) > 0 ? `${h.nombre} está en cooldown (${fmt(num(h.cdActual))})` : ''};
   }
 
   // Atacar en el duelo: normal, de oportunidad o contraataque (cobra y tira el PdG). El normal pregunta si está Sentado. Sin No2
@@ -77,7 +91,9 @@ const CreepDuelo = (() => {
     const evaEsp = (sc, d) => sc ? Combatiente.evaExtraDuelo(d, st => num(C().modTotal(sc, st))) : {val: 0, txt: ''};
     // La fórmula del daño del arma del creep (la del gancho `dano` y la que muestra el botón).
     function formulaDano(sc, d){
-      let formula = C().danoTxt(sc, C().statValor(sc, 'dmg'));
+      // 🛡 El Golpe de escudo (2026-10-27, dueño: «como si el escudo fuera un arma contundente… 1d10 + el peso + el daño»): el escudo, no el arma.
+      const eg = d.ataque.tipo === 'habilidad-arma' && d.ataque.escudoGolpe ? d.ataque.escudoGolpe : null;
+      let formula = eg ? `1d10 + ${Math.max(0, Math.round(num(eg.peso)))} + ${fmt(Math.max(0, num(C().statValor(sc, 'dmg'))))}` : C().danoTxt(sc, C().statValor(sc, 'dmg'));
       const m = d.ataque.tipo === 'habilidad-arma' ? (d.ataque.mods || {}) : null;   // lo que le suma la habilidad: dados del Tipo del arma y daño fijo
       if(m){
         if(num(m.dados) > 0) formula += ` + ${Math.round(num(m.dados))}d${Combatiente.armaEnMano(sc).tipoDado}`;
@@ -175,7 +191,8 @@ const CreepDuelo = (() => {
         const sc = deLado(lado);
         if(!sc) return [];
         return (sc.habilidades || []).filter(h => Combatiente.flashPara(h.duelo, campo)).map(h => ({habId: h.id, nombre: h.nombre, bono: num(h.duelo.flash.bono), en: h.duelo.flash.en || [], ...(h.duelo.flash.dodge ? {dodge: true} : {}),
-          costoTxt: costoFlashTxt(h), motivoNo: Combatiente.bloqueoHab(h, {hp: sc.hp}).toLowerCase()}));
+          costoTxt: C().modoSP(sc) ? `${fmt(C().costoSpHab(sc, h))} SP (en turno ajeno, ${fmt(C().costoSpHab(sc, h) * 2)})` : costoFlashTxt(h),
+          motivoNo: String(C().bloqueoHab(sc, {...h, modo: 'auto'}) || '').replace(/^Sin No2$/, '').toLowerCase()}));   // 💧 (2026-10-27: en modo SP, su SP)
       },
       flashUsar: (d, campo, modo, habId) => {
         const lado = (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
@@ -223,7 +240,28 @@ const CreepDuelo = (() => {
         if(Combatiente.stuneado(sc.estados)) return [{modo: 'evasion', etiqueta: '🏃 Evasión · Stun: 1', info: ['⚡ Stun: no puede hacer nada; su Evasión es 1']}];   // Stun (2026-10-06)
         if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, escudo: def.nombre !== Combatiente.armaEnMano(sc).nombre, natural: def.nombre === Combatiente.armaEnMano(sc).nombre ? Combatiente.armaEnMano(sc).natural : !!def.natural, etiqueta: `${def.nombre === Combatiente.armaEnMano(sc).nombre ? '🗡' : '🛡'} Parry · ${def.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo: c, motivoNo: Combatiente.defensaSinNo2(sc.nitros, c) ? 'Ya está en No2 negativos: no puede gastar más en una defensa' : '',
           info: [`Parry 🎲 ${fx(C().statValor(sc, 'parry'), 'parry')}`, disparo ? 'si gana, el disparo queda parado (sin Bloqueo)' : `si gana, Bloqueo 🎲 ${fx(C().bloqueoValor(sc))}`, ...(c > num(sc.nitros) && num(sc.nitros) >= 0 ? ['⚠ sin No2: queda en negativo (se descuenta al recargar)'] : [])]});
+        // ⚔ Con el Contraataque (2026-10-27): si gana la Evasión o el Parry, puede contestar (el duelo pregunta «¿Contraataca?»).
+        const ct = contraListo(sc);
+        if(ct.h && !d.hab) ops.forEach(o => { o.contraEsquiva = true; o.info = [...(o.info || []), ct.motivo ? `⚔ ${ct.h.nombre}: ahora no (${ct.motivo})` : `⚔ si gana, puede contraatacar (${ct.h.nombre}: ${C().modoSP(sc) ? `${fmt(C().costoSpHab(sc, ct.h) * 2)} SP` : `cooldown ${fmt(num(ct.h.cd) * 2)}`} + un primer ataque)`]; });
         return Combatiente.sinReaccionesNo2(ops, sc.estados);   // Expuesto (Degollar): sin Parry
+      },
+      // ⚔ Cobrar el Contraataque al elegir «Sí» (su SP o su cooldown, al doble: es en turno ajeno). '' = cobrado.
+      contraEsquivaPagar: async d => {
+        const sc = deLado(d.defensor);
+        if(!sc) return 'no se encontró el creep';
+        const ct = contraListo(sc);
+        if(!ct.h || ct.motivo) return ct.motivo || 'no tiene la habilidad Contraataque';
+        if(num(sc.nitros) < C().costoContraataque(sc)) return `le faltan No2 (el contraataque cuesta ${fmt(C().costoContraataque(sc))}, tiene ${fmt(num(sc.nitros))})`;
+        const r = await ui.cambiar(d.defensor.ref, c => {
+          const h = contraHab(c);
+          if(!h) return {error: 'no tiene la habilidad Contraataque'};
+          if(C().modoSP(c)) c.sp = Math.max(0, C().spActual(c) - C().costoSpHab(c, h) * 2);
+          else h.cdActual = num(h.cd) * 2;
+          return {ok: true};
+        });
+        if(!r || r.error) return (r && r.error) || 'no se pudo cobrar';
+        ui.toast(`⚔ ${sc.nombre}: ${ct.h.nombre} (Flash en turno ajeno: ${C().modoSP(sc) ? `−${fmt(C().costoSpHab(sc, ct.h) * 2)} SP` : `cooldown ${fmt(num(ct.h.cd) * 2)}`})`);
+        return '';
       },
       defender: (d, modo) => {
         const sc = deLado(d.defensor);

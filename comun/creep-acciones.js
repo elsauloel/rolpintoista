@@ -104,7 +104,9 @@ const CreepAcciones = (() => {
      en la Mesa. Cada pantalla pregunta antes («¿Atacar igual?», preguntaSinNitros). */
   const NOMBRE_ESPECIAL = {oportunidad: 'Ataque de oportunidad', contra: 'Contraataque'};
   // PdG en contraataque (o en oportunidad): la regla universal (Combatiente.statAtaqueEspecial), venga de su arma, su equipo o sus estados.
-  const bonoEspecial = (sc, tipo) => { const st = Combatiente.statAtaqueEspecial(tipo); return st ? C().modTotal(sc, st) : 0; };
+  // ⚔ El Contraataque del creep (2026-10-27, dueño: «+1 PdG»): con la habilidad, su contraataque suma +1 más.
+  const contraHab = sc => (sc.habilidades || []).some(h => h && h.contraEsquiva);
+  const bonoEspecial = (sc, tipo) => { const st = Combatiente.statAtaqueEspecial(tipo); return (st ? C().modTotal(sc, st) : 0) + (tipo === 'contra' && contraHab(sc) ? 1 : 0); };
   const costoAtaqueDe = (sc, tipo) => tipo === 'normal' ? C().costoAtaque(sc) : tipo === 'oportunidad' ? C().costoOportunidad(sc) : C().costoContraataque(sc);
   const faltanNitros = (sc, tipo) => costoAtaqueDe(sc, tipo) > num(sc.nitros);
   // Un duelo cancelado que no cuenta como ataque (2026-10-15): se descuenta del conteo y se devuelven los No2. → los No2 devueltos.
@@ -167,11 +169,23 @@ const CreepAcciones = (() => {
   const habEtq = stat => (C().STAT_LOOKUP[stat] && C().STAT_LOOKUP[stat].label) || ATTR_LABELS[stat] || stat;
   // La Ejecución de un creep: la misma regla que personajes e invocaciones (comun/combatiente.js, habEjecucion). Sin costo variable.
   function habEjecucion(sc, h){
-    return Combatiente.habEjecucion(h, h && h.duelo, {stat: s => C().statValor(sc, s), etq: habEtq, armaDano: C().ataqueTxt(sc)});
+    return Combatiente.habEjecucion(h, h && h.duelo, {stat: s => C().statValor(sc, s), etq: habEtq, armaDano: C().ataqueTxt(sc), nivel: num(sc.nivel) || 1});   // nivel: el Provocar (+ su nivel)
   }
   // «Ataque con mi arma, con arreglos» de un creep (Golpe brutal, Carga…; P134): el mismo armado que el personaje, con su arma.
   function ataqueDeHab(sc, h){
     const c = h && h.duelo;
+    const atq = ataqueDeHabBase(sc, h, c);
+    // 🛡 El Golpe de escudo (2026-10-27, dueño: «como si el escudo fuera un arma contundente»): pega con el escudo que tiene puesto (Tipo 10, el contundente;
+    // sin Parry: es su Destreza contra la Evasión); el daño, 1d10 + el peso del escudo + su Dmg (comun/creep-duelo.js). Sin escudo, peso 0 (avisa el mapa).
+    if(atq && c && c.escudoGolpe){
+      const e = C().defensa(sc, {soloEscudo: true});
+      atq.escudoGolpe = {nombre: e ? e.nombre : '', peso: e ? num(e.peso) : 0};
+      if(e) atq.armaNombre = e.nombre;
+      atq.armaId = ''; atq.tipoDado = 10; atq.sinParry = true; atq.rango = false;
+    }
+    return atq;
+  }
+  function ataqueDeHabBase(sc, h, c){
     return Combatiente.ataqueConArreglos(h, c, {arma: Combatiente.armaParaArreglos(sc),
       alcance: c && c.alcance !== undefined && c.alcance !== 'auto' ? Combatiente.alcanceHab(c, 'pdg', s => C().statValor(sc, s)) : C().alcance(sc),
       valorDe: s => C().statValor(sc, s),   // 🔓 un estado que se suelta contra un stat suyo (el Mordisco feroz: Fuerza contra su Fuerza)
@@ -383,6 +397,12 @@ const CreepAcciones = (() => {
     if(C().habAtaque(h)) sc.ataquesTurno = num(sc.ataquesTurno) + 1;  // cuenta como su ataque
     if(costoHp > 0) sc.hp = num(sc.hp) - costoHp;
     if(num(h.curaHp) > 0) sc.hp = Math.min(num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, num(sc.hp) + num(h.curaHp));   // cura sobre sí mismo
+    // 💨 El Segundo aliento (2026-10-27, dueño: «que quite cualquier debuff»): se cura N + su Constitución, le saca el debuff que se eligió antes de cobrar
+    // (`o.quitar`, el nombre; lo pregunta el mapa) y queda usada para este combate (`unaVez`).
+    let curaCon = 0, quitado = '';
+    if(num(h.curaMasCon) > 0){ const antes = num(sc.hp); sc.hp = Math.min(num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, antes + num(h.curaMasCon) + Math.max(0, num(C().statValor(sc, 'con')))); curaCon = sc.hp - antes; }
+    if(h.quitaDebuff && o.quitar){ const i = (sc.estados || []).findIndex(e => e && e.nombre === o.quitar && e.polaridad === 'debuff'); if(i >= 0){ quitado = sc.estados[i].nombre; sc.estados.splice(i, 1); } }
+    if(h.unaVez) h.unaVezUsada = true;
     const ef = efectoDeHab(sc, h, presets);
     const efecto = ef.estado;
     if(efecto && C().modsAfectanHp(efecto.mods)) C().actualizarHpMaxPorCon(sc);
@@ -392,7 +412,8 @@ const CreepAcciones = (() => {
     const esZona = auto && h.duelo && typeof h.duelo === 'object' && h.duelo.objetivo === 'zona';
     // ✨ Solo sobre el creep y sin nada que tirar: se aplica directo, sin abrir el cuadro.
     const directo = auto && !h.trampaColocar && !h.refuerzos && !h.estandarte && !h.meteoro && !h.dash && !h.blink && !h.bombaHumo && !h.provocarAliado ? sobreSi(sc, h) : null;
-    return {costo: costo + Math.max(0, num(ex.no2)), costoSp, costoHp, efecto, aviso: [ef.aviso || '', malditoDano ? `🩸 Maldito: usar ${h.nombre || 'la habilidad'} le saca ${fmt(malditoDano)} de vida` : ''].filter(Boolean).join(' · '), falta, auto, esZona, directo, nitros: sc.nitros, malditoDano};
+    return {costo: costo + Math.max(0, num(ex.no2)), costoSp, costoHp, efecto, aviso: [ef.aviso || '', malditoDano ? `🩸 Maldito: usar ${h.nombre || 'la habilidad'} le saca ${fmt(malditoDano)} de vida` : ''].filter(Boolean).join(' · '), falta, auto, esZona, directo, nitros: sc.nitros, malditoDano,
+      ...(num(h.curaMasCon) > 0 ? {curaCon, hpAhora: sc.hp} : {}), ...(quitado ? {quitado} : {})};
   }
   /* Lo que pasa después de cobrar. ui = {mesaHabilidad(sc, h, extra), mesaConTexto(texto), publicar(sc, t), toast(t),
        habDuelo(sc, h) (la Ejecución para el duelo, o null si no hay duelo), lanzarAtaque(sc, h), lanzarDuelo(sc, h, hab),

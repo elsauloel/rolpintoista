@@ -60,6 +60,12 @@
     'Corte certero': ['choque liviano', 'sangrado'], 'Zarpa certera': ['choque liviano', 'sangrado'], 'Tajo de carnicero': ['choque liviano', 'sangrado'],
     'Destripar': ['choque liviano', 'sangrado'],
     'Golpe a la rodilla': ['choque liviano', 'trabar'], 'Tarascón al tobillo': ['choque liviano', 'trabar'], 'Tiro a la rodilla': ['rango', 'trabar'], 'Mantener a raya': ['rango', 'mantener a raya'], 'Flecha que atraviesa': ['rango', 'atravesar'], 'Disparo y repliegue': ['rango', 'disparar y replegarse'], 'Nube tóxica': ['debuffer', 'nube tóxica'], 'Empuje': ['support', 'empower'], 'Sanguijuela': ['debuffer', 'sanguijuela'], 'Luz para los suyos': ['support', 'luz para los suyos'], 'Finta': ['choque liviano', 'finta'], 'Dash': ['choque liviano', 'dash'], 'Aguja siniestra': ['debuffer', 'punto débil'], 'Parpadeo': ['mago', 'parpadeo'], 'Tiro que derriba': ['rango', 'tiro que derriba'], 'Ojo de asesino': ['choque liviano', 'buscar el crítico'], 'Pisotón': ['choque pesado', 'aturdir'], 'Tirar la bronca': ['support', 'provocar para un aliado'], 'Nova arcana': ['mago', 'nova arcana'], 'Ráfaga de viento': ['mago', 'ráfaga de viento'], 'Tiro al arma': ['rango', 'tiro al arma'], 'Tiro certero': ['rango', 'tiro certero'], 'Tormenta arcana': ['mago', 'tormenta arcana'], 'Cascotazo': ['mago', 'proyectil de piedra'], 'Abanico': ['rango', 'abanico'], 'Smite': ['support', 'smite'], 'Prisión de hielo': ['mago', 'prisión de hielo'], 'Degollar': ['choque liviano', 'todo al ataque'], 'Clavar a la pared': ['rango', 'clavar a la pared'], 'Maldición debilitante': ['debuffer', 'debilitar'], 'Maldición tormentosa': ['debuffer', 'atormentar'], 'Robar el aliento': ['debuffer', 'drenar no2'], 'Envión': ['support', 'envión'], '¡Al frente!': ['support', 'llevar al lado de un rival'], 'Bomba de humo': ['choque liviano', 'desaparecer en la pelea'], 'Golpe desesperado': ['choque liviano', 'golpe desesperado'], 'Takle': ['choque pesado', 'takle'], 'Furia': ['choque pesado', 'furia'], 'Ráfaga encadenada': ['rango', 'disparos encadenados'], 'Extenuar': ['debuffer', 'extenuar'], 'Cegar': ['debuffer', 'cegar'], 'Hoja envenenada': ['choque liviano', 'veneno'], 'Mordisco infectado': ['choque liviano', 'veneno'], 'Grito de pánico': ['debuffer', 'grito de pánico'],
+    // ⚔🛡 La tanda del Choque pesado (2026-10-27): 10 warrior · 10 tanque · 10 ambiguas.
+    'Golpe brutal': ['choque pesado', 'golpe brutal'], 'Arte de la guerra': ['choque pesado', 'arte de la guerra'], 'Contraataque': ['choque pesado', 'contraataque'],
+    'Golpe que sigue': ['choque pesado', 'golpe que sigue'], 'Provocar': ['choque pesado', 'provocar'], 'Piel de hierro': ['choque pesado', 'piel de piedra'],
+    'Blindaje': ['choque pesado', 'blindaje'], 'Segundo aliento': ['choque pesado', 'segundo aliento'], 'Escudo humano': ['choque pesado', 'proteger a un aliado'],
+    'Interponerse': ['choque pesado', 'interponerse'], 'Golpe de escudo': ['choque pesado', 'derribar'], 'Carga que derriba': ['choque pesado', 'carga que derriba'],
+    'Sonic Boom': ['choque pesado', 'sonic boom'], 'Arrastrar': ['choque pesado', 'arrastrar'],
     'Red': ['hunter', 'trabar'], 'Tela de araña': ['hunter', 'trabar'],
     'Hit and run': ['choque liviano', 'golpear y alejarse'],
     'Salto': ['choque liviano', 'salto'], 'Salto aplastante': ['choque pesado', 'salto'], 'Vigilancia': ['rango', 'vigilancia'], 'Bola de fuego': ['mago', 'daño en área'], 'Confusión': ['debuffer', 'control mental'],
@@ -165,7 +171,7 @@
   // 🩸 La versión fuerte (dueño, 2026-10-21: «una versión fuerte, que salga más cara… con el sangrado como eje identitario, 4 SP»; elegida la B).
   H('Tajo de carnicero', 'DX', 'hd', 'me', 4, aA('Un tajo de carnicero que abre de lado a lado: un ataque con su arma con Perfora 1 (1 punto del daño pasa siempre la Defensa) y Crítico frecuente +1; si pega, deja un Sangrado fuerte (3 de daño por turno durante 3 turnos; se acumula y, con un golpe crítico, queda permanente).',
     {perfora: 1, critBono: 1}, 'va al duelo como un ataque con Perfora 1 y Crítico frecuente +1; si pega, Sangrado fuerte (3 por turno, 3 turnos)', 4, SGF));
-  H('Golpe de escudo', 'DK', 'hdc', 'mt', 3, zO('Golpea con el escudo: el objetivo pierde 1 No2 (a mano).', 2, 'L'));
+  // (Golpe de escudo, la vieja a mano: la reemplaza la de la tanda del Choque pesado, 2026-10-27.)
   // 🌀 Auditada (dueño, 2026-10-21; choque pesado, «barrido»): castiga a quien lo rodea. El daño se tira en cada duelo de la cascada (dueño: «así como está»).
   H('Barrido', 'DA', 'hd', 'mt', 3, oB('Gira con su arma y le pega a todos los rivales que tiene al lado (la flor de diámetro 3, 7 casillas, a su alrededor; él no se cuenta). A cada uno que no le gana le hace el daño de su arma (sus dados más su Dmg), menos su Defensa. Tira su Probabilidad de Golpe una sola vez, contra la Evasión de cada uno; quien gana su Evasión no recibe nada (sin dodge roll). Cuenta como su ataque del turno.',
     'su PdG, una vez, contra la Evasión de cada uno al lado; el daño de su arma a quien no le gana'));
@@ -187,6 +193,67 @@
     duelo: {objetivo: 'enemigo', alcance: 'fijo', alcanceN: 3, salto: 2, corre: true, tira: 'con', tiraBono: 2, contra: ['con'], dano: false, efectos: [
       {nombre: 'Pierde No2', no2: 3}, {nombre: 'Empujón', empuja: 2, detalle: 'Lo empuja 2 casillas, lejos de quien lo embiste.'},
       {nombre: 'Al final del orden', detalle: 'Se le corta el turno y pasa al final del orden de turnos; si ya era el último, pierde el turno.'}]}});
+  /* ================= ⚔🛡 LA TANDA DEL CHOQUE PESADO (dueño, 2026-10-27; docs/diseno-roles-creep.md, «Tanda Choque pesado 10 · 10 · 10») =================
+     «Podemos agarrar las habilidades de clase del Warrior y del tanque y ya adaptarlas todas a este grupo… 10 claras de tanque, 10 claras de Warrior y
+     10 ambiguas». Cada una un escalón arriba de la de clase. Lo que hace el mapa: vtt-hexgrid/js/78 (Interponerse, Golpe que sigue, Arrastrar, el
+     derribo de la Carga) y js/55 (la carrera). */
+  // ⚔ Golpe brutal (de clase, un escalón arriba; dueño: «+1 frecuente, +2 potente, +3 al daño»): queda en Guardia baja (−2 Evasión) hasta su próximo turno.
+  H('Golpe brutal', 'D', '*', 'm', 2, {...aA('Se juega todo en un golpe: un ataque con su arma con Crítico frecuente +1, Crítico potente +2 y +3 al daño. A cambio, queda en Guardia baja (−2 a la Evasión) hasta su próximo turno.',
+    {critBono: 1, critpotBono: 2, fijo: 3}, 'va al duelo como un ataque con Crítico frecuente +1, Crítico potente +2 y +3 al daño; queda en Guardia baja (−2 Evasión) hasta su próximo turno', 2, []),
+    efecto: {nombre: 'Guardia baja', turnos: 1, mods: {eva: -2}, polaridad: 'debuff', detalle: 'Guardia baja: se jugó todo en el golpe — −2 a la Evasión hasta su próximo turno.'}});
+  // ⚔ Arte de la guerra (de clase: «+2 fijo a una tirada de PG, Parry, Bloqueo o Daño»; dueño: «está bien el más 3, está bien el flash, pero que no sea
+  // después de ver los dados»): el Flash del duelo, que se marca antes de tirar (comun/creep-duelo.js flashOpciones).
+  H('Arte de la guerra', 'B', 'hd', 'm', 2, {detalle: 'FLASH (en turno ajeno cuesta el doble). Antes de tirar, elige una tirada suya del duelo —la Probabilidad de Golpe, el Parry, el Bloqueo o el daño, atacando o defendiendo— y le suma +3 fijo.',
+    no2: 0, spCosto: 2, auditada: true, ataqueTxt: 'Flash en el duelo, antes de tirar: +3 fijo a su PdG, Parry, Bloqueo o daño',
+    duelo: {modo: 'flash', flash: {en: ['pdg', 'parry', 'bloqueo', 'dano'], bono: 3}}});
+  // ⚔ Contraataque (de clase; dueño: «que no ataque gratis sin nitros, que gaste los nitros de un primer ataque»): al ganar la Evasión o el Parry, el duelo
+  // pregunta «¿Contraataca?» (comun/creep-duelo.js); +1 PdG (CreepAcciones.bonoEspecial). Flash: su SP o su cooldown, al doble (es en turno ajeno).
+  H('Contraataque', 'D', '*', 'm', 2, {detalle: 'FLASH (en el turno de otro: cuesta el doble). Si gana la Evasión o el Parry contra un ataque cuerpo a cuerpo, le contesta al que lo atacó: un ataque con su arma con +1 a la Probabilidad de Golpe, que paga lo de un primer ataque y no cuenta como su ataque del turno. El duelo lo pregunta solo («¿Contraataca?»).',
+    no2: 0, spCosto: 2, auditada: true, contraEsquiva: true, ataqueTxt: 'al ganar la Evasión o el Parry: un contraataque con +1 PdG (lo de un primer ataque)'});
+  // ⚔ Golpe que sigue ✦ (A5; dueño: «vamos así»): si lo deja en 0, otro rival pegado (vtt-hexgrid/js/78).
+  H('Golpe que sigue', 'D', '*', 'm', 2, aA('Un golpe pesado que no se detiene: un ataque con su arma con +2 al daño. Si deja al rival en 0, ataca enseguida a otro rival pegado a él, pagando lo de un primer ataque (ese segundo golpe no vuelve a seguir).',
+    {fijo: 2}, 'va al duelo como un ataque con +2 al daño; si lo deja en 0, sigue contra otro rival pegado (lo de un primer ataque)', 2, [], {sigue: true}));
+  // 🛡 Provocar (el Taunt, un escalón arriba; dueño: «PdG especial más nivel contra resistencia mental… el de creep además suma 2 de defensa y 2 de defensa
+  // especial»): el Provocado de Tirar la bronca (con quién provoca, vtt-hexgrid/js/13) y Desafiante para él (js/13: el efecto va a quien provoca).
+  H('Provocar', 'K', '*', 't', 2, {detalle: 'Se le planta a un rival dentro de su Rango y lo llama: tira su Probabilidad de Golpe especial + su nivel contra la Resistencia mental del rival. Si gana, el rival queda Provocado por él 2 turnos (su turno es para ir contra él: atacarlo o usarle una habilidad hostil; si no llega, acercarse) y el creep queda Desafiante: +2 a la Defensa y +2 a la Defensa especial, 2 turnos.',
+    no2: 1, spCosto: 2, auditada: true, ataqueTxt: 'PdG.Esp + su nivel contra la Res.Mt; Provocado 2 turnos, y él Desafiante (+2 Defensa y +2 Def. especial)',
+    duelo: {objetivo: 'enemigo', tira: 'pdgmg', tiraBonoNivel: true, contra: ['resm'], alcance: 'rango', dano: false, efectos: [{nombre: 'Provocado', turnos: 2},
+      {nombre: 'Desafiante', turnos: 2, polaridad: 'buff', detalle: 'Para quien provoca: +2 a la Defensa y +2 a la Defensa especial, 2 turnos.'}]}}, 'estados alterados');
+  // 🛡 Piel de hierro (Piel resistente + Temple, un escalón arriba; dueño: «va así»).
+  H('Piel de hierro', 'T', '*', 't', 3, {detalle: 'Endurece el cuerpo como el hierro: +6 a la Defensa, +6 a la Defensa especial y +1 a la Resistencia a crítico de todo Tipo, 2 turnos.',
+    no2: 1, spCosto: 4, auditada: true, ataqueTxt: 'sobre sí: +6 Defensa, +6 Def. especial y +1 a la Resistencia a crítico de todo Tipo, 2 turnos',
+    efecto: {nombre: 'Piel de hierro', turnos: 2, mods: {def: 6, armadmg: 6, tipo1: 1, tipo2: 1, tipo3: 1, tipo4: 1, tipo5: 1}, detalle: 'Piel de hierro: +6 a la Defensa, +6 a la Defensa especial y +1 a la Resistencia a crítico de todo Tipo, 2 turnos.'}});
+  // 🛡 Blindaje (de clase, un escalón arriba; dueño: «está bien que sea más poderosa, pero solamente contra sí mismo»): Flash, absorbe 12.
+  H('Blindaje', 'T', '*', 't', 2, {detalle: 'FLASH (en turno ajeno cuesta el doble). Solo sobre sí: un blindaje que absorbe 12 de daño de la próxima fuente de daño (si hace más, el resto entra normal).',
+    no2: 0, spCosto: 1, flash: true, auditada: true, ataqueTxt: 'Flash: sobre sí, absorbe 12 de la próxima fuente de daño',
+    duelo: {objetivo: 'uno mismo', tira: '', contra: [], efectos: [{nombre: 'Barrera', turnos: 2, escudo: 12, polaridad: 'buff', detalle: 'Blindaje: absorbe 12 de daño de la próxima fuente de daño, como una barra de HP secundaria (🛡). Si la fuente hace más, el resto entra normal.'}]}});
+  // 🛡 Segundo aliento (la Recuperación, un escalón arriba; dueño: «que cueste 3 SP y que quite cualquier debuff»): una vez por combate.
+  H('Segundo aliento', 'C', '*', 't', 3, {detalle: 'Respira hondo y se recompone: se cura 6 + su Constitución y se saca un debuff, el que elija. Una vez por combate.',
+    no2: 2, spCosto: 3, auditada: true, curaMasCon: 6, quitaDebuff: true, unaVez: true, ataqueTxt: 'se cura 6 + su Constitución y se saca un debuff a elección; una vez por combate'});
+  // 🛡 Escudo humano (el Miti-Miti, un escalón arriba; dueño: «va así. Igual puede combinar con un escudo de vida extra… de 5 HP»): el reparto, js/10.
+  H('Escudo humano', 'T', 'hdc', 't', 3, {detalle: 'Marca a un aliado a 3 casillas o menos como protegido, 2 turnos: de cada golpe o área que lo daña, el creep se lleva la mitad (redondeada para arriba), directo a su vida (sin su Defensa: ya pasó la del aliado). Si se alejan a más de 3 casillas, no reparte. Además, al usarla gana 5 de Vida extra, lo primero que se gasta de lo que le llega.',
+    no2: 1, spCosto: 3, auditada: true, ataqueTxt: 'un aliado a 3 o menos, protegido 2 turnos: él se lleva la mitad de su daño; y 5 de Vida extra',
+    efecto: {nombre: 'Vida extra', escudo: 5, detalle: 'Escudo humano: 5 de Vida extra, lo primero que se gasta de lo que le llega.'},
+    duelo: {objetivo: 'aliado', tira: '', contra: [], alcance: 'fijo', alcanceN: 3, efectos: [{nombre: 'Miti-Miti', turnos: 2, polaridad: 'buff', detalle: 'Protegido por el Escudo humano: la mitad de su daño se la lleva el creep, 2 turnos.'}]}});
+  // 🛡 Interponerse ✦ (F31; dueño: «está bien, hagámoslo así»): el botón ✨ del GM cuando atacan a un aliado (vtt-hexgrid/js/78).
+  H('Interponerse', 'TM', 'hdc', 't', 3, {detalle: 'FLASH (en el turno de otro: cuesta el doble). Cuando atacan a un aliado a 2 casillas o menos, antes de que el aliado elija cómo defenderse, salta a su lado (gratis: sin No2 ni ataques de oportunidad) y el golpe va contra él, con +2 a la Defensa contra ese golpe. Se usa con el botón ✨ del GM, que aparece cuando hay un aliado atacado a su alcance.',
+    no2: 0, spCosto: 2, flash: true, auditada: true, interponerse: {distancia: 2}, ataqueTxt: 'Flash: salta al lado de un aliado atacado (a 2 o menos) y se come el golpe, con +2 a la Defensa'});
+  // ⚖ Golpe de escudo (D22 Derribar; dueño: «como si el escudo fuera un arma contundente… y si pasa, hace el efecto»): pega con el escudo (comun/creep-acciones.js
+  // ataqueDeHab, comun/creep-duelo.js formulaDano); Sentado y Demora 1 si el golpe hizo daño.
+  H('Golpe de escudo', 'DK', 'hdc', 'mt', 2, aA('Pega con el escudo como si fuera un arma contundente (necesita un escudo puesto): su Probabilidad de Golpe (la Destreza) contra la Evasión del rival, sin Parry. Si pega: 1d10 + el peso del escudo + su Dmg contra la Defensa del rival; lo que pasa es daño y, si pasó algo, el rival queda Sentado y con Demora 1 (baja un lugar en el orden de turnos).',
+    {}, 'pega con el escudo: PdG contra la Evasión; 1d10 + el peso del escudo + su Dmg; si hace daño, Sentado y Demora 1', 2,
+    [{nombre: 'Sentado', requiereDano: true, detalle: 'Si el golpe hizo daño: queda Sentado.'}, {nombre: 'Demora', stacks: 1, requiereDano: true, detalle: 'Si el golpe hizo daño: baja 1 lugar en el orden de turnos.'}], {escudoGolpe: true}));
+  // ⚖ Carga que derriba (la Carga, un escalón arriba; dueño: «va así»): la carrera de hasta 4 (vtt-hexgrid/js/55) y el derribo desde 3 (js/78).
+  H('Carga que derriba', 'DKM', 'hd', 'mt', 2, aA('Toma carrera y se le tira encima: corre hasta 4 casillas en línea recta hasta quedar pegado (paga los No2 del movimiento) y ataca con su arma con +1 a la Probabilidad de Golpe y +1 al daño por cada casilla que corrió. Si pega y corrió 3 o más, tira su Fuerza + las casillas contra la Resistencia al control del rival: si gana, el rival queda Sentado.',
+    {}, 'corre hasta 4 en línea recta (sus No2) y ataca con +X PdG y +X al daño (X = casillas); desde 3, Fuerza + X contra la Res.CC: Sentado', 2, [], {embestida: true, cargaDerriba: 4}));
+  // ⚖ Sonic Boom (de clase, un escalón arriba; dueño: «ok»): el cono de la clase con Fuerza +2 y la diferencia de daño (directo).
+  H('Sonic Boom', 'DAK', '*', 'mt', 3, {detalle: 'FLASH (en turno ajeno cuesta el doble). Golpea el piso y una onda de choque sale en cono al frente: su Fuerza + 2 contra la Constitución de cada rival del cono. Al que pierde le saca 1 + la diferencia en No2 y le hace la diferencia de daño (físico, directo); si se queda sin No2, queda Sentado.',
+    no2: 1, spCosto: 3, flash: true, auditada: true, ataqueTxt: 'Flash: cono al frente; Fuerza +2 contra la Constitución; pierde 1 + la diferencia en No2, la diferencia de daño directo y, en 0 No2, Sentado',
+    duelo: {objetivo: 'cono', tira: 'fue', tiraBono: 2, contra: ['con'], dano: true, danoDiferencia: true, tipoDano: 'fisico', ignoraDano: true, danoDirecto: true, efectos: [{no2: 1, no2Dif: true, no2Sentado: true}]}});
+  // ⚖ Arrastrar (C16; dueño: «va así»): un ataque con su arma a 3 o menos; si pega, lo trae (vtt-hexgrid/js/78). (El enganche y el golpe van en una sola
+  // tirada: su Probabilidad de Golpe +2 contra la Evasión o el Parry.)
+  H('Arrastrar', 'DK', 'hdc', 'mt', 2, aA('Le tira un gancho, una cadena o una soga a un rival a 3 casillas o menos: un ataque con su arma con +2 a la Probabilidad de Golpe. Si pega, lo arrastra hasta dejarlo pegado a él (no camina: no gasta No2 ni da ataques de oportunidad; las trampas del camino sí lo tocan) y le hace el daño del golpe.',
+    {pdg: 2}, 'un ataque a 3 casillas o menos con +2 PdG; si pega, lo trae hasta quedar pegado (las trampas del camino lo tocan)', 2, [], {alcance: 'fijo', alcanceN: 3, arrastra: 3}));
   // (Golpe de pomo: quitado de la biblioteca en la auditoría, dueño 2026-10-21.)
   H('Ataque de furia', 'D', '*', 'm', 5, zO('Ataca sin pensar en la defensa: daño enorme.', 4, 'H'));
   // (Tackle, el viejo a mano: lo reemplaza el Takle, 2026-10-26.)
@@ -435,14 +502,14 @@
   H('Muro de escudos', 'T', 'hd', 't', 5, bU('Se atrinchera detrás de su escudo: +5 de Defensa 3 turnos.', 3, {def: 5}, 3));
   H('Aguantar', 'TC', '*', 't', 3, cU('Aprieta los dientes y recupera fuerzas.', 2, 3));
   H('Regeneración', 'C', 'bpe', 't', 5, cU('Su cuerpo se cierra solo: recupera vida.', 3, 5));
-  H('Segundo aliento', 'C', 'hd', 'tm', 6, cU('Una bocanada de energía: recupera mucha vida.', 3, 6));
+  // (Segundo aliento, la vieja a mano: la reemplaza la de la tanda del Choque pesado, 2026-10-27.)
   H('Inamovible', 'T', 'ce', 't', 4, bU('Nada lo mueve: +3 de Defensa y +2 Res.Esp 3 turnos.', 2, {def: 3, resmg: 2}, 3));
   H('Escudo de energía', 'T', 'cag', 'tg', 4, bU('Una barrera lo rodea: +3 de Defensa y +3 Res.Esp 2 turnos.', 2, {def: 3, resmg: 3}, 2));
   H('Resistencia especial', 'T', '*', 'tg', 3, bU('Se cubre contra hechizos: +4 Res.Esp 3 turnos.', 2, {resmg: 4}, 3));
   H('Dura cabeza', 'T', 'bdc', 't', 2, bU('Encoge el cuello y aguanta: +2 de Defensa 2 turnos.', 1, {def: 2}, 2));
-  H('Provocar', 'TX', '*', 't', 3, tA('Se burla y obliga al objetivo a atacarlo a él el próximo turno (a mano).', 1));
+  // (Provocar, la vieja a mano: la reemplaza la de la tanda del Choque pesado, 2026-10-27.)
   H('Rugido desafiante', 'TX', 'bd', 't', 4, tA('Ruge y los enemigos cercanos prefieren atacarlo (a mano).', 2));
-  H('Interponerse', 'T', 'hdc', 't', 3, bU('Se pone en el camino de un golpe (a mano): +3 de Defensa 1 turno.', 1, {def: 3}, 1));
+  // (Interponerse, la vieja a mano: la reemplaza la de la tanda del Choque pesado, 2026-10-27.)
   H('Rebotar', 'T', 'c', 't', 4, bU('Su coraza devuelve golpes: +4 de Defensa 2 turnos y quien lo golpea sufre 1d4 (a mano).', 2, {def: 4}, 2));
   H('Vigor', 'TC', 'bp', 't', 4, dC('Ataca y se alimenta de la pelea.', 3, 'L', 2));
   H('Postura del roble', 'T', 'p', 't', 5, bU('Raíces que lo sostienen: +4 de Defensa y +2 Res.Esp 4 turnos.', 3, {def: 4, resmg: 2}, 4));
@@ -833,7 +900,7 @@
     {}, 'va al duelo como un ataque; si pega, deja Agarrado (se suelta con Fuerza contra su Fuerza; si no, recibe el daño otra vez)', 3,
     [{nombre: 'Agarrado', soltar: {stat: 'fue', etq: 'Fuerza', difStat: 'fue', no2: 0, alEmpezar: true, danoFalla: 'golpe'}}]));
   H('Empujón', 'K', '*', 'mt', 2, tA('Empuja al objetivo un casillero (a mano).', 1));
-  H('Arrastrar', 'K', 'bpc', 'x', 3, tA('Jala al objetivo hacia el creep hasta 2 casilleros (a mano).', 2));
+  // (Arrastrar, la vieja a mano: la reemplaza la de la tanda del Choque pesado, 2026-10-27.)
   H('Onda de choque', 'AK', 'ce', 'g', 5, zO('Una onda que empuja a los adyacentes un casillero (a mano).', 4, 'M'));
   H('Grito atronador', 'AK', 'bd', 'x', 5, zO('Un grito que aturde a los adyacentes: pierden 1 No2 (a mano).', 3, 'L'));
   H('Pared de fuego', 'KA', 'e', 'g', 5, tA('Crea una línea de fuego de 3 casilleros que quema a quien la cruce (a mano).', 3));

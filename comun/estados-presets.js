@@ -150,6 +150,15 @@ const ESTADOS_PRESET = [
   // en el que se lo castea»), con −2 Evasión y −2 Defensa.
   {nombre:'Enfurecido', polaridad:'buff', turnos:2, turnosCompletos:true, mods:[{stat:'pdg', val:3}, {stat:'dmg', val:4}, {stat:'eva', val:-2}, {stat:'def', val:-2}],
     detalle:'Enfurecido: +3 a la Probabilidad de Golpe y +4 al daño, pero −2 a la Evasión y −2 a la Defensa. Dura el turno en que se lo pone y sus próximos 2 turnos completos. Si se lo vuelve a poner, no se suma: vuelve a durar 2 turnos. ⚙ Automatizado.'},
+  // ⚔🛡 La tanda del Choque pesado (2026-10-27). Desafiante: el del Provocar de creep (dueño: «el de creep además suma 2 de defensa y 2 de defensa
+  // especial»), mientras dura el Provocado (2 turnos). Piel de hierro (Piel resistente + Temple, un escalón arriba). Interpuesto: el de Interponerse, +2 a la
+  // Defensa contra el golpe que se come (se va con ese golpe o al empezar su turno: `unGolpe`, vtt-hexgrid/js/10).
+  {nombre:'Desafiante', polaridad:'buff', turnos:2, mods:[{stat:'def', val:2}, {stat:'armadmg', val:2}],
+    detalle:'Desafiante: provocó a un rival y lo espera plantado: +2 a la Defensa y +2 a la Defensa especial, 2 turnos (lo que dura el Provocado). ⚙ Automatizado.'},
+  {nombre:'Piel de hierro', polaridad:'buff', turnos:2, mods:[{stat:'def', val:6}, {stat:'armadmg', val:6}, {stat:'tipo1', val:1}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}, {stat:'tipo4', val:1}, {stat:'tipo5', val:1}],
+    detalle:'Piel de hierro: +6 a la Defensa, +6 a la Defensa especial y +1 a la Resistencia a crítico de todo Tipo, 2 turnos. ⚙ Automatizado.'},
+  {nombre:'Interpuesto', polaridad:'buff', turnos:1, unGolpe:true, mods:[{stat:'def', val:2}],
+    detalle:'Interpuesto: se metió en el golpe que iba para un aliado: +2 a la Defensa contra ese golpe (se va con el golpe, o al empezar su turno). ⚙ Automatizado.'},
   // Redoble (2026-10-25, dueño: el Support, «Redoble de tambores»): +2 a los No2 máximos durante su próximo turno completo (el No2 se recarga al
   // máximo al empezar su turno, así que ese turno tiene 2 más).
   {nombre:'Redoble', polaridad:'buff', turnos:1, turnosCompletos:true, mods:[{stat:'nitros', val:2}],

@@ -216,12 +216,16 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   if(golpe === null) throw new Error(ERROR_TIPEO);
   const guarda = ignoraDef ? null : guardianDe(t);   // la Coraza del guardián de un aliado al lado
   const muro = ignoraDef ? null : muroDe(t);   // Muro de escudos (js/26): un aliado con escudo al lado
+  const prot = o && o.reparte ? mitiMitiDe(t) : null;   // 🛡 el Escudo humano (2026-10-27): otro creep que se lleva la mitad
   const res = await modificarCreep(t.fichaId, sc => {
     const viejoC = !num((sc.usosEspecial || {})._golpe);
     sc.usosEspecial = {...(sc.usosEspecial || {}), _golpe: 1};   // (se vacía en su Mantenimiento)
     const primero = primerGolpeDeRonda(sc, 'golpeRonda', viejoC);   // por ronda (2026-10-19)
     const extra = defExtra(ignoraDef, primero, st => CreepCalculo.modTotal(sc, st), o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0);
     const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : creepDefensaMapa(sc) + extra) + num(restaExtra || 0), sc.estados, o);
+    mitiMitiPartir(r, prot);
+    // 🛡 Interpuesto (2026-10-27): el +2 a la Defensa era para este golpe; se va con él.
+    if(Array.isArray(sc.estados)) sc.estados = sc.estados.filter(e => !(e && e.unGolpe));
     const previo = num(sc.hp);
     sc.hp = Math.max(0, previo - r.recibido);
     // 🔥 Llama de Fénix (2026-10-20): si cae con la llama, revive con toda la vida y Titilando.
@@ -259,6 +263,7 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   }
   if(guarda && golpe > 0) guardianAviso(t, guarda);
   if(muro && golpe > 0) muroAviso(t, muro);
+  await mitiMitiCobrar(t, prot, res);   // 🛡 el Escudo humano (2026-10-27)
   await cosechaSiMuere(t, res);
   return res;
 }
@@ -266,8 +271,21 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
 /* 🛡 Miti-Miti (Tanque, 2026-10-11, decisiones del dueño): un personaje con la marca «Miti-Miti» (`protege` = la ficha del protegido, en su resumen
    público) se lleva la mitad de cada golpe o área que daña al protegido, redondeada para arriba, directo a su vida (sin su Defensa: ya pasó la del
    protegido). Solo el daño que llega con `o.reparte` (golpes del duelo, áreas, «Recibe daño»); no el de estados que siguen corriendo ni trampas. */
+/* 🛡 El Escudo humano de los creeps (2026-10-27, el Miti-Miti un escalón arriba): un creep con la marca protege a otro creep (`protege` = su id), a 3 casillas o
+   menos (más lejos, se corta). Lo cobra el mapa del GM, que maneja a los dos. */
+const ESCUDO_HUMANO_DIST = 3;
 function mitiMitiDe(t){
-  if(!t || !t.fichaId || t.tipo === 'creep') return null;
+  if(!t || !t.fichaId) return null;
+  if(t.tipo === 'creep'){
+    if(!soyGM) return null;
+    for(const x of tokens.values()){
+      if(!x || x === t || x.tipo !== 'creep' || !x.fichaId || x.fichaId === t.fichaId) continue;
+      const sc = creepPrivadoDe(x.fichaId);
+      if(!sc || num(sc.hp) <= 0) continue;
+      if((sc.estados || []).some(e => e && e.activo !== false && e.nombre === 'Miti-Miti' && e.protege === t.fichaId) && distanciaHex(x, t) <= ESCUDO_HUMANO_DIST) return x;
+    }
+    return null;
+  }
   for(const x of tokens.values()){
     if(!x || x === t || x.tipo !== 'pj' || !x.fichaId || String(x.fichaId).includes(SEP_INVOCACION)) continue;
     const est = (((vinculo(x) || {}).resumen || {}).estados) || [];
@@ -285,8 +303,8 @@ async function mitiMitiCobrar(t, prot, res){
   if(!prot || !res || !(num(res.r && res.r.mitiMiti) > 0)) return;
   try{
     const m = num(res.r.mitiMiti);
-    const rp = await danioPj(prot, String(m), true, 0, 0);
-    mesaLinea(`🛡 Miti-Miti: ${nombreDe(prot)} se lleva ${fmt(m)} del golpe a ${nombreDe(t)}, directo a la vida (${fmt(rp.previo)} → ${fmt(rp.nuevo)} HP)`);
+    const rp = prot.tipo === 'creep' ? await danioCreep(prot, String(m), true, 0, 0) : await danioPj(prot, String(m), true, 0, 0);   // 🛡 el Escudo humano de un creep (2026-10-27)
+    mesaLinea(`🛡 ${prot.tipo === 'creep' ? 'Escudo humano' : 'Miti-Miti'}: ${nombreDe(prot)} se lleva ${fmt(m)} del golpe a ${nombreDe(t)}, directo a la vida (${fmt(rp.previo)} → ${fmt(rp.nuevo)} HP)`);
   }catch(err){ console.error('No se pudo cobrar el Miti-Miti:', err); mesaLinea(`🛡 Miti-Miti: a ${nombreDe(prot)} le tocan ${fmt(num(res.r.mitiMiti))} de daño (✋ a mano: no se pudo aplicar solo)`); }
 }
 

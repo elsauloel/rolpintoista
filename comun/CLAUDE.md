@@ -1718,6 +1718,18 @@ versión parecida en más de una, es candidato a juntar.
   habilidad (creep: `creeps-base.js` la copia y `CreepAcciones.terminarHab` llama `ui.bombaHumo`; personaje: `FichaAcciones.avisarZonaAlMapa` manda
   `bomba-humo-habilidad`, registrado en `mensajes-mapa.js`). Efectos que aplica el mapa por nombre: «Al final del orden», «Sube en el orden» y la Demora
   con `stacks` = cuántos lugares.
+- **⚔🛡 La tanda del Choque pesado** (2026-10-27, dueño: 10 warrior · 10 tanque · 10 ambiguas; `docs/diseno-roles-creep.md`): 14 de creep nuevas en
+  `skills-creep-base.js` (Golpe brutal, Arte de la guerra, Contraataque, Golpe que sigue, Provocar, Piel de hierro, Blindaje, Segundo aliento, Escudo humano,
+  Interponerse, Golpe de escudo, Carga que derriba, Sonic Boom, Arrastrar; reemplazan a las viejas del mismo nombre) y tres de clase cambiadas (Taunt:
+  PdG.Esp + nivel; Golpe brutal: +1/+1 críticos y +2 al daño; Contraataque: Flash, 1 SP). Piezas nuevas: `tiraBonoNivel` en una Ejecución (`habEjecucion`
+  suma `o.nivel`: lo pasan la ficha, el creep y la invocación); `requiereDano` en los efectos de un ataque con arreglos (`ataqueConArreglos` y
+  `Duelo.limpiarEfectos`); en el ataque, `sigue`, `arrastra`, `cargaDerriba` (→ `derriba`, lo pone la carrera) y `escudoGolpe` (`CreepAcciones.ataqueDeHab`
+  le pone el escudo puesto: Tipo 10, sin Parry; `CreepDuelo` tira 1d10 + su peso + el Dmg), que `Duelo.crear` guarda; `unaVez` / `unaVezUsada` en una
+  habilidad (`Combatiente.bloqueoHab`); `curaMasCon` y `quitaDebuff` (`CreepAcciones.ejecutarHab`, con `o.quitar`); `contraEsquiva` en un creep (sus
+  opciones de defensa la marcan, `contraEsquivaPagar` cobra el Flash al doble y el duelo también lo ofrece tras un Parry ganado con el Bloqueo perdido;
+  +1 PdG al contraatacar); `CreepDuelo.pagarFlash` cobra SP en modo SP; `Duelo.olvidarOpciones(id)` (cambió quien defiende). Presets nuevos
+  **Desafiante**, **Piel de hierro** e **Interpuesto** (`unGolpe`: se va con el golpe que recibe). `creeps-base.js` (`armarHab`) copia todo eso y un
+  `efecto.escudo` fijo (5 de Vida extra del Escudo humano) y `efecto.detalle`.
 - **📦 El catálogo de habilidades de creep y el archivo** (2026-10-26, dueño: «vamos a dejar estos skills de creep como los de base. Todos los viejos los
   archivamos, ya no cuentan»): `skills-creep-base.js` exporta `HABILIDADES_CREEP_CATALOGO` (las auditadas) y `HABILIDADES_CREEP_ARCHIVO` (las de fábrica sin
   auditar y las de «El origen», con la etiqueta «archivada»); `HABILIDADES_CREEP_BASE` sigue con todas (las buscan por nombre las pruebas, la auditoría y el

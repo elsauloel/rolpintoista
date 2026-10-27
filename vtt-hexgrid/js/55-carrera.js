@@ -80,9 +80,18 @@ async function saltoAplastar(mio, yo){
   mesaLinea(`💥 ${txt}`, 'recordatorio');
   if(typeof momentoAbrir === 'function') momentoAbrir({tipo: 'salto', icono: '💥', titulo: `${nom} cae aplastando`, resultado: txt, estado: 'listo', datos: {chico: true}});
 }
+/* 🏃 La Carga que derriba (2026-10-27, dueño; la Carga del Warrior un escalón arriba): `ataque.cargaDerriba` = hasta cuántas casillas corre (4). La misma
+   carrera, pero suma +X a la Probabilidad de Golpe y +X al daño (X = las casillas que corrió; al lado, nada) y no empuja; si corrió 3 o más, `derriba` = X:
+   si pega, Fuerza + X contra la Res.CC y, si gana, Sentado (js/78). */
 async function cargaEmbestida(mio, t, ataque, yo){
+  const maxCarga = Math.round(num(ataque.cargaDerriba));
   const conBono = n => {
     const a = structuredClone(ataque);
+    if(maxCarga > 0){
+      a.mods = {...(a.mods || {}), pdg: num(a.mods && a.mods.pdg) + n, fijo: num(a.mods && a.mods.fijo) + n};
+      if(n >= 3) a.derriba = n;
+      return a;
+    }
     a.mods = {...(a.mods || {}), pdg: num(a.mods && a.mods.pdg) + n, fijo: num(a.mods && a.mods.fijo) + n};
     a.efectos = (a.efectos || []).map(e => num(e.empuja) > 0 ? {...e, empuja: num(e.empuja) + n, detalle: `Lo empuja ${num(e.empuja) + n} casilla${num(e.empuja) + n === 1 ? '' : 's'}, lejos de quien embiste.`} : e);
     return a;
@@ -96,8 +105,9 @@ async function cargaEmbestida(mio, t, ataque, yo){
   const sc = mio.tipo === 'creep' ? creepPrivadoDe(mio.fichaId) : null;
   const cm = sc ? costoMoverCreep(mio) : null, por = cm ? num(cm.porCasillero) : 1;
   const n = camino.length, nom = nombreDe(mio), obj = nombreDe(t);
-  if(!libre || !sc || por <= 0){
-    const motivo = !sc ? `por ahora la carrera la toman los creeps` : por <= 0 ? `${nom} no se puede mover` : `no hay una línea recta libre hasta ${obj}`;
+  const lejos = maxCarga > 0 && n > maxCarga;   // 🏃 la Carga que derriba: hasta N casillas
+  if(!libre || !sc || por <= 0 || lejos){
+    const motivo = !sc ? `por ahora la carrera la toman los creeps` : por <= 0 ? `${nom} no se puede mover` : lejos ? `${obj} está muy lejos: la carga corre ${maxCarga} casillas o menos` : `no hay una línea recta libre hasta ${obj}`;
     const si = await AvisoCombate.preguntar(`${motivo}: no puede tomar carrera. ¿Atacar igual sin la carrera? (está a ${dist} casilleros: lo decide la mesa)`,
       {icono: '🐂', titulo: 'Sin carrera', si: 'Atacar igual', no: 'Elegir otro'});
     if(si) mesaLinea(`🐂 ${nom} ataca a ${obj} sin tomar carrera (${motivo}; lo decidió la mesa)`, 'alerta-roja');
@@ -112,7 +122,8 @@ async function cargaEmbestida(mio, t, ataque, yo){
   if(typeof marcarMovido === 'function') marcarMovido(mio.id);
   mio.col = fin.col; mio.fila = fin.fila;   // (lo que sigue —la espalda, el miedo— lo mira desde donde quedó)
   const b = n + 1;
-  const txt = `${nom} toma carrera: corre ${n} casillero${n === 1 ? '' : 's'} hacia ${obj} (−${costo} No2) → +${b} a la Probabilidad de Golpe, +${b} al daño y, si pega, lo empuja ${b} casilla${b === 1 ? '' : 's'}.`;
+  const txt = maxCarga > 0 ? `${nom} carga: corre ${n} casillero${n === 1 ? '' : 's'} hacia ${obj} (−${costo} No2) → +${n} a la Probabilidad de Golpe y +${n} al daño${n >= 3 ? `; si pega, Fuerza + ${n} contra su Res.CC para derribarlo` : ' (desde 3 casillas, además lo puede derribar)'}.`
+    : `${nom} toma carrera: corre ${n} casillero${n === 1 ? '' : 's'} hacia ${obj} (−${costo} No2) → +${b} a la Probabilidad de Golpe, +${b} al daño y, si pega, lo empuja ${b} casilla${b === 1 ? '' : 's'}.`;
   mesaLinea(`🐂 ${txt}`, 'recordatorio');
   if(typeof momentoAbrir === 'function') momentoAbrir({tipo: 'carrera', icono: '🐂', titulo: `${nom} toma carrera`, resultado: txt, estado: 'listo', datos: {chico: true}});
   return conBono(n);

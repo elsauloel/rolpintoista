@@ -1118,7 +1118,7 @@ const FichaAcciones = (() => {
     const c = FichaCalculo.calcular(S);
     const a = arma || ((FichaCombate.armasEquipadasConDano(S)[0] || {}).item) || null;
     return Combatiente.habEjecucion(it, FichaBotonera.dueloDe(it), {stat: s => c.final[s], etq: s => FichaCalculo.STAT_LABEL[s] || s, X: xDeHab(it, xSp, xNitros),
-      armaDano: a ? FichaCombate.armaDanoTxt(a, c.final.dmg) : ''});
+      armaDano: a ? FichaCombate.armaDanoTxt(a, c.final.dmg) : '', nivel: num(S.meta && S.meta.nivel) || 1});   // nivel: el Taunt (PdG.Esp + nivel, 2026-10-27)
   }
   // Ataque con arma hecho con una habilidad (`duelo.modo === 'arma'`): el ataque con arreglos (comun/combatiente.js).
   function ataqueDeHabArma(S, it, arma, xSp, xNitros, ui){

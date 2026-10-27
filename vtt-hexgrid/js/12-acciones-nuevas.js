@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261023p5', '../comun/creep-botonera.js?v=20261023p8a', '../comun/creep-acciones.js?v=20261026zs', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261026q'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261023p5', '../comun/creep-botonera.js?v=20261023p8a', '../comun/creep-acciones.js?v=20261027a', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261027a'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -433,6 +433,7 @@ function acLanzarAtaqueDeHab(sc, h, emergio){
     return;
   }
   const atq = CreepAcciones.ataqueDeHab(sc, h);
+  if(atq && atq.escudoGolpe && !atq.escudoGolpe.nombre) toast(`🛡 ${sc.nombre} no tiene un escudo puesto: ${h.nombre || 'el golpe'} pega con peso 0 (1d10 + su Dmg)`);   // (avisa y deja seguir)
   const bonoSalida = emergio && atq && atq.mods ? Math.round(num(h.emerger && h.emerger.pdg)) : 0;
   if(bonoSalida) atq.mods.pdg = num(atq.mods.pdg) + bonoSalida;
   acParry.delete(sc.id);   // atacar cierra el Parry que esperaba su Bloqueo
@@ -589,6 +590,7 @@ async function acEjecutarHab(sc, habId){
   const h = (sc.habilidades || []).find(x => x.id === habId);
   if(!h) return;
   const modo = CreepCalculo.modoHab(h);
+  if(h.interponerse){ AvisoCombate.mostrar({icono: '🛡', titulo: h.nombre || 'Interponerse', texto: `${h.nombre || 'Interponerse'} se usa cuando atacan a un aliado a ${fmt(num(h.interponerse.distancia) || 2)} casillas o menos: aparece el botón ✨ arriba (y en «Podés usar» del duelo), antes de que el aliado elija cómo defenderse.`}); return; }   // 🛡 (js/78)
   if(modo === 'manual'){ acMesaHabilidad(sc, h); toast(`${h.nombre || 'Habilidad'} anunciada`); return; }   // 📣 solo el texto
   if(modo === 'auto' && Combatiente.tipoEjecucion(h.duelo) === 'flash'){ acFlashFuera(sc, h); return; }   // ⚡ sin No2, cooldown según el turno
   if(!(await CreepAcciones.confirmarSilencio(sc, h))){ toast(`${sc.nombre}: no usó ${h.nombre || 'la habilidad'}`); return; }   // el cartel del juego, antes de cobrar
@@ -606,12 +608,19 @@ async function acEjecutarHab(sc, habId){
   // ✨ El elemento a elegir (el Misil elemental, 2026-10-25): cuál, antes de cobrar; la Ejecución es la de ese elemento.
   const variante = Array.isArray(h.variantes) && h.variantes.length ? await acElegirVariante(sc, h) : null;
   if(Array.isArray(h.variantes) && h.variantes.length && !variante){ toast(`${sc.nombre}: no usó ${h.nombre || 'la habilidad'}`); return; }
+  // 💨 El Segundo aliento (2026-10-27, dueño: «que quite cualquier debuff»): cuál le saca, antes de cobrar (Ninguno = solo la cura).
+  let quitar = '';
+  if(h.quitaDebuff){
+    const malos = (sc.estados || []).filter(e => e && e.activo !== false && e.polaridad === 'debuff' && !e.derivado);
+    if(malos.length) quitar = (await Confirmar.elegir(`${sc.nombre}: ${h.nombre || 'la habilidad'} le saca un debuff. ¿Cuál?`, {titulo: h.nombre || 'Sacar un debuff', icono: '💨', no: 'Ninguno',
+      opciones: malos.map(e => ({valor: e.nombre, texto: e.nombre, detalle: [num(e.turnos) > 0 ? `${fmt(num(e.turnos))} turno${num(e.turnos) === 1 ? '' : 's'}` : '', String(e.detalle || '').slice(0, 90)].filter(Boolean).join(' — ')}))})) || '';
+  }
   const id = sc.id;
   const antes = {sp: num(sc.sp), nitros: num(sc.nitros), cd: num(h.cdActual)};   // ↩ para devolverlo si cancela al elegir el objetivo
   // ⚡ Una habilidad Flash del creep (`h.flash`, 2026-10-24, Bendecir el arma) en turno ajeno cuesta el doble (P136): el cooldown o el SP.
   const te = h.flash ? tokenEntradaCreep(sc.id) : null, doble = !!(te && modoMapa === 'combate' && esSuTurno(te[0]) === false);
   acCambiar(c => {
-    const p = CreepAcciones.ejecutarHab(c, (c.habilidades || []).find(x => x.id === habId), estadosPresetCreep(), true, {doble, ...(largo ? {extra: largo.extra} : {})});
+    const p = CreepAcciones.ejecutarHab(c, (c.habilidades || []).find(x => x.id === habId), estadosPresetCreep(), true, {doble, ...(largo ? {extra: largo.extra} : {}), ...(quitar ? {quitar} : {})});
     if(!p.error) p.creep = c;   // el creep ya cambiado (con el estado propio, si lo hubo), para lo que sigue
     return p;
   }).then(p => {
@@ -621,6 +630,11 @@ async function acEjecutarHab(sc, habId){
         cdTxt: cdNuevo !== antes.cd ? 'el cooldown' : '', sp: Math.max(0, antes.sp - num(c.sp)), nitros: Math.max(0, antes.nitros - num(c.nitros))}; }
     if(p.aviso) toast(p.aviso);
     if(doble) try{ mesaLinea(`⚡ ${p.creep.nombre || 'El creep'}: ${h.nombre || 'la habilidad'} en turno ajeno (Flash) — cuesta el doble (${CreepCalculo.modoSP(p.creep) ? `${fmt(p.costoSp)} SP` : `cooldown ${fmt(num(h.cd) * 2)}`})`, 'recordatorio'); }catch(err){}
+    if(p.curaCon !== undefined) try{   // 💨 el Segundo aliento: nunca en silencio
+      const txt = `${p.creep.nombre || 'El creep'} toma un segundo aliento: +${fmt(p.curaCon)} de vida${p.quitado ? ` y se saca ${p.quitado}` : ''} (una vez por combate).`;
+      mesaLinea(`💨 ${txt}`, 'recordatorio');
+      momentoAbrir({tipo: 'buff', icono: '💨', titulo: `${p.creep.nombre || 'El creep'}: ${h.nombre || 'Segundo aliento'}`, resultado: txt, estado: 'listo', datos: {chico: true}});
+    }catch(err){}
     if(p.malditoDano) try{ mesaLinea(`🩸 ${p.creep.nombre || 'El creep'} está Maldito: usar una habilidad le saca ${fmt(p.malditoDano)} de vida (${CreepCalculo.modoSP(p.creep) ? 'su SP' : 'su cooldown'})`, 'recordatorio'); }catch(err){}
     const sc2 = Object.assign(p.creep, {id}), h1 = (sc2.habilidades || []).find(x => x.id === habId);
     const h2v = largo && h1 && h1.duelo ? {...h1, duelo: {...h1.duelo, zonaLargo: largo.n}} : h1;   // 🔥 el muro, del largo elegido
@@ -786,7 +800,7 @@ function cerrarAccionesNuevas(){
    estados para la Ejecución, con el selector común (los "Mis presets" del GM no están en la partida: ver pendientes 7b). */
 const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261026zu', '../comun/asistente-duelo-hab.js?v=20261026d'];
 // Las recetas de habilidades de fábrica (para ↻ Reemplazar y ⬆ Subir): pesadas, recién cuando hacen falta.
-const ACE_BASE = ['../comun/creeps-base.js?v=20261026zx', '../comun/skills-creep-base.js?v=20261026zu'];
+const ACE_BASE = ['../comun/creeps-base.js?v=20261027a', '../comun/skills-creep-base.js?v=20261027a'];
 async function acCargarEditor(){ await acCargarPiezas(); await cargarPiezas(SE_PIEZAS); await cargarPiezas(ACE_PIEZAS); }
 // ⬆ Subir una habilidad del creep a la biblioteca compartida (corrección o algo nuevo); su `bibOrigen` nuevo se guarda en el creep.
 async function acSubirHab(creepId, habId){

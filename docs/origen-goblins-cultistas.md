@@ -245,3 +245,14 @@ Dueño (2026-10-27): «seguimos con el arquero, que también va a tener foco en 
   Ráfaga, con sus 9 No2, son 2 disparos: 3 + 6). Contra Bizzante y Petro le pega el 67 %.
 - **Riesgo**: muy letal contra Larry si tiene línea de tiro. La respuesta de los jugadores es cubrirse (paredes, Petro adelante, el Pedo para saltar
   detrás de algo). Palancas para bajarlo: Fuerza 6 (−2 de daño) o un arco Común de Tipo 4. A decidir con el dueño.
+- **Cambios (dueño, 2026-10-27)**: «todos los arcos que tengan tipo 6, pasalos a tipo 4» (hecho en el catálogo: el Arco del rastreador de bestias queda
+  2d4, y el primer disparo cuesta 2 No2, los siguientes 4). Y «con Especial 2 no va a poder usar habilidades; le bajaría un poco de Constitución y le
+  subiría Especial… también le podría dar una habilidad pasiva que le dé más SP» → propuesta: **Con 8 · Fue 8 · Agi 9 · Des 10 · Esp 4** (Vida 40, SP 12)
+  y la pasiva **Recuperación mental** (+1 SP por turno: recarga 3). Sus habilidades cuestan 2 o 3 SP, así que puede usar una por turno sin quedarse seco.
+  (El SP solo cuenta con el creep en modo SP; en modo cooldown no se cobra.)
+- **Números con el arco de Tipo 4** (2d4 + 8, 13 de promedio): Larry queda con ~12 tras el Disparo señalador; en el turno 2 un disparo solo lo tumba el
+  48 %, la Ráfaga (2 disparos: 2 + 4 No2) el 91 %.
+- **Flechas especiales de los creeps: ya están programadas** (2026-10-20, `vtt-hexgrid/js/12-acciones-nuevas.js`, `acFlechas`): un creep con arco o ballesta
+  que lleva flechas o virotes especiales en el **cinturón** elige cuál al atacar, igual que un personaje (se gasta y cobra su No2 al disparar). Solo en
+  el ataque común (como un personaje): las habilidades que disparan con el arma (Disparo señalador, Clavar a la pared…) no preguntan. A decidir con el
+  dueño si también (para todos). **Consumible propuesto**: 3 **Flechas silbadoras** (Común, Demora) en el cinturón.

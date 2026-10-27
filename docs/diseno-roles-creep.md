@@ -607,7 +607,16 @@ Propuesta (2026-10-27):
   el veneno; con Perfora siempre lastima, salvo que el golpe lo absorba entero un escudo (P227).
   **Detectarla** (aclaración al dueño): solo tiran quienes tienen Percepción aumentada, Pisada atenta o Desarmar trampas (al pasar al lado), o con una
   luz que revela; el resto no tira.
-- 🏹 **H4. Mina del cazador**: al pisarla, flor de 7, 3d6 directo y Pajaritos 2 turnos.
+- 🏹 **H4. Mina del cazador** — **definida** (dueño, 2026-10-27: «2 de 6 más 2, directo a la vida, y que sí lo resiste la resistencia al fuego, eso sí le
+  reduce el daño. El resto está bien»): 1 casilla (fuera de la vista de los rivales); explota en la flor de 7 (también a sus aliados); **2d6+2 de fuego
+  directo a la vida** (no lo frena la Defensa; **la Res. fuego le resta**); **Pajaritos 2 turnos**, Res.CC contra la Destreza del creep solo para eso.
+  **2 No2 y 3 SP, o cooldown 3.**
+
+**Tanda cerrada (2026-10-27): 4 y 4** — Rango y Hunter: Red tendida, Cebo, Cepo del cazador, Mina del cazador · Choque liviano: Aguja en el piso,
+Abrojos, Cordón oculto, Polvo cegador. ~~H5. Arrear~~ descartada. **Para programar (cuando el dueño diga)**, además de las 8: una trampa con Perfora (la
+Aguja del catálogo: 1d8, Perfora 1, veneno si lastima), el veneno por golpe sin tirada (P228: Dardos y Espina de mantícora), Escudo y Vida extra
+(P227, con el Relicario de sangre), la dificultad = la Destreza del que coloca (Red), el Inmovilizado «hasta el final de la ronda y una más», correr 1
+hacia adelante al caer (Cordón), y el Cebo (atraer con Res.Mt cada turno, 3 turnos, la roca pintada).
 - 🏹 ~~**H5. Arrear**~~: un disparo que lo empuja 2 hacia donde elija el creep. El dueño: «¿no existe ya algún tiro que desplace dos casillas para atrás?» —
   sí, **Mantener a raya** (lo empuja 2 lejos del tirador y Lento 2 turnos). Lo único distinto sería elegir la dirección.
 - 🗡 **L2. Abrojos** — **definida** (dueño, 2026-10-27: «va así y el rengo se aplica independientemente de si el daño lo para o no la armadura. Porque se

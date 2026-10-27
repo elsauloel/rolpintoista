@@ -566,7 +566,10 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
 > naranja sí, y no dispara ninguna detección: P226 ✅). Se diseña de a una; se programa cuando el dueño lo diga.
 
 Propuesta (2026-10-27):
-- 🏹 **H1. Cepo del cazador**: 1 casilla; 3d6 menos su Defensa e Inmovilizado 2 turnos; soltarse con Fuerza contra la Destreza del creep (2 No2).
+- 🏹 **H1. Cepo del cazador** — **definido** (2026-10-27; dueño: «a esta le vamos a sumar que cualquier tirada fallida para zafarse le hace un dado de 6 de
+  daño directo»): 1 casilla (fuera de la vista de los rivales); **3d6 menos su Defensa** e **Inmovilizado hasta el final de la ronda y una ronda completa
+  más** (como la Red); no se esquiva ni se resiste. 🔓 **Soltarse: Fuerza contra la Destreza del creep (el número), 1 No2 por intento; cada intento
+  fallido, 1d6 de daño directo** (`soltar.danoFalla`, ya existe: el Mordisco feroz). Se detecta con Percepción contra su Destreza. **2 No2 y 3 SP.**
 - 🏹 **H2. Red tendida** — **definida** (dueño, 2026-10-27; primero: «al colocar la trampa, quien la coloca tira destreza, y esa es la dificultad»;
   después lo corrigió: «que la dificultad sea el [stat] fijo sin tirar. La coloca directamente. Cae sobre las siete casillas. La tirada es la fuerza, la
   tirada de salvación. Y la del catálogo debería ser igual. Un nitro por intento de costo está bien»): la Red de caza del catálogo con la **Destreza del

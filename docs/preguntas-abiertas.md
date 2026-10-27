@@ -1316,3 +1316,4 @@ todos los «claros» de arriba. Falta programar. **El Envión cambia de nombre**
 ejemplo, te puedes tomar una poción y que suba como vida extra hasta el final del combate. Obviamente que si te la bajan también». Con el Relicario
 equipado, **cualquier curación que pase del máximo queda como Vida extra** (no se pierde), y esa Vida extra dura **hasta el «Finalizar combate»**; el daño
 la gasta como siempre. A confirmar: si tiene un tope (el Drenar vida llega hasta +50 % del máximo).
+**Tope ✅ (dueño, 2026-10-27):** la Vida extra del Relicario de sangre llega hasta **un 50 % por encima del máximo**, como el Drenar vida.

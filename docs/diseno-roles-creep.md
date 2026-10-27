@@ -591,7 +591,9 @@ Propuesta (2026-10-27):
   atrayendo: **la Res.Mt se tira al colocarlo y al empezar el turno de cada rival que lo ve dentro de la flor** (dueño, 2026-10-27: «tu propuesta para el
   cebo me parece bien. El primer rival que llega y da vuelta a la piedra, desaparece la piedra»): el primero que se para al lado la da vuelta y la piedra
   desaparece para todos. Costo: la propuesta (1 No2 y 2 SP, o cooldown 3), salvo que el dueño diga otra cosa.
-- 🗡 **L1. Aguja en el piso** — en revisión (dueño, 2026-10-27, sobre la del catálogo: «el D6, ¿se resiste con defensa? Porque si se resiste con defensa,
+- 🗡 **L1. Aguja en el piso** — **definida** (dueño, 2026-10-27: «va así»): 1 casilla (fuera de la vista de los rivales); **1d8+2 con Perfora 2**; **Veneno ×5
+  sin tirada** (entra si lastima; no, si un escudo se come el golpe entero); 2 No2 y 2 SP, o cooldown 3. Lo de abajo es cómo se llegó.
+  Antes: en revisión (dueño, 2026-10-27, sobre la del catálogo: «el D6, ¿se resiste con defensa? Porque si se resiste con defensa,
   un dado de 6 es una poronga. Nunca va a pasar el veneno, salvo que tenga perforar»). En el catálogo, la Aguja emponzoñada resta la Defensa al 1d6 pero
   **el veneno no depende del daño** (solo de la Res.Esp contra 9); los que piden lastimar son los Dardos envenenados (Común, 1d6+3). Nueva propuesta: **1d6
   directo a la vida** (busca el hueco de la armadura) y **Veneno ×5** aunque no lastime; Res.Esp contra su Destreza solo para el veneno.

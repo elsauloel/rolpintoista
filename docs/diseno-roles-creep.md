@@ -257,6 +257,14 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
 > origen quedó archivado, así que el Taunt vuelve a estar pendiente. Cada propuesta ya va un escalón arriba de la de clase (creep). ⚙ = el motor
 > ya tiene casi todo · 🔧 = hace falta una mecánica nueva en el mapa o en el duelo.
 
+**Cómo se reparten hoy las de Choque pesado** (dueño, 2026-10-27: «de las 20 que tenemos, solo 4 son de tanque y 16 serían de warrior. Igual hay
+algunas que son medio ambiguas»). Sin contar las versiones de bestia (Mordisco feroz, Coletazo, Ir por el herido, Zarpazo erguido, Arrancar la
+coraza, Mandíbula trituradora), que repiten el concepto de una humanoide:
+- ⚔ **Warrior**: Golpe fuerte, Furia, El que avisa no traiciona, Remate, Romper armadura, Golpe demoledor.
+- 🛡 **Tanque**: Aguante, Pisotón, Takle, Desarmar.
+- ⚖ **Ambiguas** (pegan, pero también controlan; el material natural de los Híbridos): Puño de roca (daño + Demora), Agarrón y Abrazo aplastante
+  (atrapar), Cornada (empujar), Barrido (le pega a todos los de al lado), Salto aplastante (entra y pega en área).
+
 | # | Concepto | De dónde sale | Versión creep propuesta | Motor |
 |---|---|---|---|---|
 | 1 | **Provocar** | Taunt (clase), D18 | Tira Especial +2 (o Constitución) contra la Res.Mt de un rival a 3 casillas o menos: queda Provocado por él hasta el final de su próximo turno (el Provocado de Tirar la bronca: el Anuncio y el brillo ya existen) | ⚙ |

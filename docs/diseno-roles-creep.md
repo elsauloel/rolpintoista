@@ -331,6 +331,9 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
      a haber esquivado; no cambia ningún dado). Combina con Desarmar (del mismo Parry) y con Arte de la guerra.
      **También cambia el de clase** (`comun/skills-clase.js`; dueño: «el de clase también debería tener flash y costar 1, cosa que al usarlo con
      flash cueste 2»): **Flash, 1 SP** (2 en turno ajeno). Se programa con la tanda.
+  10. 🛡 **Segundo aliento** (Recuperación, de clase: «Recuperación [1] — NO2: (2). Recupera 9 HP.»; dueño, 2026-10-27: «que cueste 3 SP y que
+     quite cualquier debuff, no solamente de daño»): se cura **6 + su Constitución** y se saca **un debuff, cualquiera** (el que elija), **una vez
+     por combate**. 2 No2 y 3 SP; no es Flash. Combina con Escudo humano y Provocar.
 - Ya cubiertas por una de fábrica: Amplificar daño (Golpe fuerte), Remolino (Barrido), Shockwave (Pisotón), Takle, Desarmar, Aguante; Cañón Vasco ≈
   Salto aplastante; Daño en área (tanque) ≈ Barrido. Sacadito sigue en pausa.
 

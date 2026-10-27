@@ -78,6 +78,15 @@ function choquePesadoResuelto(d){
   if(d.ataque.sigue) golpeQueSigueResuelto(d).catch(err => console.error('Golpe que sigue:', err));
 }
 const choquePesadoHechos = new Set();
+// Lo que pregunta algo espera a que el cuadro del duelo se cierre o se minimice (hasta 2 minutos), para no salirle encima.
+async function esperarDueloCerrado(maxMs){
+  const t0 = Date.now();
+  while(Date.now() - t0 < (maxMs || 120000)){
+    const f = document.getElementById('duelo-fondo');
+    if(!f || f.classList.contains('min') || !f.childElementCount || getComputedStyle(f).display === 'none') return;
+    await new Promise(r => setTimeout(r, 400));
+  }
+}
 function choquePesadoUnaVez(d, que){ const k = `${d.id}:${que}`; if(choquePesadoHechos.has(k)) return false; choquePesadoHechos.add(k); return true; }
 
 // ⚔ Golpe que sigue (dueño, 2026-10-27, «vamos así»): si lo dejó en 0, otro rival pegado; lo de un primer ataque; el segundo no sigue.
@@ -93,6 +102,7 @@ async function golpeQueSigueResuelto(d){
   const nom = nombreDe(ta), caido = d.defensor.nombre;
   if(!rivales.length){ mesaLinea(`⚔ ${nom} tumbó a ${caido}, pero no tiene otro rival pegado para seguir (Golpe que sigue)`, 'recordatorio'); return; }
   const costo = CreepCalculo.costoContraataque(sc);   // lo de un primer ataque
+  await esperarDueloCerrado();   // (probado en el mapa, 2026-10-27: la pregunta salía encima del «Fin del duelo» y el clic en «Terminar duelo» la contestaba)
   const elegido = await Confirmar.elegir(`${nom} tumbó a ${caido}: ¿sigue contra otro rival pegado? (lo de un primer ataque: ${fmt(costo)} No2; tiene ${fmt(num(sc.nitros))})`,
     {titulo: 'Golpe que sigue', icono: '⚔', no: 'No, se queda', opciones: rivales.map(x => ({valor: x.id, texto: nombreDe(x), detalle: x.tipo === 'pj' ? 'personaje' : ''}))});
   if(!elegido) return;

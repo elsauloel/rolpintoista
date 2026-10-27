@@ -1536,6 +1536,7 @@ const Duelo = (() => {
   // 🛡 Cambió quien defiende (Interponerse, 2026-10-27, vtt-hexgrid/js/78): las opciones de defensa guardadas eran las del otro.
   function olvidarOpciones(id){
     opcionesPedidas.delete(id); delete opcionesFalla[id]; delete opciones[id];
+    ['eva', 'bloqueo'].forEach(c => { const k = id + ':' + c; delete flashOps[k]; delete flashSel[k]; flashPedidas.delete(k); });   // (y sus Flash: eran los del otro, probado en el mapa)
     if(actual && actual.id === id && actual.dato) dibujar();
   }
   function recibirOpciones(id, ops){
@@ -1896,6 +1897,19 @@ const Duelo = (() => {
       return (!d.hab || d.hab.critTipo) && h.resistenciaCritico ? {resistencia: _num(h.resistenciaCritico(d)), ...(h.blindado && h.blindado(d) ? {blindado: true} : {})} : null;
     }catch(err){ console.error('Duelo: los datos del crítico de una tirada a mano', err); return null; }
   }
+  // ⚔ El Contraataque también con la defensa escrita a mano o tirada por quien no está (2026-10-27, probando el del creep en el mapa: así no se
+  // ofrecía): si la pantalla que maneja al defensor dice que esa defensa da contraataque, se anota como con el botón.
+  async function defensaConContra(d, defensa){
+    if(!defensa || d.hab) return defensa;
+    try{
+      let h = null;
+      if(cfgEscuchar.hooksLocal){ h = cfgEscuchar.hooksLocal(d.defensor); if(h && typeof h.then === 'function') h = await h; }
+      const H = hooks();
+      if(!h && H && H.soy && H.soy(d.defensor)) h = H;
+      const op = h && h.opcionesDefensa ? (h.opcionesDefensa(d) || []).find(o => o.modo === defensa.modo && o.contraEsquiva) : null;
+      return op ? {...defensa, contraEsquiva: true, ...(await alcanceContra(d, h))} : defensa;
+    }catch(err){ console.error('Duelo: el contraataque de una defensa a mano', err); return defensa; }
+  }
   async function usarManual(d, campo){
     const k = d.id + ':' + campo;
     const input = document.querySelector(`[data-mtirada="${campo}"]`);
@@ -1908,7 +1922,7 @@ const Duelo = (() => {
     const lado = (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
     const selModo = document.querySelector('[data-mmodo]');
     const modo = campo === 'eva' && selModo ? selModo.value : 'evasion';
-    const defensa = campo === 'eva' ? {modo, itemId: '', itemNombre: '', costo: 0} : null;
+    const defensa = campo === 'eva' ? await defensaConContra(d, {modo, itemId: '', itemNombre: '', costo: 0}) : null;   // ⚔ (2026-10-27)
     const cHab = d.hab && campo === 'eva' ? (d.hab.contra.find(x => x.modo === modo) || d.hab.contra[0]) : null;
     const etiqueta = campo === 'eva' ? (cHab ? cHab.etq : (modo === 'parry' ? 'Parry' : 'Evasión')) : (campo === 'pdg' && d.hab) ? etqTira(d) : (campo === 'dano' ? 'Daño' : ETIQ[campo]);
     manualAbierto.delete(k);
@@ -2192,7 +2206,7 @@ const Duelo = (() => {
       else if(ef.res || (!necesitaTiradaEf(ef) && siempreEf(ef))){
         const cab = ef.res ? `<div class="duelo-ef-res ok${nuevo ? ' nuevo' : ''}">✔ ¡FUNCIONÓ! ${siempreEf(ef) ? '' : `<span>(${ef.res.manual ? '✍ a mano' : `salió ${_fmt(ef.res.dado)} en 1d${_fmt(ef.caras)}`})</span>`}${ef.res && ef.res.extra ? ` <span>· ${_esc(ef.dado)} = <b>${_fmt(ef.res.extra.total)}</b></span>` : ''}</div>` : `<div class="duelo-ef-res ok">Entra siempre</div>`;
         let acc;
-        if(ef.aplicar === 'pedido' || ef.aplicar === 'en-curso') acc = `<div class="duelo-nota">Aplicando sobre ${_esc(d.defensor.nombre)}…</div>`;
+        if(ef.aplicar === 'pedido' || ef.aplicar === 'en-curso') acc = `<div class="duelo-nota">Aplicando sobre ${_esc(spec && spec.nombre === 'Desafiante' ? d.atacante.nombre : d.defensor.nombre)}…</div>`;
         else if(!puedeAtq) acc = `<div class="duelo-nota">esperando que ${_esc(d.atacante.nombre)} lo aplique…</div>`;
         else if(spec){
           // Los stacks de más que suma quien atacó (Guantes del envenenador, 2026-10-05): el botón ya dice cuántos van a llegar.
@@ -2201,7 +2215,8 @@ const Duelo = (() => {
           const pre = ((typeof EstadosAplicar !== 'undefined' && EstadosAplicar.DEBUFFS) || []).find(x => x.nombre === spec.nombre) || {};
           const base = Math.max(1, _num(spec.stacks) || _num(pre.stacks) || 1);
           const txt = extra ? `${spec.nombre} ×${base + extra} (${base} + ${extra} del envenenador)` : EstadosAplicarTexto(spec, ef);
-          acc = `<button type="button" data-ef-aplicar="${i}">✔ Aplicar ${_esc(txt)} sobre ${_esc(d.defensor.nombre)}</button>`;
+          const quien = spec.nombre === 'Desafiante' ? d.atacante.nombre : d.defensor.nombre;   // 😤 el Desafiante es de quien provoca (2026-10-27)
+          acc = `<button type="button" data-ef-aplicar="${i}">✔ Aplicar ${_esc(txt)} sobre ${_esc(quien)}</button>`;
         }
         else acc = `<div class="duelo-nota">✋ A mano: ${_esc(ef.detalle || 'aplicalo vos, no hay un estado automático para este efecto')}</div><button type="button" data-ef-mano="${i}">Listo, lo apliqué a mano</button>`;
         estado = cab + acc;
@@ -2827,7 +2842,7 @@ const Duelo = (() => {
     const lado = (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
     const selModo = document.querySelector('[data-manual-modo]');
     const modo = campo === 'eva' && selModo ? selModo.value : 'evasion';
-    const defensa = campo === 'eva' ? {modo, itemId: '', itemNombre: '', costo: 0} : null;
+    const defensa = campo === 'eva' ? await defensaConContra(d, {modo, itemId: '', itemNombre: '', costo: 0}) : null;   // ⚔ (2026-10-27)
     const cHab = d.hab && campo === 'eva' ? (d.hab.contra.find(x => x.modo === modo) || d.hab.contra[0]) : null;
     const etiqueta = campo === 'eva' ? (cHab ? cHab.etq : (modo === 'parry' ? 'Parry' : 'Evasión')) : (campo === 'pdg' && d.hab) ? etqTira(d) : ETIQ[campo];
     const r = {formula: f.formula, rolls, mod: f.mod, total};

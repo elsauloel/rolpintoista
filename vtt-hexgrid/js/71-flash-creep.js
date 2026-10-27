@@ -81,7 +81,7 @@ async function abrirFlashCreep(){
   const duelo = await flashCreepAtacanteDelDuelo();
   const botones = listos.slice(0, 10).map(({c, objs}) => {
     const k = flashCreepCosto(c), ataca = !!(duelo && objs.some(o => o.id === duelo.tokenId));
-    const quien = flashCreepAlrededor(c.h) ? 'alrededor suyo' : objs.length === 1 ? (objs[0].mismo ? 'a sí mismo' : nombreDe(objs[0].t)) : `${objs.length} objetivos posibles`;
+    const quien = flashCreepAlrededor(c.h) ? (c.h.duelo.objetivo === 'cono' ? 'en cono al frente' : 'alrededor suyo') : objs.length === 1 ? (objs[0].mismo ? 'a sí mismo' : nombreDe(objs[0].t)) : `${objs.length} objetivos posibles`;
     return {fila: true, texto: `${nombreDe(c.t)}: ${c.h.nombre}${ataca ? ' ⚔' : ''}`,
       detalle: `${quien} · ${k.txt}${k.ajeno ? ' (Flash en turno ajeno: el doble)' : ''}`,
       alClic: () => { AvisoCombate.cerrar(); if(objs.length === 1) flashCreepUsar(c, objs[0].id); else flashCreepElegirObjetivo(c, objs, duelo); }};

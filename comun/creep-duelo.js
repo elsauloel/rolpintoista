@@ -176,6 +176,7 @@ const CreepDuelo = (() => {
       efectosArma: d => {
         const sc = deLado(d.atacante);
         const cg = sc ? Combatiente.cargaDeDuelo(sc.estados, d.id) : null;   // + los del arma envenenada / el óleo de este golpe
+        if(sc && d.ataque && d.ataque.escudoGolpe) return [];   // 🛡 pega con el escudo: los efectos del arma no van (probado en el mapa, 2026-10-27)
         return sc ? [...Combatiente.armaEnMano(sc).efectosGolpe, ...(cg ? cg.efectos : [])].map(e => ({...EfectosGolpe.normalizar(e), stacks: num(e.stacks)})) : [];
       },
       // El daño del arma del creep (sin los efectos del golpe: los resuelve el duelo en su paso de efectos).

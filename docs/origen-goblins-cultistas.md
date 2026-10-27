@@ -46,6 +46,21 @@ del cuerpo a cuerpo; sus abejas caen con cualquier área.
 | Kobold tunelero | Goblin tunelero | Choque liviano (Excavar todavía no está auditada) | 2 o 3 |
 | Capataz kobold | Capataz goblin (lugarteniente) | Jefe de los goblins | 3 |
 
-## Encuentro 1 — propuesta (esperando el OK del dueño)
+## Encuentro 1 — la composición del dueño (2026-10-27)
 
-Ver la propuesta en la conversación del 2026-10-27; se completa acá cuando el dueño elija.
+Dueño: «un choque pesado, un choque liviano, dos shooters, uno humano y uno goblin, el humano con arco, el goblin con ballesta, y el humano jefe que
+sea mago de buffer… en nivel 1 tenés 2 skills, a partir de nivel 2, 3, 4, un skill más por nivel. Pensémoslos para que generen sinergia consigo
+mismos y entre sí.» (La primera propuesta —cultista Debuffer, rompecorazas, dos ballesteros, trampero— quedó descartada.)
+
+Propuesta de skills (esperando el OK; todas auditadas):
+
+- 👑 **Jefe humano, mago buffer (Support), nivel 3 — 4 skills**: Armas perforantes · Señalar la presa · ¡A la carga! · Bendecir el arma (Flash).
+- 🏹 **Arquero humano (Rango, tirador), nivel 3 — 4 skills**: Tiro certero · Tiro a la cabeza · Ráfaga encadenada · Vigilancia.
+- 🏹 **Ballestero goblin (Rango, trabador), nivel 2 — 3 skills**: Tiro a la rodilla · Clavar a la pared · Red tendida.
+- 🛡 **Choque pesado goblin, nivel 3 — 4 skills**: Provocar · Romper armadura · Golpe demoledor · Piel de hierro.
+- 🗡 **Choque liviano goblin (sangrador), nivel 2 — 3 skills**: Golpe que sangra · Sal en la herida · Hit and run.
+
+Sinergias: la Presa del jefe sobre Larry (−2 Evasión, +4 de daño de cada golpe) la cobran los dos tiradores y el liviano; las Armas perforantes
+(3 puntos pasan siempre la Defensa) hacen que el Sangrado del liviano le entre a Petro; el pesado provoca a Petro (Res.Mt 5) y le rompe la armadura;
+la Red y la Vigilancia frenan a Petro si va por los tiradores; ¡A la carga! suma a todos. Riesgo a simular: Ráfaga encadenada sobre una Presa puede
+tirar a Larry en un turno.

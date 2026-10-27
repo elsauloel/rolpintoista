@@ -573,12 +573,17 @@ Propuesta (2026-10-27):
   creep (el número, sin tirar) como dificultad**. Se coloca con un clic (fuera de la vista de los rivales); al pisar 1 casilla, la red **cae sobre las 7**:
   cada uno tira **Fuerza contra su Destreza** para escurrirse antes de que caiga; el que no, queda **Inmovilizado 1 turno**; **🔓 Soltarse: Fuerza contra
   su Destreza, 1 No2 por intento**. Se detecta con Percepción contra su Destreza. (La Red de caza del catálogo ya es así, con 7 fijo en las dos tiradas.)
-  Falta: el costo de la habilidad (propuesta: 2 No2 y 2 SP, o cooldown 3).
+  **Costo y duración** (dueño, 2026-10-27: «2 nitros y 3 SP, y que la red dure vigente durante 2 turnos completos de los afligidos. Sería hasta el final
+  de la ronda de la persona que triggerea. Y una ronda completa más»): **2 No2 y 3 SP**; el Inmovilizado dura **lo que queda de la ronda de quien la pisó
+  y una ronda completa más** (la marca `turnosCompletos`, como la Furia y ¡Al frente!), igual para todos los atrapados.
 - 🏹 **H3. Cebo** — **forma A elegida** (dueño, 2026-10-27: «el cazador pone como cebo algo semienterrado que parece de muchísimo valor, con un brillo
   misterioso que llama la atención»): lo deja en una casilla de su Rango (no es una trampa: se ve); los rivales que lo ven y están a 4 o menos tiran
   **Res.Mt contra la Destreza** del creep; el que pierde **camina ya hasta 3 casillas hacia el cebo** (gratis, sin oportunidad) y lo que pise en el camino
-  lo toca (la primera trampa lo frena ahí). Falta: el costo y qué pasa con el cebo después (propuesta: desaparece; quien llega a la casilla encuentra una
-  piedra pintada).
+  lo toca (la primera trampa lo frena ahí). **Alcance y final** (dueño, 2026-10-27: «el área de influencia del cebo debe ser una flor de diámetro 9 y
+  cualquier persona que se pare en un hexágono adyacente descubre que es una roca pintada y que al dar la vuelta… la levanta y abajo tiene pintado "puto
+  el que lee"»): atrae a los que lo ven dentro de una **flor de diámetro 9** (37 casillas) alrededor del cebo; el cebo **queda en el mapa** hasta que
+  alguien se para en una casilla **pegada**: ahí se descubre (el Anuncio: es una roca pintada; la levanta y abajo dice «puto el que lee») y desaparece.
+  Falta: el costo (propuesta: 1 No2 y 2 SP, o cooldown 3).
 - 🏹 **H4. Mina del cazador**: al pisarla, flor de 7, 3d6 directo y Pajaritos 2 turnos.
 - 🏹 ~~**H5. Arrear**~~: un disparo que lo empuja 2 hacia donde elija el creep. El dueño: «¿no existe ya algún tiro que desplace dos casillas para atrás?» —
   sí, **Mantener a raya** (lo empuja 2 lejos del tirador y Lento 2 turnos). Lo único distinto sería elegir la dirección.

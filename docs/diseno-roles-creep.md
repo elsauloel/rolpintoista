@@ -567,12 +567,18 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
 
 Propuesta (2026-10-27):
 - 🏹 **H1. Cepo del cazador**: 1 casilla; 3d6 menos su Defensa e Inmovilizado 2 turnos; soltarse con Fuerza contra la Destreza del creep (2 No2).
-- 🏹 **H2. Red tendida** — **definida en parte** (dueño, 2026-10-27: «una vez que cae, pueden tirar fuerza contra la destreza. Al momento de colocar la
-  trampa, quien la coloca tira destreza, y esa es la dificultad para zafarse. Fuerza contra ese valor de dificultad»): al pisar 1 casilla, la red cae
-  sobre las 7 de alrededor: Inmovilizado 1 turno. **Al colocarla, el creep tira su Destreza y ese resultado queda como la dificultad** del 🔓 Soltarse
-  (Fuerza contra ese número). Falta: si hay una tirada para escurrirse antes de que caiga, el costo del Soltarse y el de la habilidad.
-  *Mecánica nueva:* una trampa que guarda una tirada hecha al colocarla (hoy la dificultad del Soltarse es un número fijo o el stat sin tirar).
-- 🏹 **H3. Cebo** — al dueño le gusta, falta entender cómo funciona (ver las dos formas abajo). No es una trampa (no lleva la palabra ni se esconde).
+- 🏹 **H2. Red tendida** — **definida** (dueño, 2026-10-27; primero: «al colocar la trampa, quien la coloca tira destreza, y esa es la dificultad»;
+  después lo corrigió: «que la dificultad sea el [stat] fijo sin tirar. La coloca directamente. Cae sobre las siete casillas. La tirada es la fuerza, la
+  tirada de salvación. Y la del catálogo debería ser igual. Un nitro por intento de costo está bien»): la Red de caza del catálogo con la **Destreza del
+  creep (el número, sin tirar) como dificultad**. Se coloca con un clic (fuera de la vista de los rivales); al pisar 1 casilla, la red **cae sobre las 7**:
+  cada uno tira **Fuerza contra su Destreza** para escurrirse antes de que caiga; el que no, queda **Inmovilizado 1 turno**; **🔓 Soltarse: Fuerza contra
+  su Destreza, 1 No2 por intento**. Se detecta con Percepción contra su Destreza. (La Red de caza del catálogo ya es así, con 7 fijo en las dos tiradas.)
+  Falta: el costo de la habilidad (propuesta: 2 No2 y 2 SP, o cooldown 3).
+- 🏹 **H3. Cebo** — **forma A elegida** (dueño, 2026-10-27: «el cazador pone como cebo algo semienterrado que parece de muchísimo valor, con un brillo
+  misterioso que llama la atención»): lo deja en una casilla de su Rango (no es una trampa: se ve); los rivales que lo ven y están a 4 o menos tiran
+  **Res.Mt contra la Destreza** del creep; el que pierde **camina ya hasta 3 casillas hacia el cebo** (gratis, sin oportunidad) y lo que pise en el camino
+  lo toca (la primera trampa lo frena ahí). Falta: el costo y qué pasa con el cebo después (propuesta: desaparece; quien llega a la casilla encuentra una
+  piedra pintada).
 - 🏹 **H4. Mina del cazador**: al pisarla, flor de 7, 3d6 directo y Pajaritos 2 turnos.
 - 🏹 ~~**H5. Arrear**~~: un disparo que lo empuja 2 hacia donde elija el creep. El dueño: «¿no existe ya algún tiro que desplace dos casillas para atrás?» —
   sí, **Mantener a raya** (lo empuja 2 lejos del tirador y Lento 2 turnos). Lo único distinto sería elegir la dirección.

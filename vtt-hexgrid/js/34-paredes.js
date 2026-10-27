@@ -207,7 +207,7 @@ function trazoCfgAbrir(id){
   if(!el){
     el = document.createElement('div');
     el.id = 'trazo-cfg';
-    el.style.cssText = 'position:fixed;z-index:70;width:250px;background:#1F1A20;border:1px solid #6B5B4B;border-radius:10px;padding:10px 12px;color:#EDE3D2;font:13px "Space Grotesk",system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.5)';
+    el.style.cssText = 'position:fixed;z-index:70;width:250px;max-height:calc(100vh - 16px);overflow-y:auto;box-sizing:border-box;background:#1F1A20;border:1px solid #6B5B4B;border-radius:10px;padding:10px 12px;color:#EDE3D2;font:13px "Space Grotesk",system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.5)';
     document.body.appendChild(el);
     el.addEventListener('click', e => {
       const b = e.target.closest('[data-tc]');
@@ -246,8 +246,11 @@ function trazoCfgAbrir(id){
   const r = lienzo.getBoundingClientRect(), g = trazoGearMundo(t);
   const x = r.left + g.x * vista.zoom + vista.x, y = r.top + g.y * vista.zoom + vista.y;
   el.style.left = Math.max(8, Math.min(innerWidth - 262, x + 16)) + 'px';
-  el.style.top = Math.max(8, Math.min(innerHeight - el.offsetHeight - 8, y - 20)) + 'px';
+  // Se mide ya visible (escondido, offsetHeight da 0 y el cuadro se iba para abajo). El borde de abajo: el de la ventana o, si la ventana queda
+  // detrás de la barra de tareas de Windows, el de la pantalla útil (dueño, 2026-10-27: «el menú se abre para abajo y lo tapa la barra de tareas»).
   el.hidden = false;
+  const bordeAbajo = Math.min(innerHeight, (screen.availTop || 0) + screen.availHeight - (window.screenY || 0) - Math.max(0, outerHeight - innerHeight));
+  el.style.top = Math.max(8, Math.min(bordeAbajo - el.offsetHeight - 8, y - 20)) + 'px';
 }
 document.addEventListener('keydown', e => { if(e.key === 'Escape' && trazoCfgId) trazoCfgCerrar(); });
 // Clic en el 📌 → fija o suelta el dibujo. true si el clic era ahí.

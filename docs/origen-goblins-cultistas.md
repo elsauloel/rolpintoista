@@ -149,3 +149,7 @@ pondría algún skill de daño siniestro que sume algo de daño mágico directo,
   (1d8) contra Petro: 50 % (Evasión 7 o Parry 8); contra Bizzante 49 %; contra Larry 75 %. Provocar: Petro 97 %, Bizzante 62 %, Larry 14 %.
 - **Sinergias**: provoca a Petro (que con la Confusión del jefe puede terminar pegándole a los suyos), se pone Piel de hierro y le rompe la armadura con
   cada golpe que pega; la Coraza maldita del jefe le suma −2. Mientras Petro está con él, no va por el jefe ni por los tiradores.
+- **Cambio del dueño (2026-10-27)**: «el golpe demoledor yo lo reemplazaría por alguno que dé demora, ya que tiene duplicado romper armadura» →
+  propuesta: **Golpe de escudo** (un ataque + 2 SP, cd 2: pega con el escudo, sin Parry, contra la Evasión; si pasa algo de daño, Sentado y Demora 1).
+  Alternativas: Puño de roca (un ataque + 2 SP, cd 2: +2 al daño y Demora) o Takle (Flash, 2 No2 y 3 SP: Con + 2 contra Con, −3 No2, empujón y al final
+  del orden).

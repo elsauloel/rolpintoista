@@ -290,6 +290,7 @@ function equiparItemEnCreep(idx){
     toast(`${sc.nombre} equipado con ${item.nombre}`);
   }else{
     ponerArmaEnCreep(sc, item);   // 🗡 un ítem de su lista, en la mano (comun/combatiente.js, ponerArma)
+    if(Combatiente.armaEnMano(sc).natural) setTimeout(() => renombrarArmaNatural(sc.id), 0);   // 🐾 una bestia: garras, colmillos… (js/05)
     toast(`${sc.nombre} equipado con ${item.nombre}`);
   }
   $('#scrim-equipar-creep').classList.remove('open');

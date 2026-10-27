@@ -181,6 +181,22 @@ function marcarArmaNatural(sc, si){
   const a = Combatiente.armaPrincipal(sc);
   if(a) a.natural = !!si; else if(si) Combatiente.ponerArma(sc, {nombre: '', natural: true});
 }
+/* 🐾 Al marcar el arma como natural (o equiparle un arma a un creep que la tiene marcada), ofrecer cambiarle el nombre (2026-10-26, dueño:
+   «una bestia equipada con un arma del catálogo, marcada como natural, que al marcarla se le pueda poner garras, colmillos, cuernos…»).
+   Guarda el nombre del catálogo en `nombreOriginal`: con eso se sigue sabiendo cuánto vale (el trofeo, comun/combate-fin.js). */
+const NOMBRES_NATURALES = ['Garras', 'Colmillos', 'Dientes', 'Cuernos', 'Pinzas', 'Aguijón', 'Cola', 'Pico', 'Puños', 'Tentáculos'];
+async function renombrarArmaNatural(scId){
+  const sc = S.creeps.find(s => s.id === scId);
+  const a = sc && Combatiente.armaPrincipal(sc);
+  if(!a || !a.natural) return;
+  const nombre = await Confirmar.texto(`El arma de ${sc.nombre} es parte de su cuerpo: sigue con los mismos números y efectos, solo cambia cómo se llama. Vacío = dejarla como está.`,
+    {titulo: '¿Cómo se llama su arma natural?', icono: '🐾', valor: a.nombre || '', sugerencias: NOMBRES_NATURALES, si: 'Ponerle ese nombre', no: 'Dejarla así'});
+  if(!nombre || nombre === a.nombre) return;
+  if(a.nombre && !a.nombreOriginal) a.nombreOriginal = a.nombre;
+  a.nombre = nombre;
+  renderAll();
+  toast(`🐾 Ahora se llama ${nombre}`);
+}
 
 // Pieza de equipo (no arma): la Defensa va aparte, como en CATALOGO_EQUIPO.
 function ponerEquipoEnCreep(sc, d){
@@ -250,7 +266,7 @@ function abrirItemCustomGM(){
       const sc = S.creeps.find(s => s.id === scId);
       if(!sc){ toast('Elegí a qué creep equiparlo (paso 1), o publicalo con "Agregar al catálogo"'); return false; }
       if(CreepCalculo.vaAlEquipo(d)) ponerEquipoEnCreep(sc, d);   // (una varita va al equipo)
-      else ponerArmaEnCreep(sc, d);
+      else{ ponerArmaEnCreep(sc, d); if(Combatiente.armaEnMano(sc).natural) setTimeout(() => renombrarArmaNatural(sc.id), 0); }   // 🐾
       toast(`${sc.nombre} equipado con ${d.nombre}`);
       registrarEvento(`✎ Ítem custom: ${sc.nombre} equipado con ${d.nombre}`);
       renderAll();

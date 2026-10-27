@@ -484,3 +484,12 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
 - **🗑 Borrar mapa** (2026-10-13, pedido del dueño): con la pestaña de un mapa abierta (no el primero), «🗑 Borrar mapa» (`borrarMapaGM`, js/09) lo borra
   con todo lo que tiene en el mapa, con el mismo cartel y el mismo «escribí el nombre» que el 🗺 Mapas del mapa (`CreepsMapas.confirmarBorrado` /
   `borrarMapa`, comun/creeps-mapas.js). Sus creeps no se borran: pasan a la Reserva.
+
+- **🐾 Equipo natural y lo que no se ofrece en el botín** (2026-10-26, pedido del dueño): al tildar «arma natural» (Recompensas y el asistente), al
+  equiparle un arma del catálogo a un creep con el arma marcada natural o al crearle una con «✎ Ítem custom», `renombrarArmaNatural(scId)` (js/05)
+  ofrece cambiarle el nombre (`Confirmar.texto`, sugerencias Garras, Colmillos, Dientes, Cuernos…); el nombre del catálogo queda en `nombreOriginal`.
+  Las piezas naturales que no son el arma no se nombran a los jugadores (`CreepCalculo.tarjetaPublica`). El trofeo suma lo que vale el equipo natural
+  que sale del catálogo (`CreepCalculo.trofeo(sc, precioDe)`, `valorNatural`; las armas naturales de la biblioteca no, ya tienen el precio por nivel)
+  y existe también si solo hay piezas naturales («Trofeo de …»). En «Batalla terminada», lo que el GM destilda del equipo de un creep (el arma y las
+  piezas; no el trofeo ni lo extra) se vende: su valor de venta (la mitad del precio de compra, para arriba) se suma al oro y se reparte
+  (`CombateFin.ocultos`, `rep.ocultosAOro`, la casilla del paso Equipo; se ve en Doblones y en Publicar).

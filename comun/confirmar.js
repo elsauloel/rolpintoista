@@ -8,6 +8,7 @@
    Uso: `if(!(await Confirmar.preguntar('¿Borrar X?', {si: 'Borrar', peligro: true}))) return;` — la función que lo llama tiene que ser async.
    Confirmar.elegir(texto, {titulo, icono, opciones: [{valor, texto, detalle}], no}) → Promise<valor | null> (2026-10-13, Carga Elemental): una opción
    por botón (con una línea chica debajo), y «no» (Cancelar) = null. Esc / ✕ / clic afuera = null.
+   Confirmar.texto(texto, {titulo, icono, valor, sugerencias}) → Promise<string | null> (2026-10-26): un campo de texto (ver abajo).
    ========================================================= */
 const Confirmar = (() => {
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
@@ -81,5 +82,39 @@ const Confirmar = (() => {
       const b = f.querySelector('[data-cfj-op]'); if(b) b.focus();
     });
   }
-  return {preguntar, elegir};
+  /* Confirmar.texto(texto, {titulo, icono, valor, sugerencias: [..], si, no, max}) → Promise<string | null> (2026-10-26, dueño: al marcar un arma
+     como natural, «que te ofrezca cambiarle el nombre»): un campo de texto con su valor inicial y, debajo, sugerencias que lo completan con un
+     clic. Enter / el botón = el texto (sin espacios de más); Esc / ✕ / Cancelar / clic afuera = null. */
+  function texto(txt, o){
+    o = o || {};
+    estilos();
+    return new Promise(ok => {
+      const f = document.createElement('div');
+      f.className = 'cfj-fondo';
+      const sug = o.sugerencias || [];
+      f.innerHTML = `<div class="cfj-caja" role="dialog" aria-modal="true">
+        <div class="cfj-cab"><span>${esc(o.icono || '✎')} ${esc(o.titulo || 'Escribí')}</span><button type="button" data-cfj-x title="Cancelar">✕</button></div>
+        <div class="cfj-cuerpo">${txt ? `<p class="cfj-texto">${esc(txt)}</p>` : ''}
+          <input type="text" data-cfj-in maxlength="${Number(o.max) || 60}" value="${esc(o.valor || '')}" style="width:100%;box-sizing:border-box;margin-top:12px;padding:9px 11px;border-radius:10px;border:1px solid #39435c;background:#1a2030;color:#e6e9f2;font-size:15px">
+          ${sug.length ? `<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">${sug.map(s => `<button type="button" data-cfj-sug="${esc(s)}" style="border:1px solid #39435c;border-radius:999px;padding:4px 11px;background:#1f2a40;color:#e6e9f2;cursor:pointer;font-size:13px">${esc(s)}</button>`).join('')}</div>` : ''}
+          <div class="cfj-pie"><button type="button" data-cfj-ok>${esc(o.si || 'Listo')}</button><button type="button" class="sec" data-cfj-x>${esc(o.no || 'Cancelar')}</button></div></div>
+      </div>`;
+      const inp = f.querySelector('[data-cfj-in]');
+      const tecla = ev => {
+        if(ev.key === 'Escape'){ ev.stopImmediatePropagation(); ev.preventDefault(); fin(null); }
+        else if(ev.key === 'Enter'){ ev.stopImmediatePropagation(); ev.preventDefault(); fin(inp.value.trim()); }
+      };
+      const fin = v => { document.removeEventListener('keydown', tecla, true); f.remove(); ok(v); };
+      f.onclick = ev => {
+        const s = ev.target.closest('[data-cfj-sug]');
+        if(s){ inp.value = s.dataset.cfjSug; inp.focus(); return; }
+        if(ev.target.closest('[data-cfj-ok]')){ fin(inp.value.trim()); return; }
+        if(ev.target.closest('[data-cfj-x]') || ev.target === f) fin(null);
+      };
+      document.addEventListener('keydown', tecla, true);
+      document.body.appendChild(f);
+      inp.focus(); inp.select();
+    });
+  }
+  return {preguntar, elegir, texto};
 })();

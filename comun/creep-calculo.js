@@ -496,8 +496,10 @@ const CreepCalculo = (() => {
       armaNatural: a.natural,
       sinArma: !!a.sinArma,   // ✋ nada en la mano (paso 5): el mapa lo marca en el token
       // Lo de las manos (además del arma) va aparte del equipo (2026-10-17): una varita, un escudo, un orbe.
-      manosNombres: Combatiente.puestoSinArma(sc).filter(enLasManos).map(it => it.natural ? nom(it.nombre) : ver(it.nombre)).filter(Boolean).slice(0, 6),
-      equipoNombres: Combatiente.puestoSinArma(sc).filter(it => it && !enLasManos(it)).map(it => it.natural ? nom(it.nombre) : ver(it.nombre)).filter(Boolean).slice(0, 30),   // lo natural se ve con su nombre, como el arma natural
+      // 🐾 Lo natural que no es el arma (piel dura, caparazón…) no se nombra (2026-10-26, dueño: «las armaduras simplemente den los efectos, los
+      // usuarios no necesitan ver el nombre»): da sus bonos y nada más. El arma natural sí se ve (Garras, Colmillos).
+      manosNombres: Combatiente.puestoSinArma(sc).filter(it => enLasManos(it) && !it.natural).map(it => ver(it.nombre)).filter(Boolean).slice(0, 6),
+      equipoNombres: Combatiente.puestoSinArma(sc).filter(it => it && !enLasManos(it) && !it.natural).map(it => ver(it.nombre)).filter(Boolean).slice(0, 30),
       notas: String(sc.notas || '').trim().slice(0, 600),
       tipoCriatura: tipoDe(sc).slice(0, 30),   // el tipo de criatura (Matabestias de los arcos, 2026-10-11)
       pasosSilenciosos: num(modTotal(sc, 'pasossilenciosos')) > 0,   // 👣 (2026-10-15): el mapa de los jugadores no lo hace oír a 3 casilleros
@@ -697,15 +699,30 @@ const CreepCalculo = (() => {
     const base = n <= 5 ? TROFEO_PRECIO_NIVEL[n - 1] : 110 + 40 * (n - 5);
     return sc.jefe ? base * 2 : base;
   }
-  // El trofeo que suelta al morir (o null). El "especial" reemplaza al automático.
-  function trofeo(sc){
+  /* 🐾 Lo natural que lleva (2026-10-26, dueño: «que el trofeo que deja la bestia tenga algún tipo de equivalencia en valor de venta al equipo
+     que tuvo»): el arma natural y las piezas naturales (no lo invocado). `valorNatural(sc, precioDe)` = lo que valdría todo eso en la tienda
+     (precio de compra); el trofeo lo suma a su precio, así venderlo da lo mismo que vender ese equipo. `precioDe(it)` lo pone quien sabe
+     estimar (comun/combate-fin.js, con el catálogo); si no, el precio de la pieza o el del ítem del catálogo de fábrica con ese nombre (el del
+     catálogo: `nombreOriginal`, si al arma se le cambió el nombre al marcarla natural). */
+  const nombreBase = x => String(x || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const naturales = sc => (Array.isArray(sc && sc.equipo) ? sc.equipo : []).filter(it => it && it.natural === true && !it.invocadaDe && (it.nombre || it.nombreOriginal));
+  function precioDeFabrica(it){
+    if(num(it.precioCompra) > 0) return num(it.precioCompra);
+    const nb = nombreBase(it.nombreOriginal || it.nombre), arma = /^arma_/.test(String(it.tipoItem || ''));
+    const c = typeof CATALOGO_BASE !== 'undefined' ? CATALOGO_BASE.find(i => nombreBase(i.nombre) === nb && (arma ? /^arma_/.test(String(i.tipoItem || '')) : i.tipoItem === it.tipoItem)) : null;
+    return c ? num(c.precioCompra) : 0;
+  }
+  const valorNatural = (sc, precioDe) => naturales(sc).reduce((a, it) => a + Math.max(0, num((precioDe || precioDeFabrica)(it))), 0);
+  // El trofeo que suelta al morir (o null). El "especial" reemplaza al automático (y su precio, si tiene uno, también).
+  function trofeo(sc, precioDe){
     const esp = sc.trofeoEspecial || {};
     const nombreEsp = String(esp.nombre || '').trim();
     const a = armaDe(sc);
-    if(!nombreEsp && !a.natural) return null;
-    const nombre = nombreEsp || `${a.nombre || 'Arma natural'} de ${nombreLimpio(sc)}`;
-    const precio = num(esp.precio) > 0 ? num(esp.precio) : trofeoPrecioAuto(sc);
-    return {nombre, precioCompra: precio, especial: !!nombreEsp};
+    if(!nombreEsp && !a.natural && !naturales(sc).length) return null;
+    const nombre = nombreEsp || (a.natural ? `${a.nombre || 'Arma natural'} de ${nombreLimpio(sc)}` : `Trofeo de ${nombreLimpio(sc)}`);
+    const extra = num(esp.precio) > 0 ? 0 : valorNatural(sc, precioDe);
+    const precio = num(esp.precio) > 0 ? num(esp.precio) : trofeoPrecioAuto(sc) + extra;
+    return {nombre, precioCompra: precio, especial: !!nombreEsp, natural: extra};
   }
   function despojosDePrecio(precioCompra){ return Math.ceil(num(precioCompra) / 4); }   // un cuarto del precio de compra
   /* Drops fijos (2026-10-14, dueño, la Grapa del capataz: «aunque la consuma, quiero que esté entre sus drops»): nombres de ítems del
@@ -739,7 +756,7 @@ const CreepCalculo = (() => {
     if(a.nombre && !a.natural) partes.push(`${a.nombre} (arma equipable)`);
     Combatiente.equipoSinArma(sc).filter(it => !it.natural).forEach(it => partes.push(`${it.nombre} (equipo)`));   // 🐾 lo natural no se suelta (2026-10-14)
     const tr = trofeo(sc);
-    if(tr) partes.push(`${tr.nombre} (trofeo: compra ${fmt(tr.precioCompra)}, venta ${fmt(tr.precioCompra / 2)}, ${fmt(despojosDePrecio(tr.precioCompra))} despojos)`);
+    if(tr) partes.push(`${tr.nombre} (trofeo${tr.natural ? `, con ${fmt(tr.natural)} por su equipo natural` : ''}: compra ${fmt(tr.precioCompra)}, venta ${fmt(tr.precioCompra / 2)}, ${fmt(despojosDePrecio(tr.precioCompra))} despojos)`);
     dropsFijos(sc).forEach(n => partes.push(`${n} (drop fijo)`));
     if(num(sc.oroBase) > 0) partes.push(`${fmt(num(sc.oroBase))} DDE de oro (±20% al final del combate)`);
     if(Array.isArray(sc.consumibleAzar) && sc.consumibleAzar.length) partes.push(`${sc.consumibleAzar.join(', ')} (consumible al azar, en el cinturón: si lo usa, lo suelta seguro; si no, a veces)`);
@@ -749,7 +766,7 @@ const CreepCalculo = (() => {
   }
 
   return {modoSP, spMax, spRegen, spActual, costoSpHab,talisman, auraMiedo, estandartes, enLasManos, regenPasivas, masDanoElem, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
-    ARQUETIPOS, arquetiposAuto, arquetiposManual, arquetipos, arquetiposTxt, TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TROFEO_PRECIO_NIVEL, TIPOITEM_LABEL, STAT_LABEL, itemParaCreep, magiaDeItem, vaAlEquipo, nombreLimpio, tipoDe, oroSugerido, trofeoPrecioAuto,
+    ARQUETIPOS, arquetiposAuto, arquetiposManual, arquetipos, arquetiposTxt, TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TROFEO_PRECIO_NIVEL, TIPOITEM_LABEL, STAT_LABEL, itemParaCreep, magiaDeItem, vaAlEquipo, nombreLimpio, tipoDe, oroSugerido, trofeoPrecioAuto, valorNatural,
     trofeo, despojosDePrecio, dropsResumen, dropsFijos,
     correrTiposTexto, migrarObjTipos, migrarCreepTipos, migrarObjEspecial, migrarHabPdg, migrarCreepEspecial, slotDe,
     danoTxt, fuentesEquipo, modTotal, estadosArmadura, aporteArmadura, defensaEfectiva, armadmgEfectiva, resElemental, critEfectivo, critDeEstados,

@@ -683,6 +683,7 @@ const Duelo = (() => {
       ...(_num(h.dano.mult) > 1 ? {mult: Math.min(4, _num(h.dano.mult))} : {}), ...(h.dano.carga ? {carga: txtCorto(h.dano.carga, 20)} : {}),   // ✨ Carga Elemental (2026-10-13)
       ...(h.dano.porDano && typeof Combatiente !== 'undefined' && Combatiente.porDanoNorm(h.dano.porDano) ? {porDano: Combatiente.porDanoNorm(h.dano.porDano)} : {}),
       ...(h.dano.extra && String(h.dano.extra.formula || '').trim() ? {extra: {formula: txtCorto(h.dano.extra.formula, 20), tipo: txtCorto(h.dano.extra.tipo || 'fuego', 20)}} : {}),   // ☄ un segundo daño de otro tipo (el Meteoro, 2026-10-24: 4d6 físico + 2d6 de fuego)
+      ...(_num(h.dano.perfora) > 0 ? {perfora: Math.min(5, Math.round(_num(h.dano.perfora)))} : {}),   // 🗡 la Perfora del arma (2026-10-27)
       ...(h.dano.diferencia ? {diferencia: true} : {}), ...(h.dano.drena ? {drena: true, drenaTope: Math.max(0, Math.round(_num(h.dano.drenaTope))), ...(_num(h.dano.drenaPct) > 0 && _num(h.dano.drenaPct) < 100 ? {drenaPct: Math.round(_num(h.dano.drenaPct))} : {})} : {})} : null;
     const efectos = limpiarEfectos(h.efectos);
     const objetivo = ['enemigo', 'aliado', 'cualquiera', 'uno mismo', 'area', 'onda', 'cono', 'linea'].includes(h.objetivo) ? h.objetivo : 'enemigo';   // cualquiera: aliado o enemigo (2026-10-15)

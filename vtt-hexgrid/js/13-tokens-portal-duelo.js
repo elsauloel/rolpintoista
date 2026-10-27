@@ -1697,13 +1697,15 @@ async function dueloAplicarDano(d){
   const perfExtra = d.ataque && !crit ? (d.ataque.puntaDiamante && def >= Combatiente.PUNTA_DIAMANTE_DEF ? Combatiente.PUNTA_DIAMANTE_PERFORA : 0) + remachadoraPerfora(d) : 0;
   // 🛡 Armas perforantes (2026-10-25, el Support): la Perfora que le da un estado a quien ataca, contra la Defensa y contra la Defensa especial.
   const perfEst = Combatiente.perforaDeEstados((((vinculo(tokens.get(d.atacante && d.atacante.tokenId)) || {}).resumen) || {}).estados);
-  const perfN = !crit && d.ataque ? Math.min(num(d.ataque.flecha && d.ataque.flecha.perfora) + num(d.ataque.perfora) + perfExtra + perfEst.def, golpe) : 0;
+  // (+ la Perfora del arma cuando una habilidad pega con «el daño de tu arma»: Abanico, Remolino, Daño en área — 2026-10-27)
+  const atqP = d.ataque || {};
+  const perfN = !crit && (d.ataque || d.hab) ? Math.min(num(atqP.flecha && atqP.flecha.perfora) + num(atqP.perfora) + num(d.hab && d.hab.dano && d.hab.dano.perfora) + perfExtra + perfEst.def, golpe) : 0;
   const perfora = Combatiente.perforaPasa(golpe, def, perfN);   // solo cuenta si la Defensa frenaría más que eso
   let aplicar = perfora || golpe, ignoraDef = crit || perfora > 0;
   if(base.mitad){ aplicar = Math.ceil(Math.max(0, golpe - def, perfN) / 2); ignoraDef = true; }
   // ✍ La Defensa elegida a mano en el duelo (2026-10-15): «no resta» o un número, en lugar de la del defensor.
   if(dn.defensaManual === 'no'){ aplicar = base.mitad ? Math.ceil(golpe / 2) : golpe; ignoraDef = true; }
-  else if(dn.defensaManual !== undefined && dn.defensaManual !== null && dn.defensaManual !== ''){ const dmn = Math.max(0, num(dn.defensaManual)); aplicar = base.mitad ? Math.ceil(Math.max(0, golpe - dmn) / 2) : Math.max(0, golpe - dmn); ignoraDef = true; }
+  else if(dn.defensaManual !== undefined && dn.defensaManual !== null && dn.defensaManual !== ''){ const dmn = Math.max(0, num(dn.defensaManual)); aplicar = base.mitad ? Math.ceil(Math.max(0, golpe - dmn, perfN) / 2) : Math.max(0, golpe - dmn, perfN); ignoraDef = true; }   // (la Perfora vale también contra la Defensa escrita a mano, 2026-10-27)
   // …y contra la Defensa especial: de lo que llega, esos N pasan siempre; el resto va contra la Defensa especial como siempre.
   if(frenaAm && perfEst.esp > 0 && armadmg > 0){
     const resta = Math.min(armadmg, Math.max(0, aplicar - perfEst.esp));

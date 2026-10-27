@@ -1614,6 +1614,7 @@ const Combatiente = (() => {
       dano: c.dano && (formula || c.danoDiferencia) ? {formula: c.danoDiferencia ? '' : formula, tipo, ignoraDef: c.trueDamage ? true : c.ignoraDano !== undefined ? !!c.ignoraDano : tipo !== 'fisico',
         ...(c.trueDamage ? {trueDamage: true} : c.danoDirecto && (tipo !== 'fisico' || c.ignoraDano) ? {directo: true} : {}),   // (físico directo: el Pisotón, 2026-10-26)
         ...(nf(c.danoMult) > 1 ? {mult: nf(c.danoMult)} : {}), ...(porDanoNorm(c.porDano) ? {porDano: porDanoNorm(c.porDano)} : {}), ...(c.carga ? {carga: String(c.carga)} : {}),   // ✨ Carga Elemental (2026-10-13)
+        ...(c.danoArma && nf(o.armaPerfora) > 0 && tipo === 'fisico' ? {perfora: Math.min(5, Math.round(nf(o.armaPerfora)))} : {}),   // 🗡 la Perfora del arma, con «el daño de tu arma» (2026-10-27: Abanico, Remolino…)
         ...(c.danoDiferencia ? {diferencia: true} : {}), ...(c.drena ? {drena: true, drenaTope: Math.max(0, nf(c.drenaTope)), ...(nf(c.drenaPct) > 0 && nf(c.drenaPct) < 100 ? {drenaPct: Math.round(nf(c.drenaPct))} : {})} : {})} : null,   // drenaPct: cura solo ese % (2026-10-07, la Sanguijuela)
       efectos: (c.efectos || []).map(e => efectoDeEjecucion(conX && e && e.stacks === 'X' ? {...e, stacks: Math.max(1, Math.round(X))} : e, o.stat)),   // stacks «X» (Apuntar, 2026-10-11)
       ...(c.objetivo === 'area' || c.objetivo === 'onda' ? {radio: nf(c.radio)} : {}),

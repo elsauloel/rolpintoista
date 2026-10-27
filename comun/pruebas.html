@@ -5905,6 +5905,14 @@ prueba('🔄 Las habilidades de clase siguen a su clase (P222, 2026-10-27): una 
   igual([cambiadas, h.id, h.costo === '5', h.turnoAjenoSp, h.detalle === base.detalle, h.jobCosto, h.cdActual, !!h.claseHuella, quieta, tras, S.habilidades[0].costo, S.habilidades[1].costo],
     [[base.nombre], 'h1', true, '2', true, 1, 1, true, [], [], '5', '9']);
 });
+prueba('🗡 Perfora N = N puntos pasan siempre la Defensa, no le baja la Defensa (dueño, 2026-10-27); y viaja con «el daño de tu arma»', () => {
+  const pasa = (golpe, def, p) => Combatiente.perforaPasa(golpe, def, p) || Math.max(0, golpe - def);
+  const h = {nombre: 'Abanico', duelo: {objetivo: 'cono', tira: 'pdg', contra: ['eva'], dano: true, danoArma: true, tipoDano: 'fisico', ignoraDano: false}};
+  const ej = Combatiente.habEjecucion(h, h.duelo, {stat: () => 3, etq: s => s, armaDano: '1d8+4', armaPerfora: 2});
+  const sin = Combatiente.habEjecucion(h, h.duelo, {stat: () => 3, etq: s => s, armaDano: '1d8+4'});
+  igual([pasa(5, 10, 1), pasa(10, 3, 1), pasa(5, 4, 2), pasa(1, 9, 3), pasa(8, 8, 0), ej.dano.perfora, sin.dano.perfora, Duelo.limpiarHab(ej).dano.perfora],
+    [1, 7, 2, 1, 0, 2, undefined, 2]);
+});
 /* ---------- Resultado ---------- */
 Promise.all(pendientes).then(() => {
 const malas = resultados.filter(r => !r.ok);

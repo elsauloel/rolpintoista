@@ -169,7 +169,7 @@ const CreepAcciones = (() => {
   const habEtq = stat => (C().STAT_LOOKUP[stat] && C().STAT_LOOKUP[stat].label) || ATTR_LABELS[stat] || stat;
   // La Ejecución de un creep: la misma regla que personajes e invocaciones (comun/combatiente.js, habEjecucion). Sin costo variable.
   function habEjecucion(sc, h){
-    return Combatiente.habEjecucion(h, h && h.duelo, {stat: s => C().statValor(sc, s), etq: habEtq, armaDano: C().ataqueTxt(sc), nivel: num(sc.nivel) || 1});   // nivel: el Provocar (+ su nivel)
+    return Combatiente.habEjecucion(h, h && h.duelo, {stat: s => C().statValor(sc, s), etq: habEtq, armaDano: C().ataqueTxt(sc), armaPerfora: num((Combatiente.armaEnMano(sc) || {}).perfora), nivel: num(sc.nivel) || 1});   // nivel: el Provocar (+ su nivel)
   }
   // «Ataque con mi arma, con arreglos» de un creep (Golpe brutal, Carga…; P134): el mismo armado que el personaje, con su arma.
   function ataqueDeHab(sc, h){

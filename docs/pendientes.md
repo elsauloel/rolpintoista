@@ -19,6 +19,18 @@
 >   (dueño: «dije como drop, para que prueben los jugadores, de ítems consumibles, una polilla y un acelerador, por lo menos»). Se pueden poner como
 >   drop fijo de un creep (GM Tools → Recompensas → drops fijos) o sumarlos a mano al botín al finalizar el combate («+ Sumar» en el paso Equipo/Consumibles).
 
+> **📦 Auditoría pendiente del catálogo (2026-10-27, dueño: «flechas, virotes, trampas raras, ponelo en pendiente de auditoría, pero no los quites; lo
+> mismo los carcajes»).** Siguen en el catálogo; se auditan cuando toque. Lo demás quedó así: se archivaron los arcos Raros, Excepcionales y
+> Legendarios, los dos arcos Buenos viejos y todas las armas de pólvora; los consumibles que no tenían la marca se dieron por auditados (`"auditado":true`);
+> los sueltos (Expelliarmus, Anillo del último aliento, las luces Raras, la Polilla, el Ankh) se dejan como están; los 11 arcos Buenos van a la prueba en
+> el mapa (`pruebas-en-el-mapa.md`).
+> - [ ] **Flechas Raras (7)**: del rastreador, de acero templado, de fuego vivo, de hielo negro, aulladora, silenciadora, de tormenta.
+> - [ ] **Virotes Raros (9)**: de acero templado, de punta de diamante, quiebra-escudos, del verdugo, silenciador, de fuego vivo, de hielo negro, de tormenta,
+>   explosivo.
+> - [ ] **Trampas Raras (11)**: Cuchillas de guadaña, Cepo de dientes de sierra, Resina de árbol negro, Espina de mantícora, Bomba de esporas, Barril de
+>   pólvora, Géiser de fuego, Tumba de hielo, Espejo de discordia, Portal cósmico, Muralla repentina.
+> - [ ] **Carcajes (3)**: del jinete y de la guardia (Raros), del viento (Excepcional).
+
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.

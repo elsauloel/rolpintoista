@@ -98,7 +98,7 @@ Guía general propuesta (esperando el OK):
 - **Atributos (39)**: Con 9 · Fue 3 · Agi 6 · Des 6 · Esp 15. Vida 45, No2 6, Rango 6, SP 47 (regen 7).
 - **Equipo** (criterio del dueño, nivel 3: las manos + 4 Comunes + 1 Buena): manos, Varita de la grieta (Buena, la de nivel 3) y Grimorio gastado;
   piezas, Capucha de lana del culto, Túnica de aprendiz, Mitones del primer conjuro y Babuchas bordadas del adivino. Queda: PdG.Esp 16, Defensa 0,
-  Def.Esp 4, Res.Esp 12, Res.Mt 20, Evasión 6. **Consumible**: Poción de SP menor (o un Pergamino grupal de Furia de Combate, si un creep lo puede usar).
+  Def.Esp 3, Res.Esp 12, Res.Mt 19, Evasión 6. **Consumible**: Poción de SP menor (o un Pergamino grupal de Furia de Combate, si un creep lo puede usar).
 - **Skills**: Armas perforantes (1 No2, 3 SP, cd 3) · Señalar la presa (1 No2, 2 SP, cd 3) · ¡A la carga! (2 No2, 3 SP, cd 3) · Bendecir el arma
   (Flash, 2 SP, cd 2; el doble en turno ajeno). La varita: 1 No2 + 3 SP, 1d6 arcano y −2 Defensa 2 turnos.
 - **Números** (su PdG.Esp 16, 2d8, contra cada uno): Señalar la presa entra 97 % contra Larry (Res.Esp 4), 94 % contra Bizzante (5), 88 % contra

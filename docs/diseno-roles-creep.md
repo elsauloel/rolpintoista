@@ -585,11 +585,18 @@ Propuesta (2026-10-27):
   alguien se para en una casilla **pegada**: ahí se descubre (el Anuncio: es una roca pintada; la levanta y abajo dice «puto el que lee») y desaparece.
   Falta: el costo (propuesta: 1 No2 y 2 SP, o cooldown 3).
   **Dura 3 turnos** (dueño, 2026-10-27: «que el cebo esté tendido durante 3 turnos, igual tiene una tirada de resistencia mental»): mientras está, sigue
-  atrayendo (cuándo se tira la Res.Mt de nuevo: a confirmar; propuesta, al empezar el turno de cada rival que lo ve dentro de la flor).
+  atrayendo: **la Res.Mt se tira al colocarlo y al empezar el turno de cada rival que lo ve dentro de la flor** (dueño, 2026-10-27: «tu propuesta para el
+  cebo me parece bien. El primer rival que llega y da vuelta a la piedra, desaparece la piedra»): el primero que se para al lado la da vuelta y la piedra
+  desaparece para todos. Costo: la propuesta (1 No2 y 2 SP, o cooldown 3), salvo que el dueño diga otra cosa.
 - 🗡 **L1. Aguja en el piso** — en revisión (dueño, 2026-10-27, sobre la del catálogo: «el D6, ¿se resiste con defensa? Porque si se resiste con defensa,
   un dado de 6 es una poronga. Nunca va a pasar el veneno, salvo que tenga perforar»). En el catálogo, la Aguja emponzoñada resta la Defensa al 1d6 pero
   **el veneno no depende del daño** (solo de la Res.Esp contra 9); los que piden lastimar son los Dardos envenenados (Común, 1d6+3). Nueva propuesta: **1d6
   directo a la vida** (busca el hueco de la armadura) y **Veneno ×5** aunque no lastime; Res.Esp contra su Destreza solo para el veneno.
+  **El dueño, para la del catálogo (2026-10-27):** «que la aguja del catálogo tire un D8 con perfora 1 y efectivamente envenene si pasa algún punto de
+  daño, que va a ser casi siempre». Cuenta: con Perfora 1, 1d8 pasa una Defensa D con (9 − D)/8: Defensa 4 → 63 %, 5 → 50 %, 14 → 0 (el grupo de
+  El origen: Larry 4, Bizzante 5, Rockardo 14). A confirmar antes de tocar el catálogo. *Mecánica nueva:* una trampa con Perfora (hoy no existe).
+  **Detectarla** (aclaración al dueño): solo tiran quienes tienen Percepción aumentada, Pisada atenta o Desarmar trampas (al pasar al lado), o con una
+  luz que revela; el resto no tira.
 - 🏹 **H4. Mina del cazador**: al pisarla, flor de 7, 3d6 directo y Pajaritos 2 turnos.
 - 🏹 ~~**H5. Arrear**~~: un disparo que lo empuja 2 hacia donde elija el creep. El dueño: «¿no existe ya algún tiro que desplace dos casillas para atrás?» —
   sí, **Mantener a raya** (lo empuja 2 lejos del tirador y Lento 2 turnos). Lo único distinto sería elegir la dirección.

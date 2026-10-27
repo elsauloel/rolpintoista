@@ -220,8 +220,9 @@ const ESTADOS_PRESET = [
     detalle:'Shield del Support: absorbe 14 de daño, de un golpe o de varios, como una barra de HP secundaria (🛡). Dura hasta gastarse: no vence por turnos ni se recarga.'},
   // Envión (2026-10-26, dueño: el Support, «un escudo de 10 de HP que absorbe daño. Del tipo vida extra»; «dura hasta que se gaste. El escudo reemplaza,
   // no se suma»): como el Shield, absorbe 10 y dura hasta gastarse; otro Envión lo renueva (no se suma, a diferencia de la Vida extra).
-  {nombre:'Envión', polaridad:'buff', permanente:true, turnos:0, escudoMagico:10, sinRecarga:true, seGasta:true,
-    detalle:'Envión del Support: absorbe 10 de daño, de un golpe o de varios, como una barra de HP secundaria (🛡). Dura hasta gastarse: no vence por turnos ni se recarga. Otro Envión lo deja otra vez en 10 (no se suma). ⚙ Automatizado.'},
+  // (2026-10-27, dueño: «no me cierra nada el nombre en envión» → Arrojo; el nombre viejo queda como alias.)
+  {nombre:'Arrojo', alias:['Envión'], polaridad:'buff', permanente:true, turnos:0, escudoMagico:10, sinRecarga:true, seGasta:true,
+    detalle:'Arrojo del Support: un escudo que absorbe 10 de daño, de un golpe o de varios, como una barra de HP secundaria (🛡). Dura hasta gastarse: no vence por turnos ni se recarga. Otro Arrojo lo deja otra vez en 10 (no se suma). ⚙ Automatizado.'},
   // Al frente (2026-10-26, dueño: el Support, «¡Al frente!»: «que dé más 2 a la probabilidad de golpe y más 2 a la evasión hasta el final de su próximo
   // turno»): el turno en que se lo dan no cuenta (`turnosCompletos`).
   {nombre:'Al frente', polaridad:'buff', turnos:1, turnosCompletos:true, mods:[{stat:'pdg', val:2}, {stat:'pdgmg', val:2}, {stat:'eva', val:2}],

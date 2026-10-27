@@ -1207,8 +1207,8 @@ prueba('💥 Takle (Choque pesado, 2026-10-26): Flash, corre hasta 2 (saltoHab +
     Duelo.specDeEfecto(x.efectos[2]).nombre, h.nitrosCosto, h.spCosto, h.cd, HABILIDADES_CREEP_BASE.some(y => y.nombre === 'Tackle')],
     [true, 2, true, 3, 'con', 2, 'con', null, 'Pierde No2,Empujón,Al final del orden', 3, 2, 'Al final del orden', 2, 3, 3, false]);
 });
-prueba('💨 Envión (Support, 2026-10-26): Flash; a él o a un aliado, un escudo de 10 que se gasta (otro lo renueva, no se suma) y sube 1 lugar', () => {
-  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Envión'), h = armarHabilidadDeCreep(e.datos, 2);
+prueba('💨 Arrojo (ex Envión, Support, 2026-10-26): Flash; a él o a un aliado, un escudo de 10 que se gasta (otro lo renueva, no se suma) y sube 1 lugar', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Arrojo'), h = armarHabilidadDeCreep(e.datos, 2);
   const x = Combatiente.habEjecucion(h, h.duelo, {stat: s => ({rng: 5})[s] || 0, etq: s => s});
   const sc = {estados: []}; EstadosAplicar.aplicarACreep(sc, x.efectos[0].spec); sc.estados[0].escudoMagicoActual = 3; EstadosAplicar.aplicarACreep(sc, x.efectos[0].spec);
   igual([!!h.flash, x.objetivo, !!x.conmigo, sc.estados.length, sc.estados[0].escudoMagico, sc.estados[0].escudoMagicoActual === undefined ? 10 : sc.estados[0].escudoMagicoActual, !!sc.estados[0].seGasta,

@@ -2227,7 +2227,7 @@ async function dueloAplicarEfectoBase(d, ef){
   if(typeof talismanUnaVez === 'function' && !talismanUnaVez(d, ef)) return {nota: 'el talismán ya lo hizo este turno'};   // 🔮 la Cabeza reducida, el Muñeco vudú (js/53)
   if(spec.nombre === 'Demora') return dueloDemora(d.defensor.tokenId, spec.stacks);   // (stacks = cuántos lugares: el Cascotazo, Demora 2)
   if(spec.nombre === 'Al final del orden') return alFinalDelOrden(d.defensor.tokenId, d.defensor.nombre, d.hab && d.hab.nombre);   // 💥 Takle (js/04)
-  if(spec.nombre === 'Sube en el orden') return dueloAdelanto(d.defensor.tokenId, spec.stacks);   // 💨 Envión (2026-10-26)
+  if(spec.nombre === 'Sube en el orden') return dueloAdelanto(d.defensor.tokenId, spec.stacks);   // 💨 Arrojo (ex Envión, 2026-10-26)
   if(spec.soltar && !spec.soltar.visual){   // 🕸 una copia vieja de la Red Nerubian o de Tela de araña: la telaraña sale del nombre (js/68)
     const v = Combatiente.atrapaDeNombre((d.hab && d.hab.nombre) || (d.ataque && (d.ataque.habNombre || d.ataque.nombre)) || '');
     if(v) spec.soltar = {...spec.soltar, visual: v};
@@ -2401,7 +2401,7 @@ async function dueloDemora(tokenId, lugares){
   return {nota: `baja ${txt(j - i)} en el orden de turnos (${i + 1}.º → ${j + 1}.º)${falta > 0 && j < orden.length - 1 ? ` (${txt(falta)} más, a mano, al empezar la próxima ronda)` : ''}`};
 }
 
-/* 💨 Envión (2026-10-26, dueño: «sube en uno en la tabla de iniciativas»): sube `lugares` (1) en el orden de turnos. No pasa por encima del que tiene el
+/* 💨 Arrojo (ex Envión, 2026-10-26, dueño: «sube en uno en la tabla de iniciativas»): sube `lugares` (1) en el orden de turnos. No pasa por encima del que tiene el
    turno (si ya es el siguiente, o es el del turno, no sube); si ya actuó esta ronda, sube igual (le sirve para la próxima); el primero no sube. */
 async function dueloAdelanto(tokenId, lugares){
   const n = Math.max(1, Math.round(num(lugares)) || 1), txt = k => `${k} lugar${k === 1 ? '' : 'es'}`;

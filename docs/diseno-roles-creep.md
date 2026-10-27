@@ -59,7 +59,7 @@ avanzando de a uno parejamente»): siempre se sigue con **el rol que menos tiene
 > (y entonces pasan a la auditoría y a «para probar»). **Todo definido el 2026-10-26; el dueño: «ya puedes pasar a la programación».**
 
 **💚 Support (18 → 20)**
-- **Envión** (idea del dueño, 2026-10-26: «un poco como el Shield. Otorga un escudo de 10 de HP que absorbe daño. Del tipo vida extra. Y además, sube en
+- **Arrojo** (hasta el 2026-10-27 «Envión»; dueño: «no me cierra nada el nombre» → Arrojo) (idea del dueño, 2026-10-26: «un poco como el Shield. Otorga un escudo de 10 de HP que absorbe daño. Del tipo vida extra. Y además, sube en
   uno en la tabla de iniciativas. Y tiene flash»): **Flash** (en turno ajeno, el SP al doble). A él o a un aliado en su Rango: **10 de Vida extra** (no se
   recarga) y **sube 1 lugar** en el orden de turnos. Reglas de la iniciativa: no pasa por encima del que tiene el turno (si ya es el siguiente, o es el del
   turno, no sube); si ya actuó esta ronda, sube igual (le sirve para la próxima); el primero del orden no sube (el escudo vale igual). **La Vida extra

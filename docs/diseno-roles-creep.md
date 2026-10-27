@@ -310,6 +310,10 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
      atacan a un aliado a **2 casillas o menos**, antes de la tirada, **salta a su lado** (gratis: sin No2 ni ataques de oportunidad) y **el golpe va
      contra él**, con **+2 Defensa** contra ese golpe. 2 SP (4 en turno ajeno), o cooldown 3. Combina con Piel de hierro y Provocar. 🔧 Hace falta
      que el duelo pueda cambiar de defensor a mitad de camino.
+  6. ⚔ **Arte de la guerra** (de clase: «Arte de la guerra [2] — +2 fijo a una tirada de PG, Parry, Bloqueo o Daño.»; dueño, 2026-10-27: «está
+     bien el más 3, está bien el flash, pero que no sea después de ver los dados»): **Flash** (botón instantáneo en el duelo): **+3 fijo** a una
+     tirada suya de **PdG, Parry, Bloqueo o daño**, atacando o defendiendo, **elegida antes de tirar** (no después de ver los dados). 2 SP (4 en
+     turno ajeno), o cooldown 2.
 - Ya cubiertas por una de fábrica: Amplificar daño (Golpe fuerte), Remolino (Barrido), Shockwave (Pisotón), Takle, Desarmar, Aguante; Cañón Vasco ≈
   Salto aplastante; Daño en área (tanque) ≈ Barrido. Sacadito sigue en pausa.
 

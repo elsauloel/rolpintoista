@@ -294,6 +294,12 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
      +1 Res. a crítico de todo Tipo**, **2 turnos**. 1 No2 y 4 SP, o cooldown 3; no es Flash. Combina con Provocar (+8 / +8 mientras dure el
      Provocado). Originales: «Piel resistente [5] — Otorga una armadura temporal: Defensa 5, Res. Mágica 5, reduce críticos de todo tipo.
      Duración: 2 turnos.» y Temple (+1 Res. a crítico de todo Tipo, 2 turnos).
+  3. ⚔ **Golpe brutal** (de clase; dueño, 2026-10-27: «el de creep es +1 frecuente, +2 potente, +3 al daño»): un ataque con su arma con
+     **Crítico frecuente +1, Crítico potente +2 y +3 al daño**; queda en **Guardia baja** (−2 Evasión) hasta su próximo turno. Un ataque y 2 SP,
+     o cooldown 2. Combina con Furia (todo al ataque) y con Romper armadura.
+     **También cambia el de clase** (`comun/skills-clase.js`, `warrior-golpe-brutal`; dueño: «tiene que dar +1 a los dos bonos de crítico… y +2
+     al daño, y queda en guardia baja»): **Crítico frecuente +1, Crítico potente +1 y +2 al daño** (hoy solo `critpotBono: 1`; sumar `critBono: 1`
+     y `fijo: 2`, y el detalle). Se programa con la tanda.
 - Ya cubiertas por una de fábrica: Amplificar daño (Golpe fuerte), Remolino (Barrido), Shockwave (Pisotón), Takle, Desarmar, Aguante; Cañón Vasco ≈
   Salto aplastante; Daño en área (tanque) ≈ Barrido. Sacadito sigue en pausa.
 

@@ -481,7 +481,7 @@
     trampaColocar: {nombre: 'Cordón oculto', tipo: 'linea', tamano: 4, color: '#E8DDC2', alfa: 40, efecto: {area: 'pisador'}, estado: 'Sentado', amiga: true, altura: 'piso', adelante: true, visual: 'cordon',
       detectarStat: 'des', salvacion: {stat: 'agl', etq: 'Agilidad', dif: 7, que: 'efecto', difStat: 'des'}}});
   // 🗡 Polvo cegador: «va bien».
-  H('Polvo cegador', 'K', 'hd', 'e', 3, {detalle: 'Esconde una bolsita de polvo (pimienta, ceniza) en una casilla, dentro de su Rango y fuera de la vista de los rivales. Al pisarla, el polvo se levanta en las 7 casillas de alrededor: Ceguera 1 turno a todos los de adentro (ven solo a 2 casillas, su Probabilidad de Golpe a la mitad), que se resiste con Res.CC contra la Destreza del pícaro. Sin daño. Se detecta con Percepción contra su Destreza.',
+  H('Polvo cegador', 'K', 'hd', 'e', 3, {detalle: 'Esconde una bolsita de polvo (pimienta, ceniza) en una casilla, dentro de su Rango y fuera de la vista de los rivales. Al pisarla, el polvo se levanta en las 7 casillas de alrededor: Ceguera 1 turno a todos los de adentro (ven solo a 2 casillas, su Probabilidad de Golpe y su Probabilidad de Golpe especial a la mitad), que se resiste con Res.CC contra la Destreza del pícaro. Sin daño. Se detecta con Percepción contra su Destreza.',
     no2: 1, spCosto: 2, auditada: true, ataqueTxt: 'polvo en las 7 casillas: Ceguera 1 turno (Res.CC contra su Destreza)',
     trampaColocar: {nombre: 'Polvo cegador', tipo: 'flor', tamano: 0, color: '#B9B2A0', alfa: 45, efecto: {area: 'flor', radio: 1}, estado: 'Ceguera', estadoTurnos: 1, amiga: true, altura: 'piso',
       detectarStat: 'des', salvacion: {stat: 'rescc', etq: 'Res.CC', dif: 7, que: 'efecto', difStat: 'des'}}});

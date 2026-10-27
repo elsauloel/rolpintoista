@@ -178,7 +178,13 @@ skills, porque si no después buscarlos vinculados el uno al otro va a ser una p
      por una casilla libre a 4 o menos del pozo y apuñala con su arma (lo de un ataque): +3 PdG, +1d6 al daño, Crítico frecuente +1; si pega, Rengo 1 turno
      (crítico: Rengo 2 y Lisiado 1). Cooldown 2 desde que sale. **Falta programarla** (hoy son dos: `excavar` y `emerger`, vtt-hexgrid/js/46).
   2. **Golpe que sangra** (un ataque, cd 2): Sangrado.
-  3. **Polvo cegador** (la trampa: 1 No2, 2 SP, cd 3): Ceguera 1 turno en 7 casillas (ve a 2, PdG a la mitad), Res.CC contra su Destreza.
+  3. **Polvo cegador** (la trampa: 1 No2, 2 SP, cd 3): Ceguera 1 turno en 7 casillas (ve a 2, PdG y PdG.Esp a la mitad), Res.CC contra su Destreza.
 - **Números**: sale de abajo con PdG 10 + 3; el daño, 2d4 + 7 + 1d6 (15 de promedio): a Larry le pasan ~11, a Bizzante ~10, a Petro ~3.
 - **Sinergias**: abajo no lo alcanzan los Pedos de Larry; sale pegado a Larry (o a Bizzante), lo deja Rengo para que no se escape de los tiradores; el Polvo
   cegador en el camino de Larry le corta la visión (no puede apuntar a más de 2) y a Bizzante le parte el PdG.
+- **La estela del túnel (idea del dueño, 2026-10-27: «mientras el chabón está enterrado, deja atrás una estela de tierra levantada, roquitas, algo así,
+  que quede hasta el principio de su siguiente turno, durante una ronda completa. Cuando se va, van desapareciendo de a uno, de atrás para adelante, con
+  cierta lentitud, no es que simplemente hace un blink out»)**. Se puede: hoy un token bajo tierra ya se mueve (el GM lo arrastra) y los jugadores no lo
+  ven. Plan: cada casilla que recorre abajo (y el tramo hasta donde sale) queda marcada en el token (`tunel`, campo nuevo: hay que pegar la regla) y el mapa
+  dibuja tierra removida con piedritas en esas casillas; al empezar su próximo turno se borran de a una, de la más vieja a la más nueva, cada una con un
+  desvanecido. A decidir: ¿la estela la ven los jugadores (delata por dónde va)? Sin programar todavía.

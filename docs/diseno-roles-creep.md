@@ -558,6 +558,36 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
 - **Disparo múltiple** (en pausa): SP X (el doble de objetivos adicionales). Ataca a múltiples objetivos en línea directa en un cono ancho.
 - **Tiro con comba** (en pausa): SP 1. Altera la trayectoria de un ataque de rango para esquivar obstáculos. Desvío máx. 2 casillas; cada una cuenta como +1 de distancia.
 
+### Tanda de trampas (2026-10-27) — Rango y Hunter + Choque liviano
+
+> Dueño (2026-10-27): «me di cuenta que no hay trampas. Metería algunas habilidades con trampas, tanto en el choque liviano como en el rango Hunter»
+> (en el catálogo vigente, la única que coloca una es el Portal trampa del Mago). Se arman sobre las trampas del catálogo (`docs/rework-trampas.md`),
+> un escalón arriba. **Regla nueva del mismo día, ya hecha:** una trampa no se coloca a la vista de un rival (su cono azul del sigilo; la alerta
+> naranja sí, y no dispara ninguna detección: P226 ✅). Se diseña de a una; se programa cuando el dueño lo diga.
+
+Propuesta (2026-10-27):
+- 🏹 **H1. Cepo del cazador**: 1 casilla; 3d6 menos su Defensa e Inmovilizado 2 turnos; soltarse con Fuerza contra la Destreza del creep (2 No2).
+- 🏹 **H2. Red tendida** — **definida en parte** (dueño, 2026-10-27: «una vez que cae, pueden tirar fuerza contra la destreza. Al momento de colocar la
+  trampa, quien la coloca tira destreza, y esa es la dificultad para zafarse. Fuerza contra ese valor de dificultad»): al pisar 1 casilla, la red cae
+  sobre las 7 de alrededor: Inmovilizado 1 turno. **Al colocarla, el creep tira su Destreza y ese resultado queda como la dificultad** del 🔓 Soltarse
+  (Fuerza contra ese número). Falta: si hay una tirada para escurrirse antes de que caiga, el costo del Soltarse y el de la habilidad.
+  *Mecánica nueva:* una trampa que guarda una tirada hecha al colocarla (hoy la dificultad del Soltarse es un número fijo o el stat sin tirar).
+- 🏹 **H3. Cebo** — al dueño le gusta, falta entender cómo funciona (ver las dos formas abajo). No es una trampa (no lleva la palabra ni se esconde).
+- 🏹 **H4. Mina del cazador**: al pisarla, flor de 7, 3d6 directo y Pajaritos 2 turnos.
+- 🏹 ~~**H5. Arrear**~~: un disparo que lo empuja 2 hacia donde elija el creep. El dueño: «¿no existe ya algún tiro que desplace dos casillas para atrás?» —
+  sí, **Mantener a raya** (lo empuja 2 lejos del tirador y Lento 2 turnos). Lo único distinto sería elegir la dirección.
+- 🗡 **L1. Aguja en el piso**: 1 casilla; 1d6+3 y Veneno ×5 (el veneno solo si lastima).
+- 🗡 **L2. Abrojos**: flor de 7; 2d6 menos su Defensa y Rengo 2 turnos; cada paso sobre ellos lo renueva.
+- 🗡 **L3. Cuerda floja**: línea de 3; Sentado; Res.CC contra su Destreza.
+- 🗡 **L4. Polvo cegador**: 1 casilla → las 7 de alrededor; Ceguera 1 turno.
+
+**El Cebo, dos formas para elegir:**
+- **A. Al instante** (como Arrastrar): pone el cebo (algo brillante, comida, un quejido) en una casilla de su Rango; los rivales que lo ven y están a 4 o menos
+  tiran Res.Mt contra la Destreza del creep; el que pierde **camina ya hasta 3 casillas hacia el cebo** (gratis, sin oportunidad), y si en el camino hay
+  una trampa, la pisa y se frena ahí. Una sola tirada, se resuelve en el turno del creep.
+- **B. Que se queda** (como una zona): el cebo queda 2 turnos; **al empezar su turno**, cada rival que lo ve tira Res.Mt; si pierde, su primer movimiento
+  tiene que ser hacia el cebo (hasta 3 casillas, pagando sus No2), y lo que pise en el camino lo toca. Se termina cuando alguien llega a la casilla.
+
 ## 4. Casters — las ideas del rol
 
 Ya cubierto al entrar (2026-10-21): ninguna habilidad de caster auditada; en el mapa, los hechizos dirigidos y de área (cascada, dodge roll), conos,

@@ -1835,7 +1835,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   (habilidad `trampaDeHabilidad`, consumible `trampaConsumibleEnMapa`, el glifo y el portal; los pilares no) se ven los conos y la alerta del sigilo de los
   rivales que esta pantalla ve (`elegirCasillaTrampa` → `trampaConosRivales`, lo pinta `trampaConosDibujar` desde `dibujar`, js/05); una casilla dentro del
   cono azul de alguno no sirve (`trampaALaVista`, sumado a `trampaFueraDeAlcance`): avisa y la vuelve a pedir. Sin el token de quien la pone (el GM a mano),
-  no se mira nada. La zona naranja de alerta, por ahora, sí sirve (a decidir: P226).
+  no se mira nada. La zona naranja de alerta sí sirve y no dispara ninguna detección (P226 ✅, dueño).
 - **Las ocho del camino a 20 por rol** (2026-10-26, dueño): **😤 Golpe desesperado** (`desesperadoBonos`, js/69: los bonos según la vida PROPIA, con
   `Combatiente.desesperadoBonos`); **💥 Takle** (`saltoHab` de js/55 con `corre`: corre hasta quedar pegado, sin pasar paredes; vale también para una
   habilidad sin arma: `ataque.hab.saltoHab`, js/13; el efecto «Al final del orden» → `alFinalDelOrden`, js/04: se le corta el turno o, si ya era el último,

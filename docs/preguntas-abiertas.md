@@ -1269,8 +1269,10 @@ Probando el Sonic Boom se vio que un área (cono, onda, flor) también le pega a
 **A decidir:** ¿las áreas lo saltean (como si no estuviera), lo alcanzan igual (como hoy), o lo alcanzan solo si quien la tira lo elige?
 
 
-### P226 — Colocar una trampa en la zona de alerta (naranja) de un rival (2026-10-27)
+### P226 — Colocar una trampa en la zona de alerta (naranja) de un rival (2026-10-27) ✅ decidida (2026-10-27)
 
 Regla nueva del dueño (2026-10-27): «una trampa no se puede poner en el campo de visión directa de un enemigo»; al colocarla se ven los conos del
 sigilo. Hecho: el **cono azul** no sirve (avisa y la vuelve a pedir). La **zona de alerta naranja** (en el sigilo, la que pide una tirada de
 Percepción) por ahora **sí sirve**. **A decidir:** ¿se deja así, se prohíbe también, o se puede pero el rival tira Percepción para verla colocar?
+
+**Decidido (dueño, 2026-10-27):** «la zona naranja no dispara nada de detección de trampas»: queda como está (se puede, sin tirada).

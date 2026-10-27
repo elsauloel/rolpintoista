@@ -584,10 +584,15 @@ Propuesta (2026-10-27):
   el que lee"»): atrae a los que lo ven dentro de una **flor de diámetro 9** (37 casillas) alrededor del cebo; el cebo **queda en el mapa** hasta que
   alguien se para en una casilla **pegada**: ahí se descubre (el Anuncio: es una roca pintada; la levanta y abajo dice «puto el que lee») y desaparece.
   Falta: el costo (propuesta: 1 No2 y 2 SP, o cooldown 3).
+  **Dura 3 turnos** (dueño, 2026-10-27: «que el cebo esté tendido durante 3 turnos, igual tiene una tirada de resistencia mental»): mientras está, sigue
+  atrayendo (cuándo se tira la Res.Mt de nuevo: a confirmar; propuesta, al empezar el turno de cada rival que lo ve dentro de la flor).
+- 🗡 **L1. Aguja en el piso** — en revisión (dueño, 2026-10-27, sobre la del catálogo: «el D6, ¿se resiste con defensa? Porque si se resiste con defensa,
+  un dado de 6 es una poronga. Nunca va a pasar el veneno, salvo que tenga perforar»). En el catálogo, la Aguja emponzoñada resta la Defensa al 1d6 pero
+  **el veneno no depende del daño** (solo de la Res.Esp contra 9); los que piden lastimar son los Dardos envenenados (Común, 1d6+3). Nueva propuesta: **1d6
+  directo a la vida** (busca el hueco de la armadura) y **Veneno ×5** aunque no lastime; Res.Esp contra su Destreza solo para el veneno.
 - 🏹 **H4. Mina del cazador**: al pisarla, flor de 7, 3d6 directo y Pajaritos 2 turnos.
 - 🏹 ~~**H5. Arrear**~~: un disparo que lo empuja 2 hacia donde elija el creep. El dueño: «¿no existe ya algún tiro que desplace dos casillas para atrás?» —
   sí, **Mantener a raya** (lo empuja 2 lejos del tirador y Lento 2 turnos). Lo único distinto sería elegir la dirección.
-- 🗡 **L1. Aguja en el piso**: 1 casilla; 1d6+3 y Veneno ×5 (el veneno solo si lastima).
 - 🗡 **L2. Abrojos**: flor de 7; 2d6 menos su Defensa y Rengo 2 turnos; cada paso sobre ellos lo renueva.
 - 🗡 **L3. Cuerda floja**: línea de 3; Sentado; Res.CC contra su Destreza.
 - 🗡 **L4. Polvo cegador**: 1 casilla → las 7 de alrededor; Ceguera 1 turno.

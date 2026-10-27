@@ -195,3 +195,25 @@ skills, porque si no después buscarlos vinculados el uno al otro va a ser una p
   común el 60 %; Por abajo le pasa ~10, Golpe que sangra ~7 + 2 por turno, Sal en la herida (sangrando) ~12. La trampa del encuentro sigue siendo la Red del
   ballestero (para Petro y Bizzante, que sí caminan).
 - **Siguiente**: el híbrido, enfocado en aguantar a Larry y lidiar con él.
+- **La estela, decidida (dueño, 2026-10-27)**: «está bien que la vean los jugadores, porque si no es muy zarpado, como una especie de super sigilo
+  indetectable. Que los jugadores sepan dónde va. Y también el GM agarra la ficha, la desplaza, la suelta, que la animación de la creación de la estela de
+  tierra que ven todos también sea de atrás para adelante de manera suave.» → la ven todos; al soltar el token, la estela aparece casilla por casilla desde
+  la primera hasta la última, suave; dura hasta el principio de su próximo turno y se va igual, de atrás para adelante. Sin programar todavía.
+
+### 🗡⚔ 4. Goblin híbrido (Warrior + choque liviano), anti-Larry — nivel 3 (propuesta, esperando el OK)
+
+Dueño (2026-10-27): «el siguiente choque… el híbrido, más enfocado en resistir a Larry y en lidiar con él. Larry tiene muy pocos nitros… se creó ese skill
+donde puede tirarse un pedo para desplazarse con un salto alto; las trampas mucho no van a servir porque él prácticamente no se desplaza.»
+
+- **Atributos (39)**: Con 11 · Fue 8 · Agi 8 · Des 8 · Esp 4. Vida 55 (+5 = 60), No2 8, PdG 8 (9 con los guanteletes), Evasión 8, Dmg 8, Res.Esp 11.
+- **Equipo** (nivel 3: las manos + 4 Comunes + 1 Buena): **Espada de la colimba** (Tipo 6, 2 dados, Sangrado 25 %) y **Cruz de plata** (Buena, otra mano:
+  Res.Esp +2 en toda tirada; una vez por ronda, si le gana la Res.Esp a una habilidad o varita, los estados le rebotan 1 turno a quien la tiró); **Capa de
+  viajero** (Def.Esp +1, Res.Esp +1, Vida +5), **Capucha de lana del culto** (Def.Esp +1, Res.Esp +1), **Escarpines de piel de cururú** (Def.Esp +1, Res.
+  tóxico +1), **Guanteletes de cazador** (PdG +1, Defensa +1, Tipo 4 +1). Queda con **Res.Esp 15**, Def.Esp 3, Res. tóxico 1.
+- **Skills (4)**: **Salto** (un ataque + 2 SP, cd 3: hasta 3 casilleros por encima de lo que haya, sin No2 ni oportunidad, +1 PdG y Crítico frecuente +1)
+  · **Takle** (Flash, 2 No2 y 3 SP, cd 3: Con + 2 contra Con; −3 No2, empujado 2 y al final del orden) · **Remate** (un ataque + 2 SP, cd 3: herido a la
+  mitad +2 dados, a un cuarto +3) · **Ojo de asesino** (un ataque + 2 SP, cd 2: +1 PdG, +2 al daño, +1/+1 a los críticos).
+- **Números contra Larry** (Con 4, Evasión 4, Defensa 4, 20 de vida, 4 No2): Takle 99 % (le deja 1 No2 y le corta el turno); Salto le pega el 94 %, un
+  golpe común el 86 %; la espada hace 2d6 + 8 (15): le pasan ~11 por golpe; con Larry a la mitad, el Remate (+2d6) lo tumba. Aguantando a Larry: el Drenar
+  Vida con X = 5 lo resiste el 61 %, con X = 8 el 18 %, con X = 10 el 6 %; los Pedos le ganan el 66 % (contra Res.Esp 4 sería el 99 %).
+- **Riesgo**: es un cazador de Larry muy efectivo (Takle casi siempre le saca el turno). A mirar en la simulación.

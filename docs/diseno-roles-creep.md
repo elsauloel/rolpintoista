@@ -610,7 +610,10 @@ Propuesta (2026-10-27):
 - 🏹 **H4. Mina del cazador**: al pisarla, flor de 7, 3d6 directo y Pajaritos 2 turnos.
 - 🏹 ~~**H5. Arrear**~~: un disparo que lo empuja 2 hacia donde elija el creep. El dueño: «¿no existe ya algún tiro que desplace dos casillas para atrás?» —
   sí, **Mantener a raya** (lo empuja 2 lejos del tirador y Lento 2 turnos). Lo único distinto sería elegir la dirección.
-- 🗡 **L2. Abrojos**: flor de 7; 2d6 menos su Defensa y Rengo 2 turnos; cada paso sobre ellos lo renueva.
+- 🗡 **L2. Abrojos** — **definida** (dueño, 2026-10-27: «va así y el rengo se aplica independientemente de si el daño lo para o no la armadura. Porque se
+  le pegan abrojos a los pies»): flor de 7 (fuera de la vista de los rivales; la dispara pisar cualquiera de las 7, alcanza a todos los de encima);
+  **2d6+2 menos su Defensa**; **Rengo 2 turnos aunque la armadura pare el daño** (no pide lastimar); Res.CC contra la Destreza del creep, solo contra el
+  Rengo; **quedan 3 turnos** y cada paso sobre ellos renueva el Rengo sin tirar (`renuevaPaso`, como la Brea). 2 No2 y 2 SP, o cooldown 3.
 - 🗡 **L3. Cuerda floja**: línea de 3; Sentado; Res.CC contra su Destreza.
 - 🗡 **L4. Polvo cegador**: 1 casilla → las 7 de alrededor; Ceguera 1 turno.
 

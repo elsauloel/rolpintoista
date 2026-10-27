@@ -254,5 +254,5 @@ Dueño (2026-10-27): «seguimos con el arquero, que también va a tener foco en 
   48 %, la Ráfaga (2 disparos: 2 + 4 No2) el 91 %.
 - **Flechas especiales de los creeps: ya están programadas** (2026-10-20, `vtt-hexgrid/js/12-acciones-nuevas.js`, `acFlechas`): un creep con arco o ballesta
   que lleva flechas o virotes especiales en el **cinturón** elige cuál al atacar, igual que un personaje (se gasta y cobra su No2 al disparar). Solo en
-  el ataque común (como un personaje): las habilidades que disparan con el arma (Disparo señalador, Clavar a la pared…) no preguntan. A decidir con el
-  dueño si también (para todos). **Consumible propuesto**: 3 **Flechas silbadoras** (Común, Demora) en el cinturón.
+  el ataque común (como un personaje): las habilidades que disparan con el arma (Disparo señalador, Clavar a la pared…) no preguntan. **Decidido (dueño, 2026-10-27)**:
+  «una habilidad de disparo debería poder usar una flecha o virote especial» → programado para personajes y creeps (falta probarlo en el mapa). **Consumible propuesto**: 3 **Flechas silbadoras** (Común, Demora) en el cinturón.

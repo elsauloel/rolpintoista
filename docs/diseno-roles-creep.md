@@ -617,6 +617,11 @@ Abrojos, Cordón oculto, Polvo cegador. ~~H5. Arrear~~ descartada. **Para progra
 Aguja del catálogo: 1d8, Perfora 1, veneno si lastima), el veneno por golpe sin tirada (P228: Dardos y Espina de mantícora), Escudo y Vida extra
 (P227, con el Relicario de sangre), la dificultad = la Destreza del que coloca (Red), el Inmovilizado «hasta el final de la ronda y una más», correr 1
 hacia adelante al caer (Cordón), y el Cebo (atraer con Res.Mt cada turno, 3 turnos, la roca pintada).
+
+**Límite de trampas activas (regla del dueño, 2026-10-27):** «para las trampas que se colocan con skill, vamos a poner un límite de trampas activas igual
+al nivel del creep. Si se coloca una por encima de ese número, el creep o el jugador también… debe elegir cuál desarma en su lugar». Vale para creeps y
+personajes (y se entiende que también invocaciones): las trampas de habilidad **sin disparar** de quien las pone, como mucho **su nivel**; al colocar una de
+más, elige en el mapa cuál de las suyas se desarma (se borra sin dispararse). Las consumibles no cuentan. Para programar con la tanda.
 - 🏹 ~~**H5. Arrear**~~: un disparo que lo empuja 2 hacia donde elija el creep. El dueño: «¿no existe ya algún tiro que desplace dos casillas para atrás?» —
   sí, **Mantener a raya** (lo empuja 2 lejos del tirador y Lento 2 turnos). Lo único distinto sería elegir la dirección.
 - 🗡 **L2. Abrojos** — **definida** (dueño, 2026-10-27: «va así y el rengo se aplica independientemente de si el daño lo para o no la armadura. Porque se

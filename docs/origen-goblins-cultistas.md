@@ -225,7 +225,7 @@ donde puede tirarse un pedo para desplazarse con un salto alto; las trampas much
 - **El tunelero: la habilidad única se llama «Excavar»** (dueño, 2026-10-27). Al programarla, reemplaza a «Excavar (El origen)» y a «Puñalada desde abajo» (las dos sin auditar) y a la vieja «Excavar» de fábrica.
 - **Programado (2026-10-27)**: la habilidad **Excavar** única (`comun/skills-creep-base.js`; meterse 1 No2 sin cooldown; salir = un ataque, cd 2) y **la estela del túnel** (vtt-hexgrid/js/46). Falta: pegar la regla nueva (`tunel`) y probarlo en el mapa.
 
-### 🏹 5. Arquero humano del culto (Rango, tirador), anti-Larry — nivel 3 (propuesta, esperando el OK)
+### 🏹 5. Arquero humano del culto (Rango, tirador), anti-Larry — nivel 3 (OK del dueño, 2026-10-27: atributos, pasiva y flechas)
 
 Dueño (2026-10-27): «seguimos con el arquero, que también va a tener foco en Larry. Y después vamos al ballestero, que va a tener foco en Bizzante.»
 
@@ -256,3 +256,23 @@ Dueño (2026-10-27): «seguimos con el arquero, que también va a tener foco en 
   que lleva flechas o virotes especiales en el **cinturón** elige cuál al atacar, igual que un personaje (se gasta y cobra su No2 al disparar). Solo en
   el ataque común (como un personaje): las habilidades que disparan con el arma (Disparo señalador, Clavar a la pared…) no preguntan. **Decidido (dueño, 2026-10-27)**:
   «una habilidad de disparo debería poder usar una flecha o virote especial» → programado para personajes y creeps (falta probarlo en el mapa). **Consumible propuesto**: 3 **Flechas silbadoras** (Común, Demora) en el cinturón.
+
+### 🏹 6. Goblin ballestero (Rango, trabador), anti-Bizzante — nivel 2 (propuesta, esperando el OK)
+
+Dueño (2026-10-27): «después vamos al ballestero, que va a tener foco en Bizzante».
+
+- **Atributos (36)**: Con 7 · Fue 3 · Agi 8 · Des 13 · Esp 5. Vida 35, No2 8, PdG 13 (15 quieto, con el anillo), Evasión 8, Rango 13, SP 15 (recarga 2).
+  La Destreza alta sirve tres veces: puntería, la red (Fuerza contra su Destreza) y lo difícil de detectar sus trampas.
+- **Equipo** (nivel 2: las manos + 4 Comunes): **Ballesta de la grieta** (Tipo 4, 1d4 + 2, Armadura rota doble 50 %, seguro si es crítico; Recarga 2;
+  lo minero de la Grieta); **Casco de minero** (Defensa +1, luz), **Botas de minero** (Defensa +1, Pisada atenta), **Chaleco de cuero** (Defensa +2),
+  **Anillo de Puntería Certera** (PdG +2 si no se movió). Defensa 4. **Consumible**: 3 **Virotes perforantes** (Perfora 2) en el cinturón.
+- **Skills (3)**: **Tiro a la rodilla** (un ataque + 2 SP, cd 3: Rengo 2 turnos) · **Clavar a la pared** (un ataque + 3 SP, cd 3: +3 PdG, lo empuja
+  hasta 3 casillas; si choca contra algo sólido, Inmovilizado 3 turnos) · **Red tendida** (2 No2, 3 SP, cd 3: red oculta; al pisarla cae en 7 casillas,
+  Fuerza contra su Destreza o Inmovilizado hasta el final de la ronda y una más).
+- **Rol**: frenar a Bizzante (el Asalto que viene a buscar a los tiradores) y ablandarlo para los demás. La ballesta casi no le pasa la Defensa 5
+  (1d4 + 2: ~1 por tiro; 2 seguros con el Virote perforante), pero la mitad de las veces le deja Armadura rota doble (−2 Defensa), y eso lo cobran el
+  tunelero y el híbrido. A las abejas de Bizzante (10 de vida) las baja en dos o tres tiros.
+- **Números contra Bizzante** (Evasión 8): un tiro le pega el 75 %; quieto, el 88 %; Clavar a la pared (quieto, +3), más del 90 %.
+- **Sinergias**: el Rengo del Tiro a la rodilla y el del tunelero (que sale de abajo pegado a Bizzante) lo dejan clavado lejos de los tiradores; la Red
+  tendida va en el camino de Bizzante o de Petro (los que caminan); Clavar a la pared se arma con las paredes del mapa que está haciendo el dueño.
+

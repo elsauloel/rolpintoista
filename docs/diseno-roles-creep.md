@@ -290,6 +290,10 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
      +2 Def. especial**. 1 No2 y 2 SP, o cooldown 2.
      **También cambia el Taunt de clase** (`comun/skills-clase.js`, `tanque-taunt`): **PdG.Esp + nivel** (antes +1) contra la Res.Mt. Hoy el duelo
      solo admite un bono fijo (`tiraBono`): hace falta que acepte «+ nivel». Se programa con la tanda.
+  2. 🛡 **Piel de hierro** (Piel resistente + Temple, de clase; dueño, 2026-10-27: «va así»): sobre sí mismo, **+6 Defensa, +6 Def. especial y
+     +1 Res. a crítico de todo Tipo**, **2 turnos**. 1 No2 y 4 SP, o cooldown 3; no es Flash. Combina con Provocar (+8 / +8 mientras dure el
+     Provocado). Originales: «Piel resistente [5] — Otorga una armadura temporal: Defensa 5, Res. Mágica 5, reduce críticos de todo tipo.
+     Duración: 2 turnos.» y Temple (+1 Res. a crítico de todo Tipo, 2 turnos).
 - Ya cubiertas por una de fábrica: Amplificar daño (Golpe fuerte), Remolino (Barrido), Shockwave (Pisotón), Takle, Desarmar, Aguante; Cañón Vasco ≈
   Salto aplastante; Daño en área (tanque) ≈ Barrido. Sacadito sigue en pausa.
 

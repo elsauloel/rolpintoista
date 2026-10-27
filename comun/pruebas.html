@@ -2961,13 +2961,13 @@ prueba('normalizar pasa Inteligencia a Especial, corre la escala de Tipos y saca
   const sc = CreepCalculo.normalizar({nombre: 'Viejo', int: 3, armaTipo: 6, habilidades: [{nombre: 'Movimiento'}, {nombre: 'Golpe', detalle: 'Crítico 4 y 6', tiradaStat: 'int'}]});
   igual([sc.esp, sc.int, Combatiente.armaEnMano(sc).tipoDado, sc.armaTipo, sc.habilidades.length, sc.habilidades[0].tiradaStat, sc.habilidades[0].detalle, sc.crit], [3, undefined, 8, undefined, 1, 'esp', 'Crítico 6 y 8', [0, 0, 0, 0, 0]]);   // (el Tipo corrido queda en el ítem del arma: paso 2)
 });
-prueba('recompensas de un creep: oro sugerido por tipo y nivel (jefe ×2), trofeo del arma natural y lo que suelta', () => {
+prueba('recompensas de un creep: oro sugerido por tipo y nivel (jefe ×2), trofeo del arma natural (vale lo que su equipo natural, 2026-10-26) y lo que suelta', () => {
   const humano = creepPrueba({tipoCriatura: 'humano', nivel: 2}), jefe = creepPrueba({tipoCriatura: 'humanoide', nivel: 2, jefe: true});
   const bestia = creepPrueba({nombre: 'Lobo (auditar)', tipoCriatura: 'bestia', nivel: 3, armaNatural: true, armaNombre: 'Colmillos'});
   const tr = CreepCalculo.trofeo(bestia);
-  igual([CreepCalculo.oroSugerido(humano), CreepCalculo.oroSugerido(jefe), CreepCalculo.oroSugerido(bestia), tr.nombre, tr.precioCompra, CreepCalculo.despojosDePrecio(tr.precioCompra),
+  igual([CreepCalculo.oroSugerido(humano), CreepCalculo.oroSugerido(jefe), CreepCalculo.oroSugerido(bestia), tr.nombre, tr.precioCompra === CombateFin.precioNatural(null, Combatiente.armaPrincipal(bestia), bestia) && tr.precioCompra > 0, CreepCalculo.despojosDePrecio(41),
     CreepCalculo.trofeo(humano), CreepCalculo.dropsResumen(creepPrueba({oroBase: 10, equipo: [{nombre: 'Yelmo'}]})), CreepCalculo.tipoDe(creepPrueba({tipoCriatura: 'otros', tipoCriaturaOtro: ' Gólem '}))],
-    [40, 40, 0, 'Colmillos de Lobo', 50, 13, null, 'Hacha (arma equipable) · Yelmo (equipo) · 10 DDE de oro (±20% al final del combate)', 'gólem']);
+    [40, 40, 0, 'Colmillos de Lobo', true, 11, null, 'Hacha (arma equipable) · Yelmo (equipo) · 10 DDE de oro (±20% al final del combate)', 'gólem']);
 });
 prueba('🏹 la munición la decide el arma (2026-10-19): arco → una flecha, ballesta → un virote; el consumible al azar no trae munición', () => {
   const cat = CATALOGO_BASE.filter(i => i.tipoItem && !i.archivo).map(CreepCalculo.itemParaCreep);
@@ -3076,7 +3076,7 @@ prueba('fin del combate (comun/combate-fin.js): XP por creep (escapado 20%), qui
   igual([CombateFin.xpBasePorNivel(3), r.filas.length, r.xpTotal, rp.porJugador.map(p => p.xp), items.map(i => i.nombre + ' ' + i.precioCompra), r2.xpTotal, rp2.porJugador.map(p => p.xp),
     CombateFin.itemsPublicables(rep, r2).length, [arma.precioCompra, arma.tier, arma.estimado], v.publicar, v.html.includes('Garras de Orco'), CombateFin.vista(CombateFin.nuevo(), creeps, []).publicar,
     (CombateFin.clic(rep, {dataset: {repIr: 'publicar'}}), CombateFin.vista(rep, creeps, []).publicar), CombateFin.vista(rep, creeps, []).html.includes('Publicar')],
-    [150, 2, 98, [49, 12], ['Garras de Orco 30'], 90, [50, 11], 0, [60, 'Común', true], 'oculto', true, 'oculto', 'activo', true]);
+    [150, 2, 98, [49, 12], ['Garras de Orco 60'], 90, [50, 11], 0, [60, 'Común', true], 'oculto', true, 'oculto', 'activo', true]);   // (2026-10-26) el trofeo vale lo estimado de las Garras, ya no lo del nivel
 });
 prueba('🎒 Paso 6: el botín trae los ítems tal cual — la varita del catálogo con su poder, una pieza propia con sus rasgos, lo guardado también', () => {
   const varita = CATALOGO_BASE.find(i => i.nombre === 'Varita del relámpago');
@@ -4799,9 +4799,9 @@ prueba('💰 botín estimado de un mapa: el oro de cada creep + lo que suelta a 
   const ya = CreepCalculo.normalizar({id: 'y', nombre: 'Ya cobrado', nivel: 1, oroBase: 99, recompensado: true});
   const e = CombateFin.estimar([bandido, lobo, ya], cat);
   const b = e.filas.find(f => f.nombre === 'Bandido'), l = e.filas.find(f => f.nombre === 'Lobo');
-  igual([e.filas.length, b.oro, b.items.length, b.items[0].venta === b.items[0].compra / 2, b.drop.chance, b.drop.venta > 0, l.items.map(i => i.trofeo), l.items[0].venta, l.drop.chance,
+  igual([e.filas.length, b.oro, b.items.length, b.items[0].venta === b.items[0].compra / 2, b.drop.chance, b.drop.venta > 0, l.items.map(i => i.trofeo), l.items[0].venta === CombateFin.precioNatural(cat, Combatiente.armaPrincipal(lobo), lobo) / 2, l.drop.chance,
     Math.round(e.total) === Math.round(b.total + l.total), Math.round(b.total) === Math.round(b.oro + b.venta + b.drop.venta), /~\d+ DDE/.test(CombateFin.estimadoHtml(e, 'Mapa'))],
-    [2, 20, 1, true, 0.6, true, [true], 15, 0, true, true, true]);
+    [2, 20, 1, true, 0.6, true, [true], true, 0, true, true, true]);
 });
 prueba('arena movediza: si falla al soltarse, se hunde más (+1 turno), en personajes y creeps; el botón lo dice', () => {
   const soltar = {stat: 'fue', dif: 99, no2: 1, hunde: 1};
@@ -5794,13 +5794,13 @@ prueba('🐾 Bestia con equipo del catálogo marcado natural (2026-10-26): el tr
   const cat = CATALOGO_BASE.map(i => CreepCalculo.itemParaCreep(i));
   const its = CombateFin.itemsDeCreep(cat, sc), tr = its.find(i => i.trofeo);
   const vivo = CreepCalculo.tarjetaPublica({...sc, hp: 5});
-  // Solo piezas naturales (el arma, no): igual hay trofeo, «Trofeo de …»; un arma natural de la biblioteca (sin precio) no cambia el precio por nivel.
+  // Solo piezas naturales (el arma, no): igual hay trofeo, «Trofeo de …». Sin valor por nivel (2026-10-26): un arma natural de la biblioteca vale lo estimado, como cualquier pieza propia.
   const sc2 = creepPrueba({id: 'cz', nombre: 'Coraza', nivel: 1, hp: 0, equipo: [{...CreepCalculo.itemParaCreep(peto), id: 'pt', natural: true, equipado: true}]});
   const rata = creepPrueba({id: 'rt', nombre: 'Rata', nivel: 1, hp: 0});
   Combatiente.ponerArma(rata, {nombre: 'Dientes', tipoDado: 4, natural: true});
   igual([tr && tr.nombre, tr && tr.precioCompra, its.some(i => i.nombre === peto.nombre), vivo.armaNombre, vivo.equipoNombres, (CreepCalculo.trofeo(sc2) || {}).nombre,
-    (CreepCalculo.trofeo(sc2) || {}).precioCompra, CreepCalculo.trofeo(rata).precioCompra, CreepCalculo.valorNatural(sc) === num(arma.precioCompra) + num(peto.precioCompra)],
-    ['Colmillos de Lobo', 16 + num(arma.precioCompra) + num(peto.precioCompra), false, 'Colmillos', [], 'Trofeo de Coraza', 16 + num(peto.precioCompra), 16, true]);
+    (CreepCalculo.trofeo(sc2) || {}).precioCompra, CreepCalculo.trofeo(rata).precioCompra === CombateFin.precioNatural(null, Combatiente.armaPrincipal(rata), rata) && CreepCalculo.trofeo(rata).precioCompra >= 20, CreepCalculo.trofeo({...rata, equipo: []}), CreepCalculo.valorNatural(sc) === num(arma.precioCompra) + num(peto.precioCompra)],
+    ['Colmillos de Lobo', num(arma.precioCompra) + num(peto.precioCompra), false, 'Colmillos', [], 'Trofeo de Coraza', num(peto.precioCompra), true, null, true]);
 });
 prueba('🗡→💰 Lo que el GM destilda del equipo de un creep se vende y suma al oro (2026-10-26); con la casilla apagada, nada', () => {
   const peto = CATALOGO_BASE.find(i => i.tipoItem === 'armadura_rigida' && num(i.precioCompra) > 0 && !i.archivo);

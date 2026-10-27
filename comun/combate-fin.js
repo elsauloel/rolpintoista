@@ -121,6 +121,14 @@ const CombateFin = (() => {
   // (Los nombres de antes, para quien los llame.)
   const plantillaArmaCreep = (cat, sc) => plantillaPieza(cat, Combatiente.armaPrincipal(sc) || Combatiente.armaEnMano(sc), sc);
   const plantillaEquipoCreep = (cat, it, nivel) => plantillaPieza(cat, it, {nivel, nombre: ''});
+  /* 🐾 Lo que vale una pieza natural de un creep (2026-10-26, el trofeo es solo eso: CreepCalculo.trofeo): el mismo precio que tendría si se
+     soltara — la del catálogo (por `nombreOriginal` si se renombró al marcarla natural), su propio precio, o estimado comparando con el
+     catálogo (las armas naturales de la biblioteca 🐾). Sin `cat`, el catálogo de fábrica en la forma de un creep. */
+  let catFabrica = null;
+  function precioNatural(cat, it, sc){
+    if(!cat) cat = catFabrica || (catFabrica = typeof CATALOGO_BASE !== 'undefined' ? CATALOGO_BASE.filter(i => i && i.tipoItem).map(i => K.itemParaCreep(i)) : []);
+    return num(plantillaPieza(cat, {...it, nombre: it.nombreOriginal || it.nombre}, sc || {}).precioCompra);
+  }
   function plantillaTrofeo(tr, sc){
     return {nombre: tr.nombre, tipoItem: 'otros', tier: 'Común', peso: 0, ranuras: 1, precioCompra: tr.precioCompra, tipoDado: 0, danoFijo: 0, danoAmplificado: 0, armaDeRango: false,
       mods: [], efectosGolpe: [], detalle: `Trofeo de ${K.nombreLimpio(sc)}. No se equipa: se vende en una tienda o se convierte en despojos.`,
@@ -138,13 +146,8 @@ const CombateFin = (() => {
       const t = c.tipoItem === 'consumibles' ? plantillaConsumible(c) : {...plantillaDeCatalogo(c), estimado: false};
       out.push({clave: `${sc.id}:fijo:${i}`, nombre: t.nombre, precioCompra: t.precioCompra, template: t, origen: nom});
     });
-    // 🐾 El trofeo vale además lo que valía su equipo natural (2026-10-26): lo que sale del catálogo, a su precio (no se estima: las armas
-    // naturales de siempre —garras, colmillos de la biblioteca— no son un ítem que se venda, y su trofeo ya tiene el precio por nivel).
-    const tr = K.trofeo(sc, it => {
-      const nb = sinAviso(it.nombreOriginal || it.nombre), arma = /^arma_/.test(String(it.tipoItem || ''));
-      const c = cat.find(i => sinAviso(i.nombre) === nb && (arma ? /^arma_/.test(String(i.tipoItem || '')) : i.tipoItem === it.tipoItem));
-      return c ? num(plantillaDeCatalogo(c).precioCompra) : num(it.precioCompra);
-    });
+    // 🐾 El trofeo vale lo que valía su equipo natural (2026-10-26): `precioNatural`.
+    const tr = K.trofeo(sc, it => precioNatural(cat, it, sc));
     if(tr) out.push({clave: `${sc.id}:trofeo`, nombre: tr.nombre, precioCompra: tr.precioCompra, template: plantillaTrofeo(tr, sc), origen: nom, trofeo: true});
     return out;
   }
@@ -804,6 +807,6 @@ const CombateFin = (() => {
   }
 
   return {venderBaul, itemsDeCreep, dropReroll, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, municionDeCreep, cuantosAlAzar, consumibleAlAzar, darConsumiblesAlAzar, quitarConsumiblesAlAzar, DROP_TABLA, arquetiposBotin, arqsDe, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
-    plantillaArmaCreep, plantillaEquipoCreep, plantillaTrofeo, itemsDeCreep, itemsExtra, generar, estadoDeFicha, jugadores, calcularReparto,
+    plantillaArmaCreep, plantillaEquipoCreep, plantillaTrofeo, precioNatural, itemsDeCreep, itemsExtra, generar, estadoDeFicha, jugadores, calcularReparto,
     itemsPublicables, ocultos, vista, cambio, clic, lineaVerde, publicar, nuevoBotin, jugadoresBotin, botinVista, botinCambio, botinItem, despojar};
 })();

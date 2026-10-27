@@ -625,7 +625,6 @@ const CreepCalculo = (() => {
   // demonio, interdimensional y adefesio (dueño, 2026-10-11, con «Contra lo sobrenatural» de los arcos).
   const TIPOS_CRIATURA = ['humano', 'humanoide', 'bestia', 'planta', 'elemental', 'constructo', 'no-muerto', 'alienígena', 'demonio', 'interdimensional', 'adefesio'];
   const TIPOS_CON_ARMA_NATURAL = ['bestia', 'planta', 'elemental', 'alienígena', 'constructo', 'no-muerto', 'demonio', 'interdimensional', 'adefesio'];
-  const TROFEO_PRECIO_NIVEL = [16, 30, 50, 75, 110];
   const TIPOITEM_LABEL = {
     escudo_1m:'Escudo 1 mano', escudo_2m:'Escudo 2 manos',
     armadura_blanda:'Armadura blanda', armadura_rigida:'Armadura rígida',
@@ -694,16 +693,12 @@ const CreepCalculo = (() => {
     else if(t === 'humanoide') v = Math.floor(humano / 2 / 5 + 0.5) * 5;   // la mitad, a múltiplos de 5
     return sc.jefe ? v * 2 : v;
   }
-  function trofeoPrecioAuto(sc){
-    const n = Math.max(1, Math.round(num(sc.nivel)) || 1);
-    const base = n <= 5 ? TROFEO_PRECIO_NIVEL[n - 1] : 110 + 40 * (n - 5);
-    return sc.jefe ? base * 2 : base;
-  }
   /* 🐾 Lo natural que lleva (2026-10-26, dueño: «que el trofeo que deja la bestia tenga algún tipo de equivalencia en valor de venta al equipo
-     que tuvo»): el arma natural y las piezas naturales (no lo invocado). `valorNatural(sc, precioDe)` = lo que valdría todo eso en la tienda
-     (precio de compra); el trofeo lo suma a su precio, así venderlo da lo mismo que vender ese equipo. `precioDe(it)` lo pone quien sabe
-     estimar (comun/combate-fin.js, con el catálogo); si no, el precio de la pieza o el del ítem del catálogo de fábrica con ese nombre (el del
-     catálogo: `nombreOriginal`, si al arma se le cambió el nombre al marcarla natural). */
+     que tuvo»; y el mismo día: «al trofeo le vamos a quitar el valor por nivel: solamente va a ser lo que haya sido el equipo adaptado»): el arma
+     natural y las piezas naturales (no lo invocado). `valorNatural(sc, precioDe)` = lo que valdría todo eso en la tienda (precio de compra) y es
+     el precio del trofeo: venderlo da lo mismo que vender ese equipo. `precioDe(it)` lo pone quien llama; si no, `CombateFin.precioNatural`
+     (el catálogo, o estimado como cualquier pieza propia de un creep: las armas naturales de la biblioteca 🐾) y, sin esa pieza, el precio de
+     la pieza o el del ítem del catálogo de fábrica con ese nombre (el del catálogo: `nombreOriginal`, si se renombró al marcarla natural). */
   const nombreBase = x => String(x || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
   const naturales = sc => (Array.isArray(sc && sc.equipo) ? sc.equipo : []).filter(it => it && it.natural === true && !it.invocadaDe && (it.nombre || it.nombreOriginal));
   function precioDeFabrica(it){
@@ -712,7 +707,8 @@ const CreepCalculo = (() => {
     const c = typeof CATALOGO_BASE !== 'undefined' ? CATALOGO_BASE.find(i => nombreBase(i.nombre) === nb && (arma ? /^arma_/.test(String(i.tipoItem || '')) : i.tipoItem === it.tipoItem)) : null;
     return c ? num(c.precioCompra) : 0;
   }
-  const valorNatural = (sc, precioDe) => naturales(sc).reduce((a, it) => a + Math.max(0, num((precioDe || precioDeFabrica)(it))), 0);
+  const precioPorDefecto = sc => typeof CombateFin !== 'undefined' && CombateFin.precioNatural ? (it => CombateFin.precioNatural(null, it, sc)) : precioDeFabrica;
+  const valorNatural = (sc, precioDe) => naturales(sc).reduce((a, it) => a + Math.max(0, num((precioDe || precioPorDefecto(sc))(it))), 0);
   // El trofeo que suelta al morir (o null). El "especial" reemplaza al automático (y su precio, si tiene uno, también).
   function trofeo(sc, precioDe){
     const esp = sc.trofeoEspecial || {};
@@ -720,9 +716,9 @@ const CreepCalculo = (() => {
     const a = armaDe(sc);
     if(!nombreEsp && !a.natural && !naturales(sc).length) return null;
     const nombre = nombreEsp || (a.natural ? `${a.nombre || 'Arma natural'} de ${nombreLimpio(sc)}` : `Trofeo de ${nombreLimpio(sc)}`);
-    const extra = num(esp.precio) > 0 ? 0 : valorNatural(sc, precioDe);
-    const precio = num(esp.precio) > 0 ? num(esp.precio) : trofeoPrecioAuto(sc) + extra;
-    return {nombre, precioCompra: precio, especial: !!nombreEsp, natural: extra};
+    const precio = num(esp.precio) > 0 ? num(esp.precio) : valorNatural(sc, precioDe);
+    if(!(precio > 0)) return null;   // nada que valga (sin equipo natural ni precio especial): no deja trofeo
+    return {nombre, precioCompra: precio, especial: !!nombreEsp, natural: !(num(esp.precio) > 0)};   // natural: su precio es el del equipo natural
   }
   function despojosDePrecio(precioCompra){ return Math.ceil(num(precioCompra) / 4); }   // un cuarto del precio de compra
   /* Drops fijos (2026-10-14, dueño, la Grapa del capataz: «aunque la consuma, quiero que esté entre sus drops»): nombres de ítems del
@@ -756,7 +752,7 @@ const CreepCalculo = (() => {
     if(a.nombre && !a.natural) partes.push(`${a.nombre} (arma equipable)`);
     Combatiente.equipoSinArma(sc).filter(it => !it.natural).forEach(it => partes.push(`${it.nombre} (equipo)`));   // 🐾 lo natural no se suelta (2026-10-14)
     const tr = trofeo(sc);
-    if(tr) partes.push(`${tr.nombre} (trofeo${tr.natural ? `, con ${fmt(tr.natural)} por su equipo natural` : ''}: compra ${fmt(tr.precioCompra)}, venta ${fmt(tr.precioCompra / 2)}, ${fmt(despojosDePrecio(tr.precioCompra))} despojos)`);
+    if(tr) partes.push(`${tr.nombre} (trofeo${tr.natural ? ', lo que vale su equipo natural' : ''}: compra ${fmt(tr.precioCompra)}, venta ${fmt(tr.precioCompra / 2)}, ${fmt(despojosDePrecio(tr.precioCompra))} despojos)`);
     dropsFijos(sc).forEach(n => partes.push(`${n} (drop fijo)`));
     if(num(sc.oroBase) > 0) partes.push(`${fmt(num(sc.oroBase))} DDE de oro (±20% al final del combate)`);
     if(Array.isArray(sc.consumibleAzar) && sc.consumibleAzar.length) partes.push(`${sc.consumibleAzar.join(', ')} (consumible al azar, en el cinturón: si lo usa, lo suelta seguro; si no, a veces)`);
@@ -766,7 +762,7 @@ const CreepCalculo = (() => {
   }
 
   return {modoSP, spMax, spRegen, spActual, costoSpHab,talisman, auraMiedo, estandartes, enLasManos, regenPasivas, masDanoElem, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
-    ARQUETIPOS, arquetiposAuto, arquetiposManual, arquetipos, arquetiposTxt, TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TROFEO_PRECIO_NIVEL, TIPOITEM_LABEL, STAT_LABEL, itemParaCreep, magiaDeItem, vaAlEquipo, nombreLimpio, tipoDe, oroSugerido, trofeoPrecioAuto, valorNatural,
+    ARQUETIPOS, arquetiposAuto, arquetiposManual, arquetipos, arquetiposTxt, TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TIPOITEM_LABEL, STAT_LABEL, itemParaCreep, magiaDeItem, vaAlEquipo, nombreLimpio, tipoDe, oroSugerido, valorNatural,
     trofeo, despojosDePrecio, dropsResumen, dropsFijos,
     correrTiposTexto, migrarObjTipos, migrarCreepTipos, migrarObjEspecial, migrarHabPdg, migrarCreepEspecial, slotDe,
     danoTxt, fuentesEquipo, modTotal, estadosArmadura, aporteArmadura, defensaEfectiva, armadmgEfectiva, resElemental, critEfectivo, critDeEstados,

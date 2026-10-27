@@ -285,7 +285,7 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   (oro, arma natural, trofeo) y el resumen "Al morir suelta: …" (`dropsResumenCreep`); también se ve en **Ver**.
   Reglas: oro sugerido `oroSugeridoCreep` (humano 5n²+10n = 15/40/75/120/175; humanoide la mitad a múltiplos de 5; jefe ×2;
   resto 0); trofeo `trofeoDeCreep` (arma natural → trofeo con el nombre del arma + " de " + creep, o el especial;
-  precio por nivel 16/30/50/75/110, jefe ×2; despojos = ⌈precio/4⌉). Cambiar el tipo sugiere `armaNatural` y el oro.
+  precio por nivel 16/30/50/75/110, jefe ×2 — desde el 2026-10-26, lo que vale su equipo natural, ver abajo; despojos = ⌈precio/4⌉). Cambiar el tipo sugiere `armaNatural` y el oro.
   **🧭 Asistente** (`abrirAsistenteCreep`, estado `asist`): "+ Creep → Crear paso a paso" y "🧭 Paso a paso" en la ficha del
   creep (edita). 7 pasos (qué es, atributos con preset por rol y nivel, arma, armadura, habilidades, recompensas, resumen),
   se puede saltar a cualquier paso sin perder nada; trabaja sobre el creep real (crear lo agrega y **Cancelar** lo quita).
@@ -488,8 +488,8 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
 - **🐾 Equipo natural y lo que no se ofrece en el botín** (2026-10-26, pedido del dueño): al tildar «arma natural» (Recompensas y el asistente), al
   equiparle un arma del catálogo a un creep con el arma marcada natural o al crearle una con «✎ Ítem custom», `renombrarArmaNatural(scId)` (js/05)
   ofrece cambiarle el nombre (`Confirmar.texto`, sugerencias Garras, Colmillos, Dientes, Cuernos…); el nombre del catálogo queda en `nombreOriginal`.
-  Las piezas naturales que no son el arma no se nombran a los jugadores (`CreepCalculo.tarjetaPublica`). El trofeo suma lo que vale el equipo natural
-  que sale del catálogo (`CreepCalculo.trofeo(sc, precioDe)`, `valorNatural`; las armas naturales de la biblioteca no, ya tienen el precio por nivel)
+  Las piezas naturales que no son el arma no se nombran a los jugadores (`CreepCalculo.tarjetaPublica`). El trofeo vale lo que vale el equipo natural
+  (`CreepCalculo.trofeo(sc, precioDe)`, `valorNatural`, `CombateFin.precioNatural`: el precio del catálogo, el suyo o uno estimado; **ya no hay valor por nivel**, el mismo día: «solamente va a ser lo que haya sido el equipo adaptado»; sin nada que valga, no hay trofeo)
   y existe también si solo hay piezas naturales («Trofeo de …»). En «Batalla terminada», lo que el GM destilda del equipo de un creep (el arma y las
   piezas; no el trofeo ni lo extra) se vende: su valor de venta (la mitad del precio de compra, para arriba) se suma al oro y se reparte
   (`CombateFin.ocultos`, `rep.ocultosAOro`, la casilla del paso Equipo; se ve en Doblones y en Publicar).

@@ -198,7 +198,7 @@
   // Armas que aunque el creep sea "natural" son un objeto (se sueltan como ítem).
   const ARMAS_OBJETO = new Set(['Alabarda de granito', 'Lanza de obsidiana', 'Ballesta fantasma', 'Báculo de luz']);
   const TIPOS_NATURALES = new Set(['bestia', 'planta', 'elemental', 'alienígena', 'constructo', 'no-muerto', 'demonio', 'interdimensional', 'adefesio']);
-  // Nombre del trofeo de cada creep con arma natural (el valor sale solo del nivel: 16/30/50/75/110, jefes el doble).
+  // Nombre del trofeo de cada creep con arma natural (desde el 2026-10-26 el valor es lo que vale su equipo natural: CreepCalculo.trofeo).
   const TROFEOS = {
     'Rata de socavón': 'Dientes de rata de socavón', 'Luciérnaga de gas': 'Glándula de metano', 'Topo excavador': 'Garra de topo excavador',
     'Escarabajo de cobre': 'Mandíbula de escarabajo de cobre', 'Araña de cavernas': 'Colmillo de araña de cavernas', 'Gusano de roca': 'Diente de gusano de roca',

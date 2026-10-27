@@ -39,15 +39,13 @@ function cerrarEditarCreep(){
 // Las reglas de recompensas viven en comun/creep-calculo.js (2026-10-02, A6a): acá quedan los nombres de siempre.
 const TIPOS_CRIATURA = CreepCalculo.TIPOS_CRIATURA;
 const TIPOS_CON_ARMA_NATURAL = CreepCalculo.TIPOS_CON_ARMA_NATURAL;
-const TROFEO_PRECIO_NIVEL = CreepCalculo.TROFEO_PRECIO_NIVEL;
 const AYUDA_ORO = 'Cuánto oro (doblones del espacio) suelta este creep al morir.\nSugerido: humanos 15 / 40 / 75 / 120 / 175 (nivel 1 a 5); humanoides la mitad (10 / 20 / 40 / 60 / 90); jefes el doble; el resto 0.\nAl finalizar el combate se tira una variación al azar de ±20% y el GM puede ajustar el total antes de repartirlo.';
 const AYUDA_NATURAL = 'Marcala si el arma es parte del cuerpo (colmillo, garra, puño, tentáculo).\nUn arma natural no se puede equipar: al marcarla te ofrece cambiarle el nombre (Garras, Colmillos…) y al morir el creep suelta un TROFEO (que se guarda en la mochila y se vende o se convierte en despojos).\nSin marcar, el arma es un objeto y se suelta como ítem equipable.';
-const AYUDA_TROFEO = 'Es opcional: solo para cambiar lo automático.\nSi el creep tiene arma natural, ya suelta un trofeo con el nombre de su arma y un valor según su nivel (16 / 30 / 50 / 75 / 110; jefes el doble) más lo que vale su equipo natural (el arma y las piezas marcadas 🐾): venderlo da lo mismo que vender ese equipo. Con solo piezas naturales, el trofeo se llama «Trofeo de …».\nUsalo cuando quieras algo único: un dragón que deja «Escama de ceniza» por 400 en vez de sus colmillos. Vacío = el automático.';
+const AYUDA_TROFEO = 'Es opcional: solo para cambiar lo automático.\nSi el creep tiene arma natural, ya suelta un trofeo con el nombre de su arma que vale lo mismo que su equipo natural (el arma y las piezas marcadas 🐾, a su precio del catálogo o estimado): venderlo da lo mismo que vender ese equipo. Con solo piezas naturales, el trofeo se llama «Trofeo de …».\nUsalo cuando quieras algo único: un dragón que deja «Escama de ceniza» por 400 en vez de sus colmillos. Vacío = el automático.';
 
 function nombreLimpioCreep(sc){ return CreepCalculo.nombreLimpio(sc); }
 function tipoDeCreep(sc){ return CreepCalculo.tipoDe(sc); }
 function oroSugeridoCreep(sc){ return CreepCalculo.oroSugerido(sc); }
-function trofeoPrecioAuto(sc){ return CreepCalculo.trofeoPrecioAuto(sc); }
 function trofeoDeCreep(sc){ return CreepCalculo.trofeo(sc); }   // el trofeo que suelta al morir (o null)
 function despojosDePrecio(precioCompra){ return CreepCalculo.despojosDePrecio(precioCompra); }
 function dropsResumenCreep(sc){ return CreepCalculo.dropsResumen(sc); }

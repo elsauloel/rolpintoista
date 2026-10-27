@@ -1272,6 +1272,8 @@ Probando el Sonic Boom se vio que un área (cono, onda, flor) también le pega a
 línea), zona, trampa de área ni salto eléctrico alcanza a un caído (personaje o invocación en 0, creep derrotado): `iniciativaFueraDeJuego` en
 `dueloElegirAreaMapa` (js/13), `zonaRevisarToken` y `trampaAfectados` (js/08) y `rayoCadena` (js/10). Lo que sí le sigue pasando: su cuenta de muerte
 y lo que ya tenía encima (su turno). La idea de usar los consumibles de un caído quedó en `docs/pendientes.md` (Ideas del dueño).
+**Agregado (dueño, 2026-10-27):** «puede que haya efectos de movimiento, de desplazamiento que los afecte, pero vamos a dejarlo a mano, no lo vamos a
+programar por ahora». Un empuje, un arrastre o una atracción sobre un caído: ✋ a mano (el GM mueve el cuerpo si corresponde). El resto, como quedó.
 
 
 ### P226 — Colocar una trampa en la zona de alerta (naranja) de un rival (2026-10-27) ✅ decidida (2026-10-27)

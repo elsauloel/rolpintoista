@@ -1297,10 +1297,19 @@ function bnAbrirSesion(fichaId){
       alCargar: armado => {
         const S = FichaGuardado.normalizar(armado.datos, {mezclarCatalogo: bnMezclarCatalogo}).S;
         FichaGuardado.ponerImagenesInvocaciones(S, armado.imgInvocaciones);
+        const alDia = FichaGuardado.migrarHabsDeClase(S);   // 🔄 P222: las de clase siguen a su clase
         FichaGuardado.completar(S);
         bn.S = S;
         f.cargada = true;
         bnDibujar();
+        // Se guarda enseguida (solo las habilidades: lo demás que acomoda `completar` lo sigue guardando la ficha), con un aviso.
+        if(alDia.length && bnPuedeGuardar()){
+          const d = FichaGuardado.partes(S);
+          Object.keys(d).forEach(p => { if(p !== 'habilidades') f.ultimo[p] = d[p]; });
+          f.soloLectura = false;
+          FichaSesion.guardar(f, true, bnOpcionesGuardado(f));
+          toast(`🔄 ${(S.meta && S.meta.nombre) || 'Tu personaje'}: ${alDia.length === 1 ? 'se puso al día' : 'se pusieron al día'} con su clase ${alDia.join(', ')}`);
+        }
       },
       alControl: c => { f.control = c; },
       aplicarParte: (parte, datos) => FichaGuardado.aplicarParte(bn.S, parte, datos, {mezclarCatalogo: bnMezclarCatalogo, imgInvocaciones: f.ultimo.imgInvocaciones || ''}),

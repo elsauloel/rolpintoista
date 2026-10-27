@@ -311,7 +311,8 @@ function renderAll(){
   // Cualquier ficha que llegue (archivo, mesa, otra ventana) pasa por acá.
   migrarEstadoIt2(S);
   migrarEstadoEspecial(S);
-  FichaGuardado.migrarHabsDeClase(S);   // P222: las de clase siguen a su clase
+  { const alDia = FichaGuardado.migrarHabsDeClase(S);   // 🔄 P222: las de clase siguen a su clase (se guarda sola, como cualquier cambio)
+    if(alDia.length && !(typeof fichaVivo !== 'undefined' && fichaVivo && fichaVivo.soloLectura)) toast(`🔄 Se pusieron al día con su clase: ${alDia.join(', ')}`); }
   if(S.nitros === null || S.nitros === undefined) S.nitros = nitrosMaximo();
   $('#f-nombre').value = S.meta.nombre;
   fichaIdentidadRender();  // por si cambió el nombre del personaje

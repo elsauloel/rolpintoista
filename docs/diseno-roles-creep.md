@@ -342,7 +342,11 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
   12. ⚔ **Golpe que sigue** ✦ (A5; dueño, 2026-10-27: «vamos así»): un ataque con su arma con **+2 al daño**; si deja al rival **en 0**, ataca
      enseguida a **otro rival pegado** a él pagando **los No2 de un primer ataque**; la cadena se corta ahí (el segundo no sigue). Un ataque y 2 SP,
      o cooldown 2. Combina con Remate, Barrido y Furia.
-- **Cuenta** (2026-10-27, después de la 12): ⚔ 10 · 🛡 9 · ⚖ 9. Faltan una de tanque y una ambigua para 10 · 10 · 10.
+  13. 🛡 **Blindaje** (de clase: «Blindaje [1] — Flash (SP x 2). NO2: (0). Otorga un blindaje que absorbe 8 de daño de la próxima fuente de daño
+     este turno.»; dueño, 2026-10-27: «está bien que sea más poderosa, pero solamente contra sí mismo, no contra aliados»): **Flash** (botón
+     instantáneo en el duelo); **absorbe 12 de daño** de la próxima fuente de daño de este turno, **solo sobre sí mismo**. 1 SP (2 en turno ajeno),
+     o cooldown 2; sin No2. Combina con Interponerse (se mete en el golpe y lo absorbe) y con Escudo humano.
+- **Cuenta** (2026-10-27, después de la 13): ⚔ 10 · 🛡 10 · ⚖ 9. Falta una ambigua para 10 · 10 · 10.
 - Ya cubiertas por una de fábrica: Amplificar daño (Golpe fuerte), Remolino (Barrido), Shockwave (Pisotón), Takle, Desarmar, Aguante; Cañón Vasco ≈
   Salto aplastante; Daño en área (tanque) ≈ Barrido. Sacadito sigue en pausa.
 

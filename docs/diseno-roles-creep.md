@@ -339,7 +339,10 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
      queda Sentado.»; dueño, 2026-10-27: «ok»): **Flash**; el mismo cono al frente (16 casillas); **Fuerza +2 contra la Constitución** de cada rival
      del cono; al que pierde le saca **1 + la diferencia en No2** y le hace **la diferencia como daño físico directo**; sin No2, **Sentado**. 1 No2 y
      3 SP (6 en turno ajeno), o cooldown 3.
-- **Cuenta** (2026-10-27, después de la 11): ⚔ 9 · 🛡 9 · ⚖ 9. Faltan una de cada grupo para 10 · 10 · 10.
+  12. ⚔ **Golpe que sigue** ✦ (A5; dueño, 2026-10-27: «vamos así»): un ataque con su arma con **+2 al daño**; si deja al rival **en 0**, ataca
+     enseguida a **otro rival pegado** a él pagando **los No2 de un primer ataque**; la cadena se corta ahí (el segundo no sigue). Un ataque y 2 SP,
+     o cooldown 2. Combina con Remate, Barrido y Furia.
+- **Cuenta** (2026-10-27, después de la 12): ⚔ 10 · 🛡 9 · ⚖ 9. Faltan una de tanque y una ambigua para 10 · 10 · 10.
 - Ya cubiertas por una de fábrica: Amplificar daño (Golpe fuerte), Remolino (Barrido), Shockwave (Pisotón), Takle, Desarmar, Aguante; Cañón Vasco ≈
   Salto aplastante; Daño en área (tanque) ≈ Barrido. Sacadito sigue en pausa.
 

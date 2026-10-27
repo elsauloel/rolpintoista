@@ -594,7 +594,10 @@ Propuesta (2026-10-27):
   directo a la vida** (busca el hueco de la armadura) y **Veneno ×5** aunque no lastime; Res.Esp contra su Destreza solo para el veneno.
   **El dueño, para la del catálogo (2026-10-27):** «que la aguja del catálogo tire un D8 con perfora 1 y efectivamente envenene si pasa algún punto de
   daño, que va a ser casi siempre». Cuenta: con Perfora 1, 1d8 pasa una Defensa D con (9 − D)/8: Defensa 4 → 63 %, 5 → 50 %, 14 → 0 (el grupo de
-  El origen: Larry 4, Bizzante 5, Rockardo 14). A confirmar antes de tocar el catálogo. *Mecánica nueva:* una trampa con Perfora (hoy no existe).
+  El origen: Larry 4, Bizzante 5, Rockardo 14). ~~A confirmar~~ **Esa cuenta estaba mal** (la hice como si Perfora le bajara la Defensa): Perfora N =
+  N puntos del golpe pasan siempre la Defensa (dueño, 2026-10-27: «un punto de daño, si perfora uno, pasa ignorando la armadura»; así está programado
+  desde el 2026-10-10, `Combatiente.perforaPasa`). Con Perfora 1, cada aguja deja al menos 1 de daño → **el veneno entra siempre** (salvo que lo resista
+  con la Res.Esp). *Mecánica nueva:* una trampa con Perfora (hoy no existe).
   **Detectarla** (aclaración al dueño): solo tiran quienes tienen Percepción aumentada, Pisada atenta o Desarmar trampas (al pasar al lado), o con una
   luz que revela; el resto no tira.
 - 🏹 **H4. Mina del cazador**: al pisarla, flor de 7, 3d6 directo y Pajaritos 2 turnos.

@@ -643,7 +643,8 @@ Las invocaciones, igual (confirmado por el dueño).
   **Ajuste (dueño, 2026-10-27):** «3 SP y el largo tiene que ser de 4, no de 3» → **línea de 4, 1 No2 y 3 SP** (cooldown 2, la propuesta). **Cómo se ve**
   (dueño: «como una línea de un color claro y bordes negros bien saturada para que se vea, y en cada extremo algo que haga referencia como a una estaca
   donde está anotado el cordón y que se vea cierta tensión cada X cantidad de segundos, como que se mueve un poco el cordón»): un cordón claro con borde
-  negro bien marcado entre dos estacas (una en cada punta) que cada tantos segundos vibra un poco, tenso. Lo ven quienes ven la trampa (su equipo, o
+  negro bien marcado entre dos estacas (una en cada punta) que cada tantos segundos vibra un poco, tenso, **y además el contorno de puntos de las 4 casillas**
+  (dueño: «reforzado por la línea de puntos para tener bien claro el área»). Lo ven quienes ven la trampa (su equipo, o
   todos cuando se descubre o se dispara).
 - 🗡 **L4. Polvo cegador** — **definida** (dueño, 2026-10-27: «va bien»): una bolsita en 1 casilla (fuera de la vista de los rivales); al pisarla, el polvo
   alcanza la flor de 7 alrededor: **Ceguera 1 turno** a todos los de adentro; **Res.CC contra la Destreza del creep** para no tragárselo; sin daño.

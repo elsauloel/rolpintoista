@@ -5862,13 +5862,13 @@ prueba('💨 Segundo aliento (2026-10-27): se cura 6 + su Constitución, le saca
   igual([p.error || '', sc.hp, p.curaCon, p.quitado, sc.estados.some(e => e.nombre === 'Rengo'), sc.habilidades[0].unaVezUsada, /una vez/i.test(CreepCalculo.bloqueoHab(sc, sc.habilidades[0]))],
     ['', 5 + 6 + con, 6 + con, 'Rengo', false, true, true]);
 });
-prueba('🛡 Golpe de escudo (2026-10-27): pega con el escudo (Tipo 10, sin Parry), 1d10 + su peso + el Dmg; Sentado y Demora 1 solo si hizo daño', () => {
+prueba('🛡 Golpe de escudo (2026-10-27): pega con el escudo (Tipo 10, sin Parry), tantos d10 como su peso + el Dmg; Sentado y Demora 1 solo si hizo daño', () => {
   const h = chp('Golpe de escudo'), sc = creepPrueba({id: 'g1', equipo: [{id: 'e', nombre: 'Rodela de tablas', tipoItem: 'escudo_1m', def: 1, peso: 3, equipado: true}]});
   const atq = CreepAcciones.ataqueDeHab(sc, h);
   const hk = CreepDuelo.hooks({creep: () => sc, cambiar: async () => ({}), publicar: () => {}, toast: () => {}, confirmar: () => true, soy: () => true, borrarParry: () => {}});
   const v = hk.vista({id: 'd', atacante: {ref: 'g1'}, ataque: atq}, 'dano');
   const sinEscudo = CreepAcciones.ataqueDeHab(creepPrueba(), h);
-  igual([atq.escudoGolpe.nombre, atq.escudoGolpe.peso, atq.tipoDado, atq.sinParry, atq.armaNombre, String(v && v.formula).replace(/\s+/g, '').startsWith(`1d10+3+${CreepCalculo.statValor(sc, 'dmg')}`),
+  igual([atq.escudoGolpe.nombre, atq.escudoGolpe.peso, atq.tipoDado, atq.sinParry, atq.armaNombre, String(v && v.formula).replace(/\s+/g, '').startsWith(`3d10+${CreepCalculo.statValor(sc, 'dmg')}`),
     atq.efectos.map(e => `${e.nombre}${e.requiereDano ? '*' : ''}`), sinEscudo.escudoGolpe.peso],
     ['Rodela de tablas', 3, 10, true, 'Rodela de tablas', true, ['Sentado*', 'Demora*'], 0]);
 });

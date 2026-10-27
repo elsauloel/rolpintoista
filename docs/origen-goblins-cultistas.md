@@ -153,3 +153,6 @@ pondría algún skill de daño siniestro que sume algo de daño mágico directo,
   propuesta: **Golpe de escudo** (un ataque + 2 SP, cd 2: pega con el escudo, sin Parry, contra la Evasión; si pasa algo de daño, Sentado y Demora 1).
   Alternativas: Puño de roca (un ataque + 2 SP, cd 2: +2 al daño y Demora) o Takle (Flash, 2 No2 y 3 SP: Con + 2 contra Con, −3 No2, empujón y al final
   del orden).
+- **Elegido (dueño, 2026-10-27): Golpe de escudo**, con la regla corregida: «no suma el peso del escudo. Usa el escudo como si fuera un arma de tipo 10…
+  si es un escudo que pesa 3, tira 3 de 10 y daño». Programado (`comun/creep-duelo.js`, `formulaDano`). Con el Escudo de cuero endurecido (peso 2):
+  2d10 + 9 (20 de promedio).

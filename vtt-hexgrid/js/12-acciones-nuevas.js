@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261023p5', '../comun/creep-botonera.js?v=20261023p8a', '../comun/creep-acciones.js?v=20261027j', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261027b'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261023p5', '../comun/creep-botonera.js?v=20261023p8a', '../comun/creep-acciones.js?v=20261027l', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261027l'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -433,7 +433,7 @@ function acLanzarAtaqueDeHab(sc, h, emergio){
     return;
   }
   const atq = CreepAcciones.ataqueDeHab(sc, h);
-  if(atq && atq.escudoGolpe && !atq.escudoGolpe.nombre) toast(`🛡 ${sc.nombre} no tiene un escudo puesto: ${h.nombre || 'el golpe'} pega con peso 0 (1d10 + su Dmg)`);   // (avisa y deja seguir)
+  if(atq && atq.escudoGolpe && !atq.escudoGolpe.nombre) toast(`🛡 ${sc.nombre} no tiene un escudo puesto: ${h.nombre || 'el golpe'} pega con 1d10 + su Dmg`);   // (avisa y deja seguir)
   const bonoSalida = emergio && atq && atq.mods ? Math.round(num(h.emerger && h.emerger.pdg)) : 0;
   if(bonoSalida) atq.mods.pdg = num(atq.mods.pdg) + bonoSalida;
   acParry.delete(sc.id);   // atacar cierra el Parry que esperaba su Bloqueo
@@ -807,7 +807,7 @@ function cerrarAccionesNuevas(){
    estados para la Ejecución, con el selector común (los "Mis presets" del GM no están en la partida: ver pendientes 7b). */
 const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261026zu', '../comun/asistente-duelo-hab.js?v=20261026d'];
 // Las recetas de habilidades de fábrica (para ↻ Reemplazar y ⬆ Subir): pesadas, recién cuando hacen falta.
-const ACE_BASE = ['../comun/creeps-base.js?v=20261027i', '../comun/skills-creep-base.js?v=20261027i'];
+const ACE_BASE = ['../comun/creeps-base.js?v=20261027i', '../comun/skills-creep-base.js?v=20261027l'];
 async function acCargarEditor(){ await acCargarPiezas(); await cargarPiezas(SE_PIEZAS); await cargarPiezas(ACE_PIEZAS); }
 // ⬆ Subir una habilidad del creep a la biblioteca compartida (corrección o algo nuevo); su `bibOrigen` nuevo se guarda en el creep.
 async function acSubirHab(creepId, habId){

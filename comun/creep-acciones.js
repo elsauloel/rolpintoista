@@ -179,7 +179,7 @@ const CreepAcciones = (() => {
     const c = h && h.duelo;
     const atq = ataqueDeHabBase(sc, h, c);
     // 🛡 El Golpe de escudo (2026-10-27, dueño: «como si el escudo fuera un arma contundente»): pega con el escudo que tiene puesto (Tipo 10, el contundente;
-    // sin Parry: es su Destreza contra la Evasión); el daño, 1d10 + el peso del escudo + su Dmg (comun/creep-duelo.js). Sin escudo, peso 0 (avisa el mapa).
+    // sin Parry: es su Destreza contra la Evasión); el daño, tantos d10 como el peso del escudo + su Dmg (comun/creep-duelo.js; dueño, 2026-10-27). Sin escudo, 1d10 (avisa el mapa).
     if(atq && c && c.escudoGolpe){
       const e = C().defensa(sc, {soloEscudo: true});
       atq.escudoGolpe = {nombre: e ? e.nombre : '', peso: e ? num(e.peso) : 0};

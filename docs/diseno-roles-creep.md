@@ -302,7 +302,9 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
      y `fijo: 2`, y el detalle). Se programa con la tanda.
   4. ⚖ **Golpe de escudo** (D22 Derribar; dueño, 2026-10-27: «lo primero que tira es destreza contra evasión. Y si pega es fuerza más [el peso]
      del escudo… no es contra constitución, sino contra resistencia al crowd control»): necesita escudo. Pega con el escudo: **Destreza contra la
-     Evasión** del rival; si pega, el escudo pega **como un arma contundente**: **1d10 + el peso del escudo + su Dmg contra la Defensa** del
+     Evasión** del rival; si pega, el escudo pega **como un arma contundente**: ~~1d10 + el peso del escudo + su Dmg~~ → **tantos d10 como el peso
+     del escudo + su Dmg contra la Defensa** (dueño, 2026-10-27: «usa el escudo como si fuera un arma de tipo 10… si es un escudo que pesa 3, tira 3 de
+     10 y daño; si pesa 1, 1 de 10 más daño») del
      rival (el Dmg, el atributo secundario que sale de la Fuerza; dueño: «por más daño me refiero al estado secundario damage») (dueño, 2026-10-27: «como si el escudo fuera un arma contundente… y si pasa, hace el efecto que decíamos»); si la pasa, le hace **la
      diferencia de daño** y lo deja **Sentado y con Demora 1**. Sin la tirada contra la Res.CC (la reemplaza esta). Un ataque y 2 SP, o cooldown 2.
      (Los escudos de 1 mano pesan 1 a 3; el de 2 manos, hasta 6: el escudo pesado es el que mejor pega.)

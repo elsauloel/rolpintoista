@@ -91,12 +91,13 @@ const CreepDuelo = (() => {
     const evaEsp = (sc, d) => sc ? Combatiente.evaExtraDuelo(d, st => num(C().modTotal(sc, st))) : {val: 0, txt: ''};
     // La fórmula del daño del arma del creep (la del gancho `dano` y la que muestra el botón).
     function formulaDano(sc, d){
-      // 🛡 El Golpe de escudo (2026-10-27, dueño: «como si el escudo fuera un arma contundente… 1d10 + el peso + el daño»): el escudo, no el arma.
+      // 🛡 El Golpe de escudo (2026-10-27, dueño: «usa el escudo como si fuera un arma de tipo 10… si es un escudo que pesa 3, tira 3 de 10 y daño»):
+      // el escudo, no el arma: tantos d10 como su peso (mínimo 1) + el Dmg.
       const eg = d.ataque.tipo === 'habilidad-arma' && d.ataque.escudoGolpe ? d.ataque.escudoGolpe : null;
-      let formula = eg ? `1d10 + ${Math.max(0, Math.round(num(eg.peso)))} + ${fmt(Math.max(0, num(C().statValor(sc, 'dmg'))))}` : C().danoTxt(sc, C().statValor(sc, 'dmg'));
+      let formula = eg ? `${Math.max(1, Math.round(num(eg.peso)))}d10 + ${fmt(Math.max(0, num(C().statValor(sc, 'dmg'))))}` : C().danoTxt(sc, C().statValor(sc, 'dmg'));
       const m = d.ataque.tipo === 'habilidad-arma' ? (d.ataque.mods || {}) : null;   // lo que le suma la habilidad: dados del Tipo del arma y daño fijo
       if(m){
-        if(num(m.dados) > 0) formula += ` + ${Math.round(num(m.dados))}d${Combatiente.armaEnMano(sc).tipoDado}`;
+        if(num(m.dados) > 0) formula += ` + ${Math.round(num(m.dados))}d${eg ? 10 : Combatiente.armaEnMano(sc).tipoDado}`;
         if(m.dadoExtra) formula += ` + ${m.dadoExtra}`;
         if(num(m.fijo)) formula += ` ${num(m.fijo) > 0 ? '+' : '-'} ${fmt(Math.abs(num(m.fijo)))}`;
       }

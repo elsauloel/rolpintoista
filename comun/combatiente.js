@@ -1875,7 +1875,7 @@ const Combatiente = (() => {
       ...(nf(c.alejarse) > 0 ? {alejarse: Math.min(4, Math.round(nf(c.alejarse)))} : {}),   // 💨 Picar y alejarse (2026-10-21): después del duelo, se aleja N casilleros gratis (vtt-hexgrid/js/57)   // 🐂 toma carrera (la Cornada, 2026-10-21): el mapa la hace al elegir el objetivo (vtt-hexgrid/js/55)
       // ⚔🛡 La tanda del Choque pesado (2026-10-27; vtt-hexgrid/js/78): `sigue` (Golpe que sigue: si lo deja en 0, ataca a otro pegado), `arrastra` (Arrastrar:
       // si pega, lo trae hasta quedar pegado), `cargaDerriba` (Carga que derriba: la carrera de hasta N; desde 3, Fuerza + X contra la Res.CC) y `escudoGolpe`
-      // (Golpe de escudo: pega con el escudo como un arma contundente, 1d10 + su peso + el Dmg).
+      // (Golpe de escudo: pega con el escudo como un arma de Tipo 10, tantos d10 como su peso + el Dmg).
       ...(c.sigue ? {sigue: true} : {}), ...(nf(c.arrastra) > 0 ? {arrastra: Math.min(5, Math.round(nf(c.arrastra)))} : {}),
       ...(nf(c.cargaDerriba) > 0 ? {cargaDerriba: Math.min(6, Math.round(nf(c.cargaDerriba)))} : {}), ...(c.escudoGolpe ? {escudoGolpe: true} : {}),
       ...(c.terminaTurno ? {terminaTurno: true} : {}), ...(c.soloCritico ? {soloCritico: true} : {}), ...(c.perforante ? {perforante: true} : {})};   // Proyectil perforante (2026-10-13): sigue al de atrás   // Headshot (2026-10-12): si no es crítico, falla   // Degollar (2026-10-10): al resolverse, termina el turno y pasa al final del orden

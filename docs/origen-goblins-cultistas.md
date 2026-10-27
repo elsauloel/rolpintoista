@@ -82,3 +82,26 @@ Guía general propuesta (esperando el OK):
 - 🏹 Ballestero goblin, N2 — Ballesta de la grieta, Casco de minero. Tiro a la rodilla · Clavar a la pared · Red tendida.
 - 🛡 Choque pesado goblin (picapiedras), N3 — Hachón de minero, Casco de minero, Botas de minero. Provocar · Romper armadura · Golpe demoledor · Piel de hierro.
 - 🗡 Choque liviano goblin (tunelero), N2 — Daga o pico chico, Botas de minero. Excavar · Puñalada desde abajo · Golpe que sangra.
+
+### Sexto creep y trampas (dueño, 2026-10-27)
+
+- «Yo sumaría un choque más, un híbrido entre Full Warrior y choque liviano, para que también distraiga a Bizante y al mago. No lo marcaría como jefe
+  aún, pero lo pondría a nivel 4 y que sea un debuffer.» → 🗡⚔ **Choque híbrido (warrior + liviano), nivel 4 (5 skills), con debuffs**, contra
+  Bizzante y Larry. A confirmar: goblin o humano, y si «el mago» es Larry.
+- «Que alguno de ellos ponga trampas también.» → el ballestero ya trae Red tendida; se puede sumar una trampa de choque liviano (Polvo cegador,
+  Abrojos, Aguja en el piso, Cordón oculto) al tunelero o al híbrido.
+
+## Creep por creep
+
+### 👑 1. Jefe humano, mago buffer — nivel 3 (propuesta, esperando el OK)
+
+- **Atributos (39)**: Con 9 · Fue 3 · Agi 6 · Des 6 · Esp 15. Vida 45, No2 6, Rango 6, SP 47 (regen 7).
+- **Equipo** (nivel 3: arma Buena + 1 pieza Buena + 3 Comunes): Varita de la grieta (Buena), Sandalias del peregrino (Buena), Capucha de lana del
+  culto, Túnica de aprendiz, Grimorio gastado (otra mano). Queda: PdG.Esp 16, Defensa 0, Def.Esp 3, Res.Esp 13, Res.Mt 19, Evasión 6.
+- **Skills**: Armas perforantes (1 No2, 3 SP, cd 3) · Señalar la presa (1 No2, 2 SP, cd 3) · ¡A la carga! (2 No2, 3 SP, cd 3) · Bendecir el arma
+  (Flash, 2 SP, cd 2; el doble en turno ajeno). La varita: 1 No2 + 3 SP, 1d6 arcano y −2 Defensa 2 turnos.
+- **Números** (su PdG.Esp 16, 2d8, contra cada uno): Señalar la presa entra 97 % contra Larry (Res.Esp 4), 94 % contra Bizzante (5), 88 % contra
+  Petro (7). La varita contra la Evasión: Larry 97 %, Petro 88 %, Bizzante 87 %.
+- **Plan de turnos**: 1.º ¡A la carga! + Armas perforantes al picapiedras (3 No2); 2.º Señalar la presa a Larry + la varita a Petro (2 No2, −2
+  Defensa); Bendecir el arma, con el botón, al que está por pegar.
+- **Botín**: la Varita de la grieta (Buena) y la Capucha del culto; candidato a llevar los drops fijos de la Polilla y la Runa aceleradora.

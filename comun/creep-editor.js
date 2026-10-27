@@ -517,7 +517,7 @@ const CreepEditor = (() => {
     {nombre: 'Raza', tags: ['cualquiera', 'humano', 'humanoide', 'bestia', 'planta', 'elemental', 'no-muerto', 'constructo', 'alienígena', 'demonio', 'interdimensional', 'adefesio']},
     {nombre: 'Automatización', tags: ['toda automatizada', 'con parte a mano']},
     {nombre: 'Auditoría', tags: ['auditada', 'sin auditar']},
-    {nombre: 'Rol en la batalla', tags: ['choque pesado', 'choque liviano', 'rango', 'hunter', 'debuffer', 'support', 'mago']},   // (2026-10-21: docs/diseno-roles-creep.md)
+    {nombre: 'Rol en la batalla', tags: ['choque pesado', 'choque liviano', 'rango', 'hunter', 'debuffer', 'support', 'mago', 'misceláneas']},   // misceláneas (2026-10-27): las que no son de un rol (Excavar)   // (2026-10-21: docs/diseno-roles-creep.md)
     {nombre: 'Mecánica', tags: ['más daño', 'empujar', 'atrapar', 'guardia', 'golpe preciso', 'sangrado', 'trabar', 'golpear y alejarse', 'salto', 'vigilancia', 'daño en área', 'control mental', 'arma elemental', 'barrido', 'por la espalda', 'tiro apuntado', 'rayo en cadena', 'romper armadura', 'ráfaga', 'señalar', 'maleficio', 'desarmar', 'golpe anunciado', 'abrir la herida', 'manada']},   // (2026-10-21: docs/auditoria-skills-creep.md)
   ];
   // ⬆ Sube a la biblioteca una habilidad ya calculada (queda con valores fijos), marcada 🐾 de creep (o 🧙 si ya era de jugador). Si salió

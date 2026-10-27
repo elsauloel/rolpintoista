@@ -67,7 +67,7 @@
     'Interponerse': ['choque pesado', 'interponerse'], 'Golpe de escudo': ['choque pesado', 'derribar'], 'Carga que derriba': ['choque pesado', 'carga que derriba'],
     'Sonic Boom': ['choque pesado', 'sonic boom'], 'Arrastrar': ['choque pesado', 'arrastrar'],
     'Red': ['hunter', 'trabar'], 'Tela de araña': ['hunter', 'trabar'],
-    'Hit and run': ['choque liviano', 'golpear y alejarse'], 'Excavar': ['choque liviano', 'bajo tierra'],
+    'Hit and run': ['choque liviano', 'golpear y alejarse'], 'Excavar': ['misceláneas', 'bajo tierra'],   // (dueño, 2026-10-27: «yo lo pondría en habilidades misceláneas»)
     'Salto': ['choque liviano', 'salto'], 'Salto aplastante': ['choque pesado', 'salto'], 'Vigilancia': ['rango', 'vigilancia'], 'Bola de fuego': ['mago', 'daño en área'], 'Confusión': ['debuffer', 'control mental'],
     'Arma ígnea': ['support', 'arma elemental'], 'Arma helada': ['support', 'arma elemental'], 'Arma eléctrica': ['support', 'arma elemental'],
     'Arma ácida': ['support', 'arma elemental'], 'Arma venenosa': ['support', 'arma elemental'], '¡A la carga!': ['support', 'grito de guerra'], 'Arenga': ['support', 'grito de guerra'], 'Sanar': ['support', 'curar'], 'Oleada sanadora': ['support', 'curar'], 'Bálsamo': ['support', 'curar'], 'Círculo de sanación': ['support', 'curar'], 'Aura sanadora': ['support', 'curar'],

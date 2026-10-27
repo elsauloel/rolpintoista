@@ -162,3 +162,23 @@ pondría algún skill de daño siniestro que sume algo de daño mágico directo,
   va como drop fijo. A decidir si el óleo se puede usar en combate.
 - **Decidido (dueño, 2026-10-27)**: el Óleo reparador solo como drop (se usa fuera de combate; el creep no lo usa). La Poción de Cuero Duro se cambia por la
   **Poción de Piel de Cristal** (Común: escudo de 15 que absorbe solo el daño especial), porque su Defensa especial es 0 (6 con Piel de hierro).
+
+### 🗡 3. Goblin tunelero (choque liviano) — nivel 2 (propuesta, esperando el OK)
+
+Dueño (2026-10-27): «en tunelero, el fin de enterrarse, que sea el mismo skill con golpes desde abajo, que sea solo todo un solo skill. Que no sean dos
+skills, porque si no después buscarlos vinculados el uno al otro va a ser una pasada.»
+
+- **Atributos (36)**: Con 6 · Fue 7 · Agi 10 · Des 9 · Esp 4. Vida 30, No2 10, PdG 9 (10 con los guanteletes), Evasión 10, Dmg 7.
+- **Equipo** (nivel 2: las manos + 4 Comunes): **Pica Hielos** (Tipo 4, 2 dados, PdG −1: el pico chico); **Chaleco de cuero** (Defensa +2), **Casco de
+  minero** (Defensa +1, luz), **Botas de minero** (Defensa +1, Pisada atenta), **Guanteletes de cazador** (PdG +1, Defensa +1, Res. crítico Tipo 4 +1).
+  Defensa 5. **Consumible**: Poción de HP.
+- **Skills (3)**:
+  1. **Por abajo** (una sola, nueva: junta Excavar y Puñalada desde abajo; el nombre, a gusto del dueño). Si está arriba: se mete en la tierra (1 No2): nadie
+     lo puede elegir de objetivo ni le llega un área, un salto eléctrico o una oportunidad; puede quedarse abajo los turnos que quiera. Si está abajo: sale
+     por una casilla libre a 4 o menos del pozo y apuñala con su arma (lo de un ataque): +3 PdG, +1d6 al daño, Crítico frecuente +1; si pega, Rengo 1 turno
+     (crítico: Rengo 2 y Lisiado 1). Cooldown 2 desde que sale. **Falta programarla** (hoy son dos: `excavar` y `emerger`, vtt-hexgrid/js/46).
+  2. **Golpe que sangra** (un ataque, cd 2): Sangrado.
+  3. **Polvo cegador** (la trampa: 1 No2, 2 SP, cd 3): Ceguera 1 turno en 7 casillas (ve a 2, PdG a la mitad), Res.CC contra su Destreza.
+- **Números**: sale de abajo con PdG 10 + 3; el daño, 2d4 + 7 + 1d6 (15 de promedio): a Larry le pasan ~11, a Bizzante ~10, a Petro ~3.
+- **Sinergias**: abajo no lo alcanzan los Pedos de Larry; sale pegado a Larry (o a Bizzante), lo deja Rengo para que no se escape de los tiradores; el Polvo
+  cegador en el camino de Larry le corta la visión (no puede apuntar a más de 2) y a Bizzante le parte el PdG.

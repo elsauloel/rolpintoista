@@ -349,7 +349,7 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
   14. ⚖ **Arrastrar** (C16; dueño, 2026-10-27: «va así»): a un rival a **3 casillas o menos**: **Destreza contra la Evasión**; si lo engancha, lo
      **arrastra hasta quedar pegado** a él (no camina: sin No2 ni ataques de oportunidad; las trampas y zonas del camino **sí lo tocan**) y le pega
      con su arma con **+2 PdG**. Un ataque y 2 SP, o cooldown 2. Combina con Provocar, Golpe de escudo y Golpe que sigue.
-- **Cuenta** (2026-10-27): ✅ **⚔ 10 · 🛡 10 · ⚖ 10**, todas definidas. ✅ **Programadas el mismo día** (dueño: «tocaría pasar a programar todas
+- **Cuenta** (2026-10-27): ✅ **⚔ 10 · 🛡 10 · ⚖ 10**, todas definidas. ✅ **Programadas y probadas en el mapa el mismo día** (reporte: `reporte-choque-pesado-2026-10-27.md`; dueño: «tocaría pasar a programar todas
   estas nuevas skills… y una vez que estén programadas, procedé vos a probarlas en el mapa»), con los cambios de clase en Taunt, Golpe brutal y
   Contraataque. Dos decisiones chicas al programar (para revisar): el Arrastrar va en una sola tirada (su PdG +2 contra la Evasión o el Parry: si pega,
   lo trae y le pega), y el Segundo aliento, «una vez por combate», queda marcado en la habilidad hasta que el GM lo edite (no hay un «empieza el

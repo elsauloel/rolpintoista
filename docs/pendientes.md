@@ -487,6 +487,15 @@
 >   (como GM). El código da bien la fórmula a un personaje nuevo y en «Claude · pruebas» regenera; ninguna parte del código escribe un `0` (la
 >   migración de `ficha-guardado.js` respeta un `0` puesto a mano si ya tienen `spRegenAuto`). Si vuelve a pasar, buscar qué pantalla lo guardó.
 
+## 🧪 De las pruebas en el mapa del 2026-10-27 (la tanda del Choque pesado; reporte: `reporte-choque-pesado-2026-10-27.md`)
+
+- [ ] El Escudo humano de los creeps usa por dentro el estado «Miti-Miti»: el Anuncio dice «le aplicó Miti-Miti» y el cuadro del daño «(Miti-Miti)».
+  Renombrarlo a «Escudo humano» cuando lo pone un creep.
+- [ ] Arrastrar a un personaje: las zonas del camino (fuego, nubes) las revisa la pantalla de su dueño, no la del GM que lo mueve: pueden no tocarlo en el acto.
+- [ ] Las áreas (el Sonic Boom, el Pisotón) también alcanzan a un personaje caído (así era el motor): ¿excluirlos?
+- Decisiones del dueño pendientes: P222 (las skills de clase que ya tiene un personaje no se actualizan solas), P223 (cuándo se libera el Segundo aliento),
+  P224 (Arrastrar en una sola tirada).
+
 ## 🧪 De las pruebas en el mapa del 2026-10-21 (auditoría de creeps)
 
 - [x] **✍ El PdG elegido a mano cumple las mismas reglas que el del botón** (2026-10-21, dueño): «Elegir manualmente» y «Tirar a mano» pagan el ataque

@@ -100,7 +100,7 @@
 > pasa las pruebas automáticas y se sube, **pero no se prueba en el mapa en el momento**: se anota acá. Cuando el dueño lo pida, se corren todas
 > juntas en el mapa, con capturas, y se marcan.
 
-- [ ] **⚔🛡 La tanda del Choque pesado (2026-10-27, las 14 + 3 de clase)** — el dueño pidió que las pruebe Claude en el mapa al terminar de programarlas:
+- [x] **⚔🛡 La tanda del Choque pesado (2026-10-27, las 14 + 3 de clase)** — *probadas las 17 el 2026-10-27 (Claude, dos pantallas): todas andan; 5 errores encontrados y arreglados (ver el reporte)* — el dueño pidió que las pruebe Claude en el mapa al terminar de programarlas:
   Golpe brutal (críticos, daño y Guardia baja), Arte de la guerra (Flash antes de tirar), Contraataque (tras la Evasión y tras el Parry), Golpe que sigue
   (tumba y sigue), Provocar (PdG.Esp + nivel; Provocado y Desafiante), Piel de hierro, Blindaje (✨ sobre sí), Segundo aliento (cura, saca el debuff, una vez),
   Escudo humano (reparte la mitad; 5 de Vida extra), Interponerse (✨ cuando atacan a un aliado), Golpe de escudo (1d10 + peso + Dmg; Sentado y Demora),

@@ -250,7 +250,24 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
   - ✅ **Aguante** → Aguante: «(Skill nueva, 2026-10-23: la misma del modo aguante de los creeps de choque pesado, sumada al pool del Tanque por el dueño; tope de dados: nivel + 1.)»
   - **Temple**: Endurecés el cuerpo: +1 de Resistencia a crítico contra armas de todo Tipo durante 2 turnos (cada punto le quita un nivel al crítico). Solo sobre vos. ⚖ Propuesta a auditar con el grupo (críticos nuevos: Crítico frecuente baja…
 
-### Tanda Tanque (2026-10-26) — para elegir
+### Tanda Choque pesado 10 · 10 · 10 (2026-10-27) — propuesta para elegir
+
+> Dueño, 2026-10-27: «podemos agarrar las habilidades de clase del Warrior y del tanque y ya adaptarlas todas a este grupo. Podemos hacer por lo
+> menos 10 claras de tanque, 10 claras de Warrior y 10 ambiguas… Emparejemos eso». Hoy: 6 warrior, 4 tanque, 6 ambiguas (abajo) → faltan **4
+> warrior, 6 tanque y 4 ambiguas** (14). Se definen sin programar, rotando W → T → A para que avancen parejas. Propuesta (cada una un escalón
+> arriba de la de clase; las de repuesto, por si alguna no convence):
+
+- ⚔ **Warrior (+4)**: **Golpe brutal** (clase), **Arte de la guerra** (clase), **Contraataque** (clase), **Golpe que sigue** ✦ (A5).
+  Repuesto: Todo o nada, Hendidura, Frenesí que crece, Sangre por sangre.
+- 🛡 **Tanque (+6)**: **Provocar** (Taunt), **Piel de hierro** (Piel resistente + Temple), **Blindaje**, **Segundo aliento** (Recuperación),
+  **Escudo humano** (Miti-Miti), **Interponerse**. Repuesto: Inamovible, Estoicismo, Grito de desafío, Muralla, Represalia, Cubrir al de atrás,
+  Última resistencia (la tabla de abajo).
+- ⚖ **Ambiguas (+4)**: **Golpe de escudo**, **Carga que derriba** (Carga, clase), **Sonic Boom** (clase), **Arrastrar** (C16).
+  Repuesto: Espinas (Aura de espinas, clase), Lanzar, Represalia.
+- Ya cubiertas por una de fábrica: Amplificar daño (Golpe fuerte), Remolino (Barrido), Shockwave (Pisotón), Takle, Desarmar, Aguante; Cañón Vasco ≈
+  Salto aplastante; Daño en área (tanque) ≈ Barrido. Sacadito sigue en pausa.
+
+### Tanda Tanque (2026-10-26) — el menú del tanque
 
 > Dueño, 2026-10-26: «podemos diseñar algunas skills más de tanque antes de hacer [los creeps humanoides]… basarnos en las skills de clase y en
 > conceptos e ideas que vos me armes en una lista». El Tanque tenía pocas propias auditadas (Aguante, Desarmar, Pisotón, Takle); el «provocar» de El

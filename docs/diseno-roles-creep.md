@@ -302,9 +302,10 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
      y `fijo: 2`, y el detalle). Se programa con la tanda.
   4. ⚖ **Golpe de escudo** (D22 Derribar; dueño, 2026-10-27: «lo primero que tira es destreza contra evasión. Y si pega es fuerza más [el peso]
      del escudo… no es contra constitución, sino contra resistencia al crowd control»): necesita escudo. Pega con el escudo: **Destreza contra la
-     Evasión** del rival; si pega, **daño propuesto: 1d6 + el peso del escudo** (a confirmar), y después **Fuerza + el peso del escudo contra la
-     Res.CC**: si gana, **Sentado y Demora 1**. Un ataque y 2 SP, o cooldown 2. (Los escudos de 1 mano pesan 1 a 3; el de 2 manos, hasta 6: el
-     escudo pesado es el que mejor tira.)
+     Evasión** del rival; si pega, el escudo pega **como un arma contundente**: **1d10 + el peso del escudo + su Fuerza contra la Defensa** del
+     rival (dueño, 2026-10-27: «como si el escudo fuera un arma contundente… y si pasa, hace el efecto que decíamos»); si la pasa, le hace **la
+     diferencia de daño** y lo deja **Sentado y con Demora 1**. Sin la tirada contra la Res.CC (la reemplaza esta). Un ataque y 2 SP, o cooldown 2.
+     (Los escudos de 1 mano pesan 1 a 3; el de 2 manos, hasta 6: el escudo pesado es el que mejor pega.)
 - Ya cubiertas por una de fábrica: Amplificar daño (Golpe fuerte), Remolino (Barrido), Shockwave (Pisotón), Takle, Desarmar, Aguante; Cañón Vasco ≈
   Salto aplastante; Daño en área (tanque) ≈ Barrido. Sacadito sigue en pausa.
 

@@ -320,6 +320,10 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
      la come el tanque** (daño ya calculado: no le resta su Defensa); si se alejan a más de 3, se corta. Además, al usarla el tanque recibe **5 de
      Vida extra** (lo primero que se gasta de lo que le llega). 1 No2 y 3 SP, o cooldown 3; no es Flash. 🔧 Hace falta repartir el daño de uno con
      otro.
+  8. ⚖ **Carga que derriba** (Carga, de clase: «Carga [X] — Se desplaza X casilleros en línea recta, gastando los No2 correspondientes. Al
+     finalizar el recorrido, ataca con +X al daño y a la PG.»; dueño, 2026-10-27: «va así»): avanza **hasta 4 en línea recta** (paga los No2 del
+     movimiento) y ataca con su arma con **+X PdG y +X al daño** (X = casillas recorridas); si pega y corrió **3 o más**, tira **Fuerza + X contra
+     la Res.CC**: si gana, **Sentado**. Un ataque, los No2 del movimiento y 2 SP, o cooldown 2.
 - Ya cubiertas por una de fábrica: Amplificar daño (Golpe fuerte), Remolino (Barrido), Shockwave (Pisotón), Takle, Desarmar, Aguante; Cañón Vasco ≈
   Salto aplastante; Daño en área (tanque) ≈ Barrido. Sacadito sigue en pausa.
 

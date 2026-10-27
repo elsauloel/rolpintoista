@@ -1304,3 +1304,10 @@ Escudo de caparazón y Anillo de cáscara protectora.
 pase el daño físico, el veneno no se resiste». **Por golpe** (Aguja, Dardos envenenados, Espina de mantícora): sin tirada; entra si lastima (lo que
 absorbe un escudo no cuenta, P227). **Por nube o gas** (Nube de veneno, Bomba de esporas, las zonas tóxicas): Res.Esp, como hoy. Falta programarlo
 (los Dardos y la Espina hoy tienen Res.Esp; la Espina además no pide lastimar).
+
+**Clasificación ✅ (dueño, 2026-10-27):** «cuando se habla de vida extra es así: la vida extra solo aplica si te subiste de tu máximo; si no, es
+simplemente una curación». O sea, **«Vida extra N» = te curás N y lo que pasa del máximo queda como Vida extra** (con la vida llena, son N de Vida
+extra). **Vida extra:** Drenar vida, Colmillo de la Reina Araña, **Relicario de sangre** (cambia: «cada vez que matás a alguien con daño especial, te
+curás 10; si te pasás de tu máximo, eso se convierte en vida extra»), **Anillo de la siesta**, **Anillo del sereno** y **Anillo del escudo de la mañana**
+(siguen frenando solo su tipo de daño). **Escudo:** los Orbes de resguardo y del custodio, el Escudo de caparazón, el Anillo de cáscara protectora y
+todos los «claros» de arriba. Falta programar. **El Envión cambia de nombre** (dueño: «no me cierra nada el nombre»): a elegir.

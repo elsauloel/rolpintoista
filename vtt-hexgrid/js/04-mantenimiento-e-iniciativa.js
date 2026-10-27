@@ -558,7 +558,8 @@ function invConTurno(fichaId){
 async function turnoDeToken(tokenId, clave, inicio){
   const t = tokens.get(tokenId);
   if(!t || !t.fichaId) return [];
-  if(!inicio) try{ await levitarAterrizar(tokenId); }catch(err){ console.error('No se pudo resolver la trampa al aterrizar:', err); }   // Levitar: al terminar el turno toca el piso
+  if(!inicio) try{ await levitarAterrizar(tokenId); }catch(err){ console.error('No se pudo resolver la trampa al aterrizar:', err); }
+  if(inicio && soyGM && typeof ceboInicioTurno === 'function') ceboInicioTurno(tokenId).catch(err => console.error('El cebo:', err));   // 💎 el brillo vuelve a tentar (js/80)   // Levitar: al terminar el turno toca el piso
   const o = iniciativa.orden.find(x => x.id === tokenId);
   const visible = !t.oculto && !(o && o.oculto) && !enSigilo(t);
   const titulo = inicio ? `Empieza el turno de ${nombreDe(t)}:` : `Terminó el turno de ${nombreDe(t)}:`;

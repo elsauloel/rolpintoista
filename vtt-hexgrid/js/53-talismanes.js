@@ -37,17 +37,18 @@ async function talEspejito(d, entro){
     return {monto, recibido: num(res.r.recibido)};
   }catch(err){ console.error('El Espejito:', err); try{ mesaLinea(`🪞 El Espejito de ${d.defensor.nombre}: ${monto} a ${d.atacante.nombre}, a mano`, 'recordatorio'); }catch(e){} return null; }
 }
-// El Relicario: si el daño especial lo dejó en 0 (estaba de pie), quien atacó gana Vida extra N.
+// El Relicario: si el daño especial lo dejó en 0 (estaba de pie), quien atacó se cura N; lo que pase de su máximo queda como Vida extra (dueño,
+// 2026-10-27: «te curas 10. Si te pasas de tu máximo, eso se convierte en vida extra»; hasta +50 %, se va al terminar el combate: dueloCurar, js/13).
 async function talRelicario(d, mato){
   if(!mato) return null;
   const ta = tokens.get(d.atacante.tokenId);
   const n = talismanDe(ta, 'relicario');
   if(!(n > 0) || !ta) return null;
-  const spec = {nombre: 'Vida extra', escudoMagico: n};
   try{
-    if(ta.tipo === 'creep') await modificarCreep(ta.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
-    else await EstadosAplicar.encolarPj({fichaId: ta.fichaId, duenoUid: ta.duenoUid, spec, origen: `${d.atacante.nombre} · Relicario de sangre`});
-    try{ mesaLinea(`🩸 El Relicario de ${d.atacante.nombre} late: Vida extra ${n} por matar a ${d.defensor.nombre} con daño especial`, 'recordatorio'); }catch(err){}
+    const r = await dueloCurar(ta, n);
+    const sube = Math.max(0, num(r.nuevo) - num(r.previo)), exc = num(r.excedente);
+    const txt = [sube ? `se cura ${sube}` : '', exc ? `Vida extra ${exc}` : '', !sube && !exc ? 'ya estaba con la vida y la Vida extra al tope' : ''].filter(Boolean).join(' y ');
+    try{ mesaLinea(`🩸 El Relicario de ${d.atacante.nombre} late por matar a ${d.defensor.nombre} con daño especial: ${txt}`, 'recordatorio'); }catch(err){}
     return {n};
   }catch(err){ console.error('El Relicario:', err); return null; }
 }
@@ -125,11 +126,11 @@ async function talResguardo(d){
   const k = `resguardo|${d.atacante.tokenId}@${Math.round(num(mantenimientoNumero))}`;
   if(talismanUsados.has(k)) return;
   talismanUsados.add(k);
-  const spec = {nombre: 'Vida extra', turnos: 1, escudoMagico: n};
+  const spec = {nombre: 'Escudo especial', turnos: 1, escudoMagico: n};   // un escudo (P227, 2026-10-27; antes «Vida extra»)
   try{
     if(ta.tipo === 'creep') await modificarCreep(ta.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
     else await EstadosAplicar.encolarPj({fichaId: ta.fichaId, duenoUid: ta.duenoUid, spec, origen: `${d.atacante.nombre} · ${nombre}`});
-    try{ mesaLinea(`🔮 ${nombre}: ${d.atacante.nombre} recibe Vida extra ${n} hasta su próximo turno`, 'recordatorio'); }catch(err){}
+    try{ mesaLinea(`🔮 ${nombre}: ${d.atacante.nombre} recibe un escudo de ${n} hasta su próximo turno`, 'recordatorio'); }catch(err){}
   }catch(err){ console.error('El Orbe de resguardo:', err); }
 }
 // Lo que pasa al ganar una tirada de PdG.Esp (el hook del duelo, en la pantalla de quien tiró).

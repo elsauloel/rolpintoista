@@ -134,7 +134,10 @@ function resolverGolpe(golpe, defensa, efectos, o){
   const activos = (efectos || []).filter(e => e && e.activo !== false);
   if(activos.some(e => e.invulnerable)) return {recibido: 0, invulnerable: true, defensa, absorbido: 0};
   let recibido = Math.max(0, golpe - defensa);
-  let absorbido = 0;
+  // 🗡 Perfora N (`o.perfora`, 2026-10-27: las trampas que perforan, la Aguja): N puntos pasan siempre la Defensa (Combatiente.perforaPasa).
+  const perfora = o && num(o.perfora) > 0 ? Combatiente.perforaPasa(golpe, defensa, Math.min(num(o.perfora), golpe)) : 0;
+  if(perfora) recibido = perfora;
+  let absorbido = 0, vida = 0;
   const ab = Combatiente.absorberPct(activos, recibido);   // Armadura arcana: se queda con el 50 % de lo que llega, hasta 10 (2026-10-10)
   recibido = ab.recibido; absorbido += ab.tomado;
   const capas = activos.filter(e => (e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) && num(e.escudoMagicoActual ?? e.escudoMagico) > 0 && !(e.soloEspecial && !(o && o.magico)) && !(e.soloFisico && o && o.magico))
@@ -145,8 +148,9 @@ function resolverGolpe(golpe, defensa, efectos, o){
     c.escudoMagicoActual = actual - tomado;
     if(c.excedenteVida) c.escudoMagico = c.escudoMagicoActual;   // valor neto: no hay máximo
     absorbido += tomado; recibido -= tomado;
+    if(c.excedenteVida) vida += tomado;   // 🛡/❤ (P227, 2026-10-27): lo que se lleva la Vida extra es daño; lo que se come un escudo, no
   });
-  return {recibido, absorbido, defensa, ...(ab.tomado ? {arcano: ab.tomado} : {})};
+  return {recibido, absorbido, defensa, ...(vida ? {vida} : {}), ...(perfora ? {perfora} : {}), ...(ab.tomado ? {arcano: ab.tomado} : {})};
 }
 
 function leerGolpe(texto){
@@ -158,7 +162,9 @@ function golpeTexto(nombre, golpe, r, previo, nuevo){
   const extra = [];
   if(r.arcano) extra.push(`la Armadura arcana absorbió ${fmt(r.arcano)}`);
   if(r.mitiMiti) extra.push(`🛡 ${r.mitiMitiNombre} se llevó ${fmt(r.mitiMiti)} (${r.mitiMitiTxt || 'Miti-Miti'})`);
-  if(num(r.absorbido) - num(r.arcano) > 0) extra.push(`Vida extra absorbió ${fmt(num(r.absorbido) - num(r.arcano))}`);
+  if(num(r.perfora) > 0) extra.push(`pasa${num(r.perfora) > 1 ? 'n' : ''} ${fmt(r.perfora)} por la Perfora`);
+  if(num(r.absorbido) - num(r.arcano) - num(r.vida) > 0) extra.push(`el escudo absorbió ${fmt(num(r.absorbido) - num(r.arcano) - num(r.vida))}`);   // 🛡 (P227: el escudo y la Vida extra, aparte)
+  if(num(r.vida) > 0) extra.push(`la Vida extra se llevó ${fmt(r.vida)}`);
   const suf = extra.length ? ` · ${extra.join(' · ')}` : '';
   if(r.invulnerable) return `${nombre}: Invulnerable, el golpe de ${fmt(golpe)} no hizo nada`;
   if(r.recibido <= 0 && !r.absorbido) return `${nombre}: golpe de ${fmt(golpe)} · Defensa ${fmt(r.defensa)} lo frenó entero`;

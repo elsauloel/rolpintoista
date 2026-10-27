@@ -141,7 +141,7 @@ async function trampaMomentoNuevo(p){
     dano: p.dano || '', ignoraDef: !!p.ignoraDef, elemento: p.elemento || '', altura: p.altura || 'piso', pierdeSp: p.pierdeSp || '',
     cadena: p.cadena && p.pisador ? {rango: num(p.cadena.rango) || 3, golpeados: [p.tokenId || '']} : null,
     celdas: Array.isArray(p.celdas) ? p.celdas.slice(0, 120) : [],
-    portal: p.portal ? {rango: num(p.portal.rango) || 8, ...(p.portal.destino ? {destino: String(p.portal.destino)} : {})} : null, duenoTrampa: p.duenoTrampa || '', requiereDano: !!p.requiereDano, spec: p.specJson || '', muro: num(p.muro), muroLargo: num(p.muroLargo), zona: num(p.zona), aMano: p.aMano || '',
+    portal: p.portal ? {rango: num(p.portal.rango) || 8, ...(p.portal.destino ? {destino: String(p.portal.destino)} : {})} : null, duenoTrampa: p.duenoTrampa || '', requiereDano: !!p.requiereDano, ...(num(p.perfora) > 0 ? {perfora: num(p.perfora)} : {}), ...(p.adelante ? {adelante: p.adelante} : {}), spec: p.specJson || '', muro: num(p.muro), muroLargo: num(p.muroLargo), zona: num(p.zona), aMano: p.aMano || '',
     fase: '', tirando: false, evita: '', pasos: [],
     ...(p.explota ? {explota: p.explota} : {}),   // 💥 (2026-10-17)
   };
@@ -553,7 +553,7 @@ async function trampaPasoDanoAplicar(id, dt){
       const suela = dt.altura === 'aire' ? 0 : Math.max(0, statPiesDe(x, 'suelagruesa'));   // solo lo que toca el piso (2026-10-07)   // Suela gruesa (pies, 2026-10-06): lo que pisás hace menos
       if(suela){ rr.res = num(rr.res) + suela; freno = [freno, `Suela gruesa ${suela}`].filter(Boolean).join(' − '); }
       restaFreno = num(arm) + num(rr.res);
-      const oT = {magico: !!dt.elemento};   // el Orbe de absorción (js/26)
+      const oT = {magico: !!dt.elemento, ...(num(dt.perfora) > 0 && !dt.ignoraDef ? {perfora: num(dt.perfora)} : {})};   // el Orbe de absorción (js/26)   // 🗡 la Perfora de la trampa (la Aguja, 2026-10-27)
       if(x.tipo === 'creep'){ if(soyGM) res = await danioCreep(x, String(monto), dt.ignoraDef, arm, rr.res, oT); }
       else res = await (String(x.fichaId).includes(SEP_INVOCACION) ? danioInv : danioPj)(x, String(monto), dt.ignoraDef, arm, rr.res, oT);
     }catch(err){ console.error('No se pudo aplicar el daño de la trampa:', err); }
@@ -563,11 +563,13 @@ async function trampaPasoDanoAplicar(id, dt){
   else if(res){
     const g = res.r;
     texto += g.invulnerable ? ' → Invulnerable: no le hizo nada'
-      : (dt.ignoraDef ? `${freno ? ` − ${freno}` : ''} → ${fmt(g.recibido)} de daño directo a la vida` : ` − Defensa ${fmt(g.defensa - restaFreno)}${freno ? ` − ${freno}` : ''} → ${fmt(g.recibido)} de daño`) + (g.absorbido ? ` (el escudo absorbió ${fmt(g.absorbido)})` : '');
+      : (dt.ignoraDef ? `${freno ? ` − ${freno}` : ''} → ${fmt(g.recibido)} de daño directo a la vida` : ` − Defensa ${fmt(g.defensa - restaFreno)}${g.perfora ? ` (pasa${g.perfora > 1 ? 'n' : ''} ${fmt(g.perfora)} por la Perfora)` : ''}${freno ? ` − ${freno}` : ''} → ${fmt(g.recibido)} de daño`) + (num(g.absorbido) - num(g.vida) > 0 ? ` (el escudo absorbió ${fmt(num(g.absorbido) - num(g.vida))})` : '') + (num(g.vida) > 0 ? ` (la Vida extra se llevó ${fmt(g.vida)})` : '');
     if(!g.invulnerable) texto += ` · ✔ ya se descontó de la vida${x && x.tipo !== 'creep' && Number.isFinite(Number(res.previo)) && Number.isFinite(Number(res.nuevo)) ? ` (${fmt(num(res.previo))} → ${fmt(num(res.nuevo))})` : ''}`;
   }else texto += ` → ${monto} de daño${dt.ignoraDef ? ' directo a la vida' : ' menos su Defensa'} — aplicalo a mano`;
   const entro = monto <= 0 ? 0 : res ? num(res.r.recibido) : monto;   // lo que llegó a la vida (sin poder aplicarlo, se da por hecho)
-  const sinHerida = dt.requiereDano && entro <= 0;
+  // ¿Lo lastimó? (P227, 2026-10-27): la vida, más lo que se llevó su Vida extra (es vida); lo que se comió un escudo no cuenta.
+  const lastimo = entro + (res ? num(res.r.vida) : 0);
+  const sinHerida = dt.requiereDano && lastimo <= 0;
   if(sinHerida) texto += ' → no lo lastimó: lo que deja no entra';
   const titulo = dt.danoFijo ? 'Le llega la descarga' : monto <= 0 ? 'Daño' : 'Daño aplicado';
   const sig = {...dt, danoEntro: entro, ...(sinHerida ? {evita: 'efecto'} : {}), pasos: [...(dt.pasos || []), {titulo, texto}]};
@@ -656,7 +658,18 @@ async function trampaPasoInfo(id, dt){
 // 3 · Lo que le deja: sin tirada (a un creep directo; a un personaje o invocación, por comun/recibidos.js) y dice cómo soltarse.
 async function trampaPasoEstado(id, dt){
   const spec = trampaSpec(dt), x = tokens.get(dt.tokenId);
-  let que = ' — aplicalo a mano', inmune = '';
+  let que = ' — aplicalo a mano', inmune = '', cayo = '';
+  // 🪢 El Cordón oculto (2026-10-27, dueño: «cae del otro lado de la trampa en la misma dirección en la que venía caminando y queda sentado»): antes de
+  // quedar Sentado, cae una casilla más allá, si está libre (sin token ni Sólido ni pared en el medio); si no, cae donde está.
+  if(dt.adelante && x){
+    const c = dt.adelante;
+    const libre = !elementoSolidoEn(c.col, c.fila) && ![...tokens.values()].some(y => y !== x && y.col === c.col && y.fila === c.fila && !y.bajoTierra)
+      && !(typeof paredCorta === 'function' && paredCorta({col: x.col, fila: x.fila}, c));
+    if(libre){
+      try{ await coleccionTokens().doc(dt.tokenId).update({col: c.col, fila: c.fila, ruta: firebase.firestore.FieldValue.delete()}); cayo = ' · tropieza y cae una casilla más allá'; }
+      catch(err){ console.error('Cordón oculto: no se pudo mover', err); cayo = ' · tropieza (corrélo una casilla a mano)'; }
+    }else cayo = ' · tropieza, pero no hay lugar adelante: cae donde está';
+  }
   try{
     if(spec && x && x.tipo === 'creep' && x.fichaId && soyGM){
       await modificarCreep(x.fichaId, sc => { const r = EstadosAplicar.aplicarACreep(sc, spec); if(!r.ok) inmune = r.motivo || 'inmune'; });
@@ -666,7 +679,7 @@ async function trampaPasoEstado(id, dt){
       que = '';
     }
   }catch(err){ console.error('No se pudo aplicar el estado de la trampa:', err); }
-  let texto = `${spec ? EstadosAplicar.texto(spec) : 'un estado'}${que}`;
+  let texto = `${spec ? EstadosAplicar.texto(spec) : 'un estado'}${que}${cayo}`;
   const suelta = spec && !inmune ? Combatiente.textoSoltarse(spec) : '';
   if(suelta) texto += ` · Para salir, ${dt.creep ? 'en sus Acciones' : 'en la Botonera'}: ${suelta}`;
   const sig = {...dt, pasos: [...(dt.pasos || []), {titulo: 'Lo que le deja', texto}]};

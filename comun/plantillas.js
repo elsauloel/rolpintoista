@@ -94,7 +94,8 @@ const Plantillas = (() => {
     'pilar',   // pilar (2026-10-05, Varita de los pilares): no es una trampa, cada casilla es un Sólido de 1 casilla que dura `turnos`
     'lento',   // terreno lento (2026-10-04, arena movediza): una vez disparada, cada paso que sale de ella cuesta ese No2
     'explota',   // 💥 (2026-10-17, dueño): al pisarla, el mapa se queda quieto 1,5 s con una explosión y recién después el Anuncio
-    'elemento'];   // de qué elemento es el daño (2026-10-04): 'fuego' | 'hielo' | 'rayo' | 'toxico' | 'acido' — se resta esa resistencia
+    'elemento',   // de qué elemento es el daño (2026-10-04): 'fuego' | 'hielo' | 'rayo' | 'toxico' | 'acido' — se resta esa resistencia
+    'perfora', 'adelante', 'visual'];   // 2026-10-27: Perfora N (la Aguja), cae una casilla más allá (el Cordón oculto) y cómo se dibuja ('cordon')
   function trampaDesde(t){
     if(!t || typeof t !== 'object') return null;
     const n = v => Number(v) || 0;

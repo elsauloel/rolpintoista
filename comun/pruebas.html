@@ -444,8 +444,9 @@ prueba('Vida extra (2026-10-07): es neta; solo se renueva la que el efecto marca
   const es = [E({nombre: 'Vida extra', escudoMagico: 8, escudoMagicoActual: 3, turnos: 2, excedenteVida: true, recarga: true}), E({nombre: 'Vida extra', escudoMagico: 5, escudoMagicoActual: 1, excedenteVida: true, permanente: true})];
   Combatiente.pasarTurnoEstados(es, campF);
   const p = n => estadosPresetFicha().find(x => x.nombre === n || (x.alias || []).includes(n));
-  igual([es[0].escudoMagicoActual, es[1].escudoMagicoActual, p('Escudo especial').nombre, p('Excedente de vida').nombre, p('Vida extra').excedenteVida],
-    [8, 1, 'Vida extra', 'Vida extra', true]);
+  // (P227, 2026-10-27: el Escudo especial vuelve a ser un estado propio, un escudo; la Vida extra es solo la que sobra de una cura.)
+  igual([es[0].escudoMagicoActual, es[1].escudoMagicoActual, p('Escudo especial').nombre, !!p('Escudo especial').excedenteVida, p('Escudo mágico').nombre, p('Excedente de vida').nombre, p('Vida extra').excedenteVida],
+    [8, 1, 'Escudo especial', false, 'Escudo especial', 'Vida extra', true]);
 });
 prueba('vence al llegar a 0 turnos; el permanente sigue; el pausado no hace nada', () => {
   const r = Combatiente.pasarTurnoEstados([E({nombre: 'A', turnos: 1}), E({nombre: 'B', permanente: true}), {nombre: 'C', activo: false, turnos: 1, hpturno: -5}], campF);
@@ -4374,11 +4375,11 @@ prueba('trampas automáticas: el estado y la salvación viajan juntos en trampaE
   const filasDardos = ItemCorto.trampaFilas(dardos).map(f => f[0] + ': ' + f[1]);
   igual([oso.estado, oso.estadoTurnos, descarga.estadoTurnos, j, solo, TokensAuto.estadoJson(null, null), filasDardos.filter(f => /^(Efecto|Se evita)/.test(f)), oso.detalle,
     Plantillas.trampa({...dardos}).salvacion],
-    // (2026-10-19: el 📚 sale del catálogo de ítems, con los números del rework de trampas: la Trampa de oso deja Inmovilizado 1 turno y los
-    // Dardos se resisten con Res.Esp contra 7.)
-    ['Inmovilizado', 1, 1, {nombre: 'Veneno', stacks: 3, salva: {stat: 'resmg', etq: 'Res.Esp', dif: 7, que: 'efecto', logra: 'el dardo pega, pero el veneno no entra'}},
+    // (2026-10-19: el 📚 sale del catálogo de ítems, con los números del rework de trampas: la Trampa de oso deja Inmovilizado 1 turno. Desde el
+    // 2026-10-27 (P228) el veneno de los Dardos no se resiste: entra si lastiman.)
+    ['Inmovilizado', 1, 1, {nombre: 'Veneno', stacks: 3},
      {salva: {stat: 'eva', etq: 'Evasión', dif: 12, que: 'mitad'}}, '', ['Efecto: Veneno ×3'], CATALOGO_BASE.find(i => i.nombre === 'Trampa de oso').detalle.slice(0, 200),
-     {stat: 'resmg', etq: 'Res.Esp', dif: 7, que: 'efecto', logra: 'el dardo pega, pero el veneno no entra'}]);
+     undefined]);
 });
 prueba('trampa de muro: el muro viaja en trampaEstado (largo 3 o 5, 4 turnos si no dice) y la plantilla lo conserva', () => {
   igual([JSON.parse(TokensAuto.estadoJson(null, null, {largo: 3})), JSON.parse(TokensAuto.estadoJson({nombre: 'Sentado'}, null, {largo: 7, turnos: 2})),
@@ -5689,7 +5690,7 @@ prueba('Talismanes (2026-10-18): el Sahumerio saca un estado malo con un 4 en d4
   const rep = {jugadores: [{id: 'a', incluido: true, estado: 'en pie', ekeko: 20}, {id: 'b', incluido: true, estado: 'en pie'}], extra: {}, xpPorJugador: null, ddePorJugador: null};
   const rr = CombateFin.calcularReparto ? CombateFin.calcularReparto(rep, {xpTotal: 0, filas: [{derrotado: true, oro: 100}]}) : null;
   const rr2 = CombateFin.calcularReparto(rep, {xpTotal: 0, filas: [{derrotado: true, oro: 16}]});   // 8 cada uno: el 20 % es 1,6 → 2 (para arriba)
-  igual([x1.saco, x2.saco, S.efectos.map(e => e.nombre), rr ? rr.porJugador.map(p => p.dde) : null, rr2.porJugador.map(p => p.dde)], [null, 'Veneno', ['Vida extra'], rr ? [60, 50] : null, [10, 8]]);
+  igual([x1.saco, x2.saco, S.efectos.map(e => e.nombre), rr ? rr.porJugador.map(p => p.dde) : null, rr2.porJugador.map(p => p.dde)], [null, 'Veneno', ['Escudo especial'], rr ? [60, 50] : null, [10, 8]]);
 });
 
 prueba('Talismanes (2026-10-18): la Piedra bezoar, 1 stack menos de Veneno (un creep y un personaje)', () => {
@@ -5912,6 +5913,48 @@ prueba('🗡 Perfora N = N puntos pasan siempre la Defensa, no le baja la Defens
   const sin = Combatiente.habEjecucion(h, h.duelo, {stat: () => 3, etq: s => s, armaDano: '1d8+4'});
   igual([pasa(5, 10, 1), pasa(10, 3, 1), pasa(5, 4, 2), pasa(1, 9, 3), pasa(8, 8, 0), ej.dano.perfora, sin.dano.perfora, Duelo.limpiarHab(ej).dano.perfora],
     [1, 7, 2, 1, 0, 2, undefined, 2]);
+});
+/* ---------- 🪤 La tanda de trampas (2026-10-27): 4 de Rango y Hunter, 4 de Choque liviano; escudo y Vida extra (P227); el veneno por golpe (P228) ---------- */
+const trp = (nombre, nivel) => { const e = HABILIDADES_CREEP_CATALOGO.find(x => x.nombre === nombre); return e ? {...armarHabilidadDeCreep(e.datos, nivel || 1), id: 'h-' + nombre} : null; };
+prueba('🪤 Las 8 trampas de creep (2026-10-27): en el catálogo, auditadas, con su trampa (o el cebo) y la dificultad de la Destreza de quien la pone', () => {
+  const N = ['Red tendida', 'Cebo', 'Cepo del cazador', 'Mina del cazador', 'Aguja en el piso', 'Abrojos', 'Cordón oculto', 'Polvo cegador'];
+  const mal = N.filter(n => { const e = HABILIDADES_CREEP_CATALOGO.filter(x => x.nombre === n); return e.length !== 1 || !e[0].etiquetas.includes('auditada'); });
+  const valor = st => ({des: 11})[st] || 0;
+  const red = Combatiente.trampaDeHab(trp('Red tendida', 3), valor), cepo = Combatiente.trampaDeHab(trp('Cepo del cazador', 3), valor);
+  const abr = Combatiente.trampaDeHab(trp('Abrojos', 3), valor), cor = Combatiente.trampaDeHab(trp('Cordón oculto', 3), valor);
+  igual([mal, red.salvacion.dif, red.soltar.dif, red.detectar, cepo.soltar.hiere, cepo.soltar.dif, abr.zonaResistValor, cor.salvacion.stat, cor.salvacion.dif, cor.tamano, cor.adelante, cor.visual,
+    !!trp('Cebo').cebo, trp('Cebo').cebo.radio, HABILIDADES_CREEP_BASE.filter(x => x.nombre === 'Cebo').length],
+    [[], 11, 11, 11, '1d6', 11, 11, 'agl', 11, 4, true, 'cordon', true, 4, 1]);
+});
+prueba('🪤 Lo nuevo de una trampa viaja hasta el mapa (2026-10-27): Perfora, caer adelante, el dibujo del cordón, el «si falla, lastima» y entra en 300', () => {
+  const t = Plantillas.trampaDesde(Combatiente.trampaDeHab(trp('Aguja en el piso', 3), st => ({des: 9})[st] || 0));
+  const j = JSON.parse(TokensAuto.estadoJson({nombre: 'Veneno', stacks: 5}, null, null, {area: 'pisador'}, '', 0, {perfora: t.perfora, requiereDano: true, adelante: true, visual: 'cordon', de: 'abcdefghijklmnopqrst|creep'}));
+  const largos = ['Red tendida', 'Cepo del cazador', 'Mina del cazador', 'Aguja en el piso', 'Abrojos', 'Cordón oculto', 'Polvo cegador'].map(n => {
+    const x = Plantillas.trampaDesde(Combatiente.trampaDeHab(trp(n, 3), st => ({des: 12})[st] || 0));
+    return TokensAuto.estadoJson(x.estado ? {nombre: x.estado, turnos: x.estadoTurnos, stacks: x.estadoStacks, ...(x.soltar ? {soltar: x.soltar} : {})} : null, x.salvacion, null, x.efecto, x.elemento, 0,
+      {perfora: x.perfora, requiereDano: x.requiereDano, renuevaPaso: x.renuevaPaso, explota: x.explota, adelante: x.adelante, visual: x.visual, de: 'qiWXQ1daWBhfTbwD1E98|creep'});
+  });
+  igual([t.perfora, j.pf, j.adelante, j.visual, j.requiereDano, largos.every(s => s && s.length <= 300 && JSON.parse(s).de), Combatiente.soltarNorm({stat: 'fue', dif: 9, hiere: '1d6'}).hiere,
+    /si falla, 1d6 de daño directo/.test(Combatiente.textoSoltarse({soltar: {stat: 'fue', dif: 9, no2: 1, hiere: '1d6'}}))],
+    [2, 2, true, 'cordon', true, true, '1d6', true]);
+});
+prueba('🛡❤ Escudo y Vida extra (P227, 2026-10-27): el Escudo especial es un escudo; la Vida extra, lo que sobra de una cura (Relicario: hasta +50 %)', () => {
+  const p = n => ESTADOS_PRESET.find(x => x.nombre === n);
+  const v = [{nombre: 'Vida extra', activo: true, excedenteVida: true, escudoMagico: 4, escudoMagicoActual: 4}, {nombre: 'Shield', activo: true, escudoMagico: 14}];
+  const S = FichaGuardado.normalizar({}).S;
+  S.attrs = {...S.attrs, con: 4}; const max = FichaCalculo.calcular(S).final.hpmax;
+  S.inventario = [{id: 'r', nombre: 'Relicario de sangre', equipado: true, relicario: 10}];
+  S.hp = max - 2; FichaAcciones.fijarHp(S, max + 50);
+  const ve = (S.efectos || []).find(e => e.excedenteVida);
+  igual([!!p('Escudo especial').excedenteVida, !!p('Vida extra').excedenteVida, Combatiente.vidaExtraTotal(v), Combatiente.excedenteConTope(v, 30, 20, 50), S.hp === max, ve ? ve.escudoMagico : 0, !!(ve && ve.finCombate),
+    p('Arrojo').alias.includes('Envión')],
+    [false, true, 4, 6, true, Math.floor(max * 0.5), true, true]);
+});
+prueba('🧪 El veneno de las trampas por golpe no se resiste (P228, 2026-10-27): la Aguja 1d8 con Perfora 1, los Dardos y la Espina si lastiman', () => {
+  const td = n => (CATALOGO_BASE.find(i => i.nombre === n) || {}).trampaDatos || {};
+  const ag = td('Aguja emponzoñada'), da = td('Dardos envenenados'), es = td('Espina de mantícora'), nube = td('Nube de veneno');
+  igual([ag.dano, ag.perfora, !!ag.requiereDano, !!ag.salvacion, !!da.salvacion, !!da.requiereDano, !!es.salvacion, !!es.requiereDano, !!nube.salvacion],
+    [ '1d8', 1, true, false, false, true, false, true, true]);
 });
 /* ---------- Resultado ---------- */
 Promise.all(pendientes).then(() => {

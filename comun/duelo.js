@@ -1414,8 +1414,10 @@ const Duelo = (() => {
       m.dano = {...m.dano, ...info, aplicado: true};
       // ¿El golpe hizo daño? Los efectos que lo necesitan no entran si la armadura lo absorbió todo.
       const dn0 = m.dano;
-      const hizoDano = dn0.invulnerable ? false : dn0.manual ? _num(dn0.golpe) > 0 : (_num(dn0.recibido) + _num(dn0.absorbido)) > 0;
-      m.efectos = (m.efectos || []).map(ef => (ef.requiereDano && !hizoDano) ? {...ef, omitido: true, motivo: dn0.invulnerable ? 'era Invulnerable: el golpe no hizo nada' : 'el golpe no hizo daño (la armadura lo absorbió)'} : ef);
+      // 🛡/❤ (P227, dueño, 2026-10-27): lo que se lleva la Vida extra es daño (es vida); lo que se come un escudo, no (es el escudo).
+      const hizoDano = dn0.invulnerable ? false : dn0.manual ? _num(dn0.golpe) > 0 : (_num(dn0.recibido) + _num(dn0.vidaAbs)) > 0;
+      const sinDanoPor = _num(dn0.absorbido) > _num(dn0.vidaAbs) ? 'el golpe no hizo daño (lo frenaron la armadura y el escudo)' : 'el golpe no hizo daño (la armadura lo absorbió)';
+      m.efectos = (m.efectos || []).map(ef => (ef.requiereDano && !hizoDano) ? {...ef, omitido: true, motivo: dn0.invulnerable ? 'era Invulnerable: el golpe no hizo nada' : sinDanoPor} : ef);
       if((m.efectos || []).length){ m.fase = 'efectos'; m.estado = 'esperando'; cerrarSiListo(m); }
       else{ m.fase = 'fin'; m.estado = 'resuelto'; }
       tx.update(ref, cambiosDe(m));

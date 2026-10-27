@@ -213,8 +213,13 @@ const ESTADOS_PRESET = [
   // Vida extra (dueño, 2026-10-07): el ex Escudo especial y el ex Excedente de vida son lo mismo — vida de más, NETA (lo que se gasta no
   // vuelve), salvo que el efecto diga que se renueva (`recarga: true`). Absorbe el daño de cualquier fuente, también el True Damage. Sin turnos,
   // dura hasta gastarse; con turnos, vence. Si llega otra, se suma: cada una aparte, con su duración (dueño, 2026-10-07; antes reemplazaba, P137).
-  {nombre:'Vida extra', alias:['Escudo especial', 'Escudo mágico', 'Excedente de vida'], polaridad:'buff', permanente:true, turnos:0, escudoMagico:5, excedenteVida:true,
-    detalle:'Vida de más: se gasta antes que la vida y absorbe el daño de cualquier fuente, también el True Damage. Es neta: lo que se gasta no vuelve (salvo que el efecto diga que se renueva). Sin turnos dura hasta gastarse; si el efecto le pone turnos, vence. Se sube o baja a mano desde el chip.'},
+  // (2026-10-27, dueño, P227: se vuelven a separar.) La Vida extra es solo lo que una cura o un drenaje pasa del máximo («la vida extra solo aplica si te
+  // subiste de tu máximo; si no, es simplemente una curación»): es vida, así que lo que se lleva cuenta como daño. Todo lo que da «absorbe N» es un escudo.
+  {nombre:'Vida extra', alias:['Excedente de vida'], polaridad:'buff', permanente:true, turnos:0, escudoMagico:5, excedenteVida:true,
+    detalle:'Vida de más (lo que una cura te pasó del máximo): se gasta antes que la vida y absorbe el daño de cualquier fuente, también el True Damage. Es vida: lo que se lleva cuenta como daño (un veneno que pide lastimar entra igual). Es neta: lo que se gasta no vuelve. Sin turnos dura hasta gastarse; si el efecto le pone turnos, vence. Se sube o baja a mano desde el chip.'},
+  // Escudo especial (2026-10-27, P227): una barra de HP aparte que absorbe el daño; lo que se come el escudo NO es daño (lo que pide lastimar no entra).
+  {nombre:'Escudo especial', alias:['Escudo mágico'], polaridad:'buff', permanente:true, turnos:0, escudoMagico:5, sinRecarga:true,
+    detalle:'Un escudo: una barra de HP aparte que absorbe el daño de cualquier fuente antes que la vida. Lo que se come el escudo no es daño: si se come todo el golpe, no entra nada de lo que pide lastimar (veneno, sangrado…). Sin turnos dura hasta gastarse; si el efecto le pone turnos, vence.'},
   // Shield (Support, dueño 2026-10-11): absorbe 14 de daño y dura hasta gastarse — no vence por turnos ni se recarga; gastado, se va (seGasta).
   {nombre:'Shield', polaridad:'buff', permanente:true, turnos:0, escudoMagico:14, sinRecarga:true, seGasta:true,
     detalle:'Shield del Support: absorbe 14 de daño, de un golpe o de varios, como una barra de HP secundaria (🛡). Dura hasta gastarse: no vence por turnos ni se recarga.'},

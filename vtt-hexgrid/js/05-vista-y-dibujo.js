@@ -475,6 +475,7 @@ function dibujarLienzo(){
       const cT = typeof trampaCentro === 'function' ? trampaCentro(el) : celdas[0];
       trampaFichaDibujar(hexCentro(cT.col, cT.fila), z, disp);
       if(typeof atrapaDibujarSuelo === 'function' && atrapaDibujarSuelo(el, celdas, z)) superficiesAnimando = true;   // 🕸 la telaraña o la red, encima de la ficha: se lee qué trampa es (js/68)
+      if(typeof cordonDibujarSuelo === 'function' && cordonDibujarSuelo(el, celdas, z, bordeCeldas)) superficiesAnimando = true;   // 🪢 el Cordón oculto (js/79)
       const dst = destinoParsear(el.trampaDestino) || portalFijoDe(el);   // también el portal de la Varita del portal
       if(dst){   // trampa de teleport: se marca el destino (lo ve quien ve la trampa)
         const pD = hexCentro(dst.col, dst.fila);
@@ -763,6 +764,7 @@ function dibujarLienzo(){
   }
 
   if(typeof trampaConosDibujar === 'function') trampaConosDibujar(z);   // 🪤👁 los conos de los rivales mientras se elige dónde va una trampa (js/79)
+  if(typeof ceboDibujar === 'function' && ceboDibujar(z)) animando = true;   // 💎 el brillo del cebo (js/80)
   if(typeof vigilanciaDibujar === 'function') vigilanciaDibujar(z);   // 👁 el alcance de quien está en vigilancia (js/58)
   // Auras: una superficie de color semitransparente alrededor del token.
   tokens.forEach((t, id) => {

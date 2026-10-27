@@ -78,17 +78,17 @@ async function orbeCustodioMapa(o){
   const el = lista.length === 1 ? lista[0] : await new Promise(res => {
     let listo = false;
     const fin = x => { if(listo) return; listo = true; AvisoCombate.cerrar(); res(x); };
-    AvisoCombate.mostrar({icono: '🔮', titulo: `${o.orbe}: ¿a quién cubrís?`, texto: `Vida extra ${o.n} hasta su próximo turno: para vos o para un aliado dentro de tu Rango (${rng}).`,
+    AvisoCombate.mostrar({icono: '🔮', titulo: `${o.orbe}: ¿a quién cubrís?`, texto: `Un escudo de ${o.n} hasta su próximo turno: para vos o para un aliado dentro de tu Rango (${rng}).`,
       botones: [...lista.map(a => ({texto: a.yo ? `${nombreDe(a.t)} (vos)` : nombreDe(a.t), alClic: () => fin(a)})), {texto: 'A nadie', sec: true, alClic: () => fin(null)}], alCerrar: () => fin(null)});
   });
   if(!el) return;
-  const spec = {nombre: 'Vida extra', turnos: 1, escudoMagico: o.n};
+  const spec = {nombre: 'Escudo especial', turnos: 1, escudoMagico: o.n};   // un escudo (P227, 2026-10-27; antes «Vida extra»)
   try{
     if(el.t.tipo === 'creep') await modificarCreep(el.t.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
     else{
       const f = fichasPub.get(String(el.t.fichaId).split(SEP_INVOCACION)[0]);
       await EstadosAplicar.encolarPj({fichaId: el.t.fichaId, duenoUid: (f && f.duenoUid) || el.t.duenoUid, spec, origen: `${o.quien || ''} (${o.orbe})`.trim()});
     }
-    mesaLinea(`🔮 ${o.orbe}: ${nombreDe(el.t)} recibe Vida extra ${o.n} hasta su próximo turno`);
-  }catch(err){ console.error('Orbe del custodio:', err); toast(`${o.orbe}: no se pudo dar la Vida extra — a mano`); }
+    mesaLinea(`🔮 ${o.orbe}: ${nombreDe(el.t)} recibe un escudo de ${o.n} hasta su próximo turno`);
+  }catch(err){ console.error('Orbe del custodio:', err); toast(`${o.orbe}: no se pudo dar el escudo — a mano`); }
 }

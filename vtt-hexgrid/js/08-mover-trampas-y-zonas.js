@@ -750,7 +750,7 @@ function trampaValorStat(x, stat){
   const f = fichasPub.get(String(x.fichaId || '').split(SEP_INVOCACION)[0]);
   return f && f.resumen ? num(f.resumen[stat]) : 0;
 }
-async function trampaAplicarEfectos(t, el, celdaPisada, esquive, idT){
+async function trampaAplicarEfectos(t, el, celdaPisada, esquive, idT, desde){
   const afectados = trampaAfectados(t, el, celdaPisada, esquive), salva = trampaSalvaDe(el);
   if(esquive && !afectados.includes(t)){   // Reflejos de mangosta: se tiró y quedó fuera de su alcance
     const quien = t.oculto ? 'Alguien' : nombreDe(t), nom = el.trampaNombre || 'una trampa';
@@ -765,11 +765,14 @@ async function trampaAplicarEfectos(t, el, celdaPisada, esquive, idT){
     ...(explota ? {explota} : {}),
     nombreT: el.trampaNombre || 'una trampa', salva, dano: trampaDanoValido(el.trampaDano) ? el.trampaDano.trim() : '', ignoraDef: !!el.trampaIgnoraDef,
     specJson: spec && spec.nombre ? el.trampaEstado : '', elemento: (spec && spec.elemento) || '', altura: alturaDe(el), pierdeSp: (spec && spec.pierdeSp) || '', cadena: (spec && spec.cadena) || null, portal: (spec && spec.portal) || null, requiereDano: !!(spec && spec.requiereDano), duenoTrampa: el.duenoUid || '',
+    ...(spec && num(spec.pf) > 0 ? {perfora: num(spec.pf)} : {}),   // 🗡 Perfora (la Aguja, 2026-10-27)
     aMano: (String(el.trampaDetalle || '').match(/[^.]*\(a mano\)\./g) || []).map(x => x.trim()).join(' '),   // lo que el texto dice que va a mano
     celdas: celdasDeElemento(el).flatMap(c => [c.col, c.fila]),   // dónde está la trampa (el dodge roll de Reflejos de mangosta: ¿quedó afuera?)
   };
   for(const x of afectados){
-    await trampaMomentoNuevo({...comun, x, tokenId: x === t && idT ? idT : zonaIdDe(x), quien: x.oculto ? 'Alguien' : nombreDe(x), pisador: x === t, muro: x === t && muro ? muro.turnos : 0,
+    // 🪢 El Cordón oculto (2026-10-27): quien lo pisó y no se aguanta cae una casilla más allá, en la dirección en que venía.
+    const adelante = x === t && spec && spec.adelante ? trampaCasillaAdelante(celdaPisada || {col: t.col, fila: t.fila}, desde) : null;
+    await trampaMomentoNuevo({...comun, ...(adelante ? {adelante} : {}), x, tokenId: x === t && idT ? idT : zonaIdDe(x), quien: x.oculto ? 'Alguien' : nombreDe(x), pisador: x === t, muro: x === t && muro ? muro.turnos : 0,
       muroLargo: muro ? muro.largo : 0, zona: x === t && el.trampaDejaZona ? (Math.max(1, Math.round(num(el.zonaTurnos)) || 3)) : 0});
   }
 }
@@ -779,6 +782,14 @@ async function trampaAplicarEfectos(t, el, celdaPisada, esquive, idT){
    de quien la pisó, según hacia dónde caminaba (la casilla anterior de su recorrido): 3 = el frente y las dos diagonales de adelante; 5 = además
    los dos costados. Es una forma Sólida y fijada (no se pasa ni se ve a través), que se va sola con los turnos; una casilla con un token o que ya
    es sólida queda libre. La crea la pantalla de quien movió (como el resto del disparo). */
+// La casilla de adelante de `celda`, siguiendo la dirección de `desde` → `celda` (la anterior de su recorrido); sin saber de dónde venía, null.
+function trampaCasillaAdelante(celda, desde){
+  if(!celda || !desde) return null;
+  const c0 = hexACubo(celda), d0 = hexACubo(desde);
+  const dq = c0.q - d0.q, dr = c0.r - d0.r;
+  if(!VECINO_LADO.some(([a, b]) => a === dq && b === dr)) return null;
+  return {col: cuboACol(c0.q + dq, c0.r + dr), fila: cuboAFila(c0.q + dq, c0.r + dr)};
+}
 function trampaMuroDe(el){
   let e = null; try{ e = el.trampaEstado ? JSON.parse(el.trampaEstado) : null; }catch(x){}
   return e && e.muro ? TokensAuto.muroNorm(e.muro) : null;
@@ -858,7 +869,7 @@ async function trampaResolver(){
     alertaRojaAnonima(`⚠ Trampa de ${nombreMiembro(p.el.duenoUid)}${nombre}`, `${nombreDe(t)} la activó${p.el.trampaDetalle ? ' — ' + p.el.trampaDetalle : ''}`);
     // Activar una trampa rompe el sigilo (2026-09-24, regla dicha por el dueño).
     if(enSigilo(t)) await romperSigilo(p.tokenId, '', `${nombreDe(t)} activó una trampa`);
-    await trampaAplicarEfectos(t, p.el, celda0, esquive, p.tokenId);   // la salvación, el daño y el estado de cada uno, con su Aviso y la Crónica
+    await trampaAplicarEfectos(t, p.el, celda0, esquive, p.tokenId, p.desde);   // la salvación, el daño y el estado de cada uno, con su Aviso y la Crónica
     if(p.el.trampaDestino && !zafo) await trampaTeleportar(p.tokenId, tokens.get(p.tokenId), p.el);
     const muro = trampaMuroDe(p.el);
     if(muro) await trampaLevantarMuro(t, p.celda || t, p.desde, muro, p.el.trampaNombre || 'Trampa de muro');

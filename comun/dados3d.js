@@ -212,6 +212,10 @@ function dadosBotonLimpiar(){
   b.style.cssText = 'position:fixed;right:24px;bottom:84px;z-index:100001;pointer-events:auto;background:#241b2a;color:#f1e6d0;border:1px solid #6b5876;'
     + 'border-radius:10px;padding:7px 12px;font:600 13px system-ui,sans-serif;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.5);opacity:.92';
   b.onclick = () => dadosLimpiarTodo();
+  // En el mapa (2026-10-27, dueño: «sobre el texto de la mesa queda muy perdido»): abajo, sobre el mapa, pegado al panel de la Mesa (no encima).
+  const panel = document.querySelector('aside');
+  const r = panel && panel.offsetParent !== null ? panel.getBoundingClientRect() : null;
+  if(r && r.left > innerWidth / 2 && r.height > innerHeight / 2){ b.style.right = Math.round(innerWidth - r.left + 16) + 'px'; b.style.bottom = '20px'; }
   document.body.appendChild(b);
 }
 

@@ -55,12 +55,15 @@ const TokensAuto = (() => {
     const rd = !!(extra && extra.requiereDano);
     const rp = !!(extra && extra.renuevaPaso);
     const ex = !!(extra && extra.explota);
+    const pf = Math.max(0, Math.min(5, Math.round(Number(extra && extra.perfora) || 0)));   // 🗡 Perfora N (2026-10-27, la Aguja): N del daño pasan siempre la Defensa
+    const ad = !!(extra && extra.adelante);   // 🪢 al caer, una casilla más allá (el Cordón oculto, 2026-10-27)
+    const vi = extra && ['cordon'].includes(extra.visual) ? extra.visual : '';   // cómo se dibuja (el cordón entre dos estacas)
     const mg = !!(extra && extra.magica);   // 🪄 mágica (2026-10-19, dueño): se desarma —o se disipa— con el Efecto especial; la mecánica, con la Destreza   // 💥 explota (2026-10-17): la animación al pisarla (vtt-hexgrid/js/19)
     const al = extra && ['piso', 'aire', 'ambos'].includes(extra.altura) ? extra.altura : '';   // dónde está su efecto (2026-10-07: Levitar y las Suelas)   // la Brea (2026-10-04, dueño): cada paso sobre ella le renueva el estado a quien ya lo tiene   // el Dardo (2026-10-04, dueño): lo que deja solo entra si el daño pasó la Defensa
     const po = extra && extra.portal && Number(extra.portal.rango) >= 1 ? {rango: Math.min(20, Math.round(Number(extra.portal.rango))),
       ...(/^-?\d+,-?\d+$/.test(String(extra.portal.destino || '')) ? {destino: String(extra.portal.destino)} : {})} : null;   // destino fijo: Varita del portal (2026-10-05)   // el Portal cósmico: su dueño elige adónde lo manda
     const o = {...(estado && estado.nombre ? estado : {}), ...(sv ? {salva: sv} : {}), ...(mu ? {muro: mu} : {}), ...(ef ? {efecto: ef} : {}), ...(elem ? {elemento: elem} : {}), ...(le ? {lento: le} : {}),
-      ...(ps ? {pierdeSp: ps} : {}), ...(dz ? {danoZona: dz} : {}), ...(ca ? {cadena: ca} : {}), ...(po ? {portal: po} : {}), ...(rd ? {requiereDano: true} : {}), ...(rp ? {renuevaPaso: true} : {}), ...(al ? {altura: al} : {}), ...(ex ? {explota: true} : {}), ...(mg ? {magica: true} : {})};
+      ...(ps ? {pierdeSp: ps} : {}), ...(dz ? {danoZona: dz} : {}), ...(ca ? {cadena: ca} : {}), ...(po ? {portal: po} : {}), ...(rd ? {requiereDano: true} : {}), ...(rp ? {renuevaPaso: true} : {}), ...(al ? {altura: al} : {}), ...(ex ? {explota: true} : {}), ...(mg ? {magica: true} : {}), ...(pf ? {pf} : {}), ...(ad ? {adelante: true} : {}), ...(vi ? {visual: vi} : {})};
     const j = Object.keys(o).length ? JSON.stringify(o) : '';
     if(j.length > 300) return '';
     // Quién la colocó (2026-10-07, dueño: «siempre los turnos contando al caster»): `de` = "ref|tipo"; el mapa le descuenta los turnos al
@@ -161,7 +164,7 @@ const TokensAuto = (() => {
         forma: linea ? 'linea' : 'flor', radio: linea ? 0 : Plantillas.radioDeTrampa(t), largo: linea ? t.tamano : 0, cant: t.cant,
         estado: t.estado ? {nombre: t.estado, ...(t.estadoTurnos ? {turnos: t.estadoTurnos} : {}), ...(t.estadoMods ? {mods: t.estadoMods} : {}), ...(t.estadoStacks ? {stacks: t.estadoStacks} : {}), ...(t.estadoHp ? {hp: t.estadoHp} : {}), ...(t.soltar ? {soltar: t.soltar} : {})} : null,
         salvacion: t.salvacion || null, muro: t.muro || null, efecto: t.efecto || null, elemento: t.elemento || '', lento: t.lento || 0,
-        extraJson: {pierdeSp: t.pierdeSp || '', danoZona: t.danoZona || '', cadena: t.cadena || null, portal: t.portal || null, requiereDano: !!t.requiereDano, renuevaPaso: !!t.renuevaPaso, altura: t.altura || '', explota: !!t.explota, magica: t.detectarStat === 'dmgesp', de: o.fichaId ? `${o.fichaId}|${o.tipoToken === 'pj' ? 'pj' : 'creep'}` : ''},
+        extraJson: {pierdeSp: t.pierdeSp || '', danoZona: t.danoZona || '', cadena: t.cadena || null, portal: t.portal || null, requiereDano: !!t.requiereDano, renuevaPaso: !!t.renuevaPaso, altura: t.altura || '', explota: !!t.explota, perfora: t.perfora || 0, adelante: !!t.adelante, visual: t.visual || '', magica: t.detectarStat === 'dmgesp', de: o.fichaId ? `${o.fichaId}|${o.tipoToken === 'pj' ? 'pj' : 'creep'}` : ''},
         dejaZona: t.dejaZona ? t : null, turnos: Math.max(0, Math.round(Number(t.turnos) || 0)), detectar: t.detectar};
     }
     const mapaId = o.mapaId || await mapaQueMiraElGM();

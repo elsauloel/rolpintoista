@@ -94,8 +94,14 @@ const FichaAcciones = (() => {
     if(t.r && ui.registrarTirada) ui.registrarTirada(`Soltarse (${est.nombre}) · ${s.etq} contra ${s.dif}`, t.r);
     if(t.ok) S.efectos = S.efectos.filter(e => e !== est);
     const hundio = Combatiente.hundirSiFalla(est, t);
-    ui.cambio(['efectos', 'nitros']);
-    ui.toast(`${t.ok ? 'Te soltaste' : 'No te soltaste'} (${t.r ? t.r.total : '—'} contra ${s.dif})${s.no2 ? ` · −${fmt(s.no2)} No2` : ''}${hundio ? ` · te hundiste más: +${s.hunde} turno${s.hunde === 1 ? '' : 's'}` : ''}`);
+    // 🪤 Si falla y lo que lo agarra lastima (el Cepo del cazador, 2026-10-27): ese daño, directo a la vida.
+    let herida = 0;
+    if(!t.ok && s.hiere && typeof tirarDados === 'function'){
+      const rh = tirarDados(s.hiere);
+      if(rh){ herida = rh.total; if(ui.registrarTirada) ui.registrarTirada(`${est.nombre}: al forcejear se lastima · Daño directo`, rh); if(ui.fijarHp) ui.fijarHp(num(S.hp) - herida); else fijarHp(S, num(S.hp) - herida); }
+    }
+    ui.cambio(['efectos', 'nitros', ...(herida ? ['vitals'] : [])]);
+    ui.toast(`${t.ok ? 'Te soltaste' : 'No te soltaste'} (${t.r ? t.r.total : '—'} contra ${s.dif})${s.no2 ? ` · −${fmt(s.no2)} No2` : ''}${hundio ? ` · te hundiste más: +${s.hunde} turno${s.hunde === 1 ? '' : 's'}` : ''}${herida ? ` · te lastimás: −${fmt(herida)} HP` : ''}`);
   }
 
   /* ---------- La vida: Ankh y estado de muerte (js/02) ----------
@@ -137,6 +143,12 @@ const FichaAcciones = (() => {
     const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
     const tope = hpmax > 0 ? hpmax : Math.max(0, num(valor));
     const antes = num(S.hp);
+    // 🩸 El Relicario de sangre (dueño, 2026-10-27: «toda curación cuenta como vida extra… hasta el final del combate»): lo que una cura pasa del máximo
+    // queda como Vida extra (hasta +50 % del máximo, contando la que ya tiene); se va al «Finalizar combate». Una cura a alguien caído no entra.
+    if(hpmax > 0 && antes > 0 && num(valor) > hpmax && Combatiente.relicarioEnEquipo(S.inventario)){
+      const exc = Combatiente.excedenteConTope(S.efectos, num(valor) - Math.max(antes, hpmax), hpmax, Combatiente.RELICARIO_TOPE);
+      if(exc > 0) S.efectos = [...(S.efectos || []), Combatiente.estadoVidaExtra(exc, {finCombate: true, detalle: 'Vida extra del Relicario de sangre: lo que la cura pasó del máximo. Se va al terminar el combate.', id: uid()})];
+    }
     S.hp = Math.max(0, Math.min(tope, num(valor)));
     if(antes > 0 && S.hp <= 0 && ultimoAlientoListo(S)) ultimoAlientoUsar(S);   // 💍 el Anillo del último aliento (2026-10-18)
     return S.hp;
@@ -977,6 +989,7 @@ const FichaAcciones = (() => {
     if(spec.miedoDe){ draft.miedoDe = spec.miedoDe; draft.miedoDeNombre = spec.miedoDeNombre || ''; }
     if(spec.provocaDe){ draft.provocaDe = spec.provocaDe; draft.provocaDeNombre = spec.provocaDeNombre || ''; }   // 😤 Provocado por quién (2026-10-26)   // 😱 Miedo (2026-10-18): quién lo asustó
     if(spec.resetea) draft.resetea = true;   // ☠ vuelve a esos stacks, no los suma (la Nube tóxica, 2026-10-26)
+    if(spec.finCombate) draft.finCombate = true;   // 🩸 se va al «Finalizar combate» (el Relicario de sangre, 2026-10-27)
     return draft;
   }
   function aplicarEstadoRecibido(S, spec, origen, ui){

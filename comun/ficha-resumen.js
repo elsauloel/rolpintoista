@@ -215,6 +215,7 @@ const FichaResumen = (() => {
         .map(inv => ({
           id: String(inv.id),
           nombre: String(inv.nombre || 'Invocación').slice(0, 60),
+          nivel: num(inv.nivel) || 1,   // (el límite de trampas, 2026-10-27)
           hp: num(inv.hp),
           hpMax: num(inv.hpMax),
           // Nitros y estados, para que el token en el mapa muestre lo mismo

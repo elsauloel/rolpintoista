@@ -557,6 +557,8 @@ function trampaDeHabilidad(msg){
         if(ve){ toast(`⚠ ${ve} mira esa casilla: una trampa no se coloca a la vista de un rival (fuera de su cono azul)`); otra(i); return; }
         trampaAvisarAlcance(msg, h);
       }
+      // 🪤 El límite (nivel + 1 por tipo, 2026-10-27, js/79): si ya está en el tope, elige cuál de las suyas se desarma; si cancela, no se coloca.
+      if(!pilar && msg.fichaId && typeof trampaLimite === 'function' && !(await trampaLimite(msg, String(t.nombre || msg.nombre || '').trim()))){ toast(`🪤 ${msg.nombre}: no se colocó`); fin(); return; }
       try{
         if(pilar){
           if(!(await levantarPilar(h, t))){ otra(i); return; }   // casilla ocupada: la vuelve a pedir
@@ -1781,7 +1783,7 @@ async function dueloAplicarDano(d){
     if(d.hab && d.hab.atrae && !res.r.invulnerable) await dueloAtraer(d).catch(err => console.error('No se pudo atraer al objetivo:', err));   // el gancho
     if(d.hab && d.hab.riesgo && (dn.rolls || []).map(num).includes(num(d.hab.riesgo.si))) await dueloRiesgo(d).catch(err => console.error('No se pudo aplicar el riesgo:', err));   // la inestable
     // `perfora`: solo si la Perfora mandó (pasaron esos N, la Defensa frenaba más): el duelo lo cuenta así.
-    return {...base, desgaste, defensa: crit ? restaIgnorando : def, ...(perfora ? {perfora} : {}), ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, ...(num(res.r.mitiMiti) > 0 ? {mitiMiti: num(res.r.mitiMiti), mitiMitiNombre: String(res.r.mitiMitiNombre || '').slice(0, 40), mitiMitiTxt: String(res.r.mitiMitiTxt || 'Miti-Miti').slice(0, 20)} : {}), hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(magico ? {magico} : {}), ...(porDano ? {porDano} : {})};
+    return {...base, desgaste, defensa: crit ? restaIgnorando : def, ...(perfora ? {perfora} : {}), ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), ...(num(res.r.vida) > 0 ? {vidaAbs: num(res.r.vida)} : {}), invulnerable: !!res.r.invulnerable, ...(num(res.r.mitiMiti) > 0 ? {mitiMiti: num(res.r.mitiMiti), mitiMitiNombre: String(res.r.mitiMitiNombre || '').slice(0, 40), mitiMitiTxt: String(res.r.mitiMitiTxt || 'Miti-Miti').slice(0, 20)} : {}), hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(magico ? {magico} : {}), ...(porDano ? {porDano} : {})};
   }catch(err){
     console.error('No se pudo aplicar el daño del duelo:', err);
     return {...base, defensa: def, manual: true, golpe: base.mitad ? aplicar : golpe, motivoManual: err && err.message === 'SIN_DEF' ? 'la ficha todavía no publicó su Defensa' : 'falló la escritura'};
@@ -2069,8 +2071,12 @@ async function dueloCurar(t, n){
   n = Math.max(0, Math.round(num(n)));
   if(t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION)) return dueloCurarInv(t, n);
   if(t.tipo === 'creep'){
-    const res = await modificarCreep(t.fichaId, sc => { const previo = num(sc.hp); const tope = num(sc.hpMax) > 0 ? num(sc.hpMax) : previo + n; const sin = n > 0 && previo > 0 && Combatiente.sinCura(sc.estados); sc.hp = Math.min(tope, previo + Combatiente.curaQueEntra(previo, n, sc.estados)); return {previo, nuevo: sc.hp, sin}; });
-    return {previo: res.previo, nuevo: res.nuevo, ...(n > 0 && res.previo <= 0 ? {caido: true} : {}), ...(res.sin ? {sinCura: true} : {})};
+    const res = await modificarCreep(t.fichaId, sc => { const previo = num(sc.hp); const tope = num(sc.hpMax) > 0 ? num(sc.hpMax) : previo + n; const sin = n > 0 && previo > 0 && Combatiente.sinCura(sc.estados); const entra = Combatiente.curaQueEntra(previo, n, sc.estados); sc.hp = Math.min(tope, previo + entra);
+      // 🩸 el Relicario de sangre (2026-10-27): lo que pasa del máximo, Vida extra hasta el fin del combate (+50 % como mucho)
+      const exc = entra > 0 && num(sc.hpMax) > 0 && CreepCalculo.talisman(sc, 'relicario') > 0 ? Combatiente.excedenteConTope(sc.estados, previo + entra - tope, tope, Combatiente.RELICARIO_TOPE) : 0;
+      if(exc > 0) sc.estados = [...(sc.estados || []), Combatiente.estadoVidaExtra(exc, {finCombate: true, detalle: 'Vida extra del Relicario de sangre: lo que la cura pasó del máximo. Se va al terminar el combate.'})];
+      return {previo, nuevo: sc.hp, sin, exc}; });
+    return {previo: res.previo, nuevo: res.nuevo, ...(res.exc ? {excedente: res.exc} : {}), ...(n > 0 && res.previo <= 0 ? {caido: true} : {}), ...(res.sin ? {sinCura: true} : {})};
   }
   const base = fbDb.doc(fbRutaCampana(`fichas/${t.fichaId}`));
   const parteRef = base.collection('partes').doc('general');
@@ -2086,7 +2092,12 @@ async function dueloCurar(t, n){
     datos.hp = Math.min(tope, previo + n);
     tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
     tx.update(base, {actualizado: ts, 'resumen.hp': datos.hp});
-    return {previo, nuevo: datos.hp};
+    // 🩸 el Relicario de sangre (2026-10-27): lo que pasa del máximo queda como Vida extra hasta el fin del combate (+50 % como mucho).
+    const exc = num(rs.relicario) > 0 && num(rs.hpMax) > 0 ? Combatiente.excedenteConTope(rs.estados, previo + n - tope, tope, Combatiente.RELICARIO_TOPE) : 0;
+    return {previo, nuevo: datos.hp, ...(exc ? {excedente: exc} : {})};
+  }).then(async r => {
+    if(r && r.excedente) try{ await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: {nombre: 'Vida extra', escudoMagico: r.excedente, finCombate: true}, origen: 'Relicario de sangre'}); }catch(err){ console.error('Relicario de sangre:', err); }
+    return r;
   });
 }
 

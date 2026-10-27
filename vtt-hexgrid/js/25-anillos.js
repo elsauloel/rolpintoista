@@ -65,7 +65,7 @@ async function anillosEmpezar(id, t, d){
       if(mad > 0 && (obj.meta || {}).madrugadorDia !== dia){ obj.nitros = num(obj.nitros) + mad; obj.meta = {...(obj.meta || {}), madrugadorDia: dia}; lineas.push(`Madrugador: +${mad} No2 (primer combate del día)`); }
       const c = d.v('cascara');
       if(c > 0){ lista.push({id: anillosId(), nombre: 'Cáscara protectora', polaridad: 'buff', activo: true, permanente: true, anillo: true, sinRecarga: true,
-        escudoMagico: c, escudoMagicoActual: c, detalle: `Vida extra de ${c} que no se recarga: dura hasta que termine el combate.`}); lineas.push(`Cáscara protectora: Vida extra ${c}`); }
+        escudoMagico: c, escudoMagicoActual: c, detalle: `Un escudo de ${c} que no se recarga: dura hasta que termine el combate.`}); lineas.push(`Cáscara protectora: escudo de ${c}`); }
       if(el){ const e = Combatiente.ELEMENTOS[el]; lista.push({id: anillosId(), nombre: `Cambiante (${e.etq.replace('Res. ', '')})`, polaridad: 'buff', activo: true, permanente: true, anillo: true,
         mods: [{stat: 'res' + el, val: n}], detalle: `${e.etq} +${n} durante este combate.`}); lineas.push(`Cambiante: ${e.etq} +${n}`); }
       Object.entries(ANILLO_ATRIB).forEach(([st, a]) => {

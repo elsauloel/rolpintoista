@@ -38,7 +38,7 @@ Cuenta los conceptos con alguna habilidad (de fábrica auditada o de los creeps 
 de fábrica como «sin auditar», con su rol y su concepto: `ORIGEN` en `comun/skills-creep-base.js`). **Rango y Hunter se cuentan juntos** (dueño: «se van
 a superponer en muchos casos»). Se actualiza al cerrar cada habilidad.
 
-- 🛡 **Choque pesado — 21**: takle (2026-10-26), más daño, empujar, atrapar, guardia, salto, barrido, desarmar, golpe anunciado, remate, romper armadura, aturdir (Pisotón, 2026-10-26) · de El origen:
+- 🛡 **Choque pesado — 21** (+14 definidas el 2026-10-27, sin programar: 10 warrior · 10 tanque · 10 ambiguas; ver «Tanda Choque pesado»): takle (2026-10-26), más daño, empujar, atrapar, guardia, salto, barrido, desarmar, golpe anunciado, remate, romper armadura, aturdir (Pisotón, 2026-10-26) · de El origen:
   furia, pisotón, provocar, segundo aliento, aguantar el daño, cubrir al de al lado, perforar, carga que derriba.
 - 🗡 **Choque liviano — 20**: desaparecer en la pelea (Bomba de humo, 2026-10-26), golpe desesperado (2026-10-26), golpe preciso, sangrado, trabar, golpear y alejarse, salto, abrir la herida, manada, ráfaga, por la espalda · de El origen:
   robar, sigilo, varios golpes, bajo tierra, veneno (de fábrica desde el 2026-10-25: Hoja envenenada / Mordisco infectado), todo al ataque (Degollar, 2026-10-26), finta (2026-10-26), dash (2026-10-26), ojo de asesino (2026-10-26).
@@ -346,7 +346,11 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
      este turno.»; dueño, 2026-10-27: «está bien que sea más poderosa, pero solamente contra sí mismo, no contra aliados»): **Flash** (botón
      instantáneo en el duelo); **absorbe 12 de daño** de la próxima fuente de daño de este turno, **solo sobre sí mismo**. 1 SP (2 en turno ajeno),
      o cooldown 2; sin No2. Combina con Interponerse (se mete en el golpe y lo absorbe) y con Escudo humano.
-- **Cuenta** (2026-10-27, después de la 13): ⚔ 10 · 🛡 10 · ⚖ 9. Falta una ambigua para 10 · 10 · 10.
+  14. ⚖ **Arrastrar** (C16; dueño, 2026-10-27: «va así»): a un rival a **3 casillas o menos**: **Destreza contra la Evasión**; si lo engancha, lo
+     **arrastra hasta quedar pegado** a él (no camina: sin No2 ni ataques de oportunidad; las trampas y zonas del camino **sí lo tocan**) y le pega
+     con su arma con **+2 PdG**. Un ataque y 2 SP, o cooldown 2. Combina con Provocar, Golpe de escudo y Golpe que sigue.
+- **Cuenta** (2026-10-27): ✅ **⚔ 10 · 🛡 10 · ⚖ 10**, todas definidas. **Falta programarlas** (las 14 nuevas y los cambios de clase en Taunt,
+  Golpe brutal y Contraataque) cuando el dueño lo diga.
 - Ya cubiertas por una de fábrica: Amplificar daño (Golpe fuerte), Remolino (Barrido), Shockwave (Pisotón), Takle, Desarmar, Aguante; Cañón Vasco ≈
   Salto aplastante; Daño en área (tanque) ≈ Barrido. Sacadito sigue en pausa.
 

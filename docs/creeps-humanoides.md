@@ -78,8 +78,9 @@ estuvimos trabajando para los skills». 4 de cada uno, como el resto, salvo que 
 | D3 | Ladrón de fuerzas | Robar el aliento, Extenuar, sanguijuela |
 | D4 | Control mental y ceguera | Confusión, Cegar, Grito de pánico, Tótem de silencio |
 
-**Huecos del pool**: el Tanque tiene pocas skills propias auditadas (Aguante, Desarmar, Pisotón, Takle). **Antes de empezar con los creeps se diseña
-una tanda de skills de Tanque** (dueño, 2026-10-26), con la lista de ideas de `diseno-roles-creep.md` («Tanda Tanque»). Si otra línea necesita una
+**Huecos del pool**: el Tanque tenía pocas skills propias auditadas (Aguante, Desarmar, Pisotón, Takle). ✅ **Tanda Choque pesado definida el
+2026-10-27**: 14 nuevas para quedar en 10 warrior · 10 tanque · 10 ambiguas («Tanda Choque pesado 10 · 10 · 10» en `diseno-roles-creep.md`);
+falta programarlas. Los estilos de abajo se repasan con ellas al llegar a cada línea. Si otra línea necesita una
 skill que no existe, se diseña en el momento con el método de siempre.
 
 Los Casters (Mago, Support, Debuffer) usan armas especiales (varitas, báculos) y orbes o talismanes; el Rango, arcos, ballestas y hondas, con sus

@@ -762,6 +762,7 @@ function dibujarLienzo(){
     });
   }
 
+  if(typeof trampaConosDibujar === 'function') trampaConosDibujar(z);   // 🪤👁 los conos de los rivales mientras se elige dónde va una trampa (js/79)
   if(typeof vigilanciaDibujar === 'function') vigilanciaDibujar(z);   // 👁 el alcance de quien está en vigilancia (js/58)
   // Auras: una superficie de color semitransparente alrededor del token.
   tokens.forEach((t, id) => {

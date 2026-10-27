@@ -547,11 +547,16 @@ function trampaDeHabilidad(msg){
   const fin = () => { if(cant > 1 && puestas) toast(pilar ? `🧱 ${msg.nombre}: ${puestas} pilar${puestas === 1 ? '' : 'es'}` : `🪤 ${msg.nombre}: ${puestas} trampa${puestas === 1 ? '' : 's'} colocada${puestas === 1 ? '' : 's'}`); };
   const otra = i => {
     const cuenta = cant > 1 ? ` (${i + 1} de ${cant})` : '';
-    elegirDestino(async h => {
+    (pilar ? elegirDestino : (cb, ...r) => elegirCasillaTrampa(msg, cb, ...r))(async h => {   // 🪤👁 con los conos de los rivales a la vista (js/79)
       // 🪤 Regla general (dueño, 2026-10-20): una trampa se coloca dentro del Rango de quien la pone y en una casilla que vea; si no, la vuelve a
       // pedir (como el Ojo de Kicillof y la Bombucha). Los pilares y el portal siguen con el aviso de siempre.
       if(!pilar && !portal){ const no = trampaFueraDeAlcance(msg, h); if(no){ toast(no); otra(i); return; } }
-      else trampaAvisarAlcance(msg, h);
+      else{
+        // 👁 El portal también es una trampa: no a la vista de un rival (dueño, 2026-10-27; js/79). Los pilares, no.
+        const ve = portal && typeof trampaALaVista === 'function' ? trampaALaVista(msg, h) : '';
+        if(ve){ toast(`⚠ ${ve} mira esa casilla: una trampa no se coloca a la vista de un rival (fuera de su cono azul)`); otra(i); return; }
+        trampaAvisarAlcance(msg, h);
+      }
       try{
         if(pilar){
           if(!(await levantarPilar(h, t))){ otra(i); return; }   // casilla ocupada: la vuelve a pedir
@@ -576,6 +581,9 @@ function trampaFueraDeAlcance(msg, h){
   const rr = typeof rangoDeToken === 'function' ? rangoDeToken(mio) : null, rng = rr ? Math.round(num(rr.rng)) : 0, d = distanciaHex(mio, h);
   if(rng > 0 && d > rng) return `⚠ Esa casilla queda a ${d}: la trampa se coloca dentro de tu Rango (${fmt(rng)})`;
   if(!celdasVisionDe(mio).includes(nbPack(h.col, h.fila))) return '⚠ Esa casilla no la ves: la trampa se coloca en tu campo de visión';
+  // 👁 Ni a la vista de un rival (dueño, 2026-10-27): no en el cono de visión directa de ninguno que se vea (js/79).
+  const ve = typeof trampaALaVista === 'function' ? trampaALaVista(msg, h) : '';
+  if(ve) return `⚠ ${ve} mira esa casilla: una trampa no se coloca a la vista de un rival (fuera de su cono azul)`;
   return '';
 }
 /* 🪤 Una trampa consumible (2026-10-20, dueño: la misma regla que todas): se elige la casilla con un clic, dentro del Rango y a la vista de quien
@@ -585,7 +593,7 @@ function trampaConsumibleEnMapa(msg){
   const mio = [...tokens.values()].find(x => x.fichaId === msg.fichaId && x.tipo === (msg.tipoToken || 'pj'));
   if(!mio){ toast(`🪤 ${nombre}: ${msg.tipoToken === 'creep' ? 'el creep' : 'tu personaje'} no tiene token en este mapa — no se usó`); return Promise.resolve(false); }
   return new Promise(res => {
-    const pedir = () => elegirDestino(async h => {
+    const pedir = () => elegirCasillaTrampa(msg, async h => {   // 🪤👁 con los conos de los rivales a la vista (js/79)
       const no = trampaFueraDeAlcance(msg, h);
       if(no){ toast(no); pedir(); return; }
       try{
@@ -641,13 +649,15 @@ async function colocarGlifo(msg){
   const rr = mio && typeof rangoDeToken === 'function' ? rangoDeToken(mio) : null;
   const rango = rr && num(rr.rng) > 0 ? Math.round(num(rr.rng)) : 0;   // 0: sin límite (lo pone el GM)
   const dentro = c => !rango || distanciaHex(mio, c) <= rango;
-  const pedir = (texto, libre, ok) => new Promise(res => {
-    const una = () => elegirDestino(c => { if(!ok(c)){ una(); return; } res(c); }, texto, libre, () => res(null));
+  const pedir = (texto, libre, ok, conos) => new Promise(res => {
+    const una = () => (conos ? (cb, ...r) => elegirCasillaTrampa(msg, cb, ...r) : elegirDestino)(c => { if(!ok(c)){ una(); return; } res(c); }, texto, libre, () => res(null));
     una();
   });
   const lim = rango ? `a ${rango} o menos de ${esc(nombreDe(mio))} (su Rango)` : 'clic en el mapa';
   const fuera = c => { if(dentro(c)) return false; toast(`⚠ Esa casilla queda a ${distanciaHex(mio, c)}: tiene que estar dentro del Rango (${rango})`); return true; };
-  const h = await pedir(`<b>🌀 ${esc(nombre)}: elegí la casilla del glifo</b> <span>${lim} · Esc o clic derecho cancelan</span>`, true, c => !fuera(c));
+  // 👁 El glifo es una trampa: no a la vista de un rival (dueño, 2026-10-27; js/79). El destino, sí puede verse.
+  const aLaVista = c => { const ve = typeof trampaALaVista === 'function' ? trampaALaVista(msg, c) : ''; if(ve) toast(`⚠ ${ve} mira esa casilla: una trampa no se coloca a la vista de un rival (fuera de su cono azul)`); return !!ve; };
+  const h = await pedir(`<b>🌀 ${esc(nombre)}: elegí la casilla del glifo</b> <span>${lim} · Esc o clic derecho cancelan</span>`, true, c => !fuera(c) && !aLaVista(c), true);
   if(!h) return false;
   const d = await pedir(`<b>🌀 ${esc(nombre)}: elegí adónde manda</b> <span>${lim} · Esc o clic derecho cancelan</span>`, false, c => {
     if(c.col === h.col && c.fila === h.fila){ toast('El destino no puede ser la misma casilla del glifo'); return false; }

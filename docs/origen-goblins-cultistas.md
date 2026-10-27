@@ -117,3 +117,19 @@ algo de defensa… elegí el mejor objeto posible»; y «el mago» era Larry: el
   bordadas del adivino. Sale la Capucha del culto. Queda: PdG.Esp 16, Defensa 3, Def.Esp 2, Res. crítico Tipo 4 1, Res.Esp 14, Res.CC 12, Res.Mt 20,
   Evasión 6. Consumible: Poción de SP menor.
 - **Quinta skill**: Ojo certero (1 No2, 3 SP, cd 3: Crítico frecuente +2 y potente +2, 2 turnos) al arquero. Alternativa: Arrojo (Flash, 3 SP: escudo de 10).
+
+#### Corrección del dueño (2026-10-27): el jefe es **debuffer**, no support
+
+Dueño: «cuando dije híbrido me refería a un choque que sea híbrido entre Warrior y choque liviano, para molestar a Larry y a Bizzante. Cuando dije lo
+de nivel 4 me refería al mago de los creeps, que yo en principio me lo imaginaba como debuffer, no como support. Así que lo subiría a nivel 4 y le
+pondría algún skill de daño siniestro que sume algo de daño mágico directo, estilo debuff.»
+
+- 👑 **Jefe humano, mago debuffer, nivel 4** — atributos y equipo como arriba (Con 12 · Fue 3 · Agi 6 · Des 6 · Esp 15; Varita de la grieta, Grimorio
+  gastado, Capacete de hierro, Túnica de aprendiz, Mitones del primer conjuro, Babuchas bordadas del adivino; Poción de SP menor).
+- **Skills (propuesta)**: **Aguja siniestra** (2 No2, 3 SP, cd 3: PdG.Esp contra Evasión, 1d6 siniestro directo, Herida sombría y Punto débil 2 turnos)
+  · **Maldición de la coraza** (2 No2, 3 SP, cd 3: contra Res.Esp, −2 Defensa y −2 Def.Esp 3 turnos) · **Confusión** (2 No2, 3 SP, cd 4 lenta: contra
+  Res.Mt, el control mental del culto) · **Sanguijuela** (2 No2, 3 SP, cd 3: 2d6 siniestro, se cura la mitad, el objetivo no se cura 4 turnos) ·
+  **Mal de ojo** (Flash, 5 SP, el botón 🧿).
+- **Números** (PdG.Esp 16): contra la Evasión (Aguja, Sanguijuela, la varita) Larry 97 %, Petro 88 %, Bizzante 87 %; contra la Res.Esp (Coraza, Mal
+  de ojo) Larry 97 %, Bizzante 94 %, Petro 88 %; Confusión contra la Res.Mt: Petro 94 %, Bizzante 80 %, Larry 35 %.
+- Se van Armas perforantes, Señalar la presa, ¡A la carga!, Bendecir el arma y Ojo certero (eran de support).

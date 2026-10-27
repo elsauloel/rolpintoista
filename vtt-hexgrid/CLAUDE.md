@@ -1844,4 +1844,11 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   llegada); **💨 Bomba de humo** (`bombaDeHumo`, js/57: `crearNiebla` a sus pies, Sigilo y el cartel del movimiento libre del Hit and run; la usan las
   Acciones de un creep, `ui.bombaHumo` de js/12, y el Asalto por el aviso `bomba-humo-habilidad`, js/11 y js/13). La `dueloDemora` ahora baja N lugares
   (el Cascotazo, Demora 2). El botón ✨ de los creeps (js/71) ofrece rivales cuando la habilidad Flash va contra un rival (el Takle).
+- **🕳 Excavar, una sola habilidad, y la estela del túnel** (2026-10-27, dueño, el Goblin tunelero de El origen): una habilidad con `excavar` y `emerger` a la
+  vez (`Excavar` de fábrica) usa el mismo botón para las dos cosas: arriba, `acExcavarMeterse` (js/12) cobra `excavarNo2` (1) y lo mete bajo tierra, sin
+  cooldown ni SP; abajo, sigue como un ataque que sale apuñalando (`acLanzarAtaqueDeHab` + `emergerToken`, el cooldown arranca ahí). Lo que recorre bajo
+  tierra queda en el token como `tunel` ([col, fila…]; `tunelTrasMover` desde `moverToken`, js/07, y el tramo hasta donde sale en `emergerToken`) y todos
+  lo ven (`dibujarTuneles`, desde js/05): tierra removida con piedritas que aparece de a una casilla, de atrás para adelante, y se va igual cuando el GM lo
+  borra (`tunelBorrar`: al empezar su próximo turno, `turnoDeToken` de js/04; sin orden de turnos, con el ⟳ de la ronda, `tunelMantenimiento`). En la
+  niebla no se ve; un token oculto no delata su túnel. **Regla nueva** (`tunel` en `tokenValido`): hay que pegarla.
 

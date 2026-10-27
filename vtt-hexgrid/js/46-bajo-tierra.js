@@ -36,11 +36,12 @@ function emergerToken(id, o){
   const pedir = () => elegirDestino(async h => {
     if(distanciaHex(h, pozo) > dist){ toast(`Tiene que salir a ${dist} casillas o menos del pozo`); pedir(); return; }
     if(elementoSolidoEn(h.col, h.fila) || [...tokens.entries()].some(([k, x]) => k !== id && x.col === h.col && x.fila === h.fila)){ toast('Esa casilla no está libre: elegí otra'); pedir(); return; }
-    const antes = {col: t.col, fila: t.fila, bajoTierra: true, rutaJson: t.rutaJson};
+    const antes = {col: t.col, fila: t.fila, bajoTierra: true, rutaJson: t.rutaJson, tunel: t.tunel};
+    const conTunel = tunelSumar(t, lineaHex(pozo, h));   // el tramo hasta donde sale también es túnel
     t.col = h.col; t.fila = h.fila; t.bajoTierra = false; t.rutaJson = '[]';
     estelas.delete(id); pedirDibujo();
     try{
-      await coleccionTokens().doc(id).update({col: h.col, fila: h.fila, bajoTierra: firebase.firestore.FieldValue.delete(), ruta: firebase.firestore.FieldValue.delete()});
+      await coleccionTokens().doc(id).update({col: h.col, fila: h.fila, bajoTierra: firebase.firestore.FieldValue.delete(), ruta: firebase.firestore.FieldValue.delete(), ...(conTunel ? {tunel: conTunel} : {})});
     }catch(err){
       Object.assign(t, antes); pedirDibujo();
       console.error('No se pudo sacar el token de abajo de la tierra:', err);
@@ -103,4 +104,112 @@ function dibujarEfectosEmerger(z){
     activo = true;
   }
   return activo;
+}
+
+/* 🕳 La estela del túnel (dueño, 2026-10-27, el Goblin tunelero: «mientras el chabón está enterrado, deja atrás una estela de tierra levantada, roquitas…
+   que quede hasta el principio de su siguiente turno… cuando se va, van desapareciendo de a uno, de atrás para adelante, con cierta lentitud»; «está bien
+   que la vean los jugadores… y cuando el GM la desplaza y la suelta, que la creación de la estela también sea de atrás para adelante, suave»).
+   El token guarda `tunel` = [col, fila, col, fila…] (firestore.rules → tokenValido): lo que recorre bajo tierra (moverToken, js/07) y el tramo hasta donde
+   sale (emergerToken). Lo borra el GM al empezar su próximo turno (turnoDeToken, js/04) o, sin orden de turnos, con el ⟳ de la ronda. Cada pantalla lo dibuja
+   (`dibujarTuneles`, desde js/05): las casillas nuevas aparecen de a una, de la primera a la última; al borrarse, se van igual, de la más vieja a la más nueva. */
+const TUNEL_MAX = 100, TUNEL_APARECE_MS = 160, TUNEL_SE_VA_MS = 320, TUNEL_FUNDIDO_MS = 650;
+// La lista nueva (plana) con estas casillas al final, sin repetir la última; null si no hay nada nuevo.
+function tunelSumar(t, celdas){
+  const prev = Array.isArray(t.tunel) ? t.tunel.slice() : [];
+  let cambio = false;
+  (celdas || []).forEach(c => {
+    const n = prev.length;
+    if(n >= 2 && prev[n - 2] === c.col && prev[n - 1] === c.fila) return;
+    prev.push(c.col, c.fila); cambio = true;
+  });
+  if(!cambio) return null;
+  const lista = prev.slice(-TUNEL_MAX * 2);
+  t.tunel = lista;
+  return lista;
+}
+// Al soltar un token bajo tierra (js/07): el camino que hizo, sumado a su túnel (la casilla de partida incluida, si es el primer tramo).
+function tunelTrasMover(t, celdas){
+  if(!t || !t.bajoTierra || !celdas || celdas.length < 1) return null;
+  return tunelSumar(t, celdas);
+}
+// El GM borra la estela (empieza su turno, o la ronda sin orden de turnos).
+function tunelBorrar(id){
+  const t = tokens.get(id);
+  if(!t || !Array.isArray(t.tunel) || !t.tunel.length || !soyGM) return;
+  t.tunel = null; pedirDibujo();
+  coleccionTokens().doc(id).update({tunel: firebase.firestore.FieldValue.delete()}).catch(err => console.error('No se pudo borrar la estela del túnel:', err));
+}
+function tunelMantenimiento(){
+  const enOrden = new Set(((typeof iniciativa !== 'undefined' && iniciativa && iniciativa.orden) || []).map(o => o.id));
+  tokens.forEach((t, id) => { if(Array.isArray(t.tunel) && t.tunel.length && !enOrden.has(id)) tunelBorrar(id); });
+}
+// Lo que se ve: por token, cada casilla con cuándo aparece y, si se va, desde cuándo.
+const tunelVista = new Map();   // id → {clave, cargado, celdas: [{col, fila, aparece, seVa}]}
+function tunelSincronizar(){
+  const ahora = Date.now();
+  const irse = v => { let k = 0; v.celdas.forEach(c => { if(c.seVa === null) c.seVa = ahora + (k++) * TUNEL_SE_VA_MS; }); };
+  tokens.forEach((t, id) => {
+    const lista = Array.isArray(t.tunel) ? t.tunel : [], clave = lista.join(',');
+    let v = tunelVista.get(id);
+    if(!v){ v = {clave: '', cargado: false, celdas: []}; tunelVista.set(id, v); }
+    if(v.clave === clave && v.cargado) return;
+    const primera = !v.cargado; v.cargado = true; v.clave = clave;
+    const vivas = v.celdas.filter(c => c.seVa === null);
+    const nuevas = [];
+    for(let i = 0; i + 1 < lista.length; i += 2) nuevas.push({col: lista[i], fila: lista[i + 1]});
+    // ¿Es la misma estela, con casillas de más al final? Entonces aparecen solo las nuevas; si no, la vieja se va y la nueva aparece entera.
+    const sigue = vivas.length <= nuevas.length && vivas.every((c, i) => c.col === nuevas[i].col && c.fila === nuevas[i].fila);
+    if(!sigue) irse(v);
+    const desde = sigue ? vivas.length : 0;
+    nuevas.slice(desde).forEach((c, k) => v.celdas.push({col: c.col, fila: c.fila, aparece: primera ? 0 : ahora + k * TUNEL_APARECE_MS, seVa: null}));
+  });
+  tunelVista.forEach((v, id) => { if(!tokens.has(id)) irse(v); });
+}
+// Un montículo de tierra removida con piedritas (fijo para cada casilla).
+function tunelMonticulo(c, celda, r, alfa){
+  const sem = Math.abs((celda.col * 73856093) ^ (celda.fila * 19349663));
+  const rnd = k => ((sem >> (k % 16)) % 97) / 97;
+  ctx.save();
+  ctx.globalAlpha = alfa;
+  ctx.beginPath();
+  for(let i = 0; i <= 10; i++){
+    const a = i * 2 * Math.PI / 10, rr = r * (0.62 + 0.22 * rnd(i));
+    const x = c.x + Math.cos(a) * rr, y = c.y + Math.sin(a) * rr * 0.72;
+    if(i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.fillStyle = '#6e4a2b'; ctx.fill();
+  ctx.lineWidth = r * 0.05; ctx.strokeStyle = '#3f2a17'; ctx.stroke();
+  for(let i = 0; i < 6; i++){
+    const a = rnd(i + 3) * 2 * Math.PI, d = r * 0.45 * rnd(i + 7);
+    ctx.beginPath(); ctx.arc(c.x + Math.cos(a) * d, c.y + Math.sin(a) * d * 0.72, r * (0.07 + 0.06 * rnd(i + 11)), 0, 2 * Math.PI);
+    ctx.fillStyle = i % 3 === 0 ? '#9a9187' : i % 3 === 1 ? '#8d6640' : '#4f3820'; ctx.fill();
+  }
+  ctx.restore();
+}
+// → true si hay algo apareciendo o yéndose (hay que seguir animando).
+function dibujarTuneles(z){
+  tunelSincronizar();
+  const ahora = Date.now(), r = HEX * 0.55;
+  let anima = false;
+  tunelVista.forEach((v, id) => {
+    const t = tokens.get(id);
+    for(let i = v.celdas.length - 1; i >= 0; i--){
+      const c = v.celdas[i];
+      if(c.seVa !== null && ahora - c.seVa >= TUNEL_FUNDIDO_MS) v.celdas.splice(i, 1);
+    }
+    if(t && t.oculto && !soyGM) return;   // un token oculto no delata su túnel
+    v.celdas.forEach(c => {
+      if(ahora < c.aparece){ anima = true; return; }
+      if(nieblaAplica() && !nieblaVista.has(nbPack(c.col, c.fila))) return;   // en la niebla no se ve
+      let alfa = Math.min(1, (ahora - c.aparece) / 280);
+      if(alfa < 1) anima = true;
+      if(c.seVa !== null){
+        anima = true;
+        if(ahora >= c.seVa) alfa *= Math.max(0, 1 - (ahora - c.seVa) / TUNEL_FUNDIDO_MS);
+      }
+      if(alfa > 0) tunelMonticulo(hexCentro(c.col, c.fila), c, r, alfa);
+    });
+  });
+  return anima;
 }

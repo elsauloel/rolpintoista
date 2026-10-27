@@ -26,6 +26,7 @@ function escucharMantenimiento(){
     // Los creeps (solo el GM): desde el 2026-10-02 (A2b) el pase de turno lo hace el mapa (js/12, mantenimientoCreeps), sin cargar GM
     // Tools en un marco invisible.
     if(soyGM) mantenimientoCreeps(numero);
+    if(soyGM && typeof tunelMantenimiento === 'function') tunelMantenimiento();   // 🕳 sin orden de turnos, la estela del túnel se va con la ronda (js/46)
     // Los personajes que maneja este usuario (los suyos, o los que el GM controla con 🎮): desde el 2026-10-02 (hoja de ruta A2) el
     // pase de turno lo hace el mapa él mismo (js/11, mantenimientoPersonajes), sin cargar la ficha en un marco invisible.
     mantenimientoPersonajes(numero);
@@ -559,6 +560,7 @@ async function turnoDeToken(tokenId, clave, inicio){
   const t = tokens.get(tokenId);
   if(!t || !t.fichaId) return [];
   if(!inicio) try{ await levitarAterrizar(tokenId); }catch(err){ console.error('No se pudo resolver la trampa al aterrizar:', err); }
+  if(inicio && soyGM && typeof tunelBorrar === 'function') tunelBorrar(tokenId);   // 🕳 la estela del túnel dura hasta que empieza su próximo turno (js/46)
   if(inicio && soyGM && typeof ceboInicioTurno === 'function') ceboInicioTurno(tokenId).catch(err => console.error('El cebo:', err));   // 💎 el brillo vuelve a tentar (js/80)   // Levitar: al terminar el turno toca el piso
   const o = iniciativa.orden.find(x => x.id === tokenId);
   const visible = !t.oculto && !(o && o.oculto) && !enSigilo(t);

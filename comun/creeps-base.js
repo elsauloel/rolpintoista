@@ -165,6 +165,9 @@
     if(sp.provocarAliado){ h.provocarAliado = {...sp.provocarAliado}; h.modo = 'auto'; }   // 😤 Tirar la bronca (2026-10-26): el aliado y el área los elige el mapa (vtt-hexgrid/js/77)   // ✨ el Parpadeo (2026-10-26): el salto lo hace el mapa (vtt-hexgrid/js/13 blinkDeHabilidad)   // 💨 el Dash (2026-10-26): el camino y el ataque los hace el mapa (vtt-hexgrid/js/76)
     if(sp.meteoro){ h.meteoro = {...sp.meteoro}; h.modo = 'auto'; }   // ☄ el Meteoro (2026-10-24): la marca y la hace caer el mapa (vtt-hexgrid/js/74)   // 🚩 el Estandarte de guerra (2026-10-24): lo clava el mapa (vtt-hexgrid/js/73)
     if(sp.flash) h.flash = true;
+    // 🕳 Excavar (2026-10-27): meterse bajo tierra y, con el mismo botón, salir apuñalando (vtt-hexgrid/js/12 y js/46).
+    if(sp.excavar){ h.excavar = true; h.modo = 'auto'; if(sp.excavarNo2 !== undefined) h.excavarNo2 = sp.excavarNo2; }
+    if(sp.emerger) h.emerger = {...sp.emerger};
     if(sp.trampaColocar){ h.trampaColocar = JSON.parse(JSON.stringify(sp.trampaColocar)); h.modo = 'auto'; }   // 🌀 la trampa entera, como la de una varita (el Portal trampa, 2026-10-25): la coloca el mapa (trampaDeHabilidad)
     if(Array.isArray(sp.variantes)) h.variantes = JSON.parse(JSON.stringify(sp.variantes));   // ✨ el elemento a elegir al lanzarla (el Misil elemental, 2026-10-25, vtt-hexgrid/js/12)
     if(sp.largoVariable) h.largoVariable = {...sp.largoVariable};   // 🔥 el largo a elegir al lanzarla (Muro de fuego, 2026-10-24, vtt-hexgrid/js/12)   // ⚡ Flash (2026-10-24, Bendecir el arma): se usa cuando sea; en turno ajeno, el doble (vtt-hexgrid/js/12)

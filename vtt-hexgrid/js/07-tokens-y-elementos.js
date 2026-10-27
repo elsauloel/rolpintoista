@@ -1137,8 +1137,10 @@ async function moverToken(id, col, fila, celdas, levita){
   renderPanel();
   pedirDibujo();
   const doc = coleccionTokens().doc(id);
+  // 🕳 Bajo tierra (js/46, 2026-10-27): lo que recorre queda como la estela del túnel, a la vista de todos.
+  const conTunel = typeof tunelTrasMover === 'function' ? tunelTrasMover(t, celdas) : null;
   try{
-    await doc.update(ruta.length > 2 ? {col, fila, ruta, ...conRot} : {col, fila, ...conRot});
+    await doc.update({...(ruta.length > 2 ? {col, fila, ruta, ...conRot} : {col, fila, ...conRot}), ...(conTunel ? {tunel: conTunel} : {})});
     sigiloPublicarAvisos(id);
     percepcionPublicarAvisos(id);
     abrirGiroLibre(id, celdas);

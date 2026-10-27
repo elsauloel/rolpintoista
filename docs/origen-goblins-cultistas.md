@@ -218,3 +218,4 @@ donde puede tirarse un pedo para desplazarse con un salto alto; las trampas much
   Vida con X = 5 lo resiste el 61 %, con X = 8 el 18 %, con X = 10 el 6 %; los Pedos le ganan el 66 % (contra Res.Esp 4 sería el 99 %).
 - **Riesgo**: es un cazador de Larry muy efectivo (Takle casi siempre le saca el turno). A mirar en la simulación.
 - **El tunelero: la habilidad única se llama «Excavar»** (dueño, 2026-10-27). Al programarla, reemplaza a «Excavar (El origen)» y a «Puñalada desde abajo» (las dos sin auditar) y a la vieja «Excavar» de fábrica.
+- **Programado (2026-10-27)**: la habilidad **Excavar** única (`comun/skills-creep-base.js`; meterse 1 No2 sin cooldown; salir = un ataque, cd 2) y **la estela del túnel** (vtt-hexgrid/js/46). Falta: pegar la regla nueva (`tunel`) y probarlo en el mapa.

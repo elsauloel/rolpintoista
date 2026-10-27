@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261023p5', '../comun/creep-botonera.js?v=20261023p8a', '../comun/creep-acciones.js?v=20261027l', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261027l'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261023p5', '../comun/creep-botonera.js?v=20261023p8a', '../comun/creep-acciones.js?v=20261027p', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261027l'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -593,6 +593,21 @@ function acUsarEspecial(sc, itemId){
     acDibujar();
   });
 }
+// 🕳 Excavar, el primer tiempo (2026-10-27): se mete bajo tierra. Cuesta `excavarNo2` (1 si no dice); sin No2 suficientes, avisa y deja seguir (gasta lo que
+// tenga). El cooldown y el SP se pagan al salir (el segundo tiempo es un ataque).
+async function acExcavarMeterse(sc, h, tokenId){
+  const costo = Math.max(0, Math.round(num(h.excavarNo2 !== undefined ? h.excavarNo2 : 1)));
+  if(costo > num(sc.nitros) && !(await Confirmar.preguntar(`${sc.nombre} tiene ${fmt(num(sc.nitros))} No2 y meterse bajo tierra cuesta ${fmt(costo)}. ¿Hacerlo igual (gasta los que tenga)?`,
+    {titulo: h.nombre || 'Excavar', icono: '🕳', si: 'Hacerlo igual'}))){ toast(`${sc.nombre}: no usó ${h.nombre || 'Excavar'}`); return; }
+  if(costo > 0){
+    try{ await modificarCreep(sc.id, x => { x.nitros = Math.max(0, num(x.nitros) - costo); }); }
+    catch(err){ console.error('No se pudo cobrar Excavar:', err); toast('No se pudo cobrar — revisá la consola'); return; }
+  }
+  if(!(await excavarToken(tokenId))) return;
+  mesaLinea(`🕳 ${sc.nombre} se mete bajo tierra`, 'recordatorio');
+  toast(`🕳 ${sc.nombre} se metió bajo tierra${costo ? ` · −${fmt(costo)} No2` : ''}: con ${h.nombre || 'Excavar'} otra vez, sale apuñalando`);
+  if(ac && ac.creepId === sc.id) acDibujar();
+}
 async function acEjecutarHab(sc, habId){
   const h = (sc.habilidades || []).find(x => x.id === habId);
   if(!h) return;
@@ -601,8 +616,14 @@ async function acEjecutarHab(sc, habId){
   if(modo === 'manual'){ acMesaHabilidad(sc, h); toast(`${h.nombre || 'Habilidad'} anunciada`); return; }   // 📣 solo el texto
   if(modo === 'auto' && Combatiente.tipoEjecucion(h.duelo) === 'flash'){ acFlashFuera(sc, h); return; }   // ⚡ sin No2, cooldown según el turno
   if(!(await CreepAcciones.confirmarSilencio(sc, h))){ toast(`${sc.nombre}: no usó ${h.nombre || 'la habilidad'}`); return; }   // el cartel del juego, antes de cobrar
+  // 🕳 Excavar (2026-10-27, una sola habilidad): arriba, se mete en la tierra (su No2, sin cooldown ni SP); abajo, sigue como un ataque que sale apuñalando.
+  if(h.excavar && h.emerger){
+    const e = tokenEntradaCreep(sc.id);
+    if(!e){ toast(`${sc.nombre} no tiene token en este mapa: ${h.nombre || 'Excavar'} necesita el token`); return; }
+    if(!e[1].bajoTierra){ await acExcavarMeterse(sc, h, e[0]); return; }
+  }
   if(!(await CreepAcciones.confirmarSP(sc, h))){ toast(`${sc.nombre}: no usó ${h.nombre || 'la habilidad'}`); return; }   // 💧 modo SP: no le alcanza
-  if(h.excavar || h.emerger){   // 🕳 Bajo tierra (js/46): hace falta el token; avisa y deja seguir
+  if((h.excavar || h.emerger) && !(h.excavar && h.emerger)){   // 🕳 Bajo tierra (js/46): hace falta el token; avisa y deja seguir
     const e = tokenEntradaCreep(sc.id);
     if(!e){ toast(`${sc.nombre} no tiene token en este mapa: ${h.nombre || 'la habilidad'} necesita el token`); return; }
     if(h.excavar && e[1].bajoTierra){ toast(`${sc.nombre} ya está bajo tierra`); return; }
@@ -807,7 +828,7 @@ function cerrarAccionesNuevas(){
    estados para la Ejecución, con el selector común (los "Mis presets" del GM no están en la partida: ver pendientes 7b). */
 const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261026zu', '../comun/asistente-duelo-hab.js?v=20261026d'];
 // Las recetas de habilidades de fábrica (para ↻ Reemplazar y ⬆ Subir): pesadas, recién cuando hacen falta.
-const ACE_BASE = ['../comun/creeps-base.js?v=20261027i', '../comun/skills-creep-base.js?v=20261027o'];
+const ACE_BASE = ['../comun/creeps-base.js?v=20261027p', '../comun/skills-creep-base.js?v=20261027p'];
 async function acCargarEditor(){ await acCargarPiezas(); await cargarPiezas(SE_PIEZAS); await cargarPiezas(ACE_PIEZAS); }
 // ⬆ Subir una habilidad del creep a la biblioteca compartida (corrección o algo nuevo); su `bibOrigen` nuevo se guarda en el creep.
 async function acSubirHab(creepId, habId){

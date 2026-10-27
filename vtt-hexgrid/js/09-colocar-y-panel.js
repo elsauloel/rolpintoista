@@ -156,6 +156,7 @@ function escucharTokens(){
         oculto: d.oculto === true,
         revelado: d.revelado === true,   // 🎭 los jugadores ya vieron a este creep (js/29)
         bajoTierra: d.bajoTierra === true,   // 🕳 bajo tierra (js/46)
+        tunel: Array.isArray(d.tunel) ? d.tunel.map(Number) : null,   // 🕳 la estela del túnel (js/46)
       });
     });
     renderIniciativa();

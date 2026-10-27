@@ -67,7 +67,7 @@
     'Interponerse': ['choque pesado', 'interponerse'], 'Golpe de escudo': ['choque pesado', 'derribar'], 'Carga que derriba': ['choque pesado', 'carga que derriba'],
     'Sonic Boom': ['choque pesado', 'sonic boom'], 'Arrastrar': ['choque pesado', 'arrastrar'],
     'Red': ['hunter', 'trabar'], 'Tela de araña': ['hunter', 'trabar'],
-    'Hit and run': ['choque liviano', 'golpear y alejarse'],
+    'Hit and run': ['choque liviano', 'golpear y alejarse'], 'Excavar': ['choque liviano', 'bajo tierra'],
     'Salto': ['choque liviano', 'salto'], 'Salto aplastante': ['choque pesado', 'salto'], 'Vigilancia': ['rango', 'vigilancia'], 'Bola de fuego': ['mago', 'daño en área'], 'Confusión': ['debuffer', 'control mental'],
     'Arma ígnea': ['support', 'arma elemental'], 'Arma helada': ['support', 'arma elemental'], 'Arma eléctrica': ['support', 'arma elemental'],
     'Arma ácida': ['support', 'arma elemental'], 'Arma venenosa': ['support', 'arma elemental'], '¡A la carga!': ['support', 'grito de guerra'], 'Arenga': ['support', 'grito de guerra'], 'Sanar': ['support', 'curar'], 'Oleada sanadora': ['support', 'curar'], 'Bálsamo': ['support', 'curar'], 'Círculo de sanación': ['support', 'curar'], 'Aura sanadora': ['support', 'curar'],
@@ -882,7 +882,12 @@
   H('Retirada táctica', 'M', 'hd', 'r', 3, tA('Se aleja 2 casilleros sin provocar (a mano).', 1));
   H('Teletransporte corto', 'M', 'ega', 'g', 4, tA('Aparece en un casillero libre a 3 casilleros de distancia (a mano).', 2));
   H('Volar en picada', 'DM', 'b', 'e', 4, zO('Cae desde arriba sobre el objetivo (a mano el movimiento).', 3, 'M'));
-  H('Excavar', 'M', 'b', 'e', 4, tA('Se entierra y aparece 3 casilleros más allá (a mano).', 2));
+  // 🕳 Excavar (dueño, 2026-10-27, el Goblin tunelero de El origen: «el fin de enterrarse, que sea el mismo skill con golpes desde abajo, que sea solo todo un
+  // solo skill»; «la habilidad le vamos a poner excavar»): junta la vieja Excavar y la Puñalada desde abajo de El origen. Con el mismo botón: arriba, se mete
+  // en la tierra (`excavarNo2`, sin cooldown); abajo, sale apuñalando (lo de un ataque, el cooldown arranca ahí). La estela del túnel: vtt-hexgrid/js/46.
+  H('Excavar', 'DM', 'hd', 'e', 2, {...aA('Se mete en la tierra y sale apuñalando, con el mismo botón. Si está arriba: se mete bajo tierra (1 No2, sin cooldown): en su casilla queda el pozo y, mientras está abajo, nadie lo puede elegir de objetivo ni le llega un área, un salto eléctrico o un ataque de oportunidad; se puede mover por abajo y deja una estela de tierra removida que ven todos, hasta que empieza su próximo turno. Si está abajo: sale por una casilla libre a 4 o menos del pozo y apuñala con su arma (lo de un ataque): +3 a la Probabilidad de Golpe, +1d6 al daño y Crítico frecuente +1; si pega, Rengo 1 turno (con un golpe crítico, Rengo 2 turnos y Lisiado 1). El cooldown arranca al salir.',
+    {critBono: 1, dadoExtra: '1d6'}, 'arriba: se mete bajo tierra (1 No2); abajo: sale a 4 o menos y apuñala con +3 PdG, +1d6 y Crítico frecuente +1; Rengo (crítico: Rengo 2 y Lisiado 1)', 2,
+    [{nombre: 'Rengo', turnos: 1}], {critico: {efectos: [{nombre: 'Rengo', turnos: 2}, {nombre: 'Lisiado', turnos: 1}]}}), excavar: true, excavarNo2: 1, emerger: {distancia: 4, pdg: 3}});
   H('Trepar', 'M', 'bp', 'e', 2, tA('Sube por una pared o un árbol sin costo extra (a mano).', 1));
   // Trampa de verdad (2026-09-24): deja una trampa oculta al lado del token y quien la pisa queda Inmovilizado (APLICA en creeps-base.js).
   H('Trampa de raíces', 'K', 'p', 'x', 4, tS('Deja una trampa de raíces en una casilla adyacente: quien la pise queda Inmovilizado 2 turnos.', 2), 'trampas');

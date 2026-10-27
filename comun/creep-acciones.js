@@ -426,7 +426,7 @@ const CreepAcciones = (() => {
        meteoro(sc, h) (☄ el Meteoro: `h.meteoro`; el GM marca la sombra en el mapa, solo el mapa)} */
   function terminarHab(sc, h, p, ui){
     const {costo, costoHp, efecto, falta, auto, esZona, directo} = p;
-    if(h.excavar && ui.excavar) ui.excavar(sc, h);   // 🕳 Bajo tierra (2026-10-13): el mapa mete el token bajo tierra (vtt-hexgrid/js/46)
+    if(h.excavar && !h.emerger && ui.excavar) ui.excavar(sc, h);   // 🕳 Bajo tierra (2026-10-13): el mapa mete el token bajo tierra (vtt-hexgrid/js/46); con `emerger` (la Excavar única, 2026-10-27) meterse lo resuelve el mapa antes de cobrar
     if(directo){ ui.mesaHabilidad(sc, h, directo.nota); ui.toast(`${h.nombre || 'Habilidad'} ejecutada sobre ${sc.nombre}${directo.hechos.length ? ' → ' + directo.hechos.join(' · ') : ''}${costoHp > 0 ? ` · −${fmt(costoHp)} HP` : ''}`); return; }
     // Una trampa se coloca en secreto: la habilidad no se anuncia en la Mesa (los jugadores no deben enterarse).
     const hDuelo = (!auto || h.trampaColocar || esZona || h.refuerzos || h.estandarte || h.meteoro || h.dash || h.blink || h.bombaHumo || h.cebo || h.provocarAliado) ? null : ui.habDuelo(sc, h);   // habilidad dirigida: la contienda va en el cuadro del duelo

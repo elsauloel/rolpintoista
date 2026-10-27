@@ -250,8 +250,9 @@ Dueño (2026-10-27): «seguimos con el arquero, que también va a tener foco en 
   subiría Especial… también le podría dar una habilidad pasiva que le dé más SP» → propuesta: **Con 8 · Fue 8 · Agi 9 · Des 10 · Esp 4** (Vida 40, SP 12)
   y la pasiva **Recuperación mental** (+1 SP por turno: recarga 3). Sus habilidades cuestan 2 o 3 SP, así que puede usar una por turno sin quedarse seco.
   (El SP solo cuenta con el creep en modo SP; en modo cooldown no se cobra.)
-- **Números con el arco de Tipo 4** (2d4 + 8, 13 de promedio): Larry queda con ~12 tras el Disparo señalador; en el turno 2 un disparo solo lo tumba el
-  48 %, la Ráfaga (2 disparos: 2 + 4 No2) el 91 %.
+- ~~Números con el arco de Tipo 4 (2d4 + 8)~~ **Corregido (2026-10-27, al crearlo)**: el arco suma **la mitad** del Dmg (`Combatiente.dmgDelArma`):
+  2d4 + 4 (9 de promedio), ~5 contra la Defensa 4 de Larry. Larry queda con ~16 tras el Disparo señalador; en el turno 2 un disparo solo no lo tumba,
+  la Ráfaga sí el 61 %; en el turno 3, el 95 %. Bastante menos letal de lo que se había calculado.
 - **Flechas especiales de los creeps: ya están programadas** (2026-10-20, `vtt-hexgrid/js/12-acciones-nuevas.js`, `acFlechas`): un creep con arco o ballesta
   que lleva flechas o virotes especiales en el **cinturón** elige cuál al atacar, igual que un personaje (se gasta y cobra su No2 al disparar). Solo en
   el ataque común (como un personaje): las habilidades que disparan con el arma (Disparo señalador, Clavar a la pared…) no preguntan. **Decidido (dueño, 2026-10-27)**:
@@ -290,3 +291,17 @@ Los seis creeps aprobados: el jefe (mago debuffer, N4), el picapiedras (N3), el 
 **Lo que sigue**: cuando el dueño termine el mapa del encuentro, crear los seis en El origen con sus tokens en ese mapa (es la partida real: con el
 OK del dueño en el momento). Antes, probar en «Claude · pruebas» lo que usan y todavía no se vio en el mapa: Excavar y la estela, la flecha o virote
 especial en una habilidad de disparo, el Golpe de escudo y la Red (docs/pruebas-en-el-mapa.md). Después: los encuentros 2 y 3.
+
+## ✅ Creados en El origen (2026-10-27, con el OK del dueño: «creá estos creeps en el mapa ENTRADA MINAS»)
+
+Con el paso a paso de GM Tools, a mano (la auditoría del asistente quedó en `auditoria-asistente-creeps.md`). Los seis en **ENTRADA MINAS**, cada uno con
+su token oculto: **Cultista de la Grieta** (el jefe, N4, marcado Jefe), **Goblin picapiedras** (N3), **Goblin tunelero** (N2), **Goblin híbrido** (N3),
+**Arquero del culto** (N3) y **Goblin ballestero** (N2), con el equipo, las habilidades, los consumibles de diseño en el cinturón (Poción de SP menor,
+Piel de Cristal ×2, Poción de HP, 3 Flechas silbadoras, 3 Virotes dentados), la pasiva del arquero (Recuperación mental), el Óleo reparador como drop
+fijo del picapiedras y la Red del híbrido sin cooldown al empezar. La Confusión del jefe sí arranca en cooldown (es lenta, como en el catálogo).
+- **Además, al crear, cada uno recibió su consumible al azar** (la regla de los drops): el jefe, Ankh de Reencarnación y Runa de silencio; el
+  picapiedras, Poción de Cuero Duro; el tunelero, Pergamino grupal de Paso Fantasma; el híbrido, Sales aromáticas; el arquero, Flecha de fuego y
+  Vendas; el ballestero, Virote relámpago y Mate cebado. **A decidir con el dueño** si se quedan (sobre todo el Ankh del jefe).
+- Siguen en ENTRADA MINAS los 15 kobolds y ratas de antes (no se tocaron): a decidir si pasan a la Reserva.
+- Los nombres son de trabajo: el dueño los cambia si quiere. Los drops fijos del jefe (Polilla mística y Runa aceleradora, `pendientes.md`) no se
+  pusieron: a confirmar.

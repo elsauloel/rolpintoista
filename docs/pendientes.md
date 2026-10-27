@@ -19,6 +19,10 @@
 >   (dueño: «dije como drop, para que prueben los jugadores, de ítems consumibles, una polilla y un acelerador, por lo menos»). Se pueden poner como
 >   drop fijo de un creep (GM Tools → Recompensas → drops fijos) o sumarlos a mano al botín al finalizar el combate («+ Sumar» en el paso Equipo/Consumibles).
 
+> **🧭 Auditoría del asistente de creeps (2026-10-27)** → [`auditoria-asistente-creeps.md`](auditoria-asistente-creeps.md): lo que falla o confunde al
+> crear un creep paso a paso (la Habilidad lenta que no saca el cooldown, la varita que no aparece como arma, la Defensa total en 0, sin paso de
+> pasivas ni cinturón, los consumibles al azar sin aviso, un viaje por habilidad y por pieza…). Sin arreglar: a decidir qué se toca.
+
 > **📦 Auditoría pendiente del catálogo (2026-10-27, dueño: «flechas, virotes, trampas raras, ponelo en pendiente de auditoría, pero no los quites; lo
 > mismo los carcajes»).** Siguen en el catálogo; se auditan cuando toque. Lo demás quedó así: se archivaron los arcos Raros, Excepcionales y
 > Legendarios, los dos arcos Buenos viejos y todas las armas de pólvora; los consumibles que no tenían la marca se dieron por auditados (`"auditado":true`);

@@ -64,3 +64,21 @@ Sinergias: la Presa del jefe sobre Larry (−2 Evasión, +4 de daño de cada gol
 (3 puntos pasan siempre la Defensa) hacen que el Sangrado del liviano le entre a Petro; el pesado provoca a Petro (Res.Mt 5) y le rompe la armadura;
 la Red y la Vigilancia frenan a Petro si va por los tiradores; ¡A la carga! suma a todos. Riesgo a simular: Ráfaga encadenada sobre una Presa puede
 tirar a Larry en un turno.
+
+### Lo minero y el que se enterraba (dueño, 2026-10-27: «había algo de los kobolds que eran medio mineros en su equipo; había uno que se enterraba, que me gustaría mezclar»)
+
+Lo que ya hay en el catálogo y en los kobolds de la partida: **Ballesta de la grieta** (Común: Tipo 4, +2, Armadura rota doble 50 %), **Varita de la
+grieta** (Buena: 1d6 arcano y −2 Defensa 2 turnos), **Hachón de minero** (Buena: Tipo 8, 2 dados, Rompe armadura 33 %), **Hacha con pico** (Buena),
+**Honda de minero**, **Casco de minero** (y reforzado), **Botas de minero** (Pisada atenta), **Mochila de minero con farol**, **Lámpara de minero**
+(consumible), **Capucha de lana del culto**. «La Grieta» ya existe en el lore (la ballesta, la varita, la capucha del culto): el culto la adora.
+
+El que se enterraba: el **Kobold tunelero** (Daga; Excavar y Puñalada desde abajo, de El origen, sin auditar; la mecánica ya está programada para
+creeps: `vtt-hexgrid/js/46-bajo-tierra.js`). Propuesta: el **choque liviano** pasa a ser el **Goblin tunelero**, con esas dos auditadas.
+
+Guía general propuesta (esperando el OK):
+
+- 👑 Jefe humano, mago buffer, N3 — Varita de la grieta + Capucha de lana del culto. Armas perforantes · Señalar la presa · ¡A la carga! · Bendecir el arma.
+- 🏹 Arquero humano, N3 — arco. Tiro certero · Tiro a la cabeza · Ráfaga encadenada · Vigilancia.
+- 🏹 Ballestero goblin, N2 — Ballesta de la grieta, Casco de minero. Tiro a la rodilla · Clavar a la pared · Red tendida.
+- 🛡 Choque pesado goblin (picapiedras), N3 — Hachón de minero, Casco de minero, Botas de minero. Provocar · Romper armadura · Golpe demoledor · Piel de hierro.
+- 🗡 Choque liviano goblin (tunelero), N2 — Daga o pico chico, Botas de minero. Excavar · Puñalada desde abajo · Golpe que sangra.

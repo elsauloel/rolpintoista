@@ -306,7 +306,7 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
      del escudo + su Dmg contra la Defensa** (dueño, 2026-10-27: «usa el escudo como si fuera un arma de tipo 10… si es un escudo que pesa 3, tira 3 de
      10 y daño; si pesa 1, 1 de 10 más daño») del
      rival (el Dmg, el atributo secundario que sale de la Fuerza; dueño: «por más daño me refiero al estado secundario damage») (dueño, 2026-10-27: «como si el escudo fuera un arma contundente… y si pasa, hace el efecto que decíamos»); si la pasa, le hace **la
-     diferencia de daño** y lo deja **Sentado y con Demora 1**. Sin la tirada contra la Res.CC (la reemplaza esta). Un ataque y 2 SP, o cooldown 2.
+     diferencia de daño** y lo deja **Sentado y con Demora 1**. Sin la tirada contra la Res.CC (la reemplaza esta). ~~Un ataque y 2 SP~~ → **4 No2 y 3 SP** (dueño, 2026-10-27: «como un arma tipo 10… 4 nitros en lugar de 5, porque igual cuesta SP»; sigue siendo su ataque del turno), o cooldown 2.
      (Los escudos de 1 mano pesan 1 a 3; el de 2 manos, hasta 6: el escudo pesado es el que mejor pega.)
   5. 🛡 **Interponerse** (F31; dueño, 2026-10-27: «está bien, hagámoslo así»): **Flash** (botón instantáneo en el duelo, como Desarmar): cuando
      atacan a un aliado a **2 casillas o menos**, antes de la tirada, **salta a su lado** (gratis: sin No2 ni ataques de oportunidad) y **el golpe va

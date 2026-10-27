@@ -156,3 +156,4 @@ pondría algún skill de daño siniestro que sume algo de daño mágico directo,
 - **Elegido (dueño, 2026-10-27): Golpe de escudo**, con la regla corregida: «no suma el peso del escudo. Usa el escudo como si fuera un arma de tipo 10…
   si es un escudo que pesa 3, tira 3 de 10 y daño». Programado (`comun/creep-duelo.js`, `formulaDano`). Con el Escudo de cuero endurecido (peso 2):
   2d10 + 9 (20 de promedio).
+- **Costo (dueño, 2026-10-27)**: el Golpe de escudo cuesta **4 No2 y 3 SP** fijos (no lo de un ataque; sigue contando como su ataque del turno). Programado.

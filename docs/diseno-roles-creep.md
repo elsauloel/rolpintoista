@@ -614,7 +614,12 @@ Propuesta (2026-10-27):
   le pegan abrojos a los pies»): flor de 7 (fuera de la vista de los rivales; la dispara pisar cualquiera de las 7, alcanza a todos los de encima);
   **2d6+2 menos su Defensa**; **Rengo 2 turnos aunque la armadura pare el daño** (no pide lastimar); Res.CC contra la Destreza del creep, solo contra el
   Rengo; **quedan 3 turnos** y cada paso sobre ellos renueva el Rengo sin tirar (`renuevaPaso`, como la Brea). 2 No2 y 2 SP, o cooldown 3.
-- 🗡 **L3. Cuerda floja**: línea de 3; Sentado; Res.CC contra su Destreza.
+- 🗡 **L3. Cordón oculto** — **definida** (dueño, 2026-10-27: «que se llame cordón oculto… al pisarlo se mueve uno para adelante y cae sentado. No se hace
+  daño. Y tiene que tirar agilidad para no caer sentado… si pierde, cae del otro lado de la trampa en la misma dirección en la que venía caminando y queda
+  sentado. Tiene que ser barata porque el efecto es leve. Un nitro, un SP. Podemos ponerle 2 SP igual»): línea de 3 (fuera de la vista de los rivales);
+  al pisarla tira **Agilidad** (contra la Destreza del creep, como las demás); si pierde, **avanza 1 casilla en la dirección en que venía** (cae del otro
+  lado) y queda **Sentado**; sin daño. **1 No2 y 2 SP.** *Mecánica nueva:* la trampa que lo corre 1 hacia adelante (si esa casilla está ocupada o es
+  sólida, cae donde está).
 - 🗡 **L4. Polvo cegador**: 1 casilla → las 7 de alrededor; Ceguera 1 turno.
 
 **El Cebo, dos formas para elegir:**

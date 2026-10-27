@@ -1730,6 +1730,11 @@ versión parecida en más de una, es candidato a juntar.
   +1 PdG al contraatacar); `CreepDuelo.pagarFlash` cobra SP en modo SP; `Duelo.olvidarOpciones(id)` (cambió quien defiende). Presets nuevos
   **Desafiante**, **Piel de hierro** e **Interpuesto** (`unGolpe`: se va con el golpe que recibe). `creeps-base.js` (`armarHab`) copia todo eso y un
   `efecto.escudo` fijo (5 de Vida extra del Escudo humano) y `efecto.detalle`.
+- **🔄 Las habilidades de clase siguen a su clase** (P222, dueño, 2026-10-27): `FichaGuardado.migrarHabsDeClase(S)` → los nombres de las que se
+  pusieron al día (también corre en `completar`). Cada copia guarda `claseHuella` (`huellaHab`: lo que hace la habilidad, sin lo propio —`HAB_PROPIOS`:
+  Job, imagen, origen, cooldown, cargas, `automatizada`—); si la de clase (`CLASES_SKILLS` o `SKILLS_CUSTOM`, `baseDeClase`) cambió y la copia no se
+  editó a mano desde la última vez, toma la versión nueva. Una subida (`bibOrigen`, `bib-…`) no se toca. La llaman la ficha (`renderAll`, con un toast) y
+  la Botonera nueva del mapa (al abrir; la guarda enseguida). **Un campo nuevo del turno en una habilidad de personaje: sumarlo a `HAB_PROPIOS`.**
 - **📦 El catálogo de habilidades de creep y el archivo** (2026-10-26, dueño: «vamos a dejar estos skills de creep como los de base. Todos los viejos los
   archivamos, ya no cuentan»): `skills-creep-base.js` exporta `HABILIDADES_CREEP_CATALOGO` (las auditadas) y `HABILIDADES_CREEP_ARCHIVO` (las de fábrica sin
   auditar y las de «El origen», con la etiqueta «archivada»); `HABILIDADES_CREEP_BASE` sigue con todas (las buscan por nombre las pruebas, la auditoría y el

@@ -21,6 +21,9 @@
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.
+> - [ ] **⚖ Revisar Arrastrar (P224)** (2026-10-27, dueño: «Arrastrar, anotalo pendiente para que lo revise cuando esté en la compu»): quedó en **una sola
+>   tirada** —un ataque con su arma a 3 casillas o menos con +2 PdG; si pega, lo trae y le hace el daño— y lo definido eran dos (Destreza contra la
+>   Evasión para engancharlo, y después el golpe). Mirarlo en el mapa con el Warrior (prueba) de «Claude · pruebas» y decidir si queda así o se separa.
 > - [x] (2026-10-25, dueño: «podemos probar esto»; hecha en `vtt-hexgrid/js/75-flechitas-estados.js`, falta que la vea el dueño) **⬆⬇ Animación al recibir un buff o un debuff (2026-10-25, dueño: «probar una pequeña animación que cuando se coloca un buff, durante un segundo,
 >   el token tenga una animación de flechitas verdes que van para arriba; y lo mismo cuando se coloca un debuff. Para pensar si es posible y buscar el
 >   momento»; el mismo día: «anotalo para ver en la compu»).** Es posible: cada pantalla ya escucha los estados públicos de cada token (`resumen.estados`, js/09); al aparecer un estado nuevo, ~1 s
@@ -489,12 +492,13 @@
 
 ## 🧪 De las pruebas en el mapa del 2026-10-27 (la tanda del Choque pesado; reporte: `reporte-choque-pesado-2026-10-27.md`)
 
-- [ ] El Escudo humano de los creeps usa por dentro el estado «Miti-Miti»: el Anuncio dice «le aplicó Miti-Miti» y el cuadro del daño «(Miti-Miti)».
-  Renombrarlo a «Escudo humano» cuando lo pone un creep.
-- [ ] Arrastrar a un personaje: las zonas del camino (fuego, nubes) las revisa la pantalla de su dueño, no la del GM que lo mueve: pueden no tocarlo en el acto.
-- [ ] Las áreas (el Sonic Boom, el Pisotón) también alcanzan a un personaje caído (así era el motor): ¿excluirlos?
-- Decisiones del dueño pendientes: P222 (las skills de clase que ya tiene un personaje no se actualizan solas), P223 (cuándo se libera el Segundo aliento),
-  P224 (Arrastrar en una sola tirada).
+- [x] El Escudo humano de los creeps se llama así en todos lados (2026-10-27): la marca del creep, el Anuncio («le aplicó Escudo humano») y el cuadro del
+  daño («se llevó 6 (Escudo humano)»). Probado en el mapa.
+- [x] Arrastrar a un personaje: las zonas del camino las revisa la pantalla de su dueño, avisada por el momento del arrastre (2026-10-27,
+  `arrastreZonasMomento`, js/78). Probado en el mapa: Clementino arrastrado sobre una zona de brasas → «🔥 Brasas: le toca a Clementino» en su pantalla.
+- [ ] Las áreas (el Sonic Boom, el Pisotón) también alcanzan a un personaje caído (así era el motor): ¿excluirlos? → P225.
+- Decisiones del dueño: P222 ✅ (las de clase se ponen al día solas) y P223 ✅ (el Segundo aliento se libera al «Finalizar combate»), hechas y
+  probadas el 2026-10-27; P224 (Arrastrar en una sola tirada) → sección 🖥.
 
 ## 🧪 De las pruebas en el mapa del 2026-10-21 (auditoría de creeps)
 

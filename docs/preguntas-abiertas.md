@@ -1234,20 +1234,37 @@ características». Hoy: arcano (puro, directo), fuego (quema; seca el agua), hi
 a no-muertos y sombras; podría curar a un aliado si lo alcanza. *Siniestro* (sombra) — corta la curación del golpeado un turno (la Sequía chica) o le roba
 vida a quien lo lanza; pega más a lo vivo y nada a no-muertos; puede asustar (Miedo). Falta: ver si alcanza para una identidad propia y no pisar al arcano.
 
-### P222 — ¿Las habilidades de clase que ya tiene un personaje se actualizan solas cuando cambia la clase? (2026-10-27)
+### P222 — ¿Las habilidades de clase que ya tiene un personaje se actualizan solas cuando cambia la clase? (2026-10-27) ✅ decidida (2026-10-27)
 
 Al cambiar el Taunt (PdG.Esp + nivel), el Golpe brutal (+1/+1 críticos y +2 al daño) y el Contraataque (Flash, 1 SP), solo cambian las que se
 agregan de ahora en más: un personaje que ya las tenía conserva su copia (probado en el mapa: el Contraataque de juan seguía con su costo viejo).
 **A decidir:** ¿se actualizan solas las copias que no se editaron a mano (por su id de clase), se ofrece un botón «traer la versión de la clase», o
 queda así (cada mesa decide)?
 
-### P223 — El Segundo aliento «una vez por combate»: ¿cuándo se libera? (2026-10-27)
+**Decidido (dueño, 2026-10-27):** «las habilidades de clase que un personaje ya tiene, podrías detectarlas vos y reemplazarlas». Hecho:
+`FichaGuardado.migrarHabsDeClase` (la ficha al dibujarse y la Botonera del mapa al abrirse, que la guarda enseguida y avisa «🔄 se pusieron al día…»).
+Cada copia guarda `claseHuella` (cómo era la de clase al copiarse o ponerse al día): si la clase cambia, la copia toma la versión nueva; **si se
+editó a mano después, se respeta** (sigue siendo de quien la editó). Lo del personaje (Job, imagen, origen) y del turno (cooldown, cargas) se
+conserva; una subida de la biblioteca sigue con su 🔔. Probado en el mapa: juan puso al día 6 (Contraataque a 1 SP, Re-roll, Transfusión…).
+
+### P223 — El Segundo aliento «una vez por combate»: ¿cuándo se libera? (2026-10-27) ✅ decidida (2026-10-27)
 
 Hoy queda marcado en la habilidad del creep («Ya la usó en este combate») hasta que el GM lo edite: no hay un «empieza el combate» que lo libere solo.
 Casi siempre da igual (un creep pelea un combate). **A decidir:** ¿se libera al «Finalizar combate», al pasar a narrativo, o queda así?
+
+**Decidido (dueño, 2026-10-27):** «se desbloquea al finalizar el combate». Hecho: `unaVezAlTerminar` (vtt-hexgrid/js/25), con lo demás de
+«Finalizar combate»: la pantalla del GM libera las habilidades de los creeps del mapa. Probado en el mapa con el Tanque (prueba).
 
 ### P224 — Arrastrar en una sola tirada (2026-10-27)
 
 Lo definido decía «Destreza contra la Evasión; si lo engancha, lo arrastra y le pega con su arma con +2 PdG» (dos tiradas). Se programó en una sola: un
 ataque con su arma a 3 casillas o menos con +2 PdG (contra la Evasión o el Parry); si pega, lo trae y le hace el daño. **A confirmar** (o separarlo en dos).
+
+(2026-10-27, dueño: «anotalo pendiente para que lo revise cuando esté en la compu» → `docs/pendientes.md`, sección 🖥.)
+
+### P225 — ¿Las áreas alcanzan a un personaje caído? (2026-10-27)
+
+Probando el Sonic Boom se vio que un área (cono, onda, flor) también le pega a un personaje con la vida en 0: así funcionó siempre el motor
+(junta a todos los rivales que quedan adentro). Un caído no se defiende, y el daño de más puede acercarlo a morir del todo.
+**A decidir:** ¿las áreas lo saltean (como si no estuviera), lo alcanzan igual (como hoy), o lo alcanzan solo si quien la tira lo elige?
 

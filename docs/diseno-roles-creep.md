@@ -625,6 +625,7 @@ más, elige en el mapa cuál de las suyas se desarma (se borra sin dispararse). 
 **Corrección (dueño, 2026-10-27):** «tantas como su nivel más 1. Y eso por cada tipo de trampa. Si tenés dos trampas distintas, podés tener ese número de
 cada tipo»: el límite es **nivel + 1 por cada habilidad de trampa** (un creep de nivel 3 con Cepo y Red: hasta 4 cepos y 4 redes); al pasarse, elige cuál
 de ese mismo tipo se desarma.
+Las invocaciones, igual (confirmado por el dueño).
 - 🏹 ~~**H5. Arrear**~~: un disparo que lo empuja 2 hacia donde elija el creep. El dueño: «¿no existe ya algún tiro que desplace dos casillas para atrás?» —
   sí, **Mantener a raya** (lo empuja 2 lejos del tirador y Lento 2 turnos). Lo único distinto sería elegir la dirección.
 - 🗡 **L2. Abrojos** — **definida** (dueño, 2026-10-27: «va así y el rengo se aplica independientemente de si el daño lo para o no la armadura. Porque se

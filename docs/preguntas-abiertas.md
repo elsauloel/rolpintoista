@@ -1291,3 +1291,16 @@ veneno de un arma entra); en las **trampas**, lo que absorbe cualquiera **no cue
 **Regla nueva:** dos clases. **Escudo** (Shield, Envión, Barrera/Blindaje, Escudo especial…): lo que absorbe no es daño; si se come todo el golpe,
 no entra nada de lo que pide lastimar. **Vida extra** (lo que sobra de una cura o un drenaje, como el de Larry): es vida; lo que absorbe sí es daño.
 La misma cuenta en el duelo, las trampas y las zonas. **Falta:** confirmar qué va en cada clase (los ~20 ítems y habilidades que hoy dan «Vida extra»).
+
+**Criterio ✅ (dueño, 2026-10-27: «me sirve ese criterio»):** **Vida extra** = solo lo que sobra cuando una cura o un drenaje pasa del máximo (Drenar
+vida, el Colmillo de la Reina Araña). Todo lo que da «absorbe N» es un **Escudo**. Claros como escudo: Pergamino y Poción de Escudo especial, Pociones
+de Cuero duro, Piel de cristal y Aguante, Shield, Envión, Barrera (Blindaje), los 5 del Escudo humano, «No siente el dolor» (El origen). **Dudosos,
+llevados al dueño:** Relicario de sangre, Anillo de la siesta, Anillo del sereno, Anillo del escudo de la mañana, los Orbes de resguardo y del custodio,
+Escudo de caparazón y Anillo de cáscara protectora.
+
+### P228 — El veneno de las trampas: ¿se resiste? (2026-10-27) ✅ decidida
+
+**Dueño (2026-10-27):** «depende de cómo se ejecutan. Si el veneno es por una nube, ahí sí hay una resistencia. Si es por daño físico, siempre que
+pase el daño físico, el veneno no se resiste». **Por golpe** (Aguja, Dardos envenenados, Espina de mantícora): sin tirada; entra si lastima (lo que
+absorbe un escudo no cuenta, P227). **Por nube o gas** (Nube de veneno, Bomba de esporas, las zonas tóxicas): Res.Esp, como hoy. Falta programarlo
+(los Dardos y la Espina hoy tienen Res.Esp; la Espina además no pide lastimar).

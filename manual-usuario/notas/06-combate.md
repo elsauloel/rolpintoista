@@ -472,6 +472,14 @@ Jugadores y GM pueden **poner trampas en el mapa**. Una trampa es un objeto de *
 - Al soltar un movimiento, si algún casillero de la ruta pisa la trampa, **el movimiento se corta ahí** y aparece una línea roja en la [[La Mesa|Mesa]] con el nombre, quién la activó y qué hace.
 - **Daño automático:** si la trampa tiene una tirada de daño (por ejemplo, 2d6), el mapa la tira solo y se la aplica a quien la activó, restando su [[Defensa]]. En un área también daña a los creeps de adentro cuando mueve el GM; a los demás se les avisa en la Mesa. **Estados y tiradas para evitarla siguen a mano**, y el texto de cada trampa lo aclara.
 
+## Colocarlas
+Una trampa que pone alguien en la pelea (con una habilidad, un consumible o el glifo) se coloca con un clic en el mapa, y la casilla tiene que cumplir tres cosas:
+- **Dentro de tu [[Rango]]**.
+- **En una casilla que veas** (tu [[Campo de visión]]).
+- **Fuera de la vista de los rivales:** mientras elegís la casilla aparecen los conos de los rivales que ves (los mismos del [[Sigilo]]: azul el cono, naranja la zona de alerta). Una trampa **no se puede poner dentro del cono azul** de un rival: el mapa avisa y te la vuelve a pedir. Los rivales que no ves (ocultos, en sigilo, en la niebla) no cuentan.
+
+Las que pone el GM a mano, como parte del lugar, no tienen estas reglas.
+
 ## Detectarlas
 La pasiva **Percepción aumentada** ([[Pasivas]]) te interrumpe el movimiento al quedar justo al lado de una trampa y avisa que corresponde una **tirada de percepción** (botón 🔎 en la Botonera: [[Destreza]], con dado más alto por escalón).
 

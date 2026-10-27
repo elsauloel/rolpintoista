@@ -1831,6 +1831,11 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   al «Finalizar combate» (`unaVezAlTerminar`, js/25, la pantalla del GM, P223); las **zonas del camino de un arrastrado** las revisa la pantalla de su dueño
   (el momento del arrastre lleva `datos.arrastre = {tokenId, celdas}` → `arrastreZonasMomento`, js/78, desde `momentoRecibido`, js/16). La Botonera nueva
   pone al día las **habilidades de clase** del personaje al abrirlo y las guarda enseguida, con un aviso (`FichaGuardado.migrarHabsDeClase`, js/11, P222).
+- **🪤👁 Una trampa no se coloca a la vista de un rival** (regla del dueño, 2026-10-27; `js/79-trampas-a-la-vista.js`): al elegir la casilla de una trampa
+  (habilidad `trampaDeHabilidad`, consumible `trampaConsumibleEnMapa`, el glifo y el portal; los pilares no) se ven los conos y la alerta del sigilo de los
+  rivales que esta pantalla ve (`elegirCasillaTrampa` → `trampaConosRivales`, lo pinta `trampaConosDibujar` desde `dibujar`, js/05); una casilla dentro del
+  cono azul de alguno no sirve (`trampaALaVista`, sumado a `trampaFueraDeAlcance`): avisa y la vuelve a pedir. Sin el token de quien la pone (el GM a mano),
+  no se mira nada. La zona naranja de alerta, por ahora, sí sirve (a decidir: P226).
 - **Las ocho del camino a 20 por rol** (2026-10-26, dueño): **😤 Golpe desesperado** (`desesperadoBonos`, js/69: los bonos según la vida PROPIA, con
   `Combatiente.desesperadoBonos`); **💥 Takle** (`saltoHab` de js/55 con `corre`: corre hasta quedar pegado, sin pasar paredes; vale también para una
   habilidad sin arma: `ataque.hab.saltoHab`, js/13; el efecto «Al final del orden» → `alFinalDelOrden`, js/04: se le corta el turno o, si ya era el último,

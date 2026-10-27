@@ -314,6 +314,12 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
      bien el más 3, está bien el flash, pero que no sea después de ver los dados»): **Flash** (botón instantáneo en el duelo): **+3 fijo** a una
      tirada suya de **PdG, Parry, Bloqueo o daño**, atacando o defendiendo, **elegida antes de tirar** (no después de ver los dados). 2 SP (4 en
      turno ajeno), o cooldown 2.
+  7. 🛡 **Escudo humano** (Miti-Miti, de clase: «Miti-Miti [2] — Marca un personaje como protegido. El protegido comparte con el tanque la mitad
+     del daño que recibe. Duración: 1 turno.»; dueño, 2026-10-27: «va así. Igual puede combinar con un escudo de vida extra, un escudo especial de
+     5 HP»): marca a un aliado a **3 casillas o menos**: queda **Protegido 2 turnos**; del daño que recibe, **la mitad (redondeada hacia arriba) se
+     la come el tanque** (daño ya calculado: no le resta su Defensa); si se alejan a más de 3, se corta. Además, al usarla el tanque recibe **5 de
+     Vida extra** (lo primero que se gasta de lo que le llega). 1 No2 y 3 SP, o cooldown 3; no es Flash. 🔧 Hace falta repartir el daño de uno con
+     otro.
 - Ya cubiertas por una de fábrica: Amplificar daño (Golpe fuerte), Remolino (Barrido), Shockwave (Pisotón), Takle, Desarmar, Aguante; Cañón Vasco ≈
   Salto aplastante; Daño en área (tanque) ≈ Barrido. Sacadito sigue en pausa.
 

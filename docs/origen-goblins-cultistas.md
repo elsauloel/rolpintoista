@@ -200,7 +200,7 @@ skills, porque si no después buscarlos vinculados el uno al otro va a ser una p
   tierra que ven todos también sea de atrás para adelante de manera suave.» → la ven todos; al soltar el token, la estela aparece casilla por casilla desde
   la primera hasta la última, suave; dura hasta el principio de su próximo turno y se va igual, de atrás para adelante. Sin programar todavía.
 
-### 🗡⚔ 4. Goblin híbrido (Warrior + choque liviano), anti-Larry — nivel 3 (propuesta, esperando el OK)
+### 🗡⚔ 4. Goblin híbrido (Warrior + choque liviano), anti-Larry — nivel 3 (OK del dueño)
 
 Dueño (2026-10-27): «el siguiente choque… el híbrido, más enfocado en resistir a Larry y en lidiar con él. Larry tiene muy pocos nitros… se creó ese skill
 donde puede tirarse un pedo para desplazarse con un salto alto; las trampas mucho no van a servir porque él prácticamente no se desplaza.»
@@ -221,6 +221,6 @@ donde puede tirarse un pedo para desplazarse con un salto alto; las trampas much
 - **Cambio (dueño, 2026-10-27)**: «una red, tipo red Neruvian… para reemplazar el tackle sin que pierda su turno» → **Red** en lugar de Takle: Larry no
   pierde el turno (puede tirar Drenar Vida y Pedos), pero no se escapa con el salto del Pedo. **Consumible**: «como la del cuero, que da escudo, pero contra
   daño especial» → **Poción de Piel de Cristal** (Común, escudo de 15 que absorbe solo el daño especial), para aguantar el Drenar Vida y los Pedos.
-- **Riesgo**: la Red es lenta (arranca en cooldown): arranca el combate con los 4 turnos de cooldown, así que la primera vez la tira recién a partir de la ronda 5, salvo que el GM la destrabe. A mirar en la simulación.
+- **Decidido (dueño, 2026-10-27)**: «le vamos a quitar a la red que empiece con cooldown. Que quede así» → en este creep la Red **arranca disponible** (cd 4 desde que la usa; al crearlo, `cdArranca: false` en su copia). OK al híbrido.
 - **El tunelero: la habilidad única se llama «Excavar»** (dueño, 2026-10-27). Al programarla, reemplaza a «Excavar (El origen)» y a «Puñalada desde abajo» (las dos sin auditar) y a la vieja «Excavar» de fábrica.
 - **Programado (2026-10-27)**: la habilidad **Excavar** única (`comun/skills-creep-base.js`; meterse 1 No2 sin cooldown; salir = un ataque, cd 2) y **la estela del túnel** (vtt-hexgrid/js/46). Falta: pegar la regla nueva (`tunel`) y probarlo en el mapa.

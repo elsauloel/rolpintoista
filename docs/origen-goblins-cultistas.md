@@ -188,3 +188,10 @@ skills, porque si no después buscarlos vinculados el uno al otro va a ser una p
   ven. Plan: cada casilla que recorre abajo (y el tramo hasta donde sale) queda marcada en el token (`tunel`, campo nuevo: hay que pegar la regla) y el mapa
   dibuja tierra removida con piedritas en esas casillas; al empezar su próximo turno se borran de a una, de la más vieja a la más nueva, cada una con un
   desvanecido. A decidir: ¿la estela la ven los jugadores (delata por dónde va)? Sin programar todavía.
+- **Ajuste (dueño, 2026-10-27)**: «lo pienso muy vulnerable [a] Larry, así que lo voy a enfocar más en Bizzante». Y Larry casi no camina (tiene muy pocos
+  No2; se mueve con el pedo que salta alto), así que **las trampas casi no le sirven contra él**. Propuesta: el tunelero va por Bizzante y cambia el **Polvo
+  cegador** por **Sal en la herida** (un ataque + 2 SP, cd 3: si ya sangra, +2 dados y el sangrado sube): Golpe que sangra → Sal en la herida, contra la
+  regeneración de la túnica de Bizzante. Números contra Bizzante (Defensa 5, Evasión/Parry 8): saliendo de abajo pega el 84 % (PdG 1d10 + 3), un ataque
+  común el 60 %; Por abajo le pasa ~10, Golpe que sangra ~7 + 2 por turno, Sal en la herida (sangrando) ~12. La trampa del encuentro sigue siendo la Red del
+  ballestero (para Petro y Bizzante, que sí caminan).
+- **Siguiente**: el híbrido, enfocado en aguantar a Larry y lidiar con él.

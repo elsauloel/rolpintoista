@@ -133,3 +133,19 @@ pondría algún skill de daño siniestro que sume algo de daño mágico directo,
 - **Números** (PdG.Esp 16): contra la Evasión (Aguja, Sanguijuela, la varita) Larry 97 %, Petro 88 %, Bizzante 87 %; contra la Res.Esp (Coraza, Mal
   de ojo) Larry 97 %, Bizzante 94 %, Petro 88 %; Confusión contra la Res.Mt: Petro 94 %, Bizzante 80 %, Larry 35 %.
 - Se van Armas perforantes, Señalar la presa, ¡A la carga!, Bendecir el arma y Ojo certero (eran de support).
+
+### 🛡 2. Goblin picapiedras (choque pesado) — nivel 3 (propuesta, esperando el OK)
+
+- **Atributos (39)**: Con 11 · Fue 9 · Agi 6 · Des 8 · Esp 5. Vida 55 (+5 = 60), No2 6, PdG 8, Parry 8, Dmg 9, Bloqueo 9, Evasión 6, Res.Esp y Res.CC 11,
+  Res.Mt 5, Rango 8. SP 15 (regen 2) si va en modo SP.
+- **Equipo** (nivel 3: las manos + 4 Comunes + 1 Buena): **Hachón de minero** (Buena: Tipo 8, 2d8 + 1, Rompe armadura 33 %) y **Escudo de cuero
+  endurecido** (Defensa +2, Res. crítico Tipo 4 +1); **Peto de placas de aprendiz** (Defensa +4, Tipo 4 +1, Vida +5, Res.CC +1, Iniciativa −1),
+  **Casco de minero** (Defensa +1, Luz +3), **Botas de minero** (Pisada atenta, Defensa +1), **Grebas de cuero** (Defensa +1, Tipo 4 +1).
+  Queda con **Defensa 9** (15 con Piel de hierro) y Res. crítico Tipo 4 3. **Consumible**: Poción de Cuero Duro (escudo de 15 contra el daño físico:
+  para aguantar la maza de Petro).
+- **Skills**: Provocar (1 No2, 2 SP, cd 2: PdG.Esp + nivel contra Res.Mt) · Romper armadura (un ataque + 2 SP, cd 3) · Golpe demoledor (un ataque +
+  4 SP, cd 4, lenta) · Piel de hierro (1 No2, 4 SP, cd 3: +6 Defensa, +6 Def.Esp, +1 resistencia a crítico, 2 turnos).
+- **Números**: el hachón hace 2d8 + 10 (19 de promedio): a Petro le pasan ~7 (9 con la Coraza maldita del jefe), a Bizzante ~14, a Larry ~15. Su PdG 8
+  (1d8) contra Petro: 50 % (Evasión 7 o Parry 8); contra Bizzante 49 %; contra Larry 75 %. Provocar: Petro 97 %, Bizzante 62 %, Larry 14 %.
+- **Sinergias**: provoca a Petro (que con la Confusión del jefe puede terminar pegándole a los suyos), se pone Piel de hierro y le rompe la armadura con
+  cada golpe que pega; la Coraza maldita del jefe le suma −2. Mientras Petro está con él, no va por el jefe ni por los tiradores.

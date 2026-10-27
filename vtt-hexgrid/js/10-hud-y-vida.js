@@ -168,7 +168,7 @@ function golpeTexto(nombre, golpe, r, previo, nuevo){
   const suf = extra.length ? ` · ${extra.join(' · ')}` : '';
   if(r.invulnerable) return `${nombre}: Invulnerable, el golpe de ${fmt(golpe)} no hizo nada`;
   if(r.recibido <= 0 && !r.absorbido) return `${nombre}: golpe de ${fmt(golpe)} · Defensa ${fmt(r.defensa)} lo frenó entero`;
-  return `${nombre}: ${fmt(golpe)} − Defensa ${fmt(r.defensa)} → ${fmt(r.recibido)} de daño (${fmt(previo)} → ${fmt(nuevo)} HP)${suf}`;
+  return `${nombre}: ${fmt(golpe)} − Defensa ${fmt(r.defensa)} → ${fmt(num(r.recibido) + num(r.vida))} de daño (${fmt(previo)} → ${fmt(nuevo)} HP)${suf}`;   // la Vida extra cuenta como daño (P227)
 }
 
 // ignoraDef: daño directo (un crítico, una trampa que ignora la Defensa, casteo…):

@@ -275,4 +275,8 @@ Dueño (2026-10-27): «después vamos al ballestero, que va a tener foco en Bizz
 - **Números contra Bizzante** (Evasión 8): un tiro le pega el 75 %; quieto, el 88 %; Clavar a la pared (quieto, +3), más del 90 %.
 - **Sinergias**: el Rengo del Tiro a la rodilla y el del tunelero (que sale de abajo pegado a Bizzante) lo dejan clavado lejos de los tiradores; la Red
   tendida va en el camino de Bizzante o de Petro (los que caminan); Clavar a la pared se arma con las paredes del mapa que está haciendo el dueño.
+- **Cambio (dueño, 2026-10-27)**: «pondría la ballesta de filo fino y el virote especial, que sea algún virote que rompa armadura» → **Ballesta de
+  filo fino** (Común: Tipo 4, 1d4 + 4, Crítico potente +2, Recarga 2; ~1,5 por tiro contra la Defensa 5 de Bizzante) y 3 **Virotes rompe-corazas** (Buena: Rompe
+  armadura, 1 stack, +1 No2 al dispararlo; el único que rompe armadura sin ser Raro, salvo el de ácido, que suma 1d4 ácido). Cada virote que pega le
+  baja 1 la Defensa a Bizzante, para el tunelero y el híbrido.
 

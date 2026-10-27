@@ -5891,7 +5891,19 @@ prueba('🛡 Blindaje, Piel de hierro, Escudo humano, Interponerse y Arte de la 
   igual([!!r, barrera && (barrera.escudoMagico), CreepCalculo.modTotal(sc2, 'def') - def0, CreepCalculo.modTotal(sc2, 'armadmg'), CreepCalculo.critEfectivo(sc2, 2) - CreepCalculo.critEfectivo(creepPrueba(), 2),
     eh.efectoEscudo, ej.alcance, ej.efectos[0].nombre, ej.efectos[0].spec.turnos, ip.flash, ip.interponerse.distancia, Combatiente.flashPara(ag.duelo, 'pdg'), Combatiente.flashPara(ag.duelo, 'eva', 'parry'), ag.duelo.flash.bono,
     ESTADOS_PRESET.find(p => p.nombre === 'Interpuesto').unGolpe],
-    [true, 12, 6, 6, 1, 5, 3, 'Miti-Miti', 2, true, 2, true, true, 3, true]);
+    [true, 12, 6, 6, 1, 5, 3, 'Escudo humano', 2, true, 2, true, true, 3, true]);
+});
+prueba('🔄 Las habilidades de clase siguen a su clase (P222, 2026-10-27): una copia vieja toma la versión nueva; una editada a mano después, no', () => {
+  const base = CLASES_SKILLS.find(c => c.id === 'warrior').habilidades.find(x => x.id === 'warrior-contraataque');
+  const vieja = {...structuredClone(base), id: 'h1', costo: '2', turnoAjenoSp: '', detalle: 'el texto de antes', job: true, jobCosto: 1, habClaseId: base.id, habClase: 'Warrior', cdActual: 1};
+  const S = {habilidades: [vieja, {id: 'h2', nombre: 'Mía', habClaseId: 'bib-xyz', costo: '9'}]};
+  const cambiadas = FichaGuardado.migrarHabsDeClase(S);
+  const h = S.habilidades[0];
+  const quieta = FichaGuardado.migrarHabsDeClase(S);   // ya al día: no toca nada
+  h.costo = '5';                                        // la edita a mano
+  const tras = FichaGuardado.migrarHabsDeClase(S);
+  igual([cambiadas, h.id, h.costo === '5', h.turnoAjenoSp, h.detalle === base.detalle, h.jobCosto, h.cdActual, !!h.claseHuella, quieta, tras, S.habilidades[0].costo, S.habilidades[1].costo],
+    [[base.nombre], 'h1', true, '2', true, 1, 1, true, [], [], '5', '9']);
 });
 /* ---------- Resultado ---------- */
 Promise.all(pendientes).then(() => {

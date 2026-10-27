@@ -157,7 +157,7 @@ function leerGolpe(texto){
 function golpeTexto(nombre, golpe, r, previo, nuevo){
   const extra = [];
   if(r.arcano) extra.push(`la Armadura arcana absorbió ${fmt(r.arcano)}`);
-  if(r.mitiMiti) extra.push(`🛡 ${r.mitiMitiNombre} se llevó ${fmt(r.mitiMiti)} (Miti-Miti)`);
+  if(r.mitiMiti) extra.push(`🛡 ${r.mitiMitiNombre} se llevó ${fmt(r.mitiMiti)} (${r.mitiMitiTxt || 'Miti-Miti'})`);
   if(num(r.absorbido) - num(r.arcano) > 0) extra.push(`Vida extra absorbió ${fmt(num(r.absorbido) - num(r.arcano))}`);
   const suf = extra.length ? ` · ${extra.join(' · ')}` : '';
   if(r.invulnerable) return `${nombre}: Invulnerable, el golpe de ${fmt(golpe)} no hizo nada`;
@@ -274,6 +274,7 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
 /* 🛡 El Escudo humano de los creeps (2026-10-27, el Miti-Miti un escalón arriba): un creep con la marca protege a otro creep (`protege` = su id), a 3 casillas o
    menos (más lejos, se corta). Lo cobra el mapa del GM, que maneja a los dos. */
 const ESCUDO_HUMANO_DIST = 3;
+const ESCUDO_HUMANO_NOMBRES = ['Escudo humano', 'Miti-Miti'];   // (hasta el 2026-10-27 la marca del creep se llamaba como la de clase)
 function mitiMitiDe(t){
   if(!t || !t.fichaId) return null;
   if(t.tipo === 'creep'){
@@ -282,7 +283,7 @@ function mitiMitiDe(t){
       if(!x || x === t || x.tipo !== 'creep' || !x.fichaId || x.fichaId === t.fichaId) continue;
       const sc = creepPrivadoDe(x.fichaId);
       if(!sc || num(sc.hp) <= 0) continue;
-      if((sc.estados || []).some(e => e && e.activo !== false && e.nombre === 'Miti-Miti' && e.protege === t.fichaId) && distanciaHex(x, t) <= ESCUDO_HUMANO_DIST) return x;
+      if((sc.estados || []).some(e => e && e.activo !== false && ESCUDO_HUMANO_NOMBRES.includes(e.nombre) && e.protege === t.fichaId) && distanciaHex(x, t) <= ESCUDO_HUMANO_DIST) return x;
     }
     return null;
   }
@@ -296,7 +297,7 @@ function mitiMitiDe(t){
 function mitiMitiPartir(r, prot){
   if(!prot || !(r.recibido > 0)) return 0;
   const m = Math.ceil(r.recibido / 2);
-  r.recibido -= m; r.mitiMiti = m; r.mitiMitiNombre = nombreDe(prot);
+  r.recibido -= m; r.mitiMiti = m; r.mitiMitiNombre = nombreDe(prot); r.mitiMitiTxt = prot.tipo === 'creep' ? 'Escudo humano' : 'Miti-Miti';
   return m;
 }
 async function mitiMitiCobrar(t, prot, res){

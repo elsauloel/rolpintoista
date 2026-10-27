@@ -145,13 +145,24 @@ async function arrastrarResuelto(d){
   try{ await coleccionTokens().doc(d.defensor.tokenId).update({col: fin.col, fila: fin.fila, ruta: firebase.firestore.FieldValue.delete()}); }
   catch(err){ console.error('Arrastrar: no se pudo mover', err); momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `Traelo ${pasos} casillas a mano (no se pudo mover solo).`, estado: 'listo'}); return; }
   const trampaTxt = corte > 0 ? ' En el camino pisa algo: se frena ahí.' : '';
-  momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `Lo trae ${pasos} casillero${pasos === 1 ? '' : 's'} hacia ${quien} (no camina: sin No2 ni ataques de oportunidad).${trampaTxt}`, estado: 'listo'});
+  momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `Lo trae ${pasos} casillero${pasos === 1 ? '' : 's'} hacia ${quien} (no camina: sin No2 ni ataques de oportunidad).${trampaTxt}`, estado: 'listo',
+    datos: {arrastre: {tokenId: d.defensor.tokenId, celdas: final.map(x => ({col: x.col, fila: x.fila}))}}});   // las zonas del camino: las revisa la pantalla de su dueño (arrastreZonasMomento)
   mesaLinea(`🪝 ${quien} arrastra a ${nom} ${pasos} casillero${pasos === 1 ? '' : 's'}${trampaTxt ? ' — pisó una trampa en el camino' : ''}`, 'recordatorio');
   if(corte > 0 && typeof trampaResolver === 'function'){
     trampaPendiente = {tokenId: d.defensor.tokenId, tipo: 'pisa', id: tr.id, el: tr.el, celda: fin, desde: final[final.length - 2]};
     setTimeout(() => { trampaResolver().catch(err => console.error('Arrastrar: la trampa', err)); }, 600);
   }
-  try{ if(typeof zonaRevisarEntrada === 'function') zonaRevisarEntrada(d.defensor.tokenId, final, 0); }catch(err){ console.error('Arrastrar: las zonas del camino', err); }
+}
+// Las zonas del camino de alguien arrastrado (2026-10-27): cada pantalla revisa lo suyo (zonaEsMia: el dueño a su personaje, el GM a sus creeps), así
+// que la que lo arrastró avisa con el momento y la del dueño las revisa. Solo un momento de recién (al entrar al mapa no se repiten los viejos).
+const arrastresVistos = new Set();
+function arrastreZonasMomento(id, d){
+  const a = d && d.datos && d.datos.arrastre;
+  if(!a || !Array.isArray(a.celdas) || a.celdas.length < 2 || arrastresVistos.has(id)) return;
+  arrastresVistos.add(id);
+  const cuando = d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now();
+  if(Date.now() - cuando > 20000 || typeof zonaRevisarEntrada !== 'function') return;
+  setTimeout(() => { try{ zonaRevisarEntrada(a.tokenId, a.celdas, 0); }catch(err){ console.error('Arrastrar: las zonas del camino', err); } }, 800);   // (que llegue antes la casilla nueva)
 }
 
 // ⚖ Carga que derriba (dueño, 2026-10-27): si corrió 3 o más y pegó, Fuerza + X contra la Res.CC; si gana, Sentado (empate: no cae).

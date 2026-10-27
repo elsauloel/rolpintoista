@@ -369,6 +369,16 @@ async function cueroTrollAlTerminar(){
    aparecen los anuncios y, una vez resueltos todos, el botín»). El GM, al abrir «Finalizar combate» (js/18), deja un momento `fin-combate`; cada
    pantalla (js/16) resuelve en orden lo de los personajes que maneja: el equipo que se repara solo, el Anillo de cuero de troll (elegir pieza),
    la Polilla que no se usó y Desarmar trampas. El botín de un jugador (js/12) espera a que termine (`esperarFinDeCombate`). Una vez por combate. */
+/* 💨 «Una vez por combate» (P223, dueño, 2026-10-27: «se desbloquea al finalizar el combate»): el GM libera las habilidades de los creeps del mapa
+   que ya la usaron (el Segundo aliento). */
+async function unaVezAlTerminar(){
+  if(!soyGM) return;
+  for(const [id, e] of creepsPriv){
+    if(!e || !e.sc || !(e.sc.habilidades || []).some(h => h && h.unaVezUsada)) continue;
+    try{ await modificarCreep(id, sc => { (sc.habilidades || []).forEach(h => { if(h) delete h.unaVezUsada; }); }); }
+    catch(err){ console.error('No se pudo liberar el «una vez por combate»:', err); }
+  }
+}
 let finCombateEnCurso = null, finCombateHecho = false;
 const finCombateVistos = new Set();
 function finCombateMomento(id){
@@ -380,6 +390,7 @@ function finCombateMomento(id){
     try{ await cueroTrollAlTerminar(); }catch(err){ console.error('Fin del combate (cuero de troll):', err); }
     try{ await polillaAlTerminar(); }catch(err){ console.error('Fin del combate (Polilla):', err); }
     try{ await pergaminosAlTerminar(); }catch(err){ console.error('Fin del combate (pergaminos):', err); }
+    try{ await unaVezAlTerminar(); }catch(err){ console.error('Fin del combate (una vez por combate):', err); }
     try{ if(typeof desarmarAlTerminar === 'function') await desarmarAlTerminar(true); }catch(err){ console.error('Fin del combate (trampas):', err); }
   })().finally(() => { finCombateEnCurso = null; });
 }

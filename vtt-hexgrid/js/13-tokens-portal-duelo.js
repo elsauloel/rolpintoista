@@ -1769,7 +1769,7 @@ async function dueloAplicarDano(d){
     if(d.hab && d.hab.atrae && !res.r.invulnerable) await dueloAtraer(d).catch(err => console.error('No se pudo atraer al objetivo:', err));   // el gancho
     if(d.hab && d.hab.riesgo && (dn.rolls || []).map(num).includes(num(d.hab.riesgo.si))) await dueloRiesgo(d).catch(err => console.error('No se pudo aplicar el riesgo:', err));   // la inestable
     // `perfora`: solo si la Perfora mandó (pasaron esos N, la Defensa frenaba más): el duelo lo cuenta así.
-    return {...base, desgaste, defensa: crit ? restaIgnorando : def, ...(perfora ? {perfora} : {}), ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, ...(num(res.r.mitiMiti) > 0 ? {mitiMiti: num(res.r.mitiMiti), mitiMitiNombre: String(res.r.mitiMitiNombre || '').slice(0, 40)} : {}), hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(magico ? {magico} : {}), ...(porDano ? {porDano} : {})};
+    return {...base, desgaste, defensa: crit ? restaIgnorando : def, ...(perfora ? {perfora} : {}), ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), invulnerable: !!res.r.invulnerable, ...(num(res.r.mitiMiti) > 0 ? {mitiMiti: num(res.r.mitiMiti), mitiMitiNombre: String(res.r.mitiMitiNombre || '').slice(0, 40), mitiMitiTxt: String(res.r.mitiMitiTxt || 'Miti-Miti').slice(0, 20)} : {}), hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(magico ? {magico} : {}), ...(porDano ? {porDano} : {})};
   }catch(err){
     console.error('No se pudo aplicar el daño del duelo:', err);
     return {...base, defensa: def, manual: true, golpe: base.mitad ? aplicar : golpe, motivoManual: err && err.message === 'SIN_DEF' ? 'la ficha todavía no publicó su Defensa' : 'falló la escritura'};
@@ -2234,15 +2234,15 @@ async function dueloAplicarEfectoBase(d, ef){
     return r && r.ok ? {nota: `${d.atacante.nombre} queda Desafiante: +2 Defensa y +2 Defensa especial, 2 turnos`} : {manual: true, nota: `${d.atacante.nombre}: Desafiante no entró (${(r && r.motivo) || '¿?'})`};
   }
   // 🛡 El Escudo humano (2026-10-27, el Miti-Miti de creep, 2 turnos): la marca queda en el creep que la usa; el reparto lo hace js/10 (a 3 casillas o menos).
-  if(spec.nombre === 'Miti-Miti' && d.atacante.tipo === 'creep'){
+  if((spec.nombre === 'Escudo humano' || spec.nombre === 'Miti-Miti') && d.atacante.tipo === 'creep'){   // (las copias de antes del 2026-10-27 traen «Miti-Miti»)
     const ta = tokens.get(d.atacante.tokenId);
     if(!ta || !ta.fichaId || t.tipo !== 'creep') return {manual: true, nota: 'el Escudo humano de un creep protege a otro creep: aplicalo a mano'};
     if(ta.fichaId === t.fichaId) return {manual: true, nota: 'el Escudo humano es para un aliado, no para él'};
     const nom = nombreDe(t), turnos = Math.max(1, Math.round(num(spec.turnos)) || 2);
     let r = null;
     await modificarCreep(ta.fichaId, sc => {
-      sc.estados = (sc.estados || []).filter(e => !(e && e.nombre === 'Miti-Miti'));   // un protegido por vez
-      r = EstadosAplicar.aplicarACreep(sc, {nombre: 'Miti-Miti', turnos, polaridad: 'buff', protege: t.fichaId, protegeNombre: nom,
+      sc.estados = (sc.estados || []).filter(e => !(e && ESCUDO_HUMANO_NOMBRES.includes(e.nombre)));   // un protegido por vez
+      r = EstadosAplicar.aplicarACreep(sc, {nombre: 'Escudo humano', turnos, polaridad: 'buff', protege: t.fichaId, protegeNombre: nom,
         detalle: `Escudo humano: protege a ${nom} — de cada golpe o área que lo daña se lleva la mitad (para arriba), directo a la vida, ${turnos} turnos, mientras esté a ${ESCUDO_HUMANO_DIST} casillas o menos.`});
       return {};
     });

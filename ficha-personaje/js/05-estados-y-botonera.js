@@ -311,6 +311,7 @@ function renderAll(){
   // Cualquier ficha que llegue (archivo, mesa, otra ventana) pasa por acá.
   migrarEstadoIt2(S);
   migrarEstadoEspecial(S);
+  FichaGuardado.migrarHabsDeClase(S);   // P222: las de clase siguen a su clase
   if(S.nitros === null || S.nitros === undefined) S.nitros = nitrosMaximo();
   $('#f-nombre').value = S.meta.nombre;
   fichaIdentidadRender();  // por si cambió el nombre del personaje

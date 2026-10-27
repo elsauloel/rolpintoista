@@ -292,6 +292,60 @@ const FichaGuardado = (() => {
       ['detalle', 'costo', 'nitrosCosto', 'tiradaStat', 'duelo', 'modo', 'efectoNombre', 'efectoTurnos', 'efectoMods', 'efectoDetalle'].forEach(k => { if(base[k] !== undefined) h[k] = structuredClone(base[k]); else delete h[k]; });
     });
   }
+  // 🔄 Las habilidades de clase siguen a su clase (P222, dueño, 2026-10-27: «las habilidades de clase que un personaje ya tiene, podrías
+  // detectarlas vos y reemplazarlas»). La copia guarda `claseHuella` (cómo era la de clase cuando se copió o se puso al día); si la de clase
+  // cambió, la copia toma la versión nueva — salvo que se haya editado a mano desde entonces (sigue siendo de quien la editó). Una copia de
+  // antes (sin huella) se pone al día una vez. Lo propio del personaje (Job, imagen, origen) y lo del turno (cooldown, cargas) se conserva; una
+  // subida de la biblioteca (`bibOrigen`) sigue con su 🔔 de versión nueva.
+  const HAB_PROPIOS = new Set(['id', 'job', 'jobCosto', 'origen', 'imagen', 'habClaseId', 'habClase', 'bibOrigen', 'bibIgnorada', 'claseHuella',
+    'para', 'cdActual', 'cargaActual', 'usadaEsteTurno', 'unaVezUsada', 'activo']);
+  // La habilidad de clase como queda en una copia (lo mismo que suma «+ Habilidad → De clase»).
+  function habDeClaseComoCopia(base){
+    const {_bib, para, clase, ...c} = structuredClone(base);
+    c.costo = base.costo || '';
+    c.nitrosCosto = base.nitrosCosto ?? IT2_NITROS_HAB();
+    c.automatizada = base.automatizada !== false;
+    return c;
+  }
+  const IT2_NITROS_HAB = () => (typeof FichaCalculo !== 'undefined' && FichaCalculo.IT2 && FichaCalculo.IT2.nitrosHabilidad) ?? 1;
+  // Lo que hace la habilidad, sin lo propio: para comparar copia y clase.
+  function huellaHab(h){
+    const o = {};
+    Object.keys(h || {}).filter(k => !HAB_PROPIOS.has(k) && h[k] !== undefined && h[k] !== null && h[k] !== '').sort().forEach(k => { o[k] = h[k]; });
+    return JSON.stringify(o);
+  }
+  let basesDeClase = null;
+  function baseDeClase(id){
+    if(!basesDeClase){
+      if(typeof CLASES_SKILLS === 'undefined') return null;   // (todavía no cargó: no se guarda una lista vacía)
+      basesDeClase = new Map();
+      const pools = [...(typeof CLASES_SKILLS !== 'undefined' ? CLASES_SKILLS.flatMap(c => c.habilidades || []) : []),
+        ...(typeof SKILLS_CUSTOM !== 'undefined' ? SKILLS_CUSTOM : [])];
+      pools.forEach(b => { if(b && b.id && !basesDeClase.has(b.id)) basesDeClase.set(b.id, {copia: habDeClaseComoCopia(b), huella: null}); });
+    }
+    const b = basesDeClase.get(id);
+    if(b && b.huella === null) b.huella = huellaHab(b.copia);
+    return b || null;
+  }
+  // Devuelve los nombres de las que se pusieron al día.
+  function migrarHabsDeClase(S){
+    const cambiadas = [];
+    (S.habilidades || []).forEach((h, i) => {
+      if(!h || !h.habClaseId || h.bibOrigen || String(h.habClaseId).startsWith('bib-')) return;
+      const b = baseDeClase(h.habClaseId);
+      if(!b) return;
+      if(h.claseHuella === b.huella) return;                                   // ya está al día
+      const propia = huellaHab(h);
+      if(h.claseHuella && propia !== h.claseHuella) return;                    // editada a mano desde la última vez: se respeta
+      if(propia === b.huella){ h.claseHuella = b.huella; return; }             // ya era igual: solo se anota
+      const nueva = structuredClone(b.copia);
+      Object.keys(h).forEach(k => { if(HAB_PROPIOS.has(k)) nueva[k] = h[k]; });
+      nueva.claseHuella = b.huella;
+      S.habilidades[i] = nueva;
+      cambiadas.push(nueva.nombre || h.nombre || h.habClaseId);
+    });
+    return cambiadas;
+  }
   function completar(S, o){
     o = o || {};
     migrarEstadoIt2(S, o.spPorBono);
@@ -299,6 +353,7 @@ const FichaGuardado = (() => {
     migrarTextosFlash(S);
     migrarDash(S);
     migrarOjoDeAsesino(S);
+    migrarHabsDeClase(S);
     // Crítico frecuente (dueño, 2026-10-16): desde el 2026-09-25 es solo un bono (receta '0'); las fichas de antes lo sacaban de la Destreza.
     if(S.formulas && String(S.formulas.crit).trim() === 'des') S.formulas.crit = '0';
     if(S.nitros === null || S.nitros === undefined){
@@ -428,7 +483,7 @@ const FichaGuardado = (() => {
   return {ESCALA_TIPOS, DEFAULT, CATALOGO_IDS, PARTES, CLAVES_CON_PARTE,
     migrarModsIt2, migrarObjIt2, migrarEstadoIt2, migrarObjEspecial, migrarEstadoEspecial,
     correrTiposTexto, migrarObjTipos, migrarEstadoTipos, mergeDeep,
-    normalizar, completar,
+    normalizar, completar, migrarHabsDeClase, huellaHab, baseDeClase,
     serializar, imagenesInvocaciones, ponerImagenesInvocaciones, partes, leerParte, armarDatos, aplicarParte,
     leer, cargar};
 })();

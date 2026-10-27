@@ -100,7 +100,26 @@ Con los repartos por rol del asistente de creeps (`Combatiente.PESOS_ROL`), en e
 
 Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, una habilidad mágica Especial), ese atributo se sube un poco.
 
-## Equipo por nivel (propuesta)
+## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
+
+«El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4
+piezas equipables comunes. En nivel 3, a eso sumarle una de buena calidad. En nivel 4, 2 de buena calidad y 3 comunes. En nivel 5, 3 de buena calidad
+y 3 comunes. Así, a grandes rasgos, como criterio.»
+
+| Nivel | Las manos + las piezas |
+|---|---|
+| 1 | arma / arma + escudo / arma + talismán / de dos manos · 2 piezas Comunes |
+| 2 | las manos · 4 piezas Comunes |
+| 3 | las manos · 4 Comunes + 1 de Buena calidad |
+| 4 | las manos · 3 Comunes + 2 de Buena calidad |
+| 5 | las manos · 3 Comunes + 3 de Buena calidad |
+
+(Lectura de Claude, a confirmar: lo de las manos va aparte de las piezas; las de Buena calidad pueden ser el arma.)
+
+**El consumible** (dueño, 2026-10-27): el consumible que lleva cada creep (el que después cae en el botín) se elige para que **le sirva a él en la
+pelea** (y lo use), no al azar.
+
+## Equipo por nivel (propuesta vieja, reemplazada)
 
 | Nivel | Equipo |
 |---|---|

@@ -211,11 +211,16 @@ donde puede tirarse un pedo para desplazarse con un salto alto; las trampas much
   viajero** (Def.Esp +1, Res.Esp +1, Vida +5), **Capucha de lana del culto** (Def.Esp +1, Res.Esp +1), **Escarpines de piel de cururú** (Def.Esp +1, Res.
   tóxico +1), **Guanteletes de cazador** (PdG +1, Defensa +1, Tipo 4 +1). Queda con **Res.Esp 15**, Def.Esp 3, Res. tóxico 1.
 - **Skills (4)**: **Salto** (un ataque + 2 SP, cd 3: hasta 3 casilleros por encima de lo que haya, sin No2 ni oportunidad, +1 PdG y Crítico frecuente +1)
-  · **Takle** (Flash, 2 No2 y 3 SP, cd 3: Con + 2 contra Con; −3 No2, empujado 2 y al final del orden) · **Remate** (un ataque + 2 SP, cd 3: herido a la
+  · **Red** (auditada, debuffer/hunter; 2 No2 y 3 SP, cd 4, lenta: PdG contra Evasión, dentro de su Rango; si gana, Inmovilizado hasta 3 turnos; al
+  empezar su turno el atrapado tira Fuerza contra la Destreza del híbrido para soltarse, gratis; un aliado pegado lo ayuda por 1 No2) · **Remate** (un ataque + 2 SP, cd 3: herido a la
   mitad +2 dados, a un cuarto +3) · **Ojo de asesino** (un ataque + 2 SP, cd 2: +1 PdG, +2 al daño, +1/+1 a los críticos).
-- **Números contra Larry** (Con 4, Evasión 4, Defensa 4, 20 de vida, 4 No2): Takle 99 % (le deja 1 No2 y le corta el turno); Salto le pega el 94 %, un
+- **Números contra Larry** (Con 4, Evasión 4, Defensa 4, 20 de vida, 4 No2): la Red lo atrapa el 86 % (a Bizzante, el 62 %); Larry se suelta solo el 25 %
+  por turno (Fuerza 4 contra Destreza 8), con Bizzante pegado ayudándolo el 68 %; Salto le pega el 94 %, un
   golpe común el 86 %; la espada hace 2d6 + 8 (15): le pasan ~11 por golpe; con Larry a la mitad, el Remate (+2d6) lo tumba. Aguantando a Larry: el Drenar
   Vida con X = 5 lo resiste el 61 %, con X = 8 el 18 %, con X = 10 el 6 %; los Pedos le ganan el 66 % (contra Res.Esp 4 sería el 99 %).
-- **Riesgo**: es un cazador de Larry muy efectivo (Takle casi siempre le saca el turno). A mirar en la simulación.
+- **Cambio (dueño, 2026-10-27)**: «una red, tipo red Neruvian… para reemplazar el tackle sin que pierda su turno» → **Red** en lugar de Takle: Larry no
+  pierde el turno (puede tirar Drenar Vida y Pedos), pero no se escapa con el salto del Pedo. **Consumible**: «como la del cuero, que da escudo, pero contra
+  daño especial» → **Poción de Piel de Cristal** (Común, escudo de 15 que absorbe solo el daño especial), para aguantar el Drenar Vida y los Pedos.
+- **Riesgo**: la Red es lenta (arranca en cooldown): arranca el combate con los 4 turnos de cooldown, así que la primera vez la tira recién a partir de la ronda 5, salvo que el GM la destrabe. A mirar en la simulación.
 - **El tunelero: la habilidad única se llama «Excavar»** (dueño, 2026-10-27). Al programarla, reemplaza a «Excavar (El origen)» y a «Puñalada desde abajo» (las dos sin auditar) y a la vieja «Excavar» de fábrica.
 - **Programado (2026-10-27)**: la habilidad **Excavar** única (`comun/skills-creep-base.js`; meterse 1 No2 sin cooldown; salir = un ataque, cd 2) y **la estela del túnel** (vtt-hexgrid/js/46). Falta: pegar la regla nueva (`tunel`) y probarlo en el mapa.

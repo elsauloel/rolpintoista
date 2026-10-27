@@ -42,7 +42,7 @@
 > **Auditoría de las habilidades de creep (en curso, 2026-10-20) → [`docs/auditoria-skills-creep.md`](docs/auditoria-skills-creep.md)**: una por una, empezando por las de choque; criterios y lo auditado.
 > **Desde el 2026-10-21 se diseña rol por rol → [`docs/diseno-roles-creep.md`](docs/diseno-roles-creep.md)**: los roles, la lista de ideas de cada uno (se retoma al volver al rol) y la forma de trabajo.
 >
-> **Creeps humanoides nuevos (en curso, 2026-10-26) → [`docs/creeps-humanoides.md`](docs/creeps-humanoides.md)**: 20 líneas (4 warriors, 4 tanques, 4 híbridos, 8 livianos) de nivel 1 a 5, con las skills auditadas; un creep por rol, rotando; se diseña primero y se programa después.
+> **Creeps humanoides nuevos (en curso, 2026-10-26) → [`docs/creeps-humanoides.md`](docs/creeps-humanoides.md)**: 36 líneas (4 warriors, 4 tanques, 4 híbridos, 8 livianos, 4 de rango, 4 magos, 4 supports, 4 debuffers) de nivel 1 a 5, hasta Buena calidad, con las skills auditadas; un creep por rol, rotando; se diseña primero y se programa después.
 >
 > **Pruebas pendientes en el mapa → [`docs/pruebas-en-el-mapa.md`](docs/pruebas-en-el-mapa.md)** (protocolo del dueño, 2026-10-09): lo que hay que ver en el mapa, si no se puede (Chrome desconectado, falta una cuenta), no se prueba «por detrás»: se anota ahí y se prueba apenas se pueda, con capturas.
 >

@@ -250,6 +250,31 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
   - ✅ **Aguante** → Aguante: «(Skill nueva, 2026-10-23: la misma del modo aguante de los creeps de choque pesado, sumada al pool del Tanque por el dueño; tope de dados: nivel + 1.)»
   - **Temple**: Endurecés el cuerpo: +1 de Resistencia a crítico contra armas de todo Tipo durante 2 turnos (cada punto le quita un nivel al crítico). Solo sobre vos. ⚖ Propuesta a auditar con el grupo (críticos nuevos: Crítico frecuente baja…
 
+### Tanda Tanque (2026-10-26) — para elegir
+
+> Dueño, 2026-10-26: «podemos diseñar algunas skills más de tanque antes de hacer [los creeps humanoides]… basarnos en las skills de clase y en
+> conceptos e ideas que vos me armes en una lista». El Tanque tenía pocas propias auditadas (Aguante, Desarmar, Pisotón, Takle); el «provocar» de El
+> origen quedó archivado, así que el Taunt vuelve a estar pendiente. Cada propuesta ya va un escalón arriba de la de clase (creep). ⚙ = el motor
+> ya tiene casi todo · 🔧 = hace falta una mecánica nueva en el mapa o en el duelo.
+
+| # | Concepto | De dónde sale | Versión creep propuesta | Motor |
+|---|---|---|---|---|
+| 1 | **Provocar** | Taunt (clase), D18 | Tira Especial +2 (o Constitución) contra la Res.Mt de un rival a 3 casillas o menos: queda Provocado por él hasta el final de su próximo turno (el Provocado de Tirar la bronca: el Anuncio y el brillo ya existen) | ⚙ |
+| 2 | **Grito de desafío** ✦ | Taunt en área | El mismo provocar, contra todos los rivales a 2 casillas o menos (una onda: cada uno resiste por separado) | ⚙ |
+| 3 | **Piel de hierro** | Piel resistente (clase), E26 | +4 Defensa, +4 Def. especial y +1 Res. a crítico de todo Tipo, 2 turnos | ⚙ |
+| 4 | **Blindaje** | Blindaje (clase) | Flash: un escudo de 10 que absorbe la próxima fuente de daño de este turno | ⚙ |
+| 5 | **Segundo aliento** | Recuperación (clase), E25 | Se cura 4 + su Constitución, una vez por combate (o con cooldown largo) | ⚙ |
+| 6 | **Inamovible** | E27 | 2 turnos sin que lo empujen, lo tiren Sentado ni le bajen el orden, y +2 Res.CC (el preset Inamovible ya existe) | ⚙ |
+| 7 | **Estoicismo** | Estoicismo (clase de Warrior) | Flash: +2 Defensa por cada rival pegado y +1 Res. a crítico, hasta su próximo turno | ⚙ |
+| 8 | **Golpe de escudo** ✦ | D22 Derribar | Un ataque con el escudo (daño = su Bloqueo + su Dmg): si gana Fuerza contra Constitución, lo deja Sentado y Demora 1 | ⚙ |
+| 9 | **Sonic Boom** | Sonic Boom (clase) | Flash: un cono al frente (Fuerza contra Constitución); cada uno que pierde, pierde 1 + la diferencia de No2 y, en 0, queda Sentado (el efecto «Pierde No2» ya existe) | ⚙ |
+| 10 | **Escudo humano** | Miti-Miti (clase), F29 | Marca a un aliado a 3 casillas o menos: la mitad del daño que recibe se lo come el tanque, 2 turnos | 🔧 |
+| 11 | **Interponerse** ✦ | F31 | Flash: cuando atacan a un aliado a 2 casillas o menos, salta a su lado (gratis, sin oportunidad) y el golpe va contra él | 🔧 |
+| 12 | **Represalia** | G34 | Hasta su próximo turno, si le pegan a un aliado pegado a él, ataca gratis a quien pegó (una vez por turno) | 🔧 |
+| 13 | **Muralla** ✦ | D19–20 | Hasta su próximo turno, cada casilla pegada a él cuesta 1 No2 más a los rivales, y alejarse de él le da siempre oportunidad (aunque ya la haya usado) | 🔧 |
+| 14 | **Cubrir al de atrás** | F30 | Un aura: los aliados pegados a él del lado de su espalda tienen +2 Defensa, 2 turnos | 🔧 |
+| 15 | **Última resistencia** | E28 | Una vez por combate, al llegar a 0 queda en 1 de vida hasta el final de su próximo turno | 🔧 |
+
 ## 2. Choque liviano — las ideas del rol
 
 Ya cubierto al entrar (2026-10-21): golpes precisos (Tajo veloz, Estocada, Zarpazo), las variantes del Sangrado y su versión fuerte, el Rengo (Golpe a la

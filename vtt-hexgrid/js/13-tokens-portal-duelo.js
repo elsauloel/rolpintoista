@@ -1454,7 +1454,7 @@ function dueloElegirAreaMapa(msg){
     if(hab.destello) await destelloEn(h, radio, yo, hab, todos.filter(t => !t.oculto && !t.bajoTierra && !etereoDe(t) && !propio(t) && distanciaHex(h, t) <= radio && dueloEsRival(yo, t)));   // ☀ el destello (Luz para los suyos)
     if(hab.despeja) despejarEn(enCono || new Set(celdasFlor(Math.max(1, radio)).map(o => { const c0 = hexACubo(h); return nbPack(cuboACol(c0.q + o.dq, c0.r + o.dr), cuboAFila(c0.q + o.dq, c0.r + o.dr)); })), hab.nombre);   // el vendaval
     const objetivos = todos
-      .filter(t => !(hab.tormenta || hab.meteoro) || !iniciativaFueraDeJuego(t.id))   // la tormenta y el meteoro no les caen a los caídos
+      .filter(t => !iniciativaFueraDeJuego(t.id))   // 💀 un caído es un cuerpo esperando que lo revivan: ningún área lo alcanza (P225, dueño, 2026-10-27)
       // Un área de aliados (2026-10-23, la Oleada sanadora): entran los suyos ocultos (el GM con sus creeps) y él mismo (en un área; la onda, no: los gritos
       // son «no él»); una curación no les llega a los caídos.
       .filter(t => (!t.oculto || (hab.aliados && soyGM)) && !t.bajoTierra && !etereoDe(t) && (!propio(t) || (hab.aliados && hab.objetivo === 'area')) && (enCono ? enCono.has(nbPack(t.col, t.fila)) : distanciaHex(h, t) <= radio || (h.otro && distanciaHex(h.otro, t) <= radio)))   // (h.otro: la casilla de salida del Remolino)

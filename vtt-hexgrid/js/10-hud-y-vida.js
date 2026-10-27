@@ -596,7 +596,7 @@ function rayoCadena(idInicial, dano, mas, o){
     let mejor = null, mejorDist = Infinity, mejorAgua = false;
     const ch = charco(actual);
     tokens.forEach((x, id) => {
-      if(usados.has(id) || !x.fichaId || (x.oculto && !soyGM) || x.bajoTierra || etereoDe(x)) return;   // 🕳 bajo tierra / 👁 etéreo: no le llega
+      if(usados.has(id) || !x.fichaId || (x.oculto && !soyGM) || x.bajoTierra || etereoDe(x) || iniciativaFueraDeJuego(id)) return;   // 🕳 bajo tierra / 👁 etéreo / 💀 caído (P225): no le llega
       const dist = distanciaHex({col: actual.col, fila: actual.fila}, {col: x.col, fila: x.fila});
       const delCharco = !!(ch && ch.has(x.col + ',' + x.fila) && mojado(x));
       if(!delCharco && x.tipo !== t0.tipo) return;   // el salto, al mismo bando; el agua conduce a todos los que estén parados en ella

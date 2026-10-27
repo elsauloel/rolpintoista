@@ -1262,11 +1262,16 @@ ataque con su arma a 3 casillas o menos con +2 PdG (contra la Evasión o el Parr
 
 (2026-10-27, dueño: «anotalo pendiente para que lo revise cuando esté en la compu» → `docs/pendientes.md`, sección 🖥.)
 
-### P225 — ¿Las áreas alcanzan a un personaje caído? (2026-10-27)
+### P225 — ¿Las áreas alcanzan a un personaje caído? (2026-10-27) ✅ decidida (2026-10-27)
 
 Probando el Sonic Boom se vio que un área (cono, onda, flor) también le pega a un personaje con la vida en 0: así funcionó siempre el motor
 (junta a todos los rivales que quedan adentro). Un caído no se defiende, y el daño de más puede acercarlo a morir del todo.
 **A decidir:** ¿las áreas lo saltean (como si no estuviera), lo alcanzan igual (como hoy), o lo alcanzan solo si quien la tira lo elige?
+
+**Decidido (dueño, 2026-10-27):** «los personajes con 0 HP son un cuerpo esperando a ser resucitado. Nada más.» Hecho: ningún área (flor, cono, onda,
+línea), zona, trampa de área ni salto eléctrico alcanza a un caído (personaje o invocación en 0, creep derrotado): `iniciativaFueraDeJuego` en
+`dueloElegirAreaMapa` (js/13), `zonaRevisarToken` y `trampaAfectados` (js/08) y `rayoCadena` (js/10). Lo que sí le sigue pasando: su cuenta de muerte
+y lo que ya tenía encima (su turno). La idea de usar los consumibles de un caído quedó en `docs/pendientes.md` (Ideas del dueño).
 
 
 ### P226 — Colocar una trampa en la zona de alerta (naranja) de un rival (2026-10-27) ✅ decidida (2026-10-27)

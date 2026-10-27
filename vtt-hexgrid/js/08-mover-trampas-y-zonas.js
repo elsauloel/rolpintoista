@@ -415,6 +415,7 @@ const tocaElPiso = el => alturaDe(el) !== 'aire';
 // `desde`: la casilla de la que salió el movimiento (para saber si ENTRÓ a la zona o ya estaba adentro).
 function zonaRevisarToken(t, desdeMantenimiento, flotando, soloPiso, desde){
   if(!t || !zonaEsMia(t) || etereoDe(t)) return;
+  if(iniciativaFueraDeJuego(zonaIdDe(t))) return;   // 💀 un caído es un cuerpo: las zonas no le hacen nada (P225, 2026-10-27)
   elementos.forEach(el => {
     if(!el.zona || !zonaAplicaA(el, t)) return;
     const sup = typeof superficieSpec === 'function' ? superficieSpec(el) : null;
@@ -732,7 +733,7 @@ function trampaAfectados(t, el, celdaPisada, esquive){
     : area === 'flor' ? (x => distanciaHex(x, centro) <= ef.radio) : (x => enTrampa.has(nbPack(x.col, x.fila)));
   const afectados = !esquive || dentro(esquive.pos) ? [t] : [];
   if(area === 'pisador') return afectados;
-  tokens.forEach((x, id) => { if(x !== t && !(esquive && id === esquive.id) && dentro(x)) afectados.push(x); });
+  tokens.forEach((x, id) => { if(x !== t && !(esquive && id === esquive.id) && dentro(x) && !iniciativaFueraDeJuego(id)) afectados.push(x); });   // 💀 a un caído no lo alcanza (P225)
   return afectados;
 }
 /* Lo que le hace la trampa a cada afectado (2026-10-02, regla del dueño: automático donde se puede, siempre anunciado; 2026-10-04, pedido del

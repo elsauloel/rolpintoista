@@ -133,6 +133,11 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
+> - [ ] **🎒 Usar los consumibles de un aliado caído (2026-10-27, dueño: «después podemos definir que los aliados, al pararse al lado, pueden abrir su
+>   mochila o su cinturón para valerse de sus consumibles gastando nitros»).** Un personaje caído (0 de vida) es un cuerpo esperando que lo revivan (P225);
+>   un aliado pegado a él podría abrir su mochila o su cinturón y usar sus consumibles (sobre el caído o sobre sí), pagando No2. A definir: cuánto cuesta
+>   (como sacar de la mochila propia, 2 No2; del cinturón, 1), si puede llevárselos y si vale también para los creeps. Base: el intercambio en combate
+>   (`comun/intercambio.js`, la alforja) y `FichaAcciones.consumir`.
 > - [ ] **⚖ Paridad de elementos en todo el sistema (2026-10-26, dueño: «cuando terminemos con este ciclo, ir para atrás, incorporar elementos de magia,
 >   varitas, báculos, skills, en resistencias de equipo, etcétera, como para que haya cierta paridad de elementos across el sistema»).** Para después del
 >   ciclo de habilidades de creep. Hoy hay siete elementos (arcano, fuego, hielo, rayo, tóxico, ácido y, desde el 2026-10-26, ☀ luz y 🌑 siniestro: P221)
@@ -496,7 +501,7 @@
   daño («se llevó 6 (Escudo humano)»). Probado en el mapa.
 - [x] Arrastrar a un personaje: las zonas del camino las revisa la pantalla de su dueño, avisada por el momento del arrastre (2026-10-27,
   `arrastreZonasMomento`, js/78). Probado en el mapa: Clementino arrastrado sobre una zona de brasas → «🔥 Brasas: le toca a Clementino» en su pantalla.
-- [ ] Las áreas (el Sonic Boom, el Pisotón) también alcanzan a un personaje caído (así era el motor): ¿excluirlos? → P225.
+- [x] Las áreas (el Sonic Boom, el Pisotón) también alcanzan a un personaje caído (así era el motor): ¿excluirlos? → P225 ✅ (2026-10-27: no; un caído es un cuerpo).
 - Decisiones del dueño: P222 ✅ (las de clase se ponen al día solas) y P223 ✅ (el Segundo aliento se libera al «Finalizar combate»), hechas y
   probadas el 2026-10-27; P224 (Arrastrar en una sola tirada) → sección 🖥.
 

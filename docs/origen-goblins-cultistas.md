@@ -224,3 +224,24 @@ donde puede tirarse un pedo para desplazarse con un salto alto; las trampas much
 - **Decidido (dueño, 2026-10-27)**: «le vamos a quitar a la red que empiece con cooldown. Que quede así» → en este creep la Red **arranca disponible** (cd 4 desde que la usa; al crearlo, `cdArranca: false` en su copia). OK al híbrido.
 - **El tunelero: la habilidad única se llama «Excavar»** (dueño, 2026-10-27). Al programarla, reemplaza a «Excavar (El origen)» y a «Puñalada desde abajo» (las dos sin auditar) y a la vieja «Excavar» de fábrica.
 - **Programado (2026-10-27)**: la habilidad **Excavar** única (`comun/skills-creep-base.js`; meterse 1 No2 sin cooldown; salir = un ataque, cd 2) y **la estela del túnel** (vtt-hexgrid/js/46). Falta: pegar la regla nueva (`tunel`) y probarlo en el mapa.
+
+### 🏹 5. Arquero humano del culto (Rango, tirador), anti-Larry — nivel 3 (propuesta, esperando el OK)
+
+Dueño (2026-10-27): «seguimos con el arquero, que también va a tener foco en Larry. Y después vamos al ballestero, que va a tener foco en Bizzante.»
+
+- **Atributos (39)**: Con 10 · Fue 8 · Agi 9 · Des 10 · Esp 2. Vida 50, No2 9, PdG 10 (12 quieto, con el anillo), Evasión 9, Dmg 8, Rango 10 (14 con el arco).
+- **Equipo** (nivel 3: las manos + 4 Comunes + 1 Buena): **Arco del rastreador de bestias** (Buena: Tipo 6, 2 dados, Rango +4, Contra el Marcado +2 PdG;
+  es de los arcos Buenos que faltan probar en el mapa); **Anillo de Puntería Certera** (PdG +2 si no se movió ni esta ronda ni la anterior), **Capucha de
+  lana del culto** (Def.Esp +1, Res.Esp +1), **Chaleco de cuero** (Defensa +2), **Perneras de cuero hervido** (Defensa +1, Evasión +1, Iniciativa −1).
+  Queda con Defensa 3, Def.Esp 1, Evasión 10. **Consumible**: Poción de HP (los creeps todavía no usan el carcaj; las flechas especiales, como drop).
+- **Skills (4)**: **Disparo señalador** (un ataque + 2 SP, cd 3: si pega, Presa 2 turnos —Evasión −1 y +2 de daño para todos— y Marcado) · **Tiro a la
+  cabeza** (1 No2, 2 SP, cd 3: el próximo disparo +2 PdG, Crítico frecuente +1 y potente +1) · **Ráfaga encadenada** (3 SP, cd 3: hasta 3 disparos al
+  mismo blanco, cada uno mejor) · **Vigilancia** (1 No2, 2 SP, cd 3: el primero que se mueva en su alcance recibe un disparo con +2 PdG). Sale Tiro certero
+  (el Perfora no le sirve contra la Defensa 4 de Larry); entra Disparo señalador, porque con el jefe debuffer nadie más pone la Presa.
+- **Sinergia propia**: Disparo señalador deja a Larry Marcado → el arco suma +2 PdG contra el Marcado; quieto, el anillo suma otros +2. La Presa la cobran
+  también el híbrido (Red y Remate) y el ballestero.
+- **Números contra Larry** (Evasión 4, Defensa 4, 20 de vida): un disparo común le pega el 84 %; Marcado y Presa, el 98 %. El arco hace 2d6 + 8 (15): le
+  pasan ~11 (13 con la Presa). Turno 1, Disparo señalador: Larry queda con ~11. Turno 2: **cae el 95 %** (con un solo disparo alcanza casi siempre; la
+  Ráfaga, con sus 9 No2, son 2 disparos: 3 + 6). Contra Bizzante y Petro le pega el 67 %.
+- **Riesgo**: muy letal contra Larry si tiene línea de tiro. La respuesta de los jugadores es cubrirse (paredes, Petro adelante, el Pedo para saltar
+  detrás de algo). Palancas para bajarlo: Fuerza 6 (−2 de daño) o un arco Común de Tipo 4. A decidir con el dueño.

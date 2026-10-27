@@ -1595,6 +1595,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   tierra, `emergerToken` pide la casilla de salida (libre, a `distancia` o menos del pozo; Esc = sigue abajo), borra `bajoTierra`, la tierra salta
   (`dibujarEfectosEmerger`) y sigue la elección del objetivo. `acEjecutarHab` avisa antes de cobrar: sin token, ya bajo tierra, o «no está bajo
   tierra: ¿usarla igual como un ataque común?». Hoy, creeps; personajes e invocaciones, pendiente (docs/pendientes.md).
+- **👁 Pared que deja ver** (2026-10-27, dueño: «que una pared marque solidez, pero al mismo tiempo deje ver a través de sí»): el ⚙ de un dibujo que es pared
+  suma (solo el GM) «👁 Deja ver a través»: `veTraves` del trazo. Frena el paso como cualquier pared, pero la vista no (`paredCorta(a, b, {vista: true})` desde
+  `lineaLibre`, js/02: visión, conos, rango). La línea de tiro (js/32) y las flechas la siguen chocando. **Regla nueva** (`veTraves` en `trazoValido`): hay que pegarla.
 - **📌 Fijar un dibujo** (2026-10-14, dueño: «no veo el botón para fijar figuras al mapa, en particular líneas libres que marqué como sólidas»):
   un dibujo permanente del lápiz (a mano alzada o en rectas) seleccionado muestra un 📌 (js/34, `dibujarBotonPinTrazo` / `clicBotonPinTrazo`,
   a 90° de la manija). Fijado (`fijado` del trazo; reglas: `trazoValido` y los `update`) no se arrastra, no se rota ni se borra con Supr (hay que

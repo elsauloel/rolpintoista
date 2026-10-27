@@ -6,11 +6,13 @@
    (visión, conos, rango, línea de tiro) lo que queda del otro lado. Sirve para calcar el borde de una habitación del dibujo del fondo;
    con el imán, las rectas caen justo en las esquinas de los hexágonos y la pared queda en el borde entre dos casilleros.
    Lo usan: lineaLibre (js/02, la vista), extenderRuta y el soltar del arrastre (js/06, el movimiento), lineaDeTiro (js/32) y el vuelo
-   de una flecha (js/33). */
+   de una flecha (js/33).
+   👁 Pared que deja ver (`veTraves`, 2026-10-27, dueño: «que una pared marque solidez, pero al mismo tiempo deje ver a través de sí»): frena el paso
+   como cualquier pared, pero la vista (lineaLibre: visión, conos, rango) la atraviesa. Lo pone el GM desde el ⚙ del dibujo. */
 let paredesCache = {firma: '', segs: []};
 function paredesFirma(){
   let f = '';
-  trazos.forEach((t, id) => { if(t.colision && !t.hex) f += `${id}:${t.origen.x},${t.origen.y},${t.rotacion},${t.puntos.length},${t.cerrada ? 1 : 0};`; });
+  trazos.forEach((t, id) => { if(t.colision && !t.hex) f += `${id}:${t.origen.x},${t.origen.y},${t.rotacion},${t.puntos.length},${t.cerrada ? 1 : 0},${t.veTraves ? 1 : 0};`; });
   return f;
 }
 // Los puntos de un trazo en el mundo (deshace su rotación y su origen, como lo dibuja js/05).
@@ -29,7 +31,7 @@ function paredesSegs(){
       if(t.cerrada && p.length >= 3) p.push(p[0]);   // ⭕ el tramo que une el final con el principio también es pared
       for(let i = 0; i + 1 < p.length; i++){
         const a = p[i], b = p[i + 1];
-        segs.push({ax: a.x, ay: a.y, bx: b.x, by: b.y, x0: Math.min(a.x, b.x), x1: Math.max(a.x, b.x), y0: Math.min(a.y, b.y), y1: Math.max(a.y, b.y)});
+        segs.push({ax: a.x, ay: a.y, bx: b.x, by: b.y, x0: Math.min(a.x, b.x), x1: Math.max(a.x, b.x), y0: Math.min(a.y, b.y), y1: Math.max(a.y, b.y), ve: !!t.veTraves});
       }
     });
     paredesCache = {firma: f, segs};
@@ -85,21 +87,22 @@ function segmentosCruzan(ax, ay, bx, by, cx, cy, dx, dy){
   if(Math.abs(d4) <= EPS && enCaja(ax, ay, bx, by, dx, dy)) return true;
   return false;
 }
-// ¿Alguna pared corta el camino entre dos puntos del mundo?
-function paredEntrePuntos(p, q){
+// ¿Alguna pared corta el camino entre dos puntos del mundo? `soloVista`: las que dejan ver no cuentan (es una línea de vista).
+function paredEntrePuntos(p, q, soloVista){
   const segs = paredesSegs();
   if(!segs.length) return false;
   const x0 = Math.min(p.x, q.x), x1 = Math.max(p.x, q.x), y0 = Math.min(p.y, q.y), y1 = Math.max(p.y, q.y);
   for(const s of segs){
     if(s.x1 < x0 || s.x0 > x1 || s.y1 < y0 || s.y0 > y1) continue;
+    if(soloVista && s.ve) continue;   // 👁 una pared que deja ver
     if(segmentosCruzan(p.x, p.y, q.x, q.y, s.ax, s.ay, s.bx, s.by)) return true;
   }
   return false;
 }
-// ¿Alguna pared corta el paso (o la vista) entre dos casilleros? (de centro a centro)
-function paredCorta(a, b){
+// ¿Alguna pared corta el paso (o la vista) entre dos casilleros? (de centro a centro). `o.vista`: es una línea de vista (las que dejan ver, no).
+function paredCorta(a, b, o){
   if(!a || !b || (a.col === b.col && a.fila === b.fila) || !paredesSegs().length) return false;
-  return paredEntrePuntos(hexCentro(a.col, a.fila), hexCentro(b.col, b.fila));
+  return paredEntrePuntos(hexCentro(a.col, a.fila), hexCentro(b.col, b.fila), !!(o && o.vista));
 }
 // Las paredes se ven: un borde oscuro debajo del dibujo (lo llama js/05). Sin relleno (`transparente`, 2026-10-14, dueño: «cuando las uso para marcar la
 // colisión, rompe la naturalidad del mapa»): no se pinta el color ni el borde grueso; queda una línea oscura finita.
@@ -212,6 +215,7 @@ function trazoCfgAbrir(id){
       if(k === 'puntas') cambios.cerrada = !t2.cerrada;
       if(k === 'fijar') cambios.fijado = !t2.fijado;
       if(k === 'pared' && soyGM) Object.assign(cambios, t2.colision ? {colision: false} : {colision: true, fijado: true});
+      if(k === 've' && soyGM) cambios.veTraves = !t2.veTraves;
       Object.assign(t2, cambios); pedirDibujo(); trazoCfgAbrir(trazoCfgId);
       moverTrazo(trazoCfgId, cambios).catch(err => { console.error('No se pudo cambiar el dibujo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan pegar las reglas nuevas de Firestore (dibujos)' : 'No se pudo cambiar el dibujo'); });
     });
@@ -229,7 +233,8 @@ function trazoCfgAbrir(id){
     ${op('relleno', !t.transparente, t.transparente ? '◌ Sin relleno (casi no se ve) · tocá para darle color' : '● Con color · tocá para dejarlo sin relleno')}
     ${op('puntas', !!t.cerrada, t.cerrada ? '⭕ Puntas cerradas (el final se une con el principio)' : '〰 Puntas abiertas · tocá para cerrarlas')}
     ${op('fijar', !!t.fijado, t.fijado ? '📌 Fijado (no se mueve ni se rota)' : '🔓 Suelto · tocá para fijarlo')}
-    ${soyGM ? op('pared', !!t.colision, t.colision ? `🧱 Es pared${t.cerrada ? ': lo de adentro es sólido y sin grilla' : ''}` : '🧱 No es pared · tocá para que corte el paso y la vista') : ''}`;
+    ${soyGM ? op('pared', !!t.colision, t.colision ? `🧱 Es pared${t.cerrada ? ': lo de adentro es sólido y sin grilla' : ''}` : '🧱 No es pared · tocá para que corte el paso y la vista') : ''}
+    ${soyGM && t.colision ? op('ve', !!t.veTraves, t.veTraves ? '👁 Deja ver a través: frena el paso, no la vista' : '🙈 Tapa la vista · tocá para que deje ver a través') : ''}`;
   const r = lienzo.getBoundingClientRect(), g = trazoGearMundo(t);
   const x = r.left + g.x * vista.zoom + vista.x, y = r.top + g.y * vista.zoom + vista.y;
   el.style.left = Math.max(8, Math.min(innerWidth - 262, x + 16)) + 'px';

@@ -149,7 +149,7 @@ function solidosSet(){
 // sólido de destino sí: se ve la pared, no lo que hay detrás).
 // Las paredes de línea fina (js/34) también tapan; `sinParedes` las ignora (la visión de los creeps «sin sólidos»).
 function lineaLibre(desde, hasta, solidos, sinParedes){
-  if(!sinParedes && typeof paredCorta === 'function' && paredCorta(desde, hasta)) return false;
+  if(!sinParedes && typeof paredCorta === 'function' && paredCorta(desde, hasta, {vista: true})) return false;   // (👁 las que dejan ver, no tapan)
   if(!solidos.size) return true;
   const l = lineaHex(desde, hasta);
   for(let i = 0; i < l.length - 1; i++) if(solidos.has(nbPack(l[i].col, l[i].fila))) return false;

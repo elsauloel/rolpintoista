@@ -631,8 +631,9 @@ service cloud.firestore {
       // uno ajeno con esa marca (nunca uno permanente ajeno). Mover/rotar
       // uno permanente (solo origen/rotacion) o borrarlo: su dueño o el GM.
       function trazoValido(d) {
-        return d.keys().hasOnly(['puntos', 'origen', 'rotacion', 'color', 'grosor', 'permanente', 'hex', 'recto', 'colision', 'fijado', 'transparente', 'cerrada', 'duenoUid', 'creado'])
+        return d.keys().hasOnly(['puntos', 'origen', 'rotacion', 'color', 'grosor', 'permanente', 'hex', 'recto', 'colision', 'fijado', 'transparente', 'cerrada', 'veTraves', 'duenoUid', 'creado'])
           && (!('cerrada' in d) || d.cerrada is bool)   // ⭕ figura cerrada (2026-10-14)
+          && (!('veTraves' in d) || d.veTraves is bool)   // 👁 pared que deja ver (2026-10-27)
           && (!('fijado' in d) || d.fijado is bool) && (!('transparente' in d) || d.transparente is bool)   // 📌 fijado (2026-10-14)
           && (!('hex' in d) || d.hex is bool)
           && (!('recto' in d) || d.recto is bool) && (!('colision' in d) || d.colision is bool)
@@ -654,7 +655,7 @@ service cloud.firestore {
         allow update: if esMiembro(c)
           && (resource.data.duenoUid == request.auth.uid || esGM(c))
           && (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'transparente', 'cerrada', 'color'])
-            || (esGM(c) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'colision', 'fijado', 'transparente', 'cerrada', 'color'])));
+            || (esGM(c) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'colision', 'fijado', 'transparente', 'cerrada', 'color', 'veTraves'])));
         allow delete: if esMiembro(c)
           && (resource.data.permanente == false || resource.data.duenoUid == request.auth.uid || esGM(c));
       }
@@ -913,7 +914,7 @@ service cloud.firestore {
           allow update: if esMiembro(c)
             && (resource.data.duenoUid == request.auth.uid || esGM(c))
             && (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'transparente', 'cerrada', 'color'])
-              || (esGM(c) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'colision', 'fijado', 'transparente', 'cerrada', 'color'])));
+              || (esGM(c) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'colision', 'fijado', 'transparente', 'cerrada', 'color', 'veTraves'])));
           allow delete: if esMiembro(c)
             && (resource.data.permanente == false || resource.data.duenoUid == request.auth.uid || esGM(c));
         }

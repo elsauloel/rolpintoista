@@ -14,6 +14,7 @@
 >   primer daño especial del turno deja Debilitado), Túnica del archivista, Capucha acolchada de sastre, Guantes para canalizar, Calzas de bordado
 >   rúnico y Sandalias del peregrino. Queda con PdG.Esp 18, Ef.Esp 16, Defensa 2, Defensa especial 6, Res.Esp 13. Sin token en el mapa (lo pone el
 >   GM). Con 6 No2 le alcanza justo para Lluvia + Zap en el mismo turno.
+> - [ ] **🧌 Los goblins de la Grieta (2026-10-27, dueño: los kobolds pasan a goblins controlados por cultistas; tres encuentros de nivel 2-3 con humanos al mando)** → [`origen-goblins-cultistas.md`](origen-goblins-cultistas.md).
 > - [ ] **Drops para que los jugadores prueben consumibles nuevos: por lo menos una 🦋 Polilla mística y una ⏩ Runa aceleradora (el Acelerador)**
 >   (dueño: «dije como drop, para que prueben los jugadores, de ítems consumibles, una polilla y un acelerador, por lo menos»). Se pueden poner como
 >   drop fijo de un creep (GM Tools → Recompensas → drops fijos) o sumarlos a mano al botín al finalizar el combate («+ Sumar» en el paso Equipo/Consumibles).

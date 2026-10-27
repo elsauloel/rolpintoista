@@ -264,6 +264,23 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
   Última resistencia (la tabla de abajo).
 - ⚖ **Ambiguas (+4)**: **Golpe de escudo**, **Carga que derriba** (Carga, clase), **Sonic Boom** (clase), **Arrastrar** (C16).
   Repuesto: Espinas (Aura de espinas, clase), Lanzar, Represalia.
+- **Ideas nuevas** (dueño, 2026-10-27: «podemos sumar lista de ideas que se te ocurran a vos para una cosa y la otra»), además de las de clase:
+  - ⚔ *Warrior*: **Desafío a duelo** (marca a un rival: +2 PdG y +2 al daño contra él, −2 contra los demás, hasta que uno caiga) · **Insistir**
+    (cada ataque que falla le da +2 PdG al próximo contra el mismo, acumulable hasta +6) · **Lanzar el arma** (la arroja a 3 casillas con su
+    daño +2; el arma queda tirada ahí, como la de Desarmar) · **Golpe doble pesado** (dos ataques al mismo; si el primero pega, el segundo +2 al
+    daño) · **Tajo en abanico** (con arma de dos manos: un cono de 3 al frente, una tirada contra cada uno) · **Adrenalina** (cuando le entra un
+    crítico, +3 al daño de su próximo ataque) · **Rematar al caído** (+2 dados contra un rival Sentado, atrapado o en Pajaritos).
+  - 🛡 *Tanque*: **Plantarse** (si no se mueve en su turno: +3 Defensa, +2 Res.CC y una oportunidad de más hasta el próximo) · **Cortar el paso**
+    (su ataque de oportunidad, si pega, frena al que se movía: pierde el resto del movimiento) · **Ancla** (una cadena a un rival: no puede alejarse
+    a más de 2 casillas de él, 2 turnos) · **Atraer los golpes** (aura 2 turnos: un rival a 2 o menos que ataque a otro que no sea él, −2 PdG) ·
+    **Cambio de lugar** (Flash: intercambia casilla con un aliado pegado, gratis, y recibe él el próximo golpe) · **Muro de escudos** (los aliados
+    detrás de su escudo quedan cubiertos de los disparos: −3 al PdG de rango contra ellos) · **Rebote de escudo** (Flash al bloquear un disparo
+    o un hechizo: lo devuelve al que lo tiró) · **Contrapeso** (2 turnos: el que intente empujarlo o tirarlo y pierda queda Sentado).
+  - ⚖ *Ambiguas*: **Cabezazo** (sin arma, Constitución contra Constitución: Pajaritos 1 turno y 1d6; él se hace 1d4) · **Agarrar y golpear**
+    (un Agarrón y un golpe en el mismo turno, el golpe +2 si lo atrapó) · **Embestida que sigue** (empuja 2 y avanza con él, sin oportunidad) ·
+    **Golpe de pomo** (rápido: medio ataque en No2, poco daño y Demora 1) · **Martillazo al suelo** (onda alrededor con poco daño; las casillas
+    quedan como terreno difícil 2 turnos) · **Escudo de carne** (agarra a un rival atrapado y lo usa de escudo: los disparos contra él van al
+    atrapado) · **Rencor acumulado** (cada golpe que recibe le suma +1 al daño de su próximo ataque, hasta +5).
 - Ya cubiertas por una de fábrica: Amplificar daño (Golpe fuerte), Remolino (Barrido), Shockwave (Pisotón), Takle, Desarmar, Aguante; Cañón Vasco ≈
   Salto aplastante; Daño en área (tanque) ≈ Barrido. Sacadito sigue en pausa.
 

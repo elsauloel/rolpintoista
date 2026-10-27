@@ -300,6 +300,11 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
      **También cambia el de clase** (`comun/skills-clase.js`, `warrior-golpe-brutal`; dueño: «tiene que dar +1 a los dos bonos de crítico… y +2
      al daño, y queda en guardia baja»): **Crítico frecuente +1, Crítico potente +1 y +2 al daño** (hoy solo `critpotBono: 1`; sumar `critBono: 1`
      y `fijo: 2`, y el detalle). Se programa con la tanda.
+  4. ⚖ **Golpe de escudo** (D22 Derribar; dueño, 2026-10-27: «lo primero que tira es destreza contra evasión. Y si pega es fuerza más [el peso]
+     del escudo… no es contra constitución, sino contra resistencia al crowd control»): necesita escudo. Pega con el escudo: **Destreza contra la
+     Evasión** del rival; si pega, **daño propuesto: 1d6 + el peso del escudo** (a confirmar), y después **Fuerza + el peso del escudo contra la
+     Res.CC**: si gana, **Sentado y Demora 1**. Un ataque y 2 SP, o cooldown 2. (Los escudos de 1 mano pesan 1 a 3; el de 2 manos, hasta 6: el
+     escudo pesado es el que mejor tira.)
 - Ya cubiertas por una de fábrica: Amplificar daño (Golpe fuerte), Remolino (Barrido), Shockwave (Pisotón), Takle, Desarmar, Aguante; Cañón Vasco ≈
   Salto aplastante; Daño en área (tanque) ≈ Barrido. Sacadito sigue en pausa.
 

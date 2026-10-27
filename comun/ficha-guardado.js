@@ -298,7 +298,8 @@ const FichaGuardado = (() => {
   // antes (sin huella) se pone al día una vez. Lo propio del personaje (Job, imagen, origen) y lo del turno (cooldown, cargas) se conserva; una
   // subida de la biblioteca (`bibOrigen`) sigue con su 🔔 de versión nueva.
   const HAB_PROPIOS = new Set(['id', 'job', 'jobCosto', 'origen', 'imagen', 'habClaseId', 'habClase', 'bibOrigen', 'bibIgnorada', 'claseHuella',
-    'para', 'cdActual', 'cargaActual', 'usadaEsteTurno', 'unaVezUsada', 'activo']);
+    'para', 'cdActual', 'cdRestante', 'cargaActual', 'usadaEsteTurno', 'unaVezUsada', 'activo',
+    'automatizada']);   // (`automatizada` ya no decide nada —lo hace `modo`— y muchas copias no lo traen: no cuenta como diferencia)
   // La habilidad de clase como queda en una copia (lo mismo que suma «+ Habilidad → De clase»).
   function habDeClaseComoCopia(base){
     const {_bib, para, clase, ...c} = structuredClone(base);

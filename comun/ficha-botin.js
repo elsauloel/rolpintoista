@@ -101,8 +101,8 @@ const FichaBotin = (() => {
         <div style="font-size:30px;font-weight:800;line-height:1.1;color:var(--paper, #EDE3D6)">+${num_}</div><div style="font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--copper, #B87333);margin-top:2px">${etq}</div>${nota ? `<div class="hint" style="margin-top:2px">${nota}</div>` : ''}</div>`;
     const recompensas = js.length ? `<div style="margin-bottom:14px">
       ${mio ? `<div class="hint" style="text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Lo que recibís · ${esc(mio.nombre)} <span class="hint">(vos)</span> · ${esc(mio.estado || '')}</div>
-      <div style="display:flex;gap:10px;margin-bottom:8px">${caja(fmt(num(mio.xp)), 'XP · experiencia', '')}${caja(fmt(num(mio.dde)), 'DDE · doblones', '')}</div>` : ''}
-      ${otros.length ? `<div style="display:flex;flex-wrap:wrap;gap:4px 14px">${otros.map(j => `<span class="hint"><b>${esc(j.nombre)}</b> · ${esc(j.estado || '')} · +${fmt(num(j.xp))} XP · +${fmt(num(j.dde))} DDE</span>`).join('')}</div>` : ''}
+      <div style="display:flex;gap:10px;margin-bottom:8px">${caja(fmt(num(mio.xp)), 'XP · experiencia', '')}${caja(fmt(num(mio.dde)), 'DDE · doblones', '')}${num(mio.despojos) ? caja(fmt(num(mio.despojos)), 'Despojos · del equipo', '') : ''}</div>` : ''}
+      ${otros.length ? `<div style="display:flex;flex-wrap:wrap;gap:4px 14px">${otros.map(j => `<span class="hint"><b>${esc(j.nombre)}</b> · ${esc(j.estado || '')} · +${fmt(num(j.xp))} XP · +${fmt(num(j.dde))} DDE${num(j.despojos) ? ` · +${fmt(num(j.despojos))} despojos` : ''}</span>`).join('')}</div>` : ''}
       <div class="hint" style="margin-top:4px">${publicado(combate) ? 'La experiencia, el oro y lo que reclamaste se cargan en las fichas cuando el GM cierra el botín, después de que todos elijan.' : 'La experiencia y el oro ya se cargaron en las fichas.'}</div></div>` : '';
     const cerrado = combate && combate.estado === 'cerrado' && lista.length === 0
       ? '<div class="hint" style="margin-bottom:8px">El botín ya está cerrado: lo que nadie tomó se convirtió en despojos.</div>' : '';

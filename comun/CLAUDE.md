@@ -1725,7 +1725,7 @@ versión parecida en más de una, es candidato a juntar.
   pestaña «📦 Archivadas» (se puede mirar y usar igual); «Todo» y «Sin auditar» no lo muestran. `creep-editor.js` (el selector de habilidades de un creep y
   el ⬆ Subir) archiva además lo subido antes del 2026-10-26 y la colección vieja. Un creep que ya tenía una habilidad archivada la conserva.
 
-- **🐾 Trofeo con el valor del equipo natural y 🗡→💰 lo que no se ofrece** (2026-10-26): `CreepCalculo.trofeo(sc, precioDe)` vale (sin valor por nivel, ni jefe ×2: `TROFEO_PRECIO_NIVEL` y `trofeoPrecioAuto` se sacaron)
+- **🐾 Trofeo con el valor del equipo natural y 🗡→🧰 lo que no se ofrece** (2026-10-26): `CreepCalculo.trofeo(sc, precioDe)` vale (sin valor por nivel, ni jefe ×2: `TROFEO_PRECIO_NIVEL` y `trofeoPrecioAuto` se sacaron)
   `valorNatural(sc, precioDe)` (cada pieza natural con `CombateFin.precioNatural`: la del catálogo —por `nombreOriginal` si se renombró—, su precio o uno estimado) y aparece con solo piezas naturales; `tarjetaPublica` ya no
-  nombra lo natural que no es el arma. `CombateFin.ocultos(rep, r)` (el equipo destildado, con `rep.ocultosAOro`) suma su valor de venta a `oroTotal`
-  (`calcularReparto` → `oroEquipo`). `Confirmar.texto(texto, {titulo, icono, valor, sugerencias})` → Promise<string | null>: el cartel con un campo de texto.
+  nombra lo natural que no es el arma. `CombateFin.ocultos(rep, r)` (el equipo destildado, con `rep.ocultosDespojos`) lo convierte en despojos (su valor de venta)
+  (`calcularReparto` → `despojosEquipo`, `despojosCada` y `despojos` de cada jugador, que `publicar` guarda en `combate/actual` y `despojar` paga). `Confirmar.texto(texto, {titulo, icono, valor, sugerencias})` → Promise<string | null>: el cartel con un campo de texto.

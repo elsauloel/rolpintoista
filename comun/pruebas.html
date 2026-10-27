@@ -5802,25 +5802,25 @@ prueba('🐾 Bestia con equipo del catálogo marcado natural (2026-10-26): el tr
     (CreepCalculo.trofeo(sc2) || {}).precioCompra, CreepCalculo.trofeo(rata).precioCompra === CombateFin.precioNatural(null, Combatiente.armaPrincipal(rata), rata) && CreepCalculo.trofeo(rata).precioCompra >= 20, CreepCalculo.trofeo({...rata, equipo: []}), CreepCalculo.valorNatural(sc) === num(arma.precioCompra) + num(peto.precioCompra)],
     ['Colmillos de Lobo', num(arma.precioCompra) + num(peto.precioCompra), false, 'Colmillos', [], 'Trofeo de Coraza', num(peto.precioCompra), true, null, true]);
 });
-prueba('🗡→💰 Lo que el GM destilda del equipo de un creep se vende y suma al oro (2026-10-26); con la casilla apagada, nada', () => {
+prueba('🗡→🧰 Lo que el GM destilda del equipo de un creep se convierte en despojos para los que cobran, no en oro (2026-10-26); con la casilla apagada, nada', () => {
   const peto = CATALOGO_BASE.find(i => i.tipoItem === 'armadura_rigida' && num(i.precioCompra) > 0 && !i.archivo);
   const sc = creepPrueba({id: 'h1', nombre: 'Bandido', nivel: 1, hp: 0, oroBase: 0, equipo: [{...CreepCalculo.itemParaCreep(peto), id: 'pt', equipado: true}]});
   const cat = CATALOGO_BASE.map(i => CreepCalculo.itemParaCreep(i));
   const rep = CombateFin.nuevo();
   rep.enMapa = new Set(['h1']);
   rep.jugadores = [{id: 'p1', nombre: 'Ana', estado: 'en pie', incluido: true}, {id: 'p2', nombre: 'Beto', estado: 'en pie', incluido: true}];
-  const antes = CombateFin.calcularReparto(rep, CombateFin.generar(rep, [sc], cat)).oroTotal;
+  const antes = CombateFin.calcularReparto(rep, CombateFin.generar(rep, [sc], cat)).porJugador[0].despojos;
   CombateFin.cambio(rep, {dataset: {repItem: 'h1:eq:pt'}, checked: false});
   CombateFin.cambio(rep, {dataset: {repItem: 'h1:arma'}, checked: false});
   const r = CombateFin.generar(rep, [sc], cat), rp = CombateFin.calcularReparto(rep, r);
   const arma = r.filas[0].items.find(i => i.clave === 'h1:arma');
   const esperado = Math.ceil(num(peto.precioCompra) / 2) + Math.ceil(num(arma.precioCompra) / 2);
-  rep.paso = 'doblones';
+  rep.paso = 'publicar';
   const html = CombateFin.vista(rep, [sc], cat).html;
   CombateFin.cambio(rep, {dataset: {repOcultos: ''}, checked: false});
   const sin = CombateFin.calcularReparto(rep, CombateFin.generar(rep, [sc], cat));
-  igual([antes, rp.oroEquipo, rp.oroTotal, rp.ddeCada, CombateFin.itemsPublicables(rep, r).filter(i => /:(arma|eq:)/.test(i.clave)).length, /Equipo que no se ofrece/.test(html), sin.oroEquipo, sin.oroTotal],
-    [0, esperado, esperado, Math.ceil(esperado / 2), 0, true, 0, 0]);
+  igual([antes, rp.despojosEquipo, rp.oroTotal, rp.porJugador.map(p => p.despojos), CombateFin.itemsPublicables(rep, r).filter(i => /:(arma|eq:)/.test(i.clave)).length, /Equipo que no se ofrece/.test(html), sin.despojosEquipo, sin.porJugador[0].despojos],
+    [0, esperado, 0, [Math.ceil(esperado / 2), Math.ceil(esperado / 2)], 0, true, 0, 0]);
 });
 /* ---------- Resultado ---------- */
 Promise.all(pendientes).then(() => {

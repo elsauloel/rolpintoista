@@ -40,7 +40,7 @@ const CombateFin = (() => {
   /* ---------- Reporte del combate: XP, oro, ítems y jugadores; se publica a las fichas ----------
      El GM revisa y ajusta (ítems, XP, oro, quién cobra) y publica: cada jugador recibe su XP y su oro solos en la
      ficha (campanas/<id>/recompensas) y los ítems quedan en el botín para tomarlos (campanas/<id>/botin). */
-  function nuevo(){ return {oro: {}, drops: {}, extra: {}, xpPorJugador: null, ddePorJugador: null, quitados: new Set(), extras: [], jugadores: null, cargando: false, publicando: false, enMapa: null, contarEscapados: true, paso: 'equipo', ocultosAOro: true}; }
+  function nuevo(){ return {oro: {}, drops: {}, extra: {}, xpPorJugador: null, ddePorJugador: null, quitados: new Set(), extras: [], jugadores: null, cargando: false, publicando: false, enMapa: null, contarEscapados: true, paso: 'equipo', ocultosDespojos: true}; }
 
   /* Solo cuentan para la recompensa los creeps que tienen un token vinculado en el MAPA PUBLICADO (el que ven los jugadores):
      puede haber muchos creeps armados de antemano que no están en la pelea. Devuelve el Set de sus ids. */
@@ -401,24 +401,26 @@ const CombateFin = (() => {
       .sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
   }
 
-  /* 🗡→💰 El equipo que no se ofrece (2026-10-26, dueño: «si a un creep lo tengo equipado con todos sus slots, pero al morir a los jugadores
-     solamente les muestro el arma y la armadura, que todo lo demás se sume a despojos genéricos de manera equivalente a su valor. Despojos o
-     oro, cualquiera de las dos»): lo que el GM destilda en el paso Equipo (el arma y las piezas que llevaba el creep, no el trofeo ni lo extra)
-     no desaparece: se vende y su valor de venta (la mitad del precio de compra, para arriba: lo mismo que daría la tienda) se suma al oro del
-     combate y se reparte con los doblones. `rep.ocultosAOro` = false para que lo destildado no deje nada. */
+  /* 🗡→🧰 El equipo que no se ofrece (2026-10-26, dueño: «si a un creep lo tengo equipado con todos sus slots, pero al morir a los jugadores
+     solamente les muestro el arma y la armadura, que todo lo demás se sume a despojos genéricos de manera equivalente a su valor»; y el mismo
+     día: «prefiero que los ítems destildados aparezcan como despojos, no como oro»): lo que el GM destilda en el paso Equipo (el arma y las
+     piezas que llevaba el creep, no el trofeo ni lo extra) no desaparece: se convierte en despojos, tantos como DDE daría venderlo (la mitad
+     del precio de compra, para arriba), repartidos entre los que cobran (hacia arriba), como lo que nadie toma del botín. Se pagan con la
+     XP y el oro (`despojos` de cada jugador en `combate/actual`). `rep.ocultosDespojos` = false para que lo destildado no deje nada. */
   const esEquipoDeCreep = i => /:(arma$|eq:)/.test(String(i && i.clave || ''));
   const valorVenta = i => Math.ceil(num(i.precioCompra) / 2 - 1e-9);
   function ocultos(rep, r){
-    if(rep.ocultosAOro === false) return [];
+    if(rep.ocultosDespojos === false) return [];
     return r.filas.filter(f => f.derrotado).flatMap(f => f.items).filter(i => esEquipoDeCreep(i) && rep.quitados.has(i.clave)).map(i => ({i, valor: valorVenta(i)}));
   }
-  // El reparto de XP y de oro entre los jugadores incluidos.
+  // El reparto de XP, de oro y de los despojos del equipo que no se ofrece, entre los jugadores incluidos.
   function calcularReparto(rep, r){
     const incluidos = (rep.jugadores || []).filter(j => j.incluido);
     const n = incluidos.length;
     const xpTotal = Math.max(0, r.xpTotal);
-    const oroEquipo = ocultos(rep, r).reduce((a, o) => a + o.valor, 0);
-    const oroTotal = Math.max(0, r.filas.reduce((a, f) => a + (f.derrotado ? f.oro : 0), 0) + oroEquipo);
+    const despojosEquipo = ocultos(rep, r).reduce((a, o) => a + o.valor, 0);
+    const despojosCada = n ? Math.ceil(despojosEquipo / n) : 0;
+    const oroTotal = Math.max(0, r.filas.reduce((a, f) => a + (f.derrotado ? f.oro : 0), 0));
     const xpBase = n ? Math.ceil(xpTotal / n) : 0;            // como si todos estuvieran vivos, redondeo hacia arriba
     const ddeCada = n ? Math.ceil(oroTotal / n) : 0;
     // Lo que el GM fija: un valor por jugador que vale para todos (si no toca nada, el calculado) y, aparte, un extra de cada uno
@@ -430,9 +432,9 @@ const CombateFin = (() => {
       const xpParte = Math.floor(xpValor * FACTOR_XP_ESTADO[j.estado]);
       const ekeko = num(j.ekeko) > 0 ? Math.ceil(ddeValor * num(j.ekeko) / 100 - 1e-9) : 0;   // 🔮 el Ekeko: +N % de su parte, en DDE enteros y para arriba (es un bono)
       return {j, xpParte, ddeParte: ddeValor, xpExtra: num(ex.xp), ddeExtra: num(ex.dde), ekeko,
-        xp: Math.max(0, xpParte + num(ex.xp)), dde: Math.max(0, Math.round((ddeValor + ekeko + num(ex.dde)) * 100) / 100)};
+        xp: Math.max(0, xpParte + num(ex.xp)), dde: Math.max(0, Math.round((ddeValor + ekeko + num(ex.dde)) * 100) / 100), despojos: despojosCada};
     });
-    return {n, xpTotal, oroTotal, oroEquipo, xpBase, ddeCada, xpValor, ddeValor, porJugador};
+    return {n, xpTotal, oroTotal, despojosEquipo, despojosCada, xpBase, ddeCada, xpValor, ddeValor, porJugador};
   }
   function itemsPublicables(rep, r){
     const todos = [...r.filas.flatMap(f => f.items), ...itemsExtra(rep)];
@@ -443,7 +445,7 @@ const CombateFin = (() => {
      después los doblones, después la experiencia y al final publicar; cada revisión con un pequeño consejo»). `rep.paso`; el botón 📢 Publicar
      recién aparece en el último paso. */
   const PASOS_BOTIN = [
-    {id: 'equipo', nombre: 'Equipo', consejo: 'Revisá el equipo con calma: lo que dejes acá les queda a los jugadores por el resto de la partida. Abrí el «Ver» de cada pieza antes de decidir: un arma o una armadura de más cambia las próximas peleas. Lo que destildes no se pierde: se vende y su valor se suma al oro (paso Doblones).'},
+    {id: 'equipo', nombre: 'Equipo', consejo: 'Revisá el equipo con calma: lo que dejes acá les queda a los jugadores por el resto de la partida. Abrí el «Ver» de cada pieza antes de decidir: un arma o una armadura de más cambia las próximas peleas. Lo que destildes no se pierde: se convierte en despojos para los que cobran.'},
     {id: 'consumibles', nombre: 'Consumibles', consejo: 'Los que el creep usó en el combate vienen tildados; los que llevaba y no usó, destildados. Sumá o sacá los que quieras: los consumibles se gastan, así que dar uno de más pesa menos que con el equipo, pero cuidá que no se junten los fuertes.'},
     {id: 'doblones', nombre: 'Doblones', consejo: 'El oro ya trae su variación de ±20 %. Pensá en qué pueden comprar en la próxima tienda: un poco de más se gasta rápido; mucho de más cambia lo que pueden comprar. Destildá a quien no estuvo en el combate: no cobra.'},
     {id: 'experiencia', nombre: 'Experiencia', consejo: 'La experiencia los hace subir de nivel: fijate cuánto le falta a cada uno. En pie cobra el 100 %, inconsciente el 25 % y muerto nada; con un extra premiás (o castigás) algo puntual.'},
@@ -462,7 +464,7 @@ const CombateFin = (() => {
     const extras = itemsExtra(rep);
 
     const itemHtml = i => `<label class="reporte-loot-item" style="cursor:pointer;display:inline-flex;gap:5px;align-items:center${rep.quitados.has(i.clave) ? ';opacity:.45' : ''}" title="${i.template.estimado ? 'Precio estimado por comparación con el catálogo' : ''}">
-      <input type="checkbox" data-rep-item="${esc(i.clave)}"${rep.quitados.has(i.clave) ? '' : ' checked'}>${esc(i.nombre)}${i.trofeo ? ' 🏆' : ''}${rep.quitados.has(i.clave) && esEquipoDeCreep(i) && rep.ocultosAOro !== false ? ` <span class="hint" style="font-size:11px">→ ${fmt(valorVenta(i))} DDE de oro</span>` : ''}${i.drop ? ` <span class="hint" style="font-size:11px">(${i.usado ? 'lo usó' : 'no lo usó'})</span> <button type="button" class="iconbtn" data-rep-reroll="${esc(i.clave)}" title="Cambiarlo por otro al azar (de su calidad y su arquetipo)" style="padding:0 4px;margin:0">🎲</button>` : ''} <span class="reporte-loot-precio">${fmt(i.precioCompra)} DDE${i.template.estimado ? ' (est.)' : ''}</span><button type="button" class="iconbtn" data-rep-ver="${esc(i.clave)}" style="padding:2px 8px;font-size:11px">Ver</button></label>`;
+      <input type="checkbox" data-rep-item="${esc(i.clave)}"${rep.quitados.has(i.clave) ? '' : ' checked'}>${esc(i.nombre)}${i.trofeo ? ' 🏆' : ''}${rep.quitados.has(i.clave) && esEquipoDeCreep(i) && rep.ocultosDespojos !== false ? ` <span class="hint" style="font-size:11px">→ ${fmt(valorVenta(i))} despojos</span>` : ''}${i.drop ? ` <span class="hint" style="font-size:11px">(${i.usado ? 'lo usó' : 'no lo usó'})</span> <button type="button" class="iconbtn" data-rep-reroll="${esc(i.clave)}" title="Cambiarlo por otro al azar (de su calidad y su arquetipo)" style="padding:0 4px;margin:0">🎲</button>` : ''} <span class="reporte-loot-precio">${fmt(i.precioCompra)} DDE${i.template.estimado ? ' (est.)' : ''}</span><button type="button" class="iconbtn" data-rep-ver="${esc(i.clave)}" style="padding:2px 8px;font-size:11px">Ver</button></label>`;
     const porCreep = (filtro, extrasTambien) => {
       const bloques = filas.filter(f => f.items.some(filtro)).map(f => `<div class="reporte-loot-creep"><div class="reporte-loot-nombre">${esc(f.sc.nombre)}</div><div class="reporte-loot-items">${f.items.filter(filtro).map(itemHtml).join('')}</div></div>`).join('');
       const ex = extrasTambien && extras.length ? `<div class="reporte-loot-creep"><div class="reporte-loot-nombre">Botín extra</div><div class="reporte-loot-items">${extras.map(itemHtml).join('')}</div></div>` : '';
@@ -486,7 +488,7 @@ const CombateFin = (() => {
     let cuerpo = '';
     if(paso === 'equipo'){
       const eq = porCreep(i => !esConsumible(i), true);
-      cuerpo = `<label class="reporte-contar-escapados" style="margin-bottom:8px"><input type="checkbox" data-rep-ocultos${rep.ocultosAOro !== false ? ' checked' : ''}> Lo que destildes del equipo de un creep se vende: su valor de venta (la mitad del precio de compra) se suma al oro${rp.oroEquipo ? ` · ahora <b>+${fmt(rp.oroEquipo)} DDE</b>` : ''}</label>
+      cuerpo = `<label class="reporte-contar-escapados" style="margin-bottom:8px"><input type="checkbox" data-rep-ocultos${rep.ocultosDespojos !== false ? ' checked' : ''}> Lo que destildes del equipo de un creep se convierte en despojos: tantos como DDE daría venderlo (la mitad del precio de compra), repartidos entre los que cobran${rp.despojosEquipo ? ` · ahora <b>${fmt(rp.despojosEquipo)} despojos</b>${rp.n ? ` (${fmt(rp.despojosCada)} c/u)` : ''}` : ''}</label>
         <div class="reporte-loot-lista">${eq || '<div class="hint">Ningún creep derrotado suelta equipo.</div>'}</div>
         <div style="display:flex;gap:6px;margin-top:8px"><input type="text" data-rep-extra-nombre placeholder="Ítem extra (nombre)" style="flex:1"><input type="number" min="0" data-rep-extra-precio placeholder="Precio" style="width:90px"><button type="button" class="btn" data-rep-extra-add>+ Sumar</button></div>`;
     }else if(paso === 'consumibles'){
@@ -494,10 +496,8 @@ const CombateFin = (() => {
       cuerpo = `<div class="reporte-loot-lista">${co || '<div class="hint">Ningún creep derrotado lleva consumibles.</div>'}</div>`;
     }else if(paso === 'doblones'){
       const oroHtml = filas.filter(f => f.derrotado && f.oro).map(f => `<div class="reporte-fila"><span class="reporte-nombre">${esc(f.sc.nombre)}</span><span class="reporte-xp">${fmt(f.oro)} DDE</span></div>`).join('');
-      const ocu = ocultos(rep, r);
-      const ocuHtml = ocu.length ? `<div class="reporte-fila reporte-fila-lista" title="${esc(ocu.map(o => `${o.i.nombre} (${o.i.origen}): ${fmt(o.valor)} DDE`).join('\n'))}"><span class="reporte-nombre">🗡 Equipo que no se ofrece, vendido</span><span class="reporte-xp">${esc(ocu.map(o => o.i.nombre).join(', '))} · <b>${fmt(rp.oroEquipo)} DDE</b></span></div>` : '';
-      cuerpo = `<div class="reporte-lista">${oroHtml || (ocu.length ? '' : '<div class="hint">Ningún creep derrotado llevaba oro.</div>')}${ocuHtml}</div>
-        <div class="reporte-total">Oro total: <b>${fmt(rp.oroTotal)} DDE</b> (ya incluye su variación de ±20 %${rp.oroEquipo ? ` y ${fmt(rp.oroEquipo)} del equipo que no se ofrece` : ''}) · ${rp.n ? `<b>${fmt(rp.ddeCada)}</b> DDE por jugador (÷${rp.n}, hacia arriba)` : 'elegí al menos un jugador'}</div>
+      cuerpo = `<div class="reporte-lista">${oroHtml || '<div class="hint">Ningún creep derrotado llevaba oro.</div>'}</div>
+        <div class="reporte-total">Oro total: <b>${fmt(rp.oroTotal)} DDE</b> (ya incluye su variación de ±20 %) ·${rp.n ? `<b>${fmt(rp.ddeCada)}</b> DDE por jugador (÷${rp.n}, hacia arriba)` : 'elegí al menos un jugador'}</div>
         <div class="rep-por-jugador"><label>Oro por jugador <input type="number" min="0" step="1" class="rep-num rep-num-grande${rep.ddePorJugador !== null ? ' editado' : ''}" data-rep-todos="dde" value="${rp.ddeValor}"> DDE</label>
           ${rep.ddePorJugador !== null ? `<button type="button" class="iconbtn" data-rep-reset title="Volver a lo calculado">↺ calculado</button>` : '<span class="hint">calculado: se puede cambiar</span>'}</div>
         <div class="reporte-seccion-titulo">Quién cobra</div><div class="reporte-lista">${jugadoresHtml('dde')}</div>`;
@@ -515,8 +515,8 @@ const CombateFin = (() => {
       cuerpo = `<div class="reporte-lista">
         <div class="reporte-fila reporte-fila-lista"><span class="reporte-nombre">🗡 Equipo</span><span class="reporte-xp">${eq.length ? esc(eq.map(i => i.nombre).join(', ')) : 'nada'}</span></div>
         <div class="reporte-fila reporte-fila-lista"><span class="reporte-nombre">🧪 Consumibles</span><span class="reporte-xp">${co.length ? esc(co.map(i => i.nombre).join(', ')) : 'nada'}</span></div>
-        ${rp.oroEquipo ? `<div class="reporte-fila reporte-fila-lista"><span class="reporte-nombre">💰 Equipo vendido</span><span class="reporte-xp">${esc(ocultos(rep, r).map(o => o.i.nombre).join(', '))} → ${fmt(rp.oroEquipo)} DDE, sumados al oro</span></div>` : ''}
-        ${rp.porJugador.map(({j, xp, dde}) => `<div class="reporte-fila"><span class="reporte-nombre">${esc(j.nombre)}</span><span class="reporte-estado ${j.estado === 'en pie' ? 'escapo' : 'derrotado'}">${esc(j.estado)}</span><span class="reporte-xp">+${fmt(xp)} XP · +${fmt(dde)} DDE</span></div>`).join('') || '<div class="hint">Nadie cobra: elegí al menos un jugador (paso Doblones).</div>'}
+        ${rp.despojosEquipo ? `<div class="reporte-fila reporte-fila-lista" title="${esc(ocultos(rep, r).map(o => `${o.i.nombre} (${o.i.origen}): ${fmt(o.valor)} despojos`).join('\n'))}"><span class="reporte-nombre">🧰 Equipo que no se ofrece</span><span class="reporte-xp">${esc(ocultos(rep, r).map(o => o.i.nombre).join(', '))} → ${fmt(rp.despojosEquipo)} despojos</span></div>` : ''}
+        ${rp.porJugador.map(({j, xp, dde, despojos}) => `<div class="reporte-fila"><span class="reporte-nombre">${esc(j.nombre)}</span><span class="reporte-estado ${j.estado === 'en pie' ? 'escapo' : 'derrotado'}">${esc(j.estado)}</span><span class="reporte-xp">+${fmt(xp)} XP · +${fmt(dde)} DDE${despojos ? ` · +${fmt(despojos)} despojos` : ''}</span></div>`).join('') || '<div class="hint">Nadie cobra: elegí al menos un jugador (paso Doblones).</div>'}
       </div>`;
     }
     const nav = `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">${PASOS_BOTIN.map((p, i) => `<button type="button" class="iconbtn" data-rep-ir="${p.id}" style="${p.id === paso ? 'font-weight:700;border-color:#c9a227;color:#f3e2a0' : ''}">${i + 1}. ${esc(p.nombre)}</button>`).join('')}</div>`;
@@ -539,7 +539,7 @@ const CombateFin = (() => {
       return true;
     }
     if(d.repEscapados !== undefined){ rep.contarEscapados = t.checked; return true; }
-    if(d.repOcultos !== undefined){ rep.ocultosAOro = t.checked; return true; }
+    if(d.repOcultos !== undefined){ rep.ocultosDespojos = t.checked; return true; }
     return false;
   }
   // Un botón de la ventana (evento click): true (redibujar) | {ver: ítem} | {toast} | null (no era de acá). `raiz` = donde están los campos.
@@ -591,23 +591,24 @@ const CombateFin = (() => {
     if(!rp.n) return {error: 'Elegí al menos un jugador'};
     if(combateActual && combateActual.estado === 'publicado') return {error: 'Hay un botín anterior sin cerrar: cerralo primero con 🎁 Despojos (ahí se pagan su XP y su oro)'};
     const items = itemsPublicables(rep, r);
-    if(!(await confirmar(`¿Publicar los despojos?\n\n${rp.porJugador.map(({j, xp, dde}) => `· ${j.nombre}: +${fmt(xp)} XP, +${fmt(dde)} DDE`).join('\n')}\n· ${items.length} ítem(s) en el botín\n\n${items.length ? 'La XP y el oro se cargan en las fichas cuando cierres el botín (último paso, 🎁 Despojos). A los jugadores se les abre la ventana en el mapa para que elijan.' : 'Como no hay ítems, la XP y el oro se cargan solos en las fichas.'}`))) return null;
+    if(!(await confirmar(`¿Publicar los despojos?\n\n${rp.porJugador.map(({j, xp, dde, despojos}) => `· ${j.nombre}: +${fmt(xp)} XP, +${fmt(dde)} DDE${despojos ? `, +${fmt(despojos)} despojos` : ''}`).join('\n')}\n· ${items.length} ítem(s) en el botín\n\n${items.length ? 'La XP y el oro se cargan en las fichas cuando cierres el botín (último paso, 🎁 Despojos). A los jugadores se les abre la ventana en el mapa para que elijan.' : 'Como no hay ítems, la XP y el oro se cargan solos en las fichas.'}`))) return null;
     rep.publicando = true;
     if(alEmpezar) alEmpezar();
     try{
       const ts = firebase.firestore.FieldValue.serverTimestamp();
       const batch = fbDb.batch();
-      if(!items.length) rp.porJugador.forEach(({j, xp, dde}) => {
-        batch.set(fbDb.collection(fbRutaCampana('recompensas')).doc(), {fichaId: j.id, duenoUid: j.duenoUid, nombre: j.nombre.slice(0, 60), xp, dde, despojos: 0, estado: j.estado, aplicada: false, creado: ts});
+      if(!items.length) rp.porJugador.forEach(({j, xp, dde, despojos}) => {
+        batch.set(fbDb.collection(fbRutaCampana('recompensas')).doc(), {fichaId: j.id, duenoUid: j.duenoUid, nombre: j.nombre.slice(0, 60), xp, dde, despojos: despojos || 0, estado: j.estado, aplicada: false, creado: ts});
       });
+      // `despojos`: los del equipo que no se ofrece (se pagan al cerrar el botín, con la XP y el oro).
       batch.set(fbDb.doc(fbRutaCampana('combate/actual')), {numero: Date.now(), estado: items.length ? 'publicado' : 'cerrado', titulo: 'Batalla terminada', items: items.length, creado: ts,
-        jugadores: rp.porJugador.slice(0, 30).map(({j, xp, dde}) => ({fichaId: j.id, duenoUid: j.duenoUid, nombre: j.nombre.slice(0, 60), estado: j.estado, xp: Math.round(xp), dde: Math.round(dde * 100) / 100}))});
+        jugadores: rp.porJugador.slice(0, 30).map(({j, xp, dde, despojos}) => ({fichaId: j.id, duenoUid: j.duenoUid, nombre: j.nombre.slice(0, 60), estado: j.estado, xp: Math.round(xp), dde: Math.round(dde * 100) / 100, despojos: despojos || 0}))});
       items.forEach(i => {
         batch.set(fbDb.collection(fbRutaCampana('botin')).doc(), {nombre: String(i.nombre).slice(0, 80), json: JSON.stringify(i.template), origen: String(i.origen).slice(0, 80),
           precioCompra: num(i.precioCompra), despojos: Math.ceil(num(i.precioCompra) / 4), tomadoPor: '', tomadoNombre: '', creado: ts});
       });
       await batch.commit();
-      const lineas = rp.porJugador.map(({j, xp, dde}) => `${j.nombre}: +${fmt(xp)} XP${j.estado !== 'en pie' ? ` (${j.estado})` : ''}, +${fmt(dde)} DDE`).join(' · ');
+      const lineas = rp.porJugador.map(({j, xp, dde, despojos}) => `${j.nombre}: +${fmt(xp)} XP${j.estado !== 'en pie' ? ` (${j.estado})` : ''}, +${fmt(dde)} DDE${despojos ? `, +${fmt(despojos)} despojos` : ''}`).join(' · ');
       await lineaVerde('🎁 Recompensas del combate', lineas + (items.length ? ` · ${items.length} ítem(s) en el botín` : ''));
       return {ok: true, items, filas: r.filas};
     }catch(err){
@@ -670,7 +671,7 @@ const CombateFin = (() => {
     const cobran = (combateActual && Array.isArray(combateActual.jugadores)) ? combateActual.jugadores : [];
     const total = libres.reduce((a, d) => a + num(d.despojos), 0);
     const cada = elegidos.length ? Math.ceil(total / elegidos.length) : 0;
-    const lineasPago = cobran.map(c => `${c.nombre}: +${fmt(num(c.xp))} XP, +${fmt(num(c.dde))} DDE`).join('\n');
+    const lineasPago = cobran.map(c => `${c.nombre}: +${fmt(num(c.xp))} XP, +${fmt(num(c.dde))} DDE${num(c.despojos) ? `, +${fmt(num(c.despojos))} despojos del equipo que no se ofreció` : ''}`).join('\n');
     const lineasItems = reclamados.length ? `\n· Lo reclamado (${reclamados.length} ítem/s) va a la mochila de quien lo tiene${disputas.length ? ` (${disputas.length} en disputa: se corta y queda para quien lo reclamó primero)` : ''}.` : '';
     if(!(await confirmar(`¿Cerrar el botín?\n\n· ${libres.length ? `Lo que nadie tomó (${libres.length} ítem/s) se convierte en ${total} despojos: ${cada} para cada uno de ${elegidos.length} personaje(s).` : 'No queda nada sin tomar.'}${lineasItems}\n· Se cargan en las fichas la experiencia y el oro de la batalla:\n${lineasPago || '(nada)'}`))) return null;
     st.ocupado = true;
@@ -682,7 +683,7 @@ const CombateFin = (() => {
       const ids = [...new Set([...cobran.map(c => c.fichaId), ...elegidos.map(j => j.id), ...porFicha.keys()])];
       ids.forEach(id => {
         const c = cobran.find(x => x.fichaId === id), e = elegidos.find(x => x.id === id), f = (st.jugadores || []).find(x => x.id === id);
-        const xp = c ? num(c.xp) : 0, dde = c ? num(c.dde) : 0, desp = e ? cada : 0;
+        const xp = c ? num(c.xp) : 0, dde = c ? num(c.dde) : 0, desp = (e ? cada : 0) + (c ? num(c.despojos) : 0);   // + los del equipo que no se ofreció
         const items = (porFicha.get(id) || []).map(d => String(d.json || '')).filter(Boolean);
         const duenoUid = (c && c.duenoUid) || (f && f.duenoUid) || '';
         if(!duenoUid || !(xp > 0 || dde > 0 || desp > 0 || items.length)) return;

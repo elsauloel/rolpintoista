@@ -758,12 +758,20 @@ function bnRecordatorios(avisos){
 }
 // Elegir el objetivo de una habilidad (o de un ataque con arreglos) desde la Botonera nueva: como Atacar (paso 4b), con
 // dueloElegirObjetivoMapa; "Sin objetivo" vuelve a mostrar la Botonera y tira suelto acá.
-function bnElegirObjetivo(cfg){
+// 🏹 Una habilidad que dispara con el arco o la ballesta también puede llevar una flecha o un virote especial (dueño, 2026-10-27: «una
+// habilidad de disparo debería poder usar una flecha o virote especial»): el mismo «¿Qué flecha?» que Atacar, antes de elegir el objetivo.
+function bnElegirObjetivo(cfg, flechaId){
+  const atq = cfg.ataque, S = bn.S;
+  const arma = atq && atq.tipo === 'habilidad-arma' && atq.armaId ? (S.inventario || []).find(x => x.id === atq.armaId) || null : null;
+  const flechas = arma && Combatiente.municionDe(arma) && typeof FichaEquipo.flechasDelCarcaj === 'function' ? FichaEquipo.flechasDelCarcaj(S).filter(f => Combatiente.sirveLaMunicion(arma, f)) : [];
+  if(flechaId === undefined && flechas.length){ bnElegirFlecha(arma, flechas, id => bnElegirObjetivo(cfg, id)); return; }
+  const fl = flechaId ? flechas.find(f => f.id === flechaId) || null : null;
   const reabrir = () => { if(bn){ bn.host.hidden = false; bnUbicar(); bnDibujar(); } };
   bn.host.hidden = true;
   const objetivoFijo = bn.objetivoFijo || null;   // 🐈‍⬛ Enyetar: el enemigo ya se eligió en su menú (js/38)
   bn.objetivoFijo = null;
-  dueloElegirObjetivoMapa({yo: cfg.yo, ataque: cfg.ataque, objetivoFijo, conSuelto: !!cfg.suelto, alSuelto: () => { reabrir(); if(cfg.suelto) cfg.suelto(); }, alCancelar: () => {}});
+  dueloElegirObjetivoMapa({yo: cfg.yo, ataque: fl ? {...atq, flecha: fl} : atq, objetivoFijo, conSuelto: !!cfg.suelto, alSuelto: () => { reabrir(); if(cfg.suelto) cfg.suelto(); }, alCancelar: () => {},
+    ...(fl ? {alDisparar: () => bnDispararFlecha(fl.id, arma)} : {})});
 }
 // La línea de una habilidad en la Mesa, a nombre del personaje (como mesaPublicarHabilidad de la ficha).
 function bnMesaHabilidad(nombre, detalle){

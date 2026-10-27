@@ -438,7 +438,14 @@ function acLanzarAtaqueDeHab(sc, h, emergio){
   if(bonoSalida) atq.mods.pdg = num(atq.mods.pdg) + bonoSalida;
   acParry.delete(sc.id);   // atacar cierra el Parry que esperaba su Bloqueo
   acMesaHabilidad(sc, h);
-  if(atq && typeof Duelo !== 'undefined' && Duelo.disponible()) acElegirObjetivo(sc, atq, () => acPublicar(sc, CreepDuelo.pdgDeArreglos(sc, atq)));
+  if(atq && typeof Duelo !== 'undefined' && Duelo.disponible()){
+    // 🏹 Una habilidad que dispara con el arco o la ballesta también puede llevar una flecha o un virote especial del cinturón (dueño, 2026-10-27),
+    // como Atacar (acAtacar): se elige antes del objetivo y se gasta al disparar.
+    const lanzar = fl => acElegirObjetivo(sc, fl ? {...atq, flecha: fl} : atq, () => acPublicar(sc, CreepDuelo.pdgDeArreglos(sc, atq)), fl ? () => acDispararFlecha(fl.id) : null);
+    const flechas = atq.tipo === 'habilidad-arma' && !atq.escudoGolpe ? acFlechas(sc) : [];
+    if(flechas.length) acElegirFlecha(sc, flechas, fid => lanzar(fid ? flechas.find(f => f.id === fid) || null : null));
+    else lanzar(null);
+  }
   else acPublicar(sc, CreepDuelo.pdgDeArreglos(sc, atq));
 }
 // 🪤 Una 💰 con trampa: la coloca sola, oculta, al lado del token del creep (como GM Tools).

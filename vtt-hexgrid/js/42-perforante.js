@@ -11,7 +11,7 @@ function perforanteSiguiente(tA, tD, alcance, ignorar){
   const linea = flechaLinea(tA, tD, alcance);
   for(let i = 0; i < linea.length; i++){
     const c = linea[i];
-    if(solidos.has(nbPack(c.col, c.fila)) || (typeof paredCorta === 'function' && paredCorta(previa, c))) return {frena: true};
+    if(solidos.has(nbPack(c.col, c.fila)) || (typeof paredCorta === 'function' && paredCorta(previa, c, {tiro: true}))) return {frena: true};
     previa = c;
     if(i + 1 <= dist) continue;   // hasta el blanco: el camino del primer disparo
     for(const [id, t] of tokens.entries()){

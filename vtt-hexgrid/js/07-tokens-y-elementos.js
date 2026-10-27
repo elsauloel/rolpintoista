@@ -948,6 +948,8 @@ function escucharTrazos(){
         fijado: d.fijado === true,   // 📌 fijado: no se mueve ni se rota (js/34)
         transparente: d.transparente === true,   // ◌ sin relleno (js/34)
         veTraves: d.veTraves === true,   // 👁 una pared que deja ver (js/34)
+        sinRelleno: d.sinRelleno === true,   // ◻ solo la línea, el relleno transparente (js/34)
+        disparoTraves: d.disparoTraves === true,   // 🏹 una pared que deja ver y deja disparar (js/34)
         cerrada: d.cerrada !== undefined ? d.cerrada === true : (!esHex && puntos.length >= 4 && Math.hypot(puntos[0].x - puntos[puntos.length - 1].x, puntos[0].y - puntos[puntos.length - 1].y) < 1),   // ⭕ (uno viejo que termina donde empezó, también)
         duenoUid: d.duenoUid,
         creadoMs: d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now(),

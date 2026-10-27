@@ -1010,7 +1010,7 @@ function dibujarLienzo(){
     ctx.beginPath();
     trazarTrazo(ctx, t);   // en rectas o suavizado (js/34)
     ctx.globalAlpha = t.transparente ? (soyGM || !t.colision ? 0.18 : 0) * alfa : alfa;   // ◌ sin relleno (js/34): el GM lo ve tenue
-    if(t.cerrada && !t.transparente){ const ga = ctx.globalAlpha; ctx.globalAlpha = ga * 0.3; ctx.fillStyle = t.color; ctx.fill(); ctx.globalAlpha = ga; }   // ⭕ una figura cerrada se rellena tenue
+    if(t.cerrada && !t.transparente && !t.sinRelleno){ const ga = ctx.globalAlpha; ctx.globalAlpha = ga * 0.3; ctx.fillStyle = t.color; ctx.fill(); ctx.globalAlpha = ga; }   // ⭕ una figura cerrada se rellena tenue (◻ `sinRelleno`, js/34: solo la línea)
     ctx.strokeStyle = t.color;
     ctx.lineWidth = t.grosor / z;
     ctx.lineJoin = 'round'; ctx.lineCap = 'round';

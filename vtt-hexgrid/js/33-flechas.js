@@ -45,7 +45,7 @@ async function flechaErrada(d){
   let celda = {col: tD.col, fila: tD.fila}, choco = false;
   let previa = {col: tA.col, fila: tA.fila};
   for(const c of flechaLinea(tA, tD, alcance)){
-    if(solidos.has(nbPack(c.col, c.fila)) || paredCorta(previa, c)){ choco = true; break; }   // (una pared de línea fina también, js/34)
+    if(solidos.has(nbPack(c.col, c.fila)) || paredCorta(previa, c, {tiro: true})){ choco = true; break; }   // (una pared de línea fina también, js/34)
     previa = c;   // choca contra un obstáculo: cae justo antes (si no se rompe)
     celda = c;
   }

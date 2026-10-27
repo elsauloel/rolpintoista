@@ -8,11 +8,13 @@
    Lo usan: lineaLibre (js/02, la vista), extenderRuta y el soltar del arrastre (js/06, el movimiento), lineaDeTiro (js/32) y el vuelo
    de una flecha (js/33).
    👁 Pared que deja ver (`veTraves`, 2026-10-27, dueño: «que una pared marque solidez, pero al mismo tiempo deje ver a través de sí»): frena el paso
-   como cualquier pared, pero la vista (lineaLibre: visión, conos, rango) la atraviesa. Lo pone el GM desde el ⚙ del dibujo. */
+   como cualquier pared, pero la vista (lineaLibre: visión, conos, rango) la atraviesa. Lo pone el GM desde el ⚙ del dibujo.
+   🏹 Y si además deja disparar (`disparoTraves`, 2026-10-27, dueño: «que sea una opción más, que deje o no deje disparar a través las que dejan ver»):
+   la línea de tiro (js/32), las flechas (js/33) y el proyectil perforante (js/42) la cruzan. */
 let paredesCache = {firma: '', segs: []};
 function paredesFirma(){
   let f = '';
-  trazos.forEach((t, id) => { if(t.colision && !t.hex) f += `${id}:${t.origen.x},${t.origen.y},${t.rotacion},${t.puntos.length},${t.cerrada ? 1 : 0},${t.veTraves ? 1 : 0};`; });
+  trazos.forEach((t, id) => { if(t.colision && !t.hex) f += `${id}:${t.origen.x},${t.origen.y},${t.rotacion},${t.puntos.length},${t.cerrada ? 1 : 0},${t.veTraves ? 1 : 0},${t.disparoTraves ? 1 : 0};`; });
   return f;
 }
 // Los puntos de un trazo en el mundo (deshace su rotación y su origen, como lo dibuja js/05).
@@ -31,7 +33,7 @@ function paredesSegs(){
       if(t.cerrada && p.length >= 3) p.push(p[0]);   // ⭕ el tramo que une el final con el principio también es pared
       for(let i = 0; i + 1 < p.length; i++){
         const a = p[i], b = p[i + 1];
-        segs.push({ax: a.x, ay: a.y, bx: b.x, by: b.y, x0: Math.min(a.x, b.x), x1: Math.max(a.x, b.x), y0: Math.min(a.y, b.y), y1: Math.max(a.y, b.y), ve: !!t.veTraves});
+        segs.push({ax: a.x, ay: a.y, bx: b.x, by: b.y, x0: Math.min(a.x, b.x), x1: Math.max(a.x, b.x), y0: Math.min(a.y, b.y), y1: Math.max(a.y, b.y), ve: !!t.veTraves, tiro: !!(t.veTraves && t.disparoTraves)});
       }
     });
     paredesCache = {firma: f, segs};
@@ -87,22 +89,24 @@ function segmentosCruzan(ax, ay, bx, by, cx, cy, dx, dy){
   if(Math.abs(d4) <= EPS && enCaja(ax, ay, bx, by, dx, dy)) return true;
   return false;
 }
-// ¿Alguna pared corta el camino entre dos puntos del mundo? `soloVista`: las que dejan ver no cuentan (es una línea de vista).
-function paredEntrePuntos(p, q, soloVista){
+// ¿Alguna pared corta el camino entre dos puntos del mundo? `soloVista`: las que dejan ver no cuentan (es una línea de vista); `tiro`: las que dejan
+// disparar no cuentan (es un disparo).
+function paredEntrePuntos(p, q, soloVista, tiro){
   const segs = paredesSegs();
   if(!segs.length) return false;
   const x0 = Math.min(p.x, q.x), x1 = Math.max(p.x, q.x), y0 = Math.min(p.y, q.y), y1 = Math.max(p.y, q.y);
   for(const s of segs){
     if(s.x1 < x0 || s.x0 > x1 || s.y1 < y0 || s.y0 > y1) continue;
     if(soloVista && s.ve) continue;   // 👁 una pared que deja ver
+    if(tiro && s.tiro) continue;   // 🏹 una que deja disparar
     if(segmentosCruzan(p.x, p.y, q.x, q.y, s.ax, s.ay, s.bx, s.by)) return true;
   }
   return false;
 }
-// ¿Alguna pared corta el paso (o la vista) entre dos casilleros? (de centro a centro). `o.vista`: es una línea de vista (las que dejan ver, no).
+// ¿Alguna pared corta el paso (o la vista) entre dos casilleros? (de centro a centro). `o.vista`: es una línea de vista (las que dejan ver, no); `o.tiro`: es un disparo (las que dejan disparar, no).
 function paredCorta(a, b, o){
   if(!a || !b || (a.col === b.col && a.fila === b.fila) || !paredesSegs().length) return false;
-  return paredEntrePuntos(hexCentro(a.col, a.fila), hexCentro(b.col, b.fila), !!(o && o.vista));
+  return paredEntrePuntos(hexCentro(a.col, a.fila), hexCentro(b.col, b.fila), !!(o && o.vista), !!(o && o.tiro));
 }
 // Las paredes se ven: un borde oscuro debajo del dibujo (lo llama js/05). Sin relleno (`transparente`, 2026-10-14, dueño: «cuando las uso para marcar la
 // colisión, rompe la naturalidad del mapa»): no se pinta el color ni el borde grueso; queda una línea oscura finita.
@@ -212,10 +216,12 @@ function trazoCfgAbrir(id){
       if(k === 'cerrar'){ trazoCfgCerrar(); return; }
       if(k === 'color') cambios.color = b.dataset.v;
       if(k === 'relleno') cambios.transparente = !t2.transparente;
+      if(k === 'sinrelleno') cambios.sinRelleno = !t2.sinRelleno;   // ◻ (2026-10-27): la línea con su color, el relleno transparente
       if(k === 'puntas') cambios.cerrada = !t2.cerrada;
       if(k === 'fijar') cambios.fijado = !t2.fijado;
       if(k === 'pared' && soyGM) Object.assign(cambios, t2.colision ? {colision: false} : {colision: true, fijado: true});
       if(k === 've' && soyGM) cambios.veTraves = !t2.veTraves;
+      if(k === 'tiro' && soyGM) cambios.disparoTraves = !t2.disparoTraves;
       Object.assign(t2, cambios); pedirDibujo(); trazoCfgAbrir(trazoCfgId);
       moverTrazo(trazoCfgId, cambios).catch(err => { console.error('No se pudo cambiar el dibujo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan pegar las reglas nuevas de Firestore (dibujos)' : 'No se pudo cambiar el dibujo'); });
     });
@@ -231,10 +237,12 @@ function trazoCfgAbrir(id){
     <div style="font-size:11px;letter-spacing:.08em;opacity:.75;margin-bottom:4px">COLOR</div>
     <div style="display:flex;flex-wrap:wrap;gap:5px;align-items:center">${TRAZO_COLORES.map(c => `<button type="button" data-tc="color" data-v="${c}" title="${c}" style="width:20px;height:20px;border-radius:50%;cursor:pointer;background:${c};border:2px solid ${t.color === c ? '#fff' : 'rgba(0,0,0,.4)'}"></button>`).join('')}<input type="color" data-tc="colorlibre" value="${/^#[0-9a-fA-F]{6}$/.test(t.color || '') ? t.color : '#E0A458'}" title="Otro color" style="width:26px;height:22px;padding:0;border:0;background:none;cursor:pointer"></div>
     ${op('relleno', !t.transparente, t.transparente ? '◌ Sin relleno (casi no se ve) · tocá para darle color' : '● Con color · tocá para dejarlo sin relleno')}
+    ${!t.transparente ? op('sinrelleno', !!t.sinRelleno, t.sinRelleno ? '◻ Solo la línea: el relleno de adentro, transparente' : '▣ Relleno de color adentro · tocá para dejarlo transparente') : ''}
     ${op('puntas', !!t.cerrada, t.cerrada ? '⭕ Puntas cerradas (el final se une con el principio)' : '〰 Puntas abiertas · tocá para cerrarlas')}
     ${op('fijar', !!t.fijado, t.fijado ? '📌 Fijado (no se mueve ni se rota)' : '🔓 Suelto · tocá para fijarlo')}
     ${soyGM ? op('pared', !!t.colision, t.colision ? `🧱 Es pared${t.cerrada ? ': lo de adentro es sólido y sin grilla' : ''}` : '🧱 No es pared · tocá para que corte el paso y la vista') : ''}
-    ${soyGM && t.colision ? op('ve', !!t.veTraves, t.veTraves ? '👁 Deja ver a través: frena el paso, no la vista' : '🙈 Tapa la vista · tocá para que deje ver a través') : ''}`;
+    ${soyGM && t.colision ? op('ve', !!t.veTraves, t.veTraves ? '👁 Deja ver a través: frena el paso, no la vista' : '🙈 Tapa la vista · tocá para que deje ver a través') : ''}
+    ${soyGM && t.colision && t.veTraves ? op('tiro', !!t.disparoTraves, t.disparoTraves ? '🏹 Deja disparar a través' : '🛑 Frena los disparos · tocá para que deje disparar a través') : ''}`;
   const r = lienzo.getBoundingClientRect(), g = trazoGearMundo(t);
   const x = r.left + g.x * vista.zoom + vista.x, y = r.top + g.y * vista.zoom + vista.y;
   el.style.left = Math.max(8, Math.min(innerWidth - 262, x + 16)) + 'px';

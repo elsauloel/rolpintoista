@@ -157,3 +157,6 @@ pondría algún skill de daño siniestro que sume algo de daño mágico directo,
   si es un escudo que pesa 3, tira 3 de 10 y daño». Programado (`comun/creep-duelo.js`, `formulaDano`). Con el Escudo de cuero endurecido (peso 2):
   2d10 + 9 (20 de promedio).
 - **Costo (dueño, 2026-10-27)**: el Golpe de escudo cuesta **5 No2** (lo de un primer ataque de Tipo 10) **y 2 SP** (se probó 4 No2 y 3 SP y volvió atrás). Programado.
+- **Consumibles (dueño, 2026-10-27)**: además de la Poción de Cuero Duro (la usa en la pelea), un **Óleo reparador** como drop temático («ya que tiene
+  romper armadura»): hoy se usa solo fuera de combate (repara 3 de durabilidad y 3 de armadura rota de una pieza no rota), así que el creep no lo usa;
+  va como drop fijo. A decidir si el óleo se puede usar en combate.

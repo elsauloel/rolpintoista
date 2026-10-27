@@ -160,3 +160,5 @@ pondría algún skill de daño siniestro que sume algo de daño mágico directo,
 - **Consumibles (dueño, 2026-10-27)**: además de la Poción de Cuero Duro (la usa en la pelea), un **Óleo reparador** como drop temático («ya que tiene
   romper armadura»): hoy se usa solo fuera de combate (repara 3 de durabilidad y 3 de armadura rota de una pieza no rota), así que el creep no lo usa;
   va como drop fijo. A decidir si el óleo se puede usar en combate.
+- **Decidido (dueño, 2026-10-27)**: el Óleo reparador solo como drop (se usa fuera de combate; el creep no lo usa). La Poción de Cuero Duro se cambia por la
+  **Poción de Piel de Cristal** (Común: escudo de 15 que absorbe solo el daño especial), porque su Defensa especial es 0 (6 con Piel de hierro).

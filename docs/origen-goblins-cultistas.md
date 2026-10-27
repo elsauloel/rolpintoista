@@ -93,7 +93,7 @@ Guía general propuesta (esperando el OK):
 
 ## Creep por creep
 
-### 👑 1. Jefe humano, mago buffer — nivel 3 (propuesta, esperando el OK)
+### 👑 1. Jefe humano, mago buffer — nivel 3 (quedó como mago debuffer de nivel 4, más abajo: OK del dueño)
 
 - **Atributos (39)**: Con 9 · Fue 3 · Agi 6 · Des 6 · Esp 15. Vida 45, No2 6, Rango 6, SP 47 (regen 7).
 - **Equipo** (criterio del dueño, nivel 3: las manos + 4 Comunes + 1 Buena): manos, Varita de la grieta (Buena, la de nivel 3) y Grimorio gastado;
@@ -134,7 +134,7 @@ pondría algún skill de daño siniestro que sume algo de daño mágico directo,
   de ojo) Larry 97 %, Bizzante 94 %, Petro 88 %; Confusión contra la Res.Mt: Petro 94 %, Bizzante 80 %, Larry 35 %.
 - Se van Armas perforantes, Señalar la presa, ¡A la carga!, Bendecir el arma y Ojo certero (eran de support).
 
-### 🛡 2. Goblin picapiedras (choque pesado) — nivel 3 (propuesta, esperando el OK)
+### 🛡 2. Goblin picapiedras (choque pesado) — nivel 3 (OK del dueño, 2026-10-27)
 
 - **Atributos (39)**: Con 11 · Fue 9 · Agi 6 · Des 8 · Esp 5. Vida 55 (+5 = 60), No2 6, PdG 8, Parry 8, Dmg 9, Bloqueo 9, Evasión 6, Res.Esp y Res.CC 11,
   Res.Mt 5, Rango 8. SP 15 (regen 2) si va en modo SP.
@@ -163,7 +163,7 @@ pondría algún skill de daño siniestro que sume algo de daño mágico directo,
 - **Decidido (dueño, 2026-10-27)**: el Óleo reparador solo como drop (se usa fuera de combate; el creep no lo usa). La Poción de Cuero Duro se cambia por la
   **Poción de Piel de Cristal** (Común: escudo de 15 que absorbe solo el daño especial), porque su Defensa especial es 0 (6 con Piel de hierro).
 
-### 🗡 3. Goblin tunelero (choque liviano) — nivel 2 (propuesta, esperando el OK)
+### 🗡 3. Goblin tunelero (choque liviano) — nivel 2 (OK del dueño, 2026-10-27)
 
 Dueño (2026-10-27): «en tunelero, el fin de enterrarse, que sea el mismo skill con golpes desde abajo, que sea solo todo un solo skill. Que no sean dos
 skills, porque si no después buscarlos vinculados el uno al otro va a ser una pasada.»
@@ -257,7 +257,7 @@ Dueño (2026-10-27): «seguimos con el arquero, que también va a tener foco en 
   el ataque común (como un personaje): las habilidades que disparan con el arma (Disparo señalador, Clavar a la pared…) no preguntan. **Decidido (dueño, 2026-10-27)**:
   «una habilidad de disparo debería poder usar una flecha o virote especial» → programado para personajes y creeps (falta probarlo en el mapa). **Consumible propuesto**: 3 **Flechas silbadoras** (Común, Demora) en el cinturón.
 
-### 🏹 6. Goblin ballestero (Rango, trabador), anti-Bizzante — nivel 2 (propuesta, esperando el OK)
+### 🏹 6. Goblin ballestero (Rango, trabador), anti-Bizzante — nivel 2 (OK del dueño, 2026-10-27)
 
 Dueño (2026-10-27): «después vamos al ballestero, que va a tener foco en Bizzante».
 
@@ -280,3 +280,9 @@ Dueño (2026-10-27): «después vamos al ballestero, que va a tener foco en Bizz
   armadura, 1 stack, +1 No2 al dispararlo; el único que rompe armadura sin ser Raro, salvo el de ácido, que suma 1d4 ácido). Cada virote que pega le
   baja 1 la Defensa a Bizzante, para el tunelero y el híbrido.
 
+## ✅ Encuentro 1 cerrado (dueño, 2026-10-27: «los otros tres están bien, ok»)
+
+Los seis creeps aprobados: el jefe (mago debuffer, N4), el picapiedras (N3), el tunelero (N2), el híbrido (N3), el arquero (N3) y el ballestero (N2).
+**Lo que sigue**: cuando el dueño termine el mapa del encuentro, crear los seis en El origen con sus tokens en ese mapa (es la partida real: con el
+OK del dueño en el momento). Antes, probar en «Claude · pruebas» lo que usan y todavía no se vio en el mapa: Excavar y la estela, la flecha o virote
+especial en una habilidad de disparo, el Golpe de escudo y la Red (). Después: los encuentros 2 y 3.

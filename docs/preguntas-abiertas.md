@@ -1311,3 +1311,8 @@ extra). **Vida extra:** Drenar vida, Colmillo de la Reina Araña, **Relicario de
 curás 10; si te pasás de tu máximo, eso se convierte en vida extra»), **Anillo de la siesta**, **Anillo del sereno** y **Anillo del escudo de la mañana**
 (siguen frenando solo su tipo de daño). **Escudo:** los Orbes de resguardo y del custodio, el Escudo de caparazón, el Anillo de cáscara protectora y
 todos los «claros» de arriba. Falta programar. **El Envión cambia de nombre** (dueño: «no me cierra nada el nombre»): a elegir.
+
+**Relicario de sangre, efecto nuevo (dueño, 2026-10-27):** «sumale como efecto al relicario de sangre que toda curación cuenta como vida extra. Por
+ejemplo, te puedes tomar una poción y que suba como vida extra hasta el final del combate. Obviamente que si te la bajan también». Con el Relicario
+equipado, **cualquier curación que pase del máximo queda como Vida extra** (no se pierde), y esa Vida extra dura **hasta el «Finalizar combate»**; el daño
+la gasta como siempre. A confirmar: si tiene un tope (el Drenar vida llega hasta +50 % del máximo).

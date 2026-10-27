@@ -1,5 +1,9 @@
 # Rol Pintoísta — herramientas de campaña (rama `nueva-version`)
 
+> **🇦🇷 IDIOMA: TODO EN ESPAÑOL (rioplatense), SIEMPRE.** Cada mensaje al dueño —los avisos cortos de avance, las propuestas, las tablas y el
+> resumen final— va en español, aunque la conversación sea larga, venga de mucho trabajo técnico o de un resumen automático. Nunca en inglés.
+> (Pasó varias veces, la última el 2026-10-27, y molesta mucho. Antes de mandar cada mensaje, revisar el idioma.)
+
 > Esta rama (carpeta `rol-nueva-version`) es el sistema nuevo: herramientas
 > de campaña en vivo con Firebase. **Antes de tocar código acá**, leer
 > [`docs/plan-sistema-nuevo.md`](docs/plan-sistema-nuevo.md) (qué se

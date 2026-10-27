@@ -279,6 +279,10 @@ Dueño (2026-10-27): «después vamos al ballestero, que va a tener foco en Bizz
   filo fino** (Común: Tipo 4, 1d4 + 4, Crítico potente +2, Recarga 2; ~1,5 por tiro contra la Defensa 5 de Bizzante) y 3 **Virotes rompe-corazas** (Buena: Rompe
   armadura, 1 stack, +1 No2 al dispararlo; el único que rompe armadura sin ser Raro, salvo el de ácido, que suma 1d4 ácido). Cada virote que pega le
   baja 1 la Defensa a Bizzante, para el tunelero y el híbrido.
+- **Vuelta atrás (dueño, 2026-10-27)**: «vamos a dejarlo con el arma que habías propuesto vos… en vez de virotes perforantes, vamos con virotes
+  dentados que dejen sangrando; esto podría ser sinergia con Sal en la herida del choque liviano» → **Ballesta de la grieta** otra vez (1d4 + 2,
+  Armadura rota doble 50 %) y 3 **Virotes dentados** (Común: Sangrado, +1 No2 al dispararlo). Sinergia: el virote deja sangrando a Bizzante (el sangrado
+  no lo frena la Defensa y le come la regeneración de la túnica) y el tunelero cobra **Sal en la herida** (si ya sangra, +2 dados y el sangrado sube).
 
 ## ✅ Encuentro 1 cerrado (dueño, 2026-10-27: «los otros tres están bien, ok»)
 

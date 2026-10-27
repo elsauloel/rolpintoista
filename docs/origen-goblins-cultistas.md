@@ -217,3 +217,4 @@ donde puede tirarse un pedo para desplazarse con un salto alto; las trampas much
   golpe común el 86 %; la espada hace 2d6 + 8 (15): le pasan ~11 por golpe; con Larry a la mitad, el Remate (+2d6) lo tumba. Aguantando a Larry: el Drenar
   Vida con X = 5 lo resiste el 61 %, con X = 8 el 18 %, con X = 10 el 6 %; los Pedos le ganan el 66 % (contra Res.Esp 4 sería el 99 %).
 - **Riesgo**: es un cazador de Larry muy efectivo (Takle casi siempre le saca el turno). A mirar en la simulación.
+- **El tunelero: la habilidad única se llama «Excavar»** (dueño, 2026-10-27). Al programarla, reemplaza a «Excavar (El origen)» y a «Puñalada desde abajo» (las dos sin auditar) y a la vieja «Excavar» de fábrica.

@@ -106,3 +106,14 @@ Guía general propuesta (esperando el OK):
 - **Plan de turnos**: 1.º ¡A la carga! + Armas perforantes al picapiedras (3 No2); 2.º Señalar la presa a Larry + la varita a Petro (2 No2, −2
   Defensa); Bendecir el arma, con el botón, al que está por pegar.
 - **Botín**: la Varita de la grieta (Buena) y la Capucha del culto; candidato a llevar los drops fijos de la Polilla y la Runa aceleradora.
+
+#### El jefe, a nivel 4 (dueño, 2026-10-27: «le subiría un nivel más… y le pondría algún equipo que le pare, por lo menos uno de crítico tipo 4 y
+algo de defensa… elegí el mejor objeto posible»; y «el mago» era Larry: el híbrido va por Bizzante y Larry)
+
+- **Atributos (42)**: Con 12 · Fue 3 · Agi 6 · Des 6 · Esp 15 (los 3 puntos nuevos, a la Constitución: más vida, sin subir más la puntería).
+  Vida 60, No2 6, Rango 6, SP 47 (regen 7).
+- **Equipo** (nivel 4: las manos + 3 Comunes + 2 Buenas): Varita de la grieta (Buena) y Grimorio gastado; **Capacete de hierro** (Buena: Defensa +3,
+  Res. crítico Tipo 4 +1, Res.Mt +1 — el que más Defensa da de los que tienen Tipo 4), Túnica de aprendiz, Mitones del primer conjuro, Babuchas
+  bordadas del adivino. Sale la Capucha del culto. Queda: PdG.Esp 16, Defensa 3, Def.Esp 2, Res. crítico Tipo 4 1, Res.Esp 14, Res.CC 12, Res.Mt 20,
+  Evasión 6. Consumible: Poción de SP menor.
+- **Quinta skill**: Ojo certero (1 No2, 3 SP, cd 3: Crítico frecuente +2 y potente +2, 2 turnos) al arquero. Alternativa: Arrojo (Flash, 3 SP: escudo de 10).

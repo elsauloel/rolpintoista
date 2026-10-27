@@ -281,6 +281,15 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
     **Golpe de pomo** (rápido: medio ataque en No2, poco daño y Demora 1) · **Martillazo al suelo** (onda alrededor con poco daño; las casillas
     quedan como terreno difícil 2 turnos) · **Escudo de carne** (agarra a un rival atrapado y lo usa de escudo: los disparos contra él van al
     atrapado) · **Rencor acumulado** (cada golpe que recibe le suma +1 al daño de su próximo ataque, hasta +5).
+- **Orden** (dueño, 2026-10-27: «vamos de a una como hicimos hasta acá. Dos de tanque y después una y una hasta llegar a las 10»): dos de tanque
+  (4 → 6, así quedan los tres grupos en 6) y después una de cada uno, rotando, hasta 10 · 10 · 10.
+- **Definidas (sin programar todavía)**:
+  1. 🛡 **Provocar** (el Taunt en versión creep; dueño, 2026-10-27: «que el taunt de clase tire PdG especial más nivel contra resistencia mental.
+     El de creep además suma 2 de defensa y 2 de defensa especial»): a un rival en su Rango, **PdG.Esp + su nivel** contra la **Res.Mt**; si gana,
+     queda **Provocado por él 2 turnos** (el estado de Tirar la bronca, con su Anuncio y su brillo) y, mientras dure, el creep tiene **+2 Defensa y
+     +2 Def. especial**. 1 No2 y 2 SP, o cooldown 2.
+     **También cambia el Taunt de clase** (`comun/skills-clase.js`, `tanque-taunt`): **PdG.Esp + nivel** (antes +1) contra la Res.Mt. Hoy el duelo
+     solo admite un bono fijo (`tiraBono`): hace falta que acepte «+ nivel». Se programa con la tanda.
 - Ya cubiertas por una de fábrica: Amplificar daño (Golpe fuerte), Remolino (Barrido), Shockwave (Pisotón), Takle, Desarmar, Aguante; Cañón Vasco ≈
   Salto aplastante; Daño en área (tanque) ≈ Barrido. Sacadito sigue en pausa.
 

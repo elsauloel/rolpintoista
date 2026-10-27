@@ -620,7 +620,9 @@ Propuesta (2026-10-27):
   al pisarla tira **Agilidad** (contra la Destreza del creep, como las demás); si pierde, **avanza 1 casilla en la dirección en que venía** (cae del otro
   lado) y queda **Sentado**; sin daño. **1 No2 y 2 SP.** *Mecánica nueva:* la trampa que lo corre 1 hacia adelante (si esa casilla está ocupada o es
   sólida, cae donde está).
-- 🗡 **L4. Polvo cegador**: 1 casilla → las 7 de alrededor; Ceguera 1 turno.
+- 🗡 **L4. Polvo cegador** — **definida** (dueño, 2026-10-27: «va bien»): una bolsita en 1 casilla (fuera de la vista de los rivales); al pisarla, el polvo
+  alcanza la flor de 7 alrededor: **Ceguera 1 turno** a todos los de adentro; **Res.CC contra la Destreza del creep** para no tragárselo; sin daño.
+  **1 No2 y 2 SP, o cooldown 3.**
 
 **El Cebo, dos formas para elegir:**
 - **A. Al instante** (como Arrastrar): pone el cebo (algo brillante, comida, un quejido) en una casilla de su Rango; los rivales que lo ven y están a 4 o menos

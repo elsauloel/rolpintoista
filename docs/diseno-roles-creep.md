@@ -612,6 +612,8 @@ Propuesta (2026-10-27):
   directo a la vida** (no lo frena la Defensa; **la Res. fuego le resta**); **Pajaritos 2 turnos**, Res.CC contra la Destreza del creep solo para eso.
   **2 No2 y 3 SP, o cooldown 3.**
 
+**Costos que faltaban (propuestos el 2026-10-27, sin objeción del dueño):** Red tendida y Cepo del cazador, cooldown 3; Cebo, 1 No2 y 2 SP, o cooldown 3.
+
 **Tanda cerrada (2026-10-27): 4 y 4** — Rango y Hunter: Red tendida, Cebo, Cepo del cazador, Mina del cazador · Choque liviano: Aguja en el piso,
 Abrojos, Cordón oculto, Polvo cegador. ~~H5. Arrear~~ descartada. **Para programar (cuando el dueño diga)**, además de las 8: una trampa con Perfora (la
 Aguja del catálogo: 1d8, Perfora 1, veneno si lastima), el veneno por golpe sin tirada (P228: Dardos y Espina de mantícora), Escudo y Vida extra
@@ -638,6 +640,11 @@ Las invocaciones, igual (confirmado por el dueño).
   al pisarla tira **Agilidad** (contra la Destreza del creep, como las demás); si pierde, **avanza 1 casilla en la dirección en que venía** (cae del otro
   lado) y queda **Sentado**; sin daño. **1 No2 y 2 SP.** *Mecánica nueva:* la trampa que lo corre 1 hacia adelante (si esa casilla está ocupada o es
   sólida, cae donde está).
+  **Ajuste (dueño, 2026-10-27):** «3 SP y el largo tiene que ser de 4, no de 3» → **línea de 4, 1 No2 y 3 SP** (cooldown 2, la propuesta). **Cómo se ve**
+  (dueño: «como una línea de un color claro y bordes negros bien saturada para que se vea, y en cada extremo algo que haga referencia como a una estaca
+  donde está anotado el cordón y que se vea cierta tensión cada X cantidad de segundos, como que se mueve un poco el cordón»): un cordón claro con borde
+  negro bien marcado entre dos estacas (una en cada punta) que cada tantos segundos vibra un poco, tenso. Lo ven quienes ven la trampa (su equipo, o
+  todos cuando se descubre o se dispara).
 - 🗡 **L4. Polvo cegador** — **definida** (dueño, 2026-10-27: «va bien»): una bolsita en 1 casilla (fuera de la vista de los rivales); al pisarla, el polvo
   alcanza la flor de 7 alrededor: **Ceguera 1 turno** a todos los de adentro; **Res.CC contra la Destreza del creep** para no tragárselo; sin daño.
   **1 No2 y 2 SP, o cooldown 3.**

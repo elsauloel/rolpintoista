@@ -302,10 +302,14 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
      y `fijo: 2`, y el detalle). Se programa con la tanda.
   4. ⚖ **Golpe de escudo** (D22 Derribar; dueño, 2026-10-27: «lo primero que tira es destreza contra evasión. Y si pega es fuerza más [el peso]
      del escudo… no es contra constitución, sino contra resistencia al crowd control»): necesita escudo. Pega con el escudo: **Destreza contra la
-     Evasión** del rival; si pega, el escudo pega **como un arma contundente**: **1d10 + el peso del escudo + su Fuerza contra la Defensa** del
-     rival (dueño, 2026-10-27: «como si el escudo fuera un arma contundente… y si pasa, hace el efecto que decíamos»); si la pasa, le hace **la
+     Evasión** del rival; si pega, el escudo pega **como un arma contundente**: **1d10 + el peso del escudo + su Dmg contra la Defensa** del
+     rival (el Dmg, el atributo secundario que sale de la Fuerza; dueño: «por más daño me refiero al estado secundario damage») (dueño, 2026-10-27: «como si el escudo fuera un arma contundente… y si pasa, hace el efecto que decíamos»); si la pasa, le hace **la
      diferencia de daño** y lo deja **Sentado y con Demora 1**. Sin la tirada contra la Res.CC (la reemplaza esta). Un ataque y 2 SP, o cooldown 2.
      (Los escudos de 1 mano pesan 1 a 3; el de 2 manos, hasta 6: el escudo pesado es el que mejor pega.)
+  5. 🛡 **Interponerse** (F31; dueño, 2026-10-27: «está bien, hagámoslo así»): **Flash** (botón instantáneo en el duelo, como Desarmar): cuando
+     atacan a un aliado a **2 casillas o menos**, antes de la tirada, **salta a su lado** (gratis: sin No2 ni ataques de oportunidad) y **el golpe va
+     contra él**, con **+2 Defensa** contra ese golpe. 2 SP (4 en turno ajeno), o cooldown 3. Combina con Piel de hierro y Provocar. 🔧 Hace falta
+     que el duelo pueda cambiar de defensor a mitad de camino.
 - Ya cubiertas por una de fábrica: Amplificar daño (Golpe fuerte), Remolino (Barrido), Shockwave (Pisotón), Takle, Desarmar, Aguante; Cañón Vasco ≈
   Salto aplastante; Daño en área (tanque) ≈ Barrido. Sacadito sigue en pausa.
 

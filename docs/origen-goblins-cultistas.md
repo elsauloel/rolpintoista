@@ -285,4 +285,4 @@ Dueño (2026-10-27): «después vamos al ballestero, que va a tener foco en Bizz
 Los seis creeps aprobados: el jefe (mago debuffer, N4), el picapiedras (N3), el tunelero (N2), el híbrido (N3), el arquero (N3) y el ballestero (N2).
 **Lo que sigue**: cuando el dueño termine el mapa del encuentro, crear los seis en El origen con sus tokens en ese mapa (es la partida real: con el
 OK del dueño en el momento). Antes, probar en «Claude · pruebas» lo que usan y todavía no se vio en el mapa: Excavar y la estela, la flecha o virote
-especial en una habilidad de disparo, el Golpe de escudo y la Red (). Después: los encuentros 2 y 3.
+especial en una habilidad de disparo, el Golpe de escudo y la Red (docs/pruebas-en-el-mapa.md). Después: los encuentros 2 y 3.

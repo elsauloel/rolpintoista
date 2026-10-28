@@ -153,7 +153,7 @@ const FiltroCatalogo = (() => {
   /* 🛒 Los consumibles, como en la Góndola de consumibles (dueño, 2026-10-28): pociones de HP y SP, enfermería, utilitarios (Moneda Re-Roll, Polilla
      mística, Revive y Ankh primeros), trampas, pociones de otros usos y pergaminos (Combatiente.categoriaGondola). Antes: clásicos, pergaminos,
      pociones, utilería y trampas. */
-  const SUBGRUPOS = typeof Combatiente !== 'undefined' && Combatiente.GONDOLA_CATEGORIAS ? Combatiente.GONDOLA_CATEGORIAS.map(g => ['g-' + g[0], g[1], g[2]])
+  const subgrupos = () => typeof Combatiente !== 'undefined' && Combatiente.GONDOLA_CATEGORIAS ? Combatiente.GONDOLA_CATEGORIAS.map(g => ['g-' + g[0], g[1], g[2]])
     : [['g-utilitario', '🎒', 'Consumibles'], ['g-trampa', '🪤', 'Trampas']];
   function grupoDe(it){
     const p = parteDe(it);
@@ -165,6 +165,7 @@ const FiltroCatalogo = (() => {
     if((f.orden || 'categoria') !== 'categoria') return [{clave: '', label: ORDENES[f.orden] || '', items: lista}];
     const grupos = new Map();
     lista.forEach(it => { const p = grupoDe(it); if(!grupos.has(p)) grupos.set(p, []); grupos.get(p).push(it); });
+    const SUBGRUPOS = subgrupos();   // (al usarla: el filtro se puede cargar antes que combatiente.js)
     const orden = [...PARTES.map(p => p[0]).filter(p => p !== 'consumible' && p !== 'trampa'), ...SUBGRUPOS.map(g => g[0])];
     const etq = k => { const sg = SUBGRUPOS.find(g => g[0] === k); if(sg) return `${sg[1]} ${sg[2]}`; return `${(PARTES.find(x => x[0] === k) || [, ''])[1]} ${PARTE_ETQ[k] || k}`.trim(); };
     // (en los utilitarios, la Moneda Re-Roll, la Polilla, el Revive y el Ankh primero; el resto, como venían)

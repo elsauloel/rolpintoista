@@ -161,9 +161,11 @@
 > - [ ] **📜 Pergamino de Town portal (2026-10-28, dueño: «pergamino de town portal, crear y poner como drop en la próxima pelea»).** Un consumible que abre
 >   un portal de vuelta al pueblo (o a un lugar seguro). Diseñarlo (precio, calidad, qué hace en el mapa: ¿dos portales como Invocar portal, uno acá y otro en
 >   el pueblo?), cargarlo al catálogo y ponerlo como drop fijo de un creep de la próxima pelea de El origen.
-> - [ ] **⏳ «Token de turnos» (2026-10-28, lo trajo el dueño de la última partida: «Había que cambiar cómo está automatizado el sistema. Sería más simple
->   que haya un estado llamado Token de turnos y el sistema se lo saca durante el mantenimiento»).** Falta aclarar a qué parte del sistema se refiere (¿quién
->   ya jugó la ronda? ¿los turnos de los estados? ¿el turno libre?) antes de proponer nada.
+>   **🧿 Corroborar que el Mal de ojo sea bien costoso (2026-10-28, dueño: «debería ser bastante costoso, así que recordame eso para corroborar»).** Quedó
+>   sin tirada de resistencia (P230 ✅): hoy cuesta 5 SP o cooldown 3 (el doble en turno ajeno). Revisar con el dueño si sube.
+> - [ ] **⏳ «Token de turnos» (2026-10-28) — en espera:** el dueño lo tiene que definir con un colega que le va a mandar la info («Había que cambiar
+>   cómo está automatizado el sistema. Sería más simple que haya un estado llamado Token de turnos y el sistema se lo saca durante el mantenimiento»).
+>   No tocar hasta que llegue.
 > - [ ] **🎒 Usar los consumibles de un aliado caído (2026-10-27, dueño: «después podemos definir que los aliados, al pararse al lado, pueden abrir su
 >   mochila o su cinturón para valerse de sus consumibles gastando nitros»).** Un personaje caído (0 de vida) es un cuerpo esperando que lo revivan (P225);
 >   un aliado pegado a él podría abrir su mochila o su cinturón y usar sus consumibles (sobre el caído o sobre sí), pagando No2. A definir: cuánto cuesta

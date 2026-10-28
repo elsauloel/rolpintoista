@@ -239,6 +239,10 @@ const ESTADOS_PRESET = [
     detalle:'Toda tirada de PdG, Parry o Evasión se hace dos veces y se queda con la mejor.'},
   {nombre:'Sangre pura', polaridad:'buff', turnos:3, sangrePura:true,
     detalle:'Inmune a todo tipo de Veneno: no se le puede aplicar y el que ya tenga puesto no le hace daño mientras dure.'},
+  // 🪨 Inmune a lo tóxico (2026-10-28, dueño: «Larry es una roca en un robot: ningún efecto tóxico le hace nada»). Lo deja puesto la pasiva racial
+  // «Inmunidad tóxica» (comun/pasivas.js), que además suma Res. tóxico 99 (el daño tóxico no entra). Frena el Veneno como Sangre pura.
+  {nombre:'Inmune a lo tóxico', polaridad:'buff', permanente:true, sangrePura:true,
+    detalle:'Lo tóxico no le hace nada: no se le puede aplicar Veneno y el que tuviera no le hace daño. (Con la pasiva racial, además, el daño tóxico no entra.)'},
   // Coagulación (2026-10-08, dueño: antes «Coagulación extrema»; la marca interna sigue siendo coagulacionExtrema).
   {nombre:'Coagulación', alias:['Coagulación extrema'], polaridad:'buff', turnos:3, coagulacionExtrema:true,
     detalle:'Inmune a Sangrado: no se le puede aplicar y el que ya tenga puesto no le hace daño mientras dure.'},

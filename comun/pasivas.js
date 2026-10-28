@@ -22,6 +22,11 @@
    P70): Res.CC da +2. Los +1 de los stats restantes se cargaron el 2026-09-19 a pedido del dueño;
    los marcados ⚠ (No2, Rng, Crit) son los que más hay que revisar. */
 const PASIVAS_BASE = [
+  // 🪨 Inmunidad tóxica (2026-10-28, dueño: «a Larry una habilidad pasiva racial que es inmunidad a efectos tóxicos; Larry es una roca en un robot»):
+  // racial (no cuesta Job). Res. tóxico 99 (el daño tóxico no entra: zonas, armas, flechas, habilidades) y el estado «Inmune a lo tóxico» (el Veneno no entra).
+  {poolId: 'inmunidad-toxica', nombre: 'Inmunidad tóxica (racial)', jobCosto: 0, etiquetas: ['racial', 'defensiva'], estado: 'Inmune a lo tóxico',
+   mods: [{stat: 'restoxico', val: 99}],
+   detalle: 'Racial. Lo tóxico no le hace nada: el daño tóxico no entra (Res. tóxico 99) y no se le puede aplicar Veneno. ⚙ Automatizado: las dos cosas.'},
   // 🕊 Vuela (2026-10-16, dueño: «Vuela debería ser una habilidad pasiva también… en la abeja»): da el estado Vuela, permanente.
   // Un personaje también la puede elegir, justificándola con el GM (dueño, 2026-10-17, P202); jobCosto 3 provisorio.
   {poolId: 'vuela', nombre: 'Vuela', jobCosto: 3, etiquetas: ['movimiento', 'criatura'], estado: 'Vuela', mods: [],

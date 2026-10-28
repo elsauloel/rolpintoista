@@ -273,6 +273,9 @@
 > - [ ] **🔦 Un personaje en sigilo que ataca a un creep**: el GM lo tiene que ver en esa casilla hasta que se mueva o pase la ronda.
 > - [ ] **🐝 Una zona de un creep sobre una invocación** (la abeja de Bizzante): que a su dueño le aparezca el cartel y tire con los stats de la abeja.
 > - [ ] **⚔ El cuadro del duelo visto por el GM** (la cuenta del daño, el «🏹 tiro alto (−2)» en la declaración): se vio desde el jugador.
+> - [ ] **🕳 Excavar: salir en su casilla** y **la estela que se va al empezar su turno** (con el Tunelero en el orden de turnos): todo del lado del GM.
+> - [ ] **🏹 Los arcos Buenos (11)**: quedaron sin hacer. Al final de la tanda del 2026-10-28 las dos ventanas de Chrome quedaron minimizadas (el mapa
+>   medía 0 × 0) y no se pudo seguir mirando nada; se paró ahí para no probar «por detrás».
 
 - [x] **⚔ El final del duelo en la Mesa (2026-10-28, dueño)**: **probado** (jugador): «⚔ Tunelero (prueba) atacó a Clementino con Arco corto. Clementino
   esquivó.» y, en otro, «… ¡Crítico ×3! Le bajó 13 de vida.»; «🔍 Ver detalle del duelo» despliega el paso a paso.

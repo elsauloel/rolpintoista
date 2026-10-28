@@ -249,7 +249,10 @@ function trazoCfgAbrir(id){
   // Se mide ya visible (escondido, offsetHeight da 0 y el cuadro se iba para abajo). El borde de abajo: el de la ventana o, si la ventana queda
   // detrás de la barra de tareas de Windows, el de la pantalla útil (dueño, 2026-10-27: «el menú se abre para abajo y lo tapa la barra de tareas»).
   el.hidden = false;
-  const bordeAbajo = Math.min(innerHeight, (screen.availTop || 0) + screen.availHeight - (window.screenY || 0) - Math.max(0, outerHeight - innerHeight));
+  // (Lo que la ventana se pasa de la pantalla útil está en px de pantalla; con el zoom del navegador, se pasa a px de la página.)
+  const zoomPag = outerWidth > 0 && innerWidth > 0 ? outerWidth / innerWidth : 1;
+  const sobra = Math.max(0, (window.screenY || 0) + outerHeight - ((screen.availTop || 0) + screen.availHeight));
+  const bordeAbajo = innerHeight - sobra / zoomPag;
   el.style.top = Math.max(8, Math.min(bordeAbajo - el.offsetHeight - 8, y - 20)) + 'px';
 }
 document.addEventListener('keydown', e => { if(e.key === 'Escape' && trazoCfgId) trazoCfgCerrar(); });

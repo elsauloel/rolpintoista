@@ -421,6 +421,7 @@ function celdasQueTapan(id){
   });
   return s;
 }
+const moverAvisoVez = new Map();   // ⏱ tokenId → el último soltado (el aviso de moverse fuera de turno mira solo ese)
 let rodeoUltimo = null;   // el último cálculo (el mouse se mueve dentro de la misma casilla muchas veces)
 function rutaRodeo(desde, hasta, tapan){
   const solidos = solidosSet(), esSolido = c => solidos.has(nbPack(c.col, c.fila)) || !!(tapan && tapan.has(nbPack(c.col, c.fila)));
@@ -547,8 +548,9 @@ function soltar(){
       // moverse fuera de turno: se avisa, no se frena (2026-10-06) — solo si de verdad se movió (2026-10-28, probando: soltarlo en una casilla a la que no
       // llegaba anotaba «se mueve» en la Mesa sin moverse); se mira un rato, por si antes tira la Confusión.
       if(a.movio && !a.libre && !reaccion && t){
-        const de = {col: t.col, fila: t.fila}, desde = Date.now();
-        const mirar = () => { const t2 = tokens.get(a.id); if(!t2) return; if(t2.col !== de.col || t2.fila !== de.fila) avisarFueraDeTurno(a.id, null); else if(Date.now() - desde < 60e3) setTimeout(mirar, 400); };
+        const de = {col: t.col, fila: t.fila}, desde = Date.now(), vez = (moverAvisoVez.get(a.id) || 0) + 1;
+        moverAvisoVez.set(a.id, vez);   // (un intento nuevo corta el de antes: si no, el que no se movió anotaba el movimiento siguiente)
+        const mirar = () => { const t2 = tokens.get(a.id); if(!t2 || moverAvisoVez.get(a.id) !== vez) return; if(t2.col !== de.col || t2.fila !== de.fila) avisarFueraDeTurno(a.id, null); else if(Date.now() - desde < 60e3) setTimeout(mirar, 400); };
         setTimeout(mirar, 300);
       }
       if(!(a.movio && !a.libre && !reaccion && confusionAntes(a.id, () => rutaSoltada(a, tokens.get(a.id))))) rutaSoltada(a, t);

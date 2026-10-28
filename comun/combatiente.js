@@ -294,7 +294,7 @@ const Combatiente = (() => {
   /* 😇 El Pacto (dueño, 2026-10-28: «cada personaje puede tener su religión o pacto espiritual, que lo protege de morir. Cuando alguien tiene un pacto y su
      hp llega a cero, revive de forma automática y queda titilando (invulnerable) hasta el inicio de su próximo turno. El pacto se gasta hasta que, de alguna
      forma narrativa, los jugadores logren contactar a alguna entidad espiritual que les vuelva a brindar un pacto»). Es `S.meta.pacto` (sí/no) y el resumen
-     lo publica. Con cuánta vida revive: PLACEHOLDER (P229), un cuarto del máximo como el Ankh, mínimo 1. */
+     lo publica. Revive con un cuarto del máximo, mínimo 1 (P229 ✅). */
   const PACTO_VIDA_PCT = 25;
   const pactoVida = hpMax => Math.max(1, Math.floor(n(hpMax) * PACTO_VIDA_PCT / 100));
   // ¿Titila? Cualquier estado activo que da invulnerabilidad (dueño: «asociar la animación de titilar a la invulnerabilidad en general»).

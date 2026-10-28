@@ -477,11 +477,13 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     toast(`🔥 ${nombreDe(t)}: ¡la Llama de Fénix lo levanta! Revive con ${fmt(res.hpFenix)} HP y todo el SP, Titilando.`);
     try{ momentoAbrir({tipo: 'fenix', icono: '🔥', titulo: `${nombreDe(t)} renace de sus cenizas`, estado: 'listo', resultado: `La Llama de Fénix lo levanta con ${fmt(res.hpFenix)} HP y todo el SP; queda Titilando hasta su próximo turno.`}); }catch(e){}
   }
+  // 😇 Un solo anuncio (dueño, 2026-10-28: «que al revivir solo aparezca un anuncio que diga algo como "zafaste de morir: te salvó el pacto"»): quien cae lo
+  // ve al centro; los demás, en la Crónica.
   if(res.pacto){
-    const txt = `El pacto de ${nombreDe(t)} lo protege: revive con ${fmt(res.hpFenix)} HP y queda Titilando (invulnerable) hasta su próximo turno. El pacto se gastó.`;
-    toast(`😇 ${txt}`);
-    try{ mesaLinea(`😇 ${txt}`, 'recordatorio'); }catch(e){}
-    try{ momentoAbrir({tipo: 'fenix', icono: '😇', titulo: `${nombreDe(t)} cae… y su pacto lo levanta`, estado: 'listo', resultado: txt, datos: {...(t.duenoUid ? {paraUid: t.duenoUid} : {}), aviso: true}}); }catch(e){}
+    try{ momentoAbrir({tipo: 'fenix', icono: '😇', titulo: `${nombreDe(t)} zafó de morir: lo salvó el pacto`, estado: 'listo',
+      resultado: `Vuelve con ${fmt(res.hpFenix)} HP y queda Titilando (invulnerable) hasta su próximo turno. El pacto se gastó.`,
+      datos: {...(t.duenoUid ? {paraUid: t.duenoUid} : {}), aviso: true, tituloAviso: 'Zafaste de morir: te salvó el pacto',
+        textoAviso: `Volvés con ${fmt(res.hpFenix)} HP y quedás Titilando (invulnerable) hasta tu próximo turno. El pacto se gastó.`}}); }catch(e){}
   }
   if(res.absorbe) mesaLinea(`🔮 Orbe de absorción: ${nombreDe(t)} recupera ${res.absorbe} SP del daño mágico`);
   await mitiMitiCobrar(t, prot, res);

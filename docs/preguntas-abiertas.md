@@ -1325,10 +1325,13 @@ equipado, **cualquier curación que pase del máximo queda como Vida extra** (no
 la gasta como siempre. A confirmar: si tiene un tope (el Drenar vida llega hasta +50 % del máximo).
 **Tope ✅ (dueño, 2026-10-27):** la Vida extra del Relicario de sangre llega hasta **un 50 % por encima del máximo**, como el Drenar vida.
 
-### P229 — El Pacto: ¿con cuánta vida revive y en qué orden va? (2026-10-28) ⏳ abierta
+### P229 — El Pacto: ¿con cuánta vida revive y en qué orden va? (2026-10-28) ✅ decidida
 
 **Contexto:** el Pacto (dueño, 2026-10-28: «cuando alguien tiene un pacto y su hp llega a cero, revive de forma automática y queda titilando
 (invulnerable) hasta el inicio de su próximo turno; el pacto se gasta») no dice con cuánta vida vuelve. **Hoy (PLACEHOLDER, `Combatiente.PACTO_VIDA_PCT`):**
 con **un cuarto de la vida máxima** (mínimo 1), como el Ankh de Reencarnación. **Orden** cuando hay varias cosas que levantan: primero la Llama de Fénix
 (no gasta el pacto), después el Pacto, después el Ankh del cinturón (no se gasta si lo levantó el pacto). Para confirmar o cambiar: ¿un cuarto, la mitad,
 toda, 1? ¿El Pacto antes o después del Ankh?
+
+**Dueño (2026-10-28): «correcto»** a las dos: revive con **un cuarto de la vida máxima** y el orden es **Llama de Fénix → Pacto → Ankh**. Y al revivir, **un solo
+anuncio**: «Zafaste de morir: te salvó el pacto» para quien cae (en la Crónica, «X zafó de morir: lo salvó el pacto»), sin cartelito ni línea en la Mesa.

@@ -490,7 +490,7 @@ function bnUi(antes, comoGM){
 // mapa lo muestra solo, leyendo el resumen (actualizarMuerteMapa).
 function bnRevisarVida(){
   const ankh = FichaAcciones.revisarAnkh(bn.S);
-  if(ankh) toast(`¡${ankh} se activó solo! Revivís con ${fmt(bn.S.hp)} HP.`);
+  if(ankh) toast(ankh === 'El Pacto' ? `😇 Zafaste de morir: te salvó el pacto (volvés con ${fmt(bn.S.hp)} HP, Titilando).` : `¡${ankh} se activó solo! Revivís con ${fmt(bn.S.hp)} HP.`);
   FichaAcciones.revisarMuerte(bn.S);
 }
 // Una tirada del personaje armada acá, a la Mesa a su nombre y con su `ficha` (P138). Como registrarTirada de la ficha, avisa
@@ -1361,7 +1361,7 @@ function mantenimientoPersonajes(numero){
 function mantFijarHp(S, v){
   FichaAcciones.fijarHp(S, v);
   const ankh = FichaAcciones.revisarAnkh(S);
-  if(ankh) toast(`¡${ankh} se activó solo! ${(S.meta && S.meta.nombre) || 'Tu personaje'} revive con ${fmt(S.hp)} HP.`);
+  if(ankh) toast(ankh === 'El Pacto' ? `😇 ${(S.meta && S.meta.nombre) || 'Tu personaje'} zafó de morir: lo salvó el pacto (vuelve con ${fmt(S.hp)} HP, Titilando).` : `¡${ankh} se activó solo! ${(S.meta && S.meta.nombre) || 'Tu personaje'} revive con ${fmt(S.hp)} HP.`);
   FichaAcciones.revisarMuerte(S);
 }
 async function mantenimientoPersonaje(fichaId, numero){

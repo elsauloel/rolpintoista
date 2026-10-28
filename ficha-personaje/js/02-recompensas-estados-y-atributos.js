@@ -216,7 +216,7 @@ function revisarAnkh(){
   if(!nombre) return;
   $('#f-hp').value = S.hp;
   renderList('cinturon');
-  toast(`¡${nombre} se activó solo! Revivís con ${fmt(S.hp)} HP.`);
+  toast(nombre === 'El Pacto' ? `😇 Zafaste de morir: te salvó el pacto (volvés con ${fmt(S.hp)} HP, Titilando).` : `¡${nombre} se activó solo! Revivís con ${fmt(S.hp)} HP.`);
 }
 
 function revisarMuerte(){

@@ -460,9 +460,14 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     if(datosEf && JSON.stringify(efectos) !== efectosAntes) tx.set(efectosRef, {json: JSON.stringify(datosEf), actualizado: ts});   // el escudo que bajó, lo que absorbió la Armadura arcana, Titilando
     // El escudo que bajó también en el resumen público (2026-10-11, probando Shield: el token seguía mostrando 14/14 con el escudo gastado).
     const estPub = datosEf && JSON.stringify(efectos) !== efectosAntes && Array.isArray(rs.estados) ? escudosAlResumen(rs.estados, efectos) : null;
+    // Titilando, en el resumen público igual que en la ficha (2026-10-28: la marca «Titilando» sin turnos se volvía «Invulnerable · 1 turno» al guardar la
+    // ficha, y la lista del GM cambiaba de forma; ver js/81): el mismo nombre, turnos y detalle del estado que se le puso.
+    const titE = (fenix || pacto) ? efectos.find(x => x && x.titilando && x.activo !== false) : null;
+    const titPub = titE ? {nombre: String(titE.nombre).slice(0, 60), turnos: num(titE.turnos), permanente: false, invulnerable: true, polaridad: 'buff', detalle: String(titE.detalle || '').slice(0, 300)}
+      : {nombre: 'Titilando', polaridad: 'buff', invulnerable: true};
     tx.update(base, {actualizado: ts, 'resumen.hp': datos.hp, ...(absorbe ? {'resumen.sp': num(rs.sp) + absorbe} : {}), ...(estPub ? {'resumen.estados': estPub} : {}), ...(aliento ? {'resumen.ultimoAlientoUsado': true} : {}),
-      ...(fenix ? {'resumen.estados': (estPub || rs.estados || []).filter(x => !(x && /^llama de f[eé]nix/i.test(String(x.nombre || '')))).concat([{nombre: 'Titilando', polaridad: 'buff', invulnerable: true}])} : {}),
-      ...(pacto ? {'resumen.pacto': false, ...(fenix ? {} : {'resumen.estados': (estPub || rs.estados || []).concat([{nombre: 'Titilando', polaridad: 'buff', invulnerable: true}])})} : {})});
+      ...(fenix ? {'resumen.estados': (estPub || rs.estados || []).filter(x => !(x && /^llama de f[eé]nix/i.test(String(x.nombre || '')))).concat([titPub])} : {}),
+      ...(pacto ? {'resumen.pacto': false, ...(fenix ? {} : {'resumen.estados': (estPub || rs.estados || []).concat([titPub])})} : {})});
     return {r, previo, nuevo: fenix || pacto ? 0 : datos.hp, absorbe, aliento, fenix, pacto, hpFenix: datos.hp};
   });
   if(res.aliento){

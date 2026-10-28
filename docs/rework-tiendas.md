@@ -217,7 +217,7 @@ equipo ya no tienen consumibles. La Talabartería garantiza una mochila y un cin
   (los clásicos, los gastables, las trampas y las herramientas clásicas: cuerda, garfio, ganzúas) va ahí y no en la Talabartería o el Bazar.
   Adentro, por categorías y en este orden (`Combatiente.GONDOLA_CATEGORIAS` / `categoriaGondola`, que usa `FiltroCatalogo.agrupar`):
   ❤ Pociones de HP y SP · 🩹 Enfermería (curan estados) · 🎒 Utilitarios (Moneda Re-Roll, Polilla mística, Revive y Ankh siempre primeros) ·
-  🪤 Trampas · ⚗ Pociones de otros usos · 📜 Pergaminos. En los tamaños que no son el ambulante, cuántos gastables se sortean sigue igual
+  🪤 Trampas · 🏹 Munición (flechas y virotes especiales; dueño, el mismo día) · ⚗ Pociones de otros usos · 📜 Pergaminos. En los tamaños que no son el ambulante, cuántos gastables se sortean sigue igual
   (`gondola` por sección abierta, con `gondolaDe`).
 - **🧳 El ambulante** (`fijo: true`, `FIJO_AMBULANTE`): Herrería 2 armas de Tipos distintos + 1 escudo + 2 defensivas de su campo; Talabartería
   1 de rango + 1 liviana (Tipo 4) + 2 defensivas + 1 utilitaria (cinturón, mochila o carcaj); Bazar 2 varitas o báculos + 1 talismán + 1 anillo +

@@ -5155,13 +5155,13 @@ prueba('🧳 el ambulante (2026-10-28): Herrería 2 armas de Tipos distintos + e
 prueba('🛒 la góndola en categorías (2026-10-28): HP y SP, enfermería, utilitarios (Moneda, Polilla, Revive y Ankh primero), trampas, pociones de otros usos y pergaminos', () => {
   const C = Combatiente, cat = id => CATALOGO_BASE.find(i => i.id === id), nom = n => CATALOGO_BASE.find(i => i.nombre === n);
   const its = [nom('Poción de Blindaje'), cat('cat-pergamino-luz'), cat('cat-cuerda'), cat('cat-ankh'), cat('cat-antidoto'), cat('cat-pocion-hp'), cat('cat-pocion-bonos'), cat('cat-moneda-reroll'),
-    cat('cat-polilla'), cat('cat-revive'), CATALOGO_BASE.find(i => i.trampaDatos)];
+    cat('cat-polilla'), cat('cat-revive'), CATALOGO_BASE.find(i => i.trampaDatos), cat('flecha-de-fuego'), CATALOGO_BASE.find(i => i.flecha && i.flecha.virote)];
   const grupos = FiltroCatalogo.agrupar(its, {orden: 'categoria'});
   igual([its.map(i => C.categoriaGondola(i)), grupos.map(g => g.clave), grupos.find(g => g.clave === 'g-utilitario').items.map(i => i.id), C.GONDOLA_CATEGORIAS.map(g => g[2])],
-    [['pocion', 'pergamino', 'utilitario', 'utilitario', 'enfermeria', 'hpsp', 'hpsp', 'utilitario', 'utilitario', 'utilitario', 'trampa'],
-     ['g-hpsp', 'g-enfermeria', 'g-utilitario', 'g-trampa', 'g-pocion', 'g-pergamino'],
+    [['pocion', 'pergamino', 'utilitario', 'utilitario', 'enfermeria', 'hpsp', 'hpsp', 'utilitario', 'utilitario', 'utilitario', 'trampa', 'municion', 'municion'],
+     ['g-hpsp', 'g-enfermeria', 'g-utilitario', 'g-trampa', 'g-municion', 'g-pocion', 'g-pergamino'],
      ['cat-moneda-reroll', 'cat-polilla', 'cat-revive', 'cat-ankh', 'cat-cuerda'],
-     ['Pociones de HP y SP', 'Enfermería', 'Utilitarios', 'Trampas', 'Pociones de otros usos', 'Pergaminos']]);
+     ['Pociones de HP y SP', 'Enfermería', 'Utilitarios', 'Trampas', 'Munición', 'Pociones de otros usos', 'Pergaminos']]);
 });
 
 prueba('reposición (2026-10-07): lo comprado se repone con otro de la misma parte, familia y calidad; la calidad sale solo del nivel', () => {

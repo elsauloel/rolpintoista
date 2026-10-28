@@ -25,8 +25,8 @@ function estadoGrupoHtml(){
       <div class="eg-recs">${barra('❤ Vida', d.hp, d.hpMax, HP_COLOR)}${barra('✦ SP', d.sp, d.spMax, SP_COLOR)}${barra('⚡ No2', d.no2, d.no2Max, NO2_COLOR)}</div>
       ${temp.length ? temp.map(({e, i}) => `<div class="eg-est ${e.polaridad === 'buff' ? 'buff' : e.polaridad === 'debuff' ? 'debuff' : ''}">
           <span class="eg-nom">${esc(e.nombre)}${num(e.stacks) > 1 ? ` ×${fmt(num(e.stacks))}` : ''}</span>
-          <span class="eg-turnos"><button type="button" data-eg-t="${esc(id)}|${i}|-1" title="Un turno menos">−</button><b>${fmt(num(e.turnos))}</b> turno${num(e.turnos) === 1 ? '' : 's'}<button type="button" data-eg-t="${esc(id)}|${i}|1" title="Un turno más">+</button></span>
-          <button type="button" class="eg-x" data-eg-x="${esc(id)}|${i}" title="Sacarle este estado">✕ Sacar</button></div>`).join('')
+          <span class="eg-turnos"><button type="button" data-eg-t="${esc(id)}|${i}|-1" data-eg-n="${esc(e.nombre)}" title="Un turno menos">−</button><b>${fmt(num(e.turnos))}</b> turno${num(e.turnos) === 1 ? '' : 's'}<button type="button" data-eg-t="${esc(id)}|${i}|1" data-eg-n="${esc(e.nombre)}" title="Un turno más">+</button></span>
+          <button type="button" class="eg-x" data-eg-x="${esc(id)}|${i}" data-eg-n="${esc(e.nombre)}" title="Sacarle este estado">✕ Sacar</button></div>`).join('')
         : '<div class="eg-nada">Sin estados temporales.</div>'}
       ${fijos.length ? `<div class="eg-fijos">No vencen: ${fijos.map(({e}) => esc(e.nombre)).join(' · ')}</div>` : ''}
     </div>`;
@@ -74,8 +74,13 @@ function abrirEstadoDelGrupo(motivo){
   el.id = 'eg-fondo';
   document.body.appendChild(el);
   eg = {el, motivo: motivo || 'fin', firma: ''};
+  // (2026-10-28, probando: un clic justo cuando llegaba la XP se perdió) No se redibuja con un botón apretado: el clic caería entre dos dibujos.
+  let apretado = false;
+  el.addEventListener('mousedown', () => { apretado = true; });
+  eg.soltar = () => setTimeout(() => { apretado = false; }, 50);
+  document.addEventListener('mouseup', eg.soltar);
   const dibujar = () => {
-    if(!eg) return;
+    if(!eg || apretado) return;
     const html = estadoGrupoHtml();
     if(html === eg.firma) return;
     const sc = (el.querySelector('.eg-lista') || {}).scrollTop || 0;
@@ -91,12 +96,15 @@ function abrirEstadoDelGrupo(motivo){
     if(b.hasAttribute('data-eg-cerrar')){ cerrarEstadoDelGrupo(); return; }
     const dato = b.dataset.egT || b.dataset.egX;
     if(!dato) return;
-    const [id, i, delta] = dato.split('|'), t = tokens.get(id);
+    const [id, , delta] = dato.split('|'), t = tokens.get(id);
     if(!t) return;
+    // El estado, por su nombre en la lista de ahora (no por el lugar que tenía al dibujarse: si la ficha se guardó en el medio, la lista pudo cambiar).
+    const lista = ((vinculo(t) || {}).resumen || {}).estados || [], i = lista.findIndex(e => e && e.nombre === b.dataset.egN && e.activo !== false);
+    if(i < 0){ toast(`${b.dataset.egN || 'Ese estado'} ya no está`); return; }
     b.disabled = true;
     try{
-      if(b.dataset.egX) await hudEstadoCambiar(t, Number(i), 'quitar');
-      else await hudEstadoCambiar(t, Number(i), 'turnos', Number(delta));
+      if(b.dataset.egX) await hudEstadoCambiar(t, i, 'quitar');
+      else await hudEstadoCambiar(t, i, 'turnos', Number(delta));
     }catch(err){ console.error('No se pudo cambiar el estado:', err); toast('No se pudo cambiar el estado'); }
     b.disabled = false;
   });
@@ -104,6 +112,7 @@ function abrirEstadoDelGrupo(motivo){
 function cerrarEstadoDelGrupo(){
   if(!eg) return;
   clearInterval(eg.reloj);
+  if(eg.soltar) document.removeEventListener('mouseup', eg.soltar);
   eg.el.remove();
   eg = null;
 }

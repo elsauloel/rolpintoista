@@ -337,7 +337,9 @@ function zonaEsMia(t){
   // (un caído o derrotado no tira nada: 2026-10-26, visto en el mapa — la escarcha le pedía Agilidad a un goblin muerto)
   if(typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(zonaIdDe(t))) return false;
   if(t.tipo === 'creep') return soyGM;
-  return t.tipo === 'pj' && !!t.fichaId && !String(t.fichaId).includes(SEP_INVOCACION) && puedoMover(t);
+  // Una invocación también (2026-10-28: la zona de un creep nunca le llegaba a una invocación — ninguna pantalla la tomaba): la resuelve la pantalla de su
+  // dueño (o de quien tiene 🎮 el control), como un personaje; su stat y sus estados se leen de la invocación (zonaResolverBanner).
+  return t.tipo === 'pj' && !!t.fichaId && puedoMover(t);
 }
 // ¿t es rival de quien creó la zona? (mismo sentido que dueloEsRival, con el casteador guardado en el propio elemento).
 function zonaEsRival(el, t){ return el.zonaCasteadorTipo === 'creep' ? t.tipo === 'pj' : t.tipo === 'creep'; }
@@ -568,11 +570,17 @@ async function zonaResolverBanner(){
   const specZ = (() => { try{ return el.zonaEstado ? JSON.parse(el.zonaEstado) : null; }catch(err){ return null; } })();
   const veces = specZ && specZ.tiraPaso ? Math.max(1, Math.round(num(zonaBanner.pasos)) || 1) : 1;   // 🧊 una tirada por paso
   zonaBanner.tirando = true;
+  // 🐝 Una invocación (2026-10-28): su stat y sus estados, de sus datos (los de su dueño no le sirven).
+  const esInvZ = t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION);
+  let invZ = null;
+  if(esInvZ && el.zonaResistStat){ try{ await bnCargarPiezas(); invZ = await invDeToken(t); }catch(err){ console.error('No se pudo leer la invocación para la zona:', err); } }
   if(el.zonaResistStat) for(let paso = 1; paso <= veces; paso++){
     const valor = t.tipo === 'creep' ? (() => { const sc = creepPrivadoDe(t.fichaId); return sc ? zonaStatCreep(sc, el.zonaResistStat) : 0; })()
+      : esInvZ ? (invZ ? num(InvCalculo.statValor(invZ, el.zonaResistStat)) : 0)
       : (() => { const f = fichasPub.get(t.fichaId); return f && f.resumen ? num(f.resumen[el.zonaResistStat]) : 0; })();
     // La misma tirada de stat que en la ficha y GM Tools (comun/combatiente.js), con los estados de quien resiste.
-    const estadosDe = t.tipo === 'creep' ? ((creepPrivadoDe(t.fichaId) || {}).estados || []) : (((fichasPub.get(t.fichaId) || {}).resumen || {}).estados || []);
+    const estadosDe = t.tipo === 'creep' ? ((creepPrivadoDe(t.fichaId) || {}).estados || []) : esInvZ ? ((invZ || {}).estados || [])
+      : (((fichasPub.get(t.fichaId) || {}).resumen || {}).estados || []);
     // La tirada de la zona (2026-10-02, P143): si la zona guarda el stat de quien la creó, se tira AHORA (cada exposición, una tirada
     // nueva); si no (zonas viejas, del GM o de trampas), vale el número fijo guardado.
     let contra = num(el.zonaResistValor), contraTxt = String(contra);

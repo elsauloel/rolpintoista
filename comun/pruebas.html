@@ -875,6 +875,15 @@ prueba('Proyectil perforante (Shooter, 2026-10-13): 2 SP + el disparo, solo a di
   igual([hab.costo, hab.nitrosCosto, hab.soloRango, a.perforante, a.mods.pdg, a.mods.fijo, !!a.soloCritico, /Sin auditar/.test(hab.detalle), !!hab.original],
     ['2', 'ATAQUE', true, true, 0, 0, false, false, true]);
 });
+prueba('⚔ El final del duelo en una frase (2026-10-28): lo que pasó, el daño y los estados', () => {
+  const base = {atacante: {nombre: 'Fulano'}, defensor: {nombre: 'Mengano'}, ataque: {tipo: 'habilidad-arma', habNombre: 'Tiro a la rodilla', armaNombre: 'Arco'}};
+  const pego = Duelo.fraseResumen({...base, resultado: 'pego', dano: {aplicado: true, recibido: 5, hpAntes: 20, hpDespues: 15}, efectos: [{nombre: 'Rengo', aplicado: true}]});
+  const esquivo = Duelo.fraseResumen({...base, resultado: 'fallo', defensa: {modo: 'evasion'}});
+  const paro = Duelo.fraseResumen({...base, ataque: {tipo: 'normal', armaNombre: 'Hacha'}, resultado: 'fallo', defensa: {modo: 'parry', itemNombre: 'Escudo'}});
+  const cayo = Duelo.fraseResumen({...base, resultado: 'pego', crit: {critico: true, mult: 2}, dano: {aplicado: true, recibido: 0, vidaAbs: 0, hpAntes: 4, hpDespues: 4}});
+  igual([pego, esquivo, paro, cayo], ['Fulano le hizo Tiro a la rodilla a Mengano. Le bajó 5 de vida. Quedó Rengo.', 'Fulano le hizo Tiro a la rodilla a Mengano. Mengano esquivó.',
+    'Fulano atacó a Mengano con Hacha. Mengano lo paró con Escudo.', 'Fulano le hizo Tiro a la rodilla a Mengano. ¡Crítico ×2! No le hizo daño (lo frenaron la armadura o el escudo).']);
+});
 prueba('Duelo cancelado que no cuenta (2026-10-15): el conteo de ataques y los No2 vuelven a como estaban (personaje y creep)', () => {
   const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
   const arma = {id: 'a1', nombre: 'Espada', tipoItem: 'arma_1m', tipoDado: 8, equipado: true};

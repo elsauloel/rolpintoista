@@ -1367,6 +1367,37 @@ const Duelo = (() => {
     return L;
   }
 
+  /* 📜 Lo que pasó, en una frase (dueño, 2026-10-28: «cuando se termina un duelo, en la Mesa debe aparecer un resumen muy breve del outcome: "fulano le hizo
+     Tiro a la rodilla a mengano. Le bajó X de daño y quedó rengo", o "... mengano esquivó". Ahí mismo, un botón "ver detalle del duelo" con el paso a paso»).
+     La frase va en `texto` de la línea de la Mesa; el paso a paso (lineasResumen), en `formula`, plegado (comun/mesa.js). */
+  function fraseResumen(d){
+    const A = d.atacante.nombre, D = d.defensor.nombre;
+    const que = d.hab ? `le hizo ${d.hab.nombre} a ${D}` : d.ataque.tipo === 'habilidad-arma' && d.ataque.habNombre ? `le hizo ${d.ataque.habNombre} a ${D}`
+      : `atacó a ${D}${d.ataque.armaNombre ? ` con ${d.ataque.armaNombre}` : ''}`;
+    const parry = d.defensa && (d.defensa.modo === 'parry' || d.defensa.modo === 'parrydist');
+    const conItem = d.defensa && d.defensa.itemNombre ? ` con ${d.defensa.itemNombre}` : '';
+    let fin = '';
+    if(d.resultado === 'fallo') fin = d.hab ? `${D} lo resistió.` : parry ? `${D} lo paró${conItem}.` : `${D} esquivó.`;
+    else if(d.resultado === 'bloqueado') fin = `${D} lo bloqueó${conItem}.`;
+    else if(d.resultado === 'desarmado') fin = `${d.ataque && d.ataque.desarme && d.ataque.desarme.quien ? d.ataque.desarme.quien : D} desarmó al otro.`;
+    else if(d.resultado === 'pego' || d.resultado === 'mitad'){
+      const dn = d.dano || {}, partes = [];
+      if(d.crit && d.crit.critico) partes.push(`¡Crítico ×${_fmt(d.crit.mult)}!`);
+      if(d.resultado === 'mitad') partes.push('Pasó la mitad del golpe.');
+      if(dn.invulnerable) partes.push(`${D} era invulnerable: no le hizo nada.`);
+      else if(dn.aplicado){
+        const entro = _num(dn.recibido) + _num(dn.vidaAbs) + (dn.magico ? _num(dn.magico.recibido) : 0);
+        if(dn.manual) partes.push(`Le hizo ${_fmt(_num(dn.golpe))} de daño (a mano).`);
+        else partes.push(entro > 0 ? `Le bajó ${_fmt(entro)} de vida.` : 'No le hizo daño (lo frenaron la armadura o el escudo).');
+        if(_num(dn.hpDespues) <= 0 && _num(dn.hpAntes) > 0) partes.push(`${D} cayó.`);
+      }
+      const est = (d.efectos || []).filter(ef => ef && ef.aplicado && !ef.omitido).map(ef => ef.nombre).filter(Boolean);
+      if(est.length) partes.push(`Quedó ${est.join(', ')}.`);
+      if(!partes.length) partes.push(d.hab ? 'Funcionó.' : 'Le pegó.');
+      fin = partes.join(' ');
+    }
+    return `${A} ${que}.${fin ? ' ' + fin : ''}`.slice(0, 300);
+  }
   // Cuando un duelo termina, quien lo creó publica UNA línea de resumen en la Mesa (se «reclama» con `resumido`).
   async function publicarResumenSiCorresponde(d){
     if(d.estado !== 'resuelto' || d.resumido || d.creadoPor !== yo() || aplicando.has(d.id + ':resumen')) return;
@@ -1386,7 +1417,7 @@ const Duelo = (() => {
       if(datos){
         await fbDb.collection(fbRutaCampana('tiradas')).add({
           uid: yo(), jugador: fbMiembro.nombre, quien: '', origen: `⚔ Resumen del duelo · ${datos.atacante.nombre} → ${datos.defensor.nombre}`,
-          formula: lineasResumen(datos).join('\n').slice(0, 900), rolls: [], mod: 0, total: 0, desde: 'reporte',
+          formula: lineasResumen(datos).join('\n').slice(0, 900), texto: fraseResumen(datos), rolls: [], mod: 0, total: 0, desde: 'reporte',
           cuando: firebase.firestore.FieldValue.serverTimestamp(),
         });
       }
@@ -3310,5 +3341,5 @@ const Duelo = (() => {
     }catch(e){ /* sin permiso o sin reglas nuevas: no pasa nada */ }
   }
 
-  return {olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
+  return {fraseResumen, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
 })();

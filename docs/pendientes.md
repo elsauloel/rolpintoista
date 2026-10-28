@@ -38,6 +38,9 @@
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.
+> - [ ] **🎭 Mejorar cómo se traen los tokens al mapa** (2026-10-28, dueño: «anotá en "para ver en la compu", mejorar el sistema de traer tokens al mapa»).
+>   Hoy: el botón 🎭 del borde izquierdo (Token nuevo, Traer tokens de jugadores, Traer tokens de creeps por mapa) y «¿Crear su token?» al crear un creep en
+>   GM Tools. Sentarse con el dueño a ver qué molesta y cómo lo quiere.
 > - [ ] **🏪 Revisar el vendedor ambulante (y las tiendas en general)** (2026-10-28, dueño: «intenté generar una tienda de un vendedor ambulante y
 >   abrí una tienda repleta de ítems, súper random… la tienda del vendedor ambulante es alguien que vende los esenciales: una, dos armas al azar,
 >   algún escudo, alguna armadura, no mucho más que eso… después me tocará volver a revisar el tema de las tiendas»). Lo de hoy está en
@@ -155,6 +158,12 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
+> - [ ] **📜 Pergamino de Town portal (2026-10-28, dueño: «pergamino de town portal, crear y poner como drop en la próxima pelea»).** Un consumible que abre
+>   un portal de vuelta al pueblo (o a un lugar seguro). Diseñarlo (precio, calidad, qué hace en el mapa: ¿dos portales como Invocar portal, uno acá y otro en
+>   el pueblo?), cargarlo al catálogo y ponerlo como drop fijo de un creep de la próxima pelea de El origen.
+> - [ ] **⏳ «Token de turnos» (2026-10-28, lo trajo el dueño de la última partida: «Había que cambiar cómo está automatizado el sistema. Sería más simple
+>   que haya un estado llamado Token de turnos y el sistema se lo saca durante el mantenimiento»).** Falta aclarar a qué parte del sistema se refiere (¿quién
+>   ya jugó la ronda? ¿los turnos de los estados? ¿el turno libre?) antes de proponer nada.
 > - [ ] **🎒 Usar los consumibles de un aliado caído (2026-10-27, dueño: «después podemos definir que los aliados, al pararse al lado, pueden abrir su
 >   mochila o su cinturón para valerse de sus consumibles gastando nitros»).** Un personaje caído (0 de vida) es un cuerpo esperando que lo revivan (P225);
 >   un aliado pegado a él podría abrir su mochila o su cinturón y usar sus consumibles (sobre el caído o sobre sí), pagando No2. A definir: cuánto cuesta

@@ -177,7 +177,11 @@ function mesaAlertaEstilos(){
         'background:radial-gradient(ellipse at center,rgba(200,20,20,.35) 0%,rgba(150,0,0,.6) 60%,rgba(90,0,0,.8) 100%);opacity:1;transition:opacity 1.3s ease-out}' +
       '#alerta-ojo img{width:min(85vw,1000px);max-height:80vh;object-fit:contain;filter:drop-shadow(0 0 40px rgba(255,60,30,.85))}' +
       '#alerta-ojo span{font-size:min(55vmin,420px);line-height:1;filter:drop-shadow(0 0 30px rgba(255,60,30,.9))}' +
-      '#alerta-ojo.apagar{opacity:0}';
+      '#alerta-ojo.apagar{opacity:0}' +
+      '.mesa-duelo-frase{font-weight:700;line-height:1.35}' +
+      '.mesa-duelo-det summary{cursor:pointer;font-size:11px;opacity:.85;margin-top:3px;list-style:none}' +
+      '.mesa-duelo-det summary::-webkit-details-marker{display:none}' +
+      '.mesa-duelo-det[open] summary{margin-bottom:3px}';
     document.head.appendChild(st);
   }
 }
@@ -292,6 +296,15 @@ function mesaRender(docs){
       const div = document.createElement('div');
       div.className = 'mesa-tirada mesa-sistema mesa-turno' + (nueva ? ' nueva' : '');
       const lineas = String(t.formula || '').split('\n').filter(Boolean);
+      // ⚔ El final de un duelo (2026-10-28, dueño): la frase de lo que pasó a la vista y el paso a paso plegado, con «🔍 Ver detalle del duelo».
+      if(t.texto && /^⚔ Resumen del duelo/.test(String(t.origen || ''))){
+        div.classList.add('mesa-duelo-fin');
+        div.innerHTML = `<div class="mesa-duelo-frase">⚔ ${esc(t.texto)}</div>` +
+          `<details class="mesa-duelo-det"><summary>🔍 Ver detalle del duelo</summary>${lineas.map(l => `<div class="mesa-detalle">${esc(l)}</div>`).join('')}</details>`;
+        if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
+        cuerpo.appendChild(div);
+        return;
+      }
       div.innerHTML = `<span class="mesa-quien mesa-q-turno">⟳ ${esc(t.quien || t.jugador || '?')}</span> <span class="mesa-usuario">${esc(t.origen)}</span>` +
         lineas.map(l => `<div class="mesa-detalle">${esc(l)}</div>`).join('');
       if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);

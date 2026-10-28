@@ -396,6 +396,7 @@ function estelaVisibleDe(t){
 function tokenVisiblePorNiebla(t){
   if(tapadoPorNiebla(t)) return false;   // adentro de la niebla de una varita (2026-10-05)
   if(!t.oculto && marcado(t)) return true;   // Marcado (dueño, 2026-10-05): aunque vuelva la niebla de guerra, se lo sigue viendo
+  if(t.tipo === 'creep' && typeof delatadoToken === 'function' && delatadoToken(t)) return true;   // 🔦 atacó desde ahí: se lo ve hasta que se mueva o pase la ronda (js/82)
   if(!soyGM && t.tipo === 'creep' && enSigilo(t) && !reveladaCasilla(t)) return false;   // creep en sigilo: los jugadores no lo ven (salvo que un aliado vea lo oculto ahí)
   if(soyGM && !ojoRevelando && t.tipo === 'pj' && (enSigilo(t) || invisibleParaRivales(t))) return false;   // personaje en sigilo (o invisible): el GM no lo ve sin el 👁
   if(!nieblaAplica() || t.tipo === 'pj') return true;
@@ -543,7 +544,7 @@ function nieblaActualizar(){
     if(nieblaVista.size || nieblaFantasmas.size || nieblaFirma){ nieblaVista = new Set(); nieblaOida = new Set(); nieblaOida1 = new Set(); nieblaFantasmas.clear(); nieblaFirma = ''; }
     return;
   }
-  const firma = [...tokens.entries()].map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0},${t.oculto ? 1 : 0},${t.tipo},${enSigilo(t) ? 1 : 0},${daVision(t) ? radioVisionDe(t) + '/' + luzPortadaDe(t) : 0}`).join('|') + '#' + solidosFirma() + '#' + nieblaSet().size;
+  const firma = [...tokens.entries()].map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0},${t.oculto ? 1 : 0},${t.tipo},${enSigilo(t) ? 1 : 0},${daVision(t) ? radioVisionDe(t) + '/' + luzPortadaDe(t) : 0}`).join('|') + '#' + solidosFirma() + '#' + nieblaSet().size + '#' + (typeof delatadosCeldas === 'function' ? delatadosCeldas().join(',') : '');
   if(firma === nieblaFirma) return;
   nieblaFirma = firma;
   const vista = new Set();
@@ -555,6 +556,7 @@ function nieblaActualizar(){
       if(suyas && !nieblaDescubierta.has(k)) nieblaPendientes.add(k);
     });
   });
+  if(typeof delatadosCeldas === 'function') delatadosCeldas().forEach(k => vista.add(k));   // 🔦 la casilla desde donde atacó un creep, alumbrada (js/82)
   nieblaVista = vista;
   // 👂 Lo que se oye (2026-10-15): la flor de OIDO_RADIO alrededor de cada uno, para todos lados; las paredes y los Sólidos tapan.
   const oida = new Set(), oida1 = new Set(), solidosO = solidosSet(), paredesO = hayParedes();

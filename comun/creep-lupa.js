@@ -169,11 +169,16 @@ const CreepLupa = (() => {
     </div>`;
     const efectos = Combatiente.armaEnMano(sc).efectosGolpe.length && typeof EfectosGolpe !== 'undefined' ? `Al golpear: ${EfectosGolpe.resumenLista(Combatiente.armaEnMano(sc).efectosGolpe)}` : '';
     // Las armas (lo que va en las manos: el arma, y una varita, un báculo, un escudo, un orbe) y aparte el equipo (2026-10-17, dueño).
-    const pieza = it => equipado(it.nombre || '(sin nombre)', (K.TIPOITEM_LABEL[it.tipoItem] || it.tipoItem || '') + (it.natural ? ' · 🐾 natural (no se suelta)' : ''), `<small>DEF</small>+${fmt(num(it.def))}`, it.detalle);
+    // ✨ Una varita o un báculo es un arma (especial): su daño en vez de «DEF +0» (2026-10-28, dueño). Lo que no da Defensa no la muestra.
+    const pieza = it => it.especial
+      ? equipado(it.nombre || '(sin nombre)', `✨ Arma especial · ${K.TIPOITEM_LABEL[it.tipoItem] || it.tipoItem || ''}`, esc(K.especialDanoTxt(sc, it)), it.detalle)
+      : equipado(it.nombre || '(sin nombre)', (K.TIPOITEM_LABEL[it.tipoItem] || it.tipoItem || '') + (it.natural ? ' · 🐾 natural (no se suelta)' : ''), num(it.def) ? `<small>DEF</small>+${fmt(num(it.def))}` : '', it.detalle);
     const armas = [
-      equipado(Combatiente.armaEnMano(sc).nombre || (Combatiente.armaEnMano(sc).sinArma ? 'Sin arma (nada en la mano)' : 'Arma sin nombre'), Combatiente.armaEnMano(sc).armaDeRango ? 'Arma de rango' : 'Arma', esc(K.danoTxt(sc)),
-        [Combatiente.armaEnMano(sc).detalle, efectos].filter(Boolean).join(' · ')),
-      ...Combatiente.equipoSinArma(sc).filter(K.enLasManos).map(pieza),
+      // Sin arma pero con una varita: no se muestra «Sin arma» (pega con la varita; a mano limpia, desde las Acciones).
+      K.sinNadaEnMano(sc) || !Combatiente.sinArmaEnMano(sc)
+        ? equipado(Combatiente.armaEnMano(sc).nombre || (Combatiente.armaEnMano(sc).sinArma ? 'Sin arma (nada en la mano)' : 'Arma sin nombre'), Combatiente.armaEnMano(sc).armaDeRango ? 'Arma de rango' : 'Arma', esc(K.danoTxt(sc)),
+          [Combatiente.armaEnMano(sc).detalle, efectos].filter(Boolean).join(' · ')) : '',
+      ...Combatiente.equipoSinArma(sc).filter(K.enLasManos).sort((x, y) => (y.especial ? 1 : 0) - (x.especial ? 1 : 0)).map(pieza),
     ].join('');
     const equipo = (sc.equipo || []).filter(it => !K.enLasManos(it)).map(pieza).join('');
 
@@ -205,6 +210,7 @@ const CreepLupa = (() => {
       ${seccion('Habilidades', habsHtml !== undefined ? habsHtml : (habilidades ? `<div class="vc-chips">${habilidades}</div>` : '<div class="hint">Sin habilidades.</div>'))}
       ${seccion('Manos', `<div class="vc-equipos">${armas}</div>`)}
       ${seccion('Equipo', equipo ? `<div class="vc-equipos">${equipo}</div>` : '<div class="hint">Sin equipo.</div>')}
+      ${seccion('Cinturón', (sc.cinturon || []).length ? `<div class="vc-chips">${sc.cinturon.map(c => `<span class="vc-chip con-tip" data-tip="${esc(c.detalle || c.efectoDetalle || '')}">${esc(c.nombre || '(sin nombre)')}${num(c.unidades) > 1 ? ` ×${fmt(num(c.unidades))}` : ''}</span>`).join('')}</div>` : '<div class="hint">Sin consumibles.</div>')}
       ${seccion('Recompensas', recompensasVerHtml(sc))}
     </div>
     ${sc.notas ? `<div class="view-detalle"><span class="view-label">Notas</span>${esc(sc.notas)}</div>` : ''}

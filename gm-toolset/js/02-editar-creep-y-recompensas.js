@@ -289,6 +289,18 @@ function renderAsistenteCreep(){
   if(!creepAsist()){ asist.api.cerrar(); asist = null; return; }   // lo borraron desde otro lado
   asist.api.redibujar();
 }
+// Una pieza del equipo en el asistente (pasos Arma y Armadura), con 🐾 natural, 👁 ver y × quitar. Una varita o un báculo muestra su daño ✨ en vez
+// de la Defensa (2026-10-28); lo que no da Defensa no muestra el «DEF +0».
+function asistPiezaHtml(sc, it){
+  const valor = it.especial ? esc(CreepCalculo.especialDanoTxt(sc, it)) : num(it.def) ? `<small>DEF</small>+${fmt(num(it.def))}` : '';
+  const tipo = (it.especial ? '✨ Arma especial · ' : '') + (TIPOITEM_LABEL_GM[it.tipoItem] || it.tipoItem || '');
+  return `<div class="equipo-item"><div class="equipo-item-info"><div class="equipo-item-top">
+        <span class="equipado-nombre">${esc(it.nombre)}</span>${valor ? `<span class="valor-caja">${valor}</span>` : ''}
+<button class="rm" data-naturalequipo="${sc.id}:${it.id}" title="${it.natural ? 'Natural (parte del cuerpo): no se suelta al morir · tocá para que sea una pieza que se suelta' : 'Tocá para marcarla natural (piel, caparazón…): da sus bonos pero no se suelta al morir'}" style="${it.natural ? 'color:#8EE6A8;border-color:#8EE6A8' : 'opacity:.55'}">🐾</button>
+        <button class="rm" data-verequipocreep="${sc.id}:${it.id}" title="Ver la pieza (y editarla y subirla al catálogo)">👁</button>
+        <button class="rm" data-quitarequipo="${sc.id}:${it.id}" title="Quitar">×</button></div>
+        <div class="equipo-item-meta">${esc(tipo)}${it.natural ? ' · 🐾 natural: no se suelta' : ''}</div></div></div>`;
+}
 function htmlPasoAsistCreep(p){
   const sc = creepAsist();
   if(!sc) return '';
@@ -321,9 +333,14 @@ function htmlPasoAsistCreep(p){
       <div class="pap-nota" id="ac-presupuesto"></div>`;
   }
   if(p === 2){
+    // ✨ Lo que va en las manos además del arma (una varita o un báculo —un arma especial—, un escudo, un orbe): se ve acá, no en Armadura
+    // (2026-10-28, dueño: «el sistema sigue sin entender que varitas y báculos son armas especiales»).
+    const enManos = Combatiente.equipoSinArma(sc).filter(CreepCalculo.enLasManos);
+    const sinFisica = Combatiente.sinArmaEnMano(sc) && enManos.some(it => it.especial);
     return `<p class="pap-nota" style="margin:0 0 10px">Rareza sugerida para el nivel ${n}: <b>${RAREZA_ARMA[Math.min(n, 5) - 1]}</b>.</p>
-      <div class="arma-compacta"><div class="arma-compacta-top"><span class="equipado-nombre">${Combatiente.armaEnMano(sc).nombre ? esc(Combatiente.armaEnMano(sc).nombre) : '<span class="hint">Sin arma</span>'}</span><span class="valor-caja">${danoTxt(sc)}</span></div>
-        <div class="arma-detalle">${Combatiente.armaEnMano(sc).detalle ? esc(Combatiente.armaEnMano(sc).detalle) : 'Sin efecto.'}</div></div>
+      ${sinFisica ? '' : `<div class="arma-compacta"><div class="arma-compacta-top"><span class="equipado-nombre">${Combatiente.armaEnMano(sc).nombre ? esc(Combatiente.armaEnMano(sc).nombre) : '<span class="hint">Sin arma</span>'}</span><span class="valor-caja">${danoTxt(sc)}</span></div>
+        <div class="arma-detalle">${Combatiente.armaEnMano(sc).detalle ? esc(Combatiente.armaEnMano(sc).detalle) : 'Sin efecto.'}</div></div>`}
+      ${enManos.length ? `<div class="equipo-list" style="margin-top:8px">${enManos.sort((x, y) => (y.especial ? 1 : 0) - (x.especial ? 1 : 0)).map(it => asistPiezaHtml(sc, it)).join('')}</div>` : ''}
       <div class="pap-fila" style="gap:8px;margin:10px 0">
         <button type="button" class="pap-boton" data-editararma="${sc.id}">✎ Crear o editar el arma (paso a paso)</button>
         <button type="button" class="pap-boton" data-equipardelfabricante="${sc.id}">⚔ Elegir del fabricante</button>
@@ -333,17 +350,13 @@ function htmlPasoAsistCreep(p){
           'Si es natural, al morir suelta un trofeo en vez del arma y ningún jugador la puede equipar.')}`;
   }
   if(p === 3){
-    return `<p class="pap-nota" style="margin:0 0 10px">Rareza sugerida para el nivel ${n}: <b>${RAREZA_ARMADURA[Math.min(n, 5) - 1]}</b>. Defensa total: <b>${fmt(num(sc.defensa))}</b>.</p>
-      <div class="equipo-list">${Combatiente.equipoSinArma(sc).length ? Combatiente.equipoSinArma(sc).map(it => `<div class="equipo-item"><div class="equipo-item-info"><div class="equipo-item-top">
-        <span class="equipado-nombre">${esc(it.nombre)}</span><span class="valor-caja"><small>DEF</small>+${fmt(num(it.def))}</span>
-<button class="rm" data-naturalequipo="${sc.id}:${it.id}" title="${it.natural ? 'Natural (parte del cuerpo): no se suelta al morir · tocá para que sea una pieza que se suelta' : 'Tocá para marcarla natural (piel, caparazón…): da sus bonos pero no se suelta al morir'}" style="${it.natural ? 'color:#8EE6A8;border-color:#8EE6A8' : 'opacity:.55'}">🐾</button>
-        <button class="rm" data-verequipocreep="${sc.id}:${it.id}" title="Ver la pieza (y editarla y subirla al catálogo)">👁</button>
-        <button class="rm" data-quitarequipo="${sc.id}:${it.id}" title="Quitar">×</button></div>
-        <div class="equipo-item-meta">${esc(TIPOITEM_LABEL_GM[it.tipoItem] || it.tipoItem)}${it.natural ? ' · 🐾 natural: no se suelta' : ''}</div></div></div>`).join('') : '<div class="hint">Sin armadura.</div>'}</div>
+    const vestido = Combatiente.equipoSinArma(sc).filter(it => !CreepCalculo.enLasManos(it));   // (lo de las manos está en el paso Arma)
+    return `<p class="pap-nota" style="margin:0 0 10px">Rareza sugerida para el nivel ${n}: <b>${RAREZA_ARMADURA[Math.min(n, 5) - 1]}</b>. Defensa total: <b>${fmt(creepDefensaEfectiva(sc))}</b>.</p>
+      <div class="equipo-list">${vestido.length ? vestido.map(it => asistPiezaHtml(sc, it)).join('') : '<div class="hint">Sin armadura.</div>'}</div>
       <button type="button" class="pap-boton" data-equipardelfabricante="${sc.id}" style="margin-top:10px">⚔ Equipar del fabricante</button>`;
   }
   if(p === 4){
-    return `<p class="pap-nota" style="margin:0 0 10px">Se sugiere <b>una rápida (cooldown 2) y una lenta</b> (cooldown 3 a 6, arranca en cooldown).</p>
+    return `<p class="pap-nota" style="margin:0 0 10px">Se sugieren <b>${Math.max(2, n + 1)} habilidades</b> (nivel 1: dos, y una más por nivel).</p>
       <div class="hab-list">${sc.habilidades.length ? sc.habilidades.map(x => `<div class="equipo-item"><div class="equipo-item-top">
         <span class="equipado-nombre">${esc(x.nombre || '(sin nombre)')}</span><span class="hint">${esc(costoHabCreepTxt(sc, x))}${num(x.cd) > 0 ? ` · CD ${fmt(num(x.cd))}` : ''}${x.cdArranca ? ' · lenta' : ''}</span>
         <button class="rm" data-edithab="${sc.id}:${x.id}" title="Editar">✎</button><button class="rm" data-rmhab="${sc.id}:${x.id}">×</button></div></div>`).join('') : '<div class="hint">Sin habilidades.</div>'}</div>
@@ -356,7 +369,7 @@ function htmlPasoAsistCreep(p){
   return `<div class="vc-cajas vc-2">
         <div class="vc-caja"><span class="vc-caja-label">HP</span><span class="vc-caja-valor">${fmt(num(sc.hpMax))}</span></div>
         <div class="vc-caja"><span class="vc-caja-label">No2</span><span class="vc-caja-valor">${fmt(creepNitrosMax(sc))}</span></div>
-        <div class="vc-caja"><span class="vc-caja-label">Ataque</span><span class="vc-caja-valor">${esc(ataqueCreepTxt(sc))}</span></div>
+        <div class="vc-caja"><span class="vc-caja-label">Ataque</span><span class="vc-caja-valor">${esc(Combatiente.sinArmaEnMano(sc) && CreepCalculo.especialesEnMano(sc).length ? CreepCalculo.especialesEnMano(sc).map(it => CreepCalculo.especialDanoTxt(sc, it)).join(' · ') : ataqueCreepTxt(sc))}</span></div>
         <div class="vc-caja"><span class="vc-caja-label">Defensa</span><span class="vc-caja-valor">${fmt(creepDefensaEfectiva(sc))}</span></div>
       </div>
       <div class="pap-nota" style="margin-top:8px"><b>${esc(nombreLimpioCreep(sc))}</b> · nivel ${n} · ${esc(tipoDeCreep(sc) || 'tipo sin definir')}${sc.jefe ? ' · jefe' : ''} · ${ATTR_IDS.map(a => `${ATTR_LABELS[a]} ${num(sc[a])}`).join(' · ')}</div>

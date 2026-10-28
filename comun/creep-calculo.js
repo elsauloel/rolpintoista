@@ -486,6 +486,17 @@ const CreepCalculo = (() => {
     .reduce((a, it) => Math.max(a, num(it && it.auraMiedo)), 0);
   // 🔮 Un talismán de su equipo (2026-10-18): lo más grande de ese campo (`espejito`, `relicario`).
   const talisman = (sc, campo) => Combatiente.equipoPuesto(sc).reduce((a, it) => Math.max(a, num(it && it[campo])), 0);
+  /* ✨ Las armas especiales que tiene puestas (varitas, báculos: un ítem con `especial`; 2026-10-28, dueño: «el sistema sigue sin entender que varitas y
+     báculos son armas especiales»): las muestran como armas la ficha del creep, el asistente y el Resumen, y con una no está «sin nada en la mano». */
+  const especialesEnMano = sc => Combatiente.equipoPuesto(sc).filter(it => it && it.especial);
+  // Lo que pega una, en corto: «✨ 1d6 + 2 arcano» (el dado del hechizo, lo que suma del Efecto especial y el tipo de daño).
+  function especialDanoTxt(sc, it){
+    const e = (it && it.especial) || {}, d = String(e.dano || '').trim(), tipo = String((e.duelo && e.duelo.tipoDano) || '').toLowerCase();
+    const mas = e.sumaEspecial ? Combatiente.sumaEspecialDe(statValor(sc, 'dmgesp'), e.sumaEspecial) : 0;
+    return `✨ ${d || 'especial'}${mas ? ` + ${mas}` : ''}${d && tipo ? ' ' + tipo : ''}`;
+  }
+  // Sin arma y sin una especial: lo único que le queda es pegar con las manos vacías.
+  const sinNadaEnMano = sc => Combatiente.sinArmaEnMano(sc) && !especialesEnMano(sc).length;
   function tarjetaPublica(sc){
     const nom = x => String(x || '').trim().slice(0, 60);
     const vivo = num(sc.hp) > 0;
@@ -494,7 +505,7 @@ const CreepCalculo = (() => {
     return {
       armaNombre: a.natural ? nom(a.nombre) : ver(a.nombre),
       armaNatural: a.natural,
-      sinArma: !!a.sinArma,   // ✋ nada en la mano (paso 5): el mapa lo marca en el token
+      sinArma: !!a.sinArma && !especialesEnMano(sc).length,   // ✋ nada en la mano (paso 5): el mapa lo marca en el token (con una varita, no)
       // Lo de las manos (además del arma) va aparte del equipo (2026-10-17): una varita, un escudo, un orbe.
       // 🐾 Lo natural que no es el arma (piel dura, caparazón…) no se nombra (2026-10-26, dueño: «las armaduras simplemente den los efectos, los
       // usuarios no necesitan ver el nombre»): da sus bonos y nada más. El arma natural sí se ve (Garras, Colmillos).
@@ -626,6 +637,7 @@ const CreepCalculo = (() => {
   const TIPOS_CRIATURA = ['humano', 'humanoide', 'bestia', 'planta', 'elemental', 'constructo', 'no-muerto', 'alienígena', 'demonio', 'interdimensional', 'adefesio'];
   const TIPOS_CON_ARMA_NATURAL = ['bestia', 'planta', 'elemental', 'alienígena', 'constructo', 'no-muerto', 'demonio', 'interdimensional', 'adefesio'];
   const TIPOITEM_LABEL = {
+    arma_1m:'Arma de 1 mano', arma_2m:'Arma de 2 manos',
     escudo_1m:'Escudo 1 mano', escudo_2m:'Escudo 2 manos',
     armadura_blanda:'Armadura blanda', armadura_rigida:'Armadura rígida',
     manos:'Manos', cabeza:'Cabeza', pies:'Pies', piernas:'Piernas',
@@ -757,11 +769,17 @@ const CreepCalculo = (() => {
     if(num(sc.oroBase) > 0) partes.push(`${fmt(num(sc.oroBase))} DDE de oro (±20% al final del combate)`);
     if(Array.isArray(sc.consumibleAzar) && sc.consumibleAzar.length) partes.push(`${sc.consumibleAzar.join(', ')} (consumible al azar, en el cinturón: si lo usa, lo suelta seguro; si no, a veces)`);
     if(sc.municionAzar) partes.push(`${sc.municionAzar} (munición al azar, en el cinturón: la suelta seguro)`);
+    // 🎒 Lo demás del cinturón (2026-10-28, dueño: «no aparecen los consumibles»): al morir van todos al botín; los que usó, ofrecidos; los que no,
+    // los ofrece el GM si quiere (CombateFin.dropDeCreep).
+    const azar = new Set(Array.isArray(sc.consumibleAzar) ? sc.consumibleAzar : []);
+    const delCinturon = (Array.isArray(sc.cinturon) ? sc.cinturon : []).filter(c => c && c.nombre && !azar.has(c.nombre) && c.nombre !== sc.municionAzar)
+      .map(c => `${c.nombre}${num(c.unidades) > 1 ? ` ×${fmt(num(c.unidades))}` : ''}`);
+    if(delCinturon.length) partes.push(`${delCinturon.join(', ')} (en el cinturón: lo que use, lo suelta; lo que no, si el GM lo ofrece)`);
     else if(['humano', 'humanoide'].includes(tipoDe(sc))) partes.push(`a veces un consumible, según su arquetipo (${arquetiposTxt(arquetipos(sc))})`);
     return partes.length ? partes.join(' · ') : 'nada';
   }
 
-  return {modoSP, spMax, spRegen, spActual, costoSpHab,talisman, auraMiedo, estandartes, enLasManos, regenPasivas, masDanoElem, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
+  return {modoSP, spMax, spRegen, spActual, costoSpHab, especialesEnMano, especialDanoTxt, sinNadaEnMano, talisman, auraMiedo, estandartes, enLasManos, regenPasivas, masDanoElem, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
     ARQUETIPOS, arquetiposAuto, arquetiposManual, arquetipos, arquetiposTxt, TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TIPOITEM_LABEL, STAT_LABEL, itemParaCreep, magiaDeItem, vaAlEquipo, nombreLimpio, tipoDe, oroSugerido, valorNatural,
     trofeo, despojosDePrecio, dropsResumen, dropsFijos,
     correrTiposTexto, migrarObjTipos, migrarCreepTipos, migrarObjEspecial, migrarHabPdg, migrarCreepEspecial, slotDe,

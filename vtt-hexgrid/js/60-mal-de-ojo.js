@@ -99,8 +99,7 @@ function malDeOjoMomento(id, d){
   malDeOjoVistos.add(id);
   const dados = (dt.rolls || []).map(r => `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:30px;height:30px;margin:0 3px;border-radius:7px;background:#e9ecf4;color:#141a26;font-weight:900">${esc(String(r))}</span>`).join('');
   AvisoCombate.mostrar({clave: 'mal-de-ojo:' + id, icono: '🧿', titulo: `${dt.creep} te tiró mal de ojo`, soloBoton: true,
-    texto: `Volvé a tirar ${dt.etq} y quedate con el peor resultado.`,
-    pasos: [`Tu ${dt.etq} de antes: ${fmt(num(dt.total))}${dados ? ' ' : ''}`, `En el duelo contra ${dt.contra || 'el otro'}`],
+    pasos: [`Volvé a tirar tu ${dt.etq} y quedate con el peor resultado.`, `Tu ${dt.etq} de antes: ${fmt(num(dt.total))} (en el duelo contra ${dt.contra || 'el otro'})`],
     veredicto: {tono: 'malo', grande: `🧿 ${fmt(num(dt.total))}`, chico: 'tu tirada de antes'},
     botones: [{texto: `🎲 Tirar ${dt.etq}`, id: 'mal-de-ojo-tirar', alClic: () => { const b = document.getElementById('mal-de-ojo-tirar'); if(b) b.disabled = true; malDeOjoTirar(id, d); }}]});
 }

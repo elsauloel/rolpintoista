@@ -265,6 +265,30 @@
 
 ## Pendientes
 
+> **🖥 Para probar con la cuenta del GM (2026-10-28, dueño: «si hay alguna prueba relevante desde el mapa con cuenta de GM que no podés porque está en
+> segundo plano, anotala acá»).** La ventana de Chrome del GM (rolpintoista) estaba minimizada: el lado del GM se manejó por código (sus botones, con
+> sus propias funciones) y lo que se vio, desde la pantalla del jugador. Lo que pide ver la pantalla del GM:
+> - [ ] **🧿 El botón y el menú del Mal de ojo** desde la pantalla del GM (se probó tocándolo por código: lista «Tunelero → Clementino · Evasión (8)…»).
+> - [ ] **🩺 Cómo quedó el grupo al cerrar el botín** (🏁 Cerrar botín y repartir) y al publicar un combate sin ítems.
+> - [ ] **🔦 Un personaje en sigilo que ataca a un creep**: el GM lo tiene que ver en esa casilla hasta que se mueva o pase la ronda.
+> - [ ] **🐝 Una zona de un creep sobre una invocación** (la abeja de Bizzante): que a su dueño le aparezca el cartel y tire con los stats de la abeja.
+> - [ ] **⚔ El cuadro del duelo visto por el GM** (la cuenta del daño, el «🏹 tiro alto (−2)» en la declaración): se vio desde el jugador.
+
+- [x] **⚔ El final del duelo en la Mesa (2026-10-28, dueño)**: **probado** (jugador): «⚔ Tunelero (prueba) atacó a Clementino con Arco corto. Clementino
+  esquivó.» y, en otro, «… ¡Crítico ×3! Le bajó 13 de vida.»; «🔍 Ver detalle del duelo» despliega el paso a paso.
+- [x] **🧮 La cuenta del daño**: **probada** (jugador, crítico contra Escudo especial 5): «Tirada de daño 6 · crítico ×3 · = el golpe 18 · Crítico: no se
+  resta la Defensa · − Escudo especial (escudo) 5 · = ENTRA A LA VIDA 13», Clementino 25 → 12. Arreglado al verlo: antes de aplicar un crítico no avisaba que
+  los escudos igual frenan.
+- [x] **🧿 Mal de ojo paso a paso (2026-10-28, dueño)**: **probado** (el GM por código, el jugador con el mouse): el GM elige «Clementino · Evasión (8)», se
+  cobra el cooldown 3; a Clementino le aparece «Tunelero (prueba) te tiró mal de ojo» con su Evasión de antes y «🎲 Tirar Evasión»; ruedan los dos dados (el 8
+  con la animación de maldito) y «Queda 8: la de antes era más baja». Arreglado al verlo: faltaba la frase «volvé a tirar y quedate con el peor resultado».
+- [x] **🏹 Tiro alto a la vista (2026-10-28)**: **probado**: la declaración dice «🏹 tiro alto (−2): −2 PdG» y la tirada «1d10+1 −2 tiro alto (−2)».
+- [x] **👂 Flanqueado y darse vuelta (2026-10-28, pregunta del dueño)**: **probado** (jugador): con el Tanque enfrente y el Ladrón entrando por la espalda a 2
+  casillas → «¡Flanqueado! Ladrón (prueba) le queda por la espalda (+1 PdG si lo ataca)»; sin nadie enfrente → «juan oye pasos… ¿Se da vuelta? (no
+  cuesta No2)» y al aceptar, juan quedó mirando al Ladrón.
+- [x] **🔦 Se delata y deja de verse al moverse**: **probado** (jugador): el Tunelero en la niebla quedó a la vista después de disparar; al moverlo una casilla
+  dejó de verse y la casilla vieja ya no quedó alumbrada.
+
 - [x] **😇 El Pacto (2026-10-28, dueño)**: «😇 Pacto: sí / no» en la ficha (al lado del Nivel); el botón 😇 arriba del mapa, dorado si está activo y gris si se
   gastó; con la vida en 0 revive solo con un cuarto (P229), Titilando, y se gasta. **Probado** («Claude · pruebas», jugador): juan, Pacto sí en la ficha →
   el botón dorado en el mapa; 60 de daño desde «Recibe daño» → el Aviso «juan cae… y su pacto lo levanta», 7/30 HP, Titilando, el pacto en no y el botón

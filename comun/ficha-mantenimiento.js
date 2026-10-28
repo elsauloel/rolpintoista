@@ -338,8 +338,10 @@ const FichaMantenimiento = (() => {
     const veDescanso = (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, num(i.descansoVidaExtra)), 0);
     if(veDescanso > 0){
       S.efectos = (S.efectos || []).filter(e => !(e && e.descansoAnillo));
+      // (P227 ✅, 2026-10-28: es Vida extra de verdad —`excedenteVida`—: lo que se lleva cuenta como daño. Al descansar la vida ya quedó llena, así que
+      // «te curás N y lo que sobra es Vida extra» son N de Vida extra.)
       S.efectos.push({id: 'siesta' + Date.now().toString(36), nombre: 'Vida extra (Anillo de la siesta)', polaridad: 'buff', activo: true, permanente: true, sinRecarga: true, seGasta: true,
-        descansoAnillo: true, escudoMagico: veDescanso, escudoMagicoActual: veDescanso, detalle: `Vida extra de ${veDescanso}: se gasta antes que tu vida y no se recarga. Vuelve con el próximo descanso (Anillo de la siesta).`});
+        descansoAnillo: true, excedenteVida: true, escudoMagico: veDescanso, escudoMagicoActual: veDescanso, detalle: `Vida extra de ${veDescanso}: se gasta antes que tu vida y no se recarga. Vuelve con el próximo descanso (Anillo de la siesta).`});
       lineas.push(`💍 Vida extra ${veDescanso} (Anillo de la siesta)`);
     }
     // 💍 El Anillo del escudo de la mañana (2026-10-19, dueño): cada descanso, Vida extra solo contra el daño especial (`soloEspecial`: el mapa la
@@ -356,7 +358,7 @@ const FichaMantenimiento = (() => {
       if(!(v > 0)) return;
       S.efectos = (S.efectos || []).filter(e => !(e && e[k.marca]));
       S.efectos.push({id: k.marca + Date.now().toString(36), nombre: k.nombre, polaridad: 'buff', activo: true, permanente: true, sinRecarga: true, seGasta: true,
-        [k.marca]: true, [k.flag]: true, escudoMagico: v, escudoMagicoActual: v,
+        [k.marca]: true, [k.flag]: true, excedenteVida: true, escudoMagico: v, escudoMagicoActual: v,   // Vida extra de verdad (P227 ✅, 2026-10-28)
         detalle: `Vida extra de ${v} solo contra ${k.contra}. No se recarga; vuelve con el próximo descanso (${k.anillo}).`});
       lineas.push(`💍 ${k.nombre} ${v} (${k.corto})`);
     });

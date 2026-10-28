@@ -885,6 +885,16 @@ prueba('🪨 Inmunidad tóxica (2026-10-28): la pasiva racial deja «Inmune a lo
   igual([pas.jobCosto, pas.mods[0].stat, pas.mods[0].val, est.some(e => e.nombre === 'Inmune a lo tóxico' && e.sangrePura), Combatiente.inmunidad(est, veneno), !!(pedos && pedos.duelo.zonaAmiga)],
     [0, 'restoxico', 99, true, 'Sangre pura', true]);
 });
+prueba('🛡/❤ P227 (2026-10-28): los anillos de la siesta, del sereno y del escudo de la mañana dan Vida extra (cuenta como daño); la cáscara es escudo', () => {
+  const S = {...structuredClone(FichaGuardado.DEFAULT), catalogo: [], efectos: [], cinturon: [], inventario: [
+    {id: 'a1', nombre: 'Anillo de la siesta', tipoItem: 'anillos', equipado: true, descansoVidaExtra: 10},
+    {id: 'a2', nombre: 'Anillo del sereno', tipoItem: 'anillos', equipado: true, descansoEscudoFis: 8},
+    {id: 'a3', nombre: 'Anillo del escudo de la mañana', tipoItem: 'anillos', equipado: true, descansoEscudoEsp: 8}]};
+  FichaMantenimiento.descansar(S);
+  const ve = S.efectos.filter(e => e.excedenteVida).map(e => [e.nombre, e.escudoMagico, !!e.soloFisico, !!e.soloEspecial]);
+  igual([ve, /un escudo/.test(FichaCalculo.EXTRA ? (FichaCalculo.EXTRA.find(x => x.id === 'cascara') || {}).full : 'un escudo')],
+    [[['Vida extra (Anillo de la siesta)', 10, false, false], ['Escudo de la mañana', 8, false, true], ['Escudo del sereno', 8, true, false]], true]);
+});
 prueba('⚔ El final del duelo en una frase (2026-10-28): lo que pasó, el daño y los estados', () => {
   const base = {atacante: {nombre: 'Fulano'}, defensor: {nombre: 'Mengano'}, ataque: {tipo: 'habilidad-arma', habNombre: 'Tiro a la rodilla', armaNombre: 'Arco'}};
   const pego = Duelo.fraseResumen({...base, resultado: 'pego', dano: {aplicado: true, recibido: 5, hpAntes: 20, hpDespues: 15}, efectos: [{nombre: 'Rengo', aplicado: true}]});

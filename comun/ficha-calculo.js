@@ -127,7 +127,7 @@ const FichaCalculo = (() => {
     // Piernas de Buena calidad (2026-10-06, dueño).
     {id:'embestida', label:'Embestida', full:'PdG extra en tu primer ataque del turno si llegaste al rival con tus últimos 2 pasos (o más) en línea recta hacia él'},
     // Anillos Comunes (2026-10-06, dueño).
-    {id:'cascara', label:'Cáscara protectora', full:'Al empezar cada combate, una Vida extra de esta cantidad que no se recarga'},
+    {id:'cascara', label:'Cáscara protectora', full:'Al empezar cada combate, un escudo de esta cantidad que no se recarga'},
     {id:'primerasangre', label:'Primera sangre', full:'Daño extra en tu primer ataque del combate, si pega'},
     {id:'calma', label:'Calma', full:'Si no atacaste en tu turno, al terminarlo recuperás esta cantidad de No2'},
     {id:'foco', label:'Foco', full:'PdG.Esp extra si no te moviste en este turno'},

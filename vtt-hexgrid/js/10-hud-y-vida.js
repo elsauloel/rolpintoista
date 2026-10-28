@@ -83,6 +83,8 @@ function hudHtml(t){
     ((puedoMover(t) || soyGM) ? icono("ajustes", "⚙", "Barras, aura y edición del token", hudGlobo === "ajustes") : "") +
     (puedoMoverLibre(t) ? icono('libre', '🦶', 'Mover libre (atajo: M): llevarlo a otra casilla sin gastar No2 ni dejar estela', !!moverLibre && moverLibre === seleccion) : '') +
     (soyGM ? icono('oculto', t.oculto ? '🙈' : '👁', t.oculto ? 'Oculto: mostrarlo a los jugadores' : 'Ocultarlo (armarlo antes de que entre en la partida)', t.oculto) : '') +
+    // 🧹 Borrar la estela del túnel a mano (dueño, 2026-10-28: «quedó la estela marcada y no sé cómo borrarla antes de empezar a jugar»).
+    (soyGM && Array.isArray(t.tunel) && t.tunel.length ? icono('tunel', '🧹', 'Borrar la estela del túnel (se va de atrás para adelante)') : '') +
     (propio && !t.fichaId.includes(SEP_INVOCACION) ? icono('equipo', '🛡', 'Equipo y mochila: ver lo que llevás puesto y cambiarlo') : '') +
     '<button type="button" class="hud-circulo icono hud-nivel" data-hud-nivel="vital" title="Volver a lo del combate: vida, SP, No2, estados y Botonera">↩</button>' +
     '</div>' +
@@ -1051,6 +1053,7 @@ function hudConectar(t){
     const clave = b.dataset.hudBoton;
     if(clave === 'ficha'){ abrirFichaDeToken(t); return; }
     if(clave === 'libre'){ activarMoverLibre(seleccion); return; }
+    if(clave === 'tunel'){ tunelBorrar(seleccion); toast('🧹 La estela del túnel se va'); return; }
     if(clave === 'oculto'){ editarToken(seleccion, {oculto: !t.oculto, ...(!t.oculto && t.revelado ? {revelado: false} : {})}); return; }   // ocultarlo lo vuelve a esconder del todo (js/29)
     if(clave === 'equipo'){ abrirEquipoMapa(t.fichaId.split(SEP_INVOCACION)[0]); return; }   // el mapa (js/11, A4)
     if(clave === 'rayo'){

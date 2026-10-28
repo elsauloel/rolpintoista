@@ -177,9 +177,15 @@ function tunelTramo(celda, ant, sig, r, alfa, fase){
     const ux = (b.x - a.x) / l, uy = (b.y - a.y) / l;
     return {x: a.x + ux * d - uy * lado, y: a.y + uy * d + ux * lado};
   };
-  const n = total > 0 ? Math.max(2, Math.round(total / (r * 0.2))) : 0;
-  const muestras = total > 0 ? Array.from({length: n + 1}, (_, i) => ({...enRecorrido(total * i / n, (rnd(i) - 0.5) * r * 0.2), rr: r * (0.34 + 0.14 * rnd(i + 50))}))
-    : [{x: c.x, y: c.y, rr: r * 0.45}];
+  // Ancho y vaivén irregulares (dueño, 2026-10-28: «por momentos más ancho, por momentos menos… que inclusive se salga un poquito del hexágono y vuelva
+  // a entrar»): ondas suaves según el lugar del mapa, así cambian de a poco y empalman entre una casilla y la siguiente (la mitad del paso es la misma).
+  const ancho = (x, y) => { const u = x / HEX, v = y / HEX; return 0.5 + 0.3 * Math.sin(u * 1.9 + v * 1.1 + 1.3) + 0.2 * Math.sin(-u * 0.8 + v * 2.7 + 4.1); };   // 0 a 1
+  const vaiven = (x, y) => { const u = x / HEX, v = y / HEX; return 0.6 * Math.sin(u * 1.4 - v * 0.9 + 0.7) + 0.4 * Math.sin(u * 2.6 + v * 2.1 + 2.9); };   // −1 a 1
+  const n = total > 0 ? Math.max(3, Math.round(total / (r * 0.15))) : 0;
+  const muestras = total > 0 ? Array.from({length: n + 1}, (_, i) => {
+    const base = enRecorrido(total * i / n, 0);
+    return {...enRecorrido(total * i / n, vaiven(base.x, base.y) * r * 0.85), rr: r * (0.2 + 0.48 * ancho(base.x, base.y)) * (0.9 + 0.2 * rnd(i + 50))};
+  }) : [{x: c.x, y: c.y, rr: r * 0.45}];
   const terron = (x, y, rr, k) => {
     ctx.beginPath();
     for(let j = 0; j < 9; j++){
@@ -202,7 +208,9 @@ function tunelTramo(celda, ant, sig, r, alfa, fase){
       }
     });
     for(let i = 0; i < 7; i++){
-      const q = total > 0 ? enRecorrido(total * rnd(i + 800), (rnd(i + 900) - 0.5) * r * 0.7) : {x: c.x + (rnd(i + 800) - 0.5) * r * 0.6, y: c.y + (rnd(i + 900) - 0.5) * r * 0.5};
+      const d = total * rnd(i + 800), base = total > 0 ? enRecorrido(d, 0) : c;   // (sobre la zanja, que va y viene)
+      const q = total > 0 ? enRecorrido(d, vaiven(base.x, base.y) * r * 0.85 + (rnd(i + 900) - 0.5) * r * (0.3 + 0.7 * ancho(base.x, base.y)))
+        : {x: c.x + (rnd(i + 800) - 0.5) * r * 0.6, y: c.y + (rnd(i + 900) - 0.5) * r * 0.5};
       ctx.beginPath(); ctx.arc(q.x, q.y, r * (0.05 + 0.06 * rnd(i + 1000)), 0, 2 * Math.PI);
       ctx.fillStyle = i % 3 === 0 ? '#9a9187' : i % 3 === 1 ? '#8d6640' : '#4f3820'; ctx.fill();
     }

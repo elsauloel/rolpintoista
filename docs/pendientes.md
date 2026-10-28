@@ -136,7 +136,7 @@
 >   **Mientras tanto (provisorio):** un arma que se cayó la levanta solo su dueño (vtt-hexgrid/js/27, `puedeLevantarla`), y una flecha que
 >   erró es de quien la tiró; lo que no tiene dueño conocido lo levanta cualquiera. Al hacerlo, sacar esa regla.
 
-> - [ ] **🏹 Revisar los arcos Tipo 6** (2026-10-23, dueño: «los arcos tipo 6, dejémoslo como pendiente, a revisar»). Hoy hay dos familias de
+> - [x] (2026-10-28, dueño: «todos los arcos que tengan tipo 6, pasalos a tipo 4»: hecho, los 9; su balance entra en el testeo de los arcos Buenos) **🏹 Revisar los arcos Tipo 6** (2026-10-23, dueño: «los arcos tipo 6, dejémoslo como pendiente, a revisar»). Hoy hay dos familias de
 >   arco (decisión del 2026-10-09, `docs/rework-armas-rango.md` §«Arcos Tipo 4 y Tipo 6» y `docs/balance-combate.md`): Tipo 4, el liviano (todos
 >   los Comunes), y Tipo 6, el largo (10 en el catálogo, de Buena Calidad para arriba: Arco largo de tejo, Arco largo de cazador, Arco de la ciénaga,
 >   Arco del rastreador de bestias, Arco de guerra, Arco del ciervo blanco, Arco del cazador de víboras, Arco compuesto élfico, Arco del cazador de

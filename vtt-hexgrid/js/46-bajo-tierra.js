@@ -249,3 +249,76 @@ function dibujarTuneles(z){
   ['borde', 'tierra', 'detalle'].forEach(f => tramos.forEach(x => tunelTramo(...x, f)));
   return anima;
 }
+
+/* 🕳 Salir o atacar desde abajo (dueño, 2026-10-28, P231: «mientras esté bajo tierra, tiene que aparecer un botoncito flotante, más o menos donde aparece el botón
+   de limpiar dados, que diga salir; y si está adyacente a un enemigo, dos botones: salir o atacar»). Uno por token bajo tierra que maneja esta pantalla (el GM, sus
+   creeps; un jugador, su personaje). «Salir» lo saca en su casilla, sin costo y sin atacar; «Atacar» es la habilidad Excavar de nuevo (sale y apuñala). */
+function bajoTierraMios(){
+  const out = [];
+  tokens.forEach((t, id) => {
+    if(!t || !t.bajoTierra) return;
+    if(t.tipo === 'creep' ? !soyGM : !(t.tipo === 'pj' && !String(t.fichaId || '').includes(SEP_INVOCACION) && puedoMover(t))) return;
+    const pegado = rivalesDe(t).some(r => !r.bajoTierra && distanciaHex({col: t.col, fila: t.fila}, {col: r.col, fila: r.fila}) === 1);
+    out.push({id, t, pegado});
+  });
+  return out;
+}
+let bajoTierraBotonesFirma = '';
+function renderBajoTierraBotones(){
+  const lista = typeof modoMapa !== 'undefined' ? bajoTierraMios() : [];
+  const limpiar = document.getElementById('dados-limpiar');
+  const firma = lista.map(x => `${x.id}:${x.pegado ? 1 : 0}:${nombreDe(x.t)}`).join('|') + (limpiar ? '#d' : '');
+  let caja = document.getElementById('bajo-tierra-botones');
+  if(!lista.length){ if(caja) caja.remove(); bajoTierraBotonesFirma = ''; return; }
+  if(caja && firma === bajoTierraBotonesFirma) return;
+  bajoTierraBotonesFirma = firma;
+  if(!caja){
+    caja = document.createElement('div');
+    caja.id = 'bajo-tierra-botones';
+    caja.addEventListener('click', ev => {
+      const b = ev.target.closest('button[data-bt]');
+      if(!b) return;
+      const [que, id] = b.dataset.bt.split('|');
+      if(que === 'salir') bajoTierraSalir(id); else bajoTierraAtacar(id);
+    });
+    document.body.appendChild(caja);
+  }
+  // Como el 🧹 Limpiar dados (comun/dados3d.js): abajo, sobre el mapa, pegado al panel de la Mesa; si está ese botón, justo encima.
+  const panel = document.querySelector('aside');
+  const r = panel && panel.offsetParent !== null ? panel.getBoundingClientRect() : null;
+  const derecha = r && r.left > innerWidth / 2 && r.height > innerHeight / 2 ? Math.round(innerWidth - r.left + 16) : 24;
+  caja.style.cssText = `position:fixed;right:${derecha}px;bottom:${limpiar ? 64 : 20}px;z-index:100000;display:flex;flex-direction:column;gap:6px;align-items:flex-end`;
+  const est = 'border-radius:10px;padding:7px 12px;font:600 13px system-ui,sans-serif;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.5)';
+  caja.innerHTML = lista.map(x => `<div style="display:flex;gap:6px;align-items:center">
+      <span style="background:#2a1d12;color:#e8d3b0;border:1px solid #7a5532;border-radius:10px;padding:6px 10px;font:600 12px system-ui,sans-serif">🕳 ${esc(nombreDe(x.t))}</span>
+      <button type="button" data-bt="salir|${esc(x.id)}" title="Sale en su casilla, sin atacar" style="${est};background:#5f4127;color:#f6ead2;border:1px solid #a07a4f">⬆ Salir</button>
+      ${x.pegado ? `<button type="button" data-bt="atacar|${esc(x.id)}" title="Sale y apuñala a un rival pegado (la habilidad Excavar)" style="${est};background:#8a2f2f;color:#fff;border:1px solid #d47a6a">⚔ Atacar</button>` : ''}
+    </div>`).join('');
+}
+setInterval(() => { try{ renderBajoTierraBotones(); }catch(e){} }, 700);
+function bajoTierraSalir(id){
+  const t = tokens.get(id);
+  if(!t || !t.bajoTierra) return;
+  emergerToken(id, {nombre: 'Salir', alSalir: () => { mesaLinea(`🕳 ${nombreDe(t)} sale de abajo de la tierra (sin atacar)`, 'recordatorio'); renderBajoTierraBotones(); }});
+}
+// La habilidad que lo saca atacando: la de Excavar (`excavar` + `emerger`) o, si no, la que tenga `emerger`.
+const habEmerger = lista => (lista || []).find(h => h && h.excavar && h.emerger) || (lista || []).find(h => h && h.emerger) || null;
+async function bajoTierraAtacar(id){
+  const t = tokens.get(id);
+  if(!t || !t.bajoTierra) return;
+  if(t.tipo === 'creep'){
+    const sc = creepPrivadoDe(String(t.fichaId)), h = sc && habEmerger(sc.habilidades);
+    if(!h){ toast(`${nombreDe(t)} no tiene una habilidad para salir atacando: usá ⬆ Salir`); return; }
+    if(!(typeof ac !== 'undefined' && ac && ac.creepId === sc.id && !ac.host.hidden)) await abrirAccionesNuevas(sc.id);
+    acEjecutarHab(sc, h.id);
+    return;
+  }
+  // Un personaje: su Botonera, y la habilidad desde ahí (FichaAcciones.ejecutarHabilidad; elige el arma si tiene más de una).
+  const fichaId = String(t.fichaId);
+  if(!(typeof bn !== 'undefined' && bn && bn.fichaId === fichaId && !bn.host.hidden)) abrirBotonera(fichaId);
+  for(let i = 0; i < 60 && !(typeof bn !== 'undefined' && bn && bn.fichaId === fichaId && bn.S && bn.sesion && bn.sesion.cargada); i++) await new Promise(r => setTimeout(r, 250));
+  if(!(bn && bn.fichaId === fichaId && bn.S)){ toast('No se pudo abrir la Botonera'); return; }
+  const h = habEmerger(bn.S.habilidades);
+  if(!h){ toast(`${nombreDe(t)} no tiene Excavar: usá ⬆ Salir`); return; }
+  FichaAcciones.ejecutarHabilidad(bn.S, h.id, undefined, false, bnHabUi());
+}

@@ -12,8 +12,15 @@ function delatadosEscuchar(){
   if(typeof fbDb === 'undefined' || !FB_CAMPANA || !mapaMostrado || mapaMostrado === delatadosMapa) return;
   if(delatadosCorte) delatadosCorte();
   delatadosMapa = mapaMostrado; delatados = {};
+  let primera = true;
   delatadosCorte = fbDb.doc(fbRutaCampana(rutaMapaEstado('delatados'))).onSnapshot(doc => {
+    const antes = delatados;
     delatados = (doc.exists && doc.data().tokens) || {};
+    // ✨ El que se acaba de delatar aparece con los círculos que laten (dueño, 2026-10-28: «no solo tiene que aparecer visible, sino con ese brillito latente,
+    // círculos concéntricos que entran y salen, para que destaque su aparición»): el anillo y las ondas del aviso de turno (js/05, iniResaltado), 4,5 s.
+    const nuevos = primera ? [] : Object.keys(delatados).filter(id => { const a = antes[id], x = delatados[id]; return (!a || a.col !== x.col || a.fila !== x.fila || num(a.mant) !== num(x.mant)) && delatadoEn(id, tokens.get(id)); });
+    primera = false;
+    if(nuevos.length){ iniResaltado = {id: nuevos[0], ids: nuevos, hasta: Date.now() + 4500, turno: true}; }   // (con las ondas que se expanden, como el aviso de turno)
     nieblaFirma = '';   // que la niebla se recalcule
     pedirDibujo();
   }, err => console.error('No se pudo escuchar a los delatados:', err));

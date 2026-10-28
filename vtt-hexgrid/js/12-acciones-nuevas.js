@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261028g', '../comun/creep-botonera.js?v=20261023p8a', '../comun/creep-acciones.js?v=20261027p', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261027l'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261028g', '../comun/creep-botonera.js?v=20261023p8a', '../comun/creep-acciones.js?v=20261028x2', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261027l'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -391,8 +391,21 @@ function acDevolver(dev){
     try{ mesaLinea(txt, 'recordatorio'); }catch(err){}
   });
 }
+/* 🕳 Recién salido de abajo de la tierra para atacar (js/46): si se cancela el ataque, se pregunta si vuelve abajo o queda afuera (dueño, 2026-10-28, P231). */
+let acEmergido = null;   // {creepId, tokenId}
+async function acPreguntarVolverAbajo(em){
+  if(!em) return;
+  const t = tokens.get(em.tokenId);
+  if(!t || t.bajoTierra) return;
+  const r = await Confirmar.elegir(`${nombreDe(t)} no atacó. ¿Vuelve bajo tierra o queda afuera?`, {titulo: 'Excavar', icono: '🕳',
+    opciones: [{valor: 'abajo', texto: '🕳 Vuelve bajo tierra', detalle: 'como estaba, sin costo'}], no: '⬆ Queda afuera'});
+  if(r === 'abajo'){ if(await excavarToken(em.tokenId)) mesaLinea(`🕳 ${nombreDe(t)} no atacó y volvió bajo tierra`, 'recordatorio'); }
+  else mesaLinea(`🕳 ${nombreDe(t)} salió de abajo de la tierra sin atacar`, 'recordatorio');
+}
 function acElegirObjetivo(sc, ataque, suelto, alDisparar){
   const id = ac.creepId;
+  const em = acEmergido && acEmergido.creepId === sc.id ? acEmergido : null;
+  acEmergido = null;
   const reabrir = () => { if(ac && ac.creepId === id){ ac.host.hidden = false; acUbicar(); acDibujar(); } };
   ac.host.hidden = true;
   const objetivoFijo = ac.objetivoFijo || null;   // 🧿 Mal de ojo: el personaje ya se eligió en su menú (js/60)
@@ -402,7 +415,7 @@ function acElegirObjetivo(sc, ataque, suelto, alDisparar){
   const nomHab = ataque && (ataque.habNombre || (ataque.hab && ataque.hab.nombre));
   const dev = ac.devolucion && nomHab && ac.devolucion.creepId === sc.id && ac.devolucion.habNombre === nomHab ? ac.devolucion : null;
   ac.devolucion = null;
-  dueloElegirObjetivoMapa({yo: {ref: sc.id, tipo: 'creep', nombre: sc.nombre}, ataque, objetivoFijo, conSuelto: true, alSuelto: () => { reabrir(); suelto(); }, alCancelar: () => { reabrir(); acDevolver(dev); },
+  dueloElegirObjetivoMapa({yo: {ref: sc.id, tipo: 'creep', nombre: sc.nombre}, ataque, objetivoFijo, conSuelto: true, alSuelto: () => { reabrir(); suelto(); }, alCancelar: () => { reabrir(); acDevolver(dev); acPreguntarVolverAbajo(em); },
     ...(alDisparar ? {alDisparar} : {})});   // 🏹 la flecha especial se gasta al disparar (2026-10-20)
 }
 
@@ -425,14 +438,23 @@ function acLanzarAtaqueDeHab(sc, h, emergio){
   // 🕳 Emerger (js/46): si está bajo tierra, primero sale (se elige la casilla) y recién ahí elige a quién le pega; saliendo de abajo, suma
   // `emerger.pdg` a la Probabilidad de Golpe (2026-10-14, dueño: «si la hace estando bajo tierra, tiene +2 a la probabilidad de golpe»; después: «que sea +1 mejor»; 2026-10-17, el tunelero: +3, el +1 no se notaba).
   const pozo = h && h.emerger ? tokenEntradaCreep(sc.id) : null;
+  // Sale solo con un arma cuerpo a cuerpo de Tipo 4 a 10 (dueño, 2026-10-28, P231: ni de rango ni especial); sin ninguna, no sale y se le devuelve lo cobrado.
+  const armaSalida = h && h.emerger ? Combatiente.armaParaEmerger(sc) : null;
   if(pozo && pozo[1].bajoTierra){
+    if(!armaSalida){
+      const dev = ac && ac.devolucion && ac.devolucion.creepId === sc.id ? ac.devolucion : null;
+      if(ac) ac.devolucion = null;
+      AvisoCombate.mostrar({icono: '🕳', titulo: `${sc.nombre}: no puede salir atacando`, texto: `Para salir de abajo de la tierra atacando hace falta un arma cuerpo a cuerpo de Tipo 4 a 10 (no de rango ni especial). Para salir sin atacar está el botón 🕳 Salir (abajo, sobre el mapa).`});
+      acDevolver(dev);
+      return;
+    }
     const id = ac && ac.creepId;
     ac.host.hidden = true;
-    emergerToken(pozo[0], {distancia: num(h.emerger.distancia) || BAJO_TIERRA_DIST, nombre: h.nombre, alSalir: () => acLanzarAtaqueDeHab(sc, h, true),
+    emergerToken(pozo[0], {distancia: num(h.emerger.distancia) || BAJO_TIERRA_DIST, nombre: h.nombre, alSalir: () => { acEmergido = {creepId: sc.id, tokenId: pozo[0]}; acLanzarAtaqueDeHab(sc, h, true); },
       alCancelar: () => { if(ac && ac.creepId === id){ ac.host.hidden = false; acUbicar(); acDibujar(); } }});
     return;
   }
-  const atq = CreepAcciones.ataqueDeHab(sc, h);
+  const atq = CreepAcciones.ataqueDeHab(sc, h, emergio && armaSalida ? {arma: armaSalida} : undefined);
   if(atq && atq.escudoGolpe && !atq.escudoGolpe.nombre) toast(`🛡 ${sc.nombre} no tiene un escudo puesto: ${h.nombre || 'el golpe'} pega con 1d10 + su Dmg`);   // (avisa y deja seguir)
   const bonoSalida = emergio && atq && atq.mods ? Math.round(num(h.emerger && h.emerger.pdg)) : 0;
   if(bonoSalida) atq.mods.pdg = num(atq.mods.pdg) + bonoSalida;
@@ -442,7 +464,7 @@ function acLanzarAtaqueDeHab(sc, h, emergio){
     // 🏹 Una habilidad que dispara con el arco o la ballesta también puede llevar una flecha o un virote especial del cinturón (dueño, 2026-10-27),
     // como Atacar (acAtacar): se elige antes del objetivo y se gasta al disparar.
     const lanzar = fl => acElegirObjetivo(sc, fl ? {...atq, flecha: fl} : atq, () => acPublicar(sc, CreepDuelo.pdgDeArreglos(sc, atq)), fl ? () => acDispararFlecha(fl.id) : null);
-    const flechas = atq.tipo === 'habilidad-arma' && !atq.escudoGolpe ? acFlechas(sc) : [];
+    const flechas = atq.tipo === 'habilidad-arma' && !atq.escudoGolpe && !(emergio && armaSalida) ? acFlechas(sc) : [];   // (saliendo de abajo, con un arma de mano: sin flechas)
     if(flechas.length) acElegirFlecha(sc, flechas, fid => lanzar(fid ? flechas.find(f => f.id === fid) || null : null));
     else lanzar(null);
   }

@@ -614,7 +614,7 @@ service cloud.firestore {
             // El GM reasigna el dueño de un PJ, lo lleva a otra casilla
             // (mover libre, sin estela), le cambia el frente o lo oculta.
             || (resource.data.tipo == 'pj' && esGM(c)
-              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['duenoUid', 'col', 'fila', 'ruta', 'rotacion', 'oculto', 'bajoTierra']))
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['duenoUid', 'col', 'fila', 'ruta', 'rotacion', 'oculto', 'bajoTierra', 'tunel']))
           );
         allow delete: if esMiembro(c)
           && (resource.data.duenoUid == request.auth.uid || esGM(c) || resource.data.get('arma', false) == true);
@@ -901,7 +901,7 @@ service cloud.firestore {
                 && request.resource.data.duenoUid == resource.data.duenoUid)
               || (resource.data.tipo == 'creep' && esGM(c))
               || (resource.data.tipo == 'pj' && esGM(c)
-                && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['duenoUid', 'col', 'fila', 'ruta', 'rotacion', 'oculto', 'bajoTierra']))
+                && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['duenoUid', 'col', 'fila', 'ruta', 'rotacion', 'oculto', 'bajoTierra', 'tunel']))
             );
           allow delete: if esMiembro(c)
             && (resource.data.duenoUid == request.auth.uid || esGM(c) || resource.data.get('arma', false) == true);

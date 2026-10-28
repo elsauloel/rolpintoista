@@ -160,7 +160,7 @@ const FichaTienda = (() => {
       <div class="cat-meta">${precioHtml(st, item)} · Peso ${fmt(num(item.peso))}${statTxt ? ` · ${esc(statTxt)}` : ''}${item.consumible?` · consumible${item.curahp?` (${num(item.curahp)>0?'+':''}${fmt(num(item.curahp))} HP)`:''}`:''}</div>
       ${catLabel ? `<div class="cat-tipo">${esc(catLabel)}</div>` : ''}
       ${slotInfo && (slotInfo.ocupado || slotInfo.equipados.length) ? `<div class="cat-slot-fila">
-        ${slotInfo.ocupado ? `<span class="cat-slot-badge">Slot ocupado</span>` : ''}
+        ${slotInfo.ocupado && o.slotGrupo !== 'ocupado' ? `<span class="cat-slot-badge">Slot ocupado</span>` : ''}
         ${slotInfo.equipados.length ? `<button type="button" class="cat-btn-comparar" data-comparar="${item.id}">Comparar</button>` : ''}
       </div>` : ''}
       ${ItemCorto.grillaHtml(item)}
@@ -181,11 +181,12 @@ const FichaTienda = (() => {
   function catalogoHtml(S, st, o){
     const f = st.filtro || FiltroCatalogo.vacio();
     const vis = visibles(S, st);
-    const fila = item => rowHtml(S, st, item, o);
     // Agrupado por qué es (con el orden «Por tipo»); con otro orden, una sola lista.
-    const html = FiltroCatalogo.agrupar(vis, f).map(g => `
-      <div class="cat-grouphead">${esc(g.label)} · ${fmt(g.items.length)}</div>
-      <div class="cat-grid">${conStockYLegacyPrimero(st, g.items).map(fila).join('')}</div>`).join('');
+    // 🟢 Slot libre / 🩷 slot ocupado al lado del título de cada parte (dueño, 2026-10-28): libre si alguno del grupo entra sin sacarse nada.
+    const slotDeGrupo = items => { const xs = items.map(it => E().slotOcupado(S, it)).filter(Boolean); return xs.length ? (xs.some(x => !x.ocupado) ? 'libre' : 'ocupado') : ''; };
+    const html = FiltroCatalogo.agrupar(vis, f).map(g => { const sl = slotDeGrupo(g.items); return `
+      <div class="cat-grouphead"><span>${esc(g.label)} · ${fmt(g.items.length)}</span>${sl ? `<span class="cat-slot-grupo ${sl}">${sl === 'libre' ? 'Slot libre' : 'Slot ocupado'}</span>` : ''}</div>
+      <div class="cat-grid">${conStockYLegacyPrimero(st, g.items).map(item => rowHtml(S, st, item, {...(o || {}), slotGrupo: sl})).join('')}</div>`; }).join('');
     // Lo que busca está en otra pestaña: avisarlo (dueño, 2026-10-08: sin pestaña «Todo», pero que no se pierda nada).
     let otras = '';
     if(st.tienda && !st.verCompleto && String(f.buscar || '').trim()){

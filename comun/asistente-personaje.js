@@ -91,6 +91,7 @@ const AsistentePersonaje = (() => {
       tienda: undefined, dde: DDE_POR_DEFECTO, ddeGM: null, ddeTocado: false, abiertas: new Set(),
     };
     const clases = ctx.clases || [];
+    const clasesElegibles = clases.filter(c => c.id !== 'miscelaneas');   // (Misceláneas: solo un pool de habilidades, no una clase para elegir; 2026-10-28)
     const pasivasLista = ctx.pasivas ? ctx.pasivas() : [];
     const clase = () => clases.find(c => c.id === st.claseId) || null;
     const rol = () => (typeof Combatiente !== 'undefined' && Combatiente.ROL_DE_CLASE[st.claseId]) || '';
@@ -125,7 +126,7 @@ const AsistentePersonaje = (() => {
         <div class="pap-campo"><label>La idea, en dos líneas</label><textarea id="ap-concepto" maxlength="300" placeholder="Ej.: guerrera lenta que se cree elegante; un sacerdote con escopeta de agua bendita.">${esc(st.concepto)}</textarea></div>
         <h4>Clase</h4>
         <p class="pap-nota">La clase orienta qué atributos y habilidades te convienen. No restringe nada: podés elegir de cualquier clase, o ninguna.</p>
-        <div class="ap-grid">${clases.map(c => {
+        <div class="ap-grid">${clasesElegibles.map(c => {
           const p = Combatiente.PESOS_ROL[Combatiente.ROL_DE_CLASE[c.id]];
           const top = p ? p.map((w, i) => [w, ATTRS[i]]).sort((a, b) => b[0] - a[0]).slice(0, 2).map(x => labelAttr(x[1])).join(' y ') : '';
           return `<button type="button" class="ap-op${st.claseId === c.id ? ' on' : ''}" data-ap-clase="${esc(c.id)}"><b>${esc(c.nombre)}</b><small>${esc(CLASE_TXT[c.id] || '')}${top ? ` Suele llevar ${esc(top)}.` : ''}</small></button>`;

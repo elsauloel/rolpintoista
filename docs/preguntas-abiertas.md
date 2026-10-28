@@ -1348,7 +1348,7 @@ resistencia antes del aviso? (El Enyetar de los jugadores sigue con la contienda
 **Dueño (2026-10-28): «está bien que no tire resistencia; vamos a dejarlo así para hacer un paso menos. Debería ser bastante costoso, así que recordame eso
 para corroborar».** Queda sin la contienda. Pendiente: revisar el costo (hoy 5 SP o cooldown 3; el doble en turno ajeno) — anotado en `docs/pendientes.md`.
 
-### P231 — 🕳 Excavar: ¿bajo tierra ve? ¿Con qué arma sale? ¿Cancelar el ataque deja salir gratis? (2026-10-28)
+### P231 — 🕳 Excavar: ¿bajo tierra ve? ¿Con qué arma sale? ¿Cancelar el ataque deja salir gratis? (2026-10-28) ✅ decidida
 
 **Contexto (visto probando Excavar con la cuenta del GM, «Claude · pruebas»):**
 1. El Tunelero, **moviéndose bajo tierra**, entró en un cono que tocaba a juan (en sigilo) y **lo detectó**: «juan perdió el sigilo». ¿Un creep bajo tierra
@@ -1360,4 +1360,11 @@ para corroborar».** Queda sin la contienda. Pendiente: revisar el costo (hoy 5 
 
 **Propuesta:** 1) bajo tierra no ve ni detecta (sale y recién ahí); 2) sale con su arma de mano (la daga), como dice el texto; 3) cancelar el ataque lo deja
 abajo (no pasó nada). — sin decidir.
+
+**Dueño (2026-10-28):** bajo tierra **ve** (detecta en sigilo, como pasó). Sale atacando **solo con un arma cuerpo a cuerpo de Tipo 4 a 10** (ni de rango ni
+especial). Si se cancela el ataque al salir, **se le pregunta: ¿vuelve bajo tierra o queda afuera?** Además: mientras está bajo tierra, **un botón flotante**
+abajo, donde aparece «Limpiar dados»: «⬆ Salir» y, si está pegado a un rival, también «⚔ Atacar». Y **Excavar también para jugadores**, en una clase
+«Misceláneas». **Hecho:** `Combatiente.sirveParaEmerger` / `armaParaEmerger`; js/12 (creep) y `FichaAcciones.ejecutarHabilidad` + js/11 (jugador); botones en
+js/46; la habilidad `miscelaneas-excavar` en `comun/skills-clase.js` (2 SP al salir atacando, 1 No2 al meterse, como la del creep; a confirmar).
+Salir con el botón es **sin costo** (a confirmar). Las reglas de Firestore nuevas (la estela de un jugador, `tunel`) hay que pegarlas.
 

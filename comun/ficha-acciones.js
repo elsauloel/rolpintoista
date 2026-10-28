@@ -696,6 +696,20 @@ const FichaAcciones = (() => {
     const sil = Combatiente.preguntaSilencio(S.efectos, it, '', ui.yo ? (ui.yo() || {}).ref : '');   // (con la ficha: el Tótem de silencio del mapa)
     if(sil && !(await (ui.confirmar || (txt => Confirmar.preguntar(txt, {titulo: 'Silencio', icono: '🤐', si: 'Usarla igual'})))(sil))) return;
     if(Combatiente.tipoEjecucion(FichaBotonera.dueloDe(it)) === 'flash'){ ui.flashFuera(it); return; }   // ⚡ su propia regla de costo (P136)
+    /* 🕳 Excavar (2026-10-28, dueño: también para los jugadores, habilidad miscelánea): con el mismo botón, arriba se mete bajo tierra (`excavarNo2`, 1 si
+       no dice; sin SP); abajo, sale atacando con un arma cuerpo a cuerpo de Tipo 4 a 10 (Combatiente.sirveParaEmerger). El token lo maneja el mapa:
+       ui.bajoTierra() (true / false; null sin token), ui.excavar() (→ true si se metió) y ui.emerger(seguir) (vtt-hexgrid/js/11 y 46). */
+    const abajo = it.excavar && it.emerger && ui.bajoTierra ? ui.bajoTierra() : undefined;
+    if(abajo === null){ ui.toast(`${it.nombre}: tu personaje no tiene token en este mapa`); return; }
+    if(abajo === false){
+      const costoE = Math.max(0, Math.round(num(it.excavarNo2 !== undefined ? it.excavarNo2 : 1)));
+      if(costoE > num(S.nitros) && !forzar){ ui.avisarSinNitros(costoE, 'meterte bajo tierra', () => ejecutarHabilidad(S, id, armaId, true, ui)); return; }
+      if(!(await ui.excavar(it))) return;
+      S.nitros = num(S.nitros) - (forzar && costoE > num(S.nitros) ? gastoNitrosForzado(S, costoE, `usó ${it.nombre}`) : costoE);
+      ui.cambio(['nitros']);
+      ui.toast(`🕳 ${it.nombre}: te metiste bajo tierra${costoE ? ` · −${fmt(costoE)} No2` : ''} — con ${it.nombre} otra vez salís atacando; para salir sin atacar, 🕳 Salir`);
+      return;
+    }
     // Una vez por turno (2026-10-13, Sprint): avisa y deja seguir (lo decide la mesa). El conteo vive en S.ataquesArma, que vacía el turno.
     if(it.unaVezPorTurno && !forzar && num((S.ataquesArma || {})['hab:' + it.id]) > 0
       && !(await (ui.confirmar || (txt => Confirmar.preguntar(txt, {titulo: it.nombre})))(`${it.nombre} se usa una vez por turno, y ya la usaste en este. ¿Usarla igual?`))) return;
@@ -707,8 +721,13 @@ const FichaAcciones = (() => {
     // Con costo de ataque: primero se elige el arma (si hay más de una).
     let arma = null;
     if(FichaHabilidades.nitrosAtaque(it)){
-      const opciones = FichaBotonera.armasParaHabilidad(S, it);
+      let opciones = FichaBotonera.armasParaHabilidad(S, it);
       if(it.soloRango && !opciones.some(o => o.arma)){ ui.toast(`${it.nombre} se usa con un arma a distancia en la mano`); return; }   // Headshot
+      if(abajo === true){   // 🕳 saliendo de abajo de la tierra: solo un arma cuerpo a cuerpo de Tipo 4 a 10 (P231)
+        opciones = opciones.filter(o => o.arma && Combatiente.sirveParaEmerger(o.arma));
+        if(!opciones.length){ ui.toast(`🕳 ${it.nombre}: para salir atacando hace falta un arma cuerpo a cuerpo de Tipo 4 a 10 en la mano (no de rango ni especial) — para salir sin atacar, 🕳 Salir`); return; }
+        if(armaId !== undefined && !opciones.some(o => o.arma.id === armaId)) armaId = undefined;
+      }
       if(armaId === undefined && opciones.length > 1){ ui.elegirArmaHab(it, opciones); return; }
       arma = armaId ? (S.inventario.find(x => x.id === armaId) || null) : opciones[0].arma;
     }
@@ -1195,6 +1214,14 @@ const FichaAcciones = (() => {
     // 💨 El Dash del Asalto (2026-10-26): el camino y el golpe al que atraviesa los hace el mapa (vtt-hexgrid/js/76).
     if(it.dashMapa && ui.dash){ ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); ui.dash(it, arma); return; }
     const aArma = ataqueDeHabArma(S, it, arma, xSp, xNitros, ui);
+    // 🕳 Excavar desde abajo (2026-10-28): primero sale en su casilla (el mapa), con +`emerger.pdg` a la Probabilidad de Golpe, y recién ahí elige a quién.
+    if(aArma && it.emerger && ui.emerger && ui.bajoTierra && ui.bajoTierra() === true){
+      const bono = Math.round(num(it.emerger.pdg));
+      if(bono && aArma.mods) aArma.mods.pdg = num(aArma.mods.pdg) + bono;
+      ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || '');
+      ui.emerger(() => ui.elegirObjetivo({yo: ui.yo(), ataque: aArma, emergio: true, suelto: () => tirarPrimeraDeHab(S, it, ui)}));
+      return;
+    }
     if(aArma){
       ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || '');
       ui.elegirObjetivo({yo: ui.yo(), ataque: aArma, suelto: () => tirarPrimeraDeHab(S, it, ui)});

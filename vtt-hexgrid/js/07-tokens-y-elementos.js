@@ -1155,7 +1155,7 @@ async function moverToken(id, col, fila, celdas, levita){
   }catch(err){
     // Reglas de Firestore sin publicar todavía (no conocen "ruta"): se mueve
     // igual, solo que los demás no ven la estela.
-    if(err.code === 'permission-denied' && ruta.length > 2){
+    if(err.code === 'permission-denied' && (ruta.length > 2 || conTunel)){   // (🕳 la estela de un jugador bajo tierra: hasta pegar las reglas del 2026-10-28)
       try{ await doc.update({col, fila, ...conRot}); sigiloPublicarAvisos(id); percepcionPublicarAvisos(id); abrirGiroLibre(id, celdas); fuegoEntrada(id, pisadas); zonaRevisarEntrada(id, celdas, num(levita)); if(typeof aceleradorRevisar === 'function') aceleradorRevisar(id, celdas); return; }catch(e){ err = e; }
     }
     sigiloAvisosPendientes.delete(id);

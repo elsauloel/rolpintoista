@@ -26,6 +26,7 @@ const Plantillas = (() => {
     'tiradaStat', 'tiradaBono', 'tiradaExtra', 'curaHp',
     'efectoNombre', 'efectoTurnos', 'efectoHpTurno', 'efectoEscudo', 'efectoStacks', 'efectoPermanente', 'efectoMods', 'efectoDetalle',
     'zonaMapa', 'zonaRadio', 'portalMapa', 'aceleradorMapa', 'transfusionMapa', 'empower', 'enyetar', 'reroll', 'parryDistancia', 'contraEsquiva', 'cargaElemental', 'soloRango', 'unaVezPorTurno', 'trampaColocar', 'duelo',
+    'excavar', 'excavarNo2', 'emerger',   // 🕳 Excavar (2026-10-28: también de jugador)
     // Solo en lo subido a la biblioteca (el archivo de fábrica no los lleva): para quién es (P122: 'jugador' paga con
     // SP, 'creep' con cooldown) y en qué lista de "+ Habilidad" aparece (id de clase o '_custom').
     'para', 'clase'];

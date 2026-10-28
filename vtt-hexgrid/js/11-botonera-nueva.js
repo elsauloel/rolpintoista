@@ -111,8 +111,8 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261023p8a', '../comun/ficha-botin.js?v=20261026zy', '../comun/generador-tiendas.js?v=20261028y', '../comun/filtro-catalogo.js?v=20261028z', '../comun/ficha-tienda.js?v=20261022k', '../comun/ficha-mantenimiento.js?v=20261028w', '../comun/ficha-calculo.js?v=20261028w', '../comun/ficha-combate.js?v=20261015d', '../comun/skills-clase.js?v=20261028t', '../comun/ficha-habilidades.js?v=20261020q',
-  '../comun/catalogo.js?v=20261028x', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261027d', '../comun/ficha-sesion.js?v=20261020zu', '../comun/ficha-botonera.js?v=20261023p8a', '../comun/ficha-resumen.js?v=20261028o', '../comun/inv-calculo.js?v=20261023p8a', '../comun/inv-botonera.js?v=20261023p8a', '../comun/inv-acciones.js?v=20261023ng', '../comun/inv-duelo.js?v=20261026q', '../comun/ficha-acciones.js?v=20261028o', '../comun/inv-habilidades.js?v=20261027g', '../comun/inv-lupa.js?v=20261015a',
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261023p8a', '../comun/ficha-botin.js?v=20261026zy', '../comun/generador-tiendas.js?v=20261028y', '../comun/filtro-catalogo.js?v=20261028z', '../comun/ficha-tienda.js?v=20261028x2', '../comun/ficha-mantenimiento.js?v=20261028w', '../comun/ficha-calculo.js?v=20261028w', '../comun/ficha-combate.js?v=20261015d', '../comun/skills-clase.js?v=20261028x2', '../comun/ficha-habilidades.js?v=20261020q',
+  '../comun/catalogo.js?v=20261028x', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261027d', '../comun/ficha-sesion.js?v=20261020zu', '../comun/ficha-botonera.js?v=20261023p8a', '../comun/ficha-resumen.js?v=20261028o', '../comun/inv-calculo.js?v=20261023p8a', '../comun/inv-botonera.js?v=20261023p8a', '../comun/inv-acciones.js?v=20261023ng', '../comun/inv-duelo.js?v=20261026q', '../comun/ficha-acciones.js?v=20261028x2', '../comun/inv-habilidades.js?v=20261027g', '../comun/inv-lupa.js?v=20261015a',
   '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261026q', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261014e'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -173,7 +173,7 @@ function bnCargarPiezas(){
     bnCargando = cargarPiezas(BN_PIEZAS)
       // Lo que subió el grupo al catálogo (como la ficha): un consumible viejo busca ahí el estado que deja.
       .then(() => ItemsSubidos.cargar().then(l => { bnItemsSubidos = l || []; }))
-      .then(() => fetch('../ficha-personaje/ficha.css?v=20261012zy').then(r => r.text()))
+      .then(() => fetch('../ficha-personaje/ficha.css?v=20261028x1').then(r => r.text()))
       .then(css => { bnCss = css.replace(/:root\b/g, ':host'); })
       .catch(err => { bnCargando = null; throw err; });
   }
@@ -760,8 +760,13 @@ function bnRecordatorios(avisos){
 // dueloElegirObjetivoMapa; "Sin objetivo" vuelve a mostrar la Botonera y tira suelto acá.
 // 🏹 Una habilidad que dispara con el arco o la ballesta también puede llevar una flecha o un virote especial (dueño, 2026-10-27: «una
 // habilidad de disparo debería poder usar una flecha o virote especial»): el mismo «¿Qué flecha?» que Atacar, antes de elegir el objetivo.
+// 🕳 El token del personaje de la Botonera (no el de una invocación): [id, token] o null.
+function bnTokenDelPj(){ const fichaId = bn && bn.fichaId; return fichaId ? [...tokens.entries()].find(([, x]) => x.tipo === 'pj' && x.fichaId === fichaId) || null : null; }
+let bnEmergido = null;   // 🕳 recién salido de abajo para atacar: si cancela, se le pregunta si vuelve abajo (js/12, acPreguntarVolverAbajo)
 function bnElegirObjetivo(cfg, flechaId){
   const atq = cfg.ataque, S = bn.S;
+  const em = cfg.emergio && bnEmergido && bnEmergido.fichaId === bn.fichaId ? bnEmergido : null;
+  if(cfg.emergio) bnEmergido = null;
   const arma = atq && atq.tipo === 'habilidad-arma' && atq.armaId ? (S.inventario || []).find(x => x.id === atq.armaId) || null : null;
   const flechas = arma && Combatiente.municionDe(arma) && typeof FichaEquipo.flechasDelCarcaj === 'function' ? FichaEquipo.flechasDelCarcaj(S).filter(f => Combatiente.sirveLaMunicion(arma, f)) : [];
   if(flechaId === undefined && flechas.length){ bnElegirFlecha(arma, flechas, id => bnElegirObjetivo(cfg, id)); return; }
@@ -770,7 +775,8 @@ function bnElegirObjetivo(cfg, flechaId){
   bn.host.hidden = true;
   const objetivoFijo = bn.objetivoFijo || null;   // 🐈‍⬛ Enyetar: el enemigo ya se eligió en su menú (js/38)
   bn.objetivoFijo = null;
-  dueloElegirObjetivoMapa({yo: cfg.yo, ataque: fl ? {...atq, flecha: fl} : atq, objetivoFijo, conSuelto: !!cfg.suelto, alSuelto: () => { reabrir(); if(cfg.suelto) cfg.suelto(); }, alCancelar: () => {},
+  dueloElegirObjetivoMapa({yo: cfg.yo, ataque: fl ? {...atq, flecha: fl} : atq, objetivoFijo, conSuelto: !!cfg.suelto, alSuelto: () => { reabrir(); if(cfg.suelto) cfg.suelto(); },
+    alCancelar: () => { if(em && typeof acPreguntarVolverAbajo === 'function') acPreguntarVolverAbajo(em); },
     ...(fl ? {alDisparar: () => bnDispararFlecha(fl.id, arma)} : {})});
 }
 // La línea de una habilidad en la Mesa, a nombre del personaje (como mesaPublicarHabilidad de la ficha).
@@ -803,6 +809,22 @@ function bnHabUi(){
     dueloDisponible: () => !!(typeof Duelo !== 'undefined' && Duelo.disponible() && bnPuedeGuardar()),
     puedeEscribir: () => bnPuedeGuardar(),
     elegirObjetivo: cfg => bnElegirObjetivo(cfg),
+    // 🕳 Excavar (2026-10-28, también de jugador; js/46): ¿está bajo tierra? (null sin token), meterse, y salir antes de elegir a quién le pega.
+    bajoTierra: () => { const tk = bnTokenDelPj(); return tk ? !!tk[1].bajoTierra : null; },
+    excavar: async it => {
+      const tk = bnTokenDelPj();
+      if(!tk) return false;
+      const ok = await excavarToken(tk[0]);
+      if(ok) mesaLinea(`🕳 ${nombreDe(tk[1])} se mete bajo tierra`, 'recordatorio');
+      return ok;
+    },
+    emerger: seguir => {
+      const tk = bnTokenDelPj(), fichaId = bn.fichaId;
+      if(!tk){ seguir(); return; }
+      const reabrir = () => { if(bn && bn.fichaId === fichaId){ bn.host.hidden = false; bnUbicar(); bnDibujar(); } };
+      bn.host.hidden = true;
+      emergerToken(tk[0], {nombre: 'Excavar', alSalir: () => { bnEmergido = {fichaId, tokenId: tk[0]}; seguir(); }, alCancelar: reabrir});
+    },
     // 💨 el Dash del Asalto (js/76, 2026-10-26): el camino; si atraviesa a un rival, paga lo de un ataque con su arma y le pega (objetivo fijo).
     dash: (it, arma) => {
       const fichaId = bn.fichaId, tk = [...tokens.entries()].find(([, x]) => x.tipo === 'pj' && x.fichaId === fichaId);

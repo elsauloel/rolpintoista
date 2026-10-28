@@ -175,9 +175,10 @@ const CreepAcciones = (() => {
     return Combatiente.habEjecucion(h, h && h.duelo, {stat: s => C().statValor(sc, s), etq: habEtq, armaDano: C().ataqueTxt(sc), armaPerfora: num((Combatiente.armaEnMano(sc) || {}).perfora), nivel: num(sc.nivel) || 1});   // nivel: el Provocar (+ su nivel)
   }
   // «Ataque con mi arma, con arreglos» de un creep (Golpe brutal, Carga…; P134): el mismo armado que el personaje, con su arma.
-  function ataqueDeHab(sc, h){
+  // `o.arma` (opcional): otra arma que la de la mano, en el formato de Combatiente.armaParaArreglos (🕳 salir de abajo de la tierra: armaParaEmerger).
+  function ataqueDeHab(sc, h, o){
     const c = h && h.duelo;
-    const atq = ataqueDeHabBase(sc, h, c);
+    const atq = ataqueDeHabBase(sc, h, c, o);
     // 🛡 El Golpe de escudo (2026-10-27, dueño: «como si el escudo fuera un arma contundente»): pega con el escudo que tiene puesto (Tipo 10, el contundente;
     // sin Parry: es su Destreza contra la Evasión); el daño, tantos d10 como el peso del escudo + su Dmg (comun/creep-duelo.js; dueño, 2026-10-27). Sin escudo, 1d10 (avisa el mapa).
     if(atq && c && c.escudoGolpe){
@@ -188,8 +189,8 @@ const CreepAcciones = (() => {
     }
     return atq;
   }
-  function ataqueDeHabBase(sc, h, c){
-    return Combatiente.ataqueConArreglos(h, c, {arma: Combatiente.armaParaArreglos(sc),
+  function ataqueDeHabBase(sc, h, c, o){
+    return Combatiente.ataqueConArreglos(h, c, {arma: (o && o.arma) || Combatiente.armaParaArreglos(sc),
       alcance: c && c.alcance !== undefined && c.alcance !== 'auto' ? Combatiente.alcanceHab(c, 'pdg', s => C().statValor(sc, s)) : C().alcance(sc),
       valorDe: s => C().statValor(sc, s),   // 🔓 un estado que se suelta contra un stat suyo (el Mordisco feroz: Fuerza contra su Fuerza)
       danoGolpe: extra => String(C().danoTxt(sc, C().statValor(sc, 'dmg'), num(extra))).replace(/\s+/g, '')});   // el daño de este golpe, otra vez

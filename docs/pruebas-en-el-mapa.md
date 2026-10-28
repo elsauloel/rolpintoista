@@ -265,6 +265,17 @@
 
 ## Pendientes
 
+- [~] **🩺 Cómo quedó el grupo (2026-10-28, dueño)**: ventana del GM con vida, SP y No2 (con su máximo) y los estados de cada personaje con token en el
+  mapa; los temporales con − turnos + y ✕ Sacar (`vtt-hexgrid/js/81-estado-del-grupo.js`). **Probado** («Claude · pruebas», GM): al pasar de narrativo a
+  combate se abre sola; Rengo de juan 2 → 3 → 2 con + y −. **Falta**: verla abrirse sola al cerrar el botín (🏁 Cerrar botín y repartir) o al publicar un
+  combate sin ítems, y probar ✕ Sacar con un estado de prueba. (Desde GM Tools, el Despojar no la abre: solo el mapa.)
+- [x] **📦 El baúl común desde el mapa (2026-10-28, reporte de jugadores)**: el aviso «En combate no se puede usar el baúl» quedaba debajo de la tienda (no
+  se veía nada) y la ventana del baúl también se iba a abrir debajo; además la ficha leía el modo del mapa principal (narrativo) y el mapa el del mapa
+  publicado (ENTRADA MINAS, en combate). **Probado** como jugador (Saulo-Prueba): en combate el aviso se ve sobre la tienda; fuera de combate (pasado a
+  narrativo solo en esa pantalla) la ventana del baúl se abre encima de la tienda.
+- [x] **❤ El máximo en los circulitos del token (2026-10-28, dueño)**: «/30» debajo de cada circulito, «35 / 42 máx.» al editar el SP y «❤ 15 de 30
+  (máximo)» en el globo de vida. **Probado** como jugador con juan.
+
 - [ ] **🧮 La cuenta del daño en el duelo (2026-10-28, dueño: «decía 19 de daño y el siguiente paso mostraba 0… todo lo que esté frenando el daño
   tiene que estar comunicado muy claramente»)**: al aplicar el daño, el paso 5 muestra el número grande (lo que entró a la vida) y abajo «🧮 La cuenta
   del daño», renglón por renglón: la tirada, el crítico, la Defensa (con los estados que la cambian: «con Piel de hierro +6»), la Defensa contra el

@@ -157,36 +157,55 @@ function tunelSincronizar(){
   });
   tunelVista.forEach((v, id) => { if(!tokens.has(id)) irse(v); });
 }
-// El tramo de tierra removida de una casilla (dueño, 2026-10-27: «que no sean islas separadas sino una línea continua de tierra removida»): de la mitad
-// del paso anterior, por el centro de la casilla, a la mitad del siguiente, así los tramos se tocan y forman una zanja. Borde oscuro, lomo más claro y
-// piedritas a lo largo (fijas para cada casilla). `ant` / `sig`: las casillas vecinas del recorrido (null en las puntas).
-function tunelTramo(celda, ant, sig, r, alfa){
+// El tramo de tierra removida de una casilla (dueño, 2026-10-27: «que no sean islas separadas sino una línea continua de tierra removida»; 2026-10-28: «se ve
+// como con líneas rectas… que tenga unos bordes irregulares, como si fuera un montículo de tierra»): terrones desparejos encimados a lo largo del recorrido,
+// de la mitad del paso anterior, por el centro de la casilla, a la mitad del siguiente (así los tramos se tocan), con la franja ondulando un poco.
+// `fase`: 'borde' (lo oscuro de abajo), 'tierra' y 'detalle' (terrones claros y piedritas); se pinta cada fase en toda la estela antes de la siguiente,
+// para que en las uniones el borde de un tramo no manche la tierra del otro. `ant` / `sig`: las casillas vecinas del recorrido (null en las puntas).
+function tunelTramo(celda, ant, sig, r, alfa, fase){
   const c = hexCentro(celda.col, celda.fila);
   const mitad = o => { const p = hexCentro(o.col, o.fila); return {x: (p.x + c.x) / 2, y: (p.y + c.y) / 2}; };
   const pts = [ant ? mitad(ant) : null, c, sig ? mitad(sig) : null].filter(Boolean);
-  const sem = Math.abs((celda.col * 73856093) ^ (celda.fila * 19349663));
-  const rnd = k => ((sem >> (k % 16)) % 97) / 97;
-  ctx.save();
-  ctx.globalAlpha = alfa;
-  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-  const trazo = (color, ancho) => {
-    ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
-    if(pts.length === 1) ctx.lineTo(c.x + 0.01, c.y); else pts.slice(1).forEach(p => ctx.lineTo(p.x, p.y));
-    ctx.strokeStyle = color; ctx.lineWidth = ancho; ctx.stroke();
-  };
-  trazo('#3f2a17', r * 0.95);   // el borde
-  trazo('#6e4a2b', r * 0.78);   // la tierra
-  trazo('#86603a', r * 0.28);   // el lomo
-  // Piedritas a lo largo del tramo, a un lado y al otro.
+  const sem = (celda.col * 73856093) ^ (celda.fila * 19349663);
+  const rnd = k => { let x = (sem + Math.imul(k + 1, 374761393)) | 0; x = Math.imul(x ^ (x >>> 13), 1274126177); return ((x ^ (x >>> 16)) >>> 0) / 4294967296; };
+  // Puntos a lo largo del tramo (con un leve vaivén a los costados) y el tamaño de cada terrón.
   const largos = pts.slice(1).map((p, i) => Math.hypot(p.x - pts[i].x, p.y - pts[i].y)), total = largos.reduce((a, b) => a + b, 0);
-  for(let i = 0; i < 7; i++){
-    let d = total * rnd(i + 1), k = 0;
+  const enRecorrido = (d, lado) => {
+    let k = 0;
     while(k < largos.length - 1 && d > largos[k]){ d -= largos[k]; k++; }
     const a = pts[Math.min(k, pts.length - 1)], b = pts[Math.min(k + 1, pts.length - 1)], l = largos[k] || 1;
-    const ux = (b.x - a.x) / l, uy = (b.y - a.y) / l, lado = (rnd(i + 5) - 0.5) * r * 0.62;
-    const x = a.x + ux * d - uy * lado, y = a.y + uy * d + ux * lado;
-    ctx.beginPath(); ctx.arc(x, y, r * (0.06 + 0.06 * rnd(i + 11)), 0, 2 * Math.PI);
-    ctx.fillStyle = i % 3 === 0 ? '#9a9187' : i % 3 === 1 ? '#8d6640' : '#4f3820'; ctx.fill();
+    const ux = (b.x - a.x) / l, uy = (b.y - a.y) / l;
+    return {x: a.x + ux * d - uy * lado, y: a.y + uy * d + ux * lado};
+  };
+  const n = total > 0 ? Math.max(2, Math.round(total / (r * 0.2))) : 0;
+  const muestras = total > 0 ? Array.from({length: n + 1}, (_, i) => ({...enRecorrido(total * i / n, (rnd(i) - 0.5) * r * 0.2), rr: r * (0.34 + 0.14 * rnd(i + 50))}))
+    : [{x: c.x, y: c.y, rr: r * 0.45}];
+  const terron = (x, y, rr, k) => {
+    ctx.beginPath();
+    for(let j = 0; j < 9; j++){
+      const a = (j + rnd(k * 11 + j) * 0.6) * 2 * Math.PI / 9, rad = rr * (0.72 + 0.4 * rnd(k * 17 + j + 200));
+      const px = x + Math.cos(a) * rad, py = y + Math.sin(a) * rad * 0.85;
+      if(j === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.closePath(); ctx.fill();
+  };
+  ctx.save();
+  ctx.globalAlpha = alfa;
+  if(fase === 'borde'){ ctx.fillStyle = '#3f2a17'; muestras.forEach((m, k) => terron(m.x, m.y, m.rr + r * 0.08, k)); }
+  else if(fase === 'tierra'){ ctx.fillStyle = '#6e4a2b'; muestras.forEach((m, k) => terron(m.x, m.y, m.rr, k)); }
+  else{
+    // Terrones más claros encima (la tierra levantada) y piedritas a los costados.
+    muestras.forEach((m, k) => {
+      if(rnd(k + 300) < 0.45){
+        ctx.fillStyle = rnd(k + 400) < 0.5 ? '#86603a' : '#7a5532';
+        terron(m.x + (rnd(k + 500) - 0.5) * m.rr, m.y + (rnd(k + 600) - 0.5) * m.rr * 0.8, m.rr * (0.28 + 0.2 * rnd(k + 700)), k + 1000);
+      }
+    });
+    for(let i = 0; i < 7; i++){
+      const q = total > 0 ? enRecorrido(total * rnd(i + 800), (rnd(i + 900) - 0.5) * r * 0.7) : {x: c.x + (rnd(i + 800) - 0.5) * r * 0.6, y: c.y + (rnd(i + 900) - 0.5) * r * 0.5};
+      ctx.beginPath(); ctx.arc(q.x, q.y, r * (0.05 + 0.06 * rnd(i + 1000)), 0, 2 * Math.PI);
+      ctx.fillStyle = i % 3 === 0 ? '#9a9187' : i % 3 === 1 ? '#8d6640' : '#4f3820'; ctx.fill();
+    }
   }
   ctx.restore();
 }
@@ -195,6 +214,7 @@ function dibujarTuneles(z){
   tunelSincronizar();
   const ahora = Date.now(), r = HEX * 0.55;
   let anima = false;
+  const tramos = [];
   tunelVista.forEach((v, id) => {
     const t = tokens.get(id);
     for(let i = v.celdas.length - 1; i >= 0; i--){
@@ -215,8 +235,9 @@ function dibujarTuneles(z){
         anima = true;
         if(ahora >= c.seVa) alfa *= Math.max(0, 1 - (ahora - c.seVa) / TUNEL_FUNDIDO_MS);
       }
-      if(alfa > 0) tunelTramo(c, ant, sig, r, alfa);
+      if(alfa > 0) tramos.push([c, ant, sig, r, alfa]);
     });
   });
+  ['borde', 'tierra', 'detalle'].forEach(f => tramos.forEach(x => tunelTramo(...x, f)));
   return anima;
 }

@@ -191,7 +191,9 @@ const CreepAcciones = (() => {
   }
   function ataqueDeHabBase(sc, h, c, o){
     return Combatiente.ataqueConArreglos(h, c, {arma: (o && o.arma) || Combatiente.armaParaArreglos(sc),
-      alcance: c && c.alcance !== undefined && c.alcance !== 'auto' ? Combatiente.alcanceHab(c, 'pdg', s => C().statValor(sc, s)) : C().alcance(sc),
+      // (con otra arma —🕳 la de salir de abajo, cuerpo a cuerpo—: 1 más su +Rng, no el alcance del arco que tenga en la mano)
+      alcance: c && c.alcance !== undefined && c.alcance !== 'auto' ? Combatiente.alcanceHab(c, 'pdg', s => C().statValor(sc, s))
+        : o && o.arma ? 1 + Math.max(0, Math.round((o.arma.mods || []).filter(m => m && m.stat === 'rng').reduce((a, m) => a + num(m.val), 0))) : C().alcance(sc),
       valorDe: s => C().statValor(sc, s),   // 🔓 un estado que se suelta contra un stat suyo (el Mordisco feroz: Fuerza contra su Fuerza)
       danoGolpe: extra => String(C().danoTxt(sc, C().statValor(sc, 'dmg'), num(extra))).replace(/\s+/g, '')});   // el daño de este golpe, otra vez
   }

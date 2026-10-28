@@ -544,7 +544,13 @@ function soltar(){
     const reaccion = enDodge(a.id);
     if(a.movio && !a.libre && stunAntes(a.id, () => rutaSoltada(a, tokens.get(a.id)), {reaccion, mover: true})){}   // stuneado: no se mueve, salvo que la mesa lo deje (2026-10-06)
     else{
-      if(a.movio && !a.libre && !reaccion) avisarFueraDeTurno(a.id, null);   // moverse fuera de turno: se avisa, no se frena (2026-10-06)
+      // moverse fuera de turno: se avisa, no se frena (2026-10-06) — solo si de verdad se movió (2026-10-28, probando: soltarlo en una casilla a la que no
+      // llegaba anotaba «se mueve» en la Mesa sin moverse); se mira un rato, por si antes tira la Confusión.
+      if(a.movio && !a.libre && !reaccion && t){
+        const de = {col: t.col, fila: t.fila}, desde = Date.now();
+        const mirar = () => { const t2 = tokens.get(a.id); if(!t2) return; if(t2.col !== de.col || t2.fila !== de.fila) avisarFueraDeTurno(a.id, null); else if(Date.now() - desde < 60e3) setTimeout(mirar, 400); };
+        setTimeout(mirar, 300);
+      }
       if(!(a.movio && !a.libre && !reaccion && confusionAntes(a.id, () => rutaSoltada(a, tokens.get(a.id))))) rutaSoltada(a, t);
     }   // (2026-10-02: separado para que el ataque de oportunidad pueda retomar el resto del camino, js/17)
     pedirDibujo();

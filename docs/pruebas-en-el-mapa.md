@@ -286,6 +286,11 @@
 >   (`ocultoPorSigiloParaMi` no la miraba). ✅ Arreglado y vuelto a mirar publicado: el GM ve a juan (atenuado, con el ícono de sigilo) en esa casilla; juan se
 >   mueve una → el GM deja de verlo. (Falta solo el «pase la ronda», que es la misma marca.)
 > - [ ] **🐝 Una zona de un creep sobre una invocación** (la abeja de Bizzante): que a su dueño le aparezca el cartel y tire con los stats de la abeja.
+>   ✅ **El cartel, probado (2026-10-28)**: el Escarabajo levantó un Muro de fuego sobre el Lobo de Clementino; el dueño lo sacó y lo volvió a meter → en su
+>   pantalla «🔥 Muro de fuego: le toca a Lobo de prueba · No hay nada que tirar» → Aplicar → «8 de daño de fuego · Quemadura» y el Lobo 15 → 5 (8 + 2 de la
+>   Quemadura al ponerse). Falta: una zona **con tirada de resistencia** (para ver que tira con los stats de la invocación). Al crear la zona encima no pasa
+>   nada: el motor mira al entrar y en cada «Pasar de ronda». Visto de paso y ✅ arreglado: soltar un token en una casilla a la que no llegaba anotaba
+>   «⏱ actúa fuera de su turno: se mueve» en la Mesa sin haberse movido.
 > - [x] **✕ Un duelo en curso no se puede cerrar (2026-10-28, dueño: «un jugador apretó la X de cerrar y quedamos sin saber qué hacer»)**: mientras el
 >   duelo sigue, el cuadro solo tiene «—» / «Minimizar» y «Cancelar duelo» (quien podía); la ✕ y «Cerrar» vuelven cuando termina. Ver con el jugador y el GM.
 >   ✅ **Probado (2026-10-28, las dos cuentas)**: el GM ve «—», «Cancelar duelo» y «Minimizar»; el jugador, «—» y «Minimizar»; al llegar a «Fin del duelo»

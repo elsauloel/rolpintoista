@@ -268,13 +268,25 @@
 > **🖥 Para probar con la cuenta del GM (2026-10-28, dueño: «si hay alguna prueba relevante desde el mapa con cuenta de GM que no podés porque está en
 > segundo plano, anotala acá»).** La ventana de Chrome del GM (rolpintoista) estaba minimizada: el lado del GM se manejó por código (sus botones, con
 > sus propias funciones) y lo que se vio, desde la pantalla del jugador. Lo que pide ver la pantalla del GM:
-> - [ ] **🧿 El botón y el menú del Mal de ojo** desde la pantalla del GM (se probó tocándolo por código: lista «Tunelero → Clementino · Evasión (8)…»).
-> - [ ] **🩺 Cómo quedó el grupo al cerrar el botín** (🏁 Cerrar botín y repartir) y al publicar un combate sin ítems.
+> - [x] **🧿 El botón y el menú del Mal de ojo** desde la pantalla del GM — **probado con el mouse (2026-10-28, cuenta del GM)**: con el cooldown en 0 aparece el 🧿
+>   arriba; sin tiradas, «No hay ninguna tirada reciente…»; con el Tunelero disparándole a Clementino (Evasión 6, tirada por el jugador) el 🧿 se muda al
+>   costado del duelo («Podés usar») y el menú dice «Tunelero (prueba) → Clementino · Evasión (6) … cooldown 3».
+> - [ ] **🩺 Cómo quedó el grupo al cerrar el botín** (🏁 Cerrar botín y repartir) y al publicar un combate sin ítems. ✅ **Al publicar sin ítems, probado
+>   (2026-10-28, cuenta del GM)**: se abre sola con Clementino «💀 en el piso», vida 0/25, SP y No2, «No vencen: Escudo especial»; juan con Guardia baja, Rengo,
+>   Lisiado, Presa y Marcado con − / + / ✕ Sacar. «✕ Sacar» Guardia baja anduvo; «−» en Presa anduvo (2 → 1, en la ficha y en el mapa). Del lado del jugador:
+>   «Botín concluido» con la XP. Falta: al cerrar un botín **con** ítems (🏁 Cerrar botín y repartir) y al pasar a combate.
+>   ⚠ **Para revisar**: el primer «−» en Presa, tocado apenas se abrió la ventana (justo cuando a juan le llegaba la XP), **se perdió** (siguió en 2); el segundo
+>   anduvo. Sospecha: la pantalla que aplicó la recompensa guardó la ficha con los estados de antes. Además el «Titilando» del Pacto (que el mapa pone como
+>   marca en `resumen.estados`, js/10) pasó a verse como «Invulnerable · 1 turno» cuando se volvió a guardar la ficha (es el mismo estado, alias).
 > - [ ] **🔦 Un personaje en sigilo que ataca a un creep**: el GM lo tiene que ver en esa casilla hasta que se mueva o pase la ronda.
 > - [ ] **🐝 Una zona de un creep sobre una invocación** (la abeja de Bizzante): que a su dueño le aparezca el cartel y tire con los stats de la abeja.
-> - [ ] **✕ Un duelo en curso no se puede cerrar (2026-10-28, dueño: «un jugador apretó la X de cerrar y quedamos sin saber qué hacer»)**: mientras el
+> - [x] **✕ Un duelo en curso no se puede cerrar (2026-10-28, dueño: «un jugador apretó la X de cerrar y quedamos sin saber qué hacer»)**: mientras el
 >   duelo sigue, el cuadro solo tiene «—» / «Minimizar» y «Cancelar duelo» (quien podía); la ✕ y «Cerrar» vuelven cuando termina. Ver con el jugador y el GM.
-> - [ ] **⚔ El cuadro del duelo visto por el GM** (la cuenta del daño, el «🏹 tiro alto (−2)» en la declaración): se vio desde el jugador.
+>   ✅ **Probado (2026-10-28, las dos cuentas)**: el GM ve «—», «Cancelar duelo» y «Minimizar»; el jugador, «—» y «Minimizar»; al llegar a «Fin del duelo»
+>   vuelve «Cerrar» en las dos pantallas.
+> - [x] **⚔ El cuadro del duelo visto por el GM** (la cuenta del daño, el «🏹 tiro alto (−2)» en la declaración): se vio desde el jugador. ✅ **La cuenta del daño,
+>   probada desde el GM (2026-10-28)**: crítico ×4 → «24 derecho a la vida… al aplicarlo se ve la cuenta» y, al tocar «Aplicar por Clementino», «Tirada de daño 6 ·
+>   crítico ×4 · = el golpe 24 · Crítico: no se resta la Defensa · = ENTRA A LA VIDA 24», Clementino 12 → 0. (El tiro alto queda visto solo del jugador.)
 > - [ ] **🕳 Excavar: salir en su casilla** y **la estela que se va al empezar su turno** (con el Tunelero en el orden de turnos): todo del lado del GM.
 > - [ ] **🏹 Los arcos Buenos (11)**: quedaron sin hacer. Al final de la tanda del 2026-10-28 las dos ventanas de Chrome quedaron minimizadas (el mapa
 >   medía 0 × 0) y no se pudo seguir mirando nada; se paró ahí para no probar «por detrás».

@@ -291,6 +291,9 @@ function etereoDe(t){
 const invisibleParaRivales = t => !!(t && t.tipo === 'pj' && ((vinculo(t) || {}).resumen || {}).invisible);   // (nada lo publica hoy)
 const ojoDe = t => t && t.tipo === 'pj' ? Math.max(0, Math.round(num(((vinculo(t) || {}).resumen || {}).ojo))) : 0;
 function ocultoPorSigiloParaMi(t){
+  // 🔦 Atacó desde ahí (js/82): se lo ve en esa casilla hasta que se mueva o pase la ronda, esté en sigilo o invisible (2026-10-28, probando con la
+  // cuenta del GM: la marca estaba, pero el GM lo seguía viendo como «?»).
+  if(typeof delatadoToken === 'function' && delatadoToken(t)) return false;
   if(invisibleParaRivales(t)) return soyGM && !ojoRevelando;
   if(!enSigilo(t)) return false;
   // «Ve lo oculto» de un aliado, o una luz que revela (la Luz para los suyos de un creep, 2026-10-26: también del lado del GM), lo deja ver.

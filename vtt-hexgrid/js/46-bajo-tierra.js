@@ -165,24 +165,35 @@ function tunelSincronizar(){
   });
   tunelVista.forEach((v, id) => { if(!tokens.has(id)) irse(v); });
 }
-// Un montículo de tierra removida con piedritas (fijo para cada casilla).
-function tunelMonticulo(c, celda, r, alfa){
+// El tramo de tierra removida de una casilla (dueño, 2026-10-27: «que no sean islas separadas sino una línea continua de tierra removida»): de la mitad
+// del paso anterior, por el centro de la casilla, a la mitad del siguiente, así los tramos se tocan y forman una zanja. Borde oscuro, lomo más claro y
+// piedritas a lo largo (fijas para cada casilla). `ant` / `sig`: las casillas vecinas del recorrido (null en las puntas).
+function tunelTramo(celda, ant, sig, r, alfa){
+  const c = hexCentro(celda.col, celda.fila);
+  const mitad = o => { const p = hexCentro(o.col, o.fila); return {x: (p.x + c.x) / 2, y: (p.y + c.y) / 2}; };
+  const pts = [ant ? mitad(ant) : null, c, sig ? mitad(sig) : null].filter(Boolean);
   const sem = Math.abs((celda.col * 73856093) ^ (celda.fila * 19349663));
   const rnd = k => ((sem >> (k % 16)) % 97) / 97;
   ctx.save();
   ctx.globalAlpha = alfa;
-  ctx.beginPath();
-  for(let i = 0; i <= 10; i++){
-    const a = i * 2 * Math.PI / 10, rr = r * (0.62 + 0.22 * rnd(i));
-    const x = c.x + Math.cos(a) * rr, y = c.y + Math.sin(a) * rr * 0.72;
-    if(i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-  }
-  ctx.closePath();
-  ctx.fillStyle = '#6e4a2b'; ctx.fill();
-  ctx.lineWidth = r * 0.05; ctx.strokeStyle = '#3f2a17'; ctx.stroke();
-  for(let i = 0; i < 6; i++){
-    const a = rnd(i + 3) * 2 * Math.PI, d = r * 0.45 * rnd(i + 7);
-    ctx.beginPath(); ctx.arc(c.x + Math.cos(a) * d, c.y + Math.sin(a) * d * 0.72, r * (0.07 + 0.06 * rnd(i + 11)), 0, 2 * Math.PI);
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  const trazo = (color, ancho) => {
+    ctx.beginPath(); ctx.moveTo(pts[0].x, pts[0].y);
+    if(pts.length === 1) ctx.lineTo(c.x + 0.01, c.y); else pts.slice(1).forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.strokeStyle = color; ctx.lineWidth = ancho; ctx.stroke();
+  };
+  trazo('#3f2a17', r * 0.95);   // el borde
+  trazo('#6e4a2b', r * 0.78);   // la tierra
+  trazo('#86603a', r * 0.28);   // el lomo
+  // Piedritas a lo largo del tramo, a un lado y al otro.
+  const largos = pts.slice(1).map((p, i) => Math.hypot(p.x - pts[i].x, p.y - pts[i].y)), total = largos.reduce((a, b) => a + b, 0);
+  for(let i = 0; i < 7; i++){
+    let d = total * rnd(i + 1), k = 0;
+    while(k < largos.length - 1 && d > largos[k]){ d -= largos[k]; k++; }
+    const a = pts[Math.min(k, pts.length - 1)], b = pts[Math.min(k + 1, pts.length - 1)], l = largos[k] || 1;
+    const ux = (b.x - a.x) / l, uy = (b.y - a.y) / l, lado = (rnd(i + 5) - 0.5) * r * 0.62;
+    const x = a.x + ux * d - uy * lado, y = a.y + uy * d + ux * lado;
+    ctx.beginPath(); ctx.arc(x, y, r * (0.06 + 0.06 * rnd(i + 11)), 0, 2 * Math.PI);
     ctx.fillStyle = i % 3 === 0 ? '#9a9187' : i % 3 === 1 ? '#8d6640' : '#4f3820'; ctx.fill();
   }
   ctx.restore();
@@ -199,8 +210,12 @@ function dibujarTuneles(z){
       if(c.seVa !== null && ahora - c.seVa >= TUNEL_FUNDIDO_MS) v.celdas.splice(i, 1);
     }
     if(t && t.oculto && !soyGM) return;   // un token oculto no delata su túnel
-    v.celdas.forEach(c => {
+    // Las vecinas del recorrido que se tocan (una casilla de distancia); la siguiente, recién cuando ya apareció (la zanja crece de a una).
+    const pegada = (a, b) => a && b && distanciaHex(a, b) === 1;
+    v.celdas.forEach((c, i) => {
       if(ahora < c.aparece){ anima = true; return; }
+      const ant = pegada(v.celdas[i - 1], c) ? v.celdas[i - 1] : null;
+      const sig = pegada(c, v.celdas[i + 1]) && ahora >= v.celdas[i + 1].aparece ? v.celdas[i + 1] : null;
       if(nieblaAplica() && !nieblaVista.has(nbPack(c.col, c.fila))) return;   // en la niebla no se ve
       let alfa = Math.min(1, (ahora - c.aparece) / 280);
       if(alfa < 1) anima = true;
@@ -208,7 +223,7 @@ function dibujarTuneles(z){
         anima = true;
         if(ahora >= c.seVa) alfa *= Math.max(0, 1 - (ahora - c.seVa) / TUNEL_FUNDIDO_MS);
       }
-      if(alfa > 0) tunelMonticulo(hexCentro(c.col, c.fila), c, r, alfa);
+      if(alfa > 0) tunelTramo(c, ant, sig, r, alfa);
     });
   });
   return anima;

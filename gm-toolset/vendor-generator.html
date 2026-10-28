@@ -402,14 +402,14 @@ input[type=checkbox]{width:auto}
 <script src="../comun/capas.js?v=20261005f9"></script>   <!-- la última ventana que se abre queda arriba -->
 <script src="../comun/efectos-golpe.js"></script>
 <script src="../comun/catalogo.js?v=20261028x"></script>
-<script src="../comun/generador-tiendas.js?v=20261022q"></script>   <!-- la regla de cómo se arma una tienda (2026-10-06) -->
-<script src="../comun/filtro-catalogo.js?v=20261026d"></script>   <!-- el filtro del catálogo, uno para todos lados (2026-10-08) -->
+<script src="../comun/generador-tiendas.js?v=20261028y"></script>   <!-- la regla de cómo se arma una tienda (2026-10-06) -->
+<script src="../comun/filtro-catalogo.js?v=20261028y"></script>   <!-- el filtro del catálogo, uno para todos lados (2026-10-08) -->
 <script src="../comun/items-subidos.js?v=20261010a"></script>
 <script src="../comun/plantillas.js?v=20261028u"></script>
 <script src="../comun/glosario.js?v=20261022f"></script>
 <script src="../comun/item-corto.js?v=20261019z"></script>
 <script src="../comun/biblioteca.js?v=20261026zu"></script>
-<script src="../comun/combatiente.js?v=20261028p"></script>
+<script src="../comun/combatiente.js?v=20261028y"></script>
 <script src="../comun/paso-a-paso.js?v=20261010a"></script>
 <script src="../comun/estado-preguntas.js?v=20261009zl"></script>
 <script src="../comun/estados-presets.js?v=20261028t"></script>
@@ -1187,7 +1187,9 @@ function actualizarHint(){
   const cal = G.CALIDAD_POR_NIVEL[G.nivelDe(nivel)];
   const fijos = ` más los ${G.clasicos(CATALOGO).length} clásicos, que van siempre (pociones, Antídoto, Vendas, Revive, Moneda Re-Roll, Polilla, Ankh…: lo marcado «legacy» hasta Raro)`;
   $('#hint-tamano').textContent = (secs.length ? `${seccionesLabel(secs)}. ` : '⚠ Tildá al menos una sección. ') +
-    `${cfg.label}: entre ${cfg.min} y ${cfg.max} piezas de equipo por sección; góndola de gastables: Talabartería ${cfg.gondola.talabarteria >= 99 ? 'todos' : cfg.gondola.talabarteria}, Bazar ${cfg.gondola.bazar} (${G.UNIDADES_GONDOLA} de cada uno)${fijos}. Nivel ${nivel}: ` +
+    (cfg.fijo ? `${cfg.label}: Herrería 2 armas de Tipos distintos, 1 escudo y 2 defensivas; Talabartería 1 de rango, 1 liviana (Tipo 4), 2 defensivas y 1 utilitaria; Bazar 2 varitas o báculos, 1 talismán, 1 anillo y 2 defensivas. ` +
+      `🛒 Góndola: los esenciales${fijos.replace(/^ más/, ',')}, 1 pergamino, 2 trampas y 1 poción de otros usos (${G.UNIDADES_GONDOLA} de cada uno). Nivel ${nivel}: `
+    : `${cfg.label}: entre ${cfg.min} y ${cfg.max} piezas de equipo por sección; 🛒 Góndola de consumibles: ${cfg.gondola.talabarteria >= 99 ? 'todos' : cfg.gondola.talabarteria} de lo de la Talabartería, ${cfg.gondola.bazar} de lo del Bazar (${G.UNIDADES_GONDOLA} de cada uno)${fijos}. Nivel ${nivel}: `) +
     `Común ${cal[0]} % · Buena ${cal[1]} % · Rara ${cal[2]} %, más un golpe de suerte ` +
     `(${Math.round(G.SUERTE.uno * 100)} % un escalón, ${G.SUERTE.dos * 100} % dos). Efectos escasos: hasta ${cfg.tope === 0.5 ? '0 o 1' : cfg.tope} de cada uno.`;
 }

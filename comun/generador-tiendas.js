@@ -23,7 +23,9 @@ const GeneradorTiendas = (() => {
      escasez (0,5 = cada etiqueta, 0 o 1 al azar) y la reserva de reposiciones de las piezas únicas. La calidad del equipo NO depende del tamaño,
      solo del nivel (dueño, 2026-10-07: «variables independientes»). */
   const TAMANOS = {
-    ambulante: {label: 'Vendedor ambulante', min: 5, max: 7, gondola: {talabarteria: 3, bazar: 4}, variedad: 2, familias: 2, tope: 0.5, reserva: 3},
+    // 🧳 El ambulante (dueño, 2026-10-28: «alguien que vende los esenciales»): no sortea con la receta de pesos sino con una lista fija por sección
+    // (`fijo`, ver FIJO_AMBULANTE) y su góndola es corta: los esenciales (los clásicos) + 1 pergamino + 2 trampas + 1 poción de otros usos.
+    ambulante: {label: 'Vendedor ambulante', min: 5, max: 7, fijo: true, gondolaPorCategoria: {pergamino: 1, trampa: 2, pocion: 1}, variedad: 2, familias: 2, tope: 0.5, reserva: 3},
     pueblito: {label: 'Pueblito', min: 8, max: 10, gondola: {talabarteria: 5, bazar: 6}, variedad: 3, familias: 3, tope: 1, reserva: 6},
     aldea: {label: 'Aldea', min: 12, max: 15, gondola: {talabarteria: 8, bazar: 10}, variedad: 5, familias: 4, tope: 2, reserva: 10},
     ciudad: {label: 'Ciudad', min: 18, max: 22, gondola: {talabarteria: 12, bazar: 15}, variedad: 7, familias: 4, tope: 3, reserva: 16},
@@ -81,7 +83,20 @@ const GeneradorTiendas = (() => {
     bazar: {label: 'Bazar arcano', icono: '✨', detalle: 'lo mágico: consumibles, varitas y báculos, talismanes, anillos y piezas de caster',
       receta: {especial: 40, orbe: 16, anillo: 10, torso: 12, cabeza: 9, manos: 7, cinturon: 6}, minimos: {especial: 2}},   // anillos: escasos (P114; 22 → 10, 2026-10-18)
   };
-  const SECCIONES_ORDEN = ['herreria', 'talabarteria', 'bazar'];
+  /* 🛒 La Góndola de consumibles (dueño, 2026-10-28: «todo lo consumible va a tener su propia pestaña; aplica a todas las tiendas»): una cuarta
+     pestaña, siempre, con todo lo consumible (los clásicos y los gastables), dividida por Combatiente.categoriaGondola. No se elige: no es una
+     sección de equipo (SECCIONES_EQUIPO); el sorteo de gastables sigue dependiendo de las secciones abiertas (`gondola` de cada tamaño). */
+  SECCIONES.gondola = {label: 'Góndola de consumibles', icono: '🛒', detalle: 'todo lo consumible: pociones de HP y SP, enfermería, utilitarios, trampas, pociones de otros usos y pergaminos', receta: {}};
+  const SECCIONES_EQUIPO = ['herreria', 'talabarteria', 'bazar'];
+  const SECCIONES_ORDEN = [...SECCIONES_EQUIPO, 'gondola'];
+  /* 🧳 Lo fijo del ambulante (dueño, 2026-10-28): por sección, una lista de lugares — `parte` (o `partes`: una de esas, sin repetir entre los del mismo
+     grupo), cuántos (`n`) y, en las armas, `familias` (de Tipos distintos) o `familia` (un Tipo). Las defensivas, «de su campo»: las de esa sección. */
+  const FIJO_AMBULANTE = {
+    herreria: [{parte: 'arma', n: 2, familias: true}, {parte: 'escudo', n: 1}, {partes: ['torso', 'cabeza', 'manos', 'piernas', 'pies'], n: 2}],
+    talabarteria: [{parte: 'distancia', n: 1}, {parte: 'arma', n: 1, familia: 4}, {partes: ['torso', 'cabeza', 'manos', 'piernas', 'pies'], n: 2},
+      {partes: ['cinturon', 'mochila', 'carcaj'], n: 1}],
+    bazar: [{parte: 'especial', n: 2}, {parte: 'orbe', n: 1}, {parte: 'anillo', n: 1}, {partes: ['torso', 'cabeza', 'manos', 'cinturon'], n: 2}],
+  };
   // Lo que suma Destreza/Agilidad (la Talabartería) y lo que suma Fuerza/Constitución (la Herrería), para las piezas que podrían ir en las dos.
   const DE_DESTREZA = ['eva', 'sigilo', 'percepcion', 'veoculto', 'ini', 'des', 'agl', 'pasosgratis', 'rng', 'pdgdist', 'pdgt4', 'pdgt6', 'retirada', 'reflejos',
     'levitar', 'pasodoble', 'trampaoculta', 'soltarse', 'crit', 'oporahorro', 'saquerapido'];
@@ -102,9 +117,9 @@ const GeneradorTiendas = (() => {
   }
   function seccionCalc(it){
     const p = parteDe(it);
-    if(p === 'consumible') return gondolaDe(it);   // los consumibles, en la pestaña de su góndola (los clásicos, el Bazar)
+    if(p === 'consumible' || p === 'trampa' || (it.legacy && p === 'otro')) return 'gondola';   // (y los clásicos sueltos: el Garfio, las Ganzúas)   // 🛒 todo lo consumible, en su pestaña (2026-10-28; antes, la góndola de la Talabartería o del Bazar)
     if(p === 'especial' || p === 'orbe' || p === 'anillo') return 'bazar';
-    if(p === 'trampa' || p === 'distancia' || p === 'mochila' || p === 'carcaj' || p === 'otro') return 'talabarteria';
+    if(p === 'distancia' || p === 'mochila' || p === 'carcaj' || p === 'otro') return 'talabarteria';
     if(p === 'arma') return num(it.tipoDado) <= 4 ? 'talabarteria' : 'herreria';
     if(p === 'escudo') return 'herreria';
     if(p === 'cinturon') return esDeAlquimia(it) || esDeCaster(it) ? 'bazar' : 'talabarteria';
@@ -118,9 +133,9 @@ const GeneradorTiendas = (() => {
   // Qué secciones abre una tienda: las que eligió el GM (`secciones`), o las de su tipo viejo (Herrero → Herrería, Bazar → Bazar, Ramos → las tres).
   function seccionesDe(o){
     const lista = o && Array.isArray(o.secciones) ? o.secciones.filter(s => SECCIONES[s]) : [];
-    if(lista.length) return SECCIONES_ORDEN.filter(s => lista.includes(s));
+    if(lista.length) return SECCIONES_EQUIPO.filter(s => lista.includes(s));
     const t = String((o && (o.tipo || o.categoria)) || '');
-    return t === 'herrero' ? ['herreria'] : t === 'alquimista' || t === 'bazar' ? ['bazar'] : SECCIONES_ORDEN.slice();
+    return t === 'herrero' ? ['herreria'] : t === 'alquimista' || t === 'bazar' ? ['bazar'] : SECCIONES_EQUIPO.slice();
   }
 
   /* Escasez: las etiquetas de los efectos sensibles (se calculan de los bonos; no hay que cargar nada a mano). */
@@ -209,7 +224,25 @@ const GeneradorTiendas = (() => {
     const esc = escasez(R, tam);
     const plan = [], elegidos = [];
     secs.forEach(k => {
-      const sec = SECCIONES[k], receta = sec.receta, planS = [], cuota = entero(R, tam.min, tam.max);
+      const sec = SECCIONES[k], receta = sec.receta, planS = [], cuota = tam.fijo ? 0 : entero(R, tam.min, tam.max);
+      // 🧳 El ambulante: los lugares fijos de la sección (sin la variedad ni el resto por peso).
+      if(tam.fijo){
+        (FIJO_AMBULANTE[k] || []).forEach(l => {
+          if(l.partes){
+            const conAlgo = l.partes.filter(pt => candidatosDe(cat, k, pt).length);
+            for(let i = conAlgo.length - 1; i > 0; i--){ const j = Math.floor(R() * (i + 1)); [conAlgo[i], conAlgo[j]] = [conAlgo[j], conAlgo[i]]; }
+            conAlgo.slice(0, l.n).forEach(pt => planS.push({seccion: k, parte: pt}));
+            return;
+          }
+          if(l.familias && sec.familias){
+            const fams = sec.familias.slice();
+            for(let i = fams.length - 1; i > 0; i--){ const j = Math.floor(R() * (i + 1)); [fams[i], fams[j]] = [fams[j], fams[i]]; }
+            fams.slice(0, l.n).forEach(f => planS.push({seccion: k, parte: l.parte, familia: f}));
+            return;
+          }
+          for(let i = 0; i < l.n; i++) planS.push({seccion: k, parte: l.parte, ...(l.familia ? {familia: l.familia} : {})});
+        });
+      }else{
       // Primero lo garantizado (variedad de partes, familias, mínimos) y después el resto por peso.
       const defs = DEFENSIVAS.filter(p => num(receta[p]) > 0);
       const pesosDef = Object.fromEntries(defs.map(p => [p, receta[p]]));
@@ -222,9 +255,11 @@ const GeneradorTiendas = (() => {
       if(!sec.minimosDesde || ORDEN_TAMANO.indexOf(tamK) >= ORDEN_TAMANO.indexOf(sec.minimosDesde))
         Object.entries(sec.minimos || {}).forEach(([p, n]) => { if(!planS.some(l => l.parte === p)) for(let i = 0; i < n; i++) planS.push({seccion: k, parte: p}); });
       while(planS.length < cuota) planS.push({seccion: k, parte: ponderado(R, receta)});
+      }
       planS.forEach(lugar => {
         let parte = lugar.parte, item = null;
         for(let intento = 0; intento < 4 && !item; intento++){
+          if(intento && tam.fijo) break;   // (el ambulante no cambia una parte fija por otra: si no hay, no hay)
           if(intento) parte = ponderado(R, receta);   // la parte se agotó (o no tiene nada de esta sección): otra de la receta
           item = elegir(R, candidatosDe(cat, k, parte), tirarCalidad(R, nivel), usados, esc.cabe, intento ? 0 : lugar.familia);
         }
@@ -237,7 +272,20 @@ const GeneradorTiendas = (() => {
     // La góndola de cada sección: N gastables distintos, al azar pesando la calidad con el nivel (sin excluir ninguna hasta Raro).
     const gondola = [];
     const tabla = CALIDAD_POR_NIVEL[nivel] || CALIDAD_POR_NIVEL[1];
-    secs.forEach(k => {
+    const sortear = (pool, n) => {
+      while(n-- > 0 && pool.length){
+        const pesos = pool.map(it => num(tabla[TIERS.indexOf(it.tier)]) + 10);
+        let r = R() * pesos.reduce((a, b) => a + b, 0), i = 0;
+        while(i < pool.length - 1 && (r -= pesos[i]) > 0) i++;
+        const it = pool.splice(i, 1)[0];
+        usados.add(it.id); gondola.push(it);
+      }
+    };
+    // 🧳 El ambulante: una cantidad por categoría de la góndola (Combatiente.categoriaGondola), sin las fijas de cada sección.
+    if(tam.gondolaPorCategoria && typeof Combatiente !== 'undefined' && Combatiente.categoriaGondola){
+      Object.entries(tam.gondolaPorCategoria).forEach(([cat0, n]) => sortear(cat.filter(it => gastable(it) && !usados.has(it.id) && Combatiente.categoriaGondola(it) === cat0), num(n)));
+    }
+    else secs.forEach(k => {
       let n = num((tam.gondola || {})[k]);
       // Siempre en la góndola (2026-10-11, dueño: las flechas elementales «siempre disponibles en la Talabartería»): `gondolaFija` en el ítem.
       cat.filter(it => it.gondolaFija && !it.archivo && gastable(it) && gondolaDe(it) === k && !usados.has(it.id)).forEach(it => { usados.add(it.id); gondola.push(it); });
@@ -304,6 +352,6 @@ const GeneradorTiendas = (() => {
   // Cuántas veces repone una tienda publicada lo que le compran (una personalizada, como una aldea).
   const reservaDe = tamano => (TAMANOS[tamano] || TAMANOS.aldea).reserva;
 
-  return {reservaDe, clasicos, gastable, gondolaDe, UNIDADES_GONDOLA, TIERS, CALIDAD_POR_NIVEL, SUERTE, TAMANOS, SECCIONES, SECCIONES_ORDEN, seccionDe, seccionesDe, PARTE_LABEL, DEFENSIVAS, ETIQUETAS, parteDe, etiquetasDe, esDeCaster, publicable,
+  return {SECCIONES_EQUIPO, FIJO_AMBULANTE, reservaDe, clasicos, gastable, gondolaDe, UNIDADES_GONDOLA, TIERS, CALIDAD_POR_NIVEL, SUERTE, TAMANOS, SECCIONES, SECCIONES_ORDEN, seccionDe, seccionesDe, PARTE_LABEL, DEFENSIVAS, ETIQUETAS, parteDe, etiquetasDe, esDeCaster, publicable,
     tirarCalidad, nivelDe, generar, otro, simular};
 })();

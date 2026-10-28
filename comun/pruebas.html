@@ -827,7 +827,7 @@ prueba('Acelerador (Support, 2026-10-12): 1 SP y 1 No2, 10 turnos, +2 No2; y la 
   const runa = CATALOGO_BASE.find(i => i.id === 'nuevo-runa-aceleradora');
   igual([hab.costo, hab.nitrosCosto, hab.aceleradorMapa, /Sin auditar/.test(hab.detalle), /Acelerador \[1\]/.test(hab.original), Plantillas.limpiar('skills', hab).aceleradorMapa,
     !!runa, runa && runa.consumible, runa && runa.aceleradorMapa, runa && GeneradorTiendas.seccionDe(runa), runa && GeneradorTiendas.gastable(runa)],
-    ['1', 1, {turnos: 10, no2: 2}, false, true, {turnos: 10, no2: 2}, true, true, {turnos: 10, no2: 2}, 'bazar', true]);
+    ['1', 1, {turnos: 10, no2: 2}, false, true, {turnos: 10, no2: 2}, true, true, {turnos: 10, no2: 2}, 'gondola', true]);   // (todo lo consumible, en la Góndola: 2026-10-28)
 });
 prueba('Parry a distancia (Shooter, 2026-10-12): siempre 2 SP (no es Flash), la marca parryDistancia y su texto original', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'shooter').habilidades.find(h => h.id === 'shooter-parry-distancia');
@@ -1936,7 +1936,7 @@ prueba('el carcaj: viene con el arco, guarda las flechas especiales y las gasta;
   const gastada = FichaEquipo.gastarFlecha(S, dentro[0].id);
   igual([car && car.nombre, car && car.capFlechas, S.inventario.filter(i => i.tipoItem === 'carcaj').length, dentro.length, unidadesAntes, gastada.nombre,
     FichaEquipo.carcajUsado(car), S.inventario.some(i => i.flecha), FichaEquipo.carcajDe(S) === car, GeneradorTiendas.seccionDe(flecha), GeneradorTiendas.seccionDe(car)],
-    ['Carcaj de cuero', 10, 1, 1, 3, 'Flecha de fuego', 2, false, true, 'talabarteria', 'talabarteria']);
+    ['Carcaj de cuero', 10, 1, 1, 3, 'Flecha de fuego', 2, false, true, 'gondola', 'talabarteria']);
 });
 prueba('la flecha envenenada perfora 1 y su veneno necesita que pase el daño, como siempre (2026-10-09)', () => {
   const f = CATALOGO_BASE.find(i => i.id === 'flecha-envenenada'), fuego = CATALOGO_BASE.find(i => i.id === 'flecha-de-fuego');
@@ -2298,8 +2298,8 @@ prueba('utilería (2026-10-08): cuerda, garfio y ganzúas son clásicos de la Ta
   const sin = FichaResumen.desarmaTrampasDe ? FichaResumen.desarmaTrampasDe(S) : FichaResumen.resumen(S).desarmaTrampas;
   S.inventario.push({...cat('Ganzúas'), id: 'g1'});
   const con = FichaResumen.desarmaTrampasDe ? FichaResumen.desarmaTrampasDe(S) : FichaResumen.resumen(S).desarmaTrampas;
-  igual([['Cuerda (por metro)', 'Garfio', 'Ganzúas'].every(n => cl.includes(cat(n)) && G.seccionDe(cat(n)) === 'talabarteria'), G.gastable(cat('Bomba de humo')), G.seccionDe(cat('Bomba de humo')),
-    !!cat('Bomba de humo').zonaUso.niebla, cat('Cuerda (por metro)').precioCompra, cat('Garfio').precioCompra, (parseInt((con.match(/[+-]\d+$/) || ['0'])[0]) - parseInt((sin.match(/[+-]\d+$/) || ['0'])[0])) === 2], [true, true, 'talabarteria', true, 1, 20, true]);
+  igual([['Cuerda (por metro)', 'Garfio', 'Ganzúas'].every(n => cl.includes(cat(n)) && G.seccionDe(cat(n)) === 'gondola'), G.gastable(cat('Bomba de humo')), G.seccionDe(cat('Bomba de humo')),
+    !!cat('Bomba de humo').zonaUso.niebla, cat('Cuerda (por metro)').precioCompra, cat('Garfio').precioCompra, (parseInt((con.match(/[+-]\d+$/) || ['0'])[0]) - parseInt((sin.match(/[+-]\d+$/) || ['0'])[0])) === 2], [true, true, 'gondola', true, 1, 20, true]);   // (desde 2026-10-28, en la Góndola de consumibles)
 });
 
 grupo('Filtro del catálogo (2026-10-08)');
@@ -2329,8 +2329,8 @@ prueba('el filtro de la tienda: «Lugar libre» deja solo lo que se puede equipa
   const secs = FichaTienda.secciones(S, st).map(x => [x.k, x.n]), todos = FichaTienda.visibles(S, st).map(i => i.id);   // la primera pestaña: la Talabartería
   st.filtro.libre = true;
   const libres = FichaTienda.visibles(S, st).map(i => i.id);
-  FichaTienda.elegirSeccion(st, 'bazar');
-  igual([secs, todos, libres, FichaTienda.visibles(S, st).map(i => i.id)], [[['talabarteria', 2], ['bazar', 1]], ['c1', 'p1'], ['p1'], []]);
+  FichaTienda.elegirSeccion(st, 'gondola');
+  igual([secs, todos, libres, FichaTienda.visibles(S, st).map(i => i.id)], [[['talabarteria', 2], ['gondola', 1]], ['c1', 'p1'], ['p1'], []]);
 });
 
 grupo('📊 Stats (A6a)');
@@ -3598,7 +3598,7 @@ prueba('Áreas por diámetro (dueño, 2026-10-08): el texto dice el diámetro y 
     .concat(['nuevo-bengala', 'nuevo-bengala-estelar'].map(id => cat(id).zonaUso.radio), cat('esp-varita-de-la-luz').especial.estadoPropio.mods.map(m => m.val));
   const opc = Combatiente.diametroOpciones(1, {min: 1, max: 2});
   igual([Combatiente.areaTxt(0), Combatiente.areaTxt(1), Combatiente.areaTxt(2), Combatiente.diametro(3), luces, /value="1" selected>Diámetro 3 · 7 casillas/.test(opc), (opc.match(/<option/g) || []).length,
-         CATALOGO_BASE.some(i => /radio \d/.test(`${i.detalle || ''} ${i.efectoDetalle || ''}`))],
+         CATALOGO_BASE.some(i => /\bradio \d/.test(`${i.detalle || ''} ${i.efectoDetalle || ''}`))],
     ['una casilla (diámetro 1)', 'diámetro 3 (7 casillas)', 'diámetro 5 (19 casillas)', 7, [1, 1, 1, 1, 1, 1, 1], true, 2, false]);
 });
 prueba('Varita del caos (2026-10-08, segunda vuelta): el d20: 20 bien y elige quien la usa; Común 10–19 / Buena 8–19 bien al azar; 2 para arriba al revés; 1 al revés y elige el contrario; los estados del sorteo existen (con Sigilo)', () => {
@@ -3993,7 +3993,7 @@ prueba('Los óleos del Bazar (2026-10-10): consumirlo deja el estado con sus car
   const ce = CreepAcciones.efectoDeHab(sc, o2, estadosPresetCreep()), cargasCreep = ce.estado && ce.estado.cargas;
   const g = Combatiente.gastarCarga(sc.estados, 'dz');
   igual([o1.precioCompra, o2.precioCompra, o2.tier, e && e.cargas, e && e.golpe.fijo, e && e.permanente, cargasCreep, g.carga && g.carga.cargas,
-    GeneradorTiendas.seccionDe(o1), GeneradorTiendas.seccionDe(o2)], [35, 75, 'Buena Calidad', 1, 2, true, 2, 1, 'bazar', 'bazar']);
+    GeneradorTiendas.seccionDe(o1), GeneradorTiendas.seccionDe(o2), GeneradorTiendas.gondolaDe(o1)], [35, 75, 'Buena Calidad', 1, 2, true, 2, 1, 'gondola', 'gondola', 'bazar']);
 });
 prueba('⏸ La pausa (2026-10-10): el registro anota lo importante que cambió en la ficha y no lo chico', () => {
   const S0 = FichaGuardado.normalizar({}).S;
@@ -5098,7 +5098,7 @@ prueba('tienda con secciones (P179): cada ítem sabe su sección; se reparte ent
     if(secs.size < 3) sinAlguna++;
     familias = Math.min(familias, new Set(its.filter(i => G.parteDe(i) === 'arma').map(i => i.tipoDado)).size);
     const b = G.generar({secciones: ['bazar'], tamano: 'pueblito', nivel: 2, catalogo: cat});
-    soloBazar += b.items.filter(id => !b.garantizados.includes(id) && G.seccionDe(porId.get(id)) !== 'bazar').length;   // (los clásicos van en toda tienda)
+    soloBazar += b.items.filter(id => !b.garantizados.includes(id) && !b.gondola.includes(id) && G.seccionDe(porId.get(id)) !== 'bazar').length;   // (los clásicos van en toda tienda; la Góndola, aparte)
     const viejo = its.find(i => G.parteDe(i) === 'cabeza');
     if(viejo){ const nuevo = G.otro({tienda: {tamano: 'aldea', nivel: 3, items: r.items}, viejo, catalogo: cat, reponer: true}); if(nuevo && G.seccionDe(nuevo) !== G.seccionDe(viejo)) otraSec++; }
   }
@@ -5109,7 +5109,7 @@ prueba('tienda con secciones (P179): cada ítem sabe su sección; se reparte ent
     sec({tipoItem: 'cabeza', mods: [{stat: 'def', val: 1}]}), sec({tipoItem: 'armadura_rigida', mods: [{stat: 'def', val: 1}, {stat: 'armadmg', val: 1}]}), sec({tipoItem: 'pies', mods: [{stat: 'eva', val: 1}]}), sec({tipoItem: 'mochila'}),
     sec({tipoItem: 'consumibles', consumible: true}), sec({tipoItem: 'consumibles', consumible: true, trampaDatos: {}}), sec({tipoItem: 'anillos'})],
     [0, 4, 0, 0, 'talabarteria', 'herreria', 'herreria', 'talabarteria', 'herreria', 'bazar', 'herreria', 'talabarteria', 'bazar', 'herreria', 'talabarteria', 'talabarteria',
-     'talabarteria', 'bazar', 'talabarteria', 'bazar']);
+     'talabarteria', 'gondola', 'gondola', 'bazar']);
 });
 prueba('la góndola (P181): gastables aparte del equipo, N variedades por sección y tamaño; mochila y cinturón seguros en la Talabartería desde pueblito', () => {
   const G = GeneradorTiendas, cat = CATALOGO_BASE.filter(G.publicable), porId = new Map(cat.map(i => [i.id, i]));
@@ -5117,7 +5117,7 @@ prueba('la góndola (P181): gastables aparte del equipo, N variedades por secci�
   for(let n = 0; n < 25; n++){
     const r = G.generar({tamano: 'pueblito', nivel: 1, catalogo: cat}), g = new Set(r.gondola), fijos = new Set(r.garantizados);
     cuantas = Math.min(cuantas, r.gondola.length);
-    r.gondola.forEach(id => { const it = porId.get(id); if(!G.gastable(it) || G.seccionDe(it) !== G.gondolaDe(it)) malas++; });
+    r.gondola.forEach(id => { const it = porId.get(id); if(!G.gastable(it) || G.seccionDe(it) !== 'gondola') malas++; });
     const equipo = r.items.filter(id => !g.has(id) && !fijos.has(id)).map(id => porId.get(id));
     consumiblesEnEquipo += equipo.filter(i => i.tipoItem === 'consumibles').length;
     const tala = equipo.filter(i => G.seccionDe(i) === 'talabarteria');
@@ -5135,6 +5135,33 @@ prueba('los clásicos (legacy hasta Raro) van en toda tienda, de cualquier tama�
     const r = G.generar({tamano: t, secciones: s, nivel: 1, catalogo: cat}); return cl.filter(id => !r.garantizados.includes(id)).length; });
   igual([cl.length >= 12, ['cat-moneda-reroll', 'cat-polilla', 'cat-ankh', 'cat-revive', 'cat-pocion-hp', 'cat-pocion-bonos'].every(id => cl.includes(id)), faltan,
     G.clasicos(CATALOGO_BASE).some(i => i.tier === 'Excepcional')], [true, true, [0, 0, 0], false]);
+});
+
+prueba('🧳 el ambulante (2026-10-28): Herrería 2 armas de Tipos distintos + escudo + 2 defensivas; Talabartería rango + Tipo 4 + 2 defensivas + 1 utilitaria; Bazar 2 varitas + talismán + anillo + 2; góndola: esenciales + 1 pergamino + 2 trampas + 1 poción', () => {
+  const G = GeneradorTiendas, C = Combatiente, cat = CATALOGO_BASE.filter(G.publicable), porId = new Map(cat.map(i => [i.id, i]));
+  const malas = [];
+  for(let n = 0; n < 20; n++){
+    const r = G.generar({tamano: 'ambulante', nivel: 1 + n % 5, catalogo: cat}), g = new Set(r.gondola), fijos = new Set(r.garantizados);
+    const equipo = r.items.filter(id => !g.has(id) && !fijos.has(id)).map(id => porId.get(id)), de = k => equipo.filter(i => G.seccionDe(i) === k);
+    const cuenta = (l, f) => l.filter(f).length, parte = pt => i => G.parteDe(i) === pt;
+    const h = de('herreria'), t = de('talabarteria'), b = de('bazar'), armasH = h.filter(parte('arma'));
+    const extra = r.gondola.filter(id => !fijos.has(id)).map(id => C.categoriaGondola(porId.get(id))).sort();
+    const linea = [h.length, armasH.length, new Set(armasH.map(i => i.tipoDado)).size, cuenta(h, parte('escudo')), t.length, cuenta(t, parte('distancia')), cuenta(t, i => G.parteDe(i) === 'arma' && i.tipoDado === 4),
+      b.length, cuenta(b, parte('especial')), cuenta(b, parte('orbe')), cuenta(b, parte('anillo')), extra.join(','), equipo.some(i => G.seccionDe(i) === 'gondola')];
+    if(JSON.stringify(linea) !== JSON.stringify([5, 2, 2, 1, 5, 1, 1, 6, 2, 1, 1, 'pergamino,pocion,trampa,trampa', false])) malas.push(linea);
+  }
+  igual(malas.slice(0, 3), []);
+});
+prueba('🛒 la góndola en categorías (2026-10-28): HP y SP, enfermería, utilitarios (Moneda, Polilla, Revive y Ankh primero), trampas, pociones de otros usos y pergaminos', () => {
+  const C = Combatiente, cat = id => CATALOGO_BASE.find(i => i.id === id), nom = n => CATALOGO_BASE.find(i => i.nombre === n);
+  const its = [nom('Poción de Blindaje'), cat('cat-pergamino-luz'), cat('cat-cuerda'), cat('cat-ankh'), cat('cat-antidoto'), cat('cat-pocion-hp'), cat('cat-pocion-bonos'), cat('cat-moneda-reroll'),
+    cat('cat-polilla'), cat('cat-revive'), CATALOGO_BASE.find(i => i.trampaDatos)];
+  const grupos = FiltroCatalogo.agrupar(its, {orden: 'categoria'});
+  igual([its.map(i => C.categoriaGondola(i)), grupos.map(g => g.clave), grupos.find(g => g.clave === 'g-utilitario').items.map(i => i.id), C.GONDOLA_CATEGORIAS.map(g => g[2])],
+    [['pocion', 'pergamino', 'utilitario', 'utilitario', 'enfermeria', 'hpsp', 'hpsp', 'utilitario', 'utilitario', 'utilitario', 'trampa'],
+     ['g-hpsp', 'g-enfermeria', 'g-utilitario', 'g-trampa', 'g-pocion', 'g-pergamino'],
+     ['cat-moneda-reroll', 'cat-polilla', 'cat-revive', 'cat-ankh', 'cat-cuerda'],
+     ['Pociones de HP y SP', 'Enfermería', 'Utilitarios', 'Trampas', 'Pociones de otros usos', 'Pergaminos']]);
 });
 
 prueba('reposición (2026-10-07): lo comprado se repone con otro de la misma parte, familia y calidad; la calidad sale solo del nivel', () => {

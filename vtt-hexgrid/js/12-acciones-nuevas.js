@@ -307,7 +307,7 @@ function acMunicion(sc){
   const m = Combatiente.municionDe(Combatiente.armaDeCombatiente(sc));
   if(m) return m;
   const n = String(Combatiente.armaEnMano(sc).nombre || '');
-  return /ballesta/i.test(n) ? 'virote' : /arco/i.test(n) ? 'flecha' : '';
+  return /\bballesta\b/i.test(n) ? 'virote' : /\barco\b/i.test(n) ? 'flecha' : '';
 }
 function acFlechas(sc){
   const m = acMunicion(sc);

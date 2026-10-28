@@ -212,6 +212,19 @@ equipo ya no tienen consumibles. La Talabartería garantiza una mochila y un cin
 (`comun/combate-fin.js`): humanos 60 %, humanoides 45 %, el resto 15 %; un jefe, uno seguro + la chance de su tipo de un segundo (`dropSegundo`).
 ⬜ Más adelante: «Pasar de día» para reponer la góndola sin republicar; la revisión de todos los consumibles.
 
+### ✅ La Góndola de consumibles y el vendedor ambulante (dueño, 2026-10-28)
+- **🛒 Góndola de consumibles**, una cuarta pestaña en **toda** tienda (`SECCIONES.gondola`; las de equipo son `SECCIONES_EQUIPO`): todo lo consumible
+  (los clásicos, los gastables, las trampas y las herramientas clásicas: cuerda, garfio, ganzúas) va ahí y no en la Talabartería o el Bazar.
+  Adentro, por categorías y en este orden (`Combatiente.GONDOLA_CATEGORIAS` / `categoriaGondola`, que usa `FiltroCatalogo.agrupar`):
+  ❤ Pociones de HP y SP · 🩹 Enfermería (curan estados) · 🎒 Utilitarios (Moneda Re-Roll, Polilla mística, Revive y Ankh siempre primeros) ·
+  🪤 Trampas · ⚗ Pociones de otros usos · 📜 Pergaminos. En los tamaños que no son el ambulante, cuántos gastables se sortean sigue igual
+  (`gondola` por sección abierta, con `gondolaDe`).
+- **🧳 El ambulante** (`fijo: true`, `FIJO_AMBULANTE`): Herrería 2 armas de Tipos distintos + 1 escudo + 2 defensivas de su campo; Talabartería
+  1 de rango + 1 liviana (Tipo 4) + 2 defensivas + 1 utilitaria (cinturón, mochila o carcaj); Bazar 2 varitas o báculos + 1 talismán + 1 anillo +
+  2 defensivas de su campo. Si no hay de una parte, ese lugar queda vacío (no la cambia por otra). Góndola: los esenciales (los clásicos) +
+  1 pergamino + 2 trampas + 1 poción de otros usos (`gondolaPorCategoria`). La calidad sigue saliendo del nivel.
+- ⬜ Revisar los otros tamaños (pueblito… capital) con el mismo criterio cuando el dueño quiera.
+
 ### ⬜ Ideas para «Luces y utilería» (dueño, 2026-10-08: «imaginemos cuerda, yesca y pedernal… ¿qué más?»; todavía no se carga nada)
 Lista de ideas propuesta en la conversación del 2026-10-08 (fuego, cuerda, terreno y cobertura, sigilo y engaño, oficio, señales). Se elige y
 diseña cuando el dueño lo retome, junto con la revisión de los consumibles.

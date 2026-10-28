@@ -150,15 +150,16 @@ const FiltroCatalogo = (() => {
   /* Los consumibles, en separadores (dueño, 2026-10-08: «en el bazar, un separador entre el stock fijo, los pergaminos y las pociones especiales;
      en la góndola de la talabartería, entre trampas y otros consumibles»): los clásicos (lo legacy, siempre), pergaminos, pociones especiales,
      luces y utilería, trampas. */
-  const SUBGRUPOS = [['clasico', '⭐', 'Clásicos (siempre hay)'], ['pergamino', '📜', 'Pergaminos'], ['pocion', '⚗', 'Pociones especiales'],
-    ['utileria', '🔦', 'Luces y utilería'], ['trampa', '🪤', 'Trampas']];
+  /* 🛒 Los consumibles, como en la Góndola de consumibles (dueño, 2026-10-28): pociones de HP y SP, enfermería, utilitarios (Moneda Re-Roll, Polilla
+     mística, Revive y Ankh primeros), trampas, pociones de otros usos y pergaminos (Combatiente.categoriaGondola). Antes: clásicos, pergaminos,
+     pociones, utilería y trampas. */
+  const SUBGRUPOS = typeof Combatiente !== 'undefined' && Combatiente.GONDOLA_CATEGORIAS ? Combatiente.GONDOLA_CATEGORIAS.map(g => ['g-' + g[0], g[1], g[2]])
+    : [['g-utilitario', '🎒', 'Consumibles'], ['g-trampa', '🪤', 'Trampas']];
   function grupoDe(it){
     const p = parteDe(it);
-    if(p === 'trampa') return 'trampa';
-    if(it.legacy && (p === 'consumible' || p === 'otro')) return 'clasico';   // (las herramientas de siempre: cuerda, garfio, ganzúas)
-    if(p !== 'consumible') return p;
-    const c = typeof Combatiente !== 'undefined' && Combatiente.categoriaConsumible ? Combatiente.categoriaConsumible(it) : '';
-    return c === 'pergamino' ? 'pergamino' : c === 'pocion' ? 'pocion' : 'utileria';
+    if(p !== 'consumible' && p !== 'trampa' && !(it.legacy && p === 'otro')) return p;
+    if(typeof Combatiente !== 'undefined' && Combatiente.categoriaGondola) return 'g-' + Combatiente.categoriaGondola(it);
+    return p === 'trampa' ? 'g-trampa' : 'g-utilitario';
   }
   function agrupar(lista, f){
     if((f.orden || 'categoria') !== 'categoria') return [{clave: '', label: ORDENES[f.orden] || '', items: lista}];
@@ -166,6 +167,9 @@ const FiltroCatalogo = (() => {
     lista.forEach(it => { const p = grupoDe(it); if(!grupos.has(p)) grupos.set(p, []); grupos.get(p).push(it); });
     const orden = [...PARTES.map(p => p[0]).filter(p => p !== 'consumible' && p !== 'trampa'), ...SUBGRUPOS.map(g => g[0])];
     const etq = k => { const sg = SUBGRUPOS.find(g => g[0] === k); if(sg) return `${sg[1]} ${sg[2]}`; return `${(PARTES.find(x => x[0] === k) || [, ''])[1]} ${PARTE_ETQ[k] || k}`.trim(); };
+    // (en los utilitarios, la Moneda Re-Roll, la Polilla, el Revive y el Ankh primero; el resto, como venían)
+    const util = typeof Combatiente !== 'undefined' && Combatiente.utilPrimero ? Combatiente.utilPrimero : () => 99;
+    if(grupos.has('g-utilitario')) grupos.set('g-utilitario', grupos.get('g-utilitario').map((it, i) => ({it, i})).sort((a, b) => util(a.it) - util(b.it) || a.i - b.i).map(x => x.it));
     return [...grupos.keys()].sort((a, b) => orden.indexOf(a) - orden.indexOf(b)).map(k => ({clave: k, label: etq(k), items: grupos.get(k)}));
   }
 

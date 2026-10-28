@@ -41,7 +41,7 @@
 > - [ ] **🎭 Mejorar cómo se traen los tokens al mapa** (2026-10-28, dueño: «anotá en "para ver en la compu", mejorar el sistema de traer tokens al mapa»).
 >   Hoy: el botón 🎭 del borde izquierdo (Token nuevo, Traer tokens de jugadores, Traer tokens de creeps por mapa) y «¿Crear su token?» al crear un creep en
 >   GM Tools. Sentarse con el dueño a ver qué molesta y cómo lo quiere.
-> - [ ] **🏪 Revisar el vendedor ambulante (y las tiendas en general)** (2026-10-28, dueño: «intenté generar una tienda de un vendedor ambulante y
+> - [x] ✅ **(2026-10-28, hecho: el ambulante con lista fija por sección y la 🛒 Góndola de consumibles en todas las tiendas, ver `docs/rework-tiendas.md`; falta revisar los otros tamaños)** **🏪 Revisar el vendedor ambulante (y las tiendas en general)** (2026-10-28, dueño: «intenté generar una tienda de un vendedor ambulante y
 >   abrí una tienda repleta de ítems, súper random… la tienda del vendedor ambulante es alguien que vende los esenciales: una, dos armas al azar,
 >   algún escudo, alguna armadura, no mucho más que eso… después me tocará volver a revisar el tema de las tiendas»). Lo de hoy está en
 >   `comun/generador-tiendas.js` y `docs/rework-tiendas.md` (ambulante 8–12 ítems con variedad garantizada de partes defensivas). Sentarse con el

@@ -7,7 +7,7 @@
    orden (cada pantalla lo llama después de dibujar o sacar uno). Lo usan el mapa (js/02, js/25) y la ficha suelta (js/03).
    ========================================================= */
 const Flotantes = (() => {
-  const ORDEN = ['desarmar-flotante', 'shock-flotante', 'estoico-flotante', 'shield-flotante', 'blindaje-flotante', 'reroll-flotante', 'enyetar-flotante', 'maldeojo-flotante', 'bendecir-flotante', 'empower-flotante', 'polilla-flotante', 'impulso-flotante', 'trebol-flotante', 'curandero-flotante', 'wildcard-flotante', 'moneda-flotante'];
+  const ORDEN = ['desarmar-flotante', 'shock-flotante', 'estoico-flotante', 'shield-flotante', 'blindaje-flotante', 'reroll-flotante', 'enyetar-flotante', 'maldeojo-flotante', 'bendecir-flotante', 'empower-flotante', 'polilla-flotante', 'impulso-flotante', 'trebol-flotante', 'curandero-flotante', 'wildcard-flotante', 'moneda-flotante', 'pacto-flotante'];
   // Dónde van. En el mapa (2026-10-10, dueño: «arriba, al lado de los botones de los lentes, a la misma altura que esa botonera»): en fila,
   // a la izquierda de la barra de arriba (#flotantes-mapa), con la altura de sus botones y en un solo renglón (la línea de ayuda pasa al
   // globo del mouse). Donde no hay esa barra (la ficha suelta): uno arriba del otro, abajo a la izquierda.
@@ -20,6 +20,13 @@ const Flotantes = (() => {
 #moneda-flotante.flot-arriba, #impulso-flotante.flot-arriba{--flot-glow:rgba(255,205,90,.75)}
 #wildcard-flotante.flot-arriba{--flot-glow:rgba(140,150,255,.85);overflow:visible}
 #wildcard-flotante.flot-arriba::after{display:none}
+/* 😇 El Pacto (dueño, 2026-10-28: «un ángel o un halo o algo sagrado»): activo, el halo dorado brilla y la carita sube y baja despacio; gastado, queda
+   gris y quieto (el botón se ve igual, apagado). */
+#pacto-flotante.flot-arriba{--flot-glow:rgba(255,236,150,.9);overflow:visible}
+#pacto-flotante.flot-arriba.pacto-off{--flot-glow:transparent;animation:none!important;filter:grayscale(1);opacity:.5}
+#pacto-flotante .pacto-halo{display:inline-block;animation:pacto-flota 3s ease-in-out infinite}
+#pacto-flotante.pacto-off .pacto-halo{animation:none}
+@keyframes pacto-flota{0%,100%{transform:translateY(1px);filter:drop-shadow(0 0 2px rgba(255,236,150,.6))}50%{transform:translateY(-2px);filter:drop-shadow(0 0 7px rgba(255,240,170,1))}}
 /* 🃏 Cuántas hay (dueño, 2026-10-16: «que el botón te muestre cuando tenés más de una»): un circulito con el número abajo a la izquierda. */
 .wildcard-n{display:none}
 #wildcard-flotante.flot-arriba .wildcard-n{display:flex;position:absolute;left:-7px;bottom:-7px;min-width:18px;height:18px;padding:0 4px;box-sizing:border-box;
@@ -116,6 +123,7 @@ const Flotantes = (() => {
   }
   // Lo que dice el mouse: qué es y qué hace al tocarlo (con el detalle de su línea chica, salvo la moneda y la carta).
   function ponerTitulo(b){
+    if(b.id === 'pacto-flotante') return;   // 😇 su cartel lo pone pacto() (activo o gastado)
     const id = b.id, sub = b.querySelector('small'), det = sub && id !== 'moneda-flotante' && id !== 'wildcard-flotante' ? String(sub.textContent || '').trim() : '';
     b.title = `${TITULO[id] || ''}. ${det ? det.charAt(0).toUpperCase() + det.slice(1) + ' — ' : ''}${ACCION[id] || ''}.`;
   }
@@ -239,6 +247,10 @@ const Flotantes = (() => {
 #empower-flotante{position:fixed;left:16px;bottom:16px;z-index:999997;background:linear-gradient(135deg,#5a2412,#34140a);color:#ffdcc4;border:2px solid #ff8a4a;
   border-radius:16px;padding:10px 16px;font-size:15px;font-weight:800;cursor:pointer;text-align:left;transform-origin:left bottom;
   box-shadow:0 8px 26px rgba(0,0,0,.6),0 0 14px rgba(255,120,60,.5);animation:moneda-latido 2.6s ease-in-out infinite alternate}
+#pacto-flotante{position:fixed;left:16px;bottom:16px;z-index:999997;border-radius:16px;padding:10px 16px;font-size:15px;font-weight:800;cursor:pointer;text-align:left;
+  transform-origin:left bottom;border:2px solid #f2d77a;background:linear-gradient(135deg,#3d3418,#221c0a);color:#fff8dc;box-shadow:0 8px 26px rgba(0,0,0,.6),0 0 14px rgba(255,236,150,.5);animation:moneda-latido 2.6s ease-in-out infinite alternate}
+#pacto-flotante small{display:block;font-weight:500;font-size:11px;opacity:.9}
+#pacto-flotante.pacto-off{border-color:#6b6b6b;background:#2a2a2a;color:#bbb;box-shadow:0 8px 26px rgba(0,0,0,.6);animation:none}
 #blindaje-flotante, #shield-flotante, #estoico-flotante, #shock-flotante, #desarmar-flotante, #bendecir-flotante{position:fixed;left:16px;bottom:16px;z-index:999997;border-radius:16px;padding:10px 16px;
   font-size:15px;font-weight:800;cursor:pointer;text-align:left;transform-origin:left bottom;border:2px solid;animation:moneda-latido 2.6s ease-in-out infinite alternate}
 #blindaje-flotante small, #shield-flotante small, #estoico-flotante small, #shock-flotante small, #desarmar-flotante small, #bendecir-flotante small{display:block;font-weight:500;font-size:11px;opacity:.9}
@@ -329,5 +341,15 @@ const Flotantes = (() => {
   const shockwave = o => fijo('shock-flotante', '<span class="shock-estallido">💥</span>', 'Shockwave', o && {...o, sub: o.sub || 'una onda alrededor'});
   const desarmar = o => fijo('desarmar-flotante', '<span class="desarmar-esgrima">🤺</span>', 'Desarmar', o && {...o, sub: o.sub || 'en el Bloqueo'});   // 🤺 (los creeps, 2026-10-21, js/62)
   const bendecir = o => fijo('bendecir-flotante', '<span class="bendecir-brillo">✨</span>', 'Flash de creep', o && {...o, sub: o.sub || 'Bendecir el arma…'});   // ✨ (los creeps, 2026-10-24, js/71)
-  return {moneda, wildcard, empower, enyetar, malDeOjo, blindaje, shield, estoicismo, shockwave, desarmar, bendecir, reroll, apilar};
+  // 😇 El Pacto (2026-10-28): Flotantes.pacto({mostrar, activo, alClic}) — siempre a la vista para quien tiene un personaje; apagado si ya lo gastó.
+  function pacto(o){
+    fijo('pacto-flotante', '<span class="pacto-halo">😇</span>', 'Pacto', o && {...o, sub: o.activo ? 'activo: te protege de morir' : 'gastado'});
+    const b = document.getElementById('pacto-flotante');
+    if(!b) return;
+    b.classList.toggle('pacto-off', !o.activo);
+    b.title = o.activo ? 'Pacto activo: si tu vida llega a 0, revivís solo y quedás Titilando (invulnerable) hasta tu próximo turno. Se gasta al usarse.'
+      : 'Pacto gastado: se renueva cuando la historia lo dé (una entidad espiritual que te brinde otro, por el precio que decida el GM).';
+    apilar();
+  }
+  return {pacto, moneda, wildcard, empower, enyetar, malDeOjo, blindaje, shield, estoicismo, shockwave, desarmar, bendecir, reroll, apilar};
 })();

@@ -21,7 +21,7 @@ function estadoGrupoHtml(){
     const temp = estados.filter(x => egTemporal(x.e)), fijos = estados.filter(x => !egTemporal(x.e));
     const cayo = num(d.hp) <= 0;
     return `<div class="eg-pj">
-      <div class="eg-cab"><b>${esc(nombreDe(t))}</b>${cayo ? ' <span class="eg-cayo">💀 en el piso</span>' : ''}</div>
+      <div class="eg-cab"><b>${esc(nombreDe(t))}</b>${((vinculo(t) || {}).resumen || {}).pacto ? ' <span title="Pacto activo: si cae, revive solo">😇 pacto</span>' : ''}${cayo ? ' <span class="eg-cayo">💀 en el piso</span>' : ''}</div>
       <div class="eg-recs">${barra('❤ Vida', d.hp, d.hpMax, HP_COLOR)}${barra('✦ SP', d.sp, d.spMax, SP_COLOR)}${barra('⚡ No2', d.no2, d.no2Max, NO2_COLOR)}</div>
       ${temp.length ? temp.map(({e, i}) => `<div class="eg-est ${e.polaridad === 'buff' ? 'buff' : e.polaridad === 'debuff' ? 'debuff' : ''}">
           <span class="eg-nom">${esc(e.nombre)}${num(e.stacks) > 1 ? ` ×${fmt(num(e.stacks))}` : ''}</span>

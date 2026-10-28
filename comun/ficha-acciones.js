@@ -175,6 +175,14 @@ const FichaAcciones = (() => {
       S.spGastado = 0;
       return 'Llama de Fénix';
     }
+    // 😇 El Pacto (2026-10-28): revive solo, Titilando, y se gasta. Va antes que el Ankh (no lo gasta).
+    if(S.meta && S.meta.pacto){
+      const cp = FichaCalculo.calcular(S);
+      S.meta.pacto = false;
+      S.hp = Combatiente.pactoVida(Number.isNaN(cp.final.hpmax) ? 1 : cp.final.hpmax);
+      ponerTitilando(S);
+      return 'El Pacto';
+    }
     const idx = S.cinturon.findIndex(i => i.nombre === 'Ankh de Reencarnación' && num(i.unidades) > 0);
     if(idx < 0) return null;
     return aplicarRevivirConAnkh(S, 'cinturon', S.cinturon[idx].id);

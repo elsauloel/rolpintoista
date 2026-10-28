@@ -2015,6 +2015,18 @@ prueba('🔥 Llama de Fénix (2026-10-20): un personaje o un creep que cae con l
   igual([r, S.hp === hpmax, S.spGastado, S.efectos.some(e => e.fenix), S.efectos.some(e => e.titilando), rc, sc.hp, sc.estados.some(e => e.titilando), CreepAcciones.fenixCreep(sc2), sc2.hp],
     ['Llama de Fénix', true, 0, false, true, true, 30, true, false, 0]);
 });
+prueba('😇 El Pacto (2026-10-28): con la vida en 0 revive solo con un cuarto, Titilando, y se gasta; antes del Ankh, después de la llama', () => {
+  const S = {...structuredClone(FichaGuardado.DEFAULT), catalogo: [], efectos: [], cinturon: [{id: 'a', nombre: 'Ankh de Reencarnación', unidades: 1}]};
+  S.meta.pacto = true;
+  const hpmax = FichaCalculo.calcular(S).final.hpmax;
+  S.hp = 0;
+  const r = FichaAcciones.revisarAnkh(S);
+  const vida = S.hp, tit = S.efectos.some(e => e.titilando), sigue = S.meta.pacto, ankh = S.cinturon[0].unidades;
+  S.hp = 0;
+  const r2 = FichaAcciones.revisarAnkh(S);   // sin pacto: ahora sí el Ankh
+  igual([r, vida === Math.max(1, Math.floor(hpmax / 4)), tit, sigue, ankh, r2, FichaResumen.resumen({...S, meta: {...S.meta, pacto: true}}).pacto, Combatiente.pactoVida(30), Combatiente.pactoVida(2)],
+    ['El Pacto', true, true, false, 1, 'Ankh de Reencarnación', true, 7, 1]);
+});
 prueba('Poción de SP menor (2026-10-20): un tercio del SP máximo, para arriba', () => {
   const it = CATALOGO_BASE.find(i => i.nombre === 'Poción de SP menor');
   const conMax = m => { const S = {spGastado: 99}; const orig = FichaBotonera.spMaximo; FichaBotonera.spMaximo = () => m; try{ return FichaAcciones.restaurarSpDeConsumo(S, it); }finally{ FichaBotonera.spMaximo = orig; } };

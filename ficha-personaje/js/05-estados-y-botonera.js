@@ -317,6 +317,7 @@ function renderAll(){
   $('#f-nombre').value = S.meta.nombre;
   fichaIdentidadRender();  // por si cambió el nombre del personaje
   ['raza','clase','subclase','nivel','exp','dde','wildcards','wildcardsMax'].forEach(k => $('#f-'+k).value = S.meta[k]);
+  if($('#f-pacto')) $('#f-pacto').value = S.meta.pacto ? 'si' : 'no';   // 😇 (2026-10-28)
   renderPortrait();
   $('#f-loot-normal').value = S.loot.normal;
   $('#f-loot-magico').value = S.loot.magico;

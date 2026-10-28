@@ -149,6 +149,7 @@ const FichaResumen = (() => {
       // 🫳 Lo que lleva en el cinturón, para un robo (2026-10-14, vtt-hexgrid/js/47): nombre y unidades.
       cinturon: (S.cinturon || []).filter(i => i && n(i.unidades) > 0 && !i.reservado).map(i => ({n: String(i.nombre || '').slice(0, 60), u: Math.min(99, Math.round(n(i.unidades)))})).slice(0, 20),
       wildcards: Math.max(0, Math.round(n(S.meta && S.meta.wildcards))),   // 🃏 (2026-10-15): el mapa muestra la carta y prende el 🪙
+      pacto: !!(S.meta && S.meta.pacto),   // 😇 (2026-10-28): el botón de arriba del mapa
       moneda: [...(S.cinturon || []), ...(S.inventario || [])].some(i => i && (i.rerollMoneda || /moneda re-?roll/i.test(String(i.nombre || ''))) && n(i.unidades) > 0 && !i.reservado && !i.enMesa),
       pisadaAtenta: n(c.final.pisadaatenta) > 0 || !!desarmaTrampasDe(S), inamovible: n(c.final.inamovible), recuperarse: n(c.final.recuperarse), reflejos: n(c.final.reflejos),   // los primeros casilleros de cada turno, gratis (el mapa los descuenta del costo de moverse)   // Campo de visión (base 6 + ítems, pasivas y estados): el mapa lo suma a la luz de la escena para el radio de cada token
       // Crítico (2026-09-25): el mapa arma con esto la Calculadora de crítico sin que haya que escribirlo (equipo, habilidades y estados ya sumados).

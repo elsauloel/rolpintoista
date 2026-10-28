@@ -440,6 +440,15 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
       const q = Combatiente.revivirFenix(efectos, typeof estadosPresetFicha === 'function' ? estadosPresetFicha() : []);
       if(q){ efectos.splice(0, efectos.length, ...q); datos.hp = Math.max(1, num(rs.hpMax) || 1); datos.spGastado = 0; fenix = true; }
     }
+    // 😇 El Pacto (2026-10-28): si no lo levantó la llama, lo levanta el pacto: revive con un cuarto de la vida, Titilando, y el pacto se gasta.
+    let pacto = false;
+    if(previo > 0 && datos.hp <= 0 && datos.meta && datos.meta.pacto){
+      const tit = Combatiente.estadoTitilando(typeof estadosPresetFicha === 'function' ? estadosPresetFicha() : []);
+      if(tit) Combatiente.agregarEstado(efectos, tit);
+      datos.meta.pacto = false;
+      datos.hp = Combatiente.pactoVida(rs.hpMax);
+      pacto = true;
+    }
     // Orbe de absorción (js/26): el daño mágico o elemental que llegó a la vida devuelve SP, una vez por turno.
     let absorbe = 0;
     if(o && o.magico && r.recibido > 0 && num(rs.orbeAbsorcion) > 0 && !num(datos.ataquesArma._absorbe)){
@@ -448,12 +457,13 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
       datos.spGastado = num(datos.spGastado) - absorbe;
     }
     tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
-    if(datosEf && JSON.stringify(efectos) !== efectosAntes) tx.set(efectosRef, {json: JSON.stringify(datosEf), actualizado: ts});   // el escudo que bajó, lo que absorbió la Armadura arcana
+    if(datosEf && JSON.stringify(efectos) !== efectosAntes) tx.set(efectosRef, {json: JSON.stringify(datosEf), actualizado: ts});   // el escudo que bajó, lo que absorbió la Armadura arcana, Titilando
     // El escudo que bajó también en el resumen público (2026-10-11, probando Shield: el token seguía mostrando 14/14 con el escudo gastado).
     const estPub = datosEf && JSON.stringify(efectos) !== efectosAntes && Array.isArray(rs.estados) ? escudosAlResumen(rs.estados, efectos) : null;
     tx.update(base, {actualizado: ts, 'resumen.hp': datos.hp, ...(absorbe ? {'resumen.sp': num(rs.sp) + absorbe} : {}), ...(estPub ? {'resumen.estados': estPub} : {}), ...(aliento ? {'resumen.ultimoAlientoUsado': true} : {}),
-      ...(fenix ? {'resumen.estados': (estPub || rs.estados || []).filter(x => !(x && /^llama de f[eé]nix/i.test(String(x.nombre || '')))).concat([{nombre: 'Titilando', polaridad: 'buff', invulnerable: true}])} : {})});
-    return {r, previo, nuevo: fenix ? 0 : datos.hp, absorbe, aliento, fenix, hpFenix: datos.hp};
+      ...(fenix ? {'resumen.estados': (estPub || rs.estados || []).filter(x => !(x && /^llama de f[eé]nix/i.test(String(x.nombre || '')))).concat([{nombre: 'Titilando', polaridad: 'buff', invulnerable: true}])} : {}),
+      ...(pacto ? {'resumen.pacto': false, ...(fenix ? {} : {'resumen.estados': (estPub || rs.estados || []).concat([{nombre: 'Titilando', polaridad: 'buff', invulnerable: true}])})} : {})});
+    return {r, previo, nuevo: fenix || pacto ? 0 : datos.hp, absorbe, aliento, fenix, pacto, hpFenix: datos.hp};
   });
   if(res.aliento){
     const txt = `${nombreDe(t)} iba a caer, pero el Anillo del último aliento lo sostiene con 1 de vida (una vez por día)`;
@@ -466,6 +476,12 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   if(res.fenix){
     toast(`🔥 ${nombreDe(t)}: ¡la Llama de Fénix lo levanta! Revive con ${fmt(res.hpFenix)} HP y todo el SP, Titilando.`);
     try{ momentoAbrir({tipo: 'fenix', icono: '🔥', titulo: `${nombreDe(t)} renace de sus cenizas`, estado: 'listo', resultado: `La Llama de Fénix lo levanta con ${fmt(res.hpFenix)} HP y todo el SP; queda Titilando hasta su próximo turno.`}); }catch(e){}
+  }
+  if(res.pacto){
+    const txt = `El pacto de ${nombreDe(t)} lo protege: revive con ${fmt(res.hpFenix)} HP y queda Titilando (invulnerable) hasta su próximo turno. El pacto se gastó.`;
+    toast(`😇 ${txt}`);
+    try{ mesaLinea(`😇 ${txt}`, 'recordatorio'); }catch(e){}
+    try{ momentoAbrir({tipo: 'fenix', icono: '😇', titulo: `${nombreDe(t)} cae… y su pacto lo levanta`, estado: 'listo', resultado: txt, datos: {...(t.duenoUid ? {paraUid: t.duenoUid} : {}), aviso: true}}); }catch(e){}
   }
   if(res.absorbe) mesaLinea(`🔮 Orbe de absorción: ${nombreDe(t)} recupera ${res.absorbe} SP del daño mágico`);
   await mitiMitiCobrar(t, prot, res);

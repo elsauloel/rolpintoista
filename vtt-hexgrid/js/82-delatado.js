@@ -33,7 +33,7 @@ function delatadosCeldas(){
 async function delatar(tokenId){
   if(!soyGM || !tokenId) return;
   const t = tokens.get(tokenId);
-  if(!t || t.tipo !== 'creep' || t.oculto) return;
+  if(!t || t.oculto) return;
   const ya = delatados[tokenId];
   if(ya && ya.col === t.col && ya.fila === t.fila && num(ya.mant) === num(mantenimientoNumero)) return;
   const cambios = {[`tokens.${tokenId}`]: {col: t.col, fila: t.fila, mant: num(mantenimientoNumero)}, actualizado: firebase.firestore.FieldValue.serverTimestamp()};
@@ -53,7 +53,7 @@ if(typeof Duelo !== 'undefined' && Duelo.crear){
     const r = await crearSinDelatar.call(this, cfg, tokDef, miTokenId, ...resto);
     try{
       const yo = cfg && cfg.yo;
-      if(soyGM && yo && yo.tipo === 'creep' && tokDef && tokDef.tipo !== 'creep') delatar(miTokenId || tokenIdDeRef(yo.ref));
+      if(soyGM && yo && tokDef && (yo.tipo === 'creep') !== (tokDef.tipo === 'creep')) delatar(miTokenId || tokenIdDeRef(yo.ref));
     }catch(err){ console.error('No se pudo delatar al creep:', err); }
     return r;
   };
@@ -63,8 +63,38 @@ if(typeof crearElementoZona === 'function'){
   const zonaSinDelatar = crearElementoZona;
   crearElementoZona = async function(centro, cfg){
     const r = await zonaSinDelatar(centro, cfg);
-    try{ if(soyGM && cfg && cfg.casteadorTipo === 'creep' && cfg.casteadorRef) delatar(tokenIdDeRef(cfg.casteadorRef)); }
+    try{ if(soyGM && cfg && cfg.casteadorRef) delatar(tokenIdDeRef(cfg.casteadorRef)); }
     catch(err){ console.error('No se pudo delatar al creep:', err); }
     return r;
   };
 }
+
+/* Lo de los jugadores (dueño, el mismo día: «me resulta particularmente relevante para personajes con rango, casters y armas de rango, pero debe aplicar a
+   todos»): un personaje que ataca a un creep o deja una zona también se delata (al GM le importa si estaba en sigilo o invisible). Como la marca la escribe
+   solo el GM, su pantalla mira los duelos y las zonas nuevas que crean los jugadores. Lo de antes de abrir el mapa no cuenta. */
+let delatarDuelosCorte = null;
+const delatarZonasVistas = new Set();
+let delatarZonasListo = false;
+setInterval(() => {
+  try{
+    if(!soyGM || typeof fbDb === 'undefined' || !FB_CAMPANA) return;
+    if(!delatarDuelosCorte){
+      let primera = true;
+      delatarDuelosCorte = fbDb.collection(fbRutaCampana('duelos')).orderBy('creado', 'desc').limit(8).onSnapshot(snap => {
+        if(primera){ primera = false; return; }
+        snap.docChanges().forEach(ch => {
+          if(ch.type !== 'added') return;
+          const d = ch.doc.data(), a = d.atacante || {}, de = d.defensor || {};
+          if(a.tipo !== 'creep' && de.tipo === 'creep') delatar(a.tokenId || tokenIdDeRef(a.ref));
+        });
+      }, err => console.error('No se pudo mirar los duelos (delatar):', err));
+    }
+    // Las zonas que deja un jugador (un hechizo que queda en el piso).
+    elementos.forEach((el, id) => {
+      if(delatarZonasVistas.has(id)) return;
+      delatarZonasVistas.add(id);
+      if(delatarZonasListo && el && el.zona && !el.trampa && el.zonaCasteadorTipo === 'pj' && el.zonaCasteadorRef) delatar(tokenIdDeRef(el.zonaCasteadorRef));
+    });
+    delatarZonasListo = true;
+  }catch(err){}
+}, 1000);

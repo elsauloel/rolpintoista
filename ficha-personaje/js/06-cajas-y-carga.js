@@ -45,6 +45,7 @@ document.addEventListener('input', e => {
     S.loot[t.id.replace('f-loot-','')] = num(t.value); return;
   }
   if(t.id === 'f-wildcards'){ S.meta.wildcards = num(t.value); return; }
+  if(t.id === 'f-pacto'){ S.meta.pacto = t.value === 'si'; return; }   // 😇 el Pacto (2026-10-28)
   if(t.id === 'f-wildcardsMax'){ S.meta.wildcardsMax = num(t.value); return; }
   if(t.dataset.lootEsp !== undefined){
     const row = (S.loot.especial||[]).find(l => l.id === t.dataset.lootEsp);

@@ -157,12 +157,26 @@ function mantenimientoEscuchar(){
 // defecto hasta que se sepa el modo real (ver vtt-hexgrid/CLAUDE.md).
 let modoMapa = 'combate';
 let modoMapaListo = false;   // ya se leyó el modo real (para cobrar No2 solo con el modo confirmado)
+// El modo del mapa PUBLICADO (2026-10-28: leía siempre el del mapa principal; con otro mapa publicado —ENTRADA MINAS en El origen— la ficha
+// decía narrativo y el mapa combate, y el baúl común se abría en la ficha pero no en el mapa). `mapa/activo` dice cuál es; el modo de un mapa guardado
+// vive en `mapas/<id>/estado/modo` (como rutaMapaEstado del mapa).
+let modoMapaCorte = null;
 function modoMapaEscuchar(){
-  fbDb.doc(fbRutaCampana('mapa/modo')).onSnapshot(doc => {
-    modoMapaListo = true;
-    modoMapa = (doc.exists && doc.data().modo === 'narrativo') ? 'narrativo' : 'combate';
-    renderBotoneraSiAbierta();
-  }, err => console.error('Error escuchando el modo del mapa:', err));
+  let mapaId = null;
+  const escucharModo = id => {
+    if(modoMapaCorte) modoMapaCorte();
+    modoMapaCorte = fbDb.doc(fbRutaCampana(id ? `mapas/${id}/estado/modo` : 'mapa/modo')).onSnapshot(doc => {
+      modoMapaListo = true;
+      modoMapa = (doc.exists && doc.data().modo === 'narrativo') ? 'narrativo' : 'combate';
+      renderBotoneraSiAbierta();
+    }, err => console.error('Error escuchando el modo del mapa:', err));
+  };
+  fbDb.doc(fbRutaCampana('mapa/activo')).onSnapshot(doc => {
+    const id = (doc.exists && doc.data().mapaId && doc.data().mapaId !== '_principal') ? doc.data().mapaId : null;   // ('_principal' = MAPA_PRINCIPAL del mapa)
+    if(id === mapaId && modoMapaCorte) return;
+    mapaId = id;
+    escucharModo(id);
+  }, err => { console.error('Error escuchando el mapa publicado:', err); if(!modoMapaCorte) escucharModo(null); });
 }
 
 async function mantenimientoRevisar(){

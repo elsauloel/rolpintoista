@@ -50,12 +50,18 @@ function hudDatos(t){
 function hudHtml(t){
   const d = hudDatos(t);
   const puede = puedoCambiarVida(t);
+  // El máximo, a la vista (dueño, 2026-10-28: «te dice cuánto te queda pero no cuánto es tu máximo; esa información es relevante y debería ser
+  // accesible fácilmente desde ese mismo menú»): chiquito debajo del círculo, en el cartel al pasar el mouse y al lado del campo al editarlo.
+  const NOMBRE_RECURSO = {hp: 'Vida', sp: 'SP', no2: 'No2'};
   const circulo = (clave, valor, color) => {
     if(valor === null || valor === undefined) return '';
+    const maximo = d[clave + 'Max'], hayMax = maximo !== null && maximo !== undefined && num(maximo) > 0;
+    const cuanto = `${NOMBRE_RECURSO[clave]}: ${fmt(valor)}${hayMax ? ` de ${fmt(maximo)} (máximo)` : ''}`;
     if(hudEditando === clave && puede){
-      return `<input class="hud-in" data-hud-in="${clave}" style="border-color:${color}" inputmode="decimal" placeholder="${fmt(valor)}" title="Escribí el valor, o +5 / -3, y apretá Enter">`;
+      return `<span class="hud-in-caja"><input class="hud-in" data-hud-in="${clave}" style="border-color:${color}" inputmode="decimal" placeholder="${fmt(valor)}" title="${esc(cuanto)} · escribí el valor, o +5 / -3, y apretá Enter">`
+        + `<span class="hud-in-max" style="color:${color}">${fmt(valor)}${hayMax ? ` / ${fmt(maximo)} máx.` : ''}</span></span>`;
     }
-    return `<button type="button" class="hud-circulo" data-hud-valor="${clave}" style="border-color:${color}" ${puede ? '' : 'disabled'} title="${puede ? 'Clic para cambiar' : pausaSoloMirar() ? 'Partida en pausa: desde el mapa no se cambia (en tu ficha sí)' : 'Solo lo cambia su dueño'}">${fmt(valor)}</button>`;
+    return `<button type="button" class="hud-circulo" data-hud-valor="${clave}" style="border-color:${color}" ${puede ? '' : 'disabled'} title="${esc(cuanto)} · ${puede ? 'clic para cambiar' : pausaSoloMirar() ? 'partida en pausa: desde el mapa no se cambia (en tu ficha sí)' : 'solo lo cambia su dueño'}">${fmt(valor)}${hayMax ? `<span class="hud-max">/${fmt(maximo)}</span>` : ''}</button>`;
   };
   const icono = (clave, simbolo, titulo, activo) =>
     `<button type="button" class="hud-circulo icono${activo ? ' abierto' : ''}" data-hud-boton="${clave}" title="${titulo}">${simbolo}</button>`;
@@ -537,8 +543,10 @@ async function resistenciasDe(t, el, inv){
 function hudHpHtml(t, d){
   const danio = hpModo === 'danio';
   const def = d.def === null || d.def === undefined ? null : d.def;
+  const hayMax = d.hpMax !== null && d.hpMax !== undefined && num(d.hpMax) > 0;
   return `<div class="hud-globo hud-hp">
     <h3>Vida · ${esc(nombreDe(t))}</h3>
+    <div class="hud-hp-cuanto">❤ <b>${fmt(num(d.hp))}</b>${hayMax ? ` de <b>${fmt(num(d.hpMax))}</b> (máximo)` : ''}</div>
     <div class="hud-hp-modos">
       <button type="button" class="hud-mini${danio ? ' activo' : ''}" data-hud-hpmodo="danio">1 · Recibe daño</button>
       <button type="button" class="hud-mini${danio ? '' : ' activo'}" data-hud-hpmodo="directo">2 · HP directo</button>

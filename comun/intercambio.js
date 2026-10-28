@@ -500,7 +500,7 @@ const Intercambio = (() => {
     if(document.getElementById('intercambio-css')) return;
     const s = document.createElement('style');
     s.id = 'intercambio-css';
-    s.textContent = `.ix-fondo{position:fixed;inset:0;z-index:98600;background:rgba(6,8,14,.62);display:flex;align-items:center;justify-content:center;padding:12px;font-family:inherit}
+    s.textContent = `.ix-fondo{position:fixed;inset:0;z-index:99060;background:rgba(6,8,14,.62);display:flex;align-items:center;justify-content:center;padding:12px;font-family:inherit}
       .ix-fondo.ix-sin-fondo{background:transparent;pointer-events:none;align-items:flex-start;padding-top:70px}
       .ix-fondo.ix-sin-fondo .ix-caja{pointer-events:auto}
       .ix-caja{background:#151a26;color:#e9ecf4;border:1px solid #39435c;border-radius:16px;width:min(640px,100%);max-height:92vh;overflow:auto;box-shadow:0 18px 60px rgba(0,0,0,.6)}

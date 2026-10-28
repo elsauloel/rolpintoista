@@ -1284,7 +1284,7 @@ Percepción) por ahora **sí sirve**. **A decidir:** ¿se deja así, se prohíbe
 
 **Decidido (dueño, 2026-10-27):** «la zona naranja no dispara nada de detección de trampas»: queda como está (se puede, sin tirada).
 
-### P227 — Escudo y Vida extra: ¿lo que absorbe cuenta como daño? (2026-10-27) ✅ decidida y programada (salvo el nombre del Envión)
+### P227 — Escudo y Vida extra: ¿lo que absorbe cuenta como daño? (2026-10-27) ✅ decidida y programada
 
 **Dueño (2026-10-27):** «el escudo especial… a fines prácticos funciona como si fuera una barra de vida extra, que al consumirse se consumió el
 escudo. Pero eso no cuenta como daño, cuenta como el escudo… una trampa que perfora uno a alguien que tiene un escudo especial, no le aplica el
@@ -1310,7 +1310,7 @@ simplemente una curación». O sea, **«Vida extra N» = te curás N y lo que pa
 extra). **Vida extra:** Drenar vida, Colmillo de la Reina Araña, **Relicario de sangre** (cambia: «cada vez que matás a alguien con daño especial, te
 curás 10; si te pasás de tu máximo, eso se convierte en vida extra»), **Anillo de la siesta**, **Anillo del sereno** y **Anillo del escudo de la mañana**
 (siguen frenando solo su tipo de daño). **Escudo:** los Orbes de resguardo y del custodio, el Escudo de caparazón, el Anillo de cáscara protectora y
-todos los «claros» de arriba. **Programado (2026-10-28):** el Relicario ya estaba; los Orbes, el Escudo de caparazón y la Cáscara ya eran escudo; los anillos de la siesta, del sereno y del escudo de la mañana pasaron a Vida extra (lo que se llevan cuenta como daño). **El Envión cambia de nombre** (dueño: «no me cierra nada el nombre»): a elegir.
+todos los «claros» de arriba. **Programado (2026-10-28):** el Relicario ya estaba; los Orbes, el Escudo de caparazón y la Cáscara ya eran escudo; los anillos de la siesta, del sereno y del escudo de la mañana pasaron a Vida extra (lo que se llevan cuenta como daño). **El Envión cambió de nombre** (dueño: «no me cierra nada el nombre»): ahora es **Arrojo** (2026-10-27; «Envión» quedó como alias).
 
 **Relicario de sangre, efecto nuevo (dueño, 2026-10-27):** «sumale como efecto al relicario de sangre que toda curación cuenta como vida extra. Por
 ejemplo, te puedes tomar una poción y que suba como vida extra hasta el final del combate. Obviamente que si te la bajan también». Con el Relicario

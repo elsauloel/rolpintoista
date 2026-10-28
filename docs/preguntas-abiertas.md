@@ -1347,3 +1347,17 @@ resistencia antes del aviso? (El Enyetar de los jugadores sigue con la contienda
 
 **Dueño (2026-10-28): «está bien que no tire resistencia; vamos a dejarlo así para hacer un paso menos. Debería ser bastante costoso, así que recordame eso
 para corroborar».** Queda sin la contienda. Pendiente: revisar el costo (hoy 5 SP o cooldown 3; el doble en turno ajeno) — anotado en `docs/pendientes.md`.
+
+### P231 — 🕳 Excavar: ¿bajo tierra ve? ¿Con qué arma sale? ¿Cancelar el ataque deja salir gratis? (2026-10-28)
+
+**Contexto (visto probando Excavar con la cuenta del GM, «Claude · pruebas»):**
+1. El Tunelero, **moviéndose bajo tierra**, entró en un cono que tocaba a juan (en sigilo) y **lo detectó**: «juan perdió el sigilo». ¿Un creep bajo tierra
+   ve (y detecta en sigilo), o mientras está abajo no ve nada hasta salir?
+2. Al salir, el ataque de Excavar usa **el arma que tiene en la mano**: como venía de disparar, preguntó «¿Qué flecha?» y apuntaba con el arco a 14 casillas,
+   aunque la habilidad dice «sale apuñalando» (y antes salía con la Daga). ¿Sale siempre con un arma de mano (la daga), o con la que tenga?
+3. Si al salir se cancela el ataque (Esc), se le devuelve el costo y el cooldown («canceló Excavar»), **pero igual queda afuera**: salir le salió gratis.
+   ¿Cancelar lo deja abajo, o salir sin atacar está bien (y entonces, ¿cuesta algo?)?
+
+**Propuesta:** 1) bajo tierra no ve ni detecta (sale y recién ahí); 2) sale con su arma de mano (la daga), como dice el texto; 3) cancelar el ataque lo deja
+abajo (no pasó nada). — sin decidir.
+

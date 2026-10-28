@@ -299,7 +299,11 @@
 > - [x] **⚔ El cuadro del duelo visto por el GM** (la cuenta del daño, el «🏹 tiro alto (−2)» en la declaración): se vio desde el jugador. ✅ **La cuenta del daño,
 >   probada desde el GM (2026-10-28)**: crítico ×4 → «24 derecho a la vida… al aplicarlo se ve la cuenta» y, al tocar «Aplicar por Clementino», «Tirada de daño 6 ·
 >   crítico ×4 · = el golpe 24 · Crítico: no se resta la Defensa · = ENTRA A LA VIDA 24», Clementino 12 → 0. (El tiro alto queda visto solo del jugador.)
-> - [ ] **🕳 Excavar: salir en su casilla** y **la estela que se va al empezar su turno** (con el Tunelero en el orden de turnos): todo del lado del GM.
+> - [x] **🕳 Excavar: salir en su casilla** y **la estela que se va al empezar su turno** (con el Tunelero en el orden de turnos): todo del lado del GM.
+>   ✅ **Probado (2026-10-28)**: en su turno, Excavar → bajo tierra (el GM lo ve transparente sobre el pozo); se movió una casilla por abajo (deja la estela de
+>   tierra); Excavar otra vez → sale **en su casilla**, al lado de juan, y pide el objetivo; la estela siguió a la vista toda la ronda y **se borró al empezar
+>   su turno siguiente** (ronda 19). Para preparar: se lo metió en el orden después del turno de ese momento. Lo raro, a decidir en **P231**: bajo tierra
+>   detectó a juan en sigilo; el ataque al salir usó el arco («¿Qué flecha?») y no la daga; cancelar ese ataque devolvió el costo y lo dejó afuera igual.
 > - [ ] **🏹 Los arcos Buenos (11)**: quedaron sin hacer. Al final de la tanda del 2026-10-28 las dos ventanas de Chrome quedaron minimizadas (el mapa
 >   medía 0 × 0) y no se pudo seguir mirando nada; se paró ahí para no probar «por detrás».
 

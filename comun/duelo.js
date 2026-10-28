@@ -345,6 +345,14 @@ const Duelo = (() => {
     dibujarChips();
     avisarPagina();
   }
+  /* ✕ con el duelo en curso (2026-10-28, dueño: «un jugador, en lugar de apretar minimizar, apretó la X de cerrar y quedamos sin saber qué hacer; tuve que
+     cancelar el duelo y resolverlo a mano. Cuando un duelo está sucediendo, se tiene que poder minimizar o cancelar, pero no cerrar»): cerrar lo
+     descartaba en esa pantalla (sin el botón «Ver duelo» y sin los pedidos de tirada). Mientras sigue vivo, la ✕ minimiza; el «Cerrar» vuelve al terminar. */
+  const enCurso = d => !!d && d.estado !== 'resuelto' && d.estado !== 'cancelado';
+  function cerrarOMinimizar(){
+    if(actual && (!actual.dato || enCurso(actual.dato))){ if(actual.dato) minimizar(); else _toast('El duelo todavía está cargando: minimizalo cuando aparezca'); return; }
+    cerrar();
+  }
   function minimizar(){
     const f = document.getElementById('duelo-fondo');
     if(!actual || !f) return;
@@ -1554,9 +1562,8 @@ const Duelo = (() => {
     actual = null;
     const f = fondo();
     f.classList.remove('min');
-    f.innerHTML = '<div class="duelo-caja"><div class="duelo-cab"><span>⚔ Duelo</span><div class="bt"><button type="button" data-min title="Minimizar">—</button><button type="button" data-x title="Cerrar">✕</button></div></div><div class="duelo-cuerpo"><div class="duelo-nota">Abriendo…</div></div></div>';
+    f.innerHTML = '<div class="duelo-caja"><div class="duelo-cab"><span>⚔ Duelo</span><div class="bt"><button type="button" data-min title="Minimizar">—</button></div></div><div class="duelo-cuerpo"><div class="duelo-nota">Abriendo…</div></div></div>';
     f.querySelector('[data-min]').onclick = minimizar;
-    f.querySelector('[data-x]').onclick = cerrar;
     actual = {id, dato: null, baja: null, min: false};
     actual.baja = col().doc(id).onSnapshot(doc => {
       if(!doc.exists){ _toast('Ese duelo ya no existe'); cerrar(); return; }
@@ -2599,7 +2606,7 @@ const Duelo = (() => {
     const cajaAntes = f.querySelector('.duelo-caja'), scrollAntes = cajaAntes ? cajaAntes.scrollTop : 0;   // al redibujar no se pierde dónde estaba
     const mostrarBloqueo = d.fase === 'bloqueo' || !!d.bloq || (d.estado === 'empate' && d.empate && d.empate.par === 'bloqueo') || !!d.fuerza;
     f.innerHTML = `<div class="duelo-caja">
-      <div class="duelo-cab"><span>${d.hab ? '✨' : '⚔'} ${_esc(nombreAtaque)}</span><div class="bt"><button type="button" data-min title="Minimizar (queda el botón «${d.hab ? 'Ver ejecución' : 'Ver duelo'}»)">—</button><button type="button" data-x title="Cerrar">✕</button></div></div>
+      <div class="duelo-cab"><span>${d.hab ? '✨' : '⚔'} ${_esc(nombreAtaque)}</span><div class="bt"><button type="button" data-min title="Minimizar (queda el botón «${d.hab ? 'Ver ejecución' : 'Ver duelo'}»)">—</button>${enCurso(d) ? '' : '<button type="button" data-x title="Cerrar">✕</button>'}</div></div>
       <div class="duelo-cuerpo">
         <div class="duelo-paso"><h4><span class="n">1</span>Declaración</h4>
           <div class="duelo-vs">
@@ -2624,7 +2631,7 @@ const Duelo = (() => {
         <div class="duelo-pie">
           ${puedoCancelar ? `<button type="button" class="sec" data-cancelarduelo>Cancelar${d.hab ? '' : ' duelo'}</button>` : ''}
           <button type="button" class="sec" data-min2>Minimizar</button>
-          <button type="button" class="sec" data-x2>Cerrar</button>
+          ${enCurso(d) ? '' : '<button type="button" class="sec" data-x2>Cerrar</button>'}
         </div>
       </div></div>${rerollBtnHtml(d)}`;
     if(min) f.classList.add('min');
@@ -2658,8 +2665,9 @@ const Duelo = (() => {
     }
     f.querySelector('[data-min]').onclick = minimizar;
     f.querySelector('[data-min2]').onclick = minimizar;
-    f.querySelector('[data-x]').onclick = cerrar;
-    f.querySelector('[data-x2]').onclick = cerrar;
+    const bx = f.querySelector('[data-x]'), bx2 = f.querySelector('[data-x2]');   // (solo con el duelo terminado: en curso, minimizar o cancelar)
+    if(bx) bx.onclick = cerrarOMinimizar;
+    if(bx2) bx2.onclick = cerrarOMinimizar;
     const bc = f.querySelector('[data-cancelarduelo]');
     if(bc) bc.onclick = () => cancelarDuelo(d);
     // Un duelo cancelado se cierra solo en todas las pantallas (2026-10-13, dueño: quedaban abiertos «Duelo cancelado» en los mapas de los demás

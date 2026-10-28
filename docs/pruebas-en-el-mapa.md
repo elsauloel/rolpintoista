@@ -304,6 +304,16 @@
 >   tierra); Excavar otra vez → sale **en su casilla**, al lado de juan, y pide el objetivo; la estela siguió a la vista toda la ronda y **se borró al empezar
 >   su turno siguiente** (ronda 19). Para preparar: se lo metió en el orden después del turno de ese momento. Lo raro, a decidir en **P231**: bajo tierra
 >   detectó a juan en sigilo; el ataque al salir usó el arco («¿Qué flecha?») y no la daga; cancelar ese ataque devolvió el costo y lo dejó afuera igual.
+> - [x] **🕳 Excavar con lo decidido en P231 (2026-10-28, cuenta del GM)**: el Tunelero bajo tierra → abajo a la derecha «🕳 Tunelero (prueba) · ⬆ Salir · ⚔ Atacar»
+>   (Atacar porque está pegado a juan); ⚔ Atacar → sale y apunta **sin preguntar flecha** (con una Daga; solo con el Arco no puede salir atacando); Esc →
+>   «¿Vuelve bajo tierra o queda afuera?» → volvió abajo (y se le devolvió lo cobrado); ⬆ Salir → sale sin atacar, Mesa «sale de abajo de la tierra (sin
+>   atacar)», los botones desaparecen. Arreglado al verlo: el alcance al salir era el del arco (14 casillas). **Falta**: Excavar de un **jugador** (la
+>   habilidad de Misceláneas) — juan se perdió (ver abajo); hace falta un personaje con un arma cuerpo a cuerpo. Y pegar las reglas (la estela de un jugador).
+> - [ ] **✨ El que se delata aparece con ondas** (2026-10-28, programado): un token escondido en la niebla que ataca se revela con el anillo y las ondas del
+>   aviso de turno, 4,5 s. Ver en el mapa con un creep en la niebla que dispare.
+> - ⚠ **juan (de «Claude · pruebas») quedó en blanco (2026-10-28)**: al abrirlo desde la ficha, la ficha estaba rota (desde las 10:01, `jobCostoDe` declarado
+>   dos veces en `ficha-personaje/js/10`) y guardó la hoja vacía encima. Arreglado (fc80c9ae) y con un seguro: si la ficha no se puede armar, queda en solo
+>   lectura. El origen, revisado: intacto. juan no se puede recuperar (no había respaldo): hay que rehacerlo o crear otro personaje de prueba.
 > - [ ] **🏹 Los arcos Buenos (11)**: quedaron sin hacer. Al final de la tanda del 2026-10-28 las dos ventanas de Chrome quedaron minimizadas (el mapa
 >   medía 0 × 0) y no se pudo seguir mirando nada; se paró ahí para no probar «por detrás».
 

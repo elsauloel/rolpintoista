@@ -528,6 +528,11 @@
 >   (como GM). El código da bien la fórmula a un personaje nuevo y en «Claude · pruebas» regenera; ninguna parte del código escribe un `0` (la
 >   migración de `ficha-guardado.js` respeta un `0` puesto a mano si ya tienen `spRegenAuto`). Si vuelve a pasar, buscar qué pantalla lo guardó.
 
+> **🚑 2026-10-28: la ficha estuvo rota de 10:01 a ~19:20** (`jobCostoDe` declarado en `js/05` y en `js/10`: el archivo no cargaba y, al abrir un personaje,
+> se guardaba la hoja vacía encima). Arreglado y con seguro (solo lectura si no se puede armar). El origen, intacto. **Pendiente**: rehacer a juan en «Claude ·
+> pruebas»; pegar las reglas de Firestore (la estela de un jugador bajo tierra, `tunel`); una revisión automática de nombres repetidos entre archivos (hoy,
+> a mano: `scratchpad/choques.py`).
+
 ## 🧪 De las pruebas en el mapa del 2026-10-27 (la tanda del Choque pesado; reporte: `reporte-choque-pesado-2026-10-27.md`)
 
 - [x] El Escudo humano de los creeps se llama así en todos lados (2026-10-27): la marca del creep, el Anuncio («le aplicó Escudo humano») y el cuadro del

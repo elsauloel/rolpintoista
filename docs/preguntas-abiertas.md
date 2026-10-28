@@ -1365,6 +1365,7 @@ abajo (no pasó nada). — sin decidir.
 especial). Si se cancela el ataque al salir, **se le pregunta: ¿vuelve bajo tierra o queda afuera?** Además: mientras está bajo tierra, **un botón flotante**
 abajo, donde aparece «Limpiar dados»: «⬆ Salir» y, si está pegado a un rival, también «⚔ Atacar». Y **Excavar también para jugadores**, en una clase
 «Misceláneas». **Hecho:** `Combatiente.sirveParaEmerger` / `armaParaEmerger`; js/12 (creep) y `FichaAcciones.ejecutarHabilidad` + js/11 (jugador); botones en
-js/46; la habilidad `miscelaneas-excavar` en `comun/skills-clase.js` (2 SP al salir atacando, 1 No2 al meterse, como la del creep; a confirmar).
+js/46; la habilidad `miscelaneas-excavar` en `comun/skills-clase.js`. **Costos (dueño, el mismo día):** meterse, 1 No2 y 1 SP (`excavarSp`); salir atacando,
+2 SP y los No2 de un ataque, con los bonos del creep: +3 PdG, +1d6 de daño, Crítico frecuente +1 y Rengo 1 turno (crítico: Rengo 2 y Lisiado 1).
 Salir con el botón es **sin costo** (a confirmar). Las reglas de Firestore nuevas (la estela de un jugador, `tunel`) hay que pegarlas.
 

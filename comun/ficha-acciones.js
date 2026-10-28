@@ -702,12 +702,17 @@ const FichaAcciones = (() => {
     const abajo = it.excavar && it.emerger && ui.bajoTierra ? ui.bajoTierra() : undefined;
     if(abajo === null){ ui.toast(`${it.nombre}: tu personaje no tiene token en este mapa`); return; }
     if(abajo === false){
+      // Meterse (dueño, 2026-10-28): 1 No2 y 1 SP (`excavarNo2`, `excavarSp`); salir atacando, lo de la habilidad (2 SP y los No2 del ataque).
       const costoE = Math.max(0, Math.round(num(it.excavarNo2 !== undefined ? it.excavarNo2 : 1)));
+      const spE = Math.max(0, Math.round(num(it.excavarSp)));
       if(costoE > num(S.nitros) && !forzar){ ui.avisarSinNitros(costoE, 'meterte bajo tierra', () => ejecutarHabilidad(S, id, armaId, true, ui)); return; }
+      if(spE > spDisponible(S) && !(await (ui.confirmar || (txt => Confirmar.preguntar(txt, {titulo: it.nombre, icono: '🕳', si: 'Igual'})))(`Meterte bajo tierra cuesta ${fmt(spE)} SP y tenés ${fmt(spDisponible(S))}. ¿Igual?`))) return;
+      if(spE && Combatiente.sangraPorSp(S.efectos) && !(await confirmarMaldito(S, spE, ui, it.nombre))) return;   // 🩸 Maldito
       if(!(await ui.excavar(it))) return;
       S.nitros = num(S.nitros) - (forzar && costoE > num(S.nitros) ? gastoNitrosForzado(S, costoE, `usó ${it.nombre}`) : costoE);
-      ui.cambio(['nitros']);
-      ui.toast(`🕳 ${it.nombre}: te metiste bajo tierra${costoE ? ` · −${fmt(costoE)} No2` : ''} — con ${it.nombre} otra vez salís atacando; para salir sin atacar, 🕳 Salir`);
+      if(spE) gastarSp(S, spE, ui, it.nombre);
+      ui.cambio(['nitros', 'vitals']);
+      ui.toast(`🕳 ${it.nombre}: te metiste bajo tierra${costoE ? ` · −${fmt(costoE)} No2` : ''}${spE ? ` · −${fmt(spE)} SP` : ''} — con ${it.nombre} otra vez salís atacando; para salir sin atacar, ⬆ Salir`);
       return;
     }
     // Una vez por turno (2026-10-13, Sprint): avisa y deja seguir (lo decide la mesa). El conteo vive en S.ataquesArma, que vacía el turno.

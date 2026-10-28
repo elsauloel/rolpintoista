@@ -5158,8 +5158,8 @@ prueba('🕳 Excavar (2026-10-28, P231): sale atacando solo con un arma cuerpo a
   const misc = CLASES_SKILLS.find(c => c.id === 'miscelaneas'), h = misc && misc.habilidades.find(x => x.id === 'miscelaneas-excavar');
   igual([C.sirveParaEmerger(daga), C.sirveParaEmerger(arco), C.sirveParaEmerger(mazo), C.sirveParaEmerger(varita),
     (C.armaParaEmerger({equipo: [arco, daga]}) || {}).nombre, C.armaParaEmerger({equipo: [arco, mazo]}), (C.armaParaEmerger({equipo: [daga]}) || {}).nombre,
-    !!h, h && h.excavar, h && h.excavarNo2, h && h.emerger && h.emerger.pdg, h && h.duelo && h.duelo.modo, Plantillas.limpiar('skills', h).emerger && Plantillas.limpiar('skills', h).emerger.pdg],
-    [true, false, false, false, 'Daga', null, 'Daga', true, true, 1, 3, 'arma', 3]);
+    !!h, h && h.excavar, h && h.excavarNo2, h && h.excavarSp, h && h.costo, h && h.nitrosCosto, h && h.emerger && h.emerger.pdg, h && h.duelo && h.duelo.modo, Plantillas.limpiar('skills', h).emerger && Plantillas.limpiar('skills', h).emerger.pdg],
+    [true, false, false, false, 'Daga', null, 'Daga', true, true, 1, 1, '2', 'ATAQUE', 3, 'arma', 3]);   // (meterse 1 No2 + 1 SP; salir 2 SP + lo de un ataque)
 });
 prueba('🛒 la góndola en categorías (2026-10-28): HP y SP, enfermería, utilitarios (Moneda, Polilla, Revive y Ankh primero), trampas, pociones de otros usos y pergaminos', () => {
   const C = Combatiente, cat = id => CATALOGO_BASE.find(i => i.id === id), nom = n => CATALOGO_BASE.find(i => i.nombre === n);

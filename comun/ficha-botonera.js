@@ -89,6 +89,8 @@ const FichaBotonera = (() => {
   }
   function sinNitrosPara(S, h){
     if(!habAutomatizada(h)) return false;
+    // 🕳 Excavar (2026-10-28): meterse cuesta solo `excavarNo2` (1); lo de salir atacando lo revisa al ejecutarla (avisa y deja seguir), no apaga el botón.
+    if(h.excavar && h.emerger) return num(S.nitros) < num(h.excavarNo2 !== undefined ? h.excavarNo2 : 1);
     if(num(h.hpCosto) > 0 && num(S.hp) <= num(h.hpCosto)) return true;
     if(FichaHabilidades.nitrosVariable(h)) return false;
     return num(S.nitros) < costoNitrosHab(S, h);
@@ -96,6 +98,10 @@ const FichaBotonera = (() => {
   // Lo que cuesta ejecutar una habilidad, para verlo sin abrir la tarjeta. El costo en SP es texto libre.
   function costoHabilidadTxt(S, h){
     if(!habAutomatizada(h)) return '';
+    if(h.excavar && h.emerger && !h._costoExcavarAbajo){   // 🕳 los dos tiempos (2026-10-28)
+      const arriba = [num(h.excavarNo2 !== undefined ? h.excavarNo2 : 1) ? `${fmt(num(h.excavarNo2 !== undefined ? h.excavarNo2 : 1))} No2` : '', num(h.excavarSp) ? `${fmt(num(h.excavarSp))} SP` : ''].filter(Boolean).join(' y ');
+      return `meterse: ${arriba || 'sin costo'} · salir atacando: ${costoHabilidadTxt(S, {...h, _costoExcavarAbajo: true})}`;
+    }
     const partes = [];
     const nitros = costoNitrosHab(S, h);
     if(Combatiente.esFlash(h)) partes.push('⚡ Flash (sin No2; el doble en turno ajeno)');   // un Flash nunca cobra No2 (P136)

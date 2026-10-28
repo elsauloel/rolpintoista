@@ -1715,7 +1715,8 @@ async function dueloAplicarDano(d){
   }
   // Bloqueo perdido (mitad del daño): el arma o escudo con el que bloqueó pierde 1 punto de durabilidad (solo personajes: los creeps y las invocaciones no llevan).
   // 💧 En el agua, el rayo ×1,5 (js/50, 2026-10-17).
-  const golpeRayo = elDano === 'rayo' ? aplicar : 0;   // ⚡💧 lo que corre por el agua a los demás del charco (js/50), antes del ×1,5
+  const golpeRayo = elDano === 'rayo' ? aplicar : 0;
+  const aplicarSinAgua = aplicar;   // (la cuenta: lo que pasaba antes del ×1,5 del agua)   // ⚡💧 lo que corre por el agua a los demás del charco (js/50), antes del ×1,5
   if(elDano === 'rayo' && typeof aguaRayo === 'function'){ const ag = aguaRayo(t, 'rayo', aplicar); if(ag.txt){ aplicar = ag.monto; freno = [freno, ag.txt].filter(Boolean).join(' · '); } }
   let desgaste = '';
   if(base.mitad && t.tipo === 'pj' && d.defensa && d.defensa.itemId){
@@ -1723,7 +1724,7 @@ async function dueloAplicarDano(d){
     catch(err){ console.error('No se pudo pedir el desgaste del ítem:', err); }
   }
   try{
-    const oD = {distancia: !!(d.ataque && d.ataque.rango), magico: !!(habMagica || elDano), reparte: true};   // reparte: Miti-Miti (js/10)   // magico: el Orbe de absorción (js/26)   // la Defensa extra contra armas a distancia (torso blando, 2026-10-06)
+    const oD = {distancia: !!(d.ataque && d.ataque.rango), magico: !!(habMagica || elDano), reparte: true, ...(resEl ? {resTxt: `Resistencia a ${elDano}${resEl < 0 ? ' (vulnerable)' : ''}`} : {})};   // reparte: Miti-Miti (js/10)   // magico: el Orbe de absorción (js/26)   // la Defensa extra contra armas a distancia (torso blando, 2026-10-06)
     const res = esInv ? await danioInv(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD)
       : t.tipo === 'creep' ? await danioCreep(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD) : await danioPj(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD);
     if((t.tipo === 'creep' || (t.tipo === 'pj' && !esInv)) && typeof aguanteSumar === 'function') aguanteSumar(t);   // 🛡 Aguante (js/56): un golpe más, aunque la armadura lo frene todo (creeps y, desde el 2026-10-23, el Tanque)
@@ -1782,8 +1783,38 @@ async function dueloAplicarDano(d){
     if(!d.hab && d.ataque && d.ataque.flecha && (d.ataque.flecha.humo || d.ataque.flecha.luz || d.ataque.flecha.explota || d.ataque.flecha.clava)) await flechaAlPegar(d, !!res.r.invulnerable).catch(err => console.error('No se pudo aplicar el virote en el mapa:', err));
     if(d.hab && d.hab.atrae && !res.r.invulnerable) await dueloAtraer(d).catch(err => console.error('No se pudo atraer al objetivo:', err));   // el gancho
     if(d.hab && d.hab.riesgo && (dn.rolls || []).map(num).includes(num(d.hab.riesgo.si))) await dueloRiesgo(d).catch(err => console.error('No se pudo aplicar el riesgo:', err));   // la inestable
+    // 🧮 La cuenta del daño, renglón por renglón (2026-10-28, dueño: «decía 19 de daño y el siguiente paso mostraba 0… todo lo que esté frenando el daño
+    // tiene que estar comunicado muy claramente»): de la tirada a lo que entra a la vida, con cada cosa que lo frena en el medio. La dibuja el duelo.
+    const cuenta = [];
+    const R = (s, txt, v, nota, f) => cuenta.push({s, txt: String(txt || '').slice(0, 90), ...(v !== undefined && v !== null ? {v: num(v)} : {}), ...(nota ? {nota: String(nota).slice(0, 140)} : {}), ...(f ? {f: 1} : {})});
+    const manualNum = dn.defensaManual !== undefined && dn.defensaManual !== null && dn.defensaManual !== '' && dn.defensaManual !== 'no';
+    R('', 'Tirada de daño', num(dn.crudo));
+    if(menosDist) R('−', d.hab && d.hab.menosPorOrden ? 'por los que tocó antes en la línea' : 'por la distancia', menosDist);
+    if(habMagica && botella) R('+', 'la Botella con un diablito', botella);
+    if(anilloHab) R('+', `el anillo de ${elHab}`, anilloHab);
+    if(multTxt) R('=', multTxt, crudo);
+    else if(menosDist || (habMagica && botella) || anilloHab) R('=', 'el golpe', crudo);
+    if(mult > 1){ R('×', `crítico ×${mult}`, mult); R('=', 'el golpe', golpe); }
+    if(critReal) R('', 'Crítico: no se resta la Defensa');
+    else if(habMagica) R('', trueDmg ? 'True Damage: no lo frena nada' : directo ? 'Daño directo: no lo frena la Defensa ni la Defensa especial' : 'Daño especial: no se resta la Defensa (sí la Defensa especial)');
+    if(dn.defensaManual === 'no') R('', 'Defensa: no se resta (elegido a mano)');
+    else if(manualNum){ R('−', 'Defensa escrita a mano', Math.max(0, num(dn.defensaManual))); if(base.mitad) R('÷', 'Bloqueo perdido: pasa la mitad, para arriba', 2); }
+    else if(base.mitad){ R('−', 'Defensa', def); R('÷', 'Bloqueo perdido: pasa la mitad, para arriba', 2); }
+    else if(perfora && !crit) R('', `La Defensa (${def}) frenaba más: pasan ${perfora} por la Perfora`);
+    if(!crit && (base.mitad || perfora || manualNum)) R('=', 'pasa', aplicarSinAgua);
+    if(aplicar !== aplicarSinAgua) R('=', '💧 en el agua, el rayo ×1,5', aplicar);
+    const rr = res.r || {};
+    if(rr.invulnerable) R('', 'Invulnerable: el golpe no hace nada');
+    else{
+      (rr.defPartes || []).forEach(x => R('−', x.txt, x.v, x.nota));
+      if((rr.defPartes || []).length) R('=', num(rr.llega) > 0 ? 'pasa la Defensa' : 'la Defensa lo frena entero', rr.llega);
+      if(num(rr.arcano)) R('−', 'Armadura arcana (se queda con una parte)', rr.arcano);
+      (rr.capas || []).forEach(c => R('−', c.vida ? `${c.nombre} (Vida extra: se la lleva a ella)` : `${c.nombre} (escudo)`, c.v));
+      if(num(rr.mitiMiti)) R('−', `${rr.mitiMitiNombre || 'su protector'} se lleva la mitad (${rr.mitiMitiTxt || 'Miti-Miti'})`, rr.mitiMiti);
+      R('=', 'entra a la vida', rr.recibido, '', true);
+    }
     // `perfora`: solo si la Perfora mandó (pasaron esos N, la Defensa frenaba más): el duelo lo cuenta así.
-    return {...base, desgaste, defensa: crit ? restaIgnorando : def, ...(perfora ? {perfora} : {}), ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), ...(num(res.r.vida) > 0 ? {vidaAbs: num(res.r.vida)} : {}), invulnerable: !!res.r.invulnerable, ...(num(res.r.mitiMiti) > 0 ? {mitiMiti: num(res.r.mitiMiti), mitiMitiNombre: String(res.r.mitiMitiNombre || '').slice(0, 40), mitiMitiTxt: String(res.r.mitiMitiTxt || 'Miti-Miti').slice(0, 20)} : {}), hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(magico ? {magico} : {}), ...(porDano ? {porDano} : {})};
+    return {...base, desgaste, cuenta, defensa: crit ? restaIgnorando : def, ...(perfora ? {perfora} : {}), ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), ...(num(res.r.vida) > 0 ? {vidaAbs: num(res.r.vida)} : {}), invulnerable: !!res.r.invulnerable, ...(num(res.r.mitiMiti) > 0 ? {mitiMiti: num(res.r.mitiMiti), mitiMitiNombre: String(res.r.mitiMitiNombre || '').slice(0, 40), mitiMitiTxt: String(res.r.mitiMitiTxt || 'Miti-Miti').slice(0, 20)} : {}), hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(magico ? {magico} : {}), ...(porDano ? {porDano} : {})};
   }catch(err){
     console.error('No se pudo aplicar el daño del duelo:', err);
     return {...base, defensa: def, manual: true, golpe: base.mitad ? aplicar : golpe, motivoManual: err && err.message === 'SIN_DEF' ? 'la ficha todavía no publicó su Defensa' : 'falló la escritura'};

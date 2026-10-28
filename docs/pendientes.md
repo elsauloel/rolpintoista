@@ -38,6 +38,11 @@
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.
+> - [ ] **🏪 Revisar el vendedor ambulante (y las tiendas en general)** (2026-10-28, dueño: «intenté generar una tienda de un vendedor ambulante y
+>   abrí una tienda repleta de ítems, súper random… la tienda del vendedor ambulante es alguien que vende los esenciales: una, dos armas al azar,
+>   algún escudo, alguna armadura, no mucho más que eso… después me tocará volver a revisar el tema de las tiendas»). Lo de hoy está en
+>   `comun/generador-tiendas.js` y `docs/rework-tiendas.md` (ambulante 8–12 ítems con variedad garantizada de partes defensivas). Sentarse con el
+>   dueño a redefinir qué vende cada tamaño, empezando por el ambulante (pocas cosas, lo esencial).
 > - [ ] **⚖ Revisar Arrastrar (P224)** (2026-10-27, dueño: «Arrastrar, anotalo pendiente para que lo revise cuando esté en la compu»): quedó en **una sola
 >   tirada** —un ataque con su arma a 3 casillas o menos con +2 PdG; si pega, lo trae y le hace el daño— y lo definido eran dos (Destreza contra la
 >   Evasión para engancharlo, y después el golpe). Mirarlo en el mapa con el Warrior (prueba) de «Claude · pruebas» y decidir si queda así o se separa.

@@ -139,7 +139,9 @@ function resolverGolpe(golpe, defensa, efectos, o){
   // 🗡 Perfora N (`o.perfora`, 2026-10-27: las trampas que perforan, la Aguja): N puntos pasan siempre la Defensa (Combatiente.perforaPasa).
   const perfora = o && num(o.perfora) > 0 ? Combatiente.perforaPasa(golpe, defensa, Math.min(num(o.perfora), golpe)) : 0;
   if(perfora) recibido = perfora;
+  const llega = recibido;   // 🧮 lo que pasó la Defensa (la cuenta del duelo)
   let absorbido = 0, vida = 0;
+  const capasUso = [];
   const ab = Combatiente.absorberPct(activos, recibido);   // Armadura arcana: se queda con el 50 % de lo que llega, hasta 10 (2026-10-10)
   recibido = ab.recibido; absorbido += ab.tomado;
   const capas = activos.filter(e => (e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) && num(e.escudoMagicoActual ?? e.escudoMagico) > 0 && !(e.soloEspecial && !(o && o.magico)) && !(e.soloFisico && o && o.magico))
@@ -150,9 +152,11 @@ function resolverGolpe(golpe, defensa, efectos, o){
     c.escudoMagicoActual = actual - tomado;
     if(c.excedenteVida) c.escudoMagico = c.escudoMagicoActual;   // valor neto: no hay máximo
     absorbido += tomado; recibido -= tomado;
+    if(tomado > 0) capasUso.push({nombre: String(c.nombre || (c.excedenteVida ? 'Vida extra' : 'Escudo')).slice(0, 40), v: tomado, ...(c.excedenteVida ? {vida: true} : {})});
     if(c.excedenteVida) vida += tomado;   // 🛡/❤ (P227, 2026-10-27): lo que se lleva la Vida extra es daño; lo que se come un escudo, no
   });
-  return {recibido, absorbido, defensa, ...(vida ? {vida} : {}), ...(perfora ? {perfora} : {}), ...(ab.tomado ? {arcano: ab.tomado} : {})};
+  return {recibido, absorbido, defensa, llega, ...(vida ? {vida} : {}), ...(perfora ? {perfora} : {}), ...(ab.tomado ? {arcano: ab.tomado} : {}),
+    ...(capasUso.length ? {capas: capasUso} : {}), ...(o && Array.isArray(o.defPartes) ? {defPartes: o.defPartes} : {})};
 }
 
 function leerGolpe(texto){
@@ -218,6 +222,34 @@ function primerGolpeDeRonda(obj, campo, viejo){
   obj[campo] = ronda;
   return primero;
 }
+/* 🧮 La cuenta del daño, a la vista (2026-10-28, dueño: «decía 19 de daño y el siguiente paso mostraba 0… tiene que haber una instancia intermedia súper
+   clara que dice 19 de daño menos X de defensa menos 8 de blindaje; todo lo que esté frenando el daño tiene que estar comunicado muy claramente»): lo que
+   se le resta al golpe, renglón por renglón (su suma es la Defensa que usa resolverGolpe, que lo devuelve en `defPartes`). `porStack`: los creeps suman
+   los bonos de Defensa de un estado por cada stack. */
+function defEstadosNota(estados, porStack){
+  const L = [];
+  (estados || []).forEach(e => {
+    if(!e || e.activo === false) return;
+    if(e.armaduraRota){ L.push(`${e.nombre || 'Armadura rota'} −${Math.max(1, num(e.stacks) || 1)}`); return; }
+    const v = (e.mods || []).filter(m => m && m.stat === 'def').reduce((a, m) => a + num(m.val), 0) * (porStack ? Math.max(1, num(e.stacks) || 1) : 1);
+    if(v) L.push(`${e.nombre || 'un estado'} ${v > 0 ? '+' : '−'}${Math.abs(v)}`);
+  });
+  return L.length ? `con ${L.join(', ')}` : '';
+}
+function defensaPartes(c){
+  const p = [];
+  if(c.ignoraDef){ if(num(c.restaIgnorando) > 0) p.push({txt: 'Defensa especial', v: num(c.restaIgnorando)}); }
+  else{
+    const nota = defEstadosNota(c.estados, c.porStack);
+    p.push({txt: 'Defensa', v: num(c.base), ...(nota ? {nota} : {})});
+    if(c.primero && Math.max(0, num(c.valor('defprimer'))) > 0) p.push({txt: 'Defensa contra el primer golpe de la ronda', v: Math.max(0, num(c.valor('defprimer')))});
+    if(c.o && c.o.distancia && Math.max(0, num(c.valor('defdist'))) > 0) p.push({txt: 'Defensa contra armas a distancia', v: Math.max(0, num(c.valor('defdist')))});
+    if(c.guarda) p.push({txt: `Guardián: ${c.guarda.nombre} al lado`, v: num(c.guarda.val)});
+    if(c.muro) p.push({txt: `Muro de escudos con ${c.muro.nombre}`, v: num(c.muro.val)});
+  }
+  if(num(c.restaExtra)) p.push({txt: (c.o && c.o.resTxt) || 'Resistencia al elemento', v: num(c.restaExtra)});
+  return p;
+}
 const defExtra = (ignoraDef, primero, valor, o) => ignoraDef ? 0 : (primero ? Math.max(0, num(valor('defprimer'))) : 0) + (o && o.distancia ? Math.max(0, num(valor('defdist'))) : 0);
 async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   const golpe = leerGolpe(texto);
@@ -230,7 +262,8 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     sc.usosEspecial = {...(sc.usosEspecial || {}), _golpe: 1};   // (se vacía en su Mantenimiento)
     const primero = primerGolpeDeRonda(sc, 'golpeRonda', viejoC);   // por ronda (2026-10-19)
     const extra = defExtra(ignoraDef, primero, st => CreepCalculo.modTotal(sc, st), o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0);
-    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : creepDefensaMapa(sc) + extra) + num(restaExtra || 0), sc.estados, o);
+    const defPartes = defensaPartes({ignoraDef, restaIgnorando, restaExtra, base: creepDefensaMapa(sc), estados: sc.estados, porStack: true, primero, valor: st => CreepCalculo.modTotal(sc, st), o, guarda, muro});
+    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : creepDefensaMapa(sc) + extra) + num(restaExtra || 0), sc.estados, {...(o || {}), defPartes});
     mitiMitiPartir(r, prot);
     // 🛡 Interpuesto (2026-10-27): el +2 a la Defensa era para este golpe; se va con él.
     if(Array.isArray(sc.estados)) sc.estados = sc.estados.filter(e => !(e && e.unGolpe));
@@ -386,7 +419,8 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     datos.meta = datos.meta || {};
     const primero = primerGolpeDeRonda(datos.meta, 'golpeRonda', viejoP);   // por ronda (2026-10-19)
     const extra = defExtra(ignoraDef, primero, st => rs[st], o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0);
-    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : num(rs.def) + extra) + num(restaExtra || 0), efectos, o);
+    const defPartes = defensaPartes({ignoraDef, restaIgnorando, restaExtra, base: num(rs.def), estados: efectos, primero, valor: st => rs[st], o, guarda, muro});
+    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : num(rs.def) + extra) + num(restaExtra || 0), efectos, {...(o || {}), defPartes});
     mitiMitiPartir(r, prot);
     const previo = num(datos.hp);
     datos.hp = Math.max(0, previo - r.recibido);
@@ -464,7 +498,8 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     inv.golpeTurno = 1;   // (el Mantenimiento la vacía)
     const primero = primerGolpeDeRonda(inv, 'golpeRonda', viejoI);   // por ronda (2026-10-19)
     const extra = defExtra(ignoraDef, primero, st => FichaResumen.invModTotal(inv, st), o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0);
-    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : defensasDeInv(inv).def + extra) + num(restaExtra || 0), inv.estados, o);
+    const defPartes = defensaPartes({ignoraDef, restaIgnorando, restaExtra, base: defensasDeInv(inv).def, estados: inv.estados, primero, valor: st => FichaResumen.invModTotal(inv, st), o, guarda, muro});
+    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : defensasDeInv(inv).def + extra) + num(restaExtra || 0), inv.estados, {...(o || {}), defPartes});
     mitiMitiPartir(r, prot);
     const previo = num(inv.hp);
     inv.hp = Math.max(0, previo - r.recibido);

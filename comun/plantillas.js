@@ -65,7 +65,7 @@ const Plantillas = (() => {
 
   /* ---- Pasiva ---- */
   function pasiva(p){
-    const out = {nombre: String(p.nombre || ''), detalle: String(p.detalle || ''), jobCosto: Math.max(1, Number(p.jobCosto) || 1),
+    const out = {nombre: String(p.nombre || ''), detalle: String(p.detalle || ''), jobCosto: (p.jobCosto === 0 || p.jobCosto === '0') ? 0 : Math.max(1, Number(p.jobCosto) || 1),   // (0: la racial, 2026-10-28)
       mods: (p.mods || []).filter(m => m && m.stat).map(m => ({stat: m.stat, val: Number(m.val) || 0}))};
     if(Number(p.regenHp)) out.regenHp = Number(p.regenHp);
     if(String(p.estado || '').trim()) out.estado = String(p.estado).trim();   // la pasiva que da un estado (2026-10-16, Vuela)

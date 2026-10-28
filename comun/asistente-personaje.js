@@ -102,7 +102,7 @@ const AsistentePersonaje = (() => {
     const propiasArmadas = () => (S.habilidades || []);   // las custom armadas en el paso a paso de habilidades
     const jobUsado = () => [...st.habs.values()].reduce((a, x) => a + costoHab(x.claseId), 0)
       + propiasArmadas().reduce((a, h) => a + (h.job === false ? 0 : Math.max(0, num(h.jobCosto))), 0)
-      + [...st.pasivas].reduce((a, i) => a + Math.max(0, num((pasivasLista[i] || {}).datos && pasivasLista[i].datos.jobCosto) || 1), 0);
+      + [...st.pasivas].reduce((a, i) => { const c = ((pasivasLista[i] || {}).datos || {}).jobCosto; return a + ((c === 0 || c === '0') ? 0 : Math.max(0, num(c) || 1)); }, 0);   // (0: la racial, 2026-10-28)
     const intTotal = () => FichaBotonera.inteligenciaAuto(S);
     const intUsado = () => st.talentos.reduce((a, t) => a + Math.max(0, num(t.puntos)), 0);
     const totalCompra = () => { let t = 0; st.carrito.forEach((n, id) => { const it = itemTienda(id); if(it) t += precioDe(it) * n; }); return t; };
@@ -198,7 +198,7 @@ const AsistentePersonaje = (() => {
       const conIndice = pasivasLista.map((p, i) => ({p, i, cat: catDe(p.datos || {})}));
       const tarjeta = ({p, i}) => {
         const d = p.datos || {}, on = st.pasivas.has(i);
-        return `<button type="button" class="ap-op${on ? ' on' : ''}" data-ap-pasiva="${i}"><span class="ap-cab"><b>${esc(d.nombre)}</b><em>${on ? '✔ ' : ''}${fmt(Math.max(1, num(d.jobCosto) || 1))} Job</em></span><small>${esc(d.detalle || '')}</small></button>`;
+        return `<button type="button" class="ap-op${on ? ' on' : ''}" data-ap-pasiva="${i}"><span class="ap-cab"><b>${esc(d.nombre)}</b><em>${on ? '✔ ' : ''}${fmt((d.jobCosto === 0 || d.jobCosto === '0') ? 0 : Math.max(1, num(d.jobCosto) || 1))} Job</em></span><small>${esc(d.detalle || '')}</small></button>`;
       };
       const chip = (id, txt, n) => `<button type="button" class="ap-chip${st.catPasiva === id ? ' on' : ''}" data-ap-catpasiva="${id}"${st.catPasiva === id ? ' style="border-style:solid;border-color:var(--pap-laton);color:var(--pap-laton)"' : ''}>${esc(txt)}${n !== undefined ? ` (${n})` : ''}</button>`;
       const visibles = cats.filter(c => !st.catPasiva || c.id === st.catPasiva);

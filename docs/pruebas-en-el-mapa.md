@@ -307,10 +307,16 @@
 > - [x] **🕳 Excavar con lo decidido en P231 (2026-10-28, cuenta del GM)**: el Tunelero bajo tierra → abajo a la derecha «🕳 Tunelero (prueba) · ⬆ Salir · ⚔ Atacar»
 >   (Atacar porque está pegado a juan); ⚔ Atacar → sale y apunta **sin preguntar flecha** (con una Daga; solo con el Arco no puede salir atacando); Esc →
 >   «¿Vuelve bajo tierra o queda afuera?» → volvió abajo (y se le devolvió lo cobrado); ⬆ Salir → sale sin atacar, Mesa «sale de abajo de la tierra (sin
->   atacar)», los botones desaparecen. Arreglado al verlo: el alcance al salir era el del arco (14 casillas). **Falta**: Excavar de un **jugador** (la
->   habilidad de Misceláneas) — juan se perdió (ver abajo); hace falta un personaje con un arma cuerpo a cuerpo. Y pegar las reglas (la estela de un jugador).
+>   atacar)», los botones desaparecen. Arreglado al verlo: el alcance al salir era el del arco (14 casillas).
+>   ✅ **Excavar de jugador (juan rehecho, cuerpo a cuerpo)**: la Botonera dice «meterse: 1 No2 y 1 SP · salir atacando: 6 No2 (ataque con Caronero) · 2 SP»
+>   (arreglado al verlo: el botón se apagaba por el costo de salir); meterse cobra −1 No2 −1 SP y aparecen «🕳 juan · ⬆ Salir · ⚔ Atacar»; ⚔ Atacar → la
+>   declaración «con Caronero · Tipo 6 · +3 PdG · +1d6 de daño · Crítico frecuente +1» (el PdG 7 + 3 se tira como 1d10); sin No2 avisa y deja seguir;
+>   Esc → «¿Vuelve bajo tierra o queda afuera?» → vuelve; ⬆ Salir → sale sin atacar. **Para revisar**: al jugador cancelar no le devuelve lo cobrado (al
+>   creep sí); bajo tierra, el jugador no ve su propio token (solo el pozo). Falta pegar las reglas (la estela de un jugador).
 > - [ ] **✨ El que se delata aparece con ondas** (2026-10-28, programado): un token escondido en la niebla que ataca se revela con el anillo y las ondas del
 >   aviso de turno, 4,5 s. Ver en el mapa con un creep en la niebla que dispare.
+>   Intentado (2026-10-28): el Tunelero a 8 casillas, en la niebla de juan, le disparó (la marca de delatado se escribió); la ventana del jugador estaba
+>   minimizada (0 × 0) y no se pudo mirar. Repetir con las dos ventanas a la vista.
 > - ⚠ **juan (de «Claude · pruebas») quedó en blanco (2026-10-28)**: al abrirlo desde la ficha, la ficha estaba rota (desde las 10:01, `jobCostoDe` declarado
 >   dos veces en `ficha-personaje/js/10`) y guardó la hoja vacía encima. Arreglado (fc80c9ae) y con un seguro: si la ficha no se puede armar, queda en solo
 >   lectura. El origen, revisado: intacto. juan no se puede recuperar (no había respaldo): hay que rehacerlo o crear otro personaje de prueba.

@@ -271,14 +271,20 @@
 > - [x] **🧿 El botón y el menú del Mal de ojo** desde la pantalla del GM — **probado con el mouse (2026-10-28, cuenta del GM)**: con el cooldown en 0 aparece el 🧿
 >   arriba; sin tiradas, «No hay ninguna tirada reciente…»; con el Tunelero disparándole a Clementino (Evasión 6, tirada por el jugador) el 🧿 se muda al
 >   costado del duelo («Podés usar») y el menú dice «Tunelero (prueba) → Clementino · Evasión (6) … cooldown 3».
-> - [ ] **🩺 Cómo quedó el grupo al cerrar el botín** (🏁 Cerrar botín y repartir) y al publicar un combate sin ítems. ✅ **Al publicar sin ítems, probado
+> - [x] **🩺 Cómo quedó el grupo al cerrar el botín** (🏁 Cerrar botín y repartir) y al publicar un combate sin ítems. ✅ **Al publicar sin ítems, probado
 >   (2026-10-28, cuenta del GM)**: se abre sola con Clementino «💀 en el piso», vida 0/25, SP y No2, «No vencen: Escudo especial»; juan con Guardia baja, Rengo,
 >   Lisiado, Presa y Marcado con − / + / ✕ Sacar. «✕ Sacar» Guardia baja anduvo; «−» en Presa anduvo (2 → 1, en la ficha y en el mapa). Del lado del jugador:
->   «Botín concluido» con la XP. Falta: al cerrar un botín **con** ítems (🏁 Cerrar botín y repartir) y al pasar a combate.
->   ⚠ **Para revisar**: el primer «−» en Presa, tocado apenas se abrió la ventana (justo cuando a juan le llegaba la XP), **se perdió** (siguió en 2); el segundo
+>   «Botín concluido» con la XP. ✅ **Con ítems (2026-10-28)**: el Ladrón en 0 con su Cuchillo y una Poción de Ímpetu; juan reclamó la poción; «🏁 Despojar lo que
+>   nadie tomó y repartir» → se abre sola; «−» en Marcado tocado enseguida, mientras llegaban la XP y la poción → 2 → 1 en la ficha y en el mapa (con el arreglo
+>   de abajo). ✅ **Al pasar a combate**: narrativo → combate abre «Empieza el combate. Si algún estado tiene que durar más o menos…»; «+» en Rengo 2 → 3.
+>   ✅ **Arreglado (2026-10-28)**: cada botón busca su estado por nombre en la lista de ese momento, la ventana no se redibuja con un botón apretado, y el
+>   Titilando del mapa se publica igual que el de la ficha. Lo que se había visto: el primer «−» en Presa, tocado apenas se abrió la ventana (justo cuando a juan le llegaba la XP), **se perdió** (siguió en 2); el segundo
 >   anduvo. Sospecha: la pantalla que aplicó la recompensa guardó la ficha con los estados de antes. Además el «Titilando» del Pacto (que el mapa pone como
 >   marca en `resumen.estados`, js/10) pasó a verse como «Invulnerable · 1 turno» cuando se volvió a guardar la ficha (es el mismo estado, alias).
-> - [ ] **🔦 Un personaje en sigilo que ataca a un creep**: el GM lo tiene que ver en esa casilla hasta que se mueva o pase la ronda.
+> - [x] **🔦 Un personaje en sigilo que ataca a un creep**: el GM lo tiene que ver en esa casilla hasta que se mueva o pase la ronda. **Probado (2026-10-28)**:
+>   juan con Sigilo (el GM lo ve como «?»), ataca al Tunelero → la marca de delatado se escribía bien, pero el GM lo seguía viendo como «?»
+>   (`ocultoPorSigiloParaMi` no la miraba). ✅ Arreglado y vuelto a mirar publicado: el GM ve a juan (atenuado, con el ícono de sigilo) en esa casilla; juan se
+>   mueve una → el GM deja de verlo. (Falta solo el «pase la ronda», que es la misma marca.)
 > - [ ] **🐝 Una zona de un creep sobre una invocación** (la abeja de Bizzante): que a su dueño le aparezca el cartel y tire con los stats de la abeja.
 > - [x] **✕ Un duelo en curso no se puede cerrar (2026-10-28, dueño: «un jugador apretó la X de cerrar y quedamos sin saber qué hacer»)**: mientras el
 >   duelo sigue, el cuadro solo tiene «—» / «Minimizar» y «Cancelar duelo» (quien podía); la ✕ y «Cerrar» vuelven cuando termina. Ver con el jugador y el GM.

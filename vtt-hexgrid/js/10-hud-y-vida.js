@@ -1053,7 +1053,7 @@ function hudConectar(t){
     const clave = b.dataset.hudBoton;
     if(clave === 'ficha'){ abrirFichaDeToken(t); return; }
     if(clave === 'libre'){ activarMoverLibre(seleccion); return; }
-    if(clave === 'tunel'){ tunelBorrar(seleccion); toast('🧹 La estela del túnel se va'); return; }
+    if(clave === 'tunel'){ tunelBorrar(seleccion); toast('🧹 La estela del túnel se va'); hudPonerNivel('vital'); return; }   // (vuelve al primer menú: el 🧹 ya no va)
     if(clave === 'oculto'){ editarToken(seleccion, {oculto: !t.oculto, ...(!t.oculto && t.revelado ? {revelado: false} : {})}); return; }   // ocultarlo lo vuelve a esconder del todo (js/29)
     if(clave === 'equipo'){ abrirEquipoMapa(t.fichaId.split(SEP_INVOCACION)[0]); return; }   // el mapa (js/11, A4)
     if(clave === 'rayo'){

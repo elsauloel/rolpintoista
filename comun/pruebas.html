@@ -5878,7 +5878,7 @@ prueba('🕳 Excavar, una sola habilidad (2026-10-27): meterse (1 No2) y salir a
   igual([h.excavar, h.excavarNo2, h.emerger && h.emerger.distancia, h.emerger && h.emerger.pdg, h.nitrosCosto, h.cd, atq.mods.dadoExtra, atq.mods.critBono,
     atq.efectos.map(e => e.nombre), ((atq.critico && atq.critico.efectos) || []).map(e => e.nombre),
     HABILIDADES_CREEP_CATALOGO.filter(x => x.nombre === 'Excavar').length],
-    [true, 1, 4, 3, 'ATAQUE', 2, '1d6', 1, ['Rengo'], ['Rengo', 'Lisiado'], 1]);
+    [true, 1, undefined, 3, 'ATAQUE', 2, '1d6', 1, ['Rengo'], ['Rengo', 'Lisiado'], 1]);   // (sin distancia desde el 2026-10-28: sale donde está)
 });
 prueba('⚖ Carga que derriba, Arrastrar y Golpe que sigue (2026-10-27): lo que lleva el ataque al duelo', () => {
   const sc = creepPrueba();

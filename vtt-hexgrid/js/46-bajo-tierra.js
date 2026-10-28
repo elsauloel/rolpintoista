@@ -2,8 +2,8 @@
    Una habilidad con `excavar: true` mete al token bajo tierra (campo `bajoTierra` del token, firestore.rules → tokenValido): en su casilla
    queda un pozo a la vista de todos, el token no se ve (el GM lo ve transparente, encima del pozo) y no se lo puede elegir de objetivo, ni
    le llega un área, un salto eléctrico ni un ataque de oportunidad (y moverse por abajo no da oportunidad). Una habilidad con
-   `emerger: {distancia}` (un ataque con el arma) lo saca: se elige una casilla libre a esa distancia o menos del pozo, el token aparece
-   ahí y sigue el ataque. Si se cancela la salida, sigue bajo tierra (lo cobrado, cobrado: se arregla a mano).
+   `emerger` (un ataque con el arma) lo saca en la casilla donde está (desde el 2026-10-28; antes se elegía una a 4 o menos) y sigue el
+   ataque, contra un rival pegado.
    Hoy lo usan los creeps (js/12, acEjecutarHab / acLanzarAtaqueDeHab); los personajes y las invocaciones, pendiente (docs/pendientes.md). */
 const BAJO_TIERRA_DIST = 4;
 function bajoTierra(t){ return !!(t && t.bajoTierra); }
@@ -27,33 +27,25 @@ async function excavarToken(id){
   }
 }
 
-// Emerger: o = {distancia, nombre, alSalir(), alCancelar()}. Se elige la casilla de salida (libre, a `distancia` o menos del pozo).
-function emergerToken(id, o){
+// Emerger: o = {nombre, alSalir(), alCancelar()}. Sale en la casilla donde está (dueño, 2026-10-28: «que salga en la ubicación que está, no hasta 4
+// casillas; si está adyacente a un rival, puede atacarle con el skill»): para salir en otro lado, primero se lo mueve por abajo. (`o.distancia` ya no se usa.)
+async function emergerToken(id, o){
   const t = tokens.get(id);
   if(!t){ if(o.alCancelar) o.alCancelar(); return; }
-  const dist = Math.max(1, Math.round(num(o.distancia)) || BAJO_TIERRA_DIST);
-  const pozo = {col: t.col, fila: t.fila}, nom = esc(o.nombre || 'Emerger');
-  const pedir = () => elegirDestino(async h => {
-    if(distanciaHex(h, pozo) > dist){ toast(`Tiene que salir a ${dist} casillas o menos del pozo`); pedir(); return; }
-    if(elementoSolidoEn(h.col, h.fila) || [...tokens.entries()].some(([k, x]) => k !== id && x.col === h.col && x.fila === h.fila)){ toast('Esa casilla no está libre: elegí otra'); pedir(); return; }
-    const antes = {col: t.col, fila: t.fila, bajoTierra: true, rutaJson: t.rutaJson, tunel: t.tunel};
-    const conTunel = tunelSumar(t, lineaHex(pozo, h));   // el tramo hasta donde sale también es túnel
-    t.col = h.col; t.fila = h.fila; t.bajoTierra = false; t.rutaJson = '[]';
-    estelas.delete(id); pedirDibujo();
-    try{
-      await coleccionTokens().doc(id).update({col: h.col, fila: h.fila, bajoTierra: firebase.firestore.FieldValue.delete(), ruta: firebase.firestore.FieldValue.delete(), ...(conTunel ? {tunel: conTunel} : {})});
-    }catch(err){
-      Object.assign(t, antes); pedirDibujo();
-      console.error('No se pudo sacar el token de abajo de la tierra:', err);
-      toast('No se pudo salir de abajo de la tierra — movelo a mano');
-      if(o.alCancelar) o.alCancelar();
-      return;
-    }
-    emergerPolvo(pozo, h);
-    if(o.alSalir) o.alSalir();
-  }, `<b>🕳 ${nom}: ¿por dónde sale ${esc(nombreDe(t))}?</b> <span>clic en una casilla libre a ${dist} o menos del pozo · Esc o clic derecho cancelan (sigue bajo tierra)</span>`, true,
-    () => { toast(`${nombreDe(t)} sigue bajo tierra`); if(o.alCancelar) o.alCancelar(); });
-  pedir();
+  const h = {col: t.col, fila: t.fila};
+  t.bajoTierra = false; t.rutaJson = '[]';
+  estelas.delete(id); pedirDibujo();
+  try{
+    await coleccionTokens().doc(id).update({bajoTierra: firebase.firestore.FieldValue.delete(), ruta: firebase.firestore.FieldValue.delete()});
+  }catch(err){
+    t.bajoTierra = true; pedirDibujo();
+    console.error('No se pudo sacar el token de abajo de la tierra:', err);
+    toast('No se pudo salir de abajo de la tierra — sacalo a mano');
+    if(o.alCancelar) o.alCancelar();
+    return;
+  }
+  emergerPolvo(h, h);
+  if(o.alSalir) o.alSalir();
 }
 
 // El pozo: tierra removida y un agujero oscuro, en la casilla de cada token bajo tierra (lo ven todos los que verían el token).

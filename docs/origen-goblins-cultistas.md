@@ -305,3 +305,6 @@ fijo del picapiedras y la Red del híbrido sin cooldown al empezar. La Confusió
 - Siguen en ENTRADA MINAS los 15 kobolds y ratas de antes (no se tocaron): a decidir si pasan a la Reserva.
 - Los nombres son de trabajo: el dueño los cambia si quiere. Los drops fijos del jefe (Polilla mística y Runa aceleradora, `pendientes.md`) no se
   pusieron: a confirmar.
+- **Excavar, cambio (dueño, 2026-10-28)**: «que salga en la ubicación que está, no hasta 4 casillas; si está adyacente a un rival, puede atacarle con el
+  skill» → al ejecutarla bajo tierra, el tunelero sale en su casilla (sin elegir otra) y apuñala a un rival pegado. Para salir al lado de alguien, primero
+  se lo mueve por abajo.

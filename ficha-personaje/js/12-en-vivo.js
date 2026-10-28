@@ -398,7 +398,11 @@ function fichaEscuchar(f){
     // La primera vez: la ficha entera (la marca de control y lo leído ya están en f).
     alCargar: armado => {
       f.soloLectura = fichaSoloLecturaPara(f.duenoUid, f);   // con la marca de control ya leída
-      aplicarFicha(armado.datos);
+      // 🛟 Si no se pudo armar (2026-10-28: un error de carga dejó la hoja vacía y se guardó encima del personaje), queda en solo lectura: no se guarda nada.
+      if(!aplicarFicha(armado.datos)){
+        f.soloLectura = true;
+        toast('⚠ No se pudo cargar el personaje: queda en solo lectura para no pisar nada. Recargá la página; si sigue, avisale al dueño del proyecto.');
+      }
       fichaPonerImagenesInvocaciones(armado.imgInvocaciones);
       renderInvocaciones();
       f.cargada = true;

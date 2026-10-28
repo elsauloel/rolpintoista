@@ -644,10 +644,14 @@ $('#file-input').onchange = ev => {
 
 // Vuelca una ficha (objeto ya parseado) sobre el estado, con las mismas
 // migraciones y merges tanto si viene de un archivo local como de GitHub.
+// → false si no se pudo armar (S quedó como estaba): quien la abre de la mesa no tiene que guardar nada (2026-10-28: se guardaba la hoja vacía encima).
 function aplicarFicha(data){
+    let next = null;
     try{
       // La mezcla con el personaje en blanco y las migraciones: comun/ficha-guardado.js (paso 5, nivel B, área 4).
-      const {S: next, tiposMigrados} = FichaGuardado.normalizar(data, {mezclarCatalogo: lista => ItemsSubidos.mezclar(lista, itemsSubidos, DEFAULT.catalogo)});
+      const r = FichaGuardado.normalizar(data, {mezclarCatalogo: lista => ItemsSubidos.mezclar(lista, itemsSubidos, DEFAULT.catalogo)});
+      next = r.S;
+      const tiposMigrados = r.tiposMigrados;
       if(tiposMigrados) tiposGuardarJunto = true;
       // Iteración 2 (Bonos → SP, Acciones/Mov → Nitros): ver migrarEstadoIt2,
       // que corre en renderAll.
@@ -655,9 +659,11 @@ function aplicarFicha(data){
       openStat = null;
       renderAll();
       toast('Ficha cargada');
+      return true;
     }catch(err){
       console.error('Error cargando la ficha:', err);
       toast('La ficha cargó pero algo no se pudo mostrar bien — revisá la consola');
+      return !!next && S === next;   // (se armó y falló al dibujar: los datos están; si no se llegó a armar, no)
     }
 }
 

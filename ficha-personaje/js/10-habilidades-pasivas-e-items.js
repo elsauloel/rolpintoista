@@ -238,7 +238,7 @@ function abrirVersionNuevaPasiva(p){
     actualizarTxt: 'cambia su nombre, descripción, costo en Job y bonos por los nuevos; las veces que la compraste quedan.',
     alActualizar: () => {
       const d = e.datos;
-      Object.assign(p, {nombre: d.nombre || p.nombre, detalle: d.detalle || '', jobCosto: Math.max(0, jobCostoDe(d.jobCosto)),
+      Object.assign(p, {nombre: d.nombre || p.nombre, detalle: d.detalle || '', jobCosto: Math.max(0, jobCostoPasiva(d.jobCosto)),
         mods: (d.mods || []).map(m => ({...m})), regenHp: num(d.regenHp) || 0, bibOrigen: {tipo: 'pasivas', id: e.id, version: e.version || 1}});
       delete p.bibIgnorada;
       toast(`${p.nombre} actualizada a la versión ${fmt(e.version || 1)}`);
@@ -255,19 +255,19 @@ function abrirPasivaNueva(){
     textoCrearDeCero: '+ Crear de cero',
     alCrearDeCero: () => openEditor('pasivas', null),
     alElegir: agregarPasivaDeCatalogo,
-    subtitulo: e => ` · ${fmt(jobCostoDe(e.datos.jobCosto))} Job`,
+    subtitulo: e => ` · ${fmt(jobCostoPasiva(e.datos.jobCosto))} Job`,
   });
 }
 
 // Una pasiva del catálogo, lista para el personaje (la usan «+ Pasiva» y el asistente de personaje nuevo).
-// El costo en Job de una pasiva: 0 vale (la racial, 2026-10-28); sin dato, 1.
-const jobCostoDe = v => (v === 0 || v === '0') ? 0 : (num(v) || 1);
+// El costo en Job de una pasiva: 0 vale (la racial, 2026-10-28); sin dato, 1. (Otro nombre que jobCostoDe de js/05: con el mismo, este archivo no cargaba.)
+const jobCostoPasiva = v => (v === 0 || v === '0') ? 0 : (num(v) || 1);
 function pasivaDeCatalogo(datos, meta){
   const clave = datos.poolId || (meta && String(meta.reemplaza || '').startsWith('base-') ? meta.reemplaza.slice(5) : claveDePasiva(datos));
   return {
     ...structuredClone(datos), id: uid(), poolId: clave, compras: 1,
     mods: (datos.mods || []).map(m => ({...m})), regenHp: num(datos.regenHp) || 0,
-    job: true, jobCosto: Math.max(0, jobCostoDe(datos.jobCosto)), origen: '', imagen: '',
+    job: true, jobCosto: Math.max(0, jobCostoPasiva(datos.jobCosto)), origen: '', imagen: '',
     ...(meta && meta.id ? {bibOrigen: {tipo: 'pasivas', id: meta.id, version: meta.version || 1}} : {}),
   };
 }
@@ -283,7 +283,7 @@ function pasivasDelCatalogo(){
 function agregarPasivaDeCatalogo(datos, meta){
   // La corrección de una de fábrica se acumula con la de fábrica (misma clave), no como otra pasiva distinta.
   const clave = datos.poolId || (meta && String(meta.reemplaza || '').startsWith('base-') ? meta.reemplaza.slice(5) : claveDePasiva(datos));
-  const costo = Math.max(0, jobCostoDe(datos.jobCosto));
+  const costo = Math.max(0, jobCostoPasiva(datos.jobCosto));
   const tope = PASIVA_TOPE();
   const ya = S.pasivas.find(p => (p.poolId || claveDePasiva(p)) === clave);
   if(ya){

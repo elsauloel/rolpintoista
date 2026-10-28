@@ -1807,9 +1807,9 @@ async function dueloAplicarDano(d){
     if(rr.invulnerable) R('', 'Invulnerable: el golpe no hace nada');
     else{
       (rr.defPartes || []).forEach(x => R('−', x.txt, x.v, x.nota));
-      if((rr.defPartes || []).length) R('=', num(rr.llega) > 0 ? 'pasa la Defensa' : 'la Defensa lo frena entero', rr.llega);
+      if((rr.defPartes || []).length) R('=', num(rr.llega) > 0 ? (ignoraDef ? 'pasa' : 'pasa la Defensa') : (ignoraDef ? 'lo frena entero' : 'la Defensa lo frena entero'), rr.llega);
       if(num(rr.arcano)) R('−', 'Armadura arcana (se queda con una parte)', rr.arcano);
-      (rr.capas || []).forEach(c => R('−', c.vida ? `${c.nombre} (Vida extra: se la lleva a ella)` : `${c.nombre} (escudo)`, c.v));
+      (rr.capas || []).forEach(c => R('−', c.vida ? (/vida extra/i.test(c.nombre) ? `${c.nombre} (se la lleva a ella, no a la vida)` : `${c.nombre} (Vida extra: se la lleva a ella)`) : `${c.nombre} (escudo)`, c.v));
       if(num(rr.mitiMiti)) R('−', `${rr.mitiMitiNombre || 'su protector'} se lleva la mitad (${rr.mitiMitiTxt || 'Miti-Miti'})`, rr.mitiMiti);
       R('=', 'entra a la vida', rr.recibido, '', true);
     }

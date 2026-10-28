@@ -265,6 +265,15 @@
 
 ## Pendientes
 
+- [ ] **🧮 La cuenta del daño en el duelo (2026-10-28, dueño: «decía 19 de daño y el siguiente paso mostraba 0… todo lo que esté frenando el daño
+  tiene que estar comunicado muy claramente»)**: al aplicar el daño, el paso 5 muestra el número grande (lo que entró a la vida) y abajo «🧮 La cuenta
+  del daño», renglón por renglón: la tirada, el crítico, la Defensa (con los estados que la cambian: «con Piel de hierro +6»), la Defensa contra el
+  primer golpe o a distancia, el guardián, el Muro de escudos, la Defensa especial, la resistencia al elemento, lo que pasa, cada escudo por su nombre,
+  la Vida extra, el Miti-Miti y «= entra a la vida». La Mesa lo dice en una línea («19 − Defensa 11 − Blindaje (escudo) 8 = 0 a la vida»). Antes de
+  aplicarlo, el cartel aclara que es lo que tiró y que lo frenan la Defensa y los escudos. **Visto con un duelo armado a mano** (página local); falta en
+  el mapa (Chrome no estaba conectado): un golpe contra alguien con Defensa y un escudo (Blindaje), un crítico, un Bloqueo perdido (la mitad) y un daño
+  especial con resistencia al elemento.
+
 - [x] **🛡 No2 negativos en las defensas (2026-10-23, dueño)**: con 0 No2, el Parry se puede (queda en −1, con el aviso); con No2 ya negativos, el
   Parry, la Evasión pagando el sobrepeso, el dodge roll y la ayuda para zafar quedan apagados («ya está en No2 negativos…»). La oportunidad y el
   contraataque, como siempre (no bajan de 0). **Probado en parte el 2026-10-23** («Claude · pruebas»): el Escarabajo con −1 No2 atacado por juan →

@@ -1322,8 +1322,9 @@ la gasta como siempre. A confirmar: si tiene un tope (el Drenar vida llega hasta
 
 **Dueño (2026-10-27):** «depende de cómo se ejecutan. Si el veneno es por una nube, ahí sí hay una resistencia. Si es por daño físico, siempre que
 pase el daño físico, el veneno no se resiste». **Por golpe** (Aguja, Dardos envenenados, Espina de mantícora): sin tirada; entra si lastima (lo que
-absorbe un escudo no cuenta, P227). **Por nube o gas** (Nube de veneno, Bomba de esporas, las zonas tóxicas): Res.Esp, como hoy. Falta programarlo
-(los Dardos y la Espina hoy tienen Res.Esp; la Espina además no pide lastimar).
+absorbe un escudo no cuenta, P227). **Por nube o gas** (Nube de veneno, Bomba de esporas, las zonas tóxicas): Res.Esp, como hoy. **Programado** en
+la auditoría de trampas (2026-10-27). **2026-10-28 (dueño):** los Dardos quedan como el auditado (1d6+3, el veneno si lastima) y se borró la versión vieja del
+📚 del GM (que se esquivaba con Evasión contra 10); la plantilla «☠ Veneno» del asistente arranca igual. La **Espina de mantícora**, por ser Rara, pasa a **2d6+3**.
 
 ### P229 — El Pacto: ¿con cuánta vida revive y en qué orden va? (2026-10-28) ✅ decidida
 

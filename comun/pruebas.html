@@ -4365,7 +4365,7 @@ prueba('trampa de una habilidad: una conocida por tipo (veneno: daño por turno 
   v = papUltima(); v.clic('[data-et-modo="cero"]');
   const cero = papUltima().q('.pap-cab h3').textContent; papUltima().clic('[data-pap="cancelar"]');
   igual([antes, pasosVeneno, estadoOn, veneno.estado, veneno.estadoStacks, sinTurnos, veneno.salvacion, veneno.dano, veneno.tipo, pasosPuas, puas.dano, puas.estado, puas.nombre, cero.startsWith('Trampa de la habilidad')],
-    [['Cómo', 'Tipo'], ['Cómo', 'Tipo', 'Tamaño', 'Daño', 'Qué le deja', 'Se evita', 'Nombre', 'Resumen'], 'Veneno', 'Veneno', 4, true, {stat: 'Evasión', dif: 10, que: 'todo'}, '1d6', 'linea',
+    [['Cómo', 'Tipo'], ['Cómo', 'Tipo', 'Tamaño', 'Daño', 'Qué le deja', 'Se evita', 'Nombre', 'Resumen'], 'Veneno', 'Veneno', 4, true, null, '1d6+3', 'linea',
      ['Cómo', 'Tipo', 'Tamaño', 'Daño', 'Efecto adicional', 'Se evita', 'Nombre', 'Resumen'], '4d6', '', 'Púas y estacas', true]);
 });
 prueba('trampas (2026-10-19, dueño; 2026-10-23: 7-9-11): detectar Común 7 · Buena 9 · Rara 11; la que pone alguien, con su Destreza (mecánica) o su Efecto especial (mágica); el 📚 sale del catálogo', () => {
@@ -6002,8 +6002,9 @@ prueba('🛡❤ Escudo y Vida extra (P227, 2026-10-27): el Escudo especial es un
 prueba('🧪 El veneno de las trampas por golpe no se resiste (P228, 2026-10-27): la Aguja 1d8 con Perfora 1, los Dardos y la Espina si lastiman', () => {
   const td = n => (CATALOGO_BASE.find(i => i.nombre === n) || {}).trampaDatos || {};
   const ag = td('Aguja emponzoñada'), da = td('Dardos envenenados'), es = td('Espina de mantícora'), nube = td('Nube de veneno');
-  igual([ag.dano, ag.perfora, !!ag.requiereDano, !!ag.salvacion, !!da.salvacion, !!da.requiereDano, !!es.salvacion, !!es.requiereDano, !!nube.salvacion],
-    [ '1d8', 1, true, false, false, true, false, true, true]);
+  igual([ag.dano, ag.perfora, !!ag.requiereDano, !!ag.salvacion, !!da.salvacion, !!da.requiereDano, !!es.salvacion, !!es.requiereDano, !!nube.salvacion, es.dano, da.dano,
+    TRAMPAS_BASE.filter(t => t.nombre === 'Dardos envenenados').length],
+    [ '1d8', 1, true, false, false, true, false, true, true, '2d6+3', '1d6+3', 1]);   // (2026-10-28: la Espina, Rara, 2d6+3; los Dardos viejos del 📚 se borraron: queda solo el auditado)
 });
 /* ---------- Resultado ---------- */
 Promise.all(pendientes).then(() => {

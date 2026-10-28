@@ -20,7 +20,7 @@
   // ignoraDef: el daño automático va DIRECTO a la vida (fuego, hielo, electricidad y explosiones, 2026-09-24); si no, se le resta la Defensa como a un golpe (lo físico).
   // Criterio del dueño (2026-09-25): "fuego amigo" = el EFECTO también alcanza a los aliados que estén en el área. Lo físico y lo explosivo
   // (púas, cuchillas, derrumbes, gases, minas…) sí; lo mágico (arcano, relámpago, runas) distingue aliados de rivales. Los aliados NUNCA disparan una trampa.
-  const FISICAS = new Set(['Trampa de oso', 'Foso con estacas', 'Red de caza', 'Brea pegajosa', 'Aceite resbaladizo', 'Dardos envenenados', 'Cuchillas de guadaña', 'Cable de alarma',
+  const FISICAS = new Set(['Trampa de oso', 'Foso con estacas', 'Red de caza', 'Brea pegajosa', 'Aceite resbaladizo', 'Cuchillas de guadaña', 'Cable de alarma',
     'Arena movediza', 'Derrumbe', 'Nube de veneno', 'Gas somnífero', 'Bomba de esporas', 'Mina explosiva', 'Barril de pólvora']);
   // Lo que hace cada trampa, automatizado donde se puede (2026-10-02, regla del dueño: 3 turnos; Stun 1; Sentado y Sangrado no vencen solos).
   // estado (+ estadoTurnos, estadoStacks, estadoHp): lo aplica el mapa solo al dispararse. efectoManual: lo que queda a mano. salvacion: la tira
@@ -32,7 +32,6 @@
     "Red de caza": {"estado": "Inmovilizado", "estadoTurnos": 3, "efectoManual": "para liberarse: 2 No2 y Fuerza contra 8", "detectar": 6},
     "Brea pegajosa": {"estado": "Rengo", "estadoTurnos": 3, "detectar": 6},
     "Aceite resbaladizo": {"estado": "Sentado", "estadoTurnos": 0, "efectoManual": "−2 Evasión hasta su próximo turno", "salvacion": {"stat": "eva", "etq": "Evasión", "dif": 8, "que": "efecto"}, "detectar": 6},
-    "Dardos envenenados": {"estado": "Veneno", "estadoTurnos": 0, "estadoStacks": 3, "salvacion": {"stat": "eva", "etq": "Evasión", "dif": 10, "que": "todo"}, "detectar": 6},
     "Cuchillas de guadaña": {"estado": "Sangrado", "estadoTurnos": 0, "salvacion": {"stat": "eva", "etq": "Evasión", "dif": 16, "que": "todo"}, "detectar": 6},
     "Cable de alarma": {"efectoManual": "suena: alerta a los enemigos a 8 casillas y saca del sigilo a quien la toca", "detectar": 6},
     "Arena movediza": {"estado": "Inmovilizado", "estadoTurnos": 3, "efectoManual": "salir cuesta 3 No2 (2 si gana Fuerza contra 8)", "detectar": 6},
@@ -99,8 +98,6 @@
     'Suelo de brea: Rengo (moverse cuesta 2 No2) 3 turnos a quien lo pise (a mano). No hay tirada.');
   tr('Aceite resbaladizo', 1, ['debuff', 'mecánica'], 'flor', 2, '#C9B037', '',
     'Queda Sentado y con -2 Evasión hasta su próximo turno (a mano). Evasión contra 8 para no caer.');
-  tr('Dardos envenenados', 2, ['daño', 'veneno', 'mecánica'], 'linea', 3, '#6B8E23', '1d6',
-    '1d6 de daño (automático) y 3 stacks de Veneno (a mano; 1 de daño por stack por turno). Evasión contra 10 los esquiva.');
   tr('Cuchillas de guadaña', 5, ['daño', 'mecánica'], 'linea', 5, '#B0B0B0', '5d6',
     '5d6 de daño (automático) y Sangrado (a mano; 2 HP por turno hasta curarse). Evasión contra 16 lo evita.');
   tr('Cable de alarma', 1, ['alarma', 'mecánica'], 'linea', 3, '#C0A060', '',

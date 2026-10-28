@@ -30,7 +30,7 @@ const ElegirTrampa = (() => {
       def: {forma: 'flor', radio: 1, dados: 0, estado: 'Inmovilizado', estadoTurnos: 3, sal: ['Evasión', 10, 'todo'], color: '#B5A642', amiga: true, detectar: 'des'}},
     {id: 'veneno', icono: '☠', nombre: 'Veneno', idea: 'Dardos o púas envenenadas: un pinchazo y el veneno sigue haciendo daño.', base: 'Dardos envenenados',
       pasos: ['dano', 'estado', 'evita'], sugeridos: ['Veneno', 'Veneno severo'],
-      def: {forma: 'linea', largo: 3, dados: 1, caras: 6, armadura: true, estado: 'Veneno', estadoStacks: 3, sal: ['Evasión', 10, 'todo'], color: '#6B8E23', amiga: true, detectar: 'des'}},
+      def: {forma: 'linea', largo: 3, dados: 1, caras: 6, fijo: 3, armadura: true, estado: 'Veneno', estadoStacks: 3, sal: null, requiereDano: true, color: '#6B8E23', amiga: true, detectar: 'des'}},   // (2026-10-28: como los Dardos auditados: 1d6+3; el veneno entra si lastima, sin tirada — P228)
     {id: 'gas', icono: '☁', nombre: 'Gas', idea: 'Una nube que adormece, marea o envenena a los de adentro.', base: 'Gas somnífero',
       pasos: ['estado', 'evita'], sugeridos: ['Exhausto', 'Pajaritos', 'Veneno', 'Cansado'],
       def: {forma: 'flor', radio: 2, dados: 0, estado: 'Exhausto', estadoTurnos: 3, sal: ['Res.CC', 10, 'efecto'], color: '#8FBC8F', amiga: true, detectar: 'des'}},
@@ -98,7 +98,7 @@ const ElegirTrampa = (() => {
     function cargar(con){
       const d = con.def;
       Object.assign(st, {concepto: con.id, forma: d.forma, radio: d.radio || 0, largo: d.largo || 3, cant: 1,
-        haceDano: d.dados > 0, dados: d.dados || 2, caras: d.caras || 6, fijo: 0, armadura: d.armadura !== false,
+        haceDano: d.dados > 0, dados: d.dados || 2, caras: d.caras || 6, fijo: d.fijo || 0, armadura: d.armadura !== false, requiereDano: !!d.requiereDano,
         estado: d.estado || '', estadoTurnos: d.estadoTurnos || 0, estadoStacks: d.estadoStacks || 0,
         seEvita: !!d.sal, salStat: d.sal ? d.sal[0] : 'Evasión', salDif: d.sal ? d.sal[1] : 10, salQue: d.sal && d.sal[2] ? d.sal[2] : 'todo',
         nombre: con.base === 'Cable de alarma' ? 'Alarma' : con.nombre.replace(/ \(.*\)$/, ''), descripcion: '', color: d.color, amiga: !!d.amiga, detectar: d.detectar});
@@ -176,7 +176,7 @@ const ElegirTrampa = (() => {
       return {nombre: String(st.nombre || '').trim(), descripcion: String(st.descripcion || '').trim(), forma: st.forma, color: st.color, alfa: 45, amiga: !!st.amiga,
         radio: st.radio, cant: st.cant, largo: st.largo, dano: danoTxt(), contemplaArmadura: st.armadura,
         estado: tieneEstado ? st.estado : '', estadoTurnos: tieneEstado ? st.estadoTurnos : 0, estadoStacks: tieneEstado && conStacks(st.estado) ? st.estadoStacks : 0,
-        teleport: false, salvacion: st.seEvita ? {stat: st.salStat, dif: st.salDif, que: st.salQue} : null, turnos: 0, dejaZona: false, detectarStat: st.detectar === 'dmgesp' ? 'dmgesp' : 'des'};
+        teleport: false, salvacion: st.seEvita ? {stat: st.salStat, dif: st.salDif, que: st.salQue} : null, turnos: 0, dejaZona: false, ...(tieneEstado && st.requiereDano ? {requiereDano: true} : {}), detectarStat: st.detectar === 'dmgesp' ? 'dmgesp' : 'des'};
     }
     function deCero(){
       api.cerrar();

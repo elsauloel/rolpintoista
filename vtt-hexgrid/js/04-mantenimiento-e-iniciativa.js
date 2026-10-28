@@ -1062,6 +1062,7 @@ $('#modo-switch').onclick = async () => {
   const nuevo = modoMapa === 'combate' ? 'narrativo' : 'combate';
   try{
     await fbDb.doc(fbRutaCampana(rutaMapaEstado('modo'))).set({modo: nuevo, actualizado: firebase.firestore.FieldValue.serverTimestamp()});
+    if(nuevo === 'combate') abrirEstadoDelGrupo('combate');   // 🩺 los turnos de los estados que traen, para ajustarlos (js/81)
   }catch(err){
     console.error('No se pudo cambiar el modo:', err);
     toast('No se pudo cambiar el modo del mapa');

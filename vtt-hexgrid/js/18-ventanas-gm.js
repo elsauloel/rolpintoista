@@ -177,7 +177,7 @@ async function vgPublicar(){
   if(res.items.length){
     combateMapa = {...(combateMapa || {}), estado: 'publicado'};   // sin esperar al snapshot
     abrirBotinGMMapa();   // el GM ve qué toma cada uno; puede cerrar la ventana y volver a abrirla con 🎁
-  }
+  }else abrirEstadoDelGrupo('fin');   // 🩺 sin botín, el combate terminó acá (js/81)
 }
 
 /* --- 🎁 Despojos: lo que nadie tomó → despojos, y se pagan la XP y el oro --- */
@@ -217,6 +217,7 @@ async function vgDespojar(){
   toast(res.mensaje);
   vgBotin = null;   // el próximo combate arranca con la lista de personajes de nuevo
   vgCerrar('vg-botin');
+  abrirEstadoDelGrupo('fin');   // 🩺 cómo quedó el grupo: el GM decide qué estados temporales les saca (js/81)
 }
 // El combate cambió (js/12, escucharBotinParaJugador): si el botín ya no está publicado, su ventana se cierra (salvo mientras despoja).
 function vgCombateCambio(){

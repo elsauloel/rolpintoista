@@ -1858,3 +1858,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   borra (`tunelBorrar`: al empezar su próximo turno, `turnoDeToken` de js/04; sin orden de turnos, con el ⟳ de la ronda, `tunelMantenimiento`). En la
   niebla no se ve; un token oculto no delata su túnel. **Regla nueva** (`tunel` en `tokenValido`): hay que pegarla.
 
+
+- **🩺 Cómo quedó el grupo · 🔦 quien ataca se delata · 😇 el Pacto** (2026-10-28, dueño): `js/81-estado-del-grupo.js` (ventana del GM con vida, SP y No2
+  con máximo y los estados de cada personaje del mapa; − turnos + y ✕ Sacar en los temporales; se abre sola al cerrar el botín o al publicar sin botín, y al
+  pasar a combate). `js/82-delatado.js` (quien crea un duelo contra un rival o una zona queda a la vista en esa casilla hasta moverse o pasar la ronda;
+  `mapa/delatados`, lo escribe el GM, sin reglas nuevas). `js/83-pacto.js` (el botón 😇 de arriba; el pacto se gasta en `danioPj`, js/10, y en
+  `FichaAcciones.revisarAnkh`). El máximo de vida, SP y No2 se ve debajo de cada circulito del token.

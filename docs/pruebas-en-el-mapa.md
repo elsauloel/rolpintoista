@@ -265,6 +265,17 @@
 
 ## Pendientes
 
+- [x] **😇 El Pacto (2026-10-28, dueño)**: «😇 Pacto: sí / no» en la ficha (al lado del Nivel); el botón 😇 arriba del mapa, dorado si está activo y gris si se
+  gastó; con la vida en 0 revive solo con un cuarto (P229), Titilando, y se gasta. **Probado** («Claude · pruebas», jugador): juan, Pacto sí en la ficha →
+  el botón dorado en el mapa; 60 de daño desde «Recibe daño» → el Aviso «juan cae… y su pacto lo levanta», 7/30 HP, Titilando, el pacto en no y el botón
+  gris. En El origen quedaron con pacto Bizzante y Rockardo (Pietro); Larry, sin.
+- [x] **🔦 Quien ataca se delata (2026-10-28, dueño)**: **probado** con el Tunelero (arco, metido en la niebla a 7 casillas de juan): al crear el duelo
+  quedó anotado y en la pantalla del jugador se lo veía, con su casilla alumbrada. Falta ver: que deje de verse al moverse a la niebla o al pasar la ronda,
+  una zona de un creep, y un personaje en sigilo que ataca (el GM lo ve).
+- [x] **🛡 Parry contra un disparo (2026-10-28, pregunta del dueño)**: la regla (2026-10-09) es que contra un disparo el Parry vale **solo con escudo**.
+  **Probado** con el arco del Tunelero: a juan (sin arma ni escudo) solo le ofreció Evasión; a Clementino (con la Tapa de tacho de basura) le ofreció
+  «Parry · Tapa de tacho de basura — 1 No2, 1d6; si ganás, el disparo queda parado (sin Bloqueo)».
+
 - [~] **🩺 Cómo quedó el grupo (2026-10-28, dueño)**: ventana del GM con vida, SP y No2 (con su máximo) y los estados de cada personaje con token en el
   mapa; los temporales con − turnos + y ✕ Sacar (`vtt-hexgrid/js/81-estado-del-grupo.js`). **Probado** («Claude · pruebas», GM): al pasar de narrativo a
   combate se abre sola; Rengo de juan 2 → 3 → 2 con + y −. **Falta**: verla abrirse sola al cerrar el botín (🏁 Cerrar botín y repartir) o al publicar un

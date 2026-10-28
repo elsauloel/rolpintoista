@@ -44,7 +44,7 @@ async function enyetarCandidatos(yo){
       const s = Duelo.tiradaSumable(x, lado);
       if(!s || s.enyetada) return;
       const otro = x[lado === 'atacante' ? 'defensor' : 'atacante'] || {};
-      lista.push({tokenId: p.tokenId, nombre: p.nombre || nombreDe(t), etq: s.etq, total: s.total, contra: otro.nombre || 'el otro'});
+      lista.push({tokenId: p.tokenId, nombre: p.nombre || nombreDe(t), etq: s.etq, total: s.total, contra: otro.nombre || 'el otro', dueloId: doc.id, lado, ref: p.ref || '', rolls: s.rolls || []});
     });
   });
   return lista;
@@ -79,14 +79,14 @@ async function enyetarUsar(yo, objetivoId){
 /* La tirada repetida en la Mesa (2026-10-12, dueño: «cuando se tiran los dos dados, el seleccionado tiene que tener una animación»): ruedan los dos
    juegos (el de antes y el nuevo) y el que queda se destaca — Enyetar con la animación de mala vibra (destacar 'malo:idx:…', comun/dados3d.js),
    Afortunado (js/39) con el brillo dorado de siempre. Si los dados de antes no se pueden reconstruir, rueda solo el nuevo. */
-async function publicarRepeticion(nom, r, modo, desde){
+async function publicarRepeticion(nom, r, modo, desde, titulo){
   const malo = modo === 'peor', antes = Array.isArray(r.rollsAntes) ? r.rollsAntes : [], n = (r.rolls || []).length;
   const juntos = n > 0 && antes.length === n;
   const queda = juntos ? (r.nuevaQueda ? [...Array(n).keys()].map(i => i + n) : [...Array(n).keys()]) : (r.nuevaQueda ? [...Array(n).keys()] : []);
   const que = malo ? 'se queda con la peor (Enyetar)' : 'se queda con la mejor (Re-roll)';
   try{
     await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: nom,
-      origen: `${malo ? '🐈‍⬛' : '🧚'} ${nom} · repite su ${r.etq}: ${fmt(r.antes)} y ${fmt(r.nueva)} → queda ${fmt(r.ahora)} (${que})`.slice(0, 160),
+      origen: (titulo ? `${titulo}: ${fmt(r.antes)} y ${fmt(r.nueva)} → queda ${fmt(r.ahora)} (la peor)` : `${malo ? '🐈‍⬛' : '🧚'} ${nom} · repite su ${r.etq}: ${fmt(r.antes)} y ${fmt(r.nueva)} → queda ${fmt(r.ahora)} (${que})`).slice(0, 160),
       formula: juntos ? `${r.dados}+${r.dados}` : (r.dados || '0'), rolls: juntos ? [...antes, ...r.rolls] : (r.rolls || []), mod: 0, total: r.ahora,
       ...(queda.length && queda.length <= 20 ? {destacar: (malo ? 'malo:' : '') + 'idx:' + queda.join(',')} : {}),
       desde, cuando: firebase.firestore.FieldValue.serverTimestamp()});

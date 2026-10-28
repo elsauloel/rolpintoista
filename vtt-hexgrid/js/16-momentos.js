@@ -85,6 +85,7 @@ function momentoRecibido(id, d){
   if(d.tipo === 'diablito' && typeof diablitoMomento === 'function' && diablitoMomento(id, d)) return;   // 😈 la Botella con un diablito (js/53)   // ▶ Empieza tu turno: al centro de su dueño (js/04)   // 🫳 el robo en sigilo (js/47): solo la víctima y el GM
   if(d.tipo === 'rayo' && d.datos && Array.isArray(d.datos.saltos)) rayoMomento(id, d);
   if(d.tipo === 'desarme' && d.datos && typeof desarmeRuleta === 'function') desarmeRuleta(id, d.datos);
+  if(d.tipo === 'mal-de-ojo' && typeof malDeOjoMomento === 'function') malDeOjoMomento(id, d);   // 🧿 volver a tirar y quedarse con la peor (js/60)
   if(d.tipo === 'zona-extra' && typeof zonaExtraMomento === 'function') zonaExtraMomento(id, d);   // 🎲 la tirada extra de una zona, para quien la creó (js/66)   // 🤺 la ruleta de casillas (js/62)
   if(d.tipo === 'gancho' && typeof arrastreZonasMomento === 'function') arrastreZonasMomento(id, d);   // ⚖ Arrastrar: las zonas del camino, para el dueño (js/78)
   if(d.tipo === 'confusion') confusionMomento(d);   // la tirada de Confusión del turno (js/20)
@@ -128,7 +129,7 @@ function momentoRecibido(id, d){
   // `paraUids` (2026-10-08, el choque de un empujón): el mismo aviso al centro para varios (cada involucrado).
   const paraMi = d.datos && ((d.datos.paraUid && d.datos.paraUid === fbUsuario.uid) || (Array.isArray(d.datos.paraUids) && d.datos.paraUids.includes(fbUsuario.uid)));
   // (La tirada extra de una zona tiene su propio cartel, con el botón para tirar — js/66: el aviso genérico lo tapaba. 2026-10-22)
-  if(!chicoParaMi && paraMi && d.tipo !== 'zona-extra' && (d.creadoPor !== fbUsuario.uid || d.datos.aviso)){ momentoAvisoCentro(id, d); return; }
+  if(!chicoParaMi && paraMi && d.tipo !== 'zona-extra' && d.tipo !== 'mal-de-ojo' && (d.creadoPor !== fbUsuario.uid || d.datos.aviso)){ momentoAvisoCentro(id, d); return; }
   // La esquina: todo, salvo lo que esta pantalla ya sigue al centro.
   const mio = d.creadoPor === fbUsuario.uid && d.datos && d.datos.centro;
   if(d.tipo === 'oportunidad' && oporSoyDecisor(d)){ momentosFeed.delete(id); renderMomentosFeed(); return; }   // lo decide esta pantalla, al centro
@@ -138,7 +139,7 @@ function momentoRecibido(id, d){
   const ya = momentosFeed.get(id);
   // ▶ El inicio de turno sin aplicar queda (el GM tiene «Aplicar por él»); 🎲 la tirada extra de una zona, mientras espere algo (el GM tiene
   // «Tirar por él», «Que se aplique» y «Aplicar»: a los 14 s se borraba y el GM se quedaba sin el botón; 2026-10-22).
-  const largo = (d.tipo === 'inicio-turno' && d.estado === 'esperando') || (d.tipo === 'zona-extra' && ['esperando', 'tirado', 'aplicar'].includes(d.estado));
+  const largo = (d.tipo === 'inicio-turno' && d.estado === 'esperando') || (d.tipo === 'mal-de-ojo' && d.estado === 'esperando') || (d.tipo === 'zona-extra' && ['esperando', 'tirado', 'aplicar'].includes(d.estado));
   momentosFeed.set(id, {d, hasta: Date.now() + (largo ? 30 * 60 * 1000 : MOMENTO_DURA_MS), orden: ya ? ya.orden : ++momentosOrden});   // el más nuevo, arriba
   renderMomentosFeed();
 }
@@ -179,6 +180,7 @@ function renderMomentosFeed(){
     feed.style.cssText = 'position:absolute;right:12px;top:118px;width:min(300px,60vw);z-index:31;display:flex;flex-direction:column;gap:6px;pointer-events:none';
     feed.addEventListener('click', ev => {
       const b = ev.target.closest('[data-trampa-seguir]'); if(b) trampaSeguir(b.dataset.trampaSeguir);
+      const bm = ev.target.closest('[data-mal-de-ojo]'); if(bm){ const v = momentosFeed.get(bm.dataset.malDeOjo); if(v && typeof malDeOjoTirar === 'function'){ bm.disabled = true; malDeOjoTirar(bm.dataset.malDeOjo, v.d, true); } }   // 🧿 (js/60)
       const bz = ev.target.closest('[data-zona-extra]'); if(bz){ const v = momentosFeed.get(bz.dataset.zonaExtra); if(v && typeof zonaExtraTirar === 'function'){ bz.disabled = true; zonaExtraTirar(bz.dataset.zonaExtra, v.d, true); } }   // 🎲 (js/66)
       const bzo = ev.target.closest('[data-zona-extra-ok]'); if(bzo){ bzo.disabled = true; momentoActualizar(bzo.dataset.zonaExtraOk, {estado: 'aplicar'}); }   // 🎲→◎ el GM acepta por quien tiró (js/66)
       const bza = ev.target.closest('[data-zona-extra-aplicar]'); if(bza){ const v = momentosFeed.get(bza.dataset.zonaExtraAplicar); if(v && typeof zonaExtraAplicar === 'function'){ bza.disabled = true; zonaExtraAplicar(bza.dataset.zonaExtraAplicar, v.d, true); } }   // 🎲→◎ el GM aplica por quien lo recibe (js/66)
@@ -196,6 +198,7 @@ function renderMomentosFeed(){
       ${lineas ? lineas.map((l, i) => `<div style="margin-top:3px;color:${i === lineas.length - 1 ? '#e9ecf4' : '#9aa3b8'}">${esc(l)}</div>`).join('')
         : d.resultado ? `<div style="margin-top:3px;color:#cfd6e6">${esc(d.resultado)}</div>` : (d.estado === 'listo' ? '' : '<div style="margin-top:3px;color:#8d97ad">…</div>')}
       ${d.tipo === 'trampa' && d.datos && d.datos.fase ? trampaBotonFeed(k, d) : ''}
+      ${d.tipo === 'mal-de-ojo' && d.estado === 'esperando' && soyGM && !(d.datos && fbUsuario && d.datos.paraUid === fbUsuario.uid) ? `<div style="margin-top:6px"><button type="button" data-mal-de-ojo="${esc(k)}" style="font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid #8a6fd0;background:#2a1f3a;color:#e9ecf4;cursor:pointer">🎲 Tirar por él</button></div>` : ''}
       ${d.tipo === 'zona-extra' && d.estado === 'esperando' && soyGM && !(d.datos && fbUsuario && d.datos.paraUid === fbUsuario.uid) ? `<div style="margin-top:6px"><button type="button" data-zona-extra="${esc(k)}" style="font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid #6fae7d;background:#1f3a27;color:#e9ecf4;cursor:pointer">🎲 Tirar por él</button></div>` : ''}
       ${d.tipo === 'zona-extra' && d.estado === 'tirado' && soyGM && !(d.datos && fbUsuario && d.datos.paraUid === fbUsuario.uid) ? `<div style="margin-top:6px"><button type="button" data-zona-extra-ok="${esc(k)}" style="font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid #6fae7d;background:#1f3a27;color:#e9ecf4;cursor:pointer">✔ Que se aplique (por él)</button></div>` : ''}
       ${d.tipo === 'zona-extra' && d.estado === 'aplicar' && soyGM && !(typeof zonaExtraManejo === 'function' && d.datos && zonaExtraManejo(d.datos.objetivo)) ? `<div style="margin-top:6px"><button type="button" data-zona-extra-aplicar="${esc(k)}" style="font-size:12px;padding:3px 10px;border-radius:6px;border:1px solid #6fae7d;background:#1f3a27;color:#e9ecf4;cursor:pointer">◎ Aplicar por él</button></div>` : ''}

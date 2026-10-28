@@ -472,7 +472,7 @@ const Duelo = (() => {
     const o = {pdg: c(t.pdg, -6, 10), crit: c(t.crit, 0, 5), critpot: c(t.critpot, 0, 6), fijo: c(t.fijo, -10, 10), ignora: c(t.ignora, 0, 5)};   // fijo negativo: la caída (2026-10-11)
     Object.keys(o).forEach(k => { if(!o[k]) delete o[k]; });
     if(/^\d?d\d{1,2}$/.test(String(t.dado || ''))) o.dado = String(t.dado);   // el primer disparo del combate: +1 dado (2026-10-11)
-    if(!Object.keys(o).length) return null;
+    if(!Object.keys(o).length && !/tiro alto/.test(String(t.motivo || ''))) return null;   // 🏹 el tiro alto queda a la vista aunque otro bono lo compense (2026-10-28)
     o.motivo = txtCorto(t.motivo || 'el tiro', 60);
     return o;
   };
@@ -993,7 +993,8 @@ const Duelo = (() => {
       const esd = campo === 'pdg' && m.ataque && m.ataque.estandarte ? _num(m.ataque.estandarte.pdg) : 0;   // 🚩 bajo el estandarte
       if(esd > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + esd, mod: p0.mod + esd, formula: `${p0.formula} +${esd} estandarte`.slice(0, 60)}; }
       const tpd = campo === 'pdg' && m.ataque && m.ataque.tiro ? _num(m.ataque.tiro.pdg) : 0;   // el bono del tiro: distancia ideal (+) o tiro alto (−2)
-      if(tpd){ const p0 = m.pdg; m.pdg = {...p0, total: Math.max(0, p0.total + tpd), mod: p0.mod + tpd, formula: `${p0.formula} ${tpd > 0 ? '+' : '−'}${Math.abs(tpd)} ${m.ataque.tiro.motivo}`.slice(0, 60)}; }
+      if(tpd){ const p0 = m.pdg; m.pdg = {...p0, total: Math.max(0, p0.total + tpd), mod: p0.mod + tpd, formula: `${p0.formula} ${tpd > 0 ? '+' : '−'}${Math.abs(tpd)} ${m.ataque.tiro.motivo}`.slice(0, 90)}; }
+      else if(campo === 'pdg' && m.ataque && m.ataque.tiro && /tiro alto/.test(String(m.ataque.tiro.motivo || ''))){ const p0 = m.pdg; m.pdg = {...p0, formula: `${p0.formula} ±0 (${m.ataque.tiro.motivo})`.slice(0, 90)}; }
       const cpd = campo === 'pdg' && extra ? Math.round(_num(extra.cargaPdg)) : 0;   // 👁 lo que una carga suma a la Probabilidad de Golpe (Ojo de asesino, 2026-10-26)
       if(cpd > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + cpd, mod: p0.mod + cpd, formula: `${p0.formula} +${cpd} ${extra.cargaPdgNombre || 'carga'}`.slice(0, 60)}; }
       if(campo === 'eva' && defensa) m.defensa = defensa;

@@ -123,7 +123,14 @@ async function tiroRevisar(mio, t, ataque, yo){
   const ideal = Combatiente.bonoIdeal(ataque, d, ataque.alcance);
   if(!ideal && !alto) return {seguir: true, tiro: null};
   const tiro = ideal ? {...ideal} : {motivo: ''};
-  if(alto){ tiro.pdg = Math.round(num(tiro.pdg)) + (ataque.tiroAltoLimpio ? 0 : Combatiente.TIRO_ALTO_PDG); tiro.motivo = tiro.motivo ? `${tiro.motivo} y tiro alto` : 'tiro alto'; }   // sin castigo: el arco que lo trae (2026-10-11)
+  // 🏹 Cada parte con su número (2026-10-28, dueño: «con un arquero hice el tiro alto con −2 y no le aplicó la penalidad»: se aplicaba, pero si la distancia
+  // ideal u otro bono lo compensaban, no quedaba rastro). Sin castigo: el arco que lo trae (2026-10-11).
+  if(alto){
+    const pIdeal = Math.round(num(tiro.pdg)), castigo = ataque.tiroAltoLimpio ? 0 : Combatiente.TIRO_ALTO_PDG;
+    tiro.pdg = pIdeal + castigo;
+    const altoTxt = `tiro alto (${castigo ? '−' + Math.abs(castigo) : 'sin castigo'})`;
+    tiro.motivo = tiro.motivo ? `${tiro.motivo}${pIdeal ? ` (${pIdeal > 0 ? '+' : '−'}${Math.abs(pIdeal)})` : ''} y ${altoTxt}` : altoTxt;
+  }
   return {seguir: true, tiro};
 }
 // Los objetivos en la distancia ideal (para que brillen distinto mientras se apunta).

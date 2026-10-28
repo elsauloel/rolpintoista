@@ -853,8 +853,8 @@
   H('Arma venenosa', 'B', '*', 'a', 3, aE('Arma venenosa', 'tóxico y deja Veneno: 1 stack cada 3 de daño tóxico que entra (mínimo 1)'));
   // 🧿 Auditada (dueño, 2026-10-21; el Debuffer, «maleficios»): el Enyetar de los personajes, para creeps, con Flash (en turno ajeno, el doble) y el botón
   // 🧿 del GM (vtt-hexgrid/js/60). Los números, los del Enyetar: 5 SP (sin No2) o cooldown 3.
-  H('Mal de ojo', 'X', '*', 'gx', 3, {detalle: 'FLASH. Después de que un personaje tira (a la vista, dentro de su Rango), le echa el mal de ojo: tira su Probabilidad de Golpe especial contra la Resistencia especial del personaje; si gana, esa tirada se repite y se queda con la más baja, y el duelo se vuelve a resolver. Una vez por tirada. En turno ajeno cuesta el doble. El GM la usa desde el botón 🧿 (arriba, o al costado del duelo abierto).',
-    no2: 0, spCosto: 5, auditada: true, malDeOjo: true, ataqueTxt: 'su PdG.Esp contra la Res.Esp; si gana, esa tirada se repite y queda la peor',
+  H('Mal de ojo', 'X', '*', 'gx', 3, {detalle: 'FLASH. Después de que un personaje tira (a la vista, dentro de su Rango), le echa el mal de ojo: el personaje vuelve a hacer esa tirada y se queda con la más baja, y el duelo se vuelve a resolver. Una vez por tirada. En turno ajeno cuesta el doble. El GM la usa desde el botón 🧿 (arriba, o al costado del duelo abierto).',
+    no2: 0, spCosto: 5, auditada: true, malDeOjo: true, ataqueTxt: 'el personaje repite esa tirada y se queda con la peor',
     duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['resmg'], alcance: 'rango', dano: false, efectos: [{nombre: 'Mal de ojo', polaridad: 'debuff'}]}});
   H('Confusión', 'XK', '*', 'gx', 4, {detalle: 'Le enreda la mente: tira su Probabilidad de Golpe especial contra la Resistencia mental de un rival dentro de su Rango; si gana, queda Confundido 1 turno (antes de su primera acción tira 1d4: 1 decide el GM, 2 pierde el turno, 3 actúa contra un objetivo al azar, 4 actúa normal).',
     no2: 2, spCosto: 3, auditada: true, ataqueTxt: 'su PdG.Esp contra la Res.Mt del objetivo; si gana, Confusión 1 turno',

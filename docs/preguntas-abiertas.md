@@ -1335,3 +1335,11 @@ toda, 1? ¿El Pacto antes o después del Ankh?
 
 **Dueño (2026-10-28): «correcto»** a las dos: revive con **un cuarto de la vida máxima** y el orden es **Llama de Fénix → Pacto → Ankh**. Y al revivir, **un solo
 anuncio**: «Zafaste de morir: te salvó el pacto» para quien cae (en la Crónica, «X zafó de morir: lo salvó el pacto»), sin cartelito ni línea en la Mesa.
+
+### P230 — 🧿 Mal de ojo: ¿sigue habiendo una tirada para echarlo? (2026-10-28) ⏳ abierta
+
+**Contexto:** el dueño pidió (2026-10-28) que el Mal de ojo se viva así: «el jugador tira PdG en su duelo; el rival tira "mal de ojo"; selecciona la
+tirada; al jugador le aparece "fulano te tiró mal de ojo: volvé a tirar PdG y quedate con el peor resultado", botón "tirar PdG"». Antes había una
+contienda previa (el PdG.Esp del creep contra la Res.Esp del personaje; si el personaje ganaba, no pasaba nada). **Hoy (programado así):** sin esa
+contienda: el GM elige la tirada, se cobra el costo (el doble en turno ajeno) y el personaje la repite sí o sí. ¿Va así, o se vuelve a poner la tirada de
+resistencia antes del aviso? (El Enyetar de los jugadores sigue con la contienda: si se cambia uno, ¿se cambia el otro?)

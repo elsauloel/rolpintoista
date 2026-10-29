@@ -2234,7 +2234,7 @@ async function dueloAplicarEfecto(d, ef){
   const r = await dueloAplicarEfectoBase(d, ef);
   try{
     const spec = Duelo.specDeEfecto(ef), t = tokens.get(d.defensor.tokenId);
-    if(t && spec && spec.nombre && spec.nombre !== 'Desafiante' && !spec.cura && r && !r.manual && !/^no entró/i.test(String(r.nota || ''))){   // (el Desafiante es de quien provoca: se anuncia él)
+    if(t && spec && spec.nombre && spec.nombre !== 'Desafiante' && !spec.cura && r && !r.manual && !r.sinEfecto && !/^no entró/i.test(String(r.nota || ''))){   // (el Desafiante es de quien provoca: se anuncia él)
       dueloBuffMomento(d, t, spec);
       await cargaAlGolpeAbierto(t, d.defensor.tokenId, spec.nombre);
     }
@@ -2424,8 +2424,21 @@ async function dueloAplicarEfectoBase(d, ef){
     const total = res && res.total > Math.max(1, num(unico.stacks) || 1) * veces ? ` → ahora ×${res.total}` : '';
     return res && res.ok ? {nota: sumado + total} : {nota: 'no entró: ' + ((res && res.motivo) || 'está protegido')};
   }
+  // 🛡 Sin armadura puesta, el Rompe armadura de un golpe no tiene efecto (dueño, 2026-10-29: «no tiene efecto, no tiene armadura»): en un personaje la
+  // rotura va a las piezas de armadura (el escudo, solo con Parry o Bloqueo, que llegan con `item`).
+  if(spec.nombre === 'Armadura rota' && !spec.item && !String(t.fichaId).includes(SEP_INVOCACION) && !(await pjTieneArmadura(t.fichaId)))
+    return {nota: 'Rompe armadura: no tiene efecto, no tiene armadura puesta', sinEfecto: true};
   for(let i = 0; i < veces; i++) await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: unico, origen: `${d.atacante.nombre} · ${ef.nombre}`});
   return {nota: 'le llegó a su ficha: ' + EstadosAplicar.texto(unico) + (veces > 1 ? ` ×${veces}` : '')};
+}
+// ¿Tiene puesta alguna pieza de armadura que se pueda romper? (lee la ficha una vez; ante la duda, sí: la ficha avisa igual)
+async function pjTieneArmadura(fichaId){
+  try{
+    await cargarPiezas(BN_PIEZAS);
+    const l = await FichaGuardado.cargar(fbDb, fbRutaCampana(`fichas/${fichaId}`));
+    if(!l || !l.S) return true;
+    return (l.S.inventario || []).some(i => i && i.equipado && FichaCalculo.esArmaduraItem(i) && FichaCalculo.durActual(i) > 0);
+  }catch(err){ console.error('No se pudo mirar la armadura del personaje:', err); return true; }
 }
 
 // Demora (Tipo 10, dueño 2026-10-03): baja al golpeado 1 lugar en el orden de turnos, definitivo (el turno sigue con quien lo tenía).

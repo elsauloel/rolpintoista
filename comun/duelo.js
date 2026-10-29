@@ -2306,6 +2306,7 @@ const Duelo = (() => {
       const spec = specDeEfecto(ef);
       let estado;
       if(ef.omitido) estado = `<div class="duelo-ef-res no">✘ No entra: ${_esc(ef.motivo || 'el golpe no hizo daño')}</div>`;
+      else if(ef.aplicado && ef.sinEfecto) estado = `<div class="duelo-ef-res no">✘ Sin efecto${ef.nota ? ' · ' + _esc(ef.nota) : ''}</div>`;   // (Rompe armadura a quien no tiene armadura, 2026-10-29)
       else if(ef.aplicado) estado = `<div class="duelo-ef-res ok">✔ Aplicado${ef.nota ? ' · ' + _esc(ef.nota) : ''}</div>`;
       else if(ef.res && !ef.res.exito) estado = `<div class="duelo-ef-res no${nuevo ? ' nuevo' : ''}">✘ No funcionó <span>(${ef.res.manual ? '✍ a mano' : `salió ${_fmt(ef.res.dado)} en 1d${_fmt(ef.caras)}`})</span></div>`;
       else if(ef.res || (!necesitaTiradaEf(ef) && siempreEf(ef))){
@@ -3359,7 +3360,7 @@ const Duelo = (() => {
               let info;
               try{ info = await cfgEscuchar.aplicarEfecto(d, ef); }
               catch(err){ console.error('Duelo: no se pudo aplicar el efecto', err); info = {manual: true, nota: 'no se pudo aplicar solo: hacelo a mano'}; }
-              await marcarEfecto(d.id, i, {aplicado: true, aplicar: '', nota: String(info.nota || (info.manual ? 'a mano' : '')).slice(0, 120)});
+              await marcarEfecto(d.id, i, {aplicado: true, aplicar: '', nota: String(info.nota || (info.manual ? 'a mano' : '')).slice(0, 120), ...(info.sinEfecto ? {sinEfecto: true} : {})});
             }).catch(err => console.error('Duelo: error al aplicar el efecto', err));
           });
         });

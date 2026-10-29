@@ -5358,7 +5358,7 @@ prueba('personaje: manos, Defensa y resistencias con su origen (una pieza rota v
   const m = FichaLite.personaje(S), c = FichaCalculo.calcular(S);
   const roto = FichaCalculo.itemRoto(S.inventario[3]);
   igual([m.manos[0].nombre, m.manos[1].nombre, m.defensa.valor, m.crit[2].valor, m.equipo.map(e => e.nombre), m.estados.map(e => e.nombre)],
-    ['Espada', 'Broquel', c.final.def, c.final.tipo3, ['Casco', 'Peto roto'], ['Piel dura']]);
+    ['Espada', 'Broquel', c.final.def, c.final.tipo3, ['Casco', 'Peto roto'], ['Piel dura', 'Sobrepeso']]);   // (los derivados también, desde el 2026-10-29: antes `window.FichaResumen` no existía)
   const lin = m.defensa.lineas.map(l => l.txt + (l.tachado ? '~' : ''));
   cierto(lin.includes('Broquel') && lin.includes('Casco') && lin.includes('Piel dura'), 'Defensa sin sus orígenes: ' + lin.join(', '));
   if(roto) cierto(lin.includes('Peto roto (rota: no cuenta)~'), 'la pieza rota tendría que ir tachada');

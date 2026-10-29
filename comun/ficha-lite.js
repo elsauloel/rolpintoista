@@ -18,9 +18,9 @@ const FichaLite = (() => {
 
   // Nombre corto de un stat ("Defensa", "PdG", "Tipo 4"), con lo que haya cargado.
   function etq(stat){
-    const F = window.FichaCalculo;
+    const F = typeof FichaCalculo !== 'undefined' ? FichaCalculo : null;   // (las piezas son const: no cuelgan de window)
     if(F && F.STAT_LABEL && F.STAT_LABEL[stat]) return F.STAT_LABEL[stat];
-    const C = window.CreepCalculo;
+    const C = typeof CreepCalculo !== 'undefined' ? CreepCalculo : null;
     if(C && C.STAT_LOOKUP && C.STAT_LOOKUP[stat]) return C.STAT_LOOKUP[stat].label || stat;
     return stat === 'def' ? 'Defensa' : stat;
   }
@@ -117,7 +117,7 @@ const FichaLite = (() => {
       defensa: lineasFicha(S, c, 'def'),
       crit: ['tipo1', 'tipo2', 'tipo3', 'tipo4', 'tipo5'].map(id => lineasFicha(S, c, id)),
       equipo,
-      estados: estadosLista(window.FichaResumen ? FichaResumen.estadosTodos(S) : S.efectos),
+      estados: estadosLista(typeof FichaResumen !== 'undefined' ? FichaResumen.estadosTodos(S) : S.efectos),
       extras: [
         {etq: 'DDE', valor: fmt(num(meta.dde)), lineas: [{txt: 'Tu dinero: para comprar en las tiendas; es lo que cobrás al vender.'}]},
         {etq: 'Despojos', valor: `${fmt(num(S.loot && S.loot.normal))} · ${fmt(num(S.loot && S.loot.magico))} · ${fmt(esp)}`,
@@ -201,7 +201,7 @@ const FichaLite = (() => {
   function invocacion(inv, duenoNombre){
     const I = InvCalculo;
     const dmg = I.statValor(inv, 'dmg');
-    const slotDe = window.FichaCalculo ? FichaCalculo.slotDe : (t => ({escudo_1m: 'escudo', escudo_2m: 'escudo'}[t] || 'otro'));
+    const slotDe = typeof FichaCalculo !== 'undefined' ? FichaCalculo.slotDe : (t => ({escudo_1m: 'escudo', escudo_2m: 'escudo'}[t] || 'otro'));
     return {
       titulo: inv.nombre || 'Invocación',
       subtitulo: ['Invocación', duenoNombre ? `de ${duenoNombre}` : '', inv.activa === false ? 'dormida' : ''].filter(Boolean).join(' · '),

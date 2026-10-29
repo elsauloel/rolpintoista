@@ -246,7 +246,9 @@ function calcularDisposicion(){
   // Tokens ocultos (solo el GM los prepara y los muestra cuando corresponde):
   // a los jugadores ni se les dibujan ni se pueden tocar.
   const orden = [...tokens.entries()]
-    .filter(([, t]) => (soyGM || !t.oculto) && (soyGM || !t.bajoTierra) && tokenVisiblePorNiebla(t))   // 🕳 bajo tierra: los jugadores ven solo el pozo (js/46)
+    // 🕳 bajo tierra: los demás jugadores ven solo el pozo (js/46); su dueño (o quien lo maneja) lo ve transparente y lo puede mover por abajo
+    // (2026-10-28, probando Excavar de jugador: no lo veía ni lo podía agarrar).
+    .filter(([, t]) => (soyGM || !t.oculto) && (soyGM || !t.bajoTierra || puedeMover(t)) && tokenVisiblePorNiebla(t))
     .map(([id, t]) => ({id, t}))
     .sort((a, b) => (a.t.creadoMs - b.t.creadoMs) || (a.id < b.id ? -1 : 1));
   const grupos = new Map();
@@ -841,7 +843,7 @@ function dibujarLienzo(){
     // Oculto: solo lo dibuja el GM (los demás ni lo tienen en disposicion),
     // más transparente para acordarse de que los jugadores no lo ven.
     if(t.oculto || enSigilo(t)) ctx.globalAlpha = 0.5;
-    if(t.bajoTierra) ctx.globalAlpha = 0.3;   // 🕳 bajo tierra: el GM lo ve transparente, encima del pozo
+    if(t.bajoTierra) ctx.globalAlpha = 0.3;   // 🕳 bajo tierra: el GM (y su dueño) lo ve transparente, encima del pozo
     if(etereoDe(t)) ctx.globalAlpha = Math.min(ctx.globalAlpha, 0.55);   // 👁 etéreo: se ve, transparente
     // Titila (2026-10-06, dueño: «como en el Contra»): con cualquier estado que lo hace invulnerable, prende y apaga rápido.
     if(tokenTitila(t)){ if(Math.floor(performance.now() / 260) % 2) ctx.globalAlpha *= 0.2; animando = true; }

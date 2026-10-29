@@ -232,6 +232,8 @@ línea que se ejecuta **al cargar** (no adentro de una función) solo puede usar
   (`iniciativaDemorarTurno`: le toca al de abajo, él juega después sin repetir el inicio, `iniciativa.empezados`). Si a ▶ Siguiente le toca uno que
   ya jugó, el GM elige si vuelve a actuar (`iniciativaPreguntarRepite`; `iniciativa.repite`: sin inicio ni fin de turno, tampoco con el ▶ Turno
   normal a uno que ya jugó). La Demora (`dueloDemora`, js/13) ya no queda a mano: en su propio turno baja al terminarlo (`iniciativa.demoras`).
+  Y avisa (`demoraAviso`, js/13): «⏬ Fuiste demorado» al centro para quien juega con el demorado (su lugar nuevo; en su turno, «cuando lo termines
+  bajás…»; al bajar, «bajaste…: ahora estás N.º»), la Crónica para los demás.
 - **Quién ya jugó la ronda** (2026-10-10, regla del dueño con Degollar): `iniciativa.actuaron` (en el documento de la iniciativa) = los que ya
   terminaron su turno en esta ronda; ▶ Siguiente los saltea aunque algo los haya movido más abajo (Degollar, o el GM con ▼), y se vacía al
   empezar la ronda. La lista los muestra con los apagados. `dueloTerminaTurno(d)` (js/04): un ataque con `terminaTurno` que se resuelve manda

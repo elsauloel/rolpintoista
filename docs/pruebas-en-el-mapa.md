@@ -541,7 +541,11 @@
   le pega a Capataz en el turno de Capataz → «es su turno: baja 1 lugar cuando lo termine» y, con ▶, «Demora: Capataz baja 1 lugar (2.º → 3.º)»;
   (3) Tanque le pega a Warrior, que ya jugó → «baja 1 lugar (1.º → 2.º)», queda atenuado después de Tanque, y con ▶ el cartel «¿Vuelve a
   actuar?» para Warrior y para Capataz (No → se saltean, le toca a juan). Ojo: la Demora se aplica recién después de «Aplicar el daño» (como los
-  demás efectos). Las armas quedaron como estaban. **Falta**: verlo el dueño en una sesión.
+  demás efectos). Las armas quedaron como estaban. **El Aviso de la Demora** (mismo día, dueño: «tiene que aparecer un anuncio: fuiste
+  demorado, tu posición en la tabla»), probado del lado del jugador (Clementino, desde la cuenta de su dueño): Warrior le pega con la maza →
+  a la pantalla del jugador «⏬ Clementino fue demorado por Warrior (prueba) · Fuiste demorado: bajás 1 lugar en el orden de turnos: ahora estás
+  3.º (estabas 2.º)» con Entendido; en su propio turno → «Es tu turno: cuando lo termines, bajás 1 lugar»; al tocar él «✅ Terminar turno» →
+  «Terminó tu turno y, por la Demora, bajaste 1 lugar: ahora estás 4.º». **Falta**: verlo el dueño en una sesión.
 - [x] **🔮 Los ocho talismanes que faltaban** (2026-10-18, «Test con claude elsaulo», con capturas): **Piedra bezoar** (Veneno ×3 → ×2 en la
   ficha; ojo: el cuadro del duelo sigue diciendo «le llegó Veneno ×3», porque lo baja la ficha al recibirlo), **Bola de cristal** (un creep en
   sigilo a la vista → el paso «🔮 Bola de cristal» en «Empieza tu turno»), **Sahumerio** (1d4 → 4 se llevó Pajaritos; **arreglado**: el cartel

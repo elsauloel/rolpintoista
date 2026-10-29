@@ -248,7 +248,7 @@ function calcularDisposicion(){
   const orden = [...tokens.entries()]
     // 🕳 bajo tierra: los demás jugadores ven solo el pozo (js/46); su dueño (o quien lo maneja) lo ve transparente y lo puede mover por abajo
     // (2026-10-28, probando Excavar de jugador: no lo veía ni lo podía agarrar).
-    .filter(([, t]) => (soyGM || !t.oculto) && (soyGM || !t.bajoTierra || puedeMover(t)) && tokenVisiblePorNiebla(t))
+    .filter(([, t]) => (soyGM || !t.oculto) && (soyGM || !t.bajoTierra || puedoMover(t)) && tokenVisiblePorNiebla(t))
     .map(([id, t]) => ({id, t}))
     .sort((a, b) => (a.t.creadoMs - b.t.creadoMs) || (a.id < b.id ? -1 : 1));
   const grupos = new Map();

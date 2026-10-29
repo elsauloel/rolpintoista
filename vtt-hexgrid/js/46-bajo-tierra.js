@@ -14,7 +14,7 @@ async function excavarToken(id){
   const t = tokens.get(id);
   if(!t) return false;
   t.bajoTierra = true;
-  if(!soyGM && !puedeMover(t) && seleccion === id) seleccionar(null);   // (su dueño lo sigue teniendo elegido: lo mueve por abajo)
+  if(!soyGM && !puedoMover(t) && seleccion === id) seleccionar(null);   // (su dueño lo sigue teniendo elegido: lo mueve por abajo)
   pedirDibujo();
   try{
     await coleccionTokens().doc(id).update({bajoTierra: true});

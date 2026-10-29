@@ -528,6 +528,16 @@
   **Probado el 2026-10-20 (Claude, «Test con claude elsaulo»):** el creep con Excavar y la Puñalada desde abajo del Kobold tunelero: se mete en la tierra, sale al lado de Silvia (+3 PdG por salir de abajo); con crítico, los efectos pasan a Rengo 2 turnos y Lisiado 1 turno (en vez del Rengo 1).
   «👁 Ver como jugador», abajo, en Probado).
 ## Probado
+- [x] **🏹🛡🕸 Lo del encuentro 1 de El origen que faltaba ver** (2026-10-29, «Claude · pruebas», con capturas; Excavar lo probó el dueño: «anda
+  perfecto»). **Flecha especial en una habilidad de disparo**: Tunelero (prueba) con Disparo señalador → «🏹 ¿Qué flecha?» → Flecha silbadora;
+  el duelo dice «Flecha silbadora: Demora», los efectos juntan Presa y Marcado (la habilidad) con Demora (la flecha), la flecha bajó de 2 a 1 y
+  el disparo cobró 2 No2. **Golpe de escudo** (Tanque con Escudo pequeño contra Warrior): 2 SP + 5 No2, «no se puede parrear» (solo Evasión),
+  2d10 + 10 (peso 2), 18 de daño, Sentado y Demora 1. **Red** (Warrior contra Capataz): 3 SP + 2 No2, PdG contra Evasión, Inmovilizado 3 turnos;
+  al empezar el turno de Capataz, «¿se suelta?» con Fuerza contra 7 y los aliados pegados invitados a ayudar; «¡SE SOLTÓ! (11 contra 7)».
+  **Excavar sin Parry** (el mismo día, dueño: «se puede esquivar, pero no parrear»): saliendo de abajo con la Daga, el duelo dice «no se puede
+  parrear» y Capataz (que tiene un garrote) solo puede esquivar. Ajuste hecho de paso: la Demora de un creep va solo a la Crónica (el Aviso al
+  centro le tapaba al GM los otros efectos del duelo). Visto y no tocado: en la Red, el que la tiró aparece como ayudante si es del mismo bando
+  que el atrapado (solo pasa en pruebas creep contra creep; en partida es rival y no aparece).
 - [x] **⏬ El orden de turnos: ▲▼, demorar el turno, la Demora y «¿vuelve a actuar?»** (2026-10-29, «Claude · pruebas», con capturas; dueño: «si toco
   la flechita para abajo, el que está abajo y el que toqué intercambian posiciones»; «nunca pasar de ronda»; «cada uno tiene un turno por ronda»; «lo
   visual va a ser lo que regule los órdenes de las rondas»). Con Warrior, Capataz, Tanque, juan y Chamán: ▼ en el que tiene el turno → le toca al de

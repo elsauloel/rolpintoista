@@ -4059,8 +4059,14 @@ prueba('Degollar (2026-10-10): +4 PdG, +7, +1/+1 al crítico, termina el turno; 
   const venc = Combatiente.vencerAlEmpezar(S.efectos);
   igual([deg.costo, deg.nitrosCosto, at.mods.pdg, at.mods.fijo, at.mods.critBono, at.mods.critpotBono, at.terminaTurno, r && r.ok, e.nombre, e.expuesto, e.alEmpezarTurno,
     Combatiente.mitadesDeTirada(S.efectos, 'eva'), Combatiente.mitadesDeTirada(S.efectos, 'pdg'), Combatiente.estadosQueParten(S.efectos, 'eva').map(x => x.nombre),
-    filtradas.map(o => o.modo), sinNada.length, Combatiente.expuesto(S.efectos), venc.quedan.length, /deja/i.test(deg.detalle) || /orden de turnos/.test(deg.detalle)],
-    ['7', 'ATAQUE', 4, 7, 1, 1, true, true, 'Expuesto', true, true, 1, 0, ['Expuesto'], ['evasion'], 2, true, 0, true]);
+    filtradas.filter(o => !o.motivoNo).map(o => o.modo), /Expuesto/.test((filtradas.find(o => o.modo === 'parry') || {}).motivoNo || ''), sinNada.length, Combatiente.expuesto(S.efectos), venc.quedan.length, /deja/i.test(deg.detalle) || /orden de turnos/.test(deg.detalle)],
+    ['7', 'ATAQUE', 4, 7, 1, 1, true, true, 'Expuesto', true, true, 1, 0, ['Expuesto'], ['evasion'], true, 2, true, 0, true]);
+});
+prueba('🚫 El Parry que no se puede usar se ve apagado, con el motivo (2026-10-29): golpe sin Parry, Expuesto', () => {
+  const ops = [{modo: 'evasion', info: []}, {modo: 'parry', costo: 1, info: []}];
+  const sp = Combatiente.sinParryDelAtaque(ops, {ataque: {sinParry: true, habNombre: 'Golpe de escudo'}});
+  const nada = Combatiente.sinParryDelAtaque(ops, {ataque: {}});
+  igual([sp.length, sp[0].motivoNo || '', /Golpe de escudo no se deja parrear/.test(sp[1].motivoNo), nada[1].motivoNo || ''], [2, '', true, '']);
 });
 prueba('Tronco de huída (2026-10-10): Flash +2 a la Evasión con dodge roll; 2 SP fijos (también en turno ajeno)', () => {
   const tr = CLASES_SKILLS.find(x => x.id === 'asalto').habilidades.find(x => x.id === 'asalto-tronco-de-huida');

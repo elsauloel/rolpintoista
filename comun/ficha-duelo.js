@@ -305,6 +305,9 @@ const FichaDuelo = (() => {
         // Sin arma ni escudo equipado no se puede parriar (regla del dueño, 2026-09-28).
         const gratis = Combatiente.parryGratis(st => c.final[st], num((S.ataquesArma || {})._parry));   // Parada fácil (2026-10-06)
         const disparo = Combatiente.contraDisparo(d);   // contra un disparo, Parry solo con escudo (2026-10-09)
+        // 🚫 Contra un disparo, las armas que no sirven se ven apagadas, con el motivo (2026-10-29).
+        if(disparo) armasYEscudosParaParry().filter(a => !Combatiente.sirveParaParry(a.item, true) && Combatiente.sirveParaParry(a.item, false)).forEach(a =>
+          ops.push(Combatiente.parryApagado({modo: 'parry', itemId: a.item.id, itemNombre: a.item.nombre, etiqueta: `🗡 Parry · ${a.item.nombre}`, costo: 0, info: []}, 'contra un disparo solo se parrea con escudo')));
         armasYEscudosParaParry().filter(a => Combatiente.sirveParaParry(a.item, disparo)).forEach(a => {
           const costo = gratis ? 0 : Combatiente.costoParry();
           ops.push({modo: 'parry', itemId: a.item.id, itemNombre: a.item.nombre, escudo: String(a.item.tipoItem).startsWith('escudo'), etiqueta: `${String(a.item.tipoItem).startsWith('escudo') ? '🛡' : '🗡'} Parry · ${a.item.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo, motivoNo: Combatiente.defensaSinNo2(S.nitros, costo) ? 'Ya estás en No2 negativos: no podés gastar más en una defensa' : '',

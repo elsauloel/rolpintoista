@@ -785,7 +785,7 @@ const Duelo = (() => {
       ...(h.contraOtro ? {contraOtro: txtCorto(h.contraOtro, 120)} : {})};
   }
   const etqTira = d => (d.hab && d.hab.tira ? d.hab.tira.etq : 'PdG');
-  const selModoHtml = d => d.hab ? (d.hab.contra || []).map(c => `<option value="${_esc(c.modo)}">${_esc(c.etq)}</option>`).join('') : '<option value="evasion">Evasión</option><option value="parry">Parry</option>';
+  const selModoHtml = d => d.hab ? (d.hab.contra || []).map(c => `<option value="${_esc(c.modo)}">${_esc(c.etq)}</option>`).join('') : `<option value="evasion">Evasión</option>${d.ataque && d.ataque.sinParry ? '' : '<option value="parry">Parry</option>'}`;   // a mano, sin Parry si el golpe no se deja parrear
   const etqContra = d => {
     if(d.hab){
       const c = d.defensa ? (d.hab.contra || []).find(x => x.modo === d.defensa.modo) : null;
@@ -801,10 +801,15 @@ const Duelo = (() => {
   // igual — hoy solo lo define ficha.html/gm-tools.html).
   function opcionesHab(d, h){
     const hk = h || hooks();
-    return ((d.hab && d.hab.contra) || [])
+    const contra = (d.hab && d.hab.contra) || [];
+    const ops = contra
       .filter(c => c.stat !== 'parry' || !hk || !hk.puedeParry || hk.puedeParry(d))
       .map(c => ({modo: c.modo, stat: c.stat || '', itemId: '', itemNombre: '', etiqueta: `🛡 ${c.etq}`, costo: 0, motivoNo: '',
         info: c.formula ? [`${c.etq} 🎲 ${c.formula}`] : hk && hk.habValor ? [`${c.etq} 🎲 ${hk.habValor(d, 'defensor', c.stat) || '—'}${_num(c.bono) ? ` ${_num(c.bono) > 0 ? '+' : ''}${_num(c.bono)}` : ''}`] : []}));
+    // 🚫 Una habilidad que se esquiva pero no se parrea (la Red): el Parry se ve apagado, con el motivo, si el objetivo tiene con qué parrear (2026-10-29).
+    if(contra.some(c => c.stat === 'eva') && !contra.some(c => c.stat === 'parry') && hk && hk.puedeParry && hk.puedeParry(d))
+      ops.push(Combatiente.parryApagado({modo: 'parry', stat: 'parry', itemId: '', itemNombre: '', etiqueta: '🛡 Parry', costo: 0, info: []}, `${d.hab.nombre || 'esta habilidad'} se esquiva, no se parrea`));
+    return ops;
   }
   // Pasa a lo que sigue cuando quien usa la habilidad ganó la contienda (o no había): daño, efectos o fin.
   function entrarHab(m){
@@ -2792,7 +2797,7 @@ const Duelo = (() => {
       if(!doc.exists) return;
       const d = {id: m.id, ...doc.data()};
       if(m.tipo === 'duelo-opciones'){
-        const ops = conVistas(d, (h.soy && h.soy(d.defensor)) ? (d.hab ? opcionesHab(d, h) : ((h.opcionesDefensa ? h.opcionesDefensa(d) : []) || []).filter(o => !(d.ataque && d.ataque.sinParry && o.modo === 'parry'))) : null, h);   // null = este personaje/creep no es el mío
+        const ops = conVistas(d, (h.soy && h.soy(d.defensor)) ? (d.hab ? opcionesHab(d, h) : Combatiente.sinParryDelAtaque((h.opcionesDefensa ? h.opcionesDefensa(d) : []) || [], d)) : null, h);   // null = este personaje/creep no es el mío
         if(enIframe()) window.parent.postMessage({tipo: 'duelo-opciones-res', id: d.id, opciones: ops}, location.origin);
         else recibirOpciones(d.id, ops);
         return;

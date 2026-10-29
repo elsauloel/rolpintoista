@@ -15,6 +15,8 @@
    ========================================================= */
 const FichaDuelo = (() => {
   const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : 0; };
+  // 💸 Lo pagado por el ataque de ese duelo (2026-10-28): en S.ataquesArma, para devolver eso si se cancela y no cuenta (Combatiente.pagoDeDuelo).
+  const anotarPago = (S, dueloId, paga) => { if(paga === undefined) return; S.ataquesArma = S.ataquesArma || {}; Combatiente.anotarPagoDuelo(S.ataquesArma, dueloId, paga); };
   function fmt(n){ return Number.isInteger(n) ? n : Math.round(n*100)/100; }
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -156,7 +158,7 @@ const FichaDuelo = (() => {
         // Un arma envenenada, un óleo: este ataque gasta una carga (pegue o no), recién cuando se pagó (cancelar no la gasta).
         const gastar = () => { const gc = Combatiente.gastarCarga(S.efectos, d.id); if(gc.cambio) ui.cambio(['efectos']); if(gc.carga) ui.toast(Combatiente.cargaTxt(gc.carga)); };
         if(d.ataque.tipo === 'habilidad-arma') gastar();   // (los No2 ya los cobró la habilidad)
-        const uiA = {...ui, alPagar: gastar};
+        const uiA = {...ui, alPagar: paga => { gastar(); anotarPago(S, d.id, paga); }};
         if(d.ataque.tipo === 'habilidad-arma'){   // los No2 del ataque ya los cobró la habilidad: solo se tira el PdG (con lo que le suma)
           tirarValorStat(arma ? `PdG · ${arma.nombre}` : 'PdG', FichaCombate.pdgParaArma(S, arma).valor + num(d.ataque.mods && d.ataque.mods.pdg), 'pdg');
           return;
@@ -170,7 +172,7 @@ const FichaDuelo = (() => {
         const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : null;
         const gastar = () => { const gc = Combatiente.gastarCarga(S.efectos, d.id); if(gc.cambio) ui.cambio(['efectos']); if(gc.carga) ui.toast(Combatiente.cargaTxt(gc.carga)); };
         if(d.ataque.tipo === 'habilidad-arma'){ gastar(); return true; }
-        const uiA = {...ui, alPagar: gastar, sinTirada: true};
+        const uiA = {...ui, alPagar: paga => { gastar(); anotarPago(S, d.id, paga); }, sinTirada: true};
         if(d.ataque.tipo === 'normal') await FichaAcciones.atacarConArma(S, arma, undefined, uiA); else await FichaAcciones.ataqueEspecialConArma(S, arma, d.ataque.tipo, undefined, uiA);
         return true;
       },
@@ -179,9 +181,11 @@ const FichaDuelo = (() => {
         const S = getS();
         if(!d.ataque || d.ataque.tipo === 'habilidad-arma') return 0;
         const arma = d.ataque.armaId ? (S.inventario || []).find(x => x.id === d.ataque.armaId) || null : null;
+        const pago = Combatiente.pagoDeDuelo(S.ataquesArma, d.id);   // lo que se pagó de verdad (sin No2 «de cualquier modo», menos que el costo)
         let costo;
         if(d.ataque.tipo === 'normal'){ FichaCombate.desregistrarAtaque(S, arma); costo = FichaCombate.costoAtaque(S, arma); }
         else costo = FichaCombate.costoAtaqueEspecial(arma, d.ataque.tipo, S);
+        if(pago !== null) costo = pago;
         S.nitros = num(S.nitros) + costo;
         ui.cambio(['nitros', 'refresh']);
         return costo;

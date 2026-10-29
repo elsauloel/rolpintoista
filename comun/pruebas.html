@@ -1938,6 +1938,17 @@ prueba('el carcaj: viene con el arco, guarda las flechas especiales y las gasta;
     FichaEquipo.carcajUsado(car), S.inventario.some(i => i.flecha), FichaEquipo.carcajDe(S) === car, GeneradorTiendas.seccionDe(flecha), GeneradorTiendas.seccionDe(car)],
     ['Carcaj de cuero', 10, 1, 1, 3, 'Flecha de fuego', 2, false, true, 'gondola', 'talabarteria']);
 });
+prueba('💸 un duelo cancelado que no cuenta devuelve lo que se pagó de verdad, no el costo entero (2026-10-28): sin No2 «de cualquier modo», 0', () => {
+  const x = {};
+  for(let i = 0; i < 12; i++) Combatiente.anotarPagoDuelo(x, 'd' + i, i);
+  const quedan = Object.keys(x.pagosDuelo).length, viejo = Combatiente.pagoDeDuelo(x, 'd0'), nueve = Combatiente.pagoDeDuelo(x, 'd9'), otraVez = Combatiente.pagoDeDuelo(x, 'd9');
+  const sc = {nombre: 'Prueba', nitros: 0, ataquesTurno: 1};
+  const sinNada = CreepAcciones.devolverAtaque({...sc}, 'normal', 0), entero = CreepAcciones.devolverAtaque({...sc}, 'normal', null);
+  const S = fichaDePrueba({inventario: []}); S.nitros = 0;
+  let pagado = 'nada';
+  FichaAcciones.atacarConArma(S, null, true, {setParry: () => {}, cambio: () => {}, toast: () => {}, sinTirada: true, alPagar: p => { pagado = p; }});
+  igual([quedan, viejo, nueve, otraVez, sinNada, entero > 0, pagado, S.nitros], [10, null, 9, null, 0, true, 0, 0]);
+});
 prueba('🏹 la flecha de un duelo cancelado vuelve (2026-10-28): a su pila del carcaj, como pila nueva si era la última, o a la mochila sin carcaj', () => {
   const S = fichaDePrueba({inventario: []});
   const arco = CATALOGO_BASE.find(i => i.id === 'new-arco-corto'), flecha = CATALOGO_BASE.find(i => i.id === 'flecha-de-fuego');

@@ -69,6 +69,7 @@ const CreepDuelo = (() => {
     return ui.cambiar(ref, c => {
       const x = A().pagarAtaque(c, tipo, forzar);
       if(x && !x.error && dueloId) carga = Combatiente.gastarCarga(c.estados || (c.estados = []), dueloId).carga;   // un arma envenenada: recién pagado
+      if(x && !x.error && dueloId) Combatiente.anotarPagoDuelo(c, dueloId, x.paga);   // lo pagado de verdad, por si se cancela y no cuenta
       return x;
     }).then(x => {
       if(!x || x.error) return false;
@@ -159,7 +160,7 @@ const CreepDuelo = (() => {
         return !!(await atacarCon(ui, d.atacante.ref, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo, d.id, true));
       },
       // Un duelo cancelado que no cuenta como ataque (2026-10-15): el conteo y los No2, de vuelta. → los No2 devueltos.
-      devolverAtaque: d => (!d.ataque || d.ataque.tipo === 'habilidad-arma') ? 0 : ui.cambiar(d.atacante.ref, c => CreepAcciones.devolverAtaque(c, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo)),
+      devolverAtaque: d => (!d.ataque || d.ataque.tipo === 'habilidad-arma') ? 0 : ui.cambiar(d.atacante.ref, c => CreepAcciones.devolverAtaque(c, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo, Combatiente.pagoDeDuelo(c, d.id))),
       // 🏹 La flecha especial de un duelo cancelado antes de tirar, o que no cuenta (2026-10-28): vuelve al cinturón con su No2. → los No2 devueltos.
       devolverFlecha: d => {
         const v = d.ataque && d.ataque.flecha && d.ataque.flecha.vuelve;

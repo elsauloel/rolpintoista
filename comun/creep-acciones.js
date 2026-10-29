@@ -113,9 +113,10 @@ const CreepAcciones = (() => {
   const costoAtaqueDe = (sc, tipo) => tipo === 'normal' ? C().costoAtaque(sc) : tipo === 'oportunidad' ? C().costoOportunidad(sc) : C().costoContraataque(sc);
   const faltanNitros = (sc, tipo) => costoAtaqueDe(sc, tipo) > num(sc.nitros);
   // Un duelo cancelado que no cuenta como ataque (2026-10-15): se descuenta del conteo y se devuelven los No2. → los No2 devueltos.
-  function devolverAtaque(sc, tipo){
+  // `pagado` (2026-10-28): lo que se pagó de verdad (Combatiente.pagoDeDuelo); sin él, el costo entero.
+  function devolverAtaque(sc, tipo, pagado){
     if(tipo === 'normal') sc.ataquesTurno = Math.max(0, num(sc.ataquesTurno) - 1);
-    const costo = costoAtaqueDe(sc, tipo);
+    const costo = pagado !== null && pagado !== undefined ? Math.max(0, num(pagado)) : costoAtaqueDe(sc, tipo);
     sc.nitros = num(sc.nitros) + costo;
     return costo;
   }
@@ -133,14 +134,14 @@ const CreepAcciones = (() => {
       sc.nitros = forzado ? 0 : num(sc.nitros) - costo;
       Combatiente.aplicarTormenta(sc, sc.estados, costo, {motivo: 'atacar'});
       sc.ataquesTurno = num(sc.ataquesTurno) + 1;
-      return {forzado, aviso: `${sc.nombre}: −${fmt(forzado ? tenia : costo)} No2${forzado ? ` (costaba ${fmt(costo)})` : ''} · ${primero ? 'primer ataque del turno' : `ataque ${fmt(sc.ataquesTurno)} del turno`} · quedan ${fmt(sc.nitros)}`};
+      return {forzado, paga: forzado ? tenia : costo, aviso: `${sc.nombre}: −${fmt(forzado ? tenia : costo)} No2${forzado ? ` (costaba ${fmt(costo)})` : ''} · ${primero ? 'primer ataque del turno' : `ataque ${fmt(sc.ataquesTurno)} del turno`} · quedan ${fmt(sc.nitros)}`};
     }
     const nombre = NOMBRE_ESPECIAL[tipo] || 'Contraataque';
     if(forzado && !forzar) return {error: `${sc.nombre}: no le alcanzan los No2 — el ${nombre.toLowerCase()} cuesta ${fmt(costo)} y tiene ${fmt(num(sc.nitros))}`};
     sc.nitros = forzado ? 0 : num(sc.nitros) - costo;
     Combatiente.aplicarTormenta(sc, sc.estados, costo, {motivo: 'el ' + nombre.toLowerCase()});
     const bono = bonoEspecial(sc, tipo);
-    return {forzado, aviso: `${sc.nombre}: ${nombre.toLowerCase()} −${fmt(forzado ? tenia : costo)} No2 ${forzado ? `(costaba ${fmt(costo)})` : '(lo de un primer ataque)'}${bono ? ` · PdG +${fmt(bono)} por ${tipo === 'contra' ? 'contraataque' : 'oportunidad'}` : ''} · quedan ${fmt(sc.nitros)}`};
+    return {forzado, paga: forzado ? tenia : costo, aviso: `${sc.nombre}: ${nombre.toLowerCase()} −${fmt(forzado ? tenia : costo)} No2 ${forzado ? `(costaba ${fmt(costo)})` : '(lo de un primer ataque)'}${bono ? ` · PdG +${fmt(bono)} por ${tipo === 'contra' ? 'contraataque' : 'oportunidad'}` : ''} · quedan ${fmt(sc.nitros)}`};
   }
   // La línea roja de la Mesa (la misma que la de un personaje: FichaAcciones.gastoNitrosForzado).
   function alertaSinNitros(sc, tipo, forzado){

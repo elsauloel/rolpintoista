@@ -65,6 +65,7 @@ const InvDuelo = (() => {
         p = A().pagarAtaque(inv, forzar, tipo);
         if(p.error) return false;
         if(dueloId){ const gc = Combatiente.gastarCarga(inv.estados || (inv.estados = []), dueloId); if(gc.carga) p.carga = gc.carga; }   // un arma envenenada: recién pagado
+        if(dueloId) Combatiente.anotarPagoDuelo(inv, dueloId, p.paga);   // lo pagado de verdad, por si se cancela y no cuenta
         if(tipo !== 'oportunidad' && tipo !== 'contra') ui.parry.delete(inv.id);   // atacar cierra el Parry que esperaba su Bloqueo
       });
       if(p.error){ ui.toast(p.error); return false; }
@@ -133,7 +134,7 @@ const InvDuelo = (() => {
         const inv = ui.inv(d.atacante);
         if(!inv || !d.ataque || d.ataque.tipo === 'habilidad-arma') return 0;
         let costo = 0;
-        ui.cambiar(() => { costo = InvAcciones.devolverAtaque(inv, d.ataque.tipo); });
+        ui.cambiar(() => { costo = InvAcciones.devolverAtaque(inv, d.ataque.tipo, Combatiente.pagoDeDuelo(inv, d.id)); });
         return costo;
       },
       // Las invocaciones siguen las mismas reglas que los creeps.

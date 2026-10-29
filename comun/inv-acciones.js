@@ -78,9 +78,10 @@ const InvAcciones = (() => {
   const costoAtaqueDe = (inv, tipo) => especial(tipo) ? Combatiente.conExtenuado(inv.estados, Math.max(0, Combatiente.costoEspecial(Combatiente.armaEnMano(inv).tipoDado, Combatiente.armaDeCombatiente(inv), tipo) - Combatiente.ahorroEspecial(tipo, st => I().modTotal(inv, st)))) : I().costoAtaque(inv);
   const faltanNitros = (inv, tipo) => costoAtaqueDe(inv, tipo) > num(inv.nitros);
   // Un duelo cancelado que no cuenta como ataque (2026-10-15): el conteo y los No2, de vuelta. → los No2 devueltos.
-  function devolverAtaque(inv, tipo){
+  // `pagado` (2026-10-28): lo que se pagó de verdad (Combatiente.pagoDeDuelo); sin él, el costo entero.
+  function devolverAtaque(inv, tipo, pagado){
     if(!especial(tipo)) inv.ataquesTurno = Math.max(0, num(inv.ataquesTurno) - 1);
-    const costo = costoAtaqueDe(inv, tipo);
+    const costo = pagado !== null && pagado !== undefined ? Math.max(0, num(pagado)) : costoAtaqueDe(inv, tipo);
     inv.nitros = num(inv.nitros) + costo;
     return costo;
   }
@@ -95,13 +96,13 @@ const InvAcciones = (() => {
       inv.nitros = forzado ? 0 : num(inv.nitros) - costo;
       Combatiente.aplicarTormenta(inv, inv.estados, costo, {motivo: 'el ' + NOMBRE_ESPECIAL[tipo].toLowerCase()});
       const bono = bonoEspecial(inv, tipo);
-      return {forzado, aviso: `${inv.nombre}: ${NOMBRE_ESPECIAL[tipo].toLowerCase()} −${fmt(forzado ? tenia : costo)} No2 ${forzado ? `(costaba ${fmt(costo)})` : '(lo de un primer ataque)'}${bono ? ` · PdG +${fmt(bono)} por ${tipo === 'contra' ? 'contraataque' : 'oportunidad'}` : ''}`};
+      return {forzado, paga: forzado ? tenia : costo, aviso: `${inv.nombre}: ${NOMBRE_ESPECIAL[tipo].toLowerCase()} −${fmt(forzado ? tenia : costo)} No2 ${forzado ? `(costaba ${fmt(costo)})` : '(lo de un primer ataque)'}${bono ? ` · PdG +${fmt(bono)} por ${tipo === 'contra' ? 'contraataque' : 'oportunidad'}` : ''}`};
     }
     const primero = num(inv.ataquesTurno) === 0;
     inv.nitros = forzado ? 0 : num(inv.nitros) - costo;
     Combatiente.aplicarTormenta(inv, inv.estados, costo, {motivo: 'atacar'});
     inv.ataquesTurno = num(inv.ataquesTurno) + 1;
-    return {forzado, aviso: `${inv.nombre}: -${fmt(forzado ? tenia : costo)} No2${forzado ? ` (costaba ${fmt(costo)})` : ''} · ${primero ? 'primer ataque del turno' : 'ataque extra'}`};
+    return {forzado, paga: forzado ? tenia : costo, aviso: `${inv.nombre}: -${fmt(forzado ? tenia : costo)} No2${forzado ? ` (costaba ${fmt(costo)})` : ''} · ${primero ? 'primer ataque del turno' : 'ataque extra'}`};
   }
   function alertaSinNitros(inv, forzado, tipo){
     if(!forzado || typeof fbDb === 'undefined' || !fbDb || typeof fbUsuario === 'undefined' || !fbUsuario || typeof fbMiembro === 'undefined' || !fbMiembro) return;

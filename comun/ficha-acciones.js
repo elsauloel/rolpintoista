@@ -598,10 +598,11 @@ const FichaAcciones = (() => {
       ui.avisarSinNitros(costo, `atacar${arma ? ' con ' + arma.nombre : ''}`, () => atacarConArma(S, arma, true, ui));
       return;
     }
-    S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(S, costo, `atacó${arma ? ' con ' + arma.nombre : ''}`) : costo);
+    const paga = forzar && costo > num(S.nitros) ? gastoNitrosForzado(S, costo, `atacó${arma ? ' con ' + arma.nombre : ''}`) : costo;
+    S.nitros = num(S.nitros) - paga;
     tormentaPj(S, costo, `atacar${arma ? ' con ' + arma.nombre : ''}`, ui);
     const primero = FichaCombate.registrarAtaque(S, arma);   // cuenta el ataque con esa arma (comun/ficha-combate.js)
-    if(ui.alPagar) ui.alPagar();   // ya se pagó: un arma envenenada gasta su carga recién acá (2026-10-10)
+    if(ui.alPagar) ui.alPagar(paga);   // ya se pagó: un arma envenenada gasta su carga recién acá (2026-10-10); `paga`, lo que se pagó de verdad
     ui.cambio(['nitros']);
     if(!ui.sinTirada) tirarValorStat(S, arma ? `PdG · ${arma.nombre}` : 'PdG', FichaCombate.pdgParaArma(S, arma).valor, 'pdg', undefined, undefined, undefined, ui);   // el PdG a mano: paga, no tira (2026-10-21)
     const tipo = FichaCombate.tipoAtaque(arma);
@@ -617,9 +618,10 @@ const FichaAcciones = (() => {
       ui.avisarSinNitros(costo, `hacer un ${nombre.toLowerCase()}${con}`, () => ataqueEspecialConArma(S, arma, tipo, true, ui));
       return;
     }
-    S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(S, costo, `hizo un ${nombre.toLowerCase()}${con}`) : costo);
+    const paga = forzar && costo > num(S.nitros) ? gastoNitrosForzado(S, costo, `hizo un ${nombre.toLowerCase()}${con}`) : costo;
+    S.nitros = num(S.nitros) - paga;
     tormentaPj(S, costo, `el ${nombre.toLowerCase()}${con}`, ui);
-    if(ui.alPagar) ui.alPagar();   // ya se pagó (2026-10-10)
+    if(ui.alPagar) ui.alPagar(paga);   // ya se pagó (2026-10-10)
     ui.cambio(['nitros']);
     // Solo el contraataque suma el «PdG en contraataque» de la propia arma (los tipos 6 lo traen: +1 a +3, mucho menos valioso que un PdG normal porque es circunstancial);
     // y solo el ataque de oportunidad suma el «PdG en oportunidad» (los tipos 4, mismo criterio).

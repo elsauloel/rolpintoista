@@ -528,6 +528,11 @@
   **Probado el 2026-10-20 (Claude, «Test con claude elsaulo»):** el creep con Excavar y la Puñalada desde abajo del Kobold tunelero: se mete en la tierra, sale al lado de Silvia (+3 PdG por salir de abajo); con crítico, los efectos pasan a Rengo 2 turnos y Lisiado 1 turno (en vez del Rengo 1).
   «👁 Ver como jugador», abajo, en Probado).
 ## Probado
+- [x] **🚫 El Parry que no se puede usar, apagado y con el motivo** (2026-10-29, «Claude · pruebas», con capturas; dueño: «quiero que el botón de
+  parry aparezca igual, pero apagado, con algún texto encima que dice no podés parrear, cosa que la gente no pregunte»). Golpe de escudo contra
+  Warrior (Hacha y escudo): botón gris punteado «🚫 No se puede parrear · Parry · Hacha · Golpe de escudo no se deja parrear (sí esquivar)»; la Red
+  contra Capataz: «🚫 No se puede parrear · Parry · Red se esquiva, no se parrea». Cubre también, sin probar en el mapa: un disparo cuando solo
+  tiene arma (no escudo) y estar Expuesto (`Combatiente.parryApagado`, `sinParryDelAtaque`).
 - [x] **🏹🛡🕸 Lo del encuentro 1 de El origen que faltaba ver** (2026-10-29, «Claude · pruebas», con capturas; Excavar lo probó el dueño: «anda
   perfecto»). **Flecha especial en una habilidad de disparo**: Tunelero (prueba) con Disparo señalador → «🏹 ¿Qué flecha?» → Flecha silbadora;
   el duelo dice «Flecha silbadora: Demora», los efectos juntan Presa y Marcado (la habilidad) con Demora (la flecha), la flecha bajó de 2 a 1 y

@@ -134,6 +134,9 @@ const Duelo = (() => {
 .duelo-opc{display:flex;flex-direction:column;gap:6px}
 .duelo-opc small{display:block;font-weight:500;font-size:11px;opacity:.85}
 .duelo-opc small.duelo-info{font-size:13px;font-weight:700;opacity:1;color:#dfe8ff;margin-top:2px}
+.duelo-opc button.no-puede{background:#2a2f3d;border:1px dashed #6b7590;color:#9aa3b8;cursor:not-allowed;opacity:1}
+.duelo-opc button.no-puede .no-puede-txt{display:block;font-size:13px;font-weight:800;color:#ffb4a8;margin-bottom:2px;letter-spacing:.02em}
+.duelo-opc button.no-puede small{opacity:.9}
 .duelo-man{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap}
 .duelo-manual{margin-top:8px;font-size:12px;color:#9aa3b8}
 .duelo-texto{position:fixed;left:14px;top:90px;width:min(270px,22vw);max-height:70vh;overflow:auto;background:rgba(21,26,38,.97);border:1px solid #39435c;border-left:3px solid #c98545;border-radius:10px;padding:10px 12px;color:#e9ecf4;font-size:13px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.5);z-index:2}
@@ -2094,7 +2097,7 @@ const Duelo = (() => {
         }
         else if(!ops){ setTimeout(() => { if(actual && actual.id === d.id && actual.dato && !opciones[d.id]) dibujar(); }, 2000);   // vuelve a mirar hasta que lleguen
           cuerpo = '<div class="espera">cargando tus opciones de defensa… <span class="det">(la primera vez puede tardar unos segundos)</span></div>'; }
-        else cuerpo = `<div class="det">Elegí cómo te defendés (antes de ver el PdG):</div><div class="duelo-opc">${ops.map((o, i) => `<button type="button" data-def="${i}"${o.motivoNo ? ' disabled' : ''}>${_esc(o.etiqueta)}${ayudaDefensa(o.modo === 'evasion' ? 'eva' : o.modo)}${o.lupa ? lupaDuelo(d.id + ':op' + i, (vistas[d.id + ':op' + i] = o.lupa)) : ''}${o.costo ? `<small>${_fmt(o.costo)} No2</small>` : ''}${(o.info || []).map(t => `<small class="duelo-info">${_esc(t)}</small>`).join('')}${o.motivoNo ? `<small>${_esc(o.motivoNo)}</small>` : ''}</button>`).join('')}</div>`;
+        else cuerpo = `<div class="det">Elegí cómo te defendés (antes de ver el PdG):</div><div class="duelo-opc">${ops.map((o, i) => /^🚫/.test(o.motivoNo || '') ? `<button type="button" class="no-puede" disabled title="${_esc(o.motivoNo.replace(/^🚫\s*/, ''))}"><span class="no-puede-txt">🚫 ${_esc((o.motivoNo.match(/^🚫\s*([^:]+)/) || [])[1] || 'No se puede')}</span>${_esc(o.etiqueta)}<small>${_esc(o.motivoNo.replace(/^🚫\s*[^:]+:\s*/, ''))}</small></button>` : `<button type="button" data-def="${i}"${o.motivoNo ? ' disabled' : ''}>${_esc(o.etiqueta)}${ayudaDefensa(o.modo === 'evasion' ? 'eva' : o.modo)}${o.lupa ? lupaDuelo(d.id + ':op' + i, (vistas[d.id + ':op' + i] = o.lupa)) : ''}${o.costo ? `<small>${_fmt(o.costo)} No2</small>` : ''}${(o.info || []).map(t => `<small class="duelo-info">${_esc(t)}</small>`).join('')}${o.motivoNo ? `<small>${_esc(o.motivoNo)}</small>` : ''}</button>`).join('')}</div>`;
       }else{
         const txt = campo === 'pdg' ? (d.hab ? `🎲 Tirar ${_esc(etqTira(d))}` : '🎲 Pagar y tirar PdG') : desarma ? `🎲 Tirar Desarmar (tu ${campo === 'fuerza' ? 'Fuerza del golpe' : 'Bloqueo'})`
           : dOp ? (campo === 'fuerza' ? '⚔ Pegar: pasar el bloqueo (Fuerza del golpe)' : '🛡 Bloquear el golpe')

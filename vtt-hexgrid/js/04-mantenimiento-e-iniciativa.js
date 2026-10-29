@@ -335,11 +335,16 @@ function iniciativaPonerTodos(){
 // 2026-10-29). El turno sigue con quien lo tenía, salvo que el que juega baje por debajo de uno que todavía no jugó: ahí se demora (le toca al
 // que subió y él juega justo después, iniciativaDemorarTurno). Antes el turno se iba con el que bajaba y el de abajo quedaba como si ya
 // hubiera jugado (perdía su turno: «se iba al final de la lista, como si se pasara de ronda»).
+// El vecino es el que se VE arriba o abajo en la lista (`iniDisplay`, la lista gira con el turno y los que ya jugaron van abajo de la línea), no el
+// del orden guardado: antes ▼ en uno de abajo de la línea lo cambiaba con alguien de otra parte de la lista. No se cruza la línea de la ronda.
+let iniDisplay = {ids: [], corte: 0};   // lo arma renderIniciativa: los ids en el orden en que se ven y cuántos van arriba de la línea
 async function iniciativaMover(id, delta){
   if(!soyGM) return;
+  const vis = iniDisplay.ids, p = vis.indexOf(id), q = p + delta;
+  if(p < 0 || q < 0 || q >= vis.length || (p < iniDisplay.corte) !== (q < iniDisplay.corte)) return;
   const orden = iniciativa.orden.slice();
-  const i = orden.findIndex(o => o.id === id), j = i + delta;
-  if(i < 0 || j < 0 || j >= orden.length) return;
+  const i = orden.findIndex(o => o.id === id), j = orden.findIndex(o => o.id === vis[q]);
+  if(i < 0 || j < 0) return;
   const turno = iniciativa.turno, activo = orden[turno] ? orden[turno].id : null;
   const ya = new Set(iniciativa.actuaron || []);
   [orden[i], orden[j]] = [orden[j], orden[i]];
@@ -948,7 +953,8 @@ function renderIniciativa(){
         (puede
           ? `<input class="ini-valor" type="number" step="1" value="${fmt(num(o.valor))}" data-ini-valor="${esc(o.id)}" title="Iniciativa">`
           : `<span class="ini-valor">${fmt(num(o.valor))}</span>`) +
-        (soyGM ? `<button type="button" class="ini-quitar" data-ini-subir="${esc(o.id)}" title="Subir un lugar en el orden"${i === 0 ? ' disabled' : ''}>▲</button><button type="button" class="ini-quitar" data-ini-bajar="${esc(o.id)}" title="Bajar un lugar en el orden"${i === iniciativa.orden.length - 1 ? ' disabled' : ''}>▼</button>` : '') +
+        (soyGM ? (() => { const p = iniDisplay.ids.indexOf(o.id), c = iniDisplay.corte, n = iniDisplay.ids.length;   // ▲ ▼ con el vecino que se ve, sin cruzar la línea
+          return `<button type="button" class="ini-quitar" data-ini-subir="${esc(o.id)}" title="Cambiar de lugar con el de arriba"${p <= 0 || p === c ? ' disabled' : ''}>▲</button><button type="button" class="ini-quitar" data-ini-bajar="${esc(o.id)}" title="Cambiar de lugar con el de abajo"${p < 0 || p === n - 1 || p === c - 1 ? ' disabled' : ''}>▼</button>`; })() : '') +
         (soyGM ? `<button type="button" class="ini-quitar" data-ini-ocultar="${esc(o.id)}" title="${o.oculto ? 'Mostrarlo a los jugadores en la lista' : 'Ocultarlo a los jugadores en la lista'}">${o.oculto ? '🙈' : '👁'}</button><button type="button" class="ini-quitar" data-ini-quitar="${esc(o.id)}" title="Sacar de la lista">✕</button>` : '') +
       '</div>';
     };
@@ -958,6 +964,7 @@ function renderIniciativa(){
     const yaJugo = x => x.i > base && (iniciativa.actuaron || []).includes(x.o.id);
     const faltan = visibles.filter(x => x.i >= base && !yaJugo(x)), jugaron = [...visibles.filter(yaJugo), ...visibles.filter(x => x.i < base)];
     const arriba = lib ? visibles.find(x => x.o.id === lib.id) : null;
+    iniDisplay = {ids: [...faltan, ...jugaron].map(x => x.o.id), corte: faltan.length};
     lista.innerHTML = (arriba ? filaIni(arriba, false, true) : '') + faltan.map(x => filaIni(x, false)).join('') +
       `<div class="ini-ronda" title="Acá termina la ronda: los de abajo ya jugaron y vuelven a jugar en la ronda siguiente">↻ Ronda ${fmt(iniciativa.ronda + 1)}</div>` +
       jugaron.map(x => filaIni(x, true)).join('');

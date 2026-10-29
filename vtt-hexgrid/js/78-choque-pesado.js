@@ -3,7 +3,8 @@
    · 🛡 Interponerse (Flash, botón ✨): cuando atacan a un aliado a 2 casillas o menos y el aliado todavía no eligió cómo defenderse, salta a su lado (gratis,
      sin oportunidad), el golpe va contra él (el duelo cambia de defensor) y queda Interpuesto (+2 a la Defensa contra ese golpe).
    · ⚔ Golpe que sigue (`ataque.sigue`): si el golpe deja al rival en 0, ataca enseguida a otro rival pegado, pagando lo de un primer ataque (el segundo no sigue).
-   · ⚖ Arrastrar (`ataque.arrastra`): si pega, lo trae hasta quedar pegado (no camina: sin No2 ni oportunidad; las trampas del camino sí lo tocan).
+   · ⚖ Arrastrar (`ataque.arrastra`): antes del golpe, Destreza contra la Evasión para engancharlo; si lo engancha, lo trae hasta quedar pegado (no camina:
+     sin No2 ni oportunidad; las trampas y zonas del camino sí lo tocan) y sigue el golpe; si no, no hay golpe (P224, 2026-10-29).
    · ⚖ Carga que derriba (`ataque.derriba` = las casillas que corrió, desde 3; la carrera la hace js/55): si pega, Fuerza + X contra la Res.CC; si gana, Sentado.
    Lo llama el mapa del GM (maneja a los creeps): `disparoResuelto` (js/14) y el botón ✨ de los Flash de creep (js/71). */
 
@@ -73,7 +74,6 @@ function choquePesadoResuelto(d){
   if(!soyGM || !d || !d.ataque || d.hab || !d.atacante || d.atacante.tipo !== 'creep') return;
   const pego = d.resultado === 'pego' || d.resultado === 'mitad';
   if(!pego) return;
-  if(num(d.ataque.arrastra) > 0) arrastrarResuelto(d).catch(err => console.error('Arrastrar:', err));
   if(num(d.ataque.derriba) > 0) cargaDerribaResuelto(d).catch(err => console.error('Carga que derriba:', err));
   if(d.ataque.sigue) golpeQueSigueResuelto(d).catch(err => console.error('Golpe que sigue:', err));
 }
@@ -120,14 +120,45 @@ async function golpeQueSigueResuelto(d){
   acElegirObjetivo(sc, atq, () => acPublicar(sc, CreepDuelo.pdgDeArreglos(sc, atq)));
 }
 
-// ⚖ Arrastrar (dueño, 2026-10-27, «va así»): lo trae hasta quedar pegado; las trampas del camino lo tocan (la primera que pisa lo frena ahí).
-async function arrastrarResuelto(d){
-  if(!choquePesadoUnaVez(d, 'arrastra')) return;
-  const t = tokens.get(d.defensor.tokenId), ta = tokens.get(d.atacante.tokenId);
-  if(!t || !ta) return;
-  const nom = nombreDe(t), quien = d.atacante.nombre || nombreDe(ta), titulo = `${d.ataque.habNombre || 'Arrastrar'}: ${quien} arrastra a ${nom}`;
+/* ⚖ Arrastrar en dos tiempos (P224, dueño 2026-10-29: «vamos con la B», como estaba definido): antes del golpe, el ENGANCHE — la Destreza de quien
+   lo tira contra la Evasión del rival (empate: no lo engancha). Si lo engancha, lo trae hasta quedar pegado (aunque después falle el golpe) y sigue
+   el ataque con su arma con +2 PdG; si no, no pasa nada más (el ataque ya se gastó). Si ya estaba pegado, va directo al golpe. Lo llama
+   dueloElegirObjetivoMapa (js/13) antes de armar el duelo. → true: sigue el golpe (`t` queda en su casilla nueva); false: no hay golpe. */
+async function arrastrarEnganche(mio, t, ataque){
+  const hab = ataque.habNombre || 'Arrastrar', nom = nombreDe(mio), obj = nombreDe(t);
+  if(distanciaHex(mio, t) <= 1) return true;
+  const deQuien = x => x.tipo === 'creep' ? {desde: 'gm'} : {ficha: String(x.fichaId || '').split(SEP_INVOCACION)[0]};
+  const rd = Combatiente.tirarStat(trampaValorStat(mio, 'des'), confusionEstadosDe(mio), 'des');
+  const re = Combatiente.tirarStat(trampaValorStat(t, 'eva'), confusionEstadosDe(t), 'eva');
+  let engancha;
+  if(!rd || !re){
+    engancha = await AvisoCombate.preguntar(`Tirá a mano la Destreza de ${nom} contra la Evasión de ${obj} (empate: no lo engancha). ¿Lo enganchó?`, {icono: '🪝', titulo: hab, si: 'Lo enganchó', no: 'No'});
+  }else{
+    mesaPublicar(`🪝 ${nom} · ${hab} · Destreza (para engancharlo)`, {...rd, quien: nom, ...deQuien(mio)});
+    mesaPublicar(`${obj} · Evasión (que no lo enganche)`, {...re, quien: obj, ...deQuien(t)});
+    if(typeof esperarDadosMapa === 'function') await esperarDadosMapa();
+    engancha = rd.total > re.total;
+  }
+  const paraUid = t.tipo === 'pj' && t.duenoUid ? {paraUid: t.duenoUid} : {};
+  if(!engancha){
+    const txt = rd && re ? `${nom} le tira el gancho a ${obj} (Destreza ${rd.total} contra su Evasión ${re.total}): no lo engancha. No hay golpe.` : `${nom} no engancha a ${obj}: no hay golpe.`;
+    mesaLinea(`🪝 ${txt}`, 'recordatorio');
+    momentoAbrir({tipo: 'gancho', icono: '🪝', titulo: `${hab}: ${nom} no engancha a ${obj}`, resultado: txt, estado: 'listo', datos: {aviso: true, boton: 'Entendido', ...paraUid}});
+    return false;
+  }
+  if(rd && re) mesaLinea(`🪝 ${nom} engancha a ${obj} (Destreza ${rd.total} contra su Evasión ${re.total}): lo trae y le pega`, 'recordatorio');
+  const fin = await arrastrarTraer(t.id, mio.id, hab, nom);
+  if(fin){ t.col = fin.col; t.fila = fin.fila; }
+  return true;
+}
+// Lo trae hasta quedar pegado a quien lo arrastra; las trampas del camino lo tocan (la primera que pisa lo frena ahí) y las zonas, también.
+// → la casilla donde quedó, o null si no se movió.
+async function arrastrarTraer(defId, atkId, hab, quien){
+  const t = tokens.get(defId), ta = tokens.get(atkId);
+  if(!t || !ta) return null;
+  const nom = nombreDe(t), titulo = `${hab}: ${quien} arrastra a ${nom}`;
   const im = chanceDe(t, 'inamovible');
-  if(im && Math.random() * 100 < im){ momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `Es Inamovible (${im} %): no se mueve.`, estado: 'listo'}); return; }
+  if(im && Math.random() * 100 < im){ momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `Es Inamovible (${im} %): no se mueve.`, estado: 'listo'}); return null; }
   const ocupada = x => elementoSolidoEn(x.col, x.fila) || [...tokens.values()].some(y => y !== t && y.col === x.col && y.fila === x.fila && !y.bajoTierra);
   const pared = (a, b) => typeof paredCorta === 'function' && paredCorta(a, b);
   const ruta = [{col: t.col, fila: t.fila}];
@@ -137,21 +168,22 @@ async function arrastrarResuelto(d){
     if(!sig) break;
     c = sig; ruta.push(c);
   }
-  if(ruta.length < 2){ momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: distanciaHex(t, ta) <= 1 ? `Ya estaba pegado a ${quien}.` : 'No hay por dónde traerlo: queda donde está.', estado: 'listo'}); return; }
+  if(ruta.length < 2){ momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: distanciaHex(t, ta) <= 1 ? `Ya estaba pegado a ${quien}.` : 'No hay por dónde traerlo: queda donde está.', estado: 'listo'}); return null; }
   // La primera trampa del camino lo frena ahí y se dispara (como si la pisara).
-  const tr = typeof trampasEvaluarRuta === 'function' ? trampasEvaluarRuta(d.defensor.tokenId, t, ruta, 0) : null;
+  const tr = typeof trampasEvaluarRuta === 'function' ? trampasEvaluarRuta(defId, t, ruta, 0) : null;
   const corte = tr && tr.tipo === 'pisa' ? tr.indice : -1;
   const final = corte > 0 ? ruta.slice(0, corte + 1) : ruta, fin = final[final.length - 1], pasos = final.length - 1;
-  try{ await coleccionTokens().doc(d.defensor.tokenId).update({col: fin.col, fila: fin.fila, ruta: firebase.firestore.FieldValue.delete()}); }
-  catch(err){ console.error('Arrastrar: no se pudo mover', err); momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `Traelo ${pasos} casillas a mano (no se pudo mover solo).`, estado: 'listo'}); return; }
+  try{ await coleccionTokens().doc(defId).update({col: fin.col, fila: fin.fila, ruta: firebase.firestore.FieldValue.delete()}); }
+  catch(err){ console.error('Arrastrar: no se pudo mover', err); momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `Traelo ${pasos} casillas a mano (no se pudo mover solo).`, estado: 'listo'}); return null; }
   const trampaTxt = corte > 0 ? ' En el camino pisa algo: se frena ahí.' : '';
   momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `Lo trae ${pasos} casillero${pasos === 1 ? '' : 's'} hacia ${quien} (no camina: sin No2 ni ataques de oportunidad).${trampaTxt}`, estado: 'listo',
-    datos: {arrastre: {tokenId: d.defensor.tokenId, celdas: final.map(x => ({col: x.col, fila: x.fila}))}}});   // las zonas del camino: las revisa la pantalla de su dueño (arrastreZonasMomento)
+    datos: {arrastre: {tokenId: defId, celdas: final.map(x => ({col: x.col, fila: x.fila}))}}});   // las zonas del camino: las revisa la pantalla de su dueño (arrastreZonasMomento)
   mesaLinea(`🪝 ${quien} arrastra a ${nom} ${pasos} casillero${pasos === 1 ? '' : 's'}${trampaTxt ? ' — pisó una trampa en el camino' : ''}`, 'recordatorio');
   if(corte > 0 && typeof trampaResolver === 'function'){
-    trampaPendiente = {tokenId: d.defensor.tokenId, tipo: 'pisa', id: tr.id, el: tr.el, celda: fin, desde: final[final.length - 2]};
+    trampaPendiente = {tokenId: defId, tipo: 'pisa', id: tr.id, el: tr.el, celda: fin, desde: final[final.length - 2]};
     setTimeout(() => { trampaResolver().catch(err => console.error('Arrastrar: la trampa', err)); }, 600);
   }
+  return fin;
 }
 // Las zonas del camino de alguien arrastrado (2026-10-27): cada pantalla revisa lo suyo (zonaEsMia: el dueño a su personaje, el GM a sus creeps), así
 // que la que lo arrastró avisa con el momento y la del dueño las revisa. Solo un momento de recién (al entrar al mapa no se repiten los viejos).

@@ -252,10 +252,10 @@
   H('Sonic Boom', 'DAK', '*', 'mt', 3, {detalle: 'FLASH (en turno ajeno cuesta el doble). Golpea el piso y una onda de choque sale en cono al frente: su Fuerza + 2 contra la Constitución de cada rival del cono. Al que pierde le saca 1 + la diferencia en No2 y le hace la diferencia de daño (físico, directo); si se queda sin No2, queda Sentado.',
     no2: 1, spCosto: 3, flash: true, auditada: true, ataqueTxt: 'Flash: cono al frente; Fuerza +2 contra la Constitución; pierde 1 + la diferencia en No2, la diferencia de daño directo y, en 0 No2, Sentado',
     duelo: {objetivo: 'cono', tira: 'fue', tiraBono: 2, contra: ['con'], dano: true, danoDiferencia: true, tipoDano: 'fisico', ignoraDano: true, danoDirecto: true, efectos: [{no2: 1, no2Dif: true, no2Sentado: true}]}});
-  // ⚖ Arrastrar (C16; dueño: «va así»): un ataque con su arma a 3 o menos; si pega, lo trae (vtt-hexgrid/js/78). (El enganche y el golpe van en una sola
-  // tirada: su Probabilidad de Golpe +2 contra la Evasión o el Parry.)
-  H('Arrastrar', 'DK', 'hdc', 'mt', 2, aA('Le tira un gancho, una cadena o una soga a un rival a 3 casillas o menos: un ataque con su arma con +2 a la Probabilidad de Golpe. Si pega, lo arrastra hasta dejarlo pegado a él (no camina: no gasta No2 ni da ataques de oportunidad; las trampas del camino sí lo tocan) y le hace el daño del golpe.',
-    {pdg: 2}, 'un ataque a 3 casillas o menos con +2 PdG; si pega, lo trae hasta quedar pegado (las trampas del camino lo tocan)', 2, [], {alcance: 'fijo', alcanceN: 3, arrastra: 3}));
+  // ⚖ Arrastrar (C16; dueño: «va así»): en dos tiempos (P224, 2026-10-29: «vamos con la B»): el enganche (Destreza contra la Evasión) y, si lo engancha,
+  // lo trae y le pega con su arma con +2 PdG (vtt-hexgrid/js/78, arrastrarEnganche).
+  H('Arrastrar', 'DK', 'hdc', 'mt', 2, aA('Le tira un gancho, una cadena o una soga a un rival a 3 casillas o menos: su Destreza contra la Evasión del rival para engancharlo. Si lo engancha, lo arrastra hasta dejarlo pegado a él (no camina: no gasta No2 ni da ataques de oportunidad; las trampas y zonas del camino sí lo tocan) y le pega con su arma con +2 a la Probabilidad de Golpe. Si no lo engancha, no hay golpe.',
+    {pdg: 2}, 'Destreza contra Evasión para engancharlo a 3 casillas o menos: lo trae hasta quedar pegado y le pega con +2 PdG (las trampas y zonas del camino lo tocan)', 2, [], {alcance: 'fijo', alcanceN: 3, arrastra: 3}));
   // (Golpe de pomo: quitado de la biblioteca en la auditoría, dueño 2026-10-21.)
   H('Ataque de furia', 'D', '*', 'm', 5, zO('Ataca sin pensar en la defensa: daño enorme.', 4, 'H'));
   // (Tackle, el viejo a mano: lo reemplaza el Takle, 2026-10-26.)

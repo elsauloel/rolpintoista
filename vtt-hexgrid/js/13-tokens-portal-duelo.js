@@ -2085,13 +2085,13 @@ function dueloOpcionesLocal(d){
   // oportunidad / contraataque, 2026-10-04); si no, la versión corta de abajo.
   const hk = typeof acHooksDuelo === 'function' ? acHooksDuelo(d.defensor) : null;
   if(d.hab) return Duelo.conVistas(d, Duelo.opcionesHab(d, hk || {puedeParry: () => !!defensaCreepMapa(sc) && !Combatiente.expuesto(sc.estados)}), hk);   // habilidad dirigida: lo que puede tirar el creep contra ella
-  if(hk && hk.opcionesDefensa){ const o = hk.opcionesDefensa(d) || []; return Duelo.conVistas(d, Combatiente.sinParryDelAtaque(o, d), hk); }   // 🚫 sin Parry: apagado, con el motivo
+  if(hk && hk.opcionesDefensa){ const o = hk.opcionesDefensa(d) || []; return Duelo.conVistas(d, Combatiente.nombresContraDisparo(Combatiente.sinParryDelAtaque(o, d), d), hk); }   // 🚫 sin Parry: apagado, con el motivo; 🏹 contra un proyectil, «Esquivar (Agilidad)» y «Poner escudo»
   // Parry solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30, comun/combatiente.js; la misma que GM Tools).
   const def = defensaCreepMapa(sc), c = Combatiente.costoParry();
   if(Combatiente.stuneado(sc.estados)) return [{modo: 'evasion', etiqueta: '🏃 Evasión · Stun: 1'}];   // Stun (2026-10-06)
   const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión'}];
   if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, escudo: def.nombre !== Combatiente.armaEnMano(sc).nombre, natural: def.nombre === Combatiente.armaEnMano(sc).nombre ? Combatiente.armaEnMano(sc).natural : !!def.natural, etiqueta: `${def.nombre === Combatiente.armaEnMano(sc).nombre ? '🗡' : '🛡'} Parry · ${def.nombre}`, costo: c, motivoNo: Combatiente.defensaSinNo2(sc.nitros, c) ? 'Ya está en No2 negativos: no puede gastar más en una defensa' : ''});   // sin No2: queda en negativo (2026-10-06), no si ya lo estaba (2026-10-23)
-  return Combatiente.sinReaccionesNo2(Combatiente.sinParryDelAtaque(ops, d), sc.estados);   // Takle y otros ataques que no se pueden parrear; Expuesto (Degollar): el Parry, apagado
+  return Combatiente.nombresContraDisparo(Combatiente.sinReaccionesNo2(Combatiente.sinParryDelAtaque(ops, d), sc.estados), d);   // Takle y otros ataques que no se pueden parrear; Expuesto (Degollar): el Parry, apagado
 }
 // ⚡ Flash de un creep (P135): si no tiene ninguno que sirva para esta tirada, el mapa contesta solo ([]) y no hace falta
 // cargar GM Tools; si tiene, contesta GM Tools (que es quien lo cobra: cooldown). null = que pregunte.

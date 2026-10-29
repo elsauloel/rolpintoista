@@ -790,7 +790,7 @@ const Duelo = (() => {
       ...(h.contraOtro ? {contraOtro: txtCorto(h.contraOtro, 120)} : {})};
   }
   const etqTira = d => (d.hab && d.hab.tira ? d.hab.tira.etq : 'PdG');
-  const selModoHtml = d => d.hab ? (d.hab.contra || []).map(c => `<option value="${_esc(c.modo)}">${_esc(c.etq)}</option>`).join('') : `<option value="evasion">Evasión</option>${d.ataque && d.ataque.sinParry ? '' : '<option value="parry">Parry</option>'}`;   // a mano, sin Parry si el golpe no se deja parrear
+  const selModoHtml = d => d.hab ? (d.hab.contra || []).map(c => `<option value="${_esc(c.modo)}">${_esc(c.etq)}</option>`).join('') : `<option value="evasion">${Combatiente.contraDisparo(d) ? Combatiente.ESQUIVAR_TXT : 'Evasión'}</option>${d.ataque && d.ataque.sinParry ? '' : `<option value="parry">${Combatiente.contraDisparo(d) ? Combatiente.PONER_ESCUDO_TXT : 'Parry'}</option>`}`;   // a mano, sin Parry si el golpe no se deja parrear; contra un proyectil, «Esquivar (Agilidad)» y «Poner escudo»
   const etqContra = d => {
     if(d.hab){
       const c = d.defensa ? (d.hab.contra || []).find(x => x.modo === d.defensa.modo) : null;
@@ -2802,7 +2802,7 @@ const Duelo = (() => {
       if(!doc.exists) return;
       const d = {id: m.id, ...doc.data()};
       if(m.tipo === 'duelo-opciones'){
-        const ops = conVistas(d, (h.soy && h.soy(d.defensor)) ? (d.hab ? opcionesHab(d, h) : Combatiente.sinParryDelAtaque((h.opcionesDefensa ? h.opcionesDefensa(d) : []) || [], d)) : null, h);   // null = este personaje/creep no es el mío
+        const ops = conVistas(d, (h.soy && h.soy(d.defensor)) ? (d.hab ? opcionesHab(d, h) : Combatiente.nombresContraDisparo(Combatiente.sinParryDelAtaque((h.opcionesDefensa ? h.opcionesDefensa(d) : []) || [], d), d)) : null, h);   // null = este personaje/creep no es el mío
         if(enIframe()) window.parent.postMessage({tipo: 'duelo-opciones-res', id: d.id, opciones: ops}, location.origin);
         else recibirOpciones(d.id, ops);
         return;

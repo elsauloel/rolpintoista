@@ -143,7 +143,13 @@
 >   eclipses…). El dueño dudó al ver el arco Tipo 6 de la Bruja («los arcos son tipo 4»). Revisar con él si siguen las dos familias o todos pasan a
 >   Tipo 4 (y entonces rebalancear esos 10 con daño fijo o más dados, como la escalera del Tipo 4).
 
-> - [ ] **🧹 Quitar la lectura de los datos viejos del arma** (2026-10-23, dueño: «anotá como pendiente quitar los datos viejos, para que en
+> - [x] **✅ (2026-10-29, hecho: 761fcb2a; dueño: «hacé la limpieza ya»)** Se convirtieron, con OK del dueño, El origen (6 creeps), Renacuajos (4 creeps y
+>   2 invocaciones) y Test con claude elsaulo (2 y 2); Claude · pruebas ya estaba. Test y Test29-9 no se pudieron leer (su GM es otra cuenta: «no importan,
+>   seguí»): un creep viejo ahí pelea sin arma hasta que se le vuelva a poner. Una copia de lo convertido quedó en el navegador de elsaulo
+>   (localStorage `respaldo-armas-viejas-<partida>`). Se sacaron `tieneCamposArma`, `armaCombinada`, `pasarArmaAItem`, `CAMPOS_ARMA`/`ARMA_CAMPO`, los
+>   `armaRasgos` de las cuentas y las conversiones de `CreepCalculo.normalizar` e `InvCalculo.migrar`; las recetas de `creeps-base.js` pasan su arma al
+>   ítem ellas mismas, y las pruebas escriben el arma corta con `A(...)`. Falta verlo en el mapa (`docs/pruebas-en-el-mapa.md`).
+>   ~~**🧹 Quitar la lectura de los datos viejos del arma**~~ (2026-10-23, dueño: «anotá como pendiente quitar los datos viejos, para que en
 >   algún tiempo, cuando te diga que queda pendiente, si es un buen momento, se quitan»). **No hacerlo hasta que el dueño lo pida.** Tras el
 >   paso 8 de `docs/plan-inventario-creeps.md` queda a propósito un solo lugar que entiende el arma guardada con los campos sueltos de antes
 >   (armaNombre, armaTipo…): `Combatiente.armaEnMano` (la rama `tieneCamposArma`/`armaCombinada`), `pasarArmaAItem` y `CAMPOS_ARMA`/`ARMA_CAMPO` en

@@ -266,6 +266,12 @@
 
 ## Pendientes
 
+- [ ] **🧹 Las armas de los creeps después de la limpieza (2026-10-29, 761fcb2a)**: el motor ya no lee los campos viejos (armaNombre, armaTipo…). Revisado por
+  datos: los 14 creeps visibles de «Claude · pruebas» leen bien su arma (Hacha, Arco corto, Bate de Baseball…; sin arma solo el Estandarte, el Tótem y el
+  Goblin de prueba, que no tienen). **Falta verlo en el mapa con capturas** (las dos ventanas de Chrome estaban minimizadas): un creep ataca con su arma
+  (el Warrior con la Hacha) y el duelo la nombra; una invocación ataca; el 🔍 Ver de un creep y la 🪪 muestran el arma; en GM Tools, el arma en la ficha del
+  creep y un creep de la biblioteca de fábrica agregado a la mesa.
+
 > **🖥 Para probar con la cuenta del GM (2026-10-28, dueño: «si hay alguna prueba relevante desde el mapa con cuenta de GM que no podés porque está en
 > segundo plano, anotala acá»).** La ventana de Chrome del GM (rolpintoista) estaba minimizada: el lado del GM se manejó por código (sus botones, con
 > sus propias funciones) y lo que se vio, desde la pantalla del jugador. Lo que pide ver la pantalla del GM:

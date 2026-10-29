@@ -49,7 +49,7 @@
 > - [ ] **⚖ Revisar Arrastrar (P224)** (2026-10-27, dueño: «Arrastrar, anotalo pendiente para que lo revise cuando esté en la compu»): quedó en **una sola
 >   tirada** —un ataque con su arma a 3 casillas o menos con +2 PdG; si pega, lo trae y le hace el daño— y lo definido eran dos (Destreza contra la
 >   Evasión para engancharlo, y después el golpe). Mirarlo en el mapa con el Warrior (prueba) de «Claude · pruebas» y decidir si queda así o se separa.
-> - [x] (2026-10-25, dueño: «podemos probar esto»; hecha en `vtt-hexgrid/js/75-flechitas-estados.js`, falta que la vea el dueño) **⬆⬇ Animación al recibir un buff o un debuff (2026-10-25, dueño: «probar una pequeña animación que cuando se coloca un buff, durante un segundo,
+> - [x] (2026-10-25, dueño: «podemos probar esto»; hecha en `vtt-hexgrid/js/75-flechitas-estados.js`; 2026-10-28, lo vio el dueño: «esto ya está») **⬆⬇ Animación al recibir un buff o un debuff (2026-10-25, dueño: «probar una pequeña animación que cuando se coloca un buff, durante un segundo,
 >   el token tenga una animación de flechitas verdes que van para arriba; y lo mismo cuando se coloca un debuff. Para pensar si es posible y buscar el
 >   momento»; el mismo día: «anotalo para ver en la compu»).** Es posible: cada pantalla ya escucha los estados públicos de cada token (`resumen.estados`, js/09); al aparecer un estado nuevo, ~1 s
 >   de flechitas verdes que suben (buff) o rojas que bajan (debuff) sobre el token, en el dibujo del mapa (js/05, como el aura del estandarte). Así la

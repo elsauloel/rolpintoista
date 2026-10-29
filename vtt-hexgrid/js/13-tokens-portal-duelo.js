@@ -1727,8 +1727,9 @@ async function dueloAplicarDano(d){
   const aplicarSinAgua = aplicar;   // (la cuenta: lo que pasaba antes del ×1,5 del agua)   // ⚡💧 lo que corre por el agua a los demás del charco (js/50), antes del ×1,5
   if(elDano === 'rayo' && typeof aguaRayo === 'function'){ const ag = aguaRayo(t, 'rayo', aplicar); if(ag.txt){ aplicar = ag.monto; freno = [freno, ag.txt].filter(Boolean).join(' · '); } }
   let desgaste = '';
-  if(base.mitad && t.tipo === 'pj' && d.defensa && d.defensa.itemId){
-    try{ await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: {nombre: 'Desgaste', item: d.defensa.itemId}, origen: `${d.atacante.nombre} · Bloqueo perdido`}); desgaste = d.defensa.itemNombre || 'el objeto'; }
+  // (un Parry elegido a mano no dice con qué paró: `item: 'parry'` = el escudo puesto o la única pieza con la que se puede parar, 2026-10-29)
+  if(base.mitad && t.tipo === 'pj' && !String(t.fichaId).includes(SEP_INVOCACION) && d.defensa && (d.defensa.itemId || d.defensa.modo === 'parry')){
+    try{ await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: {nombre: 'Desgaste', item: d.defensa.itemId || 'parry'}, origen: `${d.atacante.nombre} · Bloqueo perdido`}); desgaste = d.defensa.itemNombre || 'el objeto con el que paró'; }
     catch(err){ console.error('No se pudo pedir el desgaste del ítem:', err); }
   }
   try{

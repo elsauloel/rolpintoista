@@ -544,6 +544,8 @@ const CreepCalculo = (() => {
   const modoSP = sc => !!(sc && sc.modoSP);
   function spMax(sc){ return Math.max(0, Math.round(num(statValor(sc, 'esp')) * 3 + num(modTotal(sc, 'sp')))); }
   function spRegen(sc){ return Math.max(1, Math.floor(num(statValor(sc, 'esp')) / 2) + Math.round(num(modTotal(sc, 'spregen')))); }
+  // 💧 La barra de SP del token (dueño, 2026-10-29: «cuando un creep tenga modo SP se le vea la barra de SP»): solo el porcentaje, como la vida; null sin modo SP.
+  function spPct(sc){ const mx = spMax(sc); return modoSP(sc) && mx > 0 ? Math.round(Math.max(0, Math.min(1, spActual(sc) / mx)) * 100) : null; }
   function spActual(sc){ return sc && sc.sp !== undefined && sc.sp !== null && sc.sp !== '' ? Math.max(0, num(sc.sp)) : spMax(sc); }
   function costoSpHab(sc, h){
     if(h && h.spCosto === 'esp') return Math.max(1, Math.round(num(statValor(sc, 'esp'))));   // cuesta tanto SP como su Especial (2026-10-21, la Bola de fuego; P216)
@@ -777,7 +779,7 @@ const CreepCalculo = (() => {
     return partes.length ? partes.join(' · ') : 'nada';
   }
 
-  return {modoSP, spMax, spRegen, spActual, costoSpHab, especialesEnMano, especialDanoTxt, sinNadaEnMano, talisman, auraMiedo, estandartes, enLasManos, regenPasivas, masDanoElem, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
+  return {modoSP, spPct, spMax, spRegen, spActual, costoSpHab, especialesEnMano, especialDanoTxt, sinNadaEnMano, talisman, auraMiedo, estandartes, enLasManos, regenPasivas, masDanoElem, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
     ARQUETIPOS, arquetiposAuto, arquetiposManual, arquetipos, arquetiposTxt, TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TIPOITEM_LABEL, STAT_LABEL, itemParaCreep, magiaDeItem, vaAlEquipo, nombreLimpio, tipoDe, oroSugerido, valorNatural,
     trofeo, despojosDePrecio, dropsResumen, dropsFijos,
     correrTiposTexto, migrarObjTipos, migrarCreepTipos, migrarObjEspecial, migrarHabPdg, migrarCreepEspecial, slotDe,

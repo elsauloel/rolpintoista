@@ -4080,6 +4080,21 @@ prueba('🛡 Armadura rota de un personaje (2026-10-29): derivada de las piezas 
     FichaResumen.estadosTodos(S).some(e => e.nombre === 'Armadura rota')],
     [['Barrera'], 1, 2, true, true, true, 0, true]);
 });
+prueba('🔧 Bloqueo perdido con el Parry elegido a mano (2026-10-29): el desgaste va al escudo puesto; sin escudo, a la única pieza que para', () => {
+  const ui = {toast(){}, cambio(){}, recordatorios(){}};
+  const conInv = inv => { const X = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S; X.inventario = inv; return X; };
+  const S = conInv([{id: 'e', nombre: 'Tapa', tipoItem: 'escudo_1m', equipado: true, peso: 1, mods: [{stat: 'def', val: 1}]},
+    {id: 'a', nombre: 'Daga', tipoItem: 'arma_1m', equipado: true, peso: 1, mods: []}]);
+  FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Desgaste', item: 'parry'}, '', ui);
+  const S2 = conInv([{id: 'a', nombre: 'Daga', tipoItem: 'arma_1m', equipado: true, peso: 1, mods: []}]);
+  FichaAcciones.aplicarEstadoRecibido(S2, {nombre: 'Desgaste', item: 'parry'}, '', ui);
+  const d = (X, id) => FichaCalculo.durActual(X.inventario.find(i => i.id === id));
+  igual([d(S, 'e'), d(S, 'a'), d(S2, 'a')], [FichaCalculo.durMax(S.inventario[0]) - 1, FichaCalculo.durMax(S.inventario[1]), FichaCalculo.durMax(S2.inventario[0]) - 1]);
+});
+prueba('💧 La barra de SP de un creep (2026-10-29): el porcentaje solo en modo SP', () => {
+  const sc = creepPrueba({nivel: 2}), mx = CreepCalculo.spMax({...sc, modoSP: true});
+  igual([CreepCalculo.spPct(sc), CreepCalculo.spPct({...sc, modoSP: true, sp: mx}), CreepCalculo.spPct({...sc, modoSP: true, sp: 0}), mx > 0], [null, 100, 0, true]);
+});
 prueba('🌀 Town portal (2026-10-29): clásico de la góndola (Común, 50), entre los utilitarios, sin trampa', () => {
   const it = CATALOGO_BASE.find(x => x.id === 'cat-town-portal');
   igual([!!it, it && it.legacy, it && it.tier, it && it.precioCompra, it && it.townPortal, it && !it.trampaDatos, it && Combatiente.categoriaGondola(it), it && Combatiente.utilPrimero(it) < 99],

@@ -89,6 +89,7 @@ function creepPublico(sc, orden){
     ...CreepCalculo.tarjetaPublica(sc),   // la 🪪 del mapa: nombres del arma y del equipo, y la nota (2026-10-09)
     resumen: {
       hpPct: hpMax > 0 ? Math.round(Math.max(0, Math.min(1, hp / hpMax)) * 100) : 0,
+      ...(CreepCalculo.spPct(sc) !== null ? {spPct: CreepCalculo.spPct(sc)} : {}),   // 💧 la barra de SP del token, en modo SP (2026-10-29)
       muerto: hp <= 0,
       opor: CreepCalculo.oportunidadPosible(sc),   // ¿puede aprovechar un ataque de oportunidad? (2026-10-02; sin mostrar sus No2)
       sinOpor: CreepCalculo.sinOportunidad(sc),

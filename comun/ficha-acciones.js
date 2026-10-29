@@ -975,6 +975,12 @@ const FichaAcciones = (() => {
     ui.toast(txt);
     try{ ui.recordatorios([{nombre: `🔧 ${quien ? quien + ': ' : ''}${txt}`, detalle: ''}]); }catch(e){}
   }
+  function piezaDelParry(S){
+    const esc = (S.inventario || []).find(x => x && x.equipado && FichaCalculo.esEscudoItem(x) && !FichaCalculo.itemRoto(x));
+    if(esc) return esc;
+    const c = FichaCombate.armasYEscudosParaParry(S);
+    return c.length === 1 ? c[0].item : null;
+  }
   function desgastarItem(S, i, n, ui){
     const antes = FichaCalculo.durActual(i);
     i.dur = Math.max(0, antes - Math.max(1, n || 1));
@@ -1068,7 +1074,8 @@ const FichaAcciones = (() => {
   function aplicarEstadoRecibido(S, spec, origen, ui){
     // Durabilidad (2026-09-26): la Armadura rota y el desgaste son de los ÍTEMS, no un estado del personaje.
     if(spec.nombre === 'Desgaste'){
-      const it = S.inventario.find(x => x.id === spec.item);
+      // `item: 'parry'` (2026-10-29): un Parry elegido a mano no dice con qué paró — el escudo puesto o, si no, la única pieza con la que se puede parar.
+      const it = spec.item === 'parry' ? piezaDelParry(S) : S.inventario.find(x => x.id === spec.item);
       if(it && FichaCalculo.durableItem(it)){ desgastarItem(S, it, 1, ui); ui.cambio(['equipo', 'mochila', 'refresh']); }
       else ui.toast(`Desgaste: no encuentro ese ítem en tu inventario`);
       return;

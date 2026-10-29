@@ -616,6 +616,7 @@ async function modificarCreep(creepId, cambiar){
     tx.update(base, {
       mapa: String(sc.mapa || '').slice(0, 80),   // en qué mapa está (comun/creeps-mapas.js)
       'resumen.hpPct': hpMax > 0 ? Math.round(Math.max(0, Math.min(1, sc.hp / hpMax)) * 100) : 0,
+      'resumen.spPct': CreepCalculo.spPct(sc) ?? firebase.firestore.FieldValue.delete(),   // 💧 la barra de SP, en modo SP (2026-10-29)
       'resumen.muerto': sc.hp <= 0,
       'resumen.opor': CreepCalculo.oportunidadPosible(sc),   // ataque de oportunidad (2026-10-02)
       'resumen.sinOpor': CreepCalculo.sinOportunidad(sc),

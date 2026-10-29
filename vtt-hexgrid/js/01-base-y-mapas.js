@@ -567,7 +567,11 @@ function estadoDe(t){
     ? entre01(num(r.hpPct) / 100)
     : (num(r.hpMax) > 0 ? entre01(num(r.hp) / num(r.hpMax)) : 0);
   const {sp: spActual, spMax} = spDeResumen(r);
-  const sp = t.tipo === 'pj' && spMax > 0 ? entre01(spActual / spMax) : null;
+  // 💧 Un creep en modo SP (2026-10-29): su barra de SP; el GM la ve con sus números, los demás con el porcentaje publicado (como la vida).
+  const scSp = t.tipo === 'creep' && typeof creepPrivadoDe === 'function' ? creepPrivadoDe(t.fichaId) : null;
+  const sp = t.tipo === 'pj' ? (spMax > 0 ? entre01(spActual / spMax) : null)
+    : t.tipo === 'creep' ? (scSp ? (CreepCalculo.spPct(scSp) !== null ? CreepCalculo.spPct(scSp) / 100 : null) : (r.spPct !== undefined && r.spPct !== null ? entre01(num(r.spPct) / 100) : null))
+    : null;
   // No2: de los PJ sale del resumen; de los creeps, de su parte privada (GM).
   const n = valoresNo2(t);
   const no2 = n && n.max > 0 ? entre01(n.valor / n.max) : null;

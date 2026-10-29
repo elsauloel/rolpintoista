@@ -535,7 +535,13 @@
   se cambian y el turno no se mueve; las flechas que cruzarían la línea de la ronda, apagadas; la Demora 2 a uno que ya jugó → queda atenuado en su
   lugar; la Demora en su propio turno → baja al terminarlo («Tanque baja 1 lugar (2.º → 3.º)»); al llegarle a uno que ya jugó → el cartel «¿Vuelve
   a actuar?»: Sí → juega sin recargar ni contar turnos (ni al empezar ni al terminar); No → se saltea; la ronda 2 arrancó una sola vez y en el
-  orden que mostraba la lista. **Falta**: una Demora de verdad desde el duelo (un arma contundente que la tenga), y verlo el dueño en una sesión.
+  orden que mostraba la lista. **La Demora desde el duelo, probada el mismo día** (dueño: «poné algún arma que ofrezca demora segura»): con una
+  «Maza de prueba (Demora segura)» (Tipo 10, Demora siempre) en Warrior y el Bate de Tanque con Demora siempre, tiradas a mano (6 contra 1):
+  (1) Warrior, en su turno, le pega a Tanque, que no jugó → «✔ Aplicado · baja 1 lugar (2.º → 3.º)», el turno sigue con Warrior; (2) Warrior
+  le pega a Capataz en el turno de Capataz → «es su turno: baja 1 lugar cuando lo termine» y, con ▶, «Demora: Capataz baja 1 lugar (2.º → 3.º)»;
+  (3) Tanque le pega a Warrior, que ya jugó → «baja 1 lugar (1.º → 2.º)», queda atenuado después de Tanque, y con ▶ el cartel «¿Vuelve a
+  actuar?» para Warrior y para Capataz (No → se saltean, le toca a juan). Ojo: la Demora se aplica recién después de «Aplicar el daño» (como los
+  demás efectos). Las armas quedaron como estaban. **Falta**: verlo el dueño en una sesión.
 - [x] **🔮 Los ocho talismanes que faltaban** (2026-10-18, «Test con claude elsaulo», con capturas): **Piedra bezoar** (Veneno ×3 → ×2 en la
   ficha; ojo: el cuadro del duelo sigue diciendo «le llegó Veneno ×3», porque lo baja la ficha al recibirlo), **Bola de cristal** (un creep en
   sigilo a la vista → el paso «🔮 Bola de cristal» en «Empieza tu turno»), **Sahumerio** (1d4 → 4 se llevó Pajaritos; **arreglado**: el cartel

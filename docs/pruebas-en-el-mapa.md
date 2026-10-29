@@ -285,10 +285,12 @@
 >   juan con Sigilo (el GM lo ve como «?»), ataca al Tunelero → la marca de delatado se escribía bien, pero el GM lo seguía viendo como «?»
 >   (`ocultoPorSigiloParaMi` no la miraba). ✅ Arreglado y vuelto a mirar publicado: el GM ve a juan (atenuado, con el ícono de sigilo) en esa casilla; juan se
 >   mueve una → el GM deja de verlo. (Falta solo el «pase la ronda», que es la misma marca.)
-> - [ ] **🐝 Una zona de un creep sobre una invocación** (la abeja de Bizzante): que a su dueño le aparezca el cartel y tire con los stats de la abeja.
+> - [x] **🐝 Una zona de un creep sobre una invocación** (la abeja de Bizzante): que a su dueño le aparezca el cartel y tire con los stats de la abeja.
 >   ✅ **El cartel, probado (2026-10-28)**: el Escarabajo levantó un Muro de fuego sobre el Lobo de Clementino; el dueño lo sacó y lo volvió a meter → en su
 >   pantalla «🔥 Muro de fuego: le toca a Lobo de prueba · No hay nada que tirar» → Aplicar → «8 de daño de fuego · Quemadura» y el Lobo 15 → 5 (8 + 2 de la
->   Quemadura al ponerse). Falta: una zona **con tirada de resistencia** (para ver que tira con los stats de la invocación). Al crear la zona encima no pasa
+>   Quemadura al ponerse). ✅ **Con tirada (2026-10-28)**: el Escarabajo (con una Nube tóxica agregada) la tiró sobre el Lobo → al dueño, «Lobo de prueba entró en
+>   Nube tóxica · Tirá Res.Esp» → «no resistió (Res.Esp 1 contra Ef.Esp 1) · 4 de daño tóxico · Veneno»: un 1 solo sale con la Res.Esp 2 del Lobo (la de
+>   Clementino es 5). El Lobo murió del veneno. Al crear la zona encima no pasa
 >   nada: el motor mira al entrar y en cada «Pasar de ronda». Visto de paso y ✅ arreglado: soltar un token en una casilla a la que no llegaba anotaba
 >   «⏱ actúa fuera de su turno: se mueve» en la Mesa sin haberse movido. Vuelto a probar publicado: el intento fallido no anota nada y el movimiento siguiente, una sola línea
 >   (antes el intento fallido seguía mirando y anotaba también el movimiento siguiente: dos líneas).
@@ -312,11 +314,13 @@
 >   (arreglado al verlo: el botón se apagaba por el costo de salir); meterse cobra −1 No2 −1 SP y aparecen «🕳 juan · ⬆ Salir · ⚔ Atacar»; ⚔ Atacar → la
 >   declaración «con Caronero · Tipo 6 · +3 PdG · +1d6 de daño · Crítico frecuente +1» (el PdG 7 + 3 se tira como 1d10); sin No2 avisa y deja seguir;
 >   Esc → «¿Vuelve bajo tierra o queda afuera?» → vuelve; ⬆ Salir → sale sin atacar. **Para revisar**: al jugador cancelar no le devuelve lo cobrado (al
->   creep sí); bajo tierra, el jugador no ve su propio token (solo el pozo). Falta pegar las reglas (la estela de un jugador).
-> - [ ] **✨ El que se delata aparece con ondas** (2026-10-28, programado): un token escondido en la niebla que ataca se revela con el anillo y las ondas del
+>   creep sí). ✅ Arreglado: bajo tierra, el jugador no veía ni podía agarrar su propio token (ahora lo ve transparente y lo mueve). ✅ **Con las reglas pegadas**:
+>   juan se movió por abajo y la estela quedó guardada y a la vista (captura).
+> - [x] **✨ El que se delata aparece con ondas** (2026-10-28, programado): un token escondido en la niebla que ataca se revela con el anillo y las ondas del
 >   aviso de turno, 4,5 s. Ver en el mapa con un creep en la niebla que dispare.
 >   Intentado (2026-10-28): el Tunelero a 8 casillas, en la niebla de juan, le disparó (la marca de delatado se escribió); la ventana del jugador estaba
->   minimizada (0 × 0) y no se pudo mirar. Repetir con las dos ventanas a la vista.
+>   minimizada (0 × 0) y no se pudo mirar. ✅ **Probado**: el Tunelero, en la niebla de juan, le dispara → en la pantalla de juan aparece con el anillo dorado y
+>   las ondas, 4,4 s (captura). (La pestaña de pruebas que se abre aparte queda en segundo plano y Chrome la congela: usar la pestaña que está a la vista.)
 > - ⚠ **juan (de «Claude · pruebas») quedó en blanco (2026-10-28)**: al abrirlo desde la ficha, la ficha estaba rota (desde las 10:01, `jobCostoDe` declarado
 >   dos veces en `ficha-personaje/js/10`) y guardó la hoja vacía encima. Arreglado (fc80c9ae) y con un seguro: si la ficha no se puede armar, queda en solo
 >   lectura. El origen, revisado: intacto. juan no se puede recuperar (no había respaldo): hay que rehacerlo o crear otro personaje de prueba.

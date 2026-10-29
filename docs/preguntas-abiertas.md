@@ -1369,3 +1369,14 @@ js/46; la habilidad `miscelaneas-excavar` en `comun/skills-clase.js`. **Costos (
 2 SP y los No2 de un ataque, con los bonos del creep: +3 PdG, +1d6 de daño, Crítico frecuente +1 y Rengo 1 turno (crítico: Rengo 2 y Lisiado 1).
 Salir con el botón es **sin costo** (a confirmar). Las reglas de Firestore nuevas (la estela de un jugador, `tunel`) hay que pegarlas.
 
+
+### P232 — 🏪 Los otros tamaños de tienda, con el criterio del ambulante (2026-10-28)
+
+**Contexto:** el ambulante pasó a una lista fija por sección (lo esencial) y su góndola, a cantidades por categoría (`FIJO_AMBULANTE`,
+`gondolaPorCategoria`, `docs/rework-tiendas.md`). El dueño (2026-10-28): «habría que hacer un paralelismo con el resto de tamaños de local, tirame
+sugerencias». Hoy pueblito…capital siguen sorteando con la receta de pesos (8–10 / 12–15 / 18–22 / 26–32 piezas por sección).
+
+**Propuesta (sin decidir):** cada tamaño = un **núcleo fijo** que crece (más armas de familias distintas, más defensivas distintas, la utilitaria) +
+**un resto al azar** con la receta de siempre, cada vez más grande; los totales quedan como hoy. Góndola por categoría que crece con el tamaño
+(pergaminos, trampas, pociones de otros usos, munición, enfermería; la capital, todo). Un lugar del núcleo sin ítem: en el ambulante queda vacío; en
+los demás, se rellena con la receta. Detalle de los números en la conversación del 2026-10-28.

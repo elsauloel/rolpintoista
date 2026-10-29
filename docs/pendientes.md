@@ -46,7 +46,7 @@
 >   algún escudo, alguna armadura, no mucho más que eso… después me tocará volver a revisar el tema de las tiendas»). Lo de hoy está en
 >   `comun/generador-tiendas.js` y `docs/rework-tiendas.md` (ambulante 8–12 ítems con variedad garantizada de partes defensivas). Sentarse con el
 >   dueño a redefinir qué vende cada tamaño, empezando por el ambulante (pocas cosas, lo esencial).
-> - [ ] **⚖ Revisar Arrastrar (P224)** (2026-10-27, dueño: «Arrastrar, anotalo pendiente para que lo revise cuando esté en la compu»): quedó en **una sola
+> - [x] **✅ (2026-10-29: la B, dos tiempos; ver P224)** **⚖ Revisar Arrastrar (P224)** (2026-10-27, dueño: «Arrastrar, anotalo pendiente para que lo revise cuando esté en la compu»): quedó en **una sola
 >   tirada** —un ataque con su arma a 3 casillas o menos con +2 PdG; si pega, lo trae y le hace el daño— y lo definido eran dos (Destreza contra la
 >   Evasión para engancharlo, y después el golpe). Mirarlo en el mapa con el Warrior (prueba) de «Claude · pruebas» y decidir si queda así o se separa.
 > - [x] (2026-10-25, dueño: «podemos probar esto»; hecha en `vtt-hexgrid/js/75-flechitas-estados.js`; 2026-10-28, lo vio el dueño: «esto ya está») **⬆⬇ Animación al recibir un buff o un debuff (2026-10-25, dueño: «probar una pequeña animación que cuando se coloca un buff, durante un segundo,

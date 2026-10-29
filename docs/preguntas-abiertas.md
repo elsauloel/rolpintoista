@@ -1255,12 +1255,20 @@ Casi siempre da igual (un creep pelea un combate). **A decidir:** ¿se libera al
 **Decidido (dueño, 2026-10-27):** «se desbloquea al finalizar el combate». Hecho: `unaVezAlTerminar` (vtt-hexgrid/js/25), con lo demás de
 «Finalizar combate»: la pantalla del GM libera las habilidades de los creeps del mapa. Probado en el mapa con el Tanque (prueba).
 
-### P224 — Arrastrar en una sola tirada (2026-10-27)
+### P224 — Arrastrar en una sola tirada (2026-10-27) ✅ decidida (2026-10-29)
 
 Lo definido decía «Destreza contra la Evasión; si lo engancha, lo arrastra y le pega con su arma con +2 PdG» (dos tiradas). Se programó en una sola: un
 ataque con su arma a 3 casillas o menos con +2 PdG (contra la Evasión o el Parry); si pega, lo trae y le hace el daño. **A confirmar** (o separarlo en dos).
 
 (2026-10-27, dueño: «anotalo pendiente para que lo revise cuando esté en la compu» → `docs/pendientes.md`, sección 🖥.)
+
+**Decidido (dueño, 2026-10-29): «vamos con la B»** — en dos tiempos, como estaba definido. Primero el **enganche**: la Destreza de quien lo tira contra la
+Evasión del rival (empate: no lo engancha; no se parrea). Si lo engancha, **lo trae hasta quedar pegado aunque después falle el golpe**, y sigue el ataque
+con su arma con +2 PdG contra la defensa que elija. Si no lo engancha, no hay golpe (el ataque se gastó). Si ya estaba pegado, va directo al golpe.
+**Hecho** (2cda7122): `arrastrarEnganche` / `arrastrarTraer` en `vtt-hexgrid/js/78-choque-pesado.js`, llamado desde `dueloElegirObjetivoMapa` (js/13);
+el texto en `comun/skills-creep-base.js`. Probado en «Claude · pruebas» (el Warrior contra juan): falla («Destreza 2 contra su Evasión 3: no lo engancha. No
+hay golpe») y engancha («Destreza 14 contra su Evasión 6»: lo trae 2 casilleros y se abre el duelo con +2 PdG). Los creeps que ya tenían Arrastrar guardado
+siguen con el texto viejo (la mecánica nueva les vale igual); el del Warrior de pruebas se actualizó.
 
 ### P225 — ¿Las áreas alcanzan a un personaje caído? (2026-10-27) ✅ decidida (2026-10-27)
 

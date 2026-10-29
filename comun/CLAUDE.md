@@ -1002,6 +1002,12 @@ versión parecida en más de una, es candidato a juntar.
   y **↩ Soltar** (`soltar`). Al cerrar el botín, `CombateFin.despojar` manda lo reclamado en la recompensa de cada personaje (`items`) y
   `Recibidos.recompensa` lo suma a la mochila (`itemsDelBotin`: los trofeos iguales se apilan; si no entra, se suma igual). Una disputa abierta
   se corta y el ítem queda para quien lo reclamó.
+- **🛡 Romper armadura: el aviso y el estado del equipo** (2026-10-29, dueño): cada punto de Armadura rota que le cae a una pieza (`romperPieza`,
+  `rompeArmaduraAlAzar` en `ficha-acciones.js`) le abre al jugador un Aviso (`avisoRotura`, con `AvisoCombate`): «<origen> te rompió <ítem>», la
+  durabilidad que le queda, la Defensa de antes → después y que en 0 se rompe y se anulan sus efectos. La spec `{nombre: 'Armadura rota', item}` acepta
+  `item: 'escudo'` = el escudo que tiene puesto (el Parry elegido a mano no dice con cuál paró). En 🛡 Equipo, debajo de las defensas,
+  `FichaEquipo.estadoEquipoHtml(S, equipados)`: «✔ todo entero» o «🛠 Estado del equipo» pieza por pieza. Un disparo con Romper armadura parado con
+  Parry de escudo va al escudo (`Combatiente.ataqueDeArma` → `ataque.rompeEscudo`; lo aplica el mapa, `dueloRompeEscudo` en `vtt-hexgrid/js/26`).
 - **`ficha-equipo.js`, Comparar lo que no se compara con números** (2026-10-22, dueño: «una varita con una espada, un talismán con una espada»):
   `slotOcupado(S, item).equipados` = lo equipado en el mismo LUGAR (primero el mismo tipo, después el resto: una varita de una mano contra la espada de
   dos manos puesta); `compararHtml` suma debajo de la tabla «Lo que hace cada uno» (`queHaceHtml`: `ItemCorto.grillaHtml` de los dos, lado a lado) y

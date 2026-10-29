@@ -6006,13 +6006,13 @@ prueba('🛡 Golpe de escudo (2026-10-27): pega con el escudo (Tipo 10, sin Parr
     atq.efectos.map(e => `${e.nombre}${e.requiereDano ? '*' : ''}`), sinEscudo.escudoGolpe.peso],
     ['Rodela de tablas', 3, 10, true, 'Rodela de tablas', true, ['Sentado*', 'Demora*'], 0]);
 });
-prueba('🕳 Excavar, una sola habilidad (2026-10-27): meterse (1 No2) y salir apuñalando (un ataque: +1d6, Crítico frecuente +1, Rengo; crítico, Rengo 2 y Lisiado)', () => {
+prueba('🕳 Excavar, una sola habilidad (2026-10-27): meterse (1 No2 y 1 SP) y salir apuñalando (un ataque y 2 SP: +1d6, Crítico frecuente +1, Rengo; crítico, Rengo 2 y Lisiado)', () => {
   const h = chp('Excavar', 2), sc = creepPrueba();
   const atq = CreepAcciones.ataqueDeHab(sc, h);
-  igual([h.excavar, h.excavarNo2, h.emerger && h.emerger.distancia, h.emerger && h.emerger.pdg, h.nitrosCosto, h.cd, atq.mods.dadoExtra, atq.mods.critBono,
+  igual([h.excavar, h.excavarNo2, h.excavarSp, CreepCalculo.costoSpHab(sc, h), h.emerger && h.emerger.distancia, h.emerger && h.emerger.pdg, h.nitrosCosto, h.cd, atq.mods.dadoExtra, atq.mods.critBono,
     atq.efectos.map(e => e.nombre), ((atq.critico && atq.critico.efectos) || []).map(e => e.nombre),
     HABILIDADES_CREEP_CATALOGO.filter(x => x.nombre === 'Excavar').length],
-    [true, 1, undefined, 3, 'ATAQUE', 2, '1d6', 1, ['Rengo'], ['Rengo', 'Lisiado'], 1]);   // (sin distancia desde el 2026-10-28: sale donde está)
+    [true, 1, 1, 2, undefined, 3, 'ATAQUE', 2, '1d6', 1, ['Rengo'], ['Rengo', 'Lisiado'], 1]);   // meterse: 1 No2 y 1 SP (modo SP); salir atacando: 2 SP (2026-10-29)   // (sin distancia desde el 2026-10-28: sale donde está)
 });
 prueba('⚖ Carga que derriba, Arrastrar y Golpe que sigue (2026-10-27): lo que lleva el ataque al duelo', () => {
   const sc = creepPrueba();

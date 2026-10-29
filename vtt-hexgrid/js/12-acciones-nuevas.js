@@ -626,19 +626,23 @@ function acUsarEspecial(sc, itemId){
     acDibujar();
   });
 }
-// 🕳 Excavar, el primer tiempo (2026-10-27): se mete bajo tierra. Cuesta `excavarNo2` (1 si no dice); sin No2 suficientes, avisa y deja seguir (gasta lo que
-// tenga). El cooldown y el SP se pagan al salir (el segundo tiempo es un ataque).
+// 🕳 Excavar, el primer tiempo (2026-10-27): se mete bajo tierra. Cuesta `excavarNo2` (1 si no dice) y, en modo SP, `excavarSp` (1 si no dice; dueño,
+// 2026-10-29: «enterrarse tiene que costar un nitro y un SP»); sin No2 o SP suficientes, avisa y deja seguir (gasta lo que tenga). El cooldown y el SP de
+// la habilidad se pagan al salir atacando (el segundo tiempo es un ataque); salir sin atacar (⬆ Salir) no cuesta nada.
 async function acExcavarMeterse(sc, h, tokenId){
   const costo = Math.max(0, Math.round(num(h.excavarNo2 !== undefined ? h.excavarNo2 : 1)));
-  if(costo > num(sc.nitros) && !(await Confirmar.preguntar(`${sc.nombre} tiene ${fmt(num(sc.nitros))} No2 y meterse bajo tierra cuesta ${fmt(costo)}. ¿Hacerlo igual (gasta los que tenga)?`,
+  const sp = CreepCalculo.modoSP(sc) ? Math.max(0, Math.round(num(h.excavarSp !== undefined ? h.excavarSp : 1))) : 0;
+  const falta = [costo > num(sc.nitros) ? `${fmt(num(sc.nitros))} No2 (cuesta ${fmt(costo)})` : '', sp > CreepCalculo.spActual(sc) ? `${fmt(CreepCalculo.spActual(sc))} SP (cuesta ${fmt(sp)})` : ''].filter(Boolean);
+  if(falta.length && !(await Confirmar.preguntar(`${sc.nombre} tiene ${falta.join(' y ')} para meterse bajo tierra. ¿Hacerlo igual (gasta lo que tenga)?`,
     {titulo: h.nombre || 'Excavar', icono: '🕳', si: 'Hacerlo igual'}))){ toast(`${sc.nombre}: no usó ${h.nombre || 'Excavar'}`); return; }
-  if(costo > 0){
-    try{ await modificarCreep(sc.id, x => { x.nitros = Math.max(0, num(x.nitros) - costo); }); }
+  if(costo > 0 || sp > 0){
+    try{ await modificarCreep(sc.id, x => { x.nitros = Math.max(0, num(x.nitros) - costo); if(sp) x.sp = Math.max(0, CreepCalculo.spActual(x) - sp); }); }
     catch(err){ console.error('No se pudo cobrar Excavar:', err); toast('No se pudo cobrar — revisá la consola'); return; }
   }
   if(!(await excavarToken(tokenId))) return;
-  mesaLinea(`🕳 ${sc.nombre} se mete bajo tierra`, 'recordatorio');
-  toast(`🕳 ${sc.nombre} se metió bajo tierra${costo ? ` · −${fmt(costo)} No2` : ''}: con ${h.nombre || 'Excavar'} otra vez, sale apuñalando`);
+  const pago = [costo ? `−${fmt(costo)} No2` : '', sp ? `−${fmt(sp)} SP` : ''].filter(Boolean).join(' ');
+  mesaLinea(`🕳 ${sc.nombre} se mete bajo tierra${pago ? ` (${pago})` : ''}`, 'recordatorio');
+  toast(`🕳 ${sc.nombre} se metió bajo tierra${pago ? ` · ${pago}` : ''}: con ${h.nombre || 'Excavar'} otra vez, sale apuñalando`);
   if(ac && ac.creepId === sc.id) acDibujar();
 }
 async function acEjecutarHab(sc, habId){
@@ -861,7 +865,7 @@ function cerrarAccionesNuevas(){
    estados para la Ejecución, con el selector común (los "Mis presets" del GM no están en la partida: ver pendientes 7b). */
 const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261027q', '../comun/asistente-duelo-hab.js?v=20261026d'];
 // Las recetas de habilidades de fábrica (para ↻ Reemplazar y ⬆ Subir): pesadas, recién cuando hacen falta.
-const ACE_BASE = ['../comun/creeps-base.js?v=20261029a', '../comun/skills-creep-base.js?v=20261029l'];
+const ACE_BASE = ['../comun/creeps-base.js?v=20261029r', '../comun/skills-creep-base.js?v=20261029r'];
 async function acCargarEditor(){ await acCargarPiezas(); await cargarPiezas(SE_PIEZAS); await cargarPiezas(ACE_PIEZAS); }
 // ⬆ Subir una habilidad del creep a la biblioteca compartida (corrección o algo nuevo); su `bibOrigen` nuevo se guarda en el creep.
 async function acSubirHab(creepId, habId){

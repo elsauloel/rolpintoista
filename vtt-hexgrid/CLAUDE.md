@@ -1872,3 +1872,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   pasar a combate). `js/82-delatado.js` (quien crea un duelo contra un rival o una zona queda a la vista en esa casilla hasta moverse o pasar la ronda;
   `mapa/delatados`, lo escribe el GM, sin reglas nuevas). `js/83-pacto.js` (el botón 😇 de arriba; el pacto se gasta en `danioPj`, js/10, y en
   `FichaAcciones.revisarAnkh`). El máximo de vida, SP y No2 se ve debajo de cada circulito del token.
+- **🌀 Town portal** (2026-10-29, dueño): `js/84-town-portal.js`. El consumible clásico (`townPortal` en el ítem, `cat-town-portal`) pide una casilla al
+  lado del token (`townPortalColocar`, desde `ui.townPortal` de js/11; si se cancela no se gasta) y deja un elemento `townPortal: true`: no es trampa,
+  lo ven todos y queda hasta que el GM lo borra. Se dibuja con `townPortalDibujar` (espiral azul que gira; js/05 lo llama en vez del relleno). La pisada,
+  `townPortalRevisar` desde `moverToken` (js/07): cualquier token que pasa se va del mapa (se borra su token; la ficha queda) y `usoEn` dispara los
+  pulsos en todas las pantallas. Pasar al mapa de la aldea, a mano (GM). Reglas nuevas: el campo `townPortal` y su `usoEn`.

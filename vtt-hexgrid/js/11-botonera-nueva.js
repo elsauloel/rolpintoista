@@ -112,7 +112,7 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261029p', '../comun/ficha-botin.js?v=20261026zy', '../comun/generador-tiendas.js?v=20261028z', '../comun/filtro-catalogo.js?v=20261028z', '../comun/ficha-tienda.js?v=20261028x2', '../comun/ficha-mantenimiento.js?v=20261028w', '../comun/ficha-calculo.js?v=20261028w', '../comun/ficha-combate.js?v=20261015d', '../comun/skills-clase.js?v=20261028e3', '../comun/ficha-habilidades.js?v=20261020q',
-  '../comun/catalogo.js?v=20261028x', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261029a', '../comun/ficha-sesion.js?v=20261020zu', '../comun/ficha-botonera.js?v=20261028b4', '../comun/ficha-resumen.js?v=20261028o', '../comun/inv-calculo.js?v=20261029a', '../comun/inv-botonera.js?v=20261023p8a', '../comun/inv-acciones.js?v=20261028x', '../comun/inv-duelo.js?v=20261029m', '../comun/ficha-acciones.js?v=20261029q', '../comun/inv-habilidades.js?v=20261027g', '../comun/inv-lupa.js?v=20261015a',
+  '../comun/catalogo.js?v=20261029t', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261029a', '../comun/ficha-sesion.js?v=20261020zu', '../comun/ficha-botonera.js?v=20261028b4', '../comun/ficha-resumen.js?v=20261028o', '../comun/inv-calculo.js?v=20261029a', '../comun/inv-botonera.js?v=20261023p8a', '../comun/inv-acciones.js?v=20261028x', '../comun/inv-duelo.js?v=20261029m', '../comun/ficha-acciones.js?v=20261029t', '../comun/inv-habilidades.js?v=20261027g', '../comun/inv-lupa.js?v=20261015a',
   '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261029m', '../comun/lupa.js?v=20261008u', '../comun/ficha-lupa.js?v=20261014e'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -573,6 +573,7 @@ const BN_ACCIONES = {
           trampa: {...it.trampaDatos, nombre: String((it.trampaDatos && it.trampaDatos.nombre) || it.nombre).slice(0, 40),
             dano: FichaAcciones.TRAMPA_DANO_RE.test(String((it.trampaDatos && it.trampaDatos.dano) || '').trim()) ? String(it.trampaDatos.dano).trim() : ''}})),   // 🪤 la trampa consumible: un clic, dentro del Rango y a la vista (2026-10-20)
     // ⏩ La Runa aceleradora (2026-10-12): se elige la casilla en el mapa (js/40).
+    townPortal: it => { if(bn) bn.host.hidden = true; return townPortalColocar({fichaId: bn.fichaId, tipoToken: 'pj', nombre: it.nombre}); },   // 🌀 (js/84): se gasta solo si quedó
     acelerador: it => { if(bn) bn.host.hidden = true; aceleradorDeHabilidad({fichaId: bn.fichaId, casteadorTipo: 'pj', turnos: num(it.aceleradorMapa.turnos) || 10, no2: num(it.aceleradorMapa.no2) || 2, nombre: it.nombre}); },
     // La zona de un consumible (2026-10-08, las bengalas): la misma de una habilidad, a nombre del personaje.
     terminar: (h, arma, xSp, xNitros) => FichaAcciones.terminarEjecucionHab(S, h, arma, xSp, xNitros, bnHabUi()),   // 📜 un consumible con Ejecución (2026-10-20)

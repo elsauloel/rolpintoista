@@ -4068,6 +4068,11 @@ prueba('🛡 Romper armadura de un arma de rango viaja en el ataque, para el esc
   igual([(at.rompeEscudo || []).length, at.rompeEscudo && at.rompeEscudo[0].caras, melee.rompeEscudo, Combatiente.esRompeArmadura({nombre: 'Armadura rota doble'}), Combatiente.esRompeArmadura({nombre: 'Sangrado'})],
     [1, 2, undefined, true, false]);
 });
+prueba('🌀 Town portal (2026-10-29): clásico de la góndola (Común, 50), entre los utilitarios, sin trampa', () => {
+  const it = CATALOGO_BASE.find(x => x.id === 'cat-town-portal');
+  igual([!!it, it && it.legacy, it && it.tier, it && it.precioCompra, it && it.townPortal, it && !it.trampaDatos, it && Combatiente.categoriaGondola(it), it && Combatiente.utilPrimero(it) < 99],
+    [true, true, 'Común', 50, true, true, 'utilitario', true]);
+});
 prueba('🏹 Contra un proyectil, las defensas se llaman «Esquivar (Agilidad)» y «Poner escudo» (2026-10-29); cuerpo a cuerpo, igual que siempre', () => {
   const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión · pagando 1 No2'}, {modo: 'parry', escudo: true, etiqueta: '🛡 Parry · Tapa'}, {modo: 'parry', etiqueta: '🗡 Parry · Daga', motivoNo: '🚫 x'}];
   const dis = Combatiente.nombresContraDisparo(ops, {ataque: {rango: true, tipo: 'arma'}}), mel = Combatiente.nombresContraDisparo(ops, {ataque: {tipo: 'arma'}});

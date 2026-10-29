@@ -694,7 +694,7 @@ service cloud.firestore {
       // solo lo puede prender o apagar el GM (al crear o después, desde ⚙️);
       // sirve con o sin Sólido. alfa 0 se permite (solo se ve el contorno).
       function elementoValido(d) {
-        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'niebla', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'fijado', 'duenoUid', 'creado', 'trampa', 'trampaNombre', 'trampaDetalle', 'portal', 'portalDestino', 'usoEn', 'fuego', 'fuegoDano', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo', 'trampaIgnoraDef', 'colision', 'turnos', 'venceMant', 'trampaItem', 'trampaFicha', 'zona', 'zonaNombre', 'zonaDano', 'zonaIgnoraDef', 'zonaEstado', 'zonaAmiga', 'zonaResistStat', 'zonaResistValor', 'zonaCasteadorRef', 'zonaCasteadorTipo', 'zonaResueltos', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaDanoDif', 'zonaDanoTipo', 'zonaTiraExtra', 'zonaNota', 'zonaTiraStat', 'zonaTiraValor', 'trampaDetectar', 'descubierta', 'trampaDejaZona', 'zonaTurnos', 'zonaAltura', 'zonaDirecto', 'zonaInmediata', 'zonaLuz', 'arma', 'armaNombre', 'armaDe', 'armaItem', 'acelerador'])
+        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'niebla', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'fijado', 'duenoUid', 'creado', 'trampa', 'trampaNombre', 'trampaDetalle', 'portal', 'portalDestino', 'usoEn', 'fuego', 'fuegoDano', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo', 'trampaIgnoraDef', 'colision', 'turnos', 'venceMant', 'trampaItem', 'trampaFicha', 'zona', 'zonaNombre', 'zonaDano', 'zonaIgnoraDef', 'zonaEstado', 'zonaAmiga', 'zonaResistStat', 'zonaResistValor', 'zonaCasteadorRef', 'zonaCasteadorTipo', 'zonaResueltos', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaDanoDif', 'zonaDanoTipo', 'zonaTiraExtra', 'zonaNota', 'zonaTiraStat', 'zonaTiraValor', 'trampaDetectar', 'descubierta', 'trampaDejaZona', 'zonaTurnos', 'zonaAltura', 'zonaDirecto', 'zonaInmediata', 'zonaLuz', 'arma', 'armaNombre', 'armaDe', 'armaItem', 'acelerador', 'townPortal'])
           && d.tipo in ['flor', 'linea', 'libre']
           && d.origen is map && d.origen.col is int && d.origen.fila is int
           && d.celdas is list && d.celdas.size() >= 2 && d.celdas.size() <= 6000 && d.celdas.size() % 2 == 0
@@ -731,6 +731,8 @@ service cloud.firestore {
           && (!('portal' in d) || d.portal is bool)
           // ⏩ Acelerador (2026-10-12): los No2 que da a quien lo pisa.
           && (!('acelerador' in d) || (d.acelerador is int && d.acelerador >= 1 && d.acelerador <= 9))
+          // 🌀 Town portal (2026-10-29): lo ve todo el mundo; quien lo pisa se va del mapa (la pantalla que lo mueve, js/84).
+          && (!('townPortal' in d) || d.townPortal is bool)
           && (!('usoEn' in d) || d.usoEn is number)
           && (!('fuego' in d) || d.fuego is bool)
           && (!('fuegoDano' in d) || (d.fuegoDano is int && d.fuegoDano >= 1 && d.fuegoDano <= 999))
@@ -828,6 +830,10 @@ service cloud.firestore {
             && request.resource.data.descubierta == true)
           // Un aliado que usa un portal deja la hora del uso (solo ese campo): dispara los pulsos en todas las pantallas.
           || (resource.data.get('portal', false) == true
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usoEn'])
+            && request.resource.data.usoEn is number)
+          // 🌀 Quien entra a un Town portal deja la hora (solo ese campo): los pulsos en todas las pantallas.
+          || (resource.data.get('townPortal', false) == true
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usoEn'])
             && request.resource.data.usoEn is number)
           // Quien resiste (o no) el efecto de una zona persistente se anota solo, uno a la vez (append).
@@ -951,6 +957,10 @@ service cloud.firestore {
               && request.resource.data.descubierta == true)
             // Un aliado que usa un portal deja la hora del uso (solo ese campo): dispara los pulsos en todas las pantallas.
             || (resource.data.get('portal', false) == true
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usoEn'])
+              && request.resource.data.usoEn is number)
+            // 🌀 Quien entra a un Town portal deja la hora (solo ese campo): los pulsos en todas las pantallas.
+            || (resource.data.get('townPortal', false) == true
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usoEn'])
               && request.resource.data.usoEn is number)
             // Quien resiste (o no) el efecto de una zona persistente se anota solo, uno a la vez (append).

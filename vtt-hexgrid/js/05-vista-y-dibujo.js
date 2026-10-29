@@ -390,7 +390,8 @@ function dibujarLienzo(){
     if(el.arma){ if(typeof armaDibujar === 'function') armaDibujar(el, z); return; }   // 🗡 el arma en el piso: solo su ficha redonda (js/27)
     const celdas = celdasDeElemento(el);
     if(el.acelerador && typeof aceleradorDibujar === 'function') aceleradorDibujar(el, z);   // ⏩ un círculo con flechitas, no la casilla (js/40)
-    const esColision = !!el.colision || !!el.acelerador;   // su relleno y su contorno ya se dibujaron arriba, todos juntos (el Acelerador, en js/40)
+    if(el.townPortal && typeof townPortalDibujar === 'function') townPortalDibujar(el, z);   // 🌀 la espiral azul que gira (js/84)
+    const esColision = !!el.colision || !!el.acelerador || !!el.townPortal;   // su relleno y su contorno ya se dibujaron arriba, todos juntos (el Acelerador, en js/40)
     if(!esColision){
     const img = el.imagen ? imagenLista(el.imagen) : null;
     const sup = !img ? (typeof zonaCuraDe === 'function' && zonaCuraDe(el) ? curaDibujarZona(el, celdas, z) : typeof superficieDibujar === 'function' ? superficieDibujar(el, celdas, z) : null) : null;   // ✨ la zona de curación (js/70), como una superficie

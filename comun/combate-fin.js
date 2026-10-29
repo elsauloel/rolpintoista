@@ -207,6 +207,7 @@ const CombateFin = (() => {
     if(it.trampaDatos) return it.trampaDatos.detectarStat === 'dmgesp' ? ['caster'] : ['liviano', 'rango'];
     if(it.revive || it.rerollMoneda || /ankh|polilla|f[eé]nix|segundo aire|velo eterno|f[eé]lix|invulnera|inmunidad a cc|coagula|sangre pura|buena fortuna|escudo especial/.test(n)) return ['universal'];
     if(num(it.curahp) > 0 || it.curaEstados || it.efectoHpTurno || /regenera|vendas|antídoto|sifón|cura plus/.test(n)) return ['universal'];
+    if(it.townPortal) return ['universal'];   // 🌀 (2026-10-29)
     if(it.zonaUso || it.aceleradorMapa) return /humo/.test(n) ? ['liviano'] : ['rango'];
     if(mods.has('luz') || mods.has('veoculto') || /vela|farol|antorcha|bengala|lámpara|cohete|faro|destello|esfera de luz|luz de la verdad|ojo de gato|colirio|revelaci/.test(n)) return ['universal'];
     if(it.curaspPct || /\bsp\b|reserva/.test(n)) return ['caster'];

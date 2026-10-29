@@ -362,6 +362,7 @@ function escucharElementos(){
         zonaEnMantenimiento: d.zonaEnMantenimiento !== false,
         zonaCadaPaso: d.zonaCadaPaso === true,
         acelerador: Number.isFinite(d.acelerador) ? d.acelerador : 0,   // ⏩ el Acelerador (2026-10-12, js/40): los No2 que da
+        townPortal: d.townPortal === true,   // 🌀 el Town portal (2026-10-29, js/84)
         zonaInmediata: d.zonaInmediata === true, zonaLuz: d.zonaLuz === true,   // (2026-10-08) enseguida a los de adentro · una luz (js/03)
         zonaAltura: ['piso', 'aire', 'ambos'].includes(d.zonaAltura) ? d.zonaAltura : '',   // dónde está su efecto (2026-10-07, js/08 alturaDe)
         zonaDirecto: d.zonaDirecto === true,   // daño directo: no lo frena la Defensa especial (2026-10-24: no se copiaba, y la zona la restaba igual)
@@ -392,6 +393,10 @@ function escucharElementos(){
       // Portal usado por un aliado: los mismos pulsos (violeta donde entró, azul donde salió) en todas las pantallas.
       if(ch.type === 'modified' && previoElem && d.portal === true && Number.isFinite(d.usoEn) && d.usoEn !== previoElem.usoEn && destinoParsear(d.portalDestino)){
         teleportEfecto(elementos.get(ch.doc.id), d.portalDestino);
+      }
+      // 🌀 Alguien entró al Town portal (js/84): los pulsos, en el portal.
+      if(ch.type === 'modified' && previoElem && d.townPortal === true && Number.isFinite(d.usoEn) && d.usoEn !== previoElem.usoEn && d.origen){
+        teleportEfecto(elementos.get(ch.doc.id), `${d.origen.col},${d.origen.fila}`);
       }
     });
     pedirDibujo();
@@ -1150,13 +1155,14 @@ async function moverToken(id, col, fila, celdas, levita){
     fuegoEntrada(id, pisadas);
     zonaRevisarEntrada(id, celdas, num(levita));   // las zonas del piso no tocan lo levitado; las del aire, sí (2026-10-07)
     if(typeof aceleradorRevisar === 'function') aceleradorRevisar(id, celdas);   // ⏩ (js/40)
+    if(typeof townPortalRevisar === 'function') townPortalRevisar(id, celdas);   // 🌀 (js/84)
     if(typeof auraRevisar === 'function') auraRevisar();   // 💀 el aura de la Calavera (js/52)
     if(typeof dodgeTrasMover === 'function') dodgeTrasMover(id);   // 🏃 el dodge roll de un área: se revisa solo al moverse (js/13)
   }catch(err){
     // Reglas de Firestore sin publicar todavía (no conocen "ruta"): se mueve
     // igual, solo que los demás no ven la estela.
     if(err.code === 'permission-denied' && (ruta.length > 2 || conTunel)){   // (🕳 la estela de un jugador bajo tierra: hasta pegar las reglas del 2026-10-28)
-      try{ await doc.update({col, fila, ...conRot}); sigiloPublicarAvisos(id); percepcionPublicarAvisos(id); abrirGiroLibre(id, celdas); fuegoEntrada(id, pisadas); zonaRevisarEntrada(id, celdas, num(levita)); if(typeof aceleradorRevisar === 'function') aceleradorRevisar(id, celdas); return; }catch(e){ err = e; }
+      try{ await doc.update({col, fila, ...conRot}); sigiloPublicarAvisos(id); percepcionPublicarAvisos(id); abrirGiroLibre(id, celdas); fuegoEntrada(id, pisadas); zonaRevisarEntrada(id, celdas, num(levita)); if(typeof aceleradorRevisar === 'function') aceleradorRevisar(id, celdas); if(typeof townPortalRevisar === 'function') townPortalRevisar(id, celdas); return; }catch(e){ err = e; }
     }
     sigiloAvisosPendientes.delete(id);
     percepcionAvisosPendientes.delete(id);

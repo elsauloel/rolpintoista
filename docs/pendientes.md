@@ -541,7 +541,7 @@
 
 > **🚑 2026-10-28: la ficha estuvo rota de 10:01 a ~19:20** (`jobCostoDe` declarado en `js/05` y en `js/10`: el archivo no cargaba y, al abrir un personaje,
 > se guardaba la hoja vacía encima). Arreglado y con seguro (solo lectura si no se puede armar). El origen, intacto. **Pendiente**: rehacer a juan en «Claude ·
-> pruebas»; pegar las reglas de Firestore (la estela de un jugador bajo tierra, `tunel`); una revisión automática de nombres repetidos entre archivos (hoy,
+> pruebas»; pegar las reglas de Firestore (la estela de un jugador bajo tierra, `tunel`; desde el 2026-10-29, también el 🌀 Town portal, `townPortal`); una revisión automática de nombres repetidos entre archivos (hoy,
 > a mano: `scratchpad/choques.py`).
 
 ## 🧪 De las pruebas en el mapa del 2026-10-27 (la tanda del Choque pesado; reporte: `reporte-choque-pesado-2026-10-27.md`)

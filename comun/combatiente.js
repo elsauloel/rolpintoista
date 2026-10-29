@@ -479,7 +479,7 @@ const Combatiente = (() => {
      La munición (flechas y virotes especiales), aparte, después de las trampas (dueño, 2026-10-28: «armarle su propia categoría»). */
   const GONDOLA_CATEGORIAS = [['hpsp', '❤', 'Pociones de HP y SP'], ['enfermeria', '🩹', 'Enfermería'], ['utilitario', '🎒', 'Utilitarios'],
     ['trampa', '🪤', 'Trampas'], ['municion', '🏹', 'Munición'], ['pocion', '⚗', 'Pociones de otros usos'], ['pergamino', '📜', 'Pergaminos']];
-  const UTIL_PRIMERO = [/moneda re-?roll/i, /polilla m[ií]stica/i, /^revive\b/i, /ankh/i];
+  const UTIL_PRIMERO = [/moneda re-?roll/i, /polilla m[ií]stica/i, /^revive\b/i, /ankh/i, /town portal/i];   // 🌀 (2026-10-29)
   const utilPrimero = it => { const nom = String((it && it.nombre) || ''); const i = UTIL_PRIMERO.findIndex(r => r.test(nom)); return i < 0 ? 99 : i; };
   function categoriaGondola(it){
     const nom = String((it && it.nombre) || '');

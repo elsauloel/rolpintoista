@@ -269,6 +269,10 @@
 
 ## Pendientes
 
+- [ ] **🌀 Town portal** (2026-10-29, js/84; **primero pegar las reglas de Firestore**, campo `townPortal`): un jugador lo usa desde su Botonera
+  (fuera y dentro de combate), elige una casilla al lado, se ve la espiral azul girando en todas las pantallas; cancelar no lo gasta; un aliado, un creep y
+  el propio que lo puso lo pisan y se van del mapa (pulsos, línea en la Mesa); el GM los trae al mapa de la aldea. Que aparezca en la góndola de cualquier
+  tienda, entre los utilitarios, a 50.
 - [x] **🧹 Las armas de los creeps después de la limpieza (2026-10-29, 761fcb2a)** — ✅ **probado el mismo día en el mapa** (las dos cuentas, con pestañas nuevas: las viejas estaban congeladas): las Acciones del Warrior (Hacha: Atacar 4 No2, Daño 1d8+12, Parry y Bloqueo con su peso), su ataque a juan («con Hacha · Tipo 8», «Rompe armadura 50 %»), su 🪪 desde el jugador («Hacha · Escudo · Chaleco»), la Botonera del Lobo de prueba de Clementino (Arco corto: 2 No2, 1d4+2, sin Parry) y GM Tools (los 21 creeps leen su arma; la Abeja curandera agregada de la biblioteca de fábrica trae el Aguijón dulce como ítem). Lo de antes: el motor ya no lee los campos viejos (armaNombre, armaTipo…). Revisado por
   datos: los 14 creeps visibles de «Claude · pruebas» leen bien su arma (Hacha, Arco corto, Bate de Baseball…; sin arma solo el Estandarte, el Tótem y el
   Goblin de prueba, que no tienen). **Falta verlo en el mapa con capturas** (las dos ventanas de Chrome estaban minimizadas): un creep ataca con su arma
@@ -531,6 +535,9 @@
   **Probado el 2026-10-20 (Claude, «Test con claude elsaulo»):** el creep con Excavar y la Puñalada desde abajo del Kobold tunelero: se mete en la tierra, sale al lado de Silvia (+3 PdG por salir de abajo); con crítico, los efectos pasan a Rengo 2 turnos y Lisiado 1 turno (en vez del Rengo 1).
   «👁 Ver como jugador», abajo, en Probado).
 ## Probado
+- [x] **🏹 Contra un proyectil: «Esquivar (Agilidad)» y «Poner escudo»** (2026-10-29, «Claude · pruebas», con captura; dueño: «específicamente para
+  proyectiles, que cambie el nombre»). El Tunelero dispara el Arco corto a Clementino: al jugador le aparecen «🏃 Esquivar (Agilidad)» y «🛡 Poner escudo ·
+  Tapa de tacho de basura»; el GM, en el desplegable a mano, «Esquivar (Agilidad) / Poner escudo». Solo cambia el nombre: se tira lo mismo.
 - [x] **🛡 Romper armadura que se come el escudo** (2026-10-29, «Claude · pruebas», GM + jugador, con capturas; dueño: «si alguien detiene un
   proyectil con un escudo, con un parry, y ese proyectil tiene adjunto romper armadura, debe aplicarle romper armadura específicamente al escudo»).
   El Tunelero dispara el Arco corto (Rompe armadura) a Clementino, que lo para con Parry de la Tapa de tacho de basura (elegido a mano, 9 contra 3):

@@ -350,7 +350,7 @@ const FichaAcciones = (() => {
       }
       // Un consumible que deja una zona en el mapa (2026-10-08, las bengalas: `zonaUso`, la misma Ejecución de una zona): se usa desde el mapa;
       // sin el mapa, no se gasta.
-      if((it.zonaUso && !ui.colocarZona) || (it.aceleradorMapa && !ui.acelerador) || (it.duelo && !ui.terminar) || (it.invocaTemporal && !ui.invocar)){ ui.toast(`${it.nombre} se usa desde el mapa (tu Botonera en el mapa): ahí elegís dónde`); return; }
+      if((it.zonaUso && !ui.colocarZona) || (it.aceleradorMapa && !ui.acelerador) || (it.townPortal && !ui.townPortal) || (it.duelo && !ui.terminar) || (it.invocaTemporal && !ui.invocar)){ ui.toast(`${it.nombre} se usa desde el mapa (tu Botonera en el mapa): ahí elegís dónde`); return; }
       // Trampa consumible (2026-09-25): al usarla se coloca sola junto a tu token; si no se puede, no se gasta.
       if(it.trampaDatos){
         if(consumiendoTrampa.has(id)) return;
@@ -362,6 +362,14 @@ const FichaAcciones = (() => {
         const cS = FichaCalculo.calcular(S);
         const conOculta = {...it, trampaDatos: Combatiente.trampaDeHab({nombre: it.nombre, trampaColocar: {...it.trampaDatos, detectarMin: Combatiente.detectarMinDe(it.tier)}}, st => cS.final[st])};   // + el mínimo por calidad (2026-10-23)
         try{ ok = await ui.colocarTrampa(conOculta); }finally{ consumiendoTrampa.delete(id); }
+        if(!ok) return;
+      }
+      // 🌀 El Town portal (2026-10-29): se elige la casilla en el mapa (js/84); si se cancela, no se gasta.
+      if(it.townPortal){
+        if(consumiendoTrampa.has(id)) return;
+        consumiendoTrampa.add(id);
+        let ok = false;
+        try{ ok = await ui.townPortal(it); }finally{ consumiendoTrampa.delete(id); }
         if(!ok) return;
       }
       S.nitros = num(S.nitros) - gastoNitros;

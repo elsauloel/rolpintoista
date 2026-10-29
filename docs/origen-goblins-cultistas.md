@@ -308,3 +308,29 @@ fijo del picapiedras y la Red del híbrido sin cooldown al empezar. La Confusió
 - **Excavar, cambio (dueño, 2026-10-28)**: «que salga en la ubicación que está, no hasta 4 casillas; si está adyacente a un rival, puede atacarle con el
   skill» → al ejecutarla bajo tierra, el tunelero sale en su casilla (sin elegir otra) y apuñala a un rival pegado. Para salir al lado de alguien, primero
   se lo mueve por abajo.
+
+## Encuentro 2 — propuesta conceptual (2026-10-29, esperando al dueño en la compu)
+
+Dueño: «el próximo encuentro va a ser ya dentro de las minas; podemos repetir alguno de los creeps anteriores, en especial el tunelero, pero al menos un
+nivel más… y agregar alguno nuevo»; «en el segundo encuentro va a haber algún personaje poderoso tipo mini boss, pero jefe jefe va a ser para el tercero»;
+«en el segundo encuentro va a aparecer un town portal».
+
+- **La mina pelea**: penumbra (Luz de la escena 2 o 3), galerías angostas de una o dos casillas (el que se para en el medio tapa el paso; Clavar a la pared
+  tiene paredes), **bolsas de grisú** (zonas de gas que marean y **explotan si les llega fuego**: arma de doble filo; hay que programar que el fuego detone
+  una zona) y **derrumbes** (trampas que cortan un pasillo o separan al grupo).
+- **Los que vuelven**: **dos Goblins tuneleros** (uno a nivel 3, con una skill más —una trampa—, y otro a nivel 2); opcional, el **ballestero a nivel 3**.
+- **Los nuevos** (lo que le faltaba al grupo goblin del encuentro 1): **Goblin escudero** (Tanque: tapa de vagoneta como escudo, tapa el pasillo, provoca a
+  Petro, desarma, cuida al farolero); **Goblin farolero** (Mago de fuego: aceite hirviendo y llamaradas; su farol es la luz de la sala —si cae, se
+  oscurece— y cerca del grisú es una bomba; contra la Def.Esp 0 de Petro); **Goblin hongero** (Support: cura con hongos y esporas, estira la pelea, el
+  objetivo prioritario).
+- **El mini jefe, tres opciones**: **A. Capataz del culto** (humano: maneja el control mental con un **Cristal de la Grieta**; mientras esté en pie los
+  goblins pelean mejor; si lo rompen, quedan aturdidos o liberados un momento; él pelea de lejos con maldiciones, una versión chica del jefe del 3 —la
+  preferida de Claude—); **B. Capataz goblin** (lugarteniente: látigo y pico pesado, arrea a los demás, turnos extra, empujones, llama refuerzos);
+  **C. Gusano de roca domado** (bestia grande que cava, sale de abajo, se traga a uno o derrumba el techo).
+- **El Town portal** (pendiente del 2026-10-28: crearlo y ponerlo de drop): el mini jefe lo lleva encima e **intenta escapar** con poca vida; si no lo
+  frenan, se va (vuelve en el 3); si lo tumban antes, el pergamino queda en el botín y el grupo puede volver al pueblo a descansar y comprar antes del
+  final. En el mapa: **simple** (se dibuja el portal en la mina y el GM cambia el mapa publicado a mano) o **automático** (el que lo pisa pasa solo al
+  mapa del pueblo y vuelve por el mismo portal; trabajo nuevo: hoy los tokens de personaje no cambian de mapa solos).
+- **Total**: 5 o 6 creeps más el mini jefe.
+- **Preguntas al dueño**: 1) qué mini jefe; 2) si intenta escapar con el portal; 3) portal simple o automático; 4) si va el grisú que explota.
+

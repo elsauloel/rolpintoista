@@ -38,6 +38,11 @@
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.
+> - [ ] **⛏ Encuentro 2 de El origen, adentro de las minas** (2026-10-29, dueño: «anotalo para pendiente en la compu, porque el teléfono se me
+>   complica»). La propuesta conceptual está en `docs/origen-goblins-cultistas.md`, sección «Encuentro 2 — propuesta conceptual». Faltan cuatro
+>   respuestas del dueño: qué mini jefe (A Capataz del culto con el Cristal de la Grieta, B Capataz goblin, C Gusano de roca domado, o una mezcla); si el
+>   mini jefe intenta escapar con el Town portal; si el portal es simple (el GM cambia el mapa) o automático (pasa solo al mapa del pueblo); y si va el
+>   grisú que explota con fuego. Después, creep por creep como en el encuentro 1 (antes, leer cómo quedó el grupo, solo lectura).
 > - [ ] **🎭 Mejorar cómo se traen los tokens al mapa** (2026-10-28, dueño: «anotá en "para ver en la compu", mejorar el sistema de traer tokens al mapa»).
 >   Hoy: el botón 🎭 del borde izquierdo (Token nuevo, Traer tokens de jugadores, Traer tokens de creeps por mapa) y «¿Crear su token?» al crear un creep en
 >   GM Tools. Sentarse con el dueño a ver qué molesta y cómo lo quiere.

@@ -1014,11 +1014,22 @@ function hudAcomodarAnillo(radioToken){
   // y medio), así se ve lo que hay alrededor del token.
   const afuera = Math.min(ANCHO_CASILLA * vista.zoom * 1.5 + 6, 200);
   const r = Math.max(radioToken + 34, afuera, minRadio, 52);
+  // Una línea de puntos del token a cada botón (dueño, 2026-10-29: «con el mapa cargado, los globitos alrededor del token se ven medio
+  // confusos»): del borde del token al borde del botón, debajo de todo (no toma clics).
+  let lineas = hud.querySelector('.hud-lineas');
+  if(!lineas){ lineas = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); lineas.setAttribute('class', 'hud-lineas'); hud.prepend(lineas); }
+  let trazos = '';
   botones.forEach((b, i) => {
-    const ang = (-90 - ARCO / 2 + paso * i) * Math.PI / 180;
-    b.style.left = Math.round(Math.cos(ang) * r) + 'px';
-    b.style.top = Math.round(Math.sin(ang) * r) + 'px';
+    const ang = (-90 - ARCO / 2 + paso * i) * Math.PI / 180, cx = Math.cos(ang), cy = Math.sin(ang);
+    b.style.left = Math.round(cx * r) + 'px';
+    b.style.top = Math.round(cy * r) + 'px';
+    const r0 = radioToken + 2, r1 = r - 20;
+    if(r1 > r0 + 4){
+      const p = `x1="${(cx * r0).toFixed(1)}" y1="${(cy * r0).toFixed(1)}" x2="${(cx * r1).toFixed(1)}" y2="${(cy * r1).toFixed(1)}"`;
+      trazos += `<line class="fondo" ${p}/><line ${p}/>`;
+    }
   });
+  if(lineas.innerHTML !== trazos) lineas.innerHTML = trazos;
   const globos = hud.querySelector('.hud-globos');
   if(globos) hudAcomodarGlobo(globos, r);
 }

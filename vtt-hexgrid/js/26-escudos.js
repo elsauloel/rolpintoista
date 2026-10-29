@@ -81,9 +81,10 @@ async function dueloRompeEscudo(d){
   if(!stacks){ mesaLinea(`🛡 ${quien} paró el disparo con ${escudo}: el Romper armadura no entró`, 'recordatorio'); return; }
   const t = tokens.get(d.defensor.tokenId);
   const origen = `${lista[0].de} · ${lista[0].nombre}`;
-  if(t && t.tipo === 'pj' && t.fichaId && !String(t.fichaId).includes(SEP_INVOCACION) && d.defensa.itemId){
+  if(t && t.tipo === 'pj' && t.fichaId && !String(t.fichaId).includes(SEP_INVOCACION)){
     try{
-      await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: {nombre: 'Armadura rota', stacks, item: d.defensa.itemId}, origen});
+      // Sin itemId (Parry elegido a mano): 'escudo' = el escudo que tiene puesto.
+      await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: {nombre: 'Armadura rota', stacks, item: d.defensa.itemId || 'escudo'}, origen});
       mesaLinea(`🛡 ${quien} paró el disparo con ${escudo}, pero el ${lista[0].nombre} se lo comió el escudo: −${stacks} Defensa y −${stacks} durabilidad de ${escudo}`);
     }catch(err){ console.error('No se pudo romper el escudo:', err); mesaLinea(`🛡 ${quien}: ✋ a mano: ${stacks} de armadura rota en ${escudo}`); }
     return;

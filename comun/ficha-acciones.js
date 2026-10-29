@@ -1078,7 +1078,9 @@ const FichaAcciones = (() => {
         if(n <= 0) return;
       }
       // Con `item` (Atraviesa escudos, 2026-10-12): esa pieza puntual (el escudo que paró el disparo), no una al azar.
-      const it = spec.item ? S.inventario.find(x => x.id === spec.item) : null;
+      // `item: 'escudo'`: el escudo que tiene puesto (un Parry elegido a mano no dice con cuál paró, 2026-10-29).
+      const it = spec.item === 'escudo' ? (S.inventario || []).find(x => x.equipado && FichaCalculo.esEscudoItem(x)) || null
+        : spec.item ? S.inventario.find(x => x.id === spec.item) : null;
       if(it && FichaCalculo.durableItem(it)){ romperPieza(S, it, n, ui, origen); return; }
       rompeArmaduraAlAzar(S, n, ui, origen); return;
     }

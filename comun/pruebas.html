@@ -2452,9 +2452,10 @@ prueba('la regeneración de una pasiva aparece como estado derivado; inactivos n
   igual(r.estados.map(e => [e.nombre, !!e.derivado]), [['Sangre de troll', true]]);
 });
 prueba('escudo con máximo, vida extra con tope y Armadura rota con sus stacks', () => {
-  const S = fichaBotonera({efectos: [{id: 'a', nombre: 'Vida extra', escudoMagico: 8, escudoMagicoActual: 5}, {id: 'b', nombre: 'Vida extra', excedenteVida: true, escudoMagicoActual: 3, excedenteTope: 9}, {id: 'c', nombre: 'Armadura rota', armaduraRota: true, stacks: 2}]});
-  const e = FichaResumen.resumen(S).estados;
-  igual([e[0].escudo, e[0].escudoMax, e[1].excedente, e[1].tope, e[1].escudoMax, e[2].stacks], [5, 8, true, 9, undefined, 2]);
+  const S = fichaBotonera({efectos: [{id: 'a', nombre: 'Vida extra', escudoMagico: 8, escudoMagicoActual: 5}, {id: 'b', nombre: 'Vida extra', excedenteVida: true, escudoMagicoActual: 3, excedenteTope: 9}, {id: 'c', nombre: 'Armadura rota', armaduraRota: true, stacks: 2}],
+    inventario: [{id: 'p', nombre: 'Soquetes', tipoItem: 'pies', equipado: true, peso: 1, mods: [{stat: 'def', val: 1}], armRota: 2, dur: 1}]});
+  const e = FichaResumen.resumen(S).estados;   // (desde el 2026-10-29, la Armadura rota de un personaje sale de las piezas: la guardada se va)
+  igual([e[0].escudo, e[0].escudoMax, e[1].excedente, e[1].tope, e[1].escudoMax, e[2].nombre, e[2].stacks, e[2].derivado, e.length], [5, 8, true, 9, undefined, 'Armadura rota', 2, true, 3]);
 });
 prueba('una invocación publica su No2 máximo con lo que le suma el equipo y su miniatura', () => {
   const S = fichaBotonera({invocaciones: [{id: 'v', nombre: 'Lobo', agl: 4, imagen: 'data:x', equipo: [{nombre: 'Collar', mods: [{stat: 'nitros', val: 2}]}]}]});
@@ -4067,6 +4068,17 @@ prueba('🛡 Romper armadura de un arma de rango viaja en el ataque, para el esc
   const at = Combatiente.ataqueDeArma(bal), melee = Combatiente.ataqueDeArma({tipoDado: 8, efectosGolpe: [{nombre: 'Rompe armadura x3', caras: 2, exitos: 1}]});
   igual([(at.rompeEscudo || []).length, at.rompeEscudo && at.rompeEscudo[0].caras, melee.rompeEscudo, Combatiente.esRompeArmadura({nombre: 'Armadura rota doble'}), Combatiente.esRompeArmadura({nombre: 'Sangrado'})],
     [1, 2, undefined, true, false]);
+});
+prueba('🛡 Armadura rota de un personaje (2026-10-29): derivada de las piezas puestas, sin restar por su cuenta; el estado guardado de antes se va al cargar', () => {
+  const S0 = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
+  S0.efectos = [{nombre: 'Armadura rota', armaduraRota: true, stacks: 2, mods: [{stat: 'def', val: -1}]}, {nombre: 'Barrera'}];
+  S0.inventario = [{id: 'a', nombre: 'Soquetes', tipoItem: 'pies', equipado: true, peso: 1, mods: [{stat: 'def', val: 1}], armRota: 2, dur: 1},
+                   {id: 'b', nombre: 'Capucha', tipoItem: 'cabeza', equipado: true, peso: 1, mods: [{stat: 'def', val: 1}]}];
+  const S = FichaGuardado.completar(S0);
+  const d = FichaResumen.estadoArmaduraRota(S), sano = FichaResumen.estadoArmaduraRota({inventario: [{id: 'b', nombre: 'Capucha', tipoItem: 'cabeza', equipado: true, peso: 1, mods: []}]});
+  igual([S.efectos.map(e => e.nombre), d.length, d[0] && d[0].stacks, d[0] && !!d[0].derivado, d[0] && !d[0].armaduraRota, /Soquetes ×2/.test((d[0] || {}).detalle || ''), sano.length,
+    FichaResumen.estadosTodos(S).some(e => e.nombre === 'Armadura rota')],
+    [['Barrera'], 1, 2, true, true, true, 0, true]);
 });
 prueba('🌀 Town portal (2026-10-29): clásico de la góndola (Común, 50), entre los utilitarios, sin trampa', () => {
   const it = CATALOGO_BASE.find(x => x.id === 'cat-town-portal');

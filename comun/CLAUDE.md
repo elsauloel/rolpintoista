@@ -1002,6 +1002,11 @@ versión parecida en más de una, es candidato a juntar.
   y **↩ Soltar** (`soltar`). Al cerrar el botín, `CombateFin.despojar` manda lo reclamado en la recompensa de cada personaje (`items`) y
   `Recibidos.recompensa` lo suma a la mochila (`itemsDelBotin`: los trofeos iguales se apilan; si no entra, se suma igual). Una disputa abierta
   se corta y el ítem queda para quien lo reclamó.
+- **🛡 La Armadura rota de un personaje es de las piezas** (2026-10-29, dueño: «reparar la armadura debe borrar el estado… esta armadura rota no es del
+  jugador, sino del ítem, pero lo tiene que ver el jugador»): el estado «Armadura rota ×N» se ve derivado de las piezas puestas con `armRota`
+  (`FichaResumen.estadoArmaduraRota`, en `estadosTodos` y en el resumen, con sus stacks), sin restar nada por su cuenta (la Defensa la restan las piezas) y
+  se va solo al repararlas. Al cargar una ficha, el estado guardado de antes se borra (`FichaGuardado.completar`); ponerlo a mano desde la ficha rompe una
+  pieza al azar por stack. Las invocaciones y los creeps siguen con el estado de siempre.
 - **🛡 Romper armadura: el aviso y el estado del equipo** (2026-10-29, dueño): cada punto de Armadura rota que le cae a una pieza (`romperPieza`,
   `rompeArmaduraAlAzar` en `ficha-acciones.js`) le abre al jugador un Aviso (`avisoRotura`, con `AvisoCombate`): «<origen> te rompió <ítem>», la
   durabilidad que le queda, la Defensa de antes → después y que en 0 se rompe y se anulan sus efectos. La spec `{nombre: 'Armadura rota', item}` acepta

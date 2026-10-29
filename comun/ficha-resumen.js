@@ -29,7 +29,22 @@ const FichaResumen = (() => {
     return [{id: 'sobrepeso', nombre: 'Sobrepeso', polaridad: 'debuff', permanente: true, stacks: 1, turnos: 0, hpturno: 0, activo: true, derivado: true, sobrepeso: s,
       detalle: `Tu equipo pesa ${fmt(s)} de más: al tirar Evasión restás ${fmt(s)}, salvo que pagues 1 No2 para evitarlo.`}];
   }
-  const estadosTodos = S => [...(S.efectos || []).filter(Combatiente.estadoVisible), ...estadosDePasivas(S), ...estadoSobrepeso(S)];
+  /* 🛡 Armadura rota (dueño, 2026-10-29: «esta armadura rota no es del jugador, sino del ítem, pero lo tiene que ver el jugador para saberlo… si ningún
+     ítem tiene, todos tienen la durabilidad full, no aparece el estado»): derivado de las piezas puestas con puntos de rotura (`armRota`, armadura o
+     escudo abollado). No se guarda ni resta nada por su cuenta (la Defensa la restan las piezas, FichaCalculo); se va solo al repararlas. */
+  function estadoArmaduraRota(S){
+    const piezas = (S.inventario || []).filter(i => i && i.equipado && FichaCalculo.durableItem(i) && FichaCalculo.armRotaDe(i) > 0);
+    if(!piezas.length) return [];
+    const st = piezas.reduce((a, i) => a + FichaCalculo.armRotaDe(i), 0);
+    const txt = piezas.map(i => {
+      const ar = FichaCalculo.armRotaDe(i), def = (i.mods || []).filter(m => m && m.stat === 'def').reduce((a, m) => a + num(m.val), 0);
+      const menos = FichaCalculo.pierdeDefPorRotura(i) ? Math.min(ar, Math.max(0, def)) : 0;
+      return `${i.nombre} ×${fmt(ar)}${menos ? ` (−${fmt(menos)} Defensa)` : ''}, durabilidad ${fmt(FichaCalculo.durActual(i))} de ${fmt(FichaCalculo.durMax(i))}`;
+    });
+    return [{id: 'armadura-rota', nombre: 'Armadura rota', polaridad: 'debuff', permanente: true, stacks: st, turnos: 0, hpturno: 0, activo: true, derivado: true,
+      detalle: `Viene de tu equipo: ${txt.join('; ')}. Se va sola cuando reparás esas piezas (herrero, talento de reparar u Óleo reparador).`}];
+  }
+  const estadosTodos = S => [...(S.efectos || []).filter(Combatiente.estadoVisible), ...estadosDePasivas(S), ...estadoSobrepeso(S), ...estadoArmaduraRota(S)];
 
   /* ---------- Moverse (js/11) ---------- */
   function estadoActivo(S, flag){
@@ -192,7 +207,7 @@ const FichaResumen = (() => {
           permanente: !!e.permanente, ...(e.invulnerable ? {invulnerable: true} : {}),
           ...(num(e.absorbePct) > 0 ? {absorbePct: num(e.absorbePct), absorbeMax: num(e.absorbeMax), absorbido: num(e.absorbido)} : {}),   // Armadura arcana (la vista previa del mapa)
           ...(e.expuesto ? {expuesto: true} : {}),   // Expuesto (Degollar): el mapa no le ofrece oportunidad ni dodge roll
-          ...(e.nombre === Combatiente.APUNTANDO ? {stacks: Math.max(1, num(e.stacks) || 1)} : {}),   // Apuntar (Shooter): cuánto apunta
+          ...(e.nombre === Combatiente.APUNTANDO || e.id === 'armadura-rota' ? {stacks: Math.max(1, num(e.stacks) || 1)} : {}),   // Apuntar (Shooter): cuánto apunta · 🛡 la Armadura rota de las piezas: cuántos puntos
           ...(e.protege ? {protege: String(e.protege).slice(0, 80), protegeNombre: String(e.protegeNombre || '').slice(0, 40)} : {}),
           ...(e.marca ? {marca: String(e.marca).slice(0, 80), marcaNombre: String(e.marcaNombre || '').slice(0, 40)} : {}),   // Marcar (Shooter): a quién marcó   // Miti-Miti (Tanque): el mapa reparte el daño del protegido
           ...(e.miedoDe ? {miedoDe: String(e.miedoDe).slice(0, 80), miedoDeNombre: String(e.miedoDeNombre || '').slice(0, 40)} : {}),   // 😱 Miedo: a quién le tiene miedo (el mapa, js/52)
@@ -261,5 +276,5 @@ const FichaResumen = (() => {
     };
   }
 
-  return {estadosDePasivas, estadoSobrepeso, estadosTodos, estadoActivo, costoMoverCasillero, invCostoMover, invFuentesEquipo, invModTotal, invNitrosMax, resumen};
+  return {estadosDePasivas, estadoSobrepeso, estadoArmaduraRota, estadosTodos, estadoActivo, costoMoverCasillero, invCostoMover, invFuentesEquipo, invModTotal, invNitrosMax, resumen};
 })();

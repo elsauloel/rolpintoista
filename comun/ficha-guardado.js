@@ -353,6 +353,9 @@ const FichaGuardado = (() => {
     migrarDash(S);
     migrarOjoDeAsesino(S);
     migrarHabsDeClase(S);
+    // 🛡 Armadura rota (dueño, 2026-10-29): en un personaje es de las piezas (`armRota`) y el estado se ve derivado de ellas (FichaResumen). El estado
+    // guardado de antes (de cuando era del personaje) se va: si no, seguía restando Defensa después de reparar el equipo.
+    if(Array.isArray(S.efectos)) S.efectos = S.efectos.filter(e => !(e && (e.armaduraRota || e.nombre === 'Armadura rota')));
     // Crítico frecuente (dueño, 2026-10-16): desde el 2026-09-25 es solo un bono (receta '0'); las fichas de antes lo sacaban de la Destreza.
     if(S.formulas && String(S.formulas.crit).trim() === 'des') S.formulas.crit = '0';
     if(S.nitros === null || S.nitros === undefined){

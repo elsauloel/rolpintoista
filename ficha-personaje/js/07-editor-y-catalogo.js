@@ -415,6 +415,8 @@ function abrirPresetsEfecto(destino){
 // mostrar nada de eso: abre y cierra el editor en el mismo tick, así el
 // navegador nunca llega a pintar el paso intermedio.
 function activarEfectoPreset(preset){
+  // 🛡 Armadura rota (2026-10-29): en el personaje va a las piezas (una al azar por stack); el estado se ve solo, derivado de ellas.
+  if(preset && (preset.armaduraRota || preset.nombre === 'Armadura rota')){ rompeArmaduraAlAzar(Math.max(1, num(preset.stacks) || 1)); renderList('efectos'); refresh(); return; }
   const {nombre, ...resto} = preset;
   const draft = Object.assign(FichaEditor.borrador(null), structuredClone(resto));
   draft.nombre = nombre;

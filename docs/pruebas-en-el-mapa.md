@@ -269,6 +269,9 @@
 
 ## Pendientes
 
+- [ ] **🛡 Armadura rota derivada de las piezas** (2026-10-29): Clementino (Tapa abollada) muestra «Armadura rota ×N» entre sus estados (ficha, ficha
+  lite y el token), con el detalle de la pieza; repararla con el herrero o el talento lo hace desaparecer; un Rompe armadura nuevo lo suma. En El origen,
+  Petro pierde el «Armadura rota ×2» viejo la próxima vez que se abra su ficha (recupera 2 de Defensa).
 - [ ] **🌀 Town portal** (2026-10-29, js/84; **primero pegar las reglas de Firestore**, campo `townPortal`): un jugador lo usa desde su Botonera
   (fuera y dentro de combate), elige una casilla al lado, se ve la espiral azul girando en todas las pantallas; cancelar no lo gasta; un aliado, un creep y
   el propio que lo puso lo pisan y se van del mapa (pulsos, línea en la Mesa); el GM los trae al mapa de la aldea. Que aparezca en la góndola de cualquier

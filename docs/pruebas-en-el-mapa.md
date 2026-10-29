@@ -390,7 +390,7 @@
 - [x] **❤ El máximo en los circulitos del token (2026-10-28, dueño)**: «/30» debajo de cada circulito, «35 / 42 máx.» al editar el SP y «❤ 15 de 30
   (máximo)» en el globo de vida. **Probado** como jugador con juan.
 
-- [~] **🧮 La cuenta del daño en el duelo (2026-10-28, dueño: «decía 19 de daño y el siguiente paso mostraba 0… todo lo que esté frenando el daño
+- [x] **🧮 La cuenta del daño en el duelo (2026-10-28, dueño: «decía 19 de daño y el siguiente paso mostraba 0… todo lo que esté frenando el daño
   tiene que estar comunicado muy claramente»)**: al aplicar el daño, el paso 5 muestra el número grande (lo que entró a la vida) y abajo «🧮 La cuenta
   del daño», renglón por renglón: la tirada, el crítico, la Defensa (con los estados que la cambian: «con Piel de hierro +6»), la Defensa contra el
   primer golpe o a distancia, el guardián, el Muro de escudos, la Defensa especial, la resistencia al elemento, lo que pasa, cada escudo por su nombre,
@@ -402,8 +402,15 @@
   aplicar, «10 de daño, menos su Defensa. Esto es lo que tiró: antes de llegar a la vida lo frena la Defensa (y sus escudos…)»; al aplicar, el 4 grande y «🧮 La cuenta
   del daño»: Tirada 10 − Defensa 1 = pasa la Defensa 9 − Escudo especial (escudo) 5 = entra a la vida 4 (25 → 21); la Mesa, en una línea. Y el **crítico** (el Tunelero con el arco, PdG 14 contra Evasión 6:
   doble crítico): antes de aplicar, «18 · derecho a la vida · Crítico ×2 (9 × 2): no se resta tu Defensa»; la cuenta: Tirada 9 · crítico ×2 = el golpe 18 · «Crítico: no
-  se resta la Defensa» · entra a la vida 18 (25 → 7). Falta: un Bloqueo perdido (contra un disparo, el escudo no deja Bloqueo: hace falta un golpe cuerpo a cuerpo
-  parado con arma o escudo) y un daño especial con resistencia al elemento.
+  se resta la Defensa» · entra a la vida 18 (25 → 7). El **Bloqueo perdido** (el Warrior con el Hacha: PdG 7 contra Parry 9 con la Tapa → Bloqueo 2 contra
+  Fuerza del golpe 3, «⚠ Pasa la mitad»): Tirada 19 − Defensa 1 · «Bloqueo perdido: pasa la mitad, para arriba ÷2» = pasa 9 (25 → 16). Y el **daño especial con
+  resistencia** (Corroer del Escarabajo contra Clementino con un estado de prueba de Res. ácido +3): Tirada 7 · «Daño especial: no se resta la Defensa (sí la
+  Defensa especial)» − Resistencia a ácido 3 = pasa 4 (16 → 12). **Arreglado**: decía «Resistencia a acido» (sin tilde; «eléctrica» para el rayo).
+- [x] **🛡 Rompe armadura a quien no tiene armadura puesta (2026-10-29, dueño: «no tiene efecto, no tiene armadura»)**: el efecto del duelo decía «✓ Aplicado ·
+  le llegó a su ficha: Armadura rota» aunque no rompía nada. Ahora el mapa mira la ficha antes: «✘ Sin efecto · Rompe armadura: no tiene efecto, no tiene armadura
+  puesta», sin anunciarlo como estado ni nombrarlo en el «Quedó…» de la Mesa. **Probado (2026-10-29)**: el Rompe armadura 50 % del Hacha del Warrior (forzado a
+  mano) contra Clementino (solo la Tapa) → «✘ Sin efecto · …»; y el ácido de Corroer, «Armadura rota ×1 (por 4 de daño…) · Rompe armadura: no tiene efecto, no tiene
+  armadura puesta». El «Quedó» del resumen ya no lo nombra (arreglado después de verlo).
 
 - [x] **🛡 No2 negativos en las defensas (2026-10-23, dueño)**: con 0 No2, el Parry se puede (queda en −1, con el aviso); con No2 ya negativos, el
   Parry, la Evasión pagando el sobrepeso, el dodge roll y la ayuda para zafar quedan apagados («ya está en No2 negativos…»). La oportunidad y el

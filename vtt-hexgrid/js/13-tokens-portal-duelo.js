@@ -1732,7 +1732,7 @@ async function dueloAplicarDano(d){
     catch(err){ console.error('No se pudo pedir el desgaste del ítem:', err); }
   }
   try{
-    const oD = {distancia: !!(d.ataque && d.ataque.rango), magico: !!(habMagica || elDano), reparte: true, ...(resEl ? {resTxt: `Resistencia a ${elDano}${resEl < 0 ? ' (vulnerable)' : ''}`} : {})};   // reparte: Miti-Miti (js/10)   // magico: el Orbe de absorción (js/26)   // la Defensa extra contra armas a distancia (torso blando, 2026-10-06)
+    const oD = {distancia: !!(d.ataque && d.ataque.rango), magico: !!(habMagica || elDano), reparte: true, ...(resEl ? {resTxt: `${elDano === 'rayo' ? 'Resistencia eléctrica' : `Resistencia a ${Combatiente.ELEMENTOS[elDano] ? Combatiente.ELEMENTOS[elDano].etq.replace('Res. ', '') : elDano}`}${resEl < 0 ? ' (vulnerable)' : ''}`} : {})};   // reparte: Miti-Miti (js/10)   // magico: el Orbe de absorción (js/26)   // la Defensa extra contra armas a distancia (torso blando, 2026-10-06)
     const res = esInv ? await danioInv(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD)
       : t.tipo === 'creep' ? await danioCreep(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD) : await danioPj(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD);
     if((t.tipo === 'creep' || (t.tipo === 'pj' && !esInv)) && typeof aguanteSumar === 'function') aguanteSumar(t);   // 🛡 Aguante (js/56): un golpe más, aunque la armadura lo frene todo (creeps y, desde el 2026-10-23, el Tanque)

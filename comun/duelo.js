@@ -1418,7 +1418,7 @@ const Duelo = (() => {
         else partes.push(entro > 0 ? `Le bajó ${_fmt(entro)} de vida.` : 'No le hizo daño (lo frenaron la armadura o el escudo).');
         if(_num(dn.hpDespues) <= 0 && _num(dn.hpAntes) > 0) partes.push(`${D} cayó.`);
       }
-      const est = (d.efectos || []).filter(ef => ef && ef.aplicado && !ef.omitido).map(ef => ef.nombre).filter(Boolean);
+      const est = (d.efectos || []).filter(ef => ef && ef.aplicado && !ef.omitido && !ef.sinEfecto).map(ef => ef.nombre).filter(Boolean);
       if(est.length) partes.push(`Quedó ${est.join(', ')}.`);
       if(!partes.length) partes.push(d.hab ? 'Funcionó.' : 'Le pegó.');
       fin = partes.join(' ');

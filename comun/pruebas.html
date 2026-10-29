@@ -5153,7 +5153,7 @@ prueba('la góndola (P181): gastables aparte del equipo, N variedades por secci�
     if(!tala.some(i => G.parteDe(i) === 'cinturon')) sinCinturon++;
   }
   igual([malas, consumiblesEnEquipo, sinMochila, sinCinturon, cuantas, G.gondolaDe({nombre: 'Bengala de mano'}), G.gondolaDe({nombre: 'Poción de fuerza'}), G.gondolaDe({nombre: 'Púas', trampaDatos: {}}),
-    G.gastable(CATALOGO_BASE.find(i => i.nombre === 'Vendas'))], [0, 0, 0, 0, 20, 'talabarteria', 'bazar', 'talabarteria', false]);   // 11 al azar + las 4 flechas elementales fijas (2026-10-11) + las 4 luces básicas fijas (2026-10-14) + la Bombucha de talco (2026-10-19)
+    G.gastable(CATALOGO_BASE.find(i => i.nombre === 'Vendas'))], [0, 0, 0, 0, 18, 'talabarteria', 'bazar', 'talabarteria', false]);   // 9 por categoría (P232: 2 pergaminos, 3 trampas, 2 pociones, 1 munición, 1 utilitario) + las 4 flechas elementales fijas (2026-10-11) + las 4 luces básicas fijas (2026-10-14) + la Bombucha de talco (2026-10-19)
   const r2 = G.generar({tamano: 'pueblito', nivel: 1, catalogo: cat});
   igual(['flecha-de-fuego', 'flecha-de-escarcha', 'flecha-relampago', 'flecha-de-acido'].map(id => r2.gondola.includes(id)), [true, true, true, true]);
 });
@@ -5179,6 +5179,23 @@ prueba('🧳 el ambulante (2026-10-28): Herrería 2 armas de Tipos distintos + e
     if(JSON.stringify(linea) !== JSON.stringify([5, 2, 2, 1, 5, 1, 1, 6, 2, 1, 1, 'pergamino,pocion,trampa,trampa', false])) malas.push(linea);
   }
   igual(malas.slice(0, 3), []);
+});
+prueba('🏪 los otros tamaños con el criterio del ambulante (P232, 2026-10-28): base fija + el resto al azar; pueblito: 3 Tipos, arco y ballesta, carcaj, varita y báculo', () => {
+  const G = GeneradorTiendas, C = Combatiente, cat = CATALOGO_BASE.filter(G.publicable), porId = new Map(cat.map(i => [i.id, i]));
+  const malas = [];
+  for(let n = 0; n < 20; n++){
+    const r = G.generar({tamano: 'pueblito', nivel: 1 + n % 5, catalogo: cat}), g = new Set(r.gondola), fijos = new Set(r.garantizados);
+    const eq = r.items.filter(id => !g.has(id) && !fijos.has(id)).map(id => porId.get(id)), de = k => eq.filter(i => G.seccionDe(i) === k);
+    const h = de('herreria'), t = de('talabarteria'), b = de('bazar'), parte = pt => i => G.parteDe(i) === pt;
+    const linea = [h.length >= 8 && h.length <= 10, t.length >= 8 && t.length <= 10, b.length >= 8 && b.length <= 10,
+      new Set(h.filter(parte('arma')).map(i => i.tipoDado)).size, t.some(i => i.arco), t.some(i => Number(i.recarga) > 0), ['mochila', 'cinturon', 'carcaj'].every(p => t.some(parte(p))),
+      b.some(i => i.especial && i.tipoItem !== 'arma_2m'), b.some(i => i.especial && i.tipoItem === 'arma_2m'), b.some(parte('orbe')), r.plan.every(l => l.id)];
+    if(JSON.stringify(linea) !== JSON.stringify([true, true, true, 3, true, true, true, true, true, true, true])) malas.push(linea);
+  }
+  const cap = G.generar({tamano: 'capital', nivel: 3, catalogo: cat}), porCat = {};
+  cap.gondola.forEach(id => { const c = C.categoriaGondola(porId.get(id)); porCat[c] = (porCat[c] || 0) + 1; });
+  igual([malas.slice(0, 3), porCat.pergamino, porCat.trampa, porCat.pocion, Object.keys(G.FIJO_POR_TAMANO), G.resumenTamano('ambulante').gondola],
+    [[], 8, 8, 8, ['ambulante', 'pueblito', 'aldea', 'ciudad', 'capital'], '1 pergamino, 2 trampas, 1 poción de otros usos']);
 });
 prueba('🕳 Excavar (2026-10-28, P231): sale atacando solo con un arma cuerpo a cuerpo de Tipo 4 a 10; Excavar también de jugador (Misceláneas, no se elige como clase)', () => {
   const C = Combatiente, arco = {id: 'a', nombre: 'Arco', tipoItem: 'arma_2m', tipoDado: 4, armaDeRango: true, equipado: true}, daga = {id: 'd', nombre: 'Daga', tipoItem: 'arma_1m', tipoDado: 4, equipado: true},

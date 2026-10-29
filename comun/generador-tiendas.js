@@ -17,21 +17,23 @@ const GeneradorTiendas = (() => {
   // Golpe de suerte («toca toca, la suerte es loca», dueño): después de tirar la calidad, subir un escalón o dos. En cualquier tamaño.
   const SUERTE = {uno: 0.04, dos: 0.005};
 
-  /* Tamaños (P181, dueño 2026-10-08: «cada pestaña tiene que mostrar más cantidad de ítems, para ofrecer una variedad más consolidada»): `min`–`max` =
-     las piezas de EQUIPO de cada sección abierta (antes era el total de la tienda, repartido); `gondola` = cuántos gastables distintos trae la
-     góndola de cada sección (99 = todos); variedad de partes defensivas y de familias de armas garantizadas por sección; tope por etiqueta de
-     escasez (0,5 = cada etiqueta, 0 o 1 al azar) y la reserva de reposiciones de las piezas únicas. La calidad del equipo NO depende del tamaño,
-     solo del nivel (dueño, 2026-10-07: «variables independientes»). */
+  /* Tamaños (P181, dueño 2026-10-08: «cada pestaña tiene que mostrar más cantidad de ítems, para ofrecer una variedad más consolidada»; P232, dueño
+     2026-10-28: «un paralelismo con el resto de tamaños», el criterio del ambulante). Cada sección trae primero su BASE FIJA (FIJO_POR_TAMANO: lo esencial,
+     cada vez más) y después, hasta `min`–`max` piezas de equipo, el resto al azar con la receta; el ambulante (`fijo`) trae solo su base. La góndola,
+     por categoría (`gondolaPorCategoria`, Combatiente.GONDOLA_CATEGORIAS; 99 = todo lo que haya): las pociones de HP y SP y la enfermería
+     no se sortean porque son todas clásicas (van siempre). Tope por etiqueta de escasez (0,5 = cada etiqueta,
+     0 o 1 al azar) y la reserva de reposiciones de las piezas únicas. La calidad del equipo NO depende del tamaño, solo del nivel (dueño, 2026-10-07:
+     «variables independientes»). */
+  const TODO = 99;
   const TAMANOS = {
-    // 🧳 El ambulante (dueño, 2026-10-28: «alguien que vende los esenciales»): no sortea con la receta de pesos sino con una lista fija por sección
-    // (`fijo`, ver FIJO_AMBULANTE) y su góndola es corta: los esenciales (los clásicos) + 1 pergamino + 2 trampas + 1 poción de otros usos.
-    ambulante: {label: 'Vendedor ambulante', min: 5, max: 7, fijo: true, gondolaPorCategoria: {pergamino: 1, trampa: 2, pocion: 1}, variedad: 2, familias: 2, tope: 0.5, reserva: 3},
-    pueblito: {label: 'Pueblito', min: 8, max: 10, gondola: {talabarteria: 5, bazar: 6}, variedad: 3, familias: 3, tope: 1, reserva: 6},
-    aldea: {label: 'Aldea', min: 12, max: 15, gondola: {talabarteria: 8, bazar: 10}, variedad: 5, familias: 4, tope: 2, reserva: 10},
-    ciudad: {label: 'Ciudad', min: 18, max: 22, gondola: {talabarteria: 12, bazar: 15}, variedad: 7, familias: 4, tope: 3, reserva: 16},
-    capital: {label: 'Capital', min: 26, max: 32, gondola: {talabarteria: 99, bazar: 20}, variedad: 8, familias: 4, tope: 4, reserva: 28},
+    // 🧳 El ambulante (dueño, 2026-10-28: «alguien que vende los esenciales»): solo su base fija; la góndola, los clásicos + 1 pergamino + 2 trampas
+    // + 1 poción de otros usos.
+    ambulante: {label: 'Vendedor ambulante', min: 5, max: 7, fijo: true, gondolaPorCategoria: {pergamino: 1, trampa: 2, pocion: 1}, tope: 0.5, reserva: 3},
+    pueblito: {label: 'Pueblito', min: 8, max: 10, gondolaPorCategoria: {pergamino: 2, trampa: 3, pocion: 2, municion: 1, utilitario: 1}, tope: 1, reserva: 6},
+    aldea: {label: 'Aldea', min: 12, max: 15, gondolaPorCategoria: {pergamino: 3, trampa: 4, pocion: 3, municion: 2, utilitario: 2}, tope: 2, reserva: 10},
+    ciudad: {label: 'Ciudad', min: 18, max: 22, gondolaPorCategoria: {pergamino: 5, trampa: 6, pocion: 5, municion: 3, utilitario: 3}, tope: 3, reserva: 16},
+    capital: {label: 'Capital', min: 26, max: 32, gondolaPorCategoria: {pergamino: 8, trampa: 8, pocion: 8, municion: 8, utilitario: 8}, tope: 4, reserva: 28},
   };
-  const ORDEN_TAMANO = ['ambulante', 'pueblito', 'aldea', 'ciudad', 'capital'];
   /* La góndola (P181, dueño 2026-10-08): los GASTABLES —trampas, pociones que no curan, pergaminos, luces— no compiten con el equipo: van en una
      góndola aparte de su sección, con muchas variedades, 3 unidades de cada uno (`UNIDADES_GONDOLA`; se reponen al volver a publicar), para que se
      usen a la ligera. Su calidad pesa poco (el precio ya filtra): a nivel bajo salen más los de calidad baja, pero puede salir cualquiera hasta Raro.
@@ -78,10 +80,10 @@ const GeneradorTiendas = (() => {
     herreria: {label: 'Herrería', icono: '⚒', detalle: 'guerra pesada: armas de Tipo 6 o más, escudos, armadura rígida, cascos y guanteletes',
       receta: {arma: 40, escudo: 14, torso: 16, cabeza: 12, manos: 10, piernas: 4, pies: 4}, familias: [6, 8, 10]},
     talabarteria: {label: 'Talabartería', icono: '🧵', detalle: 'cuero, madera y cuerda: armas a distancia y livianas (Tipo 4), cuero, botas, cinturones, mochilas y trampas',
-      receta: {distancia: 24, arma: 16, torso: 13, cabeza: 6, manos: 6, piernas: 9, pies: 9, cinturon: 9, mochila: 8, carcaj: 5}, familias: [4],
-      minimos: {mochila: 1, cinturon: 1}, minimosDesde: 'pueblito'},   // siempre una mochila y un cinturón, desde pueblito (dueño, 2026-10-08)
+      receta: {distancia: 24, arma: 16, torso: 13, cabeza: 6, manos: 6, piernas: 9, pies: 9, cinturon: 9, mochila: 8, carcaj: 5}, familias: [4]},
+      // (la mochila, el cinturón y, desde el 2026-10-28, el carcaj seguros desde pueblito: en FIJO_POR_TAMANO)
     bazar: {label: 'Bazar arcano', icono: '✨', detalle: 'lo mágico: consumibles, varitas y báculos, talismanes, anillos y piezas de caster',
-      receta: {especial: 40, orbe: 16, anillo: 10, torso: 12, cabeza: 9, manos: 7, cinturon: 6}, minimos: {especial: 2}},   // anillos: escasos (P114; 22 → 10, 2026-10-18)
+      receta: {especial: 40, orbe: 16, anillo: 10, torso: 12, cabeza: 9, manos: 7, cinturon: 6}},   // anillos: escasos (P114; 22 → 10, 2026-10-18)
   };
   /* 🛒 La Góndola de consumibles (dueño, 2026-10-28: «todo lo consumible va a tener su propia pestaña; aplica a todas las tiendas»): una cuarta
      pestaña, siempre, con todo lo consumible (los clásicos y los gastables), dividida por Combatiente.categoriaGondola. No se elige: no es una
@@ -89,14 +91,64 @@ const GeneradorTiendas = (() => {
   SECCIONES.gondola = {label: 'Góndola de consumibles', icono: '🛒', detalle: 'todo lo consumible: pociones de HP y SP, enfermería, utilitarios, trampas, pociones de otros usos y pergaminos', receta: {}};
   const SECCIONES_EQUIPO = ['herreria', 'talabarteria', 'bazar'];
   const SECCIONES_ORDEN = [...SECCIONES_EQUIPO, 'gondola'];
-  /* 🧳 Lo fijo del ambulante (dueño, 2026-10-28): por sección, una lista de lugares — `parte` (o `partes`: una de esas, sin repetir entre los del mismo
-     grupo), cuántos (`n`) y, en las armas, `familias` (de Tipos distintos) o `familia` (un Tipo). Las defensivas, «de su campo»: las de esa sección. */
-  const FIJO_AMBULANTE = {
-    herreria: [{parte: 'arma', n: 2, familias: true}, {parte: 'escudo', n: 1}, {partes: ['torso', 'cabeza', 'manos', 'piernas', 'pies'], n: 2}],
-    talabarteria: [{parte: 'distancia', n: 1}, {parte: 'arma', n: 1, familia: 4}, {partes: ['torso', 'cabeza', 'manos', 'piernas', 'pies'], n: 2},
-      {partes: ['cinturon', 'mochila', 'carcaj'], n: 1}],
-    bazar: [{parte: 'especial', n: 2}, {parte: 'orbe', n: 1}, {parte: 'anillo', n: 1}, {partes: ['torso', 'cabeza', 'manos', 'cinturon'], n: 2}],
+  /* 🧳 La base fija de cada tamaño (el ambulante, dueño 2026-10-28; los demás, P232, el mismo día): por sección, una lista de lugares — `parte` (o
+     `partes`: una de esas, sin repetir entre los del mismo grupo), cuántos (`n`) y, en las armas, `familias` (de Tipos distintos, y si son más que
+     los Tipos, de a vuelta) o `familia` (un Tipo); `clases`, de a vuelta: arco y ballesta, varita y báculo (CLASE). Las defensivas, «de su campo»:
+     las de esa sección. Un lugar sin ítem: en el ambulante queda vacío; en los demás, otro de la receta (dueño, 2026-10-28: «va así»). */
+  const DEF5 = ['torso', 'cabeza', 'manos', 'piernas', 'pies'], DEF_BAZAR = ['torso', 'cabeza', 'manos', 'cinturon'], UTILES = ['cinturon', 'mochila', 'carcaj'];
+  const CLASE = {arco: it => !!it.arco, ballesta: it => num(it.recarga) > 0, varita: it => it.tipoItem !== 'arma_2m', baculo: it => it.tipoItem === 'arma_2m'};
+  const utiles = n => [{parte: 'mochila', n}, {parte: 'cinturon', n}, {parte: 'carcaj', n}];
+  const FIJO_POR_TAMANO = {
+    ambulante: {
+      herreria: [{parte: 'arma', n: 2, familias: true}, {parte: 'escudo', n: 1}, {partes: DEF5, n: 2}],
+      talabarteria: [{parte: 'distancia', n: 1}, {parte: 'arma', n: 1, familia: 4}, {partes: DEF5, n: 2}, {partes: UTILES, n: 1}],
+      bazar: [{parte: 'especial', n: 2}, {parte: 'orbe', n: 1}, {parte: 'anillo', n: 1}, {partes: DEF_BAZAR, n: 2}]},
+    pueblito: {
+      herreria: [{parte: 'arma', n: 3, familias: true}, {parte: 'escudo', n: 1}, {partes: DEF5, n: 3}],
+      talabarteria: [{parte: 'distancia', n: 2, clases: ['arco', 'ballesta']}, {parte: 'arma', n: 1, familia: 4}, {partes: DEF5, n: 3}, ...utiles(1)],   // (+ el carcaj: dueño, 2026-10-28)
+      bazar: [{parte: 'especial', n: 3, clases: ['varita', 'baculo']}, {parte: 'orbe', n: 1}, {parte: 'anillo', n: 1}, {partes: DEF_BAZAR, n: 3}]},
+    aldea: {
+      herreria: [{parte: 'arma', n: 4, familias: true}, {parte: 'escudo', n: 2}, {partes: DEF5, n: 4}],
+      talabarteria: [{parte: 'distancia', n: 3, clases: ['arco', 'ballesta']}, {parte: 'arma', n: 2, familia: 4}, {partes: DEF5, n: 4}, ...utiles(1)],
+      bazar: [{parte: 'especial', n: 4, clases: ['varita', 'baculo']}, {parte: 'orbe', n: 2}, {parte: 'anillo', n: 1}, {partes: DEF_BAZAR, n: 4}]},
+    ciudad: {
+      herreria: [{parte: 'arma', n: 6, familias: true}, {parte: 'escudo', n: 2}, {partes: DEF5, n: 5}],
+      talabarteria: [{parte: 'distancia', n: 4, clases: ['arco', 'ballesta']}, {parte: 'arma', n: 3, familia: 4}, {partes: DEF5, n: 5}, ...utiles(1)],
+      bazar: [{parte: 'especial', n: 6, clases: ['varita', 'baculo']}, {parte: 'orbe', n: 3}, {parte: 'anillo', n: 2}, {partes: DEF_BAZAR, n: 4}]},
+    capital: {
+      herreria: [{parte: 'arma', n: 8, familias: true}, {parte: 'escudo', n: 3}, {partes: DEF5, n: 5}],
+      talabarteria: [{parte: 'distancia', n: 6, clases: ['arco', 'ballesta']}, {parte: 'arma', n: 4, familia: 4}, {partes: DEF5, n: 5}, ...utiles(2)],
+      bazar: [{parte: 'especial', n: 8, clases: ['varita', 'baculo']}, {parte: 'orbe', n: 4}, {parte: 'anillo', n: 3}, {partes: DEF_BAZAR, n: 4}]},
   };
+  const FIJO_AMBULANTE = FIJO_POR_TAMANO.ambulante;
+  // La base fija de una sección → los lugares del plan.
+  function planFijo(R, cat, k, sec, lista){
+    const planS = [];
+    const mezclar = a => { for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(R() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+    (lista || []).forEach(l => {
+      if(l.partes){ mezclar(l.partes.filter(pt => candidatosDe(cat, k, pt).length)).slice(0, l.n).forEach(pt => planS.push({seccion: k, parte: pt})); return; }
+      const fams = l.familias && sec.familias ? mezclar(sec.familias.slice()) : null;
+      for(let i = 0; i < l.n; i++) planS.push({seccion: k, parte: l.parte, ...(fams ? {familia: fams[i % fams.length]} : l.familia ? {familia: l.familia} : {}),
+        ...(l.clases ? {clase: l.clases[i % l.clases.length]} : {})});
+    });
+    return planS;
+  }
+  // Lo que trae un tamaño, en palabras (el cartel del generador de tiendas).
+  const LUGAR_TXT = {arma: ['arma', 'armas'], distancia: ['de rango', 'de rango'], escudo: ['escudo', 'escudos'], especial: ['varita o báculo', 'varitas o báculos'],
+    orbe: ['talismán', 'talismanes'], anillo: ['anillo', 'anillos'], mochila: ['mochila', 'mochilas'], cinturon: ['cinturón', 'cinturones'], carcaj: ['carcaj', 'carcajes']};
+  const CLASE_TXT = {arco: 'arco', ballesta: 'ballesta', varita: 'varita', baculo: 'báculo'};
+  const CAT_TXT = {hpsp: ['poción de HP o SP', 'pociones de HP o SP'], enfermeria: ['de enfermería', 'de enfermería'], utilitario: ['utilitario', 'utilitarios'],
+    trampa: ['trampa', 'trampas'], municion: ['munición', 'municiones'], pocion: ['poción de otros usos', 'pociones de otros usos'], pergamino: ['pergamino', 'pergaminos']};
+  function resumenTamano(tamK){
+    const tam = TAMANOS[tamK] || TAMANOS.pueblito, f = FIJO_POR_TAMANO[tamK] || {};
+    const pl = (n, par) => par[n === 1 ? 0 : 1];
+    const lugar = l => l.partes ? `${l.n} ${l.partes.every(p => UTILES.includes(p)) ? pl(l.n, ['utilitaria', 'utilitarias']) : pl(l.n, ['defensiva', 'defensivas distintas'])}`
+      : `${l.n} ${pl(l.n, LUGAR_TXT[l.parte] || [l.parte, l.parte])}${l.familias && l.n > 1 ? ' de Tipos distintos' : l.familia ? ` (Tipo ${l.familia})` : ''}${l.clases && l.n > 1 ? ` (${l.clases.map(c => CLASE_TXT[c] || c).join(' y ')})` : ''}`;
+    const equipo = SECCIONES_EQUIPO.map(k => `${SECCIONES[k].label} ${(f[k] || []).map(lugar).join(', ')}`).join('; ') + (tam.fijo ? '' : `; y el resto al azar, hasta ${tam.min}–${tam.max} piezas por sección`);
+    const g = Object.entries(tam.gondolaPorCategoria || {});
+    const gondola = g.length && g.every(([, n]) => n >= TODO) ? 'todo lo que haya' : g.map(([c, n]) => `${n} ${pl(n, CAT_TXT[c] || [c, c])}`).join(', ');
+    return {equipo, gondola};
+  }
   // Lo que suma Destreza/Agilidad (la Talabartería) y lo que suma Fuerza/Constitución (la Herrería), para las piezas que podrían ir en las dos.
   const DE_DESTREZA = ['eva', 'sigilo', 'percepcion', 'veoculto', 'ini', 'des', 'agl', 'pasosgratis', 'rng', 'pdgdist', 'pdgt4', 'pdgt6', 'retirada', 'reflejos',
     'levitar', 'pasodoble', 'trampaoculta', 'soltarse', 'crit', 'oporahorro', 'saquerapido'];
@@ -210,8 +262,8 @@ const GeneradorTiendas = (() => {
   }
 
   /* generar({secciones, tamano, nivel, catalogo, azar}) → {secciones, tamano, nivel, items: [ids], garantizados: [ids], plan: [{seccion, parte, id|null}]}.
-     (`tipo` viejo también sirve: Herrero, Bazar o Ramos.) El total del tamaño se reparte entre las secciones abiertas; la variedad de partes
-     defensivas, también. La escasez es de toda la tienda. El stock fijo va primero y fuera del total. */
+     (`tipo` viejo también sirve: Herrero, Bazar o Ramos.) Cada sección abierta: su base fija y el resto al azar. La escasez es de toda la tienda.
+     Los clásicos van primero y fuera del total. */
   function generar(o){
     const R = azarDe(o), cat = (o && o.catalogo) || [];
     const secs = seccionesDe(o);
@@ -220,49 +272,19 @@ const GeneradorTiendas = (() => {
     const usados = new Set();
     const garantizados = clasicos(cat);   // los clásicos, siempre
     garantizados.forEach(it => usados.add(it.id));
-    const variedad = tam.variedad;
     const esc = escasez(R, tam);
     const plan = [], elegidos = [];
     secs.forEach(k => {
-      const sec = SECCIONES[k], receta = sec.receta, planS = [], cuota = tam.fijo ? 0 : entero(R, tam.min, tam.max);
-      // 🧳 El ambulante: los lugares fijos de la sección (sin la variedad ni el resto por peso).
-      if(tam.fijo){
-        (FIJO_AMBULANTE[k] || []).forEach(l => {
-          if(l.partes){
-            const conAlgo = l.partes.filter(pt => candidatosDe(cat, k, pt).length);
-            for(let i = conAlgo.length - 1; i > 0; i--){ const j = Math.floor(R() * (i + 1)); [conAlgo[i], conAlgo[j]] = [conAlgo[j], conAlgo[i]]; }
-            conAlgo.slice(0, l.n).forEach(pt => planS.push({seccion: k, parte: pt}));
-            return;
-          }
-          if(l.familias && sec.familias){
-            const fams = sec.familias.slice();
-            for(let i = fams.length - 1; i > 0; i--){ const j = Math.floor(R() * (i + 1)); [fams[i], fams[j]] = [fams[j], fams[i]]; }
-            fams.slice(0, l.n).forEach(f => planS.push({seccion: k, parte: l.parte, familia: f}));
-            return;
-          }
-          for(let i = 0; i < l.n; i++) planS.push({seccion: k, parte: l.parte, ...(l.familia ? {familia: l.familia} : {})});
-        });
-      }else{
-      // Primero lo garantizado (variedad de partes, familias, mínimos) y después el resto por peso.
-      const defs = DEFENSIVAS.filter(p => num(receta[p]) > 0);
-      const pesosDef = Object.fromEntries(defs.map(p => [p, receta[p]]));
-      for(let i = 0; i < Math.min(variedad, defs.length); i++){ const p = ponderado(R, pesosDef); planS.push({seccion: k, parte: p}); delete pesosDef[p]; }
-      if(sec.familias){
-        const fams = sec.familias.slice();
-        for(let i = fams.length - 1; i > 0; i--){ const j = Math.floor(R() * (i + 1)); [fams[i], fams[j]] = [fams[j], fams[i]]; }
-        fams.slice(0, Math.min(fams.length, tam.familias)).forEach(f => planS.push({seccion: k, parte: 'arma', familia: f}));
-      }
-      if(!sec.minimosDesde || ORDEN_TAMANO.indexOf(tamK) >= ORDEN_TAMANO.indexOf(sec.minimosDesde))
-        Object.entries(sec.minimos || {}).forEach(([p, n]) => { if(!planS.some(l => l.parte === p)) for(let i = 0; i < n; i++) planS.push({seccion: k, parte: p}); });
+      const sec = SECCIONES[k], receta = sec.receta, cuota = tam.fijo ? 0 : entero(R, tam.min, tam.max);
+      // Primero la base fija de la sección (FIJO_POR_TAMANO) y después, hasta la cuota, el resto al azar con la receta (el ambulante: solo la base).
+      const planS = planFijo(R, cat, k, sec, (FIJO_POR_TAMANO[tamK] || {})[k]);
       while(planS.length < cuota) planS.push({seccion: k, parte: ponderado(R, receta)});
-      }
       planS.forEach(lugar => {
-        let parte = lugar.parte, item = null;
-        for(let intento = 0; intento < 4 && !item; intento++){
-          if(intento && tam.fijo) break;   // (el ambulante no cambia una parte fija por otra: si no hay, no hay)
-          if(intento) parte = ponderado(R, receta);   // la parte se agotó (o no tiene nada de esta sección): otra de la receta
-          item = elegir(R, candidatosDe(cat, k, parte), tirarCalidad(R, nivel), usados, esc.cabe, intento ? 0 : lugar.familia);
-        }
+        const base = candidatosDe(cat, k, lugar.parte), deClase = lugar.clase && CLASE[lugar.clase] ? base.filter(CLASE[lugar.clase]) : null;
+        let item = elegir(R, deClase || base, tirarCalidad(R, nivel), usados, esc.cabe, lugar.familia);
+        if(!item && deClase) item = elegir(R, base, tirarCalidad(R, nivel), usados, esc.cabe, lugar.familia);   // (sin uno de esa clase: otro de la misma parte)
+        // Sin ítem para el lugar: el ambulante lo deja vacío; los demás, otro de la receta (la parte se agotó o no tiene nada de esta sección).
+        for(let intento = 1; intento < 4 && !item && !tam.fijo; intento++) item = elegir(R, candidatosDe(cat, k, ponderado(R, receta)), tirarCalidad(R, nivel), usados, esc.cabe, 0);
         lugar.id = item ? item.id : null;
         plan.push(lugar);
         if(!item) return;
@@ -281,23 +303,13 @@ const GeneradorTiendas = (() => {
         usados.add(it.id); gondola.push(it);
       }
     };
-    // 🧳 El ambulante: una cantidad por categoría de la góndola (Combatiente.categoriaGondola), sin las fijas de cada sección.
-    if(tam.gondolaPorCategoria && typeof Combatiente !== 'undefined' && Combatiente.categoriaGondola){
-      Object.entries(tam.gondolaPorCategoria).forEach(([cat0, n]) => sortear(cat.filter(it => gastable(it) && !usados.has(it.id) && Combatiente.categoriaGondola(it) === cat0), num(n)));
-    }
-    else secs.forEach(k => {
-      let n = num((tam.gondola || {})[k]);
-      // Siempre en la góndola (2026-10-11, dueño: las flechas elementales «siempre disponibles en la Talabartería»): `gondolaFija` en el ítem.
-      cat.filter(it => it.gondolaFija && !it.archivo && gastable(it) && gondolaDe(it) === k && !usados.has(it.id)).forEach(it => { usados.add(it.id); gondola.push(it); });
-      const pool = cat.filter(it => gastable(it) && gondolaDe(it) === k && !usados.has(it.id));
-      while(n-- > 0 && pool.length){
-        const pesos = pool.map(it => num(tabla[TIERS.indexOf(it.tier)]) + 10);
-        let r = R() * pesos.reduce((a, b) => a + b, 0), i = 0;
-        while(i < pool.length - 1 && (r -= pesos[i]) > 0) i++;
-        const it = pool.splice(i, 1)[0];
-        usados.add(it.id); gondola.push(it);
-      }
-    });
+    // 🛒 Una cantidad por categoría de la góndola (Combatiente.categoriaGondola; P232, 2026-10-28: en todos los tamaños), de lo que venden las
+    // secciones abiertas (gondolaDe: lo de la Talabartería y lo del Bazar). Fuera del ambulante, además, lo que va siempre (2026-10-11, dueño: las
+    // flechas elementales «siempre disponibles en la Talabartería»; `gondolaFija` en el ítem).
+    const abiertas = new Set(secs), deAbiertas = it => abiertas.has(gondolaDe(it));
+    const categoria = it => typeof Combatiente !== 'undefined' && Combatiente.categoriaGondola ? Combatiente.categoriaGondola(it) : it.trampaDatos ? 'trampa' : 'utilitario';
+    if(!tam.fijo) cat.filter(it => it.gondolaFija && !it.archivo && gastable(it) && deAbiertas(it) && !usados.has(it.id)).forEach(it => { usados.add(it.id); gondola.push(it); });
+    Object.entries(tam.gondolaPorCategoria || {}).forEach(([cat0, n]) => sortear(cat.filter(it => gastable(it) && deAbiertas(it) && !usados.has(it.id) && categoria(it) === cat0), num(n)));
     return {secciones: secs, tamano: tamK, nivel, items: [...garantizados, ...elegidos, ...gondola].map(it => it.id), garantizados: garantizados.map(it => it.id),
       gondola: gondola.map(it => it.id), plan, escasez: esc.conteo};
   }
@@ -352,6 +364,6 @@ const GeneradorTiendas = (() => {
   // Cuántas veces repone una tienda publicada lo que le compran (una personalizada, como una aldea).
   const reservaDe = tamano => (TAMANOS[tamano] || TAMANOS.aldea).reserva;
 
-  return {SECCIONES_EQUIPO, FIJO_AMBULANTE, reservaDe, clasicos, gastable, gondolaDe, UNIDADES_GONDOLA, TIERS, CALIDAD_POR_NIVEL, SUERTE, TAMANOS, SECCIONES, SECCIONES_ORDEN, seccionDe, seccionesDe, PARTE_LABEL, DEFENSIVAS, ETIQUETAS, parteDe, etiquetasDe, esDeCaster, publicable,
+  return {SECCIONES_EQUIPO, FIJO_AMBULANTE, FIJO_POR_TAMANO, resumenTamano, reservaDe, clasicos, gastable, gondolaDe, UNIDADES_GONDOLA, TIERS, CALIDAD_POR_NIVEL, SUERTE, TAMANOS, SECCIONES, SECCIONES_ORDEN, seccionDe, seccionesDe, PARTE_LABEL, DEFENSIVAS, ETIQUETAS, parteDe, etiquetasDe, esDeCaster, publicable,
     tirarCalidad, nivelDe, generar, otro, simular};
 })();

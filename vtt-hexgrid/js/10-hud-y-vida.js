@@ -804,7 +804,7 @@ function hudTarjetaHtml(t, d){
     : '<span style="color:var(--muted)">Ninguno activo.</span>';
   const nota = String(d.notas || '').trim();
   return '<div class="hud-globo hud-tarjeta">' +
-    `<h3>${esc(t.nombre || '?')}</h3>` + img +
+    `<h3>${esc(nombreDe(t) || '?')}</h3>` + img +   // (el del creep vinculado, como el que sale debajo del token: el del token queda del día que se creó)
     '<div class="hud-seccion" style="padding-top:0;border-top:none"><h3>Equipo</h3>' + equipo + '</div>' +
     '<div class="hud-seccion"><h3>Estados alterados</h3>' + estados + '</div>' +
     (nota ? '<div class="hud-seccion"><h3>Nota</h3><p class="hud-tarjeta-nota">' + esc(nota) + '</p></div>' : '') +

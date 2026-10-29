@@ -106,7 +106,7 @@ async function editarToken(id, cambios){
 async function borrarToken(id){
   const t = tokens.get(id);
   if(!puedoBorrar(t)) return;
-  if(!(await Confirmar.preguntar(`¿Sacar el token "${t.nombre}" del mapa?`, {titulo: 'Sacar token', si: 'Sacar', peligro: true}))) return;
+  if(!(await Confirmar.preguntar(`¿Sacar el token "${nombreDe(t)}" del mapa?`, {titulo: 'Sacar token', si: 'Sacar', peligro: true}))) return;
   try{
     await coleccionTokens().doc(id).delete();
   }catch(err){

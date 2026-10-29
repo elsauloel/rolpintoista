@@ -457,7 +457,8 @@ function acLanzarAtaqueDeHab(sc, h, emergio){
       alCancelar: () => { if(ac && ac.creepId === id){ ac.host.hidden = false; acUbicar(); acDibujar(); } }});
     return;
   }
-  const atq = CreepAcciones.ataqueDeHab(sc, h, emergio && armaSalida ? {arma: armaSalida} : undefined);
+  // Saliendo de abajo, el golpe no se puede parrear: se puede esquivar (dueño, 2026-10-29: «se puede esquivar, pero no parrear»).
+  const atq = CreepAcciones.ataqueDeHab(sc, h, emergio && armaSalida ? {arma: {...armaSalida, sinParry: true}} : undefined);
   if(atq && atq.escudoGolpe && !atq.escudoGolpe.nombre) toast(`🛡 ${sc.nombre} no tiene un escudo puesto: ${h.nombre || 'el golpe'} pega con 1d10 + su Dmg`);   // (avisa y deja seguir)
   const bonoSalida = emergio && atq && atq.mods ? Math.round(num(h.emerger && h.emerger.pdg)) : 0;
   if(bonoSalida) atq.mods.pdg = num(atq.mods.pdg) + bonoSalida;
@@ -860,7 +861,7 @@ function cerrarAccionesNuevas(){
    estados para la Ejecución, con el selector común (los "Mis presets" del GM no están en la partida: ver pendientes 7b). */
 const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261027q', '../comun/asistente-duelo-hab.js?v=20261026d'];
 // Las recetas de habilidades de fábrica (para ↻ Reemplazar y ⬆ Subir): pesadas, recién cuando hacen falta.
-const ACE_BASE = ['../comun/creeps-base.js?v=20261029a', '../comun/skills-creep-base.js?v=20261029e'];
+const ACE_BASE = ['../comun/creeps-base.js?v=20261029a', '../comun/skills-creep-base.js?v=20261029l'];
 async function acCargarEditor(){ await acCargarPiezas(); await cargarPiezas(SE_PIEZAS); await cargarPiezas(ACE_PIEZAS); }
 // ⬆ Subir una habilidad del creep a la biblioteca compartida (corrección o algo nuevo); su `bibOrigen` nuevo se guarda en el creep.
 async function acSubirHab(creepId, habId){

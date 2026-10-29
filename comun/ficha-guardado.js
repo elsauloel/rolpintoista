@@ -120,7 +120,6 @@ const FichaGuardado = (() => {
         if(inv.esp === undefined) inv.esp = inv.int;
         delete inv.int;
       }
-      (Array.isArray(inv.armaMods) ? inv.armaMods : []).forEach(m => { if(m && m.stat === 'int') m.stat = 'esp'; });
       (Array.isArray(inv.equipo) ? inv.equipo : []).forEach(migrarObjEspecial);
       (Array.isArray(inv.habilidades) ? inv.habilidades : []).forEach(migrarObjEspecial);
     });
@@ -144,7 +143,6 @@ const FichaGuardado = (() => {
   function migrarObjTipos(o){
     if(!o || typeof o !== 'object') return;
     if(num(o.tipoDado) > 0) o.tipoDado = num(o.tipoDado) + 2;
-    if(num(o.armaTipo) > 0) o.armaTipo = num(o.armaTipo) + 2;
     ['detalle', 'descripcionNarrativa', 'efectoDetalle', 'equipoEstadoDetalle', 'notas']
       .forEach(k => { if(typeof o[k] === 'string') o[k] = correrTiposTexto(o[k]); });
     if(Array.isArray(o.habilidades)) o.habilidades.forEach(migrarObjTipos);  // de las invocaciones

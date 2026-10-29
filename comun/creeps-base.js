@@ -1673,12 +1673,17 @@
   }
   aplicarEquipo();
 /*EQUIPO_CREEP:FIN*/
-  // 🗡 El arma, un ítem de su equipo (paso 8 de docs/plan-inventario-creeps.md, 2026-10-23): las recetas de arriba la arman con los campos
-  // arma* de siempre y acá pasa a su lista, con un id fijo. (Sin comun/combatiente.js cargado quedan como antes: GM Tools los convierte al cargar.)
-  if(typeof Combatiente !== 'undefined') lista.forEach(c => {
-    Combatiente.pasarArmaAItem(c.datos);
-    const a = Combatiente.armaPrincipal(c.datos);
-    if(a) a.id = 'arma-' + c.poolId;
+  // 🗡 El arma, un ítem de su equipo (paso 8 de docs/plan-inventario-creeps.md, 2026-10-23): las recetas de arriba la arman con campos arma*
+  // (ARMA_DE_RECETA) y acá pasa a su lista, al final, con un id fijo. (2026-10-29: acá mismo; el motor ya no lee esos campos.)
+  const ARMA_DE_RECETA = {armaNombre: 'nombre', armaTipo: 'tipoDado', armaPeso: 'peso', armaFijo: 'danoFijo', armaAmplificado: 'danoAmplificado',
+    armaDeRango: 'armaDeRango', armaManos: 'tipoItem', armaMods: 'mods', armaEfectos: 'efectosGolpe', armaDetalle: 'detalle', armaNatural: 'natural'};
+  lista.forEach(c => {
+    const d = c.datos, it = {id: 'arma-' + c.poolId, equipado: true};
+    Object.entries(ARMA_DE_RECETA).forEach(([k, v]) => { if(d[k] !== undefined) it[v] = d[k]; delete d[k]; });
+    it.tipoItem = /^arma_/.test(String(it.tipoItem || '')) ? it.tipoItem : 'arma_1m';
+    it.tipoDado = Number(it.tipoDado) || 8;
+    it.peso = Math.max(1, Number(it.peso) || 1);
+    d.equipo = [...(Array.isArray(d.equipo) ? d.equipo : []), it];
   });
 
   window.CREEPS_BASE = lista;

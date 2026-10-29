@@ -11,7 +11,7 @@
      caras/exitos  probabilidad = exitos en 1d(caras); éxito = sacar más de
                    caras - exitos. caras 1 (o exitos >= caras) = siempre.
      dado          tirada extra cuando el efecto entra (ej. "1d6"), opcional.
-   En los ítems va en `efectosGolpe`; en los creeps, en `armaEfectos`.
+   Va en `efectosGolpe` del ítem (también el arma de un creep o una invocación, que es un ítem de su equipo).
    ========================================================= */
 const EfectosGolpe = (() => {
   // Probabilidades que se ofrecen al crear el arma, con su dado.

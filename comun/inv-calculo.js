@@ -159,7 +159,6 @@ const InvCalculo = (() => {
     inv.habilidades = Array.isArray(inv.habilidades) ? inv.habilidades : [];
     inv.pasivas = Array.isArray(inv.pasivas) ? inv.pasivas : [];   // (2026-10-16) como las de un creep; la que da un estado lo mantiene puesto
     if(typeof estadosPresetFicha === 'function') Combatiente.sincronizarEstadosDePasivas(inv.estados, inv.pasivas, estadosPresetFicha());
-    Combatiente.pasarArmaAItem(inv);   // 🗡 su arma, un ítem de su lista (docs/plan-inventario-creeps.md, paso 2): los campos arma* sueltos se convierten
     if(inv.defensa === undefined) inv.defensa = 0;
     Combatiente.pasarEquipoVivo(inv, {crit: false});   // 🛡 paso 3: la Defensa del equipo en vivo (la Res. a crítico nunca se le había sumado)
     // ✨ Lo que trae es suyo: un arma invocada (D7, vtt-hexgrid/js/67). Lo que levantó del piso viene marcado `invocada: false` (o con de qué otra

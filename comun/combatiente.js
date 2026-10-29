@@ -591,12 +591,12 @@ const Combatiente = (() => {
   const COSTO_LEVANTAR_ARMA = 1;   // levantar un arma del piso (js/27)
   /* «Ignora N de Resistencia a crítico» de un arma (2026-10-03, pedido del dueño): el campo `ignoraResistCrit` del arma (también el viejo
      efecto al golpear «Ignora N de Res. crítico», que no se aplicaba solo). El duelo se lo resta a la Resistencia del defensor antes de
-     calcular el crítico (lo pide al atacante con statsCritico). `arma` = {ignoraResistCrit, efectosGolpe} (un creep o una invocación: sus
-     campos armaIgnoraResistCrit / armaEfectos). */
+     calcular el crítico (lo pide al atacante con statsCritico). `arma` = {ignoraResistCrit, efectosGolpe} (también la de un creep o una
+     invocación: su arma es un ítem, armaEnMano). */
   /* Rasgos de un arma (2026-10-03, mecánicas de firma): lo que el arma cambia en CÓMO se ataca —no el daño ni los efectos al golpear—.
      espalda {pdg, fijo, critpot} · ignoraResistCrit N · sinParry (no se puede parrear) · oporGratis (el ataque de oportunidad no cuesta No2) ·
-     ahorroNitros N (el primer ataque del turno con ella cuesta N menos) · critD20 N (N d20 más al tirar el crítico). Un ítem los lleva sueltos; un
-     creep o una invocación, en `armaRasgos` (los campos viejos armaEspalda / armaIgnoraResistCrit también cuentan).
+     ahorroNitros N (el primer ataque del turno con ella cuesta N menos) · critD20 N (N d20 más al tirar el crítico). El ítem los lleva sueltos
+     (también el arma de un creep o una invocación, que es un ítem de su equipo).
      arco (2026-10-09, dueño; docs/rework-armas-rango.md): el arma de rango es un arco — suma la mitad del Dmg (ver dmgDelArma).
      recarga N (2026-10-10, dueño: las ballestas): un arma de rango que no es arco cobra el disparo N, 2N, 3N… No2 (ver recargaDe).
      perfora N (2026-10-10, dueño: «la gracia de la ballesta es perforar»): N puntos del golpe pasan siempre la Defensa, el resto va contra ella
@@ -686,15 +686,14 @@ const Combatiente = (() => {
   /* Rasgos de ballesta con el mapa (2026-10-10, dueño; docs/ideas-ballestas.md): **apuntada N** (+N PdG si no te moviste en el turno: el mapa lo
      suma al apuntar), **cargada** (llega cargada: el primer disparo del turno es gratis si no disparaste con ella el turno anterior; ver
      cargadaGratis) y **atraviesaEscudos** (si te paran el disparo con un escudo, el escudo se abolla: 1 stack de Armadura rota; lo hace el mapa). */
-  const cargadaGratis = (arma, previos, descargada) => !!(arma && (arma.cargada || (arma.armaRasgos && arma.armaRasgos.cargada)) && n(previos) === 0 && !descargada);
+  const cargadaGratis = (arma, previos, descargada) => !!(arma && arma.cargada && n(previos) === 0 && !descargada);
   /* Cuánto del Dmg (la Fuerza) suma el daño de un arma (2026-10-09, dueño): cuerpo a cuerpo, entero; un arco, la mitad redondeada para arriba;
-     cualquier otra de rango (ballesta, pólvora), nada. `arma` = {armaDeRango, arco} (un ítem; de un creep o una invocación: armaDeRango y
-     armaRasgos.arco). */
-  const esArco = arma => !!(arma && arma.armaDeRango && (arma.arco || (arma.armaRasgos && arma.armaRasgos.arco)));
+     cualquier otra de rango (ballesta, pólvora), nada. `arma` = {armaDeRango, arco} (un ítem). */
+  const esArco = arma => !!(arma && arma.armaDeRango && arma.arco);
   /* 🪨 La honda (2026-10-14, dueño: «creemos la categoría honda, un arma de rango contundente con sus propias reglas»; falta auditarla y armar la
      serie del catálogo): suma la mitad del Dmg como el arco, pero no es arco — le tira también al de al lado, no tiene tiro alto ni flechas, y no
      hace ataques de oportunidad. Su alcance es la mitad del Rango, para abajo (provisorio: P198). */
-  const esHonda = arma => !!(arma && arma.armaDeRango && !esArco(arma) && (arma.honda || (arma.armaRasgos && arma.armaRasgos.honda)));
+  const esHonda = arma => !!(arma && arma.armaDeRango && !esArco(arma) && arma.honda);
   const HONDA_RANGO = 0.5;
   const alcanceHonda = rng => Math.max(1, Math.floor(n(rng) * HONDA_RANGO));
   // El alcance de un arma de rango a partir del Rango de quien la usa (la honda, la mitad).
@@ -710,7 +709,7 @@ const Combatiente = (() => {
   const RECARGA_NOMBRE = {1: 'rápida', 2: 'común', 3: 'de asedio'};
   function recargaDe(arma){
     if(!arma || !arma.armaDeRango || esArco(arma) || esHonda(arma)) return 0;
-    const r = Math.round(n(arma.recarga || (arma.armaRasgos && arma.armaRasgos.recarga)));
+    const r = Math.round(n(arma.recarga));
     return r > 0 ? Math.min(5, r) : 0;
   }
   /* La munición especial (2026-10-10, dueño): el arco dispara flechas y la ballesta (un arma con Recarga), virotes. Las dos van en el carcaj
@@ -722,7 +721,7 @@ const Combatiente = (() => {
      primero (N, N, 3N…). Tiro rápido (2026-10-11): cada disparo más suma 1, no N (N, N+1, N+2…). */
   function recargaCosto(arma, h){
     const rc = recargaDe(arma); if(!rc) return 0;
-    const k = Math.max(0, Math.round(n(h))), r = x => arma[x] || (arma.armaRasgos && arma.armaRasgos[x]);
+    const k = Math.max(0, Math.round(n(h))), r = x => arma[x];
     if(r('tiroRapido')) return rc + k;
     if(r('dobleCuerda') && k === 1) return rc;
     return rc * (k + 1);
@@ -738,35 +737,16 @@ const Combatiente = (() => {
   }
   /* 🗡 El arma en la mano de un creep o de una invocación (2026-10-22, docs/plan-inventario-creeps.md, paso 1: «la puerta única»). Todo lo que
      necesita su arma (el daño, el peso, los costos, el duelo, el botín…) le pregunta acá, en la forma de un ítem de personaje: nombre, tipoItem,
-     tipoDado, peso, danoFijo, danoAmplificado, armaDeRango, mods, efectosGolpe, natural, detalle y sus rasgos sueltos. Hoy sale de sus campos
-     arma* (armaNombre, armaTipo…); cuando el creep y la invocación lleven sus armas como ítems (paso 2), sale de lo equipado, y nadie más cambia.
-     Siempre devuelve un arma (sin nombre, la de Tipo 8 de siempre) hasta el paso 5 (el ataque sin arma, D4). */
+     tipoDado, peso, danoFijo, danoAmplificado, armaDeRango, mods, efectosGolpe, natural, detalle y sus rasgos sueltos. Sale de lo equipado; sin
+     nada en la mano, el ataque sin arma (paso 5, D4). */
   /* Paso 2 (2026-10-22): el arma es un ítem de su lista `equipo` (la misma forma que la mochila de un personaje), el primero equipado que sea un
      arma de verdad (arma_*, con su Tipo o natural; no una varita ni la «segunda arma» de los creeps base, que solo trae bonos). Los campos sueltos
-     de antes (CAMPOS_ARMA) ya no se guardan: `pasarArmaAItem` los convierte al cargar (CreepCalculo.normalizar, InvCalculo.migrar). Si algo todavía
-     escribe alguno (una pantalla vieja, un formulario que cambia un solo dato), se COMBINA con el ítem que ya tiene: pisa solo esos datos. */
-  const ARMA_CAMPO = {armaNombre: 'nombre', armaTipo: 'tipoDado', armaPeso: 'peso', armaFijo: 'danoFijo', armaAmplificado: 'danoAmplificado',
-    armaDeRango: 'armaDeRango', armaManos: 'tipoItem', armaMods: 'mods', armaEfectos: 'efectosGolpe', armaDetalle: 'detalle', armaNatural: 'natural'};
-  const CAMPOS_ARMA = [...Object.keys(ARMA_CAMPO), 'armaRasgos', 'armaEspalda', 'armaIgnoraResistCrit'];
-  const tieneCamposArma = x => !!x && CAMPOS_ARMA.some(k => x[k] !== undefined);
+     de antes (armaNombre, armaTipo…) se convirtieron y su lectura se sacó (2026-10-29, dueño: «hacé la limpieza ya»; ver docs/pendientes.md). */
   const esArmaDeMano = it => !!it && it.equipado !== false && /^arma_/.test(String(it.tipoItem || '')) && !it.especial && (n(it.tipoDado) > 0 || it.natural === true);
   // El ítem del arma en su lista (el objeto guardado, para cambiarlo), o null.
   const armaPrincipal = x => Array.isArray(x && x.equipo) ? x.equipo.find(esArmaDeMano) || null : null;
   // Lo que lleva sin contar el arma de la mano (el escudo, los talismanes, la armadura…): las listas que muestran el equipo y el botín.
   const equipoSinArma = x => { const a = armaPrincipal(x); return (Array.isArray(x && x.equipo) ? x.equipo : []).filter(it => it !== a); };
-  // El ítem de su lista con lo que digan los campos sueltos encima.
-  function armaCombinada(x){
-    const base = armaPrincipal(x);
-    const it = base ? {...base} : {};
-    // Campos sueltos «sin nombre» encima de un arma con nombre: son los valores por defecto de una carga vieja (un creep nuevo de antes, una
-    // pestaña sin recargar), no un cambio: no pisan nada.
-    if(base && base.nombre && x.armaNombre === '') return it;
-    Object.entries(ARMA_CAMPO).forEach(([k, c]) => { if(x[k] !== undefined) it[c] = x[k]; });
-    if(x.armaRasgos && typeof x.armaRasgos === 'object') Object.assign(it, x.armaRasgos);
-    if(x.armaEspalda && !it.espalda) it.espalda = x.armaEspalda;
-    if(n(x.armaIgnoraResistCrit) && !it.ignoraResistCrit) it.ignoraResistCrit = n(x.armaIgnoraResistCrit);
-    return it;
-  }
   // Un ítem de arma con todo lo que las cuentas esperan (sin tocar el guardado: los mods y los efectos son las mismas listas).
   const armaVista = it => ({...it, nombre: it.nombre || '', tipoItem: /^arma_/.test(String(it.tipoItem || '')) ? it.tipoItem : 'arma_1m', tipoDado: n(it.tipoDado) || 8,
     peso: Math.max(1, n(it.peso) || 1), danoFijo: n(it.danoFijo), danoAmplificado: Math.max(0, n(it.danoAmplificado)), armaDeRango: !!it.armaDeRango,
@@ -777,9 +757,7 @@ const Combatiente = (() => {
   const TIPO_SIN_ARMA = 4;
   function armaEnMano(x){
     if(!x) return null;
-    // (Un dato viejo que todavía no se convirtió —una partida que no se volvió a guardar desde el paso 2— se lee con sus campos sueltos: es el
-    // único lugar que los entiende; todo lo demás lee el ítem. Cada pantalla convierte al leer: CreepCalculo.normalizar, InvCalculo.migrar.)
-    const it = tieneCamposArma(x) ? armaCombinada(x) : armaPrincipal(x);
+    const it = armaPrincipal(x);
     if(!it || !Object.keys(it).length) return {id: 'arma', ...armaVista({tipoDado: TIPO_SIN_ARMA}), sinArma: true};
     return {id: 'arma', ...armaVista(it)};
   }
@@ -874,18 +852,9 @@ const Combatiente = (() => {
     x.equipoVivo = 1;
     return true;
   }
-  // Los campos sueltos → un ítem de su lista (combinado con el arma que tenía). → true si cambió algo.
-  function pasarArmaAItem(x){
-    if(!tieneCamposArma(x)) return false;
-    const it = armaCombinada(x);
-    if(!it.id) it.id = 'arma-' + (String(it.nombre || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'sin-nombre');
-    ponerArma(x, it);
-    return true;
-  }
   // Ponerle un arma en la mano (un editor, el equipo de un creep base, levantar una): reemplaza a la que tenía. `item` en la forma de un ítem.
   function ponerArma(x, item){
     if(!x) return null;
-    CAMPOS_ARMA.forEach(k => { delete x[k]; });
     x.equipo = Array.isArray(x.equipo) ? x.equipo : [];
     const i = x.equipo.findIndex(esArmaDeMano);   // la nueva ocupa el lugar de la que tenía; si no tenía, va al final
     if(!item){ if(i >= 0) x.equipo.splice(i, 1); return null; }
@@ -941,7 +910,7 @@ const Combatiente = (() => {
     const o = {};
     if(arma && arma.espalda) o.espalda = arma.espalda;
     if(arma && arma.sinParry) o.sinParry = true;
-    if(arma && (arma.detalle || arma.armaDetalle)) o.armaDetalle = String(arma.detalle || arma.armaDetalle).slice(0, 400);   // el texto del arma, para el recuadro del duelo (2026-10-15)
+    if(arma && arma.detalle) o.armaDetalle = String(arma.detalle).slice(0, 400);   // el texto del arma, para el recuadro del duelo (2026-10-15)
     if(esArco(arma)) o.arco = true;   // el mapa pide la distancia mínima del arco al elegir el objetivo (no viaja al duelo)
     if(arma && arma.armaDeRango && arma.ideal) o.ideal = arma.ideal;   // la distancia ideal y el tiro alto: los usa el mapa al apuntar
     if(tieneTiroAlto(arma)) o.tiroAlto = true;
@@ -951,8 +920,8 @@ const Combatiente = (() => {
     if(arma && arma.armaDeRango) RASGOS_ARCO.forEach(k => { const v = arma[k]; if(v && (typeof v !== 'object' || Object.keys(v).length)) o[k] = v; });   // las mecánicas de arco: las usa el mapa al apuntar
     return o;
   }
-  /* 🏹 Mecánicas de arco (2026-10-11, dueño; docs/ideas-arcos-flechas.md, «Lo que eligió el dueño de la segunda ronda»). Sueltas en el arma (un
-     creep o una invocación, en armaRasgos); valen en cualquier arma de rango. Las suma el mapa al apuntar (vtt-hexgrid/js/35-arcos.js):
+  /* 🏹 Mecánicas de arco (2026-10-11, dueño; docs/ideas-arcos-flechas.md, «Lo que eligió el dueño de la segunda ronda»). Sueltas en el arma (un ítem,
+     también el de un creep o una invocación); valen en cualquier arma de rango. Las suma el mapa al apuntar (vtt-hexgrid/js/35-arcos.js):
      - tensar N: al disparar se puede pagar TENSAR_NO2 No2 más → +N PdG (se elige en cada disparo).
      - largoAlcance N: se puede disparar hasta LARGO_ALCANCE_MAX casilleros más allá del alcance, con −N PdG por cada uno de más.
      - emboscada N: el primer disparo de ese tirador desde que el mapa pasó a combate, Crítico frecuente +N.
@@ -1076,20 +1045,20 @@ const Combatiente = (() => {
   const TIRO_ALTO_MIN = 4, TIRO_ALTO_PDG = -2;
   // Todos los arcos lo tienen (mecánica de firma, dueño 2026-10-09) salvo que el arco traiga `sinTiroAlto` (una debilidad que lo abarata); otra
   // arma de rango, solo si trae `tiroAlto`.
-  const tieneTiroAlto = arma => !!(arma && arma.armaDeRango && (esArco(arma) ? !(arma.sinTiroAlto || (arma.armaRasgos && arma.armaRasgos.sinTiroAlto)) : (arma.tiroAlto || (arma.armaRasgos && arma.armaRasgos.tiroAlto))));
+  const tieneTiroAlto = arma => !!(arma && arma.armaDeRango && (esArco(arma) ? !arma.sinTiroAlto : arma.tiroAlto));
   /* El arco y la distancia (2026-10-09, dueño; P183 abierta para la mesa): con el arco hacen falta al menos ARCO_LIBRES casilleros libres entre
      el arquero y el objetivo (el objetivo a ARCO_LIBRES + 1 o más), no se pega cuerpo a cuerpo y no se hacen ataques de oportunidad.
      2026-10-10 (dueño): 1 casillero libre — el arco no pega al lado, pero a 2 sí (antes eran 2 libres: objetivo a 3 o más). */
   const ARCO_LIBRES = 1;
   // Mínima más larga (2026-10-11): ese arco necesita 2 casilleros libres.
-  const arcoLibres = arma => arma && (arma.minimaLarga || (arma.armaRasgos && arma.armaRasgos.minimaLarga)) ? 2 : ARCO_LIBRES;
+  const arcoLibres = arma => arma && arma.minimaLarga ? 2 : ARCO_LIBRES;
   const arcoLibresTxt = arma => arcoLibres(arma) === 1 ? '1 casillero libre' : `${arcoLibres(arma)} casilleros libres`;
   const arcoMuyCerca = (arma, distancia) => esArco(arma) && n(distancia) <= arcoLibres(arma);
   // Lo que se ahorra en No2 un disparo con Flecha en la cuerda o Encadenar (2026-10-11): previos = los disparos de ese turno con esa arma;
   // descargada = disparó con ella el turno anterior; pego = el disparo anterior de este turno pegó.
   function ahorroArco(arma, previos, descargada, pego){
     if(!arma) return 0;
-    const r = k => arma[k] || (arma.armaRasgos && arma.armaRasgos[k]);
+    const r = k => arma[k];
     return (r('enCuerda') && n(previos) === 0 && !descargada ? 1 : 0) + (r('encadenar') && n(previos) > 0 && pego ? 1 : 0);
   }
   const sirveDeOportunidad = arma => !esArco(arma) && !esHonda(arma);   // ni el arco ni la honda (2026-10-14)
@@ -2057,7 +2026,7 @@ const Combatiente = (() => {
   function pdgExtraArma(valorDe, arma){
     if(!arma || typeof valorDe !== 'function') return 0;
     const v = st => Math.max(0, Math.round(n(valorDe(st))));
-    const t = n(arma.tipoDado ?? arma.armaTipo);
+    const t = n(arma.tipoDado);
     return ([4, 6, 8, 10].includes(t) ? v('pdgt' + t) : 0) + (arma.armaDeRango ? v('pdgdist') : 0);
   }
   /* Un arma especial con modos (2026-10-08, Varita gemela: aceite o bola de fuego): cada modo es como un arma aparte —su propia casilla en la Botonera,
@@ -2114,7 +2083,7 @@ const Combatiente = (() => {
     const rc = recargaDe(o.arma);
     if(rc){   // una ballesta (o.arma, opcional): Recarga N → N, 2N, 3N…
       const h = Math.max(0, Math.round(n(o.hechos))), especial = o.ataque === 'oportunidad' || o.ataque === 'contra';
-      if(!especial && h === 0 && Math.round(n(o.costo)) === 0 && o.arma && (o.arma.cargada || (o.arma.armaRasgos && o.arma.armaRasgos.cargada)))   // llega cargada (2026-10-10)
+      if(!especial && h === 0 && Math.round(n(o.costo)) === 0 && o.arma && o.arma.cargada)   // llega cargada (2026-10-10)
         return {no2: 0, lineas: ['Llega cargada: este disparo es gratis (no disparó con ella el turno anterior)', recargaTxt(rc)]};
       const base = especial ? rc : recargaCosto(o.arma, h), l = [recargaTxt(rc, o.arma)];
       l.push(especial ? `${o.ataque === 'contra' ? 'Contraataque' : 'Ataque de oportunidad'}: lo de un primer disparo = ${rc}; no cuenta como disparo del turno`
@@ -2228,7 +2197,7 @@ const Combatiente = (() => {
   }
   const habDeConsumible = it => it && it.duelo ? {id: 'cons:' + (it.id || it.nombre), nombre: it.nombre, detalle: String(it.detalle || '').split(' ⚙')[0].split(' ✋')[0].trim(), modo: 'auto',   // a la Mesa, solo lo que hace
     duelo: conMinimoDeCalidad(it.duelo, it.tier), tiradaStat: it.duelo.tira || 'dmgesp', tiradaExtra: String(it.dano || '').trim()} : null;
-  return {anotarPagoDuelo, pagoDeDuelo, sirveParaEmerger, armaParaEmerger,GONDOLA_CATEGORIAS, categoriaGondola, utilPrimero, PACTO_VIDA_PCT, pactoVida, RELICARIO_TOPE, vidaExtraTotal, excedenteConTope, estadoVidaExtra, relicarioEnEquipo, desesperadoBonos, desesperadoTxt, identidadElemento, CRIATURAS_OSCURAS, sinCura, SIN_CURA_TXT, perforaDeEstados, presaValor, sinPresasDebiles, comoCeguera, CEGUERA_VISION, ciego, aDistancia, ciegoContraDistancia, CIEGO_DISTANCIA, habDeConsumible, efectoActivo, fenixActivo, revivirFenix, mareado, etereo, sequia, SOLO_BONO, soloBonoTxt, conFijo, gastarPasoFantasma, bezoar, conGauchito, GAUCHITO_STATS, talismanesDanoEsp, GRUPOS_CC, grupoCC, esMental, esControl, resisteCC, resisteCCEtq, columnasStats, piezasParaParry, sumaEspecialDe, sumaEspecialTxt, contraDeEjecucion, esHonda, alcanceHonda, alcanceArmaRango, HONDA_RANGO, porDanoNorm, stacksPorDano, porDanoTxt, CARGAS, cargable, conCarga, tormenta, danoTormenta, danoTormentaMover, golpeDirecto, cobroTormenta, tormentaTxt, avisarTormenta, aplicarTormenta, acelerado, gastarAcelerado, extenuado, conExtenuado, stacksCargaActiva, RASGOS_ARCO, LARGO_ALCANCE_MAX, TENSAR_NO2, largoAlcance, alcanceMaximo, afinidadEfectos, arcoRasgosTxt, lecturaTope, APUNTANDO, apuntandoX, caidaDano, recargaCosto, PUNTA_DIAMANTE_DEF, PUNTA_DIAMANTE_PERFORA, REMACHADORA_MAX, absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, unaTiradaDe, gastarUnaTirada, armaEnMano, TIPO_SIN_ARMA, sinArmaEnMano, armaPrincipal, equipoSinArma, esArmaDeMano, tieneCamposArma, pasarArmaAItem, ponerArma, CAMPOS_ARMA, defDeItem, critDeItem, defDeEquipo, critDeEquipo, pasarEquipoVivo, equipoPuesto, puestoSinArma, equipoGuardado, vaEnLaMano, manosLibres, itemComoDePersonaje, gruposDeEquipo, ponerPieza, guardarPieza, sacarPieza, COSTO_SACAR_PIEZA, ataqueConSuArma, armaParaArreglos, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, REMATE_ESCALONES, remateDados, ATRAPA_VISUALES, atrapaDeNombre, atrapaDe, atrapaPub, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoLibres, ahorroArco, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, defensaSinNo2, YA_NEGATIVO_TXT, DETECTAR_MIN_TIER, detectarMinDe, conMinimoDeCalidad, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
+  return {anotarPagoDuelo, pagoDeDuelo, sirveParaEmerger, armaParaEmerger,GONDOLA_CATEGORIAS, categoriaGondola, utilPrimero, PACTO_VIDA_PCT, pactoVida, RELICARIO_TOPE, vidaExtraTotal, excedenteConTope, estadoVidaExtra, relicarioEnEquipo, desesperadoBonos, desesperadoTxt, identidadElemento, CRIATURAS_OSCURAS, sinCura, SIN_CURA_TXT, perforaDeEstados, presaValor, sinPresasDebiles, comoCeguera, CEGUERA_VISION, ciego, aDistancia, ciegoContraDistancia, CIEGO_DISTANCIA, habDeConsumible, efectoActivo, fenixActivo, revivirFenix, mareado, etereo, sequia, SOLO_BONO, soloBonoTxt, conFijo, gastarPasoFantasma, bezoar, conGauchito, GAUCHITO_STATS, talismanesDanoEsp, GRUPOS_CC, grupoCC, esMental, esControl, resisteCC, resisteCCEtq, columnasStats, piezasParaParry, sumaEspecialDe, sumaEspecialTxt, contraDeEjecucion, esHonda, alcanceHonda, alcanceArmaRango, HONDA_RANGO, porDanoNorm, stacksPorDano, porDanoTxt, CARGAS, cargable, conCarga, tormenta, danoTormenta, danoTormentaMover, golpeDirecto, cobroTormenta, tormentaTxt, avisarTormenta, aplicarTormenta, acelerado, gastarAcelerado, extenuado, conExtenuado, stacksCargaActiva, RASGOS_ARCO, LARGO_ALCANCE_MAX, TENSAR_NO2, largoAlcance, alcanceMaximo, afinidadEfectos, arcoRasgosTxt, lecturaTope, APUNTANDO, apuntandoX, caidaDano, recargaCosto, PUNTA_DIAMANTE_DEF, PUNTA_DIAMANTE_PERFORA, REMACHADORA_MAX, absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, unaTiradaDe, gastarUnaTirada, armaEnMano, TIPO_SIN_ARMA, sinArmaEnMano, armaPrincipal, equipoSinArma, esArmaDeMano, ponerArma, defDeItem, critDeItem, defDeEquipo, critDeEquipo, pasarEquipoVivo, equipoPuesto, puestoSinArma, equipoGuardado, vaEnLaMano, manosLibres, itemComoDePersonaje, gruposDeEquipo, ponerPieza, guardarPieza, sacarPieza, COSTO_SACAR_PIEZA, ataqueConSuArma, armaParaArreglos, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, REMATE_ESCALONES, remateDados, ATRAPA_VISUALES, atrapaDeNombre, atrapaDe, atrapaPub, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoLibres, ahorroArco, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, defensaSinNo2, YA_NEGATIVO_TXT, DETECTAR_MIN_TIER, detectarMinDe, conMinimoDeCalidad, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad, sincronizarEstadosDePasivas, sangraPorSp,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

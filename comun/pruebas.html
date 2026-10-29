@@ -195,6 +195,19 @@ prueba('texto de un estado con bonos: con el nombre del stat que ve la mesa', ()
 /* ---------- Combatiente (comun/combatiente.js, paso 1 de la consolidación) ---------- */
 grupo('Combatiente');
 const E = o => ({activo: true, ...o});
+/* 🗡 Los datos de prueba escriben corta el arma de un creep o de una invocación, con campos arma* (como las recetas de comun/creeps-base.js). Desde el
+   2026-10-29 el motor solo lee el ítem de su equipo: `A(x)` la pasa ahí (sobre el mismo objeto); acá, normalizar y migrar la pasan solos. */
+const ARMA_PRUEBA = {armaNombre: 'nombre', armaTipo: 'tipoDado', armaPeso: 'peso', armaFijo: 'danoFijo', armaAmplificado: 'danoAmplificado', armaDeRango: 'armaDeRango',
+  armaManos: 'tipoItem', armaMods: 'mods', armaEfectos: 'efectosGolpe', armaDetalle: 'detalle', armaNatural: 'natural'};
+function A(x){
+  if(!x || ![...Object.keys(ARMA_PRUEBA), 'armaRasgos'].some(k => x[k] !== undefined)) return x;
+  const it = {id: 'arma-prueba'};
+  Object.entries(ARMA_PRUEBA).forEach(([k, v]) => { if(x[k] !== undefined) it[v] = x[k]; delete x[k]; });
+  if(x.armaRasgos){ Object.assign(it, x.armaRasgos); delete x.armaRasgos; }
+  Combatiente.ponerArma(x, it);
+  return x;
+}
+{ const n0 = CreepCalculo.normalizar, m0 = InvCalculo.migrar; CreepCalculo.normalizar = x => n0(A(x)); InvCalculo.migrar = x => m0(A(x)); }
 prueba('Pajaritos parte PdG y Evasión, no Parry', () => {
   const es = [E({mitadPdgEva: true})];
   igual(['pdg', 'eva', 'parry'].map(s => Combatiente.mitadesDeTirada(es, s)), [1, 1, 0]);
@@ -318,12 +331,12 @@ prueba('❄ Báculo de escarcha: ¼ del Ef.Esp para arriba y 1 de Escarcha por c
 });
 prueba('🛡 Un creep para con un báculo de sus manos, no con un orbe ni una varita; contra un disparo, solo con un escudo', () => {
   const b = CATALOGO_BASE.find(i => i.id === 'esp-buena-baculo-de-escarcha');
-  const base = {nombre: 'Chamán', armaNombre: 'Uñas', armaNatural: true, armaTipo: 6};
-  const con = eq => CreepCalculo.defensa({...base, equipo: eq});
+  const base = A({nombre: 'Chamán', armaNombre: 'Uñas', armaNatural: true, armaTipo: 6});
+  const con = eq => CreepCalculo.defensa({...base, equipo: [...base.equipo, ...eq]});
   const conBaculo = con([{...CreepCalculo.itemParaCreep(b), id: 'b'}]), soloOrbe = con([{nombre: 'Orbe salvaje', tipoItem: 'escudo_1m', orbe: true}]);
   const varita = con([{nombre: 'Varita', tipoItem: 'arma_1m', especial: {sp: 1}}]);
-  const disparo = CreepCalculo.defensa({...base, equipo: [{...CreepCalculo.itemParaCreep(b), id: 'b'}]}, {soloEscudo: true});
-  const escudo = CreepCalculo.defensa({...base, equipo: [{...CreepCalculo.itemParaCreep(b), id: 'b'}, {nombre: 'Rodela', tipoItem: 'escudo_1m', peso: 1}]}, {soloEscudo: true});
+  const disparo = CreepCalculo.defensa({...base, equipo: [...base.equipo, {...CreepCalculo.itemParaCreep(b), id: 'b'}]}, {soloEscudo: true});
+  const escudo = CreepCalculo.defensa({...base, equipo: [...base.equipo, {...CreepCalculo.itemParaCreep(b), id: 'b'}, {nombre: 'Rodela', tipoItem: 'escudo_1m', peso: 1}]}, {soloEscudo: true});
   igual([conBaculo && conBaculo.nombre, conBaculo && conBaculo.peso, soloOrbe && soloOrbe.nombre, varita && varita.nombre, disparo, escudo && escudo.nombre], ['Báculo de escarcha', 2, 'Uñas', 'Uñas', null, 'Rodela']);   // sin otra cosa, sus Uñas naturales (2026-10-21)
 });
 prueba('dos Pajaritos parten una sola vez y el cartel muestra uno', () => {
@@ -610,8 +623,8 @@ prueba('alcance y daño de un arma', () => {
 });
 prueba('el arco suma la mitad del Dmg (para arriba); otra de rango, nada; cuerpo a cuerpo, entero — personaje, creep e invocación (2026-10-09)', () => {
   const arco = {tipoItem: 'arma_2m', peso: 1, tipoDado: 4, danoFijo: 1, armaDeRango: true, arco: true};
-  const creep = {armaPeso: 2, armaTipo: 6, armaFijo: 0, armaDeRango: true, armaRasgos: Combatiente.rasgosDeItem(arco)};
-  const inv = {armaPeso: 1, armaTipo: 4, armaFijo: 0, armaDeRango: true, armaRasgos: {arco: true}};
+  const creep = A({armaPeso: 2, armaTipo: 6, armaFijo: 0, armaDeRango: true, armaRasgos: Combatiente.rasgosDeItem(arco)});
+  const inv = A({armaPeso: 1, armaTipo: 4, armaFijo: 0, armaDeRango: true, armaRasgos: {arco: true}});
   igual([Combatiente.dmgDelArma({}, 5), Combatiente.dmgDelArma(arco, 5), Combatiente.dmgDelArma(arco, 4), Combatiente.dmgDelArma({armaDeRango: true}, 5),
     Combatiente.dmgDelArma({armaDeRango: false, arco: true}, 5), FichaCombate.armaDanoTxt(arco, 5), CreepCalculo.danoTxt(creep, 3), InvCalculo.danoTxt(inv, 6),
     Combatiente.dmgDelArmaTxt(arco), Combatiente.dmgDelArmaTxt({armaDeRango: true}), Combatiente.dmgDelArmaTxt({})],
@@ -619,8 +632,8 @@ prueba('el arco suma la mitad del Dmg (para arriba); otra de rango, nada; cuerpo
 });
 prueba('el arco: distancia mínima (2 casilleros libres) y sin ataque de oportunidad, para el ítem y el arma de un creep (2026-10-09, P183)', () => {
   const arco = {armaDeRango: true, arco: true}, ballesta = {armaDeRango: true}, espada = {};
-  const creepArco = {armaTipo: 4, armaDeRango: true, armaRasgos: {arco: true}, nitros: 9, hp: 10};
-  const creepEspada = {armaTipo: 6, nitros: 9, hp: 10};
+  const creepArco = A({armaTipo: 4, armaDeRango: true, armaRasgos: {arco: true}, nitros: 9, hp: 10});
+  const creepEspada = A({armaTipo: 6, nitros: 9, hp: 10});
   igual([Combatiente.ARCO_LIBRES, Combatiente.arcoMuyCerca(arco, 1), Combatiente.arcoMuyCerca(arco, 2), Combatiente.arcoMuyCerca(arco, 3), Combatiente.arcoMuyCerca(ballesta, 1),
     Combatiente.sirveDeOportunidad(arco), Combatiente.sirveDeOportunidad(ballesta), Combatiente.sirveDeOportunidad(espada),
     Combatiente.ataqueDeArma(arco).arco, Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(creepArco)).arco, Combatiente.ataqueDeArma(espada).arco,
@@ -629,7 +642,7 @@ prueba('el arco: distancia mínima (2 casilleros libres) y sin ataque de oportun
 });
 prueba('la Recarga de la ballesta (2026-10-10): N, 2N, 3N… No2; no suma Dmg; un arco o una cuerpo a cuerpo no la tienen', () => {
   const bal = {armaDeRango: true, recarga: 2, tipoDado: 6}, asedio = {armaDeRango: true, recarga: 3}, arcoR = {armaDeRango: true, arco: true, recarga: 2}, espada = {recarga: 2, tipoDado: 6};
-  const creep = {nombre: 'Ballestero', armaTipo: 6, armaDeRango: true, armaRasgos: {recarga: 3}, ataquesTurno: 1};
+  const creep = A({nombre: 'Ballestero', armaTipo: 6, armaDeRango: true, armaRasgos: {recarga: 3}, ataquesTurno: 1});
   const l = Combatiente.costoAtaqueLineas({tipoArma: 6, arma: bal, hechos: 1, costo: 4, tiene: 8});
   igual([Combatiente.recargaDe(bal), Combatiente.recargaDe(arcoR), Combatiente.recargaDe(espada),
     [0, 1, 2].map(h => Combatiente.costoAtaque(6, h, bal)), [0, 1, 2].map(h => Combatiente.costoAtaque(6, h)),
@@ -642,7 +655,7 @@ prueba('Perfora N del arma (2026-10-10): viaja en el ataque, la copia el creep y
   const bal = CATALOGO_BASE.find(i => i.id === 'bal-de-guardia'), vir = CATALOGO_BASE.find(i => i.id === 'virote-perforante'), fl = CATALOGO_BASE.find(i => i.id === 'flecha-perforante');
   const arco = {armaDeRango: true, arco: true};
   igual([Combatiente.ataqueDeArma(bal).perfora, Combatiente.ataqueDeArma({perfora: 9}).perfora, Combatiente.ataqueDeArma({}).perfora, Combatiente.rasgosDeItem(bal).perfora,
-    Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente({armaDeRango: true, armaRasgos: {perfora: 2}})).perfora,
+    Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(A({armaDeRango: true, armaRasgos: {perfora: 2}}))).perfora,
     Combatiente.sirveLaMunicion(bal, vir), Combatiente.sirveLaMunicion(bal, fl), Combatiente.sirveLaMunicion(arco, vir), Combatiente.sirveLaMunicion(arco, fl), Combatiente.municionDe(bal),
     Combatiente.sirveParaParry(bal, false), Combatiente.armaParaDefensa({arma: {nombre: 'Ballesta', peso: 2}, arco: true, escudos: []})],   // con una ballesta no se parrea (2026-10-10)
     [2, 5, undefined, 2, 2, true, false, false, true, 'virote', false, null]);   // la de guardia quedó con Perfora 2 (revisión, 2026-10-11)
@@ -650,7 +663,7 @@ prueba('Perfora N del arma (2026-10-10): viaja en el ataque, la copia el creep y
 prueba('rasgos de ballesta (2026-10-10): llega cargada (gratis si no disparó el turno anterior), apuntada y atraviesa escudos viajan al ataque', () => {
   const tranq = {...CATALOGO_BASE.find(i => i.id === 'bal-de-tranquera'), cargada: true}, guerra = CATALOGO_BASE.find(i => i.id === 'bal-de-guerra'), asedio = CATALOGO_BASE.find(i => i.id === 'bal-de-asedio');
   const S0 = {ataquesArma: {}}, S1 = {ataquesArma: {[tranq.id]: 1}}, S2 = {ataquesArma: {}, descargadas: {[tranq.id]: true}};
-  const creep = {nombre: 'B', armaTipo: 6, armaDeRango: true, armaRasgos: {recarga: 2, cargada: true}, ataquesTurno: 0};
+  const creep = A({nombre: 'B', armaTipo: 6, armaDeRango: true, armaRasgos: {recarga: 2, cargada: true}, ataquesTurno: 0});
   igual([FichaCombate.costoAtaque(S0, tranq), FichaCombate.costoAtaque(S1, tranq), FichaCombate.costoAtaque(S2, tranq),
     CreepCalculo.costoAtaque(creep), CreepCalculo.costoAtaque({...creep, descargada: true}),
     Combatiente.ataqueDeArma(guerra).apuntada, Combatiente.ataqueDeArma(asedio).atraviesaEscudos, !!Combatiente.ataqueDeArma(tranq).apuntada],
@@ -704,7 +717,7 @@ prueba('Maldición extenuante (Debuffer, 2026-10-12): Extenuado +1 No2 por stack
   const ej = Combatiente.habEjecucion(hab, hab.duelo, {stat: () => 5, etq: s => s, X: 0});
   const presets = estadosPresetFicha(), lista = [];
   Combatiente.agregarEstado(lista, FichaAcciones.estadoDeSpec({nombre: 'Extenuado'}, presets));
-  const sc = {nombre: 'Coloso', armaTipo: 8, ataquesTurno: 0, nitros: 10, estados: []};
+  const sc = A({nombre: 'Coloso', armaTipo: 8, ataquesTurno: 0, nitros: 10, estados: []});
   const base = [CreepCalculo.costoAtaque(sc), CreepCalculo.costoParry(sc), CreepCalculo.costoNitrosHab(sc, {nitrosCosto: 1})];
   sc.estados = [{...lista[0]}];
   const uno = [CreepCalculo.costoAtaque(sc), CreepCalculo.costoParry(sc), CreepCalculo.costoNitrosHab(sc, {nitrosCosto: 1}), CreepCalculo.costoNitrosHab(sc, {nitrosCosto: 'ATAQUE'}), CreepCalculo.costoNitrosHab(sc, {nitrosCosto: 0})];
@@ -742,7 +755,7 @@ prueba('Maldición tormentosa (Debuffer, 2026-10-12): Atormentado saca vida al p
   Combatiente.agregarEstado(lista, FichaAcciones.estadoDeSpec({nombre: 'Atormentado'}, presets));
   const dos = [Combatiente.danoTormenta(lista, 3), Combatiente.danoTormenta(lista, 1), Combatiente.danoTormentaMover(lista, 5)];
   // Un creep: el ataque se paga y le saca vida; un escudo frena una parte. Invulnerable, nada.
-  const sc = {nombre: 'Coloso', armaTipo: 8, ataquesTurno: 0, nitros: 10, hp: 20, estados: [{...lista[0], stacks: 1}, {nombre: 'Escudo especial', activo: true, escudoMagico: 1, escudoMagicoActual: 1}]};
+  const sc = A({nombre: 'Coloso', armaTipo: 8, ataquesTurno: 0, nitros: 10, hp: 20, estados: [{...lista[0], stacks: 1}, {nombre: 'Escudo especial', activo: true, escudoMagico: 1, escudoMagicoActual: 1}]});
   CreepAcciones.pagarAtaque(sc, 'normal');
   const inv = {nombre: 'Lobo', hp: 10, estados: [{...lista[0], stacks: 1}, {nombre: 'Invulnerable', activo: true, invulnerable: true}]};
   const rInv = Combatiente.aplicarTormenta(inv, inv.estados, 4);
@@ -801,11 +814,11 @@ prueba('Empower (Support, rehecho 2026-10-22): +3 a la próxima tirada (+6 con d
   igual([dos, tras, fue, tiradas[2].r.mod - formulaParaValor(5).mod], [[1, 2, 6, 6], [0, true, 0], [3, 0, true], 0]);
 });
 prueba('🗡 La puerta única del arma (docs/plan-inventario-creeps.md, paso 1): Combatiente.armaEnMano da el arma de un creep como un ítem; las cuentas no cambian', () => {
-  const sc = ({nombre: 'Prueba', fue: 3, equipo: [], armaNombre: 'Hacha', armaTipo: 8, armaPeso: 2, armaFijo: 1, armaAmplificado: 1, armaManos: 'arma_2m',
+  const sc = A({nombre: 'Prueba', fue: 3, equipo: [], armaNombre: 'Hacha', armaTipo: 8, armaPeso: 2, armaFijo: 1, armaAmplificado: 1, armaManos: 'arma_2m',
     armaMods: [{stat: 'pdg', val: 1}], armaEfectos: [{nombre: 'Sangrado', caras: 4, exitos: 1}], armaRasgos: {perfora: 2}, armaDetalle: 'Pesada', estados: []});
   const a = Combatiente.armaEnMano(sc);
   const vacio = Combatiente.armaEnMano({});
-  const nat = Combatiente.armaEnMano({armaNombre: 'Garras', armaNatural: true});
+  const nat = Combatiente.armaEnMano(A({armaNombre: 'Garras', armaNatural: true}));
   igual([a.nombre, a.tipoItem, a.tipoDado, a.peso, a.danoFijo, a.danoAmplificado, a.mods.length, a.efectosGolpe.length, a.perfora, a.detalle, a.natural, a.equipado,
     CreepCalculo.pesoArma(sc), /^3d8/.test(CreepCalculo.danoTxt(sc, 0)), Combatiente.armaDeCombatiente === Combatiente.armaEnMano,
     [vacio.nombre, vacio.tipoDado, vacio.peso, vacio.natural], nat.natural, CreepCalculo.tarjetaPublica({...sc, hp: 5}).armaNombre],
@@ -971,7 +984,7 @@ prueba('Área con el centro pegado (Golpe al piso) y onda solo de aliados (¡A l
   igual([e.centroAlcance, e.radio, e.dano.formula, e.dano.ignoraDef, o.aliados, o.radio, 'centroAlcance' in sin, 'aliados' in sin], [1, 1, '1d10+5', false, true, 2, false, false]);
 });
 prueba('Drops fijos (2026-10-14, la Grapa del capataz): el creep los suelta siempre, del catálogo; los que no existen se ignoran', () => {
-  const sc = {id: 'k', nombre: 'Capataz kobold', nivel: 3, armaNombre: 'Garrote del capataz', equipo: [], dropsFijos: ['Grapa del capataz', 'No existe', ' ']};
+  const sc = A({id: 'k', nombre: 'Capataz kobold', nivel: 3, armaNombre: 'Garrote del capataz', equipo: [], dropsFijos: ['Grapa del capataz', 'No existe', ' ']});
   const its = CombateFin.itemsDeCreep(CATALOGO_BASE, sc), g = its.find(x => x.clave === 'k:fijo:0');
   const garrote = CATALOGO_BASE.find(x => x.nombre === 'Garrote del capataz');
   igual([CreepCalculo.dropsFijos(sc), !!g, g && g.template.consumible, g && g.template.efectoMods, its.some(x => x.clave === 'k:fijo:1'), /Grapa del capataz \(drop fijo\)/.test(CreepCalculo.dropsResumen(sc)),
@@ -1521,7 +1534,7 @@ prueba('🎯 Tiro a la cabeza (2026-10-21): el estado propio con su bono y que s
 prueba('🗡 Puñaladas (2026-10-21): un ataque con su arma que lleva la puñalada; Paso ligero', () => {
   const ar = n => armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos, 2);
   const p = ar('Puñalada por la espalda'), m = ar('Mordida a traición'), t = ar('Puñalada trapera');
-  const sc = {nombre: 'Kobold', armaTipo: 6, armaPeso: 1, estados: [], habilidades: [p, m, t]};
+  const sc = A({nombre: 'Kobold', armaTipo: 6, armaPeso: 1, estados: [], habilidades: [p, m, t]});
   const ap = Combatiente.ataqueConArreglos(p, p.duelo, {}), at = Combatiente.ataqueConArreglos(t, t.duelo, {});
   const pl = PASIVAS_BASE.find(x => x.poolId === 'pasos-silenciosos');
   igual([p.cd, m.cd, t.cd, ap.punalada, at.punalada, (ap.mods || {}).dados || 0, pl.nombre, FichaCalculo.STAT_LABEL.pasossilenciosos], [3, 3, 4, 'espalda', 'trapera', 0, 'Paso ligero', 'Paso ligero']);
@@ -1537,20 +1550,20 @@ prueba('🌀 Barrido y Coletazo (2026-10-21): la onda alrededor con el daño del
 prueba('👊 Patotear / Jauría (2026-10-21): el ataque lleva el tope de la patota (3) y cuesta 2 SP', () => {
   const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Patotear').datos, 2);
   const hb = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Jauría').datos, 2);
-  const sc = {nombre: 'Rata', armaNombre: 'Dientes', armaTipo: 6, modoSP: true, esp: 3, estados: [], habilidades: [h]};
+  const sc = A({nombre: 'Rata', armaNombre: 'Dientes', armaTipo: 6, modoSP: true, esp: 3, estados: [], habilidades: [h]});
   igual([CreepAcciones.ataqueDeHab(sc, h).manada, CreepAcciones.ataqueDeHab(sc, hb).manada, CreepCalculo.costoSpHab(sc, h), h.cd], [3, 3, 2, 3]);
 });
 prueba('🩸 Sal en la herida / Morder la herida (2026-10-21): el ataque lleva la marca, 2 SP y deja Sangrado', () => {
   const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Sal en la herida').datos, 2);
   const hb = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Morder la herida').datos, 2);
-  const sc = {nombre: 'Rata', armaNombre: 'Dientes', armaTipo: 6, modoSP: true, esp: 3, estados: [], habilidades: [h]};
+  const sc = A({nombre: 'Rata', armaNombre: 'Dientes', armaTipo: 6, modoSP: true, esp: 3, estados: [], habilidades: [h]});
   const atq = CreepAcciones.ataqueDeHab(sc, h);
   igual([atq.abrirHerida, (atq.efectos || []).some(e => e.nombre === 'Sangrado'), CreepCalculo.costoSpHab(sc, h), h.cd, !!CreepAcciones.ataqueDeHab(sc, hb).abrirHerida], [true, true, 2, 3, true]);
 });
 prueba('🪓 El que avisa no traiciona / Zarpazo erguido (2026-10-21): carga el estado, el turno siguiente queda listo y el golpe sale sin Parry y con empujón', () => {
   const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'El que avisa no traiciona').datos, 2);
   const hb = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Zarpazo erguido').datos, 2);
-  const sc = {nombre: 'Orco', armaNombre: 'Hacha', armaTipo: 8, nitros: 5, estados: [], habilidades: [h]};
+  const sc = A({nombre: 'Orco', armaNombre: 'Hacha', armaTipo: 8, nitros: 5, estados: [], habilidades: [h]});
   const p = CreepAcciones.ejecutarHab(sc, h, estadosPresetCreep(), true);
   const es = (sc.estados || []).find(e => e.golpeAnunciado);
   CreepAcciones.inicioTurno(sc, 'prueba:1', 1);
@@ -1582,7 +1595,7 @@ prueba('🧿 Mal de ojo (2026-10-21): la marca del botón, 5 SP sin No2, PdG.Esp
     [true, 3, 5, 'pdgmg', 'resmg', 'Mal de ojo']);
 });
 prueba('✍ El PdG a mano paga como el botón (2026-10-21): No2, el conteo y el golpe del Arma elemental, sin tirar', async () => {
-  let sc = {id: 'c1', nombre: 'Kobold', armaTipo: 4, nitros: 6, ataquesTurno: 0, des: 3, fue: 3, estados: [{...structuredClone(estadosPresetCreep().find(p => p.nombre === 'Arma eléctrica')), id: 'ae', activo: true}]};
+  let sc = A({id: 'c1', nombre: 'Kobold', armaTipo: 4, nitros: 6, ataquesTurno: 0, des: 3, fue: 3, estados: [{...structuredClone(estadosPresetCreep().find(p => p.nombre === 'Arma eléctrica')), id: 'ae', activo: true}]});
   const publicadas = [];
   const hk = CreepDuelo.hooks({creep: () => sc, cambiar: async (ref, fn) => fn(sc), publicar: (s, t) => publicadas.push(t), toast: () => {}, confirmar: async () => true, soy: () => true, borrarParry: () => {}});
   const ok = await hk.pagarManual({id: 'd1', atacante: {ref: 'c1'}, ataque: {tipo: 'normal'}});
@@ -1691,14 +1704,14 @@ prueba('Pajaritos también parte el PdG.Esp (2026-10-14); Pajaritos y Lento entr
     Combatiente.estadosQueParten(est, 'pdgmg').length], [1, 1, 1, 0, 1]);
 });
 prueba('🪨 La honda (2026-10-14): mitad del Dmg, alcance la mitad del Rango, sin oportunidad ni Recarga ni flechas; no es arco', () => {
-  const h = CATALOGO_BASE.find(x => x.nombre === 'Honda de piedras'), creep = {armaDeRango: true, armaRasgos: {honda: true}, armaTipo: 10};
+  const h = CATALOGO_BASE.find(x => x.nombre === 'Honda de piedras'), creep = A({armaDeRango: true, armaRasgos: {honda: true}, armaTipo: 10});
   igual([Combatiente.esHonda(h), Combatiente.esArco(h), Combatiente.dmgDelArma(h, 5), Combatiente.alcanceArmaRango(h, 11), Combatiente.alcanceArmaRango(h, 1),
     Combatiente.sirveDeOportunidad(h), Combatiente.recargaDe({...h, recarga: 2}), Combatiente.municionDe(h), Combatiente.tieneTiroAlto(h),
     Combatiente.esHonda(Combatiente.armaDeCombatiente(creep)), Combatiente.alcanceArmaRango({armaDeRango: true}, 11), Combatiente.dmgDelArmaTxt(h), /honda/.test(ItemCorto.armaEsencial(h))],
     [true, false, 3, 5, 1, false, 0, '', false, true, 11, 'honda: suma la mitad del Dmg', true]);
 });
 prueba('🐾 Equipo natural de un creep (2026-10-14): da sus bonos pero no se suelta al morir', () => {
-  const sc = {id: 'n', nombre: 'Coraza', nivel: 2, armaNombre: 'Martillo', equipo: [{id: 'a', nombre: 'Piel de piedra', tipoItem: 'armadura_rigida', def: 3, natural: true}, {id: 'b', nombre: 'Chaleco de cuero', tipoItem: 'armadura_blanda', def: 2}]};
+  const sc = A({id: 'n', nombre: 'Coraza', nivel: 2, armaNombre: 'Martillo', equipo: [{id: 'a', nombre: 'Piel de piedra', tipoItem: 'armadura_rigida', def: 3, natural: true}, {id: 'b', nombre: 'Chaleco de cuero', tipoItem: 'armadura_blanda', def: 2}]});
   const its = CombateFin.itemsDeCreep(CATALOGO_BASE, sc).map(i => i.nombre);
   igual([its.includes('Piel de piedra'), its.includes('Chaleco de cuero'), /Piel de piedra/.test(CreepCalculo.dropsResumen(sc)), CreepCalculo.tarjetaPublica({...sc, hp: 10}).equipoNombres],
     [false, true, false, ['Chaleco']]);   // (2026-10-26) lo natural que no es el arma ya no se nombra en la tarjeta
@@ -1721,7 +1734,7 @@ prueba('Ataque con arreglos: dados extra de otro tamaño (+1d6, 2026-10-13) viaj
 });
 prueba('El escudo de un creep, guardado sin peso, toma el del catálogo (contra un disparo para con el escudo)', () => {
   const tapa = CATALOGO_BASE.find(x => x.nombre === 'Tapa de tacho de basura');
-  const sc = {armaNombre: 'Palo con clavos', armaPeso: 1, equipo: [{nombre: 'Tapa de tacho de basura', tipoItem: tapa.tipoItem}]};
+  const sc = A({armaNombre: 'Palo con clavos', armaPeso: 1, equipo: [{nombre: 'Tapa de tacho de basura', tipoItem: tapa.tipoItem}]});
   const d = CreepCalculo.defensa(sc, {soloEscudo: true});
   igual([d.nombre, d.peso, CreepCalculo.defensa(sc).nombre], ['Tapa de tacho de basura', num(tapa.peso), 'Palo con clavos']);
 });
@@ -1731,9 +1744,9 @@ prueba('Puntos de atributo de un creep: 33 + 3 por nivel después del primero; d
     ['Puntos de atributo: 33 de 33 ✓', 'Puntos de atributo: 33 de 36 · faltan 3', 'Puntos de atributo: 36 de 33 · 3 de más']);
 });
 prueba('La 🪪 de un creep vivo muestra solo qué lleva; derrotado, los nombres (2026-10-13)', () => {
-  const sc = {hp: 10, armaNombre: 'Pico de juguete', armaNatural: false, equipo: [{nombre: 'Varita del susurro'}, {nombre: 'Capucha de lana del culto'}, {nombre: 'Buena varita del relámpago'}]};
+  const sc = A({hp: 10, armaNombre: 'Pico de juguete', armaNatural: false, equipo: [{nombre: 'Varita del susurro'}, {nombre: 'Capucha de lana del culto'}, {nombre: 'Buena varita del relámpago'}]});
   const vivo = CreepCalculo.tarjetaPublica(sc), muerto = CreepCalculo.tarjetaPublica({...sc, hp: 0});
-  const nat = CreepCalculo.tarjetaPublica({hp: 5, armaNombre: 'Dientes de rata', armaNatural: true, equipo: []});
+  const nat = CreepCalculo.tarjetaPublica(A({hp: 5, armaNombre: 'Dientes de rata', armaNatural: true, equipo: []}));
   igual([vivo.armaNombre, vivo.equipoNombres, muerto.armaNombre, muerto.equipoNombres[0], nat.armaNombre],
     ['Pico', ['Varita', 'Capucha', 'Varita'], 'Pico de juguete', 'Varita del susurro', 'Dientes de rata']);
 });
@@ -1883,7 +1896,7 @@ prueba('la distancia ideal de un arma de rango: dónde está y qué da (2026-10-
 prueba('el tiro alto: todos los arcos lo tienen salvo «sin tiro alto»; otra arma de rango, solo si lo trae (2026-10-09)', () => {
   igual([Combatiente.tieneTiroAlto({armaDeRango: true, arco: true}), Combatiente.tieneTiroAlto({armaDeRango: true, arco: true, sinTiroAlto: true}),
     Combatiente.tieneTiroAlto({armaDeRango: true}), Combatiente.tieneTiroAlto({armaDeRango: true, tiroAlto: true}), Combatiente.tieneTiroAlto({arco: true}),
-    Combatiente.tieneTiroAlto(Combatiente.armaDeCombatiente({armaDeRango: true, armaRasgos: {arco: true}})), Combatiente.tieneTiroAlto(Combatiente.armaDeCombatiente({armaDeRango: true, armaRasgos: {arco: true, sinTiroAlto: true}})),
+    Combatiente.tieneTiroAlto(Combatiente.armaDeCombatiente(A({armaDeRango: true, armaRasgos: {arco: true}}))), Combatiente.tieneTiroAlto(Combatiente.armaDeCombatiente(A({armaDeRango: true, armaRasgos: {arco: true, sinTiroAlto: true}}))),
     Combatiente.ataqueDeArma({armaDeRango: true, arco: true}).tiroAlto, Combatiente.ataqueDeArma({armaDeRango: true, arco: true, sinTiroAlto: true}).tiroAlto],
     [true, false, false, true, false, true, false, true, undefined]);
 });
@@ -1894,7 +1907,7 @@ prueba('las mecánicas de arco: largo alcance, afinidad, lo que viaja al ataque 
   igual([Combatiente.largoAlcance(arco, 7, 5), Combatiente.largoAlcance(arco, 5, 5), Combatiente.largoAlcance(arco, 10, 5), Combatiente.largoAlcance({armaDeRango: true, largoAlcance: 2}, 6, 4),
     Combatiente.largoAlcance({armaDeRango: true}, 7, 5), Combatiente.alcanceMaximo(arco, 5), Combatiente.alcanceMaximo({armaDeRango: true}, 5),
     [at.tensar, at.largoAlcance, at.emboscada, at.matabestias, at.contraMarcado, at.espaldaDistancia, at.afinidad], Combatiente.ataqueDeArma({tensar: 2}).tensar,
-    Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente({armaDeRango: true, armaRasgos: {arco: true, matabestias: 3}})).matabestias,
+    Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(A({armaDeRango: true, armaRasgos: {arco: true, matabestias: 3}}))).matabestias,
     Combatiente.afinidadEfectos(fuego).map(e => e.dado), Combatiente.rasgosDeItem(arco).largoAlcance, Combatiente.arcoRasgosTxt(arco)],
     [{extra: 2, pdg: -2}, null, null, {extra: 2, pdg: -4}, null, 9, 5,
      [2, 1, 2, 2, 1, {pdg: 2, fijo: 1}, true], undefined, 3, ['1d4+1', undefined], 1,
@@ -1983,8 +1996,8 @@ prueba('con un arco no se parrea; contra un disparo, Parry solo con escudo (2026
   const arco = {id: 'arco1', nombre: 'Arco', tipoItem: 'arma_2m', peso: 1, tipoDado: 4, armaDeRango: true, arco: true, equipado: true};
   S.inventario = [arco];
   const escudo = {tipoItem: 'escudo_1m', nombre: 'Rodela'}, espada = {tipoItem: 'arma_1m', nombre: 'Espada'};
-  const creepEsc = {armaNombre: 'Espada', armaTipo: 6, equipo: [{nombre: 'Rodela', tipoItem: 'escudo_1m', peso: 2}]};
-  const creepArco = {armaNombre: 'Arco', armaTipo: 4, armaDeRango: true, armaRasgos: {arco: true}, equipo: []};
+  const creepEsc = A({armaNombre: 'Espada', armaTipo: 6, equipo: [{nombre: 'Rodela', tipoItem: 'escudo_1m', peso: 2}]});
+  const creepArco = A({armaNombre: 'Arco', armaTipo: 4, armaDeRango: true, armaRasgos: {arco: true}, equipo: []});
   igual([FichaCombate.armasYEscudosParaParry(S).length, Combatiente.contraDisparo({ataque: {tipo: 'normal', rango: true}}), Combatiente.contraDisparo({ataque: {tipo: 'habilidad', rango: true}}),
     Combatiente.sirveParaParry(espada, false), Combatiente.sirveParaParry(espada, true), Combatiente.sirveParaParry(escudo, true), Combatiente.sirveParaParry(arco, false),
     (CreepCalculo.defensa(creepEsc) || {}).nombre, (CreepCalculo.defensa(creepEsc, {soloEscudo: true}) || {}).nombre, CreepCalculo.defensa(creepArco)],
@@ -2923,31 +2936,25 @@ prueba('el Ankh a mano revive con el 25 % del HP máximo y gasta una unidad', ()
 grupo('Reglas de un creep (paso 4, etapa 4)');
 const creepPrueba = extra => CreepCalculo.normalizar(Object.assign({nombre: 'Orco', con: 4, fue: 5, agl: 3, des: 4, esp: 2, hp: 20, hpMax: 20,
   armaNombre: 'Hacha', armaTipo: 8, armaPeso: 2, armaFijo: 1, defensa: 3, equipo: [], estados: [], habilidades: [], escalaTipos: 2}, extra || {}));
-prueba('🗡 Armas como ítems, paso 2 (docs/plan-inventario-creeps.md): al cargar, el arma suelta de un creep o una invocación pasa a ser un ítem de su equipo; un dato suelto se combina; no cuenta ni se suelta dos veces', () => {
+prueba('🗡 Armas como ítems (docs/plan-inventario-creeps.md): el arma de un creep o una invocación es un ítem de su equipo; sus bonos cuentan una vez, se reemplaza en su lugar y se suelta una sola vez; los campos sueltos de antes ya no se leen (2026-10-29)', () => {
   const escudo = {id: 'e1', nombre: 'Escudo pequeño', tipoItem: 'escudo_1m', def: 1, peso: 1, mods: [{stat: 'parry', val: 1}]};
   const sc = creepPrueba({armaMods: [{stat: 'pdg', val: 2}], armaEfectos: [{nombre: 'Sangrado', caras: 4, exitos: 1}], armaRasgos: {perfora: 1}, equipo: [escudo]});
   const it = Combatiente.armaPrincipal(sc);
-  const convertido = [Combatiente.tieneCamposArma(sc), sc.armaNombre, sc.equipo.length, sc.equipo[0] === escudo, it && it.nombre, it && it.tipoDado, it && it.peso,
+  const arma = [sc.armaNombre, sc.equipo.length, sc.equipo[0] === escudo, it && it.nombre, it && it.tipoDado, it && it.peso,
     it && it.danoFijo, it && it.perfora, it && it.equipado, Combatiente.equipoSinArma(sc).map(x => x.nombre)];
-  // los bonos del arma cuentan una sola vez
-  const pdg = CreepCalculo.modTotal(sc, 'pdg');
-  // un formulario viejo cambia un solo dato: se combina con el ítem (no se pierde el resto)
-  sc.armaNatural = true;
-  const comb = Combatiente.armaEnMano(sc);
-  CreepCalculo.normalizar(sc);
-  const trasNorm = [Combatiente.tieneCamposArma(sc), Combatiente.armaPrincipal(sc).natural, Combatiente.armaPrincipal(sc).nombre, Combatiente.armaPrincipal(sc).perfora, sc.equipo.length];
+  const pdg = CreepCalculo.modTotal(sc, 'pdg');   // los bonos del arma cuentan una sola vez
   // reemplazar el arma: ocupa su lugar
   Combatiente.ponerArma(sc, {nombre: 'Lanza', tipoItem: 'arma_2m', tipoDado: 6, peso: 3});
   const trasPoner = [sc.equipo.length, Combatiente.armaEnMano(sc).nombre, Combatiente.armaEnMano(sc).peso, sc.equipo.some(x => x.nombre === 'Hacha')];
   // el botín: el arma una vez (como arma) y el escudo como equipo
   const sc2 = creepPrueba({equipo: [structuredClone(escudo)]});
   const botin = CombateFin.itemsDeCreep(CATALOGO_BASE, sc2).map(x => x.nombre);
-  // la invocación
   const inv = InvCalculo.migrar({nombre: 'Esqueleto', armaNombre: 'Espada rota', armaTipo: 6, armaPeso: 1, equipo: []});
-  igual([convertido, pdg, [comb.natural, comb.nombre], trasNorm, trasPoner, botin.filter(n => n === 'Hacha').length, botin.includes('Escudo pequeño'),
-    [Combatiente.tieneCamposArma(inv), Combatiente.armaEnMano(inv).nombre, Combatiente.armaEnMano(inv).tipoDado, inv.equipo.length]],
-    [[false, undefined, 2, true, 'Hacha', 8, 2, 1, 1, true, ['Escudo pequeño']], 2, [true, 'Hacha'], [false, true, 'Hacha', 1, 2], [2, 'Lanza', 3, false], 1, true,
-     [false, 'Espada rota', 6, 1]]);
+  // la forma vieja (campos sueltos), sin pasar por A: el motor ya no la lee — pelea sin arma
+  const viejo = Combatiente.armaEnMano({armaNombre: 'Hacha vieja', armaTipo: 10});
+  igual([arma, pdg, trasPoner, botin.filter(n => n === 'Hacha').length, botin.includes('Escudo pequeño'),
+    [Combatiente.armaEnMano(inv).nombre, Combatiente.armaEnMano(inv).tipoDado, inv.equipo.length], [viejo.sinArma, viejo.tipoDado, 'tieneCamposArma' in Combatiente, 'pasarArmaAItem' in Combatiente]],
+    [[undefined, 2, true, 'Hacha', 8, 2, 1, 1, true, ['Escudo pequeño']], 2, [2, 'Lanza', 3, false], 1, true, ['Espada rota', 6, 1], [true, 4, false, false]]);
 });
 prueba('✨ Armas invocadas (paso 4B): lo que trae una invocación es suyo; lo levantado no; un arma invocada no va al botín', () => {
   const inv = InvCalculo.migrar({nombre: 'Esqueleto', equipo: [{id: 'a', nombre: 'Espada rota', tipoItem: 'arma_1m', tipoDado: 6, equipado: true},
@@ -2955,13 +2962,6 @@ prueba('✨ Armas invocadas (paso 4B): lo que trae una invocación es suyo; lo l
   const sc = creepPrueba({equipo: [{id: 'z', nombre: 'Escudo pequeño', tipoItem: 'escudo_1m', def: 1, invocadaDe: 'f~i', equipado: true}]});
   const botin = CombateFin.itemsDeCreep(CATALOGO_BASE, sc).map(x => x.nombre);
   igual([inv.equipo.map(x => x.invocada), botin.includes('Escudo pequeño'), botin.includes('Hacha')], [[true, false, undefined], false, true]);
-});
-prueba('🗡 Paso 2: un creep ya convertido armado encima de los valores por defecto viejos («sin nombre, Tipo 8») no pierde su arma', () => {
-  const guardado = creepPrueba({});   // convertido: la Hacha en su equipo
-  const viejo = {armaTipo: 8, armaPeso: 1, armaFijo: 0, armaAmplificado: 0, armaDeRango: false, armaNombre: '', armaDetalle: '', armaMods: [], armaEfectos: [], armaManos: 'arma_1m', armaNatural: false};
-  const sc = CreepCalculo.normalizar(Object.assign(viejo, structuredClone(guardado)));
-  const a = Combatiente.armaEnMano(sc);
-  igual([a.nombre, a.tipoDado, a.peso, a.danoFijo, Combatiente.tieneCamposArma(sc), sc.equipo.filter(Combatiente.esArmaDeMano).length], ['Hacha', 8, 2, 1, false, 1]);
 });
 prueba('🛡 Armas como ítems, paso 3: la Defensa y la Res. a crítico del equipo de un creep o una invocación, en vivo; convertir no cambia los totales', () => {
   // un creep viejo: la Defensa (3 base + 2 del casco) y el crítico (1 del casco) ya sumados al guardarlo
@@ -3041,9 +3041,9 @@ prueba('recompensas de un creep: oro sugerido por tipo y nivel (jefe ×2), trofe
 });
 prueba('🏹 la munición la decide el arma (2026-10-19): arco → una flecha, ballesta → un virote; el consumible al azar no trae munición', () => {
   const cat = CATALOGO_BASE.filter(i => i.tipoItem && !i.archivo).map(CreepCalculo.itemParaCreep);
-  const arquero = {id: 'a', tipoCriatura: 'humano', nivel: 3, armaDeRango: true, armaNombre: 'Arco corto'};
-  const ballestero = {id: 'b', tipoCriatura: 'humano', nivel: 3, armaDeRango: true, armaNombre: 'Ballesta pesada'};
-  const espada = {id: 'c', tipoCriatura: 'humano', nivel: 3, armaNombre: 'Espada corta'};
+  const arquero = A({id: 'a', tipoCriatura: 'humano', nivel: 3, armaDeRango: true, armaNombre: 'Arco corto'});
+  const ballestero = A({id: 'b', tipoCriatura: 'humano', nivel: 3, armaDeRango: true, armaNombre: 'Ballesta pesada'});
+  const espada = A({id: 'c', tipoCriatura: 'humano', nivel: 3, armaNombre: 'Espada corta'});
   const orig = Math.random; let res = [];
   try{
     for(let k = 0; k < 40; k++){
@@ -3053,8 +3053,8 @@ prueba('🏹 la munición la decide el arma (2026-10-19): arco → una flecha, b
       res.push([a.filter(fl).length === 1 && a.filter(fl).every(x => !x.template.flecha.virote), b.filter(fl).length === 1 && b.filter(fl).every(x => x.template.flecha.virote), c.filter(fl).length === 0]);
     }
   }finally{ Math.random = orig; }
-  igual([CombateFin.municionDeCreep(arquero), CombateFin.municionDeCreep(ballestero), CombateFin.municionDeCreep(espada), CombateFin.municionDeCreep({armaNombre: 'Arco largo'}),
-    res.every(r => r[0]), res.every(r => r[1]), res.every(r => r[2]), CombateFin.dropEsperado(cat, {tipoCriatura: 'bestia', nivel: 1, armaDeRango: true, armaNombre: 'Ballesta'}).venta > 0],
+  igual([CombateFin.municionDeCreep(arquero), CombateFin.municionDeCreep(ballestero), CombateFin.municionDeCreep(espada), CombateFin.municionDeCreep(A({armaNombre: 'Arco largo'})),
+    res.every(r => r[0]), res.every(r => r[1]), res.every(r => r[2]), CombateFin.dropEsperado(cat, A({tipoCriatura: 'bestia', nivel: 1, armaDeRango: true, armaNombre: 'Ballesta'})).venta > 0],
     ['flecha', 'virote', '', '', true, true, true, true]);
 });
 prueba('Crítico frecuente/potente y PdG de oportunidad/contraataque son bonos de regla, no stats de la Destreza (2026-10-20)', () => {
@@ -3098,12 +3098,12 @@ prueba('🎁 arquetipos del botín (2026-10-20): choque pesado, choque liviano, 
       it.forEach(d => { total++; const a = F.arquetiposBotin(d.template); if(!a.includes('caster') && !a.includes('universal')) fuera++; if(/Cuerda/.test(d.nombre)) cuerda = true; });
     }
   }finally{ Math.random = orig; }
-  const arquero = {id: 'q', tipoCriatura: 'humano', nivel: 3, des: 8, agl: 5, fue: 3, armaDeRango: true, armaNombre: 'Arco corto', cinturon: []};
+  const arquero = A({id: 'q', tipoCriatura: 'humano', nivel: 3, des: 8, agl: 5, fue: 3, armaDeRango: true, armaNombre: 'Arco corto', cinturon: []});
   F.darConsumiblesAlAzar(arquero, cat);
   const flecha = arquero.cinturon.find(i => i.flecha);
   arquero.cinturon = [];   // usó todo
   const drops = F.dropDeCreep(F.nuevo(), cat, arquero).map(d => d.nombre);
-  igual([K.arquetipos({fue: 8, con: 6, esp: 2}), K.arquetipos({des: 8, agl: 6, fue: 3}), K.arquetipos(mago), K.arquetipos({esp: 9, fue: 2, armaDeRango: true, armaNombre: 'Ballesta pesada'}),
+  igual([K.arquetipos({fue: 8, con: 6, esp: 2}), K.arquetipos({des: 8, agl: 6, fue: 3}), K.arquetipos(mago), K.arquetipos(A({esp: 9, fue: 2, armaDeRango: true, armaNombre: 'Ballesta pesada'})),
     K.arquetipos({fue: 8, arquetipos: ['mago', 'trampero']}),
     arq('Poción de HP'), arq('Poción de SP'), arq('Pergamino de Furia Arcana'), arq('Trampa de oso'), arq('Runa de debilidad'), arq('Vela de sebo'), arq('Poción de Fuerza del Toro'),
     arq('Poción de Paso Fantasma'), arq('Poción de Puntería Certera'), arq('Poción de Alcance Extendido'), arq('Elixir de piedra eterna'),

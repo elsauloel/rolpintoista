@@ -34,8 +34,7 @@ const CreepCalculo = (() => {
   function migrarObjTipos(o){
     if(!o || typeof o !== 'object') return;
     if(num(o.tipoDado) > 0) o.tipoDado = num(o.tipoDado) + 2;
-    if(num(o.armaTipo) > 0) o.armaTipo = num(o.armaTipo) + 2;
-    ['detalle', 'descripcionNarrativa', 'efectoDetalle', 'equipoEstadoDetalle', 'armaDetalle', 'notas']
+    ['detalle', 'descripcionNarrativa', 'efectoDetalle', 'equipoEstadoDetalle', 'notas']
       .forEach(k => { if(typeof o[k] === 'string') o[k] = correrTiposTexto(o[k]); });
   }
 
@@ -55,7 +54,7 @@ const CreepCalculo = (() => {
     (Array.isArray(o.mods) ? o.mods : []).forEach(m => { if(m && m.stat === 'int') m.stat = 'esp'; });
     (Array.isArray(o.efectoMods) ? o.efectoMods : []).forEach(m => { if(m && m.stat === 'int') m.stat = 'esp'; });
     if(o.tiradaStat === 'int') o.tiradaStat = 'esp';
-    ['detalle', 'descripcionNarrativa', 'efectoDetalle', 'equipoEstadoDetalle', 'armaDetalle', 'notas'].forEach(k => {
+    ['detalle', 'descripcionNarrativa', 'efectoDetalle', 'equipoEstadoDetalle', 'notas'].forEach(k => {
       if(typeof o[k] === 'string') o[k] = o[k].replace(/Inteligencia/g, 'Especial').replace(/inteligencia/g, 'especial');
     });
   }
@@ -591,7 +590,6 @@ const CreepCalculo = (() => {
     migrarCreepTipos(sc);
     migrarCreepEspecial(sc);
     migrarHabPdg(sc);
-    Combatiente.pasarArmaAItem(sc);   // 🗡 su arma, un ítem de su lista (docs/plan-inventario-creeps.md, paso 2): los campos arma* sueltos se convierten
     Combatiente.pasarEquipoVivo(sc);   // 🛡 paso 3: la Defensa y la Res. a crítico del equipo, en vivo (una vez: le resta lo que ya traía sumado)
     if(Array.isArray(sc.estados)) sc.estados = sc.estados.filter(e => !Combatiente.esDesarmado(e));   // ✋ paso 5: Desarmado ya no es un estado (P217)
     // Recompensas (2026-09-20): los creeps viejos no las traen.

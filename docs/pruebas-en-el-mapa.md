@@ -266,7 +266,7 @@
 
 ## Pendientes
 
-- [ ] **🧹 Las armas de los creeps después de la limpieza (2026-10-29, 761fcb2a)**: el motor ya no lee los campos viejos (armaNombre, armaTipo…). Revisado por
+- [x] **🧹 Las armas de los creeps después de la limpieza (2026-10-29, 761fcb2a)** — ✅ **probado el mismo día en el mapa** (las dos cuentas, con pestañas nuevas: las viejas estaban congeladas): las Acciones del Warrior (Hacha: Atacar 4 No2, Daño 1d8+12, Parry y Bloqueo con su peso), su ataque a juan («con Hacha · Tipo 8», «Rompe armadura 50 %»), su 🪪 desde el jugador («Hacha · Escudo · Chaleco»), la Botonera del Lobo de prueba de Clementino (Arco corto: 2 No2, 1d4+2, sin Parry) y GM Tools (los 21 creeps leen su arma; la Abeja curandera agregada de la biblioteca de fábrica trae el Aguijón dulce como ítem). Lo de antes: el motor ya no lee los campos viejos (armaNombre, armaTipo…). Revisado por
   datos: los 14 creeps visibles de «Claude · pruebas» leen bien su arma (Hacha, Arco corto, Bate de Baseball…; sin arma solo el Estandarte, el Tótem y el
   Goblin de prueba, que no tienen). **Falta verlo en el mapa con capturas** (las dos ventanas de Chrome estaban minimizadas): un creep ataca con su arma
   (el Warrior con la Hacha) y el duelo la nombra; una invocación ataca; el 🔍 Ver de un creep y la 🪪 muestran el arma; en GM Tools, el arma en la ficha del

@@ -459,7 +459,7 @@ const FichaEquipo = (() => {
       <div style="grid-column:-2 / -1;min-width:0">${Combatiente.resElementalesHtml(el => cEq.final['res' + el], el => lupa(`defensa:res${el}`))}</div>   <!-- debajo de la de crítico (la última columna) -->
     </div>
   </div>`;
-    return resumen + pesoEq + repararHtml(S, !!(o.enCombate)) + `<div class="equipo-cols">
+    return resumen + estadoEquipoHtml(S, equipados) + pesoEq + repararHtml(S, !!(o.enCombate)) + `<div class="equipo-cols">
     <div><h4 class="equipo-tit">Equipado</h4>${izq}${carcajHtml(S)}</div>
     <div><h4 class="equipo-tit">Mochila${typeof Intercambio !== 'undefined' ? ` <button type="button" class="mini" data-ix-abrir-dar="" title="Pasarle a otro personaje un ítem (también pociones y trofeos), DDE o despojos, o convertir un ítem en despojos (♻)">🤝 Pasar · ♻</button>` : ''}</h4>${der || '<div class="hint">No hay nada equipable en la mochila.</div>'}</div>
   </div>`;
@@ -486,6 +486,28 @@ const FichaEquipo = (() => {
     if(it.dur >= FichaCalculo.durMax(it)) delete it.reparoRoto;
     it.armRota = Math.max(0, FichaCalculo.armRotaDe(it) - q);
     return q;
+  }
+  /* 🛠 El estado del equipo (2026-10-29, dueño: «abajo del primer set de información del equipo, si parte del equipo está roto, que aclare bien
+     cómo está la condición de durabilidad, con detalles»): cada pieza puesta que esté gastada, dañada o rota, con su durabilidad, la Defensa que da
+     ahora y qué significa. */
+  function estadoEquipoHtml(S, equipados){
+    const dur = (equipados || []).filter(FichaCalculo.durableItem);
+    const defDe = it => (it.mods || []).filter(m => m.stat === 'def').reduce((a, m) => a + num(m.val), 0);
+    const mal = dur.filter(it => FichaCalculo.durActual(it) < FichaCalculo.durMax(it) || FichaCalculo.armRotaDe(it) > 0);
+    if(!mal.length) return dur.length ? '<div class="equipo-estado ok">✔ <b>Estado del equipo:</b> todo lo que tenés puesto está entero.</div>' : '';
+    const filas = mal.map(it => {
+      const max = FichaCalculo.durMax(it), act = FichaCalculo.durActual(it), ar = FichaCalculo.armRotaDe(it), roto = act <= 0, esEsc = FichaCalculo.esEscudoItem(it);
+      const d0 = defDe(it), menos = FichaCalculo.pierdeDefPorRotura(it) ? Math.min(ar, Math.max(0, d0)) : 0;
+      const lin = [`Durabilidad <b>${fmt(act)} de ${fmt(max)}</b>`];
+      if(roto) lin.push('<b>ROTO</b>: sigue ocupando su lugar, pero <b>no da ningún efecto</b> (ni Defensa ni bonos) hasta repararlo');
+      else{
+        if(menos > 0) lin.push(`${esEsc ? 'abollado' : 'Armadura rota'} ×${fmt(ar)}: da <b>Defensa ${fmt(d0 - menos)}</b> en vez de ${fmt(d0)} (−${fmt(menos)}) hasta que lo reparen`);
+        if(act === 1) lin.push('⚠ le queda 1 punto: el próximo lo rompe y se anulan todos sus efectos');
+      }
+      return `<div class="equipo-estado-fila${roto ? ' roto' : act <= 1 ? ' casi' : ''}"><div class="equipo-estado-nombre">${roto ? '💥' : menos > 0 ? (esEsc ? '🛡' : '🔨') : '🔧'} ${esc(it.nombre)}</div><div>${lin.join(' · ')}</div></div>`;
+    }).join('');
+    return `<div class="equipo-estado"><div class="equipo-estado-tit">🛠 Estado del equipo</div>${filas}
+      <div class="hint" style="margin-top:6px">Cada punto de Romper armadura baja 1 la durabilidad de la pieza y 1 la Defensa que da, hasta que la reparen. Si la durabilidad llega a 0, la pieza se rompe y se anulan todos sus efectos. Se repara fuera de combate: el herrero de una tienda, el talento de reparar o un Óleo reparador.</div></div>`;
   }
   function repararHtml(S, enCombate){
     const tal = talentoReparar(S), oleos = oleosDe(S);

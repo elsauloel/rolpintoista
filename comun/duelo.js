@@ -607,6 +607,8 @@ const Duelo = (() => {
     }
     if(_num(cfg.ataque.alejarse) > 0 && !hab) inicial.ataque.alejarse = Math.min(4, Math.round(_num(cfg.ataque.alejarse)));   // 💨 Picar y alejarse (2026-10-21)
     if(cfg.ataque.atraviesaEscudos && !hab) inicial.ataque.atraviesaEscudos = true;
+    if(Array.isArray(cfg.ataque.rompeEscudo) && cfg.ataque.rompeEscudo.length && !hab)   // 🛡 Romper armadura del arma de rango: si lo paran con un escudo (el mapa, js/26)
+      inicial.ataque.rompeEscudo = cfg.ataque.rompeEscudo.slice(0, 3).map(e => ({nombre: txtCorto(e.nombre || 'Rompe armadura', 40), caras: Math.max(1, Math.min(20, Math.round(_num(e.caras)) || 1)), exitos: Math.max(1, Math.min(20, Math.round(_num(e.exitos)) || 1)), stacks: Math.max(1, Math.min(5, Math.round(_num(e.stacks)) || 1))}));
     if(cfg.ataque.puntaDiamante && !hab) inicial.ataque.puntaDiamante = true;   // contra Defensa 12 o más, Perfora +2 (el mapa, 2026-10-11)
     if(cfg.ataque.remachadora && !hab) inicial.ataque.remachadora = true;   // golpes seguidos al mismo blanco, Perfora +1 cada uno (el mapa del GM)   // si lo paran con escudo, el escudo se abolla (el mapa, js/26)
     const tiro = cfg.tiro && !hab ? limpiarTiroBono(cfg.tiro) : null;

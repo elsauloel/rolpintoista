@@ -4062,6 +4062,12 @@ prueba('Degollar (2026-10-10): +4 PdG, +7, +1/+1 al crítico, termina el turno; 
     filtradas.filter(o => !o.motivoNo).map(o => o.modo), /Expuesto/.test((filtradas.find(o => o.modo === 'parry') || {}).motivoNo || ''), sinNada.length, Combatiente.expuesto(S.efectos), venc.quedan.length, /deja/i.test(deg.detalle) || /orden de turnos/.test(deg.detalle)],
     ['7', 'ATAQUE', 4, 7, 1, 1, true, true, 'Expuesto', true, true, 1, 0, ['Expuesto'], ['evasion'], true, 2, true, 0, true]);
 });
+prueba('🛡 Romper armadura de un arma de rango viaja en el ataque, para el escudo que lo pare (2026-10-29)', () => {
+  const bal = {armaDeRango: true, tipoDado: 4, efectosGolpe: [{nombre: 'Rompe armadura', caras: 2, exitos: 1}, {nombre: 'Sangrado', caras: 1, exitos: 1}]};
+  const at = Combatiente.ataqueDeArma(bal), melee = Combatiente.ataqueDeArma({tipoDado: 8, efectosGolpe: [{nombre: 'Rompe armadura x3', caras: 2, exitos: 1}]});
+  igual([(at.rompeEscudo || []).length, at.rompeEscudo && at.rompeEscudo[0].caras, melee.rompeEscudo, Combatiente.esRompeArmadura({nombre: 'Armadura rota doble'}), Combatiente.esRompeArmadura({nombre: 'Sangrado'})],
+    [1, 2, undefined, true, false]);
+});
 prueba('🚫 El Parry que no se puede usar se ve apagado, con el motivo (2026-10-29): golpe sin Parry, Expuesto', () => {
   const ops = [{modo: 'evasion', info: []}, {modo: 'parry', costo: 1, info: []}];
   const sp = Combatiente.sinParryDelAtaque(ops, {ataque: {sinParry: true, habNombre: 'Golpe de escudo'}});

@@ -57,6 +57,40 @@ async function dueloAtraviesaEscudo(d){
   const r = await dueloAplicarEfecto(d, {nombre: 'Rompe armadura', caras: 1, exitos: 1, dado: '', detalle: 'El escudo se abolla: 1 stack de Armadura rota.'});
   mesaLinea(`🛡 ${d.ataque.armaNombre || 'El disparo'} atraviesa escudos: ${quien} lo paró, pero el escudo se abolló${r && r.nota ? ` — ${r.nota}` : ' (1 stack de Armadura rota)'}`);
 }
+/* 🛡 Romper armadura de un proyectil parado con un escudo (2026-10-29, dueño: «si alguien detiene un proyectil con un escudo, con un parry, y ese
+   proyectil tiene adjunto romper armadura, debe aplicarle romper armadura específicamente al escudo: bajarle uno la defensa que otorga y uno la
+   durabilidad; si el efecto es con porcentaje, aplica las mismas condiciones»). Del arma de rango (`ataque.rompeEscudo`) y de la flecha o el
+   virote especial (sus efectos). Con porcentaje, se tira (a la Mesa). A un personaje, a ese escudo (el Aviso lo ve su jugador); a un creep, su
+   Armadura rota. Lo hace el GM al ver el duelo «bloqueado», como Atraviesa escudos. */
+async function dueloRompeEscudo(d){
+  if(!d || d.hab || !d.ataque || d.bloq || d.resultado !== 'bloqueado' || !Combatiente.contraDisparo(d) || !d.defensa || d.defensa.modo !== 'parry') return;
+  const deFlecha = (d.ataque.flecha && Array.isArray(d.ataque.flecha.efectos) ? d.ataque.flecha.efectos : []).filter(Combatiente.esRompeArmadura)
+    .map(e => ({nombre: e.nombre, caras: Math.max(1, Math.round(num(e.caras)) || 1), exitos: Math.max(1, Math.round(num(e.exitos)) || 1), stacks: Math.max(1, Math.round(num(e.stacks)) || 1), de: d.ataque.flecha.nombre}));
+  const lista = [...(d.ataque.rompeEscudo || []).map(e => ({...e, de: d.ataque.armaNombre || 'El disparo'})), ...deFlecha];
+  if(!lista.length) return;
+  const quien = d.defensor.nombre || 'el defensor', escudo = d.defensa.itemNombre || 'el escudo';
+  let stacks = 0;
+  for(const e of lista){
+    const caras = Math.max(1, e.caras), exitos = Math.min(caras, e.exitos);
+    if(exitos >= caras){ stacks += e.stacks; continue; }   // siempre
+    const r = tirarDados(`1d${caras}`);
+    const entra = r && r.total > caras - exitos;
+    try{ mesaPublicar(`${e.de} · ${e.nombre} al escudo (${Math.round(exitos / caras * 100)} %: sale con ${caras - exitos + 1} o más)`, r); }catch(err){}
+    if(entra) stacks += e.stacks;
+  }
+  if(!stacks){ mesaLinea(`🛡 ${quien} paró el disparo con ${escudo}: el Romper armadura no entró`, 'recordatorio'); return; }
+  const t = tokens.get(d.defensor.tokenId);
+  const origen = `${lista[0].de} · ${lista[0].nombre}`;
+  if(t && t.tipo === 'pj' && t.fichaId && !String(t.fichaId).includes(SEP_INVOCACION) && d.defensa.itemId){
+    try{
+      await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: {nombre: 'Armadura rota', stacks, item: d.defensa.itemId}, origen});
+      mesaLinea(`🛡 ${quien} paró el disparo con ${escudo}, pero el ${lista[0].nombre} se lo comió el escudo: −${stacks} Defensa y −${stacks} durabilidad de ${escudo}`);
+    }catch(err){ console.error('No se pudo romper el escudo:', err); mesaLinea(`🛡 ${quien}: ✋ a mano: ${stacks} de armadura rota en ${escudo}`); }
+    return;
+  }
+  const r = await dueloAplicarEfecto(d, {nombre: 'Rompe armadura', caras: 1, exitos: 1, dado: '', stacks, detalle: `El escudo se come el ${lista[0].nombre}.`});
+  mesaLinea(`🛡 ${quien} paró el disparo con ${escudo}, pero el escudo se comió el ${lista[0].nombre}${r && r.nota ? ` — ${r.nota}` : ''}`);
+}
 // Empujón: el GM, al ver un duelo bloqueado (ver arriba).
 async function dueloEmpujon(d){
   if(!d || d.hab || !d.ataque || d.ataque.rango || !d.defensor || !d.atacante) return;

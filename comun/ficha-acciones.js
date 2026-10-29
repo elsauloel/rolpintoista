@@ -972,20 +972,50 @@ const FichaAcciones = (() => {
     i.dur = Math.max(0, antes - Math.max(1, n || 1));
     if(FichaCalculo.durActual(i) !== antes) durAviso(S, i, ui);
   }
+  // La Defensa que da una pieza ahora (con lo que le baja la armadura rota o la abolladura, sin pasar de la que da; rota, nada).
+  function defDePieza(it){
+    if(FichaCalculo.itemRoto(it)) return 0;
+    const d = (it.mods || []).filter(m => m.stat === 'def').reduce((a, m) => a + num(m.val), 0);
+    return FichaCalculo.pierdeDefPorRotura(it) ? d - Math.min(FichaCalculo.armRotaDe(it), Math.max(0, d)) : d;
+  }
+  /* 💥 El Aviso de la Armadura rota (dueño, 2026-10-29: «cuando se aplica un punto de romper armadura, le tiene que aparecer una notificación al
+     usuario: tal efecto, tal ataque, tal disparo te rompió tal ítem; y explica: baja en 1 la durabilidad, baja en 1 la Defensa que otorga hasta que
+     lo reparen, y que si la durabilidad llega a 0 los demás efectos del objeto también se anulan»). `rotas` = [{it, n, defAntes}]. Con el cartel
+     del juego (comun/aviso-combate.js) en la pantalla que lo tenga (el mapa); si no, queda el toast de siempre. */
+  function avisoRotura(rotas, origen){
+    if(!rotas.length || typeof AvisoCombate === 'undefined') return;
+    const pasos = rotas.map(r => {
+      const it = r.it, max = FichaCalculo.durMax(it), act = FichaCalculo.durActual(it), esc = FichaCalculo.esEscudoItem(it);
+      const lin = [`Baja ${fmt(r.n)} la durabilidad: le queda${act === 1 ? '' : 'n'} ${fmt(act)} de ${fmt(max)}.`];
+      if(FichaCalculo.pierdeDefPorRotura(it)) lin.push(`Baja ${fmt(r.n)} la Defensa que da: de ${fmt(r.defAntes)} a ${fmt(defDePieza(it))}, hasta que lo reparen.`);
+      if(act <= 0) lin.push('💥 La durabilidad llegó a 0: está ROTO. Sigue ocupando su lugar, pero no da ningún efecto (ni Defensa ni bonos) hasta repararlo.');
+      else if(act === 1) lin.push('⚠ Le queda 1 punto: el próximo lo rompe del todo.');
+      return {titulo: `${esc ? '🛡' : '💥'} ${it.nombre}${esc ? ' (abollado)' : ''}`, texto: lin.join('\n')};
+    });
+    pasos.push({titulo: 'Para tener en cuenta', texto: 'Si la durabilidad de una pieza llega a 0, se rompe y también se anulan los demás efectos que da. Se repara fuera de combate: el herrero de una tienda, el talento de reparar o un Óleo reparador.'});
+    const nombres = [...new Set(rotas.map(r => r.it.nombre))].join(' y ');
+    const rotoAlguno = rotas.some(r => FichaCalculo.durActual(r.it) <= 0);
+    AvisoCombate.mostrar({icono: '💥', titulo: `${origen ? String(origen).split(' · ')[0] : 'Un golpe'} te rompió ${nombres}`, pasos,
+      veredicto: {tono: 'malo', grande: rotoAlguno ? '¡ROTO!' : 'Armadura rota', chico: origen ? String(origen) : ''}});
+  }
   // Una pieza puntual: +N de armadura rota (hasta su durabilidad) y −N de durabilidad.
-  function romperPieza(S, it, n, ui){
+  function romperPieza(S, it, n, ui, origen){
+    const defAntes = defDePieza(it);
     it.armRota = Math.min(FichaCalculo.durMax(it), FichaCalculo.armRotaDe(it) + n);
     desgastarItem(S, it, n, ui);
     ui.toast(`💥 Se dañó ${it.nombre}`);
     ui.cambio(['equipo', 'mochila', 'refresh']);
+    avisoRotura([{it, n, defAntes}], origen);
   }
   // Rompe armadura: una pieza de armadura equipada (que todavía no esté rota) elegida AL AZAR.
-  function rompeArmaduraAlAzar(S, veces, ui){
-    const tocadas = [];
+  function rompeArmaduraAlAzar(S, veces, ui, origen){
+    const tocadas = [], rotas = new Map();
     for(let k = 0; k < Math.max(1, veces || 1); k++){
       const pool = S.inventario.filter(i => i.equipado && FichaCalculo.esArmaduraItem(i) && FichaCalculo.durActual(i) > 0);
       if(!pool.length) break;
       const it = pool[Math.floor(Math.random() * pool.length)];
+      if(!rotas.has(it)) rotas.set(it, {it, n: 0, defAntes: defDePieza(it)});
+      rotas.get(it).n++;
       it.armRota = Math.min(FichaCalculo.durMax(it), FichaCalculo.armRotaDe(it) + 1);
       desgastarItem(S, it, 1, ui);
       tocadas.push(it.nombre);
@@ -993,6 +1023,7 @@ const FichaAcciones = (() => {
     if(!tocadas.length){ ui.toast('Rompe armadura: no tenés piezas de armadura equipadas que se puedan romper'); return 0; }
     ui.toast(`💥 Rompe armadura: se dañó ${[...new Set(tocadas)].join(', ')}`);
     ui.cambio(['equipo', 'mochila', 'refresh']);
+    avisoRotura([...rotas.values()], origen);
     return tocadas.length;
   }
   // Un estado armado a partir de lo que manda una habilidad o una trampa ({nombre, turnos, mods, hp, stacks, escudoMagico…}):
@@ -1048,8 +1079,8 @@ const FichaAcciones = (() => {
       }
       // Con `item` (Atraviesa escudos, 2026-10-12): esa pieza puntual (el escudo que paró el disparo), no una al azar.
       const it = spec.item ? S.inventario.find(x => x.id === spec.item) : null;
-      if(it && FichaCalculo.durableItem(it)){ romperPieza(S, it, n, ui); return; }
-      rompeArmaduraAlAzar(S, n, ui); return;
+      if(it && FichaCalculo.durableItem(it)){ romperPieza(S, it, n, ui, origen); return; }
+      rompeArmaduraAlAzar(S, n, ui, origen); return;
     }
     // «Revivir» (2026-10-06, el consumible Revive que usa un aliado): si sigue inconsciente (no muerto del todo), vuelve con `pct` % de la
     // vida máxima y Titilando. Si ya se levantó o ya murió, no hace nada (y lo dice).

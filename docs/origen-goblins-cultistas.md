@@ -301,7 +301,7 @@ Piel de Cristal ×2, Poción de HP, 3 Flechas silbadoras, 3 Virotes dentados), l
 fijo del picapiedras y la Red del híbrido sin cooldown al empezar. La Confusión del jefe sí arranca en cooldown (es lenta, como en el catálogo).
 - **Además, al crear, cada uno recibió su consumible al azar** (la regla de los drops): el jefe, Ankh de Reencarnación y Runa de silencio; el
   picapiedras, Poción de Cuero Duro; el tunelero, Pergamino grupal de Paso Fantasma; el híbrido, Sales aromáticas; el arquero, Flecha de fuego y
-  Vendas; el ballestero, Virote relámpago y Mate cebado. **A decidir con el dueño** si se quedan (sobre todo el Ankh del jefe).
+  Vendas; el ballestero, Virote relámpago y Mate cebado. ✅ (dueño, 2026-10-29) El Ankh del jefe ya lo sacó él a mano; los drops los gestiona él al finalizar el combate (qué le llega a los jugadores y qué no).
 - Siguen en ENTRADA MINAS los 15 kobolds y ratas de antes (no se tocaron): a decidir si pasan a la Reserva.
 - Los nombres son de trabajo: el dueño los cambia si quiere. Los drops fijos del jefe (Polilla mística y Runa aceleradora, `pendientes.md`) no se
   pusieron: a confirmar.

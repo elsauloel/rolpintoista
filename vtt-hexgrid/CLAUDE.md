@@ -226,6 +226,12 @@ línea que se ejecuta **al cargar** (no adentro de una función) solo puede usar
   que gm-tools, así la otra herramienta se entera y lo trae). Topes: vida
   entre 0 y el máximo; SP hasta el máximo. El GM ve los números de sus
   creeps escuchando la parte privada del seleccionado.
+- **▲▼ y la ronda** (2026-10-29, dueño: «cada uno tiene un turno por ronda»; «lo visual regula el orden»; el número de iniciativa solo sirve para
+  Ordenar al empezar): la lista se ve en el orden de verdad (gira desde el que juega; el que ya jugó y quedó más abajo, apagado en su lugar).
+  ▲▼ cambian con el vecino que se ve () sin cruzar la línea de la ronda (); si el que juega baja, se demora
+  (: le toca al de abajo, él juega después sin repetir el inicio, ). Si a ▶ Siguiente le toca uno que
+  ya jugó, el GM elige si vuelve a actuar (; : sin inicio ni fin de turno, tampoco con el ▶ Turno
+  normal a uno que ya jugó). La Demora (, js/13) ya no queda a mano: en su propio turno baja al terminarlo ().
 - **Quién ya jugó la ronda** (2026-10-10, regla del dueño con Degollar): `iniciativa.actuaron` (en el documento de la iniciativa) = los que ya
   terminaron su turno en esta ronda; ▶ Siguiente los saltea aunque algo los haya movido más abajo (Degollar, o el GM con ▼), y se vacía al
   empezar la ronda. La lista los muestra con los apagados. `dueloTerminaTurno(d)` (js/04): un ataque con `terminaTurno` que se resuelve manda

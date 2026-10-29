@@ -528,6 +528,14 @@
   **Probado el 2026-10-20 (Claude, «Test con claude elsaulo»):** el creep con Excavar y la Puñalada desde abajo del Kobold tunelero: se mete en la tierra, sale al lado de Silvia (+3 PdG por salir de abajo); con crítico, los efectos pasan a Rengo 2 turnos y Lisiado 1 turno (en vez del Rengo 1).
   «👁 Ver como jugador», abajo, en Probado).
 ## Probado
+- [x] **⏬ El orden de turnos: ▲▼, demorar el turno, la Demora y «¿vuelve a actuar?»** (2026-10-29, «Claude · pruebas», con capturas; dueño: «si toco
+  la flechita para abajo, el que está abajo y el que toqué intercambian posiciones»; «nunca pasar de ronda»; «cada uno tiene un turno por ronda»; «lo
+  visual va a ser lo que regule los órdenes de las rondas»). Con Warrior, Capataz, Tanque, juan y Chamán: ▼ en el que tiene el turno → le toca al de
+  abajo y él juega justo después, sin volver a recargar («retoma el turno que había demorado»); ▼ entre dos que faltan y entre dos que ya jugaron →
+  se cambian y el turno no se mueve; las flechas que cruzarían la línea de la ronda, apagadas; la Demora 2 a uno que ya jugó → queda atenuado en su
+  lugar; la Demora en su propio turno → baja al terminarlo («Tanque baja 1 lugar (2.º → 3.º)»); al llegarle a uno que ya jugó → el cartel «¿Vuelve
+  a actuar?»: Sí → juega sin recargar ni contar turnos (ni al empezar ni al terminar); No → se saltea; la ronda 2 arrancó una sola vez y en el
+  orden que mostraba la lista. **Falta**: una Demora de verdad desde el duelo (un arma contundente que la tenga), y verlo el dueño en una sesión.
 - [x] **🔮 Los ocho talismanes que faltaban** (2026-10-18, «Test con claude elsaulo», con capturas): **Piedra bezoar** (Veneno ×3 → ×2 en la
   ficha; ojo: el cuadro del duelo sigue diciendo «le llegó Veneno ×3», porque lo baja la ficha al recibirlo), **Bola de cristal** (un creep en
   sigilo a la vista → el paso «🔮 Bola de cristal» en «Empieza tu turno»), **Sahumerio** (1d4 → 4 se llevó Pajaritos; **arreglado**: el cartel

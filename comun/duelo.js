@@ -525,6 +525,13 @@ const Duelo = (() => {
   // El ícono y el «× 1,5» del daño elemental de un arma (2026-10-23, probando el PdG a mano con el Arma ígnea: salía ⚡ en el fuego y «3 → recibió 5» sin explicar).
   const magIcono = tipo => ({fuego: '🔥', hielo: '❄️', rayo: '⚡', toxico: '☠️', acido: '🧪', luz: '☀️', siniestro: '🌑'})[typeof Combatiente !== 'undefined' && Combatiente.elementoDe ? Combatiente.elementoDe(tipo) : ''] || '✨';
   const magMult = m => _num(m && m.mult) > 1 ? ` × ${String(_num(m.mult)).replace('.', ',')}` : '';
+  // 🏹 La flecha gastada (la copia del ítem, en texto) y el No2 que cobró: si el duelo se cancela antes de tirar, vuelve (devolverSiToca).
+  const flechaVuelve = v => {
+    if(!v || !v.item || typeof v.item !== 'object') return {};
+    let item = '';
+    try{ item = JSON.stringify(v.item); }catch(err){ return {}; }
+    return item.length <= 6000 ? {vuelve: {item, no2: Math.max(0, Math.min(20, Math.round(_num(v.no2))))}} : {};
+  };
   const limpiarEfectosFlecha = lista => (Array.isArray(lista) ? lista : []).filter(e => e && e.nombre).slice(0, 6).map(e => {
     const o = {nombre: txtCorto(e.nombre, 40), caras: Math.max(1, Math.round(_num(e.caras)) || 1), exitos: Math.max(1, Math.round(_num(e.exitos)) || 1), dado: txtCorto(e.dado, 20), detalle: txtCorto(e.detalle, 200)};
     if(_num(e.stacks) > 0) o.stacks = Math.round(_num(e.stacks));
@@ -609,6 +616,7 @@ const Duelo = (() => {
       ...(cfg.flecha.humo ? {humo: true} : {}), ...(cfg.flecha.luz ? {luz: true} : {}), ...(cfg.flecha.explota ? {explota: txtCorto(cfg.flecha.explota, 12)} : {}),
       ...(cfg.flecha.clava ? {clava: true} : {}), ...(cfg.flecha.rebota ? {rebota: true} : {}),
       ...(cfg.flecha.recuperable ? {recuperable: true} : {}), ...(cfg.flecha.sinDano ? {sinDano: true} : {}),   // virote recuperable (el arma) y el de red (2026-10-11)
+      ...flechaVuelve(cfg.flecha.vuelve),   // la flecha gastada y su No2, por si el duelo se cancela (2026-10-28)
       // ⚡ El salto (relámpago, tormenta): a cuántos más salta, si lleva el daño eléctrico (la mitad cada vez) y el % de Parálisis de cada salto.
       ...(cfg.flecha.salto ? {salto: {saltos: Math.min(4, Math.max(1, Math.round(_num(cfg.flecha.salto.saltos)) || 1)), dano: !!cfg.flecha.salto.dano,
         paralisis: (Array.isArray(cfg.flecha.salto.paralisis) ? cfg.flecha.salto.paralisis : []).slice(0, 4).map(v => Math.min(100, Math.max(0, Math.round(_num(v)))))}} : {})};
@@ -3103,6 +3111,7 @@ const Duelo = (() => {
   async function cancelarDuelo(d){
     const a = d.ataque || {}, especial = a.tipo === 'oportunidad' || a.tipo === 'contra';
     const pagado = !d.hab && a.tipo && a.tipo !== 'habilidad-arma' && d.pdg;
+    const conFlecha = !!(a.flecha && a.flecha.vuelve), yFlecha = conFlecha ? ` y ${a.flecha.nombre || 'la flecha'}` : '';
     let devolver = false;
     if(pagado && typeof Confirmar !== 'undefined' && Confirmar.elegir){
       const quien = (d.atacante && d.atacante.nombre) || 'El atacante';
@@ -3110,23 +3119,26 @@ const Duelo = (() => {
         ? `${quien} ya pagó los No2 de este ${a.tipo === 'contra' ? 'contraataque' : 'ataque de oportunidad'}. ¿Se los devolvemos?`
         : `${quien} ya pagó este ataque. ¿Cuenta como un ataque hecho?\n\nEs para calcular los No2: en un turno, el primer ataque con un arma cuesta la mitad de su Tipo y los siguientes, el Tipo completo. Si no cuenta, se le devuelven los No2 que pagó y su próximo ataque vuelve a costar como si no hubiera atacado.`,
         {titulo: 'Cancelar el duelo', icono: '⚔', no: 'Volver al duelo', opciones: especial
-          ? [{valor: 'no', texto: 'Sí, devolverle los No2'}, {valor: 'si', texto: 'No, ya los gastó'}]
-          : [{valor: 'no', texto: 'No cuenta', detalle: 'se le devuelven los No2'}, {valor: 'si', texto: 'Sí, cuenta como ataque', detalle: 'el próximo cuesta como un segundo ataque'}]});
+          ? [{valor: 'no', texto: `Sí, devolverle los No2${yFlecha}`}, {valor: 'si', texto: 'No, ya los gastó'}]
+          : [{valor: 'no', texto: 'No cuenta', detalle: `se le devuelven los No2${yFlecha}`}, {valor: 'si', texto: 'Sí, cuenta como ataque', detalle: 'el próximo cuesta como un segundo ataque'}]});
       if(r === null || r === undefined) return;
       devolver = r === 'no';
     }
-    col().doc(d.id).update({estado: 'cancelado', ...(devolver ? {resultado: 'devolver'} : {})}).catch(err => console.error(err));
+    // 🏹 La flecha especial (2026-10-28, dueño): se gasta al armar el duelo; si se cancela antes de tirar el PdG (o el ataque no cuenta), vuelve.
+    const flecha = conFlecha && (!d.pdg || devolver);
+    col().doc(d.id).update({estado: 'cancelado', ...(devolver ? {resultado: 'devolver'} : flecha ? {resultado: 'devolver-flecha'} : {})}).catch(err => console.error(err));
   }
   const devolviendo = new Set(), devolverIntentos = new Map();
   async function devolverSiToca(d){
-    if(devolviendo.has(d.id) || d.resultado !== 'devolver' || !d.atacante) return;
+    const soloFlecha = d.resultado === 'devolver-flecha', conFlecha = !!(d.ataque && d.ataque.flecha && d.ataque.flecha.vuelve);
+    if(devolviendo.has(d.id) || !(d.resultado === 'devolver' || soloFlecha) || !d.atacante) return;
     let hk = null;
     try{
       if(cfgEscuchar.hooksLocal){ hk = cfgEscuchar.hooksLocal(d.atacante); if(hk && typeof hk.then === 'function') hk = await hk; }
       const H = typeof window !== 'undefined' ? window.DUELO_HOOKS : null;
       if(!hk && H && H.soy && H.soy(d.atacante)) hk = H;
     }catch(err){ console.error('Duelo: ¿quién devuelve el ataque?', err); }
-    if(!hk || !hk.devolverAtaque){
+    if(!hk || !(soloFlecha ? hk.devolverFlecha : hk.devolverAtaque)){
       // Recién cargada la página, el atacante puede no estar leído todavía (un creep del mapa): se reintenta un rato (2026-10-23).
       const n = (devolverIntentos.get(d.id) || 0) + 1;
       devolverIntentos.set(d.id, n);
@@ -3144,7 +3156,7 @@ const Duelo = (() => {
           const s = await tx.get(ref);
           if(!s.exists) return 'no';
           const x = s.data().resultado;
-          if(x === 'devolver'){ tx.update(ref, {resultado: 'devuelto'}); return 'si'; }
+          if(x === d.resultado){ tx.update(ref, {resultado: 'devuelto'}); return 'si'; }
           return x === 'devuelto' ? 'no' : 'espera';
         });
         if(r === 'si'){ ok = true; break; }
@@ -3152,8 +3164,13 @@ const Duelo = (() => {
         await new Promise(res => setTimeout(res, 600));
       }
       if(!ok){ devolviendo.delete(d.id); return; }
-      const costo = await hk.devolverAtaque(d);
-      const txt = `↩ ${d.atacante.nombre}: el duelo cancelado no cuenta como ataque${Number(costo) ? ` — se le devolvieron ${Number(costo)} No2` : ''}`;
+      const costo = soloFlecha ? 0 : _num(await hk.devolverAtaque(d));
+      const no2Flecha = conFlecha && hk.devolverFlecha ? _num(await hk.devolverFlecha(d)) : 0, flechaVolvio = conFlecha && !!hk.devolverFlecha;
+      const total = costo + no2Flecha, deNo2 = total ? ` — se le devolvieron ${total} No2` : '';
+      const nomFlecha = flechaVolvio ? (d.ataque.flecha.nombre || 'la flecha') : '';
+      const txt = soloFlecha
+        ? `↩ ${d.atacante.nombre}: el duelo se canceló antes de tirar — ${nomFlecha} vuelve${no2Flecha ? ` y se le devolvieron ${no2Flecha} No2` : ''}`
+        : `↩ ${d.atacante.nombre}: el duelo cancelado no cuenta como ataque${deNo2}${flechaVolvio ? ` · ${nomFlecha} vuelve` : ''}`;
       if(typeof toast === 'function') toast(txt);
       if(typeof mesaLinea === 'function') mesaLinea(txt, 'recordatorio');
     }catch(err){ console.error('No se pudo devolver el ataque:', err); devolviendo.delete(d.id); }
@@ -3162,7 +3179,7 @@ const Duelo = (() => {
   function escuchar(cfg){
     if(escuchando || !disponible()) return;
     cfgEscuchar = cfg || {};
-    col().where('resultado', '==', 'devolver').onSnapshot(snap => snap.docs.forEach(doc => devolverSiToca({id: doc.id, ...doc.data()})),
+    col().where('resultado', 'in', ['devolver', 'devolver-flecha']).onSnapshot(snap => snap.docs.forEach(doc => devolverSiToca({id: doc.id, ...doc.data()})),
       err => console.error('Error escuchando los duelos a devolver:', err));
     /* Lo primero que llega puede venir de la memoria de la página, con solo los duelos que otra escucha ya había traído (el Desarmar del mapa:
        los abiertos). Si eso contaba como «lo que ya había pasado», los demás, al llegar del servidor, parecían recién resueltos: al abrir el mapa

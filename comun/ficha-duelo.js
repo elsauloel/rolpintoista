@@ -186,6 +186,17 @@ const FichaDuelo = (() => {
         ui.cambio(['nitros', 'refresh']);
         return costo;
       },
+      // 🏹 La flecha especial de un duelo cancelado antes de tirar, o que no cuenta (2026-10-28): vuelve al carcaj con su No2. → los No2 devueltos.
+      devolverFlecha: d => {
+        const v = d.ataque && d.ataque.flecha && d.ataque.flecha.vuelve, S = getS();
+        let f = null;
+        try{ f = v && JSON.parse(v.item); }catch(err){ console.error('La flecha a devolver no se pudo leer:', err); }
+        if(!f || !FichaEquipo.devolverFlecha(S, f)) return 0;
+        const no2 = Math.max(0, num(v.no2));
+        S.nitros = num(S.nitros) + no2;
+        ui.cambio(['inventario', 'nitros', 'refresh']);
+        return no2;
+      },
       // Para el crítico: el Crítico frecuente y potente del atacante (con el arma que usa).
       statsCritico: d => {
         const arma = armaDelInv(d.ataque.armaId);

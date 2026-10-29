@@ -1938,6 +1938,23 @@ prueba('el carcaj: viene con el arco, guarda las flechas especiales y las gasta;
     FichaEquipo.carcajUsado(car), S.inventario.some(i => i.flecha), FichaEquipo.carcajDe(S) === car, GeneradorTiendas.seccionDe(flecha), GeneradorTiendas.seccionDe(car)],
     ['Carcaj de cuero', 10, 1, 1, 3, 'Flecha de fuego', 2, false, true, 'gondola', 'talabarteria']);
 });
+prueba('🏹 la flecha de un duelo cancelado vuelve (2026-10-28): a su pila del carcaj, como pila nueva si era la última, o a la mochila sin carcaj', () => {
+  const S = fichaDePrueba({inventario: []});
+  const arco = CATALOGO_BASE.find(i => i.id === 'new-arco-corto'), flecha = CATALOGO_BASE.find(i => i.id === 'flecha-de-fuego');
+  FichaTienda.crearItems(S, arco, 1);
+  const car = S.inventario.find(i => i.tipoItem === 'carcaj');
+  car.equipado = true;
+  FichaTienda.crearItems(S, flecha, 2);
+  FichaEquipo.alCarcaj(S, S.inventario.find(i => i.flecha).id, {toast: () => {}, cambio: () => {}, modoCombate: () => false, avisarSinNitros: () => {}});
+  const id = FichaEquipo.flechasDelCarcaj(S)[0].id;
+  const a = FichaEquipo.gastarFlecha(S, id), dondeA = FichaEquipo.devolverFlecha(S, a), tras1 = FichaEquipo.carcajUsado(car);
+  FichaEquipo.gastarFlecha(S, id); const b = FichaEquipo.gastarFlecha(S, id), vacio = FichaEquipo.carcajUsado(car);
+  const dondeB = FichaEquipo.devolverFlecha(S, b), tras2 = FichaEquipo.flechasDelCarcaj(S).map(f => [f.nombre, f.unidades]);
+  car.equipado = false;
+  const dondeC = FichaEquipo.devolverFlecha(S, b), enMochila = S.inventario.filter(i => i.flecha && !i.equipado).map(i => i.unidades);
+  igual([dondeA, tras1, vacio, dondeB, tras2, dondeC, enMochila, FichaEquipo.devolverFlecha(S, null)],
+    ['carcaj', 2, 0, 'carcaj', [['Flecha de fuego', 1]], 'mochila', [1], false]);
+});
 prueba('la flecha envenenada perfora 1 y su veneno necesita que pase el daño, como siempre (2026-10-09)', () => {
   const f = CATALOGO_BASE.find(i => i.id === 'flecha-envenenada'), fuego = CATALOGO_BASE.find(i => i.id === 'flecha-de-fuego');
   const ef = EfectosGolpe.lista(f.flecha.efectosGolpe)[0];

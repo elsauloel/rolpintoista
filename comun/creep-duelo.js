@@ -160,6 +160,22 @@ const CreepDuelo = (() => {
       },
       // Un duelo cancelado que no cuenta como ataque (2026-10-15): el conteo y los No2, de vuelta. → los No2 devueltos.
       devolverAtaque: d => (!d.ataque || d.ataque.tipo === 'habilidad-arma') ? 0 : ui.cambiar(d.atacante.ref, c => CreepAcciones.devolverAtaque(c, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo)),
+      // 🏹 La flecha especial de un duelo cancelado antes de tirar, o que no cuenta (2026-10-28): vuelve al cinturón con su No2. → los No2 devueltos.
+      devolverFlecha: d => {
+        const v = d.ataque && d.ataque.flecha && d.ataque.flecha.vuelve;
+        let f = null;
+        try{ f = v && JSON.parse(v.item); }catch(err){ console.error('La flecha a devolver no se pudo leer:', err); }
+        if(!f || !f.nombre) return 0;
+        return ui.cambiar(d.atacante.ref, c => {
+          c.cinturon = c.cinturon || [];
+          const pila = c.cinturon.find(x => x.id === f.id) || c.cinturon.find(x => x.flecha && x.nombre === f.nombre);
+          if(pila) pila.unidades = num(pila.unidades) + 1;
+          else c.cinturon.push({...f, unidades: 1});
+          const no2 = Math.max(0, num(v.no2));
+          c.nitros = num(c.nitros) + no2;
+          return no2;
+        });
+      },
       // Para el crítico: el Crítico frecuente y potente del creep y su Resistencia a crítico contra el Tipo del arma que lo ataca.
       statsCritico: d => {
         const sc = deLado(d.atacante);

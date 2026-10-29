@@ -263,6 +263,23 @@ const FichaEquipo = (() => {
     if(f.unidades <= 0) c.flechas = c.flechas.filter(x => x !== f);
     return {...structuredClone(f), unidades: 1};
   }
+  // La vuelta de una flecha gastada en un duelo cancelado (2026-10-28, dueño): a su pila del carcaj (mismo id o nombre) o como pila nueva; sin
+  // carcaj, a la mochila. → 'carcaj' | 'mochila' | false.
+  function devolverFlecha(S, f){
+    if(!f || !f.nombre) return false;
+    const c = carcajDe(S);
+    if(c){
+      c.flechas = c.flechas || [];
+      const pila = c.flechas.find(x => x.id === f.id) || c.flechas.find(x => x.nombre === f.nombre);
+      if(pila) pila.unidades = num(pila.unidades) + 1;
+      else c.flechas.push({...structuredClone(f), unidades: 1});
+      return 'carcaj';
+    }
+    const pila = (S.inventario || []).find(x => esFlecha(x) && x.nombre === f.nombre && !x.equipado);
+    if(pila) pila.unidades = num(pila.unidades) + 1;
+    else S.inventario = [...(S.inventario || []), {...structuredClone(f), id: nuevoId('it-'), unidades: 1}];
+    return 'mochila';
+  }
   // El texto de lo que hace una flecha (su detalle sin el encabezado «Flecha especial…:»).
   // Lo que hace + su No2 (una sola vez: el detalle del catálogo ya lo trae, se saca y se arma de `flecha.no2`).
   const flechaTxt = f => {
@@ -593,6 +610,6 @@ const FichaEquipo = (() => {
     <div style="display:flex;gap:8px;align-items:stretch">${col(equipado, 'Equipado')}${col(item, 'Nuevo')}</div>`;
   }
 
-  return {talentoReparar, topeTalento, restoTalento, repararHtml, repararTalento, usarOleo, repararClic, SLOT_DEFS, TIER_COLOR, veCalidad, STAT_COMPARABLE_LABEL, CATEGORIAS, CATEGORIA_LABEL, ranuras, mochilaUsada, capMochila, BASE_CINTURON, esFlecha, carcajDe, capCarcaj, carcajUsado, flechasDelCarcaj, alCarcaj, delCarcaj, gastarFlecha, flechaTxt, carcajHtml, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, alCinturon, textoAlCinturon, aManoCap, aManoEntra, alternarAMano, slots, slotOcupado, defValor, statsComparables, conCosto, equipar, reemplazar,
+  return {talentoReparar, topeTalento, restoTalento, repararHtml, repararTalento, usarOleo, repararClic, SLOT_DEFS, TIER_COLOR, veCalidad, STAT_COMPARABLE_LABEL, CATEGORIAS, CATEGORIA_LABEL, ranuras, mochilaUsada, capMochila, BASE_CINTURON, esFlecha, carcajDe, capCarcaj, carcajUsado, flechasDelCarcaj, alCarcaj, delCarcaj, gastarFlecha, devolverFlecha, flechaTxt, carcajHtml, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, alCinturon, textoAlCinturon, aManoCap, aManoEntra, alternarAMano, slots, slotOcupado, defValor, statsComparables, conCosto, equipar, reemplazar,
     modTags, thumb, statTxt, html, slotLlenoHtml, compararHtml};
 })();

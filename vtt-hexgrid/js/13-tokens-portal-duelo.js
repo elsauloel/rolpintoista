@@ -998,7 +998,10 @@ function dueloElegirObjetivoMapa(msg){
           ...(ataque.recuperable ? {recuperable: true} : {}), ...(b.sinDano ? {sinDano: true} : {}),   // virote recuperable (el arma) y el de red (2026-10-11)
           ...(b.salto ? {salto: b.salto} : {}),
           ...['humo', 'luz', 'clava', 'rebota'].reduce((o, k) => b[k] ? {...o, [k]: true} : o, {}), ...(b.explota ? {explota: b.explota} : {})};   // virotes con mapa (js/33)
-        if(msg.alDisparar){ try{ msg.alDisparar(); }catch(err){ console.error('No se pudo gastar la flecha:', err); } }
+        if(msg.alDisparar){
+          try{ const pago = await msg.alDisparar(); if(pago && pago.item) flecha.vuelve = {item: pago.item, no2: num(pago.no2)}; }   // si se cancela antes de tirar, vuelve
+          catch(err){ console.error('No se pudo gastar la flecha:', err); }
+        }
       }
       let ataqueFinal = ataque && ataque.hab && ataque.hab.sagrado && ataque.hab.dano ? sagradoContra(ataque, t) : (ataqueCarga || ataque);   // Smite: el doble contra un no-muerto o un demonio
       if(typeof roboBono === 'function') ataqueFinal = roboBono(ataqueFinal, mio, t);   // 🫳 Robar: +2 en sigilo o por la espalda (js/47)

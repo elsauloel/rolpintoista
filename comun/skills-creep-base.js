@@ -253,8 +253,9 @@
     no2: 1, spCosto: 3, flash: true, auditada: true, ataqueTxt: 'Flash: cono al frente; Fuerza +2 contra la Constitución; pierde 1 + la diferencia en No2, la diferencia de daño directo y, en 0 No2, Sentado',
     duelo: {objetivo: 'cono', tira: 'fue', tiraBono: 2, contra: ['con'], dano: true, danoDiferencia: true, tipoDano: 'fisico', ignoraDano: true, danoDirecto: true, efectos: [{no2: 1, no2Dif: true, no2Sentado: true}]}});
   // ⚖ Arrastrar (C16; dueño: «va así»): en dos tiempos (P224, 2026-10-29: «vamos con la B»): el enganche (Destreza contra la Evasión) y, si lo engancha,
-  // lo trae y le pega con su arma con +2 PdG (vtt-hexgrid/js/78, arrastrarEnganche).
-  H('Arrastrar', 'DK', 'hdc', 'mt', 2, aA('Le tira un gancho, una cadena o una soga a un rival a 3 casillas o menos: su Destreza contra la Evasión del rival para engancharlo. Si lo engancha, lo arrastra hasta dejarlo pegado a él (no camina: no gasta No2 ni da ataques de oportunidad; las trampas y zonas del camino sí lo tocan) y le pega con su arma con +2 a la Probabilidad de Golpe. Si no lo engancha, no hay golpe.',
+  // lo trae y le pega con su arma con +2 PdG (vtt-hexgrid/js/78, arrastrarEnganche). El texto, general y abierto a cómo lo narre cada creep (dueño, 2026-10-29:
+  // «tiene que tener un nombre lo más abarcativo posible; puede decir que arroja una soga y trae al rival, y lo dejamos abierto»).
+  H('Arrastrar', 'DK', 'hdc', 'mt', 2, aA('Arroja una soga (o lo que tenga a mano) a un rival a 3 casillas o menos y lo trae hacia él: su Destreza contra la Evasión del rival para engancharlo. Si lo engancha, lo arrastra hasta dejarlo pegado a él (no camina: no gasta No2 ni da ataques de oportunidad; las trampas y zonas del camino sí lo tocan) y le pega con su arma con +2 a la Probabilidad de Golpe. Si no lo engancha, no hay golpe.',
     {pdg: 2}, 'Destreza contra Evasión para engancharlo a 3 casillas o menos: lo trae hasta quedar pegado y le pega con +2 PdG (las trampas y zonas del camino lo tocan)', 2, [], {alcance: 'fijo', alcanceN: 3, arrastra: 3}));
   // (Golpe de pomo: quitado de la biblioteca en la auditoría, dueño 2026-10-21.)
   H('Ataque de furia', 'D', '*', 'm', 5, zO('Ataca sin pensar en la defensa: daño enorme.', 4, 'H'));

@@ -2428,27 +2428,30 @@ async function dueloAplicarEfectoBase(d, ef){
   return {nota: 'le llegó a su ficha: ' + EstadosAplicar.texto(unico) + (veces > 1 ? ` ×${veces}` : '')};
 }
 
-// Demora (Tipo 10, dueño 2026-10-03): baja al golpeado 1 lugar en el orden de turnos, definitivo (como el ▼ del GM: el turno sigue con quien
-// lo tenía). Dos casos quedan a mano, porque moverlo solo rompería la ronda: si ya actuó y quedaría después de quien tiene el turno (actuaría
-// dos veces), o si es su propio turno (el de abajo perdería el suyo).
-// `lugares` (2026-10-26, el Cascotazo: Demora 2): cuántos lugares baja. Si ya actuó esta ronda, no pasa del que tiene el turno (no vuelve a actuar);
-// lo que no pudo bajar queda a mano.
+// Demora (Tipo 10, dueño 2026-10-03): baja al golpeado 1 lugar en el orden de turnos, definitivo (el turno sigue con quien lo tenía).
+// `lugares` (2026-10-26, el Cascotazo: Demora 2): cuántos lugares baja. Desde el 2026-10-29 (dueño: «que la demora, cuando funciona, esté
+// automatizada»), los dos casos que antes quedaban a mano también: si ya jugó esta ronda baja igual (aunque pase al que tiene el turno: sigue
+// contando como que jugó, no le vuelve a tocar) y si es su propio turno, baja cuando lo termina (`iniciativa.demoras`, js/04).
 async function dueloDemora(tokenId, lugares){
   const n = Math.max(1, Math.round(num(lugares)) || 1), txt = k => `${k} lugar${k === 1 ? '' : 'es'}`;
   const orden = iniciativa.orden.slice();
   const i = orden.findIndex(o => o.id === tokenId);
   if(i < 0) return {manual: true, nota: 'no está en el orden de turnos: a mano'};
   if(i === orden.length - 1) return {nota: 'ya era el último del orden de turnos'};
-  if(i === iniciativa.turno) return {manual: true, nota: `es su turno: bajalo ${txt(n)} (▼) cuando termine`};
-  const tope = i < iniciativa.turno ? iniciativa.turno - 1 : orden.length - 1;   // ya actuó: hasta justo antes del que tiene el turno
-  const j = Math.min(i + n, tope);
-  if(j <= i) return {manual: true, nota: `ya actuó esta ronda: bajalo ${txt(n)} (▼) al empezar la próxima`};
+  if(i === iniciativa.turno && !iniciativa.libre){
+    const demoras = {...(iniciativa.demoras || {})};
+    demoras[tokenId] = Math.round(num(demoras[tokenId])) + n;
+    if(!(await guardarIniciativa({demoras}))) return {manual: true, nota: `es su turno: bajalo ${txt(n)} a mano cuando termine`};
+    return {nota: `es su turno: baja ${txt(demoras[tokenId])} en el orden de turnos cuando lo termine`};
+  }
+  const j = Math.min(i + n, orden.length - 1);
   const activo = orden[iniciativa.turno] ? orden[iniciativa.turno].id : null;
   const [x] = orden.splice(i, 1); orden.splice(j, 0, x);
   const turno = activo ? Math.max(0, orden.findIndex(o => o.id === activo)) : iniciativa.turno;
-  if(!(await guardarIniciativa({orden, turno}))) return {manual: true, nota: 'no se pudo mover en el orden de turnos: a mano'};
-  const falta = n - (j - i);
-  return {nota: `baja ${txt(j - i)} en el orden de turnos (${i + 1}.º → ${j + 1}.º)${falta > 0 && j < orden.length - 1 ? ` (${txt(falta)} más, a mano, al empezar la próxima ronda)` : ''}`};
+  const ya = new Set(iniciativa.actuaron || []);
+  if(i < iniciativa.turno && j > turno) ya.add(tokenId);   // ya jugó y queda después del que juega: no le vuelve a tocar en esta ronda
+  if(!(await guardarIniciativa({orden: ordenSerial(orden), turno, actuaron: [...ya]}))) return {manual: true, nota: 'no se pudo mover en el orden de turnos: a mano'};
+  return {nota: `baja ${txt(j - i)} en el orden de turnos (${i + 1}.º → ${j + 1}.º)${i < iniciativa.turno ? ': ya jugó esta ronda, se nota en la próxima' : ''}`};
 }
 
 /* 💨 Arrojo (ex Envión, 2026-10-26, dueño: «sube en uno en la tabla de iniciativas»): sube `lugares` (1) en el orden de turnos. No pasa por encima del que tiene el

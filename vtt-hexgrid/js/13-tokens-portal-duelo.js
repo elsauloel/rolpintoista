@@ -2470,14 +2470,16 @@ function demoraAviso(tokenId, caso, o){
   const k = Math.max(1, Math.round(num(o.lugares)) || 1), lug = `${k} lugar${k === 1 ? '' : 'es'}`;
   const por = o.por ? String(o.por) : '';
   const f = creep ? null : fichasPub.get(String(t.fichaId || '').split(SEP_INVOCACION)[0]);
-  const para = creep ? (soyGM && fbUsuario ? fbUsuario.uid : '') : ((f && f.resumen && f.resumen.control) || t.duenoUid || '');
-  // En segunda persona para el jugador («Fuiste demorado»); en tercera para el GM con un creep y para la Crónica.
+  // Un creep: solo la Crónica. El GM ya lo ve en el duelo («✔ Aplicado · baja…»), y un Aviso al centro le tapaba los otros efectos por aplicar.
+  const para = creep ? '' : ((f && f.resumen && f.resumen.control) || t.duenoUid || '');
+  // En segunda persona para el jugador («Fuiste demorado»); en tercera para la Crónica.
   const textos = vos => caso === 'al-terminar'
       ? `${vos ? 'Es tu turno: cuando lo termines, bajás' : 'Es su turno: cuando lo termine, baja'} ${lug} en el orden de turnos.`
     : caso === 'aplicada'
       ? `${vos ? 'Terminó tu turno y, por la Demora, bajaste' : 'Terminó su turno y, por la Demora, bajó'} ${lug}: ${vos ? 'ahora estás' : 'ahora está'} ${o.hasta}.º en el orden de turnos.`
       : `${vos ? 'Bajás' : 'Baja'} ${lug} en el orden de turnos: ${vos ? 'ahora estás' : 'ahora está'} ${o.hasta}.º (${vos ? 'estabas' : 'estaba'} ${o.desde}.º).${o.yaJugo ? (vos ? ' Ya jugaste esta ronda: se nota en la próxima.' : ' Ya jugó esta ronda: se nota en la próxima.') : ''}`;
   const vos = !creep, titulo = caso === 'aplicada' ? `${quien} bajó en el orden de turnos (Demora)` : `${quien} fue demorado${por ? ` por ${por}` : ''}`;
+  if(creep){ momentoAbrir({tipo: 'demora', icono: '⏬', titulo, resultado: textos(false), estado: 'listo', datos: {chico: true}}); return; }
   momentoAbrir({tipo: 'demora', icono: '⏬', titulo, resultado: textos(false), estado: 'listo',
     datos: {...(para ? {paraUid: para} : {}), aviso: true, boton: 'Entendido',
       pasos: [{titulo: vos ? (caso === 'aplicada' ? '⏬ Bajaste en el orden de turnos' : '⏬ Fuiste demorado') : `⏬ ${nombre} ${caso === 'aplicada' ? 'bajó en el orden de turnos' : 'fue demorado'}`, texto: textos(vos)}],

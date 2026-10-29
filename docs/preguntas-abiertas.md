@@ -1370,7 +1370,7 @@ js/46; la habilidad `miscelaneas-excavar` en `comun/skills-clase.js`. **Costos (
 Salir con el botón es **sin costo** (a confirmar). Las reglas de Firestore nuevas (la estela de un jugador, `tunel`) hay que pegarlas.
 
 
-### P232 — 🏪 Los otros tamaños de tienda, con el criterio del ambulante (2026-10-28)
+### P232 — 🏪 Los otros tamaños de tienda, con el criterio del ambulante (2026-10-28) ✅ decidida
 
 **Contexto:** el ambulante pasó a una lista fija por sección (lo esencial) y su góndola, a cantidades por categoría (`FIJO_AMBULANTE`,
 `gondolaPorCategoria`, `docs/rework-tiendas.md`). El dueño (2026-10-28): «habría que hacer un paralelismo con el resto de tamaños de local, tirame
@@ -1380,3 +1380,7 @@ sugerencias». Hoy pueblito…capital siguen sorteando con la receta de pesos (8
 **un resto al azar** con la receta de siempre, cada vez más grande; los totales quedan como hoy. Góndola por categoría que crece con el tamaño
 (pergaminos, trampas, pociones de otros usos, munición, enfermería; la capital, todo). Un lugar del núcleo sin ítem: en el ambulante queda vacío; en
 los demás, se rellena con la receta. Detalle de los números en la conversación del 2026-10-28.
+
+**Dueño (2026-10-28):** «así» (base fija más un resto al azar), «va así» (rellenar el lugar vacío fuera del ambulante) y el carcaj también en el
+pueblito. **Hecho** (7d79a3af): `FIJO_POR_TAMANO` y `gondolaPorCategoria` en `comun/generador-tiendas.js`; la capital, 8 por categoría (con «todo lo
+que haya» daba 236). Detalle en `docs/rework-tiendas.md`.

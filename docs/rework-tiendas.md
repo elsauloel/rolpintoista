@@ -223,7 +223,19 @@ equipo ya no tienen consumibles. La Talabartería garantiza una mochila y un cin
   1 de rango + 1 liviana (Tipo 4) + 2 defensivas + 1 utilitaria (cinturón, mochila o carcaj); Bazar 2 varitas o báculos + 1 talismán + 1 anillo +
   2 defensivas de su campo. Si no hay de una parte, ese lugar queda vacío (no la cambia por otra). Góndola: los esenciales (los clásicos) +
   1 pergamino + 2 trampas + 1 poción de otros usos (`gondolaPorCategoria`). La calidad sigue saliendo del nivel.
-- ⬜ Revisar los otros tamaños (pueblito… capital) con el mismo criterio cuando el dueño quiera.
+- ✅ **Los otros tamaños, con el mismo criterio** (P232, dueño 2026-10-28: «base fija más un resto al azar», «va así», y el carcaj desde pueblito):
+  cada sección trae su **base fija** (`FIJO_POR_TAMANO`) y después, hasta `min`–`max`, el resto al azar con la receta. Un lugar de la base sin ítem:
+  en el ambulante queda vacío; en los demás, otro de la receta. Arco y ballesta, varita y báculo, de a vuelta (`clases`).
+  - **Herrería**: pueblito 3 armas (los 3 Tipos) + 1 escudo + 3 defensivas · aldea 4 + 2 + 4 · ciudad 6 + 2 + las 5 · capital 8 + 3 + las 5.
+  - **Talabartería**: pueblito 2 de rango (arco y ballesta) + 1 liviana + 3 defensivas + mochila, cinturón y carcaj · aldea 3 + 2 + 4 + las 3 ·
+    ciudad 4 + 3 + las 5 + las 3 · capital 6 + 4 + las 5 + 2 de cada utilitaria.
+  - **Bazar**: pueblito 3 varitas o báculos (de los dos) + 1 talismán + 1 anillo + 3 defensivas · aldea 4 + 2 + 1 + 4 · ciudad 6 + 3 + 2 + 4 ·
+    capital 8 + 4 + 3 + 4.
+  - **Góndola** (`gondolaPorCategoria`, en todos los tamaños, de lo que venden las secciones abiertas; fuera del ambulante, además lo `gondolaFija`):
+    pueblito 2 pergaminos, 3 trampas, 2 pociones de otros usos, 1 munición, 1 utilitario · aldea 3/4/3/2/2 · ciudad 5/6/5/3/3 · capital 8 de cada
+    una (con «todo lo que haya» daba 236 consumibles distintos). Las pociones de HP y SP y la enfermería no se sortean: son todas clásicas.
+  - Se sacaron la «variedad garantizada», las familias por tamaño y los mínimos de las secciones (los cubre la base fija). El cartel del generador
+    lo arma `GeneradorTiendas.resumenTamano`.
 
 ### ⬜ Ideas para «Luces y utilería» (dueño, 2026-10-08: «imaginemos cuerda, yesca y pedernal… ¿qué más?»; todavía no se carga nada)
 Lista de ideas propuesta en la conversación del 2026-10-08 (fuego, cuerda, terreno y cobertura, sigilo y engaño, oficio, señales). Se elige y

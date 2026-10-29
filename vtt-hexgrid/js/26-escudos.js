@@ -62,7 +62,7 @@ async function dueloEmpujon(d){
   if(!d || d.hab || !d.ataque || d.ataque.rango || !d.defensor || !d.atacante) return;
   const def = tokens.get(d.defensor.tokenId);
   if(!def || statPiesDe(def, 'empujon') <= 0 || !tokens.get(d.atacante.tokenId)) return;
-  const r = await dueloDemora(d.atacante.tokenId);
+  const r = await dueloDemora(d.atacante.tokenId, 1, d.defensor.nombre || nombreDe(def));
   const quien = d.defensor.nombre || nombreDe(def), a = d.atacante.nombre || 'el atacante';
   mesaLinea(`🛡 Empujón: ${quien} bloqueó el golpe y empujó a ${a} — ${r.nota || ''}`);
   if(typeof momentoAbrir === 'function') momentoAbrir({tipo: 'guardian', icono: '🛡', titulo: `Empujón de ${quien}`, resultado: `${a} queda con Demora: ${r.nota || ''}`, estado: 'listo', datos: {chico: true}});

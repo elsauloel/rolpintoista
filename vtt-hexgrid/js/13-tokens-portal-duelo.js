@@ -2275,7 +2275,7 @@ async function dueloAplicarEfectoBase(d, ef){
   const t = tokens.get(d.defensor.tokenId);
   if(!t) return {manual: true, nota: 'el token ya no está: aplicalo a mano'};
   if(typeof talismanUnaVez === 'function' && !talismanUnaVez(d, ef)) return {nota: 'el talismán ya lo hizo este turno'};   // 🔮 la Cabeza reducida, el Muñeco vudú (js/53)
-  if(spec.nombre === 'Demora') return dueloDemora(d.defensor.tokenId, spec.stacks);   // (stacks = cuántos lugares: el Cascotazo, Demora 2)
+  if(spec.nombre === 'Demora') return dueloDemora(d.defensor.tokenId, spec.stacks, (d.atacante && d.atacante.nombre) || '');   // (stacks = cuántos lugares: el Cascotazo, Demora 2)
   if(spec.nombre === 'Al final del orden') return alFinalDelOrden(d.defensor.tokenId, d.defensor.nombre, d.hab && d.hab.nombre);   // 💥 Takle (js/04)
   if(spec.nombre === 'Sube en el orden') return dueloAdelanto(d.defensor.tokenId, spec.stacks);   // 💨 Arrojo (ex Envión, 2026-10-26)
   if(spec.soltar && !spec.soltar.visual){   // 🕸 una copia vieja de la Red Nerubian o de Tela de araña: la telaraña sale del nombre (js/68)
@@ -2432,7 +2432,7 @@ async function dueloAplicarEfectoBase(d, ef){
 // `lugares` (2026-10-26, el Cascotazo: Demora 2): cuántos lugares baja. Desde el 2026-10-29 (dueño: «que la demora, cuando funciona, esté
 // automatizada»), los dos casos que antes quedaban a mano también: si ya jugó esta ronda baja igual (aunque pase al que tiene el turno: sigue
 // contando como que jugó, no le vuelve a tocar) y si es su propio turno, baja cuando lo termina (`iniciativa.demoras`, js/04).
-async function dueloDemora(tokenId, lugares){
+async function dueloDemora(tokenId, lugares, por){
   const n = Math.max(1, Math.round(num(lugares)) || 1), txt = k => `${k} lugar${k === 1 ? '' : 'es'}`;
   const orden = iniciativa.orden.slice();
   const i = orden.findIndex(o => o.id === tokenId);
@@ -2442,6 +2442,7 @@ async function dueloDemora(tokenId, lugares){
     const demoras = {...(iniciativa.demoras || {})};
     demoras[tokenId] = Math.round(num(demoras[tokenId])) + n;
     if(!(await guardarIniciativa({demoras}))) return {manual: true, nota: `es su turno: bajalo ${txt(n)} a mano cuando termine`};
+    demoraAviso(tokenId, 'al-terminar', {lugares: demoras[tokenId], por});
     return {nota: `es su turno: baja ${txt(demoras[tokenId])} en el orden de turnos cuando lo termine`};
   }
   const j = Math.min(i + n, orden.length - 1);
@@ -2451,7 +2452,36 @@ async function dueloDemora(tokenId, lugares){
   const ya = new Set(iniciativa.actuaron || []);
   if(i < iniciativa.turno && j > turno) ya.add(tokenId);   // ya jugó y queda después del que juega: no le vuelve a tocar en esta ronda
   if(!(await guardarIniciativa({orden: ordenSerial(orden), turno, actuaron: [...ya]}))) return {manual: true, nota: 'no se pudo mover en el orden de turnos: a mano'};
+  demoraAviso(tokenId, 'ahora', {lugares: j - i, desde: i + 1, hasta: j + 1, yaJugo: i < iniciativa.turno, por});
   return {nota: `baja ${txt(j - i)} en el orden de turnos (${i + 1}.º → ${j + 1}.º)${i < iniciativa.turno ? ': ya jugó esta ronda, se nota en la próxima' : ''}`};
+}
+
+/* ⏬ El Aviso de la Demora (dueño, 2026-10-29: «si alguien me aplica demora, tiene que aparecer un anuncio: fuiste demorado, tu posición en la
+   tabla…»): a quien juega con el demorado (su dueño, o quien tiene 🎮 su control; un creep, al GM), al centro con «Entendido»; los demás lo ven
+   en la Crónica. `caso`: 'ahora' (bajó al instante), 'al-terminar' (le llegó en su propio turno: baja cuando lo termine) o 'aplicada' (terminó
+   ese turno y bajó, iniciativaSiguiente en js/04). `o` = {lugares, desde, hasta, yaJugo, por}. */
+function demoraAviso(tokenId, caso, o){
+  const t = tokens.get(tokenId);
+  if(!t || typeof momentoAbrir !== 'function') return;
+  o = o || {};
+  const creep = t.tipo === 'creep', nombre = nombreDe(t);
+  const publico = !t.oculto && (creep ? creepConocido(t) : !enSigilo(t));
+  const quien = publico ? nombre : 'Alguien';
+  const k = Math.max(1, Math.round(num(o.lugares)) || 1), lug = `${k} lugar${k === 1 ? '' : 'es'}`;
+  const por = o.por ? String(o.por) : '';
+  const f = creep ? null : fichasPub.get(String(t.fichaId || '').split(SEP_INVOCACION)[0]);
+  const para = creep ? (soyGM && fbUsuario ? fbUsuario.uid : '') : ((f && f.resumen && f.resumen.control) || t.duenoUid || '');
+  // En segunda persona para el jugador («Fuiste demorado»); en tercera para el GM con un creep y para la Crónica.
+  const textos = vos => caso === 'al-terminar'
+      ? `${vos ? 'Es tu turno: cuando lo termines, bajás' : 'Es su turno: cuando lo termine, baja'} ${lug} en el orden de turnos.`
+    : caso === 'aplicada'
+      ? `${vos ? 'Terminó tu turno y, por la Demora, bajaste' : 'Terminó su turno y, por la Demora, bajó'} ${lug}: ${vos ? 'ahora estás' : 'ahora está'} ${o.hasta}.º en el orden de turnos.`
+      : `${vos ? 'Bajás' : 'Baja'} ${lug} en el orden de turnos: ${vos ? 'ahora estás' : 'ahora está'} ${o.hasta}.º (${vos ? 'estabas' : 'estaba'} ${o.desde}.º).${o.yaJugo ? (vos ? ' Ya jugaste esta ronda: se nota en la próxima.' : ' Ya jugó esta ronda: se nota en la próxima.') : ''}`;
+  const vos = !creep, titulo = caso === 'aplicada' ? `${quien} bajó en el orden de turnos (Demora)` : `${quien} fue demorado${por ? ` por ${por}` : ''}`;
+  momentoAbrir({tipo: 'demora', icono: '⏬', titulo, resultado: textos(false), estado: 'listo',
+    datos: {...(para ? {paraUid: para} : {}), aviso: true, boton: 'Entendido',
+      pasos: [{titulo: vos ? (caso === 'aplicada' ? '⏬ Bajaste en el orden de turnos' : '⏬ Fuiste demorado') : `⏬ ${nombre} ${caso === 'aplicada' ? 'bajó en el orden de turnos' : 'fue demorado'}`, texto: textos(vos)}],
+      veredicto: {tono: 'malo', grande: 'Demora', chico: caso === 'al-terminar' ? `baja ${lug} al terminar el turno` : `${o.hasta}.º en el orden de turnos`}}});
 }
 
 /* 💨 Arrojo (ex Envión, 2026-10-26, dueño: «sube en uno en la tabla de iniciativas»): sube `lugares` (1) en el orden de turnos. No pasa por encima del que tiene el

@@ -495,7 +495,7 @@ async function iniciativaSiguiente(o){
   const nuevaRonda = ronda !== iniciativa.ronda;
   // ⏬ La Demora que le llegó en su propio turno (dueloDemora): baja esos lugares ahora que terminó. Ya jugó: no le vuelve a tocar en la ronda.
   const demoras = {...(iniciativa.demoras || {})};
-  let ordenFin = orden, turnoFin = i, notaDemora = '';
+  let ordenFin = orden, turnoFin = i, notaDemora = '', avisoDemora = null;
   const nDem = termina ? Math.round(num(demoras[termina.id])) : 0;
   if(nDem > 0){
     delete demoras[termina.id];
@@ -506,6 +506,7 @@ async function iniciativaSiguiente(o){
       turnoFin = Math.max(0, ordenFin.findIndex(y => y.id === sigId));
       const tT = tokens.get(termina.id);
       notaDemora = `⏬ Demora: ${tT && !tT.oculto && !enSigilo(tT) ? nombreDe(tT) : 'alguien'} baja ${j - k} lugar${j - k === 1 ? '' : 'es'} en el orden de turnos (${k + 1}.º → ${j + 1}.º)`;
+      avisoDemora = {id: termina.id, lugares: j - k, desde: k + 1, hasta: j + 1};
     }
   }
   // Los que demoraron su turno con ▼ ya lo habían empezado: al volverles a tocar no se repite el inicio. Ronda nueva: se vacía.
@@ -516,6 +517,7 @@ async function iniciativaSiguiente(o){
     demoras, empezados: sigEmpezado ? empezados.filter(x => x !== orden[i].id) : empezados, repite: repite ? orden[i].id : null});
   if(!ok) return;
   if(notaDemora) mesaLinea(notaDemora, 'recordatorio');
+  if(avisoDemora && typeof demoraAviso === 'function') demoraAviso(avisoDemora.id, 'aplicada', avisoDemora);   // ⏬ el Aviso (js/13)
   // La Crónica, para todos (dueño, 2026-10-06): «Empieza el turno de Fulano» sale enseguida (antes esperaba a que se procesara todo, ~5 s) y
   // después se le suman lo que pasó al terminar el anterior y al empezar el suyo.
   const sig = orden[i] || {id: ''};

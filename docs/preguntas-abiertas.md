@@ -1409,3 +1409,12 @@ que pagó (`Duelo.pagoHab`) y el duelo lo lleva (`ataque.pagoHab`); «Cancelar»
 devuelve (gancho `devolverHab` de CreepDuelo, FichaDuelo e InvDuelo). Probado con el Tunelero: «se le devolvió 4 No2, 2 SP». También desde GM Tools suelto
 (9a874b70, probado: 8 → 4 No2 y cooldown 3; «No cuenta» → 8 No2 y cooldown 0).
 
+
+### P234 — 🪝 Arrastrar: si lo engancha pero no hay por dónde traerlo, ¿le pega igual? (2026-10-30)
+
+**Contexto:** probando el empate del gancho en el mapa (Warrior contra juan, con el Tanque en el medio). Enganchó, empató la fuerza, ganó
+piedra, papel o tijera y… no había casilla libre para traerlo: la Crónica dijo «No hay por dónde traerlo: queda donde está». Hoy el código igual
+abre el duelo del golpe (como si lo hubiera traído), y la Mesa dice «lo trae y le pega».
+
+**Propuesta (sin decidir):** si no lo puede mover ni un casillero, no hay golpe (como cuando pierde la fuerza: «no pasa nada») y la Mesa lo dice
+así; si lo mueve aunque sea uno y queda pegado, le pega. Alternativa: le pega igual (el gancho ya lo tiene agarrado).

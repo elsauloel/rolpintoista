@@ -302,10 +302,14 @@
   estado ya no aparece y la Defensa vuelve a 1. «Se suma» se vio antes (el disparo parado con la Tapa la dejó ×1). Falta: Petro en El origen (cuando se abra su ficha).
   Detalle visto: un Rompe armadura de un golpe a alguien sin armadura puesta (solo escudo) no rompe nada —a propósito: el escudo se rompe solo con Parry/Bloqueo—,
   pero el duelo dice «✓ Aplicado · le llegó a su ficha: Armadura rota» (el jugador ve el toast «no tenés piezas de armadura…»).
-- [ ] **🌀 Town portal** (2026-10-29, js/84; **primero pegar las reglas de Firestore**, campo `townPortal`): un jugador lo usa desde su Botonera
+- [x] **🌀 Town portal** (2026-10-29, js/84; reglas pegadas el mismo día): un jugador lo usa desde su Botonera
   (fuera y dentro de combate), elige una casilla al lado, se ve la espiral azul girando en todas las pantallas; cancelar no lo gasta; un aliado, un creep y
   el propio que lo puso lo pisan y se van del mapa (pulsos, línea en la Mesa); el GM los trae al mapa de la aldea. Que aparezca en la góndola de cualquier
   tienda, entre los utilitarios, a 50.
+  ✅ **Probado (2026-10-29, «Claude · pruebas», Mapa 1)**: Clementino lo consumió desde su Botonera (−1 No2): «elegí la casilla del portal», la espiral azul
+  girando al lado suyo, la Mesa «Clementino abrió un Town portal» y el aviso en la Crónica; el GM llevó al Tunelero por encima: pulsos en el portal, el token
+  desapareció del mapa, la Mesa «entró al Town portal y desapareció del mapa» y la Crónica (después se le repuso el token). **El portal quedó puesto** para que
+  lo vea el dueño. Falta: cancelar (Esc) sin que se gaste, dentro de combate, un personaje que lo pisa y la góndola de una tienda nueva.
 - [x] **🧹 Las armas de los creeps después de la limpieza (2026-10-29, 761fcb2a)** — ✅ **probado el mismo día en el mapa** (las dos cuentas, con pestañas nuevas: las viejas estaban congeladas): las Acciones del Warrior (Hacha: Atacar 4 No2, Daño 1d8+12, Parry y Bloqueo con su peso), su ataque a juan («con Hacha · Tipo 8», «Rompe armadura 50 %»), su 🪪 desde el jugador («Hacha · Escudo · Chaleco»), la Botonera del Lobo de prueba de Clementino (Arco corto: 2 No2, 1d4+2, sin Parry) y GM Tools (los 21 creeps leen su arma; la Abeja curandera agregada de la biblioteca de fábrica trae el Aguijón dulce como ítem). Lo de antes: el motor ya no lee los campos viejos (armaNombre, armaTipo…). Revisado por
   datos: los 14 creeps visibles de «Claude · pruebas» leen bien su arma (Hacha, Arco corto, Bate de Baseball…; sin arma solo el Estandarte, el Tótem y el
   Goblin de prueba, que no tienen). **Falta verlo en el mapa con capturas** (las dos ventanas de Chrome estaban minimizadas): un creep ataca con su arma

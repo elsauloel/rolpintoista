@@ -877,7 +877,8 @@ function dueloElegirObjetivoMapa(msg){
   const conArco = !!(ataque && ataque.arco && !ataque.hab);   // el arco: el objetivo, con al menos 2 casilleros libres en el medio (P183)
   const minimo = conArco ? Combatiente.arcoLibres(ataque) + 1 : 0;   // (la Mínima más larga: 2 libres)
   // Un disparo (arma de rango): la línea de tiro se dibuja hasta el mouse y brillan en celeste los que están en la distancia ideal (js/32).
-  const mioTiro = ataque && ataque.rango && !ataque.hab ? [...tokens.entries()].map(([id, t]) => ({...t, id})).find(propio) : null;
+  // 🪝 El gancho de Arrastrar también: va como un proyectil (dueño, 2026-10-30; js/78, arrastrarLinea).
+  const mioTiro = ataque && ((ataque.rango && !ataque.hab) || num(ataque.arrastra) > 0) ? [...tokens.entries()].map(([id, t]) => ({...t, id})).find(propio) : null;
   let nEnAlcance = 0, nIdeal = 0;
   const resaltar = () => {   // también al volver a elegir (después de «Elegir otro»)
     const alc0 = ataque && ataque.rango && !ataque.hab ? Combatiente.alcanceMaximo(ataque, ataque.alcance) : ataque && ataque.alcance;
@@ -928,6 +929,7 @@ function dueloElegirObjetivoMapa(msg){
         try{ r = await saltoHab(mio, t, conSalto, yo); }catch(err){ console.error('No se pudo saltar:', err); r = true; }
         if(!r){ pedir(); return; }
       }
+      if(ataque && num(ataque.arrastra) > 0 && mio && typeof arrastrarLinea === 'function' && !(await arrastrarLinea(mio, t, ataque))){ pedir(); return; }   // 🪝 sin línea libre, no se tira
       if(ataque && num(ataque.arrastra) > 0 && mio && typeof arrastrarEnganche === 'function'){   // 🪝 Arrastrar (js/78, P224): primero el enganche; si no lo engancha, no hay golpe
         let r = true;
         try{ r = await arrastrarEnganche(mio, t, ataque); }catch(err){ console.error('Arrastrar: el enganche', err); }

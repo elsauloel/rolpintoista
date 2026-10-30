@@ -127,6 +127,26 @@ async function golpeQueSigueResuelto(d){
   acElegirObjetivo(sc, atq, () => acPublicar(sc, CreepDuelo.pdgDeArreglos(sc, atq)));
 }
 
+// 🪝 El gancho va como un proyectil (dueño, 2026-10-30: «tiene que haber un camino libre. Si hay cualquier obstáculo entre medio, no se puede tirar
+// la habilidad, y si el obstáculo roza, ahí lo decide la mesa. Es como un proyectil»): la línea de tiro de js/32. Tapada: no se tira (se elige otro,
+// sin gastar nada; la salida a mano, «Ignorar obstáculo»); roza: lo decide la mesa. Lo llama dueloElegirObjetivoMapa (js/13) antes del enganche.
+// → true: sigue; false: elegir otro.
+async function arrastrarLinea(mio, t, ataque){
+  if(distanciaHex(mio, t) <= 1 || typeof lineaDeTiro !== 'function') return true;
+  const lt = lineaDeTiro(mio, t, new Set([mio.id, t.id]));
+  if(lt.estado === 'libre') return true;
+  const hab = ataque.habNombre || 'Arrastrar', nom = nombreDe(mio), obj = nombreDe(t), tapa = tiroTapanTxt(lt.tapan), roza = lt.estado === 'roza';
+  const r = await tiroPreguntar({icono: '🪝', titulo: roza ? `${hab}: la línea roza` : `${hab}: no hay línea libre`,
+    texto: roza
+      ? `La línea de ${nom} hacia ${obj} pasa justo por el borde de ${tapa}. ¿Pasa el gancho? Lo decide la mesa.`
+      : `Entre ${nom} y ${obj} está ${tapa}: el gancho va como un proyectil y necesita la línea libre. Elegí otro objetivo.`,
+    opciones: roza
+      ? [{valor: 'igual', texto: 'Pasa', detalle: 'lo decidió la mesa'}, {valor: 'otro', texto: 'No pasa: elegir otro', sec: true}]
+      : [{valor: 'otro', texto: 'Elegir otro'}, {valor: 'igual', texto: 'Ignorar obstáculo', detalle: 'lo decide la mesa', sec: true}]});
+  if(r !== 'igual') return false;
+  mesaLinea(`🪝 ${nom} tiró ${hab} a ${obj} con la línea ${roza ? 'rozando' : 'tapada por'} ${tapa} (lo decidió la mesa)`, 'alerta-roja');
+  return true;
+}
 /* ⚖ Arrastrar en dos tiempos (P224, dueño 2026-10-29: «vamos con la B», como estaba definido): antes del golpe, el ENGANCHE — la Destreza de quien
    lo tira contra la Evasión del rival (empate: no lo engancha). Si lo engancha, lo trae hasta quedar pegado (aunque después falle el golpe) y sigue
    el ataque con su arma con +2 PdG; si no, no pasa nada más (el ataque ya se gastó). Si ya estaba pegado, va directo al golpe. Lo llama

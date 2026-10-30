@@ -91,7 +91,7 @@ function tiroPreguntar(o){
   return new Promise(res => {
     let hecho = false;
     const fin = v => { if(hecho) return; hecho = true; res(v); };
-    AvisoCombate.mostrar({icono: '🏹', titulo: o.titulo, texto: o.texto, alCerrar: () => fin('otro'),
+    AvisoCombate.mostrar({icono: o.icono || '🏹', titulo: o.titulo, texto: o.texto, alCerrar: () => fin('otro'),
       botones: o.opciones.map(op => ({texto: op.texto, detalle: op.detalle || '', sec: !!op.sec, alClic: () => { fin(op.valor); AvisoCombate.cerrar(); }}))});
   });
 }

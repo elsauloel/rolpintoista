@@ -582,7 +582,11 @@
 - [x] (2026-10-23, Claude, «Claude · pruebas»: dos tiendas generadas seguidas traen las 4 elementales —ácido, escarcha, fuego, relámpago— y ninguna la de punta roma; publicada, desde el mapa la Talabartería las muestra con «quedan 3») **🏹 Talabartería: las 4 flechas elementales siempre en la góndola** (2026-10-11): no se pudo ver en el mapa — la tienda abierta
   («Tienda de pueblito») es anterior al cambio y su Talabartería no trae flechas. Hace falta generar una tienda nueva en el Generador de
   tiendas y mirarla desde el 🏪 del mapa (y que no salga la Flecha de punta roma).
-- [ ] **🎯 Virote recuperable**: ninguna ballesta del catálogo trae el rasgo `recuperable`, así que no hay con qué probarlo en el mapa.
+- [x] **🎯 Virote recuperable** — ✅ probado el 2026-10-30 (las dos cuentas, con una «Ballesta de prueba (recuperable)», copia de la virotera con el
+  rasgo, solo para la prueba: en el catálogo ninguna lo trae desde el rework): juan con 2 Virotes marcadores en el carcaj → Atacar → «¿Qué virote?» →
+  especial → el marcador → el Tunelero a 3, con un Sólido justo detrás; PdG 1 a mano contra Evasión 3 → falló → la Mesa: «Virote marcador chocó contra
+  un obstáculo, pero con esa ballesta no se rompe (virote recuperable)» y «quedó entero en el piso, a 3 casillas (se puede levantar)». Restaurado
+  (ballesta y virote sacados, el arco de vuelta, el Sólido borrado).
 - [x] **🐺 Una invocación que recibe un rebote** (2026-10-12): el Virote de rebote rebotó hacia el Lobo de prueba (invocación de Clementino) y el
   **Probado el 2026-10-20 (Claude, «Test con claude elsaulo»):** con el Lobo invocado, el Virote de rebote erró contra Silvia y rebotó hacia el Lobo: le llegaron sus opciones de defensa (Evasión 1d1) y el duelo terminó normal; el virote quedó en el piso. **Arreglado:** la Mesa decía «La Virote de rebote»; ahora «El virote» y «entero».
   duelo dijo «No llegaron tus opciones de defensa». Puede ser porque el Lobo está sin invocar; revisarlo con una invocación invocada.
@@ -1164,3 +1168,9 @@
   mapa»: su token de la Mazmorra se borró (no se duplicó) y quedó oculto acá. Arreglado en la prueba: los que ya tenían token acá pero figuraban en
   la Reserva (Tunelero, Chamán…) salían «se muda de la Reserva»; ahora van en «En este mapa». Restaurado (el recolector volvió a la Mazmorra, en su
   casilla).
+- [x] **🥷 Oportunidad de un rival que no se ve (P235, 2026-10-30)** — ✅ probado el mismo día (las dos cuentas, en combate): el Warrior en sigilo a la
+  espalda de juan; juan (jugador) se aleja dos casillas → **llega hasta el final sin frenarse**, sin cartel y sin línea en la Mesa; al GM le sale en
+  silencio «juan se aleja de Warrior (prueba)… (juan no ve a Warrior: si lo dejás pasar, no se entera de nada)». **Sí** → el duelo «desde el sigilo, la
+  defensa vale 1» y recién ahí la Mesa «Warrior ataca de oportunidad a juan con Hacha» (duelo cancelado). **No** (repetido en otras casillas) → ni Mesa
+  ni Crónica: la última línea de la Mesa siguió siendo la misma. Ojo al probar: quien ya atacó desde una casilla queda a la vista ahí hasta que se
+  mueva o pase la ronda (🔦, js/82), así que hay que usar otra casilla. Restaurado.

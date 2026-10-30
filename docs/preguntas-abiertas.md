@@ -1424,7 +1424,7 @@ si el obstáculo roza, ahí lo decide la mesa. Es como un proyectil.» El gancho
 `arrastrarLinea`): tapada → «Elegir otro» sin gastar nada (salida a mano: «Ignorar obstáculo»); roza → «Pasa» / «No pasa». Con la línea libre
 siempre hay por dónde traerlo (salvo una trampa del camino, que lo frena ahí), así que el caso de la pregunta ya no se da.
 
-### P235 — 🥷 Oportunidad de un rival escondido: ¿se frena y se lo nombra? (2026-10-30)
+### P235 — 🥷 Oportunidad de un rival escondido: ¿se frena y se lo nombra? (2026-10-30) ✅
 
 **Contexto:** probando el ataque de oportunidad desde el sigilo: el Warrior estaba en sigilo a la espalda de juan y juan se alejó. Al jugador le salió
 al centro «Te alejás de Warrior (prueba)… esperando a ver si aprovecha» y en la Mesa «juan se alejó de Warrior (prueba): posible ataque de
@@ -1433,3 +1433,7 @@ oportunidad». O sea, el juego delata al escondido (su nombre y que está ahí),
 **Propuesta (sin decidir):** si quien se aleja no ve al rival (sigilo, oculto, niebla), no se frena ni se avisa nada: al GM (o a quien maneje al
 escondido) le sale la pregunta en silencio y, si ataca, recién ahí se revela (el duelo ya dice «desde el sigilo»). Alternativa: se frena igual pero
 sin nombre («algo se mueve a tu espalda…»).
+
+**✅ Decidido (dueño, 2026-10-30):** «tu propuesta me parece bien. Que solo avises si la persona decide hacer el ataque de oportunidad.» Hecho en
+`vtt-hexgrid/js/17-oportunidad.js` (`oportunidadSecretas`, `datos.secreto`): no frena ni avisa; la pregunta en silencio a quien maneja al escondido; si ataca,
+se abre el duelo y queda en la Mesa y la Crónica (y quien se alejó recibe «¡… te ataca de oportunidad desde las sombras!»); si no, ningún rastro.

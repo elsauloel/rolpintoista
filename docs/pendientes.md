@@ -39,6 +39,17 @@
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.
 > - [ ] **📋 Pegar las reglas de Firestore (2026-10-30): `creeps/<id>/publico`** — la imagen completa de un creep, para el «👁 Ver completa» de su tarjeta del mapa. Sin pegarlas, el botón no aparece (GM Tools no puede publicar la imagen) y nada más se rompe.
+>   Después, probar «👁 Ver completa» (la 🪪 de un creep desde un jugador) y «Elegir otra imagen» con una foto real.
+> - [ ] **👀 Pruebas que tiene que ver el dueño (2026-10-30, dueño: «lo que tengo que ver yo, anotalo en pendiente para cuando esté en la compu»)** —
+>   detalle en `docs/pruebas-en-el-mapa.md`: el 💪 Empower desde juan (pagar, tirar en un duelo y dárselo a un aliado); ✨ levantar un arma con un clic
+>   en combate (en tu turno y fuera de él); 🤺 el desarme (el cartel, la ruleta, el duelo que vuelve) y un Warrior desarmando desde su cuenta; ⏬ la
+>   Demora en una sesión; 💥 la trampa que explota, vista desde la cuenta de un jugador.
+> - [ ] **🧩 Pruebas que necesitan armar más cosas (2026-10-30, dueño: «lo que necesite armar más cosas, anotalo para cuando esté en la compu»)** —
+>   el botín de punta a punta (Soltar de a uno, el Anuncio «🎁 Botín concluido» con un cierre real, ⚖ Comparar sobre un arma del botín, el «Estado del
+>   grupo» que se abre solo al cerrarlo); ⚔ Disputar sobre una pila (necesita dos jugadores de cuentas distintas); el ataque de una invocación y el 🔍
+>   Ver de un creep (las armas de los creeps); 🏹 una flecha especial desde el carcaj de un personaje; 🏪 la tienda cerrada en la ficha suelta.
+> - [ ] **🤖 Escanear grupo → Proponer creeps (2026-10-30, dueño: «anotalo para cuando esté en la compu»)**: probar la respuesta de la IA (usa la
+>   clave de OpenRouter del dueño).
 > - [x] **✊ Ver el desempate del duelo — hecho por el dueño el 2026-10-30 (gana juan con piedra, papel o tijera). (2026-10-30, dueño: «creá una situación de duelo que llegue a tener que tirar un desempate, dejá el duelo ahí y
 >   yo voy a la compu y veo cómo se resuelve»).** En «Claude · pruebas» quedó abierto un duelo **Warrior (prueba) contra juan**, en «⚖ ¡EMPATE!» (10 a
 >   10, forzado a mano): cada lado ve Par / Impar / ✊ Piedra, papel o tijera; el primero que elige decide el método. Con piedra, papel o tijera se abre
@@ -51,7 +62,8 @@
 >   respuestas del dueño: qué mini jefe (A Capataz del culto con el Cristal de la Grieta, B Capataz goblin, C Gusano de roca domado, o una mezcla); si el
 >   mini jefe intenta escapar con el Town portal; si el portal es simple (el GM cambia el mapa) o automático (pasa solo al mapa del pueblo); y si va el
 >   grisú que explota con fuego. Después, creep por creep como en el encuentro 1 (antes, leer cómo quedó el grupo, solo lectura).
-> - [ ] **🎭 Mejorar cómo se traen los tokens al mapa** (2026-10-28, dueño: «anotá en "para ver en la compu", mejorar el sistema de traer tokens al mapa»).
+> - [x] ✅ **(2026-10-30, hecho: 👥 Traer jugadores… y 👹 Traer creeps… abren una lista para marcar cuáles; los creeps de la Reserva o de otro mapa se
+>   mudan, no se duplican)** **🎭 Mejorar cómo se traen los tokens al mapa** (2026-10-28, dueño: «anotá en "para ver en la compu", mejorar el sistema de traer tokens al mapa»).
 >   Hoy: el botón 🎭 del borde izquierdo (Token nuevo, Traer tokens de jugadores, Traer tokens de creeps por mapa) y «¿Crear su token?» al crear un creep en
 >   GM Tools. Sentarse con el dueño a ver qué molesta y cómo lo quiere.
 > - [x] ✅ **(2026-10-28, hecho: el ambulante con lista fija por sección y la 🛒 Góndola de consumibles en todas las tiendas, ver `docs/rework-tiendas.md`; falta revisar los otros tamaños)** **🏪 Revisar el vendedor ambulante (y las tiendas en general)** (2026-10-28, dueño: «intenté generar una tienda de un vendedor ambulante y

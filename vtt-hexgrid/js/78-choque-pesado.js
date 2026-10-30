@@ -165,6 +165,8 @@ async function arrastrarEnganche(mio, t, ataque){
     mesaPublicar(`💪 ${nom} · ${hab} · Fuerza (para arrastrarlo: + su Constitución ${fmt(conMio)}, contra la Constitución de ${obj}, ${fmt(conObj)})`, {...rf, quien: nom, ...deQuien(mio)});
     if(typeof esperarDadosMapa === 'function') await esperarDadosMapa();
     trae = conMio + rf.total > conObj;
+    // ✊ Empate (dueño, 2026-10-30: «en caso de empate, piedra, papel o tijera»): entre quien maneja al que tira el gancho y el dueño del otro.
+    if(conMio + rf.total === conObj) trae = await arrastrarDesempate(mio, t, hab, nom, obj, conObj);
   }
   if(!trae){
     const txt = rf ? `${nom} engancha a ${obj} pero no lo puede traer (Constitución ${fmt(conMio)} + Fuerza ${rf.total} = ${fmt(conMio + rf.total)} contra su Constitución ${fmt(conObj)}). No pasa nada.` : `${nom} engancha a ${obj} pero no lo puede traer: no pasa nada.`;
@@ -176,6 +178,20 @@ async function arrastrarEnganche(mio, t, ataque){
   const fin = await arrastrarTraer(t.id, mio.id, hab, nom);
   if(fin){ t.col = fin.col; t.fila = fin.fila; }
   return true;
+}
+// ✊ El empate del gancho: piedra, papel o tijera (comun/ppt.js) entre quien maneja a cada uno (un creep: el GM; un personaje: su dueño). Si los
+// dos son de la misma persona (o no hay juego), se pregunta a mano. → true si gana quien tira el gancho.
+async function arrastrarDesempate(mio, t, hab, nom, obj, valor){
+  const uidDe = x => x.tipo === 'creep' ? (fbPartida && fbPartida.gmUid) || (soyGM ? fbUsuario.uid : '') : (x.duenoUid || '');
+  const ua = uidDe(mio), ub = uidDe(t);
+  mesaLinea(`🪝 Empate en ${hab} (${fmt(valor)} a ${fmt(valor)}): se desempata con ✊ piedra, papel o tijera entre ${nom} y ${obj}`, 'recordatorio');
+  if(typeof PPT !== 'undefined' && PPT.desempate && ua && ub && ua !== ub && (ua === fbUsuario.uid || ub === fbUsuario.uid)){
+    try{
+      const r = await PPT.desempate({a: {uid: ua, nombre: nom}, b: {uid: ub, nombre: obj}, texto: `${hab}: ¿${nom} arrastra a ${obj}?`});
+      if(r.ganador === 'a' || r.ganador === 'b') return r.ganador === 'a';
+    }catch(err){ console.error('Empate del gancho:', err); }
+  }
+  return AvisoCombate.preguntar(`Empate (${fmt(valor)} a ${fmt(valor)}): desempatá con piedra, papel o tijera a mano. ¿Ganó ${nom} (lo arrastra)?`, {icono: '✊', titulo: hab, si: `Ganó ${nom}`, no: `Ganó ${obj}`});
 }
 // Lo trae hasta quedar pegado a quien lo arrastra; las trampas del camino lo tocan (la primera que pisa lo frena ahí) y las zonas, también.
 // → la casilla donde quedó, o null si no se movió.

@@ -989,6 +989,7 @@ const Duelo = (() => {
       const conMas = r.gana === 'atacante' ? nb : na;
       return `⚖ Empate (${ta.total} a ${tb.total}) entre ${na} y ${nb}: gana ${ganador} porque ${conMas} llevaba un «+» fijo y la otra no`;
     }
+    if(r.desempate === 'ppt') return `⚖ Empate (${ta.total} a ${tb.total}) entre ${na} y ${nb}: se jugó ✊ piedra, papel o tijera → gana ${ganador}`;
     const mo = r.moneda;
     const quien = mo.quien === 'atacante' ? m.atacante.nombre : m.defensor.nombre;
     return `⚖ Empate (${ta.total} a ${tb.total}) entre ${na} y ${nb}, las dos con «+» fijo o ninguna: ${quien} eligió ${mo.eleccion}, salió ${mo.resultado} (${mo.resultado % 2 === 0 ? 'par' : 'impar'}) → gana ${ganador}`;
@@ -1578,6 +1579,58 @@ const Duelo = (() => {
       publicar = {origen: `${quienTiro} · Empate: ${eleccion}`, r: {formula: '1d6', rolls: [resultado], mod: 0, total: resultado}};
     });
     if(publicar && typeof mesaPublicar === 'function'){ try{ mesaPublicar(publicar.origen, publicar.r); }catch(err){} }
+    anunciarMesa(anuncio);
+  }
+
+  /* ✊ O con piedra, papel o tijera (dueño, 2026-10-30: «que te ofrezca ese mismo método o piedra, papel o tijera; el primero que haga el clic
+     determine si se resuelve de una forma o de la otra»): crea el juego (comun/ppt.js) en la misma transacción y lo anota en `empate.ppt`; cuando
+     termina, `resolverPpt` cierra el empate (a = atacante, b = defensor). Cualquier pantalla que vea el duelo vigila el juego (`vigilarPpt`), así
+     se resuelve aunque quien eligió se haya ido; la transacción no lo hace dos veces. Si se cancela, el empate vuelve a ofrecer los dos métodos. */
+  const pptPosible = d => typeof PPT !== 'undefined' && PPT.docNuevo && d.atacante && d.defensor && d.atacante.uid && d.defensor.uid && d.atacante.uid !== d.defensor.uid;
+  async function elegirPpt(id){
+    const ref = col().doc(id);
+    let pptId = null, error = '';
+    await fbDb.runTransaction(async tx => {
+      pptId = null; error = '';
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(m.estado !== 'empate' || !m.empate || m.empate.moneda || m.empate.ppt) return;   // ya lo eligió el otro
+      if(!pptPosible(m)){ error = 'Los dos lados son de la misma persona: desempatá con par o impar'; return; }
+      const r = PPT.ref();
+      tx.set(r, PPT.docNuevo({a: {uid: m.atacante.uid, nombre: m.atacante.nombre}, b: {uid: m.defensor.uid, nombre: m.defensor.nombre},
+        motivo: {tipo: 'libre', texto: `desempate del duelo: ${m.atacante.nombre} contra ${m.defensor.nombre}`}}));
+      tx.update(ref, {empate: {...m.empate, ppt: r.id}});
+      pptId = r.id;
+    });
+    if(error){ _toast(error); return; }
+    if(pptId){
+      anunciarMesa(`⚖ Empate en el duelo: se desempata con ✊ piedra, papel o tijera`);
+      vigilarPpt(id, pptId);
+    }
+  }
+  const pptVigilados = new Set();
+  function vigilarPpt(dueloId, pptId){
+    if(!pptId || pptVigilados.has(pptId) || typeof PPT === 'undefined' || !PPT.esperar) return;
+    pptVigilados.add(pptId);
+    PPT.esperar(pptId).then(({ganador}) => resolverPpt(dueloId, pptId, ganador)).catch(err => console.error('Desempate con piedra, papel o tijera:', err));
+  }
+  async function resolverPpt(id, pptId, ganador){
+    const ref = col().doc(id);
+    let anuncio = '';
+    await fbDb.runTransaction(async tx => {
+      anuncio = '';
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(m.estado !== 'empate' || !m.empate || m.empate.ppt !== pptId) return;   // ya resuelto
+      const par = m.empate.par;
+      if(ganador !== 'a' && ganador !== 'b'){ tx.update(ref, {empate: {par}}); return; }   // se canceló: vuelve a elegir
+      const r = {gana: ganador === 'a' ? 'atacante' : 'defensor', dif: 0, desempate: 'ppt'};
+      cerrarPar(m, par, r);
+      anuncio = textoDesempate(m, par, r);
+      tx.update(ref, cambiosDe(m));
+    });
     anunciarMesa(anuncio);
   }
 
@@ -2194,9 +2247,16 @@ const Duelo = (() => {
     const par = d.empate.par;
     const [na, nb, ta, tb] = nombresPar(d, par);
     const lados = [['atacante', d.atacante], ['defensor', d.defensor]].filter(([, l]) => puedoAMano(l));
-    return `<div class="duelo-veredicto empate${esNuevo ? ' nuevo' : ''}"><div class="grande">⚖ ¡EMPATE!</div><div class="chico">${_esc(na)} ${ta.total} · ${_esc(nb)} ${tb.total} — las dos llevan «+» fijo (o ninguna): se resuelve con par o impar</div>
-      ${lados.length ? lados.map(([q, l]) => `<div class="duelo-par"><span>${_esc(l.nombre)} (${q}) elige:</span><button type="button" data-par="${q}:par">Par</button><button type="button" data-par="${q}:impar">Impar</button></div>`).join('') : '<div class="chico">esperando que uno de los dos elija par o impar…</div>'}
-      <div class="chico">el primero que elige decide: se tira un dado y gana el que acierta</div></div>`;
+    if(d.empate.ppt){   // ✊ eligieron piedra, papel o tijera (2026-10-30): se espera el juego
+      vigilarPpt(d.id, d.empate.ppt);
+      return `<div class="duelo-veredicto empate${esNuevo ? ' nuevo' : ''}"><div class="grande">⚖ ¡EMPATE!</div><div class="chico">${_esc(na)} ${ta.total} · ${_esc(nb)} ${tb.total} — se desempata con ✊ piedra, papel o tijera</div>
+        <div class="chico">esperando que ${_esc(d.atacante.nombre)} y ${_esc(d.defensor.nombre)} jueguen…</div>
+        <div class="duelo-par"><button type="button" data-ppt-ver="${_esc(d.empate.ppt)}">✊ Ver el juego</button></div></div>`;
+    }
+    const ppt = pptPosible(d);
+    return `<div class="duelo-veredicto empate${esNuevo ? ' nuevo' : ''}"><div class="grande">⚖ ¡EMPATE!</div><div class="chico">${_esc(na)} ${ta.total} · ${_esc(nb)} ${tb.total} — las dos llevan «+» fijo (o ninguna): se desempata con par o impar${ppt ? ' o con piedra, papel o tijera' : ''}</div>
+      ${lados.length ? lados.map(([q, l]) => `<div class="duelo-par"><span>${_esc(l.nombre)} (${q}) elige:</span><button type="button" data-par="${q}:par">Par</button><button type="button" data-par="${q}:impar">Impar</button>${ppt ? `<button type="button" data-ppt-elegir="${q}">✊ Piedra, papel o tijera</button>` : ''}</div>`).join('') : `<div class="chico">esperando que uno de los dos elija cómo desempatar…</div>`}
+      <div class="chico">${ppt ? 'el primero que elige decide cómo se desempata: con par o impar se tira un dado y gana el que acierta; con piedra, papel o tijera juegan los dos' : 'el primero que elige decide: se tira un dado y gana el que acierta'}</div></div>`;
   }
 
   function veredictoHtml(d, esNuevo){
@@ -2209,6 +2269,7 @@ const Duelo = (() => {
       const ganador = info.gana === 'atacante' ? d.atacante.nombre : d.defensor.nombre;
       if(info.desempate === 'mas1') motivos.push(`Se resolvió el empate (${_esc(par === 'contacto' ? 'contacto' : 'Bloqueo')}): gana ${_esc(ganador)} porque la otra tirada llevaba un «+» fijo y ella no.`);
       else if(info.desempate === 'polilla') motivos.push(`Empate después de la 🦋 Polilla mística: gana ${_esc(ganador)} (quien usa la Polilla pierde los empates).`);
+      else if(info.desempate === 'ppt') motivos.push(`Se resolvió el empate (${par === 'contacto' ? 'contacto' : 'Bloqueo'}) con ✊ piedra, papel o tijera: gana ${_esc(ganador)}.`);
       else if(info.moneda) motivos.push(`Se resolvió el empate (${par === 'contacto' ? 'contacto' : 'Bloqueo'}) con par o impar: ${_esc(info.moneda.quien === 'atacante' ? d.atacante.nombre : d.defensor.nombre)} eligió ${info.moneda.eleccion}, salió ${info.moneda.resultado} (${info.moneda.resultado % 2 === 0 ? 'par' : 'impar'}) → gana ${_esc(ganador)}.`);
     });
     const mot = motivos.map(t => `<div class="duelo-motivo">⚖ ${t}</div>`).join('');
@@ -2731,6 +2792,11 @@ const Duelo = (() => {
       f.querySelectorAll('[data-par]').forEach(x => x.disabled = true);
       elegirParidad(d.id, q, e).catch(err => { console.error(err); _toast('No se pudo tirar el desempate'); });
     });
+    f.querySelectorAll('[data-ppt-elegir]').forEach(b => b.onclick = () => {
+      f.querySelectorAll('[data-par], [data-ppt-elegir]').forEach(x => x.disabled = true);
+      elegirPpt(d.id).catch(err => { console.error(err); _toast('No se pudo empezar el piedra, papel o tijera' + (err && err.code === 'permission-denied' ? ' (sin permiso)' : '')); });
+    });
+    f.querySelectorAll('[data-ppt-ver]').forEach(b => b.onclick = () => { if(typeof PPT !== 'undefined') PPT.mostrar(b.dataset.pptVer); });
     f.querySelectorAll('[data-tirar]').forEach(b => b.onclick = () => {
       const campo = b.dataset.tirar;
       b.disabled = true; b.textContent = 'Tirando…';

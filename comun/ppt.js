@@ -441,5 +441,26 @@ const PPT = (() => {
     document.head.appendChild(s);
   }
 
-  return {JUGADAS, resultado, ladoDe, ref, docNuevo, elegir, rendirse, retar, iniciar, mostrar, juega};
+  /* ⚖ Para desempatar (2026-10-30, dueño: «en caso de empate, piedra, papel o tijera»): esperar(id) → Promise<{ganador: 'a'|'b'|'', d}> cuando el
+     juego deja de estar «jugando» (ganador '' si se canceló o se borró); desempate({a, b, texto}) lo crea y lo espera. Se usa en el gancho de
+     Arrastrar (vtt-hexgrid/js/78) y en el empate del duelo (comun/duelo.js, que lo crea en su propia transacción y usa esperar). */
+  function esperar(id){
+    return new Promise(ok => {
+      let off = null, listo = false;
+      const fin = v => { if(listo) return; listo = true; if(off) off(); ok(v); };
+      off = col().doc(id).onSnapshot(s => {
+        if(!s.exists){ fin({ganador: '', d: null}); return; }
+        const d = s.data();
+        if(d.estado !== 'jugando') fin({ganador: d.ganador || '', d});
+      }, () => fin({ganador: '', d: null}));
+      if(listo && off) off();
+    });
+  }
+  async function desempate({a, b, texto}){
+    const r = ref();
+    await r.set(docNuevo({a, b, motivo: {tipo: 'libre', texto}}));
+    return esperar(r.id);
+  }
+
+  return {JUGADAS, resultado, ladoDe, ref, docNuevo, elegir, rendirse, retar, iniciar, mostrar, juega, esperar, desempate};
 })();

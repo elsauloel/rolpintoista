@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../comun/dock-izq.css?v=20261012zy">
-<link rel="stylesheet" href="gm-tools.css?v=20261030ed2">
+<link rel="stylesheet" href="gm-tools.css?v=20261030ed3">
 <script src="../comun/confirmar.js?v=20261026zw"></script>
 <script src="../comun/pausa.js?v=20261020d"></script>
 <script src="../comun/embebido.js?v=20260930b"></script>
@@ -81,8 +81,10 @@ if(['acciones', 'finalizar', 'botin'].includes(new URLSearchParams(location.sear
      editores de habilidad, arma, estado y equipo, que tienen que quedar encima. -->
 <div class="scrim" id="scrim-editar-creep">
   <div class="modal editar-creep-modal" id="editar-creep-body"></div>
-  <div class="editar-creep-pie"><button type="button" class="btn ghost" id="editar-creep-cancelar">Cancelar</button><button type="button" class="btn primary" id="editar-creep-guardar">✔ Guardar</button></div>
 </div>
+<!-- ✔ Guardar / Cancelar de la ficha del lápiz (2026-10-30): afuera de la ventana para flotar sobre la pantalla (adentro, el desenfoque del fondo los ataba al
+     scroll); se ven solo con la ficha abierta (gm-tools.css). -->
+<div class="editar-creep-pie"><button type="button" class="btn ghost" id="editar-creep-cancelar">Cancelar</button><button type="button" class="btn primary" id="editar-creep-guardar">✔ Guardar</button></div>
 
 <div class="scrim" id="scrim-acciones-creep">
   <div class="modal acciones-modal">

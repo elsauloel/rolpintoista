@@ -360,3 +360,4 @@ Propuesta (esperando el OK; solo skills auditadas, ninguna repetida con el Culti
 - **Decidido (dueño, 2026-10-29)**: al romperse el Cristal **no pasa nada más** (solo se termina el bonus; sin mecánica nueva). **Sí escapa con el Town
   portal** cuando le queda poca vida: lo lleva en el cinturón (un creep ya lo puede usar desde sus Acciones: el GM elige la casilla al lado y después lo
   mueve al portal). El grisú: el dueño no lo entendió; se le explicó y queda a su respuesta.
+- **Decidido (dueño, 2026-10-30)**: el grisú queda afuera por ahora (anotado en `pendientes.md`, «Ideas del dueño para retomar»).

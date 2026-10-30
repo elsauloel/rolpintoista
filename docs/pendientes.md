@@ -169,6 +169,9 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
+> - [ ] **💥 Bolsas de grisú en las minas (2026-10-30, dueño: «lo del grisú lo dejamos afuera x ahora»).** Manchas de gas en algunas casillas: estar
+>   adentro marea (−1 a la puntería) y, si les llega fuego (antorcha, farolero, hechizo), explotan y lastiman a todos los de cerca. Hace falta programar
+>   que el fuego detone una zona. Quedó afuera del encuentro 2 de El origen; para retomar.
 > - [ ] **📜 Pergamino de Town portal (2026-10-28, dueño: «pergamino de town portal, crear y poner como drop en la próxima pelea»).** Un consumible que abre
 >   un portal de vuelta al pueblo (o a un lugar seguro). Diseñarlo (precio, calidad, qué hace en el mapa: ¿dos portales como Invocar portal, uno acá y otro en
 >   el pueblo?), cargarlo al catálogo y ponerlo como drop fijo de un creep de la próxima pelea de El origen.

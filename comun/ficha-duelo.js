@@ -177,6 +177,17 @@ const FichaDuelo = (() => {
         return true;
       },
       // Un duelo cancelado que no cuenta como ataque (2026-10-15, dueño): se descuenta del conteo y se devuelven los No2 que pagó. → los No2 devueltos.
+      // ↩ Una habilidad cancelada que no cuenta (P233, 2026-10-29): los No2, el SP y la vida que pagó. → qué se devolvió.
+      devolverHab: d => {
+        const S = getS(), p = (d.ataque && d.ataque.pagoHab) || {}, hechos = [];
+        if(num(p.no2) > 0){ S.nitros = num(S.nitros) + num(p.no2); hechos.push(`${fmt(num(p.no2))} No2`); }
+        if(num(p.sp) > 0){ S.spGastado = Math.max(0, num(S.spGastado) - num(p.sp)); hechos.push(`${fmt(num(p.sp))} SP`); }
+        if(num(p.hp) > 0){ if(ui.fijarHp) ui.fijarHp(num(S.hp) + num(p.hp)); else S.hp = num(S.hp) + num(p.hp); hechos.push(`${fmt(num(p.hp))} de vida`); }
+        const k = 'hab:' + p.habId;
+        if(p.habId && S.ataquesArma && num(S.ataquesArma[k]) > 0) S.ataquesArma = {...S.ataquesArma, [k]: num(S.ataquesArma[k]) - 1};   // (una vez por turno)
+        ui.cambio(['nitros', 'vitals', 'refresh']);
+        return hechos.join(', ');
+      },
       devolverAtaque: d => {
         const S = getS();
         if(!d.ataque || d.ataque.tipo === 'habilidad-arma') return 0;

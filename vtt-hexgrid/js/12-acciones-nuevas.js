@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261028g', '../comun/creep-botonera.js?v=20261023p8a', '../comun/creep-acciones.js?v=20261028x', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261029m'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261008u', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261028g', '../comun/creep-botonera.js?v=20261029z', '../comun/creep-acciones.js?v=20261029z', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261029z'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -381,6 +381,7 @@ function acAtacar(tipo, flechaId){
    usada; si se cancela, `acDevolver` lo repone. Los No2 de «lo de un ataque» se cobran recién en el duelo: no hay nada que devolver. */
 function acDevolver(dev){
   if(!dev) return;
+  if(typeof Duelo !== 'undefined' && Duelo.pagoHab) Duelo.pagoHab(dev.creepId, null);   // (ya se devolvió: el duelo no lo lleva)
   acCambiarCreep(dev.creepId, c => {
     if(dev.sp > 0) c.sp = num(c.sp) + dev.sp;
     if(dev.nitros > 0) c.nitros = num(c.nitros) + dev.nitros;
@@ -693,7 +694,9 @@ async function acEjecutarHab(sc, habId){
     if(!p) return;
     { const c = p.creep, hh = (c.habilidades || []).find(x => x.id === habId), cdNuevo = num(hh && hh.cdActual);
       ac.devolucion = {creepId: id, habId, habNombre: h.nombre || 'la habilidad', creep: sc.nombre || 'El creep', cd: antes.cd,
-        cdTxt: cdNuevo !== antes.cd ? 'el cooldown' : '', sp: Math.max(0, antes.sp - num(c.sp)), nitros: Math.max(0, antes.nitros - num(c.nitros))}; }
+        cdTxt: cdNuevo !== antes.cd ? 'el cooldown' : '', sp: Math.max(0, antes.sp - num(c.sp)), nitros: Math.max(0, antes.nitros - num(c.nitros))};
+      // ↩ Lo que cobró, para el duelo que arme (P233): si se cancela y no cuenta, se devuelve.
+      if(typeof Duelo !== 'undefined' && Duelo.pagoHab) Duelo.pagoHab(id, {habId, nombre: h.nombre || '', no2: ac.devolucion.nitros, sp: ac.devolucion.sp, hp: num(p.costoHp), cd: cdNuevo !== antes.cd ? antes.cd : -1}); }
     if(p.aviso) toast(p.aviso);
     if(doble) try{ mesaLinea(`⚡ ${p.creep.nombre || 'El creep'}: ${h.nombre || 'la habilidad'} en turno ajeno (Flash) — cuesta el doble (${CreepCalculo.modoSP(p.creep) ? `${fmt(p.costoSp)} SP` : `cooldown ${fmt(num(h.cd) * 2)}`})`, 'recordatorio'); }catch(err){}
     if(p.curaCon !== undefined) try{   // 💨 el Segundo aliento: nunca en silencio

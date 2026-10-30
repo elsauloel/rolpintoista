@@ -130,6 +130,18 @@ const InvDuelo = (() => {
         return !!(await atacarSuelto(inv, d.ataque.tipo, d.id, true));
       },
       // Un duelo cancelado que no cuenta como ataque (2026-10-15): el conteo y los No2, de vuelta. → los No2 devueltos.
+      // ↩ Una habilidad cancelada que no cuenta (P233, 2026-10-29): los No2, la vida y el cooldown. → qué se devolvió.
+      devolverHab: d => {
+        const inv = ui.inv(d.atacante), p = (d.ataque && d.ataque.pagoHab) || {}, hechos = [];
+        if(!inv) return '';
+        ui.cambiar(() => {
+          if(num(p.no2) > 0){ inv.nitros = num(inv.nitros) + num(p.no2); hechos.push(`${fmt(num(p.no2))} No2`); }
+          if(num(p.hp) > 0){ inv.hp = num(inv.hp) + num(p.hp); hechos.push(`${fmt(num(p.hp))} de vida`); }
+          const h = (inv.habilidades || []).find(x => x && x.id === p.habId);
+          if(h && num(p.cd) >= 0 && num(h.cdActual) !== num(p.cd)){ h.cdActual = num(p.cd); hechos.push('el cooldown'); }
+        });
+        return hechos.join(', ');
+      },
       devolverAtaque: d => {
         const inv = ui.inv(d.atacante);
         if(!inv || !d.ataque || d.ataque.tipo === 'habilidad-arma') return 0;

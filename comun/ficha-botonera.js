@@ -95,6 +95,13 @@ const FichaBotonera = (() => {
     if(FichaHabilidades.nitrosVariable(h)) return false;
     return num(S.nitros) < costoNitrosHab(S, h);
   }
+  // 💧 Sin SP suficiente (dueño, 2026-10-29: «una habilidad sin SP suficiente se marca en rojo y aún así se deja ejecutar con advertencia previa»).
+  const spLibre = S => spMaximo(S) - num(S.spGastado);
+  function sinSpPara(S, h){
+    if(!habAutomatizada(h) || FichaHabilidades.spVariable(h) || (h.excavar && h.emerger)) return false;   // (Excavar revisa lo suyo al ejecutarla)
+    const costo = num(FichaHabilidades.costoSpDe(S, h));
+    return costo > 0 && costo > spLibre(S);
+  }
   // Lo que cuesta ejecutar una habilidad, para verlo sin abrir la tarjeta. El costo en SP es texto libre.
   function costoHabilidadTxt(S, h){
     if(!habAutomatizada(h)) return '';
@@ -448,7 +455,7 @@ const FichaBotonera = (() => {
       <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-habilidades" title="Contraer/expandir">👁</button><span>Habilidades</span></div>
       <div class="botonera-list-grid">
         ${S.habilidades.length ? S.habilidades.map(i => {
-          const sinNitros = sinNitrosPara(S, i);
+          const sinNitros = sinNitrosPara(S, i), sinSp = !sinNitros && sinSpPara(S, i);
           // Nombre y costo a la izquierda; Ver y Ejecutar siempre juntos a la derecha.
           return `<div class="cat-row bot-fila">
             <div class="bot-fila-info">
@@ -457,7 +464,7 @@ const FichaBotonera = (() => {
             </div>
             <div class="bot-fila-btns">
               <button class="mini" data-view="habilidades:${i.id}">Ver</button>
-              <button class="ejecutar-btn${habAutomatizada(i) ? ' con-lupa' : ''}${sinNitros?" sin-recursos":""}${Combatiente.esFlash(i) ? ' bt-flash' : ''}" data-ejecutar="${i.id}" ${sinNitros?'aria-disabled="true" title="No te alcanzan los recursos"':Combatiente.esFlash(i) ? 'title="⚡ Flash: se puede usar en turno ajeno (cuesta el doble)"' : ''}>${habAutomatizada(i) ? 'Ejecutar' + lupaBotonHtml(`habx:${i.id}`, "en-boton") : 'Anunciar'}</button>
+              <button class="ejecutar-btn${habAutomatizada(i) ? ' con-lupa' : ''}${sinNitros || sinSp?" sin-recursos":""}${Combatiente.esFlash(i) ? ' bt-flash' : ''}" data-ejecutar="${i.id}" ${sinNitros?'aria-disabled="true" title="No te alcanzan los recursos"':sinSp?'title="No te alcanza el SP: te avisa antes y la podés usar igual"':Combatiente.esFlash(i) ? 'title="⚡ Flash: se puede usar en turno ajeno (cuesta el doble)"' : ''}>${habAutomatizada(i) ? 'Ejecutar' + lupaBotonHtml(`habx:${i.id}`, "en-boton") : 'Anunciar'}</button>
               ${botonSegundaHab(i)}
             </div>
           </div>`;
@@ -485,7 +492,7 @@ const FichaBotonera = (() => {
     return {html, nitros: badgeNitros, sp: badgeSp, def: badgeDef};
   }
 
-  return {STATS_CON_TIRADA_IDS, TIPOS_IDS, PERCEPCION_DADO_SUBE, html, tiradaStat, tiradaPercepcion, tiradaPercepcionValor,
+  return {STATS_CON_TIRADA_IDS, TIPOS_IDS, PERCEPCION_DADO_SUBE, sinSpPara, spLibre, html, tiradaStat, tiradaPercepcion, tiradaPercepcionValor,
     spMaximo, nitrosMaximo, tienePercepcionAumentada, tieneSigilo, efectoSigilo, efectoSentado,
     statsConTirada, habStatTirable, habTieneSegundaTirada, botonSegundaHab, dueloDe, modoHab, habAutomatizada,
     armasParaHabilidad, costoAtaqueMinimo, costoAtaqueHabTxt, costoNitrosHab, sinNitrosPara, costoHabilidadTxt,

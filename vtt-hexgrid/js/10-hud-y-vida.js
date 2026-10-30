@@ -31,9 +31,10 @@ function hudDatos(t){
   const hp = secreto ? null : (t.tipo === 'creep' ? (sc ? num(sc.hp) : null) : num(r.hp));
   const {sp, spMax} = spDeResumen(r);
   const conSp = t.tipo === 'pj' && !invocacion && spMax > 0;
+  const spCreep = !secreto && sc && CreepCalculo.modoSP(sc);   // 💧 un creep en modo SP: su círculo de SP, editable por el GM (2026-10-29)
   return {
     hp, hpMax: t.tipo === 'creep' ? (sc ? num(sc.hpMax) : null) : num(r.hpMax),
-    sp: conSp ? sp : null, spMax: conSp ? spMax : null,
+    sp: conSp ? sp : spCreep ? CreepCalculo.spActual(sc) : null, spMax: conSp ? spMax : spCreep ? CreepCalculo.spMax(sc) : null,
     no2: secreto ? null : (n ? n.valor : null), no2Max: secreto ? null : (n ? n.max : null),
     def: t.tipo === 'creep' ? (sc ? creepDefensaMapa(sc) : null) : (r.def === undefined ? null : num(r.def)),
     estados: (v && v.resumen && v.resumen.estados) || [],
@@ -1334,7 +1335,7 @@ async function hudAplicar(clave, texto){
   }
   try{
     if(clave === 'no2') await cambiarNitros(t, texto);
-    else if(t.tipo === 'creep') await cambiarVidaCreep(t.fichaId, texto);
+    else if(t.tipo === 'creep') await cambiarVidaCreep(t.fichaId, texto, clave);
     else await cambiarVidaPj(t, clave, texto, levantar);
     vitalRegistrar(idTok, clave, antes);
   }catch(err){

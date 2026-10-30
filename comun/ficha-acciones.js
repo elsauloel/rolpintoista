@@ -760,10 +760,20 @@ const FichaAcciones = (() => {
       if(elegido === null) return;   // canceló: no se cobra ni se ejecuta nada
       costoSp = elegido;
     }
+    // 💧 Sin SP suficiente (dueño, 2026-10-29): avisa antes y deja usarla igual; gasta el SP que tenga y queda en 0 (como un creep en modo SP).
+    if(costoSp > 0 && !FichaHabilidades.spVariable(it) && costoSp > FichaBotonera.spLibre(S)){
+      const libre = Math.max(0, FichaBotonera.spLibre(S));
+      const txt = `Tenés ${fmt(libre)} de SP y ${it.nombre || 'la habilidad'} cuesta ${fmt(costoSp)}. ¿Usarla igual? (gasta el SP que tenés y quedás en 0)`;
+      if(!(await (ui.confirmar || (t => Confirmar.preguntar(t, {titulo: 'No te alcanza el SP', icono: '💧', si: 'Usarla igual', no: 'No'})))(txt))) return;
+      costoSp = libre;
+    }
     if(Combatiente.sangraPorSp(S.efectos) && !(await confirmarMaldito(S, costoSp, ui, it.nombre))) return;   // 🩸 Maldito: avisa y deja cancelar antes de cobrar nada
+    const no2Antes = num(S.nitros);
     S.nitros = num(S.nitros) - (forzar && costoNitros > num(S.nitros) ? gastoNitrosForzado(S, costoNitros, `usó ${it.nombre}`) : costoNitros);
     tormentaPj(S, costoNitros, `usar ${it.nombre}`, ui);
     gastarSp(S, costoSp, ui, it.nombre);   // 🩸 Maldito: la vida, al pagar
+    // ↩ Lo que cobró, para el duelo que arme (P233, 2026-10-29): si se cancela y no cuenta, se devuelve (FichaDuelo.devolverHab).
+    try{ const yoRef = ui.yo && ui.yo() && ui.yo().ref; if(yoRef && typeof Duelo !== 'undefined' && Duelo.pagoHab) Duelo.pagoHab(yoRef, {habId: it.id, nombre: it.nombre || '', no2: Math.max(0, no2Antes - num(S.nitros)), sp: costoSp, hp: num(it.hpCosto), cd: -1}); }catch(e){}
     if(it.unaVezPorTurno) S.ataquesArma = {...(S.ataquesArma || {}), ['hab:' + it.id]: num((S.ataquesArma || {})['hab:' + it.id]) + 1};
     const costoHp = num(it.hpCosto);
     if(costoHp > 0) ui.fijarHp(num(S.hp) - costoHp);

@@ -638,8 +638,14 @@ async function modificarCreep(creepId, cambiar){
   });
 }
 
-async function cambiarVidaCreep(creepId, texto){
+async function cambiarVidaCreep(creepId, texto, clave){
   await modificarCreep(creepId, sc => {
+    if(clave === 'sp'){   // 💧 el SP de un creep en modo SP, a mano desde el token (2026-10-29): entre 0 y su máximo
+      const nuevoSp = leerValorVital(texto, CreepCalculo.spActual(sc));
+      if(nuevoSp === null) throw new Error(ERROR_TIPEO);
+      sc.sp = Math.max(0, Math.min(CreepCalculo.spMax(sc), nuevoSp));
+      return;
+    }
     const hpMax = num(sc.hpMax);
     const nuevo = leerValorVital(texto, num(sc.hp));
     if(nuevo === null) throw new Error(ERROR_TIPEO);

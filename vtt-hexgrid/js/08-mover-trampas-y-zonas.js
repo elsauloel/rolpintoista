@@ -120,7 +120,7 @@ async function deshacerVital(u){
   const nombre = u.clave === 'hp' ? 'HP' : u.clave === 'sp' ? 'SP' : 'No2';
   try{
     if(u.clave === 'no2') await cambiarNitros(t, txt);
-    else if(t.tipo === 'creep') await cambiarVidaCreep(t.fichaId, txt);
+    else if(t.tipo === 'creep') await cambiarVidaCreep(t.fichaId, txt, u.clave);
     else await cambiarVidaPj(t, u.clave, txt);
     pedirDibujo();
     toast(`Deshecho: ${nombre} vuelve a ${fmt(u.antes)}`);

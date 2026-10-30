@@ -548,6 +548,13 @@ const Duelo = (() => {
   });
   const tiroTxt = t => [t.pdg ? `${t.pdg > 0 ? '+' : '−'}${_fmt(Math.abs(t.pdg))} PdG` : '', t.crit ? `Crítico frecuente +${_fmt(t.crit)}` : '', t.critpot ? `Crítico potente +${_fmt(t.critpot)}` : '',
     t.fijo ? `${t.fijo > 0 ? '+' : '−'}${_fmt(Math.abs(t.fijo))} de daño` : '', t.dado ? `+${t.dado} de daño` : '', t.ignora ? `ignora ${_fmt(t.ignora)} de Resistencia a crítico` : ''].filter(Boolean).join(', ');
+  /* ↩ Lo que cobró una habilidad antes de su duelo (P233, dueño 2026-10-29: «me parece bien que preguntes si se cobra o no»). La pantalla que la
+     ejecuta lo anota (`pagoHab(ref, {habId, nombre, no2, sp, hp, cd})`, cd = el cooldown que tenía antes, o −1 si no cambió) y el duelo que crea
+     enseguida lo lleva (`ataque.pagoHab`): si se cancela y no cuenta, quien maneja al atacante lo devuelve (gancho `devolverHab`). */
+  const pagosHab = new Map();
+  function pagoHab(ref, pago){ if(!ref) return; if(pago) pagosHab.set(String(ref), {...pago, cuando: Date.now()}); else pagosHab.delete(String(ref)); }
+  const pagoHabTxt = p => [_num(p.no2) > 0 ? `${_fmt(_num(p.no2))} No2` : '', _num(p.sp) > 0 ? `${_fmt(_num(p.sp))} SP` : '', _num(p.hp) > 0 ? `${_fmt(_num(p.hp))} de vida` : '',
+    _num(p.cd) >= 0 ? 'su cooldown' : ''].filter(Boolean).join(', ');
   // tokDef = un token del mapa ({id, nombre, tipo, fichaId, duenoUid}); miTokenId = el token del atacante (o ''); contraDe = id del duelo que se contraataca.
   async function crear(cfg, tokDef, miTokenId, contraDe){
     const hab = limpiarHab(cfg.ataque.hab);
@@ -584,6 +591,12 @@ const Duelo = (() => {
       creado: firebase.firestore.FieldValue.serverTimestamp(),
     };
     if(textoAtq && inicial.ataque) inicial.ataque.texto = textoAtq;
+    { const ph = pagosHab.get(String(cfg.yo.ref)), nomDuelo = String((hab && hab.nombre) || cfg.ataque.habNombre || '');   // ↩ lo que ya cobró la habilidad (P233)
+      if(ph && inicial.ataque && (hab || cfg.ataque.tipo === 'habilidad-arma') && Date.now() - ph.cuando < 600000 && (!ph.nombre || nomDuelo.startsWith(String(ph.nombre)))){
+        pagosHab.delete(String(cfg.yo.ref));
+        const n = v => Math.max(0, Math.min(99, Math.round(_num(v))));
+        inicial.ataque.pagoHab = {habId: txtCorto(ph.habId, 40), nombre: txtCorto(ph.nombre, 60), no2: n(ph.no2), sp: n(ph.sp), hp: n(ph.hp), cd: _num(ph.cd) >= 0 ? n(ph.cd) : -1};
+      } }
     // 🤺 Con un arma natural (garras, colmillos): no se le puede desarmar (dueño, 2026-10-22); lo dice la pantalla que crea el duelo (js/62).
     try{ if(!hab && inicial.ataque && typeof window.dueloArmaNatural === 'function' && await window.dueloArmaNatural(cfg.yo, cfg.ataque)) inicial.ataque.natural = true; }catch(e){}   // (una invocación: se lee su ficha)
     // Hechizo de área (dicho por el dueño, 2026-09-27): el casteador tira su PdG.Esp/PdG UNA SOLA VEZ para toda la
@@ -3140,6 +3153,15 @@ const Duelo = (() => {
     const pagado = !d.hab && a.tipo && a.tipo !== 'habilidad-arma' && d.pdg;
     const conFlecha = !!(a.flecha && a.flecha.vuelve), yFlecha = conFlecha ? ` y ${a.flecha.nombre || 'la flecha'}` : '';
     let devolver = false;
+    // ↩ Una habilidad que ya cobró (P233): ¿cuenta como usada? Si no, se le devuelve lo que pagó y el cooldown.
+    const ph = a.pagoHab && pagoHabTxt(a.pagoHab) ? a.pagoHab : null;
+    if(ph && !pagado && typeof Confirmar !== 'undefined' && Confirmar.elegir){
+      const quien = (d.atacante && d.atacante.nombre) || 'Quien la usó', que = pagoHabTxt(ph);
+      const r = await Confirmar.elegir(`${quien} ya pagó ${ph.nombre || 'la habilidad'} (${que}). ¿Cuenta como usada?`, {titulo: 'Cancelar', icono: '↩', no: 'Volver',
+        opciones: [{valor: 'no', texto: 'No cuenta', detalle: `se le devuelve ${que}${yFlecha}`}, {valor: 'si', texto: 'Sí, cuenta como usada', detalle: 'lo pagado queda pagado'}]});
+      if(r === null || r === undefined) return;
+      devolver = r === 'no';
+    }
     if(pagado && typeof Confirmar !== 'undefined' && Confirmar.elegir){
       const quien = (d.atacante && d.atacante.nombre) || 'El atacante';
       const r = await Confirmar.elegir(especial
@@ -3158,6 +3180,7 @@ const Duelo = (() => {
   const devolviendo = new Set(), devolverIntentos = new Map();
   async function devolverSiToca(d){
     const soloFlecha = d.resultado === 'devolver-flecha', conFlecha = !!(d.ataque && d.ataque.flecha && d.ataque.flecha.vuelve);
+    const conPagoHab = !soloFlecha && !!(d.ataque && d.ataque.pagoHab);   // ↩ una habilidad que no cuenta (P233)
     if(devolviendo.has(d.id) || !(d.resultado === 'devolver' || soloFlecha) || !d.atacante) return;
     let hk = null;
     try{
@@ -3165,7 +3188,7 @@ const Duelo = (() => {
       const H = typeof window !== 'undefined' ? window.DUELO_HOOKS : null;
       if(!hk && H && H.soy && H.soy(d.atacante)) hk = H;
     }catch(err){ console.error('Duelo: ¿quién devuelve el ataque?', err); }
-    if(!hk || !(soloFlecha ? hk.devolverFlecha : hk.devolverAtaque)){
+    if(!hk || !(soloFlecha ? hk.devolverFlecha : conPagoHab ? hk.devolverHab : hk.devolverAtaque)){
       // Recién cargada la página, el atacante puede no estar leído todavía (un creep del mapa): se reintenta un rato (2026-10-23).
       const n = (devolverIntentos.get(d.id) || 0) + 1;
       devolverIntentos.set(d.id, n);
@@ -3191,12 +3214,14 @@ const Duelo = (() => {
         await new Promise(res => setTimeout(res, 600));
       }
       if(!ok){ devolviendo.delete(d.id); return; }
-      const costo = soloFlecha ? 0 : _num(await hk.devolverAtaque(d));
+      const queHab = conPagoHab ? String((await hk.devolverHab(d)) || '') : '';
+      const costo = soloFlecha || conPagoHab ? 0 : _num(await hk.devolverAtaque(d));
       const no2Flecha = conFlecha && hk.devolverFlecha ? _num(await hk.devolverFlecha(d)) : 0, flechaVolvio = conFlecha && !!hk.devolverFlecha;
       const total = costo + no2Flecha, deNo2 = total ? ` — se le devolvieron ${total} No2` : '';
       const nomFlecha = flechaVolvio ? (d.ataque.flecha.nombre || 'la flecha') : '';
       const txt = soloFlecha
         ? `↩ ${d.atacante.nombre}: el duelo se canceló antes de tirar — ${nomFlecha} vuelve${no2Flecha ? ` y se le devolvieron ${no2Flecha} No2` : ''}`
+        : conPagoHab ? `↩ ${d.atacante.nombre}: ${d.ataque.pagoHab.nombre || 'la habilidad'} no cuenta como usada${queHab ? ` — se le devolvió ${queHab}` : ''}${no2Flecha ? ` y ${no2Flecha} No2 de la flecha` : ''}${flechaVolvio ? ` · ${nomFlecha} vuelve` : ''}`
         : `↩ ${d.atacante.nombre}: el duelo cancelado no cuenta como ataque${deNo2}${flechaVolvio ? ` · ${nomFlecha} vuelve` : ''}`;
       if(typeof toast === 'function') toast(txt);
       if(typeof mesaLinea === 'function') mesaLinea(txt, 'recordatorio');
@@ -3394,5 +3419,5 @@ const Duelo = (() => {
     }catch(e){ /* sin permiso o sin reglas nuevas: no pasa nada */ }
   }
 
-  return {fraseResumen, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
+  return {pagoHab, fraseResumen, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
 })();

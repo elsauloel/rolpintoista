@@ -136,14 +136,16 @@ const CreepBotonera = (() => {
       const costo = costoNitrosHab(sc, h);
       const partes = [costoHabTxt(sc, h)];
       if(num(h.cd) > 0 && !C().modoSP(sc)) partes.push(`CD ${fmt(num(h.cd))}`);   // (en modo SP no hay cooldown)
-      const motivo = bloqueo ? `${bloqueo} · ${partes.join(' · ')}` : partes.join(' · ');
-      return {id: h.id, nombre: h.nombre || 'Sin nombre', disabled: !!bloqueo, motivo, attr:`data-ejecutar="${sc.id}:${h.id}"`, flash: Combatiente.esFlash(h), boton: botonHabTxt(h), segunda: botonSegundaHab(h, sc), cdHtml: C().modoSP(sc) ? '' : cdControlesHtml(sc, h)};
+      // 💧 Sin SP suficiente en modo SP (dueño, 2026-10-29): en rojo, pero se deja ejecutar (avisa antes: CreepAcciones.confirmarSP).
+      const sinSp = !bloqueo && C().modoSP(sc) && !(h.excavar && h.emerger) && C().spActual(sc) < C().costoSpHab(sc, h);
+      const motivo = bloqueo ? `${bloqueo} · ${partes.join(' · ')}` : sinSp ? `Sin SP · ${partes.join(' · ')}` : partes.join(' · ');
+      return {id: h.id, nombre: h.nombre || 'Sin nombre', disabled: !!bloqueo, rojo: sinSp, motivo, attr:`data-ejecutar="${sc.id}:${h.id}"`, flash: Combatiente.esFlash(h), boton: botonHabTxt(h), segunda: botonSegundaHab(h, sc), cdHtml: C().modoSP(sc) ? '' : cdControlesHtml(sc, h)};
     });
 
     const filaHab = f => `
     <div class="accion-row">
       <div class="accion-nombre">${esc(f.nombre)}</div>
-      <span class="hab-estado ${f.disabled?'cd':'ok'}">${esc(f.motivo)}</span>
+      <span class="hab-estado ${f.disabled || f.rojo?'cd':'ok'}">${esc(f.motivo)}</span>
       <button class="verbtn" data-verhabaccion="${sc.id}:${f.id}">Ver</button>
       ${lupaBotonHtml(`${sc.id}|hab|${f.id}`, 'mini')}
       <button class="hab-ejecutar${f.flash ? ' bt-flash' : ''}" ${f.attr} ${f.disabled?'disabled':''}${f.flash ? ' title="⚡ Flash: se puede usar en turno ajeno (cuesta el doble)"' : ''}>${f.boton || 'Ejecutar'}</button>

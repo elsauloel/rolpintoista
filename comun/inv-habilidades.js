@@ -156,6 +156,8 @@ const InvHabilidades = (() => {
     return {costo, costoHp, curaHp, efectoTxt, falta, esArma, esZona, soloTrampa, sobreSi, hab, aplicadoDirecto, hDuelo};
   }
   function terminar(inv, h, p, ui){
+    // ↩ Lo que cobró, para el duelo que arme (P233, 2026-10-29): si se cancela y no cuenta, se devuelve (InvDuelo.devolverHab).
+    try{ if(ui.ref && typeof Duelo !== 'undefined' && Duelo.pagoHab) Duelo.pagoHab(ui.ref(inv), {habId: h.id, nombre: h.nombre || '', no2: num(p.costo), hp: num(p.costoHp), cd: num(h.cd) > 0 ? 0 : -1}); }catch(e){}
     if(h.trampaColocar && ui.colocarTrampa) ui.colocarTrampa(inv, h);   // 4f: como el personaje, se coloca y la habilidad sigue
     if(p.sobreSi) ui.mesaHabilidad(inv, h.nombre, [h.detalle || '', p.aplicadoDirecto ? '→ ' + p.aplicadoDirecto : '', p.hab.efectoLibre || '', p.hab.efectosNota || ''].filter(Boolean).join(' '));
     if(p.esArma) lanzarAtaque(inv, h, ui);

@@ -4095,6 +4095,18 @@ prueba('💧 La barra de SP de un creep (2026-10-29): el porcentaje solo en modo
   const sc = creepPrueba({nivel: 2}), mx = CreepCalculo.spMax({...sc, modoSP: true});
   igual([CreepCalculo.spPct(sc), CreepCalculo.spPct({...sc, modoSP: true, sp: mx}), CreepCalculo.spPct({...sc, modoSP: true, sp: 0}), mx > 0], [null, 100, 0, true]);
 });
+prueba('↩ P233 (2026-10-29): una habilidad de creep cancelada que no cuenta devuelve No2, SP y el cooldown', () => {
+  const sc = creepPrueba({nivel: 2, modoSP: true, nitros: 1, habilidades: [{id: 'h1', nombre: 'Golpe', cd: 2, cdActual: 2}]});
+  sc.sp = 3;
+  const txt = CreepAcciones.devolverHab(sc, {habId: 'h1', no2: 4, sp: 2, hp: 0, cd: 0});
+  igual([num(sc.nitros), CreepCalculo.spActual(sc), sc.habilidades[0].cdActual, /4 No2/.test(txt) && /2 SP/.test(txt) && /cooldown/.test(txt)], [5, 5, 0, true]);
+});
+prueba('💧 Sin SP suficiente (2026-10-29): la habilidad del personaje se marca (pero se deja usar)', () => {
+  const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
+  const h = {id: 'x', nombre: 'Bola', costo: '99', modo: 'auto', duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['eva']}};
+  const h2 = {...h, id: 'y', costo: '0'};
+  igual([FichaBotonera.sinSpPara(S, h), FichaBotonera.sinSpPara(S, h2)], [true, false]);
+});
 prueba('🌀 Town portal (2026-10-29): clásico de la góndola (Común, 50), entre los utilitarios, sin trampa', () => {
   const it = CATALOGO_BASE.find(x => x.id === 'cat-town-portal');
   igual([!!it, it && it.legacy, it && it.tier, it && it.precioCompra, it && it.townPortal, it && !it.trampaDatos, it && Combatiente.categoriaGondola(it), it && Combatiente.utilPrimero(it) < 99],

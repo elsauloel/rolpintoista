@@ -160,6 +160,7 @@ const CreepDuelo = (() => {
         return !!(await atacarCon(ui, d.atacante.ref, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo, d.id, true));
       },
       // Un duelo cancelado que no cuenta como ataque (2026-10-15): el conteo y los No2, de vuelta. → los No2 devueltos.
+      devolverHab: d => ui.cambiar(d.atacante.ref, c => CreepAcciones.devolverHab(c, d.ataque.pagoHab)),   // ↩ una habilidad que no cuenta (P233) → qué se devolvió
       devolverAtaque: d => (!d.ataque || d.ataque.tipo === 'habilidad-arma') ? 0 : ui.cambiar(d.atacante.ref, c => CreepAcciones.devolverAtaque(c, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo, Combatiente.pagoDeDuelo(c, d.id))),
       // 🏹 La flecha especial de un duelo cancelado antes de tirar, o que no cuenta (2026-10-28): vuelve al cinturón con su No2. → los No2 devueltos.
       devolverFlecha: d => {

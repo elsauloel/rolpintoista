@@ -674,7 +674,18 @@ const CreepAcciones = (() => {
     });
   }
 
-  return {confirmarSP,fenixCreep, bloqueoFirmeCreep, ESPERA_POR_SP, especialesCreep, costoEspecialCreep, habDeEspecialCreep, usarEspecialCreep, habEspecialParaTerminar, mantenimiento, inicioTurno, finTurno, reclamarMantenimiento, alCinturon, quitarDelCinturon, consumir, faltanNitrosConsumir, costoConsumir, colocarTrampaDeItem, consumiblesDe,
+  /* ↩ Una habilidad cancelada que no cuenta (P233, 2026-10-29): se le devuelve lo que pagó (`p` = el `ataque.pagoHab` del duelo). → qué se devolvió. */
+  function devolverHab(c, p){
+    if(!c || !p) return '';
+    const hechos = [];
+    if(num(p.no2) > 0){ c.nitros = num(c.nitros) + num(p.no2); hechos.push(`${fmt(num(p.no2))} No2`); }
+    if(num(p.sp) > 0){ c.sp = Math.min(C().spMax(c), C().spActual(c) + num(p.sp)); hechos.push(`${fmt(num(p.sp))} SP`); }
+    if(num(p.hp) > 0){ c.hp = num(c.hp) + num(p.hp); hechos.push(`${fmt(num(p.hp))} de vida`); }
+    const h = (c.habilidades || []).find(x => x && x.id === p.habId);
+    if(h && num(p.cd) >= 0 && num(h.cdActual) !== num(p.cd)){ h.cdActual = num(p.cd); hechos.push('el cooldown'); }
+    return hechos.join(', ');
+  }
+  return {devolverHab, confirmarSP,fenixCreep, bloqueoFirmeCreep, ESPERA_POR_SP, especialesCreep, costoEspecialCreep, habDeEspecialCreep, usarEspecialCreep, habEspecialParaTerminar, mantenimiento, inicioTurno, finTurno, reclamarMantenimiento, alCinturon, quitarDelCinturon, consumir, faltanNitrosConsumir, costoConsumir, colocarTrampaDeItem, consumiblesDe,
     tirada, usaUnaTirada, gastarUnaTirada, tiradaStat, esquivar, parry, fuerzaGolpe, bloqueo, dano, levantarse, tiradaSoltarse, aplicarSoltarse, pagarParry, pagarAtaque, tiradaAtaque, NOMBRE_ESPECIAL,
     costoAtaqueDe, devolverAtaque, faltanNitros, preguntaSinNitros, alertaSinNitros,
     FLAGS_ESTADO, habEtq, habEjecucion, ataqueDeHab, habTira, efectoDeHab, sobreSi, confirmarSilencio, preguntaVida, ejecutarHab, terminarHab, tiradaPrimeraHab, tiradaSegundaHab,

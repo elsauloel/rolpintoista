@@ -1406,6 +1406,6 @@ cuenta, devolver lo que pagó (SP, No2, vida) y sacarle el cooldown.
 
 **Dueño (2026-10-29):** «está bien, me parece bien que preguntes si se cobra o no». **Hecho** (34d5e76c): la pantalla que ejecuta la habilidad anota lo
 que pagó (`Duelo.pagoHab`) y el duelo lo lleva (`ataque.pagoHab`); «Cancelar» pregunta «¿Cuenta como usada?» y, si no, quien maneja al atacante lo
-devuelve (gancho `devolverHab` de CreepDuelo, FichaDuelo e InvDuelo). Probado con el Tunelero: «se le devolvió 4 No2, 2 SP». Falta: GM Tools suelto (un
-creep que ejecuta desde ahí no anota el pago).
+devuelve (gancho `devolverHab` de CreepDuelo, FichaDuelo e InvDuelo). Probado con el Tunelero: «se le devolvió 4 No2, 2 SP». También desde GM Tools suelto
+(9a874b70, probado: 8 → 4 No2 y cooldown 3; «No cuenta» → 8 No2 y cooldown 0).
 

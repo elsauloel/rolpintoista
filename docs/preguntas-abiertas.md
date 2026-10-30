@@ -1214,12 +1214,15 @@ daño por costo que el fuego, y que tenga más costo en general, que es más o m
 **Falta:** confirmar que vale para todo el rayo (habilidades de creep y de clase, varitas, flechas, trampas de descarga) y repasarlos uno por uno
 (el costo o el daño, contra el fuego); decidir qué se tira entonces para sus estados (Zap: PdG.Esp contra Res.Esp) y si suma el Ef.Esp.
 
-### P220 — Los tótems y estandartes: ¿cómo se llama esa categoría? (2026-10-25) ⏳ nombre a definir
+### P220 — Los tótems y estandartes: ¿cómo se llama esa categoría? (2026-10-25) ✅ «estructuras», por ahora
 
 **Contexto:** el Estandarte de guerra y el Tótem de silencio ponen un token propio que no actúa (tiene vida y se rompe). El dueño: «los tótems serían
 otra categoría, no sé, invocaciones inertes, no sé bien cómo llamarlas». **Decidido el mismo día:** las ondas y áreas de apoyo («a sus aliados») no
 los cuentan; los ataques sí (vtt-hexgrid/js/73 `esInerte`, js/13). En el código se llaman «inertes» por ahora.
 **Falta:** el nombre para el juego (¿inertes? ¿estructuras? ¿objetos invocados?) y si otras cosas entran en la categoría (pilares, muros con vida).
+**Decidido (dueño, 2026-10-30):** «vamos a llamarlos estructuras por ahora, a falta de un mejor nombre; igual te acepto más sugerencias». En el juego se
+dicen **estructuras** (en el código siguen como `esInerte`). Sugerencias que quedaron sobre la mesa: emplazamientos, construcciones, fetiches, artefactos
+plantados. Sigue abierto si entran otras cosas (pilares, muros con vida).
 
 ### P221 — ¿Daño de luz y daño siniestro, como contrapuntos? (2026-10-25) ✅ decidida (2026-10-26)
 

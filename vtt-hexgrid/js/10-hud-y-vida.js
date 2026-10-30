@@ -264,7 +264,7 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   if(golpe === null) throw new Error(ERROR_TIPEO);
   const guarda = ignoraDef ? null : guardianDe(t);   // la Coraza del guardián de un aliado al lado
   const muro = ignoraDef ? null : muroDe(t);   // Muro de escudos (js/26): un aliado con escudo al lado
-  const estoN = ignoraDef ? 0 : estoicoRivales(t).length;   // 🗿 Estoicismo (js/26): los rivales pegados, si tiene el estado
+  const estoN = ignoraDef ? 0 : estoicoRivales(t).length;   // 🗿 Estoicismo (js/85): los rivales pegados, si tiene el estado
   const prot = o && o.reparte ? mitiMitiDe(t) : null;   // 🛡 el Escudo humano (2026-10-27): otro creep que se lleva la mitad
   const res = await modificarCreep(t.fichaId, sc => {
     const viejoC = !num((sc.usosEspecial || {})._golpe);
@@ -410,7 +410,7 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   if(golpe === null) throw new Error(ERROR_TIPEO);
   const guarda = ignoraDef ? null : guardianDe(t);   // la Coraza del guardián de un aliado al lado
   const muro = ignoraDef ? null : muroDe(t);   // Muro de escudos (js/26): un aliado con escudo al lado
-  const estoN = ignoraDef ? 0 : estoicoRivales(t).length;   // 🗿 Estoicismo (js/26): los rivales pegados, si tiene el estado
+  const estoN = ignoraDef ? 0 : estoicoRivales(t).length;   // 🗿 Estoicismo (js/85): los rivales pegados, si tiene el estado
   const prot = o && o.reparte ? mitiMitiDe(t) : null;   // 🛡 Miti-Miti: un Tanque que se lleva la mitad
   const base = fbDb.doc(fbRutaCampana(`fichas/${t.fichaId}`));
   const parteRef = base.collection('partes').doc('general');
@@ -517,7 +517,7 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   if(golpe === null) throw new Error(ERROR_TIPEO);
   const guarda = ignoraDef ? null : guardianDe(t);   // la Coraza del guardián de un aliado al lado
   const muro = ignoraDef ? null : muroDe(t);   // Muro de escudos (js/26): un aliado con escudo al lado
-  const estoN = ignoraDef ? 0 : estoicoRivales(t).length;   // 🗿 Estoicismo (js/26): los rivales pegados, si tiene el estado
+  const estoN = ignoraDef ? 0 : estoicoRivales(t).length;   // 🗿 Estoicismo (js/85): los rivales pegados, si tiene el estado
   const prot = o && o.reparte ? mitiMitiDe(t) : null;   // 🛡 Miti-Miti: un Tanque que se lleva la mitad
   const [fichaId, invId] = String(t.fichaId).split(SEP_INVOCACION);
   const base = fbDb.doc(fbRutaCampana(`fichas/${fichaId}`));

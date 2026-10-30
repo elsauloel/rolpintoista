@@ -34,29 +34,6 @@ function muroDe(t){
   const a = aliadosAlLado(t).find(a => tieneEscudo(a.t));
   return a ? {val, nombre: nombreDe(a.t)} : null;
 }
-/* 🗿 Estoicismo (2026-10-30, dueño: el Warrior, «una especie de estado estoico en el que se te suba automáticamente la defensa por cada enemigo adyacente
-   mientras el estado esté activo»; «sin tope, y lo que cuenta como enemigo es lo que vos sugerís»): mientras tenga el estado (preset con `estoico`),
-   +N a la Defensa por cada rival pegado, contado en el momento del golpe. Cuentan solo los rivales que se ven: ni ocultos, ni en sigilo, ni bajo tierra,
-   ni etéreos, ni muertos, ni las estructuras (estandartes, tótems). Lo suma el daño (js/10), junto al Muro de escudos. */
-function estoicoRivales(t){
-  if(!t || t.col === undefined || t.fila === undefined) return [];
-  const out = [];
-  tokens.forEach((x, id) => {
-    if(!x || x === t || !x.fichaId || bandoDe(x) === bandoDe(t) || x.col === undefined) return;
-    if(distanciaHex({col: t.col, fila: t.fila}, {col: x.col, fila: x.fila}) !== 1) return;
-    if(x.oculto || x.bajoTierra || enSigilo(x) || (typeof etereoDe === 'function' && etereoDe(x)) || (typeof estandarteInfo === 'function' && estandarteInfo(x))) return;
-    const e = estadoDe(x);
-    if(e && e.muerto) return;
-    out.push({id, t: x});
-  });
-  return out;
-}
-// ¿Tiene Estoicismo activo? → {val, n} (n = rivales pegados) o null. `n` se cuenta antes (estoicoRivales) y los estados son los de adentro de la transacción.
-function estoicoDe(estados, n){
-  const e = (estados || []).find(s => s && s.activo !== false && (num(s.estoico) > 0 || String(s.nombre || '').trim().toLowerCase() === 'estoicismo'));
-  if(!e || !(n > 0)) return null;
-  return {val: (num(e.estoico) || 2) * n, n};
-}
 function muroAviso(t, m){
   if(!m || typeof momentoAbrir !== 'function') return;
   momentoAbrir({tipo: 'guardian', icono: '🛡', titulo: `Muro de escudos: ${nombreDe(t)} con ${m.nombre}`, resultado: `+${m.val} Defensa contra el golpe, por cubrirse junto al escudo de ${m.nombre}.`,

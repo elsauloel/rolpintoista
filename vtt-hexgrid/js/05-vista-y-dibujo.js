@@ -801,6 +801,7 @@ function dibujarLienzo(){
   if(typeof estandarteDibujar === 'function' && estandarteDibujar(z)) animando = true;   // 🚩 el aura de un estandarte de guerra (js/73)
   if(typeof meteoroDibujar === 'function' && meteoroDibujar(z)) animando = true;   // ☄ la sombra de un meteoro por caer (js/74)
   if(typeof flechitasRevisar === 'function') flechitasRevisar();   // ⬆⬇ los estados nuevos de cada token, para las flechitas (js/75)
+  if(typeof estoicoRevisar === 'function') estoicoRevisar();   // 🗿 Estoicismo: cuántos enemigos pegados tiene cada uno (js/85)
   if(typeof dibujarTuneles === 'function' && dibujarTuneles(z)) animando = true;   // 🕳 la estela del túnel, que aparece y se va de a una casilla (js/46)
   if(typeof dibujarPozos === 'function') dibujarPozos(z);   // 🕳 el pozo de los que están bajo tierra (js/46)
   // Tokens.
@@ -889,6 +890,7 @@ function dibujarLienzo(){
     if(typeof curaDibujarDestello === 'function' && curaDibujarDestello(d.id, x, y, rad, z)) animando = true;   // ✨ la cura de un pulso (js/70)
     if(polillaRevolotea(est)){ dibujarPolillita(x, y, rad, z, semillaDe(d.id)); animando = true; }   // 🦋 la Polilla, revoloteando
     if(typeof flechitasDibujar === 'function' && flechitasDibujar(d.id, x, y, rad, z)) animando = true;
+    if(typeof estoicoDibujar === 'function' && estoicoDibujar(d.id, x, y, rad, z)) animando = true;   // 🗿 el ±2 🛡 del Estoicismo (js/85)
     if(typeof provocadoDibujar === 'function' && provocadoDibujar(d.id, x, y, rad, z)) animando = true;   // 😤 contra quién va un provocado (js/77)   // ⬆⬇ recibió un buff o un debuff (js/75)
 
     if(seleccion === d.id){

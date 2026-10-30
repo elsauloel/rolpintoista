@@ -395,3 +395,12 @@ Propuesta (esperando el OK; solo skills auditadas). Nombre de trabajo: **Goblin 
   Evasión a 3 casillas, lo trae pegado y le pega con +2 PdG).
 - **Riesgo a medir**: Arrastrar a Larry (20 de vida, Defensa 4) con el bonus del Cristal (+5): 2d10 + 11 + 5 − 4 ≈ 23, lo tumba de un golpe. Palancas:
   Fuerza más baja, un arma de 1 dado o que el Cristal no alcance.
+- **Ajustes (dueño, 2026-10-30)**: «más defensa especial contra Larry» → equipo nuevo (propuesta): Martillo de bola; **Poncho de espejitos** (Buena: Defensa +1,
+  Def.Esp +2, Vida +10, Res.CC +1, Espejo: quien le tira daño especial recibe 1/4) y **Casco de bandas remachadas** (Buena); **Guanteletes de cuero
+  tachonado**, **Botas de caña alta de estanciero** (Defensa +1, Def.Esp +1) y **Anillo de Vitalidad Extendida** (Comunes). Queda: Defensa 5, Def.Esp 4,
+  Vida 90, Res.CC 16, Tipo 4 1. Alternativa: el Jubón de cuero tachonado en vez del Poncho (Defensa 6, Def.Esp 4, Tipo 4 3, sin Espejo). El crítico
+  Tipo 10 de Petro no importa («rara vez va a salir»). **Pasiva Impulso** (+1 No2): 7 No2. **Golpe que sigue** no le cierra al dueño («no recuerdo haber
+  auditado ese skill, me parece bastante raro para un creep») → propuesta: **Golpe brutal** (alternativas: Puño de roca, Golpe fuerte).
+- **Arrastrar, regla nueva (dueño, 2026-10-30)**: «tiene que tirar destreza para engancharlo, pero después tiene que tirar una resistencia: su
+  Constitución más una tirada de Fuerza contra la Constitución del rival; tiene que ganar esa tirada para poder arrastrarlo». Falta: confirmar si el rival
+  tira su Constitución, qué pasa si lo engancha pero no lo arrastra, y programarlo (cambia la habilidad del pool: vtt-hexgrid, `arrastra`).

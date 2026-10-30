@@ -35,6 +35,7 @@ function estoicoDe(estados, n){
 
 const estoicoPrevios = new Map();   // id del token → {clave, activo, ids: [rivales pegados]}
 const estoicoAnims = new Map();     // id del token → [{delta, inicio}]
+const estoicoCallados = new Set();  // ids de los tokens cuyo Aviso se pidió no volver a mostrar (hasta que se termine el estado)
 // ¿Este token lo maneja esta pantalla? (el personaje o su invocación: quien lo controla; un creep: el GM)
 const estoicoMio = t => t.tipo === 'creep' ? soyGM : (t.tipo === 'pj' && typeof bnManejo === 'function' && bnManejo(String(t.fichaId || '').split(SEP_INVOCACION)[0]));
 
@@ -52,13 +53,15 @@ function estoicoRevisar(){
     const por = e ? (num(e.estoico) || ESTOICO_POR) : ESTOICO_POR;
     if(!e){
       if(previo.activo && previo.ids.length) estoicoAnimar(id, -por * previo.ids.length);   // se terminó: se va lo que daba
+      estoicoCallados.delete(id);   // al volver a activarse, el Aviso vuelve a aparecer
       return;
     }
     const llegan = ids.filter(x => !previo.ids.includes(x)), seVan = previo.ids.filter(x => !ids.includes(x));
     if(previo.activo && !llegan.length && !seVan.length) return;
     const delta = previo.activo ? por * (ids.length - previo.ids.length) : por * ids.length;
     if(delta) estoicoAnimar(id, delta);
-    if(estoicoMio(t)) estoicoAvisar(id, t, {nuevo: !previo.activo, llegan, seVan, ids, n: ids.length, por});
+    if(!previo.activo) estoicoCallados.delete(id);
+    if(estoicoMio(t) && !estoicoCallados.has(id)) estoicoAvisar(id, t, {nuevo: !previo.activo, llegan, seVan, ids, n: ids.length, por});
   });
   estoicoPrevios.forEach((_, id) => { if(!tokens.has(id)){ estoicoPrevios.delete(id); estoicoAnims.delete(id); } });
 }
@@ -78,11 +81,17 @@ function estoicoAvisar(id, t, c){
   if(c.nuevo) pasos.push({titulo: 'Estoicismo', texto: `Hasta el final de tu próximo turno: +${c.por} a la Defensa por cada enemigo pegado (los que se ven), contado en cada golpe, sin tope.`});
   if(!c.nuevo && c.llegan.length) pasos.push({titulo: `Se suma${c.llegan.length === 1 ? '' : 'n'}: +${c.por * c.llegan.length} a la Defensa`, texto: nom(c.llegan)});
   if(!c.nuevo && c.seVan.length) pasos.push({titulo: `Se aleja${c.seVan.length === 1 ? '' : 'n'}: −${c.por * c.seVan.length} a la Defensa`, texto: nom(c.seVan)});
-  pasos.push({titulo: 'Total', texto: c.n ? `Tenés ${enem(c.n)} (${nom(c.ids)}): +${total} a la Defensa.` : 'No tenés ningún enemigo pegado: por ahora, +0 a la Defensa.'});
+  const totalTxt = c.n ? `Tenés ${enem(c.n)} (${nom(c.ids)}): +${total} a la Defensa.` : 'No tenés ningún enemigo pegado: por ahora, +0 a la Defensa.';
+  // «No volver a mostrar» (dueño, el mismo día: «puede llegar a ser un poco molesta… durante la duración, no volver a mostrarla; cuando se termina
+  // el estado y se vuelve a activar, que vuelva a aparecer»): se calla hasta que se termina el estado (estoicoRevisar lo olvida ahí). La animación sigue.
+  pasos.push({titulo: 'Total', html: `${esc(totalTxt)}<label style="display:flex;gap:8px;align-items:center;margin-top:10px;font-size:13px;opacity:.9;cursor:pointer">
+    <input type="checkbox" id="estoico-callar" style="width:16px;height:16px;margin:0"> No volver a mostrar mientras dure este Estoicismo</label>`});
   AvisoCombate.mostrar({clave: 'estoico-' + id, icono: '🗿', titulo: `${nombreDe(t)}: Estoicismo`, pasos,
     veredicto: {tono: 'bueno', grande: `+${total} 🛡`, chico: enem(c.n)},
     botones: [{texto: '✔ Aplicar', alClic: () => AvisoCombate.cerrar()},
       {texto: '✋ Resolver a mano', sec: true, titulo: 'No cambia nada: el golpe igual suma el bono; la mesa decide si hay algo excepcional', alClic: () => AvisoCombate.cerrar()}]});
+  const casilla = document.getElementById('estoico-callar');
+  if(casilla) casilla.onchange = () => { if(casilla.checked) estoicoCallados.add(id); else estoicoCallados.delete(id); };
 }
 // En el recorrido de los tokens que se ven (js/05): el ±N con el escudito, verde subiendo o rojo bajando. Devuelve true mientras siga animando.
 function estoicoDibujar(id, x, y, rad, z){

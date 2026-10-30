@@ -157,7 +157,18 @@ document.addEventListener('click', e => {
   renderAll();
 });
 
-function recompensasHtml(sc){
+// 🎲 El consumible al azar (la regla de los drops), con «Otro» y «✕ Sacar»: en Recompensas del lápiz y en el paso «Pasivas y cinturón» del asistente
+// (dueño, 2026-10-30: «la parte de consumible al azar debe tener el botón de re-rollearlo»).
+function consumibleAzarHtml(sc){
+  return CombateFin.cuantosAlAzar(sc) > 0 || CombateFin.municionDeCreep(sc) || (sc.consumibleAzar || []).length || sc.municionAzar ? `<div class="mini-f" style="margin-top:8px"><label>🎲 Consumible al azar: lo lleva en el cinturón; si lo usa en el combate lo suelta seguro, si no, con la chance de su tipo${CombateFin.municionDeCreep(sc) ? ` · y una ${CombateFin.municionDeCreep(sc) === 'virote' ? 'virote' : 'flecha'} especial, que suelta seguro` : ''}</label>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px">
+        <b>${[...(sc.consumibleAzar || []), ...(sc.municionAzar ? [sc.municionAzar] : [])].length ? [...(sc.consumibleAzar || []), ...(sc.municionAzar ? [sc.municionAzar] : [])].map(n => { const c = CATALOGO_BASE.find(i => i.nombre === n && i.tipoItem === 'consumibles');   // qué hace, al pasar el mouse
+          return c && c.detalle ? `<span title="${esc(c.detalle)}" style="text-decoration:underline dotted;cursor:help">${esc(n)}</span>` : esc(n); }).join(', ') : 'ninguno'}</b>
+        ${CombateFin.cuantosAlAzar(sc) > 0 || CombateFin.municionDeCreep(sc) ? `<button type="button" class="addhab" data-azar-otro="${sc.id}" style="margin:0">🎲 ${(sc.consumibleAzar || []).length || sc.municionAzar ? 'Otro' : 'Darle uno'}</button>` : ''}
+        ${(sc.consumibleAzar || []).length || sc.municionAzar ? `<button type="button" class="addhab" data-azar-quitar="${sc.id}" style="margin:0">✕ Sacar</button>` : ''}
+      </div></div>` : '';
+}
+function recompensasHtml(sc, o){
   const t = sc.tipoCriatura || '';
   const sug = oroSugeridoCreep(sc);
   const esp = sc.trofeoEspecial || {};
@@ -204,13 +215,7 @@ function recompensasHtml(sc){
           `<label style="display:flex;gap:5px;align-items:center;text-transform:none;letter-spacing:0"><input type="checkbox" data-rec="arquetipo" data-arq="${k}" data-id="${sc.id}"${act.includes(k) ? ' checked' : ''}><span style="white-space:nowrap">${t}</span></label>`).join('')}</div>
         ${manual ? `<button type="button" class="addhab" data-arq-auto="${sc.id}" style="margin:4px 0 0">Volver al automático (${esc(CreepCalculo.arquetiposTxt(auto))})</button>` : ''}
       </div>`; })() : ''}
-    ${CombateFin.cuantosAlAzar(sc) > 0 || CombateFin.municionDeCreep(sc) || (sc.consumibleAzar || []).length || sc.municionAzar ? `<div class="mini-f" style="margin-top:8px"><label>🎲 Consumible al azar: lo lleva en el cinturón; si lo usa en el combate lo suelta seguro, si no, con la chance de su tipo${CombateFin.municionDeCreep(sc) ? ` · y una ${CombateFin.municionDeCreep(sc) === 'virote' ? 'virote' : 'flecha'} especial, que suelta seguro` : ''}</label>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:12.5px">
-        <b>${[...(sc.consumibleAzar || []), ...(sc.municionAzar ? [sc.municionAzar] : [])].length ? [...(sc.consumibleAzar || []), ...(sc.municionAzar ? [sc.municionAzar] : [])].map(n => { const c = CATALOGO_BASE.find(i => i.nombre === n && i.tipoItem === 'consumibles');   // qué hace, al pasar el mouse
-          return c && c.detalle ? `<span title="${esc(c.detalle)}" style="text-decoration:underline dotted;cursor:help">${esc(n)}</span>` : esc(n); }).join(', ') : 'ninguno'}</b>
-        ${CombateFin.cuantosAlAzar(sc) > 0 || CombateFin.municionDeCreep(sc) ? `<button type="button" class="addhab" data-azar-otro="${sc.id}" style="margin:0">🎲 ${(sc.consumibleAzar || []).length || sc.municionAzar ? 'Otro' : 'Darle uno'}</button>` : ''}
-        ${(sc.consumibleAzar || []).length || sc.municionAzar ? `<button type="button" class="addhab" data-azar-quitar="${sc.id}" style="margin:0">✕ Sacar</button>` : ''}
-      </div></div>` : ''}
+    ${o && o.sinAzar ? '' : consumibleAzarHtml(sc)}
     <div class="hint" style="margin-top:6px"><b>Al morir suelta:</b> ${dropsResumenCreepHtml(sc)}</div>`;
 }
 function recompensasVerHtml(sc){ return CreepLupa.recompensasVerHtml(sc); }   // comun/creep-lupa.js
@@ -434,11 +439,12 @@ function htmlPasoAsistCreep(p){
       ${pasivasCreepHtml(sc).replace(/<div class="editar-separador">.*?<\/div>/s, '')}
       <p class="pap-nota" style="margin:14px 0 10px"><b>Cinturón:</b> consumibles que el creep puede usar en la pelea (una poción, un escudo…). Si los usa, después se ofrecen
       como botín; si no los usa, al final del combate decidís si se ofrecen al grupo o no. Además, al crearlo se le suma solo un consumible al azar (la regla de los drops).</p>
-      ${cin}`;
+      ${cin}
+      ${consumibleAzarHtml(sc)}`;
   }
   if(p === 6){
     const xp = xpBasePorNivel(n);
-    return `<p class="pap-nota" style="margin:0 0 10px">La XP que da es <b>${fmt(xp)}</b> (sale del nivel; no se edita acá).</p>${recompensasHtml(sc).replace(/<div class="editar-separador">.*?<\/div>/s, '')}`;
+    return `<p class="pap-nota" style="margin:0 0 10px">La XP que da es <b>${fmt(xp)}</b> (sale del nivel; no se edita acá).</p>${recompensasHtml(sc, {sinAzar: true}).replace(/<div class="editar-separador">.*?<\/div>/s, '')}`;
   }
   return `<div class="vc-cajas vc-2">
         <div class="vc-caja"><span class="vc-caja-label">HP</span><span class="vc-caja-valor">${fmt(num(sc.hpMax))}</span></div>

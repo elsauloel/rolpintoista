@@ -357,3 +357,6 @@ Propuesta (esperando el OK; solo skills auditadas, ninguna repetida con el Culti
 - **Consumible**: Poción de Piel de Cristal mayor (escudo contra el daño especial: el Drenar Vida y los Pedos de Larry); y el Town portal si escapa.
 - **A decidir**: si al romperse el Cristal los goblins quedan aturdidos un momento (mecánica nueva) o solo se pierde el bonus; si escapa con el Town portal;
   si va el grisú.
+- **Decidido (dueño, 2026-10-29)**: al romperse el Cristal **no pasa nada más** (solo se termina el bonus; sin mecánica nueva). **Sí escapa con el Town
+  portal** cuando le queda poca vida: lo lleva en el cinturón (un creep ya lo puede usar desde sus Acciones: el GM elige la casilla al lado y después lo
+  mueve al portal). El grisú: el dueño no lo entendió; se le explicó y queda a su respuesta.

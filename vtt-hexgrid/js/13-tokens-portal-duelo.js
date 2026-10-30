@@ -1,8 +1,10 @@
 // js/13-tokens-portal-duelo.js — tramo 13 de 14 del script de mapa.html (paso 5, nivel A: mismo código, en el mismo orden): botón de tokens, portal, zonas de habilidad, duelo, hechizos de área, dodge, muerte.
 /* ---------- Tokens: botón del borde izquierdo (🎭) ----------
-   Jugador: abre directo la ventana de "Nuevo token". GM: un menú con "Nuevo token", "Traer tokens de jugadores" y "Traer los creeps de
-   este mapa" (los que GM Tools tiene en este mapa: comun/creeps-mapas.js). Los tokens salen en fila, en el centro de lo que se ve,
-   saltean los que ya están, y los de creeps nacen ocultos (comun/tokens-auto.js). */
+   Jugador: abre directo la ventana de "Nuevo token". GM: un menú con "Nuevo token", "Traer jugadores" y "Traer creeps". Los dos «Traer»
+   abren una lista para marcar cuáles (dueño, 2026-10-30: «hay jugadores que a veces están y a veces no… que te aparezca una planilla y
+   selecciones este, este y este»): los jugadores de la partida; los creeps de este mapa, de la Reserva y de los otros mapas (los que vienen
+   de otro lado se mudan acá, como piedritas: no se duplican — comun/creeps-mapas.js). Los tokens salen en fila, en el centro de lo que se
+   ve, saltean los que ya están, y los de creeps nacen ocultos (comun/tokens-auto.js). */
 // Los creeps (públicos) que están en ese mapa: [[id, creep]].
 function creepsDelMapa(mapaId){
   const ids = new Set([...mapasLista.keys(), MAPA_PRINCIPAL]);
@@ -31,12 +33,57 @@ async function creepLlegoAlMapa(creepId){
     toast(`🗺 ${c.nombre} pasó a «${nombreMapa(mapaMostrado)}»${r.borrados ? ' (su token se fue del otro mapa)' : ''}`);
   }catch(err){ console.error('No se pudo mudar el creep a este mapa:', err); }
 }
+// Los creeps para traer, marcados: los de este mapa, los de la Reserva y los de cada otro mapa (con o sin token acá).
+async function traerCreepsElegidos(){
+  const ids = new Set([...mapasLista.keys(), MAPA_PRINCIPAL]);
+  const conToken = new Set([...tokens.values()].filter(t => t.tipo === 'creep' && t.fichaId).map(t => t.fichaId));
+  const porMapa = new Map();
+  [...creepsPub.entries()].forEach(([id, c]) => { const m = CreepsMapas.mapaDe(c, ids); if(!porMapa.has(m)) porMapa.set(m, []); porMapa.get(m).push([id, c]); });
+  const fila = ([id, c], desde) => {
+    const ya = desde === mapaMostrado && conToken.has(id), muerto = !!(c.resumen && c.resumen.muerto);
+    return {valor: id, texto: `${c.nombre || 'Creep'}${muerto ? ' 💀' : ''}`, fijo: ya,
+      detalle: ya ? 'ya tiene su token en este mapa' : desde === mapaMostrado ? '' : desde === CreepsMapas.RESERVA ? 'se muda de la Reserva a este mapa' : `se muda de «${nombreMapa(desde)}» (su token se va de allá)`};
+  };
+  const orden = l => l.sort((a, b) => String(a[1].nombre || '').localeCompare(String(b[1].nombre || ''), 'es'));
+  const grupos = [
+    {titulo: `En este mapa («${nombreMapa(mapaMostrado)}»)`, items: orden(porMapa.get(mapaMostrado) || []).map(x => fila(x, mapaMostrado))},
+    {titulo: 'En la Reserva', items: orden(porMapa.get(CreepsMapas.RESERVA) || []).map(x => fila(x, CreepsMapas.RESERVA))},
+    ...CreepsMapas.ordenar(mapasLista).filter(m => m.id !== mapaMostrado && (porMapa.get(m.id) || []).length)
+      .map(m => ({titulo: `En «${m.nombre}»`, items: orden(porMapa.get(m.id)).map(x => fila(x, m.id))})),
+  ];
+  const elegidos = await Confirmar.marcar('Marcá los creeps que traés a este mapa. Salen ocultos, en fila, en el centro de lo que ves. Los de la Reserva o de otro mapa se mudan acá (no se duplican).',
+    {titulo: 'Traer creeps', icono: '👹', grupos, si: 'Traer tokens ({n})', vacio: 'La partida todavía no tiene creeps: crealos en GM Tools.'});
+  if(!elegidos || !elegidos.length) return;
+  const destino = mapaMostrado;
+  try{
+    let mudados = 0;
+    for(const id of elegidos){
+      const c = creepsPub.get(id);
+      if(!c || CreepsMapas.mapaDe(c, ids) === destino) continue;
+      await modificarCreep(id, sc => { sc.mapa = destino; return true; });
+      const otros = (await CreepsMapas.tokensDeCreep(id)).filter(t => t.mapaId !== destino);
+      if(otros.length){ const lote = fbDb.batch(); otros.forEach(t => lote.delete(t.ref)); await lote.commit(); }
+      mudados++;
+    }
+    const lista = elegidos.map(id => [id, creepsPub.get(id)]).filter(([, c]) => c).map(([id, c]) => ({nombre: c.nombre, color: c.color, tipo: 'creep', fichaId: id, oculto: true}));
+    const r = await TokensAuto.crear(lista, {mapaId: destino, centro: centroDeLaVista()});
+    toast(`👹 ${r.creados} token(s) de creeps, ocultos a los jugadores${mudados ? ` · ${mudados} mudado(s) a este mapa` : ''}${r.salteados ? ` · ${r.salteados} ya estaban` : ''}`);
+  }catch(err){
+    console.error('No se pudieron traer los creeps:', err);
+    toast('No se pudieron traer los creeps' + (err.code === 'permission-denied' ? ' (sin permiso)' : ''));
+  }
+}
 async function traerTokensDeJugadores(){
   const fichas = [...fichasPub.entries()].filter(([id]) => !String(id).includes(SEP_INVOCACION));
   if(!fichas.length){ toast('Todavía no hay personajes en la partida'); return; }
-  if(!(await Confirmar.preguntar(`Se crean los tokens (visibles) de estos personajes, en fila, en el centro de lo que ves. Los que ya tienen token en este mapa se saltean:\n\n${fichas.map(([, f]) => f.nombre).join(', ')}`, {titulo: 'Traer jugadores', si: 'Crear tokens'}))) return;
+  const conToken = new Set([...tokens.values()].filter(t => t.tipo === 'pj' && t.fichaId).map(t => t.fichaId));
+  const items0 = fichas.map(([id, f]) => ({valor: id, texto: f.nombre || 'Personaje', fijo: conToken.has(id), detalle: conToken.has(id) ? 'ya tiene su token en este mapa' : ''}))
+    .sort((a, b) => (a.fijo - b.fijo) || a.texto.localeCompare(b.texto, 'es'));
+  const elegidos = await Confirmar.marcar('Marcá los personajes que traés a este mapa. Sus tokens salen visibles, en fila, en el centro de lo que ves.',
+    {titulo: 'Traer jugadores', icono: '👥', grupos: [{titulo: 'Personajes de la partida', items: items0}], si: 'Traer tokens ({n})'});
+  if(!elegidos || !elegidos.length) return;
   try{
-    const items = fichas.map(([id, f], i) => ({nombre: f.nombre, color: COLORES[i % COLORES.length], tipo: 'pj', fichaId: id, duenoUid: f.duenoUid, oculto: false}));
+    const items = fichas.filter(([id]) => elegidos.includes(id)).map(([id, f], i) => ({nombre: f.nombre, color: COLORES[i % COLORES.length], tipo: 'pj', fichaId: id, duenoUid: f.duenoUid, oculto: false}));
     const r = await TokensAuto.crear(items, {mapaId: mapaMostrado, centro: centroDeLaVista()});
     toast(r.creados ? `👥 ${r.creados} token(s) de jugadores creados${r.salteados ? ` · ${r.salteados} ya estaban` : ''}` : 'Todos los personajes ya tienen token en este mapa');
   }catch(err){
@@ -45,13 +92,13 @@ async function traerTokensDeJugadores(){
   }
 }
 function renderTokensMenu(){
-  const n = creepsDelMapa(mapaMostrado).length;
+  const n = creepsPub.size;
   $('#tokens-menu').innerHTML =
     `<div class="tm-tit"><span>🎭 Tokens</span></div>` +
     '<button type="button" class="btn primary chico" data-tm="nuevo" style="text-align:left">＋ Token nuevo</button>' +
-    '<button type="button" class="btn chico" data-tm="jugadores" style="text-align:left" title="Crea los tokens de los personajes que todavía no tienen token en este mapa">👥 Traer tokens de jugadores</button>' +
-    `<button type="button" class="btn chico" data-tm="creeps" style="text-align:left" title="Crea (ocultos) los tokens de los creeps que GM Tools tiene en este mapa; los que ya tienen se saltean"${n ? '' : ' disabled'}>👹 Traer los creeps de este mapa (${n})</button>` +
-    (n ? '' : '<div class="hint" style="margin-top:4px">Este mapa no tiene creeps: ubicalos desde GM Tools («🗺 Mover a…»).</div>');
+    '<button type="button" class="btn chico" data-tm="jugadores" style="text-align:left" title="Marcás qué personajes traés a este mapa">👥 Traer jugadores…</button>' +
+    `<button type="button" class="btn chico" data-tm="creeps" style="text-align:left" title="Marcás qué creeps traés: de este mapa, de la Reserva o de otro mapa (los de otro lado se mudan acá)"${n ? '' : ' disabled'}>👹 Traer creeps…</button>` +
+    (n ? '' : '<div class="hint" style="margin-top:4px">La partida todavía no tiene creeps: crealos en GM Tools.</div>');
 }
 function abrirTokensMenu(abrir){
   const menu = $('#tokens-menu');
@@ -71,7 +118,7 @@ $('#tokens-menu').addEventListener('click', e => {
   const que = b.dataset.tm;
   if(que === 'nuevo'){ abrirTokensMenu(false); $('#btn-nuevo').click(); }
   else if(que === 'jugadores'){ abrirTokensMenu(false); traerTokensDeJugadores(); }
-  else if(que === 'creeps'){ abrirTokensMenu(false); traerCreepsDelMapa(mapaMostrado); }
+  else if(que === 'creeps'){ abrirTokensMenu(false); traerCreepsElegidos(); }
 });
 document.addEventListener('mousedown', e => { if(!$('#tokens-menu').hidden && !e.target.closest('#tokens-menu, #toolkit-tokens')) abrirTokensMenu(false); });
 document.addEventListener('keydown', e => { if(e.key === 'Escape' && !$('#tokens-menu').hidden) abrirTokensMenu(false); });

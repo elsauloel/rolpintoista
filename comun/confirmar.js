@@ -116,5 +116,53 @@ const Confirmar = (() => {
       inp.focus(); inp.select();
     });
   }
-  return {preguntar, elegir, texto};
+  /* Confirmar.marcar(texto, {titulo, icono, grupos: [{titulo, items: [{valor, texto, detalle, marcado, fijo}]}], si, no, vacio}) → Promise<[valores] | null>
+     (2026-10-30, dueño: «que te aparezca una planilla… y selecciones este, este y este»): una lista con casillas, en grupos con su título (y «todos /
+     ninguno»). `fijo`: se muestra pero no se puede marcar (p. ej. «ya está en el mapa»). El botón de sí dice cuántos van (`si` con {n}); sin ninguno
+     marcado, no se puede tocar. Esc / ✕ / Cancelar / clic afuera = null. */
+  function marcar(txt, o){
+    o = o || {};
+    estilos();
+    return new Promise(ok => {
+      const f = document.createElement('div');
+      f.className = 'cfj-fondo';
+      const grupos = (o.grupos || []).filter(g => g && (g.items || []).length);
+      const todos = grupos.flatMap(g => g.items);
+      const fila = (x, i) => `<label style="display:flex;gap:10px;align-items:flex-start;padding:7px 10px;border-radius:9px;cursor:${x.fijo ? 'default' : 'pointer'};${x.fijo ? 'opacity:.55;' : ''}background:#1a2030;border:1px solid #2a3348">
+        <input type="checkbox" data-cfj-m="${i}"${x.marcado ? ' checked' : ''}${x.fijo ? ' disabled' : ''} style="margin-top:3px;width:16px;height:16px;accent-color:#2d6cdf">
+        <span style="min-width:0"><b style="font-weight:700">${esc(x.texto)}</b>${x.detalle ? `<small style="display:block;opacity:.8;font-size:12.5px;margin-top:1px">${esc(x.detalle)}</small>` : ''}</span></label>`;
+      let k = 0;
+      const html = grupos.map((g, gi) => {
+        const filas = g.items.map(x => fila(x, k++)).join('');
+        const libres = g.items.some(x => !x.fijo);
+        return `<div style="margin-top:12px"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding-bottom:5px;margin-bottom:6px;border-bottom:1px solid #2a3348">
+          <span style="font-weight:800;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:#E0A458">${esc(g.titulo || '')}</span>
+          ${libres ? `<span style="font-size:12.5px"><a href="#" data-cfj-todos="${gi}" style="color:#9cc2ff">todos</a> · <a href="#" data-cfj-ninguno="${gi}" style="color:#9cc2ff">ninguno</a></span>` : ''}</div>
+          <div style="display:flex;flex-direction:column;gap:5px">${filas}</div></div>`;
+      }).join('');
+      f.innerHTML = `<div class="cfj-caja" role="dialog" aria-modal="true" style="max-height:calc(100vh - 24px);display:flex;flex-direction:column">
+        <div class="cfj-cab"><span>${esc(o.icono || '☑')} ${esc(o.titulo || 'Elegí')}</span><button type="button" data-cfj-x title="Cancelar">✕</button></div>
+        <div class="cfj-cuerpo" style="overflow:auto">${txt ? `<p class="cfj-texto">${esc(txt)}</p>` : ''}${html || `<p class="cfj-texto">${esc(o.vacio || 'No hay nada para elegir.')}</p>`}</div>
+        <div class="cfj-pie" style="padding:0 16px 16px"><button type="button" data-cfj-ok>…</button><button type="button" class="sec" data-cfj-x>${esc(o.no || 'Cancelar')}</button></div>
+      </div>`;
+      const cajas = () => [...f.querySelectorAll('[data-cfj-m]')];
+      const elegidos = () => cajas().filter(c => c.checked && !c.disabled).map(c => todos[Number(c.dataset.cfjM)].valor);
+      const btn = f.querySelector('[data-cfj-ok]');
+      const pintar = () => { const n = elegidos().length; btn.textContent = String(o.si || 'Listo ({n})').replace('{n}', n); btn.disabled = !n; btn.style.opacity = n ? '' : '.5'; btn.style.cursor = n ? '' : 'not-allowed'; };
+      const tecla = ev => { if(ev.key === 'Escape'){ ev.stopImmediatePropagation(); ev.preventDefault(); fin(null); } };
+      const fin = v => { document.removeEventListener('keydown', tecla, true); f.remove(); ok(v); };
+      const delGrupo = gi => { const desde = grupos.slice(0, gi).reduce((s, g) => s + g.items.length, 0); return cajas().slice(desde, desde + grupos[gi].items.length); };
+      f.onclick = ev => {
+        const t = ev.target.closest('[data-cfj-todos], [data-cfj-ninguno]');
+        if(t){ ev.preventDefault(); const si = 'cfjTodos' in t.dataset; delGrupo(Number(si ? t.dataset.cfjTodos : t.dataset.cfjNinguno)).forEach(c => { if(!c.disabled) c.checked = si; }); pintar(); return; }
+        if(ev.target.closest('[data-cfj-ok]')){ if(elegidos().length) fin(elegidos()); return; }
+        if(ev.target.closest('[data-cfj-x]') || ev.target === f) fin(null);
+      };
+      f.addEventListener('change', pintar);
+      document.addEventListener('keydown', tecla, true);
+      document.body.appendChild(f);
+      pintar();
+    });
+  }
+  return {preguntar, elegir, texto, marcar};
 })();

@@ -48,26 +48,46 @@ async function emergerToken(id, o){
   if(o.alSalir) o.alSalir();
 }
 
-// El pozo: tierra removida y un agujero oscuro, en la casilla de cada token bajo tierra (lo ven todos los que verían el token).
+/* 🕳 El montículo (dueño, 2026-10-29: «aunque esté quieto tres turnos y esté bajo tierra, tiene que haber un montículo de tierra donde está parado… en
+   cuanto esté visible, se debe ver su montículo, que debe mantener el mismo estilo irregular y terroso de la estela»): en la casilla de cada token bajo
+   tierra, mientras lo esté (con estela o sin ella), un montón de terrones desparejos con los colores y la forma de la estela (`tunelTramo`), un poco más
+   alto en el medio. Lo ven todos los que verían esa casilla (antes era un pozo oscuro). */
 function dibujarPozos(z){
   tokens.forEach(t => {
     if(!t.bajoTierra || (t.oculto && !soyGM)) return;
     if(!soyGM && !tokenVisiblePorNiebla(t)) return;
-    const c = hexCentro(t.col, t.fila), r = HEX * 0.62;
-    ctx.save();
-    ctx.beginPath(); ctx.ellipse(c.x, c.y + r * 0.06, r, r * 0.78, 0, 0, 2 * Math.PI);
-    ctx.fillStyle = '#7a5532'; ctx.fill();
-    ctx.lineWidth = 2 / z; ctx.strokeStyle = '#4a321c'; ctx.stroke();
-    // terrones alrededor
-    for(let i = 0; i < 7; i++){
-      const a = i * 2 * Math.PI / 7 + 0.4, rr = r * (0.9 + 0.12 * ((i * 37) % 5) / 5);
-      ctx.beginPath(); ctx.arc(c.x + Math.cos(a) * rr, c.y + r * 0.06 + Math.sin(a) * rr * 0.78, r * (0.1 + 0.03 * (i % 3)), 0, 2 * Math.PI);
-      ctx.fillStyle = i % 2 ? '#8d6640' : '#5f4127'; ctx.fill();
+    if(!soyGM && nieblaAplica() && !nieblaVista.has(nbPack(t.col, t.fila))) return;   // en la niebla no se ve
+    const c = hexCentro(t.col, t.fila), r = HEX * 0.55;
+    const sem = (t.col * 73856093) ^ (t.fila * 19349663);
+    const rnd = k => { let x = (sem + Math.imul(k + 7, 374761393)) | 0; x = Math.imul(x ^ (x >>> 13), 1274126177); return ((x ^ (x >>> 16)) >>> 0) / 4294967296; };
+    const terron = (x, y, rr, k) => {
+      ctx.beginPath();
+      for(let j = 0; j < 9; j++){
+        const a = (j + rnd(k * 11 + j) * 0.6) * 2 * Math.PI / 9, rad = rr * (0.72 + 0.4 * rnd(k * 17 + j + 200));
+        const px = x + Math.cos(a) * rad, py = y + Math.sin(a) * rad * 0.85;
+        if(j === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.closePath(); ctx.fill();
+    };
+    // Los terrones del montón: uno grande al medio y una ronda desareja alrededor (se sale un poquito del hexágono, como la estela).
+    const monton = [{x: c.x, y: c.y, rr: r * 0.62}];
+    for(let k = 0; k < 9; k++){
+      const a = k * 2 * Math.PI / 9 + rnd(k + 20) * 0.5, d = r * (0.42 + 0.3 * rnd(k + 40));
+      monton.push({x: c.x + Math.cos(a) * d, y: c.y + Math.sin(a) * d * 0.8, rr: r * (0.3 + 0.18 * rnd(k + 60))});
     }
-    const g = ctx.createRadialGradient(c.x, c.y + r * 0.12, 0, c.x, c.y + r * 0.12, r * 0.68);
-    g.addColorStop(0, '#000'); g.addColorStop(0.7, '#160d06'); g.addColorStop(1, '#3a2615');
-    ctx.beginPath(); ctx.ellipse(c.x, c.y + r * 0.12, r * 0.66, r * 0.48, 0, 0, 2 * Math.PI);
-    ctx.fillStyle = g; ctx.fill();
+    ctx.save();
+    ctx.fillStyle = '#3f2a17'; monton.forEach((m, k) => terron(m.x, m.y, m.rr + r * 0.08, k));   // el borde oscuro
+    ctx.fillStyle = '#6e4a2b'; monton.forEach((m, k) => terron(m.x, m.y, m.rr, k));              // la tierra
+    // Lo de arriba del montón, más claro (la tierra levantada), y piedritas.
+    for(let k = 0; k < 6; k++){
+      ctx.fillStyle = rnd(k + 400) < 0.5 ? '#86603a' : '#7a5532';
+      terron(c.x + (rnd(k + 500) - 0.5) * r * 0.7, c.y + (rnd(k + 600) - 0.5) * r * 0.5 - r * 0.08, r * (0.18 + 0.14 * rnd(k + 700)), k + 1000);
+    }
+    for(let i = 0; i < 8; i++){
+      const a = rnd(i + 800) * 2 * Math.PI, d = r * (0.2 + 0.75 * rnd(i + 900));
+      ctx.beginPath(); ctx.arc(c.x + Math.cos(a) * d, c.y + Math.sin(a) * d * 0.8, r * (0.05 + 0.06 * rnd(i + 1000)), 0, 2 * Math.PI);
+      ctx.fillStyle = i % 3 === 0 ? '#9a9187' : i % 3 === 1 ? '#8d6640' : '#4f3820'; ctx.fill();
+    }
     ctx.restore();
   });
 }

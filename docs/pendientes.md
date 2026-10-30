@@ -38,6 +38,13 @@
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.
+> - [ ] **✊ Ver el desempate del duelo (2026-10-30, dueño: «creá una situación de duelo que llegue a tener que tirar un desempate, dejá el duelo ahí y
+>   yo voy a la compu y veo cómo se resuelve»).** En «Claude · pruebas» quedó abierto un duelo **Warrior (prueba) contra juan**, en «⚖ ¡EMPATE!» (10 a
+>   10, forzado a mano): cada lado ve Par / Impar / ✊ Piedra, papel o tijera; el primero que elige decide el método. Con piedra, papel o tijera se abre
+>   el juego para el GM (cuenta de Claude, el Warrior) y para Saulo-Prueba (juan). Mirarlo con las dos cuentas.
+> - [ ] **⚔ Cargar a mano el Goblin rompehuesos (2026-10-30, dueño: «cuando esté en la compu te voy a decir "pasame al Goblin Rompehuesos" y lo voy a
+>   cargar a mano, así pruebo la experiencia de crear un creep»).** Cuando lo pida, pasarle la ficha completa de `docs/origen-goblins-cultistas.md`
+>   (sección del choque pesado warrior): Poncho de espejitos de torso; la quinta habilidad la elige él. No crearlo.
 > - [ ] **⛏ Encuentro 2 de El origen, adentro de las minas** (2026-10-29, dueño: «anotalo para pendiente en la compu, porque el teléfono se me
 >   complica»). La propuesta conceptual está en `docs/origen-goblins-cultistas.md`, sección «Encuentro 2 — propuesta conceptual». Faltan cuatro
 >   respuestas del dueño: qué mini jefe (A Capataz del culto con el Cristal de la Grieta, B Capataz goblin, C Gusano de roca domado, o una mezcla); si el

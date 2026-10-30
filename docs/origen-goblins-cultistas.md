@@ -361,3 +361,8 @@ Propuesta (esperando el OK; solo skills auditadas, ninguna repetida con el Culti
   portal** cuando le queda poca vida: lo lleva en el cinturón (un creep ya lo puede usar desde sus Acciones: el GM elige la casilla al lado y después lo
   mueve al portal). El grisú: el dueño no lo entendió; se le explicó y queda a su respuesta.
 - **Decidido (dueño, 2026-10-30)**: el grisú queda afuera por ahora (anotado en `pendientes.md`, «Ideas del dueño para retomar»).
+- **Cambio pedido (dueño, 2026-10-30)**: «quiero que sea mezcla del control/support pero también que haga daño elemental». Propuesta (esperando el OK):
+  la mano pasa a la **Varita del relámpago** (Buena: 1d8 eléctrico que salta al más cercano a 4, la mitad); salen **Empuje** y **Maldición de la sequía**;
+  entran **Zap** (2 No2, 3 SP, cd 3: 1d4 eléctrico directo y Parálisis 1 turno si no resiste con su Res.Esp; salta con 50 % y 25 % de Parálisis) y
+  **Prisión de hielo** (2 No2, 3 SP, cd 3: contra la Evasión, 2d4 de hielo e Inmovilizado hasta 2 turnos; se rompe con Fuerza contra su Ef.Esp). El
+  grupo tiene Def.Esp 0 / 0 / 1: el daño elemental entra casi entero. Alternativa: dejar la Sequía y sacar el Redoble.

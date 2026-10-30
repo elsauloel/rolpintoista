@@ -70,10 +70,10 @@ function dibujarPozos(z){
       ctx.closePath(); ctx.fill();
     };
     // Los terrones del montón: uno grande al medio y una ronda desareja alrededor (se sale un poquito del hexágono, como la estela).
-    const monton = [{x: c.x, y: c.y, rr: r * 0.62}];
-    for(let k = 0; k < 9; k++){
-      const a = k * 2 * Math.PI / 9 + rnd(k + 20) * 0.5, d = r * (0.42 + 0.3 * rnd(k + 40));
-      monton.push({x: c.x + Math.cos(a) * d, y: c.y + Math.sin(a) * d * 0.8, rr: r * (0.3 + 0.18 * rnd(k + 60))});
+    const monton = [{x: c.x, y: c.y, rr: r * 0.85}];
+    for(let k = 0; k < 11; k++){
+      const a = k * 2 * Math.PI / 11 + rnd(k + 20) * 0.5, d = r * (0.6 + 0.35 * rnd(k + 40));
+      monton.push({x: c.x + Math.cos(a) * d, y: c.y + Math.sin(a) * d * 0.85, rr: r * (0.38 + 0.22 * rnd(k + 60))});
     }
     ctx.save();
     ctx.fillStyle = '#3f2a17'; monton.forEach((m, k) => terron(m.x, m.y, m.rr + r * 0.08, k));   // el borde oscuro
@@ -81,10 +81,10 @@ function dibujarPozos(z){
     // Lo de arriba del montón, más claro (la tierra levantada), y piedritas.
     for(let k = 0; k < 6; k++){
       ctx.fillStyle = rnd(k + 400) < 0.5 ? '#86603a' : '#7a5532';
-      terron(c.x + (rnd(k + 500) - 0.5) * r * 0.7, c.y + (rnd(k + 600) - 0.5) * r * 0.5 - r * 0.08, r * (0.18 + 0.14 * rnd(k + 700)), k + 1000);
+      terron(c.x + (rnd(k + 500) - 0.5) * r * 1.0, c.y + (rnd(k + 600) - 0.5) * r * 0.75 - r * 0.1, r * (0.22 + 0.18 * rnd(k + 700)), k + 1000);
     }
     for(let i = 0; i < 8; i++){
-      const a = rnd(i + 800) * 2 * Math.PI, d = r * (0.2 + 0.75 * rnd(i + 900));
+      const a = rnd(i + 800) * 2 * Math.PI, d = r * (0.25 + 1.0 * rnd(i + 900));
       ctx.beginPath(); ctx.arc(c.x + Math.cos(a) * d, c.y + Math.sin(a) * d * 0.8, r * (0.05 + 0.06 * rnd(i + 1000)), 0, 2 * Math.PI);
       ctx.fillStyle = i % 3 === 0 ? '#9a9187' : i % 3 === 1 ? '#8d6640' : '#4f3820'; ctx.fill();
     }

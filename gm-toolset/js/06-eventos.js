@@ -33,7 +33,7 @@ document.addEventListener('input', e => {
     // mientras se escribe, "+10" quedaría en 10 apenas se teclea el 1.
     if(campo === 'hp') return;
     const numericos = ['nivel','hp','hpMax','nitros','spd','defensa','armadmg','resfuego','reshielo','resrayo','restoxico','resacido','resluz','ressiniestro'];
-    sc[campo] = numericos.includes(campo) ? num(t.value) : t.value;
+    sc[campo] = numericos.includes(campo) ? num(t.value) - num(t.dataset.fmod) : t.value;   // (con `data-fmod`, lo escrito es el total: se guarda la base)
     if(campo === 'nivel'){
       actualizarBadgePresupuesto(sc, t.closest('.card'));
     }
@@ -41,7 +41,7 @@ document.addEventListener('input', e => {
   }
   if(t.dataset.crit !== undefined && t.dataset.id){
     const sc = S.creeps.find(s=>s.id===t.dataset.id);
-    if(sc) sc.crit[+t.dataset.crit] = num(t.value);
+    if(sc) sc.crit[+t.dataset.crit] = num(t.value) - num(t.dataset.critmod);   // (con `data-critmod`, lo escrito es el total)
     return;
   }
   if(t.dataset.habf !== undefined){

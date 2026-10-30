@@ -100,11 +100,11 @@ function cardHtml(sc){
 
       <div class="row3" style="grid-template-columns:1fr 1fr 1fr">
         <div class="mini-f con-tip" data-tip="${esc(ataqueOrigenTxt(sc))}"><label>Ataque</label><div class="valor-fijo">${esc(ataqueCreepTxt(sc))}</div></div>
-        <div class="mini-f con-tip" data-tip="${esc(defensaOrigenTxt(sc))}"><label>Defensa base${creepDefensaEfectiva(sc)!==num(sc.defensa) ? ` <button type="button" class="mod-origen-btn efectivo-badge" data-modorigen="${esc(creepArmaduraOrigenTxt(sc))}">efect. ${fmt(creepDefensaEfectiva(sc))}</button>` : ''}</label><input type="number" data-f="defensa" data-id="${sc.id}" value="${sc.defensa}"></div>
-        <div class="mini-f con-tip" data-tip="${esc(armadmgOrigenTxt(sc))}" title="Se resta al daño de casteo que ignora la Defensa (Paso 3 del casteo). No sale de ningún atributo: normalmente 0, salvo ítems Raros o mejores."><label>Armad. mágica${creepArmadmgEfectiva(sc)!==num(sc.armadmg) ? ` <span class="mod-origen-btn efectivo-badge">efect. ${fmt(creepArmadmgEfectiva(sc))}</span>` : ''}</label><input type="number" data-f="armadmg" data-id="${sc.id}" value="${sc.armadmg}"></div>
+        <div class="mini-f con-tip" data-tip="${esc(defensaOrigenTxt(sc))}"><label>Defensa${totalModBadge(creepDefensaEfectiva(sc), sc.defensa, creepArmaduraOrigenTxt(sc))}</label>${totalModInput('defensa', sc, creepDefensaEfectiva(sc), sc.defensa)}</div>
+        <div class="mini-f con-tip" data-tip="${esc(armadmgOrigenTxt(sc))}" title="Se resta al daño de casteo que ignora la Defensa (Paso 3 del casteo). No sale de ningún atributo: normalmente 0, salvo ítems Raros o mejores."><label>Defensa especial${totalModBadge(creepArmadmgEfectiva(sc), sc.armadmg, armadmgOrigenTxt(sc))}</label>${totalModInput('armadmg', sc, creepArmadmgEfectiva(sc), sc.armadmg)}</div>
       </div>
       <div class="row3" style="grid-template-columns:repeat(5,1fr)" title="Resistencias elementales (2026-10-04): cada una se resta al daño de su elemento, además de la Defensa especial. Lo que den su equipo y sus estados se suma solo.">
-        ${Object.entries(Combatiente.ELEMENTOS).map(([el, x]) => `<div class="mini-f"><label>${x.icono} ${esc(x.etq)}${CreepCalculo.resElemental(sc, el) !== num(sc['res' + el]) ? ` <span class="mod-origen-btn efectivo-badge">efect. ${fmt(CreepCalculo.resElemental(sc, el))}</span>` : ''}</label><input type="number" data-f="res${el}" data-id="${sc.id}" value="${num(sc['res' + el])}"></div>`).join('')}
+        ${Object.entries(Combatiente.ELEMENTOS).map(([el, x]) => `<div class="mini-f"><label>${x.icono} ${esc(x.etq)}${totalModBadge(CreepCalculo.resElemental(sc, el), sc['res' + el], `Base ${fmt(num(sc['res' + el]))}; lo demás, del equipo y los estados`)}</label>${totalModInput('res' + el, sc, CreepCalculo.resElemental(sc, el), sc['res' + el])}</div>`).join('')}
       </div>
 
 
@@ -168,7 +168,7 @@ function cardHtml(sc){
         <div class="sect-label">Res. a críticos</div>
         <div class="crit-grid" style="margin-top:4px">
           ${['Tipo 4','Tipo 6','Tipo 8','Tipo 10','Tipo 12'].map((lbl,i) => num(sc.crit[i]) !== 0 || creepCritEfectivo(sc, i) !== 0   // 🛡 (paso 3: la base y lo que suma el equipo en vivo)
-            ? `<div class="crit-cell"><label>${lbl}${creepCritEfectivo(sc,i)!==num(sc.crit[i]) ? ` <button type="button" class="mod-origen-btn efectivo-badge" data-modorigen="${esc(creepArmaduraOrigenTxt(sc))}">${fmt(creepCritEfectivo(sc,i))}</button>` : ''}</label><input type="number" data-crit="${i}" data-id="${sc.id}" value="${sc.crit[i]}"></div>`
+            ? `<div class="crit-cell"><label>${lbl}${totalModBadge(creepCritEfectivo(sc, i), sc.crit[i], creepArmaduraOrigenTxt(sc))}</label><input type="number" class="${totalModClase(creepCritEfectivo(sc, i), sc.crit[i])}" data-crit="${i}" data-id="${sc.id}" data-critmod="${fmt(creepCritEfectivo(sc, i) - num(sc.crit[i]))}" value="${fmt(creepCritEfectivo(sc, i))}"></div>`
             : '').join('')}
         </div>
       </div>` : ''}
@@ -484,3 +484,15 @@ function habCreepTira(h){ return CreepAcciones.habTira(h); }   // comun/creep-ac
 // La fórmula (el daño o el efecto), si hay stat, va aparte con el botón 🎲 — igual que Atacar → Daño (2026-09-24).
 function habCreepStatTirable(h, sc){ return CreepBotonera.habStatTirable(h, sc); }
 function habCreepTieneSegunda(h, sc){ return CreepBotonera.habTieneSegunda(h, sc); }
+
+/* Defensa, Defensa especial y resistencias en la ficha del lápiz (dueño, 2026-10-30: «en el recuadro de la defensa base, ¿no debería decir 5 en vez
+   de 0?»): como los atributos, el número es el total que cuenta (base + equipo + estados) y al lado, «+N» con de dónde sale; lo que se escribe es el
+   total y se guarda la base (el total − lo que suma el resto: `data-fmod` / `data-critmod`, js/06). */
+const totalModClase = (total, base) => { const m = num(total) - num(base); return m > 0 ? 'mod-plus' : m < 0 ? 'mod-minus' : ''; };
+function totalModBadge(total, base, origen){
+  const m = num(total) - num(base);
+  if(!m) return '';
+  return ` <button type="button" class="mod-origen-btn ${totalModClase(total, base)}" data-modorigen="${esc(`Base ${fmt(num(base))} ${m > 0 ? '+' : ''}${fmt(m)}${origen ? '\n' + origen : ''}`)}">${m > 0 ? '+' : ''}${fmt(m)}</button>`;
+}
+const totalModInput = (campo, sc, total, base) =>
+  `<input type="number" class="${totalModClase(total, base)}" data-f="${campo}" data-id="${sc.id}" data-fmod="${fmt(num(total) - num(base))}" value="${fmt(num(total))}">`;

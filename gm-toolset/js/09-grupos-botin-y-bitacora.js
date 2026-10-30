@@ -541,6 +541,58 @@ function toast(msg){
   registrarEvento(msg);
 }
 
+/* 🖼 Encuadrar la imagen de un creep (2026-10-30): la parte que se ve en su token y en su tarjeta 🪪 del mapa. */
+async function encuadrarImagenCreep(sc){
+  if(!sc || !sc.imagen || typeof recortarImagen !== 'function') return false;
+  try{
+    const r = await recortarImagen(sc.imagen, {lado: 240, tope: 120000, encuadre: sc.imagenEncuadre, conEncuadre: true});
+    sc.imagenEncuadre = r.encuadre;
+    renderAll();
+    toast('🖼 Encuadre guardado: así se ve en el token y en la tarjeta del mapa');
+    return true;
+  }catch(err){ if(err && err.message !== 'cancelado'){ console.error(err); toast('No se pudo encuadrar la imagen'); } return false; }
+}
+/* 🖼 Ver la imagen de un creep (dueño, 2026-10-30: «cuando cliques esa imagen se vea la imagen completa y ahí mismo haya un botón de encuadrar… o elegir
+   una nueva imagen»): la imagen entera, con lo que se ve en el mapa marcado, y los botones. Sin imagen, va directo a elegir una. */
+function verImagenCreep(scId){
+  const sc = S.creeps.find(s => s.id === scId);
+  if(!sc) return;
+  const elegir = () => document.querySelector(`[data-imginput="${scId}"]`)?.click();
+  if(!sc.imagen){ elegir(); return; }
+  const viejo = document.getElementById('ver-imagen-creep'); if(viejo) viejo.remove();
+  const f = document.createElement('div');
+  f.id = 'ver-imagen-creep';
+  f.className = 'recorte-scrim';
+  f.innerHTML = `<div class="recorte-caja" style="max-width:min(640px,calc(100vw - 32px))">
+    <p class="recorte-titulo">${esc(nombreLimpioCreep(sc))}: la imagen completa</p>
+    <div style="position:relative;display:inline-block;max-width:100%"><img src="${sc.imagen}" alt="" style="display:block;max-width:100%;max-height:60vh;border-radius:var(--r)"><div data-marco style="position:absolute;border:2px solid var(--brass);box-shadow:0 0 0 9999px rgba(0,0,0,.45);pointer-events:none"></div></div>
+    <p class="recorte-ayuda">El recuadro es lo que se ve en su token y en su tarjeta del mapa.</p>
+    <div class="fila recorte-botones" style="flex-wrap:wrap">
+      <button type="button" class="btn" data-vi="cerrar">Cerrar</button>
+      <button type="button" class="btn" data-vi="otra">📁 Elegir otra imagen</button>
+      <button type="button" class="btn primary" data-vi="encuadrar">🖼 Encuadrar</button>
+    </div></div>`;
+  document.body.appendChild(f);
+  const im = f.querySelector('img'), marco = f.querySelector('[data-marco]');
+  const ubicar = () => {
+    const w = im.clientWidth, h = im.clientHeight, nw = im.naturalWidth || 1, nh = im.naturalHeight || 1, k = w / nw, min = Math.min(nw, nh), e = sc.imagenEncuadre;
+    const lado = (e && num(e.t) > 0 ? num(e.t) * min : min) * k;
+    const x = e && num(e.t) > 0 ? num(e.x) * nw * k : (w - lado) / 2, y = e && num(e.t) > 0 ? num(e.y) * nh * k : (h - lado) / 2;
+    Object.assign(marco.style, {left: x + 'px', top: y + 'px', width: lado + 'px', height: lado + 'px'});
+  };
+  if(im.complete) ubicar(); else im.onload = ubicar;
+  const cerrar = () => { document.removeEventListener('keydown', tecla, true); f.remove(); };
+  const tecla = ev => { if(ev.key === 'Escape'){ ev.stopImmediatePropagation(); cerrar(); } };
+  document.addEventListener('keydown', tecla, true);
+  f.addEventListener('pointerdown', ev => { if(ev.target === f) cerrar(); });
+  f.querySelectorAll('[data-vi]').forEach(b => b.onclick = async () => {
+    const q = b.dataset.vi;
+    cerrar();
+    if(q === 'otra') elegir();
+    else if(q === 'encuadrar'){ await encuadrarImagenCreep(sc); verImagenCreep(scId); }
+  });
+}
+
 document.addEventListener('change', async e => {
   if(e.target.dataset.imginput === undefined) return;
   const scId = e.target.dataset.imginput;
@@ -551,12 +603,11 @@ document.addEventListener('change', async e => {
   if(!sc) return;
   try{
     sc.imagen = await fileToDataURL(file, 480, 0.85);
-    // 🖼 El encuadre (dueño, 2026-10-30: «en la instancia de cambiar imagen, ya debe aparecer la opción del enmarcado que se va a ver en la tarjeta del
-    // mapa»): la tarjeta 🪪 y el token toman la imagen cuadrada; acá se elige qué parte. Cancelar deja la imagen entera (se corta el centro, como antes).
-    if(typeof recortarImagen === 'function'){
-      try{ sc.imagen = await recortarImagen(sc.imagen, {lado: 480, tope: 160000}); }catch(err){ if(err && err.message !== 'cancelado') throw err; }
-    }
+    delete sc.imagenEncuadre;
     renderAll();
+    // 🖼 El encuadre (dueño, 2026-10-30: «en la instancia de cambiar imagen, ya debe aparecer la opción del enmarcado que se va a ver en la tarjeta del
+    // mapa»): se guarda la imagen entera y aparte qué parte se ve (`imagenEncuadre`), así se puede volver a encuadrar. Cancelar = el centro.
+    await encuadrarImagenCreep(sc);
   }catch(err){
     toast('No se pudo cargar esa imagen');
   }

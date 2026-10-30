@@ -296,7 +296,7 @@ function escucharVinculables(){
     pedirDibujo();
   }, err => console.error(`Error escuchando ${coleccion}:`, err));
   escuchar('fichas', fichasPub, ['duenoUid', 'resumen', 'miniatura']);
-  escuchar('creeps', creepsPub, ['orden', 'resumen', 'miniatura', 'tarjeta', 'mapa', 'color']);
+  escuchar('creeps', creepsPub, ['orden', 'resumen', 'miniatura', 'tarjeta', 'imagenCompleta', 'mapa', 'color']);
 }
 
 function componerFondo(){

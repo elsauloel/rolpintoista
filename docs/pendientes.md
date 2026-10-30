@@ -38,6 +38,7 @@
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.
+> - [ ] **📋 Pegar las reglas de Firestore (2026-10-30): `creeps/<id>/publico`** — la imagen completa de un creep, para el «👁 Ver completa» de su tarjeta del mapa. Sin pegarlas, el botón no aparece (GM Tools no puede publicar la imagen) y nada más se rompe.
 > - [x] **✊ Ver el desempate del duelo — hecho por el dueño el 2026-10-30 (gana juan con piedra, papel o tijera). (2026-10-30, dueño: «creá una situación de duelo que llegue a tener que tirar un desempate, dejá el duelo ahí y
 >   yo voy a la compu y veo cómo se resuelve»).** En «Claude · pruebas» quedó abierto un duelo **Warrior (prueba) contra juan**, en «⚖ ¡EMPATE!» (10 a
 >   10, forzado a mano): cada lado ve Par / Impar / ✊ Piedra, papel o tijera; el primero que elige decide el método. Con piedra, papel o tijera se abre

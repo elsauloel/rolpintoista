@@ -116,7 +116,7 @@ document.addEventListener('click', async e => {
   if(b.dataset.editarcreep){ abrirEditarCreep(b.dataset.editarcreep); return; }
   if(b.dataset.cerrareditar){ cancelarEditarCreep(); return; }
   if(b.dataset.img){
-    document.querySelector(`[data-imginput="${b.dataset.img}"]`)?.click();
+    verImagenCreep(b.dataset.img);   // 🖼 la imagen completa, con Encuadrar y Elegir otra (2026-10-30)
     return;
   }
   if(b.dataset.imgrm){

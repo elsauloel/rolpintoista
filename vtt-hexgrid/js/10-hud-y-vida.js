@@ -782,8 +782,10 @@ function hudEstadosHtml(t, estados, puede){
 function hudTarjetaHtml(t, d){
   const v = vinculo(t);
   const mini = v && (v.tarjeta || v.miniatura);   // la tarjeta usa una imagen más grande (400 px) si el GM ya la publicó
+  // 👁 Ver completa (dueño, 2026-10-30: «esa imagen es solo el encuadre que uno elige… que el usuario pueda hacer clic y verla completa»).
+  const completa = v && v.imagenCompleta ? `<button type="button" data-ver-completa="${esc(t.fichaId)}" title="Ver la imagen completa" style="position:absolute;right:6px;bottom:16px;background:rgba(10,8,12,.75);color:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12px;cursor:pointer">👁 Ver completa</button>` : '';
   const img = mini
-    ? `<img src="${esc(mini)}" alt="" style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--r);border:1px solid var(--line);display:block;margin-bottom:10px">`
+    ? `<div style="position:relative"><img src="${esc(mini)}" alt="" ${v && v.imagenCompleta ? `data-ver-completa="${esc(t.fichaId)}" title="Ver la imagen completa" ` : ''}style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--r);border:1px solid var(--line);display:block;margin-bottom:10px${v && v.imagenCompleta ? ';cursor:zoom-in' : ''}">${completa}</div>`
     : '';
   // El arma primero (también la natural, marcada), después cada pieza de equipo (2026-10-09).
   const arma = d.armaNombre
@@ -1633,3 +1635,27 @@ async function hudEstadoCambiar(t, indice, accion, delta){
   }
 }
 
+/* 👁 La imagen completa de un creep (2026-10-30): la tarjeta 🪪 muestra el encuadre; esto trae la completa (creeps/<id>/publico/imagen) y la muestra
+   encima de todo. Esc, ✕ o un clic la cierran. */
+async function verImagenCompletaCreep(creepId){
+  let dato = '';
+  try{ const s = await fbDb.doc(fbRutaCampana('creeps/' + creepId + '/publico/imagen')).get(); dato = s.exists ? String(s.data().dato || '') : ''; }
+  catch(err){ console.error(err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan pegar las reglas nuevas de Firestore (la imagen completa)' : 'No se pudo traer la imagen'); return; }
+  if(!dato){ toast('Este creep no tiene la imagen completa publicada'); return; }
+  const viejo = document.getElementById('imagen-completa-creep'); if(viejo) viejo.remove();
+  const f = document.createElement('div');
+  f.id = 'imagen-completa-creep';
+  f.style.cssText = 'position:fixed;inset:0;z-index:100030;background:rgba(6,5,8,.85);display:flex;align-items:center;justify-content:center;padding:20px;cursor:zoom-out';
+  f.innerHTML = `<img src="${dato}" alt="" style="max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 18px 50px rgba(0,0,0,.7)"><button type="button" title="Cerrar" style="position:absolute;top:14px;right:18px;background:none;border:none;color:#fff;font-size:26px;cursor:pointer">✕</button>`;
+  const cerrar = () => { document.removeEventListener('keydown', tecla, true); f.remove(); };
+  const tecla = e => { if(e.key === 'Escape'){ e.stopImmediatePropagation(); e.preventDefault(); cerrar(); } };
+  document.addEventListener('keydown', tecla, true);
+  f.addEventListener('click', cerrar);
+  document.body.appendChild(f);
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('[data-ver-completa]');
+  if(!b) return;
+  e.preventDefault(); e.stopPropagation();
+  verImagenCompletaCreep(b.dataset.verCompleta);
+}, true);

@@ -113,22 +113,33 @@ function creepPublico(sc, orden){
   };
 }
 
-function creepMiniatura(dataUrl, px, calidad){
+// enc = {x, y, t} (2026-10-30): el encuadre elegido (comun/recorte-imagen.js); sin él, el centro.
+function creepMiniatura(dataUrl, px, calidad, enc){
   return new Promise(res => {
     if(!dataUrl){ res(''); return; }
     const img = new Image();
     img.onload = () => {
-      const lado = Math.min(img.naturalWidth, img.naturalHeight);
-      if(!lado){ res(''); return; }
+      const min = Math.min(img.naturalWidth, img.naturalHeight);
+      if(!min){ res(''); return; }
+      const lado = enc && num(enc.t) > 0 ? Math.min(min, num(enc.t) * min) : min;
+      const sx = enc && num(enc.t) > 0 ? Math.max(0, Math.min(img.naturalWidth - lado, num(enc.x) * img.naturalWidth)) : (img.naturalWidth - lado) / 2;
+      const sy = enc && num(enc.t) > 0 ? Math.max(0, Math.min(img.naturalHeight - lado, num(enc.y) * img.naturalHeight)) : (img.naturalHeight - lado) / 2;
       const canvas = document.createElement('canvas');
-      const salida = Math.min(px || CREEP_MINIATURA_PX, lado);   // nunca se agranda más que la foto original
+      const salida = Math.min(px || CREEP_MINIATURA_PX, Math.round(lado));   // nunca se agranda más que la foto original
       canvas.width = canvas.height = salida;
-      canvas.getContext('2d').drawImage(img, (img.naturalWidth - lado) / 2, (img.naturalHeight - lado) / 2, lado, lado, 0, 0, salida, salida);
+      canvas.getContext('2d').drawImage(img, sx, sy, lado, lado, 0, 0, salida, salida);
       try{ res(canvas.toDataURL('image/jpeg', calidad || 0.8)); }catch(e){ res(''); }
     };
     img.onerror = () => res('');
     img.src = dataUrl;
   });
+}
+
+async function creepImagenPublica(ref, imagen){
+  try{
+    if(imagen){ await ref.collection('publico').doc('imagen').set({dato: imagen}); await ref.set({imagenCompleta: true}, {merge: true}); }
+    else{ await ref.set({imagenCompleta: false}, {merge: true}); await ref.collection('publico').doc('imagen').delete(); }
+  }catch(err){ console.warn('La imagen completa no se publicó (¿faltan pegar las reglas de creeps/<id>/publico?):', err && err.code); }
 }
 
 function gmEstado(texto, tipo){
@@ -158,10 +169,14 @@ async function gmTarjetasFaltantes(docs, creeps){
   if(cl.contains('modo-mantenimiento') || cl.contains('modo-acciones')) return;
   for(let i = 0; i < docs.length; i++){
     const sc = creeps[i];
-    if(!sc || !sc.imagen || docs[i].data().tarjeta) continue;
+    if(!sc || !sc.imagen) continue;
     try{
-      const t = await creepMiniatura(sc.imagen, CREEP_TARJETA_PX, 0.82);
-      if(t) await docs[i].ref.set({tarjeta: t}, {merge: true});
+      if(!docs[i].data().tarjeta){
+        const t = await creepMiniatura(sc.imagen, CREEP_TARJETA_PX, 0.82, sc.imagenEncuadre);
+        if(t) await docs[i].ref.set({tarjeta: t}, {merge: true});
+      }
+      // 🖼 La imagen completa, pública (2026-10-30): los creeps de antes la reciben una vez.
+      if(!docs[i].data().imagenCompleta) await creepImagenPublica(docs[i].ref, sc.imagen);
     }catch(err){ console.warn('No se pudo armar la imagen de tarjeta de ' + sc.nombre, err); }
   }
 }
@@ -174,7 +189,7 @@ async function gmGuardarTick(forzar){
 
   const actuales = new Map();
   creepsReales().forEach((sc, i) => {
-    actuales.set(sc.id, {json: creepFichaJson(sc), imagen: sc.imagen || '', publico: JSON.stringify(creepPublico(sc, i)), sc, orden: i});
+    actuales.set(sc.id, {json: creepFichaJson(sc), imagen: sc.imagen || '', enc: JSON.stringify(sc.imagenEncuadre || null), publico: JSON.stringify(creepPublico(sc, i)), sc, orden: i});
   });
   const guardar = [];
   actuales.forEach((a, id) => {
@@ -201,18 +216,19 @@ async function gmGuardarTick(forzar){
   for(const [id, a] of guardar){
     const u = g.ultimo[id];
     const imagenCambio = !u || u.imagen !== a.imagen;
+    const encuadreCambio = imagenCambio || u.enc !== a.enc;   // 🖼 se volvió a encuadrar: la miniatura y la tarjeta, de nuevo (2026-10-30)
     const peso = a.json.length + (imagenCambio ? a.imagen.length : 0) + 2000;
     if(hechos.length && (bytes + peso > GM_LOTE_MAX_BYTES || ops + 3 > 450)) break;  // el resto, en la próxima vuelta
     bytes += peso; ops += 3;
     const firma = gmHash(a.json) + '-' + gmHash(a.imagen);
     const doc = {...JSON.parse(a.publico), firma, actualizado: ts};
-    if(imagenCambio){ doc.miniatura = await creepMiniatura(a.imagen); doc.tarjeta = await creepMiniatura(a.imagen, CREEP_TARJETA_PX, 0.82); }
+    if(encuadreCambio){ const enc = a.sc && a.sc.imagenEncuadre; doc.miniatura = await creepMiniatura(a.imagen, 0, 0, enc); doc.tarjeta = await creepMiniatura(a.imagen, CREEP_TARJETA_PX, 0.82, enc); }
     const base = col.doc(id);
     batch.set(base, doc, {mergeFields: Object.keys(doc)});  // reemplaza el resumen entero, conserva la miniatura
     batch.set(base.collection('privado').doc('ficha'), {json: a.json});
     if(imagenCambio) batch.set(base.collection('privado').doc('imagen'), {dato: a.imagen});
     g.firmas[id] = firma;
-    hechos.push([id, a]);
+    hechos.push([id, a, imagenCambio]);
   }
   const borrados = borrar.slice(0, Math.max(0, Math.floor((450 - ops) / 3)));
   borrados.forEach(id => {
@@ -225,8 +241,12 @@ async function gmGuardarTick(forzar){
 
   try{
     await batch.commit();
+    // 🖼 La imagen completa, pública (2026-10-30, el «👁 Ver completa» de la tarjeta del mapa): aparte del lote, así si faltan pegar las reglas
+    // (creeps/<id>/publico) no frena el guardado de nada más.
+    hechos.filter(h => h[2]).forEach(([id, a]) => creepImagenPublica(col.doc(id), a.imagen));
+    borrados.forEach(id => col.doc(id).collection('publico').doc('imagen').delete().catch(() => {}));
     hechos.forEach(([id, a]) => {
-      g.ultimo[id] = {json: a.json, imagen: a.imagen, publico: a.publico};
+      g.ultimo[id] = {json: a.json, imagen: a.imagen, enc: a.enc, publico: a.publico};
       const s = g.sucios[id];
       if(s && s.clave === a.json + '|' + a.publico + '|' + a.imagen.length + gmHash(a.imagen)) delete g.sucios[id];
     });
@@ -286,7 +306,7 @@ async function gmLeerCreep(doc){
 }
 
 function gmMarcarGuardado(sc, orden, firma){
-  gmVivo.ultimo[sc.id] = {json: creepFichaJson(sc), imagen: sc.imagen || '', publico: JSON.stringify(creepPublico(sc, orden))};
+  gmVivo.ultimo[sc.id] = {json: creepFichaJson(sc), imagen: sc.imagen || '', enc: JSON.stringify(sc.imagenEncuadre || null), publico: JSON.stringify(creepPublico(sc, orden))};
   gmVivo.firmas[sc.id] = firma;
   delete gmVivo.sucios[sc.id];
 }

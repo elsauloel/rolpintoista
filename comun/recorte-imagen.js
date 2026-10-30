@@ -19,6 +19,8 @@
 const RECORTE_VISOR_PX = 320;
 const RECORTE_ZOOM_MAX = 4;
 
+/* opciones.encuadre = {x, y, t} (2026-10-30, el encuadre de la imagen de un creep): arranca mostrando esa parte (x, y: la esquina, como fracción del
+   ancho y del alto; t: el lado, como fracción del lado más chico). opciones.conEncuadre: resuelve {dato, encuadre} en vez del data URL solo. */
 function recortarImagen(fuente, opciones){
   const lado = (opciones && opciones.lado) || 96;
   const tope = (opciones && opciones.tope) || 60000;
@@ -26,7 +28,7 @@ function recortarImagen(fuente, opciones){
     const cargarDesde = src => {
       const img = new Image();
       img.onerror = () => rej(new Error('bad-image'));
-      img.onload = () => abrirRecorte(img, lado, tope, res, rej);
+      img.onload = () => abrirRecorte(img, lado, tope, res, rej, opciones || {});
       img.src = src;
     };
     if(typeof fuente === 'string'){ cargarDesde(fuente); return; }
@@ -38,7 +40,8 @@ function recortarImagen(fuente, opciones){
   });
 }
 
-function abrirRecorte(img, lado, tope, res, rej){
+function abrirRecorte(img, lado, tope, res, rej, op){
+  op = op || {};
   const anterior = document.getElementById('recorte-scrim');
   if(anterior) anterior.remove();
   const V = RECORTE_VISOR_PX;
@@ -77,7 +80,14 @@ function abrirRecorte(img, lado, tope, res, rej){
     elImg.style.height = dispH + 'px';
     elImg.style.transform = `translate(${tx}px, ${ty}px)`;
   };
-  {
+  const minNat = Math.min(img.naturalWidth, img.naturalHeight);
+  const e0 = op.encuadre;
+  if(e0 && Number(e0.t) > 0){   // el encuadre de antes
+    z = Math.max(1, Math.min(RECORTE_ZOOM_MAX, 1 / Number(e0.t)));
+    const ef = escalaBase * z;
+    tx = -Number(e0.x || 0) * img.naturalWidth * ef; ty = -Number(e0.y || 0) * img.naturalHeight * ef;
+    clamp();
+  }else{
     const {dispW, dispH} = dims();
     tx = (V - dispW) / 2; ty = (V - dispH) / 2;
   }
@@ -137,6 +147,7 @@ function abrirRecorte(img, lado, tope, res, rej){
       if(dato.length < tope) break;
       calidad = Math.max(0.5, calidad - 0.1); ladoOut = Math.round(ladoOut * 0.85);
     }
-    dato.length < tope ? res(dato) : rej(new Error('muy-grande'));
+    const encuadre = {x: sx / img.naturalWidth, y: sy / img.naturalHeight, t: sTam / minNat};
+    dato.length < tope ? res(op.conEncuadre ? {dato, encuadre} : dato) : rej(new Error('muy-grande'));
   };
 }

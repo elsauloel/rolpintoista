@@ -277,6 +277,11 @@ service cloud.firestore {
         match /privado/{doc} {
           allow read, write: if esGM(c);
         }
+        // 🖼 La imagen completa del creep, para el «👁 Ver completa» de su tarjeta del mapa (2026-10-30): la ven todos, la escribe el GM.
+        match /publico/{doc} {
+          allow read: if esMiembro(c);
+          allow write: if esGM(c);
+        }
       }
 
       // Estado general del GM (por ahora, el contador de turno).

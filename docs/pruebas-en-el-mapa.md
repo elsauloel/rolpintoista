@@ -273,16 +273,21 @@
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 
 ## Pendientes
-- [ ] **↻ Creeps que se dan vuelta y 🗡 la defensa en 1 desde el sigilo** (2026-10-30, P201): (1) en combate, un personaje que se acerca por la
+- [x] **↻ Creeps que se dan vuelta y 🗡 la defensa en 1 desde el sigilo** (2026-10-30, P201): (1) en combate, un personaje que se acerca por la
   espalda de un creep a 3 casilleros o menos → al GM le sale «Pasos a tu espalda… ¿Se da vuelta?» y lo gira; con otro personaje pegado al frente,
   «¡Flanqueado!»; un creep en sigilo o escondido no aparece en la Crónica. (2) Un ataque desde el sigilo por la espalda: el duelo dice «🗡 por la
   espalda: desde el sigilo, la defensa vale 1», no suma el +1 PdG, y la defensa del defensor queda en 1 («lo sorprendieron por la espalda: vale 1»),
   también en el ataque de oportunidad; sin sigilo, sigue el +1.
   **(1) probado el 2026-10-30** (Claude · pruebas, jugador juan contra el Goblin de prueba 1): juan entró por la espalda → al GM, «Pasos a tu
   espalda… ¿Se da vuelta?» → «↻ Darse vuelta» lo giró 180° y la Crónica dijo «oyó a juan y se dio vuelta»; con Clementino pegado, «¡Flanqueado!
-  Clementino le queda por la espalda». Al volver a juan a su lugar (ya sin sigilo), el Tunelero también «oyó pasos»: bien. **Falta (2)** y que un
-  creep en sigilo no salga en la Crónica: la ventana del jugador quedó minimizada a mitad de la prueba (el navegador no deja hacer clics ni capturas
-  así); se retoma con la ventana abierta.
+  Clementino le queda por la espalda». Al volver a juan a su lugar (ya sin sigilo), el Tunelero también «oyó pasos»: bien. **(2) probado el mismo
+  día**: juan en sigilo, pegado a la espalda del goblin, Atacar → el duelo dice «🗡 por la espalda: desde el sigilo, la defensa vale 1», el PdG
+  quedó 1d6+1 (sin el +1) y salió 6; el GM eligió Esquivar → «6 contra 1 · gana PdG de juan», en la Mesa «Evasión (lo sorprendieron por la
+  espalda: vale 1)» y crítico; se canceló («No cuenta»: le devolvió los 2 No2). **Y el creep en sigilo**: goblin en sigilo, juan llega por su
+  espalda (de espaldas a él) → al GM, «Pasos a tu espalda» → «↻ Darse vuelta»: giró, siguió en sigilo, no se publicó nada en la Crónica y el jugador
+  no lo ve. Visto de paso: ponerlo en sigilo dentro del cono de juan lo destapó solo («perdió el sigilo · lo detectó juan»). Detalle menor: el
+  botón Esquivar del GM sigue mostrando la Evasión de siempre (1d1 +2) antes de tirar; el total sí queda en 1. Sin probar: el ataque de
+  oportunidad desde el sigilo. Todo restaurado.
 
 - [x] **💧 Modo SP de los creeps, desde el GM (2026-10-29, dueño: «testeá bien el modo SP… que se le vea la barra de SP en el token»)** — ✅ probado el
   mismo día en «Claude · pruebas» (el Tunelero): el ⇄ «Con cooldown» → «Con SP · 12/12» y aparece la **barra azul de SP** en el token, debajo de la de vida

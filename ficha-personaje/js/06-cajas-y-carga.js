@@ -479,6 +479,7 @@ document.addEventListener('click', async e => {
     if(inv){
       inv.activa = true;
       inv.cooldownActual = num(inv.cooldown);
+      delete inv.turnosAgotados;   // ⏳ (2026-10-30)
       inv.nitros = invNitrosMax(inv);
       renderInvocaciones();
       toast(`${inv.nombre} invocada de nuevo`);

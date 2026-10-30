@@ -389,6 +389,50 @@ setInterval(() => {
     }).catch(err => { console.error('No se pudo sacar la invocación del mapa:', err); temporalesBorrando.delete(id); });
   });
 }, 1500);
+/* ⏳ Turnos agotados (dueño, 2026-10-30: «que no sea automatizado… aparezca una notificación: los turnos de tu invocación se agotaron. Y borrar
+   token, sumar turnos, resolver a mano, que lo decida el propietario»): el Mantenimiento ya no la duerme sola (comun/ficha-mantenimiento.js), la
+   marca `turnosAgotados`; acá, en la pantalla de quien la maneja (su dueño, o el GM con 🎮 el control), se pregunta qué hacer. Borrar la duerme
+   (y el vigilante de arriba saca su token); sumar le da más turnos; a mano la deja en 0 sin volver a preguntar. «Después» vuelve a preguntar en un rato. */
+const turnosAgotadosPreguntando = new Set();
+setInterval(() => {
+  if(typeof tokens === 'undefined' || !fbUsuario || typeof Confirmar === 'undefined') return;
+  tokens.forEach((t, id) => {
+    if(t.tipo !== 'pj' || !String(t.fichaId || '').includes(SEP_INVOCACION) || turnosAgotadosPreguntando.has(id)) return;
+    const v = vinculo(t), r = (v && v.resumen) || {};
+    if(!r.turnosAgotados || r.muerto || r.dormida) return;
+    const [ficha, invId] = String(t.fichaId).split(SEP_INVOCACION);
+    if(!(typeof bnManejo === 'function' && bnManejo(ficha))) return;
+    turnosAgotadosPreguntando.add(id);
+    turnosAgotadosPreguntar(t, ficha, invId).then(decidio => setTimeout(() => turnosAgotadosPreguntando.delete(id), decidio ? 5000 : 60000))
+      .catch(err => { console.error('Turnos agotados:', err); setTimeout(() => turnosAgotadosPreguntando.delete(id), 60000); });
+  });
+}, 1500);
+async function turnosAgotadosPreguntar(t, ficha, invId){   // → true si decidió algo
+  const nom = nombreDe(t);
+  const op = await Confirmar.elegir(`Los turnos de ${nom} se agotaron. ¿Qué hacés?`, {titulo: 'Turnos agotados', icono: '⏳', no: 'Después', opciones: [
+    {valor: 'borrar', texto: '🗑 Borrar token', detalle: 'Se va del mapa (se puede volver a invocar)'},
+    {valor: 'sumar', texto: '➕ Sumar turnos', detalle: 'Sigue invocada: elegís cuántos turnos más'},
+    {valor: 'mano', texto: '✋ Resolver a mano', detalle: 'Se queda con 0 turnos y no se vuelve a preguntar'}]});
+  if(!op) return false;
+  let n = 0;
+  if(op === 'sumar'){
+    const txt = await Confirmar.texto(`¿Cuántos turnos más le das a ${nom}?`, {titulo: 'Sumar turnos', icono: '➕', valor: '1', sugerencias: ['1', '2', '3', '5'], si: 'Sumar', max: 3});
+    n = Math.round(num(txt));
+    if(!(n > 0)) return false;
+  }
+  const ok = await editarPersonajeMapa(ficha, S => {
+    const inv = (S.invocaciones || []).find(x => x && String(x.id) === String(invId));
+    if(!inv) return false;
+    delete inv.turnosAgotados;
+    if(op === 'borrar') inv.activa = false;
+    else if(op === 'sumar') inv.cooldownActual = num(inv.cooldownActual) + n;
+    return true;
+  });
+  if(!ok){ toast(`No se pudo cambiar a ${nom}`); return false; }
+  if(op === 'sumar') mesaLinea(`⏳ ${nom}: +${n} turno${n === 1 ? '' : 's'} de invocación`, 'recordatorio');
+  else if(op === 'mano') mesaLinea(`✋ ${nom}: se le agotaron los turnos, se resuelve a mano`, 'recordatorio');
+  return true;   // (borrar: lo anuncia el vigilante de arriba al sacar el token)
+}
 // Su lugar en el orden de turnos también se va: si justo era su turno, primero pasa al siguiente (con su inicio de turno).
 async function temporalFueraDelOrden(id){
   if(!iniciativa.orden.some(o => o.id === id)) return;

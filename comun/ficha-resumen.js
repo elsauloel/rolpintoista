@@ -251,6 +251,7 @@ const FichaResumen = (() => {
           levitar: num(invModTotal(inv, 'levitar')), suelagruesa: num(invModTotal(inv, 'suelagruesa')), embestida: num(invModTotal(inv, 'embestida')), pasodoble: num(invModTotal(inv, 'pasodoble')),   // Coraza del guardián (2026-10-06)
           pisadaAtenta: num(invModTotal(inv, 'pisadaatenta')) > 0, ...(typeof InvCalculo !== 'undefined' ? {percepcion: num(InvCalculo.statValor(inv, 'percepcion'))} : {}),
           activa: inv.activa !== false,
+          ...(inv.turnosAgotados ? {turnosAgotados: true} : {}),   // ⏳ el aviso al dueño (comun/ficha-mantenimiento.js, 2026-10-30)
           sinArma: Combatiente.sinArmaEnMano(inv),   // ✋ nada en la mano (paso 5): el mapa lo marca en el token
           miniatura: miniaturaInv(inv.imagen) || (String(inv.miniatura || '').startsWith('data:image/') && inv.miniatura.length < 20000 ? inv.miniatura : ''),   // (una invocación de un pergamino trae la suya: el Ojo de Kicillof)
           estados: (inv.estados || [])

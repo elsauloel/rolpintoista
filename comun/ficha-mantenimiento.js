@@ -94,9 +94,11 @@ const FichaMantenimiento = (() => {
     const dhInv = Combatiente.curaQueEntra(inv.hp, d.hp, inv.estados);
     if(d.hp > 0 && !dhInv) rep.push(num(inv.hp) > 0 ? `🌑 ${Combatiente.SIN_CURA_TXT}` : 'Caída: la cura de este turno no la levanta');
     if(dhInv){ const antes = num(inv.hp); inv.hp = Math.max(0, Math.min(num(inv.hpMax) || Infinity, antes + dhInv)); rep.push(`HP total: ${fmt(antes)} → ${fmt(inv.hp)}`); }
-    if(num(inv.cooldown) > 0){
+    // Sus turnos (dueño, 2026-10-30: «que cero turnos no borra un token de manera automática anymore, pero sí avisa»): al llegar a 0 no se duerme
+    // sola; queda marcada (`turnosAgotados`) y el mapa le pregunta a su dueño: borrar el token, sumar turnos o resolverlo a mano (vtt-hexgrid/js/54).
+    if(num(inv.cooldown) > 0 && num(inv.cooldownActual) > 0){
       inv.cooldownActual = Math.max(0, num(inv.cooldownActual) - 1);
-      if(inv.cooldownActual === 0){ inv.activa = false; rep.push('Se duerme: llegó su cooldown a 0'); }
+      if(inv.cooldownActual === 0){ inv.turnosAgotados = true; rep.push('Se le agotaron los turnos: su dueño decide qué hacer'); }
     }
     return rep;
   }

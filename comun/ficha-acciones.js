@@ -1435,6 +1435,7 @@ const FichaAcciones = (() => {
     }
     inv.activa = true;
     inv.cooldownActual = num(inv.cooldown);
+    delete inv.turnosAgotados;   // ⏳ (2026-10-30)
     if(num(inv.hpMax) > 0) inv.hp = num(inv.hpMax);
     inv.nitros = InvCalculo.nitrosMax(inv);
     (inv.habilidades || []).forEach(x => { x.cdActual = 0; });
@@ -1455,6 +1456,7 @@ const FichaAcciones = (() => {
       lista.push(inv);
     }
     // La cuenta baja al EMPEZAR cada turno suyo (también el primero): para que actúe `turnos` turnos completos, arranca en turnos + 1 (probado en el mapa).
+    delete inv.turnosAgotados;
     Object.assign(inv, {activa: true, cooldown: turnos + 1, cooldownActual: turnos + 1, agl: mov, estados: [{nombre: 'Etéreo', polaridad: 'buff', etereo: true, permanente: true, turnos: 0, activo: true, detalle: 'Todos lo ven, pero nadie le puede hacer nada; solo observa. Atraviesa todo.'}], ojo: vision, veoculto: vision, etereo: true, sinMareo: true, temporal: true, ...(c.imagen ? {imagen: c.imagen, miniatura: c.imagen} : {})});
     inv.nitros = InvCalculo.nitrosMax(inv);
     const ref = ui.yo ? (ui.yo() || {}).ref : '';

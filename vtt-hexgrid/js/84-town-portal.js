@@ -93,8 +93,13 @@ async function townPortalRevisar(tokenId, celdas){
   const pisadas = new Set(celdas.slice(1).map(c => nbPack(c.col, c.fila)));
   const portal = [...elementos.entries()].find(([, el]) => { const c = el && el.townPortal && celdasDeElemento(el)[0]; return c && pisadas.has(nbPack(c.col, c.fila)); });
   if(!portal) return;
-  townPortalEntrados.add(tokenId);
   const nom = nombreDe(t);
+  // Antes de irse, la confirmación (dueño, 2026-10-29: «al pisar el portal, antes de desaparecer, debería aparecer un cartel que te pida confirmación»):
+  // si no entra, el token se queda parado sobre el portal.
+  townPortalEntrados.add(tokenId);
+  const entra = await Confirmar.preguntar(`${nom} pisó el Town portal. ¿Entra? Desaparece del mapa y el GM lo lleva a la última aldea con tienda que visitaron.`,
+    {titulo: 'Town portal', icono: '🌀', si: 'Entrar', no: 'Quedarse'});
+  if(!entra){ townPortalEntrados.delete(tokenId); toast(`${nom} no entró al Town portal`); return; }
   try{ await coleccionElementos().doc(portal[0]).update({usoEn: Date.now()}); }catch(e){}   // los pulsos en todas las pantallas
   await new Promise(r => setTimeout(r, 700));   // que se lo vea llegar al portal antes de desaparecer
   try{

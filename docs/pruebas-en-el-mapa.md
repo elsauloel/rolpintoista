@@ -280,6 +280,15 @@
   SP… ¿Usarla igual? (queda en 0)»; al empezar su turno recupera SP (9 → 11); ⇄ de vuelta a cooldown y la barra se va. **Arreglado**: el aviso del ⇄ decía el
   modo al revés («vuelven a usar cooldown» al pasar a SP). Visto y anotado: las habilidades sin SP suficiente no se marcan en rojo (como sí pasa sin No2);
   el anillo del token no tiene un círculo de SP para el creep; cancelar el duelo de una habilidad ya cobrada no devuelve nada (P233).
+- [x] **↩ Cancelar una habilidad ya cobrada (P233, 2026-10-29)**: el Tunelero (modo SP) ejecutó Disparo señalador (9 → 5 No2, 8 → 6 SP), «Cancelar duelo» →
+  «Tunelero ya pagó Disparo señalador (4 No2, 2 SP). ¿Cuenta como usada?» → «No cuenta» → 9 No2 y 8 SP, y la Mesa «no cuenta como usada — se le devolvió
+  4 No2, 2 SP». (En modo cooldown, devuelve el cooldown: probado en las pruebas automáticas.)
+- [x] **💧 Sin SP suficiente, en rojo y con aviso (2026-10-29, dueño)**: creep en modo SP con 1 SP → «Sin SP · 2 SP · 4 No2» en rojo y Ejecutar habilitado
+  (el aviso de siempre); Clementino con 0 SP → «Sin SP · 1 No2 · 5 SP» en rojo, el botón con borde rojo, habilitado; al ejecutar, «No te alcanza el SP:
+  Tenés 0 de SP y Recuperación cuesta 1. ¿Usarla igual? (gasta el SP que tenés y quedás en 0)».
+- [x] **💧 El círculo de SP de un creep en modo SP (2026-10-29, dueño)**: en el anillo del token, azul, «1 /12»; el GM lo editó a 8 y quedó «8/12».
+- [x] **🕳 El montículo de quien está bajo tierra (2026-10-29, dueño)**: en vez del pozo oscuro, un montón de terrones con el estilo de la estela, en su casilla,
+  aunque esté quieto y sin estela; se ve si la casilla está a la vista (con niebla, no). Visto desde el jugador.
 - [x] **✋ Terminar a mano (2026-10-29, dueño)**: al pie del duelo, junto a «Cancelar duelo» y «Minimizar» (lo ven el GM y quien lo creó): pregunta «Esto
   interrumpe el duelo hasta acá: lo que falta lo terminan de resolver con tiradas a mano en la Mesa…» con Aceptar / Cancelar; al aceptar, «✋ Terminado a
   mano», la línea en la Mesa y el cuadro se cierra solo en todas las pantallas. **Probado** (el Tunelero contra Clementino).

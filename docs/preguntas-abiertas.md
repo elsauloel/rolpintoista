@@ -1394,7 +1394,7 @@ pueblito. **Hecho** (7d79a3af): `FIJO_POR_TAMANO` y `gondolaPorCategoria` en `co
 que haya» daba 236). Detalle en `docs/rework-tiendas.md`.
 
 
-### P233 — ↩ Cancelar el duelo de una habilidad que ya se cobró (2026-10-29) ⏳ abierta
+### P233 — ↩ Cancelar el duelo de una habilidad que ya se cobró (2026-10-29) ✅ decidida
 
 **Contexto:** probando el modo SP de los creeps. Una habilidad que va al duelo (Disparo señalador, Excavar…) cobra su SP, sus No2 y su cooldown al
 ejecutarla, antes del duelo. Si el duelo se cancela antes de tirar, no se devuelve nada ni se pregunta. Con un ataque común, en cambio, «Cancelar duelo»
@@ -1403,4 +1403,9 @@ devuelve nada.
 
 **Propuesta (sin decidir):** el mismo criterio que el ataque: al cancelar el duelo de una habilidad ya cobrada, preguntar «¿Cuenta como usada?»; si no
 cuenta, devolver lo que pagó (SP, No2, vida) y sacarle el cooldown.
+
+**Dueño (2026-10-29):** «está bien, me parece bien que preguntes si se cobra o no». **Hecho** (34d5e76c): la pantalla que ejecuta la habilidad anota lo
+que pagó (`Duelo.pagoHab`) y el duelo lo lleva (`ataque.pagoHab`); «Cancelar» pregunta «¿Cuenta como usada?» y, si no, quien maneja al atacante lo
+devuelve (gancho `devolverHab` de CreepDuelo, FichaDuelo e InvDuelo). Probado con el Tunelero: «se le devolvió 4 No2, 2 SP». Falta: GM Tools suelto (un
+creep que ejecuta desde ahí no anota el pago).
 

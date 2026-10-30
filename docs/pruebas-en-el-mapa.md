@@ -260,7 +260,7 @@
   duelo; al tocarlo, la línea en la Mesa y la declaración «intenta desarmar»; si gana, «¡DESARMADO!», la ruleta de casillas en el mapa (todas las pantallas),
   el arma o el escudo en el piso a 2 casillas (y Desarmado); si pierde, lo de siempre. Un creep que defiende (con escudo) desarmando al atacante. Lo natural
   no se cae. El cobro (SP o cooldown; el doble en turno ajeno). **El Warrior** (skill de clase): su jugador ve el 🤺 en el Bloqueo, pregunta el Flash, cobra 3 SP (6 en turno ajeno); el Ejecutar de la Botonera dice dónde se usa. Cada ficha se guarda una vez para publicar la skill.
-- [x] **⚡ Botones Flash** — probado el 2026-10-21 con el Blindaje: el 🛡️ arriba en combate, al tocarlo abrió la Botonera, «¿Es tu turno?» 1 / 2 SP, cobró 1 y quedó «Barrera 8/8»; en un duelo, el 🛡️ pasó a «Podés usar». Falta: Shield, Estoicismo y Shockwave, y que se esconda sin SP. (2026-10-21): un personaje con Blindaje, Shield, Estoicismo o Shockwave, en combate: su botón arriba con su animación (y al costado
+- [x] **⚡ Botones Flash** — probado el 2026-10-21 con el Blindaje: el 🛡️ arriba en combate, al tocarlo abrió la Botonera, «¿Es tu turno?» 1 / 2 SP, cobró 1 y quedó «Barrera 8/8»; en un duelo, el 🛡️ pasó a «Podés usar». ✅ **Shield, Estoicismo y Shockwave, y que se esconda sin SP: probados el 2026-10-30** (juan, desde la cuenta del jugador, en combate, con las tres sumadas para la prueba): los tres botones arriba (🫧 💥 🗿); Shield → «¿Es tu turno?» (2 / 4 SP) → turno ajeno → elegir objetivo → Clementino → «Aplicar Shield (🛡14)» → le llegó a su ficha; durante la Ejecución, los tres pasaron a «Podés usar». Estoicismo se aplicó directo **sin preguntar el turno** (cobró 2: no traía el costo de turno ajeno — arreglado, ahora 4). Shockwave → turno ajeno 6 SP → juan quedó en 0 SP y **los tres botones se escondieron**; la onda tiró Fuerza una vez (2) contra la Res.CC del Warrior (9) y del Chamán (8): los dos resistieron. Restaurado (SP, estados, habilidades de prueba sacadas). (2026-10-21): un personaje con Blindaje, Shield, Estoicismo o Shockwave, en combate: su botón arriba con su animación (y al costado
   del duelo abierto); desaparece si no le alcanza el SP (en turno ajeno, el doble); tocarlo ejecuta la habilidad (Shield pide a quién) y cobra.
 - [x] **🧿 Mal de ojo** — probado el 2026-10-21: el 🧿 del GM arriba en combate; el menú con «Creep nuevo → Silvia Suller · Fuerza del golpe (10) · 5 SP»; el duelo PdG.Esp contra Res.Esp; al ganar, «Silvia repite su Fuerza del golpe: 10 y 10 → queda 10» y el duelo se volvió a resolver (la tirada era a mano: no tiene dados para repetir); cobró 5 SP. Falta: turno ajeno (el doble) y una tirada con dados. (2026-10-21, Debuffer): con un creep que lo tiene, el botón 🧿 arriba (solo el GM, en combate); con un duelo abierto, en la columna
   al costado; el menú con las tiradas recientes de los personajes a su alcance; el duelo PdG.Esp contra Res.Esp sin marcar en el mapa; si gana, la tirada se
@@ -286,8 +286,12 @@
   espalda: vale 1)» y crítico; se canceló («No cuenta»: le devolvió los 2 No2). **Y el creep en sigilo**: goblin en sigilo, juan llega por su
   espalda (de espaldas a él) → al GM, «Pasos a tu espalda» → «↻ Darse vuelta»: giró, siguió en sigilo, no se publicó nada en la Crónica y el jugador
   no lo ve. Visto de paso: ponerlo en sigilo dentro del cono de juan lo destapó solo («perdió el sigilo · lo detectó juan»). Detalle menor: el
-  botón Esquivar del GM sigue mostrando la Evasión de siempre (1d1 +2) antes de tirar; el total sí queda en 1. Sin probar: el ataque de
-  oportunidad desde el sigilo. Todo restaurado.
+  botón Esquivar del GM sigue mostrando la Evasión de siempre (1d1 +2) antes de tirar; el total sí queda en 1. Todo restaurado.
+  ✅ **El ataque de oportunidad desde el sigilo (2026-10-30, las dos cuentas)**: el Warrior en sigilo a la espalda de juan; juan se aleja (desde el
+  jugador) → el GM «¿Ataque de oportunidad?» → Sí → el duelo dice «🗡 por la espalda: desde el sigilo, la defensa vale 1»; la Evasión de juan
+  quedó en 1 («lo sorprendieron por la espalda») y pegó 7 contra 1. Cancelado (devolvió los 4 No2). **Visto de paso (P235)**: al jugador le salió
+  «Te alejás de Warrior (prueba)» y la Mesa «juan se alejó de Warrior (prueba)», con el Warrior escondido. (juan con arco no tiene oportunidad: «juan
+  tiene un arco, que no sirve de oportunidad», como corresponde.)
 
 - [x] **💧 Modo SP de los creeps, desde el GM (2026-10-29, dueño: «testeá bien el modo SP… que se le vea la barra de SP en el token»)** — ✅ probado el
   mismo día en «Claude · pruebas» (el Tunelero): el ⇄ «Con cooldown» → «Con SP · 12/12» y aparece la **barra azul de SP** en el token, debajo de la de vida
@@ -1151,3 +1155,10 @@
 - [x] **🧪 Cinturón con filtros en las Acciones del creep del mapa (2026-10-30)** — ✅ probado el mismo día (GM, Warrior (prueba)): el panel abre con el foco en el buscador (las teclas no van al mapa), «vendas» filtra, «＋» suma, el panel sigue abierto con lo buscado; sacada con ✕. — la misma pieza común (`comun/creep-botonera.js`), probada en la ficha del lápiz; falta verla adentro del mapa (no se probó para no pisar las pruebas del dueño en «Claude · pruebas»).
 - [x] **✊ Desempate del duelo con piedra, papel o tijera (2026-10-30)** — *probado por el dueño*: el duelo Warrior (prueba) contra juan, en empate 10 a 10, se resolvió con piedra, papel o tijera (la Mesa: «Warrior (prueba) 📄 contra ✂ juan → gana juan»).
 - [ ] **🖼 Imagen de un creep: encuadre y «👁 Ver completa» (2026-10-30)** — *probado en GM Tools (Warrior (prueba), una imagen de prueba)*: ✔ el clic en la imagen del lápiz muestra la completa con el recuadro de lo que se ve; Encuadrar arranca en el encuadre de antes, «Usar esta parte» lo guarda (x 0,375) y la miniatura y la tarjeta se rearman (el token del mapa muestra el sol); el guardado sigue andando sin la regla nueva. **Falta**: pegar la regla `creeps/<id>/publico` y ver el «👁 Ver completa» de la tarjeta 🪪 desde un jugador; «Elegir otra imagen» con una foto real.
+- [x] **🎭 Traer jugadores… y Traer creeps… con una lista (2026-10-30, dueño: «que te aparezca una planilla… y selecciones este, este y este»)** —
+  ✅ probado el mismo día (GM, «Claude · pruebas»): 👥 la lista con los dos personajes (los que ya tienen token, apagados con «ya tiene su token en este
+  mapa»); sin el token de juan, marcarlo → «Traer tokens (1)» → solo juan. 👹 la lista agrupada: En este mapa / En la Reserva / En «Mazmorra de
+  pruebas» / En «Arena de pruebas» / En «Mapa de prueba t6»; el Goblin recolector de la Mazmorra → «1 token(s) de creeps, ocultos… · 1 mudado(s) a este
+  mapa»: su token de la Mazmorra se borró (no se duplicó) y quedó oculto acá. Arreglado en la prueba: los que ya tenían token acá pero figuraban en
+  la Reserva (Tunelero, Chamán…) salían «se muda de la Reserva»; ahora van en «En este mapa». Restaurado (el recolector volvió a la Mazmorra, en su
+  casilla).

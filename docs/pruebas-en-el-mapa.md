@@ -669,7 +669,7 @@
   pasando el turno, se aplicó solo («✔ Se aplicó solo al pasar el turno»). Mapa limpio después.
 - [x] **💔 Duelo: «Aplicar el daño»** (2026-10-17, «Test con claude elsaulo», GM con 🎮 el control de Xeena): el Creep de prueba le pegó
   (empate resuelto con par) y tiró 2d8+1 = 6: el paso 5 quedó en «6 de daño, menos tu Defensa» con «💔 Aplicar el daño» y la vida sin tocar; al
-  tocarlo: «6 de daño (6 − Defensa 0) · Xeena: 5 → 0 HP». Falta: la variante del GM «Aplicar por …» con un personaje de otra cuenta.
+  tocarlo: «6 de daño (6 − Defensa 0) · Xeena: 5 → 0 HP». ✅ La variante del GM «Aplicar por …» con un personaje de otra cuenta: probada el 2026-10-28 («Aplicar por Clementino», ver «El cuadro del duelo visto por el GM»).
 - [x] **💥 Trampa que explota** (2026-10-17, «Test con claude elsaulo», GM con 🎮 el control de Xeena): una trampa en flor con «Explota»: al
   pisarla, las 7 casillas se encendieron con la onda y el mapa quedó quieto; 1,5 s después, el anuncio («🎲 Tirar el daño», «💔 Aplicar el daño (3)»,
   «Entendido»). Captura de la explosión en la conversación. Falta: verlo el dueño y un jugador desde su cuenta (pendientes, 🖥).
@@ -693,7 +693,9 @@
 - [x] **⏸ Mapa en pausa: mirar sí, tocar no** (2026-10-16, El origen, pantalla del GM en modo jugador solo en el navegador, sin guardar nada):
   arrastrar mueve la vista, la rueda hace zoom (1 → 1,76). Después (dueño: «ver lo mismo que durante una partida»): tocar un token sí lo
   selecciona y abre su menú (vida, No2, estados, ⋯, la tarjeta 🪪 de un creep), pero sin ↻ girar, sin ⚡ Botonera y con los números sin
-  poder cambiarse. **Falta**: verlo con una cuenta de jugador de verdad. (🃏 La carta de arriba con el número, probada igual, local.)
+  poder cambiarse. ✅ **Con una cuenta de jugador de verdad (2026-10-30, Saulo-Prueba en «Claude · pruebas»)**: el cartel «⏸ Partida en pausa hasta la
+  próxima sesión»; juan se selecciona con su menú (vida, SP, No2, estados, ⋯) sin ↻ ni ⚡; tocar la vida no abre nada; arrastrarlo mueve la vista y
+  juan queda en su casilla; la 🪪 del Warrior se abre. Al reanudar, el GM vio «Nadie cambió nada importante durante la pausa». (🃏 La carta de arriba con el número, probada igual, local.)
 - [x] **🃏 Wildcards: descanso y ventana** (2026-10-16, «Test con claude elsaulo», GM con el control de Silvia Suller): ⏳ Pasar de día → «¿Cómo
   descansaron?» → 🌙 Descanso reparador: Silvia queda con 2 wildcards (la Mesa lo dice); en su ficha suelta la cartita «Wildcards ×2» abajo a
   la izquierda; tirar Fuerza (1) → la carta → «🃏 Wildcard»: re-roll 4, quedan 1, la original «ya se repitió». La partida quedó en el Día 1.

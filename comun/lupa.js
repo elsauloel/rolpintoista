@@ -139,7 +139,7 @@ document.addEventListener('keydown', e => {
   font-size:10px;line-height:1;border-radius:var(--r);opacity:.55;cursor:help;filter:grayscale(.3)}
 .bt-lupa:hover,.bt-lupa:focus-visible{opacity:1;background:rgba(224,164,88,.18);outline:none}
 .bt-lupa.mini{position:static;width:auto;height:auto;padding:3px 6px;border:1px solid var(--line-soft);font-size:11px;flex:none}
-#lupa-pop{position:fixed;z-index:200;width:340px;max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);overflow-y:auto;
+#lupa-pop{position:fixed;z-index:99600;width:340px;max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);overflow-y:auto;
   background:var(--panel);border:1px solid var(--brass);border-radius:var(--r);box-shadow:0 12px 30px rgba(0,0,0,.65);
   padding:10px 12px;font-size:12.5px;color:var(--paper);text-align:left}
 #lupa-pop .lupa-titulo{font-family:"Space Grotesk",sans-serif;font-weight:700;color:var(--brass);margin-bottom:6px}

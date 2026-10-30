@@ -92,6 +92,9 @@
   efecto pueda automatizarse, se automatiza; cuando no se puede, se aclara** en la
   descripción de algún modo ("⚙ Automatizado: …" / "✋ A mano: …", como en las
   habilidades de los creeps base y las trampas del catálogo).
+- **Siempre una salida a mano** (dueño, 2026-10-30): aunque algo esté automatizado, en el momento en que pasa se avisa y se ofrece
+  **«Aplicar automático»** y **«Resolver a mano»** (por si pasa algo excepcional que el sistema no tiene programado), para poder retomar el
+  control libre en cualquier momento. Se va aplicando caso por caso (lista en `docs/pendientes.md`, «Automático, pero con salida a mano»).
 - **Consecuencia para el código y el diseño**: las herramientas *ayudan y
   recuerdan*, no *prohíben ni obligan*. Preferir avisar (y dejar seguir) antes
   que bloquear; dejar siempre una salida manual (editar un valor, forzar una

@@ -2886,6 +2886,12 @@ prueba('la 🔍 de un stat dice de dónde sale y cómo se tira', () => {
   const S = fichaBotonera(), r = FichaLupa.contenido(S, 'stat:pdg');
   igual([r.titulo, r.html.includes('De dónde sale'), r.html.includes('Tirada'), r.html.includes('sin costo')], [FichaCalculo.STAT_FULL.pdg || 'PdG', true, true, true]);
 });
+prueba('🔍 de una resistencia a crítico (2026-10-29): el nombre de la pieza equipada trae su globo con la tarjeta del ítem', () => {
+  const S = fichaBotonera();
+  S.inventario.push({id: 'cota', nombre: 'Cota de malla de acero', tipoItem: 'armadura_rigida', equipado: true, peso: 3, mods: [{stat: 'tipo2', val: 1}], detalle: 'Res. crítico Tipo 6 +1.'});
+  const h = FichaLupa.contenido(S, 'defensa:tipo2').html, k = (h.match(/data-lupa-globo="([^"]+)"/) || [])[1], g = lupaGlobos.get(k) || '';
+  igual([!!k, h.includes('>Cota de malla de acero</span>'), g.includes('Cota de malla de acero'), g.includes('Res. crítico'), lupaHoverHtml('x', '')], [true, true, true, true, 'x']);
+});
 prueba('la 🔍 de Ejecutar dice cuánto cuesta y cuánto tenés', () => {
   const S = fichaBotonera(), h = FichaLupa.contenido(S, 'habx:h1').html;
   igual([h.includes('Cuesta'), h.includes('Tenés'), h.includes('<b>2</b>'), FichaLupa.contenido(S, 'habx:nada').html], [true, true, true, '']);

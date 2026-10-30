@@ -38,6 +38,15 @@ const FichaLupa = (() => {
     return h + lupaDesgloseVars(S, vars, c, 1, new Set([id]));
   }
 
+  // El nombre de lo que suma (dueño, 2026-10-29): si es una pieza equipada, al pasar el mouse muestra su tarjeta de «Ver» completa.
+  function origenHtml(S, m){
+    const it = m.itemId && (S.inventario || []).find(i => i && i.id === m.itemId);
+    if(!it || typeof lupaHoverHtml !== 'function') return esc(m.origen);
+    let globo = '';
+    try{ globo = ver(S, 'inventario', it).html; }catch(e){}
+    return lupaHoverHtml(esc(m.origen), globo);
+  }
+
   const lupaVarsDe = (S, id) => [...new Set(String(S.formulas[id] || '0').match(/[a-z]+/gi) || [])]
     .filter(v => FichaCalculo.ATTR_LIST.some(a => a.id === v) || FichaCalculo.STAT_LIST.some(s => s.id === v));
 
@@ -57,7 +66,7 @@ const FichaLupa = (() => {
         ? fila(`${esc(STAT_FULL[v])} (valor propio)`, fmt(num(S.attrs[v])))
         : fila(`${esc(STAT_LABEL[v])} base <code>${esc(S.formulas[v] || '0')}</code>`, Number.isNaN(c.base[v]) ? '?' : fmt(c.base[v]));
       h += sub;
-      mods.forEach(m => { h += fila(`${esc(m.origen)} <span class="lupa-gris">(${esc(m.tipo || '')} · ${esc(STAT_LABEL[v])})</span>`, lupaSigno(m.val)); });
+      mods.forEach(m => { h += fila(`${origenHtml(S, m)} <span class="lupa-gris">(${esc(m.tipo || '')} · ${esc(STAT_LABEL[v])})</span>`, lupaSigno(m.val)); });
     });
     return h;
   }
@@ -69,7 +78,7 @@ const FichaLupa = (() => {
     let h = lupaBase(S, id, c);
     (c.mods[id] || []).forEach(m => {
       const fuera = excluidos.includes(m);
-      h += lupaFila(`${esc(m.origen)} <span class="lupa-gris">(${esc(m.tipo || '')})${fuera ? ' — no cuenta: es de la otra arma' : ''}</span>`, lupaSigno(m.val), fuera ? 'lupa-tachado' : '');
+      h += lupaFila(`${origenHtml(S, m)} <span class="lupa-gris">(${esc(m.tipo || '')})${fuera ? ' — no cuenta: es de la otra arma' : ''}</span>`, lupaSigno(m.val), fuera ? 'lupa-tachado' : '');
     });
     if(!(c.mods[id] || []).length) h += lupaFila(`<span class="lupa-gris">Sin modificadores${ES_ATTR(id) ? '' : ` directos a ${esc(STAT_LABEL[id] || id)}`}</span>`, '–');
     const activos = (S.efectos || []).filter(e => e.activo !== false);

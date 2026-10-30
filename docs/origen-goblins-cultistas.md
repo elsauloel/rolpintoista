@@ -381,6 +381,10 @@ y el texto cambiado), Tirar la bronca, Grito de pánico, Zap, Prisión de hielo 
 mayor, más lo que le tocó al azar al crearlo (la regla de los drops): Pergamino grupal de Reserva Ampliada y Runa de silencio. Oro sugerido 350 (jefe).
 Pendiente: el dueño revisa a mano si reemplaza alguna skill; el dibujo del Cristal en el mapa sigue siendo el del estandarte.
 
+📝 **Nota del dueño (2026-10-30)**: «dejar el anillo de piel de troll como despojo para el próximo combate: el jefe del próximo combate o el personaje
+más poderoso, el mini jefe». O sea, el **Anillo de cuero de troll** va en el botín del encuentro 2, en el Capataz del culto. Sin cargar todavía (El
+origen es la partida real: se agrega cuando el dueño lo pida o lo carga él).
+
 ### ⚔ Encuentro 2 — choque pesado warrior, nivel 4 (dueño, 2026-10-30: «que sea nivel 4, que tenga dos habilidades de tanque, dos de daño y una de
 movilidad, estrategia, tipo salto, gancho»)
 

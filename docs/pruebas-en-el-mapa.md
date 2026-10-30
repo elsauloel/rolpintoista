@@ -61,7 +61,7 @@
   **Segunda vuelta (2026-10-22)**: Comparar también con las armas (`FichaEquipo.slotOcupado` compara contra lo equipado en el mismo LUGAR, no solo
   el mismo tipo exacto: una varita de una mano contra la espada de dos manos puesta); Comparar y «🎒 Mochila y equipo» más visibles; y el Anuncio
   **«🎁 Botín concluido»** (js/11 `recompensaAnuncio`: Experiencia, DDE, Despojos, Ítems reclamados, ✔ Aceptar) cuando llega la recompensa al
-  personaje. **Falta probar en vivo** el Anuncio con un cierre real del botín (se vio con datos de muestra) y Comparar sobre un arma del botín.
+  personaje. ✅ **El Anuncio con un cierre real del botín: visto el 2026-10-30** («🎁 Botín concluido · Clementino»: +20 XP, +5 DDE, +15 despojos, ítems reclamados: ninguno). **Falta** Comparar sobre un arma del botín.
   **Tercera vuelta (2026-10-22)**: en «Botín concluido» cada ítem reclamado lleva el globo del glosario (visto en el mapa); **⚖ Comparar** muestra, debajo de
   la tabla de números, «Lo que hace cada uno» (la ficha corta de los dos, lado a lado: el hechizo de la varita, los efectos al golpear, lo de un
   talismán) y un número que no aplica a uno de los dos sale «—» sin flecha. Visto en el mapa: Varita arcana contra Cuchillo, Farol contra Tapa de
@@ -429,7 +429,7 @@
 
 - [~] **🩺 Cómo quedó el grupo (2026-10-28, dueño)**: ventana del GM con vida, SP y No2 (con su máximo) y los estados de cada personaje con token en el
   mapa; los temporales con − turnos + y ✕ Sacar (`vtt-hexgrid/js/81-estado-del-grupo.js`). **Probado** («Claude · pruebas», GM): al pasar de narrativo a
-  combate se abre sola; Rengo de juan 2 → 3 → 2 con + y −. **Falta**: verla abrirse sola al cerrar el botín (🏁 Cerrar botín y repartir) o al publicar un
+  combate se abre sola; Rengo de juan 2 → 3 → 2 con + y −. ✅ **Se abrió sola al cerrar el botín (2026-10-30, «Claude · pruebas»)**. **Falta**: al publicar un
   combate sin ítems, y probar ✕ Sacar con un estado de prueba. (Desde GM Tools, el Despojar no la abre: solo el mapa.)
 - [x] **📦 El baúl común desde el mapa (2026-10-28, reporte de jugadores)**: el aviso «En combate no se puede usar el baúl» quedaba debajo de la tienda (no
   se veía nada) y la ventana del baúl también se iba a abrir debajo; además la ficha leía el modo del mapa principal (narrativo) y el mapa el del mapa
@@ -1174,3 +1174,8 @@
   defensa vale 1» y recién ahí la Mesa «Warrior ataca de oportunidad a juan con Hacha» (duelo cancelado). **No** (repetido en otras casillas) → ni Mesa
   ni Crónica: la última línea de la Mesa siguió siendo la misma. Ojo al probar: quien ya atacó desde una casilla queda a la vista ahí hasta que se
   mueva o pase la ronda (🔦, js/82), así que hay que usar otra casilla. Restaurado.
+- [x] **🏁 «Finalizar combate» es una vista previa (2026-10-30, dueño: «hasta que yo no ponga publicar, puedo cancelar y que no pase nada»)** — ✅
+  probado el mismo día («Claude · pruebas», GM y jugador): abrir la ventana y cerrarla no creó nada (el último momento de la Crónica siguió siendo el
+  mismo); con el cartel «¿Publicar los despojos?» abierto, tampoco; al tocar «Sí», recién ahí «El GM terminó el combate» (lo de fin de combate de cada uno)
+  y el botín del jugador. Después: «Despojar lo que nadie tomó» → «Cómo quedó el grupo» se abrió solo y al jugador le llegó el Anuncio «🎁 Botín
+  concluido». (Clementino y juan de prueba quedaron con +20 XP, +5 DDE y +15 despojos.)

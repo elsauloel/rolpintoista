@@ -45,8 +45,8 @@
 >   en combate (en tu turno y fuera de él); 🤺 el desarme (el cartel, la ruleta, el duelo que vuelve) y un Warrior desarmando desde su cuenta; ⏬ la
 >   Demora en una sesión; 💥 la trampa que explota, vista desde la cuenta de un jugador.
 > - [ ] **🧩 Pruebas que necesitan armar más cosas (2026-10-30, dueño: «lo que necesite armar más cosas, anotalo para cuando esté en la compu»)** —
->   el botín de punta a punta (Soltar de a uno, el Anuncio «🎁 Botín concluido» con un cierre real, ⚖ Comparar sobre un arma del botín, el «Estado del
->   grupo» que se abre solo al cerrarlo); ⚔ Disputar sobre una pila (necesita dos jugadores de cuentas distintas); el ataque de una invocación y el 🔍
+>   el botín de punta a punta (Soltar de a uno, ⚖ Comparar sobre un arma del botín; el Anuncio «🎁 Botín concluido» y el «Estado del grupo» al cerrarlo ya
+>   se vieron el 2026-10-30); ⚔ Disputar sobre una pila (necesita dos jugadores de cuentas distintas); el ataque de una invocación y el 🔍
 >   Ver de un creep (las armas de los creeps); 🏹 una flecha especial desde el carcaj de un personaje; 🏪 la tienda cerrada en la ficha suelta.
 > - [ ] **🤖 Escanear grupo → Proponer creeps (2026-10-30, dueño: «anotalo para cuando esté en la compu»)**: probar la respuesta de la IA (usa la
 >   clave de OpenRouter del dueño).

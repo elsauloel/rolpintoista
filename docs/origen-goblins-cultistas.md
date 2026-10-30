@@ -334,3 +334,26 @@ nivel más… y agregar alguno nuevo»; «en el segundo encuentro va a haber alg
 - **Total**: 5 o 6 creeps más el mini jefe.
 - **Preguntas al dueño**: 1) qué mini jefe; 2) si intenta escapar con el portal; 3) portal simple o automático; 4) si va el grisú que explota.
 
+
+### 👑 Encuentro 2 — el mini jefe: Capataz del culto, nivel 5 (dueño, 2026-10-29: «vamos con el capataz del culto, nivel 5 como jefe»)
+
+Propuesta (esperando el OK; solo skills auditadas, ninguna repetida con el Cultista de la Grieta del encuentro 1):
+
+- **Concepto**: humano, el que maneja a los goblins con el **Cristal de la Grieta**. No pega fuerte: hace que los goblins peguen fuerte. Una versión chica
+  del jefe del 3.
+- **Atributos (45)**: Con 13 · Fue 4 · Agi 6 · Des 6 · Esp 16. Vida 65 (+10 del jubón = 75).
+- **Equipo** (nivel 5: las manos + 3 Comunes + 3 Buenas): manos, **Varita del embrollo** (Buena: 1d4 arcano y 25 % de Confusión) y **Calavera con vela**
+  (Buena, otra mano: Def.Esp +2, luz, aura espeluznante de 3 casillas contra la Res.Mt); piezas Buenas, **Jubón de cuero tachonado** (Defensa +2, Def.Esp
+  +2, Tipo 4 +2, Vida +10), **Yelmo de cubo** (Defensa +2, Tipo 10 +1 contra la maza de Petro, Iniciativa −1), **Polainas tachonadas de taller** (Defensa +1,
+  Def.Esp +1, Tipo 4 +1); Comunes, **Mitones del primer conjuro**, **Babuchas bordadas del adivino**, **Anillo de Foco Arcano**.
+- **Skills (6)**:
+  1. **Cristal de la Grieta** = el **Estandarte de guerra** con otro nombre (2 No2, 4 SP, cd 4, arranca disponible): lo clava en una casilla; sus aliados a
+     3 casillas suman +3 PdG y +5 al daño mientras siga en pie (50 de vida a nivel 5, sin defensas). Romperlo es la decisión del grupo.
+  2. **Tirar la bronca** (2 No2, 4 SP, cd 3): los rivales a 3 casillas del escudero tiran Res.Mt o quedan Provocados por él 2 turnos (Petro, Res.Mt 5).
+  3. **Grito de pánico** (2 No2, 4 SP, cd 3): su defensa cuando lo alcanzan: onda de 3 casillas, Res.Mt, 1d6 arcano y Miedo.
+  4. **Maldición de la sequía** (2 No2, 3 SP, cd 3): corta la Regeneración de Petro y la de la túnica de Bizzante 3 turnos.
+  5. **Redoble de tambores** (2 No2, 3 SP, cd 3): +2 No2 a los goblins a 4 casillas y −1 a sus cooldowns.
+  6. **Empuje** (Flash, 2 SP): +3 a la próxima tirada de un goblin (o a una resistencia suya).
+- **Consumible**: Poción de Piel de Cristal mayor (escudo contra el daño especial: el Drenar Vida y los Pedos de Larry); y el Town portal si escapa.
+- **A decidir**: si al romperse el Cristal los goblins quedan aturdidos un momento (mecánica nueva) o solo se pierde el bonus; si escapa con el Town portal;
+  si va el grisú.

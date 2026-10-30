@@ -170,7 +170,8 @@
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
 > - [ ] **✋ Automático, pero con salida a mano (2026-10-30, dueño: «tiene que existir la posibilidad de resolverlos a mano… vamos a ir viendo caso por
->   caso… aplicar automático y el botón resolver a mano»).** Cada automatización avisa en el momento y ofrece «Aplicar automático» / «Resolver a mano».
+>   caso… aplicar automático y el botón resolver a mano»; el mismo día: «lo de auditar las automatizaciones lo vamos a dejar para otro momento… siempre que
+>   se automatice algo, vamos a evaluar si vale la pena»). La auditoría de lo que ya existe, EN PAUSA.** Cada automatización avisa en el momento y ofrece «Aplicar automático» / «Resolver a mano».
 >   Casos: ✅ las **invocaciones con los turnos agotados** (borrar token / sumar turnos / resolver a mano, hecho y probado el 2026-10-30);
 >   ☐ las **zonas** (entrar a una nube de veneno: «entraste a la nube, se te aplica tal efecto» con Aplicar automático / Resolver a mano); los demás, a
 >   medida que el dueño los nombre.

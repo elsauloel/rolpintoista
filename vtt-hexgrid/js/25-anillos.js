@@ -366,7 +366,7 @@ async function cueroTrollAlTerminar(){
   }
 }
 /* 🏁 Lo de «al terminar el combate» (dueño, 2026-10-19: «que se activen cuando el GM apriete Finalizar combate; a los jugadores primero les
-   aparecen los anuncios y, una vez resueltos todos, el botín»). El GM, al abrir «Finalizar combate» (js/18), deja un momento `fin-combate`; cada
+   aparecen los anuncios y, una vez resueltos todos, el botín»). El GM, al publicar en «Finalizar combate» (js/18; abrir la ventana es solo una vista previa, 2026-10-30), deja un momento `fin-combate`; cada
    pantalla (js/16) resuelve en orden lo de los personajes que maneja: el equipo que se repara solo, el Anillo de cuero de troll (elegir pieza),
    la Polilla que no se usó y Desarmar trampas. El botín de un jugador (js/12) espera a que termine (`esperarFinDeCombate`). Una vez por combate. */
 /* 💨 «Una vez por combate» (P223, dueño, 2026-10-27: «se desbloquea al finalizar el combate»): el GM libera las habilidades de los creeps del mapa

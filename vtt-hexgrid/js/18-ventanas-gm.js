@@ -5,7 +5,7 @@
    terminada» (XP, oro, quién cobra, despojos), 📢 Publicar despojos y el botín para despojar. Los creeps salen de su parte privada
    (solo cuentan los que tienen token en el mapa publicado); al publicar, se marcan recompensados con modificarCreep (GM Tools, abierto
    en otra pestaña, se entera por la firma). El Ver de un ítem, con comun/creep-lupa.js (verItem). */
-const VG_PIEZAS = ['../comun/combate-fin.js?v=20261029t'];
+const VG_PIEZAS = ['../comun/combate-fin.js?v=20261030fc1'];
 var vg = null;            // {host, raiz}
 var vgRep = null;         // el estado del reporte (CombateFin.nuevo)
 var vgCreeps = [];        // los creeps del reporte, con su parte privada
@@ -112,10 +112,7 @@ async function abrirBotinEstimadoMapa(mapaId){
 /* --- 🏁 Finalizar combate --- */
 async function abrirFinalizarMapa(){
   if(!soyGM) return;
-  // 🏁 Lo de «al terminar el combate» arranca acá, en todas las pantallas (js/25, finCombateMomento); el botín de los jugadores lo espera.
-  try{ momentoAbrir({tipo: 'fin-combate', icono: '🏁', titulo: 'El GM terminó el combate', estado: 'listo', resultado: 'Primero lo de fin de combate de cada uno; después, el botín.', datos: {}}); }catch(err){ console.error(err); }
-  // 🕳 Con el combate terminado, las estelas de túnel que quedaron se van (dueño, 2026-10-28; a mano, el 🧹 del token).
-  try{ if(typeof tunelBorrar === 'function') tokens.forEach((t, id) => { if(Array.isArray(t.tunel) && t.tunel.length) tunelBorrar(id); }); }catch(err){ console.error(err); }
+  // (Abrir la ventana es solo una vista previa: lo de «al terminar el combate» arranca al publicar, vgFinCombateEmpezar. Dueño, 2026-10-30.)
   try{ await vgCargar(); }catch(err){ console.error(err); toast('No se pudo abrir el reporte del combate'); return; }
   vgRep = CombateFin.nuevo();
   vgCreeps = [];
@@ -160,10 +157,17 @@ function vgFinDibujar(){
   if(v.publicar !== 'oculto') b.disabled = v.publicar !== 'activo';
   if(v.faltanJugadores) vgCargarJugadores();
 }
+// 🏁 El combate terminó de verdad (dueño, 2026-10-30: «hasta que yo no ponga publicar, puedo cancelar y que no pase nada»): recién al publicar —ya
+// confirmado, antes de escribir el botín— arranca lo de «al terminar el combate» en todas las pantallas (js/25, finCombateMomento; el botín de los
+// jugadores lo espera) y se van las estelas de túnel (2026-10-28; a mano, el 🧹 del token). Antes pasaba al abrir la ventana y cerrarla no lo deshacía.
+async function vgFinCombateEmpezar(){
+  try{ await momentoAbrir({tipo: 'fin-combate', icono: '🏁', titulo: 'El GM terminó el combate', estado: 'listo', resultado: 'Primero lo de fin de combate de cada uno; después, el botín.', datos: {}}); }catch(err){ console.error(err); }
+  try{ if(typeof tunelBorrar === 'function') tokens.forEach((t, id) => { if(Array.isArray(t.tunel) && t.tunel.length) tunelBorrar(id); }); }catch(err){ console.error(err); }
+}
 async function vgPublicar(){
   if(!vgRep) return;
   const res = await CombateFin.publicar(vgRep, {creeps: vgCreeps, cat: vgCatalogo(), combateActual: combateMapa,
-    confirmar: texto => Confirmar.preguntar(texto), alEmpezar: vgFinDibujar});
+    confirmar: texto => Confirmar.preguntar(texto), alEmpezar: async () => { vgFinDibujar(); await vgFinCombateEmpezar(); }});
   if(!res) return;
   if(res.error){ toast(res.error); vgFinDibujar(); return; }
   // No se vuelven a contar en el próximo reporte (GM Tools, abierto en otra pestaña, se entera por la firma).

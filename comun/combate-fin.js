@@ -595,7 +595,7 @@ const CombateFin = (() => {
     const items = itemsPublicables(rep, r);
     if(!(await confirmar(`¿Publicar los despojos?\n\n${rp.porJugador.map(({j, xp, dde, despojos}) => `· ${j.nombre}: +${fmt(xp)} XP, +${fmt(dde)} DDE${despojos ? `, +${fmt(despojos)} despojos` : ''}`).join('\n')}\n· ${items.length} ítem(s) en el botín\n\n${items.length ? 'La XP y el oro se cargan en las fichas cuando cierres el botín (último paso, 🎁 Despojos). A los jugadores se les abre la ventana en el mapa para que elijan.' : 'Como no hay ítems, la XP y el oro se cargan solos en las fichas.'}`))) return null;
     rep.publicando = true;
-    if(alEmpezar) alEmpezar();
+    if(alEmpezar) await alEmpezar();   // (el mapa arranca ahí lo de «al terminar el combate»: que llegue antes que el botín)
     try{
       const ts = firebase.firestore.FieldValue.serverTimestamp();
       const batch = fbDb.batch();

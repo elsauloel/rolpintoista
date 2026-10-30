@@ -562,7 +562,7 @@ input[type=file]{display:none}
 #scrim-editar-creep{z-index:79}
 .ayuda-q{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;border:1px solid var(--copper);color:var(--brass);font-size:10px;font-weight:700;cursor:help;margin-left:4px;text-transform:none;vertical-align:middle}
 .ayuda-q.con-tip:hover::after{min-width:280px;max-width:320px;left:auto;right:-8px}
-.editar-creep-modal{max-width:620px;border-top:none;background:none}
+.editar-creep-modal{max-width:880px;border-top:none;background:none}   /* (más ancha, 2026-10-30, dueño: «ensancharía el menú para distribuir mejor la información») */
 .editar-creep-modal .card{box-shadow:0 18px 40px -12px rgba(0,0,0,.7)}
 .preset-grupo{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:14px 0 8px}
 .preset-grupo:first-child{margin-top:0}
@@ -803,8 +803,8 @@ input[type=file]{display:none}
 .recorte-ayuda{margin:0;font-size:12px;color:var(--muted);text-align:center;max-width:300px}
 .recorte-botones{display:flex;gap:8px;width:100%;justify-content:flex-end}
 
-/* ✔ Guardar / Cancelar de la ficha del lápiz (2026-10-30): flotan abajo a la derecha, se vea la parte que se vea. */
+/* ✔ Guardar / Cancelar de la ficha del lápiz (2026-10-30): flotan en la esquina de abajo a la derecha de la ventana (ubicarPieEditarCreep, js/02). */
 .editar-creep-pie{position:fixed;right:24px;bottom:20px;display:none;gap:10px;z-index:79;padding:10px 12px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 10px 26px rgba(0,0,0,.6)}
 .editar-creep-pie button{padding:9px 18px;font-weight:700;cursor:pointer}
-#scrim-editar-creep .editar-creep-modal{margin-bottom:96px}   /* (lugar para los botones flotantes: al final no tapan nada) */
+#scrim-editar-creep .editar-creep-modal .card{padding-bottom:84px}   /* (lugar adentro para los botones: al final no tapan nada) */
 #scrim-editar-creep.open + .editar-creep-pie{display:flex}

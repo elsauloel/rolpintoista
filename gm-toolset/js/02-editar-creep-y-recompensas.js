@@ -13,6 +13,7 @@ function renderEditarCreep(){
   const clave = activo && cuerpo.contains(activo) ? [...activo.attributes].filter(a => a.name.startsWith('data-')).map(a => `[${a.name}="${CSS.escape(a.value)}"]`).join('') : '';
   cuerpo.innerHTML = cardHtml(sc);
   scrim.scrollTop = scroll;
+  ubicarPieEditarCreep();
   if(clave){
     const nuevo = cuerpo.querySelector(clave);
     if(nuevo) nuevo.focus();
@@ -30,7 +31,20 @@ function abrirEditarCreep(scId){
   renderEditarCreep();
   $('#scrim-editar-creep').scrollTop = 0;
   $('#scrim-editar-creep').classList.add('open');
+  ubicarPieEditarCreep();
 }
+/* Los botones, adentro de la ventana (dueño, 2026-10-30: «por fuera del menú se pierden… ponelos DENTRO del menú de edición, flotando en su esquina
+   inferior derecha»): flotan sobre la pantalla (si no, se irían con el scroll), pero alineados con el borde derecho de la ventana y, cuando se ve su final,
+   arriba de su borde de abajo. */
+function ubicarPieEditarCreep(){
+  const pie = document.querySelector('.editar-creep-pie'), card = $('#editar-creep-body .card') || $('#editar-creep-body');
+  if(!pie || !card || !$('#scrim-editar-creep').classList.contains('open')) return;
+  const r = card.getBoundingClientRect();
+  pie.style.right = Math.max(12, document.documentElement.clientWidth - r.right + 14) + 'px';
+  pie.style.bottom = Math.max(14, window.innerHeight - r.bottom + 14) + 'px';
+}
+$('#scrim-editar-creep').addEventListener('scroll', ubicarPieEditarCreep, {passive: true});
+window.addEventListener('resize', ubicarPieEditarCreep);
 function editarCreepCambio(){
   const sc = S.creeps.find(s => s.id === editandoCreepId);
   return !!(sc && editandoCreepCopia && JSON.stringify(sc) !== JSON.stringify(editandoCreepCopia));

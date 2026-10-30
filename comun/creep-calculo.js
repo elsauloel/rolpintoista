@@ -278,8 +278,10 @@ const CreepCalculo = (() => {
       deItems += v;
       L.push(`${conSigno(v)} por ${it.nombre || '(sin nombre)'}`);
     });
-    const resto = num(sc.armadmg) - deItems;
+    const resto = num(sc.armadmg);   // la base (armadmgEfectiva = base + lo de los ítems y estados; antes se le restaban otra vez los ítems: 2026-10-30)
     if(resto || !L.length) L.push(`${conSigno(resto)} base (cargada a mano)`);
+    const otros = armadmgEfectiva(sc) - resto - deItems;
+    if(otros) L.push(`${conSigno(otros)} por estados`);
     L.push(`= ${fmt(armadmgEfectiva(sc))}`);
     return L.join('\n');
   }

@@ -1646,7 +1646,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   cada 700 ms, para los personajes e invocaciones que maneja esta pantalla (`bnManejo`), en combate, si un rival sin sigilo ni pasos silenciosos
   entra en su cuña ciega a `OIDO_RADIO` o menos (sin pared en el medio) y el propio no se movió ni giró, pregunta «¿Se da vuelta?»
   (`Confirmar.preguntar` → `editarToken` con `rotacionDePaso`); con otro rival pegado y a la vista, «¡Flanqueado!» (`AvisoCombate.mostrar`). Las dos
-  cosas van a la Crónica. Los creeps no reciben la oferta (P201).
+  cosas van a la Crónica. Desde el 2026-10-30 (P201) también los creeps: la pantalla del GM pregunta por los suyos (la Crónica no nombra a uno que
+  los jugadores no ven). Desde el sigilo (`porLaEspalda` → `cfg.espalda`) no se suma el +1: `Duelo.crear` marca `ataque.sorpresa` y la defensa vale 1.
 - **🕊 Vuela** (2026-10-16, dueño): el estado (`comun/estados-presets.js`) pone Levitar en `VUELA_LEVITAR` (100) y la marca `volador`. En el mapa:
   `vuelaToken(t)` (js/04: `statPiesDe(t, 'levitar') >= 100`); no aterriza (`levitarAterrizar`); `celdasQueTapan` (js/06) no le pone rivales en el
   camino (pasa por encima; terminar encima de alguien sigue sin poderse); `oportunidadCorte` (js/17) lo frena ANTES de entrar a la casilla de un

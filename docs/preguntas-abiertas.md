@@ -1030,7 +1030,7 @@ tira el dado estándar más chico que alcance, repitiendo lo que se pase; movimi
   sea necesariamente sigilo, como un sigilo soft». El mapa ya la respeta: un estado con `pasosSilenciosos` (o llamado «Pasos silenciosos»)
   no se oye. Falta decidir quién lo tiene y cómo: ¿una pasiva (para personajes y creeps), un estado que da una habilidad (cuántos turnos,
   cuánto cuesta), o algo propio de ciertos creeps (lobos, felinos, goblins exploradores)? ¿Pisar ciertos terrenos (hojas secas, agua) lo anula?
-- **P201. ¿Los creeps también se dan vuelta? — 2026-10-15.** La regla del dueño habla del personaje: «el pj debe tener la opción de darse
+- ✅ **P201. ¿Los creeps también se dan vuelta? — 2026-10-15.** **Decidido (dueño, 2026-10-30):** «los creeps también» (la pregunta le sale al GM por sus creeps visibles), y «la del sigilo reemplaza a la otra, no se suman»: atacar por la espalda desde el sigilo deja la defensa del defensor en 1, sin el +1 PdG. Las dos, automatizadas (vtt-hexgrid/js/49, comun/duelo.js `ataque.sorpresa`). Planteo original: La regla del dueño habla del personaje: «el pj debe tener la opción de darse
   vuelta». Hoy la pregunta le aparece solo a quien maneja un personaje o una invocación (vtt-hexgrid/js/49); a un creep que un personaje se le
   acerca por la espalda, el GM lo gira a mano si quiere. ¿Va también para los creeps (la pregunta al GM), o los creeps «poco inteligentes» no
   se dan vuelta? Y, relacionado: la Evasión 1 de atacar desde el sigilo por la espalda (regla del 2026-09-26, a mano), ¿sigue además del +1 PdG?

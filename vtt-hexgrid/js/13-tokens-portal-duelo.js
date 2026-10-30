@@ -983,7 +983,7 @@ function dueloElegirObjetivoMapa(msg){
       }
       try{ tiro = marcaBonos(mio, t, ataque, tiro); }catch(err){ console.error('No se pudo sumar la marca:', err); }   // 🎯 Marcar (js/36)
       let espalda = false, embestida = 0, espaldaPdg = 0;
-      try{ espalda = porLaEspalda(mio, t); espaldaPdg = espaldaBono(mio, t, ataque); }catch(err){ console.error('No se pudo ver si es por la espalda:', err); }   // nunca traba el ataque
+      try{ espalda = porLaEspalda(mio, t); espaldaPdg = espalda ? 0 : espaldaBono(mio, t, ataque); }catch(err){ console.error('No se pudo ver si es por la espalda:', err); }   // nunca traba el ataque
       try{ if(!(ataque && ataque.hab)) embestida = embestidaDe(mio, t); }catch(err){ console.error('No se pudo ver la embestida:', err); }
       let quieto = 0, primeraSangre = 0;
       try{ quieto = quietoDe(mio, ataque); primeraSangre = primeraSangreDe(mio, ataque); }catch(err){ console.error('No se pudieron ver los anillos del ataque:', err); }
@@ -1405,7 +1405,8 @@ function porLaEspalda(atq, def){
   return !!(atq && def && enSigilo(atq) && enCunaCiega(atq, def));
 }
 // 🗡 Ataque por la espalda, regla general (2026-10-15, dueño): +1 PdG si quien ataca está en la cuña ciega del defensor (a cualquier distancia, sin
-// hacer falta sigilo); con Pasos silenciosos, +1 más. Solo ataques (con el arma o con arreglos), no una habilidad dirigida.
+// hacer falta sigilo); con Paso ligero (pasos silenciosos), +1 más. Solo ataques (con el arma o con arreglos), no una habilidad dirigida. Desde el
+// sigilo no se suma: lo reemplaza la defensa en 1 (porLaEspalda → `cfg.espalda`, dueño, 2026-10-30: «la del sigilo reemplaza a la otra»).
 function espaldaBono(atq, def, ataque){
   if(!atq || !def || (ataque && ataque.hab) || !enCunaCiega(atq, def)) return 0;
   return 1 + (pasosSilenciosos(atq) ? 1 : 0);

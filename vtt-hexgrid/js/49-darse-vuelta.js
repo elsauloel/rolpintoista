@@ -7,7 +7,7 @@
    - Solo en modo combate, y solo cuando se acerca el otro: si el propio se movió o giró, no se pregunta (lo hizo él).
    - Flanqueado: si ya tiene otro rival pegado y a la vista (fuera de su cuña ciega), no hay oferta; solo el aviso.
    - Quien camina con pasos silenciosos se ve recién pegado (js/02) y no da esta oportunidad.
-   Los creeps (el GM) todavía no reciben la oferta (docs/preguntas-abiertas.md). */
+   Los creeps también (dueño, 2026-10-30, P201): la pantalla del GM pregunta por los suyos (visibles) cuando un personaje se les acerca por atrás. */
 const VUELTA_REVISAR_MS = 700;
 const vueltaPrevios = new Map();   // id del token propio → {pos: 'col,fila,rot', rivales: Set de ids}
 let vueltaAbierta = false;
@@ -15,8 +15,8 @@ let vueltaAbierta = false;
 // Los tokens que esta pantalla maneja y que pueden darse vuelta.
 function vueltaMios(){
   if(typeof bnManejo !== 'function') return [];
-  return [...tokens.entries()].filter(([id, t]) => t.tipo === 'pj' && t.fichaId && !t.oculto && !t.bajoTierra
-    && bnManejo(String(t.fichaId).split(SEP_INVOCACION)[0]) && !iniciativaFueraDeJuego(id));
+  return [...tokens.entries()].filter(([id, t]) => t.fichaId && !t.oculto && !t.bajoTierra && !iniciativaFueraDeJuego(id)
+    && (t.tipo === 'pj' ? bnManejo(String(t.fichaId).split(SEP_INVOCACION)[0]) : t.tipo === 'creep' && soyGM));
 }
 // Un rival que se ve o se oye (no oculto, no en sigilo, no bajo tierra, en juego).
 function vueltaRivalPresente(id, r){
@@ -57,6 +57,8 @@ function vueltaRevisar(){
   });
   if(oferta) vueltaOfrecer(oferta.id, oferta.rid);
 }
+// ¿La Crónica lo puede contar? Un personaje, siempre; un creep, solo si los jugadores lo ven (no delata a uno escondido o en sigilo).
+const vueltaPublico = t => t.tipo !== 'creep' || (!enSigilo(t) && (typeof visibleParaJugadores !== 'function' || visibleParaJugadores(t)));
 async function vueltaOfrecer(id, rid){
   const t = tokens.get(id), r = tokens.get(rid);
   if(!t || !r) return;
@@ -66,8 +68,8 @@ async function vueltaOfrecer(id, rid){
     if(flanco){
       AvisoCombate.mostrar({icono: '👂', titulo: 'Pasos a tu espalda',
         texto: `${nombreDe(t)} oye a ${nombreDe(r)} acercarse por la espalda, pero está enfrentando a ${nombreDe(flanco)}: no puede darse vuelta.`,
-        veredicto: {tono: 'malo', grande: '¡Flanqueado!', chico: `${nombreDe(r)} le queda por la espalda (+1 PdG si lo ataca)`}});
-      momentoAbrir({tipo: 'flanqueado', icono: '👂', titulo: `${nombreDe(t)} está flanqueado: ${nombreDe(r)} le llega por la espalda`});
+        veredicto: {tono: 'malo', grande: '¡Flanqueado!', chico: `${nombreDe(r)} le queda por la espalda`}});
+      if(vueltaPublico(t)) momentoAbrir({tipo: 'flanqueado', icono: '👂', titulo: `${nombreDe(t)} está flanqueado: ${nombreDe(r)} le llega por la espalda`});
       return;
     }
     const si = await Confirmar.preguntar(`${nombreDe(t)} oye pasos: ${nombreDe(r)} se acerca por la espalda. ¿Se da vuelta para no darle la espalda? (no cuesta No2)`,
@@ -77,7 +79,7 @@ async function vueltaOfrecer(id, rid){
     const rot = rotacionDePaso(hexCentro(t2.col, t2.fila), hexCentro(r2.col, r2.fila));
     await editarToken(id, {rotacion: rot});
     vueltaPrevios.set(id, {pos: `${t2.col},${t2.fila},${rot}`, rivales: vueltaOidos({...t2, rotacion: rot})});
-    momentoAbrir({tipo: 'darse-vuelta', icono: '↻', titulo: `${nombreDe(t2)} oyó a ${nombreDe(r2)} y se dio vuelta`});
+    if(vueltaPublico(t2)) momentoAbrir({tipo: 'darse-vuelta', icono: '↻', titulo: `${nombreDe(t2)} oyó a ${nombreDe(r2)} y se dio vuelta`});
   }catch(err){ console.error('No se pudo ofrecer darse vuelta:', err); }
   finally{ vueltaAbierta = false; }
 }

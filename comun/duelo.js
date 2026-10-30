@@ -640,6 +640,7 @@ const Duelo = (() => {
         paralisis: (Array.isArray(cfg.flecha.salto.paralisis) ? cfg.flecha.salto.paralisis : []).slice(0, 4).map(v => Math.min(100, Math.max(0, Math.round(_num(v)))))}} : {})};
     if(cfg.espalda && !hab){
       inicial.ataque.porLaEspalda = true;
+      inicial.ataque.sorpresa = true;   // 🗡 desde el sigilo por la espalda (dueño, 2026-10-30): la Evasión del defensor vale 1, en lugar del +1 PdG
       const be = limpiarEspalda(cfg.ataque.espalda);
       if(be) inicial.ataque.espalda = be;
     }
@@ -650,7 +651,7 @@ const Duelo = (() => {
     if(_num(cfg.presa) > 0) inicial.ataque.presa = Math.min(5, Math.round(_num(cfg.presa)));   // 🎯 el defensor es la Presa (2026-10-21): +2 al daño
     // 🚩 Bajo el estandarte (2026-10-24, el Estandarte de guerra del Support; lo calcula el mapa, vtt-hexgrid/js/73): +N al PdG (o PdG.Esp) y +N al daño.
     if(cfg.estandarte && (_num(cfg.estandarte.pdg) > 0 || _num(cfg.estandarte.dano) > 0)) inicial.ataque.estandarte = {pdg: Math.min(10, Math.max(0, Math.round(_num(cfg.estandarte.pdg)))), dano: Math.min(20, Math.max(0, Math.round(_num(cfg.estandarte.dano))))};
-    if(_num(cfg.espaldaPdg) > 0 && !hab){ inicial.ataque.porLaEspalda = true; inicial.ataque.espaldaPdg = Math.min(5, Math.round(_num(cfg.espaldaPdg))); }
+    if(_num(cfg.espaldaPdg) > 0 && !hab && !cfg.espalda){ inicial.ataque.porLaEspalda = true; inicial.ataque.espaldaPdg = Math.min(5, Math.round(_num(cfg.espaldaPdg))); }
     if(hab){
       inicial.hab = hab;   // (la regla de Firestore tiene que conocer el campo `hab`)
       if(hab.soloDodge && cfg.grupo){ inicial.fase = 'dodge'; inicial.estado = 'esperando'; inicial.contacto = {gana: 'defensor', dif: 0, soloDodge: true}; }   // la Tormenta arcana: directo al dodge roll
@@ -686,7 +687,7 @@ const Duelo = (() => {
     if(_num(m.ignoraResistCrit)) t.push(`ignora ${_fmt(m.ignoraResistCrit)} de Res. a crítico`);
     if(d.ataque && d.ataque.sinParry) t.push('no se puede parrear');
     if(d.ataque && d.ataque.porLaEspalda){
-      const pe = [_num(d.ataque.espaldaPdg) > 0 ? `+${_fmt(d.ataque.espaldaPdg)} PdG` : '', d.ataque.espalda ? espaldaTxt(d.ataque.espalda) : ''].filter(Boolean).join(', ');
+      const pe = [d.ataque.sorpresa ? 'desde el sigilo, la defensa vale 1' : '', _num(d.ataque.espaldaPdg) > 0 ? `+${_fmt(d.ataque.espaldaPdg)} PdG` : '', d.ataque.espalda ? espaldaTxt(d.ataque.espalda) : ''].filter(Boolean).join(', ');
       t.push(`🗡 por la espalda${pe ? ': ' + pe : ''}`);
     }
     if(d.ataque && _num(d.ataque.presa) > 0) t.push(`🎯 contra la presa: +${_fmt(d.ataque.presa)} al daño`);
@@ -1019,6 +1020,8 @@ const Duelo = (() => {
       const m = {...doc.data()};
       if(m.estado !== 'esperando' || m.fase !== fase || m[campo]) return;   // ya resuelto, otra fase o ya tiró
       m[campo] = tiro;
+      // 🗡 Lo sorprendieron por la espalda desde el sigilo (2026-09-26 / 2026-10-30, dueño): su defensa vale 1, tire lo que tire.
+      if(campo === 'eva' && m.ataque && m.ataque.sorpresa) m.eva = {...tiro, total: 1, nota: 'lo sorprendieron por la espalda: vale 1'};
       const be = campo === 'pdg' && m.ataque && m.ataque.espalda;   // por la espalda: el PdG del arma o la habilidad
       if(be && be.pdg) m.pdg = {...tiro, total: tiro.total + be.pdg, mod: tiro.mod + be.pdg, formula: `${tiro.formula} +${be.pdg} espalda`.slice(0, 60)};
       const bep = campo === 'pdg' && m.ataque ? _num(m.ataque.espaldaPdg) : 0;   // 🗡 ataque por la espalda (la regla general, 2026-10-15)

@@ -1,7 +1,7 @@
 /* ---------- 🗡 La puñalada (2026-10-21, dueño; choque liviano: Puñalada por la espalda, Mordida a traición y Puñalada trapera) ----------
    Un ataque «con tu arma» con `punalada` (Combatiente.ataqueConArreglos → `ataque.punalada`: 'espalda' | 'trapera'). Al elegir el objetivo
    (dueloElegirObjetivoMapa, js/13): si quien ataca está en el punto ciego del objetivo (enCunaCiega, la misma cuña de la visión), +1 dado de su arma y
-   Crítico frecuente +1 (el +1 PdG de todo ataque por la espalda lo suma aparte espaldaBono). La trapera, si además viene en sigilo, duplica los dados del
+   Crítico frecuente +1 (el +1 PdG de todo ataque por la espalda lo suma aparte espaldaBono; desde el sigilo, en su lugar, la defensa vale 1). La trapera, si además viene en sigilo, duplica los dados del
    arma en vez del +1 dado. A la espalda se llega en sigilo, con Paso ligero (la pasiva: no se lo oye y no le da tiempo a darse vuelta, js/49) o con el
    objetivo flanqueado. Si no está en la espalda, avisa y deja atacar igual, sin el bono (lo decide la mesa). */
 // Cuántos dados tiene el arma de quien ataca (un creep: su Peso + amplificado, como CreepCalculo.danoTxt; si no se sabe, 1).

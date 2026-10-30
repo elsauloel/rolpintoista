@@ -1757,3 +1757,7 @@ versión parecida en más de una, es candidato a juntar.
   `valorNatural(sc, precioDe)` (cada pieza natural con `CombateFin.precioNatural`: la del catálogo —por `nombreOriginal` si se renombró—, su precio o uno estimado) y aparece con solo piezas naturales; `tarjetaPublica` ya no
   nombra lo natural que no es el arma. `CombateFin.ocultos(rep, r)` (el equipo destildado, con `rep.ocultosDespojos`) lo convierte en despojos (un cuarto del precio, `despojosDePrecio`, como lo que nadie toma)
   (`calcularReparto` → `despojosEquipo`, `despojosCada` y `despojos` de cada jugador, que `publicar` guarda en `combate/actual` y `despojar` paga). `Confirmar.texto(texto, {titulo, icono, valor, sugerencias})` → Promise<string | null>: el cartel con un campo de texto.
+- **🗡 Desde el sigilo por la espalda, la defensa vale 1** (2026-10-30, dueño, P201: «la del sigilo reemplaza a la otra, no se suman»): con `cfg.espalda`
+  (quien ataca está en sigilo y en el punto ciego), `Duelo.crear` marca `ataque.sorpresa` y no suma `espaldaPdg`; `guardarTiro` deja la tirada de
+  defensa (`eva`) en 1, con la nota «lo sorprendieron por la espalda: vale 1». El bono «por la espalda» del arma sigue sumando.
+

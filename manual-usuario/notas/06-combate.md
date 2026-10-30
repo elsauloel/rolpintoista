@@ -353,25 +353,21 @@ alias: [Ataque por la espalda, Por la espalda, Flanquear, Flanqueado, Darse vuel
 tags: [combate, sigilo, regla]
 estado: confirmado
 +++
-Reglas del dueño (2026-10-15; la de sigilo, del 2026-09-26).
+Reglas del dueño (2026-10-15 y 2026-10-30; la de sigilo, del 2026-09-26).
 
 ## +1 a la PdG
-Si quien ataca está **en el punto ciego** del defensor (la cuña de atrás, la que no ve), el ataque suma **+1 a la PdG**. Vale a cualquier distancia y no hace falta estar en [[Sigilo]]. Con la pasiva **Pasos silenciosos**, **+1 más** (+2 en total).
+Si quien ataca está **en el punto ciego** del defensor (la cuña de atrás, la que no ve), el ataque suma **+1 a la PdG**. Vale a cualquier distancia y no hace falta estar en [[Sigilo]]. Con la pasiva **Paso ligero**, **+1 más** (+2 en total). Si viene en [[Sigilo]], en lugar del +1 corre la regla de abajo: no se suman.
 
 ## Darse vuelta
-Un enemigo que se acerca por la espalda **se oye** a 3 casilleros o menos ([[Niebla de guerra|el oído]]). En ese momento, el personaje puede **darse vuelta** para no darle la espalda, **sin costo de No2**.
+Un enemigo que se acerca por la espalda **se oye** a 3 casilleros o menos ([[Niebla de guerra|el oído]]). En ese momento, el personaje (o el creep) puede **darse vuelta** para no darle la espalda, **sin costo de No2**.
 - **Flanqueado:** si ya está enfrentando a otro rival (uno pegado y a la vista), **no puede darse vuelta**: el que viene por atrás le queda por la espalda.
-- **Pasos silenciosos:** a quien la tiene se lo ve recién **al quedar pegado**, y no da la oportunidad de darse vuelta.
+- **Paso ligero:** a quien tiene esta pasiva se lo ve recién **al quedar pegado**, y no da la oportunidad de darse vuelta.
 
 ## Con sigilo
-Si el atacante está en [[Sigilo]] y ataca por la espalda, **la Evasión del defensor es 1** (como cuando el [[Stun]] hace fallar la Evasión), y las armas que lo traen (dagas, estiletes) suman su bono «por la espalda».
+Si el atacante está en [[Sigilo]] y ataca por la espalda, **la defensa del defensor vale 1**, tire lo que tire (como cuando el [[Stun]] hace fallar la Evasión), y las armas que lo traen (dagas, estiletes) suman su bono «por la espalda». **Reemplaza** al +1 a la PdG: no se suman.
 
 > [!info] Qué hace el mapa solo
-> ⚙ El +1 (y el +2 con Pasos silenciosos) se suma solo en el duelo, también en el ataque de oportunidad. ⚙ La pregunta de darse vuelta le aparece a quien maneja al personaje (o a la invocación), solo en modo combate, y lo gira solo; si está flanqueado, se lo avisa. ✋ A mano: la Evasión 1 del ataque desde el sigilo.
-
-> [!question] A confirmar
-> - La Evasión 1 desde el sigilo, ¿sigue igual ahora que por la espalda ya hay un +1 a la PdG?
-> - ¿Los creeps también pueden darse vuelta cuando un personaje se les acerca por atrás? Hoy la pregunta es solo para los personajes y sus invocaciones.
+> ⚙ El +1 (y el +2 con Paso ligero) se suma solo en el duelo, también en el ataque de oportunidad; desde el sigilo, la defensa del defensor queda en 1. ⚙ La pregunta de darse vuelta le aparece a quien maneja al personaje o a la invocación, y al GM por sus creeps, solo en modo combate, y lo gira solo; si está flanqueado, se lo avisa.
 
 +++
 titulo: Sigilo

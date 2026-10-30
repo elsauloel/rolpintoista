@@ -276,14 +276,14 @@ async function oporAtacar(a){
   if(dt.vigilancia && r && typeof vigilanciaQuitar === 'function') vigilanciaQuitar(r);   // un solo disparo
   if(typeof a.alUsar === 'function') a.alUsar();   // 🪓 el golpe anunciado se gasta (js/63)
   try{
-    let espaldaPdg = 0;   // 🗡 quien se aleja dándole la espalda (js/13, la regla general del 2026-10-15)
-    try{ espaldaPdg = r ? espaldaBono(r, m, a.ataque) : 0; }catch(err){ console.error('No se pudo ver si es por la espalda:', err); }
+    let espaldaPdg = 0, espalda = false;   // 🗡 quien se aleja dándole la espalda (js/13): +1 PdG, o desde el sigilo su defensa vale 1
+    try{ espalda = r ? porLaEspalda(r, m) : false; espaldaPdg = r && !espalda ? espaldaBono(r, m, a.ataque) : 0; }catch(err){ console.error('No se pudo ver si es por la espalda:', err); }
     let miedo = 0;
     try{ miedo = r ? miedoContra(r, m) : 0; }catch(err){ console.error('No se pudo ver el miedo:', err); }   // 😱 (js/52)
     const tiro = dt.vigilancia ? {pdg: VIGILANCIA_PDG, motivo: 'desde la vigilancia'} : null;   // 👁 el disparo de la vigilancia: +2 PdG (dueño, 2026-10-21)
     let estandarte = null;
     try{ estandarte = r && typeof estandarteBonus === 'function' ? estandarteBonus(r, a.yo) : null; }catch(err){ console.error('No se pudo ver el estandarte:', err); }   // 🚩 (js/73)
-    await Duelo.crear({yo: a.yo, ataque: a.ataque, espaldaPdg, miedo, ...(tiro ? {tiro} : {}), ...(estandarte ? {estandarte} : {})}, {id: dt.moverId, nombre: nombreDe(m), tipo: m.tipo, fichaId: m.fichaId, duenoUid: m.duenoUid}, dt.rivalId);
+    await Duelo.crear({yo: a.yo, ataque: a.ataque, espalda, espaldaPdg, miedo, ...(tiro ? {tiro} : {}), ...(estandarte ? {estandarte} : {})}, {id: dt.moverId, nombre: nombreDe(m), tipo: m.tipo, fichaId: m.fichaId, duenoUid: m.duenoUid}, dt.rivalId);
   }catch(err){
     console.error('No se pudo abrir el duelo de oportunidad:', err);
     toast('No se pudo abrir el duelo: ' + String((err && err.message) || err).slice(0, 120));

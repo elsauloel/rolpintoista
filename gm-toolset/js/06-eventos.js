@@ -484,9 +484,12 @@ document.addEventListener('click', async e => {
     // duelo, trampa, zona, a quién le pegó, el aviso): comun/creep-acciones.js (paso 4 etapa 4c, tanda 5), con gmHabUi (js/04).
     if(!(await CreepAcciones.confirmarSilencio(sc, h))){ toast(`${sc.nombre}: no usó ${h.nombre || 'la habilidad'}`); return; }   // el cartel del juego, antes de cobrar
     if(!(await CreepAcciones.confirmarSP(sc, h))){ toast(`${sc.nombre}: no usó ${h.nombre || 'la habilidad'}`); return; }   // 💧 modo SP: no le alcanza
+    const antes = {sp: CreepCalculo.spActual(sc), nitros: num(sc.nitros), cd: num(h.cdActual)};   // ↩ para devolverlo si el duelo se cancela y no cuenta (P233)
     const p = CreepAcciones.ejecutarHab(sc, h, ESTADOS_PRESET_GM, true);
     if(p.error){ toast(p.error); return; }
     if(p.aviso) toast(p.aviso);
+    if(typeof Duelo !== 'undefined' && Duelo.pagoHab) Duelo.pagoHab(sc.id, {habId: h.id, nombre: h.nombre || '', no2: Math.max(0, antes.nitros - num(sc.nitros)),
+      sp: Math.max(0, antes.sp - CreepCalculo.spActual(sc)), hp: num(p.costoHp), cd: num(h.cdActual) !== antes.cd ? antes.cd : -1});
     renderAll();
     CreepAcciones.terminarHab(sc, h, p, gmHabUi);
     return;

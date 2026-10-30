@@ -133,6 +133,7 @@ function momentoRecibido(id, d){
   // La esquina: todo, salvo lo que esta pantalla ya sigue al centro.
   const mio = d.creadoPor === fbUsuario.uid && d.datos && d.datos.centro;
   if(d.tipo === 'oportunidad' && oporSoyDecisor(d)){ momentosFeed.delete(id); renderMomentosFeed(); return; }   // lo decide esta pantalla, al centro
+  if(d.tipo === 'oportunidad' && d.datos && d.datos.secreto && d.estado !== 'si'){ momentosFeed.delete(id); renderMomentosFeed(); return; }   // 🥷 hasta que ataque, nadie más lo ve (P235, js/17)
   const delGM = d.tipo === 'sigilo-pedido' && soyGM && (d.estado === 'esperandoGM' || (deteccionBanner && deteccionBanner.id === id));
   if(delGM) momentosFeed.delete(id);
   if(mio || delGM){ renderMomentosFeed(); return; }

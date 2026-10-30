@@ -679,6 +679,7 @@ function rutaSoltada(a, t){
       if(percepcionSigiloPendiente) percepcionSigiloResolver();
       if(oportunidadPendiente && oportunidadPendiente.tokenId === a.id) oportunidadResolver();
       oportunidadPublicarAvisos(t, oportunidad);
+      oportunidadSecretasPublicar(a.id);   // 🥷 (js/17)
     }
   }
 }

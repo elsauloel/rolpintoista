@@ -15,11 +15,17 @@
    apenas dejan de estar al lado (se mueva quien se mueva), se renueva: volver a pegarse y alejarse, aunque sea en el mismo turno o en el
    mismo arrastre, es otro ataque de oportunidad. Sin tope: tantos como alcancen los No2. 🕊 El que vuela (2026-10-16) puede cruzar por
    encima de un rival: la oportunidad se le ofrece antes de pasar (y al otro lado ya está usada). No aplica en modo narrativo, con 🦶 Mover libre,
-   a un token oculto ni a uno en sigilo. */
+   a un token oculto ni a uno en sigilo.
+   🥷 Un rival que quien se aleja NO ve (en sigilo, oculto o en la niebla: P235, dueño 2026-10-30: «que solo avises si la persona decide hacer el
+   ataque de oportunidad»): el camino no se frena ni se avisa nada; al terminar de moverse, a quien maneja al escondido le sale la pregunta en
+   silencio (`datos.secreto`: la Crónica no la muestra). Si ataca, se abre el duelo y recién ahí queda en la Mesa y la Crónica; si no, nada. */
 let oportunidadPendiente = null;          // {tokenId, rivalId, resto} frenado acá, a resolver al llegar
 const oportunidadUsadas = new Set();      // 'mover|rival': ya se ofreció y siguen pegados (se borra apenas dejan de estar al lado)
 let oporEspera = null;                    // pantalla de quien se aleja: {momentoId, tokenId, rivalId, resto, resultado}
 let oporDecision = null;                  // pantalla de quien decide: {id, d, armas, paso}
+let oportunidadSecretas = [];             // 🥷 {tokenId, rivalId}: rivales que no se ven, a preguntar en silencio al terminar de moverse
+// ¿Quien se mueve ve al rival? (lo mismo que tapa una línea de tiro: oculto, niebla, sigilo — js/32)
+const oporRivalVisible = r => typeof tiroTokenVisible === 'function' ? tiroTokenVisible(r) : !(r.oculto && !soyGM);
 
 const oporClave = (m, r) => m + '|' + r;
 const oporAlLado = (m, r) => { const a = tokens.get(m), b = tokens.get(r); return !!(a && b) && distanciaHex({col: a.col, fila: a.fila}, {col: b.col, fila: b.fila}) === 1; };
@@ -55,7 +61,8 @@ function oportunidadCorte(t, id, ruta){
   if(typeof dodgeLibreDe === 'function' && dodgeLibreDe(id)) return null;   // 🪵 el dodge roll de Tronco de huída no da oportunidad   // en modo narrativo no hay ataques de oportunidad: se mueve sin frenar
   if(!t || t.oculto || t.bajoTierra || etereoDe(t) || enSigilo(t) || !ruta || ruta.length < 2) return null;   // (👁 etéreo: tampoco)   // 🕳 por abajo de la tierra no da oportunidad
   const rivales = new Set(rivalesDe(t));
-  const ids = [...tokens.entries()].filter(([, r]) => rivales.has(r) && !r.bajoTierra && !etereoDe(r) && oporPuede(r)).map(([rid, r]) => ({rid, r, usada: oporUsada(id, rid)}));
+  oportunidadSecretas = [];
+  const ids = [...tokens.entries()].filter(([, r]) => rivales.has(r) && !r.bajoTierra && !etereoDe(r) && oporPuede(r)).map(([rid, r]) => ({rid, r, usada: oporUsada(id, rid), escondido: !oporRivalVisible(r)}));
   const vig = typeof vigilantesDe === 'function' ? vigilantesDe(t).filter(o => !oportunidadUsadas.has(vigClave(id, o.rid))) : [];   // 👁 Vigilancia (js/58)
   if(!ids.length && !vig.length) return null;
   for(let i = 1; i < ruta.length; i++){
@@ -66,6 +73,7 @@ function oportunidadCorte(t, id, ruta){
       // 🕊 Vuela (2026-10-16, dueño): el que cruza por encima de un rival, antes de pasar le da su oportunidad (se frena al lado).
       if(distanciaHex(antes, c) === 1 && distanciaHex(despues, c) === 0){ if(!o.usada) return {indice: i - 1, rivalId: o.rid, cruza: true}; continue; }
       if(distanciaHex(antes, c) === 1 && distanciaHex(despues, c) > 1){
+        if(o.escondido){ if(!o.usada && !oportunidadSecretas.some(s => s.rivalId === o.rid)) oportunidadSecretas.push({tokenId: id, rivalId: o.rid}); o.usada = false; continue; }   // 🥷 no lo frena
         if(!o.usada) return {indice: i - 1, rivalId: o.rid};
         o.usada = false;   // se alejó con la oportunidad ya usada: si se vuelve a pegar, es otra
       }
@@ -148,6 +156,19 @@ function renderOporEspera(){
       oporContinuar(e);
     }}]});
 }
+// 🥷 Al terminar de moverse: la pregunta en silencio a quien maneja a cada rival escondido del que se alejó de verdad (si el camino se cortó
+// antes, por una trampa o porque lo frenó otro, y sigue pegado, no hay nada).
+async function oportunidadSecretasPublicar(tokenId){
+  const lista = oportunidadSecretas.filter(s => s.tokenId === tokenId);
+  oportunidadSecretas = oportunidadSecretas.filter(s => s.tokenId !== tokenId);
+  for(const s of lista){
+    const t = tokens.get(s.tokenId), r = tokens.get(s.rivalId);
+    if(!t || !r || oporAlLado(s.tokenId, s.rivalId)) continue;
+    const decide = oporDecide(r);
+    await momentoAbrir({tipo: 'oportunidad', icono: '⚔', titulo: `${nombreDe(t)} se aleja de ${nombreDe(r)}…`, estado: 'esperando', resuelve: decide,
+      datos: {centro: true, moverId: s.tokenId, rivalId: s.rivalId, decide, secreto: true}});
+  }
+}
 // Sigue el camino que había marcado, desde donde se frenó (el resto pasa por las mismas reglas: trampas, percepción, otros rivales).
 function oporContinuar(e){
   const t = tokens.get(e.tokenId);
@@ -165,6 +186,11 @@ function oporMomento(id, d){
   if(d.estado === 'esperando' && oporSoyDecisor(d) && !(oporDecision && oporDecision.id === id)){ oporDecision = {id, d, paso: 'pregunta', armas: null}; renderOporDecision(); }
   if(d.estado !== 'esperando' && oporDecision && oporDecision.id === id && !oporDecision.cerrar){ oporDecision = null; renderOporDecision(); }   // lo contestó otra pantalla
   // Quien se aleja: la respuesta.
+  if(d.datos && d.datos.secreto && d.estado === 'si' && d.creadoPor === fbUsuario.uid && !oporSoyDecisor(d) && !oporSecretosVistos.has(id)){   // 🥷 se revela
+    oporSecretosVistos.add(id);
+    const r = tokens.get(d.datos.rivalId);
+    toast(`⚔ ¡${r ? nombreDe(r) : 'Alguien escondido'} te ataca de oportunidad desde las sombras!`);
+  }
   if(oporEspera && oporEspera.momentoId === id && !oporEspera.resultado){
     if(d.estado === 'no'){ const e = oporEspera; oporEspera = null; renderOporEspera(); oporContinuar(e); toast(`⚔ ${d.resultado && /nadie/.test(d.resultado) ? 'Seguís tu camino' : 'Te dejó pasar: seguís tu camino'}`); }
     else if(d.estado === 'si'){
@@ -174,6 +200,7 @@ function oporMomento(id, d){
     }
   }
 }
+const oporSecretosVistos = new Set();
 function renderOporDecision(){
   // Con la estética del cuadro del duelo (2026-10-03, pedido del dueño: unificar los carteles de combate): comun/aviso-combate.js.
   if(!oporDecision){ AvisoCombate.cartel('opor-decision', null); return; }
@@ -186,7 +213,7 @@ function renderOporDecision(){
   }else{
     AvisoCombate.cartel('opor-decision', dt.vigilancia ? {icono: '👁', titulo: `${nomM} se mueve en la mira de ${nomR}`, texto: `${nomR} está en vigilancia. ¿Dispara? (un solo disparo: después se le va la vigilancia)`,
       botones: [{texto: 'Sí, disparar', alClic: () => oporResponder(true)}, {texto: 'Dejarlo pasar', sec: true, alClic: () => oporResponder(false)}]}
-    : {icono: '⚔', titulo: `${nomM} ${dt.cruza ? 'pasa por encima de' : 'se aleja de'} ${nomR}`, texto: '¿Ataque de oportunidad?',
+    : {icono: '⚔', titulo: `${nomM} ${dt.cruza ? 'pasa por encima de' : 'se aleja de'} ${nomR}`, texto: dt.secreto ? `¿Ataque de oportunidad? (${nomM} no ve a ${nomR}: si lo dejás pasar, no se entera de nada)` : '¿Ataque de oportunidad?',
       botones: [{texto: 'Sí, atacar', alClic: () => oporResponder(true)}, {texto: 'No, dejarlo pasar', sec: true, alClic: () => oporResponder(false)}]});
   }
 }
@@ -197,6 +224,7 @@ async function oporResponder(si){
     oporDecision = null; renderOporDecision();
     momentoActualizar(od.id, {estado: 'no', resultado: '…y lo deja pasar.'});
     const dt = od.d.datos || {}, m = tokens.get(dt.moverId), r = tokens.get(dt.rivalId);
+    if(dt.secreto) return;   // 🥷 sin rastro: el otro no se enteró de nada
     oporMesa(dt.vigilancia ? `👁 ${r ? nombreDe(r) : 'El rival'} dejó pasar a ${m ? nombreDe(m) : 'quien se movía'}: sigue en vigilancia` : `${r ? nombreDe(r) : 'El rival'} dejó pasar a ${m ? nombreDe(m) : 'quien se alejaba'}: no hubo ataque de oportunidad`);
     return;
   }

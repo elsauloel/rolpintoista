@@ -474,7 +474,7 @@ function oportunidadEvaluarRuta(t, ruta){
   const id = rutaTokenId(t);
   if(typeof dodgeLibreDe === 'function' && dodgeLibreDe(id)) return [];   // 🪵 el dodge roll de Tronco de huída: sin oportunidad
   const rivales = new Set(rivalesDe(t));
-  const ids = [...tokens.entries()].filter(([, r]) => rivales.has(r) && !oporPuede(r)).map(([rid, r]) => ({rid, r, usada: oporUsada(id, rid)}));
+  const ids = [...tokens.entries()].filter(([, r]) => rivales.has(r) && !oporPuede(r) && oporRivalVisible(r)).map(([rid, r]) => ({rid, r, usada: oporUsada(id, rid)}));   // 🥷 del que no se ve, ni el aviso (P235)
   const salidos = [];
   for(let i = 1; i < ruta.length; i++){
     const antes = ruta[i - 1], despues = ruta[i];

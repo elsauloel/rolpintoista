@@ -554,9 +554,14 @@ async function encuadrarImagenCreep(sc){
 }
 /* 🖼 Ver la imagen de un creep (dueño, 2026-10-30: «cuando cliques esa imagen se vea la imagen completa y ahí mismo haya un botón de encuadrar… o elegir
    una nueva imagen»): la imagen entera, con lo que se ve en el mapa marcado, y los botones. Sin imagen, va directo a elegir una. */
-function verImagenCreep(scId){
+// ✔ Guardar / Cancelar (dueño, 2026-10-30: «si el único botón para terminar esta edición es "cerrar" genera la duda de si se guardan o no los
+// cambios»): `original` = la imagen y el encuadre de cuando se abrió (se conserva al volver de Encuadrar o de Elegir otra); Cancelar los repone.
+let verImagenPendiente = null;   // {scId, original}: se eligió otra imagen desde acá; al terminar de encuadrarla, la ventana vuelve
+function verImagenCreep(scId, original){
   const sc = S.creeps.find(s => s.id === scId);
   if(!sc) return;
+  original = original || {imagen: sc.imagen, imagenEncuadre: sc.imagenEncuadre ? structuredClone(sc.imagenEncuadre) : undefined};
+  verImagenPendiente = null;
   const elegir = () => document.querySelector(`[data-imginput="${scId}"]`)?.click();
   if(!sc.imagen){ elegir(); return; }
   const viejo = document.getElementById('ver-imagen-creep'); if(viejo) viejo.remove();
@@ -568,9 +573,10 @@ function verImagenCreep(scId){
     <div style="position:relative;display:inline-block;max-width:100%"><img src="${sc.imagen}" alt="" style="display:block;max-width:100%;max-height:60vh;border-radius:var(--r)"><div data-marco style="position:absolute;border:2px solid var(--brass);box-shadow:0 0 0 9999px rgba(0,0,0,.45);pointer-events:none"></div></div>
     <p class="recorte-ayuda">El recuadro es lo que se ve en su token y en su tarjeta del mapa.</p>
     <div class="fila recorte-botones" style="flex-wrap:wrap">
-      <button type="button" class="btn" data-vi="cerrar">Cerrar</button>
+      <button type="button" class="btn" data-vi="cancelar" title="Vuelve a la imagen y el encuadre que tenía al abrir esta ventana">Cancelar</button>
       <button type="button" class="btn" data-vi="otra">📁 Elegir otra imagen</button>
-      <button type="button" class="btn primary" data-vi="encuadrar">🖼 Encuadrar</button>
+      <button type="button" class="btn" data-vi="encuadrar">🖼 Encuadrar</button>
+      <button type="button" class="btn primary" data-vi="guardar">✔ Guardar</button>
     </div></div>`;
   document.body.appendChild(f);
   const im = f.querySelector('img'), marco = f.querySelector('[data-marco]');
@@ -582,14 +588,25 @@ function verImagenCreep(scId){
   };
   if(im.complete) ubicar(); else im.onload = ubicar;
   const cerrar = () => { document.removeEventListener('keydown', tecla, true); f.remove(); };
-  const tecla = ev => { if(ev.key === 'Escape'){ ev.stopImmediatePropagation(); cerrar(); } };
+  const cambio = () => sc.imagen !== original.imagen || JSON.stringify(sc.imagenEncuadre || null) !== JSON.stringify(original.imagenEncuadre || null);
+  const cancelar = () => {
+    cerrar();
+    if(!cambio()) return;
+    sc.imagen = original.imagen;
+    if(original.imagenEncuadre) sc.imagenEncuadre = structuredClone(original.imagenEncuadre); else delete sc.imagenEncuadre;
+    renderAll();
+    toast('↩ Volvió la imagen de antes');
+  };
+  const tecla = ev => { if(ev.key === 'Escape'){ ev.stopImmediatePropagation(); cancelar(); } };
   document.addEventListener('keydown', tecla, true);
-  f.addEventListener('pointerdown', ev => { if(ev.target === f) cerrar(); });
+  f.addEventListener('pointerdown', ev => { if(ev.target === f) cancelar(); });
   f.querySelectorAll('[data-vi]').forEach(b => b.onclick = async () => {
     const q = b.dataset.vi;
+    if(q === 'cancelar'){ cancelar(); return; }
     cerrar();
-    if(q === 'otra') elegir();
-    else if(q === 'encuadrar'){ await encuadrarImagenCreep(sc); verImagenCreep(scId); }
+    if(q === 'guardar'){ if(cambio()) toast('🖼 Imagen guardada: así se ve en el token y en la tarjeta del mapa'); return; }
+    if(q === 'otra'){ verImagenPendiente = {scId, original}; elegir(); }
+    else if(q === 'encuadrar'){ await encuadrarImagenCreep(sc); verImagenCreep(scId, original); }
   });
 }
 
@@ -608,6 +625,8 @@ document.addEventListener('change', async e => {
     // 🖼 El encuadre (dueño, 2026-10-30: «en la instancia de cambiar imagen, ya debe aparecer la opción del enmarcado que se va a ver en la tarjeta del
     // mapa»): se guarda la imagen entera y aparte qué parte se ve (`imagenEncuadre`), así se puede volver a encuadrar. Cancelar = el centro.
     await encuadrarImagenCreep(sc);
+    // Si se eligió desde la ventana de la imagen completa, vuelve ahí (con ✔ Guardar / Cancelar).
+    if(verImagenPendiente && verImagenPendiente.scId === scId) verImagenCreep(scId, verImagenPendiente.original);
   }catch(err){
     toast('No se pudo cargar esa imagen');
   }

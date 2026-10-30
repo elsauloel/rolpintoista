@@ -2,7 +2,7 @@
    Lo que estas habilidades de creep hacen en el mapa (lo demás —la Ejecución, los estados, el cobro— va por el camino de siempre):
    · 🛡 Interponerse (Flash, botón ✨): cuando atacan a un aliado a 2 casillas o menos y el aliado todavía no eligió cómo defenderse, salta a su lado (gratis,
      sin oportunidad), el golpe va contra él (el duelo cambia de defensor) y queda Interpuesto (+2 a la Defensa contra ese golpe).
-   · ⚔ Golpe que sigue (`ataque.sigue`): si el golpe deja al rival en 0, ataca enseguida a otro rival pegado, pagando lo de un primer ataque (el segundo no sigue).
+   · ⚔ Golpe que sigue (`ataque.sigue`): si el golpe pega, ataca enseguida a otro rival pegado, pagando lo de un primer ataque (el segundo no sigue; 2026-10-30, antes pedía dejarlo en 0).
    · ⚖ Arrastrar (`ataque.arrastra`): antes del golpe, Destreza contra la Evasión para engancharlo; si lo engancha, lo trae hasta quedar pegado (no camina:
      sin No2 ni oportunidad; las trampas y zonas del camino sí lo tocan) y sigue el golpe; si no, no hay golpe (P224, 2026-10-29).
    · ⚖ Carga que derriba (`ataque.derriba` = las casillas que corrió, desde 3; la carrera la hace js/55): si pega, Fuerza + X contra la Res.CC; si gana, Sentado.
@@ -89,27 +89,34 @@ async function esperarDueloCerrado(maxMs){
 }
 function choquePesadoUnaVez(d, que){ const k = `${d.id}:${que}`; if(choquePesadoHechos.has(k)) return false; choquePesadoHechos.add(k); return true; }
 
-// ⚔ Golpe que sigue (dueño, 2026-10-27, «vamos así»): si lo dejó en 0, otro rival pegado; lo de un primer ataque; el segundo no sigue.
+// ⚔ Golpe que sigue (dueño, 2026-10-27, «vamos así»; cambiado el 2026-10-30: «me hace ruido que tenga que matar para funcionar… si pega, pasa al
+// siguiente. Es un golpe doble. Pero tiene que haber al menos dos adyacentes al atacante»): si pegó, otro rival pegado; lo de un primer ataque; el
+// segundo no sigue. Los dos rivales pegados se avisan al usarla (acEjecutarHab, js/12).
+// Los rivales pegados al creep (a la vista, en juego), menos `fuera`. → la lista, o null si el creep no tiene token.
+function golpeQueSigueRivales(sc, fuera){
+  const e = [...tokens.entries()].find(([, x]) => x.tipo === 'creep' && x.fichaId === sc.id);
+  if(!e) return null;
+  const ta = e[1], yo = {ref: sc.id, tipo: 'creep', nombre: sc.nombre};
+  return [...tokens.entries()].map(([id, x]) => ({...x, id})).filter(x => x.id !== fuera && distanciaHex(x, ta) === 1 && !x.oculto && !x.bajoTierra
+    && !etereoDe(x) && dueloEsRival(yo, x) && !(typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(x.id)));
+}
+function golpeQueSigueRivalesPegados(sc){ const l = golpeQueSigueRivales(sc, null); return l ? l.length : null; }
 async function golpeQueSigueResuelto(d){
   if(!choquePesadoUnaVez(d, 'sigue')) return;
-  const dn = d.dano || {};
-  if(!(num(dn.hpAntes) > 0 && num(dn.hpDespues) <= 0)) return;
   const ta = tokens.get(d.atacante.tokenId), sc = ta ? creepPrivadoDe(ta.fichaId) : null;
   if(!ta || !sc || num(sc.hp) <= 0) return;
-  const yo = {ref: sc.id, tipo: 'creep', nombre: sc.nombre};
-  const rivales = [...tokens.entries()].map(([id, x]) => ({...x, id})).filter(x => x.id !== d.defensor.tokenId && distanciaHex(x, ta) === 1 && !x.oculto && !x.bajoTierra
-    && !etereoDe(x) && dueloEsRival(yo, x) && !(typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(x.id)));
+  const rivales = golpeQueSigueRivales(sc, d.defensor.tokenId) || [];
   const nom = nombreDe(ta), caido = d.defensor.nombre;
-  if(!rivales.length){ mesaLinea(`⚔ ${nom} tumbó a ${caido}, pero no tiene otro rival pegado para seguir (Golpe que sigue)`, 'recordatorio'); return; }
+  if(!rivales.length){ mesaLinea(`⚔ ${nom} le pegó a ${caido}, pero no tiene otro rival pegado para seguir (Golpe que sigue)`, 'recordatorio'); return; }
   const costo = CreepCalculo.costoContraataque(sc);   // lo de un primer ataque
   await esperarDueloCerrado();   // (probado en el mapa, 2026-10-27: la pregunta salía encima del «Fin del duelo» y el clic en «Terminar duelo» la contestaba)
-  const elegido = await Confirmar.elegir(`${nom} tumbó a ${caido}: ¿sigue contra otro rival pegado? (lo de un primer ataque: ${fmt(costo)} No2; tiene ${fmt(num(sc.nitros))})`,
+  const elegido = await Confirmar.elegir(`${nom} le pegó a ${caido}: ¿sigue contra otro rival pegado? (lo de un primer ataque: ${fmt(costo)} No2; tiene ${fmt(num(sc.nitros))})`,
     {titulo: 'Golpe que sigue', icono: '⚔', no: 'No, se queda', opciones: rivales.map(x => ({valor: x.id, texto: nombreDe(x), detalle: x.tipo === 'pj' ? 'personaje' : ''}))});
   if(!elegido) return;
   if(num(sc.nitros) < costo && !(await AvisoCombate.preguntar(`Le faltan No2 (cuesta ${fmt(costo)}, tiene ${fmt(num(sc.nitros))}). ¿Seguir igual? (queda en 0)`, {icono: '⚔', titulo: 'Sin No2', si: 'Seguir igual', no: 'No'}))) return;
   const h = (sc.habilidades || []).find(x => x && x.duelo && x.duelo.sigue);
   await modificarCreep(sc.id, c => { c.nitros = Math.max(0, num(c.nitros) - costo); return {}; });
-  mesaLinea(`⚔ ${nom} tumbó a ${caido} y sigue contra ${nombreDe(tokens.get(elegido))} (Golpe que sigue: −${fmt(costo)} No2)`, 'recordatorio');
+  mesaLinea(`⚔ ${nom} le pegó a ${caido} y sigue contra ${nombreDe(tokens.get(elegido))} (Golpe que sigue: −${fmt(costo)} No2)`, 'recordatorio');
   // El segundo golpe: con su arma, sin los arreglos de la habilidad y sin volver a seguir.
   const atq = h ? CreepAcciones.ataqueDeHab(sc, {...h, nombre: `${h.nombre} (el segundo)`, duelo: {...h.duelo, arma: {}, sigue: false}}) : Combatiente.ataqueConSuArma(sc, 'normal', CreepCalculo.alcance(sc));
   if(atq && atq.sigue) delete atq.sigue;
@@ -146,7 +153,26 @@ async function arrastrarEnganche(mio, t, ataque){
     momentoAbrir({tipo: 'gancho', icono: '🪝', titulo: `${hab}: ${nom} no engancha a ${obj}`, resultado: txt, estado: 'listo', datos: {aviso: true, boton: 'Entendido', ...paraUid}});
     return false;
   }
-  if(rd && re) mesaLinea(`🪝 ${nom} engancha a ${obj} (Destreza ${rd.total} contra su Evasión ${re.total}): lo trae y le pega`, 'recordatorio');
+  if(rd && re) mesaLinea(`🪝 ${nom} engancha a ${obj} (Destreza ${rd.total} contra su Evasión ${re.total})`, 'recordatorio');
+  // 💪 Y después tiene que poder traerlo (dueño, 2026-10-30: «su Constitución fija más una tirada de Fuerza contra la Constitución fija del rival;
+  // tiene que ganar para arrastrarlo… si tira el gancho pero pierde esa tirada, no pasa nada»). Empate: no lo trae.
+  const conMio = num(trampaValorStat(mio, 'con')), conObj = num(trampaValorStat(t, 'con'));
+  const rf = Combatiente.tirarStat(trampaValorStat(mio, 'fue'), confusionEstadosDe(mio), 'fue');
+  let trae;
+  if(!rf){
+    trae = await AvisoCombate.preguntar(`Tirá a mano: la Constitución de ${nom} (${fmt(conMio)}) + una tirada de su Fuerza, contra la Constitución de ${obj} (${fmt(conObj)}; empate: no lo trae). ¿Lo arrastró?`, {icono: '🪝', titulo: hab, si: 'Lo arrastró', no: 'No'});
+  }else{
+    mesaPublicar(`💪 ${nom} · ${hab} · Fuerza (para arrastrarlo: + su Constitución ${fmt(conMio)}, contra la Constitución de ${obj}, ${fmt(conObj)})`, {...rf, quien: nom, ...deQuien(mio)});
+    if(typeof esperarDadosMapa === 'function') await esperarDadosMapa();
+    trae = conMio + rf.total > conObj;
+  }
+  if(!trae){
+    const txt = rf ? `${nom} engancha a ${obj} pero no lo puede traer (Constitución ${fmt(conMio)} + Fuerza ${rf.total} = ${fmt(conMio + rf.total)} contra su Constitución ${fmt(conObj)}). No pasa nada.` : `${nom} engancha a ${obj} pero no lo puede traer: no pasa nada.`;
+    mesaLinea(`🪝 ${txt}`, 'recordatorio');
+    momentoAbrir({tipo: 'gancho', icono: '🪝', titulo: `${hab}: ${nom} no puede traer a ${obj}`, resultado: txt, estado: 'listo', datos: {aviso: true, boton: 'Entendido', ...paraUid}});
+    return false;
+  }
+  if(rf) mesaLinea(`🪝 ${nom} arrastra a ${obj} (Constitución ${fmt(conMio)} + Fuerza ${rf.total} = ${fmt(conMio + rf.total)} contra su Constitución ${fmt(conObj)}): lo trae y le pega`, 'recordatorio');
   const fin = await arrastrarTraer(t.id, mio.id, hab, nom);
   if(fin){ t.col = fin.col; t.fila = fin.fila; }
   return true;

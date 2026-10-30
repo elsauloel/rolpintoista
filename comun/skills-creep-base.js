@@ -210,9 +210,10 @@
   // pregunta «¿Contraataca?» (comun/creep-duelo.js); +1 PdG (CreepAcciones.bonoEspecial). Flash: su SP o su cooldown, al doble (es en turno ajeno).
   H('Contraataque', 'D', '*', 'm', 2, {detalle: 'FLASH (en el turno de otro: cuesta el doble). Si gana la Evasión o el Parry contra un ataque cuerpo a cuerpo, le contesta al que lo atacó: un ataque con su arma con +1 a la Probabilidad de Golpe, que paga lo de un primer ataque y no cuenta como su ataque del turno. El duelo lo pregunta solo («¿Contraataca?»).',
     no2: 0, spCosto: 2, auditada: true, contraEsquiva: true, ataqueTxt: 'al ganar la Evasión o el Parry: un contraataque con +1 PdG (lo de un primer ataque)'});
-  // ⚔ Golpe que sigue ✦ (A5; dueño: «vamos así»): si lo deja en 0, otro rival pegado (vtt-hexgrid/js/78).
-  H('Golpe que sigue', 'D', '*', 'm', 2, aA('Un golpe pesado que no se detiene: un ataque con su arma con +2 al daño. Si deja al rival en 0, ataca enseguida a otro rival pegado a él, pagando lo de un primer ataque (ese segundo golpe no vuelve a seguir).',
-    {fijo: 2}, 'va al duelo como un ataque con +2 al daño; si lo deja en 0, sigue contra otro rival pegado (lo de un primer ataque)', 2, [], {sigue: true}));
+  // ⚔ Golpe que sigue ✦ (A5; dueño: «vamos así»): otro rival pegado (vtt-hexgrid/js/78). Cambio del dueño (2026-10-30): «me hace ruido que tenga que matar
+  // para funcionar… si pega, pasa al siguiente. Es un golpe doble. Pero tiene que haber al menos dos adyacentes al atacante».
+  H('Golpe que sigue', 'D', '*', 'm', 2, aA('Un golpe doble, para cuando tiene al menos dos rivales pegados: un ataque con su arma con +2 al daño y, si pega, ataca enseguida a otro rival pegado a él, pagando lo de un primer ataque (ese segundo golpe no vuelve a seguir).',
+    {fijo: 2}, 'va al duelo como un ataque con +2 al daño; si pega, sigue contra otro rival pegado (lo de un primer ataque); necesita dos rivales pegados', 2, [], {sigue: true}));
   // 🛡 Provocar (el Taunt, un escalón arriba; dueño: «PdG especial más nivel contra resistencia mental… el de creep además suma 2 de defensa y 2 de defensa
   // especial»): el Provocado de Tirar la bronca (con quién provoca, vtt-hexgrid/js/13) y Desafiante para él (js/13: el efecto va a quien provoca).
   H('Provocar', 'K', '*', 't', 2, {detalle: 'Se le planta a un rival dentro de su Rango y lo llama: tira su Probabilidad de Golpe especial + su nivel contra la Resistencia mental del rival. Si gana, el rival queda Provocado por él 2 turnos (su turno es para ir contra él: atacarlo o usarle una habilidad hostil; si no llega, acercarse) y el creep queda Desafiante: +2 a la Defensa y +2 a la Defensa especial, 2 turnos.',
@@ -255,8 +256,9 @@
   // ⚖ Arrastrar (C16; dueño: «va así»): en dos tiempos (P224, 2026-10-29: «vamos con la B»): el enganche (Destreza contra la Evasión) y, si lo engancha,
   // lo trae y le pega con su arma con +2 PdG (vtt-hexgrid/js/78, arrastrarEnganche). El texto, general y abierto a cómo lo narre cada creep (dueño, 2026-10-29:
   // «tiene que tener un nombre lo más abarcativo posible; puede decir que arroja una soga y trae al rival, y lo dejamos abierto»).
-  H('Arrastrar', 'DK', 'hdc', 'mt', 2, aA('Arroja una soga (o lo que tenga a mano) a un rival a 3 casillas o menos y lo trae hacia él: su Destreza contra la Evasión del rival para engancharlo. Si lo engancha, lo arrastra hasta dejarlo pegado a él (no camina: no gasta No2 ni da ataques de oportunidad; las trampas y zonas del camino sí lo tocan) y le pega con su arma con +2 a la Probabilidad de Golpe. Si no lo engancha, no hay golpe.',
-    {pdg: 2}, 'Destreza contra Evasión para engancharlo a 3 casillas o menos: lo trae hasta quedar pegado y le pega con +2 PdG (las trampas y zonas del camino lo tocan)', 2, [], {alcance: 'fijo', alcanceN: 3, arrastra: 3}));
+  // Y para traerlo (dueño, 2026-10-30): su Constitución fija + una tirada de Fuerza contra la Constitución fija del rival; si no gana, no pasa nada.
+  H('Arrastrar', 'DK', 'hdc', 'mt', 2, aA('Arroja una soga (o lo que tenga a mano) a un rival a 3 casillas o menos y lo trae hacia él: su Destreza contra la Evasión del rival para engancharlo. Si lo engancha, tiene que poder traerlo: su Constitución más una tirada de su Fuerza contra la Constitución del rival (empate: no lo trae). Si gana, lo arrastra hasta dejarlo pegado a él (no camina: no gasta No2 ni da ataques de oportunidad; las trampas y zonas del camino sí lo tocan) y le pega con su arma con +2 a la Probabilidad de Golpe. Si no lo engancha o no lo puede traer, no pasa nada.',
+    {pdg: 2}, 'Destreza contra Evasión para engancharlo a 3 casillas o menos; Constitución + Fuerza contra su Constitución para traerlo: lo trae hasta quedar pegado y le pega con +2 PdG (las trampas y zonas del camino lo tocan)', 2, [], {alcance: 'fijo', alcanceN: 3, arrastra: 3}));
   // (Golpe de pomo: quitado de la biblioteca en la auditoría, dueño 2026-10-21.)
   H('Ataque de furia', 'D', '*', 'm', 5, zO('Ataca sin pensar en la defensa: daño enorme.', 4, 'H'));
   // (Tackle, el viejo a mano: lo reemplaza el Takle, 2026-10-26.)

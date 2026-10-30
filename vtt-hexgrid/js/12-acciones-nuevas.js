@@ -668,6 +668,12 @@ async function acEjecutarHab(sc, habId){
     if(!e[1].bajoTierra){ await acExcavarMeterse(sc, h, e[0]); return; }
   }
   if(!(await CreepAcciones.confirmarSP(sc, h))){ toast(`${sc.nombre}: no usó ${h.nombre || 'la habilidad'}`); return; }   // 💧 modo SP: no le alcanza
+  // ⚔ Golpe que sigue (dueño, 2026-10-30: «tiene que haber al menos dos adyacentes al atacante»): avisa y deja seguir.
+  if(h.duelo && h.duelo.sigue && typeof golpeQueSigueRivalesPegados === 'function'){
+    const n = golpeQueSigueRivalesPegados(sc);
+    if(n !== null && n < 2 && !(await Confirmar.preguntar(`${h.nombre || 'Golpe que sigue'} necesita al menos dos rivales pegados a ${sc.nombre} (tiene ${n}). ¿Usarla igual?`,
+      {titulo: h.nombre || 'Golpe que sigue', icono: '⚔', si: 'Usarla igual'}))){ toast(`${sc.nombre}: no usó ${h.nombre || 'la habilidad'}`); return; }
+  }
   if((h.excavar || h.emerger) && !(h.excavar && h.emerger)){   // 🕳 Bajo tierra (js/46): hace falta el token; avisa y deja seguir
     const e = tokenEntradaCreep(sc.id);
     if(!e){ toast(`${sc.nombre} no tiene token en este mapa: ${h.nombre || 'la habilidad'} necesita el token`); return; }
@@ -875,7 +881,7 @@ function cerrarAccionesNuevas(){
    estados para la Ejecución, con el selector común (los "Mis presets" del GM no están en la partida: ver pendientes 7b). */
 const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261027q', '../comun/asistente-duelo-hab.js?v=20261026d'];
 // Las recetas de habilidades de fábrica (para ↻ Reemplazar y ⬆ Subir): pesadas, recién cuando hacen falta.
-const ACE_BASE = ['../comun/creeps-base.js?v=20261029r', '../comun/skills-creep-base.js?v=20261029v'];
+const ACE_BASE = ['../comun/creeps-base.js?v=20261029r', '../comun/skills-creep-base.js?v=20261030gq1'];
 async function acCargarEditor(){ await acCargarPiezas(); await cargarPiezas(SE_PIEZAS); await cargarPiezas(ACE_PIEZAS); }
 // ⬆ Subir una habilidad del creep a la biblioteca compartida (corrección o algo nuevo); su `bibOrigen` nuevo se guarda en el creep.
 async function acSubirHab(creepId, habId){

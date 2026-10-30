@@ -232,6 +232,12 @@ const ESTADOS_PRESET = [
   // turno»): el turno en que se lo dan no cuenta (`turnosCompletos`).
   {nombre:'Al frente', polaridad:'buff', turnos:1, turnosCompletos:true, mods:[{stat:'pdg', val:2}, {stat:'pdgmg', val:2}, {stat:'eva', val:2}],
     detalle:'Al frente: +2 a la Probabilidad de Golpe (también la especial) y +2 a la Evasión, hasta el final de su próximo turno. ⚙ Automatizado.'},
+  // 🗿 Estoicismo (2026-10-30, dueño: el Warrior; «hasta el final del próximo turno»; «que se te suba automáticamente la defensa por cada enemigo adyacente
+  // mientras el estado esté activo»; «sin tope»): +1 a cada Resistencia a crítico y `estoico` = +2 a la Defensa por cada rival pegado que se ve, contado en
+  // vivo en cada golpe (lo suma el mapa: vtt-hexgrid/js/26 estoicoDe).
+  {nombre:'Estoicismo', polaridad:'buff', turnos:1, turnosCompletos:true, estoico:2,
+    mods:[{stat:'tipo1', val:1}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}, {stat:'tipo4', val:1}, {stat:'tipo5', val:1}],
+    detalle:'Estoicismo: +1 a cada Resistencia a crítico y +2 a la Defensa por cada enemigo pegado (los que se ven: no los que están en sigilo ni las estructuras), contado en el momento de cada golpe, sin tope. Hasta el final de su próximo turno. ⚙ Automatizado.'},
   // Barrera (dueño, 2026-10-06): 2 turnos — con el turno propio, la de 1 turno que uno se pone en su turno se iba antes de que lo atacaran.
   {nombre:'Barrera', polaridad:'buff', turnos:2, escudoMagico:8,
     detalle:'Blindaje del Tanque: absorbe daño de la próxima fuente de daño, como una barra de HP secundaria (🛡). Si la fuente hace más, el resto entra normal. Dura 2 turnos de quien la tiene (si se la pone en su turno, lo cubre hasta el final del siguiente).'},

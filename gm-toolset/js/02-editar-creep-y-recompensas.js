@@ -49,6 +49,15 @@ function oroSugeridoCreep(sc){ return CreepCalculo.oroSugerido(sc); }
 function trofeoDeCreep(sc){ return CreepCalculo.trofeo(sc); }   // el trofeo que suelta al morir (o null)
 function despojosDePrecio(precioCompra){ return CreepCalculo.despojosDePrecio(precioCompra); }
 function dropsResumenCreep(sc){ return CreepCalculo.dropsResumen(sc); }
+/* 🔍 Lo mismo en HTML, con un globo por ítem al pasar el mouse (dueño, 2026-10-30: «que cada nombre de ítem listado tenga el hover para ver su
+   detalle»): el globo es el «Ver» del ítem (CreepLupa.verItem) y lo muestra comun/lupa.js (lupaHoverHtml). */
+function globoItemGM(it, nombre){
+  const item = it && (it.detalle || it.mods) ? it : (CATALOGO_EQUIPO || []).find(x => x && x.nombre === (nombre || (it && it.nombre)));
+  if(!item || typeof CreepLupa === 'undefined') return '';
+  try{ const v = CreepLupa.verItem(item); return `<div class="view-title">${esc(v.titulo || item.nombre || nombre || '')}</div>${v.html}`; }catch(e){ return ''; }
+}
+function conGlobo(txtHtml, globo){ return typeof lupaHoverHtml === 'function' ? lupaHoverHtml(txtHtml, globo) : txtHtml; }
+function dropsResumenCreepHtml(sc){ return CreepCalculo.dropsResumen(sc, {nombre: (n, it) => conGlobo(esc(n), globoItemGM(it, n)), texto: t => esc(t)}); }
 function ayudaQ(txt){ return `<span class="ayuda-q con-tip" data-tip="${esc(txt)}">?</span>`; }
 
 /* Pasivas de un creep (2026-10-15, dueño: «habilitemos habilidades pasivas para creeps»): las mismas del catálogo de los personajes
@@ -150,7 +159,7 @@ function recompensasHtml(sc){
         ${CombateFin.cuantosAlAzar(sc) > 0 || CombateFin.municionDeCreep(sc) ? `<button type="button" class="addhab" data-azar-otro="${sc.id}" style="margin:0">🎲 ${(sc.consumibleAzar || []).length || sc.municionAzar ? 'Otro' : 'Darle uno'}</button>` : ''}
         ${(sc.consumibleAzar || []).length || sc.municionAzar ? `<button type="button" class="addhab" data-azar-quitar="${sc.id}" style="margin:0">✕ Sacar</button>` : ''}
       </div></div>` : ''}
-    <div class="hint" style="margin-top:6px"><b>Al morir suelta:</b> ${esc(dropsResumenCreep(sc))}</div>`;
+    <div class="hint" style="margin-top:6px"><b>Al morir suelta:</b> ${dropsResumenCreepHtml(sc)}</div>`;
 }
 function recompensasVerHtml(sc){ return CreepLupa.recompensasVerHtml(sc); }   // comun/creep-lupa.js
 
@@ -215,7 +224,7 @@ document.addEventListener('click', e => {
    Asistente paso a paso para crear o editar un creep entero (la referencia del estándar paso a paso: docs/plan-paso-a-paso.md;
    la ventana es comun/paso-a-paso.js). Crear: «✔ Crear» al final; editar: Guardar siempre visible, Cancelar repone la copia.
    ========================================================= */
-const ASIST_PASOS = ['Qué es', 'Atributos', 'Arma', 'Armadura', 'Habilidades', 'Recompensas', 'Resumen'];
+const ASIST_PASOS = ['Qué es', 'Atributos', 'Arma', 'Armadura', 'Habilidades', 'Pasivas y cinturón', 'Recompensas', 'Resumen'];   // (Pasivas y cinturón: 2026-10-30, dueño)
 const ROLES_CREEP = Combatiente.ROLES;      // los roles y sus repartos viven en comun/combatiente.js (los usa también el personaje nuevo)
 const PESOS_ROL = Combatiente.PESOS_ROL;
 const RAREZA_ARMA = ['Común', 'Común', 'Común (o Buena Calidad)', 'Buena Calidad', 'Buena Calidad (o Raro)'];
@@ -229,6 +238,7 @@ const ASIST_AYUDA = [
   'Con qué ataca: creala paso a paso, equipala del fabricante o elegí un arma natural del catálogo.',
   'Lo que lleva puesto para defenderse. Es opcional.',
   'Lo que sabe hacer además de atacar.',
+  'Opcional: pasivas (bonos que siempre tiene) y consumibles en el cinturón, que puede usar en la pelea.',
   'Lo que deja cuando lo derrotan: oro, trofeo y equipo.',
   'Revisá cómo quedó. Todo se puede volver a cambiar desde cualquier paso.',
 ];
@@ -351,18 +361,29 @@ function htmlPasoAsistCreep(p){
   }
   if(p === 3){
     const vestido = Combatiente.equipoSinArma(sc).filter(it => !CreepCalculo.enLasManos(it));   // (lo de las manos está en el paso Arma)
-    return `<p class="pap-nota" style="margin:0 0 10px">Rareza sugerida para el nivel ${n}: <b>${RAREZA_ARMADURA[Math.min(n, 5) - 1]}</b>. Defensa total: <b>${fmt(creepDefensaEfectiva(sc))}</b>.</p>
+    return `<p class="pap-nota" style="margin:0 0 10px">Rareza sugerida para el nivel ${n}: <b>${RAREZA_ARMADURA[Math.min(n, 5) - 1]}</b>. Defensa total: <b>${fmt(creepDefensaEfectiva(sc))}</b> · Defensa especial: <b>${fmt(creepArmadmgEfectiva(sc))}</b>.</p>
       <div class="equipo-list">${vestido.length ? vestido.map(it => asistPiezaHtml(sc, it)).join('') : '<div class="hint">Sin armadura.</div>'}</div>
       <button type="button" class="pap-boton" data-equipardelfabricante="${sc.id}" style="margin-top:10px">⚔ Equipar del fabricante</button>`;
   }
   if(p === 4){
-    return `<p class="pap-nota" style="margin:0 0 10px">Se sugieren <b>${Math.max(2, n + 1)} habilidades</b> (nivel 1: dos, y una más por nivel).</p>
+    return `<p class="pap-nota" style="margin:0 0 10px">Se sugieren hasta <b>${Math.max(2, n + 1)} habilidades</b> (nivel 1: dos, y una más por nivel).</p>
       <div class="hab-list">${sc.habilidades.length ? sc.habilidades.map(x => `<div class="equipo-item"><div class="equipo-item-top">
         <span class="equipado-nombre">${esc(x.nombre || '(sin nombre)')}</span><span class="hint">${esc(costoHabCreepTxt(sc, x))}${num(x.cd) > 0 ? ` · CD ${fmt(num(x.cd))}` : ''}${x.cdArranca ? ' · lenta' : ''}</span>
         <button class="rm" data-edithab="${sc.id}:${x.id}" title="Editar">✎</button><button class="rm" data-rmhab="${sc.id}:${x.id}">×</button></div></div>`).join('') : '<div class="hint">Sin habilidades.</div>'}</div>
       <button type="button" class="pap-boton" data-addhab="${sc.id}" style="margin-top:10px">+ Habilidad</button>`;
   }
   if(p === 5){
+    // 🧪 Pasivas y cinturón (dueño, 2026-10-30: «agregaría este paso, explicando que es una sugerencia… esos drops se pueden ofrecer o no al party al
+    // final del combate, y pueden usarlos o no los creeps»). El cinturón sin el botón de Usar (se está armando, no peleando).
+    const cin = CreepBotonera.cinturonHtml(sc, {consumibles: CreepAcciones.consumiblesDe(CATALOGO_BASE), cinSel: window.cinSelCreep}).replace(/<button class="hab-ejecutar" data-cin-consumir[^>]*>[^<]*<\/button>/g, '');
+    return `<p class="pap-nota" style="margin:0 0 10px">Todo esto es una <b>sugerencia</b>: se puede dejar vacío.</p>
+      <p class="pap-nota" style="margin:0 0 10px"><b>Pasivas:</b> bonos que tiene siempre (por ejemplo, Impulso: +1 No2), las mismas del catálogo de los personajes.</p>
+      ${pasivasCreepHtml(sc).replace(/<div class="editar-separador">.*?<\/div>/s, '')}
+      <p class="pap-nota" style="margin:14px 0 10px"><b>Cinturón:</b> consumibles que el creep puede usar en la pelea (una poción, un escudo…). Si los usa, después se ofrecen
+      como botín; si no los usa, al final del combate decidís si se ofrecen al grupo o no. Además, al crearlo se le suma solo un consumible al azar (la regla de los drops).</p>
+      ${cin}`;
+  }
+  if(p === 6){
     const xp = xpBasePorNivel(n);
     return `<p class="pap-nota" style="margin:0 0 10px">La XP que da es <b>${fmt(xp)}</b> (sale del nivel; no se edita acá).</p>${recompensasHtml(sc).replace(/<div class="editar-separador">.*?<\/div>/s, '')}`;
   }
@@ -371,11 +392,30 @@ function htmlPasoAsistCreep(p){
         <div class="vc-caja"><span class="vc-caja-label">No2</span><span class="vc-caja-valor">${fmt(creepNitrosMax(sc))}</span></div>
         <div class="vc-caja"><span class="vc-caja-label">Ataque</span><span class="vc-caja-valor">${esc(Combatiente.sinArmaEnMano(sc) && CreepCalculo.especialesEnMano(sc).length ? CreepCalculo.especialesEnMano(sc).map(it => CreepCalculo.especialDanoTxt(sc, it)).join(' · ') : ataqueCreepTxt(sc))}</span></div>
         <div class="vc-caja"><span class="vc-caja-label">Defensa</span><span class="vc-caja-valor">${fmt(creepDefensaEfectiva(sc))}</span></div>
+        <div class="vc-caja"><span class="vc-caja-label">Def. especial</span><span class="vc-caja-valor">${fmt(creepArmadmgEfectiva(sc))}</span></div>
       </div>
       <div class="pap-nota" style="margin-top:8px"><b>${esc(nombreLimpioCreep(sc))}</b> · nivel ${n} · ${esc(tipoDeCreep(sc) || 'tipo sin definir')}${sc.jefe ? ' · jefe' : ''} · ${ATTR_IDS.map(a => `${ATTR_LABELS[a]} ${num(sc[a])}`).join(' · ')}</div>
-      <div class="pap-nota" style="margin-top:6px"><b>Habilidades:</b> ${esc(sc.habilidades.map(x => x.nombre).join(', ') || 'ninguna')}</div>
-      <div class="pap-nota" style="margin-top:6px"><b>Al morir suelta:</b> ${esc(dropsResumenCreep(sc))}</div>
+      ${asistResumenMasHtml(sc)}
+      <div class="pap-nota" style="margin-top:6px"><b>Al morir suelta:</b> ${dropsResumenCreepHtml(sc)}</div>
       <div style="margin-top:12px"><button type="button" class="pap-boton" data-ac-bib="1">📚 Guardar en la biblioteca (propuesta)</button></div>`;
+}
+/* El resumen, más completo (dueño, 2026-10-30: «Defensa especial, resistencias, si las tuviera, cantidad de habilidades (y cuáles, con hover)»): las defensas
+   que se tiran, las resistencias (a crítico y elementales, solo las que tiene), las habilidades con su globo, las pasivas y el cinturón. */
+function asistResumenMasHtml(sc){
+  const v = id => fmt(creepStatValor(sc, id));
+  const linea = (et, html) => `<div class="pap-nota" style="margin-top:6px"><b>${et}:</b> ${html}</div>`;
+  const crit = [4, 6, 8, 10, 12].map((t, i) => [t, CreepCalculo.critEfectivo(sc, i)]).filter(([, x]) => num(x) !== 0);
+  const elem = Object.entries(Combatiente.ELEMENTOS || {}).map(([el, d]) => [d.etq.replace('Res. ', ''), CreepCalculo.resElemental(sc, el)]).filter(([, x]) => num(x) !== 0);
+  const habs = sc.habilidades || [];
+  const habHtml = habs.map(h => conGlobo(esc(h.nombre || '(sin nombre)'), (() => { try{ const r = CreepLupa.verHab(sc, h); return `<div class="view-title">${esc(r.titulo)}</div>${r.html}`; }catch(e){ return ''; } })())).join(', ');
+  const cin = (sc.cinturon || []).map(c => conGlobo(esc(c.nombre) + (num(c.unidades) > 1 ? ` ×${fmt(num(c.unidades))}` : ''), globoItemGM(c, c.nombre)));
+  return linea('Defensas que se tiran', `Evasión ${v('eva')} · Parry ${v('parry')} · Bloqueo ${fmt(CreepCalculo.bloqueoValor(sc))}`)
+    + linea('Resistencias', `Especial ${v('resmg')} · Control ${v('rescc')} · Mental ${v('resm')}`
+      + (crit.length ? ` · a crítico ${crit.map(([t, x]) => `Tipo ${t} ${fmt(num(x))}`).join(', ')}` : ' · a crítico: ninguna')
+      + (elem.length ? ` · ${elem.map(([e, x]) => `${e} ${fmt(num(x))}`).join(', ')}` : ''))
+    + linea(`Habilidades (${habs.length})`, habHtml || 'ninguna')
+    + linea('Pasivas', (sc.pasivas || []).map(p => esc(p.nombre) + (CreepCalculo.pasivaComprasCreep(p) > 1 ? ` ×${CreepCalculo.pasivaComprasCreep(p)}` : '')).join(', ') || 'ninguna')
+    + linea('Cinturón', cin.join(', ') || 'vacío');
 }
 function actualizarAsistAtributos(sc){
   const raiz = asist && asist.api ? asist.api.raiz : document;

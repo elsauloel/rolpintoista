@@ -551,6 +551,11 @@ document.addEventListener('change', async e => {
   if(!sc) return;
   try{
     sc.imagen = await fileToDataURL(file, 480, 0.85);
+    // 🖼 El encuadre (dueño, 2026-10-30: «en la instancia de cambiar imagen, ya debe aparecer la opción del enmarcado que se va a ver en la tarjeta del
+    // mapa»): la tarjeta 🪪 y el token toman la imagen cuadrada; acá se elige qué parte. Cancelar deja la imagen entera (se corta el centro, como antes).
+    if(typeof recortarImagen === 'function'){
+      try{ sc.imagen = await recortarImagen(sc.imagen, {lado: 480, tope: 160000}); }catch(err){ if(err && err.message !== 'cancelado') throw err; }
+    }
     renderAll();
   }catch(err){
     toast('No se pudo cargar esa imagen');

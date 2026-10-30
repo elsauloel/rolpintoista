@@ -28,14 +28,16 @@ function lupaTirada(valor){
 }
 
 /* Un nombre con globo (dueño, 2026-10-29: «que el nombre de los items que muestra como "origen" funcionaran con hover para poder ver desde ahí
-   mismo las características completas de ese item»): `globo` es el HTML que aparece al pasar el mouse (#lupa-globo, al lado del cuadro). Se
-   guarda acá hasta que se abre otra 🔍. */
+   mismo las características completas de ese item»): `globo` es el HTML que aparece al pasar el mouse (#lupa-globo, al lado del cuadro). Desde el
+   2026-10-30 sirve en cualquier parte de la página (GM Tools: «Al morir suelta» y el resumen del asistente de creeps): al lado del cuadro de la 🔍 si el
+   nombre está adentro; si no, al lado del nombre. Se guardan los últimos 600. */
 const lupaGlobos = new Map();
 let lupaGlobosN = 0;
 function lupaHoverHtml(txtHtml, globo){
   if(!globo) return txtHtml;
   const k = 'g' + (++lupaGlobosN);
   lupaGlobos.set(k, globo);
+  if(lupaGlobos.size > 600) lupaGlobos.delete(lupaGlobos.keys().next().value);
   return `<span class="lupa-hover" data-lupa-globo="${k}">${txtHtml}</span>`;
 }
 function cerrarLupaGlobo(){
@@ -44,15 +46,15 @@ function cerrarLupaGlobo(){
 }
 function abrirLupaGlobo(el){
   const html = lupaGlobos.get(el.dataset.lupaGlobo);
-  const pop = document.getElementById('lupa-pop');
-  if(!html || !pop) return;
+  if(!html) return;
+  const pop = el.closest('#lupa-pop');
   cerrarLupaGlobo();
   const g = document.createElement('div');
   g.id = 'lupa-globo';
   g.innerHTML = html;
   document.body.appendChild(g);
-  // Al costado del cuadro de la 🔍 (a la izquierda si no entra a la derecha), a la altura del nombre.
-  const rp = pop.getBoundingClientRect(), re = el.getBoundingClientRect(), m = 8, w = g.offsetWidth, hgt = g.offsetHeight;
+  // Al costado del cuadro de la 🔍 (o del nombre, fuera de él): a la derecha, o a la izquierda si no entra; a la altura del nombre.
+  const re = el.getBoundingClientRect(), rp = pop ? pop.getBoundingClientRect() : re, m = 8, w = g.offsetWidth, hgt = g.offsetHeight;
   let left = rp.right + 6;
   if(left + w > innerWidth - m) left = rp.left - w - 6;
   if(left < m) left = Math.max(m, Math.min(re.left, innerWidth - w - m));
@@ -79,7 +81,6 @@ function abrirLupa(el){
   const abierta = document.getElementById('lupa-pop');
   if(abierta && abierta.dataset.clave === clave){ cerrarLupa(); return; }
   cerrarLupa();
-  lupaGlobos.clear();
   const prov = Object.keys(lupaProveedores).find(p => clave.startsWith(p));
   const {titulo, html} = prov ? lupaProveedores[prov](clave) : lupaContenido(clave);
   const p = document.createElement('div');
@@ -93,11 +94,6 @@ function abrirLupa(el){
   if(top + hgt > innerHeight - m) top = Math.max(m, r.top - hgt - 4);
   p.style.top = top + 'px';
   p.style.left = Math.max(m, Math.min(r.right - w, innerWidth - w - m)) + 'px';
-  p.addEventListener('mouseover', e => { const n = e.target.closest('[data-lupa-globo]'); if(n) abrirLupaGlobo(n); });
-  p.addEventListener('mouseout', e => {
-    const n = e.target.closest('[data-lupa-globo]');
-    if(n && !(e.relatedTarget && n.contains(e.relatedTarget))) cerrarLupaGlobo();
-  });
   p.addEventListener('scroll', cerrarLupaGlobo);
 }
 
@@ -119,6 +115,13 @@ document.addEventListener('click', e => {
   e.stopPropagation();
   abrirLupa(lupa);
 }, true);
+// El globo de un nombre, en cualquier parte (2026-10-30).
+document.addEventListener('mouseover', e => { const n = e.target.closest && e.target.closest('[data-lupa-globo]'); if(n) abrirLupaGlobo(n); });
+document.addEventListener('mouseout', e => {
+  const n = e.target.closest && e.target.closest('[data-lupa-globo]');
+  if(n && !(e.relatedTarget && n.contains(e.relatedTarget))) cerrarLupaGlobo();
+});
+document.addEventListener('scroll', cerrarLupaGlobo, true);
 document.addEventListener('pointerdown', e => {
   const p = document.getElementById('lupa-pop');
   if(p && !p.contains(e.target) && !lupaDelEvento(e) && !e.target.closest('[data-lupa]')) cerrarLupa();
@@ -154,9 +157,9 @@ document.addEventListener('keydown', e => {
 #lupa-pop .lupa-sub b{color:var(--muted)}
 #lupa-pop .lupa-nota{color:var(--muted);font-size:11.5px;margin-top:3px}
 #lupa-pop code{font-family:"Space Mono",monospace;font-size:11px;color:var(--brass)}
-#lupa-pop .lupa-hover{text-decoration:underline dotted;text-underline-offset:3px;cursor:help}
-#lupa-pop .lupa-hover:hover{color:var(--brass)}
-#lupa-globo{position:fixed;z-index:201;width:320px;max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);overflow:hidden;pointer-events:none;
+.lupa-hover{text-decoration:underline dotted;text-underline-offset:3px;cursor:help}
+.lupa-hover:hover{color:var(--brass)}
+#lupa-globo{position:fixed;z-index:100050;width:320px;max-width:calc(100vw - 16px);max-height:calc(100vh - 16px);overflow:hidden;pointer-events:none;
   background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 12px 30px rgba(0,0,0,.65);
   padding:10px 12px;font-size:12.5px;color:var(--paper);text-align:left}
 #lupa-globo .view-image-wrap{display:none}

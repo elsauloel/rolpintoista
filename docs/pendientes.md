@@ -176,6 +176,9 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
+> - [ ] **⭐ Repensar la calculadora de experiencia de los creeps (2026-10-30, dueño: «volver a pensar la calculadora de experiencia, que contemple no
+>   sólo el nivel del creep sino también su equipo y la cantidad de habilidades»).** Hoy la XP sale solo del nivel (`xpBasePorNivel`, el paso Recompensas del
+>   asistente y «Batalla terminada»). Pensar cuánto suman el equipo (rareza, piezas) y las habilidades (cuántas, cuáles), y si un jefe cuenta distinto.
 > - [ ] **✋ Automático, pero con salida a mano (2026-10-30, dueño: «tiene que existir la posibilidad de resolverlos a mano… vamos a ir viendo caso por
 >   caso… aplicar automático y el botón resolver a mano»; el mismo día: «lo de auditar las automatizaciones lo vamos a dejar para otro momento… siempre que
 >   se automatice algo, vamos a evaluar si vale la pena»). La auditoría de lo que ya existe, EN PAUSA.** Cada automatización avisa en el momento y ofrece «Aplicar automático» / «Resolver a mano».

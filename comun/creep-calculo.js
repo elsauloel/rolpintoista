@@ -758,22 +758,25 @@ const CreepCalculo = (() => {
   const arquetiposManual = sc => [...new Set((Array.isArray(sc && sc.arquetipos) ? sc.arquetipos : []).map(a => ARQ_VIEJOS[a] || a).filter(a => ARQUETIPOS[a]))];
   function arquetipos(sc){ const m = arquetiposManual(sc); return m.length ? m : arquetiposAuto(sc); }
   const arquetiposTxt = lista => lista.map(a => ARQUETIPOS[a] || a).join(' + ');
-  function dropsResumen(sc){
+  // o.nombre(nombre, item?) (2026-10-30, dueño: «que cada nombre de ítem listado tenga el hover para ver su detalle»): cómo se escribe cada ítem; o.texto(t),
+  // lo demás (GM Tools lo usa para armar HTML con un globo por ítem). Sin `o`, el texto de siempre.
+  function dropsResumen(sc, o){
+    const N = (o && o.nombre) || (x => x), T = (o && o.texto) || (x => x);
     const partes = [];
     const a = armaDe(sc);
-    if(a.nombre && !a.natural) partes.push(`${a.nombre} (arma equipable)`);
-    Combatiente.equipoSinArma(sc).filter(it => !it.natural).forEach(it => partes.push(`${it.nombre} (equipo)`));   // 🐾 lo natural no se suelta (2026-10-14)
+    if(a.nombre && !a.natural) partes.push(`${N(a.nombre, a)} (arma equipable)`);
+    Combatiente.equipoSinArma(sc).filter(it => !it.natural).forEach(it => partes.push(`${N(it.nombre, it)} (equipo)`));   // 🐾 lo natural no se suelta (2026-10-14)
     const tr = trofeo(sc);
-    if(tr) partes.push(`${tr.nombre} (trofeo${tr.natural ? ', lo que vale su equipo natural' : ''}: compra ${fmt(tr.precioCompra)}, venta ${fmt(tr.precioCompra / 2)}, ${fmt(despojosDePrecio(tr.precioCompra))} despojos)`);
-    dropsFijos(sc).forEach(n => partes.push(`${n} (drop fijo)`));
+    if(tr) partes.push(`${T(tr.nombre)} (trofeo${tr.natural ? ', lo que vale su equipo natural' : ''}: compra ${fmt(tr.precioCompra)}, venta ${fmt(tr.precioCompra / 2)}, ${fmt(despojosDePrecio(tr.precioCompra))} despojos)`);
+    dropsFijos(sc).forEach(n => partes.push(`${N(n)} (drop fijo)`));
     if(num(sc.oroBase) > 0) partes.push(`${fmt(num(sc.oroBase))} DDE de oro (±20% al final del combate)`);
-    if(Array.isArray(sc.consumibleAzar) && sc.consumibleAzar.length) partes.push(`${sc.consumibleAzar.join(', ')} (consumible al azar, en el cinturón: si lo usa, lo suelta seguro; si no, a veces)`);
-    if(sc.municionAzar) partes.push(`${sc.municionAzar} (munición al azar, en el cinturón: la suelta seguro)`);
+    if(Array.isArray(sc.consumibleAzar) && sc.consumibleAzar.length) partes.push(`${sc.consumibleAzar.map(n => N(n)).join(', ')} (consumible al azar, en el cinturón: si lo usa, lo suelta seguro; si no, a veces)`);
+    if(sc.municionAzar) partes.push(`${N(sc.municionAzar)} (munición al azar, en el cinturón: la suelta seguro)`);
     // 🎒 Lo demás del cinturón (2026-10-28, dueño: «no aparecen los consumibles»): al morir van todos al botín; los que usó, ofrecidos; los que no,
     // los ofrece el GM si quiere (CombateFin.dropDeCreep).
     const azar = new Set(Array.isArray(sc.consumibleAzar) ? sc.consumibleAzar : []);
     const delCinturon = (Array.isArray(sc.cinturon) ? sc.cinturon : []).filter(c => c && c.nombre && !azar.has(c.nombre) && c.nombre !== sc.municionAzar)
-      .map(c => `${c.nombre}${num(c.unidades) > 1 ? ` ×${fmt(num(c.unidades))}` : ''}`);
+      .map(c => `${N(c.nombre, c)}${num(c.unidades) > 1 ? ` ×${fmt(num(c.unidades))}` : ''}`);
     if(delCinturon.length) partes.push(`${delCinturon.join(', ')} (en el cinturón: lo que use, lo suelta; lo que no, si el GM lo ofrece)`);
     else if(['humano', 'humanoide'].includes(tipoDe(sc))) partes.push(`a veces un consumible, según su arquetipo (${arquetiposTxt(arquetipos(sc))})`);
     return partes.length ? partes.join(' · ') : 'nada';

@@ -72,11 +72,11 @@ function cardHtml(sc){
       <button type="button" class="iconbtn" data-cerrareditar="1" title="Cancelar (Esc): si cambiaste algo, pregunta antes de descartarlo">Cancelar</button>
     </div>
     ${muertoBadgeHtml(sc)}
-    <div class="imgwrap">
-      <button type="button" class="imgpick" data-img="${sc.id}">
-        ${sc.imagen ? `<img src="${sc.imagen}" alt="">` : `<span class="imgempty">+<small>Imagen</small></span>`}
+    <div class="imgwrap${sc.imagen ? ' con-encuadre' : ''}">
+      <button type="button" class="imgpick${sc.imagen ? ' encuadrada' : ''}" data-img="${sc.id}" title="${sc.imagen ? 'Ver la imagen completa, encuadrar o elegir otra' : 'Elegir una imagen'}">
+        ${sc.imagen ? `<img src="${sc.imagen}" alt="" data-enc="${esc(JSON.stringify(sc.imagenEncuadre || null))}">` : `<span class="imgempty">+<small>Imagen</small></span>`}
       </button>
-      ${sc.imagen ? `<button class="imgrm" data-imgrm="${sc.id}">Quitar imagen</button>` : ''}
+      ${sc.imagen ? `<div class="imgwrap-lado"><div class="hint">Así se ve en su token y en su tarjeta del mapa. Clic en la imagen: verla completa, encuadrar o elegir otra.</div><button class="imgrm" data-imgrm="${sc.id}">Quitar imagen</button></div>` : ''}
       <input type="file" class="imginput" data-imginput="${sc.id}" accept="image/*" hidden>
     </div>
     <div class="cbody">
@@ -496,3 +496,20 @@ function totalModBadge(total, base, origen){
 }
 const totalModInput = (campo, sc, total, base) =>
   `<input type="number" class="${totalModClase(total, base)}" data-f="${campo}" data-id="${sc.id}" data-fmod="${fmt(num(total) - num(base))}" value="${fmt(num(total))}">`;
+
+/* 🖼 La imagen del editor, con su encuadre (dueño, 2026-10-30: «que el menú del editor ya muestre la imagen con el encuadre configurado»): el cuadrado
+   que se ve en el token y en la tarjeta del mapa (`imagenEncuadre` = {x, y: la esquina, como fracción del ancho y del alto; t: el lado, como fracción del
+   lado más chico}; sin encuadre, el centro). Lo llama renderEditarCreep (js/02) después de dibujar. */
+function encuadrarMiniaturas(raiz){
+  (raiz || document).querySelectorAll('img[data-enc]').forEach(im => {
+    const ubicar = () => {
+      const B = im.parentElement.clientWidth, nw = im.naturalWidth || 1, nh = im.naturalHeight || 1, min = Math.min(nw, nh);
+      let e = null;
+      try{ e = JSON.parse(im.dataset.enc || 'null'); }catch(err){}
+      const con = !!(e && num(e.t) > 0), k = B / ((con ? num(e.t) : 1) * min);
+      const x = con ? num(e.x) * nw : (nw - min) / 2, y = con ? num(e.y) * nh : (nh - min) / 2;
+      Object.assign(im.style, {position: 'absolute', maxWidth: 'none', width: nw * k + 'px', height: nh * k + 'px', left: -x * k + 'px', top: -y * k + 'px'});
+    };
+    if(im.complete && im.naturalWidth) ubicar(); else im.onload = ubicar;
+  });
+}

@@ -12,6 +12,7 @@ function renderEditarCreep(){
   const cuerpo = $('#editar-creep-body');
   const clave = activo && cuerpo.contains(activo) ? [...activo.attributes].filter(a => a.name.startsWith('data-')).map(a => `[${a.name}="${CSS.escape(a.value)}"]`).join('') : '';
   cuerpo.innerHTML = cardHtml(sc);
+  encuadrarMiniaturas(cuerpo);   // 🖼 la imagen con su encuadre (js/03)
   scrim.scrollTop = scroll;
   ubicarPieEditarCreep();
   if(clave){

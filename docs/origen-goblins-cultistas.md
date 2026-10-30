@@ -380,3 +380,18 @@ tachonado, Yelmo de cubo y Polainas tachonadas de taller (Buenas); Guanteletes d
 y el texto cambiado), Tirar la bronca, Grito de pánico, Zap, Prisión de hielo y Hálito polar. **Cinturón**: Town portal y Poción de Piel de Cristal
 mayor, más lo que le tocó al azar al crearlo (la regla de los drops): Pergamino grupal de Reserva Ampliada y Runa de silencio. Oro sugerido 350 (jefe).
 Pendiente: el dueño revisa a mano si reemplaza alguna skill; el dibujo del Cristal en el mapa sigue siendo el del estandarte.
+
+### ⚔ Encuentro 2 — choque pesado warrior, nivel 4 (dueño, 2026-10-30: «que sea nivel 4, que tenga dos habilidades de tanque, dos de daño y una de
+movilidad, estrategia, tipo salto, gancho»)
+
+Propuesta (esperando el OK; solo skills auditadas). Nombre de trabajo: **Goblin rompehuesos**.
+- **Atributos (42)**: Con 14 · Fue 11 · Agi 6 · Des 7 · Esp 4. Vida 70 (+20 del equipo = 90).
+- **Equipo** (las manos + 2 Buenas + 3 Comunes): **Martillo de bola** (Buena, 2 manos: Tipo 10, 2d10, Derribar 25 %; no hay armas Tipo 12 Buenas);
+  **Jubón de cuero de búfalo** (Buena: Defensa +4, Tipo 4 +1, Vida +10, Res.CC +1), **Casco de bandas remachadas** (Buena: Defensa +2, Tipo 4 +1, Res.CC +1,
+  Vida +5); **Botas de minero**, **Guanteletes de cuero tachonado**, **Anillo de Vitalidad Extendida** (Comunes). Defensa 8, Def.Esp 1. Consumible: Poción de Piel de Cristal.
+- **Skills (5)**: tanque, **Aguante** (+2 Defensa y Def.Esp hasta su turno; cada golpe recibido suma un dado a su próximo ataque) y **Segundo aliento** (se
+  cura 6 + Con y se saca un debuff, una vez por combate); daño, **Golpe demoledor** (lenta: +1 dado y Armadura rota doble, contra Petro) y **Golpe que
+  sigue** (+2 al daño; si deja a alguien en 0, le pega a otro pegado: las abejas de Bizzante); movilidad, **Arrastrar** (el gancho: Destreza contra
+  Evasión a 3 casillas, lo trae pegado y le pega con +2 PdG).
+- **Riesgo a medir**: Arrastrar a Larry (20 de vida, Defensa 4) con el bonus del Cristal (+5): 2d10 + 11 + 5 − 4 ≈ 23, lo tumba de un golpe. Palancas:
+  Fuerza más baja, un arma de 1 dado o que el Cristal no alcance.

@@ -612,6 +612,11 @@
   **Probado el 2026-10-20 (Claude, «Test con claude elsaulo»):** el creep con Excavar y la Puñalada desde abajo del Kobold tunelero: se mete en la tierra, sale al lado de Silvia (+3 PdG por salir de abajo); con crítico, los efectos pasan a Rengo 2 turnos y Lisiado 1 turno (en vez del Rengo 1).
   «👁 Ver como jugador», abajo, en Probado).
 ## Probado
+- [x] **🗿 Estoicismo** (2026-10-30, «Claude · pruebas», con capturas). juan (jugador) lo ejecuta desde la Botonera: «¿Es tu turno?» 2 / 4 SP; el Aviso
+  «Tenés 2 enemigos pegados (Warrior, Chamán): +4 🛡» con Aplicar / Resolver a mano; queda el estado (1 turno). El GM aleja al Chamán: el −2 rojo baja sobre
+  juan en la pantalla del GM y al jugador le llega «Se aleja: −2… Total +2»; lo vuelve a pegar: el +2 🛡 verde sube y «Se suma: +2… Total +4», con la casilla
+  «No volver a mostrar»; tildada, otro ir y venir ya no avisa (la animación sí). «Recibe daño» 10: la vista previa «10 − Def 4 (0 + 4 de Estoicismo) = 6» y
+  la vida 35 → 29. Al sacarle el estado, la casilla se olvida. Restaurado (vida 35, SP, sin la habilidad de prueba; el Chamán en su casilla).
 - [x] **🏹 Contra un proyectil: «Esquivar (Agilidad)» y «Poner escudo»** (2026-10-29, «Claude · pruebas», con captura; dueño: «específicamente para
   proyectiles, que cambie el nombre»). El Tunelero dispara el Arco corto a Clementino: al jugador le aparecen «🏃 Esquivar (Agilidad)» y «🛡 Poner escudo ·
   Tapa de tacho de basura»; el GM, en el desplegable a mano, «Esquivar (Agilidad) / Poner escudo». Solo cambia el nombre: se tira lo mismo.

@@ -212,13 +212,59 @@ const CreepBotonera = (() => {
     const lista = o.consumibles;
     const agregar = !lista ? '<div class="hint">Cargando el catálogo de consumibles…</div>'
       : usado >= cap ? '<div class="hint">El cinturón está lleno.</div>'
-      : `<div class="accion-row"><select data-cin-sel="${sc.id}" style="flex:1;min-width:0">${lista.map(c => `<option value="${esc(c.id)}"${c.id === o.cinSel ? ' selected' : ''}>${esc(c.nombre)}${c.tier ? ` · ${esc(c.tier)}` : ''}</option>`).join('')}</select>
-          <button class="hab-ejecutar" data-cin-agregar="${sc.id}">＋ Al cinturón</button></div>`;
+      : cinPickerHtml(sc, lista);
     return `<div class="botonera-caja">
       <div class="acciones-grupo-label" style="margin-top:0">🧪 Cinturón · ${fmt(usado)}/${fmt(cap)} ranuras</div>
       <div class="botonera-list-grid">${filas || '<div class="hint">Sin consumibles en el cinturón.</div>'}${agregar}</div>
     </div>`;
   }
 
-  return {html, cinturonHtml, formulasCombate, habStatTirable, habTieneSegunda, botonSegundaHab, botonHabTxt, cdControlesHtml};
+  /* 🧪 Elegir un consumible para el cinturón (dueño, 2026-10-30: «no debe abrir un desplegable con una lista infinita, sino un menú con ciertos filtros»):
+     ＋ Al cinturón abre un panel con buscador y las categorías de la góndola (Combatiente.GONDOLA_CATEGORIAS); cada fila tiene su «＋» (data-cin-agregar
+     + data-cin-item, lo atiende cada pantalla). Filtrar no redibuja: lo hacen cinAbrir/cinFiltrar/cinCat en el lugar (sirve adentro del recuadro aislado del
+     mapa). Queda abierto entre redibujos (`cinAbiertos`), para sumar varios. */
+  const cinAbiertos = new Set();
+  const sinAcento = s => String(s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  function cinPickerHtml(sc, lista){
+    const cats = (typeof Combatiente !== 'undefined' && Combatiente.GONDOLA_CATEGORIAS) || [];
+    const catDe = it => (typeof Combatiente !== 'undefined' && Combatiente.categoriaGondola) ? Combatiente.categoriaGondola(it) : '';
+    const hay = new Set(lista.map(catDe));
+    const abierto = cinAbiertos.has(sc.id);
+    const filas = lista.map(c => `<div class="cin-fila" data-cin-txt="${esc(sinAcento([c.nombre, c.tier, c.detalle, c.efectoNombre].join(' ')))}" data-cin-cat="${esc(catDe(c))}"
+        style="display:flex;gap:8px;align-items:center;padding:5px 6px;border-bottom:1px solid rgba(255,255,255,.06)">
+        <div style="flex:1;min-width:0"><b>${esc(c.nombre)}</b>${c.tier ? ` <span class="hint">· ${esc(c.tier)}</span>` : ''}${c.detalle ? `<div class="hint" style="font-size:11px;line-height:1.3">${esc(String(c.detalle).slice(0, 140))}${String(c.detalle).length > 140 ? '…' : ''}</div>` : ''}</div>
+        <button class="hab-ejecutar" data-cin-agregar="${sc.id}" data-cin-item="${esc(c.id)}" title="Sumarlo al cinturón">＋</button></div>`).join('');
+    return `<div style="grid-column:1/-1">
+      <button class="hab-ejecutar" data-cin-abrir="${sc.id}" onclick="CreepBotonera.cinAbrir(this)">${abierto ? '▾' : '＋'} Al cinturón</button>
+      <div data-cin-panel="${sc.id}" data-cat=""${abierto ? '' : ' hidden'} style="margin-top:6px;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:8px">
+        <input type="text" placeholder="Buscar (nombre, efecto…)" oninput="CreepBotonera.cinFiltrar(this)" style="width:100%;box-sizing:border-box;margin-bottom:6px">
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px">${cats.filter(([k]) => hay.has(k)).map(([k, ic, et]) => `<button type="button" class="verbtn" data-cin-catbtn="${esc(k)}" onclick="CreepBotonera.cinCat(this)">${ic} ${esc(et)}</button>`).join('')}</div>
+        <div data-cin-lista style="max-height:260px;overflow-y:auto">${filas}</div>
+        <div class="hint" data-cin-vacio hidden>Nada con esos filtros.</div>
+      </div></div>`;
+  }
+  function cinAbrir(btn){
+    const caja = btn.parentElement, panel = caja && caja.querySelector('[data-cin-panel]');
+    if(!panel) return;
+    panel.hidden = !panel.hidden;
+    const id = btn.dataset.cinAbrir;
+    if(panel.hidden) cinAbiertos.delete(id); else{ cinAbiertos.add(id); const inp = panel.querySelector('input'); if(inp) inp.focus(); }
+    btn.textContent = `${panel.hidden ? '＋' : '▾'} Al cinturón`;
+  }
+  function cinRefiltrar(panel){
+    const q = sinAcento((panel.querySelector('input') || {}).value || '').trim(), cat = panel.dataset.cat || '';
+    let n = 0;
+    panel.querySelectorAll('.cin-fila').forEach(f => { const ok = (!q || f.dataset.cinTxt.includes(q)) && (!cat || f.dataset.cinCat === cat); f.style.display = ok ? 'flex' : 'none'; if(ok) n++; });
+    const v = panel.querySelector('[data-cin-vacio]'); if(v) v.hidden = n > 0;
+  }
+  function cinFiltrar(inp){ const panel = inp.closest('[data-cin-panel]'); if(panel) cinRefiltrar(panel); }
+  function cinCat(b){
+    const panel = b.closest('[data-cin-panel]');
+    if(!panel) return;
+    panel.dataset.cat = panel.dataset.cat === b.dataset.cinCatbtn ? '' : b.dataset.cinCatbtn;
+    panel.querySelectorAll('[data-cin-catbtn]').forEach(x => { x.style.outline = x.dataset.cinCatbtn === panel.dataset.cat ? '2px solid #E0A458' : ''; });
+    cinRefiltrar(panel);
+  }
+
+  return {cinAbrir, cinFiltrar, cinCat, html, cinturonHtml, formulasCombate, habStatTirable, habTieneSegunda, botonSegundaHab, botonHabTxt, cdControlesHtml};
 })();

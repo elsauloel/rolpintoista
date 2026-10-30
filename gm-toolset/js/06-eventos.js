@@ -114,7 +114,7 @@ document.addEventListener('click', async e => {
   if(b.dataset.versioncreep){ const sc = S.creeps.find(s => s.id === b.dataset.versioncreep); if(sc) abrirVersionNuevaCreep(sc); return; }
   if(b.dataset.ver){ verCreep(b.dataset.ver); return; }
   if(b.dataset.editarcreep){ abrirEditarCreep(b.dataset.editarcreep); return; }
-  if(b.dataset.cerrareditar){ cerrarEditarCreep(); return; }
+  if(b.dataset.cerrareditar){ cancelarEditarCreep(); return; }
   if(b.dataset.img){
     document.querySelector(`[data-imginput="${b.dataset.img}"]`)?.click();
     return;
@@ -244,7 +244,8 @@ document.addEventListener('click', async e => {
   if(b.dataset.cinAgregar){
     const sc = S.creeps.find(s => s.id === b.dataset.cinAgregar);
     const sel = document.querySelector(`[data-cin-sel="${b.dataset.cinAgregar}"]`);
-    const it = sel ? CATALOGO_BASE.find(x => x.id === sel.value) : null;
+    const elegido = b.dataset.cinItem || (sel && sel.value);   // 🧪 la fila del panel con filtros (2026-10-30) o el desplegable viejo
+    const it = elegido ? CATALOGO_BASE.find(x => x.id === elegido) : null;
     if(!sc || !it){ toast('Elegí un consumible del catálogo'); return; }
     window.cinSelCreep = it.id;   // el desplegable recuerda el último elegido
     const x = CreepAcciones.alCinturon(sc, it, 1);

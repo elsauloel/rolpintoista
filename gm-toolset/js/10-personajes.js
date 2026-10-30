@@ -208,11 +208,14 @@ document.addEventListener('keydown', e => {
   if(!abiertos.length) return;
   const capa = s => num(getComputedStyle(s).zIndex);
   const arriba = abiertos.reduce((a, s) => capa(s) >= capa(a) ? s : a);
-  if(arriba.id === 'scrim-editar-creep'){ cerrarEditarCreep(); return; }
+  if(arriba.id === 'scrim-editar-creep'){ cancelarEditarCreep(); return; }
   const closeBtn = arriba.querySelector('[id$="-x"]');
   if(closeBtn) closeBtn.click(); else arriba.classList.remove('open');
 });
-$('#scrim-editar-creep').addEventListener('mousedown', e => { if(e.target.id === 'scrim-editar-creep') cerrarEditarCreep(); });
+$('#scrim-editar-creep').addEventListener('mousedown', e => { if(e.target.id === 'scrim-editar-creep') cancelarEditarCreep(); });
+// ✔ Guardar / Cancelar, flotando abajo a la derecha mientras la ficha está abierta (2026-10-30).
+$('#editar-creep-guardar').onclick = () => guardarEditarCreep();
+$('#editar-creep-cancelar').onclick = () => cancelarEditarCreep();
 $('#veritem-x').onclick = () => $('#scrim-ver-item').classList.remove('open');
 $('#veritem-editar').onclick = () => { $('#scrim-ver-item').classList.remove('open'); editarYSubirItemGM(verItemActual); };
 $('#veritem-baja').onclick = async () => {

@@ -802,3 +802,8 @@ input[type=file]{display:none}
 .recorte-visor img{position:absolute;left:0;top:0;max-width:none;pointer-events:none;user-select:none}
 .recorte-ayuda{margin:0;font-size:12px;color:var(--muted);text-align:center;max-width:300px}
 .recorte-botones{display:flex;gap:8px;width:100%;justify-content:flex-end}
+
+/* ✔ Guardar / Cancelar de la ficha del lápiz (2026-10-30): flotan abajo a la derecha, se vea la parte que se vea. */
+.editar-creep-pie{position:fixed;right:24px;bottom:20px;display:flex;gap:10px;z-index:5;padding:10px 12px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:0 10px 26px rgba(0,0,0,.6)}
+.editar-creep-pie button{padding:9px 18px;font-weight:700;cursor:pointer}
+#scrim-editar-creep .editar-creep-modal{margin-bottom:96px}   /* (lugar para los botones flotantes: al final no tapan nada) */

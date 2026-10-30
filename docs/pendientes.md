@@ -176,6 +176,9 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
+> - [ ] **🧬 Razas frecuentes con resistencias y debilidades sugeridas (2026-10-30, dueño: «eventualmente vamos a diseñar razas frecuentes con resistencias y
+>   debilidades sugeridas»).** El asistente de creeps ya tiene el lugar (paso «Defensa y resistencias»: la base de cada elemento, positiva o negativa); falta
+>   diseñar las razas (goblin, no-muerto, elemental de fuego…) y que al elegir el tipo de criatura se sugieran.
 > - [ ] **⭐ Repensar la calculadora de experiencia de los creeps (2026-10-30, dueño: «volver a pensar la calculadora de experiencia, que contemple no
 >   sólo el nivel del creep sino también su equipo y la cantidad de habilidades»).** Hoy la XP sale solo del nivel (`xpBasePorNivel`, el paso Recompensas del
 >   asistente y «Batalla terminada»). Pensar cuánto suman el equipo (rareza, piezas) y las habilidades (cuántas, cuáles), y si un jefe cuenta distinto.

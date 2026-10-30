@@ -19,14 +19,44 @@ function renderEditarCreep(){
   }
 }
 
+/* ✔ Guardar / Cancelar (dueño, 2026-10-30: «en ningún lugar dice guardar, sólo dice cerrar… Debería existir el botón de guardar y cancelar. El cancelar
+   debe avisar: tenés cambios sin guardar… idealmente siempre visibles, que queden en una esquina flotando»): lo que se toca se ve al momento (y GM Tools lo
+   guarda solo, como siempre); Guardar cierra dejándolo así; Cancelar (y Esc, y el clic afuera) vuelve a como estaba al abrir, preguntando antes si cambió algo. */
+let editandoCreepCopia = null;
 function abrirEditarCreep(scId){
   editandoCreepId = scId;
+  const sc = S.creeps.find(s => s.id === scId);
+  editandoCreepCopia = sc ? structuredClone(sc) : null;
   renderEditarCreep();
   $('#scrim-editar-creep').scrollTop = 0;
   $('#scrim-editar-creep').classList.add('open');
 }
+function editarCreepCambio(){
+  const sc = S.creeps.find(s => s.id === editandoCreepId);
+  return !!(sc && editandoCreepCopia && JSON.stringify(sc) !== JSON.stringify(editandoCreepCopia));
+}
+function guardarEditarCreep(){
+  const sc = S.creeps.find(s => s.id === editandoCreepId);
+  const hubo = editarCreepCambio();
+  cerrarEditarCreep();
+  if(sc) toast(hubo ? `${nombreLimpioCreep(sc)} guardado` : 'Sin cambios');
+}
+async function cancelarEditarCreep(){
+  if(!editandoCreepId) return;
+  if(editarCreepCambio()){
+    const si = await Confirmar.preguntar('Tenés cambios sin guardar. ¿Descartarlos?', {titulo: 'Cancelar', icono: '✎', si: 'Sí, descartar', no: 'No, seguir editando', peligro: true});
+    if(!si) return;
+    const i = S.creeps.findIndex(s => s.id === editandoCreepId);
+    if(i >= 0 && editandoCreepCopia) S.creeps[i] = structuredClone(editandoCreepCopia);
+    cerrarEditarCreep();
+    renderAll();
+    return;
+  }
+  cerrarEditarCreep();
+}
 
 function cerrarEditarCreep(){
+  editandoCreepCopia = null;
   editandoCreepId = null;
   $('#scrim-editar-creep').classList.remove('open');
   $('#editar-creep-body').innerHTML = '';
@@ -63,6 +93,13 @@ function ayudaQ(txt){ return `<span class="ayuda-q con-tip" data-tip="${esc(txt)
 /* Pasivas de un creep (2026-10-15, dueño: «habilitemos habilidades pasivas para creeps»): las mismas del catálogo de los personajes
    (comun/pasivas.js + lo subido a la biblioteca), con compras. Suman como en un personaje (CreepCalculo.modTotal) y la vida por turno, al
    empezar su turno (CreepAcciones). */
+// 🧪 El cinturón en la ficha del lápiz (dueño, 2026-10-30: «el sumarle cosas al cinturón también debe estar en el menú que se abre con el lápiz, en la parte
+// de recompensas»): el mismo de las Acciones (con el panel de filtros), sin el botón de usar.
+function cinturonEditorHtml(sc){
+  const cin = CreepBotonera.cinturonHtml(sc, {consumibles: CreepAcciones.consumiblesDe(CATALOGO_BASE)}).replace(/<button class="hab-ejecutar" data-cin-consumir[^>]*>[^<]*<\/button>/g, '');
+  return `<div class="editar-separador"><span>Cinturón</span></div>
+    <div class="hint" style="margin-bottom:6px">Consumibles que puede usar en la pelea. Si los usa, se ofrecen como botín; si no, al final del combate decidís si se ofrecen.</div>${cin}`;
+}
 function pasivasCreepHtml(sc){
   const ps = sc.pasivas || [];
   return `<div class="editar-separador"><span>Pasivas</span></div>
@@ -224,7 +261,7 @@ document.addEventListener('click', e => {
    Asistente paso a paso para crear o editar un creep entero (la referencia del estándar paso a paso: docs/plan-paso-a-paso.md;
    la ventana es comun/paso-a-paso.js). Crear: «✔ Crear» al final; editar: Guardar siempre visible, Cancelar repone la copia.
    ========================================================= */
-const ASIST_PASOS = ['Qué es', 'Atributos', 'Arma', 'Armadura', 'Habilidades', 'Pasivas y cinturón', 'Recompensas', 'Resumen'];   // (Pasivas y cinturón: 2026-10-30, dueño)
+const ASIST_PASOS = ['Qué es', 'Atributos', 'Arma', 'Defensa y resistencias', 'Habilidades', 'Pasivas y cinturón', 'Recompensas', 'Resumen'];   // (Pasivas y cinturón: 2026-10-30, dueño)
 const ROLES_CREEP = Combatiente.ROLES;      // los roles y sus repartos viven en comun/combatiente.js (los usa también el personaje nuevo)
 const PESOS_ROL = Combatiente.PESOS_ROL;
 const RAREZA_ARMA = ['Común', 'Común', 'Común (o Buena Calidad)', 'Buena Calidad', 'Buena Calidad (o Raro)'];
@@ -236,7 +273,7 @@ const ASIST_AYUDA = [
   'Lo básico: cómo se llama, de qué nivel es y qué tipo de criatura. El tipo sugiere el oro que deja y si su arma es natural.',
   'Cómo se reparten sus cinco atributos. Elegí un rol para cargar un reparto sugerido y después ajustalo a gusto.',
   'Con qué ataca: creala paso a paso, equipala del fabricante o elegí un arma natural del catálogo.',
-  'Lo que lleva puesto para defenderse. Es opcional.',
+  'Lo que lleva puesto para defenderse y, si tiene, sus resistencias o debilidades naturales a algún elemento. Todo es opcional.',
   'Lo que sabe hacer además de atacar.',
   'Opcional: pasivas (bonos que siempre tiene) y consumibles en el cinturón, que puede usar en la pelea.',
   'Lo que deja cuando lo derrotan: oro, trofeo y equipo.',
@@ -363,7 +400,8 @@ function htmlPasoAsistCreep(p){
     const vestido = Combatiente.equipoSinArma(sc).filter(it => !CreepCalculo.enLasManos(it));   // (lo de las manos está en el paso Arma)
     return `<p class="pap-nota" style="margin:0 0 10px">Rareza sugerida para el nivel ${n}: <b>${RAREZA_ARMADURA[Math.min(n, 5) - 1]}</b>. Defensa total: <b>${fmt(creepDefensaEfectiva(sc))}</b> · Defensa especial: <b>${fmt(creepArmadmgEfectiva(sc))}</b>.</p>
       <div class="equipo-list">${vestido.length ? vestido.map(it => asistPiezaHtml(sc, it)).join('') : '<div class="hint">Sin armadura.</div>'}</div>
-      <button type="button" class="pap-boton" data-equipardelfabricante="${sc.id}" style="margin-top:10px">⚔ Equipar del fabricante</button>`;
+      <button type="button" class="pap-boton" data-equipardelfabricante="${sc.id}" style="margin-top:10px">⚔ Equipar del fabricante</button>
+      ${asistResElementalesHtml(sc)}`;
   }
   if(p === 4){
     return `<p class="pap-nota" style="margin:0 0 10px">Se sugieren hasta <b>${Math.max(2, n + 1)} habilidades</b> (nivel 1: dos, y una más por nivel).</p>
@@ -416,6 +454,17 @@ function asistResumenMasHtml(sc){
     + linea(`Habilidades (${habs.length})`, habHtml || 'ninguna')
     + linea('Pasivas', (sc.pasivas || []).map(p => esc(p.nombre) + (CreepCalculo.pasivaComprasCreep(p) > 1 ? ` ×${CreepCalculo.pasivaComprasCreep(p)}` : '')).join(', ') || 'ninguna')
     + linea('Cinturón', cin.join(', ') || 'vacío');
+}
+/* 🔥 Resistencias y debilidades naturales (dueño, 2026-10-30: «el paso de resistencias o debilidades naturales a algún elemento… resistencia a fuego,
+   debilidad a tóxico… que puede ser racial»): la base de cada elemento (sc.resfuego…, la misma de la ficha del lápiz; data-f la guarda). Positiva: se
+   resta al daño de ese elemento; negativa: lo recibe aumentado. Lo que sume su equipo va aparte (se ve en «efect.»). */
+function asistResElementalesHtml(sc){
+  return `<div class="pap-campo" style="margin-top:16px"><label>Resistencias y debilidades naturales (opcional)</label>
+    <div class="pap-nota" style="margin:0 0 8px">Lo propio de su raza o su naturaleza: un número positivo es resistencia (se le resta a ese daño); uno negativo, debilidad (lo recibe aumentado). 0 = nada. Lo que le dé el equipo se suma solo.</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px">${Object.entries(Combatiente.ELEMENTOS).map(([el, x]) => {
+      const base = num(sc['res' + el]), ef = CreepCalculo.resElemental(sc, el);
+      return `<div class="pap-campo"><label>${x.icono} ${esc(x.etq.replace('Res. ', ''))}${ef !== base ? ` <span class="pap-nota">(con equipo ${ef > 0 ? '+' : ''}${fmt(ef)})</span>` : ''}</label><input type="number" data-f="res${el}" data-id="${sc.id}" value="${base}" step="1"></div>`;
+    }).join('')}</div></div>`;
 }
 function actualizarAsistAtributos(sc){
   const raiz = asist && asist.api ? asist.api.raiz : document;

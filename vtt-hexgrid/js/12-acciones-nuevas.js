@@ -244,7 +244,8 @@ function acAccionAca(b){
   if(d.cinQuitar){ acCambiar(c => CreepAcciones.quitarDelCinturon(c, d.cinQuitar.split(':')[1])).then(x => { if(x) toast(x.aviso); }); return true; }
   if(d.cinAgregar){
     const sel = ac.raiz.querySelector(`[data-cin-sel="${d.cinAgregar}"]`);
-    const it = sel && typeof CATALOGO_BASE !== 'undefined' ? CATALOGO_BASE.find(x => x.id === sel.value) : null;
+    const elegido = d.cinItem || (sel && sel.value);   // 🧪 la fila del panel con filtros (2026-10-30) o el desplegable viejo
+    const it = elegido && typeof CATALOGO_BASE !== 'undefined' ? CATALOGO_BASE.find(x => x.id === elegido) : null;
     if(!it){ toast('Elegí un consumible del catálogo'); return true; }
     ac.cinSel = it.id;   // el desplegable recuerda el último elegido
     acCambiar(c => CreepAcciones.alCinturon(c, it, 1)).then(x => { if(x) toast(x.aviso); });

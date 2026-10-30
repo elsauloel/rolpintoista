@@ -69,7 +69,7 @@ function cardHtml(sc){
       <button class="verbtn" data-dup="${sc.id}" title="Duplicar este creep">Duplicar</button>
       <button class="verbtn" data-bib="${sc.id}" title="Guardar este creep en la biblioteca para usarlo en cualquier partida">📚 Biblioteca</button>
       <button class="xbtn" data-del="${sc.id}" title="Eliminar creep">×</button>
-      <button type="button" class="iconbtn" data-cerrareditar="1" title="Cerrar (Esc)">Cerrar</button>
+      <button type="button" class="iconbtn" data-cerrareditar="1" title="Cancelar (Esc): si cambiaste algo, pregunta antes de descartarlo">Cancelar</button>
     </div>
     ${muertoBadgeHtml(sc)}
     <div class="imgwrap">
@@ -176,6 +176,7 @@ function cardHtml(sc){
       ${pasivasCreepHtml(sc)}
 
       ${recompensasHtml(sc)}
+      ${cinturonEditorHtml(sc)}
 
       <div class="editar-separador"><span>Habilidades</span></div>
 

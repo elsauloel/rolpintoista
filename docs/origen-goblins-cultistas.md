@@ -366,3 +366,7 @@ Propuesta (esperando el OK; solo skills auditadas, ninguna repetida con el Culti
   entran **Zap** (2 No2, 3 SP, cd 3: 1d4 eléctrico directo y Parálisis 1 turno si no resiste con su Res.Esp; salta con 50 % y 25 % de Parálisis) y
   **Prisión de hielo** (2 No2, 3 SP, cd 3: contra la Evasión, 2d4 de hielo e Inmovilizado hasta 2 turnos; se rompe con Fuerza contra su Ef.Esp). El
   grupo tiene Def.Esp 0 / 0 / 1: el daño elemental entra casi entero. Alternativa: dejar la Sequía y sacar el Redoble.
+- **Decidido (dueño, 2026-10-30)**: Maldición de la sequía, Redoble de tambores y Empuje salen y entran tres de daño elemental. Propuesta (esperando el OK):
+  **Zap** (rayo, control), **Prisión de hielo** (hielo, control) y **Hálito polar** (3 No2 y tanto SP como su Especial, cd 3: cono de 16 casillas, 2d4 + ¼
+  del Ef.Esp de hielo y Escarcha, −1 a los No2 máximos 2 turnos; dodge roll para salir del cono). Quedan: Cristal de la Grieta · Tirar la bronca · Grito de
+  pánico · Zap · Prisión de hielo · Hálito polar, con la Varita del relámpago en la mano. Descartada: Cadena de rayos (repite el salto del Zap y de la varita).

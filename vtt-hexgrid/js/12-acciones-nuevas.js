@@ -165,6 +165,12 @@ async function acConsumir(sc, itemId){
     toast(t.aviso);
     if(!t.ok) return;
   }
+  // 🌀 El Town portal (2026-10-29, js/84; dueño: el Capataz del culto «escapa con el Town portal»): el GM elige la casilla al lado del creep
+  // antes de gastarlo; si cancela, no se gasta.
+  if(it.townPortal){
+    ac.host.hidden = true;
+    if(!(await townPortalColocar({fichaId: sc.id, tipoToken: 'creep', nombre: it.nombre}))){ ac.host.hidden = false; return; }
+  }
   // ✚ Revive (2026-10-06, js/22): a otro creep caído a 5 casillas o menos; se elige antes de gastarlo.
   const pctRevive = it.revive ? Math.max(1, Math.min(100, num(it.revive.pct) || 50)) : 0;
   const revive = it.revive ? await elegirCaidoParaRevivir({fichaId: ac.creepId, bando: 'creep', rango: num(it.revive.rango) || 5, pct: pctRevive, item: it.nombre}) : null;

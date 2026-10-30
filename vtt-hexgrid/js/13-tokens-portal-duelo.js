@@ -38,7 +38,8 @@ async function traerCreepsElegidos(){
   const ids = new Set([...mapasLista.keys(), MAPA_PRINCIPAL]);
   const conToken = new Set([...tokens.values()].filter(t => t.tipo === 'creep' && t.fichaId).map(t => t.fichaId));
   const porMapa = new Map();
-  [...creepsPub.entries()].forEach(([id, c]) => { const m = CreepsMapas.mapaDe(c, ids); if(!porMapa.has(m)) porMapa.set(m, []); porMapa.get(m).push([id, c]); });
+  // (el que ya tiene su token acá va en «En este mapa», aunque figure en la Reserva: los de antes de los mapas)
+  [...creepsPub.entries()].forEach(([id, c]) => { const m = conToken.has(id) ? mapaMostrado : CreepsMapas.mapaDe(c, ids); if(!porMapa.has(m)) porMapa.set(m, []); porMapa.get(m).push([id, c]); });
   const fila = ([id, c], desde) => {
     const ya = desde === mapaMostrado && conToken.has(id), muerto = !!(c.resumen && c.resumen.muerto);
     return {valor: id, texto: `${c.nombre || 'Creep'}${muerto ? ' 💀' : ''}`, fijo: ya,

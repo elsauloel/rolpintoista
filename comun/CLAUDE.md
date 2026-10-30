@@ -1761,3 +1761,4 @@ versión parecida en más de una, es candidato a juntar.
   (quien ataca está en sigilo y en el punto ciego), `Duelo.crear` marca `ataque.sorpresa` y no suma `espaldaPdg`; `guardarTiro` deja la tirada de
   defensa (`eva`) en 1, con la nota «lo sorprendieron por la espalda: vale 1». El bono «por la espalda» del arma sigue sumando.
 
+- **`confirmar.js`, `Confirmar.marcar`** (2026-10-30, dueño: «que te aparezca una planilla… y selecciones este, este y este»): una lista con casillas en grupos (con «todos / ninguno»), `fijo` para lo que se ve pero no se marca, y el botón que cuenta cuántos van → los valores marcados o null. La usa el mapa para 👥 Traer jugadores… y 👹 Traer creeps… (js/13: los creeps de otro mapa o de la Reserva se mudan, no se duplican).

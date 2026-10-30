@@ -987,8 +987,10 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 ## 7. Skills de clase
 - [x] **🗿 Estoicismo (Warrior), automatizado (2026-10-30).** Preset «Estoicismo» (`comun/estados-presets.js`: 1 turno con `turnosCompletos`, +1 a
   cada Res. a crítico, `estoico: 2`) y la skill lo usa; el +2 por rival pegado lo suma el daño del mapa en cada golpe (`estoicoRivales` / `estoicoDe`,
-  `vtt-hexgrid/js/26-escudos.js`; js/10, junto al Muro de escudos) y sale en el desglose de la Defensa. **Falta**: mostrarlo en el HUD, la ficha lite y la
-  Botonera (hoy la Defensa que se ve ahí no lo suma; el golpe sí). Lo definido: Costo: 2 SP en tu turno, 4 en turno ajeno
+  `vtt-hexgrid/js/85-estoicismo.js`; js/10, junto al Muro de escudos) y sale en el desglose de la Defensa y en la vista previa de «Recibe daño». Lo que se ve
+  (dueño, el mismo día): el **Aviso** a quien lo maneja al activarse y cada vez que cambia la cuenta (✔ Aplicar / ✋ Resolver a mano, que no cambia nada;
+  casilla «No volver a mostrar mientras dure este Estoicismo», que se olvida al terminarse el estado) y, para todos, el **+N 🛡 verde que sube / −N rojo que
+  baja** sobre el token. **Falta**: mostrar el bono en la ficha lite y la Botonera (la Defensa que se ve ahí no lo suma; el golpe sí). Lo definido: Costo: 2 SP en tu turno, 4 en turno ajeno
   (ya cargado). **Dura hasta el final de tu próximo turno** (si se usa como Flash en turno ajeno, cubre lo que queda de esa ronda y tu turno siguiente).
   **Mientras el estado esté activo, +2 a la Defensa por cada enemigo pegado, en vivo** (dueño: «una especie de estado estoico en el que se te suba
   automáticamente la defensa por cada enemigo adyacente mientras el estado esté activo»): si se acerca otro sube, si se va baja. Sigue el +1 a cada

@@ -1878,3 +1878,8 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   lo ven todos y queda hasta que el GM lo borra. Se dibuja con `townPortalDibujar` (espiral azul que gira; js/05 lo llama en vez del relleno). La pisada,
   `townPortalRevisar` desde `moverToken` (js/07): cualquier token que pasa se va del mapa (se borra su token; la ficha queda) y `usoEn` dispara los
   pulsos en todas las pantallas. Pasar al mapa de la aldea, a mano (GM). Reglas nuevas: el campo `townPortal` y su `usoEn`.
+- **🗿 Estoicismo** (2026-10-30, dueño; el Warrior): `js/85-estoicismo.js`. Con el estado (preset `Estoicismo`, `estoico: 2`), el daño (js/10: `danioPj`,
+  `danioCreep`, `danioInv`, y la vista previa de «Recibe daño») suma +2 a la Defensa por cada rival pegado que se ve (`estoicoRivales`: ni oculto, ni en
+  sigilo, ni bajo tierra, ni etéreo, ni muerto, ni estructura), contado en el momento del golpe (`estoicoDe`), con su renglón en el desglose. Cada pantalla
+  mira lo público en cada dibujo (`estoicoRevisar`, como las flechitas de js/75): a quien lo maneja, el Aviso al activarse y en cada cambio (`estoicoAvisar`:
+  Aplicar / Resolver a mano, y «No volver a mostrar» hasta que termine, `estoicoCallados`); a todos, el ±N 🛡 flotando (`estoicoDibujar`).

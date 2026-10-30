@@ -274,6 +274,18 @@
 
 ## Pendientes
 
+- [x] **💧 Modo SP de los creeps, desde el GM (2026-10-29, dueño: «testeá bien el modo SP… que se le vea la barra de SP en el token»)** — ✅ probado el
+  mismo día en «Claude · pruebas» (el Tunelero): el ⇄ «Con cooldown» → «Con SP · 12/12» y aparece la **barra azul de SP** en el token, debajo de la de vida
+  (en el GM y en el jugador, que ve el porcentaje como con la vida); Disparo señalador cobró «−4 No2 · −2 SP» y no puso cooldown; con 1 SP, «No le alcanza el
+  SP… ¿Usarla igual? (queda en 0)»; al empezar su turno recupera SP (9 → 11); ⇄ de vuelta a cooldown y la barra se va. **Arreglado**: el aviso del ⇄ decía el
+  modo al revés («vuelven a usar cooldown» al pasar a SP). Visto y anotado: las habilidades sin SP suficiente no se marcan en rojo (como sí pasa sin No2);
+  el anillo del token no tiene un círculo de SP para el creep; cancelar el duelo de una habilidad ya cobrada no devuelve nada (P233).
+- [x] **✋ Terminar a mano (2026-10-29, dueño)**: al pie del duelo, junto a «Cancelar duelo» y «Minimizar» (lo ven el GM y quien lo creó): pregunta «Esto
+  interrumpe el duelo hasta acá: lo que falta lo terminan de resolver con tiradas a mano en la Mesa…» con Aceptar / Cancelar; al aceptar, «✋ Terminado a
+  mano», la línea en la Mesa y el cuadro se cierra solo en todas las pantallas. **Probado** (el Tunelero contra Clementino).
+- [x] **🔧 Bloqueo perdido con el Parry elegido a mano (2026-10-29)**: el desgaste no se aplicaba (el Parry a mano no dice con qué paró). Ahora va al
+  escudo puesto o, sin escudo, a la única pieza que para. **Probado**: el Warrior contra Clementino, Parry a mano 9, Bloqueo 1 → pasa la mitad y la Tapa 3 → 2.
+
 - [x] **🛡 Armadura rota derivada de las piezas** (2026-10-29): Clementino (Tapa abollada) muestra «Armadura rota ×N» entre sus estados (ficha, ficha
   lite y el token), con el detalle de la pieza; repararla con el herrero o el talento lo hace desaparecer; un Rompe armadura nuevo lo suma. En El origen,
   Petro pierde el «Armadura rota ×2» viejo la próxima vez que se abra su ficha (recupera 2 de Defensa). ✅ **Probado (2026-10-29, «Claude · pruebas», jugador)**:

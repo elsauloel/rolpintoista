@@ -1392,3 +1392,15 @@ los demás, se rellena con la receta. Detalle de los números en la conversació
 **Dueño (2026-10-28):** «así» (base fija más un resto al azar), «va así» (rellenar el lugar vacío fuera del ambulante) y el carcaj también en el
 pueblito. **Hecho** (7d79a3af): `FIJO_POR_TAMANO` y `gondolaPorCategoria` en `comun/generador-tiendas.js`; la capital, 8 por categoría (con «todo lo
 que haya» daba 236). Detalle en `docs/rework-tiendas.md`.
+
+
+### P233 — ↩ Cancelar el duelo de una habilidad que ya se cobró (2026-10-29) ⏳ abierta
+
+**Contexto:** probando el modo SP de los creeps. Una habilidad que va al duelo (Disparo señalador, Excavar…) cobra su SP, sus No2 y su cooldown al
+ejecutarla, antes del duelo. Si el duelo se cancela antes de tirar, no se devuelve nada ni se pregunta. Con un ataque común, en cambio, «Cancelar duelo»
+pregunta «¿Cuenta como un ataque hecho?» y, si no cuenta, devuelve los No2 (2026-10-15). Desde hoy está además «✋ Terminar a mano», que a propósito no
+devuelve nada.
+
+**Propuesta (sin decidir):** el mismo criterio que el ataque: al cancelar el duelo de una habilidad ya cobrada, preguntar «¿Cuenta como usada?»; si no
+cuenta, devolver lo que pagó (SP, No2, vida) y sacarle el cooldown.
+

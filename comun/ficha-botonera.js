@@ -460,11 +460,11 @@ const FichaBotonera = (() => {
           return `<div class="cat-row bot-fila">
             <div class="bot-fila-info">
               <div class="cat-nombre">${esc(i.nombre)}</div>
-              ${costoHabilidadTxt(S, i) ? `<div class="bot-fila-costo" title="Lo que cuesta ejecutarla">${esc(costoHabilidadTxt(S, i))}</div>` : ''}
+              ${costoHabilidadTxt(S, i) ? `<div class="bot-fila-costo${sinSp ? ' sin-sp' : ''}" title="${sinSp ? 'No te alcanza el SP: te avisa antes y la podés usar igual' : 'Lo que cuesta ejecutarla'}">${sinSp ? 'Sin SP · ' : ''}${esc(costoHabilidadTxt(S, i))}</div>` : ''}
             </div>
             <div class="bot-fila-btns">
               <button class="mini" data-view="habilidades:${i.id}">Ver</button>
-              <button class="ejecutar-btn${habAutomatizada(i) ? ' con-lupa' : ''}${sinNitros || sinSp?" sin-recursos":""}${Combatiente.esFlash(i) ? ' bt-flash' : ''}" data-ejecutar="${i.id}" ${sinNitros?'aria-disabled="true" title="No te alcanzan los recursos"':sinSp?'title="No te alcanza el SP: te avisa antes y la podés usar igual"':Combatiente.esFlash(i) ? 'title="⚡ Flash: se puede usar en turno ajeno (cuesta el doble)"' : ''}>${habAutomatizada(i) ? 'Ejecutar' + lupaBotonHtml(`habx:${i.id}`, "en-boton") : 'Anunciar'}</button>
+              <button class="ejecutar-btn${habAutomatizada(i) ? ' con-lupa' : ''}${sinNitros?" sin-recursos":sinSp?" sin-sp":""}${Combatiente.esFlash(i) ? ' bt-flash' : ''}" data-ejecutar="${i.id}" ${sinNitros?'aria-disabled="true" title="No te alcanzan los recursos"':sinSp?'title="No te alcanza el SP: te avisa antes y la podés usar igual"':Combatiente.esFlash(i) ? 'title="⚡ Flash: se puede usar en turno ajeno (cuesta el doble)"' : ''}>${habAutomatizada(i) ? 'Ejecutar' + lupaBotonHtml(`habx:${i.id}`, "en-boton") : 'Anunciar'}</button>
               ${botonSegundaHab(i)}
             </div>
           </div>`;

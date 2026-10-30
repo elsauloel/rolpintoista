@@ -894,6 +894,9 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 .bt-lupa.en-boton{position:static;width:auto;height:auto;padding:1px 4px;opacity:.75}
 /* Sin recursos: se ve apagado pero sigue abriendo la 🔍 (un botón disabled no recibe clics) */
 .ejecutar-btn.sin-recursos{opacity:.45;background:rgba(0,0,0,.2);color:var(--muted)}
+/* 💧 Sin SP suficiente (2026-10-29): en rojo, pero se puede usar (avisa antes) */
+.ejecutar-btn.sin-sp{border-color:#d95a6e;color:#ff9e9e}
+.bot-fila-costo.sin-sp{color:#ff8a8a}
 .consume-btn.con-lupa{display:inline-flex;align-items:center;gap:6px}
 .consume-btn.sin-recursos{opacity:.45}
 .armbox{border:1px solid var(--line-soft);background:var(--panel2);padding:8px 10px;text-align:center}

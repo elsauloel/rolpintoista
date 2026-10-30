@@ -370,3 +370,13 @@ Propuesta (esperando el OK; solo skills auditadas, ninguna repetida con el Culti
   **Zap** (rayo, control), **Prisión de hielo** (hielo, control) y **Hálito polar** (3 No2 y tanto SP como su Especial, cd 3: cono de 16 casillas, 2d4 + ¼
   del Ef.Esp de hielo y Escarcha, −1 a los No2 máximos 2 turnos; dodge roll para salir del cono). Quedan: Cristal de la Grieta · Tirar la bronca · Grito de
   pánico · Zap · Prisión de hielo · Hálito polar, con la Varita del relámpago en la mano. Descartada: Cadena de rayos (repite el salto del Zap y de la varita).
+
+### ✅ Capataz del culto creado en El origen (2026-10-30, dueño: «crealo con esos skills y después veo a mano si reemplazo alguno; buscale un equipo acorde, balanceado entre defensa y def. esp.»)
+
+En **MINAS DUNGEON** (el mapa que tenía solo a los tres personajes), con su token **oculto**; id `cqxh5ys`. Nivel 5, Jefe, humano. Con 13 · Fue 4 ·
+Agi 6 · Des 6 · Esp 16: **75 de vida**, 6 No2. **Equipo** (las manos + 3 Buenas + 3 Comunes): Varita del relámpago y Calavera con vela; Jubón de cuero
+tachonado, Yelmo de cubo y Polainas tachonadas de taller (Buenas); Guanteletes de cuero tachonado, Botas de caña alta de estanciero y Anillo de chispa
+(+2 al daño eléctrico; Comunes). Queda con **Defensa 7 y Defensa especial 7**. **Skills**: Cristal de la Grieta (el Estandarte de guerra con otro nombre
+y el texto cambiado), Tirar la bronca, Grito de pánico, Zap, Prisión de hielo y Hálito polar. **Cinturón**: Town portal y Poción de Piel de Cristal
+mayor, más lo que le tocó al azar al crearlo (la regla de los drops): Pergamino grupal de Reserva Ampliada y Runa de silencio. Oro sugerido 350 (jefe).
+Pendiente: el dueño revisa a mano si reemplaza alguna skill; el dibujo del Cristal en el mapa sigue siendo el del estandarte.

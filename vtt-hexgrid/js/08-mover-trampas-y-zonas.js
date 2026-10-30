@@ -136,6 +136,7 @@ async function deshacerUltimoMovimiento(){
   if(deshacerPila[deshacerPila.length - 1].mant !== mantenimientoNumero){ deshacerPila.length = 0; toast('Ya pasó el turno: no se puede deshacer'); return; }
   const u = deshacerPila.pop();
   if(u.tipo === 'vital'){ await deshacerVital(u); return; }
+  if(u.tipo === 'townPortal'){ if(typeof townPortalDeshacer === 'function') await townPortalDeshacer(u); return; }   // 🌀 vuelve del portal (js/84)
   const t = tokens.get(u.id);
   if(!t) return;
   try{

@@ -85,7 +85,19 @@ function townPortalDibujar(el, z){
 // Mientras haya uno a la vista, el mapa se redibuja para que la espiral gire.
 setInterval(() => { try{ for(const el of elementos.values()) if(el && el.townPortal && puedeVerElemento(el)){ pedirDibujo(); return; } }catch(e){} }, 40);
 
-// La pisada (desde moverToken, js/07): cualquier token que pasa por el portal se va del mapa.
+// Ctrl+Z de «entró al Town portal» (js/08): el token vuelve, en el portal, tal cual estaba.
+async function townPortalDeshacer(u){
+  try{
+    await coleccionTokens().doc(u.id).set({...u.datos, creado: firebase.firestore.FieldValue.serverTimestamp()});
+    townPortalEntrados.delete(u.id);
+    toast(`Deshecho: ${u.nombre || 'el token'} vuelve del Town portal`);
+    try{ mesaLinea(`↩ ${u.nombre || 'El token'} volvió del Town portal (deshecho)`, 'recordatorio'); }catch(e){}
+  }catch(err){
+    console.error('No se pudo deshacer el Town portal:', err);
+    toast(err && err.code === 'permission-denied' ? 'No podés deshacer eso' : 'No se pudo deshacer');
+  }
+}
+// La pisada (desde moverToken, js/07): cualquier token que pasa por el portal se va del mapa (si confirma).
 const townPortalEntrados = new Set();
 async function townPortalRevisar(tokenId, celdas){
   const t = tokens.get(tokenId);
@@ -102,8 +114,11 @@ async function townPortalRevisar(tokenId, celdas){
   if(!entra){ townPortalEntrados.delete(tokenId); toast(`${nom} no entró al Town portal`); return; }
   try{ await coleccionElementos().doc(portal[0]).update({usoEn: Date.now()}); }catch(e){}   // los pulsos en todas las pantallas
   await new Promise(r => setTimeout(r, 700));   // que se lo vea llegar al portal antes de desaparecer
+  let guardado = null;   // ↩ para el Ctrl+Z (dueño, 2026-10-29): el token tal cual, para volver a ponerlo
+  try{ const s = await coleccionTokens().doc(tokenId).get(); if(s.exists) guardado = s.data(); }catch(e){}
   try{
     await coleccionTokens().doc(tokenId).delete();
+    if(guardado) deshacerRegistrar({tipo: 'townPortal', id: tokenId, datos: guardado, nombre: nom});
   }catch(err){
     console.error('Town portal: no se pudo sacar el token', err);
     townPortalEntrados.delete(tokenId);

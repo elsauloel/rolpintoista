@@ -568,6 +568,9 @@ input[type=file]{display:none}
 .ayuda-q{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border-radius:50%;border:1px solid var(--copper);color:var(--brass);font-size:10px;font-weight:700;cursor:help;margin-left:4px;text-transform:none;vertical-align:middle}
 .ayuda-q.con-tip:hover::after{min-width:280px;max-width:320px;left:auto;right:-8px}
 .editar-creep-modal{max-width:880px;border-top:none;background:none}   /* (más ancha, 2026-10-30, dueño: «ensancharía el menú para distribuir mejor la información») */
+/* Las casillas del editor (2026-10-30, dueño: «la distribución de la información quedó rara»): la regla general de los campos (ancho 100 %) las estiraba
+   y el texto quedaba lejos, a la derecha; cada casilla con su tamaño, pegada a su texto. */
+.editar-creep-modal input[type=checkbox],.editar-creep-modal input[type=radio]{width:16px;min-width:16px;max-width:16px;height:16px;flex:none;margin:0}
 .editar-creep-modal .card{box-shadow:0 18px 40px -12px rgba(0,0,0,.7)}
 .preset-grupo{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:14px 0 8px}
 .preset-grupo:first-child{margin-top:0}

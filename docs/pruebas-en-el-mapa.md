@@ -273,6 +273,11 @@
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 
 ## Pendientes
+- [ ] **↻ Creeps que se dan vuelta y 🗡 la defensa en 1 desde el sigilo** (2026-10-30, P201): (1) en combate, un personaje que se acerca por la
+  espalda de un creep a 3 casilleros o menos → al GM le sale «Pasos a tu espalda… ¿Se da vuelta?» y lo gira; con otro personaje pegado al frente,
+  «¡Flanqueado!»; un creep en sigilo o escondido no aparece en la Crónica. (2) Un ataque desde el sigilo por la espalda: el duelo dice «🗡 por la
+  espalda: desde el sigilo, la defensa vale 1», no suma el +1 PdG, y la defensa del defensor queda en 1 («lo sorprendieron por la espalda: vale 1»),
+  también en el ataque de oportunidad; sin sigilo, sigue el +1.
 
 - [x] **💧 Modo SP de los creeps, desde el GM (2026-10-29, dueño: «testeá bien el modo SP… que se le vea la barra de SP en el token»)** — ✅ probado el
   mismo día en «Claude · pruebas» (el Tunelero): el ⇄ «Con cooldown» → «Con SP · 12/12» y aparece la **barra azul de SP** en el token, debajo de la de vida

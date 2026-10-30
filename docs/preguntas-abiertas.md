@@ -1410,7 +1410,7 @@ devuelve (gancho `devolverHab` de CreepDuelo, FichaDuelo e InvDuelo). Probado co
 (9a874b70, probado: 8 → 4 No2 y cooldown 3; «No cuenta» → 8 No2 y cooldown 0).
 
 
-### P234 — 🪝 Arrastrar: si lo engancha pero no hay por dónde traerlo, ¿le pega igual? (2026-10-30)
+### P234 — 🪝 Arrastrar: si lo engancha pero no hay por dónde traerlo, ¿le pega igual? (2026-10-30) ✅
 
 **Contexto:** probando el empate del gancho en el mapa (Warrior contra juan, con el Tanque en el medio). Enganchó, empató la fuerza, ganó
 piedra, papel o tijera y… no había casilla libre para traerlo: la Crónica dijo «No hay por dónde traerlo: queda donde está». Hoy el código igual
@@ -1418,3 +1418,8 @@ abre el duelo del golpe (como si lo hubiera traído), y la Mesa dice «lo trae y
 
 **Propuesta (sin decidir):** si no lo puede mover ni un casillero, no hay golpe (como cuando pierde la fuerza: «no pasa nada») y la Mesa lo dice
 así; si lo mueve aunque sea uno y queda pegado, le pega. Alternativa: le pega igual (el gancho ya lo tiene agarrado).
+
+**✅ Decidido (dueño, 2026-10-30):** «tiene que haber un camino libre. Si hay cualquier obstáculo entre medio, no se puede tirar la habilidad, y
+si el obstáculo roza, ahí lo decide la mesa. Es como un proyectil.» El gancho usa la línea de tiro de los disparos (`vtt-hexgrid/js/78`,
+`arrastrarLinea`): tapada → «Elegir otro» sin gastar nada (salida a mano: «Ignorar obstáculo»); roza → «Pasa» / «No pasa». Con la línea libre
+siempre hay por dónde traerlo (salvo una trampa del camino, que lo frena ahí), así que el caso de la pregunta ya no se da.

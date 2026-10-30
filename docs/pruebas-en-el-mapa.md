@@ -324,12 +324,16 @@
   ✅ **Probado (2026-10-29, «Claude · pruebas», Mapa 1)**: Clementino lo consumió desde su Botonera (−1 No2): «elegí la casilla del portal», la espiral azul
   girando al lado suyo, la Mesa «Clementino abrió un Town portal» y el aviso en la Crónica; el GM llevó al Tunelero por encima: pulsos en el portal, el token
   desapareció del mapa, la Mesa «entró al Town portal y desapareció del mapa» y la Crónica (después se le repuso el token). **El portal quedó puesto** para que
-  lo vea el dueño. Falta: cancelar (Esc) sin que se gaste, dentro de combate, un personaje que lo pisa y la góndola de una tienda nueva.
+  lo vea el dueño. ✅ **Probado el 2026-10-30 (las dos cuentas, en combate)**: Clementino (jugador) lo consumió desde la Botonera y Esc lo canceló
+  («Cancelado»: siguió en el cinturón y sin gastar No2); otra vez, en combate: el portal al lado (−1 No2, Mesa y Crónica); juan caminó encima (los
+  ataques de oportunidad del Warrior y el Chamán, dejados pasar por el GM) → al jugador «juan pisó el Town portal. ¿Entra?» (Entrar / Quedarse) →
+  Entrar: desapareció del mapa, la Mesa y la Crónica lo dicen. Repuesto con «Traer tokens de jugadores» (el token nuevo de juan sale en el centro
+  de lo que se ve, no en su lugar). Falta: la góndola de una tienda nueva.
 - [x] **🧹 Las armas de los creeps después de la limpieza (2026-10-29, 761fcb2a)** — ✅ **probado el mismo día en el mapa** (las dos cuentas, con pestañas nuevas: las viejas estaban congeladas): las Acciones del Warrior (Hacha: Atacar 4 No2, Daño 1d8+12, Parry y Bloqueo con su peso), su ataque a juan («con Hacha · Tipo 8», «Rompe armadura 50 %»), su 🪪 desde el jugador («Hacha · Escudo · Chaleco»), la Botonera del Lobo de prueba de Clementino (Arco corto: 2 No2, 1d4+2, sin Parry) y GM Tools (los 21 creeps leen su arma; la Abeja curandera agregada de la biblioteca de fábrica trae el Aguijón dulce como ítem). Lo de antes: el motor ya no lee los campos viejos (armaNombre, armaTipo…). Revisado por
   datos: los 14 creeps visibles de «Claude · pruebas» leen bien su arma (Hacha, Arco corto, Bate de Baseball…; sin arma solo el Estandarte, el Tótem y el
-  Goblin de prueba, que no tienen). **Falta verlo en el mapa con capturas** (las dos ventanas de Chrome estaban minimizadas): un creep ataca con su arma
-  (el Warrior con la Hacha) y el duelo la nombra; una invocación ataca; el 🔍 Ver de un creep y la 🪪 muestran el arma; en GM Tools, el arma en la ficha del
-  creep y un creep de la biblioteca de fábrica agregado a la mesa.
+  Goblin de prueba, que no tienen). ✅ **Visto en el mapa con capturas (2026-10-30)**: el Warrior ataca a juan y el duelo dice «con Hacha · Tipo 8» y
+  «Rompe armadura 50 %» (cancelado antes de tirar); su 🪪 desde el jugador: «Equipo: Hacha · Escudo · Chaleco». **Falta** con capturas: una invocación
+  ataca; el 🔍 Ver de un creep; en GM Tools, el arma en la ficha del creep y un creep de la biblioteca de fábrica agregado a la mesa.
 
 > **🖥 Para probar con la cuenta del GM (2026-10-28, dueño: «si hay alguna prueba relevante desde el mapa con cuenta de GM que no podés porque está en
 > segundo plano, anotala acá»).** La ventana de Chrome del GM (rolpintoista) estaba minimizada: el lado del GM se manejó por código (sus botones, con
@@ -707,7 +711,9 @@
   pegado a Clementino se lo ve y a 2 casilleros por la espalda no (queda el «?»). Sin la pasiva, en combate y con el GM con 🎮 el control de
   Clementino: alejarlo y volver a acercarlo por la espalda → «Pasos a tu espalda… ¿Se da vuelta?» → «↻ Darse vuelta» giró a Clementino hacia él
   y la Crónica dijo «↻ Clementino oyó a Bosque (prueba) y se dio vuelta»; con Bosque pegado al frente, la Bruja llegando por atrás → «¡Flanqueado!».
-  Control devuelto y modo narrativo. **Falta**: verlo desde la cuenta de un jugador (la oferta le sale a su pantalla, la misma pieza).
+  Control devuelto y modo narrativo. ✅ **Desde la cuenta de un jugador (2026-10-30, Saulo-Prueba)**: en combate, el Tunelero se acercó por la
+  espalda de juan → a la pantalla del jugador le salió «👂 Pasos a tu espalda… ¿Se da vuelta?» → «↻ Darse vuelta»: juan giró hacia él y la Crónica
+  dijo «juan oyó a Tunelero (prueba) y se dio vuelta». (Un creep oculto o fuera del orden de turnos no cuenta: probado de paso.)
   Visto de paso (aparte): al cancelar el duelo «No cuenta», un creep que había atacado sin No2 suficientes (pagó 3 de 4) recibió de vuelta 4.
 - [x] **📜 «Detalles técnicos» aparte en el recuadro del duelo** (2026-10-15, Claude · pruebas): Flecha a la rodilla de «Bosque (prueba)» →
   el recuadro dice solo «Le apunta a las piernas.» y «▸ Detalles técnicos» despliega «⚙ Automatizado… ✋ A mano…». El «FLASH» con su globo
@@ -1135,6 +1141,11 @@
   las dos pantallas («¿Warrior (prueba) arrastra a juan?»), el GM Piedra, el jugador Tijera → «gana Warrior (prueba)» (¡Ganaste! / Perdiste) y siguió
   el golpe. El Tanque estaba en el medio: «No hay por dónde traerlo: queda donde está», y el golpe se abrió igual (pregunta P234). Cancelado («No
   cuenta»: devolvió 8 No2 y 2 SP); el Warrior volvió a Constitución 10 y Fuerza 12.
+  **🪝 El gancho como un proyectil (2026-10-30, P234 decidida)**: Warrior arriba, Tanque en el medio, juan a 2 → al apuntar, la línea roja «2 ·
+  tapado» sobre el Tanque; clic en juan → «🪝 Arrastrar: no hay línea libre» (Elegir otro / Ignorar obstáculo) → Elegir otro volvió a pedir el
+  objetivo. Con juan al costado (la línea «2 · roza») → «Arrastrar: la línea roza… Lo decide la mesa» (Pasa / No pasa) → Pasa: la Mesa en rojo
+  «tiró Arrastrar a juan con la línea rozando Tanque (lo decidió la mesa)» y siguió el enganche (3 contra 7: no lo enganchó; el aviso al jugador).
+  Restaurado (No2 y SP del Warrior, juan en su lugar).
 - [x] **🧭 Asistente de creeps, mejoras (2026-10-30)** — *probado (GM Tools, «Claude · pruebas», creep de prueba descartado)*: ✔ 8 pasos (nuevo «Pasivas y cinturón»); «Defensa y resistencias» muestra Defensa total y Defensa especial al momento (Casco: 0 → 2; con Poncho y Casco: 3 y 2); «Se sugieren hasta 5 habilidades» en nivel 4; el cinturón del paso nuevo suma sin botón de Usar; el Resumen con Defensa especial, defensas que se tiran, resistencias, «Habilidades (2)» con globo (Aguante) y cinturón; «Al morir suelta» con globos. Sin probar: el encuadre de la imagen al elegirla (falta una foto a mano) y las resistencias elementales del paso (se guardan con el mismo campo de la ficha).
 - [x] **✎ Ficha del lápiz: Guardar / Cancelar y cinturón (2026-10-30)** — *probado (GM Tools, Warrior (prueba))*: ✔ los dos botones flotan abajo a la derecha y, scrolleado hasta el fondo, no tapan nada; el cinturón con buscador («cristal» → las dos Pociones de Piel de Cristal) y categorías; sumar una; Cancelar → «Tenés cambios sin guardar. ¿Descartarlos?» → Sí → la poción se fue y la ficha se cerró.
 - [x] **🧪 Cinturón con filtros en las Acciones del creep del mapa (2026-10-30)** — ✅ probado el mismo día (GM, Warrior (prueba)): el panel abre con el foco en el buscador (las teclas no van al mapa), «vendas» filtra, «＋» suma, el panel sigue abierto con lo buscado; sacada con ✕. — la misma pieza común (`comun/creep-botonera.js`), probada en la ficha del lápiz; falta verla adentro del mapa (no se probó para no pisar las pruebas del dueño en «Claude · pruebas»).

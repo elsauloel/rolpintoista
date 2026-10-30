@@ -252,7 +252,8 @@ function acAccionAca(b){
     return true;
   }
   if(d.modosp){   // 💧 ⇄ cooldown / SP (2026-10-20): al pasar a SP, arranca lleno
-    acCambiar(c => { c.modoSP = !c.modoSP; if(c.modoSP) c.sp = CreepCalculo.spMax(c); }).then(() => { const s2 = creepPrivadoDe(ac.creepId); toast(s2 && s2.modoSP ? `💧 ${s2.nombre}: sus habilidades pagan con SP (sin cooldown)` : `⏱ ${(s2 || {}).nombre || 'El creep'}: sus habilidades vuelven a usar cooldown`); });
+    // (el aviso dice el modo que quedó en la transacción: el creep en memoria todavía no se enteró y lo decía al revés, 2026-10-29)
+    acCambiar(c => { c.modoSP = !c.modoSP; if(c.modoSP) c.sp = CreepCalculo.spMax(c); return {modoSP: c.modoSP, nombre: c.nombre || 'El creep'}; }).then(r => { if(r) toast(r.modoSP ? `💧 ${r.nombre}: sus habilidades pagan con SP (sin cooldown)` : `⏱ ${r.nombre}: sus habilidades vuelven a usar cooldown`); });
     return true;
   }
   if(d.cdmod){

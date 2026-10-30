@@ -2610,6 +2610,7 @@ const Duelo = (() => {
     }
     else if(desarmando) cierre = `<div class="duelo-veredicto bloqueado"><div class="grande">🤺 …</div><div class="chico">Mirá el mapa: ${_esc(d.ataque.desarme.quien || '')} desarma, el arma sale volando</div></div>`;
     else if(d.estado === 'empate' && d.empate) cierre = empateHtml(d, nuevaClave('empate' + d.empate.par));
+    else if(d.estado === 'cancelado' && d.resultado === 'a-mano') cierre = `<div class="duelo-veredicto mitad"><div class="grande">✋ Terminado a mano</div><div class="chico">Lo que faltaba se resuelve con tiradas a mano en la Mesa</div></div>`;
     else if(d.resultado && (d.estado === 'resuelto' || d.fase === 'dano' || d.fase === 'efectos')) cierre = veredictoHtml(d, nuevaClave('resultado'));
     else if(d.estado === 'cancelado') cierre = `<div class="duelo-veredicto fallo"><div class="chico">${d.hab ? 'Cancelado' : 'Duelo cancelado'}</div></div>`;
     // Fin: cuando ya no queda ninguna reacción, un cartel claro y un botón para cerrarlo. «Duelo» es solo para el
@@ -2619,7 +2620,7 @@ const Duelo = (() => {
     if(d.estado === 'resuelto' && !desarmando) revelado[d.id + ':fin'] = true;
     const finHtml = d.estado === 'resuelto' && !desarmando
       ? `<div class="duelo-fin${nuevoFin ? ' nuevo' : ''}"><div class="grande">🏁 ${d.hab ? 'LISTO' : 'FIN DEL DUELO'}</div><div class="chico">Ya no queda ninguna reacción por resolver.</div><button type="button" data-fin-duelo>${d.hab ? 'Listo, cerrar' : 'Terminar duelo'}</button></div>`
-      : d.estado === 'cancelado' ? `<div class="duelo-fin"><div class="grande">🏁 ${d.hab ? 'CANCELADO' : 'DUELO CANCELADO'}</div><button type="button" data-fin-duelo>${d.hab ? 'Cerrar' : 'Terminar duelo'}</button></div>` : '';
+      : d.estado === 'cancelado' ? `<div class="duelo-fin"><div class="grande">🏁 ${d.resultado === 'a-mano' ? 'TERMINADO A MANO' : d.hab ? 'CANCELADO' : 'DUELO CANCELADO'}</div><button type="button" data-fin-duelo>${d.hab ? 'Cerrar' : 'Terminar duelo'}</button></div>` : '';
     const puedoCancelar = abierto(d) && (soyGM() || d.creadoPor === yo());
     const min = f.classList.contains('min');
     const cajaAntes = f.querySelector('.duelo-caja'), scrollAntes = cajaAntes ? cajaAntes.scrollTop : 0;   // al redibujar no se pierde dónde estaba
@@ -2648,6 +2649,7 @@ const Duelo = (() => {
         ${cierre}
         ${finHtml}
         <div class="duelo-pie">
+          ${puedoCancelar ? `<button type="button" class="sec" data-amanoduelo title="Corta ${d.hab ? 'la ejecución' : 'el duelo'} donde está: lo que falta se resuelve con tiradas a mano en la Mesa">✋ Terminar a mano</button>` : ''}
           ${puedoCancelar ? `<button type="button" class="sec" data-cancelarduelo>Cancelar${d.hab ? '' : ' duelo'}</button>` : ''}
           <button type="button" class="sec" data-min2>Minimizar</button>
           ${enCurso(d) ? '' : '<button type="button" class="sec" data-x2>Cerrar</button>'}
@@ -2689,6 +2691,8 @@ const Duelo = (() => {
     if(bx2) bx2.onclick = cerrarOMinimizar;
     const bc = f.querySelector('[data-cancelarduelo]');
     if(bc) bc.onclick = () => cancelarDuelo(d);
+    const bm = f.querySelector('[data-amanoduelo]');
+    if(bm) bm.onclick = () => terminarAMano(d);
     // Un duelo cancelado se cierra solo en todas las pantallas (2026-10-13, dueño: quedaban abiertos «Duelo cancelado» en los mapas de los demás
     // esperando un «Terminar duelo»): se ve 4 segundos y se va. Si en el medio se abrió otro duelo, no lo toca.
     if(d.estado === 'cancelado' && f.dataset.autocierre !== d.id){
@@ -3119,6 +3123,18 @@ const Duelo = (() => {
      siguiente vez le cobraba los No2 de un segundo ataque»): si el ataque ya se pagó, pregunta si cuenta y explica que es para los No2. Si no
      cuenta, el duelo queda con `resultado: 'devolver'` y la pantalla que maneja al atacante le devuelve los No2 y descuenta el ataque
      (`devolverSiToca`, con el gancho `devolverAtaque` de FichaDuelo, CreepDuelo e InvDuelo); queda `resultado: 'devuelto'`. */
+  /* ✋ Terminar a mano (dueño, 2026-10-29: «interrumpe el duelo hasta ahí y te permite terminar de resolverlo con tiradas manuales»): corta el duelo donde
+     está (queda cancelado, con `resultado: 'a-mano'`, y se cierra en todas las pantallas) y el resto se resuelve con la Mesa. No devuelve nada: lo pagado
+     y lo aplicado quedan como están. */
+  async function terminarAMano(d){
+    const txt = `Esto interrumpe ${d.hab ? 'la ejecución' : 'el duelo'} hasta acá: lo que falta lo terminan de resolver con tiradas a mano en la Mesa. Lo que ya se pagó o se aplicó queda como está.`;
+    const ok = typeof Confirmar !== 'undefined' && Confirmar.preguntar ? await Confirmar.preguntar(txt, {titulo: 'Terminar a mano', icono: '✋', si: 'Aceptar', no: 'Cancelar'}) : confirm(txt);
+    if(!ok) return;
+    try{ await col().doc(d.id).update({estado: 'cancelado', resultado: 'a-mano'}); }
+    catch(err){ console.error('No se pudo terminar el duelo a mano:', err); _toast('No se pudo terminar a mano'); return; }
+    const que = d.hab ? (d.hab.nombre || 'la habilidad') : 'el duelo';
+    if(typeof mesaLinea === 'function') mesaLinea(`✋ ${(d.atacante && d.atacante.nombre) || '¿?'} → ${(d.defensor && d.defensor.nombre) || '¿?'}: ${que} se terminó a mano; lo que falta se resuelve con la Mesa`, 'recordatorio');
+  }
   async function cancelarDuelo(d){
     const a = d.ataque || {}, especial = a.tipo === 'oportunidad' || a.tipo === 'contra';
     const pagado = !d.hab && a.tipo && a.tipo !== 'habilidad-arma' && d.pdg;

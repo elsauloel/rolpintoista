@@ -1179,3 +1179,9 @@
   mismo); con el cartel «¿Publicar los despojos?» abierto, tampoco; al tocar «Sí», recién ahí «El GM terminó el combate» (lo de fin de combate de cada uno)
   y el botín del jugador. Después: «Despojar lo que nadie tomó» → «Cómo quedó el grupo» se abrió solo y al jugador le llegó el Anuncio «🎁 Botín
   concluido». (Clementino y juan de prueba quedaron con +20 XP, +5 DDE y +15 despojos.)
+- [x] **✎ Ficha del lápiz: más ancha, Guardar/Cancelar adentro y los totales (2026-10-30, dueño)** — ✅ probado el mismo día (GM Tools, Warrior (prueba)):
+  la ventana a 880 px; «Cancelar» y «✔ Guardar» en la esquina de abajo a la derecha de la ventana (al final, sin tapar las notas); «Defensa +4» con el
+  total 4 (escribir 6 guardó base 2; Cancelar → «¿Descartarlos?» → volvió a 0); «Defensa especial» en vez de «Armad. mágica»; las resistencias
+  elementales y a crítico, igual. Arreglado el globo de la Defensa especial (restaba dos veces lo de los ítems). **🖼 La imagen completa**: Cancelar ·
+  Elegir otra imagen · Encuadrar · ✔ Guardar; encuadrar vuelve a la ventana y Cancelar repone el encuadre de antes (probado con una imagen de prueba,
+  después sacada). Falta «Elegir otra imagen» con una foto real (abre el selector de archivos).

@@ -10,7 +10,7 @@
 // No anima ni avisa lo que ya estaba al cargar el mapa.
 
 const ESTOICO_POR = 2;
-const ESTOICO_MS = 1700;
+const ESTOICO_MS = 2300;
 
 function estoicoRivales(t){
   if(!t || t.col === undefined || t.fila === undefined) return [];
@@ -97,9 +97,9 @@ function estoicoDibujar(id, x, y, rad, z){
   vivos.forEach((a, i) => {
     const f = (ahora - a.inicio) / ESTOICO_MS, sube = a.delta > 0;
     const alfa = f < 0.15 ? f / 0.15 : f > 0.7 ? (1 - f) / 0.3 : 1;
-    const yy = sube ? y - rad * (0.1 + 1.3 * f) : y - rad * 0.5 + rad * 1.3 * f;
+    const yy = sube ? y - rad * (0.2 + 1.5 * f) : y - rad * 1.4 + rad * 1.7 * f;   // el +N sube desde el token; el −N baja desde arriba
     const xx = x + (i % 2 ? rad * 0.35 : 0);
-    const tam = Math.max(13 / z, rad * 0.5);
+    const tam = Math.max(16 / z, rad * 0.75);
     const txt = `${sube ? '+' : '−'}${Math.abs(a.delta)}`;
     ctx.globalAlpha = Math.max(0, alfa);
     ctx.font = `800 ${tam}px system-ui, sans-serif`;

@@ -638,10 +638,12 @@ function hudHpPrevia(t, d, texto){
     if(rc.invulnerable) return 'Invulnerable: no recibe daño';
     return `${fmt(golpe)} × ${hpCritMult} = ${fmt(total)} (ignora la Defensa)${previaAbs(rc)} → HP ${fmt(hp)} → ${fmt(Math.max(0, hp - rc.recibido))}`;
   }
-  const r = resolverGolpe(golpe, num(d.def), estadosPrevia(t, d));
+  const est = estoicoDe(estadosPrevia(t, d), estoicoRivales(t).length);   // 🗿 Estoicismo (js/85): lo que suman los enemigos pegados
+  const def = num(d.def) + (est ? est.val : 0);
+  const r = resolverGolpe(golpe, def, estadosPrevia(t, d));
   if(r.invulnerable) return 'Invulnerable: no recibe daño';
   const nuevo = Math.max(0, hp - r.recibido);
-  return `${fmt(golpe)} − Def ${fmt(num(d.def))} = ${fmt(Math.max(0, golpe - num(d.def)))}${previaAbs(r)} → HP ${fmt(hp)} → ${fmt(nuevo)}`;
+  return `${fmt(golpe)} − Def ${fmt(def)}${est ? ` (${fmt(num(d.def))} + ${est.val} de Estoicismo)` : ''} = ${fmt(Math.max(0, golpe - def))}${previaAbs(r)} → HP ${fmt(hp)} → ${fmt(nuevo)}`;
 }
 
 /* ---------- Rayo en cadena (2026-09-25, regla del dueño, P118) ----------

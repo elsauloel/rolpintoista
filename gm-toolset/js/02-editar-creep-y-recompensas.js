@@ -193,9 +193,7 @@ function recompensasHtml(sc, o){
         <button type="button" class="addhab" data-oro-sugerido="${sc.id}" style="margin:0">Usar el sugerido (${fmt(sug)})</button>
       </div>
     </div>
-    <div class="mini-f" style="margin-top:8px">
-      <label style="display:flex;gap:6px;align-items:center;font-size:12.5px;text-transform:none;letter-spacing:0"><input type="checkbox" data-rec="armaNatural" data-id="${sc.id}"${Combatiente.armaEnMano(sc).natural ? ' checked' : ''}> El arma es parte del cuerpo (arma natural) ${ayudaQ(AYUDA_NATURAL)}</label>
-    </div>
+    ${''/* (El «arma natural» se marca con el 🐾 de cada pieza del equipo: dueño, 2026-10-30, «ya no es necesaria».) */}
     <div class="mini-f" style="margin-top:8px"><label>Trofeo especial (opcional) ${ayudaQ(AYUDA_TROFEO)}</label>
       <div style="display:flex;gap:6px">
         <input type="text" data-rec="trofeoNombre" data-id="${sc.id}" value="${esc(esp.nombre || '')}" placeholder="Nombre (vacío = automático)" maxlength="60" style="flex:1">

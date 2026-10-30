@@ -57,6 +57,24 @@ function muertoBadgeHtml(sc){
 function formulasCombateCreep(sc){ return CreepBotonera.formulasCombate(sc); }   // comun/creep-botonera.js
 
 function cardHtml(sc){
+  // Una pieza del equipo (en las manos, puesta o guardada) con sus botones.
+  const equipoFila = (it, guardado) => `
+            <div class="equipo-item"${guardado ? ' style="opacity:.75"' : ''}>
+              <div class="equipo-item-info">
+                <div class="equipo-item-top">
+                  <span class="equipado-nombre">${esc(it.nombre)}</span>
+                  ${/^arma_/.test(String(it.tipoItem || '')) && !it.especial ? `<span class="valor-caja" title="Tipo del arma"><small>TIPO</small>${fmt(num(it.tipoDado))}</span>`
+                    : `<span class="valor-caja" title="Defensa que otorga"><small>DEF</small>+${fmt(Combatiente.defDeItem(it))}</span>`}
+                  ${guardado ? `<button class="rm" data-ponerpieza="${sc.id}:${it.id}" title="Ponérsela (lo que no entre en la mano o en su lugar se guarda)">✋</button>`
+                    : it.natural ? '' : `<button class="rm" data-guardarpieza="${sc.id}:${it.id}" title="Guardarla (la lleva encima pero no da bonos)">🎒</button>`}
+                  <button class="rm" data-naturalequipo="${sc.id}:${it.id}" title="${it.natural ? 'Natural (parte del cuerpo): no se suelta al morir · tocá para que sea una pieza que se suelta' : 'Tocá para marcarla natural (piel, caparazón…): da sus bonos pero no se suelta al morir'}" style="${it.natural ? 'color:#8EE6A8;border-color:#8EE6A8' : 'opacity:.55'}">🐾</button>
+                  <button class="rm" data-verequipocreep="${sc.id}:${it.id}" title="Ver la pieza (y editarla y subirla al catálogo)">👁</button>
+                  <button class="rm" data-quitarequipo="${sc.id}:${it.id}" title="Quitar">×</button>
+                </div>
+                <div class="equipo-item-meta">${esc(TIPOITEM_LABEL_GM[it.tipoItem] || ({arma_1m: 'Arma de 1 mano', arma_2m: 'Arma de 2 manos'})[it.tipoItem] || it.tipoItem)}${it.natural ? ' · 🐾 natural: no se suelta' : ''}</div>
+                ${it.detalle ? `<div class="arma-detalle">${esc(it.detalle)}</div>` : ''}
+              </div>
+            </div>`;
   return `
   <div class="card${num(sc.hp)<=0?' card-muerto':''}" style="--accent:${sc.color}" data-id="${sc.id}">
     <div class="chead">
@@ -120,8 +138,9 @@ function cardHtml(sc){
 
       <div class="editar-separador"><span>Equipados</span></div>
 
+      ${((g, usadasMano, usadasCuerpo) => `
       <div>
-        <div class="sect-label">Arma</div>
+        <div class="sect-label">Manos <span class="cupo-equipo${usadasMano > 2 ? ' pasado' : ''}" title="Cuántas manos ocupa lo que tiene en la mano (lo de dos manos cuenta 2; lo natural, nada)">${usadasMano}/2</span></div>
         <div class="arma-compacta" style="margin-top:4px">
           <div class="arma-compacta-top">
             <span class="equipado-nombre">${Combatiente.armaEnMano(sc).nombre ? esc(Combatiente.armaEnMano(sc).nombre) : `<span class="hint">${Combatiente.armaEnMano(sc).sinArma ? '✋ Sin arma (nada en la mano)' : 'Sin nombre'}</span>`}</span>
@@ -134,31 +153,16 @@ function cardHtml(sc){
           <div class="arma-detalle">${Combatiente.armaEnMano(sc).detalle ? esc(Combatiente.armaEnMano(sc).detalle) : 'Sin efecto.'}</div>
           ${Combatiente.armaEnMano(sc).efectosGolpe.length ? `<div class="arma-detalle"><b>Al golpear:</b> ${esc(EfectosGolpe.resumenLista(Combatiente.armaEnMano(sc).efectosGolpe))}</div>` : ''}
         </div>
+        ${g.manos.length ? `<div class="equipo-list" style="margin-top:6px">${g.manos.map(it => equipoFila(it, false)).join('')}</div>` : ''}
       </div>
-
-      ${(g => [['En las manos', g.manos, ''], ['Puesto', g.puesto, 'Sin armadura.'], ['Guardado', g.guardado, '']].filter(([, l, vacio]) => l.length || vacio).map(([titulo, lista, vacio]) => `
       <div>
-        <div class="sect-label">${titulo}${titulo === 'Guardado' ? ' <span class="hint" style="text-transform:none">· lo lleva encima: no da bonos ni para; se suelta al morir</span>' : ''}</div>
-        <div class="equipo-list" style="margin-top:4px">
-          ${lista.length ? lista.map(it => `
-            <div class="equipo-item"${titulo === 'Guardado' ? ' style="opacity:.75"' : ''}>
-              <div class="equipo-item-info">
-                <div class="equipo-item-top">
-                  <span class="equipado-nombre">${esc(it.nombre)}</span>
-                  ${/^arma_/.test(String(it.tipoItem || '')) && !it.especial ? `<span class="valor-caja" title="Tipo del arma"><small>TIPO</small>${fmt(num(it.tipoDado))}</span>`
-                    : `<span class="valor-caja" title="Defensa que otorga"><small>DEF</small>+${fmt(Combatiente.defDeItem(it))}</span>`}
-                  ${titulo === 'Guardado' ? `<button class="rm" data-ponerpieza="${sc.id}:${it.id}" title="Ponérsela (lo que no entre en la mano o en su lugar se guarda)">✋</button>`
-                    : it.natural ? '' : `<button class="rm" data-guardarpieza="${sc.id}:${it.id}" title="Guardarla (la lleva encima pero no da bonos)">🎒</button>`}
-                  <button class="rm" data-naturalequipo="${sc.id}:${it.id}" title="${it.natural ? 'Natural (parte del cuerpo): no se suelta al morir · tocá para que sea una pieza que se suelta' : 'Tocá para marcarla natural (piel, caparazón…): da sus bonos pero no se suelta al morir'}" style="${it.natural ? 'color:#8EE6A8;border-color:#8EE6A8' : 'opacity:.55'}">🐾</button>
-                  <button class="rm" data-verequipocreep="${sc.id}:${it.id}" title="Ver la pieza (y editarla y subirla al catálogo)">👁</button>
-                  <button class="rm" data-quitarequipo="${sc.id}:${it.id}" title="Quitar">×</button>
-                </div>
-                <div class="equipo-item-meta">${esc(TIPOITEM_LABEL_GM[it.tipoItem] || ({arma_1m: 'Arma de 1 mano', arma_2m: 'Arma de 2 manos'})[it.tipoItem] || it.tipoItem)}${it.natural ? ' · 🐾 natural: no se suelta' : ''}</div>
-                ${it.detalle ? `<div class="arma-detalle">${esc(it.detalle)}</div>` : ''}
-              </div>
-            </div>`).join('') : `<div class="hint">${vacio}</div>`}
-        </div>
-      </div>`).join(''))(Combatiente.gruposDeEquipo(sc))}
+        <div class="sect-label">Cuerpo <span class="cupo-equipo${usadasCuerpo > CUPO_CUERPO_CREEP ? ' pasado' : ''}" title="Los lugares del cuerpo de un personaje: cabeza, armadura blanda, armadura rígida, guantes, piernas, pies y dos anillos">${usadasCuerpo}/${CUPO_CUERPO_CREEP}</span></div>
+        <div class="equipo-list" style="margin-top:4px">${g.puesto.length ? g.puesto.map(it => equipoFila(it, false)).join('') : '<div class="hint">Sin armadura.</div>'}</div>
+      </div>
+      ${g.guardado.length ? `<div>
+        <div class="sect-label">Guardado <span class="hint" style="text-transform:none">· lo lleva encima: no da bonos ni para; se suelta al morir</span></div>
+        <div class="equipo-list" style="margin-top:4px">${g.guardado.map(it => equipoFila(it, true)).join('')}</div>
+      </div>` : ''}`)(Combatiente.gruposDeEquipo(sc), manosOcupadasCreep(sc), Combatiente.gruposDeEquipo(sc).puesto.length)}
       <div>
         <button type="button" class="addhab" data-equipardelfabricante="${sc.id}" style="margin-top:6px">⚔ Equipar del fabricante</button>
       </div>
@@ -512,4 +516,14 @@ function encuadrarMiniaturas(raiz){
     };
     if(im.complete && im.naturalWidth) ubicar(); else im.onload = ubicar;
   });
+}
+
+/* ✋ Manos y 🛡 Cuerpo, con lo que ocupan (dueño, 2026-10-30: «que esté separado en dos: manos y cuerpo, y que al lado de manos diga 1/2 o 2/2… lo mismo
+   en el cuerpo»): las manos ocupadas (el arma y lo que va en la mano; lo de dos manos cuenta 2, lo natural nada) y lo puesto contra los lugares del
+   cuerpo de un personaje (cabeza, armadura blanda, armadura rígida, guantes, piernas, pies y dos anillos: comun/ficha-equipo.js SLOT_DEFS). */
+const CUPO_CUERPO_CREEP = 8;
+function manosOcupadasCreep(sc){
+  const g = Combatiente.gruposDeEquipo(sc), a = Combatiente.armaPrincipal(sc);
+  const ocupa = it => !it || it.natural === true || it.equipado === false ? 0 : /_2m$/.test(String(it.tipoItem || '')) ? 2 : 1;
+  return ocupa(a) + g.manos.reduce((s, it) => s + ocupa(it), 0);
 }

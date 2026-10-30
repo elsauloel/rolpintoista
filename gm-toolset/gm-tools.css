@@ -489,6 +489,8 @@ input[type=file]{display:none}
 .imgwrap.con-encuadre{display:flex;gap:14px;align-items:flex-end}
 .imgpick.encuadrada{width:150px;height:150px;flex:none;position:relative;display:block}
 .imgpick.encuadrada img{object-fit:fill}
+.cupo-equipo{margin-left:6px;padding:1px 7px;border:1px solid var(--line);border-radius:999px;font-size:11px;color:var(--brass);letter-spacing:0}
+.cupo-equipo.pasado{color:var(--danger);border-color:var(--danger)}
 .imgwrap-lado{display:flex;flex-direction:column;gap:8px;align-items:flex-start;max-width:340px}
 .imgempty{display:flex;flex-direction:column;align-items:center;gap:3px;font-family:"Fraunces",serif;font-size:18px;color:var(--muted)}
 .imgempty small{font-family:"Space Mono",monospace;font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}

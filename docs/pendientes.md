@@ -54,6 +54,15 @@
 >   yo voy a la compu y veo cómo se resuelve»).** En «Claude · pruebas» quedó abierto un duelo **Warrior (prueba) contra juan**, en «⚖ ¡EMPATE!» (10 a
 >   10, forzado a mano): cada lado ve Par / Impar / ✊ Piedra, papel o tijera; el primero que elige decide el método. Con piedra, papel o tijera se abre
 >   el juego para el GM (cuenta de Claude, el Warrior) y para Saulo-Prueba (juan). Mirarlo con las dos cuentas.
+> - [ ] **🔑 Cuenta de Claude con mail y contraseña, para trabajar con la compu apagada (2026-10-31, dueño: «anotalo como pendiente en la compu»).**
+>   Desde la nube Claude programa y publica, pero no entra a las partidas: la cuenta con la que prueba vive en el Chrome de la compu (Firebase
+>   pide una cuenta con el mail confirmado y miembro de la partida; la red de la nube ya llega a Firebase y al sitio, revisado). Pasos, una vez y
+>   guiado de a uno: (1) crear en el sitio una cuenta con **mail y contraseña** (el sitio ya lo permite; un mail suyo con `+claude` antes de la @,
+>   así la confirmación le llega a él); (2) sumarla a «Claude · pruebas» (como GM, para probar creeps) y a «El origen de las especies»;
+>   (3) guardar el mail y la contraseña en la configuración del entorno de la nube (menú del entorno en el título de la sesión → Editar →
+>   «Network secrets» / «API credentials») como `ROL_EMAIL` y `ROL_CLAVE` — **nunca por el chat ni en el repo** (es público). Con eso, desde la
+>   nube: leer las partidas (ej. confirmar que Ricardo tiene Prisa) y abrir el mapa en un navegador sin pantalla con capturas (cubre buena parte
+>   del «☁🧪» de abajo). Regla propuesta: en las partidas reales solo mirar salvo pedido; las pruebas, en «Claude · pruebas».
 > - [ ] **⚔ Cargar a mano el Goblin rompehuesos (2026-10-30, dueño: «cuando esté en la compu te voy a decir "pasame al Goblin Rompehuesos" y lo voy a
 >   cargar a mano, así pruebo la experiencia de crear un creep»).** Cuando lo pida, pasarle la ficha completa de `docs/origen-goblins-cultistas.md`
 >   (sección del choque pesado warrior): Poncho de espejitos de torso; la quinta habilidad la elige él. No crearlo.

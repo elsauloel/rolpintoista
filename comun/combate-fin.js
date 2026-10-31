@@ -50,7 +50,10 @@ const CombateFin = (() => {
   function puntosEquipo(sc){
     const puestas = (typeof Combatiente !== 'undefined' && Combatiente.equipoPuesto ? Combatiente.equipoPuesto(sc) : (sc.equipo || []).filter(it => it && it.equipado !== false))
       .filter(it => String(it.nombre || '').trim());   // (una pieza sin nombre es el lugar vacío del arma, no equipo)
-    let pts = puestas.reduce((a, it) => a + (PUNTOS_TIER[it.tier] || 1), 0);
+    // Una pieza sin calidad guardada (las de muchos creeps solo traen el nombre) toma la del ítem del catálogo con ese nombre.
+    const cat = typeof CATALOGO_BASE !== 'undefined' && Array.isArray(CATALOGO_BASE) ? CATALOGO_BASE : [];
+    const tierDe = it => it.tier || ((cat.find(c => c && c.nombre === it.nombre) || {}).tier);
+    let pts = puestas.reduce((a, it) => a + (PUNTOS_TIER[tierDe(it)] || 1), 0);
     // Un creep viejo con el arma suelta (sin pieza en el equipo): cuenta como una Común.
     if(!puestas.some(it => /^arma_/.test(String(it.tipoItem || ''))) && String(sc.armaNombre || '').trim()) pts += 1;
     return pts;

@@ -106,6 +106,8 @@
   entrar por `index.html` con `#in-email`/`#in-clave`, abrir el mapa con `?partida=`, apretar los botones de verdad y sacar capturas). Para probar
   antes de subir, servir la carpeta en `localhost` (`python3 -m http.server`): Firebase acepta `localhost`. La cuenta GM es GM en «Claude ·
   pruebas» y jugador en El origen (ahí no puede editar fichas ajenas). Las pruebas que igual no se puedan hacer, a `docs/pruebas-en-el-mapa.md`.
+- **Pantalla de las pruebas y capturas** (2026-10-31, dueño: «el programa está pensado para la computadora: las capturas y las pruebas tienen que
+  ser en una resolución horizontal de pantalla promedio»): el navegador sin pantalla va a **1920 × 1080** (Playwright: `viewport`), nunca tamaño celular.
 - **Pruebas automáticas**: necesitan un navegador; si la máquina no tiene uno, decirlo y anotarlo, no darlas por buenas.
 - **Seguramente está en el celular**: nada de tablas, mensajes cortos.
 - **En la compu**: Claude usa «Claude in Chrome» con dos perfiles (uno es GM en «Claude · pruebas» y jugador en El origen; el otro es GM en El

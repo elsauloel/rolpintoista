@@ -761,6 +761,7 @@ const Duelo = (() => {
       ...(_num(h.dano.mult) > 1 ? {mult: Math.min(4, _num(h.dano.mult))} : {}), ...(h.dano.carga ? {carga: txtCorto(h.dano.carga, 20)} : {}),   // ✨ Carga Elemental (2026-10-13)
       ...(h.dano.porDano && typeof Combatiente !== 'undefined' && Combatiente.porDanoNorm(h.dano.porDano) ? {porDano: Combatiente.porDanoNorm(h.dano.porDano)} : {}),
       ...(_num(h.dano.identidadTurnos) > 0 ? {identidadTurnos: Math.min(9, Math.round(_num(h.dano.identidadTurnos)))} : {}),   // 🌑 la Carga siniestra (2026-10-31)
+      ...(_num(h.dano.luzSanadora) > 0 ? {luzSanadora: Math.min(100, Math.round(_num(h.dano.luzSanadora)))} : {}),   // ☀ Luz sanadora (2026-10-31)
       ...(h.dano.extra && String(h.dano.extra.formula || '').trim() ? {extra: {formula: txtCorto(h.dano.extra.formula, 20), tipo: txtCorto(h.dano.extra.tipo || 'fuego', 20)}} : {}),   // ☄ un segundo daño de otro tipo (el Meteoro, 2026-10-24: 4d6 físico + 2d6 de fuego)
       ...(_num(h.dano.perfora) > 0 ? {perfora: Math.min(5, Math.round(_num(h.dano.perfora)))} : {}),   // 🗡 la Perfora del arma (2026-10-27)
       ...(h.dano.diferencia ? {diferencia: true} : {}), ...(h.dano.drena ? {drena: true, drenaTope: Math.max(0, Math.round(_num(h.dano.drenaTope))), ...(_num(h.dano.drenaPct) > 0 && _num(h.dano.drenaPct) < 100 ? {drenaPct: Math.round(_num(h.dano.drenaPct))} : {})} : {})} : null;
@@ -1334,13 +1335,14 @@ const Duelo = (() => {
           const tiros = magicos.map(e => ({e, r: tirarDados(e.dado)})).filter(x => x.r);
           if(tiros.length) m.dano.magico = {tipo: tiros.map(x => String(x.e.nombre || 'mágico').slice(0, 20)).join(' y '), total: tiros.reduce((a, x) => a + Math.max(0, Math.round(_num(x.r.total))), 0),
             formula: tiros.map(x => x.r.formula).join(' + ').slice(0, 60), rolls: tiros.flatMap(x => x.r.rolls || []).slice(0, 12).map(_num)};
-          const ex = magicos.find(e => _num(e.mult) > 1 || (e.porDano && e.porDano.estado) || e.cadena || _num(e.identidadTurnos) > 0);   // 🔥 lo de su elemento (Arma elemental, 2026-10-21)
+          const ex = magicos.find(e => _num(e.mult) > 1 || (e.porDano && e.porDano.estado) || e.cadena || _num(e.identidadTurnos) > 0 || _num(e.luzSanadora) > 0);   // 🔥 lo de su elemento (Arma elemental, 2026-10-21)
           if(ex){
             if(_num(ex.mult) > 1) m.dano.magico.mult = Math.min(3, _num(ex.mult));
             if(ex.porDano && ex.porDano.estado) m.dano.magico.porDano = (typeof Combatiente !== 'undefined' && Combatiente.porDanoNorm && Combatiente.porDanoNorm(ex.porDano))
               || {estado: String(ex.porDano.estado).slice(0, 40), cada: Math.max(1, Math.round(_num(ex.porDano.cada)) || 1), ...(ex.porDano.mas1 ? {mas1: true} : {})};   // con su mínimo, tope y turnos (2026-10-31)
             if(ex.cadena) m.dano.magico.cadena = true;
             if(_num(ex.identidadTurnos) > 0) m.dano.magico.identidadTurnos = Math.min(9, Math.round(_num(ex.identidadTurnos)));   // 🌑 Arma siniestra: Herida sombría 2 turnos
+            if(_num(ex.luzSanadora) > 0) m.dano.magico.luzSanadora = Math.min(100, Math.round(_num(ex.luzSanadora)));   // ☀ Arma luminosa: Luz sanadora (2026-10-31)
           }
           crudos = crudos.filter(e => !(e && e.danoMagico));
         }
@@ -1399,6 +1401,7 @@ const Duelo = (() => {
     }
     if(dn && dn.magico) L.push(`${magTitulo(dn.magico.tipo)}: ${dn.magico.total}${magMult(dn.magico)} (${dn.magico.formula}; ignora la Defensa, sin multiplicar${dn.magico.resEl ? `; − ${dn.magico.resEl}` : ''})${dn.magico.recibido !== undefined ? ` → recibió ${dn.magico.recibido}` : ''}${dn.magico.hpDespues !== undefined ? ` (${dn.magico.hpAntes} → ${dn.magico.hpDespues} HP)` : ''}`);
     if(dn && dn.porDano) L.push(`${dn.porDano.estado} ×${dn.porDano.stacks} (por ${dn.porDano.entro} de daño)${dn.porDano.manual ? ' (a mano)' : ''}`);
+    if(dn && dn.luzSanadora) L.push(`☀ Luz sanadora (${_num(dn.luzSanadora.pct)} %): ${dn.luzSanadora.quien || d.atacante.nombre} se cura ${dn.luzSanadora.monto}${dn.luzSanadora.manual ? ` (a mano${dn.luzSanadora.motivo ? ': ' + dn.luzSanadora.motivo : ''})` : dn.luzSanadora.hpAntes !== undefined && dn.luzSanadora.hpAntes !== null ? ` (${dn.luzSanadora.hpAntes} → ${dn.luzSanadora.hpDespues} HP)` : ''}`);
     if(dn && dn.drena) L.push(`Drena: ${dn.drena.quien || d.atacante.nombre} se cura ${dn.drena.monto}${dn.drena.manual ? ` (a mano${dn.drena.motivo ? ': ' + dn.drena.motivo : ''})` : `${dn.drena.hpAntes !== undefined && dn.drena.hpAntes !== null ? ` (${dn.drena.hpAntes} → ${dn.drena.hpDespues} HP)` : ''}${_num(dn.drena.excedente) ? ` · Vida extra ${dn.drena.excedente}` : ''}${dn.drena.nota ? ' · ' + dn.drena.nota : ''}`}`);
     if(dn && dn.espinas) L.push(`Espinas: ${dn.espinas.quien || d.atacante.nombre} recibe ${dn.espinas.monto} de daño devuelto${dn.espinas.manual ? ' (a mano)' : dn.espinas.hpAntes !== undefined && dn.espinas.hpAntes !== null ? ` (${dn.espinas.hpAntes} → ${dn.espinas.hpDespues} HP)` : ''}`);
     if(dn && dn.espejo) L.push(`Espejo: ${dn.espejo.quien || d.atacante.nombre} recibe ${dn.espejo.monto} de daño especial devuelto${dn.espejo.manual ? ' (a mano)' : dn.espejo.hpAntes !== undefined && dn.espejo.hpAntes !== null ? ` (${dn.espejo.hpAntes} → ${dn.espejo.hpDespues} HP)` : ''}`);
@@ -2479,10 +2482,11 @@ const Duelo = (() => {
           : `<div class="duelo-mini">${_esc(d.defensor.nombre)}: <b>${_fmt(dn.hpAntes)}</b> → <b>${_fmt(dn.hpDespues)}</b> HP${_num(dn.absorbido) ? ` · el escudo absorbió ${_fmt(dn.absorbido)}` : ''}${_num(dn.mitiMiti) > 0 ? ` · 🛡 ${_esc(dn.mitiMitiNombre || 'su protector')} se llevó ${_fmt(dn.mitiMiti)} (${_esc(dn.mitiMitiTxt || 'Miti-Miti')})` : ''}</div>` : '';
         const esp = dn.espinas ? `<div class="duelo-mini" style="color:#8fe3a9">🌵 Espinas: ${_esc(dn.espinas.quien || d.atacante.nombre)} recibe <b>${_fmt(dn.espinas.monto)}</b> de daño devuelto (1/4 del daño del golpe, directo a la vida)${dn.espinas.manual ? ' — <b>aplicalo a mano</b>' + (dn.espinas.motivo ? ' (' + _esc(dn.espinas.motivo) + ')' : '') : (dn.espinas.hpAntes !== undefined && dn.espinas.hpAntes !== null ? ` · ${_fmt(dn.espinas.hpAntes)} → ${_fmt(dn.espinas.hpDespues)} HP` : '')}</div>` : '';
         const ej = dn.espejo ? `<div class="duelo-mini" style="color:#c9b8ff">🪞 Espejo: ${_esc(dn.espejo.quien || d.atacante.nombre)} recibe <b>${_fmt(dn.espejo.monto)}</b> de daño devuelto (1/4 del daño especial, directo a la vida)${dn.espejo.manual ? ' — <b>aplicalo a mano</b>' + (dn.espejo.motivo ? ' (' + _esc(dn.espejo.motivo) + ')' : '') : (dn.espejo.hpAntes !== undefined && dn.espejo.hpAntes !== null ? ` · ${_fmt(dn.espejo.hpAntes)} → ${_fmt(dn.espejo.hpDespues)} HP` : '')}</div>` : '';
+        const ls = dn.luzSanadora ? `<div class="duelo-mini" style="color:#8fe3a9">☀ Luz sanadora (${_fmt(dn.luzSanadora.pct)} %): ${_esc(dn.luzSanadora.quien || d.atacante.nombre)} se cura <b>${_fmt(dn.luzSanadora.monto)}</b>${dn.luzSanadora.manual ? ' — <b>aplicalo a mano</b>' + (dn.luzSanadora.motivo ? ' (' + _esc(dn.luzSanadora.motivo) + ')' : '') : (dn.luzSanadora.hpAntes !== undefined && dn.luzSanadora.hpAntes !== null ? ` · ${_fmt(dn.luzSanadora.hpAntes)} → ${_fmt(dn.luzSanadora.hpDespues)} HP` : '')}</div>` : '';
         const dr = dn.drena ? `<div class="duelo-mini" style="color:#8fe3a9">🩸 Drena: ${_esc(dn.drena.quien || d.atacante.nombre)} se cura <b>${_fmt(dn.drena.monto)}</b>${dn.drena.manual ? ' — <b>aplicalo a mano</b>' + (dn.drena.motivo ? ' (' + _esc(dn.drena.motivo) + ')' : '') : `${dn.drena.hpAntes !== undefined && dn.drena.hpAntes !== null ? ` · ${_fmt(dn.drena.hpAntes)} → ${_fmt(dn.drena.hpDespues)} HP` : ''}${_num(dn.drena.excedente) ? ` · Vida extra ${_fmt(dn.drena.excedente)}` : ''}${dn.drena.nota ? ' · ' + _esc(dn.drena.nota) : ''}`}</div>` : '';
         const mg = dn.magico ? `<div class="duelo-mini" style="color:#9cc7ff">${magIcono(dn.magico.tipo)} ${_esc(magTitulo(dn.magico.tipo))}: <b>${_fmt(dn.magico.total)}</b> (${_esc(dn.magico.formula || '')})${_esc(magMult(dn.magico))} · ignora la Defensa, sin multiplicar${dn.magico.resEl ? ` · − ${_esc(dn.magico.resEl)}` : ''}${dn.magico.recibido !== undefined ? ` · recibió <b>${_fmt(dn.magico.recibido)}</b>` : ''}${dn.magico.hpDespues !== undefined ? ` · ${_fmt(dn.magico.hpAntes)} → ${_fmt(dn.magico.hpDespues)} HP` : ''}</div>` : '';
         const pd = dn.porDano ? `<div class="duelo-mini" style="color:#9cc7ff">✨ ${_esc(dn.porDano.estado)} ×${_fmt(dn.porDano.stacks)} (por ${_fmt(dn.porDano.entro)} de daño${dn.porDano.regla ? ': ' + _esc(dn.porDano.regla) : ''})${dn.porDano.nota ? ' · ' + _esc(dn.porDano.nota) : ''}${dn.porDano.manual ? ' — <b>aplicalo a mano</b>' : ''}</div>` : '';
-        cuerpo = tiro + `<div class="duelo-danobox${dn.ignoraDef ? ' crit' : ''}">${grande}</div>${conCuenta && !dn.invulnerable ? cuentaHtml(dn) : ''}${vida}${mg}${pd}${esp}${ej}${dr}`;
+        cuerpo = tiro + `<div class="duelo-danobox${dn.ignoraDef ? ' crit' : ''}">${grande}</div>${conCuenta && !dn.invulnerable ? cuentaHtml(dn) : ''}${vida}${mg}${pd}${esp}${ej}${dr}${ls}`;
       }
     }
     return `<div class="duelo-paso"><h4><span class="n">5</span>Daño</h4>${cuerpo}</div>`;
@@ -3090,6 +3094,7 @@ const Duelo = (() => {
       P.push({clave: 'dano', txt: dn.invulnerable ? `${d.defensor.nombre} es Invulnerable: no le hace nada`
         : dn.manual ? `Daño ${_num(dn.golpe)} (se aplica a mano)` : `${d.defensor.nombre} recibe ${_num(n)} de daño`});
       if(dn.magico && dn.magico.recibido !== undefined) P.push({clave: 'magico', txt: `…y ${_num(dn.magico.recibido)} de ${magTitulo(dn.magico.tipo).replace(/^Daño /, 'daño ')}`});
+      if(dn.luzSanadora && !dn.luzSanadora.manual) P.push({clave: 'luzsanadora', txt: `☀ ${dn.luzSanadora.quien || d.atacante.nombre} se cura ${_num(dn.luzSanadora.monto)} (Luz sanadora)`});
       if(dn.drena && !dn.drena.manual) P.push({clave: 'drena', txt: `${dn.drena.quien || d.atacante.nombre} se cura ${_num(dn.drena.monto)}`});
       if(dn.espinas) P.push({clave: 'espinas', txt: `Espinas: ${dn.espinas.quien || d.atacante.nombre} recibe ${_num(dn.espinas.monto)}`});
       if(dn.espejo) P.push({clave: 'espejo', txt: `Espejo: ${dn.espejo.quien || d.atacante.nombre} recibe ${_num(dn.espejo.monto)}`});

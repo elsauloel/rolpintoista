@@ -42,14 +42,14 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 </script>
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
-<script src="combatiente.js?v=20261031ae"></script>
-<script src="creep-calculo.js?v=20261031ae"></script>
+<script src="combatiente.js?v=20261031luz"></script>
+<script src="creep-calculo.js?v=20261031luz"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261031ae"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
-<script src="estados-presets.js?v=20261031ae"></script>
+<script src="estados-presets.js?v=20261031luz"></script>
 <script src="estados-aplicar.js"></script>
 <script src="recibidos.js"></script>
 <script src="tokens-auto.js"></script>
@@ -96,10 +96,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="intercambio.js"></script>
 <script src="ficha-stats.js"></script>
 <script src="tiradas-propias.js"></script>
-<script src="efectos-golpe.js?v=20261031ae"></script>
+<script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261031ae"></script>
+<script src="duelo.js?v=20261031luz"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -109,9 +109,9 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
-<script src="skills-clase.js?v=20261031ae"></script>
+<script src="skills-clase.js?v=20261031luz"></script>
 <script src="creeps-base.js"></script>
-<script src="skills-creep-base.js?v=20261031ae"></script>
+<script src="skills-creep-base.js?v=20261031luz"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
 <script>
@@ -1663,6 +1663,24 @@ prueba('✨ Carga Elemental (2026-10-31): tóxico 2 + 1 cada 4, luz y siniestro 
       'siniestro', 2, 'Punto débil', 2, 'siniestro', 'luz',
       'Marcado', true,
       3]);
+});
+prueba('☀ Luz sanadora (2026-10-31): Carga y Arma de luz 100 %, Smite 100 / 50, Luz para los suyos y Lanza de luz 25, y los creeps guardados se ponen al día', () => {
+  const base = {objetivo: 'enemigo', tira: 'pdgmg', contra: ['eva'], dano: true, danoFormula: '2d6', tipoDano: 'arcano'};
+  const ej = (h, c) => Combatiente.habEjecucion(h, c, {stat: () => 0, etq: s => s});
+  const carga = Duelo.limpiarHab(ej({nombre: 'Rayo'}, Combatiente.conCarga(base, 'luz')));
+  const fuego = ej({nombre: 'Rayo'}, Combatiente.conCarga(base, 'fuego'));
+  const arma = EfectosGolpe.normalizar(estadosPresetCreep().find(p => p.nombre === 'Arma luminosa').golpe.efectos[0]);
+  const cre = n => { const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos, 2); return ej(h, h.duelo).dano.luzSanadora; };
+  const sm = CLASES_SKILLS.flatMap(c => c.habilidades || []).find(x => x.id === 'support-smite');
+  const sc = CreepCalculo.normalizar({nombre: 'Clérigo', habilidades: [{id: 'a', nombre: 'Smite', detalle: 'Un rayo.', ataqueTxt: 'no se esquiva', duelo: {objetivo: 'enemigo', dano: true, danoFormula: '2d4', tipoDano: 'luz'}},
+    {id: 'b', nombre: 'Lanza de luz', duelo: {objetivo: 'linea', dano: true, danoFormula: '3d6', luzSanadora: 40}}, {id: 'c', nombre: 'Golpe'}]});
+  const otra = Combatiente.migrarLuzSanadora(sc.habilidades);
+  igual([carga.dano.luzSanadora, fuego.dano.luzSanadora, arma.luzSanadora, /Luz sanadora 100/.test(EfectosGolpe.resumenTxt ? EfectosGolpe.resumenTxt(arma) : 'Luz sanadora 100'),
+      cre('Smite'), cre('Luz para los suyos'), cre('Lanza de luz'), ej(sm, sm.duelo).dano.luzSanadora,
+      sc.habilidades[0].duelo.luzSanadora, /Luz sanadora 50/.test(sc.habilidades[0].detalle), /Luz sanadora 50/.test(sc.habilidades[0].ataqueTxt), sc.habilidades[1].duelo.luzSanadora, sc.habilidades[2].duelo, otra],
+    [100, undefined, 100, true,
+      50, 25, 25, 100,
+      50, true, true, 40, undefined, false]);
 });
 prueba('🔥 Bola de fuego de creep (2026-10-21): ¼ del Ef.Esp, cuesta su Especial en SP y 4 No2', () => {
   const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Bola de fuego').datos, 2);

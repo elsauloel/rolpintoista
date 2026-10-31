@@ -1660,13 +1660,13 @@ async function dueloEspejo(d, especial){
    máxima queda como Vida extra, hasta `drenaTope` % del máximo (sumado al que ya tenía). A un personaje, la vida en su parte
    `general` (como dueloCurar) y el Excedente por su cola de estados (comun/recibidos.js); a un creep, todo en sus datos; a una invocación,
    la vida (el excedente, a mano). */
-async function dueloDrenar(d, monto){
+async function dueloDrenar(d, monto, opts){
   const quien = d.atacante.nombre;
   monto = Math.max(0, Math.round(num(monto)));
   if(!monto) return {quien, monto: 0, nota: 'no hizo daño: no drena nada'};
   const ta = tokens.get(d.atacante.tokenId);
   if(!ta) return {quien, monto, manual: true, motivo: 'el token de quien la usó ya no está en el mapa'};
-  const pct = Math.max(0, num(d.hab && d.hab.dano ? d.hab.dano.drenaTope : 0));   // la Vida extra: solo las habilidades que lo dicen (un arma, no)
+  const pct = opts && opts.sinExtra ? 0 : Math.max(0, num(d.hab && d.hab.dano ? d.hab.dano.drenaTope : 0));   // (☀ la Luz sanadora: nunca pasa el máximo) la Vida extra: solo las habilidades que lo dicen (un arma, no)
   // Toda la Vida extra que ya tiene (2026-10-07: se suman, cada una aparte); el drenaje le agrega solo lo que falta para el tope.
   const excedenteDe = estados => (estados || []).filter(x => x && x.activo !== false && (x.excedenteVida || x.excedente || x.nombre === 'Excedente de vida' || x.nombre === 'Vida extra'))
     .reduce((a, e) => a + num(e.escudoMagicoActual ?? e.escudo ?? e.escudoMagico), 0);
@@ -1833,6 +1833,14 @@ async function dueloAplicarDano(d){
     // Una habilidad que drena: lo que perdió, o su % (`drenaPct`, la Sanguijuela: la mitad, para arriba).
     const drena = d.hab && d.hab.dano && d.hab.dano.drena ? await dueloDrenar(d, num(d.hab.dano.drenaPct) > 0 ? Math.ceil(perdio * num(d.hab.dano.drenaPct) / 100) : perdio)
       : !d.hab && num(dn.drenaPct) > 0 ? await dueloDrenar(d, Math.ceil(perdio * num(dn.drenaPct) / 100)) : null;
+    // ☀ Luz sanadora (dueño, 2026-10-31: «luz sanadora al 100 %… depende del caso, 100, 25, 50»): quien pega se cura ese % de la vida que le sacó el
+    // daño de luz (la habilidad: `hab.dano.luzSanadora`; el arma con luz, Arma luminosa: `dano.magico.luzSanadora`). Para abajo; 0, nada. Sin pasar
+    // su máximo (no da Vida extra). Si le pega a varios, se cura por cada uno (cada duelo es uno).
+    const lsPct = d.hab ? num(d.hab.dano && d.hab.dano.luzSanadora) : num(dn.magico && dn.magico.luzSanadora);
+    const lsSaco = res.r.invulnerable ? 0 : d.hab ? perdio : magico ? Math.max(0, num(magico.hpAntes) - num(magico.hpDespues)) : 0;
+    const lsMonto = lsPct > 0 ? Math.floor(lsSaco * Math.min(100, lsPct) / 100) : 0;
+    const luzSanadora = lsMonto > 0 ? {...(await dueloDrenar(d, lsMonto, {sinExtra: true})), pct: Math.min(100, lsPct)} : null;
+    if(luzSanadora && !luzSanadora.manual && typeof curaBurbujas === 'function') try{ curaBurbujas([[d.atacante.tokenId]]); }catch(e){}   // las chispitas verdes de la cura (js/70)
     // ✨ El estado según el daño que entró (2026-10-13, Carga Elemental: Escarcha, Veneno, Armadura rota): `hab.dano.porDano`.
     const porDano = d.hab && d.hab.dano && d.hab.dano.porDano && !res.r.invulnerable ? await dueloPorDano(d, num(res.r.recibido)).catch(err => { console.error('No se pudo aplicar el estado por daño:', err); return null; })
       : !d.hab && magico && dn.magico.porDano && !res.r.invulnerable ? await dueloPorDano(d, num(magico.recibido), dn.magico.porDano).catch(err => { console.error('No se pudo aplicar el estado por daño:', err); return null; }) : null;   // ❄🧪☠ Arma elemental (2026-10-21)
@@ -1878,7 +1886,7 @@ async function dueloAplicarDano(d){
       R('=', 'entra a la vida', rr.recibido, '', true);
     }
     // `perfora`: solo si la Perfora mandó (pasaron esos N, la Defensa frenaba más): el duelo lo cuenta así.
-    return {...base, desgaste, cuenta, defensa: crit ? restaIgnorando : def, ...(perfora ? {perfora} : {}), ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), ...(num(res.r.vida) > 0 ? {vidaAbs: num(res.r.vida)} : {}), invulnerable: !!res.r.invulnerable, ...(num(res.r.mitiMiti) > 0 ? {mitiMiti: num(res.r.mitiMiti), mitiMitiNombre: String(res.r.mitiMitiNombre || '').slice(0, 40), mitiMitiTxt: String(res.r.mitiMitiTxt || 'Miti-Miti').slice(0, 20)} : {}), hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(magico ? {magico} : {}), ...(porDano ? {porDano} : {})};
+    return {...base, desgaste, cuenta, defensa: crit ? restaIgnorando : def, ...(perfora ? {perfora} : {}), ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), ...(num(res.r.vida) > 0 ? {vidaAbs: num(res.r.vida)} : {}), invulnerable: !!res.r.invulnerable, ...(num(res.r.mitiMiti) > 0 ? {mitiMiti: num(res.r.mitiMiti), mitiMitiNombre: String(res.r.mitiMitiNombre || '').slice(0, 40), mitiMitiTxt: String(res.r.mitiMitiTxt || 'Miti-Miti').slice(0, 20)} : {}), hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(luzSanadora ? {luzSanadora} : {}), ...(magico ? {magico} : {}), ...(porDano ? {porDano} : {})};
   }catch(err){
     console.error('No se pudo aplicar el daño del duelo:', err);
     return {...base, defensa: def, manual: true, golpe: base.mitad ? aplicar : golpe, motivoManual: err && err.message === 'SIN_DEF' ? 'la ficha todavía no publicó su Defensa' : 'falló la escritura'};

@@ -411,3 +411,5 @@
   las pruebas en el mapa se corren todas juntas cuando el dueño lo pide.
 
 - Los golpes con efecto (Golpe que sangra, Mordisco que lisia, Golpe atontador…).
+
+- ☀ **Luz sanadora** (2026-10-31, dueño): Smite 50 %, Luz para los suyos 25 %, Lanza de luz 25 % (quien pega se cura ese % de la vida que le saca; ver `comun/CLAUDE.md`). Arma elemental con Luz, 100 %.

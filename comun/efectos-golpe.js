@@ -57,6 +57,7 @@ const EfectosGolpe = (() => {
       ...(ef && ef.danoMagico && ef.porDano && ef.porDano.estado ? {porDano: porDanoCopia(ef.porDano)} : {}),
       ...(ef && ef.danoMagico && n(ef.identidadTurnos) > 0 ? {identidadTurnos: Math.min(9, Math.round(n(ef.identidadTurnos)))} : {}),   // 🌑 el Arma siniestra: Herida sombría 2 turnos (2026-10-31)
       ...(ef && ef.danoMagico && ef.cadena ? {cadena: true} : {}),
+      ...(ef && ef.danoMagico && n(ef.luzSanadora) > 0 ? {luzSanadora: Math.min(100, Math.round(n(ef.luzSanadora)))} : {}),   // ☀ Arma luminosa: quien pega se cura ese % (2026-10-31)
     };
   }
   const lista = efs => (Array.isArray(efs) ? efs : []).map(normalizar).filter(x => x.nombre);
@@ -76,7 +77,7 @@ const EfectosGolpe = (() => {
 
   // "Envenenar (50%, +1d6)"
   function resumenTxt(ef){
-    if(ef.danoMagico) return `${ef.nombre} (+${ef.dado || '?'} de daño mágico, ignora la Defensa)`;
+    if(ef.danoMagico) return `${ef.nombre} (+${ef.dado || '?'} de daño mágico, ignora la Defensa${n(ef.luzSanadora) > 0 ? `; Luz sanadora ${Math.round(n(ef.luzSanadora))} %` : ''})`;
     if(ef.soloCritico) return `${ef.nombre} (solo si es crítico${ef.stacks ? `, ${ef.stacks} stacks` : ''}${siempre(ef) ? '' : ', ' + pct(ef) + '%'})`;
     if(/^drena(r)?\s+vida$/i.test(ef.nombre)) return `${ef.nombre} (${ef.drenaPct || 50} % de la vida que saca)`;
     const extras = [probTxt(ef), ef.stacks ? `${ef.stacks} stacks` : '', ef.turnos ? `${ef.turnos} turnos` : '', ef.seguroCritico && !siempre(ef) ? 'seguro si es crítico' : '', ef.dado ? `+${ef.dado}` : ''].filter(Boolean).join(', ');

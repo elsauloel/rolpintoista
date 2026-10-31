@@ -653,6 +653,10 @@ aside{
 .dato b{color:var(--brass);font-weight:500}
 .mapa-fila{border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;margin-top:8px}
 .mapa-fila.viendo{border-color:var(--brass)}
+.mapa-fila.activo{background:rgba(76,184,106,.16);border-color:#4CB86A} /* el publicado, siempre arriba (js/09, renderMapasMenu) */
+.mapa-fila.activo .mapa-nombre b{color:#7BD88F}
+.mapa-uso{font-size:11px;color:var(--muted, #9A867E);margin-top:2px}
+.mapa-fila.activo .mapa-uso{color:#7BD88F}
 .mapa-nombre{font-size:13px}
 .mapa-nombre b{color:var(--brass);font-weight:500;font-size:11px}
 .mapa-fila .fila .btn{padding:4px 8px;font-size:10.5px}

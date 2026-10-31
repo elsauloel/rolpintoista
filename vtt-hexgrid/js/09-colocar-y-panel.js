@@ -852,6 +852,21 @@ function abrirEditarToken(id){
    Mapas guardados (ver, publicar, renombrar, borrar, cuántos creeps tiene y traer sus tokens, + Nuevo mapa) y el fondo del mapa que se está mirando.
    Vive en un menú al costado del botón, como el de 🎭 Tokens: la barra lateral (donde se ve la Mesa) no se usa para menús. */
 let mapasMenuFirma = '';
+// «hoy», «ayer», «hace 3 días», «hace 2 semanas», «hace 4 meses».
+function haceTxt(ms){
+  const dias = Math.floor((Date.now() - ms) / 864e5);
+  if(dias < 1) return 'hoy';
+  if(dias < 2) return 'ayer';
+  if(dias < 14) return `hace ${dias} días`;
+  if(dias < 60) return `hace ${Math.floor(dias / 7)} semanas`;
+  return `hace ${Math.floor(dias / 30)} meses`;
+}
+function mapaUsoTxt(id){
+  if(id === mapaActivo) return 'Lo están viendo los jugadores';
+  if(mapasUsos[id]) return `Último uso: ${haceTxt(mapasUsos[id])}`;
+  const c = (mapasLista.get(id) || {}).creadoMs;
+  return c ? `Creado ${haceTxt(c)} · sin uso registrado` : 'Sin uso registrado';
+}
 function renderMapasMenu(forzar){
   const menu = $('#mapas-menu'), boton = $('#toolkit-mapas');
   if(!menu || !boton) return;
@@ -860,12 +875,14 @@ function renderMapasMenu(forzar){
   boton.classList.toggle('activo', mapasMenuAbierto);
   if(!mapasMenuAbierto) return;
   if(!forzar && menu.contains(document.activeElement) && menu.innerHTML) return;   // no pisar lo que se está escribiendo
-  const filas = [MAPA_PRINCIPAL, ...[...mapasLista.keys()].filter(id => id !== MAPA_PRINCIPAL)
-    .sort((a, b) => mapasLista.get(a).creadoMs - mapasLista.get(b).creadoMs)]
+  // Arriba el publicado (en verde); después, del más usado últimamente al menos usado (mapaUsoMs, js/01).
+  const filas = [MAPA_PRINCIPAL, ...[...mapasLista.keys()].filter(id => id !== MAPA_PRINCIPAL)]
+    .sort((a, b) => mapaUsoMs(b) - mapaUsoMs(a))
     .map(id => {
       const viendo = id === mapaMostrado, activo = id === mapaActivo;
-      return `<div class="mapa-fila${viendo ? ' viendo' : ''}">
+      return `<div class="mapa-fila${viendo ? ' viendo' : ''}${activo ? ' activo' : ''}">
         <span class="mapa-nombre">${esc(nombreMapa(id))}${activo ? ' <b>· en juego</b>' : ''}</span>
+        <div class="mapa-uso">${esc(mapaUsoTxt(id))}</div>
         <div class="fila" style="margin-top:4px">
           ${viendo ? '' : `<button type="button" class="btn" data-mapa-ver="${esc(id)}">Ver</button>`}
           ${activo ? '' : `<button type="button" class="btn primary" data-mapa-publicar="${esc(id)}">Publicar</button>`}

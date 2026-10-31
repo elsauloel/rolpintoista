@@ -300,6 +300,25 @@ let mapaEligiendoGM = null;           // el que el GM eligió mirar (null: sigue
 let mapaMostrado = MAPA_PRINCIPAL;    // el que está cargado ahora en esta pantalla
 let mapaEscuchado = null;             // el que tiene los onSnapshot activos ahora
 const mapasLista = new Map();         // id -> {nombre, creadoMs}
+// 🗺 Último uso de cada mapa (2026-10-31, dueño: «el mapa que está publicado destaque… y lo ubicaría siempre arriba, reordenando los
+// mapas de acuerdo a su último uso, para que los que se usen menos vayan quedando abajo y se pueda considerar borrarlo»).
+// campanas/<partida>/mapa/usos = {ids: {mapaId: fecha}}: al publicar un mapa se anotan el que entra y el que sale (los dos se usaron
+// hasta ese momento). Va en mapa/ (lo escribe el GM, sin reglas nuevas). Se registra desde el 2026-10-31: los anteriores se ordenan
+// por su fecha de creación hasta que se publiquen.
+const mapasUsos = {};                 // id -> ms
+function escucharMapasUsos(){
+  fbDb.doc(fbRutaCampana('mapa/usos')).onSnapshot(doc => {
+    const ids = (doc.exists && doc.data().ids) || {};
+    Object.keys(mapasUsos).forEach(k => delete mapasUsos[k]);
+    for(const [id, t] of Object.entries(ids)) mapasUsos[id] = t && t.toMillis ? t.toMillis() : Date.now();
+    renderMapasMenu(true);
+  }, err => console.error('Error escuchando el uso de los mapas:', err));
+}
+// Cuándo se usó por última vez (el publicado: ahora); sin registro, cuándo se creó.
+function mapaUsoMs(id){
+  if(id === mapaActivo) return Infinity;
+  return mapasUsos[id] || (mapasLista.get(id) || {}).creadoMs || 0;
+}
 try{ mapaEligiendoGM = localStorage.getItem('mapa-viendo') || null; }catch(e){}
 
 function nombreMapa(id){
@@ -376,6 +395,7 @@ function escucharMapaActivo(){
 // principal también tiene su entrada acá (se crea sola la primera vez que
 // hace falta), para poder renombrarlo igual que a los demás.
 function escucharMapas(){
+  escucharMapasUsos();
   fbDb.collection(fbRutaCampana('mapas')).onSnapshot(snap => {
     snap.docChanges().forEach(ch => {
       if(ch.type === 'removed'){ mapasLista.delete(ch.doc.id); return; }
@@ -447,7 +467,10 @@ function verMapa(id){
 
 async function publicarMapa(id){
   try{
-    await fbDb.doc(fbRutaCampana('mapa/activo')).set({mapaId: id, actualizado: firebase.firestore.FieldValue.serverTimestamp()});
+    const antes = mapaActivo, ahora = firebase.firestore.FieldValue.serverTimestamp();
+    await fbDb.doc(fbRutaCampana('mapa/activo')).set({mapaId: id, actualizado: ahora});
+    fbDb.doc(fbRutaCampana('mapa/usos')).set({ids: {[antes]: ahora, [id]: ahora}}, {merge: true})
+      .catch(err => console.error('No se pudo anotar el uso del mapa:', err));
     toast(`Los jugadores ahora ven "${nombreMapa(id)}"`);
   }catch(err){ console.error('No se pudo publicar el mapa:', err); toast('No se pudo publicar el mapa'); }
 }

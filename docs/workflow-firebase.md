@@ -226,6 +226,8 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   (+ `ruta`) al soltar. Un PJ vinculado a su ficha gasta Nitros: el mapa pide
   confirmar y descuenta `nitros` en `partes/general` + `resumen.nitros` en
   una transacción.
+- `campanas/{id}/mapa/usos` — `{ids: {mapaId: fecha}}` (2026-10-31): cuándo se usó por última vez cada mapa (se anota al publicar: el que
+  entra y el que sale). Lo escribe el GM; ordena la lista de 🗺 Mapas.
 - `campanas/{id}/mapa/activo` — `{mapaId, actualizado}`: cuál de los mapas
   guardados ven los jugadores ahora mismo. Ausente = el de siempre
   (`MAPA_PRINCIPAL`, ver abajo). Todos lo ven, solo el GM lo cambia

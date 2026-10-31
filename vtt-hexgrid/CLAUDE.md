@@ -1884,3 +1884,11 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   mira lo público en cada dibujo (`estoicoRevisar`, como las flechitas de js/75): a quien lo maneja, el Aviso al activarse y en cada cambio (`estoicoAvisar`:
   Aplicar / Resolver a mano, y «No volver a mostrar» hasta que termine, `estoicoCallados`); a todos, el ±N 🛡 flotando (`estoicoDibujar`). La ficha lite (js/15) y la Botonera (js/11, «Def N 🗿») suman el bono de este momento (`estoicoAhora`, con
   `estoicoToken`) y se redibujan cuando cambia la cuenta (`estoicoRefrescar`).
+
+- **🗺 Mapas: el publicado arriba y en verde, el resto por último uso** (2026-10-31, dueño: «que el mapa que está publicado destaque… ubicarlo
+  siempre arriba, reordenando los mapas de acuerdo a su último uso, para que los que se usen menos vayan quedando abajo y se pueda considerar
+  borrarlo»). `renderMapasMenu` (js/09) ordena con `mapaUsoMs` (js/01): el publicado primero (`.mapa-fila.activo`, fondo verde), después del uso
+  más reciente al más viejo; cada mapa dice «Último uso: hace N días» (`mapaUsoTxt`, `haceTxt`). El uso se anota al publicar (`publicarMapa`: el
+  que entra y el que sale) en `campanas/<id>/mapa/usos = {ids: {mapaId: fecha}}` (`escucharMapasUsos`; va en `mapa/`, que ya escribe el GM: sin
+  reglas nuevas). Se registra desde ese día: los mapas que nunca se publicaron después dicen «Creado hace N · sin uso registrado» y se ordenan
+  por fecha de creación.

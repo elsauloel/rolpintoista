@@ -60,7 +60,10 @@
 >   guiado de a uno: (1) **dueño, 2026-10-31: usa su cuenta de Gmail de pruebas** (la dirección no va en el repo). Si esa cuenta ya entra al sitio
 >   con Google, no se crea otra: «¿Olvidaste tu contraseña?» en la pantalla de entrada le pone una contraseña; si no, se crea con mail y contraseña; (2) sumarla a «Claude · pruebas» (como GM, para probar creeps) y a «El origen de las especies»;
 >   (3) guardar el mail y la contraseña en la configuración del entorno de la nube (menú del entorno en el título de la sesión → Editar →
->   «Network secrets» / «API credentials») como `ROL_EMAIL` y `ROL_CLAVE` — **nunca por el chat ni en el repo** (es público). Con eso, desde la
+>   «Network secrets» / «API credentials») como `ROL_EMAIL` y `ROL_CLAVE` — **nunca por el chat ni en el repo** (es público). **Mejor con tres cuentas** (dueño, 2026-10-31: «te puedo
+>   pasar dos o hasta tres cuentas»): una **GM** y **dos jugadores** en «Claude · pruebas», cada jugador con su personaje, para probar lo que necesita
+>   cuentas distintas (el Aviso que le llega al jugador, ⚔ Disputar el botín, el duelo y el desempate, la oportunidad del lado del jugador).
+>   Variables: `ROL_GM_EMAIL`/`ROL_GM_CLAVE`, `ROL_J1_EMAIL`/`ROL_J1_CLAVE`, `ROL_J2_EMAIL`/`ROL_J2_CLAVE` (la de GM reemplaza a `ROL_EMAIL`). Con eso, desde la
 >   nube: leer las partidas (ej. confirmar que Ricardo tiene Prisa) y abrir el mapa en un navegador sin pantalla con capturas (cubre buena parte
 >   del «☁🧪» de abajo). Regla propuesta: en las partidas reales solo mirar salvo pedido; las pruebas, en «Claude · pruebas».
 > - [ ] **⚔ Cargar a mano el Goblin rompehuesos (2026-10-30, dueño: «cuando esté en la compu te voy a decir "pasame al Goblin Rompehuesos" y lo voy a

@@ -59,7 +59,7 @@ function formulasCombateCreep(sc){ return CreepBotonera.formulasCombate(sc); }  
 function cardHtml(sc){
   // Una pieza del equipo (en las manos, puesta o guardada) con sus botones.
   const equipoFila = (it, guardado) => `
-            <div class="equipo-item"${guardado ? ' style="opacity:.75"' : ''}>
+            <div class="equipo-item${it.natural ? ' natural' : ''}"${guardado ? ' style="opacity:.75"' : ''}>
               <div class="equipo-item-info">
                 <div class="equipo-item-top">
                   <span class="equipado-nombre">${esc(it.nombre)}</span>
@@ -67,7 +67,7 @@ function cardHtml(sc){
                     : `<span class="valor-caja" title="Defensa que otorga"><small>DEF</small>+${fmt(Combatiente.defDeItem(it))}</span>`}
                   ${guardado ? `<button class="rm" data-ponerpieza="${sc.id}:${it.id}" title="Ponérsela (lo que no entre en la mano o en su lugar se guarda)">✋</button>`
                     : it.natural ? '' : `<button class="rm" data-guardarpieza="${sc.id}:${it.id}" title="Guardarla (la lleva encima pero no da bonos)">🎒</button>`}
-                  <button class="rm" data-naturalequipo="${sc.id}:${it.id}" title="${it.natural ? 'Natural (parte del cuerpo): no se suelta al morir · tocá para que sea una pieza que se suelta' : 'Tocá para marcarla natural (piel, caparazón…): da sus bonos pero no se suelta al morir'}" style="${it.natural ? 'color:#8EE6A8;border-color:#8EE6A8' : 'opacity:.55'}">🐾</button>
+                  ${natBotonHtml(sc, it)}
                   <button class="rm" data-verequipocreep="${sc.id}:${it.id}" title="Ver la pieza (y editarla y subirla al catálogo)">👁</button>
                   <button class="rm" data-quitarequipo="${sc.id}:${it.id}" title="Quitar">×</button>
                 </div>

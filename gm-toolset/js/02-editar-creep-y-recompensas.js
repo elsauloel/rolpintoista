@@ -354,14 +354,19 @@ function renderAsistenteCreep(){
   if(!creepAsist()){ asist.api.cerrar(); asist = null; return; }   // lo borraron desde otro lado
   asist.api.redibujar();
 }
+// 🐾 El botón de natural de una pieza (2026-10-30, dueño: «la diferencia visual de cuando está marcada o no es muy poca»): marcada, una píldora verde
+// llena «🐾 Natural»; sin marcar, una apagada «🐾 ¿Natural?». La pieza natural, además, con el borde izquierdo verde (`.equipo-item.natural`).
+function natBotonHtml(sc, it){
+  return `<button type="button" class="nat-btn${it.natural ? ' on' : ''}" data-naturalequipo="${sc.id}:${it.id}" title="${it.natural ? 'Natural (parte del cuerpo): no se suelta al morir · tocá para que sea una pieza que se suelta' : 'Tocá para marcarla natural (piel, caparazón…): da sus bonos pero no se suelta al morir'}">🐾 ${it.natural ? 'Natural' : '¿Natural?'}</button>`;
+}
 // Una pieza del equipo en el asistente (pasos Arma y Armadura), con 🐾 natural, 👁 ver y × quitar. Una varita o un báculo muestra su daño ✨ en vez
 // de la Defensa (2026-10-28); lo que no da Defensa no muestra el «DEF +0».
 function asistPiezaHtml(sc, it){
   const valor = it.especial ? esc(CreepCalculo.especialDanoTxt(sc, it)) : num(it.def) ? `<small>DEF</small>+${fmt(num(it.def))}` : '';
   const tipo = (it.especial ? '✨ Arma especial · ' : '') + (TIPOITEM_LABEL_GM[it.tipoItem] || it.tipoItem || '');
-  return `<div class="equipo-item"><div class="equipo-item-info"><div class="equipo-item-top">
+  return `<div class="equipo-item${it.natural ? ' natural' : ''}"><div class="equipo-item-info"><div class="equipo-item-top">
         <span class="equipado-nombre">${esc(it.nombre)}</span>${valor ? `<span class="valor-caja">${valor}</span>` : ''}
-<button class="rm" data-naturalequipo="${sc.id}:${it.id}" title="${it.natural ? 'Natural (parte del cuerpo): no se suelta al morir · tocá para que sea una pieza que se suelta' : 'Tocá para marcarla natural (piel, caparazón…): da sus bonos pero no se suelta al morir'}" style="${it.natural ? 'color:#8EE6A8;border-color:#8EE6A8' : 'opacity:.55'}">🐾</button>
+${natBotonHtml(sc, it)}
         <button class="rm" data-verequipocreep="${sc.id}:${it.id}" title="Ver la pieza (y editarla y subirla al catálogo)">👁</button>
         <button class="rm" data-quitarequipo="${sc.id}:${it.id}" title="Quitar">×</button></div>
         <div class="equipo-item-meta">${esc(tipo)}${it.natural ? ' · 🐾 natural: no se suelta' : ''}</div></div></div>`;

@@ -329,6 +329,12 @@ input[type=file]{display:none}
   border:1px solid var(--line-soft);background:var(--panel2);padding:6px 8px;
   display:flex;align-items:center;gap:8px
 }
+.equipo-item.natural{border-left:3px solid #5FC98A}
+/* 🐾 natural (2026-10-30): marcada, píldora verde llena; sin marcar, apagada */
+.nat-btn{flex:none;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.04em;padding:2px 8px;border-radius:999px;cursor:pointer;
+  background:transparent;color:var(--muted);border:1px dashed var(--line-soft);opacity:.75}
+.nat-btn:hover{opacity:1}
+.nat-btn.on{background:#5FC98A;color:#10231A;border:1px solid #5FC98A;font-weight:700;opacity:1}
 .equipo-item-info{flex:1;min-width:0}
 .equipo-item-nombre{font-weight:700;font-size:12px}
 .equipo-item-meta{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-top:2px}

@@ -236,10 +236,7 @@
 > - [ ] **💥 Bolsas de grisú en las minas (2026-10-30, dueño: «lo del grisú lo dejamos afuera x ahora»).** Manchas de gas en algunas casillas: estar
 >   adentro marea (−1 a la puntería) y, si les llega fuego (antorcha, farolero, hechizo), explotan y lastiman a todos los de cerca. Hace falta programar
 >   que el fuego detone una zona. Quedó afuera del encuentro 2 de El origen; para retomar.
-> - [ ] **📜 Pergamino de Town portal (2026-10-28, dueño: «pergamino de town portal, crear y poner como drop en la próxima pelea»).** Un consumible que abre
->   un portal de vuelta al pueblo (o a un lugar seguro). Diseñarlo (precio, calidad, qué hace en el mapa: ¿dos portales como Invocar portal, uno acá y otro en
->   el pueblo?), cargarlo al catálogo y ponerlo como drop fijo de un creep de la próxima pelea de El origen.
->   **🧿 Corroborar que el Mal de ojo sea bien costoso (2026-10-28, dueño: «debería ser bastante costoso, así que recordame eso para corroborar»).** Quedó
+> - [ ] **🧿 Corroborar que el Mal de ojo sea bien costoso (2026-10-28, dueño: «debería ser bastante costoso, así que recordame eso para corroborar»).** Quedó
 >   sin tirada de resistencia (P230 ✅): hoy cuesta 5 SP o cooldown 3 (el doble en turno ajeno). Revisar con el dueño si sube.
 > - [ ] **⏳ «Token de turnos» (2026-10-28) — en espera:** el dueño lo tiene que definir con un colega que le va a mandar la info («Había que cambiar
 >   cómo está automatizado el sistema. Sería más simple que haya un estado llamado Token de turnos y el sistema se lo saca durante el mantenimiento»).
@@ -396,8 +393,6 @@
 >   trazos) y probarlo en el mapa (`pruebas-en-el-mapa.md`).
 > - [x] **💡 Luces básicas siempre en la Talabartería (2026-10-14, dueño):** Vela de sebo, Antorcha de brea, Farol de aceite y Bengala
 >   llevan `gondolaFija` (se suman a las variedades al azar, como las flechas elementales).
-> - [ ] **💡 Una luz Común que ilumine un spot y revele lo oculto (2026-10-14, dueño: «que sea común y revele lo oculto»):** hoy lo que revela
->   un spot arranca en Buena (Bengala estelar, Varita de la luz flotante). Diseñar el Común.
 > - [ ] **💡 Luces caras: que rindan más o cuesten menos (2026-10-14, dueño: «un consumible de 350 doblones me parece un montón»):** revisar
 >   las Buenas y sobre todo las Raras (Faro de la revelación 350, Esfera de luz fría 160, Luz de la verdad 140, Cohete de luz 140): varios usos
 >   (cargas) o precio más bajo.

@@ -2075,7 +2075,8 @@ const Combatiente = (() => {
      vida que le saca el golpe de luz (`duelo.luzSanadora`; lo resuelve el mapa, vtt-hexgrid/js/13 dueloAplicarDano). Las habilidades de creep que ya
      estaban guardadas en un creep se ponen al día solas (una vez: si ya tienen el campo, no se toca). → true si cambió algo. */
   const LUZ_SANADORA_CREEP = {
-    'Smite': {pct: 50, txt: ' Luz sanadora 50 %: el creep se cura la mitad (para abajo) de la vida que le saca.'},
+    // El Smite la tuvo un rato (50 %) y se la sacamos (dueño, 2026-10-31: «al Smite no le vamos a poner luz sanadora, pero sí marcado»): pct 0 = sacarla.
+    'Smite': {pct: 0, txt: ' Luz sanadora 50 %: el creep se cura la mitad (para abajo) de la vida que le saca.'},
     'Luz para los suyos': {pct: 25, txt: ' Luz sanadora 25 %: el creep se cura la cuarta parte (para abajo) de la vida que le saca a cada uno.'},
     'Lanza de luz': {pct: 25, txt: ' Luz sanadora 25 %: se cura la cuarta parte (para abajo) de la vida que le saca a cada uno.'},
   };
@@ -2084,7 +2085,15 @@ const Combatiente = (() => {
     let cambio = false;
     habs.forEach(h => {
       const m = h && LUZ_SANADORA_CREEP[h.nombre];
-      if(!m || !h.duelo || typeof h.duelo !== 'object' || !h.duelo.dano || h.duelo.luzSanadora !== undefined) return;
+      if(!m || !h.duelo || typeof h.duelo !== 'object' || !h.duelo.dano) return;
+      if(!m.pct){   // la que se le sacó: si la tiene, afuera el campo y su texto
+        if(h.duelo.luzSanadora === undefined) return;
+        delete h.duelo.luzSanadora;
+        if(typeof h.detalle === 'string') h.detalle = h.detalle.replace(m.txt, '');
+        if(typeof h.ataqueTxt === 'string') h.ataqueTxt = h.ataqueTxt.replace(/; Luz sanadora \d+ %/, '');
+        cambio = true; return;
+      }
+      if(h.duelo.luzSanadora !== undefined) return;
       h.duelo.luzSanadora = m.pct;
       if(typeof h.detalle === 'string' && !/Luz sanadora/.test(h.detalle)) h.detalle = h.detalle.trimEnd() + m.txt;
       if(typeof h.ataqueTxt === 'string' && h.ataqueTxt && !/Luz sanadora/.test(h.ataqueTxt)) h.ataqueTxt += `; Luz sanadora ${m.pct} %`;

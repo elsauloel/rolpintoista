@@ -1784,7 +1784,7 @@ versión parecida en más de una, es candidato a juntar.
   para igualarlos alcanza con cambiar esa línea). `porDano` acepta `min` (sin `mas1`, el piso) y ahora viaja entero (mínimo, tope, turnos) por `efectos-golpe.js` y
   `duelo.js` (`porDanoCopia`); `identidadTurnos` viaja en el daño mágico de un arma y en el de una habilidad hasta el mapa (js/13).
 
-- **☀ Luz sanadora** (2026-10-31, dueño: «vamos a atribuirle luz sanadora a la luz… depende del caso, 100, 25, 50»): campo genérico `luzSanadora: N` (%)
+- **☀ Luz sanadora** (2026-10-31, dueño: «vamos a atribuirle luz sanadora a la luz… depende del caso, 100, 25, 50»; el Smite, el mismo día, no: «al Smite no le vamos a poner luz sanadora, pero sí marcado» — `migrarLuzSanadora` se la saca al de creep guardado, `pct: 0`): campo genérico `luzSanadora: N` (%)
   en la Ejecución (`duelo`) de una habilidad, o en el efecto `danoMagico` de un estado de arma (el Arma luminosa). Quien pega se cura ese % de la vida
   que le sacó el golpe (después de resistencias y del ×1,5; para abajo; 0 = nada; sin pasar su máximo, no da Vida extra); si le pega a varios (área,
   línea), una vez por cada uno. Viaja por `Combatiente.habEjecucion` → `Duelo.limpiarHab` (`hab.dano.luzSanadora`) o por `EfectosGolpe.normalizar` →

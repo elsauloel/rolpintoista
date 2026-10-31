@@ -933,7 +933,7 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 
 ## 5. Contenido a revisar (números de primer borrador)
 
-- [ ] ☀ **Luz sanadora en ítems** (2026-10-31): ya está en Arma elemental y Carga Elemental (Luz, 100 %), Smite (jugador 100 %, creep 50 %), Luz para los suyos y Lanza de luz (25 %). Candidatos del catálogo, sin tocar: **Varita del destello** (1d4 arcano en flor, «flor de luz») y el **Pergamino de luz cegadora** (hoy sin daño). Basta con sumarles `luzSanadora: N` a su Ejecución.
+- [ ] ☀ **Luz sanadora en ítems** (2026-10-31): ya está en Arma elemental y Carga Elemental (Luz, 100 %), Luz para los suyos y Lanza de luz (25 %). Candidatos del catálogo, sin tocar: **Varita del destello** (1d4 arcano en flor, «flor de luz») y el **Pergamino de luz cegadora** (hoy sin daño). Basta con sumarles `luzSanadora: N` a su Ejecución.
 - [ ] **Auditar las 60 habilidades de los creeps de «El origen de las especies»** (dueño, 2026-10-23: «pasarlas a la de fábrica y señalarlas como por auditar»): ya están entre las de fábrica (`ORIGEN` en `comun/skills-creep-base.js`, etiqueta «de El origen», «sin auditar»), con su rol y su concepto (`docs/diseno-roles-creep.md`, «Conteo por concepto»). Las 10 que se llaman como una de fábrica llevan «(El origen)»: al auditarlas, decidir cuál queda. ~~Bejines~~ → **Pedo de lobo** (dueño, 2026-10-23: «me encanta»; hecho en la de fábrica; en el Kobold hongero de la partida sigue «Bejines» hasta que se cambie desde GM Tools).
 - [ ] **Auditar las skills de creep** (dueño, 2026-10-20, lo pidió anotar). Las **321 habilidades de creeps**: daño, cooldowns, bonos, cuáles son rápidas y cuáles lentas.
 - [ ] Los **173 creeps base** (todos dicen "(auditar)") y sus recompensas.

@@ -3140,6 +3140,19 @@ prueba('drop de consumibles (comun/combate-fin.js, P181; 2026-10-19): humano 60 
     !!(tpl && tpl.consumible && tpl.tipoItem === 'consumibles' && !tpl.id), !!(full && JSON.stringify(full.trampaDatos || full.efectoNombre || full.curahp || '') === JSON.stringify(tpl.trampaDatos || tpl.efectoNombre || tpl.curahp || ''))],
     [0.6, 0.45, 0, 1, 100, 100, true, true, true, 'Común', 'Raro', 2, true, 0, 0, 0.6, true, true]);
 });
+prueba('⭐ XP de un creep repartida (P237, 2026-10-31): el estándar de su nivel da lo de siempre; una pasiva o una habilidad de más suman, lo que falta resta', () => {
+  const pieza = (tier, tipoItem) => ({id: 'x' + Math.random(), nombre: 'P', tipoItem, tier, equipado: true, mods: []});
+  const hab = i => ({id: 'h' + i, nombre: 'H' + i});
+  // Nivel 3 estándar: 4 habilidades, 1 pasiva, arma Común + 4 Comunes + 1 Buena (7 puntos).
+  const std = () => creepPrueba({nivel: 3, armaNombre: '', habilidades: [0, 1, 2, 3].map(hab), pasivas: [{id: 'p1', nombre: 'Ojo crítico'}],
+    equipo: [pieza('Común', 'arma_1m'), pieza('Común', 'armadura_blanda'), pieza('Común', 'manos'), pieza('Común', 'pies'), pieza('Común', 'cabeza'), pieza('Buena Calidad', 'piernas')]});
+  const a = std(), b = std(); b.pasivas.push({id: 'p2', nombre: 'Impulso'});
+  const c = std(); c.equipo = c.equipo.filter(it => it.tier !== 'Buena Calidad');   // le falta la pieza Buena (2 puntos)
+  const x = CombateFin.xpDeCreep(a);
+  igual([x.total, x.pts, CombateFin.xpDeCreep(b).total, CombateFin.xpDeCreep(c).total, CombateFin.xpDeCreep(creepPrueba({nivel: 5, armaNombre: '', habilidades: [0,1,2,3,4,5].map(hab), pasivas: [{id: 'p'}],
+    equipo: [pieza('Común', 'arma_1m'), pieza('Buena Calidad', 'armadura_blanda'), pieza('Buena Calidad', 'manos'), pieza('Buena Calidad', 'piernas'), pieza('Común', 'pies'), pieza('Común', 'cabeza'), pieza('Común', 'anillos')]})).total],
+    [150, 7, 161, 144, 300]);
+});
 prueba('fin del combate (comun/combate-fin.js): XP por creep (escapado 20%), quién cobra, inconsciente 25%, extras y despojos', () => {
   const rep = CombateFin.nuevo();
   rep.enMapa = new Set(['a', 'b', 'c']);
@@ -3157,7 +3170,7 @@ prueba('fin del combate (comun/combate-fin.js): XP por creep (escapado 20%), qui
   igual([CombateFin.xpBasePorNivel(3), r.filas.length, r.xpTotal, rp.porJugador.map(p => p.xp), items.map(i => i.nombre + ' ' + i.precioCompra), r2.xpTotal, rp2.porJugador.map(p => p.xp),
     CombateFin.itemsPublicables(rep, r2).length, [arma.precioCompra, arma.tier, arma.estimado], v.publicar, v.html.includes('Garras de Orco'), CombateFin.vista(CombateFin.nuevo(), creeps, []).publicar,
     (CombateFin.clic(rep, {dataset: {repIr: 'publicar'}}), CombateFin.vista(rep, creeps, []).publicar), CombateFin.vista(rep, creeps, []).html.includes('Publicar')],
-    [150, 2, 98, [49, 12], ['Garras de Orco 60'], 90, [50, 11], 0, [60, 'Común', true], 'oculto', true, 'oculto', 'activo', true]);   // (2026-10-26) el trofeo vale lo estimado de las Garras, ya no lo del nivel
+    [150, 2, 52, [26, 6], ['Garras de Orco 60'], 48, [29, 6], 0, [60, 'Común', true], 'oculto', true, 'oculto', 'activo', true]);   // (2026-10-31, P237: sin habilidades, pasivas ni equipo, dan menos)   // (2026-10-26) el trofeo vale lo estimado de las Garras, ya no lo del nivel
 });
 prueba('🎒 Paso 6: el botín trae los ítems tal cual — la varita del catálogo con su poder, una pieza propia con sus rasgos, lo guardado también', () => {
   const varita = CATALOGO_BASE.find(i => i.nombre === 'Varita del relámpago');

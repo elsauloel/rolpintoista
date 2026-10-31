@@ -480,8 +480,9 @@ function htmlPasoAsistCreep(p){
       ${consumibleAzarHtml(sc)}`;
   }
   if(p === 6){
-    const xp = xpBasePorNivel(n);
-    return `<p class="pap-nota" style="margin:0 0 10px">La XP que da es <b>${fmt(xp)}</b> (sale del nivel; no se edita acá).</p>${recompensasHtml(sc, {sinAzar: true}).replace(/<div class="editar-separador">.*?<\/div>/s, '')}`;
+    // ⭐ P237 (2026-10-31): la XP sale del nivel, las habilidades, las pasivas y el equipo (comun/combate-fin.js, xpDeCreep).
+    const x = CombateFin.xpDeCreep(sc);
+    return `<p class="pap-nota" style="margin:0 0 10px">La XP que da es <b>${fmt(x.total)}</b> (un creep estándar de nivel ${x.n} da ${fmt(x.base)}): ${esc(CombateFin.xpDesgloseTxt(x).join(' · '))}. Cada habilidad, pasiva o punto de equipo de más suma; de menos, resta.</p>${recompensasHtml(sc, {sinAzar: true}).replace(/<div class="editar-separador">.*?<\/div>/s, '')}`;
   }
   return `<div class="vc-cajas vc-2">
         <div class="vc-caja"><span class="vc-caja-label">HP</span><span class="vc-caja-valor">${fmt(num(sc.hpMax))}</span></div>

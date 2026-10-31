@@ -194,9 +194,9 @@
 > - [ ] **🧬 Razas frecuentes con resistencias y debilidades sugeridas (2026-10-30, dueño: «eventualmente vamos a diseñar razas frecuentes con resistencias y
 >   debilidades sugeridas»).** El asistente de creeps ya tiene el lugar (paso «Defensa y resistencias»: la base de cada elemento, positiva o negativa); falta
 >   diseñar las razas (goblin, no-muerto, elemental de fuego…) y que al elegir el tipo de criatura se sugieran.
-> - [ ] **⭐ Repensar la calculadora de experiencia de los creeps (2026-10-30, dueño: «volver a pensar la calculadora de experiencia, que contemple no
+> - [x] **⭐ Repensar la calculadora de experiencia de los creeps (2026-10-30, dueño: «volver a pensar la calculadora de experiencia, que contemple no
 >   sólo el nivel del creep sino también su equipo y la cantidad de habilidades»).** Hoy la XP sale solo del nivel (`xpBasePorNivel`, el paso Recompensas del
->   asistente y «Batalla terminada»). Pensar cuánto suman el equipo (rareza, piezas) y las habilidades (cuántas, cuáles), y si un jefe cuenta distinto. **Propuesta en `preguntas-abiertas.md` P237** (2026-10-31; estándar: una pasiva incluida en todo creep).
+>   asistente y «Batalla terminada»). Pensar cuánto suman el equipo (rareza, piezas) y las habilidades (cuántas, cuáles), y si un jefe cuenta distinto. **Hecho (2026-10-31, P237)**: repartida en nivel, habilidades, pasiva y equipo (estándar: una pasiva incluida en todo creep).
 > - [ ] **✋ Automático, pero con salida a mano (2026-10-30, dueño: «tiene que existir la posibilidad de resolverlos a mano… vamos a ir viendo caso por
 >   caso… aplicar automático y el botón resolver a mano»; el mismo día: «lo de auditar las automatizaciones lo vamos a dejar para otro momento… siempre que
 >   se automatice algo, vamos a evaluar si vale la pena»). La auditoría de lo que ya existe, EN PAUSA.** Cada automatización avisa en el momento y ofrece «Aplicar automático» / «Resolver a mano».

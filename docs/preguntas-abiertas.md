@@ -1469,7 +1469,7 @@ programarla (los estados ya traen `perforaGolpe`, como Armas perforantes).
 que da el estado permanente **Perforante** (`perforaGolpe: 2`, `comun/estados-presets.js`); el mapa la suma a la Perfora del arma (js/13,
 `Combatiente.perforaDeEstados`). Falta probarla en el mapa.
 
-### P237 — La XP de un creep repartida en sus partes (nivel, habilidades, pasivas, equipo) (2026-10-31) ⏳ propuesta, esperando al dueño
+### P237 — La XP de un creep repartida en sus partes (nivel, habilidades, pasivas, equipo) (2026-10-31) ✅ la propuesta, programada
 
 **Contexto:** el dueño, 2026-10-31: «esa proporción de experiencia me parece bien en principio… me gustaría que esté distribuida en nivel de creep,
 cantidad de habilidades, habilidades pasivas, equipo; que cada elemento que se le sume, sume un poquito más de experiencia… evaluar cuáles son los
@@ -1484,3 +1484,6 @@ punto de equipo; N5 (300) = 150 + 15 + 4,5. La Rata de la grieta (N3: 4 habilida
 pasiva más, ~157.
 **Falta decidir:** si se reparte así o se suma encima de lo de hoy; los porcentajes; si lo de menos resta; si cuentan los puntos de atributo de más; el
 jefe (hoy duplica oro y trofeo, no XP); y dónde se ve el desglose (el paso Recompensas del asistente y «Batalla terminada»).
+**Decidido (dueño, 2026-10-31: «podemos partir de ahí; si te parece, queda más o menos bien»)** y programado: la propuesta tal cual (repartida, 50/35/15,
+lo de menos resta). Lo que no se definió queda como estaba: los puntos de atributo no cuentan y el jefe no da más XP. `CombateFin.xpDeCreep(sc)` /
+`xpDesgloseTxt` (comun/combate-fin.js), en «Batalla terminada», en el estimado del grupo y en el paso Recompensas del asistente (con el desglose).

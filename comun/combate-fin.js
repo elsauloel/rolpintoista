@@ -33,6 +33,41 @@ const CombateFin = (() => {
     const n = Math.max(1, num(nivel) || 1);
     return 40 * n + 5 * n * (n - 1);
   }
+  /* ⭐ La XP de un creep, repartida en sus partes (P237, dueño, 2026-10-31: «que esté distribuida en nivel de creep, cantidad de habilidades,
+     habilidades pasivas, equipo; que cada elemento que se le sume, sume un poquito más de experiencia… todos los creeps tengan por estándar una
+     habilidad pasiva… si un GM le quiere agregar una pasiva más, está bien, solo que ese creep va a dar más experiencia»; «podemos partir de ahí»).
+     Un creep ESTÁNDAR de su nivel da lo de xpBasePorNivel, partido así: 50 % el nivel; 35 % entre sus habilidades y pasivas (cada una vale lo
+     mismo: estándar = nivel + 1 habilidades y 1 pasiva); 15 % el equipo puesto, en puntos (Común 1, Buena 2, Raro 3, Excepcional 4, Legendario 5;
+     el arma cuenta; estándar N1 3 · N2 5 · N3 7 · N4 8 · N5 10, +2 por nivel después). Lo de más suma su parte y lo de menos resta. */
+  const XP_PARTE = {nivel: 0.5, habilidades: 0.35, equipo: 0.15};
+  const PUNTOS_TIER = {'Común': 1, 'Buena Calidad': 2, 'Raro': 3, 'Excepcional': 4, 'Legendario': 5};
+  const EQUIPO_ESTANDAR = [3, 5, 7, 8, 10];
+  const equipoEstandar = n => n <= 5 ? EQUIPO_ESTANDAR[n - 1] : 10 + 2 * (n - 5);
+  const habsEstandar = n => n + 1;
+  function puntosEquipo(sc){
+    const puestas = (typeof Combatiente !== 'undefined' && Combatiente.equipoPuesto ? Combatiente.equipoPuesto(sc) : (sc.equipo || []).filter(it => it && it.equipado !== false))
+      .filter(it => String(it.nombre || '').trim());   // (una pieza sin nombre es el lugar vacío del arma, no equipo)
+    let pts = puestas.reduce((a, it) => a + (PUNTOS_TIER[it.tier] || 1), 0);
+    // Un creep viejo con el arma suelta (sin pieza en el equipo): cuenta como una Común.
+    if(!puestas.some(it => /^arma_/.test(String(it.tipoItem || ''))) && String(sc.armaNombre || '').trim()) pts += 1;
+    return pts;
+  }
+  function xpDeCreep(sc){
+    const n = Math.max(1, Math.round(num(sc && sc.nivel)) || 1), base = xpBasePorNivel(n);
+    const habs = (sc.habilidades || []).filter(Boolean).length, pas = (sc.pasivas || []).filter(Boolean).length, pts = puntosEquipo(sc);
+    const unidad = base * XP_PARTE.habilidades / (habsEstandar(n) + 1), punto = base * XP_PARTE.equipo / equipoEstandar(n);
+    const partes = {nivel: base * XP_PARTE.nivel, habilidades: unidad * habs, pasivas: unidad * pas, equipo: punto * pts};
+    const total = Math.max(1, Math.round(partes.nivel + partes.habilidades + partes.pasivas + partes.equipo));
+    return {total, base, n, habs, pas, pts, unidad, punto, partes, estandar: {habs: habsEstandar(n), pas: 1, pts: equipoEstandar(n)}};
+  }
+  // El desglose en palabras (el paso Recompensas del asistente de creeps).
+  function xpDesgloseTxt(x){
+    const r = v => Math.round(v * 10) / 10, dif = (v, e) => v === e ? 'el estándar' : v > e ? `${v - e} de más` : `${e - v} de menos`;
+    return [`nivel ${x.n}: ${r(x.partes.nivel)}`,
+      `${x.habs} habilidad${x.habs === 1 ? '' : 'es'} (${dif(x.habs, x.estandar.habs)}): ${r(x.partes.habilidades)}`,
+      `${x.pas} pasiva${x.pas === 1 ? '' : 's'} (${dif(x.pas, 1)}): ${r(x.partes.pasivas)}`,
+      `equipo ${x.pts} punto${x.pts === 1 ? '' : 's'} (${dif(x.pts, x.estandar.pts)}): ${r(x.partes.equipo)}`];
+  }
   // XP que da un creep que escapó, sobre la que daría derrotado.
   const XP_ESCAPO_PCT = 0.2;
   const FACTOR_XP_ESTADO = {'en pie': 1, inconsciente: 0.25, muerto: 0};
@@ -354,7 +389,7 @@ const CombateFin = (() => {
   function generar(rep, creeps, cat){
     const filas = creeps.filter(sc => !sc.recompensado && rep.enMapa && rep.enMapa.has(sc.id)).map(sc => {
       const derrotado = num(sc.hp) <= 0;
-      const xpBase = xpBasePorNivel(sc.nivel);
+      const xpBase = xpDeCreep(sc).total;   // ⭐ P237
       const xp = derrotado ? xpBase : Math.round(xpBase * XP_ESCAPO_PCT);
       const cuenta = derrotado || rep.contarEscapados;
       return {sc, derrotado, xp, cuenta, oro: derrotado ? oroDeCreep(rep, sc) : 0, items: derrotado ? [...itemsDeCreep(cat, sc), ...dropDeCreep(rep, cat, sc)] : []};
@@ -746,7 +781,7 @@ const CombateFin = (() => {
       const items = itemsDeCreep(cat, sc).map(x => ({nombre: x.nombre, compra: num(x.precioCompra), venta: ventaDe(x.precioCompra), trofeo: !!x.trofeo,
         estimado: !!(x.template && x.template.estimado)}));
       const oro = Math.max(0, num(sc.oroBase)), venta = items.reduce((a, i) => a + i.venta, 0), drop = dropEsperado(cat, sc);
-      return {nombre: K.nombreLimpio(sc), nivel: num(sc.nivel) || 1, jefe: !!sc.jefe, oro, items, venta, drop, xp: xpBasePorNivel(sc.nivel), total: oro + venta + drop.venta};
+      return {nombre: K.nombreLimpio(sc), nivel: num(sc.nivel) || 1, jefe: !!sc.jefe, oro, items, venta, drop, xp: xpDeCreep(sc).total, total: oro + venta + drop.venta};
     });
     const suma = f => filas.reduce((a, x) => a + f(x), 0);
     return {filas, oro: suma(x => x.oro), venta: suma(x => x.venta), drop: suma(x => x.drop.venta), xp: suma(x => x.xp), total: suma(x => x.total)};
@@ -813,7 +848,7 @@ const CombateFin = (() => {
     return {total, cada, n: inc.length};
   }
 
-  return {venderBaul, itemsDeCreep, dropReroll, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, municionDeCreep, cuantosAlAzar, consumibleAlAzar, darConsumiblesAlAzar, quitarConsumiblesAlAzar, DROP_TABLA, arquetiposBotin, arqsDe, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
+  return {venderBaul, itemsDeCreep, dropReroll, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, xpDeCreep, xpDesgloseTxt, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, municionDeCreep, cuantosAlAzar, consumibleAlAzar, darConsumiblesAlAzar, quitarConsumiblesAlAzar, DROP_TABLA, arquetiposBotin, arqsDe, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
     plantillaArmaCreep, plantillaEquipoCreep, plantillaTrofeo, precioNatural, itemsDeCreep, itemsExtra, generar, estadoDeFicha, jugadores, calcularReparto,
     itemsPublicables, ocultos, vista, cambio, clic, lineaVerde, publicar, nuevoBotin, jugadoresBotin, botinVista, botinCambio, botinItem, despojar};
 })();

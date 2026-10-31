@@ -940,7 +940,9 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   - **Varita del destello** (ítem): daño **de luz** (no arcano) en área, con la identidad de la luz (Marcado), Luz sanadora 25 %, y en lugar de
     Pajaritos un % de **Ceguera** (Claude propuso 20 %, 1 turno). El dueño: «Ceguera es una de las opciones del daño de luz».
   - **Luz para los suyos**: la está evaluando el dueño.
-  - Falta: Pergamino de luz cegadora (hoy no hace daño) y lo que aparezca.
+  - **Pergamino de luz cegadora**: queda como está (Res.CC contra Ef.Esp → Ceguera 1 turno, sin daño) y **suma Marcado 1 turno** a los rivales del
+    destello (dueño: «que quede marcado a todos los que les hace daño por un turno»; como no hace daño, Claude lo entendió como todos los rivales de
+    adentro, sin tirada, como el destello de Luz para los suyos —a confirmar si es solo a los que pierden la tirada).
 - [ ] 🕶 **El daño en área saca del sigilo** (dueño, 2026-10-31: «anotalo así como lo sugerís»). Hoy un área le pega al que está en sigilo
   (no lo filtra, vtt-hexgrid/js/13) y recibir daño no se lo saca (solo lo sacan que lo descubran —`romperSigilo`, js/03— o quedar Marcado). Regla
   nueva: si el área **le saca vida**, pierde el sigilo (¿con el Marcado 2 turnos de cuando lo descubren? a confirmar); si la esquiva o la resiste sin daño, sigue en sigilo.

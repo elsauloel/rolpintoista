@@ -198,7 +198,7 @@ const Biblioteca = (() => {
     q('bibg-x').onclick = q('bibg-cancel').onclick = () => q('scrim-biblioteca-guardar').classList.remove('open');
     q('bib-buscar').addEventListener('input', e => {
       const st = estado[actual]; if(!st) return;
-      st.texto = e.target.value.trim().toLowerCase();
+      st.texto = e.target.value.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');   // sin tildes (dueño, 2026-10-30)
       pintarLista();
     });
     q('bib-chips').addEventListener('click', e => {
@@ -345,7 +345,7 @@ const Biblioteca = (() => {
     const propuestas = st.vista === 'propuestas';
     const f = listaVista(st).filter(e =>
       pasaFiltros(st, e)
-      && (!st.texto || (e.nombre + ' ' + e.descripcion).toLowerCase().includes(st.texto)));
+      && (!st.texto || (e.nombre + ' ' + e.descripcion).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(st.texto)));
     document.getElementById('bib-cuenta').textContent = `${f.length} de ${listaVista(st).length}`;
     document.getElementById('bib-lista').innerHTML = f.length ? f.map(e => `
       <div class="bib-fila">

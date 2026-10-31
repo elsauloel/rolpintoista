@@ -112,7 +112,7 @@ ins{background:rgba(168,194,86,.26);color:#D6EE9C;text-decoration:none;border-ra
 <script src="../comun/sesion.js"></script>
 <script src="../comun/menu-sitio.js"></script>
 <script src="../comun/plantillas.js?v=20261028e3"></script>
-<script src="../comun/biblioteca.js?v=20261030cc1"></script>
+<script src="../comun/biblioteca.js?v=20261030tl1"></script>
 <script src="../comun/catalogo.js?v=20261029t"></script>
 <script src="../comun/skills-clase.js?v=20261030es2"></script>
 <script src="../comun/pasivas.js?v=20261030pf1"></script>
@@ -336,11 +336,11 @@ function filaHtml(e){
   </div>`;
 }
 function visibles(){
-  const q = st.texto.toLowerCase();
+  const q = st.texto.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');   // sin tildes (dueño, 2026-10-30)
   return st.entradas
     .filter(e => !st.tipo || e.tipo === st.tipo)
     .filter(e => !st.soloSin || !e.auditado)
-    .filter(e => !q || [e.nombre, e.autorNombre, e.editorNombre, e.descripcion, e.datos && e.datos.detalle].join(' ').toLowerCase().includes(q))
+    .filter(e => !q || [e.nombre, e.autorNombre, e.editorNombre, e.descripcion, e.datos && e.datos.detalle].join(' ').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(q))
     .sort((a, b) => (a.auditado - b.auditado) || (b.fecha - a.fecha) || a.nombre.localeCompare(b.nombre, 'es'));
 }
 function render(){

@@ -257,8 +257,8 @@ function tarjetaSkill(h, contexto){
 }
 function buscar(lista, q){
   if(!q) return lista;
-  q = q.toLowerCase();
-  return lista.filter(h => (h.nombre + ' ' + (h.detalle || '')).toLowerCase().includes(q));
+  q = q.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');   // sin tildes (dueño, 2026-10-30)
+  return lista.filter(h => (h.nombre + ' ' + (h.detalle || '')).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(q));
 }
 function pasaFiltroEstado(h, fe){
   if(!fe) return true;

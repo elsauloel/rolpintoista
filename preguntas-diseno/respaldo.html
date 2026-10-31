@@ -47,9 +47,9 @@ fetch('respaldo.md?v=' + Date.now()).then(r => r.text()).then(md => {
   dibujar();
 }).catch(() => { $('#aviso').textContent = 'No se pudo cargar el respaldo.'; });
 function dibujar(){
-  const q = $('#buscar').value.trim().toLowerCase();
+  const q = $('#buscar').value.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');   // sin tildes (dueño, 2026-10-30)
   $('#lista').innerHTML = secciones.map(s => {
-    const its = s.items.filter(i => !q || (i.texto + ' ' + i.resp.join(' ')).toLowerCase().includes(q));
+    const its = s.items.filter(i => !q || (i.texto + ' ' + i.resp.join(' ')).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(q));
     return `<h2>${esc(s.titulo)}</h2>` + (its.length ? '<ul>' + its.map(i => {
       const m = i.texto.match(/^\[([^\]]+)\]\s*(.*)$/);
       return `<li class="it">${m ? `<span class="meta">${esc(m[1])}</span>${esc(m[2])}` : esc(i.texto)}${i.resp.map(r => `<div class="resp">${esc(r)}</div>`).join('')}</li>`;

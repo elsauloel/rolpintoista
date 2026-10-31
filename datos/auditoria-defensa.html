@@ -128,7 +128,7 @@ function tarjeta(a){
 }
 
 function filtradas(){
-  const q = $('#buscar').value.trim().toLowerCase(), ff = $('#f-familia').value, ft = $('#f-tier').value, fd = $('#f-decision').value, o = $('#orden').value, fo = $('#f-origen').value;
+  const q = $('#buscar').value.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''), ff = $('#f-familia').value, ft = $('#f-tier').value, fd = $('#f-decision').value, o = $('#orden').value, fo = $('#f-origen').value;
   let l = armas.filter(a => {
     const d = dec.decisiones[a.id] || {};
     if(ff && a.slot !== ff) return false;
@@ -139,7 +139,7 @@ function filtradas(){
     if(fd === '_sin' && d.d) return false;
     if(fd === '_nota' && !(d.nota || '').trim()) return false;
     if(fd && !fd.startsWith('_') && d.d !== fd) return false;
-    if(q && !(a.nombre + ' ' + a.detalle).toLowerCase().includes(q)) return false;
+    if(q && !(a.nombre + ' ' + a.detalle).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(q)) return false;
     return true;
   });
   const cmp = {

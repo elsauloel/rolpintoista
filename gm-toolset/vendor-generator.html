@@ -408,7 +408,7 @@ input[type=checkbox]{width:auto}
 <script src="../comun/plantillas.js?v=20261028e3"></script>
 <script src="../comun/glosario.js?v=20261022f"></script>
 <script src="../comun/item-corto.js?v=20261019z"></script>
-<script src="../comun/biblioteca.js?v=20261030cc1"></script>
+<script src="../comun/biblioteca.js?v=20261030tl1"></script>
 <script src="../comun/combatiente.js?v=20261029t"></script>
 <script src="../comun/paso-a-paso.js?v=20261010a"></script>
 <script src="../comun/estado-preguntas.js?v=20261009zl"></script>
@@ -791,7 +791,7 @@ function renderPreview(){
   $('#tienda-nombre').value = tiendaActual.nombre || '';
   const garantizados = new Set(tiendaActual.garantizados);
   const items = tiendaActual.items.map(id => CATALOGO.find(it => it.id === id)).filter(Boolean);
-  const textoBusqueda = ($('#preview-buscar').value || '').trim().toLowerCase();
+  const textoBusqueda = ($('#preview-buscar').value || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');   // sin tildes (dueño, 2026-10-30)
   // Las pestañas (dueño, 2026-10-08: «el GM también debe poder ver las pestañas por separado, para visualizar y editar mejor cada una»):
   // «Todas» y una por sección, con cuántos tiene. Con una sección abierta, la lista y «+ Agregar ítems» son de esa sección.
   const nSec = {};
@@ -802,7 +802,7 @@ function renderPreview(){
   $('#preview-secciones').innerHTML = `<button type="button" class="preview-sec${seccionVista ? '' : ' on'}" data-preview-sec="">Todas<b>${fmt(items.length)}</b></button>` +
     pestanas.map(k => `<button type="button" class="preview-sec${seccionVista === k ? ' on' : ''}" data-preview-sec="${k}" title="${esc(G.SECCIONES[k].detalle)}">${G.SECCIONES[k].icono} ${esc(G.SECCIONES[k].label)}<b>${fmt(nSec[k] || 0)}</b></button>`).join('');
   const deVista = seccionVista ? items.filter(it => G.seccionDe(it) === seccionVista) : items;
-  const visibles = textoBusqueda ? deVista.filter(it => it.nombre.toLowerCase().includes(textoBusqueda)) : deVista;
+  const visibles = textoBusqueda ? deVista.filter(it => it.nombre.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(textoBusqueda)) : deVista;
 
   const porTier = {};
   items.forEach(it => porTier[it.tier] = (porTier[it.tier] || 0) + 1);

@@ -225,9 +225,9 @@ function histHora(ts){
 function histDibujar(docs, filtro){
   const cont = document.getElementById('hp-lista');
   if(!cont) return;
-  const f = String(filtro || '').trim().toLowerCase();
+  const f = String(filtro || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');   // sin tildes (dueño, 2026-10-30)
   const filas = docs.map(d => d.data({serverTimestamps: 'estimate'}))
-    .filter(x => !f || (x.quien + ' ' + x.texto).toLowerCase().includes(f));
+    .filter(x => !f || (x.quien + ' ' + x.texto).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(f));
   if(!filas.length){
     cont.innerHTML = `<div class="hp-vacio">${docs.length ? 'Nada coincide con lo que escribiste.' : 'Todavía no se registró nada. Se anota mientras tenés abierta alguna herramienta del GM.'}</div>`;
     return;

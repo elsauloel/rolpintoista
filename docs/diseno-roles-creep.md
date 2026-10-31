@@ -739,6 +739,11 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
    su próximo ataque con arma suma un dado del Tipo de su arma (se va a los 2 turnos si no ataca).
 3. ✅ **Arma elemental**: el arma de un aliado pega de fuego, hielo o rayo por unos turnos — **Arma ígnea / helada / eléctrica / ácida / venenosa**
    (2026-10-21: +1d4 del elemento por golpe, 3 turnos, y lo de la Carga Elemental).
+3b. **Arma elemental, una sola habilidad con el elemento a elegir** (dueño, 2026-10-31: «lo vamos a unificar en un skill de buffer que sea arma
+   elemental, que uno puede elegir el elemento y que cada elemento ofrezca sus características… fuego más daño en vez de quemadura… eléctrico salta»).
+   Reemplaza a las cinco Armas elementales y suma la siniestra (la vieja «Arma sombría», 4b): +1d4 del elemento por golpe, 3 turnos, 2 No2 y 2 SP,
+   no conviven. Fuego ×1,5 (sin quemadura) · Hielo Escarcha · Eléctrico salta + 20 % Parálisis · Ácido Armadura rota · Tóxico Veneno · **Siniestro
+   Herida sombría + Punto débil**. Abierto: Punto débil 1 o 2 turnos; ¿☀ Luz (Marcado)?; programarla ahora o junto con otras.
 4. **Filo envenenado / sangrante**: los golpes de un aliado dejan Veneno o Sangrado.
 4c. ✅ **Provocar para un aliado** — **Tirar la bronca** (hecha el 2026-10-26: radio 3, Provocado 2 turnos, 2 No2 y 4 SP; el Anuncio y el brillo; idea del dueño, 2026-10-26: «elija algún aliado y hay algún efecto en área alrededor de ese aliado que todos los que son afectados
     tienen que tirar resistencia mental para no ser provocados por el aliado que selecciona el support, y quedarían provocados durante N cantidad de turnos»):

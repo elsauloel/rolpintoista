@@ -132,7 +132,7 @@ async function borrarPersonajeGM(id, nombre, boton){
   const aviso = `Esto borra a ${nombre} de la partida, para todos, y no se puede deshacer.\n\n` +
                 `Si el jugador lo quiere conservar, avisale antes (podés bajar un respaldo con "💾 Respaldo partida" desde gm-tools).\n\n¿Seguís?`;
   if(!(await Confirmar.preguntar(aviso, {titulo: 'Borrar', si: 'Borrar', peligro: true}))) return;
-  const escrito = prompt(`Para confirmar el borrado, escribí el nombre tal cual: ${nombre}`);
+  const escrito = await Confirmar.texto(`Para confirmar el borrado, escribí el nombre tal cual: ${nombre}`, {titulo: 'Borrar', icono: '🗑', si: 'Borrar', max: 80});
   if(escrito === null) return;
   if(escrito.trim().toLowerCase() !== nombre.trim().toLowerCase()){
     toast('El nombre no coincide — no se borró nada');

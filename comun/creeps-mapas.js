@@ -65,7 +65,7 @@ const CreepsMapas = (() => {
 
   async function confirmarBorrado(nombre){
     if(!(await Confirmar.preguntar(`¿Borrar el mapa "${nombre}" con todo lo que tiene (tokens y dibujos)? No se puede deshacer.`, {titulo: 'Borrar', si: 'Borrar', peligro: true}))) return false;
-    const escrito = prompt(`Para confirmar, escribí el nombre tal cual: ${nombre}`);
+    const escrito = await Confirmar.texto(`Para confirmar, escribí el nombre tal cual: ${nombre}`, {titulo: 'Borrar el mapa', icono: '🗑', si: 'Borrar', max: 80});
     if(escrito === null) return false;
     if(escrito.trim().toLowerCase() !== String(nombre).trim().toLowerCase()){ if(typeof toast === 'function') toast('El nombre no coincide — no se borró nada'); return false; }
     return true;

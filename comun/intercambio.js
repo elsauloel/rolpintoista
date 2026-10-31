@@ -336,7 +336,7 @@ const Intercambio = (() => {
     const total = it0.consumible || it0.trofeo ? Math.max(1, num(it0.unidades) || 1) : 1;
     let k = num(unidades) || total;
     if(!unidades && total > 1){
-      const r = window.prompt(`¿Cuántas de ${it0.nombre} convertís en despojos? (tenés ${fmt(total)})`, String(total));
+      const r = await Confirmar.texto(`¿Cuántas de ${it0.nombre} convertís en despojos? (tenés ${fmt(total)})`, {titulo: 'Convertir en despojos', icono: '♻', valor: String(total), si: 'Seguir'});
       if(r === null) return;
       k = Math.max(1, Math.min(total, Math.round(num(r)) || 0));
       if(!k) return;

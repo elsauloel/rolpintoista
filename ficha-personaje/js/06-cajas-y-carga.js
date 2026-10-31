@@ -324,7 +324,7 @@ document.addEventListener('click', async e => {
     const er = S.efectos.find(x => x.id === erId);
     if(er){
       const neto = !!er.excedenteVida, max = neto ? null : num(er.escudoMagico), actual = num(er.escudoMagicoActual ?? er.escudoMagico);
-      const txt = acc === 'set' ? prompt(neto ? `${er.nombre}: ${fmt(actual)}\nEscribí el valor nuevo, +N o -N (sin tope)` : `${er.nombre}: ${fmt(actual)}/${fmt(max)}\nEscribí el valor nuevo, +N o -N (para cambiar el máximo: max 12)`, fmt(actual)) : (num(acc) > 0 ? '+' : '') + acc;
+      const txt = acc === 'set' ? await Confirmar.texto(neto ? `${er.nombre}: ${fmt(actual)}\nEscribí el valor nuevo, +N o -N (sin tope)` : `${er.nombre}: ${fmt(actual)}/${fmt(max)}\nEscribí el valor nuevo, +N o -N (para cambiar el máximo: max 12)`, {titulo: er.nombre, icono: '🛡', valor: fmt(actual), si: 'Aplicar'}) : (num(acc) > 0 ? '+' : '') + acc;
       const nuevo = txt === null ? null : escudoParsear(txt, actual, max);
       if(nuevo){ er.escudoMagico = neto ? nuevo.actual : nuevo.max; er.escudoMagicoActual = nuevo.actual; renderList('efectos'); refresh(); }
       else if(txt !== null) toast(neto ? 'Escribí un número, +N o -N' : 'Escribí un número, +N, -N o "max N"');

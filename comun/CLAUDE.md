@@ -1764,3 +1764,11 @@ versión parecida en más de una, es candidato a juntar.
   defensa (`eva`) en 1, con la nota «lo sorprendieron por la espalda: vale 1». El bono «por la espalda» del arma sigue sumando.
 
 - **`confirmar.js`, `Confirmar.marcar`** (2026-10-30, dueño: «que te aparezca una planilla… y selecciones este, este y este»): una lista con casillas en grupos (con «todos / ninguno»), `fijo` para lo que se ve pero no se marca, y el botón que cuenta cuántos van → los valores marcados o null. La usa el mapa para 👥 Traer jugadores… y 👹 Traer creeps… (js/13: los creeps de otro mapa o de la Reserva se mudan, no se duplican).
+
+- **`confirmar.js`, sin ventanas del navegador** (2026-10-31, dueño: los carteles «elsauloel.github.io dice…» → el cartel del juego): `Confirmar.avisar(texto,
+  {titulo, icono, si})` (un solo botón, «Entendido»; `preguntar` acepta `soloSi`) reemplaza a los `alert()` de la Ejecución ✨ (`avisoFalta` en
+  `asistente-duelo-hab.js`). Los `prompt()` que quedaban pasaron a `Confirmar.texto` (escribir el nombre para borrar un personaje o un mapa, renombrar el
+  mapa, corregir el día, el escudo y la Armadura rota a mano, la Inteligencia, el nombre de una tienda, las etiquetas de la biblioteca, el motivo de una baja,
+  cuántas unidades convertir en despojos) y el personaje de un respaldo, a `Confirmar.elegir`. **Una pregunta nueva va con `Confirmar`, nunca con
+  `confirm`/`prompt`/`alert`** (la función que la usa tiene que ser `async`).
+

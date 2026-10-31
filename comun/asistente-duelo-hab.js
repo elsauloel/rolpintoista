@@ -83,6 +83,8 @@ const AsistenteDueloHab = (() => {
   const TIPOS = [['arcano', 'Arcano (mágico)'], ['fuego', 'Fuego (mágico)'], ['hielo', 'Hielo (mágico)'], ['rayo', 'Eléctrico (mágico)'], ['toxico', 'Tóxico (veneno, gas)'], ['luz', 'Luz (Marcado; ×1,5 a no-muertos y demonios)'], ['siniestro', 'Siniestro (no se puede curar; nada a no-muertos y demonios)'], ['fisico', 'Físico (respeta la Defensa)']];
   const STAT_TXT = Object.fromEntries([...TIRA, ...CONTRA]);
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+  // Lo que falta para guardar: el cartel del juego, no el alert() del navegador (2026-10-31). No hay que esperarlo: el paso sigue donde estaba.
+  const avisoFalta = m => (typeof Confirmar !== 'undefined' && Confirmar.avisar ? Confirmar.avisar(m, {titulo: 'Falta algo', icono: '✋'}) : alert(m));
 
   function css(){
     if(document.getElementById('adh-css')) return;
@@ -780,7 +782,7 @@ const AsistenteDueloHab = (() => {
         if(inp) st.contraFormula = inp.value;
         if(et) st.contraFormulaEtq = et.value;
         const r = leerFormula(st.contraFormula);
-        if(!r){ alert('Escribí dados (1d6+2) o un stat más un número (des + 2).'); return; }
+        if(!r){ avisoFalta('Escribí dados (1d6+2) o un stat más un número (des + 2).'); return; }
         if(r.stat && !r.bono) st.contra.add(r.stat);
         else st.contraExtra.push(r.formula ? {formula: r.formula, etq: st.contraFormulaEtq.trim() || 'Resistencia'} : {stat: r.stat, bono: r.bono});
         st.contraFormula = ''; st.contraFormulaEtq = '';
@@ -803,7 +805,7 @@ const AsistenteDueloHab = (() => {
         dibujar();
       });
       q('[data-dano-formula]', e => { st.danoFormula = e.target.value.trim(); });
-      q('[data-dano-mas]', e => { const v = e.target.value.replace(/\s+/g, '').replace(/−/g, '-'); st.danoMas = v && /^[+-]?(\d+|\d*d\d+)([+-](\d+|\d*d\d+))*$/i.test(v) ? v : ''; if(v && !st.danoMas){ alert('Escribí un fijo y/o un dado: +2, +1d6 o +1d6+2.'); e.target.value = ''; } });
+      q('[data-dano-mas]', e => { const v = e.target.value.replace(/\s+/g, '').replace(/−/g, '-'); st.danoMas = v && /^[+-]?(\d+|\d*d\d+)([+-](\d+|\d*d\d+))*$/i.test(v) ? v : ''; if(v && !st.danoMas){ avisoFalta('Escribí un fijo y/o un dado: +2, +1d6 o +1d6+2.'); e.target.value = ''; } });
       clic('[data-freno-abrir]', () => { st.frenoAbierto = !st.frenoAbierto; dibujar(); });
       f.querySelectorAll('[name=freno]').forEach(r => r.onchange = () => {
         if(r.value === 'fisico') st.ignoraDano = false;
@@ -908,7 +910,7 @@ const AsistenteDueloHab = (() => {
         const costoResultado = () => ({sp: st.costoSp.trim(), nitrosCosto: st.costoNitrosModo === 'ataque' ? 'ATAQUE' : st.costoNitrosModo === 'x' ? 'X' : st.costoNitrosNum, hpCosto: st.costoHp, turnoAjenoSp: st.costoTurnoOn ? st.costoTurnoSp.trim() : ''});
         if(!st.activo){ cerrar(); cfg.alGuardar(null); return; }
         if(st.modo === 'flash'){
-          if(!st.flashEn.size){ alert('Marcá al menos una tirada donde vale el Flash.'); return false; }
+          if(!st.flashEn.size){ avisoFalta('Marcá al menos una tirada donde vale el Flash.'); return false; }
           cerrar(); cfg.alGuardar({duelo: {modo: 'flash', flash: {en: [...st.flashEn], bono: st.flashBono, ...(st.flashDodge ? {dodge: true} : {})}}, costo: costoResultado()}); return;
         }
         const efs = st.efectos.filter(e => e.cura !== undefined ? curaValida(e.cura) : e.nombre).map(mapEfectoOut);
@@ -928,7 +930,7 @@ const AsistenteDueloHab = (() => {
           cerrar(); cfg.alGuardar({duelo: o2, costo: costoResultado()}); return;
         }
         const hayTira = !st.tiraNinguna && (st.tiraModo === 'custom' ? !!st.tiraFormula.trim() : !!st.tira);
-        if(!st.tiraNinguna && st.tiraModo === 'custom' && !st.tiraFormula.trim()){ alert('Escribí la fórmula de la tirada custom (podés usar «X»), o tildá «No lleva tirada».'); return false; }
+        if(!st.tiraNinguna && st.tiraModo === 'custom' && !st.tiraFormula.trim()){ avisoFalta('Escribí la fórmula de la tirada custom (podés usar «X»), o tildá «No lleva tirada».'); return false; }
         const esArea = st.objetivo === 'area' || st.objetivo === 'onda' || st.objetivo === 'cono' || st.objetivo === 'linea';
         const out = {objetivo: st.objetivo, tira: (!st.tiraNinguna && st.tiraModo === 'stat') ? (st.tira || '') : '',
           contra: (hayTira && (esArea || st.objetivo === 'zona' || st.contraModo === 'stats')) ? [...st.contra, ...(st.objetivo === 'zona' ? [] : st.contraExtra)] : []};
@@ -936,19 +938,19 @@ const AsistenteDueloHab = (() => {
         if(st.objetivo === 'area' && st.centroModo) out.centroAlcance = st.centroModo === 'rango' ? 'rango' : st.centroModo === 'adyacente' ? 1 : Math.max(1, st.centroN);
         if((st.objetivo === 'area' || st.objetivo === 'onda') && st.permanencia === 'queda'){
           const z = st.zq;
-          if(!z.dano && !z.estadoNombre){ alert('La zona que queda tiene que hacer algo: un daño o un estado (paso «La zona»).'); return false; }
-          if(z.dano && !/^\d*d\d+([+-]\d+)?$|^\d+$/i.test(z.dano.replace(/\s+/g, ''))){ alert('El daño de la zona tiene que ser un número o dados (1d4, 2d6+1).'); return false; }
+          if(!z.dano && !z.estadoNombre){ avisoFalta('La zona que queda tiene que hacer algo: un daño o un estado (paso «La zona»).'); return false; }
+          if(z.dano && !/^\d*d\d+([+-]\d+)?$|^\d+$/i.test(z.dano.replace(/\s+/g, ''))){ avisoFalta('El daño de la zona tiene que ser un número o dados (1d4, 2d6+1).'); return false; }
           out.zonaQueda = {turnos: z.turnos, ...(z.dano ? {dano: z.dano.replace(/\s+/g, ''), ...(z.tipoDano ? {tipoDano: z.tipoDano} : {})} : {}),
             ...(z.estadoNombre ? {estado: {nombre: z.estadoNombre, turnos: z.estadoTurnos}} : {}), ...(z.altura !== 'aire' ? {altura: z.altura} : {}),
             ...(z.contra ? {contra: z.contra, tira: z.tira || 'dmgesp'} : {}), ...(z.nombre ? {nombre: z.nombre} : {}), ...(z.color ? {color: z.color} : {}),
             ...(!z.enMant ? {enMantenimiento: false} : {}), ...(z.cadaPaso ? {cadaPaso: true} : {}), ...(z.soloRivales ? {soloRivales: true} : {})};
         }
         if(!st.tiraNinguna && st.tiraModo === 'custom'){ out.tiraFormula = st.tiraFormula.trim(); out.tiraEtiqueta = st.tiraEtiqueta.trim() || 'Tirada'; }
-        if(esArea && !hayTira){ alert('Una habilidad de área u onda necesita una tirada (ej. PdG.Esp o Fuerza contra lo que resiste cada uno) — elegí qué tira quien la usa.'); return false; }
-        if(st.objetivo === 'zona' && !st.dano && !st.zonaEstadoNombre){ alert('Una zona persistente necesita hacer algo: marcá «Esta habilidad hace daño» en el paso Daño y/o elegí un estado en el paso Objetivo.'); return false; }
-        if(hayTira && (esArea || st.contraModo === 'stats') && st.objetivo !== 'zona' && !out.contra.length){ alert('Marcá con qué se resiste el objetivo (o elegí «Nadie» / «Otra cosa»).'); return false; }
+        if(esArea && !hayTira){ avisoFalta('Una habilidad de área u onda necesita una tirada (ej. PdG.Esp o Fuerza contra lo que resiste cada uno) — elegí qué tira quien la usa.'); return false; }
+        if(st.objetivo === 'zona' && !st.dano && !st.zonaEstadoNombre){ avisoFalta('Una zona persistente necesita hacer algo: marcá «Esta habilidad hace daño» en el paso Daño y/o elegí un estado en el paso Objetivo.'); return false; }
+        if(hayTira && (esArea || st.contraModo === 'stats') && st.objetivo !== 'zona' && !out.contra.length){ avisoFalta('Marcá con qué se resiste el objetivo (o elegí «Nadie» / «Otra cosa»).'); return false; }
         if(hayTira && !esArea && st.contraModo === 'otro'){
-          if(!st.contraOtro.trim()){ alert('Escribí con qué se resiste (o elegí «Nadie» si no hay nada que resista).'); return false; }
+          if(!st.contraOtro.trim()){ avisoFalta('Escribí con qué se resiste (o elegí «Nadie» si no hay nada que resista).'); return false; }
           out.contraOtro = st.contraOtro.trim();
         }
         if(st.dano){ out.dano = true; out.tipoDano = st.tipoDano; out.ignoraDano = st.ignoraDano;
@@ -962,21 +964,21 @@ const AsistenteDueloHab = (() => {
           }
           if(st.danoMas && !st.danoDif) out.danoMas = st.danoMas; }
         if(st.dano && st.objetivo !== 'zona' && st.objetivo !== 'uno mismo' && st.danoDif){
-          if(!hayTira || !out.contra.length){ alert('El daño «la diferencia» necesita una tirada (paso Tirada) y algo con qué resistirla (paso Resistencia).'); return false; }
+          if(!hayTira || !out.contra.length){ avisoFalta('El daño «la diferencia» necesita una tirada (paso Tirada) y algo con qué resistirla (paso Resistencia).'); return false; }
           out.danoDiferencia = true;
         }
         if(st.dano && st.danoArma && !st.danoDif && st.objetivo !== 'zona' && st.objetivo !== 'uno mismo') out.danoArma = true;
         if(st.dano && st.objetivo !== 'zona' && st.drena){ out.drena = true; out.drenaTope = Math.max(0, Math.round(Number(st.drenaTope) || 0)); if(st.drenaPct < 100) out.drenaPct = st.drenaPct; }
         if(st.objetivo === 'zona' && st.dano){
           if(st.danoDif){
-            if(!hayTira || st.tiraModo === 'custom' || !out.contra.length){ alert('El daño «la diferencia» necesita que quien la usa tire un stat (paso Tirada) y algo con qué resistirla (paso Resistencia).'); return false; }
+            if(!hayTira || st.tiraModo === 'custom' || !out.contra.length){ avisoFalta('El daño «la diferencia» necesita que quien la usa tire un stat (paso Tirada) y algo con qué resistirla (paso Resistencia).'); return false; }
             out.danoDiferencia = true;
           }
           if(st.danoExtra){
-            if(!/^\d*d\d+\s*([+-]\s*\d+)?$/i.test(st.danoExtra)){ alert('La tirada de «si el daño entra» tiene que ser una fórmula de dados, por ejemplo 1d20.'); return false; }
+            if(!/^\d*d\d+\s*([+-]\s*\d+)?$/i.test(st.danoExtra)){ avisoFalta('La tirada de «si el daño entra» tiene que ser una fórmula de dados, por ejemplo 1d20.'); return false; }
             out.danoExtra = st.danoExtra.replace(/\s+/g, '');
             // 🎲 según la tirada (2026-10-22): se guarda limpia; un renglón sin estado ni «cae» avisa
-            if(st.danoExtraEfectos.some(x => x && !x.caer && !(x.estado && String(x.estado.nombre || '').trim()))){ alert('Cada renglón de «según la tirada» necesita un estado (o «cae»).'); return false; }
+            if(st.danoExtraEfectos.some(x => x && !x.caer && !(x.estado && String(x.estado.nombre || '').trim()))){ avisoFalta('Cada renglón de «según la tirada» necesita un estado (o «cae»).'); return false; }
             const pt = typeof Combatiente !== 'undefined' && Combatiente.porTiradaNorm ? Combatiente.porTiradaNorm(st.danoExtraEfectos) : st.danoExtraEfectos;
             if(pt.length) out.danoExtraEfectos = pt;
           }

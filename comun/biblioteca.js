@@ -400,7 +400,7 @@ const Biblioteca = (() => {
         aviso(`"${ent.nombre}" quedó auditado`);
         pintar();
       }else if(acc === 'etiquetas'){
-        const txt = prompt('Etiquetas (separadas por coma):', ent.etiquetas.join(', '));
+        const txt = await Confirmar.texto('Etiquetas (separadas por coma):', {titulo: 'Etiquetas', icono: '🏷', valor: ent.etiquetas.join(', '), si: 'Guardar', max: 300});
         if(txt === null) return;
         ent.etiquetas = limpiarEtiquetas(txt);
         await fbDb.collection(coleccion).doc(ent.id).update({etiquetas: ent.etiquetas});

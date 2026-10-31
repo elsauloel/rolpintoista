@@ -9,6 +9,7 @@
    Confirmar.elegir(texto, {titulo, icono, opciones: [{valor, texto, detalle}], no}) → Promise<valor | null> (2026-10-13, Carga Elemental): una opción
    por botón (con una línea chica debajo), y «no» (Cancelar) = null. Esc / ✕ / clic afuera = null.
    Confirmar.texto(texto, {titulo, icono, valor, sugerencias}) → Promise<string | null> (2026-10-26): un campo de texto (ver abajo).
+   Confirmar.avisar(texto, {titulo, icono, si}) → Promise (2026-10-31, en vez de alert()): un aviso con un solo botón («Entendido»).
    ========================================================= */
 const Confirmar = (() => {
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
@@ -44,7 +45,7 @@ const Confirmar = (() => {
       f.innerHTML = `<div class="cfj-caja" role="dialog" aria-modal="true">
         <div class="cfj-cab"><span>${esc(o.icono || '❓')} ${esc(o.titulo || 'Confirmar')}</span><button type="button" data-cfj="no" title="Cancelar">✕</button></div>
         <div class="cfj-cuerpo"><p class="cfj-texto">${esc(texto)}</p>
-          <div class="cfj-pie"><button type="button" data-cfj="si"${o.peligro ? ' class="peligro"' : ''}>${esc(o.si || 'Sí')}</button><button type="button" class="sec" data-cfj="no">${esc(o.no || 'Cancelar')}</button></div></div>
+          <div class="cfj-pie"><button type="button" data-cfj="si"${o.peligro ? ' class="peligro"' : ''}>${esc(o.si || 'Sí')}</button>${o.soloSi ? '' : `<button type="button" class="sec" data-cfj="no">${esc(o.no || 'Cancelar')}</button>`}</div></div>
       </div>`;
       const tecla = ev => {
         if(ev.key === 'Escape'){ ev.stopImmediatePropagation(); ev.preventDefault(); fin(false); }
@@ -164,5 +165,7 @@ const Confirmar = (() => {
       pintar();
     });
   }
-  return {preguntar, elegir, texto, marcar};
+  // ℹ Un aviso con un solo botón, en vez del alert() del navegador (2026-10-31). No hace falta esperarlo: el que lo llama sigue.
+  function avisar(txt, o){ return preguntar(txt, {icono: 'ℹ', titulo: 'Aviso', si: 'Entendido', ...(o || {}), soloSi: true}); }
+  return {preguntar, elegir, texto, marcar, avisar};
 })();

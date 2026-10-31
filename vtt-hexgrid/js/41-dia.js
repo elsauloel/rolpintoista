@@ -149,7 +149,7 @@ async function pasarDeDia(){
 }
 async function corregirDia(){
   if(!soyGM) return;
-  const t = prompt(`¿Qué día es? (hoy: Día ${diaActual}). Corregir el número no renueva nada.`, String(diaActual || 1));
+  const t = await Confirmar.texto(`¿Qué día es? (hoy: Día ${diaActual}). Corregir el número no renueva nada.`, {titulo: 'Corregir el día', icono: '☀', valor: String(diaActual || 1), si: 'Cambiar'});
   if(t === null) return;
   const n = Math.max(0, Math.round(num(t)));
   try{ await refDia().set({dia: n, manual: true, actualizado: firebase.firestore.FieldValue.serverTimestamp()}); toast(`Ahora es el Día ${n}`); }

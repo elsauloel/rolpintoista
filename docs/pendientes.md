@@ -774,7 +774,7 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 11b. [ ] **Anillo de armadura indestructible en pausa** (P196, dueño 2026-10-12): archivado hasta revisar si es demasiado poderoso.
 12. [ ] **Preguntas para la mesa**: P143 (la tirada de la zona) espera la opinión del grupo. (P144 ✅ 2026-10-12: la Defensa especial es un stat.)
 
-- [ ] **Los carteles del navegador («elsauloel.github.io dice…») → el cartel del juego** (dueño, 2026-10-08: «se siente raro, ¿se podría integrar?»).
+- [x] (2026-10-31: hecho — ya no queda ningún `confirm()`; los 15 `prompt()` que quedaban pasaron a `Confirmar.texto` (o `Confirmar.elegir`: el personaje de un respaldo) y los `alert()` de la Ejecución ✨ a `Confirmar.avisar` (nuevo: un solo botón). Quedan `alert()` solo como respaldo si una página no tiene `toast` (biblioteca, ítems subidos, editar ítem, pausa, asistente de ítems: no pasa en ninguna página del juego). Probado en el mapa (corregir el día, renombrar el mapa, el aviso), en la ficha de un jugador (Inteligencia a mano) y en el generador de tiendas: cero ventanas del navegador.) **Los carteles del navegador («elsauloel.github.io dice…») → el cartel del juego** (dueño, 2026-10-08: «se siente raro, ¿se podría integrar?»).
   La pieza ya está: `AvisoCombate.preguntar(texto, {titulo, icono, si, no})` → Promise (comun/aviso-combate.js). Ya pasados (el mapa): atacar a un
   aliado, «¿atacar igual?» Sentado / sin No2 de creeps e invocaciones, consumible de creep sin No2, subirle la vida a un caído, levantar un arma lejos,
   el Impulso de los anillos. **Faltan**: los que pasan por `ui.confirmar` de forma sincrónica (FichaAcciones: Sentado y Silencio del personaje, el

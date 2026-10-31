@@ -451,7 +451,7 @@ function crearMapa(){
 
 async function renombrarMapa(id){
   const actual = nombreMapa(id);
-  const nombre = (prompt('Nuevo nombre del mapa:', actual) || '').trim().slice(0, 40);
+  const nombre = ((await Confirmar.texto('Nuevo nombre del mapa:', {titulo: 'Renombrar el mapa', icono: '🗺', valor: actual, si: 'Renombrar', max: 40})) || '').trim().slice(0, 40);
   if(!nombre || nombre === actual) return;
   try{ await fbDb.doc(fbRutaCampana(`mapas/${id}`)).set({nombre}, {merge: true}); renderPanel(true); }
   catch(err){ console.error('No se pudo renombrar el mapa:', err); toast('No se pudo renombrar el mapa'); }

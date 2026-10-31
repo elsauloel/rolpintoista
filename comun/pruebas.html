@@ -4301,6 +4301,14 @@ prueba('paso a paso: al crear, «✔ Crear» solo en el último paso; Cancelar p
   r.push(hechos, api.abierto());
   igual(r, [false, 2, 3, true, true, ['crear', 'cancelar'], false]);
 });
+prueba('aviso del juego en vez de alert() (2026-10-31): un solo botón, «Entendido», y se cierra', async () => {
+  const a = Confirmar.avisar('Falta algo', {titulo: 'Falta algo'});
+  const f = document.querySelector('.cfj-fondo');
+  const r = [f.querySelectorAll('.cfj-pie button').length, f.querySelector('[data-cfj="si"]').textContent];
+  f.querySelector('[data-cfj="si"]').click();
+  r.push(await a, !!document.querySelector('.cfj-fondo'));
+  igual(r, [1, 'Entendido', true, false]);
+});
 prueba('cartel de confirmar (2026-10-10): Sí → true, Cancelar / Esc → false; lleva el título y el botón pedidos', async () => {
   const a = Confirmar.preguntar('¿Borrar X?', {titulo: 'Borrar', si: 'Borrar', peligro: true});
   const f = document.querySelector('.cfj-fondo'), cab = f.querySelector('.cfj-cab').textContent, si = f.querySelector('[data-cfj="si"]');

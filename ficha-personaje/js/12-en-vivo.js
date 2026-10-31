@@ -539,15 +539,15 @@ async function crearPersonajeNuevo(datos, o){
   }
 }
 
-function fichaCargarArchivo(data){
+async function fichaCargarArchivo(data){
   // Respaldo de toda la partida (lo baja el GM desde el inicio): se elige
   // cuál de sus personajes cargar.
   if(data && data.tipo === 'respaldo-partida'){
     const lista = Array.isArray(data.fichas) ? data.fichas.filter(f => f && f.ficha) : [];
     if(!lista.length){ toast('Ese respaldo no tiene personajes'); return; }
-    const opciones = lista.map((f, i) => `${i + 1}. ${f.nombre || 'Sin nombre'}${f.dueno ? ` (de ${f.dueno})` : ''}`).join('\n');
-    const eleccion = prompt(`Es un respaldo de toda la partida. ¿Qué personaje querés cargar?\n\n${opciones}\n\nEscribí el número:`);
-    const n = parseInt(eleccion, 10);
+    // El cartel del juego con un botón por personaje, no el prompt() del navegador (2026-10-31).
+    const n = await Confirmar.elegir('Es un respaldo de toda la partida. ¿Qué personaje querés cargar?', {titulo: 'Cargar del respaldo', icono: '💾',
+      opciones: lista.map((f, i) => ({valor: i + 1, texto: f.nombre || 'Sin nombre', detalle: f.dueno ? `de ${f.dueno}` : ''}))});
     if(!n || n < 1 || n > lista.length) return;
     data = lista[n - 1].ficha;
   }
@@ -645,7 +645,7 @@ async function borrarPersonaje(id, nombre){
   const aviso = `Esto borra a ${nombre} de la mesa, para todos, y no se puede deshacer.\n\n` +
                 `Si querés conservarlo, antes abrilo y bajá una copia con 💾 Guardar copia.\n\n¿Seguís?`;
   if(!(await Confirmar.preguntar(aviso, {titulo: 'Borrar', si: 'Borrar', peligro: true}))) return;
-  const escrito = prompt(`Para confirmar el borrado, escribí el nombre tal cual: ${nombre}`);
+  const escrito = await Confirmar.texto(`Para confirmar el borrado, escribí el nombre tal cual: ${nombre}`, {titulo: 'Borrar', icono: '🗑', si: 'Borrar', max: 80});
   if(escrito === null) return;
   if(escrito.trim().toLowerCase() !== nombre.trim().toLowerCase()){
     toast('El nombre no coincide — no se borró nada');

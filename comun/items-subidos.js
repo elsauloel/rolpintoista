@@ -63,7 +63,7 @@ const ItemsSubidos = (() => {
     if(!item || !item.id || !item.nombre) return false;
     const duenoEmail = typeof BIBLIOTECA_DUENO_EMAIL !== 'undefined' ? BIBLIOTECA_DUENO_EMAIL : 'el dueño del proyecto';
     if(!(await Confirmar.preguntar(`¿Solicitar eliminar "${item.nombre}" del catálogo? No se borra al instante: lo tiene que aprobar ${duenoEmail}.`, {titulo: 'Solicitar eliminar', si: 'Solicitar', peligro: true}))) return false;
-    const motivo = (prompt('¿Por qué debería eliminarse? (obligatorio)') || '').trim();
+    const motivo = ((await Confirmar.texto('¿Por qué debería eliminarse? (obligatorio)', {titulo: 'Solicitar eliminar', icono: '🗑', si: 'Solicitar', max: 300})) || '').trim();
     if(!motivo){ avisar('Hace falta escribir el motivo.'); return false; }
     const dueno = typeof BIBLIOTECA_DUENO_EMAIL !== 'undefined' && fbUsuario.email === BIBLIOTECA_DUENO_EMAIL && fbUsuario.emailVerified;
     const quien = String((typeof fbMiembro !== 'undefined' && fbMiembro && fbMiembro.nombre) || fbUsuario.displayName || '').slice(0, 40);

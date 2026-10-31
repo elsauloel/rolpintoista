@@ -1190,23 +1190,23 @@ function hudConectar(t){
     if(e) abrirEditarEstado(t, e.nombre);
   });
   hud.querySelectorAll('[data-hud-quitar]').forEach(b => b.onclick = () => hudEstadoCambiar(t, num(b.dataset.hudQuitar), 'quitar'));
-  hud.querySelectorAll('[data-hud-armrota]').forEach(b => b.onclick = () => {
+  hud.querySelectorAll('[data-hud-armrota]').forEach(b => b.onclick = async () => {
     const [i, acc] = b.dataset.hudArmrota.split(':');
     const v = vinculo(t);
     const e = ((v && v.resumen && v.resumen.estados) || [])[num(i)];
     if(!e) return;
     const stacks = Math.max(1, num(e.stacks) || 1);
-    const txt = acc === 'set' ? prompt(`${e.nombre}: ×${fmt(stacks)}
-Escribí cuántos puntos de armadura rota, +N o -N (0 la repara)`, fmt(stacks)) : (num(acc) > 0 ? '+' : '') + acc;
+    const txt = acc === 'set' ? await Confirmar.texto(`${e.nombre}: ×${fmt(stacks)}
+Escribí cuántos puntos de armadura rota, +N o -N (0 la repara)`, {titulo: e.nombre, icono: '🛡', valor: fmt(stacks), si: 'Aplicar'}) : (num(acc) > 0 ? '+' : '') + acc;
     if(txt === null) return;
     hudEstadoCambiar(t, num(i), 'armadura', txt);
   });
-  hud.querySelectorAll('[data-hud-escudo]').forEach(b => b.onclick = () => {
+  hud.querySelectorAll('[data-hud-escudo]').forEach(b => b.onclick = async () => {
     const [i, acc] = b.dataset.hudEscudo.split(':');
     const v = vinculo(t);
     const e = ((v && v.resumen && v.resumen.estados) || [])[num(i)];
     if(!e) return;
-    const txt = acc === 'set' ? prompt(e.excedente ? `${e.nombre}: ${fmt(num(e.escudo))}\nEscribí el valor nuevo, +N o -N (sin tope)` : `${e.nombre}: ${fmt(num(e.escudo))}/${fmt(num(e.escudoMax))}\nEscribí el valor nuevo, +N o -N (para cambiar el máximo: max 12)`, fmt(num(e.escudo))) : (num(acc) > 0 ? '+' : '') + acc;
+    const txt = acc === 'set' ? await Confirmar.texto(e.excedente ? `${e.nombre}: ${fmt(num(e.escudo))}\nEscribí el valor nuevo, +N o -N (sin tope)` : `${e.nombre}: ${fmt(num(e.escudo))}/${fmt(num(e.escudoMax))}\nEscribí el valor nuevo, +N o -N (para cambiar el máximo: max 12)`, {titulo: e.nombre, icono: '🛡', valor: fmt(num(e.escudo)), si: 'Aplicar'}) : (num(acc) > 0 ? '+' : '') + acc;
     if(txt === null) return;
     hudEstadoCambiar(t, num(i), 'escudo', txt);
   });

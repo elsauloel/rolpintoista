@@ -319,7 +319,7 @@ select option{background:var(--panel)}
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
-<script src="comun/confirmar.js?v=20261030mc1"></script>
+<script src="comun/confirmar.js?v=20261031cart"></script>
 <script src="comun/sesion.js"></script>
 <script src="comun/respaldo.js"></script>
 <script src="comun/menu-sitio.js?v=20261031home"></script>
@@ -876,7 +876,7 @@ async function borrarPersonajeGM(id, boton){
   const aviso = `Esto borra a ${nombre} de la partida, para todos, y no se puede deshacer.\n\n` +
                 `Si el jugador lo quiere conservar, avisale antes de borrarlo (podés bajar un respaldo de toda la partida desde gm-tools, "💾 Respaldo partida").\n\n¿Seguís?`;
   if(!await Confirmar.preguntar(aviso, {titulo: 'Borrar', si: 'Borrar', peligro: true})) return;
-  const escrito = prompt(`Para confirmar el borrado, escribí el nombre tal cual: ${nombre}`);
+  const escrito = await Confirmar.texto(`Para confirmar el borrado, escribí el nombre tal cual: ${nombre}`, {titulo: 'Borrar', icono: '🗑', si: 'Borrar', max: 80});
   if(escrito === null) return;
   if(escrito.trim().toLowerCase() !== nombre.trim().toLowerCase()){
     $('#gestion-error').textContent = 'El nombre no coincide — no se borró nada';

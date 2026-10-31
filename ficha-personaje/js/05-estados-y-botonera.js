@@ -171,11 +171,11 @@ function inteligenciaAuto(){ return FichaBotonera.inteligenciaAuto(S); }   // co
 function inteligenciaManual(){ return FichaBotonera.inteligenciaManual(S); }
 function inteligenciaValor(){ return FichaBotonera.inteligenciaValor(S); }
 // Editar a mano el total: número (el total nuevo), +N / -N (sumar o restar) o "auto" (vuelve al cálculo automático).
-function editarInteligencia(){
+async function editarInteligencia(){
   if(fichaVivo && fichaVivo.soloLectura){ toast('Este personaje no es tuyo: no podés cambiarle la Inteligencia'); return; }
   const b = inteligenciaBudget(), auto = inteligenciaAuto();
-  const txt = prompt(`Inteligencia — total ahora: ${fmt(b.total)}${inteligenciaManual() !== null ? ' (fijado a mano)' : ' (automático)'}; ${fmt(b.gastado)} invertidos; automático sería ${fmt(auto)}.
-Escribí el total nuevo, +N o -N, o "auto" para volver al cálculo automático.`, fmt(b.total));
+  const txt = await Confirmar.texto(`Inteligencia — total ahora: ${fmt(b.total)}${inteligenciaManual() !== null ? ' (fijado a mano)' : ' (automático)'}; ${fmt(b.gastado)} invertidos; automático sería ${fmt(auto)}.
+Escribí el total nuevo, +N o -N, o "auto" para volver al cálculo automático.`, {titulo: 'Inteligencia', icono: '🧠', valor: fmt(b.total), sugerencias: ['auto'], si: 'Aplicar'});
   if(txt === null) return;
   const t = String(txt).trim().replace(',', '.').replace('−', '-').toLowerCase();
   let nuevo;

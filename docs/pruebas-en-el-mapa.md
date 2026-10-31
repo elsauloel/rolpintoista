@@ -616,7 +616,9 @@
   «Tenés 2 enemigos pegados (Warrior, Chamán): +4 🛡» con Aplicar / Resolver a mano; queda el estado (1 turno). El GM aleja al Chamán: el −2 rojo baja sobre
   juan en la pantalla del GM y al jugador le llega «Se aleja: −2… Total +2»; lo vuelve a pegar: el +2 🛡 verde sube y «Se suma: +2… Total +4», con la casilla
   «No volver a mostrar»; tildada, otro ir y venir ya no avisa (la animación sí). «Recibe daño» 10: la vista previa «10 − Def 4 (0 + 4 de Estoicismo) = 6» y
-  la vida 35 → 29. Al sacarle el estado, la casilla se olvida. Restaurado (vida 35, SP, sin la habilidad de prueba; el Chamán en su casilla).
+  la vida 35 → 29. Al sacarle el estado, la casilla se olvida. Restaurado (vida 35, SP, sin la habilidad de prueba; el Chamán en su casilla). ✅ **La ficha lite y la Botonera**, el mismo día: con 2 pegados, la
+  Botonera «Def 4 · Def.Esp 1 🗿» y la ficha lite Defensa 4 («Estoicismo: 2 enemigos pegados, ahora +4»); el GM aleja al Chamán y la ficha lite abierta pasa
+  sola a 2. Restaurado.
 - [x] **🏹 Contra un proyectil: «Esquivar (Agilidad)» y «Poner escudo»** (2026-10-29, «Claude · pruebas», con captura; dueño: «específicamente para
   proyectiles, que cambie el nombre»). El Tunelero dispara el Arco corto a Clementino: al jugador le aparecen «🏃 Esquivar (Agilidad)» y «🛡 Poner escudo ·
   Tapa de tacho de basura»; el GM, en el desplegable a mano, «Esquivar (Agilidad) / Poner escudo». Solo cambia el nombre: se tira lo mismo.

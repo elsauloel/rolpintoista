@@ -990,7 +990,7 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   `vtt-hexgrid/js/85-estoicismo.js`; js/10, junto al Muro de escudos) y sale en el desglose de la Defensa y en la vista previa de «Recibe daño». Lo que se ve
   (dueño, el mismo día): el **Aviso** a quien lo maneja al activarse y cada vez que cambia la cuenta (✔ Aplicar / ✋ Resolver a mano, que no cambia nada;
   casilla «No volver a mostrar mientras dure este Estoicismo», que se olvida al terminarse el estado) y, para todos, el **+N 🛡 verde que sube / −N rojo que
-  baja** sobre el token. **Falta**: mostrar el bono en la ficha lite y la Botonera (la Defensa que se ve ahí no lo suma; el golpe sí). Lo definido: Costo: 2 SP en tu turno, 4 en turno ajeno
+  baja** sobre el token. La ficha lite (Defensa, con su renglón «Estoicismo: N enemigos pegados, ahora») y la Botonera («Def N 🗿») muestran el bono de este momento y se redibujan solas cuando cambia la cuenta (`estoicoAhora` / `estoicoRefrescar`). Lo definido: Costo: 2 SP en tu turno, 4 en turno ajeno
   (ya cargado). **Dura hasta el final de tu próximo turno** (si se usa como Flash en turno ajeno, cubre lo que queda de esa ronda y tu turno siguiente).
   **Mientras el estado esté activo, +2 a la Defensa por cada enemigo pegado, en vivo** (dueño: «una especie de estado estoico en el que se te suba
   automáticamente la defensa por cada enemigo adyacente mientras el estado esté activo»): si se acerca otro sube, si se va baja. Sigue el +1 a cada

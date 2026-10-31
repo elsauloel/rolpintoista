@@ -1882,4 +1882,5 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `danioCreep`, `danioInv`, y la vista previa de «Recibe daño») suma +2 a la Defensa por cada rival pegado que se ve (`estoicoRivales`: ni oculto, ni en
   sigilo, ni bajo tierra, ni etéreo, ni muerto, ni estructura), contado en el momento del golpe (`estoicoDe`), con su renglón en el desglose. Cada pantalla
   mira lo público en cada dibujo (`estoicoRevisar`, como las flechitas de js/75): a quien lo maneja, el Aviso al activarse y en cada cambio (`estoicoAvisar`:
-  Aplicar / Resolver a mano, y «No volver a mostrar» hasta que termine, `estoicoCallados`); a todos, el ±N 🛡 flotando (`estoicoDibujar`).
+  Aplicar / Resolver a mano, y «No volver a mostrar» hasta que termine, `estoicoCallados`); a todos, el ±N 🛡 flotando (`estoicoDibujar`). La ficha lite (js/15) y la Botonera (js/11, «Def N 🗿») suman el bono de este momento (`estoicoAhora`, con
+  `estoicoToken`) y se redibujan cuando cambia la cuenta (`estoicoRefrescar`).

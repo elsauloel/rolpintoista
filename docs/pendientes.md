@@ -550,7 +550,9 @@
 > - [ ] Ballestas, tanda con mapa: rasgos «llega cargada», «apuntada», «a quemarropa» (hoy con la distancia ideal), «atraviesa escudos», ballesta
 >   de muralla; virotes explosivo, de humo, de luz, de clavo y de rebote; el garfio con soga como utilería de la Talabartería
 >   ([`ideas-ballestas.md`](ideas-ballestas.md)). La silenciosa espera al sigilo (P184).
-> - [ ] **☁ Trabajar sin depender de la compu (reevaluar)** (dueño, 2026-10-23: «me gustaría en algún momento reevaluar que todo quede subido
+> - [x] ✅ **(2026-10-31, hecho: sesiones de Claude Code en la nube manejadas desde el celular, publicando como siempre por GitHub Pages;
+>   detalle en [`plan-trabajo-remoto.md`](plan-trabajo-remoto.md). Lo que sigue, probar en el mapa desde la nube, es el pendiente «☁🧪» de arriba)**
+>   **☁ Trabajar sin depender de la compu (reevaluar)** (dueño, 2026-10-23: «me gustaría en algún momento reevaluar que todo quede subido
 >   online para no depender de que mi computadora esté desbloqueada… como hoy tengo mi proyecto de Mestiza todo online y puedo tener la
 >   computadora apagada y seguir trabajando desde el teléfono. Todavía no entiendo a fondo las implicancias, si me va a limitar el desarrollo»).
 >   Es el mismo objetivo del plan [`plan-trabajo-remoto.md`](plan-trabajo-remoto.md) y del punto de abajo (🚀). Cuando el dueño lo retome,

@@ -1487,3 +1487,6 @@ jefe (hoy duplica oro y trofeo, no XP); y dónde se ve el desglose (el paso Reco
 **Decidido (dueño, 2026-10-31: «podemos partir de ahí; si te parece, queda más o menos bien»)** y programado: la propuesta tal cual (repartida, 50/35/15,
 lo de menos resta). Lo que no se definió queda como estaba: los puntos de atributo no cuentan y el jefe no da más XP. `CombateFin.xpDeCreep(sc)` /
 `xpDesgloseTxt` (comun/combate-fin.js), en «Batalla terminada», en el estimado del grupo y en el paso Recompensas del asistente (con el desglose).
+**Atributos y jefe (dueño, el mismo día: «los puntos de atributo además pueden sumar, aunque generalmente no los usamos; y el jefe da un 25 % más»):** el
+50 % del nivel se reparte entre los puntos de atributo del presupuesto (33 + 3 por nivel): cada punto de más suma esa parte (N3: 75 ÷ 39 ≈ 1,9) y cada
+uno de menos la resta; un jefe da el total × 1,25 (`XP_JEFE`).

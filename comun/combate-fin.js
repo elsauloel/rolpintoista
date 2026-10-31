@@ -38,7 +38,10 @@ const CombateFin = (() => {
      habilidad pasiva… si un GM le quiere agregar una pasiva más, está bien, solo que ese creep va a dar más experiencia»; «podemos partir de ahí»).
      Un creep ESTÁNDAR de su nivel da lo de xpBasePorNivel, partido así: 50 % el nivel; 35 % entre sus habilidades y pasivas (cada una vale lo
      mismo: estándar = nivel + 1 habilidades y 1 pasiva); 15 % el equipo puesto, en puntos (Común 1, Buena 2, Raro 3, Excepcional 4, Legendario 5;
-     el arma cuenta; estándar N1 3 · N2 5 · N3 7 · N4 8 · N5 10, +2 por nivel después). Lo de más suma su parte y lo de menos resta. */
+     el arma cuenta; estándar N1 3 · N2 5 · N3 7 · N4 8 · N5 10, +2 por nivel después). Lo de más suma su parte y lo de menos resta.
+     Atributos y jefe (dueño, el mismo día: «los puntos de atributo además pueden sumar… y el jefe da un 25 % más»): el 50 % del nivel se reparte
+     entre los puntos de atributo del presupuesto (33 + 3 por nivel, CreepCalculo.presupuesto); cada punto de más o de menos suma o resta esa
+     parte. Un jefe da el total × 1,25. */
   const XP_PARTE = {nivel: 0.5, habilidades: 0.35, equipo: 0.15};
   const PUNTOS_TIER = {'Común': 1, 'Buena Calidad': 2, 'Raro': 3, 'Excepcional': 4, 'Legendario': 5};
   const EQUIPO_ESTANDAR = [3, 5, 7, 8, 10];
@@ -52,21 +55,28 @@ const CombateFin = (() => {
     if(!puestas.some(it => /^arma_/.test(String(it.tipoItem || ''))) && String(sc.armaNombre || '').trim()) pts += 1;
     return pts;
   }
+  const XP_JEFE = 1.25;
   function xpDeCreep(sc){
     const n = Math.max(1, Math.round(num(sc && sc.nivel)) || 1), base = xpBasePorNivel(n);
     const habs = (sc.habilidades || []).filter(Boolean).length, pas = (sc.pasivas || []).filter(Boolean).length, pts = puntosEquipo(sc);
     const unidad = base * XP_PARTE.habilidades / (habsEstandar(n) + 1), punto = base * XP_PARTE.equipo / equipoEstandar(n);
-    const partes = {nivel: base * XP_PARTE.nivel, habilidades: unidad * habs, pasivas: unidad * pas, equipo: punto * pts};
-    const total = Math.max(1, Math.round(partes.nivel + partes.habilidades + partes.pasivas + partes.equipo));
-    return {total, base, n, habs, pas, pts, unidad, punto, partes, estandar: {habs: habsEstandar(n), pas: 1, pts: equipoEstandar(n)}};
+    const attrEst = 33 + 3 * (n - 1), attrs = ['con', 'fue', 'agl', 'des', 'esp'].reduce((a, k) => a + num(sc && sc[k]), 0);
+    const porAttr = base * XP_PARTE.nivel / attrEst;
+    const partes = {nivel: base * XP_PARTE.nivel, atributos: porAttr * (attrs - attrEst), habilidades: unidad * habs, pasivas: unidad * pas, equipo: punto * pts};
+    const suma = partes.nivel + partes.atributos + partes.habilidades + partes.pasivas + partes.equipo, jefe = !!(sc && sc.jefe);
+    const total = Math.max(1, Math.round(suma * (jefe ? XP_JEFE : 1)));
+    return {total, base, n, habs, pas, pts, attrs, jefe, unidad, punto, porAttr, partes, estandar: {habs: habsEstandar(n), pas: 1, pts: equipoEstandar(n), attrs: attrEst}};
   }
   // El desglose en palabras (el paso Recompensas del asistente de creeps).
   function xpDesgloseTxt(x){
     const r = v => Math.round(v * 10) / 10, dif = (v, e) => v === e ? 'el estándar' : v > e ? `${v - e} de más` : `${e - v} de menos`;
-    return [`nivel ${x.n}: ${r(x.partes.nivel)}`,
-      `${x.habs} habilidad${x.habs === 1 ? '' : 'es'} (${dif(x.habs, x.estandar.habs)}): ${r(x.partes.habilidades)}`,
+    const l = [`nivel ${x.n}: ${r(x.partes.nivel)}`];
+    if(x.attrs !== x.estandar.attrs) l.push(`${x.attrs} puntos de atributo (${dif(x.attrs, x.estandar.attrs)}): ${x.partes.atributos > 0 ? '+' : ''}${r(x.partes.atributos)}`);
+    l.push(`${x.habs} habilidad${x.habs === 1 ? '' : 'es'} (${dif(x.habs, x.estandar.habs)}): ${r(x.partes.habilidades)}`,
       `${x.pas} pasiva${x.pas === 1 ? '' : 's'} (${dif(x.pas, 1)}): ${r(x.partes.pasivas)}`,
-      `equipo ${x.pts} punto${x.pts === 1 ? '' : 's'} (${dif(x.pts, x.estandar.pts)}): ${r(x.partes.equipo)}`];
+      `equipo ${x.pts} punto${x.pts === 1 ? '' : 's'} (${dif(x.pts, x.estandar.pts)}): ${r(x.partes.equipo)}`);
+    if(x.jefe) l.push(`jefe: × ${String(XP_JEFE).replace('.', ',')}`);
+    return l;
   }
   // XP que da un creep que escapó, sobre la que daría derrotado.
   const XP_ESCAPO_PCT = 0.2;
@@ -848,7 +858,7 @@ const CombateFin = (() => {
     return {total, cada, n: inc.length};
   }
 
-  return {venderBaul, itemsDeCreep, dropReroll, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, xpDeCreep, xpDesgloseTxt, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, municionDeCreep, cuantosAlAzar, consumibleAlAzar, darConsumiblesAlAzar, quitarConsumiblesAlAzar, DROP_TABLA, arquetiposBotin, arqsDe, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
+  return {venderBaul, itemsDeCreep, dropReroll, fuera, fueraCambiar, estimar, estimadoHtml, dropEsperado, xpBasePorNivel, xpDeCreep, xpDesgloseTxt, XP_JEFE, XP_ESCAPO_PCT, FACTOR_XP_ESTADO, nuevo, creepsEnMapa, oroDeCreep, DROP_CHANCE, DROP_OTROS, DROP_TIERS, dropChance, dropSegundo, dropTabla, dropTier, dropDeCreep, municionDeCreep, cuantosAlAzar, consumibleAlAzar, darConsumiblesAlAzar, quitarConsumiblesAlAzar, DROP_TABLA, arquetiposBotin, arqsDe, tierPorPrecio, precioEstimadoArma, precioEstimadoEquipo,
     plantillaArmaCreep, plantillaEquipoCreep, plantillaTrofeo, precioNatural, itemsDeCreep, itemsExtra, generar, estadoDeFicha, jugadores, calcularReparto,
     itemsPublicables, ocultos, vista, cambio, clic, lineaVerde, publicar, nuevoBotin, jugadoresBotin, botinVista, botinCambio, botinItem, despojar};
 })();

@@ -460,7 +460,7 @@ Propuesta (esperando el OK; solo skills auditadas). El mismo arquero del encuent
 
 Propuesta (esperando el OK; solo skills auditadas). Fuego y ácido (el hielo ya lo usa el Capataz: Prisión de hielo y Hálito polar). El azufre de las
 grietas: el ácido le come la armadura a Petro y el fuego barre las galerías angostas. Además unta las armas de los goblins.
-- **Atributos (42)**: Con 10 · Fue 3 · Agi 7 · Des 8 · Esp 14. Vida 50, No2 7, Evasión 7, Rango 8, SP 42 (6 por turno), PdG.Esp 17 (con el orbe y la
+- **Atributos (42)**: Con 10 · Fue 3 · Agi 7 · Des 8 · Esp 14. Vida 50, No2 7, Evasión 7, Rango 8, SP 42 (7 por turno), PdG.Esp 17 (con el orbe y la
   pasiva), Ef.Esp 14, Res.Mt 14.
 - **Equipo** (las manos + 3 Comunes + 2 Buenas): **Varita del chorro de ácido** (Común: contra la Evasión, Armadura rota segura y 1d4 ácido directo) y
   **Orbe del foco** (Buena: PdG.Esp +2, Def.Esp +1, Res. fuego +1); Buenas, **Delantal de boticario** (Defensa +2, Def.Esp +1, pociones +5, +2 ranuras de

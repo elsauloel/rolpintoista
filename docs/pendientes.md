@@ -57,8 +57,8 @@
 > - [ ] **🔑 Cuenta de Claude con mail y contraseña, para trabajar con la compu apagada (2026-10-31, dueño: «anotalo como pendiente en la compu»).**
 >   Desde la nube Claude programa y publica, pero no entra a las partidas: la cuenta con la que prueba vive en el Chrome de la compu (Firebase
 >   pide una cuenta con el mail confirmado y miembro de la partida; la red de la nube ya llega a Firebase y al sitio, revisado). Pasos, una vez y
->   guiado de a uno: (1) crear en el sitio una cuenta con **mail y contraseña** (el sitio ya lo permite; un mail suyo con `+claude` antes de la @,
->   así la confirmación le llega a él); (2) sumarla a «Claude · pruebas» (como GM, para probar creeps) y a «El origen de las especies»;
+>   guiado de a uno: (1) **dueño, 2026-10-31: usa su cuenta de Gmail de pruebas** (la dirección no va en el repo). Si esa cuenta ya entra al sitio
+>   con Google, no se crea otra: «¿Olvidaste tu contraseña?» en la pantalla de entrada le pone una contraseña; si no, se crea con mail y contraseña; (2) sumarla a «Claude · pruebas» (como GM, para probar creeps) y a «El origen de las especies»;
 >   (3) guardar el mail y la contraseña en la configuración del entorno de la nube (menú del entorno en el título de la sesión → Editar →
 >   «Network secrets» / «API credentials») como `ROL_EMAIL` y `ROL_CLAVE` — **nunca por el chat ni en el repo** (es público). Con eso, desde la
 >   nube: leer las partidas (ej. confirmar que Ricardo tiene Prisa) y abrir el mapa en un navegador sin pantalla con capturas (cubre buena parte

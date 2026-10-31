@@ -95,11 +95,10 @@ document.addEventListener('click', async e => {
     cargarCreepsSubidos();   // de paso, los avisos 🔔 de las tarjetas quedan al día
     Biblioteca.abrir({
       tipo: 'creeps', titulo: 'Creep nuevo',
-      textoCrearDeCero: '+ Crear de cero',
       textoAsistente: '🧭 Crear paso a paso',
       alAsistente: () => abrirAsistenteCreep(null),
       base: typeof CREEPS_BASE !== 'undefined' ? CREEPS_BASE : [],
-      alCrearDeCero: () => { const nuevo = nuevoCreep(); nuevo.mapa = mapaParaNuevo(); S.creeps.push(nuevo); renderAll(); ofrecerTokenEnMapa(nuevo); },
+      // (sin «+ Crear de cero»: el dueño, 2026-10-30, «borrá el botón crear de cero»; se crea paso a paso o desde la biblioteca)
       alElegir: agregarCreepDeBiblioteca,
       alVer: verCreepDeBiblioteca,
       grupos: CREEPS_GRUPOS,

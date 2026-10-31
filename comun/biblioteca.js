@@ -441,12 +441,13 @@ const Biblioteca = (() => {
     q('bib-titulo').textContent = `📚 ${opts.titulo || 'Biblioteca'}`;
     q('bib-buscar').value = '';
     const cero = q('bib-cero');
-    if(opts.alCrearDeCero){
+    // (2026-10-30, dueño: «borrá el botón crear de cero» del Creep nuevo: con solo `alAsistente`, queda «Crear paso a paso» solo)
+    if(opts.alCrearDeCero || opts.alAsistente){
       cero.style.display = '';
-      cero.innerHTML = `<button class="btn primary" id="bib-cero-btn">${esc(opts.textoCrearDeCero || 'Crear de cero')}</button>
+      cero.innerHTML = `${opts.alCrearDeCero ? `<button class="btn primary" id="bib-cero-btn">${esc(opts.textoCrearDeCero || 'Crear de cero')}</button>` : ''}
         ${opts.alAsistente ? `<button class="btn primary" id="bib-asistente-btn">${esc(opts.textoAsistente || 'Crear paso a paso')}</button>` : ''}
         <span class="hint"> …o elegí uno de la biblioteca:</span>`;
-      q('bib-cero-btn').onclick = () => { q('scrim-biblioteca').classList.remove('open'); opts.alCrearDeCero(); };
+      if(opts.alCrearDeCero) q('bib-cero-btn').onclick = () => { q('scrim-biblioteca').classList.remove('open'); opts.alCrearDeCero(); };
       if(opts.alAsistente) q('bib-asistente-btn').onclick = () => { q('scrim-biblioteca').classList.remove('open'); opts.alAsistente(); };
     }else cero.style.display = 'none';
     // opts.z: abrirla por encima de otra ventana (ej. el editor de una habilidad, en la ventana común paso a paso); si no, la altura de siempre.

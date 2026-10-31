@@ -1203,7 +1203,7 @@ sube. En el código es el dato `difMin` (en `soltar`, `salvacion`, la zona que d
 4. **Los consumibles de zona** (Bengalas, Bomba de humo, Bombucha de talco): si su zona se resiste contra un stat tuyo, mínimo igual.
 Las pociones y los pergaminos de bono (Furia, Escudo Arcano…) no aplican: su efecto es fijo, no depende de quien los usa.
 
-### P219 — ¿El daño eléctrico (rayo) se esquiva? (2026-10-25) ⏳ con propuesta del dueño, falta aplicarla
+### P219 — ¿El daño eléctrico (rayo) se esquiva? (2026-10-25) ⏸ en pausa (2026-10-30): caso por caso, desde Carga Elemental
 
 **Contexto:** al armar **Zap** (Mago, creep) el dueño decidió que no se esquiva con la Evasión: el daño pasa siempre y la Res.Esp solo resiste el
 estado (marca `danoSiempre` del duelo, `comun/duelo.js`). Hoy cada rayo lo hace a su manera: la Cadena de rayos, las varitas y las flechas de rayo
@@ -1213,6 +1213,22 @@ esquiva, ¿qué pasa cuando suma el Efecto especial?; si se esquiva, ¿cómo?; �
 daño por costo que el fuego, y que tenga más costo en general, que es más o menos lo mismo».
 **Falta:** confirmar que vale para todo el rayo (habilidades de creep y de clase, varitas, flechas, trampas de descarga) y repasarlos uno por uno
 (el costo o el daño, contra el fuego); decidir qué se tira entonces para sus estados (Zap: PdG.Esp contra Res.Esp) y si suma el Ef.Esp.
+**En pausa (dueño, 2026-10-30: «deberíamos ver caso por caso… me gustaría que fuera una regla general, pero tal vez algún ejemplo amerite
+revisarlo»; después: «anotá este tema como pendiente para otro momento»).** Se retoma **caso por caso, uno por mensaje** (efecto, texto original,
+descripción actual, cómo funciona hoy y cómo quedaría con la regla), empezando por el **caso 1 de 12, Carga Elemental ⚡ (Mago)**, que ya se le
+presentó (hoy: el primer golpe usa la tirada de la skill cargada y se esquiva con Evasión; los saltos no se esquivan, al mismo bando, 4 casillas, la
+mitad cada vez, sin tope; dudas: el eléctrico quedaría como el único elemento de la Carga que no se esquiva; con la Ráfaga arcana, todo el cono).
+Inventario del 2026-10-30:
+- **Hoy se esquivan (12):** Carga Elemental ⚡; Cadena de rayos (creep); Varita de chispa eléctrica, Varita de la flor de chispas, Varita del relámpago;
+  Arma eléctrica (creep), Lanza del alba, Ballesta Tormenta del Plata, Flecha y Virote de tormenta (el rayo va pegado a un golpe de arma: sugerencia,
+  que esos sigan esquivándose); Flecha y Virote relámpago (sin daño eléctrico, solo Parálisis).
+- **Ya no se esquivan (8):** Zap, Centella, Misil elemental ⚡, Varita del campo de estática (zona), Descarga eléctrica (trampa consumible y la base),
+  Descarga oculta, el ⚡ Rayo en cadena del GM.
+- **A mano (19):** Chispa, Rayo y Descarga eléctrica (biblioteca) y 16 habilidades de creeps sueltos (Chispita, Golem de cobre, Nube de estática,
+  Chamán del rayo, Arquero de tormenta, Espíritu de la tormenta, Arpía de tormenta, Chamán de la tormenta, Kobold chamán de la tormenta, Hombre cabra
+  oráculo, Cigarra de tormenta…); la mitad tira PdG físico por la expresión `MAGICA_RE`.
+- **Desajustes:** la Varita de chispa eléctrica dice «salta hasta llegar a 1» pero tiene `saltos: 2`; la trampa Descarga eléctrica (ítem) dice 3
+  casillas y el salto llega a 4; la trampa base deja Stun en vez de Parálisis.
 
 ### P220 — Los tótems y estandartes: ¿cómo se llama esa categoría? (2026-10-25) ✅ «estructuras», por ahora
 

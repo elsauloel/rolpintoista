@@ -189,6 +189,8 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
+> - [ ] **⚡ El rayo que no se esquiva, caso por caso (P219, 2026-10-30, dueño: «anotá este tema como pendiente para otro momento»).** Uno por mensaje,
+>   desde el caso 1 de 12, Carga Elemental ⚡ (ya presentado); inventario completo y desajustes en `preguntas-abiertas.md` P219.
 > - [ ] **🧬 Razas frecuentes con resistencias y debilidades sugeridas (2026-10-30, dueño: «eventualmente vamos a diseñar razas frecuentes con resistencias y
 >   debilidades sugeridas»).** El asistente de creeps ya tiene el lugar (paso «Defensa y resistencias»: la base de cada elemento, positiva o negativa); falta
 >   diseñar las razas (goblin, no-muerto, elemental de fuego…) y que al elegir el tipo de criatura se sugieran.

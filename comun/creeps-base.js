@@ -181,6 +181,8 @@
     if(Number(sp.curaMasCon) > 0) h.curaMasCon = Number(sp.curaMasCon);
     if(sp.quitaDebuff) h.quitaDebuff = true;
     if(sp.unaVez) h.unaVez = true;
+    if(sp.refuerzos){ h.refuerzos = {...sp.refuerzos}; h.modo = 'auto'; h.automatizada = true; }   // 📣 el Chillido (2026-10-30): los trae el mapa (vtt-hexgrid/js/31)
+    if(Number(sp.soloVidaHasta) > 0) h.soloVidaHasta = Number(sp.soloVidaHasta);   // con más vida, avisa y deja igual (comun/creep-acciones.js, preguntaVida)
     if(sp.interponerse) h.interponerse = {...sp.interponerse};   // (no se ejecuta desde las Acciones: la usa el botón ✨)
     if(sp.trampa !== undefined || sp.colocar){
       const o = opcionesTrampa(sp);

@@ -6056,6 +6056,14 @@ prueba('💨 Segundo aliento (2026-10-27): se cura 6 + su Constitución, le saca
   igual([p.error || '', sc.hp, p.curaCon, p.quitado, sc.estados.some(e => e.nombre === 'Rengo'), sc.habilidades[0].unaVezUsada, /una vez/i.test(CreepCalculo.bloqueoHab(sc, sc.habilidades[0]))],
     ['', 5 + 6 + con, 6 + con, 'Rengo', false, true, true]);
 });
+prueba('🐀 Chillido (2026-10-30, la Rata de galería): 1 refuerzo que también chilla, con la mitad de la vida o menos (si no, pregunta) y una vez por combate', () => {
+  const h = chp('Chillido'), sc = n => creepPrueba({nombre: 'Rata', hp: n, hpMax: 30, habilidades: [h]});
+  const tag = HABILIDADES_CREEP_CATALOGO.find(x => x.nombre === 'Chillido').etiquetas;
+  const x = sc(15), p = CreepAcciones.ejecutarHab(x, x.habilidades[0], ESTADOS_PRESET, true, {});
+  igual([h.modo, h.refuerzos, h.unaVez, h.soloVidaHasta, num(h.nitrosCosto), tag.includes('auditada'), !!CreepAcciones.preguntaVida(sc(15), h), !!CreepAcciones.preguntaVida(sc(16), h),
+    p.error || '', x.habilidades[0].unaVezUsada, /una vez/i.test(CreepCalculo.bloqueoHab(x, x.habilidades[0]))],
+    ['auto', {cant: 1, propagan: true}, true, 50, 2, true, false, true, '', true, true]);
+});
 prueba('🛡 Golpe de escudo (2026-10-27): pega con el escudo (Tipo 10, sin Parry), tantos d10 como su peso + el Dmg; Sentado y Demora 1 solo si hizo daño', () => {
   const h = chp('Golpe de escudo'), sc = creepPrueba({id: 'g1', equipo: [{id: 'e', nombre: 'Rodela de tablas', tipoItem: 'escudo_1m', def: 1, peso: 3, equipado: true}]});
   const atq = CreepAcciones.ataqueDeHab(sc, h);

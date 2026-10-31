@@ -353,10 +353,12 @@ const CreepAcciones = (() => {
   // `h.soloVidaMenos = N` (2026-10-16, dueño: la Plaga de las ratas, «solamente lo puede ejecutar si tiene menos del 50 % de la vida»): con
   // la vida en N % o más, avisa y pregunta (no bloquea: la mesa decide). → el texto de la pregunta, o ''.
   function preguntaVida(sc, h){
-    const n = Math.round(num(h && h.soloVidaMenos)), max = num(sc.hpMax);
+    // `h.soloVidaHasta = N` (el Chillido, 2026-10-30: «cuando esté en 50 % de vida o menos»): lo mismo, con N % incluido.
+    const hasta = Math.round(num(h && h.soloVidaHasta)), n = hasta || Math.round(num(h && h.soloVidaMenos)), max = num(sc.hpMax);
     if(!(n > 0) || !(max > 0)) return '';
-    const pct = Math.round(100 * num(sc.hp) / max);
-    return pct < n ? '' : `${sc.nombre} tiene ${fmt(num(sc.hp))} de ${fmt(max)} de vida (${pct} %): ${h.nombre || 'esta habilidad'} se usa solo con menos del ${n} % de la vida. ¿Usarla igual?`;
+    const pct = 100 * num(sc.hp) / max;
+    if(hasta ? pct <= n : pct < n) return '';
+    return `${sc.nombre} tiene ${fmt(num(sc.hp))} de ${fmt(max)} de vida (${Math.round(pct)} %): ${h.nombre || 'esta habilidad'} se usa solo con ${hasta ? `el ${n} % de la vida o menos` : `menos del ${n} % de la vida`}. ¿Usarla igual?`;
   }
   // Lo que se pregunta antes de cobrar (el Silencio y la condición de vida). → true si sigue.
   async function confirmarSilencio(sc, h){

@@ -18,7 +18,8 @@ function copiarTokenSeleccionado(){
 const uidCorto = () => Math.random().toString(36).slice(2, 9);
 // Un creep nuevo, copia de otro, con lo que guarda GM Tools: lo público (con su firma), la ficha privada y la imagen. → {id, nombre}.
 // `o.refuerzo` (2026-10-16, 📣 llamar refuerzos): una copia «recién llegada»: vida llena, sin estados, No2 llenos, sin ataques en el turno,
-// los cooldowns como al empezar un combate y sin las habilidades que llaman refuerzos (los refuerzos no llaman a más). Se llama «… (refuerzo)».
+// los cooldowns como al empezar un combate y sin las habilidades que llaman refuerzos (los refuerzos no llaman a más), salvo las que propagan
+// (`refuerzos.propagan`: el Chillido de la rata, 2026-10-30), que llegan sin usar. Se llama «… (refuerzo)».
 async function duplicarCreepDesdeMapa(creepId, o){
   const col = fbDb.collection(fbRutaCampana('creeps'));
   const base = col.doc(creepId);
@@ -29,7 +30,8 @@ async function duplicarCreepDesdeMapa(creepId, o){
   sc.id = nuevo.id;
   sc.nombre = o && o.refuerzo ? String(sc.nombre || 'Creep').replace(/\s*\((copia|refuerzo)\)\s*$/i, '') + ' (refuerzo)' : (sc.nombre || 'Creep') + ' (copia)';
   if(o && o.refuerzo){
-    sc.habilidades = (sc.habilidades || []).filter(h => h && !h.refuerzos).map(h => ({...h, cdActual: h.cdArranca ? num(h.cd) : 0}));
+    // (el Chillido, 2026-10-30: la que llega también chilla —`refuerzos.propagan`—, recién llegada: sin usar en este combate)
+    sc.habilidades = (sc.habilidades || []).filter(h => h && (!h.refuerzos || h.refuerzos.propagan)).map(h => { const x = {...h, cdActual: h.cdArranca ? num(h.cd) : 0}; delete x.unaVezUsada; return x; });
     sc.estados = [];
     sc.ataquesTurno = 0;
     try{ const n = CreepCalculo.normalizar(structuredClone(sc)); sc.hp = num(n.hpMax) || num(sc.hpMax); sc.nitros = CreepCalculo.nitrosMax(n); }catch(err){ sc.hp = num(sc.hpMax); }

@@ -968,6 +968,13 @@
   H('Hipnosis', 'K', 'ma', 'gx', 5, tA('El objetivo queda con la mirada perdida y no se mueve 1 turno si falla Res.Mt (a mano).', 3));
 
   /* ================= INVOCACIÓN ================= */
+  // 🐀 Chillido (2026-10-30, dueño, la Rata de galería de El origen: «el chillido es una vez por combate, pero la rata que viene sí tiene chillido
+  // también… con la vida llena»): la «Plaga en la galería» con 1 rata. Con la mitad de la vida o menos (con más, avisa y deja igual: «con la
+  // posibilidad de ejecutarlo igual en caso de que los maten muy rápido»); la que llega es una copia recién llegada que también chilla
+  // (`refuerzos.propagan`, vtt-hexgrid/js/31); cada una, una vez por combate (`unaVez`, se libera con Finalizar combate).
+  H('Chillido', 'I', 'b', 'ea', 0, {detalle: 'Mal herida, chilla y llama a otra: aparece una más donde el GM elija, con la vida llena, que también puede chillar. Una vez por combate. Se usa con la mitad de la vida o menos; con más, avisa y deja usarlo igual.',
+    no2: 2, spCosto: 0, auditada: true, unaVez: true, soloVidaHasta: 50, refuerzos: {cant: 1, propagan: true},
+    ataqueTxt: 'el GM elige en el mapa dónde aparece la copia (vida llena, sin estados, con el Chillido); entra al orden de turnos detrás de quien chilló; una vez por combate'}, 'refuerzos');
   H('Llamar a la manada', 'I', 'b', 'a', 5, tA('Entran 2 bestias más de nivel bajo al combate (a mano).', 3));
   H('Pedir refuerzos', 'I', 'hd', 'a', 6, tA('Llegan 2 aliados de nivel bajo al combate (a mano).', 3));
   H('Levantar muertos', 'I', 'm', 'g', 6, tA('Levanta un esqueleto de nivel bajo que pelea 3 turnos (a mano).', 3));

@@ -192,6 +192,12 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
+> - [ ] **🏃 Prisa, automática y a la vista (2026-10-31, dueño: «automatizar prisa: siempre primero en la tabla de la iniciativa al apretar
+>   "ordenar"; debe automatizarse pero también le debe aparecer una notificación al jugador y debe aparecer en el mensaje lateral»).** Lo que ya hay: al
+>   apretar Ordenar, `ordenarIniciativa` (`vtt-hexgrid/js/04`) pone primero a quien tiene la pasiva (`tokenTienePrisa`: `resumen.prisa` del personaje, el
+>   equipo y los estados del creep; las invocaciones no). Falta: revisar en el mapa que funcione de verdad (si la ficha no publicó `resumen.prisa` o el
+>   creep no está cargado, no pasa nada y no se nota); el **Aviso** al jugador («🏃 Prisa: vas primero en el orden de turnos») y la línea en **la
+>   Crónica** (el mensaje lateral, arriba a la derecha) para todos. Evaluar con el dueño si lleva «Resolver a mano».
 > - [ ] **⚡ El rayo que no se esquiva, caso por caso (P219, 2026-10-30, dueño: «anotá este tema como pendiente para otro momento»).** Uno por mensaje,
 >   desde el caso 1 de 12, Carga Elemental ⚡ (ya presentado); inventario completo y desajustes en `preguntas-abiertas.md` P219.
 > - [ ] **🧬 Razas frecuentes con resistencias y debilidades sugeridas (2026-10-30, dueño: «eventualmente vamos a diseñar razas frecuentes con resistencias y

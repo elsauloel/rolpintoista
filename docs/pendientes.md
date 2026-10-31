@@ -57,6 +57,9 @@
 > - [ ] **⚔ Cargar a mano el Goblin rompehuesos (2026-10-30, dueño: «cuando esté en la compu te voy a decir "pasame al Goblin Rompehuesos" y lo voy a
 >   cargar a mano, así pruebo la experiencia de crear un creep»).** Cuando lo pida, pasarle la ficha completa de `docs/origen-goblins-cultistas.md`
 >   (sección del choque pesado warrior): Poncho de espejitos de torso; la quinta habilidad la elige él. No crearlo.
+> - [ ] **🏹🔥 Cargar a mano el Arquero del culto incendiario y el Goblin chamán del azufre (2026-10-31, dueño: «dejalos así y yo te escribo cuando
+>   esté en la compu para cargarlos»).** Definidos en `docs/origen-goblins-cultistas.md` (sus dos secciones, al final). Cuando lo pida, pasarle el paso a
+>   paso para crearlos desde GM Tools. No crearlos.
 > - [ ] **⛏ Encuentro 2 de El origen, adentro de las minas** (2026-10-29, dueño: «anotalo para pendiente en la compu, porque el teléfono se me
 >   complica»). La propuesta conceptual está en `docs/origen-goblins-cultistas.md`, sección «Encuentro 2 — propuesta conceptual». Faltan cuatro
 >   respuestas del dueño: qué mini jefe (A Capataz del culto con el Cristal de la Grieta, B Capataz goblin, C Gusano de roca domado, o una mezcla); si el

@@ -446,7 +446,7 @@ Propuesta (esperando el OK; skills auditadas salvo el Chillido, que sale de «Pl
 
 ### 🏹 Encuentro 2 — Arquero del culto, la variante incendiaria, nivel 3 (dueño, 2026-10-31: «un arquero, que puede ser el mismo de la pelea anterior, con alguna variante»)
 
-Propuesta (esperando el OK; solo skills auditadas). El mismo arquero del encuentro 1, ahora con flechas de estopa: hace juego con el chamán (fuego).
+**Definido tal cual (dueño, 2026-10-31: «dejalos así»). No se crea: lo carga el dueño a mano en la compu.** Propuesta (esperando el OK; solo skills auditadas). El mismo arquero del encuentro 1, ahora con flechas de estopa: hace juego con el chamán (fuego).
 - **Atributos (39)**, los mismos: Con 8 · Fue 8 · Agi 9 · Des 10 · Esp 4 (Vida 40, SP 12). Pasiva **Recuperación mental** (+1 SP por turno).
 - **Equipo** (las manos + 4 Comunes + 1 Buena): **Arco de flechas con estopa** (Buena, en vez del Arco del rastreador: Tipo 4, 2 manos, 1 dado + 1
   amplificado, +2 de daño, Rango +5, Prende fuego 33 %); **Turbante de tela reforzada** (Buena: Defensa +1, Def.Esp +1, Campo de visión +2 —la mina está
@@ -458,7 +458,7 @@ Propuesta (esperando el OK; solo skills auditadas). El mismo arquero del encuent
 
 ### 🔥🧪 Encuentro 2 — Goblin chamán del azufre (Mago: ácido y fuego), nivel 4 (dueño, 2026-10-31: «un chamán goblin elemental; quiero que use ácido, y puede ser fuego, hielo»)
 
-Propuesta (esperando el OK; solo skills auditadas). Fuego y ácido (el hielo ya lo usa el Capataz: Prisión de hielo y Hálito polar). El azufre de las
+**Definido tal cual (dueño, 2026-10-31: «dejalos así»). No se crea: lo carga el dueño a mano en la compu.** Propuesta (esperando el OK; solo skills auditadas). Fuego y ácido (el hielo ya lo usa el Capataz: Prisión de hielo y Hálito polar). El azufre de las
 grietas: el ácido le come la armadura a Petro y el fuego barre las galerías angostas. Además unta las armas de los goblins.
 - **Atributos (42)**: Con 10 · Fue 3 · Agi 7 · Des 8 · Esp 14. Vida 50, No2 7, Evasión 7, Rango 8, SP 42 (7 por turno), PdG.Esp 17 (con el orbe y la
   pasiva), Ef.Esp 14, Res.Mt 14.

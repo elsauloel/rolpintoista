@@ -1,0 +1,2230 @@
+/* =========================================================
+   COMBATIENTE — el motor de reglas común (paso 1 de docs/plan-consolidacion.md, 2026-09-30)
+   Un personaje, una invocación y un creep son lo mismo para las reglas: alguien con stats, estados, No2, HP y escudo.
+   Acá viven, UNA sola vez, las reglas que antes estaban copiadas en la ficha, GM Tools, el mapa y comun/estados-aplicar.js.
+   Son funciones puras: reciben los datos (la lista de estados, el valor actual…) y devuelven el resultado, sin tocar la
+   pantalla ni Firebase. Cada herramienta las llama con lo suyo (S.efectos en la ficha, sc.estados en un creep,
+   inv.estados en una invocación). Cada regla que se sume acá suma sus pruebas en comun/pruebas.html.
+   Solo usa formulaParaValor (comun/tiradas.js) al tirar; se carga antes que estados-presets.js / estados-aplicar.js.
+   ========================================================= */
+const Combatiente = (() => {
+  const n = v => { const x = Number(v); return Number.isFinite(x) ? x : 0; };
+  const activos = estados => (estados || []).filter(e => e && e.activo !== false);
+
+  /* ---------- Tiradas a la mitad (2026-09-24, dueño) ----------
+     Pajaritos (PdG, PdG.Esp y Evasión: el PdG.Esp desde el 2026-10-14, dueño), Lisiado (PdG y Parry) y Sentado (Evasión) parten la TIRADA a la mitad: se tira el dado
+     completo y al resultado se lo divide por 2, para abajo, mínimo 1 — una vez por cada uno. Parálisis (PdG, Parry y
+     Evasión) es una sola mitad por stat y no se suma a Lisiado ni a Pajaritos. Devuelve cuántas veces se parte. */
+  /* 🙈 Ceguera (dueño, 2026-10-20): ve 2 casillas (CEGUERA_VISION), no elige objetivos más lejos (el mapa avisa) y su PdG y su PdG.Esp valen la mitad
+     (para abajo). Un estado viejo sin la marca `ceguera` se reconoce por el nombre. */
+  const CEGUERA_VISION = 2;
+  const ES_CEGADO = /^(ceguera|cegad[oa]s?)$/i;
+  const esCiego = e => !!e && e.activo !== false && (!!e.ceguera || ES_CEGADO.test(String(e.nombre || '').trim()));
+  /* «Cegado» = la Ceguera (dueño, 2026-10-20: «todo lo que aplique cegado, no importa su origen, va a aplicar este cegado; las definiciones
+     anteriores desaparecen»). Un estado que entra con ese nombre (los creeps de fábrica, las armas naturales, lo que ya estaba guardado) se
+     convierte en la Ceguera del preset: sin el −Evasión viejo y con su duración. Lo aplica agregarEstado, por donde entra cualquier estado. */
+  function comoCeguera(nuevo){
+    if(!nuevo || !/^cegad[oa]s?$/i.test(String(nuevo.nombre || '').trim())) return nuevo;
+    const pre = typeof ESTADOS_PRESET !== 'undefined' ? ESTADOS_PRESET.find(p => p.nombre === 'Ceguera') : null;
+    return {...nuevo, nombre: 'Ceguera', ceguera: true, mods: [], polaridad: 'debuff', ...(pre ? {turnos: pre.turnos, detalle: pre.detalle, permanente: false} : {})};
+  }
+  const ciego = estados => (estados || []).some(esCiego);
+  /* 🙈 Ciego contra un ataque a distancia (dueño, 2026-10-20): su Evasión vale la mitad. A distancia = un disparo (arma de rango) o una habilidad
+     dirigida desde más de 1 casilla (la distancia la da el mapa: window.mapaDistanciaTokens). Cuerpo a cuerpo esquiva normal. → los estados con una
+     marca más (`mitadEva`) para esa tirada, o los mismos. */
+  const CIEGO_DISTANCIA = 'Ciego contra un ataque a distancia';
+  function aDistancia(d){
+    if(!d || !d.ataque) return false;
+    if(d.ataque.rango && d.ataque.tipo !== 'habilidad') return true;
+    if(!d.hab && d.ataque.tipo !== 'habilidad') return false;
+    const a = d.atacante && d.atacante.tokenId, b = d.defensor && d.defensor.tokenId;
+    const dist = a && b && typeof window !== 'undefined' && typeof window.mapaDistanciaTokens === 'function' ? Number(window.mapaDistanciaTokens(a, b)) : NaN;
+    return Number.isFinite(dist) && dist > 1;
+  }
+  const ciegoContraDistancia = (d, estados) => ciego(estados) && aDistancia(d) ? [...(estados || []), {nombre: CIEGO_DISTANCIA, activo: true, mitadEva: true, polaridad: 'debuff'}] : (estados || []);
+  /* 🎯 Dos Presas a la vez (dueño, 2026-10-25: «que la evasión también tome la más fuerte»): vale solo la más fuerte — el daño de más (js/13
+     presaContra) y también sus mods (la Evasión): las otras no suman. `presa` = cuánto daño de más (la Presa del arquero 2, la Presa señalada 4). */
+  function presaValor(e){
+    if(!e || e.activo === false) return 0;
+    const v = Math.round(parseFloat(e.presa)) || 0;
+    if(v > 1) return v;
+    if(e.nombre === 'Presa señalada') return 4;
+    return (e.presa || e.nombre === 'Presa') ? 2 : 0;
+  }
+  /* 🛡 La Perfora que dan los estados (2026-10-25, Armas perforantes del Support): `perforaGolpe` (contra la Defensa) y `perforaEsp` (contra la
+     Defensa especial), del estado o de su preset (el resumen público lleva solo el nombre); con dos, vale la más fuerte. → {def, esp}. */
+  function perforaDeEstados(estados){
+    const presets = typeof ESTADOS_PRESET !== 'undefined' ? ESTADOS_PRESET : [];
+    const out = {def: 0, esp: 0};
+    (Array.isArray(estados) ? estados : []).forEach(e => {
+      if(!e || e.activo === false) return;
+      const p = presets.find(x => x.nombre === e.nombre) || {};
+      out.def = Math.max(out.def, Math.round(parseFloat(e.perforaGolpe ?? p.perforaGolpe)) || 0);
+      out.esp = Math.max(out.esp, Math.round(parseFloat(e.perforaEsp ?? p.perforaEsp)) || 0);
+    });
+    return out;
+  }
+  function sinPresasDebiles(estados){
+    const lista = Array.isArray(estados) ? estados : [];
+    const presas = lista.filter(e => presaValor(e) > 0);
+    if(presas.length < 2) return lista;
+    const fuerte = presas.reduce((a, e) => presaValor(e) > presaValor(a) ? e : a);
+    return lista.filter(e => !(presaValor(e) > 0 && e !== fuerte));
+  }
+  function mitadesDeTirada(estados, statId){
+    const act = activos(estados);
+    let m = 0;
+    if(['pdg', 'pdgmg', 'eva'].includes(statId) && act.some(e => e.mitadPdgEva)) m++;
+    if(['pdg', 'parry'].includes(statId) && act.some(e => e.lisiado)) m++;
+    if(['pdg', 'parry', 'eva'].includes(statId) && m === 0 && act.some(e => e.paralisis)) m++;
+    if(statId === 'eva' && act.some(e => e.sentado)) m++;
+    if(statId === 'eva' && act.some(e => e.mitadEva)) m++;   // Expuesto (Degollar, 2026-10-10)
+    if(['pdg', 'pdgmg'].includes(statId) && act.some(esCiego)) m++;   // Ceguera (2026-10-20, dueño): la mitad del PdG y del PdG.Esp
+    return m;
+  }
+  function aplicarMitades(total, veces){ for(let i = 0; i < veces; i++) total = Math.max(1, Math.floor(total / 2)); return total; }
+  // Los estados que parten esa tirada, para mostrarlos ("Pajaritos ÷2"): uno por cada mitad que cuenta mitadesDeTirada
+  // (dos estados con la misma marca parten una sola vez, así que se muestra el primero).
+  function estadosQueParten(estados, statId){
+    const act = activos(estados), out = [];
+    const primero = marca => act.find(e => e[marca]);
+    if(['pdg', 'pdgmg', 'eva'].includes(statId) && primero('mitadPdgEva')) out.push(primero('mitadPdgEva'));
+    if(['pdg', 'parry'].includes(statId) && primero('lisiado')) out.push(primero('lisiado'));
+    if(['pdg', 'parry', 'eva'].includes(statId) && !out.length && primero('paralisis')) out.push(primero('paralisis'));
+    if(statId === 'eva' && primero('sentado')) out.push(primero('sentado'));
+    if(statId === 'eva' && primero('mitadEva')) out.push(primero('mitadEva'));
+    if(['pdg', 'pdgmg'].includes(statId) && act.find(esCiego)) out.push(act.find(esCiego));
+    return out;
+  }
+
+  /* ---------- Tirar un stat (2026-09-30, tanda 2) ----------
+     La misma tirada para personaje, invocación y creep: el valor se reparte en dados reales (formulaParaValor, de
+     comun/tiradas.js); con Afortunado, PdG/Parry/Evasión se tiran DOS veces y queda la mejor (la otra viaja en `ventaja`
+     para que la Mesa la muestre); después se parte a la mitad lo que corresponda y la Evasión nunca baja de 1.
+     `o.extra`: un número fijo que se suma antes de partir (ej. la penalidad por sobrepeso de la ficha). `o.azar`: para las
+     pruebas (por defecto Math.random). Devuelve lo que se publica en la Mesa ({formula, rolls, mod, total, estados,
+     ventaja?}) o null si el valor no se puede tirar con dados reales. No publica nada: eso lo hace cada herramienta. */
+  const STATS_AFORTUNADO = ['pdg', 'parry', 'eva'];
+  // Un estado puede sumar sus propios stats (`afortunadoStats`, la Estatuilla del Gauchito Gil: también el PdG.Esp).
+  function afortunado(estados, statId){ return activos(estados).some(e => e.afortunado && (e.afortunadoTodo || STATS_AFORTUNADO.includes(statId) || (Array.isArray(e.afortunadoStats) && e.afortunadoStats.includes(statId)))); }
+  /* 🔮 La Estatuilla del Gauchito Gil (2026-10-18, dueño): la primera tirada de PdG, PdG.Esp, Evasión o Parry de cada ronda sale como Afortunado
+     (dos veces, la mejor). `tiene`: la lleva equipada; `usado`: ya la usó (la marca vive en S.ataquesArma._gauchito, que se vacía al empezar su
+     turno). Devuelve los estados con un Afortunado de esa tirada, o null si no corresponde. */
+  const GAUCHITO_STATS = ['pdg', 'pdgmg', 'eva', 'parry'];
+  /* 🔮 La Piedra bezoar (2026-10-18, dueño): cada vez que le ponen Veneno, entra con 1 stack menos (y 1 turno menos). `items`: lo que tiene
+     equipado. Cambia el estado que se va a agregar; → false si no queda nada (no entra). */
+  function bezoar(estado, items){
+    const n = (items || []).filter(i => i && i.equipado !== false).reduce((a, i) => Math.max(a, nf(i.bezoar)), 0);
+    if(!(n > 0) || !estado || !(estado.esVeneno || /^veneno$/i.test(String(estado.nombre || '').trim()))) return true;
+    estado.stacks = Math.max(0, Math.round(nf(estado.stacks) || 1) - n);
+    if(nf(estado.turnos) > 0) estado.turnos = Math.max(0, nf(estado.turnos) - n);
+    return estado.stacks > 0;
+  }
+  function conGauchito(estados, statId, tiene, usado){
+    if(!tiene || usado || !GAUCHITO_STATS.includes(statId)) return null;
+    return [...(estados || []), {nombre: 'Estatuilla del Gauchito Gil', polaridad: 'buff', activo: true, afortunado: true, afortunadoStats: GAUCHITO_STATS}];
+  }
+  // Stun (dueño, 2026-10-06): no puede hacer nada; si lo atacan, su Evasión es 1. Un estado viejo sin la marca `stun` se reconoce por el nombre.
+  const esStun = e => !!e && e.activo !== false && (!!e.stun || /^stun$/i.test(String(e.nombre || '').trim()));
+  const stuneado = estados => (estados || []).some(esStun);
+  // Mareo de invocación (2026-10-20): no actúa en su turno, pero conserva los No2 y reacciona (dodge roll, Parry). Lo que publica una ficha de sus
+  // invocaciones no trae la marca: se reconoce también por el nombre (probado en el mapa).
+  const mareado = estados => (estados || []).some(e => !!e && e.activo !== false && (!!e.mareado || /^mareo de invocaci[oó]n$/i.test(String(e.nombre || '').trim())));
+  // 👻 Etéreo (dueño, 2026-10-20: «no puede atacar ni puede ser atacado; solamente puede observar hasta que se pierda el estado»). Por la marca o el nombre.
+  const etereo = estados => (estados || []).some(e => !!e && e.activo !== false && (!!e.etereo || /^et[eé]re[oa]$/i.test(String(e.nombre || '').trim())));
+  // 🏜 Sequía (2026-10-24, dueño: la Maldición de la sequía del Debuffer): corta la regeneración PROPIA de vida y de SP del turno (las pasivas, el SP Regen,
+  // la del equipo); lo que viene de otro (la Regeneración de un Bálsamo, una cura, una zona) entra igual. Lo miran FichaMantenimiento y CreepAcciones.
+  const sequia = estados => (estados || []).some(e => !!e && e.activo !== false && (!!e.sequia || /^sequ[ií]a$/i.test(String(e.nombre || '').trim())));
+  function tirarStat(valor, estados, statId, o){
+    o = o || {};
+    if(statId === 'eva' && stuneado(estados))   // stuneado: la Evasión es 1, sin tirar
+      return {formula: '1 (Stun: Evasión 1, sin tirar)', rolls: [], mod: 1, total: 1, estados: estadosQueAfectan(estados, statId, false)};
+    const f = formulaParaValor(valor);
+    if(!f){
+      // Un stat en 0 o en negativo (2026-10-06: dos debuffs dejaron una Evasión en −5 y el duelo quedaba trabado): no hay dados que tirar; el
+      // resultado es el valor, y la Evasión nunca baja de 1. Antes devolvía null («no se puede tirar») y la tirada no salía.
+      const v = Math.round(n(valor));
+      if(!Number.isFinite(Number(valor)) || v > 0) return null;
+      const ex0 = n(o.extra), tot = v + ex0;
+      return {formula: `${v}${ex0 ? (ex0 > 0 ? `+${ex0}` : `${ex0}`) : ''} (sin dados)`, rolls: [], mod: tot, total: statId === 'eva' ? Math.max(1, tot) : tot,
+        estados: statId ? estadosQueAfectan(estados, statId, false) : []};
+    }
+    const azar = o.azar || Math.random;
+    const tirar = () => { const rolls = f.combo.map(d => 1 + Math.floor(azar() * d)); return {rolls, total: rolls.reduce((a, b) => a + b, 0) + f.mod}; };
+    const conVentaja = afortunado(estados, statId);
+    let intento = tirar(), ventaja = null;
+    if(conVentaja){
+      const segundo = tirar();
+      const gana = segundo.total > intento.total ? segundo : intento, pierde = gana === intento ? segundo : intento;
+      ventaja = {rolls: pierde.rolls, total: pierde.total, elegido: gana.total};
+      intento = gana;
+    }
+    const ex = n(o.extra);
+    const mit = statId ? mitadesDeTirada(estados, statId) : 0;
+    let total = aplicarMitades(intento.total + ex, mit);
+    if(statId === 'eva') total = Math.max(1, total);   // una tirada de Evasión nunca baja de 1 (regla del dueño, 2026-09-28)
+    return {formula: f.formula + (ex ? (ex > 0 ? `+${ex}` : `${ex}`) : '') + ' ÷2'.repeat(mit), rolls: intento.rolls, mod: f.mod + ex, total,
+      estados: statId ? estadosQueAfectan(estados, statId, conVentaja) : [], ...(ventaja ? {ventaja} : {})};
+  }
+  // Los estados que cambiaron esa tirada, para pintarlos en la Mesa (verde a favor, rojo en contra): los que le suman o
+  // restan al stat, los que la parten a la mitad (los mismos que cuenta la tirada) y Afortunado si se tiró dos veces.
+  function estadosQueAfectan(estados, statId, conVentaja){
+    const parten = new Set(estadosQueParten(estados, statId)), out = [];
+    activos(estados).forEach(e => {
+      const p = e.polaridad === 'buff' ? 'buff' : e.polaridad === 'debuff' ? 'debuff' : 'otro';
+      if((e.mods || []).some(m => m.stat === statId && n(m.val))) out.push({n: e.nombre, p});
+      else if(parten.has(e)) out.push({n: e.nombre, p: 'debuff'});
+    });
+    if(conVentaja){ const af = activos(estados).find(e => e.afortunado); if(af) out.push({n: af.nombre, p: 'buff'}); }
+    return out;
+  }
+  /* ---------- Pase de turno de los estados (paso 2, 2026-09-30) ----------
+     Lo que le hacen los estados a quien los tiene en cada Mantenimiento — igual para personaje, invocación y creep:
+       · Vida extra: es neta (2026-10-07); solo se renueva entera la que el efecto marca con `recarga`.
+       · Daño o cura por turno × stacks. El daño no hace efecto con Invulnerable, ni el de Veneno con Sangre pura, ni el de
+         Sangrado con Coagulación extrema.
+       · Stacks por turno (suben o bajan); en 0 stacks, el estado se termina.
+       · Turnos: se descuenta 1; en 0 se termina. Uno que no es permanente y no tiene turnos (dato a medio cargar) hace su
+         efecto este turno y se va (dueño, 2026-09-30; antes el personaje lo dejaba para siempre y el creep lo borraba).
+     Los estados pausados (activo === false) no hacen nada ni vencen. Modifica los estados y devuelve {hp, quedan,
+     terminados, eventos}: `hp` es cuánto cambia la vida (lo aplica cada herramienta, con su tope y su muerte), `quedan` la
+     lista sin los que se terminaron. `campos` = nombres del daño por turno y de los stacks por turno en esa herramienta
+     ({hp:'hpturno', stacks:'stacksturno'} en la ficha; {hp:'hpTurno', stacks:'stacksTurno'} en los creeps). */
+  /* El TURNO PROPIO (2026-10-06, dueño, P161 — «turno completo»): con el orden de turnos del mapa, cada uno tiene su propio reloj.
+     · AL EMPEZAR su turno: recarga No2 y SP, bajan sus cooldowns y se DISPARA lo que se dispara (veneno, sangrado, regeneración, el escudo
+       que se recarga) — `dispararEstados`.
+     · AL TERMINAR su turno: hasta el 2026-10-08 bajaba el contador. Desde P177 (dueño) el contador baja AL EMPEZAR, antes de disparar
+       (`empezarTurnoEstados`), y el fin solo le saca lo «recién» a lo que se puso en ese turno (`terminarTurnoEstados`).
+     · Lo que se dispara pega también APENAS TE LO PONEN (`dispararAlAplicar`, dueño: «aunque te apliquen un antídoto, por lo menos una vez va
+       a haber tenido efecto»); cada estado se dispara una vez por vuelta (`disparado`, que se apaga al contar): uno de N turnos pega N veces.
+     · El contador baja al terminar el turno del afectado aunque se lo hayan puesto en ese mismo turno (dueño: «una regla clara, limpia y
+       homogénea»; las trampas se diseñan con eso en cuenta — P162).
+     El ⟳ Mantenimiento de la ronda sigue para fuera de combate y para quien no está en el orden de turnos (y el mapa lo pasa solo al cambiar de
+     ronda, por lo que es de la ronda): `estadosEnMantenimiento(turnoEn, numero)` → false si tuvo un turno propio durante el Mantenimiento
+     anterior (`turnoEn` = el número de Mantenimiento de ese turno): su turno ya lo atiende todo. Sin orden de turnos, `pasarTurnoEstados`
+     hace las dos cosas juntas, como siempre (si ya se disparó al aplicarse, solo cuenta). */
+  const estadosEnMantenimiento = (turnoEn, turno) => turnoEn === undefined || turnoEn === null || n(turnoEn) < n(turno) - 1;
+  // La marca del turno en curso que lleva cada estado nuevo (la pone el mapa: «mapa:paso»; sin orden de turnos, nada). Hoy solo informa.
+  let marcaTurno = null;
+  function fijarMarcaTurno(fn){ marcaTurno = typeof fn === 'function' ? fn : null; }
+  function dispararEstados(estados, campos){
+    const lista = estados || [], c = campos || {hp: 'hpTurno', stacks: 'stacksTurno'};
+    const resFuego = Math.max(0, n(c.resFuego));   // la Quemadura (2026-10-04): la Res. fuego le resta a cada turno
+    const act = activos(c.todos || lista);   // las inmunidades miran todos sus estados (al aplicarse, se dispara uno solo)
+    const invulnerable = act.some(e => e.invulnerable), sangrePura = act.some(e => e.sangrePura), coagulacion = act.some(e => e.coagulacionExtrema);
+    const eventos = [];
+    let hp = 0;
+    lista.forEach(e => {
+      if(!e || e.activo === false || e.disparado) return;
+      e.disparado = true;
+      if(n(e.escudoMagico) > 0 && (e.recarga || (!e.excedenteVida && !e.sinRecarga))){   // la Vida extra es neta (2026-10-07): solo se renueva si el efecto lo dice (`recarga`)
+        const antes = n(e.escudoMagicoActual ?? e.escudoMagico);
+        if(antes < n(e.escudoMagico)) eventos.push({tipo: 'escudo', nombre: e.nombre, de: antes, a: n(e.escudoMagico)});
+        e.escudoMagicoActual = n(e.escudoMagico);
+      }
+      const stacks = Math.max(1, n(e.stacks) || 1);
+      let d = n(e[c.hp]) * stacks;
+      // 🎲 Una cura con dado por turno (`curaDado`, 2026-10-25; la pidió el Frenético del Support y después pasó a una cura fija de 4, pero queda para
+      // otros estados): se tira cada vez que se dispara (al ponerlo y al empezar cada turno), como la Regeneración.
+      const tiro = e.curaDado ? curaTirada(String(e.curaDado)) : null;
+      if(tiro) d += tiro.cura;
+      if(d > 0 && n(e.curaExtraPrimera) > 0){ d += n(e.curaExtraPrimera); delete e.curaExtraPrimera; }   // 💍 el Boticario: solo la primera vez (2026-10-19)
+      if(d < 0 && e.esQuemadura && resFuego){ const antes = d; d = Math.min(0, d + resFuego); eventos.push({tipo: 'resfuego', nombre: e.nombre, de: -antes, a: -d, res: resFuego}); }
+      if(d < 0 && (invulnerable || (e.esVeneno && sangrePura) || (e.esSangrado && coagulacion))){ eventos.push({tipo: 'inmune', nombre: e.nombre}); d = 0; }
+      if(d){ hp += d; eventos.push({tipo: 'hp', nombre: e.nombre, hp: d, stacks, ...(tiro ? {dado: tiro.formula, rolls: tiro.rolls} : {})}); }
+    });
+    return {hp, eventos};
+  }
+  // `o.alEmpezar` (P177, 2026-10-08): lo cuenta el inicio del turno — un estado `recien` (puesto fuera de su turno) no descuenta esta vez.
+  function contarEstados(estados, campos, o){
+    const lista = estados || [], c = campos || {hp: 'hpTurno', stacks: 'stacksTurno'};
+    const eventos = [], fin = new Set();
+    lista.forEach(e => {
+      if(e && e.agotada){ fin.add(e); return; }   // un estado con cargas ya gastado se va sin aviso
+      if(e && e.seGasta && e.activo !== false && n(e.escudoMagicoActual ?? e.escudoMagico) <= 0){ fin.add(e); eventos.push({tipo: 'fin', nombre: e.nombre}); return; }   // Shield gastado (2026-10-11)
+      if(!e || e.activo === false) return;
+      if(e.recien){ delete e.recien; if(o && o.alEmpezar) return; }
+      e.disparado = false;   // en la vuelta que viene se vuelve a disparar
+      const hayStacks = e.stacks !== undefined && e.stacks !== null && e.stacks !== '';
+      const stacks = Math.max(1, n(e.stacks) || 1);
+      const ds = n(e[c.stacks]);
+      if(ds){
+        e.stacks = Math.max(0, stacks + ds);
+        eventos.push({tipo: 'stacks', nombre: e.nombre, de: stacks, a: e.stacks});
+        if(e.stacks === 0){ fin.add(e); eventos.push({tipo: 'fin', nombre: e.nombre}); }
+      }else if(hayStacks && n(e.stacks) === 0 && !fin.has(e)){ fin.add(e); eventos.push({tipo: 'fin', nombre: e.nombre}); }
+      if(!e.permanente){
+        const antes = n(e.turnos);
+        if(antes > 0){
+          e.turnos = antes - 1;
+          if(e.turnos === 0){ if(!fin.has(e)){ fin.add(e); eventos.push({tipo: 'vence', nombre: e.nombre, de: antes}); } }
+          else eventos.push({tipo: 'turnos', nombre: e.nombre, de: antes, a: e.turnos});
+        }else if(!fin.has(e)){ fin.add(e); eventos.push({tipo: 'fin', nombre: e.nombre}); }
+      }
+    });
+    return {quedan: lista.filter(e => !fin.has(e)), terminados: lista.filter(e => fin.has(e)), eventos};
+  }
+  // Lo que se va AL EMPEZAR el turno del afectado (`alEmpezarTurno`, ej. Titilando, 2026-10-06): lo sacan las funciones de inicio de turno antes
+  // de disparar. → {quedan, eventos}. (Sin orden de turnos, el ⟳ lo cuenta como cualquier otro: dura hasta el próximo Mantenimiento.)
+  function vencerAlEmpezar(estados){
+    const lista = estados || [], fin = lista.filter(e => e && e.activo !== false && e.alEmpezarTurno);
+    return {quedan: lista.filter(e => !fin.includes(e)), eventos: fin.map(e => ({tipo: 'fin', nombre: e.nombre}))};
+  }
+  /* Bolsillo de emergencia (cinturón, 2026-10-06, dueño): al bajar del 25 % de la vida (sin llegar a 0), se toma sola la poción de curación que más
+     cura del cinturón, una vez por combate. `emergenciaCruza(antes, ahora, max)`: ¿cruzó el 25 % hacia abajo? `pocionEmergencia(cinturon)`: cuál. */
+  const emergenciaCruza = (antes, ahora, max) => n(max) > 0 && n(ahora) > 0 && n(ahora) < n(max) * 0.25 && n(antes) >= n(max) * 0.25;
+  const pocionEmergencia = cinturon => (cinturon || []).filter(i => i && n(i.curahp) > 0 && n(i.unidades) > 0).sort((a, b) => n(b.curahp) - n(a.curahp))[0] || null;
+  // Titilando (2026-10-06): un estado listo para agregar a quien vuelve de estar caído. `presets` = la lista en la forma de esa herramienta
+  // (estadosPresetFicha / estadosPresetCreep). Se agrega con agregarEstado (si ya lo tenía, se renueva).
+  // (2026-10-08, dueño: Titilando = Invulnerable): el revivido queda Invulnerable hasta que empieza su próximo turno (y por ser invulnerable, titila).
+  function estadoTitilando(presets){
+    const pre = (presets || []).find(p => p && p.invulnerable && !p.soloSistema);
+    return pre ? {id: 'tit' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), activo: true, ...structuredClone(pre), turnos: 1, permanente: false,
+      alEmpezarTurno: true, titilando: true, detalle: 'Recién revivido: invulnerable (no recibe daño ni debuffs) hasta que empieza su próximo turno. En el mapa, titila.'} : null;
+  }
+  // 🔥 Llama de Fénix (dueño, 2026-10-20): ¿tiene la llama? Y revivir con ella: la saca y pone Titilando. → la lista nueva de estados, o null.
+  const fenixActivo = estados => (estados || []).find(e => e && e.activo !== false && (e.fenix || /^llama de f[eé]nix/i.test(String(e.nombre || '').trim()))) || null;
+  function revivirFenix(estados, presets){
+    const e = fenixActivo(estados);
+    if(!e) return null;
+    const quedan = (estados || []).filter(x => x !== e), tit = estadoTitilando(presets);
+    if(tit) quedan.push(tit);
+    return quedan;
+  }
+  /* 😇 El Pacto (dueño, 2026-10-28: «cada personaje puede tener su religión o pacto espiritual, que lo protege de morir. Cuando alguien tiene un pacto y su
+     hp llega a cero, revive de forma automática y queda titilando (invulnerable) hasta el inicio de su próximo turno. El pacto se gasta hasta que, de alguna
+     forma narrativa, los jugadores logren contactar a alguna entidad espiritual que les vuelva a brindar un pacto»). Es `S.meta.pacto` (sí/no) y el resumen
+     lo publica. Revive con un cuarto del máximo, mínimo 1 (P229 ✅). */
+  const PACTO_VIDA_PCT = 25;
+  const pactoVida = hpMax => Math.max(1, Math.floor(n(hpMax) * PACTO_VIDA_PCT / 100));
+  // ¿Titila? Cualquier estado activo que da invulnerabilidad (dueño: «asociar la animación de titilar a la invulnerabilidad en general»).
+  const titila = estados => (estados || []).some(e => e && e.activo !== false && (e.invulnerable || e.titilando || /^(invulnerable|titilando)$/i.test(String(e.nombre || '').trim())));
+  /* P177 (dueño, 2026-10-08): los turnos de un estado bajan AL EMPEZAR el turno de quien lo tiene, antes de que pegue — así uno de N turnos dura
+     N rondas completas desde que se aplica. Lo recién puesto lleva `recien` (agregarEstado): si se lo pusieron en su propio turno, el fin de ese
+     turno se lo saca (terminarTurnoEstados) y su próximo inicio ya descuenta; si se lo pusieron fuera de su turno, su próximo inicio no descuenta
+     (le toca el turno entero) y el siguiente sí. Al empezar: cuenta y después dispara lo que sigue (veneno, regeneración…). */
+  function empezarTurnoEstados(estados, campos){
+    const k = contarEstados(estados, campos, {alEmpezar: true});
+    const d = dispararEstados(k.quedan, {...(campos || {}), todos: k.quedan});
+    return {hp: d.hp, quedan: k.quedan, terminados: k.terminados, eventos: [...k.eventos, ...d.eventos]};
+  }
+  // `alTerminarTurno` (2026-10-12, Acelerado): lo que vale solo dentro del turno se va al terminarlo (se saca de la misma lista).
+  /* ¿Un efecto activo? (dueño, 2026-10-24: «los turnos completos, para los buffs relevantes durante las acciones de la persona beneficiada: más daño, más
+     probabilidad de golpe, los que tienen un rol activo; los defensivos está bien que resulten desde el momento en que son casteados» y «lo mismo a la
+     inversa: los debuffs relevantes durante acciones activas —menos probabilidad de golpe, menos daño— también completos; los que afectan una variable o
+     un efecto pasivo, como menos Defensa o menos Evasión, no»). Uno que cambia algo de su ataque (PdG, PdG.Esp, daño, Ef.Esp, crítico…), que suma a sus
+     golpes (cargas, arma elemental), o que pesa en lo que hace (Pajaritos, Lisiado, Ceguera, Silencio, Confusión, Extenuado, Atormentado, Maldito); o
+     marcado `turnosCompletos`. (Stun y Miedo tienen su propia regla.) */
+  const STATS_ACTIVOS = new Set(['pdg', 'pdgmg', 'dmg', 'dmgesp', 'crit', 'critpot', 'pdgopor', 'pdgcontra', 'pdgdist', 'pdgt4', 'pdgt6', 'pdgt8', 'pdgt10']);
+  const MARCAS_ACTIVAS = ['mitadPdgEva', 'lisiado', 'ceguera', 'silencio', 'confusion', 'extenuante', 'tormenta', 'sangraSp'];
+  const efectoActivo = e => !!e && !e.stun && !e.alEmpezarTurno && (!!e.turnosCompletos || !!e.golpe || MARCAS_ACTIVAS.some(k => !!e[k])
+    || (Array.isArray(e.mods) && e.mods.some(m => m && STATS_ACTIVOS.has(m.stat) && n(m.val) !== 0)));
+  function terminarTurnoEstados(estados){
+    const terminados = [];
+    if(Array.isArray(estados)) for(let i = estados.length - 1; i >= 0; i--) if(estados[i] && estados[i].alTerminarTurno){ terminados.unshift(estados[i]); estados.splice(i, 1); }
+    // Turnos completos (2026-10-24, dueño, Ojo certero: «que el afectado inicie y termine N turnos completos con ese efecto»): el turno en que se lo
+    // pusieron no cuenta nunca — tampoco si fue el propio —, así el próximo inicio no descuenta. Vale para los efectos activos (efectoActivo).
+    (estados || []).forEach(e => { if(e && e.recien && !efectoActivo(e)) delete e.recien; });
+    return {hp: 0, quedan: estados || [], terminados, eventos: []};
+  }
+  // El pase de turno de siempre (⟳ Mantenimiento, sin orden de turnos): dispara (lo que no se disparó al aplicarse) y cuenta.
+  function pasarTurnoEstados(estados, campos){
+    const d = dispararEstados(estados, campos), k = contarEstados(estados, campos);
+    return {hp: d.hp, quedan: k.quedan, terminados: k.terminados, eventos: [...d.eventos, ...k.eventos]};
+  }
+  // Recién puesto (r = lo que devolvió agregarEstado): si es nuevo o se renovó, se dispara ya. → {hp, eventos}; la vida la aplica quien lo puso.
+  // `campos.hpActual` (opcional): la vida de quien lo recibe; si está caído (0), una cura no entra (curaQueEntra).
+  function dispararAlAplicar(r, estados, campos){
+    if(!r || !r.ok || !r.estado || (r.que !== 'nuevo' && r.que !== 'renovado')) return {hp: 0, eventos: []};
+    const d = dispararEstados([r.estado], {...(campos || {}), todos: estados});
+    if(campos && campos.hpActual !== undefined && d.hp > 0 && n(campos.hpActual) <= 0) return {hp: 0, eventos: [...d.eventos, {tipo: 'caido', nombre: r.estado.nombre}]};
+    return d;
+  }
+  /* Una cura no levanta a un caído (dueño, 2026-10-06: «una poción de cura normal no revive a alguien inconsciente; tiene que ser un efecto
+     que diga revivir»): con la vida en 0, lo que sume vida no entra (el daño sí, aunque ya no baja de 0). Para levantarlo: ✚ Revivir, un Ankh,
+     un efecto que reviva (y ahí queda Titilando). → lo que entra de `delta`. Igual para personajes, invocaciones y creeps. */
+  const curaQueEntra = (hpActual, delta, estados) => (n(delta) > 0 && (n(hpActual) <= 0 || sinCura(estados)) ? 0 : n(delta));
+  /* 🌑 No se puede curar (2026-10-26, la identidad de lo siniestro y la Sanguijuela): con un estado `sinCura` (Herida sombría, Sanguijuela) no le entra
+     ninguna cura — pociones, habilidades, Regeneración, la de cada turno. `estados` puede ser el resumen público (se reconoce también por el nombre). */
+  const sinCura = estados => (estados || []).some(e => !!e && e.activo !== false && (!!e.sinCura || /^(herida sombr[ií]a|sanguijuela)$/i.test(String(e.nombre || '').trim())));
+  const SIN_CURA_TXT = 'tiene una herida que no deja curarse (Herida sombría o Sanguijuela): no se cura';
+  const CAIDO_TXT = 'está caído: una cura no lo levanta (hace falta revivirlo)';
+  // El reporte en texto llano (Mesa del personaje, 📜 Historial del GM), un renglón por cosa que pasó.
+  const fmtN = x => Number.isInteger(x) ? String(x) : String(Math.round(x * 100) / 100);
+  function reporteTurno(eventos){
+    return (eventos || []).map(ev => {
+      if(ev.tipo === 'escudo') return `${ev.nombre}: vida extra ${fmtN(ev.de)} → ${fmtN(ev.a)}`;
+      if(ev.tipo === 'inmune') return `${ev.nombre}: no le hizo efecto (inmunidad)`;
+      if(ev.tipo === 'resfuego') return `${ev.nombre}: Res. fuego ${fmtN(ev.res)} le saca ${fmtN(ev.de - ev.a)} (de ${fmtN(ev.de)} a ${fmtN(ev.a)})`;
+      if(ev.tipo === 'hp') return `${ev.nombre}: ${ev.hp > 0 ? '+' : '−'}${fmtN(Math.abs(ev.hp))} HP${ev.dado ? ` (${ev.dado}: ${(ev.rolls || []).join('+')})` : ''}${ev.stacks > 1 ? ` (${fmtN(ev.stacks)} stacks)` : ''}`;
+      if(ev.tipo === 'stacks') return `${ev.nombre}: stacks ${fmtN(ev.de)} → ${fmtN(ev.a)}`;
+      if(ev.tipo === 'turnos') return `${ev.nombre}: ${fmtN(ev.de)} → ${fmtN(ev.a)} turno${ev.a === 1 ? '' : 's'}`;
+      if(ev.tipo === 'vence') return `${ev.nombre}: ${fmtN(ev.de)} → 0 turnos, se terminó`;
+      if(ev.tipo === 'fin') return `${ev.nombre}: se terminó`;
+      if(ev.tipo === 'caido') return `${ev.nombre}: no cura a un caído`;
+      return '';
+    }).filter(Boolean);
+  }
+
+  /* ---------- Máximo de No2 con los estados (tanda 3, 2026-09-30) ----------
+     `natural` = Agilidad efectiva + bonos a Nitros (cada herramienta lo arma con lo suyo). Cansado lo deja en 2/3 del natural
+     (para abajo); Hypeado suma un tercio del natural (para arriba); "Forzar Nitros máx." (Stun = 0, estados propios) y
+     Exhausto (un tercio del natural, para abajo) son TOPES: gana el más bajo y nunca suben el máximo (dueño, 2026-09-30: hasta
+     entonces el personaje lo tomaba como "fijar", y un forzado más alto que su máximo se lo subía). Mínimo 0. Antes había
+     tres copias (ficha, invocaciones, creeps). */
+  function nitrosMax(natural, estados){
+    if(!Number.isFinite(Number(natural))) return natural;   // la ficha usa NaN para "no se puede calcular"
+    const act = activos(estados), nat = n(natural);
+    let v = nat;
+    if(act.some(e => e.cansado)) v = Math.floor(nat * 2 / 3);
+    if(act.some(e => e.hypeado)) v += Math.ceil(nat / 3);
+    const topes = act.filter(e => e.forzarNitros !== '' && e.forzarNitros !== null && e.forzarNitros !== undefined).map(e => n(e.forzarNitros));
+    if(act.some(e => e.exhausto)) topes.push(Math.floor(nat / 3));
+    if(topes.length) v = Math.min(v, ...topes);
+    return Math.max(0, v);
+  }
+
+  /* ---------- Costo de atacar (tanda 3, 2026-09-30) ----------
+     El primer ataque del turno con un arma cuesta Tipo ÷ 2 (para arriba) en No2; los siguientes, el Tipo completo. El ataque
+     de oportunidad y el contraataque cuestan siempre lo de un primer ataque y no suman al conteo. Antes estaba en la ficha, las
+     invocaciones, los creeps y el asistente de ítems, cada uno con su copia. */
+  function costoPrimerAtaque(tipo){ return Math.ceil(n(tipo) / 2); }
+  /* Ataque de oportunidad y contraataque (regla universal, dueño 2026-10-03): cuestan lo de un primer ataque (costoPrimerAtaque), no cuentan
+     como ataque del turno y suman su PdG especial — «PdG en oportunidad» / «PdG en contraataque» — venga de donde venga (arma, equipo,
+     pasivas, estados), igual para personajes, creeps e invocaciones. `statAtaqueEspecial(tipo)` → el stat ('' si es un ataque normal). */
+  /* Bonos de regla (dueño, 2026-10-20: «crítico potente y frecuente no son stats secundarios, son bonos que modifican la regla general»):
+     no salen de ningún atributo (arrancan en 0) y no se muestran como stats secundarios; solo suman lo que den ítems, pasivas y estados. */
+  const SOLO_BONO = ['crit', 'critpot', 'pdgopor', 'pdgcontra'];
+  // El texto corto de los que no están en 0: «Bonos al crítico: frecuente +1 · potente +2 · PdG en oportunidad +1». '' si están todos en 0.
+  function soloBonoTxt(valorDe){
+    const v = id => Math.round(n(valorDe(id))), sg = x => (x > 0 ? '+' : '') + x;
+    const crit = [['crit', 'frecuente'], ['critpot', 'potente']].filter(([id]) => v(id)).map(([id, t]) => `${t} ${sg(v(id))}`);
+    const pdg = [['pdgopor', 'en oportunidad'], ['pdgcontra', 'en contraataque']].filter(([id]) => v(id)).map(([id, t]) => `PdG ${t} ${sg(v(id))}`);
+    return [...(crit.length ? [`Bonos al crítico: ${crit.join(' · ')}`] : []), ...pdg].join(' · ');
+  }
+  const ATAQUE_ESPECIAL = {oportunidad: {stat: 'pdgopor', nombre: 'Ataque de oportunidad'}, contra: {stat: 'pdgcontra', nombre: 'Contraataque'}};
+  const statAtaqueEspecial = tipo => (ATAQUE_ESPECIAL[tipo] || {}).stat || '';
+  /* Evasión contra oportunidad / contra contraataque (dueño, 2026-10-04, mecánicas de las piernas): suman a la Evasión del defensor solo
+     contra ese tipo de ataque (no al Parry). Peso de diseño: Evasión +1 ≈ contra oportunidad +2 ≈ contra contraataque +3.
+     `statEvaEspecial(tipo)` → el stat ('' si es un ataque normal). */
+  const EVA_ESPECIAL = {oportunidad: {stat: 'evaopor', nombre: 'contra oportunidad'}, contra: {stat: 'evacontra', nombre: 'contra contraataque'}};
+  const statEvaEspecial = tipo => (EVA_ESPECIAL[tipo] || {}).stat || '';
+  /* Lo que se suma a la Evasión del defensor en un duelo (2026-10-04): la Evasión contra oportunidad / contraataque según el ataque, y Pasos de
+     baile si ya se movió en el turno (lo sabe el mapa: window.mapaSeMovio(tokenId); fuera del mapa no cuenta). `valorDe(statId)` → el valor de
+     ese stat en quien se defiende. → {val, txt} («+2 contra oportunidad · +1 Pasos de baile»). */
+  function evaExtraDuelo(d, valorDe){
+    const partes = [];
+    let val = 0;
+    const tipo = d && d.ataque && d.ataque.tipo, st = statEvaEspecial(tipo);
+    const fmtN = v => `${v > 0 ? '+' : '−'}${Math.abs(v)}`;
+    if(st){ const v = n(valorDe(st)); if(v){ val += v; partes.push(`${fmtN(v)} ${EVA_ESPECIAL[tipo].nombre}`); } }
+    if(contraDisparo(d)){ const v = n(valorDe('evadisparo')); if(v){ val += v; partes.push(`${fmtN(v)} contra disparos`); } }   // (2026-10-16: lo que vuela, −1)
+    const tokenId = d && d.defensor && d.defensor.tokenId;
+    const movio = !!tokenId && typeof window !== 'undefined' && typeof window.mapaSeMovio === 'function' && window.mapaSeMovio(tokenId);
+    if(movio){ const v = n(valorDe('pasosbaile')); if(v){ val += v; partes.push(`${fmtN(v)} Pasos de baile`); } }
+    // Paso fantasma (anillo; dueño, 2026-10-19): si se movió 3 casilleros o más (desde la última vez que lo usó), su PRÓXIMA Evasión suma. Lo sabe
+    // el mapa (window.mapaPasoFantasma); se gasta al tirar esa Evasión (gastarPasoFantasma, desde el `defender` de cada duelo).
+    // Es un valor FIJO que se suma después del dado (dueño, 2026-10-19: «que el +3 sea un valor fijo que se sume»): va en `fijo`, no en `val`.
+    let fantasma = false, fijo = 0;
+    const cargado = !!tokenId && typeof window !== 'undefined' && typeof window.mapaPasoFantasma === 'function' && window.mapaPasoFantasma(tokenId);
+    if(cargado){ const v = n(valorDe('pasofantasma')); if(v){ fijo += v; partes.push(`${fmtN(v)} Paso fantasma`); fantasma = true; } }
+    return {val, txt: partes.join(' · '), ...(fijo ? {fijo} : {}), ...(fantasma ? {fantasma: true} : {})};
+  }
+  // La fórmula de la Evasión con lo fijo del duelo (el Paso fantasma) a la vista: «1d6» → «1d6+3».
+  const conFijo = (formula, ee) => ee && n(ee.fijo) ? `${formula}${n(ee.fijo) > 0 ? '+' : ''}${n(ee.fijo)}` : formula;
+  // Se tiró la Evasión que llevaba el Paso fantasma: se gasta (hasta volver a moverse 3 casilleros).
+  function gastarPasoFantasma(d, ee){
+    const tokenId = d && d.defensor && d.defensor.tokenId;
+    if(ee && ee.fantasma && tokenId && typeof window !== 'undefined' && typeof window.mapaPasoFantasmaGastar === 'function') window.mapaPasoFantasmaGastar(tokenId);
+  }
+  /* Las mecánicas «con chance» de las piezas (dueño, 2026-10-04): Retirada limpia, Inamovible, Recuperarse rápido, Reflejos de mangosta. El stat
+     va en %, tope 100 (100 = siempre, sin tirar). El dado (dueño, 2026-10-06): 10 % d10, 13 % d8, 17 % d6, 20 % 2 en d10, 25 % d4, 33 % 2 en d6,
+     50 % moneda (d2) — en general, el dado que da justo ese porcentaje y, si ninguno, el más cercano (a igual, el más chico). `chanceDado(pct)` →
+     {caras, exitos} o null (siempre / nunca); `chanceTexto(pct)` → «33 % (5–6 en d6)», «50 % (2 en d2)» o «siempre». (`retirada*`: los
+     mismos, con el nombre con el que nacieron.) */
+  const chancePct = v => Math.max(0, Math.min(100, Math.round(n(v))));
+  const CHANCE_CARAS = [2, 4, 6, 8, 10, 20];
+  function chanceDado(v){
+    const pct = chancePct(v);
+    if(pct <= 0 || pct >= 100) return null;
+    let mejor = null;
+    CHANCE_CARAS.forEach(caras => {
+      const exitos = Math.min(caras - 1, Math.max(1, Math.round(pct * caras / 100))), err = Math.abs(exitos * 100 / caras - pct);
+      if(!mejor || err < mejor.err - 0.6) mejor = {caras, exitos, err};
+    });
+    return {caras: mejor.caras, exitos: mejor.exitos};
+  }
+  function chanceTexto(v){
+    const pct = chancePct(v), d = chanceDado(pct);
+    if(pct >= 100) return 'siempre';
+    if(!d) return '';
+    return `${pct} % (${d.exitos > 1 ? (d.caras - d.exitos + 1) + '–' : ''}${d.caras} en d${d.caras})`;
+  }
+  const retiradaPct = chancePct, retiradaDado = chanceDado, retiradaTexto = chanceTexto;
+  /* Las ranuras del cinturón (dueño, 2026-10-04/05): 1 ranura = 1 unidad; el Portapergaminos es una ranura aparte donde entran
+     `portapergaminos` pergaminos (3 = entran 3; dueño, 2026-10-05: reemplaza a «agruparlos de a N por ranura»); las ranuras exclusivas (pociones, pergaminos, trampas, Ankh) se llenan primero con lo suyo. Igual para personajes y
+     creeps. `ranurasCinturon(items, o)` → las ranuras COMUNES que ocupan; `entranEnCinturon(items, it, cuantas, cap, o)` → cuántas unidades de
+     `it` entran todavía. o = {portapergaminos, excl: {pocion, pergamino, trampa, ankh}}. */
+  function categoriaConsumible(it){
+    const nom = String((it && it.nombre) || '').toLowerCase();
+    if(it && it.trampaDatos) return 'trampa';
+    if(/ankh/.test(nom)) return 'ankh';
+    if(/pergamino/.test(nom)) return 'pergamino';
+    if(/poci[oó]n|elixir|t[oó]nico|brebaje|ung[uü]ento|filtro/.test(nom) || n(it && it.curahp) > 0) return 'pocion';
+    return 'otro';
+  }
+  /* 🛒 La Góndola de consumibles (dueño, 2026-10-28): todo lo consumible va en su propia pestaña, dividido así y en este orden: las pociones de HP y
+     SP; la «enfermería» (lo que cura estados); los utilitarios (Moneda Re-Roll, Polilla mística, Revive y Ankh siempre primeros); las trampas; las
+     pociones de otros usos; los pergaminos. → 'hpsp' | 'enfermeria' | 'utilitario' | 'trampa' | 'municion' | 'pocion' | 'pergamino'.
+     La munición (flechas y virotes especiales), aparte, después de las trampas (dueño, 2026-10-28: «armarle su propia categoría»). */
+  const GONDOLA_CATEGORIAS = [['hpsp', '❤', 'Pociones de HP y SP'], ['enfermeria', '🩹', 'Enfermería'], ['utilitario', '🎒', 'Utilitarios'],
+    ['trampa', '🪤', 'Trampas'], ['municion', '🏹', 'Munición'], ['pocion', '⚗', 'Pociones de otros usos'], ['pergamino', '📜', 'Pergaminos']];
+  const UTIL_PRIMERO = [/moneda re-?roll/i, /polilla m[ií]stica/i, /^revive\b/i, /ankh/i, /town portal/i];   // 🌀 (2026-10-29)
+  const utilPrimero = it => { const nom = String((it && it.nombre) || ''); const i = UTIL_PRIMERO.findIndex(r => r.test(nom)); return i < 0 ? 99 : i; };
+  function categoriaGondola(it){
+    const nom = String((it && it.nombre) || '');
+    if(it && it.trampaDatos) return 'trampa';
+    if(it && it.flecha) return 'municion';
+    if(utilPrimero(it) < 99) return 'utilitario';
+    if(/pergamino/i.test(nom)) return 'pergamino';
+    if(curaDeItem(it).length) return 'enfermeria';
+    if(/poci[oó]n de (hp|sp|vida|regeneraci)/i.test(nom) || (/poci[oó]n|elixir|t[oó]nico|brebaje/i.test(nom) && (n(it && it.curahp) > 0 || n(it && it.curasp) > 0 || n(it && it.sp) > 0))) return 'hpsp';
+    if(categoriaConsumible(it) === 'pocion') return 'pocion';
+    return 'utilitario';
+  }
+  function ranurasCinturon(items, o){
+    o = o || {};
+    const por = {};
+    (items || []).forEach(it => {
+      if(!it) return;
+      const c = categoriaConsumible(it), u = it.consumible ? Math.max(0, n(it.unidades)) : 1;
+      por[c] = (por[c] || 0) + u;
+    });
+    if(por.pergamino) por.pergamino = Math.max(0, por.pergamino - Math.max(0, Math.round(n(o.portapergaminos))));   // los que van en el Portapergaminos
+    const excl = o.excl || {};
+    return Object.entries(por).reduce((a, [c, slots]) => a + Math.max(0, slots - Math.max(0, n(excl[c]))), 0);
+  }
+  function entranEnCinturon(items, it, cuantas, cap, o){
+    let k = 0;
+    while(k < cuantas && ranurasCinturon([...(items || []), {...it, consumible: true, unidades: k + 1}], o) <= cap) k++;
+    return k;
+  }
+  /* Los estados que traban el movimiento (Recuperarse rápido, dueño 2026-10-04): duran 1 turno menos con la chance de los pies. */
+  const ESTADOS_TRABA = ['Inmovilizado', 'Rengo', 'Sentado', 'Lento'];
+  const esTraba = e => !!e && (e.inmovilizado || e.rengo || e.sentado || e.lento || ESTADOS_TRABA.includes(String(e.nombre || '').trim()));
+  /* Soltarse (2026-10-03, trampas de Atrapar; pedido del dueño: «que el botón diga exactamente qué tira y cuánto cuesta»): un estado puede
+     traer `soltar: {stat, etq, dif, no2}` (lo pone la trampa que lo dejó). Igual para personajes, invocaciones y creeps: se paga lo que diga
+     (se suelte o no), se tira el stat contra la dificultad y, si llega, se saca el estado. */
+  const SOLTAR_ETQ = {fue: 'Fuerza', agl: 'Agilidad', des: 'Destreza', con: 'Constitución'};
+  function soltarNorm(s){
+    if(!s || !s.stat || !(Number(s.dif) >= 1)) return null;
+    const hunde = Math.max(0, Math.min(5, Math.round(Number(s.hunde) || 0)));   // arena movediza (dueño, 2026-10-04): si falla, se hunde más (+N turnos)
+    return {stat: String(s.stat), etq: String(s.etq || SOLTAR_ETQ[s.stat] || s.stat).slice(0, 20), dif: Math.round(Number(s.dif)), no2: Math.max(0, Math.round(Number(s.no2) || 0)), ...(hunde ? {hunde} : {}),
+      ...(s.alEmpezar ? {alEmpezar: true} : {}), ...(s.ayuda ? {ayuda: true} : {}),   // 🤝 un aliado pegado puede ayudar a soltarlo (1 No2, su propia tirada)   // 🔓 la tirada aparece sola al empezar su turno (2026-10-20, la Red Nerubian: vtt-hexgrid/js/54)
+      // 🦷 Mordisco feroz (2026-10-21, dueño): si no se suelta, le vuelve a entrar el daño (`danoFalla`, una fórmula); `de` = el token que lo tiene
+      // agarrado (lo suelta al empezar el turno de ese token: vtt-hexgrid/js/54).
+      ...(/^\d{1,2}d\d{1,3}([+-]\d{1,3})?$/i.test(String(s.danoFalla || '').replace(/\s+/g, '')) ? {danoFalla: String(s.danoFalla).replace(/\s+/g, '').toLowerCase()} : {}),
+      ...(s.de ? {de: String(s.de).slice(0, 80), deNombre: String(s.deNombre || '').slice(0, 40)} : {}),
+      // 🪤 El Cepo del cazador (2026-10-27, dueño: «cualquier tirada fallida para zafarse le hace un dado de 6 de daño directo»): `hiere` = esa fórmula.
+      ...(/^\d{1,2}d\d{1,3}([+-]\d{1,3})?$/i.test(String(s.hiere || '').replace(/\s+/g, '')) ? {hiere: String(s.hiere).replace(/\s+/g, '').toLowerCase()} : {}),
+      ...(ATRAPA_VISUALES.includes(s.visual) ? {visual: s.visual} : {})};   // 🕸 cómo se ve en el mapa lo que lo tiene atrapado (vtt-hexgrid/js/68)
+  }
+  /* 🕸 Lo que atrapa, a la vista (dueño, 2026-10-23): mientras dura, el mapa dibuja encima del token una telaraña (la Red Nerubian, Tela de
+     araña) o una red de soga con pesitos (la Red de caza, la Red de un creep); las trampas de telaraña y de red, en el piso. Viaja en
+     `soltar.visual` y lo público lo lleva como `atrapa`. Las copias viejas (sin el dato) se reconocen por el nombre de lo que lo lanzó. */
+  /* 🗡 Remate / Ir por el herido (dueño, 2026-10-23, choque pesado, «remate», escalonado): cuántos dados de más según la vida que le queda al
+     objetivo (`frac` = vida / vida máxima, de 0 a 1): la mitad o menos +2, un cuarto o menos +3; si no, 0. */
+  const REMATE_ESCALONES = [[0.25, 3], [0.5, 2]];
+  const remateDados = frac => { const f = Number(frac); if(!Number.isFinite(f) || f <= 0) return 0; const e = REMATE_ESCALONES.find(([tope]) => f <= tope); return e ? e[1] : 0; };
+  /* 😤 Golpe desesperado (dueño, 2026-10-26, choque liviano, escalonado por la vida PROPIA): con más de la mitad, +1 a los dos críticos y +1 al daño; con
+     la mitad o menos, +2, +2 y +3; con un cuarto o menos, además +2 PdG. `frac`: la vida que le queda, de 0 a 1. */
+  function desesperadoBonos(frac){
+    const f = Number(frac);
+    if(Number.isFinite(f) && f <= 0.25) return {critBono: 2, critpotBono: 2, fijo: 3, pdg: 2};
+    if(Number.isFinite(f) && f <= 0.5) return {critBono: 2, critpotBono: 2, fijo: 3, pdg: 0};
+    return {critBono: 1, critpotBono: 1, fijo: 1, pdg: 0};
+  }
+  const desesperadoTxt = b => [b.pdg ? `+${b.pdg} PdG` : '', `+${b.critBono} Crítico frecuente`, `+${b.critpotBono} Crítico potente`, `+${b.fijo} al daño`].filter(Boolean).join(', ');
+  const ATRAPA_VISUALES = ['telarana', 'red'];
+  const atrapaDeNombre = nombre => { const t = String(nombre || ''); return /telara|tela de ara|nerub/i.test(t) ? 'telarana' : /(^|[^a-záéíóúñ])red(es)?([^a-záéíóúñ]|$)/i.test(t) ? 'red' : ''; };
+  const atrapaDe = e => { const v = e && (e.atrapa || (e.soltar && e.soltar.visual)); return ATRAPA_VISUALES.includes(v) ? v : ''; };
+  const atrapaPub = e => { const v = atrapaDe(e); return v ? {atrapa: v} : {}; };
+  const estadoSoltable = estados => (estados || []).find(e => e && e.activo !== false && soltarNorm(e.soltar)) || null;
+  const textoSoltarse = e => { const s = soltarNorm(e && e.soltar); return s ? `🔓 Soltarse · ${s.etq} contra ${s.dif} · ${s.no2} No2${s.hunde ? ` · si falla, se hunde: +${s.hunde} turno${s.hunde === 1 ? '' : 's'}` : ''}${s.hiere ? ` · si falla, ${s.hiere} de daño directo` : ''}` : ''; };
+  // «Si te resistís, te hundís más rápido» (los dibujitos de los 80 y 90): un intento fallido le suma turnos al estado. → true si se hundió.
+  function hundirSiFalla(est, t){
+    if(!est || !t || t.ok || !t.s || !t.s.hunde) return false;
+    est.turnos = Math.max(0, Math.round(Number(est.turnos) || 0)) + t.s.hunde;
+    return true;
+  }
+  // La tirada (no cobra ni saca nada: eso lo hace cada uno). valor = el stat de quien se suelta. → {s, r, ok}
+  function tiradaSoltarse(e, valor, estados, azar){
+    const s = soltarNorm(e && e.soltar);
+    if(!s) return null;
+    const r = tirarStat(valor, estados, s.stat, azar ? {azar} : undefined);
+    return {s, r, ok: !!r && r.total >= s.dif};
+  }
+  // Sentado no puede atacar (regla del dueño, 2026-10-03: igual para personajes, invocaciones y creeps, y para cualquier ataque): se avisa y
+  // se deja seguir. Se pregunta al pagar el ataque. → el texto de la pregunta, o '' si no está Sentado. Sin nombre, en segunda persona.
+  // Silencio (2026-10-04): una habilidad que cuesta SP (un número o «X») no se puede usar; se avisa y se deja seguir. → la pregunta, o ''.
+  const cuestaSp = h => !!h && (String(h.costo || '').trim().toUpperCase() === 'X' || n(h.costo) > 0);
+  // 🤐 `ref` (2026-10-25, el Tótem de silencio del Debuffer): la ficha de quien la usa (el creep, el personaje o «ficha~invocación»); si el mapa
+  // sabe que está dentro del aura de un tótem rival (`silencioDeLugar`, vtt-hexgrid/js/73), también se pregunta. Fuera del mapa no hay tótem.
+  const preguntaSilencio = (estados, h, nombre, ref) => {
+    if(!cuestaSp(h)) return '';
+    const usar = `¿Usar ${(h && h.nombre) || 'la habilidad'} igual?`;
+    if((estados || []).some(e => e && e.activo !== false && e.silencio)) return `${nombre ? nombre + ' está' : 'Estás'} en Silencio: no ${nombre ? 'puede' : 'podés'} usar habilidades que cuestan SP. ${usar}`;
+    const lugar = ref && typeof silencioDeLugar === 'function' ? silencioDeLugar(ref) : '';
+    return lugar ? `${nombre ? nombre + ' está' : 'Estás'} dentro del aura de ${lugar}: no ${nombre ? 'puede' : 'podés'} usar habilidades que cuestan SP. ${usar}` : '';
+  };
+  // Desarmado (2026-10-07) ya no es un estado (paso 5, 2026-10-22): es el efecto que tira el arma al piso (la varita del manotazo, el caos).
+  // `esDesarmado` lo reconoce para no guardarlo (agregarEstado) y para borrar los que quedaron guardados de antes.
+  const esDesarmado = e => !!e && e.activo !== false && (e.desarmado || /^desarm(ado|e)$/i.test(String(e.nombre || '').trim()));
+  const preguntaSentado = (estados, nombre) => (estados || []).some(e => e && e.activo !== false && e.sentado)
+    ? (nombre ? `${nombre} está Sentado y no puede atacar. ¿Atacar igual?` : 'Estás Sentado: no podés atacar. ¿Atacar igual?')
+    : '';
+  // Lo que se «levanta» pagando No2: el cuerpo (Sentado, 1 No2 menos Levantarse rápido). → {est} o null.
+  function levantable(estados){
+    const s = (estados || []).find(e => e && e.activo !== false && e.sentado);
+    return s ? {est: s} : null;
+  }
+  const COSTO_LEVANTAR_ARMA = 1;   // levantar un arma del piso (js/27)
+  /* «Ignora N de Resistencia a crítico» de un arma (2026-10-03, pedido del dueño): el campo `ignoraResistCrit` del arma (también el viejo
+     efecto al golpear «Ignora N de Res. crítico», que no se aplicaba solo). El duelo se lo resta a la Resistencia del defensor antes de
+     calcular el crítico (lo pide al atacante con statsCritico). `arma` = {ignoraResistCrit, efectosGolpe} (también la de un creep o una
+     invocación: su arma es un ítem, armaEnMano). */
+  /* Rasgos de un arma (2026-10-03, mecánicas de firma): lo que el arma cambia en CÓMO se ataca —no el daño ni los efectos al golpear—.
+     espalda {pdg, fijo, critpot} · ignoraResistCrit N · sinParry (no se puede parrear) · oporGratis (el ataque de oportunidad no cuesta No2) ·
+     ahorroNitros N (el primer ataque del turno con ella cuesta N menos) · critD20 N (N d20 más al tirar el crítico). El ítem los lleva sueltos
+     (también el arma de un creep o una invocación, que es un ítem de su equipo).
+     arco (2026-10-09, dueño; docs/rework-armas-rango.md): el arma de rango es un arco — suma la mitad del Dmg (ver dmgDelArma).
+     recarga N (2026-10-10, dueño: las ballestas): un arma de rango que no es arco cobra el disparo N, 2N, 3N… No2 (ver recargaDe).
+     perfora N (2026-10-10, dueño: «la gracia de la ballesta es perforar»): N puntos del golpe pasan siempre la Defensa, el resto va contra ella
+     (el mismo día, dueño: «un punto de daño ignora la armadura, no es que te baja la armadura»; con crítico no hace falta). Cualquier arma puede traerla; se suma a la de la flecha o el virote. La aplica el mapa con el daño (ataque.perfora). */
+  /* Absorber un % del daño (2026-10-10, dueño: Armadura arcana del Mago). Un estado con `absorbePct` (50) y `absorbeMax` (10) se queda con
+     ese % de cada golpe que llega a la vida (después de la Defensa; para arriba, es un buff), hasta juntar `absorbeMax` en total; lo que juntó
+     queda en `absorbido`. Devuelve {recibido, tomado}. Lo usa el mapa al aplicar el daño (resolverGolpe, js/10). */
+  function absorberPct(estados, recibido){
+    let r = Math.max(0, n(recibido)), tomado = 0;
+    (Array.isArray(estados) ? estados : []).forEach(e => {
+      if(!e || e.activo === false || !(n(e.absorbePct) > 0) || r <= 0) return;
+      const lugar = Math.max(0, n(e.absorbeMax || Infinity) - n(e.absorbido));
+      const t = Math.min(Math.ceil(r * n(e.absorbePct) / 100), lugar, r);
+      if(t <= 0) return;
+      e.absorbido = n(e.absorbido) + t; r -= t; tomado += t;
+    });
+    return {recibido: r, tomado};
+  }
+  /* Explotar al terminar (2026-10-10, Armadura arcana): un estado con `explota = {radio, tipo}` que se vence (sus turnos) hace, alrededor de
+     quien lo tenía, tanto daño como lo que absorbió (`absorbido`), con tirada (PdG.Esp contra Evasión) y dodge roll. `explosivos(estados)` es
+     la foto de antes y `vencidosExplosivos(antes, estadosDespues)` los que ya no están: el mapa lanza la explosión (js/13, explotarAlTerminar). */
+  const explosivos = estados => (Array.isArray(estados) ? estados : []).filter(e => e && e.explota && e.activo !== false)
+    .map(e => ({id: e.id, nombre: e.nombre, absorbido: Math.round(n(e.absorbido)), radio: Math.max(1, Math.round(n(e.explota.radio)) || 1), tipo: e.explota.tipo || 'arcano', ...(e.explota.directo ? {directo: true} : {})}));
+  const vencidosExplosivos = (antes, despues) => (antes || []).filter(x => !(Array.isArray(despues) ? despues : []).some(e => e && e.explota && e.id === x.id && e.activo !== false));
+  /* Cargas (2026-10-10, dueño: Envenenar arma y los óleos). Un estado con `cargas` y `golpe = {fijo, efectos}` le suma a tus próximos ataques con
+     arma su daño fijo y sus efectos al golpear (en la forma de `efectosGolpe` de un arma: {nombre: 'Envenenar', stacks: 3}). Cada ataque gasta una
+     carga AL PAGAR Y TIRAR EL PdG (pegue o no) y queda anotado en qué duelo (`duelos`): el daño y los efectos de ese duelo lo suman. Sin cargas,
+     se va al empezar el ataque siguiente (así el último duelo todavía lo encuentra). Un Re-roll del PdG no gasta otra. */
+  // Cada ataque gasta una carga de CADA estado con cargas (2026-10-11: Arma envenenada y Ojo de asesino a la vez). → {cambio, carga (la primera,
+  // con `todas` = las que se gastaron, para el aviso)}. Un Re-roll del mismo duelo no gasta otra.
+  const conGolpe = x => !!(x && x.golpe && x.activo !== false && (n(x.cargas) > 0 || x.golpePorTurnos));   // una carga sin gastar, o un golpe que dura por turnos
+  function gastarCarga(estados, dueloId){
+    if(!Array.isArray(estados) || !dueloId) return {cambio: false, carga: null};
+    if(estados.some(e => e && e.golpe && (e.duelos || []).includes(dueloId))) return {cambio: false, carga: null};
+    let cambio = false;
+    for(let i = estados.length - 1; i >= 0; i--) if(estados[i] && estados[i].golpe && !estados[i].golpePorTurnos && n(estados[i].cargas) <= 0){ estados.splice(i, 1); cambio = true; }
+    const lista = estados.filter(conGolpe);
+    if(!lista.length) return {cambio, carga: null};
+    lista.forEach(e => {
+      e.duelos = [...(e.duelos || []).slice(-3), String(dueloId)];
+      if(e.golpePorTurnos) return;   // 🔥 Arma elemental (2026-10-21): suma a cada golpe mientras dure, sin cargas
+      e.cargas = n(e.cargas) - 1;
+      if(e.cargas <= 0){ e.activo = false; e.agotada = true; }   // gastada (2026-10-10): ya no se ve; se va al próximo ataque o al pasar el turno
+    });
+    const todas = lista.map(e => ({...e}));
+    return {cambio: true, carga: {...todas[0], todas}};
+  }
+  // ¿Se muestra en una lista de estados? Un estado con cargas que ya gastó la última no (queda escondido hasta irse).
+  /* Expuesto (Degollar, dueño 2026-10-10): hasta que empieza su próximo turno, la Evasión a la mitad (`mitadEva`) y nada que cueste No2 para
+     reaccionar: ni Parry (ni, por lo tanto, Bloqueo ni contraataque), ni ataque de oportunidad, ni dodge roll. `sinReaccionesNo2(ops, estados)`
+     deja, de las opciones de defensa de un duelo, las que no cuestan No2 (las tres pantallas: personaje, creep, invocación). */
+  const expuesto = estados => activos(estados).some(e => e.expuesto);
+  const EXPUESTO_TXT = '😱 Expuesto: sin reacciones que cuesten No2 (ni Parry ni Bloqueo) y la Evasión a la mitad';
+  function sinReaccionesNo2(ops, estados){
+    if(!expuesto(estados)) return ops;
+    return (ops || []).map(o => !o ? o : o.modo === 'parry' ? parryApagado(o, 'está Expuesto')
+      : n(o.costo) > 0 ? {...o, motivoNo: '🚫 Expuesto: no puede gastar No2 en defenderse'} : {...o, info: [...(o.info || []), EXPUESTO_TXT]});
+  }
+  /* 🚫 El Parry que no se puede usar se ve igual, apagado y con el motivo (dueño, 2026-10-29: «quiero que el botón de parry aparezca igual, pero
+     apagado, con algún texto encima que dice no podés parrear, cosa que la gente no pregunte por qué no está»). `parryApagado(op, motivo)` lo apaga;
+     `sinParryDelAtaque(ops, d)`: un golpe que no se deja parrear (`ataque.sinParry`: Golpe de escudo, Excavar, Takle, un arma con el rasgo). */
+  function parryApagado(o, motivo){ return {...o, motivoNo: `🚫 No se puede parrear: ${motivo}`}; }
+  function sinParryDelAtaque(ops, d){
+    const a = d && d.ataque;
+    if(!a || !a.sinParry) return ops;
+    const que = a.habNombre || a.armaNombre || '';
+    return (ops || []).map(o => o && o.modo === 'parry' ? parryApagado(o, `${que || 'este golpe'} no se deja parrear (sí esquivar)`) : o);
+  }
+  /* 🏹 Contra un proyectil (un disparo de arco o ballesta: `contraDisparo`), las defensas se llaman «Esquivar (Agilidad)» y «Poner escudo»
+     (dueño, 2026-10-29: «específicamente para proyectiles, que cambie el nombre»). Solo el nombre: se tira lo mismo (Evasión, Parry del escudo). */
+  const ESQUIVAR_TXT = 'Esquivar (Agilidad)', PONER_ESCUDO_TXT = 'Poner escudo';
+  function nombresContraDisparo(ops, d){
+    if(!contraDisparo(d)) return ops;
+    return (ops || []).map(o => !o || !o.etiqueta ? o : o.modo === 'evasion' ? {...o, etiqueta: o.etiqueta.replace('Evasión', ESQUIVAR_TXT)}
+      : o.modo === 'parry' && o.escudo ? {...o, etiqueta: o.etiqueta.replace('Parry', PONER_ESCUDO_TXT)} : o);
+  }
+  const estadoVisible = e => !(e && e.agotada);
+  // Lo que los estados con cargas le suman al golpe de ESE duelo: {nombre, fijo, efectos, crit, critpot} (sumados) o null.
+  // `dados` (2026-10-24, Arma bendecida): dados de más del Tipo de su arma.
+  const sumarCargas = lista => lista.length ? {nombre: lista.map(e => e.nombre).join(' + '), fijo: lista.reduce((t, e) => t + Math.round(n(e.golpe.fijo)), 0),
+    dados: lista.reduce((t, e) => t + Math.round(n(e.golpe.dados)), 0),
+    efectos: lista.flatMap(e => Array.isArray(e.golpe.efectos) ? e.golpe.efectos : []), crit: lista.reduce((t, e) => t + Math.round(n(e.golpe.crit)), 0),
+    critpot: lista.reduce((t, e) => t + Math.round(n(e.golpe.critpot)), 0), pdg: lista.reduce((t, e) => t + Math.round(n(e.golpe.pdg)), 0)} : null;   // `pdg` (2026-10-26, Ojo de asesino)
+  function cargaDeDuelo(estados, dueloId){
+    return Array.isArray(estados) && dueloId ? sumarCargas(estados.filter(x => x && x.golpe && (x.duelos || []).includes(String(dueloId)))) : null;
+  }
+  // El crítico que suman las cargas a este ataque (Ojo de asesino, 2026-10-11): lo pide el duelo ANTES de pagar el ataque, así que si todavía no
+  // se gastaron, mira las que se van a gastar (las activas con cargas). → {crit, critpot, pdg, nombre} (`pdg`: lo que suma a la Probabilidad de Golpe, 2026-10-26).
+  function cargaCritico(estados, dueloId){
+    const ya = cargaDeDuelo(estados, dueloId);
+    const c = ya || sumarCargas((estados || []).filter(conGolpe));
+    return {crit: c ? c.crit : 0, critpot: c ? c.critpot : 0, pdg: c ? c.pdg : 0, nombre: c ? c.nombre : ''};
+  }
+  const cargaTxt1 = c => c && c.golpePorTurnos ? `${c.nombre}: suma a este golpe` : c ? `${c.nombre}: ${n(c.cargas) > 0 ? `le queda${n(c.cargas) > 1 ? 'n' : ''} ${n(c.cargas)} carga${n(c.cargas) > 1 ? 's' : ''}` : 'era la última carga'}` : '';
+  const cargaTxt = c => c && Array.isArray(c.todas) && c.todas.length > 1 ? c.todas.map(cargaTxt1).join(" · ") : cargaTxt1(c);
+  // Perfora N (dueño, 2026-10-10): N puntos del golpe pasan siempre la Defensa. Devuelve cuánto pasa POR la Perfora (N, o el golpe si es menor)
+  // cuando la Defensa frenaría más que eso; si no, 0 (el golpe va contra la Defensa como siempre). La usa el mapa al aplicar el daño (js/13).
+  function perforaPasa(golpe, def, perfora){
+    const p = Math.min(Math.max(0, Math.round(n(perfora))), Math.max(0, n(golpe)));
+    return p > 0 && n(golpe) - n(def) < p ? p : 0;
+  }
+  const RASGOS_ARMA = ['espalda', 'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'honda', 'ideal', 'tiroAlto', 'sinTiroAlto', 'recarga', 'perfora', 'apuntada', 'cargada', 'atraviesaEscudos',
+    'tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'espaldaDistancia', 'afinidad',   // + las mecánicas de arco (2026-10-11, RASGOS_ARCO)
+    'caida', 'apuntadaFirme', 'tiradorApoyo', 'remate', 'primerDisparo', 'puntaDiamante', 'remachadora', 'recuperable', 'cargador', 'dobleCuerda', 'tiroRapido', 'carcajExtra',   // + las de ballesta (2026-10-11)
+    'enCuerda', 'encadenar', 'respiracion', 'racha', 'lectura', 'tiroAltoLimpio', 'contraCorre', 'abanico', 'matagente', 'matasobrenatural', 'arcoDuro', 'minimaLarga', 'emboscadaPot', 'emboscadaPdg'];   // + las de los arcos Comunes (2026-10-11)
+  /* Rasgos de ballesta con el mapa (2026-10-10, dueño; docs/ideas-ballestas.md): **apuntada N** (+N PdG si no te moviste en el turno: el mapa lo
+     suma al apuntar), **cargada** (llega cargada: el primer disparo del turno es gratis si no disparaste con ella el turno anterior; ver
+     cargadaGratis) y **atraviesaEscudos** (si te paran el disparo con un escudo, el escudo se abolla: 1 stack de Armadura rota; lo hace el mapa). */
+  const cargadaGratis = (arma, previos, descargada) => !!(arma && arma.cargada && n(previos) === 0 && !descargada);
+  /* Cuánto del Dmg (la Fuerza) suma el daño de un arma (2026-10-09, dueño): cuerpo a cuerpo, entero; un arco, la mitad redondeada para arriba;
+     cualquier otra de rango (ballesta, pólvora), nada. `arma` = {armaDeRango, arco} (un ítem). */
+  const esArco = arma => !!(arma && arma.armaDeRango && arma.arco);
+  /* 🪨 La honda (2026-10-14, dueño: «creemos la categoría honda, un arma de rango contundente con sus propias reglas»; falta auditarla y armar la
+     serie del catálogo): suma la mitad del Dmg como el arco, pero no es arco — le tira también al de al lado, no tiene tiro alto ni flechas, y no
+     hace ataques de oportunidad. Su alcance es la mitad del Rango, para abajo (provisorio: P198). */
+  const esHonda = arma => !!(arma && arma.armaDeRango && !esArco(arma) && arma.honda);
+  const HONDA_RANGO = 0.5;
+  const alcanceHonda = rng => Math.max(1, Math.floor(n(rng) * HONDA_RANGO));
+  // El alcance de un arma de rango a partir del Rango de quien la usa (la honda, la mitad).
+  const alcanceArmaRango = (arma, rng) => esHonda(arma) ? alcanceHonda(rng) : Math.max(1, Math.round(n(rng)));
+  function dmgDelArma(arma, dmg){
+    const v = n(dmg);
+    if(!arma || !arma.armaDeRango) return v;
+    return esArco(arma) || esHonda(arma) ? Math.ceil(v / 2) : 0;
+  }
+  /* La Recarga (2026-10-10, dueño; docs/rework-armas-rango.md): la ballesta es lenta — el primer disparo del turno cuesta N No2, el segundo 2N, el
+     tercero 3N… (1 = rápida o de repetición, 2 = la común, 3 = de asedio), en vez de Tipo ÷ 2 y después el Tipo. Solo en un arma de rango que no
+     sea arco. 0 = sin Recarga (cobra como cualquier arma). El ataque de oportunidad con ella cuesta N (lo de un primer disparo). */
+  const RECARGA_NOMBRE = {1: 'rápida', 2: 'común', 3: 'de asedio'};
+  function recargaDe(arma){
+    if(!arma || !arma.armaDeRango || esArco(arma) || esHonda(arma)) return 0;
+    const r = Math.round(n(arma.recarga));
+    return r > 0 ? Math.min(5, r) : 0;
+  }
+  /* La munición especial (2026-10-10, dueño): el arco dispara flechas y la ballesta (un arma con Recarga), virotes. Las dos van en el carcaj
+     (`flecha` en el ítem; un virote lleva `flecha.virote = true`) y comparten la mecánica («¿Qué flecha?», Perfora, efectos, daño híbrido). */
+  const municionDe = arma => esArco(arma) ? 'flecha' : recargaDe(arma) ? 'virote' : '';
+  const esVirote = it => !!(it && it.flecha && it.flecha.virote);
+  const sirveLaMunicion = (arma, it) => { const m = municionDe(arma); return !!m && !!(it && it.flecha) && (m === 'virote') === esVirote(it); };
+  /* Lo que cuesta el disparo h+1 del turno (h = los ya hechos) con Recarga N: N × (h + 1). Doble cuerda (2026-10-11): el segundo cuesta como el
+     primero (N, N, 3N…). Tiro rápido (2026-10-11): cada disparo más suma 1, no N (N, N+1, N+2…). */
+  function recargaCosto(arma, h){
+    const rc = recargaDe(arma); if(!rc) return 0;
+    const k = Math.max(0, Math.round(n(h))), r = x => arma[x];
+    if(r('tiroRapido')) return rc + k;
+    if(r('dobleCuerda') && k === 1) return rc;
+    return rc * (k + 1);
+  }
+  const recargaTxt = (r, arma) => `Recarga ${r}${RECARGA_NOMBRE[r] ? ` (${RECARGA_NOMBRE[r]})` : ''}${arma && (arma.tiroRapido || arma.dobleCuerda) ? (arma.tiroRapido ? ', tiro rápido' : ', doble cuerda') : ''}: ${[0, 1, 2].map(k => arma && recargaDe(arma) === r ? recargaCosto(arma, k) : (k + 1) * r).join(', ')}… No2`;
+  // El texto de cuánto Dmg suma («arco: la mitad del Dmg» / «de rango: no suma Dmg»; cuerpo a cuerpo, '').
+  const dmgDelArmaTxt = arma => !arma || !arma.armaDeRango ? '' : esArco(arma) ? 'arco: suma la mitad del Dmg' : esHonda(arma) ? 'honda: suma la mitad del Dmg' : 'de rango: no suma Dmg';
+  function rasgosDeItem(it){
+    const o = {};
+    if(!it) return o;
+    RASGOS_ARMA.forEach(k => { const v = it[k]; if(v && (typeof v !== 'object' || Object.keys(v).length)) o[k] = typeof v === 'object' ? structuredClone(v) : v; });
+    return o;
+  }
+  /* 🗡 El arma en la mano de un creep o de una invocación (2026-10-22, docs/plan-inventario-creeps.md, paso 1: «la puerta única»). Todo lo que
+     necesita su arma (el daño, el peso, los costos, el duelo, el botín…) le pregunta acá, en la forma de un ítem de personaje: nombre, tipoItem,
+     tipoDado, peso, danoFijo, danoAmplificado, armaDeRango, mods, efectosGolpe, natural, detalle y sus rasgos sueltos. Sale de lo equipado; sin
+     nada en la mano, el ataque sin arma (paso 5, D4). */
+  /* Paso 2 (2026-10-22): el arma es un ítem de su lista `equipo` (la misma forma que la mochila de un personaje), el primero equipado que sea un
+     arma de verdad (arma_*, con su Tipo o natural; no una varita ni la «segunda arma» de los creeps base, que solo trae bonos). Los campos sueltos
+     de antes (armaNombre, armaTipo…) se convirtieron y su lectura se sacó (2026-10-29, dueño: «hacé la limpieza ya»; ver docs/pendientes.md). */
+  const esArmaDeMano = it => !!it && it.equipado !== false && /^arma_/.test(String(it.tipoItem || '')) && !it.especial && (n(it.tipoDado) > 0 || it.natural === true);
+  // El ítem del arma en su lista (el objeto guardado, para cambiarlo), o null.
+  const armaPrincipal = x => Array.isArray(x && x.equipo) ? x.equipo.find(esArmaDeMano) || null : null;
+  // Lo que lleva sin contar el arma de la mano (el escudo, los talismanes, la armadura…): las listas que muestran el equipo y el botín.
+  const equipoSinArma = x => { const a = armaPrincipal(x); return (Array.isArray(x && x.equipo) ? x.equipo : []).filter(it => it !== a); };
+  // Un ítem de arma con todo lo que las cuentas esperan (sin tocar el guardado: los mods y los efectos son las mismas listas).
+  const armaVista = it => ({...it, nombre: it.nombre || '', tipoItem: /^arma_/.test(String(it.tipoItem || '')) ? it.tipoItem : 'arma_1m', tipoDado: n(it.tipoDado) || 8,
+    peso: Math.max(1, n(it.peso) || 1), danoFijo: n(it.danoFijo), danoAmplificado: Math.max(0, n(it.danoAmplificado)), armaDeRango: !!it.armaDeRango,
+    mods: Array.isArray(it.mods) ? it.mods : [], efectosGolpe: Array.isArray(it.efectosGolpe) ? it.efectosGolpe : [], natural: it.natural === true,
+    detalle: it.detalle || '', equipado: true});
+  /* ✋ Paso 5 (2026-10-22, D1 y D4): sin nada en la mano (le sacaron el arma, la guardó, nunca tuvo) pega como un personaje sin arma: 1 dado del
+     Tipo 4 + su Daño (P150, `FichaCombate.danoSinArmaTxt`); `sinArma: true`, sin nombre (no es un ítem: no se suelta ni va al botín). */
+  const TIPO_SIN_ARMA = 4;
+  function armaEnMano(x){
+    if(!x) return null;
+    const it = armaPrincipal(x);
+    if(!it || !Object.keys(it).length) return {id: 'arma', ...armaVista({tipoDado: TIPO_SIN_ARMA}), sinArma: true};
+    return {id: 'arma', ...armaVista(it)};
+  }
+  const sinArmaEnMano = x => !!(x && armaEnMano(x).sinArma);
+  const armaDeCombatiente = armaEnMano;   // (el nombre de antes: los mismos datos y más)
+  /* 🛡 Paso 3 (2026-10-22, docs/plan-inventario-creeps.md): la Defensa y la Res. a crítico de un creep o una invocación salen EN VIVO de lo que
+     tiene equipado (`def` de cada pieza o un mod `def`; los mods `tipo1`…`tipo5`), sumadas a su base (`defensa`, `crit`: lo que se carga a mano).
+     Antes se sumaban una vez al equipar (y soltar o levantar algo las dejaba mal). `pasarEquipoVivo` convierte una vez (`equipoVivo`): le resta a
+     lo guardado lo mismo que después suma en vivo, así el total no cambia. A las invocaciones el equipo nunca les sumaba Res. a crítico: no se
+     les resta (`crit: false`) y desde ahora se la suma. */
+  const puesto = it => !!it && it.equipado !== false;
+  const defDeItem = it => n(it && it.def) + (Array.isArray(it && it.mods) ? it.mods : []).filter(m => m && m.stat === 'def').reduce((a, m) => a + n(m.val), 0);
+  const critDeItem = (it, i) => (Array.isArray(it && it.mods) ? it.mods : []).filter(m => m && m.stat === 'tipo' + (i + 1)).reduce((a, m) => a + n(m.val), 0);
+  const defDeEquipo = x => (Array.isArray(x && x.equipo) ? x.equipo : []).filter(puesto).reduce((a, it) => a + defDeItem(it), 0);
+  const critDeEquipo = (x, i) => (Array.isArray(x && x.equipo) ? x.equipo : []).filter(puesto).reduce((a, it) => a + critDeItem(it, i), 0);
+  /* 🎒 Paso 4 (2026-10-22): un creep o una invocación puede llevar cosas guardadas (`equipado: false`, lo que levantó y no se puso). Solo lo
+     puesto da bonos, para, cuenta como talismán o como varita (`equipoPuesto`); lo guardado se suelta igual al morir. */
+  const equipoPuesto = x => (Array.isArray(x && x.equipo) ? x.equipo : []).filter(puesto);
+  const puestoSinArma = x => { const a = armaPrincipal(x); return equipoPuesto(x).filter(it => it !== a); };
+  const equipoGuardado = x => (Array.isArray(x && x.equipo) ? x.equipo : []).filter(it => it && it.equipado === false);
+  const vaEnLaMano = it => /^(arma|escudo)_/.test(String(it && it.tipoItem || ''));
+  // Cuántas manos tiene libres (lo natural no ocupa una mano: garras, colmillos).
+  const manosLibres = x => Math.max(0, 2 - equipoPuesto(x).filter(it => vaEnLaMano(it) && it.natural !== true).reduce((a, it) => a + (/_2m$/.test(it.tipoItem) ? 2 : 1), 0));
+  /* 🎒 Paso 7 (2026-10-22): lo que lleva un creep o una invocación, en tres grupos para los editores: en las manos (sin el arma de la mano, que se
+     muestra aparte), puesto (armadura, cabeza…: lo que da bonos) y guardado (no da bonos ni para). */
+  function gruposDeEquipo(x){
+    const a = armaPrincipal(x), lista = (Array.isArray(x && x.equipo) ? x.equipo : []).filter(Boolean);
+    return {manos: lista.filter(it => it !== a && puesto(it) && vaEnLaMano(it)), puesto: lista.filter(it => puesto(it) && !vaEnLaMano(it)),
+      guardado: lista.filter(it => !puesto(it))};
+  }
+  /* Ponerse una pieza guardada (`ponerPieza`) o guardar una puesta (`guardarPieza`). Al ponerse un arma, el arma que tenía en la mano se guarda
+     (cambia de arma) y la nueva queda primera en la lista (la que usa); si a la pieza no le alcanzan las manos, se guarda lo de la mano que haga
+     falta. Lo natural no ocupa mano ni se guarda. Lo que no va en la mano reemplaza a lo puesto en su mismo lugar (`slotDe`; 'otro' no choca).
+     → {pieza, guardados} o null. */
+  function ponerPieza(x, id, slotDe){
+    const lista = Array.isArray(x && x.equipo) ? x.equipo : null;
+    const it = lista && lista.find(e => e && e.id === id);
+    if(!it) return null;
+    const guardados = [], guardar = e => { e.equipado = false; guardados.push(e); };
+    const otros = () => lista.filter(e => e && e !== it && puesto(e) && e.natural !== true);
+    const esArma = e => /^arma_/.test(String(e.tipoItem || '')) && !e.especial;
+    if(vaEnLaMano(it)){
+      if(esArma(it)) otros().filter(esArma).forEach(guardar);
+      const manos = e => /_2m$/.test(String(e.tipoItem || '')) ? 2 : 1;
+      for(let enMano = otros().filter(vaEnLaMano); enMano.length && enMano.reduce((s, e) => s + manos(e), 0) + manos(it) > 2; enMano = otros().filter(vaEnLaMano))
+        guardar(enMano[enMano.length - 1]);
+      if(esArma(it)){ lista.splice(lista.indexOf(it), 1); lista.unshift(it); }
+    }else if(slotDe){
+      const s = slotDe(it.tipoItem);
+      if(s && s !== 'otro') otros().filter(e => !vaEnLaMano(e) && slotDe(e.tipoItem) === s).forEach(guardar);
+    }
+    it.equipado = true;
+    return {pieza: it, guardados};
+  }
+  function guardarPieza(x, id){
+    const it = (Array.isArray(x && x.equipo) ? x.equipo : []).find(e => e && e.id === id);
+    if(!it || it.natural === true) return null;
+    it.equipado = false;
+    return {pieza: it, guardados: []};
+  }
+  // 🔁 Sacar una pieza guardada en la pelea (las Acciones de un creep, la Botonera de una invocación): en combate cuesta 1 No2, como equipar a un
+  // personaje (IT2.nitrosEquipar; + Extenuado). → {aviso} o {error}.
+  const COSTO_SACAR_PIEZA = 1;
+  function sacarPieza(x, id, o){
+    o = o || {};
+    const it = (Array.isArray(x && x.equipo) ? x.equipo : []).find(e => e && e.id === id);
+    if(!it || puesto(it)) return {error: 'Ya no la tiene guardada'};
+    const costo = o.combate ? conExtenuado(x.estados, COSTO_SACAR_PIEZA) : 0;
+    if(costo > n(x.nitros)) return {error: `${x.nombre}: sin No2 — sacar ${it.nombre} cuesta ${costo}`};
+    const r = ponerPieza(x, id, o.slotDe);
+    if(!r) return {error: 'No se pudo'};
+    x.nitros = n(x.nitros) - costo;
+    return {aviso: `${x.nombre} saca ${it.nombre}${r.guardados.length ? ` y guarda ${r.guardados.map(e => e.nombre).join(' y ')}` : ''}${costo ? ` (−${costo} No2)` : ''}`};
+  }
+  // Una pieza de creep o de invocación en la forma de un ítem de personaje (la Defensa adentro de los mods), para soltarla en el piso.
+  function itemComoDePersonaje(it){
+    const o = structuredClone(it || {});
+    if(n(o.def)){ o.mods = [{stat: 'def', val: n(o.def)}, ...(Array.isArray(o.mods) ? o.mods.filter(m => m && m.stat !== 'def') : [])]; }
+    delete o.def;
+    o.equipado = false;
+    return o;
+  }
+  function pasarEquipoVivo(x, o){
+    if(!x || n(x.equipoVivo) >= 1) return false;
+    // La base no baja de 0: si lo guardado era menos que lo del equipo, ese equipo nunca se le había sumado (un creep armado a mano o por un
+    // script) y desde ahora cuenta. (Revisado el 2026-10-22: en «El origen» no hay ninguno así; los totales quedan iguales.)
+    x.defensa = Math.max(0, n(x.defensa) - defDeEquipo(x));
+    if(!o || o.crit !== false){
+      const c = Array.isArray(x.crit) ? x.crit : [];
+      x.crit = [0, 1, 2, 3, 4].map(i => Math.max(0, n(c[i]) - critDeEquipo(x, i)));
+    }
+    x.equipoVivo = 1;
+    return true;
+  }
+  // Ponerle un arma en la mano (un editor, el equipo de un creep base, levantar una): reemplaza a la que tenía. `item` en la forma de un ítem.
+  function ponerArma(x, item){
+    if(!x) return null;
+    x.equipo = Array.isArray(x.equipo) ? x.equipo : [];
+    const i = x.equipo.findIndex(esArmaDeMano);   // la nueva ocupa el lugar de la que tenía; si no tenía, va al final
+    if(!item){ if(i >= 0) x.equipo.splice(i, 1); return null; }
+    const it = {...structuredClone(item), id: String((item && item.id && item.id !== 'arma') ? item.id : 'arma-' + Math.random().toString(36).slice(2, 9)), equipado: true};
+    it.tipoItem = /^arma_/.test(String(it.tipoItem || '')) ? it.tipoItem : 'arma_1m';
+    it.tipoDado = n(it.tipoDado) || 8;
+    it.peso = Math.max(1, n(it.peso) || 1);
+    if(i >= 0) x.equipo.splice(i, 1, it); else x.equipo.push(it);
+    return it;
+  }
+  // Lo que el ataque lleva al duelo por su arma: el bono por la espalda y «no se puede parrear».
+  /* 🗡 El ataque de un creep o de una invocación con lo que tiene en la mano (paso 8, 2026-10-22: antes, la misma cuenta en siete archivos).
+     `alcance`: lo pone quien llama (CreepCalculo.alcance, InvCalculo.alcance). `armaParaArreglos`: lo mismo para una habilidad «con tu arma»
+     (Combatiente.ataqueConArreglos). */
+  function ataqueConSuArma(x, tipo, alcance){
+    const a = armaEnMano(x);
+    return {tipo: tipo || 'normal', armaId: '', armaNombre: a.nombre || '', tipoDado: a.tipoDado, rango: a.armaDeRango, ...(alcance !== undefined ? {alcance} : {}), ...ataqueDeArma(a)};
+  }
+  const armaParaArreglos = x => { const a = armaEnMano(x); return {...a, id: '', nombre: a.nombre || '', rango: a.armaDeRango}; };
+  /* 🕳 Salir de abajo de la tierra atacando (dueño, 2026-10-28, P231): solo con un arma cuerpo a cuerpo de Tipo 4 a 10 — no de rango ni especial (varita,
+     báculo, orbe). `sirveParaEmerger(item)` (un ítem de inventario o de equipo); `armaParaEmerger(x)` (un creep o una invocación): la de la mano si
+     sirve, si no la primera de su equipo que sirva, en el formato de armaParaArreglos; null si no tiene ninguna. */
+  /* 💸 Lo que se pagó de verdad por el ataque de un duelo (dueño, 2026-10-28): atacar «de cualquier modo» sin los No2 paga menos que el costo; si el
+     duelo se cancela y no cuenta, se devuelve eso, no el costo entero. Vive en `x.pagosDuelo` (dueloId → No2; los últimos 10): un creep o una
+     invocación lo llevan ellos; un personaje, en `S.ataquesArma` (se vacía al empezar el turno). `pagoDeDuelo` lo saca: el número, o null si no está. */
+  function anotarPagoDuelo(x, dueloId, paga){
+    if(!x || !dueloId) return;
+    const p = {...(x.pagosDuelo && typeof x.pagosDuelo === 'object' ? x.pagosDuelo : {})};
+    delete p[dueloId];
+    p[dueloId] = Math.max(0, n(paga));
+    const ks = Object.keys(p);
+    ks.slice(0, Math.max(0, ks.length - 10)).forEach(k => delete p[k]);
+    x.pagosDuelo = p;
+  }
+  function pagoDeDuelo(x, dueloId){
+    const p = x && x.pagosDuelo;
+    if(!p || typeof p !== 'object' || !dueloId || !(dueloId in p)) return null;
+    const v = Math.max(0, n(p[dueloId])), q = {...p};
+    delete q[dueloId];
+    x.pagosDuelo = q;
+    return v;
+  }
+  const sirveParaEmerger = it => !!it && !it.armaDeRango && !it.especial && !it.orbe && n(it.tipoDado) >= 4 && n(it.tipoDado) <= 10;
+  function armaParaEmerger(x){
+    const mano = armaEnMano(x);
+    if(mano && !mano.sinArma && sirveParaEmerger(mano)) return armaParaArreglos(x);
+    const it = (Array.isArray(x && x.equipo) ? x.equipo : []).find(i => i && i.equipado !== false && /^arma_/.test(String(i.tipoItem || '')) && sirveParaEmerger(i));
+    if(!it) return null;
+    const a = {id: 'arma', ...armaVista(it)};
+    return {...a, id: '', nombre: a.nombre || '', rango: false};
+  }
+  // ¿Es un efecto de Romper armadura? (el nombre del efecto al golpear: «Rompe armadura», «Rompe armadura x3», «Armadura rota doble»…)
+  const esRompeArmadura = e => !!e && /^(romp\w* armadura|arruina armadura|media armadura|armadura rota)/i.test(String(e.nombre || '').trim());
+  function ataqueDeArma(arma){
+    const o = {};
+    if(arma && arma.espalda) o.espalda = arma.espalda;
+    if(arma && arma.sinParry) o.sinParry = true;
+    if(arma && arma.detalle) o.armaDetalle = String(arma.detalle).slice(0, 400);   // el texto del arma, para el recuadro del duelo (2026-10-15)
+    if(esArco(arma)) o.arco = true;   // el mapa pide la distancia mínima del arco al elegir el objetivo (no viaja al duelo)
+    if(arma && arma.armaDeRango && arma.ideal) o.ideal = arma.ideal;   // la distancia ideal y el tiro alto: los usa el mapa al apuntar
+    if(tieneTiroAlto(arma)) o.tiroAlto = true;
+    if(n(arma && arma.perfora) > 0) o.perfora = Math.min(5, Math.round(n(arma.perfora)));   // Perfora N del arma (la suma el mapa al daño)
+    if(arma && arma.armaDeRango && n(arma.apuntada) > 0) o.apuntada = Math.min(5, Math.round(n(arma.apuntada)));   // +N PdG si no se movió (el mapa)
+    if(arma && arma.armaDeRango && arma.atraviesaEscudos) o.atraviesaEscudos = true;
+    // 🛡 Romper armadura de un arma de rango (2026-10-29, dueño): si el disparo lo paran con un escudo, el escudo se lo come (lo aplica el mapa, js/26).
+    const rompe = arma && arma.armaDeRango ? (Array.isArray(arma.efectosGolpe) ? arma.efectosGolpe : []).filter(esRompeArmadura) : [];
+    if(rompe.length) o.rompeEscudo = rompe.slice(0, 3).map(e => ({nombre: String(e.nombre || 'Rompe armadura').slice(0, 40), caras: Math.max(1, Math.round(n(e.caras)) || 1), exitos: Math.max(1, Math.round(n(e.exitos)) || 1), stacks: Math.max(1, Math.round(n(e.stacks)) || 1)}));
+    if(arma && arma.armaDeRango) RASGOS_ARCO.forEach(k => { const v = arma[k]; if(v && (typeof v !== 'object' || Object.keys(v).length)) o[k] = v; });   // las mecánicas de arco: las usa el mapa al apuntar
+    return o;
+  }
+  /* 🏹 Mecánicas de arco (2026-10-11, dueño; docs/ideas-arcos-flechas.md, «Lo que eligió el dueño de la segunda ronda»). Sueltas en el arma (un ítem,
+     también el de un creep o una invocación); valen en cualquier arma de rango. Las suma el mapa al apuntar (vtt-hexgrid/js/35-arcos.js):
+     - tensar N: al disparar se puede pagar TENSAR_NO2 No2 más → +N PdG (se elige en cada disparo).
+     - largoAlcance N: se puede disparar hasta LARGO_ALCANCE_MAX casilleros más allá del alcance, con −N PdG por cada uno de más.
+     - emboscada N: el primer disparo de ese tirador desde que el mapa pasó a combate, Crítico frecuente +N.
+     - matabestias N: +N de daño contra una bestia (el tipo de criatura del creep).
+     - contraMarcado N: +N PdG contra un objetivo Marcado.
+     - espaldaDistancia {pdg, fijo}: si todos los casilleros que cruza el disparo están en el punto ciego del objetivo (no hace falta sigilo).
+     - afinidad: +1 a cada dado de daño elemental de las flechas especiales. */
+  const RASGOS_ARCO = ['tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'espaldaDistancia', 'afinidad',
+    // 🎯 Las de ballesta (2026-10-11, dueño; docs/ideas-ballestas.md, «Lo que eligió el dueño»), también para cualquier arma de rango:
+    // caida N (más allá del alcance, hasta LARGO_ALCANCE_MAX, −N de DAÑO por casillero de más), apuntadaFirme N (+N PdG si no se movió ni este
+    // turno ni el anterior), tiradorApoyo N (+N PdG contra un rival pegado a un aliado tuyo), remate N (Crítico frecuente +N contra un Sentado o
+    // Inmovilizado), primerDisparo (el primer disparo del combate, +1 dado), puntaDiamante (contra Defensa 12 o más, Perfora +2), remachadora
+    // (cada golpe seguido al mismo blanco, Perfora +1, hasta +3; errar lo vuelve a 0), recuperable (el virote especial que erra no se rompe contra
+    // un obstáculo) y cargador N (los N primeros virotes especiales del combate no cobran su No2).
+    // 🏹 Las de los arcos Comunes (2026-10-11, dueño; docs/ideas-arcos-flechas.md, «Pautas del dueño»): enCuerda (Flecha en la cuerda: si no disparó
+    // el turno anterior, el primer disparo −1 No2) y encadenar (si el disparo anterior del turno pegó, el siguiente −1 No2) — los dos en el costo
+    // (ahorroArco); respiracion (+2 PdG al primer disparo del turno, −2 a los siguientes), racha (después de un crítico, el próximo disparo del turno
+    // Crítico frecuente +1), lectura N (+1 PdG por cada golpe seguido al mismo blanco, hasta +N — Común 1, Buena 2, Rara 3, dueño 2026-10-11; `true` = 3; errar lo vuelve a 0), tiroAltoLimpio (el tiro alto no
+    // resta PdG), contraCorre N (+N PdG contra un rival que se movió 3+ casilleros en su último turno completo), abanico (+1 PdG si cambia de blanco en el turno),
+    // matagente / matasobrenatural N (+N de daño contra humanos y humanoides / no-muertos, demonios e interdimensionales: «Contra lo sobrenatural», dueño 2026-10-11), arcoDuro N (−2 PdG si la Fuerza es menor que N),
+    // minimaLarga (necesita 2 casilleros libres) y emboscadaPot / emboscadaPdg N (la Emboscada también da Crítico potente o PdG).
+    'enCuerda', 'encadenar', 'respiracion', 'racha', 'lectura', 'tiroAltoLimpio', 'contraCorre', 'abanico', 'matagente', 'matasobrenatural', 'arcoDuro', 'minimaLarga', 'emboscadaPot', 'emboscadaPdg',
+    'caida', 'apuntadaFirme', 'tiradorApoyo', 'remate', 'primerDisparo', 'puntaDiamante', 'remachadora', 'recuperable', 'cargador'];
+  const LARGO_ALCANCE_MAX = 4, TENSAR_NO2 = 1;
+  // Largo alcance: el objetivo más allá del alcance (hasta LARGO_ALCANCE_MAX de más) → {extra, pdg} (pdg negativo); si no corresponde, null.
+  function largoAlcance(arma, distancia, alcance){
+    const pen = Math.round(n(arma && arma.largoAlcance)), extra = Math.round(n(distancia)) - Math.round(n(alcance));
+    if(!(pen > 0) || extra <= 0 || extra > LARGO_ALCANCE_MAX) return null;
+    return {extra, pdg: -pen * extra};
+  }
+  // Hasta dónde brillan los objetivos al apuntar: el alcance, y con Largo alcance LARGO_ALCANCE_MAX más.
+  const alcanceMaximo = (arma, alcance) => Math.round(n(alcance)) + (n(arma && arma.largoAlcance) > 0 || n(arma && arma.caida) > 0 ? LARGO_ALCANCE_MAX : 0);
+  // Alcance con caída (ballesta): el objetivo más allá del alcance (hasta LARGO_ALCANCE_MAX) → {extra, fijo} (fijo negativo); si no, null.
+  function caidaDano(arma, distancia, alcance){
+    const pen = Math.round(n(arma && arma.caida)), extra = Math.round(n(distancia)) - Math.round(n(alcance));
+    if(!(pen > 0) || extra <= 0 || extra > LARGO_ALCANCE_MAX) return null;
+    return {extra, fijo: -pen * extra};
+  }
+  const PUNTA_DIAMANTE_DEF = 12, PUNTA_DIAMANTE_PERFORA = 2, REMACHADORA_MAX = 3;
+  // Afinidad elemental: los efectos de una flecha especial con su dado de daño elemental +1.
+  const afinidadEfectos = efectos => (efectos || []).map(e => e && e.danoMagico && String(e.dado || '').trim() ? {...e, dado: `${String(e.dado).replace(/\s+/g, '')}+1`} : e);
+  // El texto corto de las mecánicas de arco de un arma (para ItemCorto).
+  function arcoRasgosTxt(it){
+    if(!it || !it.armaDeRango) return [];
+    const p = [], r = k => Math.round(n(it[k])), es = it.espaldaDistancia || {};
+    if(r('tensar') > 0) p.push(`Tensar +${r('tensar')} PdG (+${TENSAR_NO2} No2)`);
+    if(r('largoAlcance') > 0) p.push(`Largo alcance −${r('largoAlcance')} PdG por casillero`);
+    if(r('emboscada') > 0) p.push(`Emboscada: Crítico frecuente +${r('emboscada')}`);
+    if(r('matabestias') > 0) p.push(`Matabestias +${r('matabestias')} de daño`);
+    if(r('contraMarcado') > 0) p.push(`Contra el Marcado +${r('contraMarcado')} PdG`);
+    if(n(es.pdg) > 0 || n(es.fijo) > 0) p.push(`Espalda a distancia: ${[n(es.pdg) > 0 ? `+${Math.round(n(es.pdg))} PdG` : '', n(es.fijo) > 0 ? `+${Math.round(n(es.fijo))} de daño` : ''].filter(Boolean).join(', ')}`);
+    if(it.afinidad) p.push('Afinidad especial');
+    if(r('caida') > 0) p.push(`Alcance con caída: −${r('caida')} de daño por casillero de más`);
+    if(r('apuntadaFirme') > 0) p.push(`Apuntada firme +${r('apuntadaFirme')}`);
+    if(r('tiradorApoyo') > 0) p.push(`Tirador de apoyo +${r('tiradorApoyo')} PdG`);
+    if(r('remate') > 0) p.push(`Remate: Crítico frecuente +${r('remate')}`);
+    if(it.primerDisparo) p.push('Primer disparo: +1 dado');
+    if(it.puntaDiamante) p.push('Punta de diamante');
+    if(it.remachadora) p.push('Remachadora');
+    if(it.recuperable) p.push('Virote recuperable');
+    if(r('cargador') > 0) p.push(esArco(it) && r('cargador') === 1 ? 'Flecha de más' : `Cargador ${r('cargador')}`);
+    if(r('carcajExtra') > 0) p.push(`Carcaj integrado +${r('carcajExtra')}`);
+    if(it.dobleCuerda) p.push('Doble cuerda');
+    if(it.tiroRapido) p.push('Tiro rápido');
+    if(it.enCuerda) p.push('Flecha en la cuerda');
+    if(it.encadenar) p.push('Encadenar');
+    if(it.respiracion) p.push('Respiración contenida');
+    if(it.racha) p.push('Racha');
+    if(it.lectura) p.push(`Lectura del viento (hasta +${it.lectura === true ? 3 : r('lectura')} PdG)`);
+    if(it.tiroAltoLimpio) p.push('Tiro alto sin castigo');
+    if(r('contraCorre') > 0) p.push(`Contra el que corre +${r('contraCorre')} PdG`);
+    if(it.abanico) p.push('Abanico');
+    if(r('matagente') > 0) p.push(`Contra humanos +${r('matagente')} de daño`);
+    if(r('matasobrenatural') > 0) p.push(`Contra lo sobrenatural +${r('matasobrenatural')} de daño`);
+    if(r('arcoDuro') > 0) p.push(`Arco duro (Fuerza ${r('arcoDuro')})`);
+    if(it.minimaLarga) p.push('Mínima más larga');
+    if(r('emboscadaPot') > 0) p.push(`Emboscada: Crítico potente +${r('emboscadaPot')}`);
+    if(r('emboscadaPdg') > 0) p.push(`Emboscada: PdG +${r('emboscadaPdg')}`);
+    return p;
+  }
+  /* Apuntar (Shooter, 2026-10-11, decisiones del dueño): el estado «Apuntando» con X stacks (X SP y X No2, X ≤ 3) le suma al PRÓXIMO disparo con un
+     arma a distancia +X PdG y Crítico potente +X, aunque sea en otro turno (no vence: se gasta al disparar); se suma con Tensar. Lo hace el mapa (js/35). */
+  const APUNTANDO = 'Apuntando';
+  const apuntandoX = estados => { const e = (estados || []).find(x => x && x.activo !== false && x.nombre === APUNTANDO); return e ? Math.max(1, Math.min(3, Math.round(n(e.stacks)) || 1)) : 0; };
+  const lecturaTope = arma => !arma || !arma.lectura ? 0 : arma.lectura === true ? 3 : Math.max(0, Math.round(n(arma.lectura)));   // Lectura del viento: hasta +N
+  /* La distancia ideal de un arma de rango (sweet spot, 2026-10-09, dueño): `ideal = {donde: 'cerca' | 'medio' | 'lejos' | 'franja', ancho,
+     desde, hasta, pdg, crit, critpot, fijo, ignora}`. «Cerca» = justo después de la distancia mínima; «medio» = la mitad del alcance; «lejos» = las
+     últimas casillas del alcance (se mueven con el Rango de quien la usa); «franja» = de `desde` a `hasta`. El objetivo adentro → el bono del tiro.
+     Ubicarse cuesta No2: es el balance (dueño).
+     2026-10-11 (dueño): «cerca» = a 3 o 4 casilleros (a 2 era demasiado); «medio» = una franja en el medio, entre la distancia mínima y el alcance;
+     «lejos» = los 3 últimos casilleros del alcance, nunca antes del 8 (con mucho alcance, la franja se corre con él). El ancho solo cuenta en «medio». */
+  const IDEAL_DONDE = {cerca: 'cerca', medio: 'a media distancia', lejos: 'lejos', franja: 'en una franja fija'};
+  const IDEAL_CERCA = [3, 4], IDEAL_LEJOS_ANCHO = 3, IDEAL_LEJOS_MIN = 8;
+  function franjaIdeal(ideal, alcance){
+    if(!ideal) return null;
+    const min = ARCO_LIBRES + 1, ancho = Math.max(1, Math.round(n(ideal.ancho) || 2)), al = Math.max(min, Math.round(n(alcance)));
+    if(ideal.donde === 'franja') return {desde: Math.max(1, Math.round(n(ideal.desde))), hasta: Math.max(Math.round(n(ideal.desde)), Math.round(n(ideal.hasta)))};
+    if(ideal.donde === 'lejos') return {desde: Math.min(al, Math.max(IDEAL_LEJOS_MIN, al - IDEAL_LEJOS_ANCHO + 1)), hasta: al};
+    if(ideal.donde === 'medio'){ const c = Math.round((min + al) / 2), d = Math.max(min, c - Math.floor((ancho - 1) / 2)); return {desde: d, hasta: d + ancho - 1}; }
+    return {desde: Math.max(min, IDEAL_CERCA[0]), hasta: Math.max(min, IDEAL_CERCA[0]) + IDEAL_CERCA[1] - IDEAL_CERCA[0]};   // cerca: a 3 o 4
+  }
+  const BONOS_IDEAL = ['pdg', 'crit', 'critpot', 'fijo', 'ignora'];
+  // El bono del tiro si el objetivo está en la distancia ideal (o null): {pdg, crit, critpot, fijo, ignora, motivo}.
+  function bonoIdeal(arma, distancia, alcance){
+    const id = arma && arma.ideal, f = franjaIdeal(id, alcance), d = n(distancia);
+    if(!f || d < f.desde || d > f.hasta) return null;
+    const o = {motivo: 'distancia ideal'};
+    BONOS_IDEAL.forEach(k => { if(n(id[k])) o[k] = Math.round(n(id[k])); });
+    return Object.keys(o).length > 1 ? o : null;
+  }
+  function idealTxt(ideal){
+    if(!ideal) return '';
+    const b = [n(ideal.pdg) ? `PdG +${n(ideal.pdg)}` : '', n(ideal.crit) ? `Crítico frecuente +${n(ideal.crit)}` : '', n(ideal.critpot) ? `Crítico potente +${n(ideal.critpot)}` : '',
+      n(ideal.fijo) ? `+${n(ideal.fijo)} de daño` : '', n(ideal.ignora) ? `ignora ${n(ideal.ignora)} de Res. crítico` : ''].filter(Boolean).join(', ');
+    const donde = ideal.donde === 'franja' ? `de ${n(ideal.desde)} a ${n(ideal.hasta)} casilleros`
+      : ideal.donde === 'medio' ? `a media distancia (franja de ${Math.max(1, Math.round(n(ideal.ancho) || 2))})`
+      : ideal.donde === 'lejos' ? `lejos (los ${IDEAL_LEJOS_ANCHO} últimos casilleros de tu alcance, desde ${IDEAL_LEJOS_MIN})` : `cerca (a ${IDEAL_CERCA[0]} o ${IDEAL_CERCA[1]} casilleros)`;
+    return `Distancia ideal ${donde}: ${b || 'sin bono'}`;
+  }
+  // El tiro alto (2026-10-09, dueño): pasa por encima de los tokens del medio (no de los Sólidos), con el objetivo a TIRO_ALTO_MIN o más y PdG −2.
+  const TIRO_ALTO_MIN = 4, TIRO_ALTO_PDG = -2;
+  // Todos los arcos lo tienen (mecánica de firma, dueño 2026-10-09) salvo que el arco traiga `sinTiroAlto` (una debilidad que lo abarata); otra
+  // arma de rango, solo si trae `tiroAlto`.
+  const tieneTiroAlto = arma => !!(arma && arma.armaDeRango && (esArco(arma) ? !arma.sinTiroAlto : arma.tiroAlto));
+  /* El arco y la distancia (2026-10-09, dueño; P183 abierta para la mesa): con el arco hacen falta al menos ARCO_LIBRES casilleros libres entre
+     el arquero y el objetivo (el objetivo a ARCO_LIBRES + 1 o más), no se pega cuerpo a cuerpo y no se hacen ataques de oportunidad.
+     2026-10-10 (dueño): 1 casillero libre — el arco no pega al lado, pero a 2 sí (antes eran 2 libres: objetivo a 3 o más). */
+  const ARCO_LIBRES = 1;
+  // Mínima más larga (2026-10-11): ese arco necesita 2 casilleros libres.
+  const arcoLibres = arma => arma && arma.minimaLarga ? 2 : ARCO_LIBRES;
+  const arcoLibresTxt = arma => arcoLibres(arma) === 1 ? '1 casillero libre' : `${arcoLibres(arma)} casilleros libres`;
+  const arcoMuyCerca = (arma, distancia) => esArco(arma) && n(distancia) <= arcoLibres(arma);
+  // Lo que se ahorra en No2 un disparo con Flecha en la cuerda o Encadenar (2026-10-11): previos = los disparos de ese turno con esa arma;
+  // descargada = disparó con ella el turno anterior; pego = el disparo anterior de este turno pegó.
+  function ahorroArco(arma, previos, descargada, pego){
+    if(!arma) return 0;
+    const r = k => arma[k];
+    return (r('enCuerda') && n(previos) === 0 && !descargada ? 1 : 0) + (r('encadenar') && n(previos) > 0 && pego ? 1 : 0);
+  }
+  const sirveDeOportunidad = arma => !esArco(arma) && !esHonda(arma);   // ni el arco ni la honda (2026-10-14)
+  // Costos con los rasgos: el primer ataque del turno con el arma (ahorroNitros) y el ataque de oportunidad (oporGratis).
+  const costoConAhorro = (costo, arma, previos) => Math.max(0, costo - (n(previos) === 0 ? n(arma && arma.ahorroNitros) : 0));
+  const costoEspecial = (tipoDado, arma, tipo) => tipo === 'oportunidad' && arma && arma.oporGratis ? 0 : recargaDe(arma) || costoPrimerAtaque(tipoDado);
+  const RE_IGNORA_CRIT = /^ignora\s+(\d+)\s+de\s+res/i;
+  const esEfectoIgnora = e => RE_IGNORA_CRIT.test(String((e && e.nombre) || '').trim());
+  function ignoraResistCritArma(arma){
+    if(!arma) return 0;
+    const viejo = (arma.efectosGolpe || []).reduce((a, e) => { const m = RE_IGNORA_CRIT.exec(String((e && e.nombre) || '').trim()); return a + (m ? n(m[1]) : 0); }, 0);
+    return Math.max(0, Math.round(n(arma.ignoraResistCrit) + viejo));
+  }
+  // El menú «¿Qué ataque es?» (los tres botones), igual en todas las pantallas. o = {nombre, normal, primero, especial, attr, ref,
+  // primeroTxt?, siguienteTxt?}: `attr` = el data-atributo de los botones, `ref` lo que va después de «tipo:».
+  function menuTipoAtaqueHtml(o){
+    const e = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+    const b = (tipo, txt) => `<button class="btn" ${o.attr}="${tipo}:${e(o.ref)}" style="width:100%">${txt}</button>`;
+    const rc = recargaDe(o.arma);   // una ballesta: su Recarga (o.arma, opcional)
+    return `<div class="hint">${e(o.nombre)}</div>
+    ${b('normal', `⚔ Ataque normal — ${n(o.normal)} No2<br><span class="hint">${rc ? e(recargaTxt(rc)) : o.primero ? (o.primeroTxt || 'primer ataque del turno (Tipo ÷ 2)') : (o.siguienteTxt || 'Tipo completo (ya atacó este turno)')}</span>`)}
+    ${b('oportunidad', `🏃 Ataque de oportunidad — ${n(o.especialOpor ?? o.especial)} No2<br><span class="hint">${o.especialOpor === 0 ? 'gratis con esta arma' : rc ? `lo de un primer disparo (Recarga ${rc})` : 'siempre Tipo ÷ 2'}; no suma al conteo de ataques</span>`)}
+    ${b('contra', `↩ Contraataque — ${n(o.especial)} No2<br><span class="hint">solo tras ganar un Parry y un Bloqueo; siempre Tipo ÷ 2; no suma al conteo de ataques</span>`)}`;
+  }
+  // `arma` (opcional): con Recarga, el disparo cuesta Recarga × (los ya hechos + 1).
+  function costoAtaque(tipo, ataquesPrevios, arma){ const rc = recargaDe(arma); if(rc) return recargaCosto(arma, ataquesPrevios); return n(ataquesPrevios) === 0 ? costoPrimerAtaque(tipo) : n(tipo); }
+  // Cuántos ataques alcanzan con esos No2 (el primero a mitad de precio, los demás completos; con Recarga, N, 2N, 3N…).
+  function ataquesPosibles(tipo, nitros, arma){
+    const rc = recargaDe(arma);
+    if(rc){ let k = 0, g = 0; while(g + recargaCosto(arma, k) <= n(nitros)){ g += recargaCosto(arma, k); k++; } return k; }
+    const t = n(tipo), p = costoPrimerAtaque(t); return n(nitros) < p ? 0 : 1 + (t > 0 ? Math.floor((n(nitros) - p) / t) : 0);
+  }
+
+  // El Parry cuesta siempre 1 No2, con cualquier arma o escudo (2026-09-26, dueño). Sin arma ni escudo no se puede (P121).
+  function costoParry(){ return 1; }
+  /* Escudos de Buena calidad (2026-10-06, dueño: «programá todas las mecánicas nuevas»). Parada fácil: el primer Parry de cada turno no cuesta
+     No2 (`paradafacil`; la marca del turno la lleva cada uno). Bloqueo firme: +N al Bloqueo contra el primer golpe que recibe en el turno
+     (`bloqueofirme`; la marca es la misma de la Defensa contra el primer golpe). valorDe(stat) → el valor de ese stat de quien se defiende. */
+  function parryGratis(valorDe, usado){ return !usado && n(valorDe('paradafacil')) > 0; }
+  function bloqueoFirme(valorDe, yaRecibio){ return yaRecibio ? 0 : Math.max(0, Math.round(n(valorDe('bloqueofirme')))); }
+  // Un escudo de verdad (para el Muro de escudos): un ítem de la ranura de escudo que no es un orbe.
+  const esEscudo = it => !!it && /^escudo/.test(String(it.tipoItem || '')) && !it.orbe;
+  // El orbe salvaje al usar una varita, con el d6 ya tirado: el Común, con 1 te hace 1 de daño y con 6 sale doble; el domado (Buena calidad,
+  // `orbeSalvaje: 'domado'`), con 1 no pasa nada y con 5 o 6 sale doble.
+  // El Orbe salvaje (2026-10-18, dueño): con cualquier daño especial. d6: con 1 el daño que le hacés al rival te lo hacés también a vos (los dos);
+  // con 6, el daño ×2 (el salvaje) o ×3 (el domado). → {domado, propio, mult}.
+  function orbeSalvaje(o, d){
+    const domado = !!o && o.orbeSalvaje === 'domado';
+    return {domado, propio: d === 1, mult: d === 6 ? (domado ? 3 : 2) : 1};
+  }
+  /* No2 en negativo por defenderse (2026-10-06, dueño, a probar): las defensas que cuestan No2 (Parry, la Evasión que paga el sobrepeso, el
+     dodge roll) se pueden hacer sin No2: quedás en negativo y esa deuda se descuenta en la próxima recarga (`recargarNo2`). Solo las defensas;
+     todo lo demás sigue sin poder pasar de 0. Se avisa muy claro: a quien la hace, un cartel; a los demás, la Crónica (`avisarDeudaNo2`, que
+     usa `window.avisoDeudaNo2` si la pantalla lo define —el mapa—; si no, un toast). Desde el 2026-10-23: si YA estás en negativo, ninguna defensa
+     que cueste No2 se puede pagar (`defensaSinNo2`, abajo). */
+  // Levantarse de Sentado (1 No2) menos lo de «Levantarse rápido» (botas de jinete, 2026-10-06).
+  const costoLevantarse = valorDe => Math.max(0, 1 - n(valorDe ? valorDe('levantarse') : 0));
+  // `estados` (2026-10-08, dueño): con Parálisis recarga 1 No2 menos.
+  const paralizado = estados => activos(estados).some(e => e.paralisis);
+  function recargarNo2(max, actual, estados){
+    const base = n(actual) < 0 ? n(max) + n(actual) : n(max);
+    return paralizado(estados) ? Math.min(base, Math.max(base - 1, Math.min(0, base))) : base;
+  }
+  /* (2026-10-23, dueño): «uno puede quedar en nitros negativos para realizar acciones defensivas fuera de su turno —parry, dodge roll, ayudar a zafar
+     a alguien—, pero no para acciones ofensivas como ataque de oportunidad o contraataque. Y se puede siempre y cuando no tengas ya nitros negativos.»
+     `defensaSinNo2(nitros, costo)` → true si esa defensa NO se puede pagar (ya está en negativo y cuesta algo). */
+  const YA_NEGATIVO_TXT = 'ya está en No2 negativos: no puede gastar más No2 en una defensa hasta recargar';
+  const defensaSinNo2 = (nitros, costo) => n(costo) > 0 && n(nitros) < 0;
+  function avisarDeudaNo2(o){
+    if(!o || n(o.quedan) >= 0) return;
+    try{ if(typeof window !== 'undefined' && typeof window.avisoDeudaNo2 === 'function'){ window.avisoDeudaNo2(o); return; } }catch(e){}
+    if(typeof toast === 'function') toast(`⚠ ${o.nombre ? o.nombre + ': ' : ''}sin No2 para ${o.accion}: queda en ${o.quedan} No2 (se descuenta en la próxima recarga)`);
+  }
+  /* Parry y Bloqueo: SOLO con un arma o un escudo de verdad (regla del dueño, 2026-09-30, "hasta que diga lo contrario").
+     Sin nada no hay opción, y un arma natural (garras, colmillos, puños…) tampoco la da por ahora: sería circunstancial y
+     narrativo, se evalúa más adelante. Recibe {arma: {nombre, peso}|null, natural, escudos: [{nombre, peso}]} y devuelve
+     con qué se para (el arma si es de verdad, si no el primer escudo) o null. El Bloqueo suma el peso de eso. */
+  /* El arco y los disparos (2026-10-09, dueño): con un arma de rango no se parrea (`o.arco`: desde 2026-10-10, cualquier arma de rango), y un disparo (flecha, virote, bala) solo se para con un
+     escudo (`o.soloEscudo`: el ataque es de rango; ver contraDisparo). */
+  /* El arma natural (dueño, 2026-10-21, con el Desarmar): mecánicamente SÍ parrea —si en cada caso tiene sentido lo decide la mesa—, con su
+     propio peso (el del ítem del catálogo que se le equipó y se marcó natural; 1 si no tiene). Va última: un arma o un escudo de verdad, primero. */
+  function armaParaDefensa(o){
+    o = o || {};
+    if(o.arma && o.arma.nombre && !o.natural && !o.arco && !o.soloEscudo) return o.arma;
+    const escudo = (o.escudos || []).find(e => e && e.nombre && (!o.soloEscudo || e.escudo !== false));   // contra un disparo, un báculo no
+    if(escudo) return escudo;
+    if(o.arma && o.arma.nombre && o.natural && !o.arco && !o.soloEscudo) return {...o.arma, peso: Math.max(1, n(o.arma.peso) || 1), natural: true};
+    return null;
+  }
+  const SIN_ARMA_DEFENSA = 'Sin un arma (también natural) o un escudo no hay Parry ni Bloqueo';
+  // ¿El ataque del duelo es un disparo? (un arma de rango, no una habilidad): contra eso, Parry solo con escudo (2026-10-09, dueño).
+  const contraDisparo = d => !!(d && d.ataque && d.ataque.rango && d.ataque.tipo !== 'habilidad');
+  // ¿Sirve este ítem para parrear? Solo un arma cuerpo a cuerpo o un escudo: ninguna de rango (arco, ballesta, pólvora; dueño, 2026-10-10:
+  // «la ballesta, en cuanto al Parry, es igual que un arco: solo se parrea con armas de melee»); contra un disparo, solo un escudo.
+  // Las varitas y los orbes tampoco parrean (dueño, 2026-10-10: «mucho menos las varitas»); un báculo (arma especial a dos manos) sí.
+  const esVarita = it => !!(it && it.especial && it.tipoItem !== 'arma_2m');
+  const sirveParaParry = (item, disparo) => !(item && (item.armaDeRango || item.orbe || esVarita(item))) && (!disparo || esEscudo(item));
+  /* Con qué del equipo de un creep o una invocación se puede parrear (2026-10-17, el Chamán del cristal con su Báculo de escarcha: la misma regla
+     que un personaje): lo que va en las manos (`slotDe` → 'escudo' | 'mano'), que no sea natural y sirva para parrear (un escudo, un báculo, un
+     arma cuerpo a cuerpo; no un orbe, una varita ni un arma de rango); los escudos primero. Antes se miraba solo la ranura de escudo: un orbe
+     parreaba y un báculo no. → [{nombre, peso}] para `armaParaDefensa`. */
+  function piezasParaParry(equipo, slotDe, pesoDe){
+    const enMano = it => it && it.nombre && ['escudo', 'mano'].includes(slotDe(it.tipoItem)) && sirveParaParry(it, false);
+    const lista = (equipo || []).filter(enMano), deVerdad = lista.filter(it => !it.natural), nat = lista.filter(it => it.natural);   // lo natural, al final (2026-10-21)
+    return [...deVerdad.filter(esEscudo), ...deVerdad.filter(it => !esEscudo(it)), ...nat].map(it => ({nombre: it.nombre, peso: Math.max(1, n(pesoDe(it)) || 1), escudo: esEscudo(it), ...(it.natural ? {natural: true} : {})}));
+  }
+  /* El Bloqueo SIEMPRE viene después de un Parry (regla y concepto del dueño, 2026-09-30): cuando te atacan, el Parry
+     (Destreza) es interceptar el arma del rival con tu arma o tu escudo; si lo lográs, el Bloqueo (Fuerza + el peso de tu
+     arma o escudo) es aguantar la fuerza del golpe (Fuerza del atacante + el peso de su arma). Bloqueo sin Parry no existe,
+     salvo que se diseñe para un contexto especial. Cada herramienta recuerda el Parry que quedó esperando su Bloqueo. */
+  const BLOQUEO_SOLO_TRAS_PARRY = 'El Bloqueo se tira solo después de un Parry, con la misma arma o escudo';
+
+  /* ---------- Durabilidad de un ítem (2026-09-26, docs/durabilidad.md; variable de diseño desde 2026-09-30) ----------
+     Armas, escudos y piezas de armadura tienen durabilidad: puntos por cada punto de Peso (3 por defecto) y como mínimo 3.
+     Cada ítem puede traer su propio `durPorPeso` (dueño, 2026-09-30: "una variable de diseño, para generar objetos de
+     mejor calidad"): 4 o 5 = más resistente para su peso; 2 = frágil. Sin el campo vale 3. La durabilidad ACTUAL de una
+     copia (`dur`, lo que se gastó) y su Armadura rota (`armRota`) son de esa copia, no del diseño. */
+  const DUR_POR_PESO = 3, DUR_MIN = 3;
+  const TIPOS_DURABLES = ['cabeza', 'manos', 'piernas', 'pies'];
+  function esDurable(item){ const t = String((item && item.tipoItem) || ''); return !(item && item.consumible) && (/^(arma_|escudo_|armadura_)/.test(t) || TIPOS_DURABLES.includes(t)); }
+  function durPorPeso(item){ const v = n(item && item.durPorPeso); return v > 0 ? v : DUR_POR_PESO; }
+  /* Resistente / Frágil (dueño, 2026-10-04): `durExtra` suma o resta durabilidad TOTAL (Resistente ×N = +N, Frágil ×N = −N), no por Peso: más
+     margen de diseño. Con Frágil (u otro efecto que la baje) puede quedar por debajo de 3, pero nunca menos de 1. `durPorPeso` queda solo para las
+     copias viejas que lo traen. */
+  function durExtra(item){ return Math.round(n(item && item.durExtra)); }
+  function durBase(item){ return Math.max(DUR_MIN, Math.round(durPorPeso(item) * Math.max(0, Math.round(n(item && item.peso))))); }
+  function durMax(item){ const b = durBase(item), x = durExtra(item); return x < 0 ? Math.max(1, b + x) : b + x; }
+  // Texto para las características del ítem: «12 (Resistente ×3)»; null si el ítem no tiene durabilidad.
+  function durTexto(item){
+    if(!esDurable(item)) return null;
+    const x = durExtra(item), pp = durPorPeso(item), max = durMax(item);
+    const nota = x > 0 ? `Resistente ×${x}` : x < 0 ? `Frágil ×${-x}` : pp !== DUR_POR_PESO ? `${pp} por punto de Peso` : `${DUR_POR_PESO} por punto de Peso`;
+    return `${max} (${nota})`;
+  }
+
+  /* ---------- Vida extra y Vida extra: cambiar el valor a mano (2026-09-24, dueño) ----------
+     El texto puede ser un número (valor nuevo), +N / −N (sumar o restar) o «max N» (cambia el máximo). `max === null` =
+     vida extra (valor neto, sin tope ni «max N»). Devuelve {max, actual} o null si el texto no se entiende. */
+  function escudoParsear(txt, actual, max){
+    const t = String(txt || '').trim().replace(',', '.').replace('−', '-');
+    if(!t) return null;
+    const neto = max === null;
+    if(!neto){
+      const m = /^max\s*(\d+(?:\.\d+)?)$/i.exec(t);
+      if(m){ const nm = Math.max(1, parseFloat(m[1])); return {max: nm, actual: Math.min(actual, nm)}; }
+    }
+    let v;
+    if(/^[+-]\d+(?:\.\d+)?$/.test(t)) v = actual + parseFloat(t);
+    else if(/^\d+(?:\.\d+)?$/.test(t)) v = parseFloat(t);
+    else return null;
+    return {max: neto ? null : max, actual: Math.max(0, neto ? v : Math.min(max, v))};
+  }
+
+  /* ---------- Estados que se acumulan ----------
+     Devuelven el estado que ya estaba (actualizado) o null si no había uno igual (entonces se agrega el nuevo). */
+  // Veneno: suma sus stacks enteros y dura tantos turnos como stacks. Veneno severo (permanente) no se acumula.
+  function acumularVeneno(estados, nuevo){
+    if(!nuevo || !nuevo.esVeneno) return null;
+    const ya = (estados || []).find(e => e.esVeneno && e.nombre === nuevo.nombre);
+    if(!ya) return null;
+    if(!nuevo.permanente){
+      // `resetea` (2026-10-26, la Nube tóxica: quedarse adentro le resetea el Veneno): vuelve a esos stacks si tenía menos, no los suma.
+      ya.stacks = nuevo.resetea ? Math.max(Math.max(1, n(ya.stacks) || 1), Math.max(1, n(nuevo.stacks) || 1)) : Math.max(1, n(ya.stacks) || 1) + Math.max(1, n(nuevo.stacks) || 1);
+      ya.turnos = ya.stacks;
+      ya.activo = true;
+    }
+    return ya;
+  }
+  // Sangrado (2026-09-22) y Escarcha (2026-09-25): cada reaplicación suma +1 stack (el daño por turno sube de a 1; la
+  // Escarcha además renueva su duración), no una tirada nueva de stacks.
+  function acumularSangrado(estados, nuevo){
+    const clave = nuevo && nuevo.esSangrado ? 'esSangrado' : nuevo && nuevo.esQuemadura ? 'esQuemadura' : nuevo && nuevo.esEscarcha ? 'esEscarcha' : '';
+    if(!clave) return null;
+    const ya = (estados || []).find(e => e[clave] && e.nombre === nuevo.nombre);
+    if(!ya) return null;
+    if(clave !== 'esQuemadura') ya.stacks = Math.max(1, n(ya.stacks) || 1) + (clave === 'esEscarcha' ? Math.max(1, Math.round(n(nuevo.stacks)) || 1) : 1);   // la Quemadura no sube (dueño, 2026-10-04: identidad propia)   // la Escarcha suma los que trae (Carga de frío, 2026-10-13)
+    ya.activo = true;
+    if(clave === 'esEscarcha') ya.turnos = Math.max(n(ya.turnos), n(nuevo.turnos));
+    if(clave === 'esQuemadura' && n(nuevo.turnos) > 0) ya.turnos = n(nuevo.turnos);   // la Quemadura: solo vuelven a contar los turnos
+    // Sangrado (regla del dueño, 2026-10-03): +1 stack y los turnos vuelven a los del Sangrado nuevo (el estándar); si alguno es permanente, queda permanente.
+    if(clave === 'esSangrado'){
+      if(nuevo.permanente){ ya.permanente = true; ya.turnos = 0; }
+      else if(!ya.permanente && n(nuevo.turnos) > 0) ya.turnos = n(nuevo.turnos);
+    }
+    return ya;
+  }
+
+  /* ---------- Ponerle un estado a alguien (paso 2, tanda 2, 2026-09-30) ----------
+     La misma regla para el "+ Estado" a mano (personaje, invocación, creep), lo que llega de una habilidad o trampa, y el
+     formulario completo:
+       1. Inmunidades (Invulnerable, Inmunidad a CC, Sangre pura, Coagulación, jefe contra Stun): rebota. (Un estado que se
+          carga pausado no se revisa.)
+       2. Armadura rota: +1 stack al que ya tenía.
+       3. Veneno: suma sus stacks (el severo, si ya lo tiene, no hace nada). Sangrado y Escarcha: +1 stack.
+       4. Si ya tiene uno con el mismo nombre: SE RENUEVA — queda uno solo, con los números nuevos (dueño, 2026-09-30:
+          antes el "+ Estado" a mano dejaba dos iguales y solo lo que llegaba a un creep desde una habilidad lo renovaba).
+          Los que vienen de un ítem equipado no se tocan.
+       5. Si no, se agrega.
+     Modifica la lista y devuelve {ok, que: 'bloqueado'|'acumulado'|'yaLoTiene'|'renovado'|'nuevo', estado, motivo?}.
+     `o.jefe`: el que lo recibe es un creep jefe. */
+  // Lo que se pone (o se renueva o se acumula) queda `recien`: su primer inicio de turno no le descuenta si se lo pusieron fuera de su turno (P177).
+  function agregarEstado(estados, nuevo, o){
+    const r = agregarEstado0(estados, comoCeguera(nuevo), o);   // «Cegado» = la Ceguera (2026-10-20)
+    if(r && r.ok && r.estado && r.que !== 'yaLoTiene' && !r.estado.origenItem && !r.estado.derivado) r.estado.recien = true;
+    return r;
+  }
+  // Extenuado (Maldición extenuante, Debuffer, 2026-10-12): +1 No2 por stack a todo lo que cuesta No2; moverse, además, 1 No2 más cada
+  // 2 casillas (eso lo cobra el mapa, costoPasos). `conExtenuado(estados, costo)`: el costo con el recargo, solo si ya costaba algo.
+  const extenuado = estados => activos(estados).filter(e => e.extenuante).reduce((a, e) => a + Math.max(1, n(e.stacks) || 1), 0);
+  const conExtenuado = (estados, costo) => n(costo) > 0 ? n(costo) + extenuado(estados) : n(costo);
+  // ⛈ Atormentado (Maldición tormentosa, Debuffer, 2026-10-12, dueño): cada acción que cuesta No2 le saca vida al pagarla — lo que costó
+  // menos 1, +1 por cada stack de más (con 1 stack, algo de 1 No2 no duele) — y moverse, 1 de vida por stack cada 2 casillas completas (eso lo
+  // cobra el mapa). Directo a la vida: lo frenan los escudos, la vida extra e Invulnerable (no la Defensa ni la Armadura mágica).
+  // `cobroTormenta(estados, costo, {mover})` → {dano, recibido, absorbido, invulnerable}: baja los escudos de `estados`; la vida la baja quien
+  // llama (`aplicarTormenta(x, estados, costo, o)` lo hace sobre x.hp, para un creep o una invocación). `avisarTormenta` lo cuenta en la Mesa.
+  const tormenta = estados => activos(estados).filter(e => e.tormenta).reduce((a, e) => a + Math.max(1, n(e.stacks) || 1), 0);
+  const danoTormenta = (estados, costo) => { const t = tormenta(estados); return t > 0 && n(costo) > 0 ? Math.max(0, n(costo) - 1 + t - 1) : 0; };
+  const danoTormentaMover = (estados, casillas) => Math.floor(Math.max(0, n(casillas)) / 2) * tormenta(estados);
+  // Un golpe directo a la vida sobre una lista de estados: Invulnerable lo anula; la Armadura arcana, los escudos y la vida extra lo frenan
+  // (los bajan en la misma lista). Es lo de resolverGolpe del mapa, sin la Defensa.
+  function golpeDirecto(estados, golpe){
+    const act = activos(estados);
+    if(act.some(e => e.invulnerable)) return {recibido: 0, absorbido: 0, invulnerable: true};
+    let recibido = Math.max(0, n(golpe)), absorbido = 0;
+    const ab = absorberPct(act, recibido);
+    recibido = ab.recibido; absorbido += ab.tomado;
+    act.filter(e => (e.escudoMagicoActual !== undefined || n(e.escudoMagico) > 0) && n(e.escudoMagicoActual ?? e.escudoMagico) > 0)
+      .sort((a, b) => (a.excedenteVida ? 1 : 0) - (b.excedenteVida ? 1 : 0))
+      .forEach(c => {
+        if(recibido <= 0) return;
+        const actual = n(c.escudoMagicoActual ?? c.escudoMagico), tomado = Math.min(recibido, actual);
+        c.escudoMagicoActual = actual - tomado;
+        if(c.excedenteVida) c.escudoMagico = c.escudoMagicoActual;
+        absorbido += tomado; recibido -= tomado;
+      });
+    return {recibido, absorbido, invulnerable: false};
+  }
+  function cobroTormenta(estados, costo, o){
+    const dano = o && o.mover ? danoTormentaMover(estados, costo) : danoTormenta(estados, costo);
+    if(dano <= 0) return {dano: 0, recibido: 0, absorbido: 0, invulnerable: false};
+    return {dano, ...golpeDirecto(estados, dano)};
+  }
+  function tormentaTxt(nombre, r, motivo){
+    if(r.invulnerable) return `⛈ Maldición tormentosa: ${nombre || 'alguien'} es Invulnerable, ${motivo || 'actuar'} no le hizo nada`;
+    const quien = nombre || 'alguien', por = motivo || 'actuar';
+    if(r.absorbido > 0) return `⛈ Maldición tormentosa: ${quien} recibe ${r.dano} por ${por} · los escudos frenaron ${r.absorbido}${r.recibido > 0 ? ` y pierde ${r.recibido} de vida` : ': no pierde vida'}`;
+    return `⛈ Maldición tormentosa: ${quien} pierde ${r.recibido} de vida por ${por}`;
+  }
+  let tormentaUltimo = {txt: '', t: 0};   // (una transacción que se repite no lo cuenta dos veces)
+  function avisarTormenta(nombre, r, motivo){
+    if(!r || !r.dano) return;
+    const txt = tormentaTxt(nombre, r, motivo), ahora = Date.now();
+    if(tormentaUltimo.txt === txt && ahora - tormentaUltimo.t < 2500) return;
+    tormentaUltimo = {txt, t: ahora};
+    if(typeof window !== 'undefined' && typeof window.avisoTormenta === 'function'){ try{ window.avisoTormenta(txt, r, nombre); }catch(e){} }
+    else if(typeof toast === 'function') toast(txt);
+    if(typeof mesaLinea === 'function') mesaLinea(txt, 'alerta-roja', nombre);
+  }
+  function aplicarTormenta(x, estados, costo, o){
+    const r = cobroTormenta(estados, costo, o);
+    if(x && r.recibido > 0) x.hp = Math.max(0, n(x.hp) - r.recibido);
+    if(x && r.dano) avisarTormenta((o && o.nombre) || x.nombre, r, o && o.motivo);
+    return r;
+  }
+  // Acelerado (Shooter, 2026-10-12): −1 No2 por stack al próximo ataque con un arma a distancia de este turno (mínimo 0). Lo gasta ese ataque.
+  const acelerado = estados => activos(estados).filter(e => e.acelera).reduce((a, e) => a + Math.max(1, n(e.stacks) || 1), 0);
+  // 💪 Empower (2026-10-22): lo que le suma a la próxima tirada (`unaTirada`) → {n, cubre: los stats que ya lo traen en el valor} o null; y
+  // gastarlo (la tirada que lo usó). Un stat que no está en sus mods (Fuerza del golpe, un atributo pelado) lo suma como extra al tirar.
+  function unaTiradaDe(estados){
+    const es = activos(estados).filter(e => e.unaTirada);
+    if(!es.length) return null;
+    const cubre = new Set();
+    es.forEach(e => (e.mods || []).forEach(m => cubre.add(m.stat)));
+    return {n: es.reduce((a, e) => a + Math.max(1, n(e.stacks) || 1) * (n(((e.mods || [])[0] || {}).val) || 3), 0), cubre, nombres: es.map(e => e.nombre)};
+  }
+  const gastarUnaTirada = estados => { if(!Array.isArray(estados)) return false; let hubo = false; for(let i = estados.length - 1; i >= 0; i--) if(estados[i] && estados[i].unaTirada){ estados.splice(i, 1); hubo = true; } return hubo; };
+  const gastarAcelerado = estados => { if(!Array.isArray(estados)) return false; let hubo = false; for(let i = estados.length - 1; i >= 0; i--) if(estados[i] && estados[i].acelera){ estados.splice(i, 1); hubo = true; } return hubo; };
+  const golpeDeStacks = e => {
+    const g = {...(e.golpe || {})}, k = Math.max(1, n(e.stacks) || 1);
+    Object.entries(e.golpePorStack || {}).forEach(([c, v]) => { g[c] = Math.round(n(v)) * k; });
+    return g;
+  };
+  // Cuántos stacks tiene ya de un estado con cargas que todavía no se gastó (el costo de Enfocado sube con esto).
+  const stacksCargaActiva = (estados, nombre) => {
+    const e = (Array.isArray(estados) ? estados : []).find(x => x && x.nombre === nombre && x.activo !== false && !x.agotada && (n(x.cargas) > 0 || x.apila));   // con cargas (Enfocado) o que se apila (Acelerado)
+    return e ? Math.max(1, n(e.stacks) || 1) : 0;
+  };
+  function agregarEstado0(estados, nuevo, o){
+    if(!Array.isArray(estados) || !nuevo) return {ok: false, que: 'nada'};
+    if(marcaTurno && nuevo.pasoTurno === undefined){ const m = marcaTurno(); if(m) nuevo.pasoTurno = m; }   // en qué turno se lo pusieron (turno propio)
+    if(nuevo.activo !== false){
+      const motivo = inmunidad(estados, nuevo, o);
+      if(motivo) return {ok: false, que: 'bloqueado', motivo};
+      if(esDesarmado(nuevo)) return {ok: true, que: 'desarme', estado: nuevo};   // ✋ paso 5 (P217): ya no es un estado; el arma cae al piso (el mapa, js/27)
+      if(esMarca(nuevo)) for(let i = estados.length - 1; i >= 0; i--) if(esSigilo(estados[i])) estados.splice(i, 1);   // la marca le saca el sigilo
+    }
+    // 🔥 Una sola arma elemental a la vez (2026-10-21, dueño): la nueva reemplaza a la de otro elemento (la misma, se renueva como siempre).
+    if(nuevo.armaElemental) for(let i = estados.length - 1; i >= 0; i--) if(estados[i] && estados[i].armaElemental && estados[i].nombre !== nuevo.nombre) estados.splice(i, 1);
+    if(nuevo.armaduraRota){
+      const ya = estados.find(e => e && e.armaduraRota);
+      if(ya){ ya.stacks = Math.max(1, n(ya.stacks) || 1) + Math.max(1, Math.round(n(nuevo.stacks)) || 1); ya.activo = true; return {ok: true, que: 'acumulado', estado: ya}; }   // suma los que trae (2026-10-13)
+    }
+    const veneno = acumularVeneno(estados, nuevo);
+    if(veneno) return {ok: true, que: nuevo.permanente ? 'yaLoTiene' : 'acumulado', estado: veneno};
+    const sangrado = acumularSangrado(estados, nuevo);
+    if(sangrado) return {ok: true, que: 'acumulado', estado: sangrado};
+    // Vida extra (dueño, 2026-10-07: «quiero que se sumen»): otra Vida extra no reemplaza a la que había — se suma, cada una con su duración
+    // (queda aparte en la lista; el daño se come primero la que vence antes). Antes (P137) reemplazaba.
+    if(nuevo.excedenteVida && n(nuevo.escudoMagico) > 0 && estados.some(e => e && e.excedenteVida && e.nombre === nuevo.nombre && e.activo !== false)){
+      if(nuevo.escudoMagicoActual === undefined) nuevo.escudoMagicoActual = n(nuevo.escudoMagico);
+      estados.push(nuevo);
+      return {ok: true, que: 'nuevo', sumado: true, estado: nuevo};
+    }
+    // Un estado que se apila (Debilitado, 2026-10-11): otra vez = un stack más y la duración vuelve a la del nuevo.
+    if(nuevo.apila){
+      const ya = estados.find(e => e && e.nombre === nuevo.nombre && e.apila && e.activo !== false);
+      if(ya){ ya.stacks = Math.max(1, n(ya.stacks) || 1) + 1; ya.turnos = n(nuevo.turnos); return {ok: true, que: 'acumulado', estado: ya}; }
+    }
+    // Una carga que se apila (Enfocado, 2026-10-11): si todavía no se gastó, suma un stack y su golpe crece (`golpePorStack` × stacks).
+    if(nuevo.golpePorStack){
+      const ya = estados.find(e => e && e.nombre === nuevo.nombre && e.golpePorStack && e.activo !== false && !e.agotada && n(e.cargas) > 0);
+      if(ya){ ya.stacks = Math.max(1, n(ya.stacks) || 1) + 1; ya.golpe = golpeDeStacks(ya); return {ok: true, que: 'acumulado', estado: ya}; }
+      nuevo.stacks = Math.max(1, n(nuevo.stacks) || 1);
+      nuevo.golpe = golpeDeStacks(nuevo);
+    }
+    const igual = estados.find(e => e && e.nombre === nuevo.nombre && !e.origenItem && !e.derivado);
+    if(igual){
+      const id = igual.id;
+      Object.keys(igual).forEach(k => { delete igual[k]; });
+      Object.assign(igual, nuevo, id !== undefined ? {id} : {});
+      return {ok: true, que: 'renovado', estado: igual};
+    }
+    estados.push(nuevo);
+    return {ok: true, que: 'nuevo', estado: nuevo};
+  }
+
+  /* ---------- Un preset con los números que manda la habilidad ----------
+     Cuando una habilidad, trampa o zona aplica un estado estándar (Veneno, Sangrado…) con sus propios números, esos números
+     mandan sobre los del preset: turnos, bonos, daño/cura por turno, escudo, detalle y, en el Veneno (no el severo), los
+     stacks (que son también sus turnos). `base` es la copia del preset (se modifica y se devuelve); `campoHp` es el nombre
+     del daño por turno en esa herramienta ('hpTurno' en creeps, 'hpturno' en la ficha). Antes (hasta el 2026-09-30) la
+     ficha solo respetaba turnos y escudo: un Veneno ×3 de la Nube tóxica le llegaba ×4 a un personaje. */
+  function ajustarPreset(base, spec, campoHp){
+    const s = spec || {};
+    if(s.turnos !== undefined && s.turnos !== null) base.turnos = n(s.turnos);
+    if(n(s.turnos) > 0 && base.permanente) base.permanente = false;   // con turnos puestos, vence (ej. Sangrado por 2 turnos de un arma, 2026-10-03)
+    if(Array.isArray(s.mods) && s.mods.length) base.mods = s.mods.map(m => ({stat: m.stat, val: n(m.val)}));
+    if(n(s.hp)) base[campoHp || 'hpTurno'] = n(s.hp);
+    if(n(s.stacks) && base.esVeneno && !base.permanente){ base.stacks = n(s.stacks); base.turnos = base.stacks; }
+    if(n(s.stacks) && (base.esSangrado || base.esQuemadura)) base.stacks = n(s.stacks);   // un arma que deja Sangrado con más stacks (2026-10-03)
+    if(n(s.stacks) && (base.esEscarcha || base.armaduraRota)) base.stacks = Math.max(1, Math.round(n(s.stacks)));   // la Carga Elemental (Escarcha ×N, Armadura rota ×N) y la Armadura rota doble de un arma en un creep (2026-10-13)
+    if(n(s.escudoMagico)) base.escudoMagico = n(s.escudoMagico);
+    if(n(s.stacks) && base.repetir) base.stacks = Math.max(1, Math.min(3, n(s.stacks)));   // Repitiendo (2026-10-13): cuántos disparos encadena
+    if(s.detalle) base.detalle = s.detalle;
+    return base;
+  }
+
+  /* ¿El estado que pone una habilidad o un ítem al usarse (efectoNombre…) no vence? (P137, 2026-10-01, igual para personajes,
+     invocaciones y creeps): si la habilidad/ítem lo dice (efectoPermanente, la casilla "No vence" / "Sin límite"), manda eso;
+     si nunca se tocó, lo que diga el estado (`preset`). */
+  function efectoPermanente(src, preset){
+    const v = src && src.efectoPermanente;
+    return v !== undefined && v !== null ? !!v : !!(preset && preset.permanente);
+  }
+
+  /* ---------- Pasivas que dan un estado (2026-10-16, dueño: «Vuela debería ser una habilidad pasiva también… en la abeja») ----------
+     Una pasiva con `estado` (el nombre de un preset de comun/estados-presets.js) mantiene ese estado puesto, permanente, mientras la tenga —
+     como los ítems que dan un estado. Va en la lista de estados de siempre (así lo leen el mapa, el duelo y las inmunidades sin nada nuevo),
+     marcado con `origenPasiva` (el id de la pasiva): si se lo borran vuelve; si se saca la pasiva, se va; siempre queda igual al preset
+     (si el preset cambia, cambia con él; se respeta si está pausado). Uno con el mismo nombre que ya estaba puesto a mano se adopta (no se duplica). `presets`: la lista en la forma de la herramienta (estadosPresetFicha / estadosPresetCreep);
+     `nuevoId()`: un id. → true si cambió algo. Igual para personajes, creeps e invocaciones. */
+  // 🩸 Maldito (2026-10-17): cuánta vida saca cada punto de SP que se paga (0 si no está maldito).
+  const sangraPorSp = estados => activos(estados).some(e => e.sangraSp) ? 1 : 0;
+  function sincronizarEstadosDePasivas(estados, pasivas, presets, nuevoId){
+    if(!Array.isArray(estados)) return false;
+    const conEstado = (pasivas || []).filter(p => p && String(p.estado || '').trim());
+    const ids = new Set(conEstado.map(p => p.id));
+    let cambio = false;
+    for(let i = estados.length - 1; i >= 0; i--) if(estados[i] && estados[i].origenPasiva && !ids.has(estados[i].origenPasiva)){ estados.splice(i, 1); cambio = true; }
+    const mismo = (a, b) => String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase();
+    conEstado.forEach(p => {
+      const pre = (presets || []).find(x => x && (mismo(x.nombre, p.estado) || (x.alias || []).some(a => mismo(a, p.estado))));
+      // El que ya está (de la pasiva, o uno suelto con ese nombre que se adopta) queda igual al preset: si el preset cambia, cambia con él
+      // (solo se respeta si está pausado y su id).
+      const ya = estados.find(e => e && e.origenPasiva === p.id) || estados.find(e => e && !e.origenPasiva && mismo(e.nombre, p.estado));
+      if(ya){
+        // Solo lo que dice el preset (lo que el turno le agrega por su cuenta, como `recien`, queda): así no cambia en cada pasada.
+        const base = {...(pre ? {stacks: 1, ...structuredClone(pre)} : {}), permanente: true, turnos: 0, origenPasiva: p.id};
+        Object.keys(base).forEach(k => { if(k !== 'id' && JSON.stringify(ya[k]) !== JSON.stringify(base[k])){ ya[k] = base[k]; cambio = true; } });
+        return;
+      }
+      if(!pre) return;
+      estados.push({stacks: 1, ...structuredClone(pre), id: nuevoId ? nuevoId() : 'ps' + Math.random().toString(36).slice(2, 9), activo: true, permanente: true, turnos: 0, origenPasiva: p.id});
+      cambio = true;
+    });
+    return cambio;
+  }
+
+  /* ---------- Los controles (CC) y con qué se resisten (2026-10-18, dueño, P210) ----------
+     CC es el paraguas (la marca `esCC`: la Inmunidad a CC los frena a todos). Adentro, por grupo: los mentales (Res.Mt; además los frena la
+     Inmunidad mental) y los del cuerpo (aturdimiento, heridas, sentidos, atrapar, equilibrio, desarme), cada uno con su stat. El estado dice con
+     qué se resiste por defecto (los asistentes de la Ejecución y de las trampas lo proponen solos); una habilidad puntual lo puede cambiar.
+     Silencio como mental y Ceguera con Res.CC: confirmados por el dueño. Un estado propio puede traer `grupoCC` o `esMental`. */
+  const GRUPOS_CC = {
+    mental: {label: 'Mentales', icono: '🧠', resiste: 'resm', estados: ['Miedo', 'Confusión', 'Provocado', 'Sueño', 'Silencio']},
+    aturdimiento: {label: 'Aturdimiento', icono: '💫', resiste: 'rescc', estados: ['Stun', 'Pajaritos', 'Parálisis', 'Exhausto']},
+    herida: {label: 'Heridas', icono: '🦵', resiste: 'rescc', estados: ['Lisiado', 'Rengo']},
+    sentidos: {label: 'Sentidos', icono: '👁', resiste: 'rescc', estados: ['Ceguera']},
+    atrapar: {label: 'Atrapar', icono: '⛓', resiste: 'fue', estados: ['Inmovilizado', 'Lento', 'Mordido', 'Agarrado']},
+    equilibrio: {label: 'Equilibrio', icono: '🤸', resiste: 'agl', estados: ['Sentado']},
+    desarme: {label: 'Desarme', icono: '✋', resiste: 'fue', estados: ['Desarmado', 'Desarme']},
+  };
+  const RESISTE_ETQ = {resm: 'Res.Mt', rescc: 'Res.CC', fue: 'Fuerza', agl: 'Agilidad'};
+  const nombreEstadoBase = e => String((e && typeof e === 'object' ? e.nombre : e) || '').trim().toLowerCase();
+  // El grupo de control de un estado (o de su nombre): '' si no es un control.
+  function grupoCC(e){
+    if(e && typeof e === 'object' && e.grupoCC && GRUPOS_CC[e.grupoCC]) return e.grupoCC;
+    const n = nombreEstadoBase(e);
+    if(!n) return '';
+    for(const [k, g] of Object.entries(GRUPOS_CC)) if(g.estados.some(x => x.toLowerCase() === n)) return k;
+    return e && typeof e === 'object' && e.esMental ? 'mental' : '';
+  }
+  const esMental = e => !!(e && typeof e === 'object' && e.esMental) || grupoCC(e) === 'mental';
+  const esControl = e => !!(e && typeof e === 'object' && e.esCC) || !!grupoCC(e);
+  // Con qué se resiste por defecto: el id del stat ('resm', 'rescc', 'fue', 'agl') y su etiqueta ('Res.Mt'…). '' si no es un control.
+  const resisteCC = e => { const g = GRUPOS_CC[grupoCC(e)]; return g ? g.resiste : ''; };
+  const resisteCCEtq = e => RESISTE_ETQ[resisteCC(e)] || '';
+
+  /* ---------- Inmunidades ----------
+     ¿Este debuff rebota en quien lo recibe? Devuelve el motivo ('Invulnerable', 'Inmunidad a CC', 'Sangre pura',
+     'Coagulación extrema', 'Vuela' (Sentado y Rengo), 'Protección de jefe') o false. `o.jefe`: un creep jefe es inmune a Stun (P95). */
+  // Marcado (2026-10-05): mientras dure no puede entrar en sigilo, y al ponérselo se le cae el que tenía.
+  const esSigilo = e => String((e && e.nombre) || '').trim().toLowerCase() === 'sigilo';
+  const esMarca = e => !!e && (!!e.marcado || String(e.nombre || '').trim().toLowerCase() === 'marcado');
+  const marcadoEn = estados => activos(estados).some(esMarca);
+  function inmunidad(estados, est, o){
+    if(est && esSigilo(est) && marcadoEn(estados)) return 'Marcado';
+    if(!est || est.polaridad !== 'debuff') return false;
+    if(o && o.jefe && est.nombre === 'Stun') return 'Protección de jefe';
+    if(o && o.armaNatural && esDesarmado(est)) return 'Arma natural';   // (dueño, 2026-10-08): no se le cae — su arma es parte del cuerpo
+    const act = activos(estados);
+    if(act.some(e => e.invulnerable)) return 'Invulnerable';
+    if(esControl(est) && act.some(e => e.inmunidadCC)) return 'Inmunidad a CC';
+    if(esMental(est) && act.some(e => e.inmunidadMental)) return 'Inmunidad mental';   // (2026-10-18, P210) solo los controles mentales
+    if(est.esVeneno && act.some(e => e.sangrePura)) return 'Sangre pura';
+    if(est.esSangrado && act.some(e => e.coagulacionExtrema)) return 'Coagulación';
+    if((est.sentado || est.rengo) && act.some(e => e.volador)) return 'Vuela';   // (dueño, 2026-10-16) no se lo tira al piso ni se lo deja rengo
+    return false;
+  }
+
+  /* ---------- Usar una habilidad (paso 3, 2026-09-30) ----------
+     Lo mismo para personaje, invocación y creep: en qué modo se ejecuta, qué cuesta, si se puede usar ahora, hasta dónde
+     llega y lo que el cuadro del duelo necesita (la ✨ Ejecución). Cada herramienta pone lo suyo: de dónde salen los stats
+     del que la usa, las etiquetas y la X del costo variable (solo los personajes la tienen). */
+  const MODOS_HAB = ['manual', 'semi', 'auto'];
+  const nf = v => { const x = parseFloat(v); return Number.isFinite(x) ? x : 0; };   // como num() de las herramientas: '2 No2' = 2
+  // 📣 manual / 💰 semi / ✨ auto. `duelo`: la Ejecución que tiene armada (la propia o la de su plantilla); las viejas sin
+  // `modo` lo deducen: automatizada === false → manual, con Ejecución → auto, el resto → semi. null = nueva, sin elegir.
+  function modoHab(h, duelo){
+    if(!h) return 'semi';
+    if(h.modo === null) return null;
+    if(MODOS_HAB.includes(h.modo)) return h.modo;
+    if(h.automatizada === false) return 'manual';
+    return duelo ? 'auto' : 'semi';
+  }
+  // Qué arma la Ejecución: 'arma' (ataque con arreglos), 'flash' (reacción), 'zona' (persistente) o 'dirigida'.
+  function tipoEjecucion(c){
+    if(!c || typeof c !== 'object') return '';
+    if(c.modo === 'arma' || c.modo === 'flash') return c.modo;
+    return c.objetivo === 'zona' ? 'zona' : 'dirigida';
+  }
+  // Cambia la «X» del costo variable por el número elegido, en una fórmula («1dX», «X+2») o en un texto libre.
+  // \bx\b sola no alcanza: en «1dX» la X queda pegada a la «d»; por eso la segunda pasada para «dX»/«Xd».
+  function sustituirX(formula, X){
+    const s = String(Math.max(0, Math.round(nf(X))));
+    return String(formula || '').replace(/\bx\b/gi, s).replace(/dx/gi, 'd' + s).replace(/xd/gi, s + 'd');
+  }
+  const esCostoAtaque = h => String((h && h.nitrosCosto) ?? '').trim().toUpperCase() === 'ATAQUE';
+  const esCostoX = v => /x/i.test(String(v ?? ''));
+  // No2 de una habilidad: "ATAQUE" = lo que cuesta un ataque con su arma (y cuenta como ese ataque), X = se elige al
+  // usarla (acá 0), sin cargar (undefined/null) = el costo por defecto de quien la usa.
+  function costoNitrosHab(h, costoAtaque, porDefecto){
+    if(esCostoAtaque(h)) return nf(typeof costoAtaque === 'function' ? costoAtaque() : costoAtaque);
+    if(esCostoX(h && h.nitrosCosto)) return 0;
+    return nf((h && h.nitrosCosto) ?? porDefecto);
+  }
+  // ¿Se puede usar ahora? '' = sí; si no, el motivo. Se cobra lo que la habilidad tenga cargado, sea de quien sea (P133):
+  // cooldown, No2 y vida (tiene que sobrar vida después de pagarla). Una 📣 manual no cobra nada.
+  function bloqueoHab(h, o){
+    o = o || {};
+    if(o.modo === 'manual') return '';
+    if(h && h.unaVez && h.unaVezUsada) return 'Ya la usó en este combate (una vez por combate)';   // 💨 Segundo aliento (2026-10-27)
+    if(nf(h && h.cdActual) > 0) return `Cooldown · ${nf(h.cdActual)} turno(s)`;
+    if(o.nitros !== undefined && nf(o.nitros) < nf(o.costo)) return 'Sin No2';
+    if(o.hp !== undefined && nf(h && h.hpCosto) > 0 && nf(o.hp) <= nf(h.hpCosto)) return 'Sin vida';
+    return '';
+  }
+  // Hasta dónde llega (casilleros; 0 = sin límite, no resalta). `stat(id)` da el Rango ('rng') de quien la usa. En automático, lo especial
+  // (PdG.Esp, Ef.Esp) usa el Rango y el resto no resalta. El rango lo da la Destreza, siempre (dueño, 2026-10-07): ya no hay Rango de casteo
+  // del Especial; una habilidad vieja con alcance 'casteo' usa el Rango.
+  function alcanceHab(c, statTira, stat){
+    const modo = c && c.alcance !== undefined ? c.alcance : 'auto';
+    const v = id => { const x = Number(stat ? stat(id) : 0); return Number.isFinite(x) ? Math.max(0, Math.round(x)) : 0; };
+    if(modo === 'casteo' || modo === 'rango') return v('rng');
+    if(modo === 'adyacente') return 1;
+    if(modo === 'ilimitado') return 0;
+    if(modo === 'fijo') return Math.max(0, Math.round(nf(c.alcanceN)));
+    return statTira === 'pdgmg' || statTira === 'dmgesp' ? v('rng') : 0;
+  }
+  /* La cura con dados (2026-10-07, dueño: Varita de cura 1d10, cura mayor 2d8): `cura` puede ser un número o una fórmula («1d10», «2d8+1»);
+     la fórmula se tira acá, una vez, al armar la Ejecución (el resto del camino —duelo, ficha, mapa, creeps— sigue recibiendo un número).
+     → {cura, formula, rolls} o null. */
+  const ES_FORMULA_CURA = /^\s*\d*d\d+(\s*[+-]\s*\d+)?\s*$/i;
+  function curaTirada(v){
+    if(typeof v === 'string' && ES_FORMULA_CURA.test(v) && typeof tirarDados === 'function'){
+      const r = tirarDados(v.replace(/\s+/g, ''));
+      if(r) return {cura: Math.max(0, Math.round(nf(r.total))), formula: v.replace(/\s+/g, ''), rolls: r.rolls || []};
+    }
+    return null;
+  }
+  // Un efecto de la Ejecución, en la forma que usa el cuadro del duelo (y el estado que pone, `spec`).
+  /* 🔮 Talismanes (2026-10-18, dueño): lo que dejan al hacerle daño especial a alguien, una vez por turno (la Cabeza reducida, el Muñeco vudú:
+     `alDanoEspecial` = {nombre, turnos}). → [{nombre, turnos, de}]. Lo aplica el mapa del GM con el daño del duelo (vtt-hexgrid/js/53). */
+  function talismanesDanoEsp(items){
+    return (items || []).filter(i => i && i.alDanoEspecial && i.alDanoEspecial.nombre).slice(0, 3)
+      .map(i => ({nombre: String(i.alDanoEspecial.nombre), turnos: Math.max(1, Math.round(nf(i.alDanoEspecial.turnos)) || 1), de: String(i.nombre || '').slice(0, 40)}));
+  }
+  // `valorDe(statId)` (2026-10-20): los stats de quien la usa — un estado que se suelta contra uno de ellos (`soltar.difStat`, la Red Nerubian:
+  // Fuerza contra tu Ef.Esp) lleva ese valor como dificultad. `difMin` (2026-10-23, dueño: los pergaminos, «algo que pagaste»): nunca menos que eso
+  // (el Pergamino de red Nerubian: tu Ef.Esp neto, mínimo 6). Vale igual en las zonas, las trampas de una habilidad y el soltarse de un ataque.
+  function efectoDeEjecucion(e, valorDe){
+    // «Pierde No2» (2026-10-02, Sonic Boom): el objetivo pierde `no2` (+ la diferencia entre las tiradas) No2; en 0, Sentado.
+    // La purga (2026-10-07, Varita de la purga): le saca el estado malo más reciente (el mapa elige cuál: js/13 dueloAplicarEfecto).
+    if(e && e.purga) return {nombre: 'Purga', caras: 1, exitos: 1, spec: null, purga: true, detalle: 'Le saca el estado malo más reciente.'};
+    // 🧿 Disipar (2026-10-25, el Debuffer; dueño: «el usuario de disipar elige cuál quitar»): le saca uno de sus estados buenos; cuál, lo elige quien lo usa (js/13).
+    if(e && e.disipar) return {nombre: 'Disipar', caras: 1, exitos: 1, spec: null, disipar: true, detalle: 'Le saca uno de sus estados buenos: lo elige quien lo usa.'};
+    // 🥁 Baja cooldowns (2026-10-25, el Support, Redoble de tambores): a un creep que trabaja con cooldown, −`bajaCd` a cada cooldown activo (js/13).
+    if(e && nf(e.bajaCd) > 0) return {nombre: 'Baja cooldowns', caras: 1, exitos: 1, spec: null, bajaCd: Math.round(nf(e.bajaCd)), detalle: `Si trabaja con cooldown (no con SP): −${Math.round(nf(e.bajaCd))} a cada cooldown activo.`};
+    if(e && e.no2 !== undefined) return {nombre: 'Pierde No2', caras: 1, exitos: 1, spec: null, no2: Math.max(0, Math.round(nf(e.no2))), no2Dif: !!e.no2Dif, no2Sentado: !!e.no2Sentado,
+      detalle: `Pierde ${nf(e.no2)}${e.no2Dif ? ' + la diferencia' : ''} No2${e.no2Sentado ? '; si se queda sin No2, queda Sentado' : ''}.`};
+    // Con probabilidad (2026-10-05, armas especiales): `caras`/`exitos` como los efectos de un arma (33 % = 5 o 6 en d6: el duelo tira un d3 como d6); sin eso, entra siempre.
+    const caras = Math.max(1, Math.round(nf(e.caras)) || 1);
+    return {nombre: e.nombre || (e.cura ? 'Curación' : ''), caras, exitos: Math.min(caras, Math.max(1, Math.round(nf(e.exitos)) || 1)), ...(e.detalle ? {detalle: String(e.detalle)} : {}),
+      ...(nf(e.vuela) > 0 ? {vuela: Math.round(nf(e.vuela))} : {}),
+      ...(e.clava ? {clava: {turnos: Math.min(6, Math.max(1, Math.round(nf(e.clava.turnos)) || 3))}} : {}),   // 📌 Clavar a la pared (2026-10-26): si choca contra algo sólido, Inmovilizado (vtt-hexgrid/js/13 dueloEmpujar)
+      ...(nf(e.empuja) > 0 ? {empuja: Math.round(nf(e.empuja))} : {}),   // lo empuja N casillas, lejos de quien la usa (2026-10-08, ráfaga helada, vendaval)   // el arma vuela N casillas (el Desarmado de la Varita del desarme, 2026-10-07)
+      spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: nf(e.val)}] : e.mods,
+        polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : e.stat ? (nf(e.val) >= 0 ? 'buff' : 'debuff') : (e.escudo ? 'buff' : undefined), hp: e.hp, stacks: e.stacks, escudoMagico: e.escudo,   // (la polaridad que trae, 2026-10-24: ¡A la carga! quedaba como debuff)
+        ...(e.soltar ? {soltar: {...e.soltar, ...(e.soltar.difStat && typeof valorDe === 'function' && Number.isFinite(Number(valorDe(e.soltar.difStat))) ? {dif: Math.max(1, Math.round(nf(e.soltar.difMin)), Math.round(Number(valorDe(e.soltar.difStat))))} : {})}} : {})},
+      ...(() => { const t = curaTirada(e.cura); return t ? {cura: t.cura, detalle: `${e.detalle ? e.detalle + ' ' : ''}Cura ${t.formula}: ${t.rolls.length ? '[' + t.rolls.join(', ') + '] = ' : ''}${t.cura}.`.slice(0, 200)} : {cura: nf(e.cura), detalle: e.detalle || ''}; })()};
+  }
+  /* Lo que el cuadro del duelo necesita para una habilidad dirigida ✨ (y las de área, onda y zona), o null si la
+     Ejecución es un ataque con arma o un Flash. `h` la habilidad, `c` su Ejecución. `o.stat(id)`: stats de quien la usa
+     (para el alcance); `o.etq(id)`: nombre de un stat; `o.X`: la X elegida al pagar el costo variable — sin `o.X` no se
+     toca ninguna «X» de los textos. La tirada personalizada, el daño que escala con X y los textos a mano valen igual
+     para los tres (antes el creep los perdía). */
+  function habEjecucion(h, c, o){
+    if(tipoEjecucion(c) === '' || c.modo === 'arma' || c.modo === 'flash') return null;
+    o = o || {};
+    const etq = o.etq || (s => s), conX = o.X !== undefined && o.X !== null, X = nf(o.X);
+    const sx = t => conX ? sustituirX(t, X) : t;
+    // Regla (dueño, 2026-10-08): lo que se invoca con magia y puede hacer crítico (`critTipo`: la púa de hielo, el canto rodado) tira PdG, como un
+    // golpe común (Destreza); todo lo demás, PdG.Esp.
+    const stat0 = c.tira !== undefined ? c.tira : (h.tiradaStat || '');
+    const stat = nf(c.critTipo) > 0 && stat0 === 'pdgmg' ? 'pdg' : stat0;
+    const tipo = c.tipoDano || 'arcano';
+    // «El daño de tu arma» (2026-10-02, Daño en área): la fórmula del arma de quien la usa (`o.armaDano`, la que tira «Daño»).
+    const formula0 = c.danoArma ? formulaDanoHab({tiradaExtra: o.armaDano || ''}, {...c, danoFormula: ''}, o.X) : formulaDanoHab(h, c, o.X);
+    // + el Efecto especial (Ef.Esp) de quien la usa, entero (`danoSumaEsp: true`) o la mitad (0.5), para abajo (2026-10-10, Toque mágico).
+    const sumaEsp = c.danoSumaEsp && o.stat ? Math.floor(nf(o.stat('dmgesp')) * (c.danoSumaEsp === true ? 1 : nf(c.danoSumaEsp))) : 0;
+    const formula = sx(formula0 && sumaEsp > 0 ? `${formula0}+${sumaEsp}` : formula0);   // «Xd4» con la X elegida (Balas de sangre, 2026-10-13)
+    return {
+      nombre: h.nombre, objetivo: c.objetivo || 'enemigo', ...(h.detalle ? {detalle: String(h.detalle).slice(0, 600)} : {}),   // el texto, para el recuadro del duelo (2026-10-15)
+      alcance: c.objetivo === 'uno mismo' || (c.objetivo === 'area' && c.alcance === undefined) || c.objetivo === 'onda' || c.objetivo === 'cono' || c.objetivo === 'linea' ? 0 : alcanceHab(c, stat, o.stat),   // (un área con `alcance` explícito: hasta dónde va el centro, la Luz cegadora)
+      // `tiraBonoNivel` (2026-10-27, dueño: el Taunt y el Provocar, «PdG especial más nivel»): + el nivel de quien la usa (`o.nivel`).
+      tira: c.tiraFormula ? {formula: sx(c.tiraFormula), etq: c.tiraEtiqueta || 'Tirada'} : (stat ? {stat, etq: etq(stat), bono: nf(c.tiraBono !== undefined ? c.tiraBono : h.tiradaBono) + (c.tiraBonoNivel ? Math.max(0, Math.round(nf(o.nivel))) : 0), ...(nf(c.tiraMin) > 0 ? {min: nf(c.tiraMin)} : {})} : null),   // `min`: el mínimo de calidad de un pergamino (2026-10-23)   // stat + N (2026-10-15)
+      contra: contraDeEjecucion(c.contra, etq, sx),
+      // Daño «la diferencia» (2026-10-02, Drenar Vida): no se tira, es lo que quien la usa le ganó a la resistencia. «Drena»: quien la
+      // usa se cura lo que hizo de daño, y puede pasar su vida máxima hasta `drenaTope` % (como Vida extra).
+      // Daño directo (ignora la Defensa especial: proyectiles chicos) y True Damage (ignora toda defensa y la Res. elemental): dueño, 2026-10-07.
+      dano: c.dano && (formula || c.danoDiferencia) ? {formula: c.danoDiferencia ? '' : formula, tipo, ignoraDef: c.trueDamage ? true : c.ignoraDano !== undefined ? !!c.ignoraDano : tipo !== 'fisico',
+        ...(c.trueDamage ? {trueDamage: true} : c.danoDirecto && (tipo !== 'fisico' || c.ignoraDano) ? {directo: true} : {}),   // (físico directo: el Pisotón, 2026-10-26)
+        ...(nf(c.danoMult) > 1 ? {mult: nf(c.danoMult)} : {}), ...(porDanoNorm(c.porDano) ? {porDano: porDanoNorm(c.porDano)} : {}), ...(c.carga ? {carga: String(c.carga)} : {}),   // ✨ Carga Elemental (2026-10-13)
+        ...(c.danoArma && nf(o.armaPerfora) > 0 && tipo === 'fisico' ? {perfora: Math.min(5, Math.round(nf(o.armaPerfora)))} : {}),   // 🗡 la Perfora del arma, con «el daño de tu arma» (2026-10-27: Abanico, Remolino…)
+        ...(c.danoDiferencia ? {diferencia: true} : {}), ...(c.drena ? {drena: true, drenaTope: Math.max(0, nf(c.drenaTope)), ...(nf(c.drenaPct) > 0 && nf(c.drenaPct) < 100 ? {drenaPct: Math.round(nf(c.drenaPct))} : {})} : {})} : null,   // drenaPct: cura solo ese % (2026-10-07, la Sanguijuela)
+      efectos: (c.efectos || []).map(e => efectoDeEjecucion(conX && e && e.stacks === 'X' ? {...e, stacks: Math.max(1, Math.round(X))} : e, o.stat)),   // stacks «X» (Apuntar, 2026-10-11)
+      ...(c.objetivo === 'area' || c.objetivo === 'onda' ? {radio: nf(c.radio)} : {}),
+      // El centro del área, a `centroAlcance` casillas o menos de quien la usa (2026-10-13, Golpe al piso del Capataz kobold: «le pega al
+      // casillero enfrente suyo y hace daño en flor alrededor de donde golpea»; si golpea a alguien, alrededor de él).
+      ...(c.objetivo === 'area' && (c.centroAlcance === 'rango' ? Math.round(nf(o.stat ? o.stat('rng') : 0)) : Math.round(nf(c.centroAlcance))) > 0 ? {centroAlcance: c.centroAlcance === 'rango' ? Math.max(1, Math.round(nf(o.stat('rng')))) : Math.round(nf(c.centroAlcance))} : {}),
+      // Solo a los aliados (2026-10-13, ¡A laburar! del Capataz kobold: un grito que bendice a los suyos y no a los rivales).
+      ...((c.objetivo === 'area' || c.objetivo === 'onda') && c.aliados ? {aliados: true} : {}),
+      ...(c.objetivo === 'linea' ? {largo: c.largo === 'rango' ? Math.max(1, alcanceHab({alcance: 'rango'}, stat, o.stat) || 1) : Math.max(1, Math.round(nf(c.largo)) || 4)} : {}),   // línea recta desde quien la usa (2026-10-05, Varita láser); `largo: 'rango'` = todo su Rango (2026-10-25, la Lanza de luz)
+      ...((c.objetivo === 'onda' || c.objetivo === 'cono') && c.ondaDodge ? {dodge: true} : {}),
+      // 🦶 Resistir o esquivar (2026-10-26, el Pisotón, dueño: «que pueda elegir dodge roll o resistir»): con `contra` [resistencia, 'eva'], quien se
+      // defiende con la Evasión y la gana tiene que salir con el dodge roll; con la resistencia, ganarla alcanza.
+      ...((c.objetivo === 'onda' || c.objetivo === 'cono') && c.dodgeConEva ? {dodgeConEva: true} : {}),
+      ...(c.objetivo === 'area' && c.sinDodge ? {sinDodge: true} : {}),   // un área que no se esquiva corriendo (la Luz cegadora, 2026-10-20: un destello se resiste, no se esquiva)   // la onda o el cono que deja dodge roll (Daño en área, Ráfaga arcana)
+      ...(c.objetivo === 'aliado' && c.conmigo ? {conmigo: true} : {}),   // un aliado o uno mismo (Heal del Support, 2026-10-11)
+      ...(c.objetivo === 'enemigo' && nf(c.salto) > 0 ? {saltoHab: Math.min(5, Math.round(nf(c.salto))), ...(c.corre ? {corre: true} : {})} : {}),   // 💥 el Takle (2026-10-26): corre hasta quedar pegado, gratis (vtt-hexgrid/js/55)
+      ...(c.objetivo === 'onda' && c.conVista ? {conVista: true} : {}),
+      ...(c.objetivo === 'onda' && c.giro ? {giro: true} : {}),   // Remolino (2026-10-13): antes de pegar, se mueve 1 casilla gratis y alcanza a los de las dos posiciones   // la luz (2026-10-05, Varita de la luz): solo los que ve (los sólidos la tapan)
+      // Tercera tanda de armas especiales (2026-10-05): lo que deja en el suelo un área (bola de fuego, ventisca), el −1 por casillero (pelea
+      // cercana), lo que atrae (gancho, con la Fuerza del objetivo contra el Ef.Esp de quien la usa), los dos misiles que se reparten y el
+      // crítico de lo físico invocado (Tipo de su familia: estaca 4, canto rodado 10).
+      ...(c.zonaQueda ? {zonaQueda: {...c.zonaQueda, ...(c.zonaQueda.tira && o.stat ? {tiraValor: Math.round(nf(o.stat(c.zonaQueda.tira)))} : {})}} : {}),
+      ...(c.menosDistancia ? {menosDistancia: true} : {}),
+      ...(c.danoSiempre ? {danoSiempre: true} : {}),   // ⚡ el daño entra siempre; la tirada es solo para los estados (Zap, 2026-10-25)
+      ...(c.menosPorOrden ? {menosPorOrden: true} : {}),   // −1 a cada uno de los siguientes en la línea (2026-10-08, láser largo)
+      ...(c.despeja ? {despeja: true} : {}),   // apaga el fuego y despeja la niebla que toca (2026-10-08, vendaval)
+      // ☀ El destello (2026-10-26, Luz para los suyos, dueño: «un destello, ¡fum!, que sucede y no queda como área»): al lanzarse, a todos los rivales
+      // de adentro el estado (Marcado: les saca el sigilo) sin tirada, y las trampas rivales de adentro quedan a la vista. Lo hace el mapa (js/13).
+      ...(c.objetivo === 'area' && c.destello ? {destello: {nombre: String(c.destello.nombre || 'Marcado'), turnos: Math.max(1, Math.round(nf(c.destello.turnos)) || 2)}} : {}),
+      // El riesgo (2026-10-08, Varita inestable): si en los dados del daño sale `si` (un 1), quien la usa se hace `dano`.
+      ...(c.riesgo ? {riesgo: {si: Math.max(1, Math.round(nf(c.riesgo.si)) || 1), dano: String(c.riesgo.dano || '2d4'), ...(c.riesgo.porCada ? {porCada: true} : {})}} : {}),
+      ...(c.fuegoAmigo ? {fuegoAmigo: true} : {}),
+      ...(c.sagrado ? {sagrado: true} : {}),   // Smite (Support, 2026-10-13): contra un no-muerto o un demonio, el doble de dados
+      // Tormenta arcana (Mago, 2026-10-13): `proyectiles` (1d20) que caen al azar, de `cada` (1d4) cada uno; sin tirada: solo se zafa con el dodge roll.
+      ...(c.objetivo === 'area' && c.tormenta ? {tormenta: {proyectiles: String(c.tormenta.proyectiles || '1d20'), cada: String(c.tormenta.cada || '1d4')}, soloDodge: true} : {}),   // un área que también agarra a los aliados (2026-10-07, Bola de fuego mayor)
+      ...(c.atrae ? {atrae: {casillas: Math.max(1, Math.round(nf(c.atrae.casillas)) || 2), contra: c.atrae.contra || 'fue', ...(o.stat ? {tiraValor: Math.round(nf(o.stat(c.atrae.tira || 'dmgesp')))} : {})}} : {}),
+      // (+ el Ef.Esp de quien la usa, a cada misil: la Andanada arcana del Mago, 2026-10-25; la Varita de misiles no lo suma.)
+      ...(c.reparte ? {reparte: {cada: String(c.reparte.cada || '1d4') + (sumaEsp > 0 ? `+${sumaEsp}` : ''), total: Math.max(2, Math.round(nf(c.reparte.total)) || 2)}} : {}),
+      ...(nf(c.critTipo) ? {critTipo: Math.round(nf(c.critTipo))} : {}),   // la luz (2026-10-05, Varita de la luz): solo los rivales en sigilo que alcanza
+      // Rayo en cadena (2026-10-05, Varita de chispa eléctrica): si el golpe entra, salta `saltos` veces al más cercano del mismo bando a
+      // `rango` casillas o menos, la mitad cada salto (P118: la misma regla de ⚡ Rayo en cadena del token y de la trampa Descarga).
+      ...(c.cadena ? {cadena: {saltos: Math.max(1, Math.round(nf(c.cadena.saltos)) || 2), rango: Math.max(1, Math.round(nf(c.cadena.rango)) || 4), ...(c.cadena.efectos ? {efectos: true} : {}), ...(Array.isArray(c.cadena.paralisis) ? {paralisis: c.cadena.paralisis.map(nf)} : {})}} : {}),   // efectos: también a los que salta (2026-10-07); paralisis: el % de cada salto (Zap, 2026-10-25)
+      ...(c.efectoLibre ? {efectoLibre: sx(c.efectoLibre)} : {}),
+      ...(c.efectosNota ? {efectosNota: sx(c.efectosNota)} : {}),
+      ...(c.contraOtro ? {contraOtro: c.contraOtro} : {}),
+    };
+  }
+  /* El daño que deja un estado según cuánto entró (2026-10-13, Carga Elemental; dueño: «que pueda existir como regla, pero que no sea la regla
+     general»): `porDano = {estado, cada, mas1}` → 1 stack cada `cada` de daño que entró de verdad, mínimo 1 (Veneno cada 3);
+     con `mas1`, 1 y uno más cada `cada` (la Escarcha y la Armadura rota: 1, y un segundo cada 5). Sin daño, nada. Lo aplica el mapa del GM (js/13, dueloPorDano).
+     `desde`: solo si entró al menos eso; `tope`: como mucho tantos stacks (2026-10-13, Lluvia de esquirlas del Chamán del cristal, dueño:
+     «si le hace más de 4 puntos de daño, le aplica uno de escarcha» → {estado:'Escarcha', desde:5, tope:1}). */
+  /* Lo que un arma especial (un báculo) suma al daño por el Ef.Esp de quien la usa: `sumaEspecial` true = entero, 0.5 = la mitad, 0.25 = un
+     cuarto. Redondeado para arriba (2026-10-17, dueño, con el Báculo de escarcha: «en la división del especial, lo redondearía hacia arriba»;
+     es un buff). */
+  const sumaEspecialDe = (dmgesp, v) => v ? Math.max(0, Math.ceil(nf(dmgesp) * (v === true ? 1 : nf(v)))) : 0;
+  const sumaEspecialTxt = v => v === true ? 'tu Ef.Esp' : nf(v) === 0.5 ? '½ de tu Ef.Esp' : nf(v) === 0.25 ? '¼ de tu Ef.Esp' : nf(v) ? `${nf(v)} × tu Ef.Esp` : '';
+  /* Las Tiradas de stats en columnas, cada atributo con lo que sale de él debajo (2026-10-18, dueño: «la botonera de los jugadores muestra los
+     botones bien, pero la de los creeps se ve desordenada»): el mismo orden que la del personaje (FichaCalculo.GRUPOS). → 5 listas de ids. */
+  const COLUMNAS_STATS = [['con', 'resmg', 'rescc'], ['fue', 'dmg', 'bloqueo'], ['agl', 'eva', 'ini'], ['des', 'rng', 'pdg', 'percepcion', 'sigilo'], ['esp', 'pdgmg', 'dmgesp', 'resm']];
+  const columnasStats = ids => COLUMNAS_STATS.map(col => col.filter(id => (ids || []).includes(id)));
+  function porDanoNorm(p){
+    if(!p || !String(p.estado || '').trim()) return null;
+    const desde = Math.max(0, Math.round(nf(p.desde))), tope = Math.max(0, Math.round(nf(p.tope))), turnos = Math.max(0, Math.round(nf(p.turnos)));
+    // `turnos`: cuánto dura el estado que deja (2026-10-17, dueño: la Escarcha del Báculo de escarcha, 1 turno); sin él, la del preset.
+    const base = Math.max(0, Math.round(nf(p.base)));   // `base` (2026-10-25, la Ponzoña: «2 stacks más 1 por cada 5 de daño»): con `mas1`, desde cuántos arranca
+    return {estado: String(p.estado).trim().slice(0, 30), cada: Math.max(1, Math.round(nf(p.cada)) || 4), ...(p.mas1 ? {mas1: true} : {}), ...(base > 1 ? {base} : {}),
+      ...(desde > 1 ? {desde} : {}), ...(tope > 0 ? {tope} : {}), ...(turnos > 0 ? {turnos} : {})};
+  }
+  function stacksPorDano(entro, p){
+    const d = Math.max(0, Math.floor(nf(entro))), q = porDanoNorm(p);
+    if(!q || d <= 0 || (q.desde && d < q.desde)) return 0;
+    const n = q.mas1 ? (q.base || 1) + Math.floor(d / q.cada) : Math.max(1, Math.floor(d / q.cada));
+    return q.tope ? Math.min(q.tope, n) : n;
+  }
+  const porDanoTxt = p => {
+    const q = porDanoNorm(p);
+    if(!q) return '';
+    const dura = q.turnos ? ` (${q.turnos} turno${q.turnos === 1 ? '' : 's'})` : '';
+    if(q.tope === 1) return `${q.estado}: 1${q.desde ? ` si entran ${q.desde} o más de daño` : ''}${dura}`;
+    const base = q.mas1 ? `${q.estado}: ${q.base || 1}, y uno más cada ${q.cada} de daño` : `${q.estado}: 1 stack cada ${q.cada} de daño (mínimo 1)`;
+    return base + (q.desde ? `, si entran ${q.desde} o más` : '') + (q.tope ? `, hasta ${q.tope}` : '') + dura;
+  };
+  /* ✨ Carga Elemental (Mago, 2026-10-13, dueño): los cinco elementos y lo que le cambian a la Ejecución de la skill de daño. */
+  const CARGAS = {
+    fuego: {nombre: 'Fuego', icono: '🔥', que: '+50 % de daño (para arriba)', duelo: {tipoDano: 'fuego', danoMult: 1.5}},
+    hielo: {nombre: 'Frío', icono: '❄', que: 'Escarcha: 1, y una más cada 5 de daño que entra', duelo: {tipoDano: 'hielo', porDano: {estado: 'Escarcha', cada: 5, mas1: true}}},
+    rayo: {nombre: 'Eléctrico', icono: '⚡', que: 'salta al rival más cercano (4 casillas o menos) con la mitad del daño que entró, sin repetir, hasta llegar a 1; 20 % de Parálisis al primero', duelo: {tipoDano: 'eléctrico', cadena: {saltos: 99, rango: 4}, paralisis: {nombre: 'Parálisis', turnos: 1, caras: 10, exitos: 2}}},
+    acido: {nombre: 'Ácido', icono: '🧪', que: 'Armadura rota: 1, y una más cada 5 de daño que entra', duelo: {tipoDano: 'ácido', porDano: {estado: 'Armadura rota', cada: 5, mas1: true}}},
+    toxico: {nombre: 'Tóxico', icono: '☠', que: 'Veneno: 1 stack cada 3 de daño que entra (mínimo 1)', duelo: {tipoDano: 'tóxico', porDano: {estado: 'Veneno', cada: 3}}},
+  };
+  // ¿Esta Ejecución se puede cargar? Una skill (no un arma especial) de daño especial que se tira (no el arma, no la diferencia), no una zona.
+  const cargable = (it, c) => !!(it && !it.deItem && c && typeof c === 'object' && c.dano && !c.danoArma && !c.danoDiferencia && (c.tipoDano || 'arcano') !== 'fisico' && c.objetivo !== 'zona' && c.modo !== 'arma' && c.modo !== 'flash');
+  // La Ejecución con la carga puesta (una copia): el tipo de daño, el ×, el estado por daño, el salto y la Parálisis al primero.
+  function conCarga(c, clave){
+    const k = CARGAS[clave];
+    if(!k) return c;
+    const x = {...c, ...k.duelo, carga: k.nombre};
+    if(k.duelo.paralisis){ delete x.paralisis; x.efectos = [...(c.efectos || []), k.duelo.paralisis]; }
+    return x;
+  }
+  // La fórmula de daño de la Ejecución: la de la habilidad («tiradaExtra») más danoFijoPorX × X (P119); sin X, tal cual.
+  /* Con qué se resiste (2026-10-15, dueño: «"se resiste con" debe tener "otro stat" y "fórmula propia"»): cada entrada es el id de un stat
+     ('eva'), un stat más un número ({stat, bono}: «des + 2») o una fórmula de dados ({formula, etq}: «1d6+2»). Cada una lleva su `modo` (lo
+     que elige el objetivo en el duelo). */
+  function contraDeEjecucion(lista, etq0, sx){
+    const etq = s => s === 'eva' ? 'Evasión' : etq0(s);   // en el duelo, con todas las letras (2026-10-24: decía «Eva»; la Botonera sigue con la corta)
+    return (lista || []).map((x, i) => {
+      if(typeof x === 'string') return {modo: x, stat: x, etq: etq(x)};
+      if(x && x.formula) return {modo: 'f' + i, formula: sx ? sx(String(x.formula)) : String(x.formula), etq: String(x.etq || 'Resistencia').slice(0, 30)};
+      if(x && x.stat) return {modo: x.stat + (nf(x.bono) ? (nf(x.bono) > 0 ? '+' : '') + nf(x.bono) : ''), stat: x.stat, bono: nf(x.bono), etq: `${etq(x.stat)}${nf(x.bono) ? (nf(x.bono) > 0 ? ' +' : ' ') + nf(x.bono) : ''}`};
+      return null;
+    }).filter(Boolean);
+  }
+  // La fórmula del daño: la que escribió la Ejecución (`danoFormula`, 2026-10-15: el daño se edita en su recuadro) o la «segunda tirada» de la
+  // habilidad; más `danoMas` (un fijo y/o un dado: «+2», «+1d6»), que también se suma al daño de tu arma.
+  function formulaDanoHab(h, c, X){
+    const base0 = String((c && c.danoFormula) || (h && h.tiradaExtra) || '').trim();
+    const mas = String((c && c.danoMas) || '').replace(/\s+/g, '');
+    const base = base0 && mas ? `${base0}${/^[+-]/.test(mas) ? '' : '+'}${mas}` : base0;
+    const extra = X !== undefined && X !== null && c && c.danoFijoPorX ? nf(c.danoFijoPorX) * nf(X) : 0;
+    return base && extra ? `${base}${extra > 0 ? '+' : ''}${extra}` : base;
+  }
+  /* Lo que el mapa necesita para dejar puesta la zona persistente de una habilidad (el mensaje 'zona-persistente-habilidad',
+     igual para personaje y creep). `o.fichaId` y `o.tipo` ('pj'|'creep'): quién la usa; `o.X`: el costo variable;
+     `o.resistValor`: la tirada de «tira», hecha UNA vez y reusada contra cada uno que entra o sigue adentro. */
+  // Daño «la diferencia» (2026-10-02, Pedos Tóxicos): `zonaDanoDif` = cada uno que no resiste recibe la tirada de quien la creó
+  // menos la suya; `zonaTiraExtra` (ej. '1d20') + `zonaNota`: si el daño entra, se tira y se publica con ese texto (a mano).
+  const TIPO_DANO_NOMBRE = {arcano: 'arcano', fuego: 'de fuego', hielo: 'de hielo', rayo: 'eléctrico', toxico: 'tóxico', acido: 'ácido', luz: 'de luz', siniestro: 'siniestro', fisico: 'físico'};
+  function zonaDeHab(h, c, o){
+    o = o || {};
+    const dif = !!(c.dano && c.danoDiferencia);
+    return {tipo: 'zona-persistente-habilidad', fichaId: o.fichaId, casteadorTipo: o.tipo, nombre: h.nombre,
+      radio: Math.max(1, nf(c.radio) || 1), zonaTurnos: Math.max(1, nf(c.zonaTurnos) || 3), zonaAmiga: !!c.zonaAmiga, zonaAltura: c.zonaAltura || '',
+      zonaEstado: zonaEstadoConTirada(c, o), zonaDano: c.dano && !dif ? formulaDanoHab(h, c, o.X) : (dif && c.danoSuma ? String(c.danoSuma) : ''),   // con «la diferencia», `danoSuma` se le suma (miasma: + 1d4)
+      zonaIgnoraDef: c.dano ? (c.ignoraDano !== undefined ? !!c.ignoraDano : (c.tipoDano || 'arcano') !== 'fisico') : false,
+      zonaDirecto: !!(c.dano && (c.danoDirecto || c.trueDamage) && (c.tipoDano || 'arcano') !== 'fisico'),   // daño directo: no lo frena la Defensa especial (2026-10-07)
+      zonaDanoDif: dif, zonaDanoTipo: c.dano ? (TIPO_DANO_NOMBRE[c.tipoDano || 'arcano'] || '') : '',
+      zonaTiraExtra: c.dano && c.danoExtra ? String(c.danoExtra) : '',
+      zonaNota: c.efectoLibre ? (o.X === undefined || o.X === null ? String(c.efectoLibre) : sustituirX(String(c.efectoLibre), o.X)) : (c.dano && c.danoExtra ? porTiradaTxt(c.danoExtraEfectos) : ''),   // sin texto a mano, lo que dice la tabla
+      resistStat: (c.contra && c.contra[0]) || '', resistValor: o.resistValor === undefined ? null : o.resistValor,
+      // La tirada de la zona (2026-10-02, P143): el stat de quien la crea y su VALOR en ese momento; el mapa lo tira cada vez que la zona
+      // afecta a alguien (antes se tiraba una sola vez al ejecutar: `resistValor`, que sigue valiendo para las zonas viejas).
+      tiraStat: c.tira || '', tiraValor: Number.isFinite(o.tiraValor) ? Math.round(o.tiraValor) : null,
+      ...(c.niebla ? {niebla: true} : {}),   // la niebla (2026-10-05, Varita de niebla): tapa la vista, no hace nada más
+      ...(/^#[0-9a-fA-F]{6}$/.test(c.zonaColor || '') ? {zonaColor: c.zonaColor} : {}),
+      // (2026-10-08) cada paso adentro la dispara (campo de estática); afecta enseguida a los que ya están adentro («aparece bajo los pies»);
+      // es una luz (luz flotante: ilumina y deja ver lo oculto mientras dura).
+      ...(c.zonaCadaPaso ? {zonaCadaPaso: true} : {}), ...(c.zonaInmediata ? {zonaInmediata: true} : {}), ...(c.zonaLuz ? {zonaLuz: true} : {}),
+      ...(c.zonaEnMantenimiento === false ? {zonaEnMantenimiento: false} : {}),   // solo al pisarla (el campo de estática), no por quedarse
+      ...(c.zonaAlcance === 'rango' ? {zonaAlcance: 'rango'} : {}), ...(c.zonaSoloVisible ? {zonaSoloVisible: true} : {}),   // dónde se puede tirar (la Bombucha de talco)
+      // La forma (2026-10-08): 'linea' (muro de fuego: inicio y hacia dónde sigue) o 'camino' (chorro de lava: casilla por casilla, cada una pegada
+      // a la anterior, la primera a ⅓ de tu Rango), de `zonaLargo` casillas. Sin forma: la flor de siempre.
+      ...(['linea', 'camino'].includes(c.zonaForma) ? {zonaForma: c.zonaForma, zonaLargo: Math.max(2, Math.min(8, Math.round(nf(c.zonaLargo)) || 3))} : {})};
+  }
+  // El estado que deja la zona. Si se suelta contra un stat de quien la tira (2026-10-07, Varita de arena movediza: Fuerza contra tu Ef.Esp) y es el
+  // mismo stat que tira la zona, la dificultad es ese valor al crearla.
+  function zonaEstadoDe(c, o){
+    const e = c.zonaEstado || null;
+    if(!e || !e.soltar || !e.soltar.difStat || e.soltar.difStat !== c.tira || !Number.isFinite(o.tiraValor)) return e;
+    return {...e, soltar: {...e.soltar, dif: Math.max(1, Math.round(n(e.soltar.difMin)), Math.round(o.tiraValor))}};
+  }
+  // 🎲 La tabla «según la tirada extra» (2026-10-22) va adentro del JSON de `zonaEstado` (`porTirada`): el mapa la lee al tirar (js/66).
+  function zonaEstadoConTirada(c, o){
+    const e = zonaEstadoDe(c, o);
+    const pt = c.dano && c.danoExtra ? porTiradaNorm(c.danoExtraEfectos) : [];
+    return pt.length ? {...(e || {}), porTirada: pt} : e;
+  }
+  // La trampa que coloca una habilidad, lista para el mapa: si no trae nombre propio, lleva el de la habilidad.
+  // `valorDe(statId)` (2026-10-02, P145): el valor de un stat de quien la coloca — la dificultad para detectarla sale de su Destreza (trampas
+  // físicas) o de su Efecto especial (mágicas, `detectarStat: 'dmgesp'`), en el momento de colocarla. Sin `valorDe`, queda la de siempre (6).
+  /* El mínimo para detectar una trampa comprada (dueño, 2026-10-23: «es algo que pagaste»): por su calidad. Si quien la coloca tiene más (su
+     Destreza o su Efecto especial, más los Guantes de trampero), vale eso. */
+  const DETECTAR_MIN_TIER = {'Común': 7, 'Buena Calidad': 9, 'Raro': 11};
+  const detectarMinDe = tier => DETECTAR_MIN_TIER[String(tier || '').trim()] || 0;
+  /* ❤ La Vida extra que da una cura que pasa del máximo (P227, dueño, 2026-10-27): cuánta suma, sin pasar `pct` % del máximo contando la que ya tiene
+     (`excedenteConTope`), y el estado (`estadoVidaExtra`). El Relicario de sangre: hasta +50 % (`RELICARIO_TOPE`), como el Drenar vida. */
+  const RELICARIO_TOPE = 50;
+  const vidaExtraTotal = estados => (estados || []).filter(e => e && e.activo !== false && (e.excedenteVida || e.excedente)).reduce((a, e) => a + n(e.escudoMagicoActual ?? e.escudo ?? e.escudoMagico), 0);   // (el resumen público: `excedente`, `escudo`)
+  function excedenteConTope(estados, sobra, hpmax, pct){
+    const tope = Math.floor(n(hpmax) * n(pct) / 100), antes = vidaExtraTotal(estados);
+    return n(sobra) > 0 && tope > antes ? Math.min(tope, antes + Math.round(n(sobra))) - antes : 0;
+  }
+  const estadoVidaExtra = (monto, o) => ({id: (o && o.id) || ('ve' + Date.now()), nombre: 'Vida extra', polaridad: 'buff', activo: true, permanente: true, turnos: 0, stacks: 1, excedenteVida: true,
+    escudoMagico: Math.round(n(monto)), escudoMagicoActual: Math.round(n(monto)), ...(o && o.finCombate ? {finCombate: true} : {}), detalle: (o && o.detalle) || 'Vida de más: lo que una cura pasó del máximo.'});
+  const relicarioEnEquipo = inventario => (inventario || []).some(i => i && i.equipado && n(i.relicario) > 0 && !(i.dur !== undefined && n(i.dur) <= 0 && i.durable));
+  function trampaDeHab(h, valorDe){
+    const t = h && h.trampaColocar;
+    if(!t) return null;
+    const out = {...t, nombre: String(t.nombre || '').trim() || h.nombre};
+    if(typeof valorDe === 'function'){
+      const v = Number(valorDe(t.detectarStat === 'dmgesp' ? 'dmgesp' : 'des'));
+      const oculta = Math.max(0, Math.round(n(valorDe('trampaoculta'))));   // Guantes de trampero (2026-10-05): tus trampas, más difíciles de ver
+      if(Number.isFinite(v)) out.detectar = Math.max(1, Math.round(n(t.detectarMin)), Math.round(v) + oculta);   // `detectarMin`: el mínimo de una trampa comprada (por su calidad, 2026-10-23)
+      // La tirada para evitarla o para soltarse, contra un stat de quien la coloca (dueño, 2026-10-07: la trampa portal, Res.Esp contra tu
+      // Ef.Esp): `salvacion.difStat` / `soltar.difStat`. Sin `valorDe`, queda la dificultad fija que traiga (`dif`).
+      ['salvacion', 'soltar'].forEach(k => {
+        if(!t[k] || !t[k].difStat) return;
+        const d = Number(valorDe(t[k].difStat));
+        if(Number.isFinite(d)) out[k] = {...t[k], dif: Math.max(1, Math.round(n(t[k].difMin)), Math.round(d) + Math.round(n(t[k].difMas)))};   // `difMas`: + N (la trampa portal Buena: tu Ef.Esp + 2)
+      });
+      // La zona que deja, con la misma dificultad (los Abrojos, 2026-10-27): `zonaResistDifStat` = de qué stat de quien la pone sale.
+      if(t.zonaResistDifStat){ const d = Number(valorDe(t.zonaResistDifStat)); if(Number.isFinite(d)) out.zonaResistValor = Math.max(1, Math.round(d)); }
+    }
+    return out;
+  }
+  /* «Ataque con mi arma, con arreglos» (Golpe brutal, Carga, Takle…): el ataque que va al duelo, con lo que le suma la
+     habilidad (PdG, dados del Tipo del arma, daño fijo, crítico, ignorar resistencia a crítico, sin Parry, efectos al pegar
+     y los que solo pasan si es crítico). Igual para personaje y creep. `o.arma` = {id, nombre, tipoDado, rango} de quien
+     ataca; `o.alcance` = casilleros (lo calcula quien llama: el de su arma o el que diga la habilidad); `o.X` = el costo
+     variable (sin X, ninguna «X» de los textos se toca). */
+  function ataqueConArreglos(h, c, o){
+    if(!c || typeof c !== 'object' || c.modo !== 'arma') return null;
+    o = o || {};
+    const a = c.arma || {}, arma = o.arma || {}, conX = o.X !== undefined && o.X !== null, X = nf(o.X);
+    const sx = t => conX ? sustituirX(t, X) : t;
+    // La probabilidad del efecto (`caras`/`exitos`, 2026-10-13: el Mordisco infectado, 25 % = 4 en d4); sin eso, entra siempre.
+    // 🔓 Cómo se suelta (2026-10-21, el Mordisco feroz): `difStat` = el stat de quien ataca (`o.valorDe`); `danoFalla: 'golpe'` = el daño de este
+    // mismo golpe otra vez (`o.danoGolpe(dados)`: el arma con los dados de más de la habilidad, más su daño fijo).
+    const soltarDe = s => {
+      const v = s.difStat && typeof o.valorDe === 'function' ? Number(o.valorDe(s.difStat)) : NaN;
+      const g = s.danoFalla === 'golpe' && typeof o.danoGolpe === 'function' ? String(o.danoGolpe(nf(a.dados)) || '') + (nf(a.fijo) ? `+${nf(a.fijo)}` : '') : s.danoFalla;
+      return {...s, ...(Number.isFinite(v) ? {dif: Math.max(1, Math.round(nf(s.difMin)), Math.round(v))} : {}), ...(g && g !== 'golpe' ? {danoFalla: g} : {})};
+    };
+    const mapEf = e => ({nombre: e.nombre || (e.cura ? 'Curación' : ''), caras: Math.max(1, Math.round(nf(e.caras)) || 1), exitos: Math.min(Math.max(1, Math.round(nf(e.caras)) || 1), Math.max(1, Math.round(nf(e.exitos)) || 1)),
+      spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: nf(e.val)}] : e.mods, polaridad: e.stat ? (nf(e.val) >= 0 ? 'buff' : 'debuff') : undefined,
+        ...(nf(e.stacks) > 0 ? {stacks: Math.round(nf(e.stacks))} : {}),   // (Sangrado de N: Tajear, 2026-10-10)
+        ...(e.soltar ? {soltar: soltarDe(e.soltar)} : {})},
+      ...(e.clava ? {clava: {turnos: Math.min(6, Math.max(1, Math.round(nf(e.clava.turnos)) || 3))}} : {}),   // 📌 Clavar a la pared (2026-10-26): si choca contra algo sólido, Inmovilizado (vtt-hexgrid/js/13 dueloEmpujar)
+      ...(nf(e.vuela) > 0 ? {vuela: Math.round(nf(e.vuela))} : {}),   // 🎯 el arma vuela N casillas también en un ataque con el arma (el Tiro al arma, 2026-10-26)
+      ...(nf(e.empuja) > 0 ? {empuja: Math.round(nf(e.empuja))} : {}),   // el empujón (2026-10-21, la Cornada): no es un estado, lo hace el mapa
+      ...(typeof e.requiereDano === 'boolean' ? {requiereDano: e.requiereDano} : {}),   // 🛡 solo si el golpe hizo daño (el Golpe de escudo, 2026-10-27)
+      cura: nf(e.cura), detalle: e.detalle || ''});
+    const critico = c.critico ? {
+      ...(c.critico.efectos && c.critico.efectos.length ? {efectos: c.critico.efectos.map(mapEf)} : {}),
+      ...(c.critico.efectosNota ? {efectosNota: sx(c.critico.efectosNota)} : {}),
+    } : null;
+    // Por la espalda (2026-10-03): lo del arma más lo de la habilidad (`arma.espaldaPdg/Fijo/Critpot` del ✨, ej. Backstab).
+    const ESP = {pdg: 'espaldaPdg', fijo: 'espaldaFijo', critpot: 'espaldaCritpot'};
+    const esp = Object.keys(ESP).reduce((acc, k) => { const v = nf(arma.espalda && arma.espalda[k]) + nf(a[ESP[k]]); if(v > 0) acc[k] = v; return acc; }, {});
+    const perfora = Math.min(5, Math.round(nf(arma.perfora) + nf(a.perfora)));   // Perfora: la del arma + la de la habilidad (Tajear, 2026-10-10)
+    return {tipo: 'habilidad-arma', habNombre: h.nombre, ...(h.detalle ? {habDetalle: String(h.detalle).slice(0, 600)} : {}), armaId: arma.id || '', armaNombre: arma.nombre || '', tipoDado: arma.tipoDado, rango: !!arma.rango,
+      alcance: o.alcance, sinParry: !!a.sinParry || !!arma.sinParry, ...(Object.keys(esp).length ? {espalda: esp} : {}), ...(perfora > 0 ? {perfora} : {}),
+      mods: {pdg: nf(a.pdg) + nf(a.pdgPorX) * X, fuerza: nf(a.fuerza), dados: nf(a.dados) + nf(a.dadosPorX) * X,   // `dados`: fijos, del Tipo del arma (2026-10-20, Golpe fuerte de creep)
+        fijo: nf(a.fijo) + nf(a.fijoPorX) * X, ignoraResistCrit: nf(a.ignoraResistCrit), critBono: nf(a.critBono), critpotBono: nf(a.critpotBono),
+        ...(/^\d{1,2}d\d{1,3}$/i.test(String(a.dadoExtra || '')) ? {dadoExtra: String(a.dadoExtra).toLowerCase()} : {})},   // +1d6 de otro tamaño que el arma (2026-10-13)
+      efectos: (c.efectos || []).map(mapEf),
+      ...(c.efectosNota ? {efectosNota: sx(c.efectosNota)} : {}),
+      ...(critico && Object.keys(critico).length ? {critico} : {}),
+      ...(c.embestida ? {embestidaHab: true} : {}),
+      ...(nf(c.salto) > 0 ? {saltoHab: Math.min(5, Math.round(nf(c.salto)))} : {}), ...(c.aplasta ? {saltoAplasta: true} : {}),   // 🦘 el Salto (2026-10-21): salta hasta N casilleros y cae al lado del objetivo (vtt-hexgrid/js/55)
+      ...(nf(c.rafaga) > 1 ? {rafaga: Math.min(3, Math.round(nf(c.rafaga)))} : {}),   // 🗡 Ráfaga de cortes (2026-10-21): los efectos del arma y su Perfora, ×N (comun/duelo.js)
+      ...(c.punalada ? {punalada: c.punalada === 'trapera' ? 'trapera' : 'espalda'} : {}),
+      ...(c.abrirHerida ? {abrirHerida: true} : {}), ...(c.remate ? {remate: true} : {}), ...(c.desesperado ? {desesperado: true} : {}),   // 🗡 Remate / Ir por el herido (2026-10-23): +dados según la vida del objetivo (vtt-hexgrid/js/69)
+      ...(nf(c.manada) > 0 ? {manada: Math.min(5, Math.round(nf(c.manada)))} : {}),   // 👊 Patotear / Jauría (2026-10-21): +1 dado por aliado pegado al objetivo, hasta N (vtt-hexgrid/js/65)   // 🩸 Sal en la herida (2026-10-21): +2 dados si el objetivo ya sangra (vtt-hexgrid/js/64)   // 🗡 la puñalada (2026-10-21): el bono si está en la espalda (vtt-hexgrid/js/59)
+      ...(nf(c.alejarse) > 0 ? {alejarse: Math.min(4, Math.round(nf(c.alejarse)))} : {}),   // 💨 Picar y alejarse (2026-10-21): después del duelo, se aleja N casilleros gratis (vtt-hexgrid/js/57)   // 🐂 toma carrera (la Cornada, 2026-10-21): el mapa la hace al elegir el objetivo (vtt-hexgrid/js/55)
+      // ⚔🛡 La tanda del Choque pesado (2026-10-27; vtt-hexgrid/js/78): `sigue` (Golpe que sigue: si lo deja en 0, ataca a otro pegado), `arrastra` (Arrastrar:
+      // si pega, lo trae hasta quedar pegado), `cargaDerriba` (Carga que derriba: la carrera de hasta N; desde 3, Fuerza + X contra la Res.CC) y `escudoGolpe`
+      // (Golpe de escudo: pega con el escudo como un arma de Tipo 10, tantos d10 como su peso + el Dmg).
+      ...(c.sigue ? {sigue: true} : {}), ...(nf(c.arrastra) > 0 ? {arrastra: Math.min(5, Math.round(nf(c.arrastra)))} : {}),
+      ...(nf(c.cargaDerriba) > 0 ? {cargaDerriba: Math.min(6, Math.round(nf(c.cargaDerriba)))} : {}), ...(c.escudoGolpe ? {escudoGolpe: true} : {}),
+      ...(c.terminaTurno ? {terminaTurno: true} : {}), ...(c.soloCritico ? {soloCritico: true} : {}), ...(c.perforante ? {perforante: true} : {})};   // Proyectil perforante (2026-10-13): sigue al de atrás   // Headshot (2026-10-12): si no es crítico, falla   // Degollar (2026-10-10): al resolverse, termina el turno y pasa al final del orden
+  }
+  /* ⚡ Flash (P136, regla del dueño 2026-09-30): en el propio turno cuesta lo que dice la habilidad; en turno ajeno, EL DOBLE —
+     SP (personaje), cooldown (creep) y vida por igual, se use dentro del duelo o con el botón. `costo` = {sp, cd, hp};
+     `o.spAjeno`: si la habilidad tiene cargado a mano otro SP para turno ajeno, manda ese. */
+  function costoFlash(costo, turnoPropio, o){
+    const c = costo || {}, k = turnoPropio ? 1 : 2;
+    const out = {sp: Math.max(0, nf(c.sp)) * k, cd: Math.max(0, nf(c.cd)) * k, hp: Math.max(0, nf(c.hp)) * k};
+    const aj = o && o.spAjeno;
+    if(!turnoPropio && aj !== undefined && aj !== null && String(aj).trim() !== '') out.sp = Math.max(0, nf(aj));
+    return out;
+  }
+  const cdFlash = (cd, turnoPropio) => costoFlash({cd}, turnoPropio).cd;
+  /* ⚡ Flash: ¿esta Ejecución es un Flash que vale para esa tirada del duelo? `campo`: 'pdg', 'eva' (la defensa), 'bloqueo',
+     'fuerza' o 'dano'. Sin `modo`, para 'eva' vale si sirve para Evasión o Parry (la lista de opciones); con `modo`, para la
+     defensa que se eligió ('parry' o la Evasión). */
+  // Una habilidad con ⚡ Flash (se puede usar en turno ajeno, al doble): en las Botoneras late con un brillo (dueño, 2026-10-06).
+  // También una habilidad de creep marcada `flash` (2026-10-24, Bendecir el arma): se usa cuando sea; en turno ajeno, el doble (el mapa, js/12).
+  const esFlash = h => !!(h && (h.flash || (h.duelo && h.duelo.modo === 'flash')));
+  const FLASH_CSS = `<style>.bt-flash{animation:bt-flash-late 1.6s ease-in-out infinite;border-color:#ffd25a !important}
+@keyframes bt-flash-late{0%,100%{box-shadow:0 0 0 0 rgba(255,210,90,0)}50%{box-shadow:0 0 12px 3px rgba(255,210,90,.75)}}</style>`;
+  function flashPara(c, campo, modo){
+    if(!c || typeof c !== 'object' || c.modo !== 'flash' || !c.flash) return false;
+    const en = c.flash.en || [];
+    if(campo !== 'eva') return en.includes(campo);
+    return modo === undefined ? en.includes('eva') || en.includes('parry') : en.includes(modo === 'parry' ? 'parry' : 'eva');
+  }
+  // Solo sobre uno mismo y sin nada que tirar ni resistir (Blindaje y parecidos): se aplica directo, sin abrir el cuadro.
+  const sobreSiSinTiradas = hab => !!(hab && hab.objetivo === 'uno mismo' && !hab.tira && !hab.dano && !(hab.contra || []).length);
+  // Por qué una ✨ se ejecuta como 💰 en quien todavía no tiene esa parte (P134: a las invocaciones les falta la zona
+  // persistente; un ⚡ Flash se usa dentro del duelo, antes de una tirada). '' = se puede.
+  function ejecucionNoDisponible(c, quien){
+    const t = tipoEjecucion(c);
+    if(!t) return 'todavía no tiene armada la ejecución paso a paso (✨)';
+    if(quien === 'pj') return '';
+    if(t === 'flash') return 'un ⚡ Flash se usa dentro del duelo, antes de una tirada';
+    return '';
+  }
+
+  /* ---------- Repartos sugeridos de atributos (2026-10-02: los de los roles de creeps; los usan el asistente de creeps de GM Tools y el de
+     personaje nuevo, comun/asistente-personaje.js — decisión del dueño: las clases sugieren el reparto de su rol, siempre como orientación).
+     Pesos en el orden de los atributos: Con, Fue, Agl, Des, Esp. ---------- */
+  const ROLES = {brutal: 'Brutal (pega fuerte)', tanque: 'Tanque (aguanta)', rapido: 'Rápido (asalto)', rango: 'A distancia', mago: 'Mago', apoyo: 'Apoyo', debuffer: 'Debuffer (maldiciones)'};
+  const PESOS_ROL = {brutal: [.26, .30, .14, .16, .14], tanque: [.36, .26, .10, .12, .16], rapido: [.16, .18, .30, .24, .12],
+    rango: [.18, .10, .24, .32, .16], mago: [.20, .08, .16, .16, .40], apoyo: [.24, .10, .16, .14, .36], debuffer: [.22, .08, .18, .14, .38]};
+  // Cada clase de personaje, con el rol de creep que comparte su reparto.
+  const ROL_DE_CLASE = {warrior: 'brutal', asalto: 'rapido', tanque: 'tanque', mago: 'mago', shooter: 'rango', support: 'apoyo', debuffer: 'debuffer'};
+  // `total` puntos repartidos según `pesos`, con `minimo` en cada uno (los creeps: 1; un personaje nuevo: 3).
+  // (Con mínimo 1 da lo mismo que la cuenta que tenía GM Tools.)
+  function repartirAtributos(total, pesos, minimo){
+    const m = Math.max(0, Number(minimo) || 1);
+    const v = pesos.map(p => Math.max(m, Math.floor(total * p)));
+    let resto = total - v.reduce((a, b) => a + b, 0);
+    const orden = pesos.map((p, i) => [p, i]).sort((a, b) => b[0] - a[0]).map(x => x[1]);
+    for(let k = 0; resto > 0; k++, resto--) v[orden[k % orden.length]]++;
+    for(let k = 0, vueltas = 0; resto < 0 && vueltas < 1000; k++, vueltas++){ const i = orden[k % orden.length]; if(v[i] > m){ v[i]--; resto++; } }   // los mínimos se pasaron del total
+    return v;
+  }
+
+  /* Elementos (2026-10-04, dueño): el daño de un elemento se frena con la resistencia a ese elemento (Res. fuego…) y con la Defensa especial
+     (que resta TODO daño mágico, arcano o elemental). `elementoDe(texto)` reconoce el elemento en el tipo de un daño ('Fuego', 'de fuego',
+     'tóxico'…) → 'fuego' | 'hielo' | 'rayo' | 'toxico' | 'acido' | ''. */
+  const ELEMENTOS = {fuego: {etq: 'Res. fuego', icono: '🔥'}, hielo: {etq: 'Res. hielo', icono: '❄'}, rayo: {etq: 'Res. eléctrica', icono: '⚡'},   // «eléctrico» en lo que se ve (dueño, 2026-10-07: «rayo» es un haz); el id sigue `rayo`
+    toxico: {etq: 'Res. tóxico', icono: '☠'}, acido: {etq: 'Res. ácido', icono: '🧪'},
+    luz: {etq: 'Res. luz', icono: '☀'}, siniestro: {etq: 'Res. siniestro', icono: '🌑'}};   // ☀🌑 luz y siniestro (dueño, 2026-10-26, P221: ver identidadElemento)
+  /* Las cinco resistencias elementales en la Botonera y en Equipo y mochila (dueño, 2026-10-06: debajo de las resistencias a crítico), igual para
+     personajes, invocaciones y creeps. `valorDe(el)` → el número; `lupa(el)` → el botón 🔍 (o ''). Mismas clases que la fila de crítico. */
+  function resElementalesHtml(valorDe, lupa){
+    const tiles = Object.keys(ELEMENTOS).map(el => {
+      const v = n(valorDe(el)), etq = ELEMENTOS[el].etq.replace('Res. ', '');
+      const titulo = `${ELEMENTOS[el].etq}: se resta al daño de ${etq}${v < 0 ? ' — negativa: vulnerable, ese daño entra de más' : ''} (no se tira)`;
+      return `<div class="botonera-tile bt-info" title="${titulo}">${lupa ? lupa(el) : ''}<span class="bt-label">${ELEMENTOS[el].icono} ${etq.charAt(0).toUpperCase() + etq.slice(1)}</span><span class="bt-value"${v < 0 ? ' style="color:#e07a6a"' : ''}>${v < 0 ? '−' + fmtN(-v) : fmtN(v)}</span></div>`;
+    }).join('');
+    return `<div class="botonera-crit"><div class="botonera-crit-t">Resistencias elementales</div><div class="botonera-crit-grid">${tiles}</div></div>`;
+  }
+  // «Res. eléctrica 2» o, si es negativa, «Res. eléctrica −2 (vulnerable)»: lo que se muestra al restarla del daño (2026-10-06).
+  const resElementalTxt = (el, res) => `${ELEMENTOS[el] ? ELEMENTOS[el].etq : 'Res. ' + el} ${res < 0 ? '−' + (-res) + ' (vulnerable)' : res}`;
+  function elementoDe(texto){
+    const t = String(texto || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if(/fuego|llama|quema/.test(t)) return 'fuego';
+    if(/hielo|escarcha|frio/.test(t)) return 'hielo';
+    if(/rayo|electric|relampago/.test(t)) return 'rayo';
+    if(/toxic|veneno|espora/.test(t)) return 'toxico';
+    if(/acido/.test(t)) return 'acido';
+    if(/siniestr|sombr|oscur/.test(t)) return 'siniestro';   // 🌑 (2026-10-26)
+    if(/\bluz\b|de luz|radiante|sagrad/.test(t)) return 'luz';   // ☀ (2026-10-26)
+    return '';
+  }
+  const esMagicoTipo = texto => !!elementoDe(texto) || /arcan|magic/i.test(String(texto || ''));
+  /* ☀🌑 La identidad de la luz y de lo siniestro (dueño, 2026-10-26, P221: «me gusta esa definición»; «hagamos que el daño oscuro deje eso, un estado de
+     no se puede curar»). Como los demás elementos (el fuego quema, el hielo da Escarcha, el ácido rompe armadura…):
+     ☀ Luz: revela y castiga lo oscuro. Si entra daño, Marcado hasta su próximo turno; contra no-muertos y demonios, ×1,5 (para arriba).
+     🌑 Siniestro: la herida que no cierra. Si entra daño, Herida sombría (no se cura con nada hasta el final de su próximo turno); a no-muertos y
+     demonios no les hace nada (son de la sombra).
+     `identidadElemento(el, tipoCriatura)` → {mult (1 / 1,5 / 0), txt (por qué cambió), estado: el spec que deja si entra daño} o null. */
+  const CRIATURAS_OSCURAS = ['no-muerto', 'demonio'];
+  function identidadElemento(el, tipoCriatura){
+    const tc = String(tipoCriatura || '').toLowerCase().trim(), oscura = CRIATURAS_OSCURAS.includes(tc);
+    if(el === 'luz') return {mult: oscura ? 1.5 : 1, txt: oscura ? `la luz le pega ×1,5 (${tc})` : '', estado: {nombre: 'Marcado', turnos: 1}};
+    if(el === 'siniestro') return {mult: oscura ? 0 : 1, txt: oscura ? `lo siniestro no le hace nada (${tc})` : '', estado: oscura ? null : {nombre: 'Herida sombría'}};
+    return null;
+  }
+  // La Defensa especial (ex Defensa especial; dueño, 2026-10-07, P169) frena TODO el daño especial, también el tóxico (antes, 2026-10-05, el
+  // tóxico no). Lo que no frena: el daño directo (proyectiles chicos) y el True Damage — eso lo decide quien aplica el daño, no el elemento.
+  const frenaArmaduraMagica = () => true;
+
+  /* ✋ La parte a mano de un arma especial (2026-10-05, dueño: «siempre que un efecto o mecánica sea demasiado complejo de automatizar se debe
+     poder agregar una tirada o texto que lo explique, para que se resuelva manual»). `especial.aMano = {texto, tirada?, etiqueta?}`: al usarla, el
+     texto va a la Mesa («✋ A mano: …») y, si hay tirada, se tira sola con ese texto. → {texto, tirada, etiqueta} o null. */
+  function aManoEspecial(e){
+    const a = e && e.aMano;
+    if(!a) return null;
+    const texto = String(a.texto || '').trim(), tirada = String(a.tirada || '').replace(/\s+/g, '');
+    if(!texto && !tirada) return null;
+    return {texto, tirada, etiqueta: String(a.etiqueta || '').trim() || 'A mano'};
+  }
+  /* Guantes de Buena calidad (2026-10-05, dueño). `valorDe(statId)` = el stat de quien ataca (personaje, invocación o creep).
+     pdgExtraArma: el PdG con una familia de armas (pdgt4/6/8/10, según el Tipo) o a distancia (pdgdist), al atacar con esa arma.
+     ahorroEspecial: los No2 de menos del ataque de oportunidad (oporahorro) o del contraataque (contraahorro); quien llama hace max(0, costo − ahorro). */
+  function pdgExtraArma(valorDe, arma){
+    if(!arma || typeof valorDe !== 'function') return 0;
+    const v = st => Math.max(0, Math.round(n(valorDe(st))));
+    const t = n(arma.tipoDado);
+    return ([4, 6, 8, 10].includes(t) ? v('pdgt' + t) : 0) + (arma.armaDeRango ? v('pdgdist') : 0);
+  }
+  /* Un arma especial con modos (2026-10-08, Varita gemela: aceite o bola de fuego): cada modo es como un arma aparte —su propia casilla en la Botonera,
+     su costo y lo que hace— con id «<id>~<n>» y `_modoDe` = el id de la varita (los usos del turno y las cargas se cuentan en la varita). */
+  function especialesConModos(items){
+    const out = [];
+    (items || []).forEach(it => {
+      const e = (it && it.especial) || {};
+      if(!Array.isArray(e.modos) || !e.modos.length){ out.push(it); return; }
+      const {modos, ...base} = e;
+      modos.forEach((m, k) => out.push({...it, id: `${it.id}~${k}`, _modoDe: it.id, detalle: m.detalle || it.detalle,
+        especial: {...base, ...m, nombre: `${it.nombre}: ${m.nombre || 'modo ' + (k + 1)}`}}));
+    });
+    return out;
+  }
+  /* El caos (2026-10-08, Varita del caos): los estados que puede sortear y cuánto duran (docs/estados-turnos.md, la propuesta que corrige el
+     dueño: si cambia ahí, cambia acá). `spec` lista para EstadosAplicar (turnos de quien la usa; cantidades fijas donde el preset pregunta). */
+  const CAOS_ESTADOS = {
+    buff: [{nombre: 'Regeneración', turnos: 3, hp: 2}, {nombre: 'Hypeado', turnos: 2}, {nombre: 'Crítico frecuente', turnos: 2}, {nombre: 'Crítico potente', turnos: 2},
+      {nombre: 'Invulnerable', turnos: 1}, {nombre: 'Inmunidad a CC', turnos: 2}, {nombre: 'Espinas', turnos: 3}, {nombre: 'Espejo', turnos: 3},
+      {nombre: 'Vida extra', turnos: 3, escudoMagico: 10}, {nombre: 'Barrera', turnos: 2, escudoMagico: 8}, {nombre: 'Afortunado', turnos: 2},
+      {nombre: 'Sangre pura', turnos: 3}, {nombre: 'Coagulación', turnos: 3}, {nombre: 'Blindado', turnos: 2}, {nombre: 'Inamovible', turnos: 2},
+      {nombre: 'Sigilo'}],   // (dueño, 2026-10-08: el Sigilo también entra; dura hasta que lo descubran)
+    debuff: [{nombre: 'Veneno', stacks: 4}, {nombre: 'Sangrado', turnos: 2}, {nombre: 'Quemadura', turnos: 3}, {nombre: 'Escarcha', turnos: 2},
+      {nombre: 'Armadura rota'}, {nombre: 'Pajaritos', turnos: 2}, {nombre: 'Cansado', turnos: 2}, {nombre: 'Exhausto', turnos: 1},
+      {nombre: 'Stun', turnos: 1}, {nombre: 'Confusión', turnos: 2}, {nombre: 'Lisiado', turnos: 2}, {nombre: 'Inmovilizado', turnos: 1},
+      {nombre: 'Rengo', turnos: 2}, {nombre: 'Lento', turnos: 2}, {nombre: 'Miedo', turnos: 2}, {nombre: 'Provocado', turnos: 1},
+      {nombre: 'Parálisis', turnos: 1}, {nombre: 'Silencio', turnos: 1}, {nombre: 'Ceguera', turnos: 1}, {nombre: 'Marcado', turnos: 2}, {nombre: 'Sentado'},
+      {nombre: 'Desarmado', vuela: 2}],   // como la Expelliarmus: el arma vuela 2 casillas a un lado al azar
+  };
+  /* El d20 del caos (dueño, 2026-10-08, segunda vuelta): `caos = {exito}` (la Común 10, la Buena 8). Lo que se quiere es, a un aliado, un buff;
+     a un rival, un debuff. 20: sale bien y quien la usa elige cuál; exito…19: sale bien, al azar; 2…exito−1: sale al revés (al mismo objetivo), al
+     azar; 1: sale al revés y elige cuál el bando contrario. → {que: 'buff'|'debuff', a: 'objetivo', bien, elige: 'propio'|'rival'|''}. */
+  function caosResultado(d20, aliado, caos){
+    // Una copia vieja de la varita (la del d10: {exito: 6, contra, propio}) se juega como la Común nueva.
+    const ex = caos && caos.contra !== undefined ? 10 : Math.min(19, Math.max(2, n(caos && caos.exito) || 10)), d = n(d20);
+    const bien = d >= 20 || (d > 1 && d >= ex);
+    // 'rival' = el bando contrario a quien la usa: si la usa un jugador, el GM; si la usa un creep, los jugadores (dueño, 2026-10-08).
+    return {que: aliado === bien ? 'buff' : 'debuff', a: 'objetivo', bien, elige: d >= 20 ? 'propio' : d <= 1 ? 'rival' : ''};
+  }
+  // `excluir`: nombres que no pueden salir (el Desarmado contra un arma natural).
+  const caosEstado = (pol, azar, excluir) => { const l = (CAOS_ESTADOS[pol] || []).filter(e => !(excluir || []).includes(e.nombre)); return structuredClone(l[Math.floor((azar || Math.random)() * l.length)] || l[0]); };
+  const AHORRO_ESPECIAL = {oportunidad: 'oporahorro', contra: 'contraahorro', contraataque: 'contraahorro'};
+  function ahorroEspecial(tipo, valorDe){
+    const st = AHORRO_ESPECIAL[tipo];
+    return st && typeof valorDe === 'function' ? Math.max(0, Math.round(n(valorDe(st)))) : 0;
+  }
+  /* Cuánto No2 cuesta el ataque de un duelo y por qué (2026-10-08, dueño: «que diga cuántos nitros va a descontar, con el ? que explique de dónde
+     sale»). o = {tipoArma, hechos (ataques ya hechos con esa arma / en el turno), costo, tiene (No2 que tiene), ataque: 'normal'|'oportunidad'|'contra'|
+     'habilidad-arma'} → {no2, lineas}. Lo usan los ganchos `vista` de personajes, creeps e invocaciones. */
+  function costoAtaqueLineas(o){
+    const t = Math.round(n(o.tipoArma)) || 8, costo = Math.max(0, Math.round(n(o.costo))), mitad = Math.ceil(t / 2);
+    if(o.ataque === 'habilidad-arma') return {no2: 0, lineas: ['Los No2 de este ataque ya los cobró la habilidad.']};
+    const rc = recargaDe(o.arma);
+    if(rc){   // una ballesta (o.arma, opcional): Recarga N → N, 2N, 3N…
+      const h = Math.max(0, Math.round(n(o.hechos))), especial = o.ataque === 'oportunidad' || o.ataque === 'contra';
+      if(!especial && h === 0 && Math.round(n(o.costo)) === 0 && o.arma && o.arma.cargada)   // llega cargada (2026-10-10)
+        return {no2: 0, lineas: ['Llega cargada: este disparo es gratis (no disparó con ella el turno anterior)', recargaTxt(rc)]};
+      const base = especial ? rc : recargaCosto(o.arma, h), l = [recargaTxt(rc, o.arma)];
+      l.push(especial ? `${o.ataque === 'contra' ? 'Contraataque' : 'Ataque de oportunidad'}: lo de un primer disparo = ${rc}; no cuenta como disparo del turno`
+        : h ? `Ya disparó ${h === 1 ? 'una vez' : `${h} veces`} este turno: el disparo ${h + 1}.º = ${base}${base === rc * (h + 1) ? ` (${rc} × ${h + 1})` : ''}` : `Primer disparo del turno: ${rc}`);
+      if(costo !== base) l.push(`${costo < base ? 'Ahorro' : 'Recargo'} (arma, equipo o estados): ${costo < base ? '−' : '+'}${Math.abs(base - costo)}`);
+      l.push(`Cuesta ${costo} No2 · tiene ${Math.round(n(o.tiene))}${costo > n(o.tiene) ? ' (no le alcanzan: pregunta y deja seguir)' : ''}`);
+      return {no2: costo, lineas: l};
+    }
+    const l = [`Tipo del arma: ${t}`];
+    if(o.ataque === 'oportunidad' || o.ataque === 'contra') l.push(`${o.ataque === 'contra' ? 'Contraataque' : 'Ataque de oportunidad'}: lo de un primer ataque (Tipo ÷ 2${t % 2 ? ', para arriba' : ''} = ${mitad}); no cuenta como ataque del turno`);
+    // `porArma`: un personaje cuenta el primer ataque por arma (cada arma tiene el suyo a mitad de precio).
+    else if(n(o.hechos) > 0) l.push(`Ya atacó ${n(o.hechos) === 1 ? 'una vez' : `${Math.round(n(o.hechos))} veces`} ${o.porArma ? 'con esta arma' : ''} este turno: Tipo completo = ${t}`.replace('  ', ' '));
+    else l.push(`Primer ataque ${o.porArma ? 'con esta arma' : 'del turno'}: Tipo ÷ 2${t % 2 ? ', para arriba' : ''} = ${mitad}`);
+    const base = o.ataque === 'oportunidad' || o.ataque === 'contra' ? mitad : n(o.hechos) > 0 ? t : mitad;
+    if(costo !== base) l.push(`${costo < base ? 'Ahorro' : 'Recargo'} (arma, equipo o estados): ${costo < base ? '−' : '+'}${Math.abs(base - costo)}`);
+    l.push(`Cuesta ${costo} No2 · tiene ${Math.round(n(o.tiene))}${costo > n(o.tiene) ? ' (no le alcanzan: pregunta y deja seguir)' : ''}`);
+    return {no2: costo, lineas: l};
+  }
+
+  // Áreas por diámetro (dueño, 2026-10-08: «radio 1» se entendía como una sola casilla). Adentro se sigue guardando el radio (los anillos
+  // alrededor del centro: 0 = una casilla, 1 = la flor de 7, 2 = 19…); lo que se lee dice el diámetro y cuántas casillas son.
+  const diametro = radio => 2 * Math.max(0, Math.round(nf(radio))) + 1;
+  const casillasArea = radio => { const r = Math.max(0, Math.round(nf(radio))); return 3 * r * (r + 1) + 1; };
+  function areaTxt(radio){
+    const r = Math.max(0, Math.round(nf(radio)));
+    return r ? `diámetro ${diametro(r)} (${casillasArea(r)} casillas)` : 'una casilla (diámetro 1)';
+  }
+  // Las opciones de un <select> de tamaño: el valor es el radio, el texto dice el diámetro.
+  function diametroOpciones(radio, o = {}){
+    const min = o.min !== undefined ? o.min : 0, actual = Math.max(min, Math.round(nf(radio)));
+    const max = Math.max(o.max !== undefined ? o.max : 6, actual);
+    let h = '';
+    for(let r = min; r <= max; r++) h += `<option value="${r}"${r === actual ? ' selected' : ''}>Diámetro ${diametro(r)} · ${r ? `${casillasArea(r)} casillas${r === 1 ? ' (una flor)' : ''}` : 'una casilla'}</option>`;
+    return h;
+  }
+
+  /* Curar estados por grupo (P180, dueño 2026-10-08: «crear un ítem para cada debuff es un pésimo diseño: agruparlos conceptualmente… para tener
+     consumibles útiles y que la única salida no sea el Cura Plus, y que el Cura Plus además sea caro»). Un consumible con `curaEstados: ['heridas']`
+     saca, al usarlo, los estados de ese grupo; `['todo']` (el Cura Plus) saca los de todos los grupos. Lo que no está en ningún grupo no se cura con
+     un consumible: tiene su propia salida (Armadura rota se repara, Desarmado se levanta el arma, Sentado se levanta, Inmovilizado se suelta;
+     Silencio, Marcado y Mareo de invocación se esperan). Un estado nuevo que se pueda curar: sumarlo a su grupo acá. */
+  const GRUPOS_CURA = {
+    heridas: {label: 'Heridas', estados: ['Sangrado', 'Lisiado', 'Rengo']},
+    venenos: {label: 'Venenos', estados: ['Veneno', 'Veneno severo'], patron: /veneno|toxic/},   // cualquier veneno, también los que vengan
+    mente: {label: 'Mente e ilusiones', estados: ['Confusión', 'Miedo', 'Provocado', 'Ceguera']},
+    aturdimiento: {label: 'Aturdimiento', estados: ['Pajaritos', 'Stun']},
+    elementales: {label: 'Elementales', estados: ['Quemadura', 'Escarcha', 'Parálisis']},
+    fatiga: {label: 'Fatiga', estados: ['Cansado', 'Exhausto', 'Lento']},
+  };
+  const normEstado = t => String(t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+  // El grupo de un estado (por su nombre), o ''.
+  function grupoCuraDe(nombre){
+    const n = normEstado(nombre);
+    if(!n) return '';
+    for(const [k, g] of Object.entries(GRUPOS_CURA)){
+      if(g.estados.some(e => { const x = normEstado(e); return n === x || n.startsWith(x + ' '); }) || (g.patron && g.patron.test(n))) return k;
+    }
+    return '';
+  }
+  // Qué cura un ítem: la lista de grupos (['todo'] = todos), o [] si no cura estados.
+  // (Una copia vieja de Vendas, Antídoto o Cura Plus en una mochila no trae `curaEstados`: se la reconoce por el nombre.)
+  const CURA_POR_NOMBRE = {'vendas': ['heridas'], 'antidoto': ['venenos'], 'cura plus': ['todo']};
+  function curaDeItem(it){
+    if(!it) return [];
+    const lista = Array.isArray(it.curaEstados) ? it.curaEstados : (CURA_POR_NOMBRE[normEstado(it.nombre)] || []);
+    return lista.includes('todo') ? Object.keys(GRUPOS_CURA) : lista.filter(k => GRUPOS_CURA[k]);
+  }
+  // Saca de la lista los estados de esos grupos. → {quedan, sacados: [nombres]}. No toca los buffs ni lo que no está en un grupo.
+  function curarEstados(estados, grupos){
+    const g = new Set(grupos || []), quedan = [], sacados = [];
+    (estados || []).forEach(e => { const k = e && grupoCuraDe(e.nombre); if(k && g.has(k)) sacados.push(e.nombre); else quedan.push(e); });
+    return {quedan, sacados};
+  }
+  // El texto de lo que cura un ítem: «Heridas (Sangrado, Lisiado, Rengo)».
+  const textoCura = grupos => grupos.map(k => `${GRUPOS_CURA[k].label} (${GRUPOS_CURA[k].estados.join(', ')})`).join(' · ');
+
+  /* 🎲 Lo que pasa según la tirada extra de una zona (2026-10-22, dueño, los Pedos Tóxicos: «los estados se podrían automatizar después de la
+     tirada de 20»): `tabla` = [{desde, estado: {nombre, turnos?, stacks?}} | {desde, caer: true}] — «caer» es el desmayo: la vida a 0 (dueño).
+     Vale UN renglón, el más alto que alcance la tirada (con 18: Stun, no Stun más Pajaritos). Nada se aplica en silencio: quien tira ve qué
+     va a pasar y lo acepta; quien lo recibe, también (vtt-hexgrid/js/66). */
+  function porTiradaNorm(tabla){
+    if(!Array.isArray(tabla)) return [];
+    return tabla.map(f => {
+      if(!f || !Number.isFinite(Number(f.desde))) return null;
+      const desde = Math.max(1, Math.round(Number(f.desde)));
+      if(f.caer) return {desde, caer: true};
+      const e = f.estado && typeof f.estado === 'object' ? f.estado : null;
+      if(!e || !String(e.nombre || '').trim()) return null;
+      const estado = {nombre: String(e.nombre).trim().slice(0, 40)};
+      if(nf(e.turnos) > 0) estado.turnos = Math.round(nf(e.turnos));
+      if(nf(e.stacks) > 0) estado.stacks = Math.round(nf(e.stacks));
+      if(e.permanente) estado.permanente = true;
+      return {desde, estado};
+    }).filter(Boolean).sort((a, b) => a.desde - b.desde).slice(0, 6);
+  }
+  const efectoPorTirada = (tabla, total) => porTiradaNorm(tabla).filter(f => f.desde <= nf(total)).pop() || null;
+  const porTiradaFilaTxt = f => f.caer ? 'cae (la vida a 0)' : `${f.estado.nombre}${f.estado.permanente ? ' (no vence)' : nf(f.estado.turnos) > 0 ? ` (${f.estado.turnos} turno${f.estado.turnos === 1 ? '' : 's'})` : ''}${nf(f.estado.stacks) > 0 ? ` ×${f.estado.stacks}` : ''}`;
+  const porTiradaTxt = tabla => porTiradaNorm(tabla).map(f => `${f.desde}+ ${porTiradaFilaTxt(f)}`).join(' · ');
+  /* 📜 Un consumible con su Ejecución ✨ (2026-10-20, la Red Nerubian: «habría que modificar sobre el duelo»): `it.duelo` es la misma Ejecución de una
+     habilidad o de una varita. Se arma una habilidad de un uso (automática) y sigue el camino de siempre: elegir el objetivo, el cuadro del duelo, los
+     efectos. Lo usan FichaAcciones.consumir (personaje) y las Acciones de un creep (vtt-hexgrid/js/12). */
+  /* 📜 El mínimo de calidad (dueño, 2026-10-23: «la calidad mínima de algunos efectos de consumibles»): un consumible que usa tu Efecto especial —para
+     tirar o como dificultad— lo toma como mínimo según su calidad (Común 7, Buena 9, Rara 11, los mismos de las trampas; dueño, 2026-10-23: de 6-8-10 a 7-9-11). Si tenés más, vale el tuyo. */
+  function conMinimoDeCalidad(duelo, tier){
+    const min = detectarMinDe(tier);
+    if(!min || !duelo) return duelo;
+    const d = structuredClone(duelo);
+    if((d.tira || 'dmgesp') === 'dmgesp') d.tiraMin = Math.max(nf(d.tiraMin), min);
+    (d.efectos || []).forEach(e => { if(e && e.soltar && e.soltar.difStat === 'dmgesp') e.soltar.difMin = Math.max(nf(e.soltar.difMin), min); });
+    return d;
+  }
+  const habDeConsumible = it => it && it.duelo ? {id: 'cons:' + (it.id || it.nombre), nombre: it.nombre, detalle: String(it.detalle || '').split(' ⚙')[0].split(' ✋')[0].trim(), modo: 'auto',   // a la Mesa, solo lo que hace
+    duelo: conMinimoDeCalidad(it.duelo, it.tier), tiradaStat: it.duelo.tira || 'dmgesp', tiradaExtra: String(it.dano || '').trim()} : null;
+  return {anotarPagoDuelo, pagoDeDuelo, sirveParaEmerger, armaParaEmerger, parryApagado, sinParryDelAtaque, nombresContraDisparo, ESQUIVAR_TXT, PONER_ESCUDO_TXT, esRompeArmadura,GONDOLA_CATEGORIAS, categoriaGondola, utilPrimero, PACTO_VIDA_PCT, pactoVida, RELICARIO_TOPE, vidaExtraTotal, excedenteConTope, estadoVidaExtra, relicarioEnEquipo, desesperadoBonos, desesperadoTxt, identidadElemento, CRIATURAS_OSCURAS, sinCura, SIN_CURA_TXT, perforaDeEstados, presaValor, sinPresasDebiles, comoCeguera, CEGUERA_VISION, ciego, aDistancia, ciegoContraDistancia, CIEGO_DISTANCIA, habDeConsumible, efectoActivo, fenixActivo, revivirFenix, mareado, etereo, sequia, SOLO_BONO, soloBonoTxt, conFijo, gastarPasoFantasma, bezoar, conGauchito, GAUCHITO_STATS, talismanesDanoEsp, GRUPOS_CC, grupoCC, esMental, esControl, resisteCC, resisteCCEtq, columnasStats, piezasParaParry, sumaEspecialDe, sumaEspecialTxt, contraDeEjecucion, esHonda, alcanceHonda, alcanceArmaRango, HONDA_RANGO, porDanoNorm, stacksPorDano, porDanoTxt, CARGAS, cargable, conCarga, tormenta, danoTormenta, danoTormentaMover, golpeDirecto, cobroTormenta, tormentaTxt, avisarTormenta, aplicarTormenta, acelerado, gastarAcelerado, extenuado, conExtenuado, stacksCargaActiva, RASGOS_ARCO, LARGO_ALCANCE_MAX, TENSAR_NO2, largoAlcance, alcanceMaximo, afinidadEfectos, arcoRasgosTxt, lecturaTope, APUNTANDO, apuntandoX, caidaDano, recargaCosto, PUNTA_DIAMANTE_DEF, PUNTA_DIAMANTE_PERFORA, REMACHADORA_MAX, absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, unaTiradaDe, gastarUnaTirada, armaEnMano, TIPO_SIN_ARMA, sinArmaEnMano, armaPrincipal, equipoSinArma, esArmaDeMano, ponerArma, defDeItem, critDeItem, defDeEquipo, critDeEquipo, pasarEquipoVivo, equipoPuesto, puestoSinArma, equipoGuardado, vaEnLaMano, manosLibres, itemComoDePersonaje, gruposDeEquipo, ponerPieza, guardarPieza, sacarPieza, COSTO_SACAR_PIEZA, ataqueConSuArma, armaParaArreglos, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, REMATE_ESCALONES, remateDados, ATRAPA_VISUALES, atrapaDeNombre, atrapaDe, atrapaPub, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoLibres, ahorroArco, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, defensaSinNo2, YA_NEGATIVO_TXT, DETECTAR_MIN_TIER, detectarMinDe, conMinimoDeCalidad, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
+    DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
+    escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad, sincronizarEstadosDePasivas, sangraPorSp,
+    marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,
+    formulaDanoHab, zonaDeHab, trampaDeHab, ataqueConArreglos, esFlash, FLASH_CSS, flashPara, cdFlash, costoFlash,
+    porTiradaNorm, efectoPorTirada, porTiradaFilaTxt, porTiradaTxt};
+})();

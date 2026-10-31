@@ -1,0 +1,1105 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rol Pintoísta</title>
+<link rel="icon" type="image/svg+xml" href="comun/icono.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,900&family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* Inicio del sitio: iniciar sesión, elegir o crear partida y abrir sus
+   herramientas. La lógica de cuenta y partida compartida con las
+   herramientas está en comun/sesion.js. */
+:root{
+  --ink:#0F0C0E; --panel:#1A1418; --panel2:#221A1E; --line:#3B2E34; --line-soft:#2A2126;
+  --copper:#C98545; --brass:#E0A458; --wine:#8C2F3E; --bottle:#2E6B57;
+  --paper:#EDE3D2; --muted:#9A867E; --danger:#D4574E; --r:3px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:
+    repeating-linear-gradient(0deg, rgba(201,133,69,.045) 0 1px, transparent 1px 28px),
+    repeating-linear-gradient(90deg, rgba(201,133,69,.045) 0 1px, transparent 1px 28px),
+    radial-gradient(120% 80% at 50% 0%, #1C1418 0%, var(--ink) 70%);
+  color:var(--paper);font-family:"Space Grotesk",system-ui,sans-serif;font-size:15px;line-height:1.5;min-height:100vh
+}
+[hidden]{display:none!important}
+input,button{font-family:inherit;color:inherit}
+input{
+  width:100%;background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:var(--r);
+  color:var(--paper);padding:9px 10px;font-size:15px
+}
+input:focus{outline:2px solid var(--copper);outline-offset:1px;border-color:var(--copper)}
+button{cursor:pointer}
+button:disabled{opacity:.55;cursor:default}
+a{color:var(--brass)}
+
+main{max-width:860px;margin:0 auto;padding:40px 20px 48px}
+.barra{display:flex;align-items:center;gap:12px;justify-content:space-between;flex-wrap:wrap;margin-bottom:22px}
+@media(max-width:1000px){.barra{padding-left:94px}}
+.eyebrow{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--copper)}
+.cuenta{font-family:"Space Mono",monospace;font-size:11.5px;color:var(--muted);display:flex;gap:10px;align-items:center}
+h1{font-family:"Fraunces",Georgia,serif;font-weight:900;font-size:clamp(34px,6vw,54px);line-height:1.05;margin:6px 0 10px;color:var(--brass)}
+.sub{color:var(--muted);margin:0 0 28px;max-width:580px}
+h2{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:400;margin:30px 0 10px}
+
+.btn{
+  font-family:"Space Mono",monospace;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+  padding:10px 16px;border:1px solid var(--line);border-radius:var(--r);background:none;white-space:nowrap
+}
+.btn:hover{border-color:var(--copper)}
+.btn.primary{background:var(--copper);border-color:var(--copper);color:#180F08;font-weight:700}
+.btn.primary:hover{background:var(--brass)}
+.btn.chico{padding:5px 10px;font-size:10.5px}
+.enlace{background:none;border:none;color:var(--brass);text-decoration:underline;padding:0;font-size:13.5px}
+
+.caja{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.acceso{max-width:420px}
+.google{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:11px 14px;
+  background:#fff;color:#1f1f1f;border:1px solid #dadce0;border-radius:var(--r);font-weight:500;font-size:15px
+}
+.google:hover{background:#f3f3f3}
+.separador{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px;margin:18px 0}
+.separador::before,.separador::after{content:"";flex:1;height:1px;background:var(--line)}
+.pestanas{display:flex;gap:4px;margin-bottom:14px}
+.pestanas button{flex:1;background:none;border:1px solid var(--line);border-radius:var(--r);padding:7px;font-size:13.5px;color:var(--muted)}
+.pestanas button.activa{border-color:var(--copper);color:var(--paper)}
+label{display:block;font-size:12.5px;color:var(--muted);margin:10px 0 4px}
+.fila{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}
+.error{color:var(--danger);font-size:13.5px;min-height:1.2em;margin-top:10px}
+.ok{color:#8FC7A5;font-size:13.5px;margin-top:10px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.tarjeta{
+  display:flex;flex-direction:column;gap:6px;padding:16px 16px 14px;background:var(--panel);
+  border:1px solid var(--line);border-radius:var(--r);color:inherit;text-decoration:none;text-align:left;
+  transition:border-color .15s,transform .15s;font-size:15px
+}
+a.tarjeta:hover,button.tarjeta:hover,.tarjeta:focus-visible{border-color:var(--copper);transform:translateY(-1px);outline:none}
+.tarjeta .titulo{font-weight:700;font-size:17px;display:flex;align-items:center;gap:8px}
+.tarjeta .desc{color:var(--muted);font-size:13.5px}
+.tag{align-self:flex-start;font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:2px 7px;border-radius:var(--r);border:1px solid var(--line);color:var(--muted)}
+.tag.gm{border-color:var(--copper);color:var(--brass)}
+.tag.jugador{border-color:var(--bottle);color:#8FC7A5}
+.tarjeta.principal{border-color:var(--copper);background:linear-gradient(180deg,rgba(201,133,69,.1),transparent 70%),var(--panel)}
+.tarjeta.nueva{border-style:dashed;align-items:flex-start;justify-content:center;min-height:110px;background:none}
+.vacio{color:var(--muted);font-size:14px}
+.fila-nombre{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr) auto;gap:10px;align-items:center;margin-top:12px}
+.fila-nombre .partida{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fila-nombre .partida small{display:block;color:var(--muted);font-size:11.5px}
+.fila-nombre input{padding:7px 9px;font-size:14px}
+@media(max-width:560px){.fila-nombre{grid-template-columns:1fr auto}.fila-nombre .partida{grid-column:1 / -1}}
+.btn.peligro{border-color:var(--wine);color:var(--danger)}
+.btn.peligro:hover:not(:disabled){border-color:var(--danger);background:rgba(212,87,78,.12)}
+.caja.peligro{border-color:var(--wine)}
+select{
+  background:rgba(0,0,0,.28);border:1px solid var(--line);border-radius:var(--r);color:var(--paper);padding:6px 8px;font-family:inherit;font-size:13.5px;max-width:100%
+}
+select option{background:var(--panel)}
+.miembro{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;border-bottom:1px solid var(--line-soft)}
+.miembro:last-child{border-bottom:none}
+.miembro .quien{flex:1;min-width:180px}
+.miembro .quien small{display:block;color:var(--muted);font-size:12.5px}
+.miembro.huerfano .quien{color:var(--brass)}
+.subtitulo{font-family:"Space Mono",monospace;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:18px 0 2px}
+.nota{margin-top:30px;padding:14px 16px;border:1px dashed var(--line);border-radius:var(--r);color:var(--muted);font-size:13.5px}
+</style>
+</head>
+<body>
+<main>
+  <div class="barra">
+    <div class="eyebrow">Rol Pintoísta</div>
+    <div class="cuenta" id="cuenta" hidden><span id="cuenta-email"></span><button type="button" class="btn chico" id="btn-nombres" title="Cambiar el nombre con el que te ven en cada partida">✎ Mi nombre</button><button type="button" class="btn chico" id="btn-salir">Salir</button></div>
+  </div>
+
+  <!-- Cambiar el nombre en cada partida -->
+  <div class="caja" id="panel-nombres" hidden style="margin-bottom:22px;max-width:560px">
+    <b>Cómo te ven los demás</b>
+    <p class="vacio" style="margin:6px 0 4px">El nombre es por partida: en cada una podés llamarte distinto.</p>
+    <div id="lista-nombres"></div>
+    <div class="fila"><button type="button" class="btn" id="btn-nombres-cerrar">Listo</button></div>
+  </div>
+
+  <!-- Cargando -->
+  <section id="vista-cargando">
+    <p class="sub">Cargando…</p>
+  </section>
+
+  <!-- Sin conexión -->
+  <section id="vista-sin-conexion" hidden>
+    <h1>La mesa</h1>
+    <p class="sub">No se pudo conectar. Revisá la conexión a internet y recargá la página.</p>
+  </section>
+
+  <!-- Iniciar sesión -->
+  <section id="vista-login" hidden>
+    <h1>La mesa</h1>
+    <p class="sub">Herramientas para jugar en vivo, cada uno desde su casa. Entrá con tu cuenta para ver las partidas.</p>
+    <div class="caja acceso">
+      <button type="button" class="google" id="btn-google">
+        <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+        Entrar con Google
+      </button>
+      <div class="separador">o con email</div>
+      <div class="pestanas">
+        <button type="button" class="activa" data-modo="entrar">Entrar</button>
+        <button type="button" data-modo="crear">Crear cuenta</button>
+      </div>
+      <form id="form-email">
+        <label for="in-email">Email</label>
+        <input id="in-email" type="email" autocomplete="email" required>
+        <label for="in-clave">Contraseña</label>
+        <input id="in-clave" type="password" autocomplete="current-password" minlength="6" required>
+        <div id="campo-clave2" hidden>
+          <label for="in-clave2">Repetí la contraseña</label>
+          <input id="in-clave2" type="password" autocomplete="new-password" minlength="6">
+        </div>
+        <div class="fila">
+          <button type="submit" class="btn primary" id="btn-email">Entrar</button>
+          <button type="button" class="enlace" id="btn-olvide">Olvidé mi contraseña</button>
+        </div>
+        <div class="error" id="login-error"></div>
+      </form>
+    </div>
+  </section>
+
+  <!-- Falta confirmar el email -->
+  <section id="vista-confirmar" hidden>
+    <h1>Confirmá tu email</h1>
+    <p class="sub">Te mandamos un mail a <b id="confirmar-email"></b> con un link. Tocalo (mirá también en correo no deseado) y después volvé acá.</p>
+    <div class="fila">
+      <button type="button" class="btn primary" id="btn-ya-confirme">Ya lo confirmé</button>
+      <button type="button" class="btn" id="btn-reenviar">Reenviar mail</button>
+    </div>
+    <div class="error" id="confirmar-error"></div>
+  </section>
+
+  <!-- Lista de partidas -->
+  <section id="vista-partidas" hidden>
+    <h1>Partidas</h1>
+    <p class="sub">Entrá a una partida o creá una nueva. Quien crea la partida es su GM; los que se unen son jugadores.</p>
+    <div class="grid" id="lista-partidas"></div>
+
+  </section>
+
+  <!-- Una partida -->
+  <section id="vista-partida" hidden>
+    <button type="button" class="enlace" id="btn-volver">← Todas las partidas</button>
+    <h1 id="partida-nombre"></h1>
+    <p class="sub" id="partida-sub"></p>
+
+    <!-- Oferta para ser GM: le llega al jugador elegido, la primera vez que entra a la partida -->
+    <div class="caja" id="traspaso-aviso" hidden style="max-width:520px;border-color:var(--copper);margin-bottom:16px">
+      <b id="traspaso-texto"></b>
+      <p class="vacio" style="margin:6px 0 0">Si aceptás, pasás a ser el GM de la partida y el GM actual pasa a ser jugador.</p>
+      <div class="fila">
+        <button type="button" class="btn primary" id="traspaso-si">Sí, aceptar</button>
+        <button type="button" class="btn" id="traspaso-no">No</button>
+      </div>
+      <div class="error" id="traspaso-error"></div>
+    </div>
+
+    <div class="caja" id="unirse" hidden style="max-width:460px">
+      <b>Unirte a esta partida</b>
+      <form id="form-unirse">
+        <label for="in-apodo">Tu nombre en esta partida</label>
+        <input id="in-apodo" maxlength="40" required placeholder="Así te ven los demás">
+        <div class="fila"><button type="submit" class="btn primary">Unirme como jugador</button></div>
+        <div class="error" id="unirse-error"></div>
+      </form>
+    </div>
+
+    <div id="herramientas" hidden>
+      <h2>Para jugar</h2>
+      <div class="grid">
+        <a class="tarjeta principal" data-herramienta="vtt-hexgrid/mapa.html">
+          <span class="titulo">⬡ Mapa</span>
+          <span class="desc">Tablero de hexágonos con los tokens de todos, en vivo, y la mesa de tiradas.</span>
+        </a>
+        <a class="tarjeta principal" data-herramienta="ficha-personaje/ficha.html" data-solo="jugador">
+          <span class="titulo">📜 Ficha de personaje</span>
+          <span class="desc">Tus personajes de esta partida: atributos, inventario, habilidades y tiradas. Se guarda sola.</span>
+        </a>
+        <a class="tarjeta" data-herramienta="ficha-personaje/ficha.html" data-solo="gm">
+          <span class="titulo">📜 Fichas de los jugadores</span>
+          <span class="desc">Mirá los personajes de la partida (solo lectura; el GM puede editarlos).</span>
+        </a>
+      </div>
+      <div data-solo="gm">
+        <h2>Para el GM</h2>
+        <div class="grid">
+          <a class="tarjeta principal" data-herramienta="gm-toolset/gm-tools.html">
+            <span class="titulo">⚔ GM Tools</span>
+            <span class="desc">Creeps y personajes del GM en combate. Se guardan solos.</span>
+          </a>
+          <a class="tarjeta" data-herramienta="gm-toolset/vendor-generator.html">
+            <span class="titulo">🏪 Generador de tiendas</span>
+            <span class="desc">Arma el stock de un vendedor para que los jugadores compren.</span>
+          </a>
+        </div>
+      </div>
+      <h2>Referencia</h2>
+      <div class="grid">
+        <a class="tarjeta" data-herramienta="manual-usuario/manual.html" target="_blank" rel="noopener">
+          <span class="titulo">📖 Manual</span>
+          <span class="desc">Reglas del juego.</span>
+          <span class="tag">En construcción</span>
+        </a>
+      </div>
+
+      <!-- Manejo de la partida: solo el GM -->
+      <div data-solo="gm">
+        <h2>⚙ Partida</h2>
+        <div class="caja">
+          <b>Jugadores</b>
+          <div id="gestion-jugadores"></div>
+          <div id="gestion-personajes"></div>
+          <div class="error" id="gestion-error"></div>
+        </div>
+
+        <div class="caja" style="margin-top:12px">
+          <form id="form-dde-inicial">
+            <label for="in-dde-inicial" style="margin-top:0"><b style="color:var(--paper);font-size:15px">DDE inicial de los personajes nuevos</b></label>
+            <p class="vacio" style="margin:2px 0 6px">Con cuántos doblones del espacio arranca un personaje creado paso a paso. Lo estándar: 300.</p>
+            <div class="fila" style="margin-top:4px;flex-wrap:nowrap">
+              <input id="in-dde-inicial" type="number" min="0" step="10" value="300" style="max-width:140px">
+              <button type="submit" class="btn">Guardar</button>
+            </div>
+            <div class="error" id="dde-inicial-error"></div>
+          </form>
+        </div>
+
+        <div class="caja" style="margin-top:12px">
+          <form id="form-renombrar">
+            <label for="in-renombrar" style="margin-top:0"><b style="color:var(--paper);font-size:15px">Nombre de la partida</b></label>
+            <div class="fila" style="margin-top:4px;flex-wrap:nowrap">
+              <input id="in-renombrar" maxlength="60" required>
+              <button type="submit" class="btn">Guardar</button>
+            </div>
+            <div class="error" id="renombrar-error"></div>
+          </form>
+        </div>
+
+        <div class="caja peligro" style="margin-top:12px">
+          <b>Borrar la partida</b>
+          <p class="vacio" style="margin:6px 0 0">Borra todo para todos: personajes, creeps, mapa, tokens, tiradas y tiendas. No se puede deshacer.</p>
+          <div class="fila"><button type="button" class="btn peligro" id="btn-borrar-partida">Borrar la partida…</button></div>
+          <div id="borrar-confirmar" hidden>
+            <p style="margin:16px 0 0">1. Si querés guardar algo, bajá antes el respaldo:</p>
+            <div class="fila" style="margin-top:6px"><button type="button" class="btn" id="btn-respaldo">💾 Bajar respaldo</button><span class="vacio" id="respaldo-estado"></span></div>
+            <label for="in-borrar-nombre">2. Escribí el nombre de la partida (<b id="borrar-nombre"></b>) para confirmar:</label>
+            <input id="in-borrar-nombre" autocomplete="off">
+            <div class="fila">
+              <button type="button" class="btn peligro" id="btn-borrar-definitivo" disabled>Borrar para siempre</button>
+              <button type="button" class="btn" id="btn-borrar-cancelar">Cancelar</button>
+            </div>
+            <div class="vacio" id="borrar-estado" style="margin-top:10px"></div>
+            <div class="error" id="borrar-error"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Irse: solo jugadores -->
+      <div data-solo="jugador">
+        <h2>Tu lugar en la partida</h2>
+        <div class="caja">
+          <p class="vacio" style="margin:0">Si te vas, tus personajes quedan en la partida. Si volvés a unirte con esta misma cuenta, siguen siendo tuyos.</p>
+          <div class="fila"><button type="button" class="btn peligro" id="btn-irme">Irme de esta partida</button></div>
+          <div class="error" id="irme-error"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore-compat.js"></script>
+<script src="comun/confirmar.js?v=20261031cart"></script>
+<script src="comun/sesion.js"></script>
+<script src="comun/respaldo.js"></script>
+<script src="comun/menu-sitio.js?v=20261031home"></script>
+<script src="comun/paso-a-paso.js?v=20261010a"></script>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+
+const VISTAS = ['cargando', 'sin-conexion', 'login', 'confirmar', 'partidas', 'partida'];
+function mostrar(vista){
+  VISTAS.forEach(v => { $('#vista-' + v).hidden = v !== vista; });
+  $('#cuenta').hidden = !['confirmar', 'partidas', 'partida'].includes(vista);
+  // "Mi nombre" solo con la cuenta confirmada (en partidas o en una partida).
+  const conPartidas = ['partidas', 'partida'].includes(vista);
+  $('#btn-nombres').hidden = !conPartidas;
+  if(!conPartidas) $('#panel-nombres').hidden = true;
+  if(fbUsuario) $('#cuenta-email').textContent = fbUsuario.email || fbUsuario.displayName || '';
+}
+
+// Mensajes de Firebase Auth en castellano simple.
+function textoError(err){
+  const c = err && err.code || '';
+  const m = {
+    'auth/invalid-email': 'Ese email no es válido.',
+    'auth/missing-password': 'Falta la contraseña.',
+    'auth/weak-password': 'La contraseña tiene que tener al menos 6 caracteres.',
+    'auth/email-already-in-use': 'Ya hay una cuenta con ese email. Usá "Entrar" (o "Entrar con Google" si la creaste así).',
+    'auth/invalid-credential': 'Email o contraseña incorrectos.',
+    'auth/wrong-password': 'Email o contraseña incorrectos.',
+    'auth/user-not-found': 'No hay ninguna cuenta con ese email.',
+    'auth/too-many-requests': 'Demasiados intentos seguidos. Esperá un rato y probá de nuevo.',
+    'auth/popup-closed-by-user': 'Se cerró la ventana de Google antes de terminar.',
+    'auth/network-request-failed': 'Sin conexión. Revisá internet y probá de nuevo.',
+    'auth/unauthorized-domain': 'Este sitio no está autorizado en Firebase (Authentication → Configuración → Dominios autorizados).',
+    'auth/operation-not-allowed': 'Ese método de acceso no está activado en Firebase (Authentication → Método de acceso).',
+    'permission-denied': 'La mesa no lo permite (¿están publicadas las reglas nuevas?).',
+  };
+  return m[c] || ('No se pudo: ' + (err && err.message || err));
+}
+
+/* ---------- Iniciar sesión ---------- */
+
+let modoEmail = 'entrar';
+document.querySelectorAll('.pestanas button').forEach(b => b.onclick = () => {
+  modoEmail = b.dataset.modo;
+  document.querySelectorAll('.pestanas button').forEach(x => x.classList.toggle('activa', x === b));
+  $('#campo-clave2').hidden = modoEmail !== 'crear';
+  $('#in-clave2').required = modoEmail === 'crear';
+  $('#in-clave').autocomplete = modoEmail === 'crear' ? 'new-password' : 'current-password';
+  $('#btn-email').textContent = modoEmail === 'crear' ? 'Crear cuenta' : 'Entrar';
+  $('#btn-olvide').hidden = modoEmail === 'crear';
+  $('#login-error').textContent = '';
+});
+
+$('#btn-google').onclick = async () => {
+  $('#login-error').textContent = '';
+  const proveedor = new firebase.auth.GoogleAuthProvider();
+  proveedor.setCustomParameters({prompt: 'select_account'});
+  try{
+    await firebase.auth().signInWithPopup(proveedor);
+  }catch(err){
+    // En algunos celulares la ventanita está bloqueada: se va a Google y vuelve.
+    if(err.code === 'auth/popup-blocked' || err.code === 'auth/operation-not-supported-in-this-environment'){
+      await firebase.auth().signInWithRedirect(proveedor);
+      return;
+    }
+    if(err.code !== 'auth/cancelled-popup-request') $('#login-error').textContent = textoError(err);
+  }
+};
+
+$('#form-email').onsubmit = async e => {
+  e.preventDefault();
+  const email = $('#in-email').value.trim();
+  const clave = $('#in-clave').value;
+  $('#login-error').textContent = '';
+  $('#btn-email').disabled = true;
+  try{
+    if(modoEmail === 'crear'){
+      if(clave !== $('#in-clave2').value){ $('#login-error').textContent = 'Las contraseñas no coinciden.'; return; }
+      const cred = await firebase.auth().createUserWithEmailAndPassword(email, clave);
+      await cred.user.sendEmailVerification({url: location.origin + location.pathname});
+    }else{
+      await firebase.auth().signInWithEmailAndPassword(email, clave);
+    }
+  }catch(err){
+    $('#login-error').textContent = textoError(err);
+  }finally{
+    $('#btn-email').disabled = false;
+  }
+};
+
+$('#btn-olvide').onclick = async () => {
+  const email = $('#in-email').value.trim();
+  if(!email){ $('#login-error').textContent = 'Escribí tu email arriba y tocá de nuevo "Olvidé mi contraseña".'; return; }
+  try{
+    await firebase.auth().sendPasswordResetEmail(email);
+    $('#login-error').innerHTML = '<span class="ok">Listo: si hay una cuenta con ese email, te llega un mail para elegir otra contraseña.</span>';
+  }catch(err){
+    $('#login-error').textContent = textoError(err);
+  }
+};
+
+$('#btn-salir').onclick = () => { $('#panel-nombres').hidden = true; firebase.auth().signOut(); };
+
+/* ---------- Cambiar el nombre (por partida) ----------
+   El nombre vive en campanas/<id>/miembros/<uid>.nombre: cada uno puede
+   cambiar el suyo (lo permiten las reglas). Si sos el GM, también se
+   actualiza el "GM: …" que se ve en la lista de partidas. */
+
+async function abrirNombres(){
+  const panel = $('#panel-nombres');
+  panel.hidden = false;
+  const cont = $('#lista-nombres');
+  cont.innerHTML = '<p class="vacio">Cargando tus partidas…</p>';
+  try{
+    await cargarPartidas();
+  }catch(err){
+    cont.innerHTML = `<p class="error">${esc(textoError(err))}</p>`;
+    return;
+  }
+  const mias = partidas.filter(p => p.miembro);
+  if(!mias.length){
+    cont.innerHTML = '<p class="vacio">Todavía no estás en ninguna partida.</p>';
+    return;
+  }
+  cont.innerHTML = mias.map(p => `
+    <form class="fila-nombre" data-partida="${esc(p.id)}">
+      <span class="partida">${esc(p.nombre)}<small>${p.miembro.gm ? 'Sos el GM' : 'Sos jugador'}</small></span>
+      <input maxlength="40" required value="${esc(p.miembro.nombre)}" aria-label="Tu nombre en ${esc(p.nombre)}">
+      <button type="submit" class="btn chico">Guardar</button>
+    </form>`).join('') + '<div class="error" id="nombres-error"></div>';
+  cont.querySelectorAll('form').forEach(f => f.onsubmit = e => { e.preventDefault(); guardarNombre(f); });
+}
+
+async function guardarNombre(form){
+  const id = form.dataset.partida;
+  const p = partidas.find(x => x.id === id);
+  const nombre = form.querySelector('input').value.trim().slice(0, 40);
+  const boton = form.querySelector('button');
+  $('#nombres-error').textContent = '';
+  if(!p || !nombre || nombre === p.miembro.nombre) return;
+  boton.disabled = true;
+  try{
+    const lote = fbDb.batch();
+    lote.update(fbDb.doc(`campanas/${id}/miembros/${fbUsuario.uid}`), {nombre});
+    if(p.miembro.gm && p.gmUid === fbUsuario.uid) lote.update(fbDb.doc(`campanas/${id}`), {gmNombre: nombre});
+    await lote.commit();
+    p.miembro.nombre = nombre;
+    if(p.miembro.gm) p.gmNombre = nombre;
+    boton.textContent = '✓ Guardado';
+    setTimeout(() => { boton.textContent = 'Guardar'; }, 1800);
+    // Refleja el cambio en lo que está a la vista.
+    if(!$('#vista-partidas').hidden) renderPartidas();
+    if(!$('#vista-partida').hidden && FB_CAMPANA === id) irAPartida(id);
+  }catch(err){
+    console.error('No se pudo cambiar el nombre:', err);
+    $('#nombres-error').textContent = textoError(err);
+  }finally{
+    boton.disabled = false;
+  }
+}
+
+$('#btn-nombres').onclick = () => { if($('#panel-nombres').hidden) abrirNombres(); else $('#panel-nombres').hidden = true; };
+$('#btn-nombres-cerrar').onclick = () => { $('#panel-nombres').hidden = true; };
+
+$('#btn-ya-confirme').onclick = async () => {
+  $('#confirmar-error').textContent = '';
+  try{
+    await fbUsuario.reload();
+    await fbUsuario.getIdToken(true);  // para que las reglas vean el email confirmado
+    fbUsuario = firebase.auth().currentUser;
+    if(fbCuentaConfirmada(fbUsuario)) alEntrar();
+    else $('#confirmar-error').textContent = 'Todavía figura sin confirmar. Tocá el link del mail y probá de nuevo.';
+  }catch(err){
+    $('#confirmar-error').textContent = textoError(err);
+  }
+};
+
+$('#btn-reenviar').onclick = async () => {
+  $('#confirmar-error').textContent = '';
+  try{
+    await fbUsuario.sendEmailVerification({url: location.origin + location.pathname});
+    $('#confirmar-error').innerHTML = '<span class="ok">Mail reenviado.</span>';
+  }catch(err){
+    $('#confirmar-error').textContent = textoError(err);
+  }
+};
+
+/* ---------- Partidas ---------- */
+
+let partidas = [];  // [{id, nombre, gmNombre, miembro}]
+
+async function cargarPartidas(){
+  const snap = await fbDb.collection('campanas').get();
+  const lista = snap.docs
+    .map(d => ({id: d.id, ...d.data()}))
+    .filter(p => p.gmUid);  // las de antes del sistema de cuentas no tienen GM
+  await Promise.all(lista.map(async p => {
+    try{
+      const m = await fbDb.doc(`campanas/${p.id}/miembros/${fbUsuario.uid}`).get();
+      p.miembro = m.exists ? m.data() : null;
+      // Oferta de GM dirigida a esta cuenta (aviso en la tarjeta de la partida).
+      if(p.miembro && !p.miembro.gm){
+        const o = await fbDb.doc(`campanas/${p.id}/traspaso/actual`).get().catch(() => null);
+        p.oferta = !!(o && o.exists && o.data().aUid === fbUsuario.uid);
+      }
+    }catch(e){ p.miembro = null; }
+  }));
+  // Primero donde ya estás, después las demás; cada grupo por nombre.
+  partidas = lista.sort((a, b) => (!!b.miembro - !!a.miembro) || String(a.nombre).localeCompare(String(b.nombre), 'es'));
+}
+
+function renderPartidas(){
+  const cont = $('#lista-partidas');
+  cont.innerHTML = partidas.map(p => `
+    <button type="button" class="tarjeta${p.miembro ? ' principal' : ''}" data-partida="${esc(p.id)}">
+      <span class="titulo">${esc(p.nombre)}</span>
+      <span class="desc">GM: ${esc(p.gmNombre || '?')}${p.miembro ? ` · vos: ${esc(p.miembro.nombre)}` : ''}</span>
+      ${p.miembro
+        ? (p.miembro.gm ? '<span class="tag gm">Sos el GM</span>' : '<span class="tag jugador">Sos jugador</span>') + (p.oferta ? '<span class="tag gm">ð Te ofrecen ser el GM</span>' : '')
+        : '<span class="tag">Unirse</span>'}
+    </button>`).join('') +
+    `<button type="button" class="tarjeta nueva" id="btn-nueva-partida">
+      <span class="titulo">+ Crear partida</span>
+      <span class="desc">Vas a ser su GM.</span>
+    </button>`;
+  cont.querySelectorAll('[data-partida]').forEach(b => b.onclick = () => irAPartida(b.dataset.partida));
+  $('#btn-nueva-partida').onclick = abrirCrearPartida;
+}
+
+async function verPartidas(){
+  history.replaceState(null, '', location.pathname);
+  FB_CAMPANA = '';
+  mostrar('partidas');
+  $('#lista-partidas').innerHTML = '<p class="vacio">Cargando partidas…</p>';
+  try{
+    await cargarPartidas();
+    renderPartidas();
+  }catch(err){
+    console.error('No se pudieron leer las partidas:', err);
+    $('#lista-partidas').innerHTML = `<p class="error">${esc(textoError(err))}</p>`;
+  }
+}
+
+// «+ Crear partida», paso a paso en la ventana común (comun/paso-a-paso.js, 2026-10-02, tanda 6 de docs/plan-paso-a-paso.md):
+// La partida (nombre) → Vos (tu nombre en ella) → Listo («✔ Crear y entrar como GM»).
+function abrirCrearPartida(){
+  const st = {nombre: '', apodo: (fbUsuario && fbUsuario.displayName ? fbUsuario.displayName.split(' ')[0] : '').slice(0, 40)};
+  const campo = (id, etq, max, ph, val) => `<div class="pap-campo"><label for="${id}">${etq}</label><input id="${id}" maxlength="${max}" placeholder="${ph}" value="${esc(val)}"></div>`;
+  const enfocar = id => (c, a) => { const el = a.raiz.querySelector('#' + id); if(el) setTimeout(() => el.focus(), 30); };
+  const falta = i => i > 0 && !st.nombre.trim() ? 'Ponele un nombre a la partida.' : i > 1 && !st.apodo.trim() ? 'Escribí cómo te van a ver los demás.' : '';
+  async function crear(){
+    const f = falta(2);
+    if(f){ api.aviso(f); return false; }
+    try{
+      const ts = firebase.firestore.FieldValue.serverTimestamp();
+      const ref = fbDb.collection('campanas').doc();
+      const batch = fbDb.batch();
+      batch.set(ref, {nombre: st.nombre.trim().slice(0, 60), gmUid: fbUsuario.uid, gmNombre: st.apodo.trim().slice(0, 40), creado: ts});
+      batch.set(ref.collection('miembros').doc(fbUsuario.uid), {nombre: st.apodo.trim().slice(0, 40), gm: true, creado: ts});
+      await batch.commit();
+      setTimeout(() => irAPartida(ref.id), 0);
+    }catch(err){
+      console.error('No se pudo crear la partida:', err);
+      api.aviso('No se pudo crear la partida: ' + textoError(err));
+      return false;
+    }
+  }
+  const pasos = [
+    {id: 'partida', nombre: 'La partida', ayuda: '<b>¿Cómo se llama?</b> Una partida es una campaña: sus personajes, mapas, creeps y tienda. Quien la crea es su GM.',
+      html: () => campo('pn-nombre', 'Nombre de la partida', 60, 'Ej.: Piratas en el espacio', st.nombre), alMontar: enfocar('pn-nombre')},
+    {id: 'vos', nombre: 'Vos', ayuda: '<b>¿Cómo te ven los demás?</b> Tu nombre en esta partida (en la Mesa, en el mapa, en la lista de jugadores).',
+      html: () => campo('pn-apodo', 'Tu nombre en esta partida', 40, 'Así te ven los demás', st.apodo), alMontar: enfocar('pn-apodo')},
+    {id: 'listo', nombre: 'Listo', ayuda: '<b>Así queda.</b> Los jugadores la ven en la lista de partidas y entran con «Unirse».',
+      html: () => `<p style="font-size:15px;line-height:1.6;margin:0">🎲 <b>${esc(st.nombre.trim() || '—')}</b><br>GM: ${esc(st.apodo.trim() || '—')} (vos)</p>
+        <p class="pap-nota">Después: armá el primer mapa desde 🗺 Mapas, tus creeps en GM Tools y la tienda en el generador de tiendas.</p>`},
+  ];
+  const api = PasoAPaso.abrir({
+    titulo: '+ Crear partida', crear: true, ancho: 760, textoCrear: '✔ Crear y entrar como GM',
+    pasos, puedeIr: falta,
+    alInput: e => { if(e.target.id === 'pn-nombre') st.nombre = e.target.value; else if(e.target.id === 'pn-apodo') st.apodo = e.target.value; },
+    alTecla: e => {
+      if(e.key !== 'Enter' || e.target.tagName !== 'INPUT') return;
+      e.preventDefault();
+      if(api.paso() < pasos.length - 1) api.irA(api.paso() + 1);
+      else crear().then(r => { if(r !== false && api.abierto()) api.cerrar(); });
+    },
+    confirmarCancelar: '',
+    alCrear: () => crear(),
+  });
+}
+
+/* ---------- Una partida ---------- */
+
+async function irAPartida(id){
+  FB_CAMPANA = id;
+  history.replaceState(null, '', location.pathname + '?partida=' + encodeURIComponent(id));
+  mostrar('partida');
+  $('#partida-nombre').textContent = '…';
+  $('#partida-sub').textContent = '';
+  $('#unirse').hidden = true;
+  $('#herramientas').hidden = true;
+  $('#traspaso-aviso').hidden = true;
+  const [doc, miembro] = await Promise.all([
+    fbDb.doc(fbRutaCampana()).get().catch(() => null),
+    fbLeerMiembro(),
+  ]);
+  if(!doc || !doc.exists || !doc.data().gmUid){
+    fbRecordarPartida('');
+    verPartidas();
+    return;
+  }
+  const p = doc.data();
+  fbPartida = p;
+  fbMiembro = miembro;
+  $('#partida-nombre').textContent = p.nombre;
+  if(!miembro){
+    $('#partida-sub').textContent = `GM: ${p.gmNombre || '?'}. Todavía no estás en esta partida.`;
+    $('#unirse').hidden = false;
+    $('#in-apodo').focus();
+    return;
+  }
+  fbRecordarPartida(id);
+  $('#partida-sub').textContent = miembro.gm
+    ? `Sos el GM, como ${miembro.nombre}.`
+    : `Jugás como ${miembro.nombre}. GM: ${p.gmNombre || '?'}.`;
+  document.querySelectorAll('[data-herramienta]').forEach(a => {
+    a.href = a.dataset.herramienta + '?partida=' + encodeURIComponent(id);
+  });
+  document.querySelectorAll('[data-solo]').forEach(el => {
+    el.hidden = el.dataset.solo === 'gm' ? !miembro.gm : !!miembro.gm;
+  });
+  $('#herramientas').hidden = false;
+  revisarOfertaGM(p, miembro);
+  if(miembro.gm){
+    $('#in-renombrar').value = p.nombre;
+    cerrarBorrar();
+    cargarGestion();
+    cargarDdeInicial();
+  }
+}
+
+/* ---------- Traspaso del rol de GM ----------
+   Solo se hace desde acá (Jugadores → "Asignar como GM"). El GM deja una
+   oferta en campanas/<id>/traspaso/actual; el jugador la ve al entrar a la
+   partida y, si acepta, en una sola operación pasa a ser el GM (partida,
+   su miembro y el del GM anterior) y se borra la oferta. Hasta que acepta,
+   el GM sigue siendo el GM. Reglas: firebase/firestore.rules. */
+
+let ofertaGM = null;   // la oferta dirigida a esta cuenta, si hay
+
+async function revisarOfertaGM(p, miembro){
+  ofertaGM = null;
+  $('#traspaso-aviso').hidden = true;
+  $('#traspaso-error').textContent = '';
+  if(!miembro || miembro.gm) return;
+  try{
+    const d = await fbDb.doc(fbRutaCampana('traspaso/actual')).get();
+    if(!d.exists || d.data().aUid !== fbUsuario.uid) return;
+    if(d.data().deUid !== p.gmUid){                      // oferta vieja: el que la hizo ya no es GM
+      await d.ref.delete().catch(() => {});
+      return;
+    }
+    ofertaGM = d.data();
+    $('#traspaso-texto').textContent = `${ofertaGM.deNombre || 'El GM'} te quiere asignar como Game Master de "${p.nombre}". ¿Aceptás?`;
+    $('#traspaso-aviso').hidden = false;
+  }catch(err){ console.error('No se pudo revisar la oferta de GM:', err); }
+}
+
+$('#traspaso-si').onclick = async () => {
+  if(!ofertaGM) return;
+  const id = FB_CAMPANA;
+  $('#traspaso-error').textContent = '';
+  $('#traspaso-si').disabled = $('#traspaso-no').disabled = true;
+  try{
+    const lote = fbDb.batch();
+    lote.update(fbDb.doc(fbRutaCampana()), {gmUid: fbUsuario.uid, gmNombre: fbMiembro.nombre});
+    lote.update(fbDb.doc(fbRutaCampana(`miembros/${fbUsuario.uid}`)), {gm: true});
+    lote.update(fbDb.doc(fbRutaCampana(`miembros/${ofertaGM.deUid}`)), {gm: false});
+    lote.delete(fbDb.doc(fbRutaCampana('traspaso/actual')));
+    await lote.commit();
+    ofertaGM = null;
+    await irAPartida(id);   // se vuelve a cargar como GM
+  }catch(err){
+    console.error('No se pudo aceptar el rol de GM:', err);
+    $('#traspaso-error').textContent = textoError(err);
+  }finally{
+    $('#traspaso-si').disabled = $('#traspaso-no').disabled = false;
+  }
+};
+$('#traspaso-no').onclick = async () => {
+  $('#traspaso-error').textContent = '';
+  try{
+    await fbDb.doc(fbRutaCampana('traspaso/actual')).delete();
+    ofertaGM = null;
+    $('#traspaso-aviso').hidden = true;
+  }catch(err){
+    console.error('No se pudo rechazar la oferta de GM:', err);
+    $('#traspaso-error').textContent = textoError(err);
+  }
+};
+
+// GM: ofrecer el rol a un jugador (o cancelar la oferta pendiente).
+async function ofrecerGM(uid, boton){
+  const m = gestion.miembros.find(x => x.uid === uid);
+  if(!m) return;
+  if(!await Confirmar.preguntar(`¿Asignar a ${m.nombre} como Game Master?\n\nLe llega una notificación la próxima vez que entre a la partida. Hasta que la acepte, seguís siendo el GM; cuando la acepte, pasás a ser jugador.`, {titulo: 'Asignar GM', si: 'Asignar'})) return;
+  $('#gestion-error').textContent = '';
+  boton.disabled = true;
+  try{
+    await fbDb.doc(fbRutaCampana('traspaso/actual')).set({
+      aUid: uid, aNombre: m.nombre, deUid: fbUsuario.uid, deNombre: fbMiembro.nombre,
+      creado: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    await cargarGestion();
+  }catch(err){
+    console.error('No se pudo ofrecer el rol de GM:', err);
+    $('#gestion-error').textContent = textoError(err);
+    boton.disabled = false;
+  }
+}
+async function cancelarOfertaGM(boton){
+  $('#gestion-error').textContent = '';
+  boton.disabled = true;
+  try{
+    await fbDb.doc(fbRutaCampana('traspaso/actual')).delete();
+    await cargarGestion();
+  }catch(err){
+    console.error('No se pudo cancelar la oferta de GM:', err);
+    $('#gestion-error').textContent = textoError(err);
+    boton.disabled = false;
+  }
+}
+
+/* ---------- Manejo de la partida (GM) ----------
+   Jugadores con sus personajes, sacar a alguien, pasar un personaje a otro
+   jugador, renombrar y borrar la partida. Sacar no bloquea: el que sale
+   puede volver a unirse, y sus personajes (que quedan) vuelven a ser suyos
+   porque siguen a nombre de su cuenta. */
+
+let gestion = {miembros: [], fichas: [], traspaso: null};
+const fechaMs = t => t && t.toMillis ? t.toMillis() : 0;
+const fechaTxt = t => t && t.toDate ? t.toDate().toLocaleDateString('es-AR', {day: 'numeric', month: 'short', year: 'numeric'}) : '';
+
+async function cargarGestion(){
+  $('#gestion-error').textContent = '';
+  $('#gestion-jugadores').innerHTML = '<p class="vacio">Cargando jugadores…</p>';
+  $('#gestion-personajes').innerHTML = '';
+  try{
+    const [m, f, tr] = await Promise.all([
+      fbDb.collection(fbRutaCampana('miembros')).get(),
+      fbDb.collection(fbRutaCampana('fichas')).get(),
+      fbDb.doc(fbRutaCampana('traspaso/actual')).get().catch(() => null),   // sin reglas nuevas: se ignora
+    ]);
+    gestion.traspaso = tr && tr.exists ? tr.data() : null;
+    gestion.miembros = m.docs.map(d => ({uid: d.id, ...d.data()}))
+      .sort((a, b) => (!!b.gm - !!a.gm) || fechaMs(a.creado) - fechaMs(b.creado));
+    gestion.fichas = f.docs.map(d => ({id: d.id, ...d.data()}))
+      .sort((a, b) => String(a.nombre || '').localeCompare(String(b.nombre || ''), 'es'));
+    renderGestion();
+  }catch(err){
+    console.error('No se pudieron leer los jugadores:', err);
+    $('#gestion-jugadores').innerHTML = `<p class="error">${esc(textoError(err))}</p>`;
+  }
+}
+
+function renderGestion(){
+  const {miembros, fichas} = gestion;
+  const nombreFicha = f => esc(f.nombre || 'Sin nombre') + (f.resumen && f.resumen.nivel ? ` <small style="display:inline">· Lv ${esc(f.resumen.nivel)}</small>` : '');
+  $('#gestion-jugadores').innerHTML = miembros.map(m => {
+    const suyos = fichas.filter(f => f.duenoUid === m.uid).map(f => esc(f.nombre || 'Sin nombre'));
+    const detalle = m.gm ? 'GM' : (suyos.length ? `Personajes: ${suyos.join(', ')}` : 'Sin personajes');
+    const entro = fechaTxt(m.creado);
+    return `<div class="miembro">
+      <span class="quien">${esc(m.nombre)}${m.uid === fbUsuario.uid ? ' (vos)' : ''}<small>${detalle}${entro ? ` · entró el ${esc(entro)}` : ''}</small></span>
+      ${m.gm ? '<span class="tag gm">GM</span>' : (gestion.traspaso && gestion.traspaso.aUid === m.uid
+        ? `<span class="tag">Oferta de GM pendiente</span><button type="button" class="btn chico" data-cancelar-gm="1">Cancelar oferta</button>`
+        : `<button type="button" class="btn chico" data-asignar-gm="${esc(m.uid)}" title="Pasarle el rol de Game Master (le llega una oferta que tiene que aceptar)">Asignar como GM</button>`)
+        + `<button type="button" class="btn chico peligro" data-sacar="${esc(m.uid)}">Sacar</button>`}
+    </div>`;
+  }).join('') || '<p class="vacio">No hay nadie.</p>';
+  $('#gestion-jugadores').querySelectorAll('[data-sacar]').forEach(b => b.onclick = () => sacarJugador(b.dataset.sacar, b));
+  $('#gestion-jugadores').querySelectorAll('[data-asignar-gm]').forEach(b => b.onclick = () => ofrecerGM(b.dataset.asignarGm, b));
+  $('#gestion-jugadores').querySelectorAll('[data-cancelar-gm]').forEach(b => b.onclick = () => cancelarOfertaGM(b));
+
+  // Pasar personajes: sirve cuando alguien cambió de cuenta o se fue.
+  const jugadores = miembros.filter(m => !m.gm);
+  if(!fichas.length){
+    $('#gestion-personajes').innerHTML = '';
+    return;
+  }
+  $('#gestion-personajes').innerHTML = '<div class="subtitulo">Pasar un personaje a otro jugador</div>' + fichas.map(f => {
+    const tieneJugador = jugadores.some(j => j.uid === f.duenoUid);
+    const opciones = (tieneJugador ? '' : '<option value="" selected>— sin jugador (se fue) —</option>') +
+      jugadores.map(j => `<option value="${esc(j.uid)}"${j.uid === f.duenoUid ? ' selected' : ''}>${esc(j.nombre)}</option>`).join('');
+    return `<div class="miembro${tieneJugador ? '' : ' huerfano'}">
+      <span class="quien">${nombreFicha(f)}</span>
+      <select data-ficha="${esc(f.id)}" aria-label="Jugador de ${esc(f.nombre || 'este personaje')}"${jugadores.length ? '' : ' disabled'}>${opciones}</select>
+      <button type="button" class="btn chico peligro" data-borrar-ficha="${esc(f.id)}">Borrar</button>
+    </div>`;
+  }).join('');
+  $('#gestion-personajes').querySelectorAll('select[data-ficha]').forEach(s => s.onchange = () => pasarPersonaje(s));
+  $('#gestion-personajes').querySelectorAll('[data-borrar-ficha]').forEach(b => b.onclick = () => borrarPersonajeGM(b.dataset.borrarFicha, b));
+}
+
+async function sacarJugador(uid, boton){
+  const m = gestion.miembros.find(x => x.uid === uid);
+  if(!m) return;
+  if(!await Confirmar.preguntar(`¿Sacar a ${m.nombre} de la partida?\n\nSus personajes quedan y los podés pasar a otro jugador. Puede volver a unirse; si lo hace con la misma cuenta, sus personajes vuelven a ser suyos.`, {titulo: 'Sacar jugador', si: 'Sacar', peligro: true})) return;
+  $('#gestion-error').textContent = '';
+  boton.disabled = true;
+  try{
+    await fbDb.doc(fbRutaCampana(`miembros/${uid}`)).delete();
+    await cargarGestion();
+  }catch(err){
+    console.error('No se pudo sacar al jugador:', err);
+    $('#gestion-error').textContent = textoError(err);
+    boton.disabled = false;
+  }
+}
+
+// Cambia el dueño de la ficha y de sus tokens (el del personaje y los de sus
+// invocaciones, "<fichaId>~<idInvocación>"), para que el nuevo jugador los mueva.
+async function pasarPersonaje(select){
+  const f = gestion.fichas.find(x => x.id === select.dataset.ficha);
+  const nuevo = gestion.miembros.find(x => x.uid === select.value);
+  if(!f || !nuevo){ renderGestion(); return; }
+  if(!await Confirmar.preguntar(`¿Pasarle ${f.nombre || 'este personaje'} a ${nuevo.nombre}?\n\nVa a poder editar la ficha y mover sus tokens en el mapa.`, {titulo: 'Pasar personaje', si: 'Pasar'})){ renderGestion(); return; }
+  $('#gestion-error').textContent = '';
+  select.disabled = true;
+  try{
+    const tokens = await fbDb.collection(fbRutaCampana('tokens')).where('tipo', '==', 'pj').get();
+    const lote = fbDb.batch();
+    lote.update(fbDb.doc(fbRutaCampana(`fichas/${f.id}`)), {duenoUid: nuevo.uid});
+    tokens.docs
+      .filter(t => { const v = t.data().fichaId || ''; return v === f.id || v.startsWith(f.id + '~'); })
+      .forEach(t => lote.update(t.ref, {duenoUid: nuevo.uid}));
+    await lote.commit();
+    f.duenoUid = nuevo.uid;
+  }catch(err){
+    console.error('No se pudo pasar el personaje:', err);
+    $('#gestion-error').textContent = textoError(err);
+  }
+  renderGestion();
+}
+
+// Borra la ficha (con sus partes) y los tokens que la usan (el suyo y los de
+// sus invocaciones, "<fichaId>~<idInvocación>"). Mismo criterio que "Borrar
+// personaje" de la ficha, pero el GM puede hacerlo con la de cualquiera.
+async function borrarPersonajeGM(id, boton){
+  const f = gestion.fichas.find(x => x.id === id);
+  if(!f) return;
+  const nombre = f.nombre || 'Sin nombre';
+  const aviso = `Esto borra a ${nombre} de la partida, para todos, y no se puede deshacer.\n\n` +
+                `Si el jugador lo quiere conservar, avisale antes de borrarlo (podés bajar un respaldo de toda la partida desde gm-tools, "💾 Respaldo partida").\n\n¿Seguís?`;
+  if(!await Confirmar.preguntar(aviso, {titulo: 'Borrar', si: 'Borrar', peligro: true})) return;
+  const escrito = await Confirmar.texto(`Para confirmar el borrado, escribí el nombre tal cual: ${nombre}`, {titulo: 'Borrar', icono: '🗑', si: 'Borrar', max: 80});
+  if(escrito === null) return;
+  if(escrito.trim().toLowerCase() !== nombre.trim().toLowerCase()){
+    $('#gestion-error').textContent = 'El nombre no coincide — no se borró nada';
+    return;
+  }
+  $('#gestion-error').textContent = '';
+  boton.disabled = true;
+  try{
+    const base = fbDb.doc(fbRutaCampana(`fichas/${id}`));
+    const [partes, tokens] = await Promise.all([
+      base.collection('partes').get(),
+      fbDb.collection(fbRutaCampana('tokens')).where('tipo', '==', 'pj').get(),
+    ]);
+    const lote = fbDb.batch();
+    partes.docs.forEach(d => lote.delete(d.ref));
+    tokens.docs
+      .filter(t => { const v = t.data().fichaId || ''; return v === id || v.startsWith(id + '~'); })
+      .forEach(t => lote.delete(t.ref));
+    lote.delete(base);
+    await lote.commit();
+    gestion.fichas = gestion.fichas.filter(x => x.id !== id);
+    renderGestion();
+  }catch(err){
+    console.error('No se pudo borrar el personaje:', err);
+    $('#gestion-error').textContent = textoError(err);
+    boton.disabled = false;
+  }
+}
+
+// DDE inicial de los personajes nuevos (2026-10-02, decisión del dueño: 300 salvo que el GM fije otro): campanas/<id>/ajustes/partida.
+// Lo lee el asistente de personaje nuevo (comun/asistente-personaje.js).
+async function cargarDdeInicial(){
+  $('#dde-inicial-error').textContent = '';
+  try{
+    const d = await fbDb.doc(fbRutaCampana('ajustes/partida')).get();
+    const v = d.exists ? Number(d.data().ddeInicial) : NaN;
+    $('#in-dde-inicial').value = Number.isFinite(v) ? v : 300;
+  }catch(err){ $('#in-dde-inicial').value = 300; }
+}
+$('#form-dde-inicial').onsubmit = async e => {
+  e.preventDefault();
+  const v = Math.max(0, Math.round(Number($('#in-dde-inicial').value) || 0));
+  const boton = $('#form-dde-inicial button');
+  $('#dde-inicial-error').textContent = '';
+  boton.disabled = true;
+  try{
+    await fbDb.doc(fbRutaCampana('ajustes/partida')).set({ddeInicial: v, actualizado: firebase.firestore.FieldValue.serverTimestamp()}, {merge: true});
+    boton.textContent = '✓ Guardado';
+    setTimeout(() => { boton.textContent = 'Guardar'; }, 1800);
+  }catch(err){
+    console.error('No se pudo guardar el DDE inicial:', err);
+    $('#dde-inicial-error').textContent = textoError(err) + ' (¿se pegaron las reglas nuevas de Firebase?)';
+  }finally{ boton.disabled = false; }
+};
+
+$('#form-renombrar').onsubmit = async e => {
+  e.preventDefault();
+  const nombre = $('#in-renombrar').value.trim().slice(0, 60);
+  const boton = $('#form-renombrar button');
+  $('#renombrar-error').textContent = '';
+  if(!nombre || !fbPartida || nombre === fbPartida.nombre) return;
+  boton.disabled = true;
+  try{
+    await fbDb.doc(fbRutaCampana()).update({nombre});
+    fbPartida.nombre = nombre;
+    $('#partida-nombre').textContent = nombre;
+    $('#borrar-nombre').textContent = nombre;
+    boton.textContent = '✓ Guardado';
+    setTimeout(() => { boton.textContent = 'Guardar'; }, 1800);
+  }catch(err){
+    console.error('No se pudo renombrar la partida:', err);
+    $('#renombrar-error').textContent = textoError(err);
+  }finally{
+    boton.disabled = false;
+  }
+};
+
+/* Borrar la partida: Firebase no borra "la carpeta entera" desde el
+   navegador, así que se borra cada documento. Primero lo de adentro, al
+   final la partida y el miembro del GM (sin él, las reglas ya no lo dejan
+   borrar nada). Si se corta a mitad de camino, se puede volver a tocar. */
+
+function cerrarBorrar(){
+  $('#borrar-confirmar').hidden = true;
+  $('#btn-borrar-partida').hidden = false;
+  $('#in-borrar-nombre').value = '';
+  $('#btn-borrar-definitivo').disabled = true;
+  ['#borrar-estado', '#borrar-error', '#respaldo-estado'].forEach(s => { $(s).textContent = ''; });
+}
+
+$('#btn-borrar-partida').onclick = () => {
+  $('#borrar-nombre').textContent = fbPartida.nombre;
+  $('#borrar-confirmar').hidden = false;
+  $('#btn-borrar-partida').hidden = true;
+};
+$('#btn-borrar-cancelar').onclick = cerrarBorrar;
+$('#in-borrar-nombre').oninput = () => {
+  $('#btn-borrar-definitivo').disabled = $('#in-borrar-nombre').value.trim() !== String(fbPartida.nombre).trim();
+};
+
+$('#btn-respaldo').onclick = async () => {
+  const b = $('#btn-respaldo');
+  b.disabled = true;
+  $('#respaldo-estado').textContent = 'Armando el respaldo…';
+  try{
+    $('#respaldo-estado').textContent = await fbBajarRespaldo();
+  }catch(err){
+    console.error('No se pudo bajar el respaldo:', err);
+    $('#respaldo-estado').textContent = textoError(err);
+  }finally{
+    b.disabled = false;
+  }
+};
+
+async function borrarDocumentos(refs){
+  for(let i = 0; i < refs.length; i += 400){
+    const lote = fbDb.batch();
+    refs.slice(i, i + 400).forEach(r => lote.delete(r));
+    await lote.commit();
+  }
+}
+
+$('#btn-borrar-definitivo').onclick = async () => {
+  if(!await Confirmar.preguntar(`Última confirmación: ¿borrar "${fbPartida.nombre}" para siempre?`, {titulo: 'Borrar', si: 'Borrar', peligro: true})) return;
+  const base = fbDb.doc(fbRutaCampana());
+  const estado = t => { $('#borrar-estado').textContent = t; };
+  const botones = ['#btn-borrar-definitivo', '#btn-borrar-cancelar', '#btn-respaldo'];
+  botones.forEach(s => { $(s).disabled = true; });
+  $('#borrar-error').textContent = '';
+  try{
+    // Colecciones con subcolecciones: primero los hijos.
+    for(const [col, sub, texto] of [['fichas', 'partes', 'personajes'], ['creeps', 'privado', 'creeps'], ['bitacora', 'entradas', 'bitácora'], ['gmBitacora', 'entradas', 'bitácora del GM']]){
+      estado(`Borrando ${texto}…`);
+      const snap = await base.collection(col).get();
+      for(const d of snap.docs) await borrarDocumentos((await d.ref.collection(sub).get()).docs.map(h => h.ref));
+      await borrarDocumentos(snap.docs.map(d => d.ref));
+    }
+    for(const [col, texto] of [['tokens', 'tokens'], ['tiradas', 'tiradas'], ['historial', 'historial del GM'], ['mapa', 'mapa'], ['gm', 'datos del GM'], ['tienda', 'tienda'], ['tiendas', 'tiendas guardadas'], ['ajustes', 'ajustes']]){
+      estado(`Borrando ${texto}…`);
+      await borrarDocumentos((await base.collection(col).get()).docs.map(d => d.ref));
+    }
+    estado('Borrando jugadores…');
+    const miembros = await base.collection('miembros').get();
+    await borrarDocumentos(miembros.docs.filter(d => d.id !== fbUsuario.uid).map(d => d.ref));
+    await base.delete();
+    await base.collection('miembros').doc(fbUsuario.uid).delete();
+    fbRecordarPartida('');
+    await verPartidas();
+  }catch(err){
+    console.error('No se pudo borrar la partida:', err);
+    estado('');
+    $('#borrar-error').textContent = textoError(err) + ' Podés volver a intentarlo: sigue desde donde quedó.';
+    botones.forEach(s => { $(s).disabled = false; });
+  }
+};
+
+/* ---------- Irse de la partida (jugador) ---------- */
+
+$('#btn-irme').onclick = async () => {
+  if(!await Confirmar.preguntar(`¿Irte de "${fbPartida.nombre}"?\n\nTus personajes quedan en la partida. Si volvés a unirte con esta cuenta, siguen siendo tuyos.`, {titulo: 'Irte de la partida', si: 'Irme', peligro: true})) return;
+  $('#irme-error').textContent = '';
+  $('#btn-irme').disabled = true;
+  try{
+    await fbDb.doc(fbRutaCampana(`miembros/${fbUsuario.uid}`)).delete();
+    fbRecordarPartida('');
+    await verPartidas();
+  }catch(err){
+    console.error('No se pudo salir de la partida:', err);
+    $('#irme-error').textContent = textoError(err);
+  }finally{
+    $('#btn-irme').disabled = false;
+  }
+};
+
+$('#form-unirse').onsubmit = async e => {
+  e.preventDefault();
+  const apodo = $('#in-apodo').value.trim();
+  if(!apodo) return;
+  $('#unirse-error').textContent = '';
+  try{
+    await fbDb.doc(fbRutaCampana(`miembros/${fbUsuario.uid}`)).set({
+      nombre: apodo, gm: false, creado: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    $('#form-unirse').reset();
+    irAPartida(FB_CAMPANA);
+  }catch(err){
+    console.error('No se pudo unir a la partida:', err);
+    $('#unirse-error').textContent = textoError(err);
+  }
+};
+
+$('#btn-volver').onclick = () => verPartidas();
+
+/* ---------- Arranque ---------- */
+
+function alEntrar(){
+  const pedida = new URLSearchParams(location.search).get('partida');
+  if(pedida) irAPartida(pedida);
+  else verPartidas();
+}
+
+function iniciar(){
+  if(!fbIniciar()){ mostrar('sin-conexion'); return; }
+  firebase.auth().getRedirectResult().catch(err => { $('#login-error').textContent = textoError(err); });
+  firebase.auth().onAuthStateChanged(async u => {
+    fbUsuario = u || null;
+    if(!u || u.isAnonymous){ mostrar('login'); return; }
+    if(!fbCuentaConfirmada(u)){
+      $('#confirmar-email').textContent = u.email || '';
+      mostrar('confirmar');
+      return;
+    }
+    // Si el email se confirmó después de iniciar sesión, la credencial que
+    // ven las reglas puede seguir diciendo "sin confirmar": se renueva.
+    try{
+      const cred = await u.getIdTokenResult();
+      if(!cred.claims.email_verified) await u.getIdToken(true);
+    }catch(e){}
+    alEntrar();
+  });
+}
+
+iniciar();
+</script>
+</body>
+</html>

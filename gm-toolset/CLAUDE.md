@@ -15,48 +15,235 @@ abren uno al otro, solo comparten catálogo y algunos formatos de datos).
 
 ## Estado actual
 
-En desarrollo activo, las dos.
+En desarrollo activo, las dos — `gm-tools.html` es de los archivos que más
+cambia; antes de un cambio grande ahí, `git status`/`git log` para ver si
+hay trabajo reciente o en curso de otra conversación (ver
+[`../CLAUDE.md`](../CLAUDE.md)).
 
 ## Lógica principal
 
 ### gm-tools.html
+- **Partido en archivos desde el 2026-09-30** (paso 5 nivel A, `../docs/plan-paso5.md`): `gm-tools.html` es solo la pantalla
+  (~560 líneas) y carga, en este orden, `gm-tools.css` y los 12 tramos de su código en `js/`: `01-dados-reglas-y-nitros`
+  (tiradas, escala de Tipos, reglas tomadas de la ficha, No2) · `02-editar-creep-y-recompensas` (ventana de edición,
+  recompensas, asistente de creep) · `03-acciones-y-lupa` (lupa, Acciones, tarjetas) · `04-habilidades` (Ejecución, ataque
+  con arreglos, Flash, zonas) · `05-trampas-e-items` (trampa de habilidad, biblioteca de habilidades, editor, asistente de
+  ítems) · `06-eventos` (los clics de toda la página) · `07-tablero-e-ia` · `08-fin-del-combate` · `09-grupos-botin-y-bitacora`
+  · `10-personajes` (lista de fichas, estados sobre otros, trampas al mapa, revivir y el creep vacío del arranque) ·
+  `11-en-vivo` (Mesa, Firebase, guardado, Mantenimiento) · `12-modo-acciones` (dentro del mapa y el arranque). Mismo programa
+  de antes, en el mismo orden, con las mismas variables globales; una línea que se ejecuta al cargar solo puede usar funciones
+  de su archivo o de los anteriores. Cada archivo lleva su `?v=` en `gm-tools.html`.
 - Estado en memoria: `S.creeps[]`, cada uno con la forma de `nuevoCreep()`
   (ver [`datos/esquema.md`](../datos/esquema.md), sección "Creep").
 - `creepStatValor()`/`mantenimiento()` son el equivalente de `compute()`
   de la ficha: ahí se aplican los mods de equipo/estados a los stats
   finales de cada creep, incluyendo las mismas inmunidades/interceptores
   de daño (Invulnerable, Escudo mágico, etc.) espejados desde la ficha.
-- El botón "Guardar" baja `gm-creeps.json` (respaldo completo, **nunca**
-  se sube al repo) y opcionalmente `datos/creeps-publico.json` (recorte
-  público: id, nombre, imagen, HP, estados). El botón "Subir datos" sube
-  directamente ese recorte.
-- El panel Tablero (mismo diseño que en la ficha, código duplicado)
-  arma tarjetas a partir de sus creeps en vivo + lo que bajó de
-  `datos/tablero/*.json`.
+- **En vivo con Firebase** (rama `nueva-version`, bloque "CREEPS EN VIVO"
+  al final del script): si se entró a la mesa como GM, los creeps y el
+  turno se cargan de `campanas/{id}/creeps` y se guardan solos (ver
+  [`docs/workflow-firebase.md`](../docs/workflow-firebase.md)). Ya no hay
+  "Subir datos". Si entra un jugador, no se guarda nada. Los "personajes
+  del GM" (PNJ aliados, etc.) se manejan como creeps.
+- **Nitros (No2)** en lugar de Acciones (bloque `IT2_CREEP`, mismas reglas
+  que el `IT2` de la ficha): máximo = Agilidad efectiva + mods de `nitros`
+  (los viejos `mov`/`accionesmax` cuentan como No2), topeado por
+  `forzarNitros` de Stun/Exhausto (`creepNitrosMax`). `sc.nitros` es lo que
+  queda y se recarga en `mantenimiento()`. El botón ⚡ Acciones cobra: atacar
+  Tipo ÷ 2 el primer ataque del turno y Tipo completo después
+  (`sc.ataquesTurno`), habilidades `nitrosCosto` (1 por defecto) + su CD.
+  **🔍 Lupa en las Acciones** (cuadro y estilos en `../comun/lupa.js`; acá
+  solo el contenido: `lupaContenido` → `lupaHtmlCreep`, claves `data-lupa="creep|tipo|ref"`):
+  cada botón muestra el desglose de la tirada (atributo, mods con origen,
+  Lisiado, dados) y su costo en No2; Atacar sin No2 no se deshabilita (avisa
+  al tocarlo) para que la 🔍 siga abriendo. Los creeps tienen una sola arma.
+  Moverse lo cobra el mapa al arrastrar el token del creep (ya no hay
+  habilidad Movimiento). Los creeps viejos se convierten solos en
+  `normalizarCreep` (Acciones → No2; toda habilidad llamada Movimiento se
+  saca siempre).
+- **No2 sigue a la Agilidad** (`actualizarNo2PorAgl`, mismo criterio que
+  `actualizarHpMaxPorCon` para Con→Hp): al cambiar Agilidad en el editor de
+  un creep, si No2 estaba lleno sube con el nuevo máximo; si no, solo se
+  recorta si ahora pasa el nuevo (menor) máximo. Si `sc.nitros` todavía es
+  `null` (no solidificado) no se toca, sigue el máximo solo.
+- **El atributo Inteligencia se renombró a Especial** (id `int` → `esp`,
+  2026-09-18, mismo cambio que en la ficha): sigue siendo PdG.Mg/Res.Mt/
+  Rango de Casteo de un creep, solo cambió el nombre. Creeps con datos
+  viejos se convierten solos en `normalizarCreep` (`migrarCreepEspecial`/
+  `migrarObjEspecial`, mismo criterio que `migrarCreepTipos`).
+- **Percepción de un creep sale de Destreza** (2026-09-22, mismo cambio
+  que en la ficha): quinto stat derivado de Destreza junto a Rango/PdG/
+  Crítico/Parry (`CREEP_DERIVADOS_POR_ATTR.des`, `CREEP_DERIVED_STATS`).
+  A diferencia de la ficha, acá no tiene botón propio — no hay pasiva de
+  creep que le suba el dado — así que va como cualquier otro stat tirable
+  en Acciones (`CREEP_STATS_TIRADA_IDS`) y como opción de tirada en el
+  editor de habilidades de creep (`HC_STATS_SECUNDARIOS`).
+- **Escala de Tipos +2**: Tipos de arma 4/6/8/10/12 (`DADOS_ARMA`, default
+  8); `crit[0..4]` y `tipo1..tipo5` son la resistencia a Tipo 4..12. Un
+  creep sin `escalaTipos: 2` es de antes y `normalizarCreep` lo corre +2
+  una vez (`migrarCreepTipos`: `armaTipo`, equipo y textos). `nuevoCreep()`
+  trae la marca, así que los creeps guardados se vuelcan sobre
+  `creepBaseGuardado()` (sin marca) para no heredarla. En
+  vendor-generator.html, `migrarItemTipos` hace lo mismo con los ítems
+  creados a mano que vienen en `itemsDatos`.
+- **Botones**: barra superior `.accesos` con botones chicos, como la ficha
+  (Mapa, Vendedor, 👥 Personajes, Tablero, Historial, Reiniciar combate,
+  Catálogo, Respaldo partida, Cargar respaldo); la cabecera deja
+  Mantenimiento, + Creep, + Creep con IA y Finalizar Combate. Ya no hay
+  botón Inicio (lo reemplaza el menú ☰, `../comun/menu-sitio.js`).
+  Personajes (`renderListaPersonajes`) lee `fichas` y `miembros` al abrir
+  la lista y abre cada ficha en otra pestaña; cada fila tiene un ✕ para
+  que el GM borre ese personaje (`borrarPersonajeGM`: confirmar + escribir
+  el nombre, borra la ficha con sus partes y los tokens que la usan, tanto
+  en el mapa de siempre como en cualquier otro mapa guardado — ver
+  [`../docs/workflow-firebase.md`](../docs/workflow-firebase.md)). Sin
+  botón Dados (la tirada libre está en la Mesa), token de GitHub ni
+  Guardar copia (lo cubre
+  Respaldo partida, que incluye los creeps completos). "Cargar respaldo" usa
+  `#file-input`: acepta un respaldo de la partida o un `gm-creeps.json`.
+- **Barra superior unificada** (`../comun/barra.js`, `barraTexto()`, sin
+  personaje acá): la etiqueta `#gm-identidad` ("⚔ GM Tools · Partida ·
+  Usuario · GM") reemplaza al "GM Tools" fijo de antes, se actualiza en
+  `gmAlEntrar()`. El link a Vendedor ahora sí lleva `?partida=` (antes no
+  la llevaba).
+- **Habilidades de creeps paso a paso** (`PASOS_HAB_CREEP`, `hcMostrarPaso`,
+  `#scrim-hab-creep`): "+ Habilidad" y el ✎ abren el mismo asistente que la
+  ficha, adaptado: qué es → costo (No2: un número o `nitrosCosto: "ATAQUE"`,
+  lo mismo que un ataque del creep — `habCreepAtaque`, `costoHabCreepTxt` —,
+  que cuenta como ese ataque en `sc.ataquesTurno` y deja PdG como tirada por
+  defecto; cooldown, otro costo) → tirada
+  (stat del creep con `creepStatValor` y/o fórmula; `habCreepTira`, `tirarExtraDeHab`) → estado (preset o a mano) → resumen. La habilidad nueva recién
+  se agrega al creep al guardar.
+- **Ítems paso a paso** (`comun/asistente-item.js`): el ✎ del arma de un
+  creep (`abrirEditorArmaCreep`, categoría fija) y "✎ Ítem custom"
+  (`abrirItemCustomGM`: cualquier categoría menos consumibles, a qué creep,
+  tier y precio; "Crear y equipar" y/o "📦 Agregar al catálogo" vía
+  `publicarEnCatalogoGM`) usan el asistente compartido, con los números del
+  creep (`portadorCreep`). Un arma reemplaza la del creep
+  (`ponerArmaEnCreep`); el resto va a `sc.equipo` (`ponerEquipoEnCreep`).
+  Los bonos del arma van en `sc.armaMods` y cuentan con los del equipo
+  (`fuentesEquipoCreep`); sus efectos al golpear, en `sc.armaEfectos`.
+- **Efectos al golpear** (`efectosAlPegarCreep`): el Daño del creep los
+  dispara (pop-up si tienen porcentaje) y la Mesa los muestra resaltados
+  (`desde: 'efecto-gm'`, nombre del creep en rojo).
+- **Stats secundarios** (`CREEP_DERIVADOS_POR_ATTR`, `derivadosHtml`): los
+  mismos que un PJ salvo Hp.Max/No2 (ya se ven arriba) y Crg.Max/SP (no
+  aplican), debajo de cada atributo en el editor y en Ver, con el origen al
+  pasar el mouse (`statOrigenTxt`). Se calculan con `creepStatValor`.
+- **Tarjetas y edición**: la grilla muestra siempre la tarjeta compacta
+  (`cardCompactoHtml`). El lápiz abre la ficha completa (`cardHtml`) en la
+  ventana `#scrim-editar-creep` (`abrirEditarCreep`/`renderEditarCreep`,
+  que se redibuja en cada `renderAll` conservando scroll y foco). Esa
+  ventana va una capa debajo (z-index 79) de las que se abren desde ella;
+  Escape cierra solo la de más arriba.
+- "Cargar respaldo" reemplaza todos los creeps de la mesa por los del
+  archivo (con confirmación).
+- El panel Tablero arma tarjetas con los creeps abiertos (con números) +
+  las fichas de los jugadores en vivo desde Firebase, pero **solo de
+  quien tiene token puesto en el mapa publicado** (2026-09-22, a pedido
+  del dueño — antes mostraba todo lo abierto, aunque no estuviera en el
+  mapa todavía o fuera de otro escenario): `tableroEscucharMapaPublicado()`
+  sigue `mapa/activo` y la colección de tokens que corresponda
+  (`tokens` o `mapas/{id}/tokens`, mismo esquema que `vtt-hexgrid/mapa.html`)
+  y arma `tableroTokensMapa` (los `fichaId` con token ahí); `renderTablero`
+  filtra por eso. Acá no hace falta filtrar oculto/sigilo: el Tablero de
+  gm-tools lo ve solo el GM, que ve todo. El mapa tiene su propio botón
+  📋 Tablero — ver [`../vtt-hexgrid/CLAUDE.md`](../vtt-hexgrid/CLAUDE.md),
+  código no compartido (duplicado a propósito, como el resto de esta
+  sección).
 
 ### vendor-generator.html
+- **Rework del generador (2026-10-06, `../docs/rework-tiendas.md`)**: la regla vive en `../comun/generador-tiendas.js`; acá solo la pantalla.
+  Controles: tamaño, **secciones** (desde 2026-10-08, P179: ⚒ Herrería / 🧵 Talabartería / ✨ Bazar arcano, casillas `#f-secciones`; antes «tipo») y **nivel de la zona**; **🧪 Simular 200**
+  (`simularTiendas`). `generarTienda(tamano, tipo, nivel)` y «🎲 Otro» (`rerollItem` → `GeneradorTiendas.otro`) usan la pieza común; Regenerar
+  conserva toda la configuración. Lo que sigue de esta sección sobre `REPARTO_POR_CATEGORIA`, el piso de legacy, «Inicio de partida», los ítems
+  mágicos y el tope de rareza quedó viejo (se sacó).
+- **Barra superior unificada** (`../comun/barra.js`): `#tienda-identidad`
+  ("🏪 Generador de tiendas · Partida · Usuario · GM") reemplaza al
+  "Rol Pintoísta" fijo de antes. A la derecha, links a 🗺 Mapa y ⚔ GM
+  Tools (ya no hay "⌂ Partida", lo reemplaza el menú ☰).
 - `generarTienda(tamano, categoria)` sortea el stock según los pesos de
   rareza de cada tamaño (`TAMANOS`) y el reparto por categoría
-  (`REPARTO_POR_CATEGORIA`: Ramos generales / Alquimista / Herrero).
-  Alquimista tiene un piso de 40% de ítems "legacy", con el tamaño
-  topeado si no hay suficientes legacy disponibles para sostenerlo.
-- El botón "Subir datos" publica el resultado en `datos/tienda-publica.json`.
+  (`REPARTO_POR_CATEGORIA`: Ramos generales / Bazar arcano —el viejo Alquimista, clave `alquimista`— / Herrero / Inicio
+  de partida). Alquimista tiene un piso de 40% de ítems "legacy", con el
+  tamaño topeado si no hay suficientes legacy disponibles para sostenerlo.
+- **Categorías con reglas fijas** (`CATEGORIA_TAMANO_FIJO`,
+  `CATEGORIA_TIER_MAX`): Inicio de partida usa el reparto de Ramos
+  generales, con el tamaño elegido normalmente por el GM pero con tope de
+  rareza en Raro — nunca Excepcional ni Legendario. El tope se aplica en
+  el índice del catálogo (`indexarCatalogo(tierMax)`, vía `dentroDeTope`) y
+  en los pesos de sorteo (`pesosConTope`), así que ni generar, ni
+  regenerar, ni "🎲 Otro" de un ítem puntual (`rerollItem`), ni agregar a
+  mano desde "+ Agregar ítems" se lo saltan — ni siquiera como último
+  recurso si el rubro/tier pedido no tiene stock. `CATEGORIA_TAMANO_FIJO`
+  (bloquear el select de tamaño en un valor fijo, `aplicarTamanoFijo`)
+  queda armado pero sin ninguna categoría usándolo hoy.
+- "+ Crear ítem nuevo" abre el asistente compartido `comun/asistente-item.js`
+  (`abrirItemNuevo`), con tier, descripción narrativa, precio (con el ajuste
+  de la tienda), ranuras y estado al equipar; guarda con `agregarItemCreado`.
+  Los consumibles van al formulario (`abrirItemNuevoFormulario`); si ahí se
+  elige otra categoría, vuelve al asistente.
+- "🎲 Otro" en cada tarjeta (`rerollItem()`) cambia ese ítem por otro del
+  mismo rubro que no esté en la tienda, tirando la rareza con la tabla del
+  tamaño (en una tienda personalizada, misma rareza). El stock fijo no se
+  rerolea.
+- **En vivo con Firebase** (bloque "Tienda en vivo" al final del script):
+  solo para el GM. La tienda que se arma se guarda sola en
+  `campanas/{id}/tienda/borrador`; "Publicar tienda" la copia a
+  `tienda/publicada`, que es la que abren los jugadores desde la ficha, y
+  "Cerrar tienda" la borra. Los ítems creados a mano viajan dentro de la
+  tienda (`itemsDatos`): ya no se suben a `datos/catalogo.json`. Ver
+  [`docs/workflow-firebase.md`](../docs/workflow-firebase.md). Ya no hay
+  token ni botones de GitHub.
+- **Tiendas guardadas** (bloque "Tiendas guardadas"): `campanas/{id}/tiendas`,
+  una por lugar al que se vuelve. La tienda abierta recuerda de cuál salió
+  (`tiendaActual.guardadaId`); guardar es a mano y, si hay cambios sin
+  guardar, se pide confirmación antes de reemplazarla. "Generar tienda"
+  arma una nueva (sin nombre ni lugar en la lista); "Regenerar" vuelve a
+  sortear el stock de la abierta conservando nombre, ajuste de precios y
+  lugar en la lista.
+
+- **Las reglas de un creep, en `comun/creep-calculo.js`** (2026-10-01, paso 4 etapa 4a, `../docs/plan-paso4-etapa4.md`): lo
+  que vivía en `js/01`, `js/02` y `js/04` (`creepStatValor`, `creepModTotal`, `creepDefensaEfectiva`, `creepNitrosMax`, los costos,
+  `defensaCreep`, `normalizarCreep` y sus migraciones, los textos de origen, `CREEP_DERIVED_STATS`, `SLOT_MAP_GM`…) son ahora atajos
+  de una línea a `CreepCalculo`. Para cambiar una regla de creep, ir a ese archivo (y subir su `?v=` en `gm-tools.html` y en el mapa).
+
+- **El dibujo de las Acciones, en `comun/creep-botonera.js`** (2026-10-01, paso 4 etapa 4b): `renderAccionesCreep` arma la
+  ventana con `CreepBotonera.html`; `formulasCombateCreep`, `botonSegundaHabCreep`, `cdControlesHtml` y `botonHabCreepTxt` son
+  atajos. En modo Acciones (dentro del mapa), `js/12` atiende `acciones-delegar`: las Acciones nuevas del mapa (⚗) le piden un
+  botón y GM Tools dibuja las Acciones de ese creep y toca el mismo botón.
+
+- **Los ganchos del duelo, en `comun/creep-duelo.js`** (2026-10-01, paso 4 etapa 4c): `window.DUELO_HOOKS = CreepDuelo.hooks(gmDueloUi)`
+  (`js/12`); `pagarFlashCreep`, `costoFlashCreep(Txt)` y `tirarPdgDeArreglosCreep` (`js/04`) son atajos. Los clics de las Acciones
+  (`js/06`) y el ataque (`atacarNormalCreep`, `ataqueEspecialCreep`) usan `comun/creep-acciones.js`.
+
+- **Las habilidades de un creep, en `comun/creep-acciones.js`** (2026-10-01, paso 4 etapa 4c, tanda 5): el clic de Ejecutar (`js/06`)
+  es `CreepAcciones.ejecutarHab` + `terminarHab(sc, h, p, gmHabUi)` (`gmHabUi` en `js/04`: Mesa, duelo, trampa, zona, "¿A quién le
+  pegó?"); el cooldown a mano, `CreepAcciones.cdMod`. `aplicarEfectoDeConsumoCreep`, `habCreepTira`, `habEjecucionCreep`,
+  `ataqueDeHabCreep`, `tirarExtraDeHab`, `tirarSegundaDeHab`, `aplicarHabCreepSobreSi` y la tirada de `colocarZonaDeHabCreep` son
+  atajos. Lo que se ve (Mesa, carteles, el mapa) sigue acá.
+
+- **La 🔍 y el Ver de un creep, en `comun/creep-lupa.js`** (2026-10-01, paso 4 etapa 4c, tanda 6): `lupaHtmlCreep`,
+  `lupaStatCreep` (`js/03`) y `paraHabHtml` (`js/05`) son atajos; `abrirVerHabAccion` arma la tarjeta con `CreepLupa.verHab` y
+  abre la ventana de siempre. `acciones-delegar` (`js/12`) acepta `boton` (`verhab-editar`, `verhab-subir`, `verhab-reemplazar`):
+  el Ver lo muestra el mapa y, para Editar/Subir/Reemplazar, GM Tools abre ese Ver y toca el botón.
 
 ## Formato de datos
 
-- **Consumen** el catálogo (`CATALOGO_EQUIPO` en gm-tools.html, sin
-  consumibles no equipables; `CATALOGO` en vendor-generator.html, sin
-  imágenes) — se sincroniza desde `datos/catalogo.json`, **no se edita a
-  mano acá**. Ver [`datos/CLAUDE.md`](../datos/CLAUDE.md).
-- **gm-tools.html produce, opcionalmente**: el modal de Ítem custom tiene
-  un botón "📦 Agregar al catálogo" (`agregarItemCustomAlCatalogo()`) que
-  arma la entrada de catálogo directo desde el formulario (funciona con o
-  sin creep elegido) y la sube a `datos/catalogo.json`, con confirmación
-  explícita. No corre `importar_json.py` sola.
+- **Consumen** (desde 2026-09-29) el catálogo de fábrica `comun/catalogo.js`
+  (antes copiado adentro de cada archivo): gm-tools arma `CATALOGO_EQUIPO` con
+  `itemParaCreep` (la Defensa aparte, sin id) y vendor-generator usa
+  `CATALOGO = structuredClone(CATALOGO_BASE)`; los dos le suman al entrar lo
+  que subió el grupo (`cargarItemsSubidosGM`, `cargarItemsSubidosTienda`,
+  `comun/items-subidos.js`).
+- **gm-tools.html produce, opcionalmente**: "✎ Ítem custom" tiene **⬆ Subir al
+  catálogo** (`publicarEnCatalogoGM` → `Biblioteca.guardar({tipo: 'items'})`,
+  disponible al instante; corrección si tiene el nombre de uno del catálogo).
 - **gm-tools.html** produce/consume `datos/creeps-publico.json` y lee
   `datos/tablero/*.json`.
-- **vendor-generator.html** produce `datos/tienda-publica.json` (formato
-  en `datos/esquema.md`), que después lee `ficha-personaje/ficha.html`.
+- **vendor-generator.html** produce `campanas/{id}/tienda/publicada` en
+  Firebase, que después lee `ficha-personaje/ficha.html` (botón Vendedor).
+  `datos/tienda-publica.json` es de la versión vieja y ya no se usa.
 
 ## Dependencias con otras carpetas
 
@@ -65,3 +252,244 @@ En desarrollo activo, las dos.
 - `ficha-personaje/ficha.html` — comparte el formato de tarjeta de
   tablero y de efecto/estado con gm-tools.html (código duplicado, no
   importado); lee lo que publica vendor-generator.html.
+
+**`?editar=<creep>`** (2026-09-19): al cargar, abre la ventana "Editar creep" de ese
+creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
+
+- **Habilidades a mano en la tarjeta** (2026-09-20): la tarjeta compacta del creep
+  lista sus habilidades debajo de ⚡ Acciones (`habsMiniHtml`), cada una con su
+  nombre, **Ver** y **Ejecutar** (los mismos botones y reglas que las Acciones).
+- **Habilidad lenta** (2026-09-20): en el paso de costo del asistente de habilidad
+  de un creep, la casilla "Habilidad lenta" (`cdArranca`) hace que arranque con el
+  cooldown ya activo (`cdActual = cd`, como si la hubiera usado el turno anterior):
+  al crearla o marcarla, al agregar el creep desde la biblioteca y al
+  **Reiniciar combate** (Turno 0). Las que no están marcadas no se tocan.
+
+- **Catálogo base de creeps por escenario** (2026-09-20, `comun/creeps-base.js`,
+  `CREEPS_BASE`): 60 creeps (más la tribu de goblins del bosque, 10 con la etiqueta `goblin`, y 20 **debuffers**, uno por escenario y nivel, con la etiqueta `debuffer`: maldiciones de Especial contra Res. Mental, veneno, confusión y control, casi todo "a mano") y **30 humanos** de seis facciones (bandidos, bárbaros, guardia de la ciudad, piratas espaciales, cultistas, mercenarios; etiqueta `humano` + la facción) con **equipo del catálogo con nombre propio** (cada arma y pieza es un clon del ítem original —mismos efectos, peso, tier y precio— renombrado según el creep que lo lleva, y existe también como ítem del catálogo: `new-<nombre>`, así que si el creep lo "suelta" se vende y se usa igual que el original; nivel 1: arma Común; 2: arma + pieza Comunes; 3: Común + Buena Calidad; 4: dos Buena Calidad; 5: Buena Calidad + Raro; el arma cuenta como un ítem). **Cada habilidad de la biblioteca trae en su descripción "⚙ Automatizado: …" (costo, cooldown, daño, cura, estado propio, con los números) y "✋ A mano: …"** (`armarDetalle` en `creeps-base.js`) — Minas, Bosques, Montañas y Templo antiguo con
+  influencia alienígena × niveles 1 a 5 × 3 — todos con "(auditar)" en el nombre y
+  la etiqueta `auditar`. Aparecen en "+ Creep" → biblioteca junto a lo que apruebe
+  el dueño (opción `base` de `Biblioteca.abrir`), con etiquetas de escenario, nivel,
+  rol y tipo. Atributos = 33 + 3 por nivel (mismo presupuesto que gm-tools) repartidos
+  por rol; HP = Con × 5. Cada uno lleva **una skill rápida** (cooldown 2) y **una
+  lenta** (cooldown 3 a 6, `cdArranca`: arranca el combate en cooldown). Automatizado
+  por skill: costo en No2 (o "lo de un ataque"), tirada de daño (`tiradaExtra`),
+  estados con bonos a sí mismo (Def, Dmg, No2, Eva, Res.Mg) y cura (`curaHp`, que
+  ahora también funciona en los creeps). Los efectos sobre otros quedan escritos en la
+  descripción, a mano. Se corrigió además que los **bonos de Defensa de un estado**
+  cuenten en la Defensa del creep (`creepDefensaEfectiva`, y `creepDefensaMapa`).
+
+- **Recompensas del creep y asistente paso a paso** (2026-09-20, tanda 2 de P91/P92): campos nuevos del creep
+  `tipoCriatura` (+ `tipoCriaturaOtro`), `jefe`, `oroBase`, `armaNatural` y `trofeoEspecial {nombre, precio}` (defaults en
+  `nuevoCreep`/`normalizarCreep`). Sección **Recompensas** en la ficha completa del creep (`recompensasHtml`) con ayudas "?"
+  (oro, arma natural, trofeo) y el resumen "Al morir suelta: …" (`dropsResumenCreep`); también se ve en **Ver**.
+  Reglas: oro sugerido `oroSugeridoCreep` (humano 5n²+10n = 15/40/75/120/175; humanoide la mitad a múltiplos de 5; jefe ×2;
+  resto 0); trofeo `trofeoDeCreep` (arma natural → trofeo con el nombre del arma + " de " + creep, o el especial;
+  precio por nivel 16/30/50/75/110, jefe ×2 — desde el 2026-10-26, lo que vale su equipo natural, ver abajo; despojos = ⌈precio/4⌉). Cambiar el tipo sugiere `armaNatural` y el oro.
+  **🧭 Asistente** (`abrirAsistenteCreep`, estado `asist`): "+ Creep → Crear paso a paso" y "🧭 Paso a paso" en la ficha del
+  creep (edita). 7 pasos (qué es, atributos con preset por rol y nivel, arma, armadura, habilidades, recompensas, resumen),
+  se puede saltar a cualquier paso sin perder nada; trabaja sobre el creep real (crear lo agrega y **Cancelar** lo quita).
+  Los creeps base (`creeps-base.js`) ya traen tipo, jefe, oro, arma natural y nombre de trofeo (51 con arma natural).
+  Todavía **no** se usan al finalizar el combate (tandas 3 y 4).
+
+- **Fin del combate: reporte y publicación** (2026-09-20, tanda 3 de P91): "🏁 Finalizar Combate" (`renderReporteCombate`, estado `combateRep`)
+  lista **quiénes cobran** (las fichas de la partida con su estado: en pie / inconsciente / muerto según `resumen.hp` y
+  `resumen.muertoDef`; el GM destilda a quien no estuvo), **XP** (por creep; escapados al 20% opcional; ajuste del GM +/−; base por jugador =
+  ⌈total ÷ jugadores incluidos⌉; inconsciente ⌊25%⌋, muerto 0), **oro** (`oroDeCreep`: ±20% sobre `oroBase`, tirado UNA sola vez por creep;
+  ajuste del GM; ⌈total ÷ jugadores⌉ para todos los incluidos) y **botín** (ítems que suelta cada creep derrotado con casilla para
+  destildar: arma si no es natural, equipo, trofeo; más "ítem extra" a mano). Los ítems que no están en el catálogo se convierten
+  a la forma de un ítem de la ficha con **precio estimado** por comparación con el catálogo (`precioEstimadoArma/Equipo`, pool de la
+  rareza del nivel, + 8 por punto de bono y 40 por efecto al golpear). **🎁 Publicar recompensas** (`publicarRecompensas`) escribe
+  `campanas/<id>/recompensas/{auto}` (una por personaje: `fichaId`, `duenoUid`, `xp`, `dde`, `aplicada`) y `campanas/<id>/botin/{auto}`
+  (un doc por ítem: `json` con la plantilla, `tomadoPor`), deja una **línea verde** en la Mesa (`desde: 'recompensa'`, `comun/mesa.js`) y marca
+  los creeps `recompensado` (no cuentan en el próximo reporte hasta "Reiniciar combate"). La **ficha** aplica cada recompensa una sola
+  vez (`recompensasRevisar`, transacción sobre el doc) cuando el personaje está abierto y editable; si sube de nivel, pop-up de
+  felicitación (`mostrarSubidaNivel`; el mapa lo muestra mirando el nivel del resumen de la ficha propia, `mostrarSubidaNivelMapa`).
+  Reglas nuevas: `recompensas` y `botin` (hay que pegarlas). Tanda 4 hecha: el botín en la ficha ("Sumar a la mochila",
+  Comparar, ranuras libres) y "Despojar".
+
+- **Grupos de creeps, tokens automáticos y botín** (2026-09-20, tanda 4): campo `grupo` del creep (pestañas `#grupos-barra`, `grupoActivo`, `pasaGrupo`; los creeps nuevos van al grupo abierto; cambiar de grupo desde su ficha, `grupoSelectHtml`). Con un grupo abierto, **🎯 Crear tokens** (`crearTokensDelGrupo`, `comun/tokens-auto.js`) pone un token oculto por creep en fila al centro de la vista del mapa que mira el GM, salteando los que ya tienen. **🎁 Botín** (`#scrim-botin-gm`, `abrirBotinGM`): lo que nadie tomó; **🧰 Despojar** lo convierte en despojos, los reparte (hacia arriba) como recompensas y borra el botín. Modos de iframe `?modo=finalizar|botin` para abrirlos desde el mapa.
+
+- **Catálogo de habilidades para creeps** (2026-09-20): "+ Habilidad" de un creep abre la biblioteca de `comun/skills-creep-base.js` (190 habilidades, filtros por función, velocidad, rol, raza y automatización); elegir una la agrega calculada con el nivel del creep. "+ Crear de cero" abre el asistente paso a paso de siempre.
+
+- **Trampas y sigilo en los creeps base** (2026-09-20): se sumaron 14 creeps (ahora 134) y se cambiaron 5 habilidades lentas por trampas reales. Creeps con trampas: Goblin recolector, Kobold dinamitero/artificiero, Zapador demente, Cazador de las cumbres, Guardián de sellos y de runas, Trampero silvano/de caminos/a sueldo, Saboteador de la banda, Cazador de fosos, Vigía de patrulla, Minador de cubierta, Ballestero emboscado, Cazador bárbaro; con sigilo: Cazador furtivo, Vigía sombrío, Sicario de las sombras. Etiquetas nuevas `trampas` y `sigilo` (filtro "Mecánica").
+- **Arma natural del catálogo** (2026-09-20): botón 🐾 (`data-armanat`) — ver `comun/armas-naturales-base.js`.
+
+- **Estados sobre otros, automáticos** (2026-09-20): las habilidades con `estadoObjetivo` (57 del catálogo y varias trampas de creeps) abren, al ejecutarse, "🎯 ¿A quién le pegó?" con los tokens del mapa que mira el GM; el estado se aplica solo (creeps directo, personajes por aviso en `estados` que su ficha aplica). Ver `comun/estados-aplicar.js`.
+
+- **Protección de jefe** (2026-09-21, P95 versión inicial): un creep marcado **Jefe** (`sc.jefe`) es **inmune a Stun** (`Combatiente.inmunidad` con `{jefe}`, vía `Combatiente.agregarEstado` y `EstadosAplicar.bloqueadoCreep`) y tiene **+1 Res.Mg** (`creepStatValor`, con línea en la lupa): la tirada contra los debuffs. Automático; para apagarlo, se desmarca "Jefe". No cubre Exhausto ni otros controles.
+
+- **Grupo ↔ mapa** (2026-09-21): en la barra de grupos, un selector "🗺" vincula el grupo abierto a un mapa guardado (`gruposMapas`, `gruposMapasEscuchar`); "🎯 Crear tokens" usa ese mapa si el grupo lo tiene (si no, el que el GM está viendo). Renombrar o quitar el grupo mueve o borra el vínculo. Mismo dato que el panel de Mapas del mapa (ver `vtt-hexgrid/CLAUDE.md`). Va en `gm/gruposMapas`, que las reglas ya permiten al GM.
+
+- **Flujo del fin de combate** (2026-09-21): **🏁 Finalizar Combate** abre el reporte que solo ve el GM ("Fin del combate — ajustá lo que van a ver los jugadores": XP, oro, ítems y trofeos). El botón **✔ Confirmar** (antes "Publicar recompensas") carga la XP y el oro en las fichas y **abre solo, a cada jugador, la ventana del botín en el mapa**. Ya no se abre el panel de Despojar después de confirmar. El botón **🧰 Despojar** (antes "🎁 Botín") queda aparte y se usa después, cuando los jugadores ya eligieron: lo que nadie tomó se convierte en despojos y se reparte.
+
+- **"Batalla terminada"** (2026-09-21, reemplaza el flujo de arriba): **🏁 Finalizar Combate** abre, como ventana grande al centro, el reporte "⚔ Batalla terminada" que solo ve el GM: primero **lo que recibe cada jugador** (XP y DDE), después el cálculo de los creeps y los **despojos** (equipos y trofeos) para ajustar. **📢 Publicar despojos** (antes "Confirmar"; el GM revisa todo antes y recién ahí se abre a los jugadores) carga la XP y el oro y escribe `campanas/<id>/combate/actual` = `{numero, estado: 'publicado' | 'cerrado', jugadores: [{fichaId, nombre, estado, xp, dde}], items}` (`cerrado` directo si no hay ítems). Con el botín **publicado**, el botón **🎁 Despojos** (`#btn-botin`, deshabilitado el resto del tiempo) abre la misma ventana para ver qué tomó cada uno y **convertir en despojos lo que nadie tomó**; eso marca el combate como `cerrado`, cierra la ventana de todos y apaga los botones. Reglas nuevas: `combate/{doc}` (hay que pegarlas).
+
+- **Cerrar la ventana no despoja** (2026-09-21): tras "📢 Publicar despojos" al GM se le abre la ventana de despojos (qué tomó cada uno). Cerrarla (Cerrar, ✕ o clic afuera) **no cambia nada**: el botín sigue abierto y se reabre con 🎁 Despojos. Solo el botón **🧰 Despojar lo que nadie tomó** convierte lo que quedó en despojos, marca `combate/actual` como `cerrado` y apaga los botones.
+
+- **La XP y el oro se pagan al cerrar el botín** (2026-09-21): "📢 Publicar despojos" ya **no** carga la XP ni el DDE en las fichas si hay ítems: los deja anotados en `combate/actual.jugadores` (con `duenoUid`) y muestra la ventana a los jugadores. El último paso, el botón de la ventana de despojos del GM (**🏁 Despojar lo que nadie tomó y repartir XP y oro**, o **🏁 Cerrar botín y repartir XP y oro** si no queda nada sin tomar), crea **un solo pago por personaje** en `recompensas` con XP + DDE + su parte de los despojos, y la ficha del dueño lo aplica sola (con el pop-up de nivel si sube). Sin ítems en el botín, se paga al publicar como antes. No se puede publicar otro combate mientras haya uno sin cerrar.
+
+- **XP y DDE por jugador, editables** (2026-09-21): en "Lo que recibe cada jugador" del reporte de la batalla, cada fila tiene su XP y su DDE como **campos numéricos**: el GM cambia directo lo que recibe ese jugador (`combateRep.manual[fichaId] = {xp?, dde?}`; `calcularReparto` usa lo fijado y, si no, el valor calculado). El campo editado se marca y **↺** vuelve al calculado. Se sacaron los "ajustes al total" de XP y de oro; el cálculo (creeps, total, base por jugador) queda como información. El diálogo de publicar lista lo de cada jugador.
+
+- **XP y oro: un valor para todos + un extra por jugador** (2026-09-21, reemplaza la edición campo por campo de arriba): en "Lo que recibe cada jugador" hay un recuadro **Experiencia por jugador** y otro **Oro por jugador** (`combateRep.xpPorJugador` / `ddePorJugador`; vacíos = lo calculado, ↺ vuelve a eso) que se aplican a **todos** los incluidos, y cada jugador tiene sus casillas de **extra** XP y DDE (`combateRep.extra[fichaId]`, pueden ser negativos) por circunstancias particulares. Resultado por jugador = `floor(valor × factor de su estado)` + extra (el inconsciente cobra el 25% del valor, el muerto nada; el extra se suma encima; mínimo 0), mostrado como "= +N XP · +M DDE".
+
+- **Bitácora del GM** (2026-09-21): botón **📖 Bitácora GM** en la barra superior (`#btn-gbit`, ventana `#scrim-gbit`, bloque "BITÁCORA DEL GM" antes de `toast`, prefijo `gbit`). Mismo formato que la de los jugadores (páginas con pestañas, entradas en el color de su autor con "(autor · fecha · editado por …)", Ctrl+Enter para sumar) pero **privada**: vive en `campanas/<id>/gmBitacora/<página>/entradas/<id>` y solo el GM la lee y escribe. Va en el respaldo del GM (`bitacoraGM`) y se borra con la partida. Regla nueva `gmBitacora` (hay que pegarla). El código está duplicado de `ficha.html` (bloque BITÁCORA DE LA PARTIDA), con `gbit*` en vez de `bitacora*`.
+
+- **Mover creeps entre grupos arrastrando** (2026-09-21): cada tarjeta compacta tiene un asa **⠿** (`data-arrastrar-creep`) que se arrastra hasta la pestaña de otro grupo, o hasta **Sin grupo** (que ahora se ve siempre que haya grupos), y el creep cambia de contenedor (`sc.grupo`). "Todos" no recibe. En la vista "Todos" cada tarjeta muestra una etiqueta con su grupo (`.grupo-tag`). El selector "Grupo (escenario)" de la ficha completa sigue funcionando.
+
+- **Más kobolds, goblins y hombres cabra** (2026-09-21, `comun/creeps-base.js`, sección "TRIBUS Y CLANES"): +14 kobolds de las minas (3/3/3/3/2 por nivel, etiquetas `kobold` y `tribu kobold`), +10 goblins del bosque (2 por nivel) y una raza nueva de **15 hombres cabra** de las montañas (3 por nivel, etiquetas `hombre cabra` y `clan cabruno`; el **Patriarca cabruno** es jefe). Cada uno con un rol distinto y mecánicas del juego distintas (sigilo, trampas con y sin daño, Espinas, Regeneración, Blindado, Escudo mágico, Inmunidad a CC, Hypeado, Afortunado, y estados sobre otros automáticos: Quemado, Veneno, Rengo, Cegado, Pajaritos, Inmovilizado, Stun, Armadura rota, Maldito). Helper nuevo `ap(sp, estado)`: una habilidad o trampa que deja un estado sobre el objetivo sin depender del nombre en `APLICA`. El filtro "Tribu" de la biblioteca de gm-tools suma las tres razas. Todos con "(auditar)", como el resto: los números son un primer borrador.
+
+- **Ver, editar y proponer una habilidad de la biblioteca** (2026-09-21): en "+ Habilidad" cada fila tiene **👁 Ver** junto a Agregar (`alVer` → `verHabBiblioteca`, ventana `#scrim-ver-hab`): muestra la habilidad calculada con el nivel del creep (costo, cooldown, tirada, cura, estados, trampa, descripción con ⚙/✋). Desde ahí: **Agregar**, **✎ Editar** (el asistente paso a paso de siempre sobre una copia: `abrirEditorHabCreep(scId, null, {borrador, alGuardar})`, no toca al creep hasta Agregar) y **📚 Biblioteca**, que se habilita una vez editada y propone esa versión (`Biblioteca.guardar({tipo: 'habs_creep', datos: {habilidad}})`; el dueño la aprueba en la pestaña Propuestas). Una propuesta guarda la habilidad ya calculada (`datos.habilidad`, valores fijos: `armarHabilidadDeCreep` la copia sin escalar). Reglas: se sumó `habs_creep` a las listas de `biblioteca_*`/`propuestas_*` (hay que pegarlas).
+
+- **El aviso ⚙/✋ no va a la Mesa** (2026-09-21): la descripción de las habilidades del catálogo termina con "⚙ Automatizado: … ✋ A mano: …", que es información para el GM. `habPartes(h)` separa la descripción, lo automatizado y lo que se resuelve a mano, y `habTextoMesa(h)` arma lo que se publica en la Mesa al ejecutar una habilidad (`mesaConTexto` y `mesaPublicarHabilidadCreep`): solo lo que hace la habilidad (descripción + lo que va a mano, que también es efecto), sin el aviso. Funciona sobre el texto, así que cubre también los creeps ya guardados. En Ver (`#scrim-ver-hab`) el aviso sale en secciones aparte solo para el GM; el editor y las otras tarjetas siguen mostrando el texto completo.
+
+- **Ver un creep de la biblioteca: Agregar, ✎ Editar y 📚 Biblioteca; y lo mismo en cada habilidad** (2026-09-21): la ventana "Ver" de un creep del pool (`verCreepDeBiblioteca`, `#scrim-view`) tiene pie con **Agregar** (lo suma a la mesa, como antes desde la lista), **✎ Editar** (la ficha completa de siempre sobre una copia) y **📚 Biblioteca** (propone esa versión con `guardarCreepEnBiblioteca`; se habilita recién cuando se editó algo). La copia es un **borrador**: vive en `S.creeps` marcada `_borrador` mientras la ventana está abierta, para reusar los editores, y se descarta al cerrar; `creepsReales()` la deja afuera de la grilla, el Tablero, el Mantenimiento, el conteo de grupos y el guardado en Firebase (usar `creepsReales()` y no `S.creeps` en todo lo que muestre o guarde creeps de la mesa). Mientras se edita el creep, la ventana Ver y la lista de la biblioteca se esconden y vuelven al cerrar la ficha (`volverAVerCreepBib`). Cada habilidad de la lista tiene **👁 Ver** (`verHabDeCreep`, la misma tarjeta que en "+ Habilidad" pero sin Agregar), **✎ Editar** (`editarHabDeCreepBib`, el editor de habilidad por encima: `opc.encima`) y **📚 Biblioteca** (`proponerHabilidadABiblioteca`, habilitado tras editarla). Capas: lista 80, Ver creep 93, Ver habilidad `#scrim-ver-habbib` 94, editor de habilidad 96, toast 120. Ojo: `#scrim-ver-hab` / `verhab-*` son de las Acciones del creep; la tarjeta de la biblioteca usa `verhabbib-*`.
+
+- **Pajaritos ya afecta a los creeps** (2026-09-22, arreglo de P101): `mitadPdgEva:true` en el preset (`ESTADOS_PRESET_GM` y `comun/estados-aplicar.js`) y en `FLAGS_ESTADO_CREEP`; `creepStatValor` lo aplica a PdG y Evasión (mismo `floor(v/2)` que Lisiado a PdG/Parry — independientes, se pueden apilar). Se refleja en `statOrigenTxt` y en la lupa de las Acciones.
+
+- **Arreglo: los grupos de creeps se filtraban entre partidas** (2026-09-22, bug real reportado por el dueño): `gm-grupo-activo` y `gm-grupos-extra` (la pestaña abierta y los grupos vacíos creados con "＋ Grupo") vivían en `localStorage` **sin el sufijo de partida** — un grupo vacío armado en una partida aparecía como pestaña en cualquier otra partida abierta en el mismo navegador (los creeps en sí nunca se mezclaron: `sc.grupo` es un campo del creep, que ya vive correctamente bajo `campanas/{id}/creeps`). Ahora las claves llevan `-${FB_CAMPANA}`, mismo patrón que `gbit-activa-`/`bitacora-activa-`. Efecto secundario esperado: un grupo vacío armado *antes* de este arreglo no aparece más (la clave vieja queda huérfana a propósito, para no seguir arrastrando la mezcla) — se recrea con un clic en "＋ Grupo". Se revisó también `mapa-viendo` (vtt-hexgrid/mapa.html): ese sí es seguro, `recalcularMapaMostrado` descarta cualquier id que no esté en la lista de mapas de la partida actual.
+
+- **Qué pasa al "↺ Reiniciar combate"** (2026-09-22, regla dicha por el dueño; `reiniciarCombate()`): además de volver el contador a Turno 0, para cada creep de la mesa — **los cooldowns de sus habilidades vuelven a 0**, salvo las marcadas **"habilidad lenta"** (`cdArranca`), que arrancan el combate nuevo con el cooldown ya activo (`cdActual = cd`, como si la hubieran usado el turno anterior — antes esto era lo único que tocaba el reinicio; las no-lenta con un cooldown a mitad de cuenta se quedaban así, sin resetear, hasta ahora); **los Nitros se recargan a full** (`sc.nitros = creepNitrosMax(sc)`, mismo cálculo que Mantenimiento); y se **restablece la niebla de guerra del mapa publicado** (`nieblaReiniciarDesdeGM`, mismo dato que "↺ Restablecer niebla" del mapa — `mapa/niebla` o `mapas/{id}/estado/niebla` según cuál esté publicado en `mapa/activo`, `descubiertas: []`; mejor esfuerzo, si falla solo queda en la consola, no corta el resto). No toca los Nitros de los personajes de los jugadores — eso lo sigue cubriendo Mantenimiento, que el GM dispara aparte.
+
+- **Ejecutar una habilidad tira la primera tirada; la segunda va con 🎲** (2026-09-24, pedido del dueño): al apretar Ejecutar se tira **solo el stat vinculado** (`tiradaStat`: PdG, PdG.Mg u otro) o, si la habilidad no tiene stat, la fórmula (`tiradaExtra`). Si tiene las dos, la fórmula (el daño o el efecto) queda para un botón **🎲 <fórmula>** al lado de Ejecutar, como Atacar → Daño en las armas (`tirarPrimeraDeHab`/`tirarSegundaDeHab`; en gm-tools `tirarExtraDeHab`/`tirarSegundaDeHab` y `botonSegundaHabCreep`; en invocaciones `tirarExtraDeHabInv`/`tirarSegundaDeHabInv`). Las habilidades de creep armadas por el programa que tiran daño ahora traen `tiradaStat` = `'pdg'` (o `'pdgmg'` si son mágicas: rol mágico de la biblioteca o palabras como mágico/arcano/rayo/fuego/hielo en el nombre o la descripción, `esHabMagica` en `comun/creeps-base.js`); a las ya guardadas se les agrega al cargar el creep (`migrarHabPdg`, solo las que dicen "tira … de daño" y no tienen stat). Es un punto de partida: se puede cambiar el stat en el editor de la habilidad.
+
+- **📜 Historial y reporte del Mantenimiento de creeps** (2026-09-24): `mantenimiento()` arma por cada creep un reporte (daño/cura de cada estado, turnos "3 → 2", estados que se terminan, escudo mágico recargado) y lo manda al 📜 Historial del GM (`historialReporteMantenimiento`, `comun/historial.js`) — a la Mesa NO, porque el HP de los creeps es secreto. Además un `setInterval` de 1 s le pasa a `historialObservarCreeps` la lista de creeps (`creepsReales()`) para que anote cambios de HP y de estados.
+
+- **Los presets de estados alterados preguntan sus cantidades** (2026-09-24, pedido del dueño): al activar un preset estándar (ficha: "+ Estado" y estado de una invocación; gm-tools: estado de un creep, y desde el mapa que abre esas mismas ventanas), en vez de crear el estado con números fijos aparece un cartelito que pregunta de a una: **cuánto HP** (cura o daña por turno), **cuántos HP tiene el escudo**, **cuántos stacks**, **cuánto suma o resta cada bono** y por último **cuántos turnos dura** — con un tilde **"Sin límite (no vence)"** (viene tildado en los que eran permanentes, como Veneno severo o Sigilo, y se destilda para poner turnos). Lo hace `comun/estado-preguntas.js` (`EstadoPreguntas.pedir(preset, cfg)`; `cfg.hp` es `hpturno` en la ficha y `hpTurno` en gm-tools). Los presets siguen definiendo el efecto; los detalles ya no llevan números. Sangrado guarda "N de daño" como N stacks de 1 HP (así sigue sumando de a 1). Armadura rota no pregunta el bono (−1 por acumulación es la regla). Los "Mis presets" (propios) se aplican directo con sus números. Las tarjetas del selector muestran "HP: a elegir", "Turnos: a elegir", etc.
+- **"Escudo mágico" pasó a llamarse "Escudo especial"** (2026-09-24): preset, habilidades de creep que lo aplican y textos del editor y de la Mesa. Los estados viejos con el nombre anterior siguen andando (`alias: ['Escudo mágico']` en el preset, `presetPorNombre`). Los ítems del catálogo también se renombraron (Pergamino/Poción de Escudo Especial, en `datos/catalogo.json`, el Excel y los tres HTML; los ids `new-…-escudo-magico` no cambian); los que ya estaban en una mochila conservan el nombre con el que se copiaron.
+
+- **Cooldowns a mano** (2026-09-24, pedido del dueño): al lado de Ejecutar, en las tres vistas de las habilidades de un creep (tarjeta `habsMiniHtml`, ventana de Acciones `filaHab`, editor de habilidades), el GM ve **− CD n +** y, con cooldown activo, **↺**: sube o baja los turnos que le quedan a esa habilidad (`h.cdActual`, 0 a 99) o lo resetea (`cdControlesHtml`, `data-cdmod`). Sirve para deshacer una ejecución de prueba o forzar un cooldown. No devuelve los No2 gastados.
+
+- **🪤 Trampa: paso propio en el editor de habilidades de creep** (2026-09-24, pedido del dueño): el asistente de habilidad (✎ Editar / + Habilidad) ahora tiene un paso **"🪤 Trampa"** (antes de "Listo") con un tilde bien visible "Esta habilidad coloca una trampa", su nombre, qué hace, daño automático (ej. 2d6+3), radio, cantidad y el estado que deja a quien la pisa (de la lista de debuffs, más "el que ya traía" si era uno propio) con sus turnos; destildarlo **le saca la trampa** a la habilidad (`hcCargarTrampa`, `hcGuardarTrampa`, `hcTrampaResumen`). Antes las habilidades armadas por el programa traían `trampaColocar` sin forma de verla, cambiarla ni quitarla. La gestión de trampas del mapa (Terreno y Formas) queda para rediseñar: ver "A desarrollar".
+
+- **Ver una habilidad del creep: ✎ Editar y ↻ Reemplazar** (2026-09-24, pedido del dueño): el recuadro que abre el **Ver** de una habilidad (tarjeta del creep y Acciones) trae dos botones al pie: **✎ Editar** abre el editor paso a paso de esa habilidad, y **↻ Reemplazar** abre la biblioteca de habilidades para elegir otra que **pisa a esta en el mismo lugar** de la lista (`abrirCatalogoHabilidades(scId, reemplazarId)`; desde ahí también hay un atajo "Mejor editar la actual").
+
+- **📚 Trampas preconstruidas en el paso Trampa** (2026-09-24, pedido del dueño): el paso "🪤 Trampa" del editor de habilidades de creep trae un botón que abre el catálogo de trampas base (`comun/trampas-base.js`, más las propuestas del grupo, con sus filtros); al elegir una, un cartelito —el mismo de los estados, ahora genérico: `EstadoPreguntas.preguntar(cab, preguntas, alTerminar)`— pregunta **de qué tamaño (radio)**, **cuánto daño** (si la trampa hace daño automático) y **cuántas trampas** por ejecución, y carga todo en el editor para revisar antes de guardar la habilidad.
+
+- **Imagen más grande en la tarjeta del creep** (2026-09-24, el dueño notó que se veía muy borrosa): además de la `miniatura` de 96 px (la del token), gm-tools publica en el documento público del creep una imagen `tarjeta` de **hasta 400 px** (`CREEP_TARJETA_PX`, JPEG, cuadrada, sin agrandar más que la foto original) que arma junto con la miniatura al cambiar la imagen; los creeps que ya estaban en la mesa la reciben **una vez, sola, la próxima vez que el GM abre GM Tools** (`gmTarjetasFaltantes`, en segundo plano). La tarjeta 🪪 del mapa usa `tarjeta` y, si todavía no está, cae en la miniatura (`hudTarjetaHtml`). La imagen original completa sigue siendo privada del GM (`privado/imagen`).
+
+- **Parry y Bloqueo de creeps e invocaciones** (2026-09-24, pedido del dueño; igual que la ficha): el **Parry cuesta tantos No2 como el Peso de su arma** (`costoParryCreep` / `pesoArmaInv`; `armaPeso`, mínimo 1; sin No2 suficientes avisa y no tira, como Atacar) y el **Bloqueo** suma su Bloqueo + el Peso de su arma y **esa suma es el dado** (`bloqueoValorCreep`; Bloqueo 6 + Peso 3 = 9 → 1d8+1). Los botones muestran el costo y el motivo.
+
+- **Defensa y resistencias a crítico en la botonera de creeps e invocaciones + "Esquivar (Eva)"** (2026-09-25, pedido del dueño): las Acciones del creep (gm-tools) y la botonera de la invocación suman bajo el Combate una fila **Defensa** y **Resistencia a críticos Tipo 4–12** (solo se ven; en el creep cada una lleva su 🔍 con de dónde sale: equipo, base a mano, armadura rota — `defensaOrigenTxt`/`critOrigenTxt`, `lupaHtmlCreep` caso `defensa`). Igual que ya tenía la botonera del personaje. Y el botón **Esquivar** ahora dice **"Esquivar (Eva)"** en todos lados (botonera, tarjeta de combate, invocaciones y creeps).
+
+- **Ficha del creep desde el mapa (2026-09-26, pedido del dueño):** el 📜 del token de un creep vinculado (solo GM) abre, encima del mapa, la **misma ventana «Ver»** de GM Tools (`verCreep`, de solo lectura) en el iframe de Acciones (`?modo=acciones&creep=<id>&ver=1`, o el mensaje `abrir-ver-creep`). Antes abría la ventana «Editar creep» en otra pestaña (`?editar=`, que sigue existiendo).
+
+- **Armadura mágica en los creeps** (Paso 7 de las reglas de casteo, 2026-09-27, `docs/reglas-casteo.md` §1.4): campo nuevo
+  `sc.armadmg` (default 0), editable junto a Defensa en la ficha completa del creep y visible como tercer casillero "no se
+  tira" en Acciones (junto a Defensa y Res. a crítico); `creepArmadmgEfectiva(sc)` = base + mods de equipo/estados (mismo
+  patrón que los stats derivados de atributo, no el de Defensa que se hornea al equipar — ver `armadmgOrigenTxt` para el
+  desglose de la lupa). Se agregó `armadmg` a `cfgItemGM().stats` para poder dársela a un creep como bono de ítem.
+
+- **Hechizos de área** (Paso 7b del casteo, 2026-09-27): `habDueloCreep(sc, h)` suma `radio: num(c.radio)` cuando el 🎯 de
+  la habilidad tiene objetivo `'area'`. El resto (cascada, círculo compartido, fase de dodge) vive en `comun/duelo.js`
+  y `vtt-hexgrid/mapa.html` — ver `../comun/CLAUDE.md` y `../vtt-hexgrid/CLAUDE.md`.
+
+- **El Tablero solo muestra lo que está en el mapa publicado** (2026-09-22, a pedido del dueño): antes listaba TODAS las fichas de la partida y TODOS los creeps abiertos en gm-tools, tuvieran o no token puesto en algún mapa. Ahora, mientras el Tablero está abierto, además de escuchar `fichas` escucha `campanas/{id}/mapa/activo` (`tableroEscucharMapaPublicado`) y los tokens de ESE mapa (`tableroColeccionTokensDe`, mismo esquema de colecciones que `vtt-hexgrid/mapa.html`: `tokens` para el mapa principal, `mapas/{id}/tokens` para uno guardado) — `tableroTokensMapa`, un `Set` de `fichaId`s. `renderTablero()` filtra `tableroDatos.fichas` y `tableroCreepsLocales()` contra ese set antes de armar las tarjetas. Como esto lo ve solo el GM, no hace falta filtrar oculto ni sigilo (eso sí importa en la versión del mapa, ver `vtt-hexgrid/CLAUDE.md`, que además agrega el mismo Tablero ahí para que también lo puedan abrir los jugadores).
+
+- **Subida unificada: habilidades de creep y creeps** (2026-09-29, paso 3 de `../docs/plan-subida-unificada.md`): "+
+  Habilidad" de un creep abre la biblioteca de tipo `skills` (la misma de las habilidades de jugador, P122) con
+  `legado: LEGADO_HABS` (lo viejo de `biblioteca_habs_creep`), cada fila marcada 🐾 Creep · cooldown / 🧙 Jugador · SP
+  (`PARA_TXT`, `paraHabHtml`, `habDeBiblioteca(sc, datos, meta)`); ⬆ Subir en la ventana "Ver" de una habilidad del
+  creep (`#verhab-subir` → `proponerHabilidadABiblioteca`, corrección / nuevo). Los creeps guardan `bibOrigen` y la
+  tarjeta muestra 🔔 si el original se corrigió (`creepsSubidos`, `versionNuevaDeCreep`, `abrirVersionNuevaCreep`,
+  `actualizarCreepDesdeBib`: conserva vida, estados, grupo, imagen y color).
+
+- **Tres modos de ejecución en las habilidades de creep** (2026-09-30, los mismos que en la ficha): `h.modo` = 'manual'
+  (📣 Anunciar: solo el texto, no cobra ni pone cooldown), 'semi' (💰 No2 + cooldown + tirada inicial; lo del sistema
+  anterior sigue: estado propio, cura, trampa al lado del token, estado sobre el objetivo de las de fábrica) o 'auto' (✨
+  `h.duelo`). `modoHabCreep(h)` deduce el de las viejas. El editor (`PASOS_HAB_CREEP`, ahora con los pasos 7 "Cómo se
+  ejecuta" y 8 "Ejecución") muestra los pasos según el modo (`hcOrden`; `hcMostrarPaso(n)` recibe la POSICIÓN, no el
+  índice). Auto + solo sobre el creep y sin tiradas → `aplicarHabCreepSobreSi` (sin cuadro). Auto con trampa y embebido en
+  el mapa → `pedirTrampaAlMapaCreep` (el GM elige la casilla; no se anuncia a los jugadores). El ✨ de la fila abre el
+  asistente con `siempreActivo` y deja la habilidad en auto (o semi si se saca).
+- **Ataque con arreglos y ⚡ Flash de los creeps** (2026-09-30, P134/P135): una habilidad ✨ "ataque con mi arma, con arreglos"
+  va al duelo como un ataque del creep (`lanzarAtaqueDeHabCreep` → `ataqueDeHabCreep`, `Combatiente.ataqueConArreglos`):
+  el gancho `atacar` tira su PdG con lo que suma la habilidad (`tirarPdgDeArreglosCreep`, los No2 ya se cobraron) y `dano`
+  le suma los dados y el fijo. Los Flash del creep aparecen en las cajas de tirada del duelo que maneja el GM
+  (`flashOpciones`/`flashUsar`): no gastan No2, ponen el cooldown (y cobran la vida si la tienen). Al usarlo pregunta "¿Es el
+  turno de X?" (`pagarFlashCreep`): en turno ajeno, todo el costo es el doble (P136, regla del juego). Con el botón Ejecutar
+  (`usarFlashFueraDelDueloCreep`) hace lo mismo, sin No2, y lo anuncia: el bono se suma a mano a la tirada.
+
+- **"No vence" en las habilidades de creep** (2026-10-01, P137): el paso del estado del editor de habilidades suma la casilla
+  `#hc-efecto-permanente` (`h.efectoPermanente`; se marca sola al elegir un preset que no vence, y una habilidad vieja sin el dato
+  la muestra según su estado). El Excedente de vida que da una habilidad reemplaza al que tenía el creep (antes se sumaba).
+
+- **El Mantenimiento de un creep, en `comun/creep-acciones.js`** (2026-10-02, hoja de ruta A2b): `mantenimiento()` (`js/07`) usa
+  `CreepAcciones.mantenimiento(sc)` por cada creep y `gmMantenimientoRevisar` (`js/12`) `CreepAcciones.reclamarMantenimiento`. El mapa
+  ya no carga GM Tools en `?modo=mantenimiento`: pasa el turno de los creeps él mismo con la misma pieza (el modo queda sin uso, para la
+  limpieza).
+
+- **El fin del combate, en `comun/combate-fin.js`** (2026-10-02, hoja de ruta A6a): el reporte «Batalla terminada» (`js/08`) y el botín
+  para despojar (`js/09`) son ventanas sobre `CombateFin` (`renderReporteCombate` → `CombateFin.vista`; los controles `data-rep-*` los
+  atiende un solo listener; `publicarRecompensas` → `CombateFin.publicar`; `renderBotinGM`/`despojarBotin` → `botinVista`/`despojar`).
+  `combateRep` sigue siendo la variable de GM Tools (ahora con `contarEscapados` adentro). Las reglas de recompensas (`tipoDeCreep`,
+  `trofeoDeCreep`, `dropsResumenCreep`…), `itemParaCreep`, `TIPOITEM_LABEL_GM` y `STAT_LABEL_GM` son atajos a `comun/creep-calculo.js`;
+  `verCreepDatos` y `verItemDatos` arman su HTML con `comun/creep-lupa.js` (`verCreep`, `verItem`). El mapa del GM muestra las mismas
+  ventanas él mismo (`vtt-hexgrid/js/18-ventanas-gm.js`): el `?modo=finalizar|botin` y el `&ver=1` de `modo=acciones` quedaron sin uso
+  (limpieza A′).
+
+- **El editor de creeps, en `comun/creep-editor.js`** (2026-10-02, hoja de ruta A6c): el editor de habilidades (`editorHabCreep`, js/04;
+  `abrirEditorHabCreep` es un atajo; la ventana `#scrim-hab-creep` ya no está en `gm-tools.html`: la arma el componente), Subir y Reemplazar
+  (`proponerHabilidadABiblioteca`, `abrirCatalogoHabilidades`, `habDeBiblioteca`… atajos en js/05) y el editor de un estado (`editorEstadoCreep`,
+  js/05; `abrirEditorEstadoCreep(scId, esId, inicial)`; tampoco está ya `#scrim-estado-creep` en el HTML). `MODOS_HAB_CREEP`,
+  `HABS_CREEP_GRUPOS`, `textoEstadoAgregado` y `hcStatLabel` son atajos. El mapa usa las mismas piezas y ya no le pide nada a GM Tools
+  escondido: `acciones-delegar` y el `editar-estado` de un creep quedaron sin uso (limpieza A′).
+
+- **Los grupos pasaron a ser mapas** (2026-10-02, pedido del dueño; `comun/creeps-mapas.js`): las pestañas (`#mapas-barra`,
+  `renderMapasBarra`, `pestanaMapa`, `pasaPestana`) son **Todos**, los mapas de la partida (`mapasGM`, `mapasGMEscuchar`) y **🎒 Reserva**;
+  **＋ Mapa** crea uno (`pedirMapaNuevo`). Cada creep tiene **«🗺 Mover a…»** (`mapaSelectHtml`: en su propia fila de la tarjeta y en la ficha
+  completa) que lo muda con su token (`moverCreepAMapa`). En la pestaña de un mapa, **🎯 Poner sus tokens** (`crearTokensDelMapa`). Los creeps
+  nuevos van al mapa de la pestaña abierta (`mapaParaNuevo`). Al entrar, `gmMigrarGrupos` convierte los grupos viejos (una vez). Se sacaron el
+  arrastre (⠿), los grupos con nombre libre, el selector 🗺 de vínculo y `gruposMapas`. Lo de "Grupos de creeps", "Grupo ↔ mapa" y "Mover
+  creeps entre grupos arrastrando" de más arriba quedó viejo.
+
+- **El asistente de creeps, sobre la ventana común** (2026-10-02, tanda 1 de `../docs/plan-paso-a-paso.md`): `abrirAsistenteCreep` usa
+  `comun/paso-a-paso.js` (ya no está `#scrim-asistente-creep`). Crear: el creep vive marcado `_creando` (fuera de `creepsReales`: no se ve ni
+  se guarda) hasta «✔ Crear»; Cancelar lo descarta. Editar: Guardar siempre visible; Cancelar repone la copia del creep (pregunta si cambió algo).
+- **El editor de habilidades de creep, en la ventana común** (2026-10-02, tanda 2): `comun/creep-editor.js` abre `comun/paso-a-paso.js` con los
+  bloques de cada paso; ya no existe `#scrim-hab-creep` (ni su CSS). Mismo en las Acciones del mapa.
+- **Tanda 6 del paso a paso** (2026-10-02): **＋ Mapa nuevo** (`pedirMapaNuevo(marcado)`, js/09) con `comun/asistente-mapa.js` (los creeps marcados se
+  mudan con `moverCreepAMapa`; desde «Mover a… ＋ mapa nuevo» el creep arranca marcado) y el editor de **estados de creep** en la ventana común
+  (`CreepEditor.crearEstado(document.body, …)`, sin `#scrim-estado-creep`).
+
+- **¿Crear su token?** (2026-10-09, pedido del dueño): al crear (de cero, paso a paso, biblioteca, IA) o duplicar un creep que queda en un mapa (no en la
+  Reserva), GM Tools pregunta si crear su token oculto en ese mapa (`ofrecerTokenEnMapa`, js/09). Al revés, en el mapa, Ctrl+C / Ctrl+V de un token de creep
+  ofrece duplicar su ficha (ver `vtt-hexgrid/CLAUDE.md`).
+
+- **La 🪪 del mapa: arma, equipo y nota en lo público** (2026-10-09, bug: la tarjeta siempre decía «Sin equipo.»): `creepPublico` (js/11) suma
+  `CreepCalculo.tarjetaPublica(sc)` — el nombre del arma (con `armaNatural`), los nombres del equipo y la nota, nada de defensa ni bonos. Al
+  entrar, los creeps cuyo documento público no tiene `equipoNombres` se vuelven a publicar solos. **La nota del creep la ven los jugadores**
+  (los dos campos de nota lo dicen).
+
+- **🔎 Escanear grupo** (2026-10-09, pedido del dueño: escaneo + IA): botón en la cabecera (`abrirEscaneo`, al final de js/07). Lee todas las fichas con el motor
+  común (carga recién ahí ficha-calculo, ficha-guardado, ficha-combate y `comun/escaneo-grupo.js`) y muestra la lectura rápida (puntos débiles y fortalezas)
+  y tablas: resistencia a crítico por Tipo, elementales, defensas, atributos, ataque, armas y tipos de daño (rojo lo más bajo, verde lo más alto; se
+  destilda a quien no va). **🤖 Proponer creeps**: le pasa ese escaneo a la IA de «+ Creep con IA» (misma clave y modelo de OpenRouter) y muestra su
+  propuesta en texto. No escribe nada en la partida.
+- **🏁 «Si derrotan a todos», siempre a la vista** (2026-10-10, pedido del dueño): con la pestaña de un mapa abierta y creeps en él, debajo de las
+  pestañas hay un recuadro con la **experiencia** (total y por jugador), el **oro que sueltan** (±20 %), **lo que sacan si venden todo lo que
+  sueltan** (equipo, trofeos y consumibles al azar) y el **oro total** (y por jugador, entre las fichas de la partida). Son los números de
+  `CombateFin.estimar` (los mismos de 💰 Botín estimado, que queda como «Ver detalle»). `estimadoCajaHtml` en js/09.
+
+- **El menú de la izquierda** (2026-10-12, pedido del dueño: «en este mismo estilo, para mantener la coherencia»): `#dock-izq` con **🗺 Mapa** y
+  **👥 Personajes** (la lista se abre a su derecha), con los estilos comunes de `../comun/dock-izq.css` (los mismos que la ficha). Salieron de la
+  cabecera. Adentro del mapa (modo acciones) se esconde (`Embebido.iniciar`, `pagina`).
+- **👥 Quién cuenta** (2026-10-12): en «Si derrotan a todos», chips por personaje para dejar afuera al que solo observa o al que no vino
+  (`CombateFin.fuera`/`fueraCambiar`, `gm/personajes` = {fuera}); se recuerda en la partida y lo usan también Escanear grupo y Finalizar combate.
+- **«⟳ Pasar de ronda» y la clave de OpenRouter** (2026-10-13): el botón de arriba (`#btn-mant`, antes «Mantenimiento · toda la mesa») se
+  llama como en el mapa y se esconde en combate con orden de iniciativa (`gmRondaEscuchar`/`gmRondaBoton`, `js/11`: escucha `modo` e
+  `iniciativa` del mapa publicado en `mapa/activo`). Si falta la clave de OpenRouter, `orKey` (`js/07`, ahora async) abre `orPedirClave`:
+  una ventana con los tres pasos (entrar, crear la clave gratis, pegarla) en vez del `prompt()` del navegador; la usan «+ Creep con IA»
+  (y su botón «3. Pegar la clave acá») y 🔎 Escanear grupo.
+- **🗑 Borrar mapa** (2026-10-13, pedido del dueño): con la pestaña de un mapa abierta (no el primero), «🗑 Borrar mapa» (`borrarMapaGM`, js/09) lo borra
+  con todo lo que tiene en el mapa, con el mismo cartel y el mismo «escribí el nombre» que el 🗺 Mapas del mapa (`CreepsMapas.confirmarBorrado` /
+  `borrarMapa`, comun/creeps-mapas.js). Sus creeps no se borran: pasan a la Reserva.
+
+- **🐾 Equipo natural y lo que no se ofrece en el botín** (2026-10-26, pedido del dueño): al tildar «arma natural» (Recompensas y el asistente), al
+  equiparle un arma del catálogo a un creep con el arma marcada natural o al crearle una con «✎ Ítem custom», `renombrarArmaNatural(scId)` (js/05)
+  ofrece cambiarle el nombre (`Confirmar.texto`, sugerencias Garras, Colmillos, Dientes, Cuernos…); el nombre del catálogo queda en `nombreOriginal`.
+  Las piezas naturales que no son el arma no se nombran a los jugadores (`CreepCalculo.tarjetaPublica`). El trofeo vale lo que vale el equipo natural
+  (`CreepCalculo.trofeo(sc, precioDe)`, `valorNatural`, `CombateFin.precioNatural`: el precio del catálogo, el suyo o uno estimado; **ya no hay valor por nivel**, el mismo día: «solamente va a ser lo que haya sido el equipo adaptado»; sin nada que valga, no hay trofeo)
+  y existe también si solo hay piezas naturales («Trofeo de …»). En «Batalla terminada», lo que el GM destilda del equipo de un creep (el arma y las
+  piezas; no el trofeo ni lo extra) se convierte en despojos (un cuarto del precio de compra, para arriba, la misma regla que lo que nadie toma del botín; dueño: «prefiero que aparezcan como despojos, no como oro» y «que las dos usen el mismo y que sea un cuarto»), repartidos entre los que cobran y pagados con la XP y el oro
+  (`CombateFin.ocultos`, `rep.ocultosDespojos`, la casilla del paso Equipo; `despojos` de cada jugador en `combate/actual`; se ve en Equipo, en Publicar y en la ventana de la batalla).

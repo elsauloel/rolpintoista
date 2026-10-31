@@ -1,0 +1,1107 @@
+rules_version = '2';
+
+// Reglas de Firestore del proyecto rol-pintoista.
+// Este archivo es la copia versionada: para aplicarlas, se pega el
+// contenido entero en la consola de Firebase (Firestore Database →
+// Reglas → Publicar). Ver docs/workflow-firebase.md.
+//
+// Todo cuelga de campanas/{campana}: cada partida de Rol Pintoísta tiene
+// sus propios miembros, tiradas, mapa, etc., sin mezclarse con otras.
+// Solo entran cuentas confirmadas (Google, o email con el link de
+// confirmación tocado). Lo que no está explícitamente permitido acá queda
+// bloqueado.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Cuenta con email confirmado (las de Google vienen confirmadas).
+    function verificado() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+    function esMiembro(c) {
+      return verificado()
+        && exists(/databases/$(database)/documents/campanas/$(c)/miembros/$(request.auth.uid));
+    }
+    function esGM(c) {
+      return esMiembro(c)
+        && get(/databases/$(database)/documents/campanas/$(c)/miembros/$(request.auth.uid)).data.gm == true;
+    }
+
+    // Hay una oferta de traspaso del rol de GM dirigida a esta cuenta.
+    function traspasoPara(c) {
+      return verificado()
+        && exists(/databases/$(database)/documents/campanas/$(c)/traspaso/actual)
+        && get(/databases/$(database)/documents/campanas/$(c)/traspaso/actual).data.aUid == request.auth.uid;
+    }
+
+    match /campanas/{c} {
+      // Partida: {nombre, gmUid, gmNombre, creado}. Grupo cerrado de amigos:
+      // cualquier cuenta confirmada ve todas las partidas y puede unirse.
+      // Quien la crea queda como GM (en la misma operación crea su miembro
+      // con gm: true). Solo el GM la renombra o la borra.
+      allow read: if verificado();
+      allow create: if verificado()
+        && request.resource.data.keys().hasOnly(['nombre', 'gmUid', 'gmNombre', 'creado'])
+        && request.resource.data.nombre is string
+        && request.resource.data.nombre.size() > 0
+        && request.resource.data.nombre.size() <= 60
+        && request.resource.data.gmNombre is string
+        && request.resource.data.gmNombre.size() <= 40
+        && request.resource.data.gmUid == request.auth.uid
+        && request.resource.data.creado == request.time
+        && getAfter(/databases/$(database)/documents/campanas/$(c)/miembros/$(request.auth.uid)).data.gm == true;
+      allow update: if (esGM(c)
+          && request.resource.data.keys().hasOnly(['nombre', 'gmUid', 'gmNombre', 'creado'])
+          && request.resource.data.gmUid == resource.data.gmUid
+          && request.resource.data.creado == resource.data.creado
+          && request.resource.data.nombre is string
+          && request.resource.data.nombre.size() > 0
+          && request.resource.data.nombre.size() <= 60)
+        // Traspaso del rol de GM: quien acepta la oferta pasa a ser el GM (en
+        // la misma operación que su miembro pasa a gm: true y se borra la oferta).
+        || (traspasoPara(c)
+          && request.resource.data.keys().hasOnly(['nombre', 'gmUid', 'gmNombre', 'creado'])
+          && request.resource.data.gmUid == request.auth.uid
+          && request.resource.data.nombre == resource.data.nombre
+          && request.resource.data.creado == resource.data.creado
+          && request.resource.data.gmNombre is string
+          && request.resource.data.gmNombre.size() <= 40
+          && getAfter(/databases/$(database)/documents/campanas/$(c)/miembros/$(request.auth.uid)).data.gm == true
+          && !existsAfter(/databases/$(database)/documents/campanas/$(c)/traspaso/actual));
+      allow delete: if esGM(c);
+
+      // Miembro: {nombre, gm, creado}, uno por cuenta en cada partida. El
+      // nombre (apodo) lo elige cada uno al unirse. gm: true solo para quien
+      // creó la partida; nadie más puede dárselo.
+      match /miembros/{uid} {
+        allow read: if esMiembro(c) || (verificado() && request.auth.uid == uid);
+        allow create: if verificado()
+          && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['nombre', 'gm', 'creado'])
+          && request.resource.data.nombre is string
+          && request.resource.data.nombre.size() > 0
+          && request.resource.data.nombre.size() <= 40
+          && request.resource.data.creado == request.time
+          && (
+            (request.resource.data.gm == false
+              && exists(/databases/$(database)/documents/campanas/$(c)))
+            || (request.resource.data.gm == true
+              && getAfter(/databases/$(database)/documents/campanas/$(c)).data.gmUid == request.auth.uid)
+          );
+        // Cada uno cambia su nombre; el GM puede cambiar el de cualquiera.
+        // Nadie cambia quién es GM.
+        allow update: if (verificado()
+            && (request.auth.uid == uid || esGM(c))
+            && request.resource.data.keys().hasOnly(['nombre', 'gm', 'creado'])
+            && request.resource.data.gm == resource.data.gm
+            && request.resource.data.creado == resource.data.creado
+            && request.resource.data.nombre is string
+            && request.resource.data.nombre.size() > 0
+            && request.resource.data.nombre.size() <= 40)
+          // Traspaso del rol de GM (solo cambia `gm`): quien recibe la oferta
+          // pasa a gm: true y el GM que la hizo pasa a gm: false.
+          || (traspasoPara(c)
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['gm'])
+            && ((request.auth.uid == uid && request.resource.data.gm == true)
+              || (get(/databases/$(database)/documents/campanas/$(c)/traspaso/actual).data.deUid == uid
+                && request.resource.data.gm == false)));
+        // Irse de la partida, o que el GM saque a alguien.
+        allow delete: if verificado() && (request.auth.uid == uid || esGM(c));
+      }
+
+      // Traspaso del rol de GM (index.html, "Jugadores"): una sola oferta a la
+      // vez en traspaso/actual = {aUid, aNombre, deUid, deNombre, creado}. La
+      // hace el GM para un jugador de la partida; la cancela el GM o la
+      // rechaza/acepta ese jugador (al aceptar, en la misma operación pasa a
+      // ser GM: ver campanas y miembros más arriba).
+      match /traspaso/{doc} {
+        allow read: if esMiembro(c);
+        allow create, update: if doc == 'actual' && esGM(c)
+          && request.resource.data.keys().hasOnly(['aUid', 'aNombre', 'deUid', 'deNombre', 'creado'])
+          && request.resource.data.deUid == request.auth.uid
+          && request.resource.data.aUid is string
+          && request.resource.data.aUid != request.auth.uid
+          && exists(/databases/$(database)/documents/campanas/$(c)/miembros/$(request.resource.data.aUid))
+          && request.resource.data.aNombre is string && request.resource.data.aNombre.size() <= 40
+          && request.resource.data.deNombre is string && request.resource.data.deNombre.size() <= 40
+          && request.resource.data.creado == request.time;
+        allow delete: if esGM(c)
+          || (verificado() && resource.data.aUid == request.auth.uid);
+      }
+
+      // Tiradas de dados compartidas (cajita "Mesa" de ficha y gm-tools).
+      // Cada uno publica solo a su nombre; nadie las edita; el GM puede borrar.
+      // Bitácora compartida de la partida (ficha-personaje/ficha.html): páginas
+      // y entradas. Todos los miembros leen, suman y corrigen; borrar, el autor
+      // (o quien creó la página) o el GM.
+      match /bitacora/{p} {
+        allow read: if esMiembro(c);
+        allow create: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['nombre', 'creado', 'creadoUid', 'creadoPor'])
+          && request.resource.data.nombre is string && request.resource.data.nombre.size() <= 40
+          && request.resource.data.creadoUid == request.auth.uid
+          && request.resource.data.creado == request.time;
+        allow update: if esMiembro(c)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nombre'])
+          && request.resource.data.nombre is string && request.resource.data.nombre.size() > 0
+          && request.resource.data.nombre.size() <= 40;
+        allow delete: if esMiembro(c) && (resource.data.creadoUid == request.auth.uid || esGM(c));
+
+        match /entradas/{e} {
+          allow read: if esMiembro(c);
+          allow create: if esMiembro(c)
+            && request.resource.data.keys().hasOnly(['texto', 'uid', 'autor', 'creado'])
+            && request.resource.data.texto is string && request.resource.data.texto.size() <= 4000
+            && request.resource.data.uid == request.auth.uid
+            && request.resource.data.creado == request.time;
+          allow update: if esMiembro(c)
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['texto', 'editado', 'editadoUid', 'editadoPor'])
+            && request.resource.data.texto is string && request.resource.data.texto.size() <= 4000
+            && request.resource.data.editadoUid == request.auth.uid
+            && request.resource.data.editado == request.time;
+          allow delete: if esMiembro(c) && (resource.data.uid == request.auth.uid || esGM(c));
+        }
+      }
+
+      // Bitácora privada del GM (gm-toolset/gm-tools.html, "📖 Bitácora GM"): mismo
+      // formato que la compartida, pero solo el GM la lee y la escribe.
+      match /gmBitacora/{p} {
+        allow read, write: if esGM(c);
+        match /entradas/{e} {
+          allow read, write: if esGM(c);
+        }
+      }
+
+      // Historial de acciones menores del GM (comun/historial.js, botón "📜 Historial"): cambios de HP/SP, estados y el reporte
+      // del Mantenimiento de los creeps. Lo escribe y lo lee solo el GM (mirando los datos de la partida, los jugadores no
+      // escriben nada); no se edita; lo borra el GM. {uid, jugador, quien, tipo:'vital'|'mant', texto, campo?, delta?, cuando}
+      match /historial/{id} {
+        allow read, delete: if esGM(c);
+        allow create: if esGM(c)
+          && request.resource.data.keys().hasOnly(['uid', 'jugador', 'quien', 'tipo', 'texto', 'campo', 'delta', 'cuando'])
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.tipo in ['vital', 'mant']
+          && request.resource.data.quien is string && request.resource.data.quien.size() <= 60
+          && request.resource.data.texto is string && request.resource.data.texto.size() > 0 && request.resource.data.texto.size() <= 500
+          && (!('campo' in request.resource.data) || (request.resource.data.campo is string && request.resource.data.campo.size() <= 10))
+          && (!('delta' in request.resource.data) || request.resource.data.delta is number)
+          && request.resource.data.cuando == request.time;
+        allow update: if false;
+      }
+
+      // Historial de los jugadores (comun/historial.js): lo que ven los jugadores en su 📜 (personajes: HP/SP/estados; creeps visibles:
+      // "recibió N de daño", sin HP). Lo escribe la página del GM; lo lee cualquier miembro; lo borra el GM.
+      match /historial_jugadores/{id} {
+        allow read: if esMiembro(c);
+        allow delete: if esGM(c);
+        allow create: if esGM(c)
+          && request.resource.data.keys().hasOnly(['uid', 'quien', 'texto', 'campo', 'delta', 'cuando'])
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.quien is string && request.resource.data.quien.size() <= 60
+          && request.resource.data.texto is string && request.resource.data.texto.size() > 0 && request.resource.data.texto.size() <= 300
+          && (!('campo' in request.resource.data) || (request.resource.data.campo is string && request.resource.data.campo.size() <= 10))
+          && (!('delta' in request.resource.data) || request.resource.data.delta is number)
+          && request.resource.data.cuando == request.time;
+        allow update: if false;
+      }
+
+      match /tiradas/{id} {
+        allow read: if esMiembro(c);
+        allow create: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['uid', 'jugador', 'quien', 'origen', 'formula', 'rolls', 'mod', 'total', 'desde', 'cuando', 'texto', 'estilo', 'estados', 'ventaja', 'destacar', 'ficha'])
+          // De qué personaje es la tirada (P138, 2026-10-01): de ahí salen sus últimas tiradas para la Moneda Re-Roll y la Polilla.
+          && (!('ficha' in request.resource.data) || (request.resource.data.ficha is string && request.resource.data.ficha.size() <= 80))
+          // Afortunado: la tirada descartada {rolls, total, elegido} (comun/mesa.js, para mostrar las dos en la Mesa y en los dados 3D).
+          && (!('ventaja' in request.resource.data) || (request.resource.data.ventaja is map && request.resource.data.ventaja.rolls is list && request.resource.data.ventaja.rolls.size() <= 100))
+          && (!('estilo' in request.resource.data) || (request.resource.data.estilo is string && request.resource.data.estilo.size() <= 300))
+          // Estados que afectaron la tirada (comun/mesa.js, para pintarla en la Mesa): [{n, p}], sin validar cada uno adentro.
+          && (!('estados' in request.resource.data) || (request.resource.data.estados is list && request.resource.data.estados.size() <= 8))
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.total is number
+          && request.resource.data.rolls is list
+          && request.resource.data.rolls.size() <= 100
+          && request.resource.data.cuando == request.time;
+        allow update: if false;
+        allow delete: if esGM(c);
+      }
+
+      // Fichas de personaje en vivo (ficha-personaje/ficha.html).
+      // Documento principal: {duenoUid, nombre, resumen, miniatura, creado,
+      // actualizado}; contenido en partes/{parte}: {json, actualizado}.
+      // Son de los jugadores: todos los miembros las ven; solo el dueño las
+      // crea y borra. Las edita el dueño y también el GM (para ayudar a un
+      // jugador nuevo: botón "✎ Editar como GM" de la ficha); el GM además
+      // reasigna el dueño y las borra (lo usa "Borrar la partida" en el
+      // inicio). El GM no crea fichas (lo suyo va en gm-tools).
+      match /fichas/{f} {
+        allow read: if esMiembro(c);
+        allow create: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['duenoUid', 'nombre', 'resumen', 'miniatura', 'creado', 'actualizado'])
+          && !esGM(c)
+          && request.resource.data.duenoUid == request.auth.uid
+          && request.resource.data.nombre is string
+          && request.resource.data.nombre.size() <= 60
+          && request.resource.data.miniatura is string
+          && request.resource.data.miniatura.size() < 60000;
+        allow update: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['duenoUid', 'nombre', 'resumen', 'miniatura', 'creado', 'actualizado'])
+          && request.resource.data.miniatura is string
+          && request.resource.data.miniatura.size() < 60000
+          && (
+            (resource.data.duenoUid == request.auth.uid
+              && request.resource.data.duenoUid == resource.data.duenoUid)
+            // El GM puede ayudar a un jugador: edita su ficha (nombre, resumen,
+            // miniatura) y reasigna el dueño.
+            || esGM(c)
+          );
+        allow delete: if esMiembro(c) && (resource.data.duenoUid == request.auth.uid || esGM(c));
+
+        match /partes/{p} {
+          allow read: if esMiembro(c);
+          // El dueño escribe su ficha; el GM también (para ayudar a un jugador
+          // nuevo a configurar habilidades, automatizarlas, etc.).
+          allow write: if esMiembro(c)
+            && (esGM(c)
+              || get(/databases/$(database)/documents/campanas/$(c)/fichas/$(f)).data.duenoUid == request.auth.uid);
+          allow delete: if esGM(c);
+        }
+      }
+
+      // Creeps del GM en vivo (gm-toolset/gm-tools.html). El documento
+      // principal es lo que ven todos (nombre, orden, color, resumen de HP y
+      // estados, miniatura, firma); privado/ficha y privado/imagen tienen el
+      // creep completo y solo los ve el GM. Solo el GM escribe.
+      match /creeps/{id} {
+        allow read: if esMiembro(c);
+        allow write: if esGM(c);
+        match /privado/{doc} {
+          allow read, write: if esGM(c);
+        }
+        // 🖼 La imagen completa del creep, para el «👁 Ver completa» de su tarjeta del mapa (2026-10-30): la ven todos, la escribe el GM.
+        match /publico/{doc} {
+          allow read: if esMiembro(c);
+          allow write: if esGM(c);
+        }
+      }
+
+      // Estado general del GM (por ahora, el contador de turno).
+      match /gm/{doc} {
+        allow read, write: if esGM(c);
+      }
+
+      // Tienda del vendedor (gm-toolset/vendor-generator.html): {json,
+      // actualizado}. borrador = la que el GM está armando, solo la ve él.
+      // publicada = la que los jugadores abren con el botón Vendedor de la
+      // ficha. Solo el GM escribe.
+      // stock (2026-10-07, piezas únicas): {version, items, reposiciones, reserva, vendidos, actualizado}. Lo arma el GM al publicar; al
+      // comprar, cualquier miembro descuenta (y repone) con una transacción: solo items, reposiciones, vendidos y actualizado, sin pasar la reserva.
+      // gondola (2026-10-08, P181): {id: unidades} de los gastables; quien compra los descuenta en la misma transacción.
+      match /tienda/{doc} {
+        allow read: if (doc in ['publicada', 'stock'] && esMiembro(c)) || esGM(c);
+        allow write: if esGM(c) && doc in ['borrador', 'publicada', 'stock'];
+        allow update: if doc == 'stock' && esMiembro(c)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['items', 'reposiciones', 'vendidos', 'gondola', 'actualizado'])
+          && (!('gondola' in request.resource.data) || request.resource.data.gondola is map)
+          && request.resource.data.items is list && request.resource.data.items.size() <= 200
+          && request.resource.data.reposiciones is int && request.resource.data.reposiciones <= resource.data.reserva
+          && request.resource.data.vendidos is int && request.resource.data.vendidos >= resource.data.vendidos;
+      }
+
+      // Ajustes de la partida (2026-10-02): partida = {ddeInicial, actualizado} — con cuántos DDE arranca un personaje nuevo
+      // (lo lee el asistente de personaje nuevo; sin el documento, 300). Lo leen todos; lo escribe el GM.
+      match /ajustes/{doc} {
+        allow read: if esMiembro(c);
+        allow delete: if esGM(c);
+        allow create, update: if (esGM(c) && doc == 'partida'
+          && request.resource.data.keys().hasOnly(['ddeInicial', 'actualizado'])
+          && request.resource.data.ddeInicial is number
+          && request.resource.data.ddeInicial >= 0)
+          // ⏸ La pausa de la partida (2026-10-10, comun/pausa.js): {pausada, desde, gmNombre, actualizado}, solo el GM.
+          || (esGM(c) && doc == 'pausa'
+            && request.resource.data.keys().hasOnly(['pausada', 'desde', 'gmNombre', 'actualizado'])
+            && request.resource.data.pausada is bool
+            && request.resource.data.gmNombre is string && request.resource.data.gmNombre.size() <= 40);
+      }
+
+      // ⏸ El registro de la pausa (2026-10-10, comun/pausa.js): lo que cada jugador cambió en sus fichas mientras la partida estaba
+      // pausada. Lo escribe el propio jugador (una línea por cambio); lo lee y lo borra el GM al reanudar.
+      match /pausaLog/{id} {
+        allow read, delete: if esGM(c);
+        allow create: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['quien', 'jugador', 'personaje', 'texto', 'cuando'])
+          && request.resource.data.quien == request.auth.uid
+          && request.resource.data.jugador is string && request.resource.data.jugador.size() <= 40
+          && request.resource.data.personaje is string && request.resource.data.personaje.size() <= 60
+          && request.resource.data.texto is string && request.resource.data.texto.size() <= 300
+          && request.resource.data.cuando == request.time;
+      }
+
+      // Recompensas de un combate (XP y DDE por personaje): las publica el GM; la ficha del dueño las marca
+      // como aplicadas UNA vez (solo ese campo, de false a true) apenas las carga.
+      match /recompensas/{id} {
+        allow read: if esGM(c) || (esMiembro(c) && resource.data.duenoUid == request.auth.uid);
+        allow create, delete: if esGM(c);
+        allow update: if esMiembro(c) && resource.data.duenoUid == request.auth.uid
+          && resource.data.aplicada == false
+          && request.resource.data.aplicada == true
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['aplicada']);
+      }
+
+      // Botín de un combate: un documento por ítem, con su plantilla en `json`. Lo crea y borra el GM (y lo puede tocar).
+      // Reclamar y disputar (2026-10-08, comun/ficha-botin.js): cualquier miembro reclama lo libre (su uid en `tomadoPor`, el personaje
+      // en `tomadoFicha`) o suelta lo suyo; disputa lo que reclamó otro (abre un piedra, papel o tijera en `ppt` en la misma transacción
+      // y lo anota en `disputa`); y quien juega esa disputa la cierra cuando terminó (el ítem queda a nombre del ganador).
+      match /botin/{id} {
+        allow read: if esMiembro(c);
+        allow create, delete: if esGM(c);
+        allow update: if esGM(c) || (esMiembro(c) && (
+          (resource.data.get('disputa', '') == ''
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tomadoPor', 'tomadoNombre', 'tomadoFicha'])
+            && ((resource.data.tomadoPor == '' && request.resource.data.tomadoPor == request.auth.uid)
+              || (resource.data.tomadoPor == request.auth.uid && request.resource.data.tomadoPor == '')))
+          || (resource.data.tomadoPor != '' && resource.data.get('disputa', '') == ''
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['disputa'])
+            && request.resource.data.disputa is string && request.resource.data.disputa != ''
+            && getAfter(/databases/$(database)/documents/campanas/$(c)/ppt/$(request.resource.data.disputa)).data.uids.hasAll([request.auth.uid, resource.data.tomadoPor]))
+          || (resource.data.get('disputa', '') != '' && request.resource.data.get('disputa', '') == ''
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tomadoPor', 'tomadoNombre', 'tomadoFicha', 'disputa'])
+            && request.auth.uid in getAfter(/databases/$(database)/documents/campanas/$(c)/ppt/$(resource.data.disputa)).data.uids
+            && getAfter(/databases/$(database)/documents/campanas/$(c)/ppt/$(resource.data.disputa)).data.estado != 'jugando')
+        ));
+      }
+
+      // ✊ Piedra, papel o tijera (2026-10-08, comun/ppt.js): un juego entre dos de la partida ({a, b, uids, motivo, jugadas, ronda,
+      // estado, ganador, ultima…}). Lo ven todos; lo empieza uno de los dos; lo juegan los dos (y el GM lo puede cortar); lo borran ellos o el GM.
+      // Relajado (ver «Antes de abrirlo al público»): las jugadas viajan en el documento.
+      match /ppt/{id} {
+        allow read: if esMiembro(c);
+        allow create: if esMiembro(c)
+          && request.resource.data.uids is list && request.resource.data.uids.size() == 2
+          && request.auth.uid in request.resource.data.uids
+          && request.resource.data.uids[0] != request.resource.data.uids[1]
+          && request.resource.data.estado == 'jugando';
+        allow update: if esMiembro(c) && (request.auth.uid in resource.data.uids || esGM(c))
+          && request.resource.data.uids == resource.data.uids;
+        allow delete: if esGM(c) || (esMiembro(c) && request.auth.uid in resource.data.uids);
+      }
+
+      // Mesa común (2026-09-25, RETIRADA el 2026-10-05: la reemplazan paquetes y el baúl). Queda solo para leer y limpiar lo viejo:
+      // comun/intercambio.js le devuelve a cada uno lo que había ofrecido ahí y borra la oferta. Ya no se crea ni se toma nada.
+      match /mesaComun/{id} {
+        allow read: if esMiembro(c);
+        allow delete: if esMiembro(c) && (resource.data.ofrecidoPor == request.auth.uid || esGM(c));
+      }
+
+      // 🤝 Paquetes (2026-10-05, P157, comun/intercambio.js): un personaje le ofrece a otro un ítem, DDE o despojos (o, en combate, le pide un
+      // consumible de la Alforja compartida: tipo 'pedido', que entrega la pantalla del dueño de la alforja mandando el ítem en `json`). Lo leen los que figuran
+      // en `uids` (quien lo creó y los dueños de los dos personajes) y el GM. Lo crea quien ofrece (a su nombre, pendiente); quien figura en
+      // `uids` lo acepta o lo rechaza (solo estado y resolvio, una vez); lo borra cualquiera de ellos (cancelar, o cerrar lo respondido) o el GM.
+      match /paquetes/{id} {
+        allow read: if esGM(c) || (esMiembro(c) && (resource == null || request.auth.uid in resource.data.uids));   // null: mirar si sigue existiendo
+        allow create: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['tipo', 'nombre', 'json', 'itemId', 'cantidad', 'despojo', 'despojoNombre', 'deFicha', 'deNombre', 'paraFicha', 'paraNombre', 'uids', 'creadoPor', 'estado', 'resolvio', 'creado'])
+          && request.resource.data.creadoPor == request.auth.uid
+          && request.auth.uid in request.resource.data.uids
+          && request.resource.data.uids.size() <= 3
+          && request.resource.data.estado == 'pendiente'
+          && request.resource.data.tipo in ['item', 'dde', 'despojos', 'pedido']
+          && request.resource.data.json.size() < 200000
+          && request.resource.data.creado == request.time;
+        allow update: if esMiembro(c)
+          && (request.auth.uid in resource.data.uids || esGM(c))
+          && resource.data.estado == 'pendiente'
+          && request.resource.data.estado in ['aceptado', 'rechazado']
+          && request.resource.data.resolvio == request.auth.uid
+          && (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['estado', 'resolvio'])
+              // Alforja compartida: quien entrega el pedido manda el ítem en `json`
+              || (resource.data.tipo == 'pedido' && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['estado', 'resolvio', 'json'])
+                  && request.resource.data.json.size() < 200000));
+        allow delete: if esGM(c) || (esMiembro(c) && request.auth.uid in resource.data.uids);
+      }
+
+      // 📦 Baúl común (2026-10-05, P157): un ítem por documento ({tipo: 'item', nombre, json, ranuras, puso, pusoNombre, creado}); el oro en
+      // baul/dde y los despojos en baul/desp-<tipo> ({tipo, cantidad, despojo, despojoNombre}). Es del grupo: cualquier miembro guarda y saca
+      // (relajado a propósito; la honestidad la cuida el registro de abajo, que nadie puede tocar salvo el GM).
+      match /baul/{id} {
+        allow read, delete: if esMiembro(c);
+        allow create, update: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['tipo', 'nombre', 'json', 'ranuras', 'puso', 'pusoNombre', 'creado', 'cantidad', 'despojo', 'despojoNombre'])
+          && request.resource.data.tipo in ['item', 'dde', 'despojos']
+          && (request.resource.data.tipo != 'item' || (request.resource.data.puso == request.auth.uid && request.resource.data.json.size() < 200000))
+          && (request.resource.data.tipo == 'item' || (request.resource.data.cantidad is number && request.resource.data.cantidad >= 0));
+      }
+      // Registro del baúl: quién guardó y quién sacó cada cosa. Cualquier miembro lo lee y anota lo suyo; nadie lo cambia; lo borra el GM.
+      match /baulLog/{id} {
+        allow read: if esMiembro(c);
+        allow create: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['accion', 'que', 'quien', 'jugador', 'personaje', 'cuando'])
+          && request.resource.data.quien == request.auth.uid
+          && request.resource.data.accion in ['metio', 'saco']
+          && request.resource.data.cuando == request.time;
+        allow delete: if esGM(c);
+      }
+
+      // Duelos (ataque paso a paso, comun/duelo.js): un documento por ataque, que atacante y defensor escriben en vivo (sus tiradas y el veredicto).
+      // Relajado a propósito (juego entre amigos): cualquier miembro lo lee y lo actualiza; solo su autor o el GM lo borra.
+      match /duelos/{id} {
+        allow read: if esMiembro(c);
+        allow create: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['estado', 'fase', 'atacante', 'defensor', 'ataque', 'defensa', 'pdg', 'eva', 'fuerza', 'bloqueo', 'contacto', 'bloq', 'empate', 'resultado', 'critDatos', 'crit', 'dano', 'efectos', 'resumido', 'contra', 'contraDe', 'hab', 'grupo', 'rerollUsado', 'creadoPor', 'creado'])
+          && request.resource.data.creadoPor == request.auth.uid
+          && request.resource.data.creado == request.time;
+        allow update: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['estado', 'fase', 'atacante', 'defensor', 'ataque', 'defensa', 'pdg', 'eva', 'fuerza', 'bloqueo', 'contacto', 'bloq', 'empate', 'resultado', 'critDatos', 'crit', 'dano', 'efectos', 'resumido', 'contra', 'contraDe', 'hab', 'grupo', 'rerollUsado', 'creadoPor', 'creado'])
+          && request.resource.data.creadoPor == resource.data.creadoPor
+          && request.resource.data.creado == resource.data.creado;
+        allow delete: if esMiembro(c) && (resource.data.creadoPor == request.auth.uid || esGM(c));
+      }
+
+      // Momentos (2026-10-02, P146): lo que pasa en el mapa (percepción, zonas, trampas, sigilo roto) con su momento en
+      // todas las pantallas — tarjeta al centro para quien resuelve, en la esquina para el resto. También lleva el pedido de
+      // una detección al GM (la Destreza de un creep en sigilo es privada). Cualquier miembro lo crea y lo completa; lo
+      // borra su autor o el GM (los viejos los barre el GM al entrar).
+      match /momentos/{id} {
+        allow read: if esMiembro(c);
+        allow create: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['tipo', 'icono', 'titulo', 'resultado', 'estado', 'resuelve', 'datos', 'creadoPor', 'creado'])
+          && request.resource.data.titulo is string && request.resource.data.titulo.size() <= 200
+          && (!('resultado' in request.resource.data) || (request.resource.data.resultado is string && request.resource.data.resultado.size() <= 400))
+          && request.resource.data.creadoPor == request.auth.uid
+          && request.resource.data.creado == request.time;
+        allow update: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['tipo', 'icono', 'titulo', 'resultado', 'estado', 'resuelve', 'datos', 'creadoPor', 'creado'])
+          && (!('resultado' in request.resource.data) || (request.resource.data.resultado is string && request.resource.data.resultado.size() <= 400))
+          && request.resource.data.creadoPor == resource.data.creadoPor
+          && request.resource.data.creado == resource.data.creado;
+        allow delete: if esMiembro(c) && (resource.data.creadoPor == request.auth.uid || esGM(c));
+      }
+
+      // Hechizos de área (Paso 4/7 del casteo, comun/duelo.js + vtt-hexgrid/mapa.html): un documento por casteo que ata la
+      // cascada de sub-duelos (uno por objetivo dentro del área, cada uno un documento normal de `duelos`). Dibuja el
+      // círculo compartido en el mapa y dice a quién le toca. Mismo criterio relajado que `duelos`: cualquier miembro
+      // lo lee y lo actualiza (para avanzar la cascada); solo su autor o el GM lo borra.
+      match /areas/{id} {
+        allow read: if esMiembro(c);
+        allow create: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['casteador', 'hab', 'centro', 'radio', 'objetivos', 'duelos', 'indice', 'pdgCompartido', 'estado', 'creadoPor', 'creado'])
+          && request.resource.data.creadoPor == request.auth.uid
+          && request.resource.data.creado == request.time;
+        allow update: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['casteador', 'hab', 'centro', 'radio', 'objetivos', 'duelos', 'indice', 'pdgCompartido', 'estado', 'creadoPor', 'creado'])
+          && request.resource.data.creadoPor == resource.data.creadoPor
+          && request.resource.data.creado == resource.data.creado;
+        allow delete: if esMiembro(c) && (resource.data.creadoPor == request.auth.uid || esGM(c));
+      }
+
+      // Estados que te deja otro (una habilidad de un creep, una trampa): un documento por aviso, {fichaId, duenoUid, spec, origen,
+      // aplicada, creado}. Cualquier miembro lo crea (el GM, o el jugador que pisa una trampa); la ficha del dueño lo marca como
+      // aplicado UNA vez (solo ese campo, de false a true) y agrega el estado a su ficha. Nadie escribe en la ficha de otro.
+      match /estados/{id} {
+        allow read: if esGM(c) || (esMiembro(c) && resource.data.duenoUid == request.auth.uid);
+        allow create: if esMiembro(c)
+          && request.resource.data.keys().hasOnly(['fichaId', 'duenoUid', 'spec', 'origen', 'aplicada', 'creado'])
+          && request.resource.data.fichaId is string && request.resource.data.duenoUid is string
+          && request.resource.data.spec is string && request.resource.data.spec.size() <= 600
+          && request.resource.data.origen is string && request.resource.data.origen.size() <= 80
+          && request.resource.data.aplicada == false
+          && request.resource.data.creado == request.time;
+        allow update: if esMiembro(c) && resource.data.duenoUid == request.auth.uid
+          && resource.data.aplicada == false
+          && request.resource.data.aplicada == true
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['aplicada']);
+        allow delete: if esGM(c);
+      }
+
+      // Fin de un combate ("Batalla terminada"): combate/actual = {numero, estado: 'publicado' | 'cerrado', titulo, jugadores: [{fichaId,
+      // nombre, estado, xp, dde}], items, creado}. Lo escribe el GM al confirmar el reporte (publicado, o cerrado si no hay botín) y
+      // al despojar (cerrado); lo leen todos: de ahí sale la ventana con lo que recibe cada jugador y cuándo se habilitan los botones 🎁.
+      match /combate/{doc} {
+        allow read: if esMiembro(c);
+        allow write: if esGM(c) && doc == 'actual';
+      }
+
+      // Tiendas guardadas con nombre (una por lugar o vendedor al que se
+      // vuelve): {nombre, json, actualizado}. Solo el GM.
+      match /tiendas/{id} {
+        allow read, write: if esGM(c);
+      }
+
+      // Cambiar solo los valores del orden de turnos (no turno/ronda ni
+      // agregar o sacar filas, eso sigue siendo del GM): lo puede hacer
+      // cualquier miembro, porque algo se lo cambió a mitad de combate.
+      // La usan mapa/iniciativa y mapas/{mapaId}/estado/iniciativa por igual.
+      function iniciativaPropia(antes, despues) {
+        return despues.turno == antes.turno && despues.ronda == antes.ronda
+          && despues.orden is list && antes.orden is list
+          && despues.orden.size() == antes.orden.size();
+      }
+
+      // Niebla de guerra (mapa/niebla o mapas/{id}/estado/niebla):
+      // {activa, descubiertas:[celdas empaquetadas], actualizado}. El GM
+      // escribe todo (prender/apagar, reiniciar, destapar o tapar a mano);
+      // cualquier miembro puede sumar celdas descubiertas mientras se mueve
+      // (solo toca `descubiertas`).
+      function nieblaSoloCeldas() {
+        return request.resource.data.descubiertas is list
+          && request.resource.data.descubiertas.size() <= 30000
+          && (resource == null
+            ? request.resource.data.keys().hasOnly(['descubiertas'])
+            : request.resource.data.diff(resource.data).affectedKeys().hasOnly(['descubiertas']));
+      }
+
+      // Imagen de fondo del mapa (mapa/fondo, mapa/fondoImagen), modo
+      // (mapa/modo), iniciativa (mapa/iniciativa) y cuál mapa ven los
+      // jugadores (mapa/activo, ver mapas/{mapaId} más abajo). Se ven
+      // todos; el GM escribe cualquier documento, y en iniciativa además
+      // cualquier miembro (ver iniciativaPropia).
+      match /mapa/{doc} {
+        allow read: if esMiembro(c);
+        allow write: if esGM(c)
+          || (doc == 'niebla' && esMiembro(c) && nieblaSoloCeldas())
+          || (doc == 'iniciativa' && esMiembro(c) && resource != null
+            && iniciativaPropia(resource.data, request.resource.data));
+      }
+
+      // Tokens del mapa (vtt-hexgrid/mapa.html). tipo 'pj': lo mueve y edita
+      // solo su dueño; lo crea su dueño, o el GM a nombre de otro jugador
+      // (para armar el token de cada uno de antemano en un mapa sin
+      // publicar). tipo 'creep': solo el GM, siempre a su propio nombre. El
+      // GM además puede reasignar el dueño de un PJ ya creado (solo ese
+      // campo) y sacar cualquier token. fichaId (opcional): la ficha (pj) o
+      // el creep al que está vinculado.
+      function tokenValido(d) {
+        return d.keys().hasOnly(['nombre', 'color', 'tipo', 'duenoUid', 'col', 'fila', 'creado', 'fichaId', 'ruta', 'aura', 'barras', 'imagen', 'rotacion', 'oculto', 'revelado', 'bajoTierra', 'tunel'])
+          // 🎭 Los jugadores ya vieron a este creep (2026-10-09, lo pone el mapa del GM): desde ahí su lugar en el orden de turnos no desaparece.
+          && (!('revelado' in d) || d.revelado is bool)
+          // 🕳 Bajo tierra (2026-10-13, Excavar): en su casilla se ve un pozo y no se lo puede elegir de objetivo.
+          && (!('bajoTierra' in d) || d.bajoTierra is bool)
+          // 🕳 La estela del túnel (2026-10-27, Excavar): [col, fila, col, fila…] de las casillas que recorrió bajo tierra; la ven todos.
+          && (!('tunel' in d) || (d.tunel is list && d.tunel.size() <= 200))
+          && (!('fichaId' in d) || (d.fichaId is string && d.fichaId.size() <= 64))
+          // Ruta del último movimiento, [col, fila, col, fila…], para la estela.
+          && (!('ruta' in d) || (d.ruta is list && d.ruta.size() <= 200))
+          // Frente del token: 0 (abajo), 60, 120, 180, 240 o 300 grados.
+          && (!('rotacion' in d) || (d.rotacion is int && d.rotacion >= 0 && d.rotacion < 360 && d.rotacion % 60 == 0))
+          // Oculto a los jugadores: solo lo pone o quita el GM (más abajo).
+          && (!('oculto' in d) || d.oculto is bool)
+          // Imagen propia del token (solo los que no están vinculados).
+          && (!('imagen' in d) || (d.imagen is string && d.imagen.size() <= 60000))
+          && d.nombre is string && d.nombre.size() > 0 && d.nombre.size() <= 40
+          && d.color is string && d.color.matches('^#[0-9a-fA-F]{6}$')
+          && d.tipo in ['pj', 'creep']
+          && d.duenoUid is string
+          && d.col is int && d.col >= -2000 && d.col <= 2000
+          && d.fila is int && d.fila >= -2000 && d.fila <= 2000;
+      }
+      match /tokens/{id} {
+        allow read: if esMiembro(c);
+        allow create: if esMiembro(c)
+          && tokenValido(request.resource.data)
+          && request.resource.data.creado == request.time
+          && (!('oculto' in request.resource.data) || esGM(c))
+          && (
+            (request.resource.data.tipo == 'pj'
+              && (request.resource.data.duenoUid == request.auth.uid || esGM(c)))
+            || (request.resource.data.tipo == 'creep' && esGM(c)
+              && request.resource.data.duenoUid == request.auth.uid)
+          );
+        allow update: if esMiembro(c)
+          && tokenValido(request.resource.data)
+          && request.resource.data.tipo == resource.data.tipo
+          && request.resource.data.creado == resource.data.creado
+          // Ocultar o mostrar un token lo decide solo el GM.
+          && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['oculto']) || esGM(c))
+          && (
+            (resource.data.tipo == 'pj'
+              && resource.data.duenoUid == request.auth.uid
+              && request.resource.data.duenoUid == resource.data.duenoUid)
+            || (resource.data.tipo == 'creep' && esGM(c))
+            // El GM reasigna el dueño de un PJ, lo lleva a otra casilla
+            // (mover libre, sin estela), le cambia el frente o lo oculta.
+            || (resource.data.tipo == 'pj' && esGM(c)
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['duenoUid', 'col', 'fila', 'ruta', 'rotacion', 'oculto', 'bajoTierra', 'tunel']))
+          );
+        allow delete: if esMiembro(c)
+          && (resource.data.duenoUid == request.auth.uid || esGM(c) || resource.data.get('arma', false) == true);
+      }
+
+      // Lápiz del mapa (vtt-hexgrid/mapa.html, caja de herramientas):
+      // {puntos: [x1,y1,x2,y2,…] ya suavizado, origen:{x,y}, rotacion,
+      // color, grosor, permanente, duenoUid, creado}. Con `hex: true` es un
+      // marcador de trayectoria por casilleros: `puntos` son [col1,fila1,
+      // col2,fila2,…] (atado a la grilla, sin origen ni rotación útiles).
+      // Cualquiera dibuja
+      // el suyo; temporal (permanente: false) se borra solo a los pocos
+      // segundos — lo borra quien lo ve, así que cualquiera puede borrar
+      // uno ajeno con esa marca (nunca uno permanente ajeno). Mover/rotar
+      // uno permanente (solo origen/rotacion) o borrarlo: su dueño o el GM.
+      function trazoValido(d) {
+        return d.keys().hasOnly(['puntos', 'origen', 'rotacion', 'color', 'grosor', 'permanente', 'hex', 'recto', 'colision', 'fijado', 'transparente', 'cerrada', 'veTraves', 'sinRelleno', 'disparoTraves', 'duenoUid', 'creado'])
+          && (!('cerrada' in d) || d.cerrada is bool)   // ⭕ figura cerrada (2026-10-14)
+          && (!('veTraves' in d) || d.veTraves is bool)   // 👁 pared que deja ver (2026-10-27)
+          && (!('sinRelleno' in d) || d.sinRelleno is bool)   // ◻ solo la línea, el relleno transparente (2026-10-27)
+          && (!('disparoTraves' in d) || d.disparoTraves is bool)   // 🏹 la pared que deja ver, deja disparar (2026-10-27)
+          && (!('fijado' in d) || d.fijado is bool) && (!('transparente' in d) || d.transparente is bool)   // 📌 fijado (2026-10-14)
+          && (!('hex' in d) || d.hex is bool)
+          && (!('recto' in d) || d.recto is bool) && (!('colision' in d) || d.colision is bool)
+          && d.puntos is list && d.puntos.size() >= (d.get('hex', false) ? 2 : 4) && d.puntos.size() <= 400 && d.puntos.size() % 2 == 0
+          && d.origen is map && d.origen.x is number && d.origen.y is number
+          && d.rotacion is number
+          && d.color is string && d.color.matches('^#[0-9a-fA-F]{6}$')
+          && d.grosor is number && d.grosor > 0 && d.grosor <= 40
+          && d.permanente is bool
+          && d.duenoUid is string;
+      }
+      match /trazos/{id} {
+        allow read: if esMiembro(c);
+        allow create: if esMiembro(c)
+          && trazoValido(request.resource.data)
+          && request.resource.data.duenoUid == request.auth.uid
+          && request.resource.data.creado == request.time
+          && (request.resource.data.get('colision', false) == false || esGM(c));   // 🧱 una pared la pone el GM (2026-10-10)
+        allow update: if esMiembro(c)
+          && (resource.data.duenoUid == request.auth.uid || esGM(c))
+          && (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'transparente', 'cerrada', 'color', 'sinRelleno'])
+            || (esGM(c) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'colision', 'fijado', 'transparente', 'cerrada', 'color', 'veTraves', 'sinRelleno', 'disparoTraves'])));
+        allow delete: if esMiembro(c)
+          && (resource.data.permanente == false || resource.data.duenoUid == request.auth.uid || esGM(c));
+      }
+
+      // Ping del mapa (vtt-hexgrid/mapa.html, clic derecho): {x, y,
+      // duenoUid, creado}. Siempre efímero — nadie lo edita, y cualquiera
+      // lo puede borrar (se borra solo a los pocos segundos; así no queda
+      // huérfano si el que lo mandó se fue).
+      function pingValido(d) {
+        return d.keys().hasOnly(['x', 'y', 'duenoUid', 'creado'])
+          && d.x is number && d.y is number
+          && d.duenoUid is string;
+      }
+      match /pings/{id} {
+        allow read: if esMiembro(c);
+        allow create: if esMiembro(c)
+          && pingValido(request.resource.data)
+          && request.resource.data.duenoUid == request.auth.uid
+          && request.resource.data.creado == request.time;
+        allow update: if false;
+        allow delete: if esMiembro(c);
+      }
+
+      // Terreno y Formas del mapa (vtt-hexgrid/mapa.html, caja de
+      // herramientas): {tipo:'flor'|'linea'|'libre', origen:{col,fila},
+      // celdas:[dq1,dr1,…] (offsets en cubo desde origen), rotacion
+      // (0/60/…/300), color, alfa, solido, invisible, imagen (textura de
+      // fondo, opcional), imgZoom, imgDX, imgDY (cómo se acomoda esa
+      // textura), fijado, duenoUid, creado}. Cualquiera crea el suyo;
+      // después, su dueño o el GM: moverlo/rotarlo/pinearlo, y también
+      // editarlo (color, alfa, imagen y su acomodo — tipo/celdas/solido
+      // no cambian más, para eso se borra y se crea uno nuevo); borrarlo
+      // del todo también es de los dos. `invisible` (solo lo ve el GM)
+      // solo lo puede prender o apagar el GM (al crear o después, desde ⚙️);
+      // sirve con o sin Sólido. alfa 0 se permite (solo se ve el contorno).
+      function elementoValido(d) {
+        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'niebla', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'fijado', 'duenoUid', 'creado', 'trampa', 'trampaNombre', 'trampaDetalle', 'portal', 'portalDestino', 'usoEn', 'fuego', 'fuegoDano', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo', 'trampaIgnoraDef', 'colision', 'turnos', 'venceMant', 'trampaItem', 'trampaFicha', 'zona', 'zonaNombre', 'zonaDano', 'zonaIgnoraDef', 'zonaEstado', 'zonaAmiga', 'zonaResistStat', 'zonaResistValor', 'zonaCasteadorRef', 'zonaCasteadorTipo', 'zonaResueltos', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaDanoDif', 'zonaDanoTipo', 'zonaTiraExtra', 'zonaNota', 'zonaTiraStat', 'zonaTiraValor', 'trampaDetectar', 'descubierta', 'trampaDejaZona', 'zonaTurnos', 'zonaAltura', 'zonaDirecto', 'zonaInmediata', 'zonaLuz', 'arma', 'armaNombre', 'armaDe', 'armaItem', 'acelerador', 'townPortal'])
+          && d.tipo in ['flor', 'linea', 'libre']
+          && d.origen is map && d.origen.col is int && d.origen.fila is int
+          && d.celdas is list && d.celdas.size() >= 2 && d.celdas.size() <= 6000 && d.celdas.size() % 2 == 0
+          && d.rotacion is int && d.rotacion >= 0 && d.rotacion < 360 && d.rotacion % 60 == 0
+          && d.color is string && d.color.matches('^#[0-9a-fA-F]{6}$')
+          && d.alfa is int && d.alfa >= 0 && d.alfa <= 100
+          && d.solido is bool
+          && (!('invisible' in d) || d.invisible is bool)
+          // Niebla de una varita (2026-10-05): tapa la vista (la dibuja y la aplica el mapa).
+          && (!('niebla' in d) || d.niebla is bool)
+          && (!('imagen' in d) || (d.imagen is string && d.imagen.size() < 130000))
+          && (!('imgZoom' in d) || (d.imgZoom is number && d.imgZoom >= 1 && d.imgZoom <= 6))
+          && (!('imgDX' in d) || (d.imgDX is number && d.imgDX >= -10000 && d.imgDX <= 10000))
+          && (!('imgDY' in d) || (d.imgDY is number && d.imgDY >= -10000 && d.imgDY <= 10000))
+          && (!('fijado' in d) || d.fijado is bool)
+          // Trampa: solo su dueño (y el GM) la ve hasta que se dispara.
+          // El arma en el piso (2026-10-07: la Varita del manotazo y la del desarme): la levanta cualquiera (ver delete).
+          && (!('arma' in d) || d.arma is bool)
+          && (!('armaNombre' in d) || (d.armaNombre is string && d.armaNombre.size() <= 60))
+          && (!('armaDe' in d) || (d.armaDe is string && d.armaDe.size() <= 100))
+          && (!('armaItem' in d) || (d.armaItem is string && d.armaItem.size() <= 6000))
+          && (!('trampa' in d) || d.trampa is bool)
+          && (!('trampaNombre' in d) || (d.trampaNombre is string && d.trampaNombre.size() <= 40))
+          && (!('trampaDetalle' in d) || (d.trampaDetalle is string && d.trampaDetalle.size() <= 600))
+          && (!('trampaDano' in d) || (d.trampaDano is string && d.trampaDano.size() <= 12))
+          && (!('trampaEstado' in d) || (d.trampaEstado is string && d.trampaEstado.size() <= 300))
+          && (!('disparada' in d) || d.disparada is bool)
+          // Percepción aumentada (2026-10-02, P145): dificultad para detectarla y si ya la descubrió alguien (la ve todo su equipo).
+          && (!('trampaDetectar' in d) || (d.trampaDetectar is int && d.trampaDetectar >= 1 && d.trampaDetectar <= 99))
+          && (!('descubierta' in d) || d.descubierta is bool)
+          && (!('fuegoAmigo' in d) || d.fuegoAmigo is bool)
+          // La tirada de daño de la trampa ignora la Defensa de quien la pisa (daño directo).
+          && (!('trampaIgnoraDef' in d) || d.trampaIgnoraDef is bool)
+          && (!('portal' in d) || d.portal is bool)
+          // ⏩ Acelerador (2026-10-12): los No2 que da a quien lo pisa.
+          && (!('acelerador' in d) || (d.acelerador is int && d.acelerador >= 1 && d.acelerador <= 9))
+          // 🌀 Town portal (2026-10-29): lo ve todo el mundo; quien lo pisa se va del mapa (la pantalla que lo mueve, js/84).
+          && (!('townPortal' in d) || d.townPortal is bool)
+          && (!('usoEn' in d) || d.usoEn is number)
+          && (!('fuego' in d) || d.fuego is bool)
+          && (!('fuegoDano' in d) || (d.fuegoDano is int && d.fuegoDano >= 1 && d.fuegoDano <= 999))
+          && (!('portalDestino' in d) || (d.portalDestino is string && d.portalDestino.matches('^-?[0-9]+,-?[0-9]+$')))
+          && (!('trampaDestino' in d) || (d.trampaDestino is string && d.trampaDestino.matches('^-?[0-9]+,-?[0-9]+$')))
+          // Colisión del mapa (2026-09-24): forma libre ya sólida y visible para todos que se fusiona con las vecinas; solo la crea el GM.
+          && (!('colision' in d) || d.colision is bool)
+          // Formas con turnos (2026-09-24): dura `turnos` turnos; `venceMant` = número de Mantenimiento en el que se elimina (la borra el GM).
+          && (!('turnos' in d) || (d.turnos is int && d.turnos >= 1 && d.turnos <= 99))
+          && (!('venceMant' in d) || d.venceMant is int)
+          // Zona con efecto persistente (2026-09-28): daño y/o estado a quien entra o sigue adentro en el Mantenimiento,
+          // con o sin resistencia. Generaliza 🔥 (que queda como está, sin tocar). zonaResueltos: a quién ya se le aplicó
+          // (no se lo vuelve a chequear); lo escribe el propio afectado (su dueño) o el GM (sus creeps).
+          && (!('zona' in d) || d.zona is bool)
+          && (!('zonaNombre' in d) || (d.zonaNombre is string && d.zonaNombre.size() <= 40))
+          && (!('zonaDano' in d) || (d.zonaDano is string && d.zonaDano.size() <= 12))
+          && (!('zonaIgnoraDef' in d) || d.zonaIgnoraDef is bool)
+          && (!('zonaEstado' in d) || (d.zonaEstado is string && d.zonaEstado.size() <= 300))
+          && (!('zonaAmiga' in d) || d.zonaAmiga is bool)
+          && (!('zonaResistStat' in d) || (d.zonaResistStat is string && d.zonaResistStat.size() <= 12))
+          && (!('zonaResistValor' in d) || d.zonaResistValor is int)
+          && (!('zonaCasteadorRef' in d) || (d.zonaCasteadorRef is string && d.zonaCasteadorRef.size() <= 64))
+          && (!('zonaCasteadorTipo' in d) || d.zonaCasteadorTipo in ['pj', 'creep'])
+          && (!('zonaResueltos' in d) || (d.zonaResueltos is list && d.zonaResueltos.size() <= 60))
+          && (!('zonaEnMantenimiento' in d) || d.zonaEnMantenimiento is bool)
+          && (!('zonaCadaPaso' in d) || d.zonaCadaPaso is bool)
+          && (!('zonaDirecto' in d) || d.zonaDirecto is bool)   // daño directo: no lo frena la Defensa especial (2026-10-07, varitas)
+          && (!('zonaInmediata' in d) || d.zonaInmediata is bool)   // afecta enseguida a los que ya están adentro (2026-10-08)
+          && (!('zonaLuz' in d) || d.zonaLuz is bool)   // una luz del piso: ilumina y deja ver lo oculto mientras dura (2026-10-08)
+          && (!('zonaAltura' in d) || d.zonaAltura in ['piso', 'aire', 'ambos'])   // dónde está la zona (2026-10-07): Levitar y las Suelas
+          // Zona con daño «la diferencia» y una tirada extra con su texto (2026-10-02, Pedos Tóxicos).
+          && (!('zonaDanoDif' in d) || d.zonaDanoDif is bool)
+          && (!('zonaDanoTipo' in d) || (d.zonaDanoTipo is string && d.zonaDanoTipo.size() <= 20))
+          && (!('zonaTiraExtra' in d) || (d.zonaTiraExtra is string && d.zonaTiraExtra.size() <= 12))
+          && (!('zonaNota' in d) || (d.zonaNota is string && d.zonaNota.size() <= 200))
+          // La tirada de la zona en cada exposición: el stat de quien la creó y su valor al crearla (2026-10-02, P143).
+          && (!('zonaTiraStat' in d) || (d.zonaTiraStat is string && d.zonaTiraStat.size() <= 12))
+          && (!('zonaTiraValor' in d) || d.zonaTiraValor is int)
+          // Trampa persistente (2026-09-28): al dispararse se convierte en zona (mismas celdas), ver trampaResolver.
+          && (!('trampaDejaZona' in d) || d.trampaDejaZona is bool)
+          && (!('zonaTurnos' in d) || (d.zonaTurnos is int && d.zonaTurnos >= 1 && d.zonaTurnos <= 99))
+          && d.duenoUid is string;
+      }
+      // Lo que se puede cambiar de un elemento ya creado (rama del dueño o el GM, abajo): solo esos campos. Antes se volvía a validar el
+      // elemento entero (elementoValido) y, con muchos campos, Firebase cortaba por la cantidad de cuentas por pedido (2026-10-08: la trampa de
+      // arena que pone el GM con un personaje no se podía convertir en zona).
+      function elementoCambioValido(d) {
+        return d.origen is map && d.origen.col is int && d.origen.fila is int
+          && d.rotacion is int && d.rotacion >= 0 && d.rotacion < 360 && d.rotacion % 60 == 0
+          && d.color is string && d.color.matches('^#[0-9a-fA-F]{6}$')
+          && d.alfa is int && d.alfa >= 0 && d.alfa <= 100
+          && (!('fijado' in d) || d.fijado is bool)
+          && (!('invisible' in d) || d.invisible is bool)
+          && (!('imagen' in d) || (d.imagen is string && d.imagen.size() < 130000))
+          && (!('imgZoom' in d) || (d.imgZoom is number && d.imgZoom >= 1 && d.imgZoom <= 6))
+          && (!('imgDX' in d) || (d.imgDX is number && d.imgDX >= -10000 && d.imgDX <= 10000))
+          && (!('imgDY' in d) || (d.imgDY is number && d.imgDY >= -10000 && d.imgDY <= 10000))
+          && (!('trampa' in d) || d.trampa is bool)
+          && (!('trampaNombre' in d) || (d.trampaNombre is string && d.trampaNombre.size() <= 40))
+          && (!('trampaDetalle' in d) || (d.trampaDetalle is string && d.trampaDetalle.size() <= 600))
+          && (!('trampaDano' in d) || (d.trampaDano is string && d.trampaDano.size() <= 12))
+          && (!('trampaEstado' in d) || (d.trampaEstado is string && d.trampaEstado.size() <= 300))
+          && (!('trampaIgnoraDef' in d) || d.trampaIgnoraDef is bool)
+          && (!('trampaDestino' in d) || (d.trampaDestino is string && d.trampaDestino.matches('^-?[0-9]+,-?[0-9]+$')))
+          && (!('fuegoDano' in d) || (d.fuegoDano is int && d.fuegoDano >= 1 && d.fuegoDano <= 999))
+          && (!('disparada' in d) || d.disparada is bool)
+          && (!('fuegoAmigo' in d) || d.fuegoAmigo is bool)
+          && (!('turnos' in d) || (d.turnos is int && d.turnos >= 1 && d.turnos <= 99))
+          && (!('venceMant' in d) || d.venceMant is int)
+          && (!('zonaResueltos' in d) || (d.zonaResueltos is list && d.zonaResueltos.size() <= 60))
+          && (!('trampaDejaZona' in d) || d.trampaDejaZona is bool)
+          && (!('zonaTurnos' in d) || (d.zonaTurnos is int && d.zonaTurnos >= 1 && d.zonaTurnos <= 99))
+          && (!('trampaDetectar' in d) || (d.trampaDetectar is int && d.trampaDetectar >= 1 && d.trampaDetectar <= 99));
+      }
+      match /elementos/{id} {
+        allow read: if esMiembro(c);
+        allow create: if esMiembro(c)
+          && elementoValido(request.resource.data)
+          && request.resource.data.duenoUid == request.auth.uid
+          && request.resource.data.creado == request.time
+          && (!('invisible' in request.resource.data) || request.resource.data.invisible == false || esGM(c))
+          && (!('colision' in request.resource.data) || request.resource.data.colision == false || esGM(c));
+        allow update: if esMiembro(c) && (
+          ((resource.data.duenoUid == request.auth.uid || esGM(c))
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'trampaEstado', 'trampaIgnoraDef', 'trampaDestino', 'fuegoDano', 'disparada', 'fuegoAmigo', 'turnos', 'venceMant', 'zonaResueltos', 'trampaDejaZona', 'zonaTurnos', 'trampaDetectar'])
+            && elementoCambioValido(request.resource.data)
+            && (request.resource.data.get('invisible', false) == resource.data.get('invisible', false) || esGM(c)))
+          // Un rival que pisa una trampa la marca como disparada (solo ese campo).
+          || (resource.data.get('trampa', false) == true
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['disparada'])
+            && request.resource.data.disparada == true)
+          // Quien la descubre con Percepción aumentada la marca como descubierta (solo ese campo): la ve todo su equipo (P145).
+          || (resource.data.get('trampa', false) == true
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['descubierta'])
+            && request.resource.data.descubierta == true)
+          // Un aliado que usa un portal deja la hora del uso (solo ese campo): dispara los pulsos en todas las pantallas.
+          || (resource.data.get('portal', false) == true
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usoEn'])
+            && request.resource.data.usoEn is number)
+          // 🌀 Quien entra a un Town portal deja la hora (solo ese campo): los pulsos en todas las pantallas.
+          || (resource.data.get('townPortal', false) == true
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usoEn'])
+            && request.resource.data.usoEn is number)
+          // Quien resiste (o no) el efecto de una zona persistente se anota solo, uno a la vez (append).
+          || (resource.data.get('zona', false) == true
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['zonaResueltos'])
+            && request.resource.data.zonaResueltos.size() == resource.data.get('zonaResueltos', []).size() + 1)
+          // Trampa persistente ya disparada: cualquiera completa su conversión a zona (viene pre-armada por
+          // quien puso la trampa) — ver comun/CLAUDE.md "Trampas persistentes". 2026-10-04: la nube puede ocupar la flor del efecto
+          // (tipo, origen, rotacion, celdas), aunque la trampa se dispare en menos casillas (los gases).
+          || (resource.data.get('trampa', false) == true && resource.data.get('trampaDejaZona', false) == true && resource.data.get('disparada', false) == true
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['zona', 'zonaNombre', 'zonaCasteadorRef', 'zonaCasteadorTipo', 'zonaResueltos', 'turnos', 'venceMant', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaAmiga', 'zonaDano', 'zonaIgnoraDef', 'zonaEstado', 'zonaResistStat', 'zonaResistValor', 'tipo', 'origen', 'rotacion', 'celdas'])
+            && request.resource.data.tipo in ['flor', 'linea', 'libre'] && request.resource.data.celdas is list && request.resource.data.celdas.size() <= 200
+            && request.resource.data.origen is map && request.resource.data.rotacion is int
+            && request.resource.data.zona == true)
+          // El viento que despeja (2026-10-08, Varita del vendaval): a una niebla o un fuego cualquiera le saca casillas (quedan menos, forma libre).
+          || ((resource.data.get('niebla', false) == true || resource.data.get('fuego', false) == true || resource.data.get('zonaDanoTipo', '') in ['de fuego', 'fuego'])
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tipo', 'celdas', 'rotacion'])
+            && request.resource.data.tipo == 'libre' && request.resource.data.rotacion == 0
+            && request.resource.data.celdas is list && request.resource.data.celdas.size() < resource.data.celdas.size()));
+        allow delete: if esMiembro(c)
+          && (resource.data.duenoUid == request.auth.uid || esGM(c) || resource.data.get('arma', false) == true
+            // El viento que despeja (2026-10-08, Varita del vendaval): la niebla y el fuego los puede sacar cualquiera.
+            || resource.data.get('niebla', false) == true || resource.data.get('fuego', false) == true || resource.data.get('zonaDanoTipo', '') in ['de fuego', 'fuego']
+            // Desarmar trampas (talento, 2026-10-08): cualquiera de la partida saca del mapa una trampa (la desarma o se rompe).
+            || resource.data.get('trampa', false) == true);
+      }
+
+      // Mapas guardados además del de siempre (que sigue en mapa/* y
+      // tokens/* de acá arriba): {nombre, creado}. Solo el GM los crea,
+      // renombra o borra (el borrado de verdad, incluidas sus
+      // subcolecciones, lo hace el cliente antes de borrar este doc). Su
+      // fondo/modo/iniciativa y sus tokens son un espejo de mapa/* y
+      // tokens/{id}, un nivel más adentro.
+      match /mapas/{mapaId} {
+        allow read: if esMiembro(c);
+        allow create, update: if esGM(c)
+          && request.resource.data.keys().hasOnly(['nombre', 'creado'])
+          && request.resource.data.nombre is string
+          && request.resource.data.nombre.size() > 0 && request.resource.data.nombre.size() <= 40;
+        // Borrar un mapa (2026-10-13): antes iba dentro del `write` de arriba, que mira los datos nuevos — al borrar no hay, así que
+        // Firestore lo rechazaba siempre y el mapa no se podía borrar.
+        allow delete: if esGM(c);
+
+        match /estado/{doc} {
+          allow read: if esMiembro(c);
+          allow write: if esGM(c)
+            || (doc == 'niebla' && esMiembro(c) && nieblaSoloCeldas())
+            || (doc == 'iniciativa' && esMiembro(c) && resource != null
+              && iniciativaPropia(resource.data, request.resource.data));
+        }
+        match /tokens/{id} {
+          allow read: if esMiembro(c);
+          allow create: if esMiembro(c)
+            && tokenValido(request.resource.data)
+            && request.resource.data.creado == request.time
+            && (!('oculto' in request.resource.data) || esGM(c))
+            && (
+              (request.resource.data.tipo == 'pj'
+                && (request.resource.data.duenoUid == request.auth.uid || esGM(c)))
+              || (request.resource.data.tipo == 'creep' && esGM(c)
+                && request.resource.data.duenoUid == request.auth.uid)
+            );
+          allow update: if esMiembro(c)
+            && tokenValido(request.resource.data)
+            && request.resource.data.tipo == resource.data.tipo
+            && request.resource.data.creado == resource.data.creado
+            && (!request.resource.data.diff(resource.data).affectedKeys().hasAny(['oculto']) || esGM(c))
+            && (
+              (resource.data.tipo == 'pj'
+                && resource.data.duenoUid == request.auth.uid
+                && request.resource.data.duenoUid == resource.data.duenoUid)
+              || (resource.data.tipo == 'creep' && esGM(c))
+              || (resource.data.tipo == 'pj' && esGM(c)
+                && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['duenoUid', 'col', 'fila', 'ruta', 'rotacion', 'oculto', 'bajoTierra', 'tunel']))
+            );
+          allow delete: if esMiembro(c)
+            && (resource.data.duenoUid == request.auth.uid || esGM(c) || resource.data.get('arma', false) == true);
+        }
+        match /trazos/{id} {
+          allow read: if esMiembro(c);
+          allow create: if esMiembro(c)
+            && trazoValido(request.resource.data)
+            && request.resource.data.duenoUid == request.auth.uid
+            && request.resource.data.creado == request.time
+            && (request.resource.data.get('colision', false) == false || esGM(c));   // 🧱 una pared la pone el GM (2026-10-10)
+          allow update: if esMiembro(c)
+            && (resource.data.duenoUid == request.auth.uid || esGM(c))
+            && (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'transparente', 'cerrada', 'color', 'sinRelleno'])
+              || (esGM(c) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'colision', 'fijado', 'transparente', 'cerrada', 'color', 'veTraves', 'sinRelleno', 'disparoTraves'])));
+          allow delete: if esMiembro(c)
+            && (resource.data.permanente == false || resource.data.duenoUid == request.auth.uid || esGM(c));
+        }
+        match /pings/{id} {
+          allow read: if esMiembro(c);
+          allow create: if esMiembro(c)
+            && pingValido(request.resource.data)
+            && request.resource.data.duenoUid == request.auth.uid
+            && request.resource.data.creado == request.time;
+          allow update: if false;
+          allow delete: if esMiembro(c);
+        }
+        match /elementos/{id} {
+          allow read: if esMiembro(c);
+          allow create: if esMiembro(c)
+            && elementoValido(request.resource.data)
+            && request.resource.data.duenoUid == request.auth.uid
+            && request.resource.data.creado == request.time
+            && (!('invisible' in request.resource.data) || request.resource.data.invisible == false || esGM(c))
+            && (!('colision' in request.resource.data) || request.resource.data.colision == false || esGM(c));
+          allow update: if esMiembro(c) && (
+            ((resource.data.duenoUid == request.auth.uid || esGM(c))
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'trampaEstado', 'trampaIgnoraDef', 'trampaDestino', 'fuegoDano', 'disparada', 'fuegoAmigo', 'turnos', 'venceMant', 'zonaResueltos', 'trampaDejaZona', 'zonaTurnos', 'trampaDetectar'])
+              && elementoCambioValido(request.resource.data)
+              && (request.resource.data.get('invisible', false) == resource.data.get('invisible', false) || esGM(c)))
+            || (resource.data.get('trampa', false) == true
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['disparada'])
+              && request.resource.data.disparada == true)
+            // Quien la descubre con Percepción aumentada la marca como descubierta (solo ese campo): la ve todo su equipo (P145).
+            || (resource.data.get('trampa', false) == true
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['descubierta'])
+              && request.resource.data.descubierta == true)
+            // Un aliado que usa un portal deja la hora del uso (solo ese campo): dispara los pulsos en todas las pantallas.
+            || (resource.data.get('portal', false) == true
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usoEn'])
+              && request.resource.data.usoEn is number)
+            // 🌀 Quien entra a un Town portal deja la hora (solo ese campo): los pulsos en todas las pantallas.
+            || (resource.data.get('townPortal', false) == true
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['usoEn'])
+              && request.resource.data.usoEn is number)
+            // Quien resiste (o no) el efecto de una zona persistente se anota solo, uno a la vez (append).
+            || (resource.data.get('zona', false) == true
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['zonaResueltos'])
+              && request.resource.data.zonaResueltos.size() == resource.data.get('zonaResueltos', []).size() + 1)
+            // Trampa persistente ya disparada: cualquiera completa su conversión a zona.
+            || (resource.data.get('trampa', false) == true && resource.data.get('trampaDejaZona', false) == true && resource.data.get('disparada', false) == true
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['zona', 'zonaNombre', 'zonaCasteadorRef', 'zonaCasteadorTipo', 'zonaResueltos', 'turnos', 'venceMant', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaAmiga', 'zonaDano', 'zonaIgnoraDef', 'zonaEstado', 'zonaResistStat', 'zonaResistValor', 'tipo', 'origen', 'rotacion', 'celdas'])
+              && request.resource.data.tipo in ['flor', 'linea', 'libre'] && request.resource.data.celdas is list && request.resource.data.celdas.size() <= 200
+              && request.resource.data.origen is map && request.resource.data.rotacion is int
+              && request.resource.data.zona == true)
+            // El viento que despeja (2026-10-08, Varita del vendaval): a una niebla o un fuego cualquiera le saca casillas (quedan menos, forma libre).
+            || ((resource.data.get('niebla', false) == true || resource.data.get('fuego', false) == true || resource.data.get('zonaDanoTipo', '') in ['de fuego', 'fuego'])
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tipo', 'celdas', 'rotacion'])
+              && request.resource.data.tipo == 'libre' && request.resource.data.rotacion == 0
+              && request.resource.data.celdas is list && request.resource.data.celdas.size() < resource.data.celdas.size()));
+          allow delete: if esMiembro(c)
+            && (resource.data.duenoUid == request.auth.uid || esGM(c) || resource.data.get('arma', false) == true
+              || resource.data.get('niebla', false) == true || resource.data.get('fuego', false) == true || resource.data.get('zonaDanoTipo', '') in ['de fuego', 'fuego']
+              || resource.data.get('trampa', false) == true);
+        }
+      }
+    }
+
+    // (Firestore no admite comodines dentro de un nombre, por eso el match es
+    // /{bib}/{id} y se limita por lista de colecciones.)
+    // Biblioteca global de creeps (comun/biblioteca.js), fuera de las
+    // campañas: sirve para cualquier partida. Solo texto. Cada entrada:
+    // {nombre, etiquetas, descripcion, nivel, json, autorUid, autorNombre,
+    // creado}. `biblioteca_<tipo>` es la oficial: la lee cualquier cuenta
+    // confirmada y solo el dueño del proyecto la escribe. `propuestas_<tipo>`
+    // es lo que manda cualquier GM con "Guardar en la biblioteca": la ven
+    // solo su autor y el dueño, que las audita y las pasa a la oficial.
+    // (Que solo los GM la vean es visual: las reglas no saben si alguien es
+    // GM de alguna partida.)
+    function esDuenoProyecto() {
+      return verificado() && request.auth.token.email == 'rolpintoista@gmail.com';
+    }
+    // Subida unificada (2026-09-29, docs/plan-subida-unificada.md paso 1): lo que sube CUALQUIER cuenta confirmada va
+    // directo a `biblioteca_<tipo>` (disponible al instante para todos) con `auditado: false`; solo el dueño lo pasa a
+    // `true`. Cualquiera puede CORREGIR una entrada (creación colectiva): la versión sube 1, vuelve a "sin auditar" y
+    // queda anotado quién la corrigió; no puede cambiar el autor ni la fecha de creación. Borrar: el dueño, o el autor
+    // mientras siga sin auditar. `propuestas_<tipo>` queda para lo que se mandó con el camino viejo.
+    function entradaBiblioteca(d) {
+      return d.keys().hasOnly(['nombre', 'etiquetas', 'descripcion', 'nivel', 'json', 'autorUid', 'autorNombre', 'creado',
+          'auditado', 'version', 'reemplaza', 'editorUid', 'editorNombre', 'actualizado'])
+        && d.get('auditado', true) is bool
+        && d.get('version', 1) is int && d.get('version', 1) >= 1 && d.get('version', 1) <= 100000
+        && d.get('reemplaza', '') is string && d.get('reemplaza', '').size() <= 80
+        && d.get('editorUid', '') is string
+        && d.get('editorNombre', '') is string && d.get('editorNombre', '').size() <= 40
+        && d.nombre is string && d.nombre.size() > 0 && d.nombre.size() <= 60
+        && d.etiquetas is list && d.etiquetas.size() <= 12
+        && d.descripcion is string && d.descripcion.size() <= 300
+        && d.nivel is int && d.nivel >= 0 && d.nivel <= 1000
+        && d.json is string && d.json.size() <= 200000
+        && d.autorUid is string
+        && d.autorNombre is string && d.autorNombre.size() <= 40;
+    }
+    match /{bib}/{id} {
+      allow read: if verificado() && bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas', 'biblioteca_trampas', 'biblioteca_habs_creep', 'biblioteca_estados', 'biblioteca_items'];
+      allow create: if bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas', 'biblioteca_trampas', 'biblioteca_habs_creep', 'biblioteca_estados', 'biblioteca_items']
+        && entradaBiblioteca(request.resource.data)
+        && (esDuenoProyecto()
+          || (verificado()
+            && request.resource.data.autorUid == request.auth.uid
+            && request.resource.data.creado == request.time
+            && request.resource.data.auditado == false
+            && request.resource.data.version in [1, 2]));
+      allow update: if bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas', 'biblioteca_trampas', 'biblioteca_habs_creep', 'biblioteca_estados', 'biblioteca_items']
+        && entradaBiblioteca(request.resource.data)
+        && (esDuenoProyecto()
+          || (verificado()
+            && request.resource.data.auditado == false
+            && request.resource.data.version == resource.data.get('version', 1) + 1
+            && request.resource.data.autorUid == resource.data.autorUid
+            && request.resource.data.autorNombre == resource.data.autorNombre
+            && request.resource.data.creado == resource.data.creado
+            && request.resource.data.get('reemplaza', '') == resource.data.get('reemplaza', '')
+            && request.resource.data.editorUid == request.auth.uid
+            && request.resource.data.actualizado == request.time));
+      allow delete: if bib in ['biblioteca_creeps', 'biblioteca_skills', 'biblioteca_pasivas', 'biblioteca_trampas', 'biblioteca_habs_creep', 'biblioteca_estados', 'biblioteca_items']
+        && (esDuenoProyecto()
+          || (verificado() && resource.data.autorUid == request.auth.uid && resource.data.get('auditado', true) == false));
+    }
+    match /{prop}/{id} {
+      allow read: if verificado() && prop in ['propuestas_creeps', 'propuestas_skills', 'propuestas_pasivas', 'propuestas_trampas', 'propuestas_habs_creep', 'propuestas_estados', 'propuestas_items']
+        && (esDuenoProyecto() || resource.data.autorUid == request.auth.uid);
+      allow create: if verificado() && prop in ['propuestas_creeps', 'propuestas_skills', 'propuestas_pasivas', 'propuestas_trampas', 'propuestas_habs_creep', 'propuestas_estados', 'propuestas_items']
+        && entradaBiblioteca(request.resource.data)
+        && request.resource.data.autorUid == request.auth.uid
+        && request.resource.data.creado == request.time;
+      allow update: if false;
+      allow delete: if prop in ['propuestas_creeps', 'propuestas_skills', 'propuestas_pasivas', 'propuestas_trampas', 'propuestas_habs_creep', 'propuestas_estados', 'propuestas_items']
+        && (esDuenoProyecto() || (verificado() && resource.data.autorUid == request.auth.uid));
+    }
+
+    // Preguntas de diseño (preguntas-diseno/preguntas.html): el log donde el dueño del proyecto tira preguntas y
+    // cualquier cuenta confirmada (los amigos con los que arma las reglas) suma preguntas o respuestas/sugerencias.
+    // Tres pestañas comparten esta misma colección: "Preguntas" (tipo 'pregunta'), "A desarrollar" (tipo
+    // 'pendiente', lo que falta construir) y "Falta testear" (tipo 'testeo', mecánicas para probar en mesa) —
+    // las últimas dos, 2026-09-22, el dueño las tira pero cualquiera puede sumar o tildar también.
+    // Fuera de las campañas a propósito: es sobre el sistema en general, no de una partida puntual. No hace falta
+    // ser miembro de ninguna partida — alcanza con tener la cuenta confirmada. {tipo:'pregunta'|'pendiente'|
+    // 'testeo'|'respuesta', texto, padreId (una respuesta apunta a su entrada; '' si no es una respuesta), resuelta
+    // (solo en preguntas/pendientes/testeos, no en respuestas), orden (opcional, número: orden manual), autorUid, autorNombre, creado}.
+    function entradaPregunta(d) {
+      return d.keys().hasOnly(['tipo', 'texto', 'padreId', 'resuelta', 'orden', 'autorUid', 'autorNombre', 'creado'])
+        && d.tipo in ['pregunta', 'respuesta', 'pendiente', 'testeo']
+        && d.texto is string && d.texto.size() > 0 && d.texto.size() <= 4000
+        && d.padreId is string && d.padreId.size() <= 64
+        && d.resuelta is bool
+        && (!('orden' in d) || d.orden is number)
+        && d.autorUid is string
+        && d.autorNombre is string && d.autorNombre.size() <= 40;
+    }
+    match /preguntas_diseno/{id} {
+      allow read: if verificado();
+      allow create: if verificado()
+        && entradaPregunta(request.resource.data)
+        && request.resource.data.autorUid == request.auth.uid
+        && request.resource.data.creado == request.time;
+      // Cualquiera puede marcar una pregunta resuelta (o reabrirla) o cambiarla de lugar (`orden`, orden manual compartido)
+      // sin tocar el resto; el autor edita su propio texto.
+      allow update: if verificado()
+        && ((request.resource.data.diff(resource.data).affectedKeys().hasOnly(['resuelta', 'orden'])
+            && (!('orden' in request.resource.data) || request.resource.data.orden is number)
+            && request.resource.data.tipo == resource.data.tipo)
+          || (resource.data.autorUid == request.auth.uid
+            && entradaPregunta(request.resource.data)
+            && request.resource.data.autorUid == resource.data.autorUid
+            && request.resource.data.tipo == resource.data.tipo
+            && request.resource.data.padreId == resource.data.padreId
+            && request.resource.data.creado == resource.data.creado));
+      allow delete: if verificado() && resource.data.autorUid == request.auth.uid;
+    }
+  }
+}

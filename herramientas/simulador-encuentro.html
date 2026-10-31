@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Simulador de encuentros — Rol Pintoísta</title>
+<style>
+:root{--ink:#0F0C0E;--panel:#1A1418;--line:#3B2E34;--paper:#EDE3D2;--muted:#9A867E;--ok:#A8C256;--mal:#D4574E;--brass:#E0A458}
+body{margin:0;background:var(--ink);color:var(--paper);font:14px/1.4 system-ui,sans-serif;padding:16px}
+h1{font-size:18px;margin:0 0 6px} h2{font-size:14px;color:var(--brass);margin:16px 0 6px}
+pre{white-space:pre-wrap;font:12px/1.35 ui-monospace,monospace;background:var(--panel);border:1px solid var(--line);padding:10px;border-radius:6px;max-height:70vh;overflow:auto}
+table{border-collapse:collapse;font-size:13px} td,th{border:1px solid var(--line);padding:3px 8px;text-align:left}
+</style>
+</head>
+<body>
+<h1>⚔ Simulador de encuentros (2026-10-22)</h1>
+<div class="hint">Pelea «en el aire» con el motor real (comun/*.js) y los datos exportados de una partida (herramientas/sim-datos/*.json). Lo maneja
+  Claude desde la consola: <code>Sim.correr(nombreEncuentro, n)</code>, <code>Sim.narrar(nombreEncuentro)</code>.</div>
+<div id="salida"></div>
+
+<script>
+function num(v){ const n = Number(v); return Number.isFinite(n) ? n : 0; }
+function toast(){}
+function mesaConTexto(){}
+function fmt(n){ return Number.isInteger(n) ? n : Math.round(n*100)/100; }
+function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c])); }
+</script>
+<script src="../comun/tiradas.js"></script>
+<script src="../comun/critico.js"></script>
+<script src="../comun/combatiente.js"></script>
+<script src="../comun/creep-calculo.js"></script>
+<script src="../comun/creep-botonera.js"></script>
+<script src="../comun/creep-acciones.js"></script>
+<script src="../comun/creep-duelo.js"></script>
+<script src="../comun/ficha-calculo.js"></script>
+<script src="../comun/ficha-combate.js"></script>
+<script src="../comun/estados-presets.js"></script>
+<script src="../comun/estados-aplicar.js"></script>
+<script src="../comun/recibidos.js"></script>
+<script src="../comun/tokens-auto.js"></script>
+<script src="../comun/creeps-mapas.js"></script>
+<script src="../comun/paso-a-paso.js"></script>
+<script src="../comun/asistente-item.js"></script>
+<script src="../comun/asistente-duelo-hab.js"></script>
+<script src="../comun/modificadores-tirada.js"></script>
+<script src="../comun/plantillas.js"></script>
+<script src="../comun/catalogo.js"></script>
+<script src="../comun/generador-tiendas.js"></script>
+<script src="../comun/items-subidos.js"></script>
+<script src="../comun/ficha-habilidades.js"></script>
+<script src="../comun/ficha-guardado.js"></script>
+<script src="../comun/ficha-botonera.js"></script>
+<script src="../comun/ficha-resumen.js"></script>
+<script src="../comun/ficha-sesion.js"></script>
+<script src="../comun/inv-calculo.js"></script>
+<script src="../comun/inv-botonera.js"></script>
+<script src="../comun/inv-acciones.js"></script>
+<script src="../comun/inv-duelo.js"></script>
+<script src="../comun/inv-habilidades.js"></script>
+<script src="../comun/inv-lupa.js"></script>
+<script src="../comun/ficha-acciones.js"></script>
+<script src="../comun/ficha-mantenimiento.js"></script>
+<script src="../comun/estado-preguntas.js"></script>
+<script src="../comun/asistente-estado.js"></script>
+<script src="../comun/asistente-trampa.js"></script>
+<script src="../comun/elegir-trampa.js"></script>
+<script src="../comun/asistente-zona.js"></script>
+<script src="../comun/asistente-mapa.js"></script>
+<script src="../comun/selector-estados.js"></script>
+<script src="../comun/ficha-equipo.js"></script>
+<script src="../comun/ficha-botin.js"></script>
+<script src="../comun/ppt.js"></script>
+<script src="../comun/escaneo-grupo.js"></script>
+<script src="../comun/trampas-base.js"></script>
+<script src="../comun/confirmar.js"></script>
+<script src="../comun/pausa.js"></script>
+<script src="../comun/glosario.js"></script>
+<script src="../comun/item-corto.js"></script>
+<script src="../comun/filtro-catalogo.js"></script>
+<script src="../comun/ficha-tienda.js"></script>
+<script src="../comun/intercambio.js"></script>
+<script src="../comun/ficha-stats.js"></script>
+<script src="../comun/tiradas-propias.js"></script>
+<script src="../comun/efectos-golpe.js"></script>
+<script src="../comun/confirmar-turno.js"></script>
+<script src="../comun/ficha-duelo.js"></script>
+<script src="../comun/duelo.js"></script>
+<script src="../comun/aviso-combate.js"></script>
+<script src="../comun/lupa.js"></script>
+<script src="../comun/ficha-lupa.js"></script>
+<script src="../comun/ficha-editor.js"></script>
+<script src="../comun/creep-lupa.js"></script>
+<script src="../comun/combate-fin.js"></script>
+<script src="../comun/creep-editor.js"></script>
+<script src="../comun/ficha-lite.js"></script>
+<script src="../comun/skills-clase.js"></script>
+<script src="../comun/creeps-base.js"></script>
+<script src="../comun/skills-creep-base.js"></script>
+
+<script>
+/* =========================================================
+   SIMULADOR DE ENCUENTROS (2026-10-22, pedido del dueño: «armá una copia de los tres jugadores… imaginá un escenario de pelea…
+   simulá un combate con todos sus pasos… para evaluar contra qué creeps puede ser una pelea divertida, justa, con riesgo»).
+   Usa el motor real: FichaCalculo / FichaCombate / FichaMantenimiento / FichaAcciones (los personajes), CreepCalculo / CreepAcciones (los
+   creeps), Combatiente.tirarStat (las tiradas con sus estados), Critico (el crítico), Combatiente.ataqueConArreglos y habEjecucion (las
+   habilidades), EstadosAplicar y FichaAcciones.aplicarEstadoRecibido (los estados). Lo que el duelo del mapa hace con Firestore y clics, acá
+   lo hace una función (`duelo`), copiando sus reglas (resolverPar, cerrarPar, entrarCritico, dueloAplicarDano, resolverGolpe).
+   El mapa se simplifica a una LÍNEA de casilleros (distancia = diferencia de posición). No se modelan: el dodge roll para salir de un área,
+   las trampas, Excavar, las invocaciones de Bizzante, el contraataque, los talismanes, la Bronca del Capataz, las Esporas del hongero.
+   ========================================================= */
+const Sim = (() => {
+  const PRESETS_PJ = estadosPresetFicha(), PRESETS_CREEP = estadosPresetCreep();
+  const TIPOS = [4, 6, 8, 10, 12];
+  const EFECTOS_CON_DANO = ['envenenar', 'veneno severo', 'sangrado', 'drena vida', 'lisiado', 'rengo'];
+  let LOG = [], logOn = true, DATOS = null;
+  const log = s => { if(logOn) LOG.push(s); };
+  const rnd = n => 1 + Math.floor(Math.random() * n);
+  const moneda = () => Math.random() < 0.5;
+  const tir = f => { const r = tirarDados(String(f || '').trim()); return r || {formula: String(f), rolls: [], mod: 0, total: 0}; };
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  /* ---------- Cargar y armar ---------- */
+  async function cargar(ruta){
+    DATOS = await (await fetch(ruta || 'sim-datos/origen.json', {cache: 'no-store'})).json();
+    return DATOS;
+  }
+  const uiPJ = u => ({toast(){}, cambio(){}, recordatorios(){}, presets: PRESETS_PJ, mesaHabilidad(){}, registrarTirada(){}, avisarSinNitros(){}, limpiarParry(){}, muerte(){},
+    fijarHp(v){ const max = num(FichaCalculo.calcular(u.S).final.hpmax); u.S.hp = clamp(Math.round(num(v)), 0, max); }});
+  function armarPJ(ficha, x){
+    const docs = Object.entries(ficha.partes).map(([id, json]) => ({id, json}));
+    const ad = FichaGuardado.armarDatos(docs);
+    const nz = FichaGuardado.normalizar(ad.datos); const S = FichaGuardado.completar(nz.S || nz);
+    S.efectos = (S.efectos || []).filter(e => e && /\(/.test(String(e.nombre || '')));   // solo los que vienen de una pieza (Regeneración (túnica))
+    S.spGastado = 0; S.ataquesTurno = 0; S.ataquesArma = {}; S.descargadas = {}; S.muerto = {activo: false, turnos: 5, definitivo: false};
+    delete S.inicioTurnoClave; delete S.finTurnoClave;
+    (S.habilidades || []).forEach(h => { if(h && /^pedos/i.test(h.nombre || '') && h.duelo && h.duelo.objetivo === 'zona') h.duelo.zonaTurnos = 1; });   // el nerf del dueño (2026-10-22): 1 turno = dos efectos
+    const c = FichaCalculo.calcular(S);
+    S.hp = num(c.final.hpmax); S.nitros = FichaBotonera.nitrosMaximo(S);
+    const u = {tipo: 'pj', bando: 'pj', S, nombre: String(S.meta.nombre || ficha.nombre).trim(), x, id: 'pj:' + ficha.nombre, caidas: 0};
+    u.ui = uiPJ(u);
+    return u;
+  }
+  function armarCreep(json, nombre, x){
+    const sc = CreepCalculo.normalizar(JSON.parse(json));
+    sc.nombre = nombre; sc.estados = []; sc.ataquesTurno = 0; sc.usosEspecial = {}; sc.cinturon = sc.cinturon || [];
+    sc.hp = num(sc.hpMax); sc.nitros = CreepCalculo.nitrosMax(sc);
+    (sc.habilidades || []).forEach(h => { h.cdActual = h.cdArranca ? num(h.cd) : 0; });
+    delete sc.inicioTurnoClave; delete sc.finTurnoClave; sc.golpeListo = null; sc.aguanteListo = 0;
+    return {tipo: 'creep', bando: 'creep', sc, nombre, x, id: 'cr:' + nombre};
+  }
+
+  /* ---------- Lo básico de una unidad ---------- */
+  // El cálculo de la ficha es caro: se guarda por unidad y se invalida cuando algo cambia (estados, turno, equipo).
+  const calc = u => u._calc || (u._calc = FichaCalculo.calcular(u.S));
+  const tocar = u => { u._calc = null; };
+  const hp = u => num(u.S ? u.S.hp : u.sc.hp);
+  const hpMax = u => u.S ? num(calc(u).final.hpmax) : num(u.sc.hpMax);
+  const vivo = u => hp(u) > 0;
+  const estados = u => u.S ? (u.S.efectos || []) : (u.sc.estados || []);
+  const stat = (u, id) => u.S ? num(calc(u).final[id]) : num(CreepCalculo.statValor(u.sc, id));
+  const defensa = u => u.S ? num(calc(u).final.def) : num(CreepCalculo.defensaEfectiva(u.sc));
+  const armadmg = u => u.S ? num(calc(u).final.armadmg) : num(CreepCalculo.armadmgEfectiva(u.sc));
+  const resEl = (u, el) => !el ? 0 : u.S ? num(calc(u).final['res' + el]) : num(CreepCalculo.resElemental(u.sc, el));
+  const nitros = u => num(u.S ? u.S.nitros : u.sc.nitros);
+  const gastarNo2 = (u, n) => { if(u.S) u.S.nitros = num(u.S.nitros) - n; else u.sc.nitros = num(u.sc.nitros) - n; };
+  const sp = u => u.S ? Math.max(0, num(FichaBotonera.spMaximo(u.S, calc(u))) - num(u.S.spGastado)) : (CreepCalculo.modoSP(u.sc) ? CreepCalculo.spActual(u.sc) : 0);
+  const gastarSp = (u, n) => { if(u.S) FichaAcciones.gastarSp(u.S, n, u.ui, 'sim'); };
+  const dist = (a, b) => Math.abs(a.x - b.x);
+  const armaPJ = u => (FichaCombate.armasEquipadasConDano(u.S)[0] || {}).item || null;
+  const alcance = (u, arma) => u.S ? FichaCombate.alcanceDeArma(u.S, arma === undefined ? armaPJ(u) : arma, calc(u)) : CreepCalculo.alcance(u.sc);
+  const tieneEstado = (u, re) => estados(u).some(e => e && e.activo !== false && re.test(String(e.nombre || '')));
+  const estadoCon = (u, flag) => estados(u).some(e => e && e.activo !== false && e[flag]);
+  const nomHp = u => `${u.nombre} (${fmt(hp(u))}/${fmt(hpMax(u))})`;
+
+  /* ---------- Daño a la vida (como danioPj / danioCreep + resolverGolpe del mapa) ---------- */
+  function resolverGolpe(golpe, def, efectos, o){
+    const activos = (efectos || []).filter(e => e && e.activo !== false);
+    if(activos.some(e => e.invulnerable)) return {recibido: 0, invulnerable: true, defensa: def, absorbido: 0};
+    let recibido = Math.max(0, golpe - def), absorbido = 0;
+    const ab = Combatiente.absorberPct(activos, recibido);
+    recibido = ab.recibido; absorbido += ab.tomado;
+    const capas = activos.filter(e => (e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) && num(e.escudoMagicoActual ?? e.escudoMagico) > 0 && !(e.soloEspecial && !(o && o.magico)) && !(e.soloFisico && o && o.magico))
+      .sort((a, b) => (a.excedenteVida ? 1 : 0) - (b.excedenteVida ? 1 : 0));
+    capas.forEach(c => {
+      if(recibido <= 0) return;
+      const actual = num(c.escudoMagicoActual ?? c.escudoMagico), tomado = Math.min(recibido, actual);
+      c.escudoMagicoActual = actual - tomado;
+      if(c.excedenteVida) c.escudoMagico = c.escudoMagicoActual;
+      absorbido += tomado; recibido -= tomado;
+    });
+    return {recibido, absorbido, defensa: def};
+  }
+  // ignoraDef: no se resta la Defensa (crítico, daño de casteo); restaIgnorando: lo que se resta en su lugar (la Def. especial); resExtra: la Res. elemental.
+  function aplicarDano(u, monto, ignoraDef, restaIgnorando, resExtra, o){
+    const def = (ignoraDef ? num(restaIgnorando) : defensa(u)) + num(resExtra);
+    const r = resolverGolpe(Math.max(0, Math.round(num(monto))), def, estados(u), o);
+    tocar(u);
+    const antes = hp(u);
+    const nuevo = Math.max(0, antes - r.recibido);
+    if(u.S){ u.S.hp = nuevo; if(nuevo <= 0 && !u.S.muerto.activo){ u.S.muerto.activo = true; u.caidas++; } }
+    else u.sc.hp = nuevo;
+    return {...r, antes, nuevo};
+  }
+  function curar(u, n){
+    const max = hpMax(u), antes = hp(u);
+    if(antes <= 0) return 0;   // una cura no levanta a un caído
+    const nuevo = Math.min(max, antes + Math.max(0, Math.round(n)));
+    if(u.S) u.S.hp = nuevo; else u.sc.hp = nuevo;
+    return nuevo - antes;
+  }
+
+  /* ---------- Estados ---------- */
+  function aplicarSpec(u, spec, origen){
+    if(!spec || !spec.nombre) return '';
+    const s = {...spec}; tocar(u);
+    if(u.S){
+      try{ FichaAcciones.aplicarEstadoRecibido(u.S, s, origen || '', u.ui); }catch(err){ return `${s.nombre}: no se pudo (${err.message})`; }
+      return s.nombre;
+    }
+    const r = EstadosAplicar.aplicarACreep(u.sc, s);
+    return r.ok ? s.nombre : `${s.nombre}: no entró (${r.motivo})`;
+  }
+  // Un efecto del duelo (con su probabilidad): {nombre, caras, exitos, spec, cura, empuja, requiereDano…}
+  function resolverEfecto(a, d, ef, ctx){
+    const nombre = String(ef.nombre || '').trim();
+    if(!nombre) return '';
+    let caras = Math.max(1, Math.round(num(ef.caras)) || 1), exitos = Math.min(caras, Math.max(1, Math.round(num(ef.exitos)) || 1));
+    if(caras === 3){ caras = 6; exitos *= 2; }
+    const requiere = typeof ef.requiereDano === 'boolean' ? ef.requiereDano : EFECTOS_CON_DANO.includes(nombre.toLowerCase());
+    if(requiere && !ctx.hizoDano) return `${nombre}: no entra (el golpe no hizo daño)`;
+    if(ef.soloCritico && !ctx.crit) return '';
+    if(caras > 1 && !(ef.seguroCritico && ctx.crit)){ const dado = rnd(caras); if(dado <= caras - exitos) return `${nombre}: no salió (${dado} en d${caras})`; }
+    if(num(ef.cura) > 0){ const c = curar(d, num(ef.cura)); return `cura ${c}`; }
+    if(num(ef.empuja) > 0){ const dir = d.x >= a.x ? 1 : -1; d.x += dir * Math.round(num(ef.empuja)); return `empujado ${ef.empuja}`; }
+    if(ef.no2 !== undefined){ const n = Math.max(0, Math.round(num(ef.no2))) + (ef.no2Dif ? Math.abs(Math.round(num(ctx.dif))) : 0); gastarNo2(d, Math.min(nitros(d), n)); let t = `pierde ${n} No2`; if(nitros(d) <= 0 && ef.no2Sentado) t += ' · ' + aplicarSpec(d, {nombre: 'Sentado'}, a.nombre); return t; }
+    if(/^(demora|mal de ojo|enyetar|empower|marcar|purga|robo)$/i.test(nombre)) return `${nombre}: a mano en la mesa (no se simula)`;
+    let spec = ef.spec && ef.spec.nombre ? {...ef.spec} : {nombre, ...(num(ef.turnos) > 0 ? {turnos: num(ef.turnos)} : {}), ...(num(ef.stacks) > 0 ? {stacks: num(ef.stacks)} : {}), ...(ef.permanente ? {permanente: true} : {})};
+    if(ctx.crit && /^sangrado/i.test(spec.nombre)){ spec.permanente = true; spec.turnos = 0; }
+    if(ctx.crit && /armadura rota/i.test(spec.nombre)) return 'Armadura rota: no entra (fue crítico)';
+    return aplicarSpec(d, spec, a.nombre);
+  }
+
+  /* ---------- Un ataque con arma (las reglas de comun/duelo.js y dueloAplicarDano del mapa) ---------- */
+  function resolverPar(a, b){
+    const dif = a.total - b.total;
+    if(dif > 0) return {gana: 'atacante', dif};
+    if(dif < 0) return {gana: 'defensor', dif};
+    const masA = num(a.mod) > 0, masB = num(b.mod) > 0;
+    if(masA !== masB) return {gana: masA ? 'defensor' : 'atacante', dif: 0};
+    return {gana: moneda() ? 'atacante' : 'defensor', dif: 0, moneda: true};
+  }
+  // Con qué para el defensor: {nombre, peso, parry (valor), bloqueo (valor)} o null.
+  function paraCon(d, disparo){
+    if(d.S){
+      const op = FichaCombate.armasYEscudosParaParry(d.S);
+      const it = (op.find(x => Combatiente.esEscudo(x.item)) || (disparo ? null : op[0]) || {}).item;
+      return it ? {nombre: it.nombre, parry: FichaCombate.statParaArma(d.S, 'parry', it, calc(d)), bloqueo: FichaCombate.bloqueoValor(d.S, it, calc(d))} : null;
+    }
+    const def = CreepCalculo.defensa(d.sc, {soloEscudo: !!disparo});
+    return def ? {nombre: def.nombre, parry: stat(d, 'parry'), bloqueo: CreepCalculo.bloqueoValor(d.sc)} : null;
+  }
+  const tiradaStat = (u, valor, id) => Combatiente.tirarStat(valor, estados(u), id) || {formula: String(valor), rolls: [], mod: num(valor), total: num(valor)};
+  // `atq`: {tipoDado, armaNombre, arma (ítem, PJ), mods{pdg,dados,fijo,critBono,critpotBono,ignoraResistCrit,dadoExtra}, sinParry, perfora, efectos, habNombre, rango}
+  function duelo(a, d, atq){
+    const arma = atq.arma || null, tipo = num(atq.tipoDado) || 8, m = {...(atq.mods || {})};
+    const notasPrevias = [];
+    // 👊 Patotear / Jauría (vtt-hexgrid/js/65): +1 dado por aliado del mismo tipo pegado al objetivo, hasta el tope
+    if(num(atq.manada) > 0){
+      const base = String(a.nombre).replace(/\s+\d+$/, ''), k = Math.min(num(atq.manada), (a.todos || []).filter(x => x !== a && vivo(x) && x.bando === a.bando && String(x.nombre).replace(/\s+\d+$/, '') === base && dist(x, d) <= 1).length);
+      if(k > 0){ m.dados = num(m.dados) + k; notasPrevias.push(`patota +${k} dados`); }
+    }
+    // 🩸 Sal en la herida / Morder la herida (js/64): si ya sangra, +2 dados (el Sangrado lo trae la receta entre sus efectos)
+    if(atq.abrirHerida && estados(d).some(e => e.activo !== false && /sangra/i.test(e.nombre || ''))){ m.dados = num(m.dados) + 2; notasPrevias.push('ya sangraba: +2 dados'); }
+    if(notasPrevias.length) log(`     (${notasPrevias.join(' · ')})`);
+    const pdgVal = a.S ? FichaCombate.pdgParaArma(a.S, arma, calc(a)).valor + num(m.pdg)
+      : stat(a, 'pdg') + num(m.pdg) + Combatiente.pdgExtraArma(st => CreepCalculo.modTotal(a.sc, st), {tipoDado: tipo, armaDeRango: Combatiente.armaEnMano(a.sc).armaDeRango});
+    const pdg = tiradaStat(a, pdgVal, 'pdg');
+    // Contra un disparo (un arma de rango) el Parry es solo con escudo (dueño, 2026-10-09; Combatiente.contraDisparo / sirveParaParry)
+    const pc = paraCon(d, !!atq.rango), evaVal = stat(d, 'eva');
+    const parrea = !!pc && !atq.sinParry && !Combatiente.stuneado(estados(d)) && nitros(d) >= 1 && pc.parry >= evaVal;
+    let defR, modo = 'eva';
+    if(parrea){ gastarNo2(d, 1); modo = 'parry'; defR = tiradaStat(d, pc.parry, 'parry'); }
+    else defR = tiradaStat(d, evaVal, 'eva');
+    const r = resolverPar(pdg, defR);
+    const que = `${a.nombre} ${atq.habNombre ? atq.habNombre + ' ' : 'ataca '}con ${atq.armaNombre || 'las manos'} a ${d.nombre}: PdG ${pdg.total} contra ${modo === 'parry' ? 'Parry' : 'Evasión'} ${defR.total}`;
+    let resultado = 'fallo', bloq = null;
+    if(r.gana === 'atacante') resultado = 'pego';
+    else if(modo === 'parry'){
+      const fuerzaVal = a.S ? FichaCombate.statParaArma(a.S, 'fue', arma, calc(a)) + (arma ? num(arma.peso) : 0) : CreepCalculo.fuerzaGolpeValor(a.sc);
+      const fu = tiradaStat(a, fuerzaVal, 'fue'), bl = tiradaStat(d, pc.bloqueo, 'bloqueo');
+      const r2 = resolverPar(fu, bl);
+      bloq = `Fuerza del golpe ${fu.total} contra Bloqueo ${bl.total}`;
+      resultado = r2.gana === 'defensor' ? 'bloqueado' : 'mitad';
+    }
+    if(resultado === 'fallo'){ log(`  ✗ ${que} → falló`); return {resultado, hizoDano: false}; }
+    if(resultado === 'bloqueado'){ log(`  🛡 ${que} → Parry; ${bloq} → BLOQUEADO`); return {resultado, hizoDano: false}; }
+    // Crítico
+    let crit = null, mult = 1;
+    if(resultado === 'pego'){
+      const i = TIPOS.indexOf(tipo);
+      const frecuente = (a.S ? num(calc(a).final.crit) : 0) + num(m.critBono), potente = (a.S ? num(calc(a).final.critpot) : 0) + num(m.critpotBono);
+      const resist = Math.max(0, (i < 0 ? 0 : d.S ? num(calc(d).final['tipo' + (i + 1)]) : num(CreepCalculo.critEfectivo(d.sc, i))) - num(m.ignoraResistCrit));
+      const e = Critico.evaluar({pdg: pdg.total, eva: defR.total, tipo, frecuente, potente, resistencia: resist});
+      if(e.critico && !estadoCon(d, 'blindado')){
+        const rolls = Array.from({length: Math.max(1, e.dados)}, () => rnd(20));
+        const res = Critico.resultadoD20(rolls, potente);
+        crit = {dados: e.dados, rolls, mult: res.mult}; mult = res.mult;
+      }
+    }
+    // Daño
+    let formula = a.S ? (arma ? FichaCombate.armaDanoTxt(arma, FichaCombate.statParaArma(a.S, 'dmg', arma, calc(a))) : FichaCombate.danoSinArmaTxt(stat(a, "dmg"))) : CreepCalculo.danoTxt(a.sc, stat(a, 'dmg'));
+    if(num(m.dados) > 0) formula += ` + ${Math.round(num(m.dados))}d${tipo}`;
+    if(num(m.fijo)) formula += ` + ${Math.round(num(m.fijo))}`;
+    if(m.dadoExtra) formula += ` + ${m.dadoExtra}`;
+    const dr = tir(formula), crudo = Math.max(0, Math.round(dr.total)), golpe = crudo * mult;
+    const def = defensa(d);
+    const perfN = crit ? 0 : Math.min(num(atq.perfora), golpe);
+    const perfora = Combatiente.perforaPasa(golpe, def, perfN);
+    let aplicar = perfora || golpe, ignoraDef = !!crit || perfora > 0;
+    if(resultado === 'mitad'){ aplicar = Math.ceil(Math.max(0, golpe - def, perfN) / 2); ignoraDef = true; }
+    const res = aplicarDano(d, aplicar, ignoraDef, 0, 0, {distancia: !!atq.rango});
+    const hizoDano = res.recibido > 0;
+    log(`  ${crit ? '💥' : '⚔'} ${que} → ${resultado === 'mitad' ? `Parry; ${bloq} → pasa la MITAD` : 'pegó'}${crit ? ` · CRÍTICO ×${mult} (d20: ${crit.rolls.join(', ')})` : ''} · daño ${formula} = ${crudo}${mult > 1 ? ` ×${mult} = ${golpe}` : ''}${ignoraDef ? (perfora ? ` (Perfora ${perfora})` : ' (sin Defensa)') : ` − Defensa ${def}`} → ${res.recibido} a la vida${res.absorbido ? ` (${res.absorbido} absorbidos)` : ''} · ${nomHp(d)}`);
+    // Efectos del golpe: los de la habilidad y los del arma
+    const armaEf = a.S ? (arma ? arma.efectosGolpe || [] : []) : Combatiente.armaEnMano(a.sc).efectosGolpe;
+    const efs = [...(atq.efectos || []), ...armaEf.map(e => ({...EfectosGolpe.normalizar(e), stacks: num(e.stacks)}))].filter(e => e && e.nombre && !e.danoMagico && !Combatiente.esEfectoIgnora(e));
+    const notas = efs.map(ef => resolverEfecto(a, d, ef, {hizoDano, crit: !!crit, dif: r.dif})).filter(Boolean);
+    if(notas.length) log(`     efectos: ${notas.join(' · ')}`);
+    return {resultado, hizoDano, recibido: res.recibido, crit: !!crit};
+  }
+
+  /* ---------- Una habilidad dirigida, de área, de onda o sobre un aliado (Combatiente.habEjecucion) ---------- */
+  function objetivosDe(a, hab, todos, centro){
+    const vivos = todos.filter(vivo);
+    const rival = u => u.bando !== a.bando, aliado = u => u.bando === a.bando;
+    if(hab.objetivo === 'uno mismo') return [a];
+    if(hab.objetivo === 'aliado') return vivos.filter(u => aliado(u) && (hab.conmigo || u !== a)).filter(u => dist(a, u) <= Math.max(0, num(hab.alcance)));
+    if(hab.objetivo === 'onda' || hab.objetivo === 'cono') return vivos.filter(u => u !== a && dist(a, u) <= Math.max(1, num(hab.radio) || 1) && (hab.aliados ? aliado(u) : rival(u)));
+    if(hab.objetivo === 'area') return vivos.filter(u => u !== a && Math.abs(u.x - centro) <= num(hab.radio) && (hab.aliados ? aliado(u) : (hab.fuegoAmigo ? true : rival(u))));
+    return vivos.filter(u => rival(u) && dist(a, u) <= Math.max(1, num(hab.alcance) || 1));
+  }
+  function resolverHab(a, hab, objetivos, nombreHab){
+    const tira = hab.tira ? (hab.tira.formula ? tir(hab.tira.formula) : tiradaStat(a, stat(a, hab.tira.stat) + num(hab.tira.bono), hab.tira.stat)) : null;   // una sola tirada para todos (pdgCompartido)
+    const el = hab.dano ? Combatiente.elementoDe(hab.dano.tipo) : '';
+    objetivos.forEach(d => {
+      let gana = true, dif = 0, contraTxt = '';
+      if(tira && (hab.contra || []).length){
+        const mejor = hab.contra.map(c => ({c, v: stat(d, c.modo)})).sort((x, y) => y.v - x.v)[0];
+        const cr = tiradaStat(d, mejor.v, mejor.c.modo);
+        const r = resolverPar(tira, cr); gana = r.gana === 'atacante'; dif = r.dif; contraTxt = `${hab.tira.etq || hab.tira.stat} ${tira.total} contra ${mejor.c.etq || mejor.c.modo} ${cr.total}`;
+      }
+      if(!gana){ log(`  ✗ ${a.nombre} · ${nombreHab} a ${d.nombre}: ${contraTxt} → se resistió`); return; }
+      const partes = [];
+      if(hab.dano){
+        let monto = hab.dano.diferencia ? Math.max(0, dif) : Math.max(0, Math.round(tir(hab.dano.formula).total));
+        if(num(hab.dano.mult) > 1) monto = Math.ceil(monto * num(hab.dano.mult));
+        const magico = !!hab.dano.ignoraDef, frena = magico && !hab.dano.directo && !hab.dano.trueDamage && Combatiente.frenaArmaduraMagica(el);
+        const res = aplicarDano(d, monto, magico, frena ? armadmg(d) : 0, hab.dano.trueDamage ? 0 : resEl(d, el), {magico});
+        partes.push(`${monto} de daño ${hab.dano.tipo || ''}${magico ? (frena && armadmg(d) ? ` (− Def. especial ${armadmg(d)})` : ' (directo)') : ` − Defensa ${defensa(d)}`} → ${res.recibido} a la vida · ${nomHp(d)}`);
+        if(hab.dano.drena && res.recibido > 0){ const c = curar(a, num(hab.dano.drenaPct) > 0 ? Math.ceil(res.recibido * num(hab.dano.drenaPct) / 100) : res.recibido); partes.push(`${a.nombre} se cura ${c}`); }
+        (hab.efectos || []).forEach(ef => { const n = resolverEfecto(a, d, ef, {hizoDano: res.recibido > 0, dif}); if(n) partes.push(n); });
+      }else (hab.efectos || []).forEach(ef => { const n = resolverEfecto(a, d, ef, {hizoDano: true, dif}); if(n) partes.push(n); });
+      log(`  ✨ ${a.nombre} · ${nombreHab} a ${d.nombre}${contraTxt ? ` (${contraTxt})` : ''}: ${partes.join(' · ') || 'sin efecto'}`);
+    });
+  }
+
+  /* ---------- Zonas (Pedos Tóxicos): el motor de zonas del mapa, en chico ---------- */
+  let ZONAS = [];
+  function zonaCrear(a, hab, c, centro){
+    const z = {de: a, nombre: hab.nombre, centro, radio: num(c.radio), tiraStat: c.tira, tiraValor: stat(a, c.tira), contra: (c.contra || [])[0] || 'resmg', amiga: !!c.zonaAmiga,
+      turnos: Math.max(1, num(c.zonaTurnos) || 1), tipoDano: c.tipoDano, extra: c.danoExtra, libre: c.efectoLibre, vistos: new Set()};
+    ZONAS.push(z);
+    log(`  🌫 ${a.nombre} lanza ${z.nombre} (diámetro ${z.radio * 2 + 1}, ${z.turnos} turno${z.turnos === 1 ? '' : 's'}) centrada en x=${centro}`);
+    return z;
+  }
+  const enZona = (z, u) => Math.abs(u.x - z.centro) <= z.radio;
+  function zonaAplicar(z, u, motivo){
+    if(u === z.de || !vivo(u) || (!z.amiga && u.bando === z.de.bando)) return;
+    const tz = tiradaStat(z.de, z.tiraValor, z.tiraStat), cr = tiradaStat(u, stat(u, z.contra), z.contra);
+    const resistio = cr.total > tz.total;
+    if(resistio){ log(`  🌫 ${z.nombre} ${motivo} ${u.nombre}: Res.Esp ${cr.total} contra ${tz.total} → resistió`); return; }
+    const monto = Math.max(0, tz.total - cr.total), el = Combatiente.elementoDe(z.tipoDano);
+    const res = aplicarDano(u, monto, true, Combatiente.frenaArmaduraMagica(el) ? armadmg(u) : 0, resEl(u, el), {magico: true});
+    let t = `  🌫 ${z.nombre} ${motivo} ${u.nombre}: Res.Esp ${cr.total} contra ${tz.total} → ${monto} de daño ${z.tipoDano} (− Def. especial ${armadmg(u)}) → ${res.recibido} a la vida · ${nomHp(u)}`;
+    if(res.recibido > 0 && z.extra){
+      const d20 = tir(z.extra).total;
+      let ef = '';
+      if(/^larry/i.test(z.de.nombre) || /pedo/i.test(z.nombre)){ ef = d20 >= 20 ? aplicarSpec(u, {nombre: 'Stun', turnos: 2}, z.nombre) + ' (desmayo)' : d20 >= 17 ? aplicarSpec(u, {nombre: 'Stun', turnos: 1}, z.nombre) : d20 >= 7 ? aplicarSpec(u, {nombre: 'Pajaritos', turnos: 2}, z.nombre) : 'nada'; }
+      t += ` · 🎲 ${z.extra}: ${d20} → ${ef}`;
+    }
+    log(t);
+  }
+  function zonasAlEntrar(u, todos){ ZONAS.forEach(z => { if(enZona(z, u) && !z.vistos.has(u.id + ':' + z.ronda)) { z.vistos.add(u.id + ':' + z.ronda); zonaAplicar(z, u, 'alcanza a'); } }); }
+  function zonasFinDeRonda(todos, ronda){
+    ZONAS.forEach(z => { z.ronda = ronda + 1; todos.forEach(u => { if(enZona(z, u)){ z.vistos.add(u.id + ':' + z.ronda); zonaAplicar(z, u, 'sigue sobre'); } }); });
+  }
+  function zonasAlEmpezarTurnoDe(u){ ZONAS = ZONAS.filter(z => { if(z.de !== u) return true; z.turnos--; if(z.turnos <= 0){ log(`  🌫 se disipa ${z.nombre}`); return false; } return true; }); }
+
+  /* ---------- Movimiento (una línea) ---------- */
+  function costoPaso(u){ return estadoCon(u, 'rengo') ? 2 : 1; }
+  function acercar(u, hacia, hasta){   // se mueve hacia `hacia` hasta quedar a `hasta` casilleros (o lo que den los No2)
+    if(estadoCon(u, 'inmovilizado')) return 0;
+    let pasos = 0;
+    while(dist(u, hacia) > hasta && nitros(u) >= costoPaso(u) && pasos < 12){ u.x += u.x < hacia.x ? 1 : -1; gastarNo2(u, costoPaso(u)); pasos++; }
+    if(pasos) log(`  🏃 ${u.nombre} se mueve ${pasos} (queda a ${dist(u, hacia)} de ${hacia.nombre}; No2 ${nitros(u)})`);
+    return pasos;
+  }
+
+  /* ---------- Turnos ---------- */
+  function inicioTurno(u, clave, ronda){
+    zonasAlEmpezarTurnoDe(u); tocar(u);
+    if(u.S){ const r = FichaMantenimiento.inicioTurno(u.S, u.ui, clave, undefined, [], ronda); if(r && r.rep && r.rep.length) log(`  ▶ ${u.nombre}: ${r.rep.filter(x => !/No2 recargados/.test(x)).join(' · ')}`); }
+    else{ const r = CreepAcciones.inicioTurno(u.sc, clave, ronda); if(r && r.rep && r.rep.length) log(`  ▶ ${u.nombre}: ${r.rep.join(' · ')}`); }
+  }
+  function finTurno(u, clave, ronda){
+    tocar(u);
+    if(u.S) FichaMantenimiento.finTurno(u.S, u.ui, clave, undefined, [], ronda);
+    else CreepAcciones.finTurno(u.sc, clave, ronda);
+  }
+  function levantarse(u){
+    const lv = Combatiente.levantable(estados(u));
+    if(!lv) return;
+    tocar(u);
+    if(u.S){ FichaAcciones.levantarse(u.S, true, u.ui); log(`  🧍 ${u.nombre} se levanta`); }
+    else{ const r = CreepAcciones.levantarse(u.sc); log(`  🧍 ${u.nombre} ${r.error ? 'no puede levantarse: ' + r.error : 'se levanta'}`); }
+  }
+
+  /* ---------- IA de los personajes ---------- */
+  const rivalesDe = (u, todos) => todos.filter(x => vivo(x) && x.bando !== u.bando);
+  const masHerido = lista => lista.slice().sort((a, b) => hp(a) / hpMax(a) - hp(b) / hpMax(b))[0];
+  const masBlando = lista => lista.slice().sort((a, b) => (hp(a) / hpMax(a) * 100 + defensa(a) * 3) - (hp(b) / hpMax(b) * 100 + defensa(b) * 3))[0];   // los creeps van al más fácil de lastimar
+  const masCerca = (u, lista) => lista.slice().sort((a, b) => dist(u, a) - dist(u, b) || hp(a) / hpMax(a) - hp(b) / hpMax(b))[0];
+  function habPJ(u, nombreRe){ return (u.S.habilidades || []).find(h => h && nombreRe.test(String(h.nombre || ''))); }
+  function usarHabPJ(u, h, todos, o){   // o: {objetivo, centro, X}
+    const c = FichaBotonera.dueloDe(h);
+    const X = num(o && o.X);
+    const costoSp = FichaHabilidades.spVariable(h) ? X : FichaHabilidades.costoSpDe(u.S, h);
+    const arma = armaPJ(u);
+    const costoNo2 = FichaHabilidades.nitrosVariable(h) ? X : FichaBotonera.costoNitrosHab(u.S, h, arma);
+    if(sp(u) < costoSp || nitros(u) < costoNo2) return false;
+    gastarSp(u, costoSp); gastarNo2(u, costoNo2); tocar(u);
+    if(FichaHabilidades.nitrosAtaque(h)) FichaCombate.registrarAtaque(u.S, arma);
+    log(`  ⚡ ${u.nombre} usa ${h.nombre} (−${costoSp} SP, −${costoNo2} No2)`);
+    if(c && c.modo === 'arma'){
+      const atq = FichaAcciones.ataqueDeHabArma(u.S, h, arma, X, X, {dueloDisponible: () => true});
+      if(atq && o && o.objetivo) duelo(u, o.objetivo, {...atq, arma, armaNombre: arma ? arma.nombre : ''});
+      return true;
+    }
+    if(c && c.objetivo === 'zona'){ const z = zonaCrear(u, h, c, o.centro); z.ronda = o.ronda; todos.forEach(t => { if(enZona(z, t)){ z.vistos.add(t.id + ':' + z.ronda); zonaAplicar(z, t, 'alcanza a'); } }); return true; }
+    const hab = FichaAcciones.habDueloDatos(u.S, h, X, X, arma);
+    if(!hab) return true;
+    const objs = o && o.objetivo ? [o.objetivo] : objetivosDe(u, hab, todos, o && o.centro);
+    resolverHab(u, hab, objs, h.nombre);
+    return true;
+  }
+  function atacarPJ(u, d){
+    const arma = armaPJ(u);
+    const costo = FichaCombate.costoAtaque(u.S, arma);
+    if(nitros(u) < costo) return false;
+    gastarNo2(u, costo); FichaCombate.registrarAtaque(u.S, arma);
+    duelo(u, d, {tipoDado: FichaCombate.tipoAtaque(arma), arma, armaNombre: arma ? arma.nombre : 'las manos', mods: {}, rango: !!(arma && arma.armaDeRango), ...Combatiente.ataqueDeArma(arma)});
+    return true;
+  }
+  function pocion(u){
+    const p = (u.S.cinturon || []).find(c => c && num(c.unidades) > 0 && num(c.curahp) > 0);
+    if(!p || hp(u) / hpMax(u) > 0.4 || nitros(u) < 1) return false;
+    gastarNo2(u, 1); p.unidades = num(p.unidades) - 1;
+    const c = curar(u, num(p.curahp)); log(`  🧪 ${u.nombre} toma ${p.nombre}: +${c} (${nomHp(u)})`);
+    return true;
+  }
+  function turnoPJ(u, todos, ronda){
+    const riv = rivalesDe(u, todos);
+    if(!riv.length) return;
+    const n = String(u.nombre).toLowerCase();
+    if(n.startsWith('rockardo')){
+      const bl = habPJ(u, /^blindaje/i);
+      pocion(u);
+      { const o0 = masCerca(u, riv); if(o0 && dist(u, o0) > alcance(u)) acercar(u, o0, alcance(u)); }
+      if(bl && !tieneEstado(u, /^barrera/i) && riv.some(r => dist(u, r) <= 2)) usarHabPJ(u, bl, todos, {});
+      const sw = habPJ(u, /^shockwave/i), pegados = riv.filter(r => dist(u, r) <= 1);
+      if(sw && pegados.length >= 2 && sp(u) >= 4) usarHabPJ(u, sw, todos, {});
+      let obj = masCerca(u, riv);
+      for(let i = 0; i < 5 && obj; i++){
+        if(dist(u, obj) > alcance(u)) acercar(u, obj, alcance(u));
+        if(dist(u, obj) > alcance(u) || !atacarPJ(u, obj)) break;
+        if(!vivo(obj)) obj = masCerca(u, rivalesDe(u, todos));
+      }
+      return;
+    }
+    if(n.startsWith('bizzante')){
+      pocion(u);
+      let obj = masCerca(u, riv);
+      const li = habPJ(u, /^lisiar/i);
+      for(let i = 0; i < 5 && obj; i++){
+        if(dist(u, obj) > alcance(u)) acercar(u, obj, alcance(u));
+        if(dist(u, obj) > alcance(u)) break;
+        if(li && sp(u) >= 2 && !tieneEstado(obj, /lisiado|lesi/i)){ if(!usarHabPJ(u, li, todos, {objetivo: obj})) break; }
+        else if(!atacarPJ(u, obj)) break;
+        if(!vivo(obj)) obj = masCerca(u, rivalesDe(u, todos));
+      }
+      return;
+    }
+    if(n.startsWith('larry')){
+      // Transfusión: a un aliado muy herido, si Larry anda bien
+      tocar(u); const tr = habPJ(u, /^transfusi/i), al = todos.filter(x => vivo(x) && x.bando === u.bando && x !== u);
+      const nec = al.filter(x => hp(x) / hpMax(x) < 0.35).sort((a, b) => hp(a) - hp(b))[0];
+      if(tr && nec && hp(u) > hpMax(u) * 0.6 && sp(u) >= 1 && nitros(u) >= 1){
+        const da = Math.min(stat(u, 'esp'), hp(u) - Math.ceil(hpMax(u) * 0.5), hpMax(nec) - hp(nec));   // nunca queda por debajo de la mitad
+        if(da > 0){ gastarSp(u, 1); gastarNo2(u, 1); u.S.hp -= da; curar(nec, da); log(`  🩸 ${u.nombre} le pasa ${da} de vida a ${nec.nombre} (${nomHp(u)} → ${nomHp(nec)})`); }
+      }
+      // Si no tiene a nadie a su alcance, se acerca hasta su Rango (sin quedar a menos de 3 del más cercano)
+      const rng = Math.max(1, stat(u, 'rng'));
+      { const o0 = masCerca(u, riv); const pasos = o0 ? Math.min(dist(u, o0) - Math.max(3, rng), nitros(u) - 2) : 0;
+        if(pasos > 0){ u.x += Math.sign(o0.x - u.x) * pasos; gastarNo2(u, pasos); log(`  🏃 ${u.nombre} se acerca ${pasos} (queda a ${dist(u, o0)} de ${o0.nombre}; No2 ${nitros(u)})`); } }
+      // Pedos Tóxicos: donde más rivales junta (alcance: su Rango)
+      const pt = habPJ(u, /^pedos/i);
+      if(pt && sp(u) >= 5 && nitros(u) >= 2 && !ZONAS.some(z => z.de === u)){
+        let mejor = null;
+        for(let cx = u.x - rng; cx <= u.x + rng + 2; cx++){
+          const cnt = riv.filter(r => Math.abs(r.x - cx) <= 2).length, ali = al.filter(x => Math.abs(x.x - cx) <= 2).length + (Math.abs(u.x - cx) <= 2 ? 1 : 0);
+          if(cnt >= 1 && ali === 0 && (!mejor || cnt > mejor.cnt)) mejor = {cx, cnt};
+        }
+        if(mejor && mejor.cnt >= 2) usarHabPJ(u, pt, todos, {centro: mejor.cx, ronda});
+      }
+      // Drenar Vida: X SP, 2 No2, contra el más herido a su alcance (Rango)
+      const dv = habPJ(u, /^drenar/i);
+      for(let i = 0; i < 3 && dv; i++){
+        const cand = riv.filter(r => vivo(r) && dist(u, r) <= rng);
+        if(!cand.length || nitros(u) < 2) break;
+        const X = clamp(Math.floor(sp(u) / 3), 3, Math.min(12, stat(u, 'esp')));
+        if(sp(u) < X) break;
+        if(!usarHabPJ(u, dv, todos, {objetivo: masHerido(cand), X})) break;
+      }
+      // Si lo tienen pegado y no puede más, se aleja un paso
+      const peg = riv.filter(r => dist(u, r) <= 1);
+      if(peg.length && nitros(u) >= 1 && u.x > -6){ u.x -= 1; gastarNo2(u, 1); log(`  🏃 ${u.nombre} retrocede 1`); }
+      return;
+    }
+  }
+
+  /* ---------- IA de los creeps ---------- */
+  function usarHabCreep(u, h, todos, obj){
+    const p = CreepAcciones.ejecutarHab(u.sc, h, PRESETS_CREEP, true);
+    if(!p || p.error) return false;
+    log(`  ⚡ ${u.nombre} usa ${h.nombre}${p.efecto ? ` (${p.efecto.nombre} sobre sí)` : ''} · No2 ${nitros(u)}`);
+    const c = h.duelo && typeof h.duelo === 'object' ? h.duelo : null;
+    if(p.directo){ (p.directo.hechos || []).forEach(x => log(`     ${x}`)); return true; }
+    if(c && c.modo === 'arma'){
+      const atq = CreepAcciones.ataqueDeHab(u.sc, h);
+      if(atq && obj) duelo(u, obj, {...atq, armaNombre: Combatiente.armaEnMano(u.sc).nombre || ''});
+      return true;
+    }
+    const hab = CreepAcciones.habEjecucion(u.sc, h);
+    if(!hab) return true;
+    const objs = obj && hab.objetivo === 'enemigo' ? [obj] : objetivosDe(u, hab, todos, obj ? obj.x : u.x);
+    resolverHab(u, hab, objs, h.nombre);
+    return true;
+  }
+  function atacarCreep(u, d){
+    const r = CreepAcciones.pagarAtaque(u.sc, 'normal', false);
+    if(!r || r.error) return false;
+    duelo(u, d, {tipoDado: Combatiente.armaEnMano(u.sc).tipoDado, armaNombre: Combatiente.armaEnMano(u.sc).nombre || '', mods: {}, rango: Combatiente.armaEnMano(u.sc).armaDeRango, ...Combatiente.ataqueDeArma(Combatiente.armaDeCombatiente(u.sc))});
+    return true;
+  }
+  function turnoCreep(u, todos, ronda){
+    const riv = rivalesDe(u, todos), al = todos.filter(x => vivo(x) && x.bando === u.bando);
+    if(!riv.length) return;
+    const sc = u.sc, reach = alcance(u), aDist = Combatiente.armaEnMano(sc).armaDeRango;
+    const listas = (sc.habilidades || []).filter(h => h && !CreepCalculo.bloqueoHab(sc, h) && CreepCalculo.modoHab(h) !== 'manual' && !h.trampaColocar && !h.excavar && !h.refuerzos && !h.emerger);
+    const tipoDe = h => h.duelo && typeof h.duelo === 'object' ? (h.duelo.modo === 'arma' ? 'arma' : h.duelo.objetivo || 'enemigo') : (h.efectoNombre ? 'propio' : 'otro');
+    // 1) Buffs y curas (a aliados, sobre sí): al toque
+    listas.filter(h => ['aliado', 'uno mismo', 'propio'].includes(tipoDe(h)) || (tipoDe(h) === 'onda' && h.duelo.aliados)).forEach(h => {
+      const hab = h.duelo && typeof h.duelo === 'object' && h.duelo.modo !== 'arma' ? CreepAcciones.habEjecucion(sc, h) : null;
+      const esCura = hab && (hab.efectos || []).some(e => num(e.cura) > 0);
+      if(esCura){ const her = al.filter(x => hp(x) / hpMax(x) < 0.6 && dist(u, x) <= num(hab.alcance)); if(!her.length) return; usarHabCreep(u, h, todos, null); return; }
+      if(hab && hab.objetivo === 'aliado' && !al.some(x => (hab.conmigo || x !== u) && dist(u, x) <= num(hab.alcance))) return;
+      usarHabCreep(u, h, todos, null);
+    });
+    // 2) Objetivo: el rival a tiro más herido; si no, el más cercano
+    let obj = masCerca(u, riv);
+    const aTiro = riv.filter(r => dist(u, r) <= reach);
+    if(aTiro.length) obj = masBlando(aTiro);
+    if(dist(u, obj) > reach) acercar(u, obj, reach);
+    if(aDist && dist(u, obj) <= 1 && !/honda/i.test(Combatiente.armaEnMano(sc).nombre || '') && nitros(u) >= 1){ u.x += u.x >= obj.x ? 1 : -1; gastarNo2(u, 1); log(`  🏃 ${u.nombre} se aleja 1 para disparar`); }
+    if(dist(u, obj) > reach) return;
+    // 3) Un área o una onda si agarra a 2 o más
+    const area = listas.find(h => ['area', 'onda', 'cono'].includes(tipoDe(h)) && !(h.duelo.aliados));
+    if(area){ const hab = CreepAcciones.habEjecucion(sc, h = area); const objs = objetivosDe(u, hab, todos, obj.x); if(objs.length >= 2 || (objs.length === 1 && riv.length === 1)) { usarHabCreep(u, area, todos, obj); } }
+    // 4) Una dirigida (Mal de ojo, Aceite hirviendo…)
+    const dir = listas.find(h => tipoDe(h) === 'enemigo' && !CreepCalculo.bloqueoHab(sc, h));
+    if(dir){ const hab = CreepAcciones.habEjecucion(sc, h = dir); if(hab && dist(u, obj) <= Math.max(1, num(hab.alcance) || reach)) usarHabCreep(u, dir, todos, obj); }
+    // 5) Ataques: con arreglos si hay una lista; después los comunes, mientras alcancen los No2
+    for(let i = 0; i < 4; i++){
+      if(!vivo(obj)){ const t = riv.filter(r => vivo(r) && dist(u, r) <= reach); if(!t.length) break; obj = masBlando(t); }
+      const conArreglos = listas.find(h => tipoDe(h) === 'arma' && !CreepCalculo.bloqueoHab(sc, h));
+      if(conArreglos){ if(!usarHabCreep(u, conArreglos, todos, obj)) break; continue; }
+      if(!atacarCreep(u, obj)) break;
+    }
+  }
+
+  /* ---------- Una pelea ---------- */
+  function pelea(enc, o){
+    o = o || {};
+    LOG = []; logOn = !!o.narrar; ZONAS = [];
+    const F = DATOS.fichas, C = DATOS.creeps;
+    const porNombre = n => Object.values(F).find(f => f.nombre.toLowerCase().startsWith(n.toLowerCase()));
+    const pjs = [armarPJ(porNombre('Rockardo'), 2), armarPJ(porNombre('Bizzante'), 1), armarPJ(porNombre('Larry'), 0)];
+    const creeps = [];
+    const cuenta = {};
+    enc.creeps.forEach((n, i) => {
+      const base = Object.values(C).find(c => c.nombre === n) || Object.values(C).find(c => c.nombre.toLowerCase().startsWith(n.toLowerCase()));
+      if(!base) throw new Error('No encuentro el creep ' + n);
+      cuenta[n] = (cuenta[n] || 0) + 1;
+      const nombre = cuenta[n] > 1 ? `${n} ${cuenta[n]}` : n;
+      const sc0 = JSON.parse(base.json);
+      const u = armarCreep(base.json, nombre, Combatiente.armaEnMano(sc0).armaDeRango ? 9 + i : 6 + Math.floor(i / 2));
+      if(enc.ajustar) enc.ajustar(u.sc, n);
+      creeps.push(u);
+    });
+    const todos = [...pjs, ...creeps];
+    todos.forEach(u => { u.todos = todos; });
+    // Iniciativa
+    todos.forEach(u => { u.ini = tiradaStat(u, stat(u, 'ini'), 'ini').total; });
+    const orden = todos.slice().sort((a, b) => b.ini - a.ini);
+    log(`🎲 Iniciativa: ${orden.map(u => `${u.nombre} ${u.ini}`).join(' · ')}`);
+    log(`📍 Posiciones: ${todos.map(u => `${u.nombre} x=${u.x}`).join(' · ')}`);
+    let ronda = 0, fin = '';
+    const ganaron = () => creeps.every(c => !vivo(c)) ? 'pj' : pjs.every(p => !vivo(p)) ? 'creep' : '';
+    while(ronda < (o.maxRondas || 12) && !fin){
+      ronda++;
+      log(`\n━━━ Ronda ${ronda} ━━━`);
+      for(let i = 0; i < orden.length && !fin; i++){
+        const u = orden[i];
+        if(!vivo(u)) continue;
+        const clave = `sim:${ronda}:${i}`;
+        log(`\n— Turno de ${nomHp(u)} · No2 ${nitros(u)} · SP ${fmt(sp(u))}${estados(u).length ? ' · ' + estados(u).filter(e => e.activo !== false).map(e => e.nombre + (num(e.turnos) ? ` (${e.turnos}t)` : '')).join(', ') : ''}`);
+        inicioTurno(u, clave, ronda);
+        if(!vivo(u)){ log(`  💀 ${u.nombre} cayó por sus estados`); fin = ganaron(); continue; }
+        if(Combatiente.stuneado(estados(u))) log(`  ⚡ ${u.nombre} está en Stun: pierde el turno`);
+        else{
+          levantarse(u);
+          const antesX = u.x;
+          if(u.S) turnoPJ(u, todos, ronda); else turnoCreep(u, todos, ronda);
+          if(u.x !== antesX) zonasAlEntrar(u, todos);
+        }
+        finTurno(u, clave, ronda);
+        fin = ganaron();
+      }
+      if(!fin) zonasFinDeRonda(todos, ronda);
+      fin = fin || ganaron();
+    }
+    const res = {gana: fin || 'nadie', rondas: ronda, pjs: pjs.map(p => ({nombre: p.nombre, hp: hp(p), max: hpMax(p), caido: !vivo(p)})), creepsVivos: creeps.filter(vivo).map(c => `${c.nombre} ${hp(c)}/${hpMax(c)}`), log: LOG.slice()};
+    log(`\n🏁 ${fin === 'pj' ? '¡Ganaron los personajes!' : fin === 'creep' ? 'Cayeron los tres personajes' : 'Sin definir en ' + ronda + ' rondas'} · ${res.pjs.map(p => `${p.nombre} ${p.caido ? '💀' : p.hp + '/' + p.max}`).join(' · ')}${res.creepsVivos.length ? ' · quedan: ' + res.creepsVivos.join(', ') : ''}`);
+    res.log = LOG.slice();
+    return res;
+  }
+
+  /* ---------- Variantes de un creep (para `enc.ajustar`) ---------- */
+  // Sube `n` niveles: +3 atributos por nivel (fue, con, agl, des, fue, con…), vida y No2 recalculados.
+  function nivelar(sc, n){
+    const orden = ['fue', 'con', 'agl', 'des', 'esp'];
+    for(let i = 0; i < 3 * n; i++){ const a = orden[i % orden.length]; sc[a] = num(sc[a]) + 1; }
+    sc.nivel = num(sc.nivel) + n;
+    CreepCalculo.actualizarHpMaxPorCon(sc); sc.hp = sc.hpMax; sc.nitros = CreepCalculo.nitrosMax(sc);
+    return sc;
+  }
+  const itemCat = nombre => (typeof CATALOGO_BASE !== 'undefined' ? CATALOGO_BASE : []).find(it => it.nombre === nombre);
+  // Le pone un arma del catálogo (como GM Tools: ponerArmaEnCreep).
+  function ponerArma(sc, nombre){
+    const it = itemCat(nombre); if(!it) throw new Error('No está en el catálogo: ' + nombre);
+    const d = CreepCalculo.itemParaCreep(it);
+    Combatiente.ponerArma(sc, {...d, ...Combatiente.rasgosDeItem(it), natural: Combatiente.armaEnMano(sc).natural});   // 🗡 un ítem de su lista (paso 2)
+    return sc;
+  }
+  // Le suma una pieza de equipo del catálogo (la Defensa aparte, como en GM Tools; se suma en vivo: paso 3).
+  function ponerEquipo(sc, nombre){
+    const it = itemCat(nombre); if(!it) throw new Error('No está en el catálogo: ' + nombre);
+    const d = CreepCalculo.itemParaCreep(it);
+    const mods = (it.mods || []).filter(m => m.stat !== 'def');
+    sc.equipo = sc.equipo || []; sc.equipo.push({id: 'sim' + Math.random().toString(36).slice(2, 7), nombre: d.nombre, tipoItem: d.tipoItem, def: num(d.def), peso: num(d.peso), mods: structuredClone(mods), detalle: d.detalle || ''});
+    CreepCalculo.actualizarHpMaxPorCon(sc); sc.hp = sc.hpMax;
+    return sc;
+  }
+  // Le agrega una habilidad de las recetas de fábrica (comun/skills-creep-base.js), armada para su nivel. `reemplaza`: el nombre de la que saca.
+  function ponerHab(sc, nombre, reemplaza){
+    const receta = (window.HABILIDADES_CREEP_BASE || []).find(h => h.nombre === nombre); if(!receta) throw new Error('No hay receta: ' + nombre);
+    const h = window.armarHabilidadDeCreep(receta.datos, num(sc.nivel) || 1);
+    sc.habilidades = (sc.habilidades || []).filter(x => !reemplaza || x.nombre !== reemplaza);
+    sc.habilidades.push(h);
+    return sc;
+  }
+
+  /* ---------- Muchas peleas ---------- */
+  function correr(enc, n){
+    n = n || 200;
+    const r = {nombre: enc.nombre, n, ganPJ: 0, ganCreep: 0, sinDefinir: 0, rondas: 0, caidas: {}, caidosPorPelea: [0, 0, 0, 0], hpFinal: {}, errores: 0, ultimoError: ''};
+    for(let i = 0; i < n; i++){
+      let p;
+      try{ p = pelea(enc, {narrar: false}); }catch(err){ r.errores++; r.ultimoError = String(err && err.stack || err).slice(0, 400); continue; }
+      if(p.gana === 'pj') r.ganPJ++; else if(p.gana === 'creep') r.ganCreep++; else r.sinDefinir++;
+      r.rondas += p.rondas;
+      let caidos = 0;
+      p.pjs.forEach(x => { if(x.caido){ r.caidas[x.nombre] = (r.caidas[x.nombre] || 0) + 1; caidos++; } r.hpFinal[x.nombre] = (r.hpFinal[x.nombre] || 0) + x.hp / x.max; });
+      r.caidosPorPelea[caidos]++;
+    }
+    const ok = n - r.errores || 1;
+    r.resumen = {victoriaPJ: Math.round(100 * r.ganPJ / ok), derrota: Math.round(100 * r.ganCreep / ok), sinDefinir: Math.round(100 * r.sinDefinir / ok), rondasProm: Math.round(10 * r.rondas / ok) / 10,
+      caidasPct: Object.fromEntries(Object.entries(r.caidas).map(([k, v]) => [k, Math.round(100 * v / ok)])),
+      hpFinalPct: Object.fromEntries(Object.entries(r.hpFinal).map(([k, v]) => [k, Math.round(100 * v / ok)])),
+      peleasConAlgunCaido: Math.round(100 * (ok - r.caidosPorPelea[0]) / ok), peleasCon2oMasCaidos: Math.round(100 * (r.caidosPorPelea[2] + r.caidosPorPelea[3]) / ok)};
+    return r;
+  }
+  const narrar = enc => pelea(enc, {narrar: true});
+  // Varias en segundo plano, de a tandas (la pestaña sigue respondiendo): Sim.lote({clave: enc…}, n) → Sim.LOTE = {estado, resultados}
+  const LOTE = {estado: 'nada', resultados: {}};
+  function lote(encs, n){
+    LOTE.estado = 'corriendo'; LOTE.resultados = {};
+    const claves = Object.keys(encs);
+    let ki = 0, i = 0, acum = null;
+    const paso = () => {
+      if(ki >= claves.length){ LOTE.estado = 'listo'; return; }
+      const k = claves[ki];
+      if(!acum) acum = {nombre: encs[k].nombre, n, ganPJ: 0, ganCreep: 0, sinDefinir: 0, rondas: 0, caidas: {}, caidosPorPelea: [0, 0, 0, 0], hpFinal: {}, errores: 0, ultimoError: ''};
+      const hasta = Math.min(n, i + 4);
+      for(; i < hasta; i++){
+        let p;
+        try{ p = pelea(encs[k], {narrar: false}); }catch(err){ acum.errores++; acum.ultimoError = String(err && err.stack || err).slice(0, 400); continue; }
+        if(p.gana === 'pj') acum.ganPJ++; else if(p.gana === 'creep') acum.ganCreep++; else acum.sinDefinir++;
+        acum.rondas += p.rondas;
+        let caidos = 0;
+        p.pjs.forEach(x => { if(x.caido){ acum.caidas[x.nombre] = (acum.caidas[x.nombre] || 0) + 1; caidos++; } acum.hpFinal[x.nombre] = (acum.hpFinal[x.nombre] || 0) + x.hp / x.max; });
+        acum.caidosPorPelea[caidos]++;
+      }
+      if(i >= n){
+        const ok = n - acum.errores || 1;
+        acum.resumen = {victoriaPJ: Math.round(100 * acum.ganPJ / ok), derrota: Math.round(100 * acum.ganCreep / ok), sinDefinir: Math.round(100 * acum.sinDefinir / ok), rondasProm: Math.round(10 * acum.rondas / ok) / 10,
+          caidasPct: Object.fromEntries(Object.entries(acum.caidas).map(([a, v]) => [a, Math.round(100 * v / ok)])), hpFinalPct: Object.fromEntries(Object.entries(acum.hpFinal).map(([a, v]) => [a, Math.round(100 * v / ok)])),
+          peleasConAlgunCaido: Math.round(100 * (ok - acum.caidosPorPelea[0]) / ok), peleasCon2oMasCaidos: Math.round(100 * (acum.caidosPorPelea[2] + acum.caidosPorPelea[3]) / ok), errores: acum.errores, err: acum.ultimoError};
+        LOTE.resultados[k] = acum.resumen; acum = null; i = 0; ki++;
+      }
+      setTimeout(paso, 5);
+    };
+    setTimeout(paso, 5);
+  }
+
+  return {cargar, armarPJ, armarCreep, pelea, correr, narrar, lote, LOTE, nivelar, ponerArma, ponerEquipo, ponerHab, itemCat, turnoPJ, turnoCreep, rivalesDe, usarHabPJ, habPJ, get LOG(){ return LOG; }, set logOn(v){ logOn = v; }, calc, stat, defensa, armadmg, hpMax, alcance, get datos(){ return DATOS; }};
+})();
+</script>
+</body>
+</html>

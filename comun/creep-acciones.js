@@ -1,0 +1,695 @@
+/* =========================================================
+   CREEP-ACCIONES — los botones de las Acciones de un creep, fuera de GM Tools (paso 4, etapa 4c de docs/plan-paso4-etapa4.md,
+   2026-10-01)
+   Lo que antes hacía gm-toolset/js/06 (los clics de data-tirarstatcreep, -levantarcreep, -esquivarcreep, -parrycreep,
+   -bloqueocreep, -fuerzacreep, -daniocreep) y js/01 (tirarValorStat), copiado tal cual y partido en dos: lo que CAMBIA al
+   creep (pagar el Parry, levantarse: devuelven {error} o {aviso}) y las TIRADAS (devuelven {origen, r} para publicar, o
+   {error}). Así GM Tools lo hace con su creep en memoria y el mapa adentro de una transacción (modificarCreep), y cada uno
+   publica a su manera. El Parry que espera su Bloqueo lo lleva cada pantalla.
+   Necesita comun/combatiente.js, creep-calculo.js y tiradas.js.
+   ========================================================= */
+const CreepAcciones = (() => {
+  const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : 0; };
+  const fmt = n => Number.isInteger(n) ? n : Math.round(n*100)/100;
+  const C = () => CreepCalculo;
+
+  /* ---------- Tiradas ---------- */
+  // La tirada de un stat del creep es la misma que la de un personaje o una invocación (comun/combatiente.js): Afortunado
+  // (dos veces, queda la mejor), mitades y Evasión mínimo 1.
+  function tirada(nombre, valor, sc, statId, extra){   // extra: un fijo que se suma después del dado (el Paso fantasma)
+    const r = Combatiente.tirarStat(valor, sc ? sc.estados : [], statId, extra ? {extra} : undefined);
+    if(!r) return {error: `${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`};
+    return {origen: nombre, r};
+  }
+  // 💪 Lo que dura una sola tirada (Empower, `unaTirada`; el Empuje del Support, 2026-10-26): la tirada que lo sumó lo gasta, como en un personaje
+  // (FichaAcciones.gastarUnaTirada). `r.estados` dice qué estados entraron en esa tirada. → true si lo gastó (cambia `sc`; guardarlo es de cada pantalla).
+  function usaUnaTirada(sc, r){
+    const emp = sc && Combatiente.unaTiradaDe(sc.estados);
+    return !!(emp && r && (r.estados || []).some(e => e && emp.nombres.includes(e.n)));
+  }
+  const gastarUnaTirada = (sc, r) => usaUnaTirada(sc, r) && Combatiente.gastarUnaTirada(sc.estados);
+  // Una de las Tiradas de stats de las Acciones (null si el stat no existe).
+  function tiradaStat(sc, statId){
+    const d = C().STAT_LOOKUP[statId];
+    if(!sc || !d) return null;
+    return tirada(`${sc.nombre} · ${d.label}`, C().statValor(sc, statId), sc, statId);
+  }
+  const esquivar = sc => tirada(`${sc.nombre} · Esquivar`, C().statValor(sc, 'eva'), sc, 'eva');
+  const parry = sc => tirada(`${sc.nombre} · Parry`, C().statValor(sc, 'parry'), sc, 'parry');
+  const fuerzaGolpe = sc => tirada(`${sc.nombre} · Fuerza del golpe`, C().fuerzaGolpeValor(sc));
+  // El Bloqueo solo después de un Parry (regla del dueño, 2026-09-30), con el arma o el escudo con que para.
+  // Bloqueo firme (escudos de Buena calidad, 2026-10-06): +N contra el primer golpe que recibe en el turno (la marca `_golpe` la pone el daño).
+  const bloqueoFirmeCreep = sc => Combatiente.bloqueoFirme(st => C().modTotal(sc, st), num((sc.usosEspecial || {})._golpe));
+  function bloqueo(sc, parryPendiente){
+    const def = C().defensa(sc);
+    if(!def) return {error: `${sc.nombre}: ${Combatiente.SIN_ARMA_DEFENSA}`};
+    if(!parryPendiente) return {error: `${sc.nombre}: ${Combatiente.BLOQUEO_SOLO_TRAS_PARRY}`};
+    const firme = bloqueoFirmeCreep(sc);
+    return tirada(`${sc.nombre} · Bloqueo · ${def.nombre}${firme ? ` (+${fmt(firme)} Bloqueo firme)` : ''}`, C().bloqueoValor(sc) + firme, sc, 'bloqueo');
+  }
+  // El daño de su arma (los efectos al golpear los publica cada pantalla después, con comun/efectos-golpe.js).
+  function dano(sc){
+    const r = tirarDados(C().danoTxt(sc, C().statValor(sc, 'dmg')));
+    return r ? {origen: `${sc.nombre} · Daño`, r} : null;
+  }
+
+  /* ---------- Lo que cambia al creep ---------- */
+  // Levantarse (Sentado): cuesta 1 No2 y saca el estado.
+  function levantarse(sc){
+    const lv = Combatiente.levantable(sc.estados);
+    if(!lv) return {error: `${sc.nombre}: no tiene nada que levantar`};
+    const costo = Combatiente.conExtenuado(sc.estados, Combatiente.costoLevantarse(st => C().modTotal(sc, st)));   // + Extenuado   // Levantarse rápido (2026-10-06)
+    if(num(sc.nitros) < costo) return {error: `${sc.nombre}: no le alcanzan los No2 — ${'levantarse'} cuesta ${costo}`};
+    sc.nitros = num(sc.nitros) - costo;
+    Combatiente.aplicarTormenta(sc, sc.estados, costo, {motivo: 'levantarse'});
+    sc.estados = (sc.estados || []).filter(e => e !== lv.est);
+    return {aviso: `${sc.nombre} se levantó${costo ? ` · −${fmt(costo)} No2 · quedan ${fmt(sc.nitros)}` : ' (gratis)'}`};
+  }
+  // Soltarse (2026-10-03): primero la tirada (afuera de cualquier transacción: se tira una sola vez) y después aplicarla (cobra y, si salió,
+  // saca el estado). tiradaSoltarse → {s, r, ok, estId, origen} o null; aplicarSoltarse → {error} o {aviso}.
+  function tiradaSoltarse(sc){
+    const est = Combatiente.estadoSoltable(sc.estados);
+    if(!est) return null;
+    const s0 = Combatiente.soltarNorm(est.soltar), s = {...s0, no2: Combatiente.conExtenuado(sc.estados, s0.no2)};   // + Extenuado
+    const t = Combatiente.tiradaSoltarse(est, C().statValor(sc, s.stat) + Math.max(0, num(C().modTotal(sc, 'soltarse'))), sc.estados);
+    return {...t, s, estId: est.id, origen: `${sc.nombre} · Soltarse (${est.nombre}) · ${s.etq} contra ${s.dif}`};
+  }
+  function aplicarSoltarse(sc, t){
+    if(num(sc.nitros) < t.s.no2) return {error: `${sc.nombre}: no le alcanzan los No2 — soltarse cuesta ${t.s.no2}`};
+    sc.nitros = num(sc.nitros) - t.s.no2;
+    Combatiente.aplicarTormenta(sc, sc.estados, t.s.no2, {motivo: 'intentar soltarse'});
+    if(t.ok) sc.estados = (sc.estados || []).filter(e => e.id !== t.estId);
+    const hundio = Combatiente.hundirSiFalla((sc.estados || []).find(e => e.id === t.estId), t);
+    // 🪤 Si falla y lo que lo agarra lastima (el Cepo del cazador, 2026-10-27): ese daño, directo a la vida.
+    let herida = null;
+    if(!t.ok && t.s.hiere && typeof tirarDados === 'function'){ herida = tirarDados(t.s.hiere); if(herida) sc.hp = Math.max(0, num(sc.hp) - herida.total); }
+    return {aviso: `${sc.nombre} ${t.ok ? 'se soltó' : 'no se soltó'} (${t.r ? t.r.total : '—'} contra ${t.s.dif}) · −${fmt(t.s.no2)} No2 · quedan ${fmt(sc.nitros)}${hundio ? ` · se hundió más: +${t.s.hunde} turno${t.s.hunde === 1 ? '' : 's'}` : ''}${herida ? ` · se lastima: ${t.s.hiere} = ${herida.total} directo` : ''}`, ...(herida ? {herida} : {})};
+  }
+  // Pagar el Parry (siempre 1 No2, solo con un arma de verdad o un escudo). Después: la tirada (parry) y anotar el Parry pendiente.
+  function pagarParry(sc){
+    if(!C().defensa(sc)) return {error: `${sc.nombre}: ${Combatiente.SIN_ARMA_DEFENSA}`};
+    const gratis = Combatiente.parryGratis(st => C().modTotal(sc, st), num((sc.usosEspecial || {})._parry));   // Parada fácil (2026-10-06)
+    const costo = gratis ? 0 : C().costoParry(sc);
+    if(Combatiente.defensaSinNo2(sc.nitros, costo)) return {error: `${sc.nombre} ${Combatiente.YA_NEGATIVO_TXT}`};   // ya en negativo (2026-10-23)
+    sc.usosEspecial = {...(sc.usosEspecial || {}), _parry: 1};   // (se vacía al empezar su turno)
+    sc.nitros = num(sc.nitros) - costo;   // sin No2 queda en negativo: se descuenta en su próxima recarga (2026-10-06)
+    Combatiente.aplicarTormenta(sc, sc.estados, costo, {motivo: 'el Parry'});
+    const deuda = sc.nitros < 0 ? {nombre: sc.nombre, accion: 'Parry', costo, quedan: sc.nitros} : null;
+    return {aviso: `${sc.nombre}: Parry ${gratis ? 'gratis (Parada fácil)' : `−${fmt(costo)} No2`} · quedan ${fmt(sc.nitros)} · si lo gana, tirá el Bloqueo`, deuda};
+  }
+
+  /* ---------- Atacar (menú de Atacar del creep, 2026-09-26) ----------
+     'normal': el primero del turno cuesta Tipo ÷ 2 y los siguientes el Tipo completo, y suma al conteo de ataques;
+     'oportunidad' y 'contra' (contraataque): siempre Tipo ÷ 2 y no suman al conteo. Cobrar (pagarAtaque → {error} o {aviso}) y
+     después la tirada de PdG (tiradaAtaque). Un ataque normal cierra el Parry que esperaba su Bloqueo: lo borra cada pantalla.
+     Sin No2 suficientes (2026-10-02, como con los personajes: avisar y dejar seguir): costoAtaqueDe dice cuánto cuesta; con
+     `forzar`, pagarAtaque gasta los que tenga (hasta 0) y devuelve `forzado: {costo, tenia}`, y alertaSinNitros deja la línea roja
+     en la Mesa. Cada pantalla pregunta antes («¿Atacar igual?», preguntaSinNitros). */
+  const NOMBRE_ESPECIAL = {oportunidad: 'Ataque de oportunidad', contra: 'Contraataque'};
+  // PdG en contraataque (o en oportunidad): la regla universal (Combatiente.statAtaqueEspecial), venga de su arma, su equipo o sus estados.
+  // ⚔ El Contraataque del creep (2026-10-27, dueño: «+1 PdG»): con la habilidad, su contraataque suma +1 más.
+  const contraHab = sc => (sc.habilidades || []).some(h => h && h.contraEsquiva);
+  const bonoEspecial = (sc, tipo) => { const st = Combatiente.statAtaqueEspecial(tipo); return (st ? C().modTotal(sc, st) : 0) + (tipo === 'contra' && contraHab(sc) ? 1 : 0); };
+  const costoAtaqueDe = (sc, tipo) => tipo === 'normal' ? C().costoAtaque(sc) : tipo === 'oportunidad' ? C().costoOportunidad(sc) : C().costoContraataque(sc);
+  const faltanNitros = (sc, tipo) => costoAtaqueDe(sc, tipo) > num(sc.nitros);
+  // Un duelo cancelado que no cuenta como ataque (2026-10-15): se descuenta del conteo y se devuelven los No2. → los No2 devueltos.
+  // `pagado` (2026-10-28): lo que se pagó de verdad (Combatiente.pagoDeDuelo); sin él, el costo entero.
+  function devolverAtaque(sc, tipo, pagado){
+    if(tipo === 'normal') sc.ataquesTurno = Math.max(0, num(sc.ataquesTurno) - 1);
+    const costo = pagado !== null && pagado !== undefined ? Math.max(0, num(pagado)) : costoAtaqueDe(sc, tipo);
+    sc.nitros = num(sc.nitros) + costo;
+    return costo;
+  }
+  // El texto de «¿Atacar igual?» (cada pantalla lo muestra a su manera).
+  function preguntaSinNitros(sc, tipo){
+    const nombre = tipo === 'normal' ? 'este ataque' : `el ${(NOMBRE_ESPECIAL[tipo] || 'Contraataque').toLowerCase()}`;
+    return `${sc.nombre} no tiene No2 suficientes: ${nombre} cuesta ${fmt(costoAtaqueDe(sc, tipo))} y tiene ${fmt(Math.max(0, num(sc.nitros)))}.\n\n¿Atacar igual? Gasta los No2 que tenga y queda anotado en rojo en la Mesa.`;
+  }
+  function pagarAtaque(sc, tipo, forzar){
+    const costo = costoAtaqueDe(sc, tipo), tenia = Math.max(0, num(sc.nitros));
+    const forzado = costo > tenia ? {costo, tenia} : null;
+    if(tipo === 'normal'){
+      if(forzado && !forzar) return {error: `${sc.nombre}: no le alcanzan los No2 — este ataque cuesta ${fmt(costo)} y tiene ${fmt(num(sc.nitros))}`};
+      const primero = num(sc.ataquesTurno) === 0;
+      sc.nitros = forzado ? 0 : num(sc.nitros) - costo;
+      Combatiente.aplicarTormenta(sc, sc.estados, costo, {motivo: 'atacar'});
+      sc.ataquesTurno = num(sc.ataquesTurno) + 1;
+      return {forzado, paga: forzado ? tenia : costo, aviso: `${sc.nombre}: −${fmt(forzado ? tenia : costo)} No2${forzado ? ` (costaba ${fmt(costo)})` : ''} · ${primero ? 'primer ataque del turno' : `ataque ${fmt(sc.ataquesTurno)} del turno`} · quedan ${fmt(sc.nitros)}`};
+    }
+    const nombre = NOMBRE_ESPECIAL[tipo] || 'Contraataque';
+    if(forzado && !forzar) return {error: `${sc.nombre}: no le alcanzan los No2 — el ${nombre.toLowerCase()} cuesta ${fmt(costo)} y tiene ${fmt(num(sc.nitros))}`};
+    sc.nitros = forzado ? 0 : num(sc.nitros) - costo;
+    Combatiente.aplicarTormenta(sc, sc.estados, costo, {motivo: 'el ' + nombre.toLowerCase()});
+    const bono = bonoEspecial(sc, tipo);
+    return {forzado, paga: forzado ? tenia : costo, aviso: `${sc.nombre}: ${nombre.toLowerCase()} −${fmt(forzado ? tenia : costo)} No2 ${forzado ? `(costaba ${fmt(costo)})` : '(lo de un primer ataque)'}${bono ? ` · PdG +${fmt(bono)} por ${tipo === 'contra' ? 'contraataque' : 'oportunidad'}` : ''} · quedan ${fmt(sc.nitros)}`};
+  }
+  // La línea roja de la Mesa (la misma que la de un personaje: FichaAcciones.gastoNitrosForzado).
+  function alertaSinNitros(sc, tipo, forzado){
+    if(!forzado || typeof fbDb === 'undefined' || !fbDb || typeof fbUsuario === 'undefined' || !fbUsuario || typeof fbMiembro === 'undefined' || !fbMiembro) return;
+    const hizo = tipo === 'normal' ? 'atacó' : `hizo un ${(NOMBRE_ESPECIAL[tipo] || 'Contraataque').toLowerCase()}`;
+    fbDb.collection(fbRutaCampana('tiradas')).add({
+      uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '',
+      origen: `⚠ ${sc.nombre} ${hizo} sin No2 suficientes`, formula: `Costaba ${fmt(forzado.costo)} No2 y tenía ${fmt(forzado.tenia)}`,
+      rolls: [], mod: 0, total: 0, desde: 'alerta-roja',
+      cuando: firebase.firestore.FieldValue.serverTimestamp(),
+    }).catch(err => console.error('No se pudo publicar la alerta de No2:', err));
+  }
+  const pdgExtraCreep = sc => Combatiente.pdgExtraArma(st => C().modTotal(sc, st), {tipoDado: Combatiente.armaEnMano(sc).tipoDado, armaDeRango: Combatiente.armaEnMano(sc).armaDeRango});
+  function tiradaAtaque(sc, tipo){
+    const extra = pdgExtraCreep(sc);   // guantes: PdG con esa familia de armas o a distancia (2026-10-05)
+    if(tipo === 'normal') return tirada(`${sc.nombre} · PdG`, C().statValor(sc, 'pdg') + extra, sc, 'pdg');
+    const nombre = NOMBRE_ESPECIAL[tipo] || 'Contraataque';
+    return tirada(`${sc.nombre} · ${nombre} (PdG)`, C().statValor(sc, 'pdg') + bonoEspecial(sc, tipo) + extra, sc, 'pdg');
+  }
+
+  /* ---------- Habilidades (paso 4c, tanda 5; antes el clic de data-ejecutar en js/06, y js/03, js/04 y js/10) ----------
+     Ejecutar se parte en dos: ejecutarHab (lo que CAMBIA al creep: cobrar No2, cooldown y vida, la cura y el estado del sistema
+     anterior, y el atajo ✨ «solo sobre sí, sin tiradas») y terminarHab (lo que pasa DESPUÉS: la Mesa, el duelo, la trampa, la
+     zona, a quién le pegó, el aviso), que cada pantalla hace a su manera con su `ui`. Las 📣 manuales y los ⚡ Flash no pasan por
+     acá (los resuelve cada pantalla antes). */
+  const uid = () => Math.random().toString(36).slice(2,9);
+  const ATTR_LABELS = {con:'Con', fue:'Fue', agl:'Agi', des:'Des', esp:'Esp'};
+  const FLAGS_ESTADO = ['sinCura', 'fenix', 'pierdeAlDano', 'armaduraRota','silencio','confusion','lisiado','paralisis','esEscarcha','mitadPdgEva','inmovilizado','rengo','lento','cansado','exhausto','hypeado','sentado','excedenteVida','invulnerable','inmunidadCC','inmunidadMental','esMental','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','espejo','desarmado','ceguera','esCC','esVeneno','esSangrado','stun','expuesto','mitadEva','alEmpezarTurno','volador','sangraSp','aguante','vigilancia','golpeAnunciado','marcado','sequia','repetir'];   // repetir: la Ráfaga encadenada (2026-10-25), la Repetición del Shooter en un creep (vtt-hexgrid/js/35)   // marcado: el Rayo cargado (se lo ve en la niebla, 2026-10-24)   // aguante: el modo aguante (2026-10-21)   // golpeAnunciado: El que avisa no traiciona (2026-10-21)
+  const habEtq = stat => (C().STAT_LOOKUP[stat] && C().STAT_LOOKUP[stat].label) || ATTR_LABELS[stat] || stat;
+  // La Ejecución de un creep: la misma regla que personajes e invocaciones (comun/combatiente.js, habEjecucion). Sin costo variable.
+  function habEjecucion(sc, h){
+    return Combatiente.habEjecucion(h, h && h.duelo, {stat: s => C().statValor(sc, s), etq: habEtq, armaDano: C().ataqueTxt(sc), armaPerfora: num((Combatiente.armaEnMano(sc) || {}).perfora), nivel: num(sc.nivel) || 1});   // nivel: el Provocar (+ su nivel)
+  }
+  // «Ataque con mi arma, con arreglos» de un creep (Golpe brutal, Carga…; P134): el mismo armado que el personaje, con su arma.
+  // `o.arma` (opcional): otra arma que la de la mano, en el formato de Combatiente.armaParaArreglos (🕳 salir de abajo de la tierra: armaParaEmerger).
+  function ataqueDeHab(sc, h, o){
+    const c = h && h.duelo;
+    const atq = ataqueDeHabBase(sc, h, c, o);
+    // 🛡 El Golpe de escudo (2026-10-27, dueño: «como si el escudo fuera un arma contundente»): pega con el escudo que tiene puesto (Tipo 10, el contundente;
+    // sin Parry: es su Destreza contra la Evasión); el daño, tantos d10 como el peso del escudo + su Dmg (comun/creep-duelo.js; dueño, 2026-10-27). Sin escudo, 1d10 (avisa el mapa).
+    if(atq && c && c.escudoGolpe){
+      const e = C().defensa(sc, {soloEscudo: true});
+      atq.escudoGolpe = {nombre: e ? e.nombre : '', peso: e ? num(e.peso) : 0};
+      if(e) atq.armaNombre = e.nombre;
+      atq.armaId = ''; atq.tipoDado = 10; atq.sinParry = true; atq.rango = false;
+    }
+    return atq;
+  }
+  function ataqueDeHabBase(sc, h, c, o){
+    return Combatiente.ataqueConArreglos(h, c, {arma: (o && o.arma) || Combatiente.armaParaArreglos(sc),
+      // (con otra arma —🕳 la de salir de abajo, cuerpo a cuerpo—: 1 más su +Rng, no el alcance del arco que tenga en la mano)
+      alcance: c && c.alcance !== undefined && c.alcance !== 'auto' ? Combatiente.alcanceHab(c, 'pdg', s => C().statValor(sc, s))
+        : o && o.arma ? 1 + Math.max(0, Math.round((o.arma.mods || []).filter(m => m && m.stat === 'rng').reduce((a, m) => a + num(m.val), 0))) : C().alcance(sc),
+      valorDe: s => C().statValor(sc, s),   // 🔓 un estado que se suelta contra un stat suyo (el Mordisco feroz: Fuerza contra su Fuerza)
+      danoGolpe: extra => String(C().danoTxt(sc, C().statValor(sc, 'dmg'), num(extra))).replace(/\s+/g, '')});   // el daño de este golpe, otra vez
+  }
+  // ¿Tira algo? El stat vinculado (con su valor del momento) y/o la fórmula.
+  function habTira(h){
+    return !!(h && (String(h.tiradaExtra || "").trim() || (h.tiradaStat && C().STAT_LOOKUP[h.tiradaStat])));
+  }
+  // El estado «del sistema anterior» que la habilidad le pone al propio creep (h.efectoNombre…). Devuelve {estado} (null si no
+  // tiene) y, si no le hizo efecto, {aviso}.
+  function efectoDeHab(sc, h, presets){
+    const nombre = (h.efectoNombre || '').trim();
+    if(!nombre) return {estado: null};
+    // La habilidad no sabe de categorías/inmunidades — se infiere buscando un preset con el mismo nombre, igual que en ficha.html.
+    const preset = (presets || []).find(p => p.nombre === nombre || (p.alias || []).includes(nombre));
+    const turnos = num(h.efectoTurnos);
+    const stacks = Math.max(1, num(h.efectoStacks) || 1);
+    const hpTurno = num(h.efectoHpTurno);
+    const polaridad = h.efectoPolaridad || (preset ? preset.polaridad : 'otro');
+    const detalle = h.efectoDetalle || '';
+    const mods = structuredClone(h.efectoMods || []);
+    // Con un preset conocido (Invulnerable, Espinas, Vida extra, Sigilo…) el estado lleva todas sus marcas, no solo las categorías.
+    const categorias = preset ? {esCC:preset.esCC, esVeneno:preset.esVeneno, esSangrado:preset.esSangrado, esQuemadura:preset.esQuemadura,
+      stacksTurno: preset.stacksTurno ?? 0, permanente: !!preset.permanente, escudoMagico: preset.escudoMagico ?? 0, forzarNitros: preset.forzarNitros ?? ''} : {};
+    if(preset) FLAGS_ESTADO.forEach(f => { categorias[f] = !!preset[f]; });
+    if(preset && preset.golpe){ categorias.golpe = structuredClone(preset.golpe); categorias.cargas = preset.cargas; }
+    if(preset && num(preset.cortaDano) > 0) categorias.cortaDano = num(preset.cortaDano);   // 🪓 Golpe anunciado (2026-10-21): se corta con N de daño acumulado
+    if(preset && preset.apunta) categorias.apunta = structuredClone(preset.apunta);   // 🎯 Apuntando a la cabeza (2026-10-21): el bono de su próximo disparo   // las cargas (2026-10-10: los óleos)
+    // P137 (2026-10-01): "no vence" lo decide la habilidad si lo marca (como en personajes e invocaciones); si no, el estado.
+    const nuevo = {id: uid(), nombre, hpTurno, stacks, turnos, polaridad, detalle, mods, ...categorias, permanente: Combatiente.efectoPermanente(h, preset)};
+    if(num(h.efectoEscudo) > 0){   // la habilidad da HP de escudo o de Vida extra (Absorber vida, Coraza de huesos…)
+      // P137: la Vida extra nuevo reemplaza al que tenía (antes se sumaba), igual que en personajes e invocaciones.
+      nuevo.escudoMagico = num(h.efectoEscudo); nuevo.escudoMagicoActual = num(h.efectoEscudo);
+    }
+    // Ponerlo: la regla común (comun/combatiente.js, agregarEstado) — inmunidades (con la de jefe), Veneno que se acumula y,
+    // si ya tiene uno igual, se renueva (P132).
+    const r = Combatiente.agregarEstado(sc.estados, nuevo, sc);
+    if(!r.ok) return {estado: null, aviso: `${sc.nombre}: inmune ahora mismo (${r.motivo}) — ${nombre} no hizo efecto`};
+    // Lo que se dispara (regeneración, veneno…) pega apenas se lo pone (2026-10-06, P161).
+    const dis = Combatiente.dispararAlAplicar(r, sc.estados, {hp: 'hpTurno', resFuego: C().resElemental(sc, 'fuego'), hpActual: sc.hp});
+    if(dis.hp) sc.hp = Math.max(0, Math.min(num(sc.hpMax) || Infinity, num(sc.hp) + dis.hp));
+    return {estado: r.estado, disparo: dis};
+  }
+  /* ---------- El cinturón (2026-10-04, dueño: 5 ranuras de consumibles para los creeps también) ----------
+     La misma regla que un personaje: 1 ranura = 1 unidad; usar uno cuesta 1 No2 (lo del cinturón: FichaCalculo.IT2); cura, deja su estado
+     (efectoDeHab, los mismos campos que una habilidad) y tira lo suyo. Sin No2 pregunta («¿Usarlo igual?») y, forzado, gasta los que tenga. */
+  const costoConsumir = () => typeof FichaCalculo !== 'undefined' ? num(FichaCalculo.IT2.nitrosConsumirCinturon) || 1 : 1;
+  // Carga `cantidad` unidades (1 si no se dice) de un consumible del catálogo en el cinturón, las que entren. → {error} o {aviso}.
+  function alCinturon(sc, item, cantidad){
+    if(!item || !item.consumible && item.tipoItem !== 'consumibles') return {error: 'Al cinturón solo van consumibles'};
+    const quiere = Math.max(1, Math.round(num(cantidad) || 1)), entran = C().cuantasEntran(sc, item, quiere);
+    if(!entran) return {error: `${sc.nombre}: el cinturón está lleno (${C().cinturonUsado(sc)}/${C().capCinturon(sc)})`};
+    sc.cinturon = sc.cinturon || [];
+    const pila = sc.cinturon.find(x => x.consumible && x.nombre === item.nombre);
+    if(pila) pila.unidades = num(pila.unidades) + entran;
+    else{
+      const c = structuredClone(item);
+      delete c.imagen; delete c._bib; delete c.equipado;
+      c.id = uid(); c.consumible = true; c.unidades = entran; c.cargaActual = Math.max(1, num(item.cargaMax) || 1);
+      sc.cinturon.push(c);
+    }
+    return {aviso: `${sc.nombre}: ${item.nombre} ×${entran} al cinturón (${C().cinturonUsado(sc)}/${C().capCinturon(sc)})${entran < quiere ? ' · no entraban más' : ''}`};
+  }
+  function quitarDelCinturon(sc, id){
+    const it = (sc.cinturon || []).find(x => x.id === id);
+    if(!it) return {error: 'Ese consumible ya no está'};
+    sc.cinturon = sc.cinturon.filter(x => x !== it);
+    return {aviso: `${sc.nombre}: ${it.nombre} salió del cinturón`};
+  }
+  // Una trampa consumible: se coloca junto al token del creep (como la de un personaje); si no se puede, no se gasta. → {ok, aviso}.
+  // `sc` (2026-10-19): el creep, para que la dificultad sea la suya (Destreza o Efecto especial, como una trampa de habilidad).
+  async function colocarTrampaDeItem(creepId, it, sc){
+    const d0 = it && it.trampaDatos;
+    const d = d0 && sc ? Combatiente.trampaDeHab({nombre: it.nombre, trampaColocar: {...d0, detectarMin: Combatiente.detectarMinDe(it.tier)}}, st => C().statValor(sc, st)) : d0;   // + el mínimo por calidad (2026-10-23)
+    if(!d || typeof TokensAuto === 'undefined' || (d.portal && d.portal.colocador)) return {ok: false, aviso: 'Esta trampa se coloca desde el mapa'};   // (el glifo: dos clics en el mapa)
+    try{
+      const dano = /^\d{1,2}d\d{1,3}([+-]\d{1,3})?$/i.test(String(d.dano || '').trim()) ? String(d.dano).trim() : '';
+      const r = await TokensAuto.colocarTrampas({fichaId: creepId, tipoToken: 'creep', trampa: {...d, nombre: String(d.nombre || it.nombre).slice(0, 40), dano, cant: 1}});
+      if(r.colocadas) return {ok: true, aviso: `🪤 ${it.nombre} colocada junto al creep: arrastrala a donde la quieras`};
+      return {ok: false, aviso: r.motivo === 'sin-token' ? `🪤 ${it.nombre}: el creep no tiene token en el mapa — no se usó` : `🪤 ${it.nombre}: no hay lugar libre al lado del creep — no se usó`};
+    }catch(err){ console.error('No se pudo colocar la trampa:', err); return {ok: false, aviso: 'No se pudo colocar la trampa'}; }
+  }
+  // Los consumibles del catálogo para el desplegable del cinturón: [{id, nombre, tier}], por nombre. `cat`: la lista del catálogo.
+  const consumiblesDe = cat => (cat || []).filter(it => it && it.tipoItem === 'consumibles' && !it.trofeo && !it.archivo)
+    .map(it => ({id: it.id, nombre: it.nombre, tier: it.tier || ''})).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+  function faltanNitrosConsumir(sc){ return num(sc.nitros) < Combatiente.conExtenuado(sc.estados, costoConsumir()); }
+  // Usar un consumible del cinturón: → {error} | {aviso, tiradas: [{origen, r}], trampa} (trampa: el ítem, para que la pantalla la coloque).
+  function consumir(sc, id, presets, forzar){
+    const it = (sc.cinturon || []).find(x => x.id === id);
+    if(!it || num(it.unidades) <= 0) return {error: 'Ese consumible ya no está'};
+    // Saque rápido (2026-10-05): el primero del turno puede no costar (la chance se tira a la vista: va en las tiradas).
+    let costo = Combatiente.conExtenuado(sc.estados, costoConsumir()), saque = null;   // + Extenuado
+    const pctSaque = Combatiente.chancePct(C().modTotal(sc, 'saquerapido'));
+    if(pctSaque > 0 && !sc.saqueUsado){   // sin dado que rueda: se tira callado y se anuncia en texto (dueño, 2026-10-05)
+      const d = Combatiente.chanceDado(pctSaque);
+      let sale = pctSaque >= 100, txt = '⚡ Saque rápido: no costó No2';
+      if(d){ const r = tirarDados('1d' + d.caras); if(r){ sale = r.total >= d.caras - d.exitos + 1; txt = `⚡ Saque rápido (${Combatiente.chanceTexto(pctSaque)}): 1d${d.caras} = ${r.total} → ${sale ? 'salió, no costó No2' : 'no salió'}`; } }
+      sc.saqueUsado = true;
+      saque = {sale, txt};
+      if(sale) costo = 0;
+    }
+    if(costo > num(sc.nitros) && !forzar) return {error: `${sc.nombre}: no le alcanzan los No2 — usar ${it.nombre} cuesta ${fmt(costo)}`};
+    const pagado = Math.min(costo, Math.max(0, num(sc.nitros)));
+    sc.nitros = num(sc.nitros) - pagado;
+    Combatiente.aplicarTormenta(sc, sc.estados, costo, {motivo: `usar ${it.nombre}`});
+    const cargaMax = Math.max(1, num(it.cargaMax) || 1);
+    let carga = num(it.cargaActual ?? cargaMax);
+    if(carga <= 0) carga = cargaMax;
+    carga -= 1;
+    if(carga <= 0){ it.unidades = num(it.unidades) - 1; carga = cargaMax; }
+    it.cargaActual = carga;
+    if(num(it.unidades) <= 0) sc.cinturon = sc.cinturon.filter(x => x !== it);
+    const partes = [];
+    if(num(it.curahp)){
+      const boticario = num(it.curahp) > 0 ? num(C().modTotal(sc, 'boticario')) : 0;   // Mano de boticario (2026-10-05)
+      const tope = num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, antes = num(sc.hp);
+      const entra = Combatiente.curaQueEntra(antes, num(it.curahp) + boticario, sc.estados);
+      sc.hp = Math.max(0, Math.min(tope, antes + entra));   // 🌑 con una herida que no deja curarse, la cura no entra
+      partes.push(num(it.curahp) > 0 && !entra ? `❌ ${antes > 0 ? 'no se cura (Herida sombría o Sanguijuela)' : 'está caído: una cura no lo levanta'}` : `${num(it.curahp) >= 0 ? '+' : ''}${fmt(num(it.curahp) + boticario)} HP`);
+    }
+    const ef = efectoDeHab(sc, it, presets);
+    if(ef.estado){ if(C().modsAfectanHp(ef.estado.mods)) C().actualizarHpMaxPorCon(sc); partes.push(`${ef.estado.nombre}${ef.estado.permanente ? '' : ` (${fmt(ef.estado.turnos)} turnos)`}`); }
+    if(ef.aviso) partes.push(ef.aviso);
+    // Cura estados por grupo (P180).
+    const curados = Combatiente.curaDeItem(it).length ? Combatiente.curarEstados(sc.estados, Combatiente.curaDeItem(it)) : null;
+    if(curados){ if(curados.sacados.length){ sc.estados = curados.quedan; partes.push(`🩹 se le fue: ${curados.sacados.join(', ')}`); } else partes.push('🩹 no tenía nada que curar'); }
+    const tiradas = [];
+    const stat = it.tiradaStat;
+    const ATRIB = {fue: 'Fuerza', con: 'Constitución', agl: 'Agilidad', des: 'Destreza', esp: 'Especial'};
+    if(stat && (C().STAT_LOOKUP[stat] || ATRIB[stat])){ const valor = C().statValor(sc, stat) + num(it.tiradaBono); tiradas.push(tirada(`${sc.nombre} · ${it.nombre} · ${ATRIB[stat] || C().STAT_LOOKUP[stat].label || stat}`, valor, sc, stat)); }
+    const formula = String(it.tiradaExtra || '').trim();
+    if(formula){ const r = tirarDados(formula); if(r) tiradas.push({origen: `${sc.nombre} · ${it.nombre}`, r}); }
+    partes.push(`−${fmt(pagado)} No2${pagado < costo ? ' (no le alcanzaban)' : saque && saque.sale ? ' (Saque rápido)' : ''}`);
+    // El anuncio para la Mesa y la Crónica: sin la vida del creep (es privada), con el estado que le dejó y el Saque rápido.
+    const publico = [ef.estado ? ef.estado.nombre : '', curados && curados.sacados.length ? `🩹 se le fue ${curados.sacados.join(', ')}` : '', saque ? saque.txt : ''].filter(Boolean).join(' · ');
+    const anuncio = {titulo: `${sc.nombre} usó ${it.nombre}`, resultado: publico, texto: `🧪 ${sc.nombre} usó ${it.nombre}${publico ? ': ' + publico : ''}`, item: it.nombre, saqueSalio: !!(saque && saque.sale)};
+    return {aviso: `${sc.nombre} usó ${it.nombre}: ${partes.join(' · ')}`, anuncio, tiradas: tiradas.filter(t => t && !t.error), forzado: pagado < costo ? {costo, tenia: pagado} : null,
+      trampa: it.trampaDatos ? structuredClone(it) : null};
+  }
+
+  // ✨ Automática, solo sobre el propio creep y sin tiradas: aplica los efectos del cuadro de Ejecución directo. Devuelve null si
+  // no es ese caso; si no, {hechos} (para el aviso del GM) y {nota} (los textos «a mano», para la Mesa).
+  function sobreSi(sc, h){
+    const hab = habEjecucion(sc, h);
+    if(!Combatiente.sobreSiSinTiradas(hab)) return null;
+    const hechos = hab.efectos.map(ef => {
+      if(!ef.spec){ sc.hp = Math.min(num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, num(sc.hp) + num(ef.cura)); return `+${fmt(num(ef.cura))} HP`; }
+      const r = EstadosAplicar.aplicarACreep(sc, ef.spec);
+      if(!r.ok) return `${ef.nombre}: no le hizo efecto (${r.motivo})`;
+      if(C().modsAfectanHp(r.estado.mods)) C().actualizarHpMaxPorCon(sc);
+      return r.que === 'renovado' ? `${r.estado.nombre} renovado` : EstadosAplicar.texto(ef.spec);
+    });
+    return {hechos, nota: [hab.efectoLibre || '', hab.efectosNota || ''].filter(Boolean).join(' ')};
+  }
+  // Silencio (2026-10-04): avisa y deja seguir. La pregunta la hace quien llama ANTES de ejecutarHab, con el cartel del juego (no el
+  // confirm() nativo): ejecutarHab corre adentro de una transacción en el mapa y no puede esperar. true = sigue (o no había nada que preguntar).
+  // `h.soloVidaMenos = N` (2026-10-16, dueño: la Plaga de las ratas, «solamente lo puede ejecutar si tiene menos del 50 % de la vida»): con
+  // la vida en N % o más, avisa y pregunta (no bloquea: la mesa decide). → el texto de la pregunta, o ''.
+  function preguntaVida(sc, h){
+    // `h.soloVidaHasta = N` (el Chillido, 2026-10-30: «cuando esté en 50 % de vida o menos»): lo mismo, con N % incluido.
+    const hasta = Math.round(num(h && h.soloVidaHasta)), n = hasta || Math.round(num(h && h.soloVidaMenos)), max = num(sc.hpMax);
+    if(!(n > 0) || !(max > 0)) return '';
+    const pct = 100 * num(sc.hp) / max;
+    if(hasta ? pct <= n : pct < n) return '';
+    return `${sc.nombre} tiene ${fmt(num(sc.hp))} de ${fmt(max)} de vida (${Math.round(pct)} %): ${h.nombre || 'esta habilidad'} se usa solo con ${hasta ? `el ${n} % de la vida o menos` : `menos del ${n} % de la vida`}. ¿Usarla igual?`;
+  }
+  // Lo que se pregunta antes de cobrar (el Silencio y la condición de vida). → true si sigue.
+  async function confirmarSilencio(sc, h){
+    const vida = preguntaVida(sc, h);
+    if(vida && !(await Confirmar.preguntar(vida, {titulo: h.nombre || 'Habilidad', icono: '❤', si: 'Usarla igual'}))) return false;
+    const sil = Combatiente.preguntaSilencio(sc.estados, h, sc.nombre, sc.id);
+    return !sil || !!(await Confirmar.preguntar(sil, {titulo: 'Silencio', icono: '🤐', si: 'Usarla igual'}));
+  }
+  // Lo que cambia al ejecutar una 💰 o ✨ (no manual ni Flash): {error} o el plan para terminarHab.
+  // `silencioOk`: ya se preguntó con confirmarSilencio y dijo que sí; sin eso, en Silencio no la usa.
+  // 🩸 Maldito en un creep (2026-10-18, dueño, hasta que los creeps gasten SP): cada habilidad que usa le saca tanta vida como su cooldown.
+  function malditoCreep(sc, h){
+    const mal = (sc.estados || []).some(e => e && e.activo !== false && (e.sangraSp || e.nombre === 'Maldito'));
+    const cd = C().modoSP(sc) ? C().costoSpHab(sc, h) : Math.max(0, Math.round(num(h && h.cd)));   // (en modo SP, su SP)
+    if(!mal || !cd) return 0;
+    sc.hp = Math.max(0, num(sc.hp) - cd);
+    return cd;
+  }
+  // 💧 Modo SP (2026-10-20): si no le alcanza el SP, pregunta y deja seguir (queda en 0). → Promise<bool>.
+  async function confirmarSP(sc, h){
+    if(!C().modoSP(sc)) return true;
+    const cuesta = C().costoSpHab(sc, h), tiene = C().spActual(sc);
+    if(tiene >= cuesta) return true;
+    const t = `${sc.nombre} tiene ${fmt(tiene)} de SP y ${h.nombre || 'la habilidad'} cuesta ${fmt(cuesta)}. ¿Usarla igual? (queda en 0)`;
+    return typeof Confirmar !== 'undefined' ? Confirmar.preguntar(t, {titulo: 'No le alcanza el SP', icono: '💧', si: 'Usarla igual', no: 'No'}) : confirm(t);
+  }
+  // `o.doble` (2026-10-24): una habilidad Flash usada en turno ajeno cuesta el doble — el cooldown o el SP (P136; lo decide el mapa, que sabe de quién es el turno).
+  function ejecutarHab(sc, h, presets, silencioOk, o = {}){
+    const sil = Combatiente.preguntaSilencio(sc.estados, h, sc.nombre, sc.id);   // Silencio (2026-10-04): avisa y deja seguir (también el Tótem de silencio)
+    if(sil && !silencioOk) return {error: `${sc.nombre}: en Silencio, no usó ${h.nombre || 'la habilidad'}`};
+    const modo = C().modoHab(h);
+    const bloqueo = C().bloqueoHab(sc, h);
+    if(bloqueo) return {error: `${sc.nombre}: ${h.nombre || 'Habilidad'} no se puede usar — ${bloqueo}`};
+    // Se cobra lo que la habilidad tenga cargado (P133): No2, cooldown y vida; y la cura del sistema anterior, si la trae.
+    const costo = C().costoNitrosHab(sc, h), costoHp = num(h.hpCosto);
+    sc.nitros = num(sc.nitros) - costo;
+    Combatiente.aplicarTormenta(sc, sc.estados, costo, {motivo: `usar ${h.nombre || 'una habilidad'}`});
+    // 💧 En modo SP (2026-10-20): paga su SP y no queda en cooldown. Sin SP suficiente, la pantalla ya preguntó (confirmarSP): queda en 0.
+    let costoSp = 0;
+    const veces = o.doble ? 2 : 1, ex = o.extra || {};   // `o.extra` (2026-10-24, el largo del Muro de fuego): {sp, no2, cd} de más
+    if(num(ex.no2) > 0) sc.nitros = num(sc.nitros) - num(ex.no2);
+    if(C().modoSP(sc)){ costoSp = C().costoSpHab(sc, h) * veces + Math.max(0, num(ex.sp)); sc.sp = Math.max(0, C().spActual(sc) - costoSp); }
+    else h.cdActual = num(h.cd) * veces + Math.max(0, num(ex.cd));
+    const malditoDano = malditoCreep(sc, h);   // 🩸 Maldito: su cooldown en vida (2026-10-18)
+    if(C().habAtaque(h)) sc.ataquesTurno = num(sc.ataquesTurno) + 1;  // cuenta como su ataque
+    if(costoHp > 0) sc.hp = num(sc.hp) - costoHp;
+    if(num(h.curaHp) > 0) sc.hp = Math.min(num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, num(sc.hp) + num(h.curaHp));   // cura sobre sí mismo
+    // 💨 El Segundo aliento (2026-10-27, dueño: «que quite cualquier debuff»): se cura N + su Constitución, le saca el debuff que se eligió antes de cobrar
+    // (`o.quitar`, el nombre; lo pregunta el mapa) y queda usada para este combate (`unaVez`).
+    let curaCon = 0, quitado = '';
+    if(num(h.curaMasCon) > 0){ const antes = num(sc.hp); sc.hp = Math.min(num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, antes + num(h.curaMasCon) + Math.max(0, num(C().statValor(sc, 'con')))); curaCon = sc.hp - antes; }
+    if(h.quitaDebuff && o.quitar){ const i = (sc.estados || []).findIndex(e => e && e.nombre === o.quitar && e.polaridad === 'debuff'); if(i >= 0){ quitado = sc.estados[i].nombre; sc.estados.splice(i, 1); } }
+    if(h.unaVez) h.unaVezUsada = true;
+    const ef = efectoDeHab(sc, h, presets);
+    const efecto = ef.estado;
+    if(efecto && C().modsAfectanHp(efecto.mods)) C().actualizarHpMaxPorCon(sc);
+    // Lo que todavía no anda para creeps o una ✨ sin la Ejecución armada: avisa y va como 💰.
+    const falta = modo === 'auto' && !h.trampaColocar && !h.refuerzos && !h.estandarte && !h.meteoro && !h.dash && !h.blink && !h.bombaHumo && !h.cebo && !h.provocarAliado ? Combatiente.ejecucionNoDisponible(h.duelo, 'creep') : '';   // 📣 refuerzos y 🚩 el estandarte: no llevan Ejecución
+    const auto = modo === 'auto' && !falta;
+    const esZona = auto && h.duelo && typeof h.duelo === 'object' && h.duelo.objetivo === 'zona';
+    // ✨ Solo sobre el creep y sin nada que tirar: se aplica directo, sin abrir el cuadro.
+    const directo = auto && !h.trampaColocar && !h.refuerzos && !h.estandarte && !h.meteoro && !h.dash && !h.blink && !h.bombaHumo && !h.cebo && !h.provocarAliado ? sobreSi(sc, h) : null;
+    return {costo: costo + Math.max(0, num(ex.no2)), costoSp, costoHp, efecto, aviso: [ef.aviso || '', malditoDano ? `🩸 Maldito: usar ${h.nombre || 'la habilidad'} le saca ${fmt(malditoDano)} de vida` : ''].filter(Boolean).join(' · '), falta, auto, esZona, directo, nitros: sc.nitros, malditoDano,
+      ...(num(h.curaMasCon) > 0 ? {curaCon, hpAhora: sc.hp} : {}), ...(quitado ? {quitado} : {})};
+  }
+  /* Lo que pasa después de cobrar. ui = {mesaHabilidad(sc, h, extra), mesaConTexto(texto), publicar(sc, t), toast(t),
+       habDuelo(sc, h) (la Ejecución para el duelo, o null si no hay duelo), lanzarAtaque(sc, h), lanzarDuelo(sc, h, hab),
+       colocarTrampa(sc, h, auto), colocarZona(sc, h) → bool, elegirObjetivo(sc, h) (el estado sobre el objetivo), excavar(sc, h) (🕳, solo el mapa),
+       refuerzos(sc, h) (📣 llamar refuerzos: `h.refuerzos = {cant}`; el GM elige en el mapa dónde aparece cada copia, solo el mapa),
+       estandarte(sc, h) (🚩 el Estandarte de guerra: `h.estandarte`; el GM elige en el mapa dónde lo clava, solo el mapa),
+       meteoro(sc, h) (☄ el Meteoro: `h.meteoro`; el GM marca la sombra en el mapa, solo el mapa)} */
+  function terminarHab(sc, h, p, ui){
+    const {costo, costoHp, efecto, falta, auto, esZona, directo} = p;
+    if(h.excavar && !h.emerger && ui.excavar) ui.excavar(sc, h);   // 🕳 Bajo tierra (2026-10-13): el mapa mete el token bajo tierra (vtt-hexgrid/js/46); con `emerger` (la Excavar única, 2026-10-27) meterse lo resuelve el mapa antes de cobrar
+    if(directo){ ui.mesaHabilidad(sc, h, directo.nota); ui.toast(`${h.nombre || 'Habilidad'} ejecutada sobre ${sc.nombre}${directo.hechos.length ? ' → ' + directo.hechos.join(' · ') : ''}${costoHp > 0 ? ` · −${fmt(costoHp)} HP` : ''}`); return; }
+    // Una trampa se coloca en secreto: la habilidad no se anuncia en la Mesa (los jugadores no deben enterarse).
+    const hDuelo = (!auto || h.trampaColocar || esZona || h.refuerzos || h.estandarte || h.meteoro || h.dash || h.blink || h.bombaHumo || h.cebo || h.provocarAliado) ? null : ui.habDuelo(sc, h);   // habilidad dirigida: la contienda va en el cuadro del duelo
+    const esArma = auto && !h.trampaColocar && !h.dash && Combatiente.tipoEjecucion(h.duelo) === 'arma';   // ataque con arreglos: al duelo como un ataque
+    if(esArma) ui.lanzarAtaque(sc, h);
+    else if(h.trampaColocar) ui.colocarTrampa(sc, h, auto);
+    else if(h.caos){ ui.mesaHabilidad(sc, h); if(ui.caos) ui.caos(sc, h); else ui.toast(`${h.nombre}: el objetivo se elige en el mapa (⚔ Acciones)`); }   // 🎲 la Varita del caos (2026-10-18)
+    else if(auto && h.refuerzos){ ui.mesaHabilidad(sc, h); if(ui.refuerzos) ui.refuerzos(sc, h); else ui.toast(`${h.nombre}: los refuerzos se eligen desde el mapa (⚔ Acciones)`); }
+    else if(auto && h.provocarAliado){ ui.mesaHabilidad(sc, h); if(ui.provocarAliado) ui.provocarAliado(sc, h); else ui.toast(`${h.nombre}: el aliado se elige desde el mapa (⚔ Acciones)`); }   // 😤 Tirar la bronca (2026-10-26, vtt-hexgrid/js/77)
+    else if(auto && h.blink){ ui.mesaHabilidad(sc, h); if(ui.blink) ui.blink(sc, h); else ui.toast(`${h.nombre}: el salto se hace desde el mapa (⚔ Acciones)`); }
+    else if(auto && h.bombaHumo){ ui.mesaHabilidad(sc, h); if(ui.bombaHumo) ui.bombaHumo(sc, h); else ui.toast(`${h.nombre}: el humo se hace desde el mapa (⚔ Acciones)`); }   // 💨 la Bomba de humo (vtt-hexgrid/js/57)   // ✨ el Parpadeo (2026-10-26, vtt-hexgrid/js/13 blinkDeHabilidad)
+    else if(auto && h.cebo){ if(ui.cebo) ui.cebo(sc, h); else ui.toast(`${h.nombre}: el cebo se pone desde el mapa (⚔ Acciones)`); }   // 💎 el Cebo (2026-10-27, vtt-hexgrid/js/80): sin anunciarlo en la Mesa (lo delataría); el mapa deja «Algo brilla…»
+    else if(auto && h.dash){ ui.mesaHabilidad(sc, h); if(ui.dash) ui.dash(sc, h); else ui.toast(`${h.nombre}: el Dash se hace desde el mapa (⚔ Acciones)`); }   // 💨 (2026-10-26, vtt-hexgrid/js/76)
+    else if(auto && h.meteoro){ ui.mesaHabilidad(sc, h); if(ui.meteoro) ui.meteoro(sc, h); else ui.toast(`${h.nombre}: la sombra se marca desde el mapa (⚔ Acciones)`); }   // ☄ (2026-10-24, vtt-hexgrid/js/74)
+    else if(auto && h.estandarte){ ui.mesaHabilidad(sc, h); if(ui.estandarte) ui.estandarte(sc, h); else ui.toast(`${h.nombre}: el estandarte se clava desde el mapa (⚔ Acciones)`); }   // 🚩 (2026-10-24, vtt-hexgrid/js/73)
+    else if(esZona){ ui.mesaHabilidad(sc, h); if(!ui.colocarZona(sc, h)) ui.toast(`${h.nombre}: para colocar la zona hace falta ejecutarla desde el mapa (⚔ Acciones)`); }
+    // Con tirada, la descripción viaja con ella (una sola línea en la Mesa).
+    else if(habTira(h) && !hDuelo) ui.mesaConTexto(C().habTextoMesa(h));
+    else if(hDuelo && roboEnSigilo(sc, h)){ /* 🫳 un robo en sigilo no se anuncia (2026-10-14, dueño; vtt-hexgrid/js/47) */ }
+    else ui.mesaHabilidad(sc, h);
+    if(esArma){ /* ya fue al duelo */ }
+    else if(hDuelo && !h.caos) ui.lanzarDuelo(sc, h, hDuelo);
+    else if(habTira(h) && !h.trampaColocar && !esZona && !h.refuerzos && !h.estandarte && !h.meteoro && !h.dash && !h.blink && !h.bombaHumo && !h.cebo && !h.provocarAliado) ui.publicar(sc, tiradaPrimeraHab(sc, h));
+    if(h.estadoObjetivo) ui.elegirObjetivo(sc, h);   // a quién le pegó: se le aplica el estado solo
+    const partes = [`ejecutada`, costo ? `−${fmt(costo)} No2 (quedan ${fmt(p.nitros)})` : 'sin costo de No2'];
+    if(costoHp > 0) partes.push(`−${fmt(costoHp)} HP`);
+    if(num(h.curaHp) > 0) partes.push(`+${fmt(num(h.curaHp))} HP`);
+    if(falta) partes.push(`⚠ ${falta}: se ejecutó como semiautomática`);
+    if(p.costoSp) partes.push(`−${fmt(p.costoSp)} SP (quedan ${fmt(C().spActual(sc))})`);   // 💧 modo SP
+    else if(h.cd > 0) partes.push(`cooldown ${fmt(num(h.cd))} turno(s)`);
+    if(efecto) partes.push(efecto.permanente || !num(efecto.turnos) ? `${efecto.nombre} (sin límite)` : `${efecto.nombre} (${fmt(efecto.turnos)}t)`);   // (2026-10-24: Carga arcana decía «0t»)
+    ui.toast(`${h.nombre||'Habilidad'} ${partes.join(' · ')}`);
+  }
+  // 🫳 ¿Es un robo (efecto «Robo» en su Ejecución) y el creep está en sigilo? Entonces es secreto: ni la Mesa ni el duelo a la vista.
+  function roboEnSigilo(sc, h){
+    const ef = (h && h.duelo && h.duelo.efectos) || [];
+    return ef.some(e => e && /^robo$/i.test(String(e.nombre || '').trim()))
+      && (sc.estados || []).some(e => e && e.activo !== false && /^sigilo$/i.test(String(e.nombre || '').trim()));
+  }
+  // La primera tirada (Ejecutar): el stat vinculado o, si no tiene, la fórmula. null si no tira nada.
+  function tiradaPrimeraHab(sc, h){
+    const prefijo = `${sc ? sc.nombre + " · " : ""}${h.nombre || "Habilidad"}`;
+    if(sc && h.tiradaStat && C().STAT_LOOKUP[h.tiradaStat]) return tirada(`${prefijo} · ${C().STAT_LOOKUP[h.tiradaStat].label}`, C().statValor(sc, h.tiradaStat), sc, h.tiradaStat);
+    if(String(h.tiradaExtra || "").trim()){
+      const r = tirarDados(h.tiradaExtra);
+      if(r) return {origen: prefijo, r};
+    }
+    return null;
+  }
+  // La segunda tirada (🎲 <fórmula>, el daño o el efecto).
+  function tiradaSegundaHab(sc, h){
+    const r = tirarDados(String(h.tiradaExtra || "").trim());
+    return r ? {origen: `${sc ? sc.nombre + " · " : ""}${h.nombre || "Habilidad"} · Efecto`, r} : {error: 'La fórmula de la habilidad no es válida'};
+  }
+  // Zona persistente: si hay tirada («tira» del ✨), se tira UNA vez (con los stats del creep) y viaja el total. {tirada, zona} o null.
+  function zonaDeHab(sc, h){
+    const c = h && h.duelo;
+    if(!c || typeof c !== 'object' || c.objetivo !== 'zona') return null;
+    // La tirada es de la zona, no de la habilidad (2026-10-02, P143): se manda el valor del stat y el mapa lo tira en cada exposición.
+    const stat = c.tira || '';
+    const v = stat ? CreepDuelo.habStat(sc, stat) : NaN;
+    // El mensaje lo arma la regla común (comun/combatiente.js, zonaDeHab), el mismo que manda un personaje.
+    return {tirada: null, zona: Combatiente.zonaDeHab(h, c, {fichaId: sc.id, tipo: 'creep', tiraValor: Number.isFinite(v) ? v : undefined})};
+  }
+  // Cooldown a mano (− / + / ↺).
+  function cdMod(sc, habId, accion){
+    const h = (sc.habilidades || []).find(x => x.id === habId);
+    if(!h) return {error: 'No encontré esa habilidad'};
+    h.cdActual = accion === 'reset' ? 0 : Math.max(0, Math.min(99, num(h.cdActual) + num(accion)));
+    return {aviso: ''};
+  }
+
+  /* ---------- ⟳ Mantenimiento (2026-10-02, hoja de ruta A2b: lo hace también el mapa, sin cargar GM Tools) ----------
+     mantenimiento(sc): el pase de turno de UN creep — copia textual de lo que hacía mantenimiento() de GM Tools (js/07) por cada
+     creep: ataques del turno a 0, cooldowns −1, los estados (Combatiente.pasarTurnoEstados), la vida con tope, el HP máximo si
+     venció algo que lo tocaba, y No2 a full DESPUÉS de los estados (un Stun que venció ya no los topea). → {rep (para el 📜
+     Historial del GM; no va a la Mesa: el HP de un creep es secreto), enCooldown, hpAplicado, vencidos}.
+     reclamarMantenimiento(db, ref, objetivo, marca): la transacción sobre gm/mantenimiento = {aplicado}: cuántos turnos aplicarles a
+     los creeps (0 si ya los aplicó otra pantalla; si nunca se registró, arranca desde el actual), máximo 10. */
+  const MANT_MAX_SEGUIDOS = 10;
+  /* ---------- ✨ Armas especiales de un creep (2026-10-05: las reglas de combate son las mismas para todos) ----------
+     La misma habilidad que arma la ficha con una varita equipada (su Ejecución ✨, su daño + Ef.Esp, su trampa), mandada por el camino de las
+     habilidades del creep (ejecutarHab / terminarHab). Los No2 igual que un personaje: 1 el primer uso del turno + 1 por cada uso más. Los creeps no
+     tienen SP: el SP de la varita se paga con ESPERA (dueño: «adaptar, medio a ojo, SP en CD»; provisorio hasta pasar los creeps a SP, ver la hoja de
+     ruta): ESPERA_POR_SP. Los orbes de la otra mano también valen (resguardo: Vida extra; salvaje: 1d6). */
+  const ESPERA_POR_SP = sp => sp <= 0 ? 0 : sp <= 2 ? 1 : 2;   // SP 1–2 → 1 turno de espera; SP 3 o más → 2
+  const especialesCreep = sc => Combatiente.especialesConModos(Combatiente.equipoPuesto(sc).filter(it => it && it.especial));   // (lo guardado no: paso 4)   // (los modos de una varita, 2026-10-08)
+  const claveEspCreep = it => it._modoDe || it.id;
+  function costoEspecialCreep(sc, it){
+    const k = claveEspCreep(it), e = (it && it.especial) || {}, usos = num((sc.usosEspecial || {})[k]);
+    const ahorro = usos ? 0 : Math.max(0, Math.round(num(C().modTotal(sc, 'ahorroespsp'))));   // primer conjuro: el SP de menos baja la espera
+    // Las cargas (2026-10-08): mientras le queden, no hay espera (el SP de un creep).
+    const cargas = Math.max(0, Math.round(num(e.cargas))), conCarga = cargas > 0 && num((sc.cargasEsp || {})[k]) < cargas;
+    const sp = conCarga || num(e.spVidaPct) > 0 ? 0 : Math.max(0, num(e.sp) - ahorro);   // 💧 su SP de verdad (modo SP)
+    return {sp, no2: Combatiente.conExtenuado(sc.estados, Math.max(0, num(e.no2 ?? 1)) + usos * Math.max(0, num(e.sube ?? 1))), espera: C().modoSP(sc) ? 0 : conCarga ? 0 : ESPERA_POR_SP(Math.max(0, num(e.sp) - ahorro)), usos, enEspera: num((sc.esperaEspecial || {})[k]),
+      ...(cargas ? {cargas, cargaUsadas: num((sc.cargasEsp || {})[k])} : {})};
+  }
+  // 🔮 Los talismanes de su equipo que le suman algo a cada varita (la Cabeza reducida, el Muñeco vudú).
+  const conTalismanesVarita = (duelo, items) => {
+    const extra = Combatiente.efectosVarita(items);
+    if(extra.length && duelo && duelo.objetivo !== 'zona') duelo.efectos = [...(Array.isArray(duelo.efectos) ? duelo.efectos : []), ...extra];
+    return duelo;
+  };
+  function habDeEspecialCreep(sc, it){
+    const e = it.especial || {}, dano = String(e.dano || '').trim();
+    const suma = Combatiente.sumaEspecialDe(C().statValor(sc, 'dmgesp'), e.sumaEspecial);   // para arriba (2026-10-17)
+    return {id: 'esp:' + it.id, deItem: it.id, nombre: e.nombre || it.nombre, detalle: it.detalle || '', modo: 'auto', duelo: e.duelo ? structuredClone(e.duelo) : null,
+      tiradaStat: (e.duelo && e.duelo.tira) || 'pdgmg', tiradaExtra: dano ? dano + (suma > 0 ? '+' + suma : '') : '',
+      ...(e.trampaColocar ? {trampaColocar: structuredClone(e.trampaColocar)} : {}), ...(e.caos ? {caos: structuredClone(e.caos)} : {}),   // la Varita del caos (2026-10-18)
+      nitrosCosto: costoEspecialCreep(sc, it).no2, spCosto: costoEspecialCreep(sc, it).sp, cd: 0};
+  }
+  // Cobra y arma el plan (lo mismo que ejecutarHab, con la espera y los orbes). {error} o el plan, con `hab` (la habilidad de la varita).
+  function usarEspecialCreep(sc, itemId, presets, silencioOk){
+    const it = especialesCreep(sc).find(x => x.id === itemId);
+    if(!it) return {error: `${sc.nombre}: esa arma especial ya no está en su equipo`};
+    const c = costoEspecialCreep(sc, it);
+    if(c.enEspera > 0 && !C().modoSP(sc)) return {error: `${sc.nombre}: ${it.nombre} está en cooldown ${fmt(c.enEspera)} turno${c.enEspera === 1 ? '' : 's'} (en modo cooldown, un creep paga el SP con cooldown)`};
+    const h = habDeEspecialCreep(sc, it);
+    const p = ejecutarHab(sc, h, presets, silencioOk);
+    if(p.error) return p;
+    const kEsp = claveEspCreep(it);
+    if(!C().modoSP(sc)) sc.esperaEspecial = {...(sc.esperaEspecial || {}), [kEsp]: c.espera};   // (en modo SP, pagó su SP: sin espera)   // en el creep: la varita queda igual (si la saquean, vuelve a costar SP)
+    sc.usosEspecial = {...(sc.usosEspecial || {}), [kEsp]: c.usos + 1};
+    if(c.cargas && c.cargaUsadas < c.cargas) sc.cargasEsp = {...(sc.cargasEsp || {}), [kEsp]: c.cargaUsadas + 1};   // una carga menos
+    // El báculo de sangre (2026-10-08): el % de su vida máxima en vez de SP (y sin espera).
+    const vida = num(it.especial.spVidaPct) > 0 ? Math.max(1, Math.ceil(num(sc.hpMax) * num(it.especial.spVidaPct) / 100)) : 0;
+    if(vida) sc.hp = Math.max(0, num(sc.hp) - vida);
+    const propio = it.especial.estadoPropio;   // lo que se pone quien la usa (la luz)
+    if(propio && propio.nombre) EstadosAplicar.aplicarACreep(sc, structuredClone(propio));
+    const avisos = [];
+    Combatiente.equipoPuesto(sc).filter(o => o && o.orbe).forEach(o => {
+      // El Orbe salvaje, el del custodio y el de resguardo (2026-10-18): ya no al usar la varita — el mapa (vtt-hexgrid/js/53), con el daño
+      // especial y el PdG.Esp ganado.
+    });
+    if(vida) avisos.push(`🩸 cuesta vida: −${fmt(vida)} HP (el ${fmt(num(it.especial.spVidaPct))} % de su vida máxima)`);
+    p.hab = h; p.avisosOrbe = avisos; p.espera = c.espera;
+    // ✋ La parte a mano: el texto y, si hay, su tirada ya hecha (la publica cada pantalla con acPublicar / su Mesa).
+    const am = Combatiente.aManoEspecial(it.especial);
+    if(am){
+      const r = am.tirada && typeof tirarDados === 'function' ? tirarDados(am.tirada) : null;
+      p.aMano = {texto: am.texto, tirada: r ? {origen: `${it.nombre} · ${am.etiqueta}`, r} : null};
+    }
+    return p;
+  }
+  // La habilidad de la varita para lo que sigue (terminarHab), con el «doble» del orbe salvaje si salió.
+  function habEspecialParaTerminar(sc, itemId, doble){
+    const it = especialesCreep(sc).find(x => x.id === itemId);
+    if(!it) return null;
+    const h = habDeEspecialCreep(sc, it);
+    if(doble) h.tiradaExtra = String(h.tiradaExtra || '').replace(/(\d+)d(\d+)/g, (m, n, k) => `${2 * num(n)}d${k}`);
+    return h;
+  }
+  // Lo de un creep al empezar su vuelta: ataques, armas especiales y su espera, Saque rápido, cooldowns, lo que se dispara y No2 al máximo.
+  // `mant` = el ⟳ Mantenimiento de la ronda: solo dispara (el fin cuenta), como antes. Sin él, el turno propio (P177: cuenta y dispara).
+  function inicioCreep(sc, mant){
+    sc.descargada = num(sc.ataquesTurno) > 0;   // llega cargada (2026-10-10): si disparó este turno, el próximo no es gratis
+    sc.ataquesTurno = 0;
+    sc.usosEspecial = {};   // el No2 de las armas especiales vuelve a 1 (y los orbes, a su uso por turno); también la marca del primer golpe
+    Object.keys(sc.esperaEspecial || {}).forEach(k => { sc.esperaEspecial[k] = Math.max(0, num(sc.esperaEspecial[k]) - 1); if(!sc.esperaEspecial[k]) delete sc.esperaEspecial[k]; });   // la espera de sus varitas
+    sc.saqueUsado = false;   // Saque rápido: vuelve con el turno (2026-10-05)
+    let enCooldown = 0;
+    (sc.habilidades || []).forEach(h => { if(num(h.cdActual) > 0){ h.cdActual = Math.max(0, num(h.cdActual) - 1); enCooldown++; } });
+    const ag = (sc.estados || []).find(e => e && e.activo !== false && e.aguante);   // 🛡 Aguante (2026-10-21): los golpes que contó pasan a su ataque de este turno
+    sc.aguanteListo = ag ? Math.max(0, Math.round(num(ag.golpes))) : 0;
+    const ga = (sc.estados || []).find(e => e && e.activo !== false && e.golpeAnunciado);   // 🪓 el golpe que anunció: lo descarga en este turno (vtt-hexgrid/js/63)
+    sc.golpeListo = ga ? {objetivo: ga.objetivo || '', objetivoNombre: ga.objetivoNombre || '', hab: ga.hab || ''} : null;
+    const v = Combatiente.vencerAlEmpezar(sc.estados); sc.estados = v.quedan;   // Titilando se va al empezar su turno
+    const d = mant ? Combatiente.dispararEstados(sc.estados, {hp: 'hpTurno', stacks: 'stacksTurno', resFuego: C().resElemental(sc, 'fuego')})
+      : Combatiente.empezarTurnoEstados(sc.estados, {hp: 'hpTurno', stacks: 'stacksTurno', resFuego: C().resElemental(sc, 'fuego')});
+    if(d.terminados && d.terminados.length){ sc.estados = d.quedan; if(d.terminados.some(es => C().modsAfectanHp(es.mods))) C().actualizarHpMaxPorCon(sc); }
+    const rep = Combatiente.reporteTurno([...v.eventos, ...d.eventos]);
+    const rg = Math.max(0, Math.floor(num(C().modTotal(sc, 'hpregen'))));   // Regeneración de vida del equipo (2026-10-07)
+    const rp = Math.max(0, Math.floor(num(C().regenPasivas(sc))));   // sus pasivas (2026-10-15)
+    const seca = Combatiente.sequia(sc.estados);   // 🏜 la Sequía corta la regeneración propia, de vida y de SP (2026-10-24)
+    if(seca){ if(rg + rp > 0 && num(sc.hp) > 0) rep.push(`🏜 Sequía: no recupera ${rg + rp} de vida propia`); }
+    else{
+      if(rg > 0 && num(sc.hp) > 0){ d.hp += rg; rep.push(`Regeneración de vida: +${rg} HP`); }
+      if(rp > 0 && num(sc.hp) > 0){ d.hp += rp; rep.push(`Pasivas: +${rp} HP`); }
+    }
+    const dh = Combatiente.curaQueEntra(sc.hp, d.hp, sc.estados);
+    if(d.hp > 0 && !dh) rep.push(num(sc.hp) > 0 ? `🌑 ${Combatiente.SIN_CURA_TXT}` : 'Caído: la cura de este turno no lo levanta');
+    if(dh){ const antes = num(sc.hp); sc.hp = Math.max(0, Math.min(num(sc.hpMax), antes + dh)); rep.push(`HP total: ${antes} → ${sc.hp}`); }
+    if(fenixCreep(sc)) rep.push(`🔥 Llama de Fénix: revive con ${sc.hp} HP y queda Titilando`);
+    sc.nitros = Combatiente.recargarNo2(C().nitrosMax(sc), sc.nitros, sc.estados);
+    if(C().modoSP(sc) && seca){ if(C().spActual(sc) < C().spMax(sc)) rep.push(`🏜 Sequía: no recupera SP`); }
+    else if(C().modoSP(sc)){   // 💧 recarga su SP (mínimo 1 por turno)
+      const a = C().spActual(sc), b = Math.min(C().spMax(sc), a + C().spRegen(sc));
+      if(b !== a) rep.push(`SP: ${fmt(a)} → ${fmt(b)}`);
+      sc.sp = b;
+    }
+    return {rep, enCooldown, hpAplicado: d.eventos.filter(ev => ev.tipo === 'hp').length};
+  }
+  // 🔥 Llama de Fénix (2026-10-20): un creep caído con la llama revive con toda la vida y Titilando. → true si revivió.
+  function fenixCreep(sc){
+    if(!sc || num(sc.hp) > 0) return false;
+    const q = Combatiente.revivirFenix(sc.estados, typeof estadosPresetCreep === 'function' ? estadosPresetCreep() : []);
+    if(!q) return false;
+    sc.estados = q;
+    sc.hp = Math.max(1, num(sc.hpMax));
+    return true;
+  }
+  function finCreep(sc, mant){
+    if(!mant) sc.aguanteListo = 0;   // 🛡 si no atacó en su turno, perdió el aguante
+    if(!mant) sc.golpeListo = null;   // 🪓 lo mismo con el golpe anunciado
+    const k = mant ? Combatiente.contarEstados(sc.estados, {hp: 'hpTurno', stacks: 'stacksTurno'}) : Combatiente.terminarTurnoEstados(sc.estados);
+    sc.estados = k.quedan;
+    if(k.terminados.some(es => C().modsAfectanHp(es.mods))) C().actualizarHpMaxPorCon(sc);
+    const rep = Combatiente.reporteTurno(k.eventos);
+    const calma = num(C().modTotal(sc, 'calma'));   // Calma (anillo, 2026-10-06): si no atacó en su turno, recupera No2
+    if(calma > 0 && !num(sc.ataquesTurno)){ const max = C().nitrosMax(sc), antes = num(sc.nitros); if(antes < max){ sc.nitros = Math.min(max, antes + calma); rep.push(`Calma: no atacó, +${sc.nitros - antes} No2`); } }
+    return {rep, vencidos: k.terminados.length};
+  }
+  // ⟳ Mantenimiento de la ronda (fuera de combate, o si no está en el orden de turnos). Con turno propio reciente no hace nada (lo hace su turno).
+  function mantenimiento(sc, numero){   // `numero` = el de ese Mantenimiento (sin él, se aplica siempre, como antes)
+    if(numero !== undefined && !Combatiente.estadosEnMantenimiento(sc.finTurnoEn, numero)) return {rep: [], enCooldown: 0, hpAplicado: 0, vencidos: 0, enTurno: true};
+    // Lo que se dispara va antes de recargar No2 (un Stun que vence ya no los topea): dispara, cuenta y recién ahí No2.
+    const deuda = Math.min(0, num(sc.nitros));
+    const a = inicioCreep(sc, true), b = finCreep(sc, true);
+    sc.nitros = Combatiente.recargarNo2(C().nitrosMax(sc), deuda, sc.estados);
+    return {rep: [...a.rep, ...b.rep], enCooldown: a.enCooldown, hpAplicado: a.hpAplicado, vencidos: b.vencidos};
+  }
+  // El turno propio de un creep en el orden de turnos (2026-10-06, P161). `clave` = «mapa:paso:…»; si ya se aplicó → null. `numero` = el
+  // Mantenimiento en curso (para que el ⟳ de la ronda sepa que ya lo atiende su turno).
+  function inicioTurno(sc, clave, numero){
+    if(sc.inicioTurnoClave === clave) return null;
+    sc.inicioTurnoClave = clave; sc.finTurnoEn = num(numero);
+    return inicioCreep(sc);
+  }
+  function finTurno(sc, clave, numero){
+    if(sc.finTurnoClave === clave) return null;
+    sc.finTurnoClave = clave; sc.finTurnoEn = num(numero);
+    return finCreep(sc);
+  }
+  async function reclamarMantenimiento(db, ref, objetivo, marca){
+    return db.runTransaction(async tx => {
+      const doc = await tx.get(ref);
+      const hecho = doc.exists ? Math.round(num(doc.data().aplicado)) : null;
+      if(hecho !== null && hecho >= objetivo) return 0;
+      tx.set(ref, {aplicado: objetivo, actualizado: marca()});
+      return hecho === null ? 0 : Math.min(MANT_MAX_SEGUIDOS, objetivo - hecho);
+    });
+  }
+
+  /* ↩ Una habilidad cancelada que no cuenta (P233, 2026-10-29): se le devuelve lo que pagó (`p` = el `ataque.pagoHab` del duelo). → qué se devolvió. */
+  function devolverHab(c, p){
+    if(!c || !p) return '';
+    const hechos = [];
+    if(num(p.no2) > 0){ c.nitros = num(c.nitros) + num(p.no2); hechos.push(`${fmt(num(p.no2))} No2`); }
+    if(num(p.sp) > 0){ c.sp = Math.min(C().spMax(c), C().spActual(c) + num(p.sp)); hechos.push(`${fmt(num(p.sp))} SP`); }
+    if(num(p.hp) > 0){ c.hp = num(c.hp) + num(p.hp); hechos.push(`${fmt(num(p.hp))} de vida`); }
+    const h = (c.habilidades || []).find(x => x && x.id === p.habId);
+    if(h && num(p.cd) >= 0 && num(h.cdActual) !== num(p.cd)){ h.cdActual = num(p.cd); hechos.push('el cooldown'); }
+    return hechos.join(', ');
+  }
+  return {devolverHab, confirmarSP,fenixCreep, bloqueoFirmeCreep, ESPERA_POR_SP, especialesCreep, costoEspecialCreep, habDeEspecialCreep, usarEspecialCreep, habEspecialParaTerminar, mantenimiento, inicioTurno, finTurno, reclamarMantenimiento, alCinturon, quitarDelCinturon, consumir, faltanNitrosConsumir, costoConsumir, colocarTrampaDeItem, consumiblesDe,
+    tirada, usaUnaTirada, gastarUnaTirada, tiradaStat, esquivar, parry, fuerzaGolpe, bloqueo, dano, levantarse, tiradaSoltarse, aplicarSoltarse, pagarParry, pagarAtaque, tiradaAtaque, NOMBRE_ESPECIAL,
+    costoAtaqueDe, devolverAtaque, faltanNitros, preguntaSinNitros, alertaSinNitros,
+    FLAGS_ESTADO, habEtq, habEjecucion, ataqueDeHab, habTira, efectoDeHab, sobreSi, confirmarSilencio, preguntaVida, ejecutarHab, terminarHab, tiradaPrimeraHab, tiradaSegundaHab,
+    zonaDeHab, cdMod};
+})();

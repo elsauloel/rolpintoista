@@ -1,0 +1,401 @@
+# Workflow de Firebase
+
+Base del sistema nuevo de Rol Pintoísta (mapa, tokens, tiradas en vivo).
+Convive con [`workflow-github.md`](workflow-github.md): GitHub sigue
+distribuyendo el código de las herramientas; Firebase guarda lo que tiene
+que verse en vivo entre jugadores.
+
+## Proyecto
+
+- Proyecto Firebase: `rol-pintoista`, plan Spark (gratis, sin tarjeta).
+- Authentication: proveedores **Google** y **Correo electrónico/contraseña**
+  (con confirmación del email por link). Solo se usan desde el sitio web
+  (GitHub Pages): no funcionan abriendo los HTML con doble clic. El
+  proveedor Anónimo ya no se usa (se puede desactivar).
+- **Dominios autorizados** (Authentication → Configuración → Dominios
+  autorizados): además de los que vienen (`localhost`, los de Firebase),
+  `elsauloel.github.io` para el sitio de GitHub Pages.
+- Firestore: reglas versionadas en [`../firebase/firestore.rules`](../firebase/firestore.rules).
+  Para aplicarlas: consola → Firestore Database → Reglas → pegar todo →
+  Publicar. El archivo del repo y la consola tienen que quedar iguales.
+- SDK: versión *compat* cargada por `<script>` desde
+  `https://www.gstatic.com/firebasejs/12.3.0/…`, sin build step.
+- **Sesión compartida**: [`../comun/sesion.js`](../comun/sesion.js) tiene la
+  configuración, la cuenta y la partida actual (`FB_CAMPANA`, `fbUsuario`,
+  `fbMiembro`, `fbPartida`, `fbEntrarAPartida()`). Lo cargan `index.html` y
+  las herramientas; ya no hay un bloque copiado en cada una.
+
+## Cómo se entra
+
+1. `index.html`: iniciar sesión con Google, o con email y contraseña (al
+   crear la cuenta llega un mail con el link de confirmación; sin
+   confirmar no se ve nada).
+2. Lista de partidas: todas las del sitio (grupo cerrado de amigos). Se
+   entra a una donde ya estás, te unís a otra eligiendo tu nombre en esa
+   partida, o creás una nueva (quedás como su GM).
+   **Menú del sitio** ([`../comun/menu-sitio.js`](../comun/menu-sitio.js)): botón ☰ fijo arriba a
+   la izquierda en el inicio y en todas las herramientas. Abre las ramas del
+   sitio: Partidas (y las tuyas), la partida abierta con Mapa, personajes
+   (propios y de los demás; el GM, GM Tools y Generador de tiendas),
+   Manual y Cerrar sesión. Lee partidas y fichas al abrirse (caché 1 min);
+   no aparece en los iframes del mapa.
+   Arriba, "✎ Mi nombre" permite cambiar el nombre en cada partida donde
+   estás (y, si sos el GM, también el `gmNombre` de la partida).
+   Al pie de la página de la partida:
+   - **GM, "⚙ Partida"**: jugadores con sus personajes y botón Sacar
+     (borra su `miembros/{uid}`; puede volver a unirse); "Pasar un
+     personaje a otro jugador" (cambia `duenoUid` de la ficha y de sus
+     tokens de PJ, incluidas las invocaciones `<fichaId>~…`; los personajes
+     de quien se fue aparecen "sin jugador") con un botón **Borrar** al
+     lado de cada uno; renombrar; y borrar la partida (ofrece bajar el
+     respaldo y pide escribir el nombre). Borrar recorre cada colección
+     (fichas/partes, creeps/privado, tokens, tiradas, mapa, gm, tienda,
+     tiendas, miembros) y al final borra la partida y el miembro del GM.
+     Si se corta, se vuelve a tocar.
+   - **Jugador, "Irme de esta partida"**: borra su miembro; sus personajes
+     quedan a nombre de su cuenta.
+   - **Borrar un personaje puntual** (`borrarPersonajeGM`, misma lógica
+     duplicada en `index.html`, `gm-toolset/gm-tools.html` y
+     `vtt-hexgrid/mapa.html`): confirmar + escribir el nombre exacto, borra
+     `fichas/{id}` con sus `partes` y los tokens que la usan (el propio y
+     los de sus invocaciones `<fichaId>~…`). El GM lo tiene en "⚙ Partida"
+     (junto al selector de "Pasar un personaje") y en el desplegable
+     "👥 Personajes" del mapa y de gm-tools (botón ✕ junto a cada uno, solo
+     visible para el GM). El jugador sigue teniendo su propio "Borrar
+     personaje" (✕ en "👥 Personajes" de la ficha), pero solo sobre los
+     suyos — ver [`../ficha-personaje/CLAUDE.md`](../ficha-personaje/CLAUDE.md).
+3. Página de la partida: links a las herramientas con `?partida=<id>`
+   (GM Tools y el generador de tiendas solo para el GM; la ficha para
+   jugadores, y para el GM en solo lectura).
+4. Cada herramienta, sin sesión confirmada, sin partida o sin ser miembro,
+   vuelve sola al inicio. El botón ⌂ vuelve a la partida.
+
+## Estructura de datos
+
+Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
+
+- `campanas/{id}` — `{nombre, gmUid, gmNombre, creado}`. Una partida. La ve
+  cualquier cuenta confirmada; la crea cualquiera (en el mismo lote que su
+  miembro con `gm: true`); solo el GM la renombra o la borra. Las que no
+  tienen `gmUid` (anteriores a las cuentas) no aparecen en el inicio.
+- `campanas/{id}/traspaso/actual` — `{aUid, aNombre, deUid, deNombre, creado}`.
+  Oferta para pasarle el rol de GM a otro jugador: la crea el GM desde el
+  inicio de la partida (index.html, Jugadores → "Asignar como GM"; es la única
+  ruta). El jugador la ve al entrar y, si acepta, **en una sola operación**
+  cambia `campanas.gmUid/gmNombre`, su `miembros.gm` a true, el del GM
+  anterior a false, y se borra la oferta (las reglas lo permiten solo así).
+  Si rechaza, o el GM cancela, se borra. Una sola oferta a la vez.
+- `campanas/{id}/miembros/{uid}` — `{nombre, gm, creado}`. Uno por cuenta en
+  cada partida; `nombre` es el apodo elegido al unirse. `gm: true` solo lo
+  puede tener quien creó la partida; nadie cambia `gm` después. Cada uno
+  cambia su nombre o se va; el GM puede sacar a alguien.
+- `campanas/{id}/historial/{auto}` — `{uid, jugador, quien, tipo: 'vital'|'mant', texto, campo?, delta?, cuando}`
+  (2026-09-24). El "📜 Historial" del GM ([`../comun/historial.js`](../comun/historial.js)): cambios de HP y SP,
+  estados que aparecen o se terminan, y el reporte del Mantenimiento de los creeps. **Solo el GM lo lee, lo escribe
+  y lo borra**: lo escribe la página del GM mirando los datos (el `resumen` público de cada ficha y los creeps que le
+  pasan gm-tools y el mapa), así queda anotado venga de donde venga el cambio y los jugadores no escriben nada. Se
+  borra solo lo de más de 48 h. Si no hay ninguna página del GM abierta, no se anota nada. Ver `comun/historial.js`.
+- `campanas/{id}/tiradas/{auto}` — `{uid, jugador, quien, origen, formula,
+  rolls[], mod, total, desde: 'ficha'|'gm', cuando, estilo?}`. `estilo` (opcional, texto JSON ≤300) es el estilo de dados 3D de quien tiró (color, número, borde, textura, material): los demás animan esa tirada con su color. Una por tirada. La
+  publica `registrarTirada()` (ficha.html y gm-tools.html, vía
+  `mesaPublicar()`) y la cajita "Mesa" escucha las últimas 30. Nadie las
+  edita; el GM puede borrarlas. `quien` es el personaje (ficha) o el creep
+  (gm-tools lo separa del origen "<creep> · <qué tiró>"); la Mesa lo muestra
+  en color con `(jugador)` al lado, y la última tirada con fondo verde. La Mesa vive en
+  [`../comun/mesa.js`](../comun/mesa.js) (publicar, dibujar, escuchar y la
+  cajita flotante) y las fórmulas de dados en [`../comun/tiradas.js`](../comun/tiradas.js);
+  cada herramienta solo define `MESA_DESDE` y `mesaQuien(origen)`.
+  El mapa (`vtt-hexgrid/mapa.html`) muestra la misma Mesa y publica
+  tiradas libres con `desde: 'mapa'`. Ejecutar una habilidad publica su
+  descripción: si tira dados va en la misma tirada (campo `texto`), y si no
+  tira va en su propia línea con `desde: 'habilidad'` (⚡, sin números).
+  **Historial solo de la sesión** ([`../comun/mesa-historial.js`](../comun/mesa-historial.js),
+  en las tres herramientas): el GM ve 🗑 en la cabecera de la Mesa, que
+  borra todas las tiradas de la partida; y cada vez que el GM entra a
+  cualquiera de las tres se borran solas las de más de 48 h (como mucho
+  una vez por hora por navegador). Para guardar una sesión, bajar antes el
+  respaldo 💾.
+  **Grilla de dados** ([`../comun/grilla-dados.js`](../comun/grilla-dados.js)):
+  botón 🎲 Dados (al pie de la Mesa flotante; en el mapa, en la barra de
+  arriba) que despliega D4…D100 × 1–6; cada clic es una "Tirada libre"
+  común (no escribe nada distinto).
+- `campanas/{id}/fichas/{auto}` — `{duenoUid, nombre, resumen: {nivel, hp,
+  hpMax, sp, spMax, nitros, nitrosMax, costoMover (0 = no puede moverse), muerto, estados[{nombre, turnos, permanente, detalle,
+  polaridad}], invocaciones[{id, nombre, hp, hpMax, nitros, nitrosMax,
+  activa, miniatura, estados[{nombre, turnos, permanente, detalle,
+  polaridad}]}]}, miniatura, creado, actualizado}`. Una invocación tiene
+  las mismas funciones que un creep de gm-tools (No2, arma, habilidades
+  paso a paso, estados) pero la maneja su dueño — ver
+  [`../ficha-personaje/CLAUDE.md`](../ficha-personaje/CLAUDE.md). Las fichas guardadas antes de la
+  Iteración 2 publican `bonos`/`bonosMax` hasta que se vuelven a abrir (el
+  mapa y gm-tools leen los dos). Una por personaje
+  (`ficha-personaje/ficha.html`, bloque "FICHA EN VIVO"). El contenido va
+  en `fichas/{id}/partes/{parte}` — `{json, actualizado}`, con `parte` en
+  `general`, `notas`, `inventario`, `cinturon`, `habilidades`, `efectos`,
+  `invocaciones`, `imgInvocaciones` (imagen de cada invocación, por id), `otros`, `catalogo` (solo ítems propios que no están en
+  el catálogo compartido) y `retrato` (`{imagen, miniatura}`: la foto
+  completa de la cabecera y, si el jugador ya eligió con zoom qué parte
+  se ve, la miniatura recortada a mano con `comun/recorte-imagen.js` —
+  ver `ficha-personaje/CLAUDE.md`). Cada parte es el JSON de esas claves
+  de `S`; las imágenes embebidas de ítems, habilidades, etc. se guardan
+  vacías a propósito. `miniatura` (documento principal, no la parte) es
+  el retrato a 96px para el token del mapa: la elegida a mano si existe,
+  si no el centro del retrato recortado automático como antes. Todos los
+  miembros leen todo; el dueño escribe y **también el GM** (desde 2026-09-19, para ayudar a un jugador: botón "✎ Editar como GM" en la ficha, que por defecto la abre en solo lectura). Son fichas de jugadores: el GM no las crea (lo suyo va en gm-tools); además puede cambiar `duenoUid` y borrarlas con sus partes (para "Borrar la partida"). La ficha
+  escribe cada parte cuando deja de cambiar ~1,2 s (o cada 5 s si no para).
+- `biblioteca_creeps/{id}` y `propuestas_creeps/{id}` (**fuera de las
+  campañas**, sirven para cualquier partida; `biblioteca_skills`, `biblioteca_pasivas`, `biblioteca_trampas` y
+  `propuestas_skills`/`propuestas_pasivas`; pasivas ya se usan desde la ficha) —
+  `{nombre, etiquetas[], descripcion, nivel, json, autorUid, autorNombre,
+  creado}`, solo texto (el creep sin imagen, con la vida llena). La oficial
+  la lee cualquier cuenta confirmada y **solo el dueño del proyecto**
+  (`rolpintoista@gmail.com`, por el email del token) la escribe. Las
+  propuestas las crea cualquier GM con "📚 Biblioteca" en su creep; solo las
+  ve su autor y el dueño, que las aprueba (pasan a la oficial), las trae a su
+  mesa para ajustarlas o las rechaza. Lo maneja `comun/biblioteca.js`;
+  "+ Creep" de gm-tools abre la ventana (crear de cero o elegir, con buscador
+  y etiquetas que se combinan). Que solo los GM la vean es visual.
+  **Desde el 2026-09-29 (subida unificada, `docs/plan-subida-unificada.md` paso 1)**: lo que sube cualquier cuenta
+  confirmada va **directo** a `biblioteca_<tipo>` con `auditado: false` (disponible al instante para todos; el dueño
+  lo marca auditado), y cualquiera puede corregir una entrada (`version` + 1, `editorUid`/`editorNombre`/`actualizado`,
+  vuelve a sin auditar). Una corrección de un elemento de fábrica (`base-…`) es una entrada nueva con `reemplaza`.
+  Campos nuevos opcionales: `auditado, version, reemplaza, editorUid, editorNombre, actualizado` (sin `auditado` =
+  auditado). Tipos nuevos en las reglas: `estados` e `items`. `propuestas_*` queda para lo mandado con el camino
+  viejo y como respaldo si las reglas nuevas no están publicadas. **Reglas nuevas: hay que pegarlas.**
+- `campanas/{id}/creeps/{creepId}` — `{nombre, orden, color, mapa, resumen: {hpPct,
+  muerto, estados[]}, armaNombre, armaNatural, equipoNombres[], notas, miniatura, tarjeta, firma, actualizado}`.
+  `armaNombre`/`armaNatural`/`equipoNombres`/`notas` (2026-10-09): lo que muestra la 🪪 tarjeta del creep en el mapa —
+  solo nombres, sin defensa ni bonos (`CreepCalculo.tarjetaPublica`; lo escriben GM Tools y `modificarCreep` del mapa). `mapa` (2026-10-02): el id del mapa
+  donde está el creep, '' = la Reserva (`comun/creeps-mapas.js`; reemplaza a `grupo` y a `gm/gruposMapas`, que se borran al convertir). De la vida solo se
+  publica el porcentaje (`hpPct`, 0–100): los jugadores ven la barra sin
+  números. Lo público de
+  cada creep de `gm-toolset/gm-tools.html` (bloque "CREEPS EN VIVO"); lo
+  leen todos. El creep completo va en `creeps/{id}/privado/ficha` (`{json}`,
+  sin imagen) y su imagen en `creeps/{id}/privado/imagen` (`{dato}`): eso
+  solo lo lee el GM. `firma` es un hash del contenido para que otra pestaña
+  del GM note el cambio. Solo el GM escribe. Los "personajes del GM" (PNJ
+  aliados, comerciantes…) también son creeps.
+- `campanas/{id}/bitacora/{página}` — `{nombre, creado, creadoUid, creadoPor}` y
+  `bitacora/{página}/entradas/{auto}` — `{texto, uid, autor, creado, editado?,
+  editadoUid?, editadoPor?}`. Bitácora compartida de la partida (la ficha).
+  Todos leen, suman páginas y entradas, y corrigen cualquier entrada; borra
+  el autor (o quien creó la página) o el GM. Va en el respaldo y se borra con
+  la partida.
+- `campanas/{id}/gmBitacora/{página}` y `gmBitacora/{página}/entradas/{auto}` —
+  mismo formato que `bitacora`, pero **privada del GM** (solo el GM lee y
+  escribe). La usa el botón 📖 Bitácora GM de `gm-tools.html`. Va en el
+  respaldo (solo si lo baja el GM, como `bitacoraGM`) y se borra con la partida.
+- `campanas/{id}/gm/estado` — `{turno, actualizado}`. Contador de turno de
+  gm-tools. Solo el GM.
+- `campanas/{id}/tienda/borrador` y `campanas/{id}/tienda/publicada` —
+  `{json, actualizado}`. La tienda del vendedor de
+  `gm-toolset/vendor-generator.html`. `json` es la tienda (`{nombre, tamano,
+  tamanoLabel, categoria, categoriaLabel, generado, ajustePrecio,
+  garantizados[], items[], itemsDatos[]}`); `itemsDatos` son los ítems
+  completos sin imagen, para que la ficha muestre y venda también los
+  creados a mano por el GM. `borrador` es la que el GM está armando: se
+  guarda sola ~1,2 s después de cada cambio y solo la ve el GM.
+  `publicada` cambia solo con "Publicar tienda" (o se borra con "Cerrar
+  tienda"); la leen todos y la abre el botón 🏪 Vendedor de la ficha, que
+  además escucha los cambios mientras el jugador está en la tienda. Solo el
+  GM escribe. El json puede traer `guardadaId`: de qué tienda guardada salió.
+  **Abierta/cerrada (2026-09-20):** `publicada` lleva además `abierta` (bool, fuera del `json`): el GM la abre y cierra con un interruptor (no hace falta republicar) y la ficha escucha siempre ese doc: cerrada, el botón 🏪 queda desactivado ("Tienda cerrada"). Publicar conserva el estado (una tienda nueva arranca cerrada). El json suma `ajusteVenta` (%: lo que cobran los jugadores al vender ítems y despojos); `ajustePrecio` sigue siendo lo que pagan al comprar. No hizo falta cambiar las reglas.
+- `campanas/{id}/tiendas/{auto}` — `{nombre, json, actualizado}`. Tiendas
+  guardadas con nombre, una por lugar o vendedor al que se vuelve (ej. el
+  pueblito Zapallo); `json` con la misma forma que `tienda/*`. Se guardan a
+  mano ("💾 Guardar tienda" / "Guardar cambios"), se abren tal cual y se
+  pueden modificar o regenerar. Solo el GM las ve y escribe.
+- `campanas/{id}/mapa/fondo` — `{x, y, ancho, actualizado}`: posición y ancho
+  del fondo del mapa, en unidades del mapa. `campanas/{id}/mapa/fondoImagen`
+  — `{dato, actualizado}`: la imagen (data URL achicada a < 900 KB). Van
+  separadas para que acomodar el fondo no haga descargar la imagen a
+  todos. Los fondos cargados antes tenían `dato` dentro de `mapa/fondo`: se
+  siguen leyendo y se limpian al cargar otra imagen.
+- `campanas/{id}/mapa/modo` — `{modo: 'narrativo'|'combate'}`. Lo cambia el
+  GM. Todos los `mapa/*` los ven todos y solo los escribe el GM.
+- `campanas/{id}/tokens/{auto}` — `{nombre, color: '#rrggbb', tipo:
+  'pj'|'creep', duenoUid, col, fila, creado, fichaId?, ruta?}`. `ruta` es el
+  recorrido del último movimiento, `[col, fila, col, fila…]` (hasta 100
+  casillas): los demás lo ven como estela unos segundos. `fichaId` vincula
+  el token a una ficha (pj), a una invocación de una ficha
+  (`<fichaId>~<idInvocación>`, tipo pj) o a un creep: el mapa toma de ahí nombre,
+  miniatura, barras (vida roja; SP azul, solo PJ) y estados. Tokens del mapa de
+  hexágonos. Un PJ lo crea, mueve, edita y saca solo su dueño; los creeps,
+  solo el GM. El GM además puede cambiar el `duenoUid` de un PJ (y nada más
+  de ese token) y sacar cualquier token. Mover = un `update` de `col`/`fila`
+  (+ `ruta`) al soltar. Un PJ vinculado a su ficha gasta Nitros: el mapa pide
+  confirmar y descuenta `nitros` en `partes/general` + `resumen.nitros` en
+  una transacción.
+- `campanas/{id}/mapa/usos` — `{ids: {mapaId: fecha}}` (2026-10-31): cuándo se usó por última vez cada mapa (se anota al publicar: el que
+  entra y el que sale). Lo escribe el GM; ordena la lista de 🗺 Mapas.
+- `campanas/{id}/mapa/activo` — `{mapaId, actualizado}`: cuál de los mapas
+  guardados ven los jugadores ahora mismo. Ausente = el de siempre
+  (`MAPA_PRINCIPAL`, ver abajo). Todos lo ven, solo el GM lo cambia
+  ("Publicar" en el panel "🗺 Mapas").
+- `campanas/{id}/mapas/{mapaId}` — `{nombre, creado}`: metadatos de cada
+  mapa guardado además del de siempre. El GM los crea, renombra y borra
+  desde "🗺 Mapas" en `vtt-hexgrid/mapa.html`. El mapa de siempre (el único
+  que había antes de esto) sigue viviendo tal cual en `mapa/*` y
+  `tokens/*` de más arriba, con el id especial `MAPA_PRINCIPAL`
+  (`'_principal'`) — no se movió ni un dato para agregar esta función; su
+  entrada en `mapas/{id}` es solo metadato (nombre), para poder
+  renombrarlo igual que a los demás. Cada mapa nuevo tiene, un nivel
+  adentro:
+  - `mapas/{mapaId}/estado/{fondo|fondoImagen|modo|iniciativa}` — mismo
+    esquema que `mapa/*`.
+  - `mapas/{mapaId}/tokens/{auto}` — mismo esquema que `tokens/{auto}`.
+  - `mapas/{mapaId}/trazos/{auto}` — mismo esquema que `trazos/{auto}`.
+  - `mapas/{mapaId}/elementos/{auto}` — mismo esquema que
+    `elementos/{auto}`.
+  El GM puede estar mirando (y armando) un mapa distinto del que está
+  publicado; los jugadores siempre ven el publicado. Borrar un mapa borra
+  sus `estado/*`, `tokens/*`, `trazos/*`, `elementos/*` y `pings/*`
+  primero (Firestore no lo hace solo) y, si era el publicado o el que el
+  GM estaba mirando, vuelve al principal.
+- `campanas/{id}/pings/{auto}` — `{x, y, duenoUid, creado}`. El ping del
+  mapa (clic derecho, caja de herramientas): siempre efímero (`PING_MS`
+  1,8 s), nadie lo edita, cualquiera lo borra — el que lo ve programa su
+  propio borrado, igual que un trazo no permanente.
+- `campanas/{id}/trazos/{auto}` — `{puntos: [x1,y1,x2,y2,…] (ya suavizado
+  y simplificado, relativos a origen), origen: {x,y}, rotacion, color,
+  grosor, permanente, duenoUid, creado}`. El lápiz del mapa
+  (`vtt-hexgrid/mapa.html`, caja de herramientas ✏️). Cualquiera dibuja el
+  suyo. `permanente: false` (default): se ve `ESTELA_MS` (4 s) y se borra
+  sola — cualquiera puede borrar uno así, no solo su dueño, para que no
+  quede huérfano si el que lo dibujó se desconectó. `permanente: true`:
+  queda como un objeto que se mueve (`origen`) y se rota (`rotacion`,
+  libre, no a los 60°) — eso, y borrarlo del todo, solo su dueño o el GM.
+- `campanas/{id}/elementos/{auto}` — `{tipo:'flor'|'linea'|'libre',
+  origen:{col,fila}, celdas:[dq1,dr1,…] (offsets en cubo desde origen,
+  sin rotar; hasta 6000 números = 3000 casilleros — antes 200, se subió
+  2026-09-19 para que el tamaño se pueda pedir bien grande), rotacion
+  (0/60/…/300), color, alfa (0-100), solido, invisible (opcional,
+  default false), imagen (textura de fondo, opcional, string vacío si no
+  tiene), imgZoom/imgDX/imgDY (cómo se acomoda esa textura dentro de la
+  forma — 1/0/0 si no se tocó), fijado, duenoUid, creado}`. Terreno y
+  Formas del mapa (caja de herramientas ☣️/⬡), atados a la grilla
+  hexagonal a diferencia del lápiz. Cualquiera crea el suyo; después, su
+  dueño o el GM lo mueven (`origen`), rotan (`rotacion`, a los 60°, como
+  un token), pinean/despinean (`fijado`) o **editan** (`color`, `alfa`,
+  `imagen` y su acomodo — panel ⚙️, ver `vtt-hexgrid/CLAUDE.md`) — o lo
+  borran del todo. `tipo`/`celdas`/`solido` no se editan, para eso se
+  borra y se crea uno nuevo. Terreno (`solido: false`) son marcas
+  transitables (color o
+  imagen de fondo + transparencia, sin efecto mecánico todavía). Formas
+  (`solido: true`) bloquean ese casillero y cualquier trayectoria que lo
+  cruce (`elementoSolidoEn`, "avisa y bloquea": no hay rodeo automático,
+  solo se frena el arrastre) — colisión solo contra Formas por ahora, la
+  de token-contra-token según bando queda pendiente (ver
+  `vtt-hexgrid/CLAUDE.md`, sección "Pendiente"). `invisible: true` (solo
+  el GM lo puede prender o apagar, al crear o después desde ⚙️, con o sin
+  Sólido; las reglas lo exigen) hace que solo el GM y el creador vean el
+  contorno; el resto no lo ve pero igual colisiona si es sólido. Con
+  `alfa` 0 el GM y el creador también siguen viendo el contorno. `fijado: true`
+  (pineado): no se puede mover ni rotar, se comporta como el terreno de
+  abajo (clickear y arrastrar mueve el mapa, no el elemento) — sigue
+  siendo del dueño o el GM despinearlo. `niebla: true` (2026-10-05,
+  Varita de niebla): tapa la vista — a los rivales de adentro no se los ve
+  ni se los elige como objetivo desde afuera (salvo Marcados); lo dibuja y
+  lo aplica el mapa (`nieblaSet`/`tapadoPorNiebla`, js/02).
+
+`campanas/piratas-en-el-espacio` es el espacio de pruebas de antes de las
+cuentas (identidades anónimas, sin `gmUid`): no aparece en el inicio y se
+puede borrar desde la consola.
+
+## Mantenimiento del GM
+
+El GM pasa la ronda para toda la mesa con "⟳ Pasar de ronda" en el mapa o en gm-tools
+(los dos se esconden en combate con orden de iniciativa, donde la ronda pasa sola con los turnos). Eso sube
+`campanas/{id}/mapa/mantenimiento` = `{numero, cuando}`. El GM no puede
+escribir las fichas, así que cada una aplica su propio `mantenimiento()`
+(la lógica de siempre) una vez por número que le falte, hasta 10 seguidos:
+- **Ficha**: `fichas/{id}/partes/mantenimiento` = `{json: número aplicado}`,
+  tomado en una transacción (si hay varias pestañas, aplica una sola).
+  Una ficha sin ese documento arranca desde el número actual.
+- **Creeps**: `gm/mantenimiento` = `{aplicado}`, igual, desde gm-tools.
+- Para que se note enseguida aunque la ficha o gm-tools estén cerradas,
+  el mapa de cada jugador corre sus fichas en un iframe oculto
+  (`ficha.html?modo=mantenimiento#id`, uno por vez) y el del GM corre
+  `gm-tools.html?modo=mantenimiento`. Avisan `mantenimiento-listo` por
+  `postMessage` cuando guardaron. Si nadie las abre, se ponen al día al
+  abrirse. La ficha ya no tiene botón de Mantenimiento. Estos iframes (y
+  los de Botonera y Acciones) cargan siempre con `sinCache()`: el sitio
+  publicado cachea cada archivo hasta 10 minutos, y sin esto un iframe
+  podía quedar con la ficha o gm-tools de antes de la última actualización
+  mientras dura la sesión.
+
+## Respaldo de la partida
+
+Firebase gratis no hace copias de seguridad. Cualquiera baja un respaldo:
+el jugador con el botón 💾 de la ficha (arriba, junto a 🗺 Mapa) y el GM
+con "💾 Respaldo partida" en gm-tools. El código está en
+[`../comun/respaldo.js`](../comun/respaldo.js). Baja
+`respaldo-<partida>-<fecha>.json` con `{tipo: 'respaldo-partida', version,
+creado, hechoPor{nombre, gm}, partida, miembros, fichas[{id, nombre,
+duenoUid, dueno, ficha}], creepsPublicos, tokens, mapa, tiradas,
+tienda{publicada}}` y, solo si lo baja el GM, `gmCreeps{turno, creeps}` y
+`tienda.borrador` y `tienda.guardadas[{id, nombre, tienda}]` (los jugadores
+no pueden leer los creeps completos, el borrador ni las tiendas guardadas). Fechas en texto ISO. `ficha` tiene la forma de
+"Guardar copia" de la ficha (con retrato e imágenes de invocaciones) y
+`gmCreeps` la de `gm-creeps.json`. Para recuperar: en la ficha, "Cargar
+archivo" con el respaldo pregunta qué personaje cargar; en gm-tools,
+"Cargar archivo" toma los creeps (solo de un respaldo del GM). Tokens,
+mapa y tiradas quedan en el archivo pero todavía no tienen botón para
+restaurarlos.
+
+## Tareas de mantenimiento (en la consola)
+
+- **Activar los métodos de acceso**: Authentication → Método de acceso →
+  Google (elegir el email de soporte) y Correo electrónico/contraseña
+  (solo la primera opción, no "vínculo de correo electrónico").
+- **Dominios autorizados**: Authentication → Configuración → Dominios
+  autorizados → `elsauloel.github.io`.
+- **Sacar a alguien o borrar una partida**: desde "⚙ Partida" en la página
+  de la partida (ver arriba). Por consola sigue funcionando: borrar su
+  documento en `campanas/{id}/miembros`, o "Eliminar documento" sobre la
+  partida marcando también las subcolecciones.
+
+## Cómo probar
+
+Dos perfiles de Chrome (o una ventana normal y una de incógnito) con
+cuentas distintas: uno crea la partida (GM) y el otro se une (jugador).
+
+`campanas/{id}/mapa/niebla` (o `campanas/{id}/mapas/{mapaId}/estado/niebla`)
+— niebla de guerra del mapa: `{activa: bool, descubiertas: [números],
+actualizado}`. Cada número empaqueta una casilla (`(col + 100000) * 200001 +
+(fila + 100000)`); son las casillas que el grupo ya descubrió. El GM
+escribe todo (prender/apagar, reiniciar, destapar o tapar a mano); cualquier
+miembro puede sumar casillas mientras mueve su personaje (las reglas solo le
+dejan tocar `descubiertas`). Tope de 30000 casillas en las reglas (Firestore
+indexa cada elemento del arreglo: pasado de ~40000 falla). El campo de visión
+y la última posición vista se calculan en cada navegador y no se guardan.
+
+- **Trampas** (2026-09-20): los `elementos` del mapa (`campanas/{id}/elementos` y
+  `mapas/{mapaId}/elementos`) pueden llevar `trampa` (bool), `trampaNombre` (≤40),
+  `trampaDetalle` (≤200) y `disparada` (bool). Las crea y edita su dueño o el GM; un
+  rival que la pisa puede cambiar **solo** `disparada` a `true`. Hay que publicar
+  las reglas nuevas.
+
+
+### Colisión del mapa (`elementos`, 2026-09-24)
+`campanas/{id}/elementos` (y `mapas/{id}/elementos`) aceptan el campo opcional `colision: bool`; solo el GM lo puede crear en `true`. Son formas libres sólidas y fijadas; el mapa las fusiona al pintarlas y dibuja un único contorno visible para todos. Ver `vtt-hexgrid/CLAUDE.md`, "Colisión del mapa".
+
+## Pasar cosas y el baúl común (2026-10-05, P157; reemplaza a la mesa común)
+- `campanas/{id}/paquetes/{docId}` — un personaje le ofrece a otro: `{tipo: 'item'|'dde'|'despojos', nombre, json (el ítem), itemId, cantidad, despojo, despojoNombre, deFicha, deNombre, paraFicha, paraNombre, uids: [quien lo creó, dueño de deFicha, dueño de paraFicha], creadoPor, estado: 'pendiente'|'aceptado'|'rechazado', resolvio, creado}`. Lo leen los de `uids` y el GM; quien recibe lo marca aceptado (y se lo suma) o rechazado; la pantalla que maneja a quien lo ofreció lo borra (transacción) y saca el ítem reservado (`reservado: docId` en el ítem) o lo libera.
+- `campanas/{id}/baul/{docId}` — un ítem por documento `{tipo: 'item', nombre, json, ranuras, puso, pusoNombre, creado}`; el oro en `baul/dde` y los despojos en `baul/desp-<tipo>` (`{tipo, cantidad, despojo, despojoNombre}`). Cualquier miembro guarda y saca.
+- `campanas/{id}/ajustes/pausa` — ⏸ la pausa de la partida (2026-10-10, `comun/pausa.js`): `{pausada, desde, gmNombre, actualizado}`. La
+  escribe el GM; la leen todos (el cartel y, en el mapa de un jugador, la capa que no deja tocar).
+- `campanas/{id}/pausaLog/{docId}` — el registro de la pausa: `{quien, jugador, personaje, texto, cuando}`, una línea por cambio importante
+  en una ficha mientras la partida está pausada. La crea el propio jugador; la lee y la borra el GM al reanudar.
+- `campanas/{id}/baulLog/{docId}` — el registro: `{accion: 'metio'|'saco', que, quien, jugador, personaje, cuando}`. Se crea, no se cambia; lo borra el GM.
+- `campanas/{id}/mesaComun` (retirada): solo lectura y borrado, para devolver lo viejo.
+- Código: `comun/intercambio.js` (la ficha: `intercambioHost` en `js/08`; el mapa: `intercambioHostMapa` en `js/11`). **Hay que volver a pegar `firebase/firestore.rules`.**
+
+- **Botín del combate y ✊ piedra, papel o tijera** (2026-10-08): `campanas/{id}/botin/{auto}` = un ítem del botín (lo crea el GM al publicar
+  el fin del combate): `{nombre, json (la plantilla), precioCompra, despojos, origen, tomadoPor, tomadoNombre, tomadoFicha, disputa}`. Un
+  jugador **reclama** lo libre (su uid en `tomadoPor`, el personaje en `tomadoFicha`) o **suelta** lo suyo; **disputa** lo de otro creando un
+  juego en `ppt` y anotándolo en `disputa` (en la misma transacción); quien juega lo cierra y el ítem queda a nombre del ganador. Al cerrar el
+  botín, el GM manda lo reclamado en la recompensa de cada personaje (`recompensas/{auto}.items` = las plantillas) y su ficha lo suma a la
+  mochila. `campanas/{id}/ppt/{auto}` = un juego: `{a, b: {uid, nombre, ficha}, uids, motivo: {tipo: 'libre', texto} | {tipo: 'botin', botinId,
+  item}, jugadas: {a, b}, ronda, estado: 'jugando' | 'terminado' | 'cancelado', ganador, rendido, ultima: {ronda, a, b, res}, creado,
+  actualizado}`; lo ven todos, lo empieza uno de los dos, lo juegan los dos, el GM lo puede cortar y borra los de más de un día.

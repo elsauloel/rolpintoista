@@ -1,0 +1,382 @@
+/* =========================================================
+   FICHA-MANTENIMIENTO — el ⟳ Mantenimiento de un personaje (y de sus invocaciones), fuera de la ficha (2026-10-02, hoja de ruta
+   A2 de docs/pendientes.md: que el mapa lo haga sin cargar la ficha escondida)
+   Lo que antes era mantenimiento() de ficha-personaje/js/11 y la transacción de mantenimientoRevisar (js/14), copiado tal cual:
+   - aplicar(S, ui): un pase de turno sobre el personaje `S` — SP Regen al principio, los estados (Combatiente.pasarTurnoEstados),
+     la regeneración de las pasivas, la vida (por ui.fijarHp, para que el Ankh se active antes de contar los turnos de muerte), los
+     turnos de Inconsciente, No2 a full, ataques del turno a 0 y las invocaciones (No2, cooldowns, estados, se duermen al llegar su
+     cooldown a 0). Deja S.turno + 1 y S.log (HTML, lo que muestra la ficha). Devuelve {rep (líneas para la Mesa), avisos (estados
+     con pop-up), spRegen, spRecuperado}.
+     ui = {fijarHp(v) (pone la vida y revisa Ankh y muerte, con lo que muestre cada pantalla), muerte() (opcional: redibujar el
+     cartel de muerte), limpiarParry() (opcional: el Parry pendiente de cada pantalla)}.
+   - reclamar(db, rutaFicha, objetivo, marca): la transacción sobre fichas/<id>/partes/mantenimiento — cuántos turnos le toca
+     aplicar a ESTA pantalla (0 si ya los aplicó otra; una ficha que nunca registró número arranca desde el actual), máximo 10.
+   - publicarReporte(titulo, lineas, quien) y publicarRecordatorios(avisos, quien): a la Mesa (necesitan las globals de sesion.js).
+   Necesita comun/combatiente.js, ficha-calculo.js, ficha-botonera.js e inv-calculo.js.
+   ========================================================= */
+const FichaMantenimiento = (() => {
+  const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : 0; };
+  const fmt = n => Number.isInteger(n) ? n : Math.round(n*100)/100;
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+  const MAX_SEGUIDOS = 10;
+
+  // SP Regen: lo que recupera (sin pasar del máximo). Por defecto la mitad del Especial, más lo que sumen habilidades, equipo o estados.
+  function regenerarSp(S, c, rep){
+    const spRegen = Math.max(0, Number.isNaN(c.final.spregen) ? 0 : Math.floor(c.final.spregen));
+    if(spRegen > 0 && num(S.spGastado) > 0 && Combatiente.sequia(S.efectos)){ rep.push(`🏜 Sequía: no recupera SP (su SP Regen de ${fmt(spRegen)})`); return {spRegen, spRecuperado: 0}; }   // (2026-10-24)
+    const spRecuperado = Math.min(spRegen, Math.max(0, num(S.spGastado)));
+    if(spRecuperado){ S.spGastado = num(S.spGastado) - spRecuperado; rep.push(`SP: +${fmt(spRecuperado)} (SP Regen)`); }
+    return {spRegen, spRecuperado};
+  }
+  // Pasivas de regeneración: recuperan HP en cada turno (por compra).
+  function regenPasivas(S, log, rep){
+    let hp = 0;
+    if(Combatiente.sequia(S.efectos)){   // 🏜 la Sequía corta la regeneración propia (2026-10-24): pasivas y equipo
+      const propia = (S.pasivas || []).reduce((a, p) => a + num(p.regenHp) * FichaCalculo.pasivaCompras(p), 0) + Math.max(0, Math.floor(num(FichaCalculo.calcular(S).final.hpregen)));
+      if(propia > 0 && num(S.hp) > 0){ log.push(`<b>Sequía</b>: no recupera ${fmt(propia)} HP`); rep.push(`🏜 Sequía: no recupera ${fmt(propia)} de vida propia`); }
+      return 0;
+    }
+    (S.pasivas || []).forEach(p => {
+      const x = num(p.regenHp) * FichaCalculo.pasivaCompras(p);
+      if(x > 0 && num(S.hp) > 0){ hp += x; log.push(`<b>${esc(p.nombre)}</b> <span class="heal">+${fmt(x)} HP</span>`); rep.push(`${p.nombre} (pasiva): +${fmt(x)} HP`); }
+    });
+    // La Regeneración de vida del equipo (2026-10-07, la piel de troll).
+    const eq = Math.max(0, Math.floor(num(FichaCalculo.calcular(S).final.hpregen)));
+    if(eq > 0 && num(S.hp) > 0){ hp += eq; log.push(`<b>Regeneración de vida</b> <span class="heal">+${fmt(eq)} HP</span>`); rep.push(`Regeneración de vida (equipo): +${fmt(eq)} HP`); }
+    return hp;
+  }
+  // La vida por fijarHp (para que el veneno que te deja en 0 active el Ankh antes de contar los turnos de muerte) y el reporte.
+  function aplicarVida(S, ui, hpDelta, hpAntes, rep){
+    if(hpDelta > 0 && !Combatiente.curaQueEntra(S.hp, hpDelta, S.efectos)){ rep.push(num(S.hp) > 0 ? `🌑 ${Combatiente.SIN_CURA_TXT}` : `Caído: la cura de este turno no lo levanta (hace falta revivirlo)`); return; }
+    if(!hpDelta) return;
+    ui.fijarHp(num(S.hp) + hpDelta);
+    rep.push(num(S.hp) !== hpAntes ? `HP total: ${fmt(hpAntes)} → ${fmt(num(S.hp))}` : `HP total: sigue en ${fmt(hpAntes)}`);
+  }
+  // Inconsciente: un turno menos para morir.
+  function contarMuerte(S, ui, log, rep){
+    if(!(S.muerto && S.muerto.activo && !S.muerto.definitivo && num(S.hp) <= 0)) return;
+    S.muerto.turnos = Math.max(0, num(S.muerto.turnos) - 1);
+    if(S.muerto.turnos === 0){
+      S.muerto.definitivo = true;
+      log.push(`<span class="gone">TE HAS MORIDO BIEN MUERTO Y YA NO HAY VUELTA ATR&Aacute;S</span>`);
+      rep.push('Murió: ya no hay vuelta atrás');
+    }else{
+      log.push(`Inconsciente: morís en <b>${fmt(S.muerto.turnos)}</b> turno(s)`);
+      rep.push(`Inconsciente: muere en ${fmt(S.muerto.turnos)} turno${S.muerto.turnos === 1 ? '' : 's'}`);
+    }
+    if(ui.muerte) ui.muerte();
+  }
+  const camposInv = inv => ({hp: 'hpturno', stacks: 'stacksturno', resFuego: num(InvCalculo.statValor(inv, 'resfuego'))});
+  // Lo de una invocación al empezar su vuelta: No2, ataques, cooldowns, lo que se dispara y la cuenta para dormirse. → líneas.
+  // `mant` = el ⟳ Mantenimiento de la ronda (sin orden de turnos): solo dispara y el fin cuenta, como antes. Sin él, el turno propio (P177).
+  // Las armas con las que disparó este turno (llega cargada, 2026-10-10): el próximo turno su primer disparo no es gratis.
+  const descargadasDe = S => Object.fromEntries(Object.entries(S.ataquesArma || {}).filter(([k, v]) => num(v) > 0 && k !== 'sin-arma').map(([k]) => [k, true]));
+  function invInicio(inv, mant){
+    InvCalculo.migrar(inv);
+    if(inv.activa === false) return [];
+    inv.descargada = num(inv.ataquesTurno) > 0;
+    inv.nitros = Combatiente.recargarNo2(InvCalculo.nitrosMax(inv), inv.nitros, inv.estados);
+    inv.ataquesTurno = 0;
+    inv.golpeTurno = 0;   // la Defensa contra el primer golpe vuelve a valer
+    inv.parryTurno = 0;   // y la Parada fácil (escudos de Buena calidad, 2026-10-06)
+    inv.habilidades.forEach(h => { if(num(h.cdActual) > 0) h.cdActual = Math.max(0, num(h.cdActual) - 1); });
+    const v = Combatiente.vencerAlEmpezar(inv.estados); inv.estados = v.quedan;   // Titilando se va al empezar su turno
+    const d = mant ? Combatiente.dispararEstados(inv.estados, camposInv(inv)) : Combatiente.empezarTurnoEstados(inv.estados, camposInv(inv));
+    if(d.terminados && d.terminados.length) inv.estados = d.quedan;
+    const rep = Combatiente.reporteTurno([...v.eventos, ...d.eventos]);
+    const rg = Math.max(0, Math.floor(num(InvCalculo.statValor(inv, 'hpregen'))));   // Regeneración de vida (2026-10-07)
+    const rp = Math.max(0, Math.floor(num(InvCalculo.regenPasivas(inv))));   // sus pasivas (2026-10-16, como un creep)
+    if(Combatiente.sequia(inv.estados)){ if(rg + rp > 0 && num(inv.hp) > 0) rep.push(`🏜 Sequía: no recupera ${fmt(rg + rp)} de vida propia`); }   // (2026-10-24)
+    else{
+      if(rg > 0 && num(inv.hp) > 0){ d.hp += rg; rep.push(`Regeneración de vida: +${fmt(rg)} HP`); }
+      if(rp > 0 && num(inv.hp) > 0){ d.hp += rp; rep.push(`Pasivas: +${fmt(rp)} HP`); }
+    }
+    const dhInv = Combatiente.curaQueEntra(inv.hp, d.hp, inv.estados);
+    if(d.hp > 0 && !dhInv) rep.push(num(inv.hp) > 0 ? `🌑 ${Combatiente.SIN_CURA_TXT}` : 'Caída: la cura de este turno no la levanta');
+    if(dhInv){ const antes = num(inv.hp); inv.hp = Math.max(0, Math.min(num(inv.hpMax) || Infinity, antes + dhInv)); rep.push(`HP total: ${fmt(antes)} → ${fmt(inv.hp)}`); }
+    // Sus turnos (dueño, 2026-10-30: «que cero turnos no borra un token de manera automática anymore, pero sí avisa»): al llegar a 0 no se duerme
+    // sola; queda marcada (`turnosAgotados`) y el mapa le pregunta a su dueño: borrar el token, sumar turnos o resolverlo a mano (vtt-hexgrid/js/54).
+    if(num(inv.cooldown) > 0 && num(inv.cooldownActual) > 0){
+      inv.cooldownActual = Math.max(0, num(inv.cooldownActual) - 1);
+      if(inv.cooldownActual === 0){ inv.turnosAgotados = true; rep.push('Se le agotaron los turnos: su dueño decide qué hacer'); }
+    }
+    return rep;
+  }
+  function invFin(inv, mant){
+    const k = mant ? Combatiente.contarEstados(inv.estados, camposInv(inv)) : Combatiente.terminarTurnoEstados(inv.estados);
+    inv.estados = k.quedan;
+    return Combatiente.reporteTurno(k.eventos);
+  }
+
+  /* ⟳ Mantenimiento de la ronda (fuera de combate, o para quien no está en el orden de turnos): un pase de turno sobre el personaje `S`.
+     Con turno propio reciente (en combate) no hace nada —ni toca la ficha: así no pisa lo que escribió su turno—: lo hace su turno
+     (inicioTurno / finTurno). `numero` = el número de ese Mantenimiento (sin él, se aplica siempre, como antes). */
+  function aplicar(S, ui, numero){
+    const turnoAntes = num(S.turno || 1);
+    if(numero !== undefined && !Combatiente.estadosEnMantenimiento(S.finTurnoEn, numero))
+      return {rep: [], avisos: [], spRegen: 0, spRecuperado: 0, enTurno: true};
+    const c = FichaCalculo.calcular(S);
+    const log = [], rep = [];
+    const hpAntes = num(S.hp);
+    // SP Regen AL PRINCIPIO, con los números de antes de que venza o cambie ningún estado.
+    const {spRegen, spRecuperado} = regenerarSp(S, c, rep);
+    // 🛡 Aguante (sin orden de turnos): los golpes pasan a su próximo ataque y el estado se va (como el turno propio).
+    if(aguanteAlEmpezar(S, rep)) S.efectos = (S.efectos || []).filter(e => !(e && e.aguante));
+    // Lo que hacen los estados (escudo, daño/cura con inmunidades, stacks, turnos): la regla común de comun/combatiente.js.
+    const turnoEst = Combatiente.pasarTurnoEstados(S.efectos, {hp: 'hpturno', stacks: 'stacksturno', resFuego: num(c.final.resfuego)});
+    Combatiente.reporteTurno(turnoEst.eventos).forEach(l => { rep.push(l); log.push(esc(l)); });
+    const hpDelta = turnoEst.hp + regenPasivas(S, log, rep);
+    aplicarVida(S, ui, hpDelta, hpAntes, rep);
+    contarMuerte(S, ui, log, rep);
+    // Los estados que se terminaron se sacan por identidad (fijarHp pudo tocar la lista, por ejemplo el Ankh).
+    if(turnoEst.terminados.length){ const finS = new Set(turnoEst.terminados); S.efectos = S.efectos.filter(e => !finS.has(e)); }
+    S.turno = turnoAntes + 1;
+    if(ui.limpiarParry) ui.limpiarParry();
+    // Nitros al máximo y el primer ataque vuelve a costar la mitad (el SP ya se regeneró al principio).
+    S.nitros = Combatiente.recargarNo2(FichaBotonera.nitrosMaximo(S), S.nitros, S.efectos);   // la deuda de una defensa sin No2 se descuenta acá (y la Parálisis, 1 menos)
+    S.descargadas = descargadasDe(S);   // las que dispararon este turno no llegan cargadas al siguiente (2026-10-10)
+    S.ataquesTurno = 0;
+    S.ataquesArma = {};
+    let invocacionesVencidas = 0;
+    (S.invocaciones || []).forEach(inv => {
+      if(inv.activa === false) return;
+      if(numero !== undefined && !Combatiente.estadosEnMantenimiento(inv.finTurnoEn, numero)) return;   // tiene turno propio en el orden: lo hace su turno
+      const r1 = invInicio(inv, true);
+      invFin(inv, true);
+      if(r1.includes('Se duerme: llegó su cooldown a 0')) invocacionesVencidas++;
+    });
+    if(invocacionesVencidas) log.push(`${invocacionesVencidas} invocación(es) quedaron dormidas al llegar el cooldown a 0.`);
+    log.unshift(`<b style="color:var(--brass)">Turno ${S.turno}</b>`);
+    log.push(`Nitros recargados a ${fmt(num(S.nitros))}.` + (spRegen ? ` SP ${spRecuperado ? `<span class="heal">+${fmt(spRecuperado)}</span>` : '+0'} (SP Regen ${fmt(spRegen)}${spRegen && !spRecuperado ? ', ya estaba lleno' : ''}).` : ''));
+    S.log = log;
+    const avisos = (S.efectos || []).filter(e => e.popup && e.activo !== false);
+    const robos = robosNotar(S);   // 🫳 sin orden de turnos, el ⟳ es su «próximo turno»
+    if(robos.length) rep.push(`🫳 ${robosTexto(robos)}`);
+    return {rep, avisos, spRegen, spRecuperado, ...(robos.length ? {robos} : {})};
+  }
+
+  /* El TURNO PROPIO de un personaje (o de una invocación suya, `invId`) en el orden de turnos (2026-10-06, P161, turno completo).
+     `clave` = «mapa:paso:…» de ese turno: si ya se aplicó (otra pantalla, doble clic), no hace nada → null. `conTurno` = ids de sus
+     invocaciones que tienen turno propio en el orden; las demás van con el personaje. `numero` = el Mantenimiento en curso (para que el ⟳
+     de la ronda sepa que ya lo atiende su turno). ui = {fijarHp(v), muerte?(), limpiarParry?()}.
+     inicioTurno → {rep, nombre, avisos}: SP Regen, lo que se dispara, pasivas, vida, turnos de muerte, No2 al máximo, ataques a 0.
+     finTurno → {rep, nombre}: lo recién puesto deja de serlo (P177: el contador baja al empezar el turno, no al terminarlo). */
+  /* 🔮 El Sahumerio de palo santo (talismán, 2026-10-18): al empezar su turno, `sahumerio` % (25: un 4 en d4) de sacarle un estado malo al azar.
+     Se tira solo y queda en el reporte del turno (la Mesa). */
+  /* Un azar fijo para cada turno (2026-10-18): el mapa primero muestra lo que va a pasar al empezar el turno («▶ Empieza tu turno») y lo aplica
+     recién con «✔ Aplicar»; las dos veces corre inicioTurno con la misma `clave`, así que la tirada sale igual (antes se volvía a tirar y el
+     cartel podía decir «el humo se llevó Pajaritos» y después no pasar). */
+  function azarDeClave(clave){
+    let h = 2166136261;
+    for(const ch of String(clave || '')) h = Math.imul(h ^ ch.charCodeAt(0), 16777619);
+    return () => { h = Math.imul(h ^ (h >>> 15), 2246822507); h = Math.imul(h ^ (h >>> 13), 3266489909); h ^= h >>> 16; return (h >>> 0) / 4294967296; };
+  }
+  function sahumerio(S, rep, azar){
+    const pct = (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, num(i.sahumerio)), 0);
+    if(!(pct > 0)) return null;
+    const malos = (S.efectos || []).filter(e => e && e.activo !== false && e.polaridad === 'debuff' && !e.derivado && !e.origenItem);
+    if(!malos.length) return null;
+    const caras = Math.max(1, Math.round(100 / pct)), dado = 1 + Math.floor((azar || Math.random)() * caras);
+    if(dado !== caras){ rep.push(`Sahumerio de palo santo: 1d${caras} → ${dado}, el humo no alcanzó`); return {dado, saco: null}; }
+    const e = malos[Math.floor((azar || Math.random)() * malos.length)];
+    S.efectos = S.efectos.filter(x => x !== e);
+    rep.push(`Sahumerio de palo santo: 1d${caras} → ${dado}, el humo se llevó ${e.nombre}`);
+    return {dado, saco: e.nombre};
+  }
+  function inicioTurno(S, ui, clave, invId, conTurno, numero){
+    const turno = num(numero), sin = new Set(conTurno || []);
+    if(invId){
+      const inv = (S.invocaciones || []).find(i => i && i.id === invId);
+      if(!inv || inv.inicioTurnoClave === clave) return null;
+      inv.inicioTurnoClave = clave; inv.finTurnoEn = turno;
+      return {rep: invInicio(inv), nombre: inv.nombre || 'Invocación', avisos: []};
+    }
+    if(S.inicioTurnoClave === clave) return null;
+    S.inicioTurnoClave = clave; S.finTurnoEn = turno;
+    const c = FichaCalculo.calcular(S);
+    const log = [], rep = [], hpAntes = num(S.hp);
+    regenerarSp(S, c, rep);
+    // Meditar (pies, 2026-10-06): si no se movió desde que empezó su turno anterior, recupera SP (el mapa anota `movidoPaso` al cobrar el movimiento).
+    const paso = Number(String(clave || '').split(':')[1]);
+    if(num(c.final.meditar) > 0 && S.inicioPaso !== undefined && !(num(S.movidoPaso) >= num(S.inicioPaso))){
+      const m = Math.min(num(c.final.meditar), Math.max(0, num(S.spGastado)));
+      if(m){ S.spGastado = num(S.spGastado) - m; rep.push(`SP: +${fmt(m)} (Meditar: no se movió)`); }
+    }
+    if(Number.isFinite(paso)) S.inicioPaso = paso;
+    aguanteAlEmpezar(S, rep);   // 🛡 antes de que el estado se vaya (alEmpezarTurno)
+    const v = Combatiente.vencerAlEmpezar(S.efectos); S.efectos = v.quedan;   // Titilando se va al empezar su turno
+    // P177: al empezar, primero bajan los turnos de sus estados y después pega lo que sigue (empezarTurnoEstados).
+    const d = Combatiente.empezarTurnoEstados(S.efectos, {hp: 'hpturno', stacks: 'stacksturno', resFuego: num(c.final.resfuego)});
+    rep.push(...Combatiente.reporteTurno([...v.eventos, ...d.eventos]));
+    sahumerio(S, rep, clave ? azarDeClave(`${clave}|sahumerio`) : null);   // 🔮 el Sahumerio de palo santo (2026-10-18): la misma tirada en la vista previa y al aplicar
+    aplicarVida(S, ui, d.hp + regenPasivas(S, log, rep), hpAntes, rep);
+    contarMuerte(S, ui, log, rep);
+    if(d.terminados.length){ const finS = new Set(d.terminados); S.efectos = S.efectos.filter(e => !finS.has(e)); }
+    if(ui.limpiarParry) ui.limpiarParry();
+    const deudaAntes = num(S.nitros);
+    S.nitros = Combatiente.recargarNo2(FichaBotonera.nitrosMaximo(S), S.nitros, S.efectos);   // la deuda de una defensa sin No2 se descuenta acá (y la Parálisis, 1 menos)
+    S.descargadas = descargadasDe(S);
+    S.ataquesTurno = 0;
+    S.ataquesArma = {};
+    rep.push(`No2 recargados a ${fmt(num(S.nitros))}${num(S.nitros) < FichaBotonera.nitrosMaximo(S) && deudaAntes < 0 ? ` (se descontó la deuda de ${fmt(-deudaAntes)})` : ''}`);
+    (S.invocaciones || []).forEach(inv => { if(inv && inv.activa !== false && !sin.has(inv.id)){ inv.finTurnoEn = turno; invInicio(inv).forEach(l => rep.push(`${inv.nombre}: ${l}`)); } });
+    const robos = robosNotar(S);
+    return {rep, nombre: ((S.meta && S.meta.nombre) || '').trim(), avisos: (S.efectos || []).filter(e => e.popup && e.activo !== false), ...(robos.length ? {robos} : {})};
+  }
+  /* 🛡 Aguante (Tanque, 2026-10-23; el de los creeps, 2026-10-21): al empezar su turno, los golpes que contó el estado pasan a `S.aguanteListo` (su
+     primer ataque de este turno suma +1 dado por golpe, hasta su nivel + 1: vtt-hexgrid/js/56); al terminar el turno sin atacar, se pierde.
+     → true si tenía el estado. */
+  function aguanteAlEmpezar(S, rep){
+    const ag = (S.efectos || []).find(e => e && e.activo !== false && e.aguante);
+    S.aguanteListo = ag ? Math.max(0, Math.round(num(ag.golpes))) : 0;
+    if(ag) rep.push(S.aguanteListo ? `🛡 Aguante: recibió ${S.aguanteListo} golpe${S.aguanteListo === 1 ? '' : 's'} — su primer ataque de este turno suma dados` : '🛡 Aguante: no recibió golpes');
+    return !!ag;
+  }
+  // 🫳 Lo que le robaron en sigilo (2026-10-14, dueño): «al principio de su próximo turno siente el cinturón más liviano y se da cuenta de que le
+  // falta tal objeto». Devuelve los nombres y los saca de la lista.
+  function robosNotar(S){
+    const l = Array.isArray(S.robosSinNotar) ? S.robosSinNotar.filter(Boolean) : [];
+    if(l.length) S.robosSinNotar = [];   // vacío, no borrado: así la parte «otros» de las otras pantallas también lo vacía
+    return l;
+  }
+  const robosTexto = l => `Sentís el cinturón más liviano… y te das cuenta de que te falta: ${l.join(', ')}.`;
+  function finTurno(S, ui, clave, invId, conTurno, numero){
+    const turno = num(numero), sin = new Set(conTurno || []);
+    if(invId){
+      const inv = (S.invocaciones || []).find(i => i && i.id === invId);
+      if(!inv || inv.finTurnoClave === clave) return null;
+      inv.finTurnoClave = clave; inv.finTurnoEn = turno;
+      return {rep: invFin(inv), nombre: inv.nombre || 'Invocación'};
+    }
+    if(S.finTurnoClave === clave) return null;
+    S.finTurnoClave = clave; S.finTurnoEn = turno;
+    const c = FichaCalculo.calcular(S);
+    Combatiente.terminarTurnoEstados(S.efectos);   // P177: los turnos ya no bajan acá (bajan al empezar el próximo); lo recién puesto deja de serlo
+    if(num(S.aguanteListo) > 0) S.aguanteListo = 0;   // 🛡 si no atacó en su turno, perdió el aguante (como los creeps)
+    const rep = [];
+    (S.invocaciones || []).forEach(inv => { if(inv && inv.activa !== false && !sin.has(inv.id)){ inv.finTurnoEn = turno; invFin(inv).forEach(l => rep.push(`${inv.nombre}: ${l}`)); } });
+    // Calma (anillo, 2026-10-06): si no atacó en su turno, al terminarlo recupera No2 (sin pasar del máximo).
+    const calma = num(c.final.calma);
+    if(calma > 0 && !num(S.ataquesTurno)){
+      const max = FichaBotonera.nitrosMaximo(S), antes = num(S.nitros);
+      if(antes < max){ S.nitros = Math.min(max, antes + calma); rep.push(`Calma: no atacó, +${fmt(S.nitros - antes)} No2`); }
+    }
+    return {rep, nombre: ((S.meta && S.meta.nombre) || '').trim()};
+  }
+
+  // Cuántos turnos le toca aplicar a esta pantalla (la toma en una transacción: si hay varias, solo una los aplica).
+  async function reclamar(db, rutaFicha, objetivo, marca){
+    const ref = db.doc(`${rutaFicha}/partes/mantenimiento`);
+    return db.runTransaction(async tx => {
+      const doc = await tx.get(ref);
+      let hecho = null;
+      if(doc.exists){ try{ hecho = Math.round(num(JSON.parse(doc.data().json))); }catch(e){} }
+      if(hecho !== null && hecho >= objetivo) return 0;
+      tx.set(ref, {json: JSON.stringify(objetivo), actualizado: marca()});
+      return hecho === null ? 0 : Math.min(MAX_SEGUIDOS, objetivo - hecho);
+    });
+  }
+
+  const hayMesa = () => typeof fbDb !== 'undefined' && fbDb && typeof fbUsuario !== 'undefined' && fbUsuario && typeof fbMiembro !== 'undefined' && fbMiembro;
+  function publicarReporte(titulo, lineas, quien){
+    if(!lineas || !lineas.length || !hayMesa()) return;
+    fbDb.collection(fbRutaCampana('tiradas')).add({
+      uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: quien || '',
+      origen: String(titulo || '').slice(0, 60), formula: lineas.join('\n').slice(0, 900),
+      rolls: [], mod: 0, total: 0, desde: 'reporte',
+      cuando: firebase.firestore.FieldValue.serverTimestamp(),
+    }).catch(err => console.error('No se pudo publicar el reporte del Mantenimiento:', err));
+  }
+  function publicarRecordatorios(avisos, quien){
+    if(!avisos || !avisos.length || !hayMesa()) return;
+    avisos.slice(0, 5).forEach(e => {
+      fbDb.collection(fbRutaCampana('tiradas')).add({
+        uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: quien || '',
+        origen: String(e.nombre || 'Estado').slice(0, 80), formula: String(e.detalle || '').slice(0, 240),
+        rolls: [], mod: 0, total: 0, desde: 'recordatorio',
+        cuando: firebase.firestore.FieldValue.serverTimestamp(),
+      }).catch(err => console.error('No se pudo publicar el recordatorio:', err));
+    });
+  }
+
+  /* ⏳ Pasar de día (2026-10-12, dueño; lo dispara vtt-hexgrid/js/41-dia.js). ¿Qué estados terminan? Los que duran por turnos (o un turno);
+     quedan los permanentes, los de un ítem equipado y los derivados. `descansar(S)`: vida, SP y No2 al máximo (un caído no se levanta), los
+     estados con turnos terminan, el tope diario del talento de reparar vuelve a 0, carga las 🃏 wildcards del descanso (`o.wildcards`) y lo
+     mismo sus invocaciones. Devuelve las líneas del cambio. */
+  const terminaAlPasarDia = e => !!e && (!!e.finCombate || !!e.finDia || (!e.permanente && !e.origenItem && !e.derivado && !e.anillo));   // (finCombate: un pergamino que quedó; finDia: el escudo de una poción, 2026-10-20)
+  // `o.wildcards` (2026-10-15, dueño): el descanso carga wildcards hasta ese número (1 normal, 2 reparador); no se acumulan por encima.
+  function descansar(S, o){
+    const lineas = [], c = FichaCalculo.calcular(S), hpmax = Number.isNaN(c.final.hpmax) ? 0 : num(c.final.hpmax);
+    const caido = num(S.hp) <= 0 || (S.muerto && (S.muerto.activo || S.muerto.definitivo));
+    if(!caido && hpmax > 0 && num(S.hp) < hpmax){ lineas.push(`vida ${fmt(num(S.hp))} → ${fmt(hpmax)}`); S.hp = hpmax; }
+    if(num(S.spGastado) > 0){ lineas.push('SP lleno'); S.spGastado = 0; }
+    const no2 = FichaBotonera.nitrosMaximo(S);
+    if(num(S.nitros) < no2){ lineas.push('No2 lleno'); S.nitros = no2; }
+    const fin = (S.efectos || []).filter(terminaAlPasarDia);
+    if(fin.length){ S.efectos = S.efectos.filter(e => !terminaAlPasarDia(e)); lineas.push(`terminaron: ${fin.map(e => e.nombre).join(', ')}`); }
+    if(num(S.reparadoTalento) > 0) S.reparadoTalento = 0;
+    if(S.meta && S.meta.ultimoAlientoUsado){ S.meta.ultimoAlientoUsado = false; lineas.push('💍 el Anillo del último aliento se recargó'); }   // (2026-10-18)
+    // 💍 El Anillo del herrero ambulante y el de la mesa servida (2026-10-19, dueño): al descansar.
+    const eqDescanso = (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i));
+    const herr = eqDescanso.reduce((a, i) => Math.max(a, num(i.herreroDescanso)), 0);
+    if(herr > 0){
+      let k = 0;
+      (S.inventario || []).forEach(it => {
+        if(!it || !it.equipado || !FichaCalculo.durableItem(it)) return;
+        const a = FichaCalculo.durActual(it), m = FichaCalculo.durMax(it);
+        if(a < m){ it.dur = Math.min(m, a + herr); k++; }
+      });
+      if(k) lineas.push(`💍 Anillo del herrero ambulante: ${k} pieza${k === 1 ? '' : 's'} +${herr} de durabilidad`);
+    }
+    const mesaS = eqDescanso.find(i => i.mesaServida);
+    if(mesaS && typeof CATALOGO_BASE !== 'undefined' && typeof FichaEquipo !== 'undefined'){
+      const p = CATALOGO_BASE.find(i => i.id === mesaS.mesaServida);
+      if(p){
+        const r = FichaEquipo.alCinturon(S, {...structuredClone(p), unidades: 1}, 1);
+        lineas.push(r && r.movidas > 0 ? `💍 Anillo de la mesa servida: una ${p.nombre} en el cinturón` : `💍 Anillo de la mesa servida: no hay lugar en el cinturón para la ${p.nombre}`);
+      }
+    }
+    // 💍 El Anillo de la siesta (2026-10-19, dueño): cada descanso da Vida extra (no se recarga por turno; reemplaza a la que haya quedado del anterior).
+    const veDescanso = (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, num(i.descansoVidaExtra)), 0);
+    if(veDescanso > 0){
+      S.efectos = (S.efectos || []).filter(e => !(e && e.descansoAnillo));
+      // (P227 ✅, 2026-10-28: es Vida extra de verdad —`excedenteVida`—: lo que se lleva cuenta como daño. Al descansar la vida ya quedó llena, así que
+      // «te curás N y lo que sobra es Vida extra» son N de Vida extra.)
+      S.efectos.push({id: 'siesta' + Date.now().toString(36), nombre: 'Vida extra (Anillo de la siesta)', polaridad: 'buff', activo: true, permanente: true, sinRecarga: true, seGasta: true,
+        descansoAnillo: true, excedenteVida: true, escudoMagico: veDescanso, escudoMagicoActual: veDescanso, detalle: `Vida extra de ${veDescanso}: se gasta antes que tu vida y no se recarga. Vuelve con el próximo descanso (Anillo de la siesta).`});
+      lineas.push(`💍 Vida extra ${veDescanso} (Anillo de la siesta)`);
+    }
+    // 💍 El Anillo del escudo de la mañana (2026-10-19, dueño): cada descanso, Vida extra solo contra el daño especial (`soloEspecial`: el mapa la
+    // salta si el golpe no es mágico ni elemental, js/10 resolverGolpe). Como la de la siesta, no se recarga y reemplaza a la que quedó.
+    // 💍 Y el Anillo del sereno (2026-10-19, dueño): lo mismo, solo contra el daño físico (`soloFisico`).
+    const escudosDescanso = [
+      {campo: 'descansoEscudoEsp', marca: 'descansoEscudo', flag: 'soloEspecial', nombre: 'Escudo de la mañana', anillo: 'Anillo del escudo de la mañana',
+        contra: 'el daño especial (mágico o elemental): un golpe común no la toca', corto: 'solo contra el daño especial'},
+      {campo: 'descansoEscudoFis', marca: 'descansoEscudoFis', flag: 'soloFisico', nombre: 'Escudo del sereno', anillo: 'Anillo del sereno',
+        contra: 'el daño físico: el daño especial (mágico o elemental) no la toca', corto: 'solo contra el daño físico'},
+    ];
+    escudosDescanso.forEach(k => {
+      const v = (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, num(i[k.campo])), 0);
+      if(!(v > 0)) return;
+      S.efectos = (S.efectos || []).filter(e => !(e && e[k.marca]));
+      S.efectos.push({id: k.marca + Date.now().toString(36), nombre: k.nombre, polaridad: 'buff', activo: true, permanente: true, sinRecarga: true, seGasta: true,
+        [k.marca]: true, [k.flag]: true, excedenteVida: true, escudoMagico: v, escudoMagicoActual: v,   // Vida extra de verdad (P227 ✅, 2026-10-28)
+        detalle: `Vida extra de ${v} solo contra ${k.contra}. No se recarga; vuelve con el próximo descanso (${k.anillo}).`});
+      lineas.push(`💍 ${k.nombre} ${v} (${k.corto})`);
+    });
+    const wc = Math.max(0, Math.round(num(o && o.wildcards)));
+    if(wc && S.meta && Math.round(num(S.meta.wildcards)) < wc){ const antes = Math.max(0, Math.round(num(S.meta.wildcards))); S.meta.wildcards = wc; lineas.push(`🃏 ${wc - antes === 1 ? 'una wildcard' : `${wc - antes} wildcards`} (tiene ${wc})`); }
+    (S.invocaciones || []).forEach(inv => {
+      if(!inv) return;
+      const li = [];
+      if(num(inv.hp) > 0 && num(inv.hpMax) > num(inv.hp)){ li.push(`vida ${fmt(num(inv.hp))} → ${fmt(num(inv.hpMax))}`); inv.hp = num(inv.hpMax); }
+      if(typeof InvCalculo !== 'undefined'){ const m = InvCalculo.nitrosMax(inv); if(num(inv.nitros) < m){ inv.nitros = m; li.push('No2 lleno'); } }
+      const finI = (inv.estados || []).filter(terminaAlPasarDia);
+      if(finI.length){ inv.estados = inv.estados.filter(e => !terminaAlPasarDia(e)); li.push(`terminaron: ${finI.map(e => e.nombre).join(', ')}`); }
+      if(li.length) lineas.push(`${inv.nombre || 'su invocación'}: ${li.join(', ')}`);
+    });
+    if(caido) lineas.push('sigue caído (descansar no lo levanta)');
+    return lineas;
+  }
+  return {sahumerio, terminaAlPasarDia, descansar, MAX_SEGUIDOS, aplicar, inicioTurno, finTurno, reclamar, publicarReporte, publicarRecordatorios, robosTexto, invInicio};
+})();

@@ -1,0 +1,511 @@
+/* =========================================================
+   MESA — tiradas compartidas en vivo (Firebase)
+   Compartido por la ficha, gm-tools y el mapa (antes estaba copiado en
+   los tres). Todas las tiradas pasan por mesaPublicar(), que las guarda
+   en campanas/<partida>/tiradas; la Mesa muestra las últimas de todos al
+   instante. Sin internet las tiradas funcionan igual, solo que no se
+   comparten. Ver docs/workflow-firebase.md.
+
+   Cada herramienta define, en su propio script:
+   - MESA_DESDE: 'ficha' | 'gm' | 'mapa' (se guarda en cada tirada).
+   - mesaQuien(origen): quién tira (el personaje, el creep o '').
+     Si el origen empieza con "<quien> · ", ese prefijo se saca del origen
+     (gm-tools arma "<creep> · Bloqueo").
+   - MESA_AVISAR_SIN_SESION (opcional): avisar si se tira sin haber
+     entrado a la partida (el mapa).
+   La ficha y gm-tools usan la cajita flotante: mesaIniciar(alEntrar)
+   la arma, entra a la partida y después llama a alEntrar(). El mapa
+   tiene su propia Mesa en el HTML y solo usa mesaPublicar/mesaEscuchar.
+   Usa $, esc, fmt, num y toast de cada herramienta.
+   ========================================================= */
+
+const MESA_MAX = 30;
+
+let mesaIdsVistos = null;
+let mesaAnimadas = new Set();   // tiradas cuyo dado 3D ya se lanzó (la Mesa espera a que queden quietos antes de mostrar el resultado)
+let mesaRetenida = null;         // {snap, fin}: la última lista de tiradas, esperando a los dados
+// La tirada REAL (no una línea de sistema) más reciente del usuario actual, entre las que trae
+// la Mesa ahora mismo — la usa, por ejemplo, la Polilla mística (2026-09-27) para saber a qué
+// tirada sumarle el +2 desde una pantalla que no tiene su propio historial de tiradas (el mapa).
+let mesaMiUltima = null;
+
+function mesaEstado(texto){
+  const el = document.getElementById('mesa-estado');
+  if(el) el.textContent = texto;
+}
+
+// Descripción de la habilidad que se está ejecutando: viaja con su tirada,
+// para que sea una sola línea en la Mesa y no dos.
+let mesaTextoPendiente = '';
+// Una línea de texto en la Mesa, sin dados (2026-10-05): los anuncios del sistema (usar un consumible, el Saque rápido, la Retirada…).
+// quien (opcional, 2026-10-09): de quién es (un creep: el mapa de cada jugador decide si la ve, ver mesaFiltrar).
+async function mesaLinea(texto, desde, quien){
+  if(typeof fbDb === 'undefined' || !fbDb || !fbUsuario || !fbMiembro) return;
+  mesaAntes(`${quien || ''} ${texto || ''}`);
+  try{
+    await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: String(quien || '').slice(0, 60), origen: String(texto || '').slice(0, 400),
+      formula: '', rolls: [], mod: 0, total: 0, desde: desde || 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()});
+  }catch(err){ console.error('No se pudo anotar en la Mesa:', err); }
+}
+function mesaConTexto(detalle){ mesaTextoPendiente = String(detalle || '').slice(0, 300); }
+// Lo que la pantalla tenga para escribir ANTES de una línea o tirada propia (2026-10-24, el mapa: el aviso «fuera de turno», que espera a que
+// la acción de verdad ocurra). Va primero porque Firestore ordena por la hora de llegada.
+function mesaAntes(texto){
+  if(typeof window === 'undefined' || typeof window.mesaAntesDePublicar !== 'function') return;
+  try{ window.mesaAntesDePublicar(String(texto || '')); }catch(e){ console.error(e); }
+}
+
+// Devuelve el id de la tirada en la Mesa (o undefined si no se publicó). r.quien: quién tira, si la herramienta no lo sabe por el
+// origen (el mapa, cuando tira por un personaje). La `ficha` del personaje (r.ficha, o mesaFicha(origen) si la herramienta la
+// define) viaja con la tirada: de ahí salen "mis últimas tiradas" de la Moneda Re-Roll y la Polilla (comun/tiradas-propias.js, P138).
+async function mesaPublicar(origen, r){
+  // Duelo (comun/duelo.js): el PdG, la Evasión, el Parry, la Fuerza del golpe y el Bloqueo de un duelo se publican juntos cuando tiran los dos (elegir la defensa es a ciegas).
+  if(window.DUELO_RETENER) return;
+  if(!fbDb || !fbUsuario || !fbMiembro){
+    if(typeof MESA_AVISAR_SIN_SESION !== 'undefined' && MESA_AVISAR_SIN_SESION) toast('Entrá a la mesa para tirar');
+    return;
+  }
+  mesaAntes(`${r.quien || ''} ${origen || ''}`);
+  const texto = mesaTextoPendiente;
+  mesaTextoPendiente = '';
+  const quien = String(r.quien || mesaQuien(origen) || '');
+  const ficha = String(r.ficha || (typeof mesaFicha === 'function' ? mesaFicha(origen) : '') || '').slice(0, 80);
+  let origenTxt = String(origen || '');
+  if(quien && origenTxt.startsWith(quien + ' · ')) origenTxt = origenTxt.slice(quien.length + 3);
+  const doc = {
+    uid: fbUsuario.uid,
+    jugador: fbMiembro.nombre,
+    quien,
+    origen: origenTxt,
+    formula: String(r.formula || ''),
+    rolls: (r.rolls || []).slice(0, 100),
+    mod: num(r.mod),
+    total: num(r.total),
+    // r.desde = 'gm': la tirada de un creep que publica el mapa (Acciones nuevas, paso 4 etapa 4c): se pinta como las de GM Tools.
+    desde: r.desde === 'gm' ? 'gm' : MESA_DESDE,
+    cuando: firebase.firestore.FieldValue.serverTimestamp(),
+  };
+  // Estilo de dados de quien tira (comun/dados3d.js): los demás lo ven con su color.
+  const estilo = typeof dadosEstiloTxt === 'function' ? dadosEstiloTxt() : '';
+  // Estados que afectaron esta tirada (r.estados = [{n, p:'buff'|'debuff'}], lo arma cada herramienta al tirar):
+  // se pintan en la Mesa, verde los buffs y rojo los debuffs (mesaFilaContenido).
+  const estados = Array.isArray(r.estados) && r.estados.length
+    ? r.estados.slice(0, 8).map(e => ({
+        n: String((e && (e.n || e.nombre)) || '').slice(0, 40),
+        p: (e && (e.p || e.polaridad)) === 'buff' ? 'buff' : (e && (e.p || e.polaridad)) === 'debuff' ? 'debuff' : 'otro',
+      })).filter(e => e.n)
+    : [];
+  // Afortunado (2026-09-24): la otra tirada, la descartada, viaja aparte para que la Mesa y los dados 3D muestren las DOS.
+  // r.ventaja = {rolls, total, elegido}: los dados y el total de la descartada, y el total de la elegida (antes de mitades/bonos).
+  const ventaja = r.ventaja && Array.isArray(r.ventaja.rolls)
+    ? {rolls: r.ventaja.rolls.slice(0, 100).map(num), total: num(r.ventaja.total), elegido: num(r.ventaja.elegido)} : null;
+  // Reglas viejas (no conocen "ventaja", "estados", "estilo" o "texto"): se reintenta quitando campos de a uno, la tirada sale igual.
+  const extras = [['texto', texto], ['estilo', estilo], ['estados', estados.length ? estados : null], ['ventaja', ventaja], ['destacar', /^(malo:)?(max|idx:\d{1,2}(,\d{1,2}){0,19})$/.test(String(r.destacar || '')) ? r.destacar : ''], ['ficha', ficha]].filter(x => x[1]);   // destacar: 'max' = los dados 3D hacen brillar el más alto (crítico); 'idx:0,2' = esos dados (los efectos que funcionaron, 2026-10-04)
+  const intentos = [];
+  for(let n = extras.length; n >= 0; n--) intentos.push({...doc, ...Object.fromEntries(extras.slice(0, n))});
+  let err = null;
+  for(const d of intentos){
+    try{
+      const ref = await fbDb.collection(fbRutaCampana('tiradas')).add({...d, cuando: firebase.firestore.FieldValue.serverTimestamp()});
+      // 💪 Lo que se gasta con una tirada (Empower, 2026-10-22): la pantalla que lo sepa hacer (el mapa, js/37) mira los estados que la afectaron.
+      if(typeof window !== 'undefined' && typeof window.mesaTrasPublicar === 'function'){ try{ window.mesaTrasPublicar({...doc, estados, ficha}, r); }catch(e){ console.error(e); } }
+      return ref.id;
+    }catch(e){
+      err = e;
+      if(e.code !== 'permission-denied') break;
+    }
+  }
+  {
+    console.error('No se pudo publicar la tirada en la mesa:', err);
+    toast('La tirada no se pudo compartir con la mesa');
+  }
+}
+
+// Color del nombre en la Mesa: dorado las propias, verde las de aliados,
+// rojo las de creeps (desde gm-tools con un creep), blanco las neutras
+// (tiradas libres sin personaje de otros) y lila el pase de turno.
+function mesaClaseQuien(t){
+  if(t.desde === 'mantenimiento') return 'mesa-q-turno';
+  if(t.desde === 'gm' && t.quien) return 'mesa-q-creep';
+  if(fbUsuario && t.uid === fbUsuario.uid) return 'mesa-q-propia';
+  return t.quien ? 'mesa-q-aliado' : 'mesa-q-neutra';
+}
+
+// Contenido de una fila de tirada normal (no las líneas del sistema ni las
+// de efectos al golpear, que arman lo suyo aparte): lo usa cada fila de
+// #mesa-cuerpo y, si existe, el resumen de la última tirada (#mesa-resumen,
+// lo único que se ve con la cajita achicada — ver mesaRender más abajo).
+function mesaFilaContenido(t){
+  const quien = t.quien || t.jugador || '?';
+  const usuario = t.quien && t.jugador && t.quien !== t.jugador ? ` <span class="mesa-usuario">(${esc(t.jugador)})</span>` : '';
+  const mod = num(t.mod) ? ` ${t.mod > 0 ? '+' : ''}${fmt(num(t.mod))}` : '';
+  // Estados activos que afectaron esta tirada (comun/mesa.js los pinta; cada herramienta arma la lista al tirar):
+  // verde = buff, rojo = debuff.
+  const estados = Array.isArray(t.estados) ? t.estados.filter(e => e && e.n) : [];
+  const estadosHtml = estados.length
+    ? `<div class="mesa-estados">Afectada por ${estados.map(e => `<span class="mesa-${e.p === 'buff' || e.p === 'debuff' ? e.p : 'otro'}">${esc(e.n)}</span>`).join(', ')}</div>`
+    : '';
+  return `<span class="mesa-total">${fmt(num(t.total))}</span>` +
+    `<span class="mesa-quien ${mesaClaseQuien(t)}">${esc(quien)}</span>${usuario} ${esc(t.origen)}` +
+    (t.ventaja && Array.isArray(t.ventaja.rolls)
+      ? `<div class="mesa-detalle" style="line-height:1.7">🍀 <b>Afortunado</b>: tiró dos veces y se queda con la mejor<br>` +
+        `<span style="background:rgba(80,180,90,.28);border:1px solid #58b45f;border-radius:4px;padding:1px 6px">✔ ${esc(t.formula)} [${esc((t.rolls || []).join(', '))}]${esc(mod)} = <b>${fmt(num(t.ventaja.elegido))}</b></span> ` +
+        `<span style="opacity:.6;text-decoration:line-through;border:1px dashed #888;border-radius:4px;padding:1px 6px">✘ [${esc(t.ventaja.rolls.join(', '))}]${esc(mod)} = ${fmt(num(t.ventaja.total))}</span></div>`
+      : `<div class="mesa-detalle">${esc(t.formula)} [${esc((t.rolls || []).join(', '))}]${esc(mod)}</div>`) +
+    estadosHtml +
+    (t.texto ? `<div class="mesa-texto">${typeof Glosario !== 'undefined' ? Glosario.marcar(t.texto) : esc(t.texto)}</div>` : '');   // con los globos del glosario (2026-10-10)
+}
+
+// Ruta del PNG del ojo, relativa a este script (así sirve desde cualquier herramienta).
+const MESA_OJO_URL = (() => { try{ return document.currentScript && document.currentScript.src ? new URL('ojo.png', document.currentScript.src).href : ''; }catch(e){ return ''; } })();
+if(MESA_OJO_URL){ try{ new Image().src = MESA_OJO_URL; }catch(e){} }   // se precarga para que aparezca de golpe
+// Alerta del ojo del GM (revela lo que estaba oculto): línea roja en la
+// Mesa y, en todas las pantallas, un destello rojo con el ojo (comun/ojo.png)
+// que aparece de golpe y a 1–2 segundos se apaga con fade.
+// Estilos de las filas rojas de la Mesa y del destello: se ponen apenas se dibuja la Mesa,
+// no solo cuando llega la alerta, para que las filas viejas del historial también se vean rojas.
+function mesaAlertaEstilos(){
+  if(!document.getElementById('mesa-alerta-css')){
+    const st = document.createElement('style');
+    st.id = 'mesa-alerta-css';
+    st.textContent =
+      '.mesa-tirada.mesa-alerta{background:rgba(160,20,20,.9)!important;color:#fff!important;border:1px solid #ff6a6a!important}' +
+      '.mesa-tirada.mesa-recompensa{background:rgba(22,110,52,.92)!important;color:#fff!important;border:1px solid #5fd38a!important}' +
+      '.mesa-tirada.mesa-recompensa .mesa-quien,.mesa-tirada.mesa-recompensa .mesa-detalle{color:#fff!important}' +
+      '.mesa-tirada.mesa-alerta .mesa-quien,.mesa-tirada.mesa-alerta .mesa-detalle{color:#fff!important}' +
+      '#alerta-ojo{position:fixed;inset:0;z-index:99999;pointer-events:none;display:flex;align-items:center;justify-content:center;' +
+        'background:radial-gradient(ellipse at center,rgba(200,20,20,.35) 0%,rgba(150,0,0,.6) 60%,rgba(90,0,0,.8) 100%);opacity:1;transition:opacity 1.3s ease-out}' +
+      '#alerta-ojo img{width:min(85vw,1000px);max-height:80vh;object-fit:contain;filter:drop-shadow(0 0 40px rgba(255,60,30,.85))}' +
+      '#alerta-ojo span{font-size:min(55vmin,420px);line-height:1;filter:drop-shadow(0 0 30px rgba(255,60,30,.9))}' +
+      '#alerta-ojo.apagar{opacity:0}' +
+      '.mesa-duelo-frase{font-weight:700;line-height:1.35}' +
+      '.mesa-duelo-det summary{cursor:pointer;font-size:11px;opacity:.85;margin-top:3px;list-style:none}' +
+      '.mesa-duelo-det summary::-webkit-details-marker{display:none}' +
+      '.mesa-duelo-det[open] summary{margin-bottom:3px}';
+    document.head.appendChild(st);
+  }
+}
+
+function mesaAlertaOjo(){
+  mesaAlertaEstilos();
+  document.getElementById('alerta-ojo')?.remove();
+  const capa = document.createElement('div');
+  capa.id = 'alerta-ojo';
+  // El ojo es un PNG con fondo transparente (comun/ojo.png); si no carga, queda el emoji.
+  capa.innerHTML = MESA_OJO_URL ? '<img alt="" src="' + MESA_OJO_URL + '">' : '<span>👁</span>';
+  const imgOjo = capa.querySelector('img');
+  if(imgOjo) imgOjo.onerror = () => { capa.innerHTML = '<span>👁</span>'; };
+  document.body.appendChild(capa);
+  setTimeout(() => capa.classList.add('apagar'), 1100);
+  setTimeout(() => capa.remove(), 2600);
+}
+
+// Número de turno en la cabecera de la Mesa flotante (lo pone la herramienta que lo sabe:
+// la ficha y gm-tools). Se guarda por si la Mesa se arma después.
+let mesaTurnoActual = null;
+function mesaPonerTurno(n){
+  mesaTurnoActual = n;
+  const el = document.getElementById('mesa-turno');
+  if(el) el.textContent = n ? 'T' + n : '';
+}
+
+// Líneas del sistema: no son una tirada real (ni la propia ni la de nadie), así que no cuentan
+// como "la última tirada" para el resaltado verde ni para mesaMiUltima (Polilla mística).
+const MESA_DESDE_SISTEMA = ["mantenimiento", "recordatorio", "habilidad", "efecto", "efecto-gm", "alerta", "alerta-roja", "recompensa", "reporte", "incierta", "incierta-pj", "incierta-creep"];
+
+function mesaRender(docs){
+  mesaAlertaEstilos();
+  const cuerpo = $('#mesa-cuerpo');
+  const primeraVez = mesaIdsVistos === null;
+  const nuevasIds = new Set(primeraVez ? [] : docs.map(d => d.id).filter(id => !mesaIdsVistos.has(id)));
+  // La última tirada (no las líneas del sistema) va con fondo verde.
+  const ultima = docs.find(d => !MESA_DESDE_SISTEMA.includes(d.data().desde));
+  const ultimaId = ultima ? ultima.id : null;
+  // La última tirada REAL propia (ver mesaMiUltima más arriba): mismo criterio, pero además uid.
+  if(fbUsuario){
+    const mia = docs.find(d => { const t = d.data(); return t.uid === fbUsuario.uid && !MESA_DESDE_SISTEMA.includes(t.desde); });
+    mesaMiUltima = mia ? mia.data({serverTimestamps: 'estimate'}) : null;
+    if(typeof renderPolillaBoton === 'function') renderPolillaBoton();
+  }
+  // Resumen de esa misma última tirada: solo existe en la Mesa flotante
+  // (ficha y gm-tools) — es lo que se ve con la cajita achicada, ver CSS de
+  // #mesa-resumen en cada herramienta.
+  const resumen = document.getElementById('mesa-resumen');
+  if(resumen){
+    resumen.classList.toggle('con-tirada', !!ultima);
+    resumen.innerHTML = ultima
+      ? mesaFilaContenido(ultima.data({serverTimestamps: 'estimate'}))
+      : '<div class="mesa-vacia">Todavía nadie tiró.</div>';
+  }
+  let hayAjena = false;
+  cuerpo.innerHTML = docs.length ? '' : '<div class="mesa-vacia">Todavía nadie tiró.</div>';
+  docs.forEach(d => {
+    const t = d.data({serverTimestamps: 'estimate'});
+    const nueva = !primeraVez && !mesaIdsVistos.has(d.id);
+    if(nueva && fbUsuario && t.uid !== fbUsuario.uid) hayAjena = true;
+    // Efectos al golpear de un arma: línea resaltada (comun/efectos-golpe.js).
+    if(EfectosGolpe.esLineaMesa(t)){
+      const div = document.createElement('div');
+      div.className = 'mesa-tirada mesa-efecto' + (nueva ? ' nueva' : '');
+      div.innerHTML = EfectosGolpe.mesaHtml(t, t.desde === 'efecto-gm' ? 'mesa-q-creep' : mesaClaseQuien(t));
+      if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
+      cuerpo.appendChild(div);
+      return;
+    }
+    // Alerta del ojo del GM: línea roja bien evidente y el destello en pantalla.
+    if(t.desde === 'alerta'){
+      const div = document.createElement('div');
+      div.className = 'mesa-tirada mesa-sistema mesa-alerta' + (nueva ? ' nueva' : '');
+      div.innerHTML = `<span class="mesa-quien">👁 ${esc(t.origen)}</span>${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}</div>` : ''}`;
+      if(nueva){ setTimeout(() => div.classList.remove('nueva'), 1500); mesaAlertaOjo(); }
+      cuerpo.appendChild(div);
+      return;
+    }
+    // 🎭 Acción incierta (2026-10-09, vtt-hexgrid/js/29): lo que hace alguien que no se ve (o el detalle para su bando, ej. una trampa).
+    if(String(t.desde || '').startsWith('incierta')){
+      const div = document.createElement('div');
+      div.className = 'mesa-tirada mesa-sistema mesa-incierta' + (nueva ? ' nueva' : '');
+      div.style.cssText = 'border-left:3px solid #8A5CC2;background:rgba(138,92,194,.10)';
+      div.innerHTML = `<span class="mesa-quien">${esc(t.origen)}</span>${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}</div>` : ''}`;
+      if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
+      cuerpo.appendChild(div);
+      return;
+    }
+    // Recompensas del combate: línea verde que queda verde (XP, DDE y despojos que se cargaron a cada uno).
+    if(t.desde === 'recompensa'){
+      const div = document.createElement('div');
+      div.className = 'mesa-tirada mesa-sistema mesa-recompensa' + (nueva ? ' nueva' : '');
+      div.innerHTML = `<span class="mesa-quien">${esc(t.origen)}</span>${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}</div>` : ''}`;
+      if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
+      cuerpo.appendChild(div);
+      return;
+    }
+    // Alerta roja de la mesa (ej. una acción hecha sin No2 suficientes, o un
+    // personaje en sigilo que entró en Mover libre): línea roja, sin el destello del ojo.
+    if(t.desde === 'alerta-roja'){
+      const div = document.createElement('div');
+      div.className = 'mesa-tirada mesa-sistema mesa-alerta' + (nueva ? ' nueva' : '');
+      div.innerHTML = `<span class="mesa-quien">${esc(t.origen)}</span>${t.formula ? `<div class="mesa-detalle">${esc(t.formula)}</div>` : ''}`;
+      if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
+      cuerpo.appendChild(div);
+      return;
+    }
+    // Reporte del Mantenimiento de un personaje (2026-09-24): qué le pasó en el pase de turno (veneno, regeneración, estados
+    // que se terminan…). `origen` = título, `formula` = una línea por renglón.
+    if(t.desde === 'reporte'){
+      const div = document.createElement('div');
+      div.className = 'mesa-tirada mesa-sistema mesa-turno' + (nueva ? ' nueva' : '');
+      const lineas = String(t.formula || '').split('\n').filter(Boolean);
+      // ⚔ El final de un duelo (2026-10-28, dueño): la frase de lo que pasó a la vista y el paso a paso plegado, con «🔍 Ver detalle del duelo».
+      if(t.texto && /^⚔ Resumen del duelo/.test(String(t.origen || ''))){
+        div.classList.add('mesa-duelo-fin');
+        div.innerHTML = `<div class="mesa-duelo-frase">⚔ ${esc(t.texto)}</div>` +
+          `<details class="mesa-duelo-det"><summary>🔍 Ver detalle del duelo</summary>${lineas.map(l => `<div class="mesa-detalle">${esc(l)}</div>`).join('')}</details>`;
+        if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
+        cuerpo.appendChild(div);
+        return;
+      }
+      div.innerHTML = `<span class="mesa-quien mesa-q-turno">⟳ ${esc(t.quien || t.jugador || '?')}</span> <span class="mesa-usuario">${esc(t.origen)}</span>` +
+        lineas.map(l => `<div class="mesa-detalle">${esc(l)}</div>`).join('');
+      if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
+      cuerpo.appendChild(div);
+      return;
+    }
+    // Líneas del sistema (no son tiradas): pase de turno y recordatorios.
+    if(t.desde === 'mantenimiento' || t.desde === 'recordatorio' || t.desde === 'habilidad'){
+      const div = document.createElement('div');
+      div.className = 'mesa-tirada mesa-sistema' + (t.desde === 'mantenimiento' ? ' mesa-turno' : '') + (nueva ? ' nueva' : '');
+      div.innerHTML = t.desde === 'mantenimiento'
+        ? `<span class="mesa-quien mesa-q-turno">⟳ ${esc(t.origen)}</span><div class="mesa-detalle">Pasó el turno</div>`
+        : `<span class="mesa-quien ${mesaClaseQuien(t)}">${esc(t.quien || t.jugador || '?')}</span>${t.quien && t.jugador && t.quien !== t.jugador ? ` <span class="mesa-usuario">(${esc(t.jugador)})</span>` : ''} ${t.desde === "habilidad" ? "⚡" : "🔔"} ${esc(t.origen)}${t.desde === "habilidad"
+            ? `<div class="mesa-texto">${t.formula ? esc(t.formula) : "(esta habilidad no tiene descripción cargada)"}</div>`
+            : (t.formula ? `<div class="mesa-detalle">${esc(t.formula)}</div>` : "")}`;
+      if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
+      cuerpo.appendChild(div);
+      return;
+    }
+    const div = document.createElement('div');
+    div.className = 'mesa-tirada' + (d.id === ultimaId ? ' ultima' : '') + (nueva ? ' nueva' : '');
+    div.innerHTML = mesaFilaContenido(t);
+    if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
+    cuerpo.appendChild(div);
+  });
+  mesaIdsVistos = new Set(docs.map(d => d.id));
+  // Aviso opcional a la herramienta de que llegaron tiradas nuevas (el mapa lo
+  // usa para cerrar el "giro gratis" cuando alguien hace algo).
+  if(!primeraVez && typeof mesaAlAccionNueva === 'function'){
+    const nuevas = docs.filter(d => nuevasIds.has(d.id));
+    if(nuevas.length) mesaAlAccionNueva(nuevas);
+  }
+  // Lo que llegó de esta misma pantalla (2026-10-24: el mapa suelta ahí el aviso «fuera de turno» de una acción que escribió en la Mesa por su cuenta).
+  if(!primeraVez && typeof window !== 'undefined' && typeof window.mesaLlegaronMias === 'function' && fbUsuario){
+    const mias = docs.filter(d => nuevasIds.has(d.id) && d.data().uid === fbUsuario.uid).map(d => d.data());
+    if(mias.length){ try{ window.mesaLlegaronMias(mias); }catch(e){ console.error(e); } }
+  }
+  // Dados 3D para las tiradas nuevas, de la más vieja a la más nueva.
+  if(!primeraVez && typeof dadosAnimarTirada === 'function'){
+    docs.filter(d => nuevasIds.has(d.id) && !mesaAnimadas.has(d.id)).reverse().forEach(d => dadosAnimarTirada(d.data()));
+  }
+  // Cajita flotante achicada: avisa que llegó una tirada de otro.
+  const mesa = document.getElementById('mesa');
+  if(hayAjena && mesa && mesa.classList.contains('colapsada')) mesa.classList.add('aviso');
+}
+
+/* Primero los dados, después el resultado (dueño, 2026-09-26, para todo el juego): cuando llega una tirada que se va a animar en 3D, la Mesa lanza los dados
+   enseguida pero NO muestra la línea hasta que quedan quietos (máximo 7 segundos; sin espera si las animaciones están apagadas o la pestaña está oculta). */
+let mesaUltimoSnap = null;
+function mesaProcesar(snap){
+  mesaUltimoSnap = snap;
+  // 🎭 El mapa filtra lo que cada uno no tiene que ver (vtt-hexgrid/js/29: creeps sin revelar, acciones inciertas).
+  if(typeof mesaFiltrar === 'function') snap = {docs: mesaFiltrar(snap.docs)};
+  const docs = snap.docs;
+  const primeraVez = mesaIdsVistos === null;
+  const puedeEsperar = !primeraVez && typeof dadosAnimarTirada === 'function' && typeof dadosAnimara === 'function';
+  const nuevas = puedeEsperar ? docs.filter(d => !mesaIdsVistos.has(d.id) && !mesaAnimadas.has(d.id)) : [];
+  const animables = nuevas.filter(d => { try{ return dadosAnimara(d.data()); }catch(e){ return false; } });
+  if(!animables.length && !mesaRetenida){ mesaRender(docs); return; }
+  const lanzar = () => animables.reverse().forEach(d => { mesaAnimadas.add(d.id); dadosAnimarTirada(d.data()); });
+  if(mesaRetenida){ mesaRetenida.snap = snap; lanzar(); return; }   // ya se está esperando: solo se guarda lo último
+  const ret = {snap};
+  mesaRetenida = ret;
+  let empezo = typeof dados !== 'undefined' && dados.rodando > 0, hecho = false, tMax, tMin;
+  const ini = () => { empezo = true; };
+  const fin = () => {
+    if(hecho) return;
+    hecho = true;
+    window.removeEventListener('dados-inicio', ini); window.removeEventListener('dados-quietos', quietos);
+    clearTimeout(tMax); clearTimeout(tMin);
+    setTimeout(() => { if(mesaRetenida === ret){ mesaRetenida = null; mesaRender(ret.snap.docs); } }, 350);   // un instante para verlos quietos
+  };
+  const quietos = () => { if(empezo) fin(); };
+  window.addEventListener('dados-inicio', ini);
+  window.addEventListener('dados-quietos', quietos);
+  tMin = setTimeout(() => { if(!empezo) fin(); }, 2200);   // los dados no llegaron a empezar
+  tMax = setTimeout(fin, 7000);
+  lanzar();   // se lanzan DESPUÉS de escuchar los eventos, así no se pierde el «empezaron»
+}
+
+// Volver a pasar lo último por el filtro (el mapa, cuando llegan los tokens).
+function mesaRefiltrar(){ if(mesaUltimoSnap && !mesaRetenida) mesaProcesar(mesaUltimoSnap); }
+
+function mesaEscuchar(){
+  $('#mesa-cuerpo').innerHTML = '<div class="mesa-vacia">Cargando tiradas…</div>';
+  fbDb.collection(fbRutaCampana('tiradas'))
+    .orderBy('cuando', 'desc').limit(MESA_MAX)
+    .onSnapshot(snap => {
+      mesaEstado(`${fbPartida.nombre} · ${fbMiembro.nombre} · ${fbMiembro.gm ? "GM" : "jugador"}`);
+      mesaProcesar(snap);
+    }, err => {
+      console.error('Error escuchando la mesa:', err);
+      mesaEstado('desconectada');
+      $('#mesa-cuerpo').innerHTML = '<div class="mesa-vacia">No se pudieron leer las tiradas — mirá la consola.</div>';
+    });
+}
+
+// Cajita flotante de la ficha y gm-tools. Arma la cajita, entra a la
+// partida y, si todo está bien, llama a alEntrar().
+async function mesaIniciar(alEntrar){
+  const mesa = document.createElement('div');
+  mesa.id = 'mesa';
+  mesa.innerHTML =
+    '<div id="mesa-cabecera" title="Clic: achicar o agrandar · Arrastrar: mover">' +
+      fbLinkInicioHtml('⌂') + '<span id="mesa-titulo">Mesa</span><span id="mesa-turno" title="Turno actual" style="font-family:\'Space Mono\',monospace;font-size:10px;color:#9A867E"></span>' + dadosBotonHtml() + mesaBorrarHtml() + '<span id="mesa-estado">conectando…</span><span id="mesa-flecha"></span>' +
+    '</div>' +
+    '<div id="mesa-resumen"></div>' +
+    '<div id="mesa-cuerpo"></div>' +
+    '<form id="mesa-tirar"><input id="mesa-formula" placeholder="Tirada libre, ej: 2d6+3" autocomplete="off"><button type="submit" class="btn">Tirar</button></form>' +
+    '<div id="mesa-grilla"><button type="button" class="btn" title="Grilla de dados: elegí dado y cantidad">🎲 Dados</button></div>';
+  document.body.appendChild(mesa);
+  mesaPonerTurno(mesaTurnoActual);
+  const cabecera = $('#mesa-cabecera');
+  dadosConectarBoton(mesa);
+  // Grilla de dados al costado de la cajita (comun/grilla-dados.js).
+  grillaConectar($('#mesa-grilla button'), {ancla: mesa, alTirar: f => registrarTirada('Tirada libre', tirarDados(f))});
+
+  // Tirada libre por fórmula, igual que en el mapa: se publica en la Mesa
+  // y queda en el historial de la sesión.
+  $('#mesa-tirar').onsubmit = e => {
+    e.preventDefault();
+    const r = tirarDados($('#mesa-formula').value);
+    if(!r){ toast('Fórmula no válida — ej: 2d6+3'); return; }
+    registrarTirada('Tirada libre', r);
+    $('#mesa-formula').value = '';
+  };
+
+  // Posición: la cajita se arrastra desde la cabecera y el lugar queda
+  // guardado en este navegador. Mientras nunca se la movió, va abajo a la
+  // derecha, justo encima del dock si la herramienta tiene uno (aunque la
+  // barra ocupe dos renglones). Nunca queda afuera de la pantalla.
+  const dock = document.querySelector('.dock');
+  let posicion = null;
+  try{ posicion = JSON.parse(localStorage.getItem('mesa-posicion') || 'null'); }catch(e){}
+  const encuadrar = () => {
+    if(!posicion){
+      mesa.style.left = mesa.style.top = mesa.style.right = '';
+      mesa.style.bottom = dock ? (dock.offsetHeight + 12) + 'px' : '';
+      return;
+    }
+    const x = Math.max(0, Math.min(posicion.x, window.innerWidth - mesa.offsetWidth));
+    const y = Math.max(0, Math.min(posicion.y, window.innerHeight - mesa.offsetHeight));
+    mesa.style.left = x + 'px';
+    mesa.style.top = y + 'px';
+    mesa.style.right = mesa.style.bottom = 'auto';
+  };
+  window.addEventListener('resize', encuadrar);
+
+  let arrastre = null, recienMovida = false;
+  cabecera.addEventListener('pointerdown', e => {
+    if(e.button !== 0 || e.target.closest('.fb-inicio, .dados3d-boton, .dados3d-config, .mesa-borrar')) return;
+    const r = mesa.getBoundingClientRect();
+    arrastre = {px: e.clientX, py: e.clientY, x: r.left, y: r.top, movio: false};
+    cabecera.setPointerCapture(e.pointerId);
+  });
+  cabecera.addEventListener('pointermove', e => {
+    if(!arrastre) return;
+    const dx = e.clientX - arrastre.px, dy = e.clientY - arrastre.py;
+    if(!arrastre.movio && Math.abs(dx) + Math.abs(dy) < 5) return;  // un clic con pulso tembloroso no es arrastre
+    arrastre.movio = true;
+    mesa.classList.add('arrastrando');
+    posicion = {x: arrastre.x + dx, y: arrastre.y + dy};
+    encuadrar();
+  });
+  const soltar = () => {
+    if(!arrastre) return;
+    recienMovida = arrastre.movio;
+    arrastre = null;
+    mesa.classList.remove('arrastrando');
+    if(recienMovida){
+      posicion = {x: parseFloat(mesa.style.left), y: parseFloat(mesa.style.top)};
+      try{ localStorage.setItem('mesa-posicion', JSON.stringify(posicion)); }catch(e){}
+    }
+  };
+  cabecera.addEventListener('pointerup', soltar);
+  cabecera.addEventListener('pointercancel', soltar);
+
+  const aplicarColapso = colapsada => {
+    mesa.classList.toggle('colapsada', colapsada);
+    if(!colapsada) mesa.classList.remove('aviso');
+    $('#mesa-flecha').textContent = colapsada ? '▸' : '▾';
+    try{ localStorage.setItem('mesa-colapsada', colapsada ? '1' : ''); }catch(e){}
+    encuadrar();
+  };
+  let colapsada = false;
+  try{ colapsada = localStorage.getItem('mesa-colapsada') === '1'; }catch(e){}
+  aplicarColapso(colapsada);
+  cabecera.onclick = e => {
+    if(recienMovida){ recienMovida = false; return; }  // soltar después de arrastrar no achica la cajita
+    if(!e.target.closest('.fb-inicio, .dados3d-boton, .dados3d-config, .mesa-borrar')) aplicarColapso(!mesa.classList.contains('colapsada'));
+  };
+  // Solo se ve con la cajita achicada (ver CSS): un clic ahí también la agranda.
+  $('#mesa-resumen').onclick = () => aplicarColapso(false);
+
+  // Sin sesión, sin partida elegida o sin haberse unido: al inicio del sitio.
+  const entrada = await fbEntrarAPartida();
+  if(entrada === 'redirigiendo') return;
+  if(entrada !== 'ok'){
+    mesaEstado('sin internet');
+    $('#mesa-cuerpo').innerHTML = '<div class="mesa-vacia">No se pudo cargar Firebase. Las tiradas siguen funcionando, pero no se comparten.</div>';
+    return;
+  }
+  alEntrar();
+}

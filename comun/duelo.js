@@ -1,0 +1,3492 @@
+/* comun/duelo.js — Ataque paso a paso en vivo entre atacante y defensor (etapas 1 a 5: contacto, defensa, Parry, Bloqueo, crítico, daño y efectos del golpe; 1 contra 1).
+   Diseño: docs/ataque-paso-a-paso.md. Idea del dueño, 2026-09-26.
+
+   Un duelo es un documento de Firestore (campanas/<partida>/duelos/<id>) que los dos lados ven y escriben en vivo:
+     {estado: 'esperando'|'empate'|'resuelto'|'cancelado', fase: 'contacto'|'bloqueo'|'critico'|'dano'|'efectos'|'fin',
+      atacante:{ref,tipo,nombre,uid,tokenId}, defensor:{…}, ataque:{tipo,armaId,armaNombre,tipoDado},
+      defensa: {modo:'evasion'|'parry', itemId, itemNombre, costo}|null,      ← la elige el defensor A CIEGAS (antes de ver el PdG)
+      pdg, eva (la tirada de defensa: Evasión o Parry), fuerza (Fuerza del golpe), bloqueo: {total,formula,rolls,mod}|null,
+      critDatos:{frecuente,potente,resistencia}|null (lo anota cada lado al tirar: el atacante su Crítico frecuente/potente, el defensor su Resistencia a crítico al Tipo),
+      crit:{rango,diferencia,nivel,dados,critico,d20,mejor,mult}|null,
+      dano:{crudo,formula,rolls,mod,reclamado,aplicado,mult,golpe,ignoraDef,mitad,defensa,recibido,absorbido,hpAntes,hpDespues,manual}|null,
+      efectos:[{nombre,caras,exitos,dado,detalle,stacks,requiereDano,res:{dado,exito,extra}|null,omitido,motivo,aplicar:''|'pedido'|'en-curso',aplicado,nota}]|null,
+      contacto:{gana,dif,desempate,moneda}|null, bloq:{…}|null, empate:{par:'contacto'|'bloqueo', moneda?}|null,
+      resultado: 'pego'|'fallo'|'bloqueado'|'mitad'|null, contra: id del contraataque|null, contraDe, creado, creadoPor}
+   Pasos: 1 declaración → 2 contacto (PdG contra Evasión o Parry) → si el Parry gana, 3 Bloqueo (Fuerza del golpe contra Bloqueo):
+     · Evasión: gana el atacante → «pegó»; gana el defensor → «falló».
+     · Parry: gana el atacante → el Parry falló y «pegó»; gana el defensor → Bloqueo: si el defensor lo gana, «bloqueado» (se anula el golpe y puede
+       contraatacar); si lo pierde, «mitad» (pasa la mitad del daño, redondeada para arriba, y el objeto con el que bloqueó pierde 1 de durabilidad).
+   CRÍTICO (etapa 3, `comun/critico.js`): si el golpe pega, se compara PdG − la tirada de defensa (Evasión o Parry) con el rango del crítico (Tipo del arma − Crítico
+   frecuente): nivel N; la Resistencia a crítico del defensor lo baja; se tiran N − R d20 y el mejor da el multiplicador (×2 / ×3 / ×4, con Crítico potente).
+   El crítico ignora la Defensa.
+   DAÑO (etapa 4): si el golpe pega (o pasa la mitad), el atacante tira el daño de su arma (sin los efectos del golpe: son la etapa 5). Crítico: daño × multiplicador, derecho a
+   la vida (sin restar la Defensa). Sin crítico: daño − Defensa. «Pasa la mitad»: (daño − Defensa) ÷ 2, redondeado para arriba. El HP lo baja el mapa del GM
+   (`escuchar({aplicar})`: reutiliza «Recibe daño» del mapa, con Invulnerable y Escudo mágico) y el resultado queda en el duelo.
+   EFECTOS DEL GOLPE (etapa 5, dueño 2026-09-26): los efectos del arma (Lisiado 25 %, Envenenar…) se tiran UNO POR UNO como momentos propios (dado a la vista y «¡FUNCIONÓ!» /
+   «No funcionó»); si funcionan, un botón «Aplicar» los pone sobre el defensor (lo ejecuta el mapa del GM). Los que necesitan daño (Envenenar, Veneno severo, Sangrado, Drena
+   vida, Lisiado) no entran si el golpe no hizo daño; Demora, Aturdir, Derribar, Prende fuego y Rompe armadura entran aunque no pase el daño.
+   EMPATE (regla del dueño): si empatan y solo UNA de las dos tiradas lleva un «+» fijo, gana la que NO lo lleva; si las dos (o ninguna), par o impar.
+   TODOS los conectados ven el cuadro (se abre solo); se puede minimizar («⚔ Ver duelo»). Cada uno solo ve los botones que le tocan.
+
+   Cada lado tira con SU propio código (ficha o gm-tools). La página define window.DUELO_HOOKS = {
+     soy(lado), atacar(duelo), opcionesDefensa(duelo) → [{modo, itemId, etiqueta, costo, motivoNo}], defender(duelo, modo, itemId),
+     fuerza(duelo), bloquear(duelo), armaContra(duelo) → {armaId, armaNombre, tipoDado} }
+   y `registrarTirada` dispara 'tirada-registrada' (detail: {origen, r}), de donde el duelo recoge cada resultado.
+   En el MAPA no hay hooks: `escuchar({relay})` recibe la función que le manda un mensaje (`duelo-opciones`, `duelo-tirar`, `duelo-contra`) al iframe
+   de la ficha (o de las Acciones del creep) del dueño; el iframe lo ejecuta y escribe el resultado él mismo en Firestore.
+   Elegir el objetivo: dentro del mapa (iframe) con un clic en el token (`duelo-elegir-objetivo`); en una página suelta, de una lista.
+   El GM (o el dueño) puede tirar «a mano» por quien no responde.
+   Depende de sesion.js (fbDb, fbUsuario, fbMiembro, fbRutaCampana) y de las globals esc, num, fmt, toast, formulaParaValor de cada herramienta. */
+const Duelo = (() => {
+  const MAPA_PRINCIPAL = '_principal';
+  const VIGENCIA_MS = 30 * 60 * 1000;      // un duelo sin resolver deja de avisar a los 30 minutos
+  const AUTOABRIR_MS = 60 * 1000;          // el cuadro se abre solo si el duelo es de hace menos de un minuto
+  const RESUELTO_VISIBLE_MS = 2 * 60 * 1000;
+  const NOMBRE_ATAQUE = {normal: 'Ataque', oportunidad: 'Ataque de oportunidad', contra: 'Contraataque'};
+  const CAMPOS_ESCRIBIBLES = ['estado', 'fase', 'defensa', 'pdg', 'eva', 'fuerza', 'bloqueo', 'contacto', 'bloq', 'resultado', 'empate', 'critDatos', 'crit', 'dano', 'efectos', 'rerollUsado', 'resumido'];
+
+  let actual = null;         // {id, dato, baja, min} — el duelo abierto (o minimizado) en el cuadro
+  let revelado = {};         // id:clave → true: ya se animó en esta pestaña
+  let manual = {};           // clave → valor tipeado a mano
+  const manualAbierto = new Set();   // ✍ «Elegir manualmente» abierto en un paso ('duelo:campo', 2026-10-15)
+  let descartados = new Set();
+  let autoAbiertos = new Set();
+  let chips = new Map();
+  let listaDuelos = [];
+  let escuchando = null;
+  let cfgEscuchar = {};
+  let esperaTiro = null;     // {id, campo, re, defensa}
+  let pendienteSuelto = null;
+  let opciones = {};         // id → opciones de defensa del defensor (las pide al iframe o a los hooks)
+  let opcionesPedidas = new Set();
+  let aplicando = new Set();
+  // Un golpe BLOQUEADO (anulado) que esta pantalla vio resolverse (no los que ya estaban al entrar): cfgEscuchar.bloqueado(d), solo el GM
+  // (2026-10-06, el Empujón de los escudos). La primera tanda del listener se marca sin avisar.
+  const bloqueadoAvisado = new Set(), desarmadoAvisado = new Set();
+  // Un ataque con «termina el turno» (Degollar, 2026-10-10) que esta pantalla vio resolverse: cfgEscuchar.terminaTurno(d), solo el GM.
+  const terminaAvisado = new Set();
+  let terminaPrimera = true;
+  // 🏹 Una flecha especial que erró (2026-10-09): cfgEscuchar.flechaErrada(d), en la pantalla de quien disparó (no los que ya estaban al entrar).
+  const flechaAvisada = new Set();
+  const remachaAvisada = new Set();
+  const disparoAvisado = new Set();
+  let disparoPrimera = true;
+  const pdgEspAvisado = new Set();   // 🔮 el Orbe del custodio (2026-10-18)
+  let pdgEspPrimera = true;
+  const resistidaAvisada = new Set();   // 🔮 el Contrahechizo (2026-10-18)
+  let resistidaPrimera = true;
+  let flechaPrimera = true;
+  // 🪵 Un dodge roll de Tronco de huída en un golpe directo (2026-10-10): cfgEscuchar.dodgeLibre(d), en la pantalla de quien esquivó.
+  const dodgeLibreAvisado = new Set();
+  let dodgeLibrePrimera = true;
+  let bloqueadoPrimera = true, desarmadoPrimera = true;
+  let grupoAvisado = new Set();   // ids de sub-duelos de área ya avisados a cfgEscuchar.grupoResuelto (no avisar dos veces)
+  const grupoCanceladoAvisado = new Set();   // …y a cfgEscuchar.grupoCancelado (2026-10-25)
+  let dodgeActivos = new Set();   // ids de duelos con fase 'dodge' ya avisados a cfgEscuchar.dodgeEmpieza (para saber cuándo avisar dodgeTermina)
+  const retener = on => { window.DUELO_RETENER = !!on; if(on) setTimeout(() => { window.DUELO_RETENER = false; }, 20000); };   // la Mesa no publica la tirada mientras está prendido   // duelos cuyo daño está aplicando esta pestaña (GM)
+
+  const hooks = () => (typeof window !== 'undefined' && window.DUELO_HOOKS) || null;
+  const yo = () => (typeof fbUsuario !== 'undefined' && fbUsuario ? fbUsuario.uid : '');
+  const soyGM = () => !!(typeof fbMiembro !== 'undefined' && fbMiembro && fbMiembro.gm);
+  const enIframe = () => window.parent !== window;
+  const disponible = () => !!(typeof fbDb !== 'undefined' && fbDb && typeof fbUsuario !== 'undefined' && fbUsuario && typeof fbMiembro !== 'undefined' && fbMiembro);
+  const col = () => fbDb.collection(fbRutaCampana('duelos'));
+  const _esc = s => (typeof esc === 'function' ? esc(s) : String(s).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c])));
+  const _fmt = n => (typeof fmt === 'function' ? fmt(n) : String(n));
+  const _toast = m => { if(typeof toast === 'function') toast(m); };
+  const _num = v => (typeof num === 'function' ? num(v) : Number(v) || 0);
+  const abierto = d => d.estado === 'esperando' || d.estado === 'empate';
+
+  /* ---------- estilos ---------- */
+  function inyectarCss(){
+    if(document.getElementById('duelo-css')) return;
+    const s = document.createElement('style');
+    s.id = 'duelo-css';
+    s.textContent = `
+#duelo-fondo{position:fixed;inset:0;z-index:99000;background:rgba(6,8,14,.78);display:flex;align-items:center;justify-content:center;padding:12px;font-family:inherit}
+#duelo-fondo.min{display:none}
+.duelo-caja{background:#151a26;color:#e9ecf4;border:1px solid #39435c;border-radius:16px;width:min(880px,100%);max-height:96vh;overflow:auto;box-shadow:0 18px 60px rgba(0,0,0,.6)}
+.duelo-cab{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2b3347;font-weight:800;font-size:18px;letter-spacing:.03em}
+.duelo-cab .bt{display:flex;gap:6px}
+.duelo-cab button{background:#232b40;border:0;color:#c7cee2;font-size:16px;cursor:pointer;border-radius:8px;padding:4px 10px}
+.duelo-cab button:hover{background:#2d3854}
+.duelo-cuerpo{padding:16px 18px;display:flex;flex-direction:column;gap:16px}
+.duelo-vs{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:stretch}
+.duelo-lado{background:#1d2335;border:1px solid #2f3852;border-radius:12px;padding:12px 14px;min-width:0}
+.duelo-lado.atq{border-color:#a5485a}.duelo-lado.def{border-color:#4a78b8}
+.duelo-lado .rol{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#9aa4bd}
+.duelo-lado .nom{font-size:22px;font-weight:800;margin-top:2px;overflow-wrap:anywhere}
+.duelo-lado .sub{font-size:13px;color:#aab3ca;margin-top:2px}
+.duelo-vs .vs{align-self:center;font-weight:800;color:#c9a24a;font-size:26px}
+.duelo-paso{background:#1a2030;border:1px solid #2b3347;border-radius:12px;padding:12px 14px}
+.duelo-paso h4{margin:0 0 10px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#9aa4bd;font-weight:600}
+.duelo-paso h4 .n{display:inline-block;background:#2b3347;color:#e9ecf4;border-radius:50%;width:20px;height:20px;line-height:20px;text-align:center;margin-right:6px;font-size:11px}
+.duelo-tiros{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.duelo-tiro{background:#12172a;border:1px dashed #39435c;border-radius:12px;padding:12px;text-align:center;min-height:150px;display:flex;flex-direction:column;justify-content:center;gap:8px}
+.duelo-tiro .que{font-size:12px;color:#9aa4bd;text-transform:uppercase;letter-spacing:.06em}
+.duelo-tiro .espera{color:#8b95b0;font-style:italic;font-size:14px}
+.duelo-tiro .listo{color:#7fd08c;font-weight:800;font-size:17px}
+.duelo-tiro .num{font-size:64px;font-weight:900;line-height:1}
+.duelo-tiro .det{font-size:12px;color:#aab3ca}
+.duelo-tiro button,.duelo-pie button,.duelo-man button{background:#2d6cdf;color:#fff;border:0;border-radius:10px;padding:11px 14px;font-size:15px;font-weight:700;cursor:pointer}
+.duelo-tiro button:disabled{opacity:.45;cursor:default}
+.duelo-tiro button.sec,.duelo-pie button.sec{background:#2b3347;color:#d5dbec}
+.duelo-opc{display:flex;flex-direction:column;gap:6px}
+.duelo-opc small{display:block;font-weight:500;font-size:11px;opacity:.85}
+.duelo-opc small.duelo-info{font-size:13px;font-weight:700;opacity:1;color:#dfe8ff;margin-top:2px}
+.duelo-opc button.no-puede{background:#2a2f3d;border:1px dashed #6b7590;color:#9aa3b8;cursor:not-allowed;opacity:1}
+.duelo-opc button.no-puede .no-puede-txt{display:block;font-size:13px;font-weight:800;color:#ffb4a8;margin-bottom:2px;letter-spacing:.02em}
+.duelo-opc button.no-puede small{opacity:.9}
+.duelo-man{display:flex;gap:6px;align-items:center;justify-content:center;flex-wrap:wrap}
+.duelo-manual{margin-top:8px;font-size:12px;color:#9aa3b8}
+.duelo-texto{position:fixed;left:14px;top:90px;width:min(270px,22vw);max-height:70vh;overflow:auto;background:rgba(21,26,38,.97);border:1px solid #39435c;border-left:3px solid #c98545;border-radius:10px;padding:10px 12px;color:#e9ecf4;font-size:13px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.5);z-index:2}
+.duelo-texto b.t{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:#c98545;margin-bottom:6px}
+#duelo-fondo.min .duelo-texto{display:none}
+.duelo-texto details.tec{margin-top:8px;font-size:12px;color:#9aa3b8}
+.duelo-texto details.tec summary{cursor:pointer;color:#c98545}
+.duelo-manual .tg{display:inline-flex;gap:5px;align-items:center;cursor:pointer;float:right}
+.duelo-manual .tg input{width:auto}
+.duelo-mcaja{clear:both;margin-top:6px;padding:8px;border:1px dashed #39435c;border-radius:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:center}
+.duelo-mcaja input[type=text],.duelo-mcaja input[type=number],.duelo-mcaja select{background:#0e1220;color:#fff;border:1px solid #39435c;border-radius:6px;padding:7px;text-align:center}
+.duelo-mcaja input[type=text]{width:150px}
+.duelo-mcaja .mdef{width:100%;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;color:#cfd6e6}
+.duelo-mcaja .mdef label{display:inline-flex;gap:4px;align-items:center}
+.duelo-mcaja .mdef input{width:auto}
+.duelo-mcaja button{background:#2d6cdf;color:#fff;border:0;border-radius:10px;padding:8px 12px;font-weight:700;cursor:pointer}
+.duelo-mcaja .det{width:100%;text-align:center}
+.duelo-man input,.duelo-man select{background:#0e1220;color:#fff;border:1px solid #39435c;border-radius:6px;padding:7px;text-align:center}
+.duelo-man input{width:70px}
+.duelo-mini{margin-top:10px;text-align:center;font-size:14px;font-weight:700;color:#cfd6ea}
+.duelo-mini.g{color:#8fe3a9}.duelo-mini.r{color:#f1a1ad}
+.duelo-veredicto{border-radius:14px;padding:18px;text-align:center;font-weight:900;letter-spacing:.04em}
+.duelo-veredicto .grande{font-size:48px;line-height:1.1}
+.duelo-veredicto .chico{font-size:14px;font-weight:500;letter-spacing:0;margin-top:6px;opacity:.92}
+.duelo-veredicto.pego{background:linear-gradient(180deg,#1f5a34,#173f27);border:2px solid #4fce7c;color:#c9f5d6}
+.duelo-veredicto.fallo{background:linear-gradient(180deg,#5a2530,#3d181f);border:2px solid #d95a6e;color:#fbd0d7}
+.duelo-veredicto.bloqueado{background:linear-gradient(180deg,#1f3f5a,#172c3d);border:2px solid #5aa7e8;color:#cfe6fb}
+.duelo-veredicto.mitad{background:linear-gradient(180deg,#5a4a1f,#3d3317);border:2px solid #d9b45a;color:#f8ecc6}
+.duelo-veredicto.empate{background:linear-gradient(180deg,#5a4a1f,#3d3317);border:2px solid #d9b45a;color:#f8ecc6}
+.duelo-ef{background:#12172a;border:1px solid #2f3852;border-radius:10px;padding:10px 12px;margin-bottom:8px}
+.duelo-ef-top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:16px}
+.duelo-ef-prob{font-size:12px;color:#ffd25a;border:1px solid #ffd25a;border-radius:99px;padding:1px 10px}
+.duelo-ef button{margin-top:8px;background:#2d6cdf;color:#fff;border:0;border-radius:10px;padding:10px 14px;font-size:15px;font-weight:700;cursor:pointer}
+.duelo-ef button:disabled{opacity:.5}
+.duelo-ef-res{margin-top:8px;padding:10px 12px;border-radius:10px;font-weight:900;font-size:22px}
+.duelo-ef-res span{font-size:13px;font-weight:500}
+.duelo-ef-res.ok{background:rgba(79,206,124,.16);color:#8fe3a9;border:1px solid #4fce7c}
+.duelo-ef-res.no{background:rgba(154,134,126,.14);color:#9aa4bd;border:1px solid #39435c;text-decoration:none}
+.duelo-ef-res.nuevo{animation:duelo-golpe .55s cubic-bezier(.2,1.6,.4,1) both}
+.duelo-ef-tablero table{width:100%;border-collapse:collapse;font-size:14px}
+.duelo-ef-tablero th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#8d97ad;padding:2px 6px 6px}
+.duelo-ef-tablero td{padding:7px 6px;border-top:1px solid #2f3852;vertical-align:middle}
+.duelo-ef-tablero .hint{color:#ffd25a;font-size:12px}
+.duelo-ef-tablero .ok{color:#8fe3a9;font-weight:800}
+.duelo-ef-tablero .no{color:#9aa4bd;font-weight:700}
+.duelo-dado{display:inline-block;min-width:28px;text-align:center;font-size:18px;padding:2px 6px;border-radius:8px;background:#1d2a4a;border:1px solid #5aa7e8;color:#fff}
+.duelo-dado.nuevo{animation:duelo-golpe .55s cubic-bezier(.2,1.6,.4,1) both}
+.duelo-dado.ok{font-size:26px;min-width:40px;padding:4px 8px;background:radial-gradient(circle at 50% 35%,#7a5a12,#3d2c08);border:2px solid #ffd25a;color:#fff6d8;box-shadow:0 0 14px rgba(255,190,60,.75);animation:duelo-brillo 1.4s ease-in-out infinite}
+.duelo-dado.ok.nuevo{animation:duelo-golpe .55s cubic-bezier(.2,1.6,.4,1) both,duelo-brillo 1.4s ease-in-out .55s infinite}
+.duelo-funciono{font-size:15px;letter-spacing:.03em;text-shadow:0 0 10px rgba(79,206,124,.7)}
+.duelo-funciono.nuevo{display:inline-block;animation:duelo-golpe .55s cubic-bezier(.2,1.6,.4,1) .15s both}
+@keyframes duelo-brillo{0%,100%{box-shadow:0 0 8px rgba(255,190,60,.55)}50%{box-shadow:0 0 22px rgba(255,190,60,1),0 0 4px #fff inset}}
+.duelo-cuenta{margin:10px auto 0;max-width:420px;border-radius:12px;padding:10px 12px;background:rgba(0,0,0,.28);border:1px solid #39435c;text-align:left}
+.duelo-cuenta-tit{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#9fb6e8;margin-bottom:6px}
+.duelo-cuenta-fila{display:grid;grid-template-columns:18px 1fr auto;gap:8px;align-items:baseline;padding:3px 0;font-size:14px;color:#e6ebf7}
+.duelo-cuenta-fila .s{font-weight:900;text-align:center;color:#8e98b4}
+.duelo-cuenta-fila .v{font-weight:900;font-size:16px;font-variant-numeric:tabular-nums}
+.duelo-cuenta-fila small{display:block;font-size:11px;color:#8e98b4;font-weight:600}
+.duelo-cuenta-fila.resta .s,.duelo-cuenta-fila.resta .v{color:#ff8a8a}
+.duelo-cuenta-fila.suma .s,.duelo-cuenta-fila.suma .v{color:#8fe3a9}
+.duelo-cuenta-fila.sub{border-top:1px dashed #39435c;color:#cfd6ea}
+.duelo-cuenta-fila.nota .t{font-size:12px;color:#ffd25a;font-weight:700}
+.duelo-cuenta-fila.final{border-top:2px solid #cfd6ea;margin-top:2px;padding-top:6px}
+.duelo-cuenta-fila.final .t{font-weight:900;text-transform:uppercase;letter-spacing:.04em}
+.duelo-cuenta-fila.final .v{font-size:22px;color:#ff5a5a}
+.duelo-danobox{margin-top:10px;text-align:center;border-radius:12px;padding:14px;background:rgba(0,0,0,.25);border:1px solid #39435c}
+.duelo-danobox.crit{border-color:#ff5a5a;background:radial-gradient(circle at 50% 30%,rgba(120,20,20,.55),rgba(40,8,8,.6))}
+.duelo-danonum{font-size:96px;font-weight:900;line-height:1;animation:duelo-num .6s ease-out both}
+.duelo-danonum.rojo{color:#ff4d4d;text-shadow:0 0 24px rgba(255,60,60,.7)}
+.duelo-danonum.inv{font-size:40px;color:#9ad0ff}
+.duelo-danosub{font-size:14px;color:#cfd6ea;margin-top:4px}
+.duelo-danosub.rojo{font-size:26px;font-weight:900;letter-spacing:.12em;color:#ff4d4d}
+.duelo-danotiro{margin-top:10px;display:flex;align-items:center;justify-content:center;gap:10px 16px;flex-wrap:wrap;padding:10px 14px;border-radius:12px;background:rgba(45,108,223,.12);border:1px solid #2d6cdf}
+.duelo-danotiro .t{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#9fb6e8}
+.duelo-danotiro .n{font-size:46px;font-weight:900;line-height:1;color:#fff;text-shadow:0 0 14px rgba(120,170,255,.45)}
+.duelo-danotiro .dados{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.duelo-dadito{min-width:30px;height:30px;padding:0 6px;border-radius:8px;background:#e8ecf7;color:#14182a;font-weight:900;font-size:16px;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 2px 0 rgba(0,0,0,.4)}
+.duelo-dadito.mod{background:transparent;color:#e8ecf7;border:1px dashed #7d8ab0;box-shadow:none}
+.duelo-danotiro .f{width:100%;text-align:center;font-size:12px;color:#8e98b4;margin-top:-2px}
+#duelo-fondo [data-dano-tirar],#duelo-fondo [data-critico]{background:#2d6cdf;color:#fff;border:2px solid #8db3ff;border-radius:12px;padding:14px 28px;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(45,108,223,.5)}
+#duelo-fondo [data-dano-tirar]:hover,#duelo-fondo [data-critico]:hover{background:#3b7bf0}
+#duelo-fondo .bt-lupa.duelo-lupa{display:inline-flex;position:static;width:auto;height:auto;margin-left:8px;padding:2px 7px;vertical-align:middle;font-size:14px;opacity:1;filter:none;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.5);border-radius:6px}
+#duelo-fondo .bt-lupa.duelo-lupa:hover{background:rgba(255,255,255,.2)}
+#lupa-pop{z-index:100050}
+#duelo-fondo .duelo-costo-ayuda{position:relative;display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;margin-left:4px;border-radius:50%;border:1px solid currentColor;font:700 10px/1 "Space Mono",monospace;cursor:help;vertical-align:middle;opacity:.8}
+#duelo-fondo .duelo-costo-ayuda:hover,#duelo-fondo .duelo-costo-ayuda:focus{opacity:1;outline:none;background:rgba(255,255,255,.12)}
+#duelo-fondo .duelo-costo-ayuda:hover::after,#duelo-fondo .duelo-costo-ayuda:focus::after{content:attr(data-txt);position:absolute;left:50%;top:22px;transform:translateX(-50%);z-index:5;width:max-content;max-width:300px;white-space:pre-line;text-align:left;background:#1d1712;color:#EDE3D6;border:1px solid #E0A458;border-radius:6px;padding:8px 10px;font:12.5px/1.45 system-ui,sans-serif;box-shadow:0 6px 24px rgba(0,0,0,.5)}
+#duelo-fondo [data-dano-tirar]:disabled,#duelo-fondo [data-critico]:disabled{opacity:.5;cursor:default}
+#duelo-fondo [data-dano-aceptar]{background:#a3263a;color:#fff;border:2px solid #f08a9a;border-radius:12px;padding:14px 28px;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(163,38,58,.5)}
+#duelo-fondo [data-dano-aceptar].sec{font-size:14px;padding:8px 16px}
+#duelo-fondo [data-dano-aceptar]:hover{background:#bd3046}
+#duelo-fondo [data-dano-aceptar]:disabled{opacity:.5;cursor:default}
+.duelo-crit-titulo{text-align:center;font-size:30px;font-weight:900;letter-spacing:.04em;padding:10px 0 4px}
+.duelo-crit-titulo.no{color:#9aa4bd}
+.duelo-crit-titulo.posible{color:#ffd25a}
+.duelo-crit-titulo.si{color:#ffd25a;text-shadow:0 0 14px rgba(255,190,60,.7)}
+.duelo-crit-explica{text-align:center;font-size:13px;color:#aab3ca;line-height:1.5;margin-bottom:6px}
+.duelo-crit-viz{margin:8px 0 4px}
+.duelo-crit-viz-tit{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#9aa4bd;margin:8px 0 5px}
+.duelo-crit-viz-tit:first-child{margin-top:0}
+.duelo-crit-fila{display:flex;flex-wrap:wrap;align-items:center}
+.duelo-crit-cinco{display:flex;gap:2px;margin:0 7px 4px 0}
+.duelo-crit-cuad{width:20px;height:20px;border-radius:4px;background:#1d2335;border:1px solid #39435c;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#9aa4bd;flex:none;position:relative}
+.duelo-crit-cuad.frec{background:#1f6b3a;border-color:#5fd08a;color:#e6ffee}
+.duelo-crit-cuad svg{width:72%;height:72%;display:block}
+.duelo-crit-cuad.mira{color:#c9a24a}
+.duelo-crit-cuad.eva{background:#3b1820;border-color:#d95a6e;color:#ffe3e7}
+.duelo-crit-cuad.activo{background:#2d6cdf;border-color:#8db3ff;color:#fff}
+.duelo-crit-cuad.suelto{background:#12172a;border-color:#2b3347;color:#565f78}
+.duelo-crit-cuad.anulado{background:#2d6cdf;border-color:#8db3ff}
+.duelo-crit-cuad.anulado::after{content:'';position:absolute;inset:0;border-radius:3px;background:linear-gradient(135deg,transparent 44%,#ffd25a 47%,#ffd25a 53%,transparent 56%)}
+.duelo-crit-leyenda{display:flex;flex-wrap:wrap;gap:5px 16px;margin-top:6px}
+.duelo-crit-ref{display:flex;align-items:center;gap:6px;font-size:11.5px;color:#9aa4bd}
+.duelo-crit-ref .duelo-crit-cuad{width:16px;height:16px;font-size:7px}
+.duelo-d20s{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;margin:12px 0 8px}
+.duelo-d20{width:44px;height:44px;border-radius:10px;background:#12172a;border:1px solid #39435c;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#9aa4bd;position:relative}
+.duelo-d20.nuevo{animation:duelo-d20in .45s cubic-bezier(.2,1.6,.4,1) both}
+.duelo-d20.mejor{width:58px;height:58px;font-size:28px;color:#fff3c9;background:radial-gradient(circle,#8a5a12,#4a2a08);border:2px solid #ffd25a;z-index:1;box-shadow:0 0 18px rgba(255,190,60,.7)}
+.duelo-d20.mejor::before,.duelo-d20.mejor::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid #ffd25a;opacity:0;pointer-events:none;animation:duelo-onda 1.8s ease-out infinite}
+.duelo-d20.mejor::after{animation-delay:.9s}
+@keyframes duelo-onda{0%{transform:scale(.7);opacity:.95}100%{transform:scale(2.6);opacity:0}}
+@keyframes duelo-d20in{0%{transform:scale(0) rotate(-180deg);opacity:0}100%{transform:none;opacity:1}}
+.duelo-fin{text-align:center;border:2px solid #8db3ff;background:linear-gradient(180deg,#1b2a4a,#131c33);border-radius:14px;padding:16px 14px}
+.duelo-fin .grande{font-size:34px;font-weight:900;letter-spacing:.06em;color:#dbe7ff}
+.duelo-fin .chico{font-size:13px;color:#aab3ca;margin:4px 0 12px}
+.duelo-aceptar{background:#2d6cdf;color:#fff;border:2px solid #8db3ff;border-radius:12px;padding:13px 34px;font-size:18px;font-weight:800;cursor:pointer;animation:duelo-boton 1.2s ease-in-out infinite alternate}   /* 🤺 el Aceptar del desarme (2026-10-22): un botón de verdad, que titila */
+.duelo-aceptar:disabled{animation:none;opacity:.6;cursor:default}
+.duelo-fin button{background:#2d6cdf;color:#fff;border:2px solid #8db3ff;border-radius:12px;padding:13px 30px;font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 4px 16px rgba(45,108,223,.5)}
+.duelo-fin.nuevo{animation:duelo-golpe .55s cubic-bezier(.2,1.6,.4,1) both}
+.duelo-tabla{width:100%;border-collapse:collapse;margin:8px 0 0;font-size:14px}
+.duelo-tabla th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#9aa4bd;text-align:left;padding:4px 8px}
+.duelo-tabla td{padding:6px 8px;border-top:1px solid #2b3347}
+.duelo-tabla tr.mod td{color:#ffd25a}
+.duelo-tabla tr.gano td{background:rgba(255,210,90,.18);font-weight:800;color:#fff3c9}
+.duelo-veredicto.critico{background:radial-gradient(circle at 50% 30%,#8a5a12,#4a2a08 70%);border:3px solid #ffd25a;color:#fff3c9;box-shadow:0 0 40px rgba(255,190,60,.55),inset 0 0 30px rgba(255,210,90,.25)}
+.duelo-veredicto.critico .grande{font-size:64px;letter-spacing:.06em;text-shadow:0 0 18px #ffb400,0 3px 0 #7a4a00}
+.duelo-veredicto.critico .mult{font-size:34px;font-weight:900;color:#ffd25a;margin-top:2px}
+.duelo-veredicto.critico .chispas{font-size:26px}
+.duelo-veredicto.critico.nuevo{animation:duelo-golpe .55s cubic-bezier(.2,1.6,.4,1) both}
+/* El latido va en el paso en curso (el que espera una acción), no en el veredicto. */
+.duelo-paso.activo{border-color:#6fa8ff;animation:duelo-latido 1.4s ease-in-out infinite alternate}
+.duelo-paso.activo h4{color:#cfe0ff}
+/* El botón que hay que apretar ahora brilla y late. */
+.duelo-tiro button:not(.sec):not(:disabled),.duelo-ef button:not(:disabled),.duelo-contra button:not(.sec):not(:disabled),.duelo-pie button:not(.sec):not(:disabled),.duelo-fin button:not(:disabled),.duelo-par button{animation:duelo-boton 1.2s ease-in-out infinite alternate}
+@keyframes duelo-boton{0%{box-shadow:0 0 4px rgba(90,150,255,.3);filter:brightness(1)}100%{box-shadow:0 0 22px 4px rgba(110,170,255,.95);filter:brightness(1.25)}}
+.viva,.duelo-nota.viva,.espera.duelo-reroll{position:fixed;right:22px;bottom:22px;z-index:99100;background:#3a2f12;color:#ffe9a8;border:2px solid #d9b45a;border-radius:16px;padding:12px 18px;font-size:17px;font-weight:800;cursor:pointer;box-shadow:0 8px 30px rgba(0,0,0,.6),0 0 22px rgba(255,190,60,.55);animation:duelo-latido 1.6s ease-in-out infinite alternate;text-align:center}
+.duelo-reroll small{display:block;font-size:11.5px;font-weight:500;opacity:.9}
+#duelo-fondo.min .duelo-reroll{display:none}
+.duelo-reroll-fila{position:fixed;right:22px;bottom:22px;z-index:99100;display:flex;gap:10px;align-items:flex-end}
+.duelo-reroll-fila .duelo-reroll{position:static}
+.duelo-reroll.wildcard{background:#1d2347;color:#dfe4ff;border-color:#8f9cff;box-shadow:0 8px 30px rgba(0,0,0,.6),0 0 22px rgba(130,140,255,.55)}
+#duelo-fondo.min .duelo-reroll-fila{display:none}
+.duelo-flash{margin-top:8px;display:flex;flex-direction:column;gap:6px;align-items:stretch}
+.duelo-flash button.flash{background:#3a2f12;color:#ffe9a8;border:1px solid #d9b45a;font-size:14px}
+.duelo-flash button.flash small{display:block;font-weight:500;font-size:11px;opacity:.85}
+.duelo-flash button.flash.on{background:#8a5a12;box-shadow:0 0 16px rgba(255,190,60,.7)}
+.duelo-flash button.flash:disabled{opacity:.45}
+.viva{display:block;margin:6px auto;padding:10px 14px;border-radius:10px;color:#dfeaff!important;font-style:normal!important;font-weight:700;background:rgba(80,140,255,.14);border:1px solid rgba(110,170,255,.5);animation:duelo-latido 1.4s ease-in-out infinite alternate}
+.duelo-paso.activo h4 .n{background:#2d6cdf}
+@keyframes duelo-latido{0%{box-shadow:0 0 6px rgba(80,140,255,.25),inset 0 0 8px rgba(80,140,255,.06)}100%{box-shadow:0 0 30px rgba(80,150,255,.75),inset 0 0 22px rgba(80,150,255,.22)}}
+.duelo-veredicto.nuevo{animation:duelo-golpe .55s cubic-bezier(.2,1.6,.4,1) both}
+.duelo-motivo{margin-top:10px;background:rgba(0,0,0,.28);border-radius:10px;padding:10px 12px;font-size:15px;font-weight:600;letter-spacing:0}
+.duelo-par{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:10px;font-size:15px;font-weight:600;letter-spacing:0}
+.duelo-par button,.duelo-contra button{background:#c9a24a;color:#1b1608;border:0;border-radius:10px;padding:10px 18px;font-size:16px;font-weight:800;cursor:pointer}
+.duelo-par button:disabled{opacity:.5}
+.duelo-contra{margin-top:12px}
+.duelo-tiro.nuevo .num{animation:duelo-num .6s ease-out both}
+@keyframes duelo-golpe{0%{transform:scale(.3);opacity:0}70%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}
+@keyframes duelo-num{0%{transform:scale(2.4);opacity:0}100%{transform:scale(1);opacity:1}}
+.duelo-pie{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.duelo-nota{font-size:12px;color:#8b95b0}
+.duelo-lista{display:flex;flex-direction:column;gap:6px;max-height:50vh;overflow:auto}
+.duelo-lista button{background:#1d2335;color:#e9ecf4;border:1px solid #39435c;border-radius:8px;padding:9px 12px;text-align:left;cursor:pointer;font-size:14px;display:flex;justify-content:space-between;gap:8px}
+.duelo-lista button:hover{border-color:#6b8fd6}
+.duelo-lista .tag{font-size:11px;color:#9aa4bd}
+#duelo-avisos{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:98000;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+.duelo-chip{pointer-events:auto;background:#3b1820;color:#ffe3e7;border:2px solid #d95a6e;border-radius:999px;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 8px 30px rgba(0,0,0,.5);animation:duelo-chip .5s ease-out both}
+.duelo-chip.res{background:#173f27;border-color:#4fce7c;color:#c9f5d6}
+@keyframes duelo-chip{0%{transform:translateY(30px) scale(.9);opacity:0}100%{transform:none;opacity:1}}
+@media(max-width:600px){.duelo-tiros{grid-template-columns:1fr}.duelo-vs{grid-template-columns:1fr}.duelo-vs .vs{display:none}}
+`;
+    document.head.appendChild(s);
+  }
+
+  function fondo(){
+    inyectarCss();
+    let f = document.getElementById('duelo-fondo');
+    if(!f){
+      f = document.createElement('div');
+      f.id = 'duelo-fondo';
+      document.body.appendChild(f);
+    }
+    return f;
+  }
+  function quitarFondo(){
+    const f = document.getElementById('duelo-fondo');
+    if(f) f.remove();
+  }
+  function avisarPagina(){ window.dispatchEvent(new Event('ep-cerrado')); }   // la Botonera/Acciones del mapa se fijan si quedó algo abierto
+
+  function cerrar(){
+    if(actual){
+      descartados.add(actual.id);
+      if(actual.baja) actual.baja();
+    }
+    actual = null;
+    manual = {};
+    quitarFondo();
+    dibujarChips();
+    avisarPagina();
+  }
+  /* ✕ con el duelo en curso (2026-10-28, dueño: «un jugador, en lugar de apretar minimizar, apretó la X de cerrar y quedamos sin saber qué hacer; tuve que
+     cancelar el duelo y resolverlo a mano. Cuando un duelo está sucediendo, se tiene que poder minimizar o cancelar, pero no cerrar»): cerrar lo
+     descartaba en esa pantalla (sin el botón «Ver duelo» y sin los pedidos de tirada). Mientras sigue vivo, la ✕ minimiza; el «Cerrar» vuelve al terminar. */
+  const enCurso = d => !!d && d.estado !== 'resuelto' && d.estado !== 'cancelado';
+  function cerrarOMinimizar(){
+    if(actual && (!actual.dato || enCurso(actual.dato))){ if(actual.dato) minimizar(); else _toast('El duelo todavía está cargando: minimizalo cuando aparezca'); return; }
+    cerrar();
+  }
+  function minimizar(){
+    const f = document.getElementById('duelo-fondo');
+    if(!actual || !f) return;
+    actual.min = true;
+    f.classList.add('min');
+    dibujarChips();
+    avisarPagina();
+  }
+  document.addEventListener('keydown', e => {
+    if(e.key !== 'Escape') return;
+    const f = document.getElementById('duelo-fondo');
+    if(!f || f.classList.contains('min')) return;
+    e.stopPropagation();
+    if(actual) minimizar(); else quitarFondo();
+  }, true);
+
+  /* ---------- elegir el objetivo ---------- */
+  // cfg = {yo:{ref,tipo,nombre}, ataque:{tipo,armaId,armaNombre,tipoDado}, suelto: fn()} — `suelto` hace el ataque de siempre, sin objetivo.
+  function elegirObjetivo(cfg){
+    if(!disponible()){ if(cfg.suelto) cfg.suelto(); return; }
+    if(enIframe()){
+      pendienteSuelto = cfg.suelto || null;
+      window.parent.postMessage({tipo: 'duelo-elegir-objetivo', yo: cfg.yo, ataque: cfg.ataque, conSuelto: !!cfg.suelto}, location.origin);
+      return;
+    }
+    // Un hechizo de área (Paso 4/7 del casteo) necesita la geometría del mapa (marcar el centro, calcular quién
+    // queda adentro): sin el mapa abierto no hay forma de resolverlo — ni siquiera la lista de "a quién apunta".
+    if(cfg.ataque && cfg.ataque.hab && (cfg.ataque.hab.objetivo === 'area' || cfg.ataque.hab.objetivo === 'onda' || cfg.ataque.hab.objetivo === 'cono' || cfg.ataque.hab.objetivo === 'linea')){ _toast('Las habilidades de área se lanzan desde el mapa (abrilo para ejecutar esta habilidad)'); return; }
+    // Sobre uno mismo (bug real, 2026-09-29 — reportado con Blindaje ejecutado desde la ficha suelta, fuera del
+    // mapa): el mapa ya tenía este atajo (dueloElegirObjetivoMapa), pero acá faltaba — sin él, elegirObjetivoLista
+    // mostraba "¿A quién atacás?" con la lista de TODOS los demás tokens (ni siquiera incluye el propio, porque
+    // la lista se arma filtrando `!propio(t)`), así que una habilidad "a uno mismo" no tenía forma de aplicarse
+    // sobre quien la usó — solo sobre quien se eligiera por error.
+    if(cfg.ataque && cfg.ataque.hab && cfg.ataque.hab.objetivo === 'uno mismo'){ elegirObjetivoUnoMismo(cfg); return; }
+    elegirObjetivoLista(cfg);
+  }
+
+  async function elegirObjetivoUnoMismo(cfg){
+    let lista = [];
+    try{ lista = await tokensDelMapa(); }catch(err){ console.error('Duelo: no se pudieron leer los tokens', err); }
+    const mio = lista.find(t => t.fichaId === cfg.yo.ref && t.tipo === cfg.yo.tipo);
+    if(!mio){ _toast('No encontré tu token en el mapa: abrilo para ejecutar esta habilidad'); return; }
+    try{ await crear(cfg, mio, mio.id); }
+    catch(err){
+      console.error('Duelo: no se pudo crear', err);
+      _toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + (err.message || err));
+    }
+  }
+
+  async function tokensDelMapa(){
+    let mapaId = MAPA_PRINCIPAL;
+    try{
+      const a = await fbDb.doc(fbRutaCampana('mapa/activo')).get();
+      if(a.exists && a.data().mapaId) mapaId = a.data().mapaId;
+    }catch(e){ /* sin mapa activo: el principal */ }
+    const c = mapaId === MAPA_PRINCIPAL ? fbDb.collection(fbRutaCampana('tokens')) : fbDb.collection(fbRutaCampana(`mapas/${mapaId}/tokens`));
+    const snap = await c.get();
+    return snap.docs.map(d => ({id: d.id, ...d.data()})).filter(t => !t.oculto || soyGM());
+  }
+
+  // ⚔ Contraataque (Warrior, 2026-10-13): ¿el que esquiva alcanza con su arma a quien lo atacó? Se mide al elegir la Evasión (antes de
+  // tirar), con los tokens del mapa activo. Sin los dos tokens (la ficha suelta, otro mapa), no se frena: decide la mesa.
+  const distHex = (a, b) => {
+    const cubo = c => { const q = _num(c.col), r = _num(c.fila) - (q - (q & 1)) / 2; return {q, r, s: -q - r}; };
+    const A = cubo(a), B = cubo(b);
+    return (Math.abs(A.q - B.q) + Math.abs(A.r - B.r) + Math.abs(A.s - B.s)) / 2;
+  };
+  async function alcanceContra(d, h){
+    const arma = (h.armaContra && h.armaContra(d)) || {};
+    const alcance = Math.max(1, _num(arma.alcance) || 1);
+    try{
+      const toks = await tokensDelMapa();
+      const a = toks.find(t => t.id === d.atacante.tokenId), b = toks.find(t => t.id === d.defensor.tokenId);
+      if(!a || !b) return {contraAlcanza: true, contraAlcance: alcance};
+      const dist = distHex(a, b);
+      return {contraAlcanza: dist <= alcance, contraDist: dist, contraAlcance: alcance};
+    }catch(e){ return {contraAlcanza: true, contraAlcance: alcance}; }
+  }
+
+  async function elegirObjetivoLista(cfg){
+    const f = fondo();
+    f.classList.remove('min');
+    f.innerHTML = `<div class="duelo-caja"><div class="duelo-cab"><span>⚔ ¿A quién atacás?</span><div class="bt"><button type="button" data-x>✕</button></div></div>
+      <div class="duelo-cuerpo"><div class="duelo-nota">Cargando los tokens del mapa…</div></div></div>`;
+    f.querySelector('[data-x]').onclick = () => quitarFondo();
+    let lista = [];
+    try{ lista = await tokensDelMapa(); }catch(err){ console.error('Duelo: no se pudieron leer los tokens', err); }
+    const propio = t => t.fichaId === cfg.yo.ref && t.tipo === cfg.yo.tipo;
+    const objetivos = lista.filter(t => !propio(t)).sort((a, b) => String(a.nombre).localeCompare(String(b.nombre), 'es'));
+    const cuerpo = f.querySelector('.duelo-cuerpo');
+    cuerpo.innerHTML = `<div class="duelo-nota">${_esc(cfg.ataque.habNombre || NOMBRE_ATAQUE[cfg.ataque.tipo] || 'Ataque')}${cfg.ataque.armaNombre ? ' con ' + _esc(cfg.ataque.armaNombre) : ''}. Elegí el token al que va dirigido:</div>
+      <div class="duelo-lista">${objetivos.length ? objetivos.map(t => `<button type="button" data-tok="${_esc(t.id)}"><span>${_esc(t.nombre)}</span><span class="tag">${t.tipo === 'creep' ? 'creep' : 'personaje'}</span></button>`).join('') : '<div class="duelo-nota">No hay otros tokens en el mapa.</div>'}</div>
+      <div class="duelo-pie">${cfg.suelto ? '<button type="button" class="sec" data-suelto>Sin objetivo · tirada suelta</button>' : ''}<button type="button" class="sec" data-cancelar>Cancelar</button></div>`;
+    cuerpo.querySelector('[data-cancelar]').onclick = () => quitarFondo();
+    const bs = cuerpo.querySelector('[data-suelto]');
+    if(bs) bs.onclick = () => { quitarFondo(); cfg.suelto(); };
+    cuerpo.querySelector('.duelo-lista').addEventListener('click', async e => {
+      const b = e.target.closest('[data-tok]');
+      if(!b) return;
+      const t = objetivos.find(x => x.id === b.dataset.tok);
+      if(!t) return;
+      b.disabled = true;
+      const mio = lista.find(x => x.fichaId === cfg.yo.ref && x.tipo === cfg.yo.tipo);
+      try{
+        quitarFondo();
+        await crear(cfg, t, mio ? mio.id : '');
+      }catch(err){
+        console.error('Duelo: no se pudo crear', err);
+        _toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + (err.message || err));
+      }
+    });
+  }
+
+  /* «Por la espalda» (2026-10-03, pedido del dueño): el mapa avisa (`cfg.espalda`) si el atacante está en el punto ciego del defensor (la
+     misma cuña ciega de la visión) y está EN SIGILO —si lo ve, se da vuelta— y el ataque trae el bono de su arma o habilidad (`cfg.ataque.espalda` = {pdg, fijo, critpot}). Queda en
+     `ataque.porLaEspalda` y `ataque.espalda`, y se suma acá mismo, igual para todos: el PdG al guardarlo, el daño fijo al guardar el daño y el
+     Crítico potente al evaluar el crítico. */
+  function limpiarEspalda(e){
+    const o = {pdg: Math.max(0, Math.round(_num(e && e.pdg))), fijo: Math.max(0, Math.round(_num(e && e.fijo))), critpot: Math.max(0, Math.round(_num(e && e.critpot)))};
+    return (o.pdg || o.fijo || o.critpot) ? o : null;
+  }
+  const espaldaTxt = e => [e.pdg ? `+${e.pdg} PdG` : '', e.fijo ? `+${e.fijo} de daño` : '', e.critpot ? `+${e.critpot} Crítico potente` : ''].filter(Boolean).join(', ');
+  const limpiarTiroBono = t => {
+    const c = (v, lo, hi) => Math.max(lo, Math.min(hi, Math.round(_num(v))));
+    const o = {pdg: c(t.pdg, -6, 10), crit: c(t.crit, 0, 5), critpot: c(t.critpot, 0, 6), fijo: c(t.fijo, -10, 10), ignora: c(t.ignora, 0, 5)};   // fijo negativo: la caída (2026-10-11)
+    Object.keys(o).forEach(k => { if(!o[k]) delete o[k]; });
+    if(/^\d?d\d{1,2}$/.test(String(t.dado || ''))) o.dado = String(t.dado);   // el primer disparo del combate: +1 dado (2026-10-11)
+    if(!Object.keys(o).length && !/tiro alto/.test(String(t.motivo || ''))) return null;   // 🏹 el tiro alto queda a la vista aunque otro bono lo compense (2026-10-28)
+    o.motivo = txtCorto(t.motivo || 'el tiro', 60);
+    return o;
+  };
+  // Los efectos de una flecha: como los de un arma (con daño mágico, «solo si es crítico» y un estado armado en `spec`).
+  // El daño elemental en palabras (2026-10-09, dueño: «2d4 eléctrico», que no se confunda con el rayo): «eléctrico» y «tóxico» son adjetivos.
+  const esAdjMag = n => /^(rayo|el[eé]ctric|t[oó]xic)/i.test(String(n || ''));
+  const adjMag = n => /^t/i.test(String(n || '')) ? 'tóxico' : 'eléctrico';
+  const magCorto = e => esAdjMag(e.nombre) ? `+${e.dado} ${adjMag(e.nombre)}` : `+${e.dado} de ${String(e.nombre).toLowerCase()}`;
+  // La Perfora (2026-10-10): N puntos del golpe pasan siempre. Si mandó, «14 − Defensa 16 (pasan 1 por la Perfora) = 1».
+  /* 🧮 La cuenta del daño (2026-10-28, dueño: «decía 19 de daño y el siguiente paso mostraba 0… tiene que haber una instancia intermedia súper clara que
+     dice 19 de daño menos X de defensa menos 8 de blindaje»): `dano.cuenta` la arma el mapa al aplicar (js/13), un renglón por cosa —{s: '' | '+' | '−' |
+     '×' | '÷' | '=', txt, v, nota, f (el final)}—. En la Mesa, en una línea: «19 − Defensa 11 − Blindaje (escudo) 8 = 0 a la vida». */
+  const tieneCuenta = dn => !!(dn && Array.isArray(dn.cuenta) && dn.cuenta.length);
+  const cuentaTxt = dn => {
+    if(!tieneCuenta(dn)) return '';
+    let t = '';
+    dn.cuenta.forEach((c, i) => {
+      const v = c.v === undefined ? null : _num(c.v);
+      if(i === 0){ t = `${_fmt(v)}`; return; }
+      if(c.s === '−' && v) t += ` ${v < 0 ? '+' : '−'} ${c.txt} ${_fmt(Math.abs(v))}`;
+      else if(c.s === '+' && v) t += ` + ${c.txt} ${_fmt(v)}`;
+      else if(c.s === '×') t += ` ×${_fmt(v)}`;
+      else if(c.s === '÷') t += ` ÷${_fmt(v)}`;
+      else if(c.f) t += ` = ${_fmt(v)} a la vida`;
+      else if(c.s === '' && c.txt) t += ` (${c.txt})`;
+    });
+    return t;
+  };
+  function cuentaHtml(dn){
+    if(!tieneCuenta(dn)) return '';
+    const filas = dn.cuenta.map(c => {
+      const v = c.v === undefined ? null : _num(c.v);
+      const signo = c.s === '−' && v < 0 ? '+' : c.s;
+      const val = v === null ? '' : c.s === '×' ? '×' + _fmt(v) : c.s === '÷' ? '÷' + _fmt(v) : _fmt(Math.abs(v));
+      const cls = c.f ? 'final' : c.s === '=' ? 'sub' : c.s === '−' ? 'resta' : c.s === '+' ? 'suma' : c.s === '' && v === null ? 'nota' : '';
+      return `<div class="duelo-cuenta-fila ${cls}"><span class="s">${signo === '×' || signo === '÷' ? '' : _esc(signo)}</span><span class="t">${_esc(c.txt)}${c.nota ? `<small>${_esc(c.nota)}</small>` : ''}</span><span class="v">${val}</span></div>`;
+    }).join('');
+    return `<div class="duelo-cuenta"><div class="duelo-cuenta-tit">🧮 La cuenta del daño</div>${filas}</div>`;
+  }
+  const defTxt = dn => _num(dn.perfora) ? `Defensa ${_num(dn.defensa)} (pasa${_num(dn.perfora) > 1 ? 'n' : ''} ${_num(dn.perfora)} por la Perfora)` : `Defensa ${_num(dn.defensa)}`;
+  const magTitulo = tipo => esAdjMag(tipo) && !/ y /.test(String(tipo)) ? `Daño ${adjMag(tipo)}` : `Daño de ${tipo}`;
+  // El ícono y el «× 1,5» del daño elemental de un arma (2026-10-23, probando el PdG a mano con el Arma ígnea: salía ⚡ en el fuego y «3 → recibió 5» sin explicar).
+  const magIcono = tipo => ({fuego: '🔥', hielo: '❄️', rayo: '⚡', toxico: '☠️', acido: '🧪', luz: '☀️', siniestro: '🌑'})[typeof Combatiente !== 'undefined' && Combatiente.elementoDe ? Combatiente.elementoDe(tipo) : ''] || '✨';
+  const magMult = m => _num(m && m.mult) > 1 ? ` × ${String(_num(m.mult)).replace('.', ',')}` : '';
+  // 🏹 La flecha gastada (la copia del ítem, en texto) y el No2 que cobró: si el duelo se cancela antes de tirar, vuelve (devolverSiToca).
+  const flechaVuelve = v => {
+    if(!v || !v.item || typeof v.item !== 'object') return {};
+    let item = '';
+    try{ item = JSON.stringify(v.item); }catch(err){ return {}; }
+    return item.length <= 6000 ? {vuelve: {item, no2: Math.max(0, Math.min(20, Math.round(_num(v.no2))))}} : {};
+  };
+  const limpiarEfectosFlecha = lista => (Array.isArray(lista) ? lista : []).filter(e => e && e.nombre).slice(0, 6).map(e => {
+    const o = {nombre: txtCorto(e.nombre, 40), caras: Math.max(1, Math.round(_num(e.caras)) || 1), exitos: Math.max(1, Math.round(_num(e.exitos)) || 1), dado: txtCorto(e.dado, 20), detalle: txtCorto(e.detalle, 200)};
+    if(_num(e.stacks) > 0) o.stacks = Math.round(_num(e.stacks));
+    if(_num(e.turnos) > 0) o.turnos = Math.round(_num(e.turnos));
+    if(e.danoMagico) o.danoMagico = true;
+    if(e.soloCritico) o.soloCritico = true;
+    if(typeof e.requiereDano === 'boolean') o.requiereDano = e.requiereDano;   // la envenenada: su veneno entra aunque la armadura pare el golpe
+    const sp = e.spec && e.spec.nombre ? limpiarSpec(e.spec) : null;
+    if(sp) o.spec = sp;
+    return o;
+  });
+  const tiroTxt = t => [t.pdg ? `${t.pdg > 0 ? '+' : '−'}${_fmt(Math.abs(t.pdg))} PdG` : '', t.crit ? `Crítico frecuente +${_fmt(t.crit)}` : '', t.critpot ? `Crítico potente +${_fmt(t.critpot)}` : '',
+    t.fijo ? `${t.fijo > 0 ? '+' : '−'}${_fmt(Math.abs(t.fijo))} de daño` : '', t.dado ? `+${t.dado} de daño` : '', t.ignora ? `ignora ${_fmt(t.ignora)} de Resistencia a crítico` : ''].filter(Boolean).join(', ');
+  /* ↩ Lo que cobró una habilidad antes de su duelo (P233, dueño 2026-10-29: «me parece bien que preguntes si se cobra o no»). La pantalla que la
+     ejecuta lo anota (`pagoHab(ref, {habId, nombre, no2, sp, hp, cd})`, cd = el cooldown que tenía antes, o −1 si no cambió) y el duelo que crea
+     enseguida lo lleva (`ataque.pagoHab`): si se cancela y no cuenta, quien maneja al atacante lo devuelve (gancho `devolverHab`). */
+  const pagosHab = new Map();
+  function pagoHab(ref, pago){ if(!ref) return; if(pago) pagosHab.set(String(ref), {...pago, cuando: Date.now()}); else pagosHab.delete(String(ref)); }
+  const pagoHabTxt = p => [_num(p.no2) > 0 ? `${_fmt(_num(p.no2))} No2` : '', _num(p.sp) > 0 ? `${_fmt(_num(p.sp))} SP` : '', _num(p.hp) > 0 ? `${_fmt(_num(p.hp))} de vida` : '',
+    _num(p.cd) >= 0 ? 'su cooldown' : ''].filter(Boolean).join(', ');
+  // tokDef = un token del mapa ({id, nombre, tipo, fichaId, duenoUid}); miTokenId = el token del atacante (o ''); contraDe = id del duelo que se contraataca.
+  async function crear(cfg, tokDef, miTokenId, contraDe){
+    const hab = limpiarHab(cfg.ataque.hab);
+    const textoAtq = txtCorto((hab && hab.detalle) || cfg.ataque.habDetalle || cfg.ataque.armaDetalle || '', 600);   // 📜 el recuadro de la izquierda (2026-10-15)
+    const inicial = {
+      estado: 'esperando', fase: 'contacto',
+      atacante: {ref: String(cfg.yo.ref), tipo: cfg.yo.tipo, nombre: String(cfg.yo.nombre || '').slice(0, 40), uid: cfg.yo.uid || yo(), tokenId: miTokenId || ''},
+      defensor: {ref: String(tokDef.fichaId || ''), tipo: tokDef.tipo, nombre: String(tokDef.nombre || '').slice(0, 40), uid: String(tokDef.duenoUid || ''), tokenId: tokDef.id},
+      ataque: hab ? {tipo: 'habilidad', armaId: '', armaNombre: hab.nombre, tipoDado: _num(hab.critTipo), rango: true}
+        : cfg.ataque.tipo === 'habilidad-arma' ? {tipo: 'habilidad-arma', habNombre: txtCorto(cfg.ataque.habNombre, 60), armaId: String(cfg.ataque.armaId || ''), armaNombre: String(cfg.ataque.armaNombre || '').slice(0, 60), tipoDado: _num(cfg.ataque.tipoDado), rango: !!cfg.ataque.rango,
+          sinParry: !!cfg.ataque.sinParry, mods: {pdg: _num(cfg.ataque.mods && cfg.ataque.mods.pdg), fuerza: _num(cfg.ataque.mods && cfg.ataque.mods.fuerza), dados: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.dados))), fijo: _num(cfg.ataque.mods && cfg.ataque.mods.fijo), ignoraResistCrit: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.ignoraResistCrit))),
+            critBono: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.critBono))), critpotBono: Math.max(0, Math.round(_num(cfg.ataque.mods && cfg.ataque.mods.critpotBono))),
+            ...(cfg.ataque.mods && /^\d{1,2}d\d{1,3}$/i.test(String(cfg.ataque.mods.dadoExtra || '')) ? {dadoExtra: String(cfg.ataque.mods.dadoExtra).toLowerCase()} : {})}, efectos: limpiarEfectos(cfg.ataque.efectos),
+          ...(cfg.ataque.terminaTurno ? {terminaTurno: true} : {}), ...(cfg.ataque.soloCritico ? {soloCritico: true} : {}),   // Degollar: al resolverse, el mapa del GM le termina el turno
+          // ⚔🛡 El Choque pesado (2026-10-27, vtt-hexgrid/js/78): lo que hace el mapa al resolverse (el Golpe que sigue, Arrastrar, el derribo de la Carga) y el escudo con que pega.
+          ...(cfg.ataque.sigue ? {sigue: true} : {}), ...(_num(cfg.ataque.arrastra) > 0 ? {arrastra: Math.min(5, Math.round(_num(cfg.ataque.arrastra)))} : {}),
+          ...(_num(cfg.ataque.derriba) > 0 ? {derriba: Math.min(8, Math.round(_num(cfg.ataque.derriba)))} : {}),
+          ...(cfg.ataque.escudoGolpe ? {escudoGolpe: {nombre: txtCorto(cfg.ataque.escudoGolpe.nombre, 60), peso: Math.max(0, Math.min(20, Math.round(_num(cfg.ataque.escudoGolpe.peso))))}} : {}),
+          // Proyectil perforante (2026-10-13): `perforante` = al terminar, el mapa de quien disparó sigue al que está detrás (js/42);
+          // `sinEfectos` = ese segundo golpe, sin los efectos especiales (ni del arma, ni de la flecha, ni del crítico).
+          ...(cfg.ataque.perforante ? {perforante: true} : {}), ...(cfg.ataque.sinEfectos ? {sinEfectos: true} : {}),
+          ...(_num(cfg.ataque.rafaga) > 1 ? {rafaga: Math.min(3, Math.round(_num(cfg.ataque.rafaga)))} : {}),   // 🗡 Ráfaga de cortes (2026-10-21)
+          ...(cfg.ataque.efectosNota ? {efectosNota: txtCorto(cfg.ataque.efectosNota, 200)} : {}),
+          // ⚡ Critical Matters (2026-09-29): efectos/nota que solo cuentan si el golpe es crítico (ver
+          // entrarCritico/efectosHtml) — mismo saneo que los de siempre, adentro de un campo aparte.
+          ...(cfg.ataque.critico ? {critico: {
+            ...(cfg.ataque.critico.efectos && cfg.ataque.critico.efectos.length ? {efectos: limpiarEfectos(cfg.ataque.critico.efectos)} : {}),
+            ...(cfg.ataque.critico.efectosNota ? {efectosNota: txtCorto(cfg.ataque.critico.efectosNota, 200)} : {}),
+          }} : {})}
+        : {tipo: cfg.ataque.tipo, armaId: String(cfg.ataque.armaId || ''), armaNombre: String(cfg.ataque.armaNombre || '').slice(0, 60), tipoDado: _num(cfg.ataque.tipoDado), rango: !!cfg.ataque.rango},
+      defensa: null, pdg: null, eva: null, fuerza: null, bloqueo: null, contacto: null, bloq: null, empate: null, resultado: null, critDatos: null, crit: null, dano: null, efectos: null, contra: null,
+      contraDe: contraDe || '',
+      creadoPor: yo(),
+      creado: firebase.firestore.FieldValue.serverTimestamp(),
+    };
+    if(textoAtq && inicial.ataque) inicial.ataque.texto = textoAtq;
+    { const ph = pagosHab.get(String(cfg.yo.ref)), nomDuelo = String((hab && hab.nombre) || cfg.ataque.habNombre || '');   // ↩ lo que ya cobró la habilidad (P233)
+      if(ph && inicial.ataque && (hab || cfg.ataque.tipo === 'habilidad-arma') && Date.now() - ph.cuando < 600000 && (!ph.nombre || nomDuelo.startsWith(String(ph.nombre)))){
+        pagosHab.delete(String(cfg.yo.ref));
+        const n = v => Math.max(0, Math.min(99, Math.round(_num(v))));
+        inicial.ataque.pagoHab = {habId: txtCorto(ph.habId, 40), nombre: txtCorto(ph.nombre, 60), no2: n(ph.no2), sp: n(ph.sp), hp: n(ph.hp), cd: _num(ph.cd) >= 0 ? n(ph.cd) : -1};
+      } }
+    // 🤺 Con un arma natural (garras, colmillos): no se le puede desarmar (dueño, 2026-10-22); lo dice la pantalla que crea el duelo (js/62).
+    try{ if(!hab && inicial.ataque && typeof window.dueloArmaNatural === 'function' && await window.dueloArmaNatural(cfg.yo, cfg.ataque)) inicial.ataque.natural = true; }catch(e){}   // (una invocación: se lee su ficha)
+    // Hechizo de área (dicho por el dueño, 2026-09-27): el casteador tira su PdG.Esp/PdG UNA SOLA VEZ para toda la
+    // cascada; cada objetivo tira su Evasión individualmente contra esa MISMA tirada. `cfg.pdgCompartido` (la tirada
+    // ya resuelta del primer objetivo) llega precargada acá, así que este sub-duelo arranca con el contacto ya
+    // "medio hecho" — nada más pide la Evasión de este objetivo (mismo camino que cuando un lado tira antes que el otro).
+    if(cfg.pdgCompartido) inicial.pdg = limpiarTiro(cfg.pdgCompartido);
+    // Embestida (piernas, 2026-10-06): el mapa la calcula (`cfg.embestida`, PdG) y se suma al PdG al guardarlo, como por la espalda.
+    if(_num(cfg.embestida) > 0 && !hab) inicial.ataque.embestida = Math.min(10, Math.round(_num(cfg.embestida)));
+    // Anillos (2026-10-06): Pulso quieto / Foco (`quieto`, al PdG o al PdG.Esp de quien ataca) y Primera sangre (`primeraSangre`, al daño si pega).
+    if(_num(cfg.quieto) > 0) inicial.ataque.quieto = Math.min(10, Math.round(_num(cfg.quieto)));
+    if(_num(cfg.primeraSangre) > 0 && !hab) inicial.ataque.primeraSangre = Math.min(10, Math.round(_num(cfg.primeraSangre)));
+    // El bono del tiro (2026-10-09, arcos; docs/rework-armas-rango.md): lo calcula el mapa al elegir el objetivo — la distancia ideal del arco
+    // (PdG, Crítico frecuente / potente, daño fijo, ignora Resistencia) y el tiro alto (PdG −2). `motivo` es lo que se lee («distancia ideal»).
+    // Perfora N del arma (2026-10-10, las ballestas): viaja en el ataque; el mapa la suma a la de la flecha o el virote al aplicar el daño.
+    if(_num(cfg.ataque.perfora) > 0 && !hab){
+      // Una ráfaga (2026-10-21, dueño: «perfora cada uno de los golpes»): cada corte asegura su Perfora, así que pasan al menos N × cortes.
+      const rf = Math.max(1, Math.min(3, Math.round(_num(cfg.ataque.rafaga)) || 1)), pc = Math.min(5, Math.round(_num(cfg.ataque.perfora)));
+      inicial.ataque.perfora = Math.min(15, pc * rf);
+      if(rf > 1) inicial.ataque.perforaCorte = pc;
+    }
+    if(_num(cfg.ataque.alejarse) > 0 && !hab) inicial.ataque.alejarse = Math.min(4, Math.round(_num(cfg.ataque.alejarse)));   // 💨 Picar y alejarse (2026-10-21)
+    if(cfg.ataque.atraviesaEscudos && !hab) inicial.ataque.atraviesaEscudos = true;
+    if(Array.isArray(cfg.ataque.rompeEscudo) && cfg.ataque.rompeEscudo.length && !hab)   // 🛡 Romper armadura del arma de rango: si lo paran con un escudo (el mapa, js/26)
+      inicial.ataque.rompeEscudo = cfg.ataque.rompeEscudo.slice(0, 3).map(e => ({nombre: txtCorto(e.nombre || 'Rompe armadura', 40), caras: Math.max(1, Math.min(20, Math.round(_num(e.caras)) || 1)), exitos: Math.max(1, Math.min(20, Math.round(_num(e.exitos)) || 1)), stacks: Math.max(1, Math.min(5, Math.round(_num(e.stacks)) || 1))}));
+    if(cfg.ataque.puntaDiamante && !hab) inicial.ataque.puntaDiamante = true;   // contra Defensa 12 o más, Perfora +2 (el mapa, 2026-10-11)
+    if(cfg.ataque.remachadora && !hab) inicial.ataque.remachadora = true;   // golpes seguidos al mismo blanco, Perfora +1 cada uno (el mapa del GM)   // si lo paran con escudo, el escudo se abolla (el mapa, js/26)
+    const tiro = cfg.tiro && !hab ? limpiarTiroBono(cfg.tiro) : null;
+    if(tiro) inicial.ataque.tiro = tiro;
+    // 🏹 La flecha especial del disparo (2026-10-09): sus efectos al golpear (siempre, sin %) se suman a los del arco al tirar el daño, y su
+    // Perfora (N puntos del golpe pasan siempre la Defensa) lo aplica el mapa con el daño. Sus bonos de PdG / crítico ya vienen en `tiro`.
+    if(cfg.flecha && !hab && cfg.flecha.nombre) inicial.ataque.flecha = {nombre: txtCorto(cfg.flecha.nombre, 60), efectos: limpiarEfectosFlecha(cfg.flecha.efectos),
+      ...(_num(cfg.flecha.perfora) > 0 ? {perfora: Math.min(5, Math.round(_num(cfg.flecha.perfora)))} : {}),
+      // Lo que hace en el mapa (2026-10-10, virotes): humo, luz, explota (el dado de fuego), clava (contra una pared detrás), rebota (si falla).
+      ...(cfg.flecha.humo ? {humo: true} : {}), ...(cfg.flecha.luz ? {luz: true} : {}), ...(cfg.flecha.explota ? {explota: txtCorto(cfg.flecha.explota, 12)} : {}),
+      ...(cfg.flecha.clava ? {clava: true} : {}), ...(cfg.flecha.rebota ? {rebota: true} : {}),
+      ...(cfg.flecha.recuperable ? {recuperable: true} : {}), ...(cfg.flecha.sinDano ? {sinDano: true} : {}),   // virote recuperable (el arma) y el de red (2026-10-11)
+      ...flechaVuelve(cfg.flecha.vuelve),   // la flecha gastada y su No2, por si el duelo se cancela (2026-10-28)
+      // ⚡ El salto (relámpago, tormenta): a cuántos más salta, si lleva el daño eléctrico (la mitad cada vez) y el % de Parálisis de cada salto.
+      ...(cfg.flecha.salto ? {salto: {saltos: Math.min(4, Math.max(1, Math.round(_num(cfg.flecha.salto.saltos)) || 1)), dano: !!cfg.flecha.salto.dano,
+        paralisis: (Array.isArray(cfg.flecha.salto.paralisis) ? cfg.flecha.salto.paralisis : []).slice(0, 4).map(v => Math.min(100, Math.max(0, Math.round(_num(v)))))}} : {})};
+    if(cfg.espalda && !hab){
+      inicial.ataque.porLaEspalda = true;
+      inicial.ataque.sorpresa = true;   // 🗡 desde el sigilo por la espalda (dueño, 2026-10-30): la Evasión del defensor vale 1, en lugar del +1 PdG
+      const be = limpiarEspalda(cfg.ataque.espalda);
+      if(be) inicial.ataque.espalda = be;
+    }
+    // 🗡 Ataque por la espalda, regla general (2026-10-15, dueño: «simplemente es un +1 a la pdg»; Pasos silenciosos, +1 más): lo calcula el mapa
+    // (quien ataca está en la cuña ciega del defensor, sin hacer falta sigilo) y se suma al PdG al guardarlo, junto con el bono del arma si hay.
+    // 😱 Miedo (2026-10-18): quien ataca le tiene miedo al defensor: −1 PdG (o PdG.Esp) y −1 al daño, con arma o con habilidad.
+    if(_num(cfg.miedo) > 0) inicial.ataque.miedo = Math.min(3, Math.round(_num(cfg.miedo)));
+    if(_num(cfg.presa) > 0) inicial.ataque.presa = Math.min(5, Math.round(_num(cfg.presa)));   // 🎯 el defensor es la Presa (2026-10-21): +2 al daño
+    // 🚩 Bajo el estandarte (2026-10-24, el Estandarte de guerra del Support; lo calcula el mapa, vtt-hexgrid/js/73): +N al PdG (o PdG.Esp) y +N al daño.
+    if(cfg.estandarte && (_num(cfg.estandarte.pdg) > 0 || _num(cfg.estandarte.dano) > 0)) inicial.ataque.estandarte = {pdg: Math.min(10, Math.max(0, Math.round(_num(cfg.estandarte.pdg)))), dano: Math.min(20, Math.max(0, Math.round(_num(cfg.estandarte.dano))))};
+    if(_num(cfg.espaldaPdg) > 0 && !hab && !cfg.espalda){ inicial.ataque.porLaEspalda = true; inicial.ataque.espaldaPdg = Math.min(5, Math.round(_num(cfg.espaldaPdg))); }
+    if(hab){
+      inicial.hab = hab;   // (la regla de Firestore tiene que conocer el campo `hab`)
+      if(hab.soloDodge && cfg.grupo){ inicial.fase = 'dodge'; inicial.estado = 'esperando'; inicial.contacto = {gana: 'defensor', dif: 0, soloDodge: true}; }   // la Tormenta arcana: directo al dodge roll
+      else if(hab.sinOposicion){ inicial.resultado = 'pego'; entrarHab(inicial); }   // sin oposición: el cuadro se abre directo en los efectos
+    }
+    if(cfg.grupo) inicial.grupo = limpiarGrupo(cfg.grupo);   // hechizo de área (Paso 4/7): ata este sub-duelo a la cascada (docs/reglas-casteo.md §1.3)
+    const ref = await col().add(inicial);
+    autoAbiertos.add(ref.id);
+    if(!enIframe()) abrir(ref.id);   // adentro de un iframe del mapa el cuadro no se abre: lo abre el mapa (y el de todos)
+    return ref.id;
+  }
+
+  /* ---------- habilidades dirigidas (2026-09-27, docs/duelo-de-habilidades.md) ----------
+     El mismo duelo sirve para una habilidad con objetivo: `hab` describe la contienda.
+       hab = {nombre, objetivo: 'enemigo'|'aliado'|'uno mismo',
+              tira: {stat, etq, bono}|null,                       ← lo que tira quien la usa (PdG.Esp, Fuerza…)
+              contra: [{modo, stat, etq}],                        ← lo que puede tirar el objetivo (elige a ciegas si hay más de una); [] = sin oposición
+              dano: {formula, tipo, ignoraDef}|null,              ← daño de la habilidad (el mágico ignora la Defensa y no critica)
+              efectos: [{nombre, caras, exitos, dado, detalle, stacks, spec, cura}],
+              sinOposicion: bool}
+     Con oposición: la tirada de quien la usa va en `pdg` y la del objetivo en `eva` (mismas fases y mismo empate que el ataque); si gana quien la usa, sigue el daño (si tiene) y
+     los efectos; si no, «se resistió». Sin oposición (buffs, curas): el cuadro se abre directo en los efectos, con su botón «Aplicar». */
+  const nombreAtq = d => d.hab ? d.hab.nombre : (d.ataque.tipo === 'habilidad-arma' && d.ataque.habNombre ? d.ataque.habNombre : (NOMBRE_ATAQUE[d.ataque.tipo] || 'Ataque'));
+  // Ataque con un arma hecho con una habilidad (Golpe brutal, Carga, Takle…): lo que la habilidad le suma al ataque, en palabras.
+  const modsTxt = d => {
+    const m = (d.ataque && d.ataque.mods) || {}, t = [];
+    if(_num(m.pdg)) t.push(`${_num(m.pdg) > 0 ? '+' : ''}${_fmt(m.pdg)} PdG`);
+    if(_num(m.dados)) t.push(`+${_fmt(m.dados)} dado${_num(m.dados) === 1 ? '' : 's'} de daño`);
+    if(m.dadoExtra) t.push(`+${_esc(m.dadoExtra)} de daño`);
+    if(_num(m.fijo)) t.push(`${_num(m.fijo) > 0 ? '+' : ''}${_fmt(m.fijo)} de daño fijo`);
+    if(_num(m.critBono)) t.push(`Crítico frecuente +${_fmt(m.critBono)}`);   // los arreglos de crítico de una habilidad, a la vista (2026-10-21, Zarpazo)
+    if(_num(m.critpotBono)) t.push(`Crítico potente +${_fmt(m.critpotBono)}`);
+    if(_num(m.ignoraResistCrit)) t.push(`ignora ${_fmt(m.ignoraResistCrit)} de Res. a crítico`);
+    if(d.ataque && d.ataque.sinParry) t.push('no se puede parrear');
+    if(d.ataque && d.ataque.porLaEspalda){
+      const pe = [d.ataque.sorpresa ? 'desde el sigilo, la defensa vale 1' : '', _num(d.ataque.espaldaPdg) > 0 ? `+${_fmt(d.ataque.espaldaPdg)} PdG` : '', d.ataque.espalda ? espaldaTxt(d.ataque.espalda) : ''].filter(Boolean).join(', ');
+      t.push(`🗡 por la espalda${pe ? ': ' + pe : ''}`);
+    }
+    if(d.ataque && _num(d.ataque.presa) > 0) t.push(`🎯 contra la presa: +${_fmt(d.ataque.presa)} al daño`);
+    if(d.ataque && d.ataque.desarme) t.push(`🤺 ${d.ataque.desarme.quien || ''} intenta desarmar (si gana el Bloqueo, el otro pierde lo que tiene en la mano)`);
+    if(d.ataque && _num(d.ataque.miedo) > 0) t.push(`😱 con miedo: −${_fmt(d.ataque.miedo)} PdG y −${_fmt(d.ataque.miedo)} de daño`);
+    if(d.ataque && d.ataque.estandarte) t.push(`🚩 bajo el estandarte: +${_fmt(_num(d.ataque.estandarte.pdg))} ${d.hab ? 'PdG.Esp' : 'PdG'} y +${_fmt(_num(d.ataque.estandarte.dano))} de daño`);
+    if(d.ataque && _num(d.ataque.embestida) > 0) t.push(`🐂 embestida: +${_fmt(d.ataque.embestida)} PdG`);
+    if(d.ataque && _num(d.ataque.quieto) > 0) t.push(`💍 ${d.hab ? 'foco' : 'puntería certera'}: +${_fmt(d.ataque.quieto)} ${d.hab ? 'PdG.Esp' : 'PdG'}`);
+    if(d.ataque && _num(d.ataque.primeraSangre) > 0) t.push(`💍 primera sangre: +${_fmt(d.ataque.primeraSangre)} de daño si pega`);
+    if(d.ataque && d.ataque.tiro) t.push(`🏹 ${d.ataque.tiro.motivo}: ${tiroTxt(d.ataque.tiro)}`);
+    if(d.ataque && _num(d.ataque.rafaga) > 1) t.push(`🗡 ${_fmt(d.ataque.rafaga)} cortes: los efectos del arma se tiran ${_fmt(d.ataque.rafaga)} veces`);
+    if(d.ataque && _num(d.ataque.perforaCorte) > 0) t.push(`Perfora ${_fmt(d.ataque.perforaCorte)} en cada corte (pasan al menos ${_fmt(d.ataque.perfora)})`);
+    else if(d.ataque && _num(d.ataque.perfora) > 0) t.push(`perfora ${_fmt(d.ataque.perfora)}`);   // la Perfora del arma y de la habilidad (2026-10-10; sin «(el arma)» desde el 2026-10-21: puede venir de la habilidad); se suma a la del virote
+    if(d.ataque && d.ataque.flecha) t.push(`🏹 ${d.ataque.flecha.nombre}${(d.ataque.flecha.efectos || []).length ? ': ' + d.ataque.flecha.efectos.map(e => e.danoMagico ? magCorto(e) : e.nombre).join(', ') : ''}${d.ataque.flecha.perfora ? ` · perfora ${d.ataque.flecha.perfora}` : ''}`);
+    return t.join(' · ');
+  };
+  const escRe = s => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const txtCorto = (v, n) => String(v === undefined || v === null ? '' : v).trim().slice(0, n);
+  function limpiarSpec(s){
+    if(!s || !s.nombre) return null;
+    const o = {nombre: txtCorto(s.nombre, 40)};
+    if(s.turnos !== undefined && s.turnos !== null) o.turnos = Math.max(0, Math.round(_num(s.turnos)));
+    if(Array.isArray(s.mods) && s.mods.length) o.mods = s.mods.slice(0, 8).map(m => ({stat: txtCorto(m.stat, 20), val: _num(m.val)})).filter(m => m.stat);
+    if(_num(s.hp)) o.hp = _num(s.hp);
+    if(s.polaridad === 'buff' || s.polaridad === 'debuff') o.polaridad = s.polaridad;
+    if(_num(s.stacks)) o.stacks = Math.max(1, Math.round(_num(s.stacks)));
+    // Escudo (2026-09-28, pedido del dueño): un efecto de la habilidad puede dar una vida extra (Blindaje,
+    // Barrera…) en vez de (o además de) un debuff — ver EstadosAplicar.BUFFS y el paso «Efectos» del 🎯.
+    if(_num(s.escudoMagico)) o.escudoMagico = Math.max(0, Math.round(_num(s.escudoMagico)));
+    // 🔓 Cómo se suelta (2026-10-20, la Red Nerubian: Fuerza contra el Ef.Esp de quien la tiró, al empezar cada turno).
+    if(s.soltar && typeof Combatiente !== 'undefined' && Combatiente.soltarNorm(s.soltar)) o.soltar = Combatiente.soltarNorm(s.soltar);
+    if(s.provocaDe){ o.provocaDe = txtCorto(s.provocaDe, 80); o.provocaDeNombre = txtCorto(s.provocaDeNombre, 40); }   // 😤 Provocado por quién (Tirar la bronca, 2026-10-26)
+    return o;
+  }
+  function limpiarEfectos(lista){
+    return (Array.isArray(lista) ? lista : []).slice(0, 8).map(e => ({
+      nombre: txtCorto(e.nombre, 40), caras: Math.max(1, Math.round(_num(e.caras)) || 1), exitos: Math.max(1, Math.round(_num(e.exitos)) || 1), dado: txtCorto(e.dado, 20),
+      detalle: txtCorto(e.detalle, 200), stacks: Math.max(0, Math.round(_num(e.stacks))), spec: limpiarSpec(e.spec), cura: Math.max(0, Math.round(_num(e.cura))),
+      ...(e.no2 !== undefined ? {no2: Math.max(0, Math.round(_num(e.no2))), no2Dif: !!e.no2Dif, no2Sentado: !!e.no2Sentado} : {}),
+      ...(e.purga ? {purga: true} : {}),   // la purga (2026-10-07)
+      ...(e.disipar ? {disipar: true} : {}),   // 🧿 Disipar (2026-10-25)
+      ...(_num(e.bajaCd) > 0 ? {bajaCd: Math.min(6, Math.round(_num(e.bajaCd)))} : {}),   // 🥁 Redoble de tambores (2026-10-25)
+      ...(_num(e.vuela) > 0 ? {vuela: Math.min(6, Math.round(_num(e.vuela)))} : {}),   // el arma vuela N casillas (la Varita del desarme)
+      ...(_num(e.empuja) > 0 ? {empuja: Math.min(6, Math.round(_num(e.empuja)))} : {}),   // lo empuja N casillas (2026-10-08)
+      ...(e.clava ? {clava: {turnos: Math.min(6, Math.max(1, Math.round(_num(e.clava.turnos)) || 3))}} : {}),   // 📌 Clavar a la pared (2026-10-26)
+      ...(typeof e.requiereDano === 'boolean' ? {requiereDano: e.requiereDano} : {}),   // 🛡 solo si el golpe hizo daño (el Golpe de escudo, 2026-10-27)
+    })).filter(e => e.nombre);
+  }
+  // Grupo de un hechizo de área (Paso 4/7 del casteo): ata este sub-duelo a la cascada de `campanas/<id>/areas/<grupoId>`
+  // — solo lo que hace falta para dibujar/anunciar acá (el resto vive en el doc de `areas`). `indice`/`total` son 1-based.
+  function limpiarGrupo(g){
+    if(!g || !g.id) return null;
+    return {id: txtCorto(g.id, 40), indice: Math.max(1, Math.round(_num(g.indice)) || 1), total: Math.max(1, Math.round(_num(g.total)) || 1)};
+  }
+  // Una tirada ya resuelta ({total, formula, rolls, mod}) que llega de afuera (ej. la PdG compartida de un hechizo de
+  // área): mismo saneo que guardarTiro le hace a una tirada recién tirada, para no confiar ciego en lo que llega.
+  function limpiarTiro(r){
+    if(!r) return null;
+    return {total: Math.round(_num(r.total)), formula: txtCorto(r.formula, 60), rolls: (Array.isArray(r.rolls) ? r.rolls : []).slice(0, 20).map(_num), mod: _num(r.mod)};
+  }
+  function limpiarHab(h){
+    if(!h || !h.nombre) return null;
+    // Tirada personalizada (2026-09-27): la fórmula ya viene resuelta (X sustituida) desde quien la crea.
+    const t = h.tira && h.tira.formula ? {formula: txtCorto(h.tira.formula, 60), etq: txtCorto(h.tira.etq || 'Tirada', 30)}
+      : h.tira && h.tira.stat ? {stat: txtCorto(h.tira.stat, 20), etq: txtCorto(h.tira.etq || h.tira.stat, 30), bono: _num(h.tira.bono), ...(_num(h.tira.min) > 0 ? {min: _num(h.tira.min)} : {})} : null;   // min: el mínimo de calidad de un pergamino
+    const contra = (Array.isArray(h.contra) ? h.contra : []).slice(0, 4)
+      .map(c => c && c.formula ? {modo: txtCorto(c.modo || 'f', 20), formula: txtCorto(c.formula, 60), etq: txtCorto(c.etq || 'Resistencia', 30)}   // fórmula propia (2026-10-15)
+        : ({modo: txtCorto(c.modo || c.stat, 20), stat: txtCorto(c.stat || c.modo, 20), etq: txtCorto(c.etq || c.stat || c.modo, 30), ...(_num(c.bono) ? {bono: Math.round(_num(c.bono))} : {})})).filter(c => c.stat || c.formula);
+    const dano = h.dano && (String(h.dano.formula || '').trim() || h.dano.diferencia) ? {formula: txtCorto(h.dano.formula, 40), tipo: txtCorto(h.dano.tipo || 'arcano', 20), ignoraDef: h.dano.ignoraDef !== false,
+      ...(h.dano.trueDamage ? {trueDamage: true} : h.dano.directo ? {directo: true} : {}),   // dueño, 2026-10-07 (P169)
+      ...(_num(h.dano.mult) > 1 ? {mult: Math.min(4, _num(h.dano.mult))} : {}), ...(h.dano.carga ? {carga: txtCorto(h.dano.carga, 20)} : {}),   // ✨ Carga Elemental (2026-10-13)
+      ...(h.dano.porDano && typeof Combatiente !== 'undefined' && Combatiente.porDanoNorm(h.dano.porDano) ? {porDano: Combatiente.porDanoNorm(h.dano.porDano)} : {}),
+      ...(h.dano.extra && String(h.dano.extra.formula || '').trim() ? {extra: {formula: txtCorto(h.dano.extra.formula, 20), tipo: txtCorto(h.dano.extra.tipo || 'fuego', 20)}} : {}),   // ☄ un segundo daño de otro tipo (el Meteoro, 2026-10-24: 4d6 físico + 2d6 de fuego)
+      ...(_num(h.dano.perfora) > 0 ? {perfora: Math.min(5, Math.round(_num(h.dano.perfora)))} : {}),   // 🗡 la Perfora del arma (2026-10-27)
+      ...(h.dano.diferencia ? {diferencia: true} : {}), ...(h.dano.drena ? {drena: true, drenaTope: Math.max(0, Math.round(_num(h.dano.drenaTope))), ...(_num(h.dano.drenaPct) > 0 && _num(h.dano.drenaPct) < 100 ? {drenaPct: Math.round(_num(h.dano.drenaPct))} : {})} : {})} : null;
+    const efectos = limpiarEfectos(h.efectos);
+    const objetivo = ['enemigo', 'aliado', 'cualquiera', 'uno mismo', 'area', 'onda', 'cono', 'linea'].includes(h.objetivo) ? h.objetivo : 'enemigo';   // cualquiera: aliado o enemigo (2026-10-15)
+    return {nombre: txtCorto(h.nombre, 60), objetivo, tira: t, contra, dano, efectos, sinOposicion: !(t && contra.length),
+      ...(h.danoSiempre && dano && t && contra.length ? {danoSiempre: true} : {}),   // ⚡ el daño entra siempre; la tirada es solo para los estados (Zap)
+      ...((objetivo === 'onda' || objetivo === 'cono') && h.dodge ? {dodge: true} : {}),
+      ...((objetivo === 'onda' || objetivo === 'cono') && h.dodgeConEva ? {dodgeConEva: true} : {}),   // 🦶 el dodge roll solo si se defendió con la Evasión (el Pisotón)
+      ...(objetivo === 'onda' && h.conVista ? {conVista: true} : {}),   // la luz: solo a los que ve (los sólidos la tapan)
+      ...(objetivo === 'aliado' && h.conmigo ? {conmigo: true} : {}),   // un aliado o uno mismo (Heal, 2026-10-11)
+      ...(h.zonaQueda ? {zonaQueda: {turnos: Math.min(6, Math.max(1, Math.round(_num(h.zonaQueda.turnos)) || 1)), nombre: txtCorto(h.zonaQueda.nombre || '', 40),
+        ...(h.zonaQueda.dano ? {dano: txtCorto(h.zonaQueda.dano, 12)} : {}), ...(h.zonaQueda.tipoDano ? {tipoDano: txtCorto(h.zonaQueda.tipoDano, 20)} : {}),
+        ...(h.zonaQueda.estado ? {estado: {nombre: txtCorto(h.zonaQueda.estado.nombre || '', 40), ...(h.zonaQueda.estado.turnos ? {turnos: _num(h.zonaQueda.estado.turnos)} : {})}} : {}),
+        ...(['piso', 'ambos'].includes(h.zonaQueda.altura) ? {altura: h.zonaQueda.altura} : {}),   // dónde está lo que deja (2026-10-07)
+        ...(h.zonaQueda.contra ? {contra: txtCorto(h.zonaQueda.contra, 12)} : {}), ...(h.zonaQueda.tira ? {tira: txtCorto(h.zonaQueda.tira, 12), tiraValor: _num(h.zonaQueda.tiraValor)} : {}),
+        ...(h.zonaQueda.color ? {color: txtCorto(h.zonaQueda.color, 7)} : {}),
+        // Cuándo afecta y a quién (2026-10-15, editor de la Ejecución): por defecto, en cada turno a quien sigue adentro, no a cada paso, a todos.
+        ...(h.zonaQueda.enMantenimiento === false ? {enMantenimiento: false} : {}), ...(h.zonaQueda.cadaPaso ? {cadaPaso: true} : {}),
+        ...(h.zonaQueda.soloRivales ? {soloRivales: true} : {})}} : {}),   // lo que deja en el suelo (bola de fuego, ventisca)
+      ...(h.menosDistancia ? {menosDistancia: true} : {}),   // −1 por casillero después del primero (pelea cercana)
+      // Tormenta arcana (2026-10-13): sin tirada, cada sub-duelo arranca en el dodge roll; `cuenta` = cuántos proyectiles le tocaron a cada token.
+      ...(h.soloDodge ? {soloDodge: true} : {}), ...(h.sinDodge ? {sinDodge: true} : {}),   // (un área sin dodge roll: la Luz cegadora)
+      ...(h.meteoro ? {meteoro: true} : {}),   // ☄ el Meteoro (2026-10-24): cae del cielo, solo se esquiva con el dodge roll
+      ...(h.tormenta ? {tormenta: {proyectiles: txtCorto(h.tormenta.proyectiles || '1d20', 12), cada: txtCorto(h.tormenta.cada || '1d4', 12),
+        ...(h.tormenta.cuenta && typeof h.tormenta.cuenta === 'object' ? {cuenta: Object.fromEntries(Object.entries(h.tormenta.cuenta).slice(0, 40).map(([k, v]) => [txtCorto(k, 40), Math.max(0, Math.min(40, Math.round(_num(v))))]))} : {}),
+        ...(_num(h.tormenta.total) > 0 ? {total: Math.round(_num(h.tormenta.total))} : {})}} : {}),
+      ...(h.reparte ? {reparte: {cada: txtCorto(h.reparte.cada || '1d4', 12), total: Math.min(6, Math.max(2, Math.round(_num(h.reparte.total)) || 2))}} : {}),   // misiles de a uno (Varita de misiles)
+      ...(h.menosPorOrden ? {menosPorOrden: true} : {}), ...(h.despeja ? {despeja: true} : {}),   // el láser largo · el vendaval
+      ...(h.destello ? {destello: {nombre: txtCorto(h.destello.nombre || 'Marcado', 30), turnos: Math.min(9, Math.max(1, Math.round(_num(h.destello.turnos)) || 2))}} : {}),   // ☀ el destello (Luz para los suyos, 2026-10-26)
+      ...(h.riesgo ? {riesgo: {si: Math.min(20, Math.max(1, Math.round(_num(h.riesgo.si)) || 1)), dano: txtCorto(h.riesgo.dano || '2d4', 12), ...(h.riesgo.porCada ? {porCada: true} : {})}} : {}),   // la inestable
+      ...(h.atrae ? {atrae: {casillas: Math.min(6, Math.max(1, Math.round(_num(h.atrae.casillas)) || 2)), contra: txtCorto(h.atrae.contra || 'fue', 12), tiraValor: _num(h.atrae.tiraValor)}} : {}),   // el gancho
+      ...(_num(h.critTipo) ? {critTipo: Math.min(12, Math.max(1, Math.round(_num(h.critTipo))))} : {}),   // lo físico invocado critica como su Tipo
+      ...(objetivo === 'linea' ? {largo: Math.min(12, Math.max(1, Math.round(_num(h.largo)) || 4))} : {}),
+      ...(h.cadena ? {cadena: {saltos: Math.min(6, Math.max(1, Math.round(_num(h.cadena.saltos)) || 2)), rango: Math.min(6, Math.max(1, Math.round(_num(h.cadena.rango)) || 3)), ...(h.cadena.efectos ? {efectos: true} : {}), ...(Array.isArray(h.cadena.paralisis) ? {paralisis: h.cadena.paralisis.slice(0, 6).map(x => Math.max(0, Math.min(100, Math.round(_num(x)) || 0)))} : {})}} : {}),   // rayo en cadena (2026-10-05); `paralisis`: el % de cada salto (Zap, 2026-10-25)
+      ...(h.detalle ? {detalle: txtCorto(h.detalle, 600)} : {}),   // el texto de la habilidad (el recuadro de la izquierda, 2026-10-15)
+      ...(h.efectoLibre ? {efectoLibre: txtCorto(h.efectoLibre, 200)} : {}),
+      ...(h.efectosNota ? {efectosNota: txtCorto(h.efectosNota, 200)} : {}),
+      // «Otro»: se resiste con algo que no está en la lista de stats — texto libre para que la mesa lo
+      // aplique a mano (2026-09-28, pedido del dueño). No cambia sinOposicion (sigue abriéndose directo en
+      // los efectos): es solo un recordatorio visible.
+      ...(h.contraOtro ? {contraOtro: txtCorto(h.contraOtro, 120)} : {})};
+  }
+  const etqTira = d => (d.hab && d.hab.tira ? d.hab.tira.etq : 'PdG');
+  const selModoHtml = d => d.hab ? (d.hab.contra || []).map(c => `<option value="${_esc(c.modo)}">${_esc(c.etq)}</option>`).join('') : `<option value="evasion">${Combatiente.contraDisparo(d) ? Combatiente.ESQUIVAR_TXT : 'Evasión'}</option>${d.ataque && d.ataque.sinParry ? '' : `<option value="parry">${Combatiente.contraDisparo(d) ? Combatiente.PONER_ESCUDO_TXT : 'Parry'}</option>`}`;   // a mano, sin Parry si el golpe no se deja parrear; contra un proyectil, «Esquivar (Agilidad)» y «Poner escudo»
+  const etqContra = d => {
+    if(d.hab){
+      const c = d.defensa ? (d.hab.contra || []).find(x => x.modo === d.defensa.modo) : null;
+      return c ? c.etq : ((d.hab.contra || []).length === 1 ? d.hab.contra[0].etq : 'Defensa');
+    }
+    return d.defensa && d.defensa.modo === 'parry' ? 'Parry' : d.defensa && d.defensa.modo === 'parrydist' ? 'Parry a distancia (Evasión)' : 'Evasión';
+  };
+  // Las opciones de defensa de una habilidad: lo que el objetivo puede tirar contra ella (un botón por cada stat de `contra`).
+  // Parry (2026-09-29, pedido del dueño: "cajas individuales, ante el posible caso de algún skill que no se pueda
+  // parriar") sale como una caja más, PERO respeta la misma regla que un ataque normal — sin arma ni escudo
+  // equipado no hay Parry (P121): si el objetivo no puede parriar ahora, esa caja no se ofrece, aunque la
+  // habilidad la tenga marcada. `hk.puedeParry(d)` es opcional (compatibilidad hacia atrás: sin el hook, se ofrece
+  // igual — hoy solo lo define ficha.html/gm-tools.html).
+  function opcionesHab(d, h){
+    const hk = h || hooks();
+    const contra = (d.hab && d.hab.contra) || [];
+    const ops = contra
+      .filter(c => c.stat !== 'parry' || !hk || !hk.puedeParry || hk.puedeParry(d))
+      .map(c => ({modo: c.modo, stat: c.stat || '', itemId: '', itemNombre: '', etiqueta: `🛡 ${c.etq}`, costo: 0, motivoNo: '',
+        info: c.formula ? [`${c.etq} 🎲 ${c.formula}`] : hk && hk.habValor ? [`${c.etq} 🎲 ${hk.habValor(d, 'defensor', c.stat) || '—'}${_num(c.bono) ? ` ${_num(c.bono) > 0 ? '+' : ''}${_num(c.bono)}` : ''}`] : []}));
+    // 🚫 Una habilidad que se esquiva pero no se parrea (la Red): el Parry se ve apagado, con el motivo, si el objetivo tiene con qué parrear (2026-10-29).
+    if(contra.some(c => c.stat === 'eva') && !contra.some(c => c.stat === 'parry') && hk && hk.puedeParry && hk.puedeParry(d))
+      ops.push(Combatiente.parryApagado({modo: 'parry', stat: 'parry', itemId: '', itemNombre: '', etiqueta: '🛡 Parry', costo: 0, info: []}, `${d.hab.nombre || 'esta habilidad'} se esquiva, no se parrea`));
+    return ops;
+  }
+  // Pasa a lo que sigue cuando quien usa la habilidad ganó la contienda (o no había): daño, efectos o fin.
+  function entrarHab(m){
+    // Daño «la diferencia» (2026-10-02, Drenar Vida): no se tira — es lo que quien la usa le ganó a la resistencia. Queda listo para
+    // que el GM lo aplique, como si ya lo hubiera tirado.
+    if(m.hab && m.hab.dano && m.hab.dano.diferencia){
+      const dif = Math.max(0, Math.round(_num(m.contacto && m.contacto.dif)));
+      m.dano = {crudo: dif, formula: 'la diferencia', rolls: [], mod: 0, reclamado: '', aplicado: false};
+      m.efectos = aguaParalisis(m, normalizarEfectos(m.hab.efectos));
+      entrarDano(m);
+      return;
+    }
+    if(m.hab && m.hab.dano){ entrarDano(m); return; }
+    const efs = normalizarEfectos(m.hab ? m.hab.efectos : []);
+    if(efs.length){ m.efectos = efs; m.fase = 'efectos'; m.estado = 'esperando'; }
+    else{ m.fase = 'fin'; m.estado = 'resuelto'; }
+  }
+
+  /* ---------- las reglas del duelo (puras, sobre el documento) ---------- */
+  // Compara dos tiradas (a = del atacante, b = del defensor). Devuelve {gana, dif, desempate} o {empate: true}.
+  function resolverPar(a, b){
+    const dif = a.total - b.total;
+    if(dif > 0) return {gana: 'atacante', dif};
+    if(dif < 0) return {gana: 'defensor', dif};
+    const masA = _num(a.mod) > 0, masB = _num(b.mod) > 0;
+    if(masA !== masB) return {gana: masA ? 'defensor' : 'atacante', dif: 0, desempate: 'mas1'};
+    return {empate: true};
+  }
+
+  // Aplica el resultado de un par de tiradas al documento `m` (una copia), y avanza de fase.
+  // El golpe pasa (entero o a la mitad): sigue el daño.
+  function entrarDano(m){ m.fase = 'dano'; m.estado = 'esperando'; }
+
+  function cerrarPar(m, par, r){
+    const info = {gana: r.gana, dif: r.dif, desempate: r.desempate || null, moneda: r.moneda || null};
+    // 🪵 Tronco de huída (2026-10-10): la Evasión que gana con ese Flash da dodge roll — en un área que no lo daba (cono, onda), la fase
+    // dodge de siempre; en un golpe directo, esquivó igual y además puede moverse (`contacto.dodgeLibre`: lo ofrece el mapa de quien esquivó).
+    const tronco = par === 'contacto' && r.gana === 'defensor' && !!(m.eva && m.eva.dodge) && !(m.defensa && m.defensa.modo === 'parry');
+    m.empate = null;
+    m.estado = 'esperando';
+    if(par === 'contacto' && m.hab){   // habilidad dirigida: gana quien la usa → sigue; gana el objetivo → se resistió
+      m.contacto = info;
+      if(r.gana === 'atacante'){ m.resultado = 'pego'; if(m.hab.critTipo && m.hab.dano) entrarCritico(m); else entrarHab(m); }   // lo físico invocado (estaca, canto rodado) critica
+      // ⚡ El daño entra siempre (`danoSiempre`, Zap, 2026-10-25, dueño: «no se esquiva: el daño pasa y se tira resistencia especial para intentar
+      // resistir el estado»): si gana el objetivo, el daño sigue igual y solo se salva de los estados (quedan omitidos al tirar el daño).
+      else if(m.hab.danoSiempre && m.hab.dano){ m.resultado = 'pego'; m.contacto.resistioEstado = true; entrarHab(m); }
+      else if(m.grupo && m.hab.objetivo !== 'enemigo' && !m.hab.sinDodge && ((m.hab.objetivo !== 'onda' && m.hab.objetivo !== 'cono') || m.hab.dodge || tronco || (m.hab.dodgeConEva && m.defensa && m.defensa.modo === 'eva'))){   // (dos misiles repartidos: sin dodge)   // (una onda solo si deja dodge: `hab.dodge`, Daño en área)   // hechizo de área (Paso 4 del casteo): ganar la Evasión no termina el duelo, gana el DERECHO a un dodge roll (la onda alrededor de quien la usa no da dodge: no hay a dónde salir)
+        m.fase = 'dodge'; m.estado = 'esperando';
+      }
+      else{ m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; if(tronco) m.contacto.dodgeLibre = true; }
+      return;
+    }
+    if(par === 'contacto'){
+      m.contacto = info;
+      // Un disparo parado con escudo (dueño, 2026-10-09): no hay Bloqueo — parar con escudo es como esquivar (cuesta el No2 del Parry): queda parado.
+      // 🏹 Parry a distancia (Shooter, 2026-10-12, dueño): Evasión contra el PdG; si gana, cuenta como un Parry ganado (sin Bloqueo: puede contraatacar).
+      // Con un arco, antes del contraataque, el dodge roll: alejarse 1 casillero pagando sus No2 (`dodgeArco`; con ballesta no hace falta).
+      if(m.defensa && m.defensa.modo === 'parrydist' && r.gana === 'defensor'){ m.resultado = 'bloqueado'; m.fase = 'fin'; m.estado = 'resuelto'; if(m.defensa.arco){ m.contacto.dodgeLibre = true; m.contacto.dodgeArco = true; } }
+      else if(m.defensa && m.defensa.modo === 'parry' && r.gana === 'defensor' && typeof Combatiente !== 'undefined' && Combatiente.contraDisparo(m)){ m.resultado = 'bloqueado'; m.fase = 'fin'; m.estado = 'resuelto'; }
+      else if(m.defensa && m.defensa.modo === 'parry' && r.gana === 'defensor'){ m.fase = 'bloqueo'; }   // el Parry paró el PdG: sigue el Bloqueo
+      else if(r.gana === 'atacante'){ m.resultado = 'pego'; entrarCritico(m); }   // el golpe pega: ¿es crítico?
+      else{ m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; if(tronco) m.contacto.dodgeLibre = true; }
+    }else{
+      m.bloq = info;
+      // 🤺 Desarmar (2026-10-21): si gana quien lo activó, el otro pierde lo que tenía en la mano (lo hace el mapa del GM, gancho `desarmado`) y
+      // eso reemplaza el resultado de siempre (sin la mitad del daño ni el contraataque).
+      if(m.ataque && m.ataque.desarme && r.gana === m.ataque.desarme.lado){ m.resultado = 'desarmado'; m.fase = 'fin'; m.estado = 'resuelto'; return; }
+      m.resultado = r.gana === 'defensor' ? 'bloqueado' : 'mitad';
+      if(m.resultado === 'mitad') entrarDano(m);
+      else{ m.fase = 'fin'; m.estado = 'resuelto'; }
+    }
+  }
+
+  // El golpe pegó (por Evasión o por un Parry perdido): se evalúa el crítico con la misma regla, contra la tirada de defensa que se usó.
+  function entrarCritico(m){
+    const dd = m.critDatos || {};
+    // "Ignora Resistencia a crítico" (2026-09-27, pedido del dueño): una habilidad tipo "ataque con mi arma, con
+    // arreglos" (Golpe brutal y similares, duelo.arma.ignoraResistCrit) le resta puntos a la Resistencia del
+    // defensor antes de calcular el crítico — a la vista en la cuenta y en los cuadraditos, como cualquier otra.
+    const tb = (m.ataque && m.ataque.tiro) || {};   // el bono del tiro (distancia ideal del arco)
+    const ignora = _num(m.ataque && m.ataque.mods && m.ataque.mods.ignoraResistCrit) + _num(dd.ignora) + _num(tb.ignora);   // + lo que ignora el arma (statsCritico)
+    const resistencia = Math.max(0, _num(dd.resistencia) - ignora);
+    // Crítico frecuente/potente "solo esta tirada" (2026-09-29, pedido del dueño — Lisiar: el bono no puede
+    // quedar como un estado de al menos 1 turno, que podría alcanzar a un ataque posterior). A diferencia de
+    // un Efecto sobre uno mismo (que sí deja un estado real), esto se suma acá nomás, para ESTE golpe: no
+    // escribe nada en la ficha ni en S.efectos.
+    const frecuente = _num(dd.frecuente) + _num(m.ataque && m.ataque.mods && m.ataque.mods.critBono) + _num(tb.crit);
+    const potente = _num(dd.potente) + _num(m.ataque && m.ataque.mods && m.ataque.mods.critpotBono) + _num(tb.critpot) + _num(m.ataque && m.ataque.espalda && m.ataque.espalda.critpot);   // + por la espalda
+    let e = null;
+    if(typeof Critico !== 'undefined' && m.pdg && m.eva){
+      e = Critico.evaluar({pdg: m.pdg.total, eva: m.eva.total, tipo: m.ataque.tipoDado, frecuente, potente, resistencia});
+    }
+    // 🛡 Blindado (dueño, 2026-10-20: «la anulación del crítico debería estar automatizada»): un golpe que iba a ser crítico entra como uno normal.
+    if(e && e.critico && dd.blindado) e = {...e, critico: false, blindado: true};
+    if(e && e.critico){
+      const d20extra = Math.max(0, Math.round(_num(dd.d20)));   // el arma tira N d20 más en el crítico (2026-10-03)
+      m.crit = {rango: e.rango, diferencia: e.diferencia, nivel: e.nivel, dados: e.dados + d20extra, critico: true, frecuente, potente, resistencia, d20: null, mejor: 0, mult: 1, ...(d20extra ? {d20extra} : {})};
+      m.fase = 'critico';
+      m.estado = 'esperando';
+    }else{
+      m.crit = e ? {rango: e.rango, diferencia: e.diferencia, nivel: e.nivel, dados: e.dados, critico: false, frecuente, potente, resistencia, d20: null, mejor: 0, mult: 1, ...(e.blindado ? {blindado: true} : {})} : null;
+      // 🎯 Headshot (Shooter, 2026-10-12): «falla si no es crítico» — pegó, pero sin crítico no hace nada.
+      if(m.ataque && m.ataque.soloCritico){ m.crit = {...(m.crit || {}), critico: false, soloCritico: true}; m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; return; }
+      entrarDano(m);
+    }
+  }
+
+  // Tira los d20 del crítico (los tira el atacante o el GM): el mejor da el multiplicador.
+  // `aMano` (2026-10-17, dueño: «cada uno de los pasos del duelo deben tener la alternativa de tirarla a mano»): los d20 escritos (uno o varios).
+  async function tirarCritico(id, aMano){
+    const ref = col().doc(id);
+    let anuncio = '', publicar = null;
+    await fbDb.runTransaction(async tx => {
+      anuncio = ''; publicar = null;
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(m.estado !== 'esperando' || m.fase !== 'critico' || !m.crit || m.crit.d20) return;
+      const man = Array.isArray(aMano) ? aMano.map(x => Math.max(1, Math.min(20, Math.round(_num(x))))).filter(x => x >= 1).slice(0, 10) : [];
+      const n = man.length || Math.max(1, _num(m.crit.dados));
+      const rolls = man.length ? man : Array.from({length: n}, () => 1 + Math.floor(Math.random() * 20));
+      // Supercrítico (2026-09-30): dos o más 20 naturales suman sus ×4 (Critico.resultadoD20).
+      const res = Critico.resultadoD20 ? Critico.resultadoD20(rolls, m.crit.potente) : {mejor: Math.max(...rolls), mult: Critico.multiplicador(Math.max(...rolls), m.crit.potente)};
+      const mejor = res.mejor, mult = res.mult;
+      m.crit = {...m.crit, d20: rolls, mejor, mult, ...(res.supercritico ? {supercritico: res.veintes} : {})};
+      entrarDano(m);
+      tx.update(ref, cambiosDe(m));
+      const NOMBRE_MULT = {1: 'sin multiplicador: el d20 no alcanzó a multiplicar', 2: 'doble daño', 3: 'triple daño', 4: 'cuádruple daño'};
+      publicar = {origen: `${m.atacante.nombre} · Crítico (${n}d20${man.length ? ', a mano' : ''})`, r: {formula: `${n}d20${man.length ? ' (manual)' : ''}`, rolls, mod: 0, total: mejor, destacar: 'max'}};
+      anuncio = res.supercritico
+        ? `🌟 ¡SUPERCRÍTICO! ${m.atacante.nombre} contra ${m.defensor.nombre}: ${res.veintes} veintes naturales, ×${mult}, ignora la Defensa`
+        : `💥 ¡CRÍTICO! ${m.atacante.nombre} contra ${m.defensor.nombre}: ×${mult} (${NOMBRE_MULT[mult]}), ignora la Defensa`;
+    });
+    if(publicar && typeof mesaPublicar === 'function'){ try{ mesaPublicar(publicar.origen, publicar.r); }catch(err){} }
+    anunciarMesa(anuncio);
+  }
+
+  // Si ya están las dos tiradas del par de la fase, lo resuelve (o abre el desempate).
+  function avanzar(m){
+    let par = null, a = null, b = null;
+    if(m.fase === 'contacto' && m.pdg && m.eva){ par = 'contacto'; a = m.pdg; b = m.eva; }
+    else if(m.fase === 'bloqueo' && m.fuerza && m.bloqueo){ par = 'bloqueo'; a = m.fuerza; b = m.bloqueo; }
+    if(!par) return null;
+    const r = resolverPar(a, b);
+    if(r.empate){ m.estado = 'empate'; m.empate = {par}; return null; }
+    cerrarPar(m, par, r);
+    return r.desempate === 'mas1' ? textoDesempate(m, par, r) : null;
+  }
+
+  const nombresPar = (m, par) => par === 'contacto'
+    ? [`${etqTira(m)} de ${m.atacante.nombre}`, `${etqContra(m)} de ${m.defensor.nombre}`, m.pdg, m.eva]
+    : [`Fuerza del golpe de ${m.atacante.nombre}`, `Bloqueo de ${m.defensor.nombre}`, m.fuerza, m.bloqueo];
+
+  function textoDesempate(m, par, r){
+    const [na, nb, ta, tb] = nombresPar(m, par);
+    const ganador = r.gana === 'atacante' ? m.atacante.nombre : m.defensor.nombre;
+    if(r.desempate === 'mas1'){
+      const conMas = r.gana === 'atacante' ? nb : na;
+      return `⚖ Empate (${ta.total} a ${tb.total}) entre ${na} y ${nb}: gana ${ganador} porque ${conMas} llevaba un «+» fijo y la otra no`;
+    }
+    if(r.desempate === 'ppt') return `⚖ Empate (${ta.total} a ${tb.total}) entre ${na} y ${nb}: se jugó ✊ piedra, papel o tijera → gana ${ganador}`;
+    const mo = r.moneda;
+    const quien = mo.quien === 'atacante' ? m.atacante.nombre : m.defensor.nombre;
+    return `⚖ Empate (${ta.total} a ${tb.total}) entre ${na} y ${nb}, las dos con «+» fijo o ninguna: ${quien} eligió ${mo.eleccion}, salió ${mo.resultado} (${mo.resultado % 2 === 0 ? 'par' : 'impar'}) → gana ${ganador}`;
+  }
+
+  async function anunciarMesa(texto){
+    if(!texto) return;
+    try{
+      await fbDb.collection(fbRutaCampana('tiradas')).add({
+        uid: yo(), jugador: fbMiembro.nombre, quien: '', origen: texto.slice(0, 200), formula: '', rolls: [], mod: 0, total: 0,
+        desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp(),
+      });
+    }catch(err){ console.error('Duelo: no se pudo anunciar en la Mesa', err); }
+  }
+
+  const cambiosDe = m => { const c = {}; CAMPOS_ESCRIBIBLES.forEach(k => { c[k] = m[k] === undefined ? null : m[k]; }); return c; };
+
+  // Anota la tirada de `campo` ('pdg'|'eva'|'fuerza'|'bloqueo'); si ya está el otro del par, lo resuelve en la misma transacción.
+  async function guardarTiro(id, campo, r, defensa, extra){
+    const tiro = {total: campo === 'eva' ? Math.max(1, Math.round(_num(r.total))) : Math.round(_num(r.total)), formula: String(r.formula || '').slice(0, 60), rolls: (r.rolls || []).slice(0, 20).map(_num), mod: _num(r.mod),
+      ...(r.nota ? {nota: String(r.nota).slice(0, 60)} : {}), ...(r.dodge ? {dodge: true} : {})};   // (dodge: un Flash con dodge roll, Tronco de huída) · lo que se sumó a la tirada (2026-10-04: «+2 contra oportunidad»): se ve en el cuadro y en la Mesa
+    const fase = (campo === 'pdg' || campo === 'eva') ? 'contacto' : 'bloqueo';
+    const ref = col().doc(id);
+    let anuncio = '', par = null;
+    await fbDb.runTransaction(async tx => {
+      anuncio = ''; par = null;
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(m.estado !== 'esperando' || m.fase !== fase || m[campo]) return;   // ya resuelto, otra fase o ya tiró
+      m[campo] = tiro;
+      // 🗡 Lo sorprendieron por la espalda desde el sigilo (2026-09-26 / 2026-10-30, dueño): su defensa vale 1, tire lo que tire.
+      if(campo === 'eva' && m.ataque && m.ataque.sorpresa) m.eva = {...tiro, total: 1, nota: 'lo sorprendieron por la espalda: vale 1'};
+      const be = campo === 'pdg' && m.ataque && m.ataque.espalda;   // por la espalda: el PdG del arma o la habilidad
+      if(be && be.pdg) m.pdg = {...tiro, total: tiro.total + be.pdg, mod: tiro.mod + be.pdg, formula: `${tiro.formula} +${be.pdg} espalda`.slice(0, 60)};
+      const bep = campo === 'pdg' && m.ataque ? _num(m.ataque.espaldaPdg) : 0;   // 🗡 ataque por la espalda (la regla general, 2026-10-15)
+      if(bep > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + bep, mod: p0.mod + bep, formula: `${p0.formula} +${bep} espalda`.slice(0, 60)}; }
+      const emb = campo === 'pdg' && m.ataque ? _num(m.ataque.embestida) : 0;   // la Embestida de las piernas
+      if(emb > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + emb, mod: p0.mod + emb, formula: `${p0.formula} +${emb} embestida`.slice(0, 60)}; }
+      const qto = campo === 'pdg' && m.ataque ? _num(m.ataque.quieto) : 0;   // Pulso quieto / Foco (anillos)
+      if(qto > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + qto, mod: p0.mod + qto, formula: `${p0.formula} +${qto} quieto`.slice(0, 60)}; }
+      const mie = campo === 'pdg' && m.ataque ? _num(m.ataque.miedo) : 0;   // 😱 le tiene miedo al defensor
+      if(mie > 0){ const p0 = m.pdg; m.pdg = {...p0, total: Math.max(0, p0.total - mie), mod: p0.mod - mie, formula: `${p0.formula} −${mie} miedo`.slice(0, 60)}; }
+      const esd = campo === 'pdg' && m.ataque && m.ataque.estandarte ? _num(m.ataque.estandarte.pdg) : 0;   // 🚩 bajo el estandarte
+      if(esd > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + esd, mod: p0.mod + esd, formula: `${p0.formula} +${esd} estandarte`.slice(0, 60)}; }
+      const tpd = campo === 'pdg' && m.ataque && m.ataque.tiro ? _num(m.ataque.tiro.pdg) : 0;   // el bono del tiro: distancia ideal (+) o tiro alto (−2)
+      if(tpd){ const p0 = m.pdg; m.pdg = {...p0, total: Math.max(0, p0.total + tpd), mod: p0.mod + tpd, formula: `${p0.formula} ${tpd > 0 ? '+' : '−'}${Math.abs(tpd)} ${m.ataque.tiro.motivo}`.slice(0, 90)}; }
+      else if(campo === 'pdg' && m.ataque && m.ataque.tiro && /tiro alto/.test(String(m.ataque.tiro.motivo || ''))){ const p0 = m.pdg; m.pdg = {...p0, formula: `${p0.formula} ±0 (${m.ataque.tiro.motivo})`.slice(0, 90)}; }
+      const cpd = campo === 'pdg' && extra ? Math.round(_num(extra.cargaPdg)) : 0;   // 👁 lo que una carga suma a la Probabilidad de Golpe (Ojo de asesino, 2026-10-26)
+      if(cpd > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + cpd, mod: p0.mod + cpd, formula: `${p0.formula} +${cpd} ${extra.cargaPdgNombre || 'carga'}`.slice(0, 60)}; }
+      if(campo === 'eva' && defensa) m.defensa = defensa;
+      if(extra && (campo === 'pdg' || campo === 'eva')){ const {cargaPdg, cargaPdgNombre, ...cd} = extra; m.critDatos = {...(m.critDatos || {}), ...cd}; }   // Crítico frecuente/potente del atacante; Resistencia a crítico del defensor
+      anuncio = avanzar(m) || '';
+      tx.update(ref, cambiosDe(m));
+      // Tiraron los dos: las dos tiradas van juntas a la Mesa (con los dados), como cierre del suspenso.
+      const a = fase === 'contacto' ? m.pdg : m.fuerza, b = fase === 'contacto' ? m.eva : m.bloqueo;
+      if(a && b){
+        const nb = fase === 'contacto' ? etqContra(m) : 'Bloqueo';
+        const notaDe = t => t && t.nota ? ` (${t.nota})` : '';
+        par = [{origen: `${m.atacante.nombre} · ${fase === 'contacto' ? etqTira(m) : 'Fuerza del golpe'}${notaDe(a)}`, r: a}, {origen: `${m.defensor.nombre} · ${nb}${notaDe(b)}`, r: b}];
+      }
+    });
+    // Las dos tiradas se publican a la vez para que los dos juegos de dados 3D rueden juntos.
+    if(par && typeof mesaPublicar === 'function'){ await Promise.all(par.map(x => { try{ return mesaPublicar(x.origen, {formula: x.r.formula, rolls: x.r.rolls, mod: x.r.mod, total: x.r.total}); }catch(err){ return null; } })); }
+    anunciarMesa(anuncio);
+  }
+
+  // Resuelve el dodge roll de un hechizo de área (Paso 4/7 del casteo): `logroSalir` lo decide quien lo pide
+  // (el mapa lo calcula solo comparando la posición actual del token con el centro/radio del grupo; sin mapa,
+  // el GM lo puede marcar a mano — "ayuda, no bloquea"). Si logró salir, el duelo termina sin efecto ("SE
+  // RESISTIÓ"); si sigue adentro (perdió la Evasión, no se movió, no le alcanzó, Inmovilizado…), NO hay
+  // término medio (regla 4e): sigue como si hubiera perdido el contacto, con el efecto completo.
+  // 🏹 Parry a distancia con arco (2026-10-12): el dodge roll ya se hizo → aparece el contraataque.
+  async function marcarDodgeArco(id){
+    const ref = col().doc(id);
+    await fbDb.runTransaction(async tx => {
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const c = doc.data().contacto;
+      if(!c || !c.dodgeArco || c.dodgeHecho) return;
+      tx.update(ref, {contacto: {...c, dodgeHecho: true}});
+    });
+  }
+  async function resolverDodge(id, logroSalir){
+    const ref = col().doc(id);
+    let anuncio = '';
+    await fbDb.runTransaction(async tx => {
+      anuncio = '';
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(m.estado !== 'esperando' || m.fase !== 'dodge') return;
+      if(logroSalir){ m.resultado = 'fallo'; m.fase = 'fin'; m.estado = 'resuelto'; anuncio = `🏃 ${m.defensor.nombre} logró salir del área de ${m.hab.nombre}: esquivó`; }
+      else{ m.resultado = 'pego'; entrarHab(m); anuncio = `🏃 ${m.defensor.nombre} no logró salir del área de ${m.hab.nombre}: efecto completo`; }
+      tx.update(ref, cambiosDe(m));
+    });
+    anunciarMesa(anuncio);
+  }
+
+  /* ---------- efectos del golpe ---------- */
+  // Efectos que SOLO entran si el golpe hizo daño (decidido por el dueño, 2026-09-26). El resto entra aunque la armadura absorba todo. Un efecto puede traer `requiereDano` propio.
+  const EFECTOS_CON_DANO = ['envenenar', 'veneno severo', 'sangrado', 'drena vida', 'lisiado', 'rengo'];
+  const requiereDanoDe = ef => (typeof ef.requiereDano === 'boolean') ? ef.requiereDano : EFECTOS_CON_DANO.includes(String(ef.nombre || '').trim().toLowerCase());
+  const siempreEf = ef => _num(ef.caras) <= 1 || _num(ef.exitos) >= _num(ef.caras);
+  const pctEf = ef => Math.round(_num(ef.exitos) / Math.max(1, _num(ef.caras)) * 100);
+  const necesitaTiradaEf = ef => !siempreEf(ef) || !!ef.dado;
+
+  // Del efecto del arma al estado que se le pone al defensor (null = a mano: no hay estado que lo represente).
+  function specDeEfecto(ef){
+    if(ef.spec && ef.spec.nombre) return ef.spec;   // habilidades: el estado ya viene armado
+    if(_num(ef.cura) > 0) return {nombre: 'Curación', cura: Math.round(_num(ef.cura))};   // habilidades: cura sobre el objetivo
+    if(ef.no2 !== undefined) return {nombre: 'Pierde No2', no2: Math.max(0, Math.round(_num(ef.no2))), no2Dif: !!ef.no2Dif, no2Sentado: !!ef.no2Sentado};   // Sonic Boom
+    if(_num(ef.bajaCd) > 0) return {nombre: 'Baja cooldowns', bajaCd: Math.round(_num(ef.bajaCd))};   // 🥁 Redoble de tambores (2026-10-25): el mapa le baja los cooldowns
+    if(ef.disipar) return {nombre: 'Disipar', disipar: true};   // 🧿 Disipar (2026-10-25): quien lo usa elige qué estado bueno le saca
+    if(ef.purga) return {nombre: 'Purga', purga: true};   // la purga (2026-10-07): el mapa saca el estado malo más reciente
+    const n = String(ef.nombre || '').trim().toLowerCase();
+    const st = Math.max(0, Math.round(_num(ef.stacks)));
+    const tu = Math.max(0, Math.round(_num(ef.turnos)));   // turnos puestos en el efecto del arma (ej. Sangrado 2 turnos); 0 = los del estado
+    const conTurnos = sp => sp && tu ? {...sp, turnos: tu} : sp;
+    return conTurnos(specArma(n, st, ef));
+  }
+  const SANGRADO_ARMA_TURNOS = 2;
+  const esDrenaEf = ef => /^drena(r)?\s+vida$/i.test(String((ef && ef.nombre) || '').trim());
+  const esSangradoEf = ef => /^(sangrado|primera sangre)$/i.test(String((ef.spec && ef.spec.nombre) || ef.nombre || '').trim());
+  // El Sangrado con turnos pasa a permanente (le saca los turnos, al efecto y a su estado ya armado).
+  function sangradoPermanente(ef){
+    if(!esSangradoEf(ef) || ef.permanente) return ef;
+    const {turnos, ...r} = ef;
+    if(r.spec){ const {turnos: t2, ...sp} = r.spec; r.spec = sp; }
+    if(!r.spec) r.permanente = true;   // el de un arma: si no, quedaría con los 2 turnos estándar
+    return {...r, detalle: `${r.detalle ? r.detalle + ' ' : ''}(Fue crítico: el Sangrado queda permanente.)`.slice(0, 200)};
+  }
+  function specArma(n, st, ef){
+    if(n === 'rompe armadura' || n === 'arruina armadura' || n === 'media armadura') return {nombre: 'Armadura rota', stacks: Math.max(1, st)};
+    // Sangrado de un arma (regla del dueño, 2026-10-03): 2 de daño por turno durante SANGRADO_ARMA_TURNOS (2), salvo que el arma diga otros turnos
+    // o «permanente»; con un golpe crítico, permanente (sangradoPermanente). Con más stacks si el arma lo dice.
+    if(n === 'sangrado' || n === 'primera sangre') return {nombre: 'Sangrado', ...(st ? {stacks: st} : {}), ...(ef.permanente ? {} : {turnos: _num(ef.turnos) > 0 ? Math.round(_num(ef.turnos)) : SANGRADO_ARMA_TURNOS})};
+    if(n === 'rengo') return {nombre: 'Rengo'};   // Rengo en armas (2026-10-03)
+    if(n === 'parálisis' || n === 'paralisis') return {nombre: 'Parálisis', turnos: 1};   // el Arma eléctrica (2026-10-21)
+    if(n === 'envenenar' || n === 'veneno severo') return (n === 'veneno severo' || /severo/i.test(ef.detalle || '')) ? {nombre: 'Veneno severo'} : (st ? {nombre: 'Veneno', stacks: st} : {nombre: 'Veneno'});
+    if(n === 'lisiado') return {nombre: 'Lisiado'};
+    if(n === 'expuesto') return {nombre: 'Expuesto', turnos: 1};   // Exponer (arcos, 2026-10-11)
+    if(n === 'pajaritos') return {nombre: 'Pajaritos'};
+    if(n === 'aturdir') return {nombre: 'Stun'};
+    if(n === 'derribar') return {nombre: 'Sentado'};
+    if(n === 'demora' || n === 'knockdown') return {nombre: 'Demora'};   // baja 1 lugar en el orden de turnos: lo hace el mapa (`aplicaDemora`)
+    return null;
+  }
+
+  // Los efectos al golpear del arma de quien ataca; en una ráfaga (`ataque.rafaga` = N cortes), N veces, cada uno con su «Corte k».
+  function efectosArmaDe(d, h){
+    const ea = h && h.efectosArma ? (h.efectosArma(d) || []) : [];
+    const n = Math.max(1, Math.min(3, Math.round(_num(d.ataque && d.ataque.rafaga)) || 1));
+    return n === 1 ? ea : Array.from({length: n}, (_, i) => ea.map(e => ({...e, detalle: `Corte ${i + 1}${e.detalle ? ': ' + e.detalle : ''}`.slice(0, 200)}))).flat();
+  }
+  // Los efectos que trae el arma, en el formato del duelo (los manda la página del atacante al tirar el daño).
+  function normalizarEfectos(lista){
+    // «Ignora N de Res. crítico» no es un efecto sobre el golpeado: ya se usó al calcular el crítico (2026-10-03).
+    return (Array.isArray(lista) ? lista : []).filter(e => !(typeof Combatiente !== 'undefined' && Combatiente.esEfectoIgnora(e))).slice(0, 12).map(e => {   // 12: una ráfaga los repite
+      let caras = Math.max(1, Math.round(_num(e.caras)) || 1), exitos = Math.min(caras, Math.max(1, Math.round(_num(e.exitos)) || 1));
+      if(caras === 3){ caras = 6; exitos *= 2; }   // un d3 se tira con d6 (dueño, 2026-10-05: «tirar d3 es feo»): 33 % = 5 o 6
+      const o = {nombre: String(e.nombre || '').trim().slice(0, 40), caras, exitos, dado: String(e.dado || '').trim().slice(0, 20), detalle: String(e.detalle || '').trim().slice(0, 200), stacks: Math.max(0, Math.round(_num(e.stacks)))};
+      if(_num(e.turnos) > 0) o.turnos = Math.round(_num(e.turnos));
+      if(e.permanente) o.permanente = true;
+      if(e.spec && e.spec.nombre) o.spec = e.spec;
+      if(_num(e.cura) > 0) o.cura = Math.round(_num(e.cura));
+      if(e.no2 !== undefined){ o.no2 = Math.max(0, Math.round(_num(e.no2))); o.no2Dif = !!e.no2Dif; o.no2Sentado = !!e.no2Sentado; }
+      if(e.purga) o.purga = true;   // la purga (2026-10-07)
+      if(e.disipar) o.disipar = true;   // 🧿 Disipar (2026-10-25)
+      if(_num(e.bajaCd) > 0) o.bajaCd = Math.min(6, Math.round(_num(e.bajaCd)));   // 🥁 Redoble de tambores (2026-10-25)
+      if(_num(e.vuela) > 0) o.vuela = Math.min(6, Math.round(_num(e.vuela)));   // el arma vuela N casillas (la Expelliarmus, 2026-10-07)
+      if(_num(e.empuja) > 0) o.empuja = Math.min(6, Math.round(_num(e.empuja)));   // lo empuja N casillas (2026-10-08)
+      if(e.clava) o.clava = {turnos: Math.min(6, Math.max(1, Math.round(_num(e.clava.turnos)) || 3))};   // 📌 Clavar a la pared (2026-10-26)
+      if(e.seguroCritico && caras > 1) o.seguroCritico = true;
+      if(e.soloCritico) o.soloCritico = true;
+      o.requiereDano = requiereDanoDe(e);
+      o.res = null; o.omitido = false; o.motivo = ''; o.aplicar = ''; o.aplicado = false; o.nota = '';
+      return o;
+    }).filter(e => e.nombre);
+  }
+
+  const efectoResuelto = ef => ef.omitido || ef.aplicado || (ef.res && !ef.res.exito);
+  // Si ya no queda ningún efecto por resolver, el duelo termina.
+  function cerrarSiListo(m){
+    if(m.fase !== 'efectos') return;
+    if((m.efectos || []).every(efectoResuelto)){ m.fase = 'fin'; m.estado = 'resuelto'; }
+  }
+
+  // El atacante (o el GM) tira el dado de un efecto: el dado a la vista, «funcionó» o «no funcionó».
+  // `aMano` = {exito} (2026-10-17): el resultado elegido a mano, sin tirar el dado (el dado extra de daño, si funciona, se tira igual).
+  async function tirarEfecto(id, i, aMano){
+    const ref = col().doc(id);
+    let publicar = null, anuncio = '';
+    await fbDb.runTransaction(async tx => {
+      publicar = null; anuncio = '';
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      const ef = (m.efectos || [])[i];
+      if(m.fase !== 'efectos' || !ef || ef.res || ef.omitido) return;
+      const r = {dado: 0, exito: true, extra: null};
+      if(aMano){ r.exito = !!aMano.exito; r.manual = true; }
+      else if(!siempreEf(ef)){
+        r.dado = 1 + Math.floor(Math.random() * ef.caras);
+        r.exito = r.dado >= ef.caras - ef.exitos + 1;
+      }
+      if(r.exito && ef.dado && typeof tirarDados === 'function'){
+        const x = tirarDados(ef.dado);
+        if(x) r.extra = {formula: x.formula, total: x.total, rolls: (x.rolls || []).slice(0, 10)};
+      }
+      ef.res = r;
+      m.efectos = m.efectos.map((e, k) => k === i ? ef : e);
+      cerrarSiListo(m);
+      tx.update(ref, cambiosDe(m));
+      if(aMano){ anuncio = `✍ ${ef.nombre} de ${m.atacante.nombre} sobre ${m.defensor.nombre}, a mano: ${r.exito ? 'funcionó' : 'no funcionó'}`; return; }
+      if(!siempreEf(ef)) publicar = {origen: `${m.atacante.nombre} · ${ef.nombre} ${pctEf(ef)}%`, r: {formula: `1d${ef.caras}`, rolls: [r.dado], mod: 0, total: r.dado, ...(r.exito ? {destacar: 'idx:0'} : {})}};
+      anuncio = r.exito ? `✔ ${ef.nombre}${siempreEf(ef) ? '' : ' (' + pctEf(ef) + '%)'} de ${m.atacante.nombre} sobre ${m.defensor.nombre}: ${siempreEf(ef) ? '' : 'salió ' + r.dado + ' → '}¡FUNCIONÓ!${r.extra ? ' · ' + ef.dado + ' = ' + r.extra.total : ''}`
+        : `✘ ${ef.nombre} (${pctEf(ef)}%) de ${m.atacante.nombre} sobre ${m.defensor.nombre}: salió ${r.dado} → no funcionó`;
+    });
+    if(publicar && typeof mesaPublicar === 'function'){ try{ mesaPublicar(publicar.origen, publicar.r); }catch(err){} }
+    anunciarMesa(anuncio);
+  }
+
+  /* Todos los efectos con dado, juntos (2026-10-04, pedido del dueño: «para que pegar con un arma no sea una eternidad»): un solo botón tira un
+     dado por cada efecto que lo necesite; la Mesa recibe UNA tirada con todos los dados y una línea con lo que funcionó y lo que no; el cuadro
+     muestra el tablero (qué dado va con qué efecto, con qué número funciona, qué salió). */
+  /* 💧 El agua y el rayo (2026-10-17, dueño): quien está parado en un charco (el mapa: `enAgua`, vtt-hexgrid/js/50) tiene el doble de chance
+     de quedar Paralizado. Solo donde la pantalla sabe del mapa; en la ficha suelta o GM Tools queda igual. */
+  function aguaParalisis(m, efs){
+    let t = null;
+    try{ t = typeof enAgua === 'function' && typeof tokens !== 'undefined' && m.defensor ? tokens.get(m.defensor.tokenId) : null; }catch(err){ t = null; }
+    if(!t || !enAgua(t)) return efs;
+    return (efs || []).map(ef => ef && ef.nombre === 'Parálisis' && _num(ef.caras) > _num(ef.exitos)
+      ? {...ef, exitos: Math.min(_num(ef.caras), _num(ef.exitos) * 2), detalle: `${ef.detalle ? ef.detalle + ' ' : ''}(💧 en el agua: el doble de chance.)`.slice(0, 200)} : ef);
+  }
+  async function tirarEfectos(id){
+    const ref = col().doc(id);
+    let publicar = null, anuncio = '';
+    await fbDb.runTransaction(async tx => {
+      publicar = null; anuncio = '';
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(m.fase !== 'efectos') return;
+      const dados = [], partes = [];
+      m.efectos = (m.efectos || []).map(e => {
+        if(!e || e.res || e.omitido || !necesitaTiradaEf(e)) return e;
+        const ef = {...e}, r = {dado: 0, exito: true, extra: null};
+        if(!siempreEf(ef)){
+          r.dado = 1 + Math.floor(Math.random() * ef.caras);
+          r.exito = r.dado >= ef.caras - ef.exitos + 1;
+          dados.push({caras: ef.caras, dado: r.dado, exito: r.exito});
+        }
+        if(r.exito && ef.dado && typeof tirarDados === 'function'){
+          const x = tirarDados(ef.dado);
+          if(x) r.extra = {formula: x.formula, total: x.total, rolls: (x.rolls || []).slice(0, 10)};
+        }
+        ef.res = r;
+        partes.push(`${r.exito ? '✔' : '✘'} ${ef.nombre}${siempreEf(ef) ? '' : ` ${pctEf(ef)} % (salió ${r.dado} en d${ef.caras})`}${r.extra ? ` · ${ef.dado} = ${r.extra.total}` : ''}`);
+        return ef;
+      });
+      if(!partes.length) return;
+      cerrarSiListo(m);
+      tx.update(ref, cambiosDe(m));
+      // Los dados que funcionaron brillan en 3D como el d20 del crítico (2026-10-04, dueño): `destacar: 'idx:…'`.
+      const ok = dados.map((x, k) => x.exito ? k : -1).filter(k => k >= 0);
+      if(dados.length) publicar = {origen: `${m.atacante.nombre} · Efectos del golpe`, r: {formula: dados.map(x => `1d${x.caras}`).join('+'), rolls: dados.map(x => x.dado), mod: 0, total: dados.reduce((a, x) => a + x.dado, 0),
+        ...(ok.length ? {destacar: 'idx:' + ok.join(',')} : {})}};
+      anuncio = `🎲 Efectos de ${m.atacante.nombre} sobre ${m.defensor.nombre}: ${partes.join(' · ')}`;
+    });
+    if(publicar && typeof mesaPublicar === 'function'){ try{ mesaPublicar(publicar.origen, publicar.r); }catch(err){} }
+    anunciarMesa(anuncio);
+  }
+
+  // Pedir «Aplicar» (lo ejecuta el mapa del GM) o dar por hecho uno que se hace a mano.
+  async function marcarEfecto(id, i, cambios){
+    const ref = col().doc(id);
+    await fbDb.runTransaction(async tx => {
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      const ef = (m.efectos || [])[i];
+      if(m.fase !== 'efectos' || !ef || ef.aplicado) return;
+      m.efectos = m.efectos.map((e, k) => k === i ? {...e, ...cambios} : e);
+      cerrarSiListo(m);
+      tx.update(ref, cambiosDe(m));
+    });
+  }
+  async function terminarEfectos(id){
+    const ref = col().doc(id);
+    await fbDb.runTransaction(async tx => {
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(m.fase !== 'efectos') return;
+      m.fase = 'fin'; m.estado = 'resuelto';
+      tx.update(ref, cambiosDe(m));
+    });
+  }
+
+  // El atacante tiró el daño de su arma.
+  async function guardarDano(id, r, efectos, o){
+    const ref = col().doc(id);
+    await fbDb.runTransaction(async tx => {
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(m.estado !== 'esperando' || m.fase !== 'dano' || m.dano) return;
+      m.dano = {crudo: Math.max(0, Math.round(_num(r.total))), formula: String(r.formula || '').slice(0, 60), rolls: (r.rolls || []).slice(0, 20).map(_num), mod: _num(r.mod), reclamado: '', aplicado: false};
+      if(o && o.defensaManual !== undefined && o.defensaManual !== null) m.dano.defensaManual = o.defensaManual === 'no' ? 'no' : Math.max(0, Math.round(_num(o.defensaManual)));   // ✍ (2026-10-15)
+      const be = m.ataque && m.ataque.espalda;   // por la espalda: el daño fijo del arma o la habilidad
+      if(be && be.fijo) m.dano = {...m.dano, crudo: m.dano.crudo + be.fijo, mod: m.dano.mod + be.fijo, formula: `${m.dano.formula} +${be.fijo} espalda`.slice(0, 60)};
+      const ps = m.ataque ? _num(m.ataque.primeraSangre) : 0;   // Primera sangre (anillo): el daño de su primer ataque del combate
+      if(ps > 0) m.dano = {...m.dano, crudo: m.dano.crudo + ps, mod: m.dano.mod + ps, formula: `${m.dano.formula} +${ps} primera sangre`.slice(0, 60)};
+      const mied = m.ataque ? _num(m.ataque.miedo) : 0;   // 😱 le tiene miedo al defensor: −1 al daño
+      if(mied > 0) m.dano = {...m.dano, crudo: Math.max(0, m.dano.crudo - mied), mod: m.dano.mod - mied, formula: `${m.dano.formula} −${mied} miedo`.slice(0, 60)};
+      const prs = m.ataque ? _num(m.ataque.presa) : 0;   // 🎯 contra la presa: +2 al daño
+      if(prs > 0) m.dano = {...m.dano, crudo: m.dano.crudo + prs, mod: m.dano.mod + prs, formula: `${m.dano.formula} +${prs} presa`.slice(0, 60)};
+      const esdd = m.ataque && m.ataque.estandarte ? _num(m.ataque.estandarte.dano) : 0;   // 🚩 bajo el estandarte: +5 al daño
+      if(esdd > 0) m.dano = {...m.dano, crudo: m.dano.crudo + esdd, mod: m.dano.mod + esdd, formula: `${m.dano.formula} +${esdd} estandarte`.slice(0, 60)};
+      const tf = m.ataque && m.ataque.tiro ? _num(m.ataque.tiro.fijo) : 0;   // el bono del tiro: daño fijo de la distancia ideal (o la caída, negativo)
+      if(tf) m.dano = {...m.dano, crudo: Math.max(0, m.dano.crudo + tf), mod: m.dano.mod + tf, formula: `${m.dano.formula} ${tf > 0 ? '+' : '−'}${Math.abs(tf)} ${m.ataque.tiro.motivo}`.slice(0, 60)};
+      const td = m.ataque && m.ataque.tiro && m.ataque.tiro.dado && typeof tirarDados === 'function' ? tirarDados(m.ataque.tiro.dado) : null;   // el primer disparo del combate: +1 dado
+      if(td) m.dano = {...m.dano, crudo: m.dano.crudo + _num(td.total), rolls: [...m.dano.rolls, ...(td.rolls || []).map(_num)].slice(0, 20), formula: `${m.dano.formula} +${m.ataque.tiro.dado} (${_num(td.total)})`.slice(0, 60)};
+      if(m.ataque && m.ataque.flecha && m.ataque.flecha.sinDano) m.dano = {...m.dano, crudo: 0, formula: `${m.ataque.flecha.nombre}: sin daño`.slice(0, 60)};   // el virote de red (2026-10-11)
+      const critGolpe = !!(m.crit && m.crit.critico);
+      let crudos = m.hab ? m.hab.efectos : efectos;
+      if(m.ataque && m.ataque.sinEfectos) crudos = [];   // el segundo golpe del Proyectil perforante: los efectos se pierden después del primero
+      if(!m.hab && m.ataque && m.ataque.flecha && Array.isArray(m.ataque.flecha.efectos)) crudos = [...(Array.isArray(crudos) ? crudos : []), ...m.ataque.flecha.efectos];   // 🏹 la flecha especial
+      if(!m.hab){
+        // ⚡ Critical Matters de un arma (2026-10-03): el efecto con `soloCritico` entra solo si el golpe fue crítico.
+        crudos = (Array.isArray(crudos) ? crudos : []).filter(e => !(e && e.soloCritico) || critGolpe);
+        // Drena vida de un arma (2026-10-03, regla del dueño): quien ataca se cura un % (`drenaPct`, 50 si no dice) de la vida que el golpe le
+        // sacó de verdad al defensor (lo que frena la armadura no cuenta). No es un estado sobre el golpeado: lo aplica el mapa con el daño.
+        const drenas = crudos.filter(esDrenaEf);
+        if(drenas.length){ m.dano.drenaPct = Math.min(100, drenas.reduce((a, e) => a + (_num(e.drenaPct) > 0 ? _num(e.drenaPct) : 50), 0)); crudos = crudos.filter(e => !esDrenaEf(e)); }
+        // Daño mágico de un arma (2026-10-03, rayo / hielo): se tira acá, ignora la Defensa (resta la Defensa especial) y queda AFUERA del
+        // multiplicador del crítico (regla del dueño). Lo aplica el mapa junto con el daño.
+        const magicos = crudos.filter(e => e && e.danoMagico && e.dado);
+        if(magicos.length && typeof tirarDados === 'function'){
+          const tiros = magicos.map(e => ({e, r: tirarDados(e.dado)})).filter(x => x.r);
+          if(tiros.length) m.dano.magico = {tipo: tiros.map(x => String(x.e.nombre || 'mágico').slice(0, 20)).join(' y '), total: tiros.reduce((a, x) => a + Math.max(0, Math.round(_num(x.r.total))), 0),
+            formula: tiros.map(x => x.r.formula).join(' + ').slice(0, 60), rolls: tiros.flatMap(x => x.r.rolls || []).slice(0, 12).map(_num)};
+          const ex = magicos.find(e => _num(e.mult) > 1 || (e.porDano && e.porDano.estado) || e.cadena);   // 🔥 lo de su elemento (Arma elemental, 2026-10-21)
+          if(ex){
+            if(_num(ex.mult) > 1) m.dano.magico.mult = Math.min(3, _num(ex.mult));
+            if(ex.porDano && ex.porDano.estado) m.dano.magico.porDano = {estado: String(ex.porDano.estado).slice(0, 40), cada: Math.max(1, Math.round(_num(ex.porDano.cada)) || 1), ...(ex.porDano.mas1 ? {mas1: true} : {})};
+            if(ex.cadena) m.dano.magico.cadena = true;
+          }
+          crudos = crudos.filter(e => !(e && e.danoMagico));
+        }
+      }
+      // ☄ El segundo daño de una habilidad (el Meteoro: 2d6 de fuego además de los 4d6 físicos): se tira acá y lo aplica el mapa como el daño
+      // elemental de un arma (directo a la vida, menos la resistencia a su elemento).
+      const ext = m.hab && m.hab.dano && m.hab.dano.extra;
+      if(ext && ext.formula && typeof tirarDados === 'function'){ const r2 = tirarDados(ext.formula); if(r2) m.dano.magico = {tipo: String(ext.tipo || 'fuego').slice(0, 20), total: Math.max(0, Math.round(_num(r2.total))), formula: String(r2.formula || ext.formula).slice(0, 60), rolls: (r2.rolls || []).slice(0, 12).map(_num)}; }
+      m.efectos = aguaParalisis(m, normalizarEfectos(crudos));
+      if(m.hab && m.contacto && m.contacto.resistioEstado) m.efectos = m.efectos.map(ef => ({...ef, omitido: true, motivo: `lo resistió (${etqContra(m)})`}));   // ⚡ danoSiempre: el daño entró, el estado no
+      // «Seguro si es crítico» (2026-10-03): un efecto con porcentaje que, si el golpe fue crítico, entra sin tirar.
+      if(m.crit && m.crit.critico) m.efectos = m.efectos.map(ef => ef.seguroCritico ? {...ef, caras: 1, exitos: 1, detalle: `${ef.detalle ? ef.detalle + ' ' : ''}(Fue crítico: entra seguro.)`.slice(0, 200)} : ef);
+      // Regla del dueño (2026-10-03), característica del Sangrado: si entra con un golpe CRÍTICO de arma es permanente, aunque diga turnos —
+      // venga del arma o de la habilidad con la que se atacó (Ejecución «con tu arma», Critical Matters…). Solo hay crítico con un arma.
+      if(m.crit && m.crit.critico) m.efectos = m.efectos.map(sangradoPermanente);
+      // (La regla «un golpe crítico no rompe armadura» se sacó el 2026-10-23, dueño: «eso se borra». Un crítico rompe armadura como cualquier golpe.)
+      tx.update(ref, cambiosDe(m));
+    });
+  }
+
+  // Los efectos que la habilidad le suma al golpe (2026-10-10, Tajear): los de siempre y, si fue crítico, los de ⚡ Critical Matters. Uno de
+  // Critical Matters con el mismo nombre que uno de siempre lo REEMPLAZA («de una manera si no es crítico, más intensa si lo es»): Tajear deja
+  // Sangrado 3 o, con crítico, Sangrado 5; Lisiar, Lesión −1 o −2. Lo que no se repite se suma, como antes.
+  function efectosDeHabilidad(d){
+    const normales = (d.ataque && d.ataque.efectos) || [];
+    const crit = (d.crit && d.crit.critico && d.ataque && d.ataque.critico && d.ataque.critico.efectos) || [];
+    const clave = e => String((e && (e.nombre || (e.spec && e.spec.nombre))) || '').trim().toLowerCase();
+    const reemplaza = new Set(crit.map(clave).filter(Boolean));
+    return [...normales.filter(e => !reemplaza.has(clave(e))), ...crit];
+  }
+
+  /* ---------- resumen final en la Mesa ---------- */
+  // Un renglón por cosa que pasó, para la línea de reporte de la Mesa.
+  function lineasResumen(d){
+    const L = [];
+    const arma = d.ataque.armaNombre ? 'con ' + d.ataque.armaNombre : 'sin arma';
+    if(d.hab) L.push(`${d.atacante.nombre} → ${d.defensor.nombre} · ✨ ${d.hab.nombre}${d.hab.sinOposicion ? '' : ' (' + etqTira(d) + ' contra ' + etqContra(d) + ')'}`);
+    else L.push(`${d.atacante.nombre} → ${d.defensor.nombre} · ${nombreAtq(d)} ${arma} (Tipo ${_fmt(_num(d.ataque.tipoDado))})${modsTxt(d) ? ' · ' + modsTxt(d) : ''}`);
+    const defNom = d.defensa && d.defensa.modo === 'parry' ? 'Parry' + (d.defensa.itemNombre ? ' con ' + d.defensa.itemNombre : '') : d.defensa && d.defensa.modo === 'parrydist' ? 'Parry a distancia' + (d.defensa.itemNombre ? ' con ' + d.defensa.itemNombre : '') : 'Evasión';
+    if(d.hab){
+      if(d.pdg && d.eva) L.push(`${etqTira(d)} ${d.pdg.total} contra ${etqContra(d)} ${d.eva.total} → ${d.contacto && d.contacto.gana === 'atacante' ? 'funcionó' : 'se resistió'}${d.contacto && d.contacto.desempate ? ' (por desempate)' : ''}`);
+    }
+    else if(d.pdg && d.eva) L.push(`Contacto: PdG ${d.pdg.total} contra ${defNom} ${d.eva.total} → ${d.contacto && d.contacto.gana === 'atacante' ? 'pegó' : 'el defensor ganó'}${d.contacto && d.contacto.desempate ? ' (por desempate)' : ''}`);
+    if(d.fuerza && d.bloqueo) L.push(`Bloqueo: Fuerza del golpe ${d.fuerza.total} contra Bloqueo ${d.bloqueo.total} → ${d.bloq && d.bloq.gana === 'defensor' ? 'bloqueado' : 'no alcanzó'}${d.bloq && d.bloq.desempate ? ' (por desempate)' : ''}`);
+    if(d.crit && d.crit.critico) L.push(`¡Crítico ×${d.crit.mult}!${d.crit.mult > 1 ? '' : ' (el d20 no alcanzó a multiplicar, pero ignora la Defensa)'} (d20: ${(d.crit.d20 || []).join(', ')})`);
+    const dn = d.dano;
+    if(dn && dn.aplicado){
+      const crit = d.resultado === 'pego' && d.crit && d.crit.critico;
+      if(dn.invulnerable) L.push('Daño: era Invulnerable, no hizo nada');
+      else if(tieneCuenta(dn) && !dn.manual) L.push(`Daño: ${cuentaTxt(dn)} (${dn.hpAntes} → ${dn.hpDespues} HP)`);
+      else if(d.hab && dn.ignoraDef && !dn.manual) L.push(`Daño ${d.hab.dano ? d.hab.dano.tipo : 'mágico'}: ${dn.golpe} directo a la vida${dn.cargaMult ? ` (${dn.cargaMult})` : ''}${dn.freno ? ` (lo frenan: ${dn.freno})` : ''} (${dn.hpAntes} → ${dn.hpDespues} HP)`);
+      else if(dn.manual) L.push(`Daño: ${dn.golpe} (se aplicó a mano)`);
+      else if(crit) L.push(`Daño: ${dn.crudo} × ${dn.mult} = ${dn.golpe} derecho a la vida (${dn.hpAntes} → ${dn.hpDespues} HP)`);
+      else if(dn.mitad) L.push(`Daño: pasó la mitad → ${dn.recibido} (${dn.hpAntes} → ${dn.hpDespues} HP)`);
+      else L.push(`Daño: ${dn.crudo} − ${defTxt(dn)}${dn.freno ? ` − ${dn.freno}` : ''} = ${dn.recibido} (${dn.hpAntes} → ${dn.hpDespues} HP)`);
+    }
+    if(dn && dn.magico) L.push(`${magTitulo(dn.magico.tipo)}: ${dn.magico.total}${magMult(dn.magico)} (${dn.magico.formula}; ignora la Defensa, sin multiplicar${dn.magico.resEl ? `; − ${dn.magico.resEl}` : ''})${dn.magico.recibido !== undefined ? ` → recibió ${dn.magico.recibido}` : ''}${dn.magico.hpDespues !== undefined ? ` (${dn.magico.hpAntes} → ${dn.magico.hpDespues} HP)` : ''}`);
+    if(dn && dn.porDano) L.push(`${dn.porDano.estado} ×${dn.porDano.stacks} (por ${dn.porDano.entro} de daño)${dn.porDano.manual ? ' (a mano)' : ''}`);
+    if(dn && dn.drena) L.push(`Drena: ${dn.drena.quien || d.atacante.nombre} se cura ${dn.drena.monto}${dn.drena.manual ? ` (a mano${dn.drena.motivo ? ': ' + dn.drena.motivo : ''})` : `${dn.drena.hpAntes !== undefined && dn.drena.hpAntes !== null ? ` (${dn.drena.hpAntes} → ${dn.drena.hpDespues} HP)` : ''}${_num(dn.drena.excedente) ? ` · Vida extra ${dn.drena.excedente}` : ''}${dn.drena.nota ? ' · ' + dn.drena.nota : ''}`}`);
+    if(dn && dn.espinas) L.push(`Espinas: ${dn.espinas.quien || d.atacante.nombre} recibe ${dn.espinas.monto} de daño devuelto${dn.espinas.manual ? ' (a mano)' : dn.espinas.hpAntes !== undefined && dn.espinas.hpAntes !== null ? ` (${dn.espinas.hpAntes} → ${dn.espinas.hpDespues} HP)` : ''}`);
+    if(dn && dn.espejo) L.push(`Espejo: ${dn.espejo.quien || d.atacante.nombre} recibe ${dn.espejo.monto} de daño especial devuelto${dn.espejo.manual ? ' (a mano)' : dn.espejo.hpAntes !== undefined && dn.espejo.hpAntes !== null ? ` (${dn.espejo.hpAntes} → ${dn.espejo.hpDespues} HP)` : ''}`);
+    if(d.resultado === 'mitad') L.push(`Durabilidad: ${d.defensa && d.defensa.itemNombre ? d.defensa.itemNombre : 'el objeto que bloqueó'} pierde 1 punto`);
+    (d.efectos || []).forEach(ef => {
+      if(ef.omitido) L.push(`— ${ef.nombre}: no entró (${ef.motivo || 'sin daño'})`);
+      else if(ef.res && !ef.res.exito) L.push(`✘ ${ef.nombre} (${pctEf(ef)} %): no funcionó`);
+      else if(ef.aplicado) L.push(`✔ ${ef.nombre}${siempreEf(ef) ? '' : ' (' + pctEf(ef) + ' %)'}: aplicado${ef.nota ? ' · ' + ef.nota : ''}`);
+      else L.push(`? ${ef.nombre}: quedó sin resolver`);
+    });
+    const fin = d.hab ? {pego: 'La habilidad funcionó', fallo: 'El objetivo la resistió'}[d.resultado] : {pego: 'El golpe pegó', fallo: 'El golpe falló', bloqueado: 'El golpe fue bloqueado', mitad: 'Pasó la mitad del daño', desarmado: `${d.ataque && d.ataque.desarme && d.ataque.desarme.quien ? d.ataque.desarme.quien : 'Lo'} desarmó al otro`}[d.resultado];
+    if(fin) L.push(`Resultado: ${fin}`);
+    return L;
+  }
+
+  /* 📜 Lo que pasó, en una frase (dueño, 2026-10-28: «cuando se termina un duelo, en la Mesa debe aparecer un resumen muy breve del outcome: "fulano le hizo
+     Tiro a la rodilla a mengano. Le bajó X de daño y quedó rengo", o "... mengano esquivó". Ahí mismo, un botón "ver detalle del duelo" con el paso a paso»).
+     La frase va en `texto` de la línea de la Mesa; el paso a paso (lineasResumen), en `formula`, plegado (comun/mesa.js). */
+  function fraseResumen(d){
+    const A = d.atacante.nombre, D = d.defensor.nombre;
+    const que = d.hab ? `le hizo ${d.hab.nombre} a ${D}` : d.ataque.tipo === 'habilidad-arma' && d.ataque.habNombre ? `le hizo ${d.ataque.habNombre} a ${D}`
+      : `atacó a ${D}${d.ataque.armaNombre ? ` con ${d.ataque.armaNombre}` : ''}`;
+    const parry = d.defensa && (d.defensa.modo === 'parry' || d.defensa.modo === 'parrydist');
+    const conItem = d.defensa && d.defensa.itemNombre ? ` con ${d.defensa.itemNombre}` : '';
+    let fin = '';
+    if(d.resultado === 'fallo') fin = d.hab ? `${D} lo resistió.` : parry ? `${D} lo paró${conItem}.` : `${D} esquivó.`;
+    else if(d.resultado === 'bloqueado') fin = `${D} lo bloqueó${conItem}.`;
+    else if(d.resultado === 'desarmado') fin = `${d.ataque && d.ataque.desarme && d.ataque.desarme.quien ? d.ataque.desarme.quien : D} desarmó al otro.`;
+    else if(d.resultado === 'pego' || d.resultado === 'mitad'){
+      const dn = d.dano || {}, partes = [];
+      if(d.crit && d.crit.critico) partes.push(`¡Crítico ×${_fmt(d.crit.mult)}!`);
+      if(d.resultado === 'mitad') partes.push('Pasó la mitad del golpe.');
+      if(dn.invulnerable) partes.push(`${D} era invulnerable: no le hizo nada.`);
+      else if(dn.aplicado){
+        const entro = _num(dn.recibido) + _num(dn.vidaAbs) + (dn.magico ? _num(dn.magico.recibido) : 0);
+        if(dn.manual) partes.push(`Le hizo ${_fmt(_num(dn.golpe))} de daño (a mano).`);
+        else partes.push(entro > 0 ? `Le bajó ${_fmt(entro)} de vida.` : 'No le hizo daño (lo frenaron la armadura o el escudo).');
+        if(_num(dn.hpDespues) <= 0 && _num(dn.hpAntes) > 0) partes.push(`${D} cayó.`);
+      }
+      const est = (d.efectos || []).filter(ef => ef && ef.aplicado && !ef.omitido && !ef.sinEfecto).map(ef => ef.nombre).filter(Boolean);
+      if(est.length) partes.push(`Quedó ${est.join(', ')}.`);
+      if(!partes.length) partes.push(d.hab ? 'Funcionó.' : 'Le pegó.');
+      fin = partes.join(' ');
+    }
+    return `${A} ${que}.${fin ? ' ' + fin : ''}`.slice(0, 300);
+  }
+  // Cuando un duelo termina, quien lo creó publica UNA línea de resumen en la Mesa (se «reclama» con `resumido`).
+  async function publicarResumenSiCorresponde(d){
+    if(d.estado !== 'resuelto' || d.resumido || d.creadoPor !== yo() || aplicando.has(d.id + ':resumen')) return;
+    aplicando.add(d.id + ':resumen');
+    const ref = col().doc(d.id);
+    let datos = null;
+    try{
+      await fbDb.runTransaction(async tx => {
+        datos = null;
+        const doc = await tx.get(ref);
+        if(!doc.exists) return;
+        const m = {id: d.id, ...doc.data()};
+        if(m.resumido || m.estado !== 'resuelto') return;
+        tx.update(ref, {resumido: true});
+        datos = m;
+      });
+      if(datos){
+        await fbDb.collection(fbRutaCampana('tiradas')).add({
+          uid: yo(), jugador: fbMiembro.nombre, quien: '', origen: `⚔ Resumen del duelo · ${datos.atacante.nombre} → ${datos.defensor.nombre}`,
+          formula: lineasResumen(datos).join('\n').slice(0, 900), texto: fraseResumen(datos), rolls: [], mod: 0, total: 0, desde: 'reporte',
+          cuando: firebase.firestore.FieldValue.serverTimestamp(),
+        });
+      }
+    }catch(err){ console.error('Duelo: no se pudo publicar el resumen', err); }
+  }
+
+  // Reclamar un pedido de «Aplicar» para que, con varias pestañas del GM, solo una lo ejecute.
+  async function reclamarEfecto(id, i){
+    const ref = col().doc(id);
+    let mio = false;
+    await fbDb.runTransaction(async tx => {
+      mio = false;
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      const ef = (m.efectos || [])[i];
+      if(!ef || ef.aplicado || ef.aplicar !== 'pedido') return;
+      m.efectos = m.efectos.map((e, k) => k === i ? {...e, aplicar: 'en-curso'} : e);
+      tx.update(ref, cambiosDe(m));
+      mio = true;
+    });
+    return mio;
+  }
+
+  /* 💔 Un clic antes de recibir el daño (2026-10-17, dueño: «si en un ataque pasa el daño, el duelo debe tener la instancia de pasó tanto daño,
+     menos tu armadura, apretá aplicar daño… tiene que haber una instancia donde el jugador hace un clic antes de recibir daño automatizado»):
+     si el que recibe es un personaje o una invocación, el GM no aplica el daño hasta que su dueño (o quien tiene 🎮 su control) toca
+     «💔 Aplicar el daño» (`dano.aceptado`); si el jugador no está, el GM lo hace «por él». Desde el 2026-10-22 también a un creep (dueño, después
+     de la sesión en «El origen de las especies»: «como GM, parrié con un creep, el bloqueo falló y pasó la mitad del daño, pero nunca me apareció
+     el anuncio "te entró X daño — aplicar"»): el GM lo aplica con su clic. */
+  const pideAceptar = d => !!(d && d.defensor);
+  async function aceptarDano(id){
+    const ref = col().doc(id);
+    await fbDb.runTransaction(async tx => {
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(m.fase !== 'dano' || !m.dano || m.dano.aplicado || m.dano.aceptado) return;
+      m.dano = {...m.dano, aceptado: yo()};
+      tx.update(ref, cambiosDe(m));
+    });
+  }
+  // El GM (en el mapa) aplica el daño al HP: primero se «reclama» para que, con varias pestañas del GM, solo una lo aplique.
+  async function reclamarAplicacion(id){
+    const ref = col().doc(id);
+    let mio = false;
+    await fbDb.runTransaction(async tx => {
+      mio = false;
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(m.fase !== 'dano' || !m.dano || m.dano.aplicado || m.dano.reclamado) return;
+      if(pideAceptar(m) && !m.dano.aceptado) return;   // 💔 espera el OK de quien lo recibe
+      m.dano = {...m.dano, reclamado: yo()};
+      tx.update(ref, cambiosDe(m));
+      mio = true;
+    });
+    return mio;
+  }
+  async function guardarAplicacion(id, info){
+    const ref = col().doc(id);
+    let anuncio = '';
+    await fbDb.runTransaction(async tx => {
+      anuncio = '';
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(m.fase !== 'dano' || !m.dano || m.dano.aplicado) return;
+      m.dano = {...m.dano, ...info, aplicado: true};
+      // ¿El golpe hizo daño? Los efectos que lo necesitan no entran si la armadura lo absorbió todo.
+      const dn0 = m.dano;
+      // 🛡/❤ (P227, dueño, 2026-10-27): lo que se lleva la Vida extra es daño (es vida); lo que se come un escudo, no (es el escudo).
+      const hizoDano = dn0.invulnerable ? false : dn0.manual ? _num(dn0.golpe) > 0 : (_num(dn0.recibido) + _num(dn0.vidaAbs)) > 0;
+      const sinDanoPor = _num(dn0.absorbido) > _num(dn0.vidaAbs) ? 'el golpe no hizo daño (lo frenaron la armadura y el escudo)' : 'el golpe no hizo daño (la armadura lo absorbió)';
+      m.efectos = (m.efectos || []).map(ef => (ef.requiereDano && !hizoDano) ? {...ef, omitido: true, motivo: dn0.invulnerable ? 'era Invulnerable: el golpe no hizo nada' : sinDanoPor} : ef);
+      if((m.efectos || []).length){ m.fase = 'efectos'; m.estado = 'esperando'; cerrarSiListo(m); }
+      else{ m.fase = 'fin'; m.estado = 'resuelto'; }
+      tx.update(ref, cambiosDe(m));
+      const dn = m.dano, crit = m.resultado === 'pego' && m.crit && m.crit.critico;
+      anuncio = dn.manual ? `⚔ ${m.atacante.nombre} le pegó a ${m.defensor.nombre}${crit ? ' con crítico ×' + m.crit.mult : ''}: ${dn.golpe} de daño (aplicalo a mano)`
+        : dn.invulnerable ? `⚔ ${m.atacante.nombre} → ${m.defensor.nombre}: Invulnerable, el golpe no hizo nada`
+        : tieneCuenta(dn) ? `${crit ? '💥' : dn.mitad ? '⚠' : '⚔'} ${m.atacante.nombre} → ${m.defensor.nombre}: ${cuentaTxt(dn)} (${dn.hpAntes} → ${dn.hpDespues} HP)`
+        : crit ? `💥 ${m.atacante.nombre} → ${m.defensor.nombre}: ${dn.golpe} de daño (×${m.crit.mult}) derecho a la vida (${dn.hpAntes} → ${dn.hpDespues} HP)`
+        : dn.mitad ? `⚠ ${m.atacante.nombre} → ${m.defensor.nombre}: pasó la mitad: ${dn.recibido} de daño (${dn.hpAntes} → ${dn.hpDespues} HP)`
+        // El daño especial (ignora la Defensa): lo que lo frena va en `freno` (Defensa especial, Res. elemental) — no se repite como «Defensa» (2026-10-07).
+        : dn.ignoraDef ? `⚔ ${m.atacante.nombre} → ${m.defensor.nombre}: ${dn.crudo}${dn.cargaMult ? ` (${dn.cargaMult})` : ''}${dn.freno ? ` − ${dn.freno}` : ''} = ${dn.recibido} de daño, directo a la vida (${dn.hpAntes} → ${dn.hpDespues} HP)`
+        : `⚔ ${m.atacante.nombre} → ${m.defensor.nombre}: ${dn.crudo} − ${defTxt(dn)}${dn.freno ? ` − ${dn.freno}` : ''} = ${dn.recibido} de daño (${dn.hpAntes} → ${dn.hpDespues} HP)`;
+      if(_num(dn.mitiMiti) > 0 && !dn.manual && !tieneCuenta(dn)) anuncio += ` · 🛡 ${dn.mitiMitiNombre || 'su protector'} se llevó ${_num(dn.mitiMiti)} (${dn.mitiMitiTxt || 'Miti-Miti'})`;   // Miti-Miti (Tanque, 2026-10-11): lo que se llevó el protector
+    });
+    anunciarMesa(anuncio);
+  }
+
+  // Empate con «+» en las dos (o en ninguna): el primero que elige par o impar decide; se tira un d6 y gana el que acierta.
+  // La moneda rueda en 3D como cualquier otra tirada del duelo (regla del dueño, 2026-09-27): se publica en la Mesa
+  // y `nReveal` (ver más abajo) hace que el cuadro espere a que el dado quede quieto antes de mostrar quién ganó.
+  async function elegirParidad(id, quien, eleccion){
+    const ref = col().doc(id);
+    let anuncio = '', publicar = null;
+    await fbDb.runTransaction(async tx => {
+      anuncio = ''; publicar = null;
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(m.estado !== 'empate' || !m.empate || m.empate.moneda) return;   // ya lo eligió el otro
+      const par = m.empate.par;
+      const resultado = 1 + Math.floor(Math.random() * 6);
+      const esPar = resultado % 2 === 0;
+      const acierta = (eleccion === 'par') === esPar;
+      const gana = acierta ? quien : (quien === 'atacante' ? 'defensor' : 'atacante');
+      const r = {gana, dif: 0, desempate: 'moneda', moneda: {quien, eleccion, resultado}};
+      cerrarPar(m, par, r);
+      anuncio = textoDesempate(m, par, r);
+      tx.update(ref, cambiosDe(m));
+      const quienTiro = quien === 'atacante' ? m.atacante.nombre : m.defensor.nombre;
+      publicar = {origen: `${quienTiro} · Empate: ${eleccion}`, r: {formula: '1d6', rolls: [resultado], mod: 0, total: resultado}};
+    });
+    if(publicar && typeof mesaPublicar === 'function'){ try{ mesaPublicar(publicar.origen, publicar.r); }catch(err){} }
+    anunciarMesa(anuncio);
+  }
+
+  /* ✊ O con piedra, papel o tijera (dueño, 2026-10-30: «que te ofrezca ese mismo método o piedra, papel o tijera; el primero que haga el clic
+     determine si se resuelve de una forma o de la otra»): crea el juego (comun/ppt.js) en la misma transacción y lo anota en `empate.ppt`; cuando
+     termina, `resolverPpt` cierra el empate (a = atacante, b = defensor). Cualquier pantalla que vea el duelo vigila el juego (`vigilarPpt`), así
+     se resuelve aunque quien eligió se haya ido; la transacción no lo hace dos veces. Si se cancela, el empate vuelve a ofrecer los dos métodos. */
+  const pptPosible = d => typeof PPT !== 'undefined' && PPT.docNuevo && d.atacante && d.defensor && d.atacante.uid && d.defensor.uid && d.atacante.uid !== d.defensor.uid;
+  async function elegirPpt(id){
+    const ref = col().doc(id);
+    let pptId = null, error = '';
+    await fbDb.runTransaction(async tx => {
+      pptId = null; error = '';
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(m.estado !== 'empate' || !m.empate || m.empate.moneda || m.empate.ppt) return;   // ya lo eligió el otro
+      if(!pptPosible(m)){ error = 'Los dos lados son de la misma persona: desempatá con par o impar'; return; }
+      const r = PPT.ref();
+      tx.set(r, PPT.docNuevo({a: {uid: m.atacante.uid, nombre: m.atacante.nombre}, b: {uid: m.defensor.uid, nombre: m.defensor.nombre},
+        motivo: {tipo: 'libre', texto: `desempate del duelo: ${m.atacante.nombre} contra ${m.defensor.nombre}`}}));
+      tx.update(ref, {empate: {...m.empate, ppt: r.id}});
+      pptId = r.id;
+    });
+    if(error){ _toast(error); return; }
+    if(pptId){
+      anunciarMesa(`⚖ Empate en el duelo: se desempata con ✊ piedra, papel o tijera`);
+      vigilarPpt(id, pptId);
+    }
+  }
+  const pptVigilados = new Set();
+  function vigilarPpt(dueloId, pptId){
+    if(!pptId || pptVigilados.has(pptId) || typeof PPT === 'undefined' || !PPT.esperar) return;
+    pptVigilados.add(pptId);
+    PPT.esperar(pptId).then(({ganador}) => resolverPpt(dueloId, pptId, ganador)).catch(err => console.error('Desempate con piedra, papel o tijera:', err));
+  }
+  async function resolverPpt(id, pptId, ganador){
+    const ref = col().doc(id);
+    let anuncio = '';
+    await fbDb.runTransaction(async tx => {
+      anuncio = '';
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(m.estado !== 'empate' || !m.empate || m.empate.ppt !== pptId) return;   // ya resuelto
+      const par = m.empate.par;
+      if(ganador !== 'a' && ganador !== 'b'){ tx.update(ref, {empate: {par}}); return; }   // se canceló: vuelve a elegir
+      const r = {gana: ganador === 'a' ? 'atacante' : 'defensor', dif: 0, desempate: 'ppt'};
+      cerrarPar(m, par, r);
+      anuncio = textoDesempate(m, par, r);
+      tx.update(ref, cambiosDe(m));
+    });
+    anunciarMesa(anuncio);
+  }
+
+  /* ---------- el cuadro del duelo ---------- */
+  function abrir(id){
+    if(!disponible()) return;
+    descartados.delete(id);
+    if(actual && actual.id === id){
+      actual.min = false;
+      const f0 = document.getElementById('duelo-fondo');
+      if(f0) f0.classList.remove('min');
+      dibujarChips();
+      return;
+    }
+    if(actual && actual.baja) actual.baja();
+    actual = null;
+    const f = fondo();
+    f.classList.remove('min');
+    f.innerHTML = '<div class="duelo-caja"><div class="duelo-cab"><span>⚔ Duelo</span><div class="bt"><button type="button" data-min title="Minimizar">—</button></div></div><div class="duelo-cuerpo"><div class="duelo-nota">Abriendo…</div></div></div>';
+    f.querySelector('[data-min]').onclick = minimizar;
+    actual = {id, dato: null, baja: null, min: false};
+    actual.baja = col().doc(id).onSnapshot(doc => {
+      if(!doc.exists){ _toast('Ese duelo ya no existe'); cerrar(); return; }
+      if(!actual || actual.id !== id) return;
+      actual.dato = {id, ...doc.data()};
+      // Primero ruedan los dados 3D y, cuando quedan a la vista, se muestra el resultado en el cuadro (no antes).
+      const nRev = nReveal(actual.dato);
+      if(actual.nRev === undefined){ actual.nRev = nRev; dibujar(); return; }   // al abrir un duelo que ya está avanzado no se espera nada
+      if(nRev > actual.nRev && typeof dadosActivos === 'function' && dadosActivos() && !document.hidden){
+        if(!actual.reteniendo){
+          actual.reteniendo = true;
+          esperarDados(() => { if(!actual || actual.id !== id) return; actual.reteniendo = false; actual.nRev = nReveal(actual.dato); dibujar(); });
+        }
+        return;
+      }
+      if(!actual.reteniendo){ actual.nRev = nRev; dibujar(); }
+    }, err => { console.error('Duelo: error escuchando', err); _toast('No se pudo seguir el duelo'); });
+    dibujarChips();
+  }
+
+  // 🎮 Si el GM tomó el control de un personaje (2026-09-30), su lado lo maneja quien lo controla, no su dueño. Lo avisa la
+  // página: el mapa con cfg.controlDe(lado), la ficha suelta con el hook controlDe(lado) → uid de quien lo controla, o ''.
+  const controlDe = lado => (cfgEscuchar.controlDe && cfgEscuchar.controlDe(lado)) || (hooks() && hooks().controlDe && hooks().controlDe(lado)) || '';
+  const esMio = lado => { if(!lado) return false; const c = controlDe(lado); return c ? c === yo() : lado.uid === yo(); };
+  // ¿Puede esta pestaña tirar por ese lado con su propio código (o pidiéndolo al iframe)?
+  const puedoTirarYo = lado => esMio(lado) && !!(cfgEscuchar.relay || (hooks() && hooks().soy && hooks().soy(lado)));
+  const puedoAMano = lado => soyGM() || esMio(lado);
+
+  // Envía un pedido al dueño del lado: en el mapa, al iframe; en una página suelta, se ejecuta acá.
+  // Paso 4, etapa 3c-4c (2026-10-01): el mapa puede contestar él mismo por un lado (el personaje de su Botonera nueva) con
+  // cfg.hooksLocal(lado) → los mismos ganchos de la ficha (comun/ficha-duelo.js), sin pasar por el marco.
+  // hooksLocal puede devolver una promesa (2026-10-02: el mapa tiene que cargar al personaje la primera vez): se espera; si termina
+  // en null, va por el camino de siempre.
+  function enviar(lado, msg){
+    const hl = cfgEscuchar.hooksLocal ? cfgEscuchar.hooksLocal(lado) : null;
+    const otro = () => { if(cfgEscuchar.relay) cfgEscuchar.relay(lado, msg); else ejecutar(msg); };
+    if(hl && typeof hl.then === 'function'){ hl.then(h => h ? ejecutar(msg, h) : otro(), err => { console.error('Duelo: hooksLocal', err); otro(); }); return; }
+    if(hl){ ejecutar(msg, hl); return; }
+    otro();
+  }
+
+  let opcionesFalla = {};   // id → true: las opciones no llegaron (tardaron demasiado o la ficha/Acciones no respondió)
+  function pedirOpciones(d){
+    // Si la pestaña ya sabe calcularlas sola (el mapa del GM con un creep), no hace falta esperar a un iframe. Se prueba en cada dibujo
+    // (2026-10-05): recién cargada la página, los datos del creep llegan un momento después — apenas están, las opciones aparecen solas.
+    if(cfgEscuchar.opcionesLocal){
+      let ops = null;
+      try{ ops = cfgEscuchar.opcionesLocal(d); }catch(err){ console.error('Duelo: opcionesLocal', err); }
+      if(ops){ opcionesPedidas.add(d.id); recibirOpciones(d.id, ops); return; }
+    }
+    if(opcionesPedidas.has(d.id)) return;
+    opcionesPedidas.add(d.id);
+    delete opcionesFalla[d.id];
+    enviar(d.defensor, {tipo: 'duelo-opciones', id: d.id});
+    setTimeout(() => { if(!opciones[d.id]){ opcionesFalla[d.id] = true; if(actual && actual.id === d.id && actual.dato) dibujar(); } }, 12000);
+  }
+  // 🛡 Cambió quien defiende (Interponerse, 2026-10-27, vtt-hexgrid/js/78): las opciones de defensa guardadas eran las del otro.
+  function olvidarOpciones(id){
+    opcionesPedidas.delete(id); delete opcionesFalla[id]; delete opciones[id];
+    ['eva', 'bloqueo'].forEach(c => { const k = id + ':' + c; delete flashOps[k]; delete flashSel[k]; flashPedidas.delete(k); });   // (y sus Flash: eran los del otro, probado en el mapa)
+    if(actual && actual.id === id && actual.dato) dibujar();
+  }
+  function recibirOpciones(id, ops){
+    if(Array.isArray(ops)){ opciones[id] = ops; delete opcionesFalla[id]; }
+    else opcionesFalla[id] = true;   // el dueño contestó que no puede (no es su personaje, etc.)
+    if(actual && actual.id === id && actual.dato) dibujar();
+  }
+
+  /* ---------- Reacciones Flash dentro del duelo (2026-09-27, docs/duelo-de-habilidades.md §10) ----------
+     Una habilidad Flash (`duelo.modo === 'flash'`, `duelo.flash = {en: ['pdg','eva','parry','bloqueo','fuerza','dano'], bono}`) se puede usar ANTES de una tirada del duelo (regla de Flash:
+     se declara antes de tirar, nunca después de ver el resultado; no cuesta No2, solo los SP de la habilidad). En cada caja de tirada, quien tira ve un botón por cada Flash que le sirve;
+     lo marca y, al tirar, la página del dueño cobra los SP (`flashUsar`) y el bono se suma a esa tirada (queda en su fórmula: «+2 ⚡»). Una vez por tirada. */
+  /* ---------- Qué dado tira cada botón, y su 🔍 (2026-10-08, dueño: «que se diga qué dado va a ser, ej. "Tirar PdG · 1d10", con la lupita
+     para ver el detalle de origen; lo mismo para cada tirada») ----------
+     La página de quien tira contesta con el gancho `vista(d, campo, modo)` → {formula, titulo, html} (html: el desglose del 🔍, armado con los
+     ladrillos de comun/lupa.js). campo: 'pdg' | 'fuerza' | 'bloqueo' | 'dano'; para las opciones de defensa, 'eva' | 'parry' | 'contra' (el stat
+     con que se resiste una habilidad, en `modo`). Sin el gancho, el botón queda como siempre. */
+  let vistas = {};        // 'duelo:campo' → {formula, titulo, html} | null (no hay)
+  let vistasPedidas = new Set();
+  let lupaDueloLista = false;
+  const ladoDeCampo = (d, campo) => (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
+  function pedirVista(d, campo){
+    const k = d.id + ':' + campo;
+    if(vistasPedidas.has(k)) return;
+    vistasPedidas.add(k);
+    enviar(ladoDeCampo(d, campo), {tipo: 'duelo-vista', id: d.id, campo});
+    setTimeout(() => { if(vistas[k] === undefined) vistas[k] = null; }, 6000);
+  }
+  function recibirVista(id, campo, v){
+    vistas[id + ':' + campo] = v && typeof v === 'object' ? v : null;
+    if(actual && actual.id === id && actual.dato) dibujar();
+  }
+  function lupaDuelo(k, v){
+    if(!v || !v.html || typeof lupaBotonHtml !== 'function') return '';
+    if(!lupaDueloLista && typeof lupaRegistrar === 'function'){
+      lupaDueloLista = true;
+      // Al desglose de la página se le suma «Esta tirada»: los dados que se tiran de verdad (con los bonos del duelo y las mitades).
+      lupaRegistrar('duelo|', clave => {
+        const x = vistas[clave.slice(6)];
+        if(!x) return {titulo: '', html: ''};
+        const f = String(x.formula || '');
+        const esta = f && typeof lupaSeccion === 'function' ? lupaSeccion('Esta tirada', lupaFila('Se tira', _esc(f))
+          + (f.includes('÷2') ? lupaNota('÷2: un estado (Pajaritos, Lisiado, Parálisis o Sentado) parte el resultado a la mitad, para abajo.') : '')) : '';
+        return {titulo: x.titulo || 'De dónde sale', html: (x.html || '') + esta};
+      });
+    }
+    return lupaBotonHtml('duelo|' + k, 'duelo-lupa');
+  }
+  // «descuenta 2 No2» con un «?» que al pasar el mouse dice de dónde sale (2026-10-08, dueño). Sin el dato de la página, el texto de siempre.
+  function costoAtaqueHtml(d){
+    const v = vistas[d.id + ':pdg'], c = v && v.costo;
+    if(!c) return '<div class="det">descuenta los No2 del ataque</div>';
+    if(!c.no2) return `<div class="det">${_esc((c.lineas || [])[0] || 'no descuenta No2')}</div>`;
+    return `<div class="det">descuenta <b>${_fmt(c.no2)} No2</b> <span class="duelo-costo-ayuda" tabindex="0" data-txt="${_esc((c.lineas || []).join('\n'))}">?</span></div>`;
+  }
+  // Lo que se suma al texto del botón: « · 1d10» y el 🔍.
+  function vistaBoton(d, campo){
+    const k = d.id + ':' + campo;
+    if(vistas[k] === undefined){ pedirVista(d, campo); return ''; }
+    const v = vistas[k];
+    return v ? `${v.formula ? ` · ${_esc(v.formula)}` : ''}${lupaDuelo(k, v)}` : '';
+  }
+  // Las opciones de defensa con su 🔍 (y, en una habilidad, el dado que tiraría con cada stat).
+  function conVistas(d, ops, h){
+    if(!Array.isArray(ops) || !h || typeof h.vista !== 'function') return ops;
+    return ops.map(o => {
+      let v = null;
+      try{ v = d.hab ? h.vista(d, 'contra', o.stat) : h.vista(d, o.modo === 'evasion' ? 'eva' : o.modo, o.itemId); }catch(err){ console.error('Duelo: vista', err); }
+      if(!v) return o;
+      const r = {...o, lupa: {titulo: v.titulo || '', html: v.html || '', formula: v.formula || ''}};
+      if(d.hab && v.formula) r.info = [`${String(o.etiqueta || '').replace(/^🛡 /, '')} 🎲 ${v.formula}`];
+      return r;
+    });
+  }
+  let flashOps = {};      // 'duelo:campo' → opciones que calculó la página del que tira ([] = ninguna)
+  let flashSel = {};      // 'duelo:campo' → habId marcado
+  let flashPedidas = new Set();
+  function pedirFlash(d, campo){
+    const k = d.id + ':' + campo;
+    if(flashPedidas.has(k)) return;
+    flashPedidas.add(k);
+    const lado = (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
+    // Un creep sin Flash para esta tirada: el mapa del GM ya lo sabe y contesta solo, sin cargar GM Tools (P135, 2026-09-30).
+    if(lado.tipo === 'creep' && cfgEscuchar.flashLocal){
+      let ops = null;
+      try{ ops = cfgEscuchar.flashLocal(d, campo, lado); }catch(err){ console.error('Duelo: flashLocal', err); }
+      if(ops){ flashOps[k] = ops; return; }
+    }
+    enviar(lado, {tipo: 'duelo-flash', id: d.id, campo});
+    setTimeout(() => { if(flashOps[k] === undefined) flashOps[k] = []; }, 6000);
+  }
+  function recibirFlash(id, campo, ops){
+    flashOps[id + ':' + campo] = Array.isArray(ops) ? ops : [];
+    if(actual && actual.id === id && actual.dato) dibujar();
+  }
+  const ETQ_FLASH = {pdg: 'la tirada de ataque (PdG)', eva: 'Evasión', parry: 'Parry', bloqueo: 'Bloqueo', fuerza: 'Fuerza del golpe', dano: 'el daño'};
+  function flashHtml(d, campo){
+    const k = d.id + ':' + campo;
+    if(flashOps[k] === undefined){ pedirFlash(d, campo); return ''; }
+    const ops = flashOps[k];
+    if(!ops.length) return '';
+    return `<div class="duelo-flash"><div class="det">⚡ Flash (se declara antes de tirar · no cuesta No2):</div>${ops.map(o => {   // costoTxt: lo que cuesta (un creep: cooldown); si no, SP
+      const on = flashSel[k] === o.habId;
+      const vale = (o.en || []).map(e => ETQ_FLASH[e] || e).join(', ');
+      return `<button type="button" class="flash${on ? ' on' : ''}" data-flash="${_esc(campo)}:${_esc(o.habId)}"${o.motivoNo ? ' disabled' : ''} title="Vale para: ${_esc(vale)}">${on ? '✔ ' : ''}⚡ ${_esc(o.nombre)} +${_fmt(o.bono)}<small>${o.costoTxt ? _esc(o.costoTxt) : _fmt(o.costoSp) + ' SP'}${campo === 'eva' && (o.en || []).length ? ' · vale con ' + _esc((o.en || []).filter(e => e === 'eva' || e === 'parry').map(e => ETQ_FLASH[e]).join(' o ')) : ''}${o.dodge ? ' · si ganás, dodge roll' : ''}${o.motivoNo ? ' · ' + _esc(o.motivoNo) : ''}</small></button>`;
+    }).join('')}</div>`;
+  }
+
+  const ETIQ = {pdg: 'PdG', eva: 'Defensa', fuerza: 'Fuerza del golpe', bloqueo: 'Bloqueo', dano: 'Daño'};
+  /* ---------- Re-roll dentro del duelo (2026-09-27, dueño; docs/reroll.md) ----------
+     Con una Moneda Re-Roll (cinturón: 1 No2; mochila: 2 No2) se puede volver a hacer «la última tirada que hiciste». En el duelo eso es REABRIR esa tirada: se borra y quien la hizo la
+     vuelve a tirar con el botón de siempre (dados 3D, mismo empate). Solo se puede mientras no pasó a una etapa posterior con tiradas (Bloqueo, crítico, daño) ni se aplicó daño ni
+     efectos. El botón flotante 🪙 del cuadro lo ve quien tiene una moneda y puede reabrir alguna de sus tiradas; la página del dueño cobra los No2, tira la moneda (par se conserva,
+     impar se rompe) y reabre. */
+  function puedeReabrir(m, campo){
+    if(!m || m.estado === 'cancelado' || m.dano) return false;
+    if(m.rerollUsado && m.rerollUsado[campo]) return false;   // una moneda por tirada: esta ya usó la suya
+    if((m.efectos || []).some(e => e && (e.res || e.aplicado || e.aplicar))) return false;
+    const critHecho = !!(m.crit && m.crit.d20);
+    if(campo === 'critico') return critHecho;
+    if(campo === 'pdg' || campo === 'eva') return !!m[campo] && !m.fuerza && !m.bloqueo && !critHecho;
+    if(campo === 'fuerza' || campo === 'bloqueo') return !!m[campo] && !critHecho;
+    return false;
+  }
+  // La última tirada que hizo ese lado que todavía se puede reabrir (la más avanzada primero).
+  const campoReabrible = (m, lado) => (lado === 'atacante' ? ['critico', 'fuerza', 'pdg'] : ['bloqueo', 'eva']).find(c => puedeReabrir(m, c)) || null;
+  const etqCampo = (d, c) => c === 'pdg' ? etqTira(d) : c === 'eva' ? etqContra(d) : c === 'critico' ? 'los d20 del crítico' : ETIQ[c];
+  async function reabrir(id, campo, con){   // `con`: 'wildcard' | 'moneda' (lo que dice la Mesa; 2026-10-20: con la carta decía «Moneda»)
+    const ref = col().doc(id);
+    let ok = false, anuncio = '';
+    await fbDb.runTransaction(async tx => {
+      ok = false; anuncio = '';
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(!puedeReabrir(m, campo)) return;
+      m.rerollUsado = {...(m.rerollUsado || {}), [campo]: true};
+      const quien = (campo === 'pdg' || campo === 'fuerza' || campo === 'critico') ? m.atacante.nombre : m.defensor.nombre;
+      if(campo === 'critico'){ m.crit = {...m.crit, d20: null, mejor: 0, mult: 1}; m.fase = 'critico'; }
+      else if(campo === 'fuerza' || campo === 'bloqueo'){ m[campo] = null; m.bloq = null; m.empate = null; m.resultado = null; m.crit = null; m.fase = 'bloqueo'; }
+      else{
+        m[campo] = null; if(campo === 'eva') m.defensa = null;
+        m.contacto = null; m.bloq = null; m.empate = null; m.resultado = null; m.crit = null; m.fase = 'contacto';
+        if(m.hab) m.efectos = null;
+      }
+      m.estado = 'esperando';
+      const upd = cambiosDe(m);
+      if(m.resumido) upd.resumido = false;   // el resumen final se vuelve a publicar cuando termine
+      tx.update(ref, upd);
+      ok = true;
+      anuncio = con === 'wildcard' ? `🃏 ${quien} usó una wildcard: vuelve a tirar ${etqCampo(m, campo)}` : `🪙 ${quien} usó una Moneda Re-Roll: vuelve a tirar ${etqCampo(m, campo)}`;
+    });
+    if(ok) anunciarMesa(anuncio);
+    return ok;
+  }
+  /* 🦋 Polilla mística dentro del duelo (dueño, 2026-10-08: «yo saco 7, el rival 8, perdí; uso la polilla: 9 contra 8, se tiene que revertir el
+     resultado»): le suma +n a la última tirada que hizo ese lado (la Fuerza del golpe o el Bloqueo si ya se llegó ahí; si no, el PdG o la defensa)
+     y vuelve a resolver ese paso con el número nuevo — puede dar vuelta quién ganó. Vale mientras el paso se pueda reabrir (como la Moneda: antes
+     de los d20 del crítico, del daño y de aplicar efectos). lado: 'atacante' | 'defensor'. → {campo, etq, antes, ahora, contra, resultado} o null. */
+  const campoPolilla = (m, lado) => (lado === 'atacante' ? ['fuerza', 'pdg'] : ['bloqueo', 'eva']).find(c => m && m[c] && puedeReabrir({...m, rerollUsado: null}, c)) || null;
+  // Con una tirada cambiada (Polilla, Empower, Enyetar), el paso vuelve a resolverse desde ahí.
+  function reabrirPaso(m, campo){
+    if(campo === 'fuerza' || campo === 'bloqueo'){ m.bloq = null; m.empate = null; m.resultado = null; m.crit = null; m.fase = 'bloqueo'; }
+    else{ m.contacto = null; m.bloq = null; m.empate = null; m.resultado = null; m.crit = null; m.fase = 'contacto'; if(m.hab) m.efectos = null; }
+    m.estado = 'esperando';
+  }
+  /* 🐈‍⬛ Enyetar (Debuffer, 2026-10-12, dueño): esa misma tirada de ese lado se repite (los mismos dados, con el mismo «+») y queda la más baja;
+     el duelo se vuelve a resolver (un empate, con la regla de siempre). Una vez por tirada (queda 🐈 en su fórmula).
+     modo 'mejor' (🧚 Re-roll, Support, el reverso): queda la más alta (y la marca es 🍀). Cada una, una vez por tirada.
+     → {campo, etq, antes, nueva, ahora, contra, dados, rolls, rollsAntes, nuevaQueda} o null (no se puede: ya siguió, o ya la tenía). */
+  async function enyetarTirada(id, lado, modo){
+    const mejor = modo === 'mejor', marca = mejor ? '🍀' : '🐈';
+    const ref = col().doc(id);
+    let res = null, anuncio = '', tiro = null;
+    await fbDb.runTransaction(async tx => {
+      res = null; anuncio = '';
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      const campo = campoPolilla(m, lado);
+      if(!campo) return;
+      const t0 = m[campo] || {}, otro = {pdg: 'eva', eva: 'pdg', fuerza: 'bloqueo', bloqueo: 'fuerza'}[campo];
+      if(String(t0.formula || '').includes(marca)) return;
+      if(!tiro){   // se tira una sola vez aunque la transacción se repita
+        const dados = String(t0.formula || '').match(/\d*d\d+/g) || [], rolls = [];
+        dados.forEach(dd => { const [c, f] = dd.split('d'); for(let i = 0; i < Math.min(20, Math.max(1, _num(c) || 1)); i++) rolls.push(1 + Math.floor(Math.random() * Math.max(1, _num(f)))); });
+        tiro = {rolls, dados: dados.join('+'), total: rolls.reduce((a, b) => a + b, 0) + _num(t0.mod)};
+      }
+      const queda = mejor ? tiro.total > _num(t0.total) : tiro.total < _num(t0.total);
+      m[campo] = {...t0, ...(queda ? {total: tiro.total, rolls: tiro.rolls} : {}), formula: `${t0.formula || ''} ${marca}`.slice(0, 60)};
+      reabrirPaso(m, campo);
+      anuncio = avanzar(m) || '';
+      const upd = cambiosDe(m);
+      if(m.resumido) upd.resumido = false;
+      tx.update(ref, upd);
+      res = {campo, etq: etqCampo(m, campo), antes: _num(t0.total), nueva: tiro.total, ahora: m[campo].total, contra: m[otro] ? _num(m[otro].total) : null,
+        dados: tiro.dados, rolls: tiro.rolls, rollsAntes: (Array.isArray(t0.rolls) ? t0.rolls : []).map(_num), mod: _num(t0.mod), nuevaQueda: queda};
+    });
+    if(anuncio) anunciarMesa(anuncio);
+    return res;
+  }
+  // usa (2026-10-12, Empower): el nombre de lo que suma, para el aviso del empate (por defecto, la Polilla).
+  async function sumarATirada(id, lado, n, marca, usa = 'la Polilla'){
+    const ref = col().doc(id);
+    let res = null, anuncio = '';
+    await fbDb.runTransaction(async tx => {
+      res = null; anuncio = '';
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      const campo = campoPolilla(m, lado);
+      if(!campo) return;
+      const t0 = m[campo], otro = {pdg: 'eva', eva: 'pdg', fuerza: 'bloqueo', bloqueo: 'fuerza'}[campo];
+      m[campo] = {...t0, total: _num(t0.total) + n, mod: _num(t0.mod) + n, formula: `${t0.formula || ''} +${n}${marca ? ' ' + marca : ''}`.slice(0, 60)};
+      reabrirPaso(m, campo);
+      // Si con el +n queda empatado, pierde quien usó la Polilla (dueño, 2026-10-08): no hay desempate.
+      const par = campo === 'fuerza' || campo === 'bloqueo' ? 'bloqueo' : 'contacto';
+      const pa = par === 'contacto' ? m.pdg : m.fuerza, pb = par === 'contacto' ? m.eva : m.bloqueo;
+      if(pa && pb && resolverPar(pa, pb).empate){
+        const gana = lado === 'atacante' ? 'defensor' : 'atacante';
+        cerrarPar(m, par, {gana, dif: 0, desempate: 'polilla'});
+        anuncio = `⚖ Empate (${_num(pa.total)} a ${_num(pb.total)}) después de ${usa}: gana ${gana === 'atacante' ? m.atacante.nombre : m.defensor.nombre} (quien usa ${usa} pierde los empates)`;
+      }
+      else anuncio = avanzar(m) || '';
+      const upd = cambiosDe(m);
+      if(m.resumido) upd.resumido = false;   // el resumen final se vuelve a publicar cuando termine
+      tx.update(ref, upd);
+      res = {campo, etq: etqCampo(m, campo), antes: _num(t0.total), ahora: m[campo].total, contra: m[otro] ? _num(m[otro].total) : null, empate: /quien usa /.test(anuncio),
+        resultado: m.estado === 'empate' ? 'empate' : (m.resultado || (m.contacto && m.contacto.gana) || '')};
+    });
+    if(anuncio) anunciarMesa(anuncio);
+    return res;
+  }
+  // 💪 Empower (2026-10-12): la tirada de ese lado a la que todavía se le puede sumar (la misma que la Polilla) y cuántos Empower ya lleva.
+  function tiradaSumable(m, lado){
+    const c = campoPolilla(m, lado);
+    if(!c) return null;
+    const t = m[c] || {};
+    return {campo: c, etq: etqCampo(m, c), total: _num(t.total), empowers: (String(t.formula || '').match(/💪/gu) || []).length, enyetada: String(t.formula || '').includes('🐈'), afortunada: String(t.formula || '').includes('🍀')};
+  }
+  let rerollInfo = {}, rerollPedidas = new Set();
+  function ladoMio(d){ return puedoTirarYo(d.atacante) ? 'atacante' : puedoTirarYo(d.defensor) ? 'defensor' : ''; }
+  function pedirRerollInfo(d, lado){
+    const k = d.id + ':' + lado;
+    if(rerollPedidas.has(k)) return;
+    rerollPedidas.add(k);
+    const l = d[lado];
+    if(l.tipo === 'creep' || String(l.ref || '').includes('~')){ rerollInfo[k] = {disponible: false}; return; }
+    enviar(l, {tipo: 'duelo-reroll-info', id: d.id, lado});
+    setTimeout(() => { if(rerollInfo[k] === undefined) rerollInfo[k] = {disponible: false}; }, 6000);
+  }
+  function recibirRerollInfo(id, lado, info){
+    rerollInfo[id + ':' + lado] = info || {disponible: false};
+    if(actual && actual.id === id && actual.dato) dibujar();
+  }
+  function rerollBtnHtml(d){
+    if(d.estado === 'cancelado') return '';
+    const lado = ladoMio(d);
+    if(!lado) return '';
+    const campo = campoReabrible(d, lado);
+    if(!campo){ return ''; }
+    const k = d.id + ':' + lado;
+    if(rerollInfo[k] === undefined){ pedirRerollInfo(d, lado); return ''; }
+    const info = rerollInfo[k];
+    if(!info.disponible) return '';
+    // 🃏 Wildcard (2026-10-15): al lado de la moneda, si tiene; se gasta al usarla. Una info vieja (sin `moneda`) es una moneda.
+    const etq = _esc(etqCampo(d, campo)), conMoneda = info.moneda !== false, w = Math.max(0, Math.round(_num(info.wildcards)));
+    const bMoneda = conMoneda ? `<button type="button" class="duelo-reroll" data-reroll="${_esc(lado)}:${_esc(campo)}:moneda" title="Volver a tirar ${etq} (moneda en ${_esc(info.donde || 'el inventario')}, sin costo de No2) y después se tira una moneda: par se conserva, impar se rompe">🪙 Moneda<small>volver a tirar ${etq}</small></button>` : '';
+    const bWild = w ? `<button type="button" class="duelo-reroll wildcard" data-reroll="${_esc(lado)}:${_esc(campo)}:wildcard" title="Volver a tirar ${etq} gastando una wildcard (te quedan ${w}), sin costo de No2">🃏 Wildcard<small>volver a tirar ${etq}</small></button>` : '';
+    return bMoneda && bWild ? `<div class="duelo-reroll-fila">${bWild}${bMoneda}</div>` : bMoneda || bWild;
+  }
+
+
+  const nombreDefensa = d => d.hab ? etqContra(d) : d.defensa ? (d.defensa.modo === 'parry' ? 'Parry' + (d.defensa.itemNombre ? ' · ' + d.defensa.itemNombre : '') : d.defensa.modo === 'parrydist' ? '🏹 Parry a distancia' + (d.defensa.itemNombre ? ' · ' + d.defensa.itemNombre : '') : 'Evasión') : 'Defensa';
+
+  function numerosHtml(tiro, esNuevo, que, quien){
+    return `<div class="duelo-tiro${esNuevo ? ' nuevo' : ''}"><div class="que">${_esc(que)}${tiro.nota ? ' (' + _esc(tiro.nota) + ')' : ''} · ${_esc(quien)}</div><div class="num">${_fmt(tiro.total)}</div><div class="det">${_esc(tiro.formula || '')}${tiro.rolls && tiro.rolls.length ? ' → ' + tiro.rolls.join(' + ') : ''}${_num(tiro.mod) ? ' ' + (_num(tiro.mod) > 0 ? '+' : '−') + ' ' + Math.abs(_num(tiro.mod)) : ''}</div></div>`;
+  }
+
+  /* ✍ Elegir manualmente (2026-10-15, dueño: «el duelo termina siendo un poco encorsetado: en cada instancia, además de los botones automatizados,
+     en algún rincón un elegir manualmente con un recuadro para tipear una tirada custom»). En cada paso que esta pantalla puede tirar (la suya, o a
+     mano por otro): una fórmula de dados («1d10+3», se tira) o un número (es el resultado). En el daño, además, cuánta Defensa resta: la del
+     defensor, nada u otro número (`dano.defensaManual`, lo usa el mapa al aplicar). El PdG de un ataque paga lo mismo que el botón (desde el 2026-10-21, `pagarManual`). */
+  function manualHtml(d, campo){
+    const k = d.id + ':' + campo, abierto = manualAbierto.has(k);
+    const tg = `<label class="tg" title="Pasar de lo automático a una tirada que escribís vos"><input type="checkbox" data-mtg="${campo}"${abierto ? ' checked' : ''}> ✍ Elegir manualmente</label>`;
+    if(!abierto) return `<div class="duelo-manual">${tg}</div>`;
+    const dOpM0 = (campo === 'fuerza' || campo === 'bloqueo') && !(d.ataque && d.ataque.desarme) && typeof window.dueloDesarmeOpcion === 'function'
+      ? window.dueloDesarmeOpcion(d, campo === 'fuerza' ? 'atacante' : 'defensor') : null, dOpM = dOpM0 && !dOpM0.apagado ? dOpM0 : null;   // apagada (cooldown): no va en el desplegable   // 🤺 a mano también se elige si es para desarmar (2026-10-22)
+    const sel = campo === 'eva' ? `<select data-mmodo>${selModoHtml(d)}</select>`
+      : dOpM ? `<select data-mdesarme>${campo === 'fuerza' ? '<option value="">⚔ Pegar: pasar el bloqueo</option>' : '<option value="">🛡 Bloquear el golpe</option>'}<option value="1">🤺 Desarmar (${_esc(dOpM.costo || '')})</option></select>` : '';
+    const dm = manual['mdef:' + d.id] || 'auto';
+    const def = campo === 'dano' ? `<div class="mdef">Defensa: <label><input type="radio" name="mdef-${d.id}" value="auto" data-mdef${dm === 'auto' ? ' checked' : ''}> la del defensor</label>
+      <label><input type="radio" name="mdef-${d.id}" value="no" data-mdef${dm === 'no' ? ' checked' : ''}> no resta</label>
+      <label><input type="radio" name="mdef-${d.id}" value="num" data-mdef${dm === 'num' ? ' checked' : ''}> otra: <input type="number" min="0" data-mdefn style="width:64px" value="${_esc(manual['mdefn:' + d.id] || '')}"></label></div>` : '';
+    return `<div class="duelo-manual">${tg}<div class="duelo-mcaja">${sel}<input type="text" data-mtirada="${campo}" placeholder="1d10+3 o un número" value="${_esc(manual['m:' + k] || '')}"><button type="button" data-musar="${campo}">✔ Usar esta tirada</button>${def}
+      <div class="det">Una fórmula de dados (se tira) o un número (es el resultado).${campo === 'pdg' && !d.hab && !(d.ataque && d.ataque.tipo === 'habilidad-arma') ? ' Paga el ataque igual que el botón (sus No2).' : ''}</div></div></div>`;
+  }
+  // El crítico a mano: los d20 que salieron (uno o varios), escritos.
+  function manualCriticoHtml(d){
+    const k = d.id + ':critico', abierto = manualAbierto.has(k);
+    const tg = `<label class="tg" title="Escribir los d20 en vez de tirarlos"><input type="checkbox" data-mtg="critico"${abierto ? ' checked' : ''}> ✍ Elegir manualmente</label>`;
+    if(!abierto) return `<div class="duelo-manual">${tg}</div>`;
+    return `<div class="duelo-manual">${tg}<div class="duelo-mcaja"><input type="text" data-critman placeholder="los d20: 18, o 12 19" value="${_esc(manual['crit:' + d.id] || '')}"><button type="button" data-critusar>✔ Usar</button>
+      <div class="det">El mejor d20 decide el multiplicador, como siempre (dos 20 naturales: supercrítico).</div></div></div>`;
+  }
+  // Los efectos a mano: para cada uno que falta, «funcionó» o «no funcionó».
+  function manualEfectosHtml(d, efs){
+    const k = d.id + ':efectos', abierto = manualAbierto.has(k);
+    const tg = `<label class="tg" title="Decidir a mano si cada efecto funciona"><input type="checkbox" data-mtg="efectos"${abierto ? ' checked' : ''}> ✍ Elegir manualmente</label>`;
+    if(!abierto) return `<div class="duelo-manual">${tg}</div>`;
+    const filas = efs.map((ef, i) => [ef, i]).filter(([ef]) => !ef.res && !ef.omitido && necesitaTiradaEf(ef))
+      .map(([ef, i]) => `<div class="duelo-mcaja"><b>${_esc(ef.nombre)}</b> <button type="button" data-efman="${i}:1">✔ Funcionó</button> <button type="button" class="sec" data-efman="${i}:0">✘ No funcionó</button></div>`).join('');
+    return `<div class="duelo-manual">${tg}${filas}<div class="det">Sin tirar el dado. Si el efecto trae daño propio, ese se tira igual.</div></div>`;
+  }
+  /* 🤺 Desarmar (2026-10-21): en el paso del Bloqueo, quien todavía no tiró su parte (el atacante su Fuerza del golpe, el defensor su Bloqueo) lo
+     activa con Flash. La tirada es la misma; si gana, el resultado es «desarmado» (cerrarPar). → true si quedó marcado. */
+  async function marcarDesarme(id, lado, info){
+    const ref = col().doc(id);
+    let ok = false;
+    await fbDb.runTransaction(async tx => {
+      const doc = await tx.get(ref);
+      if(!doc.exists) return;
+      const m = {...doc.data()};
+      if(m.estado !== 'esperando' || m.fase !== 'bloqueo' || (m.ataque && m.ataque.desarme) || m.hab || !m.ataque) return;
+      if(lado === 'atacante' ? m.fuerza : m.bloqueo) return;
+      // adentro de `ataque` (las reglas de Firestore no dejan campos nuevos en el duelo)
+      tx.update(ref, {'ataque.desarme': {lado: lado === 'atacante' ? 'atacante' : 'defensor', nombre: txtCorto((info && info.nombre) || 'Desarmar', 40), quien: txtCorto((info && info.quien) || '', 40)}});
+      ok = true;
+    });
+    return ok;
+  }
+  /* ✍ El PdG a mano cumple las mismas reglas que el del botón (dueño, 2026-10-21): antes de anotarlo, la página de quien ataca paga el ataque
+     (No2, Sentado, sin No2, el conteo de ataques) y gasta lo que suma al golpe (óleos, Arma envenenada, Arma elemental), sin tirar el dado:
+     el gancho `pagarManual(d)` de FichaDuelo, CreepDuelo e InvDuelo. → false si se canceló (no se anota nada). */
+  async function pagarManual(d){
+    let h = null;
+    try{
+      if(cfgEscuchar.hooksLocal){ h = cfgEscuchar.hooksLocal(d.atacante); if(h && typeof h.then === 'function') h = await h; }
+      const H = hooks();
+      if(!h && H && H.soy && H.soy(d.atacante)) h = H;
+      if(h && h.pagarManual) return (await h.pagarManual(d)) !== false;
+    }catch(err){ console.error('Duelo: pagar el PdG a mano', err); }
+    return true;
+  }
+  /* ✍ Una tirada escrita a mano lleva igual los datos del crítico de su lado (2026-10-20, probando el Blindado en el mapa: a mano se perdían):
+     el Crítico frecuente y potente de quien ataca; la Resistencia a crítico y el Blindado de quien defiende. Solo si esta pantalla maneja ese lado. */
+  async function extraManual(d, campo){
+    if(campo !== 'pdg' && campo !== 'eva') return null;
+    const lado = campo === 'pdg' ? d.atacante : d.defensor;
+    let h = null;
+    try{
+      if(cfgEscuchar.hooksLocal){ h = cfgEscuchar.hooksLocal(lado); if(h && typeof h.then === 'function') h = await h; }
+      const H = typeof window !== 'undefined' ? window.DUELO_HOOKS : null;
+      if(!h && H && H.soy && H.soy(lado)) h = H;
+      if(!h) return null;
+      if(campo === 'pdg') return !d.hab && h.statsCritico ? h.statsCritico(d) || null : null;
+      return (!d.hab || d.hab.critTipo) && h.resistenciaCritico ? {resistencia: _num(h.resistenciaCritico(d)), ...(h.blindado && h.blindado(d) ? {blindado: true} : {})} : null;
+    }catch(err){ console.error('Duelo: los datos del crítico de una tirada a mano', err); return null; }
+  }
+  // ⚔ El Contraataque también con la defensa escrita a mano o tirada por quien no está (2026-10-27, probando el del creep en el mapa: así no se
+  // ofrecía): si la pantalla que maneja al defensor dice que esa defensa da contraataque, se anota como con el botón.
+  async function defensaConContra(d, defensa){
+    if(!defensa || d.hab) return defensa;
+    try{
+      let h = null;
+      if(cfgEscuchar.hooksLocal){ h = cfgEscuchar.hooksLocal(d.defensor); if(h && typeof h.then === 'function') h = await h; }
+      const H = hooks();
+      if(!h && H && H.soy && H.soy(d.defensor)) h = H;
+      const op = h && h.opcionesDefensa ? (h.opcionesDefensa(d) || []).find(o => o.modo === defensa.modo && o.contraEsquiva) : null;
+      return op ? {...defensa, contraEsquiva: true, ...(await alcanceContra(d, h))} : defensa;
+    }catch(err){ console.error('Duelo: el contraataque de una defensa a mano', err); return defensa; }
+  }
+  async function usarManual(d, campo){
+    const k = d.id + ':' + campo;
+    const input = document.querySelector(`[data-mtirada="${campo}"]`);
+    const txt = String(input ? input.value : '').trim().replace(/\s+/g, '');
+    let r = null;
+    if(/^-?\d+$/.test(txt)){ const n = parseInt(txt, 10); r = {formula: String(n), rolls: [], mod: n, total: n}; }
+    else if(txt && typeof tirarDados === 'function') r = tirarDados(txt);
+    if(!r){ _toast('Escribí una fórmula de dados (1d10+3) o un número'); return; }
+    r = {...r, formula: `${r.formula || txt} (manual)`.slice(0, 60)};
+    const lado = (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
+    const selModo = document.querySelector('[data-mmodo]');
+    const modo = campo === 'eva' && selModo ? selModo.value : 'evasion';
+    const defensa = campo === 'eva' ? await defensaConContra(d, {modo, itemId: '', itemNombre: '', costo: 0}) : null;   // ⚔ (2026-10-27)
+    const cHab = d.hab && campo === 'eva' ? (d.hab.contra.find(x => x.modo === modo) || d.hab.contra[0]) : null;
+    const etiqueta = campo === 'eva' ? (cHab ? cHab.etq : (modo === 'parry' ? 'Parry' : 'Evasión')) : (campo === 'pdg' && d.hab) ? etqTira(d) : (campo === 'dano' ? 'Daño' : ETIQ[campo]);
+    manualAbierto.delete(k);
+    if(campo === 'dano'){
+      const sel = document.querySelector(`[name="mdef-${d.id}"]:checked`), n = document.querySelector('[data-mdefn]');
+      const defensaManual = sel && sel.value === 'no' ? 'no' : sel && sel.value === 'num' ? Math.max(0, Math.round(_num(n && n.value))) : null;
+      // Los efectos al golpear del arma (si esta pantalla maneja al atacante) y los de la habilidad, como en el daño de siempre.
+      let efectos = [];
+      // (2026-10-21, probando la Ráfaga en el mapa: a mano se perdían los efectos del arma de un creep) — los ganchos locales del mapa primero.
+      try{
+        let h = null;
+        if(cfgEscuchar.hooksLocal){ h = cfgEscuchar.hooksLocal(d.atacante); if(h && typeof h.then === 'function') h = await h; }
+        const H = hooks();
+        if(!h && H && H.soy && H.soy(d.atacante)) h = H;
+        if(!d.hab && h && h.efectosArma) efectos = efectosArmaDe(d, h);
+      }catch(err){}
+      if(!d.hab) efectos = [...efectos, ...efectosDeHabilidad(d)];
+      if(typeof mesaPublicar === 'function'){ try{ mesaPublicar(`${lado.nombre} · ${etiqueta} (manual)`, r); }catch(err){} }
+      guardarDano(d.id, r, efectos, {defensaManual}).catch(err => { console.error(err); _toast('No se pudo anotar la tirada en el duelo'); });
+      return;
+    }
+    if(campo === 'pdg' && !d.hab && !(await pagarManual(d))) return;   // las mismas reglas que el botón
+    // 🤺 Elegido «Desarmar» en el desplegable: primero se paga y se marca (lo mismo que el botón 🤺), después va la tirada escrita.
+    const selDes = (campo === 'fuerza' || campo === 'bloqueo') ? document.querySelector('[data-mdesarme]') : null;
+    if(selDes && selDes.value === '1'){
+      let ok = false;
+      try{ ok = typeof window.dueloDesarmar === 'function' && await window.dueloDesarmar(d.id, campo === 'fuerza' ? 'atacante' : 'defensor'); }catch(err){ console.error('Desarmar:', err); }
+      if(!ok){ manualAbierto.add(k); dibujar(); return; }
+    }
+    guardarTiro(d.id, campo, r, defensa, await extraManual(d, campo)).catch(err => { console.error(err); _toast('No se pudo anotar la tirada en el duelo'); });
+  }
+
+  // El «?» que explica Esquivar, Parry y Bloqueo (comun/modificadores-tirada.js; si la página no lo carga, no aparece).
+  const ayudaDefensa = clave => typeof ModTirada !== 'undefined' && ModTirada.ayuda ? ModTirada.ayuda(clave).replace('class="bt-ayuda"', 'class="bt-ayuda en-linea"') : '';
+
+  // Una caja de tirada. campo: 'pdg'|'eva'|'fuerza'|'bloqueo'.
+  function cajaHtml(d, campo, otro, esNuevo){
+    const esAtq = campo === 'pdg' || campo === 'fuerza';
+    const lado = esAtq ? d.atacante : d.defensor;
+    const tiro = d[campo];
+    const fase = (campo === 'pdg' || campo === 'eva') ? 'contacto' : 'bloqueo';
+    const ladoN = esAtq ? 'atacante' : 'defensor';
+    const desarma = fase === 'bloqueo' && d.ataque && d.ataque.desarme && d.ataque.desarme.lado === ladoN;   // 🤺 esta tirada vale como Desarmar
+    const etiqueta = campo === 'eva' ? nombreDefensa(d) : (campo === 'pdg' && d.hab) ? etqTira(d) : desarma ? `🤺 Desarmar (${ETIQ[campo]})` : ETIQ[campo];
+    const parCompleto = !!(tiro && d[otro]);
+    if(parCompleto) return numerosHtml(tiro, esNuevo, etiqueta, lado.nombre);
+    if(tiro){
+      // Quien tiró ve SU propia tirada mientras espera al otro (para el resto queda secreta hasta que tiren los dos).
+      const propia = esMio(lado)
+        ? `<div class="num" style="font-size:52px">${_fmt(tiro.total)}</div><div class="det">tu tirada · ${_esc(tiro.formula || '')}${tiro.rolls && tiro.rolls.length ? ' → ' + tiro.rolls.join(' + ') : ''}${_num(tiro.mod) ? ' ' + (_num(tiro.mod) > 0 ? '+' : '−') + ' ' + Math.abs(_num(tiro.mod)) : ''}</div><div class="det">🔒 los demás no la ven hasta que tiren los dos</div>`
+        : `<div class="listo">✔ ${_esc(lado.nombre)} ya tiró <b>${_esc(tiro.formula || 'los dados')}</b></div><div class="det">el resultado se muestra cuando tiren los dos</div>`;
+      return `<div class="duelo-tiro"><div class="que">${_esc(etiqueta)} · ${_esc(lado.nombre)}</div>${propia}</div>`;
+    }
+    const vivo = d.estado === 'esperando' && d.fase === fase;
+    if(!vivo) return `<div class="duelo-tiro"><div class="que">${_esc(etiqueta)} · ${_esc(lado.nombre)}</div><div class="espera">no llegó a tirar</div></div>`;
+    const quien = _esc(lado.nombre);
+    let cuerpo;
+    // 🤺 Desarmar (2026-10-22): ¿puedo elegirlo acá? (dOp) ¿o el otro ya lo eligió contra mí? (quiereDesarmarme)
+    const dOp0 = (campo === 'fuerza' || campo === 'bloqueo') && !(d.ataque && d.ataque.desarme) && typeof window.dueloDesarmeOpcion === 'function' ? window.dueloDesarmeOpcion(d, ladoN) : null;
+    const dOp = dOp0 && !dOp0.apagado ? dOp0 : null, dOpApagado = dOp0 && dOp0.apagado ? dOp0 : null;   // apagada: el botón se ve, sin poder tocarlo (2026-10-22, dueño)
+    const quiereDesarmarme = fase === 'bloqueo' && !!(d.ataque && d.ataque.desarme) && d.ataque.desarme.lado !== ladoN;
+    if(puedoTirarYo(lado)){
+      if(campo === 'eva'){
+        if(!opciones[d.id] && !opcionesFalla[d.id]) pedirOpciones(d);   // (si esta pestaña las calcula sola, ya quedan acá mismo)
+        const ops = opciones[d.id];
+        if(!ops && opcionesFalla[d.id]){
+          cuerpo = `<div class="espera">No llegaron tus opciones de defensa (la ficha o las Acciones no respondieron).</div>${window.DUELO_MOTIVO ? `<div class="det">${_esc(window.DUELO_MOTIVO)}</div>` : ''}<button type="button" class="sec" data-reintentar-def>↻ Reintentar</button>
+            <div class="duelo-man"><input type="number" min="1" data-manual="eva" placeholder="valor" value="${_esc(manual.eva || '')}"><select data-manual-modo>${selModoHtml(d)}</select><button type="button" class="sec" data-tirarpor="eva">🎲 Tirar a mano</button></div>`;
+        }
+        else if(!ops){ setTimeout(() => { if(actual && actual.id === d.id && actual.dato && !opciones[d.id]) dibujar(); }, 2000);   // vuelve a mirar hasta que lleguen
+          cuerpo = '<div class="espera">cargando tus opciones de defensa… <span class="det">(la primera vez puede tardar unos segundos)</span></div>'; }
+        else cuerpo = `<div class="det">Elegí cómo te defendés (antes de ver el PdG):</div><div class="duelo-opc">${ops.map((o, i) => /^🚫/.test(o.motivoNo || '') ? `<button type="button" class="no-puede" disabled title="${_esc(o.motivoNo.replace(/^🚫\s*/, ''))}"><span class="no-puede-txt">🚫 ${_esc((o.motivoNo.match(/^🚫\s*([^:]+)/) || [])[1] || 'No se puede')}</span>${_esc(o.etiqueta)}<small>${_esc(o.motivoNo.replace(/^🚫\s*[^:]+:\s*/, ''))}</small></button>` : `<button type="button" data-def="${i}"${o.motivoNo ? ' disabled' : ''}>${_esc(o.etiqueta)}${ayudaDefensa(o.modo === 'evasion' ? 'eva' : o.modo)}${o.lupa ? lupaDuelo(d.id + ':op' + i, (vistas[d.id + ':op' + i] = o.lupa)) : ''}${o.costo ? `<small>${_fmt(o.costo)} No2</small>` : ''}${(o.info || []).map(t => `<small class="duelo-info">${_esc(t)}</small>`).join('')}${o.motivoNo ? `<small>${_esc(o.motivoNo)}</small>` : ''}</button>`).join('')}</div>`;
+      }else{
+        const txt = campo === 'pdg' ? (d.hab ? `🎲 Tirar ${_esc(etqTira(d))}` : '🎲 Pagar y tirar PdG') : desarma ? `🎲 Tirar Desarmar (tu ${campo === 'fuerza' ? 'Fuerza del golpe' : 'Bloqueo'})`
+          : dOp ? (campo === 'fuerza' ? '⚔ Pegar: pasar el bloqueo (Fuerza del golpe)' : '🛡 Bloquear el golpe')
+          : quiereDesarmarme ? (campo === 'fuerza' ? '⚔ Pegar (contra el desarme)' : '🛡 Bloquear el desarme')
+          : campo === 'fuerza' ? '🎲 Tirar Fuerza del golpe' : `🎲 Tirar Bloqueo${d.defensa && d.defensa.itemNombre ? ' · ' + _esc(d.defensa.itemNombre) : ''}`;
+        cuerpo = `<button type="button" data-tirar="${campo}">${txt}${d.hab && campo === 'pdg' && d.hab.tira && d.hab.tira.formula ? ` · ${_esc(d.hab.tira.formula)}` : vistaBoton(d, campo)}${campo === 'bloqueo' ? ayudaDefensa('bloqueo') : ''}</button>${campo === 'pdg' && !d.hab ? costoAtaqueHtml(d) : ''}`;
+      }
+      // «Fulanito intenta desarmarte» / «…intenta quitarte el arma» (dueño, 2026-10-22): solo para que lo sepa; la tirada es la misma.
+      if(quiereDesarmarme){
+        const dsA = d.ataque.desarme, quien = dsA.quien || d[dsA.lado].nombre;
+        const item = ladoN === 'defensor' ? ((d.defensa && d.defensa.itemNombre) || 'lo que tenés en la mano') : (d.ataque.armaNombre || 'tu arma');
+        const titulo = ladoN === 'defensor' ? `🤺 ${quien} intenta desarmarte` : `🤺 ${quien} intenta quitarte el arma`;
+        cuerpo = `<div class="duelo-desarme-aviso" style="margin:0 0 8px;padding:8px 10px;border:1px solid #ffd25a;border-radius:8px;background:rgba(255,210,90,.10);color:#ffd25a;font-weight:700">${_esc(titulo)}</div><div class="det" style="margin:-2px 0 8px">Si no ganás esta tirada, se te cae ${_esc(item)} (sale volando 2 casillas). La tirada es la de siempre: tu ${ladoN === 'defensor' ? 'Bloqueo' : 'Fuerza del golpe'}.</div>` + cuerpo;
+        const kAv = d.id + ':desarme-aviso';
+        if(!revelado[kAv]){ revelado[kAv] = true; _toast(titulo); }
+      }
+      // 🤺 Desarmar (dueño, 2026-10-22): no se declara en el turno; se elige acá, en el Bloqueo que sigue a un Parry ganado, EN VEZ de pegar
+      // (quien ataca) o de bloquear (quien defiende, si paró con el arma). Quién puede y cuánto cuesta lo dice el mapa (js/62); el botón paga, marca y tira.
+      if(dOp) cuerpo += `<div class="det" style="margin-top:8px">${campo === 'fuerza' ? 'o, en vez de pegar:' : 'o, en vez de bloquear:'}</div><button type="button" class="sec" data-desarmar="${campo}" title="${_esc(dOp.titulo || '')}">🤺 Desarmar a ${_esc(d[esAtq ? 'defensor' : 'atacante'].nombre)} · ${_esc(dOp.costo || '')}</button>`;
+      else if(dOpApagado) cuerpo += `<div class="det" style="margin-top:8px">${campo === 'fuerza' ? 'o, en vez de pegar:' : 'o, en vez de bloquear:'}</div><button type="button" class="sec" disabled style="opacity:.5;cursor:not-allowed" title="Ahora no se puede: ${_esc(dOpApagado.apagado)}">🤺 Desarmar · ${_esc(dOpApagado.apagado)}</button>`;
+      cuerpo += flashHtml(d, campo) + manualHtml(d, campo);
+    }else if(puedoAMano(lado)){
+      const selModo = campo === 'eva' ? `<select data-manual-modo>${selModoHtml(d)}</select>` : '';
+      cuerpo = `<div class="espera duelo-nota">esperando que ${quien} tire…</div>
+        <div class="duelo-man">${selModo}<input type="number" min="1" data-manual="${campo}" placeholder="valor" value="${_esc(manual[campo] || '')}"><button type="button" class="sec" data-tirarpor="${campo}">🎲 Tirar a mano</button></div>
+        <div class="det">${soyGM() ? 'como GM, tirás por él' : 'tirás vos'}: escribí el valor del stat y se tira con dados</div>${manualHtml(d, campo)}`;
+    }else{
+      cuerpo = `<div class="espera duelo-nota">esperando que ${quien} tire…</div>`;
+    }
+    return `<div class="duelo-tiro"><div class="que">${_esc(etiqueta)} · ${quien}</div>${cuerpo}</div>`;
+  }
+
+  /* 🤺 El resultado de un desarme espera a su ruleta (2026-10-22, dueño: «si gana el desarme, el duelo se minimiza, se muestra la animación, el duelo
+     se vuelve a ver, se muestra el resultado y aparece Terminar duelo»): mientras gira, el cuadro dice «🤺 …»; cuando la ruleta termina, el mapa
+     llama a desarmeListo(id) y el cuadro vuelve con «¡DESARMADO!». Si la ruleta no llega (sin la pantalla del GM), a los 15 s se muestra igual. */
+  const DESARME_ESPERA_MS = 15000, desarmeVisto = new Map(), desarmeHecho = new Set();
+  // Antes de la ruleta, el cartel «Fulanito desarmó a Menganito» con Aceptar (`ataque.desarme.aceptado`), atacando o defendiendo (dueño, 2026-10-22).
+  const desarmeEsperaAceptar = d => !!(d && d.ataque && d.ataque.desarme && !d.ataque.desarme.aceptado);
+  function desarmePendiente(d){
+    if(!d || d.estado !== 'resuelto' || d.resultado !== 'desarmado' || desarmeHecho.has(d.id)) return false;
+    if(desarmeEsperaAceptar(d)) return true;   // sin plazo: espera el Aceptar
+    const clave = d.id + (d.ataque.desarme.aceptado ? ':ok' : '');
+    if(!desarmeVisto.has(clave)){
+      desarmeVisto.set(clave, Date.now());
+      setTimeout(() => { if(actual && actual.id === d.id) dibujar(); }, DESARME_ESPERA_MS + 100);
+    }
+    return Date.now() - desarmeVisto.get(clave) < DESARME_ESPERA_MS;
+  }
+  async function desarmeAceptar(id){
+    try{ await col().doc(id).update({'ataque.desarme.aceptado': true}); }catch(err){ console.error('Desarmar: no se pudo aceptar', err); _toast('No se pudo: probá de nuevo'); }
+  }
+  function desarmeListo(id){
+    desarmeHecho.add(id);
+    abrir(id);
+    if(actual && actual.id === id && actual.dato) dibujar();
+  }
+  // 🤺 El desarme en juego, dicho en el paso 3 (2026-10-22, dueño: «¿se vio en algún lado que la tirada es para un desarme?»).
+  function desarmeAvisoHtml(d){
+    const ds = d.ataque && d.ataque.desarme;
+    if(!ds) return '';
+    const quien = ds.lado === 'atacante' ? d.atacante.nombre : d.defensor.nombre, victima = ds.lado === 'atacante' ? d.defensor.nombre : d.atacante.nombre;
+    const pierde = ds.lado === 'atacante' ? ((d.defensa && d.defensa.itemNombre) || 'lo que tiene en la mano') : (d.ataque.armaNombre || 'su arma');
+    return `<div class="det" style="margin:-2px 0 8px;color:#ffd25a">Si gana ${_esc(quien)}, a ${_esc(victima)} se le cae ${_esc(pierde)} (sale volando 2 casillas). Si no, lo de siempre.</div>`;
+  }
+  // Línea corta con quién ganó un par ya resuelto.
+  function miniHtml(d, par){
+    const info = par === 'contacto' ? d.contacto : d.bloq;
+    if(!info) return '';
+    const a = par === 'contacto' ? d.pdg : d.fuerza, b = par === 'contacto' ? d.eva : d.bloqueo;
+    const [na, nb] = nombresPar(d, par);
+    const gano = info.gana === 'atacante' ? na : nb;
+    return `<div class="duelo-mini ${info.gana === 'atacante' ? 'r' : 'g'}">${a.total} contra ${b.total} · gana ${_esc(gano)}${info.desempate ? ' (desempate)' : ''}</div>`;
+  }
+
+  function empateHtml(d, esNuevo){
+    const par = d.empate.par;
+    const [na, nb, ta, tb] = nombresPar(d, par);
+    const lados = [['atacante', d.atacante], ['defensor', d.defensor]].filter(([, l]) => puedoAMano(l));
+    if(d.empate.ppt){   // ✊ eligieron piedra, papel o tijera (2026-10-30): se espera el juego
+      vigilarPpt(d.id, d.empate.ppt);
+      return `<div class="duelo-veredicto empate${esNuevo ? ' nuevo' : ''}"><div class="grande">⚖ ¡EMPATE!</div><div class="chico">${_esc(na)} ${ta.total} · ${_esc(nb)} ${tb.total} — se desempata con ✊ piedra, papel o tijera</div>
+        <div class="chico">esperando que ${_esc(d.atacante.nombre)} y ${_esc(d.defensor.nombre)} jueguen…</div>
+        <div class="duelo-par"><button type="button" data-ppt-ver="${_esc(d.empate.ppt)}">✊ Ver el juego</button></div></div>`;
+    }
+    const ppt = pptPosible(d);
+    return `<div class="duelo-veredicto empate${esNuevo ? ' nuevo' : ''}"><div class="grande">⚖ ¡EMPATE!</div><div class="chico">${_esc(na)} ${ta.total} · ${_esc(nb)} ${tb.total} — las dos llevan «+» fijo (o ninguna): se desempata con par o impar${ppt ? ' o con piedra, papel o tijera' : ''}</div>
+      ${lados.length ? lados.map(([q, l]) => `<div class="duelo-par"><span>${_esc(l.nombre)} (${q}) elige:</span><button type="button" data-par="${q}:par">Par</button><button type="button" data-par="${q}:impar">Impar</button>${ppt ? `<button type="button" data-ppt-elegir="${q}">✊ Piedra, papel o tijera</button>` : ''}</div>`).join('') : `<div class="chico">esperando que uno de los dos elija cómo desempatar…</div>`}
+      <div class="chico">${ppt ? 'el primero que elige decide cómo se desempata: con par o impar se tira un dado y gana el que acierta; con piedra, papel o tijera juegan los dos' : 'el primero que elige decide: se tira un dado y gana el que acierta'}</div></div>`;
+  }
+
+  function veredictoHtml(d, esNuevo){
+    const nuevo = esNuevo ? ' nuevo' : '';
+    const motivos = [];
+    [d.contacto, d.bloq].forEach((info, i) => {
+      if(!info || !info.desempate) return;
+      const par = i === 0 ? 'contacto' : 'bloqueo';
+      const [na, nb, ta, tb] = nombresPar(d, par);
+      const ganador = info.gana === 'atacante' ? d.atacante.nombre : d.defensor.nombre;
+      if(info.desempate === 'mas1') motivos.push(`Se resolvió el empate (${_esc(par === 'contacto' ? 'contacto' : 'Bloqueo')}): gana ${_esc(ganador)} porque la otra tirada llevaba un «+» fijo y ella no.`);
+      else if(info.desempate === 'polilla') motivos.push(`Empate después de la 🦋 Polilla mística: gana ${_esc(ganador)} (quien usa la Polilla pierde los empates).`);
+      else if(info.desempate === 'ppt') motivos.push(`Se resolvió el empate (${par === 'contacto' ? 'contacto' : 'Bloqueo'}) con ✊ piedra, papel o tijera: gana ${_esc(ganador)}.`);
+      else if(info.moneda) motivos.push(`Se resolvió el empate (${par === 'contacto' ? 'contacto' : 'Bloqueo'}) con par o impar: ${_esc(info.moneda.quien === 'atacante' ? d.atacante.nombre : d.defensor.nombre)} eligió ${info.moneda.eleccion}, salió ${info.moneda.resultado} (${info.moneda.resultado % 2 === 0 ? 'par' : 'impar'}) → gana ${_esc(ganador)}.`);
+    });
+    const mot = motivos.map(t => `<div class="duelo-motivo">⚖ ${t}</div>`).join('');
+    const item = d.defensa && d.defensa.itemNombre ? d.defensa.itemNombre : 'el objeto con el que bloqueó';
+    const disparoParado = d.resultado === 'bloqueado' && !d.bloq && !(d.defensa && d.defensa.modo === 'parrydist') && typeof Combatiente !== 'undefined' && Combatiente.contraDisparo(d);
+    const interceptado = d.resultado === 'bloqueado' && d.defensa && d.defensa.modo === 'parrydist';
+    // Efecto que la skill no puede automatizar del todo (2026-09-27, pedido del dueño — "Pasos personalizados"
+    // del 🎯): texto libre + la diferencia entre las dos tiradas, si hubo contienda, para resolverlo a mano.
+    const efectoLibre = d.hab && d.hab.efectoLibre
+      ? `<div class="duelo-motivo">✋ ${_esc(d.hab.efectoLibre)}${d.contacto ? ` <b>(diferencia: ${_fmt(Math.abs(_num(d.contacto.dif)))})</b>` : ''}</div>` : '';
+    let caja;
+    if(d.hab && d.resultado === 'pego' && d.hab.sinOposicion) caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">✨ ${_esc(d.hab.nombre.toUpperCase())}</div><div class="chico">${_esc(d.atacante.nombre)} → ${_esc(d.defensor.nombre)} · no hay nada que resistir: se aplica</div>${efectoLibre}</div>`;
+    else if(d.hab && d.resultado === 'pego' && d.contacto && d.contacto.resistioEstado) caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">⚡ EL DAÑO ENTRA</div><div class="chico">${_esc(d.defensor.nombre)} resistió los estados de ${_esc(d.hab.nombre)} (${_esc(etqContra(d))}), pero no se esquiva: el daño pasa igual</div>${mot}${efectoLibre}</div>`;
+    else if(d.hab && d.resultado === 'pego') caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">✨ ¡FUNCIONÓ!</div><div class="chico">${_esc(d.hab.nombre)} de ${_esc(d.atacante.nombre)} venció la ${_esc(etqContra(d))} de ${_esc(d.defensor.nombre)}</div>${mot}${efectoLibre}</div>`;
+    else if(d.hab && d.resultado === 'fallo') caja = `<div class="duelo-veredicto fallo${nuevo}"><div class="grande">🛡 SE RESISTIÓ</div><div class="chico">${_esc(d.defensor.nombre)} resistió ${_esc(d.hab.nombre)} (${_esc(etqContra(d))})</div>${mot}</div>`;
+    else if(d.resultado === 'pego' && d.crit && d.crit.critico){
+      const porParry = d.defensa && d.defensa.modo === 'parry';
+      caja = `<div class="duelo-veredicto critico${nuevo}"><div class="chispas">✨ 💥 ✨</div><div class="grande">${d.crit.supercritico ? '¡SUPERCRÍTICO!' : '¡CRÍTICO!'}</div><div class="mult">×${d.crit.mult} · ${NOMBRE_MULT[d.crit.mult] || `${d.crit.supercritico} VEINTES NATURALES`}</div><div class="chico">${porParry ? 'El Parry no alcanzó y ' : ''}${d.crit.mult > 1 ? 'el golpe ignora la Defensa: todo el daño se multiplica y va derecho a la vida' : 'es crítico aunque el d20 no multiplique: el golpe ignora la Defensa y va derecho a la vida (daño ×1)'}</div>${mot}</div>`;
+    }else if(d.resultado === 'pego'){
+      const porParry = d.defensa && d.defensa.modo === 'parry';
+      caja = `<div class="duelo-veredicto pego${nuevo}"><div class="grande">⚔ ¡PEGÓ!</div><div class="chico">${porParry ? 'El Parry no alcanzó: el golpe entra completo' : 'El golpe entra completo'}</div>${mot}</div>`;
+    }else if(d.resultado === 'fallo' && d.crit && d.crit.soloCritico){
+      caja = `<div class="duelo-veredicto fallo${nuevo}"><div class="grande">🎯 SIN CRÍTICO</div><div class="chico">Pegó, pero no fue crítico: ${_esc(d.ataque.habNombre || 'el disparo')} no hace nada (solo vale si es crítico)</div>${mot}</div>`;
+    }else if(d.resultado === 'fallo'){
+      caja = `<div class="duelo-veredicto fallo${nuevo}"><div class="grande">🛡 FALLÓ</div><div class="chico">${_esc(d.defensor.nombre)} lo esquivó</div>${mot}</div>`;
+    }else if(interceptado){
+      caja = `<div class="duelo-veredicto bloqueado${nuevo}"><div class="grande">🏹 ¡INTERCEPTADO!</div><div class="chico">${_esc(d.defensor.nombre)} lo paró con un disparo (Parry a distancia): el golpe queda anulado</div>${mot}</div>`;
+    }else if(d.resultado === 'bloqueado' && disparoParado){
+      caja = `<div class="duelo-veredicto bloqueado${nuevo}"><div class="grande">🛡 ¡PARADO!</div><div class="chico">${_esc(d.defensor.nombre)} paró el disparo con el escudo: queda anulado</div>${mot}</div>`;
+    }else if(d.resultado === 'bloqueado'){
+      const desFalloA = d.ataque && d.ataque.desarme && d.ataque.desarme.lado === 'atacante';   // 🤺 quiso desarmar atacando y no le salió (2026-10-22)
+      caja = `<div class="duelo-veredicto bloqueado${nuevo}">${desFalloA ? `<div class="chico" style="color:#ffd25a;font-weight:700;margin-bottom:4px">🤺 ${_esc(d.atacante.nombre)} intentó desarmar a ${_esc(d.defensor.nombre)}, pero falló</div>` : ''}<div class="grande">🛡 ¡BLOQUEADO!</div><div class="chico">El golpe queda anulado</div>${mot}</div>`;
+    }else if(d.resultado === 'desarmado'){
+      const ds = (d.ataque && d.ataque.desarme) || {}, quien = ds.lado === 'atacante' ? d.atacante.nombre : d.defensor.nombre, otro = ds.lado === 'atacante' ? d.defensor.nombre : d.atacante.nombre;
+      const obj = ds.lado === 'atacante' ? (d.defensa && d.defensa.itemNombre) || 'lo que tenía en la mano' : (d.ataque && d.ataque.armaNombre) || 'su arma';
+      caja = `<div class="duelo-veredicto bloqueado${nuevo}"><div class="grande">🤺 ¡DESARMADO!</div><div class="chico">${_esc(quien)} le saca ${_esc(obj)} a ${_esc(otro)}: sale volando 2 casillas</div>${mot}</div>`;
+    }else if(d.resultado === 'mitad'){
+      const desFallo = d.ataque && d.ataque.desarme && d.ataque.desarme.lado === 'defensor';   // 🤺 quiso desarmar defendiendo y no le salió
+      caja = `<div class="duelo-veredicto mitad${nuevo}">${desFallo ? `<div class="chico" style="color:#ffd25a;font-weight:700;margin-bottom:4px">🤺 ${_esc(d.defensor.nombre)} intentó desarmar a ${_esc(d.atacante.nombre)}, pero falló</div>` : ''}<div class="grande">⚠ PASA LA MITAD</div><div class="chico">${desFallo ? 'No bloqueó el golpe: ' : 'Paró el golpe pero no lo frenó del todo: '}pasa la mitad del daño (redondeada para arriba)</div>
+        <div class="duelo-motivo">🔧 ${_esc(item)} pierde 1 punto de durabilidad${d.dano && d.dano.desgaste ? ' <span style="font-weight:400">(ya se le descontó en su ficha)</span>' : ''}</div>${mot}</div>`;
+    }else return '';
+    // Contraataque (regla del dueño, 2026-10-01, P139): solo después de un Parry Y un Bloqueo exitosos — eso es «bloqueado». El paso
+    // siguiente es una pregunta, Sí o No: con Sí se abre un duelo nuevo con los papeles al revés (quien defendía ataca). `contra`:
+    // el id de ese duelo, 'no' si decidió no contraatacar, vacío mientras decide.
+    // Un disparo parado con escudo no da contraataque (dueño, 2026-10-09): no hubo Bloqueo y el tirador está lejos.
+    let contra = '';
+    const faltaDodgeArco = !!(d.contacto && d.contacto.dodgeArco && !d.contacto.dodgeHecho);   // 🏹 con arco: primero el dodge roll
+    if(d.resultado === 'bloqueado' && !d.contra && !disparoParado && faltaDodgeArco)
+      contra = `<div class="duelo-mini">🏹 Con el arco, para contraatacar ${esMio(d.defensor) ? 'primero hacé' : _esc(d.defensor.nombre) + ' primero hace'} el dodge roll: alejarse 1 casillero de ${_esc(d.atacante.nombre)} (pagando sus No2).</div>`;
+    else if(d.resultado === 'bloqueado' && !d.contra && !disparoParado){
+      const propio = esMio(d.defensor);
+      if(propio || soyGM()) contra = `<div class="duelo-contra"><div class="duelo-nota" style="margin-bottom:8px">⚔ ${propio ? 'Ganaste' : _esc(d.defensor.nombre) + ' ganó'} ${interceptado ? 'el Parry a distancia' : 'el Parry y el Bloqueo'}: <b>¿${propio ? 'contraatacás' : 'contraataca'} a ${_esc(d.atacante.nombre)}?</b><br><span style="opacity:.8">Cuesta lo de un primer ataque con su arma y se abre un duelo nuevo con los papeles al revés.</span></div>`
+        + `<button type="button" data-contra>Sí, contraatacar${propio ? '' : ' (por ' + _esc(d.defensor.nombre) + ')'}</button> <button type="button" class="sec" data-contra-no>No</button></div>`;
+      else contra = `<div class="duelo-mini">⚔ ${_esc(d.defensor.nombre)} puede contraatacar: está decidiendo…</div>`;
+    }
+    else if((d.resultado === 'fallo' || (d.resultado === 'mitad' && d.defensa && d.defensa.modo === 'parry' && d.defensor.tipo === 'creep')) && !d.hab && !d.contra && d.defensa && d.defensa.contraEsquiva){   // (el creep, también tras ganar el Parry, 2026-10-27)
+      // ⚔ Contraataque (Warrior, 2026-10-13, dueño): esquivó con la Evasión → puede contestar, si lo alcanza: 2 SP + el No2 de un primer ataque.
+      const propio = esMio(d.defensor);
+      if(!d.defensa.contraAlcanza) contra = `<div class="duelo-mini">⚔ ${_esc(d.defensor.nombre)} esquivó, pero no alcanza a ${_esc(d.atacante.nombre)} para contraatacar (distancia ${_fmt(d.defensa.contraDist)}, su alcance ${_fmt(d.defensa.contraAlcance)})</div>`;
+      else if(propio || soyGM()) contra = `<div class="duelo-contra"><div class="duelo-nota" style="margin-bottom:8px">⚔ ${d.resultado === 'mitad' ? _esc(d.defensor.nombre) + ' ganó el Parry' : propio ? 'Esquivaste' : _esc(d.defensor.nombre) + ' esquivó'}: <b>¿${propio ? 'contraatacás' : 'contraataca'} a ${_esc(d.atacante.nombre)}?</b> (Contraataque)<br><span style="opacity:.8">${d.defensor.tipo === 'creep' ? 'Cuesta su Contraataque (Flash, el doble en turno ajeno)' : 'Cuesta 2 SP'} y lo de un primer ataque con su arma; se abre un duelo nuevo con los papeles al revés.</span></div>`
+        + `<button type="button" data-contra>Sí, contraatacar${propio ? '' : ' (por ' + _esc(d.defensor.nombre) + ')'}</button> <button type="button" class="sec" data-contra-no>No</button></div>`;
+      else contra = `<div class="duelo-mini">⚔ ${_esc(d.defensor.nombre)} puede contraatacar: está decidiendo…</div>`;
+    }
+    else if(d.contra === 'no') contra = `<div class="duelo-mini">${_esc(d.defensor.nombre)} decidió no contraatacar</div>`;
+    else if(d.contra) contra = `<div class="duelo-mini">⚔ ${_esc(d.defensor.nombre)} contraatacó: hay otro duelo abierto</div>`;
+    return caja + contra;
+  }
+
+  const NOMBRE_MULT = {1: 'SIN MULTIPLICADOR', 2: 'DOBLE DAÑO', 3: 'TRIPLE DAÑO', 4: 'CUÁDRUPLE DAÑO'};
+  // El NIVEL del crítico (cuántos d20 se tiran) da el título antes de tirar: 1 = crítico, 2 = doble crítico, 3 = triple crítico… Después de tirar, el mejor d20 da el multiplicador del DAÑO (doble daño, triple daño…).
+  const tituloNivel = n => n <= 1 ? '¡ES CRÍTICO!' : n === 2 ? '¡ES DOBLE CRÍTICO!' : n === 3 ? '¡ES TRIPLE CRÍTICO!' : n === 4 ? '¡ES CUÁDRUPLE CRÍTICO!' : `¡ES CRÍTICO DE NIVEL ${n}!`;
+
+  // Paso 6 · Efectos del golpe: cada efecto es un momento propio (dado a la vista, «funcionó», «Aplicar»).
+  function efectosHtml(d){
+    const efs = d.efectos || [];
+    // Efecto personalizado (2026-09-27, pedido del dueño — mismo criterio que `efectoLibre` en el veredicto):
+    // texto libre, sin tirada ni botón «Aplicar», se muestra igual haya o no efectos automáticos.
+    const nota = (d.hab && d.hab.efectosNota) || (d.ataque && d.ataque.efectosNota) || '';
+    // ⚡ Critical Matters (2026-09-29, pedido del dueño — Lisiar): el texto libre de "si es crítico" solo se
+    // muestra cuando el golpe SALIÓ crítico — d.crit ya está resuelto a esta altura (se evalúa antes del daño).
+    const notaCritico = (d.crit && d.crit.critico && d.ataque && d.ataque.critico && d.ataque.critico.efectosNota) || '';
+    // «Se resiste con» a mano (2026-09-28): la habilidad tira igual pero no hay stat automático que la resista.
+    const contraOtro = (d.hab && d.hab.contraOtro) || '';
+    if(!efs.length && !nota && !notaCritico && !contraOtro) return '';
+    const puedeAtq = esMio(d.atacante) || soyGM();
+    // El tablero de los dados (2026-10-04): una fila por efecto que se tira — su dado, con qué número funciona y qué salió.
+    const conDado = efs.map((ef, i) => [ef, i]).filter(([ef]) => !siempreEf(ef));
+    const faltan = efs.filter(ef => !ef.res && !ef.omitido && necesitaTiradaEf(ef));
+    const fila = ([ef, i]) => {
+      const clave = d.id + ':efd' + i, nuevo = ef.res && !revelado[clave];
+      if(ef.res) revelado[clave] = true;
+      const desde = ef.caras - ef.exitos + 1;
+      const dadoTxt = ef.res && ef.res.manual ? '✍' : ef.res ? _fmt(ef.res.dado) : '';   // ✍ elegido a mano
+      const res = ef.omitido ? `<span class="no">no entra</span>` : !ef.res ? '<span class="espera">—</span>'
+        : ef.res.exito ? `<b class="duelo-dado ok${nuevo ? ' nuevo' : ''}">${dadoTxt}</b> <span class="ok duelo-funciono${nuevo ? ' nuevo' : ''}">¡FUNCIONÓ!</span>`
+        : `<b class="duelo-dado${nuevo ? ' nuevo' : ''}">${dadoTxt}</b> <span class="no">✘ no funcionó</span>`;
+      return `<tr><td>🎲 d${_fmt(ef.caras)}</td><td><b>${_esc(ef.nombre)}</b> <span class="hint">${pctEf(ef)} %</span></td><td>${desde === ef.caras ? _fmt(desde) : `${_fmt(desde)}–${_fmt(ef.caras)}`}</td><td>${res}</td></tr>`;
+    };
+    // Mientras el daño espera su «💔 Aplicar el daño» (fase 'dano'), los efectos no se pueden tirar todavía: antes los botones se veían y no
+    // hacían nada (2026-10-20, probado en el mapa). Se avisa en su lugar.
+    const esperaDano = d.fase === 'dano' && faltan.length;
+    const tablero = conDado.length ? `<div class="duelo-ef duelo-ef-tablero"><table><thead><tr><th>Dado</th><th>Efecto</th><th>Funciona con</th><th>Salió</th></tr></thead><tbody>${conDado.map(fila).join('')}</tbody></table>
+      ${esperaDano ? `<div class="espera duelo-nota">Primero se aplica el daño (💔 arriba); después se tiran los efectos.</div>` : faltan.length ? (puedeAtq ? `<button type="button" data-ef-tirar-todos>🎲 Tirar ${faltan.length === 1 ? 'el efecto' : 'los efectos'} (${faltan.map(ef => siempreEf(ef) ? _esc(ef.dado) : '1d' + _fmt(ef.caras)).join(' · ')})</button>`
+        : `<div class="espera duelo-nota">esperando que ${_esc(d.atacante.nombre)} tire los efectos…</div>`) : ''}${faltan.length && puedeAtq && !esperaDano ? manualEfectosHtml(d, efs) : ''}</div>` : '';
+    const cards = efs.map((ef, i) => {
+      if(!siempreEf(ef) && !(ef.res && ef.res.exito && !ef.omitido && !ef.aplicado) && !ef.aplicado) return '';   // en el tablero: sin tirar, falló o no entra
+      const clave = d.id + ':ef' + i;
+      const nuevo = ef.res && !revelado[clave];
+      if(ef.res) revelado[clave] = true;
+      const prob = siempreEf(ef) ? 'siempre' : `${pctEf(ef)} % (${ef.exitos > 1 ? (ef.caras - ef.exitos + 1) + '–' : ''}${ef.caras} en d${ef.caras})`;   // «17 % (6 en d6)»
+      const spec = specDeEfecto(ef);
+      let estado;
+      if(ef.omitido) estado = `<div class="duelo-ef-res no">✘ No entra: ${_esc(ef.motivo || 'el golpe no hizo daño')}</div>`;
+      else if(ef.aplicado && ef.sinEfecto) estado = `<div class="duelo-ef-res no">✘ Sin efecto${ef.nota ? ' · ' + _esc(ef.nota) : ''}</div>`;   // (Rompe armadura a quien no tiene armadura, 2026-10-29)
+      else if(ef.aplicado) estado = `<div class="duelo-ef-res ok">✔ Aplicado${ef.nota ? ' · ' + _esc(ef.nota) : ''}</div>`;
+      else if(ef.res && !ef.res.exito) estado = `<div class="duelo-ef-res no${nuevo ? ' nuevo' : ''}">✘ No funcionó <span>(${ef.res.manual ? '✍ a mano' : `salió ${_fmt(ef.res.dado)} en 1d${_fmt(ef.caras)}`})</span></div>`;
+      else if(ef.res || (!necesitaTiradaEf(ef) && siempreEf(ef))){
+        const cab = ef.res ? `<div class="duelo-ef-res ok${nuevo ? ' nuevo' : ''}">✔ ¡FUNCIONÓ! ${siempreEf(ef) ? '' : `<span>(${ef.res.manual ? '✍ a mano' : `salió ${_fmt(ef.res.dado)} en 1d${_fmt(ef.caras)}`})</span>`}${ef.res && ef.res.extra ? ` <span>· ${_esc(ef.dado)} = <b>${_fmt(ef.res.extra.total)}</b></span>` : ''}</div>` : `<div class="duelo-ef-res ok">Entra siempre</div>`;
+        let acc;
+        if(ef.aplicar === 'pedido' || ef.aplicar === 'en-curso') acc = `<div class="duelo-nota">Aplicando sobre ${_esc(spec && spec.nombre === 'Desafiante' ? d.atacante.nombre : d.defensor.nombre)}…</div>`;
+        else if(!puedeAtq) acc = `<div class="duelo-nota">esperando que ${_esc(d.atacante.nombre)} lo aplique…</div>`;
+        else if(spec){
+          // Los stacks de más que suma quien atacó (Guantes del envenenador, 2026-10-05): el botón ya dice cuántos van a llegar.
+          let extra = 0;
+          try{ extra = cfgEscuchar.stacksExtra ? Math.max(0, Math.round(_num(cfgEscuchar.stacksExtra(d, spec)))) : 0; }catch(err){ extra = 0; }
+          const pre = ((typeof EstadosAplicar !== 'undefined' && EstadosAplicar.DEBUFFS) || []).find(x => x.nombre === spec.nombre) || {};
+          const base = Math.max(1, _num(spec.stacks) || _num(pre.stacks) || 1);
+          const txt = extra ? `${spec.nombre} ×${base + extra} (${base} + ${extra} del envenenador)` : EstadosAplicarTexto(spec, ef);
+          const quien = spec.nombre === 'Desafiante' ? d.atacante.nombre : d.defensor.nombre;   // 😤 el Desafiante es de quien provoca (2026-10-27)
+          acc = `<button type="button" data-ef-aplicar="${i}">✔ Aplicar ${_esc(txt)} sobre ${_esc(quien)}</button>`;
+        }
+        else acc = `<div class="duelo-nota">✋ A mano: ${_esc(ef.detalle || 'aplicalo vos, no hay un estado automático para este efecto')}</div><button type="button" data-ef-mano="${i}">Listo, lo apliqué a mano</button>`;
+        estado = cab + acc;
+      }
+      else if(puedeAtq && !conDado.length) estado = `<button type="button" data-ef-tirar="${i}">🎲 Tirar ${siempreEf(ef) ? _esc(ef.dado) : '1d' + _fmt(ef.caras)}</button><div class="duelo-nota">${siempreEf(ef) ? '' : 'de ' + _fmt(ef.caras - ef.exitos + 1) + (ef.exitos > 1 ? ' a ' + _fmt(ef.caras) : '') + ' funciona · '}${ef.requiereDano ? 'necesita que el golpe haga daño' : 'entra aunque no pase el daño'}</div>`;
+      else estado = `<div class="espera duelo-nota">esperando que ${_esc(d.atacante.nombre)} tire…</div>`;
+      return `<div class="duelo-ef"><div class="duelo-ef-top"><b>${_esc(ef.nombre)}</b><span class="duelo-ef-prob">${_esc(prob)}</span></div>${ef.detalle ? `<div class="duelo-nota">${_esc(ef.detalle)}</div>` : ''}${estado}</div>`;
+    }).join('');
+    const contraCard = contraOtro ? `<div class="duelo-ef"><div class="duelo-nota">✋ Se resiste con: ${_esc(contraOtro)}</div></div>` : '';
+    const notaCard = contraCard + (nota ? `<div class="duelo-ef"><div class="duelo-nota">✋ <b>A mano:</b> ${_esc(nota)}</div></div>` : '')
+      + (notaCritico ? `<div class="duelo-ef"><div class="duelo-nota">⚡ Crítico: ${_esc(notaCritico)}</div></div>` : '');
+    const pendiente = d.fase === 'efectos' && efs.length;
+    return `<div class="duelo-paso"><h4><span class="n">${d.hab ? (d.hab.sinOposicion ? 2 : d.hab.dano ? 4 : 3) : 6}</span>${d.hab ? 'Efectos de la habilidad' : 'Efectos del golpe'}</h4>${notaCard}${tablero}${cards}${pendiente && puedeAtq ? '<div class="duelo-pie" style="margin-top:8px"><button type="button" class="sec" data-ef-terminar>Terminar sin resolver los que faltan</button></div>' : ''}</div>`;
+  }
+  const EstadosAplicarTexto = (spec, ef) => spec.cura ? `Curación de ${spec.cura} HP` : (typeof EstadosAplicar !== 'undefined' ? EstadosAplicar.texto(spec) : spec.nombre) + (spec.nombre === 'Armadura rota' && spec.stacks > 1 ? ` ×${spec.stacks}` : '');
+
+  // Paso 5 · Daño: la tirada del arma, la cuenta y, cuando el GM lo aplica, el número grande y la vida.
+  function danoHtml(d){
+    const dn = d.dano;
+    const crit = d.resultado === 'pego' && d.crit && d.crit.critico;
+    const mult = crit ? d.crit.mult : 1;
+    const arma = d.ataque.armaNombre ? ` · ${_esc(d.ataque.armaNombre)}` : '';
+    let cuerpo;
+    if(!dn){
+      const soyAtq = esMio(d.atacante) && (cfgEscuchar.relay || (hooks() && hooks().soy && hooks().soy(d.atacante)));
+      if(soyAtq) cuerpo = `<div style="text-align:center"><button type="button" data-dano-tirar>🎲 Tirar el daño${arma}${d.hab ? (d.hab.dano && d.hab.dano.formula ? ` · ${_esc(d.hab.dano.formula)}${d.hab.dano.extra && d.hab.dano.extra.formula ? ` + ${_esc(d.hab.dano.extra.formula)} de ${_esc(d.hab.dano.extra.tipo || 'fuego')}` : ''}` : '') : vistaBoton(d, 'dano')}</button>${flashHtml(d, 'dano')}<div class="duelo-nota" style="margin-top:6px">${crit ? `Es crítico: todo el daño se multiplica ×${mult} y va derecho a la vida (no se resta la Defensa).` : d.resultado === 'mitad' ? 'Pasa la mitad: (daño − Defensa) ÷ 2, redondeado para arriba.' : (d.hab && d.hab.dano && d.hab.dano.ignoraDef ? `Daño ${_esc(d.hab.dano.tipo)}: ignora la Defensa, no critica y va derecho a la vida.` : 'Se le resta la Defensa del defensor.')}</div></div>${manualHtml(d, 'dano')}`;
+      else if(puedoAMano(d.atacante)) cuerpo = `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire el daño…</div>
+        <div class="duelo-man"><input type="number" min="1" data-manual="dano" placeholder="daño" value="${_esc(manual.dano || '')}"><button type="button" class="sec" data-tirarpor="dano">🎲 Tirar a mano</button></div>${manualHtml(d, 'dano')}`;
+      else cuerpo = `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.atacante.nombre)} tire el daño…</div>`;
+    }else{
+      const defMan = dn.defensaManual === 'no' ? ' · ✍ sin restar Defensa' : dn.defensaManual !== undefined && dn.defensaManual !== null ? ` · ✍ Defensa ${_fmt(_num(dn.defensaManual))} (a mano)` : '';
+      // La tirada, a la vista (2026-10-24, dueño: «en el paso 5 se ve muy poco clara la tirada y el resultado del daño»): el total grande y cada dado.
+      const dados = (dn.rolls || []).map(r => `<span class="duelo-dadito">${_esc(String(r))}</span>`).join('')
+        + (_num(dn.mod) ? `<span class="duelo-dadito mod">${_num(dn.mod) > 0 ? '+' : '−'}${_fmt(Math.abs(_num(dn.mod)))}</span>` : '');
+      const tiro = `<div class="duelo-danotiro"><span class="t">🎲 Daño${arma}${defMan}</span><span class="n">${_fmt(dn.crudo)}</span>${dados ? `<span class="dados">${dados}</span>` : ''}<span class="f">${_esc(dn.formula || '')}</span></div>`;
+      // ☄ El segundo daño (el fuego del Meteoro, o el elemental de un arma), a la vista también antes de aplicarlo (2026-10-24: no se veía hasta el final).
+      const mgAntes = dn.magico ? `<div class="duelo-mini" style="color:#9cc7ff">${magIcono(dn.magico.tipo)} ${_esc(magTitulo(dn.magico.tipo))}: <b>${_fmt(dn.magico.total)}</b> (${_esc(dn.magico.formula || '')})${_esc(magMult(dn.magico))} · directo: no lo frena la Defensa ni se multiplica; sí la resistencia a ese elemento</div>` : '';
+      if(!dn.aplicado && pideAceptar(d) && !dn.aceptado){
+        // 💔 Lo que pasó, antes de descontarlo: «tanto de daño, menos tu Defensa» y el botón (el dueño) o la espera (el resto; el GM, «por él»).
+        const ignora = d.hab && d.hab.dano && d.hab.dano.ignoraDef;
+        const suyo = esMio(d.defensor), tu = suyo ? 'tu' : 'su';
+        // El resultado con el número grande, como después de aplicarlo (2026-10-24, dueño: «destacarlo un poco mejor»).
+        const fuerte = crit || ignora, total = crit ? dn.crudo * mult : dn.crudo;
+        const que = crit ? `Crítico ×${mult} (${_fmt(dn.crudo)} × ${mult}): no se resta ${tu} Defensa.`
+          : ignora && d.hab.dano.trueDamage ? `de daño ${_esc(d.hab.dano.tipo || 'especial')}: True Damage, no lo frena nada.`
+          : ignora && d.hab.dano.directo ? `de daño ${_esc(d.hab.dano.tipo || 'especial')}, directo: no lo frena ${tu} Defensa especial (sí ${tu}s resistencias a ese elemento, ${suyo ? 'si tenés' : 'si tiene'}).`   // (2026-10-24: Ráfaga arcana decía que la frenaba)
+          : ignora ? `de daño ${_esc(d.hab.dano.tipo || 'especial')} (lo frenan ${tu} Defensa especial y ${tu}s resistencias, ${suyo ? 'si tenés' : 'si tiene'}).`
+          : d.resultado === 'mitad' ? `Pasa la mitad: (${_fmt(dn.crudo)} − ${tu} Defensa) ÷ 2, redondeado para arriba.`
+          : `de daño, menos ${tu} Defensa.`;
+        // 🧮 (2026-10-28) Que se sepa que no es lo que entra: lo frenan la Defensa y lo demás, y al aplicarlo se ve la cuenta completa.
+        const frenan = ignora && d.hab.dano.trueDamage ? '' : `<div class="duelo-danosub" style="font-size:12px;color:#9fb6e8;margin-top:6px">Esto es lo que tiró: antes de llegar a la vida lo ${crit ? 'frenan solo' : ignora ? 'frenan la Defensa especial, las resistencias' : 'frena la Defensa'}${crit ? (suyo ? ' tus escudos o tu Vida extra, si tenés' : ' sus escudos o su Vida extra, si tiene') : (suyo ? ' (y tus escudos o tu Vida extra, si tenés)' : ' (y sus escudos o su Vida extra, si tiene)')}. Al aplicarlo se ve la cuenta, renglón por renglón.</div>`;
+        cuerpo = tiro + `<div class="duelo-danobox${fuerte ? ' crit' : ''}"><div class="duelo-danonum${fuerte ? ' rojo' : ''}" style="font-size:72px">${_fmt(total)}</div>${fuerte ? '<div class="duelo-danosub rojo" style="font-size:20px">DERECHO A LA VIDA</div>' : ''}<div class="duelo-danosub" style="font-size:14px">${que}</div>${frenan}</div>${mgAntes}`
+          + (suyo ? `<div style="text-align:center;margin-top:8px"><button type="button" data-dano-aceptar>💔 Aplicar el daño</button><div class="duelo-nota" style="margin-top:6px">⚙ Al tocarlo se descuenta solo de tu vida (y se ve cómo queda).</div></div>`
+            : `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.defensor.nombre)} aplique el daño…</div>${soyGM() ? `<div style="text-align:center;margin-top:6px"><button type="button" class="sec" data-dano-aceptar>💔 Aplicar por ${_esc(d.defensor.nombre)}</button></div>` : ''}`);
+      }else if(!dn.aplicado){
+        cuerpo = tiro + `<div class="duelo-mini">${crit ? `×${mult} = <b>${_fmt(dn.crudo * mult)}</b> derecho a la vida…` : 'Calculando lo que pasa con la Defensa…'}</div>${mgAntes}
+          <div class="duelo-nota" style="text-align:center">${soyGM() ? 'Aplicando el daño al HP…' : 'El GM aplica el daño al HP.'}</div>
+          ${soyGM() ? `<div class="duelo-man"><input type="number" min="0" data-manual="recibido" placeholder="daño recibido" value="${_esc(manual.recibido || '')}"><button type="button" class="sec" data-aplicar-mano>Ya lo apliqué a mano</button></div>` : ''}`;
+      }else{
+        const golpe = _num(dn.golpe);
+        let grande;
+        if(dn.invulnerable) grande = `<div class="duelo-danonum inv">INVULNERABLE</div><div class="duelo-danosub">El golpe no hizo nada</div>`;
+        else if(dn.manual) grande = `<div class="duelo-danonum">${_fmt(golpe)}</div><div class="duelo-danosub">de daño — <b>aplicalo a mano</b> (${_esc(dn.motivoManual || 'no se pudo aplicar solo')})</div>`;
+        // 🧮 Con la cuenta: el número grande es lo que entró a la vida; cómo se llegó, abajo, renglón por renglón.
+        else if(tieneCuenta(dn)) grande = `<div class="duelo-danonum${dn.ignoraDef ? ' rojo' : ''}">${_fmt(dn.recibido)}</div><div class="duelo-danosub">de daño entró a la vida de ${_esc(d.defensor.nombre)}</div>`;
+        // (una habilidad física que sale crítica va por el renglón del crítico, el de abajo)
+        else if(dn.ignoraDef && d.hab && !(d.crit && d.crit.critico)) grande = `<div class="duelo-danonum rojo">${_fmt(golpe)}</div><div class="duelo-danosub rojo">DERECHO A LA VIDA</div><div class="duelo-danosub">daño ${_esc(d.hab.dano ? d.hab.dano.tipo : 'mágico')}${dn.cargaMult ? ` · ${_esc(dn.cargaMult)}` : ''} · ignora la Defensa y no critica${dn.freno ? ` · lo frenan: ${_esc(dn.freno)} → entran ${_fmt(_num(dn.recibido) + _num(dn.absorbido))}` : ''}</div>`;
+        else if(dn.ignoraDef) grande = `<div class="duelo-danonum rojo">${_fmt(golpe)}</div><div class="duelo-danosub rojo">DERECHO A LA VIDA</div><div class="duelo-danosub">${_fmt(dn.crudo)} × ${_fmt(dn.mult)} · el crítico ignora la Defensa</div>`;
+        else if(dn.mitad) grande = `<div class="duelo-danonum">${_fmt(dn.recibido)}</div><div class="duelo-danosub">de daño (la mitad de ${_fmt(dn.crudo)} − Defensa ${_fmt(dn.defensa)}, redondeada para arriba${dn.freno ? `; además − ${_esc(dn.freno)}` : ''})</div>`;
+        else grande = `<div class="duelo-danonum">${_fmt(dn.recibido)}</div><div class="duelo-danosub">de daño (${_fmt(dn.crudo)} − ${_esc(defTxt(dn))}${dn.freno ? ` − ${_esc(dn.freno)}` : ''})</div>`;
+        const conCuenta = tieneCuenta(dn) && !dn.manual;
+        const vida = dn.hpAntes !== undefined && dn.hpAntes !== null && dn.hpDespues !== undefined && dn.hpDespues !== null
+          ? conCuenta ? `<div class="duelo-mini">${_esc(d.defensor.nombre)}: <b>${_fmt(dn.hpAntes)}</b> → <b>${_fmt(dn.hpDespues)}</b> HP</div>`
+          : `<div class="duelo-mini">${_esc(d.defensor.nombre)}: <b>${_fmt(dn.hpAntes)}</b> → <b>${_fmt(dn.hpDespues)}</b> HP${_num(dn.absorbido) ? ` · el escudo absorbió ${_fmt(dn.absorbido)}` : ''}${_num(dn.mitiMiti) > 0 ? ` · 🛡 ${_esc(dn.mitiMitiNombre || 'su protector')} se llevó ${_fmt(dn.mitiMiti)} (${_esc(dn.mitiMitiTxt || 'Miti-Miti')})` : ''}</div>` : '';
+        const esp = dn.espinas ? `<div class="duelo-mini" style="color:#8fe3a9">🌵 Espinas: ${_esc(dn.espinas.quien || d.atacante.nombre)} recibe <b>${_fmt(dn.espinas.monto)}</b> de daño devuelto (1/4 del daño del golpe, directo a la vida)${dn.espinas.manual ? ' — <b>aplicalo a mano</b>' + (dn.espinas.motivo ? ' (' + _esc(dn.espinas.motivo) + ')' : '') : (dn.espinas.hpAntes !== undefined && dn.espinas.hpAntes !== null ? ` · ${_fmt(dn.espinas.hpAntes)} → ${_fmt(dn.espinas.hpDespues)} HP` : '')}</div>` : '';
+        const ej = dn.espejo ? `<div class="duelo-mini" style="color:#c9b8ff">🪞 Espejo: ${_esc(dn.espejo.quien || d.atacante.nombre)} recibe <b>${_fmt(dn.espejo.monto)}</b> de daño devuelto (1/4 del daño especial, directo a la vida)${dn.espejo.manual ? ' — <b>aplicalo a mano</b>' + (dn.espejo.motivo ? ' (' + _esc(dn.espejo.motivo) + ')' : '') : (dn.espejo.hpAntes !== undefined && dn.espejo.hpAntes !== null ? ` · ${_fmt(dn.espejo.hpAntes)} → ${_fmt(dn.espejo.hpDespues)} HP` : '')}</div>` : '';
+        const dr = dn.drena ? `<div class="duelo-mini" style="color:#8fe3a9">🩸 Drena: ${_esc(dn.drena.quien || d.atacante.nombre)} se cura <b>${_fmt(dn.drena.monto)}</b>${dn.drena.manual ? ' — <b>aplicalo a mano</b>' + (dn.drena.motivo ? ' (' + _esc(dn.drena.motivo) + ')' : '') : `${dn.drena.hpAntes !== undefined && dn.drena.hpAntes !== null ? ` · ${_fmt(dn.drena.hpAntes)} → ${_fmt(dn.drena.hpDespues)} HP` : ''}${_num(dn.drena.excedente) ? ` · Vida extra ${_fmt(dn.drena.excedente)}` : ''}${dn.drena.nota ? ' · ' + _esc(dn.drena.nota) : ''}`}</div>` : '';
+        const mg = dn.magico ? `<div class="duelo-mini" style="color:#9cc7ff">${magIcono(dn.magico.tipo)} ${_esc(magTitulo(dn.magico.tipo))}: <b>${_fmt(dn.magico.total)}</b> (${_esc(dn.magico.formula || '')})${_esc(magMult(dn.magico))} · ignora la Defensa, sin multiplicar${dn.magico.resEl ? ` · − ${_esc(dn.magico.resEl)}` : ''}${dn.magico.recibido !== undefined ? ` · recibió <b>${_fmt(dn.magico.recibido)}</b>` : ''}${dn.magico.hpDespues !== undefined ? ` · ${_fmt(dn.magico.hpAntes)} → ${_fmt(dn.magico.hpDespues)} HP` : ''}</div>` : '';
+        const pd = dn.porDano ? `<div class="duelo-mini" style="color:#9cc7ff">✨ ${_esc(dn.porDano.estado)} ×${_fmt(dn.porDano.stacks)} (por ${_fmt(dn.porDano.entro)} de daño${dn.porDano.regla ? ': ' + _esc(dn.porDano.regla) : ''})${dn.porDano.nota ? ' · ' + _esc(dn.porDano.nota) : ''}${dn.porDano.manual ? ' — <b>aplicalo a mano</b>' : ''}</div>` : '';
+        cuerpo = tiro + `<div class="duelo-danobox${dn.ignoraDef ? ' crit' : ''}">${grande}</div>${conCuenta && !dn.invulnerable ? cuentaHtml(dn) : ''}${vida}${mg}${pd}${esp}${ej}${dr}`;
+      }
+    }
+    return `<div class="duelo-paso"><h4><span class="n">5</span>Daño</h4>${cuerpo}</div>`;
+  }
+  // Tabla de valores del d20 para el multiplicador, a la vista ANTES de tirar. Si hay Crítico potente, dice cuánto se movió cada umbral y por qué.
+  function tablaCriticoHtml(c, d, mejor){
+    const P = Math.max(0, Math.round(_num(c.potente)));
+    const u = Critico.umbrales(P), b = Critico.umbrales(0);
+    const filas = [['×2', 'DOBLE DAÑO', b.doble, u.doble, P, 1], ['×3', 'TRIPLE DAÑO', b.triple, u.triple, Math.floor(P / 2), 2], ['×4', 'CUÁDRUPLE DAÑO', b.cuadruple, u.cuadruple, Math.floor(P / 3), 3]];
+    const gano = mejor ? (mejor >= u.cuadruple ? 2 : mejor >= u.triple ? 1 : mejor >= u.doble ? 0 : -1) : -2;
+    const cambia = P > 0;
+    const razones = cambia ? `<div class="duelo-nota" style="margin-top:6px">🔧 <b>Tabla modificada:</b> ${_esc(d.atacante.nombre)} tiene <b>Crítico potente ${_fmt(P)}</b>${_num(c.potente) ? ' (de su equipo, habilidades o estados)' : ''}. Cada punto baja <b>1</b> el número del doble daño (hasta un mínimo de 1), <b>1 cada 2 puntos</b> el del triple y <b>1 cada 3 puntos</b> el del cuádruple. Por eso: doble ${b.doble} → <b>${u.doble}</b>${P >= 2 ? `, triple ${b.triple} → <b>${u.triple}</b>` : ''}${P >= 3 ? `, cuádruple ${b.cuadruple} → <b>${u.cuadruple}</b>` : ''}.</div>` : `<div class="duelo-nota" style="margin-top:6px">Tabla base (sin Crítico potente).</div>`;
+    return `<table class="duelo-tabla"><thead><tr><th>Multiplicador</th><th>Sale con el mejor d20 de…</th>${cambia ? '<th>Base</th>' : ''}</tr></thead><tbody>
+      ${filas.map((f, i) => `<tr class="${gano === i ? 'gano' : ''}${f[3] !== f[2] ? ' mod' : ''}"><td>${f[0]} · ${f[1]}</td><td><b>${f[3] >= 20 && i === 2 ? '20' : f[3] + ' o más'}</b>${f[3] !== f[2] ? ' ✎' : ''}</td>${cambia ? `<td>${f[2] >= 20 && i === 2 ? '20' : f[2] + ' o más'}</td>` : ''}</tr>`).join('')}
+      <tr class="${gano === -1 ? 'gano' : ''}"><td>×1 · sin multiplicador</td><td>menos de ${u.doble}</td>${cambia ? `<td>menos de ${b.doble}</td>` : ''}</tr></tbody></table>${razones}`;
+  }
+
+  // Paso 4 · Crítico: la cuenta, los d20 y (si sale) la celebración.
+  // Fase 'dodge' (Paso 4/7 del casteo, hechizo de área): el defensor ganó la Evasión y tiene el derecho a moverse
+  // hasta 2 casilleros para intentar salir del área. El movimiento en sí no pasa por acá (ya cuesta No2 arrastrando
+  // el token, como siempre): esto solo espera a que alguien diga "ya elegí" y revisa si logró salir.
+  function dodgeHtml(d, nuevo){
+    const puedeMapa = !!(cfgEscuchar && cfgEscuchar.chequearDodge);
+    const puedeAMano = esMio(d.defensor) || soyGM();
+    const tormenta = d.hab && d.hab.soloDodge;   // Tormenta arcana: no hubo tirada, el dodge roll es la única salida
+    const meteoro = tormenta && d.hab.meteoro;   // ☄ el Meteoro
+    return `<div class="duelo-veredicto pego${nuevo ? ' nuevo' : ''}">
+      <div class="grande">${meteoro ? '☄ ¡CAE EL METEORO!' : tormenta ? '🌩 ¡CAE LA TORMENTA!' : '🏃 ¡GANÓ LA EVASIÓN!'}</div>
+      ${meteoro && d.hab.dano ? `<div class="chico">Si ${_esc(d.defensor.nombre)} sigue adentro le tocan <b>${_esc(d.hab.dano.formula)}</b> de daño físico (lo frena la Defensa)${d.hab.dano.extra ? ` y <b>${_esc(d.hab.dano.extra.formula)}</b> de ${_esc(d.hab.dano.extra.tipo)} (directo, menos su resistencia)` : ''}.</div>`
+        : tormenta && d.hab.dano ? `<div class="chico">A ${_esc(d.defensor.nombre)} le tocan <b>${_esc(d.hab.dano.formula)}</b> de daño arcano, directo a la vida, si sigue adentro.</div>` : ''}
+      <div class="chico">${_esc(d.defensor.nombre)} tiene derecho a un <b>dodge roll</b>: hasta 2 casilleros, arrastrando el token en el mapa (ya cuesta No2 solo, con Rengo/Inmovilizado de siempre). Si logra salir del área, no recibe nada; si sigue adentro por cualquier motivo, recibe el efecto completo — no hay término medio.</div>
+      ${puedeMapa ? '<div class="duelo-contra" style="text-align:center;margin-top:10px"><button type="button" data-dodge-resolver>▶ Ya se movió (o decidió no hacerlo): revisar</button></div>' : ''}
+      ${puedeAMano ? `<div class="duelo-nota" style="margin:8px 0 4px">${puedeMapa ? 'O a mano, si ya sabés el resultado:' : 'Se revisa mejor desde el mapa. A mano:'}</div>
+        <div class="duelo-pie" style="justify-content:center"><button type="button" class="sec" data-dodge-manual="1">✔ Logró esquivar</button><button type="button" class="sec" data-dodge-manual="0">✘ Sigue adentro</button></div>` : ''}
+      ${!puedeMapa && !puedeAMano ? '<div class="duelo-nota">esperando que se resuelva el dodge roll…</div>' : ''}
+    </div>`;
+  }
+  // Cuadraditos del crítico (2026-09-27, pedido del dueño — hacer visible la cuenta abstracta de PdG/Evasión/Tipo/
+  // rango/resistencia). Arriba, el Tipo del arma en cuadrados: los que se pierden por Crítico frecuente quedan
+  // atenuados, el resto (el rango real) queda entero. Abajo, la tirada de PdG completa (no la diferencia — el
+  // dueño pidió ver el total real): lo que se come la Evasión/Parry en rojo con una «E», y lo que queda se agrupa
+  // de a «rango» — cada grupo entero es un nivel de crítico (azul); los que anula la Resistencia a crítico quedan
+  // tachados cuadradito por cuadradito (no con una línea por encima de todo el grupo); lo que sobra sin llegar a
+  // un grupo entero queda gris, suelto. Las dos filas se reordenan de a 5 (pedido del dueño, para contar de un
+  // vistazo) y abajo hay una leyenda con lo que significa cada color/símbolo.
+  function criticoVizHtml(d){
+    const c = d.crit;
+    const tipo = Math.max(1, Math.round(_num(d.ataque.tipoDado)));
+    const rango = Math.max(1, Math.round(_num(c.rango)));
+    const evaTotal = Math.max(0, Math.round(_num(d.eva.total)));
+    const pdgTotal = Math.max(0, Math.round(_num(d.pdg.total)));
+    const nivel = Math.max(0, Math.round(_num(c.nivel)));
+    const resistencia = Math.max(0, Math.round(_num(c.resistencia)));
+    const nombreDef2 = d.defensa && d.defensa.modo === 'parry' ? 'Parry' : 'Evasión';
+    const cuad = (cls, txt) => `<div class="duelo-crit-cuad ${cls || ''}">${txt || ''}</div>`;
+    // Agrupados de a 5 (pedido del dueño, para contar fácil de un vistazo) — el hueco extra cada 5 es solo
+    // visual, no cambia nada del cálculo (el color/tachado de cada cuadradito ya dice lo que corresponde).
+    const deA5 = arr => { const out = []; for(let i = 0; i < arr.length; i += 5) out.push(`<div class="duelo-crit-cinco">${arr.slice(i, i + 5).join('')}</div>`); return out.join(''); };
+
+    // Fila del Rango: los cuadraditos que resta el Crítico frecuente van en verde con una «F» (pedido del dueño).
+    const nFrec = Math.max(0, tipo - rango);
+    // Los que quedan llevan la mira (dueño, 2026-10-12: «los recuadros vacíos podrían estar con el ícono de la mira, el círculo con las cuatro rayitas»).
+    const MIRA = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="4.6"/><path d="M8 1v3.2M8 11.8V15M1 8h3.2M11.8 8H15"/></svg>';
+    const filaTipo = deA5(Array.from({length: tipo}, (_, i) => i < nFrec ? cuad('frec', 'F') : cuad('mira', MIRA)));
+
+    // La tirada, agrupada de a «rango» (2026-09-28, el dueño volvió a este agrupado en vez de a 5: cada grupo
+    // entero es un nivel de crítico, así se cuentan de un vistazo). Primero lo que come la Evasión/Parry (rojo,
+    // «E», de a 5 porque no es un nivel); los grupos que anula la Resistencia quedan tachados cuadradito por
+    // cuadradito.
+    const grupos = [];
+    const nEva = Math.min(evaTotal, pdgTotal);
+    for(let i = 0; i < nEva; i += 5) grupos.push(Array.from({length: Math.min(5, nEva - i)}, () => cuad('eva', 'E')));
+    let quedan = Math.max(0, pdgTotal - evaTotal), grupo = 0, huboAnulado = false, huboSuelto = false;
+    while(quedan >= rango){
+      grupo++;
+      const anulado = grupo > nivel - resistencia && grupo <= nivel;
+      if(anulado) huboAnulado = true;
+      grupos.push(Array.from({length: rango}, () => cuad(anulado ? 'anulado' : 'activo')));
+      quedan -= rango;
+    }
+    if(quedan > 0){ huboSuelto = true; grupos.push(Array.from({length: quedan}, () => cuad('suelto'))); }
+    const filaTirada = grupos.map(g => `<div class="duelo-crit-cinco">${g.join('')}</div>`).join('');
+
+    const leyenda = [
+      `${cuad('mira', MIRA)}<span>= el rango del crítico: cuántos puntos de diferencia hacen falta para cada nivel</span>`,
+      nFrec ? `${cuad('frec', 'F')}<span>= Crítico frecuente (${_fmt(nFrec)}): se resta del Tipo y achica el rango</span>` : '',
+      evaTotal ? `${cuad('eva', 'E')}<span>= tirada de ${_esc(nombreDef2)}</span>` : '',
+      `${cuad('activo')}<span>= cuenta para un nivel de crítico</span>`,
+      huboAnulado ? `${cuad('anulado')}<span>= anulado por Resistencia a crítico (Tipo ${_fmt(tipo)})</span>` : '',
+      huboSuelto ? `${cuad('suelto')}<span>= no llega a completar un nivel</span>` : '',
+    ].filter(Boolean).map(t => `<div class="duelo-crit-ref">${t}</div>`).join('');
+
+    return `<div class="duelo-crit-viz">
+      <div class="duelo-crit-viz-tit">Rango del crítico: Tipo ${_fmt(tipo)}${tipo !== rango ? ` − Crítico frecuente = ${_fmt(rango)}` : ''}</div>
+      <div class="duelo-crit-fila">${filaTipo}</div>
+      <div class="duelo-crit-viz-tit">Tu tirada: PdG ${_fmt(pdgTotal)}${evaTotal ? ` − ${_esc(nombreDef2)} ${_fmt(evaTotal)}` : ''}</div>
+      <div class="duelo-crit-fila">${filaTirada}</div>
+      <div class="duelo-crit-leyenda">${leyenda}</div>
+    </div>`;
+  }
+  function criticoHtml(d){
+    const c = d.crit;
+    const nombreDef = d.defensa && d.defensa.modo === 'parry' ? 'Parry' : 'Evasión';
+    const cuenta = `PdG ${_fmt(d.pdg.total)} − ${nombreDef} ${_fmt(d.eva.total)} = ${_fmt(c.diferencia)} · rango del crítico ${_fmt(c.rango)} (Tipo ${_fmt(_num(d.ataque.tipoDado))}${_num(c.frecuente) ? ' − Crít. frecuente ' + _fmt(c.frecuente) : ''}) → nivel ${_fmt(c.nivel)}${_num(c.resistencia) ? ` − resistencia ${_fmt(c.resistencia)}` : ''}`;
+    // Lo primero que se lee es el veredicto en grande; la cuenta que lo explica va debajo, en renglones.
+    const titulo = (clase, txt) => `<div class="duelo-crit-titulo ${clase}">${txt}</div>`;
+    const explica = lineas => `<div class="duelo-crit-explica">${lineas.map(l => `<div>${_esc(l)}</div>`).join('')}</div>`;
+    const ignoraResistCrit = _num(d.ataque && d.ataque.mods && d.ataque.mods.ignoraResistCrit);
+    const critBono = _num(d.ataque && d.ataque.mods && d.ataque.mods.critBono);
+    const critpotBono = _num(d.ataque && d.ataque.mods && d.ataque.mods.critpotBono);
+    const nombreHab = d.hab ? d.hab.nombre : d.ataque.habNombre || 'Esta habilidad';
+    const lCuenta = [`PdG ${_fmt(d.pdg.total)} − ${nombreDef} ${_fmt(d.eva.total)} = ${_fmt(c.diferencia)} de diferencia`,
+      `Rango del crítico: ${_fmt(c.rango)} (Tipo ${_fmt(_num(d.ataque.tipoDado))}${_num(c.frecuente) ? ' − Crítico frecuente ' + _fmt(c.frecuente) : ''})`,
+      ...(ignoraResistCrit ? [`${_esc(nombreHab)} ignora ${_fmt(ignoraResistCrit)} de Resistencia a crítico del defensor.`] : []),
+      ...(critBono ? [`${_esc(nombreHab)} suma +${_fmt(critBono)} a tu Crítico frecuente, solo en esta tirada.`] : []),
+      ...(critpotBono ? [`${_esc(nombreHab)} suma +${_fmt(critpotBono)} a tu Crítico potente, solo en esta tirada.`] : []),
+      ...(d.ataque && d.ataque.tiro && (d.ataque.tiro.crit || d.ataque.tiro.critpot || d.ataque.tiro.ignora) ? [`🏹 ${_esc(d.ataque.tiro.motivo)}: ${_esc(tiroTxt(d.ataque.tiro))}.`] : []),
+      ...(_num(d.critDatos && d.critDatos.ignora) ? [`${_esc(d.ataque.armaNombre || 'El arma')} ignora ${_fmt(d.critDatos.ignora)} de Resistencia a crítico del defensor.`] : []),
+      ...(_num(c.d20extra) ? [`${_esc(d.ataque.armaNombre || 'El arma')} tira ${_fmt(c.d20extra)} d20 más en el crítico.`] : []),
+      ...(_num(d.ataque && d.ataque.espalda && d.ataque.espalda.critpot) ? [`Por la espalda: +${_fmt(d.ataque.espalda.critpot)} a tu Crítico potente.`] : []),
+      `Nivel del crítico: ${_fmt(c.nivel)}${_num(c.resistencia) ? ` − Resistencia a crítico ${_fmt(c.resistencia)} = ${_fmt(c.dados)} d20` : ''}`];
+    let cuerpo;
+    const viz = criticoVizHtml(d);
+    if(!c.critico){
+      const anulado = c.nivel > 0 && c.dados <= 0;
+      cuerpo = titulo('no', c.blindado ? '🛡 CRÍTICO ANULADO' : '✘ NO ES CRÍTICO')
+        + explica([c.blindado ? `🛡 ${(d.defensor && d.defensor.nombre) || 'El defensor'} tiene Blindado: el golpe iba a ser crítico, pero entra como uno normal.`
+          : anulado ? `La Resistencia a crítico (${_fmt(c.resistencia)}) del defensor anuló el crítico.` : `La diferencia (${_fmt(c.diferencia)}) no alcanza el rango del crítico (${_fmt(c.rango)}).`, ...lCuenta])
+        + viz;
+    }else if(!c.d20){
+      const puede = esMio(d.atacante) || soyGM();
+      cuerpo = titulo('posible', '💥 ' + tituloNivel(_num(c.dados)))
+        + explica([`Ya es crítico y el golpe ignora la Defensa. Se tiran ${_fmt(c.dados)} d20 y el mejor decide cuánto se multiplica el daño.`, ...lCuenta])
+        + viz
+        + tablaCriticoHtml(c, d, 0)
+        + `<div class="duelo-contra" style="text-align:center">${puede ? `<button type="button" data-critico>🎲 Tirar ${_fmt(c.dados)} d20</button>` : `<div class="espera duelo-nota">esperando que ${_esc(d.atacante.nombre)} tire el crítico…</div>`}</div>`
+        + (puede ? manualCriticoHtml(d) : '');
+    }else{
+      // Los d20 como fichas: el más alto destaca con ondas concéntricas.
+      const nuevoD20 = !revelado[d.id + ':d20']; revelado[d.id + ':d20'] = true;
+      const iMejor = c.d20.indexOf(c.mejor);
+      const fichas = `<div class="duelo-d20s">${c.d20.map((x, i) => `<div class="duelo-d20${(c.supercritico ? x === 20 : i === iMejor) ? ' mejor' : ''}${nuevoD20 ? ' nuevo' : ''}" style="animation-delay:${(i * 0.12).toFixed(2)}s">${_fmt(x)}</div>`).join('')}</div>`;
+      cuerpo = titulo('si', c.supercritico ? `🌟 ¡SUPERCRÍTICO! ×${_fmt(c.mult)} · ${_fmt(c.supercritico)} VEINTES NATURALES` : `💥 ¡CRÍTICO! ×${_fmt(c.mult)} · ${NOMBRE_MULT[c.mult]}`)
+        + fichas
+        + explica([c.supercritico
+            ? `d20: salieron ${_fmt(c.supercritico)} veintes naturales. Supercrítico: cada 20 vale ×4 y se suman (${Array(c.supercritico).fill('×4').join(' + ')} = ×${_fmt(c.mult)}), sin importar umbrales ni modificadores.`
+            : `d20: el mejor fue ${_fmt(c.mejor)}${c.mult > 1 ? '' : ': no alcanza a multiplicar, pero SIGUE siendo crítico y el golpe ignora la Defensa'}.`, ...lCuenta])
+        + viz
+        + tablaCriticoHtml(c, d, c.mejor);
+    }
+    return `<div class="duelo-paso"><h4><span class="n">4</span>Crítico</h4>${cuerpo}</div>`;
+  }
+
+  // Cuántas revelaciones con dados tiene el duelo (el contacto, el Bloqueo, la moneda de un empate, los d20 del crítico,
+  // el daño y cada efecto tirado): el cuadro espera a los dados 3D en cada una. La moneda es su propia revelación,
+  // aparte de la de contacto/Bloqueo (que ya contaron al llegar las dos tiradas parejas) — así el cuadro también
+  // espera a que el d6 quede quieto antes de mostrar quién ganó el empate (2026-09-27, pedido del dueño).
+  const nReveal = d => (d.pdg && d.eva ? 1 : 0) + (d.fuerza && d.bloqueo ? 1 : 0)
+    + ((d.contacto && d.contacto.moneda) || (d.bloq && d.bloq.moneda) ? 1 : 0)
+    + (d.crit && d.crit.d20 ? 1 : 0) + (d.dano ? 1 : 0) + (d.efectos || []).filter(e => e && e.res && !siempreEf(e)).length;
+
+  // Espera a que los dados 3D rueden y queden quietos (o un máximo, por si no hay animación) y llama a cb.
+  function esperarDados(cb){
+    let hecho = false, empezo = typeof dados !== 'undefined' && dados.rodando > 0, tMax, tMin;   // si los dados ya están rodando, no hace falta esperar a que «empiecen»
+    const t0 = Date.now();
+    const fin = () => {
+      if(hecho) return;
+      hecho = true;
+      window.removeEventListener('dados-inicio', ini); window.removeEventListener('dados-quietos', quietos);
+      clearTimeout(tMax); clearTimeout(tMin);
+      setTimeout(cb, 400);   // un instante para verlos quietos
+    };
+    const ini = () => { empezo = true; };
+    const quietos = () => { if(empezo) fin(); };
+    window.addEventListener('dados-inicio', ini);
+    window.addEventListener('dados-quietos', quietos);
+    tMin = setTimeout(() => { if(!empezo) fin(); }, 2200);   // los dados no llegaron a empezar: no se espera más
+    tMax = setTimeout(fin, 7000);
+  }
+
+  function dibujar(){
+    const d = actual && actual.dato;
+    const f = document.getElementById('duelo-fondo');
+    if(!d || !f || actual.reteniendo) return;
+    f.querySelectorAll('[data-manual]').forEach(i => { manual[i.dataset.manual] = i.value; });   // conservar lo tipeado a mano
+    f.querySelectorAll('[data-mtirada]').forEach(i => { manual['m:' + d.id + ':' + i.dataset.mtirada] = i.value; });   // ✍ lo escrito en «Elegir manualmente»
+    { const sm = f.querySelector(`[name="mdef-${d.id}"]:checked`), nm = f.querySelector('[data-mdefn]'); if(sm) manual['mdef:' + d.id] = sm.value; if(nm) manual['mdefn:' + d.id] = nm.value; }
+    const nombreAtaque = nombreAtq(d);
+    const nuevaClave = k => { const c = d.id + ':' + k; const nuevo = !revelado[c]; revelado[c] = true; return nuevo; };
+    const contactoListo = !!(d.pdg && d.eva), bloqueoListo = !!(d.fuerza && d.bloqueo);
+    if(!contactoListo) delete revelado[d.id + ':contacto'];   // tras un re-roll, el nuevo resultado vuelve a animarse
+    if(!bloqueoListo) delete revelado[d.id + ':bloqueo'];
+    if(!d.resultado) delete revelado[d.id + ':resultado'];
+    if(!(d.crit && d.crit.d20)) delete revelado[d.id + ':d20'];
+    const nuevoContacto = contactoListo ? nuevaClave('contacto') : false;
+    const nuevoBloqueo = bloqueoListo ? nuevaClave('bloqueo') : false;
+    let cierre = '';
+    const desarmando = desarmePendiente(d);
+    if(desarmando && desarmeEsperaAceptar(d)){
+      const ds = d.ataque.desarme, quien = d[ds.lado], otro = d[ds.lado === 'atacante' ? 'defensor' : 'atacante'];
+      const item = ds.lado === 'atacante' ? ((d.defensa && d.defensa.itemNombre) || 'lo que tenía en la mano') : (d.ataque.armaNombre || 'su arma');
+      const puedo = esMio(quien) || soyGM();
+      cierre = `<div class="duelo-veredicto bloqueado"><div class="grande">🤺 ¡${_esc(quien.nombre)} desarmó a ${_esc(otro.nombre)}!</div><div class="chico">${_esc(otro.nombre)} pierde ${_esc(item)}: sale volando 2 casillas</div>
+        ${puedo ? `<div style="margin-top:14px"><button type="button" class="duelo-aceptar" data-desarme-aceptar>${esMio(quien) ? '✔ Aceptar' : `✔ Aceptar por ${_esc(quien.nombre)}`}</button><div class="chico" style="margin-top:6px;opacity:.85">Al aceptar, el arma sale volando (mirá el mapa)</div></div>` : `<div class="chico" style="margin-top:6px">esperando que ${_esc(quien.nombre)} acepte…</div>`}</div>`;
+    }
+    else if(desarmando) cierre = `<div class="duelo-veredicto bloqueado"><div class="grande">🤺 …</div><div class="chico">Mirá el mapa: ${_esc(d.ataque.desarme.quien || '')} desarma, el arma sale volando</div></div>`;
+    else if(d.estado === 'empate' && d.empate) cierre = empateHtml(d, nuevaClave('empate' + d.empate.par));
+    else if(d.estado === 'cancelado' && d.resultado === 'a-mano') cierre = `<div class="duelo-veredicto mitad"><div class="grande">✋ Terminado a mano</div><div class="chico">Lo que faltaba se resuelve con tiradas a mano en la Mesa</div></div>`;
+    else if(d.resultado && (d.estado === 'resuelto' || d.fase === 'dano' || d.fase === 'efectos')) cierre = veredictoHtml(d, nuevaClave('resultado'));
+    else if(d.estado === 'cancelado') cierre = `<div class="duelo-veredicto fallo"><div class="chico">${d.hab ? 'Cancelado' : 'Duelo cancelado'}</div></div>`;
+    // Fin: cuando ya no queda ninguna reacción, un cartel claro y un botón para cerrarlo. «Duelo» es solo para el
+    // combate cuerpo a cuerpo de siempre (PdG contra Evasión) — una habilidad (d.hab) usa un texto genérico, para
+    // no llamarle "duelo" a un buff sobre uno mismo o un aliado (2026-09-29, pedido del dueño).
+    const nuevoFin = d.estado === 'resuelto' && !desarmando && !revelado[d.id + ':fin'];
+    if(d.estado === 'resuelto' && !desarmando) revelado[d.id + ':fin'] = true;
+    const finHtml = d.estado === 'resuelto' && !desarmando
+      ? `<div class="duelo-fin${nuevoFin ? ' nuevo' : ''}"><div class="grande">🏁 ${d.hab ? 'LISTO' : 'FIN DEL DUELO'}</div><div class="chico">Ya no queda ninguna reacción por resolver.</div><button type="button" data-fin-duelo>${d.hab ? 'Listo, cerrar' : 'Terminar duelo'}</button></div>`
+      : d.estado === 'cancelado' ? `<div class="duelo-fin"><div class="grande">🏁 ${d.resultado === 'a-mano' ? 'TERMINADO A MANO' : d.hab ? 'CANCELADO' : 'DUELO CANCELADO'}</div><button type="button" data-fin-duelo>${d.hab ? 'Cerrar' : 'Terminar duelo'}</button></div>` : '';
+    const puedoCancelar = abierto(d) && (soyGM() || d.creadoPor === yo());
+    const min = f.classList.contains('min');
+    const cajaAntes = f.querySelector('.duelo-caja'), scrollAntes = cajaAntes ? cajaAntes.scrollTop : 0;   // al redibujar no se pierde dónde estaba
+    const mostrarBloqueo = d.fase === 'bloqueo' || !!d.bloq || (d.estado === 'empate' && d.empate && d.empate.par === 'bloqueo') || !!d.fuerza;
+    f.innerHTML = `<div class="duelo-caja">
+      <div class="duelo-cab"><span>${d.hab ? '✨' : '⚔'} ${_esc(nombreAtaque)}</span><div class="bt"><button type="button" data-min title="Minimizar (queda el botón «${d.hab ? 'Ver ejecución' : 'Ver duelo'}»)">—</button>${enCurso(d) ? '' : '<button type="button" data-x title="Cerrar">✕</button>'}</div></div>
+      <div class="duelo-cuerpo">
+        <div class="duelo-paso"><h4><span class="n">1</span>Declaración</h4>
+          <div class="duelo-vs">
+            <div class="duelo-lado atq"><div class="rol">${d.hab ? 'Usa la habilidad' : 'Ataca'}</div><div class="nom">${_esc(d.atacante.nombre)}</div><div class="sub">${d.hab ? _esc(d.hab.nombre) + (d.hab.tira ? ' · tira ' + _esc(d.hab.tira.etq) : '') : (d.ataque.armaNombre ? 'con ' + _esc(d.ataque.armaNombre) : 'sin arma') + ' · Tipo ' + _fmt(_num(d.ataque.tipoDado)) + (modsTxt(d) ? ' · ' + (typeof Glosario !== 'undefined' ? Glosario.marcar(modsTxt(d)) : _esc(modsTxt(d))) : '')}</div></div>
+            <div class="vs">VS</div>
+            <div class="duelo-lado def"><div class="rol">${d.hab ? (d.hab.sinOposicion ? 'Objetivo' : 'Se resiste') : 'Defiende'}</div><div class="nom">${_esc(d.defensor.nombre)}</div><div class="sub">${d.defensor.tipo === 'creep' ? 'creep' : 'personaje'}${d.defensa ? ' · ' + _esc(nombreDefensa(d)) : ''}</div></div>
+          </div></div>
+        ${d.hab && d.hab.sinOposicion ? '' : `<div class="duelo-paso"><h4><span class="n">2</span>${d.hab ? '' : 'Contacto: '}${_esc(etqTira(d))} contra ${d.defensa || (d.hab && d.hab.contra.length === 1) ? _esc(etqContra(d)) : 'la defensa que elija'}</h4>
+          <div class="duelo-tiros">${cajaHtml(d, 'pdg', 'eva', nuevoContacto)}${cajaHtml(d, 'eva', 'pdg', nuevoContacto)}</div>
+          ${miniHtml(d, 'contacto')}
+        </div>`}
+        ${mostrarBloqueo ? `<div class="duelo-paso"><h4><span class="n">3</span>${d.ataque && d.ataque.desarme ? '🤺 Desarmar: ' : 'Bloqueo: '}Fuerza del golpe contra Bloqueo</h4>${desarmeAvisoHtml(d)}
+          <div class="duelo-tiros">${cajaHtml(d, 'fuerza', 'bloqueo', nuevoBloqueo)}${cajaHtml(d, 'bloqueo', 'fuerza', nuevoBloqueo)}</div>
+          ${miniHtml(d, 'bloqueo')}
+        </div>` : ''}
+        ${d.fase === 'dodge' ? dodgeHtml(d, nuevaClave('dodge')) : ''}
+        ${d.crit ? criticoHtml(d) : ''}
+        ${(d.fase === 'dano' || d.dano) ? danoHtml(d) : ''}
+        ${efectosHtml(d)}
+        ${cierre}
+        ${finHtml}
+        <div class="duelo-pie">
+          ${puedoCancelar ? `<button type="button" class="sec" data-amanoduelo title="Corta ${d.hab ? 'la ejecución' : 'el duelo'} donde está: lo que falta se resuelve con tiradas a mano en la Mesa">✋ Terminar a mano</button>` : ''}
+          ${puedoCancelar ? `<button type="button" class="sec" data-cancelarduelo>Cancelar${d.hab ? '' : ' duelo'}</button>` : ''}
+          <button type="button" class="sec" data-min2>Minimizar</button>
+          ${enCurso(d) ? '' : '<button type="button" class="sec" data-x2>Cerrar</button>'}
+        </div>
+      </div></div>${rerollBtnHtml(d)}`;
+    if(min) f.classList.add('min');
+    // 📜 El texto de la habilidad o del arma, a la izquierda (2026-10-15, dueño: «durante un duelo tener a la izquierda el recuadro del texto de la
+    // habilidad, para saber qué está sucediendo y qué debería suceder»). Viaja en `ataque.texto` (lo arma crear()).
+    if(d.ataque && d.ataque.texto){
+      const tx = document.createElement('div');
+      tx.className = 'duelo-texto';
+      // Lo que pasa, con sus globos; las notas ⚙ / ✋ en «Detalles técnicos» (dueño, 2026-10-15: lo técnico no va en el texto).
+      const pt = typeof ItemCorto !== 'undefined' && ItemCorto.partes ? ItemCorto.partes(d.ataque.texto) : {hace: d.ataque.texto, tecnico: ''};
+      const marcar = x => typeof Glosario !== 'undefined' && Glosario.marcar ? Glosario.marcar(x) : _esc(x);
+      tx.innerHTML = `<b class="t">📜 ${_esc(nombreAtq(d))}</b>${marcar(pt.hace)}${pt.tecnico ? `<details class="tec"><summary>Detalles técnicos</summary>${_esc(pt.tecnico)}</details>` : ''}`;
+      f.appendChild(tx);
+    }
+    // El paso en curso (el último que aparece, mientras el duelo siga abierto) late para llamar la atención.
+    if(d.estado !== 'resuelto' && d.estado !== 'cancelado'){
+      const pasos = f.querySelectorAll('.duelo-paso');
+      if(pasos.length > 1) pasos[pasos.length - 1].classList.add('activo');
+    }
+    // Scroll: si cambió el paso en curso (o el duelo terminó) se enfoca ese recuadro; si solo se actualizó algo del mismo paso, se queda donde estaba.
+    const caja = f.querySelector('.duelo-caja');
+    if(caja){
+      const clave = d.id + '|' + f.querySelectorAll('.duelo-paso').length + '|' + d.fase + '|' + d.estado + '|' + (d.empate ? d.empate.par : '');
+      const cambio = f.dataset.pasoClave !== clave;
+      f.dataset.pasoClave = clave;
+      if(!cambio) caja.scrollTop = scrollAntes;
+      else{
+        const objetivo = f.querySelector('.duelo-paso.activo') || f.querySelector('.duelo-fin');
+        if(objetivo) caja.scrollTop += objetivo.getBoundingClientRect().top - caja.getBoundingClientRect().top - 70;
+      }
+    }
+    f.querySelector('[data-min]').onclick = minimizar;
+    f.querySelector('[data-min2]').onclick = minimizar;
+    const bx = f.querySelector('[data-x]'), bx2 = f.querySelector('[data-x2]');   // (solo con el duelo terminado: en curso, minimizar o cancelar)
+    if(bx) bx.onclick = cerrarOMinimizar;
+    if(bx2) bx2.onclick = cerrarOMinimizar;
+    const bc = f.querySelector('[data-cancelarduelo]');
+    if(bc) bc.onclick = () => cancelarDuelo(d);
+    const bm = f.querySelector('[data-amanoduelo]');
+    if(bm) bm.onclick = () => terminarAMano(d);
+    // Un duelo cancelado se cierra solo en todas las pantallas (2026-10-13, dueño: quedaban abiertos «Duelo cancelado» en los mapas de los demás
+    // esperando un «Terminar duelo»): se ve 4 segundos y se va. Si en el medio se abrió otro duelo, no lo toca.
+    if(d.estado === 'cancelado' && f.dataset.autocierre !== d.id){
+      f.dataset.autocierre = d.id;
+      setTimeout(() => { if(actual && actual.id === d.id && actual.dato && actual.dato.estado === 'cancelado') cerrar(); }, 4000);
+    }
+    const bDodgeResolver = f.querySelector('[data-dodge-resolver]');
+    if(bDodgeResolver) bDodgeResolver.onclick = () => {
+      bDodgeResolver.disabled = true;
+      let adentro = true;
+      try{ adentro = !!cfgEscuchar.chequearDodge(d); }catch(err){ console.error('Duelo: chequearDodge', err); }
+      resolverDodge(d.id, !adentro).catch(err => { console.error(err); _toast('No se pudo resolver el dodge roll'); bDodgeResolver.disabled = false; });
+    };
+    f.querySelectorAll('[data-dodge-manual]').forEach(b => b.onclick = () => {
+      f.querySelectorAll('[data-dodge-manual]').forEach(x => x.disabled = true);
+      resolverDodge(d.id, b.dataset.dodgeManual === '1').catch(err => { console.error(err); _toast('No se pudo resolver el dodge roll'); });
+    });
+    f.querySelectorAll('[data-par]').forEach(b => b.onclick = () => {
+      const [q, e] = b.dataset.par.split(':');
+      f.querySelectorAll('[data-par]').forEach(x => x.disabled = true);
+      elegirParidad(d.id, q, e).catch(err => { console.error(err); _toast('No se pudo tirar el desempate'); });
+    });
+    f.querySelectorAll('[data-ppt-elegir]').forEach(b => b.onclick = () => {
+      f.querySelectorAll('[data-par], [data-ppt-elegir]').forEach(x => x.disabled = true);
+      elegirPpt(d.id).catch(err => { console.error(err); _toast('No se pudo empezar el piedra, papel o tijera' + (err && err.code === 'permission-denied' ? ' (sin permiso)' : '')); });
+    });
+    f.querySelectorAll('[data-ppt-ver]').forEach(b => b.onclick = () => { if(typeof PPT !== 'undefined') PPT.mostrar(b.dataset.pptVer); });
+    f.querySelectorAll('[data-tirar]').forEach(b => b.onclick = () => {
+      const campo = b.dataset.tirar;
+      b.disabled = true; b.textContent = 'Tirando…';
+      enviar(campo === 'pdg' || campo === 'fuerza' ? d.atacante : d.defensor, {tipo: 'duelo-tirar', id: d.id, campo, flash: flashSel[d.id + ':' + campo] || ''});
+      setTimeout(() => { if(actual && actual.dato && !actual.dato[campo]) dibujar(); }, 8000);
+    });
+    f.querySelectorAll('[data-desarme-aceptar]').forEach(b => b.onclick = () => { b.disabled = true; desarmeAceptar(d.id); });
+    f.querySelectorAll('[data-desarmar]').forEach(b => b.onclick = async () => {   // 🤺 elegir Desarmar y tirar (js/62 cobra y lo marca)
+      const campo = b.dataset.desarmar, lado = campo === 'fuerza' ? 'atacante' : 'defensor';
+      f.querySelectorAll('[data-desarmar],[data-tirar]').forEach(x => x.disabled = true);
+      let ok = false;
+      try{ ok = typeof window.dueloDesarmar === 'function' && await window.dueloDesarmar(d.id, lado); }catch(err){ console.error('Desarmar:', err); }
+      if(!ok){ dibujar(); return; }
+      enviar(d[lado], {tipo: 'duelo-tirar', id: d.id, campo, flash: ''});
+      setTimeout(() => { if(actual && actual.dato && !actual.dato[campo]) dibujar(); }, 8000);
+    });
+    f.querySelectorAll('[data-def]').forEach(b => b.onclick = () => {
+      const o = (opciones[d.id] || [])[Number(b.dataset.def)];
+      if(!o) return;
+      f.querySelectorAll('[data-def]').forEach(x => x.disabled = true);
+      enviar(d.defensor, {tipo: 'duelo-tirar', id: d.id, campo: 'eva', modo: o.modo, itemId: o.itemId || '', flash: flashSel[d.id + ':eva'] || ''});
+      setTimeout(() => { if(actual && actual.dato && !actual.dato.eva){ opcionesPedidas.delete(d.id); dibujar(); } }, 8000);
+    });
+    f.querySelectorAll('[data-flash]').forEach(b => b.onclick = () => {   // marcar o desmarcar el Flash de esta tirada
+      const [campo, habId] = b.dataset.flash.split(':'), k = d.id + ':' + campo;
+      flashSel[k] = flashSel[k] === habId ? '' : habId;
+      dibujar();
+    });
+    f.querySelectorAll('[data-tirarpor]').forEach(b => b.onclick = () => tirarPorAusente(d, b.dataset.tirarpor));
+    f.querySelectorAll('[data-mtg]').forEach(c => c.onchange = () => { const k = d.id + ':' + c.dataset.mtg; if(c.checked) manualAbierto.add(k); else manualAbierto.delete(k); dibujar(); });   // ✍
+    f.querySelectorAll('[data-musar]').forEach(b => b.onclick = () => usarManual(d, b.dataset.musar));
+    // ✍ El crítico y los efectos a mano (2026-10-17).
+    const bcm = f.querySelector('[data-critusar]');
+    if(bcm) bcm.onclick = () => {
+      const inp = f.querySelector('[data-critman]'), txt = String(inp ? inp.value : '');
+      const tiros = (txt.match(/\d+/g) || []).map(Number).filter(n => n >= 1 && n <= 20);
+      if(!tiros.length){ _toast('Escribí los d20 que salieron (de 1 a 20)'); return; }
+      manual['crit:' + d.id] = txt; manualAbierto.delete(d.id + ':critico'); bcm.disabled = true;
+      tirarCritico(d.id, tiros).catch(err => { console.error(err); _toast('No se pudo anotar el crítico'); });
+    };
+    f.querySelectorAll('[data-efman]').forEach(b => b.onclick = () => {
+      const [i, ok] = String(b.dataset.efman).split(':');
+      b.disabled = true;
+      tirarEfecto(d.id, Number(i), {exito: ok === '1'}).catch(err => { console.error(err); _toast('No se pudo anotar el efecto'); });
+    });
+    f.querySelectorAll('[data-mdef]').forEach(rb => rb.onchange = () => { manual['mdef:' + d.id] = rb.value; });
+    const brd = f.querySelector('[data-reintentar-def]');
+    if(brd) brd.onclick = () => { opcionesPedidas.delete(d.id); delete opcionesFalla[d.id]; delete opciones[d.id]; dibujar(); };
+    const btt = f.querySelector('[data-ef-tirar-todos]');
+    if(btt) btt.onclick = () => { btt.disabled = true; btt.textContent = 'Tirando…'; tirarEfectos(d.id).catch(err => { console.error(err); _toast('No se pudieron tirar los efectos'); }); };
+    f.querySelectorAll('[data-ef-tirar]').forEach(b => b.onclick = () => { b.disabled = true; b.textContent = 'Tirando…'; tirarEfecto(d.id, Number(b.dataset.efTirar)).catch(err => { console.error(err); _toast('No se pudo tirar el efecto'); }); });
+    f.querySelectorAll('[data-ef-aplicar]').forEach(b => b.onclick = () => { b.disabled = true; marcarEfecto(d.id, Number(b.dataset.efAplicar), {aplicar: 'pedido'}).catch(err => { console.error(err); _toast('No se pudo pedir la aplicación'); }); });
+    f.querySelectorAll('[data-ef-mano]').forEach(b => b.onclick = () => { b.disabled = true; marcarEfecto(d.id, Number(b.dataset.efMano), {aplicado: true, aplicar: '', nota: 'a mano'}).catch(err => console.error(err)); });
+    const bft = f.querySelector('[data-ef-terminar]');
+    if(bft) bft.onclick = () => terminarEfectos(d.id).catch(err => console.error(err));
+    const bdt = f.querySelector('[data-dano-tirar]');
+    if(bdt) bdt.onclick = () => { bdt.disabled = true; bdt.textContent = 'Tirando…'; enviar(d.atacante, {tipo: 'duelo-tirar', id: d.id, campo: 'dano', flash: flashSel[d.id + ':dano'] || ''}); setTimeout(() => { if(actual && actual.dato && !actual.dato.dano) dibujar(); }, 8000); };
+    const bac = f.querySelector('[data-dano-aceptar]');
+    if(bac) bac.onclick = () => { bac.disabled = true; bac.textContent = 'Aplicando…'; aceptarDano(d.id).catch(err => { console.error(err); _toast('No se pudo aplicar el daño'); bac.disabled = false; }); };
+    const bam = f.querySelector('[data-aplicar-mano]');
+    if(bam) bam.onclick = () => { const v = Math.max(0, Math.round(_num((f.querySelector('[data-manual="recibido"]') || {}).value))); guardarAplicacion(d.id, {manual: true, golpe: v, recibido: v, mult: 1, crudo: d.dano.crudo, motivoManual: 'lo aplicó el GM a mano'}).catch(err => console.error(err)); };
+    const bcr = f.querySelector('[data-critico]');
+    if(bcr) bcr.onclick = () => { bcr.disabled = true; bcr.textContent = 'Tirando…'; tirarCritico(d.id).catch(err => { console.error(err); _toast('No se pudo tirar el crítico'); }); };
+    f.querySelectorAll('[data-reroll]').forEach(brr => brr.onclick = () => {
+      const [lado, campo, con] = brr.dataset.reroll.split(':');
+      f.querySelectorAll('[data-reroll]').forEach(x => { x.disabled = true; });
+      enviar(d[lado], {tipo: 'duelo-reroll', id: d.id, campo, ...(con ? {con} : {})});
+      delete rerollInfo[d.id + ':' + lado]; rerollPedidas.delete(d.id + ':' + lado);
+      setTimeout(() => { if(actual && actual.dato) dibujar(); }, 4000);
+    });
+    const bfin = f.querySelector('[data-fin-duelo]');
+    if(bfin){ bfin.onclick = cerrar; if(nuevoFin){ try{ bfin.scrollIntoView({behavior: 'smooth', block: 'nearest'}); }catch(err){} } }
+    const bcon = f.querySelector('[data-contra]');
+    if(bcon) bcon.onclick = () => { bcon.disabled = true; enviar(d.defensor, {tipo: 'duelo-contra', id: d.id}); };
+    const bconNo = f.querySelector('[data-contra-no]');
+    if(bconNo) bconNo.onclick = () => {
+      bconNo.disabled = true;
+      col().doc(d.id).update({contra: 'no'}).catch(err => { console.error('Duelo: no se pudo anotar «no contraatacar»', err); bconNo.disabled = false; _toast('No se pudo anotar la respuesta: probá de nuevo'); });
+    };
+  }
+
+  /* ---------- las tiradas: lo que corre en la página del dueño (iframe del mapa o página suelta) ---------- */
+  const RE_CAMPO = {pdg: /pdg/i, eva: /evasi|parry/i, fuerza: /fuerza/i, bloqueo: /bloqueo/i, dano: /da[ñn]o/i};
+
+  async function ejecutar(m, hk){
+    const h = hk || hooks();
+    if(!h || !disponible()) return;
+    try{
+      const doc = await col().doc(m.id).get();
+      if(!doc.exists) return;
+      const d = {id: m.id, ...doc.data()};
+      if(m.tipo === 'duelo-opciones'){
+        const ops = conVistas(d, (h.soy && h.soy(d.defensor)) ? (d.hab ? opcionesHab(d, h) : Combatiente.nombresContraDisparo(Combatiente.sinParryDelAtaque((h.opcionesDefensa ? h.opcionesDefensa(d) : []) || [], d), d)) : null, h);   // null = este personaje/creep no es el mío
+        if(enIframe()) window.parent.postMessage({tipo: 'duelo-opciones-res', id: d.id, opciones: ops}, location.origin);
+        else recibirOpciones(d.id, ops);
+        return;
+      }
+      if(m.tipo === 'duelo-reroll-info'){   // ¿tengo una moneda de re-roll?
+        const lado = m.lado === 'defensor' ? d.defensor : d.atacante;
+        const info = (h.soy && h.soy(lado) && h.rerollInfo) ? (h.rerollInfo(d) || {disponible: false}) : {disponible: false};
+        if(enIframe()) window.parent.postMessage({tipo: 'duelo-reroll-info-res', id: d.id, lado: m.lado, info}, location.origin);
+        else recibirRerollInfo(d.id, m.lado, info);
+        return;
+      }
+      if(m.tipo === 'duelo-reroll'){   // usar la moneda: verifica, cobra, reabre la tirada y tira la moneda
+        const lado = (m.campo === 'pdg' || m.campo === 'fuerza' || m.campo === 'critico') ? d.atacante : d.defensor;
+        if(!(h.soy && h.soy(lado) && h.rerollUsar) || !puedeReabrir(d, m.campo)){ _toast('Esa tirada ya no se puede repetir'); return; }
+        await h.rerollUsar(d, m.campo, m.con === 'wildcard' ? 'wildcard' : m.con === 'moneda' ? 'moneda' : undefined);
+        return;
+      }
+      if(m.tipo === 'duelo-vista'){   // ¿qué dado tirás en esta tirada, y de dónde sale? (2026-10-08)
+        const lado = ladoDeCampo(d, m.campo);
+        let v = null;
+        try{ v = (h.soy && h.soy(lado) && typeof h.vista === 'function') ? (h.vista(d, m.campo) || null) : null; }catch(err){ console.error('Duelo: vista', err); }
+        if(enIframe()) window.parent.postMessage({tipo: 'duelo-vista-res', id: d.id, campo: m.campo, vista: v}, location.origin);
+        else recibirVista(d.id, m.campo, v);
+        return;
+      }
+      if(m.tipo === 'duelo-flash'){   // ¿qué Flash tengo para esta tirada?
+        const lado = (m.campo === 'pdg' || m.campo === 'fuerza' || m.campo === 'dano') ? d.atacante : d.defensor;
+        const ops = (h.soy && h.soy(lado) && h.flashOpciones) ? (h.flashOpciones(d, m.campo) || []) : [];
+        if(enIframe()) window.parent.postMessage({tipo: 'duelo-flash-res', id: d.id, campo: m.campo, opciones: ops}, location.origin);
+        else recibirFlash(d.id, m.campo, ops);
+        return;
+      }
+      if(m.tipo === 'duelo-contra'){
+        const alEsquivar = (d.resultado === 'fallo' || (d.resultado === 'mitad' && d.defensa && d.defensa.modo === 'parry' && d.defensor.tipo === 'creep')) && !d.hab && d.defensa && d.defensa.contraEsquiva && d.defensa.contraAlcanza;   // ⚔ Contraataque (Warrior; el creep, también tras el Parry)
+        if(!h.soy || !h.soy(d.defensor) || !h.armaContra || (d.resultado !== 'bloqueado' && !alEsquivar) || d.contra || (d.contacto && d.contacto.dodgeArco && !d.contacto.dodgeHecho)) return;
+        const arma = h.armaContra(d) || {};
+        if(alEsquivar){
+          const err = h.contraEsquivaPagar ? await h.contraEsquivaPagar(d, arma) : 'esta página no sabe cobrar el Contraataque';
+          if(err){ _toast('No se pudo contraatacar: ' + err); return; }
+        }
+        const tok = {id: d.atacante.tokenId, nombre: d.atacante.nombre, tipo: d.atacante.tipo, fichaId: d.atacante.ref, duenoUid: d.atacante.uid};
+        const nid = await crear({yo: {ref: d.defensor.ref, tipo: d.defensor.tipo, nombre: d.defensor.nombre}, ataque: {tipo: 'contra', armaId: arma.armaId || '', armaNombre: arma.armaNombre || '', tipoDado: arma.tipoDado || 8}}, tok, d.defensor.tokenId, d.id);
+        await col().doc(d.id).update({contra: nid});
+        return;
+      }
+      if(m.tipo !== 'duelo-tirar') return;
+      const campo = m.campo;
+      const lado = (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
+      const fase = (campo === 'pdg' || campo === 'eva') ? 'contacto' : campo === 'dano' ? 'dano' : 'bloqueo';
+      if(!h.soy || !h.soy(lado) || d[campo] || d.estado !== 'esperando' || d.fase !== fase) return;
+      if(!hk) document.querySelectorAll('.scrim.open').forEach(s => s.classList.remove('open'));   // sin la Botonera abierta debajo
+      let defensa = null;
+      if(campo === 'eva'){
+        const op = (d.hab ? opcionesHab(d, h) : (h.opcionesDefensa ? h.opcionesDefensa(d) : [])).find(o => o.modo === m.modo && (o.itemId || '') === (m.itemId || ''));
+        if(!op || op.motivoNo) return;
+        defensa = {modo: op.modo, itemId: op.itemId || '', itemNombre: op.itemNombre || '', costo: _num(op.costo), ...(op.arco ? {arco: true} : {}), ...(op.escudo ? {escudo: true} : {}), ...(op.natural ? {natural: true} : {})};   // (escudo, natural: para Desarmar, 2026-10-22)
+        if(op.contraEsquiva && !d.hab) defensa = {...defensa, contraEsquiva: true, ...(await alcanceContra(d, h))};   // ⚔ Contraataque (Warrior)
+      }
+      let extra = null;
+      if(!d.hab && campo === 'pdg' && h.statsCritico) extra = h.statsCritico(d) || null;
+      if((!d.hab || d.hab.critTipo) && campo === 'eva' && h.resistenciaCritico) extra = {resistencia: _num(h.resistenciaCritico(d)),
+        ...(h.blindado && h.blindado(d) ? {blindado: true} : {})};   // (una habilidad física con crítico, también) · 🛡 Blindado (2026-10-20)
+      // ⚡ Critical Matters (2026-09-29): a esta altura (el daño se tira después del crítico, ver entrarCritico)
+      // d.crit ya está resuelto — si el golpe salió crítico, los efectos de duelo.critico.efectos se suman a
+      // los de siempre (arma + habilidad), mismo mecanismo de "recordar y tirar" que ya usan efectosArma/efectos.
+      if(campo === 'dano') extra = {efectos: d.hab ? [] : [...efectosArmaDe(d, h), ...efectosDeHabilidad(d)]};
+      if(campo !== 'dano') retener(true);   // el PdG / Evasión / Parry / Fuerza / Bloqueo se muestran juntos cuando tiran los dos (elegir la defensa es a ciegas)
+      let re = campo === 'eva' ? (m.modo === 'parry' ? /parry/i : /evasi/i) : RE_CAMPO[campo];
+      if(d.hab && campo === 'pdg') re = new RegExp(escRe(etqTira(d)), 'i');
+      if(d.hab && campo === 'eva'){ const c = d.hab.contra.find(x => x.modo === m.modo); re = new RegExp(escRe(c ? c.etq : m.modo), 'i'); }
+      let flash = null;   // Flash marcado: la página cobra los SP y el bono se suma a la tirada cuando llegue
+      if(m.flash && h.flashUsar){
+        // flashUsar puede preguntar algo antes de cobrar (un creep: «¿es su turno?», P136) — se espera la respuesta; dentro
+        // del mapa, el cartel hace que se muestre la ventana de esta página.
+        const pedido = h.flashUsar(d, campo, m.modo || '', m.flash);
+        setTimeout(avisarMapaUi, 120);
+        flash = (await pedido) || null;
+        if(!flash) _toast('No se usó el Flash: se tira sin él');
+        delete flashOps[d.id + ':' + campo]; flashPedidas.delete(d.id + ':' + campo);
+      }
+      esperaTiro = {id: d.id, campo, re, defensa, extra, flash};
+      if(d.hab && (campo === 'pdg' || campo === 'eva')){
+        if(h.habTirar) h.habTirar(d, campo === 'pdg' ? 'atacante' : 'defensor', m.modo);
+        else{ esperaTiro = null; retener(false); _toast('Esta página no sabe tirar habilidades'); }
+      }
+      else if(d.hab && campo === 'dano') tirarDanoHab(d, h);
+      else if(campo === 'pdg') h.atacar(d);
+      else if(campo === 'eva') h.defender(d, m.modo, m.itemId || '');
+      else if(campo === 'fuerza') h.fuerza(d);
+      else if(campo === 'dano') h.dano(d);
+      else h.bloquear(d);
+      setTimeout(avisarMapaUi, 350);
+    }catch(err){
+      console.error('Duelo: no se pudo ejecutar el pedido', err);
+      esperaTiro = null;
+      retener(false);
+      _toast('No se pudo tirar: ' + (err.message || err));
+      avisarMapaUi();
+    }
+  }
+
+  window.addEventListener('tirada-registrada', e => {
+    if(!esperaTiro) return;
+    const det = e.detail || {}, r = det.r || {};
+    if(!esperaTiro.re.test(String(det.origen || ''))) return;
+    const {id, campo, defensa, extra, flash} = esperaTiro;
+    esperaTiro = null;
+    retener(false);
+    let rr = r;
+    // Una Evasión contra oportunidad / contra contraataque (2026-10-04): la página la etiqueta «Evasión (+2 contra oportunidad)»; el duelo guarda esa nota.
+    const notaEsp = String(det.origen || '').match(/\(([+−-]\s*\d+\s+(?:contra |Pasos de baile)[^)]*)\)/);   // y Pasos de baile
+    if(notaEsp) rr = {...r, nota: notaEsp[1]};
+    if(flash && _num(flash.bono)){   // el Flash suma un «+» fijo a la tirada (y cuenta como tal en el desempate)
+      rr = {...r, mod: _num(r.mod) + _num(flash.bono), total: _num(r.total) + _num(flash.bono), formula: String(r.formula || '') + ` +${_num(flash.bono)} ⚡`,
+        ...(flash.dodge && campo === 'eva' ? {dodge: true} : {})};   // Tronco de huída (2026-10-10): si gana la Evasión, dodge roll
+      anunciarMesa(`⚡ ${flash.etq || 'Flash'}: +${_num(flash.bono)} a ${ETQ_FLASH[campo === 'eva' ? 'eva' : campo] || 'la tirada'} (${flash.quien || 'un jugador'})`);
+    }
+    (campo === 'dano' ? guardarDano(id, rr, extra && extra.efectos) : guardarTiro(id, campo, rr, defensa, extra)).catch(err => { console.error('Duelo: no se pudo guardar la tirada', err); _toast('No se pudo anotar la tirada en el duelo'); })
+      .then(() => avisarMapaUi());
+  });
+
+  // Adentro de un iframe del mapa: le cuenta si hay algún cartelito abierto (Nitros, sobrepeso…) que el jugador tiene que ver, o si ya puede esconderse.
+  function avisarMapaUi(){
+    if(!enIframe()) return;
+    const abiertoUi = !!document.querySelector('.scrim.open, .pap-fondo, #ct-fondo');
+    window.parent.postMessage({tipo: abiertoUi ? 'duelo-ui-visible' : 'botonera-cerrada'}, location.origin);
+  }
+
+  window.addEventListener('message', e => {
+    if(e.origin !== location.origin || !e.data) return;
+    const m = e.data;
+    if(m.tipo === 'duelo-suelto' && pendienteSuelto){   // el mapa: «Sin objetivo · tirada suelta»
+      const f = pendienteSuelto; pendienteSuelto = null;
+      f();
+      return;
+    }
+    if(m.tipo === 'duelo-cancelado'){ pendienteSuelto = null; return; }
+    if(m.tipo === 'duelo-opciones' || m.tipo === 'duelo-tirar' || m.tipo === 'duelo-contra' || m.tipo === 'duelo-flash' || m.tipo === 'duelo-reroll-info' || m.tipo === 'duelo-reroll') ejecutar(m);
+  });
+
+  // A mano: el GM (o el dueño) escribe el valor del stat y se tira con dados.
+  async function tirarPorAusente(d, campo){
+    const input = document.querySelector(`[data-manual="${campo}"]`);
+    const valor = Math.round(_num(input ? input.value : manual[campo]));
+    const f = typeof formulaParaValor === 'function' ? formulaParaValor(valor) : null;
+    if(!f){ _toast('Escribí el valor del stat (un número mayor que 0)'); return; }
+    const rolls = f.combo.map(x => 1 + Math.floor(Math.random() * x));
+    const total = rolls.reduce((a, b) => a + b, 0) + f.mod;
+    const lado = (campo === 'pdg' || campo === 'fuerza' || campo === 'dano') ? d.atacante : d.defensor;
+    const selModo = document.querySelector('[data-manual-modo]');
+    const modo = campo === 'eva' && selModo ? selModo.value : 'evasion';
+    const defensa = campo === 'eva' ? await defensaConContra(d, {modo, itemId: '', itemNombre: '', costo: 0}) : null;   // ⚔ (2026-10-27)
+    const cHab = d.hab && campo === 'eva' ? (d.hab.contra.find(x => x.modo === modo) || d.hab.contra[0]) : null;
+    const etiqueta = campo === 'eva' ? (cHab ? cHab.etq : (modo === 'parry' ? 'Parry' : 'Evasión')) : (campo === 'pdg' && d.hab) ? etqTira(d) : ETIQ[campo];
+    const r = {formula: f.formula, rolls, mod: f.mod, total};
+    if(campo === 'dano' && typeof mesaPublicar === 'function'){ try{ mesaPublicar(`${lado.nombre} · ${etiqueta} (a mano)`, r); }catch(err){} }   // las tiradas de un par se publican juntas cuando tiran los dos
+    if(campo === 'pdg' && !d.hab && !(await pagarManual(d))) return;   // las mismas reglas que el botón (2026-10-21)
+    (campo === 'dano' ? guardarDano(d.id, r) : guardarTiro(d.id, campo, r, defensa, await extraManual(d, campo))).catch(err => { console.error(err); _toast('No se pudo anotar la tirada en el duelo'); });
+  }
+
+  // El daño de una habilidad: la fórmula que dejó la habilidad (ya con lo que suma el que la usa), tirada por quien la usa.
+  function tirarDanoHab(d, h){
+    const f = d.hab && d.hab.dano ? d.hab.dano.formula : '';
+    const r = f && typeof tirarDados === 'function' ? tirarDados(f) : null;
+    if(!r){ esperaTiro = null; retener(false); _toast('La fórmula de daño de la habilidad no es válida: ' + f); return; }
+    const reg = (h && h.registrarTirada) || (typeof registrarTirada === 'function' ? registrarTirada : null);
+    if(reg) reg(`Daño · ${d.hab.nombre}`, r, d);
+    else{ esperaTiro = null; retener(false); _toast('Esta pantalla no sabe publicar el daño de la habilidad: tiralo a mano'); }   // nunca callado
+  }
+
+  /* ---------- lo que se ve de un duelo que esta pantalla no tiene abierto (P151, dueño 2026-10-03: «las dos») ----------
+     Cada paso que ya pasó (contacto, Bloqueo, crítico, daño, efectos, fin) se revela en esta pantalla recién cuando los dados 3D quedan
+     quietos («primero los dados, después el resultado»): el botón «Ver duelo» dice en qué va y, si el cuadro no está abierto acá,
+     `cfg.paso(d, nuevos, todos)` (el mapa) lo cuenta en la Crónica. Solo lo público: el daño que recibió, no la vida que le queda. */
+  const pasosVistos = new Map();       // id → Set de claves ya reveladas en esta pantalla
+  const pasosEnEspera = new Set();     // 'id:clave' esperando a los dados
+  const resueltoDesde = new Map();     // id → cuándo esta pantalla lo vio resolverse (el botón queda un rato)
+  let pasosListo = false;              // el primer aviso: lo que ya había pasado no se anuncia
+  function pasosDe(d){
+    const P = [];
+    const g = d.contacto && d.contacto.gana;
+    if(d.pdg && d.eva && g){
+      const desemp = d.contacto.desempate ? ' (desempate)' : '';
+      if(d.hab) P.push({clave: 'contacto', dados: 1, txt: `${etqTira(d)} ${d.pdg.total} contra ${etqContra(d)} ${d.eva.total} → ${g === 'atacante' ? 'funcionó' : 'se resistió'}${desemp}`});
+      else{
+        const parry = d.defensa && d.defensa.modo === 'parry';
+        P.push({clave: 'contacto', dados: 1, txt: `PdG ${d.pdg.total} contra ${parry ? 'Parry' : 'Evasión'} ${d.eva.total} → ${g === 'atacante' ? 'pegó' : parry ? 'lo frena el Parry' : 'falló'}${desemp}`});
+      }
+    }
+    if(d.fuerza && d.bloqueo && d.bloq && d.bloq.gana) P.push({clave: 'bloqueo', dados: 1, txt: `Fuerza ${d.fuerza.total} contra Bloqueo ${d.bloqueo.total} → ${d.bloq.gana === 'defensor' ? 'bloqueó' : 'pasa la mitad'}`});
+    if(d.crit && d.crit.d20 && d.crit.critico) P.push({clave: 'critico', dados: 1, txt: `${_num(d.crit.supercritico) >= 2 ? '¡SUPERCRÍTICO' : '¡Crítico'} ×${d.crit.mult}!`});
+    const dn = d.dano;
+    if(dn && dn.aplicado){
+      const n = dn.recibido !== undefined && dn.recibido !== null ? dn.recibido : dn.golpe;
+      P.push({clave: 'dano', txt: dn.invulnerable ? `${d.defensor.nombre} es Invulnerable: no le hace nada`
+        : dn.manual ? `Daño ${_num(dn.golpe)} (se aplica a mano)` : `${d.defensor.nombre} recibe ${_num(n)} de daño`});
+      if(dn.magico && dn.magico.recibido !== undefined) P.push({clave: 'magico', txt: `…y ${_num(dn.magico.recibido)} de ${magTitulo(dn.magico.tipo).replace(/^Daño /, 'daño ')}`});
+      if(dn.drena && !dn.drena.manual) P.push({clave: 'drena', txt: `${dn.drena.quien || d.atacante.nombre} se cura ${_num(dn.drena.monto)}`});
+      if(dn.espinas) P.push({clave: 'espinas', txt: `Espinas: ${dn.espinas.quien || d.atacante.nombre} recibe ${_num(dn.espinas.monto)}`});
+      if(dn.espejo) P.push({clave: 'espejo', txt: `Espejo: ${dn.espejo.quien || d.atacante.nombre} recibe ${_num(dn.espejo.monto)}`});
+    }
+    (d.efectos || []).forEach((ef, i) => {
+      if(ef.omitido) P.push({clave: 'ef' + i, txt: `${ef.nombre}: no entra`});
+      else if(ef.res) P.push({clave: 'ef' + i, dados: siempreEf(ef) ? 0 : 1, txt: `${ef.nombre}: ${ef.res.exito ? 'funcionó' : 'no funcionó'}`});
+    });
+    if(d.estado === 'resuelto'){
+      const fin = d.hab ? {pego: 'La habilidad funcionó', fallo: 'El objetivo la resistió'}[d.resultado]
+        : {pego: 'El golpe pegó', fallo: 'El golpe falló', bloqueado: 'El golpe fue bloqueado', mitad: 'Pasó la mitad del daño'}[d.resultado];
+      P.push({clave: 'fin', txt: `🏁 ${fin || 'Terminó'}`});
+    }
+    return P;
+  }
+  const pasosRevelados = d => { const v = pasosVistos.get(d.id); return v ? pasosDe(d).filter(p => v.has(p.clave)) : []; };
+  function revisarPasos(){
+    const ahora = Date.now();
+    listaDuelos.forEach(d => {
+      if(d.estado === 'resuelto' && !resueltoDesde.has(d.id)) resueltoDesde.set(d.id, pasosListo ? ahora : (d.creado && d.creado.toMillis ? d.creado.toMillis() : ahora));
+      let vistos = pasosVistos.get(d.id);
+      if(!vistos){ vistos = new Set(); pasosVistos.set(d.id, vistos); }
+      const nuevos = pasosDe(d).filter(p => !vistos.has(p.clave) && !pasosEnEspera.has(d.id + ':' + p.clave));
+      if(!nuevos.length) return;
+      const grande = actual && actual.id === d.id && !actual.min;
+      if(!pasosListo || grande || descartados.has(d.id)){ nuevos.forEach(p => vistos.add(p.clave)); return; }   // ya se ve en el cuadro (o no interesa)
+      nuevos.forEach(p => pasosEnEspera.add(d.id + ':' + p.clave));
+      const revelar = () => {
+        nuevos.forEach(p => { vistos.add(p.clave); pasosEnEspera.delete(d.id + ':' + p.clave); });
+        const dd = listaDuelos.find(x => x.id === d.id) || d;
+        dibujarChips();
+        if(cfgEscuchar.paso && !(actual && actual.id === d.id && !actual.min)){
+          try{ cfgEscuchar.paso(dd, nuevos, pasosRevelados(dd)); }catch(err){ console.error('Duelo: paso', err); }
+        }
+      };
+      if(nuevos.some(p => p.dados) && !document.hidden) esperarDados(revelar); else revelar();   // oculta: no hay dados que esperar
+    });
+    pasosListo = true;
+  }
+
+  /* ---------- botones «Ver duelo» y apertura automática ---------- */
+  function contenedorAvisos(){
+    inyectarCss();
+    let c = document.getElementById('duelo-avisos');
+    if(!c){
+      c = document.createElement('div'); c.id = 'duelo-avisos'; document.body.appendChild(c);
+      // Lo que ocupan los botones de los duelos minimizados, para que el cartel de abajo (el dodge roll…) se suba encima y no quede tapado
+      // (dueño, 2026-10-22: «probemos subiendo el cartel»; comun/aviso-combate.js usa --duelo-avisos-alto).
+      const medir = () => { const h = c.childElementCount ? Math.ceil(c.getBoundingClientRect().height) + 10 : 0; document.documentElement.style.setProperty('--duelo-avisos-alto', h + 'px'); };
+      if(typeof ResizeObserver === 'function') new ResizeObserver(medir).observe(c);
+      new MutationObserver(medir).observe(c, {childList: true});
+      medir();
+    }
+    return c;
+  }
+
+  function dibujarChips(){
+    const mostrar = new Map();
+    const ahora = Date.now();
+    listaDuelos.forEach(d => {
+      if(descartados.has(d.id)) return;
+      const t = d.creado && d.creado.toMillis ? d.creado.toMillis() : ahora;
+      if(abierto(d) && ahora - t > VIGENCIA_MS) return;
+      if(d.estado === 'resuelto' && ahora - (resueltoDesde.get(d.id) || t) > RESUELTO_VISIBLE_MS) return;   // a contar desde que se resolvió
+      if(d.estado === 'cancelado') return;
+      const abiertoAhora = actual && actual.id === d.id && !actual.min;
+      if(abiertoAhora) return;
+      mostrar.set(d.id, d);
+    });
+    if(actual && actual.min && actual.dato && !mostrar.has(actual.id)) mostrar.set(actual.id, actual.dato);
+    [...chips.keys()].forEach(id => { if(!mostrar.has(id)){ chips.get(id).remove(); chips.delete(id); } });
+    const RES = {pego: '⚔ Pegó', fallo: '🛡 Falló', bloqueado: '🛡 Bloqueó', mitad: '⚠ Pasó la mitad'};
+    const critico = d => d.resultado === 'pego' && d.crit && d.crit.critico;
+    mostrar.forEach((d, id) => {
+      const ult = pasosRevelados(d).filter(p => p.clave !== 'fin').pop();   // en qué va (lo ya revelado en esta pantalla)
+      const txt = d.estado === 'resuelto'
+        ? (d.hab && d.hab.sinOposicion && d.resultado === 'pego' ? `✨ ${d.atacante.nombre} le dio ${d.hab.nombre} a ${d.defensor.nombre} · ver`   // un buff o una cura (2026-10-25: decía «Pegó»)
+          : `${critico(d) ? '💥 ¡CRÍTICO ×' + d.crit.mult + '!' : (RES[d.resultado] || 'Resuelto')}: ${d.atacante.nombre} → ${d.defensor.nombre} · ver`)
+        : d.fase === 'critico' ? `💥 Crítico: ${d.atacante.nombre} → ${d.defensor.nombre} · tirar d20`
+        : d.fase === 'dodge' ? `🏃 Dodge roll: ${d.defensor.nombre} vs. ${d.hab ? d.hab.nombre : 'área'}`
+        : d.estado === 'empate' ? `⚖ Empate: ${d.atacante.nombre} → ${d.defensor.nombre} · elegir par o impar`
+        : ult ? `${d.hab ? '✨' : '⚔'} ${d.atacante.nombre} → ${d.defensor.nombre} · ${ult.txt}`
+        : d.hab ? `✨ Ver ejecución: ${d.atacante.nombre} → ${d.defensor.nombre}` : `⚔ Ver duelo: ${d.atacante.nombre} → ${d.defensor.nombre}`;
+      let el = chips.get(id);
+      if(!el){
+        el = document.createElement('button');
+        el.type = 'button';
+        el.onclick = () => abrir(id);
+        contenedorAvisos().appendChild(el);
+        chips.set(id, el);
+      }
+      // Mientras un paso espera a los dados, el botón no lo adelanta (ni el «💥 Crítico» que viene después).
+      if(el.textContent && [...pasosEnEspera].some(k => k.startsWith(id + ':'))) return;
+      el.className = 'duelo-chip' + (d.estado === 'resuelto' ? ' res' : '');
+      el.textContent = txt;
+      el.title = d.hab ? 'Ver la ejecución' : 'Ver el duelo';
+    });
+    // Hook opcional (2026-09-27, pedido del dueño): el mapa lo usa para hacer latir en el
+    // lienzo a los dos tokens de cada duelo que quedó minimizado/de fondo para esta pantalla —
+    // así se entiende entre quiénes hay acción sin reabrir el cuadro grande. No rompe ficha ni
+    // gm-tools, que no lo definen.
+    if(typeof dueloParesActivos === 'function'){
+      dueloParesActivos([...mostrar.values()]
+        .filter(d => d.estado !== 'resuelto')
+        .map(d => ({id: d.id, atacanteTokenId: d.atacante && d.atacante.tokenId, defensorTokenId: d.defensor && d.defensor.tokenId, fase: d.fase})));
+    }
+  }
+
+  // cfg.opcionesLocal(duelo) → opciones de defensa o null (el mapa del GM las calcula solo para un creep, sin cargar las Acciones).
+  // cfg.aplicarEfecto(duelo, efecto) → {nota, manual?} (solo el mapa del GM): pone el estado del efecto sobre el defensor.
+  // cfg.aplicaSolo(duelo, efecto) → bool (opcional, 2026-10-11): qué efectos reclama esta pantalla; sin él, todos los que puede. La ficha suelta solo los de
+  // su personaje (antes, con dos personajes del mismo jugador, la ficha de uno reclamaba el efecto del otro y lo dejaba «a mano»).
+  // cfg.aplicar(duelo) → info (solo el mapa del GM): aplica el daño al HP del defensor y devuelve lo que pasó.
+  // cfg.relay(lado, mensaje) (el mapa): cómo mandarle un pedido al iframe de la ficha o de las Acciones del dueño de ese lado.
+  /* Cancelar un duelo (2026-10-15, dueño: «alguien puso atacar, se abrió el duelo, pusimos cancelar duelo, el ataque no se ejecutó, y la
+     siguiente vez le cobraba los No2 de un segundo ataque»): si el ataque ya se pagó, pregunta si cuenta y explica que es para los No2. Si no
+     cuenta, el duelo queda con `resultado: 'devolver'` y la pantalla que maneja al atacante le devuelve los No2 y descuenta el ataque
+     (`devolverSiToca`, con el gancho `devolverAtaque` de FichaDuelo, CreepDuelo e InvDuelo); queda `resultado: 'devuelto'`. */
+  /* ✋ Terminar a mano (dueño, 2026-10-29: «interrumpe el duelo hasta ahí y te permite terminar de resolverlo con tiradas manuales»): corta el duelo donde
+     está (queda cancelado, con `resultado: 'a-mano'`, y se cierra en todas las pantallas) y el resto se resuelve con la Mesa. No devuelve nada: lo pagado
+     y lo aplicado quedan como están. */
+  async function terminarAMano(d){
+    const txt = `Esto interrumpe ${d.hab ? 'la ejecución' : 'el duelo'} hasta acá: lo que falta lo terminan de resolver con tiradas a mano en la Mesa. Lo que ya se pagó o se aplicó queda como está.`;
+    const ok = typeof Confirmar !== 'undefined' && Confirmar.preguntar ? await Confirmar.preguntar(txt, {titulo: 'Terminar a mano', icono: '✋', si: 'Aceptar', no: 'Cancelar'}) : confirm(txt);
+    if(!ok) return;
+    try{ await col().doc(d.id).update({estado: 'cancelado', resultado: 'a-mano'}); }
+    catch(err){ console.error('No se pudo terminar el duelo a mano:', err); _toast('No se pudo terminar a mano'); return; }
+    const que = d.hab ? (d.hab.nombre || 'la habilidad') : 'el duelo';
+    if(typeof mesaLinea === 'function') mesaLinea(`✋ ${(d.atacante && d.atacante.nombre) || '¿?'} → ${(d.defensor && d.defensor.nombre) || '¿?'}: ${que} se terminó a mano; lo que falta se resuelve con la Mesa`, 'recordatorio');
+  }
+  async function cancelarDuelo(d){
+    const a = d.ataque || {}, especial = a.tipo === 'oportunidad' || a.tipo === 'contra';
+    const pagado = !d.hab && a.tipo && a.tipo !== 'habilidad-arma' && d.pdg;
+    const conFlecha = !!(a.flecha && a.flecha.vuelve), yFlecha = conFlecha ? ` y ${a.flecha.nombre || 'la flecha'}` : '';
+    let devolver = false;
+    // ↩ Una habilidad que ya cobró (P233): ¿cuenta como usada? Si no, se le devuelve lo que pagó y el cooldown.
+    const ph = a.pagoHab && pagoHabTxt(a.pagoHab) ? a.pagoHab : null;
+    if(ph && !pagado && typeof Confirmar !== 'undefined' && Confirmar.elegir){
+      const quien = (d.atacante && d.atacante.nombre) || 'Quien la usó', que = pagoHabTxt(ph);
+      const r = await Confirmar.elegir(`${quien} ya pagó ${ph.nombre || 'la habilidad'} (${que}). ¿Cuenta como usada?`, {titulo: 'Cancelar', icono: '↩', no: 'Volver',
+        opciones: [{valor: 'no', texto: 'No cuenta', detalle: `se le devuelve ${que}${yFlecha}`}, {valor: 'si', texto: 'Sí, cuenta como usada', detalle: 'lo pagado queda pagado'}]});
+      if(r === null || r === undefined) return;
+      devolver = r === 'no';
+    }
+    if(pagado && typeof Confirmar !== 'undefined' && Confirmar.elegir){
+      const quien = (d.atacante && d.atacante.nombre) || 'El atacante';
+      const r = await Confirmar.elegir(especial
+        ? `${quien} ya pagó los No2 de este ${a.tipo === 'contra' ? 'contraataque' : 'ataque de oportunidad'}. ¿Se los devolvemos?`
+        : `${quien} ya pagó este ataque. ¿Cuenta como un ataque hecho?\n\nEs para calcular los No2: en un turno, el primer ataque con un arma cuesta la mitad de su Tipo y los siguientes, el Tipo completo. Si no cuenta, se le devuelven los No2 que pagó y su próximo ataque vuelve a costar como si no hubiera atacado.`,
+        {titulo: 'Cancelar el duelo', icono: '⚔', no: 'Volver al duelo', opciones: especial
+          ? [{valor: 'no', texto: `Sí, devolverle los No2${yFlecha}`}, {valor: 'si', texto: 'No, ya los gastó'}]
+          : [{valor: 'no', texto: 'No cuenta', detalle: `se le devuelven los No2${yFlecha}`}, {valor: 'si', texto: 'Sí, cuenta como ataque', detalle: 'el próximo cuesta como un segundo ataque'}]});
+      if(r === null || r === undefined) return;
+      devolver = r === 'no';
+    }
+    // 🏹 La flecha especial (2026-10-28, dueño): se gasta al armar el duelo; si se cancela antes de tirar el PdG (o el ataque no cuenta), vuelve.
+    const flecha = conFlecha && (!d.pdg || devolver);
+    col().doc(d.id).update({estado: 'cancelado', ...(devolver ? {resultado: 'devolver'} : flecha ? {resultado: 'devolver-flecha'} : {})}).catch(err => console.error(err));
+  }
+  const devolviendo = new Set(), devolverIntentos = new Map();
+  async function devolverSiToca(d){
+    const soloFlecha = d.resultado === 'devolver-flecha', conFlecha = !!(d.ataque && d.ataque.flecha && d.ataque.flecha.vuelve);
+    const conPagoHab = !soloFlecha && !!(d.ataque && d.ataque.pagoHab);   // ↩ una habilidad que no cuenta (P233)
+    if(devolviendo.has(d.id) || !(d.resultado === 'devolver' || soloFlecha) || !d.atacante) return;
+    let hk = null;
+    try{
+      if(cfgEscuchar.hooksLocal){ hk = cfgEscuchar.hooksLocal(d.atacante); if(hk && typeof hk.then === 'function') hk = await hk; }
+      const H = typeof window !== 'undefined' ? window.DUELO_HOOKS : null;
+      if(!hk && H && H.soy && H.soy(d.atacante)) hk = H;
+    }catch(err){ console.error('Duelo: ¿quién devuelve el ataque?', err); }
+    if(!hk || !(soloFlecha ? hk.devolverFlecha : conPagoHab ? hk.devolverHab : hk.devolverAtaque)){
+      // Recién cargada la página, el atacante puede no estar leído todavía (un creep del mapa): se reintenta un rato (2026-10-23).
+      const n = (devolverIntentos.get(d.id) || 0) + 1;
+      devolverIntentos.set(d.id, n);
+      if(n <= 6) setTimeout(() => devolverSiToca(d), 2500);
+      return;
+    }
+    devolviendo.add(d.id);
+    try{
+      const ref = col().doc(d.id);
+      // La pantalla ve «devolver» antes de que el servidor lo tenga (escritura propia pendiente) y la transacción lee el servidor: si todavía no
+      // llegó, espera y reintenta (2026-10-23: antes devolvía «no» y el duelo quedaba sin devolver para siempre).
+      let ok = false;
+      for(let i = 0; i < 8; i++){
+        const r = await fbDb.runTransaction(async tx => {
+          const s = await tx.get(ref);
+          if(!s.exists) return 'no';
+          const x = s.data().resultado;
+          if(x === d.resultado){ tx.update(ref, {resultado: 'devuelto'}); return 'si'; }
+          return x === 'devuelto' ? 'no' : 'espera';
+        });
+        if(r === 'si'){ ok = true; break; }
+        if(r === 'no') break;
+        await new Promise(res => setTimeout(res, 600));
+      }
+      if(!ok){ devolviendo.delete(d.id); return; }
+      const queHab = conPagoHab ? String((await hk.devolverHab(d)) || '') : '';
+      const costo = soloFlecha || conPagoHab ? 0 : _num(await hk.devolverAtaque(d));
+      const no2Flecha = conFlecha && hk.devolverFlecha ? _num(await hk.devolverFlecha(d)) : 0, flechaVolvio = conFlecha && !!hk.devolverFlecha;
+      const total = costo + no2Flecha, deNo2 = total ? ` — se le devolvieron ${total} No2` : '';
+      const nomFlecha = flechaVolvio ? (d.ataque.flecha.nombre || 'la flecha') : '';
+      const txt = soloFlecha
+        ? `↩ ${d.atacante.nombre}: el duelo se canceló antes de tirar — ${nomFlecha} vuelve${no2Flecha ? ` y se le devolvieron ${no2Flecha} No2` : ''}`
+        : conPagoHab ? `↩ ${d.atacante.nombre}: ${d.ataque.pagoHab.nombre || 'la habilidad'} no cuenta como usada${queHab ? ` — se le devolvió ${queHab}` : ''}${no2Flecha ? ` y ${no2Flecha} No2 de la flecha` : ''}${flechaVolvio ? ` · ${nomFlecha} vuelve` : ''}`
+        : `↩ ${d.atacante.nombre}: el duelo cancelado no cuenta como ataque${deNo2}${flechaVolvio ? ` · ${nomFlecha} vuelve` : ''}`;
+      if(typeof toast === 'function') toast(txt);
+      if(typeof mesaLinea === 'function') mesaLinea(txt, 'recordatorio');
+    }catch(err){ console.error('No se pudo devolver el ataque:', err); devolviendo.delete(d.id); }
+  }
+
+  function escuchar(cfg){
+    if(escuchando || !disponible()) return;
+    cfgEscuchar = cfg || {};
+    col().where('resultado', 'in', ['devolver', 'devolver-flecha']).onSnapshot(snap => snap.docs.forEach(doc => devolverSiToca({id: doc.id, ...doc.data()})),
+      err => console.error('Error escuchando los duelos a devolver:', err));
+    /* Lo primero que llega puede venir de la memoria de la página, con solo los duelos que otra escucha ya había traído (el Desarmar del mapa:
+       los abiertos). Si eso contaba como «lo que ya había pasado», los demás, al llegar del servidor, parecían recién resueltos: al abrir el mapa
+       aparecían todos los duelos del día en botones y en la Crónica, y los avisos de «la primera vez no» (el Empujón, termina el turno, la flecha
+       que erra, el desarme…) podían repetirse con duelos viejos (2026-10-23). Hasta que contesta el servidor, no se toma nada. (Con los cambios
+       de origen: si el servidor confirma lo mismo que la memoria, igual hay que enterarse.) */
+    let servidorVisto = false;
+    escuchando = col().where('estado', 'in', ['esperando', 'empate', 'resuelto']).onSnapshot({includeMetadataChanges: true}, snap => {
+      if(snap.metadata.fromCache && !servidorVisto) return;
+      servidorVisto = true;
+      listaDuelos = snap.docs.map(doc => ({id: doc.id, ...doc.data()}));
+      const ahora = Date.now();
+      // Un duelo nuevo se abre solo para todos los conectados; si ya hay otro abierto y sin resolver, queda el botón.
+      listaDuelos.forEach(d => {
+        if(d.estado !== 'esperando' || descartados.has(d.id) || autoAbiertos.has(d.id)) return;
+        const t = d.creado && d.creado.toMillis ? d.creado.toMillis() : ahora;
+        if(ahora - t > AUTOABRIR_MS) return;
+        autoAbiertos.add(d.id);
+        if(!actual || (actual.dato && (actual.dato.estado === 'resuelto' || actual.dato.estado === 'cancelado'))) abrir(d.id);
+      });
+      revisarPasos();
+      dibujarChips();
+      listaDuelos.forEach(publicarResumenSiCorresponde);   // el resumen final en la Mesa
+      // Hechizo de área (Paso 4/7 del casteo): un sub-duelo con `grupo` que se resolvió — el mapa (GM) avanza la cascada
+      // al siguiente objetivo o cierra el grupo si era el último.
+      if(cfgEscuchar.grupoResuelto && soyGM()){
+        listaDuelos.forEach(d => {
+          if(!d.grupo || d.estado !== 'resuelto' || grupoAvisado.has(d.id)) return;
+          grupoAvisado.add(d.id);
+          try{ cfgEscuchar.grupoResuelto(d); }catch(err){ console.error('Duelo: grupoResuelto', err); }
+        });
+      }
+      // …y si se canceló (2026-10-25, dueño: «arreglá lo del duelo cancelado y la marca en el mapa»): el mapa cierra lo que faltaba del área. Un duelo
+      // cancelado sale de esta escucha (solo trae los que esperan o se resolvieron): se mira el que se fue y, si era de un área, se lee cómo quedó.
+      if(cfgEscuchar.grupoCancelado && soyGM()){
+        snap.docChanges().forEach(ch => {
+          const x = ch.type === 'removed' ? ch.doc.data() : null;
+          if(!x || !x.grupo || grupoCanceladoAvisado.has(ch.doc.id)) return;
+          col().doc(ch.doc.id).get().then(doc => {
+            if(!doc.exists || doc.data().estado !== 'cancelado' || grupoCanceladoAvisado.has(doc.id)) return;
+            grupoCanceladoAvisado.add(doc.id);
+            cfgEscuchar.grupoCancelado({id: doc.id, ...doc.data()});
+          }).catch(err => console.error('Duelo: grupoCancelado', err));
+        });
+      }
+      if(cfgEscuchar.desarmado && soyGM()){   // 🤺 Desarmar (2026-10-21): el arma o el escudo al piso (el mapa del GM)
+        listaDuelos.forEach(d => {
+          if(d.estado !== 'resuelto' || d.resultado !== 'desarmado' || desarmadoAvisado.has(d.id)) return;
+          desarmadoAvisado.add(d.id);
+          if(!desarmadoPrimera) try{ cfgEscuchar.desarmado(d); }catch(err){ console.error('Duelo: desarmado', err); }
+        });
+      }
+      desarmadoPrimera = false;
+      if(cfgEscuchar.bloqueado && soyGM()){
+        listaDuelos.forEach(d => {
+          if(d.estado !== 'resuelto' || d.resultado !== 'bloqueado' || bloqueadoAvisado.has(d.id)) return;
+          bloqueadoAvisado.add(d.id);
+          if(!bloqueadoPrimera) try{ cfgEscuchar.bloqueado(d); }catch(err){ console.error('Duelo: bloqueado', err); }
+        });
+      }
+      bloqueadoPrimera = false;
+      if(cfgEscuchar.terminaTurno && soyGM()){
+        listaDuelos.forEach(d => {
+          if(d.estado !== 'resuelto' || !d.ataque || !d.ataque.terminaTurno || terminaAvisado.has(d.id)) return;
+          terminaAvisado.add(d.id);
+          if(!terminaPrimera) try{ cfgEscuchar.terminaTurno(d); }catch(err){ console.error('Duelo: terminaTurno', err); }
+        });
+      }
+      terminaPrimera = false;
+      if(cfgEscuchar.dodgeLibre){
+        listaDuelos.forEach(d => {
+          if(d.estado !== 'resuelto' || !d.contacto || !d.contacto.dodgeLibre || dodgeLibreAvisado.has(d.id)) return;
+          dodgeLibreAvisado.add(d.id);
+          if(!dodgeLibrePrimera && (esMio(d.defensor) || (soyGM() && d.defensor && d.defensor.tipo === 'creep'))) try{ cfgEscuchar.dodgeLibre(d); }catch(err){ console.error('Duelo: dodgeLibre', err); }
+        });
+      }
+      dodgeLibrePrimera = false;
+      if(cfgEscuchar.flechaErrada){
+        listaDuelos.forEach(d => {
+          if(d.estado !== 'resuelto' || !d.ataque || !d.ataque.flecha || !['fallo', 'bloqueado'].includes(d.resultado) || flechaAvisada.has(d.id)) return;
+          flechaAvisada.add(d.id);
+          if(!flechaPrimera && esMio(d.atacante)) try{ cfgEscuchar.flechaErrada(d); }catch(err){ console.error('Duelo: flechaErrada', err); }
+        });
+      }
+      flechaPrimera = false;
+      if(cfgEscuchar.pdgEspGanado){   // 🔮 ganó una tirada de PdG.Esp (el Orbe del custodio, 2026-10-18), en la pantalla de quien la tiró
+        listaDuelos.forEach(d => {
+          if(!d.contacto || d.contacto.gana !== 'atacante' || !d.hab || !d.hab.tira || d.hab.tira.stat !== 'pdgmg' || pdgEspAvisado.has(d.id)) return;
+          pdgEspAvisado.add(d.id);
+          if(!pdgEspPrimera && (esMio(d.atacante) || (soyGM() && d.atacante && d.atacante.tipo === 'creep'))) try{ cfgEscuchar.pdgEspGanado(d); }catch(err){ console.error('Duelo: pdgEspGanado', err); }
+        });
+        pdgEspPrimera = false;
+      }
+      if(cfgEscuchar.habResistida && soyGM()){   // 🔮 el defensor le ganó la Res.Esp a una habilidad (el Contrahechizo, 2026-10-18): la pantalla del GM
+        listaDuelos.forEach(d => {
+          if(!d.contacto || d.contacto.gana !== 'defensor' || !d.hab || resistidaAvisada.has(d.id)) return;
+          resistidaAvisada.add(d.id);
+          if(!resistidaPrimera) try{ cfgEscuchar.habResistida(d); }catch(err){ console.error('Duelo: habResistida', err); }
+        });
+        resistidaPrimera = false;
+      }
+      if(cfgEscuchar.disparoResuelto){   // 🏹 un ataque que terminó, en la pantalla de quien atacó (Lectura del viento, Racha, Encadenar; 2026-10-11)
+        listaDuelos.forEach(d => {
+          if(d.estado !== 'resuelto' || !d.ataque || d.hab || disparoAvisado.has(d.id)) return;
+          disparoAvisado.add(d.id);
+          if(!disparoPrimera && (esMio(d.atacante) || (soyGM() && d.atacante && d.atacante.tipo === 'creep'))) try{ cfgEscuchar.disparoResuelto(d); }catch(err){ console.error('Duelo: disparoResuelto', err); }
+        });
+        disparoPrimera = false;
+      }
+      if(cfgEscuchar.remachadoraErro && soyGM()){   // 🎯 la Remachadora (2026-10-11): errar o que la bloqueen vuelve la cuenta a 0
+        listaDuelos.forEach(d => {
+          if(d.estado !== 'resuelto' || !d.ataque || !d.ataque.remachadora || !['fallo', 'bloqueado'].includes(d.resultado) || remachaAvisada.has(d.id)) return;
+          remachaAvisada.add(d.id);
+          try{ cfgEscuchar.remachadoraErro(d); }catch(err){ console.error('Duelo: remachadoraErro', err); }
+        });
+      }
+      // Fase 'dodge' de un hechizo de área (pedido del dueño, 2026-09-27): avisa cuando un duelo ENTRA y cuando SALE
+      // de la fase (se resolvió, moviéndose o declinando) — el mapa usa esto para minimizar/reabrir el cuadro solo y
+      // mostrar un cartel de "no me quiero mover" mientras le toca decidir a quien defiende (o al GM).
+      if(cfgEscuchar.dodgeEmpieza || cfgEscuchar.dodgeTermina){
+        const enDodgeAhora = new Map(listaDuelos.filter(d => d.fase === 'dodge' && d.estado === 'esperando').map(d => [d.id, d]));
+        enDodgeAhora.forEach((d, id) => {
+          if(dodgeActivos.has(id)) return;
+          dodgeActivos.add(id);
+          if(cfgEscuchar.dodgeEmpieza) try{ cfgEscuchar.dodgeEmpieza(d); }catch(err){ console.error('Duelo: dodgeEmpieza', err); }
+        });
+        [...dodgeActivos].forEach(id => {
+          if(enDodgeAhora.has(id)) return;
+          dodgeActivos.delete(id);
+          const d = listaDuelos.find(x => x.id === id) || {id};
+          if(cfgEscuchar.dodgeTermina) try{ cfgEscuchar.dodgeTermina(d); }catch(err){ console.error('Duelo: dodgeTermina', err); }
+        });
+      }
+      // El GM (en el mapa) aplica el daño al HP apenas el atacante lo tira.
+      if(cfgEscuchar.aplicar && soyGM()){
+        listaDuelos.forEach(d => {
+          if(d.fase !== 'dano' || !d.dano || d.dano.aplicado || d.dano.reclamado || aplicando.has(d.id)) return;
+          if(pideAceptar(d) && !d.dano.aceptado) return;   // 💔 el personaje que lo recibe todavía no tocó «Aplicar el daño»
+          aplicando.add(d.id);
+          reclamarAplicacion(d.id).then(async mio => {
+            if(!mio) return;
+            let info;
+            try{ info = await cfgEscuchar.aplicar(d); }
+            catch(err){ console.error('Duelo: no se pudo aplicar el daño', err); info = {manual: true, motivoManual: 'no se pudo aplicar solo'}; }
+            const crit = d.resultado === 'pego' && d.crit && d.crit.critico;
+            await guardarAplicacion(d.id, {golpe: 0, ...info});
+          }).catch(err => console.error('Duelo: error al aplicar el daño', err));
+        });
+      }
+      // El GM (en el mapa) aplica los efectos que el atacante pidió («Aplicar») — y, desde el 2026-09-29, también
+      // uno mismo cuando el efecto es sobre su propio personaje (`esMio(d.defensor)`, ej. Blindaje): antes esto
+      // dependía SIEMPRE de que el GM tuviera el mapa abierto y conectado, así que un buff sobre uno mismo se
+      // quedaba en «Aplicando…» para siempre si nadie más estaba mirando. Escribir la propia ficha nunca
+      // necesita permiso de nadie más, así que no hace falta esperar al GM para eso puntual.
+      if(cfgEscuchar.aplicarEfecto){
+        listaDuelos.forEach(d => {
+          if(d.fase !== 'efectos' || !(soyGM() || esMio(d.defensor))) return;
+          (d.efectos || []).forEach((ef, i) => {
+            const clave = d.id + ':' + i;
+            if(ef.aplicar !== 'pedido' || ef.aplicado || aplicando.has(clave)) return;
+            if(cfgEscuchar.aplicaSolo && !soyGM() && !cfgEscuchar.aplicaSolo(d, ef)) return;
+            const sp = specDeEfecto(ef);
+            if(sp && sp.nombre === 'Demora' && !cfgEscuchar.aplicaDemora) return;   // el orden de turnos lo mueve el mapa
+            aplicando.add(clave);
+            reclamarEfecto(d.id, i).then(async mio => {
+              if(!mio) return;
+              let info;
+              try{ info = await cfgEscuchar.aplicarEfecto(d, ef); }
+              catch(err){ console.error('Duelo: no se pudo aplicar el efecto', err); info = {manual: true, nota: 'no se pudo aplicar solo: hacelo a mano'}; }
+              await marcarEfecto(d.id, i, {aplicado: true, aplicar: '', nota: String(info.nota || (info.manual ? 'a mano' : '')).slice(0, 120), ...(info.sinEfecto ? {sinEfecto: true} : {})});
+            }).catch(err => console.error('Duelo: error al aplicar el efecto', err));
+          });
+        });
+      }
+    }, err => console.error('Duelo: error escuchando los duelos', err));
+    limpiarViejos();
+  }
+
+  async function limpiarViejos(){
+    if(!soyGM()) return;
+    try{
+      const corte = firebase.firestore.Timestamp.fromMillis(Date.now() - 24 * 3600 * 1000);
+      const snap = await col().where('creado', '<', corte).limit(30).get();
+      await Promise.all(snap.docs.map(d => d.ref.delete()));
+    }catch(e){ /* sin permiso o sin reglas nuevas: no pasa nada */ }
+  }
+
+  return {pagoHab, fraseResumen, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
+})();

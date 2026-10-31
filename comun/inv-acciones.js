@@ -1,0 +1,153 @@
+/* =========================================================
+   INV-ACCIONES — los botones de la Botonera de una invocación, fuera de la ficha (paso 4, etapa 4e, tanda 3 de
+   docs/plan-paso4-etapa4.md, 2026-10-01)
+   Lo que antes hacía ficha-personaje/js/04-invocaciones.js (tirarValorStatInv, invAtacar/invAtacarSuelto, invDanio,
+   invTirarStat), copiado tal cual y partido como comun/creep-acciones.js: lo que CAMBIA a la invocación (pagar el Parry o el
+   ataque: devuelven {error} o {aviso}) y las TIRADAS (devuelven {origen, r} para publicar, o {error}). Así la ficha lo hace con
+   su personaje en memoria y el mapa con el de la Botonera nueva, y cada uno publica y guarda a su manera. El Parry que espera su
+   Bloqueo lo lleva cada pantalla.
+   Necesita comun/combatiente.js, inv-calculo.js, ficha-calculo.js (STAT_LABEL) y tiradas.js (tirarDados).
+   ========================================================= */
+const InvAcciones = (() => {
+  const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : 0; };
+  const fmt = n => Number.isInteger(n) ? n : Math.round(n*100)/100;
+  const I = () => InvCalculo;
+  const etq = statId => FichaCalculo.STAT_LABEL[statId] || statId;
+
+  /* ---------- Tiradas ---------- */
+  // La misma tirada que el personaje y los creeps (comun/combatiente.js): con Afortunado también tira dos veces (P100).
+  function tirada(inv, nombre, valor, statId, extra){   // extra: un fijo que se suma después del dado (el Paso fantasma)
+    const r = Combatiente.tirarStat(valor, inv.estados, statId, extra ? {extra} : undefined);
+    if(!r) return {error: `${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`};
+    return {origen: `${inv.nombre} · ${nombre}`, r};
+  }
+  // Una tirada de stat de la Botonera (también Esquivar, Parry y Bloqueo). o: {parryPendiente (¿tiene un Parry esperando su
+  // Bloqueo?), trasParry (el duelo ya sabe que el Parry se ganó)}. Devuelve {error} o {tirada, parry: 'poner'|'sacar'|'',
+  // aviso, cambio (true si le cobró algo)}: el Parry cobra 1 No2 y deja el Bloqueo pendiente; el Bloqueo lo cierra.
+  function tirarStat(inv, statId, o){
+    o = o || {};
+    if((statId === 'parry' || statId === 'bloqueo') && !I().defensa(inv)) return {error: `${inv.nombre}: ${Combatiente.SIN_ARMA_DEFENSA}`};
+    let parry = '', aviso = '', cambio = false;
+    if(statId === 'bloqueo'){
+      if(!o.trasParry && !o.parryPendiente) return {error: `${inv.nombre}: ${Combatiente.BLOQUEO_SOLO_TRAS_PARRY}`};
+      parry = 'sacar';
+    }
+    if(statId === 'parry'){
+      const gratis = Combatiente.parryGratis(st => I().modTotal(inv, st), num(inv.parryTurno));   // Parada fácil (2026-10-06)
+      const costo = gratis ? 0 : Combatiente.conExtenuado(inv.estados, Combatiente.costoParry());   // el Parry siempre cuesta 1 No2 (+ Extenuado)
+      if(Combatiente.defensaSinNo2(inv.nitros, costo)) return {error: `${inv.nombre} ${Combatiente.YA_NEGATIVO_TXT}`};   // ya en negativo (2026-10-23)
+      inv.parryTurno = 1;   // (se vacía al empezar su turno)
+      inv.nitros = num(inv.nitros) - costo;   // sin No2 queda en negativo: se descuenta en su próxima recarga (2026-10-06)
+      Combatiente.aplicarTormenta(inv, inv.estados, costo, {motivo: 'el Parry'});
+      Combatiente.avisarDeudaNo2({nombre: inv.nombre, accion: 'Parry', costo, quedan: num(inv.nitros)});
+      parry = 'poner';   // si gana el Parry, sigue el Bloqueo
+      cambio = true;
+      aviso = `${inv.nombre}: Parry ${gratis ? 'gratis (Parada fácil)' : `−${fmt(costo)} No2`} · quedan ${fmt(inv.nitros)}`;
+    }
+    const firme = statId === 'bloqueo' ? Combatiente.bloqueoFirme(st => I().modTotal(inv, st), num(inv.golpeTurno)) : 0;   // Bloqueo firme (2026-10-06)
+    const valor = statId === 'bloqueo' ? I().bloqueoValor(inv) + firme : I().statValor(inv, statId);
+    return {tirada: tirada(inv, etq(statId) + (firme ? ` (+${fmt(firme)} Bloqueo firme)` : ''), valor, statId), parry, aviso, cambio};
+  }
+  // El daño de su arma; mods: lo que suma un ataque con arreglos (dados y fijo). Los efectos al golpear los publica cada pantalla.
+  function dano(inv, mods){
+    let formula = I().danoTxt(inv, I().statValor(inv, 'dmg'));
+    if(mods){
+      if(num(mods.dados) > 0) formula += ` + ${Math.round(num(mods.dados))}d${Combatiente.armaEnMano(inv).tipoDado}`;
+      if(mods.dadoExtra) formula += ` + ${mods.dadoExtra}`;
+      if(num(mods.fijo)) formula += ` ${num(mods.fijo) > 0 ? '+' : '-'} ${fmt(Math.abs(num(mods.fijo)))}`;
+    }
+    const r = tirarDados(formula);
+    return r ? {origen: `${inv.nombre} · Daño Arma`, r} : null;
+  }
+
+  /* ---------- Atacar ----------
+     Con el duelo: el ataque que va al cuadro (ataqueDuelo). Sin duelo (o "Sin objetivo"): cobrar (pagarAtaque: el primero del
+     turno Tipo ÷ 2, después el Tipo completo; suma al conteo) y tirar el PdG (tiradaAtaque). Atacar cierra el Parry pendiente:
+     lo borra cada pantalla. */
+  function ataqueDuelo(inv, tipo){
+    return Combatiente.ataqueConSuArma(inv, tipo === 'oportunidad' || tipo === 'contra' ? tipo : 'normal', I().alcance(inv));
+  }
+  /* Sin No2 suficientes (2026-10-02, hoja de ruta B-7, igual que los creeps y los personajes: avisar y dejar seguir): faltanNitros, la
+     pregunta «¿Atacar igual?», pagar forzando (gasta los que tenga, hasta 0) y la línea roja de la Mesa (alertaSinNitros). */
+  /* Ataque de oportunidad y contraataque (2026-10-03, como los creeps — CreepAcciones): cuestan lo de un primer ataque (Tipo ÷ 2), no cuentan
+     como ataque del turno y suman el «PdG en oportunidad» / «PdG en contraataque» de su arma. Antes se cobraban y tiraban como uno normal. */
+  const NOMBRE_ESPECIAL = {oportunidad: 'Ataque de oportunidad', contra: 'Contraataque'};
+  // La regla universal (Combatiente.statAtaqueEspecial): el PdG especial venga de su arma, su equipo o sus estados.
+  const bonoEspecial = (inv, tipo) => { const st = Combatiente.statAtaqueEspecial(tipo); return st ? I().modTotal(inv, st) : 0; };
+  const especial = tipo => tipo === 'oportunidad' || tipo === 'contra';
+  const costoAtaqueDe = (inv, tipo) => especial(tipo) ? Combatiente.conExtenuado(inv.estados, Math.max(0, Combatiente.costoEspecial(Combatiente.armaEnMano(inv).tipoDado, Combatiente.armaDeCombatiente(inv), tipo) - Combatiente.ahorroEspecial(tipo, st => I().modTotal(inv, st)))) : I().costoAtaque(inv);
+  const faltanNitros = (inv, tipo) => costoAtaqueDe(inv, tipo) > num(inv.nitros);
+  // Un duelo cancelado que no cuenta como ataque (2026-10-15): el conteo y los No2, de vuelta. → los No2 devueltos.
+  // `pagado` (2026-10-28): lo que se pagó de verdad (Combatiente.pagoDeDuelo); sin él, el costo entero.
+  function devolverAtaque(inv, tipo, pagado){
+    if(!especial(tipo)) inv.ataquesTurno = Math.max(0, num(inv.ataquesTurno) - 1);
+    const costo = pagado !== null && pagado !== undefined ? Math.max(0, num(pagado)) : costoAtaqueDe(inv, tipo);
+    inv.nitros = num(inv.nitros) + costo;
+    return costo;
+  }
+  function preguntaSinNitros(inv, tipo){
+    return `${inv.nombre} no tiene No2 suficientes: ${especial(tipo) ? 'el ' + NOMBRE_ESPECIAL[tipo].toLowerCase() : 'este ataque'} cuesta ${fmt(costoAtaqueDe(inv, tipo))} y tiene ${fmt(Math.max(0, num(inv.nitros)))}.\n\n¿Atacar igual? Gasta los No2 que tenga y queda anotado en rojo en la Mesa.`;
+  }
+  function pagarAtaque(inv, forzar, tipo){
+    const costo = costoAtaqueDe(inv, tipo), tenia = Math.max(0, num(inv.nitros));
+    const forzado = costo > num(inv.nitros) ? {costo, tenia} : null;
+    if(forzado && !forzar) return {error: `${inv.nombre}: no le alcanzan los Nitros — ${especial(tipo) ? 'el ' + NOMBRE_ESPECIAL[tipo].toLowerCase() : 'este ataque'} cuesta ${fmt(costo)} y tiene ${fmt(num(inv.nitros))}`};
+    if(especial(tipo)){
+      inv.nitros = forzado ? 0 : num(inv.nitros) - costo;
+      Combatiente.aplicarTormenta(inv, inv.estados, costo, {motivo: 'el ' + NOMBRE_ESPECIAL[tipo].toLowerCase()});
+      const bono = bonoEspecial(inv, tipo);
+      return {forzado, paga: forzado ? tenia : costo, aviso: `${inv.nombre}: ${NOMBRE_ESPECIAL[tipo].toLowerCase()} −${fmt(forzado ? tenia : costo)} No2 ${forzado ? `(costaba ${fmt(costo)})` : '(lo de un primer ataque)'}${bono ? ` · PdG +${fmt(bono)} por ${tipo === 'contra' ? 'contraataque' : 'oportunidad'}` : ''}`};
+    }
+    const primero = num(inv.ataquesTurno) === 0;
+    inv.nitros = forzado ? 0 : num(inv.nitros) - costo;
+    Combatiente.aplicarTormenta(inv, inv.estados, costo, {motivo: 'atacar'});
+    inv.ataquesTurno = num(inv.ataquesTurno) + 1;
+    return {forzado, paga: forzado ? tenia : costo, aviso: `${inv.nombre}: -${fmt(forzado ? tenia : costo)} No2${forzado ? ` (costaba ${fmt(costo)})` : ''} · ${primero ? 'primer ataque del turno' : 'ataque extra'}`};
+  }
+  function alertaSinNitros(inv, forzado, tipo){
+    if(!forzado || typeof fbDb === 'undefined' || !fbDb || typeof fbUsuario === 'undefined' || !fbUsuario || typeof fbMiembro === 'undefined' || !fbMiembro) return;
+    fbDb.collection(fbRutaCampana('tiradas')).add({
+      uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '',
+      origen: `⚠ ${inv.nombre} ${especial(tipo) ? 'hizo un ' + NOMBRE_ESPECIAL[tipo].toLowerCase() : 'atacó'} sin No2 suficientes`, formula: `Costaba ${fmt(forzado.costo)} No2 y tenía ${fmt(forzado.tenia)}`,
+      rolls: [], mod: 0, total: 0, desde: 'alerta-roja',
+      cuando: firebase.firestore.FieldValue.serverTimestamp(),
+    }).catch(err => console.error('No se pudo publicar la alerta de No2:', err));
+  }
+  const pdgExtraInv = inv => Combatiente.pdgExtraArma(st => I().modTotal(inv, st), {tipoDado: Combatiente.armaEnMano(inv).tipoDado, armaDeRango: Combatiente.armaEnMano(inv).armaDeRango});   // guantes (2026-10-05)
+  const tiradaAtaque = (inv, tipo) => especial(tipo) ? tirada(inv, `${NOMBRE_ESPECIAL[tipo]} (PdG)`, I().statValor(inv, 'pdg') + bonoEspecial(inv, tipo) + pdgExtraInv(inv), 'pdg')
+    : tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg') + pdgExtraInv(inv), 'pdg');
+
+  // El menú «¿Qué ataque es?» de una invocación (el mismo de personajes y creeps: Combatiente.menuTipoAtaqueHtml).
+  const menuTipoAtaque = (inv, attr) => Combatiente.menuTipoAtaqueHtml({nombre: inv.nombre, arma: Combatiente.armaDeCombatiente(inv), normal: I().costoAtaque(inv), primero: num(inv.ataquesTurno) === 0,
+    especial: costoAtaqueDe(inv, 'contra'), especialOpor: costoAtaqueDe(inv, 'oportunidad'), attr, ref: inv.id});
+  /* Levantarse (Sentado) y Soltarse (trampas de Atrapar): 2026-10-03, «las reglas de combate aplican a creeps, personajes e invocaciones
+     por igual». Levantarse cuesta lo mismo que a un personaje (FichaCalculo.IT2.nitrosLevantarse). Soltarse: primero la tirada (una sola
+     vez), después aplicarla (cobra y, si salió, saca el estado). → {error} / {aviso}; tiradaSoltarse → {s, r, ok, est, origen} o null. */
+  function levantarse(inv){
+    const lv = Combatiente.levantable(inv.estados);
+    if(!lv) return null;
+    const est = lv.est;
+    const costo = Combatiente.conExtenuado(inv.estados, Math.max(0, num(FichaCalculo.IT2.nitrosLevantarse) - num(I().modTotal(inv, 'levantarse'))));   // + Extenuado   // Levantarse rápido (2026-10-06)
+    if(num(inv.nitros) < costo) return {error: `${inv.nombre}: no le alcanzan los No2 — ${'levantarse'} cuesta ${costo}`};
+    inv.nitros = num(inv.nitros) - costo;
+    Combatiente.aplicarTormenta(inv, inv.estados, costo, {motivo: 'levantarse'});
+    inv.estados = inv.estados.filter(e => e !== est);
+    return {aviso: `${inv.nombre} se levantó${costo ? ` · −${fmt(costo)} No2` : ''}`};
+  }
+  function tiradaSoltarse(inv){
+    const est = Combatiente.estadoSoltable(inv.estados);
+    if(!est) return null;
+    const s0 = Combatiente.soltarNorm(est.soltar), s = {...s0, no2: Combatiente.conExtenuado(inv.estados, s0.no2)};   // + Extenuado
+    const t = Combatiente.tiradaSoltarse(est, I().statValor(inv, s.stat) + Math.max(0, num(I().modTotal(inv, 'soltarse'))), inv.estados);
+    return {...t, s, est, origen: `${inv.nombre} · Soltarse (${est.nombre}) · ${s.etq} contra ${s.dif}`};
+  }
+  function aplicarSoltarse(inv, t){
+    if(num(inv.nitros) < t.s.no2) return {error: `${inv.nombre}: no le alcanzan los No2 — soltarse cuesta ${t.s.no2}`};
+    inv.nitros = num(inv.nitros) - t.s.no2;
+    Combatiente.aplicarTormenta(inv, inv.estados, t.s.no2, {motivo: 'intentar soltarse'});
+    if(t.ok) inv.estados = (inv.estados || []).filter(e => e !== t.est && !(t.est.id && e.id === t.est.id));
+    const hundio = Combatiente.hundirSiFalla((inv.estados || []).find(e => e === t.est || (t.est.id && e.id === t.est.id)), t);
+    return {aviso: `${inv.nombre} ${t.ok ? 'se soltó' : 'no se soltó'} (${t.r ? t.r.total : '—'} contra ${t.s.dif}) · −${fmt(t.s.no2)} No2${hundio ? ` · se hundió más: +${t.s.hunde} turno${t.s.hunde === 1 ? '' : 's'}` : ''}`};
+  }
+  return {devolverAtaque, levantarse, tiradaSoltarse, aplicarSoltarse, tirada, tirarStat, dano, ataqueDuelo, pagarAtaque, tiradaAtaque, faltanNitros, preguntaSinNitros, alertaSinNitros, bonoEspecial, costoAtaqueDe, menuTipoAtaque};
+})();

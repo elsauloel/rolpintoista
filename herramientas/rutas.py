@@ -11,5 +11,4 @@ RAIZ = AQUI.parent
 FICHA = str(RAIZ / "ficha-personaje" / "ficha.html")
 GM = str(RAIZ / "gm-toolset" / "gm-tools.html")
 VENDOR = str(RAIZ / "gm-toolset" / "vendor-generator.html")
-XLSX = str(RAIZ / "assets" / "catalogo.xlsx")
 SP = str(AQUI)

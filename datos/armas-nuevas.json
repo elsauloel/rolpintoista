@@ -1,0 +1,1823 @@
+[
+ {
+  "id": "nuevo-cuchillo-de-cocina-reconvertido",
+  "nombre": "Cuchillo de cocina reconvertido",
+  "tanda": 1,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Lo que había en la cocina de la nave. Sirve para pinchar, y para untar. Variación: pdg +1."
+ },
+ {
+  "id": "nuevo-estilete-de-practica",
+  "nombre": "Estilete de práctica",
+  "tanda": 1,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 1,
+  "danoFijo": 1,
+  "mods": [
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Punta afilada de más. El arma del que recién empieza, y por eso la usa con cuidado: +1 de daño fijo y PdG +1."
+ },
+ {
+  "id": "nuevo-lezna-de-zapatero",
+  "nombre": "Lezna de zapatero",
+  "tanda": 1,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Lisiado",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de dejar Lisiado 3 turnos (pincha donde duele)."
+   }
+  ],
+  "detalle": "Pincha justo en el tendón. PdG +1 y 25 % de Lisiado."
+ },
+ {
+  "id": "nuevo-daga-de-duelo",
+  "nombre": "Daga de duelo",
+  "tanda": 1,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 2,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "pdg",
+    "val": 1
+   },
+   {
+    "stat": "critpot",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Equilibrada para encontrar el hueco. PdG +1 y Crítico potente +2."
+ },
+ {
+  "id": "nuevo-lanza-de-leva",
+  "nombre": "Lanza de leva",
+  "tanda": 1,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_2m",
+  "tipoDado": 4,
+  "peso": 3,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Lisiado",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de dejar Lisiado 3 turnos."
+   }
+  ],
+  "detalle": "La lanza de todo recluta: a dos manos, Alcance +1 y 25 % de Lisiado."
+ },
+ {
+  "id": "nuevo-aguja-de-acupunturista",
+  "nombre": "Aguja de acupunturista",
+  "tanda": 1,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 1,
+  "danoFijo": 2,
+  "mods": [
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Sangrado",
+    "caras": 6,
+    "exitos": 2,
+    "detalle": "33 % de dejar Sangrado."
+   }
+  ],
+  "detalle": "Fina como un pelo: +2 de daño fijo, PdG +1 y 33 % de Sangrado."
+ },
+ {
+  "id": "nuevo-estoque-de-esgrima",
+  "nombre": "Estoque de esgrima",
+  "tanda": 1,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 2,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 1
+   },
+   {
+    "stat": "critpot",
+    "val": 3
+   },
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "El arma de los duelistas: Alcance +1, Crítico potente +3 y Crítico frecuente +1."
+ },
+ {
+  "id": "nuevo-lanza-de-lisiar",
+  "nombre": "Lanza de lisiar",
+  "tanda": 1,
+  "tier": "Raro",
+  "tipoItem": "arma_2m",
+  "tipoDado": 4,
+  "peso": 3,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 2
+   },
+   {
+    "stat": "critpot",
+    "val": 3
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Lisiado",
+    "caras": 6,
+    "exitos": 2,
+    "detalle": "33 % de dejar Lisiado 3 turnos."
+   }
+  ],
+  "detalle": "Larga y traicionera: Alcance +2, Crítico potente +3 y 33 % de Lisiado."
+ },
+ {
+  "id": "nuevo-punal-envenenado",
+  "nombre": "Puñal envenenado",
+  "tanda": 1,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 2,
+  "danoFijo": 1,
+  "mods": [
+   {
+    "stat": "critpot",
+    "val": 3
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Envenenar",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Cada golpe deja 3 stacks de Veneno (1 HP por stack por turno).",
+    "stacks": 3
+   }
+  ],
+  "detalle": "La hoja siempre húmeda. +1 de daño fijo, Crítico potente +3 y Veneno de 3 stacks en cada golpe."
+ },
+ {
+  "id": "nuevo-aguijon-de-la-reina-avispa",
+  "nombre": "Aguijón de la Reina Avispa",
+  "tanda": 1,
+  "tier": "Excepcional",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 2,
+  "danoFijo": 2,
+  "mods": [
+   {
+    "stat": "critpot",
+    "val": 4
+   },
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Envenenar",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Veneno severo por 4 turnos en cada golpe."
+   }
+  ],
+  "detalle": "Sacado del nido de la reina. +2 de daño fijo, Crítico potente +4, Crítico frecuente +1 y Veneno severo por 4 turnos en cada golpe."
+ },
+ {
+  "id": "nuevo-lanza-del-alba",
+  "nombre": "Lanza del alba",
+  "tanda": 1,
+  "tier": "Excepcional",
+  "tipoItem": "arma_2m",
+  "tipoDado": 4,
+  "peso": 4,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 2
+   },
+   {
+    "stat": "pdg",
+    "val": 1
+   },
+   {
+    "stat": "critpot",
+    "val": 2
+   },
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Lisiado",
+    "caras": 2,
+    "exitos": 1,
+    "detalle": "50 % de dejar Lisiado 3 turnos."
+   }
+  ],
+  "detalle": "Brilla al primer sol. A dos manos: Alcance +2, PdG +1, Crítico potente +2, Crítico frecuente +1 y 50 % de Lisiado."
+ },
+ {
+  "id": "nuevo-colmillo-de-la-reina-arana",
+  "nombre": "Colmillo de la Reina Araña",
+  "tanda": 1,
+  "tier": "Legendario",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 3,
+  "danoFijo": 3,
+  "mods": [
+   {
+    "stat": "pdg",
+    "val": 2
+   },
+   {
+    "stat": "crit",
+    "val": 2
+   },
+   {
+    "stat": "critpot",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Envenenar",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Veneno severo por 6 turnos en cada golpe."
+   },
+   {
+    "nombre": "Drena vida",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Recupera el 50 % del daño hecho; lo que pasa del máximo de HP queda como Excedente de vida."
+   }
+  ],
+  "detalle": "El colmillo de una reina que ya no está. +3 de daño fijo, PdG +2, Crítico frecuente +2, Crítico potente +2, Veneno severo por 6 turnos en cada golpe y Drena vida (50 % del daño, con Excedente de vida)."
+ },
+ {
+  "id": "nuevo-espada-de-entrenamiento",
+  "nombre": "Espada de entrenamiento",
+  "tanda": 2,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "mods": [],
+  "efectosGolpe": [
+   {
+    "nombre": "Lisiado",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de dejar Lisiado 3 turnos."
+   }
+  ],
+  "detalle": "La de madera forrada en lata. Corta, mal, pero corta. 25 % de Lisiado (los moretones también cuentan)."
+ },
+ {
+  "id": "nuevo-machete-de-chacarero",
+  "nombre": "Machete de chacarero",
+  "tanda": 2,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 6,
+  "peso": 1,
+  "danoFijo": 1,
+  "mods": [
+   {
+    "stat": "ini",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Para abrir yuyo y, si hace falta, otras cosas. +1 de daño fijo."
+ },
+ {
+  "id": "nuevo-sable-de-abordaje-oxidado",
+  "nombre": "Sable de abordaje oxidado",
+  "tanda": 2,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "mods": [],
+  "efectosGolpe": [
+   {
+    "nombre": "Sangrado",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de dejar Sangrado."
+   }
+  ],
+  "detalle": "Herrumbre en el filo: 25 % de Sangrado."
+ },
+ {
+  "id": "nuevo-espada-larga-de-infanteria",
+  "nombre": "Espada larga de infantería",
+  "tanda": 2,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "parry",
+    "val": 1
+   },
+   {
+    "stat": "pdgcontra",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "La espada del soldado raso, bien balanceada. Parry +1. PdG +1 al contraatacar."
+ },
+ {
+  "id": "nuevo-cimitarra-del-desierto",
+  "nombre": "Cimitarra del desierto",
+  "tanda": 2,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 6,
+  "peso": 2,
+  "danoFijo": 1,
+  "mods": [
+   {
+    "stat": "ini",
+    "val": 1
+   },
+   {
+    "stat": "pdgcontra",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Sangrado",
+    "caras": 6,
+    "exitos": 2,
+    "detalle": "33 % de dejar Sangrado."
+   }
+  ],
+  "detalle": "Curva y ligera: +1 de daño fijo, Iniciativa +1 y 33 % de Sangrado. PdG +1 al contraatacar."
+ },
+ {
+  "id": "nuevo-espada-de-la-guardia",
+  "nombre": "Espada de la guardia",
+  "tanda": 2,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "parry",
+    "val": 1
+   },
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Entregada con el uniforme. Parry +1 y Crítico frecuente +1."
+ },
+ {
+  "id": "nuevo-katana-de-maestro",
+  "nombre": "Katana de maestro",
+  "tanda": 2,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "parry",
+    "val": 2
+   },
+   {
+    "stat": "ini",
+    "val": 1
+   },
+   {
+    "stat": "crit",
+    "val": 1
+   },
+   {
+    "stat": "pdgcontra",
+    "val": 3
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Sangrado",
+    "caras": 2,
+    "exitos": 1,
+    "detalle": "50 % de dejar Sangrado."
+   }
+  ],
+  "detalle": "Forjada por quien enseña a forjar. Parry +2, Iniciativa +1, Crítico frecuente +1 y 50 % de Sangrado. PdG +3 al contraatacar."
+ },
+ {
+  "id": "nuevo-sable-del-capitan-pirata",
+  "nombre": "Sable del capitán pirata",
+  "tanda": 2,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 6,
+  "peso": 2,
+  "danoFijo": 2,
+  "mods": [
+   {
+    "stat": "parry",
+    "val": 1
+   },
+   {
+    "stat": "crit",
+    "val": 1
+   },
+   {
+    "stat": "pdgcontra",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Sangrado",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Cada golpe deja Sangrado."
+   }
+  ],
+  "detalle": "Muchas cubiertas, muchas heridas. +2 de daño fijo, Parry +1, Crítico frecuente +1 y Sangrado en cada golpe. PdG +2 al contraatacar."
+ },
+ {
+  "id": "nuevo-espada-vampirica-menor",
+  "nombre": "Espada vampírica menor",
+  "tanda": 2,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "parry",
+    "val": 1
+   },
+   {
+    "stat": "pdgcontra",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Drena vida",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Recupera el 25 % del daño hecho (no pasa el máximo de HP)."
+   }
+  ],
+  "detalle": "Se bebe un poco de lo que corta. Parry +1 y Drena vida (25 % del daño). PdG +2 al contraatacar."
+ },
+ {
+  "id": "nuevo-espadon-de-acero-de-toledo",
+  "nombre": "Espadón de acero de Toledo",
+  "tanda": 2,
+  "tier": "Excepcional",
+  "tipoItem": "arma_2m",
+  "tipoDado": 6,
+  "peso": 4,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "parry",
+    "val": 2
+   },
+   {
+    "stat": "crit",
+    "val": 2
+   },
+   {
+    "stat": "pdgcontra",
+    "val": 3
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Sangrado",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Cada golpe deja Sangrado."
+   }
+  ],
+  "detalle": "A dos manos y de otro siglo: Parry +2, Crítico frecuente +2 y Sangrado en cada golpe. PdG +3 al contraatacar."
+ },
+ {
+  "id": "nuevo-katana-del-viento",
+  "nombre": "Katana del viento",
+  "tanda": 2,
+  "tier": "Excepcional",
+  "tipoItem": "arma_1m",
+  "tipoDado": 6,
+  "peso": 3,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "ini",
+    "val": 2
+   },
+   {
+    "stat": "parry",
+    "val": 2
+   },
+   {
+    "stat": "crit",
+    "val": 2
+   },
+   {
+    "stat": "pdgcontra",
+    "val": 3
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Lisiado",
+    "caras": 2,
+    "exitos": 1,
+    "detalle": "50 % de dejar Lisiado 3 turnos."
+   }
+  ],
+  "detalle": "Corta antes de que llegue el sonido: Iniciativa +2, Parry +2, Crítico frecuente +2 y 50 % de Lisiado. PdG +3 al contraatacar."
+ },
+ {
+  "id": "nuevo-filo-del-capitan-sin-nombre",
+  "nombre": "Filo del Capitán Sin Nombre",
+  "tanda": 2,
+  "tier": "Legendario",
+  "tipoItem": "arma_1m",
+  "tipoDado": 6,
+  "peso": 3,
+  "danoFijo": 3,
+  "mods": [
+   {
+    "stat": "parry",
+    "val": 3
+   },
+   {
+    "stat": "ini",
+    "val": 1
+   },
+   {
+    "stat": "crit",
+    "val": 4
+   },
+   {
+    "stat": "critpot",
+    "val": 1
+   },
+   {
+    "stat": "pdgcontra",
+    "val": 3
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Sangrado",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Cada golpe deja Sangrado."
+   },
+   {
+    "nombre": "Envenenar",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Veneno severo por 5 turnos en cada golpe."
+   }
+  ],
+  "detalle": "De un capitán que nadie recuerda. +3 de daño fijo, Parry +3, Iniciativa +1, Crítico frecuente +4, Crítico potente +1, Sangrado y Veneno severo por 5 turnos en cada golpe. PdG +3 al contraatacar."
+ },
+ {
+  "id": "nuevo-hachuela-de-lenador",
+  "nombre": "Hachuela de leñador",
+  "tanda": 3,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 8,
+  "peso": 1,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "ini",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "La del rincón del taller. Parte leña y, con suerte, algo más. Iniciativa +1."
+ },
+ {
+  "id": "nuevo-hacha-de-mano",
+  "nombre": "Hacha de mano",
+  "tanda": 3,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 8,
+  "peso": 1,
+  "danoFijo": 1,
+  "mods": [],
+  "efectosGolpe": [
+   {
+    "nombre": "Rompe armadura",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de dejar 1 stack de Armadura rota."
+   }
+  ],
+  "detalle": "+1 de daño fijo y 25 % de romper armadura."
+ },
+ {
+  "id": "nuevo-tomahawk-de-pantano",
+  "nombre": "Tomahawk de pantano",
+  "tanda": 3,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 8,
+  "peso": 1,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Con el mango largo se engancha la espada del otro. Bloqueo +1."
+ },
+ {
+  "id": "nuevo-hacha-de-guerra",
+  "nombre": "Hacha de guerra",
+  "tanda": 3,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 8,
+  "peso": 2,
+  "danoFijo": 0,
+  "mods": [],
+  "efectosGolpe": [
+   {
+    "nombre": "Rompe armadura",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de dejar 1 stack de Armadura rota."
+   }
+  ],
+  "detalle": "La de las milicias. 25 % de romper armadura."
+ },
+ {
+  "id": "nuevo-hacha-de-abordaje",
+  "nombre": "Hacha de abordaje",
+  "tanda": 3,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 8,
+  "peso": 1,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   },
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Para trepar y pelear en el pasamanos. Bloqueo +1 y Alcance +1."
+ },
+ {
+  "id": "nuevo-hachon-de-minero",
+  "nombre": "Hachón de minero",
+  "tanda": 3,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 8,
+  "peso": 2,
+  "danoFijo": 1,
+  "mods": [],
+  "efectosGolpe": [
+   {
+    "nombre": "Rompe armadura",
+    "caras": 6,
+    "exitos": 2,
+    "detalle": "33 % de dejar 1 stack de Armadura rota."
+   }
+  ],
+  "detalle": "Hecho para la piedra: +1 de daño fijo y 33 % de romper armadura."
+ },
+ {
+  "id": "nuevo-hacha-del-caudillo",
+  "nombre": "Hacha del Caudillo",
+  "tanda": 3,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 8,
+  "peso": 2,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Rompe armadura",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Cada golpe deja 1 stack de Armadura rota."
+   }
+  ],
+  "detalle": "Cada golpe abre la armadura. Bloqueo +1 y Rompe armadura en cada golpe."
+ },
+ {
+  "id": "nuevo-segur-de-verdugo",
+  "nombre": "Segur de verdugo",
+  "tanda": 3,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 8,
+  "peso": 2,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Rompe armadura",
+    "caras": 2,
+    "exitos": 1,
+    "detalle": "50 % de dejar 1 stack de Armadura rota."
+   }
+  ],
+  "detalle": "De mango largo y filo ancho: Alcance +1 y 50 % de romper armadura."
+ },
+ {
+  "id": "nuevo-hacha-arrojadiza",
+  "nombre": "Hacha arrojadiza",
+  "tanda": 3,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 8,
+  "peso": 2,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Sangrado",
+    "caras": 2,
+    "exitos": 1,
+    "detalle": "50 % de dejar Sangrado."
+   }
+  ],
+  "detalle": "Se tira y vuelve (a veces). Alcance +2, 50 % de Sangrado."
+ },
+ {
+  "id": "nuevo-gran-hacha-de-doble-filo",
+  "nombre": "Gran hacha de doble filo",
+  "tanda": 3,
+  "tier": "Excepcional",
+  "tipoItem": "arma_2m",
+  "tipoDado": 8,
+  "peso": 4,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Rompe armadura",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Cada golpe deja 1 stack de Armadura rota."
+   }
+  ],
+  "detalle": "A dos manos, con filo de los dos lados: Bloqueo +2 y Rompe armadura en cada golpe."
+ },
+ {
+  "id": "nuevo-hacha-del-cazador-de-armaduras",
+  "nombre": "Hacha del Cazador de Armaduras",
+  "tanda": 3,
+  "tier": "Excepcional",
+  "tipoItem": "arma_1m",
+  "tipoDado": 8,
+  "peso": 3,
+  "danoFijo": 2,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 2
+   },
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Rompe armadura",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Cada golpe deja 2 stacks de Armadura rota.",
+    "stacks": 2
+   }
+  ],
+  "detalle": "Nació para desarmar caballeros: +2 de daño fijo, Bloqueo +2, Alcance +1 y 2 stacks de Armadura rota en cada golpe."
+ },
+ {
+  "id": "nuevo-hacha-del-fin-de-la-veta",
+  "nombre": "Hacha del Fin de la Veta",
+  "tanda": 3,
+  "tier": "Legendario",
+  "tipoItem": "arma_2m",
+  "tipoDado": 8,
+  "peso": 4,
+  "danoFijo": 3,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 3
+   },
+   {
+    "stat": "rng",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Rompe armadura",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Cada golpe deja 2 stacks de Armadura rota.",
+    "stacks": 2
+   },
+   {
+    "nombre": "Sangrado",
+    "caras": 1,
+    "exitos": 1,
+    "detalle": "Cada golpe deja Sangrado."
+   }
+  ],
+  "detalle": "Se dice que cortó la última veta del mundo. A dos manos: +3 de daño fijo, Bloqueo +3, Alcance +1, 2 stacks de Armadura rota y Sangrado en cada golpe."
+ },
+ {
+  "id": "nuevo-garrote-de-pastor",
+  "nombre": "Garrote de pastor",
+  "tanda": 4,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 10,
+  "peso": 1,
+  "danoFijo": 0,
+  "mods": [],
+  "efectosGolpe": [
+   {
+    "nombre": "Demora",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "detalle": "Una rama gruesa y un poco de cuero. Sirve para las ovejas y para los que las quieren. 25 % de Demora."
+ },
+ {
+  "id": "nuevo-mazo-de-carnicero",
+  "nombre": "Mazo de carnicero",
+  "tanda": 4,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 10,
+  "peso": 1,
+  "danoFijo": 1,
+  "mods": [],
+  "efectosGolpe": [
+   {
+    "nombre": "Demora",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "detalle": "Ablanda carne y otras cosas. +1 de daño fijo."
+ },
+ {
+  "id": "nuevo-porra-de-guardia",
+  "nombre": "Porra de guardia",
+  "tanda": 4,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 10,
+  "peso": 1,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Demora",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "detalle": "Reglamentaria. Bloqueo +1."
+ },
+ {
+  "id": "nuevo-maza-de-guerra",
+  "nombre": "Maza de guerra",
+  "tanda": 4,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 10,
+  "peso": 2,
+  "danoFijo": 0,
+  "mods": [],
+  "efectosGolpe": [],
+  "detalle": "Cabeza de hierro y mucha convicción."
+ },
+ {
+  "id": "nuevo-martillo-de-herrero",
+  "nombre": "Martillo de herrero",
+  "tanda": 4,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 10,
+  "peso": 1,
+  "danoFijo": 1,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   },
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Demora",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "detalle": "El que da forma al acero: +1 de daño fijo, Bloqueo +1, Parry +1 y 25 % de Demora."
+ },
+ {
+  "id": "nuevo-estrella-del-alba",
+  "nombre": "Estrella del alba",
+  "tanda": 4,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 10,
+  "peso": 1,
+  "danoFijo": 1,
+  "mods": [],
+  "efectosGolpe": [
+   {
+    "nombre": "Rompe armadura",
+    "caras": 6,
+    "exitos": 2,
+    "detalle": "33 % de dejar 1 stack de Armadura rota."
+   }
+  ],
+  "detalle": "Bola con púas en cadena. +1 de daño fijo y 33 % de romper armadura."
+ },
+ {
+  "id": "nuevo-martillo-del-sargento-mayor",
+  "nombre": "Martillo del sargento mayor",
+  "tanda": 4,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 10,
+  "peso": 2,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   },
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Aturdir",
+    "caras": 6,
+    "exitos": 1,
+    "detalle": "17 % de dejar Aturdido (Stun: sin Nitros 2 turnos y toda Evasión sale 1)."
+   }
+  ],
+  "detalle": "Ordena a golpes: Bloqueo +1, Parry +1 y algo menos de 1 chance en 5 de Aturdir."
+ },
+ {
+  "id": "nuevo-maza-de-justicia",
+  "nombre": "Maza de justicia",
+  "tanda": 4,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 10,
+  "peso": 3,
+  "danoFijo": 0,
+  "mods": [],
+  "efectosGolpe": [
+   {
+    "nombre": "Demora",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "detalle": "Pesada y solemne. 25 % de Demora."
+ },
+ {
+  "id": "nuevo-cachiporra-reforzada",
+  "nombre": "Cachiporra reforzada",
+  "tanda": 4,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 10,
+  "peso": 2,
+  "danoFijo": 2,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Demora",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "detalle": "Con anillos de hierro: +2 de daño fijo, Bloqueo +1 y 25 % de Demora."
+ },
+ {
+  "id": "nuevo-martillo-de-guerra-a-dos-manos",
+  "nombre": "Martillo de guerra a dos manos",
+  "tanda": 4,
+  "tier": "Excepcional",
+  "tipoItem": "arma_2m",
+  "tipoDado": 10,
+  "peso": 4,
+  "danoFijo": 0,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Aturdir",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de dejar Aturdido (Stun: sin Nitros 2 turnos y toda Evasión sale 1)."
+   }
+  ],
+  "detalle": "Se levanta con los dos brazos y baja con la ley: Bloqueo +2 y 25 % de Aturdir."
+ },
+ {
+  "id": "nuevo-maza-del-penasco",
+  "nombre": "Maza del Peñasco",
+  "tanda": 4,
+  "tier": "Excepcional",
+  "tipoItem": "arma_1m",
+  "tipoDado": 10,
+  "peso": 3,
+  "danoFijo": 2,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 2
+   },
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Demora",
+    "caras": 2,
+    "exitos": 1,
+    "detalle": "50 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "detalle": "Una piedra con mango: +2 de daño fijo, Bloqueo +2, Parry +1 y 50 % de Demora."
+ },
+ {
+  "id": "nuevo-mazo-del-juicio-final",
+  "nombre": "Mazo del Juicio Final",
+  "tanda": 4,
+  "tier": "Legendario",
+  "tipoItem": "arma_2m",
+  "tipoDado": 10,
+  "peso": 4,
+  "danoFijo": 3,
+  "mods": [
+   {
+    "stat": "bloqueo",
+    "val": 3
+   },
+   {
+    "stat": "parry",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Aturdir",
+    "caras": 6,
+    "exitos": 2,
+    "detalle": "33 % de dejar Aturdido (Stun: sin Nitros 2 turnos y toda Evasión sale 1)."
+   },
+   {
+    "nombre": "Demora",
+    "caras": 4,
+    "exitos": 3,
+    "detalle": "75 % de bajar al golpeado 1 lugar en la tabla de iniciativa (definitivo)."
+   }
+  ],
+  "detalle": "Dicen que suena una sola vez. A dos manos: +3 de daño fijo, Bloqueo +3, Parry +2, 33 % de Aturdir y 75 % de Demora."
+ },
+ {
+  "id": "nuevo-honda-de-pastor",
+  "nombre": "Honda de pastor",
+  "tanda": 5,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 1,
+  "danoFijo": 1,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 3
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Con ella se cuidan las ovejas y se espantan lobos. +1 de daño fijo y Rango +3."
+ },
+ {
+  "id": "nuevo-arco-de-rama",
+  "nombre": "Arco de rama",
+  "tanda": 5,
+  "tier": "Común",
+  "tipoItem": "arma_2m",
+  "tipoDado": 6,
+  "peso": 1,
+  "danoFijo": 0,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 3
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Una rama flexible y una cuerda de tripa. Rango +3."
+ },
+ {
+  "id": "nuevo-cerbatana",
+  "nombre": "Cerbatana",
+  "tanda": 5,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 3
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Envenenar",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de dejar Veneno (2 stacks).",
+    "stacks": 2
+   }
+  ],
+  "detalle": "Un tubo largo y dardos untados. Rango +3 y 25 % de Veneno."
+ },
+ {
+  "id": "nuevo-arco-de-cuerno",
+  "nombre": "Arco de cuerno",
+  "tanda": 5,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_2m",
+  "tipoDado": 6,
+  "peso": 2,
+  "danoFijo": 0,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 4
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Cuerno de carnero laminado: tira lejos y con fuerza. Rango +4."
+ },
+ {
+  "id": "nuevo-ballesta-de-repeticion",
+  "nombre": "Ballesta de repetición",
+  "tanda": 5,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 6,
+  "peso": 1,
+  "danoFijo": 2,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 4
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Un cargador de madera con seis virotes. +2 de daño fijo y Rango +4."
+ },
+ {
+  "id": "nuevo-arcabuz-de-mecha",
+  "nombre": "Arcabuz de mecha",
+  "tanda": 5,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 8,
+  "peso": 1,
+  "danoFijo": 1,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 4
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Pólvora, mecha y mucho humo. +1 de daño fijo y Rango +4."
+ },
+ {
+  "id": "nuevo-arco-del-cazador-de-viboras",
+  "nombre": "Arco del cazador de víboras",
+  "tanda": 5,
+  "tier": "Raro",
+  "tipoItem": "arma_2m",
+  "tipoDado": 6,
+  "peso": 2,
+  "danoFijo": 1,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 5
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Envenenar",
+    "caras": 2,
+    "exitos": 1,
+    "detalle": "50 % de dejar Veneno (2 stacks).",
+    "stacks": 2
+   }
+  ],
+  "detalle": "Flechas con punta de colmillo. +1 de daño fijo, Rango +5 y 50 % de Veneno."
+ },
+ {
+  "id": "nuevo-ballesta-de-asedio",
+  "nombre": "Ballesta de asedio",
+  "tanda": 5,
+  "tier": "Raro",
+  "tipoItem": "arma_2m",
+  "tipoDado": 8,
+  "peso": 2,
+  "danoFijo": 0,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 5
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Rompe armadura",
+    "caras": 2,
+    "exitos": 1,
+    "detalle": "50 % de dejar 1 stack de Armadura rota."
+   }
+  ],
+  "detalle": "Un virote del largo de un brazo: atraviesa placas. Rango +5 y 50 % de romper armadura."
+ },
+ {
+  "id": "nuevo-trabuco-del-contrabandista",
+  "nombre": "Trabuco del contrabandista",
+  "tanda": 5,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 8,
+  "peso": 1,
+  "danoFijo": 2,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 4
+   },
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Derribar",
+    "caras": 4,
+    "exitos": 1,
+    "detalle": "25 % de derribar al golpeado (cae al suelo)."
+   }
+  ],
+  "detalle": "Boca ancha y cañón corto: a corta distancia derriba a cualquiera. +2 de daño fijo, Rango +4, PdG +1 y 25 % de Derribar."
+ },
+ {
+  "id": "nuevo-arco-de-fuego-del-centinela",
+  "nombre": "Arco de fuego del centinela",
+  "tanda": 5,
+  "tier": "Excepcional",
+  "tipoItem": "arma_2m",
+  "tipoDado": 6,
+  "peso": 3,
+  "danoFijo": 0,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 6
+   },
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Prende fuego",
+    "caras": 6,
+    "exitos": 2,
+    "detalle": "33 % de dejar terreno incendiado en la casilla del golpeado."
+   }
+  ],
+  "detalle": "Flechas con estopa embreada: encienden lo que tocan. Rango +6, PdG +1 y 33 % de Prende fuego."
+ },
+ {
+  "id": "nuevo-rifle-de-cerrojo-del-cazador",
+  "nombre": "Rifle de cerrojo del cazador",
+  "tanda": 5,
+  "tier": "Excepcional",
+  "tipoItem": "arma_2m",
+  "tipoDado": 10,
+  "peso": 2,
+  "danoFijo": 0,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 6
+   },
+   {
+    "stat": "pdg",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Largo, pesado y silencioso de tan preciso. Rango +6 y PdG +2."
+ },
+ {
+  "id": "nuevo-arco-del-ultimo-halcon",
+  "nombre": "Arco del Último Halcón",
+  "tanda": 5,
+  "tier": "Legendario",
+  "tipoItem": "arma_2m",
+  "tipoDado": 8,
+  "peso": 3,
+  "danoFijo": 2,
+  "armaDeRango": true,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 8
+   },
+   {
+    "stat": "pdg",
+    "val": 2
+   },
+   {
+    "stat": "critpot",
+    "val": 3
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Sangrado",
+    "caras": 2,
+    "exitos": 1,
+    "detalle": "50 % de dejar Sangrado."
+   }
+  ],
+  "detalle": "Dicen que sigue apuntando aunque nadie lo tenga en la mano. +2 de daño fijo, Rango +8, PdG +2, Crítico potente +3 y 50 % de Sangrado."
+ },
+ {
+  "id": "nuevo-daga-de-vigia",
+  "nombre": "Daga de vigía",
+  "tanda": 7,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "pdgopor",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "La daga de quien vigila la puerta y ataca al que se quiere escabullir. PdG +1 en ataques de oportunidad."
+ },
+ {
+  "id": "nuevo-estilete-de-centinela",
+  "nombre": "Estilete de centinela",
+  "tanda": 7,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "pdgopor",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Fino y rápido para el que pasa a su lado. PdG +2 en ataques de oportunidad."
+ },
+ {
+  "id": "nuevo-lanza-de-centinela",
+  "nombre": "Lanza de centinela",
+  "tanda": 7,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_2m",
+  "tipoDado": 4,
+  "peso": 2,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 1
+   },
+   {
+    "stat": "pdgopor",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Con el asta llega al que intenta pasar de largo. Alcance +1 y PdG +1 en ataques de oportunidad."
+ },
+ {
+  "id": "nuevo-estoque-de-guardia",
+  "nombre": "Estoque de guardia",
+  "tanda": 7,
+  "tier": "Común",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "ini",
+    "val": 1
+   },
+   {
+    "stat": "pdgopor",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Punta rápida, hecha para castigar el descuido. Iniciativa +1 y PdG +2 en ataques de oportunidad."
+ },
+ {
+  "id": "nuevo-lanza-del-porton",
+  "nombre": "Lanza del portón",
+  "tanda": 7,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_2m",
+  "tipoDado": 4,
+  "peso": 2,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 1
+   },
+   {
+    "stat": "pdgopor",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "La lanza de quien custodia una entrada: nadie pasa sin recibir un pinchazo. Alcance +1 y PdG +2 en ataques de oportunidad."
+ },
+ {
+  "id": "nuevo-aguja-de-la-vigilia",
+  "nombre": "Aguja de la vigilia",
+  "tanda": 7,
+  "tier": "Buena Calidad",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "pdgopor",
+    "val": 3
+   },
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Casi no se ve venir, y casi siempre acierta al que se descuida. PdG +3 en ataques de oportunidad y Crítico +1."
+ },
+ {
+  "id": "nuevo-pica-de-retaguardia",
+  "nombre": "Pica de retaguardia",
+  "tanda": 7,
+  "tier": "Raro",
+  "tipoItem": "arma_2m",
+  "tipoDado": 4,
+  "peso": 3,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 2
+   },
+   {
+    "stat": "pdgopor",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [],
+  "detalle": "Larga como una escalera: cubre la retirada de los suyos y frena a los que persiguen. Alcance +2 y PdG +2 en ataques de oportunidad."
+ },
+ {
+  "id": "nuevo-lanza-del-guardian-del-paso",
+  "nombre": "Lanza del guardián del paso",
+  "tanda": 7,
+  "tier": "Raro",
+  "tipoItem": "arma_2m",
+  "tipoDado": 4,
+  "peso": 2,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 1
+   },
+   {
+    "stat": "pdgopor",
+    "val": 3
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Lisiado",
+    "caras": 6,
+    "exitos": 2,
+    "detalle": "33 % de dejar Lisiado 3 turnos."
+   }
+  ],
+  "detalle": "Quien intenta cruzar el paso lo hace cojeando. Alcance +1, PdG +3 en ataques de oportunidad y 33 % de Lisiado."
+ },
+ {
+  "id": "nuevo-punal-del-sereno",
+  "nombre": "Puñal del sereno",
+  "tanda": 7,
+  "tier": "Raro",
+  "tipoItem": "arma_1m",
+  "tipoDado": 4,
+  "peso": 1,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "pdgopor",
+    "val": 3
+   },
+   {
+    "stat": "critpot",
+    "val": 3
+   },
+   {
+    "stat": "crit",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Lisiado",
+    "caras": 6,
+    "exitos": 2,
+    "detalle": "33 % de dejar Lisiado 3 turnos."
+   }
+  ],
+  "detalle": "Sale de la oscuridad cuando alguien baja la guardia. PdG +3 en ataques de oportunidad, Crítico +1, Crítico potente +3 y 33 % de Lisiado."
+ },
+ {
+  "id": "nuevo-lanza-del-paso-de-las-tres-puertas",
+  "nombre": "Lanza del Paso de las Tres Puertas",
+  "tanda": 7,
+  "tier": "Legendario",
+  "tipoItem": "arma_2m",
+  "tipoDado": 4,
+  "peso": 3,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 3
+   },
+   {
+    "stat": "pdgopor",
+    "val": 3
+   },
+   {
+    "stat": "pdg",
+    "val": 2
+   },
+   {
+    "stat": "crit",
+    "val": 2
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Lisiado",
+    "caras": 4,
+    "exitos": 3,
+    "detalle": "75 % de dejar Lisiado 3 turnos."
+   }
+  ],
+  "detalle": "Tres puertas custodió y por ninguna pasó un enemigo sin sangrar. Alcance +3, PdG +2, PdG +3 en ataques de oportunidad, Crítico +2 y 75 % de Lisiado."
+ },
+ {
+  "id": "nuevo-pica-del-muro-eterno",
+  "nombre": "Pica del Muro Eterno",
+  "tanda": 7,
+  "tier": "Excepcional",
+  "tipoItem": "arma_2m",
+  "tipoDado": 4,
+  "peso": 3,
+  "danoFijo": 0,
+  "armaDeRango": false,
+  "mods": [
+   {
+    "stat": "rng",
+    "val": 2
+   },
+   {
+    "stat": "pdgopor",
+    "val": 3
+   },
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
+  "efectosGolpe": [
+   {
+    "nombre": "Lisiado",
+    "caras": 2,
+    "exitos": 1,
+    "detalle": "50 % de dejar Lisiado 3 turnos."
+   }
+  ],
+  "detalle": "Dicen que ningún ejército pasó nunca del otro lado de esta pica. Alcance +2, PdG +1, PdG +3 en ataques de oportunidad y 50 % de Lisiado."
+ }
+]

@@ -1,0 +1,1078 @@
+// js/12-acciones-nuevas.js — tramo 12 de 14 del script de mapa.html (paso 5, nivel A: mismo código, en el mismo orden): Acciones nuevas de un creep (⚗).
+/* ---------- ⚗ Acciones nuevas de un creep (prueba) — paso 4, etapa 4b (docs/plan-paso4-etapa4.md, 2026-10-01) ----------
+   Con el interruptor ⚗ prendido (el mismo de la Botonera nueva), las Acciones de un creep (⚡ del token o B) las dibuja el mapa
+   con comun/creep-botonera.js, en un recuadro aislado (shadow DOM) con el gm-tools.css de siempre, así se ven igual. Los datos
+   salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
+   Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
+   encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
+const AC_PIEZAS = ['../comun/lupa.js?v=20261030lp2', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261028g', '../comun/creep-botonera.js?v=20261030cn2', '../comun/creep-acciones.js?v=20261030ch1', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261029z'];
+var ac = null;          // {creepId, host, raiz}
+var acCss = '';
+var acCargando = null;
+function acCargarPiezas(){
+  if(!acCargando){
+    if(!document.querySelector('link[data-bn-fuentes]')){
+      const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = BN_FUENTES; l.dataset.bnFuentes = '1'; document.head.appendChild(l);
+    }
+    acCargando = cargarPiezas(AC_PIEZAS)
+      .then(() => fetch('../gm-toolset/gm-tools.css?v=20261022c').then(r => r.text()))
+      .then(css => { acCss = css.replace(/:root\b/g, ':host'); })
+      .catch(err => { acCargando = null; throw err; });
+  }
+  return acCargando;
+}
+function acUbicar(){
+  if(!ac || ac.host.hidden) return;
+  const h = ac.host;
+  if(!botoneraEnMitad()){ h.removeAttribute('style'); return; }
+  const r = $('#lienzo-caja').getBoundingClientRect();
+  Object.assign(h.style, {left: r.left + 'px', top: r.top + 'px', right: 'auto', bottom: 'auto', width: Math.round(r.width / 2) + 'px', height: r.height + 'px'});
+}
+window.addEventListener('resize', acUbicar);
+function acDibujar(){
+  if(!ac) return;
+  const cuerpo = ac.raiz.querySelector('#ac-contenido');
+  const crudo = creepPrivadoDe(ac.creepId);
+  if(!crudo){ cuerpo.innerHTML = '<div class="modal acciones-modal"><div class="body"><div class="hint">Cargando el creep…</div></div></div>'; return; }
+  const sc = CreepCalculo.normalizar(structuredClone(crudo));
+  sc.id = ac.creepId;
+  // El catálogo para cargarle consumibles al cinturón (2026-10-04): llega con las piezas de la Botonera nueva.
+  const consumibles = typeof CATALOGO_BASE !== 'undefined' ? CreepAcciones.consumiblesDe(CATALOGO_BASE) : null;
+  if(!consumibles && typeof bnCargarPiezas === 'function' && !ac.cargandoCatalogo){ ac.cargandoCatalogo = true; bnCargarPiezas().then(() => acDibujar()).catch(() => {}); }
+  const r = CreepBotonera.html(sc, {parryPendiente: acParry.has(ac.creepId), consumibles, cinSel: ac.cinSel, ...(typeof armasOpciones === 'function' ? armasOpciones(tokenDeCreep(ac.creepId)) : {}), ...(typeof atrapadosOpciones === 'function' ? atrapadosOpciones(tokenDeCreep(ac.creepId)) : {})});
+  const scroll = ac.host.scrollTop;
+  cuerpo.innerHTML = `<div class="modal acciones-modal">
+    <header>
+      <div style="display:flex;align-items:center;gap:10px;min-width:0">
+        <h3>Acciones</h3>
+        <span class="acciones-badge">${esc(r.badge)}</span>
+        <span style="font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(r.titulo)}</span>
+      </div>
+      <button class="iconbtn" data-ac-cerrar title="Cerrar (B o Esc)">Cerrar</button>
+    </header>
+    <div class="body">${r.html}</div>
+  </div>`;
+  ac.host.scrollTop = scroll;
+  acVerCreepDibujar();   // el 🔍 Ver todo, si está abierto (A6a)
+}
+/* Paso 4c (tandas 1 y 2): lo que el mapa ya hace él mismo, con comun/creep-acciones.js — las tiradas de stats, Esquivar, Fuerza
+   del golpe, Daño (con los efectos al golpear de su arma), Levantarse, Parry y Bloqueo. Lo que cambia al creep (No2, Sentado) se
+   escribe con modificarCreep (transacción sobre su parte privada + resumen + firma: GM Tools, abierto en otra pestaña, se entera
+   por la firma). El Parry que espera su Bloqueo vive acá (acParry), como en GM Tools. */
+var acParry = new Set();
+function acCreep(){
+  const crudo = creepPrivadoDe(ac.creepId);
+  if(!crudo) return null;
+  const sc = CreepCalculo.normalizar(structuredClone(crudo));
+  sc.id = ac.creepId;
+  return sc;
+}
+// Una tirada del creep a la Mesa, a su nombre y pintada como las de GM Tools; avisa 'tirada-registrada' (lo recoge el duelo).
+function acPublicar(sc, t){
+  if(!t) return;
+  if(t.error){ toast(t.error); return; }
+  mesaPublicar(t.origen, {...t.r, quien: sc.nombre, desde: 'gm'});
+  window.dispatchEvent(new CustomEvent('tirada-registrada', {detail: {origen: t.origen, r: t.r}}));
+  // 💪 Empower (el Empuje del Support, 2026-10-26): la tirada que lo sumó lo gasta.
+  if(sc.id && CreepAcciones.usaUnaTirada(sc, t.r)) modificarCreep(sc.id, c => { CreepAcciones.gastarUnaTirada(c, t.r); }).catch(err => console.error('Empower: no se pudo gastar', err));
+}
+// Cambia el creep en una transacción: `cambiar(sc)` recibe el creep al día (normalizado) y devuelve {error} o {aviso}. Si es un
+// error de la regla, no se escribe nada y se avisa. Devuelve lo que devolvió `cambiar`, o null.
+/* ---------- El Mantenimiento de los creeps, hecho por el mapa del GM (2026-10-02, hoja de ruta A2b) ----------
+   Antes, en cada ⟳ el mapa del GM cargaba GM Tools en un marco invisible para que les pasara el turno. Ahora lo hace el mapa con la
+   misma regla (CreepAcciones.mantenimiento): toma los turnos con la misma transacción de GM Tools (gm/mantenimiento; si otra
+   pantalla ya los aplicó, nada), le pasa el turno a cada creep de la partida (modificarCreep: transacción + resumen + firma, así GM
+   Tools abierto en otra pestaña se entera), sube el contador de turno de GM Tools (gm/estado) y anota en el 📜 Historial. */
+async function mantenimientoCreeps(numero){
+  if(!soyGM) return;
+  try{
+    await acCargarPiezas();
+    const veces = await CreepAcciones.reclamarMantenimiento(fbDb, fbDb.doc(fbRutaCampana('gm/mantenimiento')), numero,
+      () => firebase.firestore.FieldValue.serverTimestamp());
+    if(!veces) return;
+    acParry.clear();
+    const snap = await fbDb.collection(fbRutaCampana('creeps')).get();
+    let enCooldown = 0, hpAplicado = 0, vencidos = 0;
+    for(const doc of snap.docs){
+      for(let i = 0; i < veces; i++){
+        let r = null, nombre = '';
+        let expl = [];
+        try{ await modificarCreep(doc.id, crudo => { const sc = CreepCalculo.normalizar(crudo); const ant = Combatiente.explosivos(sc.estados); r = CreepAcciones.mantenimiento(sc, numero); nombre = sc.nombre; expl = Combatiente.vencidosExplosivos(ant, sc.estados); return r; }); }
+        catch(err){ r = null; console.error(`Mantenimiento: no se pudo pasar el turno del creep ${doc.id}`, err); }   // un creep a medio borrar, etc.
+        if(!r) continue;
+        enCooldown += r.enCooldown; hpAplicado += r.hpAplicado; vencidos += r.vencidos;
+        if(expl.length){ const tk = [...tokens.entries()].map(([id, x]) => ({...x, id})).find(x => x.tipo === 'creep' && x.fichaId === doc.id); expl.forEach(ex => tk ? explotarAlTerminar(tk, ex) : mesaLinea(`💥 ${ex.nombre} de ${nombre} explota por ${ex.absorbido} (a mano: su token no está en este mapa)`)); }
+        if(r.rep.length && typeof historialReporteMantenimiento === 'function') historialReporteMantenimiento(nombre, r.rep);
+      }
+    }
+    await fbDb.doc(fbRutaCampana('gm/estado')).set({turno: firebase.firestore.FieldValue.increment(veces),
+      actualizado: firebase.firestore.FieldValue.serverTimestamp()}, {merge: true});
+    const detalle = [enCooldown ? `${enCooldown} CD en cuenta regresiva` : '', hpAplicado ? `${hpAplicado} estado(s) aplicados` : '',
+      vencidos ? `${vencidos} estado(s) vencidos` : ''].filter(Boolean).join(' · ');
+    toast(`Creeps: No2 recargados${detalle ? ` · ${detalle}` : ''}`);
+    if(ac && !ac.host.hidden) acDibujar();
+  }catch(err){
+    console.error('No se pudo aplicar el Mantenimiento a los creeps:', err);
+    toast('No se pudo pasar el turno de los creeps — mirá la consola');
+  }
+}
+function acCambiar(cambiar){ return acCambiarCreep(ac.creepId, cambiar); }
+async function acCambiarCreep(creepId, cambiar){
+  try{
+    return await modificarCreep(creepId, crudo => {
+      const x = cambiar(CreepCalculo.normalizar(crudo));
+      if(x && x.error) throw Object.assign(new Error(x.error), {regla: true});
+      return x;
+    });
+  }catch(err){
+    if(err.regla) toast(err.message);
+    else { console.error('No se pudo cambiar el creep:', err); toast('No se pudo guardar el creep — revisá la consola'); }
+    return null;
+  }
+}
+// Los efectos al golpear de su arma (comun/efectos-golpe.js): recordar y tirar, no aplicar — igual que GM Tools.
+function acEfectosAlPegar(sc){
+  EfectosGolpe.alPegar({arma: `${sc.nombre} · ${Combatiente.armaEnMano(sc).nombre || 'arma'}`, efectos: Combatiente.armaEnMano(sc).efectosGolpe, publicar: linea => {
+    if(!fbDb || !fbUsuario || !fbMiembro) return;
+    fbDb.collection(fbRutaCampana('tiradas')).add({
+      uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: String(sc.nombre || '').slice(0, 60),
+      origen: linea.origen.slice(0, 120), formula: linea.formula.slice(0, 900),
+      rolls: linea.rolls.slice(0, 100), mod: 0, total: 0, desde: 'efecto-gm',
+      cuando: firebase.firestore.FieldValue.serverTimestamp(),
+    }).catch(err => console.error('No se pudieron publicar los efectos en la Mesa:', err));
+  }});
+}
+// Usar un consumible del cinturón de un creep (2026-10-04): sin No2 pregunta; una trampa se coloca antes (si no se puede, no se gasta).
+async function acConsumir(sc, itemId){
+  const it = (sc.cinturon || []).find(x => x.id === itemId);
+  if(!it) return;
+  let forzar = false;
+  if(CreepAcciones.faltanNitrosConsumir(sc)){
+    if(!(await AvisoCombate.preguntar(`${sc.nombre} no tiene los No2 para usar ${it.nombre} (cuesta ${CreepAcciones.costoConsumir()}). ¿Usarlo igual? Gasta los que tenga.`, {icono: '⚠', titulo: 'Sin No2', si: 'Sí, usarlo'}))) return;
+    forzar = true;
+  }
+  if(it.trampaDatos){
+    const glifo = it.trampaDatos.portal && it.trampaDatos.portal.colocador;   // 🌀 el Glifo de teletransporte: dos clics en el mapa (js/13)
+    const t = glifo ? await (async () => { ac.host.hidden = true; const td = Combatiente.trampaDeHab({nombre: it.nombre, trampaColocar: {...it.trampaDatos, detectarMin: Combatiente.detectarMinDe(it.tier)}}, st => CreepCalculo.statValor(sc, st));
+        const ok = await colocarGlifo({fichaId: sc.id, tipoToken: 'creep', nombre: it.nombre, trampa: td}); return {ok, aviso: ok ? `🌀 ${it.nombre} colocado` : `🌀 ${it.nombre}: no se usó`}; })()
+      : await (async () => {   // 🪤 la trampa consumible: un clic, dentro del Rango y a la vista (2026-10-20)
+          ac.host.hidden = true;
+          const td = Combatiente.trampaDeHab({nombre: it.nombre, trampaColocar: {...it.trampaDatos, detectarMin: Combatiente.detectarMinDe(it.tier)}}, st => CreepCalculo.statValor(sc, st));
+          const dano = /^\d{1,2}d\d{1,3}([+-]\d{1,3})?$/i.test(String(td.dano || '').trim()) ? String(td.dano).trim() : '';
+          const ok = await trampaConsumibleEnMapa({fichaId: sc.id, tipoToken: 'creep', nombre: it.nombre, trampa: {...td, nombre: String(td.nombre || it.nombre).slice(0, 40), dano}});
+          return {ok, aviso: ok ? `🪤 ${it.nombre} colocada` : `🪤 ${it.nombre}: no se usó`};
+        })();
+    toast(t.aviso);
+    if(!t.ok) return;
+  }
+  // 🌀 El Town portal (2026-10-29, js/84; dueño: el Capataz del culto «escapa con el Town portal»): el GM elige la casilla al lado del creep
+  // antes de gastarlo; si cancela, no se gasta.
+  if(it.townPortal){
+    ac.host.hidden = true;
+    if(!(await townPortalColocar({fichaId: sc.id, tipoToken: 'creep', nombre: it.nombre}))){ ac.host.hidden = false; return; }
+  }
+  // ✚ Revive (2026-10-06, js/22): a otro creep caído a 5 casillas o menos; se elige antes de gastarlo.
+  const pctRevive = it.revive ? Math.max(1, Math.min(100, num(it.revive.pct) || 50)) : 0;
+  const revive = it.revive ? await elegirCaidoParaRevivir({fichaId: ac.creepId, bando: 'creep', rango: num(it.revive.rango) || 5, pct: pctRevive, item: it.nombre}) : null;
+  if(it.revive && !revive) return;
+  let res = null;
+  const x = await acCambiar(c => { res = CreepAcciones.consumir(c, itemId, estadosPresetCreep(), forzar); return res; });
+  if(!x || !res) return;
+  if(revive){
+    try{ await revivirElegido(revive, pctRevive, sc.nombre); res.aviso += ` · ✚ revivió a ${revive.nombre}`; if(res.anuncio){ res.anuncio.resultado = [res.anuncio.resultado, `✚ revive a ${revive.nombre}`].filter(Boolean).join(' · '); res.anuncio.texto += ` · ✚ revive a ${revive.nombre}`; } }
+    catch(e){ console.error(e); toast(`No se pudo revivir a ${revive.nombre}: ${e.message}`); }
+  }
+  (res.tiradas || []).forEach(t => acPublicar(sc, t));
+  if(it.duelo){ const sc2 = acCreep() || sc; CreepAcciones.terminarHab(sc2, Combatiente.habDeConsumible(it), {costo: 0, auto: true, nitros: sc2.nitros}, acHabUi()); }   // 📜 su Ejecución (2026-10-20)
+  // 🌫 Un consumible que deja una zona (la Bomba de humo, la Bombucha de talco), un ⏩ Acelerador (la Runa) o una invocación (el Ojo de Kicillof)
+  // (dueño, 2026-10-22: la Bomba de humo de un creep se gastaba sin pedir la casilla y no hacía nada): el mismo camino que un personaje
+  // (js/11, bnConsumirUi): el GM elige la casilla en el mapa. La invocación de un creep no existe todavía: se avisa y se pone a mano.
+  if(it.zonaUso){ const sc2 = acCreep() || sc; acHabUi().colocarZona(sc2, {id: 'zona:' + it.id, nombre: it.nombre, detalle: it.detalle || '', modo: 'auto', duelo: it.zonaUso}); }
+  if(it.aceleradorMapa){ ac.host.hidden = true; aceleradorDeHabilidad({fichaId: sc.id, casteadorTipo: 'creep', turnos: num(it.aceleradorMapa.turnos) || 10, no2: num(it.aceleradorMapa.no2) || 2, nombre: it.nombre}); }
+  if(it.invocaTemporal) toast(`✋ ${it.nombre}: la invocación de un creep se pone a mano (creá su token en el mapa)`);
+  const tok = [...tokens.values()].find(x => x.tipo === 'creep' && x.fichaId === ac.creepId);
+  // js/21: Mesa y Crónica. Un creep que los jugadores no ven: solo la Mesa, con su nombre (js/29 decide: «acción incierta» o nada). Una trampa
+  // ya la anunció TokensAuto.
+  if(res.anuncio && !it.trampaDatos) anunciarConsumo(res.anuncio, !tok || !visibleParaJugadores(tok), sc.nombre);
+  if(res.forzado) mesaLinea(`⚠ ${sc.nombre} usó ${it.nombre} sin los No2 (cuesta ${res.forzado.costo}, tenía ${res.forzado.tenia})`, 'alerta-roja');
+  toast(res.aviso);
+}
+function acAccionAca(b){
+  const d = b.dataset, sc = acCreep();
+  if(!sc) return false;
+  if(d.verhabaccion){ acVerHab(sc, d.verhabaccion); return true; }
+  if(d.ayudarsoltarcreep){ ayudarASoltar({tipo: 'creep', tokenId: d.ayudarsoltarcreep}); return true; }   // 🤝 (js/54)
+  if(d.levantararmacreep){ acLevantarArma(d.levantararmacreep); return true; }   // 🗡 un arma en el piso (js/27)
+  if(d.sacarpiezacreep){   // 🔁 lo guardado a la mano (paso 7)
+    const itId = d.sacarpiezacreep.split(':')[1];
+    acCambiar(c => Combatiente.sacarPieza(c, itId, {combate: modoMapa === 'combate', slotDe: CreepCalculo.slotDe})).then(x => { if(x && x.aviso){ toast(x.aviso); mesaLinea(`🔁 ${x.aviso}`, 'recordatorio', sc.nombre); } });
+    return true;
+  }
+  if(d.tirarstatcreep){ acPublicar(sc, CreepAcciones.tiradaStat(sc, d.tirarstatcreep.split(':')[1])); return true; }
+  if(d.esquivarcreep){ acPublicar(sc, CreepAcciones.esquivar(sc)); return true; }
+  if(d.fuerzacreep){ acPublicar(sc, CreepAcciones.fuerzaGolpe(sc)); return true; }
+  if(d.daniocreep){
+    const t = CreepAcciones.dano(sc);
+    if(t){ acPublicar(sc, t); acEfectosAlPegar(sc); }
+    return true;
+  }
+  if(d.levantarcreep){ acCambiar(c => CreepAcciones.levantarse(c)).then(x => { if(x) toast(x.aviso); }); return true; }
+  if(d.soltarcreep){   // trampas de Atrapar (2026-10-03): la tirada una vez (afuera de la transacción), después cobra y, si salió, saca el estado
+    const sc = acCreep(), t = sc && CreepAcciones.tiradaSoltarse(sc);
+    if(!t) return true;
+    if(num(sc.nitros) < t.s.no2){ toast(`${sc.nombre}: no le alcanzan los No2 — soltarse cuesta ${t.s.no2}`); return true; }
+    acPublicar(sc, {origen: t.origen, r: t.r});
+    acCambiar(c => CreepAcciones.aplicarSoltarse(c, t)).then(x => { if(x) toast(x.error || x.aviso); });
+    return true;
+  }
+  if(d.parrycreep){
+    const id = ac.creepId;
+    acCambiar(c => CreepAcciones.pagarParry(c)).then(x => {
+      if(!x) return;
+      if(x.deuda) Combatiente.avisarDeudaNo2(x.deuda);   // sin No2: queda en negativo (2026-10-06)
+      acParry.add(id);   // si gana el Parry, sigue el Bloqueo
+      acPublicar(sc, CreepAcciones.parry(sc));
+      toast(x.aviso);
+      acDibujar();
+    });
+    return true;
+  }
+  if(d.atacarcreep){ acAtacar('normal'); return true; }   // Atacar = ataque normal (dueño, 2026-10-06)
+  if(d.otroataquecreep){ acPreguntarTipoAtaque(sc); return true; }   // la oportunidad o el contraataque, a mano
+  // El cinturón (2026-10-04): usar, sacar y cargar consumibles.
+  if(d.cinConsumir){ acConsumir(sc, d.cinConsumir.split(':')[1]); return true; }
+  if(d.cinQuitar){ acCambiar(c => CreepAcciones.quitarDelCinturon(c, d.cinQuitar.split(':')[1])).then(x => { if(x) toast(x.aviso); }); return true; }
+  if(d.cinAgregar){
+    const sel = ac.raiz.querySelector(`[data-cin-sel="${d.cinAgregar}"]`);
+    const elegido = d.cinItem || (sel && sel.value);   // 🧪 la fila del panel con filtros (2026-10-30) o el desplegable viejo
+    const it = elegido && typeof CATALOGO_BASE !== 'undefined' ? CATALOGO_BASE.find(x => x.id === elegido) : null;
+    if(!it){ toast('Elegí un consumible del catálogo'); return true; }
+    ac.cinSel = it.id;   // el desplegable recuerda el último elegido
+    acCambiar(c => CreepAcciones.alCinturon(c, it, 1)).then(x => { if(x) toast(x.aviso); });
+    return true;
+  }
+  if(d.ejecutar){ acEjecutarHab(sc, d.ejecutar.split(':')[1]); return true; }
+  if(d.especialcreep){ acUsarEspecial(sc, d.especialcreep.split(':')[1]); return true; }   // ✨ un arma especial
+  if(d.danohabcreep){
+    const h = (sc.habilidades || []).find(x => x.id === d.danohabcreep.split(':')[1]);
+    if(h) acPublicar(sc, CreepAcciones.tiradaSegundaHab(sc, h));
+    return true;
+  }
+  if(d.modosp){   // 💧 ⇄ cooldown / SP (2026-10-20): al pasar a SP, arranca lleno
+    // (el aviso dice el modo que quedó en la transacción: el creep en memoria todavía no se enteró y lo decía al revés, 2026-10-29)
+    acCambiar(c => { c.modoSP = !c.modoSP; if(c.modoSP) c.sp = CreepCalculo.spMax(c); return {modoSP: c.modoSP, nombre: c.nombre || 'El creep'}; }).then(r => { if(r) toast(r.modoSP ? `💧 ${r.nombre}: sus habilidades pagan con SP (sin cooldown)` : `⏱ ${r.nombre}: sus habilidades vuelven a usar cooldown`); });
+    return true;
+  }
+  if(d.cdmod){
+    const [, habId, accion] = d.cdmod.split(':');
+    acCambiar(c => CreepAcciones.cdMod(c, habId, accion));
+    return true;
+  }
+  if(d.bloqueocreep){
+    const t = CreepAcciones.bloqueo(sc, acParry.has(ac.creepId));
+    if(t.error){ toast(t.error); return true; }
+    acParry.delete(ac.creepId);
+    acDibujar();
+    acPublicar(sc, t);
+    return true;
+  }
+  return false;
+}
+/* Paso 4c (tanda 4): lo que el duelo le pide a un creep (su PdG, la defensa, el daño, la Fuerza del golpe, el Bloqueo, el crítico,
+   el Flash, las tiradas de una habilidad dirigida) lo contesta el mapa con los mismos ganchos de GM Tools (comun/creep-duelo.js),
+   sin pasar por el marco — para cualquier creep con token, si quien mira es el GM con ⚗ prendido (las piezas se cargan al
+   prenderlo o al entrar con él prendido). Si no, por el marco, como siempre. */
+function acDueloUi(){
+  return {
+    creep: ref => { const c = creepPrivadoDe(ref); if(!c) return null; const sc = CreepCalculo.normalizar(structuredClone(c)); sc.id = ref; return sc; },
+    cambiar: (ref, fn) => acCambiarCreep(ref, fn),
+    publicar: (sc, t) => acPublicar(sc, t),
+    toast: t => toast(t),
+    confirmar: t => AvisoCombate.preguntar(t, {icono: '⚔', titulo: '¿Atacar igual?', si: 'Atacar igual', no: 'No'}),   // el cartel del juego (un confirm() nativo congelaba la pestaña)
+    soy: lado => !!(lado && lado.tipo === 'creep' && soyGM && creepPrivadoDe(lado.ref)),
+    borrarParry: ref => acParry.delete(ref),
+  };
+}
+function acHooksDuelo(lado){
+  if(!lado || lado.tipo !== 'creep' || !soyGM || !bnActiva() || typeof CreepDuelo === 'undefined' || !creepPrivadoDe(lado.ref)) return null;
+  return CreepDuelo.hooks(acDueloUi());
+}
+
+/* Paso 4c (tanda 3): Atacar. El menú "¿Qué ataque es?" (normal / oportunidad / contraataque, con lo que cuesta cada uno, igual que
+   GM Tools), después el objetivo con un clic en el token (dueloElegirObjetivoMapa, el mismo de siempre) y el duelo; "Sin objetivo"
+   hace el ataque suelto acá (cobra con modificarCreep y tira el PdG). Las tiradas que pide el duelo las sigue haciendo GM Tools
+   en el marco (tanda 4). */
+function acPreguntarTipoAtaque(sc){
+  const normal = CreepCalculo.costoAtaque(sc), primero = num(sc.ataquesTurno) === 0, especial = CreepCalculo.costoContraataque(sc), especialOpor = CreepCalculo.costoOportunidad(sc);
+  ac.raiz.querySelector('#ac-tipo-lista').innerHTML = Combatiente.menuTipoAtaqueHtml({nombre: sc.nombre, arma: Combatiente.armaDeCombatiente(sc), normal, primero, especial, especialOpor, attr: 'data-ac-tipo', ref: sc.id});   // el menú común
+  ac.raiz.querySelector('#ac-tipo-ataque').classList.add('open');
+}
+/* 🏹 La flecha o el virote especial de un creep (dueño, 2026-10-20: «cualquier creep con arco o ballesta debe tener un virote especial al azar
+   disponible para su uso»): lo lleva en el cinturón (comun/combate-fin.js, darConsumiblesAlAzar). Al atacar con el arco o la ballesta, el mismo
+   «¿Qué flecha?» que un personaje; se gasta y cobra su No2 al disparar. */
+function acMunicion(sc){
+  if(!sc || !Combatiente.armaEnMano(sc).armaDeRango) return '';
+  const m = Combatiente.municionDe(Combatiente.armaDeCombatiente(sc));
+  if(m) return m;
+  const n = String(Combatiente.armaEnMano(sc).nombre || '');
+  return /\bballesta\b/i.test(n) ? 'virote' : /\barco\b/i.test(n) ? 'flecha' : '';
+}
+function acFlechas(sc){
+  const m = acMunicion(sc);
+  return m ? (sc.cinturon || []).filter(i => i && i.flecha && num(i.unidades) > 0 && (m === 'virote') === !!i.flecha.virote) : [];
+}
+function acElegirFlecha(sc, flechas, alElegir, abierto){
+  const vir = acMunicion(sc) === 'virote', cosa = vir ? 'virote' : 'flecha', Cosa = vir ? 'Virote' : 'Flecha';
+  const txt = f => typeof FichaEquipo !== 'undefined' && FichaEquipo.flechaTxt ? FichaEquipo.flechaTxt(f) : String(f.detalle || '').slice(0, 90);
+  AvisoCombate.mostrar({clave: 'elegir-flecha', icono: '🏹', titulo: `¿Qué ${cosa}? · ${sc.nombre}`, texto: `Los ${cosa}s comunes no se gastan. Un${vir ? '' : 'a'} especial se gasta al disparar${vir ? 'lo' : 'la'}.`,
+    botones: [{texto: `🏹 ${Cosa} común`, detalle: 'sin costo extra', alClic: () => { AvisoCombate.cerrar(); alElegir(''); }},
+      {texto: `✨ ${Cosa} especial ${abierto ? '▴' : '▾'}`, sec: !!abierto, detalle: `${flechas.length === 1 ? '1 clase' : `${flechas.length} clases`} en el cinturón`, alClic: () => acElegirFlecha(sc, flechas, alElegir, !abierto)},
+      ...(abierto ? flechas.map(f => ({fila: true, texto: `${f.nombre} ×${fmt(num(f.unidades) || 1)}`, detalle: txt(f), alClic: () => { AvisoCombate.cerrar(); alElegir(f.id); }})) : [])]});
+}
+function acDispararFlecha(flechaId){
+  let item = null;   // (una copia, por si el duelo se cancela: CreepDuelo.devolverFlecha)
+  return acCambiar(c => {
+    const f = (c.cinturon || []).find(x => x.id === flechaId);
+    if(!f) return {ok: true};
+    item = {...JSON.parse(JSON.stringify(f)), unidades: 1};
+    const costo = Math.max(0, num(f.flecha && f.flecha.no2));
+    // Una flecha especial es ofensiva: no deja en No2 negativos (dueño, 2026-10-23). Sin los No2, gasta los que tenga (hasta 0) y avisa en rojo,
+    // como la del personaje (js/11, gastoNitrosForzado).
+    const tenia = Math.max(0, num(c.nitros)), paga = Math.min(costo, tenia);
+    if(paga) c.nitros = num(c.nitros) - paga;
+    f.unidades = num(f.unidades) - 1;
+    if(f.unidades <= 0) c.cinturon = c.cinturon.filter(x => x !== f);
+    return {ok: true, nombre: f.nombre, costo, paga, tenia};
+  }).then(x => {
+    if(!x || !x.nombre) return;
+    const quien = acCreep() ? acCreep().nombre : 'El creep';
+    mesaLinea(`🏹 ${quien} dispara ${x.nombre}${x.costo ? ` (+${fmt(x.paga)} No2)` : ''}`, 'recordatorio');
+    if(x.paga < x.costo) mesaLinea(`⚠ ${quien} disparó ${x.nombre} sin No2 suficientes · costaba ${fmt(x.costo)} y tenía ${fmt(x.tenia)}`, 'alerta-roja');
+    return item ? {item, no2: x.paga} : null;
+  });
+}
+function acAtacar(tipo, flechaId){
+  const sc = acCreep();
+  if(!sc) return;
+  if(tipo === 'normal' && !flechaId && sc.golpeListo && typeof golpeAnunciadoAtacar === 'function' && golpeSaltear !== sc.id){ golpeAnunciadoAtacar(sc, tipo); return; }   // 🪓 el golpe anunciado (js/63)
+  if(golpeSaltear === sc.id) golpeSaltear = '';
+  if(tipo === 'normal' && !flechaId && num(sc.aguanteListo) > 0 && typeof aguanteAtacar === 'function'){ aguanteAtacar(sc); return; }   // 🛡 modo aguante (js/56)
+  const id = ac.creepId;
+  const flechas = tipo === 'normal' ? acFlechas(sc) : [];
+  if(flechaId === undefined && flechas.length && typeof Duelo !== 'undefined' && Duelo.disponible()){ acElegirFlecha(sc, flechas, fid => acAtacar(tipo, fid)); return; }
+  const fl = flechaId ? flechas.find(f => f.id === flechaId) || null : null;
+  const hacer = async () => {
+    const qs = Combatiente.preguntaSentado(sc.estados, sc.nombre);   // Sentado no puede atacar (cualquier ataque)
+    if(qs && !(await AvisoCombate.preguntar(qs, {icono: '⚔', titulo: 'Atacar igual', si: 'Sí, atacar'}))) return;
+    const forzar = CreepAcciones.faltanNitros(sc, tipo);   // sin No2: avisar y dejar seguir (2026-10-02)
+    if(forzar && !(await AvisoCombate.preguntar(CreepAcciones.preguntaSinNitros(sc, tipo), {icono: '⚠', titulo: 'Sin No2', si: 'Sí, atacar'}))) return;
+    acCambiar(c => CreepAcciones.pagarAtaque(c, tipo, forzar)).then(x => {
+      if(!x) return;
+      CreepAcciones.alertaSinNitros(sc, tipo, x.forzado);
+      if(tipo === 'normal') acParry.delete(id);   // atacar cierra el Parry que esperaba su Bloqueo
+      acPublicar(sc, CreepAcciones.tiradaAtaque(sc, tipo));
+      toast(x.aviso);
+      acDibujar();
+    });
+  };
+  if(typeof Duelo === 'undefined' || !Duelo.disponible()){ hacer(); return; }
+  acElegirObjetivo(sc, {...Combatiente.ataqueConSuArma(sc, tipo, CreepCalculo.alcance(sc)),   // (con los rasgos de su arma: por la espalda, sin Parry)
+    ...(fl ? {flecha: fl} : {}),   // 🏹 la flecha o el virote especial (2026-10-20)
+    ...(num(Combatiente.armaEnMano(sc).arcoDuro) > 0 && num(CreepCalculo.statValor(sc, 'fue')) < num(Combatiente.armaEnMano(sc).arcoDuro) ? {arcoDuroPdg: -2} : {})}, hacer,
+    fl ? () => acDispararFlecha(fl.id) : null);   // Arco duro
+}
+// Elegir el objetivo (de un ataque o de una habilidad) con un clic en el token: mientras tanto las Acciones nuevas se esconden
+// (tapan el mapa); "Sin objetivo" o cancelar las vuelven a mostrar. `suelto`: lo que se hace sin objetivo.
+/* ↩ Cancelar al elegir el objetivo devuelve lo que cobró la habilidad (dueño, 2026-10-23: «si cancelás, se cancela el cooldown y el costo que hayas
+   pagado»): `acEjecutarHab` deja en `ac.devolucion` lo cobrado (cooldown, SP, No2) y la habilidad; si el objetivo se elige (o se tira suelto) ya está
+   usada; si se cancela, `acDevolver` lo repone. Los No2 de «lo de un ataque» se cobran recién en el duelo: no hay nada que devolver. */
+function acDevolver(dev){
+  if(!dev) return;
+  if(typeof Duelo !== 'undefined' && Duelo.pagoHab) Duelo.pagoHab(dev.creepId, null);   // (ya se devolvió: el duelo no lo lleva)
+  acCambiarCreep(dev.creepId, c => {
+    if(dev.sp > 0) c.sp = num(c.sp) + dev.sp;
+    if(dev.nitros > 0) c.nitros = num(c.nitros) + dev.nitros;
+    const h = (c.habilidades || []).find(x => x.id === dev.habId);
+    if(h) h.cdActual = dev.cd;
+    return {ok: true};
+  }).then(r => {
+    if(!r) return;
+    const que = [dev.cdTxt, dev.sp > 0 ? `${fmt(dev.sp)} SP` : '', dev.nitros > 0 ? `${fmt(dev.nitros)} No2` : ''].filter(Boolean).join(' y ');
+    const txt = `↩ ${dev.creep}: canceló ${dev.habNombre}${que ? ` — se le devolvió ${que}` : ''}`;
+    toast(txt);
+    try{ mesaLinea(txt, 'recordatorio'); }catch(err){}
+  });
+}
+/* 🕳 Recién salido de abajo de la tierra para atacar (js/46): si se cancela el ataque, se pregunta si vuelve abajo o queda afuera (dueño, 2026-10-28, P231). */
+let acEmergido = null;   // {creepId, tokenId}
+async function acPreguntarVolverAbajo(em){
+  if(!em) return;
+  const t = tokens.get(em.tokenId);
+  if(!t || t.bajoTierra) return;
+  const r = await Confirmar.elegir(`${nombreDe(t)} no atacó. ¿Vuelve bajo tierra o queda afuera?`, {titulo: 'Excavar', icono: '🕳',
+    opciones: [{valor: 'abajo', texto: '🕳 Vuelve bajo tierra', detalle: 'como estaba, sin costo'}], no: '⬆ Queda afuera'});
+  if(r === 'abajo'){ if(await excavarToken(em.tokenId)) mesaLinea(`🕳 ${nombreDe(t)} no atacó y volvió bajo tierra`, 'recordatorio'); }
+  else mesaLinea(`🕳 ${nombreDe(t)} salió de abajo de la tierra sin atacar`, 'recordatorio');
+}
+function acElegirObjetivo(sc, ataque, suelto, alDisparar){
+  const id = ac.creepId;
+  const em = acEmergido && acEmergido.creepId === sc.id ? acEmergido : null;
+  acEmergido = null;
+  const reabrir = () => { if(ac && ac.creepId === id){ ac.host.hidden = false; acUbicar(); acDibujar(); } };
+  ac.host.hidden = true;
+  const objetivoFijo = ac.objetivoFijo || null;   // 🧿 Mal de ojo: el personaje ya se eligió en su menú (js/60)
+  ac.objetivoFijo = null;
+  // ↩ Lo cobrado por la habilidad que lanza este ataque (no la de otra: un ataque común no trae `habNombre` ni `hab`). Un ataque con el arma la nombra
+  // en `habNombre`; una habilidad dirigida o de área, en `hab.nombre`.
+  const nomHab = ataque && (ataque.habNombre || (ataque.hab && ataque.hab.nombre));
+  const dev = ac.devolucion && nomHab && ac.devolucion.creepId === sc.id && ac.devolucion.habNombre === nomHab ? ac.devolucion : null;
+  ac.devolucion = null;
+  dueloElegirObjetivoMapa({yo: {ref: sc.id, tipo: 'creep', nombre: sc.nombre}, ataque, objetivoFijo, conSuelto: true, alSuelto: () => { reabrir(); suelto(); }, alCancelar: () => { reabrir(); acDevolver(dev); acPreguntarVolverAbajo(em); },
+    ...(alDisparar ? {alDisparar} : {})});   // 🏹 la flecha especial se gasta al disparar (2026-10-20)
+}
+
+/* Paso 4c (tanda 5): las habilidades. Lo que cambia al creep (cobrar, cura y estado propio, el atajo ✨ «solo sobre sí») va en una
+   transacción (CreepAcciones.ejecutarHab); lo que pasa después (la Mesa, el duelo, la trampa, la zona, «¿a quién le pegó?», el
+   aviso) lo hace CreepAcciones.terminarHab con acHabUi — igual que GM Tools, pero con el mapa a mano: la trampa ✨ y la zona se
+   colocan con un clic, como las de un personaje. */
+function acMesaHabilidad(sc, h, extra){
+  if(!fbDb || !fbUsuario || !fbMiembro) return;
+  fbDb.collection(fbRutaCampana('tiradas')).add({
+    uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: String((sc && sc.nombre) || '').slice(0, 60),
+    origen: String((h && h.nombre) || 'Habilidad').slice(0, 80),
+    formula: [CreepCalculo.habTextoMesa(h), extra || ''].filter(Boolean).join(' ').slice(0, 300),   // sin el aviso ⚙/✋ para el GM
+    rolls: [], mod: 0, total: 0, desde: 'habilidad',
+    cuando: firebase.firestore.FieldValue.serverTimestamp(),
+  }).catch(err => console.error('No se pudo publicar la habilidad en la Mesa:', err));
+}
+// «Ataque con mi arma, con arreglos»: se anuncia y va al cuadro del duelo; sin duelo, se tira el PdG suelto.
+function acLanzarAtaqueDeHab(sc, h, emergio){
+  // 🕳 Emerger (js/46): si está bajo tierra, primero sale (se elige la casilla) y recién ahí elige a quién le pega; saliendo de abajo, suma
+  // `emerger.pdg` a la Probabilidad de Golpe (2026-10-14, dueño: «si la hace estando bajo tierra, tiene +2 a la probabilidad de golpe»; después: «que sea +1 mejor»; 2026-10-17, el tunelero: +3, el +1 no se notaba).
+  const pozo = h && h.emerger ? tokenEntradaCreep(sc.id) : null;
+  // Sale solo con un arma cuerpo a cuerpo de Tipo 4 a 10 (dueño, 2026-10-28, P231: ni de rango ni especial); sin ninguna, no sale y se le devuelve lo cobrado.
+  const armaSalida = h && h.emerger ? Combatiente.armaParaEmerger(sc) : null;
+  if(pozo && pozo[1].bajoTierra){
+    if(!armaSalida){
+      const dev = ac && ac.devolucion && ac.devolucion.creepId === sc.id ? ac.devolucion : null;
+      if(ac) ac.devolucion = null;
+      AvisoCombate.mostrar({icono: '🕳', titulo: `${sc.nombre}: no puede salir atacando`, texto: `Para salir de abajo de la tierra atacando hace falta un arma cuerpo a cuerpo de Tipo 4 a 10 (no de rango ni especial). Para salir sin atacar está el botón 🕳 Salir (abajo, sobre el mapa).`});
+      acDevolver(dev);
+      return;
+    }
+    const id = ac && ac.creepId;
+    ac.host.hidden = true;
+    emergerToken(pozo[0], {distancia: num(h.emerger.distancia) || BAJO_TIERRA_DIST, nombre: h.nombre, alSalir: () => { acEmergido = {creepId: sc.id, tokenId: pozo[0]}; acLanzarAtaqueDeHab(sc, h, true); },
+      alCancelar: () => { if(ac && ac.creepId === id){ ac.host.hidden = false; acUbicar(); acDibujar(); } }});
+    return;
+  }
+  // Saliendo de abajo, el golpe no se puede parrear: se puede esquivar (dueño, 2026-10-29: «se puede esquivar, pero no parrear»).
+  const atq = CreepAcciones.ataqueDeHab(sc, h, emergio && armaSalida ? {arma: {...armaSalida, sinParry: true}} : undefined);
+  if(atq && atq.escudoGolpe && !atq.escudoGolpe.nombre) toast(`🛡 ${sc.nombre} no tiene un escudo puesto: ${h.nombre || 'el golpe'} pega con 1d10 + su Dmg`);   // (avisa y deja seguir)
+  const bonoSalida = emergio && atq && atq.mods ? Math.round(num(h.emerger && h.emerger.pdg)) : 0;
+  if(bonoSalida) atq.mods.pdg = num(atq.mods.pdg) + bonoSalida;
+  acParry.delete(sc.id);   // atacar cierra el Parry que esperaba su Bloqueo
+  acMesaHabilidad(sc, h);
+  if(atq && typeof Duelo !== 'undefined' && Duelo.disponible()){
+    // 🏹 Una habilidad que dispara con el arco o la ballesta también puede llevar una flecha o un virote especial del cinturón (dueño, 2026-10-27),
+    // como Atacar (acAtacar): se elige antes del objetivo y se gasta al disparar.
+    const lanzar = fl => acElegirObjetivo(sc, fl ? {...atq, flecha: fl} : atq, () => acPublicar(sc, CreepDuelo.pdgDeArreglos(sc, atq)), fl ? () => acDispararFlecha(fl.id) : null);
+    const flechas = atq.tipo === 'habilidad-arma' && !atq.escudoGolpe && !(emergio && armaSalida) ? acFlechas(sc) : [];   // (saliendo de abajo, con un arma de mano: sin flechas)
+    if(flechas.length) acElegirFlecha(sc, flechas, fid => lanzar(fid ? flechas.find(f => f.id === fid) || null : null));
+    else lanzar(null);
+  }
+  else acPublicar(sc, CreepDuelo.pdgDeArreglos(sc, atq));
+}
+// 🪤 Una 💰 con trampa: la coloca sola, oculta, al lado del token del creep (como GM Tools).
+async function acColocarTrampaJunto(sc, h){
+  try{
+    const r = await TokensAuto.colocarTrampas({fichaId: sc.id, tipoToken: 'creep', trampa: Combatiente.trampaDeHab(h, st => CreepCalculo.statValor(sc, st))});   // forma única (P123)
+    if(r.colocadas) toast(`🪤 ${r.colocadas === 1 ? 'Trampa colocada' : r.colocadas + ' trampas colocadas'} al lado de ${sc.nombre}, oculta${r.colocadas === 1 ? '' : 's'} a los jugadores`);
+    else if(r.motivo === 'sin-token') toast(`${sc.nombre} no tiene token en ese mapa: la trampa no se colocó (ponela a mano con Terreno y Formas → Trampa)`);
+    else toast('No hay casilla libre al lado del token para la trampa');
+  }catch(err){
+    console.error('No se pudo colocar la trampa:', err);
+    toast('No se pudo colocar la trampa' + (err.code === 'permission-denied' ? ' (sin permiso)' : ' — ponela a mano'));
+  }
+}
+// 🎯 «¿A quién le pegó?» (h.estadoObjetivo): los tokens del mapa que se está viendo; un creep lo recibe directo, un personaje por
+// un aviso que su ficha aplica sola (comun/estados-aplicar.js) — como GM Tools.
+var acObjetivoPendiente = null;
+function acElegirObjetivoEstado(sc, h){
+  const spec = h.estadoObjetivo;
+  const toks = [...tokens.entries()].map(([id, t]) => ({id, ...t, nombre: nombreDe(t)}))
+    .filter(t => t.fichaId && !String(t.fichaId).includes('~') && !(t.tipo === 'creep' && t.fichaId === sc.id))
+    .sort((a, b) => (a.tipo === b.tipo ? 0 : a.tipo === 'pj' ? -1 : 1) || String(a.nombre).localeCompare(String(b.nombre), 'es'));
+  acObjetivoPendiente = {sc, h, spec, toks};
+  ac.raiz.querySelector('#ac-obj-titulo').textContent = `🎯 ¿A quién le pegó ${h.nombre || 'la habilidad'}?`;
+  ac.raiz.querySelector('#ac-obj-cuerpo').innerHTML = `<p class="hint" style="margin:0 0 10px">Se le aplica solo: <b>${esc(EstadosAplicar.texto(spec))}</b>. Elegí a quien la recibió; si falló, tocá "Nadie".</p>
+    ${toks.length ? toks.map(t => `<button type="button" class="addhab" data-ac-obj="${esc(t.id)}" style="display:block;width:100%;margin:0 0 6px;text-align:left">${t.tipo === 'pj' ? '🧑' : '👹'} ${esc(t.nombre)}${t.oculto ? ' 🙈' : ''}</button>`).join('') : '<div class="hint">No hay otros tokens en el mapa que estás viendo.</div>'}`;
+  ac.raiz.querySelector('#ac-objetivo').classList.add('open');
+}
+async function acAplicarEstadoAObjetivo(pend, tokenId){
+  const tok = pend.toks.find(t => t.id === tokenId), spec = pend.spec;
+  if(!tok) return;
+  try{
+    if(tok.tipo === 'creep'){
+      const r = await acCambiarCreep(tok.fichaId, c => {
+        const x = EstadosAplicar.aplicarACreep(c, spec);
+        if(!x.ok) return {error: `${c.nombre}: inmune ahora mismo (${x.motivo}) — no recibió ${spec.nombre}`};
+        if(CreepCalculo.modsAfectanHp(x.estado.mods)) CreepCalculo.actualizarHpMaxPorCon(c);
+        return {aviso: `🎯 ${c.nombre} recibe ${EstadosAplicar.texto(spec)}`};
+      });
+      if(r) toast(r.aviso);
+      return;
+    }
+    await EstadosAplicar.encolarPj({fichaId: tok.fichaId, duenoUid: tok.duenoUid, spec, origen: `${pend.sc.nombre}: ${pend.h.nombre || ''}`});
+    toast(`🎯 ${tok.nombre} recibe ${EstadosAplicar.texto(spec)} (su ficha lo aplica sola)`);
+  }catch(err){
+    console.error('No se pudo aplicar el estado:', err);
+    toast('No se pudo aplicar el estado' + (err.code === 'permission-denied' ? ' (faltan pegar las reglas nuevas)' : ''));
+  }
+}
+function acHabUi(){
+  return {
+    mesaHabilidad: (sc, h, extra) => acMesaHabilidad(sc, h, extra),
+    mesaConTexto: t => mesaConTexto(t),
+    publicar: (sc, t) => acPublicar(sc, t),
+    toast: t => toast(t),
+    habDuelo: (sc, h) => (typeof Duelo !== 'undefined' && Duelo.disponible()) ? CreepAcciones.habEjecucion(sc, h) : null,
+    lanzarAtaque: (sc, h) => acLanzarAtaqueDeHab(sc, h),
+    lanzarDuelo: (sc, h, hab) => acElegirObjetivo(sc, {tipo: 'habilidad', hab, alcance: hab.alcance}, () => acPublicar(sc, CreepAcciones.tiradaPrimeraHab(sc, h))),
+    // ✨ el GM elige la casilla (los jugadores no se enteran); 💰 al lado del token, como siempre.
+    refuerzos: (sc, h) => { ac.host.hidden = true; llamarRefuerzos(sc, h); },   // 📣 js/31
+    estandarte: (sc, h) => { ac.host.hidden = true; plantarEstandarte(sc, h); },   // 🚩 js/73
+    meteoro: (sc, h) => { ac.host.hidden = true; marcarMeteoro(sc, h); },   // ☄ js/74
+    // 😤 Tirar la bronca (js/77): el aliado y el área alrededor de él.
+    provocarAliado: (sc, h) => {
+      const id = ac && ac.creepId, reabrir = () => { if(ac && ac.creepId === id){ ac.host.hidden = false; acUbicar(); acDibujar(); } };
+      ac.host.hidden = true;
+      provocarAliado(sc, h, reabrir);
+    },
+    // ✨ el Parpadeo (2026-10-26): salta él solo, hasta `blink.distancia` casillas (blinkDeHabilidad, js/13).
+    blink: (sc, h) => {
+      const id = ac && ac.creepId, reabrir = () => { if(ac && ac.creepId === id){ ac.host.hidden = false; acUbicar(); acDibujar(); } };
+      ac.objetivoFijo = null; ac.host.hidden = true;
+      const fr = !!(h.blink && h.blink.alFrente);   // 🎯 ¡Al frente! (2026-10-26): a un aliado, pegado a un rival
+      blinkDeHabilidad({fichaId: sc.id, casteadorTipo: 'creep', nombre: h.nombre, distancia: num(h.blink && h.blink.distancia) || 3, soloYo: !fr,
+        ...(fr ? {alFrente: true, estado: String(h.blink.estado || 'Al frente')} : {}), alTerminar: reabrir});
+    },
+    // 💨 la Bomba de humo (2026-10-26, js/57): la niebla a sus pies, Sigilo y el movimiento libre.
+    bombaHumo: (sc, h) => {
+      const id = ac && ac.creepId, reabrir = () => { if(ac && ac.creepId === id){ ac.host.hidden = false; acUbicar(); acDibujar(); } };
+      ac.host.hidden = true;
+      bombaDeHumo({fichaId: sc.id, casteadorTipo: 'creep', nombre: h.nombre, radio: num(h.bombaHumo && h.bombaHumo.radio) || 1, turnos: num(h.bombaHumo && h.bombaHumo.turnos) || 1, mover: num(h.bombaHumo && h.bombaHumo.mover) || 3, alTerminar: reabrir});
+    },
+    // 💎 el Cebo (2026-10-27, js/80): elige la casilla; la dificultad es su Destreza (el número).
+    cebo: (sc, h) => {
+      const id = ac && ac.creepId, reabrir = () => { if(ac && ac.creepId === id){ ac.host.hidden = false; acUbicar(); acDibujar(); } };
+      ac.host.hidden = true;
+      const c = h.cebo || {};
+      colocarCebo({fichaId: sc.id, nombre: h.nombre, dif: CreepCalculo.statValor(sc, c.difStat || 'des'), radio: num(c.radio) || 4, turnos: num(c.turnos) || 3, mueve: num(c.mueve) || 3, alTerminar: reabrir});
+    },
+    // 💨 el Dash (js/76): el camino; si atraviesa a un rival, paga lo de un ataque y le pega (con su objetivo fijo).
+    dash: (sc, h) => {
+      const tk = tokenEntradaCreep(sc.id);
+      if(!tk){ toast(`${h.nombre}: ${sc.nombre} no tiene token en este mapa`); return; }
+      const id = ac && ac.creepId, reabrir = () => { if(ac && ac.creepId === id){ ac.host.hidden = false; acUbicar(); acDibujar(); } };
+      ac.host.hidden = true;
+      dashEjecutar(tk[0], {nombre: h.nombre, casillas: num(h.dash && h.dash.casillas) || 3, alTerminar: reabrir, atacar: async rid => {
+        const r = await acCambiarCreep(sc.id, c => { const p = CreepAcciones.pagarAtaque(c, 'normal', true); return p.error ? p : {aviso: p.aviso}; });
+        if(r && r.aviso) toast(r.aviso);
+        const scN = creepPrivadoDe(sc.id) || sc, atq = CreepAcciones.ataqueDeHab(scN, h);
+        if(!atq) return false;
+        ac.objetivoFijo = rid;
+        acElegirObjetivo(scN, atq, () => acPublicar(scN, CreepDuelo.pdgDeArreglos(scN, atq)));
+        return true;
+      }});
+    },
+    colocarTrampa: (sc, h, auto) => { if(auto){ ac.host.hidden = true; trampaDeHabilidad({fichaId: sc.id, tipoToken: 'creep', nombre: h.nombre, trampa: Combatiente.trampaDeHab(h, st => CreepCalculo.statValor(sc, st))}); } else acColocarTrampaJunto(sc, h); },
+    colocarZona: (sc, h) => {
+      const z = CreepAcciones.zonaDeHab(sc, h);
+      if(!z) return false;
+      if(z.tirada) acPublicar(sc, z.tirada);
+      ac.host.hidden = true;
+      zonaPersistenteDeHabilidad(z.zona);
+      return true;
+    },
+    elegirObjetivo: (sc, h) => acElegirObjetivoEstado(sc, h),
+    // 🕳 Excavar (js/46): el token queda bajo tierra; en su casilla, el pozo.
+    caos: (sc, h) => caosDeHabilidad({fichaId: sc.id, casteadorTipo: 'creep', nombre: h.nombre, caos: h.caos}),   // 🎲 (js/13, 2026-10-18)
+    excavar: (sc, h) => {
+      const e = tokenEntradaCreep(sc.id);
+      if(!e){ toast(`${sc.nombre} no tiene token en este mapa: no se pudo meter bajo tierra`); return; }
+      excavarToken(e[0]).then(ok => { if(ok) toast(`🕳 ${sc.nombre} se metió bajo tierra: queda el pozo a la vista y nadie lo puede atacar hasta que salga`); });
+    },
+  };
+}
+// ⚡ Un Flash con el botón, fuera del cuadro del duelo: la misma regla de costo (cooldown y vida, el doble en turno ajeno); se
+// anuncia y el bono se suma a mano.
+async function acFlashFuera(sc, h){
+  const p = await CreepDuelo.pagarFlash(acDueloUi(), sc.id, h.id);
+  if(!p) return;
+  const f = h.duelo.flash || {};
+  acMesaHabilidad(sc, h, `⚡ Flash: +${fmt(num(f.bono))} a la tirada.`);
+  toast(`${h.nombre}: ⚡ +${fmt(num(f.bono))} (sumalo a mano a la tirada; dentro del duelo se suma solo) · ${ConfirmarTurno.textoCosto(p)}`);
+}
+// ✨ Un arma especial del creep (2026-10-05): cobra (No2 y espera) y sigue por el camino de sus habilidades (CreepAcciones.terminarHab).
+function acUsarEspecial(sc, itemId){
+  const id = sc.id;
+  acCambiar(c => {
+    const p = CreepAcciones.usarEspecialCreep(c, itemId, estadosPresetCreep());
+    if(!p.error) p.creep = c;
+    return p;
+  }).then(p => {
+    if(!p) return;   // (un error ya lo avisó acCambiar)
+    if(p.aviso) toast(p.aviso);
+    const sc2 = Object.assign(p.creep, {id}), h2 = CreepAcciones.habEspecialParaTerminar(sc2, itemId, p.doble);
+    (p.avisosOrbe || []).forEach(a => acMesaHabilidad(sc2, {nombre: a.split(':')[0]}, a.split(': ').slice(1).join(': ')));
+    (p.custodio || []).forEach(c => orbeCustodioMapa({fichaId: id, tipo: 'creep', n: c.n, orbe: c.orbe, quien: sc2.nombre}));   // js/26
+    if(h2) CreepAcciones.terminarHab(sc2, h2, p, acHabUi());
+    if(p.aMano){   // ✋ la parte a mano
+      if(p.aMano.tirada){ if(p.aMano.texto) mesaConTexto('✋ A mano: ' + p.aMano.texto); acPublicar(sc2, p.aMano.tirada); }
+      else acMesaHabilidad(sc2, {nombre: (h2 || {}).nombre || 'Arma especial'}, '✋ A mano: ' + p.aMano.texto);
+    }
+    acDibujar();
+  });
+}
+// 🕳 Excavar, el primer tiempo (2026-10-27): se mete bajo tierra. Cuesta `excavarNo2` (1 si no dice) y, en modo SP, `excavarSp` (1 si no dice; dueño,
+// 2026-10-29: «enterrarse tiene que costar un nitro y un SP»); sin No2 o SP suficientes, avisa y deja seguir (gasta lo que tenga). El cooldown y el SP de
+// la habilidad se pagan al salir atacando (el segundo tiempo es un ataque); salir sin atacar (⬆ Salir) no cuesta nada.
+async function acExcavarMeterse(sc, h, tokenId){
+  const costo = Math.max(0, Math.round(num(h.excavarNo2 !== undefined ? h.excavarNo2 : 1)));
+  const sp = CreepCalculo.modoSP(sc) ? Math.max(0, Math.round(num(h.excavarSp !== undefined ? h.excavarSp : 1))) : 0;
+  const falta = [costo > num(sc.nitros) ? `${fmt(num(sc.nitros))} No2 (cuesta ${fmt(costo)})` : '', sp > CreepCalculo.spActual(sc) ? `${fmt(CreepCalculo.spActual(sc))} SP (cuesta ${fmt(sp)})` : ''].filter(Boolean);
+  if(falta.length && !(await Confirmar.preguntar(`${sc.nombre} tiene ${falta.join(' y ')} para meterse bajo tierra. ¿Hacerlo igual (gasta lo que tenga)?`,
+    {titulo: h.nombre || 'Excavar', icono: '🕳', si: 'Hacerlo igual'}))){ toast(`${sc.nombre}: no usó ${h.nombre || 'Excavar'}`); return; }
+  if(costo > 0 || sp > 0){
+    try{ await modificarCreep(sc.id, x => { x.nitros = Math.max(0, num(x.nitros) - costo); if(sp) x.sp = Math.max(0, CreepCalculo.spActual(x) - sp); }); }
+    catch(err){ console.error('No se pudo cobrar Excavar:', err); toast('No se pudo cobrar — revisá la consola'); return; }
+  }
+  if(!(await excavarToken(tokenId))) return;
+  const pago = [costo ? `−${fmt(costo)} No2` : '', sp ? `−${fmt(sp)} SP` : ''].filter(Boolean).join(' ');
+  mesaLinea(`🕳 ${sc.nombre} se mete bajo tierra${pago ? ` (${pago})` : ''}`, 'recordatorio');
+  toast(`🕳 ${sc.nombre} se metió bajo tierra${pago ? ` · ${pago}` : ''}: con ${h.nombre || 'Excavar'} otra vez, sale apuñalando`);
+  if(ac && ac.creepId === sc.id) acDibujar();
+}
+async function acEjecutarHab(sc, habId){
+  const h = (sc.habilidades || []).find(x => x.id === habId);
+  if(!h) return;
+  const modo = CreepCalculo.modoHab(h);
+  if(h.interponerse){ AvisoCombate.mostrar({icono: '🛡', titulo: h.nombre || 'Interponerse', texto: `${h.nombre || 'Interponerse'} se usa cuando atacan a un aliado a ${fmt(num(h.interponerse.distancia) || 2)} casillas o menos: aparece el botón ✨ arriba (y en «Podés usar» del duelo), antes de que el aliado elija cómo defenderse.`}); return; }   // 🛡 (js/78)
+  if(modo === 'manual'){ acMesaHabilidad(sc, h); toast(`${h.nombre || 'Habilidad'} anunciada`); return; }   // 📣 solo el texto
+  if(modo === 'auto' && Combatiente.tipoEjecucion(h.duelo) === 'flash'){ acFlashFuera(sc, h); return; }   // ⚡ sin No2, cooldown según el turno
+  if(!(await CreepAcciones.confirmarSilencio(sc, h))){ toast(`${sc.nombre}: no usó ${h.nombre || 'la habilidad'}`); return; }   // el cartel del juego, antes de cobrar
+  // 🕳 Excavar (2026-10-27, una sola habilidad): arriba, se mete en la tierra (su No2, sin cooldown ni SP); abajo, sigue como un ataque que sale apuñalando.
+  if(h.excavar && h.emerger){
+    const e = tokenEntradaCreep(sc.id);
+    if(!e){ toast(`${sc.nombre} no tiene token en este mapa: ${h.nombre || 'Excavar'} necesita el token`); return; }
+    if(!e[1].bajoTierra){ await acExcavarMeterse(sc, h, e[0]); return; }
+  }
+  if(!(await CreepAcciones.confirmarSP(sc, h))){ toast(`${sc.nombre}: no usó ${h.nombre || 'la habilidad'}`); return; }   // 💧 modo SP: no le alcanza
+  // ⚔ Golpe que sigue (dueño, 2026-10-30: «tiene que haber al menos dos adyacentes al atacante»): avisa y deja seguir.
+  if(h.duelo && h.duelo.sigue && typeof golpeQueSigueRivalesPegados === 'function'){
+    const n = golpeQueSigueRivalesPegados(sc);
+    if(n !== null && n < 2 && !(await Confirmar.preguntar(`${h.nombre || 'Golpe que sigue'} necesita al menos dos rivales pegados a ${sc.nombre} (tiene ${n}). ¿Usarla igual?`,
+      {titulo: h.nombre || 'Golpe que sigue', icono: '⚔', si: 'Usarla igual'}))){ toast(`${sc.nombre}: no usó ${h.nombre || 'la habilidad'}`); return; }
+  }
+  if((h.excavar || h.emerger) && !(h.excavar && h.emerger)){   // 🕳 Bajo tierra (js/46): hace falta el token; avisa y deja seguir
+    const e = tokenEntradaCreep(sc.id);
+    if(!e){ toast(`${sc.nombre} no tiene token en este mapa: ${h.nombre || 'la habilidad'} necesita el token`); return; }
+    if(h.excavar && e[1].bajoTierra){ toast(`${sc.nombre} ya está bajo tierra`); return; }
+    if(h.emerger && !e[1].bajoTierra && !(await Confirmar.preguntar(`${sc.nombre} no está bajo tierra (le falta Excavar). ¿Usar ${h.nombre || 'la habilidad'} igual, como un ataque común, sin salir de un pozo?`,
+      {titulo: 'No está bajo tierra', icono: '🕳', si: 'Usarla igual'}))) return;
+  }
+  // 🔥 El largo a elegir (Muro de fuego, 2026-10-24): de qué largo, el costo y recién ahí se cobra y se ejecuta.
+  const largo = h.largoVariable ? await muroLargo(sc, h) : null;
+  if(h.largoVariable && !largo){ toast(`${sc.nombre}: no usó ${h.nombre || 'la habilidad'}`); return; }
+  // ✨ El elemento a elegir (el Misil elemental, 2026-10-25): cuál, antes de cobrar; la Ejecución es la de ese elemento.
+  const variante = Array.isArray(h.variantes) && h.variantes.length ? await acElegirVariante(sc, h) : null;
+  if(Array.isArray(h.variantes) && h.variantes.length && !variante){ toast(`${sc.nombre}: no usó ${h.nombre || 'la habilidad'}`); return; }
+  // 💨 El Segundo aliento (2026-10-27, dueño: «que quite cualquier debuff»): cuál le saca, antes de cobrar (Ninguno = solo la cura).
+  let quitar = '';
+  if(h.quitaDebuff){
+    const malos = (sc.estados || []).filter(e => e && e.activo !== false && e.polaridad === 'debuff' && !e.derivado);
+    if(malos.length) quitar = (await Confirmar.elegir(`${sc.nombre}: ${h.nombre || 'la habilidad'} le saca un debuff. ¿Cuál?`, {titulo: h.nombre || 'Sacar un debuff', icono: '💨', no: 'Ninguno',
+      opciones: malos.map(e => ({valor: e.nombre, texto: e.nombre, detalle: [num(e.turnos) > 0 ? `${fmt(num(e.turnos))} turno${num(e.turnos) === 1 ? '' : 's'}` : '', String(e.detalle || '').slice(0, 90)].filter(Boolean).join(' — ')}))})) || '';
+  }
+  const id = sc.id;
+  const antes = {sp: num(sc.sp), nitros: num(sc.nitros), cd: num(h.cdActual)};   // ↩ para devolverlo si cancela al elegir el objetivo
+  // ⚡ Una habilidad Flash del creep (`h.flash`, 2026-10-24, Bendecir el arma) en turno ajeno cuesta el doble (P136): el cooldown o el SP.
+  const te = h.flash ? tokenEntradaCreep(sc.id) : null, doble = !!(te && modoMapa === 'combate' && esSuTurno(te[0]) === false);
+  acCambiar(c => {
+    const p = CreepAcciones.ejecutarHab(c, (c.habilidades || []).find(x => x.id === habId), estadosPresetCreep(), true, {doble, ...(largo ? {extra: largo.extra} : {}), ...(quitar ? {quitar} : {})});
+    if(!p.error) p.creep = c;   // el creep ya cambiado (con el estado propio, si lo hubo), para lo que sigue
+    return p;
+  }).then(p => {
+    if(!p) return;
+    { const c = p.creep, hh = (c.habilidades || []).find(x => x.id === habId), cdNuevo = num(hh && hh.cdActual);
+      ac.devolucion = {creepId: id, habId, habNombre: h.nombre || 'la habilidad', creep: sc.nombre || 'El creep', cd: antes.cd,
+        cdTxt: cdNuevo !== antes.cd ? 'el cooldown' : '', sp: Math.max(0, antes.sp - num(c.sp)), nitros: Math.max(0, antes.nitros - num(c.nitros))};
+      // ↩ Lo que cobró, para el duelo que arme (P233): si se cancela y no cuenta, se devuelve.
+      if(typeof Duelo !== 'undefined' && Duelo.pagoHab) Duelo.pagoHab(id, {habId, nombre: h.nombre || '', no2: ac.devolucion.nitros, sp: ac.devolucion.sp, hp: num(p.costoHp), cd: cdNuevo !== antes.cd ? antes.cd : -1}); }
+    if(p.aviso) toast(p.aviso);
+    if(doble) try{ mesaLinea(`⚡ ${p.creep.nombre || 'El creep'}: ${h.nombre || 'la habilidad'} en turno ajeno (Flash) — cuesta el doble (${CreepCalculo.modoSP(p.creep) ? `${fmt(p.costoSp)} SP` : `cooldown ${fmt(num(h.cd) * 2)}`})`, 'recordatorio'); }catch(err){}
+    if(p.curaCon !== undefined) try{   // 💨 el Segundo aliento: nunca en silencio
+      const txt = `${p.creep.nombre || 'El creep'} toma un segundo aliento: +${fmt(p.curaCon)} de vida${p.quitado ? ` y se saca ${p.quitado}` : ''} (una vez por combate).`;
+      mesaLinea(`💨 ${txt}`, 'recordatorio');
+      momentoAbrir({tipo: 'buff', icono: '💨', titulo: `${p.creep.nombre || 'El creep'}: ${h.nombre || 'Segundo aliento'}`, resultado: txt, estado: 'listo', datos: {chico: true}});
+    }catch(err){}
+    if(p.malditoDano) try{ mesaLinea(`🩸 ${p.creep.nombre || 'El creep'} está Maldito: usar una habilidad le saca ${fmt(p.malditoDano)} de vida (${CreepCalculo.modoSP(p.creep) ? 'su SP' : 'su cooldown'})`, 'recordatorio'); }catch(err){}
+    const sc2 = Object.assign(p.creep, {id}), h1 = (sc2.habilidades || []).find(x => x.id === habId);
+    const h2v = largo && h1 && h1.duelo ? {...h1, duelo: {...h1.duelo, zonaLargo: largo.n}} : h1;   // 🔥 el muro, del largo elegido
+    const h2 = variante && h2v ? {...h2v, nombre: `${h2v.nombre}: ${variante.nombre}`, duelo: JSON.parse(JSON.stringify(variante.duelo))} : h2v;   // ✨ el misil del elemento elegido
+    if(variante) try{ mesaLinea(`${variante.icono || '✨'} ${sc2.nombre}: ${h.nombre}, de ${variante.nombre} (${variante.que})`, 'recordatorio'); }catch(err){}
+    if(largo) try{ mesaLinea(`🔥 ${sc2.nombre}: ${h.nombre} de ${largo.n} casillas — ${largo.txt}`, 'recordatorio'); }catch(err){}
+    if(typeof habilidadAnuncio === 'function') habilidadAnuncio(sc2, h2);   // 🛡 «… se pone en modo aguante» (js/56)
+    if(typeof vigilanciaActivada === 'function') vigilanciaActivada(sc2, h2);   // 👁 es su ataque del turno (js/58)
+    if(typeof golpeAnunciadoActivado === 'function') golpeAnunciadoActivado(sc2, h2);   // 🪓 a quién apunta y el anuncio (js/63)
+    CreepAcciones.terminarHab(sc2, h2, p, acHabUi());
+    acDibujar();
+  });
+}
+// ✨ ¿De qué elemento? (el Misil elemental, 2026-10-25) → la variante elegida, o null si cancela.
+async function acElegirVariante(sc, h){
+  const clave = await Confirmar.elegir(`${sc.nombre}: ¿de qué elemento es ${h.nombre || 'el misil'}?`, {titulo: h.nombre || 'Elegí el elemento', icono: '✨', no: 'Cancelar',
+    opciones: h.variantes.map(v => ({valor: v.clave, texto: `${v.icono || ''} ${v.nombre}`.trim(), detalle: v.que || ''}))});
+  return clave ? h.variantes.find(v => v.clave === clave) || null : null;
+}
+/* 🔥 De qué largo (2026-10-24, dueño, el Muro de fuego: «un mínimo de 3, que se pueda ampliar por un costo adicional en SP, y cada 2 casilleros también
+   un nitro; te pregunta de qué largo, ahí te confirma el costo y ahí se ejecuta»). `h.largoVariable` = {min, max, sp y no2 (por casilla de más; o no2Cada:
+   1 No2 cada tantas)}. En
+   modo cooldown, cada 2 casillas de más suman 1 al cooldown en vez del SP. → {n, extra: {sp, no2, cd}, txt} o null si cancela. */
+async function muroLargo(sc, h){
+  const lv = h.largoVariable, min = Math.max(1, num(lv.min) || 3), max = Math.max(min, num(lv.max) || min), modoSP = CreepCalculo.modoSP(sc);
+  const costo = n => {
+    const mas = n - min, extra = {sp: modoSP ? mas * Math.max(0, num(lv.sp)) : 0, no2: lv.no2 !== undefined ? mas * Math.max(0, num(lv.no2)) : num(lv.no2Cada) > 0 ? Math.floor(mas / num(lv.no2Cada)) : 0, cd: modoSP ? 0 : Math.floor(mas / 2)};
+    const no2 = CreepCalculo.costoNitrosHab(sc, h) + extra.no2;
+    const txt = `${fmt(no2)} No2 y ${modoSP ? `${fmt(CreepCalculo.costoSpHab(sc, h) + extra.sp)} SP` : `cooldown ${fmt(num(h.cd) + extra.cd)}`}`;
+    return {n, extra, txt};
+  };
+  const opciones = [];
+  for(let n = min; n <= max; n++) opciones.push({valor: n, texto: `${n} casillas${n === min ? ' (lo mínimo)' : ''}`, detalle: costo(n).txt});
+  const n = await Confirmar.elegir(`¿De qué largo levanta ${sc.nombre} el ${h.nombre || 'muro'}? Cada casilla de más cuesta más.`, {titulo: h.nombre || 'Largo', icono: '🔥', opciones, no: 'Cancelar'});
+  if(n === null || n === undefined) return null;
+  const c = costo(Number(n));
+  if(!(await Confirmar.preguntar(`${h.nombre} de ${c.n} casillas: cuesta ${c.txt}. ¿Lo levanta?`, {titulo: h.nombre || 'Confirmar el costo', icono: '🔥', si: 'Levantarlo', no: 'Cancelar'}))) return null;
+  return c;
+}
+// Un botón de las Acciones nuevas: se lo pide a GM Tools en el marco (lo carga si hace falta, sin abrir nada).
+/* Paso 4c, tanda 6: el Ver de una habilidad del creep, adentro del recuadro (comun/creep-lupa.js, el mismo de GM Tools). */
+var acViendo = null;   // "creepId:habId" de lo que muestra el Ver
+function acVerHab(sc, ref){
+  const h = (sc.habilidades || []).find(x => x.id === ref.split(':')[1]);
+  if(!h) return;
+  acViendo = ref;
+  const v = CreepLupa.verHab(sc, h);
+  ac.raiz.querySelector('#ac-ver-titulo').textContent = v.titulo;
+  ac.raiz.querySelector('#ac-ver-cuerpo').innerHTML = v.html;
+  ac.raiz.querySelector('#ac-ver').classList.add('open');
+}
+function acDelegar(datos, boton){
+  const marco = $('#botonera-marco'), msg = {tipo: 'acciones-delegar', creep: ac.creepId, datos, ...(boton ? {boton} : {})};
+  if(botonera.herramienta === 'gm'){
+    if(botonera.lista) MensajesMapa.alMarco(marco, msg); else botonera.pendiente = msg;
+    return;
+  }
+  botonera = {herramienta: 'gm', fichaId: ac.creepId, invId: '', lista: false, pendiente: msg, completa: false, precarga: true};
+  marco.src = sinCache(`../gm-toolset/gm-tools.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=acciones&precarga=1`);
+}
+function acCrear(){
+  const host = document.createElement('div');
+  host.id = 'acciones-nuevas';
+  host.hidden = true;
+  document.body.appendChild(host);
+  const raiz = host.attachShadow({mode: 'open'});
+  ventanasAlFrente(host, raiz);   // (js/11)
+  raiz.innerHTML = `<style id="ac-css"></style><div id="ac-contenido"></div>
+    <div class="scrim" id="ac-objetivo"><div class="modal" style="max-width:440px">
+      <header><h3 id="ac-obj-titulo">🎯 ¿A quién le pegó?</h3></header>
+      <div class="body" id="ac-obj-cuerpo"></div>
+      <footer><button class="btn ghost" data-ac-obj="nadie">Nadie (falló)</button></footer>
+    </div></div>
+    <div class="scrim" id="ac-ver"><div class="modal" style="max-width:420px">
+      <header><h3 id="ac-ver-titulo">Habilidad</h3><button class="iconbtn" data-ac-ver="no">Cerrar</button></header>
+      <div class="body" id="ac-ver-cuerpo"></div>
+      <footer>
+        <button class="btn ghost" data-ac-ver="verhab-subir" title="Subir esta habilidad a la biblioteca compartida, con toda su configuración: queda disponible para todos al instante">⬆ Subir</button>
+        <button class="btn ghost" data-ac-ver="verhab-reemplazar" title="Cambiar esta habilidad por otra de la biblioteca">↻ Reemplazar</button>
+        <button class="btn primary" data-ac-ver="verhab-editar" title="Abrir el editor paso a paso de esta habilidad">✎ Editar</button>
+      </footer>
+    </div></div>
+    <div class="scrim" id="ac-vercreep"><div class="modal" style="max-width:820px">
+      <header><h3 id="ac-vercreep-titulo">Creep</h3><button class="iconbtn" data-ac-vc="no">Cerrar</button></header>
+      <div class="body" id="ac-vercreep-cuerpo"></div>
+      <footer><button class="btn primary" data-ac-vc="editar" title="Abrir la ficha completa del creep en GM Tools (otra pestaña) para cambiar sus números">✎ Editar en GM Tools</button></footer>
+    </div></div>
+    <div class="scrim" id="ac-tipo-ataque"><div class="modal" style="max-width:360px">
+      <header><h3>¿Qué ataque es?</h3><button class="iconbtn" data-ac-tipo="no">Cerrar</button></header>
+      <div class="body" id="ac-tipo-lista" style="display:flex;flex-direction:column;gap:9px"></div>
+    </div></div>`;
+  raiz.querySelector('#ac-tipo-ataque').addEventListener('mousedown', e => { if(e.target.id === 'ac-tipo-ataque') e.target.classList.remove('open'); });
+  raiz.querySelector('#ac-ver').addEventListener('mousedown', e => { if(e.target.id === 'ac-ver'){ e.target.classList.remove('open'); acViendo = null; } });
+  raiz.querySelector('#ac-objetivo').addEventListener('mousedown', e => { if(e.target.id === 'ac-objetivo'){ e.target.classList.remove('open'); acObjetivoPendiente = null; } });
+  raiz.querySelector('#ac-vercreep').addEventListener('mousedown', e => { if(e.target.id === 'ac-vercreep') acVerCreepCerrar(); });
+  raiz.addEventListener('click', e => {
+    const b = e.target.closest('button');
+    if(!b || !ac) return;
+    if(b.dataset.acCerrar !== undefined){ cerrarAccionesNuevas(); return; }
+    if(b.dataset.acObj){
+      raiz.querySelector('#ac-objetivo').classList.remove('open');
+      const pend = acObjetivoPendiente;
+      acObjetivoPendiente = null;
+      if(pend && b.dataset.acObj !== 'nadie') acAplicarEstadoAObjetivo(pend, b.dataset.acObj);
+      return;
+    }
+    if(b.dataset.acVer){
+      raiz.querySelector('#ac-ver').classList.remove('open');
+      const v = acViendo;
+      acViendo = null;
+      // ✎ Editar, ⬆ Subir y ↻ Reemplazar: con comun/creep-editor.js, acá (A6c; antes se los pedía a GM Tools escondido).
+      const [cid, hid] = (v || '').split(':');
+      if(v && b.dataset.acVer === 'verhab-editar') acEditarHab(cid, hid);
+      else if(v && b.dataset.acVer === 'verhab-subir') acSubirHab(cid, hid);
+      else if(v && b.dataset.acVer === 'verhab-reemplazar') acReemplazarHab(cid, hid);
+      return;
+    }
+    if(b.dataset.acVc){
+      const id = ac.creepId;
+      acVerCreepCerrar();
+      if(b.dataset.acVc === 'editar') window.open('../gm-toolset/gm-tools.html?partida=' + encodeURIComponent(FB_CAMPANA) + '&editar=' + encodeURIComponent(id), '_blank', 'noopener');
+      return;
+    }
+    if(b.dataset.acTipo){
+      raiz.querySelector('#ac-tipo-ataque').classList.remove('open');
+      if(b.dataset.acTipo !== 'no') acAtacar(b.dataset.acTipo.split(':')[0]);
+      return;
+    }
+    // Confusión (2026-10-04, js/20): la primera acción del turno tira antes.
+    if(stunEsAccion(b)){ const tid = confusionTokenDe(ac.creepId, 'creep'); if(stunAntes(tid, () => stunReclic(raiz, b, tid), {reaccion: stunEsReaccion(b)})) return; }   // Stun (2026-10-06); Mareo (2026-10-20)
+    if(confusionEsAccion(b)){ const tid = confusionTokenDe(ac.creepId, 'creep'); if(confusionAntes(tid, () => confusionReclic(raiz, b, tid))) return; avisarFueraDeTurno(tid, b); }
+    if(acAccionAca(b)) return;
+    const datos = {...b.dataset};
+    if(!Object.keys(datos).length) return;
+    acDelegar(datos);
+  });
+  // Clic en el fondo: se cierra (e.target acá es siempre el recuadro: se mira el primer elemento real, como en la Botonera nueva).
+  host.addEventListener('mousedown', e => { const t = e.composedPath()[0]; if(t === host || (t && t.id === 'ac-contenido')) cerrarAccionesNuevas(); });
+  return {host, raiz};
+}
+async function abrirAccionesNuevas(creepId){
+  if(ac && ac.creepId === creepId && !ac.host.hidden){ cerrarAccionesNuevas(); return; }   // B (o el token) otra vez: se cierra
+  try{ await acCargarPiezas(); }catch(err){ console.error(err); toast('No se pudieron cargar las Acciones nuevas — se abren las de siempre'); abrirAcciones(creepId, null, true); return; }
+  if(!ac) ac = Object.assign({creepId: ''}, acCrear());
+  const lupaCss = (document.getElementById('lupa-css') || {}).textContent || '';   // los 🔍 (comun/lupa.js)
+  ac.raiz.querySelector('#ac-css').textContent = acCss + lupaCss + (typeof ItemCorto !== 'undefined' ? ItemCorto.CSS : '') + PANEL_CSS + ' #ac-contenido{font-family:"Space Grotesk",system-ui,sans-serif;font-size:14px;line-height:1.45;color:var(--paper)}';
+  ac.creepId = creepId;
+  if(bn && !bn.host.hidden) cerrarBotoneraNueva();
+  ac.host.hidden = false;
+  acUbicar();
+  centrarTokenDeBotonera('gm', creepId);
+  acDibujar();
+}
+function cerrarAccionesNuevas(){
+  if(!ac) return;
+  ac.host.hidden = true;
+  ac.raiz.querySelector('#ac-vercreep').classList.remove('open');
+  ac.soloVer = false;
+}
+/* ---------- ✎ El editor de una habilidad de creep, hecho por el mapa (2026-10-02, hoja de ruta A6c, docs/plan-a6c-editor-creeps.md) ----------
+   El ✎ Editar del Ver de una habilidad se lo pedía a GM Tools escondido. Ahora es el editor común (comun/creep-editor.js: el mismo paso
+   a paso, con la trampa y la Ejecución ✨), adentro del recuadro de las Acciones nuevas; guarda con modificarCreep (acCambiarCreep). Los
+   estados para la Ejecución, con el selector común (los "Mis presets" del GM no están en la partida: ver pendientes 7b). */
+const ACE_PIEZAS = ['../comun/creep-editor.js?v=20261030fl1', '../comun/asistente-duelo-hab.js?v=20261026d'];
+// Las recetas de habilidades de fábrica (para ↻ Reemplazar y ⬆ Subir): pesadas, recién cuando hacen falta.
+const ACE_BASE = ['../comun/creeps-base.js?v=20261030ch1', '../comun/skills-creep-base.js?v=20261030ch1'];
+async function acCargarEditor(){ await acCargarPiezas(); await cargarPiezas(SE_PIEZAS); await cargarPiezas(ACE_PIEZAS); }
+// ⬆ Subir una habilidad del creep a la biblioteca compartida (corrección o algo nuevo); su `bibOrigen` nuevo se guarda en el creep.
+async function acSubirHab(creepId, habId){
+  try{ await acCargarEditor(); await cargarPiezas(ACE_BASE); }catch(err){ console.error(err); toast('No se pudo abrir la biblioteca'); return; }
+  const sc = acCreepDe(creepId), hab = sc && sc.habilidades.find(x => x.id === habId);
+  if(!hab) return;
+  CreepEditor.subirHab(sc, hab, {alSubir: (r, origen) => acCambiarCreep(creepId, s2 => { const h2 = s2.habilidades.find(x => x.id === habId); if(h2) h2.bibOrigen = origen; return {}; })});
+}
+// ↻ Reemplazar una habilidad del creep por otra de la biblioteca (en el mismo lugar de la lista).
+async function acReemplazarHab(creepId, habId){
+  try{ await acCargarEditor(); await cargarPiezas(ACE_BASE); }catch(err){ console.error(err); toast('No se pudo abrir la biblioteca'); return; }
+  const sc = acCreepDe(creepId);
+  if(!sc) return;
+  CreepEditor.elegirDeBiblioteca(sc, {reemplazarId: habId,
+    alCrearDeCero: viejaId => acEditarHab(creepId, viejaId),
+    alElegir: async (h, viejaId) => {
+      let msg = '';
+      const r = await acCambiarCreep(creepId, s2 => { msg = CreepEditor.ponerHab(s2, h, viejaId); return {}; });
+      if(r) toast(msg);
+    }});
+}
+/* El ⚙ de un estado de un creep (el HUD, A6c-c3): el editor común de estados (comun/creep-editor.js), adentro del recuadro de las Acciones
+   nuevas; si no estaban a la vista, se abren solo para esto (ac.soloEstado). Sin "Mis presets" (no están en la partida: pendientes 7b). */
+async function abrirEditarEstadoCreepMapa(creepId, nombre){
+  const yaVisible = ac && ac.host && !ac.host.hidden && ac.creepId === creepId;
+  if(!yaVisible) await abrirAccionesNuevas(creepId);
+  if(!ac || ac.host.hidden || ac.creepId !== creepId) return;
+  ac.soloEstado = !yaVisible;
+  const cerrarSiSolo = () => { if(ac.soloEstado){ ac.soloEstado = false; setTimeout(() => cerrarAccionesNuevas(), 0); } };
+  try{ await acCargarEditor(); await PresetsGM.listo(); }catch(err){ console.error(err); toast('No se pudo abrir el editor'); cerrarSiSolo(); return; }
+  if(!ac.editorEstado){
+    ac.editorEstado = CreepEditor.crearEstado(ac.raiz, {
+      creep: id => acCreepDe(id),
+      guardar: (id, aplicar) => acCambiarCreep(id, sc => { aplicar(sc); return {}; }),
+      toast: m => toast(m),
+      alCerrar: () => cerrarSiSoloEstado(),
+      personalizados: () => PresetsGM.lista(),   // los "Mis presets" del GM (comun/presets-gm.js, B-7b)
+      guardarPresets: lista => PresetsGM.guardar(lista),
+    });
+  }
+  const sc = acCreepDe(creepId), es = sc && (sc.estados || []).find(x => x && x.nombre === nombre);
+  if(!es){ toast('No encontré ese estado en el creep'); cerrarSiSolo(); return; }
+  ac.editorEstado.abrir(creepId, es.id);
+}
+// Un preset nuevo que se pidió guardar desde el asistente de estados: a los "Mis presets" del GM, en la partida.
+function acGuardarPresetGM(preset){
+  const l = [...PresetsGM.lista()], i = l.findIndex(p => p.nombre === preset.nombre);
+  if(i >= 0) l[i] = preset; else l.push(preset);
+  PresetsGM.guardar(l);
+}
+function cerrarSiSoloEstado(){ if(ac && ac.soloEstado){ ac.soloEstado = false; setTimeout(() => cerrarAccionesNuevas(), 0); } }
+// Una copia del creep, normalizada (la parte privada que escucha el mapa).
+function acCreepDe(id){ const crudo = creepPrivadoDe(id); if(!crudo) return null; const sc = CreepCalculo.normalizar(structuredClone(crudo)); sc.id = id; return sc; }
+async function acEditarHab(creepId, habId){
+  if(typeof CreepEditor === 'undefined') toast('Cargando el editor…');   // la primera vez tarda unos segundos (dueño, 2026-10-15)
+  // (Que «Editar» la primera vez «no abría»: el editor quedaba arriba, fuera de la vista, si las Acciones estaban scrolleadas; ver ventanasAlFrente, js/11.)
+  try{ await acCargarEditor(); await PresetsGM.listo(); }
+  catch(err){ console.error(err); toast('No se pudo abrir el editor'); return; }
+  if(!ac.editor){
+    ac.editor = CreepEditor.crear(ac.raiz, {
+      creep: id => acCreepDe(id),
+      guardarHab: (id, aplicar) => acCambiarCreep(id, sc => { aplicar(sc); return {}; }),
+      personalizados: () => PresetsGM.lista(),   // los "Mis presets" del GM (comun/presets-gm.js, B-7b)
+      elegirEstadoDuelo: async () => {
+        const sc0 = creepPrivadoDe(ac.creepId);
+        await PresetsGM.listo();
+        const r = await SelectorEstados.abrir({
+          titulo: 'Estado alterado', para: (sc0 && sc0.nombre) || '', presets: estadosPresetCreep(), propios: PresetsGM.lista(),
+          cfgPreguntas: {hp: 'hpTurno', statLabel: id => (SE_STATS_CREEP[id] && SE_STATS_CREEP[id][0]) || id},
+          stats: Object.entries(SE_STATS_CREEP).map(([id, [label, full]]) => ({id, label, full})),
+          armarDeAsistente: res => ({nombre: res.nombre, polaridad: res.polaridad, turnos: res.turnos, permanente: res.permanente, stacks: 1, hpTurno: res.hp, stacksTurno: 0,
+            escudoMagico: res.escudo, mods: res.mods, detalle: res.detalle, ...res.flags, ...(res.forzarNitros !== undefined ? {forzarNitros: res.forzarNitros} : {})}),
+        });
+        if(!r) return null;
+        if(r.guardar) acGuardarPresetGM(r.preset);
+        const pr = r.preset;
+        return {modo: 'preset', nombre: pr.nombre, turnos: pr.turnos, permanente: !!pr.permanente, hp: num(pr.hpTurno), mods: pr.mods, stacks: pr.stacks, escudoMagico: num(pr.escudoMagico), polaridad: pr.polaridad, detalle: pr.detalle};
+      },
+      toast: m => toast(m),
+    }, {id: 'scrim-hab-creep'});
+  }
+  ac.editor.abrir(creepId, habId);
+  // Sus botones son solo suyos: que no los atienda también el manejador general del recuadro. (2026-10-15: el editor abre la ventana común
+  // en cada `abrir` —ya no tiene un `scrim` fijo—, así que se engancha a la ventana recién abierta; antes esto tiraba error y «Editar» no abría.)
+  const rz = ac.editor.raiz;
+  if(rz && !rz.dataset.sinPropagar){ rz.dataset.sinPropagar = '1'; ['click', 'change', 'input'].forEach(ev => rz.addEventListener(ev, e => e.stopPropagation())); }
+}
+/* ---------- 🔍 Ver todo de un creep, hecho por el mapa (2026-10-02, hoja de ruta A6a) ----------
+   El 🔍 Ver todo de la ficha lite abría la ventana «Ver» de GM Tools escondido en el marco. Ahora la muestra el mapa adentro del
+   recuadro de las Acciones nuevas, con comun/creep-lupa.js (verCreep: el mismo dibujo que GM Tools), y se redibuja con cada cambio
+   del creep (acDibujar). Si las Acciones no estaban a la vista, se abren solo para esto (ac.soloVer: al cerrar el Ver se cierran).
+   ✎ Editar abre GM Tools en otra pestaña (el editor del creep pasa al mapa en la A6c). */
+async function abrirVerCreepMapa(creepId){
+  const yaVisible = ac && !ac.host.hidden && ac.creepId === creepId;
+  if(!yaVisible) await abrirAccionesNuevas(creepId);
+  if(!ac || ac.host.hidden || ac.creepId !== creepId) return;
+  ac.soloVer = !yaVisible;
+  ac.raiz.querySelector('#ac-vercreep').classList.add('open');
+  acVerCreepDibujar();
+}
+function acVerCreepDibujar(){
+  if(!ac || !ac.raiz.querySelector('#ac-vercreep').classList.contains('open')) return;
+  const sc = acCreep();
+  if(!sc){ ac.raiz.querySelector('#ac-vercreep-cuerpo').innerHTML = '<div class="hint">Cargando el creep…</div>'; return; }
+  if(!sc.imagen){ const pub = creepsPub.get(ac.creepId); sc.imagen = pub && (pub.tarjeta || pub.miniatura) || ''; }   // la foto completa es privada del GM: la tarjeta pública alcanza
+  const v = CreepLupa.verCreep(sc);
+  ac.raiz.querySelector('#ac-vercreep-titulo').textContent = v.titulo;
+  ac.raiz.querySelector('#ac-vercreep-cuerpo').innerHTML = v.html;
+}
+function acVerCreepCerrar(){
+  if(!ac) return;
+  ac.raiz.querySelector('#ac-vercreep').classList.remove('open');
+  if(ac.soloVer){ ac.soloVer = false; cerrarAccionesNuevas(); }
+}
+document.addEventListener('keydown', e => {
+  if(!ac || ac.host.hidden || !$('#botonera-capa').hidden || elegirDestinoCb) return;
+  if(e.key !== 'Escape') return;
+  e.preventDefault();
+  const abiertos = [...ac.raiz.querySelectorAll('.scrim.open')], cartel = abiertos[abiertos.length - 1];   // el de más arriba
+  if(cartel && cartel.id === 'ac-vercreep'){ acVerCreepCerrar(); return; }
+  if(cartel){ cartel.classList.remove('open'); acObjetivoPendiente = null; return; }
+  cerrarAccionesNuevas();
+});
+
+/* Batalla terminada: cuando el GM confirma el fin del combate, a cada jugador se le abre solo la ventana (la de la ficha, en el iframe de la
+   Botonera, a pantalla casi completa) con lo que recibe cada uno y los despojos para elegir. El botón 🎁 del borde izquierdo (para todos, junto
+   a 🎭 y 🎲) la vuelve a abrir mientras haya botín publicado; con el botín cerrado, se apaga. Solo reacciona a un combate NUEVO (`numero`),
+   no al que ya estaba al entrar. Lo lee de campanas/<id>/combate/actual. */
+let combateMapa = null, combatePrimero = true, combateNumeroVisto = null, combateTimer = null;
+const combatePublicado = () => !!(combateMapa && combateMapa.estado === 'publicado');
+function actualizarBotonDespojosMapa(){
+  const b = $('#toolkit-botin');
+  if(!b) return;
+  b.disabled = !combatePublicado();
+  b.title = combatePublicado() ? (soyGM ? 'Despojos: ver qué tomó cada uno y convertir en despojos lo que nadie tomó' : 'Despojos: abrir la ventana de la batalla para elegir del botín') : 'Despojos: se habilita cuando el GM publica el botín de un combate';
+}
+function abrirBatallaDeJugador(){
+  const fichaId = fichaPrincipalId();
+  if(!fichaId){ toast('🎁 Hay botín del combate, pero no tenés un personaje para tomarlo'); return; }
+  abrirBotinMapa(fichaId);   // el mapa (js/11, A5)
+}
+function escucharBotinParaJugador(){
+  if(!fbUsuario) return;
+  fbDb.doc(fbRutaCampana('combate/actual')).onSnapshot(snap => {
+    const d = snap.exists ? snap.data() : null;
+    const nuevo = !combatePrimero && !!d && d.numero !== combateNumeroVisto;
+    const cerrada = combatePublicado() && d && d.estado !== 'publicado';
+    combatePrimero = false;
+    combateMapa = d;
+    if(d) combateNumeroVisto = d.numero;
+    actualizarBotonDespojosMapa();
+    $('#toolkit-botin').classList.toggle('pendiente', combatePublicado());
+    if(!soyGM && nuevo){
+      clearTimeout(combateTimer);
+      combateTimer = setTimeout(async () => { if(typeof esperarFinDeCombate === 'function') await esperarFinDeCombate(); toast('⚔ Batalla terminada'); abrirBatallaDeJugador(); }, 600);   // 🏁 primero lo de fin de combate (js/25)
+    }
+    if(cerrada && bnBotinCombateCerrado()) toast('El GM cerró el botín: lo que nadie tomó se convirtió en despojos');
+    else if(cerrada && botonera.completa && !$('#botonera-capa').hidden){ cerrarBotonera(); toast('El GM cerró el botín: lo que nadie tomó se convirtió en despojos'); }
+    if(typeof bnBotinDibujar === 'function') bnBotinDibujar();
+    if(soyGM) vgCombateCambio();   // la ventana del botín del GM (js/18)
+  }, err => console.error('Error escuchando el fin del combate:', err));
+}
+// 🏪 Tienda (2026-09-24, pedido del dueño): abre la tienda que publicó el GM, sin salir del mapa, en la ventana de la ficha del
+// personaje principal (mismo iframe que la Botonera y el botín). Solo con la tienda abierta.
+$('#toolkit-tienda').onclick = async () => {   // (2026-10-22: con la tienda cerrada también se abre, solo para mirar)
+  if(soyGM){ window.open('../gm-toolset/vendor-generator.html?partida=' + encodeURIComponent(FB_CAMPANA), '_blank', 'noopener'); return; }   // el GM arma y abre la tienda en el generador
+  const fichaId = fichaPrincipalId();
+  if(!fichaId){ toast('Para usar la tienda necesitás un personaje'); return; }
+  abrirTiendaMapa(fichaId);   // el mapa (js/11, A5): mira si está abierta y la muestra
+};
+$('#toolkit-botin').onclick = () => {
+  if(!combatePublicado()) return;
+  if(soyGM) abrirBotinGMMapa(); else abrirBatallaDeJugador();   // el GM: el mapa (js/18, A6a)
+};
+
+/* GM Tools adentro del mapa: el reporte de fin de combate (modo=finalizar) y el botín para despojar (modo=botin). */
+function abrirModoGM(modo){
+  const capa = $('#botonera-capa');
+  const marco = $('#botonera-marco');
+  capa.hidden = false;
+  botonera = {herramienta: 'gm', fichaId: '', lista: false, pendiente: null, completa: true};
+  ubicarBotoneraCapa();
+  $('#botonera-cargando-texto').textContent = modo === 'finalizar' ? 'Abriendo el reporte del combate…' : 'Abriendo el botín…';
+  $('#botonera-cargando').hidden = false;
+  marco.src = sinCache(`../gm-toolset/gm-tools.html?partida=${encodeURIComponent(FB_CAMPANA)}&modo=${modo}`);
+}
+$('#btn-finalizar-mapa').onclick = () => abrirFinalizarMapa();   // el mapa (js/18, A6a); abrirModoGM quedó sin uso (limpieza A′)
+
+/* Tokens automáticos (comun/tokens-auto.js): uno por creep de un grupo, o uno por personaje de jugador. */
+function centroDeLaVista(){
+  const w = pantallaAMundo(anchoPx / 2, altoPx / 2);
+  return mundoAHex(w.x, w.y);
+}

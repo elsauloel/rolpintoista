@@ -1,0 +1,671 @@
+// js/12-en-vivo.js — tramo 12 de 14 del script de ficha.html (paso 5, nivel A: mismo código, en el mismo orden).
+/* =========================================================
+   MESA — tiradas compartidas en vivo: comun/mesa.js
+   Acá solo va lo propio de esta herramienta: MESA_DESDE, mesaQuien()
+   (quién tira) y lo que publica cosas que no son tiradas.
+   ========================================================= */
+
+const MESA_DESDE = 'ficha';
+
+// Quién tiró: el personaje cargado en la ficha.
+// Si el origen viene prefijado "<invocación> · ...", la tirada es de esa
+// invocación (mismo criterio que gm-tools con sus creeps); si no, es del
+// propio personaje.
+function mesaQuien(origen){
+  const inv = S.invocaciones.find(i => i.nombre && String(origen || '').startsWith(i.nombre + ' · '));
+  if(inv) return inv.nombre;
+  return ((S.meta && S.meta.nombre) || '').trim();
+}
+// De qué personaje es la tirada (comun/mesa.js la publica con su `ficha`): el abierto, también lo de sus invocaciones (P138).
+function mesaFicha(){ return fichaVivo && fichaVivo.id ? fichaVivo.id : ''; }
+
+
+/* =========================================================
+   FICHA EN VIVO (Firebase)
+   El personaje abierto se guarda solo en campanas/<campaña>/fichas/<id>:
+   el documento principal tiene dueño, nombre, un resumen público (HP,
+   SP, estados) y una miniatura del retrato para el token del mapa;
+   el contenido va repartido en fichas/<id>/partes/<parte> (general,
+   inventario, efectos…) para escribir solo lo que cambió, y espaciado
+   por el tope diario de escrituras del plan gratis.
+   Imágenes: solo se guardan el retrato de la cabecera (parte "retrato")
+   y las de las invocaciones (parte "imgInvocaciones"). Las de ítems,
+   habilidades y catálogo no viajan (quedan vacías al volver a abrir).
+   Las invocaciones también se publican en el resumen (nombre, HP,
+   miniatura) para poder vincularlas a un token del mapa.
+   Todos los miembros ven cualquier ficha de PJ; solo el dueño la
+   modifica (lo imponen las reglas). Ver docs/workflow-firebase.md.
+   ========================================================= */
+
+// Qué va en cada parte y cómo se arman, leen y aplican: comun/ficha-guardado.js (paso 5, nivel B, área 4).
+const PARTES_FICHA = FichaGuardado.PARTES;
+const CLAVES_CON_PARTE = FichaGuardado.CLAVES_CON_PARTE;
+const CATALOGO_IDS = FichaGuardado.CATALOGO_IDS;
+// Cuándo se escribe (1,2 s quieto, o cada 5 s si no para de cambiar): comun/ficha-sesion.js (paso 4, etapa 3a).
+const GUARDAR_QUIETO_MS = FichaSesion.QUIETO_MS;
+const GUARDAR_MAX_MS = FichaSesion.MAX_MS;
+const MINIATURA_PX = 96;
+const MINIATURA_MAX = 60000;   // tope que aceptan las reglas
+const GM_SIN_PERSONAJES = 'Como GM, tus personajes y creeps se manejan desde gm-tools. Acá solo podés mirar las fichas de los jugadores.';
+
+const fichaSerializar = FichaGuardado.serializar;
+function fichaPartesActuales(){ return FichaGuardado.partes(S); }
+function fichaImagenesInvocaciones(){ return FichaGuardado.imagenesInvocaciones(S); }
+function fichaPonerImagenesInvocaciones(mapa){ FichaGuardado.ponerImagenesInvocaciones(S, mapa); }
+const fichaLeerParte = FichaGuardado.leerParte;
+// Las imágenes de las invocaciones no viajan con su parte: se vuelven a poner desde la última parte imgInvocaciones leída.
+function fichaAplicarParte(parte, datos){
+  FichaGuardado.aplicarParte(S, parte, datos, {
+    mezclarCatalogo: lista => ItemsSubidos.mezclar(lista, itemsSubidos, DEFAULT.catalogo),
+    imgInvocaciones: fichaVivo ? (fichaVivo.ultimo.imgInvocaciones || '') : null,
+  });
+}
+
+// El resumen público (lo que leen los tokens del mapa, el Tablero, la Calculadora de crítico): comun/ficha-resumen.js, el mismo
+// que arma el mapa cuando guarda un personaje desde la Botonera nueva (paso 4, etapa 3c).
+function fichaResumen(){ return FichaResumen.resumen(S, {control: fichaVivo && fichaVivo.control, miniaturaInv: fichaMiniaturaInvocacion}); }
+
+// Miniaturas de las invocaciones para el resumen: se calculan aparte (tardan
+// un instante) y, cuando están, se vuelve a revisar el resumen.
+const miniaturasInvocaciones = new Map();  // imagen -> miniatura ('' mientras se calcula)
+function fichaMiniaturaInvocacion(imagen){
+  if(!imagen || !imagen.startsWith('data:')) return '';
+  if(miniaturasInvocaciones.has(imagen)) return miniaturasInvocaciones.get(imagen);
+  miniaturasInvocaciones.set(imagen, '');
+  fichaMiniatura(imagen).then(m => {
+    miniaturasInvocaciones.set(imagen, m);
+    if(fichaVivo) fichaVivo.revisarResumen = true;
+  });
+  return '';
+}
+
+function fichaNombre(){
+  return String(S.meta.nombre || '').trim().slice(0, 60) || 'Sin nombre';
+}
+
+// La miniatura del personaje (token del mapa): si el jugador ya eligió a
+// mano qué parte se ve (comun/recorte-imagen.js, S.meta.miniatura), se
+// usa esa; si no, se recorta el centro del retrato como antes.
+async function fichaMiniaturaActual(){
+  return S.meta.miniatura || await fichaMiniatura(S.meta.imagen);
+}
+
+// Retrato achicado para el token del mapa (unos pocos KB).
+function fichaMiniatura(dataUrl){
+  return new Promise(res => {
+    if(!dataUrl){ res(''); return; }
+    const img = new Image();
+    img.onload = () => {
+      const lado = Math.min(img.naturalWidth, img.naturalHeight);
+      if(!lado){ res(''); return; }
+      const canvas = document.createElement('canvas');
+      canvas.width = canvas.height = MINIATURA_PX;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, (img.naturalWidth - lado) / 2, (img.naturalHeight - lado) / 2, lado, lado, 0, 0, MINIATURA_PX, MINIATURA_PX);
+      try{ res(canvas.toDataURL('image/jpeg', 0.8)); }catch(e){ res(''); }
+    };
+    img.onerror = () => res('');
+    img.src = dataUrl;
+  });
+}
+
+/* ---------- Estado visible (barra superior y cartel de solo lectura) ---------- */
+
+function fichaEstado(texto, tipo){
+  const el = $('#guardado-estado');
+  if(!el) return;
+  el.textContent = texto;
+  el.dataset.estado = tipo || '';
+}
+
+function fichaEstadoAlDia(){
+  const f = fichaVivo;
+  if(!f){ fichaEstado('Sin personaje abierto: los cambios no se guardan.'); return; }
+  if(!f.cargada){ fichaEstado('Cargando personaje…'); return; }
+  if(f.soloLectura){ fichaEstado('Solo lectura: tus cambios acá no se guardan.', 'lectura'); return; }
+  if(f.reintentarDesde){ fichaEstado('⚠ No se pudo guardar — reintentando', 'error'); return; }
+  if(f.escribiendo){ fichaEstado('Guardando…'); return; }
+  if(Object.keys(f.sucias).length){ fichaEstado('Cambios sin guardar…'); return; }
+  fichaEstado(`✓ Guardado en la mesa · ${fichaNombre()}${f.editaGM ? ' (editando como GM)' : ''}`, 'ok');
+}
+
+// Usuario a mostrar en la barra junto al personaje abierto: el dueño, si es
+// de otro (se busca una sola vez por apertura, no en cada render), o vos.
+// fichaIdentidadRender() usa este valor cacheado para no repetir la
+// consulta a Firebase en cada tecla (p.ej. al cambiarle el nombre).
+let fichaIdentidadUsuario = '';
+
+function fichaIdentidadRender(){
+  const f = fichaVivo;
+  // La pestaña dice el personaje abierto y la partida (2026-09-27, pedido del dueño): "Aurelio · Nombre de la partida · Ficha".
+  try{
+    const partida = fbPartida && fbPartida.nombre ? fbPartida.nombre : '';
+    const nombre = f && f.cargada ? String(fichaNombre() || '').trim() : '';
+    document.title = nombre ? `${nombre}${partida ? ' · ' + partida : ''} · Ficha` : `${partida ? partida + ' · ' : ''}Ficha de personaje`;
+  }catch(e){}
+  $('#barra-partida').innerHTML = f && f.cargada
+    ? `<b>📜 Ficha</b> <span class="sec">${barraTexto(esc(fichaNombre()), fichaIdentidadUsuario ? esc(fichaIdentidadUsuario) : undefined)}</span>`
+    : `<b>📜 Ficha</b> <span class="sec">${esc(barraTexto())}</span>`;
+}
+
+// ¿La ficha se abre solo para mirar? El dueño la edita; cualquier otro la mira.
+// El GM también la mira, pero puede pasar a editarla (para ayudar a un jugador
+// nuevo a configurar habilidades, automatizarlas, etc.): f.editaGM.
+function fichaSoloLecturaPara(duenoUid, f){
+  // 🎮 Control del GM (2026-09-30, pedido del dueño): mientras el GM tiene el control, él la usa como si fuera el dueño y
+  // todos los demás —el dueño incluido— la ven en solo lectura, hasta que la devuelve.
+  const ctl = f && f.control && f.control.uid;
+  if(ctl) return ctl !== fbUsuario.uid;
+  // Tu propio personaje nunca arranca en solo lectura, seas GM o no (2026-09-29, bug real: un GM que también
+  // juega con su propio PJ —"múltiples cuentas, mismo dueño" no aplica acá, es la MISMA cuenta con los dos roles—
+  // lo abría en solo lectura por defecto, como si fuera de otro jugador, y las habilidades con duelo (que
+  // chequean fichaVivo.soloLectura) no hacían nada, sin ningún aviso). El resto de las reglas de GM (fichas
+  // ajenas en solo lectura salvo "Editar como GM") sigue igual.
+  if(duenoUid === fbUsuario.uid) return false;
+  if(fbMiembro.gm) return !(f && f.editaGM);
+  return true;
+}
+
+/* ---------- 🎮 Tomar / devolver el control (2026-09-30, pedido del dueño) ----------
+   Distinto de "✎ Editar como GM" (que es para configurar): con el control, el GM USA el personaje como si fuera su dueño —
+   Botonera, duelos, habilidades, token en el mapa pagando No2, botín, estados que le llegan y Mantenimiento—. El dueño
+   queda en solo lectura con un cartel hasta que se lo devuelve, y la Mesa avisa las dos cosas. No pide permiso al jugador
+   (juego entre amigos: anotado en "Antes de abrirlo al público"). La marca vive en la parte `control` de la ficha
+   ({uid, nombre, desde}; "null" = la tiene su dueño) y, para el mapa, en `resumen.control` (el uid del GM). */
+const fichaControloYo = f => !!(f && f.control && fbUsuario && f.control.uid === fbUsuario.uid);
+// El momento del cambio de control (2026-10-02, P146): el mapa del jugador dueño lo muestra al centro; el de los demás, en la esquina.
+function fichaMomentoControl(tomo){
+  if(!fbDb || !fbUsuario || !fbMiembro || !fichaVivo) return;
+  fbDb.collection(fbRutaCampana('momentos')).add({tipo: 'control', icono: tomo ? '🎮' : '↩',
+    titulo: (tomo ? `El GM tomó el control de ${fichaNombre()}` : `El GM devolvió el control de ${fichaNombre()}`).slice(0, 200),
+    resultado: tomo ? 'Su jugador queda en solo lectura hasta que se lo devuelva.' : 'Lo vuelve a manejar su jugador.', estado: 'listo', resuelve: '',
+    datos: {centro: true, paraUid: fichaVivo.duenoUid || ''}, creadoPor: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
+  }).catch(err => console.error('No se pudo publicar el momento del control:', err));
+}
+function fichaAvisarMesaControl(texto){
+  if(!fbDb || !fbUsuario || !fbMiembro) return;
+  fbDb.collection(fbRutaCampana('tiradas')).add({
+    uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: fichaNombre(),
+    origen: texto.slice(0, 80), formula: '', rolls: [], mod: 0, total: 0, desde: 'recordatorio',
+    cuando: firebase.firestore.FieldValue.serverTimestamp(),
+  }).catch(err => console.error('No se pudo avisar en la Mesa:', err));
+}
+async function fichaTomarControl(){
+  const f = fichaVivo;
+  if(!f || !fbMiembro.gm || !f.cargada || fichaControloYo(f)) return;
+  if(!(await Confirmar.preguntar(`¿Tomar el control de ${fichaNombre()}?\n\nLo vas a usar como si fueras su jugador (Botonera, duelos, habilidades, token, Mantenimiento). Su jugador queda en solo lectura hasta que se lo devuelvas, y la Mesa avisa.`, {titulo: 'Tomar el control', si: 'Tomar el control'}))) return;
+  const base = fbDb.doc(fbRutaCampana(`fichas/${f.id}`));
+  const control = {uid: fbUsuario.uid, nombre: fbMiembro.nombre || 'GM', desde: Date.now()};
+  try{
+    await base.collection('partes').doc('control').set({json: JSON.stringify(control), actualizado: firebase.firestore.FieldValue.serverTimestamp()});
+    await base.update({'resumen.control': fbUsuario.uid});
+  }catch(err){ console.error('No se pudo tomar el control:', err); toast('No se pudo tomar el control — revisá la consola'); return; }
+  f.editaGM = false;
+  fichaControlCambio(f, control, true);
+  fichaAvisarMesaControl(`🎮 El GM (${control.nombre}) tomó el control de ${fichaNombre()}`);
+  fichaMomentoControl(true);
+}
+async function fichaDevolverControl(){
+  const f = fichaVivo;
+  if(!f || !fichaControloYo(f)) return;
+  await fichaGuardarTick(true);   // sube lo último antes de soltarlo
+  const base = fbDb.doc(fbRutaCampana(`fichas/${f.id}`));
+  try{
+    await base.collection('partes').doc('control').set({json: 'null', actualizado: firebase.firestore.FieldValue.serverTimestamp()});
+    await base.update({'resumen.control': firebase.firestore.FieldValue.delete()});
+  }catch(err){ console.error('No se pudo devolver el control:', err); toast('No se pudo devolver el control — revisá la consola'); return; }
+  fichaAvisarMesaControl(`↩ El GM devolvió el control de ${fichaNombre()} a su jugador`);
+  fichaMomentoControl(false);
+  fichaControlCambio(f, null, true);
+}
+// Llega (o cambia) la marca de control: recalcula quién puede editar y avisa. `avisar` = false en la carga inicial.
+function fichaControlCambio(f, control, avisar){
+  const antes = f.soloLectura;
+  f.control = control && control.uid ? control : null;
+  if(f.control) f.editaGM = false;
+  const ahora = fichaSoloLecturaPara(f.duenoUid, f);
+  // Al dueño que queda en solo lectura: primero sube lo que tenía sin guardar (fichaGuardarTick mira soloLectura al empezar).
+  if(!antes && ahora && fichaHayPendiente()) fichaGuardarTick(true);
+  f.soloLectura = ahora;
+  if(avisar && antes !== ahora){
+    const mio = f.duenoUid === fbUsuario.uid;
+    if(f.control && mio) toast(`🎮 El GM (${f.control.nombre}) tomó el control de tu personaje: queda en solo lectura hasta que te lo devuelva`);
+    else if(!f.control && mio) toast('↩ El GM te devolvió el control de tu personaje');
+    else if(fichaControloYo(f)) toast(`🎮 Tenés el control de ${fichaNombre()}: lo usás como si fueras su jugador`);
+    else if(!f.control) toast('Devolviste el control: la ficha vuelve a solo lectura');
+  }
+  fichaMostrarLectura();
+  fichaEstadoAlDia();
+  if(!f.soloLectura){ mantenimientoRevisar(); recompensasRevisar(); estadosRevisar(); }
+  renderBotoneraSiAbierta();
+}
+
+async function fichaAlternarEdicionGM(){
+  const f = fichaVivo;
+  if(!f || !fbMiembro.gm || !f.cargada) return;
+  if(f.editaGM){
+    await fichaGuardarTick(true);   // sube lo que quedó pendiente antes de volver a mirar
+    f.editaGM = false;
+    f.soloLectura = true;
+    toast('Volviste a solo lectura');
+  }else{
+    f.editaGM = true;
+    f.soloLectura = false;
+    toast('Editás esta ficha como GM: lo que cambies se guarda en el personaje');
+  }
+  fichaMostrarLectura();
+  fichaEstadoAlDia();
+}
+
+// El GM abre desde el mapa el selector o el editor de estados de un personaje que no es suyo: pasa a editar como GM sin avisar
+// (mismo modo que "✎ Editar como GM"; las reglas ya lo permiten) para que lo que cambie se guarde en el personaje.
+function fichaEditarComoGMSilencioso(){
+  const f = fichaVivo;
+  if(!f || !fbMiembro.gm || f.editaGM || !f.cargada) return;
+  f.editaGM = true;
+  f.soloLectura = false;
+  fichaMostrarLectura();
+  fichaEstadoAlDia();
+}
+
+async function fichaMostrarLectura(){
+  let cartel = $('#ficha-lectura');
+  const f = fichaVivo;
+  const editaGM = !!(f && f.editaGM && fbMiembro.gm);
+  const controlo = fichaControloYo(f);
+  if(!f || (!f.soloLectura && !editaGM && !controlo)){
+    if(cartel) cartel.remove();
+    fichaIdentidadUsuario = '';
+    fichaIdentidadRender();
+    return;
+  }
+  if(!cartel){
+    cartel = document.createElement('div');
+    cartel.id = 'ficha-lectura';
+    document.body.appendChild(cartel);
+  }
+  cartel.classList.toggle('editando-gm', editaGM || controlo);
+  const boton = (texto, accion, titulo) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'mini'; b.textContent = texto; b.onclick = accion;
+    if(titulo) b.title = titulo;
+    cartel.appendChild(b);
+  };
+  const armar = dueno => {
+    const deQuien = dueno ? ' de ' + dueno : '';
+    const mio = f.duenoUid === fbUsuario.uid;
+    if(controlo){
+      cartel.textContent = `🎮 Tenés el control del personaje${deQuien}: lo usás como si fueras su jugador (Botonera, duelos, token, Mantenimiento). Su jugador lo ve en solo lectura.`;
+      boton('↩ Devolver el control', fichaDevolverControl, 'Se lo devolvés a su jugador; la Mesa avisa');
+      return;
+    }
+    if(f.control && mio){
+      cartel.textContent = `🎮 El GM (${f.control.nombre}) tiene el control de tu personaje: lo ves en solo lectura hasta que te lo devuelva.`;
+      return;
+    }
+    cartel.textContent = editaGM
+      ? `Editando como GM el personaje${deQuien}: lo que cambies se guarda en su ficha.`
+      : `Solo lectura: ${dueno ? 'personaje de ' + dueno : 'este personaje no es tuyo'}${f.control ? ` (lo controla el GM, ${f.control.nombre})` : ''}. Los cambios que hagas acá no se guardan.`;
+    if(fbMiembro.gm){
+      boton(editaGM ? 'Volver a solo lectura' : '✎ Editar como GM', fichaAlternarEdicionGM, 'Para configurar la ficha (habilidades, equipo…); no la juega');
+      if(!f.control) boton('🎮 Tomar el control', fichaTomarControl, 'Usarlo como si fueras su jugador, hasta devolvérselo');
+    }
+  };
+  armar('');
+  fichaIdentidadUsuario = '';  // se corrige abajo apenas se sepa el dueño; mientras, muestra tu nombre
+  fichaIdentidadRender();
+  try{
+    const m = await fbDb.doc(fbRutaCampana(`miembros/${f.duenoUid}`)).get();
+    if(m.exists && fichaVivo === f && (f.soloLectura || f.editaGM || fichaControloYo(f))){
+      armar(m.data().nombre);
+      fichaIdentidadUsuario = m.data().nombre;
+      fichaIdentidadRender();
+    }
+  }catch(e){}
+}
+
+/* ---------- Guardado ---------- */
+
+// El guardado en sí (qué partes cambiaron, cuándo escribir, reintentar) vive en comun/ficha-sesion.js (paso 4, etapa 3a), el
+// mismo que usa el mapa. Acá, lo propio de la ficha: qué se guarda (partes, resumen, nombre, miniatura) y qué se muestra.
+function fichaOpcionesGuardado(f){
+  return {
+    db: fbDb, ruta: fbRutaCampana(`fichas/${f.id}`), marcaDeTiempo: () => firebase.firestore.FieldValue.serverTimestamp(),
+    partes: fichaPartesActuales, resumen: fichaResumen, nombre: fichaNombre, miniatura: fichaMiniaturaActual,
+    juntos: () => tiposGuardarJunto, juntosListo: () => { tiposGuardarJunto = false; },
+    alEstado: fichaEstadoAlDia, vigente: () => fichaVivo === f,
+    alError: (err, primeraVez) => {
+      if(primeraVez) toast(err.code === 'permission-denied'
+        ? 'No se pudo guardar: la mesa no te deja modificar este personaje'
+        : 'No se pudo guardar la ficha en la mesa — se reintenta sola');
+    },
+  };
+}
+async function fichaGuardarTick(forzar){
+  const f = fichaVivo;
+  if(!f || f.soloLectura || !f.cargada || f.escribiendo) return;
+  return FichaSesion.guardar(f, forzar, fichaOpcionesGuardado(f));
+}
+
+setInterval(() => fichaGuardarTick(false), 1000);
+
+function fichaHayPendiente(){ return FichaSesion.pendiente(fichaVivo, fichaPartesActuales); }
+
+window.addEventListener('beforeunload', e => {
+  if(!fichaHayPendiente()) return;
+  fichaGuardarTick(true);
+  e.preventDefault();
+  e.returnValue = '';
+});
+
+/* ---------- Abrir, escuchar, soltar ---------- */
+
+// soloEnPestana: la ficha de otro jugador (abierta desde el mapa o desde
+// Personajes) queda en la dirección, pero no pasa a ser "la tuya" en este
+// navegador.
+function fichaRecordar(id, soloEnPestana){
+  if(!soloEnPestana){ try{ localStorage.setItem('ficha-actual-' + FB_CAMPANA, id || ''); }catch(e){} }
+  try{ history.replaceState(null, '', id ? '#' + id : location.pathname + location.search); }catch(e){}
+}
+
+// El estado de un personaje abierto (fichaVivo): comun/ficha-sesion.js.
+function fichaNuevoEstado(id, duenoUid, cargada){ return FichaSesion.nueva(id, duenoUid, cargada, fichaSoloLecturaPara(duenoUid, null)); }
+
+// Escuchar el personaje: comun/ficha-sesion.js (paso 4, etapa 3a), el mismo que usa el mapa. Acá, lo que la ficha hace en
+// cada momento (armarse y dibujarse, avisos, solo lectura, control del GM).
+function fichaEscuchar(f){
+  FichaSesion.escuchar(f, {
+    db: fbDb, ruta: fbRutaCampana(`fichas/${f.id}`), vigente: () => fichaVivo === f,
+    // Documento principal: si cambia el dueño (el GM lo reasignó) o se borra.
+    alDoc: doc => {
+      if(!doc.exists){
+        if(doc.metadata.hasPendingWrites) return;
+        toast('Este personaje se borró de la mesa');
+        fichaDesenganchar();
+        return;
+      }
+      const d = doc.data();
+      const lectura = fichaSoloLecturaPara(d.duenoUid, f);
+      f.duenoUid = d.duenoUid;
+      f.miniaturaDoc = typeof d.miniatura === 'string' ? d.miniatura : '';   // la que ven los tokens del mapa
+      if(lectura !== f.soloLectura){
+        f.soloLectura = lectura;
+        toast(lectura ? 'Este personaje pasó a otro dueño: queda en solo lectura' : 'Ahora este personaje es tuyo');
+        fichaMostrarLectura();
+        fichaEstadoAlDia();
+      }
+    },
+    // La primera vez: la ficha entera (la marca de control y lo leído ya están en f).
+    alCargar: armado => {
+      f.soloLectura = fichaSoloLecturaPara(f.duenoUid, f);   // con la marca de control ya leída
+      // 🛟 Si no se pudo armar (2026-10-28: un error de carga dejó la hoja vacía y se guardó encima del personaje), queda en solo lectura: no se guarda nada.
+      if(!aplicarFicha(armado.datos)){
+        f.soloLectura = true;
+        toast('⚠ No se pudo cargar el personaje: queda en solo lectura para no pisar nada. Recargá la página; si sigue, avisale al dueño del proyecto.');
+      }
+      fichaPonerImagenesInvocaciones(armado.imgInvocaciones);
+      renderInvocaciones();
+      f.cargada = true;
+      // "Mis últimas tiradas" desde la Mesa (P138): para la Moneda Re-Roll y la Polilla. Se corta con el personaje.
+      tiradasMesa = [];
+      f.cortes.push(TiradasPropias.escuchar(fbDb, fbRutaCampana('tiradas'), f.id, (S.meta && S.meta.nombre) || '', lista => {
+        if(fichaVivo !== f) return;
+        tiradasMesa = lista;
+        if($('#scrim-reroll').classList.contains('open')) renderReroll();
+        renderPolillaBoton();
+      }));
+      // Si la ficha tiene retrato pero el token del mapa se quedó sin miniatura, la vuelve a publicar.
+      if(!f.soloLectura && !f.miniaturaDoc && (S.meta.imagen || S.meta.miniatura)){ f.reponerMiniatura = true; }
+      f.revisarResumen = true;
+      fichaMostrarLectura();
+      fichaEstadoAlDia();
+      // ?precarga=1 (paso 4): el mapa la carga de antemano, o para un duelo, sin abrir nada; avisa que está lista y espera.
+      if(MODO_BOTONERA){ if(new URLSearchParams(location.search).get('precarga') === '1') botoneraAvisarMapa('botonera-lista'); else botoneraModoAbrir(); }
+      mantenimientoRevisar();
+      recompensasRevisar();
+    },
+    alControl: nuevo => fichaControlCambio(f, nuevo, true),
+    aplicarParte: (parte, datos) => fichaAplicarParte(parte, datos),
+    alCambiar: () => {
+      renderAll();
+      if(!f.soloLectura) toast('La ficha se actualizó desde otra ventana');
+      fichaEstadoAlDia();
+    },
+    alErrorPartes: () => fichaEstado('⚠ No se pudo leer el personaje — mirá la consola', 'error'),
+  });
+}
+
+// Corta la conexión con el personaje abierto sin guardar nada más.
+function fichaDesenganchar(){
+  const f = fichaVivo;
+  if(!f) return;
+  FichaSesion.cortar(f);
+  fichaVivo = null;
+  fichaRecordar('');
+  fichaMostrarLectura();
+  fichaEstadoAlDia();
+}
+
+// Guarda lo pendiente del personaje abierto y lo suelta.
+async function fichaSoltar(){
+  const f = fichaVivo;
+  if(!f) return;
+  for(let i = 0; f.escribiendo && i < 100; i++) await new Promise(r => setTimeout(r, 100));
+  if(fichaVivo === f && !f.soloLectura && f.cargada) await fichaGuardarTick(true);
+  if(fichaVivo === f) fichaDesenganchar();
+}
+
+async function fichaAbrir(id){
+  if(!fbDb || !fbMiembro || !id) return false;
+  if(fichaVivo && fichaVivo.id === id) return true;
+  let doc;
+  try{
+    doc = await fbDb.doc(fbRutaCampana(`fichas/${id}`)).get();
+  }catch(err){
+    console.error('No se pudo abrir el personaje:', err);
+    toast('No se pudo abrir el personaje');
+    return false;
+  }
+  if(!doc.exists){ toast('Ese personaje ya no está en la mesa'); return false; }
+  await fichaSoltar();
+  const f = fichaNuevoEstado(id, doc.data().duenoUid, false);
+  fichaVivo = f;
+  fichaRecordar(id, doc.data().duenoUid !== (fbUsuario && fbUsuario.uid));
+  fichaEstadoAlDia();
+  fichaEscuchar(f);
+  return true;
+}
+
+// «＋ Personaje nuevo»: el asistente paso a paso (comun/asistente-personaje.js, tanda 7 de docs/plan-paso-a-paso.md).
+function abrirPersonajeNuevo(){
+  if(!fbDb || !fbMiembro){ toast('Sin conexión con la partida: no se pueden crear personajes'); return; }
+  if(fbMiembro.gm){ toast(GM_SIN_PERSONAJES); return; }
+  AsistentePersonaje.abrir({
+    base: () => FichaGuardado.normalizar({}, {mezclarCatalogo: lista => ItemsSubidos.mezclar(lista, itemsSubidos, DEFAULT.catalogo)}).S,
+    clases: CLASES_SKILLS,
+    pool: claseId => habsDelPool(claseId),
+    habilidad: (claseId, habId) => habDeClase(claseId, habId),
+    // Una habilidad propia (custom), con el mismo paso a paso de la ficha (comun/ficha-editor.js) pero sobre el personaje que se está armando.
+    editarHabilidad: (draft, id, alCambiar) => FichaEditor.crear(document.body, {
+      S: () => draft, toast: m => toast(m), confirmar: (t, o) => Confirmar.preguntar(t, o), alCambiar: () => alCambiar(),
+      elegirTipoItem: actual => elegirTipoItemFicha(actual), elegirEstadoItem: () => elegirEstadoItemFicha(), elegirEstadoDuelo: () => elegirEstadoDuelo(),
+      alSubirCatalogo: () => {},
+    }).abrir('habilidades', id || null),
+    pasivas: () => pasivasDelCatalogo(),
+    pasiva: (datos, meta) => pasivaDeCatalogo(datos, meta),
+    tienda: async () => FichaTienda.desdeDoc(await fbDb.doc(fbRutaCampana('tienda/publicada')).get()),
+    // El DDE con que arranca un personaje: 300 (lo estándar), salvo que el GM fije otro en ⚙ Partida (campanas/<id>/ajustes/partida).
+    ddeInicial: async () => {
+      try{ const d = await fbDb.doc(fbRutaCampana('ajustes/partida')).get(); const v = d.exists ? Number(d.data().ddeInicial) : NaN; return Number.isFinite(v) ? v : AsistentePersonaje.DDE_POR_DEFECTO; }
+      catch(e){ return AsistentePersonaje.DDE_POR_DEFECTO; }
+    },
+    imagen: async file => {
+      const imagen = await fileToDataURL(file, 480, 0.85);
+      let miniatura = '';
+      try{ miniatura = await recortarImagen(file, {lado: MINIATURA_PX, tope: MINIATURA_MAX}); }catch(e){ if(e.message !== 'cancelado') throw e; }
+      return {imagen, miniatura};
+    },
+    alCrear: datos => crearPersonajeNuevo(datos, {asistente: true}),
+    toast,
+  });
+}
+async function crearPersonajeNuevo(datos, o){
+  if(!fbDb || !fbMiembro){ toast('Sin conexión con la partida: no se pueden crear personajes'); return; }
+  if(fbMiembro.gm){ toast(GM_SIN_PERSONAJES); return; }
+  if(!datos && !(await Confirmar.preguntar('¿Crear un personaje nuevo, en blanco, en la mesa?\n\nEl personaje que tenés abierto queda guardado como está.', {titulo: 'Personaje nuevo', si: 'Crear'}))) return;
+  await fichaSoltar();
+  if(datos) aplicarFicha(datos); else fichaNueva();
+  try{
+    const ts = firebase.firestore.FieldValue.serverTimestamp();
+    const ref = fbDb.collection(fbRutaCampana('fichas')).doc();
+    await ref.set({
+      duenoUid: fbUsuario.uid,
+      nombre: fichaNombre(),
+      resumen: fichaResumen(),
+      miniatura: await fichaMiniaturaActual(),
+      creado: ts,
+      actualizado: ts,
+    });
+    const f = fichaNuevoEstado(ref.id, fbUsuario.uid, true);
+    fichaVivo = f;
+    fichaRecordar(ref.id);
+    fichaEscuchar(f);
+    await fichaGuardarTick(true);
+    toast(o && o.asistente ? `${fichaNombre()} creado: ya está en la mesa` : datos ? 'Archivo cargado como personaje nuevo' : 'Personaje nuevo creado en la mesa');
+  }catch(err){
+    console.error('No se pudo crear el personaje:', err);
+    toast('No se pudo crear el personaje en la mesa — revisá la consola');
+    fichaEstadoAlDia();
+  }
+}
+
+async function fichaCargarArchivo(data){
+  // Respaldo de toda la partida (lo baja el GM desde el inicio): se elige
+  // cuál de sus personajes cargar.
+  if(data && data.tipo === 'respaldo-partida'){
+    const lista = Array.isArray(data.fichas) ? data.fichas.filter(f => f && f.ficha) : [];
+    if(!lista.length){ toast('Ese respaldo no tiene personajes'); return; }
+    // El cartel del juego con un botón por personaje, no el prompt() del navegador (2026-10-31).
+    const n = await Confirmar.elegir('Es un respaldo de toda la partida. ¿Qué personaje querés cargar?', {titulo: 'Cargar del respaldo', icono: '💾',
+      opciones: lista.map((f, i) => ({valor: i + 1, texto: f.nombre || 'Sin nombre', detalle: f.dueno ? `de ${f.dueno}` : ''}))});
+    if(!n || n < 1 || n > lista.length) return;
+    data = lista[n - 1].ficha;
+  }
+  if(fichaVivo){
+    if(fichaVivo.soloLectura){ toast('Este personaje no es tuyo: no podés cargarle un archivo'); return; }
+    aplicarFicha(data);  // se guarda solo en la mesa
+    return;
+  }
+  if(fbMiembro){ crearPersonajeNuevo(data); return; }
+  aplicarFicha(data);
+}
+
+/* ---------- Personajes (modal) ---------- */
+
+async function abrirPersonajes(){
+  const lista = $('#personajes-lista');
+  $('#scrim-personajes').classList.add('open');
+  if(!fbDb || !fbMiembro){
+    lista.innerHTML = '<div class="hint">Sin conexión con la partida. Podés cargar un archivo .json, pero no se guarda en ningún lado.</div>';
+    return;
+  }
+  lista.innerHTML = '<div class="hint">Buscando personajes…</div>';
+  try{
+    const [fichas, miembros] = await Promise.all([
+      fbDb.collection(fbRutaCampana('fichas')).get(),
+      fbDb.collection(fbRutaCampana('miembros')).get(),
+    ]);
+    const nombres = new Map(miembros.docs.map(d => [d.id, d.data().nombre]));
+    const todas = fichas.docs
+      .map(d => ({id: d.id, ...d.data()}))
+      .sort((a, b) => String(a.nombre || '').localeCompare(String(b.nombre || ''), 'es'));
+    const mias = todas.filter(x => x.duenoUid === fbUsuario.uid);
+    const otras = todas.filter(x => x.duenoUid !== fbUsuario.uid);
+    lista.innerHTML = '';
+    const titulo = texto => {
+      const t = document.createElement('div');
+      t.className = 'hint';
+      t.textContent = texto;
+      lista.appendChild(t);
+    };
+    const fila = (x, propia) => {
+      const abierto = fichaVivo && fichaVivo.id === x.id;
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'display:flex;gap:7px;align-items:stretch';
+      const b = document.createElement('button');
+      b.className = 'btn' + (abierto ? ' primary' : '');
+      b.style.flex = '1';
+      const nivel = x.resumen && x.resumen.nivel ? ` · Lv ${fmt(num(x.resumen.nivel))}` : '';
+      const dueno = propia ? '' : ` — ${nombres.get(x.duenoUid) || '¿?'}`;
+      b.textContent = `${x.nombre || 'Sin nombre'}${nivel}${dueno}${abierto ? ' (abierto)' : ''}`;
+      if(!propia && !abierto) b.title = fbMiembro.gm ? 'Se abre en una pestaña nueva, en solo lectura (como GM la podés editar desde ahí)' : 'Se abre en una pestaña nueva, en solo lectura';
+      b.onclick = async () => {
+        $('#scrim-personajes').classList.remove('open');
+        if(abierto) return;
+        // La ficha de otro jugador va en otra pestaña, así no se pierde la propia.
+        if(!propia){
+          window.open(`ficha.html?partida=${encodeURIComponent(FB_CAMPANA)}#${encodeURIComponent(x.id)}`, '_blank', 'noopener');
+          return;
+        }
+        await fichaAbrir(x.id);
+      };
+      wrap.appendChild(b);
+      if(propia){
+        const borrar = document.createElement('button');
+        borrar.className = 'iconbtn';
+        borrar.textContent = '✕';
+        borrar.title = `Borrar a ${x.nombre || 'este personaje'} de la mesa`;
+        borrar.onclick = () => borrarPersonaje(x.id, x.nombre || 'Sin nombre');
+        wrap.appendChild(borrar);
+      }
+      lista.appendChild(wrap);
+    };
+    if(fbMiembro.gm){
+      // El GM usa gm-tools para lo suyo: acá solo mira las fichas de los jugadores.
+      titulo('Personajes de los jugadores (solo para ver). Los tuyos y los creeps se manejan desde gm-tools.');
+      if(todas.length) todas.forEach(x => fila(x, false));
+      else titulo('Todavía nadie creó personajes.');
+    }else{
+      titulo('Tus personajes');
+      if(mias.length) mias.forEach(x => fila(x, true));
+      else titulo('Todavía no tenés ninguno: creá uno nuevo o cargá un archivo.');
+      if(otras.length){
+        titulo('De los demás (solo para ver)');
+        otras.forEach(x => fila(x, false));
+      }
+    }
+    ['#personajes-nuevo', '#personajes-archivo'].forEach(s => { $(s).style.display = fbMiembro.gm ? 'none' : ''; });
+  }catch(err){
+    console.error('Error listando personajes:', err);
+    lista.innerHTML = '<div class="hint">No se pudo traer la lista de personajes. ¿Están publicadas las reglas nuevas?</div>';
+  }
+}
+
+async function borrarPersonaje(id, nombre){
+  const aviso = `Esto borra a ${nombre} de la mesa, para todos, y no se puede deshacer.\n\n` +
+                `Si querés conservarlo, antes abrilo y bajá una copia con 💾 Guardar copia.\n\n¿Seguís?`;
+  if(!(await Confirmar.preguntar(aviso, {titulo: 'Borrar', si: 'Borrar', peligro: true}))) return;
+  const escrito = await Confirmar.texto(`Para confirmar el borrado, escribí el nombre tal cual: ${nombre}`, {titulo: 'Borrar', icono: '🗑', si: 'Borrar', max: 80});
+  if(escrito === null) return;
+  if(escrito.trim().toLowerCase() !== nombre.trim().toLowerCase()){
+    toast('El nombre no coincide — no se borró nada');
+    return;
+  }
+  const eraElAbierto = fichaVivo && fichaVivo.id === id;
+  if(eraElAbierto){ fichaDesenganchar(); fichaNueva(); }
+  try{
+    const base = fbDb.doc(fbRutaCampana(`fichas/${id}`));
+    const partes = await base.collection('partes').get();
+    const batch = fbDb.batch();
+    partes.docs.forEach(d => batch.delete(d.ref));
+    await batch.commit();
+    await base.delete();
+    toast(`${nombre} borrado de la mesa`);
+    abrirPersonajes();
+  }catch(err){
+    console.error('Error borrando el personaje:', err);
+    toast('No se pudo borrar el personaje — revisá la consola');
+  }
+}
+
+

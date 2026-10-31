@@ -1,0 +1,1750 @@
+[
+ {
+  "id": "nuevo-gorro-acolchado",
+  "nombre": "Gorro acolchado",
+  "tier": "Común",
+  "tipoItem": "cabeza",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 40,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +2 · Res. crítico Tipo 4 +1",
+  "descripcionNarrativa": "Lo cosió la abuela de alguien con lo que había: lana, trapos y mucha paciencia. Nadie lo confunde con un casco, pero más de un ladrón de callejón se quedó con la daga atascada en el relleno."
+ },
+ {
+  "id": "nuevo-yelmo-de-guardia",
+  "nombre": "Yelmo de guardia",
+  "tier": "Buena Calidad",
+  "tipoItem": "cabeza",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 100,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 4
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +4 · Res. crítico Tipo 4 +1",
+  "descripcionNarrativa": "Sale del mismo molde que miles de otros, con la barbuda algo abollada de tanto uso. Quien lo lleva puesto sabe que tiene detrás a toda una guardia, aunque esté solo."
+ },
+ {
+  "id": "nuevo-casco-de-hierro-batido",
+  "nombre": "Casco de hierro batido",
+  "tier": "Raro",
+  "tipoItem": "cabeza",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 220,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 5
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo4",
+    "val": 1
+   },
+   {
+    "stat": "eva",
+    "val": -1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +5 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 10 +1 · Evasión -1",
+  "descripcionNarrativa": "Un herrero terco lo martilló durante una noche entera, golpe a golpe, hasta que sonó como una campana. Todavía suena: se lo oye venir de lejos y casi nadie se anima a pegarle."
+ },
+ {
+  "id": "nuevo-yelmo-del-penasco",
+  "nombre": "Yelmo del Peñasco",
+  "tier": "Excepcional",
+  "tipoItem": "cabeza",
+  "peso": 3,
+  "ranuras": 0,
+  "precioCompra": 600,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 6
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo4",
+    "val": 1
+   },
+   {
+    "stat": "ini",
+    "val": -1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +6 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 10 +1 · Iniciativa -1",
+  "descripcionNarrativa": "Cuentan que nació de una piedra de río que un escultor ahuecó y le dio rostro. Es tan pesado que obliga a caminar con la frente alta, y los golpes le resbalan como al agua."
+ },
+ {
+  "id": "nuevo-corona-del-alfil-sordo",
+  "nombre": "Corona del Alfil Sordo",
+  "tier": "Legendario",
+  "tipoItem": "cabeza",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 1400,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 5
+   },
+   {
+    "stat": "tipo1",
+    "val": 3
+   },
+   {
+    "stat": "tipo4",
+    "val": 2
+   },
+   {
+    "stat": "esp",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +5 · Res. crítico Tipo 4 +3 · Res. crítico Tipo 10 +2 · Especial +1",
+  "descripcionNarrativa": "Perteneció a un rey que se quedó sordo de tanto oír mentiras, y nunca más volvió a sobresaltarse. Cuando alguien se la pone, el mundo se acalla y los golpes llegan de a uno y de frente."
+ },
+ {
+  "id": "nuevo-jubon-de-cuero-curtido",
+  "nombre": "Jubón de cuero curtido",
+  "tier": "Común",
+  "tipoItem": "armadura_blanda",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 60,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 3
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +3 · Res. crítico Tipo 4 +1",
+  "descripcionNarrativa": "Cuero de vaca curtido con corteza de roble y cosido dos veces, por si acaso. Huele a establo y a viaje, y salvó a más de un cuerpo de una mala tarde."
+ },
+ {
+  "id": "nuevo-casaca-de-guardia-costera",
+  "nombre": "Casaca de la guardia costera",
+  "tier": "Buena Calidad",
+  "tipoItem": "armadura_blanda",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 110,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 5
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "eva",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +5 · Res. crítico Tipo 4 +1 · Evasión +1",
+  "descripcionNarrativa": "Encerada contra la sal y cortada para trepar por el cordaje sin enredarse. Los guardias costeros juran que el mar se traga mejor a los que van muy abrigados."
+ },
+ {
+  "id": "nuevo-coleto-de-jabali",
+  "nombre": "Coleto de piel de jabalí",
+  "tier": "Raro",
+  "tipoItem": "armadura_blanda",
+  "peso": 3,
+  "ranuras": 0,
+  "precioCompra": 200,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 6
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "eva",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +6 · Res. crítico Tipo 4 +2 · Evasión +1",
+  "descripcionNarrativa": "El cazador que la hizo se dejó las cerdas por dentro, así que cada movimiento erizado avisa al que quiera acercarse. No es fina, pero es de las que no fallan."
+ },
+ {
+  "id": "nuevo-capa-de-seda-de-arana",
+  "nombre": "Capa de seda de araña",
+  "tier": "Excepcional",
+  "tipoItem": "armadura_blanda",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 650,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 5
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "eva",
+    "val": 2
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +5 · Res. crítico Tipo 4 +2 · Evasión +2",
+  "descripcionNarrativa": "Tejida por una araña que aprendió a hilar a la luz de la luna. Pesa menos que un suspiro y casi nada la corta: los cuchillos se cansan antes de pasar."
+ },
+ {
+  "id": "nuevo-cota-de-malla-fina",
+  "nombre": "Cota de malla fina",
+  "tier": "Buena Calidad",
+  "tipoItem": "armadura_rigida",
+  "peso": 3,
+  "ranuras": 0,
+  "precioCompra": 130,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 6
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "tipo2",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +6 · Res. crítico Tipo 4 +1 · Res. crítico Tipo 6 +1",
+  "descripcionNarrativa": "Miles de anillos pequeños, remachados uno a uno por manos pacientes. Suena un poco al caminar, como un río de monedas, y guarda al cuerpo mejor que cualquier promesa."
+ },
+ {
+  "id": "nuevo-coraza-de-placas",
+  "nombre": "Coraza de placas",
+  "tier": "Raro",
+  "tipoItem": "armadura_rigida",
+  "peso": 5,
+  "ranuras": 0,
+  "precioCompra": 250,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 9
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo2",
+    "val": 1
+   },
+   {
+    "stat": "tipo3",
+    "val": 1
+   },
+   {
+    "stat": "eva",
+    "val": -1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +9 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 6 +1 · Res. crítico Tipo 8 +1 · Evasión -1",
+  "descripcionNarrativa": "Peto y espaldar de acero bien pulido, con correas que crujen en cada paso. Quien la lleva es una pequeña fortaleza que camina, a paso lento y seguro."
+ },
+ {
+  "id": "nuevo-armadura-de-placas-de-campeon",
+  "nombre": "Armadura de placas de campeón",
+  "tier": "Excepcional",
+  "tipoItem": "armadura_rigida",
+  "peso": 5,
+  "ranuras": 0,
+  "precioCompra": 900,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 11
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo2",
+    "val": 2
+   },
+   {
+    "stat": "tipo3",
+    "val": 1
+   },
+   {
+    "stat": "ini",
+    "val": -1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +11 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 6 +2 · Res. crítico Tipo 8 +1 · Iniciativa -1",
+  "descripcionNarrativa": "La encargó un noble a un maestro armero que tardó un año en terminarla; después el noble murió y la armadura siguió esperando dueño. Calza tan justa que parece una segunda piel de acero."
+ },
+ {
+  "id": "nuevo-coraza-del-titan-caido",
+  "nombre": "Coraza del Titán caído",
+  "tier": "Legendario",
+  "tipoItem": "armadura_rigida",
+  "peso": 4,
+  "ranuras": 0,
+  "precioCompra": 1800,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 12
+   },
+   {
+    "stat": "tipo1",
+    "val": 3
+   },
+   {
+    "stat": "tipo2",
+    "val": 2
+   },
+   {
+    "stat": "tipo3",
+    "val": 2
+   },
+   {
+    "stat": "mov",
+    "val": -1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +12 · Res. crítico Tipo 4 +3 · Res. crítico Tipo 6 +2 · Res. crítico Tipo 8 +2 · Movimiento -1",
+  "descripcionNarrativa": "Dicen que un gigante cayó en la montaña y que con su peto se forjó ésta. Cada placa tiene la marca de una mano enorme y en el pecho todavía se escucha, si se apoya la oreja, un latido lejano."
+ },
+ {
+  "id": "nuevo-guantes-de-trabajo-reforzados",
+  "nombre": "Guantes de trabajo reforzados",
+  "tier": "Común",
+  "tipoItem": "manos",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 40,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +1 · Res. crítico Tipo 4 +1",
+  "descripcionNarrativa": "Nacieron para cargar barriles y terminaron peleando por costumbre. Los nudillos reforzados tienen más historias que dientes el que los recibió."
+ },
+ {
+  "id": "nuevo-manoplas-de-cota",
+  "nombre": "Manoplas de cota",
+  "tier": "Buena Calidad",
+  "tipoItem": "manos",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 100,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 3
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "tipo2",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +3 · Res. crítico Tipo 4 +1 · Res. crítico Tipo 6 +1",
+  "descripcionNarrativa": "Malla fina hasta la muñeca, con un forro de gamuza para que no pellizque. Una mano bien cubierta es media pelea ganada."
+ },
+ {
+  "id": "nuevo-guanteletes-del-duelista",
+  "nombre": "Guanteletes del duelista",
+  "tier": "Raro",
+  "tipoItem": "manos",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 200,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 3
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo2",
+    "val": 1
+   },
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +3 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 6 +1 · Parry +1",
+  "descripcionNarrativa": "Los duelistas de la costa desvían el acero con la mano libre, y ésta es su mano. Están tan gastados en la palma que ya toman la forma de quien los usa."
+ },
+ {
+  "id": "nuevo-manoplas-del-desollador",
+  "nombre": "Manoplas del Desollador",
+  "tier": "Excepcional",
+  "tipoItem": "manos",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 700,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 4
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo2",
+    "val": 2
+   },
+   {
+    "stat": "pdg",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +4 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 6 +2 · PdG +1",
+  "descripcionNarrativa": "Terminan en garras cortas y curvas, como de ave rapaz. Su primer dueño las usaba para trabajar cueros; el segundo, no tanto."
+ },
+ {
+  "id": "nuevo-grebas-de-cuero",
+  "nombre": "Grebas de cuero",
+  "tier": "Común",
+  "tipoItem": "piernas",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 50,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +2 · Res. crítico Tipo 4 +1",
+  "descripcionNarrativa": "Cuero endurecido al fuego sobre las espinillas, atado con tiras. Protege de las patadas y de esas piedras que siempre aparecen en el peor momento."
+ },
+ {
+  "id": "nuevo-perneras-de-malla",
+  "nombre": "Perneras de malla",
+  "tier": "Buena Calidad",
+  "tipoItem": "piernas",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 120,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 4
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "tipo2",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +4 · Res. crítico Tipo 4 +1 · Res. crítico Tipo 6 +1",
+  "descripcionNarrativa": "Malla sobre acolchado, ideal para quien pelea en pie y no piensa retroceder. Hacen un ruido característico que anuncia que alguien llega para quedarse."
+ },
+ {
+  "id": "nuevo-grebas-de-escamas-de-dragon-menor",
+  "nombre": "Grebas de escamas de dragón menor",
+  "tier": "Excepcional",
+  "tipoItem": "piernas",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 700,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 6
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo2",
+    "val": 2
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +6 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 6 +2",
+  "descripcionNarrativa": "Cada escama fue cosida una por una, sobre el cuero, por manos cuidadosas. Vienen de un dragón pequeño que cometió el error de creerse grande."
+ },
+ {
+  "id": "nuevo-botas-de-suela-ferrada",
+  "nombre": "Botas de suela ferrada",
+  "tier": "Buena Calidad",
+  "tipoItem": "pies",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 90,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 3
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +3 · Res. crítico Tipo 4 +1",
+  "descripcionNarrativa": "La suela lleva clavos de hierro que muerden la piedra mojada y el barro. Sirven para pisar fuerte, y para que el otro lo sepa."
+ },
+ {
+  "id": "nuevo-botas-del-caminante-de-viento",
+  "nombre": "Botas del Caminante de Viento",
+  "tier": "Excepcional",
+  "tipoItem": "pies",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 650,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 3
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "mov",
+    "val": 1
+   },
+   {
+    "stat": "eva",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +3 · Res. crítico Tipo 4 +1 · Movimiento +1 · Evasión +1",
+  "descripcionNarrativa": "Livianas como una idea: el que las calza siente que la tierra le empuja los pies hacia adelante. Nadie recuerda quién las hizo, pero todos saben adónde llevan."
+ },
+ {
+  "id": "nuevo-rodela-de-tablas",
+  "nombre": "Rodela de tablas",
+  "tier": "Común",
+  "tipoItem": "escudo_1m",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 45,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 3
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "bloqueo",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +3 · Res. crítico Tipo 4 +1 · Bloqueo +1",
+  "descripcionNarrativa": "Tablas de roble unidas con un cuero y un asa clavada a mano. Tiene más astillas que años, pero cuando hace falta, hace de pared."
+ },
+ {
+  "id": "nuevo-escudo-de-asedio",
+  "nombre": "Escudo de asedio",
+  "tier": "Raro",
+  "tipoItem": "escudo_2m",
+  "peso": 6,
+  "ranuras": 0,
+  "precioCompra": 300,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 8
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo3",
+    "val": 1
+   },
+   {
+    "stat": "bloqueo",
+    "val": 2
+   },
+   {
+    "stat": "ini",
+    "val": -1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +8 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 8 +1 · Bloqueo +2 · Iniciativa -1",
+  "descripcionNarrativa": "Es tan alto que se apoya en el suelo, y tras él caben dos personas y una excusa. Cuando se lo planta, el mundo se detiene a pensarlo."
+ },
+ {
+  "id": "nuevo-broquel-del-rompeolas",
+  "nombre": "Broquel del Rompeolas",
+  "tier": "Excepcional",
+  "tipoItem": "escudo_1m",
+  "peso": 3,
+  "ranuras": 0,
+  "precioCompra": 800,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 6
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo3",
+    "val": 1
+   },
+   {
+    "stat": "bloqueo",
+    "val": 2
+   },
+   {
+    "stat": "parry",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +6 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 8 +1 · Bloqueo +2 · Parry +1",
+  "descripcionNarrativa": "Se fue forjando en el muelle, a golpes de mar, hasta aprender a aguantar lo que llegue. Los hachazos rebotan como olas contra el espigón."
+ },
+ {
+  "id": "nuevo-egida-del-ultimo-bastion",
+  "nombre": "Égida del Último Bastión",
+  "tier": "Legendario",
+  "tipoItem": "escudo_2m",
+  "peso": 6,
+  "ranuras": 0,
+  "precioCompra": 1900,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 10
+   },
+   {
+    "stat": "tipo1",
+    "val": 3
+   },
+   {
+    "stat": "tipo3",
+    "val": 2
+   },
+   {
+    "stat": "bloqueo",
+    "val": 3
+   },
+   {
+    "stat": "resm",
+    "val": 2
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +10 · Res. crítico Tipo 4 +3 · Res. crítico Tipo 8 +2 · Bloqueo +3 · Res. Mt +2",
+  "descripcionNarrativa": "Se levantó una sola vez para defender lo indefendible, y desde entonces lleva la marca de cada golpe que le ahorró a otro. Dicen que sigue esperando ese último frente."
+ },
+ {
+  "id": "nuevo-faja-del-estallido",
+  "nombre": "Faja del Estallido",
+  "tier": "Legendario",
+  "tipoItem": "cinturon",
+  "peso": 1,
+  "ranuras": 8,
+  "precioCompra": 1300,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "tipo5",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +2 · Res. crítico Tipo 12 +1",
+  "descripcionNarrativa": "Una faja ancha, reforzada con tiras de lona alquitranada y placas de plomo. Quien la usa aprendió a aguantar lo que revienta cerca sin perder el equilibrio."
+ },
+ {
+  "id": "nuevo-anillo-de-polvora-mansa",
+  "nombre": "Anillo de Pólvora Mansa",
+  "tier": "Legendario",
+  "tipoItem": "anillos",
+  "peso": 0,
+  "ranuras": 1,
+  "precioCompra": 3000,
+  "mods": [
+   {
+    "stat": "tipo5",
+    "val": 1
+   },
+   {
+    "stat": "resm",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Res. crítico Tipo 12 +1 · Res. Mt +1",
+  "descripcionNarrativa": "Un aro ennegrecido por mil chispas que jamás llegaron a prender. Quien lo lleva se asombra de lo poco que le explota alrededor."
+ },
+ {
+  "id": "nuevo-anillo-de-percepcion-aumentada",
+  "nombre": "Anillo de percepción aumentada",
+  "tier": "Raro",
+  "tipoItem": "anillos",
+  "peso": 0,
+  "ranuras": 1,
+  "precioCompra": 2000,
+  "mods": [],
+  "efectoMods": [],
+  "detalle": "Percepción aumentada mientras lo llevás puesto (el mismo efecto que la pasiva del Job).",
+  "descripcionNarrativa": "Un aro de plata con una piedra clara en forma de ojo. Al ponérselo, los sonidos se afinan y los rincones oscuros dejan de guardar secretos: cada detalle fuera de lugar salta a la vista.",
+  "equipoEstadoNombre": "Percepción aumentada",
+  "equipoEstadoDetalle": "Tus tiradas de percepción usan un dado más alto (cada dado sube un escalón) y las trampas ocultas cercanas te avisan. Es el mismo efecto que la pasiva «Percepción aumentada» del Job.",
+  "percepcionAumentada": true
+ },
+ {
+  "id": "nuevo-gafas-de-aviador",
+  "nombre": "Gafas de aviador",
+  "tier": "Común",
+  "tipoItem": "cabeza",
+  "peso": 0,
+  "ranuras": 0,
+  "precioCompra": 60,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +1 · Visión +1",
+  "descripcionNarrativa": "Cristales ahumados y cuero gastado; alguien las trajo de una cabina que ya no existe. Con ellas se ve un poco más lejos y se llora un poco menos con el viento.",
+  "categoria": "vision"
+ },
+ {
+  "id": "nuevo-capucha-de-vigia",
+  "nombre": "Capucha de vigía",
+  "tier": "Común",
+  "tipoItem": "cabeza",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 55,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +2 · Res. crítico Tipo 4 +1 · Visión +1",
+  "descripcionNarrativa": "Con visera larga para el sol de la muralla y una ranura ancha para los ojos. Los vigías de garita juran que con ella se ve hasta el día siguiente.",
+  "categoria": "vision"
+ },
+ {
+  "id": "nuevo-yelmo-de-vigia",
+  "nombre": "Yelmo de vigía",
+  "tier": "Buena Calidad",
+  "tipoItem": "cabeza",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 120,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 4
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +4 · Res. crítico Tipo 4 +1 · Visión +1",
+  "descripcionNarrativa": "Un yelmo abierto por delante, con una pequeña visera móvil. Quien lo usa aprendió a mirar sin que le moleste la cabeza que lleva puesta.",
+  "categoria": "vision"
+ },
+ {
+  "id": "nuevo-monoculo-del-cartografo",
+  "nombre": "Monóculo del cartógrafo",
+  "tier": "Buena Calidad",
+  "tipoItem": "cabeza",
+  "peso": 0,
+  "ranuras": 0,
+  "precioCompra": 130,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 1
+   },
+   {
+    "stat": "esp",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +1 · Visión +1 · Especial +1",
+  "descripcionNarrativa": "Un cristal fino en marco de bronce, con una escala grabada en el borde. Hace que el mundo parezca ya dibujado y medido.",
+  "categoria": "vision"
+ },
+ {
+  "id": "nuevo-capa-del-explorador",
+  "nombre": "Capa del explorador",
+  "tier": "Buena Calidad",
+  "tipoItem": "armadura_blanda",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 130,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 4
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "eva",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +4 · Res. crítico Tipo 4 +1 · Evasión +1 · Visión +1",
+  "descripcionNarrativa": "Lleva un forro de bolsillos para brújulas y catalejos. No abriga demasiado, pero acostumbra a mirar hacia adelante.",
+  "categoria": "vision"
+ },
+ {
+  "id": "nuevo-casco-del-centinela",
+  "nombre": "Casco del centinela",
+  "tier": "Raro",
+  "tipoItem": "cabeza",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 300,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 5
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo4",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 2
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +5 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 10 +1 · Visión +2",
+  "descripcionNarrativa": "Un casco cerrado, con mira de rendija que afila la vista en lugar de estrecharla. Los centinelas dicen que no se sienten las horas de guardia.",
+  "categoria": "vision"
+ },
+ {
+  "id": "nuevo-antifaz-del-ave-nocturna",
+  "nombre": "Antifaz del ave nocturna",
+  "tier": "Raro",
+  "tipoItem": "cabeza",
+  "peso": 0,
+  "ranuras": 0,
+  "precioCompra": 250,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "eva",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 2
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +2 · Evasión +1 · Visión +2",
+  "descripcionNarrativa": "Cuero negro y plumas de lechuza cosidas al borde. Con él puesto, la oscuridad parece una idea que otros tienen.",
+  "categoria": "vision"
+ },
+ {
+  "id": "nuevo-anillo-de-vista-aguda-mayor",
+  "nombre": "Anillo de vista aguda mayor",
+  "tier": "Raro",
+  "tipoItem": "anillos",
+  "peso": 0,
+  "ranuras": 1,
+  "precioCompra": 2000,
+  "mods": [
+   {
+    "stat": "vision",
+    "val": 2
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Visión +2",
+  "descripcionNarrativa": "Una alianza de plata con una piedra ámbar que sigue con la vista a quien la lleva. La distancia se vuelve un asunto de opinión.",
+  "categoria": "vision"
+ },
+ {
+  "id": "nuevo-casco-de-ojos-de-aguila",
+  "nombre": "Casco de ojos de águila",
+  "tier": "Excepcional",
+  "tipoItem": "cabeza",
+  "peso": 3,
+  "ranuras": 0,
+  "precioCompra": 750,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 6
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "tipo4",
+    "val": 1
+   },
+   {
+    "stat": "pdg",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 3
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +6 · Res. crítico Tipo 4 +2 · Res. crítico Tipo 10 +1 · PdG +1 · Visión +3",
+  "descripcionNarrativa": "Forjado con dos ojos de bronce sobre la frente y una visera que parece pico. Ve lo que ve un águila y golpea cuando el águila golpea.",
+  "categoria": "vision"
+ },
+ {
+  "id": "nuevo-anillo-de-vista-aguda",
+  "nombre": "Anillo de vista aguda",
+  "tier": "Común",
+  "tipoItem": "anillos",
+  "peso": 0,
+  "ranuras": 1,
+  "precioCompra": 1200,
+  "mods": [
+   {
+    "stat": "vision",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Visión +1",
+  "descripcionNarrativa": "Un aro sencillo de cobre con una gota de cristal. Dicen que se le abren los ojos a quien lo lleva.",
+  "categoria": "vision"
+ },
+ {
+  "id": "nuevo-anillo-de-vista-aguda-superior",
+  "nombre": "Anillo de vista aguda superior",
+  "tier": "Legendario",
+  "tipoItem": "anillos",
+  "peso": 0,
+  "ranuras": 1,
+  "precioCompra": 3000,
+  "mods": [
+   {
+    "stat": "vision",
+    "val": 3
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Visión +3",
+  "descripcionNarrativa": "Un anillo que ya no parece de metal: más bien un ojo diminuto que mira por dos. El horizonte deja de ser un límite.",
+  "categoria": "vision"
+ },
+ {
+  "id": "nuevo-yelmo-del-ojo-que-todo-lo-ve",
+  "nombre": "Yelmo del Ojo Que Todo Lo Ve",
+  "tier": "Legendario",
+  "tipoItem": "cabeza",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 1900,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 7
+   },
+   {
+    "stat": "tipo1",
+    "val": 3
+   },
+   {
+    "stat": "tipo4",
+    "val": 2
+   },
+   {
+    "stat": "esp",
+    "val": 1
+   },
+   {
+    "stat": "vision",
+    "val": 3
+   },
+   {
+    "stat": "veoculto",
+    "val": 30
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +7 · Res. crítico Tipo 4 +3 · Res. crítico Tipo 10 +2 · Especial +1 · Visión +3 · Ve lo oculto (todo tu campo de visión)",
+  "descripcionNarrativa": "Dicen que perteneció a un rey al que nadie pudo engañar jamás. En la frente lleva un ojo abierto de cristal, y frente a él no hay sombra, disfraz ni truco que aguante: todo se ve como es.",
+  "categoria": "vision",
+  "revelaOculto": true,
+  "equipoEstadoNombre": "Ojo que todo lo ve",
+  "equipoEstadoDetalle": "Mientras lo llevás puesto no hay nada oculto en todo tu campo de visión: los creeps en sigilo y las trampas escondidas se ven. ⚙ Automático: el mapa lo lee (stat «Ve lo oculto»)."
+ },
+ {
+  "id": "nuevo-correa-con-bolsitas",
+  "nombre": "Correa con bolsitas",
+  "tier": "Común",
+  "tipoItem": "cinturon",
+  "peso": 0,
+  "ranuras": 0,
+  "precioCompra": 55,
+  "mods": [
+   {
+    "stat": "capcinturon",
+    "val": 2
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Ranuras de cinturón +2",
+  "descripcionNarrativa": "Una correa de cuero con dos bolsitas cosidas a mano. Sirve para llevar lo que hay que sacar rápido.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-cinto-de-hebilla-ancha",
+  "nombre": "Cinto de hebilla ancha",
+  "tier": "Común",
+  "tipoItem": "cinturon",
+  "peso": 0,
+  "ranuras": 0,
+  "precioCompra": 60,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +1 · Ranuras de cinturón +1",
+  "descripcionNarrativa": "Una hebilla de bronce del tamaño de un puño protege el vientre mejor de lo que parece.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-cinturon-de-aprendiz-de-boticario",
+  "nombre": "Cinturón de aprendiz de boticario",
+  "tier": "Buena Calidad",
+  "tipoItem": "cinturon",
+  "peso": 0,
+  "ranuras": 0,
+  "precioCompra": 110,
+  "mods": [
+   {
+    "stat": "capcinturon",
+    "val": 3
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Ranuras de cinturón +3",
+  "descripcionNarrativa": "Tres frasquitos con corchos numerados y un pañuelo para limpiar los dedos. Todavía huele a lavanda.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-cinturon-de-guardia-de-puerta",
+  "nombre": "Cinturón de guardia de puerta",
+  "tier": "Buena Calidad",
+  "tipoItem": "cinturon",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 120,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "capcinturon",
+    "val": 2
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +2 · Ranuras de cinturón +2",
+  "descripcionNarrativa": "Ancho, con refuerzos de cuero doble y dos cartucheras. Lo entregan con el uniforme.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-cinturon-de-doble-hilera",
+  "nombre": "Cinturón de doble hilera",
+  "tier": "Raro",
+  "tipoItem": "cinturon",
+  "peso": 0,
+  "ranuras": 0,
+  "precioCompra": 220,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 5
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +1 · Ranuras de cinturón +5",
+  "descripcionNarrativa": "Dos hileras de bolsillos cosidos uno sobre otro, con broches de latón. Cada cosa tiene su lugar y su orden.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-cinturon-del-cazador-de-alimanas",
+  "nombre": "Cinturón del cazador de alimañas",
+  "tier": "Raro",
+  "tipoItem": "cinturon",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 230,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "capcinturon",
+    "val": 4
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +2 · Ranuras de cinturón +4",
+  "descripcionNarrativa": "Con ganchos para cebos y cajitas para cepos. Huele a monte y a sudor viejo.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-cinturon-de-bandolero",
+  "nombre": "Cinturón de bandolero",
+  "tier": "Raro",
+  "tipoItem": "cinturon",
+  "peso": 0,
+  "ranuras": 0,
+  "precioCompra": 240,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "eva",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 4
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +2 · Evasión +1 · Ranuras de cinturón +4",
+  "descripcionNarrativa": "Cruzado al pecho y ajustado en la cintura: todo a mano y nada que estorbe al correr.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-cinturon-del-gran-boticario",
+  "nombre": "Cinturón del gran boticario",
+  "tier": "Excepcional",
+  "tipoItem": "cinturon",
+  "peso": 0,
+  "ranuras": 0,
+  "precioCompra": 620,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "capcinturon",
+    "val": 7
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +2 · Ranuras de cinturón +7",
+  "descripcionNarrativa": "Tubos de vidrio, ampollas y polvos en bolsillos con forro de corcho. Los movimientos bruscos están mal vistos.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-cinturon-blindado-de-sargento",
+  "nombre": "Cinturón blindado de sargento",
+  "tier": "Excepcional",
+  "tipoItem": "cinturon",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 650,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 4
+   },
+   {
+    "stat": "capcinturon",
+    "val": 4
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +4 · Ranuras de cinturón +4",
+  "descripcionNarrativa": "Placas de acero bajo el cuero y cartucheras de bronce. Un cinturón de los que sirven para no perder la compostura.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-cinturon-del-coleccionista",
+  "nombre": "Cinturón del Coleccionista",
+  "tier": "Legendario",
+  "tipoItem": "cinturon",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 1500,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 3
+   },
+   {
+    "stat": "capcinturon",
+    "val": 10
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +3 · Ranuras de cinturón +10",
+  "descripcionNarrativa": "Lo llevó alguien que no podía dejar nada atrás: diez bolsillos de tamaños distintos y ninguno vacío.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-cinturon-del-titan",
+  "nombre": "Cinturón del Titán",
+  "tier": "Legendario",
+  "tipoItem": "cinturon",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 1700,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 5
+   },
+   {
+    "stat": "tipo5",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 6
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +5 · Res. crítico Tipo 12 +1 · Ranuras de cinturón +6",
+  "descripcionNarrativa": "Un cinturón de un tamaño imposible, recortado para humanos. Aguanta lo que reviente cerca.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-morral-de-tela",
+  "nombre": "Morral de tela",
+  "tier": "Común",
+  "tipoItem": "mochila",
+  "peso": 0,
+  "ranuras": 0,
+  "precioCompra": 50,
+  "mods": [
+   {
+    "stat": "capmochila",
+    "val": 4
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Ranuras de mochila +4",
+  "descripcionNarrativa": "Un saco con correas, remendado dos veces. Alcanza para lo justo.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-mochila-de-cuero",
+  "nombre": "Mochila de cuero",
+  "tier": "Común",
+  "tipoItem": "mochila",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 70,
+  "mods": [
+   {
+    "stat": "capmochila",
+    "val": 6
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Ranuras de mochila +6",
+  "descripcionNarrativa": "Cuero grueso y costuras dobles. Cuando llueve, huele a establo.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-mochila-de-campamento",
+  "nombre": "Mochila de campamento",
+  "tier": "Buena Calidad",
+  "tipoItem": "mochila",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 130,
+  "mods": [
+   {
+    "stat": "capmochila",
+    "val": 8
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Ranuras de mochila +8",
+  "descripcionNarrativa": "Con soporte de madera y correas para la manta. La usan los que duermen donde caen.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-alforja-de-mula",
+  "nombre": "Alforja de mula",
+  "tier": "Buena Calidad",
+  "tipoItem": "mochila",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 150,
+  "mods": [
+   {
+    "stat": "capmochila",
+    "val": 10
+   },
+   {
+    "stat": "eva",
+    "val": -1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Ranuras de mochila +10 · Evasión -1",
+  "descripcionNarrativa": "Dos bolsas grandes cruzadas: cabe de todo, pero estorban al esquivar.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-mochila-de-explorador",
+  "nombre": "Mochila de explorador",
+  "tier": "Raro",
+  "tipoItem": "mochila",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 300,
+  "mods": [
+   {
+    "stat": "capmochila",
+    "val": 12
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Ranuras de mochila +12",
+  "descripcionNarrativa": "Cada bolsillo tiene un dueño y una etiqueta. Los exploradores no pierden nada, ni siquiera el tiempo.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-mochila-de-viaje-reforzada",
+  "nombre": "Mochila de viaje reforzada",
+  "tier": "Raro",
+  "tipoItem": "mochila",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 320,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "capmochila",
+    "val": 10
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +1 · Ranuras de mochila +10",
+  "descripcionNarrativa": "Con placas de cuero duro en la espalda: sirve de almohada y de escudo al mismo tiempo.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-mochila-del-mago-de-camino",
+  "nombre": "Mochila del mago de camino",
+  "tier": "Excepcional",
+  "tipoItem": "mochila",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 800,
+  "mods": [
+   {
+    "stat": "esp",
+    "val": 1
+   },
+   {
+    "stat": "capmochila",
+    "val": 16
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Especial +1 · Ranuras de mochila +16",
+  "descripcionNarrativa": "Por fuera parece pequeña. Por dentro, no se sabe.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-mochila-del-buhonero",
+  "nombre": "Mochila del buhonero",
+  "tier": "Excepcional",
+  "tipoItem": "mochila",
+  "peso": 3,
+  "ranuras": 0,
+  "precioCompra": 1100,
+  "mods": [
+   {
+    "stat": "capmochila",
+    "val": 28
+   },
+   {
+    "stat": "mov",
+    "val": -1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Ranuras de mochila +28 · Movimiento -1 (drawback grande a cambio de un beneficio enorme)",
+  "descripcionNarrativa": "Un almacén en la espalda: ollas, velas, cascabeles y todo lo que alguien pueda llegar a necesitar.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-zurron-del-gigante",
+  "nombre": "Zurrón del gigante",
+  "tier": "Legendario",
+  "tipoItem": "mochila",
+  "peso": 3,
+  "ranuras": 0,
+  "precioCompra": 1800,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "capmochila",
+    "val": 24
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +2 · Ranuras de mochila +24",
+  "descripcionNarrativa": "Cuero de un animal que nadie logró volver a ver. Se ata con una cuerda que da tres vueltas al cuerpo.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-mochila-sin-fondo",
+  "nombre": "Mochila sin fondo",
+  "tier": "Legendario",
+  "tipoItem": "mochila",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 2000,
+  "mods": [
+   {
+    "stat": "capmochila",
+    "val": 30
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Ranuras de mochila +30",
+  "descripcionNarrativa": "Se mete la mano y no se encuentra el fondo. A veces vuelve con algo que no se había guardado.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-delantal-de-boticario",
+  "nombre": "Delantal de boticario",
+  "tier": "Buena Calidad",
+  "tipoItem": "armadura_blanda",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 120,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "capcinturon",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +2 · Ranuras de cinturón +1",
+  "descripcionNarrativa": "Manchado de mil recetas, con un bolsillo para cada frasco. Los boticarios dicen que se pierde menos con las manos ocupadas.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-chaleco-de-mil-bolsillos",
+  "nombre": "Chaleco de mil bolsillos",
+  "tier": "Raro",
+  "tipoItem": "armadura_blanda",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 260,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 4
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 2
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +4 · Res. crítico Tipo 4 +1 · Ranuras de cinturón +2",
+  "descripcionNarrativa": "Nadie los contó jamás: siempre aparece uno más. El chaleco ideal para quien no sabe dónde dejó algo.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-gabardina-del-contrabandista",
+  "nombre": "Gabardina del contrabandista",
+  "tier": "Excepcional",
+  "tipoItem": "armadura_blanda",
+  "peso": 2,
+  "ranuras": 0,
+  "precioCompra": 780,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 5
+   },
+   {
+    "stat": "tipo1",
+    "val": 2
+   },
+   {
+    "stat": "eva",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 3
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +5 · Res. crítico Tipo 4 +2 · Evasión +1 · Ranuras de cinturón +3",
+  "descripcionNarrativa": "El forro interior es un hormiguero de bolsillos secretos. Un guardia hurgó una vez y se fue con las manos vacías.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-capa-de-mil-pliegues",
+  "nombre": "Capa de mil pliegues",
+  "tier": "Legendario",
+  "tipoItem": "armadura_blanda",
+  "peso": 1,
+  "ranuras": 0,
+  "precioCompra": 1900,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 6
+   },
+   {
+    "stat": "tipo1",
+    "val": 3
+   },
+   {
+    "stat": "esp",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 5
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +6 · Res. crítico Tipo 4 +3 · Especial +1 · Ranuras de cinturón +5",
+  "descripcionNarrativa": "Cada pliegue guarda algo: una poción, una carta, un secreto. Quien la lleva sonríe como si supiera algo que vos no.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-guantes-de-prestidigitador",
+  "nombre": "Guantes de prestidigitador",
+  "tier": "Raro",
+  "tipoItem": "manos",
+  "peso": 0,
+  "ranuras": 0,
+  "precioCompra": 230,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 2
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "des",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 1
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +2 · Res. crítico Tipo 4 +1 · Des +1 · Ranuras de cinturón +1",
+  "descripcionNarrativa": "Un bolsillito en cada puño y un truco en cada dedo. Con ellos siempre hay algo por sacar.",
+  "categoria": "contenedores"
+ },
+ {
+  "id": "nuevo-sombrero-de-copa-del-mago",
+  "nombre": "Sombrero de copa del mago",
+  "tier": "Raro",
+  "tipoItem": "cabeza",
+  "peso": 0,
+  "ranuras": 0,
+  "precioCompra": 280,
+  "mods": [
+   {
+    "stat": "def",
+    "val": 1
+   },
+   {
+    "stat": "tipo1",
+    "val": 1
+   },
+   {
+    "stat": "esp",
+    "val": 1
+   },
+   {
+    "stat": "capcinturon",
+    "val": 2
+   }
+  ],
+  "efectoMods": [],
+  "detalle": "Defensa +1 · Res. crítico Tipo 4 +1 · Especial +1 · Ranuras de cinturón +2",
+  "descripcionNarrativa": "Por dentro es más grande que por fuera, y de vez en cuando se asoma un conejo. Nadie sabe por qué.",
+  "categoria": "contenedores"
+ }
+]

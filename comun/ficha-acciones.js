@@ -1,0 +1,1527 @@
+/* =========================================================
+   FICHA-ACCIONES — botones de la Botonera que cambian al personaje (paso 4, etapa 3c de docs/plan-paso4-etapa3.md,
+   2026-10-01)
+   Lo que hacen (cobrar No2, poner o sacar un estado) es lo mismo en la ficha y en la Botonera nueva del mapa; lo que se ve
+   (el cartel de "no te alcanzan los Nitros", el aviso, redibujar) lo pone cada pantalla con `ui`:
+     ui = {presets (los estados estándar, forma ficha: estadosPresetFicha()), toast(texto),
+           avisarSinNitros(costo, accion, continuar) (el cartel con Cancelar / "Realizar de cualquier modo"),
+           cambio(lista) (qué cambió: 'efectos', 'nitros' — para redibujar y guardar)}
+   Copiado tal cual de la ficha (js/02 y js/09), con `S` como parámetro. Necesita ficha-calculo.js, ficha-habilidades.js y
+   ficha-botonera.js antes; gastoNitrosForzado usa la sesión de Firebase de la página (fbDb, fbUsuario, fbMiembro).
+   ========================================================= */
+const FichaAcciones = (() => {
+  const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : 0; };
+  function fmt(n){ return Number.isInteger(n) ? n : Math.round(n*100)/100; }
+  const uid = () => Math.random().toString(36).slice(2,9);
+  const IT2 = () => FichaCalculo.IT2;
+
+  // Publica la línea roja y devuelve cuántos Nitros descontar (los que haya, nunca de más). (js/09)
+  function gastoNitrosForzado(S, costo, hizo){
+    const disp = Math.max(0, num(S.nitros));
+    if(typeof fbDb !== 'undefined' && fbDb && fbUsuario && fbMiembro){
+      const nombre = ((S.meta && S.meta.nombre) || '').trim() || fbMiembro.nombre;
+      fbDb.collection(fbRutaCampana('tiradas')).add({
+        uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '',
+        origen: `⚠ ${nombre} ${hizo} sin Nitros suficientes`, formula: `Costaba ${fmt(costo)} No2 y tenía ${fmt(disp)}`,
+        rolls: [], mod: 0, total: 0, desde: 'alerta-roja',
+        cuando: firebase.firestore.FieldValue.serverTimestamp(),
+      }).catch(err => console.error('No se pudo publicar la alerta de Nitros:', err));
+    }
+    return Math.min(costo, disp);
+  }
+
+  /* ---------- Sigilo: entrar y salir con un botón (js/02) ----------
+     Quien tiene la habilidad "Sigilo" ve en la Botonera un botón directo, sin
+     pasar por "+ Estado". Entrar cuesta IT2.nitrosSigilo (1 No2, a revisar) y
+     aplica el estado alterado "Sigilo" sobre uno mismo (el mapa lo lee de ahí);
+     salir es gratis. No se avisa en la Mesa: el sigilo no se anuncia. */
+  function alternarSigilo(S, forzar, ui){
+    const actual = FichaBotonera.efectoSigilo(S);
+    if(actual){
+      S.efectos = S.efectos.filter(e => e !== actual);
+      ui.cambio(['efectos']);
+      ui.toast('Saliste del sigilo');
+      return;
+    }
+    // Marcado (2026-10-05): mientras dure la marca no se puede entrar en sigilo (se le saca a mano si la mesa decide otra cosa).
+    if(Combatiente.marcadoEn(S.efectos)){ ui.toast('Estás Marcado: no podés entrar en sigilo hasta que se te vaya la marca'); return; }
+    const costo = Combatiente.conExtenuado(S.efectos, num(IT2().nitrosSigilo));   // + Extenuado
+    if(num(S.nitros) < costo && !forzar){
+      ui.avisarSinNitros(costo, 'entrar en sigilo', () => alternarSigilo(S, true, ui));
+      return;
+    }
+    const preset = ui.presets.find(p => p.nombre === 'Sigilo');
+    S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(S, costo, 'entró en sigilo') : costo);
+    tormentaPj(S, costo, 'entrar en sigilo', ui);
+    S.efectos.push({id: uid(), nombre: 'Sigilo', imagen: '', turnos: 0, stacks: 1, hpturno: 0, stacksturno: 0,
+      permanente: true, activo: true, popup: false, detalle: (preset && preset.detalle) || '', mods: [], ...FichaHabilidades.flagsDePreset(ui.presets, 'Sigilo')});
+    ui.cambio(['efectos', 'nitros']);
+    ui.toast(`Entraste en sigilo${costo ? ` · -${fmt(costo)} No2` : ''}`);
+  }
+
+  /* ---------- Sentado: levantarse cuesta 1 No2 (js/02) ----------
+     El estado Sentado no vence solo; el botón "Levantarse" de la Botonera lo saca y cobra IT2.nitrosLevantarse. */
+  function levantarse(S, forzar, ui){
+    const lv = Combatiente.levantable(S.efectos);
+    if(!lv) return;
+    const actual = lv.est;
+    const costo = Combatiente.conExtenuado(S.efectos, Math.max(0, num(IT2().nitrosLevantarse) - num(FichaCalculo.calcular(S).final.levantarse)));   // Levantarse rápido (2026-10-06) + Extenuado
+    if(num(S.nitros) < costo && !forzar){
+      ui.avisarSinNitros(costo, 'levantarte', () => levantarse(S, true, ui));
+      return;
+    }
+    S.nitros = num(S.nitros) - (forzar && costo > num(S.nitros) ? gastoNitrosForzado(S, costo, 'se levantó') : costo);
+    tormentaPj(S, costo, 'levantarse', ui);
+    S.efectos = S.efectos.filter(e => e !== actual);
+    ui.cambio(['efectos', 'nitros']);
+    ui.toast(`Te levantaste${costo ? ` · -${fmt(costo)} No2` : ''}`);
+  }
+
+  /* ---------- Soltarse (2026-10-03): el estado que dejó una trampa de Atrapar dice qué tirar y cuánto cuesta (Combatiente.soltarNorm) ----------
+     Se paga se suelte o no; si la tirada llega a la dificultad, se saca el estado. ui = el de Levantarse + registrarTirada(origen, r). */
+  function soltarse(S, forzar, ui){
+    const est = Combatiente.estadoSoltable(S.efectos);
+    if(!est) return;
+    const s0 = Combatiente.soltarNorm(est.soltar), s = {...s0, no2: Combatiente.conExtenuado(S.efectos, s0.no2)};   // + Extenuado
+    if(num(S.nitros) < s.no2 && !forzar){
+      ui.avisarSinNitros(s.no2, 'intentar soltarte', () => soltarse(S, true, ui));
+      return;
+    }
+    S.nitros = num(S.nitros) - (forzar && s.no2 > num(S.nitros) ? gastoNitrosForzado(S, s.no2, 'intentó soltarse') : s.no2);
+    tormentaPj(S, s.no2, 'intentar soltarse', ui);
+    const f = FichaCalculo.calcular(S).final;
+    const t = Combatiente.tiradaSoltarse(est, num(f[s.stat]) + Math.max(0, num(f.soltarse)), S.efectos);   // + Guantes de escapista (2026-10-05)
+    if(t.r && ui.registrarTirada) ui.registrarTirada(`Soltarse (${est.nombre}) · ${s.etq} contra ${s.dif}`, t.r);
+    if(t.ok) S.efectos = S.efectos.filter(e => e !== est);
+    const hundio = Combatiente.hundirSiFalla(est, t);
+    // 🪤 Si falla y lo que lo agarra lastima (el Cepo del cazador, 2026-10-27): ese daño, directo a la vida.
+    let herida = 0;
+    if(!t.ok && s.hiere && typeof tirarDados === 'function'){
+      const rh = tirarDados(s.hiere);
+      if(rh){ herida = rh.total; if(ui.registrarTirada) ui.registrarTirada(`${est.nombre}: al forcejear se lastima · Daño directo`, rh); if(ui.fijarHp) ui.fijarHp(num(S.hp) - herida); else fijarHp(S, num(S.hp) - herida); }
+    }
+    ui.cambio(['efectos', 'nitros', ...(herida ? ['vitals'] : [])]);
+    ui.toast(`${t.ok ? 'Te soltaste' : 'No te soltaste'} (${t.r ? t.r.total : '—'} contra ${s.dif})${s.no2 ? ` · −${fmt(s.no2)} No2` : ''}${hundio ? ` · te hundiste más: +${s.hunde} turno${s.hunde === 1 ? '' : 's'}` : ''}${herida ? ` · te lastimás: −${fmt(herida)} HP` : ''}`);
+  }
+
+  /* ---------- La vida: Ankh y estado de muerte (js/02) ----------
+     Lo que cambia en el personaje; lo que se ve (el campo de HP, el cartel de "Inconsciente", el aviso) lo pone cada pantalla. */
+  // Usa un Ankh: gasta una unidad y revive con el 25 % del HP máximo. Devuelve el nombre del ítem (o null).
+  function aplicarRevivirConAnkh(S, key, id){
+    const it = S[key].find(x => x.id === id);
+    if(!it) return null;
+    it.unidades = num(it.unidades) - 1;
+    purgarSiAgotado(S, key, it.id);
+    const cc = FichaCalculo.calcular(S);
+    const hpmaxAnkh = Number.isNaN(cc.final.hpmax) ? 0 : cc.final.hpmax;
+    S.hp = Math.max(1, Math.floor(hpmaxAnkh * 0.25));
+    ponerTitilando(S);
+    return it.nombre;
+  }
+  // Titilando (2026-10-06): quien vuelve de estar caído titila, invulnerable, hasta que empieza su próximo turno.
+  function ponerTitilando(S){
+    if(typeof estadosPresetFicha !== 'function') return;
+    const e = Combatiente.estadoTitilando(estadosPresetFicha());
+    if(e){ S.efectos = S.efectos || []; Combatiente.agregarEstado(S.efectos, e); }
+  }
+  // Toda baja de HP pasa por acá: nunca baja de 0 ni pasa del máximo. Devuelve el HP que quedó.
+  // ⛈ Maldición tormentosa (2026-10-12): al pagar una acción con No2, Atormentado le saca vida (Combatiente.cobroTormenta). Se llama justo
+  // después de descontar los No2, con el costo de la acción (no lo que alcanzó a pagar).
+  function tormentaPj(S, costo, motivo, ui){
+    const r = Combatiente.cobroTormenta(S.efectos, costo);
+    if(!r.dano) return r;
+    if(r.recibido > 0){
+      if(ui && ui.fijarHp) ui.fijarHp(num(S.hp) - r.recibido);
+      else{ S.hp = Math.max(0, num(S.hp) - r.recibido); revisarAnkh(S); revisarMuerte(S); }
+    }
+    if(ui && ui.cambio) ui.cambio(['efectos', 'nitros', 'vitals']);
+    Combatiente.avisarTormenta(((S.meta && S.meta.nombre) || '').trim(), r, motivo);
+    return r;
+  }
+  function fijarHp(S, valor){
+    const c = FichaCalculo.calcular(S);
+    const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
+    const tope = hpmax > 0 ? hpmax : Math.max(0, num(valor));
+    const antes = num(S.hp);
+    // 🩸 El Relicario de sangre (dueño, 2026-10-27: «toda curación cuenta como vida extra… hasta el final del combate»): lo que una cura pasa del máximo
+    // queda como Vida extra (hasta +50 % del máximo, contando la que ya tiene); se va al «Finalizar combate». Una cura a alguien caído no entra.
+    if(hpmax > 0 && antes > 0 && num(valor) > hpmax && Combatiente.relicarioEnEquipo(S.inventario)){
+      const exc = Combatiente.excedenteConTope(S.efectos, num(valor) - Math.max(antes, hpmax), hpmax, Combatiente.RELICARIO_TOPE);
+      if(exc > 0) S.efectos = [...(S.efectos || []), Combatiente.estadoVidaExtra(exc, {finCombate: true, detalle: 'Vida extra del Relicario de sangre: lo que la cura pasó del máximo. Se va al terminar el combate.', id: uid()})];
+    }
+    S.hp = Math.max(0, Math.min(tope, num(valor)));
+    if(antes > 0 && S.hp <= 0 && ultimoAlientoListo(S)) ultimoAlientoUsar(S);   // 💍 el Anillo del último aliento (2026-10-18)
+    return S.hp;
+  }
+  /* 💍 El Anillo del último aliento (2026-10-18, dueño): una vez por día, cuando un golpe lo dejaría en 0, queda con 1. La marca
+     (`S.meta.ultimoAlientoUsado`) la saca el descanso (FichaMantenimiento.descansar). El daño que aplica el mapa hace lo mismo (js/10, danioPj). */
+  const ultimoAlientoListo = S => !(S.meta && S.meta.ultimoAlientoUsado) && (S.inventario || []).some(i => i && i.equipado && i.ultimoAliento && !FichaCalculo.itemRoto(i));
+  function ultimoAlientoUsar(S){
+    S.hp = 1;
+    S.meta = {...(S.meta || {}), ultimoAlientoUsado: true};
+    const quien = ((S.meta && S.meta.nombre) || 'Tu personaje').trim();
+    try{ if(typeof mesaLinea === 'function') mesaLinea(`💍 ${quien}: el Anillo del último aliento lo sostiene con 1 de vida (una vez por día)`, 'recordatorio'); else if(typeof toast === 'function') toast(`💍 Anillo del último aliento: quedás con 1 de vida`); }catch(err){}
+  }
+  // Si el HP llega a 0 y hay un Ankh de Reencarnación en el cinturón, se activa solo (en la mochila no). Devuelve su nombre si se activó.
+  function revisarAnkh(S){
+    if(num(S.hp) > 0) return null;
+    if(S.muerto && S.muerto.definitivo) return null; // muerte definitiva: ya no hay vuelta atrás
+    // 🔥 Llama de Fénix (2026-10-20): revive con toda la vida y todo el SP, Titilando. Va antes que el Ankh (no lo gasta).
+    const conLlama = Combatiente.revivirFenix(S.efectos, typeof estadosPresetFicha === 'function' ? estadosPresetFicha() : []);
+    if(conLlama){
+      S.efectos = conLlama;
+      const cf = FichaCalculo.calcular(S);
+      S.hp = Math.max(1, Number.isNaN(cf.final.hpmax) ? 1 : num(cf.final.hpmax));
+      S.spGastado = 0;
+      return 'Llama de Fénix';
+    }
+    // 😇 El Pacto (2026-10-28): revive solo, Titilando, y se gasta. Va antes que el Ankh (no lo gasta).
+    if(S.meta && S.meta.pacto){
+      const cp = FichaCalculo.calcular(S);
+      S.meta.pacto = false;
+      S.hp = Combatiente.pactoVida(Number.isNaN(cp.final.hpmax) ? 1 : cp.final.hpmax);
+      ponerTitilando(S);
+      return 'El Pacto';
+    }
+    const idx = S.cinturon.findIndex(i => i.nombre === 'Ankh de Reencarnación' && num(i.unidades) > 0);
+    if(idx < 0) return null;
+    return aplicarRevivirConAnkh(S, 'cinturon', S.cinturon[idx].id);
+  }
+  // ✚ Revivir (2026-10-02, A6b; antes calcularHpRevivir de la ficha, js/11): con cuánto HP revive — un % del máximo o un valor neto,
+  // mínimo 1. → {hpmax, val}. El diálogo lo pone cada pantalla; revivir(S, val) deja el HP (y el estado de muerte, al día).
+  function hpRevivir(S, modo, pct, valor){
+    const c = FichaCalculo.calcular(S);
+    const hpmax = Number.isNaN(c.final.hpmax) ? 0 : c.final.hpmax;
+    if(modo === 'pct'){
+      const p = Math.max(0, Math.min(100, num(pct) || 0));
+      return {hpmax, val: Math.max(1, Math.floor(hpmax * p / 100))};
+    }
+    return {hpmax, val: Math.max(1, Math.floor(num(valor) || 1))};
+  }
+  function revivir(S, val){
+    S.hp = val;
+    return revisarMuerte(S);
+  }
+  // Con HP > 0 deja de estar inconsciente; con 0, queda inconsciente (5 turnos para morir). Devuelve {vivo, revivio} o {vivo: false, cayo}.
+  /* 🩸 Pagar SP (2026-10-17): suma lo gastado y, si está Maldito (la Maldición de la sangre), le saca 1 de vida por cada punto, en el momento
+     de pagar (antes del efecto; puede dejarlo caído: dueño). Lo avisa con un toast y en la Mesa (`ui.mesaHabilidad`, si la pantalla la tiene).
+     → la vida que perdió. Lo que se pierde por un estado ajeno (Succión arcana) no es «gastar»: no pasa por acá. */
+  function gastarSp(S, n, ui, motivo){
+    n = Math.max(0, num(n));
+    S.spGastado = num(S.spGastado) + n;
+    const k = Combatiente.sangraPorSp(S.efectos);
+    if(!k || !n) return 0;
+    const perdida = n * k, antes = num(S.hp);
+    if(ui && ui.fijarHp) ui.fijarHp(antes - perdida); else{ fijarHp(S, antes - perdida); revisarMuerte(S); }
+    const txt = `🩸 Maldito: pagar ${fmt(n)} SP${motivo ? ` (${motivo})` : ''} te sacó ${fmt(perdida)} de vida (${fmt(antes)} → ${fmt(num(S.hp))})`;
+    if(ui && ui.toast) ui.toast(txt);
+    if(ui && ui.mesaHabilidad) try{ ui.mesaHabilidad('Maldición de la sangre', txt); }catch(err){}
+    if(ui && ui.cambio) ui.cambio(['vitals']);
+    return perdida;
+  }
+  /* 🩸 Antes de pagar (2026-10-17, dueño: «cuando alguien está maldito, a la hora de ejecutar cualquier habilidad que le cueste SP, le debe
+     aparecer una notificación: estás maldito, esto te va a bajar tanto la vida… Aceptar, cancelar»). → true para seguir (sin maldición o sin SP,
+     sin preguntar); false si canceló: no se cobra nada. */
+  async function confirmarMaldito(S, sp, ui, motivo){
+    const k = Combatiente.sangraPorSp(S.efectos);
+    sp = Math.max(0, num(sp));
+    if(!k || !sp) return true;
+    const perdida = sp * k, antes = num(S.hp), queda = Math.max(0, antes - perdida);
+    const txt = `Estás Maldito: ${motivo ? `usar ${motivo} ` : 'pagar '}cuesta ${fmt(sp)} SP y te va a bajar ${fmt(perdida)} de vida (${fmt(antes)} → ${fmt(queda)})${queda <= 0 ? ': quedás caído' : ''}.`;
+    const preguntar = (ui && ui.confirmarMaldito) || (t => Confirmar.preguntar(t, {titulo: 'Estás Maldito', icono: '🩸', si: 'Aceptar', no: 'Cancelar', peligro: queda <= 0}));
+    return !!(await preguntar(txt));
+  }
+  function revisarMuerte(S){
+    if(!S.muerto) S.muerto = {activo:false, turnos:5, definitivo:false};
+    if(num(S.hp) > 0){
+      if(S.muerto.activo){
+        S.muerto = {activo:false, turnos:5, definitivo:false};
+        ponerTitilando(S);
+        return {vivo: true, revivio: true};
+      }
+      return {vivo: true, revivio: false};
+    }
+    if(!S.muerto.activo && !S.muerto.definitivo){
+      S.muerto.activo = true;
+      S.muerto.turnos = 5;
+      return {vivo: false, cayo: true};
+    }
+    return {vivo: false, cayo: false};
+  }
+
+  /* ---------- Consumir un ítem (js/06, el botón Consumir; js/02 y js/09) ---------- */
+  function purgarSiAgotado(S, key, id){
+    const it = S[key].find(x=>x.id===id);
+    if(it && it.consumible && num(it.unidades) <= 0){
+      S[key] = S[key].filter(x=>x.id!==id);
+      return true;
+    }
+    return false;
+  }
+  function restaurarSpDeConsumo(S, it){
+    const pct = num(it.curaspPct);
+    if(pct <= 0) return 0;
+    const restaurar = Math.ceil(FichaBotonera.spMaximo(S) * Math.min(pct, 100) / 100);
+    S.spGastado = Math.max(0, num(S.spGastado) - restaurar);
+    return restaurar;
+  }
+  // Oleo reparador: quita Armadura rota si está activa (es permanente, no vence sola). Devuelve cuántas se quitaron.
+  function repararArmadura(S){
+    const antes = S.efectos.length;
+    S.efectos = S.efectos.filter(e => e.nombre !== 'Armadura rota');
+    return antes - S.efectos.length;
+  }
+  // El estado del sistema anterior que deja el consumible (comun/ficha-habilidades.js); avisa si una inmunidad lo bloqueó.
+  function efectoDeConsumo(S, it, presets, toast){
+    const r = FichaHabilidades.aplicarEfectoDeConsumo(S, it, presets);
+    if(!r) return null;
+    if(!r.ok){ toast(`Inmune ahora mismo${r.motivo === 'inmune' ? '' : ` (${r.motivo})`} — ${r.nombre} no hizo efecto`); return null; }
+    return r.estado;
+  }
+  // Las tiradas propias del ítem (su stat con su bono, y su fórmula), armadas sin publicar: [{origen, r} | {error}].
+  // La ficha usa las suyas (tirarExtraDeItem, con el cartel de sobrepeso si el stat es la Evasión); el mapa, estas.
+  function tiradasDeItem(S, it){
+    const out = [];
+    const stat = it.tiradaStat;
+    if(stat && (FichaCalculo.ATTR_LIST.some(a => a.id === stat) || FichaBotonera.statsConTirada().some(s => s.id === stat))){
+      const nombre = `${it.nombre} · ${FichaCalculo.STAT_LABEL[stat]}`, valor = FichaCalculo.calcular(S).final[stat] + num(it.tiradaBono);
+      const r = Combatiente.tirarStat(valor, S.efectos, stat, {extra: undefined});   // en 0 o negativo: el valor, sin dados (no traba nada)
+      out.push(r ? {origen: nombre, r} : {error: `${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`});
+    }
+    const formula = (it.tiradaExtra || '').trim();
+    if(formula){
+      const r = tirarDados(formula);
+      if(r) out.push({origen: it.nombre, r});
+    }
+    return out;
+  }
+  /* Consumir (el botón Consumir de la Botonera, la mochila o el cinturón). id: el del ítem (mochila o cinturón).
+     ui, además de lo de siempre: fijarHp(valor) (y lo que la pantalla muestre de la vida), efecto(it) (el estado que deja, o
+     null), tirarExtra(it) (sus tiradas), colocarTrampa(it) (async → true si se colocó; una trampa consumible no se gasta si
+     no). cambio(lista) recibe 'inventario' o 'cinturon', 'efectos' si hubo estado o reparación, 'vitals' y 'nitros'. */
+  const consumiendoTrampa = new Set();
+  /* Lo que cuesta sacar este consumible (2026-10-05): del cinturón 1 No2, de la mochila 2; el primero del turno, con Saque rápido (cinturón,
+     una chance que se tira a la vista) puede no costar, y con Bolsillo exterior (mochila) cuesta 1. → {costo, saque: bool, bolsillo: bool}. */
+  function costoDeSacar(S, key, ui){
+    const f = FichaCalculo.calcular(S).final, meta = S.meta || (S.meta = {}), turno = num(S.turno) || 1;
+    let costo = FichaBotonera.costoConsumirNitros(key), saque = false, bolsillo = false;
+    if(key === 'cinturon' && num(f.saquerapido) > 0 && meta.saqueTurno !== turno){
+      const pct = Combatiente.chancePct(f.saquerapido), d = Combatiente.chanceDado(pct);
+      // Sin dado que rueda (dueño, 2026-10-05: «sacar algo del cinturón no amerita pararse a tirar un dado»): se tira callado y se anuncia en texto.
+      let sale = pct >= 100, saqueTxt = '⚡ Saque rápido: no costó No2';
+      if(d){
+        const r = tirarDados('1d' + d.caras);
+        if(r){ sale = r.total >= d.caras - d.exitos + 1; saqueTxt = `⚡ Saque rápido (${Combatiente.chanceTexto(pct)}): 1d${d.caras} = ${r.total} → ${sale ? 'salió, no costó No2' : 'no salió'}`; }
+      }
+      saque = {sale, txt: saqueTxt};
+      if(sale) costo = 0;
+    }
+    if(key === 'inventario' && num(f.bolsilloext) > 0 && meta.bolsilloTurno !== turno){ costo = Math.max(0, costo - 1); bolsillo = true; }
+    // 💍 El Anillo del alquimista (2026-10-18): el primer consumible del turno sacado del cinturón no cuesta No2.
+    let alquimista = false;
+    if(key === 'cinturon' && costo > 0 && meta.alquimistaTurno !== turno && (S.inventario || []).some(i => i && i.equipado && i.alquimista && !FichaCalculo.itemRoto(i))){ costo = 0; alquimista = true; }
+    return {costo: Combatiente.conExtenuado(S.efectos, costo), saque, bolsillo, alquimista};   // + Extenuado
+  }
+  async function consumir(S, id, forzar, ui, sacado){
+    { const it = [...(S.inventario || []), ...(S.cinturon || [])].find(x => x.id === id); if(it && (it.enMesa || it.reservado)){ ui.toast(`Está ofrecido a ${it.reservadoPara || 'otro personaje'}: cancelá la oferta primero (🤝)`); return; } }   // 🤝 comun/intercambio.js
+    let it = S.inventario.find(x=>x.id===id);
+    let key = 'inventario';
+    if(!it){ it = S.cinturon.find(x=>x.id===id); key = 'cinturon'; }
+    if(it && it.flecha){ ui.toast(`${it.nombre}: es una flecha especial; va en el carcaj y se elige al disparar con un arco`); return false; }
+    if(it && num(it.oleoReparador) > 0){ ui.toast(`${it.nombre}: se usa desde 🛡 Equipo y mochila, con el 🧴 de la pieza que querés reparar (fuera de combate)`); return false; }   // 2026-10-12
+    if(it && num(it.unidades) > 0){
+      const sac = sacado || costoDeSacar(S, key, ui);   // Saque rápido / Bolsillo exterior: se calcula una vez (si pide «hacerlo igual», no se vuelve a tirar)
+      const costoNitros = sac.costo;
+      let gastoNitros = costoNitros;
+      if(costoNitros > num(S.nitros)){
+        if(!forzar){
+          ui.avisarSinNitros(costoNitros, `consumir ${it.nombre} ${key === 'cinturon' ? 'del cinturón' : 'de la mochila'}`, () => consumir(S, id, true, ui, sac));
+          return;
+        }
+        gastoNitros = gastoNitrosForzado(S, costoNitros, `consumió ${it.nombre}`);
+      }
+      // Revive (2026-10-06, dueño: «hagámoslo»): con el mapa, se elige al aliado caído antes de gastarlo (si no se elige, no se gasta).
+      let revive = null;
+      if(it.revive && ui.elegirCaido){
+        if(consumiendoTrampa.has(id)) return;
+        consumiendoTrampa.add(id);
+        try{ revive = await ui.elegirCaido(it); }finally{ consumiendoTrampa.delete(id); }
+        if(!revive) return;
+      }
+      // Un consumible que deja una zona en el mapa (2026-10-08, las bengalas: `zonaUso`, la misma Ejecución de una zona): se usa desde el mapa;
+      // sin el mapa, no se gasta.
+      if((it.zonaUso && !ui.colocarZona) || (it.aceleradorMapa && !ui.acelerador) || (it.townPortal && !ui.townPortal) || (it.duelo && !ui.terminar) || (it.invocaTemporal && !ui.invocar)){ ui.toast(`${it.nombre} se usa desde el mapa (tu Botonera en el mapa): ahí elegís dónde`); return; }
+      // Trampa consumible (2026-09-25): al usarla se coloca sola junto a tu token; si no se puede, no se gasta.
+      if(it.trampaDatos){
+        if(consumiendoTrampa.has(id)) return;
+        consumiendoTrampa.add(id);
+        let ok = false;
+        // Quien la coloca le pone la dificultad (dueño, 2026-10-19: «las que coloca un personaje, sea creep, invocación o jugador, van a tener la
+        // dificultad de quien la coloca»): su Destreza si es mecánica, su Efecto especial si es mágica (`detectarStat`), más los Guantes de
+        // trampero. El número del catálogo es para cuando la pone el GM. La misma cuenta que una trampa de habilidad (Combatiente.trampaDeHab).
+        const cS = FichaCalculo.calcular(S);
+        const conOculta = {...it, trampaDatos: Combatiente.trampaDeHab({nombre: it.nombre, trampaColocar: {...it.trampaDatos, detectarMin: Combatiente.detectarMinDe(it.tier)}}, st => cS.final[st])};   // + el mínimo por calidad (2026-10-23)
+        try{ ok = await ui.colocarTrampa(conOculta); }finally{ consumiendoTrampa.delete(id); }
+        if(!ok) return;
+      }
+      // 🌀 El Town portal (2026-10-29): se elige la casilla en el mapa (js/84); si se cancela, no se gasta.
+      if(it.townPortal){
+        if(consumiendoTrampa.has(id)) return;
+        consumiendoTrampa.add(id);
+        let ok = false;
+        try{ ok = await ui.townPortal(it); }finally{ consumiendoTrampa.delete(id); }
+        if(!ok) return;
+      }
+      S.nitros = num(S.nitros) - gastoNitros;
+      tormentaPj(S, gastoNitros, `usar ${it.nombre}`, ui);
+      if(it.zonaUso) ui.colocarZona(it);   // la bengala: se elige el centro en el mapa
+      if(it.aceleradorMapa) ui.acelerador(it);   // ⏩ la Runa aceleradora: se elige la casilla en el mapa
+      if(it.duelo) ui.terminar(Combatiente.habDeConsumible(it), null, 0, 0);   // 📜 su Ejecución: el objetivo y el cuadro del duelo (la Red Nerubian)
+      if(it.invocaTemporal) invocarTemporal(S, it, ui);   // 👁 una invocación de un rato (el Ojo de Kicillof)
+      if(sac.saque) S.meta.saqueTurno = num(S.turno) || 1;   // el primero del turno ya se sacó
+      if(sac.bolsillo) S.meta.bolsilloTurno = num(S.turno) || 1;
+      if(sac.alquimista) S.meta.alquimistaTurno = num(S.turno) || 1;   // 💍 el Anillo del alquimista, una vez por turno
+
+      const cargaMax = Math.max(1, num(it.cargaMax) || 1);
+      let carga = num(it.cargaActual ?? cargaMax);
+      if(carga <= 0) carga = cargaMax;
+      carga -= 1;
+      let gastoUnidad = false;
+      if(carga <= 0){
+        it.unidades = num(it.unidades) - 1;
+        carga = cargaMax;
+        gastoUnidad = true;
+      }
+      it.cargaActual = carga;
+      purgarSiAgotado(S, key, id);
+
+      // Solo se toca el HP si el ítem efectivamente cura o daña: si no,
+      // el clamp contra hpmax lo bajaría igual (con la ficha recién
+      // abierta hpmax es 0 y eso mataba al personaje de una).
+      // Mano de boticario (2026-10-05): suma a lo que cura una poción.
+      const boticario = num(it.curahp) > 0 ? num(FichaCalculo.calcular(S).final.boticario) : 0;
+      let curaNo = '';   // 🌑 la cura no entró (2026-10-26, visto en el mapa: con Sanguijuela el aviso decía «+25 HP» y la vida no subía)
+      if(num(it.curahp)){
+        const entra = Combatiente.curaQueEntra(S.hp, num(it.curahp) + boticario, S.efectos);
+        if(entra) ui.fijarHp(num(S.hp) + entra);
+        else if(num(it.curahp) > 0) curaNo = num(S.hp) > 0 ? 'no se cura (Herida sombría o Sanguijuela)' : 'está caído: una cura no lo levanta';   // 🌑 Herida sombría / Sanguijuela
+      }
+      const efecto = ui.efecto(it);
+      // 📜 A todo el grupo (dueño, 2026-10-19: Buena Fortuna, Inmunidad a CC, Blindaje): el mismo estado a los aliados (el mapa los conoce).
+      const cfgEf = FichaHabilidades.configEfectoDe(S, it);
+      if(efecto && cfgEf && cfgEf.efectoParty){
+        if(ui.alGrupo) ui.alGrupo(efecto, cfgEf);
+        else ui.toast(`${it.nombre}: ✋ a tus aliados, a mano (desde el mapa les llega solo)`);
+      }
+      // Cura estados por grupo (P180): Vendas, Antídoto, Té de tilo, Sales aromáticas, Ungüento de la Turca, Mate cebado; el Cura Plus, todos.
+      const curados = Combatiente.curaDeItem(it).length ? Combatiente.curarEstados(S.efectos, Combatiente.curaDeItem(it)) : null;
+      if(curados && curados.sacados.length) S.efectos = curados.quedan;
+      ui.tirarExtra(it);
+      const spRestaurado = restaurarSpDeConsumo(S, it);
+      const reparados = it.nombre === 'Oleo reparador' ? repararArmadura(S) : 0;
+      let reviveTxt = '';
+      if(it.revive){
+        const pct = Math.max(1, Math.min(100, num(it.revive.pct) || 50));
+        if(revive){
+          try{ await ui.revivir(revive, pct, it); reviveTxt = `✚ revive a ${revive.nombre} (${pct} % de su vida)`; }
+          catch(e){ console.error(e); reviveTxt = `✚ no se pudo revivir a ${revive.nombre}: aplicalo a mano (✚ Revivir en su ficha)`; }
+        } else reviveTxt = `✚ ✋ a mano: revivilo con ✚ Revivir en su ficha (${pct} % de su vida); desde el mapa se elige solo`;
+      }
+      const curadosTxt = curados ? (curados.sacados.length ? `🩹 se le fue: ${curados.sacados.join(', ')}` : '🩹 no tenía nada que curar') : '';
+      ui.cambio([key, ...(efecto || reparados || (curados && curados.sacados.length) ? ['efectos'] : []), ...(it.invocaTemporal ? ['invocaciones'] : []), 'vitals', 'nitros']);
+      const partes = [];
+      if(curaNo) partes.push(`❌ ${curaNo}`);
+      else if(it.curahp) partes.push(`${num(it.curahp)>=0?'+':''}${fmt(num(it.curahp) + boticario)} HP${boticario ? ` (+${fmt(boticario)} de Mano de boticario)` : ''}`);
+      if(spRestaurado) partes.push(`+${fmt(spRestaurado)} SP`);
+      partes.push(`-${costoNitros} No2${sac.saque && sac.saque.sale ? ' (Saque rápido)' : sac.bolsillo ? ' (Bolsillo exterior)' : sac.alquimista ? ' (Anillo del alquimista)' : ''}`);
+      if(cargaMax > 1) partes.push(gastoUnidad ? 'última carga usada' : `carga ${carga}/${cargaMax}`);
+      if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
+      if(reparados) partes.push(reparados > 1 ? 'armadura reparada por completo' : 'armadura reparada');
+      if(reviveTxt) partes.push(reviveTxt);
+      if(curadosTxt) partes.push(curadosTxt);
+      ui.toast(`${it.nombre}: ${partes.join(' · ')}`);
+      // El anuncio (dueño, 2026-10-05: «se anuncia en el log y en la crónica»): una línea en la Mesa y, en el mapa, la Crónica para los demás.
+      const quien = (S.meta && S.meta.nombre) || 'Alguien';
+      const publicas = [...(curaNo ? [`❌ ${curaNo}`] : it.curahp ? [`${num(it.curahp) >= 0 ? '+' : ''}${fmt(num(it.curahp) + boticario)} HP`] : []), ...(efecto ? [efecto.nombre] : []), ...(revive ? [`✚ revive a ${revive.nombre}`] : []), ...(curados && curados.sacados.length ? [`🩹 se le fue ${curados.sacados.join(', ')}`] : [])];
+      const resultado = [publicas.join(' · '), sac.saque ? sac.saque.txt : '', sac.alquimista ? '💍 Anillo del alquimista: no costó No2' : ''].filter(Boolean).join(' · ');
+      const anuncio = {titulo: `${quien} usó ${it.nombre}`, resultado, texto: `🧪 ${quien} usó ${it.nombre}${resultado ? ': ' + resultado : ''}`, item: it.nombre, saqueSalio: !!(sac.saque && sac.saque.sale)};
+      if(it.trampaDatos){}   // una trampa: ya la anunció TokensAuto (🎭 acción incierta para el rival, 2026-10-09)
+      else if(ui.anunciar) ui.anunciar(anuncio);
+      else{ if(typeof mesaLinea === 'function') mesaLinea(anuncio.texto); if(anuncio.saqueSalio) ui.toast(`⚡ Saque rápido: sacar ${it.nombre} del cinturón no te costó No2`); }
+    }
+  }
+
+  /* ---------- Combate suelto: tiradas de la Botonera fuera del duelo (paso 3c-4a; js/03, js/11 y js/02) ----------
+     ui, además de toast / avisarSinNitros: registrarTirada(origen, r) (publicarla), preguntarSobrepeso({nombre, valor, extra,
+     sobre}) (el cartel; la pantalla después llama a sobrepesoPagar y tirarValorStat), cambio(lista) ('nitros', 'refresh',
+     'botonera', en ese orden), getParry() / setParry(id) (el arma o escudo del último Parry, que espera su Bloqueo: lo guarda
+     cada pantalla), elegirArma(tipo, armas) (el cartel "¿Con qué arma?": 'parry' | 'bloqueo' | 'fuerza' | 'dano'; la pantalla
+     llama a armaElegida) y efectosAlPegar(arma) (los efectos al golpear, comun/efectos-golpe.js). */
+  // Tirar un stat: Afortunado, mitades y Evasión mínimo 1 (Combatiente.tirarStat); la Evasión con sobrepeso pregunta antes.
+  function tirarValorStat(S, nombre, valor, statId, extra, sobrepeso, sobre, ui){
+    // Un valor en 0 o negativo (un PdG con Debilitado ×2, por ejemplo) se tira igual: el motor da el valor sin dados. Antes se cortaba acá
+    // y el duelo quedaba en «Tirando…» para siempre (encontrado probando la Remachadora en el mapa, 2026-10-12).
+    if(!formulaParaValor(valor) && !(Number.isFinite(Number(valor)) && Math.round(num(valor)) <= 0)){ ui.toast(`${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`); return; }
+    if(statId === 'eva' && !sobrepeso){
+      const s = FichaCalculo.calcular(S).sobrecarga;
+      if(s > 0){
+        ui.preguntarSobrepeso({nombre, valor, extra, sobre: s});
+        return;
+      }
+    }
+    if(sobrepeso === 'penal') extra = num(extra) - num(sobre);
+    // 💪 Empower (2026-10-22): la próxima tirada lleva su +3. Los stats de sus mods ya lo traen en `valor`; los demás (Fuerza del golpe, un
+    // atributo pelado) lo suman acá. Esta tirada lo gasta (abajo, gastarUnaTirada).
+    const emp = Combatiente.unaTiradaDe(S.efectos);
+    if(emp && !emp.cubre.has(statId)) extra = num(extra) + emp.n;
+    // La tirada en sí (Afortunado, mitades, Evasión mínimo 1) es la del motor común: comun/combatiente.js.
+    // 🔮 La Estatuilla del Gauchito Gil: una sola tirada por RONDA (dueño, 2026-10-18: «una vez por ronda, independientemente de a qué tirada
+    // afecte»), la primera de PdG, PdG.Esp, Evasión o Parry, como Afortunado (Combatiente.conGauchito). En el mapa la ronda la dice
+    // window.rondaDeCombate (la marca queda en S.meta.gauchitoRonda); sin el mapa, se renueva al empezar su turno (S.ataquesArma._gauchito).
+    const tieneG = (S.inventario || []).some(i => i && i.equipado && i.gauchito && !FichaCalculo.itemRoto(i));
+    const ronda = typeof window !== 'undefined' && typeof window.rondaDeCombate === 'function' ? window.rondaDeCombate() : null;
+    const usadoG = ronda !== null && ronda !== undefined ? (S.meta && S.meta.gauchitoRonda) === ronda : num((S.ataquesArma || {})._gauchito) > 0;
+    const conG = Combatiente.conGauchito(S.efectos, statId, tieneG, usadoG);
+    const r = Combatiente.tirarStat(valor, conG || S.efectos, statId, {extra});
+    if(conG && r){
+      S.ataquesArma = {...(S.ataquesArma || {}), _gauchito: 1};
+      if(ronda !== null && ronda !== undefined) S.meta = {...(S.meta || {}), gauchitoRonda: ronda};
+      ui.cambio(['nitros']);
+    }
+    // 🍀 El Anillo del trébol: el estado se gasta con la tirada que hizo Afortunado.
+    if(r && (S.efectos || []).some(e => e && e.trebol && e.activo !== false)){ S.efectos = S.efectos.filter(e => !(e && e.trebol)); ui.cambio(['efectos', 'refresh']); }
+    if(r && emp) gastarUnaTirada(S, r, ui, !emp.cubre.has(statId));
+    if(sobrepeso === 'penal') r.estados.push({n: 'Sobrepeso', p: 'debuff'});
+    else if(sobrepeso === 'pagado') r.estados.push({n: 'Sobrepeso (pagó 1 No2)', p: 'otro'});
+    ui.registrarTirada(nombre, r);
+  }
+  // 💪 Lo que dura una sola tirada (Empower, `unaTirada`): esa tirada lo gasta. `marcar`: la Mesa lo pinta entre los estados de la tirada (si el
+  // stat no estaba en sus mods, estadosQueAfectan no lo vio).
+  function gastarUnaTirada(S, r, ui, marcar){
+    const emp = Combatiente.unaTiradaDe(S.efectos);
+    if(!emp || !Combatiente.gastarUnaTirada(S.efectos)) return false;
+    if(r && marcar){ r.estados = r.estados || []; emp.nombres.forEach(nm => { if(!r.estados.some(e => e && e.n === nm)) r.estados.push({n: nm, p: 'buff'}); }); }
+    if(ui && ui.cambio) ui.cambio(['efectos', 'refresh']);
+    return true;
+  }
+  // El cartel de sobrepeso, "Pagar 1 No2": devuelve false si no alcanzan (y no cierra el cartel).
+  function sobrepesoPagar(S, ui){
+    const pago = Combatiente.conExtenuado(S.efectos, 1);   // + Extenuado
+    if(Combatiente.defensaSinNo2(S.nitros, pago)){ ui.toast(`${((S.meta && S.meta.nombre) || 'Tu personaje').trim()} ${Combatiente.YA_NEGATIVO_TXT}`); return false; }   // ya en negativo (2026-10-23)
+    S.nitros = num(S.nitros) - pago;   // una defensa: sin No2 queda en negativo, se descuenta en la próxima recarga (2026-10-06)
+    tormentaPj(S, pago, 'esquivar con sobrepeso', ui);
+    ui.cambio(['nitros', 'refresh']);
+    Combatiente.avisarDeudaNo2({nombre: ((S.meta && S.meta.nombre) || '').trim(), accion: 'la Evasión (pagando el sobrepeso)', costo: pago, quedan: num(S.nitros)});
+    return true;
+  }
+  // Parry: siempre 1 No2 (Combatiente.costoParry); queda esperando su Bloqueo con esa misma arma o escudo.
+  function parryConArma(S, arma, forzar, ui){
+    // Parada fácil (escudos de Buena calidad, 2026-10-06): el primer Parry del turno, gratis. La marca se vacía al empezar su turno.
+    const fin = FichaCalculo.calcular(S).final;
+    const gratis = Combatiente.parryGratis(st => fin[st], num((S.ataquesArma || {})._parry));
+    const costo = gratis ? 0 : Combatiente.conExtenuado(S.efectos, Combatiente.costoParry());   // + Extenuado
+    if(Combatiente.defensaSinNo2(S.nitros, costo)){ ui.toast(`${((S.meta && S.meta.nombre) || 'Tu personaje').trim()} ${Combatiente.YA_NEGATIVO_TXT}`); return; }   // ya en negativo (2026-10-23)
+    S.ataquesArma = {...(S.ataquesArma || {}), _parry: 1};
+    const con = arma ? ' con ' + arma.nombre : '';
+    // Una defensa: sin No2 se hace igual y queda en negativo; la deuda se descuenta en la próxima recarga (dueño, 2026-10-06).
+    S.nitros = num(S.nitros) - costo;
+    tormentaPj(S, costo, `el Parry${con}`, ui);
+    ui.cambio(['nitros']);
+    Combatiente.avisarDeudaNo2({nombre: ((S.meta && S.meta.nombre) || '').trim(), accion: `Parry${con}`, costo, quedan: num(S.nitros)});
+    ui.setParry(arma ? arma.id : null);   // queda esperando su Bloqueo (si ganás el Parry)
+    tirarValorStat(S, arma ? `Parry · ${arma.nombre}` : 'Parry', FichaCombate.statParaArma(S, 'parry', arma), 'parry', undefined, undefined, undefined, ui);
+    ui.toast(`Parry${con}: ${gratis ? 'gratis (Parada fácil)' : `−${fmt(costo)} No2`} · te quedan ${fmt(num(S.nitros))}${arma ? ' · si lo ganás, tirá el Bloqueo' : ''}`);
+    ui.cambio(['refresh', 'botonera']);
+  }
+  // Bloqueo: tu Bloqueo (de Fuerza) MÁS el peso del arma o escudo; esa suma es el dado.
+  // Bloqueo firme (escudos de Buena calidad, 2026-10-06): +N contra el primer golpe que recibe en el turno (la marca `_golpe` la pone el daño).
+  function bloqueoConArma(S, arma, ui){
+    const fin = FichaCalculo.calcular(S).final;
+    const firme = Combatiente.bloqueoFirme(st => fin[st], num((S.ataquesArma || {})._golpe));
+    tirarValorStat(S, `${arma ? `Bloqueo · ${arma.nombre}` : 'Bloqueo'}${firme ? ` (+${fmt(firme)} Bloqueo firme)` : ''}`, FichaCombate.bloqueoValor(S, arma) + firme, 'bloqueo', undefined, undefined, undefined, ui);
+  }
+  // Fuerza del golpe: tu Fuerza + el peso de tu arma; esa suma es el dado (contra el Bloqueo del defensor). Sin costo.
+  function fuerzaGolpeValorConArma(S, arma){
+    return FichaCombate.statParaArma(S, 'fue', arma) + (arma ? num(arma.peso) : 0);
+  }
+  function fuerzaGolpeConArma(S, arma, ui, extra){   // `extra`: lo que suma la habilidad del ataque (el Dash, 2026-10-26)
+    tirarValorStat(S, arma ? `Fuerza del golpe · ${arma.nombre}` : 'Fuerza del golpe', fuerzaGolpeValorConArma(S, arma) + num(extra), 'fue', undefined, undefined, undefined, ui);
+  }
+  // Botones Parry, Bloqueo y Fuerza del golpe: con dos o más armas equipadas se elige con cuál.
+  function elegirArmaDefensa(S, tipo, ui){
+    // El Bloqueo solo existe después de un Parry, y es con la misma arma o escudo (regla del dueño, 2026-09-30).
+    if(tipo === 'bloqueo'){
+      const pendiente = ui.getParry();
+      const armaDelParry = pendiente ? S.inventario.find(x => x.id === pendiente && x.equipado) : null;
+      ui.setParry(null);
+      if(armaDelParry) bloqueoConArma(S, armaDelParry, ui);
+      else ui.toast(Combatiente.BLOQUEO_SOLO_TRAS_PARRY);
+      ui.cambio(['botonera']);
+      return;
+    }
+    // Parry: con un arma o un escudo (regla del dueño, 2026-09-30); la Fuerza del golpe, con un arma que pega.
+    const armas = tipo === 'fuerza' ? FichaCombate.armasEquipadasConDano(S) : FichaCombate.armasYEscudosParaParry(S);
+    if(tipo !== 'fuerza' && !armas.length){ ui.toast(Combatiente.SIN_ARMA_DEFENSA); return; }
+    if(armas.length <= 1){ armaElegida(S, tipo, armas.length ? armas[0].item : null, ui); return; }
+    ui.elegirArma(tipo, armas);
+  }
+  // Lo elegido en "¿Con qué arma?".
+  function armaElegida(S, tipo, arma, ui){
+    if(tipo === 'dano'){ if(arma) tirarDanoDeArma(S, arma, ui); return; }
+    if(tipo === 'parry') parryConArma(S, arma, false, ui); else if(tipo === 'fuerza') fuerzaGolpeConArma(S, arma, ui); else bloqueoConArma(S, arma, ui);
+  }
+  // Daño del arma (con lo que suma el stat Daño) y sus efectos al golpear.
+  function tirarDanoDeArma(S, it, ui){
+    const dmg = FichaCalculo.calcular(S).final.dmg;
+    const r = tirarDados(FichaCombate.armaDanoTxt(it, dmg));
+    if(!r) return;
+    gastarUnaTirada(S, r, ui, true);   // 💪 el +3 ya venía en el Daño
+    ui.registrarTirada(it.nombre, r);
+    ui.efectosAlPegar(it);
+  }
+  function pedirArmaYTirar(S, ui){
+    const armas = FichaCombate.armasEquipadasConDano(S);
+    if(!armas.length){   // sin arma: el daño sin arma (provisorio, P150)
+      const r = tirarDados(FichaCombate.danoSinArmaTxt(FichaCalculo.calcular(S).final.dmg));
+      if(r){ gastarUnaTirada(S, r, ui, true); ui.registrarTirada('Sin arma', r); }
+      return;
+    }
+    if(armas.length === 1){ tirarDanoDeArma(S, armas[0].item, ui); return; }
+    ui.elegirArma('dano', armas);
+  }
+
+  /* ---------- Atacar (paso 3c-4b; js/11) ----------
+     Lo que hace el ataque suelto (sin objetivo) o el que el duelo le pide al atacante: cobrar los No2 y tirar el PdG.
+     Ataque normal: el primero del turno con esa arma cuesta Tipo ÷ 2, los siguientes el Tipo completo (cuenta como ataque).
+     Ataque de oportunidad y Contraataque (regla a prueba, P139): SIEMPRE Tipo ÷ 2 y NO suman al conteo de ataques. */
+  // Sentado: el cartel del juego (no el confirm() nativo). Devuelve true si no hay nada que preguntar, o lo que diga ui.confirmar (bool o
+  // promesa). Solo se espera (await) si es una promesa: así, sin pregunta, el ataque sigue en el mismo momento que antes.
+  const confirmarSentado = (S, ui) => { const q = Combatiente.preguntaSentado(S.efectos); return !q || (ui.confirmar || (t => Confirmar.preguntar(t, {titulo: /Desarmad/.test(t) ? 'Desarmado' : 'Sentado', si: 'Atacar igual'})))(q); };
+  const esperarSiHace = x => x && typeof x.then === 'function' ? x : null;
+  async function atacarConArma(S, arma, forzar, ui){
+    if(!forzar){ const ok = confirmarSentado(S, ui), p = esperarSiHace(ok); if(!(p ? await p : ok)) return; }   // Sentado no puede atacar: avisa y deja seguir
+    ui.setParry(null);
+    const costo = FichaCombate.costoAtaque(S, arma);
+    if(costo > num(S.nitros) && !forzar){
+      ui.avisarSinNitros(costo, `atacar${arma ? ' con ' + arma.nombre : ''}`, () => atacarConArma(S, arma, true, ui));
+      return;
+    }
+    const paga = forzar && costo > num(S.nitros) ? gastoNitrosForzado(S, costo, `atacó${arma ? ' con ' + arma.nombre : ''}`) : costo;
+    S.nitros = num(S.nitros) - paga;
+    tormentaPj(S, costo, `atacar${arma ? ' con ' + arma.nombre : ''}`, ui);
+    const primero = FichaCombate.registrarAtaque(S, arma);   // cuenta el ataque con esa arma (comun/ficha-combate.js)
+    if(ui.alPagar) ui.alPagar(paga);   // ya se pagó: un arma envenenada gasta su carga recién acá (2026-10-10); `paga`, lo que se pagó de verdad
+    ui.cambio(['nitros']);
+    if(!ui.sinTirada) tirarValorStat(S, arma ? `PdG · ${arma.nombre}` : 'PdG', FichaCombate.pdgParaArma(S, arma).valor, 'pdg', undefined, undefined, undefined, ui);   // el PdG a mano: paga, no tira (2026-10-21)
+    const tipo = FichaCombate.tipoAtaque(arma);
+    const impar = primero && tipo % 2 !== 0;
+    ui.toast(`${arma ? arma.nombre : 'Sin arma ⚠ (Tipo provisorio)'}: -${fmt(costo)} No2 · ${primero ? 'primer ataque con esta arma' : `ataque ${FichaCombate.ataquesConArma(S, arma)} con esta arma`}${impar ? ' · ⚠ Tipo impar, redondeo provisorio' : ''}`);
+  }
+  const NOMBRE_ATAQUE_ESPECIAL = {oportunidad: 'Ataque de oportunidad', contra: 'Contraataque'};
+  async function ataqueEspecialConArma(S, arma, tipo, forzar, ui){
+    const costo = FichaCombate.costoAtaqueEspecial(arma, tipo, S), nombre = NOMBRE_ATAQUE_ESPECIAL[tipo] || 'Ataque';
+    const con = arma ? ' con ' + arma.nombre : '';
+    if(!forzar){ const ok = confirmarSentado(S, ui), p = esperarSiHace(ok); if(!(p ? await p : ok)) return; }
+    if(costo > num(S.nitros) && !forzar){
+      ui.avisarSinNitros(costo, `hacer un ${nombre.toLowerCase()}${con}`, () => ataqueEspecialConArma(S, arma, tipo, true, ui));
+      return;
+    }
+    const paga = forzar && costo > num(S.nitros) ? gastoNitrosForzado(S, costo, `hizo un ${nombre.toLowerCase()}${con}`) : costo;
+    S.nitros = num(S.nitros) - paga;
+    tormentaPj(S, costo, `el ${nombre.toLowerCase()}${con}`, ui);
+    if(ui.alPagar) ui.alPagar(paga);   // ya se pagó (2026-10-10)
+    ui.cambio(['nitros']);
+    // Solo el contraataque suma el «PdG en contraataque» de la propia arma (los tipos 6 lo traen: +1 a +3, mucho menos valioso que un PdG normal porque es circunstancial);
+    // y solo el ataque de oportunidad suma el «PdG en oportunidad» (los tipos 4, mismo criterio).
+    const bonoContra = tipo === 'contra' ? FichaCombate.statParaArma(S, 'pdgcontra', arma) : tipo === 'oportunidad' ? FichaCombate.statParaArma(S, 'pdgopor', arma) : 0;
+    if(!ui.sinTirada) tirarValorStat(S, `${nombre} · PdG${arma ? ' · ' + arma.nombre : ''}`, FichaCombate.pdgParaArma(S, arma).valor + (Number.isNaN(bonoContra) ? 0 : bonoContra), 'pdg', undefined, undefined, undefined, ui);   // a mano: sin tirar
+    ui.toast(`${nombre}${con}: −${fmt(costo)} No2 (lo de un primer ataque)${bonoContra > 0 ? ` · PdG +${fmt(bonoContra)} por ${tipo === 'contra' ? 'contraataque' : 'oportunidad'}` : ''} · te quedan ${fmt(num(S.nitros))}`);
+    ui.cambio(['refresh']);
+  }
+
+  /* ---------- Habilidades (paso 3c-5a): Ejecutar / Anunciar, el costo X y la 🎲 segunda tirada (js/11 y js/02) ----------
+     Lo que pasa después de cobrar (anunciar y tirar, o abrir la Ejecución paso a paso, colocar una trampa, avisar una zona) lo
+     decide cada pantalla con `ui`:
+       ui = el de combate (toast, registrarTirada, avisarSinNitros, cambio, preguntarSobrepeso…) +
+            mesaHabilidad(nombre, detalle) (la línea de la habilidad en la Mesa, a nombre del personaje), fijarHp(valor),
+            efecto(it) (el estado del sistema anterior: FichaAcciones.efectoDeConsumo), colocarTrampa(it), avisarZona(it),
+            terminar(it, arma, xSp, xNitros) (anunciar y tirar, o la Ejecución), flashFuera(it), elegirArmaHab(it, opciones)
+            (el cartel "¿con qué arma?"), pedirCostoX(it, arma) (el cartel del costo X) y cerrarCostoX().
+       cambio(lista) además recibe 'habilidades' y 'efectos'. */
+  // Al ejecutar una habilidad, su descripción va a la Mesa aunque no tire dados: si tira, viaja con la tirada (una sola línea);
+  // si no, va en su propia línea.
+  function habilidadTira(h){
+    return !!(h && (String(h.tiradaExtra || "").trim() || h.tiradaStat));
+  }
+  function anunciarHabilidad(S, h, ui){
+    const detalle = (h && (h.detalle || h.efectoDetalle)) || "";
+    if(habilidadTira(h)) mesaConTexto(detalle);
+    else ui.mesaHabilidad(h.nombre, detalle);
+  }
+  // Ejecutar tira SOLO la primera tirada: el stat vinculado o, si no tiene, la fórmula. La segunda va con el botón 🎲.
+  function tirarPrimeraDeHab(S, it, ui){
+    if(FichaBotonera.habStatTirable(it)){
+      tirarValorStat(S, `${it.nombre} · ${FichaCalculo.STAT_LABEL[it.tiradaStat]}`, FichaCalculo.calcular(S).final[it.tiradaStat] + num(it.tiradaBono), it.tiradaStat, undefined, undefined, undefined, ui);   // tiradaBono: bono fijo de la habilidad al stat (ej. Takle: +1 PdG)
+      return true;
+    }
+    const formula = (it.tiradaExtra || '').trim();
+    if(formula){
+      const r = tirarDados(formula);
+      if(r){ ui.registrarTirada(it.nombre, r); return true; }
+    }
+    return false;
+  }
+  function tirarSegundaDeHab(S, id, ui){
+    const it = S.habilidades.find(h => h.id === id);
+    if(!it) return;
+    const r = tirarDados((it.tiradaExtra || '').trim());
+    if(r) ui.registrarTirada(`${it.nombre} · Efecto`, r);
+    else ui.toast('La fórmula de la habilidad no es válida');
+  }
+  // Si la habilidad cuesta como un ataque, cuenta como ese ataque del arma (el próximo ataque con esa arma ya paga Tipo
+  // completo). Devuelve el texto.
+  function registrarAtaqueDeHabilidad(S, it, arma){
+    if(!FichaHabilidades.nitrosAtaque(it)) return '';
+    const primero = FichaCombate.registrarAtaque(S, arma);   // cuenta como ese ataque (comun/ficha-combate.js)
+    return `ataque con ${arma ? arma.nombre : 'sin arma'}${primero ? ' (primero del turno)' : ''}`;
+  }
+  // Tope de X en costos variables. PLACEHOLDER: ver IT2.limiteXNitros/limiteXSp.
+  // El tope de X: el general (si algún día se define) y el de la habilidad (`xMax`, 2026-10-11: Apuntar, X de 1 a 3), el menor de los dos.
+  function limiteCostoX(S, cual, it){
+    if(cual === 'hp') return Math.max(0, Math.floor(num(FichaCalculo.calcular(S).final.esp)));   // la vida en X: como mucho tu Especial (Balas de sangre)
+    const f = cual === 'sp' ? IT2().limiteXSp : IT2().limiteXNitros;
+    const base = typeof f === 'function' ? f(FichaCalculo.calcular(S)) : null, xm = it && num(it.xMax) > 0 ? num(it.xMax) : null;
+    return base === null ? xm : xm === null ? base : Math.min(base, xm);
+  }
+  async function ejecutarHabilidad(S, id, armaId, forzar, ui){
+    const it = S.habilidades.find(h => h.id === id);
+    if(!it) return;
+    // 📣 Manual: "Anunciar" solo publica la descripción en la Mesa.
+    if(FichaBotonera.modoHab(it) === 'manual'){
+      ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || '');
+      ui.toast(`${it.nombre} anunciada`);
+      return;
+    }
+    // Silencio (2026-10-04): avisa y deja seguir.
+    const sil = Combatiente.preguntaSilencio(S.efectos, it, '', ui.yo ? (ui.yo() || {}).ref : '');   // (con la ficha: el Tótem de silencio del mapa)
+    if(sil && !(await (ui.confirmar || (txt => Confirmar.preguntar(txt, {titulo: 'Silencio', icono: '🤐', si: 'Usarla igual'})))(sil))) return;
+    if(Combatiente.tipoEjecucion(FichaBotonera.dueloDe(it)) === 'flash'){ ui.flashFuera(it); return; }   // ⚡ su propia regla de costo (P136)
+    /* 🕳 Excavar (2026-10-28, dueño: también para los jugadores, habilidad miscelánea): con el mismo botón, arriba se mete bajo tierra (`excavarNo2`, 1 si
+       no dice; sin SP); abajo, sale atacando con un arma cuerpo a cuerpo de Tipo 4 a 10 (Combatiente.sirveParaEmerger). El token lo maneja el mapa:
+       ui.bajoTierra() (true / false; null sin token), ui.excavar() (→ true si se metió) y ui.emerger(seguir) (vtt-hexgrid/js/11 y 46). */
+    const abajo = it.excavar && it.emerger && ui.bajoTierra ? ui.bajoTierra() : undefined;
+    if(abajo === null){ ui.toast(`${it.nombre}: tu personaje no tiene token en este mapa`); return; }
+    if(abajo === false){
+      // Meterse (dueño, 2026-10-28): 1 No2 y 1 SP (`excavarNo2`, `excavarSp`); salir atacando, lo de la habilidad (2 SP y los No2 del ataque).
+      const costoE = Math.max(0, Math.round(num(it.excavarNo2 !== undefined ? it.excavarNo2 : 1)));
+      const spE = Math.max(0, Math.round(num(it.excavarSp)));
+      if(costoE > num(S.nitros) && !forzar){ ui.avisarSinNitros(costoE, 'meterte bajo tierra', () => ejecutarHabilidad(S, id, armaId, true, ui)); return; }
+      if(spE > spDisponible(S) && !(await (ui.confirmar || (txt => Confirmar.preguntar(txt, {titulo: it.nombre, icono: '🕳', si: 'Igual'})))(`Meterte bajo tierra cuesta ${fmt(spE)} SP y tenés ${fmt(spDisponible(S))}. ¿Igual?`))) return;
+      if(spE && Combatiente.sangraPorSp(S.efectos) && !(await confirmarMaldito(S, spE, ui, it.nombre))) return;   // 🩸 Maldito
+      if(!(await ui.excavar(it))) return;
+      S.nitros = num(S.nitros) - (forzar && costoE > num(S.nitros) ? gastoNitrosForzado(S, costoE, `usó ${it.nombre}`) : costoE);
+      if(spE) gastarSp(S, spE, ui, it.nombre);
+      ui.cambio(['nitros', 'vitals']);
+      ui.toast(`🕳 ${it.nombre}: te metiste bajo tierra${costoE ? ` · −${fmt(costoE)} No2` : ''}${spE ? ` · −${fmt(spE)} SP` : ''} — con ${it.nombre} otra vez salís atacando; para salir sin atacar, ⬆ Salir`);
+      return;
+    }
+    // Una vez por turno (2026-10-13, Sprint): avisa y deja seguir (lo decide la mesa). El conteo vive en S.ataquesArma, que vacía el turno.
+    if(it.unaVezPorTurno && !forzar && num((S.ataquesArma || {})['hab:' + it.id]) > 0
+      && !(await (ui.confirmar || (txt => Confirmar.preguntar(txt, {titulo: it.nombre})))(`${it.nombre} se usa una vez por turno, y ya la usaste en este. ¿Usarla igual?`))) return;
+    // Costo en vida: hace falta que sobre vida después de pagarlo.
+    if(num(it.hpCosto) > 0 && num(S.hp) <= num(it.hpCosto)){
+      ui.toast(`No te alcanza la vida — ${it.nombre} cuesta ${fmt(num(it.hpCosto))} HP y tenés ${fmt(num(S.hp))}`);
+      return;
+    }
+    // Con costo de ataque: primero se elige el arma (si hay más de una).
+    let arma = null;
+    if(FichaHabilidades.nitrosAtaque(it)){
+      let opciones = FichaBotonera.armasParaHabilidad(S, it);
+      if(it.soloRango && !opciones.some(o => o.arma)){ ui.toast(`${it.nombre} se usa con un arma a distancia en la mano`); return; }   // Headshot
+      if(abajo === true){   // 🕳 saliendo de abajo de la tierra: solo un arma cuerpo a cuerpo de Tipo 4 a 10 (P231)
+        opciones = opciones.filter(o => o.arma && Combatiente.sirveParaEmerger(o.arma));
+        if(!opciones.length){ ui.toast(`🕳 ${it.nombre}: para salir atacando hace falta un arma cuerpo a cuerpo de Tipo 4 a 10 en la mano (no de rango ni especial) — para salir sin atacar, 🕳 Salir`); return; }
+        if(armaId !== undefined && !opciones.some(o => o.arma.id === armaId)) armaId = undefined;
+      }
+      if(armaId === undefined && opciones.length > 1){ ui.elegirArmaHab(it, opciones); return; }
+      arma = armaId ? (S.inventario.find(x => x.id === armaId) || null) : opciones[0].arma;
+    }
+    const armaPendiente = FichaHabilidades.nitrosAtaque(it) ? arma : undefined;
+    if(FichaHabilidades.habCostoVariable(it)){ ui.pedirCostoX(it, armaPendiente); return; }
+    const costoNitros = FichaBotonera.costoNitrosHab(S, it, arma);
+    if(costoNitros > num(S.nitros) && !forzar){
+      ui.avisarSinNitros(costoNitros, `usar ${it.nombre}${FichaHabilidades.nitrosAtaque(it) ? ` (ataque con ${arma ? arma.nombre : 'sin arma'})` : ''}`, () => ejecutarHabilidad(S, id, armaId, true, ui));
+      return;
+    }
+    let costoSp = FichaHabilidades.costoSpDe(S, it);   // Enfocado: sube con cada uso seguido
+    // Costo distinto en turno ajeno (2026-09-28, pedido del dueño): antes de cobrar nada, un cartelito pregunta.
+    if(String(it.turnoAjenoSp || '').trim() && !FichaHabilidades.spVariable(it)){
+      const elegido = await ConfirmarTurno.pedir(it.nombre, costoSp, num(it.turnoAjenoSp), {ident: {nombre: ((S.meta && S.meta.nombre) || '').trim(), ref: ui.yo ? (ui.yo() || {}).ref : ''}});
+      if(elegido === null) return;   // canceló: no se cobra ni se ejecuta nada
+      costoSp = elegido;
+    }
+    // 💧 Sin SP suficiente (dueño, 2026-10-29): avisa antes y deja usarla igual; gasta el SP que tenga y queda en 0 (como un creep en modo SP).
+    if(costoSp > 0 && !FichaHabilidades.spVariable(it) && costoSp > FichaBotonera.spLibre(S)){
+      const libre = Math.max(0, FichaBotonera.spLibre(S));
+      const txt = `Tenés ${fmt(libre)} de SP y ${it.nombre || 'la habilidad'} cuesta ${fmt(costoSp)}. ¿Usarla igual? (gasta el SP que tenés y quedás en 0)`;
+      if(!(await (ui.confirmar || (t => Confirmar.preguntar(t, {titulo: 'No te alcanza el SP', icono: '💧', si: 'Usarla igual', no: 'No'})))(txt))) return;
+      costoSp = libre;
+    }
+    if(Combatiente.sangraPorSp(S.efectos) && !(await confirmarMaldito(S, costoSp, ui, it.nombre))) return;   // 🩸 Maldito: avisa y deja cancelar antes de cobrar nada
+    const no2Antes = num(S.nitros);
+    S.nitros = num(S.nitros) - (forzar && costoNitros > num(S.nitros) ? gastoNitrosForzado(S, costoNitros, `usó ${it.nombre}`) : costoNitros);
+    tormentaPj(S, costoNitros, `usar ${it.nombre}`, ui);
+    gastarSp(S, costoSp, ui, it.nombre);   // 🩸 Maldito: la vida, al pagar
+    // ↩ Lo que cobró, para el duelo que arme (P233, 2026-10-29): si se cancela y no cuenta, se devuelve (FichaDuelo.devolverHab).
+    try{ const yoRef = ui.yo && ui.yo() && ui.yo().ref; if(yoRef && typeof Duelo !== 'undefined' && Duelo.pagoHab) Duelo.pagoHab(yoRef, {habId: it.id, nombre: it.nombre || '', no2: Math.max(0, no2Antes - num(S.nitros)), sp: costoSp, hp: num(it.hpCosto), cd: -1}); }catch(e){}
+    if(it.unaVezPorTurno) S.ataquesArma = {...(S.ataquesArma || {}), ['hab:' + it.id]: num((S.ataquesArma || {})['hab:' + it.id]) + 1};
+    const costoHp = num(it.hpCosto);
+    if(costoHp > 0) ui.fijarHp(num(S.hp) - costoHp);
+    const curaHp = num(it.curaHp);
+    if(curaHp > 0) ui.fijarHp(num(S.hp) + curaHp);   // cura sobre uno mismo, sin pasar del máximo
+    const ataque = registrarAtaqueDeHabilidad(S, it, arma);
+    const efecto = ui.efecto(it);
+    ui.colocarTrampa(it);
+    ui.avisarZona(it);
+    const invocada = invocarConHab(S, it, ui);
+    ui.terminar(it, arma, 0, 0);
+    ui.cambio(['habilidades', ...(efecto ? ['efectos'] : []), ...(invocada ? ['invocaciones'] : []), 'nitros', 'vitals']);
+    const partes = [`ejecutada`];
+    if(costoSp) partes.push(`-${fmt(costoSp)} SP`);
+    partes.push(costoNitros ? `-${fmt(costoNitros)} No2` : 'sin costo de Nitros');
+    if(costoHp > 0) partes.push(`-${fmt(costoHp)} HP`);
+    if(curaHp > 0) partes.push(`+${fmt(curaHp)} HP`);
+    if(ataque) partes.push(ataque);
+    if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
+    ui.toast(`${it.nombre} ${partes.join(' · ')}`);
+  }
+  /* ---------- ✨ Armas especiales (2026-10-05, rework mágico, docs/rework-armas.md) ----------
+     Una varita o un báculo es «un hechizo equipable»: el ítem equipado trae `especial` = {nombre?, sp, no2? (1), sube? (1), dano (fórmula),
+     sumaEspecial (true = el Ef.Esp entero, 0.5 = la mitad), duelo (la misma Ejecución ✨ de una habilidad: objetivo, tira, contra, tipoDano,
+     efectos con caras/éxitos, radio…), trampaColocar?}. Usarla arma una habilidad con eso y sigue el mismo camino de una ✨ (cuadro del duelo,
+     área, cono, zona, trampa). Costo (dueño): 1 No2 el primer uso del turno y +1 por cada uso más de ESA arma (el conteo es el de los ataques de
+     cada arma, `S.ataquesArma['esp:<id>']`, que se vacía en el Mantenimiento), más su SP; sin SP, cada SP se paga con 1 No2 más. */
+  const claveEsp = it => 'esp:' + (it._modoDe || it.id);   // (los modos de una varita cuentan juntos)
+  const armasEspeciales = S => Combatiente.especialesConModos((S.inventario || []).filter(i => i && i.equipado && i.especial && !FichaCalculo.itemRoto(i)));
+  // Las cargas (2026-10-08, Varita de cargas): `especial.cargas` usos por combate sin SP (se vuelven a llenar al terminar el combate, js/25 del mapa).
+  const cargasUsadas = (S, it) => num((S.cargasEsp || {})[it._modoDe || it.id]);
+  const usosEspecial = (S, it) => num((S.ataquesArma || {})[claveEsp(it)]);
+  function costoEspecial(S, it){
+    const e = it.especial || {}, usos = usosEspecial(S, it);
+    const ahorro = usos ? 0 : Math.max(0, Math.round(num(FichaCalculo.calcular(S).final.ahorroespsp)));   // Mitones del primer conjuro (2026-10-05)
+    const cargas = Math.max(0, Math.round(num(e.cargas))), conCarga = cargas > 0 && cargasUsadas(S, it) < cargas;
+    return {no2: Combatiente.conExtenuado(S.efectos, Math.max(0, num(e.no2 ?? 1)) + usos * Math.max(0, num(e.sube ?? 1))), sp: conCarga ? 0 : Math.max(0, num(e.sp) - ahorro), usos, vida: vidaPorUso(S, e),
+      ...(cargas ? {cargas, cargaUsadas: cargasUsadas(S, it)} : {})};
+  }
+  // El báculo de sangre (2026-10-08): cada uso cuesta `spVidaPct` % de tu vida máxima (para arriba) en vez de SP.
+  const vidaPorUso = (S, e) => num(e && e.spVidaPct) > 0 ? Math.max(1, Math.ceil(num(FichaCalculo.calcular(S).final.hpmax) * num(e.spVidaPct) / 100)) : 0;
+  const spDisponible = S => Math.max(0, num(FichaCalculo.calcular(S).final.sp) - num(S.spGastado));
+  // 🔮 Los talismanes que le suman algo a cada varita (la Cabeza reducida, el Muñeco vudú): sus efectos, al final de los de la Ejecución.
+  const conTalismanesVarita = (duelo, items) => {
+    const extra = Combatiente.efectosVarita(items);
+    if(extra.length && duelo && duelo.objetivo !== 'zona') duelo.efectos = [...(Array.isArray(duelo.efectos) ? duelo.efectos : []), ...extra];
+    return duelo;
+  };
+  function habDeArmaEspecial(S, it){
+    const e = it.especial || {}, f = FichaCalculo.calcular(S).final;
+    const suma = Combatiente.sumaEspecialDe(f.dmgesp, e.sumaEspecial);   // para arriba (2026-10-17)
+    const dano = String(e.dano || '').trim();
+    return {id: claveEsp(it), deItem: it.id, nombre: e.nombre || it.nombre, detalle: it.detalle || '', modo: 'auto',
+      duelo: e.duelo ? structuredClone(e.duelo) : null, tiradaStat: (e.duelo && e.duelo.tira) || 'pdgmg',
+      tiradaExtra: dano ? dano + (suma > 0 ? `+${suma}` : '') : '', ...(e.trampaColocar ? {trampaColocar: structuredClone(e.trampaColocar)} : {}),
+      ...(e.portalMapa ? {portalMapa: structuredClone(e.portalMapa)} : {}), ...(e.blink ? {blink: structuredClone(e.blink)} : {}), ...(e.caos ? {caos: structuredClone(e.caos)} : {})};   // (el blink y el caos, 2026-10-08)   // los portales (2026-10-07, Varita del portal aliado)
+  }
+  // El «Qué hace» de un arma especial en la Botonera: su costo ahora y lo que hace (sin las notas de automatización).
+  const ataqueEspecialMenu = (S, it) => {
+    const t = String(it.detalle || '').split(' ⚙')[0].split(' ✋')[0].trim();
+    return {costo: costoEspecialTxt(S, it), que: t.length <= 200 ? t : t.slice(0, 200).replace(/[\s,;:(]+\S*$/, '') + '…'};   // corta en una palabra, nunca a la mitad
+  };
+  const costoEspecialTxt = (S, it) => { const c = costoEspecial(S, it); return `${fmt(c.no2)} No2${c.sp ? ` + ${fmt(c.sp)} SP` : ''}${c.vida ? ` + ${fmt(c.vida)} HP` : ''}${c.usos ? ` (uso ${c.usos + 1} del turno)` : ''}${c.cargas ? (c.cargaUsadas < c.cargas ? ` · carga ${c.cargaUsadas + 1} de ${c.cargas}` : ' · sin cargas') : ''}`; };
+  /* Los orbes equipados (2026-10-05) al usar un arma especial: el de resguardo te pone Vida extra 2 hasta tu próximo turno (una vez por turno: el
+     conteo vive en S.ataquesArma, que vacía el Mantenimiento); el salvaje tira 1d6: con 1 te hace 1 de daño, con 6 el efecto sale doble (los dados del
+     daño ×2; si el arma no hace daño, el doble lo decide la mesa). Todo a la vista en la Mesa. Devuelve true si sale doble. */
+  function orbesAlUsar(S, item, it, ui){
+    let doble = false;
+    (S.inventario || []).filter(o => o && o.equipado && o.orbe && !FichaCalculo.itemRoto(o)).forEach(o => {
+      // El Orbe salvaje, el del custodio y el de resguardo (2026-10-18, dueño) ya no van al usar la varita: el salvaje, con cualquier daño
+      // especial; el custodio y el de resguardo, al ganar una tirada de PdG.Esp. Los hace el mapa (vtt-hexgrid/js/53).
+    });
+    return doble;
+  }
+  // ✋ La parte a mano (Combatiente.aManoEspecial): el texto a la Mesa y, si hay, su tirada (con el texto pegado).
+  function aManoAlUsar(nombre, e, ui){
+    const am = Combatiente.aManoEspecial(e);
+    if(!am) return;
+    const r = am.tirada && typeof tirarDados === 'function' ? tirarDados(am.tirada) : null;
+    if(am.tirada && !r) ui.toast(`${nombre}: la tirada «${am.tirada}» no es una fórmula válida`);
+    if(r && ui.registrarTirada){
+      if(am.texto && typeof mesaConTexto === 'function') mesaConTexto('✋ A mano: ' + am.texto);
+      ui.registrarTirada(`${nombre} · ${am.etiqueta}`, r);
+    }else if(am.texto) ui.mesaHabilidad(nombre, '✋ A mano: ' + am.texto);
+  }
+  // `spFijo`: el SP ya decidido (⚡ Flash en turno ajeno: el doble), para no volver a preguntar al pagar con No2 o sin No2.
+  async function usarArmaEspecial(S, itemId, forzar, ui, sinSp, spFijo){
+    const item = armasEspeciales(S).find(x => x.id === itemId);
+    if(!item){ ui.toast('Esa arma especial no está equipada'); return; }
+    const it = habDeArmaEspecial(S, item), c = costoEspecial(S, item), e = item.especial || {};
+    const confirmar = ui.confirmar || (t => Confirmar.preguntar(t, {titulo: it.nombre}));   // el cartel del juego, no el confirm() nativo
+    // Una vez por turno (2026-10-07, la Expelliarmus): avisa y deja seguir (lo decide la mesa).
+    if(e.unaVezPorTurno && c.usos > 0 && spFijo === undefined && !sinSp && !forzar
+      && !(await confirmar(`${it.nombre} se usa una vez por turno, y ya la usaste en este. ¿Usarla igual?`))) return;
+    // ⚡ Flash (2026-10-07, la Expelliarmus): se puede usar en turno ajeno, y ahí el SP cuesta el doble (la regla de siempre del Flash).
+    if(e.flash && spFijo === undefined && !sinSp && !forzar && typeof ConfirmarTurno !== 'undefined'){
+      const p = await ConfirmarTurno.flash(`⚡ ${it.nombre}`, {sp: c.sp}, {spAjeno: it.turnoAjenoSp, ident: {nombre: ((S.meta && S.meta.nombre) || '').trim(), ref: ui.yo ? (ui.yo() || {}).ref : ''}});
+      if(!p) return;
+      spFijo = num(p.sp);
+    }
+    // Sin cargas (la Varita de cargas): avisa y deja seguir, pagando su SP.
+    if(c.cargas && c.cargaUsadas >= c.cargas && spFijo === undefined && !sinSp && !forzar
+      && !(await confirmar(`${it.nombre}: ya usaste las ${c.cargas} cargas de este combate. ¿Usarla igual pagando su SP (${fmt(c.sp)})?`))) return;
+    let no2 = c.no2, sp = spFijo !== undefined ? spFijo : c.sp;
+    // Túnica de sangre (2026-10-06): con «pagar con vida», cada vez se elige si el SP sale de la vida (1 HP por SP). La elección viaja como
+    // sinSp === 'vida' (si hay que confirmar los No2 y se vuelve a llamar, no se pregunta ni se cobra dos veces); la vida se cobra al pagar.
+    let conVida = sinSp === 'vida';
+    if(!conVida && sp > 0 && !sinSp && num(FichaCalculo.calcular(S).final.pagarhp) > 0){
+      conVida = !!(await confirmar(`${it.nombre}: ¿pagás los ${fmt(sp)} SP con vida (${fmt(sp)} HP)?\n\nAceptar: con vida · Cancelar: con SP`));
+      if(conVida) sinSp = 'vida';
+    }
+    let hpVida = conVida ? sp : 0;
+    if(conVida) sp = 0;
+    if(c.vida > 0){ hpVida = c.vida; sp = 0; }   // el báculo de sangre: vida en vez de SP
+    if(sp > spDisponible(S) && !sinSp){
+      if(!(await confirmar(`Te falta SP: ${it.nombre} cuesta ${fmt(sp)} SP y tenés ${fmt(spDisponible(S))}. ¿La pagás con No2? (${fmt(no2 + sp)} No2 en vez de ${fmt(no2)} No2 + ${fmt(sp)} SP)`))) return;
+      return usarArmaEspecial(S, itemId, forzar, ui, true, spFijo);
+    }
+    if(sinSp === true){ no2 += sp; sp = 0; }
+    if(no2 > num(S.nitros) && !forzar){
+      ui.avisarSinNitros(no2, `usar ${it.nombre}`, () => usarArmaEspecial(S, itemId, true, ui, sinSp, spFijo));
+      return;
+    }
+    if(Combatiente.sangraPorSp(S.efectos) && !(await confirmarMaldito(S, sp, ui, it.nombre))) return;   // 🩸 Maldito
+    S.nitros = num(S.nitros) - (forzar && no2 > num(S.nitros) ? gastoNitrosForzado(S, no2, `usó ${it.nombre}`) : no2);
+    tormentaPj(S, no2, `usar ${it.nombre}`, ui);
+    gastarSp(S, sp, ui, it.nombre);   // 🩸 Maldito
+    if(hpVida){   // la Túnica de sangre: el SP, con vida
+      if(ui.fijarHp) ui.fijarHp(num(S.hp) - hpVida); else S.hp = Math.max(0, num(S.hp) - hpVida);
+      ui.mesaHabilidad(it.nombre, c.vida > 0 ? `🩸 cuesta vida: −${fmt(hpVida)} HP (el ${fmt(num(e.spVidaPct))} % de su vida máxima).` : `🩸 pagó ${fmt(hpVida)} SP con vida (−${fmt(hpVida)} HP).`);
+    }
+    S.ataquesArma = {...(S.ataquesArma || {}), [claveEsp(item)]: c.usos + 1};
+    if(c.cargas && c.cargaUsadas < c.cargas) S.cargasEsp = {...(S.cargasEsp || {}), [item._modoDe || item.id]: c.cargaUsadas + 1};   // una carga menos
+    const doble = orbesAlUsar(S, item, it, ui);   // los orbes de la otra mano (resguardo, salvaje)
+    if(doble) it.tiradaExtra = String(it.tiradaExtra || '').replace(/(\d+)d(\d+)/g, (m, n, k) => `${2 * num(n)}d${k}`);
+    // Lo que el arma le pone a quien la usa (2026-10-05, Varita de la luz: luz y «ve lo oculto» hasta el final del turno).
+    const propio = item.especial && item.especial.estadoPropio;
+    if(propio && propio.nombre){
+      S.efectos = Array.isArray(S.efectos) ? S.efectos : [];
+      Combatiente.agregarEstado(S.efectos, {id: uid(), imagen: '', stacks: 1, hpturno: 0, stacksturno: 0, permanente: false, activo: true, popup: false,
+        polaridad: 'buff', detalle: '', mods: [], ...structuredClone(propio)});
+    }
+    ui.colocarTrampa(it);
+    if((it.portalMapa || it.blink || it.caos) && ui.enMapa) avisarZonaAlMapa(S, it, ui);   // los portales, el blink y el caos: se eligen en el mapa
+    ui.terminar(it, null, 0, 0);
+    aManoAlUsar(it.nombre, item.especial, ui);
+    ui.cambio(['nitros', 'vitals', 'habilidades', 'efectos']);
+    ui.toast(`${it.nombre}: −${fmt(no2)} No2${sp ? ` · −${fmt(sp)} SP` : ''}${hpVida ? ` · −${fmt(hpVida)} HP (con vida)` : sinSp === true ? ' (sin SP: pagado con No2)' : ''}`);
+  }
+
+  // El costo X ya elegido en el cartel (sp y nitros): valida, cobra y sigue como Ejecutar. Devuelve true si se ejecutó.
+  function confirmarCostoVariable(S, it, sp, nitros, arma, ui, hp){
+    const hpX = FichaHabilidades.hpVariable(it);
+    if(sp < 0 || nitros < 0 || (hpX && num(hp) < 0)){
+      ui.toast('Los valores no pueden ser negativos');
+      return false;
+    }
+    const pagaN = FichaHabilidades.nitrosVariable(it) ? Combatiente.conExtenuado(S.efectos, nitros) : nitros;   // X No2 + Extenuado (lo fijo ya lo trae)
+    if(pagaN > num(S.nitros)){
+      ui.toast(`No te alcanzan los Nitros — tenés ${fmt(num(S.nitros))}`);
+      return false;
+    }
+    const limN = limiteCostoX(S, 'nitros', it), limS = limiteCostoX(S, 'sp', it);
+    if(limN !== null && FichaHabilidades.nitrosVariable(it) && nitros > limN){ ui.toast(`Como mucho ${fmt(limN)} Nitros en X`); return false; }
+    if(limS !== null && FichaHabilidades.spVariable(it) && sp > limS){ ui.toast(`Como mucho ${fmt(limS)} SP en X`); return false; }
+    if(hpX){   // la vida en X (Balas de sangre): de 1 a tu Especial, y tiene que sobrarte vida
+      const limH = limiteCostoX(S, 'hp', it);
+      if(num(hp) < 1){ ui.toast('Elegí cuánta vida gastás (al menos 1)'); return false; }
+      if(limH !== null && num(hp) > limH){ ui.toast(`Como mucho ${fmt(limH)} de vida en X (tu Especial)`); return false; }
+      if(num(S.hp) <= num(hp)){ ui.toast(`No te alcanza la vida — tenés ${fmt(num(S.hp))}`); return false; }
+    }
+    // 🩸 Maldito (Drenar Vida: el SP que eligió en X): pregunta antes de cobrar; sin maldición sigue igual que siempre (sin esperar).
+    if(Combatiente.sangraPorSp(S.efectos) && sp > 0) return confirmarMaldito(S, sp, ui, it.nombre).then(ok => ok ? cobrarCostoVariable(S, it, sp, nitros, arma, ui, hp, hpX, pagaN) : false);
+    return cobrarCostoVariable(S, it, sp, nitros, arma, ui, hp, hpX, pagaN);
+  }
+  function cobrarCostoVariable(S, it, sp, nitros, arma, ui, hp, hpX, pagaN){
+    S.nitros = Math.max(0, num(S.nitros) - pagaN);
+    tormentaPj(S, pagaN, `usar ${it.nombre}`, ui);
+    gastarSp(S, sp, ui, it.nombre);   // 🩸 Maldito
+    const costoHp = hpX ? Math.round(num(hp)) : num(it.hpCosto);
+    if(costoHp > 0) ui.fijarHp(num(S.hp) - costoHp);
+    if(num(it.curaHp) > 0) ui.fijarHp(num(S.hp) + num(it.curaHp));
+    const ataque = registrarAtaqueDeHabilidad(S, it, arma);
+    const efecto = ui.efecto(it);
+    ui.colocarTrampa(it);
+    ui.avisarZona(it);
+    const invocada = invocarConHab(S, it, ui);
+    ui.terminar(hpX ? {...it, _xHp: costoHp} : it, arma, sp, nitros);   // la X de vida viaja en la copia (xDeHab)
+    ui.cerrarCostoX();
+    ui.cambio(['habilidades', ...(efecto ? ['efectos'] : []), ...(invocada ? ['invocaciones'] : []), 'nitros', 'vitals']);
+    const partes = [`ejecutada`, `-${fmt(sp)} SP`, `-${fmt(nitros)} No2`];
+    if(costoHp > 0) partes.push(`-${fmt(costoHp)} HP`);
+    if(ataque) partes.push(ataque);
+    if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
+    ui.toast(`${it.nombre} ${partes.join(' · ')}`);
+    return true;
+  }
+
+  /* ---------- Paso 3c-5b: lo que termina una habilidad ✨ automática (js/02 y js/01) ----------
+     ui además de lo de habilidades: yo() → {ref, tipo: 'pj', nombre} (el lado del duelo), dueloDisponible() (el duelo conectado y
+     el personaje editable), puedeEscribir() (editable, aunque el duelo no esté), elegirObjetivo({yo, ataque, suelto}) (elegir el
+     token y abrir el duelo), colocarZona(it, xSp, xNitros) → true/false, presets (los estados estándar), recordatorios(avisos)
+     (líneas para la Mesa); cambio además recibe 'equipo' y 'mochila'. */
+  // Aviso al quedar en 1 punto y al romperse: cartel y una línea en la Mesa para todos.
+  function durAviso(S, i, ui){
+    const a = FichaCalculo.durActual(i), quien = ((S.meta && S.meta.nombre) || '').trim();
+    const txt = a <= 0 ? `💥 ${i.nombre} se rompió: sigue ocupando el lugar pero no da ningún efecto hasta que se repare` : a === 1 ? `⚠ ${i.nombre} está a punto de romperse (queda 1 punto de durabilidad)` : '';
+    if(!txt) return;
+    ui.toast(txt);
+    try{ ui.recordatorios([{nombre: `🔧 ${quien ? quien + ': ' : ''}${txt}`, detalle: ''}]); }catch(e){}
+  }
+  function piezaDelParry(S){
+    const esc = (S.inventario || []).find(x => x && x.equipado && FichaCalculo.esEscudoItem(x) && !FichaCalculo.itemRoto(x));
+    if(esc) return esc;
+    const c = FichaCombate.armasYEscudosParaParry(S);
+    return c.length === 1 ? c[0].item : null;
+  }
+  function desgastarItem(S, i, n, ui){
+    const antes = FichaCalculo.durActual(i);
+    i.dur = Math.max(0, antes - Math.max(1, n || 1));
+    if(FichaCalculo.durActual(i) !== antes) durAviso(S, i, ui);
+  }
+  // La Defensa que da una pieza ahora (con lo que le baja la armadura rota o la abolladura, sin pasar de la que da; rota, nada).
+  function defDePieza(it){
+    if(FichaCalculo.itemRoto(it)) return 0;
+    const d = (it.mods || []).filter(m => m.stat === 'def').reduce((a, m) => a + num(m.val), 0);
+    return FichaCalculo.pierdeDefPorRotura(it) ? d - Math.min(FichaCalculo.armRotaDe(it), Math.max(0, d)) : d;
+  }
+  /* 💥 El Aviso de la Armadura rota (dueño, 2026-10-29: «cuando se aplica un punto de romper armadura, le tiene que aparecer una notificación al
+     usuario: tal efecto, tal ataque, tal disparo te rompió tal ítem; y explica: baja en 1 la durabilidad, baja en 1 la Defensa que otorga hasta que
+     lo reparen, y que si la durabilidad llega a 0 los demás efectos del objeto también se anulan»). `rotas` = [{it, n, defAntes}]. Con el cartel
+     del juego (comun/aviso-combate.js) en la pantalla que lo tenga (el mapa); si no, queda el toast de siempre. */
+  function avisoRotura(rotas, origen){
+    if(!rotas.length || typeof AvisoCombate === 'undefined') return;
+    const pasos = rotas.map(r => {
+      const it = r.it, max = FichaCalculo.durMax(it), act = FichaCalculo.durActual(it), esc = FichaCalculo.esEscudoItem(it);
+      const lin = [`Baja ${fmt(r.n)} la durabilidad: le queda${act === 1 ? '' : 'n'} ${fmt(act)} de ${fmt(max)}.`];
+      if(FichaCalculo.pierdeDefPorRotura(it)) lin.push(`Baja ${fmt(r.n)} la Defensa que da: de ${fmt(r.defAntes)} a ${fmt(defDePieza(it))}, hasta que lo reparen.`);
+      if(act <= 0) lin.push('💥 La durabilidad llegó a 0: está ROTO. Sigue ocupando su lugar, pero no da ningún efecto (ni Defensa ni bonos) hasta repararlo.');
+      else if(act === 1) lin.push('⚠ Le queda 1 punto: el próximo lo rompe del todo.');
+      return {titulo: `${esc ? '🛡' : '💥'} ${it.nombre}${esc ? ' (abollado)' : ''}`, texto: lin.join('\n')};
+    });
+    pasos.push({titulo: 'Para tener en cuenta', texto: 'Si la durabilidad de una pieza llega a 0, se rompe y también se anulan los demás efectos que da. Se repara fuera de combate: el herrero de una tienda, el talento de reparar o un Óleo reparador.'});
+    const nombres = [...new Set(rotas.map(r => r.it.nombre))].join(' y ');
+    const rotoAlguno = rotas.some(r => FichaCalculo.durActual(r.it) <= 0);
+    AvisoCombate.mostrar({icono: '💥', titulo: `${origen ? String(origen).split(' · ')[0] : 'Un golpe'} te rompió ${nombres}`, pasos,
+      veredicto: {tono: 'malo', grande: rotoAlguno ? '¡ROTO!' : 'Armadura rota', chico: origen ? String(origen) : ''}});
+  }
+  // Una pieza puntual: +N de armadura rota (hasta su durabilidad) y −N de durabilidad.
+  function romperPieza(S, it, n, ui, origen){
+    const defAntes = defDePieza(it);
+    it.armRota = Math.min(FichaCalculo.durMax(it), FichaCalculo.armRotaDe(it) + n);
+    desgastarItem(S, it, n, ui);
+    ui.toast(`💥 Se dañó ${it.nombre}`);
+    ui.cambio(['equipo', 'mochila', 'refresh']);
+    avisoRotura([{it, n, defAntes}], origen);
+  }
+  // Rompe armadura: una pieza de armadura equipada (que todavía no esté rota) elegida AL AZAR.
+  function rompeArmaduraAlAzar(S, veces, ui, origen){
+    const tocadas = [], rotas = new Map();
+    for(let k = 0; k < Math.max(1, veces || 1); k++){
+      const pool = S.inventario.filter(i => i.equipado && FichaCalculo.esArmaduraItem(i) && FichaCalculo.durActual(i) > 0);
+      if(!pool.length) break;
+      const it = pool[Math.floor(Math.random() * pool.length)];
+      if(!rotas.has(it)) rotas.set(it, {it, n: 0, defAntes: defDePieza(it)});
+      rotas.get(it).n++;
+      it.armRota = Math.min(FichaCalculo.durMax(it), FichaCalculo.armRotaDe(it) + 1);
+      desgastarItem(S, it, 1, ui);
+      tocadas.push(it.nombre);
+    }
+    if(!tocadas.length){ ui.toast('Rompe armadura: no tenés piezas de armadura equipadas que se puedan romper'); return 0; }
+    ui.toast(`💥 Rompe armadura: se dañó ${[...new Set(tocadas)].join(', ')}`);
+    ui.cambio(['equipo', 'mochila', 'refresh']);
+    avisoRotura([...rotas.values()], origen);
+    return tocadas.length;
+  }
+  // Un estado armado a partir de lo que manda una habilidad o una trampa ({nombre, turnos, mods, hp, stacks, escudoMagico…}):
+  // el preset con ese nombre con los números de la habilidad encima (comun/combatiente.js, ajustarPreset), o uno propio.
+  function estadoDeSpec(spec, presets){
+    const preset = FichaHabilidades.presetPorNombre(presets, spec.nombre);
+    let draft;
+    if(preset){
+      const {nombre, ...resto} = preset;
+      draft = {id: uid(), nombre, ...structuredClone(resto)};
+      Combatiente.ajustarPreset(draft, spec, 'hpturno');
+    }else{
+      const mods = (spec.mods || []).map(m => ({stat: m.stat, val: num(m.val)}));
+      const txt = mods.map(m => `${num(m.val) > 0 ? '+' : ''}${fmt(num(m.val))} ${FichaCalculo.STAT_LABEL[m.stat] || m.stat}`);
+      if(spec.hp) txt.push(`${spec.hp > 0 ? '+' : ''}${spec.hp} HP por turno`);
+      if(spec.escudoMagico) txt.push(`escudo de ${num(spec.escudoMagico)}`);
+      draft = {id: uid(), nombre: spec.nombre || 'Efecto', polaridad: spec.polaridad || (spec.escudoMagico ? 'buff' : 'debuff'), turnos: num(spec.turnos), stacks: Math.max(1, Math.round(num(spec.stacks)) || 1),   // los stacks que manda (Apuntando ×X, 2026-10-11)
+         hpturno: num(spec.hp), stacksturno: 0,
+        permanente: false, detalle: spec.detalle || txt.join(', '), mods, ...(num(spec.escudoMagico) ? {escudoMagico: num(spec.escudoMagico)} : {})};
+    }
+    draft.activo = true;
+    if(!draft.polaridad) draft.polaridad = 'debuff';
+    if(spec.soltar && Combatiente.soltarNorm(spec.soltar)) draft.soltar = Combatiente.soltarNorm(spec.soltar);   // cómo se suelta (trampas de Atrapar)
+    if(spec.protege){ draft.protege = spec.protege; draft.protegeNombre = spec.protegeNombre || ''; }   // Miti-Miti (Tanque, 2026-10-11): a quién protege
+    if(spec.permanente === true) draft.permanente = true;   // «no vence» (Marcar, 2026-10-12)
+    if(spec.marca){ draft.marca = spec.marca; draft.marcaNombre = spec.marcaNombre || ''; }   // Marcar (Shooter, 2026-10-12): a quién marcó
+    if(spec.marcadoPor){ draft.marcadoPor = spec.marcadoPor; draft.marcadoToken = spec.marcadoToken || ''; }
+    if(spec.miedoDe){ draft.miedoDe = spec.miedoDe; draft.miedoDeNombre = spec.miedoDeNombre || ''; }
+    if(spec.provocaDe){ draft.provocaDe = spec.provocaDe; draft.provocaDeNombre = spec.provocaDeNombre || ''; }   // 😤 Provocado por quién (2026-10-26)   // 😱 Miedo (2026-10-18): quién lo asustó
+    if(spec.resetea) draft.resetea = true;   // ☠ vuelve a esos stacks, no los suma (la Nube tóxica, 2026-10-26)
+    if(spec.finCombate) draft.finCombate = true;   // 🩸 se va al «Finalizar combate» (el Relicario de sangre, 2026-10-27)
+    return draft;
+  }
+  function aplicarEstadoRecibido(S, spec, origen, ui){
+    // Durabilidad (2026-09-26): la Armadura rota y el desgaste son de los ÍTEMS, no un estado del personaje.
+    if(spec.nombre === 'Desgaste'){
+      // `item: 'parry'` (2026-10-29): un Parry elegido a mano no dice con qué paró — el escudo puesto o, si no, la única pieza con la que se puede parar.
+      const it = spec.item === 'parry' ? piezaDelParry(S) : S.inventario.find(x => x.id === spec.item);
+      if(it && FichaCalculo.durableItem(it)){ desgastarItem(S, it, 1, ui); ui.cambio(['equipo', 'mochila', 'refresh']); }
+      else ui.toast(`Desgaste: no encuentro ese ítem en tu inventario`);
+      return;
+    }
+    if(spec.nombre === 'Armadura rota'){
+      let n = Math.max(1, num(spec.stacks) || 1);
+      // 💍 Armadura indestructible (anillo, 2026-10-12): la primera Armadura rota del combate se absorbe. En un personaje la rotura va a las piezas,
+      // no a un estado, así que se frena acá (el mapa solo la veía en los estados; la marca la libera el mapa al terminar el combate, js/25).
+      if(num(FichaCalculo.calcular(S).final.absorbearmadura) > 0 && !S.absorbeUsada){
+        S.absorbeUsada = true; n -= 1;
+        const quien = ((S.meta && S.meta.nombre) || '').trim();
+        ui.toast('💍 El anillo de armadura indestructible absorbió la Armadura rota');
+        try{ ui.recordatorios([{nombre: `💍 ${quien ? quien + ': ' : ''}el anillo absorbió la Armadura rota (una vez por combate)`, detalle: ''}]); }catch(e){}
+        ui.cambio(['otros', 'refresh']);
+        if(n <= 0) return;
+      }
+      // Con `item` (Atraviesa escudos, 2026-10-12): esa pieza puntual (el escudo que paró el disparo), no una al azar.
+      // `item: 'escudo'`: el escudo que tiene puesto (un Parry elegido a mano no dice con cuál paró, 2026-10-29).
+      const it = spec.item === 'escudo' ? (S.inventario || []).find(x => x.equipado && FichaCalculo.esEscudoItem(x)) || null
+        : spec.item ? S.inventario.find(x => x.id === spec.item) : null;
+      if(it && FichaCalculo.durableItem(it)){ romperPieza(S, it, n, ui, origen); return; }
+      rompeArmaduraAlAzar(S, n, ui, origen); return;
+    }
+    // «Revivir» (2026-10-06, el consumible Revive que usa un aliado): si sigue inconsciente (no muerto del todo), vuelve con `pct` % de la
+    // vida máxima y Titilando. Si ya se levantó o ya murió, no hace nada (y lo dice).
+    if(spec.nombre === 'Revivir'){
+      const quien = origen ? origen + ': ' : '';
+      if(S.muerto && S.muerto.definitivo){ ui.toast(`${quien}llegó tarde, ya estabas muerto`); return; }
+      if(num(S.hp) > 0){ ui.toast(`${quien}ya estabas en pie`); return; }
+      const {val} = hpRevivir(S, 'pct', num(spec.pct) || 50);
+      revivir(S, val);
+      ui.cambio(['vitals', 'efectos', 'refresh']);
+      ui.toast(`✚ ${quien}te revivió con ${fmt(val)} de vida (titilás hasta que empiece tu turno)`);
+      return;
+    }
+    // «Pierde SP» (2026-10-04, Succión arcana): gasta `stacks` SP (sin pasar de lo que tiene).
+    if(spec.nombre === 'Pierde SP'){
+      const max = num(FichaCalculo.calcular(S).final.sp), antes = Math.max(0, max - num(S.spGastado));
+      const n = Math.min(antes, Math.max(0, Math.round(num(spec.stacks))));
+      S.spGastado = num(S.spGastado) + n;
+      ui.cambio(['vitals', 'refresh']);
+      ui.toast(`${origen ? origen + ': ' : ''}−${fmt(n)} SP (${fmt(antes)} → ${fmt(antes - n)})`);
+      return;
+    }
+    // «Quitar estado» (2026-10-18, los Estandartes: el aliado se alejó): saca ese estado entero, sin aviso si ya no estaba.
+    if(spec.nombre === 'Quitar estado'){
+      const antes = (S.efectos || []).length;
+      S.efectos = (S.efectos || []).filter(x => !(x && x.nombre === spec.estado));
+      if(S.efectos.length !== antes) ui.cambio(['efectos', 'refresh']);
+      return;
+    }
+    // «Acortar estado» (2026-10-04, Recuperarse rápido de los pies): le saca `stacks` turnos al estado `estado` (si llega a 0, se va).
+    if(spec.nombre === 'Acortar estado'){
+      const e = (S.efectos || []).find(x => x && x.activo !== false && x.nombre === spec.estado && !x.permanente);
+      if(!e){ ui.toast(`${origen ? origen + ': ' : ''}ya no tenés ${spec.estado}`); return; }
+      const menos = Math.max(1, Math.round(num(spec.stacks) || 1));
+      e.turnos = Math.max(0, num(e.turnos) - menos);
+      if(e.turnos <= 0) S.efectos = S.efectos.filter(x => x !== e);
+      ui.cambio(['efectos', 'refresh']);
+      ui.toast(`${origen ? origen + ': ' : ''}${spec.estado} ${e.turnos > 0 ? `queda en ${e.turnos} turno${e.turnos === 1 ? '' : 's'}` : 'se terminó'}`);
+      return;
+    }
+    // «Transfusión» (2026-10-13, Transfusión sanguínea): `vida` negativa = da vida (nunca baja de 1); positivo = recibe (sin pasar el máximo; a un
+    // caído no lo levanta: Combatiente.curaQueEntra).
+    if(spec.nombre === 'Transfusión'){
+      const d = Math.round(num(spec.vida !== undefined ? spec.vida : spec.hp)), antes = num(S.hp), max = num(FichaCalculo.calcular(S).final.hpmax);
+      const nuevo = d < 0 ? Math.max(Math.min(antes, 1), antes + d) : Math.min(max > 0 ? max : antes + d, antes + Combatiente.curaQueEntra(antes, d, S.efectos));
+      S.hp = nuevo;
+      ui.cambio(['vitals', 'refresh']);
+      ui.toast(`🩸 ${origen ? origen + ': ' : ''}${d < 0 ? 'diste' : 'recibiste'} ${fmt(Math.abs(nuevo - antes))} de vida (${fmt(antes)} → ${fmt(nuevo)})`);
+      return;
+    }
+    // 🫳 «Robo» (2026-10-14, vtt-hexgrid/js/47): un ladrón se llevó una unidad de este ítem del cinturón.
+    if(spec.nombre === 'Robo'){
+      const it = (S.cinturon || []).find(x => x && x.nombre === spec.item && num(x.unidades) > 0 && !x.reservado);
+      if(!it){ if(!spec.secreto) ui.toast(`🫳 ${origen ? origen + ' ' : ''}intentó robarte ${spec.item || 'algo'}, pero ya no lo tenías`); return; }
+      it.unidades = num(it.unidades) - 1;
+      if(it.unidades <= 0) S.cinturon = S.cinturon.filter(x => x !== it);
+      // En sigilo (2026-10-14, dueño): sin aviso; se da cuenta al empezar su próximo turno (FichaMantenimiento: `robosSinNotar`).
+      if(spec.secreto){ S.robosSinNotar = [...(Array.isArray(S.robosSinNotar) ? S.robosSinNotar : []), String(spec.item || 'algo')].slice(-10); ui.cambio(['cinturon', 'refresh']); return; }
+      ui.cambio(['cinturon', 'refresh']);
+      ui.toast(`🫳 ${origen || 'Alguien'} te robó: ${spec.item}`);
+      return;
+    }
+    // «Pierde No2» (2026-10-02, Sonic Boom): baja los No2 (`stacks` = cuántos); si llega a 0 y corresponde, queda Sentado.
+    if(spec.nombre === 'Gana No2'){   // 🧉 el Matelisto Taragüí (2026-10-18): aunque pase su máximo (dueño); lo de más se va en la próxima recarga
+      const n = Math.max(0, Math.round(num(spec.stacks))), antes = num(S.nitros);
+      S.nitros = antes + n;
+      ui.cambio(['nitros', 'refresh']);
+      ui.toast(`${origen ? origen + ': ' : ''}+${fmt(S.nitros - antes)} No2 (${fmt(antes)} → ${fmt(S.nitros)})`);
+      return;
+    }
+    if(spec.nombre === 'Pierde No2'){
+      const n = Math.max(0, Math.round(num(spec.stacks))), antes = num(S.nitros);
+      S.nitros = Math.max(0, antes - n);
+      let txt = `−${fmt(n)} No2 (${fmt(antes)} → ${fmt(S.nitros)})`;
+      if(S.nitros <= 0 && spec.sentadoEnCero){ const r = Combatiente.agregarEstado(S.efectos, estadoDeSpec({nombre: 'Sentado'}, ui.presets)); if(r.ok) txt += ' · quedás Sentado'; }
+      ui.cambio(['nitros', 'efectos', 'refresh']);
+      ui.toast(`${origen ? origen + ': ' : ''}${txt}`);
+      return;
+    }
+    const draft = estadoDeSpec(spec, ui.presets);
+    const quien = origen ? `${origen}: ` : '';
+    // 🔮 La Piedra bezoar: el Veneno entra con 1 stack menos (si no queda nada, no entra).
+    if(!Combatiente.bezoar(draft, (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)))){ ui.toast(`🔮 ${quien}la Piedra bezoar se tragó el Veneno`); return; }
+    // Inmunidades, acumulación y renovación: la regla común (comun/combatiente.js, agregarEstado).
+    const r = Combatiente.agregarEstado(S.efectos, draft);
+    if(!r.ok){ ui.toast(`🛡 ${quien}Inmune ahora mismo (${r.motivo}) — ${draft.nombre} no te afectó`); return; }
+    if(r.que === 'yaLoTiene'){ ui.toast(`${quien}${draft.nombre}: ya lo tenías, no se acumula`); return; }
+    // Lo que se dispara (veneno, regeneración…) pega apenas te lo ponen (2026-10-06, P161).
+    let resF = 0;
+    try{ resF = num(FichaCalculo.calcular(S).final.resfuego); }catch(e){}   // (un personaje a medio armar)
+    const dis = Combatiente.dispararAlAplicar(r, S.efectos, {hp: 'hpturno', resFuego: resF, hpActual: S.hp});
+    if(dis.hp){ try{ fijarHp(S, num(S.hp) + dis.hp); revisarAnkh(S); revisarMuerte(S); }catch(e){ S.hp = Math.max(0, num(S.hp) + dis.hp); } }
+    ui.cambio(['efectos', 'refresh', ...(dis.hp ? ['vitals'] : [])]);
+    ui.toast(`🎯 ${quien}recibiste ${draft.nombre}${r.que === 'renovado' ? ' (se renovó el que tenías)' : r.que === 'acumulado' ? ` (×${r.estado.stacks})` : ''}${dis.hp ? ` · ya ${dis.hp < 0 ? 'te sacó' : 'te curó'} ${fmt(Math.abs(dis.hp))} HP` : ''}`);
+  }
+  // Aplica un efecto del cuadro de Ejecución directo sobre el propio personaje (`fichaId`), sin esperar al GM.
+  function dueloAplicarEfectoPropio(S, fichaId, d, ef, ui){
+    if(!fichaId || d.defensor.tipo !== 'pj' || d.defensor.ref !== fichaId) return {manual: true, nota: 'a mano'};
+    const spec = Duelo.specDeEfecto(ef);
+    if(!spec) return {manual: true, nota: 'a mano'};
+    if(spec.cura){
+      const antes = num(S.hp);
+      ui.fijarHp(antes + num(spec.cura));
+      return {nota: `+${fmt(num(spec.cura))} HP (${fmt(antes)} → ${fmt(num(S.hp))})`};
+    }
+    aplicarEstadoRecibido(S, spec, `${d.atacante.nombre} · ${ef.nombre}`, ui);
+    return {nota: typeof EstadosAplicar !== 'undefined' ? EstadosAplicar.texto(spec) : spec.nombre};
+  }
+  function xDeHab(it, xSp, xNitros){ return FichaHabilidades.spVariable(it) ? num(xSp) : FichaHabilidades.nitrosVariable(it) ? num(xNitros) : FichaHabilidades.hpVariable(it) ? num(it._xHp) : 0; }
+  // La Ejecución para el cuadro del duelo: la regla común (comun/combatiente.js, habEjecucion).
+  // `arma`: con la que se ejecuta (si cuesta lo mismo que un ataque); sin ella, la principal — para «el daño de tu arma».
+  function habDueloDatos(S, it, xSp, xNitros, arma){
+    const c = FichaCalculo.calcular(S);
+    const a = arma || ((FichaCombate.armasEquipadasConDano(S)[0] || {}).item) || null;
+    return Combatiente.habEjecucion(it, FichaBotonera.dueloDe(it), {stat: s => c.final[s], etq: s => FichaCalculo.STAT_LABEL[s] || s, X: xDeHab(it, xSp, xNitros),
+      armaDano: a ? FichaCombate.armaDanoTxt(a, c.final.dmg) : '', armaPerfora: a ? num(a.perfora) : 0, nivel: num(S.meta && S.meta.nivel) || 1});   // nivel: el Taunt (PdG.Esp + nivel, 2026-10-27)
+  }
+  // Ataque con arma hecho con una habilidad (`duelo.modo === 'arma'`): el ataque con arreglos (comun/combatiente.js).
+  function ataqueDeHabArma(S, it, arma, xSp, xNitros, ui){
+    const c = FichaBotonera.dueloDe(it);
+    if(!c || c.modo !== 'arma' || !ui.dueloDisponible()) return null;
+    return Combatiente.ataqueConArreglos(it, c, {X: c.x === 'sp' ? num(xSp) : num(xNitros),
+      arma: {id: arma ? arma.id : '', nombre: arma ? arma.nombre : '', tipoDado: FichaCombate.tipoAtaque(arma), rango: !!(arma && arma.armaDeRango), espalda: arma && arma.espalda, sinParry: !!(arma && arma.sinParry)},
+      alcance: c.alcance !== undefined && c.alcance !== 'auto' ? Combatiente.alcanceHab(c, 'pdg', s => FichaCalculo.calcular(S).final[s]) : FichaCombate.alcanceDeArma(S, arma)});
+  }
+  // ✨ Automática, solo sobre uno mismo y sin tiradas (Blindaje y parecidos): se aplica directo, sin abrir el cuadro, y se anuncia.
+  // Devuelve false si no es ese caso.
+  function aplicarHabSobreMiDirecto(S, it, h, ui){
+    if(!Combatiente.sobreSiSinTiradas(h) || !ui.puedeEscribir()) return false;
+    const yo = ui.yo();
+    const d = {defensor: {tipo: 'pj', ref: yo.ref}, atacante: {nombre: (S.meta && S.meta.nombre) || 'Personaje'}};
+    const hechos = (h.efectos || []).map(ef => { const r = dueloAplicarEfectoPropio(S, yo.ref, d, ef, ui); return r && !r.manual && r.nota ? r.nota : `${ef.nombre || 'Efecto'}: a mano`; });
+    const texto = [it.detalle || it.efectoDetalle || '', hechos.length ? '→ ' + hechos.join(' · ') : '', h.efectoLibre || '', h.efectosNota || ''].filter(Boolean).join(' ');
+    ui.mesaHabilidad(it.nombre, texto);
+    ui.cambio(['efectos', 'vitals']);
+    return true;
+  }
+  // Lo último que hace ejecutar una habilidad: anunciarla y tirar su primera tirada, o abrir el duelo.
+  /* ✨ Carga Elemental (Mago, 2026-10-13, dueño): con la habilidad, al lanzar una skill de daño especial se pregunta el elemento (o ninguno); cuesta
+     la mitad del SP de esa skill (para arriba, mínimo 1), y se lanza una copia con la carga (Combatiente.conCarga). Sin SP para la carga, sale sin ella. */
+  async function cargaElemental(S, it, xSp, ui){
+    if(!(S.habilidades || []).some(h => h && h.cargaElemental)) return it;
+    const c = FichaBotonera.dueloDe(it);
+    if(!Combatiente.cargable(it, c)) return it;
+    const sp = FichaHabilidades.spVariable(it) ? num(xSp) : num(it.costo);
+    const costo = Math.max(1, Math.ceil(sp / 2));
+    const tengo = Math.max(0, FichaBotonera.spMaximo(S, FichaCalculo.calcular(S)) - num(S.spGastado));
+    if(tengo < costo){ ui.toast(`✨ Carga Elemental: te falta SP (cuesta ${fmt(costo)}, tenés ${fmt(tengo)}) — ${it.nombre} sale sin carga`); return it; }
+    const elegir = ui.elegir || ((t, o) => Confirmar.elegir(t, o));
+    const clave = await elegir(`¿Le ponés un elemento a ${it.nombre}? Cuesta ${fmt(costo)} SP (la mitad de la skill).`, {titulo: 'Carga Elemental', icono: '✨',
+      opciones: Object.entries(Combatiente.CARGAS).map(([k, x]) => ({valor: k, texto: `${x.icono} ${x.nombre}`, detalle: x.que})), no: 'Sin carga'});
+    if(!clave || !Combatiente.CARGAS[clave]) return it;
+    if(Combatiente.sangraPorSp(S.efectos) && !(await confirmarMaldito(S, costo, ui, 'la Carga Elemental'))) return it;   // 🩸 Maldito
+    gastarSp(S, costo, ui, 'Carga Elemental');   // 🩸 Maldito
+    ui.cambio(['vitals']);
+    const k = Combatiente.CARGAS[clave];
+    ui.toast(`✨ Carga Elemental: ${k.icono} ${k.nombre} · −${fmt(costo)} SP`);
+    return {...it, nombre: `${it.nombre} (${k.nombre})`, duelo: Combatiente.conCarga(c, clave)};
+  }
+  function terminarEjecucionHab(S, it, arma, xSp, xNitros, ui){
+    // 💰 Semiautomática: ya cobró el costo; anuncia y tira la tirada inicial (si tiene). Los efectos, a mano.
+    if(FichaBotonera.modoHab(it) !== 'auto'){ anunciarHabilidad(S, it, ui); tirarPrimeraDeHab(S, it, ui); return; }
+    if(!FichaBotonera.dueloDe(it)){
+      if(it.trampaColocar) return;   // una trampa sola: el anuncio y la casilla ya los maneja colocarTrampa
+      if(it.portalMapa || it.blink || it.bombaHumo || it.caos || it.aceleradorMapa || it.transfusionMapa){ ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); return; }   // los portales, el blink, el caos y el Acelerador: se anuncian y se eligen en el mapa
+      if(it.invoca && it.invoca.invId){ ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); return; }   // solo invoca: se anuncia (la invocación ya la hizo invocarConHab)
+      ui.toast(`${it.nombre}: todavía no tiene armada la ejecución paso a paso (✨) — se ejecutó como semiautomática`); anunciarHabilidad(S, it, ui); tirarPrimeraDeHab(S, it, ui); return;
+    }
+    // 💨 El Dash del Asalto (2026-10-26): el camino y el golpe al que atraviesa los hace el mapa (vtt-hexgrid/js/76).
+    if(it.dashMapa && ui.dash){ ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); ui.dash(it, arma); return; }
+    const aArma = ataqueDeHabArma(S, it, arma, xSp, xNitros, ui);
+    // 🕳 Excavar desde abajo (2026-10-28): primero sale en su casilla (el mapa), con +`emerger.pdg` a la Probabilidad de Golpe, y recién ahí elige a quién.
+    if(aArma && it.emerger && ui.emerger && ui.bajoTierra && ui.bajoTierra() === true){
+      const bono = Math.round(num(it.emerger.pdg));
+      if(bono && aArma.mods) aArma.mods.pdg = num(aArma.mods.pdg) + bono;
+      ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || '');
+      ui.emerger(() => ui.elegirObjetivo({yo: ui.yo(), ataque: aArma, emergio: true, suelto: () => tirarPrimeraDeHab(S, it, ui)}));
+      return;
+    }
+    if(aArma){
+      ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || '');
+      ui.elegirObjetivo({yo: ui.yo(), ataque: aArma, suelto: () => tirarPrimeraDeHab(S, it, ui)});
+      return;
+    }
+    // Zona persistente: no abre el cuadro del duelo — queda puesta en el mapa y se resuelve sola.
+    const cZona = FichaBotonera.dueloDe(it);
+    if(cZona && typeof cZona === 'object' && cZona.objetivo === 'zona'){
+      ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || '');
+      if(!ui.colocarZona(it, xSp, xNitros)) ui.toast(`${it.nombre}: para colocar la zona hace falta tener el mapa abierto`);
+      return;
+    }
+    // Solo sobre uno mismo y sin nada que tirar (Blindaje y parecidos): no hace falta el cuadro — se aplica directo y se anuncia.
+    if(aplicarHabSobreMiDirecto(S, it, habDueloDatos(S, it, xSp, xNitros, arma), ui)) return;
+    // ✨ Carga Elemental (2026-10-13): si se puede cargar, primero la pregunta (y después sigue igual, con la copia cargada).
+    if(ui.dueloDisponible() && (S.habilidades || []).some(h => h && h.cargaElemental) && Combatiente.cargable(it, FichaBotonera.dueloDe(it))){
+      cargaElemental(S, it, xSp, ui).then(it2 => lanzarDirigida(S, it2, arma, xSp, xNitros, ui)).catch(err => { console.error('Carga Elemental:', err); lanzarDirigida(S, it, arma, xSp, xNitros, ui); });
+      return;
+    }
+    lanzarDirigida(S, it, arma, xSp, xNitros, ui);
+  }
+  function lanzarDirigida(S, it, arma, xSp, xNitros, ui){
+    const hDuelo = ui.dueloDisponible() ? habDueloDatos(S, it, xSp, xNitros, arma) : null;   // habilidad dirigida (duelo): se anuncia sin tirada y la contienda va en el cuadro
+    if(hDuelo) ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); else anunciarHabilidad(S, it, ui);
+    if(hDuelo) ui.elegirObjetivo({yo: ui.yo(), ataque: {tipo: 'habilidad', hab: hDuelo, alcance: hDuelo.alcance}, suelto: () => tirarPrimeraDeHab(S, it, ui)});
+    else tirarPrimeraDeHab(S, it, ui);
+  }
+
+  /* ---------- Paso 3c-5c: habilidades que colocan algo en el mapa (js/10 y js/02) ----------
+     ui además: enMapa() (la página corre dentro del mapa —la ficha en su marco— o ES el mapa) y alMapa(tipo, msg) (la ficha le
+     manda el mensaje al mapa; el mapa llama directo a lo que hace con él: zona-habilidad, portal-habilidad,
+     zona-persistente-habilidad, trampa-habilidad). */
+  const TRAMPA_DANO_RE = /^\d{1,2}d\d{1,3}([+-]\d{1,3})?$/i;
+  // Habilidad con zona en el mapa (zonaMapa: 'cono'/'flor') o Invocar portal (portalMapa): se le avisa al mapa.
+  function avisarZonaAlMapa(S, h, ui){
+    if(!h || !ui.enMapa() || !ui.yo().ref) return;
+    // Invocar portal: le pide al mapa que deje elegir los dos puntos (dentro del Rango) y cree los portales.
+    if(h.portalMapa){
+      // `distancia` (2026-10-07, Varita del portal aliado): el segundo, a esa distancia o menos del primero. Los turnos son los de quien los abre.
+      try{ ui.alMapa('portal-habilidad', {fichaId: ui.yo().ref, casteadorTipo: 'pj', turnos: Math.max(1, num(h.portalMapa.turnos) || 3), distancia: Math.max(0, num(h.portalMapa.distancia) || 0), nombre: h.nombre}); }
+      catch(err){ console.error('No se pudo avisar el portal al mapa:', err); }
+      return;
+    }
+    // 🩸 Transfusión sanguínea (2026-10-13, Debuffer): se eligen en el mapa quién da, quién recibe y cuánto (vtt-hexgrid/js/45).
+    // El tope es el Especial de quien la usa (dueño, 2026-10-14: «el ESP del caster en lugar de 20»), aunque la copia de la habilidad diga otro número.
+    if(h.transfusionMapa){
+      const esp = Math.round(num(FichaCalculo.calcular(S).final.esp));
+      try{ ui.alMapa('transfusion-habilidad', {fichaId: ui.yo().ref, nombre: h.nombre, max: Math.max(1, esp || num(h.transfusionMapa.max) || 20)}); }
+      catch(err){ console.error('No se pudo avisar la Transfusión al mapa:', err); }
+      return;
+    }
+    // ⏩ El Acelerador (2026-10-12, Support): se elige la casilla en el mapa (vtt-hexgrid/js/40).
+    if(h.aceleradorMapa){
+      try{ ui.alMapa('acelerador-habilidad', {fichaId: ui.yo().ref, casteadorTipo: 'pj', turnos: Math.max(1, num(h.aceleradorMapa.turnos) || 10), no2: Math.max(1, num(h.aceleradorMapa.no2) || 2), nombre: h.nombre}); }
+      catch(err){ console.error('No se pudo avisar el Acelerador al mapa:', err); }
+      return;
+    }
+    // El caos (2026-10-08, Varita del caos): se elige el objetivo en el mapa y ahí se tira el d10.
+    if(h.caos){
+      try{ ui.alMapa('caos-habilidad', {fichaId: ui.yo().ref, casteadorTipo: 'pj', nombre: h.nombre, caos: h.caos}); }
+      catch(err){ console.error('No se pudo avisar el caos al mapa:', err); }
+      return;
+    }
+    // 💨 La Bomba de humo (2026-10-26, el Asalto): la niebla a sus pies, Sigilo y el movimiento libre (vtt-hexgrid/js/57).
+    if(h.bombaHumo){
+      try{ ui.alMapa('bomba-humo-habilidad', {fichaId: ui.yo().ref, casteadorTipo: 'pj', nombre: h.nombre, radio: num(h.bombaHumo.radio) || 1, turnos: num(h.bombaHumo.turnos) || 1, mover: num(h.bombaHumo.mover) || 2}); }
+      catch(err){ console.error('No se pudo avisar la Bomba de humo al mapa:', err); }
+      return;
+    }
+    // El blink (2026-10-08): quien la usa (o un aliado que ve) salta hasta `distancia` casillas.
+    if(h.blink){
+      try{ ui.alMapa('blink-habilidad', {fichaId: ui.yo().ref, casteadorTipo: 'pj', distancia: Math.max(1, num(h.blink.distancia) || 3), nombre: h.nombre}); }
+      catch(err){ console.error('No se pudo avisar el blink al mapa:', err); }
+      return;
+    }
+    if(!h.zonaMapa) return;
+    try{ ui.alMapa('zona-habilidad', {fichaId: ui.yo().ref, forma: h.zonaMapa, radio: num(h.zonaRadio) || 1, nombre: h.nombre}); }
+    catch(err){ console.error('No se pudo avisar la zona al mapa:', err); }
+  }
+  // Se ejecuta con la habilidad: coloca la trampa en el mapa (si hay token del personaje en el mapa en juego).
+  async function colocarTrampaDeHab(S, h, ui){
+    const t = h.trampaColocar;
+    if(!t || typeof TokensAuto === 'undefined' || !ui.yo().ref) return;
+    // La dificultad para detectarla sale de quien la coloca (P145): el personaje, o la invocación si `ui.valorStat` lo dice.
+    const valorDe = ui.valorStat || (st => FichaCalculo.calcular(S).final[st]);
+    // ✨ Automática (2026-09-30): se anuncia (sin la ubicación) y se elige la casilla en el mapa. Sin el mapa abierto (ficha suelta),
+    // queda al lado del token como siempre.
+    if(FichaBotonera.modoHab(h) === 'auto' && ui.enMapa()){
+      // La trampa la anuncia TokensAuto al colocarla (🎭 acción incierta para el rival, 2026-10-09); los pilares se ven, se anuncian acá.
+      if(t.pilar) ui.mesaHabilidad(h.nombre, `${h.detalle || ''}${h.detalle ? ' — ' : ''}🧱 levanta pilares de piedra.`);
+      try{ ui.alMapa('trampa-habilidad', {fichaId: ui.yo().ref, tipoToken: 'pj', nombre: h.nombre, trampa: Combatiente.trampaDeHab(h, valorDe)}); }
+      catch(err){ console.error('No se pudo avisar la trampa al mapa:', err); }
+      return;
+    }
+    if(t.pilar){ ui.toast(`🧱 ${h.nombre}: los pilares se levantan desde el mapa (abrilo y usala ahí)`); return; }
+    try{
+      const dano = TRAMPA_DANO_RE.test(String(t.dano || '').trim()) ? String(t.dano).trim() : '';
+      const r = await TokensAuto.colocarTrampas({fichaId: ui.yo().ref, tipoToken: 'pj', trampa: {...Combatiente.trampaDeHab(h, valorDe), dano}});
+      if(r.colocadas) ui.toast(`🪤 ${h.nombre}: ${r.colocadas > 1 ? r.colocadas + ' trampas colocadas' : 'trampa colocada'} en el mapa`);
+      else ui.toast(r.motivo === 'sin-token' ? `🪤 ${h.nombre}: tu personaje no tiene token en el mapa en juego — no se colocó la trampa` : `🪤 ${h.nombre}: no hay lugar libre al lado de tu token`);
+    }catch(err){ console.error('No se pudo colocar la trampa:', err); ui.toast('No se pudo colocar la trampa — revisá la consola'); }
+  }
+  // Manda al mapa todo lo que hace falta para crear la zona persistente: radio, duración, estado y/o daño, y con qué resistencia.
+  // Si hay tirada («tira» del ✨), NO se tira acá (2026-10-02, P143: la habilidad no falla, la zona aparece siempre): se manda el valor
+  // del stat en este momento y el mapa lo tira cada vez que la zona afecta a alguien. Devuelve false si no se pudo avisar (sin mapa abierto).
+  function colocarZonaDeHab(S, it, xSp, xNitros, ui){
+    const c = FichaBotonera.dueloDe(it);
+    if(!c || typeof c !== 'object' || c.objetivo !== 'zona') return false;
+    if(!ui.enMapa() || !ui.yo().ref) return false;
+    const stat = c.tira || '';
+    const v = stat ? FichaCalculo.calcular(S).final[stat] : NaN;
+    try{
+      // El mensaje lo arma la regla común (comun/combatiente.js, zonaDeHab), el mismo que manda un creep.
+      const zona = Combatiente.zonaDeHab(it, c, {fichaId: ui.yo().ref, tipo: 'pj', X: xDeHab(it, xSp, xNitros), tiraValor: Number.isFinite(v) ? v : undefined});
+      ui.alMapa(zona.tipo, zona);
+      return true;
+    }catch(err){ console.error('No se pudo avisar la zona al mapa:', err); return false; }
+  }
+
+  /* ---------- Habilidad que invoca (2026-10-02, pedido del dueño: «Invocar Abeja» de Bizzante) ----------
+     `h.invoca = {invId}`: una de las invocaciones del personaje, la plantilla. Al ejecutarla (después de cobrar) despierta la
+     plantilla —o una copia suya que esté dormida— con sus turnos («Cuántos turnos dura»), la vida y los No2 llenos y los cooldowns a
+     cero; si ya están todas en juego, crea una copia nueva («Abeja 2», con `copiaDe`), así se puede usar varias veces seguidas. Con el
+     mapa abierto le pide la casilla donde aparece (el mapa mueve su token o lo crea, y la mesa se entera por la Crónica). Devuelve la
+     invocación, {falta: true} si la invocación elegida ya no existe, o null si la habilidad no invoca. */
+  function invocacionDeHab(S, h){
+    const c = h && h.invoca;
+    if(!c || !c.invId) return null;
+    const lista = S.invocaciones = Array.isArray(S.invocaciones) ? S.invocaciones : [];
+    const plantilla = lista.find(i => i && i.id === c.invId);
+    if(!plantilla) return {falta: true};
+    const familia = [plantilla, ...lista.filter(i => i && i.copiaDe === plantilla.id)];
+    let inv = familia.find(i => i.activa === false);
+    if(!inv){
+      inv = structuredClone(plantilla);
+      inv.id = uid();
+      inv.copiaDe = plantilla.id;
+      const base = plantilla.nombre || 'Invocación';
+      let n = familia.length + 1;
+      while(lista.some(i => i && i.nombre === `${base} ${n}`)) n++;
+      inv.nombre = `${base} ${n}`;
+      inv.habilidades = (inv.habilidades || []).map(x => ({...x, id: uid()}));
+      inv.estados = (inv.estados || []).map(x => ({...x, id: uid()}));
+      inv.equipo = (inv.equipo || []).map(x => ({...x, id: uid()}));
+      lista.splice(lista.indexOf(familia[familia.length - 1]) + 1, 0, inv);
+    }
+    inv.activa = true;
+    inv.cooldownActual = num(inv.cooldown);
+    delete inv.turnosAgotados;   // ⏳ (2026-10-30)
+    if(num(inv.hpMax) > 0) inv.hp = num(inv.hpMax);
+    inv.nitros = InvCalculo.nitrosMax(inv);
+    (inv.habilidades || []).forEach(x => { x.cdActual = 0; });
+    return inv;
+  }
+  /* 👁 Un consumible que invoca algo por un rato (2026-10-20, el Ojo de Kicillof): `it.invocaTemporal = {id, nombre, turnos, mov, vision, color}`.
+     Crea (o vuelve a despertar: siempre la misma, `id`, así no se acumulan) una invocación con esos turnos (su cooldown: se duerme al llegar a 0),
+     Movimiento `mov` (sus No2), visión en flor de radio `vision` para todos lados que revela lo oculto, invisible para los rivales y sin mareo; y
+     le pide al mapa dónde aparece (ui.invocar, el mismo aviso que una habilidad que invoca). */
+  function invocarTemporal(S, it, ui){
+    const c = it.invocaTemporal || {}, lista = S.invocaciones = Array.isArray(S.invocaciones) ? S.invocaciones : [];
+    const id = String(c.id || 'temporal'), turnos = Math.max(1, Math.round(num(c.turnos)) || 2), mov = Math.max(1, Math.round(num(c.mov)) || 5), vision = Math.max(1, Math.round(num(c.vision)) || 2);
+    let inv = lista.find(i => i && i.id === id);
+    if(!inv){
+      inv = {id, nombre: String(c.nombre || it.nombre), color: c.color || '#7FD4E8', imagen: '', activa: true, cooldown: turnos, cooldownActual: turnos, hp: 1, hpMax: 1, spd: 0,
+        con: 1, fue: 1, agl: mov, des: 1, esp: 1, defensa: 0, notas: '',
+        estados: [], habilidades: [], equipo: [{id: 'arma-' + id, nombre: '', tipoItem: 'arma_1m', tipoDado: 4, peso: 1, natural: true, equipado: true}]};   // 🗡 su arma, un ítem (paso 2)
+      lista.push(inv);
+    }
+    // La cuenta baja al EMPEZAR cada turno suyo (también el primero): para que actúe `turnos` turnos completos, arranca en turnos + 1 (probado en el mapa).
+    delete inv.turnosAgotados;
+    Object.assign(inv, {activa: true, cooldown: turnos + 1, cooldownActual: turnos + 1, agl: mov, estados: [{nombre: 'Etéreo', polaridad: 'buff', etereo: true, permanente: true, turnos: 0, activo: true, detalle: 'Todos lo ven, pero nadie le puede hacer nada; solo observa. Atraviesa todo.'}], ojo: vision, veoculto: vision, etereo: true, sinMareo: true, temporal: true, ...(c.imagen ? {imagen: c.imagen, miniatura: c.imagen} : {})});
+    inv.nitros = InvCalculo.nitrosMax(inv);
+    const ref = ui.yo ? (ui.yo() || {}).ref : '';
+    const avisar = ui.invocar || (ui.alMapa && ui.enMapa && ui.enMapa() ? m => ui.alMapa('invocacion-habilidad', m) : null);
+    if(!avisar){ ui.toast(`👁 ${inv.nombre} invocado (${fmt(turnos)} turnos) — poné su token en el mapa`); return inv; }
+    avisar({ref: `${ref}~${inv.id}`, fichaId: ref, lugar: 'rango', nombre: inv.nombre, color: inv.color, quien: (S.meta && S.meta.nombre) || 'Personaje', habilidad: it.nombre, turnos});
+    return inv;
+  }
+  function invocarConHab(S, h, ui){
+    if(h && h.invocaTemporal) return invocarTemporal(S, h, ui);   // 👁 una invocación de un rato (el Ojo de Kicillof del Support)
+    const inv = invocacionDeHab(S, h);
+    if(!inv) return null;
+    if(inv.falta){ ui.toast(`${h.nombre}: la invocación que tenía elegida ya no está en tu ficha — elegí otra en el editor de la habilidad`); return null; }
+    const turnos = num(inv.cooldown);
+    const ref = ui.yo().ref;
+    if(ref && ui.enMapa()){
+      try{ ui.alMapa('invocacion-habilidad', {fichaId: ref, ref: `${ref}~${inv.id}`, nombre: inv.nombre, color: inv.color || '', quien: (S.meta && S.meta.nombre) || 'Personaje', habilidad: h.nombre, turnos}); }
+      catch(err){ console.error('No se pudo avisar la invocación al mapa:', err); }
+    }else ui.toast(`🔮 ${inv.nombre} invocada${turnos ? ` (${fmt(turnos)} turnos)` : ''} — poné su token en el mapa`);
+    return inv;
+  }
+
+  /* ---------- Talentos, trampas consumibles y el Ankh a mano (paso 4, etapa 3c-7, 2026-10-01; antes en js/05, js/10 y js/06) ---------- */
+  // Tirar un talento: 1d(nivel × 2) + la Inteligencia sin invertir. La publica cada pantalla (ui.registrarTirada).
+  function tirarSocial(S, i, ui){
+    const r = tirarDados(FichaLupa.formulaSocial(S, i));
+    if(!r){ ui.toast(`${i.nombre}: sin nivel ni Inteligencia sin invertir — no hay nada que tirar`); return; }
+    ui.registrarTirada(i.nombre, r);
+  }
+  // Trampa consumible: coloca en el mapa la trampa del ítem (`trampaDatos`) en la casilla libre al frente de tu token; después la arrastrás a donde quieras
+  // (solo la ven vos y el GM, y la disparan los rivales). Devuelve true si se colocó (entonces se gasta la unidad). fichaId: el del personaje.
+  // El consumible en la forma en que se guarda en la trampa (para devolverlo a su dueño si no se dispara).
+  function itemDeTrampa(it){ const c = structuredClone(it); delete c.imagen; delete c.equipado; delete c.enMesa; delete c.reservado; delete c.reservadoPara; delete c.id; c.unidades = 1; c.cargaActual = 1; return JSON.stringify(c); }
+  async function colocarTrampaDeItem(fichaId, it, ui){
+    const d = it.trampaDatos;
+    if(d && d.portal && d.portal.colocador){ ui.toast(`🌀 ${it.nombre} se coloca desde el mapa (tu Botonera en el mapa): ahí elegís el glifo y su destino`); return false; }
+    if(!d || typeof TokensAuto === 'undefined' || !fichaId){ ui.toast('Para colocar la trampa tenés que estar en la mesa, con tu personaje en el mapa'); return false; }
+    try{
+      const dano = TRAMPA_DANO_RE.test(String(d.dano || '').trim()) ? String(d.dano).trim() : '';
+      // Forma única de trampa (P123): el `tamano` de la flor es su radio (tamano 2 = flor de 19 casillas, como dice el ítem).
+      const r = await TokensAuto.colocarTrampas({fichaId, tipoToken: 'pj',
+        trampa: {...d, nombre: String(d.nombre || it.nombre).slice(0, 40), dano, cant: 1},
+        item: itemDeTrampa(it)});
+      if(r.colocadas){ ui.toast(`🪤 ${it.nombre} colocada junto a tu token: arrastrala en el mapa a donde la quieras`); return true; }
+      ui.toast(r.motivo === 'sin-token' ? `🪤 ${it.nombre}: tu personaje no tiene token en el mapa en juego — no se usó` : `🪤 ${it.nombre}: no hay lugar libre al lado de tu token — no se usó`);
+      return false;
+    }catch(err){ console.error('No se pudo colocar la trampa:', err); ui.toast('No se pudo colocar la trampa — revisá la consola'); return false; }
+  }
+  // El Ankh usado a mano (el botón Consumir de uno de la mochila): revive con el 25 % del HP máximo. Devuelve el nombre del
+  // ítem, o null si no está o no le quedan unidades.
+  function ankhAMano(S, key, id){
+    const it = S[key] && S[key].find(x => x.id === id);
+    if(!it || num(it.unidades) <= 0) return null;
+    return aplicarRevivirConAnkh(S, key, id);
+  }
+
+  return {gastarSp, confirmarMaldito, gastoNitrosForzado, tormentaPj, alternarSigilo, levantarse, soltarse, hpRevivir, revivir,
+    tirarSocial, colocarTrampaDeItem, itemDeTrampa, ankhAMano,
+    TRAMPA_DANO_RE, avisarZonaAlMapa, colocarTrampaDeHab, colocarZonaDeHab, invocacionDeHab, invocarConHab,
+    durAviso, desgastarItem, rompeArmaduraAlAzar, estadoDeSpec, aplicarEstadoRecibido, dueloAplicarEfectoPropio, xDeHab, habDueloDatos,
+    ataqueDeHabArma, aplicarHabSobreMiDirecto, terminarEjecucionHab,
+    habilidadTira, anunciarHabilidad, tirarPrimeraDeHab, tirarSegundaDeHab, registrarAtaqueDeHabilidad, limiteCostoX,
+    ejecutarHabilidad, confirmarCostoVariable, armasEspeciales, costoEspecial, costoEspecialTxt, habDeArmaEspecial, usarArmaEspecial, ataqueEspecialMenu,
+    atacarConArma, ataqueEspecialConArma, NOMBRE_ATAQUE_ESPECIAL,
+    tirarValorStat, gastarUnaTirada, sobrepesoPagar, parryConArma, bloqueoConArma, fuerzaGolpeValorConArma, fuerzaGolpeConArma, elegirArmaDefensa, armaElegida, tirarDanoDeArma, pedirArmaYTirar,
+    aplicarRevivirConAnkh, fijarHp, revisarAnkh, revisarMuerte,
+    purgarSiAgotado, restaurarSpDeConsumo, repararArmadura, efectoDeConsumo, tiradasDeItem, consumir};
+})();

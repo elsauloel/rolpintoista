@@ -1,0 +1,796 @@
+/* =========================================================
+   CREEP-CALCULO — las reglas de un creep, fuera de GM Tools (paso 4, etapa 4a de docs/plan-paso4-etapa4.md, 2026-10-01)
+   Lo que antes vivía en gm-toolset/js/01 y js/02 (creepStatValor, creepModTotal, Defensa, Defensa especial, críticos, No2
+   máximo, costos de atacar / Parry / habilidades, Bloqueo, Fuerza del golpe, daño del arma, normalizarCreep y sus
+   migraciones, los textos de "de dónde sale"), copiado tal cual: todo recibe el creep (`sc`). Así calculan igual GM Tools y
+   el mapa (que tenía copias parciales: creepModTotalMapa, creepDefensaMapa, zonaStatCreep…). No toca pantalla ni Firebase.
+   Necesita comun/combatiente.js.
+   ========================================================= */
+const CreepCalculo = (() => {
+  const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : 0; };
+  const fmt = n => Number.isInteger(n) ? n : Math.round(n*100)/100;
+
+  const IT2_CREEP = {
+    nitrosHabilidad: 1,            // costo por defecto de una habilidad (el de atacar es Combatiente.costoAtaque)
+  };
+  const DADOS_ARMA = [4, 6, 8, 10, 12];
+
+  /* ---------- Escala de Tipos de arma +2 ----------
+     Los Tipos pasaron de 2/4/6/8/10 a 4/6/8/10/12 (igual que en ficha.html).
+     Los creeps guardados antes traen armaTipo, el equipo y los textos con la
+     escala vieja: normalizarCreep los corre +2 una sola vez y los marca con
+     escalaTipos. Los creeps nuevos ya nacen marcados. */
+  const ESCALA_TIPOS = 2;
+  const RE_TIPOS_LISTA = /(?<![Áá]rea )(\b(?:[Tt]ipos?|[Cc]r[ií]tic[oa]s?|[Cc]rit)\s+(?:de\s+)?)((?:10|[2468])\b(?:\s*(?:,|y)\s*(?:10|[2468])\b)*)(?!\s*%)/g;
+  const RE_TIPOS_T = /\bT(10|[2468])(?=\s*,?\s*P\d)|(?<=\dd ?)T(10|[2468])\b/g;
+
+  function correrTiposTexto(txt){
+    if(typeof txt !== 'string' || !txt) return txt;
+    return txt
+      .replace(RE_TIPOS_LISTA, (m, pre, lista) => pre + lista.replace(/\d+/g, n => +n + 2))
+      .replace(RE_TIPOS_T, (m, a, b) => 'T' + (+(a || b) + 2));
+  }
+
+  function migrarObjTipos(o){
+    if(!o || typeof o !== 'object') return;
+    if(num(o.tipoDado) > 0) o.tipoDado = num(o.tipoDado) + 2;
+    ['detalle', 'descripcionNarrativa', 'efectoDetalle', 'equipoEstadoDetalle', 'notas']
+      .forEach(k => { if(typeof o[k] === 'string') o[k] = correrTiposTexto(o[k]); });
+  }
+
+  function migrarCreepTipos(sc){
+    if(num(sc.escalaTipos) >= ESCALA_TIPOS) return;
+    migrarObjTipos(sc);
+    ['equipo', 'habilidades', 'estados'].forEach(k => (Array.isArray(sc[k]) ? sc[k] : []).forEach(migrarObjTipos));
+    sc.escalaTipos = ESCALA_TIPOS;
+  }
+
+  // El atributo Inteligencia se renombró a Especial (id 'int' -> 'esp',
+  // 2026-09-18) para poder reusar el nombre después con un significado
+  // distinto — ver la misma migración en ficha.html. Se puede correr varias
+  // veces sin cambiar nada.
+  function migrarObjEspecial(o){
+    if(!o || typeof o !== 'object') return;
+    (Array.isArray(o.mods) ? o.mods : []).forEach(m => { if(m && m.stat === 'int') m.stat = 'esp'; });
+    (Array.isArray(o.efectoMods) ? o.efectoMods : []).forEach(m => { if(m && m.stat === 'int') m.stat = 'esp'; });
+    if(o.tiradaStat === 'int') o.tiradaStat = 'esp';
+    ['detalle', 'descripcionNarrativa', 'efectoDetalle', 'equipoEstadoDetalle', 'notas'].forEach(k => {
+      if(typeof o[k] === 'string') o[k] = o[k].replace(/Inteligencia/g, 'Especial').replace(/inteligencia/g, 'especial');
+    });
+  }
+
+  // 2026-09-24: las habilidades de creep armadas por el programa que tiran daño ("⚙ Automatizado: ... tira 2d6+3 de daño")
+  // ahora traen vinculada la tirada de PdG (o PdG.Esp si es mágica) para que Ejecutar tire primero la probabilidad de golpe.
+  // A las ya guardadas se les agrega al cargar; a las que ya tienen un stat elegido a mano no se las toca.
+  function migrarHabPdg(sc){
+    const U = window.CreepsBaseUtil;
+    (Array.isArray(sc.habilidades) ? sc.habilidades : []).forEach(h => {
+      if(!h || h.tiradaStat || !String(h.tiradaExtra || '').trim() || h.trampaColocar) return;
+      if(!/tira [^;]*? de daño/i.test(String(h.detalle || ''))) return;
+      h.tiradaStat = U && U.esHabMagica && U.esHabMagica(h.nombre, h.detalle) ? 'pdgmg' : 'pdg';
+    });
+  }
+
+  function migrarCreepEspecial(sc){
+    if(sc.int !== undefined){
+      if(sc.esp === undefined) sc.esp = sc.int;
+      delete sc.int;
+    }
+    (Array.isArray(Combatiente.armaEnMano(sc).mods) ? Combatiente.armaEnMano(sc).mods : []).forEach(m => { if(m && m.stat === 'int') m.stat = 'esp'; });
+    ['equipo', 'habilidades', 'estados'].forEach(k => (Array.isArray(sc[k]) ? sc[k] : []).forEach(migrarObjEspecial));
+  }
+
+  /* ---------- Ranuras del equipo ---------- */
+  const SLOT_MAP = {
+    arma_1m:'mano', arma_2m:'mano',
+    escudo_1m:'escudo', escudo_2m:'escudo',
+    armadura_blanda:'armadura', armadura_rigida:'armadura',
+    cabeza:'cabeza', manos:'manos', piernas:'piernas', pies:'pies',
+    cinturon:'cinturon', mochila:'mochila', carcaj:'carcaj',
+  };
+  function slotDe(tipoItem){ return SLOT_MAP[tipoItem] || 'otro'; }
+
+  /* ---------- Stats ---------- */
+  // 🗡 Su arma: siempre por la puerta única (Combatiente.armaEnMano, docs/plan-inventario-creeps.md), nunca por los campos arma* sueltos.
+  const armaDe = sc => Combatiente.armaEnMano(sc);
+  function danoTxt(sc, extra, dadosMas){   // dadosMas: dados del arma de más en este golpe (el Mordisco feroz)
+    const a = armaDe(sc);
+    const dados = a.peso + a.danoAmplificado + Math.max(0, num(dadosMas));
+    const tipo = a.tipoDado;
+    const fijo = a.danoFijo + Combatiente.dmgDelArma(a, num(extra));   // cuerpo a cuerpo el Dmg entero; un arco, la mitad; otra de rango, nada
+    return `${dados}d${tipo}${fijo?` + ${fmt(fijo)}`:''}`;
+  }
+
+  // Lo que el creep tiene puesto y da bonos (su arma adentro; lo guardado no: paso 4).
+  const fuentesEquipo = sc => Combatiente.equipoPuesto(sc);
+
+  // Suma los modificadores que apuntan a un stat puntual, vengan del equipo
+  // puesto o de estados activos — mismo criterio que collectMods()+modTotal
+  // en ficha.html, para que un ítem con "bloqueo +N" o un estado que suba
+  // Fuerza afecten al creep de verdad y no solo la Res. a crítico.
+  function modTotal(sc, statId){
+    let total = 0;
+    // Un «+Rango de casteo» viejo suma al Rango (2026-10-07: el rango lo da la Destreza, siempre).
+    fuentesEquipo(sc).forEach(it => (it.mods||[]).forEach(m => { if(m.stat === statId || (statId === 'rng' && m.stat === 'rangocasteo')) total += num(m.val); }));
+    (typeof Combatiente !== 'undefined' && Combatiente.sinPresasDebiles ? Combatiente.sinPresasDebiles(sc.estados||[]) : (sc.estados||[])).forEach(es => {   // (dos Presas: solo la más fuerte, 2026-10-25)
+      if(es.activo === false) return;
+      const stacks = Math.max(1, num(es.stacks)||1);
+      (es.mods||[]).forEach(m => { if(m.stat === statId || (statId === 'rng' && m.stat === 'rangocasteo')) total += num(m.val) * stacks; });
+    });
+    // Pasivas (2026-10-15, dueño: «habilitemos habilidades pasivas para creeps, no hacemos una excepción»): las mismas del catálogo de los
+    // personajes, con sus compras.
+    (sc.pasivas||[]).forEach(p => { const c = pasivaComprasCreep(p); (p.mods||[]).forEach(m => { if(m.stat === statId) total += num(m.val) * c; }); });
+    return total;
+  }
+  const pasivaComprasCreep = p => Math.max(1, Math.round(num(p && p.compras)) || 1);
+  // La vida que recuperan sus pasivas por turno (Regeneración…).
+  const regenPasivas = sc => (sc.pasivas||[]).reduce((a, p) => a + num(p.regenHp) * pasivaComprasCreep(p), 0);
+  /* 💍 Cuánto suma un creep al daño de un elemento (`masDanoElem` = {el, n}): de los anillos de su equipo y de sus pasivas (una pasiva propia
+     con el efecto del anillo que no se suelta, dueño 2026-10-18: el Chamán del cristal). → {n, fuentes: [nombres]}. */
+  function masDanoElem(sc, el){
+    const fuentes = [];
+    let n = 0;
+    const sumar = (x, mult) => { if(x && x.masDanoElem && x.masDanoElem.el === el && num(x.masDanoElem.n)){ n += num(x.masDanoElem.n) * mult; fuentes.push(x.nombre || '?'); } };
+    Combatiente.equipoPuesto(sc).forEach(i => sumar(i, 1));
+    (sc && sc.pasivas || []).forEach(p => sumar(p, pasivaComprasCreep(p)));
+    return {n, fuentes};
+  }
+
+  // Armadura rota activa reduce la Defensa — igual que en ficha.html.
+  function estadosArmadura(sc){
+    const activos = (sc.estados||[]).filter(e => e.activo !== false);
+    return {
+      rota: activos.filter(e => e.armaduraRota).reduce((a, e) => a + Math.max(1, num(e.stacks) || 1), 0),  // puntos de Defensa que quita
+    };
+  }
+  function aporteArmadura(sc, statId){
+    return Combatiente.equipoPuesto(sc).filter(it => slotDe(it.tipoItem) === 'armadura')
+      .reduce((a,it) => a + (statId === 'def' ? num(it.def) : (it.mods||[]).filter(m=>m.stat===statId).reduce((s,m)=>s+num(m.val),0)), 0);
+  }
+  function defensaEfectiva(sc){
+    const {rota} = estadosArmadura(sc);
+    let v = num(sc.defensa) + (num(sc.equipoVivo) >= 1 ? Combatiente.defDeEquipo(sc) : 0);   // 🛡 la base + lo equipado (paso 3; un creep sin convertir la trae sumada)
+    // Bonos de Defensa de los estados (ej. Piel de escoria): se suman por stack.
+    (sc.estados || []).forEach(es => { if(es.activo === false) return; const st = Math.max(1, num(es.stacks) || 1); (es.mods || []).forEach(m => { if(m.stat === 'def') v += num(m.val) * st; }); });
+    v -= rota;
+    return Math.max(0, v);
+  }
+  // Defensa especial (Paso 3 de las reglas de casteo, docs/reglas-casteo.md):
+  // stat general, fijo, que NO sale de ningún atributo (base a mano, 0 por
+  // defecto) — solo la dan ítems Raros o mejores, vía sus bonos genéricos
+  // (no tiene un campo propio como "def" en las piezas de armadura). Protege
+  // el daño de casteo que "ignora la Defensa" (Paso 1); no tiene nada que ver
+  // con Vida extra ni con la habilidad "Armadura arcana" del Mago.
+  // Resistencia elemental de un creep (2026-10-04): la base que le pone el GM (sc.resfuego…) + lo que dan su equipo y sus estados.
+  function resElemental(sc, el){
+    const id = 'res' + el;
+    return num(sc[id]) + modTotal(sc, id);   // negativa = vulnerable: recibe más daño de ese elemento (Coraza de acero pulido, 2026-10-06)
+  }
+  function armadmgEfectiva(sc){
+    return Math.max(0, num(sc.armadmg) + modTotal(sc, 'armadmg'));
+  }
+  // La resistencia a crítico: la base + lo equipado (paso 3, en vivo; un creep sin convertir la trae sumada) + los estados (Endurecido…, 2026-10-12).
+  const critDeEstados = (estados, i) => (estados || []).filter(e => e && e.activo !== false).reduce((a, e) => a + (e.mods || []).filter(m => m.stat === 'tipo' + (i + 1)).reduce((x, m) => x + num(m.val), 0) * Math.max(1, num(e.stacks) || 1), 0);
+  function critEfectivo(sc, i){
+    return num((sc.crit || [])[i]) + (num(sc.equipoVivo) >= 1 ? Combatiente.critDeEquipo(sc, i) : 0) + critDeEstados(sc.estados, i);
+  }
+  /* Stats secundarios de los creeps: los mismos que un PJ, cada uno sale de
+     su atributo (fórmula base = el atributo) + mods (ver statValor).
+     Hp.Max y No2 ya se ven arriba; Crg.Max y SP no aplican a los creeps. */
+  const DERIVADOS_POR_ATTR = {
+    con: [['resmg', 'Res.Esp'], ['rescc', 'Res.CC']],
+    fue: [['dmg', 'Dmg'], ['bloqueo', 'Bloqueo']],
+    agl: [['eva', 'Eva'], ['ini', 'Iniciativa']],
+    des: [['rng', 'Rng'], ['pdg', 'PdG'], ['parry', 'Parry'], ['percepcion', 'Percep.'], ['sigilo', 'Sigilo']],   // (crit/critpot: bonos de regla, 2026-10-20)
+    esp: [['pdgmg', 'PdG.Esp'], ['dmgesp', 'Ef.Esp'], ['resm', 'Res.Mt']],   // (el Rango de casteo se fue, 2026-10-07: el rango es de la Destreza)
+  };
+  const ATTR_NOMBRE = {con:'Constitución', fue:'Fuerza', agl:'Agilidad', des:'Destreza', esp:'Especial'};
+
+  // Los 5 atributos base (entradas con attr apuntando a sí mismas) más los
+  // stats secundarios derivados de un PJ (Res.Esp/Res.CC de Con, Dmg/
+  // Potencia de Fue, Eva/Ini/Mov de Agl, Rango/PdG/Crítico/Parry/Percepción
+  // de Des, PdG.Esp/Res.M de Especial). STATS_TIRADA_IDS
+  // recorta cuáles se muestran como botón en las Acciones.
+  const DERIVED_STATS = [
+    {id:'con', label:'Con', attr:'con'}, {id:'fue', label:'Fue', attr:'fue'},
+    {id:'agl', label:'Agi', attr:'agl'}, {id:'des', label:'Des', attr:'des'}, {id:'esp', label:'Esp', attr:'esp'},
+    {id:'resmg', label:'Res.Esp', attr:'con'}, {id:'rescc', label:'Res.CC', attr:'con'},
+    {id:'dmg', label:'Dmg', attr:'fue'}, {id:'bloqueo', label:'Bloqueo', attr:'fue'},
+    {id:'eva', label:'Eva', attr:'agl'}, {id:'ini', label:'Iniciativa', attr:'agl'}, {id:'mov', label:'Mov', attr:'agl'},
+    {id:'rng', label:'Rango', attr:'des'}, {id:'pdg', label:'PdG', attr:'des'}, {id:'crit', label:'Crítico frecuente', attr:'des'}, {id:'critpot', label:'Crítico potente', attr:'des'}, {id:'parry', label:'Parry', attr:'des'}, {id:'percepcion', label:'Percepción', attr:'des'}, {id:'sigilo', label:'Sigilo', attr:'des'},
+    {id:'pdgmg', label:'PdG.Esp', attr:'esp'}, {id:'dmgesp', label:'Ef.Esp', attr:'esp'}, {id:'resm', label:'Res.Mt', attr:'esp'},
+  ];
+  // Mismo criterio que STATS_CON_TIRADA_IDS/STATS_REDUNDANTES_COMBATE en la
+  // Botonera de la ficha: los 5 atributos base + los secundarios que no
+  // tienen ya su propio botón en la caja de Combate.
+  const STATS_TIRADA_IDS = ['con', 'fue', 'agl', 'des', 'esp', 'resmg', 'rescc', 'ini', 'pdgmg', 'dmgesp', 'resm', 'percepcion', 'sigilo'];
+  const STAT_LOOKUP = Object.fromEntries(DERIVED_STATS.map(d => [d.id, d]));
+  function statValor(sc, statId){
+    const d = STAT_LOOKUP[statId];
+    if(!d) return 0;
+    if(Combatiente.SOLO_BONO.includes(statId)) return modTotal(sc, statId);   // bonos de regla: no salen de la Destreza (2026-10-20)
+    // Suma tanto lo que sube el atributo que lo gobierna (fue, des, etc.,
+    // que arrastra a todos sus derivados) como lo que apunta directo al
+    // derivado (p.ej. un ítem con "bloqueo +N" que no toca Fuerza). Para un
+    // atributo base tirado directo (statId === d.attr) no hay que sumar el
+    // mod dos veces.
+    let v = num(sc[d.attr]) + modTotal(sc, d.attr);
+    if(statId !== d.attr) v += modTotal(sc, statId);
+    // Pajaritos (PdG/Eva) y Lisiado (PdG/Parry) ya no achican el stat: parten el resultado de la tirada (mitadesDeTirada, en tirarValorStat).
+    if(statId === 'resmg' && sc.jefe) v += 1;   // protección de jefe: +1 Res.Esp (la tirada contra los debuffs)
+    if(statId === 'mov'){
+      const activos = (sc.estados||[]).filter(e => e.activo !== false);
+      if(activos.some(e => e.inmovilizado)) v = 0;
+      else if(activos.some(e => e.rengo)) v = Math.floor(v / 2);
+    }
+    return v;
+  }
+  function estadoActivo(sc, flag){
+    return (sc.estados || []).some(e => e.activo !== false && e[flag]);
+  }
+  // Cada fuente (equipo o estado activo) que le suma a un stat, con su valor.
+  function aportesMod(sc, statId){
+    const out = [];
+    fuentesEquipo(sc).forEach(it => {
+      const v = (it.mods||[]).filter(m => m.stat === statId).reduce((a, m) => a + num(m.val), 0);
+      if(v) out.push({nombre: it.nombre || '(sin nombre)', val: v, tipo: 'equipado'});
+    });
+    (sc.estados||[]).forEach(es => {
+      if(es.activo === false) return;
+      const stacks = Math.max(1, num(es.stacks)||1);
+      const v = (es.mods||[]).filter(m => m.stat === statId).reduce((a, m) => a + num(m.val) * stacks, 0);
+      if(v) out.push({nombre: es.nombre || '(sin nombre)', val: v, tipo: 'estado alterado'});
+    });
+    return out;
+  }
+  // Nombres de los estados activos que aportan un mod a ese stat, para
+  // poder mostrar "de dónde sale" al tocar el indicador +/-.
+  function origenesMod(sc, statId){
+    const deEquipo = fuentesEquipo(sc)
+      .filter(it => (it.mods||[]).some(m => m.stat === statId))
+      .map(it => it.nombre || '(sin nombre)');
+    const deEstados = (typeof Combatiente !== 'undefined' && Combatiente.sinPresasDebiles ? Combatiente.sinPresasDebiles(sc.estados||[]) : (sc.estados||[]))
+      .filter(es => es.activo !== false && (es.mods||[]).some(m => m.stat === statId))
+      .map(es => es.nombre || '(sin nombre)');
+    return [...deEquipo, ...deEstados];
+  }
+
+  /* ---------- De dónde sale cada cosa (textos para la 🔍 y los globitos) ---------- */
+  const conSigno = v => `${v > 0 ? '+' : ''}${fmt(v)}`;
+  // De dónde sale un stat secundario: su atributo y lo que lo modifica.
+  function statOrigenTxt(sc, statId, label){
+    const attr = STAT_LOOKUP[statId].attr;
+    const L = [`${ATTR_NOMBRE[attr]} base: ${fmt(num(sc[attr]))}`];
+    aportesMod(sc, attr).forEach(a => L.push(`${conSigno(a.val)} ${ATTR_NOMBRE[attr]} por ${a.nombre}`));
+    aportesMod(sc, statId).forEach(a => L.push(`${conSigno(a.val)} ${label} por ${a.nombre}`));
+    if(['pdg', 'pdgmg', 'eva'].includes(statId) && estadoActivo(sc, 'mitadPdgEva')) L.push('Pajaritos: a la mitad');
+    if((statId === 'pdg' || statId === 'parry') && estadoActivo(sc, 'lisiado')) L.push('Lisiado: a la mitad');
+    if(['pdg', 'parry', 'eva'].includes(statId) && estadoActivo(sc, 'paralisis')) L.push('Parálisis: a la mitad');
+    L.push(`= ${fmt(statValor(sc, statId))}`);
+    return L.join('\n');
+  }
+  function armadmgOrigenTxt(sc){
+    const L = [];
+    let deItems = 0;
+    fuentesEquipo(sc).forEach(it => {
+      const v = (it.mods || []).filter(m => m.stat === 'armadmg').reduce((a, m) => a + num(m.val), 0);
+      if(!v) return;
+      deItems += v;
+      L.push(`${conSigno(v)} por ${it.nombre || '(sin nombre)'}`);
+    });
+    const resto = num(sc.armadmg);   // la base (armadmgEfectiva = base + lo de los ítems y estados; antes se le restaban otra vez los ítems: 2026-10-30)
+    if(resto || !L.length) L.push(`${conSigno(resto)} base (cargada a mano)`);
+    const otros = armadmgEfectiva(sc) - resto - deItems;
+    if(otros) L.push(`${conSigno(otros)} por estados`);
+    L.push(`= ${fmt(armadmgEfectiva(sc))}`);
+    return L.join('\n');
+  }
+  // Ataque = daño del arma + Fuerza (Dmg), el mismo que tira "Daño Arma".
+  function ataqueTxt(sc){
+    return danoTxt(sc, statValor(sc, 'dmg'));
+  }
+  // De dónde sale el Ataque: dados y fijo del arma, Fuerza y lo que la sube,
+  // mods directos de Dmg. Un arma de rango no suma Fuerza (ver danoTxt).
+  function ataqueOrigenTxt(sc){
+    const a = armaDe(sc);
+    const dados = a.peso + a.danoAmplificado;
+    const L = [`${dados}d${a.tipoDado} por ${a.nombre || 'el arma'}`];
+    if(a.danoFijo) L.push(`${conSigno(a.danoFijo)} fijo del arma`);
+    if(a.armaDeRango){
+      L.push('Arma de rango: no suma Fuerza');
+    }else{
+      L.push(`${conSigno(num(sc.fue))} Fuerza base`);
+      aportesMod(sc, 'fue').forEach(a => L.push(`${conSigno(a.val)} Fuerza por ${a.nombre}`));
+      aportesMod(sc, 'dmg').forEach(a => L.push(`${conSigno(a.val)} Daño por ${a.nombre}`));
+    }
+    L.push(`= ${ataqueTxt(sc)}`);
+    return L.join('\n');
+  }
+  // De dónde sale la Defensa: lo que da cada pieza de armadura, el resto
+  // cargado a mano, y si la armadura está rota o arruinada.
+  function defensaOrigenTxt(sc){
+    const L = [];
+    let deItems = 0;
+    (sc.equipo||[]).filter(it => it && it.equipado !== false).forEach(it => {
+      const v = Combatiente.defDeItem(it);
+      if(!v) return;
+      deItems += v;
+      L.push(`${conSigno(v)} por ${it.nombre || '(sin nombre)'}`);
+    });
+    const resto = num(sc.equipoVivo) >= 1 ? num(sc.defensa) : num(sc.defensa) - deItems;   // (la base)
+    if(resto || !L.length) L.push(`${conSigno(resto)} base (cargada a mano)`);
+    const {rota} = estadosArmadura(sc);
+    if(rota) L.push(`Armadura rota: -${rota} de Defensa`);
+    L.push(`= ${fmt(defensaEfectiva(sc))}`);
+    return L.join('\n');
+  }
+  // De dónde sale una resistencia a crítico (i = 0..4 → Tipo 4..12): lo que
+  // da cada pieza de equipo (se suma a sc.crit al equiparla), el resto cargado
+  // a mano, y si la armadura está rota o arruinada (ver critEfectivo).
+  function critOrigenTxt(sc, i){
+    const stat = 'tipo' + (i + 1);
+    const L = [];
+    let deItems = 0;
+    (sc.equipo||[]).filter(it => it && it.equipado !== false).forEach(it => {
+      const v = Combatiente.critDeItem(it, i);
+      if(!v) return;
+      deItems += v;
+      L.push(`${conSigno(v)} por ${it.nombre || '(sin nombre)'}`);
+    });
+    const resto = num(sc.equipoVivo) >= 1 ? num(sc.crit[i]) : num(sc.crit[i]) - deItems;   // (la base)
+    if(resto || !L.length) L.push(`${conSigno(resto)} base (cargada a mano)`);
+    const deEst = critDeEstados(sc.estados, i);
+    if(deEst) L.push(`${conSigno(deEst)} por estados`);
+    L.push(`= ${conSigno(critEfectivo(sc, i))}`);
+    return L.join('\n');
+  }
+  function armaduraOrigenTxt(sc){
+    const activos = (sc.estados||[]).filter(e => e.activo !== false && e.armaduraRota);
+    const nombres = activos.map(e => e.nombre || '(sin nombre)').join(', ');
+    return `Reducido por: ${nombres || 'estado activo'}`;
+  }
+
+  /* ---------- Vida y No2 ---------- */
+  // ¿Estos modificadores cambian el Hp.Max? (Con, o Hp.Max directo)
+  function modsAfectanHp(mods){
+    return (mods || []).some(m => m.stat === 'con' || m.stat === 'hpmax');
+  }
+  // Recalcula hpMax = con*5 + mods de Hp.Max (con efectivo; equipo y estados
+  // incluidos, igual que en la ficha) cuando cambia con o algo que da Hp.Max.
+  // Si el creep estaba a HP lleno lo deja lleno; si no, sólo recorta hp si se
+  // pasa del nuevo máximo.
+  function actualizarHpMaxPorCon(sc){
+    const conEfectivo = num(sc.con) + modTotal(sc, 'con');
+    const nuevoHpMax = Math.max(0, conEfectivo * 5 + modTotal(sc, 'hpmax'));
+    const estabaFull = num(sc.hp) >= num(sc.hpMax);
+    sc.hpMax = nuevoHpMax;
+    sc.hp = estabaFull ? nuevoHpMax : Math.min(num(sc.hp), nuevoHpMax);
+  }
+  function nitrosMax(sc){
+    // Natural = Agilidad efectiva + bonos a Nitros (los viejos de Movimiento y Acciones máx. cuentan como No2); los estados
+    // (Cansado, Hypeado, Exhausto, Stun) los aplica el motor común (comun/combatiente.js), igual que a personajes e invocaciones.
+    return Combatiente.nitrosMax(num(sc.agl) + modTotal(sc, 'agl') + modTotal(sc, 'nitros') + modTotal(sc, 'mov') + modTotal(sc, 'accionesmax'), sc.estados);
+  }
+  function actualizarNo2PorAgl(sc, antes){
+    if(sc.nitros === null || sc.nitros === undefined) return;  // todavía no se solidificó: arranca lleno solo
+    const nuevoMax = nitrosMax(sc);
+    sc.nitros = antes.full ? nuevoMax : Math.min(num(sc.nitros), nuevoMax);
+  }
+
+  /* ---------- Costos ---------- */
+  // Primer ataque del turno: Tipo ÷ 2 (redondeado para arriba); los demás, Tipo completo.
+  function costoAtaque(sc){ return Combatiente.conExtenuado(sc.estados, costoAtaque0(sc)); }   // + Extenuado (2026-10-12)
+  function costoAtaque0(sc){ const a = armaDe(sc); if(Combatiente.cargadaGratis(a, sc.ataquesTurno, sc.descargada)) return 0; return Math.max(0, Combatiente.costoConAhorro(Combatiente.costoAtaque(a.tipoDado, sc.ataquesTurno, a), a, sc.ataquesTurno) - Combatiente.ahorroArco(a, sc.ataquesTurno, sc.descargada, sc.ultimoPego)); }   // regla común (comun/combatiente.js)   // + Flecha en la cuerda / Encadenar (2026-10-11)
+  // Nitros de una habilidad: un número, o "ATAQUE" = lo que le cuesta un
+  // ataque con su arma (Tipo ÷ 2 el primero del turno) y cuenta como ese ataque.
+  function habAtaque(h){ return String((h && h.nitrosCosto) ?? "").trim().toUpperCase() === "ATAQUE"; }
+  function costoNitrosHab(sc, h){ const c = Combatiente.costoNitrosHab(h, () => costoAtaque(sc), IT2_CREEP.nitrosHabilidad); return habAtaque(h) ? c : Combatiente.conExtenuado(sc.estados, c); }   // + Extenuado   // comun/combatiente.js
+  /* La descripción de las habilidades del catálogo termina con un aviso para el GM: "⚙ Automatizado: … ✋ A mano: …".
+     Eso es cosa de la herramienta (se ve en Ver y en la tarjeta), no de la mesa: a la Mesa, que lee todo el mundo,
+     va solo lo que hace la habilidad (la descripción más lo que se resuelve a mano, que también es lo que hace). */
+  function habPartes(h){
+    const t = String((h && (h.detalle || h.descripcion)) || '');
+    const i = t.indexOf('⚙');
+    if(i < 0) return {descripcion: t.trim(), auto: '', mano: ''};
+    const resto = t.slice(i).replace(/^⚙\s*Automati[a-z]*:\s*/i, '');
+    const j = resto.indexOf('✋');
+    const auto = (j < 0 ? resto : resto.slice(0, j)).trim().replace(/\.$/, '');
+    const mano = j < 0 ? '' : resto.slice(j).replace(/^✋\s*A mano:\s*/i, '').trim();
+    return {descripcion: t.slice(0, i).trim(), auto, mano: /^nada, todo está automatizado\.?$/i.test(mano) ? '' : mano};
+  }
+  function habTextoMesa(h){
+    const p = habPartes(h);
+    return [p.descripcion, p.mano].filter(Boolean).join(' ');
+  }
+  function costoHabTxt(sc, h){
+    const n = costoNitrosHab(sc, h), sp = modoSP(sc) ? `${fmt(costoSpHab(sc, h))} SP · ` : '';   // 💧 en modo SP, también su SP
+    if(habAtaque(h)) return `${sp}${fmt(n)} No2 (como un ataque)`;
+    return n ? `${sp}${fmt(n)} No2` : sp ? sp.replace(/ · $/, '') : "sin costo";
+  }
+  // Parry y Bloqueo de un creep (2026-09-24, pedido del dueño; igual que en la ficha): el Parry cuesta 1 No2 (2026-09-26; antes el Peso de su arma);
+  // el Bloqueo suma su Bloqueo + el Peso del arma y ESA SUMA es el dado.
+  function pesoArma(sc){ return armaDe(sc).peso; }
+  function costoParry(sc){ return Combatiente.conExtenuado(sc && sc.estados, Combatiente.costoParry()); }   // + Extenuado   // siempre 1 No2, sin importar el arma (comun/combatiente.js)
+  // Con qué para el creep (Parry y Bloqueo): su arma si no es natural, si no un escudo de su equipo; null = no puede
+  // (regla del dueño 2026-09-30, comun/combatiente.js). El Bloqueo suma el peso de eso.
+  // o.soloEscudo: contra un disparo, solo un escudo (2026-10-09). Con un arco no se parrea.
+  function defensa(sc, o){
+    if(!sc) return null;
+    const a = armaDe(sc);
+    return Combatiente.armaParaDefensa({arma: a.nombre ? {nombre: a.nombre, peso: a.peso} : null, natural: a.natural,
+      arco: a.armaDeRango, soloEscudo: !!(o && o.soloEscudo),
+      escudos: Combatiente.piezasParaParry(Combatiente.puestoSinArma(sc), slotDe, pesoPieza)});   // un báculo sí, un orbe no (2026-10-17)
+  }
+  // El peso de una pieza del equipo (2026-10-13): las equipadas antes no lo guardaban; si falta, el del catálogo con ese nombre.
+  function pesoPieza(it){
+    if(num(it && it.peso) > 0) return num(it.peso);
+    const c = typeof CATALOGO_BASE !== 'undefined' && it ? CATALOGO_BASE.find(x => x && x.nombre === it.nombre) : null;
+    return c ? num(c.peso) : 0;
+  }
+  function bloqueoValor(sc){ const d = defensa(sc); return statValor(sc, 'bloqueo') + (d ? num(d.peso) : 0); }
+  // Fuerza del golpe (reglas del escudo, 2026-09-26): la tirada del atacante contra el Bloqueo del defensor = su Fuerza (con los estados activos) + el peso de su arma; la SUMA es el dado.
+  function fuerzaGolpeValor(sc){ return num(sc.fue) + (sc.estados || []).filter(e => e.activo !== false).reduce((a, e) => a + (e.mods || []).filter(m => m.stat === 'fue').reduce((x, m) => x + num(m.val) * Math.max(1, num(e.stacks) || 1), 0), 0) + pesoArma(sc); }
+  // Contraataque (regla a prueba, 2026-09-26): tras un Parry, siempre cuesta lo de un primer ataque y no suma al conteo de ataques del turno.
+  function costoContraataque(sc){ return Combatiente.conExtenuado(sc.estados, Math.max(0, Combatiente.costoPrimerAtaque(armaDe(sc).tipoDado) - Combatiente.ahorroEspecial('contra', st => modTotal(sc, st)))); }   // regla común (comun/combatiente.js)
+  // ¿Le alcanzan los No2 para un ataque de oportunidad (lo de un primer ataque con su arma)? (2026-10-02, pedido del dueño: el mapa solo
+  // frena a quien se aleja si el que se queda puede aprovecharlo.) Se publica en su resumen (`opor`): los jugadores no ven sus No2.
+  // El ataque de oportunidad: lo de un primer ataque, o nada si su arma es oporGratis.
+  function costoOportunidad(sc){ return Combatiente.conExtenuado(sc.estados, Math.max(0, Combatiente.costoEspecial(armaDe(sc).tipoDado, armaDe(sc), 'oportunidad') - Combatiente.ahorroEspecial('oportunidad', st => modTotal(sc, st)))); }
+  // ¿Su arma no sirve de oportunidad? (un arco: 2026-10-09) — lo publica el creep para que el mapa diga el motivo.
+  const sinOportunidad = sc => !Combatiente.sirveDeOportunidad(armaDe(sc));
+  function oportunidadPosible(sc){
+    const n = sc.nitros === null || sc.nitros === undefined ? nitrosMax(sc) : num(sc.nitros);
+    return !(num(sc.hp) <= 0) && n >= costoOportunidad(sc) && Combatiente.sirveDeOportunidad(armaDe(sc))   // con un arco, no (2026-10-09)
+      && !Combatiente.expuesto(sc.estados);   // Expuesto (Degollar, 2026-10-10): no reacciona con No2
+  }
+  // Lo que muestra la 🪪 tarjeta del creep en el mapa a cualquier jugador (2026-10-09): solo NOMBRES — el arma (también la natural,
+  // marcada) y cada pieza de equipo, sin defensa, bonos ni detalle — y la nota. Lo publican GM Tools (creepPublico) y el mapa al
+  // cambiar un creep (modificarCreep), en el documento público del creep; el resto de la ficha sigue siendo privada del GM.
+  /* Los puntos de atributo de un creep (2026-10-13, dueño: «en Ver o Editar no dice en ningún lado si faltan o sobran puntos»): 33 + 3 por
+     cada nivel después del primero, repartidos entre Con, Fue, Agl, Des y Esp. Es una guía: avisa, no bloquea. */
+  function presupuesto(sc){
+    const nivel = Math.max(1, num(sc && sc.nivel) || 1), total = 33 + 3 * (nivel - 1);
+    const usado = ['con', 'fue', 'agl', 'des', 'esp'].reduce((a, k) => a + num(sc && sc[k]), 0);
+    return {nivel, total, usado, pend: total - usado};
+  }
+  function presupuestoTxt(sc){
+    const b = presupuesto(sc);
+    return `Puntos de atributo: ${b.usado} de ${b.total}${b.pend > 0 ? ` · faltan ${b.pend}` : b.pend < 0 ? ` · ${-b.pend} de más` : ' ✓'}`;
+  }
+  // Verde si está justo, ámbar si faltan, rojo si sobran.
+  function presupuestoHtml(sc){
+    const b = presupuesto(sc), color = b.pend > 0 ? '#e0b84a' : b.pend < 0 ? '#e0685a' : '#6fcf8a';
+    return `<span class="creep-puntos" title="Nivel ${b.nivel}: 33 + 3 por cada nivel después del primero = ${b.total}. Es una guía: solo avisa." style="font-size:12px;font-weight:700;color:${color};text-transform:none;letter-spacing:0">${presupuestoTxt(sc)}</span>`;
+  }
+  /* Lo que se ve de una pieza de un creep vivo (2026-10-13, dueño: «que vean que tiene una varita, un pico, pero no el detalle hasta que
+     mueran»): solo qué es — la primera palabra que nombra la cosa («Varita del susurro» → «Varita», «Chaleco de cuero» → «Chaleco»),
+     salteando lo que la califica («Buena», «Gran», «El»…). */
+  const NO_NOMBRA = new Set(['el', 'la', 'los', 'las', 'un', 'una', 'buen', 'buena', 'buenas', 'buenos', 'gran', 'grande', 'pequeño', 'pequeña',
+    'viejo', 'vieja', 'nuevo', 'nueva', 'mi', 'su', 'mayor', 'menor', 'doble', 'falso', 'falsa']);
+  function nombreGenerico(nombre){
+    const palabras = String(nombre || '').trim().split(/\s+/).filter(Boolean);
+    const p = palabras.find(w => !NO_NOMBRA.has(w.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''))) || palabras[0] || '';
+    return p ? p.charAt(0).toUpperCase() + p.slice(1).toLowerCase() : '';
+  }
+  // Vivo, se publica solo qué es cada cosa; derrotado (vida 0), los nombres de verdad. El arma natural (es su cuerpo) se ve siempre.
+  // Lo que va en las manos (2026-10-17, dueño: «las varitas, los báculos, las armas especiales son armas, no son equipo; lo mismo los orbes…
+  // lo que tiene en las manos son las armas y los escudos»): armas (también varitas y báculos), escudos, orbes y talismanes.
+  const enLasManos = it => /^(arma_|escudo_)/.test(String((it && it.tipoItem) || ''));
+  // 💀 El radio del aura espeluznante (la Calavera con vela, 2026-10-18): lo más grande de lo que tiene equipado.
+  // 💀 El aura espeluznante (el radio): de la Calavera con vela del equipo o de una pasiva propia con su efecto (dueño 2026-10-18: El ocultista).
+  // 🚩 Los estandartes de un creep (los aliados cerca, con el bono): de su equipo y de sus pasivas (dueño 2026-10-18: el Kobold hongero, rango 2).
+  // `rango`: hasta cuántas casillas llega (sin él, 1: al lado). → [{stat, val, rango, nombre}].
+  const estandartes = sc => [...Combatiente.equipoPuesto(sc), ...(Array.isArray(sc && sc.pasivas) ? sc.pasivas : [])]
+    .filter(x => x && x.estandarte && x.estandarte.stat)
+    .map(x => ({stat: String(x.estandarte.stat), val: num(x.estandarte.val), rango: Math.max(1, Math.round(num(x.estandarte.rango)) || 1), nombre: String(x.nombre || '').slice(0, 40)}));
+  const auraMiedo = sc => [...Combatiente.equipoPuesto(sc), ...(Array.isArray(sc && sc.pasivas) ? sc.pasivas : [])]
+    .reduce((a, it) => Math.max(a, num(it && it.auraMiedo)), 0);
+  // 🔮 Un talismán de su equipo (2026-10-18): lo más grande de ese campo (`espejito`, `relicario`).
+  const talisman = (sc, campo) => Combatiente.equipoPuesto(sc).reduce((a, it) => Math.max(a, num(it && it[campo])), 0);
+  /* ✨ Las armas especiales que tiene puestas (varitas, báculos: un ítem con `especial`; 2026-10-28, dueño: «el sistema sigue sin entender que varitas y
+     báculos son armas especiales»): las muestran como armas la ficha del creep, el asistente y el Resumen, y con una no está «sin nada en la mano». */
+  const especialesEnMano = sc => Combatiente.equipoPuesto(sc).filter(it => it && it.especial);
+  // Lo que pega una, en corto: «✨ 1d6 + 2 arcano» (el dado del hechizo, lo que suma del Efecto especial y el tipo de daño).
+  function especialDanoTxt(sc, it){
+    const e = (it && it.especial) || {}, d = String(e.dano || '').trim(), tipo = String((e.duelo && e.duelo.tipoDano) || '').toLowerCase();
+    const mas = e.sumaEspecial ? Combatiente.sumaEspecialDe(statValor(sc, 'dmgesp'), e.sumaEspecial) : 0;
+    return `✨ ${d || 'especial'}${mas ? ` + ${mas}` : ''}${d && tipo ? ' ' + tipo : ''}`;
+  }
+  // Sin arma y sin una especial: lo único que le queda es pegar con las manos vacías.
+  const sinNadaEnMano = sc => Combatiente.sinArmaEnMano(sc) && !especialesEnMano(sc).length;
+  function tarjetaPublica(sc){
+    const nom = x => String(x || '').trim().slice(0, 60);
+    const vivo = num(sc.hp) > 0;
+    const ver = x => vivo ? nombreGenerico(x) : nom(x);
+    const a = armaDe(sc);
+    return {
+      armaNombre: a.natural ? nom(a.nombre) : ver(a.nombre),
+      armaNatural: a.natural,
+      sinArma: !!a.sinArma && !especialesEnMano(sc).length,   // ✋ nada en la mano (paso 5): el mapa lo marca en el token (con una varita, no)
+      // Lo de las manos (además del arma) va aparte del equipo (2026-10-17): una varita, un escudo, un orbe.
+      // 🐾 Lo natural que no es el arma (piel dura, caparazón…) no se nombra (2026-10-26, dueño: «las armaduras simplemente den los efectos, los
+      // usuarios no necesitan ver el nombre»): da sus bonos y nada más. El arma natural sí se ve (Garras, Colmillos).
+      manosNombres: Combatiente.puestoSinArma(sc).filter(it => enLasManos(it) && !it.natural).map(it => ver(it.nombre)).filter(Boolean).slice(0, 6),
+      equipoNombres: Combatiente.puestoSinArma(sc).filter(it => it && !enLasManos(it) && !it.natural).map(it => ver(it.nombre)).filter(Boolean).slice(0, 30),
+      notas: String(sc.notas || '').trim().slice(0, 600),
+      tipoCriatura: tipoDe(sc).slice(0, 30),   // el tipo de criatura (Matabestias de los arcos, 2026-10-11)
+      pasosSilenciosos: num(modTotal(sc, 'pasossilenciosos')) > 0,   // 👣 (2026-10-15): el mapa de los jugadores no lo hace oír a 3 casilleros
+      // 💀 La Calavera con vela (2026-10-18): el aura y el Ef.Esp con que asusta (lo tira la pantalla del jugador que entra, js/52).
+      // Siempre se escribe (2026-10-19: si no, al sacarle el aura el documento público seguía con la vieja y el creep seguía asustando).
+      auraMiedo: auraMiedo(sc), auraEfEsp: auraMiedo(sc) > 0 ? (v => Number.isFinite(v) ? Math.round(v) : 0)(statValor(sc, 'dmgesp')) : 0,
+      // 🚩 Es un estandarte de guerra (2026-10-24, vtt-hexgrid/js/73): su aura y su bonus, para que todas las pantallas lo dibujen (0 = no lo es).
+      estandarteRadio: sc.estandarte ? Math.max(0, Math.round(num(sc.estandarte.radio))) : 0,
+      estandartePdg: sc.estandarte ? Math.max(0, Math.round(num(sc.estandarte.pdg))) : 0,
+      estandarteDano: sc.estandarte ? Math.max(0, Math.round(num(sc.estandarte.dano))) : 0,
+      estandarteSilencio: sc.estandarte && sc.estandarte.silencio ? 1 : 0,   // 🤐 un Tótem de silencio (2026-10-25): silencia a los rivales del aura
+      // ☄ La sombra de el Meteoro que está por caer (2026-10-24, vtt-hexgrid/js/74): dónde y de qué tamaño (radio 0 = ninguna).
+      meteoroCol: sc.meteoro ? Math.round(num(sc.meteoro.col)) : 0, meteoroFila: sc.meteoro ? Math.round(num(sc.meteoro.fila)) : 0, meteoroRadio: sc.meteoro ? Math.max(0, Math.round(num(sc.meteoro.radio))) : 0,
+    };
+  }
+  // Alcance de su arma, en casilleros: un arma de rango usa su Rango; una de cuerpo a cuerpo, 1 + lo que le sume a Rango.
+  function alcance(sc){
+    const a = armaDe(sc);
+    if(a.armaDeRango){ const v = statValor(sc, 'rng'); return Number.isNaN(v) ? 0 : Combatiente.alcanceArmaRango(a, v); }   // la honda, la mitad
+    const bono = a.mods.filter(m => m.stat === 'rng').reduce((a, m) => a + num(m.val), 0);
+    return 1 + Math.max(0, Math.round(bono));
+  }
+
+  /* ---------- Habilidades: modo y si se pueden usar ---------- */
+  function modoHab(h){ return Combatiente.modoHab(h, h && h.duelo && typeof h.duelo === 'object' ? h.duelo : null); }   // la regla común
+  // ¿Se puede usar ahora? La regla común (P133): cooldown, No2 y vida (una 📣 manual no cobra nada).
+  function bloqueoHab(sc, h){ return Combatiente.bloqueoHab(modoSP(sc) ? {...h, cdActual: 0} : h, {modo: modoHab(h), nitros: sc.nitros, costo: costoNitrosHab(sc, h), hp: sc.hp}); }   // (en modo SP no hay cooldown)
+  /* 💧 SP para creeps (dueño, 2026-10-20: «que las skills puedan usar SP en vez de cooldown, con un switch, para probar las dos en simultáneo»).
+     `sc.modoSP`: sus habilidades cuestan SP (además de sus No2) y no tienen cooldown. Máximo como un personaje: Especial × 3 (+ lo que sume el
+     equipo o un estado al stat `sp`); recarga al empezar su turno la mitad del Especial, **nunca menos de 1** (dueño). El SP de una habilidad:
+     `h.spCosto` si lo trae; si no, un número en `h.costo`; si no, su cooldown (sin cooldown: 1). `sc.sp` = el que le queda (sin dato: lleno). */
+  const modoSP = sc => !!(sc && sc.modoSP);
+  function spMax(sc){ return Math.max(0, Math.round(num(statValor(sc, 'esp')) * 3 + num(modTotal(sc, 'sp')))); }
+  function spRegen(sc){ return Math.max(1, Math.floor(num(statValor(sc, 'esp')) / 2) + Math.round(num(modTotal(sc, 'spregen')))); }
+  // 💧 La barra de SP del token (dueño, 2026-10-29: «cuando un creep tenga modo SP se le vea la barra de SP»): solo el porcentaje, como la vida; null sin modo SP.
+  function spPct(sc){ const mx = spMax(sc); return modoSP(sc) && mx > 0 ? Math.round(Math.max(0, Math.min(1, spActual(sc) / mx)) * 100) : null; }
+  function spActual(sc){ return sc && sc.sp !== undefined && sc.sp !== null && sc.sp !== '' ? Math.max(0, num(sc.sp)) : spMax(sc); }
+  function costoSpHab(sc, h){
+    if(h && h.spCosto === 'esp') return Math.max(1, Math.round(num(statValor(sc, 'esp'))));   // cuesta tanto SP como su Especial (2026-10-21, la Bola de fuego; P216)
+    { const m = /^esp\+(\d+)$/.exec(String((h && h.spCosto) || '')); if(m) return Math.max(1, Math.round(num(statValor(sc, 'esp')))) + Number(m[1]); }   // su Especial + N (el Misil elemental, 2026-10-25)
+    if(h && h.spCosto !== undefined && h.spCosto !== null && h.spCosto !== '' && Number.isFinite(Number(h.spCosto))) return Math.max(0, Math.round(Number(h.spCosto)));
+    const c = parseInt(String((h && h.costo) || '').trim(), 10);
+    if(Number.isFinite(c) && c > 0) return c;
+    const cd = Math.round(num(h && h.cd));
+    return cd > 0 ? cd : 1;
+  }
+
+  /* ---------- Normalizar un creep guardado ---------- */
+  // Estados de creeps guardados antes de los No2: los presets que tocaban
+  // Acciones pasan a tocar No2 (solo si el estado no trae ya ese efecto).
+  const ESTADOS_NITROS_MIGRAR = {
+    Cansado: {mods:[{stat:'nitros', val:-1}]},
+    Hypeado: {mods:[{stat:'nitros', val:1}]},
+    Exhausto: {forzarNitros:1},
+    Stun: {forzarNitros:0},
+  };
+  // Rellena campos que creeps viejos (guardados antes de una función nueva)
+  // pueden no tener, para que el resto del código no se tope con undefined.
+  /* El cinturón de un creep (dueño, 2026-10-04: «los creeps vienen por default con 5 ranuras de consumibles, aunque rara vez se usen»): la
+     misma regla que un personaje — 1 ranura = 1 unidad, base 5 + las ranuras que le dé su equipo (capcinturon). */
+  const BASE_CINTURON = 5;
+  // Portapergaminos y ranuras exclusivas (2026-10-05): la cuenta común, Combatiente.ranurasCinturon.
+  const opcionesCinturon = sc => ({portapergaminos: num(modTotal(sc, 'portapergaminos')),
+    excl: {pocion: num(modTotal(sc, 'ranurapocion')), pergamino: num(modTotal(sc, 'ranurapergamino')), trampa: num(modTotal(sc, 'ranuratrampa')), ankh: num(modTotal(sc, 'ranuraankh'))}});
+  const cinturonUsado = sc => Combatiente.ranurasCinturon(sc.cinturon || [], opcionesCinturon(sc));
+  const capCinturon = sc => BASE_CINTURON + num(modTotal(sc, 'capcinturon'));
+  const cinturonLibre = sc => Math.max(0, capCinturon(sc) - cinturonUsado(sc));
+  const cuantasEntran = (sc, it, cuantas) => Combatiente.entranEnCinturon(sc.cinturon || [], it, cuantas, capCinturon(sc), opcionesCinturon(sc));
+
+  function normalizar(sc){
+    const crit = Array.isArray(sc.crit) ? sc.crit.map(v=>num(v)) : [];
+    while(crit.length < 5) crit.push(0);
+    sc.crit = crit.slice(0, 5);
+    sc.equipo = Array.isArray(sc.equipo) ? sc.equipo : [];
+    sc.estados = Array.isArray(sc.estados) ? sc.estados : [];
+    sc.habilidades = Array.isArray(sc.habilidades) ? sc.habilidades : [];
+    sc.pasivas = Array.isArray(sc.pasivas) ? sc.pasivas : [];   // (2026-10-15)
+    if(typeof estadosPresetCreep === 'function') Combatiente.sincronizarEstadosDePasivas(sc.estados, sc.pasivas, estadosPresetCreep());   // la pasiva que da un estado (2026-10-16)
+    sc.cinturon = Array.isArray(sc.cinturon) ? sc.cinturon : [];   // consumibles a mano (2026-10-04)
+    migrarCreepTipos(sc);
+    migrarCreepEspecial(sc);
+    migrarHabPdg(sc);
+    Combatiente.pasarEquipoVivo(sc);   // 🛡 paso 3: la Defensa y la Res. a crítico del equipo, en vivo (una vez: le resta lo que ya traía sumado)
+    if(Array.isArray(sc.estados)) sc.estados = sc.estados.filter(e => !Combatiente.esDesarmado(e));   // ✋ paso 5: Desarmado ya no es un estado (P217)
+    // Recompensas (2026-09-20): los creeps viejos no las traen.
+    if(typeof sc.mapa !== 'string') sc.mapa = '';   // en qué mapa está (comun/creeps-mapas.js; '' = la Reserva)
+    if(sc.tipoCriatura === undefined) sc.tipoCriatura = '';
+    if(sc.tipoCriaturaOtro === undefined) sc.tipoCriaturaOtro = '';
+    sc.jefe = sc.jefe === true;
+    sc.oroBase = Math.max(0, num(sc.oroBase));
+    if(!sc.trofeoEspecial || typeof sc.trofeoEspecial !== 'object') sc.trofeoEspecial = {nombre: '', precio: 0};
+    // Acciones → No2.
+    if(sc.acc !== undefined || sc.accMax !== undefined){
+      delete sc.acc;
+      delete sc.accMax;
+      delete sc.nitros;  // arranca lleno (abajo), aunque la carga haya traído un valor por defecto
+      sc.estados.forEach(es => {
+        const m = ESTADOS_NITROS_MIGRAR[es.nombre];
+        if(!m) return;
+        const yaTiene = (es.forzarNitros !== undefined && es.forzarNitros !== '') || (es.mods || []).some(x => x.stat === 'nitros');
+        if(yaTiene) return;
+        if(m.mods) es.mods = [...(es.mods || []), ...structuredClone(m.mods)];
+        if(m.forzarNitros !== undefined) es.forzarNitros = m.forzarNitros;
+      });
+    }
+    // La habilidad Movimiento se quitó: moverse se cobra desde el mapa. Se
+    // saca siempre, por si una pestaña con la versión vieja la vuelve a meter.
+    sc.habilidades = sc.habilidades.filter(h => h && h.nombre !== 'Movimiento');
+    delete sc.sinMovimiento;
+    sc.habilidades.forEach(h => {
+      if(h.accionesCosto === undefined) return;
+      if(h.nitrosCosto === undefined) h.nitrosCosto = h.accionesCosto;
+      delete h.accionesCosto;
+    });
+    if(sc.nitros === undefined || sc.nitros === null) sc.nitros = nitrosMax(sc);
+    if(sc.ataquesTurno === undefined) sc.ataquesTurno = 0;
+    delete sc.compacto;  // la tarjeta ya no se despliega: se edita en una ventana
+    return sc;
+  }
+
+  /* ---------- Recompensas del creep: oro, arma natural y trofeo (2026-10-02, hoja de ruta A6a) ----------
+     Copiado tal cual de gm-toolset/js/02 (tipoDeCreep, oroSugeridoCreep, trofeoDeCreep, dropsResumenCreep…): lo usan GM Tools y
+     el «Ver» de un creep (comun/creep-lupa.js), también en el mapa. */
+  // demonio, interdimensional y adefesio (dueño, 2026-10-11, con «Contra lo sobrenatural» de los arcos).
+  const TIPOS_CRIATURA = ['humano', 'humanoide', 'bestia', 'planta', 'elemental', 'constructo', 'no-muerto', 'alienígena', 'demonio', 'interdimensional', 'adefesio'];
+  const TIPOS_CON_ARMA_NATURAL = ['bestia', 'planta', 'elemental', 'alienígena', 'constructo', 'no-muerto', 'demonio', 'interdimensional', 'adefesio'];
+  const TIPOITEM_LABEL = {
+    arma_1m:'Arma de 1 mano', arma_2m:'Arma de 2 manos',
+    escudo_1m:'Escudo 1 mano', escudo_2m:'Escudo 2 manos',
+    armadura_blanda:'Armadura blanda', armadura_rigida:'Armadura rígida',
+    manos:'Manos', cabeza:'Cabeza', pies:'Pies', piernas:'Piernas',
+  };
+  // Etiquetas cortas de los stats de un ítem de creep (antes STAT_LABEL_GM de GM Tools).
+  const STAT_LABEL = {
+    tipo1:'Tipo 4', tipo2:'Tipo 6', tipo3:'Tipo 8', tipo4:'Tipo 10', tipo5:'Tipo 12',
+    pdg:'PdG', eva:'Evasión', ini:'Iniciativa', mov:'Mov', parry:'Parry', crit:'Crítico frecuente', critpot:'Crítico potente',
+    bonos:'Bonos', rangocasteo:'Rango', accionesmax:'Acciones máx.', nitros:'No2',
+    resm:'Res.Mt', resmg:'Res.Esp', rescc:'Res.CC',
+    con:'Con', fue:'Fue', agl:'Agi', des:'Des', esp:'Esp',
+    // Los que dan las piezas defensivas (2026-10-06: en GM Tools se veían con su nombre interno, «oporahorro +1»).
+    dmg:'Dmg', bloqueo:'Bloqueo', pdgopor:'PdG en oportunidad', pdgcontra:'PdG en contraataque', pdgmg:'PdG.Esp', dmgesp:'Ef.Esp',
+    percepcion:'Percepción', vision:'Visión', luz:'Luz', sigilo:'Sigilo', spregen:'SP Regen', boticario:'Mano de boticario',
+    resfuego:'Res. fuego', reshielo:'Res. hielo', resrayo:'Res. eléctrica', restoxico:'Res. tóxico', resacido:'Res. ácido', resluz:'Res. luz', ressiniestro:'Res. siniestro', armadmg:'Defensa especial', hpregen:'Regeneración de vida',
+    pisadaatenta:'Pisada atenta', recuperarse:'Recuperarse rápido (%)', capcinturon:'Ranuras de cinturón', inamovible:'Inamovible (%)', guardian:'Guardián', escolta:'Escolta (a mano)', levantarse:'Levantarse rápido', levitar:'Levitar', suelagruesa:'Suela gruesa', meditar:'Meditar',
+    pdgt4:'PdG con punzantes', pdgt6:'PdG con cortantes', pdgt8:'PdG con hachas', pdgt10:'PdG con contundentes', pdgdist:'PdG a distancia', evadisparo:'Evasión contra disparos',
+    oporahorro:'Oportunidad: No2 de menos', contraahorro:'Contraataque: No2 de menos', soltarse:'Soltarse', trampaoculta:'Trampas mejor escondidas',
+    ahorroespsp:'Primer conjuro: SP de menos', venenista:'Envenenador: stacks de más',
+  };
+  // Un ítem del catálogo en la forma del equipo de un creep (antes itemParaCreep de GM Tools, js/01): sin id, la Defensa separada de los
+  // otros bonos (`def`), sin los campos que un creep no usa. Es la forma de CATALOGO_EQUIPO (GM Tools) y del catálogo del fin del combate.
+  // Lo mágico de un ítem (2026-10-05): el hechizo de un arma especial y lo de un orbe. Va igual en el equipo de un creep que en una ficha.
+  const TALISMAN_CAMPOS = ['talisman', 'auraMiedo', 'espejito', 'relicario', 'alDanoEspecial', 'botella', 'masDanoElem', 'saltoMas', 'estandarte', 'bezoar', 'contrahechizo'];
+  function magiaDeItem(it){
+    const o = {};
+    if(it && it.especial) o.especial = structuredClone(it.especial);
+    if(it && it.orbe){ o.orbe = true; if(it.orbeResguardo) o.orbeResguardo = it.orbeResguardo; if(it.orbeSalvaje) o.orbeSalvaje = it.orbeSalvaje === 'domado' ? 'domado' : true; if(it.orbeCustodio) o.orbeCustodio = it.orbeCustodio; }   // (la absorción: solo personajes, que tienen SP)
+    // 🔮 Los talismanes (2026-10-18): sus marcas viajan acá para que lleguen por todos los caminos que le equipan algo a un creep (el catálogo de
+    // GM Tools, «Poner en el creep», la copia al catálogo), no solo por itemParaCreep (antes se perdían: quedaban los stats y no la mecánica).
+    if(it) TALISMAN_CAMPOS.forEach(k => { if(it[k]) o[k] = structuredClone(it[k]); });
+    return o;
+  }
+  // ¿Va en el equipo del creep (y no como su arma)? Todo lo que no es arma, y las armas especiales (2026-10-05: una varita no le cambia el arma).
+  const vaAlEquipo = it => !String((it && it.tipoItem) || '').startsWith('arma_') || !!(it && it.especial);
+  function itemParaCreep(it){
+    const arma = it.tipoItem.startsWith('arma_');
+    const o = {nombre: it.nombre, tipoItem: it.tipoItem, tier: it.tier, tipoDado: arma ? (it.tipoDado || 0) : 0, danoFijo: arma ? (it.danoFijo || 0) : 0,
+      peso: it.peso || 0, precioCompra: it.precioCompra || 0, def: (it.mods || []).filter(m => m.stat === 'def').reduce((a, m) => a + (Number(m.val) || 0), 0)};
+    if(arma && it.danoAmplificado) o.danoAmplificado = it.danoAmplificado;
+    if(it.durPorPeso) o.durPorPeso = it.durPorPeso;   // durabilidad de diseño (si no es la de siempre)
+    if(it.durExtra) o.durExtra = it.durExtra;         // Resistente / Frágil (2026-10-04)
+    if(arma && it.armaDeRango) o.armaDeRango = true;
+    if(arma) Object.assign(o, Combatiente.rasgosDeItem(it));   // los rasgos del arma (por la espalda, ignora, sin Parry, firmas…)
+    if(arma && (it.efectosGolpe || []).length) o.efectosGolpe = structuredClone(it.efectosGolpe);
+    Object.assign(o, magiaDeItem(it));   // ✨ arma especial / 🔮 orbe: viaja tal cual (si la saquean, vuelve a costar SP)
+    if(it.tipoItem === 'consumibles'){ o.consumible = true; if(it.curahp) o.curahp = it.curahp; if(it.legacy) o.legacy = true;
+      if(it.flecha) o.flecha = structuredClone(it.flecha); }   // la munición (2026-10-19): el botín la reconoce (flechas para el arco, virotes para la ballesta)
+    const otros = (it.mods || []).filter(m => m.stat !== 'def');
+    if(otros.length) o.mods = structuredClone(otros);
+    o.detalle = it.detalle || '';
+    if(it.descripcionNarrativa) o.descripcionNarrativa = it.descripcionNarrativa;
+    return o;
+  }
+  function nombreLimpio(sc){ return String(sc.nombre || 'Creep').replace(/\s*\(auditar\)\s*$/i, '').trim(); }
+  function tipoDe(sc){
+    return sc.tipoCriatura === 'otros' ? String(sc.tipoCriaturaOtro || '').trim().toLowerCase() : String(sc.tipoCriatura || '');
+  }
+  function oroSugerido(sc){
+    const n = Math.max(1, Math.round(num(sc.nivel)) || 1);
+    const humano = 5 * n * n + 10 * n;   // 15, 40, 75, 120, 175
+    const t = tipoDe(sc);
+    let v = 0;
+    if(t === 'humano') v = humano;
+    else if(t === 'humanoide') v = Math.floor(humano / 2 / 5 + 0.5) * 5;   // la mitad, a múltiplos de 5
+    return sc.jefe ? v * 2 : v;
+  }
+  /* 🐾 Lo natural que lleva (2026-10-26, dueño: «que el trofeo que deja la bestia tenga algún tipo de equivalencia en valor de venta al equipo
+     que tuvo»; y el mismo día: «al trofeo le vamos a quitar el valor por nivel: solamente va a ser lo que haya sido el equipo adaptado»): el arma
+     natural y las piezas naturales (no lo invocado). `valorNatural(sc, precioDe)` = lo que valdría todo eso en la tienda (precio de compra) y es
+     el precio del trofeo: venderlo da lo mismo que vender ese equipo. `precioDe(it)` lo pone quien llama; si no, `CombateFin.precioNatural`
+     (el catálogo, o estimado como cualquier pieza propia de un creep: las armas naturales de la biblioteca 🐾) y, sin esa pieza, el precio de
+     la pieza o el del ítem del catálogo de fábrica con ese nombre (el del catálogo: `nombreOriginal`, si se renombró al marcarla natural). */
+  const nombreBase = x => String(x || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const naturales = sc => (Array.isArray(sc && sc.equipo) ? sc.equipo : []).filter(it => it && it.natural === true && !it.invocadaDe && (it.nombre || it.nombreOriginal));
+  function precioDeFabrica(it){
+    if(num(it.precioCompra) > 0) return num(it.precioCompra);
+    const nb = nombreBase(it.nombreOriginal || it.nombre), arma = /^arma_/.test(String(it.tipoItem || ''));
+    const c = typeof CATALOGO_BASE !== 'undefined' ? CATALOGO_BASE.find(i => nombreBase(i.nombre) === nb && (arma ? /^arma_/.test(String(i.tipoItem || '')) : i.tipoItem === it.tipoItem)) : null;
+    return c ? num(c.precioCompra) : 0;
+  }
+  const precioPorDefecto = sc => typeof CombateFin !== 'undefined' && CombateFin.precioNatural ? (it => CombateFin.precioNatural(null, it, sc)) : precioDeFabrica;
+  const valorNatural = (sc, precioDe) => naturales(sc).reduce((a, it) => a + Math.max(0, num((precioDe || precioPorDefecto(sc))(it))), 0);
+  // El trofeo que suelta al morir (o null). El "especial" reemplaza al automático (y su precio, si tiene uno, también).
+  function trofeo(sc, precioDe){
+    const esp = sc.trofeoEspecial || {};
+    const nombreEsp = String(esp.nombre || '').trim();
+    const a = armaDe(sc);
+    if(!nombreEsp && !a.natural && !naturales(sc).length) return null;
+    const nombre = nombreEsp || (a.natural ? `${a.nombre || 'Arma natural'} de ${nombreLimpio(sc)}` : `Trofeo de ${nombreLimpio(sc)}`);
+    const precio = num(esp.precio) > 0 ? num(esp.precio) : valorNatural(sc, precioDe);
+    if(!(precio > 0)) return null;   // nada que valga (sin equipo natural ni precio especial): no deja trofeo
+    return {nombre, precioCompra: precio, especial: !!nombreEsp, natural: !(num(esp.precio) > 0)};   // natural: su precio es el del equipo natural
+  }
+  function despojosDePrecio(precioCompra){ return Math.ceil(num(precioCompra) / 4); }   // un cuarto del precio de compra
+  /* Drops fijos (2026-10-14, dueño, la Grapa del capataz: «aunque la consuma, quiero que esté entre sus drops»): nombres de ítems del
+     catálogo que el creep suelta siempre al morir, además de su arma, su equipo, el trofeo y el consumible al azar (comun/combate-fin.js). */
+  const dropsFijos = sc => (Array.isArray(sc && sc.dropsFijos) ? sc.dropsFijos : []).map(n => String(n || '').trim()).filter(Boolean).slice(0, 10);
+  /* 🎁 Arquetipos (2026-10-19, dueño: «puede haber creeps que tengan más de un arquetipo»): qué familias de consumibles suelta más
+     (comun/combate-fin.js). Se deducen de sus datos —coloca trampas → trampero; arma de rango → tirador; Especial más alto que Fuerza y Destreza,
+     o una varita o un foco → mago; si no es mago ni tirador → guerrero— y el GM los cambia en Recompensas (`sc.arquetipos`; vacío = automático). */
+  /* (2026-10-20, dueño: «guerrero hace mucha referencia a la clase»): cuatro arquetipos. Choque pesado (va de frente: Fuerza y Constitución),
+     choque liviano (Destreza y Agilidad), caster (Especial: magos, supports, debuffers) y rango (arma a distancia, física). Se deducen así: arma de
+     rango → rango; Especial más alto que Fuerza, Destreza y Agilidad, o una varita o un foco → caster; si no es ninguno de los dos, cuerpo a
+     cuerpo: pesado si Fuerza + Constitución ≥ Destreza + Agilidad, si no liviano. Los nombres viejos (guerrero, mago, tirador, trampero) se leen. */
+  const ARQUETIPOS = {pesado: '🛡 Choque pesado', liviano: '🗡 Choque liviano', caster: '✨ Caster', rango: '🏹 Rango'};
+  const ARQ_VIEJOS = {guerrero: 'pesado', mago: 'caster', tirador: 'rango', trampero: 'liviano'};
+  function arquetiposAuto(sc){
+    if(!sc) return ['pesado'];
+    const out = [];
+    const caster = num(sc.esp) > Math.max(num(sc.fue), num(sc.des), num(sc.agl)) || (sc.equipo || []).some(i => i && (i.especial || /^foco-/.test(String(i.id || ''))));
+    const rango = armaDe(sc).armaDeRango;
+    if(!caster && !rango) out.push(num(sc.fue) + num(sc.con) >= num(sc.des) + num(sc.agl) ? 'pesado' : 'liviano');
+    if(caster) out.push('caster');
+    if(rango) out.push('rango');
+    return out;
+  }
+  const arquetiposManual = sc => [...new Set((Array.isArray(sc && sc.arquetipos) ? sc.arquetipos : []).map(a => ARQ_VIEJOS[a] || a).filter(a => ARQUETIPOS[a]))];
+  function arquetipos(sc){ const m = arquetiposManual(sc); return m.length ? m : arquetiposAuto(sc); }
+  const arquetiposTxt = lista => lista.map(a => ARQUETIPOS[a] || a).join(' + ');
+  // o.nombre(nombre, item?) (2026-10-30, dueño: «que cada nombre de ítem listado tenga el hover para ver su detalle»): cómo se escribe cada ítem; o.texto(t),
+  // lo demás (GM Tools lo usa para armar HTML con un globo por ítem). Sin `o`, el texto de siempre.
+  function dropsResumen(sc, o){
+    const N = (o && o.nombre) || (x => x), T = (o && o.texto) || (x => x);
+    const partes = [];
+    const a = armaDe(sc);
+    if(a.nombre && !a.natural) partes.push(`${N(a.nombre, a)} (arma equipable)`);
+    Combatiente.equipoSinArma(sc).filter(it => !it.natural).forEach(it => partes.push(`${N(it.nombre, it)} (equipo)`));   // 🐾 lo natural no se suelta (2026-10-14)
+    const tr = trofeo(sc);
+    if(tr) partes.push(`${T(tr.nombre)} (trofeo${tr.natural ? ', lo que vale su equipo natural' : ''}: compra ${fmt(tr.precioCompra)}, venta ${fmt(tr.precioCompra / 2)}, ${fmt(despojosDePrecio(tr.precioCompra))} despojos)`);
+    dropsFijos(sc).forEach(n => partes.push(`${N(n)} (drop fijo)`));
+    if(num(sc.oroBase) > 0) partes.push(`${fmt(num(sc.oroBase))} DDE de oro (±20% al final del combate)`);
+    if(Array.isArray(sc.consumibleAzar) && sc.consumibleAzar.length) partes.push(`${sc.consumibleAzar.map(n => N(n)).join(', ')} (consumible al azar, en el cinturón: si lo usa, lo suelta seguro; si no, a veces)`);
+    if(sc.municionAzar) partes.push(`${N(sc.municionAzar)} (munición al azar, en el cinturón: la suelta seguro)`);
+    // 🎒 Lo demás del cinturón (2026-10-28, dueño: «no aparecen los consumibles»): al morir van todos al botín; los que usó, ofrecidos; los que no,
+    // los ofrece el GM si quiere (CombateFin.dropDeCreep).
+    const azar = new Set(Array.isArray(sc.consumibleAzar) ? sc.consumibleAzar : []);
+    const delCinturon = (Array.isArray(sc.cinturon) ? sc.cinturon : []).filter(c => c && c.nombre && !azar.has(c.nombre) && c.nombre !== sc.municionAzar)
+      .map(c => `${N(c.nombre, c)}${num(c.unidades) > 1 ? ` ×${fmt(num(c.unidades))}` : ''}`);
+    if(delCinturon.length) partes.push(`${delCinturon.join(', ')} (en el cinturón: lo que use, lo suelta; lo que no, si el GM lo ofrece)`);
+    else if(['humano', 'humanoide'].includes(tipoDe(sc))) partes.push(`a veces un consumible, según su arquetipo (${arquetiposTxt(arquetipos(sc))})`);
+    return partes.length ? partes.join(' · ') : 'nada';
+  }
+
+  return {modoSP, spPct, spMax, spRegen, spActual, costoSpHab, especialesEnMano, especialDanoTxt, sinNadaEnMano, talisman, auraMiedo, estandartes, enLasManos, regenPasivas, masDanoElem, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
+    ARQUETIPOS, arquetiposAuto, arquetiposManual, arquetipos, arquetiposTxt, TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TIPOITEM_LABEL, STAT_LABEL, itemParaCreep, magiaDeItem, vaAlEquipo, nombreLimpio, tipoDe, oroSugerido, valorNatural,
+    trofeo, despojosDePrecio, dropsResumen, dropsFijos,
+    correrTiposTexto, migrarObjTipos, migrarCreepTipos, migrarObjEspecial, migrarHabPdg, migrarCreepEspecial, slotDe,
+    danoTxt, fuentesEquipo, modTotal, estadosArmadura, aporteArmadura, defensaEfectiva, armadmgEfectiva, resElemental, critEfectivo, critDeEstados,
+    statValor, estadoActivo, aportesMod, origenesMod, conSigno, statOrigenTxt, armadmgOrigenTxt, ataqueTxt, ataqueOrigenTxt,
+    defensaOrigenTxt, critOrigenTxt, armaduraOrigenTxt, modsAfectanHp, actualizarHpMaxPorCon, nitrosMax, actualizarNo2PorAgl,
+    costoAtaque, habAtaque, costoNitrosHab, habPartes, habTextoMesa, costoHabTxt, pesoArma, costoParry, defensa, bloqueoValor,
+    fuerzaGolpeValor, costoContraataque, costoOportunidad, oportunidadPosible, sinOportunidad, tarjetaPublica, nombreGenerico, presupuesto, presupuestoTxt, presupuestoHtml, alcance, modoHab, bloqueoHab, ESTADOS_NITROS_MIGRAR, normalizar};
+})();

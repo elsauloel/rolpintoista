@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys, pathlib
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
-from rutas import FICHA, GM, VENDOR, XLSX, SP
+from rutas import FICHA, GM, VENDOR, SP
 
 # Marca los items cuyo Detalle promete algo que el programa no hace.
 # No entiende el texto: busca senales de que ahi se describe una mecanica
@@ -56,7 +56,8 @@ def analizar(items):
 
 if __name__ == '__main__':
     import sys, json
-    items = json.load(open(SP + "/catalogo_items.json", encoding="utf-8"))
+    from catalogo_comun import leer_catalogo
+    items = leer_catalogo()
     revisar, ok = analizar(items)
     print(f"Ítems: {len(items)} · con mecánica descrita en el Detalle: {len(revisar)}\n")
     # Agrupar por que tan cubierto esta

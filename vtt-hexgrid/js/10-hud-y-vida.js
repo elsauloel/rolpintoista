@@ -1,0 +1,1670 @@
+// js/10-hud-y-vida.js — tramo 10 de 14 del script de mapa.html (paso 5, nivel A: mismo código, en el mismo orden): HUD del token, vida y daño, rayo en cadena, creeps privados.
+/* ---------- Controles flotantes del token (HUD) ----------
+   Al seleccionar un token aparecen encima, como en Roll20: tres círculos
+   con Vida (rojo), SP (azul) y No2 (verde) que se pueden editar con un
+   clic, un botón de estados alterados, el engranaje (barras y aura) y el
+   rayo (Botonera de la ficha o Acciones del creep). Todo se guarda donde
+   corresponde: la ficha, el creep o el propio token. */
+
+let hudGlobo = '';      // '' | 'estados' | 'ajustes'
+let hudEditando = '';   // 'hp' | 'sp' | 'no2'
+let hudNivel = 'vital'; // 'vital' (clic izquierdo: lo del combate) | 'resto' (clic derecho: lo demás)
+function hudPonerNivel(n){
+  if(hudNivel === n) return;
+  hudNivel = n; hudGlobo = ''; hudEditando = '';
+  pedirDibujo();
+}
+
+function hudCerrar(){
+  hudGlobo = '';
+  hudEditando = '';
+}
+
+// Valores que se muestran en los círculos.
+function hudDatos(t){
+  const v = vinculo(t);
+  const r = (v && v.resumen) || {};
+  const sc = t.tipo === 'creep' ? creepPrivadoDe(t.fichaId) : null;
+  const n = valoresNo2(t);
+  const invocacion = !!(v && v.invocacion);
+  const secreto = t.tipo === 'creep' && !soyGM;  // los jugadores no ven números de creeps
+  const hp = secreto ? null : (t.tipo === 'creep' ? (sc ? num(sc.hp) : null) : num(r.hp));
+  const {sp, spMax} = spDeResumen(r);
+  const conSp = t.tipo === 'pj' && !invocacion && spMax > 0;
+  const spCreep = !secreto && sc && CreepCalculo.modoSP(sc);   // 💧 un creep en modo SP: su círculo de SP, editable por el GM (2026-10-29)
+  return {
+    hp, hpMax: t.tipo === 'creep' ? (sc ? num(sc.hpMax) : null) : num(r.hpMax),
+    sp: conSp ? sp : spCreep ? CreepCalculo.spActual(sc) : null, spMax: conSp ? spMax : spCreep ? CreepCalculo.spMax(sc) : null,
+    no2: secreto ? null : (n ? n.valor : null), no2Max: secreto ? null : (n ? n.max : null),
+    def: t.tipo === 'creep' ? (sc ? creepDefensaMapa(sc) : null) : (r.def === undefined ? null : num(r.def)),
+    estados: (v && v.resumen && v.resumen.estados) || [],
+    notas: (v && v.notas) || '',
+    // El GM ve los nombres de verdad (de la ficha privada); los jugadores, lo publicado: de un creep vivo, solo qué es (2026-10-13).
+    armaNombre: (t.tipo === 'creep' && soyGM && sc ? Combatiente.armaEnMano(sc).nombre : (v && v.armaNombre)) || '',
+    armaNatural: !!(v && v.armaNatural),
+    equipoNombres: (t.tipo === 'creep' && soyGM && sc ? Combatiente.equipoSinArma(sc).filter(e => e && !CreepCalculo.enLasManos(e)).map(e => e.nombre).filter(Boolean) : (v && v.equipoNombres)) || [],
+    manosNombres: (t.tipo === 'creep' && soyGM && sc ? Combatiente.equipoSinArma(sc).filter(e => CreepCalculo.enLasManos(e)).map(e => e.nombre).filter(Boolean) : (v && v.manosNombres)) || [],   // (2026-10-17)
+    equipoVago: t.tipo === 'creep' && !soyGM && !(v && v.resumen && v.resumen.muerto) && num(sc ? sc.hp : 1) > 0,
+  };
+}
+
+function hudHtml(t){
+  const d = hudDatos(t);
+  const puede = puedoCambiarVida(t);
+  // El máximo, a la vista (dueño, 2026-10-28: «te dice cuánto te queda pero no cuánto es tu máximo; esa información es relevante y debería ser
+  // accesible fácilmente desde ese mismo menú»): chiquito debajo del círculo, en el cartel al pasar el mouse y al lado del campo al editarlo.
+  const NOMBRE_RECURSO = {hp: 'Vida', sp: 'SP', no2: 'No2'};
+  const circulo = (clave, valor, color) => {
+    if(valor === null || valor === undefined) return '';
+    const maximo = d[clave + 'Max'], hayMax = maximo !== null && maximo !== undefined && num(maximo) > 0;
+    const cuanto = `${NOMBRE_RECURSO[clave]}: ${fmt(valor)}${hayMax ? ` de ${fmt(maximo)} (máximo)` : ''}`;
+    if(hudEditando === clave && puede){
+      return `<span class="hud-in-caja"><input class="hud-in" data-hud-in="${clave}" style="border-color:${color}" inputmode="decimal" placeholder="${fmt(valor)}" title="${esc(cuanto)} · escribí el valor, o +5 / -3, y apretá Enter">`
+        + `<span class="hud-in-max" style="color:${color}">${fmt(valor)}${hayMax ? ` / ${fmt(maximo)} máx.` : ''}</span></span>`;
+    }
+    return `<button type="button" class="hud-circulo" data-hud-valor="${clave}" style="border-color:${color}" ${puede ? '' : 'disabled'} title="${esc(cuanto)} · ${puede ? 'clic para cambiar' : pausaSoloMirar() ? 'partida en pausa: desde el mapa no se cambia (en tu ficha sí)' : 'solo lo cambia su dueño'}">${fmt(valor)}${hayMax ? `<span class="hud-max">/${fmt(maximo)}</span>` : ''}</button>`;
+  };
+  const icono = (clave, simbolo, titulo, activo) =>
+    `<button type="button" class="hud-circulo icono${activo ? ' abierto' : ''}" data-hud-boton="${clave}" title="${titulo}">${simbolo}</button>`;
+
+  const fichaDeToken = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';
+  // Una invocación la maneja el mismo dueño que su personaje: mismo ⚡
+  // (Botonera propia) que un PJ, ya no queda afuera.
+  const propio = fichaDeToken && ((!soyGM && vinculo(t) && vinculo(t).duenoUid === fbUsuario.uid) || controloFicha(fichaDeToken));
+  const conRayo = !pausaSoloMirar() && (propio || (soyGM && t.tipo === 'creep' && t.fichaId && creepsPub.has(t.fichaId)));   // ⏸ en pausa, sin Botonera
+
+  // Con 🦶 Mover libre prendido el HUD se limpia: solo queda el pie, en rojo, para que
+  // se note que el modo está activo (y el ↻ para girar, que no cuesta No2).
+  const libreActivo = !!moverLibre && moverLibre === seleccion && puedoMoverLibre(t);
+  if(libreActivo){
+    return '<div class="hud-anillo">' +
+      '<button type="button" class="hud-circulo icono abierto libre-activo" data-hud-boton="libre" title="Mover libre ACTIVO: tocá para apagarlo (M, Esc o clic derecho)">🦶</button>' +
+      '</div><div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (la línea de color del marco). Girar no gasta No2">↻</div>';
+  }
+  // Los botones se acomodan en ronda alrededor del token (ver hudUbicar). Dos niveles (dueño, 2026-10-06): al seleccionarlo, lo inmediato
+  // del combate (vida, SP, No2, estados, Botonera); con el ⋯, todo lo demás; el ↩ vuelve. (El clic derecho sigue siendo ping y cancelar.)
+  if(hudNivel === 'resto') return '<div class="hud-anillo">' +
+    (t.tipo === 'creep' ? icono('tarjeta', '🪪', 'Ver tarjeta: imagen, equipo y nota', hudGlobo === 'tarjeta') : '') +
+    (fichaDeToken ? icono('ficha', '📜', 'Abrir la ficha en otra pestaña') : '') +
+    (soyGM && t.tipo === 'creep' && t.fichaId && creepsPub.has(t.fichaId) ? icono('ficha', '📜', 'Ver la ficha del creep (la misma ventana «Ver» de GM Tools)') : '') +
+    ((puedoMover(t) || soyGM) ? icono("ajustes", "⚙", "Barras, aura y edición del token", hudGlobo === "ajustes") : "") +
+    (puedoMoverLibre(t) ? icono('libre', '🦶', 'Mover libre (atajo: M): llevarlo a otra casilla sin gastar No2 ni dejar estela', !!moverLibre && moverLibre === seleccion) : '') +
+    (soyGM ? icono('oculto', t.oculto ? '🙈' : '👁', t.oculto ? 'Oculto: mostrarlo a los jugadores' : 'Ocultarlo (armarlo antes de que entre en la partida)', t.oculto) : '') +
+    // 🧹 Borrar la estela del túnel a mano (dueño, 2026-10-28: «quedó la estela marcada y no sé cómo borrarla antes de empezar a jugar»).
+    (soyGM && Array.isArray(t.tunel) && t.tunel.length ? icono('tunel', '🧹', 'Borrar la estela del túnel (se va de atrás para adelante)') : '') +
+    (propio && !t.fichaId.includes(SEP_INVOCACION) ? icono('equipo', '🛡', 'Equipo y mochila: ver lo que llevás puesto y cambiarlo') : '') +
+    '<button type="button" class="hud-circulo icono hud-nivel" data-hud-nivel="vital" title="Volver a lo del combate: vida, SP, No2, estados y Botonera">↩</button>' +
+    '</div>' +
+    (puedoMoverLibre(t) ? '<div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (la línea de color del marco). Girar no gasta No2">↻</div>' : '') +
+    (hudGlobo === 'tarjeta' && t.tipo === 'creep' ? '<div class="hud-globos">' + hudTarjetaHtml(t, d) + '</div>'
+      : hudGlobo === 'ajustes' && (puedoMover(t) || soyGM) ? '<div class="hud-globos">' + hudAjustesHtml(t, d) + '</div>' : '');
+  // Un creep visto por un jugador (dueño, 2026-10-16): tiene pocos botones, así que la tarjeta 🪪 va en este primer menú y no hace falta el ⋯
+  // (los dos niveles eran para la ficha propia, que tenía demasiados).
+  const creepJugador = t.tipo === 'creep' && !soyGM;
+  let html = '<div class="hud-anillo">' +
+    circulo('hp', d.hp, HP_COLOR) + circulo('sp', d.sp, SP_COLOR) + circulo('no2', d.no2, NO2_COLOR) +
+    icono('estados', '◎', 'Estados alterados', hudGlobo === 'estados') +
+    (creepJugador ? icono('tarjeta', '🪪', 'Ver tarjeta: imagen, equipo y nota', hudGlobo === 'tarjeta') : '') +
+    (conRayo ? icono('rayo', '⚡', propio ? 'Abrir la Botonera (atajo: B, la de tu personaje principal)' : 'Abrir las Acciones del creep') : '') +
+    (creepJugador ? '' : '<button type="button" class="hud-circulo icono hud-nivel" data-hud-nivel="resto" title="Más: ficha, tarjeta, ajustes, mover libre, equipo…">⋯</button>') +
+    '</div>' +
+    (puedoMoverLibre(t) ? '<div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (la línea de color del marco). Girar no gasta No2">↻</div>' : '');
+  let globo = '';
+  if(hudGlobo === 'estados') globo = hudEstadosHtml(t, d.estados, puedoCambiarEstados(t));
+  if(hudGlobo === 'hp' && puede) globo = hudHpHtml(t, d);
+  if(hudGlobo === 'tarjeta' && creepJugador) globo = hudTarjetaHtml(t, d);
+  return html + (globo ? '<div class="hud-globos">' + globo + '</div>' : '');
+}
+
+/* ---------- Vida desde el círculo rojo: recibir daño o cambiar HP directo ----------
+   Un clic en el círculo rojo abre un mini menú con dos opciones que se
+   cambian ahí mismo: 1) "Recibe daño" (por defecto): se escribe el daño del
+   golpe y se le resta la Defensa; 2) "HP directo": el número de siempre
+   (valor, +5, -3) sin tener en cuenta la Defensa. */
+let hpRayo = false;   // ⚡ Rayo en cadena en "Recibe daño" (P118): daño directo y salta a los rivales cercanos
+let hpCritMult = 1;   // multiplicador de crítico de "Recibe daño" (1 = sin crítico; 2 doble daño, 3 triple, 4 cuádruple). Un crítico multiplica TODO el daño y NO resta la Defensa (Comun/critico.js).
+let hpModo = 'danio';   // 'danio' | 'directo' (vuelve a 'danio' cada vez que se abre)
+
+function creepDefensaMapa(sc){ return CreepCalculo.defensaEfectiva(sc); }   // comun/creep-calculo.js
+
+// Defensa especial (Paso 3 de las reglas de casteo, docs/reglas-casteo.md):
+// stat general y fijo, sin atributo (base a mano, sc.armadmg, 0 por
+// defecto). A diferencia de Defensa, sus bonos de equipo NO se hornean en
+// la base al equipar (gm-tools los deja en it.mods): se suman acá en vivo,
+// igual que gm-tools.html (creepModTotal). Se resta al daño de casteo que
+// ignora la Defensa (mismo lugar donde antes se usaba 0 a secas).
+function creepArmadmgMapa(sc){ return CreepCalculo.armadmgEfectiva(sc); }
+
+// Golpe − Defensa, con Invulnerable y Escudo mágico (mismas reglas que gm-tools
+// con los creeps). Modifica el escudo de `efectos`: pasar una copia para solo mirar.
+// o.magico: el golpe es daño especial (mágico o elemental); sin eso, un escudo `soloEspecial` (el Escudo de la mañana, 2026-10-19) no lo toca;
+// con eso, uno `soloFisico` (el Escudo del sereno) tampoco.
+function resolverGolpe(golpe, defensa, efectos, o){
+  const activos = (efectos || []).filter(e => e && e.activo !== false);
+  if(activos.some(e => e.invulnerable)) return {recibido: 0, invulnerable: true, defensa, absorbido: 0};
+  let recibido = Math.max(0, golpe - defensa);
+  // 🗡 Perfora N (`o.perfora`, 2026-10-27: las trampas que perforan, la Aguja): N puntos pasan siempre la Defensa (Combatiente.perforaPasa).
+  const perfora = o && num(o.perfora) > 0 ? Combatiente.perforaPasa(golpe, defensa, Math.min(num(o.perfora), golpe)) : 0;
+  if(perfora) recibido = perfora;
+  const llega = recibido;   // 🧮 lo que pasó la Defensa (la cuenta del duelo)
+  let absorbido = 0, vida = 0;
+  const capasUso = [];
+  const ab = Combatiente.absorberPct(activos, recibido);   // Armadura arcana: se queda con el 50 % de lo que llega, hasta 10 (2026-10-10)
+  recibido = ab.recibido; absorbido += ab.tomado;
+  const capas = activos.filter(e => (e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) && num(e.escudoMagicoActual ?? e.escudoMagico) > 0 && !(e.soloEspecial && !(o && o.magico)) && !(e.soloFisico && o && o.magico))
+    .sort((a, b) => (a.excedenteVida ? 1 : 0) - (b.excedenteVida ? 1 : 0));   // primero los escudos, al final la vida extra
+  capas.forEach(c => {
+    if(recibido <= 0) return;
+    const actual = num(c.escudoMagicoActual ?? c.escudoMagico), tomado = Math.min(recibido, actual);
+    c.escudoMagicoActual = actual - tomado;
+    if(c.excedenteVida) c.escudoMagico = c.escudoMagicoActual;   // valor neto: no hay máximo
+    absorbido += tomado; recibido -= tomado;
+    if(tomado > 0) capasUso.push({nombre: String(c.nombre || (c.excedenteVida ? 'Vida extra' : 'Escudo')).slice(0, 40), v: tomado, ...(c.excedenteVida ? {vida: true} : {})});
+    if(c.excedenteVida) vida += tomado;   // 🛡/❤ (P227, 2026-10-27): lo que se lleva la Vida extra es daño; lo que se come un escudo, no
+  });
+  return {recibido, absorbido, defensa, llega, ...(vida ? {vida} : {}), ...(perfora ? {perfora} : {}), ...(ab.tomado ? {arcano: ab.tomado} : {}),
+    ...(capasUso.length ? {capas: capasUso} : {}), ...(o && Array.isArray(o.defPartes) ? {defPartes: o.defPartes} : {})};
+}
+
+function leerGolpe(texto){
+  const crudo = String(texto || '').trim().replace(',', '.');
+  return /^\d+(?:\.\d+)?$/.test(crudo) ? parseFloat(crudo) : null;
+}
+
+function golpeTexto(nombre, golpe, r, previo, nuevo){
+  const extra = [];
+  if(r.arcano) extra.push(`la Armadura arcana absorbió ${fmt(r.arcano)}`);
+  if(r.mitiMiti) extra.push(`🛡 ${r.mitiMitiNombre} se llevó ${fmt(r.mitiMiti)} (${r.mitiMitiTxt || 'Miti-Miti'})`);
+  if(num(r.perfora) > 0) extra.push(`pasa${num(r.perfora) > 1 ? 'n' : ''} ${fmt(r.perfora)} por la Perfora`);
+  if(num(r.absorbido) - num(r.arcano) - num(r.vida) > 0) extra.push(`el escudo absorbió ${fmt(num(r.absorbido) - num(r.arcano) - num(r.vida))}`);   // 🛡 (P227: el escudo y la Vida extra, aparte)
+  if(num(r.vida) > 0) extra.push(`la Vida extra se llevó ${fmt(r.vida)}`);
+  const suf = extra.length ? ` · ${extra.join(' · ')}` : '';
+  if(r.invulnerable) return `${nombre}: Invulnerable, el golpe de ${fmt(golpe)} no hizo nada`;
+  if(r.recibido <= 0 && !r.absorbido) return `${nombre}: golpe de ${fmt(golpe)} · Defensa ${fmt(r.defensa)} lo frenó entero`;
+  return `${nombre}: ${fmt(golpe)} − Defensa ${fmt(r.defensa)} → ${fmt(num(r.recibido) + num(r.vida))} de daño (${fmt(previo)} → ${fmt(nuevo)} HP)${suf}`;   // la Vida extra cuenta como daño (P227)
+}
+
+// ignoraDef: daño directo (un crítico, una trampa que ignora la Defensa, casteo…):
+// no se le resta la Defensa. restaIgnorando (opcional, Paso 3 del casteo): en vez
+// de nada, se le resta ESTO (la Defensa especial) — solo lo usa el daño de casteo
+// que ignora la Defensa (dueloAplicarDano); todo lo demás (críticos, trampas,
+// fuego, Rayo en cadena) sigue ignorando la Defensa entera, sin cambios.
+// restaExtra (2026-10-04): lo que se resta además (la resistencia al elemento del daño), con o sin Defensa.
+/* La Defensa extra de una pieza (torso blando, 2026-10-06): contra el primer golpe que recibe en la RONDA (`defprimer`; dueño, 2026-10-19, con el
+   Anillo del primer golpe; antes era en el turno). La marca es la ronda en que recibió el último golpe (`primerGolpeDeRonda`) y contra armas a distancia (`defdist`, con `o.distancia`). Solo cuando la Defensa cuenta (no en un crítico ni en lo que la ignora). */
+/* La Coraza del guardián (2026-10-06, dueño: automática): un aliado AL LADO (a 1 casillero, del mismo bando: creeps con creeps; personajes e
+   invocaciones entre sí) con `guardian` le suma esa Defensa a quien recibe el golpe, solo cuando la Defensa cuenta. No se acumulan: vale el mayor.
+   Cada vez que entra, la Crónica lo cuenta a todos y a quien maneja al protegido le aparece un aviso chico (momento con `datos.chico`). */
+function guardianValor(x){
+  if(!x || !x.fichaId) return 0;
+  if(x.tipo === 'creep'){ const sc = creepPrivadoDe(x.fichaId); return sc ? Math.max(0, num(CreepCalculo.modTotal(sc, 'guardian'))) : 0; }
+  const ri = resumenDeInv(x);
+  if(ri) return Math.max(0, num(ri.guardian));
+  const f = fichasPub.get(x.fichaId);
+  return Math.max(0, num(f && f.resumen && f.resumen.guardian));
+}
+function guardianDe(t){
+  if(!t || t.col === undefined || t.fila === undefined) return null;
+  const bando = x => x.tipo === 'creep' ? 'creep' : 'pj';
+  let mejor = null;
+  tokens.forEach(x => {
+    if(!x || x === t || !x.fichaId || x.fichaId === t.fichaId || bando(x) !== bando(t) || x.col === undefined) return;
+    if(distanciaHex({col: t.col, fila: t.fila}, {col: x.col, fila: x.fila}) > 1) return;
+    const val = guardianValor(x);
+    if(val > 0 && (!mejor || val > mejor.val)) mejor = {val, nombre: nombreDe(x)};
+  });
+  return mejor;
+}
+function guardianAviso(t, g){
+  if(!g || typeof momentoAbrir !== 'function') return;
+  const nom = nombreDe(t);
+  momentoAbrir({tipo: 'guardian', icono: '🛡', titulo: `${g.nombre} protege a ${nom}`, resultado: `+${g.val} Defensa contra el golpe, por estar al lado de su guardián.`,
+    estado: 'listo', datos: {...(t.tipo !== 'creep' && t.duenoUid ? {paraUid: t.duenoUid} : {}), chico: true, aviso: true}});
+}
+// ¿Es el primer golpe que recibe en esta ronda? Anota la ronda en `obj[campo]` (sin el mapa de turnos, la marca de siempre: se vacía en su turno).
+function primerGolpeDeRonda(obj, campo, viejo){
+  const ronda = typeof window.rondaDeCombate === 'function' ? window.rondaDeCombate() : null;
+  if(ronda === null || ronda === undefined) return viejo;
+  const primero = obj[campo] !== ronda;
+  obj[campo] = ronda;
+  return primero;
+}
+/* 🧮 La cuenta del daño, a la vista (2026-10-28, dueño: «decía 19 de daño y el siguiente paso mostraba 0… tiene que haber una instancia intermedia súper
+   clara que dice 19 de daño menos X de defensa menos 8 de blindaje; todo lo que esté frenando el daño tiene que estar comunicado muy claramente»): lo que
+   se le resta al golpe, renglón por renglón (su suma es la Defensa que usa resolverGolpe, que lo devuelve en `defPartes`). `porStack`: los creeps suman
+   los bonos de Defensa de un estado por cada stack. */
+function defEstadosNota(estados, porStack){
+  const L = [];
+  (estados || []).forEach(e => {
+    if(!e || e.activo === false) return;
+    if(e.armaduraRota){ L.push(`${e.nombre || 'Armadura rota'} −${Math.max(1, num(e.stacks) || 1)}`); return; }
+    const v = (e.mods || []).filter(m => m && m.stat === 'def').reduce((a, m) => a + num(m.val), 0) * (porStack ? Math.max(1, num(e.stacks) || 1) : 1);
+    if(v) L.push(`${e.nombre || 'un estado'} ${v > 0 ? '+' : '−'}${Math.abs(v)}`);
+  });
+  return L.length ? `con ${L.join(', ')}` : '';
+}
+function defensaPartes(c){
+  const p = [];
+  if(c.ignoraDef){ if(num(c.restaIgnorando) > 0) p.push({txt: 'Defensa especial', v: num(c.restaIgnorando)}); }
+  else{
+    const nota = defEstadosNota(c.estados, c.porStack);
+    p.push({txt: 'Defensa', v: num(c.base), ...(nota ? {nota} : {})});
+    if(c.primero && Math.max(0, num(c.valor('defprimer'))) > 0) p.push({txt: 'Defensa contra el primer golpe de la ronda', v: Math.max(0, num(c.valor('defprimer')))});
+    if(c.o && c.o.distancia && Math.max(0, num(c.valor('defdist'))) > 0) p.push({txt: 'Defensa contra armas a distancia', v: Math.max(0, num(c.valor('defdist')))});
+    if(c.guarda) p.push({txt: `Guardián: ${c.guarda.nombre} al lado`, v: num(c.guarda.val)});
+    if(c.muro) p.push({txt: `Muro de escudos con ${c.muro.nombre}`, v: num(c.muro.val)});
+    if(c.estoico) p.push({txt: `Estoicismo: ${c.estoico.n} enemigo${c.estoico.n === 1 ? '' : 's'} pegado${c.estoico.n === 1 ? '' : 's'}`, v: num(c.estoico.val)});
+  }
+  if(num(c.restaExtra)) p.push({txt: (c.o && c.o.resTxt) || 'Resistencia al elemento', v: num(c.restaExtra)});
+  return p;
+}
+const defExtra = (ignoraDef, primero, valor, o) => ignoraDef ? 0 : (primero ? Math.max(0, num(valor('defprimer'))) : 0) + (o && o.distancia ? Math.max(0, num(valor('defdist'))) : 0);
+async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
+  const golpe = leerGolpe(texto);
+  if(golpe === null) throw new Error(ERROR_TIPEO);
+  const guarda = ignoraDef ? null : guardianDe(t);   // la Coraza del guardián de un aliado al lado
+  const muro = ignoraDef ? null : muroDe(t);   // Muro de escudos (js/26): un aliado con escudo al lado
+  const estoN = ignoraDef ? 0 : estoicoRivales(t).length;   // 🗿 Estoicismo (js/85): los rivales pegados, si tiene el estado
+  const prot = o && o.reparte ? mitiMitiDe(t) : null;   // 🛡 el Escudo humano (2026-10-27): otro creep que se lleva la mitad
+  const res = await modificarCreep(t.fichaId, sc => {
+    const viejoC = !num((sc.usosEspecial || {})._golpe);
+    sc.usosEspecial = {...(sc.usosEspecial || {}), _golpe: 1};   // (se vacía en su Mantenimiento)
+    const primero = primerGolpeDeRonda(sc, 'golpeRonda', viejoC);   // por ronda (2026-10-19)
+    const estoico = estoicoDe(sc.estados, estoN);
+    const extra = defExtra(ignoraDef, primero, st => CreepCalculo.modTotal(sc, st), o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0) + (estoico ? estoico.val : 0);
+    const defPartes = defensaPartes({ignoraDef, restaIgnorando, restaExtra, base: creepDefensaMapa(sc), estados: sc.estados, porStack: true, primero, valor: st => CreepCalculo.modTotal(sc, st), o, guarda, muro, estoico});
+    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : creepDefensaMapa(sc) + extra) + num(restaExtra || 0), sc.estados, {...(o || {}), defPartes});
+    mitiMitiPartir(r, prot);
+    // 🛡 Interpuesto (2026-10-27): el +2 a la Defensa era para este golpe; se va con él.
+    if(Array.isArray(sc.estados)) sc.estados = sc.estados.filter(e => !(e && e.unGolpe));
+    const previo = num(sc.hp);
+    sc.hp = Math.max(0, previo - r.recibido);
+    // 🔥 Llama de Fénix (2026-10-20): si cae con la llama, revive con toda la vida y Titilando.
+    let fenix = false;
+    if(sc.hp <= 0){ const q = Combatiente.revivirFenix(sc.estados, typeof estadosPresetCreep === 'function' ? estadosPresetCreep() : []); if(q){ sc.estados = q; sc.hp = Math.max(1, num(sc.hpMax)); fenix = true; } }
+    const bronca = typeof broncaSumar === 'function' ? broncaSumar(sc, r) : null;   // 😤 cada golpe que le duele suma (js/51)
+    // 🎯 Si le entra daño, pierde la puntería (Tiro a la cabeza, 2026-10-21, dueño: «solamente si le hacen daño»).
+    let punteria = '';
+    if(num(r.recibido) > 0){ const i = (sc.estados || []).findIndex(e => e && e.activo !== false && e.pierdeAlDano); if(i >= 0){ punteria = sc.estados[i].nombre; sc.estados.splice(i, 1); } }
+    // 🪓 El golpe anunciado (js/63): se corta con 10 de daño o más, sumando los golpes mientras lo carga (dueño, 2026-10-21).
+    let golpeCae = false, golpeAcum = 0, golpeTope = 0, golpeHab = null;
+    if(num(r.recibido) > 0){ const j = (sc.estados || []).findIndex(e => e && e.activo !== false && num(e.cortaDano) > 0);
+      if(j >= 0){ const e = sc.estados[j]; e.danoRecibido = num(e.danoRecibido) + num(r.recibido); golpeAcum = e.danoRecibido; golpeTope = num(e.cortaDano);
+        golpeHab = (sc.habilidades || []).find(h => h && e.hab && h.golpeAnunciado && (h.nombre === e.hab || h.id === e.hab)) || null;   // (el estado guarda el nombre, js/63)   // ⚡ la Descarga arcana: un hechizo cargado se dice distinto
+        if(golpeAcum >= golpeTope){ golpeCae = true; sc.estados.splice(j, 1); } } }
+    return {r, previo, nuevo: fenix ? 0 : sc.hp, bronca, fenix, hpFenix: sc.hp, punteria, golpeCae, golpeAcum, golpeTope, golpeHab};
+  });
+  toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
+  if(res.fenix){
+    toast(`🔥 ${nombreDe(t)}: ¡la Llama de Fénix lo levanta! Revive con ${fmt(res.hpFenix)} HP y queda Titilando.`);
+    try{ momentoAbrir({tipo: 'fenix', icono: '🔥', titulo: `${nombreDe(t)} renace de sus cenizas`, estado: 'listo', resultado: `La Llama de Fénix lo levanta con ${fmt(res.hpFenix)} HP; queda Titilando hasta su próximo turno.`}); }catch(e){}
+  }
+  if(res.bronca && typeof broncaAnunciar === 'function') broncaAnunciar(t, res.bronca);
+  if(res.golpeCae || res.golpeAcum){   // 🪓 (js/63)
+    const h = res.golpeHab, hechizo = typeof GA_HECHIZO === 'function' && GA_HECHIZO(h), ico = typeof GA_ICONO === 'function' ? GA_ICONO(h) : '🪓';
+    const txt = hechizo
+      ? (res.golpeCae ? `${nombreDe(t)} recibió ${fmt(res.golpeAcum)} de daño mientras cargaba: ¡se le corta ${h.nombre} y pierde lo cargado!` : `${nombreDe(t)} sigue cargando ${h.nombre}: lleva ${fmt(res.golpeAcum)} de daño de ${fmt(res.golpeTope)} (con ${fmt(res.golpeTope)} se le corta)`)
+      : (res.golpeCae ? `${nombreDe(t)} recibió ${fmt(res.golpeAcum)} de daño mientras cargaba: ¡se le cae el golpe!` : `${nombreDe(t)} aguanta el golpe cargado: lleva ${fmt(res.golpeAcum)} de daño de ${fmt(res.golpeTope)} (con ${fmt(res.golpeTope)} se le cae)`);
+    mesaLinea(`${ico} ${txt}`, 'recordatorio');
+    try{ momentoAbrir({tipo: 'golpe-anunciado', icono: ico, titulo: txt, estado: 'listo', datos: {chico: true}}); }catch(e){}
+  }
+  if(res.punteria){
+    const txt = `🎯 ${nombreDe(t)} recibió daño y pierde la puntería (se le va ${res.punteria})`;
+    try{ mesaLinea(txt, 'recordatorio'); momentoAbrir({tipo: 'punteria', icono: '🎯', titulo: `${nombreDe(t)} pierde la puntería`, estado: 'listo', resultado: txt.slice(3)}); }catch(e){}
+  }
+  if(guarda && golpe > 0) guardianAviso(t, guarda);
+  if(muro && golpe > 0) muroAviso(t, muro);
+  await mitiMitiCobrar(t, prot, res);   // 🛡 el Escudo humano (2026-10-27)
+  await cosechaSiMuere(t, res);
+  return res;
+}
+
+/* 🛡 Miti-Miti (Tanque, 2026-10-11, decisiones del dueño): un personaje con la marca «Miti-Miti» (`protege` = la ficha del protegido, en su resumen
+   público) se lleva la mitad de cada golpe o área que daña al protegido, redondeada para arriba, directo a su vida (sin su Defensa: ya pasó la del
+   protegido). Solo el daño que llega con `o.reparte` (golpes del duelo, áreas, «Recibe daño»); no el de estados que siguen corriendo ni trampas. */
+/* 🛡 El Escudo humano de los creeps (2026-10-27, el Miti-Miti un escalón arriba): un creep con la marca protege a otro creep (`protege` = su id), a 3 casillas o
+   menos (más lejos, se corta). Lo cobra el mapa del GM, que maneja a los dos. */
+const ESCUDO_HUMANO_DIST = 3;
+const ESCUDO_HUMANO_NOMBRES = ['Escudo humano', 'Miti-Miti'];   // (hasta el 2026-10-27 la marca del creep se llamaba como la de clase)
+function mitiMitiDe(t){
+  if(!t || !t.fichaId) return null;
+  if(t.tipo === 'creep'){
+    if(!soyGM) return null;
+    for(const x of tokens.values()){
+      if(!x || x === t || x.tipo !== 'creep' || !x.fichaId || x.fichaId === t.fichaId) continue;
+      const sc = creepPrivadoDe(x.fichaId);
+      if(!sc || num(sc.hp) <= 0) continue;
+      if((sc.estados || []).some(e => e && e.activo !== false && ESCUDO_HUMANO_NOMBRES.includes(e.nombre) && e.protege === t.fichaId) && distanciaHex(x, t) <= ESCUDO_HUMANO_DIST) return x;
+    }
+    return null;
+  }
+  for(const x of tokens.values()){
+    if(!x || x === t || x.tipo !== 'pj' || !x.fichaId || String(x.fichaId).includes(SEP_INVOCACION)) continue;
+    const est = (((vinculo(x) || {}).resumen || {}).estados) || [];
+    if(est.some(e => e && e.activo !== false && e.nombre === 'Miti-Miti' && e.protege === t.fichaId)) return x;
+  }
+  return null;
+}
+function mitiMitiPartir(r, prot){
+  if(!prot || !(r.recibido > 0)) return 0;
+  const m = Math.ceil(r.recibido / 2);
+  r.recibido -= m; r.mitiMiti = m; r.mitiMitiNombre = nombreDe(prot); r.mitiMitiTxt = prot.tipo === 'creep' ? 'Escudo humano' : 'Miti-Miti';
+  return m;
+}
+async function mitiMitiCobrar(t, prot, res){
+  if(!prot || !res || !(num(res.r && res.r.mitiMiti) > 0)) return;
+  try{
+    const m = num(res.r.mitiMiti);
+    const rp = prot.tipo === 'creep' ? await danioCreep(prot, String(m), true, 0, 0) : await danioPj(prot, String(m), true, 0, 0);   // 🛡 el Escudo humano de un creep (2026-10-27)
+    mesaLinea(`🛡 ${prot.tipo === 'creep' ? 'Escudo humano' : 'Miti-Miti'}: ${nombreDe(prot)} se lleva ${fmt(m)} del golpe a ${nombreDe(t)}, directo a la vida (${fmt(rp.previo)} → ${fmt(rp.nuevo)} HP)`);
+  }catch(err){ console.error('No se pudo cobrar el Miti-Miti:', err); mesaLinea(`🛡 Miti-Miti: a ${nombreDe(prot)} le tocan ${fmt(num(res.r.mitiMiti))} de daño (✋ a mano: no se pudo aplicar solo)`); }
+}
+
+/* La cosecha (2026-10-07, Varita de la cosecha): si alguien cae con la marca «Cosecha de X», X recupera 2 SP y 2 de vida (un creep, solo la
+   vida: no usa SP). Lo hace el mapa del GM, como el resto del daño. */
+async function cosechaSiMuere(t, res){
+  try{
+    if(!soyGM || !res || !(num(res.previo) > 0) || num(res.nuevo) > 0) return;
+    const marca = (((vinculo(t) || {}).resumen || {}).estados || []).find(e => e && e.activo !== false && /^Cosecha de /.test(String(e.nombre || '')));
+    if(!marca) return;
+    const quien = String(marca.nombre).replace(/^Cosecha de /, '').trim();
+    const ct = [...tokens.values()].find(x => x.fichaId && nombreDe(x) === quien);
+    if(!ct){ mesaLinea(`🌾 Cosecha: ${nombreDe(t)} cayó marcado; ${quien} recupera 2 SP y 2 de vida (a mano: su token no está en el mapa)`); return; }
+    const esInv = ct.tipo === 'pj' && String(ct.fichaId).includes(SEP_INVOCACION);
+    const rc = esInv ? await dueloCurarInv(ct, 2) : await dueloCurar(ct, 2);
+    const vida = Math.max(0, num(rc && rc.nuevo) - num(rc && rc.previo));
+    let sp = '';
+    if(ct.tipo === 'pj' && !esInv){
+      const base = fbDb.doc(fbRutaCampana(`fichas/${ct.fichaId}`)), parteRef = base.collection('partes').doc('general');
+      const vuelve = await fbDb.runTransaction(async tx => {
+        const [parte, ficha] = await Promise.all([tx.get(parteRef), tx.get(base)]);
+        if(!parte.exists || !ficha.exists) return 0;
+        const datos = JSON.parse(parte.data().json || '{}'), rs = ficha.data().resumen || {};
+        const n = Math.min(2, Math.max(0, num(datos.spGastado)));
+        if(!n) return 0;
+        datos.spGastado = num(datos.spGastado) - n;
+        tx.set(parteRef, {json: JSON.stringify(datos), actualizado: firebase.firestore.FieldValue.serverTimestamp()});
+        tx.update(base, {'resumen.sp': num(rs.sp) + n});
+        return n;
+      });
+      sp = vuelve ? `${vida ? ' y' : ''} ${vuelve} SP` : '';
+    }
+    mesaLinea(`🌾 Cosecha: ${nombreDe(t)} cayó marcado; ${quien} recupera ${vida ? vida + ' de vida' : ''}${sp}${!vida && !sp ? 'nada (ya estaba lleno)' : ''}`);
+  }catch(err){ console.error('No se pudo aplicar la cosecha:', err); }
+}
+
+// Los estados con escudo del resumen público, con el escudo que les queda (se emparejan por nombre, en orden: el resumen no lleva ids).
+function escudosAlResumen(pub, efectos){
+  const conEscudo = efectos.filter(e => e && e.activo !== false && (e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0));
+  const usados = new Set();
+  return pub.map(x => {
+    if(!x || x.escudo === undefined) return x;
+    const e = conEscudo.find(y => y.nombre === x.nombre && !usados.has(y));
+    if(!e) return x;
+    usados.add(e);
+    return {...x, escudo: num(e.escudoMagicoActual ?? e.escudoMagico)};
+  });
+}
+async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
+  const golpe = leerGolpe(texto);
+  if(golpe === null) throw new Error(ERROR_TIPEO);
+  const guarda = ignoraDef ? null : guardianDe(t);   // la Coraza del guardián de un aliado al lado
+  const muro = ignoraDef ? null : muroDe(t);   // Muro de escudos (js/26): un aliado con escudo al lado
+  const estoN = ignoraDef ? 0 : estoicoRivales(t).length;   // 🗿 Estoicismo (js/85): los rivales pegados, si tiene el estado
+  const prot = o && o.reparte ? mitiMitiDe(t) : null;   // 🛡 Miti-Miti: un Tanque que se lleva la mitad
+  const base = fbDb.doc(fbRutaCampana(`fichas/${t.fichaId}`));
+  const parteRef = base.collection('partes').doc('general');
+  const efectosRef = base.collection('partes').doc('efectos');   // los estados viven en su propia parte (2026-10-10: antes se leían de «general» y no estaban)
+  const ts = firebase.firestore.FieldValue.serverTimestamp();
+  const res = await fbDb.runTransaction(async tx => {
+    const [parte, ficha, partEf] = await Promise.all([tx.get(parteRef), tx.get(base), tx.get(efectosRef)]);
+    if(!parte.exists || !ficha.exists) throw new Error('La ficha todavía no se guardó en la mesa');
+    const datos = JSON.parse(parte.data().json || '{}');
+    const datosEf = partEf.exists ? JSON.parse(partEf.data().json || '{}') : null;
+    const efectos = datosEf && Array.isArray(datosEf.efectos) ? datosEf.efectos : (datos.efectos || []);
+    const efectosAntes = JSON.stringify(efectos);
+    const rs = ficha.data().resumen || {};
+    if(rs.def === undefined) throw new Error('SIN_DEF');
+    const viejoP = !num((datos.ataquesArma || {})._golpe);
+    datos.ataquesArma = {...(datos.ataquesArma || {}), _golpe: 1};   // (el Mantenimiento la vacía)
+    datos.meta = datos.meta || {};
+    const primero = primerGolpeDeRonda(datos.meta, 'golpeRonda', viejoP);   // por ronda (2026-10-19)
+    const estoico = estoicoDe(efectos, estoN);
+    const extra = defExtra(ignoraDef, primero, st => rs[st], o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0) + (estoico ? estoico.val : 0);
+    const defPartes = defensaPartes({ignoraDef, restaIgnorando, restaExtra, base: num(rs.def), estados: efectos, primero, valor: st => rs[st], o, guarda, muro, estoico});
+    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : num(rs.def) + extra) + num(restaExtra || 0), efectos, {...(o || {}), defPartes});
+    mitiMitiPartir(r, prot);
+    const previo = num(datos.hp);
+    datos.hp = Math.max(0, previo - r.recibido);
+    // 💍 El Anillo del último aliento (2026-10-18): una vez por día, el golpe que lo dejaría en 0 lo deja en 1 (comun/ficha-acciones.js, fijarHp).
+    let aliento = false;
+    if(previo > 0 && datos.hp <= 0 && num(rs.ultimoAliento) > 0 && !(datos.meta && datos.meta.ultimoAlientoUsado)){ datos.hp = 1; datos.meta = {...(datos.meta || {}), ultimoAlientoUsado: true}; aliento = true; }
+    // 🔥 Llama de Fénix (2026-10-20): el golpe que lo deja en 0 lo hace renacer con toda la vida y todo el SP, Titilando (acá mismo: no depende
+    // de que la pantalla del dueño esté abierta).
+    let fenix = false;
+    if(previo > 0 && datos.hp <= 0){
+      const q = Combatiente.revivirFenix(efectos, typeof estadosPresetFicha === 'function' ? estadosPresetFicha() : []);
+      if(q){ efectos.splice(0, efectos.length, ...q); datos.hp = Math.max(1, num(rs.hpMax) || 1); datos.spGastado = 0; fenix = true; }
+    }
+    // 😇 El Pacto (2026-10-28): si no lo levantó la llama, lo levanta el pacto: revive con un cuarto de la vida, Titilando, y el pacto se gasta.
+    let pacto = false;
+    if(previo > 0 && datos.hp <= 0 && datos.meta && datos.meta.pacto){
+      const tit = Combatiente.estadoTitilando(typeof estadosPresetFicha === 'function' ? estadosPresetFicha() : []);
+      if(tit) Combatiente.agregarEstado(efectos, tit);
+      datos.meta.pacto = false;
+      datos.hp = Combatiente.pactoVida(rs.hpMax);
+      pacto = true;
+    }
+    // Orbe de absorción (js/26): el daño mágico o elemental que llegó a la vida devuelve SP, una vez por turno.
+    let absorbe = 0;
+    if(o && o.magico && r.recibido > 0 && num(rs.orbeAbsorcion) > 0 && !num(datos.ataquesArma._absorbe)){
+      absorbe = Math.min(num(rs.orbeAbsorcion), Math.max(0, num(datos.spGastado)));
+      datos.ataquesArma._absorbe = 1;
+      datos.spGastado = num(datos.spGastado) - absorbe;
+    }
+    tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
+    if(datosEf && JSON.stringify(efectos) !== efectosAntes) tx.set(efectosRef, {json: JSON.stringify(datosEf), actualizado: ts});   // el escudo que bajó, lo que absorbió la Armadura arcana, Titilando
+    // El escudo que bajó también en el resumen público (2026-10-11, probando Shield: el token seguía mostrando 14/14 con el escudo gastado).
+    const estPub = datosEf && JSON.stringify(efectos) !== efectosAntes && Array.isArray(rs.estados) ? escudosAlResumen(rs.estados, efectos) : null;
+    // Titilando, en el resumen público igual que en la ficha (2026-10-28: la marca «Titilando» sin turnos se volvía «Invulnerable · 1 turno» al guardar la
+    // ficha, y la lista del GM cambiaba de forma; ver js/81): el mismo nombre, turnos y detalle del estado que se le puso.
+    const titE = (fenix || pacto) ? efectos.find(x => x && x.titilando && x.activo !== false) : null;
+    const titPub = titE ? {nombre: String(titE.nombre).slice(0, 60), turnos: num(titE.turnos), permanente: false, invulnerable: true, polaridad: 'buff', detalle: String(titE.detalle || '').slice(0, 300)}
+      : {nombre: 'Titilando', polaridad: 'buff', invulnerable: true};
+    tx.update(base, {actualizado: ts, 'resumen.hp': datos.hp, ...(absorbe ? {'resumen.sp': num(rs.sp) + absorbe} : {}), ...(estPub ? {'resumen.estados': estPub} : {}), ...(aliento ? {'resumen.ultimoAlientoUsado': true} : {}),
+      ...(fenix ? {'resumen.estados': (estPub || rs.estados || []).filter(x => !(x && /^llama de f[eé]nix/i.test(String(x.nombre || '')))).concat([titPub])} : {}),
+      ...(pacto ? {'resumen.pacto': false, ...(fenix ? {} : {'resumen.estados': (estPub || rs.estados || []).concat([titPub])})} : {})});
+    return {r, previo, nuevo: fenix || pacto ? 0 : datos.hp, absorbe, aliento, fenix, pacto, hpFenix: datos.hp};
+  });
+  if(res.aliento){
+    const txt = `${nombreDe(t)} iba a caer, pero el Anillo del último aliento lo sostiene con 1 de vida (una vez por día)`;
+    try{ mesaLinea(`💍 ${txt}`, 'recordatorio'); }catch(err){}
+    try{ momentoAbrir({tipo: 'zona-renueva', icono: '💍', titulo: 'Anillo del último aliento', estado: 'listo', resultado: txt, datos: {}}); }catch(err){}
+  }
+  toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
+  if(guarda && golpe > 0) guardianAviso(t, guarda);
+  if(muro && golpe > 0) muroAviso(t, muro);
+  if(res.fenix){
+    toast(`🔥 ${nombreDe(t)}: ¡la Llama de Fénix lo levanta! Revive con ${fmt(res.hpFenix)} HP y todo el SP, Titilando.`);
+    try{ momentoAbrir({tipo: 'fenix', icono: '🔥', titulo: `${nombreDe(t)} renace de sus cenizas`, estado: 'listo', resultado: `La Llama de Fénix lo levanta con ${fmt(res.hpFenix)} HP y todo el SP; queda Titilando hasta su próximo turno.`}); }catch(e){}
+  }
+  // 😇 Un solo anuncio (dueño, 2026-10-28: «que al revivir solo aparezca un anuncio que diga algo como "zafaste de morir: te salvó el pacto"»): quien cae lo
+  // ve al centro; los demás, en la Crónica.
+  if(res.pacto){
+    try{ momentoAbrir({tipo: 'fenix', icono: '😇', titulo: `${nombreDe(t)} zafó de morir: lo salvó el pacto`, estado: 'listo',
+      resultado: `Vuelve con ${fmt(res.hpFenix)} HP y queda Titilando (invulnerable) hasta su próximo turno. El pacto se gastó.`,
+      datos: {...(t.duenoUid ? {paraUid: t.duenoUid} : {}), aviso: true, tituloAviso: 'Zafaste de morir: te salvó el pacto',
+        textoAviso: `Volvés con ${fmt(res.hpFenix)} HP y quedás Titilando (invulnerable) hasta tu próximo turno. El pacto se gastó.`}}); }catch(e){}
+  }
+  if(res.absorbe) mesaLinea(`🔮 Orbe de absorción: ${nombreDe(t)} recupera ${res.absorbe} SP del daño mágico`);
+  await mitiMitiCobrar(t, prot, res);
+  await cosechaSiMuere(t, res);
+  return res;
+}
+
+/* Paso 4, etapa 4e (2026-10-01): el daño que recibe una INVOCACIÓN (token «fichaId~invId») — antes el duelo lo dejaba a mano.
+   Su Defensa sale de sus datos con la misma regla que la ficha (comun/inv-calculo.js) y se escribe en la parte `invocaciones` del
+   personaje con una transacción, como la vida desde el token (cambiarVidaPj): HP, escudos que absorbieron y el resumen público. */
+async function invDeToken(t){
+  const [fichaId, invId] = String(t.fichaId).split(SEP_INVOCACION);
+  const parte = await fbDb.doc(fbRutaCampana(`fichas/${fichaId}/partes/invocaciones`)).get();
+  if(!parte.exists) return null;
+  return (JSON.parse(parte.data().json || '{}').invocaciones || []).find(i => i && i.id === invId) || null;
+}
+const defensasDeInv = inv => { const x = InvCalculo.migrar(structuredClone(inv)); return {def: InvCalculo.defensaEfectiva(x), armadmg: Math.max(0, num(InvCalculo.statValor(x, 'armadmg')))}; };
+async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
+  const golpe = leerGolpe(texto);
+  if(golpe === null) throw new Error(ERROR_TIPEO);
+  const guarda = ignoraDef ? null : guardianDe(t);   // la Coraza del guardián de un aliado al lado
+  const muro = ignoraDef ? null : muroDe(t);   // Muro de escudos (js/26): un aliado con escudo al lado
+  const estoN = ignoraDef ? 0 : estoicoRivales(t).length;   // 🗿 Estoicismo (js/85): los rivales pegados, si tiene el estado
+  const prot = o && o.reparte ? mitiMitiDe(t) : null;   // 🛡 Miti-Miti: un Tanque que se lleva la mitad
+  const [fichaId, invId] = String(t.fichaId).split(SEP_INVOCACION);
+  const base = fbDb.doc(fbRutaCampana(`fichas/${fichaId}`));
+  const parteRef = base.collection('partes').doc('invocaciones');
+  const ts = firebase.firestore.FieldValue.serverTimestamp();
+  const res = await fbDb.runTransaction(async tx => {
+    const [parte, ficha] = await Promise.all([tx.get(parteRef), tx.get(base)]);
+    if(!parte.exists || !ficha.exists) throw new Error('La ficha todavía no se guardó en la mesa');
+    const datos = JSON.parse(parte.data().json || '{}');
+    const inv = (datos.invocaciones || []).find(i => i && i.id === invId);
+    if(!inv) throw new Error('La invocación ya no existe');
+    if(!Array.isArray(inv.estados)) inv.estados = [];
+    const viejoI = !num(inv.golpeTurno);
+    inv.golpeTurno = 1;   // (el Mantenimiento la vacía)
+    const primero = primerGolpeDeRonda(inv, 'golpeRonda', viejoI);   // por ronda (2026-10-19)
+    const estoico = estoicoDe(inv.estados, estoN);
+    const extra = defExtra(ignoraDef, primero, st => FichaResumen.invModTotal(inv, st), o) + (guarda ? guarda.val : 0) + (muro ? muro.val : 0) + (estoico ? estoico.val : 0);
+    const defPartes = defensaPartes({ignoraDef, restaIgnorando, restaExtra, base: defensasDeInv(inv).def, estados: inv.estados, primero, valor: st => FichaResumen.invModTotal(inv, st), o, guarda, muro, estoico});
+    const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : defensasDeInv(inv).def + extra) + num(restaExtra || 0), inv.estados, {...(o || {}), defPartes});
+    mitiMitiPartir(r, prot);
+    const previo = num(inv.hp);
+    inv.hp = Math.max(0, previo - r.recibido);
+    const rs = ficha.data().resumen || {};
+    tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
+    tx.update(base, {actualizado: ts, 'resumen.invocaciones': (rs.invocaciones || []).map(i => i.id === invId ? {...i, hp: inv.hp} : i)});
+    return {r, previo, nuevo: inv.hp};
+  });
+  toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
+  if(guarda && golpe > 0) guardianAviso(t, guarda);
+  if(muro && golpe > 0) muroAviso(t, muro);
+  await mitiMitiCobrar(t, prot, res);
+  await cosechaSiMuere(t, res);
+  return res;
+}
+
+/* La resistencia de un token a un elemento y su Defensa especial (2026-10-04), para restarlas al daño mágico o elemental: personaje (su resumen),
+   creep (su parte privada, solo el GM), invocación (sus datos). → {res, armadmg}; con `inv` ya leída, sin volver a leerla. */
+async function resistenciasDe(t, el, inv){
+  if(!t) return {res: 0, armadmg: 0};
+  if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); return {res: sc && el ? CreepCalculo.resElemental(sc, el) : 0, armadmg: sc ? creepArmadmgMapa(sc) : 0}; }
+  if(String(t.fichaId || '').includes(SEP_INVOCACION)){
+    try{
+      await bnCargarPiezas();
+      const i = inv || await invDeToken(t);
+      if(!i) return {res: 0, armadmg: 0};
+      const x = InvCalculo.migrar(structuredClone(i));
+      return {res: el ? num(InvCalculo.statValor(x, 'res' + el)) : 0, armadmg: Math.max(0, num(InvCalculo.statValor(x, 'armadmg')))};
+    }catch(err){ return {res: 0, armadmg: 0}; }
+  }
+  const f = fichasPub.get(t.fichaId), r = (f && f.resumen) || {};
+  return {res: el ? num(r['res' + el]) : 0, armadmg: Math.max(0, num(r.armadmg))};   // negativa = vulnerable (2026-10-06)
+}
+
+function hudHpHtml(t, d){
+  const danio = hpModo === 'danio';
+  const def = d.def === null || d.def === undefined ? null : d.def;
+  const hayMax = d.hpMax !== null && d.hpMax !== undefined && num(d.hpMax) > 0;
+  return `<div class="hud-globo hud-hp">
+    <h3>Vida · ${esc(nombreDe(t))}</h3>
+    <div class="hud-hp-cuanto">❤ <b>${fmt(num(d.hp))}</b>${hayMax ? ` de <b>${fmt(num(d.hpMax))}</b> (máximo)` : ''}</div>
+    <div class="hud-hp-modos">
+      <button type="button" class="hud-mini${danio ? ' activo' : ''}" data-hud-hpmodo="danio">1 · Recibe daño</button>
+      <button type="button" class="hud-mini${danio ? '' : ' activo'}" data-hud-hpmodo="directo">2 · HP directo</button>
+    </div>
+    <div class="hud-hp-expl">${danio
+      ? (def === null
+        ? 'No conozco su Defensa todavía (la ficha la publica al guardarse). Usá <b>2 · HP directo</b>.'
+        : hpRayo ? '<b>⚡ Relámpago</b>: daño eléctrico <b>directo a la vida</b> (no se resta la Defensa) y <b>salta</b> a otros del mismo bando hasta 3 casillas de distancia, una vez por objetivo, con la mitad del daño en cada salto (hacia abajo: con 1 ya no salta).'
+        : hpCritMult > 1 ? `<b>Crítico (×${hpCritMult})</b>: el daño se multiplica y <b>NO se resta la Defensa</b> (${fmt(def)}); lo que pasa baja su HP.`
+        : `Escribí el <b>daño del golpe</b>. Se le resta la Defensa (<b>${fmt(def)}</b>) y lo que pasa baja su HP.`)
+      : 'Cambia el HP <b>sin tener en cuenta la Defensa</b>. Un número lo fija; +5 cura y −3 baja directo.'}</div>
+    ${danio ? `<div class="hud-crit-fila" title="Si el golpe fue crítico, elegí el multiplicador que dio el d20: el daño se multiplica y NO se resta la Defensa">
+      ${[[1, 'Normal', 'Sin crítico'], [2, '×2', 'Doble daño'], [3, '×3', 'Triple daño'], [4, '×4', 'Cuádruple daño']].map(([k, r, t2]) => `<button type="button" class="hud-mini${hpCritMult === k ? ' activo' : ''}" data-hud-critmult="${k}" title="${t2}">${r}</button>`).join('')}
+      ${typeof Critico !== 'undefined' ? '<button type="button" class="hud-mini calc" data-hud-critcalc="1" title="Calculadora de crítico: PdG, Evasión, d20…">🎯</button>' : ''}
+    </div>` : ''}
+    ${danio ? `<div class="hud-crit-fila"><button type="button" class="hud-mini${hpRayo ? ' activo' : ''}" data-hud-rayo="1" title="Relámpago: daño eléctrico directo a la vida (no se resta la Defensa) que salta a otros del mismo bando hasta 3 casillas de distancia, una sola vez por objetivo, con la mitad del daño en cada salto (redondeado hacia arriba)">⚡ Relámpago en cadena</button></div>` : ''}
+    <input class="hud-hp-in" data-hud-hp-in inputmode="decimal" autocomplete="off" placeholder="${danio ? 'daño del golpe' : 'valor, +5 o −3'}">
+    <div class="hud-hp-prev" data-hud-hp-prev></div>
+    <div class="hud-hp-pie">Enter aplica · Esc cierra</div>
+  </div>`;
+}
+
+// Lo que va a pasar, en vivo mientras se escribe (sin tocar nada todavía).
+// Los estados con los que se calcula la vista previa (copia: solo mirar). Un creep, los suyos; un personaje o una invocación, los que publica su
+// ficha (escudos, Vida extra, Invulnerable, Armadura arcana: 2026-10-10, antes la vista previa de un personaje no veía ninguno).
+function estadosPrevia(t, d){
+  const sc = t.tipo === 'creep' ? creepPrivadoDe(t.fichaId) : null;
+  if(sc) return structuredClone(sc.estados || []);
+  return (d.estados || []).map(e => ({nombre: e.nombre, ...(e.invulnerable ? {invulnerable: true} : {}),
+    ...(e.escudo !== undefined ? {escudoMagicoActual: num(e.escudo), escudoMagico: num(e.escudoMax ?? e.escudo), ...(e.excedente ? {excedenteVida: true} : {})} : {}),
+    ...(num(e.absorbePct) > 0 ? {absorbePct: num(e.absorbePct), absorbeMax: num(e.absorbeMax), absorbido: num(e.absorbido)} : {})}));
+}
+// «(Armadura arcana −4) (escudo −3)»: lo que se queda cada cosa en la vista previa.
+const previaAbs = r => `${r.arcano ? ` (Armadura arcana −${fmt(r.arcano)})` : ''}${num(r.absorbido) - num(r.arcano) > 0 ? ` (escudo −${fmt(num(r.absorbido) - num(r.arcano))})` : ''}`;
+function hudHpPrevia(t, d, texto){
+  const crudo = String(texto || '').trim();
+  if(!crudo) return '';
+  const hp = num(d.hp);
+  if(hpModo === 'directo'){
+    const nuevo = leerValorVital(crudo, hp);
+    if(nuevo === null) return 'Escribí un número, o +5 / −3';
+    const tope = num(d.hpMax) > 0 ? Math.min(num(d.hpMax), nuevo) : nuevo;
+    return `HP ${fmt(hp)} → ${fmt(Math.max(0, tope))}`;
+  }
+  if(/^[+\-−]/.test(crudo)) return 'Para curar o ajustar sin Defensa, usá 2 · HP directo';
+  const golpe = leerGolpe(crudo);
+  if(golpe === null) return 'Escribí el daño del golpe (un número)';
+  if(d.def === null || d.def === undefined) return '—';
+  if(hpRayo){   // rayo: directo a la vida + cadena
+    const r0 = resolverGolpe(golpe, 0, estadosPrevia(t, d));
+    if(r0.invulnerable) return 'Invulnerable: no recibe daño';
+    const cad = rayoCadena(seleccion, golpe);
+    return `⚡ ${fmt(golpe)} directo${previaAbs(r0)} → HP ${fmt(hp)} → ${fmt(Math.max(0, hp - r0.recibido))}` + (cad.length > 1 ? ` · salta a ${cad.slice(1).map(c => `${nombreDe(c.t)} ${c.dano}`).join(' → ')}` : ' · no hay a quién saltar');
+  }
+  if(hpCritMult > 1){   // crítico: todo el daño × multiplicador, sin restar la Defensa
+    const total = golpe * hpCritMult;
+    const rc = resolverGolpe(total, 0, estadosPrevia(t, d));
+    if(rc.invulnerable) return 'Invulnerable: no recibe daño';
+    return `${fmt(golpe)} × ${hpCritMult} = ${fmt(total)} (ignora la Defensa)${previaAbs(rc)} → HP ${fmt(hp)} → ${fmt(Math.max(0, hp - rc.recibido))}`;
+  }
+  const est = estoicoDe(estadosPrevia(t, d), estoicoRivales(t).length);   // 🗿 Estoicismo (js/85): lo que suman los enemigos pegados
+  const def = num(d.def) + (est ? est.val : 0);
+  const r = resolverGolpe(golpe, def, estadosPrevia(t, d));
+  if(r.invulnerable) return 'Invulnerable: no recibe daño';
+  const nuevo = Math.max(0, hp - r.recibido);
+  return `${fmt(golpe)} − Def ${fmt(def)}${est ? ` (${fmt(num(d.def))} + ${est.val} de Estoicismo)` : ''} = ${fmt(Math.max(0, golpe - def))}${previaAbs(r)} → HP ${fmt(hp)} → ${fmt(nuevo)}`;
+}
+
+/* ---------- Rayo en cadena (2026-09-25, regla del dueño, P118) ----------
+   El rayo salta a otros personajes: hasta 4 casillas de distancia (3 hasta el 2026-10-13; dueño: «en general el salto eléctrico, 4 casilleros») del último golpeado, UNA sola vez por objetivo, y cada salto hace la MITAD del
+   daño del anterior, redondeada hacia abajo (dueño, 2026-10-07: «salta tantas veces como le permita el número»: 8 → 4 → 2 → 1; el salto que
+   llega con 1 es el último). Salta a los del mismo bando que el primer golpeado (los rivales de quien lanza el rayo: si golpeó a un
+   creep, salta a creeps; si a un personaje, a personajes) y siempre al más cercano. Daño mágico: directo a la vida.
+   Regla general del salto eléctrico (dueño, 2026-10-13): 4 casillas; cada salto es la MITAD DEL DAÑO QUE ENTRÓ al anterior (no del tirado) y
+   resta la Res. eléctrica de quien lo recibe; salta todas las veces que pueda, sin tope, hasta llegar a 1. `rayoCadena` arma el camino (los
+   más cercanos, con el daño que tendría sin resistencias); `rayoCadenaAplicar` lo recorre de verdad y corta cuando el daño no llega a 1. */
+const RAYO_SALTO_MAX = 4;
+// `mas` (2026-10-18, el Anillo de tormenta): casillas de más para cada salto.
+// 💧 El agua (dueño, 2026-10-20, P214: «el salto no debería repetir objetivo… en el charco tiene que seguir saltando, y cada salto tiene que hacer
+// menos daño que el anterior»): desde alguien parado en un charco, el salto llega a cualquiera de ese charco sin importar la distancia y los
+// recorre primero (el más cercano antes); después sigue afuera con la regla de siempre. A cada mojado, su golpe × 1,5 (rayoCadenaAplicar): en el
+// agua cada salto pega el 75 % del anterior. `o.soloAgua`: solo los del charco (el rayo de un golpe que no salta, que igual corre por el agua).
+function rayoCadena(idInicial, dano, mas, o){
+  o = o || {};
+  const t0 = tokens.get(idInicial);
+  if(!t0) return [];
+  const mojado = x => typeof enAgua === 'function' && enAgua(x);
+  const charco = x => mojado(x) && typeof charcoCeldas === 'function' ? charcoCeldas(x) : null;
+  const multAgua = typeof AGUA_MULT_RAYO !== 'undefined' ? AGUA_MULT_RAYO : 1.5;
+  const cadena = [{id: idInicial, t: t0, dano: Math.max(0, Math.ceil(num(dano)))}];
+  const usados = new Set([idInicial]);
+  let actual = t0, d = cadena[0].dano;
+  for(let i = 0; i < 12; i++){
+    let mejor = null, mejorDist = Infinity, mejorAgua = false;
+    const ch = charco(actual);
+    tokens.forEach((x, id) => {
+      if(usados.has(id) || !x.fichaId || (x.oculto && !soyGM) || x.bajoTierra || etereoDe(x) || iniciativaFueraDeJuego(id)) return;   // 🕳 bajo tierra / 👁 etéreo / 💀 caído (P225): no le llega
+      const dist = distanciaHex({col: actual.col, fila: actual.fila}, {col: x.col, fila: x.fila});
+      const delCharco = !!(ch && ch.has(x.col + ',' + x.fila) && mojado(x));
+      if(!delCharco && x.tipo !== t0.tipo) return;   // el salto, al mismo bando; el agua conduce a todos los que estén parados en ella
+      if(o.soloAgua && !delCharco) return;
+      if(!delCharco && dist > RAYO_SALTO_MAX + Math.max(0, Math.round(num(mas)))) return;
+      if(delCharco && !mejorAgua){ mejor = {id, x}; mejorDist = dist; mejorAgua = true; return; }   // los del charco, primero
+      if(delCharco === mejorAgua && dist < mejorDist){ mejor = {id, x}; mejorDist = dist; }
+    });
+    if(!mejor || d <= 1) break;
+    d = Math.floor(d / 2);
+    if(mojado(mejor.x)) d = Math.ceil(d * multAgua);
+    usados.add(mejor.id);
+    cadena.push({id: mejor.id, t: mejor.x, dano: d});
+    actual = mejor.x;
+  }
+  return cadena;
+}
+// Aplica los saltos que este cliente puede (el GM, todos; un jugador, los suyos) y avisa en la Mesa lo demás para hacerlo a mano. Cada salto: la
+// mitad de lo que le entró al anterior (cadena[0].dano = lo que le entró al primero), menos la Res. eléctrica de quien lo recibe. Devuelve los
+// saltos que hubo de verdad ({id, t, dano, entro}), para el momento de la Crónica y lo que se aplica a cada uno (la Parálisis de la flecha…).
+async function rayoCadenaAplicar(cadena, o){
+  o = o || {};
+  const hubo = [], hechos = [], manual = [];
+  let prev = Math.max(0, Math.floor(num(cadena[0] && cadena[0].dano)));
+  for(const s of cadena.slice(1)){
+    const dano0 = Math.floor(prev / 2);
+    if(dano0 < 1) break;
+    const agua = typeof aguaRayo === 'function' ? aguaRayo(s.t, 'rayo', dano0) : {monto: dano0, txt: ''}, dano = agua.monto;   // 💧 en el agua, ×1,5 (js/50)
+    const nombre = s.t.oculto ? 'Alguien' : nombreDe(s.t);
+    let ok = false, entro = dano, resTxt = '';
+    try{
+      const esInv = s.t.tipo === 'pj' && String(s.t.fichaId).includes(SEP_INVOCACION);
+      const puede = s.t.fichaId && (s.t.tipo === 'creep' ? soyGM : (soyGM || puedoMover(s.t)));   // personajes e invocaciones: el GM también (2026-10-05)
+      if(puede){
+        const res = (await resistenciasDe(s.t, 'rayo')).res;
+        if(res) resTxt = ` − ${Combatiente.resElementalTxt('rayo', res)}`;
+        const r = s.t.tipo === 'creep' ? await danioCreep(s.t, String(dano), true, 0, res, {magico: true}) : esInv ? await danioInv(s.t, String(dano), true, 0, res, {magico: true}) : await danioPj(s.t, String(dano), true, 0, res, {magico: true});
+        entro = r && r.r ? num(r.r.recibido) : Math.max(0, dano - res);
+        ok = true;
+      }
+    }catch(err){ console.error('No se pudo aplicar el salto del rayo:', err); }
+    hubo.push({id: s.id, t: s.t, dano, entro});
+    (ok ? hechos : manual).push(`${nombre}: ${dano}${resTxt}${ok && entro !== dano ? ` → ${entro}` : ''}`);
+    prev = entro;
+  }
+  if(hubo.length && !o.callado) alertaRojaAnonima('⚡ Relámpago en cadena', `Saltó a ${hubo.length} más (la mitad de lo que le entró al anterior, para abajo; cada uno resta su Res. eléctrica). ${hechos.length ? 'Aplicado solo: ' + hechos.join(' · ') + '. ' : ''}${manual.length ? 'Aplicalo a mano: ' + manual.join(' · ') + ' (directo a la vida).' : ''}`);
+  return hubo;
+}
+
+async function hudHpAplicar(t, texto){
+  if(!String(texto).trim()) return;
+  try{
+    if(hpModo === 'directo'){
+      hudGlobo = '';
+      await hudAplicar('hp', texto);
+      return;
+    }
+    if(/^[+\-−]/.test(String(texto).trim())){ toast('Para curar o ajustar sin Defensa, usá 2 · HP directo'); return; }
+    const idTok = seleccion, antes = vitalActual(t, 'hp');
+    const golpe = leerGolpe(texto);
+    const crit = hpCritMult > 1 && golpe !== null;   // crítico: daño × multiplicador y directo (sin Defensa)
+    const txtDanio = crit ? String(golpe * hpCritMult) : texto;
+    const directo = crit || (hpRayo && golpe !== null);   // el rayo también va directo a la vida
+    const resH = t.tipo === 'creep' ? await danioCreep(t, txtDanio, directo) : await danioPj(t, txtDanio, directo, 0, 0, {reparte: true});   // reparte: Miti-Miti
+    const entroH = resH && resH.r ? num(resH.r.recibido) : golpe;   // salta la mitad de lo que entró (2026-10-13)
+    if(hpRayo && golpe !== null && entroH > 1) rayoCadenaAplicar(rayoCadena(idTok, entroH));   // salta a los cercanos (no espera: se avisa en la Mesa)
+    vitalRegistrar(idTok, 'hp', antes);   // (Ctrl+Z devuelve el HP; un escudo que absorbió el golpe no se recarga)
+    hudGlobo = '';
+  }catch(err){
+    console.error('No se pudo aplicar el daño:', err);
+    toast(err.message === ERROR_TIPEO ? 'Escribí el daño del golpe (un número)'
+      : err.message === 'SIN_DEF' ? 'Su ficha todavía no publicó la Defensa: usá 2 · HP directo'
+      : err.code === 'permission-denied' ? 'No podés cambiar eso' : 'No se pudo aplicar: ' + err.message);
+  }finally{
+    pedirDibujo();
+  }
+}
+
+function hudEstadosHtml(t, estados, puede){
+  // El + abre el selector de estados de la ficha (o de gm-tools en creeps),
+  // dentro del mapa, con sus presets y su mecánica.
+  const agregar = puede && puedeAgregarEstado(t)
+    ? '<div class="hud-globo-acciones"><button type="button" class="hud-mini" data-hud-estado-nuevo="1">+ Estado</button></div>' : '';
+  if(!estados.length) return '<div class="hud-globo"><h3>Estados alterados</h3><span style="color:var(--muted)">Ninguno activo.</span>' + agregar + '</div>';
+  return '<div class="hud-globo"><h3>Estados alterados</h3>' + estados.map((e, i) => {
+    const turnos = e.permanente ? "∞" : (num(e.turnos) ? fmt(num(e.turnos)) + "t" : "—");
+    const det = String(e.detalle || "").trim();
+    return `<div class="hud-estado">
+      <span style="width:9px;height:9px;border-radius:50%;background:${ESTADO_COLOR[e.polaridad] || ESTADO_COLOR['']};flex:none"></span>
+      <span class="nom${det ? " con-tip" : ""}" tabindex="${det ? 0 : -1}" title="${esc(det || e.nombre)}">${esc(e.nombre)}</span>
+      ${det ? `<span class="estado-tip"><b>${esc(e.nombre)}</b>${esc(det)}</span>` : ""}
+      <span class="turnos">${turnos}</span>` +
+      (e.armaduraRota && (puede || t.tipo !== 'creep')
+        ? (puede && !e.derivado
+          ? `<button type="button" class="hud-mini" data-hud-armrota="${i}:-1" title="Un punto menos de armadura rota (al llegar a 0, se repara)">−</button><button type="button" class="hud-mini" data-hud-armrota="${i}:set" title="Escribir cuántos puntos de armadura rota (número, +N, -N; 0 la repara)">×${fmt(num(e.stacks) || 1)}</button><button type="button" class="hud-mini" data-hud-armrota="${i}:1" title="Un punto más de armadura rota">+</button>`
+          : `<span class="turnos" title="Puntos de armadura rota">×${fmt(num(e.stacks) || 1)}</span>`) : '') +
+      (e.escudo !== undefined && (puede || t.tipo !== 'creep')
+        ? (puede && !e.derivado
+          ? `<button type="button" class="hud-mini" data-hud-escudo="${i}:-1" title="Un punto menos">−</button><button type="button" class="hud-mini" data-hud-escudo="${i}:set" title="Escribir el valor (número, +N, -N${e.excedente ? '' : '; «max N» cambia el máximo'})">${e.excedente ? '❤+' + fmt(num(e.escudo)) + (e.tope ? '/' + fmt(num(e.tope)) : '') : '🛡' + fmt(num(e.escudo)) + '/' + fmt(num(e.escudoMax))}</button><button type="button" class="hud-mini" data-hud-escudo="${i}:1" title="Uno más">+</button>`
+          : `<span class="turnos" title="${e.excedente ? 'Vida extra' : 'Escudo actual / máximo'}">${e.excedente ? '❤+' + fmt(num(e.escudo)) + (e.tope ? '/' + fmt(num(e.tope)) : '') : '🛡' + fmt(num(e.escudo)) + '/' + fmt(num(e.escudoMax))}</span>`) : '') +
+      (puede && !e.permanente && !e.derivado ? `<button type="button" class="hud-mini" data-hud-turnos="${i}:-1" title="Un turno menos">−</button>
+        <button type="button" class="hud-mini" data-hud-turnos="${i}:1" title="Un turno más">+</button>` : '') +
+      (puede && !e.derivado ? `<button type="button" class="hud-mini peligro" data-hud-quitar="${i}" title="Sacar este estado">✕</button>` : '') +
+      (puede && !e.derivado && puedeAgregarEstado(t) ? `<button type="button" class="hud-mini" data-hud-estado-editar="${i}" title="Editar este estado">⚙</button>` : '') +
+      (e.derivado ? '<span title="Viene de una pasiva: se saca quitando la pasiva" style="color:var(--muted)">✦</span>' : '') +
+    '</div>';
+  }).join('') + agregar + '</div>';
+}
+
+// Tarjeta del creep (🪪): imagen más grande, equipo (solo nombres, sin
+// def/mods/detalle) y la nota narrativa, para que cualquier jugador la
+// abra desde el token sin tener que preguntarle al GM. Todo de solo
+// lectura — para editar sigue siendo GM Tools.
+function hudTarjetaHtml(t, d){
+  const v = vinculo(t);
+  const mini = v && (v.tarjeta || v.miniatura);   // la tarjeta usa una imagen más grande (400 px) si el GM ya la publicó
+  // 👁 Ver completa (dueño, 2026-10-30: «esa imagen es solo el encuadre que uno elige… que el usuario pueda hacer clic y verla completa»).
+  const completa = v && v.imagenCompleta ? `<button type="button" data-ver-completa="${esc(t.fichaId)}" title="Ver la imagen completa" style="position:absolute;right:6px;bottom:16px;background:rgba(10,8,12,.75);color:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 10px;font-size:12px;cursor:pointer">👁 Ver completa</button>` : '';
+  const img = mini
+    ? `<div style="position:relative"><img src="${esc(mini)}" alt="" ${v && v.imagenCompleta ? `data-ver-completa="${esc(t.fichaId)}" title="Ver la imagen completa" ` : ''}style="width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--r);border:1px solid var(--line);display:block;margin-bottom:10px${v && v.imagenCompleta ? ';cursor:zoom-in' : ''}">${completa}</div>`
+    : '';
+  // El arma primero (también la natural, marcada), después cada pieza de equipo (2026-10-09).
+  const arma = d.armaNombre
+    ? `<span class="arma" title="${d.armaNatural ? 'Arma natural: es parte de su cuerpo' : 'Su arma'}">🗡 ${esc(d.armaNombre)}${d.armaNatural ? ' <i>(natural)</i>' : ''}</span>`
+    : '';
+  // Lo de las manos (2026-10-17, dueño): el arma y además una varita, un báculo, un escudo, un orbe — armas, no equipo.
+  const manos = (d.manosNombres || []).map(n => `<span class="arma" title="En la otra mano">✋ ${esc(n)}</span>`).join('');
+  const equipo = (arma || manos || (d.equipoNombres && d.equipoNombres.length))
+    ? `<div class="hud-tarjeta-equipo">${arma}${manos}${(d.equipoNombres || []).map(n => `<span>${esc(n)}</span>`).join('')}</div>${d.equipoVago ? '<div style="color:var(--muted);font-size:11.5px;margin-top:4px">Se ve qué lleva; cómo es, recién al derrotarlo.</div>' : ''}`
+    : '<span style="color:var(--muted)">Sin equipo.</span>';
+  const estados = d.estados.length
+    ? d.estados.map(e => {
+        const turnos = e.permanente ? '∞' : (num(e.turnos) ? fmt(num(e.turnos)) + 't' : '—');
+        return `<div class="hud-estado">
+          <span style="width:9px;height:9px;border-radius:50%;background:${ESTADO_COLOR[e.polaridad] || ESTADO_COLOR['']};flex:none"></span>
+          <span class="nom">${esc(e.nombre)}</span><span class="turnos">${turnos}</span>
+        </div>`;
+      }).join('')
+    : '<span style="color:var(--muted)">Ninguno activo.</span>';
+  const nota = String(d.notas || '').trim();
+  return '<div class="hud-globo hud-tarjeta">' +
+    `<h3>${esc(nombreDe(t) || '?')}</h3>` + img +   // (el del creep vinculado, como el que sale debajo del token: el del token queda del día que se creó)
+    '<div class="hud-seccion" style="padding-top:0;border-top:none"><h3>Equipo</h3>' + equipo + '</div>' +
+    '<div class="hud-seccion"><h3>Estados alterados</h3>' + estados + '</div>' +
+    (nota ? '<div class="hud-seccion"><h3>Nota</h3><p class="hud-tarjeta-nota">' + esc(nota) + '</p></div>' : '') +
+  '</div>';
+}
+
+function hudAjustesHtml(t, d){
+  const barras = barrasDe(t);
+  const aura = t.aura || {};
+  const puede = puedoMover(t);
+  const check = (clave, texto, color, si) =>
+    `<label class="hud-chip" style="--chip:${color}" title="Mostrar la barra de ${texto} debajo del token">` +
+    `<input type="checkbox" data-hud-barra="${clave}"${si ? ' checked' : ''}><span class="muestra"></span>${texto}</label>`;
+  // Caja "actual / máximo" debajo de cada barra: el actual se edita ahí
+  // mismo (mismo mecanismo que tocar el círculo del anillo); el máximo es
+  // de lectura, sale de la ficha (fórmula) o del creep.
+  // El máximo del SP de un personaje también se edita acá (a mano, sin tocar la fórmula de la ficha): número, +N / -N o "auto".
+  const recurso = (clave, valor, maximo, maxEditable) => {
+    if(valor === null || valor === undefined) return '<div class="hud-recurso vacio">—</div>';
+    const maxHtml = maxEditable && maximo !== null && maximo !== undefined
+      ? `<span class="hud-recurso-max">/</span><input type="text" inputmode="decimal" class="hud-recurso-actual" style="width:44px" data-hud-recurso-max="${clave}" value="${fmt(maximo)}" title="Máximo: escribí el valor nuevo, +N / -N, o «auto» para volver al cálculo de la ficha, y apretá Enter">`
+      : `<span class="hud-recurso-max">/ ${maximo === null || maximo === undefined ? '—' : fmt(maximo)}</span>`;
+    return `<div class="hud-recurso">` +
+      `<input type="text" inputmode="decimal" class="hud-recurso-actual" data-hud-recurso="${clave}" value="${fmt(valor)}" title="Escribí el valor, o +5 / -3, y apretá Enter">` +
+      maxHtml +
+    '</div>';
+  };
+  const seccion = (titulo, cuerpo) => `<div class="hud-seccion"><h3>${titulo}</h3>${cuerpo}</div>`;
+  // Los tokens sin ficha ni creep (NPC, objetos) pueden llevar su propia
+  // imagen; los vinculados usan la miniatura de su ficha o creep.
+  const imagenHtml = (!puede || vinculo(t)) ? '' : seccion('Imagen',
+    '<div style="display:flex;align-items:center;gap:10px">' +
+      (t.imagen ? `<img src="${esc(t.imagen)}" alt="" style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid ${esc(t.color || '#9A867E')}">` : '') +
+      '<div class="hud-acciones" style="margin:0;flex:1">' +
+        `<button type="button" class="hud-mini" data-hud-imagen="1">${t.imagen ? 'Cambiar' : 'Elegir imagen'}</button>` +
+        (t.imagen ? '<button type="button" class="hud-mini peligro" data-hud-imagen-no="1">Quitar</button>' : '') +
+      '</div>' +
+    '</div>');
+  // Nombre, color, vínculo y dueño se editan en el panel del costado.
+  const editarHtml = (puede || soyGM)
+    ? '<div class="hud-pie"><button type="button" class="hud-mini" data-hud-editar="1">✎ Editar token</button></div>'
+    : '';
+  if(!puede) return '<div class="hud-globo">' + seccion('Token', '') + editarHtml + '</div>';
+  return '<div class="hud-globo">' +
+    seccion('Barras',
+      '<div class="hud-barras">' +
+        check('hp', 'Vida', HP_COLOR, barras.hp) +
+        check('sp', 'SP', SP_COLOR, barras.sp) +
+        check('no2', 'No2', NO2_COLOR, barras.no2) +
+      '</div>' +
+      '<div class="hud-recursos">' +
+        recurso('hp', d.hp, d.hpMax) +
+        recurso('sp', d.sp, d.spMax, t.tipo === 'pj' && !String(t.fichaId || '').includes(SEP_INVOCACION)) +
+        recurso('no2', d.no2, d.no2Max) +
+      '</div>') +
+    seccion('Aura',
+      '<div class="hud-rejilla">' +
+        '<label for="hud-aura-radio">Anillos</label>' +
+        `<input id="hud-aura-radio" type="number" min="0" max="30" step="1" inputmode="numeric" value="${Math.round(num(aura.radio))}" data-hud-aura="radio" title="1 = su casilla y las 6 de alrededor (diámetro 3); 2 = 19 casillas (diámetro 5); 0 = sin aura">` +
+        '<label for="hud-aura-color">Color</label>' +
+        `<input id="hud-aura-color" type="color" value="${/^#[0-9a-fA-F]{6}$/.test(aura.color || '') ? aura.color : '#E0A458'}" data-hud-aura="color">` +
+        '<label for="hud-aura-forma">Forma</label>' +
+        '<select id="hud-aura-forma" data-hud-aura="forma" style="grid-column:span 3">' +
+          `<option value="hex"${aura.forma === 'circulo' ? '' : ' selected'}>Hexágonos</option>` +
+          `<option value="circulo"${aura.forma === 'circulo' ? ' selected' : ''}>Círculo</option>` +
+        '</select>' +
+      '</div>' +
+      '<div class="hud-acciones">' +
+        (aura.radio ? '<button type="button" class="hud-mini peligro" data-hud-aura-no="1">Quitar</button>' : '') +
+        '<button type="button" class="hud-mini" data-hud-aura-ok="1">Guardar aura</button>' +
+      '</div>' +
+      '<p class="hud-ayuda">Anillos alrededor del token: 1 = su casilla y las 6 de alrededor (diámetro 3), 2 = 19 casillas (diámetro 5). La ven todos.</p>') +
+    imagenHtml +
+    editarHtml +
+    '</div>';
+}
+
+// Cartel fijo arriba a la derecha con el nombre del token y su dueño (el
+// jugador, o "GM" en un creep/NPC): no se achica con el zoom, para
+// leerlo igual con la grilla chiquita.
+// Cartel fijo del elemento (Terreno/Formas) seleccionado: si es sólido o transitable,
+// bien visible. Se actualiza al dibujar (solo toca el DOM si cambia).
+let etiquetaElementoTexto = null;
+function actualizarEtiquetaElemento(){
+  const el = $('#elemento-etiqueta');
+  const e = elementoSeleccionado ? elementos.get(elementoSeleccionado) : null;
+  if(!e || !fbMiembro || creando || !puedeVerElemento(e)){
+    if(etiquetaElementoTexto !== ''){ el.hidden = true; etiquetaElementoTexto = ''; }
+    return;
+  }
+  const forma = e.tipo === 'linea' ? 'Línea' : e.tipo === 'libre' ? 'Forma libre' : 'Flor';
+  // Una trampa, una zona o un portal dicen qué son (2026-10-04, dueño: «debe ser claro lo que es el objeto al seleccionarlo»).
+  const especial = elementoQueEs(e);
+  if(especial){
+    const clave = 'especial|' + especial;
+    if(clave === etiquetaElementoTexto) return;
+    etiquetaElementoTexto = clave;
+    el.className = 'especial';
+    el.innerHTML = especial;
+    el.hidden = false;
+    return;
+  }
+  const estado = e.solido
+    ? '<span class="es-solido">🧱 SÓLIDO · bloquea el paso</span>'
+    : '<span class="es-libre">🚶 TRANSITABLE · se puede pisar</span>';
+  const extra = (e.invisible ? ' · <span>👁 invisible para jugadores</span>' : '') + (e.fijado ? ' · <span>📌 fijado</span>' : '');
+  const dueno = nombreMiembro(e.duenoUid);
+  const html = `<b>${forma}</b> <span>${esc(/^\(/.test(dueno) ? dueno : `(${dueno})`)}</span> · ${estado}${extra}`;
+  const clase = e.solido ? 'solido' : 'libre';
+  const clave = clase + '|' + html;
+  if(clave === etiquetaElementoTexto) return;
+  etiquetaElementoTexto = clave;
+  el.className = clase;
+  el.innerHTML = html;
+  el.hidden = false;
+}
+
+// Qué es un elemento especial, para el cartel de arriba: el nombre, de quién es, en qué estado está y qué hace. '' si es una forma común.
+function elementoQueEs(e){
+  const dueno = nombreMiembro(e.duenoUid), de = esc(/^\(/.test(dueno) ? dueno : `(${dueno})`);
+  const corto = txt => { const t = String(txt).replace(/\s*⚙[\s\S]*$/, '').trim();
+    if(t.length <= 480 && !/[^.!?…)]$/.test(t)) return t;
+    if(t.length <= 480){ const p = t.lastIndexOf('. '); return p > 40 ? t.slice(0, p + 1) : t; }   // una trampa vieja, guardada cortada: hasta la última frase entera
+    const c = t.slice(0, 480); return c.slice(0, Math.max(c.lastIndexOf('. ') + 1, 200)) + ' …'; };
+  const det = txt => txt ? `<div class="que-hace">${esc(corto(txt))}</div>` : '';
+  // 🗡 El arma en el piso (2026-10-07, js/27): su nombre, de quién era y cómo se levanta (el cartel de arriba a la derecha, como un token).
+  if(e.arma){
+    const [ref, tipo] = String(e.armaDe || '').split('|'), t = [...tokens.values()].find(x => x.fichaId === ref && (x.tipo === 'creep' ? 'creep' : 'pj') === tipo);
+    return `<b>${iconoDeElemento(e)} ${esc(e.armaNombre || 'Arma')}</b>${t ? ` <span>(se le cayó a ${esc(nombreDe(t))})</span>` : ''}<div class="que-hace">En el piso: la levanta cualquiera que esté encima o al lado, por 1 No2, desde su Botonera.</div>`;
+  }
+  if(e.zona){
+    const t = num(e.turnos) > 0 && mantenimientoNumero !== null ? Math.max(0, num(e.venceMant) - Math.round(num(mantenimientoNumero))) : 0;
+    return `<b>🌫 ZONA · ${esc(e.zonaNombre || 'Efecto persistente')}</b> <span>${de}</span>${t ? ` · <span>quedan ${t} turno${t === 1 ? '' : 's'}</span>` : ''}` +
+      ` · <span class="es-libre">la sufre quien entra y quien sigue adentro en el Mantenimiento</span>`;
+  }
+  if(e.portal) return `<b>🌀 PORTAL</b> <span>${de}</span> · <span class="es-libre">lo usan los aliados de quien lo abrió: lleva al otro portal</span>`;
+  if(e.trampa){
+    // Quién la dispara y a quién alcanza (dueño, 2026-10-19: «al seleccionar una trampa, arriba a la derecha, también se debe aclarar esto»).
+    const mag = trampaEsMagica(e), ef = trampaEfectoDe(e), sola = (ef ? ef.area : (celdasDeElemento(e).length > 1 ? 'trampa' : 'pisador')) === 'pisador';
+    const quien = mag ? '✨ mágica: la disparan solo los rivales de quien la puso' : '⚙ mecánica: la dispara cualquiera que la pise, también los aliados';
+    const estado = e.disparada ? '<span class="es-solido">💥 DETONADA</span>'
+      : `<span class="es-trampa">⚠ ARMADA · ${quien} · ${sola ? 'afecta a quien la pisa' : 'afecta a todos los del área'}</span>`;
+    return `<b>🪤 TRAMPA · ${esc(e.trampaNombre || 'sin nombre')}</b> <span>${de}</span> · ${estado}${det(e.trampaDetalle)}`;
+  }
+  return '';
+}
+
+function actualizarEtiquetaToken(){
+  const el = $('#token-etiqueta');
+  const t = seleccion ? tokens.get(seleccion) : null;
+  if(!t || !fbMiembro || creando){ el.hidden = true; return; }
+  const dueno = t.tipo === 'creep' ? 'GM' : nombreMiembro(t.duenoUid);
+  el.innerHTML = `<b>${esc(nombreDe(t))}</b> <span>(${esc(dueno)})</span>`;
+  el.hidden = false;
+}
+
+// Dibuja el HUD y lo acomoda sobre el token seleccionado.
+function hudUbicar(){
+  actualizarEtiquetaToken();
+  actualizarEtiquetaElemento();
+  actualizarAvisoColocacion();
+  actualizarAvisoLentes();
+  const hud = $('#hud');
+  const t = seleccion ? tokens.get(seleccion) : null;
+  if(!t || !fbMiembro || creando){ hud.hidden = true; return; }
+  const d = disposicion.find(x => x.id === seleccion);
+  const vis = visibles.get(seleccion) || (d ? {x: d.x, y: d.y} : hexCentro(t.col, t.fila));
+  const radio = (d ? d.radio : HEX * 0.68) * vista.zoom;
+  const px = vis.x * vista.zoom + vista.x, py = vis.y * vista.zoom + vista.y;
+  const firma = JSON.stringify([seleccion, hudNivel, hudGlobo, hudEditando, hpModo, hudDatos(t), barrasDe(t), t.aura || null, (t.imagen || '').length, soyGM, !!t.oculto, moverLibre === seleccion]);
+  if(hud.dataset.firma !== firma){
+    hud.dataset.firma = firma;
+    hud.innerHTML = hudHtml(t);
+    hudConectar(t);
+  }
+  hud.hidden = false;
+  hud.style.left = Math.round(px) + 'px';
+  hud.style.top = Math.round(py) + 'px';
+  hudAcomodarAnillo(radio);
+  hudAcomodarRotar(t, radio);
+}
+
+// Ubica el handle de rotación en el lado del frente, un poco más afuera
+// que el anillo. Se llama sola (sin depender de la firma) para que se
+// mueva en cada cuadro, tanto al arrastrarlo como cuando llega un cambio
+// de otra pantalla.
+function hudAcomodarRotar(t, radioToken){
+  const handle = $('#hud').querySelector('.hud-rotar');
+  if(!handle) return;
+  const ang = (90 + num(t.rotacion || 0)) * Math.PI / 180;
+  const r = radioToken + 28;
+  handle.style.left = Math.round(Math.cos(ang) * r) + 'px';
+  handle.style.top = Math.round(Math.sin(ang) * r) + 'px';
+}
+
+// Reparte los botones en ronda alrededor del token, dejando un hueco abajo
+// (ahí van las barras y el nombre). El radio crece con el zoom y con la
+// cantidad de botones, para que no se pisen.
+function hudAcomodarAnillo(radioToken){
+  const hud = $('#hud');
+  const botones = [...hud.querySelectorAll('.hud-anillo > *')];
+  if(!botones.length) return;
+  const ARCO = 300;              // grados que ocupa la ronda (60 libres abajo)
+  const paso = botones.length > 1 ? ARCO / (botones.length - 1) : 0;
+  const minRadio = botones.length > 1 ? 21 / Math.sin(Math.min(Math.PI / 2, paso * Math.PI / 360)) : 0;
+  // Como en Roll20: la ronda va por fuera de las casillas vecinas (un casillero
+  // y medio), así se ve lo que hay alrededor del token.
+  const afuera = Math.min(ANCHO_CASILLA * vista.zoom * 1.5 + 6, 200);
+  const r = Math.max(radioToken + 34, afuera, minRadio, 52);
+  // Una línea de puntos del token a cada botón (dueño, 2026-10-29: «con el mapa cargado, los globitos alrededor del token se ven medio
+  // confusos»): del borde del token al borde del botón, debajo de todo (no toma clics).
+  let lineas = hud.querySelector('.hud-lineas');
+  if(!lineas){ lineas = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); lineas.setAttribute('class', 'hud-lineas'); hud.prepend(lineas); }
+  let trazos = '';
+  botones.forEach((b, i) => {
+    const ang = (-90 - ARCO / 2 + paso * i) * Math.PI / 180, cx = Math.cos(ang), cy = Math.sin(ang);
+    b.style.left = Math.round(cx * r) + 'px';
+    b.style.top = Math.round(cy * r) + 'px';
+    const r0 = radioToken + 2, r1 = r - 20;
+    if(r1 > r0 + 4){
+      const p = `x1="${(cx * r0).toFixed(1)}" y1="${(cy * r0).toFixed(1)}" x2="${(cx * r1).toFixed(1)}" y2="${(cy * r1).toFixed(1)}"`;
+      trazos += `<line class="fondo" ${p}/><line ${p}/>`;
+    }
+  });
+  if(lineas.innerHTML !== trazos) lineas.innerHTML = trazos;
+  const globos = hud.querySelector('.hud-globos');
+  if(globos) hudAcomodarGlobo(globos, r);
+}
+
+// El panel que se abre (estados o ajustes) va al costado del anillo, sin
+// tapar el token: a la derecha, o a la izquierda si no entra. Siempre dentro
+// del mapa y, si es más alto que la pantalla, con scroll.
+// Los globos del HUD (vida, estados, ajustes) se pueden ARRASTRAR desde su título y dejar donde mejor convenga (2026-09-25, pedido del dueño):
+// queda en esa posición de la pantalla (no sigue al token) y se recuerda por navegador. Doble clic en el título: vuelve a acomodarse solo.
+let globoPos = null;   // {x, y} respecto de la caja del mapa, o null = automático
+try{ const g = JSON.parse(localStorage.getItem('hud-globo-pos') || 'null'); if(g && Number.isFinite(g.x) && Number.isFinite(g.y)) globoPos = {x: g.x, y: g.y}; }catch(e){}
+function hudGloboGuardarPos(){ try{ if(globoPos) localStorage.setItem('hud-globo-pos', JSON.stringify(globoPos)); else localStorage.removeItem('hud-globo-pos'); }catch(e){} }
+document.addEventListener('pointerdown', e => {
+  const h3 = e.target.closest && e.target.closest('#hud .hud-globo h3');
+  if(!h3 || e.button !== 0) return;
+  const globos = h3.closest('.hud-globos'), caja = $('#lienzo-caja');
+  if(!globos || !caja) return;
+  e.preventDefault(); e.stopPropagation();
+  const cr = caja.getBoundingClientRect(), gr = globos.getBoundingClientRect();
+  const dx = e.clientX - gr.left, dy = e.clientY - gr.top;
+  const mover = ev => {
+    const w = globos.offsetWidth, h = globos.offsetHeight;
+    globoPos = {x: Math.max(0, Math.min(ev.clientX - dx - cr.left, cr.width - w)), y: Math.max(0, Math.min(ev.clientY - dy - cr.top, cr.height - h))};
+    pedirDibujo();
+  };
+  const soltar = () => { removeEventListener('pointermove', mover); removeEventListener('pointerup', soltar); hudGloboGuardarPos(); };
+  addEventListener('pointermove', mover); addEventListener('pointerup', soltar);
+}, true);
+document.addEventListener('dblclick', e => {
+  if(e.target.closest && e.target.closest('#hud .hud-globo h3')){ globoPos = null; hudGloboGuardarPos(); pedirDibujo(); }
+});
+function hudAcomodarGlobo(globos, r){
+  const caja = $('#lienzo-caja').getBoundingClientRect();
+  const hud = $('#hud').getBoundingClientRect();
+  const px = hud.left - caja.left, py = hud.top - caja.top;   // centro del token
+  const margen = 8;
+  // Con la Botonera abierta (ocupa la mitad izquierda del mapa) el globo se acomoda solo en la mitad libre, sin quedar tapado ni cortado.
+  const capaBot = $('#botonera-capa');
+  const minX = capaBot && !capaBot.hidden && !botonera.completa && botoneraEnMitad() ? Math.round(caja.width / 2) + margen : margen;
+  globos.style.maxHeight = Math.max(120, caja.height - margen * 2) + 'px';
+  const w = globos.offsetWidth, h = globos.offsetHeight;
+  const lado = r + 26;
+  let x, y;
+  if(px + lado + w <= caja.width - margen || px - lado - w >= minX){
+    x = px + lado + w <= caja.width - margen ? px + lado : px - lado - w;
+    y = py - h / 2;
+  }else{
+    // No entra a ningún costado (pantalla angosta): abajo o arriba del anillo.
+    x = px - w / 2;
+    y = py + lado;
+    if(y + h > caja.height - margen) y = py - lado - h;
+  }
+  x = Math.max(minX, Math.min(x, caja.width - w - margen));
+  y = Math.max(margen, Math.min(y, caja.height - h - margen));
+  if(globoPos){ x = Math.max(0, Math.min(globoPos.x, caja.width - w)); y = Math.max(0, Math.min(globoPos.y, caja.height - h)); }   // lo puso el usuario a mano
+  globos.style.left = Math.round(x - px) + 'px';
+  globos.style.top = Math.round(y - py) + 'px';
+}
+
+function hudConectar(t){
+  const hud = $('#hud');
+  hud.querySelectorAll('[data-hud-valor]').forEach(b => b.onclick = () => {
+    // Vida: mini menu (recibir dano / HP directo). Las invocaciones siguen con el campo simple.
+    if(b.dataset.hudValor === 'hp' && !(t.fichaId || '').includes(SEP_INVOCACION)){
+      if(hudGlobo === 'hp'){ hudGlobo = ''; } else { hudGlobo = 'hp'; hpModo = 'danio'; hpCritMult = 1; hpRayo = false; }
+      hudEditando = ''; pedirDibujo();
+      return;
+    }
+    hudEditando = b.dataset.hudValor; hudGlobo = ''; pedirDibujo();
+    setTimeout(() => { const i = hud.querySelector('[data-hud-in]'); if(i) i.focus(); }, 30);
+  });
+  // Mini menú de la vida: modos, campo con vista previa y Enter/Esc.
+  hud.querySelectorAll('[data-hud-hpmodo]').forEach(b => b.onclick = () => { hpModo = b.dataset.hudHpmodo; pedirDibujo(); });
+  hud.querySelectorAll('[data-hud-rayo]').forEach(b => b.onclick = () => { hpRayo = !hpRayo; if(hpRayo) hpCritMult = 1; pedirDibujo(); });
+  hud.querySelectorAll('[data-hud-critmult]').forEach(b => b.onclick = () => { hpCritMult = Math.max(1, Math.min(4, num(b.dataset.hudCritmult))); pedirDibujo(); });
+  hud.querySelectorAll('[data-hud-critcalc]').forEach(b => b.onclick = () => { if(typeof Critico !== 'undefined') Critico.abrir({defensor: seleccion || ''}); });
+  const campoHp = hud.querySelector('[data-hud-hp-in]');
+  if(campoHp){
+    const dHp = hudDatos(t);
+    const previa = hud.querySelector('[data-hud-hp-prev]');
+    campoHp.oninput = () => { previa.textContent = hudHpPrevia(t, dHp, campoHp.value); };
+    campoHp.onkeydown = e => {
+      if(e.key === 'Enter'){ e.preventDefault(); hudHpAplicar(t, campoHp.value); }
+      if(e.key === 'Escape'){ e.stopPropagation(); hudGlobo = ''; pedirDibujo(); }
+    };
+    setTimeout(() => campoHp.focus(), 30);
+  }
+  const campo = hud.querySelector('[data-hud-in]');
+  if(campo){
+    campo.onkeydown = e => {
+      if(e.key === 'Enter'){ e.preventDefault(); hudAplicar(campo.dataset.hudIn, campo.value); }
+      if(e.key === 'Escape'){ hudEditando = ''; pedirDibujo(); }
+    };
+    campo.onblur = () => { hudEditando = ''; pedirDibujo(); };
+  }
+  hud.querySelectorAll('[data-hud-nivel]').forEach(b => b.onclick = () => hudPonerNivel(b.dataset.hudNivel));
+  hud.querySelectorAll('[data-hud-boton]').forEach(b => b.onclick = () => {
+    const clave = b.dataset.hudBoton;
+    if(clave === 'ficha'){ abrirFichaDeToken(t); return; }
+    if(clave === 'libre'){ activarMoverLibre(seleccion); return; }
+    if(clave === 'tunel'){ tunelBorrar(seleccion); toast('🧹 La estela del túnel se va'); hudPonerNivel('vital'); return; }   // (vuelve al primer menú: el 🧹 ya no va)
+    if(clave === 'oculto'){ editarToken(seleccion, {oculto: !t.oculto, ...(!t.oculto && t.revelado ? {revelado: false} : {})}); return; }   // ocultarlo lo vuelve a esconder del todo (js/29)
+    if(clave === 'equipo'){ abrirEquipoMapa(t.fichaId.split(SEP_INVOCACION)[0]); return; }   // el mapa (js/11, A4)
+    if(clave === 'rayo'){
+      const fichaDeToken = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';
+      const invDeToken = t.tipo === 'pj' && t.fichaId && t.fichaId.includes(SEP_INVOCACION) ? t.fichaId.split(SEP_INVOCACION)[1] : '';
+      if(fichaDeToken) abrirBotonera(fichaDeToken, undefined, invDeToken); else abrirAcciones(t.fichaId);
+      return;
+    }
+    hudGlobo = hudGlobo === clave ? '' : clave;
+    hudEditando = '';
+    if(hudGlobo === 'estados') estadosPrecargar(t);   // así «+ Estado» abre enseguida
+    pedirDibujo();
+  });
+  const nuevoEstado = hud.querySelector('[data-hud-estado-nuevo]');
+  if(nuevoEstado) nuevoEstado.onclick = () => abrirEstadoNuevo(t);
+  // Descripción del estado: se muestra al pasar el mouse (o con Tab) y se
+  // ubica a mano, para que no la recorte el scroll del globo ni el borde
+  // del mapa.
+  hud.querySelectorAll('.hud-estado .nom.con-tip').forEach(nom => {
+    const tip = nom.parentElement.querySelector('.estado-tip');
+    if(!tip) return;
+    const mostrar = () => {
+      tip.classList.add('visible');
+      const caja = $('#lienzo-caja').getBoundingClientRect();
+      const r = nom.getBoundingClientRect();
+      const margen = 8;
+      const ancho = tip.offsetWidth, alto = tip.offsetHeight;
+      let x = r.left;
+      x = Math.max(caja.left + margen, Math.min(x, caja.right - ancho - margen));
+      let y = r.top - alto - 6;                       // arriba del renglón
+      if(y < caja.top + margen) y = r.bottom + 6;     // no entra: abajo
+      y = Math.max(caja.top + margen, Math.min(y, caja.bottom - alto - margen));
+      tip.style.left = Math.round(x) + 'px';
+      tip.style.top = Math.round(y) + 'px';
+    };
+    const esconder = () => tip.classList.remove('visible');
+    nom.onmouseenter = mostrar;
+    nom.onfocus = mostrar;
+    nom.onmouseleave = esconder;
+    nom.onblur = esconder;
+  });
+  hud.querySelectorAll('[data-hud-estado-editar]').forEach(b => b.onclick = () => {
+    const v = vinculo(t);
+    const e = ((v && v.resumen && v.resumen.estados) || [])[num(b.dataset.hudEstadoEditar)];
+    if(e) abrirEditarEstado(t, e.nombre);
+  });
+  hud.querySelectorAll('[data-hud-quitar]').forEach(b => b.onclick = () => hudEstadoCambiar(t, num(b.dataset.hudQuitar), 'quitar'));
+  hud.querySelectorAll('[data-hud-armrota]').forEach(b => b.onclick = async () => {
+    const [i, acc] = b.dataset.hudArmrota.split(':');
+    const v = vinculo(t);
+    const e = ((v && v.resumen && v.resumen.estados) || [])[num(i)];
+    if(!e) return;
+    const stacks = Math.max(1, num(e.stacks) || 1);
+    const txt = acc === 'set' ? await Confirmar.texto(`${e.nombre}: ×${fmt(stacks)}
+Escribí cuántos puntos de armadura rota, +N o -N (0 la repara)`, {titulo: e.nombre, icono: '🛡', valor: fmt(stacks), si: 'Aplicar'}) : (num(acc) > 0 ? '+' : '') + acc;
+    if(txt === null) return;
+    hudEstadoCambiar(t, num(i), 'armadura', txt);
+  });
+  hud.querySelectorAll('[data-hud-escudo]').forEach(b => b.onclick = async () => {
+    const [i, acc] = b.dataset.hudEscudo.split(':');
+    const v = vinculo(t);
+    const e = ((v && v.resumen && v.resumen.estados) || [])[num(i)];
+    if(!e) return;
+    const txt = acc === 'set' ? await Confirmar.texto(e.excedente ? `${e.nombre}: ${fmt(num(e.escudo))}\nEscribí el valor nuevo, +N o -N (sin tope)` : `${e.nombre}: ${fmt(num(e.escudo))}/${fmt(num(e.escudoMax))}\nEscribí el valor nuevo, +N o -N (para cambiar el máximo: max 12)`, {titulo: e.nombre, icono: '🛡', valor: fmt(num(e.escudo)), si: 'Aplicar'}) : (num(acc) > 0 ? '+' : '') + acc;
+    if(txt === null) return;
+    hudEstadoCambiar(t, num(i), 'escudo', txt);
+  });
+  hud.querySelectorAll('[data-hud-turnos]').forEach(b => b.onclick = () => {
+    const [i, delta] = b.dataset.hudTurnos.split(':');
+    hudEstadoCambiar(t, num(i), 'turnos', num(delta));
+  });
+  hud.querySelectorAll('[data-hud-barra]').forEach(c => c.onchange = () => {
+    const barras = {...barrasDe(t)};
+    barras[c.dataset.hudBarra] = c.checked;
+    editarToken(seleccion, {barras});
+  });
+  // Caja "actual / máximo": Enter guarda (mismo camino que el círculo del
+  // anillo), Escape o perder el foco sin guardar vuelve al valor de antes.
+  hud.querySelectorAll('[data-hud-recurso]').forEach(inp => {
+    inp.onkeydown = e => {
+      if(e.key === 'Enter'){ e.preventDefault(); hudAplicar(inp.dataset.hudRecurso, inp.value); }
+      if(e.key === 'Escape'){ inp.value = inp.defaultValue; inp.blur(); }
+    };
+    inp.onblur = () => { inp.value = inp.defaultValue; };
+  });
+  hud.querySelectorAll('[data-hud-recurso-max]').forEach(inp => {
+    inp.onkeydown = e => {
+      if(e.key === 'Enter'){ e.preventDefault(); hudAplicarMax(inp.dataset.hudRecursoMax, inp.value); }
+      if(e.key === 'Escape'){ inp.value = inp.defaultValue; inp.blur(); }
+    };
+    inp.onblur = () => { inp.value = inp.defaultValue; };
+  });
+  const handleRotar = hud.querySelector('[data-hud-rotar]');
+  if(handleRotar) handleRotar.onpointerdown = e => {
+    e.preventDefault();
+    handleRotar.setPointerCapture(e.pointerId);
+    const centro = handleRotar.parentElement.getBoundingClientRect();
+    const d = disposicion.find(x => x.id === seleccion);
+    const tokIni = tokens.get(seleccion);
+    rotando = {id: seleccion, cx: centro.left, cy: centro.top, radio: (d ? d.radio : HEX * 0.68) * vista.zoom, inicial: num(tokIni && tokIni.rotacion || 0), seq0: nieblaSeq, pend0: new Set(nieblaPendientes)};
+  };
+  if(handleRotar) handleRotar.onpointermove = e => {
+    if(!rotando || rotando.id !== seleccion) return;
+    const dx = e.clientX - rotando.cx, dy = e.clientY - rotando.cy;
+    if(Math.hypot(dx, dy) < 6) return;
+    // 0° = frente abajo, sentido horario (mismo criterio que rota la imagen).
+    let ang = Math.atan2(-dx, dy) * 180 / Math.PI;
+    ang = (((Math.round(ang / 60) * 60) % 360) + 360) % 360;
+    const tok = tokens.get(rotando.id);
+    if(tok && tok.rotacion !== ang){
+      tok.rotacion = ang;
+      hudAcomodarRotar(tok, rotando.radio);
+      pedirDibujo();
+    }
+  };
+  if(handleRotar) handleRotar.onpointerup = async e => {
+    if(!rotando) return;
+    const id = rotando.id, inicial = rotando.inicial, seq0 = rotando.seq0, pend0 = rotando.pend0;
+    const tok = tokens.get(id);
+    rotando = null;
+    handleRotar.releasePointerCapture(e.pointerId);
+    if(!tok) return;
+    const fin = num(tok.rotacion || 0);
+    // Girar cuesta No2 en combate: COSTO_GIRO_NO2 por cada giro de 60° (a debatir, P14)…
+    let dif = Math.abs(fin - inicial) % 360;
+    if(dif > 180) dif = 360 - dif;
+    let costo = Math.round(dif / 60) * COSTO_GIRO_NO2;
+    // Con 🦶 Mover libre prendido girar tampoco gasta No2, y el GM no cobra el giro
+    // de un personaje de un jugador (no puede tocar su ficha): ahí no se gasta ni el giro gratis.
+    const giroSinCosto = moverLibre === id || (soyGM && tok.tipo === 'pj');
+    // …salvo el primero después de moverse: elegir hacia dónde queda mirando es gratis.
+    let usoGratis = false, cobrado = 0;
+    if(costo > 0 && !giroSinCosto && giroLibre.has(id)){
+      giroLibre.delete(id);
+      usoGratis = true;
+      costo = 0;
+      toast('Elegiste hacia dónde mirás (gratis). Desde ahora, cada giro cuesta 1 No2 por giro de 60°.');
+    }
+    if(costo > 0 && !giroSinCosto && costoMoverDe(tok) && costo > costoMoverDe(tok).disponibles){
+      tok.rotacion = inicial; pedirDibujo();
+      toast(`No te alcanzan los No2 para girar: cuesta ${fmt(costo)} y tenés ${fmt(Math.max(0, costoMoverDe(tok).disponibles))}. Con Mover libre (🦶) girar es gratis.`);
+      return;
+    }
+    if(costo > 0 && !giroSinCosto && costoMoverDe(tok)){
+      try{
+        const esCreep = tok.tipo === 'creep';
+        const quedan = esCreep ? await gastarNitrosCreep(tok.fichaId, costo) : await gastarNitros(tok.fichaId, costo);
+        cobrado = costo;
+        toast(`Giro: −${fmt(costo)} No2 · ${esCreep ? 'le quedan' : 'te quedan'} ${fmt(quedan)}${quedan < 0 ? ' ⚠ se pasó de los No2' : ''}`);
+      }catch(err){
+        console.error('No se pudo cobrar el giro:', err);
+        tok.rotacion = inicial; pedirDibujo();
+        toast('No se pudo cobrar el giro, así que no giró');
+        return;
+      }
+    }
+    if(fin !== inicial) deshacerRegistrar({tipo: 'giro', id, fichaId: tok.fichaId, esCreep: tok.tipo === 'creep', costo: cobrado, rotacion: inicial, gratis: usoGratis, seq0, pend0});
+    editarToken(id, {rotacion: fin});
+  };
+  const botonEditar = hud.querySelector("[data-hud-editar]");
+  if(botonEditar) botonEditar.onclick = () => { const id = seleccion; hudCerrar(); abrirEditarToken(id); };
+  const botonImagen = hud.querySelector("[data-hud-imagen]");
+  if(botonImagen) botonImagen.onclick = () => elegirImagenToken(seleccion);
+  const quitarImagen = hud.querySelector('[data-hud-imagen-no]');
+  if(quitarImagen) quitarImagen.onclick = () => editarToken(seleccion, {imagen: firebase.firestore.FieldValue.delete()});
+  const guardarAura = () => {
+    const radio = Math.min(30, Math.max(0, Math.round(num(hud.querySelector('[data-hud-aura="radio"]').value))));
+    const color = hud.querySelector('[data-hud-aura="color"]').value;
+    const forma = hud.querySelector('[data-hud-aura="forma"]').value === 'circulo' ? 'circulo' : 'hex';
+    editarToken(seleccion, {aura: radio > 0 ? {radio, forma, color} : firebase.firestore.FieldValue.delete()});
+  };
+  const campoRadio = hud.querySelector('[data-hud-aura="radio"]');
+  // Solo números naturales: se descartan comas, puntos y signos al tipear.
+  if(campoRadio) campoRadio.oninput = () => {
+    const limpio = campoRadio.value.replace(/[^0-9]/g, '');
+    if(limpio !== campoRadio.value) campoRadio.value = limpio;
+  };
+  if(campoRadio) campoRadio.onkeydown = e => { if(e.key === 'Enter'){ e.preventDefault(); guardarAura(); } };
+  const ok = hud.querySelector('[data-hud-aura-ok]');
+  if(ok) ok.onclick = guardarAura;
+  const quitar = hud.querySelector('[data-hud-aura-no]');
+  if(quitar) quitar.onclick = () => {
+    hud.querySelector('[data-hud-aura="radio"]').value = '0';
+    guardarAura();
+  };
+}
+
+async function hudAplicar(clave, texto){
+  const t = seleccion ? tokens.get(seleccion) : null;
+  if(!t || !puedoCambiarVida(t) || !String(texto).trim()){ hudEditando = ''; pedirDibujo(); return; }
+  const idTok = seleccion, antes = vitalActual(t, clave);
+  // Subirle la vida a un caído (2026-10-06, dueño: una cura no levanta a un inconsciente): avisa y deja seguir — a mano, lo decide la mesa;
+  // si sigue, queda de pie (sin Titilando: eso es de los efectos que reviven).
+  let levantar = false;
+  if(clave === 'hp' && antes !== null && antes !== undefined && num(antes) <= 0){
+    const nuevo = leerValorVital(texto, num(antes));
+    if(nuevo !== null && nuevo > 0){
+      if(!(await AvisoCombate.preguntar(`${nombreDe(t)} ${Combatiente.CAIDO_TXT}: para eso está ✚ Revivir (o un Ankh).\n\n¿Cambiarle la vida igual, a mano? (Lo decide la mesa.)`, {icono: '💔', titulo: 'Está caído', si: 'Sí, cambiarla'}))){ hudEditando = ''; pedirDibujo(); return; }
+      levantar = true;
+    }
+  }
+  try{
+    if(clave === 'no2') await cambiarNitros(t, texto);
+    else if(t.tipo === 'creep') await cambiarVidaCreep(t.fichaId, texto, clave);
+    else await cambiarVidaPj(t, clave, texto, levantar);
+    vitalRegistrar(idTok, clave, antes);
+  }catch(err){
+    console.error('No se pudo cambiar el valor:', err);
+    toast(err.message === ERROR_TIPEO ? 'Escribí un número, o +5 / -3'
+      : esCuotaAgotada(err) ? CUOTA_AGOTADA_TXT
+      : err.code === 'permission-denied' ? 'No podés cambiar eso' : 'No se pudo guardar: ' + err.message);
+  }finally{
+    hudEditando = '';
+    pedirDibujo();
+  }
+}
+
+// SP máximo a mano desde el HUD (2026-09-24, pedido de los jugadores): se guarda como un ajuste `meta.spMaxExtra` sobre el máximo que
+// calcula la ficha (Especial × 3 + bonos), así "auto" (o el mismo valor calculado) lo deja como estaba. El SP que ya se gastó se
+// conserva: subir el máximo suma SP disponible, bajarlo lo resta (sin quedar por debajo de 0).
+async function hudAplicarMax(clave, texto){
+  const t = seleccion ? tokens.get(seleccion) : null;
+  if(!t || clave !== 'sp' || t.tipo !== 'pj' || !puedoCambiarVida(t) || !String(texto).trim()){ pedirDibujo(); return; }
+  try{
+    await cambiarSpMaxPj(t, texto);
+  }catch(err){
+    console.error('No se pudo cambiar el SP máximo:', err);
+    toast(err.message === ERROR_TIPEO ? 'Escribí un número, +5 / -3 o «auto»'
+      : esCuotaAgotada(err) ? CUOTA_AGOTADA_TXT
+      : err.code === 'permission-denied' ? 'No podés cambiar eso' : 'No se pudo guardar: ' + err.message);
+  }finally{
+    pedirDibujo();
+  }
+}
+async function cambiarSpMaxPj(t, texto){
+  const fichaId = t.fichaId.split(SEP_INVOCACION)[0];
+  const base = fbDb.doc(fbRutaCampana(`fichas/${fichaId}`));
+  const parteRef = base.collection('partes').doc('general');
+  const ts = firebase.firestore.FieldValue.serverTimestamp();
+  await fbDb.runTransaction(async tx => {
+    const [parte, ficha] = await Promise.all([tx.get(parteRef), tx.get(base)]);
+    if(!parte.exists || !ficha.exists) throw new Error('La ficha todavía no se guardó en la mesa');
+    const datos = JSON.parse(parte.data().json || '{}');
+    const r = ficha.data().resumen || {};
+    if(r.spMax === undefined) throw new Error('abrí tu ficha una vez para que se actualice');
+    const spMax = num(r.spMax);
+    datos.meta = datos.meta || {};
+    const extraViejo = num(datos.meta.spMaxExtra);
+    const calculado = spMax - extraViejo;   // lo que da la fórmula de la ficha
+    const crudo = String(texto).trim().toLowerCase();
+    let nuevoMax;
+    if(crudo === 'auto') nuevoMax = calculado;
+    else{
+      const v = leerValorVital(texto, spMax);
+      if(v === null) throw new Error(ERROR_TIPEO);
+      nuevoMax = v;
+    }
+    nuevoMax = Math.max(1, Math.round(nuevoMax * 100) / 100);
+    datos.meta.spMaxExtra = nuevoMax - calculado === 0 ? 0 : nuevoMax - calculado;
+    const gastado = Math.min(nuevoMax, Math.max(0, num(datos.spGastado)));
+    datos.spGastado = gastado;
+    tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
+    tx.update(base, {actualizado: ts, 'resumen.spMax': nuevoMax, 'resumen.sp': nuevoMax - gastado});
+  });
+}
+
+// No2 desde el HUD (los PJ en su ficha, los creeps en su parte privada).
+async function cambiarNitros(t, texto){
+  if(t.tipo === 'creep'){
+    await modificarCreep(t.fichaId, sc => {
+      const nuevo = leerValorVital(texto, num(sc.nitros));
+      if(nuevo === null) throw new Error(ERROR_TIPEO);
+      sc.nitros = Math.max(0, nuevo);
+    });
+    return;
+  }
+  const base = fbDb.doc(fbRutaCampana(`fichas/${t.fichaId}`));
+  const parteRef = base.collection('partes').doc('general');
+  const ts = firebase.firestore.FieldValue.serverTimestamp();
+  await fbDb.runTransaction(async tx => {
+    const [parte, ficha] = await Promise.all([tx.get(parteRef), tx.get(base)]);
+    if(!parte.exists || !ficha.exists) throw new Error('La ficha todavía no se guardó en la mesa');
+    const datos = JSON.parse(parte.data().json || '{}');
+    const r = ficha.data().resumen || {};
+    const actual = datos.nitros === null || datos.nitros === undefined ? num(r.nitros) : num(datos.nitros);
+    const nuevo = leerValorVital(texto, actual);
+    if(nuevo === null) throw new Error(ERROR_TIPEO);
+    datos.nitros = Math.max(0, nuevo);
+    tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
+    tx.update(base, {'resumen.nitros': datos.nitros, actualizado: ts});
+  });
+}
+
+function puedeAgregarEstado(t){
+  if(!t || !t.fichaId || pausaSoloMirar()) return false;
+  return t.tipo === 'creep' ? soyGM : true;
+}
+
+// Abre el selector de estados de la herramienta que corresponde.
+function abrirFichaDeToken(t){
+  // Ficha lite (2026-10-02, js/15): un creep vinculado (el GM), y un personaje o una invocación mío — o cualquiera, siendo GM (dueño, 2026-10-05:
+  // «que ese botón siempre muestre la ficha lite; desde la lite se puede ir a la completa») — abren encima del mapa lo esencial del combate.
+  // La de otro jugador, para un jugador, se abre en otra pestaña como antes.
+  if(t.tipo === 'creep' && t.fichaId && soyGM){ abrirFichaLite({tipo: 'creep', creepId: t.fichaId}); return; }
+  const fichaId = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';
+  if(!fichaId) return;
+  const invId = t.fichaId.includes(SEP_INVOCACION) ? t.fichaId.split(SEP_INVOCACION)[1] : '';
+  if(fbUsuario && (t.duenoUid === fbUsuario.uid || controloFicha(fichaId) || soyGM)){
+    abrirFichaLite(invId ? {tipo: 'inv', fichaId, invId} : {tipo: 'pj', fichaId});
+    return;
+  }
+  const url = '../ficha-personaje/ficha.html?partida=' + encodeURIComponent(FB_CAMPANA) + '#' + encodeURIComponent(fichaId);
+  window.open(url, '_blank', 'noopener');
+}
+
+/* "+ Estado" de un token (2026-10-02, hoja de ruta A3): lo hace el mapa con el selector común (comun/selector-estados.js) — los presets
+   con sus preguntas, los "Mis presets" del personaje y "Crear estado nuevo (paso a paso)" — y lo aplica con la regla común
+   (Combatiente.agregarEstado: inmunidades, acumular, renovar). Un personaje o una invocación se guardan con editarPersonajeMapa (js/11);
+   un creep, con modificarCreep. Antes abría la ficha o GM Tools escondidas en el marco. */
+const SE_PIEZAS = ['../comun/estado-preguntas.js?v=20261009zl', '../comun/asistente-estado.js?v=20261018f', '../comun/buscar-estados.js?v=20261024sequia', '../comun/selector-estados.js?v=20261008m'];
+const idEstadoNuevo = () => Math.random().toString(36).slice(2, 9);
+// Los stats que ofrece el asistente de estados y sus nombres, como en GM Tools (un creep) y en la ficha (un personaje o invocación).
+const SE_STATS_CREEP = {def: ['Def', 'Defensa'], dmg: ['Dmg', 'Daño'], pdg: ['PdG', 'Probabilidad de golpe'], eva: ['Eva', 'Evasión'], parry: ['Parry', 'Parry'],
+  nitros: ['No2', 'Nitros'], con: ['Con', 'Constitución'], fue: ['Fue', 'Fuerza'], agl: ['Agi', 'Agilidad'], des: ['Des', 'Destreza'], esp: ['Esp', 'Especial'],
+  resm: ['Res.Mt', 'Resistencia mental'], resmg: ['Res.Esp', 'Resistencia especial'], rescc: ['Res.CC', 'Resistencia a CC'], ini: ['Iniciativa', 'Iniciativa'],
+  crit: ['Crítico frecuente', 'Crítico frecuente (baja el rango del crítico)'], critpot: ['Crítico potente', 'Crítico potente (baja los umbrales del d20)']};
+const seStatsFicha = () => FichaCalculo.MOD_TARGETS.filter(s => !['sp', 'spregen', 'crgmax', 'capcinturon', 'capmochila', 'luz', 'veoculto'].includes(s.id))
+  .map(s => ({id: s.id, label: FichaCalculo.STAT_LABEL[s.id] || s.id, full: FichaCalculo.STAT_FULL[s.id] || ''}));
+/* «+ Estado» rápido (2026-10-04, dueño: «tarda mucho en abrirse el menú»): antes cargaba las piezas y leía la ficha COMPLETA del personaje
+   (≈2 s) antes de mostrar nada. Ahora, al abrir el globo de estados (◎ o E) se adelantan las piezas y los "Mis presets" del personaje (una sola
+   parte de la ficha, `partes/efectos`); al tocar «+ Estado» el menú aparece enseguida, y la ficha completa se lee recién al elegir el estado. */
+const sePrecarga = new Map();   // fichaId → Promise de sus "Mis presets"
+async function leerPropiosFicha(fichaId){
+  try{ const d = await fbDb.doc(fbRutaCampana(`fichas/${fichaId}/partes/efectos`)).get(); return d.exists ? (JSON.parse(d.data().json || '{}').efectosPersonalizados || []) : []; }
+  catch(err){ return []; }
+}
+function estadosPrecargar(t){
+  if(!t || !puedoCambiarEstados(t)) return;
+  (async () => { await bnCargarPiezas(); await cargarPiezas(SE_PIEZAS); if(t.tipo === 'creep') await acCargarPiezas(); })().catch(() => {});
+  if(t.tipo === 'pj' && t.fichaId){ const id = t.fichaId.split(SEP_INVOCACION)[0]; if(!sePrecarga.has(id)) sePrecarga.set(id, leerPropiosFicha(id)); }
+}
+async function abrirEstadoNuevo(t){
+  if(!puedeAgregarEstado(t) || !puedoCambiarEstados(t)) return;
+  try{ await bnCargarPiezas(); await cargarPiezas(SE_PIEZAS); if(t.tipo === 'creep') await acCargarPiezas(); }
+  catch(err){ console.error(err); toast('No se pudo abrir el selector de estados'); return; }
+  if(t.tipo === 'creep') return abrirEstadoNuevoCreep(t);
+  const [fichaId, invId] = t.fichaId.split(SEP_INVOCACION);
+  const propios = await (sePrecarga.get(fichaId) || leerPropiosFicha(fichaId));
+  sePrecarga.delete(fichaId);   // la próxima vez se vuelven a leer (pueden haber cambiado)
+  const rs = (fichasPub.get(fichaId) || {}).resumen || {};
+  const invPub = invId ? (rs.invocaciones || []).find(x => x && x.id === invId) : null;
+  const elegido = await SelectorEstados.abrir({
+    titulo: 'Estado alterado', para: invPub ? invPub.nombre : nombreDe(t),
+    presets: estadosPresetFicha(), propios,
+    cfgPreguntas: {hp: 'hpturno', statLabel: id => FichaCalculo.STAT_LABEL[id] || id},
+    stats: seStatsFicha(),
+    armarDeAsistente: res => ({nombre: res.nombre, polaridad: res.polaridad, turnos: res.turnos, permanente: res.permanente, stacks: 1, hpturno: res.hp, stacksturno: 0,
+      escudoMagico: res.escudo, mods: res.mods, detalle: res.detalle, popup: false, ...res.flags, ...(res.forzarNitros !== undefined ? {forzarNitros: res.forzarNitros} : {})}),
+  });
+  if(!elegido) return;
+  // Recién ahora se abre la ficha para escribir el estado (y el preset nuevo, si se pidió guardarlo).
+  await editarPersonajeMapa(fichaId, async S => {
+    const inv = invId ? (S.invocaciones || []).find(x => x && x.id === invId) : null;
+    if(invId && !inv){ toast('Esa invocación ya no está'); return false; }
+    const {preset, guardar} = elegido;
+    if(guardar){
+      S.efectosPersonalizados = S.efectosPersonalizados || [];
+      const i = S.efectosPersonalizados.findIndex(p => p.nombre === preset.nombre);
+      if(i >= 0) S.efectosPersonalizados[i] = preset; else S.efectosPersonalizados.push(preset);
+    }
+    const lista = inv ? (inv.estados = inv.estados || []) : (S.efectos = S.efectos || []);
+    const nuevo = inv ? SelectorEstados.estadoInvocacion(preset, idEstadoNuevo()) : SelectorEstados.estadoPersonaje(preset, idEstadoNuevo());
+    const r = Combatiente.agregarEstado(lista, nuevo);
+    const quien = inv ? inv.nombre : ((S.meta && S.meta.nombre) || '');
+    if(!r.ok){ toast(`🛡 ${quien}: inmune ahora mismo (${r.motivo}) — ${nuevo.nombre} no se pudo aplicar`); return guardar; }
+    if(r.que === 'yaLoTiene'){ toast(`${quien}: ${nuevo.nombre} ya lo tiene, no se acumula`); return guardar; }
+    if(inv && InvCalculo.modsAfectanHp(r.estado.mods)) InvCalculo.actualizarHpMaxPorCon(inv);
+    // Lo que se dispara (veneno, regeneración…) pega apenas se lo ponen (2026-10-06, P161).
+    const dis = Combatiente.dispararAlAplicar(r, lista, {hp: 'hpturno', resFuego: num(inv ? InvCalculo.statValor(inv, 'resfuego') : FichaCalculo.calcular(S).final.resfuego), hpActual: inv ? inv.hp : S.hp});
+    if(dis.hp){ if(inv) inv.hp = Math.max(0, Math.min(num(inv.hpMax) || Infinity, num(inv.hp) + dis.hp)); else mantFijarHp(S, num(S.hp) + dis.hp); }
+    toast(`${quien}: ${SelectorEstados.textoAgregado(r, 'hpturno')}${dis.hp ? ` · ya ${dis.hp < 0 ? 'sacó' : 'curó'} ${fmt(Math.abs(dis.hp))} HP` : ''}`);
+    return true;
+  });
+}
+async function abrirEstadoNuevoCreep(t){
+  const sc0 = creepPrivadoDe(t.fichaId);
+  await PresetsGM.listo();
+  const elegido = await SelectorEstados.abrir({
+    titulo: 'Estado alterado', para: (sc0 && sc0.nombre) || nombreDe(t),
+    presets: estadosPresetCreep(), propios: PresetsGM.lista(),   // los "Mis presets" del GM, en la partida (comun/presets-gm.js, B-7b)
+    cfgPreguntas: {hp: 'hpTurno', statLabel: id => (SE_STATS_CREEP[id] && SE_STATS_CREEP[id][0]) || id},
+    stats: Object.entries(SE_STATS_CREEP).map(([id, [label, full]]) => ({id, label, full})),
+    armarDeAsistente: res => ({nombre: res.nombre, polaridad: res.polaridad, turnos: res.turnos, permanente: res.permanente, stacks: 1, hpTurno: res.hp, stacksTurno: 0,
+      escudoMagico: res.escudo, mods: res.mods, detalle: res.detalle, ...res.flags, ...(res.forzarNitros !== undefined ? {forzarNitros: res.forzarNitros} : {})}),
+  });
+  if(!elegido) return;
+  if(elegido.guardar) acGuardarPresetGM(elegido.preset);
+  let r = null, nombre = '';
+  try{
+    await modificarCreep(t.fichaId, crudo => {
+      const sc = CreepCalculo.normalizar(crudo);
+      nombre = sc.nombre;
+      r = Combatiente.agregarEstado(sc.estados, SelectorEstados.estadoCreep(elegido.preset, idEstadoNuevo(), CreepAcciones.FLAGS_ESTADO), {jefe: sc.jefe});
+      if(r.ok && CreepCalculo.modsAfectanHp(r.estado.mods)) CreepCalculo.actualizarHpMaxPorCon(sc);
+      // Lo que se dispara (veneno, regeneración…) pega apenas se lo ponen (2026-10-06, P161).
+      const dis = Combatiente.dispararAlAplicar(r, sc.estados, {hp: 'hpTurno', resFuego: CreepCalculo.resElemental(sc, 'fuego'), hpActual: sc.hp});
+      if(dis.hp){ sc.hp = Math.max(0, Math.min(num(sc.hpMax) || Infinity, num(sc.hp) + dis.hp)); r.disparo = dis; }
+    });
+  }catch(err){ console.error('No se pudo poner el estado al creep:', err); toast('No se pudo poner el estado — mirá la consola'); return; }
+  if(!r) return;
+  if(!r.ok){ toast(`${nombre}: inmune ahora mismo (${r.motivo}) — ${elegido.preset.nombre} no se pudo aplicar`); return; }
+  if(r.que === 'yaLoTiene'){ toast(`${nombre}: ${elegido.preset.nombre} ya lo tiene, no se acumula`); return; }
+  toast(`${nombre}: ${SelectorEstados.textoAgregado(r, 'hpTurno')}${r.disparo ? ` · ya ${r.disparo.hp < 0 ? 'sacó' : 'curó'} ${fmt(Math.abs(r.disparo.hp))} HP` : ''}`);
+}
+
+// ⚙ de un estado: abre su editor en la ficha o en gm-tools (se busca por
+// nombre, porque el resumen no guarda el id del estado). Las invocaciones
+// no tienen editor individual de estado: solo reabre su Botonera (el
+// estado se saca con × ahí mismo).
+function abrirEditarEstado(t, nombre){
+  if(!puedeAgregarEstado(t)) return;
+  if(t.tipo === 'creep') abrirEditarEstadoCreepMapa(t.fichaId, nombre);   // el editor común en el mapa (js/12, A6c)
+  else{
+    const invId = t.fichaId.includes(SEP_INVOCACION) ? t.fichaId.split(SEP_INVOCACION)[1] : '';
+    // Personaje: el editor común en el mapa (js/11, A6b). Una invocación no tiene editor de estado individual (como en la ficha):
+    // se abre su Botonera, donde se le sacan.
+    if(invId) abrirBotonera(t.fichaId.split(SEP_INVOCACION)[0], undefined, invId);
+    else abrirEditarEstadoMapa(t.fichaId, nombre);
+  }
+}
+
+// Estados alterados desde el HUD: sacar uno o cambiarle los turnos.
+// Vida extra / Vida extra: el texto puede ser un número, +N / -N o «max N» (comun/combatiente.js, igual que ficha y gm-tools).
+function escudoParsear(txt, actual, max){ return Combatiente.escudoParsear(txt, actual, max); }
+async function hudEstadoCambiar(t, indice, accion, delta){
+  const v = vinculo(t);
+  const lista = (v && v.resumen && v.resumen.estados) || [];
+  const objetivo = lista[indice];
+  if(!objetivo || !puedoCambiarEstados(t)) return;
+  const tocar = arr => {
+    const i = arr.findIndex(e => e && e.nombre === objetivo.nombre && e.activo !== false);
+    if(i < 0) throw new Error('Ese estado ya no está');
+    if(accion === 'quitar') arr.splice(i, 1);
+    else if(accion === 'armadura'){
+      // Armadura rota: -1 de Defensa por punto (stacks). Al llegar a 0 se repara (el estado se saca), igual que en la ficha.
+      const e = arr[i], actual = Math.max(1, num(e.stacks) || 1);
+      const n = leerValorVital(delta, actual);
+      if(n === null) throw new Error('escribí un número, +N o -N');
+      if(Math.round(n) <= 0) arr.splice(i, 1); else e.stacks = Math.round(n);
+    }
+    else if(accion === 'escudo'){
+      const e = arr[i], neto = !!e.excedenteVida, actual = num(e.escudoMagicoActual ?? e.escudoMagico);
+      const n = escudoParsear(delta, actual, neto ? null : num(e.escudoMagico));
+      if(!n) throw new Error(neto ? 'escribí un número, +N o -N' : 'escribí un número, +N, -N o "max N"');
+      e.escudoMagico = neto ? n.actual : n.max; e.escudoMagicoActual = n.actual;
+    }
+    else arr[i].turnos = Math.max(0, num(arr[i].turnos) + delta);
+    return arr;
+  };
+  try{
+    if(t.tipo === 'creep'){
+      await modificarCreep(t.fichaId, sc => { sc.estados = tocar(Array.isArray(sc.estados) ? sc.estados : []); });
+    }else{
+      const [fichaId, invId] = t.fichaId.split(SEP_INVOCACION);
+      const base = fbDb.doc(fbRutaCampana(`fichas/${fichaId}`));
+      const parteRef = base.collection('partes').doc(invId ? 'invocaciones' : 'efectos');
+      const ts = firebase.firestore.FieldValue.serverTimestamp();
+      await fbDb.runTransaction(async tx => {
+        const [parte, ficha] = await Promise.all([tx.get(parteRef), tx.get(base)]);
+        if(!parte.exists || !ficha.exists) throw new Error('La ficha todavía no se guardó en la mesa');
+        const datos = JSON.parse(parte.data().json || '{}');
+        const cambios = {actualizado: ts};
+        if(invId){
+          const r = ficha.data().resumen || {};
+          const inv = (datos.invocaciones || []).find(i => i && i.id === invId);
+          if(!inv) throw new Error('La invocación ya no existe');
+          inv.estados = tocar(Array.isArray(inv.estados) ? inv.estados : []);
+          const resumenEstados = inv.estados.filter(e => e && e.activo !== false && e.nombre).slice(0, 30).map(e => ({
+            nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...(e.invulnerable ? {invulnerable: true} : {}), ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
+            polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '', ...Combatiente.atrapaPub(e),   // 🕸 js/68
+            detalle: String(e.detalle || '').slice(0, 200),
+          }));
+          cambios['resumen.invocaciones'] = (r.invocaciones || []).map(i => i.id === invId ? {...i, estados: resumenEstados} : i);
+        }else{
+          datos.efectos = tocar(Array.isArray(datos.efectos) ? datos.efectos : []);
+          cambios['resumen.estados'] = datos.efectos.filter(e => e && e.activo !== false && e.nombre).slice(0, 30).map(e => ({
+            nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...(e.invulnerable ? {invulnerable: true} : {}), ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
+            polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '', ...Combatiente.atrapaPub(e),   // 🕸 js/68
+            detalle: String(e.detalle || '').slice(0, 200),
+          }));
+        }
+        tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
+        tx.update(base, cambios);
+      });
+    }
+  }catch(err){
+    console.error('No se pudo cambiar el estado:', err);
+    toast(esCuotaAgotada(err) ? CUOTA_AGOTADA_TXT : err.code === 'permission-denied' ? 'No podés cambiar eso' : 'No se pudo cambiar el estado: ' + err.message);
+  }
+}
+
+/* 👁 La imagen completa de un creep (2026-10-30): la tarjeta 🪪 muestra el encuadre; esto trae la completa (creeps/<id>/publico/imagen) y la muestra
+   encima de todo. Esc, ✕ o un clic la cierran. */
+async function verImagenCompletaCreep(creepId){
+  let dato = '';
+  try{ const s = await fbDb.doc(fbRutaCampana('creeps/' + creepId + '/publico/imagen')).get(); dato = s.exists ? String(s.data().dato || '') : ''; }
+  catch(err){ console.error(err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan pegar las reglas nuevas de Firestore (la imagen completa)' : 'No se pudo traer la imagen'); return; }
+  if(!dato){ toast('Este creep no tiene la imagen completa publicada'); return; }
+  const viejo = document.getElementById('imagen-completa-creep'); if(viejo) viejo.remove();
+  const f = document.createElement('div');
+  f.id = 'imagen-completa-creep';
+  f.style.cssText = 'position:fixed;inset:0;z-index:100030;background:rgba(6,5,8,.85);display:flex;align-items:center;justify-content:center;padding:20px;cursor:zoom-out';
+  f.innerHTML = `<img src="${dato}" alt="" style="max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 18px 50px rgba(0,0,0,.7)"><button type="button" title="Cerrar" style="position:absolute;top:14px;right:18px;background:none;border:none;color:#fff;font-size:26px;cursor:pointer">✕</button>`;
+  const cerrar = () => { document.removeEventListener('keydown', tecla, true); f.remove(); };
+  const tecla = e => { if(e.key === 'Escape'){ e.stopImmediatePropagation(); e.preventDefault(); cerrar(); } };
+  document.addEventListener('keydown', tecla, true);
+  f.addEventListener('click', cerrar);
+  document.body.appendChild(f);
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('[data-ver-completa]');
+  if(!b) return;
+  e.preventDefault(); e.stopPropagation();
+  verImagenCompletaCreep(b.dataset.verCompleta);
+}, true);

@@ -1,0 +1,1774 @@
+# comun/
+
+## Qué es
+
+Código JS compartido por la ficha, gm-tools, el generador de tiendas, el
+mapa, el editor de catálogo y el inicio (`index.html`). Cada archivo se
+suma con `<script src="../comun/archivo.js">` (o `comun/archivo.js` desde
+la raíz) — **nunca se copia adentro de un HTML**: si algo se repite en dos
+herramientas, va acá. No hay build step ni módulos: son scripts clásicos
+que dependen de que cada herramienta ya haya definido lo que usan (`$`,
+`esc`, `fmt`, `num`, `toast`, y para los que hablan con Firebase, las
+globals de `sesion.js`).
+
+## Estado actual
+
+En uso activo. Antes de escribir algo nuevo acá, `grep` el nombre en las
+tres herramientas de juego (ficha, gm-tools, mapa) — si ya existe una
+versión parecida en más de una, es candidato a juntar.
+
+## Contenido
+
+- **`biblioteca.js`** — biblioteca global de creeps, pasivas y trampas (y luego skills): ventana
+  para elegir con buscador y etiquetas, guardar como propuesta (o directo si
+  es el dueño del proyecto) y auditar propuestas. `Biblioteca.abrir({tipo,
+  titulo, alElegir, alCrearDeCero})` y `Biblioteca.guardar({tipo, datos,
+  nombre, nivel})`; `Biblioteca.abrir` acepta `base` (entradas del código que siempre están, aunque Firebase falle) y `subtitulo(entrada)`. Crea su propio HTML. Depende de `sesion.js`. La usan `ficha.html` (pasivas) y
+  `gm-tools.html` (creeps).
+- **`creeps-base.js`** — `CREEPS_BASE`: 173 creeps (60 por escenario + 20 goblins + 14 kobolds + 15 hombres cabra + 20 debuffers + 30 humanos + tramperos/sigilosos, a auditar), en la biblioteca de creeps de gm-tools.
+- **`pasivas.js`** — `PASIVAS_BASE`: catálogo base de pasivas de Job (bonos a stats con escalones y regeneración de HP). La ficha lo ofrece en "+ Pasiva → catálogo"; se suma a las aprobadas desde Firebase (`biblioteca_pasivas`).
+- **`sesion.js`** — configuración de Firebase, la cuenta (`fbUsuario`), la
+  partida elegida (`FB_CAMPANA`, `localStorage`) y el miembro/partida
+  actuales (`fbMiembro`, `fbPartida`). `fbEntrarAPartida()` es lo que cada
+  herramienta llama al arrancar (y, ya adentro, pone en la pestaña "Herramienta — Nombre de la partida"): si falta sesión, partida o ser miembro,
+  manda sola al inicio (`fbUrlInicio`). Lo carga primero cualquier página
+  que use Firebase. Ver [`../docs/workflow-firebase.md`](../docs/workflow-firebase.md).
+- **`menu-sitio.js`** — (orden desde 2026-09-19: ⌂ Home → la partida abierta con todo su menú → otras partidas → Manual → Cerrar sesión) el botón ☰ fijo arriba a la izquierda, igual en
+  todas las páginas: abre el árbol del sitio (partida abierta primero,
+  Mapa, personajes propios y ajenos, GM Tools, Generador de tiendas,
+  Manual, Cerrar sesión). Lee partidas y fichas de Firebase con caché de
+  1 minuto; no aparece dentro de los iframes del mapa (Botonera,
+  Acciones, Mantenimiento). **⌂ al lado del ☰** (2026-10-31, dueño): `#menu-sitio-home`, mismo tamaño y forma, siempre visible, va al
+  Home (`index.html`, todas las partidas). Lo que va a la derecha del ☰ arranca en 102 px (📜 Historial de `historial.js`; el margen
+  de las barras: mapa 106, ficha/gm-tools `.accesos` 86, tiendas `.hero` 86, auditoría y preguntas 106, `html.hist-on` 218/206).
+- **`barra.js`** — `barraTexto(personaje, usuario)`: arma el texto de
+  identidad de la cabecera de cada herramienta ("Partida · Usuario", o
+  "Partida · Personaje (Usuario)" — la ficha es la única que pasa
+  personaje). Es solo el texto; cada herramienta lo mete en su propio
+  layout (el mapa lo usa tal cual en `#estado`; ficha, gm-tools y el
+  generador de tiendas le agregan su propio nombre de herramienta
+  delante). Depende de `sesion.js` (`fbPartida`, `fbMiembro`).
+- **`mesa.js`** — la cajita "Mesa" de tiradas compartidas: publicar
+  (`mesaPublicar`), dibujar (`mesaRender`), escuchar en vivo
+  (`mesaEscuchar`) y, en la ficha/gm-tools, armar la cajita flotante
+  arrastrable (`mesaIniciar(alEntrar)`). Cada herramienta solo define
+  `MESA_DESDE` (`'ficha'|'gm'|'mapa'`) y `mesaQuien(origen)` (quién tira);
+  el mapa además define `MESA_AVISAR_SIN_SESION`. Achicada (`.colapsada`),
+  la ficha y gm-tools muestran igual la última tirada real (no las líneas
+  de sistema) en `#mesa-resumen`, con su detalle completo — mismo
+  contenido que la fila verde de `#mesa-cuerpo` (`mesaFilaContenido`,
+  compartido entre las dos); clic ahí también agranda la cajita. El CSS de
+  `#mesa-resumen` va en cada herramienta (no en este archivo, que es solo
+  JS); el mapa no lo tiene, su Mesa no es la flotante. Depende de
+  `comun/tiradas.js` (fórmulas), `comun/efectos-golpe.js` (líneas
+  resaltadas) y `comun/dados3d.js`/`comun/grilla-dados.js` (botones de la
+  cabecera).
+- **`tiradas.js`** — fórmulas de dados puras, sin Firebase:
+  `parseDados`/`tirarDados` (parsear y tirar "2d6+3"), `horaTxt`, y
+  `formulaParaValor` (reparte un valor de stat en dados reales — la usan
+  la ficha, gm-tools y la lupa para "tirar un stat").
+- **`lupa.js`** — el cuadro 🔍 "cómo se calcula" que cuelga de un botón
+  (`lupaBotonHtml(clave)` con `data-lupa="clave"`; `abrirLupa`/`cerrarLupa`
+  arman y ubican `#lupa-pop`, con los ladrillos `lupaFila`/`lupaSeccion`/
+  `lupaNota`/`lupaSigno`/`lupaTirada`). El cuadro y los estilos son
+  compartidos; **cada herramienta define `lupaContenido(clave)`**, que arma
+  el desglose puntual (en la ficha delega a `lupaHtml`, en gm-tools a
+  `lupaHtmlCreep`). El clic en el 🔍 se intercepta en fase de captura, así
+  que nunca dispara el botón que lo contiene.
+- **`mesa-historial.js`** — el GM ve 🗑 en la cabecera de la Mesa para
+  borrar todo el historial de tiradas; además, cada vez que el GM entra a
+  una herramienta se borran solas las de más de 48 h (como mucho una vez
+  por hora por navegador). Nadie más puede borrar.
+- **`grilla-dados.js`** — la grilla de dados estilo Roll20 (D4…D100 × 1–6)
+  que se abre al costado del botón "🎲 Dados"; cada clic es una tirada
+  libre que se publica en la Mesa.
+- **`dados3d.js`** — (2026-09-19: las tiradas de varios jugadores se superponen —una caja por estilo, dados quietos 4,5 s— y cada tirada viaja con el estilo de dados de quien la hizo, campo `estilo` de la Mesa; el botón de prender/apagar en el mapa está en el pie de la grilla de dados, junto a "Personalización") animación 3D (dice-box-threejs, cargada recién con la
+  primera tirada) que rueda sobre la herramienta cuando llega una tirada
+  nueva a la Mesa. Prender/apagar y elegir estilo es por navegador
+  (`localStorage`); no escribe nada en Firebase.
+- **`respaldo.js`** — arma y baja un `.json` con todo lo que un jugador (o,
+  con más detalle, el GM) puede leer de la partida, ya que el plan gratis
+  de Firebase no hace copias de seguridad. `fbBajarRespaldo()` es el punto
+  de entrada; lo usan el botón 💾 de la ficha, "Respaldo partida" de
+  gm-tools y "Borrar la partida" del inicio (para ofrecerlo antes).
+- **`efectos-golpe.js`** (`EfectosGolpe`) — los efectos de un arma que se
+  aplican al **golpear** (Envenenar, Rompe armadura…): al tirar el Daño,
+  los de probabilidad abren un pop-up para tirar (50 % = moneda, 25 % =
+  d4…) y todo queda en la Mesa en una línea resaltada. Aplicarlos sobre el
+  rival sigue siendo manual a propósito — la herramienta solo recuerda y
+  tira, no toca el estado del objetivo.
+- **`asistente-item.js`** (`AsistenteItem`) — crear o editar un ítem de
+  equipo (no consumibles) paso a paso: categoría y descripción → lo
+  práctico según la categoría (armas: Tipo, empuñadura, peso/daño, bonos,
+  efectos al golpear; defensa: Defensa y resistencias a crítico; el resto:
+  bonos) → estado al equipar, precio/lugar → resumen. Lo usan
+  `ficha-personaje/ficha.html`, `gm-toolset/gm-tools.html`,
+  `gm-toolset/vendor-generator.html` y `datos/catalogo-editor.html`, cada
+  una pasándole sus propios números de personaje/creep vía `cfg`. En
+  "Empuñadura", **Rango** (arma de rango: su propia mecánica, no suma Dmg)
+  y **Alcance** (arma cuerpo a cuerpo: bono para pegar a más de un
+  casillero sin dejar de sumar Dmg) comparten el mismo mod (`rng`), pero se
+  etiquetan y explican distinto según `armaDeRango` — no son lo mismo, ver
+  "Rango vs. Alcance" en el Glosario del manual (`datos/reglas.json`).
+- **`prueba-dados.html`** — página aparte (no un script) para elegir estilo
+  y sonido de los dados 3D; el ⚙ de la Mesa la abre en una pestaña.
+- **`recorte-imagen.js`** (`recortarImagen(fuente, {lado, tope})`) — antes
+  de guardar una imagen chica y cuadrada (el token de un NPC en
+  `vtt-hexgrid/mapa.html`, la miniatura del token de un personaje en
+  `ficha-personaje/ficha.html`), abre un cuadro para arrastrar y hacer
+  zoom (rueda del mouse o una barra) y elegir qué parte de la foto se ve,
+  en vez de recortar siempre el centro. `fuente` es un `File` recién
+  elegido o, para volver a recortar algo ya guardado, directamente un
+  data URL. Devuelve una promesa con el data URL final (jpeg, tratando
+  de quedar bajo `tope` bytes) o rechaza con `Error('cancelado')` si se
+  cierra sin elegir. Como `lupa.js`: el marcado y la lógica van acá, el
+  CSS (`.recorte-scrim`/`.recorte-caja`/etc., con las variables de color
+  de cada herramienta) en cada HTML que lo use.
+
+## Dependencias con otras carpetas
+
+- Todas las herramientas de juego (`ficha-personaje/`, `gm-toolset/`,
+  `vtt-hexgrid/`, `index.html`) cargan de acá lo que necesitan; ver el
+  `CLAUDE.md` de cada una para qué usa de qué archivo.
+- `firebase/firestore.rules` — los permisos que `sesion.js`, `mesa.js` y
+  `respaldo.js` dan por sentado (leer/escribir `tiradas`, `miembros`, etc.).
+
+- **Alerta del ojo 👁 del GM** (`mesa.js`, `mesaAlertaOjo`, 2026-09-19): una
+  línea de la Mesa con `desde: 'alerta'` se dibuja como fila roja y, si llega
+  nueva (no al cargar el historial), dispara en esa pantalla un destello rojo
+  con el ojo (`comun/ojo.png`) grande que a ~1 s se apaga con fade. Lo publica el botón "👁
+  Revelar lo oculto" del mapa; lo ven todos los que tengan la Mesa (mapa,
+  ficha, gm-tools). Su CSS se inyecta solo (no va en cada HTML).
+
+- **`grilla-dados.js`, pie opcional** (2026-09-19): `grillaConectar(boton, {…, pie})` acepta
+  un HTML que se muestra debajo de la grilla (el mapa pone ahí el link
+  "Personalización 🎲" a `prueba-dados.html`); sin `pie` no aparece nada.
+
+- **`skills-clase.js`** — `CLASES_SKILLS`: el pool de habilidades de las 7 clases (las auditadas van automatizadas; el resto, con `skillSA`, solo se anuncia y su descripción empieza con "(Sin auditar)")
+  ya cerradas (las 7 clases, la mayoría todavía vacía). La ficha lo ofrece en
+  "+ Habilidad → De clase" (`abrirHabClase`/`agregarHabClase`) y copia la skill
+  al personaje con `habClaseId` (para no duplicarla) y Job 1 si es de su clase,
+  2 si es de otra (Custom: 3). Una skill se agrega acá recién cuando queda ✅
+  en [`../docs/clases-borrador.md`](../docs/clases-borrador.md).
+
+- **`biblioteca.js`, filtros agrupados y Ver** (2026-09-20): `opts.grupos = [{nombre, tags}]` muestra las etiquetas en menús desplegables por criterio (dentro de un grupo alcanza con una etiqueta, entre grupos se piden todos; lo que no está en ningún grupo va a "Otros"); sin `grupos` quedan los chips sueltos. `opts.alVer(datos, entrada)` agrega el botón 👁 Ver junto a Agregar (gm-tools lo usa para ver un creep completo, `verCreepDeBiblioteca`).
+
+- **`skills-creep-base.js`** (2026-09-20) — `HABILIDADES_CREEP_BASE`: 190 habilidades generales para creeps (no atadas a un creep puntual: "Golpe fuerte", "Piel de piedra", "Grito de guerra"…), con etiquetas de función (daño, defensa, buff, debuff, curación, control, movilidad, invocación, área), velocidad (rápida CD 2 / lenta CD 3–6), rol, raza y automatización (toda automatizada / con parte a mano). Cada entrada guarda la receta `{sp, cd, lenta}` y `armarHabilidadDeCreep(datos, nivel)` la calcula con el nivel del creep (usa `window.CreepsBaseUtil` de `creeps-base.js`, que debe cargarse antes). Se abre desde gm-tools con "+ Habilidad" (`abrirCatalogoHabilidades`, biblioteca `tipo: 'habs_creep'`, solo base, sin Firebase).
+
+- **`skills-creep-base.js`, ampliado** (2026-09-20): ahora **321 habilidades** con las mecánicas del juego — **sigilo** (entrar en sigilo es automático: la habilidad aplica el estado real `Sigilo`), **trampas** (26: cobran No2 y cooldown solas y traen el daño de la trampa escalado al nivel, `{T}`; se colocan con Terreno y Formas → Trampa, cuyo "daño automático" tira y aplica el mapa), terreno y formas, niebla y visión, iniciativa, auras, estados alterados (sobre sí mismo, **todo automatizado** con los presets reales: Invulnerable, Inmunidad a CC, Espinas, Escudo mágico, Afortunado, Regeneración, Blindado…; sobre otros, a mano), orientación (punto ciego), movimiento, botín y jefe. Filtros: función, mecánica del juego, a quién apunta, velocidad (rápida CD 2–3 / lenta CD 4–6), rol, raza y automatización. `armarHab` (creeps-base) ahora acepta `efecto.nombre/polaridad/hp` (estado real) y `trampa` (`{T}` en la descripción).
+- **`armas-naturales-base.js`** (2026-09-20, P94) — `ARMAS_NATURALES_BASE`: 66 armas naturales generales (garras, colmillos, aguijones, cuernos, cola, puños, tentáculos, pinzas, pico, toque, aliento, escupitajos, energía…) con efectos al golpear (Envenenar, Sangrado, Rompe armadura, Aturdir, Derribar, Agarrar, Prende fuego, Drena vida…). `armarArmaNatural(datos, nivel)` la calcula con el nivel del creep y la potencia (ligera/media/pesada). Se abre con **🐾** en el arma del creep o en el paso del arma del asistente (`abrirCatalogoArmasNaturales`); filtros por parte del cuerpo, efecto, alcance, potencia y tipo de daño.
+
+- **Trampas automáticas** (2026-09-20): las habilidades de creep con trampa (`sp.trampa` con daño o `sp.colocar` sin daño; `h.trampaColocar` en la habilidad) **se colocan solas**: al ejecutarlas, `TokensAuto.colocarTrampas` (`tokens-auto.js`) crea el elemento-trampa (Terreno y Formas, `trampa: true`, oculto a los jugadores hasta que se dispara, con `trampaDano` para que el mapa tire y aplique el daño) en la casilla libre más cercana al frente del token del creep, en el mapa que el GM está viendo (una flor de 1 si la descripción dice "flor de 1"; "3 minas/trampas" pone 3, "dos trampas" pone 2). La habilidad no se anuncia en la Mesa. Si el creep no tiene token en ese mapa avisa y no coloca nada. Los estados sobre quien la pisa (Inmovilizado, Rengo…) y la tirada para evitarla se aplican solos desde el 2026-10-02 (ver vtt-hexgrid/CLAUDE.md, «Trampas automáticas»), con el Aviso al afectado y la Crónica para la mesa.
+
+- **`estados-aplicar.js`** (`EstadosAplicar`, 2026-09-20) — estados alterados sobre OTROS, automáticos. `componer`/`aplicarACreep(sc, spec)` (creeps, respetando Invulnerable / Inmunidad a CC / Sangre pura / Coagulación) y `encolarPj({fichaId, duenoUid, spec, origen})`: a un personaje no se le escribe la ficha desde afuera; se deja un aviso en `campanas/<id>/estados` y **la ficha del dueño lo aplica sola, una vez** (`estadosEscuchar`/`aplicarEstadoRecibido` en ficha.html, mismo mecanismo que las recompensas). `spec = {nombre, turnos?, mods?, hp?}`: con el nombre de un preset (cualquiera de `estados-presets.js`, buffs incluidos desde el 2026-09-29) usa ese preset; si no, es un estado propio ("Debilitado: −2 Daño 3 turnos"). En `creeps-base.js`, `APLICA` (nombre de la habilidad → estado) conecta 57 habilidades y trampas: al usar la habilidad, gm-tools abre "¿A quién le pegó?" (tokens del mapa que mira el GM, o "Nadie" si falló) y aplica el estado (`elegirObjetivoDeHab`); una trampa lleva `trampaEstado` en su elemento y el mapa se lo aplica a quien la pisa (y a los de adentro si es de área) con `trampaAplicarEstado`. Reglas nuevas: colección `estados` y el campo `trampaEstado` de los elementos (hay que pegarlas).
+
+- **`biblioteca.js`, etiquetas al guardar** (2026-09-21): "Guardar en la biblioteca" ya no pide escribir las etiquetas a ciegas: muestra **todas las disponibles como desplegables con chips** (mismo estilo que los filtros), que escriben en el campo de texto (que sigue aceptando etiquetas propias, separadas por coma). Salen de `opts.grupos` (los mismos grupos del filtro), las sugeridas del tipo (`SUGERENCIAS`) y las que ya usan las entradas de la biblioteca (base + oficial + propuestas, si se pueden leer); lo que no está en ningún grupo va a "Otros". `Biblioteca.guardar` acepta `grupos` y `base` como `abrir`; gm-tools los pasa desde `CREEPS_GRUPOS` y `HABS_CREEP_GRUPOS`.
+
+- **Sangrado se acumula (2026-09-22)**: a diferencia de Veneno (suma sus stacks enteros), reaplicar Sangrado suma **+1 stack** nada más — el daño por turno sube de a 1 (2 → 3 → 4…), mismo mecanismo que Armadura rota. Se guarda como `stacks:2, hpTurno:-1` (antes `stacks:1, hpTurno:-2`, mismo resultado la primera vez). `acumularSangrado`/`acumularSangradoCreep` (ficha, gm-tools) y la rama `esSangrado` en `EstadosAplicar.aplicarACreep` (comun/estados-aplicar.js), mismo patrón que sus pares de Veneno/Armadura rota.
+
+- **`mesa.js` — línea `desde: 'reporte'`** (2026-09-24): reporte del Mantenimiento de un personaje (`mesaPublicarReporte` en la ficha); `formula` lleva un renglón por cosa que pasó. Cuenta como línea del sistema (no es una tirada ni una acción: no cierra el giro libre del mapa).
+
+- **`historial.js`** — el botón **📜 Historial** (solo el GM, fijo arriba al lado del ☰, 2026-09-24): abre una lista con las acciones chicas que no van a la Mesa — cambios de HP y SP de personajes y creeps, estados que aparecen o se terminan y el reporte del Mantenimiento de los creeps —, para que el GM chequee sin ir token por token. Lo escribe la página del GM **mirando los datos**: el `resumen` público de cada ficha (`campanas/<id>/fichas`) y los creeps que le pasan gm-tools y el mapa cada segundo con `historialObservarCreeps(lista)`; no sabe quién hizo el cambio. Si hay varias pestañas del GM, una sola registra (`historialEsLider`, turno en `localStorage`). `historialReporteMantenimiento(quien, lineas)` lo usa gm-tools. Colección `campanas/<id>/historial` (solo GM), se limpia sola pasadas 48 h. Lo arranca `mesaHistorialAlEntrar()` (`mesa-historial.js`) vía `historialAlEntrar()`; no aparece en los iframes del mapa. Reserva lugar para su botón con `html.hist-on header / .accesos / .hero` (CSS propio, si una herramienta cambia esas barras hay que ajustarlo). Se carga después de `mesa-historial.js` en ficha, gm-tools y mapa (el generador de tiendas y el inicio no lo tienen).
+
+- **Afortunado visible y estados de "mitad" (2026-09-24)**: con Afortunado se tiran dos veces y la descartada viaja en `r.ventaja = {rolls, total, elegido}` (campo `ventaja` de la tirada, con regla nueva en `firestore.rules`): la Mesa muestra las dos (✔ elegida verde, ✘ descartada tachada) y los dados 3D ruedan los dos juegos con un cartel (`dadosCartelAfortunado`). Sin la regla pegada, la tirada sale igual pero sin la descartada. **Pajaritos y Lisiado ya no achican el dado**: se tira el dado completo y al resultado se lo divide por 2, para abajo, mínimo 1 (`mitadesDeTirada`/`aplicarMitades`, duplicadas en ficha y gm-tools); la fórmula se muestra con ` ÷2`.
+
+- **`asistente-estado.js`** (`AsistenteEstado`, 2026-09-25, pedido del dueño) — menú **paso a paso para crear un estado alterado de cero**: 1) nombre, bueno/malo/otro y descripción opcional; 2) **¿qué hace?** (daña o cura por turno, suma o resta a números, da un escudo, reglas especiales ya automatizadas —las mismas marcas de los presets: mitades de tirada, inmovilizado, rengo, cansado, exhausto, hypeado, sin No2, sentado, invulnerable, inmunidades, afortunado, control—, o solo un recordatorio); 3) las cantidades de cada cosa elegida (los pasos se arman según lo que se marcó); 4) cuánto dura (turnos o sin límite); 5) un resumen en palabras llanas con "guardar en Mis presets" y un atajo al formulario completo. No conoce ni la ficha ni gm-tools: `AsistenteEstado.abrir({stats, para, guardable, alTerminar(res), alFormulario(res)})` devuelve un resultado neutro `{nombre, polaridad, detalle, hp, mods, escudo, flags, forzarNitros, turnos, permanente, guardar}` y cada herramienta lo convierte (`armarPresetDeAsistente` en la ficha, `armarPresetDeAsistenteGM` en gm-tools). Reemplaza al botón "Estado personalizado" del selector de presets (ahora "＋ Crear estado nuevo (paso a paso)"), en la ficha (personaje e invocaciones) y en los creeps; desde el mapa se llega igual, porque el ＋ Estado abre esos mismos selectores. `#ae-fondo` cuenta como ventana abierta en los modos del iframe del mapa (Botonera y Acciones).
+
+- **`modificadores-tirada.js`** (`ModTirada`, 2026-09-25, pedido del dueño) — en las botoneras (ficha, invocaciones y Acciones de creeps) los botones de **Atacar (PdG), Esquivar, Parry y Bloqueo** se pintan de **verde** si los modifica un estado alterado a favor (buff), de **rojo** si es en contra (debuff) y de **ámbar** si hay de los dos, y muestran ahí mismo cuál es ("Pajaritos ÷2 · Afortunado ×2 · Bendición +2"; en el `title` va completo). Lee los estados activos: `mods` del stat, `mitadPdgEva`, `lisiado`, `sentado` (Evasión) y `afortunado`. `ModTirada.tile(estados, statId)` → `{clase, html, titulo}`. La 🔍 del botón sigue mostrando el desglose completo. Se sumó también Sentado a `estadosQueAfectanStat*` (el color de la Mesa).
+
+- **`historial.js` para jugadores** (2026-09-25, pedido del dueño): los jugadores también tienen su botón **📜 Historial**, que lee `campanas/<id>/historial_jugadores` (regla nueva: lee cualquier miembro, escribe y borra solo el GM). Lo escribe la página del GM mirando los datos (igual que el del GM): de los **personajes** lo mismo (HP, SP, estados); de los **creeps** solo lo que ya se ve en el mapa, sin HP actual ni máximo ("recibió 5 de daño", "se curó 3", "+ Veneno") y solo de los que no están ocultos ni en sigilo (`publico` lo calcula el mapa en `historialObservarCreeps`; gm-tools no lo manda, así que las líneas públicas de creeps salen solo si el mapa está abierto en la pestaña del GM). Los cambios que hace **Ctrl+Z** (HP/SP) quedan en los dos historiales porque se anotan mirando los datos, sin saber si fue un deshacer; los movimientos deshechos no se anotan. Hay que publicar las reglas.
+
+- **`asistente-trampa.js`** (`AsistenteTrampa`, 2026-09-25, pedido del dueño) — menú **paso a paso para crear o editar una trampa**, el mismo en todos lados: nombre y efecto, superficie (forma/radio/cantidad), quién la dispara (fuego amigo), daño (con "contempla la armadura"), estado que deja (**cuadrícula** con mini descripción de cada debuff), tirada para evitarla, cuánto dura la trampa (solo en el mapa) y resumen (con "guardar como recurrente"). `AsistenteTrampa.abrir({contexto:'mapa'|'habilidad', editando, inicial, estados, colores, alTerminar(res), alCancelar})` y `detalleFinal(res)`. Se usa en: el mapa (al tildar Trampa en Terreno y Formas, botón "🪄 Armar la trampa paso a paso", el "crear custom" del catálogo y el ⚙ de una trampa ya colocada, en modo edición: los cambios se ven en vivo y se guardan con Guardar), el editor de habilidades de creep de gm-tools (los campos `#hc-trampa-*` quedan escondidos y se llenan desde el menú) y el de habilidades de personaje de la ficha. `trampaColocar` ahora guarda también `amiga` (fuego amigo) y `estado` ({nombre, turnos}). El viejo asistente `abrirAsistenteTrampa` (`wt`) del mapa quedó sin usar. Las reglas de Firestore suman `trampaIgnoraDef` a los `update` de elementos: hay que publicarlas.
+
+- **`guia-diseno.js`** (`GuiaDiseno`, 2026-09-25, pedido del dueño) — **guía educativa y visual de diseño**: `GuiaDiseno.abrir(seccion?)` abre una ventana que lleva de la mano ("¿qué querés diseñar?" → skill / arma / estado / algo del mapa) con grillas de tarjetas: para una **skill**, las 7 clases (Warrior, **Asalto**, Tanque, Mago, Shooter, Support, Debuffer) y el abanico de mecánicas de cada una con skills de ejemplo; para un **arma**, qué la define, las familias (hachas → Rompe armadura, contundentes → Knockdown, punzantes → Lisiado, cortantes → Sangrado…) y la grilla de efectos con filtro (🏠 de casa / ✨ excepcional); además los estados existentes y las mecánicas del mapa. Siempre aclara que son **guías, no reglas**. Los datos están al principio del archivo (`DATOS`: `CLASES`, `FAMILIAS`, `EFECTOS_ARMA`, `ESTADOS`, `MAPA`) y espejan `docs/guia-de-diseno.md` y `docs/clases-borrador.md`: al sumar una mecánica, tocar los tres. Se abre desde el **☰ → 📐 Guía de diseño** (aparece en las páginas que cargan el script: mapa, gm-tools y ficha). Sin Firebase. **La clase se llama Asalto** (no "emboscador"): el rol de creep `emboscador` pasó a `asalto` en las etiquetas de la biblioteca de creeps y habilidades (los creeps ya guardados en Firebase con la etiqueta vieja la conservan hasta que se editen).
+
+- **`critico.js`** (`Critico`, 2026-09-25, pedido del dueño) — el **golpe crítico nuevo** (P113 y P115): funciones puras `rango(tipo, frecuente)` (el Tipo del arma menos los puntos de Crítico frecuente, mínimo 2), `umbrales(potente)` (doble daño 7 − P con piso 1, triple 17 − P÷2, cuádruple 20 − P÷3), `evaluar({pdg, eva, tipo, frecuente, potente, resistencia})` (nivel N = diferencia ÷ rango; se tiran N − R d20), `multiplicador(mejorD20, potente)` y `resolverDano` (con crítico: todo el daño × multiplicador y la Defensa NO se resta), más una **ventana** `Critico.abrir()` (☰ → 🎯 Calculadora de crítico) donde se ponen PdG, Evasión, Tipo del arma, frecuente, potente, resistencia y daño; tira los d20 y publica en la Mesa. **Las tiradas de PdG contra Evasión se siguen comparando a mano**: esto solo hace la cuenta del crítico. Pendiente (en `docs/pendientes.md` §8): usarlo dentro de "Recibe daño" del mapa, y decidir qué pasa con el stat Crit de la ficha y los ítems con "crítico +N".
+
+- **Calculadora de crítico: panel flotante** (2026-09-25, pedido del dueño): ya no es una ventana modal con fondo oscuro sino un **panel flotante** (a la derecha, se arrastra desde su cabecera, ✕ cierra; Esc solo cierra si el foco está adentro) que se puede dejar abierto **junto a la Botonera**. Si la Botonera (en el mapa, un iframe `#botonera-marco`; en la ficha, `.botonera-modal`) queda debajo, la calculadora se **reubica sola** al espacio libre de un costado (achicándose hasta 300 px); si no hay lugar libre, se queda a la derecha y se puede mover a mano (moverla a mano desactiva la reubicación).
+- **🎲 Dados libres dentro de la Botonera** (2026-09-25, pedido del dueño): la cabecera de la Botonera (y la de la Botonera de una invocación) tiene un botón 🎲 al lado de "Cerrar" que abre la grilla de dados (`grilla-dados.js`) y publica la tirada libre en la Mesa (en modo botonera la Mesa flotante estaba tapada).
+
+- **Calculadora de crítico, paso a paso y autocompletada** (2026-09-25, pedido del dueño): la ventana ahora es un asistente de 5 pasos **en el orden de las tiradas**: 1 el arma del atacante (Tipo, Crítico frecuente y potente), 2 su PdG, 3 la Evasión del defensor (y su Resistencia a crítico a ese Tipo), 4 ¿hay crítico? (nivel, cuántos d20 y el botón de tirarlos), 5 el daño y el resultado (con "Publicar en la Mesa" y "Otro golpe"). Se **completa sola**: la herramienta puede definir `criticoDatosIniciales()` (la ficha: su Crítico frecuente y potente —con equipo, habilidades y estados ya sumados— y el Tipo de su arma equipada) y/o `criticoFuentes()` (el mapa: la lista de tokens con `{id, nombre, tipo, frecuente, potente, resistencias[5], defensa}`; se elige "¿Quién ataca?" y "¿Quién defiende?" y se cargan el arma, los críticos, la Resistencia correspondiente al Tipo y la Defensa). La ficha publica para eso `resumen.crit`, `critpot`, `armaTipo` y `rescrit` (hay que abrir/guardar cada ficha una vez con la versión nueva); para los creeps (solo el GM) se usa su parte privada. Desde el 🎯 del menú de vida de un token, ese token viene elegido como defensor.
+
+- **`duelo.js`** (`Duelo`, 2026-09-26, pedido del dueño) — **ataque paso a paso en vivo** entre atacante y defensor (etapa 1: contacto, 1 contra 1; diseño en [`../docs/ataque-paso-a-paso.md`](../docs/ataque-paso-a-paso.md)). Un duelo es un documento de `campanas/<id>/duelos`. **El cuadro del duelo se le abre solo a TODOS los conectados** (mapa, ficha suelta, gm-tools suelto); se puede minimizar (queda el botón «⚔ Ver duelo») y cada uno solo ve los botones que le tocan. **El objetivo se elige con un clic en el token del mapa**: la Botonera/Acciones (iframe) le manda al mapa `duelo-elegir-objetivo` y el mapa (que reutiliza `elegirDestino`) crea el duelo con `Duelo.crear`; en una página suelta se elige de una lista. **En el mapa no hay hooks**: `Duelo.escuchar({tirar})` recibe la función que le pide la tirada al iframe del dueño (mensaje `duelo-tirar`, sin mostrarlo salvo que aparezca un cartelito de Nitros/sobrepeso: `duelo-ui-visible`), y el iframe la anota él mismo en Firestore. Cada página con datos define `window.DUELO_HOOKS = {soy, atacar, opcionesDefensa, defender, fuerza, bloquear, armaContra}` (etapa 2: el defensor elige Evasión o Parry, después Bloqueo y contraataque; los pedidos del mapa viajan por `relay` a los iframes) (ficha: personaje **e invocaciones** `fichaId~invId`; gm-tools: creeps) y `registrarTirada` dispara `'tirada-registrada'` (`detail: {origen, r}`): de ahí el duelo recoge el PdG y la Evasión de siempre. El GM (o el dueño) puede tirar «a mano» por quien no responde. **Empate** (regla del dueño): gana la tirada sin «+» fijo si solo una lo lleva; si no, par o impar entre los dos (`Duelo.elegirParidad`, estado `empate`). Necesita las reglas nuevas de `duelos` (hay que pegarlas). Los duelos de más de un día los borra el GM al entrar.
+
+- **Primero los dados, después el resultado (2026-09-26, dueño, para todo el juego):** cuando llega una tirada a la Mesa que se va a animar en 3D, `mesaProcesar` (`mesa.js`) **lanza los dados enseguida y no muestra la línea hasta que quedan quietos** (`dados3d.js` avisa con los eventos `dados-inicio` / `dados-quietos`; máximo 7 s, sin espera con las animaciones apagadas, la pestaña oculta o dentro de los iframes del mapa). `dadosAnimara(t)` dice si una tirada se va a animar. El **dado más alto puede destacar** (`destacar: 'max'` en la tirada: crece, sube, brilla y suelta ondas; lo usan los d20 del crítico). El cuadro del duelo espera igual antes de revelar contacto, Bloqueo y crítico.
+
+- **Espinas devueltas en el duelo** (2026-09-27, regla del dueño): 1/4 (para arriba) del daño INFLIGIDO —con el multiplicador del crítico, antes de la Defensa: lo resista o no la armadura—, directo a la vida del atacante, si el defensor tiene Espinas y el golpe pegó (o pasó la mitad) cuerpo a cuerpo. `dueloEspinas` en el mapa; `dano.espinas` en el duelo; campo `ataque.rango` (lo mandan ficha, invocaciones y GM Tools). Ver `../docs/skills-clase-y-duelo.md` §7.
+
+- **Duelo de habilidades dirigidas y `asistente-duelo-hab.js`** (2026-09-27, pedido del dueño): `duelo.js` acepta `ataque.tipo: 'habilidad'` con `hab` = {nombre, objetivo, tira, contra[], dano, efectos[], sinOposicion} (ver el comentario de `limpiarHab`): la misma contienda que un ataque (tirada contra tirada, empate, dados 3D), con daño mágico que ignora la Defensa y no critica, y efectos que son estados o cura; sin oposición se abre directo en los efectos. Las páginas definen los hooks `habTirar(d, quien, modo)` y `habValor(d, quien, stat)`. `AsistenteDueloHab.abrir({nombre, inicial, tieneFormula, alGuardar})` es la ventanita 🎯 que configura `habilidad.duelo`. Diseño en `../docs/duelo-de-habilidades.md`. La regla de Firestore de `duelos` necesita el campo `hab`.
+
+- **Re-roll (Moneda Re-Roll)** (2026-09-27, regla del dueño; `../docs/reroll.md`): botón 🪙 de la Botonera (repite la última tirada, cobra No2 y tira la moneda: par se conserva, impar se rompe) y botón flotante 🪙 del cuadro del duelo, que **reabre** tu última tirada (`Duelo.reabrir`, `puedeReabrir`; hooks de la página `rerollInfo` / `rerollUsar`; mensajes `duelo-reroll-info` y `duelo-reroll`).
+- **Re-roll: sin costo, cualquier tirada, una moneda por tirada** (2026-09-27, correcciones del dueño): usar la Moneda Re-Roll ya **no cuesta No2**; se abre una **ventana** (`#scrim-reroll`, `abrirReroll`/`renderReroll`) con las últimas tiradas del jugador para elegir **cuál** repetir (no solo "la última"); **una moneda por tirada** (marca `rerollId`/`rerollUsados` fuera del duelo, campo `rerollUsado` del documento del duelo adentro). El botón 🪙 vive **siempre visible** en el mapa (grupo de arriba a la derecha, junto a lentes y rango; solo jugadores) además de en la cabecera de la Botonera. Ver `../docs/reroll.md`.
+- **Polilla mística: botón flotante siempre visible** (2026-09-27, pedido del dueño): el consumible ya creaba, al usarlo, el estado permanente «Polilla revoloteando» (`efectoNombre` del ítem). Ahora, mientras ese estado esté activo, un botón flotante 🦋 (`renderPolillaBoton`, esquina inferior izquierda, z-index por encima de cualquier ventana o del duelo) queda siempre visible; al tocarlo (`usarPolilla`) suma **+2 a la última tirada propia del log** (no vuelve a tirar nada — la Mesa ya publicada no se reescribe, se anuncia con `publicarRecordatorios`) y el estado se saca solo. Sin ninguna tirada en el log, no hace nada y avisa. Vale solo en `ficha-personaje/ficha.html` (personaje, no invocaciones ni creeps).
+- **PdG.Mg → PdG.Esp, Res.Mg → Res.Esp** (2026-09-27, pedido del dueño): son los mismos dos stats de siempre (PdG y resistencia derivados del atributo **Especial**), solo cambió la **etiqueta** — los ids **no cambiaron** (`pdgmg`, `resmg`). Se renombró en las tres herramientas (`STAT_LABEL`/`CREEP_DERIVED_STATS`), en `datos/catalogo.json` (texto de ítems), en `comun/creeps-base.js`/`skills-creep-base.js`/`pasivas.js`/`duelo.js`/`asistente-duelo-hab.js`/`asistente-trampa.js`/`trampas-base.js`, en `datos/catalogo-editor.html`/`auditoria-creeps.html`/`auditoria-defensa.html` y en el manual (`manual-usuario/notas/`, recompilado). Las entradas históricas fechadas (preguntas-abiertas.md, CLAUDE.md de otras carpetas) **no** se reescribieron a propósito — un "PdG.Mg" en una nota vieja es el "PdG.Esp" de hoy. Motivo: **Taunt** (Tanque) pasó de tirar Especial puro a tirar **PdG.Esp** contra el **Res.Esp** del objetivo, y "mágico" ya no describía bien un efecto que no siempre es magia.
+
+- **`duelo.js`, hook opcional `dueloParesActivos`** (2026-09-27, pedido del dueño): cada vez que `dibujarChips()` recalcula qué duelos quedan minimizados/de fondo para esta pantalla (no el que está con el cuadro grande abierto acá mismo), llama a `dueloParesActivos([{id, atacanteTokenId, defensorTokenId}, …])` si esa función existe (`typeof === 'function'`) — no rompe ficha ni gm-tools, que no la definen. La usa `vtt-hexgrid/mapa.html` para hacer latir en el lienzo a los dos tokens involucrados (ver su `CLAUDE.md`), así se entiende entre quiénes hay acción sin reabrir el cuadro.
+
+- **`asistente-duelo-hab.js`, "Ignora la Defensa" independiente del tipo** (2026-09-27, Paso 6 de las reglas de casteo — el tipo de daño de una habilidad ya lo cubría este asistente, construido el mismo día): antes, el tipo (Arcano/Fuego/Hielo/Rayo/Físico) ataba siempre "ignora armadura" (mágico = sí, físico = no), lo que contradice el Paso 1 de `docs/reglas-casteo.md` (lo que ignora la armadura es cómo se narra, no el elemento — una "aguja de hielo" física no ignora, aunque sea "Hielo"). Ahora hay un tilde aparte, **"Ignora la Defensa"**, que arranca según el tipo elegido pero se puede destildar a mano para esa excepción (`st.ignoraDano`, se resetea al cambiar el tipo). `habDueloDe` (ficha) y `habDueloCreep` (gm-tools) leen `c.ignoraDano` si está definido; si una habilidad vieja no lo tiene, siguen infiriéndolo del tipo como antes (compatible hacia atrás).
+
+- **`asistente-item.js`, bono "Armadura mágica"** (2026-09-27, Paso 7 de las reglas de casteo): el stat nuevo `armadmg` (ver `docs/reglas-casteo.md` §1.4) se puede dar como bono de ítem desde el paso "Bonos" de siempre — acceso rápido en la categoría Defensa (`RAPIDOS.defensa`) y disponible como "+ Otro stat" en cualquier categoría (ya estaba en la lista de stats de la ficha por venir de `EXTRA`; se sumó a mano a `cfgItemGM` de gm-tools, que arma su lista de stats aparte). El asistente no impone ninguna rareza mínima — es la mesa la que decide reservarlo para ítems Raros o mejores, como dice 3e.
+
+- **`asistente-duelo-hab.js`, daño que escala con X** (2026-09-27, P119, `docs/preguntas-abiertas.md`): mismo criterio que
+  ya usaba "ataque con mi arma, con arreglos" para su X (`dadosPorX`/`fijoPorX`, resuelta ANTES de armar el duelo, al pagar
+  el costo). El paso "Daño" del 🎯 suma `danoFijoPorX` (cuánto se suma a la fórmula por cada punto de X), **visible solo si
+  la habilidad ya tiene costo "X"** (`cfg.costoVariable: 'sp'|'nitros'|''`, nuevo parámetro de `AsistenteDueloHab.abrir`,
+  derivado de `spVariable(it)`/`nitrosVariable(it)` — los creeps de gm-tools no tienen costo variable, así que ahí siempre
+  es `''` y la opción no aparece). `habDueloDe(it, xSp, xNitros)` (antes sin esos dos parámetros) arma la fórmula final
+  (`base + danoFijoPorX * X`, con la X ya elegida en `#scrim-costox`) justo antes de crear el duelo; `terminarEjecucionHab`
+  le pasa la X que recibió. **Rayo Mágico** (Mago) quedó auditada con esto — primera skill del juego con daño variable por
+  X en el duelo. Simplificación consciente: sin tope de X por habilidad (el "X ≤ Especial" de Rayo Mágico queda ✋ a mano;
+  el placeholder general `IT2.limiteXSp` sigue sin confirmar) y sin dados extra por X (`danoDadosPorX`), solo el caso fijo.
+
+- **Hechizos de área: la misma cascada del duelo, no una herramienta aparte** (2026-09-27, Paso 7b del casteo, pedido explícito del dueño — "quiero que tenga el mismo espíritu del paso a paso... que se vea en la mesa"): `duelo.js` suma un objetivo `'area'` a `hab` (con `radio`, configurado en `asistente-duelo-hab.js`) y una **fase nueva, `dodge`**: si el defensor gana el contacto Y el duelo tiene `d.grupo` (ver más abajo), en vez de "SE RESISTIÓ" se abre el derecho a un dodge roll (`resolverDodge(id, logroSalir)` decide el fin). Dos hooks nuevos de `escuchar(cfg)`, ambos solo para el mapa/GM: `chequearDodge(d)` (¿el defensor sigue adentro del área?) y `grupoResuelto(d)` (avanzar la cascada de `vtt-hexgrid/mapa.html`, colección nueva `campanas/<id>/areas/<id>`, ver su `CLAUDE.md`). `Duelo.crear` ahora exporta `limpiarHab` (lo usa el mapa al crear el documento del área) y acepta `cfg.yo.uid` explícito (si no se pasa, sigue usando `yo()` como siempre) — hacía falta porque, en la cascada, del 2do objetivo en adelante es el mapa del GM el que llama a `crear()`, no el casteador. **El casteador tira su PdG.Esp/PdG una sola vez para toda la cascada** (corrección del dueño probando en mesa, 2026-09-27): `crear()` acepta `cfg.pdgCompartido` (una tirada ya resuelta, saneada por `limpiarTiro`) y la precarga en `inicial.pdg` — el mapa la captura del primer objetivo resuelto (`dueloGrupoResuelto`, guardada en `areas/<id>.pdgCompartido`) y se la pasa a cada sub-duelo siguiente, que entonces solo pide la Evasión de ese objetivo. Reglas nuevas: campos `grupo` y `pdgCompartido` en `duelos`/`areas`, colección `areas` completa — hay que pegarlas.
+  Dos hooks más de `escuchar(cfg)`, `dodgeEmpieza(d)`/`dodgeTermina(d)` (2026-09-27, pedido del dueño probando en
+  mesa): avisan, con edge-detection propio (`dodgeActivos`, un Set — una sola vez al entrar y una sola vez al salir
+  de la fase `dodge`, sin importar cuántos snapshots pasen mientras dura), para que el mapa minimice el cuadro solo
+  en la pantalla de quien tiene que decidir el dodge roll (y lo reabra al terminar) — ver `../vtt-hexgrid/CLAUDE.md`
+  para el detalle. No usan Firestore: es puramente local a cada pantalla.
+
+- **`asistente-duelo-hab.js` paso a paso** (2026-09-27, pedido del dueño — mismo criterio que `asistente-item.js`,
+  `asistente-estado.js` y `asistente-trampa.js`): el 🎯 (ahora ⚔) ya no es un formulario largo de una sola pantalla —
+  cada pregunta es su propio paso, con chips arriba (`pasos()`, dinámica según `st.activo`/`st.modo`/`st.objetivo`/
+  `st.tira`), un título y una explicación por paso, y Atrás/Siguiente. Reusa la paleta oscura que ya tenía el archivo
+  (`#adh-fondo`/`.adh`, azul `#2d6cdf`) en vez de la de pergamino de `asistente-item.js`. Guardar queda siempre
+  visible en el pie (se está editando siempre, nunca "creando" un ítem nuevo de cero como si pasa en el de ítems).
+  El resumen final ("Listo") repite en una línea lo que quedó configurado. Ninguna validación ni el payload final
+  cambiaron — solo la presentación.
+- **Íconos del duelo: ⚔ en vez de 🎯** (2026-09-27, pedido del dueño): el 🎯 (apuntar/objetivo) se usa en todo el
+  código para varias cosas de "elegir objetivo" que no son el duelo — se cambió solo lo que representa
+  específicamente "el duelo de esta habilidad": el encabezado del asistente, sus botones disparadores y la
+  etiqueta "duelo" del ítem, en `ficha-personaje/ficha.html` y `gm-toolset/gm-tools.html`. El resto de los 🎯 del
+  juego (Crear tokens, ¿A quién le pegó?, etc.) no se tocó.
+- **Botón "🎲 Dados" de la Mesa: visible achicada o agrandada** (2026-09-27, pedido del dueño): antes
+  `#mesa.colapsada #mesa-grilla{display:none}` lo escondía del todo con la Mesa achicada — se sacó esa regla
+  (`ficha-personaje/ficha.html` y `gm-toolset/gm-tools.html`) para que se vea igual en los dos estados.
+- **Áreas: seguro contra que se queden pegadas para siempre** (2026-09-27, bug real reportado por el dueño —
+  "el área no debería dejar ninguna marca en el terreno" — quedó el círculo violeta en el mapa después de que Orbe
+  arcano ya había terminado): la causa más probable es un sub-duelo en fase `dodge` que nadie llegó a resolver
+  (el cartel «✋ No me quiero mover» solo lo ve el defensor o el GM — si ninguno lo toca, la cascada nunca avanza y
+  `areas/<id>.estado` se queda en `'en-curso'` para siempre). `escucharAreas()` (`vtt-hexgrid/mapa.html`) ahora,
+  además de la autocuración de siempre, cierra sola (`estado:'terminado'`) cualquier área que siga `'en-curso'`
+  pasados `AREA_ATASCADA_MS` (5 minutos) desde que se creó — sin importar la causa puntual del bloqueo, la marca en
+  el mapa nunca queda para siempre.
+- **La moneda de un empate rueda en 3D** (2026-09-27, pedido del dueño): `elegirParidad` (desempate por par o impar)
+  publicaba el resultado del d6 directo, sin pasar por la Mesa ni por los dados 3D — el cuadro mostraba quién ganó
+  al instante. Ahora publica la tirada con `mesaPublicar` (mismo camino que el d20 del crítico, `tirarCritico`) y
+  `nReveal` (`comun/duelo.js`) suma un paso propio cuando `d.contacto.moneda`/`d.bloq.moneda` aparece (aparte del que
+  ya contaba `pdg`+`eva`), así el cuadro espera a que el dado de la moneda quede quieto antes de revelar quién ganó
+  el empate — mismo mecanismo que ya usaban contacto, Bloqueo y crítico ("Primero los dados, después el resultado").
+
+- **`estado-preguntas.js`, tope opcional del Excedente de vida** (2026-09-27, pedido del dueño): al activar el
+  preset «Excedente de vida», el cartelito paso a paso suma una pregunta más, «¿Tiene un tope máximo de
+  excedente?», con el mismo checkbox «Sin límite» que ya usaba la pregunta de turnos (generalizado: cualquier
+  pregunta con `q.sinLimite` lo tiene, no solo `q.turnos`) — se guarda en `excedenteTope` (`null` = sin tope,
+  nada lo hace cumplir solo, es un recordatorio). El chip ❤+N lo muestra como ❤+N/tope cuando hay uno cargado
+  (ficha, gm-tools y el HUD del mapa — se agregó `tope` al resumen público que arma cada uno). **El estado nunca
+  se borra solo al llegar a 0** (confirmado revisando el código: ni `escudoParsear` ni el handler de los botones
+  −/+/escribir tocan la lista de efectos, solo el valor — ya funcionaba así antes de este cambio, sin necesitar
+  nada nuevo).
+
+- **`asistente-duelo-hab.js`/`duelo.js`: tirada personalizada y "efecto a mano" (2026-09-27, pedido del dueño,
+  auditando Drenar vida)** — herramienta GENERAL, no a medida de una skill puntual: el 🎯 sigue siendo el mismo
+  duelo compartido de siempre (elige objetivo en el mapa, cuadro visible a toda la mesa, minimizable), pero dos
+  de sus pasos ahora aceptan "no automatizar del todo":
+  - **Paso "Tirada"**: en vez de elegir un stat de la ficha, "Personalizada" deja escribir tu propia fórmula
+    (`tiraFormula`, admite **`X`**) con tu propio texto (`tiraEtiqueta`). `habDueloDe` (ficha) arma
+    `hab.tira = {formula, etq}` con la X ya sustituida (mismo momento que `danoFijoPorX`, antes de crear el
+    duelo) en vez de `{stat, etq, bono}`; `DUELO_HOOKS.habTirar` tira esa fórmula igual que cualquier stat
+    (`if(c.formula){ tirarDados(c.formula); ...; return; }`) — el resto del duelo (contienda, empate, dados 3D,
+    Mesa) no sabe ni le importa si la tirada vino de un stat o de una fórmula, porque siempre lee `c.etq`/el
+    resultado ya tirado. `sustituirX(formula, X)` (reemplaza el token `X` por un número) es el mismo helper para
+    esto y para `efectoLibre`.
+  - **Paso "Daño"**: una casilla nueva "Tiene un efecto que no se puede automatizar del todo" abre un texto
+    libre (`efectoLibre`) que el cuadro del duelo muestra en el veredicto junto a la **diferencia numérica**
+    entre las dos tiradas (`d.contacto.dif`, que ya calculaba el duelo pero no se mostraba en ningún lado) —
+    para que se resuelva a mano con el número a la vista, sin tener que abrir la consola ni adivinar.
+  - `limpiarHab` (usado por los hechizos de área) reconoce ambas formas de `tira` y pasa `efectoLibre`, así que
+    un hechizo de área también podría usar tirada personalizada si hiciera falta (no probado todavía).
+  - **Descartado en el camino**: una primera versión metía esto en una ventanita aparte de la ficha
+    (`pasosCustom`, con su propio popup fuera del duelo) — el dueño pidió que se mantuviera la dinámica real del
+    duelo compartido en vez de una herramienta paralela, así que se sacó esa versión por completo (no queda
+    ningún resto en el código) y se rehizo como está acá.
+  - **El sistema de ejecución simple (`tiradaStat`/`tiradaExtra`, sin `duelo`) sigue existiendo a propósito** —
+    el dueño lo va a testear en paralelo con el grupo antes de decidir si lo reemplaza del todo; el checkbox
+    "¿Se juega en el duelo?" del primer paso del 🎯 ya permite desactivar el duelo por habilidad para quien
+    prefiera la ejecución de siempre.
+  - **Drenar vida** (Debuffer) es la primera skill auditada así: tira personalizada "X + 1dX" (etiqueta
+    "Drenaje") contra Res.Esp (un stat normal, sin necesitar personalizar la Resistencia); el efecto a mano
+    explica que se drena la diferencia, con Excedente de vida si pasa el máximo. No2 = 2 (dicho por el dueño,
+    no estaba en el texto original).
+
+- **`asistente-duelo-hab.js`: paso "Costo" (2026-09-27, pedido del dueño — "al principio te tiene que preguntar
+  qué se cobra al ejecutar")**: segundo paso del 🎯 (justo después de "¿Se juega?"), con SP (texto, admite "X"),
+  No2 (Un número / X / Lo mismo que un ataque) y HP. **No es un dato nuevo**: lee y escribe el mismo
+  `it.costo`/`it.nitrosCosto`/`it.hpCosto` de siempre — el paso "Costo" del editor de la habilidad sigue
+  existiendo y editando lo mismo; ahora se puede tocar desde cualquiera de los dos lugares. `AsistenteDueloHab.abrir`
+  necesita `cfg.costoInicial = {sp, nitrosCosto, hpCosto}` para arrancar con los valores actuales, y su
+  `alGuardar` ahora recibe `{duelo, costo}` en vez del `duelo` pelado (o sigue siendo `null` para "sin duelo"/
+  "sacar el duelo", que no toca el costo) — **los dos call sites existentes** (`ficha-personaje/ficha.html` y
+  `gm-toolset/gm-tools.html`, el ✎ de una habilidad de creep) se actualizaron para el nuevo contrato; los creeps
+  no tienen costo en HP todavía, así que ahí `costoInicial.hpCosto` queda sin pasar y `r.costo.hpCosto` no se
+  guarda (el campo igual aparece en el paso, pensando en el día que haga falta).
+
+- **`duelo.js`: la cuenta del crítico en cuadraditos** (2026-09-27, pedido del dueño — antes era una probeta,
+  hecha con la herramienta de visualización para acordar el diseño; ahora vive en el duelo de verdad):
+  `criticoVizHtml(d)`, dentro del paso "4. Crítico", en las tres situaciones (no es crítico, es crítico
+  esperando tirar los d20, y ya tirados). Arriba, **"Rango del crítico"**: el Tipo del arma en cuadraditos, con
+  los que resta el Crítico frecuente tachados y atenuados (queda el rango real entero). Abajo, **"Tu tirada"**:
+  la tirada de PdG **completa** (no la diferencia — el dueño pidió ver el total real de la tirada), con lo que
+  se come la Evasión/Parry en rojo con una «E», y el resto agrupado de a "rango": cada grupo entero es un nivel
+  de crítico (azul); los grupos que anula la Resistencia a crítico quedan con una raya dorada encima (`.anulado`);
+  lo que sobra sin llegar a completar un grupo queda gris, suelto. Mismos colores que ya usaba el resto del
+  cuadro (`#2d6cdf` azul, `#d95a6e`/`#3b1820` rojo, `#ffd25a` dorado, `#39435c` bordes) — no se inventó paleta
+  nueva.
+
+- **`opcionesDefensa`: mostrar la fórmula ANTES de elegir, también para los creeps** (2026-09-27, pedido del
+  dueño — "uno debe saber cuánto tira antes de apretar el botón"): la ficha (personajes e invocaciones) ya
+  mostraba "Evasión 🎲 1d8+2" / "Parry 🎲 …" al lado de cada botón del menú "Elegí cómo te defendés" (campo
+  `info` de cada opción, que el cuadro del duelo ya sabía dibujar — `comun/duelo.js` línea de `Elegí cómo te
+  defendés`); a `gm-toolset/gm-tools.html` (creeps) le faltaba, mismo `fx()` que ya usaba la ficha
+  (`formulaParaValor` + `mitadesDeTirada` para Pajaritos/Lisiado/Parálisis).
+
+- **Cuadraditos del crítico: de a 5 y con leyenda (2026-09-27, ajuste del dueño a lo recién agregado)**: dos
+  correcciones sobre `criticoVizHtml`. (1) **Tachado por cuadradito, no por grupo**: un grupo de "rango" que anula
+  la Resistencia a crítico ya no lleva una línea sobre todo el grupo (`.duelo-crit-grupo.anulado::after`, sacado)
+  — cada cuadradito de ese grupo lleva su propia franja diagonal dorada (`.duelo-crit-cuad.anulado::after`, un
+  degradé sobre el cuadradito individual), así el tachado no se pierde al reordenar. (2) **Agrupado de a 5**
+  (`deA5`, en las dos filas): un hueco un poco más grande cada 5 cuadraditos, solo para poder contar de un
+  vistazo sin tener que ir de a uno — no tiene ningún significado de juego, es aparte del agrupado por "rango"
+  (que sigue existiendo, solo por color: azul = cuenta, tachado = anulado, gris = no llega a un nivel entero).
+  Se sumó una **leyenda** (`.duelo-crit-leyenda`) debajo de las dos filas con un cuadradito de ejemplo de cada
+  color/símbolo y su significado (incluye el Tipo del arma en el texto de "anulado por Resistencia a crítico").
+
+- **"Ignora Resistencia a crítico" en "Ataque con mi arma, con arreglos" (2026-09-27, pedido del dueño)**: nuevo
+  campo del paso "Tu ataque" del 🎯 (`comun/asistente-duelo-hab.js`, checkbox + cuántos puntos,
+  `duelo.arma.ignoraResistCrit`) para skills como Golpe brutal que ignoran parte de la Resistencia a crítico del
+  objetivo. `ataqueDeHabArma` (ficha.html) lo pasa en `mods.ignoraResistCrit`; `entrarCritico` (`comun/duelo.js`)
+  le resta esos puntos a la Resistencia ANTES de `Critico.evaluar`, así se ve reflejado en la cuenta, en los
+  cuadraditos y en cuántos d20 se tiran — con una línea extra en la explicación cuando corresponde ("Golpe brutal
+  ignora 2 de Resistencia a crítico del defensor."). Solo para modo `'arma'` (el único donde hoy hay crítico —
+  las habilidades dirigidas con daño mágico no critican). No se conectó todavía del lado de gm-tools (los creeps
+  no tienen un `ataqueDeHabArma` propio hoy — ver "A desarrollar" si hiciera falta).
+  **Corregido el mismo día**: `Duelo.crear()` armaba `ataque.mods` con una lista fija de campos (`pdg`, `dados`,
+  `fijo`) que no incluía `ignoraResistCrit` — se guardaba en el objeto que llegaba, pero `crear()` lo descartaba
+  al sanear el doc antes de escribirlo en Firestore, así que el checkbox no hacía nada en la partida real (sí se
+  veía bien en el resumen del asistente, por eso no se notó antes). Ya está en la lista.
+
+- **+Crítico frecuente/potente "solo esta tirada" en "Ataque con mi arma, con arreglos" (2026-09-29, pedido del
+  dueño, auditando Lisiar)**: mismo espíritu que "Ignora Resistencia a crítico" de arriba, pero para el rango del
+  crítico en vez de la resistencia — dos campos nuevos del paso "Tu ataque", `duelo.arma.critBono`/`critpotBono`.
+  La diferencia con darle el bono como un "Efecto sobre uno mismo" (`efectoMods` con `crit`/`critpot`) es a
+  propósito: un efecto **dura al menos 1 turno** (mínimo del asistente de estados) y por lo tanto podría alcanzar
+  a un ataque posterior dentro del mismo turno — Lisiar necesita que el bono cuente **solo para el ataque de esta
+  habilidad puntual**, sin dejar ningún estado. `ataqueDeHabArma` (ficha.html) los pasa en
+  `mods.critBono`/`mods.critpotBono`; `Duelo.crear()` los suma a la lista blanca de `ataque.mods` que sí persiste
+  (mismo bug real que ya tuvo `ignoraResistCrit`: sin sumarlos ahí, el checkbox se ve bien en el asistente pero no
+  hace nada en la partida); `entrarCritico` (`comun/duelo.js`) los suma a `frecuente`/`potente` ANTES de
+  `Critico.evaluar` (no después: así también corrigen el rango del crítico y no solo el multiplicador), con su
+  propia línea en la explicación ("Lisiar suma +1 a tu Crítico frecuente, solo en esta tirada."). No toca `S.efectos`
+  ni ninguna ficha — vive solo dentro de la cuenta de ese golpe. Mismas limitaciones que `ignoraResistCrit`: solo
+  modo `'arma'`, sin conectar del lado de gm-tools todavía.
+
+- **`pausa.js`** (`Pausa`, 2026-10-10, pedido del dueño) — **⏸ pausar la partida** entre sesiones: `iniciar({donde: 'mapa'|'ficha'|'gm'})` (escucha
+  `ajustes/pausa`, muestra el cartel y, en el mapa de un jugador, una capa sobre el lienzo que no deja tocar y frena sus teclas; cierra la Botonera),
+  `boton(el)` (el botón del GM: ⏸ Pausar / ▶ Reanudar; al reanudar muestra el registro con «Borrar» o «Guardar»), `alGuardar(cambios, personaje)`
+  (lo llama `FichaSesion.guardar` después de guardar: si está en pausa y no es el GM, anota en `pausaLog` lo importante que cambió) y
+  `diferencias(parte, viejo, nuevo)` (las líneas: DDE, nivel, experiencia, atributos, mochila, equipo, cinturón, habilidades, pasivas, talentos;
+  las notas y la imagen no; la vida, los No2 y el SP sí). Lo cargan el mapa, la ficha y GM Tools. Reglas nuevas (`ajustes/pausa`, `pausaLog`).
+- **Absorber un % y explotar al terminar** (2026-10-10, Armadura arcana): un estado con `absorbePct`/`absorbeMax` se queda con ese % de cada golpe
+  que llega a la vida (`Combatiente.absorberPct`, lo usa `resolverGolpe` del mapa, js/10: solo el daño que aplica el mapa) y junta `absorbido`; con
+  `explota = {radio, tipo, directo}`, al vencerse el mapa lanza la explosión (`explosivos`/`vencidosExplosivos`; js/04 el turno propio, js/12 el
+  Mantenimiento de los creeps, js/11 el de los personajes; `explotarAlTerminar` en js/13: una onda con tirada y dodge roll).
+- **«Daño directo» con su globo** (2026-10-10, dueño: «siempre que hables de daño directo, ponele el hipervínculo»): entrada en `Glosario`; se marca
+  en los ítems, en el Ver de las habilidades (personaje, creep, invocación) y en el texto de la Mesa.
+- **Flash con dodge roll** (2026-10-10, Tronco de huída): `duelo.flash.dodge` (casilla en el paso del Flash). La Evasión que gana con ese Flash
+  lleva `dodge`; en un área sin dodge (cono, onda) abre la fase dodge de siempre, y en un golpe directo deja `contacto.dodgeLibre` y el mapa de
+  quien esquivó ofrece moverse hasta 2 casilleros sin oportunidad (`cfgEscuchar.dodgeLibre`, js/13 `dueloDodgeLibre`).
+- **Expuesto y «termina el turno»** (2026-10-10, Degollar): preset `Expuesto` (`expuesto`, `mitadEva`: la Evasión a la mitad, y `alEmpezarTurno`).
+  `Combatiente.expuesto(estados)` y `sinReaccionesNo2(ops, estados)` (las opciones de defensa del duelo sin Parry ni nada que cueste No2: ficha,
+  creep, invocación y el mapa); el resumen público lleva la marca (la oportunidad y el dodge roll del mapa la miran). Una Ejecución «con tu arma»
+  con `terminaTurno` (casilla en el paso «Tu ataque») lo lleva en el ataque del duelo; al resolverse, `cfgEscuchar.terminaTurno(d)` (solo el GM).
+- **Cargas** (2026-10-10, Envenenar arma y los óleos): un estado con `cargas` y `golpe = {fijo, efectos}` (efectos en la forma de `efectosGolpe`)
+  le suma a tus próximos ataques con arma ese daño fijo y esos efectos. `Combatiente.gastarCarga(estados, dueloId)` (cada ataque gasta una al pagar y
+  tirar el PdG, pegue o no; un Re-roll no gasta otra; sin cargas se va al empezar el ataque siguiente), `cargaDeDuelo(estados, dueloId)` →
+  {nombre, fijo, efectos, dados, crit, critpot, pdg} y `cargaTxt`. `golpe.pdg` (2026-10-26): `cargaCritico` lo devuelve, el gancho
+  `statsCritico` lo manda como `cargaPdg` y `guardarTiro` (duelo.js) lo suma al PdG del ataque («+1 <la carga>»). Lo usan los ganchos `atacar`, `dano`/`formulaDano` y `efectosArma` de `FichaDuelo`, `CreepDuelo` e
+  `InvDuelo`. Preset «Arma envenenada» (2 cargas, +3, Veneno ×3) en `estados-presets.js`.
+- **Daño de una habilidad + el Efecto especial** (2026-10-10, Toque mágico): `duelo.danoSumaEsp` (true = el Ef.Esp entero, 0.5 = la mitad, para abajo),
+  como `sumaEspecial` de las varitas; lo suma `Combatiente.habEjecucion` con `o.stat('dmgesp')`. En la Ejecución, paso Daño, «Suma tu Efecto especial». La
+  Perfora de un ataque con habilidad: `duelo.arma.perfora` (Tajear), se suma a la del arma.
+- **Critical Matters reemplaza al mismo efecto** (2026-10-10, Tajear): `Duelo.efectosDeHabilidad(d)` — si el golpe fue crítico, un efecto de
+  `ataque.critico.efectos` con el mismo nombre que uno de `ataque.efectos` lo reemplaza (Tajear: Sangrado 3 → 5; Lisiar: Lesión −1 → −2); lo que
+  no se repite se suma. `Combatiente.ataqueConArreglos` lleva los `stacks` de un efecto (Sangrado de N).
+- **⚡ Critical Matters: efectos que solo pasan si el golpe es crítico (2026-09-29, pedido del dueño, auditando
+  Lisiar — "un efecto que es de una manera si no es crítico, y de una manera más intensa si el golpe sí es
+  crítico")**: en el paso "Al pegar" del 🎯/✨, solo para modo `'arma'` (el único que puede critear), un checkbox
+  nuevo **⚡ Critical Matters** destapa una segunda tanda de ◎ Estado / 💚 Cura / Personalizar — **el mismo
+  andamiaje de siempre, duplicado**, que se guarda en `duelo.critico = {efectos, efectosNota}` (top-level, al
+  lado de `duelo.efectos`/`efectosNota`, no adentro de `duelo.arma`: es "qué pasa si pega", no un arreglo del
+  ataque en sí). Se **suma** a los efectos de siempre, no los reemplaza — Lisiar por ejemplo lleva la Lesión
+  −1 PG de siempre en `efectos`, y en `critico.efectos` un texto libre aclarando que pasa a −2 fijo.
+  - **Generalización del paso "Efectos" para no duplicar código**: `filaEstadoPresetHtml`/`filaEstadoManualHtml`
+    ya tomaban `(e, i)` con `i` como clave de fila en los `data-ef-*`; ahora `i` puede ser un número (lista de
+    siempre) o `'c'+número` (lista de Critical Matters) — `efRef(clave)` (nuevo, en el bloque de handlers)
+    resuelve la clave al array real (`st.efectos` o `st.efectosCritico`) y al índice adentro, así **una sola
+    fila de handlers sirve para las dos listas** (`data-ef-nombre`, `-stat`, `-val`, `-turnos`, `-escudo`,
+    `-cura`, `-x`, `-recambiar`). `data-ef-mas` distingue con un prefijo (`"estado"`/`"cura"` vs
+    `"c:estado"`/`"c:cura"`) a cuál de las dos empuja.
+  - **`comun/duelo.js`**: `Duelo.crear()` sanea `cfg.ataque.critico` igual que `cfg.ataque.efectos`/`efectosNota`
+    (mismo `limpiarEfectos`, mismo tope de 8 y de 200 caracteres) y lo guarda en `inicial.ataque.critico` — sin
+    esto, mismo bug real que ya tuvieron `ignoraResistCrit` y `critBono`/`critpotBono` (se ve bien en el
+    asistente, no persiste). `entrarCritico` ya resuelve `d.crit` ANTES de la fase de daño, así que al tirar el
+    daño (`campo === 'dano'`, donde ya se arma `extra.efectos` con lo de la propia arma + `d.ataque.efectos`) se
+    suma también `d.ataque.critico.efectos` **si y solo si** `d.crit.critico` es `true` — mismo mecanismo de
+    "recordar y tirar, no aplicar" que ya usan `efectosArma`/`d.ataque.efectos` (el estado se muestra con su
+    botón «Aplicar», no se escribe solo). `efectosHtml` agrega una tarjeta aparte **"⚡ Crítico: …"** con
+    `d.ataque.critico.efectosNota`, con la misma condición (`d.crit && d.crit.critico`) — no aparece si el golpe
+    no fue crítico, aunque la habilidad tenga el texto cargado.
+  - **`ficha-personaje/ficha.html`**: `ataqueDeHabArma` mapea `c.critico.efectos` con el mismo `mapEf` que ya
+    usaba para `c.efectos` (mismo shape `{nombre, caras, exitos, spec, cura, detalle}`) y pasa `c.critico.efectosNota`
+    por `sustituirX` igual que `c.efectosNota` (por si el texto usa «X»).
+  - **Verificado de punta a punta** (no solo por sintaxis): la ventana del asistente arma el `duelo.critico`
+    esperado; `Duelo.crear()` contra un Firestore simulado lo persiste saneado; un doc de duelo armado a mano
+    con `d.crit.critico: true` muestra la tarjeta del estado y la nota "⚡ Crítico: …" (con `d.crit.critico:
+    false` no aparece ninguna de las dos, confirmando que la condición realmente filtra y no que siempre se
+    muestre). Sin conectar del lado de gm-tools (mismo alcance que `critBono`/`ignoraResistCrit`: los creeps no
+    tienen `ataqueDeHabArma` propio todavía).
+
+- **Paso "Efectos": mismo "Personalizar" que Tirada y Daño (2026-09-27, pedido del dueño)**: además de los
+  ◎ Estado/💚 Cura de siempre, un checkbox "Personalizar: tiene otro efecto que no está en la lista" abre un
+  texto libre (`efectosNota`) — para algo que no encaja como estado ni como cura (ej. "invertí el orden de
+  turno"). Existe tanto en modo `'hab'` como en modo `'arma'` (los dos usan `cuerpoEfectos`). Se muestra en
+  `efectosHtml` (`comun/duelo.js`) como una tarjeta más, sin tirada ni botón «Aplicar» — a diferencia de
+  `efectoLibre` (que sale en el veredicto, con la diferencia numérica), esta nota no depende de que haya una
+  tirada de por medio, así que `efectosHtml` ya no se corta si `d.efectos` viene vacío: se dibuja igual cuando
+  hay nota, en cualquier fase del duelo (no hizo falta tocar `entrarHab`/`guardarAplicacion`: alcanza con que el
+  render la muestre, sin importar a qué fase saltó el duelo por no tener efectos automáticos).
+
+- **Bug real encontrado jugando: `sustituirX` no tocaba la X pegada a una «d» (2026-09-28, Drenar vida en
+  partida real)**: el dueño reportó que el botón "🎲 Tirar Drenaje" del duelo se quedaba tirando sin resultado
+  (se prende de nuevo el brillo, nada pasa). Causa: `sustituirX` (`ficha-personaje/ficha.html`) usaba
+  `/\bx\b/gi` — en «X+1dX» eso reemplaza la primera X (con borde de palabra a los dos lados) pero NO la
+  segunda, porque «d» y «X» son las dos `\w` y no hay borde de palabra entre ellas. La fórmula quedaba
+  «3+1dX», con una X literal, y `tirarDados` la rechaza en silencio (`parseDados` devuelve `null`, y el hook
+  `habTirar` solo llama a `registrarTirada` `if(r)` — sin `else`, no avisaba nada). Arreglado con una segunda
+  pasada para `dx`/`xd` (dado de X caras / X dados) además de la de siempre — sigue sin tocar el resto de un
+  texto libre (`efectoLibre`/`efectosNota`) porque una palabra normal no trae "dx"/"xd" pegados. De paso,
+  `DUELO_HOOKS.habTirar` ahora avisa con un toast si la fórmula personalizada no es válida, en vez de quedarse
+  callado — para que la próxima vez que pase algo así se note enseguida, no después de 8 segundos de brillo.
+
+- **Cuadraditos del crítico, ajuste (2026-09-28, pedido del dueño)**: (1) la barra de "Tu tirada" vuelve a agruparse por el **rango** (cada grupo = un nivel de crítico; lo que se come la Evasión/Parry, las «E», va aparte de a 5) en vez de a 5 parejo; la fila de arriba (Rango) sigue de a 5. (2) Los cuadraditos que resta el **Crítico frecuente** van en **verde con una «F»** (`.duelo-crit-cuad.frec`, antes atenuados) y la leyenda suma su línea "F = Crítico frecuente (N)…" cuando hay alguno.
+- **La tirada de Evasión nunca baja de 1** (2026-09-28, regla del dueño): se corrige a mínimo 1 al tirarla (`tirarValorStat` y `tirarValorStatInv` en `ficha.html`, `tirarValorStat` en `gm-tools.html`: cubre sobrepeso, mitades de Pajaritos/Sentado y modificadores negativos) y, como red de seguridad, al guardarla en el duelo (`guardarTiro`, `comun/duelo.js`, campo `eva`).
+
+- **Objetivo "Onda alrededor de quien la usa" (`objetivo: 'onda'`, 2026-09-28, pedido del dueño; primera skill: Shockwave del Tanque)**: nueva opción en el paso "Objetivo" del 🎯 (`asistente-duelo-hab.js`), con su radio (1 = los adyacentes). Reusa por completo la cascada de los hechizos de área (`vtt-hexgrid/mapa.html`, `dueloElegirAreaMapa` → doc `areas`, un sub-duelo por rival, quien la usa tira **una sola vez** y cada uno se resiste por separado) con tres diferencias: (1) **no hay que marcar el centro**: es el propio token de quien la usa (si no está en el mapa avisa y no lanza); (2) **no hay dodge roll** (`cerrarPar` en `duelo.js`: ganar la resistencia termina el duelo como "se resistió", no abre la fase `dodge`, porque no hay a dónde salir); (3) se saltea el paso "Alcance" (queda en 8 pasos). Igual que en el área: solo rivales, sin el propio ejecutor ni ocultos. `habDueloDe` (ficha) y `habDueloCreep` (gm-tools) mandan `radio` también para la onda, y `limpiarHab` acepta el objetivo. Sin ficha/mapa abierto avisa "se lanzan desde el mapa". No hacen falta reglas nuevas de Firestore. **Shockwave** (`comun/skills-clase.js`): `duelo: {objetivo:'onda', radio:1, tira:'fue', contra:['con'], efectos:[Pajaritos 2 turnos]}`; SP 3 (Flash ×2 = el doble, 6 SP en turno ajeno, a mano). Si el objetivo gana la Constitución no pasa nada (mismo criterio que Sonic Boom).
+
+- **Objetivo "Zona persistente" (`objetivo: 'zona'`, 2026-09-28, pedido del dueño — "que la automatización no
+  quite el momento de esto está pasando"; primera skill: Nube tóxica del Debuffer)**: nueva opción del paso
+  "Objetivo" del 🎯 (`comun/asistente-duelo-hab.js`), con radio, duración en turnos, si también afecta a los
+  aliados, y qué estado deja (con stacks si es Veneno/Veneno severo). A diferencia de área/onda **no se resuelve
+  al ejecutar**: crea un elemento de Terreno y Formas que queda puesto varios turnos y se chequea de a uno —
+  generaliza 🔥 Terreno incendiado (que sigue existiendo tal cual, sin tocar) para que además pueda dejar un
+  estado, con o sin resistencia, y lo pueda colocar una habilidad de jugador o de creep, no solo el GM a mano.
+  - **No pasa por `comun/duelo.js`** (no hay contienda instantánea, así que no hay dodge ni cascada de
+    sub-duelos): `ficha.html`/`gm-tools.html` interceptan el objetivo `'zona'` ANTES de armar el duelo normal
+    (`colocarZonaDeHab`/`colocarZonaDeHabCreep`) — si la habilidad tiene tirada (paso "Tirada"), la tira UNA
+    vez ahí mismo (con `compute().final[stat]` en la ficha, `creepStatValor` en gm-tools) y le manda al mapa,
+    por `postMessage({tipo:'zona-persistente-habilidad', …})`, el radio, la duración, el estado, el daño (si
+    el paso "Daño" está tildado, la fórmula sale de `it.tiradaExtra` como cualquier duelo) y esa tirada ya
+    resuelta. El mapa (`zonaPersistenteDeHabilidad`, `vtt-hexgrid/mapa.html`) pide el centro con un clic (como
+    un hechizo de área) y crea el elemento. Sin el mapa abierto, avisa que hace falta para colocarla.
+  - **El elemento** lleva `zona`, `zonaNombre`, `zonaDano?`, `zonaIgnoraDef?`, `zonaEstado?` (JSON
+    `{nombre,turnos,stacks?}`), `zonaAmiga?`, `zonaResistStat?`, `zonaResistValor?` (la tirada del casteador),
+    `zonaCasteadorRef`/`zonaCasteadorTipo` (quién la creó, para saber quién es rival) y `zonaResueltos` (a
+    quién ya se le aplicó el estado — no se lo vuelve a chequear). Mismo `turnos`/`venceMant` de siempre
+    (Formas con turnos) para que se borre sola. **Reglas de Firestore nuevas: hay que publicarlas** (los
+    campos `zona*` en `elementoValido` y en el `update` de `elementos`, con una rama nueva que deja a
+    cualquier afectado sumarse solo a `zonaResueltos`, uno a la vez).
+  - **El motor** (`vtt-hexgrid/mapa.html`, junto a `fuegoMantenimiento`): `zonaRevisarEntrada`/
+    `zonaRevisarMantenimiento` — mismo momento que ya usa el fuego (al mover un token, y en cada ⟳
+    Mantenimiento) — revisan, **cada pantalla lo suyo** (el dueño sus personajes, el GM sus creeps), si algún
+    token propio está parado en una zona que le falte algo: el daño se vuelve a chequear siempre (como el
+    fuego); el estado, solo si ese token no está ya en `zonaResueltos`.
+  - **El cartelito, no el silencio** (el pedido explícito del dueño): en vez de resolver todo solo, se encola
+    y se muestra `#zona-banner` — "🌫 *Nube tóxica*: *Fulano* entró — tirá Res.Esp para resistir" con un botón
+    🎲, o "le toca a *Fulano*" con un botón "Aplicar" si no hay nada que tirar (una zona de puro daño, tipo un
+    fuego armado por skill). Al resolver (`zonaResolverBanner`): si hay resistencia, tira el stat del afectado
+    (de `resumen.<stat>` publicado por la ficha para un PJ — se sumó `resumen.resmg`, Res.Esp, para esto — o
+    `zonaStatCreep` para un creep) contra la tirada guardada del casteador (empate = gana quien creó la zona);
+    si no resistió, aplica el daño (`danioPj`/`danioCreep`, como el fuego) y el estado (`EstadosAplicar`,
+    mismo mecanismo que "Estados sobre otros, automáticos" de gm-tools — a un creep directo, a un PJ con
+    `encolarPj`: la ficha del dueño lo aplica sola, aunque no esté mirando el mapa en ese momento) — y recién
+    ahí anota `zonaResueltos`. El resultado se muestra un momento más en el mismo cartelito antes de cerrarse.
+    Todo publicado a la Mesa (`mesaPublicar` para la tirada de resistencia; el daño ya se anuncia solo).
+  - **Nube tóxica** (`comun/skills-clase.js`): SP 3, No2 1, radio 1 (diámetro 3), dura 3 turnos, tira Especial
+    contra Res.Esp (una sola vez), Veneno ×3 al que pierde, no afecta a los aliados.
+  - **Etapa 2, pendiente** (lo cosmético, no construido todavía): partir el botón ⬡ del toolkit en tres —
+    Formas libres / Trampas / Zonas con efectos persistentes — para poder colocar una zona directo en el mapa
+    sin pasar por una habilidad, y sumar la misma opción al asistente de trampas (una trampa que, en vez de
+    dispararse una sola vez, deja puesta una zona). Ver el hilo de diseño de esta fecha.
+
+- **Etapa 2 — el ⬡ despliega tres modos, y "Zonas con efectos persistentes" tiene su asistente paso a paso**
+  (2026-09-28, pedido del dueño, sigue a la etapa 1 de arriba). El botón ⬡ Terreno y Formas del toolkit
+  (`vtt-hexgrid/mapa.html`, `HERRAMIENTAS`) ya no entra directo a un modo: el clic despliega dos filas más debajo
+  (`elementoSubmenuAbierto`) — **Formas libres** (lo de siempre: color, transparencia, imagen, Sólido, Invisible,
+  Turnos, 🧱 Colisión del GM — pero ya sin la casilla "Trampa" ni "🔥 Terreno incendiado", que se sacaron de acá) y
+  **Trampas** (mismo panel de dibujo, ahora con los campos de trampa siempre visibles — el modo ya implica que
+  es una trampa, no hace falta tildar nada; al entrar sin nombre se abre solo el asistente de siempre). **🔥
+  Terreno incendiado no se puede crear más desde acá** — lo reemplaza una zona con solo daño (sin estado); el
+  mecanismo viejo (`fuego`/`fuegoDano`, `fuegoEntrada`/`fuegoMantenimiento`) queda intacto para lo que ya estaba
+  colocado, sin tocar una línea.
+  - **Zonas con efectos persistentes** es la tercera opción y NO usa el panel de dibujo: abre de una
+    `comun/asistente-zona.js` (`AsistenteZona.abrir`), un asistente paso a paso nuevo (mismo estilo visual que
+    `asistente-trampa.js`, con su propio prefijo de clases `az-` para no compartir CSS por las dudas) con 7
+    pasos: **tamaño** (radio; por ahora solo Flor — Línea y Forma libre se siguen armando a mano por "Formas
+    libres") **+ turnos que dura** en el mismo paso, **daño** (fórmula, tipo, ignora Defensa), **estado** (de
+    `EstadosAplicar.DEBUFFS`, con stacks si es Veneno/Veneno severo), **resistencia** (opcional: como quien la
+    pone es el GM y no hay nadie que tire, en vez de una tirada compartida se le pone un **número fijo** de
+    dificultad — mismo criterio que ya usan las trampas en su texto), **disparo** (dos preguntas independientes:
+    ¿sigue afectando en cada Mantenimiento a quien se queda adentro?, y ¿se dispara con cada paso caminado
+    adentro o alcanza con entrar?) y **nombre + color**. Al terminar, pide marcar el centro con un clic (como un
+    hechizo de área) y crea el elemento — `crearElementoZona(centro, cfg)`, la misma función que ahora también
+    usa `zonaPersistenteDeHabilidad` (la de la Etapa 1, sin duplicar código). Cualquier miembro puede usarlo,
+    igual que Formas libres y Trampas; el "bando" de una zona puesta así es el de quien la coloca (el GM =
+    rival de los PJ, un jugador = rival de los creeps), sin un token puntual de casteador.
+  - **Motor: dos disparadores nuevos, independientes** (`zonaEnMantenimiento`, default `true`; `zonaCadaPaso`,
+    default `false`) que generalizan cómo y cuándo se chequea una zona — pensados para poder armar un piso de
+    púas (duele al caminar, no por quedarse parado) además de una nube que sigue afectando a quien se queda
+    quieto: `zonaRevisarMantenimiento()` salta las zonas con `zonaEnMantenimiento === false`;
+    `zonaRevisarEntrada(id, celdas)` sigue mirando dónde terminó el movimiento para el caso normal, y ADEMÁS,
+    para las zonas con `zonaCadaPaso`, cuenta cualquier casillero cruzado que sea suyo y venga de uno que no lo
+    era (mismo conteo que ya usa 🔥, una vez por movimiento, no por casillero — ver el comentario en el código).
+  - **Bug real encontrado probando el asistente**: si se elegía Veneno sin poner stacks a mano, los dos
+    asistentes (`asistente-zona.js` y el paso "Objetivo" de `asistente-duelo-hab.js`) mandaban igual un `turnos`
+    fijo (0 o 2) junto al nombre — `EstadosAplicar.componer` lo toma tal cual y el Veneno quedaba con los stacks
+    de siempre (4) pero vencido antes de tiempo. Arreglado: sin stacks a mano, no se manda `turnos` en absoluto,
+    así el preset se aplica entero. Nube tóxica (Etapa 1) no lo sufría porque siempre manda sus 3 stacks a mano.
+  - **Reglas de Firestore nuevas** (además de las de la Etapa 1, todavía sin publicar): `zonaEnMantenimiento` y
+    `zonaCadaPaso` sumadas a `elementoValido`.
+  - **Pendiente**: sumar la misma opción de "queda como zona" al asistente de trampas (una trampa que en vez de
+    dispararse una vez deja puesta una zona), y que el asistente de zonas también sepa armar Línea/Forma libre.
+
+- **Trampas persistentes (2026-09-28, pedido del dueño, sigue a las dos etapas de arriba)**: en el asistente
+  paso a paso de una trampa del mapa (`comun/asistente-trampa.js`, no en las que coloca una habilidad) hay un
+  paso nuevo, justo después de "Estado": **"¿Al dispararse, queda además como una zona?"**. Marcado, además del
+  golpe de siempre (una vez, a quien la pisó), la trampa deja puesta una zona con el **mismo daño y/o estado**
+  que ya se configuró — como una trampa de gas que, al saltar, deja la nube ahí un rato. Se pregunta cuántos
+  turnos dura esa zona, si sigue afectando en cada Mantenimiento y si se dispara con cada paso o alcanza con
+  entrar (mismos dos disparadores de la Etapa 2), y si la zona se resiste con algo (dificultad fija, como el
+  asistente de zonas — aparte del "se evita" de la trampa, que sigue siendo a mano y es solo para el golpe inicial).
+  - **Cómo se guarda**: la trampa dormida lleva `trampaDejaZona` + `zonaTurnos` (la duración de la zona
+    resultante — distinto de `turnos`/`venceMant`, que mientras la trampa no se disparó puede significar "se
+    borra sola si nadie la pisa") + `zonaEnMantenimiento`/`zonaCadaPaso`/`zonaResistStat`/`zonaResistValor`.
+    Nada de esto activa nada todavía: son datos a la espera.
+  - **Al dispararse** (`trampaResolver`, `vtt-hexgrid/mapa.html`): después del golpe de siempre, si
+    `trampaDejaZona`, una segunda escritura convierte el MISMO elemento (mismas celdas) en una zona de verdad
+    — `zona: true`, copiando `trampaDano`→`zonaDano`, `trampaEstado`→`zonaEstado` (ya es el mismo formato JSON,
+    se copia tal cual), `trampaIgnoraDef`→`zonaIgnoraDef`, `fuegoAmigo`→`zonaAmiga`, y recalculando
+    `turnos`/`venceMant` con `zonaTurnos` desde ese momento (no desde que se colocó la trampa). El "bando" de la
+    zona resultante es el mismo que ya definía `trampaDispara` (dueño GM → rivales los PJ; dueño jugador →
+    rivales los creeps), sin un token de casteador puntual — mismo criterio que una zona puesta a mano.
+  - **Regla de Firestore nueva**: quien dispara la trampa no es necesariamente su dueño, así que hace falta una
+    rama de permiso aparte para esa segunda escritura — "una trampa con `trampaDejaZona` ya disparada, cualquiera
+    completa su conversión a zona" (los campos vienen pre-armados por quien puso la trampa, no se inventan).
+  - **Pendiente**: "Trampas guardadas" (recurrentes) todavía no recuerda esta configuración — una trampa
+    persistente guardada y vuelta a cargar pierde el "deja zona" (hay que rearmarlo). Tampoco está en las
+    trampas que coloca una habilidad (`trampaColocar`), solo en las del mapa.
+
+- **El menú «Duelo» de una habilidad pasa a llamarse «Ejecución» (2026-09-28, pedido del dueño)**: probando
+  configurar Blindaje (un escudo sobre uno mismo) desde el 🎯/⚔ de `comun/asistente-duelo-hab.js`, quedó claro
+  que el nombre "Duelo" quedaba chico — el menú sirve para automatizar CUALQUIER tipo de habilidad (ataques,
+  pero también buffs y curas sobre uno mismo o un aliado), y "unifica el efecto visual de ejecutar" cualquiera
+  de ellas con el mismo cuadro compartido. Cambio solo de **etiqueta visible** (título del asistente `✨
+  Ejecución · <nombre>`, el botón `✨`/tag de la lista de habilidades en ficha y gm-tools, y —dentro de
+  `comun/duelo.js`— la cabecera, el tooltip de minimizar y el chip pendiente cuando el duelo es de una habilidad,
+  `d.hab` truthy) — el motor real de combate cuerpo a cuerpo (`Duelo`, `duelo.js`, PdG contra Evasión) sigue
+  siendo un duelo de verdad y conserva su nombre y su ⚔ en todo lo demás (un ataque con arma normal, sin `d.hab`).
+  - **Tres obstáculos reales encontrados en el ejercicio, los tres corregidos el mismo día:**
+    1. **Paso "Tirada": "Nada" vivía escondido** adentro del `<select>` de stats y no existía en modo
+       Personalizada — un buff con tirada personalizada (propia, de sabor) no tenía forma de decir "no hay
+       nada que resistir". Ahora es un tilde propio (`tiraNinguna`) que tapa el resto del paso sea cual sea
+       el modo.
+    2. **Paso "Resistencia" exigía siempre un stat** en cuanto había cualquier tirada — bloqueaba a Blindaje
+       (una tirada propia sin nada que la resista). Suma **"Nadie"** (se aplica directo igual, `contraModo:
+       'ninguna'`) y **"Otro"** (`contraOtro`, texto libre que se muestra en el cuadro del duelo como
+       recordatorio para resolverlo a mano) al lado de "Con un stat de la lista"; el layout de la lista de
+       checkboxes quedó además más prolijo (`.adh-check-list`, `align-items:flex-start`, ancho explícito —
+       el dueño lo reportó "desprolijo" en una captura; no se pudo reproducir el desalineado exacto en una
+       prueba aislada, así que el endurecimiento del CSS es preventivo).
+    3. **Paso "Efectos" solo ofrecía debuffs**: `EstadosAplicar` solo tenía `DEBUFFS` (Veneno, Sangrado…) —
+       nada de escudo ni de ningún buff, así que "Escudo especial" (lo que Blindaje necesita) no aparecía ni
+       se podía dar un valor de escudo. `EstadosAplicar` suma **`BUFFS`** (Escudo especial, Barrera — mismos
+       presets que `EFECTOS_PRESET`/`ESTADOS_PRESET_GM`, ver `ficha-personaje/CLAUDE.md`) y `presetPorNombre`
+       busca en los dos; `componer`/`limpiarSpec`/`texto` ahora saben de `escudoMagico` (con un valor a mano
+       ganándole al del preset), y el paso "Efectos" del 🎯 suma un campo propio "o un escudo de (opcional)"
+       por cada ◎ Estado, con **autocompletado** al elegir "Escudo especial"/"Barrera" (carga su escudo y
+       turnos de siempre, editable igual). `escudoMagico` tuvo que sumarse a CUATRO saneos separados que
+       hasta ahora solo conocían campos de debuff — el mismo tipo de bug que ya pasó antes con
+       `ignoraResistCrit` (ver la entrada del Paso "Ignora Resistencia a crítico" más arriba): el `limpiarSpec`
+       **local** de `comun/duelo.js` (no el de `EstadosAplicar`, son dos funciones separadas con el mismo
+       nombre), `EstadosAplicar.limpiarSpec`, y `aplicarEstadoRecibido` de la ficha (que arma el draft del
+       estado recién llegado a mano, sin pasar por `EstadosAplicar.componer`).
+  - **Blindaje en sí no se tocó** — sigue siendo una habilidad del sistema simple de siempre (sin duelo, paso
+    "Efecto" del editor, `efectoEscudo: 8`, ver `ficha-personaje/CLAUDE.md`), que ya funcionaba. Este trabajo
+    solo abre la puerta a que, si alguna vez se quiere migrarla (u otra parecida) al cuadro de Ejecución
+    compartido, el paso "Efectos" ya la sepa representar.
+
+- **Bug real: el checkbox del cuadro de Ejecución se estiraba a todo el ancho (2026-09-28, reportado por el
+  dueño con capturas de los pasos Resistencia y Daño)**: `#adh-fondo` (`comun/asistente-duelo-hab.js`) resetea
+  el ancho de `select`/`input[type=text]`/`input[type=number]`, pero nunca lo hacía para `input[type=checkbox]`
+  ni `input[type=radio]` — ambas herramientas (`ficha-personaje/ficha.html`, `gm-toolset/gm-tools.html`) tienen
+  una regla global `input,textarea,select{width:100%}` para sus propios formularios, que sin ese reset se colaba
+  también en los checkboxes/radios del cuadro: el checkbox se estiraba a ~600px (toda la fila, con el tilde
+  real pintado en una esquina) y el texto de la etiqueta quedaba empujado a una columna de ~60px, una palabra
+  por línea — exactamente lo que se veía en las capturas. **No se pudo reproducir en un harness aislado** (sin
+  el CSS del host no aparece) — se diagnosticó recién al reproducirlo contra el stylesheet real de gm-tools.html
+  (extraído a un archivo aparte para una prueba, después borrado). Fix: `width:16px;min-width:16px;max-width:16px`
+  fijo para esos dos tipos de input dentro de `#adh-fondo label.op`. Afecta a TODOS los checkboxes/radios del
+  cuadro (existían desde el 27, no solo los nuevos del 28), así que corrige de una: "¿Se juega?", Resistencia,
+  Daño y el "Personalizar" de Efectos.
+- **Paso "Daño": "No hace daño" pasa a ser una opción explícita** (mismo pedido, 2026-09-28): el único checkbox
+  "Esta habilidad hace daño" (con "no hace daño" implícito al dejarlo destildado) se reemplaza por un radio
+  No/Sí — mismo criterio que "Nadie"/"Otro" de Resistencia, para que ningún paso del cuadro dependa de leer un
+  estado por omisión.
+- **Paso "Efectos": el selector de "◎ Estado" reusa el selector real en vez de reinventar uno propio (2026-09-28,
+  pedido del dueño — "el selector de estado no debería ser un desplegable... sino un botón de +ESTADO que
+  despliegue el menú de estados alterados... siguiendo el mismo andamiaje")**: antes, cada fila de estado era un
+  campo de texto libre (con un `<datalist>` de sugerencias) + turnos + un bono + un escudo, todo a mano — una
+  versión pobre del selector de "+ Estado" que ya existe en toda la mesa (la grilla con Ver/Activar de siempre +
+  el cartelito de `EstadoPreguntas` que pregunta las cantidades una por una). Ahora el botón "＋ Estado" (y el
+  "✎ Cambiar" de una fila ya elegida) llama a `cfg.elegirEstado()`, una función opcional que **cada página define
+  con SU propio catálogo** — `comun/asistente-duelo-hab.js` no sabe nada de `EFECTOS_PRESET` ni
+  `ESTADOS_PRESET_GM`, solo espera una Promise que resuelve `null` (canceló), `{modo:'manual'}` ("Empezar en
+  blanco": cae en los campos de texto de siempre, para algo que no está en ningún catálogo) o
+  `{modo:'preset', nombre, turnos, permanente, hp, mods, stacks, escudoMagico, polaridad, detalle}` (un preset
+  real, ya con sus cantidades respondidas). Sin `elegirEstado` (compatibilidad), el botón sigue con el
+  comportamiento viejo.
+  - **`ficha-personaje/ficha.html`**: `elegirEstadoDuelo()` reutiliza `abrirPresetsEfecto`/`aplicarPresetEfecto`
+    con un destino nuevo, `'duelo'` — mismo mecanismo que ya distinguía `'directo'`/`'inv'`/`'item'`/`'efecto'`,
+    sin tocar ninguno de esos. Como la elección llega por un clic asincrónico (no hay `editing.draft` que llenar:
+    el resultado tiene que volver como el valor de una Promise), se guarda un resolver (`presetDueloResolver`) y
+    `cerrarPresetsDuelo(valor)` lo resuelve y cierra el panel — hay que llamarlo desde los TRES lugares que antes
+    solo hacían `$('#scrim-presets').classList.remove('open')` a mano: el botón ✕, el clic afuera del panel y el
+    handler global de Escape (este último se comparte con un montón de otros scrims: si se agrega uno más ahí,
+    hay que revisar si también necesita este tratamiento). El panel usa `z-index:60` de fondo — se sube a 99600
+    al abrirse para 'duelo' (el cuadro de Ejecución está en 99500) y se repone al cerrar.
+  - **`gm-toolset/gm-tools.html`**: mismo patrón (`presetsCreepDestino`, `presetDueloResolverGM`,
+    `cerrarPresetsDuelo`) sobre `abrirPresetsEstadoCreep`/`aplicarPresetEstadoCreep` (el selector de aplicar un
+    estado directo a un creep abierto) — con una diferencia real: ese selector nunca tuvo "— Empezar en blanco —"
+    (siempre se aplica un preset real a un creep), así que `elegirEstadoDuelo()` arma su propio HTML con ese
+    botón agregado en vez de llamar a `abrirPresetsEstadoCreep` tal cual.
+  - **Verificado en vivo, no solo por sintaxis**: se probó el flujo completo (abrir el cuadro, ＋ Estado, elegir
+    "Escudo especial"/"Barrera" de la grilla real, responder el cartelito de HP del escudo y turnos, ver la
+    tarjeta de resumen en el paso Efectos, Guardar) en las dos páginas reales — no en un harness aislado —
+    cargando cada una con su propio arranque de sesión desactivado a propósito para la prueba (archivo aparte,
+    después borrado) porque `mesaIniciar(gmAlEntrar)`/`mesaIniciar(fbAlEntrar)` redirigen solos al no encontrar
+    sesión.
+
+- **`comun/confirmar-turno.js` — costo distinto en turno ajeno (2026-09-28, pedido del dueño, paso intermedio
+  hasta tener al mapa avisando solo de quién es el turno — ver `docs/pendientes.md`)**: el paso "Costo" del
+  🎯/✨ (`comun/asistente-duelo-hab.js`) suma un tilde "El costo en SP es distinto si no es tu turno" + un campo
+  con el SP que se cobra en ese caso (`turnoAjenoSp`; al tildarlo por primera vez se autocompleta con el doble
+  del SP de arriba — el mismo criterio que ya usa Shockwave en su texto, editable igual). Solo guarda el dato;
+  vacío = no aplica. `ConfirmarTurno.pedir(nombre, costoPropio, costoAjeno)` (mismo patrón de Promise que
+  `EstadoPreguntas.preguntar`: `null` si se cancela) es quien pregunta «¿es tu turno?» — lo usa
+  `ficha-personaje/ficha.html` en `ejecutarHabilidad` (ahora `async`), justo antes de cobrar el SP (después del
+  gate de No2 insuficiente, antes de `S.spGastado += costoSp`): si `it.turnoAjenoSp` tiene algo y el SP no es
+  «X» (`!spVariable(it)`), se pregunta y el SP a cobrar es la respuesta — cancelar no cobra ni ejecuta nada.
+  **Solo en la ficha por ahora**: `gm-toolset/gm-tools.html` no toca el archivo ni el flujo de Ejecutar de un
+  creep — los creeps no tienen un concepto de SP gastado (`h.costo` ahí es solo para mostrar/duelo, ver la nota
+  de la investigación de este mismo día en el hilo de diseño), así que no hay nada que cobrar distinto todavía;
+  el checkbox del 🎯 igual se puede tildar y guardar en `h.turnoAjenoSp` para cuando haga falta. **No se combina
+  con costo variable "X"** (`confirmarCostoVariable`, el modal de X): a propósito, sin precedente real que lo
+  necesite. Verificado en vivo (no solo por sintaxis): el pop-up, las tres respuestas (Sí/No/Cancelar) y que
+  cobran exactamente lo que dicen, con Shockwave de prueba (3 SP propio, 6 SP ajeno).
+
+- **Bug real: una habilidad "a uno mismo" pedía objetivo igual, y nunca podía aplicarse sin el GM (2026-09-29,
+  reportado por el dueño probando Blindaje en una partida real — "el origen de las especies")**. Dos fallas
+  separadas, encontradas siguiendo el reporte:
+  1. **`Duelo.elegirObjetivo` (`comun/duelo.js`) solo tenía el atajo "sin objetivo: uno mismo" del lado del
+     mapa** (`dueloElegirObjetivoMapa`, `vtt-hexgrid/mapa.html`, agregado el 2026-09-28 junto con Shockwave).
+     Cuando la habilidad se ejecuta **fuera del mapa** (ficha suelta, sin iframe — `elegirObjetivoLista`), no
+     existía el mismo atajo: se mostraba "¿A quién atacás?" con la lista de TODOS los demás tokens — ni
+     siquiera incluía el propio, porque la lista se arma filtrando `!propio(t)` — así que una habilidad "a uno
+     mismo" no tenía forma de aplicarse sobre quien la usó, solo sobre quien se eligiera por error. Fix: nueva
+     `elegirObjetivoUnoMismo(cfg)`, mismo criterio que el mapa (busca el propio token con `tokensDelMapa()` y
+     llama a `crear()` directo), enganchada en `elegirObjetivo` antes de caer en `elegirObjetivoLista`.
+  2. **Aunque el objetivo fuera correcto, aplicar el efecto (el botón «✔ Aplicar» del cuadro) dependía SIEMPRE
+     de que el GM tuviera el mapa abierto y conectado** — `cfgEscuchar.aplicarEfecto` (el hook que realmente
+     escribe el estado) estaba gateado a `soyGM()` sin excepción, porque hasta ahora la única función que lo
+     definía era la del mapa (`dueloAplicarEfecto`, pensada para aplicar sobre un RIVAL, algo que solo el GM
+     puede hacer). Un buff sobre uno mismo escribe la PROPIA ficha, que no necesita el permiso de nadie más.
+     Fix: el gate pasó a `soyGM() || esMio(d.defensor)` (por duelo, no global), y `ficha-personaje/ficha.html`
+     define su propio hook, `dueloAplicarEfectoPropio(d, ef)` (reusa `aplicarEstadoRecibido`, el mismo camino
+     ya probado para estados que llegan de afuera; cura se aplica con `fijarHp`), enganchado en su
+     `Duelo.escuchar({aplicarEfecto: dueloAplicarEfectoPropio})` de cuando corre **suelta** (`fbAlEntrar`,
+     `window.parent === window`). **Corriendo dentro del mapa** (Botonera embebida, el modo normal de jugar) no
+     hizo falta tocar la ficha: el propio `Duelo.escuchar` del mapa ya usa `dueloAplicarEfecto`, que sabe
+     aplicar a un PJ vía `EstadosAplicar.encolarPj` — con el gate relajado, alcanza con que CUALQUIER miembro
+     (no solo el GM) tenga el mapa abierto para que su propio buff se aplique solo.
+  **No verificado en vivo con Firebase real** (solo por trazado de código + sintaxis: no hay forma de simular
+  un duelo completo con Firestore real sin credenciales) — pedido al dueño reprobar en su partida.
+
+- **Bug real encontrado: `#ct-fondo` (¿Es tu turno?) quedaba invisible dentro de la Botonera del mapa
+  (2026-09-29, siguiendo el mismo reporte de Blindaje "no pasa nada" — el dueño confirmó que Shockwave SÍ
+  funciona embebido, lo que descartó las dos causas de arriba como explicación completa)**. `ficha-personaje/ficha.html`
+  tiene una regla CSS que en modo Botonera (`?modo=botonera`, la ficha corre en un iframe dentro del mapa) oculta
+  TODO hijo directo de `<body>` salvo una lista puntual de excepciones (`:not(.scrim):not(.toast):not(#ep-fondo)…`)
+  — pensada para que solo se vea la Botonera y sus ventanitas, con fondo transparente. Al sumar
+  `comun/confirmar-turno.js` (el cartelito "¿Es tu turno?" del paso Costo, `turnoAjenoSp`) se cargó el script pero
+  se olvidó agregar su `#ct-fondo` a esa lista — así que una habilidad con "el costo en SP es distinto si no es tu
+  turno" tildado, ejecutada desde la Botonera del mapa, queda **esperando un clic en un cartelito invisible**: sin
+  ningún error, sin ningún toast, "no pasa nada" para quien la usa (el `await ConfirmarTurno.pedir(...)` de
+  `ejecutarHabilidad` nunca se resuelve). Arreglado sumando `:not(#ct-fondo)` a la regla de `ficha-personaje/ficha.html`
+  (línea de `html.modo-botonera body > :not(...)`). Verificado con una prueba de CSS aislada (no con Firebase real):
+  con el fix, `#ct-fondo` computa `display:block`; sin él, `display:none`. **Pedido al dueño**: confirmar si
+  Blindaje tenía tildado ese checkbox (parece la explicación más probable dado que no daba ningún error) y reprobar
+  ejecutándolo desde la Botonera del mapa. **Confirmado por el dueño: arregló el problema.**
+
+- **Parry como caja individual en «¿Con qué se resiste el objetivo?» (2026-09-29, pedido del dueño)**: el paso
+  Resistencia del 🎯/✨ (`comun/asistente-duelo-hab.js`, `CONTRA`) tenía Evasión y varios stats pasivos, pero no
+  Parry — el dueño pidió que apareciera como una caja más (no mezclada con el texto de Evasión), "ante el posible
+  caso de algún skill que no se pueda parriar" (o sea: que sea el diseño de CADA habilidad, tildando o no la
+  caja, el que decida si se puede parriar — no una regla fija del sistema). Se sumó `['parry', 'Parry (bloquear
+  con un arma o escudo — solo si el objetivo tiene uno equipado)']` a `CONTRA`; al marcarla aparece un aviso
+  (re-renderiza sola al tocar esa caja puntual, algo que las demás cajas de esta lista no hacían — no hacía falta
+  antes porque no dependían de ningún otro texto en pantalla) explicando que igual no se ofrece si el objetivo no
+  tiene arma ni escudo equipado.
+  - **Por qué no hacía falta más código en el motor**: para una habilidad dirigida (`d.hab`), la tirada de cada
+    stat de `contra` (Evasión, Res.Esp, Parry, lo que sea) ya se resuelve genéricamente por `DUELO_HOOKS.habTirar`
+    (busca el stat en `d.hab.contra` por `modo` y tira `compute().final[stat]`/`creepStatValor(sc, stat)`, ver
+    `comun/duelo.js` línea ~1671) — el hook `defender` (con su lógica hardcodeada de Evasión/Parry de un ataque
+    normal) **nunca se llama** para un duelo de habilidad, solo para uno de arma. Así que Parry como stat de
+    `contra` ya "andaba" en el sentido de tirar el número correcto; lo único que faltaba era la opción en la
+    lista y la regla de "sin arma no hay Parry".
+  - **La regla "sin arma ni escudo no se puede parriar" (P121) se respeta con un hook nuevo, opcional**:
+    `comun/duelo.js`'s `opcionesHab(d, h)` (arma una caja por cada stat de `contra` para que el objetivo elija
+    a ciegas) ahora filtra la caja de Parry si `h.puedeParry` existe y devuelve `false` — sin el hook (compatibilidad
+    hacia atrás), se sigue ofreciendo igual. `ficha-personaje/ficha.html` y `gm-toolset/gm-tools.html` suman
+    `puedeParry: d => …` a `DUELO_HOOKS`, reusando `armasYEscudosParaParry()`/`sc.armaNombre`/`inv.armaNombre` —
+    los mismos criterios que ya usa `opcionesDefensa` para un ataque normal.
+  - **No verificado en vivo con Firebase real** (el checkbox y el aviso sí, con una prueba aislada del asistente
+    en el navegador — ver el bug de arriba para la técnica) — el flujo completo (crear una habilidad con Parry
+    marcado, ejecutarla contra alguien con y sin arma) queda para probar en mesa.
+
+- **`estados-presets.js`** (`ESTADOS_PRESET`, 2026-09-29, paso 0d de `../docs/plan-subida-unificada.md`) — **la lista única de
+  estados alterados estándar** (Veneno, Sangrado, Stun, Escudo especial, Barrera, Sigilo…, 31). Antes había tres copias que se
+  habían ido separando: `EFECTOS_PRESET` (ficha), `ESTADOS_PRESET_GM` (gm-tools) y `DEBUFFS`/`BUFFS` (`estados-aplicar.js`).
+  Ahora las tres salen de acá: `estadosPresetFicha()` (nombres de campo de la ficha, `hpturno`/`stacksturno`, y Armadura rota
+  con su −1 Defensa como mod) y `estadosPresetCreep()` (forma de creep, con `stacks: 1, hpTurno: 0` por defecto; Armadura rota
+  sin mod porque el creep la resta aparte, por acumulación — si se le pusiera el mod, se descontaría dos veces).
+  `EstadosAplicar.DEBUFFS`/`BUFFS` son esa misma lista partida por polaridad (BUFFS pasó de 2 a 15: ahora una Ejecución que
+  da, por ejemplo, Invulnerable a un aliado le llega con su marca real). Se carga **antes** de `estados-aplicar.js` (ficha,
+  gm-tools, mapa y `datos/auditoria-skills.html`). Al juntarlas se reconciliaron: **Sangrado** en todos lados como
+  `stacks: 2, hpTurno: −1` (la regla del 2026-09-22; la ficha seguía con la forma vieja y sumaba de a 2 al reaplicarse) —
+  y `estado-preguntas.js` ya no le pregunta "¿Cuántos stacks?" aparte (salen del daño); **Afortunado** 3 turnos (gm-tools
+  tenía 2; igual se pregunta al activarlo); los textos viejos de Inmovilizado y Rengo en gm-tools (hablaban de Movimiento);
+  **Barrera**, que faltaba en gm-tools; y los textos, en tercera persona para que sirvan a personajes y creeps.
+
+- **`plantillas.js`** (`Plantillas`, 2026-09-29, paso 1 de `../docs/plan-subida-unificada.md`) — qué datos viajan al
+  subir cada tipo de elemento: `Plantillas.limpiar(tipo, datos)` para `skills`, `habs_creep`, `creeps`, `pasivas`,
+  `trampas`, `estados`, `items` (copia limpia, no toca el original; saca también `bibOrigen`). Se carga antes que
+  `biblioteca.js` (ficha, gm-tools, mapa) y en `datos/auditoria-skills.html`, que usa `Plantillas.habilidad` para
+  escribir `skills-clase.js`.
+- **`biblioteca.js`, subida unificada** (2026-09-29): lo que sube cualquiera queda al instante en la biblioteca, con
+  🔶 sin auditar hasta que el dueño lo marca ✅; "¿corrección de X o algo nuevo?" con `opts.basadoEn`; `alElegir(datos,
+  meta)` con `{tipo, id, version}`; `Biblioteca.entrada(tipo, id)` para el aviso de versión nueva. Detalle en el
+  comentario de cabecera y en `../docs/plan-subida-unificada.md` ("Paso 1: cómo quedó"). Reglas nuevas: hay que pegarlas.
+- **`biblioteca.js`, para herramientas con pantalla propia** (2026-09-29, paso 2): `Biblioteca.lista(tipo)` devuelve lo
+  subido (sin lo de fábrica) sin abrir la ventana; `guardar` acepta `datosPara(modo)` (datos distintos si es corrección
+  o algo nuevo) y `alSubir({id, version, modo})` (la entrada que quedó). La ficha los usa para las habilidades.
+- **`biblioteca.js`, colección vieja a la vista** (2026-09-29, paso 3): `opts.legado = {tipo, convertir(datos)}` en
+  `abrir`/`guardar` lee además `biblioteca_<legado>` (y sus propuestas) convertidas a la forma nueva, con su colección
+  en `ent.col` para auditar/borrar; corregir una entrada vieja crea una nueva con `reemplaza`. Lo usa gm-tools para las
+  habilidades de creep (`biblioteca_habs_creep` → `biblioteca_skills`). `Plantillas.limpiar('skills', {para:'creep'})`
+  limpia como habilidad de creep.
+- **`biblioteca.js`, cartel único de versión nueva** (2026-09-29, paso 4): `Biblioteca.versionNueva(subidas, origen,
+  ignorada)` (¿hay una versión más nueva que la de la copia?) y `Biblioteca.avisoVersion(opts)` (el cartel "🔔 hay una
+  versión nueva" con Actualizar / Dejar la mía / Ahora no). Todas las herramientas lo usan en vez de un cartel propio.
+- **Una sola forma de trampa (P123, 2026-09-29, decidido por el dueño)**: la trampa que coloca una habilidad
+  (`trampaColocar`, ficha y gm-tools) pasó a tener la misma forma que las del mapa y el catálogo — `tipo`/`tamano` (flor:
+  su radio, 0 = una casilla, como en el mapa y en las trampas consumibles; línea: largo), color, alfa, daño, `estado` (nombre) + `estadoTurnos` (+ `estadoMods` si es un estado
+  propio), zona que deja al dispararse, `turnos` (cuánto dura puesta) y `cant` (cuántas deja por ejecución).
+  `Plantillas.trampaDesde(t)` traduce cualquier trampa (también las viejas `{radio, cant, estado: {nombre, turnos}}` de
+  `creeps-base.js` y de las habilidades ya guardadas, que no se tocaron) y `Plantillas.radioDeTrampa(t)` da el radio de la
+  flor. `TokensAuto.colocarTrampas({fichaId, tipoToken, trampa})` coloca esa forma (color, alfa, estado, zona que deja
+  —mismos campos `trampaDejaZona`/`zona*` que pone el mapa— y vencimiento con `turnos`/`venceMant`); sigue aceptando los
+  parámetros sueltos de antes. `AsistenteTrampa` en contexto `'habilidad'` suma forma (flor/línea), color, "deja zona" y
+  duración (9 pasos; el teleport y la forma libre siguen siendo solo del mapa) y exporta `aTrampa(res)`, `inicialDe(t)` y
+  `resumenTexto(t)`, que usan la ficha y gm-tools (gm-tools guarda la trampa en edición en `hcTrampa`; los campos
+  `#hc-trampa-*` quedaron sin uso). (Una primera versión de este cambio tomó `tamano` como "radio + 1" y achicaba las
+  trampas consumibles —"flor de radio 2 (19 casillas)" salía de 7—; se corrigió el mismo día: `tamano` ES el radio.)
+- **`catalogo.js`** (`CATALOGO_BASE`, 2026-09-29, paso 5 de `../docs/plan-subida-unificada.md`) — **el catálogo de ítems
+  de fábrica**, la única copia: la cargan la ficha (`DEFAULT.catalogo`), GM Tools (`CATALOGO_EQUIPO` vía `itemParaCreep`),
+  el generador de tiendas (`CATALOGO`) y `datos/catalogo-editor.html`, que lo escribe directo en `nueva-version` (un ítem
+  por renglón, JSON compacto, conserva la cabecera). Reemplaza a las tres copias que había adentro de esos HTML, a
+  `datos/catalogo.json` y al Excel + scripts de Python (retirados). Formato: `../datos/esquema.md`.
+- **`items-subidos.js`** (`ItemsSubidos`, 2026-09-29, P124) — suma al catálogo de fábrica lo que subió el grupo
+  (`biblioteca_items`): `mezclar(lista, subidas, base)` (una corrección reemplaza al de fábrica con el mismo id; lo nuevo
+  entra como `usr-<id>`; cada uno lleva `_bib` con de dónde salió), `cargar()`, `basadoEn(item, catalogo)` (para
+  "¿corrección o algo nuevo?" al subir) y `etiqueta(item)` ("🔶 sin auditar · subido por X"). Lo usan ficha, gm-tools y el
+  generador de tiendas; el botón de todos es **⬆ Subir al catálogo** (`Biblioteca.guardar({tipo: 'items'})`).
+  **Solicitar eliminar un ítem** (2026-09-30, pedido del dueño): `solicitarBaja(item)` — pide confirmación y una
+  justificación escrita obligatoria, y sube una entrada más a `biblioteca_items` marcada `datos.baja = true` (mismo
+  esquema de siempre, sin reglas de Firestore nuevas); si la pide el dueño entra auditada (se saca al instante), si no
+  queda 🔶 sin auditar hasta que el dueño la revise en `datos/auditoria.html` (✅ Auditado confirma la baja, 🗑 Descartar
+  la rechaza y el ítem vuelve). `mezclar` la lee aparte de los ítems de verdad y filtra del catálogo a cualquier ítem (de
+  fábrica o subido) que tenga una baja auditada apuntándole — no borra nada, así que revertir es gratis. Botón
+  **🗑 Solicitar eliminar** en el "Ver" de un ítem del catálogo (ficha, gm-tools, generador de tiendas); no aparece para
+  ítems que no son del catálogo (mochila propia, arma/pieza de un creep, plantilla de botín).
+- **`biblioteca.js`, operaciones para la auditoría** (2026-09-29, paso 6): `auditar(tipo, id, col?)`,
+  `descartar(tipo, id, col?)`, `corregirComoDueno(tipo, id, datos, col?)` (versión + 1, queda auditada),
+  `propuestasViejas(tipo)`, `aprobarPropuesta(tipo, ent)`, `rechazarPropuesta(tipo, id)`, y `fecha` en cada entrada. Las usa
+  `datos/auditoria.html`. El menú ☰ (`menu-sitio.js`) suma el link "🔍 Auditoría de lo subido".
+- **`editar-item.js`** (`EditarItem`, 2026-09-30, pedido del dueño): desde **cualquier "Ver" de un ítem** —tienda, catálogo,
+  mochila de otro jugador, botín, arma o pieza de un creep— el botón **✎ Editar y subir** arma una COPIA, la edita con el
+  asistente de siempre (consumibles: formulario corto propio) y la sube con `Biblioteca.guardar({tipo:'items'})`
+  (corrección del ítem del catálogo o algo nuevo). No toca lo que se estaba mirando. Si la copia tiene otros bonos que el
+  ítem del catálogo actual (una copia vieja, como el Martillo de sargento con Crítico +10), pregunta cuál editar. Lo que la
+  copia no trae (rareza, precio, narrativa) se completa del ítem del catálogo. `EditarItem.subir(item, {catalogo})` sube
+  directo (lo usa el ⬆ del editor del arma de un creep). En la ficha, los ítems propios editables siguen con su "Editar"
+  de siempre; el de "Editar y subir" aparece para el catálogo/tienda/botín y en fichas de solo lectura.
+- **Supercrítico** (2026-09-30, regla del dueño): `Critico.resultadoD20(rolls, potente)` → `{mejor, mult, veintes,
+  supercritico}`: con dos o más 20 NATURALES en los d20 del crítico, cada 20 vale ×4 y se suman (dos = ×8, tres = ×12),
+  sin importar umbrales ni Crítico potente; si no, el mejor d20 como siempre. `Critico.nombreMult(mult)`. Lo usan la
+  calculadora de crítico y el duelo (`tirarCritico` guarda `crit.supercritico` = cuántos 20; el cuadro muestra
+  «¡SUPERCRÍTICO!», resalta todos los 20 y explica la suma). No hace falta regla nueva de Firestore (va dentro de `crit`).
+- **`pruebas.html`** (2026-09-30, paso 0 de `../docs/plan-consolidacion.md`) — **pruebas automáticas del motor**: carga los scripts
+  de `comun/` (sin sesión ni Firebase) y verifica resultados conocidos (dados, crítico y supercrítico, estados y su
+  acumulación, inmunidades, plantillas, catálogo, ítems subidos). Todo en verde = se puede seguir. **Cada función que se mueva
+  al motor común suma acá sus pruebas.** `window.PRUEBAS = {total, fallas}` para leerlo desde el navegador. La lista manual
+  complementaria es `../docs/pruebas-de-humo.md`.
+- **`combatiente.js`** (`Combatiente`, 2026-09-30, paso 1 de `../docs/plan-consolidacion.md`) — **el motor de reglas común**
+  de personajes, invocaciones y creeps. Funciones puras (reciben la lista de estados o el valor y devuelven el resultado, sin
+  tocar pantalla ni Firebase): `mitadesDeTirada`/`aplicarMitades`/`estadosQueParten` (Pajaritos, Lisiado, Parálisis,
+  Sentado), `escudoParsear`, `acumularVeneno`/`acumularSangrado` (+ Escarcha), `inmunidad(estados, est, {jefe})`
+  (devuelve el motivo o false), `ajustarPreset(base, spec, campoHp)` (los números que manda una habilidad pisan los del
+  preset), `tirarStat(valor, estados, statId, {extra, azar})` (LA tirada de un stat: Afortunado, mitades, Evasión mínimo 1;
+  devuelve lo que se publica en la Mesa, no publica), `estadosQueAfectan` (los estados que se pintan en la Mesa),
+  `nitrosMax(natural, estados)` (Cansado, Hypeado, Exhausto y Stun/"forzar" como topes, P130),
+  `agregarEstado(estados, nuevo, {jefe})` (ponerle un estado a alguien: inmunidades, acumular o renovar uno igual, P132 —
+  lo usan todos los "+ Estado", los formularios completos, lo recibido y `EstadosAplicar.aplicarACreep`),
+  `pasarTurnoEstados(estados, {hp, stacks})` + `reporteTurno(eventos)` (lo que hacen los estados en el Mantenimiento, paso 2 —
+  lo usan `mantenimiento()` de la ficha, el de sus invocaciones y el de gm-tools; P131: sin turnos ni permanente = 1 turno), `costoAtaque(tipo,
+  ataquesPrevios)` / `costoPrimerAtaque` / `ataquesPosibles` (Tipo ÷ 2 el primero, completo después),
+  `costoParry()` y `armaParaDefensa({arma, natural, escudos})` (**Parry y Bloqueo solo con un arma o un escudo; un arma
+  natural no alcanza, por ahora** — regla del dueño 2026-09-30; lo usan `armasYEscudosParaParry` de la ficha,
+  `defensaInv`, `defensaCreep` de GM Tools y `defensaCreepMapa` del mapa). **No hay Bloqueo sin Parry**
+  (`BLOQUEO_SOLO_TRAS_PARRY`, concepto del dueño 2026-09-30: el Parry intercepta el arma, el Bloqueo aguanta el golpe): cada
+  herramienta recuerda el Parry que espera su Bloqueo (`parryArmaPendiente` en la ficha, `parryPendienteInv`,
+  `parryPendienteCreep`); el botón de Bloqueo se ve siempre, apagado, mostrando lo que tiraría, para decidir entre Parry y
+  Evasión.
+  **Usar una habilidad** (paso 3, 2026-09-30): `modoHab(h, duelo)` (📣/💰/✨; `duelo` = la Ejecución que tenga armada),
+  `costoNitrosHab(h, costoAtaque, porDefecto)`, `bloqueoHab(h, {modo, nitros, costo, hp})` (cooldown, No2 y vida — P133: se
+  cobra lo que la habilidad tenga, sea de quien sea), `alcanceHab(c, statTira, stat)`, `habEjecucion(h, c, {stat, etq, X})`
+  (lo que el cuadro del duelo necesita: tirada o fórmula propia, resistencias, daño, efectos, radio, textos a mano; sin `X`
+  no se toca ninguna «X»), `efectoDeEjecucion(e)`, `sustituirX`, `sobreSiSinTiradas(hab)` (el atajo de Blindaje) y
+  `ejecucionNoDisponible(c, 'pj'|'inv'|'creep')` (P134: ataque con arma y Flash todavía solo en personajes, zona no en
+  invocaciones → aviso y 💰), `zonaDeHab(h, c, {fichaId, tipo, X, resistValor})` (el mensaje 'zona-persistente-habilidad'
+  al mapa), `formulaDanoHab(h, c, X)` y `trampaDeHab(h)` (la trampa lista para el mapa), `ataqueConArreglos(h, c, {arma,
+  alcance, X})` (el ataque 'habilidad-arma' que va al duelo: lo usan `ataqueDeHabArma` de la ficha y `ataqueDeHabCreep` de GM
+  Tools) y `flashPara(c, campo, modo)` (¿este ⚡ Flash vale para esa tirada?). **Flash de creeps** (P135, solo cooldown):
+  `comun/duelo.js` ya les pregunta (antes los salteaba); el mapa contesta solo si el creep no tiene ninguno
+  (`cfgEscuchar.flashLocal` = `dueloFlashLocal`) y si tiene, contesta GM Tools; una opción puede traer `costoTxt` en vez de
+  `costoSp`. **Todo Flash cuesta el doble en turno ajeno** (P136, regla del juego: `costoFlash({sp, cd, hp}, turnoPropio,
+  {spAjeno})`), en el duelo o con el botón: `ConfirmarTurno.flash(nombre, costo, {quien, spAjeno})` pregunta y devuelve lo
+  que se cobra (`textoFlash`/`textoCosto` para mostrarlo). `flashUsar` puede devolver una Promise; el duelo la espera, y
+  dentro del mapa el cartel (`#ct-fondo`) cuenta como ventana abierta para que se muestre la página que lo abrió. En la ficha,
+  `pagarFlash`/`usarFlashFueraDelDuelo`; en GM Tools, `pagarFlashCreep`/`usarFlashFueraDelDueloCreep`. Lo usan `habDueloDatos`/`modoHab`/`costoNitrosHab` de la ficha, `habDueloInv`/`invEjecutarHab`
+  de las invocaciones y `habEjecucionCreep`/`aplicarHabCreepSobreSi`/`modoHabCreep` de GM Tools.
+- **`ficha-calculo.js`** (`FichaCalculo`, 2026-09-30, paso 5 nivel B área 1, `../docs/plan-paso5.md`) — **el cálculo de un
+  personaje, fuera de la ficha**: la lista de atributos y stats (`GRUPOS`, `EXTRA`, `STAT_LIST`, `ATTR_LIST`, `MOD_TARGETS`,
+  `STAT_LABEL`, `STAT_FULL`), las ranuras (`slotDe`), la durabilidad de los ítems (`durableItem`, `itemRoto`, `armRotaDe`…),
+  `pasivaCompras`, `jobTotal(nivel)`, los bonos con su origen (`modsDe(S)`) y los stats finales (`calcular(S)`, el viejo
+  `compute()`: base + equipo + pasivas + estados, fórmulas de la ficha, No2 máximo). Recibe la ficha (`S`) en vez de leerla
+  de una variable global, así que lo puede usar cualquier pantalla que tenga los datos de un personaje. La ficha usa los mismos
+  nombres de siempre como alias (`compute()` = `FichaCalculo.calcular(S)`). Comparado contra el cálculo viejo en 1 500 fichas
+  al azar: igual. Ojo: las fórmulas de stats de cada ficha se evalúan como código (`evalFormula`), igual que siempre.
+- **`ficha-combate.js`** (`FichaCombate`, 2026-10-01, paso 5 nivel B área 2) — **el combate de un personaje, fuera de la
+  ficha**: qué tiene en cada mano (`asignarManos`), con qué ataca (`armasEquipadasConDano`) y con qué parría
+  (`armasYEscudosParaParry`), el PdG y los stats de cada arma sin los bonos de la otra (`pdgParaArma`, `statParaArma`, P129),
+  el Bloqueo (`bloqueoValor`: Bloqueo + peso), el alcance, el daño (`armaDanoTxt`), las fórmulas de los botones
+  (`formulasCombate`), el costo de atacar (`costoAtaque`, `costoAtaqueEspecial`) y el conteo de ataques del turno
+  (`registrarAtaque`). Reciben la ficha (`S`); la ficha conserva sus nombres de siempre como alias y sigue haciendo lo que se
+  ve (carteles, Mesa, Botonera). Comparado contra lo viejo en 1 200 fichas al azar: igual.
+- **`embebido.js`** (`Embebido`, 2026-09-30, paso 4 etapa 1, `../docs/plan-paso4.md`) — **una herramienta dentro del mapa**
+  (la ficha con `?modo=botonera`, GM Tools con `?modo=acciones|finalizar|botin`). `Embebido.iniciar({clase, pagina,
+  noCuenta})`: esconde SOLO la página de la herramienta (`pagina`) y las piezas comunes que el mapa ya muestra (`COMUNES`:
+  Mesa flotante, menú ☰, historial, cuadro del duelo, dados 3D); **cualquier otra ventana o cartel se ve** (antes era al revés:
+  una lista fija de ventanas permitidas, y cada cartel nuevo desaparecía). Mira la página y le avisa al mapa solo en los
+  cambios: `embebido-abierto` (el mapa muestra la capa del marco, encima del duelo si hay uno a la vista) y `embebido-cerrado`
+  (la saca, para que el marco transparente no tape el mapa). `noCuenta`: lo que se ve pero no es una ventana (la Polilla
+  mística). **Un cartel nuevo no necesita registrarse en ningún lado**; una parte nueva de la PÁGINA que se agregue al
+  `<body>` sí va en `pagina` (si no, se vería dentro del mapa y dejaría la capa abierta).
+- **`mensajes-mapa.js`** (`MensajesMapa`, 2026-09-30, paso 4 etapa 1) — **la lista de TODOS los mensajes** entre el mapa y la
+  ficha / GM Tools de su marco (`TIPOS`: quién lo manda, quién lo recibe y para qué), con `alMapa(tipo, datos)` (desde el
+  marco) y `alMarco(marco, tipo|mensaje, datos)` (desde el mapa). Un mensaje sin registrar se manda igual pero avisa en la
+  consola, y el mapa avisa si le llega uno que no conoce. **Un mensaje nuevo se agrega acá.** `duelo.js` y `embebido.js`
+  siguen con su `postMessage` propio (sus tipos están en la lista).
+  **`?precarga=1`** (ficha `modo=botonera`, GM Tools `modo=acciones`): la herramienta carga **sin abrir nada** y avisa que
+  está lista; la usan el reenvío del duelo (si no, la Botonera o las Acciones aparecían encima del duelo) y
+  `precargarMarco()` del mapa (6 s después de entrar carga la ficha propia o GM Tools para que la primera apertura no espere).
+- **Durabilidad, variable de diseño** (2026-09-30, dueño): `Combatiente.durMax(item)` / `durPorPeso` / `durTexto` /
+  `esDurable` — 3 puntos por punto de Peso salvo que el ítem traiga `durPorPeso` (4–5 = más resistente, 2 = frágil), mínimo
+  3. `asistente-item.js` lo pregunta (paso Peso y daño / Peso-Precio) y lo muestra en el resumen; los "Ver" de ficha, GM Tools,
+  tienda y editor del catálogo muestran «Durabilidad N (X por punto de Peso)». `Plantillas.limpiar('items')` ya no sube `dur`
+  ni `armRota` (desgaste de la copia). El motor ahora también se carga en `vendor-generator.html` y `catalogo-editor.html`.
+- **`modificadores-tirada.js`, el «?» de las defensas** (2026-09-30, pedido del dueño — "que el sistema sea un poco
+  autoexplicativo"): `ModTirada.ayuda('eva'|'parry'|'bloqueo')` pone un circulito «?» en el botón; al pasar el mouse explica
+  el concepto (textos en `AYUDA`, siguen las notas Parry/Bloqueo/Evasión del manual: si cambia una regla, cambiar los dos).
+  Tocarlo no dispara el botón. Está en la Botonera del personaje, la de las invocaciones, las Acciones de los creeps y en
+  "Elegí cómo te defendés" / "Tirar Bloqueo" del duelo (el mapa ahora también carga este archivo). **Una regla de combate nueva o corregida va acá, no en una herramienta.** La ficha, GM Tools
+  y el mapa conservan los nombres de siempre como atajos de una línea (`escudoParsear`, `mitadesDeTirada`, etc.);
+  `estados-aplicar.js` y `modificadores-tirada.js` también lo usan. Se carga **antes** de `estados-presets.js` en ficha,
+  gm-tools, mapa y `datos/auditoria-skills.html`.
+
+- **`ficha-habilidades.js`** (`FichaHabilidades`, 2026-10-01, paso 5 nivel B área 3) — el costo en SP/No2 de una habilidad de personaje (fijo, "X", "como un ataque") y el estado "del sistema anterior" que una habilidad o un ítem pone al ejecutarse/consumirse (`aplicarEfectoDeConsumo(S, it, presets)`, con `configEfectoDe` y `flagsDePreset`). gm-tools e invocaciones tienen su propia versión, con diferencias de verdad (P137).
+- **`ficha-guardado.js`** (`FichaGuardado`, 2026-10-01, paso 5 nivel B área 4) — **la forma de un personaje y cómo se guarda y se lee de Firebase**, sin la ficha: `DEFAULT` (el personaje en blanco), las migraciones de fichas viejas, `normalizar(datos, {mezclarCatalogo})` (mezcla con el personaje en blanco; devuelve `{S, tiposMigrados}`), `completar(S)` (migraciones repetibles y No2 llenos; usa `FichaCalculo`), las partes (`PARTES`, `partes(S)`, `leerParte`, `armarDatos(docs)`, `aplicarParte(S, parte, datos, o)`) y **`leer(db, ruta)` / `cargar(db, ruta)`**: traen un personaje UNA vez (`ruta` = `fbRutaCampana('fichas/<id>')`), con `cargar` devolviendo además `S` listo para `FichaCalculo`/`FichaCombate`/`FichaHabilidades` — así el mapa puede leer un personaje sin cargar la ficha. Necesita `catalogo.js` antes; `completar`/`cargar`, `ficha-calculo.js`.
+- **`ficha-sesion.js`** (`FichaSesion`, 2026-10-01, paso 4 etapa 3a, `../docs/plan-paso4-etapa3.md`) — **tener abierto un personaje en vivo**, para cualquier pantalla: `nueva(id, duenoUid, cargada, soloLectura)` (el objeto de la sesión: `fichaVivo` en la ficha), `escuchar(f, o)` (lo arma la primera vez y aplica lo que cambia desde otra ventana; `o` trae qué hacer en cada momento: `alDoc`, `alCargar` —que tiene que poner `f.cargada = true`—, `alControl`, `aplicarParte`, `alCambiar`, `alErrorPartes`, y `vigente()`), `guardar(f, forzar, o)` (solo las partes que cambiaron, cuando quedan quietas 1,2 s o cada 5 s; reintenta a los 8 s y avisa solo la primera vez: `o.alError(err, primeraVez)`), `pendiente(f, partes)` y `cortar(f)`. Dos pantallas con el mismo personaje se comportan como dos ventanas de la ficha (en cada parte gana la última que guarda). La ficha (`js/12`) lo usa con sus carteles; el mapa lo va a usar para la Botonera nueva. Necesita `ficha-guardado.js`.
+- **`ficha-botonera.js`** (`FichaBotonera`, 2026-10-01, paso 4 etapa 3b) — **el dibujo de la Botonera de un personaje**: `html(S, {modoMapa, parryArmaPendiente, lupa})` → `{html, nitros, sp, def}` y sus ayudantes (`costoHabilidadTxt`, `sinNitrosPara`, `costoNitrosHab`, `consumeButton`, `habAutomatizada`/`modoHab`/`dueloDe`, Inteligencia y Talentos, sigilo/sentado, Percepción aumentada…), todos con `S` como parámetro. Lo usan la ficha (`renderBotonera` y los mismos nombres como atajos) y el mapa (⚗ Botonera nueva). Desde la 3c también arma tiradas sin publicarlas: `tiradaStat(S, statId)` y `tiradaPercepcion(S, azar)` → `{origen, r}` o `{error}` (la ficha usa la de Percepción; el mapa, las dos).
+- **`ficha-resumen.js`** (`FichaResumen`, 2026-10-01, paso 4 etapa 3c) — **el resumen público de un personaje** (lo que leen los tokens del mapa, el Tablero, la Calculadora de crítico, el historial): `resumen(S, {control, miniaturaInv})`, más los estados derivados (`estadosDePasivas`, `estadoSobrepeso`, `estadosTodos`), `estadoActivo`/`costoMoverCasillero` y el No2 máximo de una invocación (`invNitrosMax`, `invModTotal`, `invFuentesEquipo`). La ficha lo usa con sus nombres de siempre (`fichaResumen`…); el mapa lo va a usar para guardar un personaje desde la Botonera nueva. **Un dato nuevo que tenga que ver el mapa va acá.** Necesita ficha-calculo, ficha-combate, ficha-botonera y combatiente antes.
+- **`ficha-acciones.js`** (`FichaAcciones`, 2026-10-01, paso 4 etapa 3c) — **los botones de la Botonera que cambian al personaje**, para la ficha y el mapa: `alternarSigilo(S, forzar, ui)`, `levantarse(S, forzar, ui)` y `gastoNitrosForzado(S, costo, hizo)` (la línea roja de la Mesa). `ui = {presets, toast, avisarSinNitros(costo, accion, continuar), cambio(lista)}`: lo que se ve lo pone cada pantalla. Los próximos botones que se muden (atacar…) van acá. Desde el paso 3: `consumir(S, id, forzar, ui)` (ui suma `fijarHp`, `efecto`, `tirarExtra`, `colocarTrampa`) y la vida (`fijarHp`, `revisarAnkh`, `revisarMuerte`, `aplicarRevivirConAnkh`), con `purgarSiAgotado`, `restaurarSpDeConsumo`, `repararArmadura`, `efectoDeConsumo` y `tiradasDeItem`. Desde el paso 4a: el combate suelto — `tirarValorStat` (con el cartel de sobrepeso de la Evasión), `sobrepesoPagar`, `parryConArma`, `bloqueoConArma`, `fuerzaGolpeConArma`, `elegirArmaDefensa`/`armaElegida`, `tirarDanoDeArma`, `pedirArmaYTirar` (ui suma `registrarTirada`, `preguntarSobrepeso`, `getParry`/`setParry`, `elegirArma`, `efectosAlPegar`). Desde el 4b: `atacarConArma` y `ataqueEspecialConArma` (oportunidad / contraataque, `NOMBRE_ATAQUE_ESPECIAL`). Desde el 5a
+  (habilidades): `ejecutarHabilidad(S, id, armaId, forzar, ui)`, `confirmarCostoVariable(S, it, sp, nitros, arma, ui)`,
+  `anunciarHabilidad`, `habilidadTira`, `tirarPrimeraDeHab`, `tirarSegundaDeHab`, `registrarAtaqueDeHabilidad` y `limiteCostoX`
+  (ui suma `mesaHabilidad`, `fijarHp`, `efecto`, `colocarTrampa`, `avisarZona`, `terminar(it, arma, xSp, xNitros)` —lo que pasa
+  después de cobrar: anunciar y tirar, o la Ejecución—, `flashFuera`, `elegirArmaHab`, `pedirCostoX(it, arma)` y `cerrarCostoX`;
+  `cambio` además recibe 'habilidades' y 'efectos'). `anunciarHabilidad` usa `mesaConTexto` de `mesa.js`. Desde el 5b (✨
+  automáticas): `terminarEjecucionHab(S, it, arma, xSp, xNitros, ui)`, `ataqueDeHabArma`, `habDueloDatos`, `xDeHab`,
+  `aplicarHabSobreMiDirecto`, `dueloAplicarEfectoPropio(S, fichaId, d, ef, ui)`, `aplicarEstadoRecibido`, `estadoDeSpec(spec,
+  presets)`, `durAviso`, `desgastarItem` y `rompeArmaduraAlAzar` (ui suma `yo()`, `dueloDisponible()`, `puedeEscribir()`,
+  `elegirObjetivo(cfg)`, `colocarZona`, `presets`, `recordatorios`; `cambio` además 'equipo' y 'mochila'). Desde el 5c (las que
+  colocan algo en el mapa): `avisarZonaAlMapa(S, h, ui)` (portal y zona de habilidad), `colocarTrampaDeHab(S, h, ui)` y
+  `colocarZonaDeHab(S, it, xSp, xNitros, ui)` (zona persistente); ui suma `enMapa()` y `alMapa(tipo, msg)` (la ficha manda el aviso
+  por `MensajesMapa`; el mapa lo resuelve directo, `bnAlMapa`). Desde el 7: `tirarSocial(S, i, ui)` (un talento; ui: `toast`,
+  `registrarTirada`), `colocarTrampaDeItem(fichaId, it, ui)` (la trampa consumible junto al token; es el `colocarTrampa` de
+  `consumir`) y `ankhAMano(S, key, id)` (el Ankh usado desde la mochila; devuelve el nombre o null).
+- **`ficha-duelo.js`** (`FichaDuelo`, 2026-10-01, paso 4 etapa 3c-4c) — **lo que el duelo (`duelo.js`) le pide a un personaje**:
+  `hooks(() => S, ui)` devuelve los ganchos (`soy`, `controlDe`, `registrarTirada`, `atacar`, `statsCritico`,
+  `resistenciaCritico`, `efectosArma`, `dano`, `rerollInfo`, `rerollUsar`, `flashOpciones`, `flashUsar`, `habTirar`, `habValor`,
+  `puedeParry`, `opcionesDefensa`, `defender`, `fuerza`, `bloquear`, `armaContra`) con el `ui` de combate de `FichaAcciones` más
+  `soy(lado)`, `controlDe(lado)`, `reabrir(id, campo)` (`Duelo.reabrir`) y `fijarHp(v)`; `cambio` además recibe `'vitals'`,
+  `'inventario'` y `'cinturon'`. También `monedaReroll(S)`, `tirarMonedaReroll(S, m, ui)`, `costoFlashDe(h)` y
+  `pagarFlash(S, h, ui)` y (5a) `usarFlashFueraDelDuelo(S, it, ui)`. Solo personajes: las **invocaciones** las sigue resolviendo la ficha con su código. La ficha arma sus
+  `window.DUELO_HOOKS` con esto (`js/11`, `dueloPj`); el mapa, para el personaje de la Botonera nueva (`bnHooksDuelo`). Necesita
+  `confirmar-turno.js` (Flash). **`duelo.js` acepta `cfg.hooksLocal(lado)`** (en `escuchar`): si devuelve ganchos, el pedido
+  (`duelo-opciones`, `duelo-tirar`, `duelo-flash`, `duelo-reroll`, `duelo-contra`…) se resuelve ahí mismo con `ejecutar(m, hk)` en
+  vez de mandarlo al marco; la tirada se recoge igual, por el evento `tirada-registrada` (que dispara quien publica).
+- **`creep-calculo.js`** (`CreepCalculo`, 2026-10-01, paso 4 etapa 4a, `../docs/plan-paso4-etapa4.md`) — **las reglas de un creep,
+  fuera de GM Tools**: stats con equipo y estados (`statValor`, `modTotal`), Defensa, Armadura mágica, críticos, No2 máximo, costos
+  (atacar, contraataque, Parry, habilidades), con qué para (`defensa`), Bloqueo, Fuerza del golpe, daño del arma, modo y bloqueo de
+  una habilidad, los textos de "de dónde sale", `normalizar` (y sus migraciones) y las tablas de stats. Todo recibe el creep
+  (`sc`). GM Tools lo usa con sus nombres de siempre (`creepStatValor`…); el mapa lo carga siempre (antes tenía copias
+  parciales). **Una regla de creep nueva o corregida va acá.** Necesita `combatiente.js`. `tarjetaPublica(sc)` (2026-10-09): lo que va al
+  documento público para la 🪪 del mapa (`armaNombre`, `armaNatural`, `equipoNombres`, `notas`; solo nombres) — lo usan `creepPublico` de GM
+  Tools y `modificarCreep` del mapa.
+- **`creep-botonera.js`** (`CreepBotonera`, 2026-10-01, paso 4 etapa 4b) — **el dibujo de las Acciones de un creep**:
+  `html(sc, {parryPendiente, lupa})` → `{titulo, badge, html}` y sus ayudantes (`formulasCombate`, `botonSegundaHab`, `botonHabTxt`,
+  `cdControlesHtml`). Lo usan GM Tools (`renderAccionesCreep`) y el mapa (⚗ Acciones nuevas). Necesita `creep-calculo.js`,
+  `modificadores-tirada.js` y `tiradas.js`.
+- **`creep-acciones.js`** (`CreepAcciones`, 2026-10-01, paso 4 etapa 4c) — **los botones de las Acciones de un creep**: las
+  tiradas (`tirada`, `tiradaStat`, `esquivar`, `parry`, `fuerzaGolpe`, `bloqueo`, `dano` → `{origen, r}` o `{error}`) y lo que
+  cambia al creep (`levantarse`, `pagarParry` → `{error}` o `{aviso}`). Cada pantalla publica y guarda a su manera (GM Tools en
+  memoria; el mapa con `modificarCreep`). **`mesa.js`**: una tirada con `r.desde = 'gm'` se guarda como de GM Tools (nombre del
+  creep en rojo), aunque la publique el mapa. Desde la tanda 5, **las habilidades**: `ejecutarHab(sc, h, presets)` (bloqueo, cobrar,
+  cura y estado del sistema anterior, atajo «solo sobre sí» → `{error}` o qué sigue) y `terminarHab(sc, h, p, ui)` (lo que pasa
+  después; `ui = {mesaHabilidad, mesaConTexto, publicar, toast, habDuelo, lanzarAtaque, lanzarDuelo, colocarTrampa(sc, h, auto),
+  colocarZona, elegirObjetivo}`), más `habEjecucion`, `ataqueDeHab`, `habTira`, `efectoDeHab`, `sobreSi`, `tiradaPrimeraHab`,
+  `tiradaSegundaHab`, `zonaDeHab` y `cdMod`. Necesita `estados-aplicar.js` y `combatiente.js`.
+- **`ficha-mantenimiento.js`** (`FichaMantenimiento`, 2026-10-02, hoja de ruta A2) — **el ⟳ Mantenimiento de un personaje y sus
+  invocaciones**: `aplicar(S, ui)` (copia textual de `mantenimiento()` de la ficha: SP Regen, estados, pasivas, vida por `ui.fijarHp`,
+  turnos de muerte, No2, invocaciones; deja `S.turno` y `S.log`; devuelve `{rep, avisos}`), `reclamar(db, rutaFicha, objetivo, marca)`
+  (la transacción de `partes/mantenimiento`: cuántos turnos aplicar), `publicarReporte` y `publicarRecordatorios`. Lo usan la ficha
+  (`js/11`, `js/14`) y el mapa (`mantenimientoPersonajes`). Necesita combatiente, ficha-calculo, ficha-botonera e inv-calculo.
+- **`ficha-equipo.js`** (`FichaEquipo`, 2026-10-02, hoja de ruta A4) — **Equipo y mochila de un personaje**: `SLOT_DEFS`, `slots(S)`,
+  `slotOcupado(S, item)`, `defValor`, `statsComparables`, `TIER_COLOR`; `equipar(S, id, ui)` (el botón Equipar/Sacar: mesa común,
+  trofeo, consumible al cinturón, slot lleno → `ui.slotLleno(it)`, costo en combate), `reemplazar(S, eqId, nuevoId, ui)`, `conCosto(…)`
+  (el cobro de equipar en combate); y el dibujo: `html(S, {lupa})`, `slotLlenoHtml(S, it)`, `compararHtml(S, item, equipadoId,
+  {precioHtml})`. `ui = {toast, avisarSinNitros, modoCombate(), alPagar?(), slotLleno(it), cambio(partes, o)}`. Lo usan la ficha (sus
+  nombres de siempre son atajos) y el mapa (`abrirEquipoMapa`). Necesita ficha-calculo, ficha-combate y ficha-acciones.
+- **🎭 Acción incierta en la Mesa** (2026-10-09): `mesa.js` pasa los documentos por `mesaFiltrar(docs)` si la página lo define (el mapa,
+  `vtt-hexgrid/js/29-accion-incierta.js`) y dibuja las líneas `desde: 'incierta' | 'incierta-pj' | 'incierta-creep'` en violeta;
+  `mesaRefiltrar()` vuelve a pasar lo último; `mesaLinea(texto, desde, quien)` acepta de quién es. `TokensAuto.colocarTrampas` anuncia cada
+  trampa colocada (`incierta-pj` / `incierta-creep`, con `ficha`); `FichaAcciones` ya no anuncia el detalle de una trampa (✨ o consumible).
+  `TiradasPropias` deja afuera esas líneas.
+- **`escaneo-grupo.js`** (`EscaneoGrupo`, 2026-10-09) — **🔎 el escaneo del grupo** para el GM: `perfil(S, id)` (un personaje con el motor de la ficha: atributos, defensas, resistencia a crítico por Tipo, elementales, ataque, armas y tipos de daño), `lectura(perfiles)` (puntos débiles y fortalezas en palabras), `html(perfiles)` y `textoParaIA(perfiles, notas)` + `IA_SISTEMA` (para pedirle creeps a la IA). Lo usa GM Tools (🔎 Escanear grupo). Necesita ficha-calculo, ficha-combate y combatiente.
+- **`ppt.js`** (`PPT`, 2026-10-08, pedido del dueño) — **✊ piedra, papel o tijera**: entre dos de la partida (un jugador contra otro o contra el
+  GM), «para muchas situaciones» y para disputar un ítem del botín. `retar()` (contra quién y para qué), `elegir(id, jugada)` (transacción: la
+  segunda jugada resuelve; empate = otra ronda; si es por el botín, el ítem queda a nombre del ganador en la misma transacción), `rendirse(id)`,
+  `ref()`/`docNuevo({a, b, motivo})` (para crearlo dentro de otra transacción), `resultado(a, b)`, `mostrar(id)`, `juega(id)` e `iniciar()`
+  (escucha los juegos del usuario y muestra la ventana: las tres manos en triángulo, «Esperando a…», el resultado cuando eligieron los dos;
+  y desde el 2026-10-22 también los juegos ajenos en curso, para **mirar**: el botón «👀 A y B están jugando… · Ver» y la ventana de espectador;
+  — oculta, queda un botoncito abajo). El resultado va a la Mesa y a la Crónica del mapa (`momentoAbrir`, si está). La cargan el mapa (botón ✊
+  arriba a la derecha), la ficha y GM Tools; adentro de un marco del mapa no se inicia. Colección `ppt` (reglas nuevas).
+- **`ficha-botin.js`, reclamar y disputar** (2026-10-08, pedido del dueño): «Sumar a la mochila» pasó a **🙋 Reclamar** (`tomar`: el ítem queda
+  a tu nombre, `tomadoFicha` = el personaje; no toca la mochila), **⚔ Disputar** (`disputar`: crea el piedra, papel o tijera con quien lo reclamó)
+  y **↩ Soltar** (`soltar`). Al cerrar el botín, `CombateFin.despojar` manda lo reclamado en la recompensa de cada personaje (`items`) y
+  `Recibidos.recompensa` lo suma a la mochila (`itemsDelBotin`: los trofeos iguales se apilan; si no entra, se suma igual). Una disputa abierta
+  se corta y el ítem queda para quien lo reclamó.
+- **🛡 La Armadura rota de un personaje es de las piezas** (2026-10-29, dueño: «reparar la armadura debe borrar el estado… esta armadura rota no es del
+  jugador, sino del ítem, pero lo tiene que ver el jugador»): el estado «Armadura rota ×N» se ve derivado de las piezas puestas con `armRota`
+  (`FichaResumen.estadoArmaduraRota`, en `estadosTodos` y en el resumen, con sus stacks), sin restar nada por su cuenta (la Defensa la restan las piezas) y
+  se va solo al repararlas. Al cargar una ficha, el estado guardado de antes se borra (`FichaGuardado.completar`); ponerlo a mano desde la ficha rompe una
+  pieza al azar por stack. Las invocaciones y los creeps siguen con el estado de siempre.
+- **🛡 Romper armadura: el aviso y el estado del equipo** (2026-10-29, dueño): cada punto de Armadura rota que le cae a una pieza (`romperPieza`,
+  `rompeArmaduraAlAzar` en `ficha-acciones.js`) le abre al jugador un Aviso (`avisoRotura`, con `AvisoCombate`): «<origen> te rompió <ítem>», la
+  durabilidad que le queda, la Defensa de antes → después y que en 0 se rompe y se anulan sus efectos. La spec `{nombre: 'Armadura rota', item}` acepta
+  `item: 'escudo'` = el escudo que tiene puesto (el Parry elegido a mano no dice con cuál paró). En 🛡 Equipo, debajo de las defensas,
+  `FichaEquipo.estadoEquipoHtml(S, equipados)`: «✔ todo entero» o «🛠 Estado del equipo» pieza por pieza. Un disparo con Romper armadura parado con
+  Parry de escudo va al escudo (`Combatiente.ataqueDeArma` → `ataque.rompeEscudo`; lo aplica el mapa, `dueloRompeEscudo` en `vtt-hexgrid/js/26`).
+- **`ficha-equipo.js`, Comparar lo que no se compara con números** (2026-10-22, dueño: «una varita con una espada, un talismán con una espada»):
+  `slotOcupado(S, item).equipados` = lo equipado en el mismo LUGAR (primero el mismo tipo, después el resto: una varita de una mano contra la espada de
+  dos manos puesta); `compararHtml` suma debajo de la tabla «Lo que hace cada uno» (`queHaceHtml`: `ItemCorto.grillaHtml` de los dos, lado a lado) y
+  un número que uno de los dos no tiene sale «—» sin flecha; `statsComparables` no inventa «daño promedio» para una varita (arma especial sin Tipo).
+- **`ficha-botin.js`, por grupos y en pilas** (2026-10-22, dueño: «mano, cuerpo y consumibles… lo repetido enlistado, chaleco de cuero ×N, y reclamar uno,
+  dos, tres»): `GRUPOS` (mano = armas, escudos, varitas y talismanes (los orbes son una variante de talismán); cuerpo = lo demás que se equipa; consumibles; trofeos), `grupoDe(item)`, `pilas(lista, yo,
+  miUid)` (los iguales juntos: mismo tipo, nombre, calidad, números y efectos; con libres / mías / de otros / en disputa), `tomarVarios(S, lista, ui)` y
+  `idsDeBoton(btn, raiz)` (el botón «Reclamar» lleva los documentos libres de la pila en `data-botin-tomar` y la cantidad sale del `[data-botin-cant]`).
+  Cada ítem sigue siendo su documento del botín. Los dos manejadores (mapa js/11 y ficha js/08) usan `idsDeBoton` + `tomarVarios`.
+- **`ficha-botin.js`** (`FichaBotin`, 2026-10-02, hoja de ruta A5) — **el botín del combate visto por un jugador**: `loot(snap)` (lo que
+  nadie tomó), `textoItem`, `html(S, {combate, loot, puede, fichaId})` (la ventana «Batalla terminada») y `tomar(S, entrada, ui)` («Sumar a
+  la mochila», con su transacción y la línea en la Mesa). Lo usan la ficha y el mapa (`abrirBotinMapa`).
+- **`ficha-tienda.js`** (`FichaTienda`, 2026-10-02, hoja de ruta A5) — **la tienda vista por un personaje**: los grupos de compra, el
+  precio con el ajuste del vendedor, la búsqueda, el orden y los filtros (`visibles`), la fila y el catálogo (`rowHtml`, `catalogoHtml`),
+  el carrito y comprar, agregar gratis, crear ítems (las pilas de consumibles), vender (`vendibles`, `venderHtml`, `venderCambio`,
+  `vender`), reparar (`aReparar`, `repararHtml`, `reparar`), el ítem al azar y `desdeDoc` (la tienda publicada; `abierta`). Con la tienda
+  **cerrada** (`cerrada(st)`, 2026-10-22) se mira y nada más: la fila sin carrito, y comprar, agregar gratis, vender y reparar avisan
+  `CERRADA_MSG`. Todo recibe el personaje
+  (`S`) y el estado de la tienda en pantalla (`st`: tienda, carrito, venderSel, orden, ordenDesc, verCompleto, filtros, extraItem). Lo
+  usan la ficha (`tiendaSt`, getters sobre sus variables) y el mapa (`bnTiendaSt`). `ficha-equipo.js` suma `CATEGORIAS`,
+  `CATEGORIA_LABEL`, `ranuras`, `mochilaUsada` y `capMochila`; `ficha-calculo.js` ahora exporta `SLOT_LABEL`.
+- **`selector-estados.js`** (`SelectorEstados`, 2026-10-02, hoja de ruta A3) — **el "+ Estado" para cualquier pantalla**: `abrir({titulo,
+  para, presets, propios, cfgPreguntas, stats, armarDeAsistente})` → Promise de `{preset, guardar}` o null (la grilla por Buffs/Debuffs/
+  Otros, "Mis presets", "＋ Crear estado nuevo (paso a paso)"; un preset estándar pregunta sus cantidades con `EstadoPreguntas`), más
+  `estadoPersonaje/estadoInvocacion/estadoCreep(preset, id[, flags])` (el estado como lo arma cada herramienta) y `textoAgregado(r,
+  campoHp)`. Lo usa el mapa; la ficha y GM Tools siguen con su grilla propia (misma regla). Necesita `estado-preguntas.js` y
+  `asistente-estado.js`.
+- **`CreepAcciones.mantenimiento(sc)` y `reclamarMantenimiento(db, ref, objetivo, marca)`** (2026-10-02, hoja de ruta A2b): el pase de
+  turno de un creep (copia textual de `mantenimiento()` de GM Tools, por creep) y la transacción de `gm/mantenimiento`. Lo usan GM Tools
+  (`js/07`, `js/12`) y el mapa del GM (`mantenimientoCreeps`).
+- **`duelo.js`: `hooksLocal` puede devolver una promesa** (2026-10-02): `enviar` la espera; si termina en null va por `relay` como
+  siempre. Lo usa el mapa para leer al personaje la primera vez que el duelo le pide algo.
+- **Creep sin No2 para atacar** (2026-10-02, como con los personajes: avisar y dejar seguir): `CreepAcciones.faltanNitros(sc, tipo)`,
+  `preguntaSinNitros(sc, tipo)` (el texto de «¿Atacar igual?»), `pagarAtaque(sc, tipo, forzar)` (forzado: gasta los que tenga hasta 0 y
+  devuelve `forzado: {costo, tenia}`) y `alertaSinNitros(sc, tipo, forzado)` (la línea roja de la Mesa). Lo usan `CreepDuelo` (el
+  «🎲 Pagar y tirar PdG» del duelo, por GM Tools o por el mapa con ⚗), `atacarNormalCreep`/`ataqueEspecialCreep` de GM Tools y `acAtacar`
+  del mapa. Antes el ataque se rechazaba y, dentro del mapa, el aviso quedaba en GM Tools escondido.
+- **Invocación sin No2 para atacar** (2026-10-02, hoja de ruta B-7, igual que los creeps): `InvAcciones.faltanNitros(inv)`,
+  `preguntaSinNitros(inv)`, `pagarAtaque(inv, forzar)` (forzado: gasta los que tenga hasta 0 y devuelve `forzado: {costo, tenia}`) y
+  `alertaSinNitros(inv, forzado)` (la línea roja). Lo usan `InvDuelo` (el ataque del duelo; `ui.confirmar` opcional, si no `confirm`),
+  `invAtacarSuelto` de la ficha y `bnInvAtacar` del mapa.
+- **`recibidos.js`** (`Recibidos`, 2026-10-02, hoja de ruta B-8) — **lo que le llega a un personaje desde afuera**, el lado que recibe
+  los avisos: `campanas/<id>/estados` (lo que deja `EstadosAplicar.encolarPj`: al personaje o a una invocación suya, `fichaId~invId`, sin
+  reglas nuevas) y `campanas/<id>/recompensas` (XP, DDE, despojos y trampas que vuelven, del fin del combate). `escuchar(col, cb)` (los
+  pendientes de este usuario; el GM, todos), `deFicha(docs, fichaId)`, `tomar(doc, borrar)` (transacción: lo aplica una sola pantalla;
+  `borrar` = el GM con 🎮 el control), `estado(S, doc, ui)` (con `FichaAcciones.aplicarEstadoRecibido` o `InvHabilidades.ponerEstado`),
+  `recompensa(S, doc)` → `{partes, subio, vueltas}`, `aplicarExp(S, exp)`/`expParaNivel` (la XP y la subida de nivel, antes `applyExp` de
+  la ficha), `devolverTrampas` y `textoVueltas`. Lo usan la ficha (`js/02`, y `applyExp` de `js/01`) y el mapa (`recibidosEscuchar`, para
+  los personajes que maneja ese usuario): antes solo la ficha abierta los aplicaba.
+- **`creep-lupa.js`** (`CreepLupa`, 2026-10-01, paso 4 etapa 4c, tanda 6) — **la 🔍 y el "Ver" de un creep**, para GM Tools y el
+  mapa: `contenido(sc, clave)` → `{titulo, html}` (clave `"creepId|tipo|ref"`, la de los `data-lupa` de `creep-botonera.js`:
+  stat, defensa, atacar, daño, habilidad), `verHab(sc, h)` → `{titulo, html}` (la tarjeta de Ver de una habilidad), `paraHtml(h)`
+  (🐾 creep / 🧙 jugador) y `stat(sc, statId, o)`. Solo arma el HTML (como `ficha-lupa.js`). Necesita `creep-calculo.js` y
+  `lupa.js`.
+- **`creep-duelo.js`** (`CreepDuelo`, 2026-10-01, paso 4 etapa 4c) — **lo que el duelo le pide a un creep**: `hooks(ui)` devuelve los
+  ganchos (`soy`, `atacar`, `defender`, `dano`, `fuerza`, `bloquear`, crítico, Flash, habilidad dirigida…) con `ui = {creep(ref),
+  cambiar(ref, fn), publicar(sc, t), toast, confirmar, soy, borrarParry}`. GM Tools arma `window.DUELO_HOOKS` con esto; el mapa,
+  `acHooksDuelo` (en `hooksLocal`). Necesita `creep-acciones.js`, `efectos-golpe.js` y `confirmar-turno.js`.
+- **`ficha-lupa.js`** (`FichaLupa`, 2026-10-01, paso 4 etapa 3c-6) — **la 🔍 y el "Ver" de un personaje**, para la ficha y el
+  mapa: `contenido(S, clave)` → `{titulo, html}` (el desglose de cada 🔍 de la Botonera: `stat:`, `defensa:`, `atacar:`, `danio:`,
+  `social:`, `habx:`, `hab:`, `cons:`; las de las invocaciones siguen en la ficha) y `ver(S, key, it)` → `{titulo, html}` (la tarjeta
+  de "Ver" de un ítem, habilidad, pasiva, talento o estado). También `jobCostoDe`, `formulaSocial(S, i)` y `narrativaDe(S, it)`.
+  Solo arma el HTML: el cuadro lo abre `lupa.js` (cada pantalla define `lupaContenido`) y la ventana de Ver, cada pantalla.
+  Necesita `lupa.js` (sus ladrillos) y las piezas `ficha-*.js`.
+- **`lupa.js`, 🔍 adentro de un recuadro aislado** (2026-10-01): `lupaDelEvento(e)` busca el 🔍 en `e.composedPath()`, así el
+  cuadro abre también desde la Botonera nueva del mapa (shadow DOM, donde `e.target` es el recuadro). Sus estilos llevan
+  `id="lupa-css"` (el mapa los copia adentro del recuadro).
+- **`pruebas.html` acepta pruebas async** (2026-10-01): una prueba que devuelve una promesa se anota cuando termina y el resumen la espera. `IT2` (los costos en No2/SP) vive ahora en `ficha-calculo.js` (`FichaCalculo.IT2`). **Al cambiar un archivo de `comun/` que la ficha carga con `?v=`, subir su versión** (si no, el navegador usa la copia vieja: pasó con `ficha-calculo.js`).
+
+- **`Combatiente.efectoPermanente(src, preset)`** (2026-10-01, P137): ¿el estado que pone una habilidad o un ítem al usarse
+  (`efectoNombre`…) no vence? Si la habilidad/ítem tiene `efectoPermanente` (la casilla "No vence" / "Sin límite"), manda eso; si
+  no, el `permanente` del estado. La usan la ficha (`ficha-habilidades.js`), las invocaciones y los creeps (`creep-acciones.js`).
+  El Excedente de vida que da una habilidad **reemplaza** al que había en los tres (antes, en los creeps, se sumaba).
+
+- **`inv-calculo.js`** (`InvCalculo`, 2026-10-01, paso 4 etapa 4e, tanda 1) — **las reglas de una invocación, fuera de la ficha**:
+  `statValor`, `aportesMod`, `defensaEfectiva` (suma los estados que cambian la Defensa, salvo Armadura rota, que cuenta por
+  acumulación), `critEfectivo`, `nitrosMax`, `defensa` (con qué para), `bloqueoValor`, `costoAtaque`, `costoNitrosHab`,
+  `costoHabTxt`, `bloqueoHab`, `danoTxt`, `ataqueTxt`, `actualizarHpMaxPorCon`, `migrar` y las listas de stats (`INV_STATS_TIRADA_IDS`…).
+  Todo recibe la invocación (`inv`). La ficha lo usa con sus nombres de siempre (`invStatValor`…). Necesita `combatiente.js`,
+  `ficha-calculo.js`, `ficha-resumen.js` y `ficha-botonera.js` (al llamar).
+- **`inv-botonera.js`** (`InvBotonera`, 2026-10-01, paso 4 etapa 4e, tanda 2) — **el dibujo de la Botonera de una invocación**:
+  `html(inv, {parryPendiente, lupa})` → `{titulo, badge, html}` y `botonSegundaHab(inv, h)`. Lo usan la ficha (`renderBotoneraInv`)
+  y el mapa (Botonera nueva, `bnDibujarInv`). Necesita `inv-calculo.js`, `combatiente.js`, `ficha-calculo.js`, `ficha-botonera.js`,
+  `modificadores-tirada.js` y `tiradas.js`.
+- **`ficha-sesion.js`: la primera carga espera al servidor** (2026-10-01): `escuchar` ya no arma el personaje con un aviso que venga
+  de la memoria local de Firestore (`snap.metadata.fromCache`; el listener va con `includeMetadataChanges`), porque podía traer solo
+  algunas partes y, sin "otros", la migración de la escala de Tipos corría +2 las armas que sí llegaban.
+- **`inv-acciones.js`** (`InvAcciones`, 2026-10-01, paso 4 etapa 4e, tanda 3) — **los botones de la Botonera de una invocación**:
+  `tirada(inv, nombre, valor, statId)`, `tirarStat(inv, statId, {parryPendiente, trasParry})` (el Parry cobra 1 No2 y deja el
+  Bloqueo pendiente; el Bloqueo lo cierra), `dano(inv, mods)`, `ataqueDuelo(inv)`, `pagarAtaque(inv)` y `tiradaAtaque(inv)`. Devuelven
+  `{origen, r}` / `{error}` / `{aviso}`: cada pantalla publica y guarda a su manera. Lo usan la ficha (`js/04`) y el mapa (`bnInvAca`).
+- **`inv-duelo.js`** (`InvDuelo`, 2026-10-01, paso 4 etapa 4e, tanda 4) — **lo que el duelo le pide a una invocación** (lado
+  `fichaId~invId`): `hooks(ui)` devuelve los ganchos (`soy`, `atacar`, `statsCritico`, `resistenciaCritico`, `efectosArma`, `dano`,
+  `rerollInfo`, `flashOpciones`, `flashUsar`, `habTirar`, `habValor`, `puedeParry`, `opcionesDefensa`, `defender`, `fuerza`,
+  `bloquear`, `armaContra`) con `ui = {inv(lado), registrar(origen, r), toast, cambiar(fn), parry, soy}`; también `pagarFlash(inv, h,
+  ui)` y `costoFlash(h)`. Lo usan la ficha (`dueloInv`, `js/11`) y el mapa (`bnHooksDueloInv`, en `hooksLocal`).
+- **`inv-habilidades.js`** (`InvHabilidades`, 2026-10-01, paso 4 etapa 4e, tanda 5) — **las habilidades de una invocación**:
+  `ejecutar(inv, h, presets, dueloDisponible)` (cobrar, cooldown, vida, cura, estado del sistema anterior, atajo ✨ «solo sobre ella»)
+  y `terminar(inv, h, p, ui)` (Mesa, duelo, ataque con arreglos, tirada, aviso), más `tiradaPrimera`, `tiradaSegunda`, `habEjecucion`,
+  `ataqueDeHab`, `lanzarAtaque`, `usarFlashFuera`, `ponerEstado`, `aplicarSpec`, `anunciar`. `ui = {mesaHabilidad, mesaConTexto, publicar,
+  toast, cambio, cambiar, parry, dueloDisponible, elegirObjetivo(inv, cfg)}`. Lo usan la ficha (`invHabUi`, `js/04`) y el mapa
+  (`bnInvHabUi`).
+- **`inv-lupa.js`** (`InvLupa`, 2026-10-01, paso 4 etapa 4e, tanda 6) — **la 🔍 y el Ver de una invocación**: `contenido(inv, clave)`
+  (clave `"inv:invId:tipo:ref"`, la de `inv-botonera.js`), `verHab(inv, h)` y `stat(inv, statId, o)`. Solo arma el HTML. Lo usan la
+  ficha (`lupaHtmlInv`, `verHabInv`) y el mapa (`lupaContenido`, `#bn-verinv`).
+- **Zonas y trampas de las invocaciones** (2026-10-02, paso 4 etapa 4f, P134): `InvHabilidades.zona(inv, h, ui)` y la trampa al
+  ejecutar (`ui.colocarTrampa`, que usa `FichaAcciones.colocarTrampaDeHab` con la referencia `fichaId~invId`); `ui` suma `enMapa()`,
+  `ref(inv)`, `colocarZona(msg)` y `colocarTrampa(inv, h)`. `Combatiente.ejecucionNoDisponible` ya no frena la zona de una invocación.
+- **`ficha-lite.js`** (`FichaLite`, 2026-10-02, pedido del dueño) — **la ficha lite**: lo esencial de un combate en una ventanita.
+  `personaje(S)`, `creep(sc)` e `invocacion(inv, duenoNombre)` arman el mismo modelo `{titulo, subtitulo, manos[2], defensa, crit[5],
+  equipo[], estados[], extras[]}`; cada número trae sus `lineas` de origen (`{txt, val, nota?, tachado?}`) y la cuenta siempre cierra
+  (si no, una línea "Otros ajustes"). `html(modelo, botones)` lo dibuja con `CSS` (va en un recuadro aislado; los globos de origen son
+  CSS puro al pasar el mouse). Solo arma HTML. Lo usa el mapa (`vtt-hexgrid/js/15-ficha-lite.js`). Necesita las piezas `ficha-*.js`
+  (personaje), `creep-calculo.js` o `inv-calculo.js`.
+- **Zona persistente: daño «la diferencia» y tirada extra** (2026-10-02, pedido del dueño para Pedos Tóxicos): en el paso «Daño» del ✨
+  (`asistente-duelo-hab.js`), con objetivo zona hay una tercera opción, **«Sí: la diferencia entre las tiradas»** (`danoDiferencia`): cada
+  uno que no resiste recibe la tirada de quien la creó menos la suya (empate: nada). Y **«Si el daño entra, tirar además»** (`danoExtra`,
+  ej. `1d20`): se tira solo y sale en la Mesa con el texto de «Tiene un efecto que no se puede automatizar» (`efectoLibre`: qué significa
+  cada resultado; aplicarlo sigue a mano). Tipo de daño nuevo **Tóxico** (P142). `Combatiente.zonaDeHab` manda `zonaDanoDif`,
+  `zonaDanoTipo`, `zonaTiraExtra`, `zonaNota`. **Regla del dueño: resistir una zona evita todo** (antes el daño de fórmula entraba igual).
+  Reglas de Firestore nuevas (esos cuatro campos del elemento).
+- **🎲→◎ Según la tirada extra de una zona** (2026-10-22, dueño, los Pedos Tóxicos: «los estados se podrían automatizar después de la tirada de 20»):
+  en el paso «Daño» de la Ejecución (`asistente-duelo-hab.js`, con objetivo zona y «tirar además»), la tabla **«desde N → estado»** / **«desde N → cae
+  (la vida a 0)»** (`danoExtraEfectos`; el estado se elige con el selector real, `cfg.elegirEstado`). `Combatiente.porTiradaNorm`, `efectoPorTirada(tabla,
+  total)` (vale el renglón más alto que alcance), `porTiradaFilaTxt`, `porTiradaTxt`; `zonaDeHab` la manda adentro del JSON de `zonaEstado` (`porTirada`,
+  sin regla nueva de Firestore) y, si no hay texto a mano, la nota de la zona es la tabla. Lo aplica el mapa con dos Anuncios (vtt-hexgrid/js/66).
+- **Daño especial — `dmgesp`, «Dmg.Esp»** (2026-10-02, pedido del dueño): stat secundario nuevo del Especial (fórmula por defecto
+  `esp`, como el Dmg de la Fuerza), para tiradas puntuales de "cuánto daño" (ej. Pedos Tóxicos tira Dmg.Esp contra Res.Esp). Está en
+  `FichaCalculo.GRUPOS`, `FichaGuardado.DEFAULT.formulas` (una ficha vieja lo recibe sola al mezclarse), `CreepCalculo` (derivados y botón de
+  tirada), `InvCalculo` (botón y editor), el ✨ (`TIRA` de `asistente-duelo-hab.js`; su alcance automático es el Rango de casteo, como
+  PdG.Esp) y el editor de habilidades de creep. Lo suben los **Anillos / Pociones / Pergaminos de Furia Arcana** (`comun/catalogo.js`, +1/+2/+3,
+  pares de los de Furia de Combate) y la pasiva **Potencia especial** (`comun/pasivas.js`, +1).
+- **La tirada de una zona persistente es de la zona, no de la habilidad** (2026-10-02, dueño; P143 sigue abierta para el grupo): al
+  ejecutar ya no se tira nada — la zona aparece siempre. `Combatiente.zonaDeHab` manda `tiraStat` + `tiraValor` (el valor del stat de quien
+  la crea en ese momento; lo calculan `FichaAcciones.colocarZonaDeHab`, `CreepAcciones.zonaDeHab` e `InvHabilidades.zona`) y el mapa lo tira
+  **cada vez que la zona afecta a alguien**. En el ✨, con objetivo zona, el paso se llama «Tirada de la zona» (solo un stat, o «No»).
+- **Efecto especial (Ef.Esp)** (2026-10-02): el stat `dmgesp` se renombró de "Daño especial" a **"Efecto especial"** (la potencia de
+  los efectos del Especial, daño u otros); el id no cambió. También es la dificultad de las trampas mágicas que coloca una habilidad.
+- **Dificultad para detectar una trampa** (2026-10-02, P145): `AsistenteTrampa` suma el paso «detecta» — en el mapa un número
+  (`detectar`, trampa común 8), en una habilidad de qué stat sale (`detectarStat: 'des' | 'dmgesp'`). `Combatiente.trampaDeHab(h, valorDe)`
+  calcula `detectar` con el stat de quien la coloca; `TokensAuto.colocarTrampas` lo escribe como `trampaDetectar`. `Plantillas.TRAMPA` suma
+  `detectar` y `detectarStat`. `FichaBotonera.tiradaPercepcionValor(valor, aumentada, azar)`: la tirada de Percepción a partir del valor.
+- **Hoja de ruta A6a: las ventanas sueltas, comunes** (2026-10-02):
+  - **`ficha-stats.js`** (`FichaStats`) — **📊 Stats de un personaje**: `presupuesto(S)`, `puntosHtml(S)`, `statTile`, `desglose`,
+    `atributosHtml(S, abierto)` (los atributos con sus derivados; `abierto` = el stat con el desglose a la vista), `cambiarAtributo(S, attr,
+    valor, mod)` y `cambiarFormula(S, id, txt)`. Lo usan la ficha (`renderAttrs`, `statTile`, `breakdown` son atajos) y el mapa
+    (`abrirStatsMapa`, adentro de la Botonera nueva).
+  - **`ficha-duelo.js`, la Moneda Re-Roll**: `rerollHtml(S, lista)` → `{aviso, filas}` (la ventana con "mis últimas tiradas",
+    `comun/tiradas-propias.js`), `repetirTirada(u, registrar, toast)` y `usarReroll(S, h, ui)` (marca `rerollUsados`, repite y tira la
+    moneda). La ficha (`renderReroll`) y el mapa (`abrirRerollMapa`).
+  - **`creep-lupa.js`**: `verCreep(sc, {habilidades})` → `{titulo, html}` (el «Ver» de un creep entero: GM Tools `verCreepDatos` y el 🔍 Ver
+    todo del mapa), `derivadosHtml`, `recompensasVerHtml` y `verItem(item)` (el «Ver» de un ítem visto por el GM: arma o pieza de un creep,
+    catálogo, plantilla del botín). Solo HTML con las clases de `gm-tools.css`.
+  - **`creep-calculo.js`**: las reglas de **recompensas** (`TIPOS_CRIATURA`, `TIPOS_CON_ARMA_NATURAL`, `TROFEO_PRECIO_NIVEL`, `nombreLimpio`,
+    `tipoDe`, `oroSugerido`, `trofeoPrecioAuto`, `trofeo`, `despojosDePrecio`, `dropsResumen`), las etiquetas `TIPOITEM_LABEL` y `STAT_LABEL`
+    (antes `TIPOITEM_LABEL_GM` / `STAT_LABEL_GM`) e `itemParaCreep(it)` (un ítem del catálogo en la forma del equipo de un creep). GM Tools
+    conserva sus nombres de siempre como atajos.
+  - **`combate-fin.js`** (`CombateFin`) — **el fin del combate del GM**: el reporte «Batalla terminada» (`nuevo`, `creepsEnMapa`,
+    `jugadores`, `generar`, `calcularReparto`, `itemsPublicables`, `vista` → `{html, publicar, faltanJugadores}`, `cambio`/`clic` para sus
+    controles `data-rep-*`, `publicar`) y el botín para despojar (`nuevoBotin`, `jugadoresBotin`, `botinVista`, `botinCambio`, `botinItem`,
+    `despojar`), más `lineaVerde`. El estado (antes `combateRep`, `xpContarEscapados`, `botinGM` de GM Tools) se pasa como parámetro.
+    `confirmar(texto)` y `alEmpezar()` los pone cada pantalla. Lo usan GM Tools (`js/08`, `js/09`) y el mapa del GM (`js/18`). Necesita
+    `creep-calculo.js` e `items-subidos.js` (`sinAviso`).
+- **`ficha-editor.js`** (`FichaEditor`, 2026-10-02, hoja de ruta A6b, `../docs/plan-a6b-editor.md`) — **el editor de la ficha, común**: las
+  tablas (`SCHEMA`, `CAMPO_LABEL`, `CAMPO_NUM`: qué campos tiene cada tipo de entrada), `borrador`, `getModVal`/`setModVal`,
+  `itemComoEntradaDeCatalogo`, `PASOS_HAB`/`MODOS_HAB`/`pasosHabilidad`/`habLegado`, `statOptions`, `agregarEstadoConAviso`,
+  `resumenEjecucionHab`, `abrirEjecucionHab`, `tipoItemHtml`, `subirAlCatalogo`, `imagenADatos` (antes `fileToDataURL`), `portador`, y
+  **`crear(els, ctx)`**: el editor como componente sobre una ventana que pone cada pantalla (`els` = scrim, título, cuerpo y los botones del
+  pie) — formulario, paso a paso de habilidades, trampa, estado al usar/equipar, imagen, mods, Guardar/Eliminar, el asistente de ítems, la
+  Ejecución ✨. `ctx = {S(), toast, confirmar, alCambiar(keys), elegirTipoItem(actual), elegirEstadoItem(), elegirEstadoDuelo(),
+  alSubirCatalogo(), alCerrar?()}`. Devuelve `{abrir(key, id, equipadoPreset, opciones), cerrar, dibujar, irAPaso, abrirAsistenteItem,
+  aplicarTipoItem, estado}`. Lo usan la ficha (`editorFicha`, js/10) y el mapa (`bnEditar`, adentro de la Botonera nueva). **Un campo nuevo
+  de un tipo de entrada** va en `SCHEMA` de este archivo (y en `CAMPO_LABEL`, y en `CAMPO_NUM` si es un número). Los botones del editor
+  llevan `data-ed` (antes ids), así andan también adentro del recuadro aislado del mapa.
+- **`ficha-acciones.js`, ✚ Revivir** (2026-10-02, A6b): `hpRevivir(S, modo, pct, valor)` → `{hpmax, val}` y `revivir(S, val)`. Lo usan la
+  ficha y el mapa (`abrirRevivirMapa`).
+- **`creep-editor.js`** (`CreepEditor`, 2026-10-02, hoja de ruta A6c, `../docs/plan-a6c-editor-creeps.md`) — **el editor de creeps, común**:
+  `crear(contenedor, ctx, {id})` (el editor paso a paso de una habilidad de creep, que arma su propia ventana —la de GM Tools, con `data-hc`—;
+  `ctx = {creep(scId), guardarHab(scId, aplicar), personalizados(), elegirEstadoDuelo(), toast, alCerrar?}`; `abrir(scId, habId, {borrador,
+  alGuardar, encima})`), `crearEstado(contenedor, ctx, {id})` (el editor de un estado de creep, `data-ec`; `ctx = {creep, guardar(scId,
+  aplicar), toast, confirmar?, alCerrar?, personalizados?(), guardarPresets?(lista)}`; `abrir(scId, esId, inicial)`), las habilidades de la
+  biblioteca para un creep (`habDeBiblioteca`, `subirHab`, `ponerHab`, `elegirDeBiblioteca`, `LEGADO_HABS`, `paraDeDatos`, `PARA_TXT`,
+  `HABS_CREEP_GRUPOS`), `MODOS_HAB_CREEP`, `PASOS_HAB_CREEP`, `statLabel`, `opcionesStat`, `opcionesEstadosHtml`, `textoEstadoAgregado`. Lo
+  usan GM Tools (en `#scrim-hab-creep` / `#scrim-estado-creep`, que crea el componente) y el mapa (adentro de las Acciones nuevas). Para
+  Reemplazar con recetas de fábrica necesita `creeps-base.js` + `skills-creep-base.js` (el mapa los carga recién ahí).
+- **`presets-gm.js`** (`PresetsGM`, 2026-10-02, hoja de ruta B-7b) — **los "Mis presets" de estados del GM, en la partida**
+  (`campanas/<id>/gm/presetsEstados = {json, actualizado}`, solo el GM): `escuchar(cb)`, `listo()`, `lista()`, `guardar(lista)`. Antes vivían
+  solo en la memoria de GM Tools y se perdían al recargar. Lo usan GM Tools (`S.estadosPersonalizados` se llena al entrar) y el mapa.
+- **`creeps-mapas.js`** (`CreepsMapas`, 2026-10-02, pedido del dueño: "los grupos en realidad son mapas") — **en qué mapa está cada creep**:
+  `sc.mapa` (id del mapa, '' = la Reserva; reemplaza a `sc.grupo` y al vínculo grupo↔mapa `gm/gruposMapas`, que se sacaron de
+  `tokens-auto.js`). `ordenar(mapas)` (el orden del panel de Mapas), `mapaDe(sc, ids)` (si su mapa ya no existe, la Reserva),
+  `tokensDeCreep(id)` (en todos los mapas), `mudarTokens(c, destino)` (sus tokens se van de los otros mapas y, si tenía, aparece uno oculto
+  en el destino; a la Reserva solo se van), `crearMapa(nombre)` y `migrar(creeps, {vacios})` (los grupos viejos → mapas, una vez: con token →
+  el mapa del token; vinculado → su mapa; si no, el mapa con su nombre o uno nuevo). Lo usan GM Tools (pestañas, «🗺 Mover a…», la
+  conversión al entrar, borrar un creep) y el mapa (🎭 "Traer los creeps de este mapa", el panel de Mapas, `creepLlegoAlMapa`).
+- **`paso-a-paso.js`** (`PasoAPaso`, 2026-10-02, pedido del dueño; plan en `../docs/plan-paso-a-paso.md`) — **la ventana única para crear y editar
+  paso a paso**, con el formato del asistente de creeps: cabecera «Crear un X / Editar X · paso N de M: Nombre» y Cancelar; pestañas «1. QUÉ ES…»
+  que saltan (salvo que `puedeIr` diga por qué todavía no); la ayuda de cada paso; pie con «← Atrás», «Siguiente →» y **Guardar siempre visible al
+  editar** o **«✔ Crear» en el último paso al crear**. `PasoAPaso.abrir({titulo, crear, pasos (o función), puedeIr, alClic/alInput/alCambio,
+  alGuardar/alCrear, alCancelar, confirmarCancelar, extras, contenedor, z})` → `{raiz, cuerpo, paso, pasoId, irA, redibujar, aviso, cerrar}`.
+  Trae su CSS (paleta cobre) y clases de base (`.pap-campo`, `.pap-fila`, `.pap-nota`, `.pap-boton`); Escape cancela solo si es la ventana
+  de más arriba. **Todo asistente nuevo o rehecho va sobre esta pieza** (tandas en el plan). La usan el asistente de creeps de GM Tools y los
+  tres editores de habilidades (personaje en `ficha-editor.js`, creep en `creep-editor.js`, invocación en la ficha) y el asistente de ítems
+  (`asistente-item.js`: su contenido por paso es `contenidoPaso` → {h, ayuda}; los botones extra de `cfg.botones` van al pie). También la Ejecución ✨ (`asistente-duelo-hab.js`, z 99500,
+  «Sacar esta configuración» en el pie; sus controles se conectan en cada dibujo con `conectar()`). Un paso puede devolver HTML o
+  **un bloque ya armado** (un elemento): se muestra tal cual, conserva lo escrito y vuelve a su lugar al cambiar de paso (así los editores que
+  guardan todo en sus campos, como el de creeps y el de invocaciones, no se reescribieron). Ancha por defecto (hasta 1100 px; `ancho: 'completo'`
+  para toda la pantalla): el juego es para PC.
+  Desde la tanda 5 también los asistentes de **estados**, **trampas** y **zonas** y las **cantidades de un preset** (`EstadoPreguntas.preguntar`,
+  640 px, «✔ Listo»; sigue avisando con el evento `ep-cerrado`): su CSS de contenido cuelga de `.ae-c` / `.at-c` / `.az-c` / `.ep-c`, las
+  pestañas saltan hasta donde lo anterior está completo (`faltaAntes(i)` como `puedeIr`) y `alCancelar` de cada uno se llama al cancelar. Ya no
+  existen `#ae-fondo`, `#at-fondo`, `#az-fondo`, `#ep-fondo` ni `#adh-fondo`: para "¿hay una ventana abierta?" alcanza con `.pap-fondo`. Un Escape
+  lo atiende solo la ventana de más arriba (`stopImmediatePropagation`), así no cierra también la ventana que la abrió.
+  **Tanda 6 (2026-10-02):** `asistente-mapa.js` (abajo); `FichaEditor.crear(donde, ctx)` ya no recibe una ventana (`donde` = dónde se abre la
+  ventana común: `document.body` en la ficha, el recuadro aislado en el mapa) y **todo** lo edita por pasos — el formulario genérico se arma con
+  `pasosFormulario(key, draft)` (pasivas, talentos, estados, consumibles y el «formulario completo» de un ítem) + `htmlFormulario(key, draft,
+  bloques)` + Resumen; `CreepEditor.crearEstado(contenedor, ctx)` → `{abrir, cerrar, raiz, estado}` (Qué es · Duración · Vida · Números · Resumen).
+- **`asistente-personaje.js`** (`AsistentePersonaje`, 2026-10-02, tanda 7) — «＋ Personaje nuevo» paso a paso: Idea · Imagen · Atributos (33 puntos,
+  mínimo 3, con «Usar la sugerencia» de la clase) · Habilidades (las de su clase primero, ★) · Pasivas · Talentos (6 de Inteligencia) · Equipo (la
+  tienda publicada y abierta, con el DDE inicial: 300 o el de `ajustes/partida`) · Historia · Resumen (con los avisos de lo que sobra o falta). No
+  escribe nada: `ctx = {base, clases, pool, habilidad, editarHabilidad, pasivas, pasiva, tienda, ddeInicial, imagen, alCrear, toast}` (la ficha:
+  `abrirPersonajeNuevo`, js/12). Pedidos del dueño del mismo día: en Habilidades, «＋ Crear una habilidad nueva» (abre el paso a paso de
+  habilidades de `ficha-editor.js` sobre el personaje en armado: `editarHabilidad(S, id, alCambiar)`; queda en `S.habilidades`, con Editar/Quitar) y
+  el 🧩 Pool custom (2 de Job); en Pasivas, categorías con filtro (`CATEGORIAS_PASIVA` y `categoriaDePasiva(p)` en `pasivas.js`: Ofensivas,
+  Defensivas, Recuperación, Recursos, Utilidad — salen de las etiquetas y de lo que suma); en Equipo, el DDE inicial en una caja editable (300 o el
+  del GM; el texto invita a preguntarle al GM). `Combatiente.ROLES`/`PESOS_ROL`/`ROL_DE_CLASE`/`repartirAtributos(total, pesos, minimo)`: los repartos sugeridos (los usa también el asistente
+  de creeps de GM Tools).
+- **`item-corto.js`** (`ItemCorto`, 2026-10-02, pedido del dueño) — **cómo se ve un ítem o una trampa en una grilla para elegir**: solo lo que hace
+  (`grillaHtml(item)`; una trampa en filas cortas, `trampaHtml(t)`/`trampaFilas(t)`), y en «Ver» lo mismo más el recuadro «Detalles técnicos»
+  (`verHtml(item)`, `tecnicoHtml(item|texto)`; las notas ⚙/✋ las separa `partes(texto)`). `ItemCorto.CSS` (el mapa lo copia en sus recuadros
+  aislados). Lo usan `ficha-tienda.js`, `ficha-lupa.js`, `creep-lupa.js`, el generador de tiendas, el editor del catálogo y `biblioteca.js` (las
+  trampas: su ficha corta y «Ver detalles técnicos»; otras listas pueden pasar `opts.cuerpo(e)`/`opts.tecnico(e)`; `opts.z` la abre por encima).
+- **Habilidad que invoca** (2026-10-02, `ficha-acciones.js`: `invocacionDeHab`/`invocarConHab`): en el paso Ejecución del editor (`ficha-editor.js`, `invocaHtml`) se elige una invocación del personaje (`h.invoca = {invId}`). Al ejecutarla, después de cobrar, la despierta con vida y No2 llenos y sus turnos, o crea una copia («Abeja 2», `copiaDe`) si ya está en juego (reusa una copia dormida). Con el mapa abierto manda `invocacion-habilidad` y el mapa pide la casilla (mueve el token que ya tenía o lo crea) y lo cuenta en la Crónica.
+- **Daño «la diferencia» y «drena» en habilidades dirigidas** (2026-10-02, Drenar Vida de Larry): en el paso «Daño» del ✨ (`asistente-duelo-hab.js`) «Sí: la diferencia entre las tiradas» ya no es solo de zonas (`danoDiferencia`: el duelo no tira daño, `entrarHab` lo arma con lo que ganó quien la usa) y la casilla «Drena» (`drena`, `drenaTope` %): quien la usa se cura lo que el objetivo perdió de verdad, y lo que pasa de su máximo queda como Excedente de vida hasta ese %. `Combatiente.habEjecucion` → `hab.dano.{diferencia, drena, drenaTope}`; lo aplica el mapa del GM junto con el daño (`dueloDrenar` en `vtt-hexgrid/js/13`: personaje por `dueloCurar` + el Excedente por `encolarPj`; creep en sus datos; invocación, la vida). El cuadro y el resumen de la Mesa muestran «🩸 Drena».
+- **«El daño de tu arma» y la onda con dodge roll** (2026-10-02, Daño en área del Tanque): en el paso «Daño» del ✨, «Sí: el daño de tu arma» (`danoArma`; dirigida, área u onda): `Combatiente.habEjecucion` usa `o.armaDano` (la fórmula del botón «Daño»: `FichaAcciones.habDueloDatos(S, it, xSp, xNitros, arma)` con el arma con que se ejecuta o la principal; `CreepCalculo.ataqueTxt`; `InvCalculo.ataqueTxt`). En «Objetivo», la onda puede dejar dodge roll a quien gana (`ondaDodge` → `hab.dodge`; `cerrarPar` de `duelo.js`).
+- **Objetivo «cono» y efecto «Pierde No2»** (2026-10-02, Sonic Boom): el ✨ suma «Cono al frente de quien la usa» (el mismo de la detección del sigilo; el mapa lo arma con `zonasSigilo` y lo guarda en `centro: {col, fila, cono, rot}` del área, sin reglas nuevas; sin dodge) y, en Efectos, «＋ Pierde No2» (`{no2, no2Dif, no2Sentado}`: el número + la diferencia de las tiradas; en 0, Sentado). Lo aplica el mapa del GM (`dueloAplicarEfecto`: un creep directo; un personaje o invocación por `encolarPj` con `{nombre: 'Pierde No2', stacks, sentadoEnCero}`, que atienden `FichaAcciones.aplicarEstadoRecibido` y `Recibidos.estado`).
+- **`elegir-trampa.js`** (`ElegirTrampa`, 2026-10-02, pedido del dueño) — al tildar «🪤 Esta habilidad coloca una trampa» (en los tres editores de
+  habilidades: personaje, creep, invocación) se abre este menú: **una trampa conocida** (12 tipos con sus valores sugeridos, sacados del catálogo
+  de trampas hasta auditarlo: `CONCEPTOS` — púas, cepo, red, veneno, gas, explosiva, fuego, hielo, eléctrica, pegajosa, runa, alarma — y un paso a
+  paso con lo que importa de cada tipo: Tamaño, Daño, Qué le deja / Efecto adicional, Se evita, Nombre, Resumen), **armar de cero**
+  (`AsistenteTrampa`) o **del catálogo** (`cfg.alCatalogo`). Devuelve la trampa en la forma única (`AsistenteTrampa.aTrampa`). Una trampa puede
+  llevar **`estadoStacks`** (Veneno, Sangrado: el daño por turno): `Plantillas.TRAMPA`, `TokensAuto.colocarTrampas` (va en el `stacks` del estado) y
+  `AsistenteTrampa` (lo conserva). Con la trampa ya elegida, el editor ofrece «🪤 Elegir otra trampa» y «🪄 Ajustar todo, paso a paso».
+- **`asistente-mapa.js`** (`AsistenteMapa`, 2026-10-02, tanda 6) — «＋ Mapa nuevo» paso a paso: Nombre → Creeps (cuáles se mudan a este mapa, agrupados
+  por dónde están) → Listo. `abrir({nombre, creeps: [{id, nombre, donde}], marcados, alCrear({nombre, creeps}), alCancelar})`; no escribe nada: el
+  mapa (`crearMapa`, js/01) y GM Tools (`pedirMapaNuevo`, js/09) crean el mapa y mudan los creeps a su manera.
+
+
+- **Por la espalda** (2026-10-03, pedido del dueño): un arma puede traer `espalda: {pdg, fijo, critpot}` (asistente de ítems, paso «Peso y daño»; creeps `sc.armaEspalda`, invocaciones `inv.armaEspalda`; una habilidad con el arma suma `arma.espaldaPdg/Fijo/Critpot` del ✨). El mapa avisa a `Duelo.crear` (`cfg.espalda`) si quien ataca está **en sigilo** y en el punto ciego del defensor; el duelo lo guarda en `ataque.porLaEspalda`/`ataque.espalda` (`limpiarEspalda`) y lo suma: PdG al guardar la tirada, daño fijo al guardar el daño, Crítico potente en `entrarCritico`. Sin reglas nuevas (va dentro de `ataque`).
+
+- **Efecto de arma «seguro si es crítico»** (2026-10-03, rework T4): `seguroCritico: true` en un efecto de `efectosGolpe` con porcentaje. `EfectosGolpe.normalizar` lo conserva (y ahora también `stacks`, que antes se perdían al guardar en el asistente); el asistente de ítems tiene la casilla; `Duelo.guardarDano` (exportado), si `m.crit.critico`, lo deja en 1/1 (entra sin tirar).
+- **Regla (dueño, 2026-10-03), característica del Sangrado: con un golpe crítico de arma queda permanente**, aunque diga turnos — venga del arma o de la habilidad con la que se atacó (Ejecución «con tu arma», Critical Matters). Lo hace `Duelo.guardarDano` (`sangradoPermanente`: saca los `turnos` del efecto y de su `spec`). Manual: 07-estados, «Sangrado».
+- **Ataque de oportunidad y contraataque, regla universal** (dueño, 2026-10-03): `Combatiente.statAtaqueEspecial(tipo)` / `ATAQUE_ESPECIAL` — cuestan lo de un primer ataque, no cuentan como ataque del turno y suman su PdG especial (`pdgopor` / `pdgcontra`) venga de donde venga (arma, equipo, pasivas, estados): personajes (`FichaCombate.statParaArma`), creeps (`CreepCalculo.modTotal`) e invocaciones (`InvCalculo.modTotal`). El menú «¿Qué ataque es?» es uno solo: `Combatiente.menuTipoAtaqueHtml` (ficha, mapa, GM Tools, invocaciones con `InvAcciones.menuTipoAtaque`).
+- **Cómo se ve un arma** (dueño, 2026-10-03, como las trampas): `ItemCorto.armaEsencial(item)` (lo esencial para la grilla: Tipo, manos, dados, daño, bonos, efectos; es el Detalle de las armas del rework y lo que muestra un arma sin Detalle) y `ItemCorto.armaTecnico(item)` (las explicaciones de cada mecánica que tiene, en «Detalles técnicos» del Ver; armadas de los datos). La narrativa va aparte (`descripcionNarrativa`).
+- **Arma que ignora Resistencia a crítico** (dueño, 2026-10-03): campo `ignoraResistCrit` del arma (creep: `sc.armaIgnoraResistCrit`; invocación: `inv.armaIgnoraResistCrit`; el viejo efecto «Ignora N de Res. crítico» también cuenta). `Combatiente.ignoraResistCritArma(arma)`; cada atacante lo manda en `statsCritico` (`ignora`) y `entrarCritico` lo resta a la Resistencia del defensor (se suma a la de una habilidad). El efecto viejo ya no aparece como efecto al golpear.
+- **Efectos de arma «solo si es crítico» y «Drena vida»** (dueño, 2026-10-03): `soloCritico: true` en un efecto de `efectosGolpe` (Critical Matters de un arma: `Duelo.guardarDano` lo descarta si el golpe no fue crítico); «Drena vida» con `drenaPct` (50 si no dice) no es un estado sobre el golpeado: queda en `dano.drenaPct` y el mapa (`dueloAplicarDano` → `dueloDrenar`) cura a quien atacó ese % de la vida que el defensor perdió de verdad (lo que frena la armadura no cuenta; redondea para arriba; sin Excedente).
+- **Rasgos de un arma / mecánicas de firma** (dueño, 2026-10-03): `Combatiente.RASGOS_ARMA` = espalda, ignoraResistCrit, sinParry (no se puede parrear), oporGratis (oportunidad sin No2), ahorroNitros (primer ataque −N), critD20 (+N d20 en el crítico). Un ítem los lleva sueltos (`rasgosDeItem`); un creep o una invocación, en `armaRasgos` (`armaDeCombatiente(x)` también lee los viejos armaEspalda/armaIgnoraResistCrit). `ataqueDeArma(arma)` = lo que el ataque lleva al duelo (espalda, sinParry); `costoConAhorro` / `costoEspecial` = los costos. Además en armas: **Rengo**, **Sangrado con stacks** y **daño mágico** (efecto con `dado` + `danoMagico`: `Duelo.guardarDano` lo tira aparte → `dano.magico`; el mapa lo aplica **directo**: no resta la Defensa ni la Armadura mágica, solo la resistencia a su elemento —dueño, 2026-10-09: «es daño directo»—, y **sin multiplicar con el crítico**).
+- **Sangrado de un arma, estándar** (dueño, 2026-10-03): 2 de daño por 2 turnos (`SANGRADO_ARMA_TURNOS` en `duelo.js`, `specArma`) salvo que el efecto diga `turnos` o `permanente`; con crítico, permanente (`sangradoPermanente` lo marca `permanente`). Reaplicar (`Combatiente.acumularSangrado`): +1 stack y los turnos vuelven a los del nuevo; si alguno es permanente, queda permanente.
+- **Duelo minimizado: en qué va y la Crónica** (dueño, 2026-10-03, P151): `Duelo.pasosDe(d)` arma un texto por paso ya resuelto (contacto, Bloqueo, crítico, daño recibido —sin la vida que le queda—, efectos, fin). Cada pantalla los revela recién con los dados quietos (`revisarPasos`; en una pestaña oculta, enseguida): el botón «Ver duelo» muestra el último («⚔ juan → Bruja · PdG 5 contra Evasión 1 → pegó») y, si el cuadro no está abierto ahí, llama a `cfg.paso(d, nuevos, todos)` de `Duelo.escuchar` (el mapa: una tarjeta por duelo en la Crónica). El botón de un duelo resuelto queda 2 minutos desde que se resolvió (antes, desde que se creó).
+- **Armadura rota doble** (2026-10-03, Raras del Tipo 8): un efecto «Rompe armadura» con `stacks: 2` deja 2 stacks por golpe (`specArma` del duelo ya lo hacía); `ItemCorto.armaEsencial` lo escribe «Armadura rota doble» (×N con más).
+- **Demora automática** (dueño, 2026-10-03, Tipo 10): `specArma` reconoce «Demora» (y su nombre viejo, «Knockdown») como `{nombre: 'Demora'}`; solo la aplica una pantalla que escuche con `aplicaDemora: true` (el mapa: `dueloDemora` baja al golpeado 1 lugar en el orden de turnos). Derribar sigue siendo Sentado. `ItemCorto` explica Demora, Aturdir y Derribar en «Detalles técnicos».
+- **Sentado no puede atacar, para todos** (dueño, 2026-10-03: «las reglas de combate aplican a creeps, personajes e invocaciones por igual»): `Combatiente.preguntaSentado(estados, nombre)` → la pregunta «… está Sentado y no puede atacar. ¿Atacar igual?» (sin nombre, «Estás Sentado: no podés atacar…») o . Se pregunta **al pagar** cualquier ataque (normal, oportunidad, contraataque), suelto o en el duelo: `FichaAcciones.atacarConArma` / `ataqueEspecialConArma` (personaje, ficha y mapa; `ui.confirmar` o `confirm`), `InvDuelo` y los ataques sueltos de la invocación (ficha js/04, mapa js/11), `CreepDuelo.atacarCon`, las Acciones del mapa (js/12) y GM Tools (js/01). Antes: el creep solo en el ataque normal, la ficha suelta antes del menú y el mapa nunca.
+- **El dado al lado del porcentaje** (dueño, 2026-10-03: «17 % (6 en d6)», bien sintético): `ItemCorto` (texto corto de las armas: `dadoEf`/`pctTxt`) y la tarjeta del efecto en el duelo muestran qué se tira: «Aturdir 17 % (6 en d6)», «Lisiado 75 % (2–4 en d4)». Las 240 armas ya rehechas tienen el Detalle actualizado.
+- **Soltarse** (2026-10-03, trampas de Atrapar): un estado puede traer `soltar: {stat, etq, dif, no2}` (lo deja la trampa: `trampaDatos.soltar` → `TokensAuto.colocarTrampas` → el JSON de `trampaEstado` → `EstadosAplicar.limpiarSpec/componer` y `FichaAcciones.estadoDeSpec` lo conservan). `Combatiente.soltarNorm`, `estadoSoltable`, `textoSoltarse` («🔓 Soltarse · Fuerza contra 6 · 2 No2»: el botón dice qué tira y cuánto cuesta) y `tiradaSoltarse`. Se paga se suelte o no; si llega, se saca el estado. Personaje: `FichaAcciones.soltarse` (ficha y mapa); creep: `CreepAcciones.tiradaSoltarse`/`aplicarSoltarse` (GM Tools y el mapa: la tirada afuera de la transacción); invocación: `InvAcciones.tiradaSoltarse`/`aplicarSoltarse` y, de paso, `InvAcciones.levantarse` (le faltaba).
+- **`aviso-combate.js`** (`AvisoCombate`, 2026-10-03, pedido del dueño: «todos los pop-ups de anuncio de efectos de combate, a quien lo afecta, con la estética del duelo; empezar a unificar estéticas y menúes») — `mostrar({icono, titulo, pasos: [{titulo, texto}], veredicto: {tono: malo|bueno|neutro, grande, chico}, texto, aMano, boton, alCerrar})` / `cerrar()`: usa los estilos del cuadro del duelo (`Duelo.estilos()`): cabecera, una tarjeta por paso, el cartel grande del resultado (rojo/verde/azul) y «Entendido». Lo usa el Aviso del mapa (`momentoAvisoCentro`, js/16; las trampas mandan `datos.pasos` y `datos.veredicto`). Al resto de la mesa, la Crónica. Próximo: pasar a esta pieza los otros carteles del centro (zonas, percepción, oportunidad).
+- **`AvisoCombate.cartel(clave, o | null)`** (2026-10-03): los carteles que piden algo (tirar, decidir, esperar), con el mismo marco del duelo pero sin oscurecer el mapa; se redibujan por clave y se apilan; `posicion: "abajo"` para el dodge roll. Los usan las zonas (js/08), «Algo está fuera de lugar» y la detección del GM (js/16), el ataque de oportunidad (js/17) y el dodge roll (js/13). Se sacó `momentoEstiloCentro`.
+- **`AvisoCombate.mostrar`, paso a paso** (2026-10-04, trampas): acepta `botones: [{texto, alClic, sec, deshabilitado}]` (la tirada que toca, en vez de «Entendido»), pasos con `espera: true` (el que falta, punteado) y `clave` (volver a llamar con la misma clave redibuja la ventana abierta sin cerrarla ni llamar a `alCerrar`); `abiertoClave()`. `Duelo.esperarDados(cb)` quedó exportado (espera a que los dados 3D queden quietos): lo usa el paso a paso de las trampas del mapa (`vtt-hexgrid/js/19`).
+- **💰 Botín estimado de un mapa** (2026-10-04, pedido del dueño): `CombateFin.estimar(creeps, cat)` → `{filas, oro, venta, drop, xp, total}` (si derrotan a
+  todos: el oro de cada creep sin el ±20 %, su arma no natural, su equipo y su trofeo a precio de venta —la mitad de la compra— y el consumible al azar
+  como valor esperado, `dropEsperado`) y `estimadoHtml(est, titulo)` (la tabla, con el reparto entre 3, 4 y 5). Lo usan el mapa (🗺 Mapas → «💰 Botín
+  estimado», `abrirBotinEstimadoMapa`, js/18) y GM Tools (la pestaña de un mapa, `abrirBotinEstimado`, js/09). Primer paso de la hoja de ruta del GM.
+- **Efectos del golpe, todos juntos** (2026-10-04, pedido del dueño: «para que pegar con un arma no sea una eternidad»): en el paso de efectos del
+  duelo, un solo botón «🎲 Tirar los efectos (1d6 · 1d3 · 1d4)» (`tirarEfectos` en `duelo.js`) tira un dado por cada efecto con probabilidad; la Mesa
+  recibe UNA tirada con todos los dados (`1d6+1d3+1d4`) y una línea con lo que funcionó y lo que no. El cuadro muestra un **tablero** (dado · efecto
+  y su % · con qué número funciona · qué salió, ✔/✘) y debajo solo las tarjetas de lo que funcionó (o entra siempre), con su «Aplicar». Si ningún
+  efecto tiene probabilidad, queda el botón por efecto de antes. Probado en vivo.
+- **El dado de un efecto que funciona brilla** (2026-10-04, pedido del dueño: «como el d20 del crítico»): la tirada de los efectos lleva
+  `destacar: 'idx:0,2'` (los dados de los efectos que funcionaron) y `dados3d.js` (`dadosDestacar(c, notacion, cual)`, que también sigue aceptando
+  `'max'`) agranda, sube, hace brillar y suelta ondas en esos dados; la Mesa (`mesa.js`) acepta ese formato. En el tablero del duelo, el número
+  de un efecto que funcionó es grande y dorado, late y dice «¡FUNCIONÓ!». (El tablero se probó en vivo; los dados 3D, no: la ventana estaba oculta.)
+- **Resistencias elementales y Sigilo** (2026-10-04, pedido del dueño). Stats nuevos: **`resfuego`, `reshielo`, `resrayo`, `restoxico`, `resacido`**
+  (`FichaCalculo.EXTRA`, base 0; los suben ítems, pasivas y estados) y **`sigilo`** (derivado de Destreza, fórmula `des`: la tirada para no ser descubierto).
+  Fichas (y su resumen público), invocaciones (`InvCalculo.statValor`) y creeps (`CreepCalculo.resElemental(sc, el)` = la base que pone el GM —fila
+  🔥 ❄ ⚡ ☠ 🧪 del editor del creep en GM Tools— + equipo y estados; Sigilo entre los derivados de Destreza). `Combatiente.ELEMENTOS` y
+  `Combatiente.elementoDe(texto)` ('Fuego', 'de fuego', 'tóxico' → 'fuego'…). **Se restan solos** al daño de su elemento, junto con la **Armadura mágica**
+  (que frena todo daño mágico, arcano o elemental): en el duelo (habilidad con `dano.tipo`), en las zonas (`zonaDanoTipo`) y en las trampas (`elemento`
+  adentro del JSON de `trampaEstado`: `TokensAuto.estadoJson(…, elemento)`, `Plantillas.TRAMPA`; Llamarada y Géiser fuego, Escarcha y Tumba de hielo hielo,
+  Descarga rayo, Bomba de esporas tóxico). El mapa los lee con `resistenciasDe(t, el)` (js/10) y `danioCreep/Pj/Inv` aceptan una resta extra. La
+  detección del sigilo (js/16) tira **Sigilo** en vez de Destreza. La ficha lite muestra Sigilo y las resistencias que no están en 0. Falta: el daño de las
+  armas (las armas mágicas, en su rework).
+- **Durabilidad: Resistente / Frágil** (2026-10-04, dueño): `durExtra` en el ítem (Resistente ×N = +N, Frágil ×N = −N a la durabilidad total, nunca
+  menos de 1). `Combatiente.durBase` (3 por Peso, mínimo 3; o el `durPorPeso` de una copia vieja) y `durMax` = base + extra. El asistente de ítems
+  pregunta «Durabilidad: Resistente (+) o Frágil (−)» y convierte un `durPorPeso` viejo al guardar. Una pieza rota cuesta el doble de reparar hasta
+  quedar entera (`FichaTienda.costoReparar`, `reparoRoto`).
+- **Botones con detalle y Evasión especial a la vista** (2026-10-04, dueño: «decidir con la información completa», «que no sea silencioso»): los
+  botones de `AvisoCombate.mostrar` / `cartel` aceptan `detalle` (una línea chica debajo; el cartel de «¿Con qué arma?» del ataque de oportunidad
+  pone ahí el daño y lo que hace cada arma). En el duelo, una tirada cuyo origen trae «(+N contra …)» guarda esa `nota` (`tiro.nota`) y se muestra
+  en el cuadro y en la Mesa («Evasión (+2 contra oportunidad)»). El mapa del GM arma las opciones de defensa de un creep con `CreepDuelo` (ya no con
+  su copia corta), así se ven los dados que tiraría.
+- **Cinturón: 1 ranura = 1 unidad, para personajes y creeps** (2026-10-04/05, dueño): `FichaEquipo.alCinturon(S, it, cantidad)` (todos los caminos
+  que meten algo en el cinturón de un personaje: Equipar, «→ Cinturón», el editor, lo que vuelve del combate; lleno, no entra), `cinturonUsado`,
+  `capCinturon` (base `BASE_CINTURON` 5 + `capcinturon`), `textoAlCinturon`. Creeps: `CreepCalculo.capCinturon/cinturonUsado/cinturonLibre`,
+  `CreepAcciones.alCinturon/quitarDelCinturon/consumir/colocarTrampaDeItem/consumiblesDe` y la sección `CreepBotonera.cinturonHtml` de sus Acciones.
+  Las invocaciones no llevan cinturón (decisión del dueño).
+- **`intercambio.js`** (`Intercambio`, 2026-10-05, P157; reemplaza a la «mesa común» de la ficha) — **pasarle cosas a otro personaje y el baúl
+  común**, para la ficha y el mapa. Ofrecer (fuera de combate, a cualquiera): el ítem queda `reservado` (+ `reservadoPara`) en quien lo ofrece hasta
+  que el otro acepta (no se usa, equipa ni vende: lo miran `FichaEquipo.equipar`, `FichaAcciones.consumir`, `FichaTienda.vendibles` y la Moneda
+  Re-Roll); oro y despojos se apartan al ofrecer. Quien recibe ve «Te ofrecen algo — Aceptar / Rechazar»; la pantalla de quien ofreció cierra el
+  paquete (transacción) y saca o libera lo reservado. El baúl: solo desde una tienda abierta y fuera de combate, 10 ranuras por personaje de la
+  partida (`POR_INTEGRANTE`), registro `baulLog` + Mesa. `iniciar(host)` con `host = {maneja(id), leer(id), con(id, async S => bool), enCombate(),
+  tienda(), toast, propias()}` (ficha: `intercambioHost`, js/08; mapa: `intercambioHostMapa`, js/11); `abrirDar(fichaId, {itemId})`,
+  `abrirBaul(fichaId)`, `botonDar(it)` (el botón de la mochila), `clic(b, fichaId)`. Devuelve sola lo que quedó en la vieja mesa común.
+  Colecciones `paquetes`, `baul`, `baulLog` (reglas nuevas).
+- **`intercambio.js`, en combate** (2026-10-05): solo ítems y solo a los aliados al lado (`host.adyacentes(fichaId)`; el mapa los saca de los tokens a 1
+  casillero); cuesta 1 No2 desde el cinturón (stat `pasamanos` > 0: 0) y 2 desde la mochila, se paga al ofrecer (sin No2: pregunta y deja seguir con la
+  línea roja); lo que llega va al cinturón si entra. **Alforja compartida** (stat `alforja`): paquete `tipo: 'pedido'` — lo crea quien saca; la pantalla
+  que maneja al dueño de la alforja lo entrega sola (`pedidos(fichaId)`: saca la unidad y la manda en `json`, o lo rechaza); quien lo pidió lo recibe,
+  paga 1 No2 y queda en la Mesa. Reglas: `tipo` admite 'pedido' y su `json` se puede escribir al entregarlo.
+- **`Combatiente.ranurasCinturon`, Portapergaminos** (2026-10-05): `o.portapergaminos` = cuántos pergaminos entran en la ranura aparte (ya no
+  `porPergamino`, que los agrupaba de a N).
+- **✨ Armas especiales** (2026-10-05, rework mágico, `../docs/rework-armas.md`): una varita o un báculo es **un hechizo equipable**. El ítem trae
+  `especial = {nombre?, sp, no2? (1), sube? (1), dano, sumaEspecial (true | 0.5), duelo (la Ejecución ✨: objetivo, tira, contra, tipoDano,
+  efectos con caras/éxitos, radio, zona…), trampaColocar?}`. `FichaAcciones.usarArmaEspecial(S, itemId, forzar, ui)` arma una habilidad con eso
+  (`habDeArmaEspecial`) y sigue el camino de una ✨ (`ui.terminar`, `ui.colocarTrampa`); cobra `costoEspecial` = 1 No2 el primer uso del turno,
+  +1 por uso (el conteo es `S.ataquesArma['esp:<id>']`, que vacía el Mantenimiento) y su SP (sin SP alcanza: pregunta y cobra 1 No2 por SP).
+  `armasEspeciales(S)` (las equipadas) y `costoEspecialTxt`. **Se usan desde Atacar** (dueño, 2026-10-05: «se tratan como un ataque»): la
+  Botonera (`ficha-botonera.js`) pone cada una en la caja Combate como un «✨ Atacar» más (`data-botoneraaccion="atacar" data-arma`) con su «Qué hace»;
+  su Atacar va directo a `usarArmaEspecial` (ficha js/11 y mapa js/11), sin «¿Qué ataque es?»: no tiene oportunidad ni contraataque (P160, dueño:
+  «cada botón con su recorrido propio»). El «Qué hace» sale de `FichaAcciones.ataqueEspecialMenu`. Con un arma especial equipada no aparece el Atacar a
+  mano limpia (solo los ataques posibles). `Combatiente.efectoDeEjecucion` ahora respeta `caras`/`exitos` (efectos con %). Una varita (arma
+  especial sin Tipo) no tiene daño físico (`FichaCombate.armaDanoTxt`) y una varita o un orbe (`orbe: true`) no parrean. Catálogo: 30 armas y 3
+  orbes Comunes (`esp-*`); las partes que todavía no se automatizan dicen «✋ A mano». `especial.estadoPropio` (2026-10-05, Varita de la luz): un
+  estado que se pone quien la usa al usarla (la luz: Luz portada 3 y Ve lo oculto 3, 1 turno).
+- **`capas.js`** (2026-10-05, dueño: «hay menús que quedan detrás de otros»): la última ventana (`.scrim`) que se abre queda arriba de las que ya
+  estaban abiertas (le sube el z-index mientras está abierta; al cerrarse vuelve al suyo). Se carga en la ficha, GM Tools, el generador de tiendas y
+  el mapa; no hay que llamar nada. Caso que lo motivó: en la ficha, «Vender a la tienda» quedaba detrás de la tienda.
+- **✨ Armas especiales de un creep** (2026-10-05, `comun/creep-acciones.js`): `especialesCreep(sc)` (las de su equipo), `costoEspecialCreep`, `habDeEspecialCreep`
+  (la misma habilidad que arma la ficha) y `usarEspecialCreep` (cobra y sigue por `ejecutarHab`/`terminarHab`, con sus orbes y su `estadoPropio`). No2 como un
+  personaje; el SP se paga con ESPERA (`ESPERA_POR_SP`: SP 1–2 → 1 turno, 3+ → 2; provisorio hasta pasar los creeps a SP). La espera y los usos viven en el
+  creep (`sc.esperaEspecial`, `sc.usosEspecial`), no en la varita: si la saquea un jugador, vuelve a costar SP. Botón `data-especialcreep` (Botonera del creep;
+  mapa js/12 `acUsarEspecial`, GM Tools js/06).
+- **Asistente de ítems: armas especiales y orbes** (2026-10-05): `asistente-item.js` pregunta «⚔ Física / ✨ Especial» (un arma) y «🛡 Escudo / 🔮
+  Orbe» (un escudo de una mano). Especial: Empuñadura · Hechizo · Qué hace ✨ (abre `AsistenteDueloHab` con el costo del arma; la trampa con
+  `ElegirTrampa`, conservando `pilar`/`portal`) · ✋ A mano (`especial.aMano = {texto, tirada?, etiqueta?}`: al usarla, el texto a la Mesa y la
+  tirada se tira sola — `Combatiente.aManoEspecial`, en `FichaAcciones.usarArmaEspecial` y `CreepAcciones.usarEspecialCreep`). `cfg.sinEspecial`
+  (el arma de un creep o de una invocación) y `cfg.elegirEstado` (el «+ Estado» de la Ejecución). **Guardar con `AsistenteItem.fusionar(base, d)`**,
+  no con `{...base, ...d}`: si no, a una varita le vuelve el Tipo 8 de fábrica. La Ejecución (`asistente-duelo-hab.js`) conserva lo que no edita
+  (`CONSERVA`) y edita la probabilidad de cada efecto (`caras`/`exitos`). `CreepCalculo.magiaDeItem`/`vaAlEquipo`: una varita equipada a un creep va
+  a su equipo con su `especial`. El editor del catálogo y el generador de tiendas cargan ahora la Ejecución y las trampas.
+- **Guantes de Buena calidad: mecánicas nuevas** (2026-10-05): stats `pdgt4/6/8/10` y `pdgdist` (`Combatiente.pdgExtraArma(valorDe, arma)`: en
+  `FichaCombate.pdgParaArma`, `CreepAcciones.tiradaAtaque`, `InvAcciones.tiradaAtaque` y los ataques con arreglos), `oporahorro`/`contraahorro`
+  (`Combatiente.ahorroEspecial(tipo, valorDe)`: `FichaCombate.costoAtaqueEspecial(arma, tipo, S)` —pasar S—, `CreepCalculo.costoOportunidad/
+  costoContraataque`, `InvAcciones`, el resumen `oporCosto`), `soltarse` (la tirada de Soltarse), `trampaoculta` (`Combatiente.trampaDeHab` y la trampa
+  consumible), `ahorroespsp` (`FichaAcciones.costoEspecial`, `CreepAcciones.costoEspecialCreep`) y `venenista` (en el resumen público; el mapa,
+  `venenistaDe` en js/13, se lo suma a los venenos del duelo).
+- **Marcado** (2026-10-05): preset nuevo (`marcado: true`). `Combatiente.agregarEstado`: al ponerse saca el Sigilo; mientras dura, el Sigilo
+  rebota (`inmunidad` → 'Marcado'); `Combatiente.marcadoEn(estados)`. `FichaAcciones.alternarSigilo` avisa y no entra. El mapa lo hace brillar
+  (`marcado`, `brilloMarca`) y lo deja ver a través de la niebla.
+- **Ejecución, lo nuevo del 2026-10-05:** objetivo `linea` (`largo`), `cadena: {saltos, rango}`, `conVista` en una `onda` (la luz: todos los rivales que ve, en sigilo o no) y `niebla`
+  en una `zona` (crea un elemento `niebla`, no una zona con efecto). Una trampa con `pilar: true` levanta Sólidos de 1 casilla (uno por clic); con
+  `portal: {rango, fijo: true}` se marca también el destino (`portal.destino` en su `trampaEstado`, `TokensAuto.estadoJson`). Las trampas con
+  `cant` se colocan **de a una por clic** (js/13, `trampaDeHabilidad`). Tercera tanda (2026-10-05): `zonaQueda` (un área deja una zona al lanzarse,
+  js/13 `dueloZonaQueda`), `menosDistancia` (−1 por casillero, `dueloAplicarDano`), `atrae` (el gancho, js/13 `dueloAtraer`), `reparte` (dos misiles,
+  js/13 `dueloSegundoMisil`, cascada sin dodge) y `critTipo` (una habilidad física critica como un arma de ese Tipo: `cerrarPar` → `entrarCritico`).
+  Orbes: `orbeResguardo` (Escudo especial N, una vez por turno) y `orbeSalvaje` (1d6) en `FichaAcciones.orbesAlUsar`.
+- **Torso rígido de Buena calidad: mecánicas nuevas** (2026-10-06): **vulnerable** — una resistencia elemental negativa suma daño de ese elemento
+  (ya no se corta en 0: `CreepCalculo.resElemental`, `resistenciasDe` del mapa; el texto, `Combatiente.resElementalTxt(el, res)` → «Res. rayo −2
+  (vulnerable)»). **Guardián** (`guardian`, en el resumen público del personaje y de sus invocaciones): el mapa (`guardianDe`, js/10) le suma esa
+  Defensa a quien recibe el golpe si hay un aliado de su bando a 1 casillero con guardián (vale el mayor; solo si la Defensa cuenta) y abre un
+  momento (`tipo: 'guardian'`, `datos.chico`): la Crónica para todos y un toast para quien maneja al protegido (`momentoRecibido`, js/16).
+  **Inamovible** es un preset (buff, `inamovible 100`); la Armadura del inamovible lo pone al equiparla y trae el mismo bono. `escolta`: solo un
+  recordatorio (✋ a mano).
+- **Turno propio, completo** (2026-10-06, dueño, P161): con el orden de turnos del mapa, `▶ Siguiente` (GM) sube `paso`, deja `termino` y la
+  pantalla que lo tocó aplica (js/04, `turnoDeToken`) el **fin** del turno que termina (`FichaMantenimiento.finTurno` / `CreepAcciones.finTurno`:
+  `Combatiente.contarEstados`) y el **inicio** del siguiente (`inicioTurno`: No2, SP Regen, cooldowns, espera de varitas, pasivas, cuenta de muerte,
+  `Combatiente.dispararEstados`); los caídos salteados igual pasan su turno. Las invocaciones con token en el orden tienen el suyo; las demás van
+  con su dueño (`conTurno`). **Lo que se dispara pega al aplicarse** (`Combatiente.dispararAlAplicar(r, estados, campos)` en cada camino que pone
+  un estado y sabe poner la vida: `EstadosAplicar.aplicarACreep`, `FichaAcciones.aplicarEstadoRecibido`, `InvHabilidades.ponerEstado`,
+  `FichaHabilidades.aplicarEfectoDeConsumo`, el estado propio de una habilidad de creep, los «+ Estado» del mapa, de la ficha —
+  `FichaEditor.agregarEstadoConAviso(…, {alDisparar})`— y de GM Tools); cada estado se dispara una vez por vuelta (`disparado`).
+  `pasarTurnoEstados` = disparar + contar (el ⟳ de siempre). El ⟳ Mantenimiento (`aplicar(S, ui, numero)`, `CreepAcciones.mantenimiento(sc,
+  numero)`) no toca a quien tuvo turno propio durante el Mantenimiento anterior (`finTurnoEn` = número de Mantenimiento;
+  `Combatiente.estadosEnMantenimiento`), ni siquiera escribe su ficha; el cambio de ronda lo pasa solo (`pasarMantenimiento`). Una invocación
+  cuyo token aparece entra al final del orden con el preset «Mareo de invocación» (`invocacionAlOrden`). Cada pase va a la Crónica
+  (`tipo: 'turno'`) y a la Mesa. La lista de turnos gira: el que actúa arriba y una línea «↻ Ronda N+1».
+- **Atacar = ataque normal** (2026-10-06, dueño): el botón Atacar ya no pregunta «¿Qué ataque es?» — va directo al ataque normal (personaje,
+  invocación y creep; ficha, GM Tools y mapa). La oportunidad la ofrece el mapa cuando un rival se aleja (js/17) y el contraataque el duelo después
+  de ganar el Parry y el Bloqueo. El menú de siempre queda en un botón chico de cada Botonera, «↪ Oportunidad o contraataque, a mano»
+  (`data-botoneraaccion="otroataque"`, `data-otroataquecreep`, `data-invotroataque`), por si el mapa no lo detectó (narrativo, mover libre, la ficha suelta).
+
+- **Fuera de turno y Flash** (2026-10-06, dueño): con el orden de turnos el mapa sabe de quién es el turno (`esSuTurno`, js/04). Una acción
+  fuera de turno (atacar, habilidad, consumible, moverse) no se frena: `avisarFueraDeTurno` avisa con un toast y una línea en la Mesa (no avisan
+  las defensas, la oportunidad ni el contraataque). `ConfirmarTurno` ya no pregunta «¿es tu turno?» si la pantalla lo sabe
+  (`window.confirmarTurnoSaber(o)`, con `o.ident = {nombre, ref}`): en turno ajeno cobra lo de turno ajeno y avisa «No es tu turno · ⚡ Flash,
+  cuesta el doble». Las habilidades con Flash (`Combatiente.esFlash(h)`) laten con un brillo en las Botoneras (`bt-flash`, `Combatiente.FLASH_CSS`).
+- **Defensas en No2 negativos** (2026-10-06, P163, a probar): `Combatiente.recargarNo2(max, actual)` (la recarga descuenta la deuda: personaje,
+  invocación y creep, en el turno propio y en el ⟳) y `Combatiente.avisarDeudaNo2({nombre, accion, costo, quedan})` (usa `window.avisoDeudaNo2` si
+  la pantalla lo define —el mapa: `AvisoCombate` para quien la hace y un momento `tipo: 'deuda'` en la Crónica—; si no, un toast). Parry
+  (`FichaAcciones.parryConArma`, `CreepAcciones.pagarParry` → `{aviso, deuda}`, `InvAcciones.tirarStat`), la Evasión que paga el sobrepeso
+  (`FichaAcciones.sobrepesoPagar`) y el dodge roll (js/06 y js/08: `enDodge(id)`) ya no se frenan sin No2; en el duelo, la opción se ofrece con
+  «⚠ sin No2: quedás en negativo». **No aplica al ataque de oportunidad ni al contraataque** (dueño): son ataques y siguen sin bajar de 0.
+- **Stun nuevo** (2026-10-06, dueño): no le toca los No2 (el preset ya no lleva `forzarNitros`, lleva `stun: true`); `Combatiente.stuneado(estados)`
+  (también reconoce un Stun viejo por el nombre). Su Evasión es 1 sin tirar (`Combatiente.tirarStat`); en el duelo solo se le ofrece la Evasión
+  (ficha, creep, invocación y el mapa); en el mapa, cualquier acción o movimiento de un stuneado muestra un cartel con «Hacerlo igual (lo decide la
+  mesa)» (`stunAntes`, js/20). Barrera: 2 turnos.
+
+- **Pies de Buena calidad** (2026-10-06): `levantarse` (`Combatiente.costoLevantarse(valorDe)`, en personajes, invocaciones y creeps), `pasoseguro`
+  (el mapa: `costoPasos(ruta, por, gratis, recargo, seguro)`, `pasoSeguroDe(t)`, una vez por turno), `suelagruesa` (resta al daño de zonas y
+  trampas: `statPiesDe(t, st)`, js/04) y `meditar` (`FichaMantenimiento.inicioTurno`: +SP si `movidoPaso` < `inicioPaso`; `gastarNitros` anota
+  `movidoPaso`). El resumen público lleva `pasoseguro` y `suelagruesa` (personaje e invocaciones).
+- **Levitar** (pies, 2026-10-06; reemplaza a `pasoseguro`): `levitar` = los primeros N casilleros de cada turno sin tocar el piso. El mapa:
+  `costoPasos(…, levita)` (sin terreno lento), `trampasEvaluarRuta(…, levita)` (no pisa ni detecta), `moverToken(…, levita)` (el fuego del terreno
+  solo desde ahí; las zonas no, pueden ser nubes), `levitarRestante` / `levitarUsar` (por turno) y `levitarAterrizar` (al terminar su turno, la
+  trampa donde quedó parado se dispara).
+- **El dado de cada chance** (2026-10-06, dueño): `Combatiente.chanceDado(pct)` elige el dado que da justo ese porcentaje (10 % d10, 13 % d8, 17 % d6, 20 % 9–10 en d10, 25 % d4, 33 % 5–6 en d6, 50 % 2 en d2) y si ninguno, el más cercano (a igual, el más chico). Un efecto de arma con d5 se tira con d10 (`EfectosGolpe.normalizar`, `ItemCorto`), como el d3 con d6.
+- **Titilando** (2026-10-06, dueño: «como en el Contra»): preset nuevo (`titilando`, `invulnerable`, `alEmpezarTurno`, 1 turno). Quien vuelve de estar caído titila, invulnerable, hasta que empieza su próximo turno: `Combatiente.vencerAlEmpezar(estados)` lo saca en `FichaMantenimiento.inicioTurno`/`invInicio` y `CreepAcciones.inicioCreep` (sin orden de turnos, el ⟳ lo cuenta: dura hasta el próximo Mantenimiento). Lo ponen SOLO los efectos que reviven: `FichaAcciones.aplicarRevivirConAnkh` y `revisarMuerte` (✚ Revivir), con `Combatiente.estadoTitilando(presets)`. **Una cura no levanta a un caído** (dueño, el mismo día): `Combatiente.curaQueEntra(hpActual, delta)` y `CAIDO_TXT`; `dispararAlAplicar` acepta `campos.hpActual` (todas las llamadas lo pasan); la regeneración del turno (`aplicarVida`, `invInicio`, `inicioCreep`), una poción (`consumir`) y la cura del duelo (`dueloCurar`) no suben de 0. Subir la vida a mano desde el token avisa y deja seguir (y lo saca de inconsciente, sin Titilando). `Combatiente.titila(estados)`: cualquier estado invulnerable hace titilar el token; el estado público lleva `invulnerable: true`.
+- **Resistencias elementales a la vista** (2026-10-06, dueño): `Combatiente.resElementalesHtml(valorDe, lupa)` — la fila «Resistencias elementales» (🔥 ❄ ⚡ ☠ 🧪; negativa en rojo, «vulnerable») debajo de la de resistencia a crítico, en la Botonera del personaje (con 🔍), Equipo y mochila (con 🔍), la Botonera de una invocación y las Acciones de un creep.
+- **Piernas de Buena calidad** (2026-10-06): `embestida` (PdG en el primer ataque del turno si los últimos 2 pasos fueron en línea recta hasta el rival; el mapa la calcula, `vtt-hexgrid/js/13` `embestidaDe`, y `Duelo.crear` la recibe en `cfg.embestida` → `ataque.embestida`, sumada al PdG al guardarlo) y `pasodoble` (el primer casillero del turno al doble, como Lento: `lentoRecargo` del mapa). El resumen público los lleva (personaje e invocaciones).
+- **Bolsillo de emergencia** (cinturón, desde Raro; 2026-10-06): `Combatiente.emergenciaCruza(antes, ahora, max)` (¿cruzó el 25 % de la vida hacia abajo, sin llegar a 0?) y `pocionEmergencia(cinturon)` (la poción de curación que más cura). El stat `emergencia` y la marca `emergenciaUsada` van en el resumen del personaje; lo aplica el mapa (`vtt-hexgrid/js/24-emergencia.js`).
+- **Anillos Comunes** (2026-10-06): stats `cascara` (Escudo especial que no se recarga: el estado lleva `sinRecarga`), `primerasangre`, `calma` (`FichaMantenimiento.finTurno` / `CreepAcciones.finCreep`: si no atacó, +No2), `foco` y `pulso` (el duelo: `ataque.quieto`), `pasofantasma` (`Combatiente.evaExtraDuelo`, con `window.mapaCasillerosRonda`), `cambiante`, `absorbearmadura` e `impulsofue/des/esp/con` (estados con `anillo: true` e `impulso`, que el resumen publica). El duelo suma `ataque.quieto` al PdG y `ataque.primeraSangre` al daño. Lo de empezar/terminar el combate lo hace el mapa (`vtt-hexgrid/js/25-anillos.js`).
+- **✚ Revive, el consumible** (2026-10-06, dueño: «hagámoslo»): un ítem con `revive: {pct, rango}` (cat-revive: 50 %, 5 casillas). `FichaAcciones.consumir` pide `ui.elegirCaido(it)` antes de gastarlo (null = no se gasta) y después `ui.revivir(caido, pct, it)`; sin esas funciones (la ficha suelta) se gasta y avisa «✋ a mano». A un personaje le llega el aviso `{nombre: 'Revivir', pct}` (`EstadosAplicar.encolarPj`; `limpiarSpec` conserva `pct`): `FichaAcciones.aplicarEstadoRecibido` lo revive (`hpRevivir` + `revivir`, con Titilando) solo si sigue inconsciente y no muerto del todo. Una invocación, a mano (`Recibidos.estado`).
+- **Escudos y orbes de Buena calidad** (2026-10-06): `Combatiente.parryGratis(valorDe, usado)` (Parada fácil), `bloqueoFirme(valorDe, yaRecibio)`, `esEscudo(item)` (un escudo que no es orbe) y `orbeSalvaje(orbe, d6)` (salvaje o domado). Las usan el Parry y el Bloqueo de `ficha-acciones.js`, `creep-acciones.js` (`bloqueoFirmeCreep`), `inv-acciones.js` y las opciones de defensa de los tres duelos. `ficha-resumen.js` publica `conEscudo`, `muroescudos`, `empujon` y `orbeAbsorcion` (y en las invocaciones, los tres primeros). `duelo.js`: hook `cfg.bloqueado(d)` (solo el GM, un duelo que esta pantalla vio terminar «bloqueado»). Detalle en `docs/rework-defensa.md`.
+- **`generador-tiendas.js`** (`GeneradorTiendas`, 2026-10-06, `docs/rework-tiendas.md`) — **la regla de cómo se arma una tienda**: tamaño (cantidad, variedad de partes defensivas, familias de armas, tope de escasez, techo de calidad) × nivel de la zona (`CALIDAD_POR_NIVEL`) × tipo (`TIPOS`: recetas por parte del cuerpo; la clave del Bazar es `alquimista`), golpe de suerte (`SUERTE`), etiquetas de escasez calculadas de los bonos (`ETIQUETAS`, `etiquetasDe`), `parteDe(item)`, `generar({tipo, tamano, nivel, catalogo})`, `otro({tienda, id, catalogo})` y `simular({…, veces})`. Funciones puras; lo usa `gm-toolset/vendor-generator.html`. Nada archivado ni «solo botín» sale. **🛒 Góndola de consumibles** (2026-10-28): todo lo consumible va a la sección `gondola` (fuera de `SECCIONES_EQUIPO`), en categorías de `Combatiente.categoriaGondola`; el ambulante usa `FIJO_AMBULANTE` y `gondolaPorCategoria`.
+- **`buscar-estados.js`** (`BuscarEstados`, 2026-10-08, pedido del dueño) — **el buscador de la lista de estados alterados**: `conectar(contenedor)` pone una
+  caja arriba de la lista ya dibujada y filtra las tarjetas al escribir, por nombre (sin acentos), por su descripción y por palabras clave (`PALABRAS`:
+  «regen», «escudo», «dot», «control», «cc»…); con varias palabras, tienen que estar todas; los grupos vacíos se esconden. Lo usan la ficha
+  (`#presets-body`), GM Tools (`#presets-creep-body`) y `selector-estados.js` (el mapa). **Un estado nuevo con un nombre que no dice lo que hace:
+  sumarle sus palabras clave en `PALABRAS`.**
+- **Áreas por diámetro** (2026-10-08, dueño: «radio 1» se entendía como una sola casilla): todo lo que se lee dice el **diámetro** y las casillas
+  («diámetro 3 (7 casillas)»); adentro se sigue guardando el `radio` (anillos alrededor del centro). `Combatiente.areaTxt(radio)`,
+  `diametro(radio)`, `casillasArea(radio)` y `diametroOpciones(radio, {min, max})` (las opciones de un `<select>` de tamaño: valor = radio, texto =
+  diámetro; lo usan la Ejecución ✨, el asistente de zonas, el de trampas y «Elegir trampa»). Un texto nuevo de un área: «flor de diámetro 3 (7
+  casillas)», nunca «radio N» ni «flor de N». **Las varitas y bengalas que iluminan, siempre una flor de 7 (diámetro 3).**
+- **Duelo: el dado de cada botón y su 🔍** (2026-10-08, dueño): `duelo.js` le pide a la página de quien tira el gancho opcional
+  `vista(d, campo, modo)` → `{formula, titulo, html}` (mensaje `duelo-vista` / `duelo-vista-res`; campo 'pdg' | 'fuerza' | 'bloqueo' | 'dano', y para
+  las opciones de defensa 'eva' | 'parry' | 'contra'). El botón dice «🎲 Tirar PdG · 1d6+1» con un 🔍 (`lupaRegistrar('duelo|', …)` en `lupa.js`: el
+  desglose de la página + «Esta tirada»); `Duelo.conVistas(d, ops, h)` les pone el 🔍 a las opciones de defensa. Lo tienen `FichaDuelo`, `CreepDuelo`
+  e `InvDuelo` (la fórmula sale de las mismas tiradas, sin publicarlas). `lupa.js` acepta proveedores por prefijo: `lupaRegistrar(prefijo, fn)`.
+- **El contador de los estados baja al EMPEZAR el turno** (P177, dueño, 2026-10-08): `Combatiente.empezarTurnoEstados(estados, campos)` (cuenta y
+  después dispara) en el inicio del turno propio de personajes, invocaciones y creeps; `terminarTurnoEstados(estados)` en el fin (solo saca la marca
+  `recien`). `agregarEstado` marca `recien` todo lo que pone, renueva o acumula: si fue fuera de su turno, el primer inicio no descuenta. El ⟳
+  Mantenimiento de la ronda sigue con `pasarTurnoEstados` (`invInicio/invFin(inv, true)`, `inicioCreep/finCreep(sc, true)`).
+- **`filtro-catalogo.js`** (`FiltroCatalogo`, 2026-10-08, pedido del dueño: «ponerle onda» + rango de precio + «slots libres») — **el filtro del catálogo, uno para
+  todos lados**: `crear(contenedor, cfg)` dibuja buscador, chips con cuántos quedan (qué es —`GeneradorTiendas.parteDe`—, calidad, una/dos manos, «🟢 Lugar libre»
+  si `cfg.libre(it)`), orden y «⚙ Más filtros» (Tipo, daño/elemento, que suba, efecto al golpear, precio desde–hasta con `cfg.precio`, peso; `cfg.etiquetas` →
+  «Efecto escaso», `cfg.origen` → «De dónde sale») y devuelve `{f, filtrar(), agrupar(lista), actualizar(), limpiar(), activos(), dibujar()}`; trae su propio CSS
+  (anda en el recuadro aislado del mapa). Suelto: `pasa(it, f, ctx)`, `ordenar(lista, f, ctx)`, `agrupar(lista, f)`, `vacio()`, `cuantos(f)`. Lo usan
+  `ficha-tienda.js` (`st.filtro` = su estado; `FichaTienda.base`, `libre`, `ctxFiltro`), la ficha, el mapa, el generador de tiendas, GM Tools y el editor del
+  catálogo. Necesita `generador-tiendas.js` antes. **Un filtro nuevo del catálogo va acá, no en una pantalla.**
+- **La calidad de los ítems, solo para el GM** (2026-10-08, dueño): `FichaEquipo.veCalidad()` (= `fbMiembro.gm`). Todo lo que un jugador ve de un ítem
+  (tienda, catálogo, mochila, botín, intercambio, asistente de ítems, «Editar y subir», el filtro) muestra la calidad solo si da true. **Un lugar nuevo que
+  muestre `it.tier` a un jugador: pasarlo por ahí.**
+- **Tienda con tres secciones** (P179, dueño 2026-10-08): `GeneradorTiendas.SECCIONES` / `SECCIONES_ORDEN` (⚒ Herrería, 🧵 Talabartería, ✨ Bazar
+  arcano), `seccionDe(item)` (a qué pestaña va cada ítem; con caché) y `seccionesDe(o)` (las que abre una tienda: `secciones`, o su tipo viejo);
+  `generar({secciones, tamano, nivel, catalogo})`. `FichaTienda.secciones(S, st)`, `seccionActual`, `seccionesHtml` (las pestañas, con su CSS) y
+  `elegirSeccion(st, k)`; `st.seccion` = la pestaña abierta (`base` filtra por ella). El filtro (`filtro-catalogo.js`) suma el desplegable
+  **Resistencia a crítico** (`rescrit`: tipo1…tipo5 = contra Tipo 4…12; ya no aparecen en «Que suba», donde «Tipo 4» se confundía con un arma).
+- **Curar estados por grupo** (P180, dueño 2026-10-08): `Combatiente.GRUPOS_CURA` (heridas, venenos, mente, aturdimiento, elementales, fatiga, con sus
+  estados), `grupoCuraDe(nombre)`, `curaDeItem(item)` (lo que cura: `item.curaEstados`, `['todo']` = todos; las copias viejas de Vendas, Antídoto y Cura Plus
+  se reconocen por el nombre), `curarEstados(estados, grupos)` → `{quedan, sacados}` y `textoCura`. Lo aplican `FichaAcciones.consumir` (personaje, ficha y
+  mapa) y `CreepAcciones.consumir`. **Un estado nuevo que se pueda curar con un consumible: sumarlo a su grupo en `GRUPOS_CURA`.**
+- **La góndola de gastables** (P181, dueño 2026-10-08): `GeneradorTiendas.gastable`, `gondolaDe`, `UNIDADES_GONDOLA` (3); `generar` devuelve `gondola`;
+  `TAMANOS[t].min/max` son ahora por sección y `TAMANOS[t].gondola` las variedades de cada góndola. La tienda del jugador (`FichaTienda`) muestra «🧺 quedan
+  N» y descuenta las unidades al comprar (`tienda/stock.gondola`). Drops de los creeps más frecuentes (`CombateFin.dropChance` / `dropSegundo`).
+- **Cómo se ve una trampa** (dueño, 2026-10-08: «al verla tenés que entender que es una trampa y más o menos cómo funciona»): `ItemCorto.trampaHtml` lleva el
+  distintivo «🪤 Trampa · se coloca en el mapa · la dispara un rival al pisarla» y `trampaFilas` separa **Se dispara** (la superficie que se pisa: `tipo`/`tamano`)
+  de **Alcanza** (el efecto: `efecto.area` pisador / trampa / flor con su `radio` y `centro`, y si está en el piso o en el aire). Antes era una sola fila «Forma».
+- **🏹 El arco suma la mitad del Dmg** (2026-10-09, dueño; `../docs/rework-armas-rango.md`, `../docs/balance-combate.md`): rasgo de arma `arco`
+  (en `Combatiente.RASGOS_ARMA`: un ítem lo lleva suelto, un creep o una invocación en `armaRasgos`). `Combatiente.dmgDelArma(arma, dmg)` = cuánto
+  del Dmg suma el daño (cuerpo a cuerpo entero; arco la mitad, para arriba; otra de rango nada), `esArco(arma)` y `dmgDelArmaTxt(arma)`. Lo usan
+  las tres cuentas de daño (`FichaCombate.armaDanoTxt`, `CreepCalculo.danoTxt`, `InvCalculo.danoTxt`), sus 🔍, la ficha lite e `ItemCorto`; el
+  asistente de ítems pregunta «¿Es un arco?» cuando el arma es a distancia. El Tipo es el dado (un arco de d6 es Tipo 6). **Distancia mínima y
+  oportunidad** (P183, abierta para la mesa): `Combatiente.ARCO_LIBRES` (2), `arcoMuyCerca(arma, distancia)`, `sirveDeOportunidad(arma)`;
+  `ataqueDeArma` lleva `arco` (el mapa, al elegir el objetivo: brillan solo los que están a 3+ y uno más cerca avisa y deja seguir —lo decide
+  la mesa, con línea en la Mesa—); `armaDeCombatiente` ahora trae `armaDeRango`. Sin oportunidad con el arco: `FichaResumen` publica `sinOpor`
+  (personaje solo con arcos; invocación con arco), `CreepCalculo.oportunidadPosible` da false y el mapa no frena ni ofrece el arco (js/17).
+- **🏹 Línea de tiro, tiro alto y distancia ideal** (2026-10-09, dueño; `../docs/rework-armas-rango.md`): rasgos de un arma de rango `tiroAlto`
+  (por encima de los tokens, no de los Sólidos; `Combatiente.TIRO_ALTO_MIN` 4, `TIRO_ALTO_PDG` −2) e `ideal = {donde: 'cerca' | 'medio' | 'lejos' |
+  'franja', ancho, desde, hasta, pdg, crit, critpot, fijo, ignora}` (`Combatiente.franjaIdeal(ideal, alcance)`, `bonoIdeal(arma, distancia, alcance)`,
+  `idealTxt`); los dos están en `RASGOS_ARMA` y `ataqueDeArma` los lleva. El duelo acepta `cfg.tiro = {pdg, crit, critpot, fijo, ignora, motivo}`
+  (`ataque.tiro`): lo suma al PdG al guardarlo (puede ser negativo), al crítico, a la resistencia ignorada y al daño, y lo muestra («🏹 distancia
+  ideal: …»). El asistente de ítems los pregunta en un arma a distancia; `ItemCorto` los muestra y explica; `calculadora_armas.py` les pone precio.
+  **El tiro alto es de todos los arcos** (`Combatiente.tieneTiroAlto(arma)`): un arco sin él lleva `sinTiroAlto` (debilidad, lo abarata); otra
+  arma de rango, solo con `tiroAlto`. La comba quedó para después (P185: falta definir cuán curva es).
+- **🏹 Mecánicas de arco** (2026-10-11, dueño; `../docs/ideas-arcos-flechas.md`): `Combatiente.RASGOS_ARCO` (también en `RASGOS_ARMA`; valen en
+  cualquier arma de rango) = `tensar`, `largoAlcance`, `emboscada`, `matabestias`, `contraMarcado`, `espaldaDistancia` {pdg, fijo} y `afinidad`.
+  `ataqueDeArma` los lleva al ataque; `largoAlcance(arma, distancia, alcance)`, `alcanceMaximo`, `afinidadEfectos` y `arcoRasgosTxt` (el texto de
+  `ItemCorto`); los aplica el mapa al apuntar (`vtt-hexgrid/js/35-arcos.js`). El asistente de ítems los pregunta en un arma de rango; el glosario
+  los explica. `CreepCalculo.tarjetaPublica` publica `tipoCriatura` (Matabestias). `GeneradorTiendas`: un ítem con `gondolaFija` sale siempre en
+  la góndola de su sección (las 4 flechas elementales).
+  **Las de ballesta** (2026-10-11, `../docs/ideas-ballestas.md`) se sumaron a la misma lista: `caida` (`caidaDano`), `apuntadaFirme`, `tiradorApoyo`,
+  `remate`, `primerDisparo` (el duelo acepta `tiro.dado`: un dado de daño de más; y `tiro.fijo` puede ser negativo), `puntaDiamante` y
+  `remachadora` (`Duelo.crear` los guarda en el ataque; el mapa del GM los suma a la Perfora; hook `remachadoraErro` de `Duelo.escuchar`),
+  `recuperable` y `cargador`; además `dobleCuerda` / `tiroRapido` (`Combatiente.recargaCosto(arma, h)`: el costo del disparo h+1 con Recarga) y
+  `carcajExtra` (`FichaEquipo.capCarcaj(c, S)`). Una flecha o virote con `flecha.sinDano` pega sin daño (el Virote de red).
+- **🏹 Flechas especiales y el carcaj** (2026-10-09, dueño; `../docs/ideas-arcos-flechas.md`): las flechas comunes son ilimitadas; las
+  **especiales** son consumibles con `flecha = {no2, pdg, crit, critpot, ignora, perfora, efectosGolpe}` (21 en `catalogo.js`, ids `flecha-*`; sus
+  efectos son **siempre**, sin %: lo fuerte se paga con No2 y oro) y se venden en la góndola de la Talabartería (`GeneradorTiendas.gondolaDe`). El
+  **carcaj** es una pieza propia (`tipoItem: 'carcaj'`, lugar «Carcaj» en `FichaEquipo.SLOT_DEFS`, `capFlechas`; 4 en el catálogo, `carcaj-*`) que
+  guarda las flechas adentro (`carcaj.flechas`): `FichaEquipo.carcajDe`, `capCarcaj`, `carcajUsado`, `flechasDelCarcaj`, `alCarcaj` / `delCarcaj`
+  (gratis fuera de combate; en combate como equipar), `gastarFlecha`, `flechaTxt` y `carcajHtml` (en «Equipo y mochila»). **Todo arco viene con el
+  Carcaj de cuero (10)** si no tenía ninguno (`FichaTienda.crearItems`). Una flecha no se «consume» (`FichaAcciones.consumir` la rechaza; la
+  Botonera no la lista). Al disparar con un arco desde el mapa: «¿Qué flecha?» (js/11 `bnElegirFlecha`), se gasta y cobra su No2 al crear el duelo
+  (`bnDispararFlecha`; un carcaj veloz, `saqueRapido` = N: las primeras N flechas del turno que cuestan No2 tiran una moneda, 2 = gratis), sus bonos van al `tiro` y sus efectos y su Perfora al duelo
+  (`cfg.flecha` → `ataque.flecha`: `guardarDano` suma los efectos; el mapa resta la Perfora de la Defensa). Si erra: hook `flechaErrada` del duelo
+  (vtt-hexgrid/js/33). Los creeps con arco dejan siempre una flecha especial (`CombateFin`, `peleaConArco`). **Falta:** elegir flecha en la ficha
+  suelta, en las Acciones de un creep y en las invocaciones.
+- **`glosario.js`** (`Glosario`, 2026-10-09, pedido del dueño) — **los términos del juego con globo al pasar el mouse**: un solo glosario armado de
+  los estados (`ESTADOS_PRESET`, su `detalle` sin las notas ⚙/✋), los bonos de las piezas (`FichaCalculo`: el `full` de cada stat) y las mecánicas
+  de armas y flechas (`MECANICAS`: Tipo, Perfora, tiro alto, distancia ideal, Crítico frecuente/potente, daño elemental, salto, carcaj…).
+  `marcar(texto)` → HTML con cada término (la primera vez que aparece; no los básicos: PdG, Evasión, Defensa…) en `<span class="glo">`; el globo
+  lo arma este archivo solo, en cualquier pantalla (también en los recuadros aislados del mapa: `composedPath`). `def(termino)`, `CSS` (va dentro de
+  `ItemCorto.CSS`). Lo usa `item-corto.js` en la grilla, el «Ver» y las filas de una trampa; se carga **antes** de `item-corto.js` (ficha, GM Tools,
+  generador de tiendas, editor del catálogo, mapa). **«Detalles técnicos» de un arma ya no repite lo que explica un globo**: queda el Peso, el
+  Alcance/Rango, la línea de tiro, cómo se tiran los efectos y la durabilidad, en una lista corta. **Un término nuevo**: sumarlo en `MECANICAS`, o
+  darle `full` a su stat o `detalle` a su estado.
+- **`flotantes.js`** (`Flotantes`, 2026-10-09, pedido del dueño) — **los botones de recordatorio** (en el mapa, arriba en fila a la izquierda de la barra de los lentes, a su altura —2026-10-10, elección del dueño—; en la ficha suelta, abajo a la izquierda): `moneda({mostrar, sub, alClic})`
+  dibuja (o saca) el de la 🪙 Moneda Re-Roll —con brillo de moneda, mientras tengas una: un recordatorio— y `apilar()` acomoda la 🦋 Polilla, el 💍
+  anillo de impulso y la moneda uno arriba del otro (cada pantalla lo llama después de dibujar o sacar uno). Lo usan el mapa (js/02, js/25; la moneda
+  con `resumen.moneda` de su personaje) y la ficha suelta (js/03, `renderMonedaFlotante`; adentro del mapa no, la pone el mapa).
+- **Extenuado y Empower** (2026-10-12): `Combatiente.extenuado(estados)` / `conExtenuado(estados, costo)` suman el recargo de No2 de Extenuado
+  (Maldición extenuante) en cada costo (personaje, creep, invocación; el mapa lo suma al moverse con `costoPasos(…, ext)`). `Duelo.tiradaSumable(m, lado)`
+  y `Duelo.sumarATirada(id, lado, n, marca, usa)` (el nombre de lo que suma, para el aviso del empate); `Flotantes.empower(o)` (el botón 💪).
+- **`confirmar.js`** (`Confirmar`, 2026-10-10, pedido del dueño) — **el cartel del juego para preguntar sí o no**, en vez del `confirm()` del
+  navegador (que además congelaba la pestaña con la extensión de Chrome): `Confirmar.preguntar(texto, {titulo, icono, si, no, peligro})` →
+  `Promise<boolean>` (Esc / ✕ / clic afuera = no; Enter = sí). Trae su propio estilo y va arriba de todo. Lo cargan todas las páginas; **no se usa
+  más `confirm()` en ningún lado**. Quien lo llama es `async` y hace `await`; los `ctx.confirmar`/`ui.confirmar` que
+  se inyectan a las piezas comunes son `(t, o) => Confirmar.preguntar(t, o)` y las piezas los esperan con `await`. Excepción: `CreepAcciones.ejecutarHab`
+  e `InvHabilidades.ejecutar` siguen sincrónicas (corren en una transacción): el Silencio se pregunta antes con `confirmarSilencio(...)` y se les
+  pasa `silencioOk = true`. `AvisoCombate.preguntar` delega en este.
+- **`dock-izq.css`** (2026-10-12) — los estilos del menú de botones de la izquierda (`.dock-izq`, `.dock-btn`, `.dock-ico`, `.dock-txt`), que
+  comparten la ficha y GM Tools (salieron de `ficha.css`). Cada página pone sus botones.
+- **`combate-fin.js`, quién cuenta** (2026-10-12): `fuera()` / `fueraCambiar(id, afuera)` — los personajes que el GM deja afuera de los cálculos
+  (`gm/personajes`); `jugadores()` los arranca destildados.
+- **La Defensa especial va siempre con la Defensa** (dueño, 2026-10-12): «Def. especial» (antes «Armad. mágica») en las botoneras de
+  personaje, invocación y creep, debajo de la Defensa en Equipo y mochila, en la cabecera de la Botonera («Def 2 · Def.Esp 0») y siempre en
+  la ficha lite.
+- **Proyectil perforante** (2026-10-13): `duelo.perforante` (al nivel del duelo, como `soloCritico`) viaja con `Combatiente.ataqueConArreglos` y
+  `Duelo.crear` lo guarda en el ataque; el segundo golpe lleva `ataque.sinEfectos` y `Duelo.guardarDano` le vacía los efectos (del arma, la flecha y
+  el crítico; tampoco tira daño mágico de efectos). La Ejecución (`asistente-duelo-hab.js`) lo conserva al editar.
+- **La vida en X** (2026-10-13, Balas de sangre): `hpCosto: 'X'` → `FichaHabilidades.hpVariable(h)` (cuenta en `habCostoVariable`). El cartel del
+  costo X (ficha `#scrim-costox`, mapa `#bn-costox`) suma «Vida (HP) a gastar»; `FichaAcciones.confirmarCostoVariable(S, it, sp, nitros, arma, ui,
+  hp)` la valida (de 1 a `limiteCostoX(S, 'hp', it)` = el Especial; tiene que sobrar vida), la cobra y pasa la X a la Ejecución en una copia
+  (`{...it, _xHp}` → `xDeHab`). `Combatiente.habEjecucion` reemplaza la «X» de la fórmula de daño (`Xd4`). Solo personajes. **Ojo**: el paso Costo
+  de la Ejecución ✨ y el editor guardan el HP como número: editar la skill ahí le borra la «X».
+- **Habilidades «una vez por turno»** (2026-10-13, Sprint): `h.unaVezPorTurno` → `FichaAcciones.ejecutarHabilidad` cuenta los usos en
+  `S.ataquesArma['hab:<id>']` (lo vacía el turno) y, si ya la usó, pregunta «¿Usarla igual?» (avisa y deja seguir). Preset nuevo **Sprint**
+  (`sprint: 3`, `alEmpezarTurno`), publicado por `FichaResumen` (`sprint`).
+- **Sub-duelo que arranca en el dodge roll** (2026-10-13, Tormenta arcana): `hab.soloDodge` (lo conserva `limpiarHab`, junto con `hab.tormenta`)
+  hace que `Duelo.crear` de un sub-duelo de área (`cfg.grupo`) empiece en la fase `dodge` (sin tirada); el cuadro dice «¡CAE LA TORMENTA!» y el daño
+  que le toca.
+- **⚔ Contraataque al esquivar** (2026-10-13, Warrior): un personaje con una habilidad `contraEsquiva` marca su opción de Evasión
+  (`FichaDuelo.opcionesDefensa` → `op.contraEsquiva`); al elegirla, `duelo.js` mide si alcanza al atacante (`alcanceContra`: tokens del mapa
+  activo + el `alcance` que devuelve `armaContra`) y lo guarda en `defensa.{contraEsquiva, contraAlcanza, contraDist, contraAlcance}`. Si gana
+  la Evasión, el veredicto ofrece «¿Contraatacás?» (como tras Parry + Bloqueo); el gancho `contraEsquivaPagar(d, arma)` cobra 2 SP (o devuelve
+  por qué no) y se abre el duelo `contra` de siempre (el No2 de un primer ataque lo cobra al tirar el PdG). Solo personajes.
+- **✨ Carga Elemental y el estado según el daño** (2026-10-13, Mago): `Combatiente.CARGAS` (fuego, hielo, rayo, acido, toxico: lo que le cambia a
+  la Ejecución), `cargable(it, c)`, `conCarga(c, clave)`; en la Ejecución, `danoMult` (→ `hab.dano.mult`, el mapa lo aplica al daño tirado) y
+  `porDano = {estado, cada, mas1}` (→ `hab.dano.porDano`; `stacksPorDano(entro, p)`: 1 cada `cada` de lo que entró, mínimo 1; con `mas1`, 1 y uno
+  más cada `cada`). «Stacks según el daño» es una opción de cada skill, no una regla general de los elementos (dueño). `FichaAcciones.terminarEjecucionHab`
+  pregunta la carga (`cargaElemental`) antes de lanzar una dirigida. La Escarcha, al reaplicarse, suma los stacks que trae (antes siempre 1).
+  `Confirmar.elegir(texto, {titulo, icono, opciones: [{valor, texto, detalle}], no})` → Promise<valor | null>: una pregunta con varias opciones.
+- **⚡ Salto eléctrico, regla general** (dueño, 2026-10-13): 4 casillas (`RAYO_SALTO_MAX`, js/10; `cadena.rango` por defecto 4); cada salto es la
+  mitad de lo que le ENTRÓ al anterior y resta la Res. eléctrica de quien lo recibe (`rayoCadenaAplicar` lo recorre de verdad y devuelve los saltos
+  que hubo); salta todas las veces que pueda hasta llegar a 1 (sin el tope de `saltos`, salvo la flecha sin daño). La Parálisis, la de cada cosa.
+- **El equipo de un creep vivo, a medias** (2026-10-13, dueño: «que vean que tiene una varita, un pico, pero no el detalle hasta que mueran»):
+  `CreepCalculo.tarjetaPublica(sc)` publica, mientras el creep tiene vida, solo qué es cada cosa (`nombreGenerico`: «Varita del susurro» → «Varita»,
+  salteando «Buena», «Gran»…); con vida 0, los nombres de verdad. El arma natural se ve siempre. GM Tools vuelve a publicar al entrar si lo público
+  no coincide; el mapa del GM ve los nombres de la ficha privada.
+- **Drops fijos de un creep** (2026-10-14, dueño, la Grapa del capataz: «aunque la consuma, quiero que esté entre sus drops»): `sc.dropsFijos`
+  (nombres del catálogo, hasta 10; `CreepCalculo.dropsFijos`) — `CombateFin.itemsDeCreep` los suma siempre al botín (un consumible con
+  `plantillaConsumible`, lo demás con `plantillaDeCatalogo`) y `dropsResumen` los lista «(drop fijo)». Se editan en GM Tools → Recompensas.
+- **Área con el centro cerca y onda solo de aliados** (2026-10-13, Capataz kobold): `duelo.centroAlcance` (un área cuyo centro va a esa
+  distancia o menos, y no en la propia casilla: Golpe al piso = 1) y `duelo.aliados` (un área u onda que alcanza solo a los del bando de quien
+  la usa: ¡A laburar!). Los pasa `Combatiente.habEjecucion`; los mira el mapa (`dueloElegirAreaMapa`, js/13). Todavía no están en el asistente
+  de la Ejecución (si se reedita la habilidad con el asistente, se pierden: volver a ponerlos).
+- **🪨 La honda** (2026-10-14, dueño): rasgo de arma `honda` (en `RASGOS_ARMA`; un creep o invocación, en `armaRasgos`). `Combatiente.esHonda`
+  (nunca a la vez que arco), `dmgDelArma` (la mitad del Dmg, como el arco), `alcanceArmaRango(arma, rng)` / `alcanceHonda` (la mitad del Rango,
+  para abajo: `HONDA_RANGO`, provisorio, P198) — lo usan `FichaCombate.alcanceDeArma`, `CreepCalculo.alcance` y las invocaciones —,
+  `sirveDeOportunidad` (no), sin Recarga, sin munición, sin tiro alto. El asistente de ítems pregunta «¿Es una honda?»; `ItemCorto` y el
+  glosario la nombran. Una sola en el catálogo (Honda de piedras); la serie y la auditoría, en `docs/pendientes.md`.
+- **🐾 Equipo natural de un creep** (2026-10-14, dueño: «que los ítems defensivos también puedan marcarse como armadura natural, para darles
+  equipos inspirados en el catálogo que no dejen el drop»): una pieza del equipo de un creep con `natural: true` da sus bonos pero no se suelta
+  (`CombateFin.itemsDeCreep`, y por eso el botín estimado; `CreepCalculo.dropsResumen`); en la tarjeta pública se ve con su nombre, como el arma
+  natural. El 🐾 de cada pieza en GM Tools (editor del creep y su vista) la marca o desmarca.
+- **🗡 Por la espalda, regla general, y 👣 Pasos silenciosos** (2026-10-15, P200): `duelo.js` acepta `cfg.espaldaPdg` (lo calcula el mapa: +1 en el
+  punto ciego, +2 con Pasos silenciosos) → `ataque.porLaEspalda` + `ataque.espaldaPdg`, sumado al PdG al guardarlo («+N espalda») y al texto
+  «🗡 por la espalda: +N PdG»; se suma al bono «por la espalda» del arma (que sigue pidiendo sigilo). Stat nuevo `pasossilenciosos`
+  (`FichaCalculo.EXTRA`; `FichaResumen` publica `pasosSilenciosos`; `CreepCalculo.tarjetaPublica` publica el booleano) y la pasiva
+  `pasos-silenciosos` en `pasivas.js` (jobCosto 1).
+- **`asistente-duelo-hab.js`: el editor de la Ejecución ES el cuadro del duelo** (2026-10-15, `../docs/plan-editor-ejecucion.md`, dueño: «quiero que
+  visualmente se vea igual el editor de un duelo como cuando uno lo está ejecutando»). Ya no usa la ventana común paso a paso: abre `#ejd-fondo`
+  con los estilos de `duelo.js` (`Duelo.estilos`; por eso el editor del catálogo y el generador de tiendas cargan también `duelo.js`) y los mismos
+  recuadros (Declaración, la zona que queda, Contacto, Daño, Efectos; un ataque con el arma: PdG, defensa, Bloqueo, Crítico, Daño, Efectos). Cada
+  botón o caja con ✎ (`data-ejd-pop`) abre debajo sus controles (`st.pop`; los `cuerpo*` de siempre, con los colores del duelo). Lo nuevo en el dato:
+  `objetivo: 'cualquiera'`, `tiraBono`, `contra` con `{stat, bono}` / `{formula, etq}` (`Combatiente.contraDeEjecucion`; `limpiarHab` los conserva y
+  `opcionesHab` muestra la fórmula), `zonaQueda.{enMantenimiento, cadaPaso, soloRivales}`, `danoFormula` (la fórmula del daño se escribe acá; si es
+  otra que la «segunda tirada» de la habilidad, manda esta) y `danoMas` (un fijo y/o un dado que se le suma, también al daño del arma),
+  `centroAlcance: 'rango'`. `cfg.formulaDano` (lo pasan los cinco editores que la abren) es la fórmula de la habilidad. En las pruebas: `ejd(s)`,
+  `ejdPop(id)`, `ejdGuardar()`.
+- **🃏 Wildcards** (2026-10-15, `../docs/reroll.md`): repiten una tirada como la Moneda Re-Roll, pero se gastan siempre. `ficha-duelo.js`
+  (`wildcards`, `conQueReroll`, `usarReroll(S, h, ui, con)`, hooks `rerollInfo`/`rerollUsar(d, campo, con)`), `duelo.js` (el botón «🃏 Wildcard» junto
+  al 🪙), `flotantes.js` (`Flotantes.wildcard`: la cartita que gira), `ficha-resumen.js` (`resumen.wildcards`), `ficha-mantenimiento.js`
+  (`descansar(S, {wildcards})`: el descanso del día las carga hasta 1 o 2).
+- **💔 Aplicar el daño en el duelo** (2026-10-17, dueño: un clic del jugador antes de recibir daño automatizado): `duelo.js` `pideAceptar(d)`
+  (el defensor no es un creep) → el GM no reclama ni aplica el daño hasta que `dano.aceptado` (`aceptarDano`, el botón `[data-dano-aceptar]`
+  del paso 5: «💔 Aplicar el daño» para el dueño o quien tiene 🎮 el control, «💔 Aplicar por …» para el GM). En las trampas, el paso
+  `dano-aplicar` (vtt-hexgrid/js/19).
+
+- **El Ef.Esp de un arma especial, para arriba** (2026-10-17, dueño, con el Báculo de escarcha): `Combatiente.sumaEspecialDe(dmgesp, sumaEspecial)`
+  (true = entero, 0.5 = la mitad, 0.25 = un cuarto: los seis báculos) redondea **para arriba** y lo usan personajes y creeps; `sumaEspecialTxt`.
+  El asistente de ítems ofrece «Un cuarto» (antes borraba el ¼ de un báculo al editarlo). El Báculo de escarcha deja la Escarcha por daño
+  (`duelo.porDano = {estado: 'Escarcha', cada: 5, desde: 5, turnos: 1}`: 1 por cada 5 que entran, 1 turno; `porDano.turnos` = cuánto dura lo que deja), no por porcentaje. La habilidad (`danoSumaEsp`, Toque
+  mágico) sigue para abajo.
+- **Con qué para un creep o una invocación** (2026-10-17): `Combatiente.piezasParaParry(equipo, slotDe, pesoDe)` — lo de sus manos que sirve
+  para parrear (escudos primero, después un báculo o un arma cuerpo a cuerpo; no un orbe, una varita ni un arma de rango), la misma regla que un
+  personaje. Lo usan `CreepCalculo.defensa` e `InvCalculo.defensa`. Antes miraban solo la ranura de escudo: un orbe parreaba y un báculo no.
+- **✍ Elegir manualmente, en todos los pasos del duelo** (2026-10-17, dueño: «cada uno de los pasos del duelo deben tener la alternativa de
+  tirarla a mano»): ya estaba (2026-10-15) en el PdG, la defensa, la Fuerza del golpe, el Bloqueo y el daño (con qué Defensa resta); se sumaron
+  el **crítico** (`manualCriticoHtml`: los d20 escritos → `tirarCritico(id, aMano)`) y los **efectos** (`manualEfectosHtml`: «✔ Funcionó» /
+  «✘ No funcionó» por cada uno → `tirarEfecto(id, i, {exito})`; el tablero muestra ✍).
+- **`rodillo.js`** (`Rodillo`, 2026-10-18, dueño: «el rodillo quedará como opción para ocasiones que lo ameriten») — **un sorteo con su momento**:
+  `Rodillo.girar({titulo, subtitulo, opciones: [{nombre, detalle, extra}], elegido, girar, aplicar, ms, auto})` → Promise al tocar «Aplicar». El
+  resultado ya viene decidido (`elegido`): el rodillo muestra los nombres pasando de abajo hacia arriba, frenando hasta clavarse en el elegido, y
+  después «¡Salió X!» con su detalle y `extra`. Lo usa la Varita del caos (vtt-hexgrid/js/13: `caosAnunciarD20` → `caosRodillo`). Los creeps
+  también usan la varita: `CreepAcciones.habDeEspecialCreep` lleva `caos` y `terminarHab` llama `ui.caos` (js/12).
+- **😱 El Miedo nuevo** (2026-10-18, dueño, con la Calavera con vela): ya no es −2 PdG y −2 Daño. El preset (`miedo: true`, `alEmpezarTurno`)
+  lleva `miedoDe` / `miedoDeNombre` (quién lo asustó; los conservan `EstadosAplicar.limpiarSpec/componer`, `FichaAcciones.estadoDeSpec` y el
+  resumen público). Moverse hacia él cuesta 2 No2 por casillero (el mapa) y `Duelo.crear({miedo: 1})` → `ataque.miedo`: −1 al PdG (o PdG.Esp)
+  y −1 al daño, con arma o habilidad. `CreepCalculo.auraMiedo(sc)` y `itemParaCreep` conservan `auraMiedo` (el radio del aura de la Calavera).
+- **Los controles por grupo** (2026-10-18, dueño, P210): `Combatiente.GRUPOS_CC` (mental, aturdimiento, herida, sentidos, atrapar, equilibrio,
+  desarme, cada uno con su `resiste`), `grupoCC(estado|nombre)`, `esMental`, `esControl`, `resisteCC` (el id del stat) y `resisteCCEtq`
+  («Res.Mt»…). `Combatiente.inmunidad`: la Inmunidad a CC frena todo control; la **Inmunidad mental** (`inmunidadMental`, preset nuevo) solo los
+  mentales. La Ejecución ✨ (al poner un control sin resistencia elegida) y los asistentes de trampas (al elegir el estado) proponen la resistencia
+  del grupo; se puede cambiar. **Un control nuevo: sumarlo a su grupo en `GRUPOS_CC`.**
+- **🔮 Talismanes** (2026-10-18, dueño; `../docs/talismanes.md`): ítems `tal-*` de la otra mano (`orbe` + `talisman`: no parrean). Lo que hacen solos:
+  `auraMiedo` (la Calavera, el mapa js/52), `espejito` / `relicario` (el resumen público y `CreepCalculo.talisman(sc, campo)`; el mapa js/53),
+  `alPegarVarita` (`Combatiente.efectosVarita(items)`: `FichaAcciones.habDeArmaEspecial` y `CreepAcciones.habDeEspecialCreep` le suman ese efecto a
+  la varita, con un `detalle` «🔮 …» que el mapa usa para que entre una vez por turno; `efectoDeEjecucion` ahora conserva el `detalle`) y `gauchito`
+  (`Combatiente.conGauchito`: `FichaAcciones.tirarValorStat` agrega un Afortunado a la primera tirada de PdG, PdG.Esp, Evasión o Parry; marca
+  `S.ataquesArma._gauchito`). `afortunado()` acepta `afortunadoStats` en el estado.
+
+- **🏹 La munición del botín la decide el arma** (2026-10-19, dueño): `CombateFin.municionDeCreep(sc)` → 'flecha' | 'virote' | '' (`Combatiente.municionDe`
+  del arma, o el nombre «Arco…» / «Ballesta…» en los creeps de fábrica, que no traen esos datos). El que la usa suelta siempre una del tier de su nivel;
+  el consumible al azar ya no trae munición (`poolGeneral`); el 🎲 vuelve a tirar dentro de su tipo. `CreepCalculo.itemParaCreep` conserva `flecha`
+  (antes la perdía, y la flecha segura de los arqueros nunca salía).
+- **🎁 El consumible al azar, por familia y arquetipo** (2026-10-19, dueño): `CreepCalculo.ARQUETIPOS` (guerrero, mago, tirador, trampero),
+  `arquetiposAuto(sc)` (de sus datos), `arquetiposManual(sc)` (`sc.arquetipos`, lo elige el GM en Recompensas), `arquetipos(sc)` y `arquetiposTxt`.
+  `CombateFin`: `DROP_TABLA` (la calidad por nivel), `FAMILIAS`, `FAMILIA_PESOS` (por arquetipo; varios se promedian: `pesosDe(sc)`) y
+  `familiaBotin(item)` (lo que hace el consumible; un ítem puede forzarla con `familiaBotin`). `dropElegir(cat, tier, pesos)`: dentro de la calidad,
+  primero la familia y después el ítem. Solo humanos y humanoides sueltan consumible (`DROP_OTROS` = 0). `sinBotin: true` en un ítem: nunca sale
+  (la Cuerda). **Un consumible nuevo que no encaje en una familia: darle `familiaBotin`.**
+- **🎲 El consumible al azar nace con el creep** (2026-10-19, dueño): `CombateFin.cuantosAlAzar(sc)` (humano o humanoide 1, jefe 2, el resto 0),
+  `consumibleAlAzar`, `darConsumiblesAlAzar(sc, cat)` (saca los anteriores —`azar: true` en el cinturón— y pone nuevos; `sc.consumibleAzar` = los
+  nombres) y `quitarConsumiblesAlAzar`. Son su drop aunque los use; con `sc.consumibleAzar`, `dropDeCreep` no sortea al morir. GM Tools se lo da al
+  «✔ Crear» del asistente y lo cambia con 🎲 en Recompensas.
+- **📜 Consumibles: `efectoFinCombate`** (el estado lleva `finCombate`: se va al «Finalizar combate», vtt-hexgrid/js/25, y al descansar),
+  **`efectoParty`** (el mismo estado a los aliados del mapa: `FichaAcciones.consumir` llama `ui.alGrupo(estado, item)`; el mapa, `bnEfectoAlGrupo`)
+  y **`efectoRecarga`** (un escudo que se renueva cada turno). 2026-10-19, los pergaminos.
+- **🎁 Arquetipos del botín, versión 2026-10-20** (reemplaza a las familias con pesos): `CreepCalculo.ARQUETIPOS` = pesado, liviano, caster, rango
+  (`arquetiposAuto`: rango si su arma es a distancia; caster si el Especial gana a Fuerza, Destreza y Agilidad o lleva varita o foco; si no,
+  pesado o liviano por Fuerza+Constitución contra Destreza+Agilidad; los nombres viejos se leen). `CombateFin.arquetiposBotin(item)` (o el campo
+  `arquetiposBotin` del ítem) y `dropElegir(cat, tier, arqs)`: uno al azar entre lo de sus arquetipos y lo universal. Lista: docs/botin-arquetipos.md.
+  `sc.municionAzar`: la flecha o el virote con que nace un creep con arco o ballesta (en el cinturón; drop seguro).
+- **📋 «Batalla terminada», paso a paso** (2026-10-20, dueño): `CombateFin.vista` muestra un paso por vez (`rep.paso`, `PASOS_BOTIN`): Equipo →
+  Consumibles → Doblones → Experiencia → Publicar, cada uno con su consejo para el GM; `data-rep-ir` cambia de paso y el 📢 Publicar aparece recién
+  en el último (`publicar: 'oculto'` antes). `dropDeCreep` pone en el botín **todos** los consumibles del creep (el al azar, su flecha o virote y lo
+  que le quede en el cinturón): los que usó, tildados; los que no, destildados (`rep.quitados`). `rep.drops[scId]` guarda `{nombre, usado}`.
+- **📜 Consumibles con Ejecución y 🔓 soltarse** (2026-10-20, la Red Nerubian): un consumible con `duelo` arma una habilidad de un uso
+  (`Combatiente.habDeConsumible`) y va al cuadro del duelo como una varita. Un estado con `soltar.alEmpezar`: la tirada para soltarse aparece sola al
+  empezar el turno de quien lo tiene (gratis, una por turno; sin el botón 🔓 de reintentar) y `soltar.difStat` toma el stat de quien lo puso
+  (`efectoDeEjecucion(e, valorDe)`); con `soltar.ayuda`, un aliado pegado puede ayudar (1 No2, su propia tirada). Lo hace el mapa: vtt-hexgrid/js/54.
+- **🙈 Ceguera nueva** (dueño, 2026-10-20): `Combatiente.CEGUERA_VISION` (2 casillas de visión), `ciego(estados)`; la mitad del PdG y del PdG.Esp
+  (`mitadesDeTirada`, sin el −2 de antes); el mapa avisa al elegir un objetivo o el centro de un área a más de 2 (`cegueraPermite`, js/13).
+  Contra un ataque a distancia (`Combatiente.aDistancia(d)`: un disparo, o un hechizo dirigido desde más de 1 casilla, con
+  `window.mapaDistanciaTokens`) su Evasión vale la mitad: `ciegoContraDistancia(d, estados)` en `defender`, `habTirar`, `opcionesDefensa`, `vista` y
+  `habValor` de FichaDuelo, CreepDuelo e InvDuelo. Todo «Cegado» entra como la Ceguera (`comoCeguera`, dentro de `agregarEstado`).
+- **👁 Un consumible que invoca por un rato** (2026-10-20, el Ojo de Kicillof): `it.invocaTemporal = {id, nombre, turnos, mov, vision, color, imagen}` →
+  `FichaAcciones` (invocarTemporal) crea o despierta esa invocación (siempre la misma `id`) con `ojo` (visión en flor para todos lados), `veoculto`,
+  `etereo` (se ve, pero no es objetivo de nada, no pisa trampas o zonas y atraviesa todo, también las paredes: el mapa, `etereoDe`, js/03 y js/06) y `sinMareo`; el mapa pide dónde aparece
+  (`ui.invocar` → `invocacionDeHabilidad`). Su `miniatura` viaja en el resumen público. Aparece en una casilla dentro del Rango de quien lo invoca y
+  que esa persona vea (`lugar: 'rango'`).
+- **👻 Etéreo, el estado** (2026-10-20, dueño, P213: «no puede atacar ni puede ser atacado; solamente puede observar»): preset `Etéreo` (`etereo: true`,
+  2 turnos) y `Combatiente.etereo(estados)` (por la marca o el nombre). El mapa (`etereoDe`, js/03) lo mira en lo público de cualquiera (personaje,
+  invocación, creep) además de la marca del Ojo; el freno de actuar es el de Stun y Mareo (`stunAntes`, js/20: `o.mover` deja moverse). El Ojo de
+  Kicillof lo lleva puesto (permanente: se va con el ojo).
+- **💧 Creeps con SP** (2026-10-20, dueño: «que las skills puedan usar SP en vez de cooldown, con un switch, para probarlas en simultáneo»): `sc.modoSP`
+  (el ⇄ junto a «Habilidades» en las Acciones del mapa y de GM Tools, `data-modosp`; al prenderlo arranca lleno). `CreepCalculo.modoSP/spMax` (Especial × 3 + `sp`)
+  `/spRegen` (la mitad del Especial + `spregen`, **mínimo 1**, dueño) `/spActual` (`sc.sp`; sin dato, lleno) `/costoSpHab` (`h.spCosto`; si no, un número en `h.costo`; si
+  no, su cooldown; sin cooldown, 1). En modo SP `bloqueoHab` no mira el cooldown, `CreepAcciones.ejecutarHab` cobra SP en vez de cooldown (`p.costoSp`),
+  `confirmarSP` pregunta si no alcanza (deja seguir, queda en 0), `inicioCreep` recarga, Pasar de día lo llena (js/41) y las varitas cobran su SP
+  sin espera (`costoEspecialCreep` → `sp`). Maldito: le saca vida igual a su SP.
+- **🦷 Soltarse con daño y quién lo tiene agarrado** (2026-10-21, el Mordisco feroz): `soltar.danoFalla` (una fórmula: si no se suelta, recibe ese
+  daño) y `soltar.de` / `deNombre` (el token que lo tiene agarrado) — los conserva `Combatiente.soltarNorm`. En una Ejecución «con tu arma», un
+  efecto con `soltar.difStat` toma el stat de quien ataca (`o.valorDe`) y `danoFalla: 'golpe'` el daño de ese mismo golpe (`o.danoGolpe(dados)`;
+  `CreepAcciones.ataqueDeHab` los pasa). Presets «Mordido» (grupo Atrapar) y «Mordiendo» (`muerdeA`, `desde`: `EstadosAplicar` los conserva);
+  `FichaResumen` publica el `soltar` que trae `de`. Lo hace el mapa: vtt-hexgrid/js/54.
+- **🗡 Ráfaga** (2026-10-21): una Ejecución «con tu arma» con `rafaga: N` (`Combatiente.ataqueConArreglos` → `ataque.rafaga`): `Duelo.crear` hace valer la
+  Perfora en cada corte (`perfora` = N × cortes, `perforaCorte` = la del arma) y `efectosArmaDe(d, h)` (duelo.js) repite los efectos al golpear del arma N veces («Corte k»); `normalizarEfectos` acepta hasta 12.
+- **🔥 Arma elemental** (2026-10-21, el Support): presets «Arma ígnea / helada / eléctrica / ácida / venenosa» (`estados-presets.js`) con `golpe` y
+  **`golpePorTurnos`** (`Combatiente.gastarCarga` los suma a cada golpe mientras duren, sin cargas) y `armaElemental` (`agregarEstado`: una sola a la
+  vez). Un efecto de daño mágico puede llevar `mult` (fuego), `porDano` (hielo, ácido, tóxico) y `cadena` (rayo): los conserva `EfectosGolpe.normalizar`,
+  `Duelo.guardarDano` los pasa a `dano.magico` y el mapa los aplica (js/13). `specArma` reconoce «Parálisis» (1 turno). Una habilidad de creep con
+  `cuentaComoAtaque` es su acción de ataque del turno (`armarHab` la copia; el mapa, js/58).
+- **Zona que tira una sola vez** (2026-10-26, la Nube tóxica): `unaVez: true` adentro del `zonaEstado` de una zona con daño → una vez que el estado le
+  entró a alguien (`zonaResueltos`), la zona ya no le tira ni le hace daño (vtt-hexgrid/js/08 `zonaLeFalta`). Sin la marca, una zona con daño sigue
+  revisándose siempre (el fuego).
+  Con `resetea: true` además (2026-10-26, dueño): al que ya tiene el estado y sigue adentro al pasar de ronda (o vuelve a entrar), sin tirada ni daño,
+  el estado vuelve a sus stacks (`Combatiente.acumularVeneno` no suma si el nuevo trae `resetea`; lo conservan `EstadosAplicar` y `FichaAcciones.estadoDeSpec`);
+  si ya no lo tiene, le vuelve a tirar.
+- **Habilidades de creep del 2026-10-26 (camino a 20 por rol)**: `Combatiente.desesperadoBonos(frac)` / `desesperadoTxt` (el Golpe desesperado; la Ejecución
+  «con tu arma» con `desesperado`); `habEjecucion` pasa `saltoHab` + `corre` en una dirigida contra un rival (el Takle); presets nuevos **Enfurecido** (la
+  Furia), **Envión** (escudo de 10 que se gasta y se renueva, no se suma) y **Al frente** (+2 PdG y +2 Evasión, `turnosCompletos` 1); `bombaHumo` en una
+  habilidad (creep: `creeps-base.js` la copia y `CreepAcciones.terminarHab` llama `ui.bombaHumo`; personaje: `FichaAcciones.avisarZonaAlMapa` manda
+  `bomba-humo-habilidad`, registrado en `mensajes-mapa.js`). Efectos que aplica el mapa por nombre: «Al final del orden», «Sube en el orden» y la Demora
+  con `stacks` = cuántos lugares.
+- **⚔🛡 La tanda del Choque pesado** (2026-10-27, dueño: 10 warrior · 10 tanque · 10 ambiguas; `docs/diseno-roles-creep.md`): 14 de creep nuevas en
+  `skills-creep-base.js` (Golpe brutal, Arte de la guerra, Contraataque, Golpe que sigue, Provocar, Piel de hierro, Blindaje, Segundo aliento, Escudo humano,
+  Interponerse, Golpe de escudo, Carga que derriba, Sonic Boom, Arrastrar; reemplazan a las viejas del mismo nombre) y tres de clase cambiadas (Taunt:
+  PdG.Esp + nivel; Golpe brutal: +1/+1 críticos y +2 al daño; Contraataque: Flash, 1 SP). Piezas nuevas: `tiraBonoNivel` en una Ejecución (`habEjecucion`
+  suma `o.nivel`: lo pasan la ficha, el creep y la invocación); `requiereDano` en los efectos de un ataque con arreglos (`ataqueConArreglos` y
+  `Duelo.limpiarEfectos`); en el ataque, `sigue`, `arrastra`, `cargaDerriba` (→ `derriba`, lo pone la carrera) y `escudoGolpe` (`CreepAcciones.ataqueDeHab`
+  le pone el escudo puesto: Tipo 10, sin Parry; `CreepDuelo` tira 1d10 + su peso + el Dmg), que `Duelo.crear` guarda; `unaVez` / `unaVezUsada` en una
+  habilidad (`Combatiente.bloqueoHab`); `curaMasCon` y `quitaDebuff` (`CreepAcciones.ejecutarHab`, con `o.quitar`); `contraEsquiva` en un creep (sus
+  opciones de defensa la marcan, `contraEsquivaPagar` cobra el Flash al doble y el duelo también lo ofrece tras un Parry ganado con el Bloqueo perdido;
+  +1 PdG al contraatacar); `CreepDuelo.pagarFlash` cobra SP en modo SP; `Duelo.olvidarOpciones(id)` (cambió quien defiende). Presets nuevos
+  **Desafiante**, **Piel de hierro** e **Interpuesto** (`unGolpe`: se va con el golpe que recibe). `creeps-base.js` (`armarHab`) copia todo eso y un
+  `efecto.escudo` fijo (5 de Vida extra del Escudo humano) y `efecto.detalle`.
+- **🔄 Las habilidades de clase siguen a su clase** (P222, dueño, 2026-10-27): `FichaGuardado.migrarHabsDeClase(S)` → los nombres de las que se
+  pusieron al día (también corre en `completar`). Cada copia guarda `claseHuella` (`huellaHab`: lo que hace la habilidad, sin lo propio —`HAB_PROPIOS`:
+  Job, imagen, origen, cooldown, cargas, `automatizada`—); si la de clase (`CLASES_SKILLS` o `SKILLS_CUSTOM`, `baseDeClase`) cambió y la copia no se
+  editó a mano desde la última vez, toma la versión nueva. Una subida (`bibOrigen`, `bib-…`) no se toca. La llaman la ficha (`renderAll`, con un toast) y
+  la Botonera nueva del mapa (al abrir; la guarda enseguida). **Un campo nuevo del turno en una habilidad de personaje: sumarlo a `HAB_PROPIOS`.**
+- **📦 El catálogo de habilidades de creep y el archivo** (2026-10-26, dueño: «vamos a dejar estos skills de creep como los de base. Todos los viejos los
+  archivamos, ya no cuentan»): `skills-creep-base.js` exporta `HABILIDADES_CREEP_CATALOGO` (las auditadas) y `HABILIDADES_CREEP_ARCHIVO` (las de fábrica sin
+  auditar y las de «El origen», con la etiqueta «archivada»); `HABILIDADES_CREEP_BASE` sigue con todas (las buscan por nombre las pruebas, la auditoría y el
+  simulador). `Biblioteca.abrir` / `guardar` aceptan `baseArchivo` (de fábrica, archivadas) y `archivado(entrada)` (lo subido que ya no cuenta): eso va a la
+  pestaña «📦 Archivadas» (se puede mirar y usar igual); «Todo» y «Sin auditar» no lo muestran. `creep-editor.js` (el selector de habilidades de un creep y
+  el ⬆ Subir) archiva además lo subido antes del 2026-10-26 y la colección vieja. Un creep que ya tenía una habilidad archivada la conserva.
+
+- **🐾 Trofeo con el valor del equipo natural y 🗡→🧰 lo que no se ofrece** (2026-10-26): `CreepCalculo.trofeo(sc, precioDe)` vale (sin valor por nivel, ni jefe ×2: `TROFEO_PRECIO_NIVEL` y `trofeoPrecioAuto` se sacaron)
+  `valorNatural(sc, precioDe)` (cada pieza natural con `CombateFin.precioNatural`: la del catálogo —por `nombreOriginal` si se renombró—, su precio o uno estimado) y aparece con solo piezas naturales; `tarjetaPublica` ya no
+  nombra lo natural que no es el arma. `CombateFin.ocultos(rep, r)` (el equipo destildado, con `rep.ocultosDespojos`) lo convierte en despojos (un cuarto del precio, `despojosDePrecio`, como lo que nadie toma)
+  (`calcularReparto` → `despojosEquipo`, `despojosCada` y `despojos` de cada jugador, que `publicar` guarda en `combate/actual` y `despojar` paga). `Confirmar.texto(texto, {titulo, icono, valor, sugerencias})` → Promise<string | null>: el cartel con un campo de texto.
+- **🗡 Desde el sigilo por la espalda, la defensa vale 1** (2026-10-30, dueño, P201: «la del sigilo reemplaza a la otra, no se suman»): con `cfg.espalda`
+  (quien ataca está en sigilo y en el punto ciego), `Duelo.crear` marca `ataque.sorpresa` y no suma `espaldaPdg`; `guardarTiro` deja la tirada de
+  defensa (`eva`) en 1, con la nota «lo sorprendieron por la espalda: vale 1». El bono «por la espalda» del arma sigue sumando.
+
+- **`confirmar.js`, `Confirmar.marcar`** (2026-10-30, dueño: «que te aparezca una planilla… y selecciones este, este y este»): una lista con casillas en grupos (con «todos / ninguno»), `fijo` para lo que se ve pero no se marca, y el botón que cuenta cuántos van → los valores marcados o null. La usa el mapa para 👥 Traer jugadores… y 👹 Traer creeps… (js/13: los creeps de otro mapa o de la Reserva se mudan, no se duplican).
+
+- **`confirmar.js`, sin ventanas del navegador** (2026-10-31, dueño: los carteles «elsauloel.github.io dice…» → el cartel del juego): `Confirmar.avisar(texto,
+  {titulo, icono, si})` (un solo botón, «Entendido»; `preguntar` acepta `soloSi`) reemplaza a los `alert()` de la Ejecución ✨ (`avisoFalta` en
+  `asistente-duelo-hab.js`). Los `prompt()` que quedaban pasaron a `Confirmar.texto` (escribir el nombre para borrar un personaje o un mapa, renombrar el
+  mapa, corregir el día, el escudo y la Armadura rota a mano, la Inteligencia, el nombre de una tienda, las etiquetas de la biblioteca, el motivo de una baja,
+  cuántas unidades convertir en despojos) y el personaje de un respaldo, a `Confirmar.elegir`. **Una pregunta nueva va con `Confirmar`, nunca con
+  `confirm`/`prompt`/`alert`** (la función que la usa tiene que ser `async`).
+

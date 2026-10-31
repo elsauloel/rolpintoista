@@ -192,6 +192,12 @@
 
 > **💡 Ideas del dueño para retomar (2026-10-10, «anotalo todo en pendientes, para cuando te diga ¿por dónde seguimos?»)** — en este orden
 > de lo que se fue dictando; nada de esto está hecho todavía salvo donde se dice.
+> - [ ] **☁🧪 Probar en el mapa desde la nube: vistas previas y un Firebase de prueba (2026-10-31, dueño: «anotalo pendiente, primero me tendrías que
+>   explicar bien qué es y qué implica»).** Es el escalón que sigue al trabajo en la nube (hecho el 2026-10-31): las etapas 2 y 3 de
+>   [`plan-trabajo-remoto.md`](plan-trabajo-remoto.md) — un link de prueba por cambio antes de publicarlo, y una copia de Firebase de mentira (el
+>   emulador) con cuentas de prueba, para que una sesión en la nube pueda abrir el mapa en un navegador sin pantalla, jugar con dos cuentas y sacar
+>   capturas sin tocar las partidas reales. **Antes de hacer nada: explicárselo bien y sin jerga** (qué es, qué cambia en cómo trabaja él, qué hay que
+>   instalar o configurar una vez en la compu, qué cuesta y qué riesgos tiene) y que decida.
 > - [ ] **🏃 Prisa, automática y a la vista (2026-10-31, dueño: «automatizar prisa: siempre primero en la tabla de la iniciativa al apretar
 >   "ordenar"; debe automatizarse pero también le debe aparecer una notificación al jugador y debe aparecer en el mensaje lateral»).** Lo que ya hay: al
 >   apretar Ordenar, `ordenarIniciativa` (`vtt-hexgrid/js/04`) pone primero a quien tiene la pasiva (`tokenTienePrisa`: `resumen.prisa` del personaje, el

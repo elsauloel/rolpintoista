@@ -1,6 +1,13 @@
 # Plan: trabajo remoto (Firebase Hosting, vistas previas, emulador)
 
-> **Estado: guardado, sin empezar** (2026-10-12). El dueño lo compartió para que quede: **no arrancar hasta que lo pida**.
+> **✅ Lo básico, hecho (2026-10-31, dueño: «guiame paso a paso para pasar el proyecto full online para no depender de tener la compu prendida»):**
+> sesiones de **Claude Code en la nube** sobre este repo, manejadas desde la app del celular, publicando como siempre por GitHub Pages (no hizo
+> falta Firebase Hosting). Se autorizó la app de Claude en GitHub, se abrió la red del entorno «Predeterminado» (el sitio, gstatic y Firebase) y la
+> memoria de Claude pasó al repo ([`memoria-claude.md`](memoria-claude.md); el `CLAUDE.md` raíz dice qué hacer en la nube y en la compu). Lo
+> que sigue sin resolver desde la nube: probar en el mapa (no hay Chrome con las cuentas del dueño) y leer las partidas. Las etapas 2 y 3 de abajo
+> (vistas previas y emulador con navegador headless) son la mejora para eso, si algún día hace falta.
+>
+> **Estado anterior: guardado, sin empezar** (2026-10-12). El dueño lo compartió para que quede: **no arrancar hasta que lo pida**.
 > Cuando lo pida, guiarlo **de a un paso y sin jerga** (la etapa 1 la hace él desde la compu, con sus sesiones de Firebase y
 > GitHub). El texto de abajo es el que redactó el asistente en otra conversación y el dueño pidió guardar tal cual. Lo que ya
 > se sabe para empezar (Node.js no instalado en la compu, vistas previas por pull request y no por rama, la dirección nueva y

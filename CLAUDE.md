@@ -4,6 +4,12 @@
 > resumen final— va en español, aunque la conversación sea larga, venga de mucho trabajo técnico o de un resumen automático. Nunca en inglés.
 > (Pasó varias veces, la última el 2026-10-27, y molesta mucho. Antes de mandar cada mensaje, revisar el idioma.)
 
+> **☁ Se trabaja desde la compu y desde la nube** (Claude Code en la nube, manejado desde el celular; desde el 2026-10-31).
+> - **En una sesión en la nube**: antes de empezar, leer [`docs/memoria-claude.md`](docs/memoria-claude.md) (lo que Claude aprendió del dueño: cómo
+>   hablarle, cómo trabajar, criterios de diseño, cómo probar) y **subir directo a `nueva-version`**, no a una rama `claude/…` (si no, no se publica).
+> - **En la compu**: antes de empezar, `git pull` (puede haber trabajo hecho desde la nube). Lo nuevo que tenga que valer en cualquier sesión se
+>   suma también a `docs/memoria-claude.md`. El repo es **público**: ahí no van emails ni ids de partidas, personajes o cuentas.
+
 > Esta rama (carpeta `rol-nueva-version`) es el sistema nuevo: herramientas
 > de campaña en vivo con Firebase. **Antes de tocar código acá**, leer
 > [`docs/plan-sistema-nuevo.md`](docs/plan-sistema-nuevo.md) (qué se

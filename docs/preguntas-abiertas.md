@@ -1468,3 +1468,19 @@ programarla (los estados ya traen `perforaGolpe`, como Armas perforantes).
 **Decidido (dueño, 2026-10-30: «respecto a la pasiva con perfora, hacemos como decís vos»)** y programado: pasiva **Perforante** (1 Job, `comun/pasivas.js`)
 que da el estado permanente **Perforante** (`perforaGolpe: 2`, `comun/estados-presets.js`); el mapa la suma a la Perfora del arma (js/13,
 `Combatiente.perforaDeEstados`). Falta probarla en el mapa.
+
+### P237 — La XP de un creep repartida en sus partes (nivel, habilidades, pasivas, equipo) (2026-10-31) ⏳ propuesta, esperando al dueño
+
+**Contexto:** el dueño, 2026-10-31: «esa proporción de experiencia me parece bien en principio… me gustaría que esté distribuida en nivel de creep,
+cantidad de habilidades, habilidades pasivas, equipo; que cada elemento que se le sume, sume un poquito más de experiencia… evaluar cuáles son los
+estándares para diseñar creeps por nivel… todos los creeps tengan por estándar una habilidad pasiva incluida y contemplada; si un GM le quiere agregar una
+pasiva más, está bien, solo que ese creep va a dar más experiencia». Hoy la XP sale solo del nivel (`xpBasePorNivel`: 40/90/150/220/300).
+**El estándar por nivel** (ya decidido en `creeps-humanoides.md`, más la pasiva nueva): atributos 33 + 3 por nivel; habilidades nivel + 1; **1 pasiva**;
+equipo: N1 arma + 2 Comunes · N2 las manos + 4 Comunes · N3 + 4 Comunes y 1 Buena · N4 + 3 Comunes y 2 Buenas · N5 + 3 Comunes y 3 Buenas.
+**Propuesta de Claude:** un creep estándar da exactamente la XP de hoy, repartida: **50 % el nivel** (atributos), **35 % habilidades + pasiva** (cada una
+vale lo mismo: la parte ÷ (nivel + 2)), **15 % el equipo** (en puntos: Común 1, Buena 2, Raro 3; estándar N1 3 · N2 5 · N3 7 · N4 8 · N5 10, el arma
+cuenta). Cada habilidad, pasiva o punto de equipo de más suma su parte; de menos, resta. Ejemplos: N3 (150) = 75 + 10,5 por habilidad/pasiva + 3,2 por
+punto de equipo; N5 (300) = 150 + 15 + 4,5. La Rata de la grieta (N3: 4 habilidades, 1 pasiva, arma Buena + 4 Comunes = 6 puntos) daría ~147; con una
+pasiva más, ~157.
+**Falta decidir:** si se reparte así o se suma encima de lo de hoy; los porcentajes; si lo de menos resta; si cuentan los puntos de atributo de más; el
+jefe (hoy duplica oro y trofeo, no XP); y dónde se ve el desglose (el paso Recompensas del asistente y «Batalla terminada»).

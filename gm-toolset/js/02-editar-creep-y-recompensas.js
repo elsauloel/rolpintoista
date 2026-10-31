@@ -290,7 +290,7 @@ const creepAsist = () => asist ? S.creeps.find(s => s.id === asist.id) : null;
 const ASIST_AYUDA = [
   'Lo básico: cómo se llama, de qué nivel es y qué tipo de criatura. El tipo sugiere el oro que deja y si su arma es natural.',
   'Cómo se reparten sus cinco atributos. Elegí un rol para cargar un reparto sugerido y después ajustalo a gusto.',
-  'Con qué ataca: creala paso a paso, equipala del fabricante o elegí un arma natural del catálogo.',
+  'Con qué ataca: elegila del fabricante o creala paso a paso (si es parte del cuerpo, marcala como natural).',   // (dueño, 2026-10-30: «primero elegir del fabricante, segundo crear o editar, sólo esos dos botones»)
   'Lo que lleva puesto para defenderse y, si tiene, sus resistencias o debilidades naturales a algún elemento. Todo es opcional.',
   'Lo que sabe hacer además de atacar.',
   'Opcional: pasivas (bonos que siempre tiene) y consumibles en el cinturón, que puede usar en la pelea.',
@@ -407,9 +407,8 @@ function htmlPasoAsistCreep(p){
         <div class="arma-detalle">${Combatiente.armaEnMano(sc).detalle ? esc(Combatiente.armaEnMano(sc).detalle) : 'Sin efecto.'}</div></div>`}
       ${enManos.length ? `<div class="equipo-list" style="margin-top:8px">${enManos.sort((x, y) => (y.especial ? 1 : 0) - (x.especial ? 1 : 0)).map(it => asistPiezaHtml(sc, it)).join('')}</div>` : ''}
       <div class="pap-fila" style="gap:8px;margin:10px 0">
-        <button type="button" class="pap-boton" data-editararma="${sc.id}">✎ Crear o editar el arma (paso a paso)</button>
         <button type="button" class="pap-boton" data-equipardelfabricante="${sc.id}">⚔ Elegir del fabricante</button>
-        <button type="button" class="pap-boton" data-armanat="${sc.id}">🐾 Arma natural del catálogo</button>
+        <button type="button" class="pap-boton" data-editararma="${sc.id}">✎ Crear o editar el arma (paso a paso)</button>
       </div>
       ${campo('¿El arma es parte del cuerpo?', `<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-rec="armaNatural" data-id="${sc.id}"${Combatiente.armaEnMano(sc).natural ? ' checked' : ''}> Arma natural (colmillo, garra, puño…) ${ayudaQ(AYUDA_NATURAL)}</label>`,
           'Si es natural, al morir suelta un trofeo en vez del arma y ningún jugador la puede equipar.')}`;

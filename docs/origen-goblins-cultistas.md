@@ -442,3 +442,4 @@ Propuesta (esperando el OK; skills auditadas salvo el Chillido, que sale de «Pl
     que también tiene el Chillido**; **una vez por combate** cada rata).
   - **Falta programar el Chillido así** (hoy, «Plaga en la galería»: 2 ratas, la copia llega sin la habilidad y no tiene límite por combate): `cant: 1`,
     que la copia conserve el Chillido y que cada rata lo pueda usar una sola vez por combate.
+- **Chillido programado y probado (2026-10-30)**: habilidad auditada **Chillido** en el pool (`comun/skills-creep-base.js`): `refuerzos: {cant: 1, propagan: true}`, `unaVez`, `soloVidaHasta: 50`. Para la rata: + Habilidad → «Chillido» (ya no hace falta «Plaga en la galería»).

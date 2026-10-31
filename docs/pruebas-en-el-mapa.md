@@ -97,6 +97,11 @@
 - [ ] **🗡 Pasiva Perforante** (2026-10-30, P236): un personaje o un creep con la pasiva lleva el estado Perforante; su golpe común contra Petro
   (Defensa 12) en el mapa «Clon origen» de «Claude · pruebas» pasa 2 (y suma la Perfora del arma: Dientes podridos + Perforante = 4); con crítico, nada.
 
+- [x] **🐀 Chillido** (2026-10-30, «Claude · pruebas», mapa «Arena de pruebas», con capturas): el Kobold rascador con el Chillido agregado desde GM
+  Tools (+ Habilidad → buscar «Chillido» → Agregar); con 15 de 30 no pregunta nada, pide la casilla y llega **una** copia «(refuerzo)» con 30/30 y el
+  Chillido sin usar; la original queda «Ya la usó en este combate»; la copia, con la vida llena, pregunta «… se usa solo con el 50 % de la vida o menos.
+  ¿Usarla igual?» (Usarla igual / Cancelar).
+
 ## Auditoría de creeps: para probar
 
 > Forma de trabajo del dueño (2026-10-21): lo que se define en la auditoría de habilidades de creep (`docs/auditoria-skills-creep.md`) se programa,

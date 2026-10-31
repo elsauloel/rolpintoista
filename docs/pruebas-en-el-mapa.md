@@ -94,6 +94,9 @@
   figura» tildado, en rectas (clic, clic, clic y doble clic o Enter) y a mano alzada (al soltar), el trazo nace con las puntas unidas, sin pasar
   por el ⚙. Y con 🧱 además, lo de adentro queda sólido y sin grilla.
 
+- [ ] **🗡 Pasiva Perforante** (2026-10-30, P236): un personaje o un creep con la pasiva lleva el estado Perforante; su golpe común contra Petro
+  (Defensa 12) en el mapa «Clon origen» de «Claude · pruebas» pasa 2 (y suma la Perfora del arma: Dientes podridos + Perforante = 4); con crítico, nada.
+
 ## Auditoría de creeps: para probar
 
 > Forma de trabajo del dueño (2026-10-21): lo que se define en la auditoría de habilidades de creep (`docs/auditoria-skills-creep.md`) se programa,

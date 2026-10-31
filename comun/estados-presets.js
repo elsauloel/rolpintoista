@@ -247,6 +247,10 @@ const ESTADOS_PRESET = [
     detalle:'Inmune a todo tipo de Veneno: no se le puede aplicar y el que ya tenga puesto no le hace daño mientras dure.'},
   // 🪨 Inmune a lo tóxico (2026-10-28, dueño: «Larry es una roca en un robot: ningún efecto tóxico le hace nada»). Lo deja puesto la pasiva racial
   // «Inmunidad tóxica» (comun/pasivas.js), que además suma Res. tóxico 99 (el daño tóxico no entra). Frena el Veneno como Sangre pura.
+  // 🗡 Perforante (2026-10-30, dueño: «perfora armadura podría ser una habilidad pasiva»; P236: Perfora 2 vale menos que +2 al daño —es un piso, no
+  // suma, y con crítico no hace nada—, así que va como pasiva de 1 Job): lo da la pasiva Perforante (comun/pasivas.js), permanente. Se suma a la del arma.
+  {nombre:'Perforante', polaridad:'buff', permanente:true, perforaGolpe:2,
+    detalle:'Pasiva: en cada golpe que da, 2 puntos de daño pasan siempre la Defensa del rival (el resto va contra ella como siempre; con crítico no hace falta, ya la ignora). Se suma a la Perfora del arma. ⚙ Automatizado en el mapa.'},
   {nombre:'Inmune a lo tóxico', polaridad:'buff', permanente:true, sangrePura:true,
     detalle:'Lo tóxico no le hace nada: no se le puede aplicar Veneno y el que tuviera no le hace daño. (Con la pasiva racial, además, el daño tóxico no entra.)'},
   // Coagulación (2026-10-08, dueño: antes «Coagulación extrema»; la marca interna sigue siendo coagulacionExtrema).

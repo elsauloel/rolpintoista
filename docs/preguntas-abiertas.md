@@ -1457,7 +1457,7 @@ sin nombre («algo se mueve a tu espalda…»).
 `vtt-hexgrid/js/17-oportunidad.js` (`oportunidadSecretas`, `datos.secreto`): no frena ni avisa; la pregunta en silencio a quien maneja al escondido; si ataca,
 se abre el duelo y queda en la Mesa y la Crónica (y quien se alejó recibe «¡… te ataca de oportunidad desde las sombras!»); si no, ningún rastro.
 
-### P236 — ¿Perfora como habilidad pasiva? ¿Cuánto vale contra «+1 al daño»? (2026-10-30) ⏳
+### P236 — ¿Perfora como habilidad pasiva? ¿Cuánto vale contra «+1 al daño»? (2026-10-30) ✅ pasiva Perforante, Perfora 2 por 1 Job
 
 **Contexto:** el dueño, al diseñar la Rata de galería: «perfora armadura podría ser una habilidad pasiva… si hay una pasiva que da más uno al daño, no sé
 si perfora uno es igual, mejor o peor». La Perfora N **no se suma**: es un piso (N puntos pasan siempre la Defensa; si el golpe ya pasa más, no cambia
@@ -1465,3 +1465,6 @@ nada; `Combatiente.perforaPasa`). Así que vale **menos** que +N al daño: solo 
 nada en un crítico (ya ignora la Defensa) y el +1 al daño sí se multiplica en el crítico. Su gracia: asegura que el golpe lastime, y con eso entran los
 efectos «si lo lastima» (veneno). Propuesta: una pasiva de 1 Job con **Perfora 2** (al lado de Golpe fuerte, +1 al daño). Falta: que el dueño decida y
 programarla (los estados ya traen `perforaGolpe`, como Armas perforantes).
+**Decidido (dueño, 2026-10-30: «respecto a la pasiva con perfora, hacemos como decís vos»)** y programado: pasiva **Perforante** (1 Job, `comun/pasivas.js`)
+que da el estado permanente **Perforante** (`perforaGolpe: 2`, `comun/estados-presets.js`); el mapa la suma a la Perfora del arma (js/13,
+`Combatiente.perforaDeEstados`). Falta probarla en el mapa.

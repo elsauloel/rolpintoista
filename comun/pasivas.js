@@ -51,6 +51,10 @@ const PASIVAS_BASE = [
    detalle: '+1 Res.Esp (resistencia mágica).', mods: [{stat: 'resmg', val: 1}]},
   {poolId: 'golpe-fuerte', nombre: 'Golpe fuerte', jobCosto: 1, etiquetas: ['stat', 'ofensiva'],
    detalle: '+1 Dmg (daño).', mods: [{stat: 'dmg', val: 1}]},
+  // 🗡 Perforante (2026-10-30, dueño, P236: «hacemos como decís vos»): Perfora 2 por 1 Job, al lado de Golpe fuerte (+1 al daño). La Perfora no suma
+  // daño: asegura que lastime (y que entren los efectos «si lo lastima»); por eso 2 y no 1. Da el estado Perforante (comun/estados-presets.js).
+  {poolId: 'perforante', nombre: 'Perforante', jobCosto: 1, etiquetas: ['ofensiva'], estado: 'Perforante', mods: [],
+   detalle: 'Perfora 2: en cada golpe, 2 puntos del daño pasan siempre la Defensa del rival. No suma daño: asegura que lastime aunque tenga mucha armadura (y que entren los efectos «si lo lastima», como el veneno); con crítico no hace falta. Se suma a la Perfora del arma. ⚙ Automatizado: mientras la tenga, lleva puesto el estado Perforante y el mapa lo cuenta en cada golpe.'},
   {poolId: 'guardia-firme', nombre: 'Guardia firme', jobCosto: 1, etiquetas: ['stat', 'defensiva'],
    detalle: '+1 Bloqueo.', mods: [{stat: 'bloqueo', val: 1}]},
   {poolId: 'espalda-de-mula', nombre: 'Espalda de mula', jobCosto: 1, etiquetas: ['stat', 'utilidad'],

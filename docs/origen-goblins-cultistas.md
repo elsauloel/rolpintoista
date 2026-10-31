@@ -430,3 +430,15 @@ Propuesta (esperando el OK; skills auditadas salvo el Chillido, que sale de «Pl
   menos; con más, avisa y pregunta, así que se puede usar igual; la que llega es una copia sin el Chillido; una vez por combate).
 - **Números** (grupo del 2026-10-27): golpe común contra Larry pega 96 % y es crítico 82 % (doble 50 %); contra Petro, 84 % y 50 %; contra Bizzante, 82 % y
   40 %. Con Ojo de asesino: Larry 95 % de crítico. A Petro, sin crítico, le pasan los 2 de la Perfora (y el veneno). **Riesgo**: dos mordidas tumban a Larry.
+- **Definida (dueño, 2026-10-30)**: «el chillido es una vez por combate, pero la rata que viene sí tiene chillido también… con la vida llena;
+  Ráfaga de zarpazos la cambiaría por sigilo; una vez que la definamos, dejala anotada y yo la voy a crear manualmente». **No se crea**: la carga el
+  dueño a mano. Queda:
+  - Atributos Con 6 · Fue 6 · Agi 11 · Des 13 · Esp 3 (Vida 30); arma natural **Dientes podridos** (Tipo 4, 1 dado, Perfora 2, Veneno 3 stacks 50 %,
+    seguro si es crítico); equipo Jubón de piel de lobizón, Guantes de agarre, Polainas de ratero, Anillo de Manos Ligeras (él los marca como
+    naturales); pasiva **Ojo crítico**.
+  - Skills: **Ojo de asesino** · **Hit and run** · **Sigilo** (en lugar de Ráfaga de zarpazos; propuesta: la **Bomba de humo** auditada, con nombre de
+    rata —«Perderse en la galería»: polvo y oscuridad a sus pies, diámetro 3, 1 turno; Sigilo aunque la vean y hasta 3 casillas gratis sin
+    oportunidad; 3 No2, 3 SP, cd 3—) · **Chillido** (2 No2; con la mitad de la vida o menos, con más avisa y deja igual; **1 rata, con la vida llena,
+    que también tiene el Chillido**; **una vez por combate** cada rata).
+  - **Falta programar el Chillido así** (hoy, «Plaga en la galería»: 2 ratas, la copia llega sin la habilidad y no tiene límite por combate): `cant: 1`,
+    que la copia conserve el Chillido y que cada rata lo pueda usar una sola vez por combate.

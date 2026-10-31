@@ -42,12 +42,15 @@ const diaTermina = e => FichaMantenimiento.terminaAlPasarDia(e);
 const DIA_WILDCARDS = {normal: 1, bueno: 2};   // 🃏 cuántas carga cada descanso (dueño, 2026-10-15)
 const diaDescansarPj = (S, descanso) => FichaMantenimiento.descansar(S, {wildcards: DIA_WILDCARDS[descanso] || 1});
 // Un renglón del descanso → un paso del Anuncio, con su título.
+// Un recuadro por personaje, con todo lo suyo adentro (dueño, 2026-10-30: «este reporte del paso del día está muy mal organizado, cada personaje
+// debe tener un texto propio con la información completa en un recuadro para cada uno»): antes era un paso por línea (Vida, SP, No2…).
 function diaPasos(nombre, lineas){
-  const quien = nombre ? ` · ${nombre}` : '';
-  if(!lineas.length) return [{titulo: `Descanso${quien}`, texto: 'Ya estaba entero: no había nada para recargar.'}];
-  const tit = l => /^vida /.test(l) ? '❤ Vida' : /^SP /.test(l) ? '🔵 SP' : /^No2 /.test(l) ? '🟢 No2' : /^terminaron/.test(l) ? '⏳ Estados'
-    : /^🃏/.test(l) ? '🃏 Wildcards' : /^💍/.test(l) ? '💍 Equipo' : /^sigue caído/.test(l) ? '💀 Caído' : 'Descanso';
-  return lineas.map(l => ({titulo: tit(l) + quien, texto: l.charAt(0).toUpperCase() + l.slice(1)}));
+  const titulo = nombre || 'Tu personaje';
+  if(!lineas.length) return [{titulo, texto: 'Ya estaba entero: no había nada para recargar.', resumen: 'ya estaba entero'}];
+  const icono = l => /^vida /.test(l) ? '❤' : /^SP /.test(l) ? '🔵' : /^No2 /.test(l) ? '🟢' : /^terminaron/.test(l) ? '⏳'
+    : /^(🃏|💍)/.test(l) ? '' : /^sigue caído/.test(l) ? '💀' : '•';
+  const fila = l => { const i = icono(l), t = l.charAt(0).toUpperCase() + l.slice(1); return `<span style="display:block;margin:2px 0">${i ? i + ' ' : ''}${esc(t)}</span>`; };
+  return [{titulo, html: lineas.map(fila).join(''), resumen: lineas.join(' · ')}];   // (resumen: para la Crónica)
 }
 let diaTrabajando = false;
 async function diaRevisar(antes){
@@ -87,7 +90,7 @@ async function diaRevisar(antes){
     for(const [k, pasos] of anuncios){
       if(typeof momentoAbrir !== 'function' || !pasos.length) continue;
       try{ await momentoAbrir({tipo: 'dia-descanso', icono: '☀', titulo: `Día ${dia}: descansaste`, estado: 'listo',
-        resultado: pasos.map(p => p.texto).join(' · ').slice(0, 900),
+        resultado: pasos.map(p => `${p.titulo}: ${p.resumen || p.texto || ''}`).join(' · ').slice(0, 400),   // (las reglas: hasta 400)
         datos: {paraUids: k.split(','), aviso: true, boton: 'Aceptar', pasos: pasos.slice(0, 20)}}); }
       catch(err){ console.error('Pasar de día: no se pudo mostrar el anuncio', err); }
     }

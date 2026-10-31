@@ -185,12 +185,12 @@ function histEstilos(){
   const s = document.createElement('style');
   s.id = 'historial-css';
   s.textContent = `
-#historial-boton{position:fixed;top:10px;left:56px;z-index:70;height:38px;padding:0 12px;display:flex;align-items:center;gap:6px;
+#historial-boton{position:fixed;top:10px;left:102px;z-index:70;height:38px;padding:0 12px;display:flex;align-items:center;gap:6px;
   background:#1A1418;border:1px solid #3B2E34;border-radius:3px;cursor:pointer;color:#EDE3D2;box-shadow:0 4px 12px rgba(0,0,0,.45);
   font:600 12.5px "Space Grotesk",system-ui,sans-serif;letter-spacing:0;text-transform:none}
 #historial-boton:hover{border-color:#C98545}
 #historial-boton.abierto{border-color:#E0A458;color:#E0A458}
-#historial-panel{position:fixed;top:54px;left:56px;z-index:70;width:430px;max-width:calc(100vw - 66px);max-height:calc(100vh - 66px);
+#historial-panel{position:fixed;top:54px;left:102px;z-index:70;width:430px;max-width:calc(100vw - 112px);max-height:calc(100vh - 66px);
   display:flex;flex-direction:column;background:#1A1418;border:1px solid #3B2E34;border-radius:3px;box-shadow:0 12px 30px rgba(0,0,0,.6);
   font-family:"Space Grotesk",system-ui,sans-serif;font-size:13px;line-height:1.35;color:#EDE3D2;text-align:left}
 #historial-panel[hidden]{display:none!important}
@@ -208,10 +208,10 @@ function histEstilos(){
 #historial-panel .hp-sube{color:#8FD19A}
 #historial-panel .hp-mant{color:#B9A6E8}
 #historial-panel .hp-vacio{padding:18px 12px;color:#9A867E;text-align:center}
-/* lugar para el botón en la barra de cada herramienta (además del ☰) */
-html.hist-on header{padding-left:172px!important}
-html.hist-on .accesos{padding-left:160px}
-html.hist-on .hero > div:first-child{padding-left:160px}`;
+/* lugar para el botón en la barra de cada herramienta (además del ☰ y la ⌂ de comun/menu-sitio.js) */
+html.hist-on header{padding-left:218px!important}
+html.hist-on .accesos{padding-left:206px}
+html.hist-on .hero > div:first-child{padding-left:206px}`;
   document.head.appendChild(s);
 }
 

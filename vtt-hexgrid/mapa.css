@@ -112,7 +112,7 @@ button:disabled{opacity:.5;cursor:not-allowed}
 header{
   display:flex;align-items:center;gap:10px;padding:8px 14px;background:var(--panel);border-bottom:1px solid var(--line);flex:none;flex-wrap:wrap
 }
-header{padding-left:60px!important} /* lugar para el menú del sitio (comun/menu-sitio.js) */
+header{padding-left:106px!important} /* lugar para el menú del sitio y la ⌂ (comun/menu-sitio.js) */
 header h1{margin:0;font-size:16px;color:var(--brass);font-weight:700}
 #estado{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);flex:1;min-width:120px}
 .zoom{display:flex;gap:4px}

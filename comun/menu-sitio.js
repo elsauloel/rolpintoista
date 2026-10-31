@@ -16,6 +16,13 @@
    personajes) se leen de Firebase al abrir, con un rato de caché. No
    aparece dentro de los iframes del mapa (botonera, acciones,
    mantenimiento).
+
+   Al lado del ☰, siempre, el botón ⌂ (casita, mismo tamaño y forma): va
+   directo al Home, la lista de todas las partidas (2026-10-31, dueño:
+   «al lado suyo aparezca siempre un botón del mismo tamaño y forma, con
+   una casita, que te lleve al home»). Lo que se pone a la derecha del ☰
+   (📜 Historial, el margen de cada barra) arranca después de la casita:
+   MENU_ANCHO = 102 px.
    ========================================================= */
 
 const MENU_RAIZ = new URL('./', FB_INICIO).href;
@@ -46,6 +53,11 @@ function menuEstilos(){
 #menu-sitio-boton.abierto span:nth-child(1){transform:translateY(6px) rotate(45deg)}
 #menu-sitio-boton.abierto span:nth-child(2){opacity:0}
 #menu-sitio-boton.abierto span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+#menu-sitio-home{position:fixed;top:10px;left:56px;z-index:70;width:38px;height:38px;display:flex;align-items:center;
+  justify-content:center;padding:0;background:#1A1418;border:1px solid #3B2E34;border-radius:3px;box-sizing:border-box;
+  cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.45);color:#E0A458;text-decoration:none}
+#menu-sitio-home:hover{border-color:#C98545}
+#menu-sitio-home svg{display:block;width:20px;height:20px}
 #menu-sitio{position:fixed;top:54px;left:10px;z-index:200;width:290px;max-width:calc(100vw - 20px);max-height:calc(100vh - 66px);
   overflow-y:auto;background:#1A1418;border:1px solid #3B2E34;border-radius:3px;box-shadow:0 12px 30px rgba(0,0,0,.6);
   font-family:"Space Grotesk",system-ui,sans-serif;font-size:14px;line-height:1.35;color:#EDE3D2;padding:6px 0;text-align:left}
@@ -65,7 +77,7 @@ function menuEstilos(){
 #menu-sitio .ms-partida{font-weight:700;color:#E0A458}
 #menu-sitio .ms-nota{padding:4px 14px 4px 44px;font-size:12px;color:#9A867E}
 #menu-sitio hr{border:0;border-top:1px solid #2A2126;margin:6px 0}
-#btn-revivir{left:58px!important}`;
+#btn-revivir{left:104px!important}`;
   document.head.appendChild(s);
 }
 
@@ -199,10 +211,18 @@ function menuIniciar(){
   boton.setAttribute('aria-label', 'Menú del sitio');
   boton.setAttribute('aria-expanded', 'false');
   boton.innerHTML = '<span></span><span></span><span></span>';
+  // ⌂ Home: siempre al lado del ☰, mismo tamaño y forma.
+  const home = document.createElement('a');
+  home.id = 'menu-sitio-home';
+  home.href = menuUrl('index.html');
+  home.title = 'Home: todas las partidas';
+  home.setAttribute('aria-label', 'Home: todas las partidas');
+  home.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' +
+    '<path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 9.5V20h4.5v-6h4v6h4.5V9.5"/></svg>';
   const panel = document.createElement('nav');
   panel.id = 'menu-sitio';
   panel.hidden = true;
-  document.body.append(boton, panel);
+  document.body.append(boton, home, panel);
   Object.assign(menuSitio, {boton, panel});
 
   boton.onclick = e => {

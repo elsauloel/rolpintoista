@@ -16,7 +16,7 @@
    ========================================================= */
 const Embebido = (() => {
   // Lo que ponen los archivos comunes y el mapa ya tiene: dentro del marco no se muestra nunca.
-  const COMUNES = ['#mesa', '#alerta-ojo', '#menu-sitio-boton', '#menu-sitio', '#historial-boton', '#historial-panel',
+  const COMUNES = ['#mesa', '#alerta-ojo', '#menu-sitio-boton', '#menu-sitio-home', '#menu-sitio', '#historial-boton', '#historial-panel',
     '#duelo-fondo', '#duelo-avisos', '[id^="dados3d-capa-"]', '#dados-afortunado'];
   // Lo que nunca cuenta como "algo abierto" (aunque se vea): avisos al pie y ayudas que viven dentro de otra ventana.
   const NO_CUENTA = ['.toast', '#lupa-pop', '#bt-ayuda-pop', '.ef-tip'];

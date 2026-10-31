@@ -38,7 +38,9 @@ versión parecida en más de una, es candidato a juntar.
   Mapa, personajes propios y ajenos, GM Tools, Generador de tiendas,
   Manual, Cerrar sesión). Lee partidas y fichas de Firebase con caché de
   1 minuto; no aparece dentro de los iframes del mapa (Botonera,
-  Acciones, Mantenimiento).
+  Acciones, Mantenimiento). **⌂ al lado del ☰** (2026-10-31, dueño): `#menu-sitio-home`, mismo tamaño y forma, siempre visible, va al
+  Home (`index.html`, todas las partidas). Lo que va a la derecha del ☰ arranca en 102 px (📜 Historial de `historial.js`; el margen
+  de las barras: mapa 106, ficha/gm-tools `.accesos` 86, tiendas `.hero` 86, auditoría y preguntas 106, `html.hist-on` 218/206).
 - **`barra.js`** — `barraTexto(personaje, usuario)`: arma el texto de
   identidad de la cabecera de cada herramienta ("Partida · Usuario", o
   "Partida · Personaje (Usuario)" — la ficha es la única que pasa

@@ -100,8 +100,12 @@
 
 - **Subir directo a `nueva-version`** (`git push origin HEAD:nueva-version`), no a una rama `claude/…`: lo que no llega a `nueva-version` no se
   publica. Antes de empezar, partir de la última `nueva-version`. Para ver que se publicó: `curl` al archivo en `https://elsauloel.github.io/rolpintoista/`.
-- **No hay Chrome con las cuentas del dueño**: no se puede probar en el mapa ni leer las partidas de Firebase. Las pruebas en el mapa se anotan en
-  `docs/pruebas-en-el-mapa.md`; si hace falta un dato de una partida, pedírselo al dueño (o que mande una captura).
+- **Tres cuentas de prueba en la nube (desde el 2026-10-31)**: el entorno tiene `ROL_GM_EMAIL`/`ROL_GM_CLAVE`, `ROL_J1_…` y `ROL_J2_…` (nunca
+  mostrarlas en el chat ni escribirlas en el repo). Con ellas: leer las partidas por la API REST de Firebase (login `accounts:signInWithPassword`
+  con la `apiKey` de `comun/sesion.js`, después Firestore con el token) y **probar en el mapa** con el Chromium sin pantalla (Playwright ya instalado:
+  entrar por `index.html` con `#in-email`/`#in-clave`, abrir el mapa con `?partida=`, apretar los botones de verdad y sacar capturas). Para probar
+  antes de subir, servir la carpeta en `localhost` (`python3 -m http.server`): Firebase acepta `localhost`. La cuenta GM es GM en «Claude ·
+  pruebas» y jugador en El origen (ahí no puede editar fichas ajenas). Las pruebas que igual no se puedan hacer, a `docs/pruebas-en-el-mapa.md`.
 - **Pruebas automáticas**: necesitan un navegador; si la máquina no tiene uno, decirlo y anotarlo, no darlas por buenas.
 - **Seguramente está en el celular**: nada de tablas, mensajes cortos.
 - **En la compu**: Claude usa «Claude in Chrome» con dos perfiles (uno es GM en «Claude · pruebas» y jugador en El origen; el otro es GM en El

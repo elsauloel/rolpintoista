@@ -1096,8 +1096,8 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 .accesos{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:flex-end;margin-bottom:10px}
 /* El menú de la izquierda (.dock-izq, .dock-btn): comun/dock-izq.css (2026-10-12, lo comparten la ficha y GM Tools). */
 #btn-botonera{border-color:var(--copper)}
-.accesos{padding-left:40px} /* lugar para el menú del sitio (comun/menu-sitio.js) */
-#menu-sitio-boton,#menu-sitio{z-index:49!important} /* debajo de las ventanas (z 50) */
+.accesos{padding-left:86px} /* lugar para el menú del sitio y la ⌂ (comun/menu-sitio.js) */
+#menu-sitio-boton,#menu-sitio-home,#menu-sitio{z-index:49!important} /* debajo de las ventanas (z 50) */
 .accesos .note{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-right:auto;min-width:0}
 .accesos .partida{font-family:"Space Mono",monospace;font-size:11px;font-weight:700;color:var(--brass);white-space:nowrap}
 .accesos .partida:empty{display:none}

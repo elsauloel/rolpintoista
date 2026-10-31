@@ -54,7 +54,7 @@
 >   yo voy a la compu y veo cómo se resuelve»).** En «Claude · pruebas» quedó abierto un duelo **Warrior (prueba) contra juan**, en «⚖ ¡EMPATE!» (10 a
 >   10, forzado a mano): cada lado ve Par / Impar / ✊ Piedra, papel o tijera; el primero que elige decide el método. Con piedra, papel o tijera se abre
 >   el juego para el GM (cuenta de Claude, el Warrior) y para Saulo-Prueba (juan). Mirarlo con las dos cuentas.
-> - [ ] **🔑 Cuenta de Claude con mail y contraseña, para trabajar con la compu apagada (2026-10-31, dueño: «anotalo como pendiente en la compu»).**
+> - [x] (2026-10-31: hecho — las tres cuentas están en el entorno de la nube y entran; probado leyendo las partidas y en el mapa) **🔑 Cuenta de Claude con mail y contraseña, para trabajar con la compu apagada (2026-10-31, dueño: «anotalo como pendiente en la compu»).**
 >   Desde la nube Claude programa y publica, pero no entra a las partidas: la cuenta con la que prueba vive en el Chrome de la compu (Firebase
 >   pide una cuenta con el mail confirmado y miembro de la partida; la red de la nube ya llega a Firebase y al sitio, revisado). Pasos, una vez y
 >   guiado de a uno: (1) **dueño, 2026-10-31: usa su cuenta de Gmail de pruebas** (la dirección no va en el repo). Si esa cuenta ya entra al sitio

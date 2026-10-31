@@ -933,6 +933,18 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 
 ## 5. Contenido a revisar (números de primer borrador)
 
+- [ ] ☀ **Revisión de los efectos de luz, uno por uno (dueño, 2026-10-31) — instancia de diseño: NO aplicar hasta que el dueño diga.** Decidido:
+  - **Smite** (jugador y creep): **sí** lleva Luz sanadora, como la propuso Claude (jugador 100 %, creep 50 %) y deja Marcado. Ojo: el commit
+    `22e3b06e` se la sacó (antes de que el dueño cambiara de idea); al aplicar, volver a ponérsela y dejar el Marcado del de jugador.
+  - **Lanza de luz** (creep Mago) → se llama **Lanza arcana** («no es una lanza de luz»): sigue arcana, sin Luz sanadora (Claude lo supuso; el dueño no lo contradijo).
+  - **Varita del destello** (ítem): daño **de luz** (no arcano) en área, con la identidad de la luz (Marcado), Luz sanadora 25 %, y en lugar de
+    Pajaritos un % de **Ceguera** (Claude propuso 20 %, 1 turno). El dueño: «Ceguera es una de las opciones del daño de luz».
+  - **Luz para los suyos**: la está evaluando el dueño.
+  - Falta: Pergamino de luz cegadora (hoy no hace daño) y lo que aparezca.
+- [ ] 🕶 **El daño en área saca del sigilo** (dueño, 2026-10-31: «anotalo así como lo sugerís»). Hoy un área le pega al que está en sigilo
+  (no lo filtra, vtt-hexgrid/js/13) y recibir daño no se lo saca (solo lo sacan que lo descubran —`romperSigilo`, js/03— o quedar Marcado). Regla
+  nueva: si el área **le saca vida**, pierde el sigilo (¿con el Marcado 2 turnos de cuando lo descubren? a confirmar); si la esquiva o la resiste sin daño, sigue en sigilo.
+
 - [ ] ☀ **Luz sanadora en ítems** (2026-10-31): ya está en Arma elemental y Carga Elemental (Luz, 100 %), Luz para los suyos y Lanza de luz (25 %). Candidatos del catálogo, sin tocar: **Varita del destello** (1d4 arcano en flor, «flor de luz») y el **Pergamino de luz cegadora** (hoy sin daño). Basta con sumarles `luzSanadora: N` a su Ejecución.
 - [ ] **Auditar las 60 habilidades de los creeps de «El origen de las especies»** (dueño, 2026-10-23: «pasarlas a la de fábrica y señalarlas como por auditar»): ya están entre las de fábrica (`ORIGEN` en `comun/skills-creep-base.js`, etiqueta «de El origen», «sin auditar»), con su rol y su concepto (`docs/diseno-roles-creep.md`, «Conteo por concepto»). Las 10 que se llaman como una de fábrica llevan «(El origen)»: al auditarlas, decidir cuál queda. ~~Bejines~~ → **Pedo de lobo** (dueño, 2026-10-23: «me encanta»; hecho en la de fábrica; en el Kobold hongero de la partida sigue «Bejines» hasta que se cambie desde GM Tools).
 - [ ] **Auditar las skills de creep** (dueño, 2026-10-20, lo pidió anotar). Las **321 habilidades de creeps**: daño, cooldowns, bonos, cuáles son rápidas y cuáles lentas.

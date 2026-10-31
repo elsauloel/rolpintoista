@@ -1793,3 +1793,11 @@ versión parecida en más de una, es candidato a juntar.
   Dónde va: Arma elemental y Carga Elemental con ☀ Luz, 100 % (siguen dejando Marcado); Smite del Support de jugador, 100 %; Smite de creep, 50 %;
   Luz para los suyos y Lanza de luz (creeps), 25 %. Los creeps guardados con esas tres se ponen al día solos (`Combatiente.migrarLuzSanadora`, en
   `CreepCalculo.normalizar`: si la habilidad ya tiene el campo no se toca); las fichas, por la puesta al día de las habilidades de clase.
+  Revisión del dueño (2026-10-31, después): Smite del Support 100 % (y Marcado 1 turno), Smite de creep 50 %, Destello revelador (antes Luz para los
+  suyos) 25 %, Varita del destello 25 %. La Lanza arcana (antes Lanza de luz) ya no. `migrarLuzSanadora` también renombra las de creep guardadas
+  (`RENOMBRES_LUZ`) y le saca el campo a la que lo perdió (`pct: 0`).
+- **🔄 Ítems de fábrica que cambiaron** (2026-10-31): una ficha (`S.inventario`) o un creep (`sc.equipo`) guardan su propia copia del ítem; si uno de
+  fábrica cambia de mecánica, la copia vieja se pone al día con `Combatiente.ponerAlDiaItemsFabrica(lista)` (la ficha en `renderAll` y
+  `FichaGuardado.completar`; el creep en `CreepCalculo.normalizar`). Cada ítem va en `ITEMS_AL_DIA` con `vieja(it)` (cómo reconocer la copia de antes:
+  si no coincide —la editaron a mano—, no se toca) y las `claves` que se copian del catálogo. Primero: la Varita del destello (luz en vez de arcano,
+  Ceguera 20 % en vez de Pajaritos, Luz sanadora 25 %).

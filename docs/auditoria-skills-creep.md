@@ -412,4 +412,4 @@
 
 - Los golpes con efecto (Golpe que sangra, Mordisco que lisia, Golpe atontador…).
 
-- ☀ **Luz sanadora** (2026-10-31, dueño): Luz para los suyos 25 %, Lanza de luz 25 % (quien pega se cura ese % de la vida que le saca; ver `comun/CLAUDE.md`). Arma elemental con Luz, 100 %. El Smite no la lleva (el dueño, el mismo día: «al Smite no le vamos a poner luz sanadora, pero sí marcado»; la de creep ya dejaba Marcado si no lo resiste, la del jugador ahora siempre).
+- ☀ **Luz sanadora** (2026-10-31, dueño): Smite 50 % (se la sacamos un rato y volvió el mismo día), Destello revelador 25 % (quien pega se cura ese % de la vida que le saca; ver `comun/CLAUDE.md`). Arma elemental con Luz, 100 %. **Nombres nuevos** (dueño, 2026-10-31): «Lanza de luz» → **Lanza arcana** («no es una lanza de luz»; sin Luz sanadora) y «Luz para los suyos» → **Destello revelador**; los creeps guardados se ponen al día solos (`Combatiente.migrarLuzSanadora`).

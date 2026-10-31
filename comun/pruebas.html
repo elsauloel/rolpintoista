@@ -42,8 +42,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 </script>
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
-<script src="combatiente.js?v=20261031smite"></script>
-<script src="creep-calculo.js?v=20261031luz"></script>
+<script src="combatiente.js?v=20261031luz2"></script>
+<script src="creep-calculo.js?v=20261031luz2"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261031ae"></script>
 <script src="creep-duelo.js"></script>
@@ -109,9 +109,9 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
-<script src="skills-clase.js?v=20261031smite"></script>
+<script src="skills-clase.js?v=20261031luz2"></script>
 <script src="creeps-base.js"></script>
-<script src="skills-creep-base.js?v=20261031smite"></script>
+<script src="skills-creep-base.js?v=20261031luz2"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
 <script>
@@ -1282,8 +1282,8 @@ prueba('🎯 Tiro certero (Rango, 2026-10-26): +1 PdG, Perfora 3 e ignora 2 de R
   igual([a.mods.pdg, a.perfora, a.mods.ignoraResistCrit, h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('rango'), e.etiquetas.includes('tiro certero')],
     [1, 4, 2, 'ATAQUE', 2, 2, true, true]);
 });
-prueba('☀ Luz para los suyos (Support, 2026-10-26, rehecha: un destello): área de diámetro 5 sin dodge; Marcado 2 sin tirada; Ef.Esp contra Res.Esp, 1d8 de luz directo', () => {
-  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Luz para los suyos'), h = armarHabilidadDeCreep(e.datos, 2);
+prueba('☀ Destello revelador (antes Luz para los suyos; Support, 2026-10-26, rehecha: un destello): área de diámetro 5 sin dodge; Marcado 2 sin tirada; Ef.Esp contra Res.Esp, 1d8 de luz directo', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Destello revelador'), h = armarHabilidadDeCreep(e.datos, 2);
   const x = Combatiente.habEjecucion(h, h.duelo, {stat: s => ({rng: 5, dmgesp: 6})[s] || 0, etq: s => s});
   const l = Duelo.limpiarHab(x);
   igual([x.objetivo, x.radio, !!x.sinDodge, x.tira.stat, x.contra.map(c => c.stat || c).join(','), x.dano.formula, x.dano.tipo, !!x.dano.directo, x.destello.nombre, x.destello.turnos, l.destello.nombre, x.alcance > 0, h.cd, e.etiquetas.includes('support')],
@@ -1495,8 +1495,8 @@ prueba('🎯 Dos Presas a la vez (2026-10-25): vale solo la más fuerte, tambié
   igual([evaNada - evaAmbas, CreepCalculo.modTotal(sc, 'eva'), Combatiente.sinPresasDebiles(sc.estados).map(e => e.nombre).join(','), Combatiente.presaValor({nombre: 'Presa'})],
     [2, -2, 'Presa señalada', 2]);
 });
-prueba('✨ Lanza de luz (Mago, 2026-10-25): línea tan larga como su Rango, 3d6 arcano y Deslumbrado (Res.Esp −2, 2 turnos)', () => {
-  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Lanza de luz');
+prueba('✨ Lanza arcana (antes Lanza de luz; Mago, 2026-10-25): línea tan larga como su Rango, 3d6 arcano y Deslumbrado (Res.Esp −2, 2 turnos)', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Lanza arcana');
   const h = armarHabilidadDeCreep(e.datos, 2);
   const ej = Combatiente.habEjecucion(h, h.duelo, {stat: s => s === 'rng' ? 7 : 3, etq: s => s});
   const lim = Duelo.limpiarHab(ej), est = EstadosAplicar.componer(ej.efectos[0].spec);
@@ -1664,7 +1664,7 @@ prueba('✨ Carga Elemental (2026-10-31): tóxico 2 + 1 cada 4, luz y siniestro 
       'Marcado', true,
       3]);
 });
-prueba('☀ Luz sanadora (2026-10-31): Carga y Arma de luz 100 %, Smite 100 / 50, Luz para los suyos y Lanza de luz 25, y los creeps guardados se ponen al día', () => {
+prueba('☀ Luz sanadora (2026-10-31): Carga y Arma de luz 100 %, Smite 100 / 50, Destello revelador 25, Lanza arcana sin, y los creeps guardados se ponen al día', () => {
   const base = {objetivo: 'enemigo', tira: 'pdgmg', contra: ['eva'], dano: true, danoFormula: '2d6', tipoDano: 'arcano'};
   const ej = (h, c) => Combatiente.habEjecucion(h, c, {stat: () => 0, etq: s => s});
   const carga = Duelo.limpiarHab(ej({nombre: 'Rayo'}, Combatiente.conCarga(base, 'luz')));
@@ -1672,18 +1672,34 @@ prueba('☀ Luz sanadora (2026-10-31): Carga y Arma de luz 100 %, Smite 100 / 50
   const arma = EfectosGolpe.normalizar(estadosPresetCreep().find(p => p.nombre === 'Arma luminosa').golpe.efectos[0]);
   const cre = n => { const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos, 2); return ej(h, h.duelo).dano.luzSanadora; };
   const sm = CLASES_SKILLS.flatMap(c => c.habilidades || []).find(x => x.id === 'support-smite');
+  // Un creep guardado: el Smite sin el campo (o que lo perdió el rato que no lo tuvo) lo recupera; la Lanza de luz pasa a Lanza arcana y lo pierde;
+  // Luz para los suyos pasa a Destello revelador con 25 %.
   const sc = CreepCalculo.normalizar({nombre: 'Clérigo', habilidades: [{id: 'a', nombre: 'Smite', detalle: 'Un rayo.', ataqueTxt: 'no se esquiva', duelo: {objetivo: 'enemigo', dano: true, danoFormula: '2d4', tipoDano: 'luz'}},
-    {id: 'b', nombre: 'Lanza de luz', duelo: {objetivo: 'linea', dano: true, danoFormula: '3d6', luzSanadora: 40}}, {id: 'c', nombre: 'Golpe'}]});
+    {id: 'b', nombre: 'Lanza de luz', detalle: 'Dispara una lanza de luz. Luz sanadora 25 %: se cura la cuarta parte (para abajo) de la vida que le saca a cada uno.', ataqueTxt: 'una línea; Luz sanadora 25 %', duelo: {objetivo: 'linea', dano: true, danoFormula: '3d6', luzSanadora: 25}},
+    {id: 'c', nombre: 'Golpe'}, {id: 'd', nombre: 'Luz para los suyos', detalle: 'Un destello.', duelo: {objetivo: 'area', dano: true, danoFormula: '1d8', tipoDano: 'luz'}}]});
+  const [hs, hl, hg, hd] = sc.habilidades;
   const otra = Combatiente.migrarLuzSanadora(sc.habilidades);
-  // El Smite que había quedado con la Luz sanadora 50 % guardada la pierde (2026-10-31) y el del jugador deja Marcado
-  const vieja = [{nombre: 'Smite', detalle: 'Un rayo. Luz sanadora 50 %: el creep se cura la mitad (para abajo) de la vida que le saca.', ataqueTxt: 'no se esquiva; Luz sanadora 50 %', duelo: {dano: true, luzSanadora: 50}}];
-  igual([Combatiente.migrarLuzSanadora(vieja), vieja[0].duelo.luzSanadora, vieja[0].detalle, vieja[0].ataqueTxt, sm.duelo.efectos.map(e => e.nombre).join()], [true, undefined, 'Un rayo.', 'no se esquiva', 'Marcado']);
   igual([carga.dano.luzSanadora, fuego.dano.luzSanadora, arma.luzSanadora, /Luz sanadora 100/.test(EfectosGolpe.resumenTxt ? EfectosGolpe.resumenTxt(arma) : 'Luz sanadora 100'),
-      cre('Smite'), cre('Luz para los suyos'), cre('Lanza de luz'), ej(sm, sm.duelo).dano.luzSanadora,
-      sc.habilidades[0].duelo.luzSanadora, /Luz sanadora 50/.test(sc.habilidades[0].detalle), /Luz sanadora 50/.test(sc.habilidades[0].ataqueTxt), sc.habilidades[1].duelo.luzSanadora, sc.habilidades[2].duelo, otra],
+      cre('Smite'), cre('Destello revelador'), cre('Lanza arcana'), ej(sm, sm.duelo).dano.luzSanadora, sm.duelo.efectos.map(e => e.nombre).join(), /Luz sanadora 100/.test(sm.detalle),
+      hs.duelo.luzSanadora, /Luz sanadora 50/.test(hs.detalle), /Luz sanadora 50/.test(hs.ataqueTxt),
+      hl.nombre, hl.duelo.luzSanadora, hl.detalle, hl.ataqueTxt, hg.duelo, hd.nombre, hd.duelo.luzSanadora, otra,
+      !!HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Lanza de luz' || x.nombre === 'Luz para los suyos')],
     [100, undefined, 100, true,
-      undefined, 25, 25, undefined,
-      undefined, false, false, 40, undefined, false]);
+      50, 25, undefined, 100, 'Marcado', true,
+      50, true, true,
+      'Lanza arcana', undefined, 'Dispara una lanza arcana.', 'una línea', undefined, 'Destello revelador', 25, false,
+      false]);
+});
+prueba('🔄 Varita del destello (2026-10-31): daño de luz en área, Luz sanadora 25 %, Ceguera en lugar de Pajaritos; la copia vieja de una ficha o un creep se pone al día', () => {
+  const v = CATALOGO_BASE.find(i => i.id === 'esp-varita-del-destello'), d = v.especial.duelo;
+  const ej = Combatiente.habEjecucion({nombre: v.nombre, tiradaExtra: v.especial.dano}, d, {stat: () => 0, etq: s => s});   // (la varita: su daño va en la tirada extra, FichaAcciones.habDeArmaEspecial)
+  const vieja = {id: v.id, nombre: v.nombre, equipado: true, especial: {sp: 3, dano: '1d4', duelo: {objetivo: 'area', tira: 'pdgmg', contra: ['eva'], dano: true, tipoDano: 'arcano', efectos: [{nombre: 'Pajaritos', caras: 5, exitos: 1}], radio: 1, danoDirecto: true}}, detalle: 'Flor de luz: 1d4 arcano.'};
+  const editada = structuredClone(vieja); editada.especial.duelo.efectos = [{nombre: 'Sangrado'}];
+  const lista = [vieja, editada, {id: 'otro', nombre: 'Espada'}];
+  const c1 = Combatiente.ponerAlDiaItemsFabrica(lista), c2 = Combatiente.ponerAlDiaItemsFabrica(lista);
+  igual([d.tipoDano, d.radio, d.luzSanadora, d.efectos.map(e => `${e.nombre}:${e.turnos}:${e.caras}:${e.exitos}`).join(), !!d.sinDodge, ej.dano.luzSanadora, ej.dano.tipo,
+      /Marcado/.test(v.detalle), /Ceguera/.test(v.detalle), c1, c2, vieja.especial.duelo.tipoDano, vieja.equipado, vieja.detalle === v.detalle, editada.especial.duelo.tipoDano],
+    ['luz', 1, 25, 'Ceguera:1:5:1', false, 25, 'luz', true, true, true, false, 'luz', true, true, 'arcano']);
 });
 prueba('🔥 Bola de fuego de creep (2026-10-21): ¼ del Ef.Esp, cuesta su Especial en SP y 4 No2', () => {
   const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Bola de fuego').datos, 2);

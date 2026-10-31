@@ -1197,7 +1197,7 @@ async function areaCrearSiguienteSubDuelo(areaId, a){
       if(intento) await new Promise(r => setTimeout(r, 700));
       mia = await fbDb.runTransaction(async tx => {
         const doc = await tx.get(ref);
-        if(!doc.exists) return 'tarde';   // (recién lanzada: el servidor todavía no la tiene — 2026-10-25, la Lanza de luz)
+        if(!doc.exists) return 'tarde';   // (recién lanzada: el servidor todavía no la tiene — 2026-10-25, la Lanza de luz, hoy Lanza arcana)
         const duelos = (doc.data().duelos || []).slice();
         if(duelos[idx]) return 'no';
         if(num(doc.data().indice) < idx) return 'tarde';
@@ -1216,7 +1216,7 @@ async function areaCrearSiguienteSubDuelo(areaId, a){
     // objetivo en adelante, `a.pdgCompartido` (capturado del primero al resolverse, ver dueloGrupoResuelto) llega
     // precargado — este sub-duelo solo le pide la Evasión a ESTE objetivo, contra esa misma tirada.
     dueloId = await Duelo.crear({yo: a.casteador, ataque: {tipo: 'habilidad', hab: tormentaHabDe(a.hab, tokenId), alcance: 0}, grupo: {id: areaId, indice: idx + 1, total: Math.max(objetivos.length, num(a.hab && a.hab.reparte && a.hab.reparte.total))}, pdgCompartido: a.pdgCompartido || null,
-      presa: a.hab && a.hab.dano ? (() => { try{ return presaContra(tokens.get(a.casteador.tokenId), t); }catch(err){ return 0; } })() : 0},   // 🎯 la Presa también en un área o una línea (2026-10-25, la Lanza de luz)
+      presa: a.hab && a.hab.dano ? (() => { try{ return presaContra(tokens.get(a.casteador.tokenId), t); }catch(err){ return 0; } })() : 0},   // 🎯 la Presa también en un área o una línea (2026-10-25, la Lanza de luz, hoy Lanza arcana)
       {id: tokenId, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, a.casteador.tokenId, '');
   }catch(err){   // (que se pueda reintentar: se libera la reserva)
     console.error('No se pudo crear el sub-duelo del área:', err); areaSubDueloCreando.delete(clave);
@@ -1510,7 +1510,7 @@ function dueloElegirAreaMapa(msg){
     const casteador = {ref: String(yo.ref || ''), tipo: yo.tipo, nombre: String(yo.nombre || '').slice(0, 40), uid: (mio && mio.duenoUid) || fbUsuario.uid, tokenId: mio ? mio.id : ''};
     const enCono = h.cono ? conoDeArea(h) : h.linea ? new Set(h.linea) : null;   // el cono (Sonic Boom) o la línea (Varita láser): sus casillas
     if(hab.zonaQueda) dueloZonaQueda(hab, h, Math.max(1, radio), yo);   // lo que deja en el suelo (bola de fuego, ventisca)
-    if(hab.destello) await destelloEn(h, radio, yo, hab, todos.filter(t => !t.oculto && !t.bajoTierra && !etereoDe(t) && !propio(t) && distanciaHex(h, t) <= radio && dueloEsRival(yo, t)));   // ☀ el destello (Luz para los suyos)
+    if(hab.destello) await destelloEn(h, radio, yo, hab, todos.filter(t => !t.oculto && !t.bajoTierra && !etereoDe(t) && !propio(t) && distanciaHex(h, t) <= radio && dueloEsRival(yo, t)));   // ☀ el destello (Destello revelador)
     if(hab.despeja) despejarEn(enCono || new Set(celdasFlor(Math.max(1, radio)).map(o => { const c0 = hexACubo(h); return nbPack(cuboACol(c0.q + o.dq, c0.r + o.dr), cuboAFila(c0.q + o.dq, c0.r + o.dr)); })), hab.nombre);   // el vendaval
     const objetivos = todos
       .filter(t => !iniciativaFueraDeJuego(t.id))   // 💀 un caído es un cuerpo esperando que lo revivan: ningún área lo alcanza (P225, dueño, 2026-10-27)
@@ -2063,7 +2063,7 @@ async function despejarEn(celdas, nombre){
   toast(ok === tareas.length ? `💨 ${nombre || 'El viento'}: despejó ${casillas} casilla${casillas === 1 ? '' : 's'} de niebla o fuego`
     : `💨 ${nombre || 'El viento'}: despejó ${ok} de ${tareas.length} — lo demás, a mano (faltan pegar las reglas)`);
 }
-/* ☀ El destello (2026-10-26, Luz para los suyos, dueño: «un destello, ¡fum!, que sucede y no queda como área… revela los ocultos y los deja marcados
+/* ☀ El destello (2026-10-26, Luz para los suyos —desde el 2026-10-31 Destello revelador—, dueño: «un destello, ¡fum!, que sucede y no queda como área… revela los ocultos y los deja marcados
    a todos, revela las trampas y todo»): el fogonazo en todas las pantallas (el momento «estallido», con tono de luz), el estado (Marcado: saca el
    sigilo) a cada rival de adentro, sin tirada, y las trampas rivales de adentro, descubiertas para todos. El daño sigue por la cascada (sin dodge). */
 async function destelloEn(h, radio, yo, hab, rivales){

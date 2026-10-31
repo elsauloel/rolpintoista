@@ -589,7 +589,8 @@ const CreepCalculo = (() => {
     sc.estados = Array.isArray(sc.estados) ? sc.estados : [];
     sc.habilidades = Array.isArray(sc.habilidades) ? sc.habilidades : [];
     Combatiente.migrarArmasElementales(sc.habilidades);   // 🔥 las cinco Armas elementales de antes → una «Arma elemental» (2026-10-31)
-    Combatiente.migrarLuzSanadora(sc.habilidades);   // ☀ Smite, Luz para los suyos y Lanza de luz: Luz sanadora (2026-10-31)
+    Combatiente.migrarLuzSanadora(sc.habilidades);   // ☀ Smite y Destello revelador: Luz sanadora; Lanza arcana y Destello revelador, los nombres nuevos (2026-10-31)
+    Combatiente.ponerAlDiaItemsFabrica(sc.equipo);   // 🔄 ítems de fábrica que cambiaron (la Varita del destello, 2026-10-31)
     sc.pasivas = Array.isArray(sc.pasivas) ? sc.pasivas : [];   // (2026-10-15)
     if(typeof estadosPresetCreep === 'function') Combatiente.sincronizarEstadosDePasivas(sc.estados, sc.pasivas, estadosPresetCreep());   // la pasiva que da un estado (2026-10-16)
     sc.cinturon = Array.isArray(sc.cinturon) ? sc.cinturon : [];   // consumibles a mano (2026-10-04)

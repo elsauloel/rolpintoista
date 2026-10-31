@@ -296,7 +296,7 @@ function ocultoPorSigiloParaMi(t){
   if(typeof delatadoToken === 'function' && delatadoToken(t)) return false;
   if(invisibleParaRivales(t)) return soyGM && !ojoRevelando;
   if(!enSigilo(t)) return false;
-  // «Ve lo oculto» de un aliado, o una luz que revela (la Luz para los suyos de un creep, 2026-10-26: también del lado del GM), lo deja ver.
+  // «Ve lo oculto» de un aliado, o una luz que revela (el Destello revelador de un creep, antes Luz para los suyos, 2026-10-26: también del lado del GM), lo deja ver.
   return soyGM ? (t.tipo === 'pj' && !ojoRevelando && !reveladaCasilla(t)) : (t.tipo === 'creep' && !reveladaCasilla(t));
 }
 function sigiloFantasmasActualizar(){

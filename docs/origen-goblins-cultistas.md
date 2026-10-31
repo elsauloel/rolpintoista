@@ -443,3 +443,34 @@ Propuesta (esperando el OK; skills auditadas salvo el Chillido, que sale de «Pl
   - **Falta programar el Chillido así** (hoy, «Plaga en la galería»: 2 ratas, la copia llega sin la habilidad y no tiene límite por combate): `cant: 1`,
     que la copia conserve el Chillido y que cada rata lo pueda usar una sola vez por combate.
 - **Chillido programado y probado (2026-10-30)**: habilidad auditada **Chillido** en el pool (`comun/skills-creep-base.js`): `refuerzos: {cant: 1, propagan: true}`, `unaVez`, `soloVidaHasta: 50`. Para la rata: + Habilidad → «Chillido» (ya no hace falta «Plaga en la galería»).
+
+### 🏹 Encuentro 2 — Arquero del culto, la variante incendiaria, nivel 3 (dueño, 2026-10-31: «un arquero, que puede ser el mismo de la pelea anterior, con alguna variante»)
+
+Propuesta (esperando el OK; solo skills auditadas). El mismo arquero del encuentro 1, ahora con flechas de estopa: hace juego con el chamán (fuego).
+- **Atributos (39)**, los mismos: Con 8 · Fue 8 · Agi 9 · Des 10 · Esp 4 (Vida 40, SP 12). Pasiva **Recuperación mental** (+1 SP por turno).
+- **Equipo** (las manos + 4 Comunes + 1 Buena): **Arco de flechas con estopa** (Buena, en vez del Arco del rastreador: Tipo 4, 2 manos, 1 dado + 1
+  amplificado, +2 de daño, Rango +5, Prende fuego 33 %); **Turbante de tela reforzada** (Buena: Defensa +1, Def.Esp +1, Campo de visión +2 —la mina está
+  en penumbra—, Res. fuego +1); Comunes: **Anillo de Puntería Certera**, **Chaleco de cuero**, **Perneras de cuero hervido** y **Guantes de piel de
+  lagarto overo** (Def.Esp +1, Res. fuego +1).
+- **Skills (4)**: **Disparo señalador**, **Ráfaga encadenada** y **Vigilancia** (las de antes) y, en lugar de Tiro a la cabeza, **Mina del cazador**
+  (2 No2, 3 SP, cd 3: mina oculta, 2d6+2 de fuego directo en las 7 casillas y Pajaritos; en una galería angosta corta el paso).
+- Si se lo quiere a **nivel 4**: +3 atributos (Des 11, Con 9, Agi 10) y vuelve Tiro a la cabeza como quinta skill.
+
+### 🔥🧪 Encuentro 2 — Goblin chamán del azufre (Mago: ácido y fuego), nivel 4 (dueño, 2026-10-31: «un chamán goblin elemental; quiero que use ácido, y puede ser fuego, hielo»)
+
+Propuesta (esperando el OK; solo skills auditadas). Fuego y ácido (el hielo ya lo usa el Capataz: Prisión de hielo y Hálito polar). El azufre de las
+grietas: el ácido le come la armadura a Petro y el fuego barre las galerías angostas. Además unta las armas de los goblins.
+- **Atributos (42)**: Con 10 · Fue 3 · Agi 7 · Des 8 · Esp 14. Vida 50, No2 7, Evasión 7, Rango 8, SP 42 (6 por turno), PdG.Esp 17 (con el orbe y la
+  pasiva), Ef.Esp 14, Res.Mt 14.
+- **Equipo** (las manos + 3 Comunes + 2 Buenas): **Varita del chorro de ácido** (Común: contra la Evasión, Armadura rota segura y 1d4 ácido directo) y
+  **Orbe del foco** (Buena: PdG.Esp +2, Def.Esp +1, Res. fuego +1); Buenas, **Delantal de boticario** (Defensa +2, Def.Esp +1, pociones +5, +2 ranuras de
+  cinturón, Res. ácido +2, Res.CC +1) y **Yelmo de bronce con runas** (Defensa +1, Def.Esp +2, Res. fuego +1, Res.Esp +1); Comunes, **Anillo de ácido**
+  (+2 al daño de ácido), **Guantes de piel de lagarto overo** y **Zuecos de boticario**. Queda Defensa 4, Def.Esp 5. Consumible: Poción de HP.
+- **Pasiva**: **Puntería arcana** (+1 PdG.Esp).
+- **Skills (5)**: **Corroer** (2 No2, 3 SP, cd 3: 2d6 + 2 ácido y Armadura rota 1, +1 cada 5 de daño) · **Bola de fuego** (4 No2, SP = su Especial,
+  cd 2: flor de diámetro 3, 2d6 + 3 de fuego y Quemadura; dodge roll) · **Muro de fuego** (1 No2, 3 SP, cd 3: línea de 4 a 8, 3 turnos, 3d4 de fuego
+  directo y Quemadura a quien la cruza) · **Arma ácida** (2 No2, 2 SP, cd 3: el arma de un aliado suma +1d4 ácido directo y Armadura rota 1 por golpe,
+  3 turnos; es su ataque del turno) · **Parpadeo** (Flash, 2 SP: se teletransporta 3 casillas sin oportunidad).
+- **Juego**: Arma ácida al Rompehuesos (cada martillazo le rompe armadura a Petro) o a una rata; Muro de fuego para cortar la galería y separar al
+  grupo; Bola de fuego cuando se amontonan; Corroer a Petro; Parpadeo cuando lo alcanzan las ratas o Bizzante.
+- **Riesgo**: Bola de fuego (≈ 10 + Quemadura 2 por turno 3 turnos) más la Ráfaga del arquero sobre Larry. Palancas: Esp 12 o sacar la Bola de fuego.

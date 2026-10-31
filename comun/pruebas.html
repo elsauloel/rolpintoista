@@ -1338,12 +1338,21 @@ prueba('💪 Empuje (Support, 2026-10-26): Flash, Empower a un aliado; la tirada
   igual([!!h.flash, h.duelo.objetivo, h.duelo.efectos[0].nombre, h.spCosto, h.cd, usa, gasto, sc.estados.length, CreepAcciones.gastarUnaTirada(sc2, r2), e.etiquetas.includes('support')],
     [true, 'aliado', 'Empower', 2, 2, true, true, 0, false, true]);
 });
-prueba('☠ Nube tóxica (Debuffer, 2026-10-26): zona de diámetro 3, 4 turnos, Ef.Esp contra Res.Esp, 2d4 tóxico directo y Veneno 3 (resetea)', () => {
+prueba('☠ Nube tóxica (Debuffer, 2026-10-26; +1 stack desde el 2026-10-31): zona de diámetro 3, 4 turnos, Ef.Esp contra Res.Esp, 2d4 tóxico directo y Veneno 3 (unaVez + sumaUno)', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Nube tóxica'), h = armarHabilidadDeCreep(e.datos, 2);
   const z = Combatiente.zonaDeHab(h, h.duelo, {fichaId: 'c1', tipo: 'creep', tiraValor: 7});
   const est = typeof z.zonaEstado === 'string' ? JSON.parse(z.zonaEstado) : z.zonaEstado;
-  igual([h.duelo.objetivo, z.radio, z.zonaTurnos, z.resistStat, z.tiraStat, z.tiraValor, z.zonaDano, z.zonaDirecto, z.zonaAmiga, est.nombre, est.stacks, !!est.unaVez, !!est.resetea, h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('debuffer')],
+  igual([h.duelo.objetivo, z.radio, z.zonaTurnos, z.resistStat, z.tiraStat, z.tiraValor, z.zonaDano, z.zonaDirecto, z.zonaAmiga, est.nombre, est.stacks, !!est.unaVez, !!est.sumaUno, h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('debuffer')],
     ['zona', 1, 4, 'resmg', 'dmgesp', 7, '2d4', true, false, 'Veneno', 3, true, true, 1, 3, 3, true]);
+});
+// ☠ La regla del 2026-10-31 (dueño): ya envenenado, cada vez que la nube lo afecta le suma 1 stack (el mapa manda {nombre, stacks: 1}, js/08).
+prueba('☠ Nube tóxica: ya envenenado, cada activación suma 1 stack (3 → 4 → 5), en un creep y en la de clase del Debuffer', () => {
+  const sc = {estados: []}; EstadosAplicar.aplicarACreep(sc, {nombre: 'Veneno', stacks: 3});
+  EstadosAplicar.aplicarACreep(sc, {nombre: 'Veneno', stacks: 1}); const a = sc.estados[0].stacks;
+  EstadosAplicar.aplicarACreep(sc, {nombre: 'Veneno', stacks: 1});
+  const c = ((CLASES_SKILLS.find(k => k.id === 'debuffer') || {}).habilidades || []).find(x => x.id === 'debuffer-nube-toxica');
+  const ze = c && c.duelo && c.duelo.zonaEstado;
+  igual([a, sc.estados[0].stacks, !!(ze && ze.unaVez), !!(ze && ze.sumaUno)], [4, 5, true, true]);
 });
 prueba('☠ Veneno que resetea (2026-10-26, la Nube tóxica): vuelve a sus stacks si tenía menos, no suma; sin la marca, suma', () => {
   const sc = {estados: []}; EstadosAplicar.aplicarACreep(sc, {nombre: 'Veneno', stacks: 3});

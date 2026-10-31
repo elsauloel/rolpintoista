@@ -1892,3 +1892,11 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   que entra y el que sale) en `campanas/<id>/mapa/usos = {ids: {mapaId: fecha}}` (`escucharMapasUsos`; va en `mapa/`, que ya escribe el GM: sin
   reglas nuevas). Se registra desde ese día: los mapas que nunca se publicaron después dicen «Creado hace N · sin uso registrado» y se ordenan
   por fecha de creación.
+
+- **☠ Nube tóxica: ya envenenado, +1 stack por activación** (2026-10-31, dueño: «una vez que estás envenenado, la nube tóxica solamente suma un
+  stack cada vez que se activa; puede ser al entrar o al momento de activación dentro del turno»). Reemplaza al «resetea» del 2026-10-26 (que le
+  volvía el Veneno a 3). `zonaEstado` lleva `unaVez` + `sumaUno` (la del Debuffer de los jugadores, `comun/skills-clase.js`, y la de los creeps,
+  `comun/skills-creep-base.js`): la primera vez, resistencia, daño y Veneno 3; después, al que ya tiene el Veneno y entra (viniendo de afuera) o
+  sigue adentro en el Mantenimiento, sin tirada ni daño, `zonaSumarStack` (js/08) le manda `{nombre, stacks: 1}` (Veneno suma sus stacks), con la
+  Crónica y la Mesa. Moverse adentro no cuenta. Las zonas ya puestas con `resetea` hacen lo mismo. Probado en el mapa con un creep (3 → 4 → 5).
+

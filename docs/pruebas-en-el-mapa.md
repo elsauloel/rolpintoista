@@ -281,6 +281,12 @@
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 
 ## Pendientes
+- [ ] **🏃 Prisa al ordenar los turnos** (2026-10-31, hecho desde la nube, `vtt-hexgrid/js/86-prisa.js`): (1) en «El origen de las especies»,
+  confirmar que **Ricardo** tiene Prisa (en su ficha: la pasiva o lo que se la dé; la ficha tiene que haberse guardado una vez para publicar
+  `resumen.prisa`); desde la nube no se pueden leer las partidas. (2) Con Ricardo en el orden de turnos, ⇅ Ordenar → al GM, el Aviso «Prisa al
+  ordenar los turnos» con quién la tiene: «✔ Aplicar» lo pone primero; «✋ Resolver a mano» ordena solo por la tirada. (3) La pantalla del jugador
+  de Ricardo: el Aviso «🏃 Prisa: vas primero…»; las demás, la línea en la Crónica. (4) Dos con Prisa (sumársela a un creep de prueba): los dos
+  arriba, entre ellos el de tirada más alta primero. Sin nadie con Prisa, Ordenar no muestra cartel.
 - [x] **↻ Creeps que se dan vuelta y 🗡 la defensa en 1 desde el sigilo** (2026-10-30, P201): (1) en combate, un personaje que se acerca por la
   espalda de un creep a 3 casilleros o menos → al GM le sale «Pasos a tu espalda… ¿Se da vuelta?» y lo gira; con otro personaje pegado al frente,
   «¡Flanqueado!»; un creep en sigilo o escondido no aparece en la Crónica. (2) Un ataque desde el sigilo por la espalda: el duelo dice «🗡 por la

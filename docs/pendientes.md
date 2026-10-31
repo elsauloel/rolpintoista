@@ -198,7 +198,9 @@
 >   emulador) con cuentas de prueba, para que una sesión en la nube pueda abrir el mapa en un navegador sin pantalla, jugar con dos cuentas y sacar
 >   capturas sin tocar las partidas reales. **Antes de hacer nada: explicárselo bien y sin jerga** (qué es, qué cambia en cómo trabaja él, qué hay que
 >   instalar o configurar una vez en la compu, qué cuesta y qué riesgos tiene) y que decida.
-> - [ ] **🏃 Prisa, automática y a la vista (2026-10-31, dueño: «automatizar prisa: siempre primero en la tabla de la iniciativa al apretar
+> - [x] ✅ **(2026-10-31, hecho desde la nube, falta verlo en el mapa: al apretar Ordenar con alguien con Prisa, el GM elige «✔ Aplicar» o «✋ Resolver a
+>   mano» (solo por la tirada; el GM acomoda con ▲▼); el jugador recibe el Aviso y los demás la Crónica — `vtt-hexgrid/js/86-prisa.js`; para probar en
+>   `pruebas-en-el-mapa.md`)** **🏃 Prisa, automática y a la vista (2026-10-31, dueño: «automatizar prisa: siempre primero en la tabla de la iniciativa al apretar
 >   "ordenar"; debe automatizarse pero también le debe aparecer una notificación al jugador y debe aparecer en el mensaje lateral»).** Lo que ya hay: al
 >   apretar Ordenar, `ordenarIniciativa` (`vtt-hexgrid/js/04`) pone primero a quien tiene la pasiva (`tokenTienePrisa`: `resumen.prisa` del personaje, el
 >   equipo y los estados del creep; las invocaciones no). Falta: revisar en el mapa que funcione de verdad (si la ficha no publicó `resumen.prisa` o el

@@ -1070,7 +1070,7 @@ function conectarIniciativa(){
   const traer = $('#ini-traer');
   if(traer) traer.onclick = iniciativaPonerTodos;
   const ordenar = $('#ini-ordenar');
-  if(ordenar) ordenar.onclick = () => guardarIniciativa({orden: ordenarIniciativa(iniciativa.orden), turno: 0, libre: null});
+  if(ordenar) ordenar.onclick = () => prisaOrdenar();   // 🏃 con Prisa, el GM elige Aplicar o Resolver a mano (js/86)
   const siguiente = $('#ini-siguiente');
   if(siguiente) siguiente.onclick = () => iniciativaSiguiente();
   const limpiar = $('#ini-limpiar');

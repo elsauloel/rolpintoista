@@ -114,6 +114,7 @@ const CreepEditor = (() => {
           <div></div><div></div>
         </div>
         <label class="chk-lenta" style="display:flex;align-items:center;gap:8px;margin-top:10px;cursor:pointer"><input type="checkbox" data-hc="cd-arranca" style="width:auto"> <span><b>Habilidad lenta</b>: arranca el combate con el cooldown ya activo (como si la hubiera usado el turno anterior)</span></label>
+        <label class="chk-flash" style="display:flex;align-items:center;gap:8px;margin-top:8px;cursor:pointer"><input type="checkbox" data-hc="flash" style="width:auto"> <span><b>⚡ Flash</b>: se puede usar en el turno de cualquiera, con el botón instantáneo del GM (también en el duelo abierto); en turno ajeno cuesta el doble (el cooldown o el SP)</span></label>
         <div class="hint" style="margin-top:6px">Cooldown: cuántos turnos tiene que esperar para volver a usarla (0 = cuando quiera). La vida se descuenta sola al usarla (tiene que sobrarle). "Otro costo" es un recordatorio libre: un objeto, etc.</div>
       </div>
       <div class="hc-paso" data-hc-paso="2">
@@ -338,6 +339,7 @@ const CreepEditor = (() => {
       $h('cd').value = h.cd || 0;
       $h('hpcosto').value = h.hpCosto || 0;
       $h('cd-arranca').checked = !!h.cdArranca;
+      $h('flash').checked = !!h.flash;   // ⚡ (2026-10-30, dueño: «si quisiera marcar que una habilidad tiene flash, ¿existe una ruta? no la encuentro»)
       $h('detalle').value = h.detalle || '';
       $h('tirada').value = h.tiradaExtra || '';
       $h('tirada-stat').innerHTML = opcionesStat(h.tiradaStat || "");
@@ -373,7 +375,7 @@ const CreepEditor = (() => {
     // Lo que hay en la pantalla (para saber si cambió algo antes de descartar).
     function datosDePantalla(){
       return ['nombre', 'detalle', 'costo', 'nitros-modo', 'acciones', 'cd', 'hpcosto', 'tirada', 'tirada-stat', 'efecto-nombre', 'efecto-turnos', 'efecto-stacks', 'efecto-hpturno', 'efecto-detalle']
-        .map(n => $h(n) ? $h(n).value : '').concat([$h('cd-arranca').checked, $h('efecto-permanente').checked, $h('trampa-on').checked, JSON.stringify(e && e.duelo || null)]);
+        .map(n => $h(n) ? $h(n).value : '').concat([$h('cd-arranca').checked, $h('flash').checked, $h('efecto-permanente').checked, $h('trampa-on').checked, JSON.stringify(e && e.duelo || null)]);
     }
 
     async function guardar(){
@@ -385,7 +387,7 @@ const CreepEditor = (() => {
       const v = {
         nombre: $h('nombre').value.trim() || 'Sin nombre', costo: $h('costo').value,
         nitrosCosto: $h('nitros-modo').value === "ataque" ? "ATAQUE" : Math.max(0, num($h('acciones').value) || 0),
-        cd: Math.max(0, num($h('cd').value) || 0), hpCosto: Math.max(0, num($h('hpcosto').value) || 0), cdArranca: $h('cd-arranca').checked,
+        cd: Math.max(0, num($h('cd').value) || 0), hpCosto: Math.max(0, num($h('hpcosto').value) || 0), cdArranca: $h('cd-arranca').checked, flash: $h('flash').checked,
         detalle: $h('detalle').value, tiradaExtra: $h('tirada').value.trim(), tiradaStat: $h('tirada-stat').value,
         efectoNombre: $h('efecto-nombre').value.trim(), efectoTurnos: Math.max(0, num($h('efecto-turnos').value) || 0),
         efectoStacks: Math.max(1, num($h('efecto-stacks').value) || 1), efectoHpTurno: num($h('efecto-hpturno').value) || 0,
@@ -403,6 +405,7 @@ const CreepEditor = (() => {
         const eraLenta = !!h.cdArranca;
         h.cdArranca = v.cdArranca;
         if(h.cdArranca && (!eraLenta || !ed.habId)) h.cdActual = h.cd;
+        if(v.flash) h.flash = true; else delete h.flash;   // ⚡ Flash: el botón instantáneo del GM (vtt-hexgrid/js/71) y el doble en turno ajeno (js/12)
         h.detalle = v.detalle;
         h.tiradaExtra = v.tiradaExtra;
         h.tiradaStat = v.tiradaStat;

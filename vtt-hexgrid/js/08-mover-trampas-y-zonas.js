@@ -487,6 +487,61 @@ function zonaRevisarEntrada(id, celdas, levita){
   });
   zonaRevisarToken(t, false, !!(celdas && celdas.length > 1 && lev >= celdas.length - 1), false, celdas && celdas.length > 1 ? celdas[0] : null);   // si todo el camino fue levitando, lo del piso todavía no
 }
+/* ☠ El Veneno de una zona, a la vista y con salida a mano (2026-10-31, dueño: «Cada vez que se aplica el veneno o se suma un stack, tiene que
+   aparecer una notificación comunicando esto está sucediendo. Aplicar, resolver a mano.»). Antes de ponerle Veneno a alguien (la primera vez, tras no
+   resistir) o de sumarle el stack (zonaSumarStack), la pantalla que resuelve ese token (el GM para un creep; el dueño, o quien tiene 🎮 el control,
+   para un personaje o una invocación) ve el cartel «☠ <zona>: <quién> — Veneno 3 → 4» con «✔ Aplicar» y «✋ Resolver a mano». Va en un cartel
+   (AvisoCombate.cartel, no el Aviso modal: otro Aviso que llegue no lo pisa) y de a uno: varias activaciones seguidas (varios tokens, el
+   Mantenimiento) esperan en fila. Resolver a mano no toca el estado y lo deja dicho en la Mesa y la Crónica. Al aplicarse, el jugador del personaje
+   (si no es quien lo resolvió) recibe su Aviso y queda la línea en la Crónica (zonaVenenoContar). */
+const zonaEsVeneno = spec => !!(spec && /^Veneno/.test(String(spec.nombre || '')));
+function zonaStacksDe(t, nombre){
+  const e = (typeof confusionEstadosDe === 'function' ? confusionEstadosDe(t) : []).find(x => x && x.activo !== false && x.nombre === nombre);
+  // (el resumen público de un personaje no lleva los stacks del Veneno: sus turnos son sus stacks, Combatiente.acumularVeneno)
+  return e ? Math.max(1, num(e.stacks) || (/^Veneno/.test(nombre) ? num(e.turnos) : 0) || 1) : 0;
+}
+let zonaVenenoCola = Promise.resolve();
+let zonaVenenoN = 0;
+// Lo que se acaba de aplicar, para que el cartel siguiente de la fila no muestre el número viejo mientras llega el cambio (15 s).
+const zonaVenenoRecien = new Map();   // tokenId|nombre → {stacks, t}
+// → Promise<{aplicar, antes, despues}>
+function zonaVenenoPreguntar(t, el, spec, primera){
+  const p = zonaVenenoCola.then(() => new Promise(ok => {
+    const nombreZ = el.zonaNombre || 'la zona', quien = t.oculto ? 'Alguien' : nombreDe(t);
+    const k = zonaIdDe(t) + '|' + spec.nombre, rec = zonaVenenoRecien.get(k);
+    const antes = Math.max(zonaStacksDe(t, spec.nombre), rec && Date.now() - rec.t < 15000 ? rec.stacks : 0), suma = Math.max(1, num(spec.stacks) || 1);
+    const despues = antes && spec.nombre === 'Veneno severo' ? antes : antes + suma;   // el severo no se acumula (Combatiente.acumularVeneno)
+    const clave = 'zona-veneno-' + (++zonaVenenoN);
+    const fin = v => { AvisoCombate.cartel(clave, null); if(v) zonaVenenoRecien.set(k, {stacks: despues, t: Date.now()}); ok({aplicar: v, antes, despues}); };
+    AvisoCombate.cartel(clave, {icono: '☠', titulo: `${nombreZ}: ${quien}`,
+      pasos: [{titulo: 'A quién', texto: quien},
+        {titulo: 'Qué pasa', texto: antes ? `${spec.nombre} ${antes} → ${despues}${primera ? '' : ' (ya estaba envenenado: la nube le suma 1 stack, sin tirada)'}` : `Queda con ${spec.nombre} ${despues}`}],
+      botones: [{texto: '✔ Aplicar', id: 'zona-veneno-aplicar', alClic: () => fin(true)},
+        {texto: '✋ Resolver a mano', id: 'zona-veneno-mano', sec: true, titulo: 'No se toca el estado: lo acomodan a mano', alClic: () => fin(false)}]});
+  }));
+  zonaVenenoCola = p.catch(() => {});
+  return p;
+}
+// El jugador del personaje (o de la invocación): el dueño de la ficha, aunque lo esté resolviendo el GM con 🎮 el control. Un creep: nadie.
+function zonaVenenoJugador(t){
+  if(!t || t.tipo === 'creep') return '';
+  const f = fichasPub.get(String(t.fichaId || '').split(SEP_INVOCACION)[0]);
+  return (f && f.duenoUid) || t.duenoUid || '';
+}
+// La Mesa y la Crónica de lo que pasó con el Veneno; al jugador del personaje (si no lo resolvió él), su Aviso al centro.
+async function zonaVenenoContar(t, el, spec, r){
+  const nombreZ = el.zonaNombre || 'la zona', cambio = r.antes ? `${spec.nombre} ${r.antes} → ${r.despues}` : `${spec.nombre} ${r.despues}`;
+  if(t.oculto){ toast(`${nombreZ}: ${r.aplicar ? cambio : `${spec.nombre}, se resuelve a mano`}`); return; }
+  const quien = nombreDe(t), resultado = r.aplicar ? cambio : `${cambio}: se resuelve a mano`;
+  const uid = zonaVenenoJugador(t);
+  const aviso = r.aplicar && uid && uid !== fbUsuario.uid;
+  momentoAbrir({tipo: 'zona-veneno', icono: '☠', titulo: `${quien} · ${nombreZ}`, resultado, estado: 'listo',
+    datos: aviso ? {paraUids: [uid], aviso: true, tituloAviso: nombreZ, textoAviso: r.antes ? `Tu ${spec.nombre} sube: ${r.antes} → ${r.despues}.` : `Quedás con ${spec.nombre} ${r.despues}.`} : {}});
+  try{
+    await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '', origen: `☠ ${nombreZ}: ${quien} — ${resultado}`,
+      formula: '', rolls: [], mod: 0, total: 0, desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()});
+  }catch(err){}
+}
 async function zonaRenovarEstado(t, spec, el, como){
   const nombre = el.zonaNombre || 'la zona';
   if(como === 'sumaUno') return zonaSumarStack(t, spec, el, nombre);
@@ -510,11 +565,15 @@ async function zonaRenovarEstado(t, spec, el, como){
 // ficha (encolarPj, `fichaId~invId` para una invocación) y un creep directo.
 async function zonaSumarStack(t, spec, el, nombre){
   try{
+    // ☠ Con el Veneno, primero el cartel con «Aplicar» / «Resolver a mano» (2026-10-31); la Mesa y la Crónica las pone zonaVenenoContar.
+    const r = zonaEsVeneno(spec) ? await zonaVenenoPreguntar(t, el, spec, false) : null;
+    if(r && !r.aplicar){ await zonaVenenoContar(t, el, spec, r); return; }
     if(t.tipo === 'creep') await modificarCreep(t.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
     else await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec, origen: nombre});
+    if(r){ await zonaVenenoContar(t, el, spec, r); return; }
     if(t.oculto){ toast(`${nombre}: +1 stack de ${spec.nombre}`); return; }
     const quien = nombreDe(t);
-    momentoAbrir({tipo: 'zona-renueva', icono: '☠', titulo: `${quien} sigue en ${nombre}`, resultado: `Ya envenenado: la nube le suma 1 stack de ${spec.nombre} (sin tirada).`, estado: 'listo', datos: {}});
+    momentoAbrir({tipo: 'zona-renueva', icono: '☠', titulo: `${quien} sigue en ${nombre}`, resultado: `Ya tenía ${spec.nombre}: la zona le suma 1 stack (sin tirada).`, estado: 'listo', datos: {}});
     try{
       await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '', origen: `☠ ${nombre}: ${quien} sigue adentro — +1 stack de ${spec.nombre}`,
         formula: '', rolls: [], mod: 0, total: 0, desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()});
@@ -688,11 +747,16 @@ async function zonaResolverBanner(){
       try{ mesaPublicar(`${quienTxt} · ${spec.nombre} ${Combatiente.chanceTexto(num(spec.pct))}`, {formula: '1d' + ch.caras, rolls: r ? r.rolls : [], mod: 0, total: r ? r.total : 0}); }catch(err){}
       if(!sale){ partes.push(`${spec.nombre}: no salió (${Combatiente.chanceTexto(num(spec.pct))})`); spec = null; }
     }
+    // ☠ El Veneno, con su cartel «Aplicar» / «Resolver a mano» (2026-10-31, dueño; ver zonaVenenoPreguntar).
+    const rv = spec && spec.nombre && zonaEsVeneno(spec) ? await zonaVenenoPreguntar(t, el, spec, true) : null;
+    if(rv && !rv.aplicar){ partes.push(`${spec.nombre}: se resuelve a mano`); zonaVenenoContar(t, el, spec, rv); spec = null; }
     if(spec && spec.nombre){
       try{
         if(t.tipo === 'creep'){ await modificarCreep(t.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec)); }
         else{ await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec, origen: el.zonaNombre || 'Zona'}); }
-        partes.push(spec.nombre);
+        partes.push(rv ? (rv.antes ? `${spec.nombre} ${rv.antes} → ${rv.despues}` : `${spec.nombre} ${rv.despues}`) : spec.nombre);
+        // Al jugador del personaje (si no lo resolvió él), su Aviso; la línea de la Crónica ya la pone el momento de la zona.
+        if(rv && t.tipo !== 'creep' && !t.oculto){ const uid = zonaVenenoJugador(t); if(uid && uid !== fbUsuario.uid) zonaVenenoContar(t, el, spec, rv); }
       }catch(err){ console.error('No se pudo aplicar el estado de la zona:', err); partes.push(`${spec.nombre} (aplicalo a mano)`); }
     }
   }

@@ -1900,3 +1900,14 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   sigue adentro en el Mantenimiento, sin tirada ni daño, `zonaSumarStack` (js/08) le manda `{nombre, stacks: 1}` (Veneno suma sus stacks), con la
   Crónica y la Mesa. Moverse adentro no cuenta. Las zonas ya puestas con `resetea` hacen lo mismo. Probado en el mapa con un creep (3 → 4 → 5).
 
+- **☠ El Veneno de una zona, con cartel y salida a mano** (2026-10-31, dueño: «Cada vez que se aplica el veneno o se suma un stack, tiene que aparecer
+  una notificación comunicando esto está sucediendo. Aplicar, resolver a mano.»). Antes de poner Veneno (la primera vez, tras no resistir, en
+  `zonaResolverBanner`) o de sumar el +1 (`zonaSumarStack`), la pantalla que resuelve ese token ve un cartel (`zonaVenenoPreguntar`: «☠ <zona>: <quién>»,
+  «Veneno 3 → 4», «✔ Aplicar» / «✋ Resolver a mano»). Es un `AvisoCombate.cartel` (no el Aviso modal, que otro Aviso pisaría) y van en fila
+  (`zonaVenenoCola`), de a uno; `zonaVenenoRecien` recuerda lo recién aplicado para que el siguiente muestre el número nuevo. Resolver a mano no toca
+  el estado y lo deja en la Mesa y la Crónica; al aplicarse, `zonaVenenoContar` pone la Mesa y la Crónica y, si quien lo resolvió no es el jugador del
+  personaje (`zonaVenenoJugador`: el dueño de la ficha, aunque lo resuelva el GM con 🎮 el control), le manda su Aviso al centro («Tu Veneno sube:
+  3 → 4»). Los stacks de un personaje salen de los turnos de su Veneno en el resumen (el resumen no publica los stacks). Probado en el mapa: un creep
+  (GM: aplicar, +1 en el Mantenimiento, a mano, dos seguidas en fila) y Prueba Uno (el jugador decide lo suyo; con el control, el GM decide y al
+  jugador le llega el Aviso).
+

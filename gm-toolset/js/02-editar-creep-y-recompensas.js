@@ -359,6 +359,39 @@ function renderAsistenteCreep(){
 function natBotonHtml(sc, it){
   return `<button type="button" class="nat-btn${it.natural ? ' on' : ''}" data-naturalequipo="${sc.id}:${it.id}" title="${it.natural ? 'Natural (parte del cuerpo): no se suelta al morir · tocá para que sea una pieza que se suelta' : 'Tocá para marcarla natural (piel, caparazón…): da sus bonos pero no se suelta al morir'}">🐾 ${it.natural ? 'Natural' : '¿Natural?'}</button>`;
 }
+// 🧾 Lo que da cada pieza y la suma del equipo (2026-10-30, dueño: «también te debe mostrar la defensa y resistencias modificadas por cada objeto, y
+// debajo también un listado de la sumatoria de bonos y efectos del equipo completo»). La Defensa con Combatiente.defDeItem; lo demás, sus mods.
+const ETQ_PIEZA_EXTRA = {hpmax: 'Vida', sp: 'SP máximo', evaopor: 'Evasión en oportunidad', impulsodes: 'Impulso de Destreza (1 por combate)',
+  impulsofue: 'Impulso de Fuerza (1 por combate)', impulsocon: 'Impulso de Constitución (1 por combate)', impulsoesp: 'Impulso de Especial (1 por combate)',
+  defprimer: 'Defensa contra el 1.er golpe', cascara: 'Cáscara protectora', primerasangre: 'Primera sangre', pulso: 'Pulso quieto (PdG)', foco: 'Foco (PdG.Esp)',
+  pasofantasma: 'Paso fantasma', retirada: 'Retirada (%)', pasosgratis: 'Pasos gratis', pasosbaile: 'Pasos de baile', capmochila: 'Mochila'};
+const etqPieza = stat => stat === 'def' ? 'Defensa' : (CreepCalculo.STAT_LABEL[stat] || ETQ_PIEZA_EXTRA[stat] || stat);
+function bonosDePieza(it){
+  const out = [], d = Combatiente.defDeItem(it);
+  if(d) out.push({stat: 'def', val: d});
+  (it.mods || []).forEach(m => { if(m && m.stat && m.stat !== 'def' && num(m.val)) out.push({stat: m.stat, val: num(m.val)}); });
+  return out;
+}
+function efectosDePieza(it){
+  const L = [];
+  if(num(it.perfora) > 0) L.push(`Perfora ${fmt(num(it.perfora))}`);
+  (it.efectosGolpe || []).forEach(e => {
+    const c = num(e.caras), x = num(e.exitos), pct = c > 1 && x > 0 && x < c ? ` ${Math.round(100 * x / c)} %` : '';
+    L.push(`Al golpear: ${e.nombre || 'efecto'}${num(e.stacks) > 1 ? ` ×${fmt(num(e.stacks))}` : ''}${pct}${e.seguroCritico ? ' (seguro si es crítico)' : ''}`);
+  });
+  return L;
+}
+const bonosTxt = l => l.map(b => `${etqPieza(b.stat)} ${b.val > 0 ? '+' : ''}${fmt(b.val)}`).join(' · ');
+function sumaEquipoHtml(sc){
+  const piezas = Combatiente.equipoPuesto(sc);
+  const tot = new Map();
+  piezas.forEach(it => bonosDePieza(it).forEach(b => tot.set(b.stat, (tot.get(b.stat) || 0) + b.val)));
+  const bonos = [...tot].filter(([, v]) => v).map(([stat, val]) => ({stat, val}));
+  const efectos = piezas.flatMap(it => efectosDePieza(it).map(t => `${it.nombre}: ${t}`));
+  return `<div class="equipo-suma"><div class="equipo-suma-tit">Suma del equipo completo (con el arma)</div>
+    <div>${bonos.length ? esc(bonosTxt(bonos)) : '<span class="hint">No suma ningún bono.</span>'}</div>
+    ${efectos.length ? `<div class="equipo-suma-tit" style="margin-top:6px">Efectos</div><ul>${efectos.map(t => `<li>${esc(t)}</li>`).join('')}</ul>` : ''}</div>`;
+}
 // Una pieza del equipo en el asistente (pasos Arma y Armadura), con 🐾 natural, 👁 ver y × quitar. Una varita o un báculo muestra su daño ✨ en vez
 // de la Defensa (2026-10-28); lo que no da Defensa no muestra el «DEF +0».
 function asistPiezaHtml(sc, it){
@@ -369,7 +402,8 @@ function asistPiezaHtml(sc, it){
 ${natBotonHtml(sc, it)}
         <button class="rm" data-verequipocreep="${sc.id}:${it.id}" title="Ver la pieza (y editarla y subirla al catálogo)">👁</button>
         <button class="rm" data-quitarequipo="${sc.id}:${it.id}" title="Quitar">×</button></div>
-        <div class="equipo-item-meta">${esc(tipo)}${it.natural ? ' · 🐾 natural: no se suelta' : ''}</div></div></div>`;
+        <div class="equipo-item-meta">${esc(tipo)}${it.natural ? ' · 🐾 natural: no se suelta' : ''}</div>
+        ${(() => { const t = [bonosTxt(bonosDePieza(it)), ...efectosDePieza(it)].filter(Boolean).join(' · '); return `<div class="equipo-item-bonos">${t ? esc(t) : '<span class="hint">No suma nada</span>'}</div>`; })()}</div></div>`;
 }
 function htmlPasoAsistCreep(p){
   const sc = creepAsist();
@@ -423,6 +457,7 @@ function htmlPasoAsistCreep(p){
     return `<p class="pap-nota" style="margin:0 0 10px">Rareza sugerida para el nivel ${n}: <b>${RAREZA_ARMADURA[Math.min(n, 5) - 1]}</b>. Defensa total: <b>${fmt(creepDefensaEfectiva(sc))}</b> · Defensa especial: <b>${fmt(creepArmadmgEfectiva(sc))}</b>.</p>
       <div class="equipo-list">${vestido.length ? vestido.map(it => asistPiezaHtml(sc, it)).join('') : '<div class="hint">Sin armadura.</div>'}</div>
       <button type="button" class="pap-boton" data-equipardelfabricante="${sc.id}" style="margin-top:10px">⚔ Equipar del fabricante</button>
+      ${sumaEquipoHtml(sc)}
       ${asistResElementalesHtml(sc)}`;
   }
   if(p === 4){

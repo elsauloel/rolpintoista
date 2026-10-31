@@ -336,6 +336,11 @@ input[type=file]{display:none}
 .nat-btn:hover{opacity:1}
 .nat-btn.on{background:#5FC98A;color:#10231A;border:1px solid #5FC98A;font-weight:700;opacity:1}
 .equipo-item-info{flex:1;min-width:0}
+/* 🧾 lo que da cada pieza y la suma del equipo (asistente de creeps, 2026-10-30) */
+.equipo-item-bonos{font-size:12px;color:var(--paper);margin-top:3px}
+.equipo-suma{margin-top:12px;padding:8px 10px;border:1px solid var(--line-soft);background:var(--panel2);font-size:12px}
+.equipo-suma-tit{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.equipo-suma ul{margin:2px 0 0;padding-left:18px}
 .equipo-item-nombre{font-weight:700;font-size:12px}
 .equipo-item-meta{font-family:"Space Mono",monospace;font-size:10px;color:var(--muted);margin-top:2px}
 

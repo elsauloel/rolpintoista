@@ -410,3 +410,23 @@ Propuesta (esperando el OK; solo skills auditadas). Nombre de trabajo: **Goblin 
   tira su Constitución, qué pasa si lo engancha pero no lo arrastra, y programarlo (cambia la habilidad del pool: vtt-hexgrid, `arrastra`).
 - **Decidido y programado (2026-10-30)**: Arrastrar = Destreza contra Evasión para engancharlo y, después, su Constitución fija + una tirada de Fuerza contra la Constitución fija del rival (si pierde, no pasa nada); Golpe que sigue = si pega, sigue contra otro rival pegado (necesita dos pegados). Los dos en el pool; probados en el mapa. Los creeps que ya tienen esas habilidades conservan el texto viejo en su copia (la regla nueva igual vale): se actualiza con ↻ Reemplazar.
 - **Rompehuesos, definido (dueño, 2026-10-30)**: torso **Poncho de espejitos**; la quinta habilidad la elige él a mano (las otras cuatro: Aguante, Segundo aliento, Golpe demoledor, Arrastrar; pasiva Impulso). **No se crea**: el dueño lo carga a mano en la compu («pasame al Goblin Rompehuesos»). Empates del gancho y del duelo: con piedra, papel o tijera (programado el 2026-10-30).
+
+### 🐀 Encuentro 2 — Rata de galería (choque liviano, críticos y veneno), nivel 3 (dueño, 2026-10-30)
+
+Dueño: «una rata nivel 3 con un arma natural que sea tipo 4 con perfora armadura por 2 y 50 % de envenenar… mucha destreza y agilidad, la posibilidad
+de dar golpes críticos, medio blandita, pero que una de las skills sea chillido, que llame a otra rata… solamente cuando esté en 50 % de vida o menos,
+con la posibilidad de ejecutarlo igual en caso de que los maten muy rápido»; el equipo, inspirado en el catálogo (él después lo marca como natural).
+
+Propuesta (esperando el OK; skills auditadas salvo el Chillido, que sale de «Plaga en la galería», sin auditar):
+- **Atributos (39)**: Con 6 · Fue 6 · Agi 11 · Des 13 · Esp 3. Vida 30, No2 11, PdG 13 (14 con las garras), Evasión 11 (12 con el pelaje), Dmg 6.
+- **Arma natural** (la Buena): **Dientes podridos**, Tipo 4, 1 dado, **Perfora 2**, **Veneno 3 stacks 50 %, seguro si es crítico** (entre la Aguja de
+  zurcir untada y la Aguja del boticario: la Perfora 2 en lugar del PdG +1). La otra mano, vacía.
+- **Equipo** (4 Comunes): **Jubón de piel de lobizón** (pelaje: Def.Esp +2, Evasión +1), **Guantes de agarre** (garras: PdG +1), **Polainas de
+  ratero** (Evasión contra oportunidad +1, Sigilo +1), **Anillo de Manos Ligeras** (una vez por combate, +2 a una tirada de Destreza). Queda Defensa 0,
+  Def.Esp 2.
+- **Pasiva**: **Ojo crítico** (+1 Crítico frecuente: con el Tipo 4, crítico desde 3 de diferencia).
+- **Skills (4)**: **Ráfaga de zarpazos** (3 SP, cd 3: +2 dados, el veneno del arma se tira 3 veces y la Perfora vale en cada mordida) · **Ojo de asesino**
+  (2 SP, cd 2) · **Hit and run** (2 SP, cd 3) · **Chillido** (propuesta: «Plaga en la galería» con 1 rata en vez de 2; 2 No2; con la mitad de la vida o
+  menos; con más, avisa y pregunta, así que se puede usar igual; la que llega es una copia sin el Chillido; una vez por combate).
+- **Números** (grupo del 2026-10-27): golpe común contra Larry pega 96 % y es crítico 82 % (doble 50 %); contra Petro, 84 % y 50 %; contra Bizzante, 82 % y
+  40 %. Con Ojo de asesino: Larry 95 % de crítico. A Petro, sin crítico, le pasan los 2 de la Perfora (y el veneno). **Riesgo**: dos mordidas tumban a Larry.

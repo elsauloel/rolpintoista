@@ -117,6 +117,10 @@ function flDibujar(){
         ];
       }
     }
+    // 🗿 Estoicismo (js/85): lo de este momento se suma a la Defensa (el golpe lo vuelve a contar en el suyo).
+    const est = typeof estoicoAhora === 'function' ? estoicoAhora(estoicoToken(fl.tipo === 'creep' ? 'creep' : 'pj', fl.tipo === 'creep' ? fl.creepId : fl.clave)) : null;
+    if(est && modelo.defensa) modelo.defensa = {valor: num(modelo.defensa.valor) + est.val,
+      lineas: [...modelo.defensa.lineas, {txt: `Estoicismo: ${est.n} enemigo${est.n === 1 ? '' : 's'} pegado${est.n === 1 ? '' : 's'}, ahora`, val: est.val, nota: 'estado'}]};
   }catch(err){ console.error('Ficha lite:', err); aviso('No se pudo armar la ficha lite'); return; }
   cuerpo.innerHTML = FichaLite.html(modelo, botones);
 }

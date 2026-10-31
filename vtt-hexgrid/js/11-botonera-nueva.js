@@ -202,6 +202,10 @@ function bnDibujar(){
   if(!bn.S){ cuerpo.innerHTML = '<div class="modal catalogo-modal botonera-modal"><div class="body"><div class="hint">Cargando el personaje…</div></div></div>'; return; }
   if(bn.invId){ bnDibujarInv(cuerpo); return; }
   const r = FichaBotonera.html(bn.S, {modoMapa, parryArmaPendiente: bn.parryPendiente || null, ...(typeof armasOpciones === 'function' ? armasOpciones(tokenDePj(bn.fichaId)) : {}), ...(typeof atrapadosOpciones === 'function' ? atrapadosOpciones(tokenDePj(bn.fichaId)) : {})});
+  // 🗿 Estoicismo (js/85): la Defensa del encabezado con lo de este momento.
+  const est = typeof estoicoAhora === 'function' ? estoicoAhora(tokenDePj(bn.fichaId)) : null;
+  const def = est ? r.def.replace(/^Def (-?\d+)/, (x, d) => `Def ${num(d) + est.val}`) : r.def;
+  const defTit = est ? `Defensa (con +${est.val} de Estoicismo: ${est.n} enemigo${est.n === 1 ? '' : 's'} pegado${est.n === 1 ? '' : 's'})` : 'Defensa';
   const scroll = bn.host.scrollTop;
   cuerpo.innerHTML = `<div class="modal catalogo-modal botonera-modal">
     <header>
@@ -209,7 +213,7 @@ function bnDibujar(){
         <h3>Botonera</h3>
         <span class="botonera-badge">${esc(r.nitros)}</span>
         <span class="botonera-badge">${esc(r.sp)}</span>
-        <span class="botonera-badge" title="Defensa">${esc(r.def)}</span>
+        <span class="botonera-badge" title="${esc(defTit)}">${esc(def)}${est ? ' 🗿' : ''}</span>
         <span class="hint" style="font-size:11px">${esc((bn.S.meta && bn.S.meta.nombre) || '')}</span>
       </div>
       <div style="display:flex;gap:6px;flex:none"><button class="iconbtn" data-bn-cerrar title="Cerrar (B o Esc)">Cerrar</button></div>

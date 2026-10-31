@@ -33,6 +33,19 @@ function estoicoDe(estados, n){
   return {val: (num(e.estoico) || ESTOICO_POR) * n, n};
 }
 
+// El bono de ahora mismo de un token, para mostrarlo (la ficha lite y la Botonera; el golpe lo vuelve a contar en su momento): {val, n} o null.
+function estoicoAhora(t){
+  const e = t && estadoDe(t);
+  return e && !e.muerto ? estoicoDe(e.estados, estoicoRivales(t).length) : null;
+}
+// El token de un personaje o una invocación (tipo 'pj', «ficha~inv») o de un creep (tipo 'creep', su id).
+const estoicoToken = (tipo, fichaId) => [...tokens.values()].find(x => x && x.tipo === tipo && x.fichaId === fichaId) || null;
+// Cambió la cuenta: las ventanas abiertas que la muestran se redibujan (un rival que se mueve no les llega por otro lado).
+function estoicoRefrescar(){
+  try{ if(typeof flDibujar === 'function') flDibujar(); }catch(err){}
+  try{ if(typeof bn !== 'undefined' && bn && bn.host && !bn.host.hidden && typeof bnDibujar === 'function') bnDibujar(); }catch(err){}
+}
+
 const estoicoPrevios = new Map();   // id del token → {clave, activo, ids: [rivales pegados]}
 const estoicoAnims = new Map();     // id del token → [{delta, inicio}]
 const estoicoCallados = new Set();  // ids de los tokens cuyo Aviso se pidió no volver a mostrar (hasta que se termine el estado)
@@ -52,7 +65,7 @@ function estoicoRevisar(){
     if(!previo || previo.clave !== clave) return;   // recién aparece o cambió de vínculo: solo se anota
     const por = e ? (num(e.estoico) || ESTOICO_POR) : ESTOICO_POR;
     if(!e){
-      if(previo.activo && previo.ids.length) estoicoAnimar(id, -por * previo.ids.length);   // se terminó: se va lo que daba
+      if(previo.activo && previo.ids.length){ estoicoAnimar(id, -por * previo.ids.length); estoicoRefrescar(); }   // se terminó: se va lo que daba
       estoicoCallados.delete(id);   // al volver a activarse, el Aviso vuelve a aparecer
       return;
     }
@@ -60,6 +73,7 @@ function estoicoRevisar(){
     if(previo.activo && !llegan.length && !seVan.length) return;
     const delta = previo.activo ? por * (ids.length - previo.ids.length) : por * ids.length;
     if(delta) estoicoAnimar(id, delta);
+    estoicoRefrescar();
     if(!previo.activo) estoicoCallados.delete(id);
     if(estoicoMio(t) && !estoicoCallados.has(id)) estoicoAvisar(id, t, {nuevo: !previo.activo, llegan, seVan, ids, n: ids.length, por});
   });

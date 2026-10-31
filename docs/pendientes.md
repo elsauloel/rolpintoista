@@ -276,10 +276,7 @@
 >   permita ver también los distintos efectos aplicados a ese hexágono. Déjalo en pendientes y después lo desarrollamos»):** un clic en una casilla sin token
 >   la selecciona; el cartel de arriba a la derecha (`#token-etiqueta`, el del token seleccionado) dice «Hexágono libre» y lista lo público que la toca:
 >   auras, zonas (con su estado y turnos), muros y Sólidos, fuego, hielo o agua, la luz, una trampa ya vista… Solo lo que esa pantalla puede ver.
-> - [ ] **🗡🌑 Arma sombría, habilidad de Support para creeps (2026-10-26, dueño: «pensemos para futuro, un encantamiento… algo así como arma sombría, que le
->   suma el mismo efecto de este skill [la Aguja siniestra] al ataque de un aliado durante X cantidad de turnos… lo vamos a dar al support»):** a un aliado en
->   su Rango, sus golpes con arma dejan Punto débil (−1 a las resistencias a crítico) durante unos turnos, como las Armas elementales. Detalle en
->   `docs/diseno-roles-creep.md` (Support, idea 4b).
+> - [x] (2026-10-31, descartada por el dueño: «redundante con la del Debuffer», la Aguja siniestra) **🗡🌑 Arma sombría, habilidad de Support para creeps.**
 > - [ ] **💉 Adrenalina, habilidad de Support para creeps (2026-10-26, dueño: «anotala en la lista para trabajar en el futuro»):** a un aliado en su Rango,
 >   +1 PdG ese turno y, si trabaja con cooldown, −2 a cada cooldown activo; si trabaja con SP, recupera 4 SP (o la variante: su próxima habilidad
 >   de este turno le cuesta 3 SP menos). 1 No2 y 2 SP, o cooldown 3. Detalle en `docs/diseno-roles-creep.md` (Support, idea 13).

@@ -364,8 +364,8 @@ function zonaLeFalta(el, t){
   if(el.trampa) return !(el.zonaResueltos || []).includes(zonaClave(el, t));
   // `unaVez` (adentro del JSON de zonaEstado; 2026-10-26, la Nube tóxica: «una vez envenenado, la nube ya no le vuelve a tirar»): con el estado
   // ya puesto, tampoco el daño.
-  // Con `resetea` (2026-10-26, dueño): si ya no tiene el estado (se lo curó, se le terminó), le vuelve a tirar.
-  if(el.zonaEstado && (el.zonaResueltos || []).includes(zonaClave(el, t))){ const e = zonaSpecDe(el); if(e.unaVez && !(e.resetea && !zonaTieneEstado(t, e.nombre))) return false; }
+  // Con `sumaUno` (o el `resetea` de antes): si ya no tiene el estado (se lo curó, se le terminó), le vuelve a tirar.
+  if(el.zonaEstado && (el.zonaResueltos || []).includes(zonaClave(el, t))){ const e = zonaSpecDe(el); if(e.unaVez && !((e.sumaUno || e.resetea) && !zonaTieneEstado(t, e.nombre))) return false; }
   if(el.zonaDano || el.zonaDanoDif) return true;
   if(el.zonaLuz && typeof luzSinLuz === 'function' && luzSinLuz(el)){ let e = {}; try{ e = JSON.parse(el.zonaEstado || '{}') || {}; }catch(x){} if(!e.nombre) return false; }   // (la bombucha de talco: solo revela)
   if(el.zonaEstado && !(el.zonaResueltos || []).includes(zonaClave(el, t))) return true;
@@ -428,11 +428,13 @@ function zonaRevisarToken(t, desdeMantenimiento, flotando, soloPiso, desde){
     if(soloPiso && alturaDe(el) !== 'piso') return;
     const cs = celdasDeElemento(el), enZona = c => cs.some(x => x.col === c.col && x.fila === c.fila);
     if(!enZona(t)) return;
-    // ☠ Resetea (2026-10-26, la Nube tóxica, dueño): al que ya tiene el estado de la zona y sigue adentro al pasar de ronda (o vuelve a entrar),
-    // sin tirada ni daño, el estado vuelve a sus stacks (no se suman).
+    // ☠ +1 stack (2026-10-31, la Nube tóxica, dueño: «una vez que estás envenenado, la nube tóxica solamente suma un stack cada vez que se
+    // activa; puede ser al entrar o al momento de activación dentro del turno»): al que ya tiene el estado de la zona y sigue adentro al pasar
+    // de ronda (o vuelve a entrar), sin tirada ni daño, le suma 1 stack. `sumaUno` en el JSON de zonaEstado; las zonas de antes traen `resetea`
+    // (del 2026-10-26: volvía a sus stacks) y desde hoy hacen lo mismo. Vale igual para personajes, invocaciones y creeps.
     const e = zonaSpecDe(el);
-    if(e.resetea && e.nombre && (el.zonaResueltos || []).includes(zonaClave(el, t)) && zonaTieneEstado(t, e.nombre)){
-      if(desdeMantenimiento || (desde && !enZona(desde))) zonaRenovarEstado(t, {nombre: e.nombre, ...(e.stacks ? {stacks: e.stacks} : {}), ...(e.turnos ? {turnos: e.turnos} : {}), resetea: true}, el, 'resetea');
+    if((e.sumaUno || e.resetea) && e.nombre && (el.zonaResueltos || []).includes(zonaClave(el, t)) && zonaTieneEstado(t, e.nombre)){
+      if(desdeMantenimiento || (desde && !enZona(desde))) zonaRenovarEstado(t, {nombre: e.nombre, stacks: 1}, el, 'sumaUno');
       return;
     }
     if(!zonaLeFalta(el, t)) return;
@@ -487,7 +489,7 @@ function zonaRevisarEntrada(id, celdas, levita){
 }
 async function zonaRenovarEstado(t, spec, el, como){
   const nombre = el.zonaNombre || 'la zona';
-  if(como === 'resetea') return zonaResetearEstado(t, spec, el, nombre);
+  if(como === 'sumaUno') return zonaSumarStack(t, spec, el, nombre);
   try{
     if(t.tipo === 'creep') await modificarCreep(t.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
     else await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec, origen: nombre});
@@ -503,20 +505,21 @@ async function zonaRenovarEstado(t, spec, el, como){
     }catch(err){}
   }catch(err){ console.error('No se pudo renovar el estado de la zona:', err); }
 }
-// ☠ El estado que la zona le resetea a quien sigue adentro (la Nube tóxica): sin tirada; Crónica y Mesa (un oculto, solo esta pantalla).
-async function zonaResetearEstado(t, spec, el, nombre){
+// ☠ +1 stack del estado de la zona a quien ya lo tiene (la Nube tóxica, 2026-10-31): sin tirada ni daño; Crónica y Mesa (un oculto, solo esta
+// pantalla). Se aplica como cualquier estado que llega (Veneno suma sus stacks: Combatiente.acumularVeneno), un personaje o invocación por su
+// ficha (encolarPj, `fichaId~invId` para una invocación) y un creep directo.
+async function zonaSumarStack(t, spec, el, nombre){
   try{
     if(t.tipo === 'creep') await modificarCreep(t.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
     else await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec, origen: nombre});
-    const vuelve = spec.stacks ? `vuelve a ${spec.stacks} stack${spec.stacks === 1 ? '' : 's'}` : `vuelve a ${spec.turnos || ''} turnos`;
-    if(t.oculto){ toast(`${nombre}: ${spec.nombre} ${vuelve}`); return; }
+    if(t.oculto){ toast(`${nombre}: +1 stack de ${spec.nombre}`); return; }
     const quien = nombreDe(t);
-    momentoAbrir({tipo: 'zona-renueva', icono: '☠', titulo: `${quien} sigue en ${nombre}`, resultado: `Seguir adentro le resetea el ${spec.nombre}: ${vuelve} (sin tirada).`, estado: 'listo', datos: {}});
+    momentoAbrir({tipo: 'zona-renueva', icono: '☠', titulo: `${quien} sigue en ${nombre}`, resultado: `Ya envenenado: la nube le suma 1 stack de ${spec.nombre} (sin tirada).`, estado: 'listo', datos: {}});
     try{
-      await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '', origen: `☠ ${nombre}: ${quien} sigue adentro — su ${spec.nombre} ${vuelve}`,
+      await fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: fbMiembro.nombre, quien: '', origen: `☠ ${nombre}: ${quien} sigue adentro — +1 stack de ${spec.nombre}`,
         formula: '', rolls: [], mod: 0, total: 0, desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()});
     }catch(err){}
-  }catch(err){ console.error('No se pudo resetear el estado de la zona:', err); }
+  }catch(err){ console.error('No se pudo sumar el stack de la zona:', err); }
 }
 function zonaRevisarMantenimiento(){ tokens.forEach(t => zonaRevisarToken(t, true)); }
 // Una zona recién puesta que «aparece bajo los pies» (2026-10-08, campo de estática, arena movediza Buena, luz flotante): cada pantalla revisa sus

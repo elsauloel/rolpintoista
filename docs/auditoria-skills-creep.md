@@ -216,7 +216,10 @@
 - ✅ **Cadena de rayos** (Mago, 2026-10-21): PdG.Esp contra la Evasión de un rival a su Rango; **2d4 eléctrico** (sin el Ef.Esp: P216 en pausa; lo frenan la
   Defensa especial y la resistencia eléctrica) que **salta** con la regla general del rayo (al más cercano a 4 o menos, la mitad de lo que entró, sin repetir,
   hasta 1; por el agua en un charco) y **20 % de Parálisis** 1 turno al primero. **3 No2** y **3 SP**, o cooldown 3. **Para probar.**
-- ✅ **Arma ígnea, Arma helada, Arma eléctrica, Arma ácida, Arma venenosa** (Support, «arma elemental», 2026-10-21, dueño: «que cada creep tenga
+- ✅ **Arma elemental** (2026-10-31, dueño: las cinco de abajo pasan a ser UNA habilidad que elige el elemento al usarla, **+1d6** en vez de 1d4, el tóxico
+  con mínimo 2 y dos elementos más: ☀ luz (Marcado) y 🌑 siniestro (Herida sombría y Punto débil, 2 turnos)). Mismo costo (2 No2 y 2 SP, o cooldown 3).
+  Los creeps guardados con las viejas se pasan solos a la nueva (`Combatiente.migrarArmasElementales`). Probada en el mapa (luz, siniestro, tóxico).
+- (Historia) ✅ **Arma ígnea, Arma helada, Arma eléctrica, Arma ácida, Arma venenosa** (Support, «arma elemental», 2026-10-21, dueño: «que cada creep tenga
   uno… y el daño especial se sume al daño habitual del ataque»): le encanta el arma a un aliado a su Rango (o la propia) **3 turnos de ese aliado**: cada
   golpe con arma que pega suma **+1d4 del elemento**, daño directo (solo lo frena la resistencia a ese elemento; no se multiplica con el crítico), y lo
   de la Carga Elemental sobre esa parte: fuego ×1,5; hielo Escarcha 1 (+1 cada 5); rayo salta (la mitad de lo que entró) y 20 % de Parálisis 1 turno;

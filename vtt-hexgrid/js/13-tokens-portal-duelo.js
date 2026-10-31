@@ -1723,7 +1723,9 @@ async function dueloAplicarDano(d){
   const elHab = d.hab && d.hab.dano && num(dn.crudo) > 0 ? Combatiente.elementoDe(d.hab.dano.tipo) : '';
   const anilloHab = elHab && typeof talMasDanoElem === 'function' ? talMasDanoElem(d, elHab) : 0;
   // ☀🌑 La identidad de la luz y de lo siniestro (2026-10-26): ×1,5 la luz a no-muertos y demonios; lo siniestro, nada (Combatiente.identidadElemento).
-  const idHab = elHab && t ? Combatiente.identidadElemento(elHab, ((vinculo(t) || {}).tipoCriatura)) : null, multId = idHab ? idHab.mult : 1;
+  const idHab0 = elHab && t ? Combatiente.identidadElemento(elHab, ((vinculo(t) || {}).tipoCriatura)) : null;
+  // 🌑 La Carga siniestra (2026-10-31): su Herida sombría dura 2 turnos (`identidadTurnos`), no 1.
+  const idHab = idHab0 && idHab0.estado && num(d.hab.dano.identidadTurnos) > 0 ? {...idHab0, estado: {...idHab0.estado, turnos: num(d.hab.dano.identidadTurnos)}} : idHab0, multId = idHab ? idHab.mult : 1;
   const mult = critReal ? d.crit.mult : 1, crudo = Math.ceil(Math.max(0, num(dn.crudo) - menosDist + (magico ? botella : 0) + anilloHab) * multHab * multId), golpe = crudo * mult;
   // (☀🌑 el ×1,5 de la luz o el ×0 de lo siniestro van con lo que multiplica, no con lo que frena — 2026-10-26: decía «9 − la luz le pega ×1,5 = 9»)
   const sinId = Math.ceil(Math.max(0, num(dn.crudo) - menosDist + (magico ? botella : 0) + anilloHab) * multHab);
@@ -1798,7 +1800,9 @@ async function dueloAplicarDano(d){
       const elMag = String(dn.magico.tipo || '').includes(' y ') ? '' : Combatiente.elementoDe(dn.magico.tipo);
       const resMag = elMag ? (await resistenciasDe(t, elMag, invLeida)).res : 0;
       const anilloMag = elMag && typeof talMasDanoElem === 'function' ? talMasDanoElem(d, elMag) : 0;   // 💍 el anillo de ese elemento
-      const idMag = elMag ? Combatiente.identidadElemento(elMag, ((vinculo(t) || {}).tipoCriatura)) : null;   // ☀🌑 (2026-10-26)
+      const idMag0 = elMag ? Combatiente.identidadElemento(elMag, ((vinculo(t) || {}).tipoCriatura)) : null;   // ☀🌑 (2026-10-26)
+      // 🌑 El Arma siniestra (2026-10-31): su Herida sombría dura 2 turnos (`identidadTurnos`), no 1.
+      const idMag = idMag0 && idMag0.estado && num(dn.magico.identidadTurnos) > 0 ? {...idMag0, estado: {...idMag0.estado, turnos: num(dn.magico.identidadTurnos)}} : idMag0;
       const multMag = (num(dn.magico.mult) > 1 ? num(dn.magico.mult) : 1) * (idMag ? idMag.mult : 1);   // 🔥 Arma ígnea (2026-10-21): ×1,5, para arriba
       const totMag = Math.ceil((num(dn.magico.total) + (habMagica ? 0 : botella) + anilloMag) * (salvaje && !habMagica ? salvaje.mult : 1) * multMag);   // 🔮 la Botella y el Orbe salvaje (si no los usó ya el daño de la habilidad)
       const agM = typeof aguaRayo === 'function' ? aguaRayo(t, elMag, totMag) : {monto: totMag, txt: ''};   // 💧 (js/50)
@@ -1886,7 +1890,8 @@ async function dueloAplicarDano(d){
 async function dueloIdentidadEstado(d, el, id){
   const r = await dueloAplicarEfecto(d, {nombre: id.estado.nombre, spec: id.estado});
   const ic = (Combatiente.ELEMENTOS[el] || {}).icono || '';
-  try{ mesaLinea(`${ic} ${d.defensor.nombre}: ${el === 'luz' ? 'la luz lo deja Marcado hasta su próximo turno' : 'Herida sombría: no se cura con nada hasta el final de su próximo turno'}${r && r.manual ? ' (aplicalo a mano)' : ''}`, 'recordatorio'); }catch(err){}
+  const tn = num(id.estado.turnos) > 1 ? num(id.estado.turnos) : 0;   // (el Arma siniestra: 2 turnos)
+  try{ mesaLinea(`${ic} ${d.defensor.nombre}: ${el === 'luz' ? 'la luz lo deja Marcado hasta su próximo turno' : tn ? `Herida sombría: no se cura con nada durante ${tn} turnos` : 'Herida sombría: no se cura con nada hasta el final de su próximo turno'}${r && r.manual ? ' (aplicalo a mano)' : ''}`, 'recordatorio'); }catch(err){}
   return r;
 }
 // ✨ El estado según el daño que entró (2026-10-13, Carga Elemental): N stacks (Combatiente.stacksPorDano) del estado al defensor, con el mismo camino

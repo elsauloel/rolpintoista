@@ -28,6 +28,12 @@ const EfectosGolpe = (() => {
   const n = v => { const x = parseInt(v, 10); return Number.isFinite(x) ? x : 0; };
   const e = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
 
+  // El estado según el daño que entra, tal cual (con su mínimo, su tope, su duración…): Combatiente.porDanoNorm si está cargado (2026-10-31: antes
+  // se perdía todo menos estado/cada/mas1, y el Arma elemental tóxica necesita su mínimo de 2 y la siniestra su tope y sus turnos).
+  function porDanoCopia(p){
+    if(typeof Combatiente !== 'undefined' && Combatiente.porDanoNorm){ const q = Combatiente.porDanoNorm(p); if(q) return q; }
+    return {estado: String(p.estado).slice(0, 40), cada: Math.max(1, n(p.cada) || 1), ...(p.mas1 ? {mas1: true} : {})};
+  }
   function normalizar(ef){
     let caras = Math.max(1, n(ef && ef.caras) || 1);
     let exitos = Math.min(caras, Math.max(1, n(ef && ef.exitos) || 1));
@@ -48,7 +54,8 @@ const EfectosGolpe = (() => {
       ...(n(ef && ef.drenaPct) > 0 ? {drenaPct: Math.round(n(ef.drenaPct))} : {}),   // Drena vida: % de la vida que le saca de verdad
       // 🔥 Lo del elemento sobre el daño mágico (Arma elemental, 2026-10-21): ×1,5 (fuego), el estado según lo que entra (hielo, ácido, tóxico), salta (rayo).
       ...(ef && ef.danoMagico && Number(ef.mult) > 1 ? {mult: Math.min(3, Number(ef.mult))} : {}),
-      ...(ef && ef.danoMagico && ef.porDano && ef.porDano.estado ? {porDano: {estado: String(ef.porDano.estado).slice(0, 40), cada: Math.max(1, n(ef.porDano.cada) || 1), ...(ef.porDano.mas1 ? {mas1: true} : {})}} : {}),
+      ...(ef && ef.danoMagico && ef.porDano && ef.porDano.estado ? {porDano: porDanoCopia(ef.porDano)} : {}),
+      ...(ef && ef.danoMagico && n(ef.identidadTurnos) > 0 ? {identidadTurnos: Math.min(9, Math.round(n(ef.identidadTurnos)))} : {}),   // 🌑 el Arma siniestra: Herida sombría 2 turnos (2026-10-31)
       ...(ef && ef.danoMagico && ef.cadena ? {cadena: true} : {}),
     };
   }

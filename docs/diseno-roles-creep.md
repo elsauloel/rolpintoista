@@ -739,7 +739,7 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
    su próximo ataque con arma suma un dado del Tipo de su arma (se va a los 2 turnos si no ataca).
 3. ✅ **Arma elemental**: el arma de un aliado pega de fuego, hielo o rayo por unos turnos — **Arma ígnea / helada / eléctrica / ácida / venenosa**
    (2026-10-21: +1d4 del elemento por golpe, 3 turnos, y lo de la Carga Elemental).
-3b. **Arma elemental, una sola habilidad con el elemento a elegir** (dueño, 2026-10-31: «lo vamos a unificar en un skill de buffer que sea arma
+3b. ✅ **Hecha y probada en el mapa el 2026-10-31 (+1d6 por pedido del dueño ese día).** **Arma elemental, una sola habilidad con el elemento a elegir** (dueño, 2026-10-31: «lo vamos a unificar en un skill de buffer que sea arma
    elemental, que uno puede elegir el elemento y que cada elemento ofrezca sus características… fuego más daño en vez de quemadura… eléctrico salta»).
    Reemplaza a las cinco Armas elementales y suma la siniestra (la vieja «Arma sombría», 4b): +1d4 del elemento por golpe, 3 turnos, 2 No2 y 2 SP,
    no conviven. Fuego ×1,5 (sin quemadura) · Hielo Escarcha · Eléctrico salta + 20 % Parálisis · Ácido Armadura rota · **Tóxico Veneno, 1 stack

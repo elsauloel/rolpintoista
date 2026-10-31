@@ -760,6 +760,7 @@ const Duelo = (() => {
       ...(h.dano.trueDamage ? {trueDamage: true} : h.dano.directo ? {directo: true} : {}),   // dueño, 2026-10-07 (P169)
       ...(_num(h.dano.mult) > 1 ? {mult: Math.min(4, _num(h.dano.mult))} : {}), ...(h.dano.carga ? {carga: txtCorto(h.dano.carga, 20)} : {}),   // ✨ Carga Elemental (2026-10-13)
       ...(h.dano.porDano && typeof Combatiente !== 'undefined' && Combatiente.porDanoNorm(h.dano.porDano) ? {porDano: Combatiente.porDanoNorm(h.dano.porDano)} : {}),
+      ...(_num(h.dano.identidadTurnos) > 0 ? {identidadTurnos: Math.min(9, Math.round(_num(h.dano.identidadTurnos)))} : {}),   // 🌑 la Carga siniestra (2026-10-31)
       ...(h.dano.extra && String(h.dano.extra.formula || '').trim() ? {extra: {formula: txtCorto(h.dano.extra.formula, 20), tipo: txtCorto(h.dano.extra.tipo || 'fuego', 20)}} : {}),   // ☄ un segundo daño de otro tipo (el Meteoro, 2026-10-24: 4d6 físico + 2d6 de fuego)
       ...(_num(h.dano.perfora) > 0 ? {perfora: Math.min(5, Math.round(_num(h.dano.perfora)))} : {}),   // 🗡 la Perfora del arma (2026-10-27)
       ...(h.dano.diferencia ? {diferencia: true} : {}), ...(h.dano.drena ? {drena: true, drenaTope: Math.max(0, Math.round(_num(h.dano.drenaTope))), ...(_num(h.dano.drenaPct) > 0 && _num(h.dano.drenaPct) < 100 ? {drenaPct: Math.round(_num(h.dano.drenaPct))} : {})} : {})} : null;
@@ -1333,11 +1334,13 @@ const Duelo = (() => {
           const tiros = magicos.map(e => ({e, r: tirarDados(e.dado)})).filter(x => x.r);
           if(tiros.length) m.dano.magico = {tipo: tiros.map(x => String(x.e.nombre || 'mágico').slice(0, 20)).join(' y '), total: tiros.reduce((a, x) => a + Math.max(0, Math.round(_num(x.r.total))), 0),
             formula: tiros.map(x => x.r.formula).join(' + ').slice(0, 60), rolls: tiros.flatMap(x => x.r.rolls || []).slice(0, 12).map(_num)};
-          const ex = magicos.find(e => _num(e.mult) > 1 || (e.porDano && e.porDano.estado) || e.cadena);   // 🔥 lo de su elemento (Arma elemental, 2026-10-21)
+          const ex = magicos.find(e => _num(e.mult) > 1 || (e.porDano && e.porDano.estado) || e.cadena || _num(e.identidadTurnos) > 0);   // 🔥 lo de su elemento (Arma elemental, 2026-10-21)
           if(ex){
             if(_num(ex.mult) > 1) m.dano.magico.mult = Math.min(3, _num(ex.mult));
-            if(ex.porDano && ex.porDano.estado) m.dano.magico.porDano = {estado: String(ex.porDano.estado).slice(0, 40), cada: Math.max(1, Math.round(_num(ex.porDano.cada)) || 1), ...(ex.porDano.mas1 ? {mas1: true} : {})};
+            if(ex.porDano && ex.porDano.estado) m.dano.magico.porDano = (typeof Combatiente !== 'undefined' && Combatiente.porDanoNorm && Combatiente.porDanoNorm(ex.porDano))
+              || {estado: String(ex.porDano.estado).slice(0, 40), cada: Math.max(1, Math.round(_num(ex.porDano.cada)) || 1), ...(ex.porDano.mas1 ? {mas1: true} : {})};   // con su mínimo, tope y turnos (2026-10-31)
             if(ex.cadena) m.dano.magico.cadena = true;
+            if(_num(ex.identidadTurnos) > 0) m.dano.magico.identidadTurnos = Math.min(9, Math.round(_num(ex.identidadTurnos)));   // 🌑 Arma siniestra: Herida sombría 2 turnos
           }
           crudos = crudos.filter(e => !(e && e.danoMagico));
         }

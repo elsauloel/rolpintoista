@@ -377,6 +377,17 @@ const CreepAcciones = (() => {
     sc.hp = Math.max(0, num(sc.hp) - cd);
     return cd;
   }
+  /* ✨ La variante a elegir al usar una habilidad (`h.variantes`: el elemento del Misil elemental, 2026-10-25; el del Arma elemental, 2026-10-31):
+     pregunta cuál antes de cobrar. → Promise<variante | null> (null = canceló). `conVariante(h, v)`: la habilidad con la Ejecución de esa variante,
+     para lo que sigue (terminarHab). Lo usan el mapa (vtt-hexgrid/js/12) y GM Tools (gm-toolset/js/06): antes GM Tools no preguntaba. */
+  async function elegirVariante(sc, h){
+    if(!Array.isArray(h && h.variantes) || !h.variantes.length) return null;
+    const clave = await Confirmar.elegir(`${sc.nombre}: ¿de qué elemento es ${h.nombre || 'la habilidad'}?`, {titulo: h.nombre || 'Elegí el elemento', icono: '✨', no: 'Cancelar',
+      opciones: h.variantes.map(v => ({valor: v.clave, texto: `${v.icono || ''} ${v.nombre}`.trim(), detalle: v.que || ''}))});
+    return clave ? h.variantes.find(v => v.clave === clave) || null : null;
+  }
+  const conVariante = (h, v) => v && h ? {...h, nombre: `${h.nombre}: ${v.nombre}`, duelo: JSON.parse(JSON.stringify(v.duelo))} : h;
+  const varianteTxt = (sc, h, v) => `${v.icono || '✨'} ${sc.nombre}: ${h.nombre}, de ${v.nombre} (${v.que})`;
   // 💧 Modo SP (2026-10-20): si no le alcanza el SP, pregunta y deja seguir (queda en 0). → Promise<bool>.
   async function confirmarSP(sc, h){
     if(!C().modoSP(sc)) return true;
@@ -687,7 +698,7 @@ const CreepAcciones = (() => {
     if(h && num(p.cd) >= 0 && num(h.cdActual) !== num(p.cd)){ h.cdActual = num(p.cd); hechos.push('el cooldown'); }
     return hechos.join(', ');
   }
-  return {devolverHab, confirmarSP,fenixCreep, bloqueoFirmeCreep, ESPERA_POR_SP, especialesCreep, costoEspecialCreep, habDeEspecialCreep, usarEspecialCreep, habEspecialParaTerminar, mantenimiento, inicioTurno, finTurno, reclamarMantenimiento, alCinturon, quitarDelCinturon, consumir, faltanNitrosConsumir, costoConsumir, colocarTrampaDeItem, consumiblesDe,
+  return {elegirVariante, conVariante, varianteTxt, devolverHab, confirmarSP,fenixCreep, bloqueoFirmeCreep, ESPERA_POR_SP, especialesCreep, costoEspecialCreep, habDeEspecialCreep, usarEspecialCreep, habEspecialParaTerminar, mantenimiento, inicioTurno, finTurno, reclamarMantenimiento, alCinturon, quitarDelCinturon, consumir, faltanNitrosConsumir, costoConsumir, colocarTrampaDeItem, consumiblesDe,
     tirada, usaUnaTirada, gastarUnaTirada, tiradaStat, esquivar, parry, fuerzaGolpe, bloqueo, dano, levantarse, tiradaSoltarse, aplicarSoltarse, pagarParry, pagarAtaque, tiradaAtaque, NOMBRE_ESPECIAL,
     costoAtaqueDe, devolverAtaque, faltanNitros, preguntaSinNitros, alertaSinNitros,
     FLAGS_ESTADO, habEtq, habEjecucion, ataqueDeHab, habTira, efectoDeHab, sobreSi, confirmarSilencio, preguntaVida, ejecutarHab, terminarHab, tiradaPrimeraHab, tiradaSegundaHab,

@@ -31,10 +31,11 @@
   const bU = (detalle, no2, mods, turnos) => ({detalle, no2, efecto: {mods, turnos}});
   const cU = (detalle, no2, k) => ({detalle, no2, cura: k});
   const dC = (detalle, no2, dano, k) => ({detalle, no2, dano, cura: k});
-  // 🔥 Arma elemental (2026-10-21, el Support): le pone a un aliado (o a sí mismo) el estado de su elemento, 3 turnos; es su acción de ataque del turno.
-  const aE = (estado, que) => ({detalle: `Le encanta el arma a un aliado dentro de su Rango (o la propia): durante 3 turnos de ese aliado, cada golpe con arma que pega suma +1d4 de daño ${que}. Es daño directo: solo lo frena la resistencia a ese elemento. Si ya tenía otra arma elemental, esta la reemplaza. Es su acción de ataque del turno.`,
-    no2: 2, spCosto: 2, auditada: true, cuentaComoAtaque: true, ataqueTxt: `${estado} a un aliado (o a sí mismo) 3 turnos: +1d4 ${que.split(/[,(]| y /)[0].trim()} por golpe`,
-    duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', dano: false, efectos: [{nombre: estado}]}});
+  // 🔥 Arma elemental (2026-10-21, el Support; 2026-10-31, dueño: «lo vamos a unificar en un skill … que uno puede elegir el elemento y que cada
+  // elemento ofrezca sus características», «un dado de 6 de daño, no un dado de 4»): le pone a un aliado (o a sí mismo) el estado del elemento
+  // elegido (Arma ígnea, helada… en comun/estados-presets.js), 3 turnos; es su acción de ataque del turno. El elemento se elige al usarla
+  // (`variantes`: el mapa, vtt-hexgrid/js/12, y GM Tools, gm-toolset/js/06).
+  const ARMAS_ELEM = Combatiente.ARMAS_ELEMENTALES, duAE = Combatiente.armaElementalDuelo;   // la lista vive en comun/combatiente.js (la usa la migración)
   // 🌀 Barrido y Coletazo (2026-10-21, choque pesado): la onda alrededor (el Remolino del Warrior, sin moverse): su PdG una vez contra la Evasión de
   // cada uno, el daño de su arma (dados + Dmg) a quien no le gana; sin dodge roll. Lo de un ataque y 2 SP, o cooldown 3; es su ataque del turno.
   // (Sin `cuentaComoAtaque`: cobrar «lo de un ataque» ya lo cuenta como su ataque del turno; con las dos, contaba dos. Probado en el mapa, 2026-10-21.)
@@ -69,8 +70,7 @@
     'Red': ['hunter', 'trabar'], 'Tela de araña': ['hunter', 'trabar'],
     'Hit and run': ['choque liviano', 'golpear y alejarse'], 'Excavar': ['misceláneas', 'bajo tierra'],   // (dueño, 2026-10-27: «yo lo pondría en habilidades misceláneas»)
     'Salto': ['choque liviano', 'salto'], 'Salto aplastante': ['choque pesado', 'salto'], 'Vigilancia': ['rango', 'vigilancia'], 'Bola de fuego': ['mago', 'daño en área'], 'Confusión': ['debuffer', 'control mental'],
-    'Arma ígnea': ['support', 'arma elemental'], 'Arma helada': ['support', 'arma elemental'], 'Arma eléctrica': ['support', 'arma elemental'],
-    'Arma ácida': ['support', 'arma elemental'], 'Arma venenosa': ['support', 'arma elemental'], '¡A la carga!': ['support', 'grito de guerra'], 'Arenga': ['support', 'grito de guerra'], 'Sanar': ['support', 'curar'], 'Oleada sanadora': ['support', 'curar'], 'Bálsamo': ['support', 'curar'], 'Círculo de sanación': ['support', 'curar'], 'Aura sanadora': ['support', 'curar'],
+    'Arma elemental': ['support', 'arma elemental'], '¡A la carga!': ['support', 'grito de guerra'], 'Arenga': ['support', 'grito de guerra'], 'Sanar': ['support', 'curar'], 'Oleada sanadora': ['support', 'curar'], 'Bálsamo': ['support', 'curar'], 'Círculo de sanación': ['support', 'curar'], 'Aura sanadora': ['support', 'curar'],
     'Barrido': ['choque pesado', 'barrido'], 'Coletazo': ['choque pesado', 'barrido'],
     'Tiro a la cabeza': ['rango', 'tiro apuntado'], 'Desarmar': ['choque pesado', 'desarmar'], 'El que avisa no traiciona': ['choque pesado', 'golpe anunciado'], 'Sal en la herida': ['choque liviano', 'abrir la herida'], 'Remate': ['choque pesado', 'remate'], 'Ir por el herido': ['choque pesado', 'remate'], 'Morder la herida': ['choque liviano', 'abrir la herida'], 'Patotear': ['choque liviano', 'manada'], 'Jauría': ['choque liviano', 'manada'], 'Zarpazo erguido': ['choque pesado', 'golpe anunciado'], 'Mal de ojo': ['debuffer', 'maleficio'], 'Disparo señalador': ['rango', 'señalar'], 'Ráfaga de cortes': ['choque liviano', 'ráfaga'], 'Ráfaga de zarpazos': ['choque liviano', 'ráfaga'],
     'Romper armadura': ['choque pesado', 'romper armadura'], 'Arrancar la coraza': ['choque pesado', 'romper armadura'],
@@ -848,13 +848,12 @@
   H('Pudrición', 'X', 'pm', 'x', 4, tA('El objetivo queda podrido: −2 de Defensa y −1 de Daño 3 turnos (a mano).', 2));
   // 😵 Auditada (dueño, 2026-10-21; el Debuffer, control mental): su PdG.Esp contra la Res.Mt de un rival en su Rango; si gana, Confusión 1 turno (el mapa la
   // tira: js/20). 2 No2 y 3 SP, o cooldown 4.
-  // 🔥❄⚡🧪☠ Auditadas (dueño, 2026-10-21; el Support, «arma elemental»): +1d4 del elemento por golpe 3 turnos y lo de cada elemento (lo de la Carga
-  // Elemental); 2 No2 y 2 SP, o cooldown 3. Una por elemento: cada creep support lleva la suya. Sirven igual con armas naturales.
-  H('Arma ígnea', 'B', '*', 'a', 3, aE('Arma ígnea', 'de fuego, ×1,5 (para arriba)'));
-  H('Arma helada', 'B', '*', 'a', 3, aE('Arma helada', 'de hielo y deja Escarcha 1 (una más cada 5 de daño de hielo que entra)'));
-  H('Arma eléctrica', 'B', '*', 'a', 3, aE('Arma eléctrica', 'eléctrico, que salta al rival más cercano (4 casillas o menos) con la mitad de lo que entró, y 20 % de Parálisis 1 turno al golpeado'));
-  H('Arma ácida', 'B', '*', 'a', 3, aE('Arma ácida', 'de ácido y deja Armadura rota 1 (una más cada 5 de daño de ácido que entra)'));
-  H('Arma venenosa', 'B', '*', 'a', 3, aE('Arma venenosa', 'tóxico y deja Veneno: 1 stack cada 3 de daño tóxico que entra (mínimo 1)'));
+  // 🔥❄⚡🧪☠☀🌑 Auditada (dueño, 2026-10-21, el Support, «arma elemental»; 2026-10-31: las cinco de antes —Arma ígnea, helada, eléctrica, ácida y
+  // venenosa, una por elemento— pasan a ser UNA sola que elige el elemento al usarla, con +1d6 y dos elementos más, luz y siniestro). 2 No2 y 2 SP,
+  // o cooldown 3. Sirve igual con armas naturales. Sin elegir (si algo la lanza sin preguntar), la de fuego.
+  H('Arma elemental', 'B', '*', 'a', 3, {detalle: Combatiente.ARMA_ELEMENTAL.detalle,
+    no2: 2, spCosto: 2, auditada: true, cuentaComoAtaque: true, ataqueTxt: Combatiente.ARMA_ELEMENTAL.ataqueTxt,
+    duelo: duAE(ARMAS_ELEM[0].estado), variantes: Combatiente.armaElementalVariantes()});
   // 🧿 Auditada (dueño, 2026-10-21; el Debuffer, «maleficios»): el Enyetar de los personajes, para creeps, con Flash (en turno ajeno, el doble) y el botón
   // 🧿 del GM (vtt-hexgrid/js/60). Los números, los del Enyetar: 5 SP (sin No2) o cooldown 3.
   H('Mal de ojo', 'X', '*', 'gx', 3, {detalle: 'FLASH. Después de que un personaje tira (a la vista, dentro de su Rango), le echa el mal de ojo: el personaje vuelve a hacer esa tirada y se queda con la más baja, y el duelo se vuelve a resolver. Una vez por tirada. En turno ajeno cuesta el doble. El GM la usa desde el botón 🧿 (arriba, o al costado del duelo abierto).',

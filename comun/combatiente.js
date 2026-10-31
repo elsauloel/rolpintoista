@@ -1666,6 +1666,7 @@ const Combatiente = (() => {
       dano: c.dano && (formula || c.danoDiferencia) ? {formula: c.danoDiferencia ? '' : formula, tipo, ignoraDef: c.trueDamage ? true : c.ignoraDano !== undefined ? !!c.ignoraDano : tipo !== 'fisico',
         ...(c.trueDamage ? {trueDamage: true} : c.danoDirecto && (tipo !== 'fisico' || c.ignoraDano) ? {directo: true} : {}),   // (físico directo: el Pisotón, 2026-10-26)
         ...(nf(c.danoMult) > 1 ? {mult: nf(c.danoMult)} : {}), ...(porDanoNorm(c.porDano) ? {porDano: porDanoNorm(c.porDano)} : {}), ...(c.carga ? {carga: String(c.carga)} : {}),   // ✨ Carga Elemental (2026-10-13)
+        ...(nf(c.identidadTurnos) > 0 ? {identidadTurnos: Math.min(9, Math.round(nf(c.identidadTurnos)))} : {}),   // 🌑 la Carga siniestra: Herida sombría 2 turnos (2026-10-31)
         ...(c.danoArma && nf(o.armaPerfora) > 0 && tipo === 'fisico' ? {perfora: Math.min(5, Math.round(nf(o.armaPerfora)))} : {}),   // 🗡 la Perfora del arma, con «el daño de tu arma» (2026-10-27: Abanico, Remolino…)
         ...(c.danoDiferencia ? {diferencia: true} : {}), ...(c.drena ? {drena: true, drenaTope: Math.max(0, nf(c.drenaTope)), ...(nf(c.drenaPct) > 0 && nf(c.drenaPct) < 100 ? {drenaPct: Math.round(nf(c.drenaPct))} : {})} : {})} : null,   // drenaPct: cura solo ese % (2026-10-07, la Sanguijuela)
       efectos: (c.efectos || []).map(e => efectoDeEjecucion(conX && e && e.stacks === 'X' ? {...e, stacks: Math.max(1, Math.round(X))} : e, o.stat)),   // stacks «X» (Apuntar, 2026-10-11)
@@ -1733,13 +1734,14 @@ const Combatiente = (() => {
     const desde = Math.max(0, Math.round(nf(p.desde))), tope = Math.max(0, Math.round(nf(p.tope))), turnos = Math.max(0, Math.round(nf(p.turnos)));
     // `turnos`: cuánto dura el estado que deja (2026-10-17, dueño: la Escarcha del Báculo de escarcha, 1 turno); sin él, la del preset.
     const base = Math.max(0, Math.round(nf(p.base)));   // `base` (2026-10-25, la Ponzoña: «2 stacks más 1 por cada 5 de daño»): con `mas1`, desde cuántos arranca
-    return {estado: String(p.estado).trim().slice(0, 30), cada: Math.max(1, Math.round(nf(p.cada)) || 4), ...(p.mas1 ? {mas1: true} : {}), ...(base > 1 ? {base} : {}),
+    const min = Math.max(0, Math.round(nf(p.min)));     // `min` (2026-10-31, el Arma elemental tóxica: «el mínimo de tóxico es 2 stacks»): sin `mas1`, el piso
+    return {estado: String(p.estado).trim().slice(0, 30), cada: Math.max(1, Math.round(nf(p.cada)) || 4), ...(p.mas1 ? {mas1: true} : {}), ...(base > 1 ? {base} : {}), ...(min > 1 ? {min} : {}),
       ...(desde > 1 ? {desde} : {}), ...(tope > 0 ? {tope} : {}), ...(turnos > 0 ? {turnos} : {})};
   }
   function stacksPorDano(entro, p){
     const d = Math.max(0, Math.floor(nf(entro))), q = porDanoNorm(p);
     if(!q || d <= 0 || (q.desde && d < q.desde)) return 0;
-    const n = q.mas1 ? (q.base || 1) + Math.floor(d / q.cada) : Math.max(1, Math.floor(d / q.cada));
+    const n = q.mas1 ? (q.base || 1) + Math.floor(d / q.cada) : Math.max(q.min || 1, Math.floor(d / q.cada));
     return q.tope ? Math.min(q.tope, n) : n;
   }
   const porDanoTxt = p => {
@@ -1747,16 +1749,25 @@ const Combatiente = (() => {
     if(!q) return '';
     const dura = q.turnos ? ` (${q.turnos} turno${q.turnos === 1 ? '' : 's'})` : '';
     if(q.tope === 1) return `${q.estado}: 1${q.desde ? ` si entran ${q.desde} o más de daño` : ''}${dura}`;
-    const base = q.mas1 ? `${q.estado}: ${q.base || 1}, y uno más cada ${q.cada} de daño` : `${q.estado}: 1 stack cada ${q.cada} de daño (mínimo 1)`;
+    const base = q.mas1 ? `${q.estado}: ${q.base || 1}, y uno más cada ${q.cada} de daño` : `${q.estado}: 1 stack cada ${q.cada} de daño (mínimo ${q.min || 1})`;
     return base + (q.desde ? `, si entran ${q.desde} o más` : '') + (q.tope ? `, hasta ${q.tope}` : '') + dura;
   };
   /* ✨ Carga Elemental (Mago, 2026-10-13, dueño): los cinco elementos y lo que le cambian a la Ejecución de la skill de daño. */
+  /* ☠ El Veneno según el daño tóxico que entra (2026-10-31, dueño, para la Carga Elemental: «un mínimo 2… más 2 stacks, más un stack por cada 4
+     puntos de daño»). `carga`: lo de Carga Elemental. `arma`: lo del Arma elemental de los creeps (por ahora 1 cada 3, mínimo 2; si el dueño
+     decide que vaya igual que la Carga, alcanza con que `arma` sea lo mismo que `carga`: el preset Arma venenosa lo lee de acá). */
+  const VENENO_POR_DANO = {carga: {estado: 'Veneno', mas1: true, base: 2, cada: 4}, arma: {estado: 'Veneno', cada: 3, min: 2}};
+  /* ✨ Carga Elemental (Mago, 2026-10-13, dueño): los elementos y lo que le cambian a la Ejecución de la skill de daño. 2026-10-31 (dueño): el
+     tóxico pasa a 2 stacks y uno más cada 4 de daño, y se suman ☀ luz (Marcado, su identidad) y 🌑 siniestro (Herida sombría y Punto débil, 2 turnos). */
   const CARGAS = {
     fuego: {nombre: 'Fuego', icono: '🔥', que: '+50 % de daño (para arriba)', duelo: {tipoDano: 'fuego', danoMult: 1.5}},
     hielo: {nombre: 'Frío', icono: '❄', que: 'Escarcha: 1, y una más cada 5 de daño que entra', duelo: {tipoDano: 'hielo', porDano: {estado: 'Escarcha', cada: 5, mas1: true}}},
     rayo: {nombre: 'Eléctrico', icono: '⚡', que: 'salta al rival más cercano (4 casillas o menos) con la mitad del daño que entró, sin repetir, hasta llegar a 1; 20 % de Parálisis al primero', duelo: {tipoDano: 'eléctrico', cadena: {saltos: 99, rango: 4}, paralisis: {nombre: 'Parálisis', turnos: 1, caras: 10, exitos: 2}}},
     acido: {nombre: 'Ácido', icono: '🧪', que: 'Armadura rota: 1, y una más cada 5 de daño que entra', duelo: {tipoDano: 'ácido', porDano: {estado: 'Armadura rota', cada: 5, mas1: true}}},
-    toxico: {nombre: 'Tóxico', icono: '☠', que: 'Veneno: 1 stack cada 3 de daño que entra (mínimo 1)', duelo: {tipoDano: 'tóxico', porDano: {estado: 'Veneno', cada: 3}}},
+    toxico: {nombre: 'Tóxico', icono: '☠', que: 'Veneno: 2 stacks, y uno más cada 4 de daño que entra', duelo: {tipoDano: 'tóxico', porDano: VENENO_POR_DANO.carga}},
+    luz: {nombre: 'Luz', icono: '☀', que: 'Marcado hasta su próximo turno (×1,5 contra no-muertos y demonios)', duelo: {tipoDano: 'luz'}},
+    siniestro: {nombre: 'Siniestro', icono: '🌑', que: 'Herida sombría y Punto débil, los dos 2 turnos (a no-muertos y demonios no les hace nada)',
+      duelo: {tipoDano: 'siniestro', identidadTurnos: 2, porDano: {estado: 'Punto débil', cada: 1, tope: 1, turnos: 2}}},
   };
   // ¿Esta Ejecución se puede cargar? Una skill (no un arma especial) de daño especial que se tira (no el arma, no la diferencia), no una zona.
   const cargable = (it, c) => !!(it && !it.deItem && c && typeof c === 'object' && c.dano && !c.danoArma && !c.danoDiferencia && (c.tipoDano || 'arcano') !== 'fisico' && c.objetivo !== 'zona' && c.modo !== 'arma' && c.modo !== 'flash');
@@ -2023,6 +2034,42 @@ const Combatiente = (() => {
      🌑 Siniestro: la herida que no cierra. Si entra daño, Herida sombría (no se cura con nada hasta el final de su próximo turno); a no-muertos y
      demonios no les hace nada (son de la sombra).
      `identidadElemento(el, tipoCriatura)` → {mult (1 / 1,5 / 0), txt (por qué cambió), estado: el spec que deja si entra daño} o null. */
+  /* 🔥❄⚡🧪☠☀🌑 Arma elemental (el Support de los creeps; 2026-10-31, dueño: «lo vamos a unificar en un skill … que uno puede elegir el elemento y
+     que cada elemento ofrezca sus características», «un dado de 6 de daño, no un dado de 4»). Una sola habilidad que, al usarla, elige el elemento y
+     le pone a un aliado (o a sí mismo) el estado de ese elemento 3 turnos (Arma ígnea, helada… en comun/estados-presets.js). Vive acá (no en
+     skills-creep-base.js) para que la migración de los creeps guardados (CreepCalculo.normalizar) ande también donde el catálogo no está cargado. */
+  const ARMAS_ELEMENTALES = [
+    {clave: 'fuego', estado: 'Arma ígnea', nombre: 'Fuego', icono: '🔥', que: '+1d6 de fuego ×1,5 (para arriba)'},
+    {clave: 'hielo', estado: 'Arma helada', nombre: 'Hielo', icono: '❄', que: '+1d6 de hielo y Escarcha 1 (una más cada 5 de daño de hielo)'},
+    {clave: 'rayo', estado: 'Arma eléctrica', nombre: 'Eléctrico', icono: '⚡', que: '+1d6 eléctrico que salta al rival más cercano (4 casillas o menos) con la mitad, y 20 % de Parálisis 1 turno'},
+    {clave: 'acido', estado: 'Arma ácida', nombre: 'Ácido', icono: '🧪', que: '+1d6 de ácido y Armadura rota 1 (una más cada 5 de daño de ácido)'},
+    {clave: 'toxico', estado: 'Arma venenosa', nombre: 'Tóxico', icono: '☠', que: '+1d6 tóxico y Veneno: 1 stack cada 3 de daño tóxico (mínimo 2)'},
+    {clave: 'luz', estado: 'Arma luminosa', nombre: 'Luz', icono: '☀', que: '+1d6 de luz y Marcado hasta su próximo turno (×1,5 contra no-muertos y demonios)'},
+    {clave: 'siniestro', estado: 'Arma siniestra', nombre: 'Siniestro', icono: '🌑', que: '+1d6 siniestro, Herida sombría y Punto débil 2 turnos (a no-muertos y demonios no les hace nada)'},
+  ];
+  const ARMA_ELEMENTAL = {
+    nombre: 'Arma elemental',
+    detalle: 'Le encanta el arma a un aliado dentro de su Rango (o la propia) con el elemento que elija al usarla: durante 3 turnos de ese aliado, cada golpe con arma que pega suma +1d6 de daño de ese elemento, con lo suyo: ' +
+      '🔥 fuego ×1,5 · ❄ hielo, Escarcha · ⚡ eléctrico, salta y puede paralizar · 🧪 ácido, Armadura rota · ☠ tóxico, Veneno (mínimo 2) · ☀ luz, Marcado · 🌑 siniestro, Herida sombría y Punto débil 2 turnos. ' +
+      'Es daño directo: solo lo frena la resistencia a ese elemento. Si ya tenía un arma elemental, la nueva la reemplaza. Es su acción de ataque del turno. ⚙ Automatizado: el elemento se elige al usarla y el daño y lo de cada elemento se aplican solos en el duelo.',
+    ataqueTxt: 'el arma de un aliado (o la propia) 3 turnos: +1d6 del elemento que elija por golpe',
+  };
+  const armaElementalDuelo = estado => ({objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', dano: false, efectos: [{nombre: estado}]});
+  const armaElementalVariantes = () => ARMAS_ELEMENTALES.map(a => ({clave: a.clave, nombre: a.nombre, icono: a.icono, que: a.que, duelo: armaElementalDuelo(a.estado)}));
+  /* Los creeps guardados con las cinco de antes (Arma ígnea, helada, eléctrica, ácida, venenosa: una habilidad por elemento) pasan a tener UNA
+     «Arma elemental» (la primera que tenían, con su id, su costo y su cooldown; las demás se sacan). → true si cambió algo. */
+  const ARMAS_ELEM_VIEJAS = ['Arma ígnea', 'Arma helada', 'Arma eléctrica', 'Arma ácida', 'Arma venenosa'];
+  function migrarArmasElementales(habs){
+    if(!Array.isArray(habs)) return false;
+    const viejas = habs.filter(h => h && ARMAS_ELEM_VIEJAS.includes(h.nombre));
+    if(!viejas.length) return false;
+    const yaNueva = habs.some(h => h && h.nombre === ARMA_ELEMENTAL.nombre);
+    const queda = yaNueva ? null : viejas[0];
+    if(queda) Object.assign(queda, {nombre: ARMA_ELEMENTAL.nombre, detalle: ARMA_ELEMENTAL.detalle, ataqueTxt: ARMA_ELEMENTAL.ataqueTxt,
+      duelo: armaElementalDuelo(ARMAS_ELEMENTALES[0].estado), variantes: armaElementalVariantes()});
+    for(let i = habs.length - 1; i >= 0; i--) if(habs[i] && ARMAS_ELEM_VIEJAS.includes(habs[i].nombre) && habs[i] !== queda) habs.splice(i, 1);
+    return true;
+  }
   const CRIATURAS_OSCURAS = ['no-muerto', 'demonio'];
   function identidadElemento(el, tipoCriatura){
     const tc = String(tipoCriatura || '').toLowerCase().trim(), oscura = CRIATURAS_OSCURAS.includes(tc);
@@ -2221,7 +2268,7 @@ const Combatiente = (() => {
   }
   const habDeConsumible = it => it && it.duelo ? {id: 'cons:' + (it.id || it.nombre), nombre: it.nombre, detalle: String(it.detalle || '').split(' ⚙')[0].split(' ✋')[0].trim(), modo: 'auto',   // a la Mesa, solo lo que hace
     duelo: conMinimoDeCalidad(it.duelo, it.tier), tiradaStat: it.duelo.tira || 'dmgesp', tiradaExtra: String(it.dano || '').trim()} : null;
-  return {anotarPagoDuelo, pagoDeDuelo, sirveParaEmerger, armaParaEmerger, parryApagado, sinParryDelAtaque, nombresContraDisparo, ESQUIVAR_TXT, PONER_ESCUDO_TXT, esRompeArmadura,GONDOLA_CATEGORIAS, categoriaGondola, utilPrimero, PACTO_VIDA_PCT, pactoVida, RELICARIO_TOPE, vidaExtraTotal, excedenteConTope, estadoVidaExtra, relicarioEnEquipo, desesperadoBonos, desesperadoTxt, identidadElemento, CRIATURAS_OSCURAS, sinCura, SIN_CURA_TXT, perforaDeEstados, presaValor, sinPresasDebiles, comoCeguera, CEGUERA_VISION, ciego, aDistancia, ciegoContraDistancia, CIEGO_DISTANCIA, habDeConsumible, efectoActivo, fenixActivo, revivirFenix, mareado, etereo, sequia, SOLO_BONO, soloBonoTxt, conFijo, gastarPasoFantasma, bezoar, conGauchito, GAUCHITO_STATS, talismanesDanoEsp, GRUPOS_CC, grupoCC, esMental, esControl, resisteCC, resisteCCEtq, columnasStats, piezasParaParry, sumaEspecialDe, sumaEspecialTxt, contraDeEjecucion, esHonda, alcanceHonda, alcanceArmaRango, HONDA_RANGO, porDanoNorm, stacksPorDano, porDanoTxt, CARGAS, cargable, conCarga, tormenta, danoTormenta, danoTormentaMover, golpeDirecto, cobroTormenta, tormentaTxt, avisarTormenta, aplicarTormenta, acelerado, gastarAcelerado, extenuado, conExtenuado, stacksCargaActiva, RASGOS_ARCO, LARGO_ALCANCE_MAX, TENSAR_NO2, largoAlcance, alcanceMaximo, afinidadEfectos, arcoRasgosTxt, lecturaTope, APUNTANDO, apuntandoX, caidaDano, recargaCosto, PUNTA_DIAMANTE_DEF, PUNTA_DIAMANTE_PERFORA, REMACHADORA_MAX, absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, unaTiradaDe, gastarUnaTirada, armaEnMano, TIPO_SIN_ARMA, sinArmaEnMano, armaPrincipal, equipoSinArma, esArmaDeMano, ponerArma, defDeItem, critDeItem, defDeEquipo, critDeEquipo, pasarEquipoVivo, equipoPuesto, puestoSinArma, equipoGuardado, vaEnLaMano, manosLibres, itemComoDePersonaje, gruposDeEquipo, ponerPieza, guardarPieza, sacarPieza, COSTO_SACAR_PIEZA, ataqueConSuArma, armaParaArreglos, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, REMATE_ESCALONES, remateDados, ATRAPA_VISUALES, atrapaDeNombre, atrapaDe, atrapaPub, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoLibres, ahorroArco, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, defensaSinNo2, YA_NEGATIVO_TXT, DETECTAR_MIN_TIER, detectarMinDe, conMinimoDeCalidad, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
+  return {VENENO_POR_DANO, ARMAS_ELEMENTALES, ARMA_ELEMENTAL, armaElementalDuelo, armaElementalVariantes, migrarArmasElementales, anotarPagoDuelo, pagoDeDuelo, sirveParaEmerger, armaParaEmerger, parryApagado, sinParryDelAtaque, nombresContraDisparo, ESQUIVAR_TXT, PONER_ESCUDO_TXT, esRompeArmadura,GONDOLA_CATEGORIAS, categoriaGondola, utilPrimero, PACTO_VIDA_PCT, pactoVida, RELICARIO_TOPE, vidaExtraTotal, excedenteConTope, estadoVidaExtra, relicarioEnEquipo, desesperadoBonos, desesperadoTxt, identidadElemento, CRIATURAS_OSCURAS, sinCura, SIN_CURA_TXT, perforaDeEstados, presaValor, sinPresasDebiles, comoCeguera, CEGUERA_VISION, ciego, aDistancia, ciegoContraDistancia, CIEGO_DISTANCIA, habDeConsumible, efectoActivo, fenixActivo, revivirFenix, mareado, etereo, sequia, SOLO_BONO, soloBonoTxt, conFijo, gastarPasoFantasma, bezoar, conGauchito, GAUCHITO_STATS, talismanesDanoEsp, GRUPOS_CC, grupoCC, esMental, esControl, resisteCC, resisteCCEtq, columnasStats, piezasParaParry, sumaEspecialDe, sumaEspecialTxt, contraDeEjecucion, esHonda, alcanceHonda, alcanceArmaRango, HONDA_RANGO, porDanoNorm, stacksPorDano, porDanoTxt, CARGAS, cargable, conCarga, tormenta, danoTormenta, danoTormentaMover, golpeDirecto, cobroTormenta, tormentaTxt, avisarTormenta, aplicarTormenta, acelerado, gastarAcelerado, extenuado, conExtenuado, stacksCargaActiva, RASGOS_ARCO, LARGO_ALCANCE_MAX, TENSAR_NO2, largoAlcance, alcanceMaximo, afinidadEfectos, arcoRasgosTxt, lecturaTope, APUNTANDO, apuntandoX, caidaDano, recargaCosto, PUNTA_DIAMANTE_DEF, PUNTA_DIAMANTE_PERFORA, REMACHADORA_MAX, absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, unaTiradaDe, gastarUnaTirada, armaEnMano, TIPO_SIN_ARMA, sinArmaEnMano, armaPrincipal, equipoSinArma, esArmaDeMano, ponerArma, defDeItem, critDeItem, defDeEquipo, critDeEquipo, pasarEquipoVivo, equipoPuesto, puestoSinArma, equipoGuardado, vaEnLaMano, manosLibres, itemComoDePersonaje, gruposDeEquipo, ponerPieza, guardarPieza, sacarPieza, COSTO_SACAR_PIEZA, ataqueConSuArma, armaParaArreglos, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, REMATE_ESCALONES, remateDados, ATRAPA_VISUALES, atrapaDeNombre, atrapaDe, atrapaPub, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoLibres, ahorroArco, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, defensaSinNo2, YA_NEGATIVO_TXT, DETECTAR_MIN_TIER, detectarMinDe, conMinimoDeCalidad, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad, sincronizarEstadosDePasivas, sangraPorSp,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

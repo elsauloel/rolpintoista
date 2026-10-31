@@ -1772,3 +1772,15 @@ versión parecida en más de una, es candidato a juntar.
   cuántas unidades convertir en despojos) y el personaje de un respaldo, a `Confirmar.elegir`. **Una pregunta nueva va con `Confirmar`, nunca con
   `confirm`/`prompt`/`alert`** (la función que la usa tiene que ser `async`).
 
+- **🔥❄⚡🧪☠☀🌑 Arma elemental, una sola, y Carga Elemental con luz y siniestro** (2026-10-31, dueño): las cinco Armas elementales de creep (Arma ígnea,
+  helada, eléctrica, ácida, venenosa) pasan a ser UNA habilidad, «Arma elemental», que elige el elemento al usarla (`variantes`, el mismo mecanismo del
+  Misil elemental) y suma **+1d6** (antes 1d4). Los siete elementos, el texto y la Ejecución viven en `combatiente.js` (`ARMAS_ELEMENTALES`, `ARMA_ELEMENTAL`,
+  `armaElementalDuelo`, `armaElementalVariantes`) para que `CreepCalculo.normalizar` migre los creeps guardados (`migrarArmasElementales`: una sola, con el id y
+  el cooldown de la primera) aunque el catálogo de habilidades no esté cargado. Los estados (uno por elemento) siguen en `estados-presets.js`; nuevos: **Arma
+  luminosa** (☀: la identidad de la luz, Marcado) y **Arma siniestra** (🌑: Herida sombría 2 turnos con `identidadTurnos` y Punto débil 2 turnos con `porDano
+  {tope: 1, turnos: 2}`). La pregunta del elemento: `CreepAcciones.elegirVariante` / `conVariante` / `varianteTxt`, en el mapa (js/12) y ahora también en GM Tools
+  (js/06; antes salía la primera variante sin preguntar). **Carga Elemental** (Mago): `CARGAS` suma `luz` y `siniestro` (lo mismo), y el tóxico pasa a **2 stacks
+  y uno más cada 4 de daño** (`VENENO_POR_DANO.carga`); el del Arma elemental queda en 1 cada 3, mínimo 2 (`VENENO_POR_DANO.arma`, que lee el preset Arma venenosa:
+  para igualarlos alcanza con cambiar esa línea). `porDano` acepta `min` (sin `mas1`, el piso) y ahora viaja entero (mínimo, tope, turnos) por `efectos-golpe.js` y
+  `duelo.js` (`porDanoCopia`); `identidadTurnos` viaja en el daño mágico de un arma y en el de una habilidad hasta el mapa (js/13).
+

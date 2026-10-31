@@ -42,14 +42,14 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 </script>
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
-<script src="combatiente.js"></script>
-<script src="creep-calculo.js"></script>
+<script src="combatiente.js?v=20261031ae"></script>
+<script src="creep-calculo.js?v=20261031ae"></script>
 <script src="creep-botonera.js"></script>
-<script src="creep-acciones.js"></script>
+<script src="creep-acciones.js?v=20261031ae"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
-<script src="estados-presets.js"></script>
+<script src="estados-presets.js?v=20261031ae"></script>
 <script src="estados-aplicar.js"></script>
 <script src="recibidos.js"></script>
 <script src="tokens-auto.js"></script>
@@ -96,10 +96,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="intercambio.js"></script>
 <script src="ficha-stats.js"></script>
 <script src="tiradas-propias.js"></script>
-<script src="efectos-golpe.js"></script>
+<script src="efectos-golpe.js?v=20261031ae"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js"></script>
+<script src="duelo.js?v=20261031ae"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -109,9 +109,9 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
-<script src="skills-clase.js"></script>
+<script src="skills-clase.js?v=20261031ae"></script>
 <script src="creeps-base.js"></script>
-<script src="skills-creep-base.js"></script>
+<script src="skills-creep-base.js?v=20261031ae"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
 <script>
@@ -958,7 +958,7 @@ prueba('Carga Elemental (Mago, 2026-10-13): stacks según el daño que entra, la
   const limpio = Duelo.limpiarHab(Combatiente.habEjecucion({nombre: 'Rayo', tiradaExtra: '2d6'}, Combatiente.conCarga(base, 'hielo'), {}));
   igual([hab.costo, hab.cargaElemental, esc, ven, aci, eh.dano.tipo, eh.dano.mult, el.cadena.rango, el.efectos.map(e => [e.nombre, e.caras, e.exitos]),
     limpio.dano.porDano, Combatiente.cargable({}, base), Combatiente.cargable({}, {...base, tipoDano: 'fisico'}), Combatiente.cargable({deItem: 'x'}, base), typeof Confirmar.elegir],
-    ['X', true, [0, 1, 1, 2, 2, 3], [1, 1, 1, 2], [1, 2], 'fuego', 1.5, 4, [['Parálisis', 10, 2]], {estado: 'Escarcha', cada: 5, mas1: true}, true, false, false, 'function']);
+    ['X', true, [0, 1, 1, 2, 2, 3], [2, 2, 2, 3] /* el tóxico: 2 + 1 cada 4 desde el 2026-10-31 */, [1, 2], 'fuego', 1.5, 4, [['Parálisis', 10, 2]], {estado: 'Escarcha', cada: 5, mas1: true}, true, false, false, 'function']);
 });
 prueba('Estado según el daño con umbral y tope (Lluvia de esquirlas, 2026-10-13): 1 Escarcha si entran 5 o más', () => {
   const p = {estado: 'Escarcha', desde: 5, tope: 1};
@@ -1612,7 +1612,8 @@ prueba('✍ El PdG a mano paga como el botón (2026-10-21): No2, el conteo y el 
 });
 prueba('🔥 Arma elemental (2026-10-21): el estado suma a cada golpe por turnos, una sola a la vez, y lo del elemento viaja', () => {
   const datos = n => HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos;
-  const h = armarHabilidadDeCreep(datos('Arma eléctrica'), 2);
+  const h0 = armarHabilidadDeCreep(datos('Arma elemental'), 2);
+  const h = CreepAcciones.conVariante(h0, h0.variantes.find(v => v.clave === 'rayo'));   // (2026-10-31: una sola, con el elemento a elegir)
   const hab = Combatiente.habEjecucion(h, h.duelo, {stat: () => 0, etq: s => s});
   const P = estadosPresetCreep(), pre = n => structuredClone(P.find(p => p.nombre === n));
   const est = [];
@@ -1624,6 +1625,44 @@ prueba('🔥 Arma elemental (2026-10-21): el estado suma a cada golpe por turnos
   igual([h.cd, h.no2 ?? h.nitrosCosto, h.cuentaComoAtaque, hab.objetivo, hab.conmigo, (hab.efectos[0] || {}).nombre, est.map(e => e.nombre).join(','), est[0].turnos,
     !!g1.carga, !!g2.carga, ef[0].danoMagico, ef[0].cadena, ef[1].nombre, Duelo.specDeEfecto(ef[1]).nombre, hel.porDano.estado, hel.porDano.mas1, EfectosGolpe.normalizar(pre('Arma ígnea').golpe.efectos[0]).mult],
     [3, 2, true, 'aliado', true, 'Arma eléctrica', 'Arma eléctrica', 3, true, true, true, true, 'Parálisis', 'Parálisis', 'Escarcha', true, 1.5]);
+});
+prueba('🔥 Arma elemental, una sola (2026-10-31): siete elementos, +1d6, tóxico mínimo 2, luz y siniestro, y los creeps viejos migran', () => {
+  const datos = n => HABILIDADES_CREEP_BASE.filter(x => x.nombre === n);
+  const h = armarHabilidadDeCreep(datos('Arma elemental')[0].datos, 2);
+  const P = estadosPresetCreep(), pre = n => structuredClone(P.find(p => p.nombre === n));
+  const viejas = ['Arma ígnea', 'Arma helada', 'Arma eléctrica', 'Arma ácida', 'Arma venenosa'].map(n => datos(n).length);
+  const dados = Combatiente.ARMAS_ELEMENTALES.map(a => pre(a.estado).golpe.efectos[0].dado);
+  const tox = EfectosGolpe.normalizar(pre('Arma venenosa').golpe.efectos[0]).porDano;
+  const sin = EfectosGolpe.normalizar(pre('Arma siniestra').golpe.efectos[0]);
+  const luz = EfectosGolpe.normalizar(pre('Arma luminosa').golpe.efectos[0]);
+  // Un creep guardado con dos de las viejas: queda una sola «Arma elemental», con el id y el cooldown de la primera.
+  const sc = CreepCalculo.normalizar({nombre: 'Chamán', habilidades: [{id: 'x1', nombre: 'Arma ígnea', cd: 3, cdActual: 2, duelo: {efectos: [{nombre: 'Arma ígnea'}]}}, {id: 'x2', nombre: 'Arma helada', cd: 3}, {id: 'x3', nombre: 'Golpe'}]});
+  igual([datos('Arma elemental').length, viejas.join(), h.variantes.map(v => v.clave).join(), h.cd, h.no2 ?? h.nitrosCosto, h.cuentaComoAtaque, (h.duelo.efectos[0] || {}).nombre,
+      [...new Set(dados)].join(), Combatiente.stacksPorDano(1, tox), Combatiente.stacksPorDano(9, tox), Combatiente.porDanoTxt(tox),
+      Combatiente.elementoDe(luz.nombre), Combatiente.elementoDe(sin.nombre), sin.identidadTurnos, sin.porDano.estado, sin.porDano.turnos, Combatiente.stacksPorDano(7, sin.porDano),
+      sc.habilidades.map(x => x.nombre).join(), sc.habilidades[0].id, sc.habilidades[0].cdActual, sc.habilidades[0].variantes.length,
+      CreepAcciones.conVariante(h, h.variantes.find(v => v.clave === 'siniestro')).duelo.efectos[0].nombre],
+    [1, '0,0,0,0,0', 'fuego,hielo,rayo,acido,toxico,luz,siniestro', 3, 2, true, 'Arma ígnea',
+      '1d6', 2, 3, 'Veneno: 1 stack cada 3 de daño (mínimo 2)',
+      'luz', 'siniestro', 2, 'Punto débil', 2, 1,
+      'Arma elemental,Golpe', 'x1', 2, 7,
+      'Arma siniestra']);
+});
+prueba('✨ Carga Elemental (2026-10-31): tóxico 2 + 1 cada 4, luz y siniestro (Herida sombría y Punto débil 2 turnos)', () => {
+  const C = Combatiente.CARGAS, tox = C.toxico.duelo.porDano;
+  const base = {objetivo: 'enemigo', tira: 'pdgmg', contra: ['eva'], dano: true, danoFormula: '2d6', tipoDano: 'arcano'};
+  const sin = Combatiente.conCarga(base, 'siniestro'), luz = Combatiente.conCarga(base, 'luz');
+  const hab = Combatiente.habEjecucion({nombre: 'Rayo'}, sin, {stat: () => 0, etq: s => s});
+  const habL = Combatiente.habEjecucion({nombre: 'Rayo'}, luz, {stat: () => 0, etq: s => s});
+  igual([Object.keys(C).join(), Combatiente.stacksPorDano(1, tox), Combatiente.stacksPorDano(4, tox), Combatiente.stacksPorDano(9, tox), Combatiente.porDanoTxt(tox),
+      hab.dano.tipo, hab.dano.identidadTurnos, hab.dano.porDano.estado, hab.dano.porDano.turnos, Combatiente.elementoDe(hab.dano.tipo), Combatiente.elementoDe(habL.dano.tipo),
+      Combatiente.identidadElemento('luz', '').estado.nombre, Combatiente.cargable({nombre: 'x'}, sin),
+      // el Arma venenosa de los creeps sigue en 1 cada 3, mínimo 2 (con los parámetros de Combatiente.VENENO_POR_DANO.arma)
+      Combatiente.stacksPorDano(9, estadosPresetCreep().find(p => p.nombre === 'Arma venenosa').golpe.efectos[0].porDano)],
+    ['fuego,hielo,rayo,acido,toxico,luz,siniestro', 2, 3, 4, 'Veneno: 2, y uno más cada 4 de daño',
+      'siniestro', 2, 'Punto débil', 2, 'siniestro', 'luz',
+      'Marcado', true,
+      3]);
 });
 prueba('🔥 Bola de fuego de creep (2026-10-21): ¼ del Ef.Esp, cuesta su Especial en SP y 4 No2', () => {
   const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Bola de fuego').datos, 2);

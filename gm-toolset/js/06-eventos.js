@@ -484,6 +484,9 @@ document.addEventListener('click', async e => {
     // duelo, trampa, zona, a quién le pegó, el aviso): comun/creep-acciones.js (paso 4 etapa 4c, tanda 5), con gmHabUi (js/04).
     if(!(await CreepAcciones.confirmarSilencio(sc, h))){ toast(`${sc.nombre}: no usó ${h.nombre || 'la habilidad'}`); return; }   // el cartel del juego, antes de cobrar
     if(!(await CreepAcciones.confirmarSP(sc, h))){ toast(`${sc.nombre}: no usó ${h.nombre || 'la habilidad'}`); return; }   // 💧 modo SP: no le alcanza
+    // ✨ El elemento a elegir (el Misil elemental, el Arma elemental; 2026-10-31: antes GM Tools no preguntaba y salía el primero), antes de cobrar.
+    const variante = Array.isArray(h.variantes) && h.variantes.length ? await CreepAcciones.elegirVariante(sc, h) : null;
+    if(Array.isArray(h.variantes) && h.variantes.length && !variante){ toast(`${sc.nombre}: no usó ${h.nombre || 'la habilidad'}`); return; }
     const antes = {sp: CreepCalculo.spActual(sc), nitros: num(sc.nitros), cd: num(h.cdActual)};   // ↩ para devolverlo si el duelo se cancela y no cuenta (P233)
     const p = CreepAcciones.ejecutarHab(sc, h, ESTADOS_PRESET_GM, true);
     if(p.error){ toast(p.error); return; }
@@ -491,7 +494,8 @@ document.addEventListener('click', async e => {
     if(typeof Duelo !== 'undefined' && Duelo.pagoHab) Duelo.pagoHab(sc.id, {habId: h.id, nombre: h.nombre || '', no2: Math.max(0, antes.nitros - num(sc.nitros)),
       sp: Math.max(0, antes.sp - CreepCalculo.spActual(sc)), hp: num(p.costoHp), cd: num(h.cdActual) !== antes.cd ? antes.cd : -1});
     renderAll();
-    CreepAcciones.terminarHab(sc, h, p, gmHabUi);
+    if(variante) try{ mesaLinea(CreepAcciones.varianteTxt(sc, h, variante), 'recordatorio'); }catch(err){}
+    CreepAcciones.terminarHab(sc, CreepAcciones.conVariante(h, variante), p, gmHabUi);
     return;
   }
   if(b.dataset.especialcreep){   // ✨ un arma especial del creep (2026-10-05): el mismo camino que en el mapa (comun/creep-acciones.js)

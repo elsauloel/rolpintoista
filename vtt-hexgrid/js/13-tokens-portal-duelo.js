@@ -854,7 +854,7 @@ function dueloResaltarObjetivos(propio, alcance, esValido, minimo = 0){
   pedirDibujo();
   return set.size;
 }
-function dueloAvisoObjetivoOcultar(){ const el = $('#duelo-objetivo'); if(el) el.hidden = true; if(objetivosResaltados){ objetivosResaltados = null; pedirDibujo(); } if(typeof tiroTerminar === 'function') tiroTerminar(); }
+function dueloAvisoObjetivoOcultar(){ if(typeof debilApuntarFin === 'function') debilApuntarFin(); const el = $('#duelo-objetivo'); if(el) el.hidden = true; if(objetivosResaltados){ objetivosResaltados = null; pedirDibujo(); } if(typeof tiroTerminar === 'function') tiroTerminar(); }
 
 /* 🙈 Ceguera (dueño, 2026-10-20): «no te permita, por más que uno físicamente vea cosas en el mapa, seleccionar objetivos a más de dos casilleros».
    Avisa y ofrece «Hacerlo igual (lo decide la mesa)», como el resto de las reglas del mapa. → true si sigue. */
@@ -916,6 +916,7 @@ function dueloElegirObjetivoMapa(msg){
   // "aliado" → brillan los del mismo bando (2026-09-27, pedido del dueño). Es solo una ayuda visual: se puede
   // clickear cualquiera igual, pero si no es del bando esperado se pide confirmar antes de abrir el duelo
   // ("avisa y deja seguir", no bloquea — no hay razón mecánica para prohibir un golpe a un aliado a propósito).
+  if(typeof debilApuntar === 'function') debilApuntar(msg, false);   // 🎯 «DÉBIL / RESISTENTE» arriba de los candidatos (js/89)
   const objetivoTipo = (ataque && ataque.hab && ataque.hab.objetivo) || 'enemigo';
   const esValido = objetivoTipo === 'aliado' ? t => !dueloEsRival(yo, t) : objetivoTipo === 'enemigo' ? t => dueloEsRival(yo, t) : null;   // «cualquiera» (2026-10-15): no sugiere bando
   const califica = t => { const r = objetivoCalifica(ataque, t); return !r || r.ok; };   // 🎯 una habilidad con condición: brillan solo los que califican
@@ -1502,6 +1503,7 @@ function dueloElegirAreaMapa(msg){
   seleccion = null; hudCerrar(); pedirDibujo();
   const propio = t => t.fichaId === yo.ref && t.tipo === yo.tipo;
   const radio = Math.max(0, Math.round(num(hab.radio)) || 0);
+  if(typeof debilApuntar === 'function' && hab.objetivo !== 'onda' && hab.objetivo !== 'cono' && !msg.centroFijo) debilApuntar(msg, true);   // 🎯 (js/89): mientras se marca el centro o la línea
   // msg.alCancelar (2026-10-23): las Acciones de un creep reabren su recuadro y devuelven lo cobrado (js/12); si no, el aviso al marco de siempre.
   const cancelado = () => { if(msg.alCancelar){ msg.alCancelar(); return; } try{ MensajesMapa.alMarco($('#botonera-marco'), 'duelo-cancelado'); }catch(e){} };
   const lanzar = async h => {
@@ -1753,6 +1755,7 @@ async function dueloAplicarDano(d){
   const resEl = elDano && !trueDmg ? (await resistenciasDe(t, elDano, invLeida)).res : 0;
   let freno = [...(menosDist ? [d.hab && d.hab.menosPorOrden ? `${menosDist} por los que tocó antes en la línea` : `la distancia ${menosDist}`] : []), ...(frenaAm && armadmg ? [`Defensa especial ${armadmg}`] : []), ...(resEl ? [Combatiente.resElementalTxt(elDano, resEl)] : [])].join(' − ');
   if(idHab && idHab.txt && multId === 1) freno = [freno, idHab.txt].filter(Boolean).join(' · ');   // ☀🌑 (lo que multiplica va en cargaMult)
+  if(elDano && !trueDmg && t.tipo === 'creep' && typeof debilRevelar === 'function' && (resEl || (idHab && idHab.mult === 0))) debilRevelar(t, elDano, {res: resEl, mult: idHab ? idHab.mult : 1}).catch(err => console.error('Revelar débil/resistente:', err));   // 🎯 (js/89)
   // 🏹 Perfora N (regla del dueño, 2026-10-10): N puntos del golpe pasan SIEMPRE, sin que los frene la Defensa; el resto va contra la Defensa como
   // siempre. O sea: recibe lo que pase la Defensa, pero nunca menos de N (ni más que el golpe). Con crítico no hace falta: ya ignora la Defensa entera.
   // (Antes, hasta el 2026-10-10, le restaba N a la Defensa: contra un tanque casi no servía.)
@@ -1803,6 +1806,7 @@ async function dueloAplicarDano(d){
       const idMag0 = elMag ? Combatiente.identidadElemento(elMag, ((vinculo(t) || {}).tipoCriatura)) : null;   // ☀🌑 (2026-10-26)
       // 🌑 El Arma siniestra (2026-10-31): su Herida sombría dura 2 turnos (`identidadTurnos`), no 1.
       const idMag = idMag0 && idMag0.estado && num(dn.magico.identidadTurnos) > 0 ? {...idMag0, estado: {...idMag0.estado, turnos: num(dn.magico.identidadTurnos)}} : idMag0;
+      if(elMag && t.tipo === 'creep' && typeof debilRevelar === 'function' && (resMag || (idMag && idMag.mult === 0))) debilRevelar(t, elMag, {res: resMag, mult: idMag ? idMag.mult : 1}).catch(err => console.error('Revelar débil/resistente:', err));   // 🎯 (js/89)
       const multMag = (num(dn.magico.mult) > 1 ? num(dn.magico.mult) : 1) * (idMag ? idMag.mult : 1);   // 🔥 Arma ígnea (2026-10-21): ×1,5, para arriba
       const totMag = Math.ceil((num(dn.magico.total) + (habMagica ? 0 : botella) + anilloMag) * (salvaje && !habMagica ? salvaje.mult : 1) * multMag);   // 🔮 la Botella y el Orbe salvaje (si no los usó ya el daño de la habilidad)
       const agM = typeof aguaRayo === 'function' ? aguaRayo(t, elMag, totMag) : {monto: totMag, txt: ''};   // 💧 (js/50)

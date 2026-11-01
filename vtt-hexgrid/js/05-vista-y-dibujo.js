@@ -960,6 +960,8 @@ function dibujarLienzo(){
       if(barras.sp && est.sp !== null) barra(est.sp, SP_COLOR);
       if(barras.no2 && est.no2 !== null) barra(est.no2, NO2_COLOR);
     }
+    // 🎯 Débil / resistente (js/89, 2026-11-01): la marca de lo descubierto (creeps) y, mientras se apunta, la etiqueta arriba del token.
+    if(typeof debilDibujar === 'function'){ try{ const db = debilDibujar(d.id, t, x, y, rad, z, debajo); debajo = db.debajo; if(db.animando) animando = true; }catch(err){ console.error('Débil/resistente:', err); } }
 
     // Estados: circulitos con la inicial sobre el borde de arriba del token
     // (verde = beneficio, violeta = perjuicio). Solo en el seleccionado: sin

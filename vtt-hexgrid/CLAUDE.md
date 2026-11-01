@@ -294,6 +294,21 @@ línea que se ejecuta **al cargar** (no adentro de una función) solo puede usar
   **🤝 De mano a mano** (2026-11-01, dueño): en el token de OTRO personaje (no invocación ni creep) pegado a uno que maneja esta pantalla
   (`manosMiPersonaje(t)` en js/11: sus personajes, o los que el GM controla con 🎮; caído o no), un 🤝 en el primer menú → `Intercambio.abrirManos`
   (darle o pedirle un ítem; costos y cartel en `comun/CLAUDE.md`, «de mano a mano»).
+  **🎯 Débil / Resistente / Inmune** (2026-11-01, dueño: «al momento de seleccionar los posibles objetivos, donde los tokens laten, ahí ya diga
+  débil o resistente»; «que no se sepa, pero una vez que se revela, ya quede marcado»; por creep, no por tipo: «van a venir por equipo… que hagan sus
+  apuestas»; «el GM siempre tiene la información desde el principio»): `js/89-debil.js`. Mientras se elige el objetivo (`debilApuntar` desde
+  `dueloElegirObjetivoMapa` y `dueloElegirAreaMapa`; `debilApuntarFin` en `dueloAvisoObjetivoOcultar`), cada candidato que late lleva arriba una
+  etiqueta («DÉBIL AL FUEGO», «RESISTENTE AL HIELO», «INMUNE A LO TÓXICO», «DÉBIL A DISPAROS», «DÉBIL A LO SAGRADO», «DÉBIL (MATABESTIAS)»), según
+  `debilDelAtaque` (el elemento de la habilidad o de su segundo daño, el daño mágico de los efectos del arma o de la flecha, el Arma elemental de los
+  estados de quien ataca, si es un disparo, lo sagrado, el Matabestias) contra `debilSabido` (resistencias: creep → `CreepCalculo.resElemental` solo
+  el GM; personaje → `resumen.res<el>`, todos; res ≥ 99 = inmune; Vuela → débil a disparos; tipo de criatura → la luz ×1,5 y lo siniestro ×0).
+  Un jugador, de un creep, ve solo lo revelado (`creeps/<id>.revelado = {el: debil|resistente|inmune}`, que lee `escucharVinculables`) y lo que está a
+  la vista (vuela, su tipo de criatura); sobre personajes, todo (decisión de Claude). Lo revela `debilRevelar` desde `dueloAplicarDano` (solo el mapa del
+  GM: el daño de la habilidad o el elemental del arma que entró con resistencia ≠ 0 o ×0): lo guarda, abre un momento para todos y deja la línea en la
+  Mesa. Debajo de las barras de un creep, una marca chica persistente (🔥▼ débil, ❄▲ resistente, ⛔ inmune); el GM la ve completa, lo que los
+  jugadores todavía no descubrieron, tenue. En la tarjeta 🪪 del creep, «Débil / resistente» y, el GM, «🙈 Olvidar lo descubierto»
+  (`data-debil-olvidar`, borra `revelado`). Sin reglas nuevas (el GM ya escribe `creeps/<id>`; GM Tools publica con `mergeFields`, no lo pisa).
+  Pendiente: las zonas que pegan y las trampas no revelan (solo el duelo).
   **🫧😱💤 Íconos de los estados alrededor del token** (2026-11-01, dueño: «iconos para los estados… que vayan apareciendo alrededor del token»;
   «circulitos… primero en los vértices del hexágono y luego en los lados; borde verde los beneficiosos y rojo los malos»; «agruparlos cuando son
   similares… mejor emojis»): `js/88-iconos-estados.js` (`iconosEstadosDibujar`, llamado desde el recorrido de tokens de js/05). Un circulito por estado

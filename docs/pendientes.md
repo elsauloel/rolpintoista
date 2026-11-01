@@ -274,7 +274,7 @@
 > - [x] (2026-10-26, hecho: el dueño dijo que sí; `dodgeTrasMover`, js/13, desde `moverToken`) **🏃 El dodge roll después de moverse (visto en el mapa, 2026-10-26, Claude):** con el cartel «juan ganó la Evasión · Arrastrá el token
 >   hasta 2 casilleros», una vez que se arrastró el cartel sigue igual («No me quiero mover») y para cerrar hay que abrir el duelo y tocar «▶ Ya se movió:
 >   revisar». Propuesta: al soltar el movimiento, que se revise solo (o que el cartel cambie a «✔ Ya me moví»). Preguntarle al dueño.
-> - [ ] **🎯 «Débil» y «Resistente» en el token (2026-10-26, dueño: «cuando uno ejecuta una habilidad con un daño elemental y alguno de los objetivos tiene
+> - [x] ✅ (2026-11-01, hecho: `vtt-hexgrid/js/89-debil.js`; probado en el mapa) **🎯 «Débil» y «Resistente» en el token (2026-10-26, dueño: «cuando uno ejecuta una habilidad con un daño elemental y alguno de los objetivos tiene
 >   debilidad contra ese daño elemental, que aparezca en el token algún cartel que diga débil o algún tipo de lenguaje visual que lo identifique fácilmente.
 >   Lo mismo a la inversa, pero resistente»):** al elegir el objetivo (o el área) de una habilidad con daño elemental, cada token que le pega de más (la luz a
 >   un no-muerto o demonio, una debilidad a ese elemento) lleva una marca «DÉBIL» y el que lo frena (Res. a ese elemento, lo siniestro contra un no-muerto)

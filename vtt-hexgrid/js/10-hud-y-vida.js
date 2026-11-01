@@ -831,6 +831,7 @@ function hudTarjetaHtml(t, d){
     `<h3>${esc(nombreDe(t) || '?')}</h3>` + img +   // (el del creep vinculado, como el que sale debajo del token: el del token queda del día que se creó)
     '<div class="hud-seccion" style="padding-top:0;border-top:none"><h3>Equipo</h3>' + equipo + '</div>' +
     '<div class="hud-seccion"><h3>Estados alterados</h3>' + estados + '</div>' +
+    (typeof debilTarjetaHtml === 'function' ? debilTarjetaHtml(t) : '') +   // 🎯 débil / resistente (js/89)
     (nota ? '<div class="hud-seccion"><h3>Nota</h3><p class="hud-tarjeta-nota">' + esc(nota) + '</p></div>' : '') +
   '</div>';
 }

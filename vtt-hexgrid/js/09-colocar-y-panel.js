@@ -277,6 +277,7 @@ function escucharVinculables(){
         o.equipoNombres = Array.isArray(d.equipoNombres) ? d.equipoNombres.map(n => String(n || '').trim()).filter(Boolean) : [];
         o.manosNombres = Array.isArray(d.manosNombres) ? d.manosNombres.map(n => String(n || '').trim()).filter(Boolean) : [];   // lo de las manos (2026-10-17)
         o.tipoCriatura = String(d.tipoCriatura || '').trim();   // Matabestias de los arcos (js/35, 2026-10-11)
+        o.revelado = d.revelado && typeof d.revelado === 'object' ? {...d.revelado} : {};   // 🎯 lo que los jugadores ya descubrieron (js/89, 2026-11-01)
         o.pasosSilenciosos = d.pasosSilenciosos === true;   // 👣 Pasos silenciosos (js/02, 2026-10-15)
         o.auraMiedo = num(d.auraMiedo); o.auraEfEsp = num(d.auraEfEsp);   // 💀 la Calavera con vela (js/52, 2026-10-18)
         o.estandarteRadio = num(d.estandarteRadio); o.estandartePdg = num(d.estandartePdg); o.estandarteDano = num(d.estandarteDano); o.estandarteSilencio = num(d.estandarteSilencio);   // 🚩 el Estandarte de guerra y 🤐 el Tótem de silencio (js/73)

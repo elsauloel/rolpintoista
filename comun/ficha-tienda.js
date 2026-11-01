@@ -222,6 +222,7 @@ const FichaTienda = (() => {
 
   /* ---------- Carrito y compra ---------- */
   function carrito(S, st){
+    if(!st.carrito.length && cerrada(st)) return {html: `<div class="carrito-vacio">🔒 La tienda está cerrada: podés mirar, pero no comprar.</div>`, total: 0, puede: false, falta: 0};   // (dueño, 2026-11-01)
     if(!st.carrito.length) return {html: `<div class="carrito-vacio">Carrito vacío — usá "+ Carrito" en los ítems que quieras comprar.</div>`, total: 0, puede: false, falta: 0};
     let total = 0;
     const html = st.carrito.map(ent => {

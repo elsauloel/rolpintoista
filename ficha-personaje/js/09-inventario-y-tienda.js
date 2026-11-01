@@ -352,7 +352,7 @@ function renderCatalogoModal(){
   if($('#catalogo-secciones')) $('#catalogo-secciones').innerHTML = FichaTienda.seccionesHtml(S, tiendaSt);   // las pestañas (antes que el filtro: deciden qué hay)
   const fc = filtroCatalogo();
   if(fc) fc.actualizar();   // lo que hay para filtrar pudo cambiar (otra tienda, otra pestaña, 👁 ver todo, el catálogo)
-  const html = FichaTienda.catalogoHtml(S, tiendaSt);
+  const html = FichaTienda.catalogoHtml(S, tiendaSt, {gestion: catalogoGestion()});
   $('#catalogo-body').innerHTML = html;
   renderCabeceraTienda();
   $('#catalogo-dde').textContent = fmt(num(S.meta.dde));

@@ -584,7 +584,9 @@ function precioTiendaHtml(item){ return FichaTienda.precioHtml(tiendaSt, item); 
 // null para lo que no ocupa un slot del cuerpo (consumibles, etc.).
 function slotOcupadoInfo(item){ return FichaEquipo.slotOcupado(S, item); }   // comun/ficha-equipo.js
 
-function catalogoRowHtml(item){ return FichaTienda.rowHtml(S, tiendaSt, item); }   // comun/ficha-tienda.js (A5)
+// Editar / Eliminar de la tienda (dueño, 2026-11-01): en una ficha de la partida, solo el GM que la edita como GM; la ficha suelta sin partida, sí.
+function catalogoGestion(){ return typeof fichaVivo === 'undefined' || !fichaVivo || !!(fichaVivo.editaGM && typeof fbMiembro !== 'undefined' && fbMiembro && fbMiembro.gm); }
+function catalogoRowHtml(item){ return FichaTienda.rowHtml(S, tiendaSt, item, {gestion: catalogoGestion()}); }   // comun/ficha-tienda.js (A5)
 
 // Stats de un ítem en forma comparable: Defensa, daño promedio del arma
 // (dados*(caras+1)/2 + fijo, no la tirada exacta) y todos sus mods menos

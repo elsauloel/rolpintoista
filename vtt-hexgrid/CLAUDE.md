@@ -291,6 +291,9 @@ línea que se ejecuta **al cargar** (no adentro de una función) solo puede usar
   `hudHtml`): tres círculos editables con Vida (rojo), SP (azul) y No2
   (verde) repartidos en ronda alrededor del token (`hudAcomodarAnillo`), 📜 abrir la ficha en otra pestaña, ◎ estados alterados (ver con su descripción al pasar el mouse, ±turnos, sacar y "+ Estado", que abre el selector de presets de la ficha o de gm-tools en el iframe del mapa), ⚙ barras y aura del
   token, ⚡ Botonera (PJ propio o su invocación) o Acciones (creep del GM).
+  **🤝 De mano a mano** (2026-11-01, dueño): en el token de OTRO personaje (no invocación ni creep) pegado a uno que maneja esta pantalla
+  (`manosMiPersonaje(t)` en js/11: sus personajes, o los que el GM controla con 🎮; caído o no), un 🤝 en el primer menú → `Intercambio.abrirManos`
+  (darle o pedirle un ítem; costos y cartel en `comun/CLAUDE.md`, «de mano a mano»).
   Las invocaciones ya tienen las mismas funciones que un creep (No2,
   estados, habilidades — ver [`../ficha-personaje/CLAUDE.md`](../ficha-personaje/CLAUDE.md)):
   su dueño ve el mismo ⚡ que en su propio personaje (`propio` en

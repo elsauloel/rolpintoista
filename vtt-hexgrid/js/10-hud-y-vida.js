@@ -106,6 +106,8 @@ function hudHtml(t){
     icono('estados', '◎', 'Estados alterados', hudGlobo === 'estados') +
     (creepJugador ? icono('tarjeta', '🪪', 'Ver tarjeta: imagen, equipo y nota', hudGlobo === 'tarjeta') : '') +
     (conRayo ? icono('rayo', '⚡', propio ? 'Abrir la Botonera (atajo: B, la de tu personaje principal)' : 'Abrir las Acciones del creep') : '') +
+    // 🤝 De mano a mano (dueño, 2026-11-01): el token de un personaje aliado pegado al mío (caído o no) → darle o pedirle un ítem (js/11, comun/intercambio.js).
+    (!pausaSoloMirar() && typeof manosMiPersonaje === 'function' && manosMiPersonaje(t) ? icono('manos', '🤝', 'Darle o pedirle un ítem (está pegado a tu personaje)') : '') +
     (creepJugador ? '' : '<button type="button" class="hud-circulo icono hud-nivel" data-hud-nivel="resto" title="Más: ficha, tarjeta, ajustes, mover libre, equipo…">⋯</button>') +
     '</div>' +
     (puedoMoverLibre(t) ? '<div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (la línea de color del marco). Girar no gasta No2">↻</div>' : '');
@@ -1145,6 +1147,7 @@ function hudConectar(t){
     if(clave === 'tunel'){ tunelBorrar(seleccion); toast('🧹 La estela del túnel se va'); hudPonerNivel('vital'); return; }   // (vuelve al primer menú: el 🧹 ya no va)
     if(clave === 'oculto'){ editarToken(seleccion, {oculto: !t.oculto, ...(!t.oculto && t.revelado ? {revelado: false} : {})}); return; }   // ocultarlo lo vuelve a esconder del todo (js/29)
     if(clave === 'equipo'){ abrirEquipoMapa(t.fichaId.split(SEP_INVOCACION)[0]); return; }   // el mapa (js/11, A4)
+    if(clave === 'manos'){ const mio = manosMiPersonaje(t); if(mio) Intercambio.abrirManos(mio, t.fichaId); return; }   // 🤝 de mano a mano (js/11)
     if(clave === 'rayo'){
       const fichaDeToken = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';
       const invDeToken = t.tipo === 'pj' && t.fichaId && t.fichaId.includes(SEP_INVOCACION) ? t.fichaId.split(SEP_INVOCACION)[1] : '';

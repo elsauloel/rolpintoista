@@ -4843,6 +4843,13 @@ prueba('🤝 recibir (P157): un ítem llega a la mochila como copia nueva (sin r
   igual([a.id, a.unidades, S.inventario.length, b.equipado, 'reservado' in b, 'aMano' in b, b.id !== 'p1' && !!b.id, (S.loot.especial || []).find(l => l.nombre === 'Escamas de dragón').cantidad],
     ['p1', 4, 2, false, false, false, true, 3]);
 });
+prueba('🤝 de mano a mano y 💸 ambos pagan (dueño, 2026-11-01): el pedido «mano» no es el de la alforja; quien da paga por de dónde sale (cinturón 1, mochila 2), quien recibe por adónde va (mano 1, mochila 2); un caído, 0', () => {
+  const S = FichaGuardado.normalizar({}).S; S.hp = 10;
+  const C = FichaGuardado.normalizar({}).S; C.hp = 0;
+  igual([Intercambio._esMano({tipo: 'pedido', despojo: 'mano'}), Intercambio._esMano({tipo: 'pedido', despojo: ''}), Intercambio._esMano({tipo: 'item', despojo: 'mano'}),
+    Intercambio._costoEntrega(S, 'cinturon'), Intercambio._costoEntrega(S, 'inventario'), Intercambio._costoRecibe(S, 'mano'), Intercambio._costoRecibe(S, 'mochila'),
+    Intercambio._costoEntrega(C, 'inventario'), Intercambio._costoRecibe(C, 'mochila')], [true, false, false, 1, 2, 1, 2, 0, 0]);
+});
 prueba('♻ convertir en despojos (dueño, 2026-10-05): un cuarto del precio, para arriba; parte de una pila; lo equipado o lo ofrecido no', () => {
   const S = FichaGuardado.normalizar({}).S;
   S.inventario = [{id: 'b', nombre: 'Bate', precioCompra: 35, ranuras: 1}, {id: 'p', nombre: 'Poción', consumible: true, unidades: 4, precioCompra: 25, ranuras: 1},

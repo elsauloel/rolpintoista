@@ -257,6 +257,11 @@
 >   aliado» (el de arriba de la mochila y el de cada ítem) y en el mapa solo aparece con un aliado pegado (sin nadie al lado, arriba queda «♻
 >   Despojos»). Probado con clics en «Claude · pruebas» (2026-11-01): Prueba Uno le pasó una poción a Prueba Dos caída (0 de vida; −2 No2, la
 >   aceptó desde su cuenta) y Prueba Dos, caída, le pasó una a Prueba Uno (−2 No2, aceptada). Capturas `mapa-1101-2*`.
+>   **Después, el mismo día (dueño):** 🤝 desde el token del aliado pegado («¿querés pedirle un ítem o darle un ítem?», con el cartel Aceptar /
+>   Rechazar para el otro) y 💸 **ambos pagan** en combate, al concretarse: quien da 1 (cinturón, 0 con Pasamanos) o 2 (mochila); quien recibe 1 (al
+>   cinturón) o 2 (a la mochila); un caído no paga; rechazado, nadie. El botón de la mochila queda: en combate muestra a todos y, si no está al lado,
+>   pregunta «¿Dar igual?». Detalle en `comun/CLAUDE.md` («de mano a mano»). Decisiones de Claude, a revisar: el cinturón solo para
+>   consumibles (un arma o una armadura va a la mochila) —«al cinturón» por corrección del dueño, antes decía «a la mano»—; el botón 🤝 es solo entre personajes (no creeps); quien pide elige el destino al pedir.
 > - [ ] **⚖ Paridad de elementos en todo el sistema (2026-10-26, dueño: «cuando terminemos con este ciclo, ir para atrás, incorporar elementos de magia,
 >   varitas, báculos, skills, en resistencias de equipo, etcétera, como para que haya cierta paridad de elementos across el sistema»).** Para después del
 >   ciclo de habilidades de creep. Hoy hay siete elementos (arcano, fuego, hielo, rayo, tóxico, ácido y, desde el 2026-10-26, ☀ luz y 🌑 siniestro: P221)

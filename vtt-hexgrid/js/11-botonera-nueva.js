@@ -1435,6 +1435,17 @@ function recibidosEscuchar(){
   setInterval(() => { if((recibidosPend.estados || []).length || (recibidosPend.recompensas || []).length) recibidosRevisar(); }, 5000);
   Intercambio.iniciar(intercambioHostMapa);   // 🤝 lo que le ofrecen a un personaje y lo que él ofreció (comun/intercambio.js)
 }
+/* 🤝 De mano a mano (dueño, 2026-11-01: «cuando un aliado está adyacente, si seleccionás el token del aliado… un botón redondito… con las manos
+   estrechándose»): el id del personaje que maneja esta pantalla (los suyos, o los que el GM controla con 🎮) y está pegado a `t`, si `t` es el
+   token de OTRO personaje (no una invocación ni un creep), caído o no. Si hay varios míos pegados, el primero. '' si no hay. */
+function manosMiPersonaje(t){
+  if(!t || t.tipo !== 'pj' || !t.fichaId || String(t.fichaId).includes(SEP_INVOCACION) || bnManejo(t.fichaId)) return '';
+  for(const x of tokens.values()){
+    if(!x || x.tipo !== 'pj' || !x.fichaId || String(x.fichaId).includes(SEP_INVOCACION) || x.fichaId === t.fichaId) continue;
+    if(bnManejo(x.fichaId) && distanciaHex({col: x.col, fila: x.fila}, {col: t.col, fila: t.fila}) <= 1) return x.fichaId;
+  }
+  return '';
+}
 /* 🤝 Pasar cosas entre personajes y 📦 el baúl común (2026-10-05, P157): la regla y las ventanas en comun/intercambio.js; acá, cómo el mapa
    toca a un personaje (editarPersonajeMapa: el de la Botonera nueva o una sesión de un rato). */
 const intercambioHostMapa = {

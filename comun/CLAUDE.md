@@ -1330,9 +1330,23 @@ versión parecida en más de una, es candidato a juntar.
   Colecciones `paquetes`, `baul`, `baulLog` (reglas nuevas).
 - **`intercambio.js`, «🤝 Pasar a un aliado»** (2026-11-01, dueño: «es el mismo mecanismo, caído o no»): en combate `botonDar(it, fichaId)` dice
   «🤝 Pasar a un aliado» y, si el host tiene `adyacentes` (el mapa), no aparece sin un aliado pegado; `textoPasar(fichaId)` da el texto del botón de
-  arriba de la mochila (`FichaEquipo.html(S, {fichaId})`): fuera de combate «🤝 Pasar · ♻», en combate con alguien al lado «🤝 Pasar a un aliado ·
-  ♻», sin nadie «♻ Despojos». Un caído (0 de vida) da y recibe igual (su token sigue en el mapa).
-- **`intercambio.js`, en combate** (2026-10-05): solo ítems y solo a los aliados al lado (`host.adyacentes(fichaId)`; el mapa los saca de los tokens a 1
+  arriba de la mochila (`FichaEquipo.html(S, {fichaId})`): fuera de combate «🤝 Pasar · ♻», en combate «🤝 Pasar a un aliado · ♻» (desde la regla
+  nueva del mismo día aparece siempre: ver «de mano a mano» abajo). Un caído (0 de vida) da y recibe igual (su token sigue en el mapa).
+- **`intercambio.js`, 🤝 de mano a mano y 💸 ambos pagan** (2026-11-01, dueño). **Ruta nueva:** el token de OTRO personaje pegado al mío (caído o no)
+  muestra 🤝 entre sus botones flotantes (`manosMiPersonaje(t)` en vtt-hexgrid/js/11) → `Intercambio.abrirManos(miFicha, aliadoId)`: «🎁 Darle un
+  ítem» (= `ofrecer` con el aliado ya elegido) o «🙋 Pedirle un ítem» (lee su ficha; `pedirMano`: paquete `tipo: 'pedido'` con `despojo: 'mano'` y
+  `despojoNombre: '<origen>><destino>'` — sin campos nuevos, así no cambian las reglas de Firestore). El dueño del ítem ve el cartel «🤝 Te piden
+  algo» (el mismo de las ofertas, `mostrarPendientes`) y acepta (`aceptarPedido`: lo saca, lo manda en `json`) o rechaza; quien pidió lo recibe en
+  `pedidos()`. La alforja (`pedido` sin `despojo: 'mano'`) sigue entregándose sola. **Costos en combate (dueño: «Ambos pagan. De mochila a mano: el
+  dueño de la mochila paga 2 y el que recibe paga 1. De cinturón a mano: 1 cada uno. De mochila a mochila: 2 cada uno. El personaje caído no paga
+  No2»):** quien da, por de dónde sale (`costoEntrega`: cinturón 1 —0 con Pasamanos—, mochila 2); quien recibe, por adónde lo pone (`costoRecibe`:
+  'mano' (nombre interno; en pantalla «al cinturón», dueño: «el que recibe paga 1 si lo recibe en el cinturón»), solo un consumible y si entra —`entraEnMano`—, 1; 'mochila' 2). Un caído (`S.hp <= 0`) paga 0. Se cobra cuando se concreta:
+  quien recibe al aceptar (elige en el cartel «Al cinturón · 1 No2» / «A la mochila · 2 No2»; en un pedido, lo elige al pedir); quien da, al aceptarse
+  (la oferta: en `reconciliar`, con el origen de la reserva; el pedido: en `aceptarPedido`). Rechazado, nadie paga. Sin No2: se pregunta al ofrecer/
+  pedir/aceptar y el cobro deja la línea roja (`gastoNitrosForzado`). Una línea en la Mesa por cada uno. **El botón de la mochila** sigue y en
+  combate aparece siempre: la lista muestra a todos (los de al lado primero, marcados); si el elegido no está pegado, el cartel «El aliado no está
+  adyacente. ¿Dar igual?» (Sí sigue). Fuera de combate, sin costo y sin destino (a la mochila).
+- **`intercambio.js`, en combate** (2026-10-05; **los costos y la regla de «solo al lado» los reemplazó el 2026-11-01, ver arriba**): solo ítems y solo a los aliados al lado (`host.adyacentes(fichaId)`; el mapa los saca de los tokens a 1
   casillero); cuesta 1 No2 desde el cinturón (stat `pasamanos` > 0: 0) y 2 desde la mochila, se paga al ofrecer (sin No2: pregunta y deja seguir con la
   línea roja); lo que llega va al cinturón si entra. **Alforja compartida** (stat `alforja`): paquete `tipo: 'pedido'` — lo crea quien saca; la pantalla
   que maneja al dueño de la alforja lo entrega sola (`pedidos(fichaId)`: saca la unidad y la manda en `json`, o lo rechaza); quien lo pidió lo recibe,

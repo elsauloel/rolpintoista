@@ -294,6 +294,15 @@ línea que se ejecuta **al cargar** (no adentro de una función) solo puede usar
   **🤝 De mano a mano** (2026-11-01, dueño): en el token de OTRO personaje (no invocación ni creep) pegado a uno que maneja esta pantalla
   (`manosMiPersonaje(t)` en js/11: sus personajes, o los que el GM controla con 🎮; caído o no), un 🤝 en el primer menú → `Intercambio.abrirManos`
   (darle o pedirle un ítem; costos y cartel en `comun/CLAUDE.md`, «de mano a mano»).
+  **🫧😱💤 Íconos de los estados alrededor del token** (2026-11-01, dueño: «iconos para los estados… que vayan apareciendo alrededor del token»;
+  «circulitos… primero en los vértices del hexágono y luego en los lados; borde verde los beneficiosos y rojo los malos»; «agruparlos cuando son
+  similares… mejor emojis»): `js/88-iconos-estados.js` (`iconosEstadosDibujar`, llamado desde el recorrido de tokens de js/05). Un circulito por estado
+  (fondo oscuro, borde verde buff / rojo debuff / gris ninguno) con un emoji por familia (`ICONOS_ESTADO`, la tabla única: clave = nombre en minúsculas
+  sin tildes; «Regeneración (túnica)» toma el de Regeneración; uno inventado lleva la inicial). Lugares: los 6 vértices (arriba primero) y después los 6
+  medios de los lados, hasta 12 (el último, «+N» si hay más); orden de llegada y lugar estable mientras dura (`iconosOrden`). Animaciones chicas
+  (burbujas del Veneno, gotita del Sangrado, llamita, chispazo, Z del Sueño, estrellitas del Stun) mantienen `animando`. Si ocupan abajo, las
+  barras bajan. No muestra los derivados ni los apagados; el Sigilo (🕶) solo si está de verdad en sigilo, y como se dibuja en el recorrido de
+  tokens visibles, un rival no ve nada. Reemplazan a los circulitos con la inicial del seleccionado y a la insignia 🥷 (quedan 🙈 y ✋, más adentro).
   Las invocaciones ya tienen las mismas funciones que un creep (No2,
   estados, habilidades — ver [`../ficha-personaje/CLAUDE.md`](../ficha-personaje/CLAUDE.md)):
   su dueño ve el mismo ⚡ que en su propio personaje (`propio` en

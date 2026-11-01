@@ -801,6 +801,7 @@ function dibujarLienzo(){
   if(typeof estandarteDibujar === 'function' && estandarteDibujar(z)) animando = true;   // 🚩 el aura de un estandarte de guerra (js/73)
   if(typeof meteoroDibujar === 'function' && meteoroDibujar(z)) animando = true;   // ☄ la sombra de un meteoro por caer (js/74)
   if(typeof flechitasRevisar === 'function') flechitasRevisar();   // ⬆⬇ los estados nuevos de cada token, para las flechitas (js/75)
+  if(typeof iconosLimpiar === 'function') iconosLimpiar();   // 🫧 el orden de los íconos de estados de los tokens que ya no están (js/88)
   if(typeof estoicoRevisar === 'function') estoicoRevisar();   // 🗿 Estoicismo: cuántos enemigos pegados tiene cada uno (js/85)
   if(typeof dibujarTuneles === 'function' && dibujarTuneles(z)) animando = true;   // 🕳 la estela del túnel, que aparece y se va de a una casilla (js/46)
   if(typeof dibujarPozos === 'function') dibujarPozos(z);   // 🕳 el pozo de los que están bajo tierra (js/46)
@@ -917,14 +918,14 @@ function dibujarLienzo(){
     {
       const marcas = [];
       if(t.oculto) marcas.push('🙈');
-      if(enSigilo(t)) marcas.push('🥷');
+      if(enSigilo(t) && typeof iconosEstadosDibujar !== 'function') marcas.push('🥷');   // (con los íconos de estados, el Sigilo va en la ronda: 🕶, js/88)
       if(modoMapa === 'combate' && tokenSinArma(t)) marcas.push('✋');   // ✋ nada en la mano (paso 5): pega sin arma
       if(marcas.length){
         const alfaPrevio = ctx.globalAlpha;
         ctx.globalAlpha = 1;
         const rm = Math.max(6 / z, rad * 0.3);
         marcas.forEach((m, i) => {
-          const mx = x + rad * 0.62 - i * rm * 2.1, my = y - rad * 0.62;
+          const mx = x + rad * 0.4 - i * rm * 2.1, my = y - rad * 0.36;   // (2026-11-01: más adentro, los vértices son de los íconos de estados)
           ctx.beginPath(); ctx.arc(mx, my, rm, 0, 2 * Math.PI);
           ctx.fillStyle = 'rgba(15,12,14,.8)'; ctx.fill();
           ctx.font = `${rm * 1.35}px "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif`;
@@ -939,6 +940,12 @@ function dibujarLienzo(){
     // (rad*sqrt3/2: el hexágono de lado arriba no llega a "rad" de alto.)
     const bordeV = rad * SQ3 / 2;
     let debajo = y + bordeV + 3 / z;
+    // 🫧😱💤 Los íconos de los estados en los vértices y los lados del token (js/88, 2026-11-01); si ocupan abajo, las barras bajan.
+    if(est && typeof iconosEstadosDibujar === 'function'){
+      const ie = iconosEstadosDibujar(d.id, t, est, x, y, rad, z);
+      if(ie.animando) animando = true;
+      if(ie.abajo > 0) debajo += ie.abajo;
+    }
     if(est){
       const bw = rad * 1.8, bh = Math.max(3 / z, rad * 0.13);
       const barra = (valor, color) => {
@@ -957,7 +964,7 @@ function dibujarLienzo(){
     // Estados: circulitos con la inicial sobre el borde de arriba del token
     // (verde = beneficio, violeta = perjuicio). Solo en el seleccionado: sin
     // seleccionar, el mapa muestra nada más que el token y sus barras.
-    if(est && est.estados.length && seleccion === d.id){
+    if(est && est.estados.length && seleccion === d.id && typeof iconosEstadosDibujar !== 'function'){   // (reemplazados por los íconos, js/88)
       const max = 5;
       const lista = est.estados.slice(0, max);
       const r = Math.max(5 / z, rad * 0.24);

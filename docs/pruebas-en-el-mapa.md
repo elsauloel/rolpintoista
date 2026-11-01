@@ -51,7 +51,7 @@
   Trofeos; los iguales en una pila «×N» con la cantidad a reclamar. **Probado en «Test con claude elsaulo» (2026-10-22, Claude)**: 4 goblins de prueba
   derrotados con equipo repetido (4 chalecos, 2 lanzas, 2 pociones, varita, escudo, honda, hacha, casco, capucha, botas, bomba, bengala) → Finalizar
   combate → Publicar → el botín de Silvia (con el control) mostró los grupos y las pilas; reclamar 2 chalecos → «2 libres · 2 tuyos», «↩ Soltar 1» y
-  el aviso «2 × Chaleco de cuero son tuyos». Todo borrado y el combate anterior repuesto. Falta probar: Disputar sobre una pila y Soltar de a uno.
+  el aviso «2 × Chaleco de cuero son tuyos». Todo borrado y el combate anterior repuesto. ✅ Disputar sobre una pila y Soltar de a uno: probados el 2026-11-01.
   **Retoques del dueño (2026-10-22, mirándolo como jugador en «Claude · pruebas»; probados ahí como GM)**: el cartel «🎁 ¡Botín disponible!» junto al
   botón del dock mientras hay botín publicado; la cabecera con tus XP y DDE en dos recuadros grandes (los demás jugadores en una línea chica);
   los títulos Mano / Cuerpo / Consumibles / Trofeos como banda destacada; el nombre de cada ítem con el globo del glosario (su resumen al pasar el
@@ -61,7 +61,7 @@
   **Segunda vuelta (2026-10-22)**: Comparar también con las armas (`FichaEquipo.slotOcupado` compara contra lo equipado en el mismo LUGAR, no solo
   el mismo tipo exacto: una varita de una mano contra la espada de dos manos puesta); Comparar y «🎒 Mochila y equipo» más visibles; y el Anuncio
   **«🎁 Botín concluido»** (js/11 `recompensaAnuncio`: Experiencia, DDE, Despojos, Ítems reclamados, ✔ Aceptar) cuando llega la recompensa al
-  personaje. ✅ **El Anuncio con un cierre real del botín: visto el 2026-10-30** («🎁 Botín concluido · Clementino»: +20 XP, +5 DDE, +15 despojos, ítems reclamados: ninguno). **Falta** Comparar sobre un arma del botín.
+  personaje. ✅ **El Anuncio con un cierre real del botín: visto el 2026-10-30** («🎁 Botín concluido · Clementino»: +20 XP, +5 DDE, +15 despojos, ítems reclamados: ninguno). ✅ Comparar sobre un arma del botín: probado el 2026-11-01.
   **Tercera vuelta (2026-10-22)**: en «Botín concluido» cada ítem reclamado lleva el globo del glosario (visto en el mapa); **⚖ Comparar** muestra, debajo de
   la tabla de números, «Lo que hace cada uno» (la ficha corta de los dos, lado a lado: el hechizo de la varita, los efectos al golpear, lo de un
   talismán) y un número que no aplica a uno de los dos sale «—» sin flecha. Visto en el mapa: Varita arcana contra Cuchillo, Farol contra Tapa de
@@ -81,7 +81,7 @@
 - [x] **🏪 La tienda cerrada se puede mirar** (dueño, 2026-10-22): con la tienda cerrada, el 🏪 del mapa y el Vendedor de la ficha abren la última
   publicada con el cartel «🔒 Cerrada: podés mirar, no comprar ni vender» (sin carrito, Comprar, Vaciar, Vender, Reparación ni ítem aleatorio; Ver
   y Comparar sí); si el GM la cierra con la ventana abierta, se queda mirando y el carrito se vacía; cuando la abre, «🏪 El GM abrió la tienda».
-  Visto en «Claude · pruebas» (juan, desde el mapa: cerrada y después abierta). **Falta probar** lo mismo en la ficha suelta.
+  Visto en «Claude · pruebas» (juan, desde el mapa: cerrada y después abierta). ✅ En la ficha suelta, probado el 2026-11-01 (ver la tanda de ese día, arriba en Pendientes).
 - [x] (2026-10-22, lo vio el dueño) **✅ Terminar mi turno** (dueño, 2026-10-22): en la cabecera del orden de turnos (también achicado), cuando le toca a un token mío, el botón
   «✅ Terminar mi turno»; al tocarlo queda «⏳ Terminando…», la Crónica dice «Fulano terminó su turno» y la pantalla del GM pasa al siguiente por él
   («El GM pasó el turno»). Si no hay ninguna pantalla del GM abierta, a los 20 s el botón se vuelve a habilitar. Si el turno ya había pasado, la
@@ -281,6 +281,21 @@
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 
 ## Pendientes
+- [x] **🧪 Tanda del 2026-11-01 (desde la nube, con clics, cuentas GM / Jugador 1 / Jugador 2; capturas `mapa-1101-*`; todo restaurado, 0 diferencias)**:
+  ☀ **Luz sanadora mínimo 1** (482ff3c2): Destello revelador del Goblin scout, 2 de daño a Abeja Diestra → «Luz sanadora (25 %): se cura 1 · 34 → 35».
+  🤝 **Pasar a un aliado** (9e570c0d): en combate el botón dice «🤝 Pasar a un aliado» y, sin nadie pegado, arriba queda «♻ Despojos» y no hay botón por
+  ítem; Prueba Uno → Prueba Dos **caída** (0 de vida) una Poción de SP menor (−2 No2, la aceptó desde su cuenta: le llegó al cinturón) y Prueba Dos,
+  caída, → Prueba Uno una Poción de Cuero Duro (−2 No2, aceptada). 🎁 **Botín** (armado a mano: 3 Pociones de SP menor y la Aguja de acupunturista):
+  Reclamar 2 de la pila → «2 tuyos», ↩ Soltar 1 → 1; ⚖ Comparar la Aguja contra la Ballesta de mano puesta (tabla y «Lo que hace cada uno»).
+  ⚔ **Disputar una pila**: solo aparece cuando ya no quedan libres (Jugador 2 reclamó las 2 libres); piedra contra tijera → «¡Ganaste! · te llevás
+  Poción de SP menor» y las tres quedaron de Prueba Dos. 🐝 **Una invocación ataca** (Abeja de prueba de Prueba Dos → Basilio): PdG a mano 20 contra
+  Evasión 4 → crítico ×3 → 18 a la vida; el duelo dice «sin arma · Tipo 4» porque el arma de la abeja no tiene nombre (dato, no falla). 🔍 **Ver todo
+  de un creep** (Basilio, desde el GM): Manos con la Varita de la grieta (1d6 arcano) y el Grimorio gastado. 🏹 **Virote especial desde el carcaj**
+  (Prueba Uno, Ballesta de mano + Carcaj de cuero con 2 Virotes marcadores): «🏹 Virote común / ✨ Virote especial ▾» → Virote marcador → la línea de
+  tiro pidió «Ignorar obstáculo» → 12 de daño y Marcado 2 turnos; el carcaj bajó 2 → 1. 🏪 **La tienda cerrada en la ficha suelta**: el GM la cerró
+  desde el Generador de tiendas; el Vendedor de la ficha suelta la abre con «🔒 Cerrada: podés mirar, no comprar ni vender», sin carrito, Vender,
+  Reparación ni ítem aleatorio (Ver y Comparar sí); al reabrirla, «El GM abrió la tienda» y vuelven los «+ Carrito». **Para mirar**: en esa tienda
+  (cerrada o abierta) cada ítem muestra «Editar» y «Eliminar» al jugador, y con la tienda cerrada sigue el texto «Carrito vacío — usá "+ Carrito"».
 - [ ] **🏃 Prisa al ordenar los turnos** (2026-10-31, hecho desde la nube, `vtt-hexgrid/js/86-prisa.js`): (1) en «El origen de las especies»,
   confirmar que **Ricardo** tiene Prisa (en su ficha: la pasiva o lo que se la dé; la ficha tiene que haberse guardado una vez para publicar
   `resumen.prisa`); desde la nube no se pueden leer las partidas. (2) Con Ricardo en el orden de turnos, ⇅ Ordenar → al GM, el Aviso «Prisa al

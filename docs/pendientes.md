@@ -48,10 +48,16 @@
 >   detalle en `docs/pruebas-en-el-mapa.md`: el 💪 Empower desde juan (pagar, tirar en un duelo y dárselo a un aliado); ✨ levantar un arma con un clic
 >   en combate (en tu turno y fuera de él); 🤺 el desarme (el cartel, la ruleta, el duelo que vuelve) y un Warrior desarmando desde su cuenta; ⏬ la
 >   Demora en una sesión; 💥 la trampa que explota, vista desde la cuenta de un jugador.
-> - [ ] **🧩 Pruebas que necesitan armar más cosas (2026-10-30, dueño: «lo que necesite armar más cosas, anotalo para cuando esté en la compu»)** —
+> - [x] **🧩 Pruebas que necesitan armar más cosas (2026-10-30, dueño: «lo que necesite armar más cosas, anotalo para cuando esté en la compu»)** —
 >   el botín de punta a punta (Soltar de a uno, ⚖ Comparar sobre un arma del botín; el Anuncio «🎁 Botín concluido» y el «Estado del grupo» al cerrarlo ya
 >   se vieron el 2026-10-30); ⚔ Disputar sobre una pila (necesita dos jugadores de cuentas distintas); el ataque de una invocación y el 🔍
 >   Ver de un creep (las armas de los creeps); 🏹 una flecha especial desde el carcaj de un personaje; 🏪 la tienda cerrada en la ficha suelta.
+>   ✅ **Todas probadas con clics en «Claude · pruebas» (2026-11-01, desde la nube, las tres cuentas; capturas `mapa-1101-*`)**: botín (Reclamar 2 de
+>   una pila, ↩ Soltar 1, ⚖ Comparar la Aguja contra la Ballesta puesta), ⚔ Disputar la pila (Jugador 2 contra Jugador 1: piedra contra tijera, ganó
+>   y se llevó las tres), una invocación ataca (Abeja de prueba → Basilio: crítico ×3, 18 a la vida), 🔍 Ver todo de Basilio (Manos: Varita de la
+>   grieta y Grimorio), 🏹 Virote marcador desde el carcaj con la Ballesta de mano («¿Qué virote?», Marcado 2 turnos, carcaj 2 → 1) y la tienda
+>   cerrada en la ficha suelta (el cartel «🔒 Cerrada», sin carrito ni Vender; al reabrirla, «El GM abrió la tienda»). Detalle en
+>   `docs/pruebas-en-el-mapa.md`. Todo restaurado.
 > - [ ] **🤖 Escanear grupo → Proponer creeps (2026-10-30, dueño: «anotalo para cuando esté en la compu»)**: probar la respuesta de la IA (usa la
 >   clave de OpenRouter del dueño).
 > - [x] **✊ Ver el desempate del duelo — hecho por el dueño el 2026-10-30 (gana juan con piedra, papel o tijera). (2026-10-30, dueño: «creá una situación de duelo que llegue a tener que tirar un desempate, dejá el duelo ahí y

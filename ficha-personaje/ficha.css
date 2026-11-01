@@ -1214,3 +1214,7 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 #scrim-catalogo .modal > header > div > .iconbtn,
 #scrim-catalogo .modal > header > div > .catalogo-dde-badge{white-space:nowrap;flex:0 0 auto}
 #scrim-catalogo .modal > header .tienda-badge{white-space:normal;max-width:460px;line-height:1.4}
+
+/* El cartel de «Solo lectura» / «Editar como GM» / «Tenés el control» va fijo arriba al centro: le hacemos lugar bajando la línea de la ficha
+   para que no la tape (dueño, 2026-11-01). */
+html.con-lectura .accesos{padding-top:44px}

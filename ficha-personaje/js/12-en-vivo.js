@@ -275,6 +275,7 @@ async function fichaMostrarLectura(){
   const controlo = fichaControloYo(f);
   if(!f || (!f.soloLectura && !editaGM && !controlo)){
     if(cartel) cartel.remove();
+    document.documentElement.classList.remove('con-lectura');   // (el lugar para el cartel, ficha.css: 2026-11-01)
     fichaIdentidadUsuario = '';
     fichaIdentidadRender();
     return;
@@ -284,6 +285,7 @@ async function fichaMostrarLectura(){
     cartel.id = 'ficha-lectura';
     document.body.appendChild(cartel);
   }
+  document.documentElement.classList.add('con-lectura');
   cartel.classList.toggle('editando-gm', editaGM || controlo);
   const boton = (texto, accion, titulo) => {
     const b = document.createElement('button');

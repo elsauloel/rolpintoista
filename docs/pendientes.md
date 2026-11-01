@@ -282,9 +282,12 @@
 > - [ ] **🐾 Ampliar el pool de habilidades de creep (2026-10-26, dueño: «si en algún momento quiero expandir el pool… hay algunas ideas que me parecían muy
 >   buenas»):** las propuestas que no se eligieron en el camino a 20, con sus números, en `docs/diseno-roles-creep.md` → «Para ampliar el pool más adelante»;
 >   y lo que no tiene ✅ en la lista de cada rol.
-> - [ ] **💨 El viento disipa gases y nubes (2026-10-26, dueño: «que los efectos de viento disipen gases y nubes»):** una habilidad, varita o zona
->   de viento (Ráfaga de viento, Varita de la ventisca…) que pasa por una zona de gas o nube (las que dibuja `nubeColor`, vtt-hexgrid/js/50: tóxicas,
->   humo, niebla, talco…) la saca del mapa en las casillas que toca (o entera). Para el futuro.
+> - [x] **💨 El viento disipa gases y nubes (2026-10-26; hecho 2026-11-01, dueño: «si el efecto de viento cubre media nube, que cambie la forma de la nube y
+>   que borre solamente esos casilleros»):** `despejarEn` (vtt-hexgrid/js/13) despeja también las zonas que se dibujan como nube (`nubeColor`, js/50) en
+>   las casillas que toca; la nube sigue con las que le quedan (forma libre). Lo hacen la Varita del vendaval, la Varita de la ráfaga helada y la Ráfaga
+>   de viento (creep). **Pegar las reglas** (`firebase/firestore.rules`, «El viento que despeja» con `zona`) para que lo haga un jugador sobre una nube
+>   ajena; sin pegarlas, el GM igual puede (la vuelve a crear con las casillas que quedan). Idea: un empujón de viento de un solo objetivo podría
+>   despejar las casillas por donde pasa el empujado (no se hizo).
 > - [ ] **⬡ Seleccionar un hexágono libre y ver qué lo afecta (2026-10-26, dueño: «que uno pueda seleccionar un hexágono libre y que donde hoy muestra… el
 >   nombre, que diga hexágono libre… si ese hexágono está siendo afectado por algún efecto público, por ejemplo, algún aura, algún muro, alguna zona… que te
 >   permita ver también los distintos efectos aplicados a ese hexágono. Déjalo en pendientes y después lo desarrollamos»):** un clic en una casilla sin token

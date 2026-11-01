@@ -416,9 +416,9 @@
   // 🌬 Auditada (dueño, 2026-10-26; el Mago, «control elemental», Ráfaga de viento: «la siguiente va a ser la ráfaga de viento, pero que empuje por lo menos
   // tres»): el cono al frente (el del Hálito polar), su PdG.Esp contra la Evasión de cada rival; al que no esquiva, 1d6 arcano (poco: es control), lo empuja
   // 3 (el Empujón, con su choque) y queda Sentado. Costo de Claude: 2 No2 y 3 SP, o cooldown 3.
-  H('Ráfaga de viento', 'DK', 'ega', 'g', 3, {detalle: 'Suelta una ráfaga de viento en cono al frente (16 casillas): tira su Probabilidad de Golpe especial contra la Evasión de cada rival del cono. Al que no la esquiva, 1d6 de daño arcano (lo frena la Defensa especial), lo empuja 3 casillas lejos del mago (si choca contra algo, el daño de colisión de siempre) y queda Sentado (levantarse le cuesta No2). No afecta a sus aliados.',
+  H('Ráfaga de viento', 'DK', 'ega', 'g', 3, {detalle: 'Suelta una ráfaga de viento en cono al frente (16 casillas): tira su Probabilidad de Golpe especial contra la Evasión de cada rival del cono. Al que no la esquiva, 1d6 de daño arcano (lo frena la Defensa especial), lo empuja 3 casillas lejos del mago (si choca contra algo, el daño de colisión de siempre) y queda Sentado (levantarse le cuesta No2). No afecta a sus aliados. Además apaga el fuego y despeja la niebla, las nubes y los gases de las casillas del cono (si cubre media nube, se lleva solo esa mitad).',
     no2: 2, spCosto: 3, auditada: true, ataqueTxt: 'cono al frente: su PdG.Esp contra la Evasión de cada rival; 1d6 arcano, lo empuja 3 y queda Sentado',
-    duelo: {objetivo: 'cono', tira: 'pdgmg', contra: ['eva'], dano: true, danoFormula: '1d6', tipoDano: 'arcano',
+    duelo: {objetivo: 'cono', tira: 'pdgmg', contra: ['eva'], dano: true, danoFormula: '1d6', tipoDano: 'arcano', despeja: true,   // 💨 despeja nubes y gases (2026-11-01)
       efectos: [{nombre: 'Empujón', empuja: 3, detalle: 'Lo empuja 3 casillas, lejos del mago.'}, {nombre: 'Sentado'}]}});
   // 💥 Auditada (dueño, 2026-10-26; el Mago, «áreas y terreno», Nova arcana: «vamos con la nova, como ya decimos»): la onda alrededor (la del Barrido) con
   // su PdG.Esp contra la Evasión de cada rival pegado; al que no esquiva, 2d6 arcano y lo empuja 2 (el Empujón, con su choque). Costo de Claude: 2 No2 y

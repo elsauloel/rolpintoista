@@ -2197,6 +2197,12 @@ const Combatiente = (() => {
     if(!Array.isArray(habs)) return false;
     let cambio = false;
     habs.forEach(h => {
+      // 💨 La Ráfaga de viento despeja nubes y gases (dueño, 2026-11-01): la que ya estaba guardada en un creep se pone al día.
+      if(h && h.nombre === 'Ráfaga de viento' && h.duelo && typeof h.duelo === 'object' && h.duelo.objetivo === 'cono' && !h.duelo.despeja){
+        h.duelo.despeja = true;
+        if(typeof h.detalle === 'string' && !/despeja/.test(h.detalle)) h.detalle = h.detalle.trimEnd() + ' Además apaga el fuego y despeja la niebla, las nubes y los gases de las casillas del cono (si cubre media nube, se lleva solo esa mitad).';
+        cambio = true;
+      }
       const rn = h && RENOMBRES_LUZ[h.nombre];
       if(rn){
         h.nombre = rn.nombre;
@@ -2226,6 +2232,11 @@ const Combatiente = (() => {
      (comun/catalogo.js), pero solo si sigue siendo la de antes (`vieja`): si alguien la editó a mano, no se toca. → true si cambió algo.
      · Varita del destello (dueño, 2026-10-31): daño de luz (no arcano), Marcado, Luz sanadora 25 % y Ceguera en lugar de Pajaritos. */
   const ITEMS_AL_DIA = [
+    // 💨 (dueño, 2026-11-01): la Varita de la ráfaga helada también despeja nubes y gases; el vendaval, el texto nuevo.
+    {id: 'esp-buena-varita-de-la-rafaga-helada', nombre: 'Varita de la ráfaga helada', claves: ['especial', 'detalle'],
+      vieja: it => { const d = it.especial && it.especial.duelo; return !!(d && d.objetivo === 'cono' && !d.despeja); }},
+    {id: 'esp-buena-varita-del-vendaval', nombre: 'Varita del vendaval', claves: ['detalle'],
+      vieja: it => typeof it.detalle === 'string' && /despeja la niebla de las casillas/.test(it.detalle)},
     {id: 'esp-varita-del-destello', nombre: 'Varita del destello', claves: ['especial', 'detalle'],
       vieja: it => { const d = it.especial && it.especial.duelo; return !!(d && d.tipoDano === 'arcano' && (d.efectos || []).some(e => e && e.nombre === 'Pajaritos')); }},
   ];

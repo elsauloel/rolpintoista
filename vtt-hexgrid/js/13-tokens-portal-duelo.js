@@ -2047,29 +2047,47 @@ async function dueloEmpujar(d, n, clava){
 // (dueño, 2026-10-08): despeja SOLO las casillas que toca — una niebla o un fuego de varias casillas pierde esas y el resto queda (pasa a forma
 // libre); si no le queda ninguna, se borra. Lo puede hacer cualquiera (reglas: «El viento que despeja»).
 async function despejarEn(celdas, nombre){
+  // 💨 (2026-11-01, dueño: «el viento disipa gases y nubes… si cubre media nube, que cambie la forma y borre solamente esos casilleros»):
+  // además de la niebla y el fuego, las zonas de gas o nube (todo lo que se dibuja como nube, `nubeColor` de js/50: tóxica, humo, talco,
+  // miasma, gas, vapor, esporas, niebla/bruma como zona). Mismo recorte: la zona sigue con las casillas que le quedan (forma libre).
   const tareas = [];
+  const queEs = el => el.niebla ? 'niebla' : (el.fuego || (el.zona && /fuego/i.test(el.zonaDanoTipo || ''))) ? 'fuego'
+    : String(el.zonaNombre || 'nube').trim().toLowerCase() || 'nube';
   elementos.forEach((el, id) => {
     const fuego = el.fuego || (el.zona && /fuego/i.test(el.zonaDanoTipo || ''));
-    if(!el.niebla && !fuego) return;
+    const nube = !!(el.zona && typeof nubeColor === 'function' && nubeColor(el));
+    if(!el.niebla && !fuego && !nube) return;
     const todas = celdasDeElemento(el);
     const quedan = todas.filter(c => !celdas.has(nbPack(c.col, c.fila)));
-    if(quedan.length < todas.length) tareas.push({id, quedan, origen: el.origen, sacadas: todas.length - quedan.length});
+    if(quedan.length < todas.length) tareas.push({id, quedan, origen: el.origen, sacadas: todas.length - quedan.length, que: queEs(el)});
   });
   if(!tareas.length) return;
-  let ok = 0, casillas = 0;
+  let ok = 0;
+  const hechas = new Map();   // qué → casillas
   for(const t of tareas){
     try{
       const ref = coleccionElementos().doc(t.id);
-      if(!t.quedan.length) await ref.delete();
-      else{
-        const c0 = hexACubo(t.origen);
-        await ref.update({tipo: 'libre', rotacion: 0, celdas: t.quedan.flatMap(c => { const k = hexACubo(c); return [k.q - c0.q, k.r - c0.r]; })});
+      const c0 = hexACubo(t.origen);
+      const nuevas = {tipo: 'libre', rotacion: 0, celdas: t.quedan.flatMap(c => { const k = hexACubo(c); return [k.q - c0.q, k.r - c0.r]; })};
+      try{
+        if(!t.quedan.length) await ref.delete();
+        else await ref.update(nuevas);
+      }catch(err){
+        // Sin las reglas nuevas pegadas («El viento que despeja» con zonas, 2026-11-01) el recorte de una nube lo rechaza Firestore; el GM (o
+        // quien la puso) igual puede: la vuelve a crear con las casillas que quedan y borra la vieja.
+        if(err.code !== 'permission-denied' || !(soyGM || (elementos.get(t.id) || {}).duenoUid === fbUsuario.uid)) throw err;
+        if(t.quedan.length){ const raw = (await ref.get()).data(); if(raw) await coleccionElementos().add({...raw, ...nuevas, duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp()}); }
+        await ref.delete();
       }
-      ok++; casillas += t.sacadas;
+      ok++; hechas.set(t.que, (hechas.get(t.que) || 0) + t.sacadas);
     }catch(err){ console.error('No se pudo despejar:', err); }
   }
-  toast(ok === tareas.length ? `💨 ${nombre || 'El viento'}: despejó ${casillas} casilla${casillas === 1 ? '' : 's'} de niebla o fuego`
-    : `💨 ${nombre || 'El viento'}: despejó ${ok} de ${tareas.length} — lo demás, a mano (faltan pegar las reglas)`);
+  const quien = nombre || 'El viento';
+  const txt = [...hechas].map(([q, n]) => `${n} casilla${n === 1 ? '' : 's'} de ${q}`).join(', ');
+  if(ok){
+    toast(`💨 ${quien} despejó ${txt}${ok < tareas.length ? ' — lo demás, a mano (faltan pegar las reglas)' : ''}`);
+    try{ mesaLinea(`💨 ${quien} despejó ${txt}`, 'recordatorio'); }catch(err){}
+  }else toast(`💨 ${quien}: no pudo despejar la nube — a mano (faltan pegar las reglas)`);
 }
 /* ☀ El destello (2026-10-26, Luz para los suyos —desde el 2026-10-31 Destello revelador—, dueño: «un destello, ¡fum!, que sucede y no queda como área… revela los ocultos y los deja marcados
    a todos, revela las trampas y todo»): el fogonazo en todas las pantallas (el momento «estallido», con tono de luz), el estado (Marcado: saca el

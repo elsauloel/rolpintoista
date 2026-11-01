@@ -42,7 +42,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 </script>
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
-<script src="combatiente.js?v=20261101jefe2"></script>
+<script src="combatiente.js?v=20261101viento"></script>
 <script src="creep-calculo.js?v=20261101adren"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261101jefe2"></script>
@@ -111,7 +111,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="pasivas.js"></script>
 <script src="skills-clase.js?v=20261101adren"></script>
 <script src="creeps-base.js"></script>
-<script src="skills-creep-base.js?v=20261101adren"></script>
+<script src="skills-creep-base.js?v=20261101viento"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
 <script>
@@ -6397,6 +6397,16 @@ prueba('💉 Un estado que se apila puesto a mano en un creep (el selector) se a
   const poner = () => Combatiente.agregarEstado(sc.estados, SelectorEstados.estadoCreep(ad, Math.random().toString(36).slice(2, 9), CreepAcciones.FLAGS_ESTADO));
   poner(); poner();
   igual([sc.estados.length, sc.estados[0].stacks, CreepCalculo.statValor(sc, 'pdg'), CreepCalculo.statValor(sc, 'eva'), CreepCalculo.statValor(sc, 'dmg')], [1, 2, 7, 6, 5]);
+});
+prueba('💨 El viento despeja nubes y gases (2026-11-01): la Ráfaga de viento y la Varita de la ráfaga helada traen `despeja`, y las guardadas se ponen al día', () => {
+  const base = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Ráfaga de viento');
+  const vieja = [{nombre: 'Ráfaga de viento', detalle: 'Suelta una ráfaga.', duelo: {objetivo: 'cono', dano: true}}];
+  const cambio = Combatiente.migrarLuzSanadora(vieja);
+  const helada = CATALOGO_BASE.find(i => i.id === 'esp-buena-varita-de-la-rafaga-helada');
+  const copia = [{id: helada.id, nombre: helada.nombre, especial: {sp: 4, duelo: {objetivo: 'cono', dano: true}}, detalle: 'vieja'}];
+  Combatiente.ponerAlDiaItemsFabrica(copia);
+  igual([!!base.datos.sp.duelo.despeja, cambio, vieja[0].duelo.despeja, /despeja la niebla, las nubes/.test(vieja[0].detalle), !!helada.especial.duelo.despeja, !!copia[0].especial.duelo.despeja, copia[0].detalle === helada.detalle],
+    [true, true, true, true, true, true, true]);
 });
 /* ---------- Resultado ---------- */
 Promise.all(pendientes).then(() => {

@@ -1968,3 +1968,12 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   turno a Pajaritos, Miedo, Provocado, Silencio, Ceguera, Inmovilizado, Agarrado, Sentado, Exhausto) y llama a `window.avisoJefe(info)`: en la pantalla del GM,
   el cartel «Aplicar la regla» / «Aplicar igual» (o «Aplicar completo (N turnos)»); lo segundo se lo vuelve a poner al creep con `{sinJefe: true}`
   (`modificarCreep`). En otra pantalla, la regla con su línea en la Mesa. GM Tools tiene el mismo cartel (`gm-toolset/js/03`).
+
+- **💨 El viento despeja nubes y gases** (2026-11-01, dueño): `despejarEn(celdas, nombre)` (js/13, lo llama el área con `hab.despeja`: cono, línea o flor)
+  saca la niebla, el fuego y **las zonas que se dibujan como nube** (`nubeColor`, js/50: tóxica, humo, talco, miasma, gas, vapor, esporas, niebla/bruma)
+  **solo en las casillas que toca**: la zona pasa a forma libre con las que le quedan (y sigue funcionando igual: al entrar, en el Mantenimiento, el
+  dibujo); sin ninguna, se borra. Toast y línea en la Mesa («💨 Ráfaga de viento despejó N casillas de nube tóxica»). Sin las reglas nuevas pegadas
+  (`zona` en «El viento que despeja» de firestore.rules), el recorte de una nube ajena lo rechaza Firestore: el GM o quien la puso la vuelve a crear
+  con las casillas que quedan (`add` + `delete`; el id de la zona cambia). Lo usan: Varita del vendaval, Varita de la ráfaga helada (`despeja` en su
+  duelo; las copias viejas se ponen al día con `Combatiente.ponerAlDiaItemsFabrica`) y la Ráfaga de viento de creep (`migrarLuzSanadora` le suma
+  `despeja` a la guardada).

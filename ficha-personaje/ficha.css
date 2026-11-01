@@ -1204,3 +1204,13 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 /* 🪙 Sin Moneda Re-Roll (2026-10-09, dueño): el botón gris y tachado con una línea roja; tocarlo avisa. */
 .sin-moneda{position:relative;filter:grayscale(1);opacity:.55}
 .sin-moneda::after{content:'';position:absolute;left:12%;right:12%;top:50%;height:2px;margin-top:-1px;background:#D8524B;transform:rotate(-40deg);border-radius:2px;pointer-events:none}
+
+/* 🏪 El encabezado de la tienda (2026-11-01, dueño: «el encabezado todo mal configurado, con partes que se salían por fuera»): el título en una línea,
+   los botones sin partirse y, si no entran, bajan a otro renglón en lugar de salirse del cuadro. */
+#scrim-catalogo .modal > header{flex-wrap:wrap;gap:8px 14px}
+#scrim-catalogo .modal > header h3{white-space:nowrap;flex:0 0 auto}
+#scrim-catalogo .modal > header > div{flex-wrap:wrap;justify-content:flex-end;min-width:0;flex:1 1 auto}
+#scrim-catalogo .modal > header > div > .btn,
+#scrim-catalogo .modal > header > div > .iconbtn,
+#scrim-catalogo .modal > header > div > .catalogo-dde-badge{white-space:nowrap;flex:0 0 auto}
+#scrim-catalogo .modal > header .tienda-badge{white-space:normal;max-width:460px;line-height:1.4}

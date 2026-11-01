@@ -209,7 +209,7 @@ function histEstilos(){
 #historial-panel .hp-mant{color:#B9A6E8}
 #historial-panel .hp-vacio{padding:18px 12px;color:#9A867E;text-align:center}
 /* lugar para el botón en la barra de cada herramienta (además del ☰ y la ⌂ de comun/menu-sitio.js) */
-html.hist-on header{padding-left:218px!important}
+html.hist-on header:not(.modal header):not([role=dialog] header){padding-left:218px!important}   /* (no en los encabezados de las ventanas: 2026-11-01, la tienda de la ficha) */
 html.hist-on .accesos{padding-left:206px}
 html.hist-on .hero > div:first-child{padding-left:206px}`;
   document.head.appendChild(s);

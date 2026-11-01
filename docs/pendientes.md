@@ -880,9 +880,10 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] **Manual** (`manual-usuario/notas`): grupos y tokens automáticos, botín, Despojar, Finalizar combate en el mapa, trampas automáticas, estados sobre otros, protección de jefe, botón 🎭 y grupos ↔ mapas, y una nota de casteo cuando estén las reglas.
 
 ## 4. Diseño pendiente
-- [ ] **😱💤 Sumar Pánico y Sueño a cosas que los den (dueño, 2026-11-01: «anotá como pendiente sumar pánico y…» —el mensaje se cortó—).** Hoy no los da
+- [ ] **😱💤 Sumar Pánico y Sueño a cosas que los den (dueño, 2026-11-01: «sumar algunos ítems o circunstancias que den pánico y que den sueño, que duerman»).** Hoy no los da
   nada (solo el selector de estados). Candidatos: el Grito de pánico (hoy da Miedo) → Pánico; algo que duerma (una flecha, un polvo, una habilidad de creep).
-  Abierto también: si el veneno o el sangrado del Mantenimiento despiertan al dormido, y si la Inmunidad a CC sigue frenando Miedo, Pánico y Sueño o solo la mental.
+  Decidido (dueño, 2026-11-01): el veneno y el sangrado del Mantenimiento NO despiertan («es el daño externo el que despierta», como está programado);
+  la Inmunidad a CC frena todos los controles, también Miedo, Pánico y Sueño (como está).
 - [x] **Trampas para jugadores**: hecho (2026-09-24, el paso 🪤 del editor de habilidades del personaje; desde el 2026-09-30, en ✨ se elige la casilla).
 - [x] **Zona persistente y trampas en invocaciones** (P134): hecho el 2026-10-02 (etapa 4f, `plan-paso4-etapa4.md`): la zona anda y el
   editor de habilidades de invocación tiene el paso 🪤 Trampa. (Ataque con arma con arreglos y ⚡ Flash ya andan en creeps e

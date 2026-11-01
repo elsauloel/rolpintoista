@@ -241,11 +241,16 @@
 > - [ ] **⏳ «Token de turnos» (2026-10-28) — en espera:** el dueño lo tiene que definir con un colega que le va a mandar la info («Había que cambiar
 >   cómo está automatizado el sistema. Sería más simple que haya un estado llamado Token de turnos y el sistema se lo saca durante el mantenimiento»).
 >   No tocar hasta que llegue.
-> - [ ] **🎒 Usar los consumibles de un aliado caído (2026-10-27, dueño: «después podemos definir que los aliados, al pararse al lado, pueden abrir su
+> - [x] **🎒 Usar los consumibles de un aliado caído (2026-10-27, dueño: «después podemos definir que los aliados, al pararse al lado, pueden abrir su
 >   mochila o su cinturón para valerse de sus consumibles gastando nitros»).** Un personaje caído (0 de vida) es un cuerpo esperando que lo revivan (P225);
 >   un aliado pegado a él podría abrir su mochila o su cinturón y usar sus consumibles (sobre el caído o sobre sí), pagando No2. A definir: cuánto cuesta
 >   (como sacar de la mochila propia, 2 No2; del cinturón, 1), si puede llevárselos y si vale también para los creeps. Base: el intercambio en combate
 >   (`comun/intercambio.js`, la alforja) y `FichaAcciones.consumir`.
+>   ✅ **Resuelto (dueño, 2026-11-01: «es el mismo mecanismo, caído o no… al abrir la mochila, mientras tiene un aliado adyacente, aparezca un botón
+>   que sea pasar a un aliado»):** no hay un sistema aparte; es el 🤝 de siempre (comun/intercambio.js). En combate el botón dice «🤝 Pasar a un
+>   aliado» (el de arriba de la mochila y el de cada ítem) y en el mapa solo aparece con un aliado pegado (sin nadie al lado, arriba queda «♻
+>   Despojos»). Probado con clics en «Claude · pruebas» (2026-11-01): Prueba Uno le pasó una poción a Prueba Dos caída (0 de vida; −2 No2, la
+>   aceptó desde su cuenta) y Prueba Dos, caída, le pasó una a Prueba Uno (−2 No2, aceptada). Capturas `mapa-1101-2*`.
 > - [ ] **⚖ Paridad de elementos en todo el sistema (2026-10-26, dueño: «cuando terminemos con este ciclo, ir para atrás, incorporar elementos de magia,
 >   varitas, báculos, skills, en resistencias de equipo, etcétera, como para que haya cierta paridad de elementos across el sistema»).** Para después del
 >   ciclo de habilidades de creep. Hoy hay siete elementos (arcano, fuego, hielo, rayo, tóxico, ácido y, desde el 2026-10-26, ☀ luz y 🌑 siniestro: P221)

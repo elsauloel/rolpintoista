@@ -1595,7 +1595,7 @@ async function abrirEquipoMapa(fichaId){
 }
 function bnEquipoDibujar(){
   if(!bn || !bn.S) return;
-  bn.raiz.querySelector('#bn-equipo-cuerpo').innerHTML = FichaEquipo.html(bn.S, {lupa: true, enCombate: modoMapa === 'combate'});
+  bn.raiz.querySelector('#bn-equipo-cuerpo').innerHTML = FichaEquipo.html(bn.S, {lupa: true, enCombate: modoMapa === 'combate', fichaId: bn.fichaId});
   if(bnComparando) bnCompararDibujar();
 }
 function bnEquipoCerrar(){

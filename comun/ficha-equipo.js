@@ -420,7 +420,7 @@ const FichaEquipo = (() => {
       <div class="equipo-slot-cab"><span>${esc(sd.label)}</span></div>
       ${items.map(it => {
         const info = slotOcupado(S, it);
-        return filaHtml(it, `${typeof Intercambio !== 'undefined' ? Intercambio.botonDar(it) + Intercambio.botonDespojos(it) : ''}${aManoBoton(S, it)}<button type="button" class="mini on" data-toggle="${it.id}" title="${info && info.ocupado ? 'El slot está lleno: te deja reemplazar o comparar' : 'Equipar'}">${info && info.ocupado ? 'Cambiar…' : 'Equipar'}</button>`);
+        return filaHtml(it, `${typeof Intercambio !== 'undefined' ? Intercambio.botonDar(it, o && o.fichaId) + Intercambio.botonDespojos(it) : ''}${aManoBoton(S, it)}<button type="button" class="mini on" data-toggle="${it.id}" title="${info && info.ocupado ? 'El slot está lleno: te deja reemplazar o comparar' : 'Equipar'}">${info && info.ocupado ? 'Cambiar…' : 'Equipar'}</button>`);
       }).join('')}
     </div>`;
     }).join('');
@@ -461,7 +461,7 @@ const FichaEquipo = (() => {
   </div>`;
     return resumen + estadoEquipoHtml(S, equipados) + pesoEq + repararHtml(S, !!(o.enCombate)) + `<div class="equipo-cols">
     <div><h4 class="equipo-tit">Equipado</h4>${izq}${carcajHtml(S)}</div>
-    <div><h4 class="equipo-tit">Mochila${typeof Intercambio !== 'undefined' ? ` <button type="button" class="mini" data-ix-abrir-dar="" title="Pasarle a otro personaje un ítem (también pociones y trofeos), DDE o despojos, o convertir un ítem en despojos (♻)">🤝 Pasar · ♻</button>` : ''}</h4>${der || '<div class="hint">No hay nada equipable en la mochila.</div>'}</div>
+    <div><h4 class="equipo-tit">Mochila${typeof Intercambio !== 'undefined' ? ` <button type="button" class="mini" data-ix-abrir-dar="" title="Pasarle a otro personaje un ítem (también pociones y trofeos), DDE o despojos, o convertir un ítem en despojos (♻). En combate, solo a un aliado al lado (caído o no).">${esc(Intercambio.textoPasar ? Intercambio.textoPasar(o && o.fichaId) : '🤝 Pasar · ♻')}</button>` : ''}</h4>${der || '<div class="hint">No hay nada equipable en la mochila.</div>'}</div>
   </div>`;
   }
   /* 🔧 Reparar sin herrero (dueño, 2026-10-12; P99): el talento «Reparar equipo» y el Óleo reparador. Solo fuera de combate. Cada punto

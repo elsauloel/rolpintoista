@@ -802,10 +802,23 @@ const Intercambio = (() => {
   }
 
   // El botón de la mochila (la ficha y la ventana de Equipo): 🤝 Dar, o lo que está ofrecido.
-  function botonDar(it){
+  // En combate (dueño, 2026-11-01: «al abrir la mochila, mientras tiene un aliado adyacente, aparezca un botón que sea pasar a un aliado… esté caído
+  // o no, es el mismo mecanismo»): dice «🤝 Pasar a un aliado» y, si la pantalla sabe quién está al lado (el mapa), solo aparece con un aliado pegado
+  // (caído o no: un caído es un cuerpo que sigue en el mapa). `fichaId`: de quién es la mochila (sin él, no se filtra).
+  function botonDar(it, fichaId){
     if(!it || it.equipado) return '';
+    const combate = !!(host && host.enCombate && host.enCombate());
+    if(combate && !(it.reservado || it.enMesa) && host.adyacentes && fichaId && !(host.adyacentes(fichaId) || []).length) return '';
+    if(combate && !(it.reservado || it.enMesa)) return `<button type="button" class="mini" data-ix-dar="${esc(it.id)}" title="En combate: pasárselo a un aliado que esté al lado (1 No2 si sale del cinturón, 2 si sale de la mochila). Vale igual si está caído.">🤝 Pasar a un aliado</button>`;
     if(it.reservado || it.enMesa) return `<button type="button" class="mini on" data-ix-abrir-dar="" title="Ofrecido a ${esc(it.reservadoPara || 'otro personaje')}: queda reservado hasta que lo acepte. Tocá para cancelar.">🤝 Ofrecido a ${esc(it.reservadoPara || '…')}</button>`;
     return `<button type="button" class="mini" data-ix-dar="${esc(it.id)}" title="Ofrecérselo a otro personaje (fuera de combate)">🤝 Dar</button>`;
+  }
+  // El botón de arriba de la mochila (Pasar · ♻): en combate dice «Pasar a un aliado» si hay uno pegado; si no, queda solo el ♻ (despojos).
+  function textoPasar(fichaId){
+    const combate = !!(host && host.enCombate && host.enCombate());
+    if(!combate) return '🤝 Pasar · ♻';
+    if(host.adyacentes && fichaId && !(host.adyacentes(fichaId) || []).length) return '♻ Despojos';
+    return '🤝 Pasar a un aliado · ♻';
   }
   // Un clic de la mochila: true si era de esta pieza.
   function clic(b, fichaId){
@@ -816,7 +829,7 @@ const Intercambio = (() => {
     return false;
   }
 
-  return {POR_INTEGRANTE, iniciar, revisar, reservado, botonDar, botonDespojos, despojosDeItem, clic, abrirDar, abrirBaul, pintarBotonBaul, cerrar,
+  return {POR_INTEGRANTE, iniciar, revisar, reservado, botonDar, textoPasar, botonDespojos, despojosDeItem, clic, abrirDar, abrirBaul, pintarBotonBaul, cerrar,
     // para las pruebas
     _ofrecer: ofrecer, _aDespojos: aDespojos, _liberar: liberar, _quitarReservado: quitarReservado, _separar: separar, _aMochila: aMochila, _despojo: despojo};
 })();

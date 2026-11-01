@@ -1328,6 +1328,10 @@ versión parecida en más de una, es candidato a juntar.
   tienda(), toast, propias()}` (ficha: `intercambioHost`, js/08; mapa: `intercambioHostMapa`, js/11); `abrirDar(fichaId, {itemId})`,
   `abrirBaul(fichaId)`, `botonDar(it)` (el botón de la mochila), `clic(b, fichaId)`. Devuelve sola lo que quedó en la vieja mesa común.
   Colecciones `paquetes`, `baul`, `baulLog` (reglas nuevas).
+- **`intercambio.js`, «🤝 Pasar a un aliado»** (2026-11-01, dueño: «es el mismo mecanismo, caído o no»): en combate `botonDar(it, fichaId)` dice
+  «🤝 Pasar a un aliado» y, si el host tiene `adyacentes` (el mapa), no aparece sin un aliado pegado; `textoPasar(fichaId)` da el texto del botón de
+  arriba de la mochila (`FichaEquipo.html(S, {fichaId})`): fuera de combate «🤝 Pasar · ♻», en combate con alguien al lado «🤝 Pasar a un aliado ·
+  ♻», sin nadie «♻ Despojos». Un caído (0 de vida) da y recibe igual (su token sigue en el mapa).
 - **`intercambio.js`, en combate** (2026-10-05): solo ítems y solo a los aliados al lado (`host.adyacentes(fichaId)`; el mapa los saca de los tokens a 1
   casillero); cuesta 1 No2 desde el cinturón (stat `pasamanos` > 0: 0) y 2 desde la mochila, se paga al ofrecer (sin No2: pregunta y deja seguir con la
   línea roja); lo que llega va al cinturón si entra. **Alforja compartida** (stat `alforja`): paquete `tipo: 'pedido'` — lo crea quien saca; la pantalla

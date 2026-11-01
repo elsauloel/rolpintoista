@@ -184,7 +184,7 @@ function recompensasHtml(sc, o){
         ${t === 'otros' ? `<input type="text" data-rec="tipoCriaturaOtro" data-id="${sc.id}" value="${esc(sc.tipoCriaturaOtro || '')}" placeholder="¿Qué tipo es?" maxlength="30" style="margin-top:4px">` : ''}
       </div>
       <div class="mini-f"><label>¿Es jefe?</label>
-        <label style="display:flex;gap:6px;align-items:center;font-size:12.5px;text-transform:none;letter-spacing:0"><input type="checkbox" data-rec="jefe" data-id="${sc.id}"${sc.jefe ? ' checked' : ''}> Jefe (doble oro y trofeo; protección: inmune a Stun y +1 Res.Esp)</label>
+        <label style="display:flex;gap:6px;align-items:center;font-size:12.5px;text-transform:none;letter-spacing:0"><input type="checkbox" data-rec="jefe" data-id="${sc.id}"${sc.jefe ? ' checked' : ''}> Jefe (doble oro y trofeo; protección: inmune a Stun, Sueño, Parálisis, Confusión y Pánico; los controles más leves le duran 1 turno; +1 Res.Esp)</label>
       </div>
     </div>
     <div class="mini-f" style="margin-top:8px"><label>Oro que carga (DDE) ${ayudaQ(AYUDA_ORO)}</label>
@@ -420,7 +420,7 @@ function htmlPasoAsistCreep(p){
           <option value="otros"${t === 'otros' ? ' selected' : ''}>Otros…</option></select>
           ${t === 'otros' ? `<input type="text" data-rec="tipoCriaturaOtro" data-id="${sc.id}" value="${esc(sc.tipoCriaturaOtro || '')}" placeholder="Escribí qué tipo es" maxlength="30" style="margin-top:6px">` : ''}`,
           'Define cuánto oro se sugiere y si el arma es natural por defecto (podés cambiar ambas cosas después).')
-      + campo('¿Es un jefe?', `<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-rec="jefe" data-id="${sc.id}"${sc.jefe ? ' checked' : ''}> Sí: deja el doble de oro y de trofeo, es inmune a Stun y tiene +1 Res.Esp (protección de jefe)</label>`)
+      + campo('¿Es un jefe?', `<label style="display:flex;gap:8px;align-items:center"><input type="checkbox" data-rec="jefe" data-id="${sc.id}"${sc.jefe ? ' checked' : ''}> Sí: deja el doble de oro y de trofeo, es inmune a Stun, Sueño, Parálisis, Confusión y Pánico, los controles más leves (Pajaritos, Miedo, Provocado, Silencio, Ceguera, Inmovilizado, Agarrado, Sentado, Exhausto) le duran como máximo 1 turno, y tiene +1 Res.Esp (protección de jefe)</label>`)
       + campo('Imagen (opcional)', `<button type="button" class="pap-boton" data-ac-img="1">${sc.imagen ? 'Cambiar imagen' : '+ Elegir imagen'}</button>
           <input type="file" data-imginput="${sc.id}" accept="image/*" hidden>`)
       + campo('Nota (opcional)', `<textarea rows="3" data-ac-campo="notas" maxlength="600">${esc(sc.notas || '')}</textarea>`, 'La ven los jugadores en la 🪪 tarjeta del creep en el mapa (junto con los nombres de su arma y su equipo).');

@@ -840,7 +840,7 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   trampa (personaje y creep) se anuncia así al rival.
 - [ ] **✊ Piedra, papel o tijera** (2026-10-08, `comun/ppt.js`): pegar las reglas nuevas (`ppt` y `botin`); el ✊ del mapa contra un jugador y contra el GM, el empate (otra ronda), rendirse, ocultar y volver con el botoncito de abajo, la línea de la Mesa y la Crónica.
 - [ ] **Trampas automáticas** (se colocan solas, ocultas, con daño) y **estados sobre otros** ("¿A quién le pegó?", la ficha aplica el aviso; trampas con estado).
-- [ ] **Protección de jefe** (inmune a Stun, +1 Res.Esp).
+- [x] **Protección de jefe** (inmune a Stun, +1 Res.Esp) → v2 el 2026-11-01 (ver abajo).
 - [ ] Botón **🗺 Mapas** del GM (se arregló una posible falla de caché: confirmar que abre; si no, mandar el error de la consola).
 - [ ] Al borrar un creep, la pregunta de borrar sus tokens en todos los mapas.
 - [x] **🎮 Tomar el control** (2026-09-30): probado en "Claude · pruebas" con Clementino (personaje del dueño con otra cuenta) desde la cuenta del GM: tomar el control (marca, cartel, Mesa), estado recibido (Veneno ×2, el aviso se borra), pase de turno (25 → 23, reporte en la Mesa), Botonera desde el mapa, mover pagando No2 (12 → 11), ser atacado por un creep (el GM elige la defensa y tira la Evasión) y devolver el control. Todo restaurado. Falta mirarlo desde la cuenta del jugador (el cartel de solo lectura en su pantalla).
@@ -918,7 +918,11 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   - [ ] 💤 **El veneno y el sangrado del Mantenimiento no despiertan del Sueño** (no pasan por el daño del mapa): ¿deberían? (Claude, 2026-11-01)
   - [ ] 😱 **El −2 del Miedo/Pánico en las áreas** sigue a mano (los sub-duelos del área no lo llevan).
 - [ ] **Despojos mágico/especial** de los ítems: siguen a mano.
-- [ ] **Protección de jefe, segunda versión** (P95): resistencia a otros controles (Exhausto, Inmovilizado…), contador de resistencia o fases.
+- [x] **Protección de jefe, segunda versión** (P95, dueño, 2026-11-01) ✅: inmune a Stun, Sueño, Parálisis, Confusión y Pánico; le duran como máximo 1 turno
+  Pajaritos, Miedo, Provocado, Silencio, Ceguera, Inmovilizado, Agarrado, Sentado y Exhausto; el resto le entra normal (Desarmado tampoco: dura hasta que levanta
+  el arma); sigue el +1 Res.Esp. `Combatiente.JEFE_INMUNE` / `JEFE_UN_TURNO`, aviso en la Mesa «inmune (jefe)» / «le dura 1 turno (jefe)».
+- [ ] **💡 Idea para más adelante (no programar todavía): contador de resistencia del jefe** (dueño, 2026-11-01): cada control que le entra le da +1 para
+  resistir el próximo, así no se lo puede encadenar turno tras turno.
 - [ ] **Estados sobre otros más finos**: los que faltan automatizar (empujar, derribar, huir, "pierde el sigilo", etc.).
 - [x] ~~**Grupos vacíos en el menú 🎭**~~ — ya no hay grupos: el 🎭 trae los creeps del mapa (2026-10-02, grupos → mapas).
 

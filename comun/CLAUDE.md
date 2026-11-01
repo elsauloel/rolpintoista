@@ -1879,3 +1879,7 @@ versión parecida en más de una, es candidato a juntar.
   efectiva y la vida máxima de la Con efectiva (`actualizarHpMaxPorCon`). Prueba en `pruebas.html`. Lo que faltaba: un estado que se apila puesto
   **a mano** en un creep (el selector, `SelectorEstados.estadoCreep` con `CreepAcciones.FLAGS_ESTADO`) perdía `apila` (y `turnosCompletos`) y no se
   acumulaba: Adrenalina ×2 quedaba ×1. Ahora están en `FLAGS_ESTADO` (y en `FLAGS_ESTADO_CREEP` de GM Tools).
+
+- **😈 Protección de jefe v2** (P95, 2026-11-01): `Combatiente.JEFE_INMUNE` / `JEFE_UN_TURNO`, en `inmunidad` y `agregarEstado0` con `o.jefe` (se pasa el sc,
+  con nombre e id); `o.sinJefe` la saltea («Aplicar igual»). Avisa con `reglaJefe(info)` → `window.avisoJefe` (mapa js/90, GM Tools js/03) o la Mesa. El
+  «+ Estado» de un creep (`SelectorEstados.estadoCreep`, GM Tools) copia todo el preset salvo alias/imagen/icono (antes se perdían sueno, miedo, panico…).

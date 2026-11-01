@@ -1477,7 +1477,7 @@ function abrirFichaDeToken(t){
    con sus preguntas, los "Mis presets" del personaje y "Crear estado nuevo (paso a paso)" — y lo aplica con la regla común
    (Combatiente.agregarEstado: inmunidades, acumular, renovar). Un personaje o una invocación se guardan con editarPersonajeMapa (js/11);
    un creep, con modificarCreep. Antes abría la ficha o GM Tools escondidas en el marco. */
-const SE_PIEZAS = ['../comun/estado-preguntas.js?v=20261009zl', '../comun/asistente-estado.js?v=20261018f', '../comun/buscar-estados.js?v=20261024sequia', '../comun/selector-estados.js?v=20261008m'];
+const SE_PIEZAS = ['../comun/estado-preguntas.js?v=20261009zl', '../comun/asistente-estado.js?v=20261018f', '../comun/buscar-estados.js?v=20261024sequia', '../comun/selector-estados.js?v=20261101jefe'];
 const idEstadoNuevo = () => Math.random().toString(36).slice(2, 9);
 // Los stats que ofrece el asistente de estados y sus nombres, como en GM Tools (un creep) y en la ficha (un personaje o invocación).
 const SE_STATS_CREEP = {def: ['Def', 'Defensa'], dmg: ['Dmg', 'Daño'], pdg: ['PdG', 'Probabilidad de golpe'], eva: ['Eva', 'Evasión'], parry: ['Parry', 'Parry'],
@@ -1560,7 +1560,7 @@ async function abrirEstadoNuevoCreep(t){
     await modificarCreep(t.fichaId, crudo => {
       const sc = CreepCalculo.normalizar(crudo);
       nombre = sc.nombre;
-      r = Combatiente.agregarEstado(sc.estados, SelectorEstados.estadoCreep(elegido.preset, idEstadoNuevo(), CreepAcciones.FLAGS_ESTADO), {jefe: sc.jefe});
+      r = Combatiente.agregarEstado(sc.estados, SelectorEstados.estadoCreep(elegido.preset, idEstadoNuevo(), CreepAcciones.FLAGS_ESTADO), sc);   // (sc: el jefe con nombre e id, para el cartel de la Protección de jefe)
       if(r.ok && CreepCalculo.modsAfectanHp(r.estado.mods)) CreepCalculo.actualizarHpMaxPorCon(sc);
       // Lo que se dispara (veneno, regeneración…) pega apenas se lo ponen (2026-10-06, P161).
       const dis = Combatiente.dispararAlAplicar(r, sc.estados, {hp: 'hpTurno', resFuego: CreepCalculo.resElemental(sc, 'fuego'), hpActual: sc.hp});

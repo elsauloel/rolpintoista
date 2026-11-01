@@ -1962,3 +1962,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   (el que la pisa ya perdió el sigilo al activarla; esto alcanza a los de alrededor de una que explota). «Saca» = vida perdida (lo que se come un
   escudo o la Vida extra no cuenta). La pantalla que aplica el daño necesita poder tocar sus estados (el dueño o el GM); si no, avisa para hacerlo a mano.
 
+
+- **🛡 Protección de jefe como recordatorio** (2026-11-01, dueño: «no obligatorio, un recordatorio de reglas y una opción de automatización; que el GM pueda
+  definir sobre la marcha»), `js/90-proteccion-jefe.js`: Combatiente aplica la regla por defecto (inmune a Stun, Sueño, Parálisis, Confusión, Pánico; máximo 1
+  turno a Pajaritos, Miedo, Provocado, Silencio, Ceguera, Inmovilizado, Agarrado, Sentado, Exhausto) y llama a `window.avisoJefe(info)`: en la pantalla del GM,
+  el cartel «Aplicar la regla» / «Aplicar igual» (o «Aplicar completo (N turnos)»); lo segundo se lo vuelve a poner al creep con `{sinJefe: true}`
+  (`modificarCreep`). En otra pantalla, la regla con su línea en la Mesa. GM Tools tiene el mismo cartel (`gm-toolset/js/03`).

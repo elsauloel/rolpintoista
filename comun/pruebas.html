@@ -42,10 +42,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 </script>
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
-<script src="combatiente.js?v=20261101adren"></script>
+<script src="combatiente.js?v=20261101jefe2"></script>
 <script src="creep-calculo.js?v=20261101adren"></script>
 <script src="creep-botonera.js"></script>
-<script src="creep-acciones.js?v=20261101deriv"></script>
+<script src="creep-acciones.js?v=20261101jefe2"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
@@ -81,7 +81,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="elegir-trampa.js"></script>
 <script src="asistente-zona.js"></script>
 <script src="asistente-mapa.js"></script>
-<script src="selector-estados.js"></script>
+<script src="selector-estados.js?v=20261101jefe"></script>
 <script src="ficha-equipo.js"></script>
 <script src="ficha-botin.js"></script>
 <script src="ppt.js"></script>
@@ -187,6 +187,29 @@ prueba('Invulnerable bloquea un debuff', () => {
   igual(EstadosAplicar.aplicarACreep(sc, {nombre: 'Pajaritos'}).motivo, 'Invulnerable');
 });
 prueba('un jefe es inmune a Stun', () => igual(EstadosAplicar.aplicarACreep({estados: [], jefe: true}, {nombre: 'Stun'}).motivo, 'Protección de jefe'));
+prueba('😈 jefe v2: inmune a Sueño, Parálisis, Confusión y Pánico; Miedo de 2 turnos queda en 1; Sentado (permanente) en 1; Veneno normal', () => {
+  const sc = {estados: [], jefe: true, nombre: 'Jefe'};
+  const m = n => EstadosAplicar.aplicarACreep(sc, {nombre: n}).motivo || '';
+  const mi = EstadosAplicar.aplicarACreep(sc, {nombre: 'Miedo', turnos: 2});
+  const se = EstadosAplicar.aplicarACreep(sc, {nombre: 'Sentado'});
+  const ve = EstadosAplicar.aplicarACreep(sc, {nombre: 'Veneno', stacks: 3});
+  const com = {estados: [], nombre: 'Común'}; const mc = EstadosAplicar.aplicarACreep(com, {nombre: 'Miedo', turnos: 2});
+  igual([m('Sueño'), m('Parálisis'), m('Confusión'), m('Pánico'), mi.ok, mi.estado.turnos, se.estado.turnos, !!se.estado.permanente, ve.ok, mc.estado.turnos],
+    ['Protección de jefe', 'Protección de jefe', 'Protección de jefe', 'Protección de jefe', true, 1, 1, false, true, 2]);
+});
+prueba('🛡 jefe: «Aplicar igual» (sinJefe) le pone el Stun y el Miedo completo; la regla avisa con info para el cartel', () => {
+  const vistos = []; const antes = window.avisoJefe; window.avisoJefe = i => vistos.push(i);
+  const est = [];
+  const a = Combatiente.agregarEstado(est, {id: 'a', nombre: 'Stun', polaridad: 'debuff', turnos: 2}, {jefe: true, sinJefe: true, nombre: 'J'});
+  const b = Combatiente.agregarEstado(est, {id: 'b', nombre: 'Miedo', polaridad: 'debuff', turnos: 2}, {jefe: true, sinJefe: true, nombre: 'J'});
+  window.avisoJefe = antes;
+  igual([a.ok, b.estado.turnos, !!b.estado.jefeUnTurno], [true, 2, false]);
+});
+prueba('el «+ Estado» de un creep copia todo el preset (Sueño trae sueno y stun; Pánico, panico)', () => {
+  const pre = n => estadosPresetCreep().find(p => p.nombre === n);
+  const su = SelectorEstados.estadoCreep(pre('Sueño'), 'x', CreepAcciones.FLAGS_ESTADO), pa = SelectorEstados.estadoCreep(pre('Pánico'), 'y', CreepAcciones.FLAGS_ESTADO);
+  igual([su.sueno, su.stun, su.esCC, pa.panico, su.id, su.alias === undefined], [true, true, true, true, 'x', true]);
+});
 prueba('estado propio con escudo queda como buff', () => igual(EstadosAplicar.componer({nombre: 'Blindaje improvisado', escudoMagico: 6}).polaridad, 'buff'));
 prueba('texto de un estado con turnos y escudo', () => igual(EstadosAplicar.texto({nombre: 'Vida extra', turnos: 1, escudoMagico: 8}), 'Vida extra (1 turno, 🛡8)'));
 prueba('texto de un Veneno con stacks: ×3, sin los turnos del preset', () => igual(EstadosAplicar.texto({nombre: 'Veneno', stacks: 3}), 'Veneno ×3'));

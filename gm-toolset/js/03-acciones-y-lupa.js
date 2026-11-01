@@ -299,7 +299,7 @@ function habsMiniHtml(sc){
 // (nombre/turnos/stacks/hpTurno/etc.) — se guardan/leen todas igual, así
 // que un solo array evita repetirlas en los 4 lugares que las tocan
 // (abrir editor, guardar, elegir preset, guardar como preset personalizado).
-const FLAGS_ESTADO_CREEP = ['apila', 'turnosCompletos', 'armaduraRota','silencio','confusion','lisiado','paralisis','esEscarcha','mitadPdgEva','inmovilizado','rengo','lento','cansado','exhausto','hypeado','sentado','excedenteVida','invulnerable','inmunidadCC','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','espejo','desarmado','ceguera','esCC','esVeneno','esSangrado','volador','sangraSp'];
+const FLAGS_ESTADO_CREEP = ['apila', 'turnosCompletos', 'armaduraRota','silencio','confusion','lisiado','paralisis','esEscarcha','mitadPdgEva','inmovilizado','rengo','lento','cansado','exhausto','hypeado','sentado','excedenteVida','invulnerable','inmunidadCC','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','espejo','desarmado','ceguera','esCC','esVeneno','esSangrado','volador','sangraSp','sueno','miedo','panico','esQuemadura','acelera','alTerminarTurno','extenuante','tormenta','unaTirada','unGolpe','sinRecarga','seGasta','etereo','golpePorTurnos','mareado'];   // (2026-11-01: faltaban; igual ahora se copia todo el preset)
 
 // Presets estándar de estados: la lista vive en comun/estados-presets.js (una sola
 // para ficha, gm-tools y mapa); acá se pide en la forma de un creep.
@@ -417,7 +417,9 @@ function activarEstadoPresetCreep(preset){
   $('#scrim-presets-creep').classList.remove('open');
   const sc = S.creeps.find(s => s.id === presetsCreepScId);
   if(!sc) return;
+  const {alias, imagen, icono, ...resto} = structuredClone(preset);   // todo lo del preset (2026-11-01: antes solo FLAGS_ESTADO_CREEP y se perdían sueno, miedo…)
   const datos = {
+    ...resto,
     nombre: preset.nombre,
     detalle: preset.detalle || '',
     turnos: preset.turnos ?? 0,
@@ -433,7 +435,7 @@ function activarEstadoPresetCreep(preset){
   };
   FLAGS_ESTADO_CREEP.forEach(f => { datos[f] = !!preset[f]; });
   // Inmunidades, acumulación (Armadura rota, Veneno, Sangrado, Escarcha) y renovación de uno igual: comun/combatiente.js.
-  const r = Combatiente.agregarEstado(sc.estados, {id: uid(), ...datos}, {jefe: sc.jefe});
+  const r = Combatiente.agregarEstado(sc.estados, {id: uid(), ...datos}, sc);
   if(!r.ok){ toast(`${sc.nombre}: inmune ahora mismo (${r.motivo}) — ${preset.nombre} no se pudo aplicar`); return; }
   if(r.que === 'yaLoTiene'){ toast(`${sc.nombre}: ${datos.nombre} ya lo tiene, no se acumula`); return; }
   if(modsAfectanHp(r.estado.mods)) actualizarHpMaxPorCon(sc);
@@ -527,3 +529,22 @@ function manosOcupadasCreep(sc){
   const ocupa = it => !it || it.natural === true || it.equipado === false ? 0 : /_2m$/.test(String(it.tipoItem || '')) ? 2 : 1;
   return ocupa(a) + g.manos.reduce((s, it) => s + ocupa(it), 0);
 }
+
+// 🛡 La Protección de jefe como recordatorio (2026-11-01, dueño): la regla la aplica Combatiente por defecto y avisa acá; el GM elige aplicarla o
+// ponerle el estado igual / completo (sin la protección). Lo mismo que el mapa (vtt-hexgrid/js/90-proteccion-jefe.js).
+window.avisoJefe = async function(info){
+  if(!info) return;
+  if(typeof Confirmar === 'undefined' || !info.estado){ toast(info.txt); return; }
+  const unTurno = info.tipo === 'unTurno';
+  const r = await Confirmar.elegir(info.txt, {titulo: 'Protección de jefe', icono: '🛡', no: unTurno ? 'Aplicar la regla (1 turno)' : 'Aplicar la regla (no entra)',
+    opciones: [
+      {texto: unTurno ? 'Aplicar la regla (1 turno)' : 'Aplicar la regla (no entra)', detalle: 'Lo que dice la Protección de jefe', valor: 'regla'},
+      {texto: unTurno ? `Aplicar completo (${info.antes || info.turnos + ' turnos'})` : 'Aplicar igual', detalle: 'Sin la protección: lo decide el GM', valor: 'igual'}]});
+  if(r !== 'igual') return;
+  const sc = (S.creeps || []).find(s => s.id === info.creepId) || (S.creeps || []).find(s => s.nombre === info.creepNombre);
+  if(!sc){ toast(`No encontré a ${info.creepNombre}: ponele ${info.estado.nombre} a mano`); return; }
+  sc.estados = sc.estados || [];
+  Combatiente.agregarEstado(sc.estados, {...JSON.parse(JSON.stringify(info.estado)), id: uid()}, {...sc, sinJefe: true});
+  renderAll();
+  toast(`🛡 ${sc.nombre}: ${info.estado.nombre} ${unTurno ? 'completo' : 'igual'} (sin la Protección de jefe)`);
+};

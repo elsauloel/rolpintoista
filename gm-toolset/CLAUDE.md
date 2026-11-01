@@ -318,6 +318,9 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
 - **Estados sobre otros, automáticos** (2026-09-20): las habilidades con `estadoObjetivo` (57 del catálogo y varias trampas de creeps) abren, al ejecutarse, "🎯 ¿A quién le pegó?" con los tokens del mapa que mira el GM; el estado se aplica solo (creeps directo, personajes por aviso en `estados` que su ficha aplica). Ver `comun/estados-aplicar.js`.
 
 - **Protección de jefe** (2026-09-21, P95 versión inicial): un creep marcado **Jefe** (`sc.jefe`) es **inmune a Stun** (`Combatiente.inmunidad` con `{jefe}`, vía `Combatiente.agregarEstado` y `EstadosAplicar.bloqueadoCreep`) y tiene **+1 Res.Mg** (`creepStatValor`, con línea en la lupa): la tirada contra los debuffs. Automático; para apagarlo, se desmarca "Jefe". No cubre Exhausto ni otros controles.
+  **v2 (2026-11-01, dueño):** inmune a Stun, Sueño, Parálisis, Confusión y Pánico (`Combatiente.JEFE_INMUNE`); Pajaritos, Miedo, Provocado, Silencio, Ceguera,
+  Inmovilizado, Agarrado, Sentado y Exhausto le duran como máximo 1 turno (`JEFE_UN_TURNO`: `turnos: 1`, `permanente: false`, `jefeUnTurno`); el resto normal.
+  Aviso en la Mesa / toast (`avisarJefe`). Además el «+ Estado» de un creep copia todo el preset (antes solo FLAGS_ESTADO_CREEP).
 
 - **Grupo ↔ mapa** (2026-09-21): en la barra de grupos, un selector "🗺" vincula el grupo abierto a un mapa guardado (`gruposMapas`, `gruposMapasEscuchar`); "🎯 Crear tokens" usa ese mapa si el grupo lo tiene (si no, el que el GM está viendo). Renombrar o quitar el grupo mueve o borra el vínculo. Mismo dato que el panel de Mapas del mapa (ver `vtt-hexgrid/CLAUDE.md`). Va en `gm/gruposMapas`, que las reglas ya permiten al GM.
 

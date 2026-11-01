@@ -157,8 +157,12 @@ const SelectorEstados = (() => {
     const {nombre, ...resto} = preset;
     return {id, nombre, ...structuredClone(resto)};
   }
+  // Un creep recibe TODO lo del preset (2026-11-01: antes solo una lista de marcas —FLAGS_ESTADO— y se perdían sueno, miedo, panico, esQuemadura,
+  // etereo…: el estado puesto a mano no funcionaba completo), salvo lo de presentación; los campos de siempre, con el nombre que usan los creeps.
   function estadoCreep(preset, id, flags){
+    const {alias, imagen, icono, ...resto} = structuredClone(preset || {});
     const datos = {
+      ...resto,
       id,
       nombre: preset.nombre,
       detalle: preset.detalle || '',

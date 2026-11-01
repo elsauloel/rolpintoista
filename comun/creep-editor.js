@@ -785,7 +785,7 @@ const CreepEditor = (() => {
           return;
         }
         // Un estado nuevo: la misma regla que el "+ Estado" (inmunidades, acumular o renovar uno igual), comun/combatiente.js.
-        const r = Combatiente.agregarEstado(sc.estados, {id: uid(), ...datos}, {jefe: sc.jefe});
+        const r = Combatiente.agregarEstado(sc.estados, {id: uid(), ...datos}, sc);
         if(!r.ok){ aviso = `${sc.nombre}: inmune ahora mismo (${r.motivo}) — ${nombre} no se pudo aplicar`; return; }
         if(r.que === 'yaLoTiene'){ aviso = `${sc.nombre}: ${nombre} ya lo tiene, no se acumula`; return; }
         if(K.modsAfectanHp(r.estado.mods)) K.actualizarHpMaxPorCon(sc);

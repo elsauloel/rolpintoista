@@ -19,8 +19,8 @@
 // La clave es el nombre en minúsculas y sin tildes. Un estado que no está acá (uno inventado en la mesa) lleva su inicial.
 const ICONOS_ESTADO = {
   // ☠ Daño en el tiempo
-  'veneno': {ic: '🫧', anim: 'burbujas', n: 3},
-  'veneno severo': {ic: '🫧', anim: 'burbujas', n: 5},
+  'veneno': {ic: '🤢', anim: 'burbujas', n: 3},   // (dueño, 2026-11-01: 🤢 y 🤮 el severo)
+  'veneno severo': {ic: '🤮', anim: 'burbujas', n: 5},
   'sangrado': {ic: '🩸', anim: 'gota'},
   'quemadura': {ic: '🔥', anim: 'llama'},
   // 💫 Controles

@@ -1845,6 +1845,12 @@ versión parecida en más de una, es candidato a juntar.
   (mapa js/12 y GM Tools js/06). Jugador: `FichaAcciones.ejecutarHabilidad` (6º parámetro `vSel`) sigue con una copia: la Ejecución del elemento y el
   `costo` de SP de esa manera. Los creeps guardados migran solos (`Combatiente.migrarArmaElementalAzar`: 2 SP → 1, `azarElegir`, textos).
 - **🎯 Débil / Resistente / Inmune en el token** (2026-11-01): lo dibuja y lo revela el mapa (`vtt-hexgrid/js/89-debil.js`, ver `vtt-hexgrid/CLAUDE.md`); usa `Combatiente.elementoDe`, `identidadElemento`, `ARMAS_ELEMENTALES` y `CreepCalculo.resElemental`. Lo descubierto de cada creep vive en `creeps/<id>.revelado`.
+- **🚫 Anulación** (2026-11-01, dueño: el «Dispel Magic»): efecto `anula: true` (el efecto `{nombre: 'Anulación', anula: true}` y la Ejecución `anula`),
+  viaja como `disipar` (Combatiente.efectoDeHab, Duelo.limpiarHab / specDeEfecto, el asistente). En el duelo (vtt-hexgrid/js/13 dueloAplicarEfectoBase): al que
+  no resiste le saca TODOS los estados buenos mágicos (`Combatiente.ESTADOS_MAGICOS` + las Armas elementales + `magico: true`; no `derivado`), con reintentos
+  si la ficha se estaba guardando. Al lanzar el área (`anularEn`): zonas mágicas (luz o con `zonaCasteadorRef`, no nube ni fuego) recortadas, trampas
+  mágicas y portales del Mago afuera, el Ojo de Kicillof cerrado, y las invocaciones de los rivales: Ef.Esp de quien la usa contra la Res.Esp de su
+  INVOCADOR (dueño); si no resiste (empate resiste), su token se va. Las invocaciones no entran en el duelo del área. Reglas: `esZonaMagica` (falta pegar).
 - **☀ Luz sanadora** (2026-10-31, dueño: «vamos a atribuirle luz sanadora a la luz… depende del caso, 100, 25, 50»; el Smite, el mismo día, no: «al Smite no le vamos a poner luz sanadora, pero sí marcado» — `migrarLuzSanadora` se la saca al de creep guardado, `pct: 0`): campo genérico `luzSanadora: N` (%)
   en la Ejecución (`duelo`) de una habilidad, o en el efecto `danoMagico` de un estado de arma (el Arma luminosa). Quien pega se cura ese % de la vida
   que le sacó el golpe (después de resistencias y del ×1,5; para abajo, pero mínimo 1 si le sacó vida —dueño, 2026-11-01—; sin pasar su máximo, no da Vida extra); si le pega a varios (área,

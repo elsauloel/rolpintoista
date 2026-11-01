@@ -328,6 +328,7 @@
   sus aliados; no a los caídos. Si él cae antes, la sombra se disipa. Es su ataque del turno. 2 No2 y 5 SP (propuesta de Claude), o **cooldown 3 que arranca
   el combate activo**, como una lenta (`arrancaEnCooldown`). Probado en el mapa el 2026-10-24 (con 4d6 de fuego; falta verlo desde un jugador).
 
+- ✅ **Anulación** (Debuffer, el «Dispel Magic», 2026-11-01, dueño: «Anulación me gusta, todo el resto va bien»): flor de diámetro 5 en su Rango, Ef.Esp contra la Res.Esp de cada rival; al que no resiste le saca todos sus estados buenos mágicos; además recorta zonas mágicas, saca trampas mágicas y portales, cierra el Ojo de Kicillof y desvanece las invocaciones si su invocador no resiste. 2 No2 y 5 SP, o cooldown 4. Igual que el Pergamino de anulación (Raro, 90).
 - ✅ **Disipar** (Debuffer, «romper lo que lo protege», 2026-10-25, dueño: «el usuario de disipar elige cuál quitar»): su PdG.Esp contra la Res.Esp de un
   rival en su Rango; si gana, la pantalla del GM muestra los estados buenos del objetivo (no los que salen del equipo o las pasivas) y elige cuál sacarle
   (`disipar: true` en el efecto; js/13). Sin estados buenos, no pasa nada. 2 No2 y 3 SP, o cooldown 3 (costo propuesto por Claude, como las maldiciones). Probado en el mapa el 2026-10-25 (GM, «Claude · pruebas»): ganó contra juan, el menú mostró

@@ -1513,6 +1513,7 @@ function dueloElegirAreaMapa(msg){
     const enCono = h.cono ? conoDeArea(h) : h.linea ? new Set(h.linea) : null;   // el cono (Sonic Boom) o la línea (Varita láser): sus casillas
     if(hab.zonaQueda) dueloZonaQueda(hab, h, Math.max(1, radio), yo);   // lo que deja en el suelo (bola de fuego, ventisca)
     if(hab.destello) await destelloEn(h, radio, yo, hab, todos.filter(t => !t.oculto && !t.bajoTierra && !etereoDe(t) && !propio(t) && distanciaHex(h, t) <= radio && dueloEsRival(yo, t)));   // ☀ el destello (Destello revelador)
+    if(hab.anula) await anularEn(new Set(celdasFlor(Math.max(1, radio)).map(o => { const c0 = hexACubo(h); return nbPack(cuboACol(c0.q + o.dq, c0.r + o.dr), cuboAFila(c0.q + o.dq, c0.r + o.dr)); })), yo, hab, todos.filter(t => !propio(t) && dueloEsRival(yo, t)));   // 🚫 la Anulación: lo mágico del área
     if(hab.despeja) despejarEn(enCono || new Set(celdasFlor(Math.max(1, radio)).map(o => { const c0 = hexACubo(h); return nbPack(cuboACol(c0.q + o.dq, c0.r + o.dr), cuboAFila(c0.q + o.dq, c0.r + o.dr)); })), hab.nombre);   // el vendaval
     const objetivos = todos
       .filter(t => !iniciativaFueraDeJuego(t.id))   // 💀 un caído es un cuerpo esperando que lo revivan: ningún área lo alcanza (P225, dueño, 2026-10-27)
@@ -1520,6 +1521,7 @@ function dueloElegirAreaMapa(msg){
       // son «no él»); una curación no les llega a los caídos.
       .filter(t => (!t.oculto || (hab.aliados && soyGM)) && !t.bajoTierra && !etereoDe(t) && (!propio(t) || (hab.aliados && hab.objetivo === 'area')) && (enCono ? enCono.has(nbPack(t.col, t.fila)) : distanciaHex(h, t) <= radio || (h.otro && distanciaHex(h.otro, t) <= radio)))   // (h.otro: la casilla de salida del Remolino)
       .filter(t => !habEsCura(hab) || !iniciativaFueraDeJuego(t.id))
+      .filter(t => !hab.anula || !(t.tipo === 'pj' && String(t.fichaId || '').includes(SEP_INVOCACION)))   // 🚫 las invocaciones las resuelve anularEn (contra su invocador)
       .filter(t => !hab.aliados || typeof esInerte !== 'function' || !esInerte(t))   // 🪵 al tótem y al estandarte no les llega lo de apoyo (js/73, 2026-10-25)
       .filter(t => hab.aliados ? !dueloEsRival(yo, t) : (hab.fuegoAmigo || h.linea || dueloEsRival(yo, t)))   // (la línea tiene fuego amigo: dueño, 2026-10-05; `aliados`: solo los suyos, 2026-10-13)
       .filter(t => !hab.conVista || lineaLibre(h, t, solidosSet()))   // la luz (Varita de la luz): todos los rivales que alcanza a ver, en sigilo o no (dueño, 2026-10-05)
@@ -2089,6 +2091,70 @@ async function despejarEn(celdas, nombre){
     try{ mesaLinea(`💨 ${quien} despejó ${txt}`, 'recordatorio'); }catch(err){}
   }else toast(`💨 ${quien}: no pudo despejar la nube — a mano (faltan pegar las reglas)`);
 }
+/* 🚫 La Anulación (2026-11-01, dueño: el «Dispel Magic»; los estados van por el duelo, `anula`): lo mágico que cae en el área, de los rivales:
+   - zonas mágicas (una luz —`zonaLuz`— o una zona que dejó una habilidad —`zonaCasteadorRef`—; no las nubes ni el fuego, que son físicos: eso es del
+     viento): pierden las casillas que caen adentro, como el viento (forma libre; sin ninguna, se borra);
+   - trampas mágicas (`magica` en su trampaEstado: glifos, runas, portales) y los portales del Mago (`portal`): se van del mapa;
+   - el Ojo de Kicillof (una invocación etérea, lo único que lo afecta): se cierra.
+   Lo propio del que la usa no se toca (las zonas y trampas de su bando, sus invocaciones). Lo que las reglas no dejan tocar (zonas o portales
+   ajenos, sin pegar las reglas nuevas), queda a mano con aviso. */
+async function anularEn(celdas, yo, hab, rivales){
+  const nombre = (hab && hab.nombre) || 'La Anulación', partes = [], aMano = [];
+  const esDelBando = el => yo.tipo === 'creep' ? trampaEsDelGM(el) : !trampaEsDelGM(el);   // (js/07: manda quién la puso)
+  const tocaArea = el => celdasDeElemento(el).some(c => celdas.has(nbPack(c.col, c.fila)));
+  const tareas = [];
+  elementos.forEach((el, id) => {
+    if(!tocaArea(el) || esDelBando(el)) return;
+    if(el.trampa && trampaEsMagica(el)) tareas.push({id, tipo: 'trampa', el});
+    else if(el.portal && !el.townPortal) tareas.push({id, tipo: 'portal', el});
+    else if(el.zona && (el.zonaLuz || el.zonaCasteadorRef) && !(typeof nubeColor === 'function' && nubeColor(el)) && !el.fuego && !/fuego/i.test(el.zonaDanoTipo || '')) tareas.push({id, tipo: 'zona', el});
+  });
+  let zonas = 0, casillas = 0, trampas = 0, portales = 0;
+  for(const t of tareas){
+    const ref = coleccionElementos().doc(t.id), nom = t.el.zonaNombre || t.el.nombre || (t.tipo === 'trampa' ? 'una trampa' : t.tipo === 'portal' ? 'un portal' : 'una zona');
+    try{
+      if(t.tipo === 'zona'){
+        const todas = celdasDeElemento(t.el), quedan = todas.filter(c => !celdas.has(nbPack(c.col, c.fila)));
+        const c0 = hexACubo(t.el.origen), nuevas = {tipo: 'libre', rotacion: 0, celdas: quedan.flatMap(c => { const k = hexACubo(c); return [k.q - c0.q, k.r - c0.r]; })};
+        try{ if(!quedan.length) await ref.delete(); else await ref.update(nuevas); }
+        catch(err){
+          // Sin las reglas nuevas pegadas (esZonaMagica, 2026-11-01) Firestore no deja recortar una zona ajena; el GM (o quien la puso) igual puede:
+          // la vuelve a crear con las casillas que quedan y borra la vieja (como el viento, despejarEn).
+          if(err.code !== 'permission-denied' || !(soyGM || (elementos.get(t.id) || {}).duenoUid === fbUsuario.uid)) throw err;
+          if(quedan.length){ const raw = (await ref.get()).data(); if(raw) await coleccionElementos().add({...raw, ...nuevas, duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp()}); }
+          await ref.delete();
+        }
+        zonas++; casillas += todas.length - quedan.length;
+      }else{ await ref.delete(); if(t.tipo === 'trampa') trampas++; else portales++; }
+    }catch(err){ console.error('Anulación: no se pudo', t.tipo, err); aMano.push(nom); }
+  }
+  if(zonas) partes.push(`${casillas} casilla${casillas === 1 ? '' : 's'} de ${zonas} zona${zonas === 1 ? '' : 's'} mágica${zonas === 1 ? '' : 's'}`);
+  if(trampas) partes.push(`${trampas} trampa${trampas === 1 ? '' : 's'} mágica${trampas === 1 ? '' : 's'}`);
+  if(portales) partes.push(`${portales} portal${portales === 1 ? '' : 'es'}`);
+  // ✨ Las invocaciones de los rivales (dueño, 2026-11-01: «la tirada es contra la Res.Esp de quien controla la invocación»): el Ef.Esp de quien la usa
+  // contra la Res.Esp del invocador (su ficha); si no la resiste (empate: resiste), la invocación se va del mapa. Quedan fuera del duelo del área (js/13 lanzar).
+  const efEsp = yo.tipo === 'creep' ? (() => { const sc = typeof creepPrivadoDe === 'function' ? creepPrivadoDe(yo.ref) : null; return sc ? CreepCalculo.statValor(sc, 'dmgesp') : 0; })()
+    : num((((fichasPub.get(String(yo.ref || '').split(SEP_INVOCACION)[0]) || {}).resumen) || {}).dmgesp);
+  for(const t of (rivales || [])){
+    if(etereoDe(t) || !(t.tipo === 'pj' && String(t.fichaId || '').includes(SEP_INVOCACION)) || !celdas.has(nbPack(t.col, t.fila))) continue;
+    const nom = nombreDe(t), duenoF = fichasPub.get(String(t.fichaId).split(SEP_INVOCACION)[0]), resEsp = num(((duenoF || {}).resumen || {}).resmg);
+    const a = Combatiente.tirarStat(efEsp, [], 'dmgesp'), r = Combatiente.tirarStat(resEsp, [], 'resmg');
+    const ta = a ? a.total : 0, tr = r ? r.total : 0, quien = (duenoF && duenoF.nombre) || 'su invocador';
+    if(ta > tr){
+      try{ await coleccionTokens().doc(t.id).delete(); partes.push(`${nom} (Ef.Esp ${ta} contra la Res.Esp ${tr} de ${quien}: se desvanece)`); if(soyGM && typeof temporalFueraDelOrden === 'function') await temporalFueraDelOrden(t.id); }
+      catch(err){ console.error('Anulación: no se pudo sacar la invocación', err); aMano.push(`${nom} (se desvanece)`); }
+    }else mesaLinea(`🚫 ${nombre}: ${quien} sostiene a ${nom} (Res.Esp ${tr} contra Ef.Esp ${ta})`, 'recordatorio');
+  }
+  // 👁 El Ojo de Kicillof: etéreo (no entra en el área de siempre), pero la anulación lo cierra.
+  for(const t of (rivales || [])){
+    if(!(etereoDe(t) && celdas.has(nbPack(t.col, t.fila)) && t.tipo === 'pj' && String(t.fichaId || '').includes(SEP_INVOCACION))) continue;
+    const nom = nombreDe(t);
+    try{ await coleccionTokens().doc(t.id).delete(); partes.push(`cerró ${nom}`); if(soyGM && typeof temporalFueraDelOrden === 'function') await temporalFueraDelOrden(t.id); }
+    catch(err){ console.error('Anulación: no se pudo cerrar el ojo', err); aMano.push(nom); }
+  }
+  if(partes.length) mesaLinea(`🚫 ${nombre} anuló ${partes.join(', ')}`, 'recordatorio');
+  if(partes.length || aMano.length) toast(`🚫 ${nombre}: ${partes.join(', ') || 'nada'}${aMano.length ? ` — a mano: ${aMano.join(', ')} (faltan pegar las reglas)` : ''}`);
+}
 /* ☀ El destello (2026-10-26, Luz para los suyos —desde el 2026-10-31 Destello revelador—, dueño: «un destello, ¡fum!, que sucede y no queda como área… revela los ocultos y los deja marcados
    a todos, revela las trampas y todo»): el fogonazo en todas las pantallas (el momento «estallido», con tono de luz), el estado (Marcado: saca el
    sigilo) a cada rival de adentro, sin tirada, y las trampas rivales de adentro, descubiertas para todos. El daño sigue por la cascada (sin dodge). */
@@ -2442,6 +2508,36 @@ async function dueloAplicarEfectoBase(d, ef){
       (x.habilidades || []).forEach(h => { if(num(h.cdActual) > 0){ h.cdActual = Math.max(0, num(h.cdActual) - n); bajadas.push(h.nombre || 'una habilidad'); } });
     });
     return {nota: bajadas.length ? `−${n} al cooldown de ${bajadas.join(', ')}` : 'no tenía cooldowns activos'};
+  }
+  // 🚫 Anulación (2026-11-01, dueño: el «Dispel Magic»): a quien no la resiste le saca TODOS sus estados buenos mágicos (Combatiente.esEstadoMagico; no
+  // lo del equipo ni las pasivas). Una invocación de un personaje no resiste la anulación: desaparece del mapa (su token se borra; en la ficha queda
+  // como estaba hasta que su dueño la vuelva a invocar). Lo aplica la pantalla que maneja al objetivo (el GM para los creeps).
+  if(spec.anula){
+    if(t.tipo === 'pj' && String(t.fichaId || '').includes(SEP_INVOCACION)){
+      const nom = nombreDe(t);
+      try{ await coleccionTokens().doc(d.defensor.tokenId).delete(); mesaLinea(`🚫 ${nom} se desvanece: la anuló ${d.atacante.nombre || 'una Anulación'}`, 'recordatorio');
+        if(soyGM && typeof temporalFueraDelOrden === 'function') await temporalFueraDelOrden(d.defensor.tokenId);
+        return {nota: `${nom} se desvanece (invocación anulada)`}; }
+      catch(err){ console.error('Anulación: no se pudo sacar la invocación', err); return {manual: true, nota: `sacá a ${nom} del mapa a mano (se desvanece)`}; }
+    }
+    const lista = ((vinculo(t) || {}).resumen || {}).estados || [];
+    const magicos = lista.filter(e => Combatiente.esEstadoMagico(e)).map(e => e.nombre);
+    if(!magicos.length) return {nota: 'no tenía ningún estado mágico para anular'};
+    // De a uno (la misma transacción que el ✕ del HUD, que no avisa si falla); si la ficha estaba guardándose a la vez (otra pantalla), se reintenta:
+    // después de cada vuelta se mira qué quedó.
+    const siguen = () => { const ahora = ((vinculo(t) || {}).resumen || {}).estados || []; return magicos.filter(nom => ahora.some(e => e && e.nombre === nom && e.activo !== false)); };
+    let faltan = magicos.slice();
+    for(let vuelta = 0; vuelta < 3 && faltan.length; vuelta++){
+      for(const nom of faltan){
+        const idx = (((vinculo(t) || {}).resumen || {}).estados || []).findIndex(e => e && e.nombre === nom && e.activo !== false);
+        if(idx >= 0) try{ await hudEstadoCambiar(t, idx, 'quitar'); }catch(err){ console.error('Anulación: no se pudo sacar', nom, err); }
+      }
+      await new Promise(r => setTimeout(r, 1500));
+      faltan = siguen();
+    }
+    const sacados = magicos.filter(nom => !faltan.includes(nom));
+    return sacados.length === magicos.length ? {nota: `le anuló ${sacados.join(', ')}`}
+      : {manual: true, nota: `le anuló ${sacados.join(', ') || 'nada'}; sacale a mano ${magicos.filter(n => !sacados.includes(n)).join(', ')}`};
   }
   // 🧿 Disipar (2026-10-25, el Debuffer; dueño: «el usuario de disipar elige cuál quitar»): sus estados buenos (no los que salen solos del equipo o las
   // pasivas) y quien lo usa elige uno. Lo aplica la pantalla del GM, que maneja a los creeps que hoy lo usan.

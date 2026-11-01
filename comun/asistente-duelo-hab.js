@@ -1020,8 +1020,9 @@ const AsistenteDueloHab = (() => {
     }
     // Un efecto de la lista `st.efectos`, listo para guardar en `duelo.efectos` — mismo shape tanto si vino del
     // selector real (origen:'preset', con mods/hp/stacks/permanente/detalle) como si se escribió a mano.
-    const CONSERVA = ['cadena', 'danoSiempre', 'conVista', 'conmigo', 'niebla', 'aliados', 'menosDistancia', 'atrae', 'reparte', 'critTipo', 'soloSigilo', 'fuegoAmigo', 'soloCritico', 'perforante', 'giro', 'tormenta', 'sagrado'];
+    const CONSERVA = ['cadena', 'danoSiempre', 'conVista', 'conmigo', 'niebla', 'aliados', 'menosDistancia', 'atrae', 'reparte', 'critTipo', 'soloSigilo', 'fuegoAmigo', 'soloCritico', 'perforante', 'giro', 'tormenta', 'sagrado', 'despeja', 'anula'];
     function mapEfectoOut(e){
+      if(e.anula) return {nombre: e.nombre || 'Anulación', anula: true};   // 🚫 (2026-11-01)
       if(e.disipar) return {nombre: e.nombre || 'Disipar', disipar: true};
       if(Number(e.bajaCd) > 0) return {nombre: e.nombre || 'Baja cooldowns', bajaCd: Number(e.bajaCd), ...(Number(e.spRecupera) > 0 ? {spRecupera: Number(e.spRecupera)} : {})};   // 🥁 (2026-10-25) tampoco se edita acá   // 🧿 (2026-10-25) no se edita acá: se conserva
       if(e.purga) return {nombre: e.nombre || 'Purga', purga: true};

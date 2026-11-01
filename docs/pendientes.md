@@ -353,9 +353,7 @@
 >   **Además, un «🕸 Ver mapa de nodos»** (dueño: «tipo el mapa conceptual de Obsidian»): puntos y líneas que conectan habilidades, mecánicas y roles,
 >   para ver de un vistazo las variantes (ej.: desde el Warrior, la línea al Salto del choque liviano). El manual ya tiene un mapa así
 >   (`manual-usuario/`), se puede reusar. Pendiente: el paso del asistente y el mapa de nodos.
-> - [ ] **✨ Dispel Magic (2026-10-20, dueño, «anotar en el tintero»):** un efecto (habilidad o consumible, probablemente en área) que deshace la magia:
->   lo único que podría afectar al Ojo de Kicillof (etéreo: nada más le hace nada). Falta definir qué disipa (invocaciones temporales, zonas, buffs mágicos,
->   trampas mágicas…), con qué se tira y su costo.
+> - [x] **✨ Dispel Magic → «Anulación» (hecho 2026-11-01, dueño: «Anulación me gusta, todo el resto va bien»):** el Pergamino de anulación (Raro, 90) y la habilidad de creep Anulación (Debuffer, 2 No2 y 5 SP o cooldown 4): flor de diámetro 5; a los rivales que no resisten (Ef.Esp contra Res.Esp) les saca todos sus estados buenos mágicos (`Combatiente.ESTADOS_MAGICOS` / `esEstadoMagico`); recorta las zonas mágicas, saca trampas mágicas y portales, cierra el Ojo de Kicillof, y las invocaciones se desvanecen si su invocador no resiste (`anularEn`, vtt-hexgrid/js/13).
 > - [ ] **🌦 Un sistema de climas (2026-10-19, dueño: «déjalo pendiente», diseño futuro):** que **cada día amanezca con un clima distinto**
 >   (encaja con el ⏳ Pasar de día, `vtt-hexgrid/js/41-dia.js`: la tarjeta «AMANESE QUE NO ES POCO» podría decir qué clima tocó). Ejemplos del dueño:
 >   **calor** → más daño de fuego, menos de hielo; **frío intenso** → al revés; **lluvia** → menos daño de fuego, más daño eléctrico y más
@@ -881,7 +879,7 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] **Manual** (`manual-usuario/notas`): grupos y tokens automáticos, botín, Despojar, Finalizar combate en el mapa, trampas automáticas, estados sobre otros, protección de jefe, botón 🎭 y grupos ↔ mapas, y una nota de casteo cuando estén las reglas.
 
 ## 4. Diseño pendiente
-- [ ] **📋 Pegar las reglas de Firestore (2026-11-01, el dueño está fuera de casa):** `firebase/firestore.rules` con el 💨 viento que recorta nubes (`esNube`, commit 6575a0d9). Sin pegarlas, un jugador que despeja la nube de otro ve «a mano (faltan pegar las reglas)»; el GM ya puede.
+- [ ] **📋 Pegar las reglas de Firestore (2026-11-01, el dueño está fuera de casa):** `firebase/firestore.rules` con el 💨 viento que recorta nubes (`esNube`, commit 6575a0d9) y 🚫 la Anulación que recorta zonas mágicas ajenas (`esZonaMagica`). Sin pegarlas, un jugador que despeja la nube de otro ve «a mano (faltan pegar las reglas)»; el GM ya puede.
 - [x] **😱💤 Sumar Pánico y Sueño a cosas que los den (dueño, 2026-11-01: «sumar algunos ítems o circunstancias que den pánico y que den sueño, que duerman»).** Hoy no los da
   nada (solo el selector de estados). Candidatos: el Grito de pánico (hoy da Miedo) → Pánico; algo que duerma (una flecha, un polvo, una habilidad de creep).
   Decidido (dueño, 2026-11-01): el veneno y el sangrado del Mantenimiento NO despiertan («es el daño externo el que despierta», como está programado);

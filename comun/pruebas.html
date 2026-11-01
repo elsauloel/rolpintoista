@@ -42,7 +42,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 </script>
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
-<script src="combatiente.js?v=20261101viento"></script>
+<script src="combatiente.js?v=20261101anula"></script>
 <script src="creep-calculo.js?v=20261101sueno"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261101jefe2"></script>
@@ -99,7 +99,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261101adren"></script>
+<script src="duelo.js?v=20261101anula"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -111,7 +111,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="pasivas.js"></script>
 <script src="skills-clase.js?v=20261101adren"></script>
 <script src="creeps-base.js"></script>
-<script src="skills-creep-base.js?v=20261101viento"></script>
+<script src="skills-creep-base.js?v=20261101anula"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
 <script>
@@ -1412,6 +1412,22 @@ prueba('💤 Pánico y Sueño en cosas (2026-11-01): el Grito viejo se pone al d
     [true, 'Grito espeluznante', true, true, 'Pánico', 'Otra', true,
       'area', 1, 'resm', false, 'Sueño', 4,
       'Sueño', 'Raro', 'resm', 'Sueño', false]);
+});
+prueba('🚫 Anulación (2026-11-01, el Dispel Magic): qué estados son mágicos; la habilidad de creep y el Pergamino de anulación; el efecto viaja por el duelo', () => {
+  const M = e => Combatiente.esEstadoMagico(e);
+  const an = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Anulación').datos, 2);
+  const pg = CATALOGO_BASE.find(x => x.id === 'nuevo-pergamino-de-anulacion');
+  const ej = Combatiente.habEjecucion(an, an.duelo, {stat: () => 0, etq: s => s});
+  const lim = Duelo.limpiarHab(ej);
+  igual([M({nombre: 'Shield', polaridad: 'buff'}), M({nombre: 'Arma luminosa', polaridad: 'buff'}), M({nombre: 'Adrenalina', polaridad: 'buff'}), M({nombre: 'Pila pila', polaridad: 'buff'}),
+      M({nombre: 'Barrera (túnica)', polaridad: 'buff'}), M({nombre: 'Cuero duro (poción)', polaridad: 'buff'}), M({nombre: 'Veneno', polaridad: 'debuff'}),
+      M({nombre: 'Shield', polaridad: 'buff', derivado: true}), M({nombre: 'Sprint', polaridad: 'buff'}),
+      an.duelo.objetivo, an.duelo.radio, an.duelo.contra.join(','), an.duelo.anula, an.nitrosCosto, an.spCosto, an.cd,
+      pg.tier, pg.precioCompra, pg.duelo.radio, pg.duelo.anula, pg.duelo.efectos[0].anula, !!ej.anula, !!lim.anula,
+      Duelo.specDeEfecto({anula: true}).anula, Duelo.specDeEfecto(lim.efectos && lim.efectos[0] || {anula: true}).nombre],
+    [true, true, true, true, true, false, false, false, false,
+      'area', 2, 'resmg', true, 2, 5, 4,
+      'Raro', 90, 2, true, true, true, true, true, 'Anulación']);
 });
 prueba('🌺 Malviaje de floripondio (2026-11-01): el Pánico contra todos; control mental; jefe inmune; lo cura el Té de tilo', () => {
   const e = ESTADOS_PRESET.find(x => x.nombre === 'Malviaje de floripondio');

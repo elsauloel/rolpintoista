@@ -88,6 +88,10 @@ const ESTADOS_PRESET = [
   // 😱 Pánico (dueño, 2026-11-01: «vamos a definir miedo y pánico»): el Miedo contra TODOS sus rivales a la vista (`panico`; el mapa, js/52).
   {nombre:'Pánico', polaridad:'debuff', turnos:1, esCC:true, panico:true, alEmpezarTurno:true,
     detalle:'Aterrado de todos: como el Miedo, pero contra todos sus rivales. Cada casillero que mueve y que termina a 3 o menos de un rival a la vista, sin alejarse de ese rival, le cuesta el doble de No2, y todo lo que hace contra cualquier rival va con −2 a la probabilidad de golpe y −2 al daño, común o especial. Dura hasta que empieza su próximo turno. Es un control mental: se resiste con la Resistencia mental (Res.Mt), no con la Res.CC; lo frenan la Inmunidad mental y la Inmunidad a CC, y lo cura el Té de tilo. ⚙ Automatizado en el mapa. ✋ A mano: el −2 en un área o una onda.'},
+  // 🌺 Malviaje de floripondio (dueño, 2026-11-01: «como un pánico pero contra todos, aliados y rivales; como un veneno severo [respecto del veneno], el
+  // más terrible de todos»): el Pánico contra TODOS los que ve, aliados incluidos (`floripondio`; el mapa, js/52). Dura 2 turnos (decisión de Claude).
+  {nombre:'Malviaje de floripondio', polaridad:'debuff', turnos:2, esCC:true, floripondio:true,
+    detalle:'Un malviaje: aterrado de todos, amigos y enemigos. Como el Pánico, pero contra cualquiera que vea, también sus aliados: cada casillero que mueve y que termina a 3 o menos de otro (aliado o rival) a la vista, sin alejarse de ese, le cuesta el doble de No2, y todo lo que hace contra cualquiera va con −2 a la probabilidad de golpe y −2 al daño, común o especial. Dura 2 turnos. Es un control mental: se resiste con la Resistencia mental (Res.Mt), no con la Res.CC; lo frenan la Inmunidad mental y la Inmunidad a CC, y lo cura el Té de tilo. ⚙ Automatizado en el mapa. ✋ A mano: el −2 en un área o una onda.'},
   {nombre:'Provocado', polaridad:'debuff', turnos:2, esCC:true,
     detalle:'Provocado (Taunt): ira dirigida. Mientras dure, su turno es para ir contra quien lo provocó: atacarlo o usar contra él una habilidad hostil (si no llega, acercarse). No se cura, no se protege ni hace otra cosa en lugar de eso (✋ a mano: lo respeta el jugador o el GM). Es un control (lo reducen la resistencia a CC y la Inmunidad a CC).'},
   {nombre:'Escarcha', polaridad:'debuff', turnos:2, stacks:1, esEscarcha:true, mods:[{stat:'nitros', val:-1}],
@@ -219,7 +223,7 @@ const ESTADOS_PRESET = [
     detalle:'Inmune a todos los controles, los del cuerpo y los mentales: Stun, Pajaritos, Parálisis, Exhausto, Lisiado, Rengo, Ceguera, Inmovilizado, Lento, Sentado, Desarmado, Miedo, Pánico, Confusión, Provocado, Silencio (no se le pueden aplicar mientras dure). Veneno y Sangrado no cuentan como control.'},
   // Inmunidad mental (2026-10-18, dueño, P210): solo los controles mentales (Combatiente.GRUPOS_CC.mental). La dan el Atrapasueños y otros talismanes.
   {nombre:'Inmunidad mental', polaridad:'buff', turnos:2, inmunidadMental:true,
-    detalle:'Inmune a los controles mentales: Miedo, Pánico, Confusión, Provocado, Sueño y Silencio (no se le pueden aplicar mientras dure). Los del cuerpo (Stun, Inmovilizado…) le entran igual.'},
+    detalle:'Inmune a los controles mentales: Miedo, Pánico, Malviaje de floripondio, Confusión, Provocado, Sueño y Silencio (no se le pueden aplicar mientras dure). Los del cuerpo (Stun, Inmovilizado…) le entran igual.'},
   {nombre:'Espinas', polaridad:'buff', turnos:3, espinas:true,
     detalle:'Mientras dure, cada ataque cuerpo a cuerpo que recibe le devuelve al atacante 1/4 (25 %) del daño del golpe (con el crítico, antes de la Defensa), redondeado hacia arriba, directo a la vida. ⚙ Automatizado en el duelo; ✋ a mano fuera de él.'},
   // Espejo (dueño, 2026-10-07): el espejo de las Espinas para el daño especial — a cualquier distancia (la magia se tira de lejos).

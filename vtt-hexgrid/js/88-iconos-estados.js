@@ -29,7 +29,8 @@ const ICONOS_ESTADO = {
   'sueno': {ic: '💤', anim: 'zetas'},
   'paralisis': {ic: '⚡', anim: 'chispa'},
   'miedo': {ic: '😱'},
-  'panico': {ic: '😱', fondo: '#7A1420'},   // el mismo grito, sobre fondo rojo
+  'panico': {ic: '😱', fondo: '#7A1420'},
+  'malviaje de floripondio': {ic: '🌺', fondo: '#5B2A86'},   // (2026-11-01) el Pánico contra todos: flor sobre violeta   // el mismo grito, sobre fondo rojo
   'confusion': {ic: '🌀'},
   'provocado': {ic: '😤'},
   'silencio': {ic: '🤐'},
@@ -108,6 +109,7 @@ const ICONOS_FAMILIAS = [
   [/quema|fuego|ardien|llama/, {ic: '🔥', pol: 'debuff', anim: 'llama'}],
   [/hielo|escarcha|congel|helad/, {ic: '❄️', pol: 'debuff'}],
   [/(^|\s)rayo|electric/, {ic: '⚡', pol: 'debuff'}],
+  [/floripondio/, {ic: '🌺', pol: 'debuff'}],
   [/miedo|terror|panico/, {ic: '😱', pol: 'debuff'}],
   [/sueno|dormid/, {ic: '💤', pol: 'debuff'}],
   [/(^|\s)(cura|regenera)/, {ic: '✚', pol: 'buff', color: '#5BD17A'}],

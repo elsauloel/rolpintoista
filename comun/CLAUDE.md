@@ -1883,3 +1883,15 @@ versión parecida en más de una, es candidato a juntar.
 - **😈 Protección de jefe v2** (P95, 2026-11-01): `Combatiente.JEFE_INMUNE` / `JEFE_UN_TURNO`, en `inmunidad` y `agregarEstado0` con `o.jefe` (se pasa el sc,
   con nombre e id); `o.sinJefe` la saltea («Aplicar igual»). Avisa con `reglaJefe(info)` → `window.avisoJefe` (mapa js/90, GM Tools js/03) o la Mesa. El
   «+ Estado» de un creep (`SelectorEstados.estadoCreep`, GM Tools) copia todo el preset salvo alias/imagen/icono (antes se perdían sueno, miedo, panico…).
+
+- **😱💤 Cosas que dan Pánico y Sueño** (2026-11-01, dueño): **Grito espeluznante** (habilidad de creep, ex «Grito de pánico»: onda de 3, PdG.Esp contra
+  Res.Mt, 1d6 arcano y **Pánico**; textos en `Combatiente.GRITO_ESPELUZNANTE`, los creeps guardados se ponen al día con `migrarGritoEspeluznante`, que
+  corre en `CreepCalculo.normalizar`); **Polen somnífero** (habilidad de creep, Debuffer: área flor de 7 en su Rango, Ef.Esp contra Res.Mt, Sueño, sin
+  daño; cooldown 4 o 2 No2 + 4 SP); **Flecha somnífera** (`flecha-somnifera`, Rara, 120, +2 No2: si pega, Sueño 2 turnos, sin tirada, como el Miedo de
+  la Flecha aulladora; el Sueño entra en la fase de efectos, después del daño de la misma flecha, así que no lo despierta su propio golpe);
+  **Polvo de adormidera** (`nuevo-polvo-de-adormidera`, Buena, 60: como el Pergamino de luz cegadora, flor de 7 en tu Rango, cada RIVAL tira Res.Mt contra
+  tu Ef.Esp; el que pierde, Sueño 2 turnos; a los aliados no los duerme).
+- **🌺 Malviaje de floripondio** (estado, 2026-11-01, dueño: «como un pánico pero contra todos, aliados y rivales… el más terrible de todos»): `floripondio`
+  en el preset; lo mismo que el Pánico (−2 PdG/PdG.Esp y −2 daño común/especial, `miedoContra` de js/52, y doble No2 por casillero que termina a 3 o menos
+  de otro sin alejarse, `miedoFuentes` → `floripondioOtros`) pero contra cualquiera que se vea, aliados incluidos. 2 turnos (decisión de Claude). Control
+  mental (Res.Mt; GRUPOS_CC.mental y el grupo «mente» del Té de tilo), en `JEFE_INMUNE`. Ícono 🌺 sobre violeta (js/88). Nada lo da todavía (pendientes).

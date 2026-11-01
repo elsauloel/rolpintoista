@@ -19,6 +19,24 @@ function panicoDe(t){
   return (typeof confusionEstadosDe === 'function' ? confusionEstadosDe(t) : [])
     .some(e => e && e.activo !== false && (e.panico || /^p[aá]nico$/i.test(String(e.nombre || '').trim())));
 }
+// 🌺 Malviaje de floripondio (2026-11-01): el Pánico contra TODOS (aliados y rivales).
+function floripondioDe(t){
+  return (typeof confusionEstadosDe === 'function' ? confusionEstadosDe(t) : [])
+    .some(e => e && e.activo !== false && (e.floripondio || /^mal ?viaje de floripondio$/i.test(String(e.nombre || '').trim())));
+}
+// Con el floripondio: todos los demás tokens que se ven (ni ocultos, ni muertos, ni en sigilo), aliados y rivales.
+function floripondioOtros(t){
+  if(!floripondioDe(t)) return [];
+  const lista = [];
+  tokens.forEach(r => {
+    if(r === t || r.oculto) return;
+    const e = typeof estadoDe === 'function' ? estadoDe(r) : null;
+    if(e && e.muerto) return;
+    if(typeof enSigilo === 'function' && enSigilo(r)) return;
+    lista.push(r);
+  });
+  return lista;
+}
 // Los rivales que lo asustan con Pánico: los de rivalesDe (js/02: ni ocultos ni muertos) que se ven (no los que están en sigilo).
 function panicoRivales(t){
   if(!panicoDe(t) || typeof rivalesDe !== 'function') return [];
@@ -26,7 +44,7 @@ function panicoRivales(t){
 }
 // Dónde están los que lo asustan (para cobrar los pasos): los de su Miedo y, con Pánico, sus rivales.
 function miedoFuentes(t){
-  return [...miedoEstados(t).map(e => e.miedoDe && tokens.get(e.miedoDe)).filter(Boolean), ...panicoRivales(t)].map(x => ({col: x.col, fila: x.fila}));
+  return [...miedoEstados(t).map(e => e.miedoDe && tokens.get(e.miedoDe)).filter(Boolean), ...panicoRivales(t), ...floripondioOtros(t)].map(x => ({col: x.col, fila: x.fila}));
 }
 // ¿El paso de `a` a `b` cuesta el doble? Termina a MIEDO_RADIO o menos de alguno y no se aleja de ese.
 function miedoPasoAsusta(a, b, fuentes){
@@ -38,6 +56,7 @@ function miedoContra(atq, def){
   const defId = def.id || idDeToken(def);
   if(defId && miedoEstados(atq).some(e => e.miedoDe === defId)) return MIEDO_PENA;
   if(panicoDe(atq) && (atq.tipo === 'creep' ? def.tipo === 'pj' : def.tipo === 'creep')) return MIEDO_PENA;
+  if(floripondioDe(atq)) return MIEDO_PENA;   // 🌺 contra cualquiera, aliados incluidos
   return 0;
 }
 

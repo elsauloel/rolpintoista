@@ -881,10 +881,16 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] **Manual** (`manual-usuario/notas`): grupos y tokens automáticos, botín, Despojar, Finalizar combate en el mapa, trampas automáticas, estados sobre otros, protección de jefe, botón 🎭 y grupos ↔ mapas, y una nota de casteo cuando estén las reglas.
 
 ## 4. Diseño pendiente
-- [ ] **😱💤 Sumar Pánico y Sueño a cosas que los den (dueño, 2026-11-01: «sumar algunos ítems o circunstancias que den pánico y que den sueño, que duerman»).** Hoy no los da
+- [ ] **📋 Pegar las reglas de Firestore (2026-11-01, el dueño está fuera de casa):** `firebase/firestore.rules` con el 💨 viento que recorta nubes (`esNube`, commit 6575a0d9). Sin pegarlas, un jugador que despeja la nube de otro ve «a mano (faltan pegar las reglas)»; el GM ya puede.
+- [x] **😱💤 Sumar Pánico y Sueño a cosas que los den (dueño, 2026-11-01: «sumar algunos ítems o circunstancias que den pánico y que den sueño, que duerman»).** Hoy no los da
   nada (solo el selector de estados). Candidatos: el Grito de pánico (hoy da Miedo) → Pánico; algo que duerma (una flecha, un polvo, una habilidad de creep).
   Decidido (dueño, 2026-11-01): el veneno y el sangrado del Mantenimiento NO despiertan («es el daño externo el que despierta», como está programado);
   la Inmunidad a CC frena todos los controles, también Miedo, Pánico y Sueño (como está).
+  ✅ Hecho (2026-11-01, dueño: «me parece bien esas cosas… y al grito de pánico le vamos a poner de nombre grito espeluznante»): **Grito espeluznante**
+  (ex Grito de pánico: deja Pánico; los creeps guardados se ponen al día solos), **Flecha somnífera** (Rara, 120), **Polvo de adormidera** (Buena, 60) y
+  **Polen somnífero** (habilidad de creep, Debuffer, bestias y plantas). Detalle en `comun/CLAUDE.md`.
+- [ ] **🌺 Algo que dé Malviaje de floripondio** (2026-11-01: el estado ya existe —el Pánico contra todos, aliados incluidos, 2 turnos, en el selector—
+  y todavía no lo da nada). Candidatos: una flor o planta del Bosque (polen, espinas que pinchan), un hongo, un brebaje o una flecha.
 - [x] **Trampas para jugadores**: hecho (2026-09-24, el paso 🪤 del editor de habilidades del personaje; desde el 2026-09-30, en ✨ se elige la casilla).
 - [x] **Zona persistente y trampas en invocaciones** (P134): hecho el 2026-10-02 (etapa 4f, `plan-paso4-etapa4.md`): la zona anda y el
   editor de habilidades de invocación tiene el paso 🪤 Trampa. (Ataque con arma con arreglos y ⚡ Flash ya andan en creeps e

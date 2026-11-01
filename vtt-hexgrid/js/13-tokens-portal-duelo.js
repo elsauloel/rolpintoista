@@ -1829,6 +1829,10 @@ async function dueloAplicarDano(d){
       if(botella > 0) await talBotella(d, botella, [...(habMagica ? (dn.rolls || []) : []), ...(dn.magico ? (dn.magico.rolls || []) : [])]).catch(err => console.error('La Botella:', err));
     }
     const perdio = Math.max(0, num(res.previo) - num(res.nuevo));
+    // 🕶 Un golpe de área que le saca más vida que su Sigilo lo delata (dueño, 2026-11-01; js/03 sigiloDelatarPorDano). Lo que sacó: el golpe y lo
+    // elemental del arma especial, si lo hubo.
+    if(d.hab && ['area', 'onda', 'cono', 'linea'].includes(d.hab.objetivo) && !res.r.invulnerable && typeof sigiloDelatarPorDano === 'function')
+      await sigiloDelatarPorDano(d.defensor.tokenId, perdio + (magico ? Math.max(0, num(magico.hpAntes) - num(magico.hpDespues)) : 0), d.hab.nombre).catch(err => console.error('El sigilo que se delata:', err));
     // Habilidad que drena: todo lo que perdió. Arma que drena (2026-10-03): su % de lo que perdió de verdad (curar redondea para arriba).
     // Una habilidad que drena: lo que perdió, o su % (`drenaPct`, la Sanguijuela: la mitad, para arriba).
     const drena = d.hab && d.hab.dano && d.hab.dano.drena ? await dueloDrenar(d, num(d.hab.dano.drenaPct) > 0 ? Math.ceil(perdio * num(d.hab.dano.drenaPct) / 100) : perdio)

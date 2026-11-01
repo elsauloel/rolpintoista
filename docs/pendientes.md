@@ -242,8 +242,6 @@
 > - [ ] **💥 Bolsas de grisú en las minas (2026-10-30, dueño: «lo del grisú lo dejamos afuera x ahora»).** Manchas de gas en algunas casillas: estar
 >   adentro marea (−1 a la puntería) y, si les llega fuego (antorcha, farolero, hechizo), explotan y lastiman a todos los de cerca. Hace falta programar
 >   que el fuego detone una zona. Quedó afuera del encuentro 2 de El origen; para retomar.
-> - [ ] **🧿 Corroborar que el Mal de ojo sea bien costoso (2026-10-28, dueño: «debería ser bastante costoso, así que recordame eso para corroborar»).** Quedó
->   sin tirada de resistencia (P230 ✅): hoy cuesta 5 SP o cooldown 3 (el doble en turno ajeno). Revisar con el dueño si sube.
 > - [ ] **⏳ «Token de turnos» (2026-10-28) — en espera:** el dueño lo tiene que definir con un colega que le va a mandar la info («Había que cambiar
 >   cómo está automatizado el sistema. Sería más simple que haya un estado llamado Token de turnos y el sistema se lo saca durante el mantenimiento»).
 >   No tocar hasta que llegue.
@@ -956,9 +954,10 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
     **Marcado 1 turno a todos los que les hace daño** (dueño: «que quede marcado a todos los que les hace daño por un turno»).
   - **Luz para los suyos** → se llama **Destello revelador** (propuesta de Claude, el dueño: «ok»); todo lo demás queda igual (Marcado 2 turnos, trampas a la vista, 1d8 de luz, Luz sanadora 25 %).
   - **Pergamino de luz cegadora**: queda como está (Res.CC contra Ef.Esp → Ceguera 1 turno, sin daño, sin Marcado).
-- [ ] 🕶 **El daño en área saca del sigilo** — **en revisión, lo estamos charlando** (dueño, 2026-10-31: «lo dejamos así, pero que está en revisión»; antes: «anotalo así como lo sugerís»). No programar todavía. Hoy un área le pega al que está en sigilo
-  (no lo filtra, vtt-hexgrid/js/13) y recibir daño no se lo saca (solo lo sacan que lo descubran —`romperSigilo`, js/03— o quedar Marcado). Regla
-  nueva: si el área **le saca vida**, pierde el sigilo (¿con el Marcado 2 turnos de cuando lo descubren? a confirmar); si la esquiva o la resiste sin daño, sigue en sigilo.
+- [x] 🕶 **El daño en área saca del sigilo** — ✅ hecho (2026-11-01, dueño: «la 2… me parece bien así»). Si un golpe de área (habilidad o arma
+  especial de objetivo área, onda, cono o línea; una zona que pega; el daño de una trampa) le saca a alguien en Sigilo **más vida que su valor de Sigilo**
+  (Destreza + bonos), sale del sigilo: sin tirada y **sin** el Marcado 2 turnos de cuando lo descubren (se delató). Igual o menos, o sin daño, sigue oculto.
+  `sigiloDelatarPorDano` (vtt-hexgrid/js/03), llamado desde `dueloAplicarDano` (js/13), las zonas (js/08) y las trampas (js/19). Probado en el mapa.
 
 - [x] ☀ **Luz sanadora en ítems** (2026-10-31): resuelto en la revisión de luz — la Varita del destello la lleva (25 %); el Pergamino de luz cegadora queda como está (sin daño).
 - [ ] **Auditar las 60 habilidades de los creeps de «El origen de las especies»** (dueño, 2026-10-23: «pasarlas a la de fábrica y señalarlas como por auditar»): ya están entre las de fábrica (`ORIGEN` en `comun/skills-creep-base.js`, etiqueta «de El origen», «sin auditar»), con su rol y su concepto (`docs/diseno-roles-creep.md`, «Conteo por concepto»). Las 10 que se llaman como una de fábrica llevan «(El origen)»: al auditarlas, decidir cuál queda. ~~Bejines~~ → **Pedo de lobo** (dueño, 2026-10-23: «me encanta»; hecho en la de fábrica; en el Kobold hongero de la partida sigue «Bejines» hasta que se cambie desde GM Tools).

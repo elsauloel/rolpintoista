@@ -570,6 +570,7 @@ async function trampaPasoDanoAplicar(id, dt){
   // ¿Lo lastimó? (P227, 2026-10-27): la vida, más lo que se llevó su Vida extra (es vida); lo que se comió un escudo no cuenta.
   const lastimo = entro + (res ? num(res.r.vida) : 0);
   const sinHerida = dt.requiereDano && lastimo <= 0;
+  if(res && res.r && !res.r.invulnerable && typeof sigiloDelatarPorDano === 'function') await sigiloDelatarPorDano(dt.tokenId, Math.max(0, num(res.previo) - num(res.nuevo)), dt.nombreT ? `🪤 ${dt.nombreT}` : 'La trampa').catch(err => console.error('El sigilo que se delata:', err));   // 🕶 (js/03, 2026-11-01)
   if(sinHerida) texto += ' → no lo lastimó: lo que deja no entra';
   const titulo = dt.danoFijo ? 'Le llega la descarga' : monto <= 0 ? 'Daño' : 'Daño aplicado';
   const sig = {...dt, danoEntro: entro, ...(sinHerida ? {evita: 'efecto'} : {}), pasos: [...(dt.pasos || []), {titulo, texto}]};

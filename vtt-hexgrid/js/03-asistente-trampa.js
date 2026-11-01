@@ -242,6 +242,36 @@ async function romperSigilo(id, detector, motivo, sinMomento){   // motivo (opci
     if(!sinMomento) momentoAbrir({tipo: 'sigilo', icono: '🕶', titulo: `¡${nombreDe(t)} quedó al descubierto!`, resultado: motivo || `Lo detectó ${detector}`, estado: 'listo'});   // P146 (js/16)
   }finally{ setTimeout(() => sigiloRompiendo.delete(id), 3000); }
 }
+/* 🕶 El daño en área delata (dueño, 2026-11-01: «la 2 … me parece bien así»): si un golpe de ÁREA (habilidad o arma especial de objetivo área, onda,
+   cono o línea; una zona que pega; la explosión o el daño de una trampa) le saca a alguien que está en Sigilo MÁS vida que su valor de Sigilo
+   (Destreza + bonos: el mismo número que tira para no ser descubierto, js/16), sale del sigilo. Sin tirada y SIN el Marcado 2 turnos de cuando lo
+   descubren (no lo encontraron: se delató). Si le saca igual o menos, o no le saca vida (lo esquivó, lo resistió, un escudo), sigue oculto.
+   La pantalla que aplicó el daño (la que puede tocar sus estados); si no puede, avisa para hacerlo a mano. → true si lo sacó. */
+function sigiloValorDe(t){
+  if(!t) return 0;
+  if(t.tipo === 'creep'){ const sc = typeof creepPrivadoDe === 'function' ? creepPrivadoDe(t.fichaId) : null; return sc ? num(CreepCalculo.statValor(sc, 'sigilo')) : 0; }
+  const f = fichasPub.get(String(t.fichaId || '').split(SEP_INVOCACION)[0]);
+  return f && f.resumen ? num(f.resumen.sigilo !== undefined ? f.resumen.sigilo : f.resumen.des) : 0;
+}
+async function sigiloDelatarPorDano(id, saco, origen){
+  const t = tokens.get(id);
+  saco = Math.round(num(saco));
+  if(!t || saco <= 0 || !enSigilo(t) || sigiloRompiendo.has(id)) return false;
+  const valor = sigiloValorDe(t);
+  if(saco <= valor) return false;
+  const txt = `${origen ? origen + ': ' : ''}el golpe le sacó ${saco} de vida, más que su Sigilo (${valor})`;
+  const e = estadoDe(t);
+  const idx = e ? e.estados.findIndex(s => String((s && s.nombre) || '').trim().toLowerCase() === 'sigilo') : -1;
+  if(idx < 0 || !puedoCambiarEstados(t)){ toast(`✋ ${nombreDe(t)} se delató (${txt}): sacale el Sigilo a mano`); return false; }
+  sigiloRompiendo.add(id);
+  try{
+    await hudEstadoCambiar(t, idx, 'quitar');
+    sigiloAviso(`🕶 ${nombreDe(t)} se delató y salió del sigilo`, txt);
+    toast(`🕶 ${nombreDe(t)} se delató: ${txt}`);
+    return true;
+  }catch(err){ console.error('No se pudo sacar el sigilo:', err); toast(`✋ ${nombreDe(t)} se delató (${txt}): sacale el Sigilo a mano`); return false; }
+  finally{ setTimeout(() => sigiloRompiendo.delete(id), 3000); }
+}
 // Cada vez que algo se movió o cambió de sigilo: si un token en sigilo que puedo
 // manejar (mi personaje; el GM, sus creeps) quedó dentro de un cono rival, pierde el sigilo.
 function sigiloRevisar(){

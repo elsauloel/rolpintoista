@@ -1914,3 +1914,12 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   (GM: aplicar, +1 en el Mantenimiento, a mano, dos seguidas en fila) y Prueba Uno (el jugador decide lo suyo; con el control, el GM decide y al
   jugador le llega el Aviso).
 
+- **🕶 El daño en área delata** (2026-11-01, dueño: opción «el golpe le saca más que su Sigilo», sin tirada): `sigiloDelatarPorDano(tokenId, saco, origen)`
+  y `sigiloValorDe(t)` en js/03. Si un golpe de ÁREA le saca a alguien en Sigilo más vida que su valor de Sigilo (personaje: `resumen.sigilo`, o la
+  Destreza en fichas viejas; creep: `CreepCalculo.statValor(sc, 'sigilo')` — el mismo número de js/16), se le saca el estado Sigilo con
+  `hudEstadoCambiar` (no con `romperSigilo`: **sin** el Marcado 2 turnos de cuando lo descubren) y va a la Mesa «🕶 Fulano se delató y salió del sigilo».
+  Lo llaman: `dueloAplicarDano` (js/13) si `d.hab.objetivo` es área, onda, cono o línea (los misiles van por la cascada de áreas pero son de objetivo
+  único: no cuentan); `zonaResolverBanner` (js/08), con lo que perdió de vida por la zona; `trampaPasoDanoAplicar` (js/19), el daño de una trampa
+  (el que la pisa ya perdió el sigilo al activarla; esto alcanza a los de alrededor de una que explota). «Saca» = vida perdida (lo que se come un
+  escudo o la Vida extra no cuenta). La pantalla que aplica el daño necesita poder tocar sus estados (el dueño o el GM); si no, avisa para hacerlo a mano.
+

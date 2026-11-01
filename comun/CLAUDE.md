@@ -1357,6 +1357,21 @@ versión parecida en más de una, es candidato a juntar.
   abierto (`leerParaCartel`, una vez) y se rearma si cambia el modo del mapa (`dataset.k`). **El caído** que da (`ofrecer`), pide (`pedirMano`) o
   acepta darle algo a quien se lo pidió (`aceptarPedido`) ve antes el cartel «😵 Estás inconsciente. ¿Querés hacerlo igual?» (`avisoInconsciente`);
   sigue pagando 0.
+- **`intercambio.js`, ✋ Equipármelo** (2026-11-01, dueño: «si uno recibe algo que puede quedar equipado en la mano… y tiene una mano libre, al recibirlo te
+  tiene que preguntar: te lo quedás equipado, lo ponés en la vaina, lo ponés en la mochila. Dejarlo equipado cuesta lo mismo en nitros que ponerlo en el
+  cinturón»). Destino nuevo **'equipar'** (`COSTO_DESTINO.equipar` = 1; fuera de combate gratis; el caído 0): lo de la mano (`esDeMano`) si le queda lugar en
+  las manos para ese tipo (`entraEnManos` = `FichaEquipo.slotOcupado(S, it)` sin ocupar: una mano / dos manos / escudo). Botón «Equipármelo» en el cartel de
+  quien recibe (también **fuera de combate**, junto a «A la vaina / correa» y «A la mochila») y en «🙋 Pedirle»; sin mano libre, apagado con el ⚠ y, al
+  tocarlo, el aviso. `recibir(S, p, 'equipar')` lo deja `equipado`.
+- **💸 No2 negativos** (2026-11-01, dueño: «vamos a dejarlo para acciones ofensivas tipo ataque de oportunidad también. Pero ahora sí la restricción es
+  siempre que tengas 0 nitros o más. Si ya tenés nitros negativos, ahí no podés hacer ninguna acción que te siga restando»). **El ataque de oportunidad y el
+  contraataque**, sin No2, se hacen igual y dejan en negativo, como una defensa y sin preguntar (`FichaAcciones.ataqueEspecialConArma`,
+  `CreepAcciones.pagarAtaque`/`faltanNitros`, `InvAcciones.pagarAtaque`/`faltanNitros`, con `Combatiente.avisarDeudaNo2`); el mapa ya no los descarta por
+  No2 (`oporPuede`, `oporArmasDe` de vtt-hexgrid/js/17, `CreepCalculo.oportunidadPosible`) salvo que estén en negativo. **Ya en negativo, ninguna acción que
+  cueste No2** (`Combatiente.defensaSinNo2` = `sinNo2Negativo`, `YA_NEGATIVO_TXT` general): además de las defensas de siempre, el «Realizar de cualquier
+  modo» de un personaje (`avisarSinNitros` de la ficha y `bnSinNitros` del mapa: atacar, habilidades, consumir, sigilo, levantarse, equipar en combate…),
+  el ataque y el consumible de un creep, el ataque de una invocación y todo el intercambio (`negativo(S, costo)` en `intercambio.js`: ofrecer, aceptar,
+  pedir, dar lo pedido, la alforja, despojos en combate).
 - **`intercambio.js`, en combate** (2026-10-05; **los costos y la regla de «solo al lado» los reemplazó el 2026-11-01, ver arriba**): solo ítems y solo a los aliados al lado (`host.adyacentes(fichaId)`; el mapa los saca de los tokens a 1
   casillero); cuesta 1 No2 desde el cinturón (stat `pasamanos` > 0: 0) y 2 desde la mochila, se paga al ofrecer (sin No2: pregunta y deja seguir con la
   línea roja); lo que llega va al cinturón si entra. **Alforja compartida** (stat `alforja`): paquete `tipo: 'pedido'` — lo crea quien saca; la pantalla
@@ -1444,7 +1459,7 @@ versión parecida en más de una, es candidato a juntar.
   la pantalla lo define —el mapa: `AvisoCombate` para quien la hace y un momento `tipo: 'deuda'` en la Crónica—; si no, un toast). Parry
   (`FichaAcciones.parryConArma`, `CreepAcciones.pagarParry` → `{aviso, deuda}`, `InvAcciones.tirarStat`), la Evasión que paga el sobrepeso
   (`FichaAcciones.sobrepesoPagar`) y el dodge roll (js/06 y js/08: `enDodge(id)`) ya no se frenan sin No2; en el duelo, la opción se ofrece con
-  «⚠ sin No2: quedás en negativo». **No aplica al ataque de oportunidad ni al contraataque** (dueño): son ataques y siguen sin bajar de 0.
+  «⚠ sin No2: quedás en negativo». ~~No aplica al ataque de oportunidad ni al contraataque~~ — **desde el 2026-11-01 sí** (ver «💸 No2 negativos» abajo).
 - **Stun nuevo** (2026-10-06, dueño): no le toca los No2 (el preset ya no lleva `forzarNitros`, lleva `stun: true`); `Combatiente.stuneado(estados)`
   (también reconoce un Stun viejo por el nombre). Su Evasión es 1 sin tirar (`Combatiente.tirarStat`); en el duelo solo se le ofrece la Evasión
   (ficha, creep, invocación y el mapa); en el mapa, cualquier acción o movimiento de un stuneado muestra un cartel con «Hacerlo igual (lo decide la

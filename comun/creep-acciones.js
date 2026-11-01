@@ -111,7 +111,10 @@ const CreepAcciones = (() => {
   const contraHab = sc => (sc.habilidades || []).some(h => h && h.contraEsquiva);
   const bonoEspecial = (sc, tipo) => { const st = Combatiente.statAtaqueEspecial(tipo); return (st ? C().modTotal(sc, st) : 0) + (tipo === 'contra' && contraHab(sc) ? 1 : 0); };
   const costoAtaqueDe = (sc, tipo) => tipo === 'normal' ? C().costoAtaque(sc) : tipo === 'oportunidad' ? C().costoOportunidad(sc) : C().costoContraataque(sc);
-  const faltanNitros = (sc, tipo) => costoAtaqueDe(sc, tipo) > num(sc.nitros);
+  // 💸 (2026-11-01, dueño): el ataque de oportunidad y el contraataque, sin No2, se hacen igual y dejan en negativo (como una defensa): no se pregunta.
+  // Ya en negativo no se pregunta tampoco: pagarAtaque lo frena con el aviso.
+  const especialTipo = tipo => tipo === 'oportunidad' || tipo === 'contra';
+  const faltanNitros = (sc, tipo) => !especialTipo(tipo) && num(sc.nitros) >= 0 && costoAtaqueDe(sc, tipo) > num(sc.nitros);
   // Un duelo cancelado que no cuenta como ataque (2026-10-15): se descuenta del conteo y se devuelven los No2. → los No2 devueltos.
   // `pagado` (2026-10-28): lo que se pagó de verdad (Combatiente.pagoDeDuelo); sin él, el costo entero.
   function devolverAtaque(sc, tipo, pagado){
@@ -127,7 +130,8 @@ const CreepAcciones = (() => {
   }
   function pagarAtaque(sc, tipo, forzar){
     const costo = costoAtaqueDe(sc, tipo), tenia = Math.max(0, num(sc.nitros));
-    const forzado = costo > tenia ? {costo, tenia} : null;
+    if(Combatiente.defensaSinNo2(sc.nitros, costo)) return {error: `${sc.nombre} ${Combatiente.YA_NEGATIVO_TXT}`};   // ya en negativo: nada (2026-11-01)
+    const forzado = costo > tenia && !especialTipo(tipo) ? {costo, tenia} : null;   // la oportunidad / el contraataque no se fuerzan: van a negativo
     if(tipo === 'normal'){
       if(forzado && !forzar) return {error: `${sc.nombre}: no le alcanzan los No2 — este ataque cuesta ${fmt(costo)} y tiene ${fmt(num(sc.nitros))}`};
       const primero = num(sc.ataquesTurno) === 0;
@@ -137,8 +141,8 @@ const CreepAcciones = (() => {
       return {forzado, paga: forzado ? tenia : costo, aviso: `${sc.nombre}: −${fmt(forzado ? tenia : costo)} No2${forzado ? ` (costaba ${fmt(costo)})` : ''} · ${primero ? 'primer ataque del turno' : `ataque ${fmt(sc.ataquesTurno)} del turno`} · quedan ${fmt(sc.nitros)}`};
     }
     const nombre = NOMBRE_ESPECIAL[tipo] || 'Contraataque';
-    if(forzado && !forzar) return {error: `${sc.nombre}: no le alcanzan los No2 — el ${nombre.toLowerCase()} cuesta ${fmt(costo)} y tiene ${fmt(num(sc.nitros))}`};
-    sc.nitros = forzado ? 0 : num(sc.nitros) - costo;
+    sc.nitros = num(sc.nitros) - costo;   // sin No2, queda en negativo (2026-11-01)
+    Combatiente.avisarDeudaNo2({nombre: sc.nombre, accion: 'el ' + nombre.toLowerCase(), costo, quedan: num(sc.nitros)});
     Combatiente.aplicarTormenta(sc, sc.estados, costo, {motivo: 'el ' + nombre.toLowerCase()});
     const bono = bonoEspecial(sc, tipo);
     return {forzado, paga: forzado ? tenia : costo, aviso: `${sc.nombre}: ${nombre.toLowerCase()} −${fmt(forzado ? tenia : costo)} No2 ${forzado ? `(costaba ${fmt(costo)})` : '(lo de un primer ataque)'}${bono ? ` · PdG +${fmt(bono)} por ${tipo === 'contra' ? 'contraataque' : 'oportunidad'}` : ''} · quedan ${fmt(sc.nitros)}`};
@@ -295,6 +299,7 @@ const CreepAcciones = (() => {
       saque = {sale, txt};
       if(sale) costo = 0;
     }
+    if(Combatiente.defensaSinNo2(sc.nitros, costo)) return {error: `${sc.nombre} ${Combatiente.YA_NEGATIVO_TXT}`};   // ya en negativo (2026-11-01)
     if(costo > num(sc.nitros) && !forzar) return {error: `${sc.nombre}: no le alcanzan los No2 — usar ${it.nombre} cuesta ${fmt(costo)}`};
     const pagado = Math.min(costo, Math.max(0, num(sc.nitros)));
     sc.nitros = num(sc.nitros) - pagado;

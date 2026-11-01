@@ -76,7 +76,8 @@ const InvAcciones = (() => {
   const bonoEspecial = (inv, tipo) => { const st = Combatiente.statAtaqueEspecial(tipo); return st ? I().modTotal(inv, st) : 0; };
   const especial = tipo => tipo === 'oportunidad' || tipo === 'contra';
   const costoAtaqueDe = (inv, tipo) => especial(tipo) ? Combatiente.conExtenuado(inv.estados, Math.max(0, Combatiente.costoEspecial(Combatiente.armaEnMano(inv).tipoDado, Combatiente.armaDeCombatiente(inv), tipo) - Combatiente.ahorroEspecial(tipo, st => I().modTotal(inv, st)))) : I().costoAtaque(inv);
-  const faltanNitros = (inv, tipo) => costoAtaqueDe(inv, tipo) > num(inv.nitros);
+  // 💸 (2026-11-01, dueño): la oportunidad y el contraataque, sin No2, van a negativo sin preguntar; ya en negativo, pagarAtaque lo frena.
+  const faltanNitros = (inv, tipo) => !especial(tipo) && num(inv.nitros) >= 0 && costoAtaqueDe(inv, tipo) > num(inv.nitros);
   // Un duelo cancelado que no cuenta como ataque (2026-10-15): el conteo y los No2, de vuelta. → los No2 devueltos.
   // `pagado` (2026-10-28): lo que se pagó de verdad (Combatiente.pagoDeDuelo); sin él, el costo entero.
   function devolverAtaque(inv, tipo, pagado){
@@ -90,10 +91,12 @@ const InvAcciones = (() => {
   }
   function pagarAtaque(inv, forzar, tipo){
     const costo = costoAtaqueDe(inv, tipo), tenia = Math.max(0, num(inv.nitros));
-    const forzado = costo > num(inv.nitros) ? {costo, tenia} : null;
+    if(Combatiente.defensaSinNo2(inv.nitros, costo)) return {error: `${inv.nombre} ${Combatiente.YA_NEGATIVO_TXT}`};   // ya en negativo: nada (2026-11-01)
+    const forzado = costo > num(inv.nitros) && !especial(tipo) ? {costo, tenia} : null;   // la oportunidad / el contraataque van a negativo
     if(forzado && !forzar) return {error: `${inv.nombre}: no le alcanzan los Nitros — ${especial(tipo) ? 'el ' + NOMBRE_ESPECIAL[tipo].toLowerCase() : 'este ataque'} cuesta ${fmt(costo)} y tiene ${fmt(num(inv.nitros))}`};
     if(especial(tipo)){
-      inv.nitros = forzado ? 0 : num(inv.nitros) - costo;
+      inv.nitros = num(inv.nitros) - costo;   // sin No2, queda en negativo (2026-11-01)
+      Combatiente.avisarDeudaNo2({nombre: inv.nombre, accion: 'el ' + NOMBRE_ESPECIAL[tipo].toLowerCase(), costo, quedan: num(inv.nitros)});
       Combatiente.aplicarTormenta(inv, inv.estados, costo, {motivo: 'el ' + NOMBRE_ESPECIAL[tipo].toLowerCase()});
       const bono = bonoEspecial(inv, tipo);
       return {forzado, paga: forzado ? tenia : costo, aviso: `${inv.nombre}: ${NOMBRE_ESPECIAL[tipo].toLowerCase()} −${fmt(forzado ? tenia : costo)} No2 ${forzado ? `(costaba ${fmt(costo)})` : '(lo de un primer ataque)'}${bono ? ` · PdG +${fmt(bono)} por ${tipo === 'contra' ? 'contraataque' : 'oportunidad'}` : ''}`};

@@ -53,7 +53,7 @@ function oporPuede(r){
   if(rs.sinOpor) return false;   // solo tiene un arco: con el arco no hay oportunidad (2026-10-09)
   if(r.tipo === 'creep') return rs.opor !== false;
   if(rs.oporCosto === undefined || rs.nitros === undefined || rs.nitros === null) return true;
-  return num(rs.nitros) >= num(rs.oporCosto);
+  return num(rs.nitros) >= 0 || !num(rs.oporCosto);   // sin No2 va a negativo; ya en negativo, no (2026-11-01)
 }
 // El primer punto del camino en que se aleja de un rival que puede aprovecharlo → {indice (último casillero al lado), rivalId} o null.
 function oportunidadCorte(t, id, ruta){
@@ -264,7 +264,7 @@ async function oporArmasDe(r){
     if(!sc) return [];
     const costo = CreepCalculo.costoOportunidad(sc);
     const n = sc.nitros === null || sc.nitros === undefined ? CreepCalculo.nitrosMax(sc) : num(sc.nitros);
-    if(n < costo || !Combatiente.sirveDeOportunidad(Combatiente.armaDeCombatiente(sc))) return [];   // con un arco no hay oportunidad
+    if((costo > 0 && n < 0) || !Combatiente.sirveDeOportunidad(Combatiente.armaDeCombatiente(sc))) return [];   // con un arco no hay oportunidad; sin No2 va a negativo, ya en negativo no (2026-11-01)
     return [{nombre: Combatiente.armaEnMano(sc).nombre || (Combatiente.armaEnMano(sc).sinArma ? 'sin arma' : 'su arma'), costo, yo: {ref: r.fichaId, tipo: 'creep', nombre}, detalle: oporDetalle(CreepCalculo.ataqueTxt(sc), sc, Combatiente.armaDeCombatiente(sc)),
       ataque: Combatiente.ataqueConSuArma(sc, 'oportunidad', CreepCalculo.alcance(sc))}];
   }
@@ -277,7 +277,7 @@ async function oporArmasDe(r){
     const inv = (S.invocaciones || []).find(x => x && x.id === invId);
     if(!inv) return [];
     const costo = Math.max(0, Combatiente.costoEspecial(Combatiente.armaEnMano(inv).tipoDado, Combatiente.armaDeCombatiente(inv), 'oportunidad') - Combatiente.ahorroEspecial('oportunidad', st => FichaResumen.invModTotal(inv, st)));
-    if(num(inv.nitros) < costo) return [];
+    if(costo > 0 && num(inv.nitros) < 0) return [];   // sin No2 va a negativo; ya en negativo, no (2026-11-01)
     return [{nombre: Combatiente.armaEnMano(inv).nombre || (Combatiente.armaEnMano(inv).sinArma ? 'sin arma' : 'su arma'), costo, yo: {ref: r.fichaId, tipo: 'pj', nombre}, detalle: oporDetalle(typeof InvCalculo !== 'undefined' ? InvCalculo.ataqueTxt(inv) : '', inv, Combatiente.armaDeCombatiente(inv)),
       ataque: Combatiente.ataqueConSuArma(inv, 'oportunidad', typeof InvCalculo !== 'undefined' ? InvCalculo.alcance(inv) : 1)}];
   }
@@ -286,7 +286,7 @@ async function oporArmasDe(r){
   const todas = FichaCombate.armasEquipadasConDano(S).map(x => x.item), lista = todas.filter(Combatiente.sirveDeOportunidad);   // el arco no sirve de oportunidad
   if(todas.length && !lista.length) return [];   // solo un arco: tampoco a mano limpia (tiene las dos manos ocupadas)
   return (lista.length ? lista : [null]).map(arma => ({arma, costo: FichaCombate.costoAtaqueEspecial(arma, 'oportunidad', S)}))
-    .filter(x => x.costo <= disponibles)
+    .filter(x => !x.costo || disponibles >= 0)   // sin No2 va a negativo; ya en negativo, no (2026-11-01)
     .map(({arma, costo}) => ({nombre: arma ? arma.nombre : 'sin arma', costo, yo: {ref: fichaId, tipo: 'pj', nombre},
       detalle: arma ? [`Daño ${FichaCombate.armaDanoTxt(arma, calc.final.dmg)}`, typeof ItemCorto !== 'undefined' ? ItemCorto.armaEsencial(arma) : ''].filter(Boolean).join(' · ') : 'A mano limpia',
       ataque: {tipo: 'oportunidad', armaId: arma ? arma.id : '', armaNombre: arma ? arma.nombre : '', tipoDado: FichaCombate.tipoAtaque(arma), rango: !!(arma && arma.armaDeRango), alcance: FichaCombate.alcanceDeArma(S, arma), ...Combatiente.ataqueDeArma(arma)}}));

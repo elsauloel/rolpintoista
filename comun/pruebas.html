@@ -42,10 +42,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 </script>
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
-<script src="combatiente.js?v=20261101min1"></script>
-<script src="creep-calculo.js?v=20261031luz2"></script>
+<script src="combatiente.js?v=20261101no2"></script>
+<script src="creep-calculo.js?v=20261101no2"></script>
 <script src="creep-botonera.js"></script>
-<script src="creep-acciones.js?v=20261031ae"></script>
+<script src="creep-acciones.js?v=20261101no2"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
@@ -3412,6 +3412,15 @@ prueba('atacar con un creep sin No2: sin forzar no cobra; forzado gasta los que 
   const si = CreepAcciones.pagarAtaque(sc, 'normal', true);
   igual([falta, !!no.error, antes, sc.nitros, si.forzado, sc.ataquesTurno, CreepAcciones.preguntaSinNitros(creepPrueba({nitros: 1}), 'oportunidad').includes('cuesta 4 y tiene 1')],
     [true, true, 2, 0, {costo: 4, tenia: 2}, 1, true]);
+});
+
+prueba('💸 No2 negativos (dueño, 2026-11-01): la oportunidad y el contraataque van a negativo sin preguntar; ya en negativo, nada que cueste No2', () => {
+  const sc = creepPrueba({nitros: 1});
+  const pregunta = CreepAcciones.faltanNitros(sc, 'oportunidad'), op = CreepAcciones.pagarAtaque(sc, 'oportunidad'), quedan = sc.nitros;
+  const otra = CreepAcciones.pagarAtaque(sc, 'contra'), normal = CreepAcciones.pagarAtaque(sc, 'normal', true), preguntaNeg = CreepAcciones.faltanNitros(sc, 'normal');
+  igual([pregunta, !op.error, !!op.forzado, quedan, !!otra.error, !!normal.error, preguntaNeg, sc.nitros,
+      CreepCalculo.oportunidadPosible(creepPrueba({nitros: 0})), CreepCalculo.oportunidadPosible(creepPrueba({nitros: -1})), Combatiente.sinNo2Negativo(-1, 2), Combatiente.sinNo2Negativo(0, 2), Combatiente.sinNo2Negativo(-1, 0)],
+    [false, true, false, -3, true, true, false, -3, true, false, true, false, false]);
 });
 
 prueba('un pase de turno de un creep: el estado daña y baja un turno, cooldown −1, No2 a full, ataques a 0', () => {

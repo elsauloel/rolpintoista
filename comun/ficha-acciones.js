@@ -622,12 +622,12 @@ const FichaAcciones = (() => {
     const costo = FichaCombate.costoAtaqueEspecial(arma, tipo, S), nombre = NOMBRE_ATAQUE_ESPECIAL[tipo] || 'Ataque';
     const con = arma ? ' con ' + arma.nombre : '';
     if(!forzar){ const ok = confirmarSentado(S, ui), p = esperarSiHace(ok); if(!(p ? await p : ok)) return; }
-    if(costo > num(S.nitros) && !forzar){
-      ui.avisarSinNitros(costo, `hacer un ${nombre.toLowerCase()}${con}`, () => ataqueEspecialConArma(S, arma, tipo, true, ui));
-      return;
-    }
-    const paga = forzar && costo > num(S.nitros) ? gastoNitrosForzado(S, costo, `hizo un ${nombre.toLowerCase()}${con}`) : costo;
+    // 💸 Una reacción ofensiva fuera de turno (dueño, 2026-11-01: «vamos a dejarlo para acciones ofensivas tipo ataque de oportunidad también»): como
+    // una defensa, sin No2 se hace igual y queda en negativo (la deuda se descuenta en la próxima recarga), si arranca en 0 o más; ya en negativo, no.
+    if(Combatiente.defensaSinNo2(S.nitros, costo)){ ui.toast(`${((S.meta && S.meta.nombre) || 'Tu personaje').trim()} ${Combatiente.YA_NEGATIVO_TXT}`); return; }
+    const paga = costo;
     S.nitros = num(S.nitros) - paga;
+    Combatiente.avisarDeudaNo2({nombre: ((S.meta && S.meta.nombre) || '').trim(), accion: `el ${nombre.toLowerCase()}${con}`, costo, quedan: num(S.nitros)});
     tormentaPj(S, costo, `el ${nombre.toLowerCase()}${con}`, ui);
     if(ui.alPagar) ui.alPagar(paga);   // ya se pagó (2026-10-10)
     ui.cambio(['nitros']);

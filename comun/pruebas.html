@@ -45,7 +45,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="combatiente.js?v=20261101adren"></script>
 <script src="creep-calculo.js?v=20261101adren"></script>
 <script src="creep-botonera.js"></script>
-<script src="creep-acciones.js?v=20261101azar2"></script>
+<script src="creep-acciones.js?v=20261101deriv"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
@@ -6350,6 +6350,30 @@ prueba('🧪 El veneno de las trampas por golpe no se resiste (P228, 2026-10-27)
   igual([ag.dano, ag.perfora, !!ag.requiereDano, !!ag.salvacion, !!da.salvacion, !!da.requiereDano, !!es.salvacion, !!es.requiereDano, !!nube.salvacion, es.dano, da.dano,
     TRAMPAS_BASE.filter(t => t.nombre === 'Dardos envenenados').length],
     [ '1d8', 1, true, false, false, true, false, true, true, '2d6+3', '1d6+3', 1]);   // (2026-10-28: la Espina, Rara, 2d6+3; los Dardos viejos del 📚 se borraron: queda solo el auditado)
+});
+prueba('💉 Subir un atributo sube sus derivados (dueño, 2026-11-01: «siempre… jugadores, creeps e invocaciones»): Adrenalina ×1 y ×2', () => {
+  const ad = ESTADOS_PRESET.find(p => p.nombre === 'Adrenalina');
+  const st = n => ({...ad, activo: true, stacks: n});
+  const ids = ['pdg', 'parry', 'eva', 'ini', 'dmg', 'bloqueo', 'rng', 'percepcion', 'sigilo'];
+  // Jugador: las fórmulas de la ficha (pdg = des, eva = agl, dmg = fue…) con el atributo ya subido; también el máximo de No2 (= agl).
+  const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
+  S.attrs = {...S.attrs, con: 3, fue: 3, agl: 4, des: 5, esp: 2};
+  const pj = n => { S.efectos = n ? [st(n)] : []; const f = FichaCalculo.calcular(S).final; return [...ids.map(i => num(f[i])), num(f.nitros)]; };
+  // Creep e invocación: statValor = atributo efectivo (con los mods de estados y sus stacks) + lo que apunta al derivado; No2 máximo = Agi efectiva.
+  const sc = {nombre: 'Goblin', con: 3, fue: 3, agl: 4, des: 5, esp: 2, estados: []};
+  const cr = n => { sc.estados = n ? [st(n)] : []; return [...ids.map(i => CreepCalculo.statValor(sc, i)), CreepCalculo.nitrosMax(sc)]; };
+  const inv = InvCalculo.migrar({nombre: 'Abeja', con: 3, fue: 3, agl: 4, des: 5, esp: 2, hp: 15, hpMax: 15, estados: []});
+  const iv = n => { inv.estados = n ? [st(n)] : []; return [...ids.map(i => InvCalculo.statValor(inv, i)), FichaResumen.invNitrosMax(inv)]; };
+  const sube = (f, k) => { const a = f(0), b = f(k); return b.map((v, i) => v - a[i]); };
+  const esperado = k => [k, k, k, k, k, k, k, k, k, k];
+  igual([sube(pj, 1), sube(pj, 2), sube(cr, 1), sube(cr, 2), sube(iv, 1), sube(iv, 2)], [esperado(1), esperado(2), esperado(1), esperado(2), esperado(1), esperado(2)]);
+});
+prueba('💉 Un estado que se apila puesto a mano en un creep (el selector) se acumula: Adrenalina ×2 sube los derivados +2 (2026-11-01)', () => {
+  const ad = ESTADOS_PRESET.find(p => p.nombre === 'Adrenalina');
+  const sc = {nombre: 'Goblin', con: 3, fue: 3, agl: 4, des: 5, esp: 2, estados: []};
+  const poner = () => Combatiente.agregarEstado(sc.estados, SelectorEstados.estadoCreep(ad, Math.random().toString(36).slice(2, 9), CreepAcciones.FLAGS_ESTADO));
+  poner(); poner();
+  igual([sc.estados.length, sc.estados[0].stacks, CreepCalculo.statValor(sc, 'pdg'), CreepCalculo.statValor(sc, 'eva'), CreepCalculo.statValor(sc, 'dmg')], [1, 2, 7, 6, 5]);
 });
 /* ---------- Resultado ---------- */
 Promise.all(pendientes).then(() => {

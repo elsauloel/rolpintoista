@@ -1871,3 +1871,11 @@ versión parecida en más de una, es candidato a juntar.
   Flash, a él o a un aliado en su Rango, el estado Pila pila (+2 PdG y PdG.Esp, `turnosCompletos`: desde ya hasta el final de su próximo turno) y el
   efecto `Baja cooldowns` con `bajaCd: 2` + `spRecupera: 4` (vtt-hexgrid/js/13: con cooldowns, −2 a cada uno; en modo SP, +4 SP sin pasar el máximo).
   1 No2 y 2 SP, o cooldown 3. Íconos: 💉 y 🔋 (js/88).
+
+- **💉 Subir un atributo sube sus derivados** (dueño, 2026-11-01: «siempre… jugadores, creeps e invocaciones»). Ya era así en los tres: el jugador
+  evalúa sus fórmulas (`S.formulas`: pdg/parry/rng/percepcion/sigilo = des; eva/ini/nitros = agl; dmg/bloqueo/crgmax = fue; resmg/rescc = con, hpmax = con×5;
+  pdgmg/dmgesp/resm = esp, sp = esp×3, spregen = esp/2) con el atributo ya subido; el creep (`CreepCalculo.statValor`, `DERIVED_STATS`) y la invocación
+  (`InvCalculo.statValor`, `INV_STAT_ATTR`) suman al derivado el atributo efectivo (con los mods de estados × stacks), el No2 máximo sale de la Agi
+  efectiva y la vida máxima de la Con efectiva (`actualizarHpMaxPorCon`). Prueba en `pruebas.html`. Lo que faltaba: un estado que se apila puesto
+  **a mano** en un creep (el selector, `SelectorEstados.estadoCreep` con `CreepAcciones.FLAGS_ESTADO`) perdía `apila` (y `turnosCompletos`) y no se
+  acumulaba: Adrenalina ×2 quedaba ×1. Ahora están en `FLAGS_ESTADO` (y en `FLAGS_ESTADO_CREEP` de GM Tools).

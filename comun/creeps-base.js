@@ -170,6 +170,7 @@
     if(sp.emerger) h.emerger = {...sp.emerger};
     if(sp.trampaColocar){ h.trampaColocar = JSON.parse(JSON.stringify(sp.trampaColocar)); h.modo = 'auto'; }   // 🌀 la trampa entera, como la de una varita (el Portal trampa, 2026-10-25): la coloca el mapa (trampaDeHabilidad)
     if(Array.isArray(sp.variantes)) h.variantes = JSON.parse(JSON.stringify(sp.variantes));   // ✨ el elemento a elegir al lanzarla (el Misil elemental, 2026-10-25, vtt-hexgrid/js/12)
+    if(sp.azarElegir) h.azarElegir = {...sp.azarElegir};   // 🎰 al azar (su costo) o eligiendo (esto de más): el Arma elemental (2026-11-01, Combatiente.elegirVarianteAzar)
     if(sp.largoVariable) h.largoVariable = {...sp.largoVariable};   // 🔥 el largo a elegir al lanzarla (Muro de fuego, 2026-10-24, vtt-hexgrid/js/12)   // ⚡ Flash (2026-10-24, Bendecir el arma): se usa cuando sea; en turno ajeno, el doble (vtt-hexgrid/js/12)
     if(sp.golpeAnunciado) h.golpeAnunciado = JSON.parse(JSON.stringify(sp.golpeAnunciado));   // 🪓 El que avisa no traiciona (2026-10-21): el golpe que descarga (vtt-hexgrid/js/63)
     if(sp.desarmar) h.desarmar = true;   // 🤺 Desarmar (2026-10-21): el botón instantáneo del GM (vtt-hexgrid/js/62)   // 🧿 Mal de ojo (2026-10-21): el botón del GM (vtt-hexgrid/js/60)

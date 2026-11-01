@@ -589,6 +589,7 @@ const CreepCalculo = (() => {
     sc.estados = Array.isArray(sc.estados) ? sc.estados : [];
     sc.habilidades = Array.isArray(sc.habilidades) ? sc.habilidades : [];
     Combatiente.migrarArmasElementales(sc.habilidades);   // 🔥 las cinco Armas elementales de antes → una «Arma elemental» (2026-10-31)
+    Combatiente.migrarArmaElementalAzar(sc.habilidades);   // 🎰 al azar (1 SP) o eligiendo (2 SP) (2026-11-01)
     Combatiente.migrarLuzSanadora(sc.habilidades);   // ☀ Smite y Destello revelador: Luz sanadora; Lanza arcana y Destello revelador, los nombres nuevos (2026-10-31)
     Combatiente.ponerAlDiaItemsFabrica(sc.equipo);   // 🔄 ítems de fábrica que cambiaron (la Varita del destello, 2026-10-31)
     sc.pasivas = Array.isArray(sc.pasivas) ? sc.pasivas : [];   // (2026-10-15)

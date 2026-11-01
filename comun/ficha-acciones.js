@@ -693,8 +693,8 @@ const FichaAcciones = (() => {
     const base = typeof f === 'function' ? f(FichaCalculo.calcular(S)) : null, xm = it && num(it.xMax) > 0 ? num(it.xMax) : null;
     return base === null ? xm : xm === null ? base : Math.min(base, xm);
   }
-  async function ejecutarHabilidad(S, id, armaId, forzar, ui){
-    const it = S.habilidades.find(h => h.id === id);
+  async function ejecutarHabilidad(S, id, armaId, forzar, ui, vSel){
+    let it = S.habilidades.find(h => h.id === id);
     if(!it) return;
     // 📣 Manual: "Anunciar" solo publica la descripción en la Mesa.
     if(FichaBotonera.modoHab(it) === 'manual'){
@@ -706,6 +706,25 @@ const FichaAcciones = (() => {
     const sil = Combatiente.preguntaSilencio(S.efectos, it, '', ui.yo ? (ui.yo() || {}).ref : '');   // (con la ficha: el Tótem de silencio del mapa)
     if(sil && !(await (ui.confirmar || (txt => Confirmar.preguntar(txt, {titulo: 'Silencio', icono: '🤐', si: 'Usarla igual'})))(sil))) return;
     if(Combatiente.tipoEjecucion(FichaBotonera.dueloDe(it)) === 'flash'){ ui.flashFuera(it); return; }   // ⚡ su propia regla de costo (P136)
+    /* 🎰 Arma elemental del Support (2026-11-01, dueño: «un precio un poquito más barato en SP que te haga elegir el elemento al azar, con el rodillo…
+       y 1 SP más para elegir»): antes de cobrar, ¿al azar (su costo) o eligiendo (`azarElegir.sp` de más)? Sigue con una copia: la Ejecución de ese
+       elemento y el SP de esa manera. `vSel`: lo ya elegido (si hay que volver a llamar por los No2, no pregunta otra vez). */
+    if(it.armaElemental || (Array.isArray(it.variantes) && it.variantes.length && it.azarElegir)){
+      const vs = Array.isArray(it.variantes) && it.variantes.length ? it.variantes : Combatiente.armaElementalVariantes();
+      const masSp = Math.max(0, Math.round(num(((it.azarElegir || Combatiente.AZAR_ELEGIR) || {}).sp)));
+      let v = vSel;
+      if(!v){
+        const base = FichaHabilidades.costoSpDe(S, it), no2 = FichaBotonera.costoNitrosHab(S, it, null);
+        const r = await Combatiente.elegirVarianteAzar({quien: ((S.meta && S.meta.nombre) || 'Tu personaje').trim(), nombre: it.nombre, variantes: vs, elegir: ui.elegir,
+          costoAzar: `${fmt(no2)} No2 + ${fmt(base)} SP`, costoElegir: `${fmt(no2)} No2 + ${fmt(base + masSp)} SP`});
+        if(!r) return;
+        v = {...r.variante, _modo: r.elegido ? 'elegir' : 'azar'};
+      }
+      const base0 = it;
+      it = {...it, nombre: `${it.nombre}: ${v.nombre}${v._modo === 'azar' ? ' (🎰 al azar)' : ''}`, duelo: JSON.parse(JSON.stringify(v.duelo)),
+        costo: String(Math.max(0, Math.round(num(FichaHabilidades.parseCostoSp(base0.costo)))) + (v._modo === 'elegir' ? masSp : 0))};
+      vSel = v;
+    }
     /* 🕳 Excavar (2026-10-28, dueño: también para los jugadores, habilidad miscelánea): con el mismo botón, arriba se mete bajo tierra (`excavarNo2`, 1 si
        no dice; sin SP); abajo, sale atacando con un arma cuerpo a cuerpo de Tipo 4 a 10 (Combatiente.sirveParaEmerger). El token lo maneja el mapa:
        ui.bajoTierra() (true / false; null sin token), ui.excavar() (→ true si se metió) y ui.emerger(seguir) (vtt-hexgrid/js/11 y 46). */
@@ -750,7 +769,7 @@ const FichaAcciones = (() => {
     if(FichaHabilidades.habCostoVariable(it)){ ui.pedirCostoX(it, armaPendiente); return; }
     const costoNitros = FichaBotonera.costoNitrosHab(S, it, arma);
     if(costoNitros > num(S.nitros) && !forzar){
-      ui.avisarSinNitros(costoNitros, `usar ${it.nombre}${FichaHabilidades.nitrosAtaque(it) ? ` (ataque con ${arma ? arma.nombre : 'sin arma'})` : ''}`, () => ejecutarHabilidad(S, id, armaId, true, ui));
+      ui.avisarSinNitros(costoNitros, `usar ${it.nombre}${FichaHabilidades.nitrosAtaque(it) ? ` (ataque con ${arma ? arma.nombre : 'sin arma'})` : ''}`, () => ejecutarHabilidad(S, id, armaId, true, ui, vSel));
       return;
     }
     let costoSp = FichaHabilidades.costoSpDe(S, it);   // Enfocado: sube con cada uso seguido

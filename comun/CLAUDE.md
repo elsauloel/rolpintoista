@@ -1835,6 +1835,15 @@ versión parecida en más de una, es candidato a juntar.
   para igualarlos alcanza con cambiar esa línea). `porDano` acepta `min` (sin `mas1`, el piso) y ahora viaja entero (mínimo, tope, turnos) por `efectos-golpe.js` y
   `duelo.js` (`porDanoCopia`); `identidadTurnos` viaja en el daño mágico de un arma y en el de una habilidad hasta el mapa (js/13).
 
+- **🎰 Arma elemental al azar o eligiendo** (2026-11-01, dueño: «un precio un poquito más barato en SP que te haga elegir el elemento al azar, con el
+  rodillo… y 1 SP más para elegir el elemento»), para creep Y para jugador. `azarElegir` en la habilidad = lo que suma ELEGIR sobre su costo (que es el
+  del azar): creep `{sp: 1, cd: 1}` (2 No2 + 1 SP al azar / 2 SP eligiendo; con cooldown 3 / 4 — el cd es decisión de Claude); el Support de jugador
+  tiene ahora «Arma elemental» (`support-arma-elemental`, `armaElemental: true`, `azarElegir: {sp: 1}`): 1 No2 + 2 SP al azar / 3 SP eligiendo
+  (propuesta de Claude, a revisar). La pregunta y el rodillo son comunes: `Combatiente.elegirVarianteAzar` (Confirmar.elegir; `Rodillo.girar` si la
+  pantalla lo tiene —el mapa—, si no un aviso; y un momento `rodillo` para que las demás pantallas lo vean girar: vtt-hexgrid/js/16 `rodilloMomento`,
+  con el resultado a la Crónica recién al parar). Creep: `CreepAcciones.elegirVariante` devuelve la variante con `_extra` → `ejecutarHab(…, {extra})`
+  (mapa js/12 y GM Tools js/06). Jugador: `FichaAcciones.ejecutarHabilidad` (6º parámetro `vSel`) sigue con una copia: la Ejecución del elemento y el
+  `costo` de SP de esa manera. Los creeps guardados migran solos (`Combatiente.migrarArmaElementalAzar`: 2 SP → 1, `azarElegir`, textos).
 - **🎯 Débil / Resistente / Inmune en el token** (2026-11-01): lo dibuja y lo revela el mapa (`vtt-hexgrid/js/89-debil.js`, ver `vtt-hexgrid/CLAUDE.md`); usa `Combatiente.elementoDe`, `identidadElemento`, `ARMAS_ELEMENTALES` y `CreepCalculo.resElemental`. Lo descubierto de cada creep vive en `creeps/<id>.revelado`.
 - **☀ Luz sanadora** (2026-10-31, dueño: «vamos a atribuirle luz sanadora a la luz… depende del caso, 100, 25, 50»; el Smite, el mismo día, no: «al Smite no le vamos a poner luz sanadora, pero sí marcado» — `migrarLuzSanadora` se la saca al de creep guardado, `pct: 0`): campo genérico `luzSanadora: N` (%)
   en la Ejecución (`duelo`) de una habilidad, o en el efecto `danoMagico` de un estado de arma (el Arma luminosa). Quien pega se cura ese % de la vida

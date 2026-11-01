@@ -488,7 +488,7 @@ document.addEventListener('click', async e => {
     const variante = Array.isArray(h.variantes) && h.variantes.length ? await CreepAcciones.elegirVariante(sc, h) : null;
     if(Array.isArray(h.variantes) && h.variantes.length && !variante){ toast(`${sc.nombre}: no usó ${h.nombre || 'la habilidad'}`); return; }
     const antes = {sp: CreepCalculo.spActual(sc), nitros: num(sc.nitros), cd: num(h.cdActual)};   // ↩ para devolverlo si el duelo se cancela y no cuenta (P233)
-    const p = CreepAcciones.ejecutarHab(sc, h, ESTADOS_PRESET_GM, true);
+    const p = CreepAcciones.ejecutarHab(sc, h, ESTADOS_PRESET_GM, true, variante && variante._extra ? {extra: variante._extra} : {});   // 🎰 elegir el elemento cuesta más (2026-11-01)
     if(p.error){ toast(p.error); return; }
     if(p.aviso) toast(p.aviso);
     if(typeof Duelo !== 'undefined' && Duelo.pagoHab) Duelo.pagoHab(sc.id, {habId: h.id, nombre: h.nombre || '', no2: Math.max(0, antes.nitros - num(sc.nitros)),

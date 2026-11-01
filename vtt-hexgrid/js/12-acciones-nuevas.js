@@ -700,7 +700,7 @@ async function acEjecutarHab(sc, habId){
   // ⚡ Una habilidad Flash del creep (`h.flash`, 2026-10-24, Bendecir el arma) en turno ajeno cuesta el doble (P136): el cooldown o el SP.
   const te = h.flash ? tokenEntradaCreep(sc.id) : null, doble = !!(te && modoMapa === 'combate' && esSuTurno(te[0]) === false);
   acCambiar(c => {
-    const p = CreepAcciones.ejecutarHab(c, (c.habilidades || []).find(x => x.id === habId), estadosPresetCreep(), true, {doble, ...(largo ? {extra: largo.extra} : {}), ...(quitar ? {quitar} : {})});
+    const p = CreepAcciones.ejecutarHab(c, (c.habilidades || []).find(x => x.id === habId), estadosPresetCreep(), true, {doble, ...(largo || (variante && variante._extra) ? {extra: {sp: num(largo && largo.extra.sp) + num(variante && variante._extra && variante._extra.sp), no2: num(largo && largo.extra.no2), cd: num(largo && largo.extra.cd) + num(variante && variante._extra && variante._extra.cd)}} : {}), ...(quitar ? {quitar} : {})});
     if(!p.error) p.creep = c;   // el creep ya cambiado (con el estado propio, si lo hubo), para lo que sigue
     return p;
   }).then(p => {

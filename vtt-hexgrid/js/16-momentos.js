@@ -75,6 +75,18 @@ function rayoMomento(id, d){
   if(Date.now() - t > 20000 || typeof rayoSaltoEfecto !== 'function') return;
   d.datos.saltos.forEach((s, i) => setTimeout(() => rayoSaltoEfecto(s.desde, s.hacia), i * 450));
 }
+/* 🎰 El rodillo que giró otra pantalla (2026-11-01, el Arma elemental al azar; Combatiente.elegirVarianteAzar): las demás lo ven girar una vez (solo si
+   es de recién), con «✔ Visto». La pantalla que lo giró ya lo vio. */
+const rodillosVistos = new Set();
+function rodilloMomento(id, d){
+  if(rodillosVistos.has(id) || !d.datos || !d.datos.rodillo || typeof Rodillo === 'undefined') return;
+  rodillosVistos.add(id);
+  if(fbUsuario && d.creadoPor === fbUsuario.uid) return;
+  const t = d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now();
+  if(Date.now() - t > 20000) return;
+  if(document.getElementById('rodillo-fondo')) return;   // ya hay uno abierto: queda en la Crónica
+  Rodillo.girar({...d.datos.rodillo, auto: true, aplicar: '✔ Visto'});
+}
 const caosHechos = new Set();
 function momentoRecibido(id, d){
   if(d.tipo === 'robo-pedido'){ if(typeof roboMomento === 'function') roboMomento(id, d); return; }
@@ -85,6 +97,7 @@ function momentoRecibido(id, d){
   if(d.tipo === 'diablito' && typeof diablitoMomento === 'function' && diablitoMomento(id, d)) return;   // 😈 la Botella con un diablito (js/53)   // ▶ Empieza tu turno: al centro de su dueño (js/04)   // 🫳 el robo en sigilo (js/47): solo la víctima y el GM
   if(d.tipo === 'rayo' && d.datos && Array.isArray(d.datos.saltos)) rayoMomento(id, d);
   if(d.tipo === 'desarme' && d.datos && typeof desarmeRuleta === 'function') desarmeRuleta(id, d.datos);
+  if(d.tipo === 'rodillo') rodilloMomento(id, d);   // 🎰 el rodillo de otro (el Arma elemental al azar, 2026-11-01)
   if(d.tipo === 'mal-de-ojo' && typeof malDeOjoMomento === 'function') malDeOjoMomento(id, d);   // 🧿 volver a tirar y quedarse con la peor (js/60)
   if(d.tipo === 'zona-extra' && typeof zonaExtraMomento === 'function') zonaExtraMomento(id, d);   // 🎲 la tirada extra de una zona, para quien la creó (js/66)   // 🤺 la ruleta de casillas (js/62)
   if(d.tipo === 'gancho' && typeof arrastreZonasMomento === 'function') arrastreZonasMomento(id, d);   // ⚖ Arrastrar: las zonas del camino, para el dueño (js/78)

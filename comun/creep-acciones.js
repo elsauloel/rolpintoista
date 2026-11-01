@@ -387,12 +387,20 @@ const CreepAcciones = (() => {
      para lo que sigue (terminarHab). Lo usan el mapa (vtt-hexgrid/js/12) y GM Tools (gm-toolset/js/06): antes GM Tools no preguntaba. */
   async function elegirVariante(sc, h){
     if(!Array.isArray(h && h.variantes) || !h.variantes.length) return null;
+    // 🎰 Al azar o eligiendo (el Arma elemental, 2026-11-01): elegir cuesta `azarElegir` de más (`v._extra`, para ejecutarHab: o.extra).
+    if(h.azarElegir){
+      const sp = C().modoSP(sc), ae = h.azarElegir, base = sp ? C().costoSpHab(sc, h) : Math.round(num(h.cd));
+      const r = await Combatiente.elegirVarianteAzar({quien: sc.nombre, nombre: h.nombre || 'la habilidad', variantes: h.variantes,
+        costoAzar: sp ? `${fmt(base)} SP` : `cooldown ${fmt(base)}`, costoElegir: sp ? `${fmt(base + num(ae.sp))} SP` : `cooldown ${fmt(base + num(ae.cd))}`});
+      if(!r) return null;
+      return {...r.variante, _modo: r.elegido ? 'elegir' : 'azar', ...(r.elegido ? {_extra: {sp: num(ae.sp), cd: num(ae.cd)}} : {})};
+    }
     const clave = await Confirmar.elegir(`${sc.nombre}: ¿de qué elemento es ${h.nombre || 'la habilidad'}?`, {titulo: h.nombre || 'Elegí el elemento', icono: '✨', no: 'Cancelar',
       opciones: h.variantes.map(v => ({valor: v.clave, texto: `${v.icono || ''} ${v.nombre}`.trim(), detalle: v.que || ''}))});
     return clave ? h.variantes.find(v => v.clave === clave) || null : null;
   }
   const conVariante = (h, v) => v && h ? {...h, nombre: `${h.nombre}: ${v.nombre}`, duelo: JSON.parse(JSON.stringify(v.duelo))} : h;
-  const varianteTxt = (sc, h, v) => `${v.icono || '✨'} ${sc.nombre}: ${h.nombre}, de ${v.nombre} (${v.que})`;
+  const varianteTxt = (sc, h, v) => `${v.icono || '✨'} ${sc.nombre}: ${h.nombre}, de ${v.nombre}${v._modo === 'azar' ? ' (🎰 al azar)' : v._modo === 'elegir' ? ' (✋ elegido)' : ''} (${v.que})`;
   // 💧 Modo SP (2026-10-20): si no le alcanza el SP, pregunta y deja seguir (queda en 0). → Promise<bool>.
   async function confirmarSP(sc, h){
     if(!C().modoSP(sc)) return true;
@@ -478,7 +486,7 @@ const CreepAcciones = (() => {
     if(num(h.curaHp) > 0) partes.push(`+${fmt(num(h.curaHp))} HP`);
     if(falta) partes.push(`⚠ ${falta}: se ejecutó como semiautomática`);
     if(p.costoSp) partes.push(`−${fmt(p.costoSp)} SP (quedan ${fmt(C().spActual(sc))})`);   // 💧 modo SP
-    else if(h.cd > 0) partes.push(`cooldown ${fmt(num(h.cd))} turno(s)`);
+    else if(h.cd > 0) partes.push(`cooldown ${fmt(Math.max(num(h.cd), num(h.cdActual)))} turno(s)`);   // (el de más de elegir el elemento, 2026-11-01)
     if(efecto) partes.push(efecto.permanente || !num(efecto.turnos) ? `${efecto.nombre} (sin límite)` : `${efecto.nombre} (${fmt(efecto.turnos)}t)`);   // (2026-10-24: Carga arcana decía «0t»)
     ui.toast(`${h.nombre||'Habilidad'} ${partes.join(' · ')}`);
   }

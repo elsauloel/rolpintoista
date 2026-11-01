@@ -851,8 +851,10 @@
   // 🔥❄⚡🧪☠☀🌑 Auditada (dueño, 2026-10-21, el Support, «arma elemental»; 2026-10-31: las cinco de antes —Arma ígnea, helada, eléctrica, ácida y
   // venenosa, una por elemento— pasan a ser UNA sola que elige el elemento al usarla, con +1d6 y dos elementos más, luz y siniestro). 2 No2 y 2 SP,
   // o cooldown 3. Sirve igual con armas naturales. Sin elegir (si algo la lanza sin preguntar), la de fuego.
-  H('Arma elemental', 'B', '*', 'a', 3, {detalle: Combatiente.ARMA_ELEMENTAL.detalle,
-    no2: 2, spCosto: 2, auditada: true, cuentaComoAtaque: true, ataqueTxt: Combatiente.ARMA_ELEMENTAL.ataqueTxt,
+  // 🎰 (2026-11-01, dueño: «un precio un poquito más barato en SP que te haga elegir el elemento al azar, con el rodillo… y 1 SP más para elegir»):
+  // al azar 2 No2 y 1 SP (o cooldown 3); eligiendo, 1 SP más (o cooldown 4) — `azarElegir`, Combatiente.AZAR_ELEGIR.
+  H('Arma elemental', 'B', '*', 'a', 3, {detalle: Combatiente.ARMA_ELEMENTAL.detalle, azarElegir: {...Combatiente.AZAR_ELEGIR},
+    no2: 2, spCosto: 1, auditada: true, cuentaComoAtaque: true, ataqueTxt: Combatiente.ARMA_ELEMENTAL.ataqueTxt,
     duelo: duAE(ARMAS_ELEM[0].estado), variantes: Combatiente.armaElementalVariantes()});
   // 🧿 Auditada (dueño, 2026-10-21; el Debuffer, «maleficios»): el Enyetar de los personajes, para creeps, con Flash (en turno ajeno, el doble) y el botón
   // 🧿 del GM (vtt-hexgrid/js/60). Los números, los del Enyetar: 5 SP (sin No2) o cooldown 3.

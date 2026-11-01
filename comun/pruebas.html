@@ -42,10 +42,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 </script>
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
-<script src="combatiente.js?v=20261101miedo2"></script>
-<script src="creep-calculo.js?v=20261101no2"></script>
+<script src="combatiente.js?v=20261101azar2"></script>
+<script src="creep-calculo.js?v=20261101azar"></script>
 <script src="creep-botonera.js"></script>
-<script src="creep-acciones.js?v=20261101no2"></script>
+<script src="creep-acciones.js?v=20261101azar2"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
@@ -109,9 +109,9 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
-<script src="skills-clase.js?v=20261101tienda"></script>
+<script src="skills-clase.js?v=20261101azar"></script>
 <script src="creeps-base.js"></script>
-<script src="skills-creep-base.js?v=20261101miedo"></script>
+<script src="skills-creep-base.js?v=20261101azar"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
 <script>
@@ -1647,6 +1647,16 @@ prueba('🔥 Arma elemental, una sola (2026-10-31): siete elementos, +1d6, tóxi
       'luz', 'siniestro', 2, 'Punto débil', 2, 1,
       'Arma elemental,Golpe', 'x1', 2, 7,
       'Arma siniestra']);
+});
+prueba('🎰 Arma elemental al azar o eligiendo (2026-11-01): creep 1 SP / 2 SP (cooldown 3 / 4), los guardados migran, y la del Support de jugador', () => {
+  const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Arma elemental').datos, 2);
+  const sc = CreepCalculo.normalizar({nombre: 'Chamán', habilidades: [{id: 'y1', nombre: 'Arma elemental', spCosto: 2, cd: 3, variantes: Combatiente.armaElementalVariantes(), duelo: Combatiente.armaElementalDuelo('Arma ígnea')}]});
+  const sup = CLASES_SKILLS.find(c => c.id === 'support').habilidades.find(x => x.id === 'support-arma-elemental');
+  const vs = Combatiente.armaElementalVariantes(), idx = new Set(Array.from({length: 200}, () => Combatiente.varianteAlAzar(vs)));
+  igual([h.spCosto, h.cd, JSON.stringify(h.azarElegir), sc.habilidades[0].spCosto, JSON.stringify(sc.habilidades[0].azarElegir), /al azar/.test(sc.habilidades[0].detalle),
+      !!sup, sup && sup.costo, sup && sup.nitrosCosto, sup && sup.armaElemental, sup && sup.azarElegir.sp, Math.min(...idx), Math.max(...idx), Combatiente.varianteAlAzar([])],
+    [1, 3, '{"sp":1,"cd":1}', 1, '{"sp":1,"cd":1}', true,
+      true, '2', 1, true, 1, 0, 6, -1]);
 });
 prueba('✨ Carga Elemental (2026-10-31): tóxico 2 + 1 cada 4, luz y siniestro (Herida sombría y Punto débil 2 turnos)', () => {
   const C = Combatiente.CARGAS, tox = C.toxico.duelo.porDano;

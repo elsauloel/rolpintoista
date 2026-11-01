@@ -219,6 +219,7 @@
 - ✅ **Arma elemental** (2026-10-31, dueño: las cinco de abajo pasan a ser UNA habilidad que elige el elemento al usarla, **+1d6** en vez de 1d4, el tóxico
   con mínimo 2 y dos elementos más: ☀ luz (Marcado) y 🌑 siniestro (Herida sombría y Punto débil, 2 turnos)). Mismo costo (2 No2 y 2 SP, o cooldown 3).
   Los creeps guardados con las viejas se pasan solos a la nueva (`Combatiente.migrarArmasElementales`). Probada en el mapa (luz, siniestro, tóxico).
+  🎰 (2026-11-01, dueño) al azar (el rodillo) 2 No2 + 1 SP, o eligiendo 2 SP (cooldown 3 / 4); también para el Support de jugador (1 No2 + 2 / 3 SP, propuesta de Claude).
 - (Historia) ✅ **Arma ígnea, Arma helada, Arma eléctrica, Arma ácida, Arma venenosa** (Support, «arma elemental», 2026-10-21, dueño: «que cada creep tenga
   uno… y el daño especial se sume al daño habitual del ataque»): le encanta el arma a un aliado a su Rango (o la propia) **3 turnos de ese aliado**: cada
   golpe con arma que pega suma **+1d4 del elemento**, daño directo (solo lo frena la resistencia a ese elemento; no se multiplica con el crítico), y lo

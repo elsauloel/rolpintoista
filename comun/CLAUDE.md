@@ -1786,7 +1786,7 @@ versión parecida en más de una, es candidato a juntar.
 
 - **☀ Luz sanadora** (2026-10-31, dueño: «vamos a atribuirle luz sanadora a la luz… depende del caso, 100, 25, 50»; el Smite, el mismo día, no: «al Smite no le vamos a poner luz sanadora, pero sí marcado» — `migrarLuzSanadora` se la saca al de creep guardado, `pct: 0`): campo genérico `luzSanadora: N` (%)
   en la Ejecución (`duelo`) de una habilidad, o en el efecto `danoMagico` de un estado de arma (el Arma luminosa). Quien pega se cura ese % de la vida
-  que le sacó el golpe (después de resistencias y del ×1,5; para abajo; 0 = nada; sin pasar su máximo, no da Vida extra); si le pega a varios (área,
+  que le sacó el golpe (después de resistencias y del ×1,5; para abajo, pero mínimo 1 si le sacó vida —dueño, 2026-11-01—; sin pasar su máximo, no da Vida extra); si le pega a varios (área,
   línea), una vez por cada uno. Viaja por `Combatiente.habEjecucion` → `Duelo.limpiarHab` (`hab.dano.luzSanadora`) o por `EfectosGolpe.normalizar` →
   `dano.magico.luzSanadora`; lo resuelve el mapa del GM en un solo lugar (`dueloAplicarDano` de vtt-hexgrid/js/13, con `dueloDrenar(d, monto,
   {sinExtra: true})`, las chispitas verdes de js/70) y el duelo lo muestra en verde (`dano.luzSanadora` = {quien, monto, pct, hpAntes, hpDespues}).

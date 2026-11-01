@@ -2075,8 +2075,8 @@ const Combatiente = (() => {
      vida que le saca el golpe de luz (`duelo.luzSanadora`; lo resuelve el mapa, vtt-hexgrid/js/13 dueloAplicarDano). Las habilidades de creep que ya
      estaban guardadas en un creep se ponen al día solas (una vez: si ya tienen el campo, no se toca). → true si cambió algo. */
   const LUZ_SANADORA_CREEP = {
-    'Smite': {pct: 50, txt: ' Luz sanadora 50 %: el creep se cura la mitad (para abajo) de la vida que le saca.'},   // (se la sacamos un rato y volvió el mismo día)
-    'Destello revelador': {pct: 25, txt: ' Luz sanadora 25 %: el creep se cura la cuarta parte (para abajo) de la vida que le saca a cada uno.'},
+    'Smite': {pct: 50, txt: ' Luz sanadora 50 %: el creep se cura la mitad (para abajo, mínimo 1) de la vida que le saca.'},   // (se la sacamos un rato y volvió el mismo día)
+    'Destello revelador': {pct: 25, txt: ' Luz sanadora 25 %: el creep se cura la cuarta parte (para abajo, mínimo 1) de la vida que le saca a cada uno.'},
     // Lanza arcana: la tuvo un rato (25 %) y se la sacamos (dueño, 2026-10-31: «no es una lanza de luz»): pct 0 = sacarla.
     'Lanza arcana': {pct: 0, txt: ' Luz sanadora 25 %: se cura la cuarta parte (para abajo) de la vida que le saca a cada uno.'},
   };
@@ -2092,6 +2092,8 @@ const Combatiente = (() => {
         if(rn.texto) ['detalle', 'ataqueTxt'].forEach(k => { if(typeof h[k] === 'string') h[k] = h[k].replace(rn.texto[0], rn.texto[1]); });
         cambio = true;
       }
+      // el mínimo 1 (dueño, 2026-11-01): el texto guardado de antes lo dice
+      if(h && typeof h.detalle === 'string' && !(LUZ_SANADORA_CREEP[h.nombre] && !LUZ_SANADORA_CREEP[h.nombre].pct) && /Luz sanadora/.test(h.detalle) && h.detalle.includes('(para abajo) de la vida')){ h.detalle = h.detalle.replace('(para abajo) de la vida', '(para abajo, mínimo 1) de la vida'); cambio = true; }
       const m = h && LUZ_SANADORA_CREEP[h.nombre];
       if(!m || !h.duelo || typeof h.duelo !== 'object' || !h.duelo.dano) return;
       if(!m.pct){   // la que se le sacó: si la tiene, afuera el campo y su texto

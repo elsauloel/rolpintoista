@@ -1834,11 +1834,11 @@ async function dueloAplicarDano(d){
     const drena = d.hab && d.hab.dano && d.hab.dano.drena ? await dueloDrenar(d, num(d.hab.dano.drenaPct) > 0 ? Math.ceil(perdio * num(d.hab.dano.drenaPct) / 100) : perdio)
       : !d.hab && num(dn.drenaPct) > 0 ? await dueloDrenar(d, Math.ceil(perdio * num(dn.drenaPct) / 100)) : null;
     // ☀ Luz sanadora (dueño, 2026-10-31: «luz sanadora al 100 %… depende del caso, 100, 25, 50»): quien pega se cura ese % de la vida que le sacó el
-    // daño de luz (la habilidad: `hab.dano.luzSanadora`; el arma con luz, Arma luminosa: `dano.magico.luzSanadora`). Para abajo; 0, nada. Sin pasar
+    // daño de luz (la habilidad: `hab.dano.luzSanadora`; el arma con luz, Arma luminosa: `dano.magico.luzSanadora`). Para abajo, pero mínimo 1 si le sacó vida (dueño, 2026-11-01: «que el mínimo sea 1 igual de curación»); si no le sacó, nada. Sin pasar
     // su máximo (no da Vida extra). Si le pega a varios, se cura por cada uno (cada duelo es uno).
     const lsPct = d.hab ? num(d.hab.dano && d.hab.dano.luzSanadora) : num(dn.magico && dn.magico.luzSanadora);
     const lsSaco = res.r.invulnerable ? 0 : d.hab ? perdio : magico ? Math.max(0, num(magico.hpAntes) - num(magico.hpDespues)) : 0;
-    const lsMonto = lsPct > 0 ? Math.floor(lsSaco * Math.min(100, lsPct) / 100) : 0;
+    const lsMonto = lsPct > 0 && lsSaco > 0 ? Math.max(1, Math.floor(lsSaco * Math.min(100, lsPct) / 100)) : 0;   // mínimo 1 si sacó vida (dueño, 2026-11-01)
     const luzSanadora = lsMonto > 0 ? {...(await dueloDrenar(d, lsMonto, {sinExtra: true})), pct: Math.min(100, lsPct)} : null;
     if(luzSanadora && !luzSanadora.manual && typeof curaBurbujas === 'function') try{ curaBurbujas([[d.atacante.tokenId]]); }catch(e){}   // las chispitas verdes de la cura (js/70)
     // ✨ El estado según el daño que entró (2026-10-13, Carga Elemental: Escarcha, Veneno, Armadura rota): `hab.dano.porDano`.

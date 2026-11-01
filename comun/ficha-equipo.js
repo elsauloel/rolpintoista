@@ -125,7 +125,10 @@ const FichaEquipo = (() => {
      Un arma (vaina o correa) o un escudo (solo correa) que está «a mano» (`aMano`) se equipa sin gastar No2; y uno equipado, si queda una
      vaina o correa libre, se guarda ahí sin gastar No2. Cuántas hay: los stats `vainas` y `correas`. Fuera de combate no cuesta nada igual. */
   const esEscudo = it => String((it && it.tipoItem) || '').startsWith('escudo');
-  const aManoApto = it => !!it && (FichaCombate.esArma(it.tipoItem) || esEscudo(it));
+  // Todo lo que va en la mano (2026-11-01, dueño: «en la correa pueden ir armas o escudos, cualquier cosa que vaya en la mano: talismanes, armas
+  // especiales, todo»): armas de una y dos manos (las varitas son arma_1m) y escudos (los orbes y talismanes son escudo_1m). La vaina del cinturón,
+  // las armas; la correa de la mochila, cualquiera de las dos cosas (aManoEntra). Lo usa también el intercambio (recibir «a la vaina / correa»).
+  const aManoApto = it => !!it && (FichaCombate.esArma(it.tipoItem) || esEscudo(it) || (FichaCombate.esMano && FichaCombate.esMano(it.tipoItem)));
   function aManoCap(S){ const f = FichaCalculo.calcular(S).final; return {vainas: Math.max(0, Math.round(num(f.vainas))), correas: Math.max(0, Math.round(num(f.correas)))}; }
   // ¿Entra `it` a mano, junto con los que ya están (salvo `sin`)?
   function aManoEntra(S, it, sin){
@@ -632,6 +635,6 @@ const FichaEquipo = (() => {
     <div style="display:flex;gap:8px;align-items:stretch">${col(equipado, 'Equipado')}${col(item, 'Nuevo')}</div>`;
   }
 
-  return {talentoReparar, topeTalento, restoTalento, repararHtml, repararTalento, usarOleo, repararClic, SLOT_DEFS, TIER_COLOR, veCalidad, STAT_COMPARABLE_LABEL, CATEGORIAS, CATEGORIA_LABEL, ranuras, mochilaUsada, capMochila, BASE_CINTURON, esFlecha, carcajDe, capCarcaj, carcajUsado, flechasDelCarcaj, alCarcaj, delCarcaj, gastarFlecha, devolverFlecha, flechaTxt, carcajHtml, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, alCinturon, textoAlCinturon, aManoCap, aManoEntra, alternarAMano, slots, slotOcupado, defValor, statsComparables, conCosto, equipar, reemplazar,
+  return {talentoReparar, topeTalento, restoTalento, repararHtml, repararTalento, usarOleo, repararClic, SLOT_DEFS, TIER_COLOR, veCalidad, STAT_COMPARABLE_LABEL, CATEGORIAS, CATEGORIA_LABEL, ranuras, mochilaUsada, capMochila, BASE_CINTURON, esFlecha, carcajDe, capCarcaj, carcajUsado, flechasDelCarcaj, alCarcaj, delCarcaj, gastarFlecha, devolverFlecha, flechaTxt, carcajHtml, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, alCinturon, textoAlCinturon, aManoCap, aManoEntra, aManoApto, esEscudo, alternarAMano, slots, slotOcupado, defValor, statsComparables, conCosto, equipar, reemplazar,
     modTags, thumb, statTxt, html, slotLlenoHtml, compararHtml};
 })();

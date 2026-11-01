@@ -128,7 +128,10 @@ const Intercambio = (() => {
   /* ---------- En combate: el costo en No2 ---------- */
   const finalDe = S => { try{ return FichaCalculo.calcular(S).final; }catch(e){ return {}; } };
   // Pasarlo en combate: 1 desde el cinturón (0 con Pasamanos), 2 desde la mochila.
-  const costoCombate = (S, key) => key === 'cinturon' ? (num(finalDe(S).pasamanos) > 0 ? 0 : 1) : 2;
+  // 🗡 Lo que sale de una vaina o una correa (2026-11-01, dueño: «en la correa pueden ir armas o escudos, cualquier cosa que vaya en la mano») se paga
+  // como del cinturón: está a mano. `origenDe(key, it)`: 'correa' si está en la mochila pero colgado a mano (`aMano`).
+  const origenDe = (key, it) => key === 'inventario' && it && it.aMano ? 'correa' : key;
+  const costoCombate = (S, key) => key === 'cinturon' || key === 'correa' ? (num(finalDe(S).pasamanos) > 0 ? 0 : 1) : 2;
   const COSTO_ALFORJA = 1;
   /* 💸 Ambos pagan (dueño, 2026-11-01: «Ambos pagan. De mochila a mano: el dueño de la mochila paga 2 y el que recibe paga 1. De cinturón a mano:
      1 cada uno. De mochila a mochila: 2 cada uno. El personaje caído no paga No2»). En combate, cuando se concreta (al aceptar), cada uno lo
@@ -136,9 +139,20 @@ const Intercambio = (() => {
      (`destino`): 'mano' (al cinturón, listo para usar: solo un consumible) 1, 'mochila' 2. Un caído (0 de vida) no paga. Si se rechaza, nadie. */
   const caido = S => !!S && num(S.hp) <= 0;
   const costoEntrega = (S, key) => caido(S) ? 0 : costoCombate(S, key);
-  const COSTO_DESTINO = {mano: 1, mochila: 2};
+  const COSTO_DESTINO = {mano: 1, correa: 1, mochila: 2};   // 'mano' = al cinturón; 'correa' = a una vaina o correa libre (queda a mano)
   const costoRecibe = (S, destino) => caido(S) ? 0 : (COSTO_DESTINO[destino] || 2);
-  const DESTINO_TXT = {mano: 'al cinturón', mochila: 'a la mochila'}, ORIGEN_TXT = {cinturon: 'del cinturón', inventario: 'de la mochila'};
+  const DESTINO_TXT = {mano: 'al cinturón', correa: 'a la vaina / correa', mochila: 'a la mochila'}, ORIGEN_TXT = {cinturon: 'del cinturón', correa: 'de la vaina / correa', inventario: 'de la mochila'};
+  // 🗡 ¿Va en una vaina o una correa? Lo de la mano (armas, varitas, escudos, orbes) y si le queda una libre (FichaEquipo.aManoEntra, sobre una copia).
+  const esDeMano = it => !!it && typeof FichaEquipo !== 'undefined' && !!FichaEquipo.aManoApto && FichaEquipo.aManoApto(it);
+  const tieneCorreas = S => { if(!S || typeof FichaEquipo === 'undefined' || !FichaEquipo.aManoCap) return false; try{ const c = FichaEquipo.aManoCap(S); return c.vainas + c.correas > 0; }catch(e){ return false; } };
+  function entraEnCorrea(S, it){
+    if(!esDeMano(it) || !tieneCorreas(S)) return false;
+    try{ return FichaEquipo.aManoEntra(S, {...structuredClone(it), id: '__nuevo', aMano: false, equipado: false}); }catch(e){ return false; }
+  }
+  const sinCorreaTxt = it => FichaEquipo.esEscudo && FichaEquipo.esEscudo(it) ? 'no te queda una correa libre (un escudo va en la correa de la mochila, no en la vaina del cinturón)' : 'no te queda una vaina ni una correa libre';
+  // 😵 El caído (dueño, 2026-11-01: «el caído no puede tomar la acción de dar o pedir… igual sí tiene que poder, pero te tiene que advertir: estás
+  // inconsciente»): puede, con el cartel; sigue sin pagar No2.
+  const avisoInconsciente = S => !caido(S) ? Promise.resolve(true) : Confirmar.preguntar(`${nombreDe(S)} está inconsciente (0 de vida). ¿Querés hacerlo igual?`, {titulo: '😵 Estás inconsciente', si: 'Sí, igual', no: 'No'});
   // ¿Entra en el cinturón (destino 'mano', el nombre interno)? Se prueba sobre una copia.
   function entraEnMano(S, it){
     if(!it || !it.consumible || typeof FichaEquipo === 'undefined') return false;
@@ -178,13 +192,14 @@ const Intercambio = (() => {
       if(!f) return 'Ese ítem ya no está';
       if(f.it.equipado) return 'Está equipado: sacalo primero';
       if(reservado(f.it)) return 'Ya está ofrecido';
+      if(!(await avisoInconsciente(S))) return 'cancelado';
       const total = num(f.it.unidades) || 1, k = f.it.consumible ? Math.max(1, Math.min(total, Math.round(num(que.unidades) || total))) : total;
       const json = JSON.stringify(copia(f.it, f.it.consumible ? k : undefined));
       if(json.length > 200000) return 'El ítem es demasiado grande para mandarlo';
       const combate = !!(host && host.enCombate());
-      const costo = combate ? costoEntrega(S, f.key) : 0;   // 💸 se cobra cuando lo acepte (reconciliar), no ahora
+      const costo = combate ? costoEntrega(S, origenDe(f.key, f.it)) : 0;   // 💸 se cobra cuando lo acepte (reconciliar), no ahora
       if(costo > 0 && num(S.nitros) < costo && !(await Confirmar.preguntar(`Cuando lo acepte vas a pagar ${fmt(costo)} No2 y tenés ${fmt(num(S.nitros))}. ¿Ofrecérselo igual?`, {titulo: 'Sin No2', si: 'Ofrecer igual'}))) return 'cancelado';
-      await ref.set({...base, tipo: 'item', nombre: String(f.it.nombre || '').slice(0, 80), json, cantidad: f.it.consumible ? k : 1, despojoNombre: f.key});   // despojoNombre: de dónde sale (cinturon | inventario)
+      await ref.set({...base, tipo: 'item', nombre: String(f.it.nombre || '').slice(0, 80), json, cantidad: f.it.consumible ? k : 1, despojoNombre: origenDe(f.key, f.it)});   // despojoNombre: de dónde sale (cinturon | correa | inventario)
       const parte = separar(S, f, k);
       parte.reservado = ref.id; parte.reservadoPara = base.paraNombre;
       return null;
@@ -216,6 +231,7 @@ const Intercambio = (() => {
       if(!it) return '';
       const nuevo = aMochila(S, it);
       if(destino === 'mochila') return ' (a la mochila)';
+      if(destino === 'correa'){ if(FichaEquipo.aManoEntra(S, nuevo)){ nuevo.aMano = true; return ' (a la vaina / correa: a mano)'; } return ' (a la mochila: no quedaba vaina ni correa libre)'; }
       if((destino === 'mano' || (!destino && host && host.enCombate())) && nuevo.consumible && typeof FichaEquipo !== 'undefined'){   // al cinturón si entra
         const r = FichaEquipo.alCinturon(S, nuevo, num(it.unidades) || 1);
         if(r.movidas) return ' (al cinturón)';
@@ -228,12 +244,13 @@ const Intercambio = (() => {
   async function aceptar(p, destino){
     if(!host || !host.maneja(p.paraFicha)) return;
     const combate = !!host.enCombate() && p.tipo === 'item';
-    destino = combate ? (destino === 'mano' ? 'mano' : 'mochila') : '';
+    destino = combate ? (['mano', 'correa'].includes(destino) ? destino : 'mochila') : '';
     await host.con(p.paraFicha, async S => {
       if(p.tipo === 'item'){
         let it = null; try{ it = JSON.parse(p.json || 'null'); }catch(e){}
         if(!it){ host.toast('No se pudo leer el ítem'); return false; }
         if(destino === 'mano' && !entraEnMano(S, it)){ host.toast(`${p.nombre} no entra en el cinturón (está lleno o no es un consumible): aceptalo a la mochila o hacé lugar.`); return false; }
+        if(destino === 'correa' && !entraEnCorrea(S, it)){ host.toast(`${p.nombre}: ${esDeMano(it) ? sinCorreaTxt(it) : 'solo lo que va en la mano va en una vaina o correa'}. Aceptalo a la mochila o hacé lugar.`); return false; }
         if(destino !== 'mano' && !entraEnMochila(S, it)){ host.toast(`Mochila llena: ${p.nombre} no entra. Hacé lugar y aceptalo de nuevo.`); return false; }
       }
       const costo = combate ? costoRecibe(S, destino) : 0;   // 💸 lo suyo, al aceptar (2026-11-01)
@@ -318,7 +335,8 @@ const Intercambio = (() => {
           if(p.estado === 'aceptado'){
             if(p.tipo === 'item'){
               // 💸 lo suyo, recién ahora (2026-11-01): según de dónde salió (la reserva lo dice; si no, lo anotado en el aviso)
-              const key = ['inventario', 'cinturon'].find(k => (S[k] || []).some(x => x && x.reservado === p.id)) || p.despojoNombre || 'inventario';
+              const kRes = ['inventario', 'cinturon'].find(k => (S[k] || []).some(x => x && x.reservado === p.id));
+              const key = kRes ? origenDe(kRes, S[kRes].find(x => x && x.reservado === p.id)) : (p.despojoNombre || 'inventario');
               const costo = host.enCombate() ? costoEntrega(S, key) : 0, antes = num(S.nitros);
               if(costo > 0) cobrarNitros(S, costo, `le pasó ${p.nombre} a ${p.paraNombre}`);
               const pagado = antes - num(S.nitros);
@@ -437,13 +455,13 @@ const Intercambio = (() => {
             const combate = !!(host && host.enCombate());
             const [origen, destPedido] = String(p.despojoNombre || '').split('>');
             let it0 = null; try{ it0 = JSON.parse(p.json || 'null'); }catch(e){}
-            const destino = destPedido === 'mano' && entraEnMano(S, it0) ? 'mano' : 'mochila';   // si en el cinturón ya no entra, va a la mochila (y paga eso)
+            const destino = destPedido === 'mano' && entraEnMano(S, it0) ? 'mano' : destPedido === 'correa' && entraEnCorrea(S, it0) ? 'correa' : 'mochila';   // si en el cinturón (o la correa) ya no entra, va a la mochila (y paga eso)
             const costo = combate ? costoRecibe(S, destino) : 0;
             const antes = num(S.nitros);
             cobrarNitros(S, costo, `le pidió ${p.nombre} a ${p.deNombre}`);
             const pagado = antes - num(S.nitros);
             const donde = recibir(S, p, combate ? destino : 'mochila') || '';
-            host.toast(`🤝 ${p.deNombre} te dio ${paqueteTxt(p)}${donde}${destPedido === 'mano' && destino !== 'mano' ? ' (en el cinturón no entraba)' : ''}`);
+            host.toast(`🤝 ${p.deNombre} te dio ${paqueteTxt(p)}${donde}${destPedido === 'mano' && destino !== 'mano' ? ' (en el cinturón no entraba)' : destPedido === 'correa' && destino !== 'correa' ? ' (no quedaba vaina ni correa libre: va a la mochila)' : ''}`);
             if(typeof mesaLinea === 'function') mesaLinea(`🤝 ${p.deNombre} le pasó ${paqueteTxt(p)} a ${p.paraNombre}, que se lo pidió${combate ? ` (${ORIGEN_TXT[origen] || ''} → ${DESTINO_TXT[destino]} · ${p.paraNombre} ${costo ? '−' + fmt(pagado) + ' No2' + (pagado < costo ? ` de ${fmt(costo)}: no le alcanzaban` : '') : caido(S) ? 'no paga: está caído' : 'sin No2'})` : ''}`, 'recompensa');
             hubo = true;
             continue;
@@ -469,10 +487,11 @@ const Intercambio = (() => {
   const esMano = p => p && p.tipo === 'pedido' && p.despojo === 'mano';
   async function pedirMano(S, miFicha, aliado, it, key, destino){
     const combate = !!(host && host.enCombate());
-    destino = destino === 'mano' ? 'mano' : 'mochila';
+    destino = ['mano', 'correa'].includes(destino) ? destino : 'mochila';
+    if(!(await avisoInconsciente(S))) return 'cancelado';
     const costo = combate ? costoRecibe(S, destino) : 0;   // lo paga al recibirlo; acá solo avisa si no le van a alcanzar
     if(costo > 0 && num(S.nitros) < costo && !(await Confirmar.preguntar(`Cuando te lo dé vas a pagar ${fmt(costo)} No2 y tenés ${fmt(num(S.nitros))}. ¿Pedírselo igual?`, {titulo: 'Sin No2', si: 'Pedir igual'}))) return 'cancelado';
-    await col('paquetes').add({tipo: 'pedido', nombre: String(it.nombre || '').slice(0, 80), json: '', itemId: it.id, cantidad: 1, despojo: 'mano', despojoNombre: (key === 'cinturon' ? 'cinturon' : 'inventario') + '>' + destino,
+    await col('paquetes').add({tipo: 'pedido', nombre: String(it.nombre || '').slice(0, 80), json: '', itemId: it.id, cantidad: 1, despojo: 'mano', despojoNombre: (['cinturon', 'correa'].includes(key) ? key : 'inventario') + '>' + destino,
       deFicha: aliado.id, deNombre: String(aliado.nombre || '').slice(0, 60), paraFicha: miFicha, paraNombre: nombreDe(S), creadoPor: fbUsuario.uid,
       uids: [...new Set([fbUsuario.uid, aliado.duenoUid || '', (fichas.find(f => f.id === miFicha) || {}).duenoUid || ''].filter(Boolean))],
       estado: 'pendiente', resolvio: '', creado: ts()});
@@ -485,7 +504,9 @@ const Intercambio = (() => {
       const f = buscar(S, p.itemId);
       if(!f || f.it.equipado || reservado(f.it) || (f.it.consumible && !(num(f.it.unidades) > 0))){ host.toast(`${p.nombre}: ya no lo tenés suelto (equipado, ofrecido o gastado)`); await rechazar(p); return false; }
       const combate = !!host.enCombate();
-      const costo = combate ? costoEntrega(S, f.key) : 0;   // 💸 lo suyo, al aceptar (2026-11-01)
+      if(!(await avisoInconsciente(S))) return false;
+      const origenP = origenDe(f.key, f.it);
+      const costo = combate ? costoEntrega(S, origenP) : 0;   // 💸 lo suyo, al aceptar (2026-11-01)
       if(costo > 0 && num(S.nitros) < costo && !(await preguntarNitros(S, costo))) return false;
       const k = f.it.consumible ? 1 : undefined;
       const json = JSON.stringify(copia(f.it, k));
@@ -506,7 +527,7 @@ const Intercambio = (() => {
       const antes = num(S.nitros);
       if(costo > 0) cobrarNitros(S, costo, `le dio ${p.nombre} a ${p.paraNombre}`);
       const pagado = antes - num(S.nitros);
-      if(combate && typeof mesaLinea === 'function') mesaLinea(`🤝 ${p.deNombre} le da ${p.nombre} a ${p.paraNombre}, que se lo pidió (${ORIGEN_TXT[f.key]} · ${p.deNombre} ${costo ? '−' + fmt(pagado) + ' No2' + (pagado < costo ? ` de ${fmt(costo)}: no le alcanzaban` : '') : caido(S) ? 'no paga: está caído' : 'sin No2: Pasamanos'})`);
+      if(combate && typeof mesaLinea === 'function') mesaLinea(`🤝 ${p.deNombre} le da ${p.nombre} a ${p.paraNombre}, que se lo pidió (${ORIGEN_TXT[origenP]} · ${p.deNombre} ${costo ? '−' + fmt(pagado) + ' No2' + (pagado < costo ? ` de ${fmt(costo)}: no le alcanzaban` : '') : caido(S) ? 'no paga: está caído' : 'sin No2: Pasamanos'})`);
       host.toast(`🤝 Le diste ${p.nombre} a ${p.paraNombre}`);
       return true;
     });
@@ -566,31 +587,50 @@ const Intercambio = (() => {
   }
   // El cartel de lo que te ofrecen, uno por vez.
   let cartel = null;
+  // Quien recibe, para el cartel (sus vainas y correas, si está caído): el que maneja esta pantalla o, si no lo tiene abierto, leído una vez (2026-11-01).
+  const leidosCartel = new Map();
+  function leerParaCartel(id){
+    const S = host.leer(id); if(S) return S;
+    if(leidosCartel.has(id)) return leidosCartel.get(id) || null;
+    leidosCartel.set(id, null);
+    if(typeof FichaGuardado !== 'undefined') FichaGuardado.cargar(fbDb, fbRutaCampana(`fichas/${id}`)).then(r => {
+      if(!r || !r.S) return;
+      leidosCartel.set(id, r.S); setTimeout(() => leidosCartel.delete(id), 20000);
+      if(cartel){ cartel.remove(); cartel = null; } mostrarPendientes();
+    }).catch(() => {});
+    return null;
+  }
   function mostrarPendientes(){
     const p = paquetes.find(x => x.tipo !== 'pedido' && x.estado === 'pendiente' && host.maneja(x.paraFicha))
       || paquetes.find(x => esMano(x) && x.estado === 'pendiente' && host.maneja(x.deFicha));   // 🤝 te piden algo (2026-11-01)
     if(!p){ if(cartel){ cartel.remove(); cartel = null; } return; }
-    if(cartel && cartel.dataset.id === p.id) return;
-    estilos();
-    if(cartel) cartel.remove();
-    let it = null; if(p.tipo === 'item'){ try{ it = JSON.parse(p.json || 'null'); }catch(e){} }
     const pide = esMano(p);
     // 💸 Los botones (2026-11-01): en combate, quien recibe elige adónde lo pone y ve lo que paga (un caído, 0); quien da, lo que le cuesta a él.
     const combate = !!host.enCombate();
-    const yo = host.leer(pide ? p.deFicha : p.paraFicha), yoCaido = caido(yo);
+    const yo = leerParaCartel(pide ? p.deFicha : p.paraFicha), yoCaido = caido(yo);
+    // se rearma si cambió algo de lo que muestra (el modo del mapa llega después del aviso; quien recibe se lee después)
+    const clave = [p.id, combate, !!yo, yoCaido].join('|');
+    if(cartel && cartel.dataset.id === p.id && cartel.dataset.k === clave) return;
+    estilos();
+    if(cartel) cartel.remove();
+    let it = null; if(p.tipo === 'item'){ try{ it = JSON.parse(p.json || 'null'); }catch(e){} }
     const n = c => yoCaido ? '0 No2 (caído)' : `${fmt(c)} No2`;
     const [origen, destPedido] = String(p.despojoNombre || '').split('>');
     let botones = '<button type="button" data-ix-acepto>Aceptar</button>', pideTxt = '';
     if(pide){
-      if(combate) botones = `<button type="button" data-ix-acepto>Dárselo · ${yo ? n(costoEntrega(yo, origen)) : (origen === 'cinturon' ? '1' : '2') + ' No2'}</button>`;
-      pideTxt = `<p class="ix-hint">Sale ${origen === 'cinturon' ? 'de tu cinturón' : 'de tu mochila'}${combate ? ` y lo quiere ${DESTINO_TXT[destPedido] || 'a la mochila'}: los dos pagan al dárselo (vos por sacarlo, él por guardarlo; un caído no paga)` : ''}.</p>`;
+      if(combate) botones = `<button type="button" data-ix-acepto>Dárselo · ${yo ? n(costoEntrega(yo, origen)) : (origen === 'inventario' ? '2' : '1') + ' No2'}</button>`;
+      pideTxt = `<p class="ix-hint">Sale ${({cinturon: 'de tu cinturón', correa: 'de tu vaina / correa'})[origen] || 'de tu mochila'}${combate ? ` y lo quiere ${DESTINO_TXT[destPedido] || 'a la mochila'}: los dos pagan al dárselo (vos por sacarlo, él por guardarlo; un caído no paga)` : ''}.</p>`;
     } else if(combate && p.tipo === 'item'){
-      botones = (it && it.consumible ? `<button type="button" data-ix-acepto="mano">Al cinturón · ${n(COSTO_DESTINO.mano)}</button>` : '') + `<button type="button" data-ix-acepto="mochila">A la mochila · ${n(COSTO_DESTINO.mochila)}</button>`;
-      pideTxt = `<p class="ix-hint">Sale ${ORIGEN_TXT[origen] || 'de lo suyo'}; ${esc(p.deNombre)} paga lo suyo cuando lo aceptes. ${it && it.consumible ? '' : 'Solo un consumible va al cinturón.'}</p>`;
+      // 🗡 Lo de la mano (armas, escudos, varitas, orbes) va también a una vaina o una correa libre (2026-11-01), si quien recibe tiene.
+      const correa = esDeMano(it) && (!yo || tieneCorreas(yo)), correaLibre = correa && (!yo || entraEnCorrea(yo, it));   // (sin leerlo todavía: se ofrece y se revisa al aceptar)
+      botones = (it && it.consumible ? `<button type="button" data-ix-acepto="mano">Al cinturón · ${n(COSTO_DESTINO.mano)}</button>` : '')
+        + (correa ? `<button type="button" data-ix-acepto="correa"${correaLibre ? '' : ' class="sec" title="No te queda lugar"'}>A la vaina / correa · ${n(COSTO_DESTINO.correa)}</button>` : '')
+        + `<button type="button" data-ix-acepto="mochila">A la mochila · ${n(COSTO_DESTINO.mochila)}</button>`;
+      pideTxt = `<p class="ix-hint">Sale ${ORIGEN_TXT[origen] || 'de lo suyo'}; ${esc(p.deNombre)} paga lo suyo cuando lo aceptes. ${it && it.consumible ? '' : correa ? (correaLibre ? 'Va a mano en una vaina o correa libre (se equipa sin No2).' : `⚠ ${sinCorreaTxt(it)}: aceptalo a la mochila o hacé lugar.`) : 'Solo un consumible va al cinturón.'}</p>`;
     }
     cartel = document.createElement('div');
     cartel.className = 'ix-fondo ix-sin-fondo';
-    cartel.dataset.id = p.id;
+    cartel.dataset.id = p.id; cartel.dataset.k = clave;
     cartel.innerHTML = `<div class="ix-caja ix-chica" role="dialog">
       <div class="ix-cab"><span>🤝 ${pide ? 'Te piden algo' : 'Te ofrecen algo'}</span></div>
       <div class="ix-cuerpo">
@@ -727,7 +767,7 @@ const Intercambio = (() => {
     }
     const alforjas = (abierta.alforjas || []).filter(a => a.items.length);
     cuerpo.innerHTML = `
-      ${combate ? `<div class="ix-aviso">⚔ En combate, solo ítems y pagan los dos cuando se concreta (al aceptar): vos, 1 No2 si sale del cinturón (0 con Pasamanos) o 2 si sale de la mochila; el otro, 1 si lo pone en el cinturón o 2 si lo guarda en la mochila. Un caído no paga. Si lo rechaza, nadie paga. Tiene que estar al lado${host.adyacentes ? '' : ' (fijate en el mapa)'}: si no, se pregunta.</div>` : ''}
+      ${combate ? `<div class="ix-aviso">⚔ En combate, solo ítems y pagan los dos cuando se concreta (al aceptar): vos, 1 No2 si sale del cinturón o de una vaina / correa (0 con Pasamanos) o 2 si sale de la mochila; el otro, 1 si lo pone en el cinturón (un consumible) o en una vaina / correa libre (lo de la mano), o 2 si lo guarda en la mochila. Un caído no paga (se le avisa que está inconsciente). Si lo rechaza, nadie paga. Tiene que estar al lado${host.adyacentes ? '' : ' (fijate en el mapa)'}: si no, se pregunta.</div>` : ''}
       ${que}
       <div class="ix-paso"><h4>A quién</h4><p><select id="ix-dest">${opcDest}</select></p>
         <p class="ix-hint">Le llega un aviso para aceptarlo o rechazarlo. Hasta que acepte, ${abierta.itemId || combate ? 'el ítem queda reservado (sigue ocupando lugar y no se puede usar)' : 'un ítem queda reservado en tu mochila (ocupa su lugar y no se usa) y el oro o los despojos quedan apartados'}; si no lo acepta, vuelve.</p></div>
@@ -806,20 +846,21 @@ const Intercambio = (() => {
     const combate = host.enCombate();
     const costoTxt = c => !combate ? '' : c ? ` (vos ${fmt(c)} No2)` : mio && caido(mio) ? ' (vos 0: caído)' : ' (vos 0: Pasamanos)';
     const pend = paquetes.filter(p => p.estado === 'pendiente' && ((p.tipo === 'item' && p.deFicha === fichaId && p.paraFicha === aliado.id) || (esMano(p) && p.paraFicha === fichaId && p.deFicha === aliado.id)));
-    const fila = (it, key, boton) => `<div class="ix-fila"><span class="ix-q" title="${esc(textoItem(it))}">${key === 'cinturon' ? '🧷' : '🎒'} ${esc(it.nombre)}${num(it.unidades) > 1 ? ` <span class="ix-hint">(${fmt(num(it.unidades))})</span>` : ''}</span>${boton}</div>`;
+    const fila = (it, key, boton) => `<div class="ix-fila"><span class="ix-q" title="${esc(textoItem(it))}">${key === 'cinturon' ? '🧷' : it.aMano ? '🗡' : '🎒'} ${esc(it.nombre)}${num(it.unidades) > 1 ? ` <span class="ix-hint">(${fmt(num(it.unidades))})</span>` : ''}</span>${boton}</div>`;
     let lista = '';
     if(modo === 'dar'){
-      lista = !mio ? '<p class="ix-hint">Cargando tu mochila…</p>' : (() => { const L = sueltos(mio); return L.length ? L.map(({it, key}) => fila(it, key, `<button type="button" data-ix-mano-dar="${esc(it.id)}">Dárselo${costoTxt(costoEntrega(mio, key))}</button>`)).join('') : '<p class="ix-hint">No tenés nada suelto para darle (lo equipado o lo ya ofrecido no cuenta).</p>'; })();
+      lista = !mio ? '<p class="ix-hint">Cargando tu mochila…</p>' : (() => { const L = sueltos(mio); return L.length ? L.map(({it, key}) => fila(it, key, `<button type="button" data-ix-mano-dar="${esc(it.id)}">Dárselo${costoTxt(costoEntrega(mio, origenDe(key, it)))}</button>`)).join('') : '<p class="ix-hint">No tenés nada suelto para darle (lo equipado o lo ya ofrecido no cuenta).</p>'; })();
       lista = `<div class="ix-paso"><h4>🎁 Darle un ítem — de tu mochila y tu cinturón</h4>${lista}<p class="ix-hint">Le llega un aviso para aceptarlo o rechazarlo; hasta que responda, queda reservado.${combate ? ' Pagan los dos recién cuando lo acepta (él elige al cinturón, 1 No2, o a la mochila, 2); si lo rechaza, nadie paga. Un consumible de una pila va de a 1.' : ''}</p></div>`;
     } else if(modo === 'pedir'){
       const pc = d => mio ? costoRecibe(mio, d) : COSTO_DESTINO[d];
       const botonesPedir = (it, key) => !combate ? `<button type="button" data-ix-mano-pedir="${esc(it.id)}|${key}|mochila">Pedírselo</button>`
-        : (it.consumible ? `<button type="button" data-ix-mano-pedir="${esc(it.id)}|${key}|mano">Al cinturón${costoTxt(pc('mano'))}</button>` : '') + `<button type="button" class="sec" data-ix-mano-pedir="${esc(it.id)}|${key}|mochila">A la mochila${costoTxt(pc('mochila'))}</button>`;
+        : (it.consumible ? `<button type="button" data-ix-mano-pedir="${esc(it.id)}|${key}|mano">Al cinturón${costoTxt(pc('mano'))}</button>` : '')
+          + (esDeMano(it) && tieneCorreas(mio) ? `<button type="button" data-ix-mano-pedir="${esc(it.id)}|${key}|correa"${entraEnCorrea(mio, it) ? '' : ' class="sec" title="No te queda lugar"'}>A la vaina / correa${costoTxt(pc('correa'))}</button>` : '') + `<button type="button" class="sec" data-ix-mano-pedir="${esc(it.id)}|${key}|mochila">A la mochila${costoTxt(pc('mochila'))}</button>`;
       lista = !suyo ? '<p class="ix-hint">Mirando su mochila…</p>' : (() => { const L = sueltos(suyo); return L.length ? L.map(({it, key}) => fila(it, key, botonesPedir(it, key))).join('') : '<p class="ix-hint">No tiene nada suelto en la mochila ni en el cinturón.</p>'; })();
       lista = `<div class="ix-paso"><h4>🙋 Pedirle un ítem — de su mochila y su cinturón</h4>${lista}<p class="ix-hint">Le llega un aviso para aceptarlo o rechazarlo.${combate ? ' Pagan los dos recién si te lo da: vos según adónde lo ponés (al cinturón 1, a la mochila 2); él según de dónde sale (cinturón 1, mochila 2). Un caído no paga. Un consumible de una pila va de a 1.' : ''}</p></div>`;
     }
     cuerpo.innerHTML = `
-      ${combate ? `<div class="ix-aviso">⚔ En combate pagan los dos, cuando se concreta: quien da, 1 No2 si sale del cinturón (0 con Pasamanos) o 2 si sale de la mochila; quien recibe, 1 si lo pone en el cinturón o 2 si lo guarda en la mochila. Un caído no paga. Si se rechaza, nadie paga.</div>` : ''}
+      ${combate ? `<div class="ix-aviso">⚔ En combate pagan los dos, cuando se concreta: quien da, 1 No2 si sale del cinturón o de una vaina / correa (0 con Pasamanos) o 2 si sale de la mochila; quien recibe, 1 si lo pone en el cinturón (un consumible) o en una vaina / correa libre (lo de la mano), o 2 si lo guarda en la mochila. Un caído no paga (se le avisa que está inconsciente). Si se rechaza, nadie paga.</div>` : ''}
       <div class="ix-paso"><h4>¿Qué querés hacer con ${esc(aliado.nombre)}?</h4>
         <div class="ix-fila"><button type="button" data-ix-mano-modo="dar"${modo === 'dar' ? ' class="on"' : ' class="sec"'}>🎁 Darle un ítem</button><button type="button" data-ix-mano-modo="pedir"${modo === 'pedir' ? ' class="on"' : ' class="sec"'}>🙋 Pedirle un ítem</button></div></div>
       ${lista}
@@ -850,9 +891,10 @@ const Intercambio = (() => {
       const f = abierta.suyo && buscar(abierta.suyo, itemId);
       if(!f) return;
       if(paquetes.some(p => esMano(p) && p.estado === 'pendiente' && p.paraFicha === fichaId && p.itemId === itemId)){ host.toast('Ya se lo pediste: esperá que responda'); return; }
+      if(destino === 'correa' && abierta.mio && !entraEnCorrea(abierta.mio, f.it)){ host.toast(`${f.it.nombre}: ${sinCorreaTxt(f.it)}. Pedilo a la mochila o hacé lugar.`); return; }
       b.disabled = true;
       let error = null;
-      await hacer(fichaId, async S => { error = await pedirMano(S, fichaId, aliado, f.it, key, destino); return false; });
+      await hacer(fichaId, async S => { error = await pedirMano(S, fichaId, aliado, f.it, origenDe(key, f.it), destino); return false; });
       b.disabled = false;
       if(error){ if(error !== 'cancelado') host.toast(error); return; }
       host.toast(`🙋 Le pediste ${f.it.nombre} a ${aliado.nombre}: le llega un aviso`);
@@ -1028,5 +1070,5 @@ const Intercambio = (() => {
 
   return {POR_INTEGRANTE, iniciar, revisar, reservado, botonDar, textoPasar, botonDespojos, despojosDeItem, clic, abrirDar, abrirManos, abrirBaul, pintarBotonBaul, cerrar,
     // para las pruebas
-    _ofrecer: ofrecer, _aDespojos: aDespojos, _liberar: liberar, _quitarReservado: quitarReservado, _separar: separar, _aMochila: aMochila, _despojo: despojo, _esMano: esMano, _costoEntrega: costoEntrega, _costoRecibe: costoRecibe};
+    _ofrecer: ofrecer, _aDespojos: aDespojos, _liberar: liberar, _quitarReservado: quitarReservado, _separar: separar, _aMochila: aMochila, _despojo: despojo, _esMano: esMano, _costoEntrega: costoEntrega, _costoRecibe: costoRecibe, _origenDe: origenDe, _entraEnCorrea: entraEnCorrea, _recibir: recibir};
 })();

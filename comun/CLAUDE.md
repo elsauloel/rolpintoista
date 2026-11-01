@@ -1346,6 +1346,17 @@ versión parecida en más de una, es candidato a juntar.
   pedir/aceptar y el cobro deja la línea roja (`gastoNitrosForzado`). Una línea en la Mesa por cada uno. **El botón de la mochila** sigue y en
   combate aparece siempre: la lista muestra a todos (los de al lado primero, marcados); si el elegido no está pegado, el cartel «El aliado no está
   adyacente. ¿Dar igual?» (Sí sigue). Fuera de combate, sin costo y sin destino (a la mochila).
+- **`intercambio.js`, 🗡 a la vaina / correa y 😵 el caído avisado** (2026-11-01, dueño: «el cinturón va sobre el consumible, pero… cinturones/mochilas
+  con correa para llevar un arma. Ahí pueden ir también… armas o escudos, cualquier cosa que vaya en la mano: talismanes, armas especiales, todo»; «el
+  caído… igual sí tiene que poder, pero te tiene que advertir: estás inconsciente»). Destino nuevo **'correa'** (`COSTO_DESTINO.correa = 1`): lo de la
+  mano (`FichaEquipo.aManoApto`: armas de una y dos manos —las varitas son arma_1m— y escudos —orbes y talismanes son escudo_1m—) va a una vaina o correa
+  libre y queda `aMano` (`entraEnCorrea` = `FichaEquipo.aManoEntra` sobre una copia). Se mantiene la regla de siempre: **la vaina del cinturón, armas; la
+  correa de la mochila, armas o escudos** (un escudo no entra en una vaina). En el cartel de quien recibe aparece «A la vaina / correa · 1 No2» si es de
+  la mano y tiene vainas o correas (sin lugar: el botón apagado, el ⚠ y, al tocarlo, el aviso); en «🙋 Pedirle», lo mismo. Lo que **sale** de una vaina
+  o correa paga como del cinturón (`origenDe(key, it)` → 'correa': 1, 0 con Pasamanos). El cartel lee a quien recibe aunque esa pantalla no lo tenga
+  abierto (`leerParaCartel`, una vez) y se rearma si cambia el modo del mapa (`dataset.k`). **El caído** que da (`ofrecer`), pide (`pedirMano`) o
+  acepta darle algo a quien se lo pidió (`aceptarPedido`) ve antes el cartel «😵 Estás inconsciente. ¿Querés hacerlo igual?» (`avisoInconsciente`);
+  sigue pagando 0.
 - **`intercambio.js`, en combate** (2026-10-05; **los costos y la regla de «solo al lado» los reemplazó el 2026-11-01, ver arriba**): solo ítems y solo a los aliados al lado (`host.adyacentes(fichaId)`; el mapa los saca de los tokens a 1
   casillero); cuesta 1 No2 desde el cinturón (stat `pasamanos` > 0: 0) y 2 desde la mochila, se paga al ofrecer (sin No2: pregunta y deja seguir con la
   línea roja); lo que llega va al cinturón si entra. **Alforja compartida** (stat `alforja`): paquete `tipo: 'pedido'` — lo crea quien saca; la pantalla

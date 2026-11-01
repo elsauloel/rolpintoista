@@ -4850,6 +4850,24 @@ prueba('🤝 de mano a mano y 💸 ambos pagan (dueño, 2026-11-01): el pedido �
     Intercambio._costoEntrega(S, 'cinturon'), Intercambio._costoEntrega(S, 'inventario'), Intercambio._costoRecibe(S, 'mano'), Intercambio._costoRecibe(S, 'mochila'),
     Intercambio._costoEntrega(C, 'inventario'), Intercambio._costoRecibe(C, 'mochila')], [true, false, false, 1, 2, 1, 2, 0, 0]);
 });
+prueba('🗡 de mano a mano a la vaina / correa (dueño, 2026-11-01): lo de la mano va a una vaina o correa libre por 1 No2 y queda a mano; el escudo, solo en la correa; sale de ahí como del cinturón', () => {
+  const S = FichaGuardado.normalizar({}).S;
+  S.inventario = [{id: 'mc', nombre: 'Mochila de soldado', tipoItem: 'mochila', equipado: true, mods: [{stat: 'correas', val: 1}]},
+    {id: 'ep', nombre: 'Espada', tipoItem: 'arma_1m', aMano: true, ranuras: 1}];
+  const esc1 = {nombre: 'Escudo de madera', tipoItem: 'escudo_1m', ranuras: 1}, var1 = {nombre: 'Varita', tipoItem: 'arma_1m', ranuras: 1}, pocion = {nombre: 'Poción', consumible: true, unidades: 1};
+  const ocupada = Intercambio._entraEnCorrea(S, esc1);   // la única correa ya tiene la espada
+  S.inventario[1].aMano = false;
+  const libreEsc = Intercambio._entraEnCorrea(S, esc1), libreVar = Intercambio._entraEnCorrea(S, var1), poc = Intercambio._entraEnCorrea(S, pocion);
+  Intercambio._recibir(S, {tipo: 'item', json: JSON.stringify(esc1)}, 'correa');
+  const recibido = S.inventario.find(i => i.nombre === 'Escudo de madera');
+  const lleno = Intercambio._entraEnCorrea(S, var1);
+  const T = FichaGuardado.normalizar({}).S;   // solo una vaina (cinturón): el escudo no entra
+  T.inventario = [{id: 'cv', nombre: 'Cinturón con vaina', tipoItem: 'cinturon', equipado: true, mods: [{stat: 'vainas', val: 1}]}];
+  igual([ocupada, libreEsc, libreVar, poc, !!recibido.aMano, lleno, Intercambio._entraEnCorrea(T, esc1), Intercambio._entraEnCorrea(T, var1),
+    Intercambio._origenDe('inventario', {aMano: true}), Intercambio._origenDe('inventario', {}), Intercambio._origenDe('cinturon', {aMano: true}),
+    Intercambio._costoEntrega(S, 'correa'), Intercambio._costoRecibe(S, 'correa')],
+    [false, true, true, false, true, false, false, true, 'correa', 'inventario', 'cinturon', 1, 1]);
+});
 prueba('♻ convertir en despojos (dueño, 2026-10-05): un cuarto del precio, para arriba; parte de una pila; lo equipado o lo ofrecido no', () => {
   const S = FichaGuardado.normalizar({}).S;
   S.inventario = [{id: 'b', nombre: 'Bate', precioCompra: 35, ranuras: 1}, {id: 'p', nombre: 'Poción', consumible: true, unidades: 4, precioCompra: 25, ranuras: 1},

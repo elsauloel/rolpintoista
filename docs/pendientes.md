@@ -262,6 +262,9 @@
 >   cinturón) o 2 (a la mochila); un caído no paga; rechazado, nadie. El botón de la mochila queda: en combate muestra a todos y, si no está al lado,
 >   pregunta «¿Dar igual?». Detalle en `comun/CLAUDE.md` («de mano a mano»). Decisiones de Claude, a revisar: el cinturón solo para
 >   consumibles (un arma o una armadura va a la mochila) —«al cinturón» por corrección del dueño, antes decía «a la mano»—; el botón 🤝 es solo entre personajes (no creeps); quien pide elige el destino al pedir.
+>   **Y después (dueño):** el caído puede dar o pedir, pero con el cartel «😵 Estás inconsciente» antes; y lo de la mano (armas, escudos, varitas,
+>   orbes) se puede recibir **a la vaina / correa** (1 No2, queda a mano; la vaina del cinturón, armas; la correa de la mochila, armas o escudos; lo que
+>   sale de ahí paga como del cinturón). Probado con clics (manos2-1101-*).
 > - [ ] **⚖ Paridad de elementos en todo el sistema (2026-10-26, dueño: «cuando terminemos con este ciclo, ir para atrás, incorporar elementos de magia,
 >   varitas, báculos, skills, en resistencias de equipo, etcétera, como para que haya cierta paridad de elementos across el sistema»).** Para después del
 >   ciclo de habilidades de creep. Hoy hay siete elementos (arcano, fuego, hielo, rayo, tóxico, ácido y, desde el 2026-10-26, ☀ luz y 🌑 siniestro: P221)

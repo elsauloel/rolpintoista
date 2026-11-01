@@ -1866,8 +1866,8 @@ versión parecida en más de una, es candidato a juntar.
 - **💉 Adrenalina y 🔋 Pila pila** (2026-11-01, dueño). Adrenalina: la del Support de jugador (`support-adrenalina`, auditada: a vos o a un aliado
   en tu Rango, el estado Adrenalina —`apila`: +1 Des, Fue y Agi por stack, 2 turnos que se renuevan—; 5 SP, 0 No2; «Lento» = solo en tu turno, no es
   Flash) y la misma para creeps (`Combatiente.ADRENALINA_CREEP`: 1 No2 + 5 SP o cooldown 4, lenta; ⚖ costo de Claude), que reemplaza a la vieja de
-  fábrica (Hypeado): `Combatiente.migrarAdrenalina` (en `CreepCalculo.normalizar`). Ojo: en un creep los atributos del estado suben el atributo, pero
-  sus stats derivados (PdG, Evasión…) son fijos del creep y no cambian. Pila pila (`Combatiente.PILA_PILA`, la idea 13 del Support, nombre del dueño):
+  fábrica (Hypeado): `Combatiente.migrarAdrenalina` (en `CreepCalculo.normalizar`). En un creep también suben
+  sus derivados (PdG, Evasión…: `CreepCalculo.statValor` parte del atributo efectivo; corregido el 2026-11-01, ver «Subir un atributo»). Pila pila (`Combatiente.PILA_PILA`, la idea 13 del Support, nombre del dueño):
   Flash, a él o a un aliado en su Rango, el estado Pila pila (+2 PdG y PdG.Esp, `turnosCompletos`: desde ya hasta el final de su próximo turno) y el
   efecto `Baja cooldowns` con `bajaCd: 2` + `spRecupera: 4` (vtt-hexgrid/js/13: con cooldowns, −2 a cada uno; en modo SP, +4 SP sin pasar el máximo).
   1 No2 y 2 SP, o cooldown 3. Íconos: 💉 y 🔋 (js/88).

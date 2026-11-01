@@ -2410,7 +2410,14 @@ async function dueloAplicarEfectoBase(d, ef){
     if(t.tipo !== 'creep') return {nota: 'no trabaja con cooldowns de creep'};
     const sc = creepPrivadoDe(t.fichaId);
     if(!sc || !soyGM) return {manual: true, nota: `bajale ${n} a sus cooldowns activos a mano`};
-    if(CreepCalculo.modoSP(sc)) return {nota: 'trabaja con SP: no tiene cooldowns que bajar'};
+    if(CreepCalculo.modoSP(sc)){
+      // 🔋 Pila pila (2026-11-01, el Support): en modo SP, en lugar de bajar los cooldowns recupera `spRecupera` SP (sin pasar su máximo).
+      const r = Math.round(num(spec.spRecupera));
+      if(!(r > 0)) return {nota: 'trabaja con SP: no tiene cooldowns que bajar'};
+      let antes = 0, despues = 0;
+      await modificarCreep(t.fichaId, x => { antes = CreepCalculo.spActual(x); despues = Math.min(CreepCalculo.spMax(x), antes + r); x.sp = despues; });
+      return {nota: despues > antes ? `recupera ${fmt(despues - antes)} SP (${fmt(antes)} → ${fmt(despues)})` : 'ya tenía los SP al máximo'};
+    }
     let bajadas = [];
     await modificarCreep(t.fichaId, x => {
       bajadas = [];

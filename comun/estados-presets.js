@@ -170,6 +170,14 @@ const ESTADOS_PRESET = [
   // máximo al empezar su turno, así que ese turno tiene 2 más).
   {nombre:'Redoble', polaridad:'buff', turnos:1, turnosCompletos:true, mods:[{stat:'nitros', val:2}],
     detalle:'El redoble de tambores lo empuja: +2 No2 en su próximo turno completo (el turno en que se lo dan no cuenta). Si se lo vuelven a dar, no se suma: vuelve a durar 1 turno. ⚙ Automatizado.'},
+  // 💉 Adrenalina (2026-11-01, dueño: «mantener la del jugador y adaptarla para creeps»; el Support): +1 Destreza, +1 Fuerza y +1 Agilidad 2 turnos.
+  // Acumulable (`apila`): otra vez suma un stack (+1 más a los tres) y vuelve a durar 2 turnos. Los mods cuentan × stacks (ficha y creep).
+  {nombre:'Adrenalina', polaridad:'buff', turnos:2, stacks:1, apila:true, mods:[{stat:'des', val:1}, {stat:'fue', val:1}, {stat:'agl', val:1}],
+    detalle:'Un torrente de adrenalina: +1 a Destreza, Fuerza y Agilidad (y a todo lo que sale de ellas) por cada stack, durante 2 turnos. Acumulable: otra Adrenalina suma +1 más a los tres y vuelve a durar 2 turnos. ⚙ Automatizado.'},
+  // 🔋 Pila pila (2026-11-01, dueño: la idea 13 del Support de creep, él la nombró): +2 PdG y PdG.Esp desde que se lo dan y hasta el final de su próximo
+  // turno completo (`turnosCompletos`: si se lo dan en turno ajeno —es Flash— vale para esa tirada y para todo su próximo turno; decisión de Claude).
+  {nombre:'Pila pila', polaridad:'buff', turnos:1, turnosCompletos:true, mods:[{stat:'pdg', val:2}, {stat:'pdgmg', val:2}],
+    detalle:'Cargado de energía: +2 a la Probabilidad de Golpe (común y especial) desde ya y hasta el final de su próximo turno completo. Si se lo vuelven a dar, no se suma: vuelve a durar. ⚙ Automatizado.'},
   // Armas perforantes (2026-10-25, dueño: el Support, que la nombró y le dio 3 turnos «porque al poder fallar, prefiero que dure un turno más»; «un estado que le hace perforar 3 de defensa y 3 de defensa especial»): en
   // cada golpe que da, la Perfora de siempre (N puntos pasan siempre) contra la Defensa y contra la Defensa especial (js/13, Combatiente.perforaDeEstados).
   {nombre:'Armas perforantes', polaridad:'buff', turnos:3, turnosCompletos:true, perforaGolpe:3, perforaEsp:3,

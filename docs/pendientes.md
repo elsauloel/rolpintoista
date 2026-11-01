@@ -291,9 +291,7 @@
 >   la selecciona; el cartel de arriba a la derecha (`#token-etiqueta`, el del token seleccionado) dice «Hexágono libre» y lista lo público que la toca:
 >   auras, zonas (con su estado y turnos), muros y Sólidos, fuego, hielo o agua, la luz, una trampa ya vista… Solo lo que esa pantalla puede ver.
 > - [x] (2026-10-31, descartada por el dueño: «redundante con la del Debuffer», la Aguja siniestra) **🗡🌑 Arma sombría, habilidad de Support para creeps.**
-> - [ ] **💉 Adrenalina, habilidad de Support para creeps (2026-10-26, dueño: «anotala en la lista para trabajar en el futuro»):** a un aliado en su Rango,
->   +1 PdG ese turno y, si trabaja con cooldown, −2 a cada cooldown activo; si trabaja con SP, recupera 4 SP (o la variante: su próxima habilidad
->   de este turno le cuesta 3 SP menos). 1 No2 y 2 SP, o cooldown 3. Detalle en `docs/diseno-roles-creep.md` (Support, idea 13).
+> - [x] **💉 Adrenalina y 🔋 Pila pila, Support (2026-11-01, hecho):** el dueño mantuvo la **Adrenalina del jugador** (auditada y automatizada: estado Adrenalina, +1 Des/Fue/Agi 2 turnos, acumulable, 5 SP, solo en tu turno) y la llevó a creeps (1 No2 + 5 SP o cooldown 4, reemplaza a la vieja de Hypeado). La idea 13 (+PdG y −2 cooldowns o +4 SP) se hizo aparte como **Pila pila** (nombre del dueño): +2 PdG hasta el final de su próximo turno, Flash, 1 No2 y 2 SP o cooldown 3. Ver `docs/diseno-roles-creep.md` (idea 13). Queda ver si Pila pila se adapta al jugador.
 > - [ ] **🐾 Nombres para las versiones «bestia» de algunas habilidades de creep (2026-10-25, dueño: «anotá en pendientes buscar nombres para las versiones
 >   bestia de algunos skills»):** varias habilidades auditadas tienen una sola versión para todos o solo la humanoide (la Aguja del desamparo, Disipar, Señalar la
 >   presa, la Lanza de luz, el Meteoro…). Repasar cuáles piden una versión bestia con su propio nombre, como ya pasó con Corroer / Escupitajo ácido, Golpe que

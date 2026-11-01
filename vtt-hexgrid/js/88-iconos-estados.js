@@ -16,7 +16,8 @@
 
 // Agrupados por familia (dueño, 2026-11-01: «no es necesario que cada estado tenga su ícono exclusivo; podemos agruparlos cuando son similares…
 // mejor emojis»). El borde (verde / rojo) dice si es bueno o malo, así que un mismo emoji puede ir en un buff y en un debuff de la misma familia.
-// La clave es el nombre en minúsculas y sin tildes. Un estado que no está acá (uno inventado en la mesa) lleva su inicial.
+// La clave es el nombre en minúsculas y sin tildes. Un estado que no está acá (uno inventado en la mesa) busca su familia por palabra (ICONOS_FAMILIAS) y,
+// si no matchea nada, lleva su inicial.
 const ICONOS_ESTADO = {
   // ☠ Daño en el tiempo
   'veneno': {ic: '🤢', anim: 'burbujas', n: 3},   // (dueño, 2026-11-01: 🤢 y 🤮 el severo)
@@ -61,7 +62,7 @@ const ICONOS_ESTADO = {
   // 🫧 Escudos y defensas
   'shield': {ic: '🫧', fondo: '#1C4A66'}, 'escudo especial': {ic: '🫧', fondo: '#1C4A66'},
   'barrera': {ic: '🔷'}, 'armadura arcana': {ic: '🔷'},
-  'endurecido': {ic: '🪨'}, 'piel de hierro': {ic: '🪨'}, 'blindado': {ic: '🪨'}, 'estoicismo': {ic: '🪨'}, 'inamovible': {ic: '🪨'}, 'aguante': {ic: '🪨'},
+  'cuero duro': {ic: '🪨', pol: 'buff'}, 'endurecido': {ic: '🪨'}, 'piel de hierro': {ic: '🪨'}, 'blindado': {ic: '🪨'}, 'estoicismo': {ic: '🪨'}, 'inamovible': {ic: '🪨'}, 'aguante': {ic: '🪨'},
   'al frente': {ic: '🧱'}, 'interpuesto': {ic: '🧱'},
   'invulnerable': {ic: '⭐'}, 'titilando': {ic: '⭐'},
   'inmunidad a cc': {ic: '🧿'}, 'inmunidad mental': {ic: '🧿'}, 'inmune a lo toxico': {ic: '🧿'},
@@ -75,7 +76,7 @@ const ICONOS_ESTADO = {
   'bendecido': {ic: '✨'},
   'afortunado': {ic: '🍀'},
   'vigilancia': {ic: '👀'},
-  'redoble': {ic: '🥁'},
+  'redoble': {ic: '🥁'}, 'adrenalina': {ic: '💉'}, 'pila pila': {ic: '🔋'},
   'repitiendo': {ic: '🔁'},
   // ⏩ Movimiento
   'acelerado': {ic: '⏩'}, 'sprint': {ic: '⏩'},
@@ -96,6 +97,34 @@ const ICONOS_ANGULOS = [240, 300, 180, 0, 120, 60, 270, 210, 330, 150, 30, 90]; 
 const iconosOrden = new Map();   // id del token → [nombres normalizados, en orden de llegada]
 
 const iconosNorm = s => String(s || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
+// Un estado que no está en la tabla (uno creado a mano en la mesa, una pasiva con nombre propio) toma el ícono de su familia si su nombre tiene una
+// palabra conocida (dueño, 2026-11-01: «Cuero duro» → 🪨 de las defensas; «veneno» → 🤢…), con la polaridad de la familia si el estado no trae la suya.
+// Solo cae en la inicial si no matchea nada. Orden: lo más específico primero.
+const ICONOS_FAMILIAS = [
+  [/cuero|piel|coraza|armadura|escudo|blindad|endurec/, {ic: '🪨', pol: 'buff'}],
+  [/venen|toxic/, {ic: '🤢', pol: 'debuff', anim: 'burbujas', n: 3}],
+  [/sangr/, {ic: '🩸', pol: 'debuff', anim: 'gota'}],
+  [/quema|fuego|ardien|llama/, {ic: '🔥', pol: 'debuff', anim: 'llama'}],
+  [/hielo|escarcha|congel|helad/, {ic: '❄️', pol: 'debuff'}],
+  [/(^|\s)rayo|electric/, {ic: '⚡', pol: 'debuff'}],
+  [/miedo|terror|panico/, {ic: '😱', pol: 'debuff'}],
+  [/sueno|dormid/, {ic: '💤', pol: 'debuff'}],
+  [/(^|\s)(cura|regenera)/, {ic: '✚', pol: 'buff', color: '#5BD17A'}],
+  [/(^|\s)marca/, {ic: '🎯', pol: 'debuff'}],
+  [/maldi/, {ic: '💀', pol: 'debuff'}],
+  [/(^|\s)lent/, {ic: '🐌', pol: 'debuff'}],
+  [/veloz|rapid|acelerad/, {ic: '⏩', pol: 'buff'}],
+  [/fuerza|fuerte/, {ic: '💪', pol: 'buff'}],
+  [/suerte/, {ic: '🍀', pol: 'buff'}],
+  [/bendi|sagrad/, {ic: '✨', pol: 'buff'}],
+];
+function iconoDeEstado(clave){
+  const def = ICONOS_ESTADO[clave] || ICONOS_ESTADO[clave.replace(/\s*\(.*\)\s*$/, '')];   // «Regeneración (túnica)» → el de Regeneración
+  if(def) return def;
+  const fam = ICONOS_FAMILIAS.find(([re]) => re.test(clave));
+  return fam ? fam[1] : null;
+}
 
 // Los estados a mostrar de un token, en su orden estable. → [{clave, e}]
 function iconosLista(id, t, est){
@@ -143,8 +172,8 @@ function iconosEstadosDibujar(id, t, est, x, y, rad, z){
   ver.forEach(({clave, e}, i) => {
     const {px, py} = lugar(i);
     if(py + r > y + rad * 0.8) res.abajo = Math.max(res.abajo, py + r - (y + rad * Math.sqrt(3) / 2));
-    const def = ICONOS_ESTADO[clave] || ICONOS_ESTADO[clave.replace(/\s*\(.*\)\s*$/, '')];   // «Regeneración (túnica)» → el de Regeneración
-    const pol = e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '';
+    const def = iconoDeEstado(clave);
+    const pol = e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : (def && def.pol) || '';
     circulo(px, py, ICONOS_BORDE[pol], def && def.fondo);
     const semilla = (i * 97 + id.length * 13) % 1000;
     if(def){

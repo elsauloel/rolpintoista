@@ -730,6 +730,7 @@ const Duelo = (() => {
       ...(e.purga ? {purga: true} : {}),   // la purga (2026-10-07)
       ...(e.disipar ? {disipar: true} : {}),   // 🧿 Disipar (2026-10-25)
       ...(_num(e.bajaCd) > 0 ? {bajaCd: Math.min(6, Math.round(_num(e.bajaCd)))} : {}),   // 🥁 Redoble de tambores (2026-10-25)
+      ...(_num(e.spRecupera) > 0 ? {spRecupera: Math.min(20, Math.round(_num(e.spRecupera)))} : {}),   // 🔋 Pila pila (2026-11-01)
       ...(_num(e.vuela) > 0 ? {vuela: Math.min(6, Math.round(_num(e.vuela)))} : {}),   // el arma vuela N casillas (la Varita del desarme)
       ...(_num(e.empuja) > 0 ? {empuja: Math.min(6, Math.round(_num(e.empuja)))} : {}),   // lo empuja N casillas (2026-10-08)
       ...(e.clava ? {clava: {turnos: Math.min(6, Math.max(1, Math.round(_num(e.clava.turnos)) || 3))}} : {}),   // 📌 Clavar a la pared (2026-10-26)
@@ -1104,7 +1105,7 @@ const Duelo = (() => {
     if(ef.spec && ef.spec.nombre) return ef.spec;   // habilidades: el estado ya viene armado
     if(_num(ef.cura) > 0) return {nombre: 'Curación', cura: Math.round(_num(ef.cura))};   // habilidades: cura sobre el objetivo
     if(ef.no2 !== undefined) return {nombre: 'Pierde No2', no2: Math.max(0, Math.round(_num(ef.no2))), no2Dif: !!ef.no2Dif, no2Sentado: !!ef.no2Sentado};   // Sonic Boom
-    if(_num(ef.bajaCd) > 0) return {nombre: 'Baja cooldowns', bajaCd: Math.round(_num(ef.bajaCd))};   // 🥁 Redoble de tambores (2026-10-25): el mapa le baja los cooldowns
+    if(_num(ef.bajaCd) > 0) return {nombre: 'Baja cooldowns', bajaCd: Math.round(_num(ef.bajaCd)), ...(_num(ef.spRecupera) > 0 ? {spRecupera: Math.round(_num(ef.spRecupera))} : {})};   // 🥁 Redoble de tambores (2026-10-25): el mapa le baja los cooldowns
     if(ef.disipar) return {nombre: 'Disipar', disipar: true};   // 🧿 Disipar (2026-10-25): quien lo usa elige qué estado bueno le saca
     if(ef.purga) return {nombre: 'Purga', purga: true};   // la purga (2026-10-07): el mapa saca el estado malo más reciente
     const n = String(ef.nombre || '').trim().toLowerCase();
@@ -1162,6 +1163,7 @@ const Duelo = (() => {
       if(e.purga) o.purga = true;   // la purga (2026-10-07)
       if(e.disipar) o.disipar = true;   // 🧿 Disipar (2026-10-25)
       if(_num(e.bajaCd) > 0) o.bajaCd = Math.min(6, Math.round(_num(e.bajaCd)));   // 🥁 Redoble de tambores (2026-10-25)
+      if(_num(e.spRecupera) > 0) o.spRecupera = Math.min(20, Math.round(_num(e.spRecupera)));   // 🔋 Pila pila (2026-11-01)
       if(_num(e.vuela) > 0) o.vuela = Math.min(6, Math.round(_num(e.vuela)));   // el arma vuela N casillas (la Expelliarmus, 2026-10-07)
       if(_num(e.empuja) > 0) o.empuja = Math.min(6, Math.round(_num(e.empuja)));   // lo empuja N casillas (2026-10-08)
       if(e.clava) o.clava = {turnos: Math.min(6, Math.max(1, Math.round(_num(e.clava.turnos)) || 3))};   // 📌 Clavar a la pared (2026-10-26)

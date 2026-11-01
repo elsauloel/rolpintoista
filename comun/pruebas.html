@@ -42,14 +42,14 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 </script>
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
-<script src="combatiente.js?v=20261101azar2"></script>
-<script src="creep-calculo.js?v=20261101azar"></script>
+<script src="combatiente.js?v=20261101adren"></script>
+<script src="creep-calculo.js?v=20261101adren"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261101azar2"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
-<script src="estados-presets.js?v=20261101miedo"></script>
+<script src="estados-presets.js?v=20261101adren"></script>
 <script src="estados-aplicar.js"></script>
 <script src="recibidos.js"></script>
 <script src="tokens-auto.js"></script>
@@ -99,7 +99,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261101miedo"></script>
+<script src="duelo.js?v=20261101adren"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -109,9 +109,9 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
-<script src="skills-clase.js?v=20261101azar"></script>
+<script src="skills-clase.js?v=20261101adren"></script>
 <script src="creeps-base.js"></script>
-<script src="skills-creep-base.js?v=20261101azar"></script>
+<script src="skills-creep-base.js?v=20261101adren"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
 <script>
@@ -6318,6 +6318,24 @@ prueba('😱 Miedo y Pánico (dueño, 2026-11-01): −2, control mental, lo cura
   igual([!!pa, pa && pa.panico, pa && pa.esCC, Combatiente.grupoCC('Pánico'), Combatiente.esMental(pa), /−2/.test(mi.detalle), /−2/.test(pa.detalle),
       Combatiente.inmunidad([E({inmunidadMental: true})], deb(pa)), Combatiente.inmunidad([E({inmunidadCC: true})], deb(pa)), cur.sacados.join()],
     [true, true, true, 'mental', true, true, true, 'Inmunidad mental', 'Inmunidad a CC', 'Pánico,Miedo']);
+});
+prueba('💉 Adrenalina y 🔋 Pila pila (dueño, 2026-11-01): se acumula, la vieja de creep se pone al día, Pila pila Flash con −2 cooldowns o +4 SP', () => {
+  const ad = ESTADOS_PRESET.find(p => p.nombre === 'Adrenalina'), pp = ESTADOS_PRESET.find(p => p.nombre === 'Pila pila');
+  const est = [];
+  Combatiente.agregarEstado(est, {...ad}); const r2 = Combatiente.agregarEstado(est, {...ad});
+  const jug = CLASES_SKILLS.flatMap(c => c.habilidades || []).find(h => h.id === 'support-adrenalina');
+  const vieja = [{nombre: 'Adrenalina', detalle: 'Un torrente de energía: +1 No2 máximo.', efectoNombre: 'Hypeado', efectoTurnos: 3, cd: 3, cdActual: 5, nitrosCosto: 1}];
+  const mig = Combatiente.migrarAdrenalina(vieja);
+  const cre = n => armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos, 2);
+  const pila = cre('Pila pila'), adc = cre('Adrenalina');
+  igual([!!ad, ad.apila, ad.mods.map(m => m.stat + m.val).join(), r2.que, est[0].stacks, jug.costo, jug.nitrosCosto, jug.duelo.efectos[0].nombre, /Sin auditar/.test(jug.detalle),
+      mig, vieja[0].efectoNombre, vieja[0].duelo.efectos[0].nombre, vieja[0].cd, vieja[0].cdActual, vieja[0].spCosto,
+      !!pp, pp.mods.map(m => m.stat + m.val).join(), pila.flash, pila.spCosto, pila.nitrosCosto, pila.cd, pila.duelo.efectos[1].bajaCd, pila.duelo.efectos[1].spRecupera,
+      adc.duelo.efectos[0].nombre, adc.spCosto, adc.cd, HABILIDADES_CREEP_BASE.filter(x => x.nombre === 'Adrenalina').length],
+    [true, true, 'des1,fue1,agl1', 'acumulado', 2, '5', 0, 'Adrenalina', false,
+      true, undefined, 'Adrenalina', 4, 4, 5,
+      true, 'pdg2,pdgmg2', true, 2, 1, 3, 2, 4,
+      'Adrenalina', 5, 4, 1]);
 });
 prueba('💤 Sueño (dueño, 2026-11-01): un Stun mental que lo cura el Té de tilo y lo frena la Inmunidad mental', () => {
   const su = ESTADOS_PRESET.find(p => p.nombre === 'Sueño');

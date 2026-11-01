@@ -183,7 +183,7 @@ const FichaResumen = (() => {
       // nitros ≥ esto. Sin armas con daño, a mano limpia. Con el arco no hay oportunidad (2026-10-09): si solo tiene arcos, `sinOpor`.
       oporCosto: (() => { const armas = FichaCombate.armasEquipadasConDano(S).map(x => x.item).filter(Combatiente.sirveDeOportunidad); return Math.min(...(armas.length ? armas : [null]).map(a => FichaCombate.costoAtaqueEspecial(a, 'oportunidad', S))); })(),
       sinOpor: (() => { const armas = FichaCombate.armasEquipadasConDano(S).map(x => x.item); return armas.length > 0 && !armas.some(Combatiente.sirveDeOportunidad); })(),
-      sinArma: FichaCombate.armasEquipadasConDano(S).length === 0,   // ✋ nada en la mano (paso 5): el mapa lo marca en el token
+      sinArma: FichaCombate.armasEquipadasConDano(S).length === 0 && !(S.inventario || []).some(i => i && i.equipado && i.especial),   // ✋ nada en la mano (paso 5): el mapa lo marca en el token (con una varita u otra arma especial, no: 2026-11-01, Larry con la Varita de granizo; igual que los creeps, CreepCalculo)
       costoMover: IT2().inmovilizadoBloqueaMover && estadoActivo(S, 'inmovilizado') ? 0 : costoMoverCasillero(S),
       extenuado: Combatiente.extenuado(S.efectos), tormenta: Combatiente.tormenta(S.efectos),   // ⛈ Atormentado: el mapa cobra la vida al moverse
       empower: (S.habilidades || []).some(h => h && h.empower),

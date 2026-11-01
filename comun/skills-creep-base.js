@@ -70,7 +70,7 @@
     'Red': ['hunter', 'trabar'], 'Tela de araña': ['hunter', 'trabar'],
     'Hit and run': ['choque liviano', 'golpear y alejarse'], 'Excavar': ['misceláneas', 'bajo tierra'],   // (dueño, 2026-10-27: «yo lo pondría en habilidades misceláneas»)
     'Salto': ['choque liviano', 'salto'], 'Salto aplastante': ['choque pesado', 'salto'], 'Vigilancia': ['rango', 'vigilancia'], 'Bola de fuego': ['mago', 'daño en área'], 'Confusión': ['debuffer', 'control mental'],
-    'Arma elemental': ['support', 'arma elemental'], '¡A la carga!': ['support', 'grito de guerra'], 'Arenga': ['support', 'grito de guerra'], 'Sanar': ['support', 'curar'], 'Oleada sanadora': ['support', 'curar'], 'Bálsamo': ['support', 'curar'], 'Círculo de sanación': ['support', 'curar'], 'Aura sanadora': ['support', 'curar'],
+    'Arma elemental': ['support', 'arma elemental'], 'Adrenalina': ['support', 'empujón'], 'Pila pila': ['support', 'empujón'], '¡A la carga!': ['support', 'grito de guerra'], 'Arenga': ['support', 'grito de guerra'], 'Sanar': ['support', 'curar'], 'Oleada sanadora': ['support', 'curar'], 'Bálsamo': ['support', 'curar'], 'Círculo de sanación': ['support', 'curar'], 'Aura sanadora': ['support', 'curar'],
     'Barrido': ['choque pesado', 'barrido'], 'Coletazo': ['choque pesado', 'barrido'],
     'Tiro a la cabeza': ['rango', 'tiro apuntado'], 'Desarmar': ['choque pesado', 'desarmar'], 'El que avisa no traiciona': ['choque pesado', 'golpe anunciado'], 'Sal en la herida': ['choque liviano', 'abrir la herida'], 'Remate': ['choque pesado', 'remate'], 'Ir por el herido': ['choque pesado', 'remate'], 'Morder la herida': ['choque liviano', 'abrir la herida'], 'Patotear': ['choque liviano', 'manada'], 'Jauría': ['choque liviano', 'manada'], 'Zarpazo erguido': ['choque pesado', 'golpe anunciado'], 'Mal de ojo': ['debuffer', 'maleficio'], 'Disparo señalador': ['rango', 'señalar'], 'Ráfaga de cortes': ['choque liviano', 'ráfaga'], 'Ráfaga de zarpazos': ['choque liviano', 'ráfaga'],
     'Romper armadura': ['choque pesado', 'romper armadura'], 'Arrancar la coraza': ['choque pesado', 'romper armadura'],
@@ -656,6 +656,12 @@
   H('Empuje', 'B', '*', 'a', 2, {detalle: 'FLASH (se puede usar en cualquier momento; en turno ajeno cuesta el doble). A un aliado (o a sí mismo) dentro de su Rango: Empower, +3 a su próxima tirada, la que sea (ataque, defensa, daño, resistencia). Otro Empuje antes de que tire suma +3 más. Esa tirada lo gasta.',
     no2: 0, spCosto: 2, flash: true, auditada: true, ataqueTxt: 'Flash: a él o a un aliado en su Rango, +3 a su próxima tirada (Empower)',
     duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', efectos: [{nombre: 'Empower'}]}});
+  // 💉 Auditada (dueño, 2026-11-01: «mantener la Adrenalina del jugador y adaptarla para creeps»; reemplaza a la vieja de fábrica, Hypeado +1 No2 máximo):
+  // a él o a un aliado en su Rango, el estado Adrenalina (+1 Des, Fue y Agi 2 turnos, acumulable). Costo propuesto por Claude: 1 No2 + 5 SP, o cooldown 4 (lenta).
+  // 🔋 Pila pila (dueño, 2026-11-01: la idea 13 del Support, «con otro nombre»; él la nombró, +2 PdG y Flash): +2 PdG hasta el final de su próximo turno y
+  // −2 cooldowns (o +4 SP). Las dos viven en Combatiente.
+  [Combatiente.ADRENALINA_CREEP, Combatiente.PILA_PILA].forEach(x => H(x.nombre, 'B', '*', 'a', x.cd, {detalle: x.detalle, no2: x.no2, spCosto: x.spCosto, auditada: true, ...(x.flash ? {flash: true} : {}),
+    ataqueTxt: x.ataqueTxt, duelo: JSON.parse(JSON.stringify(x.duelo))}));
   H('Redoble de tambores', 'BA', '*', 'a', 3, {detalle: 'Un redoble que empuja a los suyos: sus aliados a 4 casillas o menos (no él) suman +2 No2 en su próximo turno (Redoble) y, los que trabajan con cooldown (no con SP), bajan en 1 cada cooldown que tengan activo.',
     no2: 2, spCosto: 3, auditada: true, ataqueTxt: 'a sus aliados a 4 o menos: +2 No2 su próximo turno y −1 a sus cooldowns activos',
     duelo: {objetivo: 'onda', radio: 4, aliados: true, tira: '', contra: [], efectos: [{nombre: 'Redoble'}, {nombre: 'Baja cooldowns', bajaCd: 1}]}});
@@ -1140,7 +1146,6 @@
   H('Coagulación rápida', 'T', 'bhd', 't', 4, eS('Sus heridas cierran al instante: inmune al sangrado.', 1, 'Coagulación', 'buff', 3));
   H('Coraza blindada', 'T', 'cd', 't', 4, eS('Ningún golpe crítico lo atraviesa.', 2, 'Blindado', 'buff', 3));
   H('Regeneración rápida', 'C', 'bpm', 'tm', 5, eS('Sus heridas se cierran solas: recupera vida cada turno.', 2, 'Regeneración', 'buff', 3, {hp: 3}));
-  H('Adrenalina', 'B', 'hdb', 'me', 3, eS('Un torrente de energía: +1 No2 máximo.', 1, 'Hypeado', 'buff', 3));
   H('Frenesí de curación', 'CB', 'bm', 'm', 6, eS('Recupera vida por turno y ataca más rápido: +1 No2.', 3, 'Regeneración', 'buff', 3, {hp: 2, mods: {nitros: 1}}));
   H('Escudo de espinas', 'TD', 'p', 'tm', 5, eS('Espinas y una barrera de savia: devuelve daño y gana +2 de Defensa.', 3, 'Espinas', 'buff', 3, {mods: {def: 2}}));
 

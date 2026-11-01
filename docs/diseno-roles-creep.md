@@ -769,7 +769,7 @@ Llamar refuerzos) se puede reusar. Hoy ninguna habilidad de support de creep est
 11. **Orden de ataque**: un aliado ataca ya, fuera de su turno (o su próximo ataque no cuesta No2).
 12. ✅ **Redoble de tambores** (2026-10-25): a sus aliados a 4 casillas o menos (no a él), +2 No2 su próximo turno y −1 a cada cooldown activo de los
     que trabajan con cooldown (no con SP).
-13. **Adrenalina**: a un aliado se le baja el cooldown de una habilidad (vuelve a usar la fuerte). ⏸ Para más adelante (dueño, 2026-10-26: «anotala en la lista para trabajar en el futuro»). Propuesta guardada: a un aliado en su Rango, +1 PdG ese turno y, si trabaja con cooldown, −2 a cada cooldown activo; si trabaja con SP, recupera 4 SP (sin pasar su máximo) — o, la variante, su próxima habilidad de este turno le cuesta 3 SP menos. 1 No2 y 2 SP, o cooldown 3.
+13. ✅ **Pila pila** (antes «Adrenalina», idea 13; hecha el 2026-11-01, dueño: «se crea para creeps con otro nombre», él la nombró «Pila pila», con +2 a la probabilidad de golpe y Flash): a él o a un aliado en su Rango, +2 PdG y PdG.Esp desde ya hasta el final de su próximo turno (estado Pila pila) y, si trabaja con cooldown, −2 a cada cooldown activo; si trabaja con SP, recupera 4 SP. Flash (en turno ajeno, el doble). 1 No2 y 2 SP, o cooldown 3. Vive en `Combatiente.PILA_PILA`. ~~**Adrenalina**: a un aliado se le baja el cooldown de una habilidad (vuelve a usar la fuerte). ⏸ Para más adelante (dueño, 2026-10-26: «anotala en la lista para trabajar en el futuro»). Propuesta guardada: a un aliado en su Rango, +1 PdG ese turno y, si trabaja con cooldown, −2 a cada cooldown activo; si trabaja con SP, recupera 4 SP (sin pasar su máximo) — o, la variante, su próxima habilidad de este turno le cuesta 3 SP menos. 1 No2 y 2 SP, o cooldown 3.~~
 14. **Canalizar**: le pasa SP a un aliado caster.
 15. ≈ **¡Ahora!** → Envión (2026-10-26: sube 1 lugar, con un escudo de 10): un aliado juega justo después del support en el orden de turnos (sube su iniciativa; hoy Emboscada de manada).
 16. **Prisa**: un aliado se mueve gratis unos casilleros y ataca más barato.
@@ -833,7 +833,7 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
 - ✅ **Smite** → Smite: «Smite [1] — NO2: (1). Rayo de daño holy inesquivable que causa 1d4 de daño.»
 - **Ojo de Kicillof**: Invocás, en una casilla dentro de tu Rango y que veas, un ojo volador etéreo que movés vos: Movimiento 5 y dura 2 turnos (entra al orden sin mareo); al cumplirlos, desaparece. Ve en una flor de diámetro 5 alrededor suyo, para…
 - **Transferir SP** (en pausa): SP 1. Transfiere 1d6 SP entre vos y un aliado.
-- ⏸ **Adrenalina** (en pausa) → Adrenalina, anotada para el futuro (docs/pendientes.md): SP 5. +1 a Destreza, Fuerza y Agilidad durante 2 turnos. Acumulable. Lento.
+- ✅ **Adrenalina** (2026-11-01, dueño: «mantener la del jugador y adaptarla para creeps»): la del Support de jugador, auditada y automatizada (a él o a un aliado en su Rango, estado Adrenalina: +1 Des, Fue y Agi 2 turnos, acumulable; 5 SP, lenta = solo en su turno), y la misma para creeps (`Combatiente.ADRENALINA_CREEP`, 1 No2 + 5 SP o cooldown 4, propuesta de Claude), que reemplaza a la de fábrica vieja (Hypeado). La idea 13 quedó como «Pila pila», aparte.
 - **Marca del cazador** (en pausa): SP 3. No2 1. Un aliado dentro de tu Rango recibe Crítico frecuente ×1 durante 2 turnos (baja 1 el rango de sus críticos; mínimo 2). ✋ A mano: dale el estado \
 
 ## 6. Debuffer — el listado completo (2026-10-21)

@@ -62,7 +62,7 @@ const ICONOS_ESTADO = {
   // 🫧 Escudos y defensas
   'shield': {ic: '🫧', fondo: '#1C4A66'}, 'escudo especial': {ic: '🫧', fondo: '#1C4A66'},
   'barrera': {ic: '🔷'}, 'armadura arcana': {ic: '🔷'},
-  'cuero duro': {ic: '🪨', pol: 'buff'}, 'endurecido': {ic: '🪨'}, 'piel de hierro': {ic: '🪨'}, 'blindado': {ic: '🪨'}, 'estoicismo': {ic: '🪨'}, 'inamovible': {ic: '🪨'}, 'aguante': {ic: '🪨'},
+  '__mano': {ic: '✋'}, 'cuero duro': {ic: '🪨', pol: 'buff'}, 'endurecido': {ic: '🪨'}, 'piel de hierro': {ic: '🪨'}, 'blindado': {ic: '🪨'}, 'estoicismo': {ic: '🪨'}, 'inamovible': {ic: '🪨'}, 'aguante': {ic: '🪨'},
   'al frente': {ic: '🧱'}, 'interpuesto': {ic: '🧱'},
   'invulnerable': {ic: '⭐'}, 'titilando': {ic: '⭐'},
   'inmunidad a cc': {ic: '🧿'}, 'inmunidad mental': {ic: '🧿'}, 'inmune a lo toxico': {ic: '🧿'},
@@ -148,8 +148,12 @@ const iconosFuente = px => `${px}px "Segoe UI Emoji", "Apple Color Emoji", "Noto
 // correr las barras).
 function iconosEstadosDibujar(id, t, est, x, y, rad, z){
   const res = {animando: false, abajo: 0};
-  if(!est || !est.estados || !est.estados.length) return res;
-  const lista = iconosLista(id, t, est);
+  // ✋ Nada en la mano (dueño, 2026-11-01: «que la mano se ubique como el resto de los estados»): un circulito más, borde gris, al final de la ronda,
+  // solo en modo combate (como la marca de antes, js/05).
+  const mano = modoMapa === 'combate' && typeof tokenSinArma === 'function' && tokenSinArma(t);
+  if((!est || !est.estados || !est.estados.length) && !mano) return res;
+  const lista = iconosLista(id, t, est || {estados: []});
+  if(mano) lista.push({clave: '__mano', e: {nombre: 'Nada en la mano'}});
   if(!lista.length) return res;
   const r = Math.max(6 / z, rad * 0.235);
   const max = ICONOS_ANGULOS.length;

@@ -919,7 +919,7 @@ function dibujarLienzo(){
       const marcas = [];
       if(t.oculto) marcas.push('🙈');
       if(enSigilo(t) && typeof iconosEstadosDibujar !== 'function') marcas.push('🥷');   // (con los íconos de estados, el Sigilo va en la ronda: 🕶, js/88)
-      if(modoMapa === 'combate' && tokenSinArma(t)) marcas.push('✋');   // ✋ nada en la mano (paso 5): pega sin arma
+      if(modoMapa === 'combate' && tokenSinArma(t) && typeof iconosEstadosDibujar !== 'function') marcas.push('✋');   // ✋ nada en la mano (paso 5): pega sin arma (con js/88, va en la ronda de los estados: 2026-11-01)
       if(marcas.length){
         const alfaPrevio = ctx.globalAlpha;
         ctx.globalAlpha = 1;
@@ -941,8 +941,8 @@ function dibujarLienzo(){
     const bordeV = rad * SQ3 / 2;
     let debajo = y + bordeV + 3 / z;
     // 🫧😱💤 Los íconos de los estados en los vértices y los lados del token (js/88, 2026-11-01); si ocupan abajo, las barras bajan.
-    if(est && typeof iconosEstadosDibujar === 'function'){
-      const ie = iconosEstadosDibujar(d.id, t, est, x, y, rad, z);
+    if(typeof iconosEstadosDibujar === 'function' && (est || (modoMapa === 'combate' && tokenSinArma(t)))){   // (✋ nada en la mano también va en la ronda)
+      const ie = iconosEstadosDibujar(d.id, t, est || {estados: []}, x, y, rad, z);
       if(ie.animando) animando = true;
       if(ie.abajo > 0) debajo += ie.abajo;
     }

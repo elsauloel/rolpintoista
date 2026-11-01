@@ -18,6 +18,15 @@ service cloud.firestore {
     function verificado() {
       return request.auth != null && request.auth.token.email_verified == true;
     }
+    // 💨 El viento que despeja (2026-11-01, dueño: «solamente con viento y a las zonas específicas»): una zona que se dibuja como nube o gas
+    // (las mismas palabras que nubeColor, vtt-hexgrid/js/50) — no cualquier zona. Una zona de fuego no es nube (la cubre la regla del fuego).
+    function esNube(d) {
+      return d.get('zona', false) == true
+        && !(d.get('zonaDanoTipo', '').matches('(?i).*fuego.*'))
+        && (d.get('zonaNombre', '').matches('(?i).*(veneno|espora|ponzo|humo|talco|harina|miasma|pedo|t[oó]xic|niebla|neblina|bruma|gas|nube|vapor).*')
+          || d.get('zonaEstado', '').matches('(?i).*veneno.*')
+          || d.get('zonaDanoTipo', '').matches('(?i).*t[oó]xic.*'));
+    }
     function esMiembro(c) {
       return verificado()
         && exists(/databases/$(database)/documents/campanas/$(c)/miembros/$(request.auth.uid));
@@ -855,7 +864,7 @@ service cloud.firestore {
             && request.resource.data.zona == true)
           // El viento que despeja (2026-10-08, Varita del vendaval): a una niebla o un fuego cualquiera le saca casillas (quedan menos, forma libre).
           || ((resource.data.get('niebla', false) == true || resource.data.get('fuego', false) == true || resource.data.get('zonaDanoTipo', '') in ['de fuego', 'fuego']
-              || resource.data.get('zona', false) == true)   // 💨 (2026-11-01) también las zonas de nube o gas (el cliente solo recorta las que dibuja como nube)
+              || esNube(resource.data))   // 💨 (2026-11-01) también las zonas de nube o gas (solo esas: esNube)
             && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tipo', 'celdas', 'rotacion'])
             && request.resource.data.tipo == 'libre' && request.resource.data.rotacion == 0
             && request.resource.data.celdas is list && request.resource.data.celdas.size() < resource.data.celdas.size()));
@@ -863,7 +872,7 @@ service cloud.firestore {
           && (resource.data.duenoUid == request.auth.uid || esGM(c) || resource.data.get('arma', false) == true
             // El viento que despeja (2026-10-08, Varita del vendaval): la niebla y el fuego los puede sacar cualquiera.
             || resource.data.get('niebla', false) == true || resource.data.get('fuego', false) == true || resource.data.get('zonaDanoTipo', '') in ['de fuego', 'fuego']
-            || resource.data.get('zona', false) == true   // 💨 (2026-11-01) una nube o un gas que el viento se lleva entero
+            || esNube(resource.data)   // 💨 (2026-11-01) una nube o un gas que el viento se lleva entero (solo esas: esNube)
             // Desarmar trampas (talento, 2026-10-08): cualquiera de la partida saca del mapa una trampa (la desarma o se rompe).
             || resource.data.get('trampa', false) == true);
       }
@@ -982,14 +991,14 @@ service cloud.firestore {
               && request.resource.data.zona == true)
             // El viento que despeja (2026-10-08, Varita del vendaval): a una niebla o un fuego cualquiera le saca casillas (quedan menos, forma libre).
             || ((resource.data.get('niebla', false) == true || resource.data.get('fuego', false) == true || resource.data.get('zonaDanoTipo', '') in ['de fuego', 'fuego']
-              || resource.data.get('zona', false) == true)   // 💨 (2026-11-01) también las zonas de nube o gas (el cliente solo recorta las que dibuja como nube)
+              || esNube(resource.data))   // 💨 (2026-11-01) también las zonas de nube o gas (solo esas: esNube)
               && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tipo', 'celdas', 'rotacion'])
               && request.resource.data.tipo == 'libre' && request.resource.data.rotacion == 0
               && request.resource.data.celdas is list && request.resource.data.celdas.size() < resource.data.celdas.size()));
           allow delete: if esMiembro(c)
             && (resource.data.duenoUid == request.auth.uid || esGM(c) || resource.data.get('arma', false) == true
               || resource.data.get('niebla', false) == true || resource.data.get('fuego', false) == true || resource.data.get('zonaDanoTipo', '') in ['de fuego', 'fuego']
-            || resource.data.get('zona', false) == true   // 💨 (2026-11-01) una nube o un gas que el viento se lleva entero
+            || esNube(resource.data)   // 💨 (2026-11-01) una nube o un gas que el viento se lleva entero (solo esas: esNube)
               || resource.data.get('trampa', false) == true);
         }
       }

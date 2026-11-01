@@ -1468,7 +1468,7 @@
      Miedo (−2 PdG y −2 Daño, control), Sombra (sigilo) y aura de pestilencia. Desde el nivel 3 llevan una TERCERA habilidad. */
   COLOR.cripta = '#7C8A6E'; ESCENARIO_TXT.cripta = 'cripta';
   const NM = ['no-muerto', 'cripta'];
-  const MIEDO3 = () => tercera(ap(ta('Chillido del hambre', 'Un alarido que hiela: el objetivo queda con Miedo 2 turnos (−2 PdG y −2 Daño; no puede acercarse a quien lo asustó, a mano).', 2), A('Miedo', 2)), 4);
+  const MIEDO3 = () => tercera(ap(ta('Chillido del hambre', 'Un alarido que hiela: el objetivo queda con Miedo 2 turnos (−2 a la PdG y al daño contra quien lo asustó; acercarse a 3 o menos de él le cuesta el doble de No2).', 2), A('Miedo', 2)), 4);
   const PESTE3 = () => tercera(ta('Aura de pestilencia', 'Un hedor que enferma: los enemigos adyacentes al empezar su turno pierden 1 No2 (a mano, lo aplica el GM).', 1), 4);
   const COSECHA3 = () => tercera(dx('Cosecha de almas', 'Arranca un jirón de alma: daño y gana Vida extra.', 3, 'M', 1), 5);
   Object.assign(TROFEOS, {'Esqueleto corredor': 'Tibia veloz', 'Zombi de la cripta': 'Dedo hinchado', 'Sabueso espectral': 'Colmillo de niebla', 'Ghoul devorador': 'Garra de ghoul',

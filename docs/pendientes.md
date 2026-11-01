@@ -912,7 +912,9 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] **Armas de rango: «grappling hook»** (dueño, 2026-10-05): sumar el efecto de atraer al rival a las armas de rango cuando toque su rework.
 - [ ] **Botas Raras que dejan levitar** (dueño, 2026-10-05, para la ampliación del catálogo): ignoran el terreno y las trampas.
 - [ ] **Intercambiar lugar y mover a un aliado como hechizos** (dueño, 2026-10-05): el efecto vale, pero no para armas.
-- [ ] **Miedo y Sueño como hechizos** (dueño, 2026-10-05): valen como efectos de habilidades (no de armas). Estados a crear cuando se trabajen los hechizos.
+- [x] **Miedo, Pánico y Sueño** (dueño, 2026-10-05; hechos el 2026-11-01): 😱 Miedo −2 a la PdG (o PdG.Esp) y −2 al daño (común o especial) contra quien lo asustó y doble No2 por cada paso que termina a 3 o menos de él sin alejarse; 😱 Pánico, lo mismo contra todos sus rivales; 💤 Sueño, un Stun de 2 turnos que se corta con daño o si un aliado pegado lo sacude (1 No2). Los tres son controles mentales (Res.Mt). Ver `vtt-hexgrid/CLAUDE.md` (js/52 y js/87).
+  - [ ] 💤 **El veneno y el sangrado del Mantenimiento no despiertan del Sueño** (no pasan por el daño del mapa): ¿deberían? (Claude, 2026-11-01)
+  - [ ] 😱 **El −2 del Miedo/Pánico en las áreas** sigue a mano (los sub-duelos del área no lo llevan).
 - [ ] **Despojos mágico/especial** de los ítems: siguen a mano.
 - [ ] **Protección de jefe, segunda versión** (P95): resistencia a otros controles (Exhausto, Inmovilizado…), contador de resistencia o fases.
 - [ ] **Estados sobre otros más finos**: los que faltan automatizar (empujar, derribar, huir, "pierde el sigilo", etc.).

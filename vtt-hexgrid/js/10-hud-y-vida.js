@@ -108,6 +108,8 @@ function hudHtml(t){
     (conRayo ? icono('rayo', '⚡', propio ? 'Abrir la Botonera (atajo: B, la de tu personaje principal)' : 'Abrir las Acciones del creep') : '') +
     // 🤝 De mano a mano (dueño, 2026-11-01): el token de un personaje aliado pegado al mío (caído o no) → darle o pedirle un ítem (js/11, comun/intercambio.js).
     (!pausaSoloMirar() && typeof manosMiPersonaje === 'function' && manosMiPersonaje(t) ? icono('manos', '🤝', 'Darle o pedirle un ítem (está pegado a tu personaje)') : '') +
+    // 💤 Despertarlo (2026-11-01): el token de un aliado dormido pegado a uno mío → sacudirlo por 1 No2 (js/87).
+    (!pausaSoloMirar() && typeof suenoDespertadorDe === 'function' && suenoDespertadorDe(t) ? icono('despertar', '💤', 'Despertarlo: sacudirlo cuesta 1 No2 (está pegado a tu personaje)') : '') +
     (creepJugador ? '' : '<button type="button" class="hud-circulo icono hud-nivel" data-hud-nivel="resto" title="Más: ficha, tarjeta, ajustes, mover libre, equipo…">⋯</button>') +
     '</div>' +
     (puedoMoverLibre(t) ? '<div class="hud-rotar" data-hud-rotar="1" title="Arrastrá para rotar el frente (la línea de color del marco). Girar no gasta No2">↻</div>' : '');
@@ -294,9 +296,11 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
       if(j >= 0){ const e = sc.estados[j]; e.danoRecibido = num(e.danoRecibido) + num(r.recibido); golpeAcum = e.danoRecibido; golpeTope = num(e.cortaDano);
         golpeHab = (sc.habilidades || []).find(h => h && e.hab && h.golpeAnunciado && (h.nombre === e.hab || h.id === e.hab)) || null;   // (el estado guarda el nombre, js/63)   // ⚡ la Descarga arcana: un hechizo cargado se dice distinto
         if(golpeAcum >= golpeTope){ golpeCae = true; sc.estados.splice(j, 1); } } }
-    return {r, previo, nuevo: fenix ? 0 : sc.hp, bronca, fenix, hpFenix: sc.hp, punteria, golpeCae, golpeAcum, golpeTope, golpeHab};
+    const desperto = num(r.recibido) > 0 && typeof suenoQuitarDe === 'function' && suenoQuitarDe(sc.estados);   // 💤 el daño lo despierta (js/87)
+    return {r, previo, nuevo: fenix ? 0 : sc.hp, bronca, fenix, hpFenix: sc.hp, punteria, golpeCae, golpeAcum, golpeTope, golpeHab, desperto};
   });
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
+  if(res.desperto && typeof mesaLinea === 'function') mesaLinea(`💤 ${nombreDe(t)} se despertó: recibió daño`, 'recordatorio');
   if(res.fenix){
     toast(`🔥 ${nombreDe(t)}: ¡la Llama de Fénix lo levanta! Revive con ${fmt(res.hpFenix)} HP y queda Titilando.`);
     try{ momentoAbrir({tipo: 'fenix', icono: '🔥', titulo: `${nombreDe(t)} renace de sus cenizas`, estado: 'listo', resultado: `La Llama de Fénix lo levanta con ${fmt(res.hpFenix)} HP; queda Titilando hasta su próximo turno.`}); }catch(e){}
@@ -464,6 +468,7 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
       datos.ataquesArma._absorbe = 1;
       datos.spGastado = num(datos.spGastado) - absorbe;
     }
+    const desperto = num(r.recibido) > 0 && typeof suenoQuitarDe === 'function' && suenoQuitarDe(efectos);   // 💤 el daño lo despierta (js/87)
     tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
     if(datosEf && JSON.stringify(efectos) !== efectosAntes) tx.set(efectosRef, {json: JSON.stringify(datosEf), actualizado: ts});   // el escudo que bajó, lo que absorbió la Armadura arcana, Titilando
     // El escudo que bajó también en el resumen público (2026-10-11, probando Shield: el token seguía mostrando 14/14 con el escudo gastado).
@@ -473,11 +478,13 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     const titE = (fenix || pacto) ? efectos.find(x => x && x.titilando && x.activo !== false) : null;
     const titPub = titE ? {nombre: String(titE.nombre).slice(0, 60), turnos: num(titE.turnos), permanente: false, invulnerable: true, polaridad: 'buff', detalle: String(titE.detalle || '').slice(0, 300)}
       : {nombre: 'Titilando', polaridad: 'buff', invulnerable: true};
-    tx.update(base, {actualizado: ts, 'resumen.hp': datos.hp, ...(absorbe ? {'resumen.sp': num(rs.sp) + absorbe} : {}), ...(estPub ? {'resumen.estados': estPub} : {}), ...(aliento ? {'resumen.ultimoAlientoUsado': true} : {}),
+    tx.update(base, {actualizado: ts, 'resumen.hp': datos.hp, ...(absorbe ? {'resumen.sp': num(rs.sp) + absorbe} : {}), ...(estPub ? {'resumen.estados': estPub} : {}),
+      ...(desperto ? {'resumen.estados': (estPub || rs.estados || []).filter(x => !(x && SUENO_RE.test(String(x.nombre || '').trim())))} : {}), ...(aliento ? {'resumen.ultimoAlientoUsado': true} : {}),
       ...(fenix ? {'resumen.estados': (estPub || rs.estados || []).filter(x => !(x && /^llama de f[eé]nix/i.test(String(x.nombre || '')))).concat([titPub])} : {}),
       ...(pacto ? {'resumen.pacto': false, ...(fenix ? {} : {'resumen.estados': (estPub || rs.estados || []).concat([titPub])})} : {})});
-    return {r, previo, nuevo: fenix || pacto ? 0 : datos.hp, absorbe, aliento, fenix, pacto, hpFenix: datos.hp};
+    return {r, previo, nuevo: fenix || pacto ? 0 : datos.hp, absorbe, aliento, fenix, pacto, hpFenix: datos.hp, desperto};
   });
+  if(res.desperto && typeof mesaLinea === 'function') mesaLinea(`💤 ${nombreDe(t)} se despertó: recibió daño`, 'recordatorio');
   if(res.aliento){
     const txt = `${nombreDe(t)} iba a caer, pero el Anillo del último aliento lo sostiene con 1 de vida (una vez por día)`;
     try{ mesaLinea(`💍 ${txt}`, 'recordatorio'); }catch(err){}
@@ -543,11 +550,14 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     const previo = num(inv.hp);
     inv.hp = Math.max(0, previo - r.recibido);
     const rs = ficha.data().resumen || {};
+    const desperto = num(r.recibido) > 0 && typeof suenoQuitarDe === 'function' && suenoQuitarDe(inv.estados);   // 💤 el daño lo despierta (js/87)
+    const sinSueno = i => desperto && Array.isArray(i.estados) ? {estados: i.estados.filter(x => !(x && SUENO_RE.test(String(x.nombre || '').trim())))} : {};
     tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
-    tx.update(base, {actualizado: ts, 'resumen.invocaciones': (rs.invocaciones || []).map(i => i.id === invId ? {...i, hp: inv.hp} : i)});
-    return {r, previo, nuevo: inv.hp};
+    tx.update(base, {actualizado: ts, 'resumen.invocaciones': (rs.invocaciones || []).map(i => i.id === invId ? {...i, hp: inv.hp, ...sinSueno(i)} : i)});
+    return {r, previo, nuevo: inv.hp, desperto};
   });
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
+  if(res.desperto && typeof mesaLinea === 'function') mesaLinea(`💤 ${nombreDe(t)} se despertó: recibió daño`, 'recordatorio');
   if(guarda && golpe > 0) guardianAviso(t, guarda);
   if(muro && golpe > 0) muroAviso(t, muro);
   await mitiMitiCobrar(t, prot, res);
@@ -1147,7 +1157,8 @@ function hudConectar(t){
     if(clave === 'tunel'){ tunelBorrar(seleccion); toast('🧹 La estela del túnel se va'); hudPonerNivel('vital'); return; }   // (vuelve al primer menú: el 🧹 ya no va)
     if(clave === 'oculto'){ editarToken(seleccion, {oculto: !t.oculto, ...(!t.oculto && t.revelado ? {revelado: false} : {})}); return; }   // ocultarlo lo vuelve a esconder del todo (js/29)
     if(clave === 'equipo'){ abrirEquipoMapa(t.fichaId.split(SEP_INVOCACION)[0]); return; }   // el mapa (js/11, A4)
-    if(clave === 'manos'){ const mio = manosMiPersonaje(t); if(mio) Intercambio.abrirManos(mio, t.fichaId); return; }   // 🤝 de mano a mano (js/11)
+    if(clave === 'manos'){ const mio = manosMiPersonaje(t); if(mio) Intercambio.abrirManos(mio, t.fichaId); return; }
+    if(clave === 'despertar'){ if(typeof suenoSacudir === 'function') suenoSacudir(t); return; }   // 💤 (js/87)   // 🤝 de mano a mano (js/11)
     if(clave === 'rayo'){
       const fichaDeToken = t.tipo === 'pj' && t.fichaId ? t.fichaId.split(SEP_INVOCACION)[0] : '';
       const invDeToken = t.tipo === 'pj' && t.fichaId && t.fichaId.includes(SEP_INVOCACION) ? t.fichaId.split(SEP_INVOCACION)[1] : '';

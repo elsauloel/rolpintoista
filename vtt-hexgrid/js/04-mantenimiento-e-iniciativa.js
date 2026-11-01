@@ -1182,16 +1182,19 @@ function lentoEn(col, fila){
 // lento no los frena.
 // `ext` (Extenuado, Maldición extenuante, 2026-10-12): además, 1 No2 más por stack cada 2 casillas que se pagan (la 2.ª, la 4.ª…).
 // `sprint` (Sprint, 2026-10-13): los primeros casilleros pagados (después de los gratis) ya están pagos: cuestan solo el recargo (Rengo, terreno lento).
-// `miedo` (😱 Miedo, 2026-10-18): las casillas de quienes lo asustaron; cada paso que lo acerca a uno cuesta MIEDO_NO2 (2), aunque fuera gratis.
+// `miedo` (😱 Miedo y 😱 Pánico, 2026-11-01, dueño: «acercarse a 3 casilleros o menos cuesta doble nitro cada movimiento»): las casillas de quienes
+// lo asustaron (con Pánico, las de todos sus rivales a la vista). Un paso que termina a MIEDO_RADIO (3) o menos de uno de ellos y no se aleja de él
+// (queda a la misma distancia o más cerca) cuesta el doble de lo normal; uno de los pasos gratis cuesta lo que costaría pagado (el doble de 0 sería 0).
+// Alejarse no cuesta extra. (Antes, 2026-10-18: cada paso hacia él, 2 No2.)
 function costoPasos(ruta, porCasillero, gratis, recargo, levita, ext, sprint, miedo){
   const acc = [];
   let s = 0, pagados = 0, sp = Math.max(0, num(sprint));
   for(let i = 1; i < (ruta || []).length; i++){
-    const asusta = porCasillero > 0 && (miedo || []).some(f => distanciaHex(ruta[i], f) < distanciaHex(ruta[i - 1], f));
-    if(i <= num(gratis) && asusta) s += MIEDO_NO2;
+    const asusta = porCasillero > 0 && miedoPasoAsusta(ruta[i - 1], ruta[i], miedo);
+    if(i <= num(gratis) && asusta) s += porCasillero;
     if(i > num(gratis)){
       const lento = porCasillero > 0 && i > num(levita) ? lentoEn(ruta[i - 1].col, ruta[i - 1].fila) : 0;
-      const paso = porCasillero > 0 ? Math.max(porCasillero, lento, asusta ? MIEDO_NO2 : 0) : 0;
+      const paso = porCasillero > 0 ? Math.max(porCasillero, lento) * (asusta ? 2 : 1) : 0;
       s += sp > 0 && porCasillero > 0 ? (sp--, Math.max(0, paso - 1)) : paso;
       if(porCasillero > 0 && ++pagados % 2 === 0) s += Math.max(0, num(ext));
     }

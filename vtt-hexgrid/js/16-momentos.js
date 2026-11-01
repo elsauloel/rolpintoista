@@ -89,7 +89,8 @@ function momentoRecibido(id, d){
   if(d.tipo === 'zona-extra' && typeof zonaExtraMomento === 'function') zonaExtraMomento(id, d);   // 🎲 la tirada extra de una zona, para quien la creó (js/66)   // 🤺 la ruleta de casillas (js/62)
   if(d.tipo === 'gancho' && typeof arrastreZonasMomento === 'function') arrastreZonasMomento(id, d);   // ⚖ Arrastrar: las zonas del camino, para el dueño (js/78)
   if(d.tipo === 'confusion') confusionMomento(d);   // la tirada de Confusión del turno (js/20)
-  if(d.tipo === 'soltar-ayuda' && typeof soltarAyudaMomento === 'function') soltarAyudaMomento(id, d);   // 🤝 «¿Lo ayudás a zafarse?» (js/54, 2026-10-23)
+  if(d.tipo === 'soltar-ayuda' && typeof soltarAyudaMomento === 'function') soltarAyudaMomento(id, d);
+  if(d.tipo === 'sueno-despertar' && typeof suenoMomento === 'function') suenoMomento(id, d);   // 💤 lo sacudió un aliado (js/87, 2026-11-01)   // 🤝 «¿Lo ayudás a zafarse?» (js/54, 2026-10-23)
   oporMomento(id, d);   // el ataque de oportunidad: la pregunta a quien decide y la respuesta a quien se aleja (js/17)
   // Una trampa, paso a paso (js/19): la víctima la resuelve al centro; el resto, en la Crónica.
   if(d.tipo === 'trampa' && d.datos && d.datos.fase){ trampaMomento(id, d); return; }

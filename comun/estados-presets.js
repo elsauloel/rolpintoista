@@ -32,6 +32,10 @@ const ESTADOS_PRESET = [
   // Stun (dueño, 2026-10-06): «el Stun es no poder hacer nada; y si te atacan, tu Evasión es 1. Punto.» No le toca los No2.
   {nombre:'Stun', polaridad:'debuff', turnos:2, stun:true, esCC:true,
     detalle:'No puede hacer nada mientras dura: ni atacar, ni moverse, ni usar habilidades o consumibles, ni hacer Parry. Si lo atacan, su Evasión es 1 (sin tirar). No le toca los No2. ⚙ Automatizado: la Evasión sale 1 sola; en el mapa, cualquier acción avisa que está stuneado (y la mesa puede dejarla pasar).'},
+  // 💤 Sueño (dueño, 2026-11-01: «es un stun que igual se termina con daño y también puede haber algunas situaciones específicas que lo despierten»):
+  // `stun` (todo lo del Stun) + `sueno`. Lo despierta el daño que le saca vida (el mapa, js/10 y js/87) o un aliado pegado que lo sacude (1 No2, js/87).
+  {nombre:'Sueño', polaridad:'debuff', turnos:2, stun:true, sueno:true, esCC:true,
+    detalle:'Dormido: como el Stun, no puede hacer nada mientras dura (ni atacar, ni moverse, ni usar habilidades o consumibles, ni hacer Parry) y si lo atacan su Evasión es 1 (sin tirar). Se despierta si recibe daño (cualquier golpe que le saque vida) o si un aliado pegado lo sacude (💤 en su token, 1 No2). Es un control mental: se resiste con la Resistencia mental (Res.Mt), no con la Res.CC; lo frenan la Inmunidad mental y la Inmunidad a CC, y lo cura el Té de tilo. ⚙ Automatizado en el mapa. ✋ A mano: el veneno o el sangrado del Mantenimiento no lo despiertan solos.'},
   {nombre:'Hypeado', polaridad:'buff', turnos:3, hypeado:true,
     detalle:'Sus No2 máximos suben un tercio del natural (redondeado hacia arriba). Ej.: con 9 de máximo, gana 3 y llega a 12; con 7, gana 3 y llega a 10.'},
   {nombre:'Armadura rota', polaridad:'debuff', stacks:1, turnos:0, permanente:true, armaduraRota:true,
@@ -76,11 +80,14 @@ const ESTADOS_PRESET = [
   // Lento (2026-10-04, dueño, con las mecánicas de los pies): el primer casillero que se mueve en cada turno cuesta el doble. Lo acorta Recuperarse rápido.
   {nombre:'Lento', polaridad:'debuff', turnos:2, lento:true, esCC:true,
     detalle:'Lento: el primer casillero que se mueve en cada turno cuesta el doble de No2 mientras dure.'},
-  // Miedo (2026-10-18, dueño, con la Calavera con vela; reemplaza al de −2 PdG y −2 Daño): lleva `miedoDe` = el token que lo asustó (y
-  // `miedoDeNombre`). Moverse hacia él cuesta 2 No2 por casillero (el mapa, js/04 y js/52) y lo que haga contra él va con −1 PdG y −1 al daño
-  // (el duelo, `ataque.miedo`). Dura hasta que empieza su próximo turno.
+  // Miedo (2026-10-18, dueño, con la Calavera con vela; reglas nuevas del dueño, 2026-11-01): lleva `miedoDe` = el token que lo asustó (y
+  // `miedoDeNombre`). Cada paso que termina a 3 o menos de él sin alejarse cuesta el doble de No2 (el mapa, js/04 y js/52) y lo que haga contra él va
+  // con −2 a la PdG (o PdG.Esp) y −2 al daño, común o especial (el duelo, `ataque.miedo`). Dura hasta que empieza su próximo turno.
   {nombre:'Miedo', polaridad:'debuff', turnos:1, esCC:true, miedo:true, alEmpezarTurno:true,
-    detalle:'Asustado: cada casillero que se mueve hacia quien lo asustó le cuesta 2 No2, y todo lo que hace contra él (un ataque, una habilidad, una varita) va con −1 a la probabilidad de golpe y −1 al daño, común o especial. Dura hasta que empieza su próximo turno. Es un control (lo frenan la resistencia a CC y la Inmunidad a CC). ⚙ Automatizado en el mapa. ✋ A mano: el −1 en un área o una onda que lo incluye, y el Miedo que no viene de nadie (una trampa).'},
+    detalle:'Asustado: cada casillero que mueve y que termina a 3 o menos de quien lo asustó, sin alejarse de él, le cuesta el doble de No2 (alejarse cuesta lo normal), y todo lo que hace contra él (un ataque, una habilidad, una varita) va con −2 a la probabilidad de golpe y −2 al daño, común o especial. Dura hasta que empieza su próximo turno. Es un control mental: se resiste con la Resistencia mental (Res.Mt), no con la Res.CC; lo frenan la Inmunidad mental y la Inmunidad a CC, y lo cura el Té de tilo. ⚙ Automatizado en el mapa. ✋ A mano: el −2 en un área o una onda que lo incluye, y el Miedo que no viene de nadie (una trampa).'},
+  // 😱 Pánico (dueño, 2026-11-01: «vamos a definir miedo y pánico»): el Miedo contra TODOS sus rivales a la vista (`panico`; el mapa, js/52).
+  {nombre:'Pánico', polaridad:'debuff', turnos:1, esCC:true, panico:true, alEmpezarTurno:true,
+    detalle:'Aterrado de todos: como el Miedo, pero contra todos sus rivales. Cada casillero que mueve y que termina a 3 o menos de un rival a la vista, sin alejarse de ese rival, le cuesta el doble de No2, y todo lo que hace contra cualquier rival va con −2 a la probabilidad de golpe y −2 al daño, común o especial. Dura hasta que empieza su próximo turno. Es un control mental: se resiste con la Resistencia mental (Res.Mt), no con la Res.CC; lo frenan la Inmunidad mental y la Inmunidad a CC, y lo cura el Té de tilo. ⚙ Automatizado en el mapa. ✋ A mano: el −2 en un área o una onda.'},
   {nombre:'Provocado', polaridad:'debuff', turnos:2, esCC:true,
     detalle:'Provocado (Taunt): ira dirigida. Mientras dure, su turno es para ir contra quien lo provocó: atacarlo o usar contra él una habilidad hostil (si no llega, acercarse). No se cura, no se protege ni hace otra cosa en lugar de eso (✋ a mano: lo respeta el jugador o el GM). Es un control (lo reducen la resistencia a CC y la Inmunidad a CC).'},
   {nombre:'Escarcha', polaridad:'debuff', turnos:2, stacks:1, esEscarcha:true, mods:[{stat:'nitros', val:-1}],
@@ -201,10 +208,10 @@ const ESTADOS_PRESET = [
   {nombre:'Invulnerable', alias:['Titilando'], polaridad:'buff', turnos:3, invulnerable:true,
     detalle:'No recibe daño de ninguna fuente (golpes, veneno, sangrado, etc.) y no se le puede aplicar ningún debuff. En el mapa, su token titila.'},
   {nombre:'Inmunidad a CC', polaridad:'buff', turnos:2, inmunidadCC:true,
-    detalle:'Inmune a todos los controles, los del cuerpo y los mentales: Stun, Pajaritos, Parálisis, Exhausto, Lisiado, Rengo, Ceguera, Inmovilizado, Lento, Sentado, Desarmado, Miedo, Confusión, Provocado, Silencio (no se le pueden aplicar mientras dure). Veneno y Sangrado no cuentan como control.'},
+    detalle:'Inmune a todos los controles, los del cuerpo y los mentales: Stun, Pajaritos, Parálisis, Exhausto, Lisiado, Rengo, Ceguera, Inmovilizado, Lento, Sentado, Desarmado, Miedo, Pánico, Confusión, Provocado, Silencio (no se le pueden aplicar mientras dure). Veneno y Sangrado no cuentan como control.'},
   // Inmunidad mental (2026-10-18, dueño, P210): solo los controles mentales (Combatiente.GRUPOS_CC.mental). La dan el Atrapasueños y otros talismanes.
   {nombre:'Inmunidad mental', polaridad:'buff', turnos:2, inmunidadMental:true,
-    detalle:'Inmune a los controles mentales: Miedo, Confusión, Provocado, Sueño y Silencio (no se le pueden aplicar mientras dure). Los del cuerpo (Stun, Inmovilizado…) le entran igual.'},
+    detalle:'Inmune a los controles mentales: Miedo, Pánico, Confusión, Provocado, Sueño y Silencio (no se le pueden aplicar mientras dure). Los del cuerpo (Stun, Inmovilizado…) le entran igual.'},
   {nombre:'Espinas', polaridad:'buff', turnos:3, espinas:true,
     detalle:'Mientras dure, cada ataque cuerpo a cuerpo que recibe le devuelve al atacante 1/4 (25 %) del daño del golpe (con el crítico, antes de la Defensa), redondeado hacia arriba, directo a la vida. ⚙ Automatizado en el duelo; ✋ a mano fuera de él.'},
   // Espejo (dueño, 2026-10-07): el espejo de las Espinas para el daño especial — a cualquier distancia (la magia se tira de lejos).

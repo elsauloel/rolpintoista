@@ -1689,6 +1689,13 @@ versión parecida en más de una, es candidato a juntar.
   lleva `miedoDe` / `miedoDeNombre` (quién lo asustó; los conservan `EstadosAplicar.limpiarSpec/componer`, `FichaAcciones.estadoDeSpec` y el
   resumen público). Moverse hacia él cuesta 2 No2 por casillero (el mapa) y `Duelo.crear({miedo: 1})` → `ataque.miedo`: −1 al PdG (o PdG.Esp)
   y −1 al daño, con arma o habilidad. `CreepCalculo.auraMiedo(sc)` y `itemParaCreep` conservan `auraMiedo` (el radio del aura de la Calavera).
+  **Desde el 2026-11-01 (dueño):** −2 (PdG o PdG.Esp, y daño común o especial: `Duelo.crear({miedo: 2})`), y el paso que termina a 3 o menos de él sin
+  alejarse cuesta el doble de No2 (alejarse, lo normal). **😱 Pánico** (preset nuevo, `panico: true`): lo mismo contra todos sus rivales.
+  **💤 Sueño** (preset nuevo, `stun` + `sueno`; `Combatiente.stuneado` también lo reconoce por el nombre): un Stun que se corta con el daño o si un
+  aliado pegado lo sacude (el mapa, js/87). Los tres son
+  controles mentales (`Combatiente.GRUPOS_CC.mental`): se resisten con **Res.Mt**, no con la Res.CC (dueño, 2026-11-01; `resisteCC` → 'resm', lo que
+  proponen los asistentes), los frenan la Inmunidad mental y —por ser `esCC`— la Inmunidad a CC (decisión de Claude: es «inmune a todos los
+  controles», su texto ya los nombra), y los cura el grupo «mente» (Té de tilo, `GRUPOS_CURA.mente`).
 - **Los controles por grupo** (2026-10-18, dueño, P210): `Combatiente.GRUPOS_CC` (mental, aturdimiento, herida, sentidos, atrapar, equilibrio,
   desarme, cada uno con su `resiste`), `grupoCC(estado|nombre)`, `esMental`, `esControl`, `resisteCC` (el id del stat) y `resisteCCEtq`
   («Res.Mt»…). `Combatiente.inmunidad`: la Inmunidad a CC frena todo control; la **Inmunidad mental** (`inmunidadMental`, preset nuevo) solo los

@@ -125,7 +125,7 @@ const Combatiente = (() => {
     return [...(estados || []), {nombre: 'Estatuilla del Gauchito Gil', polaridad: 'buff', activo: true, afortunado: true, afortunadoStats: GAUCHITO_STATS}];
   }
   // Stun (dueño, 2026-10-06): no puede hacer nada; si lo atacan, su Evasión es 1. Un estado viejo sin la marca `stun` se reconoce por el nombre.
-  const esStun = e => !!e && e.activo !== false && (!!e.stun || /^stun$/i.test(String(e.nombre || '').trim()));
+  const esStun = e => !!e && e.activo !== false && (!!e.stun || /^(stun|sue[ñn]o)$/i.test(String(e.nombre || '').trim()));   // 💤 el Sueño es un Stun (2026-11-01; por el nombre, para lo que publica una ficha)
   const stuneado = estados => (estados || []).some(esStun);
   // Mareo de invocación (2026-10-20): no actúa en su turno, pero conserva los No2 y reacciona (dodge roll, Parry). Lo que publica una ficha de sus
   // invocaciones no trae la marca: se reconoce también por el nombre (probado en el mapa).
@@ -1492,7 +1492,7 @@ const Combatiente = (() => {
      qué se resiste por defecto (los asistentes de la Ejecución y de las trampas lo proponen solos); una habilidad puntual lo puede cambiar.
      Silencio como mental y Ceguera con Res.CC: confirmados por el dueño. Un estado propio puede traer `grupoCC` o `esMental`. */
   const GRUPOS_CC = {
-    mental: {label: 'Mentales', icono: '🧠', resiste: 'resm', estados: ['Miedo', 'Confusión', 'Provocado', 'Sueño', 'Silencio']},
+    mental: {label: 'Mentales', icono: '🧠', resiste: 'resm', estados: ['Miedo', 'Pánico', 'Confusión', 'Provocado', 'Sueño', 'Silencio']},
     aturdimiento: {label: 'Aturdimiento', icono: '💫', resiste: 'rescc', estados: ['Stun', 'Pajaritos', 'Parálisis', 'Exhausto']},
     herida: {label: 'Heridas', icono: '🦵', resiste: 'rescc', estados: ['Lisiado', 'Rengo']},
     sentidos: {label: 'Sentidos', icono: '👁', resiste: 'rescc', estados: ['Ceguera']},
@@ -2265,7 +2265,7 @@ const Combatiente = (() => {
   const GRUPOS_CURA = {
     heridas: {label: 'Heridas', estados: ['Sangrado', 'Lisiado', 'Rengo']},
     venenos: {label: 'Venenos', estados: ['Veneno', 'Veneno severo'], patron: /veneno|toxic/},   // cualquier veneno, también los que vengan
-    mente: {label: 'Mente e ilusiones', estados: ['Confusión', 'Miedo', 'Provocado', 'Ceguera']},
+    mente: {label: 'Mente e ilusiones', estados: ['Confusión', 'Miedo', 'Pánico', 'Provocado', 'Sueño', 'Ceguera']},
     aturdimiento: {label: 'Aturdimiento', estados: ['Pajaritos', 'Stun']},
     elementales: {label: 'Elementales', estados: ['Quemadura', 'Escarcha', 'Parálisis']},
     fatiga: {label: 'Fatiga', estados: ['Cansado', 'Exhausto', 'Lento']},

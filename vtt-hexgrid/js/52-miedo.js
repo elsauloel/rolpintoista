@@ -1,25 +1,44 @@
-/* ---------- 😱 El Miedo y la 💀 Calavera con vela (2026-10-18, dueño) ----------
-   El Miedo (comun/estados-presets.js) lleva `miedoDe` = el token que lo asustó. Mientras dura, cada casillero que se mueve hacia ese token le
-   cuesta MIEDO_NO2 (costoPasos, js/04, con `miedoFuentes`) y todo lo que hace contra él va con −1 PdG y −1 al daño (`miedoContra` → el `miedo`
-   de Duelo.crear, js/13 y js/17). Dura hasta que empieza su próximo turno.
+/* ---------- 😱 El Miedo, 😱 el Pánico y 💀 la Calavera con vela (2026-10-18; reglas nuevas del dueño, 2026-11-01) ----------
+   El Miedo (comun/estados-presets.js) lleva `miedoDe` = el token que lo asustó. Mientras dura:
+   · todo lo que hace contra él va con −MIEDO_PENA (2) a la PdG (o PdG.Esp) y −2 al daño (común o especial): `miedoContra` → el `miedo` de
+     Duelo.crear (js/13 y js/17), con arma o con habilidad;
+   · cada paso que termina a MIEDO_RADIO (3) o menos de él y no se aleja le cuesta el doble de No2 (costoPasos, js/04, con `miedoFuentes`).
+   El Pánico (estado nuevo, 2026-11-01) es lo mismo contra TODOS sus rivales: −2/−2 a lo que hace contra cualquiera de ellos y el doble de No2 por
+   cada paso que termina a 3 o menos de un rival a la vista sin alejarse de ese rival (si se aleja de uno pero queda cerca de otro y no se aleja de
+   ese otro, igual cuesta el doble). Los dos duran hasta que empieza su próximo turno.
    La Calavera con vela: quien la lleva (`auraMiedo` = el radio, en lo que publica su ficha o su tarjeta de creep) tiene un aura espeluznante.
    Cada vez que un rival entra (estaba afuera y ahora está a `radio` o menos), tira su Res.Mt contra el Ef.Esp de quien la lleva (dos tiradas
    nuevas; el empate lo gana la calavera) y, si no llega, queda con Miedo. Lo resuelve la pantalla que maneja al que entró (sus personajes; el
    GM, los creeps), en modo combate: el Anuncio para él y la Crónica para la mesa. Lo que ya estaba adentro al abrir el mapa no cuenta. */
-const MIEDO_NO2 = 2;
+const MIEDO_PENA = 2, MIEDO_RADIO = 3;
 function miedoEstados(t){
   return (typeof confusionEstadosDe === 'function' ? confusionEstadosDe(t) : [])
     .filter(e => e && e.activo !== false && (e.miedo || /^miedo$/i.test(String(e.nombre || '').trim())));
 }
-// Dónde están los que lo asustaron (para cobrar los pasos hacia ellos).
-function miedoFuentes(t){
-  return miedoEstados(t).map(e => e.miedoDe && tokens.get(e.miedoDe)).filter(Boolean).map(x => ({col: x.col, fila: x.fila}));
+function panicoDe(t){
+  return (typeof confusionEstadosDe === 'function' ? confusionEstadosDe(t) : [])
+    .some(e => e && e.activo !== false && (e.panico || /^p[aá]nico$/i.test(String(e.nombre || '').trim())));
 }
-// ¿`atq` le tiene miedo a `def`? → 1 (el −1 del duelo) o 0.
+// Los rivales que lo asustan con Pánico: los de rivalesDe (js/02: ni ocultos ni muertos) que se ven (no los que están en sigilo).
+function panicoRivales(t){
+  if(!panicoDe(t) || typeof rivalesDe !== 'function') return [];
+  return rivalesDe(t).filter(r => !(typeof enSigilo === 'function' && enSigilo(r)));
+}
+// Dónde están los que lo asustan (para cobrar los pasos): los de su Miedo y, con Pánico, sus rivales.
+function miedoFuentes(t){
+  return [...miedoEstados(t).map(e => e.miedoDe && tokens.get(e.miedoDe)).filter(Boolean), ...panicoRivales(t)].map(x => ({col: x.col, fila: x.fila}));
+}
+// ¿El paso de `a` a `b` cuesta el doble? Termina a MIEDO_RADIO o menos de alguno y no se aleja de ese.
+function miedoPasoAsusta(a, b, fuentes){
+  return (fuentes || []).some(f => { const d = distanciaHex(b, f); return d <= MIEDO_RADIO && d <= distanciaHex(a, f); });
+}
+// ¿`atq` le tiene miedo a `def` (su Miedo, o Pánico y `def` es su rival)? → MIEDO_PENA (el −2 del duelo) o 0.
 function miedoContra(atq, def){
   if(!atq || !def) return 0;
   const defId = def.id || idDeToken(def);
-  return defId && miedoEstados(atq).some(e => e.miedoDe === defId) ? 1 : 0;
+  if(defId && miedoEstados(atq).some(e => e.miedoDe === defId)) return MIEDO_PENA;
+  if(panicoDe(atq) && (atq.tipo === 'creep' ? def.tipo === 'pj' : def.tipo === 'creep')) return MIEDO_PENA;
+  return 0;
 }
 
 /* ---------- El aura de la Calavera ---------- */
@@ -85,7 +104,7 @@ async function auraResolver(id, pid){
   const quien = nombreDe(t), de = p.oculto ? 'Alguien' : nombreDe(p);
   const res = auraResMtDe(t), ef = auraEfEspDe(p);
   const titulo = `${quien} entra en el aura espeluznante de ${de}`;
-  const paso1 = {titulo: '💀 El aura espeluznante', texto: `Tira Res.Mt contra el Ef.Esp de ${de}: si no llega, queda con Miedo (moverse hacia ${de} le cuesta ${MIEDO_NO2} No2 por casillero, y contra ${de} tiene −1 a la probabilidad de golpe y −1 al daño) hasta que empieza su próximo turno.`};
+  const paso1 = {titulo: '💀 El aura espeluznante', texto: `Tira Res.Mt contra el Ef.Esp de ${de}: si no llega, queda con Miedo (cada paso que termina a ${MIEDO_RADIO} casilleros o menos de ${de} sin alejarse le cuesta el doble de No2, y contra ${de} tiene −${MIEDO_PENA} a la probabilidad de golpe y −${MIEDO_PENA} al daño, común o especial) hasta que empieza su próximo turno.`};
   if(res === null || ef === null){
     try{ momentoAbrir({tipo: 'zona-renueva', icono: '💀', titulo, estado: 'listo', resultado: `Res.Mt contra el Ef.Esp de ${de}: tiralo a mano (faltan los datos para tirarlo solo).`, datos: {}}); }catch(err){}
     try{ mesaLinea(`💀 ${quien} entró en el aura espeluznante de ${de}: Res.Mt contra su Ef.Esp, a mano`, 'recordatorio'); }catch(err){}

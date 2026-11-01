@@ -213,8 +213,10 @@ function stunAntes(tokenId, seguir, o){
         {texto: 'Hacerlo igual (lo decide la mesa)', sec: true, alClic: () => { AvisoCombate.cerrar(); stunPase = tokenId; seguir(); }}]});
     return true;
   }
-  AvisoCombate.mostrar({icono: '💫', titulo: `${nombreDe(t)} está stuneado`, pasos: [{titulo: 'No puede hacer nada',
-    texto: 'Mientras dura el Stun no puede atacar, moverse, usar habilidades o consumibles, ni hacer Parry. Si lo atacan, su Evasión es 1 (sin tirar).'}],
+  const duerme = typeof dormido === 'function' && dormido(t);   // 💤 el Sueño es un Stun que se corta con daño (js/87)
+  AvisoCombate.mostrar({icono: duerme ? '💤' : '💫', titulo: `${nombreDe(t)} está ${duerme ? 'dormido' : 'stuneado'}`, pasos: [{titulo: 'No puede hacer nada',
+    texto: duerme ? 'Mientras duerme no puede atacar, moverse, usar habilidades o consumibles, ni hacer Parry. Si lo atacan, su Evasión es 1 (sin tirar). Se despierta si recibe daño o si un aliado pegado lo sacude (1 No2).'
+      : 'Mientras dura el Stun no puede atacar, moverse, usar habilidades o consumibles, ni hacer Parry. Si lo atacan, su Evasión es 1 (sin tirar).'}],
     botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()},
       {texto: 'Hacerlo igual (lo decide la mesa)', sec: true, alClic: () => { AvisoCombate.cerrar(); stunPase = tokenId; seguir(); }}]});
   return true;

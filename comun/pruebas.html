@@ -42,14 +42,14 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 </script>
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
-<script src="combatiente.js?v=20261101no2"></script>
+<script src="combatiente.js?v=20261101miedo2"></script>
 <script src="creep-calculo.js?v=20261101no2"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261101no2"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
-<script src="estados-presets.js?v=20261031luz"></script>
+<script src="estados-presets.js?v=20261101miedo"></script>
 <script src="estados-aplicar.js"></script>
 <script src="recibidos.js"></script>
 <script src="tokens-auto.js"></script>
@@ -99,7 +99,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261031luz"></script>
+<script src="duelo.js?v=20261101miedo"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -111,7 +111,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="pasivas.js"></script>
 <script src="skills-clase.js?v=20261101tienda"></script>
 <script src="creeps-base.js"></script>
-<script src="skills-creep-base.js?v=20261101min1"></script>
+<script src="skills-creep-base.js?v=20261101miedo"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
 <script>
@@ -6300,6 +6300,21 @@ prueba('🛡❤ Escudo y Vida extra (P227, 2026-10-27): el Escudo especial es un
   igual([!!p('Escudo especial').excedenteVida, !!p('Vida extra').excedenteVida, Combatiente.vidaExtraTotal(v), Combatiente.excedenteConTope(v, 30, 20, 50), S.hp === max, ve ? ve.escudoMagico : 0, !!(ve && ve.finCombate),
     p('Arrojo').alias.includes('Envión')],
     [false, true, 4, 6, true, Math.floor(max * 0.5), true, true]);
+});
+prueba('😱 Miedo y Pánico (dueño, 2026-11-01): −2, control mental, lo cura el Té de tilo; el Pánico existe en el selector', () => {
+  const mi = ESTADOS_PRESET.find(p => p.nombre === 'Miedo'), pa = ESTADOS_PRESET.find(p => p.nombre === 'Pánico');
+  const E = o => ({activo: true, ...o}), deb = o => ({polaridad: 'debuff', ...o});
+  const cur = Combatiente.curarEstados([{nombre: 'Pánico'}, {nombre: 'Miedo'}, {nombre: 'Marcado'}], ['mente']);
+  igual([!!pa, pa && pa.panico, pa && pa.esCC, Combatiente.grupoCC('Pánico'), Combatiente.esMental(pa), /−2/.test(mi.detalle), /−2/.test(pa.detalle),
+      Combatiente.inmunidad([E({inmunidadMental: true})], deb(pa)), Combatiente.inmunidad([E({inmunidadCC: true})], deb(pa)), cur.sacados.join()],
+    [true, true, true, 'mental', true, true, true, 'Inmunidad mental', 'Inmunidad a CC', 'Pánico,Miedo']);
+});
+prueba('💤 Sueño (dueño, 2026-11-01): un Stun mental que lo cura el Té de tilo y lo frena la Inmunidad mental', () => {
+  const su = ESTADOS_PRESET.find(p => p.nombre === 'Sueño');
+  const E = o => ({activo: true, ...o}), deb = o => ({polaridad: 'debuff', ...o});
+  igual([!!su, su && su.turnos, Combatiente.stuneado([{nombre: 'Sueño'}]), Combatiente.stuneado([{...su}]), Combatiente.grupoCC('Sueño'), Combatiente.resisteCC('Sueño'),
+      Combatiente.inmunidad([E({inmunidadMental: true})], deb(su)), Combatiente.curarEstados([{nombre: 'Sueño'}], ['mente']).sacados.join(), Combatiente.tirarStat(8, [{...su}], 'eva').total],
+    [true, 2, true, true, 'mental', 'resm', 'Inmunidad mental', 'Sueño', 1]);
 });
 prueba('🧪 El veneno de las trampas por golpe no se resiste (P228, 2026-10-27): la Aguja 1d8 con Perfora 1, los Dardos y la Espina si lastiman', () => {
   const td = n => (CATALOGO_BASE.find(i => i.nombre === n) || {}).trampaDatos || {};

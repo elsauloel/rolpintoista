@@ -646,7 +646,7 @@ const Duelo = (() => {
     }
     // 🗡 Ataque por la espalda, regla general (2026-10-15, dueño: «simplemente es un +1 a la pdg»; Pasos silenciosos, +1 más): lo calcula el mapa
     // (quien ataca está en la cuña ciega del defensor, sin hacer falta sigilo) y se suma al PdG al guardarlo, junto con el bono del arma si hay.
-    // 😱 Miedo (2026-10-18): quien ataca le tiene miedo al defensor: −1 PdG (o PdG.Esp) y −1 al daño, con arma o con habilidad.
+    // 😱 Miedo / Pánico (2026-10-18; −2 desde el 2026-11-01): quien ataca le tiene miedo al defensor: −N PdG (o PdG.Esp) y −N al daño (común o especial), con arma o con habilidad.
     if(_num(cfg.miedo) > 0) inicial.ataque.miedo = Math.min(3, Math.round(_num(cfg.miedo)));
     if(_num(cfg.presa) > 0) inicial.ataque.presa = Math.min(5, Math.round(_num(cfg.presa)));   // 🎯 el defensor es la Presa (2026-10-21): +2 al daño
     // 🚩 Bajo el estandarte (2026-10-24, el Estandarte de guerra del Support; lo calcula el mapa, vtt-hexgrid/js/73): +N al PdG (o PdG.Esp) y +N al daño.
@@ -1306,7 +1306,7 @@ const Duelo = (() => {
       if(be && be.fijo) m.dano = {...m.dano, crudo: m.dano.crudo + be.fijo, mod: m.dano.mod + be.fijo, formula: `${m.dano.formula} +${be.fijo} espalda`.slice(0, 60)};
       const ps = m.ataque ? _num(m.ataque.primeraSangre) : 0;   // Primera sangre (anillo): el daño de su primer ataque del combate
       if(ps > 0) m.dano = {...m.dano, crudo: m.dano.crudo + ps, mod: m.dano.mod + ps, formula: `${m.dano.formula} +${ps} primera sangre`.slice(0, 60)};
-      const mied = m.ataque ? _num(m.ataque.miedo) : 0;   // 😱 le tiene miedo al defensor: −1 al daño
+      const mied = m.ataque ? _num(m.ataque.miedo) : 0;   // 😱 le tiene miedo al defensor: −N al daño
       if(mied > 0) m.dano = {...m.dano, crudo: Math.max(0, m.dano.crudo - mied), mod: m.dano.mod - mied, formula: `${m.dano.formula} −${mied} miedo`.slice(0, 60)};
       const prs = m.ataque ? _num(m.ataque.presa) : 0;   // 🎯 contra la presa: +2 al daño
       if(prs > 0) m.dano = {...m.dano, crudo: m.dano.crudo + prs, mod: m.dano.mod + prs, formula: `${m.dano.formula} +${prs} presa`.slice(0, 60)};

@@ -1696,6 +1696,20 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   −1 al daño. El aura: quien lleva un ítem con `auraMiedo` (el radio; la ficha lo publica en `resumen.auraMiedo` y `dmgesp`, un creep en su
   tarjeta: `auraMiedo`, `auraEfEsp`) asusta a los rivales que entran: `auraRevisar` (cada 700 ms y al moverse, en combate, para lo que maneja
   esta pantalla) los encola y `auraResolver` abre el Anuncio: Ef.Esp contra Res.Mt (empate: la calavera), Miedo si no llega, Crónica y Mesa.
+  **Reglas nuevas (dueño, 2026-11-01):** `MIEDO_PENA` = 2 (−2 PdG/PdG.Esp y −2 al daño común o especial) y `miedoPasoAsusta(a, b, fuentes)`: el paso
+  que termina a `MIEDO_RADIO` (3) o menos de una fuente y no se aleja de ella (misma distancia o más cerca) cuesta el doble de lo normal
+  (`Math.max(porCasillero, lento) × 2`); uno de los pasos gratis cuesta `porCasillero` (el doble de 0 no tendría efecto); alejarse, lo normal.
+  **😱 Pánico** (`panicoDe`, por la marca `panico` o el nombre): las fuentes son todos sus rivales a la vista (`panicoRivales`: `rivalesDe`, js/02,
+  sin los que están en sigilo) y `miedoContra` da −2 contra cualquier rival (creep ↔ personaje). ✋ A mano: el −2 en un área (los sub-duelos
+  del área no lo llevan).
+- **💤 El Sueño** (2026-11-01, dueño: «es un stun que igual se termina con daño y también puede haber algunas situaciones específicas que lo
+  despierten»; `js/87-sueno.js`): el preset lleva `stun` (todo lo del Stun: `stunAntes` de js/20 muestra «está dormido») y `sueno`. Se despierta
+  (1) con daño: `danioCreep` / `danioPj` / `danioInv` (js/10) llaman `suenoQuitarDe(estados)` dentro de su transacción cuando `r.recibido > 0`
+  (en el personaje también lo saca de `resumen.estados`; en la invocación, de `resumen.invocaciones`), y la Mesa dice «💤 Fulano se despertó: recibió
+  daño»; el veneno y el sangrado del Mantenimiento no pasan por ahí (✋). (2) Decisión de Claude: un aliado pegado lo sacude por 1 No2 — el botón
+  💤 del HUD (`suenoDespertadorDe(t)`: un token mío del mismo bando, despierto, a 1 casilla, en combate) → `suenoSacudir(t)`: cobra el No2 (sin
+  No2, «¿Hacerlo igual?»; ya en negativo, no) y, si esta pantalla maneja al dormido o es el GM, `suenoDespertar(t)`; si no, el momento
+  `sueno-despertar` (js/16 → `suenoMomento`: lo toma con una transacción la pantalla que lo maneja o la del GM).
 - **🔮 Talismanes en el combate** (2026-10-18; `js/53-talismanes.js`): `talismanDe(t, campo)`, `talEspejito(d, entro)` y `talRelicario(d, mato)` (los llama
   `dueloAplicarDano`, js/13, después del Espejo) y `talismanUnaVez(d, ef)` (`dueloAplicarEfectoBase`: el efecto «🔮 …» de un talismán entra una vez por
   turno de quien usó la varita, `talismanUsados`).

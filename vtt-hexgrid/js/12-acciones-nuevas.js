@@ -192,12 +192,32 @@ async function acConsumir(sc, itemId){
   if(it.zonaUso){ const sc2 = acCreep() || sc; acHabUi().colocarZona(sc2, {id: 'zona:' + it.id, nombre: it.nombre, detalle: it.detalle || '', modo: 'auto', duelo: it.zonaUso}); }
   if(it.aceleradorMapa){ ac.host.hidden = true; aceleradorDeHabilidad({fichaId: sc.id, casteadorTipo: 'creep', turnos: num(it.aceleradorMapa.turnos) || 10, no2: num(it.aceleradorMapa.no2) || 2, nombre: it.nombre}); }
   if(it.invocaTemporal) toast(`✋ ${it.nombre}: la invocación de un creep se pone a mano (creá su token en el mapa)`);
+  if(it.efectoParty) acEfectoAlGrupo(sc, it);   // 📜 un pergamino grupal: también a los creeps aliados del mapa (2026-11-03)
   const tok = [...tokens.values()].find(x => x.tipo === 'creep' && x.fichaId === ac.creepId);
   // js/21: Mesa y Crónica. Un creep que los jugadores no ven: solo la Mesa, con su nombre (js/29 decide: «acción incierta» o nada). Una trampa
   // ya la anunció TokensAuto.
   if(res.anuncio && !it.trampaDatos) anunciarConsumo(res.anuncio, !tok || !visibleParaJugadores(tok), sc.nombre);
   if(res.forzado) mesaLinea(`⚠ ${sc.nombre} usó ${it.nombre} sin los No2 (cuesta ${res.forzado.costo}, tenía ${res.forzado.tenia})`, 'alerta-roja');
   toast(res.aviso);
+}
+/* 📜 A todo el grupo, de un creep (2026-11-03: el Pergamino de Regeneración menor del Sanador y el grupal de Furia de Combate del Hachero le
+   quedaban solo a él): el mismo estado que un personaje les pasa a sus aliados (js/25, bnEfectoAlGrupo), a los otros creeps en pie de este mapa. */
+async function acEfectoAlGrupo(sc, it){
+  const spec = {nombre: String(it.efectoPreset || it.efectoNombre || '').trim(), turnos: num(it.efectoTurnos) || 3, polaridad: 'buff',
+    ...((it.efectoMods || []).length ? {mods: it.efectoMods} : {}), ...(num(it.efectoHpTurno) ? {hp: num(it.efectoHpTurno)} : {}),
+    ...(it.efectoDetalle ? {detalle: it.efectoDetalle} : {})};
+  if(!spec.nombre || !soyGM) return;
+  const vistos = new Set([String(sc.id)]), nombres = [];
+  for(const [, t] of tokens){
+    if(!t || t.tipo !== 'creep' || !t.fichaId || vistos.has(String(t.fichaId))) continue;
+    vistos.add(String(t.fichaId));
+    let ok = false;
+    try{ await modificarCreep(t.fichaId, crudo => { if(num(crudo.hp) <= 0) return false; ok = EstadosAplicar.aplicarACreep(crudo, spec).ok; return ok; }); }
+    catch(err){ console.error('No se pudo pasar el estado a un creep aliado:', err); }
+    if(ok) nombres.push(nombreDe(t));
+  }
+  toast(nombres.length ? `📜 ${it.nombre}: también a ${nombres.join(', ')}` : `📜 ${it.nombre}: no hay aliados en el mapa`);
+  if(nombres.length && typeof mesaLinea === 'function') mesaLinea(`📜 ${it.nombre}: ${spec.nombre} ${spec.turnos} turnos también a ${nombres.join(', ')}`, 'recordatorio', sc.nombre);
 }
 function acAccionAca(b){
   const d = b.dataset, sc = acCreep();

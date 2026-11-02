@@ -5,6 +5,32 @@
 > auditado ([`diseno-roles-creep.md`](diseno-roles-creep.md), los «20 por rol»); los creeps base viejos (`comun/creeps-base.js`) y sus skills
 > **no son referencia**.
 
+## ▶ Actualización 2026-11-02 (dueño) — se retoma con este plan, unificado
+
+> Dueño, 2026-11-02: «crear un pool de creeps genéricos… de cada rol una variedad, nivel 1 a 5, con un equipo acorde… todos humanoides, para
+> poder crear creeps rápidamente y cambiarles el nombre de acuerdo a su circunstancia». Al ver este plan de octubre: «vamos a seguir tu
+> recomendación. Dejémosla asentada». (Reemplaza a `plan-creeps-esenciales.md`, armado ese mismo día sin ver este.)
+
+- **Dos pools**: **Esenciales** (estas líneas humanoides, la base para armar una pelea rápido) y **Ampliado** (nombre a confirmar: los que van
+  saliendo al jugar —goblins, mineros, el culto…—, de referencia; crece con la campaña).
+- **Cuántas por rol: 4 es una referencia, no una regla** («en tanto podamos pensar en estrategias puntuales que valgan la pena, ampliar o reducir
+  el número de variantes por rol; no me caso con ese número»). Cada línea = **una estrategia distinta dentro del rol**.
+- **Orden**: **rol por rol**; al cerrar la ronda se ve cómo seguir según las estrategias posibles con las skills de cada rol. **Primero las
+  esencias puras del rol**; después, hibridar y cruzar funciones donde tenga sentido de diseño.
+- **Pasiva desde el nivel 3** (una que refuerce su estrategia).
+- **Consumible fijo, vinculado al rol** (además de «que le sirva y lo use»). Propuesta por rol, a confirmar con cada línea: Tanque → poción de
+  defensa (Cuero duro) · Warrior → fuerza o furia · Choque liviano → óleo venenoso · Rango → flecha o virote especial · Hunter → una trampa ·
+  Mago → poción de SP · Support → poción de curación · Debuffer → un polvo o una bombucha.
+- **Rango = Shooter** (Shooter es el nombre de la clase de jugador); el Hunter es una de sus líneas.
+- Lo demás de este documento sigue: habilidades (2 en nivel 1, +1 por nivel), equipo por nivel (tope Buena calidad), atributos, forma de trabajo.
+
+### Aprobados
+
+- **T1 · Escudero · Tanque · nivel 1** (aprobado 2026-11-02, «el tanque me parece bien»; a revisar sus skills contra las de la línea: Aguante,
+  Desarmar, Pisotón): Con 12 · Fue 9 · Esp 6 · Agi 3 · Des 3 (33), vida 60. Garrote de pastor (Tipo 10, Demora 33 %) · Escudo de roble
+  reforzado · Peto de hierro · Casco de cuero endurecido. Skills: Provocar (rápida) · Piel de hierro (lenta). Consumible: a definir (poción de
+  Cuero duro). Estrategia: se planta adelante, obliga a que le peguen a él y frena al que se acerca.
+
 ## La idea
 
 Un pool de **creeps humanoides predeterminados**, listos para usar, pensados de a uno: cada creep es una **línea** que va del nivel 1 al 5, y en
@@ -147,7 +173,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | Línea | Nivel 1 | Nivel 2 | Nivel 3 | Nivel 4 | Nivel 5 |
 |---|---|---|---|---|---|
 | W1 | | | | | |
-| T1 | | | | | |
+| T1 | ✅ (2026-11-02) | | | | |
 | H1 | | | | | |
 | L1 | | | | | |
 | L2 | | | | | |

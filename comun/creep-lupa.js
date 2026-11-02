@@ -228,7 +228,7 @@ const CreepLupa = (() => {
     const L = [];
     L.push(linea('Categoría', K.TIPOITEM_LABEL[item.tipoItem] || item.tipoItem));
     if(item.tier) L.push(linea('Rareza', item.tier));
-    if(esArma) L.push(linea('Daño', `${Math.max(1,num(item.peso))}d${num(item.tipoDado)||8}${num(item.danoFijo)?` +${fmt(num(item.danoFijo))}`:''}`));
+    if(esArma) L.push(linea('Daño', `${Math.max(1,num(item.peso)||1)+Math.max(0,num(item.danoAmplificado))}d${num(item.tipoDado)||8}${num(item.danoFijo)?` +${fmt(num(item.danoFijo))}`:''}`));
     if(item.def) L.push(linea('Defensa', `${num(item.def)>0?'+':''}${fmt(num(item.def))}`));
     L.push(linea('Peso', fmt(num(item.peso))));
     // Durabilidad (variable de diseño del ítem, comun/combatiente.js). Los creeps no la gastan: importa si lo sueltan o se publica.

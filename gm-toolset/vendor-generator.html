@@ -579,7 +579,7 @@ function modsResumenHtml(item){
 // orden por daño (ver ordenarItems).
 function danoDe(item){
   if(!ES_ARMA(item.tipoItem)) return 0;
-  return Math.max(1, num(item.peso) || 1) * (num(item.tipoDado) || 8) + num(item.danoFijo);
+  return (Math.max(1, num(item.peso) || 1) + Math.max(0, num(item.danoAmplificado))) * (num(item.tipoDado) || 8) + num(item.danoFijo);   // + los dados amplificados (2026-11-03)
 }
 
 function entero(min, max){ return min + Math.floor(Math.random() * (max - min + 1)); }

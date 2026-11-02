@@ -42,7 +42,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 </script>
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
-<script src="combatiente.js?v=20261102anula5"></script>
+<script src="combatiente.js?v=20261103anul"></script>
 <script src="creep-calculo.js?v=20261103esen"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261101jefe2"></script>
@@ -6480,6 +6480,12 @@ prueba('💨 El viento despeja nubes y gases (2026-11-01): la Ráfaga de viento 
   Combatiente.ponerAlDiaItemsFabrica(copia);
   igual([!!base.datos.sp.duelo.despeja, cambio, vieja[0].duelo.despeja, /despeja la niebla, las nubes/.test(vieja[0].detalle), !!helada.especial.duelo.despeja, !!copia[0].especial.duelo.despeja, copia[0].detalle === helada.detalle],
     [true, true, true, true, true, true, true]);
+});
+prueba('🚫 Anulación con un pergamino: las zonas e invocaciones usan el mismo Ef.Esp que el duelo (con el mínimo de calidad, 2026-11-03)', () => {
+  const perg = CATALOGO_BASE.find(i => i.id === 'nuevo-pergamino-de-anulacion');
+  const h = Combatiente.habDeConsumible(perg);
+  const ej = Combatiente.habEjecucion(h, h.duelo, {stat: () => 3, etq: s => s});
+  igual([ej.tira.min, ej.anulaValor], [11, 11]);
 });
 /* ---------- Resultado ---------- */
 Promise.all(pendientes).then(() => {

@@ -38,6 +38,11 @@
   - Consumibles: Poción de Cuero duro (escudo 15 contra daño físico) y Poción de Piel de Cristal (escudo 15 contra daño especial) (dueño: «así,
     circunstancialmente, puede defenderse de alguien que le haga daño mágico y ser una verdadera molestia»).
   - El T4 Peleador de control se queda con Desarmar y Pisotón.
+- **W1 · Hachero · Warrior · nivel 1** (aprobado 2026-11-02, «pasemos al siguiente»). Estrategia: rompe la armadura del que más se defiende y lo
+  castiga. Atributos (33): Fue 10 · Con 9 · Des 6 · Agi 4 · Esp 4. Vida 45. Equipo (Común): Hacha (Tipo 8, Rompe armadura 50 %) · Cota de malla
+  de hierro (Def +4, Res. crít. T6 +1, Eva −1) · Casco de cuero endurecido (Def +1, Res. crít. T4 +1); Def +5, sin Def. especial (su punto débil,
+  con la Esp baja). Skills: Golpe fuerte (rápida, 1 SP, cd 2) · Romper armadura (lenta, 2 SP, cd 3). Consumible: Pergamino grupal de Furia de
+  Combate (+1 Daño a él y su grupo, 3 turnos).
 - **Por programar (decidido 2026-11-02)**: **Piel de hierro escala con el nivel: +(3 + nivel)** a la Defensa y a la Def. especial (nivel 1: +4,
   nivel 3: +6 como hoy, nivel 5: +8); sigue +1 Res. a crítico y 2 turnos. Hoy es +6 fijo (de la tanda del 2026-10-27).
 - **T2 · Muralla con púas · Tanque · nivel 1** (aprobado 2026-11-02): Con 13 · Fue 8 · Esp 6 · Agi 3 · Des 3 (33), vida 65. Hacha con garfio
@@ -185,7 +190,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 
 | Línea | Nivel 1 | Nivel 2 | Nivel 3 | Nivel 4 | Nivel 5 |
 |---|---|---|---|---|---|
-| W1 | | | | | |
+| W1 | ✅ (2026-11-02) | | | | |
 | T1 | ✅ (2026-11-02) | | | | |
 | T2 | ✅ (2026-11-02) | | | | |
 | H1 | | | | | |

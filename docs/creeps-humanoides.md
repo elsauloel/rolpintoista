@@ -26,10 +26,13 @@
 
 ### Aprobados
 
-- **T1 · Escudero · Tanque · nivel 1** (aprobado 2026-11-02, «el tanque me parece bien»; a revisar sus skills contra las de la línea: Aguante,
-  Desarmar, Pisotón): Con 12 · Fue 9 · Esp 6 · Agi 3 · Des 3 (33), vida 60. Garrote de pastor (Tipo 10, Demora 33 %) · Escudo de roble
+- **T1 · Escudero · Tanque · nivel 1** (aprobado 2026-11-02, «el tanque me parece bien»; el dueño confirmó que se queda con Provocar y Piel de
+  hierro, y Desarmar y Pisotón pasan al T4 Peleador de control): Con 12 · Fue 9 · Esp 6 · Agi 3 · Des 3 (33), vida 60. Garrote de pastor (Tipo 10, Demora 33 %) · Escudo de roble
   reforzado · Peto de hierro · Casco de cuero endurecido. Skills: Provocar (rápida) · Piel de hierro (lenta). Consumible: a definir (poción de
   Cuero duro). Estrategia: se planta adelante, obliga a que le peguen a él y frena al que se acerca.
+- **T2 · Muralla con púas · Tanque · nivel 1** (aprobado 2026-11-02): Con 13 · Fue 8 · Esp 6 · Agi 3 · Des 3 (33), vida 65. Hacha con garfio
+  (Tipo 8, Bloqueo +1, Derribar 25 %) · Puerta de granero (Def +2, Bloqueo +2, Eva −1) · Coraza de cuero hervido (Def +3, Res. crít. T4 +1,
+  Res.CC +1). Skills: Coraza de púas (rápida) · Aguante (lenta). Consumible: poción de Cuero duro. Estrategia: castiga al que le pega; no persigue.
 
 ## La idea
 
@@ -174,6 +177,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 |---|---|---|---|---|---|
 | W1 | | | | | |
 | T1 | ✅ (2026-11-02) | | | | |
+| T2 | ✅ (2026-11-02) | | | | |
 | H1 | | | | | |
 | L1 | | | | | |
 | L2 | | | | | |

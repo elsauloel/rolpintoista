@@ -281,6 +281,12 @@
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 
 ## Pendientes
+- [ ] **📌 Clavar a la pared, paso a paso con clics (dueño, 2026-11-02: «quiero que lo pruebes en el mapa paso a paso con los clics y que te
+  garantice que funcione bien»; correr en la próxima tanda de pruebas, cuando el dueño diga «pasá las pruebas»).** Habilidad de creep de Rango
+  (comun/skills-creep-base.js, `clava`, vtt-hexgrid/js/13). Casos: (1) sin pared detrás: empuja 3 y nada más; (2) con pared/Sólido/colisión a 1–2
+  casillas: daño de colisión y Inmovilizado 3 turnos; (3) contra otro token: solo el choque, sin clavar; (4) al empezar su turno, soltarse con Fuerza
+  contra el PdG del golpe (gana y pierde); (5) un aliado pegado lo ayuda a soltarse; (6) los 3 turnos se cumplen y se suelta solo; (7) el +3 a la
+  PdG se ve en el duelo; (8) un fallo (no pega): no empuja. Capturas de cada paso, desde el GM y desde el jugador clavado.
 - [x] **🧪 Tanda del 2026-11-01 (desde la nube, con clics, cuentas GM / Jugador 1 / Jugador 2; capturas `mapa-1101-*`; todo restaurado, 0 diferencias)**:
   ☀ **Luz sanadora mínimo 1** (482ff3c2): Destello revelador del Goblin scout, 2 de daño a Abeja Diestra → «Luz sanadora (25 %): se cura 1 · 34 → 35».
   🤝 **Pasar a un aliado** (9e570c0d): en combate el botón dice «🤝 Pasar a un aliado» y, sin nadie pegado, arriba queda «♻ Despojos» y no hay botón por

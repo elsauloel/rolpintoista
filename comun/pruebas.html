@@ -42,8 +42,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 </script>
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
-<script src="combatiente.js?v=20261103nit"></script>
-<script src="creep-calculo.js?v=20261103t2b"></script>
+<script src="combatiente.js?v=20261103t3"></script>
+<script src="creep-calculo.js?v=20261103t3"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261103t2b"></script>
 <script src="creep-duelo.js"></script>
@@ -111,8 +111,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="pasivas.js"></script>
 <script src="skills-clase.js?v=20261102anula4"></script>
 <script src="creeps-base.js"></script>
-<script src="skills-creep-base.js?v=20261103esen"></script>
-<script src="creeps-esenciales.js?v=20261103t2b"></script>
+<script src="skills-creep-base.js?v=20261103t3"></script>
+<script src="creeps-esenciales.js?v=20261103t3"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
 <script>
@@ -6271,14 +6271,14 @@ prueba('⚔ Golpe brutal (2026-10-27): el de creep +1 frecuente, +2 potente, +3 
   igual([a.critBono, a.critpotBono, a.fijo, h.efectoNombre, h.efectoTurnos, h.efectoMods[0].stat, h.efectoMods[0].val, h.efectoPolaridad, gb.critBono, gb.critpotBono, gb.fijo],
     [1, 2, 3, 'Guardia baja', 1, 'eva', -2, 'debuff', 1, 1, 2]);
 });
-prueba('😤 Provocar de creep y Taunt de clase (2026-10-27): PdG.Esp + el nivel contra la Res.Mt; el creep queda Desafiante (+2 Defensa y +2 Def. especial)', () => {
+prueba('😤 Provocar de creep (Ef.Esp + 2 desde el 2026-11-03) y Taunt de clase (2026-10-27, PdG.Esp + el nivel) contra la Res.Mt; el creep queda Desafiante (+2 Defensa y +2 Def. especial)', () => {
   const h = chp('Provocar', 3), sc = creepPrueba({nivel: 3});
   const ej = CreepAcciones.habEjecucion(sc, h);
   const taunt = CLASES_SKILLS.find(c => c.id === 'tanque').habilidades.find(x => x.id === 'tanque-taunt');
   const tj = Combatiente.habEjecucion(taunt, taunt.duelo, {stat: () => 4, etq: s => s, nivel: 2});
   const des = ESTADOS_PRESET.find(p => p.nombre === 'Desafiante');
   igual([ej.tira.stat, ej.tira.bono, ej.contra.map(c => c.modo), ej.efectos.map(e => e.nombre), tj.tira.stat, tj.tira.bono, des.turnos, des.mods.map(m => `${m.stat}${m.val}`)],
-    ['pdgmg', 3, ['resm'], ['Provocado', 'Desafiante'], 'pdgmg', 2, 2, ['def2', 'armadmg2']]);
+    ['dmgesp', 2, ['resm'], ['Provocado', 'Desafiante'], 'pdgmg', 2, 2, ['def2', 'armadmg2']]);
 });
 prueba('⚔ Contraataque de creep (2026-10-27): marca la Evasión y el Parry; con la habilidad, su contraataque suma +1 PdG; el de clase es Flash y cuesta 1', () => {
   const h = chp('Contraataque'), sc = creepPrueba({id: 'c1', habilidades: [h]}), sin = creepPrueba({id: 'c2'});
@@ -6366,7 +6366,7 @@ prueba('⭐ El pool esencial (2026-11-03): los 6 de nivel 1, con su equipo, cint
     d('Escudero').equipo.map(i => i.nombre).join(), d('Escudero').cinturon.map(i => i.nombre).join(), d('Hachero').fue, d('Hachero').agl,
     d('Piromante').habilidades.map(h => h.nombre + ':' + h.cd).join(), d('Escudero').habilidades[1].efectoMods.find(m => m.stat === 'def').val,
     CREEPS_BASE.filter(c => c.pool !== 'esencial').length > 100],
-    [0, 6, true, 'Garrote de pastor,Escudo de caparazón de tortuga gigante,Peto de hierro,Cofia de anillas sueltas', 'Poción de Cuero Duro,Poción de Piel de Cristal', 9, 6,
+    [0, 6, true, 'Hacha de piedra,Escudo de caparazón de tortuga gigante,Peto de hierro,Cofia de anillas sueltas', 'Poción de Cuero Duro,Poción de Piel de Cristal', 9, 6,
       'Lengua de fuego:4,Muro de fuego:3', 4, true]);
 });
 prueba('🔄 Las habilidades de clase siguen a su clase (P222, 2026-10-27): una copia vieja toma la versión nueva; una editada a mano después, no', () => {
@@ -6555,8 +6555,19 @@ prueba('🛡 Un creep hace Parry con su arma o con su escudo, y el Bloqueo usa e
   const ops = hk.opcionesDefensa({defensor: {ref: sc.id, tipo: 'creep'}, atacante: {}, ataque: {tipo: 'normal'}}).filter(o => o.modo === 'parry');
   igual([lista.map(x => x.nombre).join(), soloEsc.map(x => x.nombre).join(), CreepCalculo.bloqueoValor(sc, 'Escudo de caparazón de tortuga gigante') - b0,
     ops.map(o => o.itemNombre + ':' + o.escudo).join(), sc.agl, sc.des, sc.esp],
-    ['Garrote de pastor,Escudo de caparazón de tortuga gigante', 'Escudo de caparazón de tortuga gigante', 2,
-      'Garrote de pastor:false,Escudo de caparazón de tortuga gigante:true', 5, 4, 5]);
+    ['Hacha de piedra,Escudo de caparazón de tortuga gigante', 'Escudo de caparazón de tortuga gigante', 2,
+      'Hacha de piedra:false,Escudo de caparazón de tortuga gigante:true', 5, 7, 4]);
+});
+prueba('🛡 Provocar tira Ef.Esp + 2 (2026-11-03), el guardado se pone al día; la Defensa y la Def. especial no bajan de 0 salvo «permiteNegativa»', () => {
+  const sc = structuredClone(CREEPS_BASE.find(c => c.pool === 'esencial' && c.nombre === 'Escudero').datos);
+  const pr = sc.habilidades.find(h => h.nombre === 'Provocar');
+  const vieja = [{nombre: 'Provocar', detalle: 'tira su Probabilidad de Golpe especial + su nivel contra la Resistencia mental', ataqueTxt: 'PdG.Esp + su nivel contra la Res.Mt', duelo: {tira: 'pdgmg', tiraBonoNivel: true, contra: ['resm']}}];
+  const cambio = Combatiente.migrarLuzSanadora(vieja);
+  const maldita = [{nombre: 'Coraza maldita', mods: [{stat: 'def', val: -2}, {stat: 'armadmg', val: -2}]}];
+  const sc2 = {armadmg: 0, estados: maldita};
+  igual([pr.duelo.tira, pr.duelo.tiraBono, !!pr.duelo.tiraBonoNivel, cambio, vieja[0].duelo.tira, vieja[0].duelo.tiraBono, 'tiraBonoNivel' in vieja[0].duelo, /Efecto especial \+ 2/.test(vieja[0].detalle),
+    Combatiente.pisoDefensa(-2, maldita), Combatiente.pisoDefensa(-2, [{nombre: 'X', permiteNegativa: true}]), CreepCalculo.armadmgEfectiva(sc2)],
+    ['dmgesp', 2, false, true, 'dmgesp', 2, false, true, 0, -2, 0]);
 });
 prueba('💧 Poción de SP en un creep (2026-11-03): en modo SP devuelve SP; con cooldowns baja 1 turno a la habilidad elegida, o avisa que no hay nada en espera', () => {
   const pot = CATALOGO_BASE.find(i => i.nombre === 'Poción de SP menor');

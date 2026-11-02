@@ -68,10 +68,10 @@
 
   // ---- Nivel 1 (aprobados por el dueño el 2026-11-02; detalle y porqués en docs/creeps-humanoides.md) ----
   // Atributos en el orden Con · Fue · Agi · Des · Esp (suman 33).
-  esencial({linea: 'T1', nombre: 'Escudero', rol: 'tanque', rolTxt: 'tanque', nivel: 1, atrib: [11, 8, 5, 4, 5],
-    equipo: ['Garrote de pastor', 'Escudo de caparazón de tortuga gigante', 'Peto de hierro', 'Cofia de anillas sueltas'],
+  esencial({linea: 'T1', nombre: 'Escudero', rol: 'tanque', rolTxt: 'tanque', nivel: 1, atrib: [12, 5, 5, 7, 4],   // Con Fue Agi Des Esp (dueño, 2026-11-03)
+    equipo: ['Hacha de piedra', 'Escudo de caparazón de tortuga gigante', 'Peto de hierro', 'Cofia de anillas sueltas'],
     habilidades: ['Provocar', 'Piel de hierro'], consumibles: ['Poción de Cuero Duro', 'Poción de Piel de Cristal'],
-    estrategia: 'Tanque. Se planta adelante, provoca al que más pega y aguanta; el garrote demora al que lo ignora.'});
+    estrategia: 'Tanque. Se planta adelante, provoca al que más pega y aguanta; con el hacha le rompe la armadura al que lo ignora.'});
   esencial({linea: 'M1', nombre: 'Piromante', rol: 'mago', rolTxt: 'mágico', nivel: 1, atrib: [7, 2, 5, 5, 14],
     equipo: ['Varita de la bola de fuego', 'Botella con un diablito', 'Campera de cuero con tachas', 'Gorro de piel de salamandra'],
     habilidades: ['Lengua de fuego', 'Muro de fuego'], consumibles: ['Poción de SP menor'],

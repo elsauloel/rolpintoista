@@ -276,6 +276,8 @@ const FichaCalculo = (() => {
     final.nitros = Combatiente.nitrosMax(final.nitros, efectosActivos);
     // 💧 La recarga de SP por turno nunca baja de 1 (dueño, 2026-10-20, P215: la misma regla que los creeps con SP).
     if(!Number.isNaN(final.spregen)) final.spregen = Math.max(1, final.spregen);
+    // 🛡 La Defensa y la Defensa especial no bajan de 0 (dueño, 2026-11-03), salvo un estado con `permiteNegativa` (como creeps e invocaciones).
+    ['def', 'armadmg'].forEach(k => { if(!Number.isNaN(final[k]) && typeof Combatiente !== 'undefined' && Combatiente.pisoDefensa) final[k] = Combatiente.pisoDefensa(final[k], efectosActivos); });
     // Pajaritos y Lisiado ya no achican el stat: parten el RESULTADO de la tirada (ver mitadesDeTirada / tirarValorStat).
     // Inmovilizado y Rengo ya no tocan un stat: Movimiento se fundió en
     // Nitros, así que actúan al moverse (ver costoMoverCasillero).

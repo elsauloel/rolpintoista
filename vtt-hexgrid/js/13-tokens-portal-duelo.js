@@ -1751,7 +1751,7 @@ async function dueloAplicarDano(d){
     }catch(err){ console.error('No se pudieron leer los datos de la invocación:', err); return {...base, manual: true, motivoManual: 'es una invocación (no se pudieron leer sus datos)'}; }
   }
   else if(t.tipo === 'creep'){ const sc = creepPrivadoDe(t.fichaId); def = sc ? creepDefensaMapa(sc) : 0; armadmg = sc ? creepArmadmgMapa(sc) : 0; }
-  else{ const f = fichasPub.get(t.fichaId); def = f && f.resumen && f.resumen.def !== undefined ? num(f.resumen.def) : 0; armadmg = f && f.resumen ? num(f.resumen.armadmg || 0) : 0; }
+  else{ const f = fichasPub.get(t.fichaId); def = f && f.resumen && f.resumen.def !== undefined ? num(f.resumen.def) : 0; armadmg = f && f.resumen ? Combatiente.pisoDefensa(num(f.resumen.armadmg || 0), f.resumen.estados) : 0; }   // 🛡 piso 0 también para un resumen viejo (2026-11-03)
   // Un crítico real ignora la Defensa entera (0); el daño de casteo que la ignora (Paso 1) resta la Defensa especial (Paso 3) en vez de nada.
   // El elemento del daño de la habilidad (2026-10-04): se resta además la resistencia de quien lo recibe a ese elemento (Res. fuego…).
   const elDano = d.hab && d.hab.dano ? Combatiente.elementoDe(d.hab.dano.tipo) : '';
@@ -1881,7 +1881,7 @@ async function dueloAplicarDano(d){
     else if(menosDist || (habMagica && botella) || anilloHab) R('=', 'el golpe', crudo);
     if(mult > 1){ R('×', `crítico ×${mult}`, mult); R('=', 'el golpe', golpe); }
     if(critReal) R('', 'Crítico: no se resta la Defensa');
-    else if(habMagica) R('', trueDmg ? 'True Damage: no lo frena nada' : directo ? 'Daño directo: no lo frena la Defensa ni la Defensa especial' : 'Daño especial: no se resta la Defensa (sí la Defensa especial)');
+    else if(habMagica) R('', trueDmg ? 'True Damage: no lo frena nada' : directo ? 'Daño directo: no lo frena la Defensa ni la Defensa especial' : 'Daño especial: no se resta la Defensa; se resta la Defensa especial');
     if(dn.defensaManual === 'no') R('', 'Defensa: no se resta (elegido a mano)');
     else if(manualNum){ R('−', 'Defensa escrita a mano', Math.max(0, num(dn.defensaManual))); if(base.mitad) R('÷', 'Bloqueo perdido: pasa la mitad, para arriba', 2); }
     else if(base.mitad){ R('−', 'Defensa', def); R('÷', 'Bloqueo perdido: pasa la mitad, para arriba', 2); }

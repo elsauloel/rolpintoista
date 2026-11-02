@@ -35,15 +35,22 @@
 
 > ✅ **Programados el 2026-11-03** en `comun/creeps-esenciales.js` (el pool esencial: «+ Creep» de GM Tools → pestaña «⭐ Pool esencial»): T1, M1, L1, S1, W1 (con los atributos revisados), D1. Equipo del catálogo por nombre, habilidades de fábrica con su costo y cooldown, consumibles en el cinturón.
 
-- **T1 · Escudero · Tanque · nivel 1** (aprobado 2026-11-02, revisado el mismo día a fondo). Referencia: un grupo de nivel 1, no los personajes
-  actuales. Estrategia: se planta adelante, provoca y aguanta; amenaza con la Demora del garrote (el que lo ignora pierde tiempo).
-  - Atributos (33): Con 11 · Fue 8 · Esp 5 · Des 4 · Agi 5. Vida 55. PdG 4 (pega de vez en cuando: dueño, «tiene que presentar algún tipo de
-    amenaza más allá de ser una bolsa de golpes»). **Ajuste del 2026-11-03, a revisar en el boceto**: Agi 3 → 5 (dueño: «sí») para que pueda
-    atacar con el garrote sin saltarse la regla (con Agi 3 tenía 3 No2 y el ataque cuesta 5); sale 1 de Des (PdG 5 → 4) y 1 de Esp (Provocar
-    tira PdG.Esp 5 en vez de 6). Antes: Con 11 · Fue 8 · Esp 6 · Des 5 · Agi 3.
-  - Equipo (Común): Garrote de pastor (Tipo 10, Demora 33 %) · Escudo de caparazón de tortuga gigante (Def +1, Def. esp. +1, Bloqueo +1) ·
-    Peto de hierro (Def +3) · Cofia de anillas sueltas (Def +1, Def. esp. +1, Res. crít. T4 +1). Total Def +5, Def. esp. +2 (dueño: «principalmente
-    defensa física, pero algún tipo de defensa especial como plan secundario»).
+- **T1 · Escudero · Tanque · nivel 1** (aprobado 2026-11-02; **atributos y arma rehechos el 2026-11-03**, dueño: «dejarlo así»). Referencia: un grupo
+  de nivel 1, no los personajes actuales. Estrategia: se planta adelante, provoca y aguanta; con el hacha le rompe la armadura al que lo ignora.
+  - **Criterio del dueño para tanques (2026-11-03)**: «en el primer nivel suele tener un problema de que puede hacer pocas cosas»: en nivel 1, **al
+    menos Agi 5** (los No2 de un creep salen de su Agilidad: un ataque con un arma de Tipo 8–10 y algo de movimiento; con un hacha de Tipo 8, 4 No2
+    de un ataque y 1 de movimiento). Orden de atributos: **Con > Des > Agi > Fue** (el Esp, lo que sobra). Al subir de nivel: bastante Con y Fue,
+    un poquito de Agi y de Des.
+  - Atributos (33): **Con 12 · Des 7 · Agi 5 · Fue 5 · Esp 4**. Vida 60. Antes (2026-11-02): Con 11 · Fue 8 · Esp 6 · Des 5 · Agi 3; el mismo día
+    pasó un rato por Agi 5 · Des 4 · Esp 5.
+  - **Boceto de atributos, nivel 1 a 5** (+3 por nivel; Con / Des / Agi / Fue / Esp → vida): nv1 12/7/5/5/4 → 60 · nv2 13/7/6/6/4 → 65 · nv3
+    14/8/6/7/4 → 70 · nv4 15/8/7/8/4 → 75 · nv5 16/9/7/9/4 → 80. En nivel 5, 7 No2: un ataque (4) y 3 para moverse o defenderse.
+  - Equipo (Común): **Hacha de piedra** (Tipo 8, +1 de daño, Bloqueo +1, Rompe armadura 33 %; 1d8 + 6) · Escudo de caparazón de tortuga gigante
+    (Def +1, Def. esp. +1, Bloqueo +1) · Peto de hierro (Def +3) · Cofia de anillas sueltas (Def +1, Def. esp. +1, Res. crít. T4 +1). Total Def +5,
+    Def. esp. +2 (dueño: «principalmente defensa física, pero algún tipo de defensa especial como plan secundario»). Antes llevaba el Garrote de
+    pastor (Tipo 10: el ataque costaba 5 y no le alcanzaba). Puede hacer Parry con el hacha o con el escudo (2026-11-03, para todos).
+  - **Provocar tira Ef.Esp + 2** (dueño, 2026-11-03: «para que pegue, lo que tiene que tirar es efecto especial más 2 como parte de la habilidad»;
+    antes PdG.Esp + su nivel). Con Esp 4: 6 contra la Res.Mt del rival.
   - Skills: Provocar (rápida, 1 No2 + 2 SP, cd 2) · Piel de hierro (lenta, 1 No2 + 4 SP, cd 3).
   - Consumibles: Poción de Cuero duro (escudo 15 contra daño físico) y Poción de Piel de Cristal (escudo 15 contra daño especial) (dueño: «así,
     circunstancialmente, puede defenderse de alguien que le haga daño mágico y ser una verdadera molestia»).

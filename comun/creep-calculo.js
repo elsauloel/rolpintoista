@@ -194,7 +194,7 @@ const CreepCalculo = (() => {
     return num(sc[id]) + modTotal(sc, id);   // negativa = vulnerable: recibe más daño de ese elemento (Coraza de acero pulido, 2026-10-06)
   }
   function armadmgEfectiva(sc){
-    return Math.max(0, num(sc.armadmg) + modTotal(sc, 'armadmg'));
+    return Combatiente.pisoDefensa(num(sc.armadmg) + modTotal(sc, 'armadmg'), sc.estados);   // piso 0, salvo `permiteNegativa` (2026-11-03)
   }
   // La resistencia a crítico: la base + lo equipado (paso 3, en vivo; un creep sin convertir la trae sumada) + los estados (Endurecido…, 2026-10-12).
   const critDeEstados = (estados, i) => (estados || []).filter(e => e && e.activo !== false).reduce((a, e) => a + (e.mods || []).filter(m => m.stat === 'tipo' + (i + 1)).reduce((x, m) => x + num(m.val), 0) * Math.max(1, num(e.stacks) || 1), 0);

@@ -285,6 +285,11 @@
   varita sobre rival y sobre casilla con zona, pergamino recortando); ✅ Malviaje (duelo y movimiento); ✅ jefe desde un duelo (Polvo de
   adormidera); ✅ Adrenalina se va a los 2 turnos; ✅ Perforante; ✅ DÉBIL A LA LUZ en área. **Quedan**: Anulación sobre invocación de creep,
   trampa mágica, portal y Ojo de Kicillof; contraataque con 0 No2 e invocación en negativo; intercambio desde la ficha suelta y mochila con caído.
+- [x] **⭐ Creeps esenciales en combate, 2026-11-03** → [`reporte-humo-2026-11-03.md`](reporte-humo-2026-11-03.md) (capturas `humo-1103-*`): los seis se
+  agregan completos desde «⭐ Pool esencial»; ✅ Piel de hierro (+4/+4, cd 3), Provocar (Provocado / Desafiante), Parry y Bloqueo del Escudero, Lengua de
+  fuego (2d6+3, Quemadura, diablito, cd 4), Muro de fuego, el ataque del Hachero y las pociones. **Arreglados**: las pociones de escudo en un creep
+  y la cuenta entre paréntesis en las tiradas de creeps. **Queda**: ver que los cooldowns bajen al pasar los turnos (no se pudo: la otra tanda usaba
+  el orden de turnos), cruzar el Muro de fuego, y probar en pelea al Sangrador, el Sanador y el Maldito.
 - [x] **Las que quedaban, 2026-11-03** → [`reporte-pruebas-pendientes-2026-11-03.md`](reporte-pruebas-pendientes-2026-11-03.md) (capturas `pend-1103-*`; 0
   diferencias al restaurar): ✅ contraataque desde 0 No2 (creep −4, personaje −3) y en negativo nada más (Parry apagado, ataque y ataque de una
   invocación bloqueados; con 0, «¿Atacar igual?»); ✅ pasar ítems desde la ficha suelta, un caído que da (cartel «Estás inconsciente», 0 No2) y que

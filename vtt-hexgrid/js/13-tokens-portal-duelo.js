@@ -954,7 +954,7 @@ function dueloElegirObjetivoMapa(msg){
       let t = cand[0];
       if(caido(t)){ toast(`💚 ${nombreDe(t)} está caído: una curación no lo levanta. Elegí otro.`); pedir(); return; }
       if(esValido && !esValido(t)){
-        const msg = objetivoTipo === 'aliado' ? `${nombreDe(t)} es un rival, no un aliado. ¿Igual apuntarle con esta habilidad pensada para aliados?` : `${nombreDe(t)} es un aliado, no un rival. ¿Igual atacarlo?`;
+        const msg = objetivoTipo === 'aliado' ? `${nombreDe(t)} es un rival, no un aliado. ¿Igual apuntarle con esta habilidad pensada para aliados?` : `${nombreDe(t)} es un aliado, no un rival.${typeof floripondioDe === 'function' && floripondioDe(todos.find(propio)) ? ' 🌺 Pero estás malviajando: lo ves como a un enemigo.' : ''} ¿Igual atacarlo?`;
         if(!(await AvisoCombate.preguntar(msg, {icono: '⚔', titulo: objetivoTipo === 'aliado' ? 'Apuntarle a un rival' : 'Atacar a un aliado', si: objetivoTipo === 'aliado' ? 'Sí, apuntarle' : 'Sí, atacarlo', no: 'Elegir otro'}))){ pedir(); return; }
       }
       const cal = objetivoCalifica(ataque, t);   // 🎯 no califica: avisa y deja seguir (va como un ataque común)
@@ -1063,12 +1063,13 @@ function dueloElegirObjetivoMapa(msg){
       if(typeof roboBono === 'function') ataqueFinal = roboBono(ataqueFinal, mio, t);   // 🫳 Robar: +2 en sigilo o por la espalda (js/47)
       if(typeof roboSecretoSi === 'function' && roboSecretoSi(ataqueFinal, mio, t)){ roboSecretoIniciar(yo, ataqueFinal, mio, t); return; }   // 🫳 en sigilo: en secreto (js/47)
       let miedo = 0;
-      try{ miedo = miedoContra(mio, t); }catch(err){ console.error('No se pudo ver el miedo:', err); }   // 😱 le tiene miedo (js/52): −1 PdG y −1 al daño
+      let malviaje = false;
+      try{ miedo = miedoContra(mio, t); malviaje = !!(miedo && miedoEsMalviaje(mio, t)); }catch(err){ console.error('No se pudo ver el miedo:', err); }   // 😱 le tiene miedo (js/52): −2 PdG y −2 al daño · 🌺 malviajando
       let presa = 0;
       try{ presa = presaContra(mio, t); }catch(err){ console.error('No se pudo ver la presa:', err); }   // 🎯 el defensor está señalado: +2 al daño
       let estandarte = null;
       try{ estandarte = typeof estandarteBonus === 'function' ? estandarteBonus(mio, yo) : null; }catch(err){ console.error('No se pudo ver el estandarte:', err); }   // 🚩 bajo el estandarte de un aliado (js/73)
-      Duelo.crear({yo, ataque: ataqueFinal, espalda, espaldaPdg, embestida, quieto, primeraSangre, tiro, flecha, miedo, presa, ...(estandarte ? {estandarte} : {})}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
+      Duelo.crear({yo, ataque: ataqueFinal, espalda, espaldaPdg, embestida, quieto, primeraSangre, tiro, flecha, miedo, ...(malviaje ? {malviaje} : {}), presa, ...(estandarte ? {estandarte} : {})}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
         .catch(err => { console.error('No se pudo abrir el duelo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + String((err && err.message) || err).slice(0, 120)); });
     }, `<b>${ataque && ataque.hab ? '✨ ' + esc(ataque.hab.nombre) + ': elegí el objetivo' : '⚔ ' + esc(yo.nombre || 'Atacar') + ': elegí a quién atacás'}</b> <span>clic sobre el token · Esc o clic derecho cancelan${nEnAlcance ? ' · ✨ brillan los que están a tu alcance (' + (minimo ? `de ${minimo} a ` : '') + Math.round(num(ataque.alcance)) + ' casillero' + (Math.round(num(ataque.alcance)) === 1 ? '' : 's') + ')' : conArco ? ` · 🏹 el arco necesita ${Combatiente.arcoLibresTxt(ataque)} en el medio` : ''}${mioTiro ? ' · la línea muestra si el tiro pasa' : ''}${nIdeal ? ' · 💠 en celeste, tu distancia ideal (' + esc(Combatiente.idealTxt(ataque.ideal)) + ')' : ''}</span>`, true, cancelado);
     // Sin nadie a tiro con un arco (2026-10-09): se dice por qué — su alcance no llega a la distancia mínima, o no hay nadie en esa franja.
@@ -1605,7 +1606,7 @@ function actualizarMuerteMapa(){
   if(!el){
     el = document.createElement('div');
     el.id = 'muerte-mapa';
-    el.style.cssText = 'position:fixed;inset:0;z-index:60;pointer-events:none;background:radial-gradient(ellipse at center,rgba(150,0,0,.10) 35%,rgba(150,0,0,.34) 100%);box-shadow:inset 0 0 120px rgba(190,0,0,.35)';
+    el.style.cssText = 'position:fixed;inset:0;z-index:60;pointer-events:none;background:radial-gradient(ellipse at center,rgba(150,0,0,.05) 35%,rgba(150,0,0,.22) 100%);box-shadow:inset 0 0 110px rgba(190,0,0,.25)';
     el.innerHTML = '<div id="muerte-mapa-txt" style="position:absolute;top:14px;left:50%;transform:translateX(-50%);text-align:center;color:#FFB4B4;font-family:\'Space Mono\',monospace;text-shadow:0 0 10px #000;background:rgba(40,0,0,.55);padding:8px 16px;border-radius:8px"></div>' +
       '<button type="button" id="muerte-mapa-revivir" class="btn" style="position:absolute;bottom:26px;left:50%;transform:translateX(-50%);pointer-events:auto;padding:10px 22px;font-size:15px;font-weight:700;background:#7A1E1E;border:1px solid #FF7E7E;color:#fff">✚ Revivir</button>';
     document.body.appendChild(el);
@@ -2337,7 +2338,7 @@ function dueloOpcionesLocal(d){
   const def = defensaCreepMapa(sc), c = Combatiente.costoParry();
   if(Combatiente.stuneado(sc.estados)) return [{modo: 'evasion', etiqueta: '🏃 Evasión · Stun: 1'}];   // Stun (2026-10-06)
   const ops = [{modo: 'evasion', etiqueta: '🏃 Evasión'}];
-  if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, escudo: def.nombre !== Combatiente.armaEnMano(sc).nombre, natural: def.nombre === Combatiente.armaEnMano(sc).nombre ? Combatiente.armaEnMano(sc).natural : !!def.natural, etiqueta: `${def.nombre === Combatiente.armaEnMano(sc).nombre ? '🗡' : '🛡'} Parry · ${def.nombre}`, costo: c, motivoNo: Combatiente.defensaSinNo2(sc.nitros, c) ? 'Ya está en No2 negativos: no puede gastar más en una defensa' : ''});   // sin No2: queda en negativo (2026-10-06), no si ya lo estaba (2026-10-23)
+  if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, escudo: def.nombre !== Combatiente.armaEnMano(sc).nombre, natural: def.nombre === Combatiente.armaEnMano(sc).nombre ? Combatiente.armaEnMano(sc).natural : !!def.natural, etiqueta: `${def.nombre === Combatiente.armaEnMano(sc).nombre ? '🗡' : '🛡'} Parry · ${def.nombre}`, costo: c, reglaNo2: Combatiente.defensaSinNo2(sc.nitros, c) ? {nombre: sc.nombre, nitros: num(sc.nitros), accion: 'Parry'} : null});   // sin No2: queda en negativo (2026-10-06), no si ya lo estaba (2026-10-23)
   return Combatiente.nombresContraDisparo(Combatiente.sinReaccionesNo2(Combatiente.sinParryDelAtaque(ops, d), sc.estados), d);   // Takle y otros ataques que no se pueden parrear; Expuesto (Degollar): el Parry, apagado
 }
 // ⚡ Flash de un creep (P135): si no tiene ninguno que sirva para esta tirada, el mapa contesta solo ([]) y no hace falta

@@ -520,7 +520,10 @@ const FichaAcciones = (() => {
     const fin = FichaCalculo.calcular(S).final;
     const gratis = Combatiente.parryGratis(st => fin[st], num((S.ataquesArma || {})._parry));
     const costo = gratis ? 0 : Combatiente.conExtenuado(S.efectos, Combatiente.costoParry());   // + Extenuado
-    if(Combatiente.defensaSinNo2(S.nitros, costo)){ ui.toast(`${((S.meta && S.meta.nombre) || 'Tu personaje').trim()} ${Combatiente.YA_NEGATIVO_TXT}`); return; }   // ya en negativo (2026-10-23)
+    if(Combatiente.defensaSinNo2(S.nitros, costo)){   // ya en negativo (2026-10-23) · ⚖ la regla se puede saltar con la mesa (2026-11-03)
+      Combatiente.reglaNo2({nombre: ((S.meta && S.meta.nombre) || 'Tu personaje').trim(), nitros: S.nitros, accion: `Parry${arma ? ' con ' + arma.nombre : ''}`}, () => parryConArma(S, arma, forzar, ui));
+      return;
+    }
     S.ataquesArma = {...(S.ataquesArma || {}), _parry: 1};
     const con = arma ? ' con ' + arma.nombre : '';
     // Una defensa: sin No2 se hace igual y queda en negativo; la deuda se descuenta en la próxima recarga (dueño, 2026-10-06).
@@ -624,7 +627,10 @@ const FichaAcciones = (() => {
     if(!forzar){ const ok = confirmarSentado(S, ui), p = esperarSiHace(ok); if(!(p ? await p : ok)) return; }
     // 💸 Una reacción ofensiva fuera de turno (dueño, 2026-11-01: «vamos a dejarlo para acciones ofensivas tipo ataque de oportunidad también»): como
     // una defensa, sin No2 se hace igual y queda en negativo (la deuda se descuenta en la próxima recarga), si arranca en 0 o más; ya en negativo, no.
-    if(Combatiente.defensaSinNo2(S.nitros, costo)){ ui.toast(`${((S.meta && S.meta.nombre) || 'Tu personaje').trim()} ${Combatiente.YA_NEGATIVO_TXT}`); return; }
+    if(Combatiente.defensaSinNo2(S.nitros, costo)){   // ⚖ la regla se puede saltar con la mesa (2026-11-03)
+      Combatiente.reglaNo2({nombre: ((S.meta && S.meta.nombre) || 'Tu personaje').trim(), nitros: S.nitros, accion: `${nombre}${con}`}, () => ataqueEspecialConArma(S, arma, tipo, true, ui));
+      return;
+    }
     const paga = costo;
     S.nitros = num(S.nitros) - paga;
     Combatiente.avisarDeudaNo2({nombre: ((S.meta && S.meta.nombre) || '').trim(), accion: `el ${nombre.toLowerCase()}${con}`, costo, quedan: num(S.nitros)});

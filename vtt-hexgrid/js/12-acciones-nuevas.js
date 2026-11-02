@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261030lp2', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261028g', '../comun/creep-botonera.js?v=20261030cn2', '../comun/creep-acciones.js?v=20261101jefe2', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261031ae'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261030lp2', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261028g', '../comun/creep-botonera.js?v=20261030cn2', '../comun/creep-acciones.js?v=20261103nit', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261103nit'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -121,10 +121,12 @@ async function acCambiarCreep(creepId, cambiar){
   try{
     return await modificarCreep(creepId, crudo => {
       const x = cambiar(CreepCalculo.normalizar(crudo));
-      if(x && x.error) throw Object.assign(new Error(x.error), {regla: true});
+      if(x && x.error) throw Object.assign(new Error(x.error), {regla: true, reglaNo2: x.reglaNo2 || null});
       return x;
     });
   }catch(err){
+    // ⚖ Ya en No2 negativos (2026-11-03): «la regla dice que no podés» — con «Hacerlo igual», se vuelve a intentar (esta vez pasa).
+    if(err.reglaNo2){ if(await Combatiente.reglaNo2(err.reglaNo2)) return acCambiarCreep(creepId, cambiar); return null; }
     if(err.regla) toast(err.message);
     else { console.error('No se pudo cambiar el creep:', err); toast('No se pudo guardar el creep — revisá la consola'); }
     return null;

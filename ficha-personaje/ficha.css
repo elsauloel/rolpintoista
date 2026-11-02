@@ -956,7 +956,7 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 
 /* ---------- Estado Muerto ---------- */
 #overlay-muerte{
-  position:fixed;inset:0;background:rgba(160,20,20,.32);z-index:35;pointer-events:none;
+  position:fixed;inset:0;background:rgba(160,20,20,.2);z-index:35;pointer-events:none;   /* menos opaco (dueño, 2026-11-03) */
   display:none;align-items:center;justify-content:center
 }
 #overlay-muerte.open{display:flex}

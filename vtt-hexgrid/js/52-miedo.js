@@ -59,6 +59,13 @@ function miedoContra(atq, def){
   if(floripondioDe(atq)) return MIEDO_PENA;   // 🌺 contra cualquiera, aliados incluidos
   return 0;
 }
+// 🌺 ¿El −2 de miedoContra viene del Malviaje (y no de un Miedo o un Pánico)? Para que el duelo diga «malviajando» (dueño, 2026-11-03).
+function miedoEsMalviaje(atq, def){
+  if(!atq || !def || !floripondioDe(atq)) return false;
+  const defId = def.id || idDeToken(def);
+  if(defId && miedoEstados(atq).some(e => e.miedoDe === defId)) return false;
+  return !(panicoDe(atq) && (atq.tipo === 'creep' ? def.tipo === 'pj' : def.tipo === 'creep'));
+}
 
 /* ---------- El aura de la Calavera ---------- */
 function auraMiedoDe(t){

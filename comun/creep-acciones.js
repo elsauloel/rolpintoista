@@ -90,7 +90,7 @@ const CreepAcciones = (() => {
     if(!C().defensa(sc)) return {error: `${sc.nombre}: ${Combatiente.SIN_ARMA_DEFENSA}`};
     const gratis = Combatiente.parryGratis(st => C().modTotal(sc, st), num((sc.usosEspecial || {})._parry));   // Parada fácil (2026-10-06)
     const costo = gratis ? 0 : C().costoParry(sc);
-    if(Combatiente.defensaSinNo2(sc.nitros, costo)) return {error: `${sc.nombre} ${Combatiente.YA_NEGATIVO_TXT}`};   // ya en negativo (2026-10-23)
+    if(Combatiente.defensaSinNo2(sc.nitros, costo)) return Combatiente.errorNo2(sc.nombre, sc.nitros, 'Parry');   // ya en negativo (2026-10-23) · ⚖ (2026-11-03)
     sc.usosEspecial = {...(sc.usosEspecial || {}), _parry: 1};   // (se vacía al empezar su turno)
     sc.nitros = num(sc.nitros) - costo;   // sin No2 queda en negativo: se descuenta en su próxima recarga (2026-10-06)
     Combatiente.aplicarTormenta(sc, sc.estados, costo, {motivo: 'el Parry'});
@@ -130,7 +130,7 @@ const CreepAcciones = (() => {
   }
   function pagarAtaque(sc, tipo, forzar){
     const costo = costoAtaqueDe(sc, tipo), tenia = Math.max(0, num(sc.nitros));
-    if(Combatiente.defensaSinNo2(sc.nitros, costo)) return {error: `${sc.nombre} ${Combatiente.YA_NEGATIVO_TXT}`};   // ya en negativo: nada (2026-11-01)
+    if(Combatiente.defensaSinNo2(sc.nitros, costo)) return Combatiente.errorNo2(sc.nombre, sc.nitros, tipo === 'normal' ? 'atacar' : `el ${(NOMBRE_ESPECIAL[tipo] || 'Contraataque').toLowerCase()}`);   // ya en negativo (2026-11-01) · ⚖
     const forzado = costo > tenia && !especialTipo(tipo) ? {costo, tenia} : null;   // la oportunidad / el contraataque no se fuerzan: van a negativo
     if(tipo === 'normal'){
       if(forzado && !forzar) return {error: `${sc.nombre}: no le alcanzan los No2 — este ataque cuesta ${fmt(costo)} y tiene ${fmt(num(sc.nitros))}`};

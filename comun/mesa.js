@@ -74,7 +74,7 @@ async function mesaPublicar(origen, r){
   if(quien && origenTxt.startsWith(quien + ' · ')) origenTxt = origenTxt.slice(quien.length + 3);
   const doc = {
     uid: fbUsuario.uid,
-    jugador: fbMiembro.nombre,
+    jugador: String(r.jugador || fbMiembro.nombre).slice(0, 60),   // r.jugador (2026-11-03): la tirada de un personaje ajeno en el duelo, con su dueño
     quien,
     origen: origenTxt,
     formula: String(r.formula || ''),

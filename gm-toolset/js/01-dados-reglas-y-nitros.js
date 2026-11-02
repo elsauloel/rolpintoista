@@ -514,7 +514,7 @@ async function atacarNormalCreep(sc){
   const forzar = CreepAcciones.faltanNitros(sc, 'normal');   // sin No2: avisar y dejar seguir (2026-10-02)
   if(forzar && !(await Confirmar.preguntar(CreepAcciones.preguntaSinNitros(sc, 'normal'), {titulo: 'Sin No2', icono: '⚡', si: 'Atacar igual'}))) return;
   const x = CreepAcciones.pagarAtaque(sc, 'normal', forzar);   // comun/creep-acciones.js
-  if(x.error){ toast(x.error); return; }
+  if(x.error){ if(!Combatiente.errorReglaNo2(x, () => atacarNormalCreep(sc))) toast(x.error); return; }   // ⚖ en negativo: la regla, o hacerlo igual
   CreepAcciones.alertaSinNitros(sc, 'normal', x.forzado);
   parryPendienteCreep.delete(sc.id);   // atacar cierra el Parry que esperaba su Bloqueo
   renderAll();
@@ -527,7 +527,7 @@ async function ataqueEspecialCreep(sc, tipo){
   const forzar = CreepAcciones.faltanNitros(sc, tipo);
   if(forzar && !(await Confirmar.preguntar(CreepAcciones.preguntaSinNitros(sc, tipo), {titulo: 'Sin No2', icono: '⚡', si: 'Atacar igual'}))) return;
   const x = CreepAcciones.pagarAtaque(sc, tipo, forzar);   // comun/creep-acciones.js
-  if(x.error){ toast(x.error); return; }
+  if(x.error){ if(!Combatiente.errorReglaNo2(x, () => ataqueEspecialCreep(sc, tipo))) toast(x.error); return; }   // ⚖ en negativo: la regla, o hacerlo igual
   CreepAcciones.alertaSinNitros(sc, tipo, x.forzado);
   renderAll();
   publicarTiradaCreep(CreepAcciones.tiradaAtaque(sc, tipo));

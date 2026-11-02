@@ -282,7 +282,7 @@ document.addEventListener('click', async e => {
     const sc = S.creeps.find(s=>s.id===b.dataset.parrycreep);
     if(!sc) return;
     const x = CreepAcciones.pagarParry(sc);   // comun/creep-acciones.js
-    if(x.error){ toast(x.error); return; }
+    if(x.error){ if(!Combatiente.errorReglaNo2(x, () => b.click())) toast(x.error); return; }   // ⚖ en negativo: la regla, o hacerlo igual (otro clic, con permiso)
     if(x.deuda) Combatiente.avisarDeudaNo2(x.deuda);   // sin No2: queda en negativo (2026-10-06)
     parryPendienteCreep.add(sc.id);   // si gana el Parry, sigue el Bloqueo
     renderAll();

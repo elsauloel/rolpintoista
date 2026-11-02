@@ -476,6 +476,8 @@ async function invAtacarSuelto(invId, tipo){
   // Sin No2 suficientes: «¿Atacar igual?» (B-7, como los creeps): gasta los que tenga y deja la línea roja.
   const forzar = InvAcciones.faltanNitros(inv, tipo);
   if(forzar && !(await Confirmar.preguntar(InvAcciones.preguntaSinNitros(inv, tipo), {titulo: 'Sin No2', si: 'Atacar igual'}))) return;
+  if(Combatiente.defensaSinNo2(inv.nitros, InvAcciones.costoAtaqueDe(inv, tipo))
+    && !(await Combatiente.reglaNo2({nombre: inv.nombre, nitros: inv.nitros, accion: tipo === 'normal' ? 'atacar' : tipo === 'contra' ? 'contraatacar' : 'el ataque de oportunidad'}))) return;   // ⚖ (2026-11-03)
   const p = InvAcciones.pagarAtaque(inv, forzar, tipo);   // comun/inv-acciones.js
   if(p.error){ toast(p.error); return; }
   InvAcciones.alertaSinNitros(inv, p.forzado, tipo);
@@ -531,7 +533,7 @@ function invTirarStat(invId, statId, o){
   const inv = S.invocaciones.find(x => x.id === invId);
   if(!inv) return;
   const p = InvAcciones.tirarStat(inv, statId, {...(o || {}), parryPendiente: parryPendienteInv.has(inv.id)});   // comun/inv-acciones.js
-  if(p.error){ toast(p.error); return; }
+  if(p.error){ if(!Combatiente.errorReglaNo2(p, () => invTirarStat(invId, statId, o))) toast(p.error); return; }   // ⚖ en negativo: la regla, o hacerlo igual
   if(p.parry === 'sacar') parryPendienteInv.delete(inv.id);
   if(p.parry === 'poner') parryPendienteInv.add(inv.id);
   if(p.parry) renderInvocaciones();

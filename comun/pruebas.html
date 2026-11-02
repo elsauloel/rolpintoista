@@ -42,14 +42,14 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 </script>
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
-<script src="combatiente.js?v=20261103anul"></script>
+<script src="combatiente.js?v=20261103nit"></script>
 <script src="creep-calculo.js?v=20261103esen"></script>
 <script src="creep-botonera.js"></script>
-<script src="creep-acciones.js?v=20261101jefe2"></script>
+<script src="creep-acciones.js?v=20261103nit"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
-<script src="estados-presets.js?v=20261101sueno"></script>
+<script src="estados-presets.js?v=20261103nit"></script>
 <script src="estados-aplicar.js"></script>
 <script src="recibidos.js"></script>
 <script src="tokens-auto.js"></script>
@@ -99,7 +99,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261103raro"></script>
+<script src="duelo.js?v=20261103nit"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -6494,6 +6494,31 @@ prueba('🛡 El efecto del duelo dice «Armadura rota ×2» una sola vez (2026-1
 prueba('🎲 La tirada de un creep en el duelo va a la Mesa con su nombre y en rojo, la publique quien la publique (2026-11-03: salía «Jugador 1»)', () => {
   igual([Duelo.quienDeLado({nombre: 'Goblin', tipo: 'creep'}), Duelo.quienDeLado({nombre: 'Rockardo', tipo: 'pj'}), Duelo.quienDeLado(null)],
     [{quien: 'Goblin', desde: 'gm'}, {quien: 'Rockardo'}, {}]);
+});
+prueba('⚖ No2 negativos: la regla se puede saltar con la mesa — «Hacerlo igual» abre un permiso corto; el error lleva lo que hace falta para preguntar (2026-11-03)', () => {
+  const antes = Combatiente.defensaSinNo2(-2, 1);
+  const cero = Combatiente.defensaSinNo2(0, 1), gratis = Combatiente.defensaSinNo2(-2, 0);
+  const e = Combatiente.errorNo2('Goblin', -3, 'Parry');
+  Combatiente.permitirNo2Negativo();
+  const conPermiso = Combatiente.defensaSinNo2(-2, 1), sigue = Combatiente.permisoNo2();
+  const sc = creepPrueba({nombre: 'Goblin', nitros: -2, estados: []});
+  const parry = CreepAcciones.pagarParry(sc);
+  Combatiente.cerrarPermisoNo2();
+  const txt = Combatiente.reglaNo2Texto({nombre: 'Goblin', nitros: -3, accion: 'Parry'});
+  igual([antes, cero, gratis, !!e.error, e.reglaNo2, conPermiso, sigue, !parry.error, /La regla dice que no podés hacerlo/.test(txt), Combatiente.REGLA_NO2_SI, Combatiente.REGLA_NO2_NO],
+    [true, false, false, true, {nombre: 'Goblin', nitros: -3, accion: 'Parry'}, false, true, true, true, 'Hacerlo igual (discutilo con la mesa)', 'Respetar la regla']);
+});
+prueba('🌺 Malviaje: la descripción dice que ve a todos como enemigos (2026-11-03)', () => {
+  const p = ESTADOS_PRESET.find(e => e.nombre === 'Malviaje de floripondio');
+  igual([/ve a todos como enemigos, aliados y rivales por igual/.test(p.detalle), /^Malviajando/.test(p.detalle)], [true, true]);
+});
+prueba('🎲 La tirada de un personaje ajeno en el duelo no lleva la cuenta de quien la publica (2026-11-03: salía «Prueba Uno (Jugador 2)»)', () => {
+  const guardado = window.fbUsuario;
+  window.fbUsuario = {uid: 'yo'};
+  try{
+    igual([Duelo.quienDeLado({nombre: 'Prueba Uno', tipo: 'pj', uid: 'otro'}), Duelo.quienDeLado({nombre: 'Mía', tipo: 'pj', uid: 'yo'})],
+      [{quien: 'Prueba Uno', jugador: 'Prueba Uno'}, {quien: 'Mía'}]);
+  }finally{ window.fbUsuario = guardado; }
 });
 /* ---------- Resultado ---------- */
 Promise.all(pendientes).then(() => {

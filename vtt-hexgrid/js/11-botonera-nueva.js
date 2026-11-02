@@ -112,8 +112,8 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261101correa', '../comun/ficha-botin.js?v=20261026zy', '../comun/generador-tiendas.js?v=20261028z', '../comun/filtro-catalogo.js?v=20261028z', '../comun/ficha-tienda.js?v=20261028x2', '../comun/ficha-mantenimiento.js?v=20261030it1', '../comun/ficha-calculo.js?v=20261028w', '../comun/ficha-combate.js?v=20261015d', '../comun/skills-clase.js?v=20261031ae', '../comun/ficha-habilidades.js?v=20261020q',
-  '../comun/catalogo.js?v=20261029t', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261029u', '../comun/ficha-sesion.js?v=20261020zu', '../comun/ficha-botonera.js?v=20261029z2', '../comun/ficha-resumen.js?v=20261030it1', '../comun/inv-calculo.js?v=20261029a', '../comun/inv-botonera.js?v=20261023p8a', '../comun/inv-acciones.js?v=20261101no2', '../comun/inv-duelo.js?v=20261031ae', '../comun/ficha-acciones.js?v=20261101no2', '../comun/inv-habilidades.js?v=20261029z', '../comun/inv-lupa.js?v=20261015a',
-  '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261031ae', '../comun/lupa.js?v=20261030lp2', '../comun/ficha-lupa.js?v=20261030lp2'];
+  '../comun/catalogo.js?v=20261029t', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261029u', '../comun/ficha-sesion.js?v=20261020zu', '../comun/ficha-botonera.js?v=20261029z2', '../comun/ficha-resumen.js?v=20261030it1', '../comun/inv-calculo.js?v=20261029a', '../comun/inv-botonera.js?v=20261023p8a', '../comun/inv-acciones.js?v=20261103nit', '../comun/inv-duelo.js?v=20261103nit', '../comun/ficha-acciones.js?v=20261103nit', '../comun/inv-habilidades.js?v=20261029z', '../comun/inv-lupa.js?v=20261015a',
+  '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261103nit', '../comun/lupa.js?v=20261030lp2', '../comun/ficha-lupa.js?v=20261030lp2'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
    anterior"): en la ficha las columnas se juntan recién con la PANTALLA angosta (@media), pero en el mapa la pantalla es ancha y el panel
@@ -173,7 +173,7 @@ function bnCargarPiezas(){
     bnCargando = cargarPiezas(BN_PIEZAS)
       // Lo que subió el grupo al catálogo (como la ficha): un consumible viejo busca ahí el estado que deja.
       .then(() => ItemsSubidos.cargar().then(l => { bnItemsSubidos = l || []; }))
-      .then(() => fetch('../ficha-personaje/ficha.css?v=20261029z2').then(r => r.text()))
+      .then(() => fetch('../ficha-personaje/ficha.css?v=20261103nit').then(r => r.text()))
       .then(css => { bnCss = css.replace(/:root\b/g, ':host'); })
       .catch(err => { bnCargando = null; throw err; });
   }
@@ -280,7 +280,7 @@ function bnInvAca(b){
   if(d.invtirarstat){
     const ui = bnUi(FichaGuardado.partes(bn.S));
     const p = InvAcciones.tirarStat(inv, d.invtirarstat.split(':')[1], {parryPendiente: bn.invParry.has(inv.id)});
-    if(p.error){ toast(p.error); return true; }
+    if(p.error){ if(!Combatiente.errorReglaNo2(p, () => bnInvAca(b))) toast(p.error); return true; }   // ⚖ en negativo: la regla, o hacerlo igual
     if(p.parry === 'sacar') bn.invParry.delete(inv.id);
     if(p.parry === 'poner') bn.invParry.add(inv.id);
     if(p.cambio) ui.cambio(); else if(p.parry) bnDibujar();
@@ -405,6 +405,8 @@ function bnInvAtacar(invId, tipo){
     const forzar = InvAcciones.faltanNitros(inv, tipo);
     if(forzar && !(await AvisoCombate.preguntar(InvAcciones.preguntaSinNitros(inv, tipo), {icono: '⚠', titulo: 'Sin No2', si: 'Sí, atacar'}))) return;
     const ui = bnUi(FichaGuardado.partes(bn.S));
+    if(Combatiente.defensaSinNo2(inv.nitros, InvAcciones.costoAtaqueDe(inv, tipo))
+      && !(await Combatiente.reglaNo2({nombre: inv.nombre, nitros: inv.nitros, accion: tipo === 'normal' ? 'atacar' : tipo === 'contra' ? 'contraatacar' : 'el ataque de oportunidad'}))) return;   // ⚖ (2026-11-03)
     const p = InvAcciones.pagarAtaque(inv, forzar, tipo);
     if(p.error){ toast(p.error); return; }
     InvAcciones.alertaSinNitros(inv, p.forzado, tipo);
@@ -985,7 +987,8 @@ function bnAbrirCartel(id){
 }
 function bnSinNitros(costo, accion, continuar){
   // 💸 Ya en No2 negativos, ninguna acción que cueste No2, tampoco «Realizar de cualquier modo» (dueño, 2026-11-01)
-  if(Combatiente.defensaSinNo2(bn.S.nitros, costo)){ toast(`${((bn.S.meta && bn.S.meta.nombre) || 'Tu personaje').trim()} ${Combatiente.YA_NEGATIVO_TXT}`); return; }
+  // ⚖ (2026-11-03): la regla se puede saltar con la mesa: «Hacerlo igual» sigue como el «Realizar de cualquier modo».
+  if(Combatiente.defensaSinNo2(bn.S.nitros, costo)){ Combatiente.reglaNo2({nombre: ((bn.S.meta && bn.S.meta.nombre) || 'Tu personaje').trim(), nitros: bn.S.nitros, accion}, continuar); return; }
   bnSinNitrosSeguir = continuar;
   bn.raiz.querySelector('#bn-sn-texto').innerHTML = `No podés <b>${esc(accion)}</b>: cuesta <b>${fmt(costo)} No2</b> y tenés <b>${fmt(Math.max(0, num(bn.S.nitros)))}</b>.`;
   bnAbrirCartel('bn-sin-nitros');

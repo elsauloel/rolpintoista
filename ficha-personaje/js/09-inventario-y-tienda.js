@@ -8,7 +8,8 @@ let sinNitrosPendiente = null;
 
 function avisarSinNitros(costo, accion, continuar){
   // 💸 Ya en No2 negativos, ninguna acción que cueste No2, tampoco «Realizar de cualquier modo» (dueño, 2026-11-01)
-  if(Combatiente.defensaSinNo2(S.nitros, costo)){ toast(`${((S.meta && S.meta.nombre) || 'Tu personaje').trim()} ${Combatiente.YA_NEGATIVO_TXT}`); return; }
+  // ⚖ (2026-11-03): la regla se puede saltar con la mesa: «Hacerlo igual» sigue como el «Realizar de cualquier modo».
+  if(Combatiente.defensaSinNo2(S.nitros, costo)){ Combatiente.reglaNo2({nombre: ((S.meta && S.meta.nombre) || 'Tu personaje').trim(), nitros: S.nitros, accion}, continuar); return; }
   sinNitrosPendiente = {continuar, costo, accion};
   $('#sin-nitros-texto').innerHTML = `No podés <b>${esc(accion)}</b>: cuesta <b>${fmt(costo)} No2</b> y tenés <b>${fmt(Math.max(0, num(S.nitros)))}</b>.`;
   $('#scrim-sin-nitros').classList.add('open');

@@ -65,6 +65,9 @@ const CreepDuelo = (() => {
     if(qs && !(await ui.confirmar(qs))) return false;
     const forzar = A().faltanNitros(sc, tipo);
     if(forzar && !(await ui.confirmar(A().preguntaSinNitros(sc, tipo)))) return false;
+    // ⚖ Ya en No2 negativos (2026-11-03): la regla dice que no, pero con la mesa se puede hacer igual.
+    if(Combatiente.defensaSinNo2(sc.nitros, A().costoAtaqueDe(sc, tipo))
+      && !(await Combatiente.reglaNo2({nombre: sc.nombre, nitros: sc.nitros, accion: tipo === 'normal' ? 'atacar' : tipo === 'contra' ? 'contraatacar' : 'el ataque de oportunidad'}))) return false;
     let carga = null;
     return ui.cambiar(ref, c => {
       const x = A().pagarAtaque(c, tipo, forzar);
@@ -258,7 +261,7 @@ const CreepDuelo = (() => {
         // Parry con un arma o un escudo (regla del dueño, 2026-09-30); desde el 2026-10-21 también con un arma natural (va última).
         const disparo = Combatiente.contraDisparo(d), def = C().defensa(sc, {soloEscudo: disparo});   // contra un disparo, Parry solo con escudo
         if(Combatiente.stuneado(sc.estados)) return [{modo: 'evasion', etiqueta: '🏃 Evasión · Stun: 1', info: ['⚡ Stun: no puede hacer nada; su Evasión es 1']}];   // Stun (2026-10-06)
-        if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, escudo: def.nombre !== Combatiente.armaEnMano(sc).nombre, natural: def.nombre === Combatiente.armaEnMano(sc).nombre ? Combatiente.armaEnMano(sc).natural : !!def.natural, etiqueta: `${def.nombre === Combatiente.armaEnMano(sc).nombre ? '🗡' : '🛡'} Parry · ${def.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo: c, motivoNo: Combatiente.defensaSinNo2(sc.nitros, c) ? 'Ya está en No2 negativos: no puede gastar más en una defensa' : '',
+        if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, escudo: def.nombre !== Combatiente.armaEnMano(sc).nombre, natural: def.nombre === Combatiente.armaEnMano(sc).nombre ? Combatiente.armaEnMano(sc).natural : !!def.natural, etiqueta: `${def.nombre === Combatiente.armaEnMano(sc).nombre ? '🗡' : '🛡'} Parry · ${def.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo: c, reglaNo2: Combatiente.defensaSinNo2(sc.nitros, c) ? {nombre: sc.nombre, nitros: num(sc.nitros), accion: 'Parry'} : null,
           info: [`Parry 🎲 ${fx(C().statValor(sc, 'parry'), 'parry')}`, disparo ? 'si gana, el disparo queda parado (sin Bloqueo)' : `si gana, Bloqueo 🎲 ${fx(C().bloqueoValor(sc))}`, ...(c > num(sc.nitros) && num(sc.nitros) >= 0 ? ['⚠ sin No2: queda en negativo (se descuenta al recargar)'] : [])]});
         else if(disparo && C().defensa(sc)) ops.push(Combatiente.parryApagado({modo: 'parry', itemId: '', itemNombre: C().defensa(sc).nombre, etiqueta: `🗡 Parry · ${C().defensa(sc).nombre}`, costo: 0, info: []}, 'contra un disparo solo se parrea con escudo'));   // 🚫 (2026-10-29)
         // ⚔ Con el Contraataque (2026-10-27): si gana la Evasión o el Parry, puede contestar (el duelo pregunta «¿Contraataca?»).
@@ -289,12 +292,14 @@ const CreepDuelo = (() => {
         if(!sc) return;
         if(modo === 'parry'){
           if(!C().defensa(sc)){ ui.toast(`${sc.nombre}: ${Combatiente.SIN_ARMA_DEFENSA}`); return; }
-          return ui.cambiar(d.defensor.ref, c => A().pagarParry(c)).then(x => {   // sin No2 queda en negativo (2026-10-06)
+          const pagar = () => ui.cambiar(d.defensor.ref, c => A().pagarParry(c)).then(x => {   // sin No2 queda en negativo (2026-10-06)
             if(!x) return;
+            if(x.error){ if(!Combatiente.errorReglaNo2(x, pagar)) ui.toast(x.error); return; }   // ⚖ en negativo: la regla, o hacerlo igual
             if(x.deuda) Combatiente.avisarDeudaNo2(x.deuda);
             ui.publicar(sc, A().tirada(`${sc.nombre} · Parry`, C().statValor(sc, 'parry'), sc, 'parry'));
             ui.toast(x.aviso);
           });
+          return pagar();
         }
         const ee = evaEsp(sc, d);
         ui.publicar(sc, A().tirada(`${sc.nombre} · Evasión${ee.txt ? ` (${ee.txt})` : ''}`, C().statValor(sc, 'eva') + ee.val, {...sc, estados: Combatiente.ciegoContraDistancia(d, sc.estados)}, 'eva', ee.fijo));   // 🙈 ciego contra un ataque a distancia: la mitad

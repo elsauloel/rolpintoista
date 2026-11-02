@@ -393,7 +393,7 @@ function momentoAvisoCentro(id, d){
   // Con la estética del cuadro del duelo (2026-10-03, pedido del dueño: unificar los pop-ups de efectos de combate): comun/aviso-combate.js.
   const dt = d.datos || {};
   AvisoCombate.mostrar({icono: d.icono || '•', titulo: dt.tituloAviso || d.titulo || '', pasos: Array.isArray(dt.pasos) ? dt.pasos : [],   // (tituloAviso / textoAviso: en segunda persona para quien le pasó, 2026-10-28)
-    texto: Array.isArray(dt.pasos) && dt.pasos.length ? '' : (dt.textoAviso || d.resultado || ''), veredicto: dt.veredicto || null, aMano: dt.aMano || '',
+    texto: Array.isArray(dt.pasos) && dt.pasos.length ? '' : ((dt.porUid && fbUsuario && dt.porUid[fbUsuario.uid]) || dt.textoAviso || d.resultado || ''), veredicto: dt.veredicto || null, aMano: dt.aMano || '',
     ...(dt.boton ? {boton: String(dt.boton).slice(0, 30)} : {}),   // ej. «💚 Aceptar» de una cura (2026-10-07)
     alCerrar: () => {
       avisoCentro = null;

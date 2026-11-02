@@ -46,7 +46,7 @@ const InvDuelo = (() => {
         if(p.parry === 'poner') ui.parry.add(inv.id);
         return !!p.parry;
       });
-      if(p.error){ ui.toast(p.error); return; }
+      if(p.error){ if(!Combatiente.errorReglaNo2(p, () => tirarStat(inv, statId, o))) ui.toast(p.error); return; }   // ⚖ en negativo: la regla, o hacerlo igual
       if(p.aviso) ui.toast(p.aviso);
       publicar(p.tirada);
     }
@@ -60,6 +60,9 @@ const InvDuelo = (() => {
       if(qs && !(await (ui.confirmar || (t => Confirmar.preguntar(t, {titulo: /Desarmad/.test(t) ? 'Desarmado' : 'Sentado', si: 'Atacar igual'})))(qs))) return false;
       const forzar = A().faltanNitros(inv, tipo);
       if(forzar && !(await (ui.confirmar || (t => Confirmar.preguntar(t, {titulo: 'Sin No2', si: 'Atacar igual'})))(A().preguntaSinNitros(inv, tipo)))) return false;
+      // ⚖ Ya en No2 negativos (2026-11-03): la regla dice que no, pero con la mesa se puede hacer igual.
+      if(Combatiente.defensaSinNo2(inv.nitros, A().costoAtaqueDe(inv, tipo))
+        && !(await Combatiente.reglaNo2({nombre: inv.nombre, nitros: inv.nitros, accion: tipo === 'normal' ? 'atacar' : tipo === 'contra' ? 'contraatacar' : 'el ataque de oportunidad'}))) return false;
       let p;
       ui.cambiar(() => {
         p = A().pagarAtaque(inv, forzar, tipo);
@@ -224,7 +227,7 @@ const InvDuelo = (() => {
         const disparo = Combatiente.contraDisparo(d), def = I().defensa(inv, {soloEscudo: disparo});   // contra un disparo, Parry solo con escudo
         if(Combatiente.stuneado(inv.estados)) return [{modo: 'evasion', etiqueta: '🏃 Evasión · Stun: 1', info: ['⚡ Stun: no puede hacer nada; su Evasión es 1']}];   // Stun (2026-10-06)
         if(!def && disparo && I().defensa(inv)) ops.push(Combatiente.parryApagado({modo: 'parry', itemId: '', itemNombre: I().defensa(inv).nombre, etiqueta: `🗡 Parry · ${I().defensa(inv).nombre}`, costo: 0, info: []}, 'contra un disparo solo se parrea con escudo'));   // 🚫 (2026-10-29)
-        if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, escudo: def.nombre !== Combatiente.armaEnMano(inv).nombre, natural: def.nombre === Combatiente.armaEnMano(inv).nombre ? Combatiente.armaEnMano(inv).natural : !!def.natural, etiqueta: `${def.nombre === Combatiente.armaEnMano(inv).nombre ? '🗡' : '🛡'} Parry · ${def.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo: c, motivoNo: Combatiente.defensaSinNo2(inv.nitros, c) ? 'Ya está en No2 negativos: no puede gastar más en una defensa' : '',
+        if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, escudo: def.nombre !== Combatiente.armaEnMano(inv).nombre, natural: def.nombre === Combatiente.armaEnMano(inv).nombre ? Combatiente.armaEnMano(inv).natural : !!def.natural, etiqueta: `${def.nombre === Combatiente.armaEnMano(inv).nombre ? '🗡' : '🛡'} Parry · ${def.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo: c, reglaNo2: Combatiente.defensaSinNo2(inv.nitros, c) ? {nombre: inv.nombre, nitros: num(inv.nitros), accion: 'Parry'} : null,
           info: [`Parry 🎲 ${fx(I().statValor(inv, 'parry'), 'parry', inv.estados)}`, disparo ? 'si gana, el disparo queda parado (sin Bloqueo)' : `si ganás, Bloqueo 🎲 ${fx(I().bloqueoValor(inv))}`, ...(c > num(inv.nitros) && num(inv.nitros) >= 0 ? ['⚠ sin No2: queda en negativo (se descuenta al recargar)'] : [])]});
         return Combatiente.sinReaccionesNo2(ops, inv.estados);   // Expuesto (Degollar): sin Parry
       },

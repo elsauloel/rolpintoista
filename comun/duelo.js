@@ -648,6 +648,7 @@ const Duelo = (() => {
     // (quien ataca está en la cuña ciega del defensor, sin hacer falta sigilo) y se suma al PdG al guardarlo, junto con el bono del arma si hay.
     // 😱 Miedo / Pánico (2026-10-18; −2 desde el 2026-11-01): quien ataca le tiene miedo al defensor: −N PdG (o PdG.Esp) y −N al daño (común o especial), con arma o con habilidad.
     if(_num(cfg.miedo) > 0) inicial.ataque.miedo = Math.min(3, Math.round(_num(cfg.miedo)));
+    if(_num(cfg.miedo) > 0 && cfg.malviaje) inicial.ataque.malviaje = true;   // 🌺 el −N viene del Malviaje de floripondio: «malviajando» (2026-11-03)
     if(_num(cfg.presa) > 0) inicial.ataque.presa = Math.min(5, Math.round(_num(cfg.presa)));   // 🎯 el defensor es la Presa (2026-10-21): +2 al daño
     // 🚩 Bajo el estandarte (2026-10-24, el Estandarte de guerra del Support; lo calcula el mapa, vtt-hexgrid/js/73): +N al PdG (o PdG.Esp) y +N al daño.
     if(cfg.estandarte && (_num(cfg.estandarte.pdg) > 0 || _num(cfg.estandarte.dano) > 0)) inicial.ataque.estandarte = {pdg: Math.min(10, Math.max(0, Math.round(_num(cfg.estandarte.pdg)))), dano: Math.min(20, Math.max(0, Math.round(_num(cfg.estandarte.dano))))};
@@ -692,7 +693,7 @@ const Duelo = (() => {
     }
     if(d.ataque && _num(d.ataque.presa) > 0) t.push(`🎯 contra la presa: +${_fmt(d.ataque.presa)} al daño`);
     if(d.ataque && d.ataque.desarme) t.push(`🤺 ${d.ataque.desarme.quien || ''} intenta desarmar (si gana el Bloqueo, el otro pierde lo que tiene en la mano)`);
-    if(d.ataque && _num(d.ataque.miedo) > 0) t.push(`😱 con miedo: −${_fmt(d.ataque.miedo)} PdG y −${_fmt(d.ataque.miedo)} de daño`);
+    if(d.ataque && _num(d.ataque.miedo) > 0) t.push(`${d.ataque.malviaje ? '🌺 malviajando' : '😱 con miedo'}: −${_fmt(d.ataque.miedo)} PdG y −${_fmt(d.ataque.miedo)} de daño`);
     if(d.ataque && d.ataque.estandarte) t.push(`🚩 bajo el estandarte: +${_fmt(_num(d.ataque.estandarte.pdg))} ${d.hab ? 'PdG.Esp' : 'PdG'} y +${_fmt(_num(d.ataque.estandarte.dano))} de daño`);
     if(d.ataque && _num(d.ataque.embestida) > 0) t.push(`🐂 embestida: +${_fmt(d.ataque.embestida)} PdG`);
     if(d.ataque && _num(d.ataque.quieto) > 0) t.push(`💍 ${d.hab ? 'foco' : 'puntería certera'}: +${_fmt(d.ataque.quieto)} ${d.hab ? 'PdG.Esp' : 'PdG'}`);
@@ -1036,7 +1037,7 @@ const Duelo = (() => {
       const qto = campo === 'pdg' && m.ataque ? _num(m.ataque.quieto) : 0;   // Pulso quieto / Foco (anillos)
       if(qto > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + qto, mod: p0.mod + qto, formula: `${p0.formula} +${qto} quieto`.slice(0, 60)}; }
       const mie = campo === 'pdg' && m.ataque ? _num(m.ataque.miedo) : 0;   // 😱 le tiene miedo al defensor
-      if(mie > 0){ const p0 = m.pdg; m.pdg = {...p0, total: Math.max(0, p0.total - mie), mod: p0.mod - mie, formula: `${p0.formula} −${mie} miedo`.slice(0, 60)}; }
+      if(mie > 0){ const p0 = m.pdg; m.pdg = {...p0, total: Math.max(0, p0.total - mie), mod: p0.mod - mie, formula: `${p0.formula} −${mie} ${m.ataque.malviaje ? 'malviaje' : 'miedo'}`.slice(0, 60)}; }
       const esd = campo === 'pdg' && m.ataque && m.ataque.estandarte ? _num(m.ataque.estandarte.pdg) : 0;   // 🚩 bajo el estandarte
       if(esd > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + esd, mod: p0.mod + esd, formula: `${p0.formula} +${esd} estandarte`.slice(0, 60)}; }
       const tpd = campo === 'pdg' && m.ataque && m.ataque.tiro ? _num(m.ataque.tiro.pdg) : 0;   // el bono del tiro: distancia ideal (+) o tiro alto (−2)
@@ -1312,7 +1313,7 @@ const Duelo = (() => {
       const ps = m.ataque ? _num(m.ataque.primeraSangre) : 0;   // Primera sangre (anillo): el daño de su primer ataque del combate
       if(ps > 0) m.dano = {...m.dano, crudo: m.dano.crudo + ps, mod: m.dano.mod + ps, formula: `${m.dano.formula} +${ps} primera sangre`.slice(0, 60)};
       const mied = m.ataque ? _num(m.ataque.miedo) : 0;   // 😱 le tiene miedo al defensor: −N al daño
-      if(mied > 0) m.dano = {...m.dano, crudo: Math.max(0, m.dano.crudo - mied), mod: m.dano.mod - mied, formula: `${m.dano.formula} −${mied} miedo`.slice(0, 60)};
+      if(mied > 0) m.dano = {...m.dano, crudo: Math.max(0, m.dano.crudo - mied), mod: m.dano.mod - mied, formula: `${m.dano.formula} −${mied} ${m.ataque.malviaje ? 'malviaje' : 'miedo'}`.slice(0, 60)};
       const prs = m.ataque ? _num(m.ataque.presa) : 0;   // 🎯 contra la presa: +2 al daño
       if(prs > 0) m.dano = {...m.dano, crudo: m.dano.crudo + prs, mod: m.dano.mod + prs, formula: `${m.dano.formula} +${prs} presa`.slice(0, 60)};
       const esdd = m.ataque && m.ataque.estandarte ? _num(m.ataque.estandarte.dano) : 0;   // 🚩 bajo el estandarte: +5 al daño
@@ -2179,7 +2180,7 @@ const Duelo = (() => {
         }
         else if(!ops){ setTimeout(() => { if(actual && actual.id === d.id && actual.dato && !opciones[d.id]) dibujar(); }, 2000);   // vuelve a mirar hasta que lleguen
           cuerpo = '<div class="espera">cargando tus opciones de defensa… <span class="det">(la primera vez puede tardar unos segundos)</span></div>'; }
-        else cuerpo = `<div class="det">Elegí cómo te defendés (antes de ver el PdG):</div><div class="duelo-opc">${ops.map((o, i) => /^🚫/.test(o.motivoNo || '') ? `<button type="button" class="no-puede" disabled title="${_esc(o.motivoNo.replace(/^🚫\s*/, ''))}"><span class="no-puede-txt">🚫 ${_esc((o.motivoNo.match(/^🚫\s*([^:]+)/) || [])[1] || 'No se puede')}</span>${_esc(o.etiqueta)}<small>${_esc(o.motivoNo.replace(/^🚫\s*[^:]+:\s*/, ''))}</small></button>` : `<button type="button" data-def="${i}"${o.motivoNo ? ' disabled' : ''}>${_esc(o.etiqueta)}${ayudaDefensa(o.modo === 'evasion' ? 'eva' : o.modo)}${o.lupa ? lupaDuelo(d.id + ':op' + i, (vistas[d.id + ':op' + i] = o.lupa)) : ''}${o.costo ? `<small>${_fmt(o.costo)} No2</small>` : ''}${(o.info || []).map(t => `<small class="duelo-info">${_esc(t)}</small>`).join('')}${o.motivoNo ? `<small>${_esc(o.motivoNo)}</small>` : ''}</button>`).join('')}</div>`;
+        else cuerpo = `<div class="det">Elegí cómo te defendés (antes de ver el PdG):</div><div class="duelo-opc">${ops.map((o, i) => /^🚫/.test(o.motivoNo || '') ? `<button type="button" class="no-puede" disabled title="${_esc(o.motivoNo.replace(/^🚫\s*/, ''))}"><span class="no-puede-txt">🚫 ${_esc((o.motivoNo.match(/^🚫\s*([^:]+)/) || [])[1] || 'No se puede')}</span>${_esc(o.etiqueta)}<small>${_esc(o.motivoNo.replace(/^🚫\s*[^:]+:\s*/, ''))}</small></button>` : `<button type="button" data-def="${i}"${o.motivoNo ? ' disabled' : ''}>${_esc(o.etiqueta)}${ayudaDefensa(o.modo === 'evasion' ? 'eva' : o.modo)}${o.lupa ? lupaDuelo(d.id + ':op' + i, (vistas[d.id + ':op' + i] = o.lupa)) : ''}${o.costo ? `<small>${_fmt(o.costo)} No2</small>` : ''}${(o.info || []).map(t => `<small class="duelo-info">${_esc(t)}</small>`).join('')}${o.motivoNo ? `<small>${_esc(o.motivoNo)}</small>` : ''}${o.reglaNo2 ? `<small class="duelo-info" style="color:#ffb3b3">⚖ La regla dice que no (en ${_fmt(o.reglaNo2.nitros)} No2): tocalo para decidir</small>` : ''}</button>`).join('')}</div>`;
       }else{
         const txt = campo === 'pdg' ? (d.hab ? `🎲 Tirar ${_esc(etqTira(d))}` : '🎲 Pagar y tirar PdG') : desarma ? `🎲 Tirar Desarmar (tu ${campo === 'fuerza' ? 'Fuerza del golpe' : 'Bloqueo'})`
           : dOp ? (campo === 'fuerza' ? '⚔ Pegar: pasar el bloqueo (Fuerza del golpe)' : '🛡 Bloquear el golpe')
@@ -2427,7 +2428,14 @@ const Duelo = (() => {
   }
   /* ¿A nombre de quién va a la Mesa la tirada de un lado del duelo? (2026-11-03: la publica la pantalla del que tira segundo; la PdG de un creep
      salía con el nombre de la cuenta del jugador que defendía, «Jugador 1»). Un creep va como las de GM Tools (rojo); un personaje, con su nombre. */
-  const quienDeLado = l => !l || !l.nombre ? {} : l.tipo === 'creep' ? {quien: String(l.nombre), desde: 'gm'} : {quien: String(l.nombre)};
+  /* Un personaje de otro (2026-11-03, dueño: salía «Prueba Uno (Jugador 2)»: el nombre de la cuenta de quien publica): va con el nombre de su dueño
+     si esta pantalla lo conoce (el mapa: `miembros`); si no, sin la cuenta entre paréntesis (jugador = el personaje), nunca con la ajena. */
+  const jugadorDeLado = l => {
+    if(!l || !l.uid || typeof fbUsuario === 'undefined' || !fbUsuario || l.uid === fbUsuario.uid) return {};
+    try{ const m = typeof miembros !== 'undefined' && miembros && miembros.get ? miembros.get(l.uid) : null; if(m && m.nombre) return {jugador: String(m.nombre)}; }catch(e){}
+    return {jugador: String(l.nombre)};
+  };
+  const quienDeLado = l => !l || !l.nombre ? {} : l.tipo === 'creep' ? {quien: String(l.nombre), desde: 'gm'} : {quien: String(l.nombre), ...jugadorDeLado(l)};
   const EstadosAplicarTexto = (spec, ef) => spec.cura ? `Curación de ${spec.cura} HP` : (typeof EstadosAplicar !== 'undefined' ? EstadosAplicar.texto(spec) : spec.nombre + (spec.stacks > 1 ? ` ×${spec.stacks}` : ''));   // EstadosAplicar.texto ya dice «×N» (2026-11-03: salía «Armadura rota ×2 ×2»)
 
   // Paso 5 · Daño: la tirada del arma, la cuenta y, cuando el GM lo aplica, el número grande y la vida.
@@ -2828,11 +2836,17 @@ const Duelo = (() => {
       enviar(d[lado], {tipo: 'duelo-tirar', id: d.id, campo, flash: ''});
       setTimeout(() => { if(actual && actual.dato && !actual.dato[campo]) dibujar(); }, 8000);
     });
-    f.querySelectorAll('[data-def]').forEach(b => b.onclick = () => {
+    f.querySelectorAll('[data-def]').forEach(b => b.onclick = async () => {
       const o = (opciones[d.id] || [])[Number(b.dataset.def)];
       if(!o) return;
+      // ⚖ Ya en No2 negativos (2026-11-03, dueño): «la regla dice que no podés hacerlo» — respetarla o hacerlo igual (con la mesa).
+      let forzarNo2 = false;
+      if(o.reglaNo2 && typeof Combatiente !== 'undefined' && Combatiente.reglaNo2){
+        if(!(await Combatiente.reglaNo2(o.reglaNo2))) return;
+        forzarNo2 = true;
+      }
       f.querySelectorAll('[data-def]').forEach(x => x.disabled = true);
-      enviar(d.defensor, {tipo: 'duelo-tirar', id: d.id, campo: 'eva', modo: o.modo, itemId: o.itemId || '', flash: flashSel[d.id + ':eva'] || ''});
+      enviar(d.defensor, {tipo: 'duelo-tirar', id: d.id, campo: 'eva', modo: o.modo, itemId: o.itemId || '', flash: flashSel[d.id + ':eva'] || '', ...(forzarNo2 ? {forzarNo2: true} : {})});
       setTimeout(() => { if(actual && actual.dato && !actual.dato.eva){ opcionesPedidas.delete(d.id); dibujar(); } }, 8000);
     });
     f.querySelectorAll('[data-flash]').forEach(b => b.onclick = () => {   // marcar o desmarcar el Flash de esta tirada
@@ -2967,8 +2981,9 @@ const Duelo = (() => {
       if(!hk) document.querySelectorAll('.scrim.open').forEach(s => s.classList.remove('open'));   // sin la Botonera abierta debajo
       let defensa = null;
       if(campo === 'eva'){
+        if(m.forzarNo2 && typeof Combatiente !== 'undefined' && Combatiente.permitirNo2Negativo) Combatiente.permitirNo2Negativo();   // ⚖ «Hacerlo igual» (2026-11-03)
         const op = (d.hab ? opcionesHab(d, h) : (h.opcionesDefensa ? h.opcionesDefensa(d) : [])).find(o => o.modo === m.modo && (o.itemId || '') === (m.itemId || ''));
-        if(!op || op.motivoNo) return;
+        if(!op || op.motivoNo || (op.reglaNo2 && !m.forzarNo2)) return;
         defensa = {modo: op.modo, itemId: op.itemId || '', itemNombre: op.itemNombre || '', costo: _num(op.costo), ...(op.arco ? {arco: true} : {}), ...(op.escudo ? {escudo: true} : {}), ...(op.natural ? {natural: true} : {})};   // (escudo, natural: para Desarmar, 2026-10-22)
         if(op.contraEsquiva && !d.hab) defensa = {...defensa, contraEsquiva: true, ...(await alcanceContra(d, h))};   // ⚔ Contraataque (Warrior)
       }

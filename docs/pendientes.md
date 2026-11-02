@@ -895,6 +895,8 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] **🏹🛡 Equipo con ventaja contra proyectiles (dueño, 2026-11-02, diseñando el Piromante):** no hay piezas Comunes ni Buenas que den Evasión
   contra disparos o Defensa contra proyectiles (el stat `evadisparo` existe, solo lo usa lo que vuela). Crear algunas (torso, capa, escudo liviano…),
   pensadas sobre todo para casters y livianos.
+- [ ] **👁 Ojo de Kicillof como habilidad de Support (dueño, 2026-11-03: «sería interesante, habría que pensarlo en coste»):** hoy es solo el
+  Pergamino de ojo. Pensar el costo (SP, No2, cooldown; probablemente lenta) y si dura menos o ve menos que el pergamino. A diseñar, no programar todavía.
 - [ ] **(ver «Talismanes elementales») 🔥 Talismán Común que potencie el fuego (dueño, 2026-11-02, Piromante):** hoy no hay ninguno (solo resistencias: Piedra de brasa; en Buena,
   el Orbe del foco da PdG.Esp). Crear uno (p. ej. «+2 al daño de fuego» o «el fuego deja Quemadura más larga») y uno por elemento si tiene sentido.
 - [x] **📋 Pegar las reglas de Firestore (2026-11-01; pegadas por el dueño el 2026-11-02 — probado: un jugador recortó con el Pergamino de anulación una luz ajena del GM):** `firebase/firestore.rules` con el 💨 viento que recorta nubes y la 🚫 Anulación (recortar o borrar entera una zona ajena con creador o una luz: `esZonaMagica`/`esNube`, update y delete; 2026-11-02) (`esNube`, commit 6575a0d9) y 🚫 la Anulación que recorta zonas mágicas ajenas (`esZonaMagica`). Sin pegarlas, un jugador que despeja la nube de otro ve «a mano (faltan pegar las reglas)»; el GM ya puede.

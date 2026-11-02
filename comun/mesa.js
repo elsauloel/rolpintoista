@@ -179,15 +179,22 @@ function mesaAlertaEstilos(){
       '#alerta-ojo span{font-size:min(55vmin,420px);line-height:1;filter:drop-shadow(0 0 30px rgba(255,60,30,.9))}' +
       '#alerta-ojo.apagar{opacity:0}' +
       '.mesa-duelo-frase{font-weight:700;line-height:1.35}' +
-      // 🔍 «Ver detalle del duelo» como botón (dueño, 2026-11-03: «que se vea como un botón, con un reborde y un fondo más claro»)
-      '.mesa-duelo-det summary{display:inline-block;cursor:pointer;font-size:12px;font-weight:700;margin-top:5px;list-style:none;padding:3px 10px;' +
-        'border:1px solid currentColor;border-radius:6px;background:rgba(255,255,255,.14);opacity:1;user-select:none}' +
-      '.mesa-duelo-det summary:hover{background:rgba(255,255,255,.26)}' +
-      '.mesa-duelo-det summary::-webkit-details-marker{display:none}' +
-      '.mesa-duelo-det summary .ocultar{display:none}' +
-      '.mesa-duelo-det[open] summary .ver{display:none}' +
-      '.mesa-duelo-det[open] summary .ocultar{display:inline}' +
-      '.mesa-duelo-det[open] summary{margin-bottom:4px}';
+      // 🔍 «Ver detalle del duelo» como botón (dueño, 2026-11-03: «que se vea como un botón, con un reborde y un fondo más claro») que abre un recuadro
+      '.mesa-duelo-btn{display:inline-block;cursor:pointer;font:inherit;font-size:12px;font-weight:700;margin-top:5px;padding:3px 10px;color:inherit;' +
+        'border:1px solid currentColor;border-radius:6px;background:rgba(255,255,255,.14)}' +
+      '.mesa-duelo-btn:hover{background:rgba(255,255,255,.26)}' +
+      '#mesa-duelo-pop{position:fixed;inset:0;z-index:99990;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px}' +
+      '#mesa-duelo-pop .caja{background:#211a16;color:#efe6da;border:1px solid #6b5443;border-top:3px solid #d9963c;border-radius:10px;' +
+        'width:min(560px,100%);max-height:calc(100vh - 60px);display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.6);font-family:inherit}' +
+      '#mesa-duelo-pop header{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #4a3b30}' +
+      '#mesa-duelo-pop header h3{margin:0;font-size:15px;flex:1}' +
+      '#mesa-duelo-pop .x{background:none;border:1px solid #6b5443;color:#efe6da;border-radius:6px;cursor:pointer;font-size:14px;padding:2px 9px}' +
+      '#mesa-duelo-pop .frase{padding:12px 16px 4px;font-weight:700;line-height:1.4}' +
+      '#mesa-duelo-pop .lineas{padding:6px 16px 12px;overflow:auto}' +
+      '#mesa-duelo-pop .lineas div{padding:6px 0;border-bottom:1px dashed #4a3b30;line-height:1.4;font-size:13.5px}' +
+      '#mesa-duelo-pop .lineas div:last-child{border-bottom:none}' +
+      '#mesa-duelo-pop footer{padding:10px 16px;border-top:1px solid #4a3b30;text-align:right}' +
+      '#mesa-duelo-pop footer button{background:#d9963c;color:#1d1714;border:none;border-radius:6px;padding:7px 18px;font-weight:700;cursor:pointer;font:inherit}';
     document.head.appendChild(st);
   }
 }
@@ -219,6 +226,22 @@ function mesaPonerTurno(n){
 // como "la última tirada" para el resaltado verde ni para mesaMiUltima (Polilla mística).
 const MESA_DESDE_SISTEMA = ["mantenimiento", "recordatorio", "habilidad", "efecto", "efecto-gm", "alerta", "alerta-roja", "recompensa", "reporte", "incierta", "incierta-pj", "incierta-creep"];
 
+// 🔍 El recuadro con el detalle de un duelo (2026-11-03, dueño): título, la frase y el paso a paso; se cierra con Aceptar, la ✕, Esc o un clic afuera.
+function mesaDueloDetalle(origen, frase, lineas){
+  const viejo = document.getElementById('mesa-duelo-pop'); if(viejo) viejo.remove();
+  const e = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
+  const pop = document.createElement('div');
+  pop.id = 'mesa-duelo-pop';
+  pop.innerHTML = `<div class="caja" role="dialog" aria-modal="true"><header><h3>${e(origen.replace(/^⚔ Resumen del duelo · /, '⚔ Duelo: '))}</h3><button type="button" class="x" title="Cerrar">✕</button></header>` +
+    `${frase ? `<div class="frase">${e(frase)}</div>` : ''}<div class="lineas">${(lineas || []).map(l => `<div>${e(l)}</div>`).join('') || '<div>Sin detalle.</div>'}</div>` +
+    `<footer><button type="button" class="ok">Aceptar</button></footer></div>`;
+  const cerrar = () => { pop.remove(); document.removeEventListener('keydown', tecla, true); };
+  const tecla = ev => { if(ev.key === 'Escape'){ ev.stopPropagation(); ev.preventDefault(); cerrar(); } };
+  pop.addEventListener('click', ev => { if(ev.target === pop || ev.target.closest('.x, .ok')) cerrar(); });
+  document.addEventListener('keydown', tecla, true);
+  document.body.appendChild(pop);
+  const ok = pop.querySelector('.ok'); if(ok) ok.focus();
+}
 function mesaRender(docs){
   mesaAlertaEstilos();
   const cuerpo = $('#mesa-cuerpo');
@@ -306,7 +329,9 @@ function mesaRender(docs){
       if(t.texto && /^⚔ Resumen del duelo/.test(String(t.origen || ''))){
         div.classList.add('mesa-duelo-fin');
         div.innerHTML = `<div class="mesa-duelo-frase">⚔ ${esc(t.texto)}</div>` +
-          `<details class="mesa-duelo-det"><summary><span class="ver">🔍 Ver detalle del duelo</span><span class="ocultar">▴ Ocultar el detalle</span></summary>${lineas.map(l => `<div class="mesa-detalle">${esc(l)}</div>`).join('')}</details>`;
+          `<button type="button" class="mesa-duelo-btn">🔍 Ver detalle del duelo</button>`;
+        // 🔍 El detalle se abre en un recuadro (dueño, 2026-11-03: «que se abra como un recuadro… que no quede ahí en la Mesa, queda muy poco claro»).
+        div.querySelector('.mesa-duelo-btn').addEventListener('click', ev => { ev.stopPropagation(); mesaDueloDetalle(String(t.origen || ''), String(t.texto || ''), lineas); });
         if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
         cuerpo.appendChild(div);
         return;

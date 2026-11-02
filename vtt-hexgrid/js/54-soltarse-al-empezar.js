@@ -324,7 +324,7 @@ async function ayudarASoltar({tipo, invId, tokenId}){
     const sc = typeof acCreep === 'function' ? acCreep() : null;
     if(!sc) return;
     quien = sc.nombre;
-    if(num(sc.nitros) < 0){ toast(`${sc.nombre} ya está en No2 negativos: no puede ayudar`); return; }   // defensiva: puede quedar en negativo, no si ya lo estaba (2026-10-23)
+    if(num(sc.nitros) < 0 && !(await Combatiente.reglaNo2({nombre: sc.nombre, nitros: num(sc.nitros), accion: 'ayudar a soltarse'}))) return;   // ya en negativo: la regla, o «Hacerlo igual» con la mesa (2026-11-03; antes, solo un aviso)
     tt = Combatiente.tiradaSoltarse(e, CreepCalculo.statValor(sc, s.stat) + Math.max(0, num(CreepCalculo.modTotal(sc, 'soltarse'))), sc.estados);
     await acCambiar(c => { c.nitros = num(c.nitros) - costo; return {aviso: ''}; });
     mesaPublicar(`${quien} · Ayudar a soltar a ${atrapado} · ${s.etq} contra ${s.dif}`, {...tt.r, quien, desde: 'gm'});
@@ -334,12 +334,13 @@ async function ayudarASoltar({tipo, invId, tokenId}){
     if(tipo === 'inv' && !inv) return;
     quien = inv ? inv.nombre : ((S.meta && S.meta.nombre) || 'Alguien');
     const tiene = num(inv ? inv.nitros : S.nitros);
-    if(tiene < 0){ toast(`${quien} ya está en No2 negativos: no puede ayudar`); return; }   // defensiva: puede quedar en negativo, no si ya lo estaba (2026-10-23)
+    if(tiene < 0 && !(await Combatiente.reglaNo2({nombre: quien, nitros: tiene, accion: 'ayudar a soltarse'}))) return;   // ya en negativo: la regla, o «Hacerlo igual» con la mesa (2026-11-03; antes, solo un aviso)
     const valor = inv ? InvCalculo.statValor(inv, s.stat) + Math.max(0, num(InvCalculo.modTotal(inv, 'soltarse')))
       : num(FichaCalculo.calcular(S).final[s.stat]) + Math.max(0, num(FichaCalculo.calcular(S).final.soltarse));
     tt = Combatiente.tiradaSoltarse(e, valor, inv ? inv.estados : S.efectos);
+    const antesPartes = FichaGuardado.partes(S);   // (2026-11-03: antes se tomaba DESPUÉS de cobrar, y el cobro no se guardaba)
     if(inv) inv.nitros = num(inv.nitros) - costo; else S.nitros = num(S.nitros) - costo;
-    bnUi(FichaGuardado.partes(S)).cambio();
+    bnUi(antesPartes).cambio();
     ficha = inv ? bn.fichaId + SEP_INVOCACION + inv.id : bn.fichaId;
     mesaPublicar(`${quien} · Ayudar a soltar a ${atrapado} · ${s.etq} contra ${s.dif}`, {...tt.r, quien, ficha});
   }

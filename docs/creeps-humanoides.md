@@ -102,6 +102,16 @@
   (Def. esp. +2, Res. eléc. +1, Luz +1) · Peto de cuero de lampalagua (Def +1, Def. esp. +2, Vida +5, Res. ácido +1) · Botas de caña alta de
   estanciero (Def +1, Def. esp. +1): Def +2, Def. esp. +5. Skills: Sanar (rápida, 1 No2 + 2 SP, cd 2: 1d6+4) · Purificar (lenta, Flash, 2 SP, cd 3).
   Consumible: Pergamino de Regeneración menor (grupo: 5 por turno, 3 turnos).
+  - **Boceto completo, nivel 1 a 5** (aprobado como ruta, dueño 2026-11-03: «cierra»). Atributos (Esp > Con > Agi > Des > Fue; Esp/Con/Agi/Des/Fue
+    → vida, con el +5 del peto): nv1 12/8/6/4/3 → 45 · nv2 13/9/7/4/3 → 50 · nv3 15/10/7/4/3 → 55 · nv4 16/11/8/4/3 → 60 · nv5 18/12/8/4/3 → 65.
+    | Nivel | Habilidad nueva | Pasiva | Equipo |
+    |---|---|---|---|
+    | 1 | Sanar · Purificar | — | Varita de cura, Orbe de luz, Peto de lampalagua, Botas de estanciero |
+    | 2 | **Oleada sanadora** (cura en área a los aliados) | **Manos de curandero** 🆕 (+1 a cada cura que da) | + 2 Comunes (capucha, guantes) |
+    | 3 | **Luz para los suyos** | — | la varita, de Buena calidad |
+    | 4 | **Levantar al caído** 🆕 (reanima a un aliado caído con poca vida) | **Fe inquebrantable** 🆕 (+2 Res.Mt) | + el orbe de Buena |
+    | 5 | **Milagro** 🆕 (cura grande en área y saca un estado malo a cada aliado; muy lenta, arranca en espera) | — | + el peto de Buena |
+    🆕 = idea nueva, se diseña al llegar a ese nivel. Consumible: Pergamino de Regeneración menor.
 - **D1 · Maldito · Debuffer · nivel 1** (aprobado 2026-11-02). Estrategia: les baja las defensas a los rivales para que todos peguen más. Atributos
   (33): Esp 13 · Con 8 · Agi 6 · Des 4 · Fue 2. Vida 40. Equipo (Común): Varita del susurro (1d6 arcano que no se esquiva, Silencio 25 %) ·
   Atrapasueños (Def. esp. +2, Res.Mt +3) · Casaca curtida de salteador (Def +1, Def. esp. +1, Ini +1, Percep. +2) · Capucha de lana del culto
@@ -249,7 +259,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 > 3. Terminada la **ronda de nivel 1** de todas las líneas, se vuelve a la primera (el Escudero) y se define su **nivel 2**, repasando y ajustando el
 >    boceto sobre la marcha; después la ronda de nivel 2, la de 3…
 > Al crearlo en GM Tools se elige el nivel y aparece solo con lo de ese nivel (pendiente de programar). Las 6 líneas con el nivel 1 aprobado sin
-> boceto completo (Sanador, Hachero, Maldito; el Sangrador, hecho el 2026-11-03; el Piromante ya tiene su escalado; el Escudero, hecho el 2026-11-03) necesitan el suyo.
+> boceto completo (Hachero, Maldito; el Sangrador y el Sanador, hechos el 2026-11-03; el Piromante ya tiene su escalado; el Escudero, hecho el 2026-11-03) necesitan el suyo.
 
 0. **Antes**: la tanda de skills de Tanque (`diseno-roles-creep.md`).
 1. **Rotación**: un creep de un rol, después uno del siguiente: Warrior → Tanque → Híbrido → Liviano → Liviano → Rango → Mago → Support → Debuffer →

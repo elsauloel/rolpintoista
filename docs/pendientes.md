@@ -38,7 +38,7 @@
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.
-> - [ ] **🏃 Prisa de verdad para Rockardo en El origen (2026-10-31, dueño: «para cuando esté en la compu, agregarle la prisa real a Rockardo»).**
+> - [x] (2026-11-03: hecho por el dueño) **🏃 Prisa de verdad para Rockardo en El origen (2026-10-31, dueño: «para cuando esté en la compu, agregarle la prisa real a Rockardo»).**
 >   Su «Prisa» está escrita a mano (sin el +1 Prisa), así que el mapa no lo pone primero al ordenar los turnos. Desde la nube no se puede: la ficha
 >   es de su jugador y el GM de El origen es la cuenta del dueño. Pasos (GM de El origen): abrir la ficha de Rockardo → «✎ Editar como GM» → en
 >   Pasivas, borrar su Prisa → «+ Pasiva» → catálogo → Prisa (cuesta lo mismo, 1 de Job). En «Claude · pruebas» ya se hizo y se probó en el mapa.

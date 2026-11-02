@@ -474,3 +474,9 @@ grietas: el ácido le come la armadura a Petro y el fuego barre las galerías an
 - **Juego**: Arma ácida al Rompehuesos (cada martillazo le rompe armadura a Petro) o a una rata; Muro de fuego para cortar la galería y separar al
   grupo; Bola de fuego cuando se amontonan; Corroer a Petro; Parpadeo cuando lo alcanzan las ratas o Bizzante.
 - **Riesgo**: Bola de fuego (≈ 10 + Quemadura 2 por turno 3 turnos) más la Ráfaga del arquero sobre Larry. Palancas: Esp 12 o sacar la Bola de fuego.
+- **Cambio (dueño, 2026-11-03: «el delantal de boticario lo reemplazaría por algo que sirva más contra el party»)**: el torso pasa a la **Coraza rúnica**
+  (Buena: Defensa +2 · Def.Esp +2 · Res.Esp +2 · SP máximo +3 · Res.Mt +1) en lugar del Delantal de boticario (nadie del grupo pega con ácido ni fuego; la
+  Res.Esp resiste el Drenar vida y los Pedos de Larry). No hay torsos Buenos con Res. tóxico. Queda: **Defensa 4 · Def.Esp 6 · Res.Esp +3 · SP 45 ·
+  Res.Mt +1 · Res. fuego +3 · Res. ácido +1 · Res. tóxico +1**; pierde las pociones +5, las 2 ranuras de cinturón y Res.CC +1 (la Poción de HP cura
+  25). **«Arma ácida» ya no existe** (se unificó el 2026-10-31 en **Arma elemental**: al azar o eligiendo el elemento por 1 SP más / 1 turno de espera
+  más): para el ácido contra Petro, elegirlo. Lo carga el dueño a mano.

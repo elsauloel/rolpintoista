@@ -11,8 +11,9 @@
 > poder crear creeps rápidamente y cambiarles el nombre de acuerdo a su circunstancia». Al ver este plan de octubre: «vamos a seguir tu
 > recomendación. Dejémosla asentada». (Reemplaza a `plan-creeps-esenciales.md`, armado ese mismo día sin ver este.)
 
-- **Dos pools**: **Esenciales** (estas líneas humanoides, la base para armar una pelea rápido) y **Ampliado** (nombre a confirmar: los que van
-  saliendo al jugar —goblins, mineros, el culto…—, de referencia; crece con la campaña).
+- **Dos pools** (nombres del dueño, 2026-11-02): el **pool esencial** (estas líneas humanoides, las más genéricas: la base para armar una pelea
+  rápido) y el **pool de campaña** (los que van saliendo al jugar —goblins, mineros, el culto…—, de referencia; se va agrandando con el juego).
+  Al crear un creep o elegirlo de la biblioteca, se elige de uno de los dos.
 - **Cuántas por rol: 4 es una referencia, no una regla** («en tanto podamos pensar en estrategias puntuales que valgan la pena, ampliar o reducir
   el número de variantes por rol; no me caso con ese número»). Cada línea = **una estrategia distinta dentro del rol**.
 - **Orden**: **rol por rol**; al cerrar la ronda se ve cómo seguir según las estrategias posibles con las skills de cada rol. **Primero las

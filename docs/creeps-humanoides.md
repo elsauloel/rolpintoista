@@ -27,10 +27,19 @@
 
 ### Aprobados
 
-- **T1 · Escudero · Tanque · nivel 1** (aprobado 2026-11-02, «el tanque me parece bien»; el dueño confirmó que se queda con Provocar y Piel de
-  hierro, y Desarmar y Pisotón pasan al T4 Peleador de control): Con 12 · Fue 9 · Esp 6 · Agi 3 · Des 3 (33), vida 60. Garrote de pastor (Tipo 10, Demora 33 %) · Escudo de roble
-  reforzado · Peto de hierro · Casco de cuero endurecido. Skills: Provocar (rápida) · Piel de hierro (lenta). Consumible: a definir (poción de
-  Cuero duro). Estrategia: se planta adelante, obliga a que le peguen a él y frena al que se acerca.
+- **T1 · Escudero · Tanque · nivel 1** (aprobado 2026-11-02, revisado el mismo día a fondo). Referencia: un grupo de nivel 1, no los personajes
+  actuales. Estrategia: se planta adelante, provoca y aguanta; amenaza con la Demora del garrote (el que lo ignora pierde tiempo).
+  - Atributos (33): Con 11 · Fue 8 · Esp 6 · Des 5 · Agi 3. Vida 55. PdG 5 (pega de vez en cuando: dueño, «tiene que presentar algún tipo de
+    amenaza más allá de ser una bolsa de golpes»).
+  - Equipo (Común): Garrote de pastor (Tipo 10, Demora 33 %) · Escudo de caparazón de tortuga gigante (Def +1, Def. esp. +1, Bloqueo +1) ·
+    Peto de hierro (Def +3) · Cofia de anillas sueltas (Def +1, Def. esp. +1, Res. crít. T4 +1). Total Def +5, Def. esp. +2 (dueño: «principalmente
+    defensa física, pero algún tipo de defensa especial como plan secundario»).
+  - Skills: Provocar (rápida, 1 No2 + 2 SP, cd 2) · Piel de hierro (lenta, 1 No2 + 4 SP, cd 3).
+  - Consumibles: Poción de Cuero duro (escudo 15 contra daño físico) y Poción de Piel de Cristal (escudo 15 contra daño especial) (dueño: «así,
+    circunstancialmente, puede defenderse de alguien que le haga daño mágico y ser una verdadera molestia»).
+  - El T4 Peleador de control se queda con Desarmar y Pisotón.
+- **Por programar (decidido 2026-11-02)**: **Piel de hierro escala con el nivel: +(3 + nivel)** a la Defensa y a la Def. especial (nivel 1: +4,
+  nivel 3: +6 como hoy, nivel 5: +8); sigue +1 Res. a crítico y 2 turnos. Hoy es +6 fijo (de la tanda del 2026-10-27).
 - **T2 · Muralla con púas · Tanque · nivel 1** (aprobado 2026-11-02): Con 13 · Fue 8 · Esp 6 · Agi 3 · Des 3 (33), vida 65. Hacha con garfio
   (Tipo 8, Bloqueo +1, Derribar 25 %) · Puerta de granero (Def +2, Bloqueo +2, Eva −1) · Coraza de cuero hervido (Def +3, Res. crít. T4 +1,
   Res.CC +1). Skills: Coraza de púas (rápida) · Aguante (lenta). Consumible: poción de Cuero duro. Estrategia: castiga al que le pega; no persigue.

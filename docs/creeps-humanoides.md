@@ -208,12 +208,15 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 
 ## Forma de trabajo
 
-> **Cambio del dueño (2026-11-03): cada línea se diseña ENTERA, de nivel 1 a 5, antes de pasar a la siguiente.** Una línea es un solo creep con un
-> solo nombre en todos los niveles (el Escudero es Escudero en el 1 y en el 5; no hay un nombre por nivel). Se arranca imaginándolo **en nivel 5**,
-> con todas sus habilidades y su estrategia completa, y desde ahí se baja: qué tiene sentido que tenga primero y qué suma en cada nivel. Al crearlo
-> en GM Tools se elige el nivel y aparece solo con los atributos, las habilidades y el equipo de ese nivel. La siguiente línea del mismo rol es otra
-> variedad, con otra estrategia (T2 Muralla con púas, T3 Guardaespaldas… son variedades, no niveles). Lo de abajo («nivel 2 en adelante, se recorren
-> las mismas líneas») queda reemplazado por esto. Las 6 líneas con el nivel 1 aprobado se completan de 2 a 5, empezando por el Escudero.
+> **Forma de trabajo, ajustada por el dueño (2026-11-03): boceto de 1 a 5, y después rondas por nivel.** Una línea es un solo creep con un solo
+> nombre en todos los niveles (el Escudero es Escudero en el 1 y en el 5); T2 Muralla con púas, T3 Guardaespaldas… son otras variedades, no niveles.
+> 1. **Al empezar cada línea, el boceto**: imaginarlo en nivel 5 (todas sus habilidades, pasivas, equipo y su estrategia completa) y bajar: qué tiene
+>    sentido que tenga primero y qué suma en cada nivel. Queda anotado.
+> 2. **Y se define su nivel 1** (atributos, equipo, habilidades, consumible). Se pasa a la siguiente línea de la rotación (boceto + nivel 1), y así.
+> 3. Terminada la **ronda de nivel 1** de todas las líneas, se vuelve a la primera (el Escudero) y se define su **nivel 2**, repasando y ajustando el
+>    boceto sobre la marcha; después la ronda de nivel 2, la de 3…
+> Al crearlo en GM Tools se elige el nivel y aparece solo con lo de ese nivel (pendiente de programar). Las 6 líneas con el nivel 1 aprobado sin
+> boceto completo (Escudero, Sangrador, Sanador, Hachero, Maldito; el Piromante ya tiene su escalado) necesitan el suyo.
 
 0. **Antes**: la tanda de skills de Tanque (`diseno-roles-creep.md`).
 1. **Rotación**: un creep de un rol, después uno del siguiente: Warrior → Tanque → Híbrido → Liviano → Liviano → Rango → Mago → Support → Debuffer →

@@ -45,7 +45,7 @@
     circunstancialmente, puede defenderse de alguien que le haga daño mágico y ser una verdadera molestia»).
   - El T4 Peleador de control se queda con Desarmar y Pisotón.
 - **W1 · Hachero · Warrior · nivel 1** (aprobado 2026-11-02, con la Cofia de anillas sueltas en lugar del casco de cuero: Def +5, Def. esp. +1). Estrategia: rompe la armadura del que más se defiende y lo
-  castiga. Atributos (33): Fue 10 · Con 9 · Des 6 · Agi 4 · Esp 4. Vida 45. Equipo (Común): Hacha (Tipo 8, Rompe armadura 50 %) · Cota de malla
+  castiga. Atributos (33, revisados el mismo día: «me da cosa que tenga pocos No2»): Fue 9 · Con 8 · Des 6 · Agi 6 · Esp 4. Vida 40, No2 6. Equipo (Común): Hacha (Tipo 8, Rompe armadura 50 %) · Cota de malla
   de hierro (Def +4, Res. crít. T6 +1, Eva −1) · Casco de cuero endurecido (Def +1, Res. crít. T4 +1); Def +5, sin Def. especial (su punto débil,
   con la Esp baja). Skills: Golpe fuerte (rápida, 1 SP, cd 2) · Romper armadura (lenta, 2 SP, cd 3). Consumible: Pergamino grupal de Furia de
   Combate (+1 Daño a él y su grupo, 3 turnos).

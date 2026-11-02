@@ -18,6 +18,10 @@
   el número de variantes por rol; no me caso con ese número»). Cada línea = **una estrategia distinta dentro del rol**.
 - **Orden**: **rol por rol**; al cerrar la ronda se ve cómo seguir según las estrategias posibles con las skills de cada rol. **Primero las
   esencias puras del rol**; después, hibridar y cruzar funciones donde tenga sentido de diseño.
+- **Orden de la ronda** (dueño, 2026-11-02, «por disfrute a la hora de diseñar»: alternar físico y mágico): 1 Tanque (hecho: Escudero) ·
+  2 Mago · 3 Choque liviano · 4 Support · 5 Warrior · 6 Debuffer · y los que restan, alternando (de Claude): 7 Rango · 8 Mago · 9 Híbrido ·
+  10 Support · 11 Choque liviano · 12 Debuffer. Cada uno **a fondo** (todo el texto: atributos, equipo, skills, consumible) antes de pasar al
+  siguiente; no en horizontal («en la dispersión se terminan escapando detalles de diseño»).
 - **Pasivas en los niveles pares**: la primera en el **nivel 2** y una más en el **nivel 4** (dueño, 2026-11-02: «pueden aparecer a partir de nivel 2 y vuelven a aparecer una habilidad pasiva más en cada nivel par»; antes había dicho desde el 3). Refuerzan su estrategia.
 - **Consumible fijo, vinculado al rol** (además de «que le sirva y lo use»). Propuesta por rol, a confirmar con cada línea: Tanque → poción de
   defensa (Cuero duro) · Warrior → fuerza o furia · Choque liviano → óleo venenoso · Rango → flecha o virote especial · Hunter → una trampa ·
@@ -38,12 +42,12 @@
   - Consumibles: Poción de Cuero duro (escudo 15 contra daño físico) y Poción de Piel de Cristal (escudo 15 contra daño especial) (dueño: «así,
     circunstancialmente, puede defenderse de alguien que le haga daño mágico y ser una verdadera molestia»).
   - El T4 Peleador de control se queda con Desarmar y Pisotón.
-- **W1 · Hachero · Warrior · nivel 1** (aprobado 2026-11-02, «pasemos al siguiente»). Estrategia: rompe la armadura del que más se defiende y lo
+- **W1 · Hachero · Warrior · nivel 1** (PROPUESTA, sin revisar: el dueño no la miró todavía, 2026-11-02). Estrategia: rompe la armadura del que más se defiende y lo
   castiga. Atributos (33): Fue 10 · Con 9 · Des 6 · Agi 4 · Esp 4. Vida 45. Equipo (Común): Hacha (Tipo 8, Rompe armadura 50 %) · Cota de malla
   de hierro (Def +4, Res. crít. T6 +1, Eva −1) · Casco de cuero endurecido (Def +1, Res. crít. T4 +1); Def +5, sin Def. especial (su punto débil,
   con la Esp baja). Skills: Golpe fuerte (rápida, 1 SP, cd 2) · Romper armadura (lenta, 2 SP, cd 3). Consumible: Pergamino grupal de Furia de
   Combate (+1 Daño a él y su grupo, 3 turnos).
-- **L1 · Sangrador · Choque liviano · nivel 1** (aprobado 2026-11-02). Estrategia: abre heridas y las agranda; crece cuanto más dura la pelea.
+- **L1 · Sangrador · Choque liviano · nivel 1** (PROPUESTA, sin revisar: el dueño no la miró todavía, 2026-11-02). Estrategia: abre heridas y las agranda; crece cuanto más dura la pelea.
   Atributos (33): Agi 10 · Des 8 · Con 6 · Fue 6 · Esp 3. Vida 30. Equipo (Común): Cuchilla del frigorífico (Tipo 6, +2 daño, Sangrado 25 %) ·
   Chaleco de cuero (Def +2) · Calzas de cuero flexible (Eva +1). Skills: Golpe que sangra (rápida, 1 SP, cd 2) · Sal en la herida (lenta, 2 SP,
   cd 3). Consumible: Óleo venenoso. Punto débil: vida 30 y Esp 3.
@@ -194,11 +198,11 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 
 | Línea | Nivel 1 | Nivel 2 | Nivel 3 | Nivel 4 | Nivel 5 |
 |---|---|---|---|---|---|
-| W1 | ✅ (2026-11-02) | | | | |
+| W1 | (propuesta) | | | | |
 | T1 | ✅ (2026-11-02) | | | | |
 | T2 | ✅ (2026-11-02) | | | | |
 | H1 | | | | | |
-| L1 | ✅ (2026-11-02) | | | | |
+| L1 | (propuesta) | | | | |
 | L2 | | | | | |
 | R1 | | | | | |
 | M1 | | | | | |

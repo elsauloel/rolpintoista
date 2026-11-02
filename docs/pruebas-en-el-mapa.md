@@ -94,7 +94,7 @@
   figura» tildado, en rectas (clic, clic, clic y doble clic o Enter) y a mano alzada (al soltar), el trazo nace con las puntas unidas, sin pasar
   por el ⚙. Y con 🧱 además, lo de adentro queda sólido y sin grilla.
 
-- [ ] **🗡 Pasiva Perforante** (2026-10-30, P236): un personaje o un creep con la pasiva lleva el estado Perforante; su golpe común contra Petro
+- [x] **🗡 Pasiva Perforante** (probado 2026-11-03: «pasan 2 por la Perfora» contra Defensa 25) (2026-10-30, P236): un personaje o un creep con la pasiva lleva el estado Perforante; su golpe común contra Petro
   (Defensa 12) en el mapa «Clon origen» de «Claude · pruebas» pasa 2 (y suma la Perfora del arma: Dientes podridos + Perforante = 4); con crítico, nada.
 
 - [x] **🐀 Chillido** (2026-10-30, «Claude · pruebas», mapa «Arena de pruebas», con capturas): el Kobold rascador con el Chillido agregado desde GM
@@ -281,6 +281,10 @@
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 
 ## Pendientes
+- [x] **Tanda de la noche del 2026-11-03** → [`reporte-pruebas-2026-11-03.md`](reporte-pruebas-2026-11-03.md): ✅ Anulación (habilidad de jugador,
+  varita sobre rival y sobre casilla con zona, pergamino recortando); ✅ Malviaje (duelo y movimiento); ✅ jefe desde un duelo (Polvo de
+  adormidera); ✅ Adrenalina se va a los 2 turnos; ✅ Perforante; ✅ DÉBIL A LA LUZ en área. **Quedan**: Anulación sobre invocación de creep,
+  trampa mágica, portal y Ojo de Kicillof; contraataque con 0 No2 e invocación en negativo; intercambio desde la ficha suelta y mochila con caído.
 - [x] **📌 Clavar a la pared — probado 2026-11-03 con clics** (GM con el Goblin ballestero, Jugador 1 con Prueba Uno, Jugador 2 con Prueba Dos):
   ✔ sin pared: lo empuja 3 en línea recta y nada más · ✔ con un Sólido detrás: 1 casillero, choque (4 de daño) e Inmovilizado 3 turnos con
   «se suelta con Fuerza contra 5» · ✔ contra un token: chocan los dos (3 y 5 de daño), sin clavar · ✔ soltarse perdiendo (1d3=3 contra 5) y

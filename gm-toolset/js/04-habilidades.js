@@ -123,7 +123,7 @@ function equipoItemHtml(item, idx){
         ${item.tier ? `<div class="cat-tier-badge" style="color:${tierColor};border-color:${tierColor};background:${tierColor}22">${esc(item.tier)}</div>` : ''}
       </div>
       <div class="cat-meta"><b>${esc(statTxt)}</b> · Peso ${fmt(num(item.peso))}</div>
-      ${modsHtml ? `<div class="cat-mods">${modsHtml}</div>` : ''}
+      ${modsHtml && !item.detalle ? `<div class="cat-mods">${modsHtml}</div>` : ''}   <!-- la línea verde de bonos solo si no hay texto: repetía lo mismo (dueño, 2026-11-03) -->
       ${item.detalle ? `<div class="cat-detalle">${typeof Glosario !== 'undefined' ? Glosario.marcar(item.detalle) : esc(item.detalle)}</div>` : ''}   <!-- 📖 el glosario al pasar el mouse (2026-11-03, dueño) -->
     </div>
     <button type="button" class="mini" data-veritem="${idx}">Ver</button>

@@ -722,7 +722,7 @@ function itemCardHtml(item, esGarantizado){
       <div class="cat-tier-badge" style="color:${color};border-color:${color};background:${color}22">${esc(item.tier)}</div>
     </div>
     <div class="cat-meta">${precioHtmlDe(item)} · Peso ${fmt(num(item.peso))}${statTxt ? ` · ${esc(statTxt)}` : ''}${item.consumible?` · consumible${item.curahp?` (${num(item.curahp)>0?'+':''}${fmt(num(item.curahp))} HP)`:''}`:''}</div>
-    ${modsHtml ? `<div class="cat-mods">${modsHtml}</div>` : ''}
+    ${modsHtml && !item.detalle ? `<div class="cat-mods">${modsHtml}</div>` : ''}   <!-- la línea verde de bonos solo si no hay texto: repetía lo mismo (dueño, 2026-11-03) -->
     ${ItemCorto.grillaHtml(item)}
     <div class="cat-card-pie">
       ${esGarantizado ? '<span class="cat-garantizado">Clásico · siempre</span>' : (tiendaActual.gondola || []).includes(item.id) ? `<span class="cat-garantizado" title="Gastable de la góndola: ${G.UNIDADES_GONDOLA} unidades al publicar">🧺 Góndola ×${G.UNIDADES_GONDOLA}</span>` : '<span></span>'}

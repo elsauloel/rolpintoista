@@ -45,6 +45,17 @@
     pasó un rato por Agi 5 · Des 4 · Esp 5.
   - **Boceto de atributos, nivel 1 a 5** (+3 por nivel; Con / Des / Agi / Fue / Esp → vida): nv1 12/7/5/5/4 → 60 · nv2 13/7/6/6/4 → 65 · nv3
     14/8/6/7/4 → 70 · nv4 15/8/7/8/4 → 75 · nv5 16/9/7/9/4 → 80. En nivel 5, 7 No2: un ataque (4) y 3 para moverse o defenderse.
+  - **Boceto completo, nivel 1 a 5** (aprobado como boceto, dueño 2026-11-03: «me cierra ese camino, como boceto está bien»; se ajusta al definir
+    cada nivel). Identidad: el **escudo** y **cubrir el frente**; Desarmar y Pisotón quedan para el T4 (Peleador de control).
+    | Nivel | Habilidad nueva | Pasiva | Equipo |
+    |---|---|---|---|
+    | 1 | Provocar · Piel de hierro | — | Hacha de piedra, Escudo de tortuga, Peto de hierro, Cofia (2 Comunes) |
+    | 2 | **Golpe de escudo** (ambigua, falta diseñarla) | **Guardia firme** (+1 Bloqueo) | + 2 Comunes (piernas, manos) |
+    | 3 | **Plantarse** (sin moverse en su turno: +3 Def, +2 Res.CC y una oportunidad de más) | — | el escudo pasa a Buena calidad |
+    | 4 | **Interponerse** (recibe los golpes por un aliado) | **Cortar el paso** (su oportunidad, si pega, frena al que se movía) | + el peto de Buena |
+    | 5 | **Muro de escudos** (los aliados detrás de su escudo: −3 al PdG de rango contra ellos) | — | + el hacha de Buena |
+    Consumibles: Cuero Duro y Piel de Cristal; desde nivel 3, quizás las versiones más fuertes. El equipo puntual se elige del catálogo al definir
+    cada nivel.
   - Equipo (Común): **Hacha de piedra** (Tipo 8, +1 de daño, Bloqueo +1, Rompe armadura 33 %; 1d8 + 6) · Escudo de caparazón de tortuga gigante
     (Def +1, Def. esp. +1, Bloqueo +1) · Peto de hierro (Def +3) · Cofia de anillas sueltas (Def +1, Def. esp. +1, Res. crít. T4 +1). Total Def +5,
     Def. esp. +2 (dueño: «principalmente defensa física, pero algún tipo de defensa especial como plan secundario»). Antes llevaba el Garrote de
@@ -225,7 +236,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 > 3. Terminada la **ronda de nivel 1** de todas las líneas, se vuelve a la primera (el Escudero) y se define su **nivel 2**, repasando y ajustando el
 >    boceto sobre la marcha; después la ronda de nivel 2, la de 3…
 > Al crearlo en GM Tools se elige el nivel y aparece solo con lo de ese nivel (pendiente de programar). Las 6 líneas con el nivel 1 aprobado sin
-> boceto completo (Escudero, Sangrador, Sanador, Hachero, Maldito; el Piromante ya tiene su escalado) necesitan el suyo.
+> boceto completo (Sangrador, Sanador, Hachero, Maldito; el Piromante ya tiene su escalado; el Escudero, hecho el 2026-11-03) necesitan el suyo.
 
 0. **Antes**: la tanda de skills de Tanque (`diseno-roles-creep.md`).
 1. **Rotación**: un creep de un rol, después uno del siguiente: Warrior → Tanque → Híbrido → Liviano → Liviano → Rango → Mago → Support → Debuffer →

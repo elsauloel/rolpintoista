@@ -887,9 +887,9 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   bendecida / Fragmento de sol · Ojo de vidrio negro / Calavera susurrante · Piedra rúnica / Prisma del foco. Reemplaza al pendiente del talismán
   de fuego. Cuando exista, el Piromante (M1) cambia la Botella con un diablito por el Brasero de mano.
 - [ ] **⏳ Costo alto ⇒ cooldown alto (dueño, 2026-11-02, con el Piromante):** «si tiene un alto coste, ya sea de SP o de nitros, eso se tiene que
-  traducir en cooldown». Revisar las habilidades de creep: las que cuestan mucho (SP = su Especial, 3+ No2…) y tienen cooldown 2 → subirlas (cooldown 3
-  que arranca activado, como las lentas). Primer caso decidido: los misiles (Lengua de fuego y sus hermanos: 2 No2 + SP = Especial) → cooldown 3,
-  arranca en cooldown.
+  traducir en cooldown». Revisar las habilidades de creep: las que cuestan mucho (SP = su Especial, 3+ No2…) y tienen cooldown 2 → subirlas (lentas o muy lentas). Categorías (dueño, 2026-11-02): **rápidas** cooldown 2 · **lentas** cooldown 3 o 4 · **muy lentas** cooldown 3 o 4 que arrancan
+  en cooldown. Primer caso decidido: los misiles (Lengua de fuego y sus hermanos: 2 No2 + SP = Especial) → **lentas, cooldown 4** (no arrancan en
+  cooldown).
 - [ ] **🏹🛡 Equipo con ventaja contra proyectiles (dueño, 2026-11-02, diseñando el Piromante):** no hay piezas Comunes ni Buenas que den Evasión
   contra disparos o Defensa contra proyectiles (el stat `evadisparo` existe, solo lo usa lo que vuela). Crear algunas (torso, capa, escudo liviano…),
   pensadas sobre todo para casters y livianos.

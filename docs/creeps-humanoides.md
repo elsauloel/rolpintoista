@@ -22,6 +22,8 @@
   2 Mago · 3 Choque liviano · 4 Support · 5 Warrior · 6 Debuffer · y los que restan, alternando (de Claude): 7 Rango · 8 Mago · 9 Híbrido ·
   10 Support · 11 Choque liviano · 12 Debuffer. Cada uno **a fondo** (todo el texto: atributos, equipo, skills, consumible) antes de pasar al
   siguiente; no en horizontal («en la dispersión se terminan escapando detalles de diseño»).
+- **Rápidas, lentas y muy lentas** (dueño, 2026-11-02): **rápidas** = cooldown 2 · **lentas** = cooldown 3 o 4 · **muy lentas** = cooldown 3 o 4
+  que **arrancan la pelea en cooldown**. El costo y el cooldown van juntos: lo caro es lento o muy lento.
 - **Pasivas en los niveles pares**: la primera en el **nivel 2** y una más en el **nivel 4** (dueño, 2026-11-02: «pueden aparecer a partir de nivel 2 y vuelven a aparecer una habilidad pasiva más en cada nivel par»; antes había dicho desde el 3). Refuerzan su estrategia.
 - **Consumible fijo, vinculado al rol** (además de «que le sirva y lo use»). Propuesta por rol, a confirmar con cada línea: Tanque → poción de
   defensa (Cuero duro) · Warrior → fuerza o furia · Choque liviano → óleo venenoso · Rango → flecha o virote especial · Hunter → una trampa ·
@@ -47,16 +49,16 @@
   de hierro (Def +4, Res. crít. T6 +1, Eva −1) · Casco de cuero endurecido (Def +1, Res. crít. T4 +1); Def +5, sin Def. especial (su punto débil,
   con la Esp baja). Skills: Golpe fuerte (rápida, 1 SP, cd 2) · Romper armadura (lenta, 2 SP, cd 3). Consumible: Pergamino grupal de Furia de
   Combate (+1 Daño a él y su grupo, 3 turnos).
-- **L1 · Sangrador · Choque liviano · nivel 1** (PROPUESTA, sin revisar: el dueño no la miró todavía, 2026-11-02). Estrategia: abre heridas y las agranda; crece cuanto más dura la pelea.
+- **L1 · Sangrador · Choque liviano · nivel 1** (aprobado 2026-11-02, cambiando las Calzas de cuero flexible por las Zapatillas de lona). Estrategia: abre heridas y las agranda; crece cuanto más dura la pelea.
   Atributos (33): Agi 10 · Des 8 · Con 6 · Fue 6 · Esp 3. Vida 30. Equipo (Común): Cuchilla del frigorífico (Tipo 6, +2 daño, Sangrado 25 %) ·
-  Chaleco de cuero (Def +2) · Calzas de cuero flexible (Eva +1). Skills: Golpe que sangra (rápida, 1 SP, cd 2) · Sal en la herida (lenta, 2 SP,
+  Chaleco de cuero (Def +2) · Zapatillas de lona (Eva +1, Def. esp. +1, Ini −1). Skills: Golpe que sangra (rápida, 1 SP, cd 2) · Sal en la herida (lenta, 2 SP,
   cd 3). Consumible: Óleo venenoso. Punto débil: vida 30 y Esp 3.
 - **M1 · Piromante · Mago · nivel 1** (aprobado 2026-11-02). Estrategia: controla el terreno con fuego (muro que corta el paso) y quema de a
   uno. Atributos (33): Esp 14 · Con 7 · Agi 5 · Des 5 · Fue 2. Vida 40 (con la campera). Equipo (Común): Varita de la bola de fuego · Botella con
   un diablito (+2 daño especial; se cambia por el Brasero de mano cuando existan los talismanes elementales) · Campera de cuero con tachas (Def +1,
   Def. esp. +1, Res. crít. T4 +1, Vida +5) · Gorro de piel de salamandra (Def. esp. +1, Res. fuego +1, Res.Mt +1): Def +1 secundaria (dueño: «algo
-  de defensa física, aunque sea secundaria»). Skills: Lengua de fuego (rápida; 2 No2 + SP = su Especial; cooldown 3 que arranca activado, por
-  programar: «costo alto ⇒ cooldown alto») · Muro de fuego (lenta, 1 No2 + 3 SP, cd 3). Consumible: Poción de SP menor.
+  de defensa física, aunque sea secundaria»). Skills: Lengua de fuego (lenta; 2 No2 + SP = su Especial; cooldown 4, por programar: «costo alto ⇒
+  cooldown alto») · Muro de fuego (lenta, 1 No2 + 3 SP, cd 3). Consumible: Poción de SP menor.
 - **Por programar (decidido 2026-11-02)**: **Piel de hierro escala con el nivel: +(3 + nivel)** a la Defensa y a la Def. especial (nivel 1: +4,
   nivel 3: +6 como hoy, nivel 5: +8); sigue +1 Res. a crítico y 2 turnos. Hoy es +6 fijo (de la tanda del 2026-10-27).
 - **T2 · Muralla con púas · Tanque · nivel 1** (aprobado 2026-11-02): Con 13 · Fue 8 · Esp 6 · Agi 3 · Des 3 (33), vida 65. Hacha con garfio
@@ -208,7 +210,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | T1 | ✅ (2026-11-02) | | | | |
 | T2 | ✅ (2026-11-02) | | | | |
 | H1 | | | | | |
-| L1 | (propuesta) | | | | |
+| L1 | ✅ (2026-11-02) | | | | |
 | L2 | | | | | |
 | R1 | | | | | |
 | M1 | ✅ (2026-11-02) | | | | |

@@ -879,10 +879,21 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] **Manual** (`manual-usuario/notas`): grupos y tokens automáticos, botín, Despojar, Finalizar combate en el mapa, trampas automáticas, estados sobre otros, protección de jefe, botón 🎭 y grupos ↔ mapas, y una nota de casteo cuando estén las reglas.
 
 ## 4. Diseño pendiente
+- [ ] **🔥❄⚡ Talismanes elementales (propuesta de Claude, 2026-11-02; el dueño: «definitivamente hay que crear talismanes potenciadores de daños
+  elementales… dejalo para más adelante»).** Uno por elemento, Común (70: +2 al daño de ese elemento, +1 a su resistencia) y Buena (140: +3 al daño y
+  un plus de su efecto: Quemadura +1 turno · Escarcha +1 stack · Parálisis +10 % · Armadura rota segura · Veneno +1 stack · Luz sanadora +25 % ·
+  Herida sombría +1 turno · arcano: +1 PdG.Esp). Nombres propuestos: Brasero de mano / Corazón de salamandra · Carámbano tallado / Lágrima del
+  glaciar · Botella de rayo / Cuerno del trueno · Frasco corroído / Glándula de babosa · Hongo seco del pantano / Colmillo de yarará · Vela
+  bendecida / Fragmento de sol · Ojo de vidrio negro / Calavera susurrante · Piedra rúnica / Prisma del foco. Reemplaza al pendiente del talismán
+  de fuego. Cuando exista, el Piromante (M1) cambia la Botella con un diablito por el Brasero de mano.
+- [ ] **⏳ Costo alto ⇒ cooldown alto (dueño, 2026-11-02, con el Piromante):** «si tiene un alto coste, ya sea de SP o de nitros, eso se tiene que
+  traducir en cooldown». Revisar las habilidades de creep: las que cuestan mucho (SP = su Especial, 3+ No2…) y tienen cooldown 2 → subirlas (cooldown 3
+  que arranca activado, como las lentas). Primer caso decidido: los misiles (Lengua de fuego y sus hermanos: 2 No2 + SP = Especial) → cooldown 3,
+  arranca en cooldown.
 - [ ] **🏹🛡 Equipo con ventaja contra proyectiles (dueño, 2026-11-02, diseñando el Piromante):** no hay piezas Comunes ni Buenas que den Evasión
   contra disparos o Defensa contra proyectiles (el stat `evadisparo` existe, solo lo usa lo que vuela). Crear algunas (torso, capa, escudo liviano…),
   pensadas sobre todo para casters y livianos.
-- [ ] **🔥 Talismán Común que potencie el fuego (dueño, 2026-11-02, Piromante):** hoy no hay ninguno (solo resistencias: Piedra de brasa; en Buena,
+- [ ] **(ver «Talismanes elementales») 🔥 Talismán Común que potencie el fuego (dueño, 2026-11-02, Piromante):** hoy no hay ninguno (solo resistencias: Piedra de brasa; en Buena,
   el Orbe del foco da PdG.Esp). Crear uno (p. ej. «+2 al daño de fuego» o «el fuego deja Quemadura más larga») y uno por elemento si tiene sentido.
 - [x] **📋 Pegar las reglas de Firestore (2026-11-01; pegadas por el dueño el 2026-11-02 — probado: un jugador recortó con el Pergamino de anulación una luz ajena del GM):** `firebase/firestore.rules` con el 💨 viento que recorta nubes y la 🚫 Anulación (recortar o borrar entera una zona ajena con creador o una luz: `esZonaMagica`/`esNube`, update y delete; 2026-11-02) (`esNube`, commit 6575a0d9) y 🚫 la Anulación que recorta zonas mágicas ajenas (`esZonaMagica`). Sin pegarlas, un jugador que despeja la nube de otro ve «a mano (faltan pegar las reglas)»; el GM ya puede.
 - [x] **😱💤 Sumar Pánico y Sueño a cosas que los den (dueño, 2026-11-01: «sumar algunos ítems o circunstancias que den pánico y que den sueño, que duerman»).** Hoy no los da

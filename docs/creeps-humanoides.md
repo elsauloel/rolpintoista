@@ -51,6 +51,12 @@
   Atributos (33): Agi 10 · Des 8 · Con 6 · Fue 6 · Esp 3. Vida 30. Equipo (Común): Cuchilla del frigorífico (Tipo 6, +2 daño, Sangrado 25 %) ·
   Chaleco de cuero (Def +2) · Calzas de cuero flexible (Eva +1). Skills: Golpe que sangra (rápida, 1 SP, cd 2) · Sal en la herida (lenta, 2 SP,
   cd 3). Consumible: Óleo venenoso. Punto débil: vida 30 y Esp 3.
+- **M1 · Piromante · Mago · nivel 1** (aprobado 2026-11-02). Estrategia: controla el terreno con fuego (muro que corta el paso) y quema de a
+  uno. Atributos (33): Esp 14 · Con 7 · Agi 5 · Des 5 · Fue 2. Vida 40 (con la campera). Equipo (Común): Varita de la bola de fuego · Botella con
+  un diablito (+2 daño especial; se cambia por el Brasero de mano cuando existan los talismanes elementales) · Campera de cuero con tachas (Def +1,
+  Def. esp. +1, Res. crít. T4 +1, Vida +5) · Gorro de piel de salamandra (Def. esp. +1, Res. fuego +1, Res.Mt +1): Def +1 secundaria (dueño: «algo
+  de defensa física, aunque sea secundaria»). Skills: Lengua de fuego (rápida; 2 No2 + SP = su Especial; cooldown 3 que arranca activado, por
+  programar: «costo alto ⇒ cooldown alto») · Muro de fuego (lenta, 1 No2 + 3 SP, cd 3). Consumible: Poción de SP menor.
 - **Por programar (decidido 2026-11-02)**: **Piel de hierro escala con el nivel: +(3 + nivel)** a la Defensa y a la Def. especial (nivel 1: +4,
   nivel 3: +6 como hoy, nivel 5: +8); sigue +1 Res. a crítico y 2 turnos. Hoy es +6 fijo (de la tanda del 2026-10-27).
 - **T2 · Muralla con púas · Tanque · nivel 1** (aprobado 2026-11-02): Con 13 · Fue 8 · Esp 6 · Agi 3 · Des 3 (33), vida 65. Hacha con garfio
@@ -205,7 +211,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | L1 | (propuesta) | | | | |
 | L2 | | | | | |
 | R1 | | | | | |
-| M1 | | | | | |
+| M1 | ✅ (2026-11-02) | | | | |
 | S1 | | | | | |
 | D1 | | | | | |
 | W2 | | | | | |

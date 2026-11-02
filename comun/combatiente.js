@@ -1712,6 +1712,10 @@ const Combatiente = (() => {
     const caras = Math.max(1, Math.round(nf(e.caras)) || 1);
     return {nombre: e.nombre || (e.cura ? 'Curación' : ''), caras, exitos: Math.min(caras, Math.max(1, Math.round(nf(e.exitos)) || 1)), ...(e.detalle ? {detalle: String(e.detalle)} : {}),
       ...(nf(e.vuela) > 0 ? {vuela: Math.round(nf(e.vuela))} : {}),
+      // 🧪 Tolerar el efecto (2026-11-03, la Espina tóxica: «puede tirar resistencia especial para tolerar el veneno»): `tolera = {stat, contra}` —
+      // el golpeado tira su `stat` contra el `contra` de quien la usa (su valor viaja acá, `valor`); si lo supera, el estado no entra (el daño, sí).
+      ...(e.tolera && e.tolera.stat ? {tolera: {stat: String(e.tolera.stat), contra: String(e.tolera.contra || 'dmgesp'),
+        valor: typeof valorDe === 'function' && Number.isFinite(Number(valorDe(e.tolera.contra || 'dmgesp'))) ? Math.round(Number(valorDe(e.tolera.contra || 'dmgesp'))) : Math.round(nf(e.tolera.valor))}} : {}),
       ...(e.clava ? {clava: {turnos: Math.min(6, Math.max(1, Math.round(nf(e.clava.turnos)) || 3))}} : {}),   // 📌 Clavar a la pared (2026-10-26): si choca contra algo sólido, Inmovilizado (vtt-hexgrid/js/13 dueloEmpujar)
       ...(nf(e.empuja) > 0 ? {empuja: Math.round(nf(e.empuja))} : {}),   // lo empuja N casillas, lejos de quien la usa (2026-10-08, ráfaga helada, vendaval)   // el arma vuela N casillas (el Desarmado de la Varita del desarme, 2026-10-07)
       spec: e.cura ? null : {nombre: e.nombre, turnos: e.turnos, mods: e.stat ? [{stat: e.stat, val: nf(e.val)}] : e.mods,

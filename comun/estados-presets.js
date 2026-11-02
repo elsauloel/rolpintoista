@@ -194,6 +194,9 @@ const ESTADOS_PRESET = [
   // próximo turno (Combatiente.sinCura → curaQueEntra). La deja todo daño siniestro que entra.
   {nombre:'Herida sombría', polaridad:'debuff', turnos:1, turnosCompletos:true, sinCura:true, mods:[],
     detalle:'Una herida de sombra que no cierra: no se cura con nada (pociones, habilidades, Regeneración, lo que cura cada turno) hasta el final de su próximo turno. La deja el daño siniestro. ⚙ Automatizado.'},
+  // 🥶 Escalofrío (2026-11-03, dueño: la rápida siniestra del Debuffer): −2 a su PdG hasta el final de su próximo turno.
+  {nombre:'Escalofrío', polaridad:'debuff', turnos:1, turnosCompletos:true, mods:[{stat:'pdg', val:-2}],
+    detalle:'Un frío de sombra que le mete miedo en el cuerpo: −2 a su Probabilidad de Golpe hasta el final de su próximo turno. ⚙ Automatizado.'},
   // 🐛 Sanguijuela (2026-10-26, dueño, la Sanguijuela del Mago): pegada 4 turnos; mientras está, no se cura. Se la arranca al empezar su turno con Fuerza
   // contra el Efecto especial de quien la lanzó (el `soltar` lo trae el efecto de la habilidad).
   {nombre:'Sanguijuela', polaridad:'debuff', turnos:4, sinCura:true, mods:[],

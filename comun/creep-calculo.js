@@ -90,6 +90,14 @@ const CreepCalculo = (() => {
         }
         if(!h.pielNivel){ h.pielNivel = true; cambio = true; }
       }
+      // ⚡ La Aguja siniestra pasa a rápida (dueño, 2026-11-03): de cooldown 3, 2 No2 y 3 SP a cooldown 2, 1 No2 y 2 SP. Una vez (`agujaRapida`).
+      if(h.nombre === 'Aguja siniestra' && !h.agujaRapida){
+        if(num(h.cd) === 3){ h.cd = 2; if(num(h.cdActual) > 2) h.cdActual = 2; }
+        if(num(h.nitrosCosto) === 2) h.nitrosCosto = 1;
+        if(num(h.spCosto) === 3) h.spCosto = 2;
+        if(typeof h.detalle === 'string') h.detalle = h.detalle.replace(/cuesta 2 No2/g, 'cuesta 1 No2').replace(/cooldown 3 \(con SP: 3 SP\)/g, 'cooldown 2 (con SP: 2 SP)');
+        h.agujaRapida = true; cambio = true;
+      }
       if(MISILES_LENTOS.includes(h.nombre) && num(h.cd) === 2){
         h.cd = 4; if(num(h.cdActual) > 4) h.cdActual = 4;
         if(typeof h.detalle === 'string') h.detalle = h.detalle.replace(/cooldown 2\b/g, 'cooldown 4');

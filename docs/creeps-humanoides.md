@@ -72,7 +72,7 @@
   con la Esp baja). Skills: Golpe fuerte (rápida, 1 SP, cd 2) · Romper armadura (lenta, 2 SP, cd 3). Consumible: Pergamino grupal de Furia de
   Combate (+1 Daño a él y su grupo, 3 turnos).
   - **Atributos de nivel 1 rehechos** (dueño, 2026-11-03: «fue 9, con 7, agi 6, des 7, esp 4, para empezar»): **Fue 9 · Con 7 · Agi 6 · Des 7 ·
-    Esp 4** (vida 35). El creep cargado sigue con Con 8 · Des 6 hasta que el dueño diga «cargá».
+    Esp 4** (vida 35). **Cargado en el pool esencial el 2026-11-03.**
   - **Boceto completo, nivel 1 a 5** (2026-11-03). Atributos (Fue/Con/Agi/Des/Esp → vida): nv1 9/7/6/7/4 → 35 · nv2 10/8/7/7/4 → 40 · nv3
     11/9/7/8/4 → 45 · nv4 12/10/8/8/4 → 50 · nv5 13/11/8/9/4 → 55.
     | Nivel | Habilidad nueva | Pasiva | Equipo |
@@ -131,11 +131,11 @@
   3 SP, cd 3). Consumible: Runa de debilidad (trampa). Falta una rápida de Debuffer (pendiente).
 - ✅ **Programado el 2026-11-03** (antes «Por programar»): **Piel de hierro escala con el nivel: +(3 + nivel)** a la Defensa y a la Def. especial (nivel 1: +4,
   nivel 3: +6 como hoy, nivel 5: +8); sigue +1 Res. a crítico y 2 turnos. Hoy es +6 fijo (de la tanda del 2026-10-27).
-  - **Aguja siniestra pasa a rápida** (dueño, 2026-11-03, «vamos con esto»; **por programar**): cooldown 2 y más barata (1 No2 + 2 SP), mismo
+  - **Aguja siniestra pasa a rápida** (dueño, 2026-11-03, «vamos con esto»; **programado el 2026-11-03**: los creeps guardados se ponen al día solos): cooldown 2 y más barata (1 No2 + 2 SP), mismo
     efecto (1d6 siniestro directo, −1 a todas las resistencias a crítico 2 turnos). Así el nivel 1 tiene una lenta fuerte (Maldición de la coraza)
     y una rápida que acompaña. Ninguna habilidad de Debuffer era rápida: se diseña además una rápida nueva (en curso).
   - **Rápidas de Debuffer al pool** (dueño, 2026-11-03): **Escalofrío** (siniestro + −2 PdG) y **Espina tóxica** (tóxica + Veneno 2), definidas en
-    `diseno-roles-creep.md` (Debuffer, conceptos 2 y 17), sin programar. Candidatas: Escalofrío para el Maldito, Espina tóxica para el D2 Tóxico.
+    `diseno-roles-creep.md` (Debuffer, conceptos 2 y 17), **programadas el 2026-11-03**. Candidatas: Escalofrío para el Maldito, Espina tóxica para el D2 Tóxico.
   - **Boceto completo, nivel 1 a 5** (2026-11-03, todo con lo que ya existe). Atributos (Esp/Con/Agi/Des/Fue → vida): nv1 13/8/6/4/2 → 40 ·
     nv2 14/9/7/4/2 → 45 · nv3 16/9/7/5/2 → 45 · nv4 17/10/8/5/2 → 50 · nv5 19/10/8/6/2 → 50.
     | Nivel | Habilidad nueva | Pasiva | Equipo |
@@ -263,7 +263,7 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
     contenida) · **Chaleco de cuero** (Def +2) · **Botas de cuero de vaca** (Def +1, Res. crít. T4 +1): Def +3, Def. esp. 0. Skills: **Tiro certero**
     (rápida, cd 2: +1 PdG, Perfora 3, ignora 2 de Res. a crítico; lo de un disparo) · **Tiro a la cabeza** (lenta, cd 3: apunta; el próximo
     disparo +2 PdG, Crítico frecuente +1 y potente +1; lo pierde si le hacen daño). Consumible: Flecha perforante. Juego: apunta, dispara con todo y
-    con lo que sobra el Tiro certero; si le llegan, se aleja (7 No2) y vuelve a disparar. Sin cargar hasta que el dueño diga.
+    con lo que sobra el Tiro certero; si le llegan, se aleja (7 No2) y vuelve a disparar. **Cargado en el pool esencial el 2026-11-03.**
 
 - **M2 · Mago de escarcha · Mago** (boceto aprobado 2026-11-03, dueño: «me cierra»; nivel 1 por definir). Estrategia: el mago de control: no
   quema, **frena** (encierra, empuja, deja el campo congelado y Escarcha). Todo con lo que ya existe. Atributos (Esp/Con/Agi/Des/Fue → vida, con

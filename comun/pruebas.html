@@ -42,14 +42,14 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 </script>
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
-<script src="combatiente.js?v=20261103t3"></script>
-<script src="creep-calculo.js?v=20261103t3"></script>
+<script src="combatiente.js?v=20261103t4"></script>
+<script src="creep-calculo.js?v=20261103t4"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261103t2b"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
-<script src="estados-presets.js?v=20261103nit2"></script>
+<script src="estados-presets.js?v=20261103t4"></script>
 <script src="estados-aplicar.js"></script>
 <script src="recibidos.js"></script>
 <script src="tokens-auto.js"></script>
@@ -99,7 +99,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261103humo"></script>
+<script src="duelo.js?v=20261103t4"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -111,8 +111,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="pasivas.js"></script>
 <script src="skills-clase.js?v=20261102anula4"></script>
 <script src="creeps-base.js"></script>
-<script src="skills-creep-base.js?v=20261103t3"></script>
-<script src="creeps-esenciales.js?v=20261103t3"></script>
+<script src="skills-creep-base.js?v=20261103t4"></script>
+<script src="creeps-esenciales.js?v=20261103t4"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
 <script>
@@ -1186,7 +1186,7 @@ prueba('🎯 Aguja siniestra (Debuffer, 2026-10-26): PdG.Esp contra Evasión, 1d
   const P = estadosPresetCreep().find(p => p.nombre === 'Punto débil');
   const sc = {nombre: 'X', crit: [2, 2, 2, 2, 2], estados: [{...structuredClone(P), id: 'e1', activo: true}], equipo: []};
   igual([h.duelo.tira, h.duelo.contra.join(','), h.duelo.danoFormula, !!h.duelo.danoDirecto, Combatiente.elementoDe(h.duelo.tipoDano), h.duelo.efectos[0].nombre, P.turnos, CreepCalculo.critEfectivo(sc, 0), h.cd, e.etiquetas.includes('debuffer')],
-    ['pdgmg', 'eva', '1d6', true, 'siniestro', 'Punto débil', 2, 1, 3, true]);
+    ['pdgmg', 'eva', '1d6', true, 'siniestro', 'Punto débil', 2, 1, 2, true]);   // (rápida, cooldown 2, desde el 2026-11-03);
 });
 prueba('💨 Dash (Choque liviano y Asalto, 2026-10-26): el camino lo hace el mapa; el golpe al que atraviesa, +2 PdG y +1 a la Fuerza del golpe', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Dash'), h = armarHabilidadDeCreep(e.datos, 2);
@@ -6366,8 +6366,32 @@ prueba('⭐ El pool esencial (2026-11-03): los 6 de nivel 1, con su equipo, cint
     d('Escudero').equipo.map(i => i.nombre).join(), d('Escudero').cinturon.map(i => i.nombre).join(), d('Hachero').fue, d('Hachero').agl,
     d('Piromante').habilidades.map(h => h.nombre + ':' + h.cd).join(), d('Escudero').habilidades[1].efectoMods.find(m => m.stat === 'def').val,
     CREEPS_BASE.filter(c => c.pool !== 'esencial').length > 100],
-    [0, 6, true, 'Hacha de piedra,Escudo de caparazón de tortuga gigante,Peto de hierro,Cofia de anillas sueltas', 'Poción de Cuero Duro,Poción de Piel de Cristal', 9, 6,
+    [0, 7, true, 'Hacha de piedra,Escudo de caparazón de tortuga gigante,Peto de hierro,Cofia de anillas sueltas', 'Poción de Cuero Duro,Poción de Piel de Cristal', 9, 6,
       'Lengua de fuego:4,Muro de fuego:3', 4, true]);
+});
+prueba('🏹 El Tirador de precisión al pool esencial y el Hachero con sus atributos nuevos (2026-11-03)', () => {
+  const d = n => CREEPS_BASE.find(c => c.pool === 'esencial' && c.nombre === n).datos;
+  const t = d('Tirador de precisión'), h = d('Hachero');
+  igual([t.des, t.agl, t.con, t.fue, t.esp, t.hp, t.equipo.map(i => i.nombre).join(), t.habilidades.map(x => x.nombre + ':' + x.cd).join(), t.cinturon.map(i => i.nombre).join(),
+    [h.fue, h.con, h.agl, h.des, h.esp, h.hp].join()],
+    [11, 7, 7, 5, 3, 35, 'Arco de la espera,Chaleco de cuero,Botas de cuero de vaca', 'Tiro certero:2,Tiro a la cabeza:3', 'Flecha perforante', '9,7,6,7,4,35']);
+});
+prueba('⚡🥶🧪 Debuffer (2026-11-03): la Aguja siniestra rápida (y los guardados al día), Escalofrío y Espina tóxica; tolerar el Veneno con Res.Esp', () => {
+  const H = nm => HABILIDADES_CREEP_BASE.find(x => x.nombre === nm);
+  const ag = armarHabilidadDeCreep(H('Aguja siniestra').datos, 1), es = armarHabilidadDeCreep(H('Escalofrío').datos, 1), ep = armarHabilidadDeCreep(H('Espina tóxica').datos, 1);
+  // Una Aguja guardada con lo de antes: cooldown 3, 2 No2 y 3 SP.
+  const vieja = structuredClone(ag); vieja.cd = 3; vieja.cdActual = 3; vieja.nitrosCosto = 2; vieja.spCosto = 3; vieja.detalle = vieja.detalle.replace('cuesta 1 No2', 'cuesta 2 No2').replace('cooldown 2 (con SP: 2 SP)', 'cooldown 3 (con SP: 3 SP)');
+  const sc = {nombre: 'Viejo', nivel: 1, habilidades: [vieja]};
+  const c1 = CreepCalculo.migrarPielYMisiles(sc), c2 = CreepCalculo.migrarPielYMisiles(sc);
+  const ef = Combatiente.efectoDeEjecucion(ep.duelo.efectos[0], st => st === 'dmgesp' ? 9 : 0);
+  const pre = ESTADOS_PRESET.find(x => x.nombre === 'Escalofrío');
+  const mald = CREEPS_BASE.find(c => c.pool === 'esencial' && c.nombre === 'Maldito').datos.habilidades.find(x => x.nombre === 'Aguja siniestra');
+  igual([ag.cd, ag.nitrosCosto, ag.spCosto, !!ag.cdArranca, c1, vieja.cd, vieja.cdActual, vieja.nitrosCosto, vieja.spCosto, /cooldown 2 \(con SP: 2 SP\)/.test(vieja.detalle), c2,
+    es.cd, es.nitrosCosto, es.duelo.contra.join(), es.duelo.tipoDano, !!es.duelo.danoDirecto, es.duelo.efectos[0].nombre, pre.mods[0].stat + pre.mods[0].val, !!pre.turnosCompletos,
+    ep.cd, ep.duelo.contra.join(), ep.duelo.tipoDano, !!ep.duelo.danoDirecto, ef.spec.nombre, ef.spec.stacks, JSON.stringify(ef.tolera), mald.cd,
+    H('Escalofrío').etiquetas.includes('rápida'), H('Espina tóxica').etiquetas.includes('auditada')],
+    [2, 1, 2, false, true, 2, 2, 1, 2, true, false, 2, 1, 'resm', 'siniestro', true, 'Escalofrío', 'pdg-2', true,
+      2, 'eva', 'toxico', true, 'Veneno', 2, '{"stat":"resmg","contra":"dmgesp","valor":9}', 2, true, true]);
 });
 prueba('🔄 Las habilidades de clase siguen a su clase (P222, 2026-10-27): una copia vieja toma la versión nueva; una editada a mano después, no', () => {
   const base = CLASES_SKILLS.find(c => c.id === 'warrior').habilidades.find(x => x.id === 'warrior-contraataque');

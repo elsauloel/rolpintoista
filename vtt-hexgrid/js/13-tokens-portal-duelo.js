@@ -2500,8 +2500,25 @@ async function anulaAntesDeAplicar(d, ef){
   const nom = await Confirmar.elegir(`${d.atacante.nombre || 'La Anulación'} anula: ¿qué estado mágico le saca a ${nombreDe(t)}?`, {titulo: 'Anulación', icono: '🚫', no: 'Ninguno', opciones: ops});
   return nom ? {anulaElegido: String(nom)} : null;
 }
+// 🧪 Tolerar un efecto (2026-11-03, la Espina tóxica: «puede tirar resistencia especial para tolerar el veneno»): el golpeado tira su stat
+// (`ef.tolera.stat`) contra el valor de quien la usó (`ef.tolera.valor`, su Ef.Esp); si lo supera, el estado no entra. La tirada va a la Mesa.
+async function dueloTolera(d, ef){
+  const tl = ef && ef.tolera;
+  if(!tl || !tl.stat) return null;
+  const t = tokens.get(d.defensor.tokenId);
+  if(!t) return null;
+  const valor = typeof trampaValorStat === 'function' ? num(trampaValorStat(t, tl.stat)) : 0;
+  const etq = (typeof ZONA_STAT_LABEL !== 'undefined' && ZONA_STAT_LABEL[tl.stat]) || (tl.stat === 'resmg' ? 'Res.Esp' : tl.stat);
+  const r = Combatiente.tirarStat(valor, [], tl.stat);
+  if(!r) return null;
+  const quien = nombreDe(t), contra = Math.round(num(tl.valor));
+  try{ mesaPublicar(`${quien} · ${etq} (tolerar ${ef.nombre})`, {formula: r.formula, rolls: r.rolls, mod: r.mod, total: r.total, quien}); }catch(err){}
+  return r.total > contra ? {nota: `${quien} lo toleró: ${etq} ${r.total} contra ${contra} — no le queda ${ef.nombre}`, sinEfecto: true}
+    : {tirada: r.total, contra};
+}
 async function dueloAplicarEfecto(d, ef){
-  if(num(ef && ef.empuja) > 0) return dueloEmpujar(d, num(ef.empuja), ef.clava);   // el empujón no es un estado (2026-10-08)   // 📌 clava: si choca contra algo sólido (2026-10-26)
+  if(num(ef && ef.empuja) > 0) return dueloEmpujar(d, num(ef.empuja), ef.clava);
+  if(ef && ef.tolera){ const tl = await dueloTolera(d, ef); if(tl && tl.sinEfecto) return tl; }   // el empujón no es un estado (2026-10-08)   // 📌 clava: si choca contra algo sólido (2026-10-26)
   const r = await dueloAplicarEfectoBase(d, ef);
   try{
     const spec = Duelo.specDeEfecto(ef), t = tokens.get(d.defensor.tokenId);

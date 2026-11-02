@@ -75,6 +75,19 @@
   Atributos (33): Agi 10 · Des 8 · Con 6 · Fue 6 · Esp 3. Vida 30. Equipo (Común): Cuchilla del frigorífico (Tipo 6, +2 daño, Sangrado 25 %) ·
   Chaleco de cuero (Def +2) · Zapatillas de lona (Eva +1, Def. esp. +1, Ini −1). Skills: Golpe que sangra (rápida, 1 SP, cd 2) · Sal en la herida (lenta, 2 SP,
   cd 3). Consumible: Óleo venenoso. Punto débil: vida 30 y Esp 3.
+  - **Boceto completo, nivel 1 a 5** (aprobado como ruta conceptual, dueño 2026-11-03: «me cierra como ruta conceptual, con algunas observaciones
+    que iré ajustando a medida que vayamos definiendo cada paso»). Atributos (Agi > Des > Con = Fue > Esp; Agi/Des/Con/Fue/Esp → vida): nv1
+    10/8/6/6/3 → 30 · nv2 11/9/7/6/3 → 35 · nv3 12/10/7/7/3 → 35 · nv4 13/11/8/7/3 → 40 · nv5 14/12/8/8/3 → 40.
+    | Nivel | Habilidad nueva | Pasiva | Equipo |
+    |---|---|---|---|
+    | 1 | Golpe que sangra · Sal en la herida | — | Cuchilla del frigorífico, Chaleco de cuero, Zapatillas de lona |
+    | 2 | **Corte profundo** (el sangrado fuerte) | **Olfato de sangre** 🆕 (+1 PdG contra quien sangra) | + 2 Comunes (guantes, capucha) |
+    | 3 | **Ráfaga de cortes** (+2 dados, efectos del arma ×3) | — | la cuchilla, de Buena calidad |
+    | 4 | **Reflejos** 🆕 (un dodge roll gratis cuando lo atacan) | **Herida que no cierra** 🆕 (su Sangrado suma 1 stack más) | + el chaleco de Buena |
+    | 5 | **Hemorragia** 🆕 (hace estallar el sangrado: todo el daño que le quedaba, de golpe) | — | + las zapatillas de Buena |
+    🆕 = idea nueva, se diseña al llegar a ese nivel. Consumible: Óleo venenoso.
+  - **Nota del dueño (2026-11-03)**: pensó que el choque liviano tuviera acento en la **Destreza**; queda para **otra línea de liviano, más enfocada
+    en críticos** (candidata: una de las que faltan, L2–L4 o la segunda vuelta).
 - **M1 · Piromante · Mago · nivel 1** (aprobado 2026-11-02). Estrategia: controla el terreno con fuego (muro que corta el paso) y quema de a
   uno. Atributos (33): Esp 14 · Con 7 · Agi 5 · Des 5 · Fue 2. Vida 40 (con la campera). Equipo (Común): Varita de la bola de fuego · Botella con
   un diablito (+2 daño especial; se cambia por el Brasero de mano cuando existan los talismanes elementales) · Campera de cuero con tachas (Def +1,
@@ -236,7 +249,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 > 3. Terminada la **ronda de nivel 1** de todas las líneas, se vuelve a la primera (el Escudero) y se define su **nivel 2**, repasando y ajustando el
 >    boceto sobre la marcha; después la ronda de nivel 2, la de 3…
 > Al crearlo en GM Tools se elige el nivel y aparece solo con lo de ese nivel (pendiente de programar). Las 6 líneas con el nivel 1 aprobado sin
-> boceto completo (Sangrador, Sanador, Hachero, Maldito; el Piromante ya tiene su escalado; el Escudero, hecho el 2026-11-03) necesitan el suyo.
+> boceto completo (Sanador, Hachero, Maldito; el Sangrador, hecho el 2026-11-03; el Piromante ya tiene su escalado; el Escudero, hecho el 2026-11-03) necesitan el suyo.
 
 0. **Antes**: la tanda de skills de Tanque (`diseno-roles-creep.md`).
 1. **Rotación**: un creep de un rol, después uno del siguiente: Warrior → Tanque → Híbrido → Liviano → Liviano → Rango → Mago → Support → Debuffer →

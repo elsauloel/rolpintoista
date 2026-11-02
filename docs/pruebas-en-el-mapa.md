@@ -681,6 +681,12 @@
   **Probado el 2026-10-20 (Claude, «Test con claude elsaulo»):** el creep con Excavar y la Puñalada desde abajo del Kobold tunelero: se mete en la tierra, sale al lado de Silvia (+3 PdG por salir de abajo); con crítico, los efectos pasan a Rengo 2 turnos y Lisiado 1 turno (en vez del Rengo 1).
   «👁 Ver como jugador», abajo, en Probado).
 ## Probado
+- [x] **Tanda 4 (2026-11-03, «Claude · pruebas», con capturas `t4-1103-*`; detalle en `reporte-pruebas-4-2026-11-03.md`)**: 👁 Sólidos «Se ve entero» con las
+  reglas pegadas (el ⚙ guarda, desde un jugador el objeto entero y lo de atrás y adentro tapados; uno nuevo desde Formas libres); ⚡ Aguja siniestra rápida
+  (espera 2, 1 No2, los viejos al día, baja con el turno del creep); 🥶 Escalofrío (1d4 siniestro directo, Herida sombría, −2 PdG en el ataque siguiente,
+  dura su turno siguiente; ícono arreglado); 🧪 Espina tóxica (daño directo sin Defensa, tolera / no tolera el Veneno, también contra un creep desde el GM);
+  🏹 Tirador (Tiro a la cabeza +4 con la Respiración contenida, Flecha perforante del cinturón, Tiro certero); 🪓 Hachero con los atributos nuevos; ⚔ el
+  resumen del duelo en la Mesa (GM y jugador) con «🔍 Ver detalle del duelo» (arreglado «Quedó con Armadura rota»). Restaurado: 0 diferencias.
 - [x] **🗿 Estoicismo** (2026-10-30, «Claude · pruebas», con capturas). juan (jugador) lo ejecuta desde la Botonera: «¿Es tu turno?» 2 / 4 SP; el Aviso
   «Tenés 2 enemigos pegados (Warrior, Chamán): +4 🛡» con Aplicar / Resolver a mano; queda el estado (1 turno). El GM aleja al Chamán: el −2 rojo baja sobre
   juan en la pantalla del GM y al jugador le llega «Se aleja: −2… Total +2»; lo vuelve a pegar: el +2 🛡 verde sube y «Se suma: +2… Total +4», con la casilla

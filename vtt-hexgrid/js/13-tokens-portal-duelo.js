@@ -2239,7 +2239,7 @@ async function anularEn(celdas, yo, hab, rivales){
   for(const t of (rivales || [])){
     if(!(etereoDe(t) && celdas.has(nbPack(t.col, t.fila)) && t.tipo === 'pj' && String(t.fichaId || '').includes(SEP_INVOCACION))) continue;
     const nom = nombreDe(t);
-    try{ await coleccionTokens().doc(t.id).delete(); partes.push(`cerró ${nom}`); if(soyGM && typeof temporalFueraDelOrden === 'function') await temporalFueraDelOrden(t.id); }
+    try{ await coleccionTokens().doc(t.id).delete(); partes.push(`${nom} (se cerró)`); if(soyGM && typeof temporalFueraDelOrden === 'function') await temporalFueraDelOrden(t.id); }
     catch(err){ console.error('Anulación: no se pudo cerrar el ojo', err); aMano.push(nom); }
   }
   if(partes.length) mesaLinea(`🚫 ${nombre} anuló ${partes.join(', ')}`, 'recordatorio');

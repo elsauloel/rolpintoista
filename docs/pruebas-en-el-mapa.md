@@ -285,6 +285,13 @@
   varita sobre rival y sobre casilla con zona, pergamino recortando); ✅ Malviaje (duelo y movimiento); ✅ jefe desde un duelo (Polvo de
   adormidera); ✅ Adrenalina se va a los 2 turnos; ✅ Perforante; ✅ DÉBIL A LA LUZ en área. **Quedan**: Anulación sobre invocación de creep,
   trampa mágica, portal y Ojo de Kicillof; contraataque con 0 No2 e invocación en negativo; intercambio desde la ficha suelta y mochila con caído.
+- [x] **Las que quedaban, 2026-11-03** → [`reporte-pruebas-pendientes-2026-11-03.md`](reporte-pruebas-pendientes-2026-11-03.md) (capturas `pend-1103-*`; 0
+  diferencias al restaurar): ✅ contraataque desde 0 No2 (creep −4, personaje −3) y en negativo nada más (Parry apagado, ataque y ataque de una
+  invocación bloqueados; con 0, «¿Atacar igual?»); ✅ pasar ítems desde la ficha suelta, un caído que da (cartel «Estás inconsciente», 0 No2) y que
+  recibe (0 No2, a la vaina); ✅ Miedo 2 turnos a un jefe (regla → 1, completo → 2); ✅ Malviaje −2 contra un aliado; ✅ Anulación: Ojo de Kicillof,
+  invocación de un jugador, trampa mágica. **Arreglados**: el ítem que se duplicaba con el personaje abierto en el mapa y en la ficha suelta
+  (`comun/intercambio.js`) y el texto de la deuda de No2 en el contraataque. **Quedan**: ❌ la Anulación sobre un portal ajeno (faltaban las
+  reglas: agregadas, hay que pegarlas, y volver a probar); las pruebas de humo de los creeps esenciales en el mapa (Escudero, Piromante).
 - [x] **📌 Clavar a la pared — probado 2026-11-03 con clics** (GM con el Goblin ballestero, Jugador 1 con Prueba Uno, Jugador 2 con Prueba Dos):
   ✔ sin pared: lo empuja 3 en línea recta y nada más · ✔ con un Sólido detrás: 1 casillero, choque (4 de daño) e Inmovilizado 3 turnos con
   «se suelta con Fuerza contra 5» · ✔ contra un token: chocan los dos (3 y 5 de daño), sin clavar · ✔ soltarse perdiendo (1d3=3 contra 5) y

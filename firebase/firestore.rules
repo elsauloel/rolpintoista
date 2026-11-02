@@ -882,7 +882,9 @@ service cloud.firestore {
             || resource.data.get('niebla', false) == true || resource.data.get('fuego', false) == true || resource.data.get('zonaDanoTipo', '') in ['de fuego', 'fuego']
             || esNube(resource.data) || esZonaMagica(resource.data)   // 💨 (2026-11-01) una nube o un gas que el viento se lleva entero (solo esas: esNube)
             // Desarmar trampas (talento, 2026-10-08): cualquiera de la partida saca del mapa una trampa (la desarma o se rompe).
-            || resource.data.get('trampa', false) == true);
+            || resource.data.get('trampa', false) == true
+            // 🚫 La Anulación (2026-11-03, probada en el mapa): un portal de los rivales también se va (no el Town Portal).
+            || (resource.data.get('portal', false) == true && resource.data.get('townPortal', false) != true));
       }
 
       // Mapas guardados además del de siempre (que sigue en mapa/* y
@@ -1007,7 +1009,8 @@ service cloud.firestore {
             && (resource.data.duenoUid == request.auth.uid || esGM(c) || resource.data.get('arma', false) == true
               || resource.data.get('niebla', false) == true || resource.data.get('fuego', false) == true || resource.data.get('zonaDanoTipo', '') in ['de fuego', 'fuego']
             || esNube(resource.data) || esZonaMagica(resource.data)   // 💨 (2026-11-01) una nube o un gas que el viento se lleva entero (solo esas: esNube)
-              || resource.data.get('trampa', false) == true);
+              || resource.data.get('trampa', false) == true
+              || (resource.data.get('portal', false) == true && resource.data.get('townPortal', false) != true));   // 🚫 la Anulación (2026-11-03)
         }
       }
     }

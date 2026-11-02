@@ -124,7 +124,7 @@ function equipoItemHtml(item, idx){
       </div>
       <div class="cat-meta"><b>${esc(statTxt)}</b> · Peso ${fmt(num(item.peso))}</div>
       ${modsHtml ? `<div class="cat-mods">${modsHtml}</div>` : ''}
-      ${item.detalle ? `<div class="cat-detalle">${esc(item.detalle)}</div>` : ''}
+      ${item.detalle ? `<div class="cat-detalle">${typeof Glosario !== 'undefined' ? Glosario.marcar(item.detalle) : esc(item.detalle)}</div>` : ''}   <!-- 📖 el glosario al pasar el mouse (2026-11-03, dueño) -->
     </div>
     <button type="button" class="mini" data-veritem="${idx}">Ver</button>
     ${dropFijoCreepId ? `<button type="button" class="cat-btn-equipar" data-dropfijo="${idx}">＋ Drop fijo</button>`

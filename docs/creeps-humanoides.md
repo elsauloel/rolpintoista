@@ -17,7 +17,7 @@
   el número de variantes por rol; no me caso con ese número»). Cada línea = **una estrategia distinta dentro del rol**.
 - **Orden**: **rol por rol**; al cerrar la ronda se ve cómo seguir según las estrategias posibles con las skills de cada rol. **Primero las
   esencias puras del rol**; después, hibridar y cruzar funciones donde tenga sentido de diseño.
-- **Pasiva desde el nivel 3** (una que refuerce su estrategia).
+- **Pasivas en los niveles pares**: la primera en el **nivel 2** y una más en el **nivel 4** (dueño, 2026-11-02: «pueden aparecer a partir de nivel 2 y vuelven a aparecer una habilidad pasiva más en cada nivel par»; antes había dicho desde el 3). Refuerzan su estrategia.
 - **Consumible fijo, vinculado al rol** (además de «que le sirva y lo use»). Propuesta por rol, a confirmar con cada línea: Tanque → poción de
   defensa (Cuero duro) · Warrior → fuerza o furia · Choque liviano → óleo venenoso · Rango → flecha o virote especial · Hunter → una trampa ·
   Mago → poción de SP · Support → poción de curación · Debuffer → un polvo o una bombucha.

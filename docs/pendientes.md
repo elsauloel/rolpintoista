@@ -879,6 +879,8 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] **Manual** (`manual-usuario/notas`): grupos y tokens automáticos, botín, Despojar, Finalizar combate en el mapa, trampas automáticas, estados sobre otros, protección de jefe, botón 🎭 y grupos ↔ mapas, y una nota de casteo cuando estén las reglas.
 
 ## 4. Diseño pendiente
+- [ ] **⚡ Una habilidad RÁPIDA de Debuffer (cooldown 2), auditada (dueño, 2026-11-02, con el Maldito D1):** hoy las del Debuffer auditadas son
+  todas lentas (Maldición de la coraza, Aguja siniestra, Maldición debilitante…); las rápidas que hay (Intimidar, Hacer tropezar) son viejas y a mano.
 - [ ] **🔥❄⚡ Talismanes elementales (propuesta de Claude, 2026-11-02; el dueño: «definitivamente hay que crear talismanes potenciadores de daños
   elementales… dejalo para más adelante»).** Uno por elemento, Común (70: +2 al daño de ese elemento, +1 a su resistencia) y Buena (140: +3 al daño y
   un plus de su efecto: Quemadura +1 turno · Escarcha +1 stack · Parálisis +10 % · Armadura rota segura · Veneno +1 stack · Luz sanadora +25 % ·

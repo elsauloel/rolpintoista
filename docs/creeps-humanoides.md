@@ -67,6 +67,11 @@
   (Def. esp. +2, Res. eléc. +1, Luz +1) · Peto de cuero de lampalagua (Def +1, Def. esp. +2, Vida +5, Res. ácido +1) · Botas de caña alta de
   estanciero (Def +1, Def. esp. +1): Def +2, Def. esp. +5. Skills: Sanar (rápida, 1 No2 + 2 SP, cd 2: 1d6+4) · Purificar (lenta, Flash, 2 SP, cd 3).
   Consumible: Pergamino de Regeneración menor (grupo: 5 por turno, 3 turnos).
+- **D1 · Maldito · Debuffer · nivel 1** (aprobado 2026-11-02). Estrategia: les baja las defensas a los rivales para que todos peguen más. Atributos
+  (33): Esp 13 · Con 8 · Agi 6 · Des 4 · Fue 2. Vida 40. Equipo (Común): Varita del susurro (1d6 arcano que no se esquiva, Silencio 25 %) ·
+  Atrapasueños (Def. esp. +2, Res.Mt +3) · Casaca curtida de salteador (Def +1, Def. esp. +1, Ini +1, Percep. +2) · Capucha de lana del culto
+  (Def. esp. +1, Res.Esp +1): Def +1, Def. esp. +4. Skills: Maldición de la coraza (lenta, 2 No2 + 3 SP, cd 3) · Aguja siniestra (lenta, 2 No2 +
+  3 SP, cd 3). Consumible: Runa de debilidad (trampa). Falta una rápida de Debuffer (pendiente).
 - **Por programar (decidido 2026-11-02)**: **Piel de hierro escala con el nivel: +(3 + nivel)** a la Defensa y a la Def. especial (nivel 1: +4,
   nivel 3: +6 como hoy, nivel 5: +8); sigue +1 Res. a crítico y 2 turnos. Hoy es +6 fijo (de la tanda del 2026-10-27).
 - **T2 · Muralla con púas · Tanque · nivel 1** (aprobado 2026-11-02): Con 13 · Fue 8 · Esp 6 · Agi 3 · Des 3 (33), vida 65. Hacha con garfio
@@ -223,7 +228,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | R1 | | | | | |
 | M1 | ✅ (2026-11-02) | | | | |
 | S1 | ✅ (2026-11-02) | | | | |
-| D1 | | | | | |
+| D1 | ✅ (2026-11-02) | | | | |
 | W2 | | | | | |
 | T2 | | | | | |
 | H2 | | | | | |

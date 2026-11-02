@@ -2512,7 +2512,8 @@ async function dueloTolera(d, ef){
   const r = Combatiente.tirarStat(valor, [], tl.stat);
   if(!r) return null;
   const quien = nombreDe(t), contra = Math.round(num(tl.valor));
-  try{ mesaPublicar(`${quien} · ${etq} (tolerar ${ef.nombre})`, {formula: r.formula, rolls: r.rolls, mod: r.mod, total: r.total, quien}); }catch(err){}
+  const aNombre = typeof Duelo !== 'undefined' && Duelo.quienDeLado ? Duelo.quienDeLado(d.defensor) : {};   // a nombre del golpeado y su dueño (no la cuenta de quien publica; 2026-11-03)
+  try{ mesaPublicar(`${quien} · ${etq} (tolerar ${ef.nombre})`, {formula: r.formula, rolls: r.rolls, mod: r.mod, total: r.total, quien, ...aNombre}); }catch(err){}
   return r.total > contra ? {nota: `${quien} lo toleró: ${etq} ${r.total} contra ${contra} — no le queda ${ef.nombre}`, sinEfecto: true}
     : {tirada: r.total, contra};
 }

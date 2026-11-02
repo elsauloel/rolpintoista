@@ -44,7 +44,7 @@
   - Consumibles: Poción de Cuero duro (escudo 15 contra daño físico) y Poción de Piel de Cristal (escudo 15 contra daño especial) (dueño: «así,
     circunstancialmente, puede defenderse de alguien que le haga daño mágico y ser una verdadera molestia»).
   - El T4 Peleador de control se queda con Desarmar y Pisotón.
-- **W1 · Hachero · Warrior · nivel 1** (PROPUESTA, sin revisar: el dueño no la miró todavía, 2026-11-02). Estrategia: rompe la armadura del que más se defiende y lo
+- **W1 · Hachero · Warrior · nivel 1** (aprobado 2026-11-02, con la Cofia de anillas sueltas en lugar del casco de cuero: Def +5, Def. esp. +1). Estrategia: rompe la armadura del que más se defiende y lo
   castiga. Atributos (33): Fue 10 · Con 9 · Des 6 · Agi 4 · Esp 4. Vida 45. Equipo (Común): Hacha (Tipo 8, Rompe armadura 50 %) · Cota de malla
   de hierro (Def +4, Res. crít. T6 +1, Eva −1) · Casco de cuero endurecido (Def +1, Res. crít. T4 +1); Def +5, sin Def. especial (su punto débil,
   con la Esp baja). Skills: Golpe fuerte (rápida, 1 SP, cd 2) · Romper armadura (lenta, 2 SP, cd 3). Consumible: Pergamino grupal de Furia de
@@ -214,7 +214,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 
 | Línea | Nivel 1 | Nivel 2 | Nivel 3 | Nivel 4 | Nivel 5 |
 |---|---|---|---|---|---|
-| W1 | (propuesta) | | | | |
+| W1 | ✅ (2026-11-02) | | | | |
 | T1 | ✅ (2026-11-02) | | | | |
 | T2 | ✅ (2026-11-02) | | | | |
 | H1 | | | | | |

@@ -179,9 +179,15 @@ function mesaAlertaEstilos(){
       '#alerta-ojo span{font-size:min(55vmin,420px);line-height:1;filter:drop-shadow(0 0 30px rgba(255,60,30,.9))}' +
       '#alerta-ojo.apagar{opacity:0}' +
       '.mesa-duelo-frase{font-weight:700;line-height:1.35}' +
-      '.mesa-duelo-det summary{cursor:pointer;font-size:11px;opacity:.85;margin-top:3px;list-style:none}' +
+      // 🔍 «Ver detalle del duelo» como botón (dueño, 2026-11-03: «que se vea como un botón, con un reborde y un fondo más claro»)
+      '.mesa-duelo-det summary{display:inline-block;cursor:pointer;font-size:12px;font-weight:700;margin-top:5px;list-style:none;padding:3px 10px;' +
+        'border:1px solid currentColor;border-radius:6px;background:rgba(255,255,255,.14);opacity:1;user-select:none}' +
+      '.mesa-duelo-det summary:hover{background:rgba(255,255,255,.26)}' +
       '.mesa-duelo-det summary::-webkit-details-marker{display:none}' +
-      '.mesa-duelo-det[open] summary{margin-bottom:3px}';
+      '.mesa-duelo-det summary .ocultar{display:none}' +
+      '.mesa-duelo-det[open] summary .ver{display:none}' +
+      '.mesa-duelo-det[open] summary .ocultar{display:inline}' +
+      '.mesa-duelo-det[open] summary{margin-bottom:4px}';
     document.head.appendChild(st);
   }
 }
@@ -300,7 +306,7 @@ function mesaRender(docs){
       if(t.texto && /^⚔ Resumen del duelo/.test(String(t.origen || ''))){
         div.classList.add('mesa-duelo-fin');
         div.innerHTML = `<div class="mesa-duelo-frase">⚔ ${esc(t.texto)}</div>` +
-          `<details class="mesa-duelo-det"><summary>🔍 Ver detalle del duelo</summary>${lineas.map(l => `<div class="mesa-detalle">${esc(l)}</div>`).join('')}</details>`;
+          `<details class="mesa-duelo-det"><summary><span class="ver">🔍 Ver detalle del duelo</span><span class="ocultar">▴ Ocultar el detalle</span></summary>${lineas.map(l => `<div class="mesa-detalle">${esc(l)}</div>`).join('')}</details>`;
         if(nueva) setTimeout(() => div.classList.remove('nueva'), 1500);
         cuerpo.appendChild(div);
         return;

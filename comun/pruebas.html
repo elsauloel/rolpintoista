@@ -938,8 +938,11 @@ prueba('⚔ El final del duelo en una frase (2026-10-28): lo que pasó, el daño
   const esquivo = Duelo.fraseResumen({...base, resultado: 'fallo', defensa: {modo: 'evasion'}});
   const paro = Duelo.fraseResumen({...base, ataque: {tipo: 'normal', armaNombre: 'Hacha'}, resultado: 'fallo', defensa: {modo: 'parry', itemNombre: 'Escudo'}});
   const cayo = Duelo.fraseResumen({...base, resultado: 'pego', crit: {critico: true, mult: 2}, dano: {aplicado: true, recibido: 0, vidaAbs: 0, hpAntes: 4, hpDespues: 4}});
-  igual([pego, esquivo, paro, cayo], ['Fulano le hizo Tiro a la rodilla a Mengano. Le bajó 5 de vida. Quedó con Rengo.', 'Fulano le hizo Tiro a la rodilla a Mengano. Mengano esquivó.',
-    'Fulano atacó a Mengano con Hacha. Mengano lo paró con Escudo.', 'Fulano le hizo Tiro a la rodilla a Mengano. ¡Crítico ×2! No le hizo daño (lo frenaron la armadura o el escudo).']);
+  const tumbo = Duelo.fraseResumen({...base, resultado: 'pego', dano: {aplicado: true, recibido: 18, hpAntes: 6, hpDespues: 0}});   // más que la vida que tenía (2026-11-03)
+  const justo = Duelo.fraseResumen({...base, resultado: 'pego', dano: {aplicado: true, recibido: 6, hpAntes: 6, hpDespues: 0}});
+  igual([pego, esquivo, paro, cayo, tumbo, justo], ['Fulano le hizo Tiro a la rodilla a Mengano. Le bajó 5 de vida. Quedó con Rengo.', 'Fulano le hizo Tiro a la rodilla a Mengano. Mengano esquivó.',
+    'Fulano atacó a Mengano con Hacha. Mengano lo paró con Escudo.', 'Fulano le hizo Tiro a la rodilla a Mengano. ¡Crítico ×2! No le hizo daño (lo frenaron la armadura o el escudo).',
+    'Fulano le hizo Tiro a la rodilla a Mengano. Le hizo 18 de daño y Mengano cayó.', 'Fulano le hizo Tiro a la rodilla a Mengano. Le bajó 6 de vida. Mengano cayó.']);
 });
 prueba('Duelo cancelado que no cuenta (2026-10-15): el conteo de ataques y los No2 vuelven a como estaban (personaje y creep)', () => {
   const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;

@@ -1446,8 +1446,11 @@ const Duelo = (() => {
       else if(dn.aplicado){
         const entro = _num(dn.recibido) + _num(dn.vidaAbs) + (dn.magico ? _num(dn.magico.recibido) : 0);
         if(dn.manual) partes.push(`Le hizo ${_fmt(_num(dn.golpe))} de daño (a mano).`);
-        else partes.push(entro > 0 ? `Le bajó ${_fmt(entro)} de vida.` : 'No le hizo daño (lo frenaron la armadura o el escudo).');
-        if(_num(dn.hpDespues) <= 0 && _num(dn.hpAntes) > 0) partes.push(`${D} cayó.`);
+        else if(_num(dn.hpDespues) <= 0 && _num(dn.hpAntes) > 0 && entro > _num(dn.hpAntes)) partes.push(`Le hizo ${_fmt(entro)} de daño y ${D} cayó.`);   // más que la vida que tenía (dueño, 2026-11-03: decía «le bajó 18» con 6 de vida)
+        else{
+          partes.push(entro > 0 ? `Le bajó ${_fmt(entro)} de vida.` : 'No le hizo daño (lo frenaron la armadura o el escudo).');
+          if(_num(dn.hpDespues) <= 0 && _num(dn.hpAntes) > 0) partes.push(`${D} cayó.`);
+        }
       }
       const est = (d.efectos || []).filter(ef => ef && ef.aplicado && !ef.omitido && !ef.sinEfecto).map(ef => (ef.spec && ef.spec.nombre) || ef.nombre).filter(Boolean);   // el estado que quedó (Rompe armadura → «Armadura rota», 2026-11-03)
       if(est.length) partes.push(`Quedó con ${est.join(', ')}.`);

@@ -112,7 +112,7 @@ function equipoItemHtml(item, idx){
   const statTxt = esp
     ? `✨ ${esp.dano ? `${esc(esp.dano)}${esp.sumaEspecial === true ? ' + Ef.Esp' : num(esp.sumaEspecial) === 0.25 ? ' + ¼ Ef.Esp' : num(esp.sumaEspecial) ? ' + ½ Ef.Esp' : ''}` : 'sin daño'} · ${num(esp.no2 ?? 1)} No2 · espera ${CreepAcciones.ESPERA_POR_SP(num(esp.sp))}`
     : esArma
-    ? `Daño ${Math.max(1,item.peso)}d${item.tipoDado}${item.danoFijo?` +${item.danoFijo}`:''}`
+    ? `Daño ${Math.max(1, num(item.peso) || 1) + Math.max(0, num(item.danoAmplificado))}d${item.tipoDado}${item.danoFijo?` +${item.danoFijo}`:''}`   // + los dados amplificados (2026-11-03: decía 1d4 en un arco de 1 dado + 1 amplificado)
     : (esCons ? (item.curahp ? `Cura ${fmt(item.curahp)} HP` : 'Consumible') : item.orbe ? '🔮 Orbe (al usar una varita)' : `Defensa +${item.def}`);
   const tierColor = TIER_COLOR[item.tier] || TIER_COLOR['Común'];
   const modsHtml = modsResumenHtmlGM(item.mods);

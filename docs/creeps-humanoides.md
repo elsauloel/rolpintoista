@@ -245,6 +245,20 @@ Con los repartos por rol del asistente de creeps (`Combatiente.PESOS_ROL`), en e
 
 Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, una habilidad mágica Especial), ese atributo se sube un poco.
 
+- **R1 · Tirador de precisión · Rango** (boceto aprobado 2026-11-03, dueño: «bien, seguimos»; nivel 1 en definición). Estrategia: el francotirador;
+  se queda lejos, apunta y cada disparo busca el crítico o pasar la armadura. Acento en **Destreza y críticos** (la idea del dueño para un liviano,
+  2026-11-03, le calza a esta línea). Todo con lo que ya existe.
+  - Atributos (Des > Agi = Con > Fue > Esp; Des/Agi/Con/Fue/Esp → vida): nv1 11/7/7/5/3 → 35 · nv2 12/7/8/6/3 → 40 · nv3 13/8/8/7/3 → 40 · nv4
+    14/8/9/8/3 → 45 · nv5 15/9/10/8/3 → 50. Con Agi 7 (7 No2) y arco Tipo 4 (primer disparo 2): en nivel 1 dispara dos veces o dispara y se mueve.
+    | Nivel | Habilidad nueva | Pasiva | Equipo |
+    |---|---|---|---|
+    | 1 | **Tiro certero** (rápida) · **Tiro a la cabeza** (lenta) | — | Arco de la espera · Chaleco de cuero · botas |
+    | 2 | **Vigilancia** | **Puntería** (+1 PdG) | + 2 Comunes (capucha, guantes) |
+    | 3 | **Tiro al arma** | — | el arco, de Buena calidad |
+    | 4 | **Disparo señalador** | **Ojo crítico** (+1 Crítico frecuente) | + el chaleco de Buena |
+    | 5 | **Flecha que atraviesa** | — | + las botas de Buena |
+    Consumible: Flecha perforante (Común).
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

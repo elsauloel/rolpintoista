@@ -180,7 +180,7 @@ function inicioTurnoMomento(id, d){
   // Ya aplicado: el mismo cartel, con lo que pasó, y «Entendido».
   if(d.estado === 'listo' && inicioMostrados.has(id) && AvisoCombate.abiertoClave && AvisoCombate.abiertoClave() === 'inicio-turno:' + id){
     AvisoCombate.mostrar({clave: 'inicio-turno:' + id, icono: '▶', titulo: 'Empieza tu turno', pasos: dt.pasos || [], texto: '', soloBoton: true,
-      veredicto: {tono: 'bueno', grande: '✔ YA SE APLICÓ'}, botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()}]});
+      veredicto: dt.noAplicado ? {tono: 'malo', grande: '⏱ YA NO ES TU TURNO', chico: 'Cambió el orden de turnos: el inicio no se aplicó.'} : {tono: 'bueno', grande: '✔ YA SE APLICÓ'}, botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()}]});
     return true;
   }
   return d.estado === 'listo' && inicioMostrados.has(id);

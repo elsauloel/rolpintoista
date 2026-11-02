@@ -961,7 +961,7 @@ const Duelo = (() => {
       entrarDano(m);
       tx.update(ref, cambiosDe(m));
       const NOMBRE_MULT = {1: 'sin multiplicador: el d20 no alcanzó a multiplicar', 2: 'doble daño', 3: 'triple daño', 4: 'cuádruple daño'};
-      publicar = {origen: `${m.atacante.nombre} · Crítico (${n}d20${man.length ? ', a mano' : ''})`, r: {formula: `${n}d20${man.length ? ' (manual)' : ''}`, rolls, mod: 0, total: mejor, destacar: 'max'}};
+      publicar = {origen: `${m.atacante.nombre} · Crítico (${n}d20${man.length ? ', a mano' : ''})`, r: {formula: `${n}d20${man.length ? ' (manual)' : ''}`, rolls, mod: 0, total: mejor, destacar: 'max', ...quienDeLado(m.atacante)}};
       anuncio = res.supercritico
         ? `🌟 ¡SUPERCRÍTICO! ${m.atacante.nombre} contra ${m.defensor.nombre}: ${res.veintes} veintes naturales, ×${mult}, ignora la Defensa`
         : `💥 ¡CRÍTICO! ${m.atacante.nombre} contra ${m.defensor.nombre}: ×${mult} (${NOMBRE_MULT[mult]}), ignora la Defensa`;
@@ -1053,11 +1053,11 @@ const Duelo = (() => {
       if(a && b){
         const nb = fase === 'contacto' ? etqContra(m) : 'Bloqueo';
         const notaDe = t => t && t.nota ? ` (${t.nota})` : '';
-        par = [{origen: `${m.atacante.nombre} · ${fase === 'contacto' ? etqTira(m) : 'Fuerza del golpe'}${notaDe(a)}`, r: a}, {origen: `${m.defensor.nombre} · ${nb}${notaDe(b)}`, r: b}];
+        par = [{origen: `${m.atacante.nombre} · ${fase === 'contacto' ? etqTira(m) : 'Fuerza del golpe'}${notaDe(a)}`, r: a, lado: m.atacante}, {origen: `${m.defensor.nombre} · ${nb}${notaDe(b)}`, r: b, lado: m.defensor}];
       }
     });
     // Las dos tiradas se publican a la vez para que los dos juegos de dados 3D rueden juntos.
-    if(par && typeof mesaPublicar === 'function'){ await Promise.all(par.map(x => { try{ return mesaPublicar(x.origen, {formula: x.r.formula, rolls: x.r.rolls, mod: x.r.mod, total: x.r.total}); }catch(err){ return null; } })); }
+    if(par && typeof mesaPublicar === 'function'){ await Promise.all(par.map(x => { try{ return mesaPublicar(x.origen, {formula: x.r.formula, rolls: x.r.rolls, mod: x.r.mod, total: x.r.total, ...quienDeLado(x.lado)}); }catch(err){ return null; } })); }
     anunciarMesa(anuncio);
   }
 
@@ -1212,7 +1212,7 @@ const Duelo = (() => {
       cerrarSiListo(m);
       tx.update(ref, cambiosDe(m));
       if(aMano){ anuncio = `✍ ${ef.nombre} de ${m.atacante.nombre} sobre ${m.defensor.nombre}, a mano: ${r.exito ? 'funcionó' : 'no funcionó'}`; return; }
-      if(!siempreEf(ef)) publicar = {origen: `${m.atacante.nombre} · ${ef.nombre} ${pctEf(ef)}%`, r: {formula: `1d${ef.caras}`, rolls: [r.dado], mod: 0, total: r.dado, ...(r.exito ? {destacar: 'idx:0'} : {})}};
+      if(!siempreEf(ef)) publicar = {origen: `${m.atacante.nombre} · ${ef.nombre} ${pctEf(ef)}%`, r: {formula: `1d${ef.caras}`, rolls: [r.dado], mod: 0, total: r.dado, ...(r.exito ? {destacar: 'idx:0'} : {}), ...quienDeLado(m.atacante)}};
       anuncio = r.exito ? `✔ ${ef.nombre}${siempreEf(ef) ? '' : ' (' + pctEf(ef) + '%)'} de ${m.atacante.nombre} sobre ${m.defensor.nombre}: ${siempreEf(ef) ? '' : 'salió ' + r.dado + ' → '}¡FUNCIONÓ!${r.extra ? ' · ' + ef.dado + ' = ' + r.extra.total : ''}`
         : `✘ ${ef.nombre} (${pctEf(ef)}%) de ${m.atacante.nombre} sobre ${m.defensor.nombre}: salió ${r.dado} → no funcionó`;
     });
@@ -1264,7 +1264,7 @@ const Duelo = (() => {
       // Los dados que funcionaron brillan en 3D como el d20 del crítico (2026-10-04, dueño): `destacar: 'idx:…'`.
       const ok = dados.map((x, k) => x.exito ? k : -1).filter(k => k >= 0);
       if(dados.length) publicar = {origen: `${m.atacante.nombre} · Efectos del golpe`, r: {formula: dados.map(x => `1d${x.caras}`).join('+'), rolls: dados.map(x => x.dado), mod: 0, total: dados.reduce((a, x) => a + x.dado, 0),
-        ...(ok.length ? {destacar: 'idx:' + ok.join(',')} : {})}};
+        ...(ok.length ? {destacar: 'idx:' + ok.join(',')} : {}), ...quienDeLado(m.atacante)}};
       anuncio = `🎲 Efectos de ${m.atacante.nombre} sobre ${m.defensor.nombre}: ${partes.join(' · ')}`;
     });
     if(publicar && typeof mesaPublicar === 'function'){ try{ mesaPublicar(publicar.origen, publicar.r); }catch(err){} }
@@ -2425,7 +2425,10 @@ const Duelo = (() => {
     const pendiente = d.fase === 'efectos' && efs.length;
     return `<div class="duelo-paso"><h4><span class="n">${d.hab ? (d.hab.sinOposicion ? 2 : d.hab.dano ? 4 : 3) : 6}</span>${d.hab ? 'Efectos de la habilidad' : 'Efectos del golpe'}</h4>${notaCard}${tablero}${cards}${pendiente && puedeAtq ? '<div class="duelo-pie" style="margin-top:8px"><button type="button" class="sec" data-ef-terminar>Terminar sin resolver los que faltan</button></div>' : ''}</div>`;
   }
-  const EstadosAplicarTexto = (spec, ef) => spec.cura ? `Curación de ${spec.cura} HP` : (typeof EstadosAplicar !== 'undefined' ? EstadosAplicar.texto(spec) : spec.nombre) + (spec.nombre === 'Armadura rota' && spec.stacks > 1 ? ` ×${spec.stacks}` : '');
+  /* ¿A nombre de quién va a la Mesa la tirada de un lado del duelo? (2026-11-03: la publica la pantalla del que tira segundo; la PdG de un creep
+     salía con el nombre de la cuenta del jugador que defendía, «Jugador 1»). Un creep va como las de GM Tools (rojo); un personaje, con su nombre. */
+  const quienDeLado = l => !l || !l.nombre ? {} : l.tipo === 'creep' ? {quien: String(l.nombre), desde: 'gm'} : {quien: String(l.nombre)};
+  const EstadosAplicarTexto = (spec, ef) => spec.cura ? `Curación de ${spec.cura} HP` : (typeof EstadosAplicar !== 'undefined' ? EstadosAplicar.texto(spec) : spec.nombre + (spec.stacks > 1 ? ` ×${spec.stacks}` : ''));   // EstadosAplicar.texto ya dice «×N» (2026-11-03: salía «Armadura rota ×2 ×2»)
 
   // Paso 5 · Daño: la tirada del arma, la cuenta y, cuando el GM lo aplica, el número grande y la vida.
   function danoHtml(d){
@@ -3510,5 +3513,5 @@ const Duelo = (() => {
     }catch(e){ /* sin permiso o sin reglas nuevas: no pasa nada */ }
   }
 
-  return {pagoHab, fraseResumen, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
+  return {textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, fraseResumen, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
 })();

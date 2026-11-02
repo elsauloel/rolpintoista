@@ -99,7 +99,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261102anula5"></script>
+<script src="duelo.js?v=20261103raro"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -6486,6 +6486,14 @@ prueba('🚫 Anulación con un pergamino: las zonas e invocaciones usan el mismo
   const h = Combatiente.habDeConsumible(perg);
   const ej = Combatiente.habEjecucion(h, h.duelo, {stat: () => 3, etq: s => s});
   igual([ej.tira.min, ej.anulaValor], [11, 11]);
+});
+prueba('🛡 El efecto del duelo dice «Armadura rota ×2» una sola vez (2026-11-03: salía «×2 ×2»)', () => {
+  const txt = Duelo.textoEfecto({nombre: 'Armadura rota', stacks: 2});
+  igual([(txt.match(/×2/g) || []).length, /^Armadura rota ×2/.test(txt), (Duelo.textoEfecto({nombre: 'Veneno', stacks: 3}).match(/×3/g) || []).length], [1, true, 1]);
+});
+prueba('🎲 La tirada de un creep en el duelo va a la Mesa con su nombre y en rojo, la publique quien la publique (2026-11-03: salía «Jugador 1»)', () => {
+  igual([Duelo.quienDeLado({nombre: 'Goblin', tipo: 'creep'}), Duelo.quienDeLado({nombre: 'Rockardo', tipo: 'pj'}), Duelo.quienDeLado(null)],
+    [{quien: 'Goblin', desde: 'gm'}, {quien: 'Rockardo'}, {}]);
 });
 /* ---------- Resultado ---------- */
 Promise.all(pendientes).then(() => {

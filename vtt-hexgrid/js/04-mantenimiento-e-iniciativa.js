@@ -783,6 +783,13 @@ async function inicioTurnoAplicar(id, d, porGM){
   if(inicioAplicando.has(id) || !dt.tokenId || !dt.clave) return;
   inicioAplicando.add(id);
   try{
+    // ⏱ Solo mientras siga siendo su turno (2026-11-03: con el orden cambiado —Ordenar, ▲▼, Limpiar— el cartel viejo quedaba con su «✔ Aplicar» y le
+    // aplicaba a Rockardo el inicio de un turno que ya no era el suyo). Si ya no lo es, se cierra sin tocar nada.
+    if(!inicioTurnoVigente(dt.tokenId, dt.clave)){
+      await momentoActualizar(id, {estado: 'listo', resultado: '⏱ Ya no es su turno: el inicio no se aplicó (cambió el orden de turnos)', 'datos.noAplicado': true});
+      if(!porGM) toast('Ya no es tu turno: el inicio no se aplicó');
+      return;
+    }
     const tp = tokens.get(dt.tokenId);
     if(dt.provocado && tp) provocadoAvisados.add(`${tp.fichaId}:${Math.round(num(iniciativa.paso))}`);   // 😤 ya estaba en este reporte
     await turnoDeToken(dt.tokenId, dt.clave, true);
@@ -792,13 +799,21 @@ async function inicioTurnoAplicar(id, d, porGM){
   }catch(err){ console.error('No se pudo aplicar el inicio del turno:', err); toast('No se pudo aplicar el inicio del turno — mirá la consola'); }
   finally{ inicioAplicando.delete(id); }
 }
+/* ¿Sigue vigente el inicio de turno de este token con esta clave («mapa:paso»)? Sí, si el paso del orden es el mismo y el turno es suyo (o es de un
+   turno libre que después vuelve a él). Sin orden de turnos o sin él en el orden, sí (no hay con qué comparar). */
+function inicioTurnoVigente(tokenId, clave){
+  if(!iniciativa.orden.length || !iniciativa.orden.some(o => o.id === tokenId)) return true;
+  const c = String(clave || ''), paso = Number(c.slice(c.lastIndexOf(':') + 1));
+  if(Number.isFinite(paso) && paso !== Math.round(num(iniciativa.paso))) return false;
+  return esSuTurno(tokenId) !== false || !!(iniciativa.libre && iniciativa.libre.vuelve === tokenId);
+}
 // Al pasar el turno: si quedó sin aplicar, se aplica ahora (turnoDeToken no aplica dos veces la misma clave) y se cierra su momento.
 async function inicioTurnoForzar(tokenId, clave){
   const t = tokens.get(tokenId);
   if(!t || t.tipo === 'creep') return;
   try{
     const snap = await fbDb.collection(fbRutaCampana('momentos')).where('tipo', '==', 'inicio-turno').where('datos.clave', '==', clave).get();
-    const pend = snap.docs.find(x => x.data().estado === 'esperando');
+    const pend = snap.docs.find(x => x.data().estado === 'esperando' && (x.data().datos || {}).tokenId === tokenId);   // el suyo (2026-11-03: antes, cualquiera con esa clave)
     if(!pend) return;
     await turnoDeToken(tokenId, clave, true);
     await momentoActualizar(pend.id, {estado: 'listo', resultado: '✔ Se aplicó solo al pasar el turno (nadie lo había aplicado)'});

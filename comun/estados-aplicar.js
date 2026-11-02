@@ -105,7 +105,8 @@ const EstadosAplicar = (() => {
     if(!p) return spec;
     const s = {...spec};
     if(s.turnos === undefined && !s.stacks && Number(p.turnos) > 0) s.turnos = p.turnos;
-    if(s.permanente === undefined && p.permanente) s.permanente = true;
+    // Con turnos puestos, vence (2026-11-03: el Sangrado de 2 turnos de un golpe le llegaba al personaje como permanente).
+    if(s.permanente === undefined && p.permanente && !(Number(s.turnos) > 0)) s.permanente = true;
     if(!s.mods && Array.isArray(p.mods) && p.mods.length) s.mods = p.mods;
     if(!s.detalle && p.detalle) s.detalle = String(p.detalle).split(/\s*[⚙✋]/)[0];
     if(!s.polaridad && p.polaridad) s.polaridad = p.polaridad;

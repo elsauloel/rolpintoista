@@ -2049,6 +2049,15 @@ prueba('Miti-Miti (Tanque, 2026-10-11): la marca guarda a quién protege, en el 
   igual([c.protege, c.protegeNombre, c.turnos, c.polaridad, l.protege, f.protege, f.protegeNombre, f.turnos, hab.costo, hab.nitrosCosto, hab.duelo.objetivo, hab.duelo.alcance, /Sin auditar/.test(hab.detalle)],
     ['ficha-juan', 'juan', 1, 'buff', 'ficha-juan', 'ficha-juan', 'juan', 1, '2', 1, 'aliado', 'rango', false]);
 });
+prueba('el Sangrado de 2 turnos le llega a un personaje con sus 2 turnos, no permanente (2026-11-03, los golpes que sangran)', () => {
+  const pres = estadosPresetFicha();
+  const viaje = sp => EstadosAplicar.limpiarSpec(EstadosAplicar.conDatosDelPreset(sp));
+  const S = {efectos: [], inventario: [], hp: 20, meta: {nombre: 'x'}}, ui = {presets: pres, cambio: () => {}, toast: () => {}, recordatorios: () => {}};
+  FichaAcciones.aplicarEstadoRecibido(S, viaje({nombre: 'Sangrado', turnos: 2}), 'x', ui);
+  FichaAcciones.aplicarEstadoRecibido(S, viaje({nombre: 'Sangrado', turnos: 2}), 'x', ui);
+  const sin = FichaAcciones.estadoDeSpec(viaje({nombre: 'Sangrado'}), pres);
+  igual([viaje({nombre: 'Sangrado', turnos: 2}).permanente, S.efectos[0].turnos, S.efectos[0].permanente, S.efectos[0].stacks, sin.permanente], [undefined, 2, false, 3, true]);
+});
 prueba('la distancia ideal de un arma de rango: dónde está y qué da (2026-10-09; cerca 3–4 y lejos los 3 últimos desde 8, 2026-10-11)', () => {
   const arco = (ideal) => ({armaDeRango: true, arco: true, ideal});
   const cerca = arco({donde: 'cerca', ancho: 2, pdg: 1}), lejos = arco({donde: 'lejos', ancho: 2, crit: 1}), medio = arco({donde: 'medio', ancho: 1, critpot: 2}), fija = arco({donde: 'franja', desde: 5, hasta: 6, fijo: 2});

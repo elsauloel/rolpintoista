@@ -265,6 +265,19 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
     disparo +2 PdG, Crítico frecuente +1 y potente +1; lo pierde si le hacen daño). Consumible: Flecha perforante. Juego: apunta, dispara con todo y
     con lo que sobra el Tiro certero; si le llegan, se aleja (7 No2) y vuelve a disparar. Sin cargar hasta que el dueño diga.
 
+- **M2 · Mago de escarcha · Mago** (boceto aprobado 2026-11-03, dueño: «me cierra»; nivel 1 por definir). Estrategia: el mago de control: no
+  quema, **frena** (encierra, empuja, deja el campo congelado y Escarcha). Todo con lo que ya existe. Atributos (Esp/Con/Agi/Des/Fue → vida, con
+  el +5 de la capa): nv1 14/8/5/4/2 → 45 · nv2 15/9/5/5/2 → 50 · nv3 17/9/6/5/2 → 50 · nv4 18/10/6/6/2 → 55 · nv5 20/10/7/6/2 → 55.
+  | Nivel | Habilidad nueva | Pasiva | Equipo |
+  |---|---|---|---|
+  | 1 | **Dardo helado** · **Hálito polar** | — | Varita de la ventisca + Escudo de cuero mojado · Capa de viajero · Anillo de escarcha |
+  | 2 | **Parpadeo** (rápida, escape) | **Potencia especial** (+1 Ef.Esp) | + 2 Comunes (Polainas de cuero remendado, botas) |
+  | 3 | **Prisión de hielo** | — | la varita, de Buena calidad |
+  | 4 | **Ráfaga de viento** | **Temple mágico** (+1 Res.Esp) | + la capa de Buena |
+  | 5 | **Lluvia de escarcha** | — | + el escudo de Buena |
+  Consumible: Poción de SP menor (en modo cooldown, le baja 1 turno a una habilidad). Ojo: no hay ninguna habilidad de hielo rápida (como con el
+  Piromante): en nivel 1, dos lentas y la varita.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

@@ -873,7 +873,7 @@ Inmovilizado, Rengo, Desarmado; y, de personajes, Enyetar.
 16. **Dominar**: el GM decide su próxima acción (a mano; muy caro).
 
 **D. Daño que dura**
-17. ✅ **Veneno a distancia** — **Espina tóxica** (definida 2026-11-03, sin programar; rápida de Debuffer, dueño: «tóxico también es patrimonio del debuffer… puede ser un dardo venenoso especial, no físico»; sale del Veneno de clase): una espina de energía tóxica, PdG.Esp contra la Evasión de un rival en su Rango; si pega, **1d4 tóxico directo** (le resta la Def. especial) y **Veneno 2**. **Rápida**: 1 No2 + 1 SP, o cooldown 2.
+17. ✅ **Veneno a distancia** — **Espina tóxica** (definida 2026-11-03, sin programar; rápida de Debuffer, dueño: «tóxico también es patrimonio del debuffer… puede ser un dardo venenoso especial, no físico»; sale del Veneno de clase): una espina de energía tóxica, PdG.Esp contra la Evasión de un rival en su Rango; si pega, **1d4 tóxico directo** (daño directo: no le resta ninguna Defensa, ni la especial; dueño, 2026-11-03: «si es directo no se resta la defensa») y **Veneno 2**, que el golpeado puede tolerar con su **Res.Esp** contra el Ef.Esp del Debuffer (si la gana, no le queda el Veneno; el daño entra igual). **Rápida**: 1 No2 + 1 SP, o cooldown 2.
 18. **Plaga**: un veneno que al empezar su turno contagia al que tiene al lado.
 19. **Maldición que quema**: Quemadura que no se apaga con agua.
 

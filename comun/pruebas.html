@@ -45,7 +45,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="combatiente.js?v=20261103nit"></script>
 <script src="creep-calculo.js?v=20261103esen"></script>
 <script src="creep-botonera.js"></script>
-<script src="creep-acciones.js?v=20261103nit"></script>
+<script src="creep-acciones.js?v=20261103pocion"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
@@ -4868,6 +4868,15 @@ prueba('cinturón de un creep (2026-10-04): 5 ranuras, cargar (lleno no entra), 
   igual([!!a1.aviso, /no entraban más/.test(a2.aviso), lleno, sc.hp, sc.nitros, sc.estados.some(e => e.nombre === 'Bendición'), sc.cinturon[0].unidades, /4\/5 ranuras/.test(html), /data-cin-agregar/.test(html),
     CreepAcciones.consumiblesDe([poc, {id: 'x', nombre: 'Espada', tipoItem: 'arma_1m'}]).map(c => c.id)],
     [true, true, [5, 5, 1, true], 16, 2, true, 4, true, true, ['cat-poc']]);
+});
+prueba('cinturón de un creep (2026-11-03): la Poción de Cuero Duro y la de Piel de Cristal dejan su escudo solo físico / solo especial, como en un personaje', () => {
+  const sc = creepPrueba({nitros: 3, hp: 20, hpMax: 20});
+  const cat = n => CATALOGO_BASE.find(i => i.nombre === n);
+  CreepAcciones.alCinturon(sc, cat('Poción de Cuero Duro'), 1); CreepAcciones.alCinturon(sc, cat('Poción de Piel de Cristal'), 1);
+  CreepAcciones.consumir(sc, sc.cinturon[0].id, estadosPresetCreep(), false); CreepAcciones.consumir(sc, sc.cinturon[0].id, estadosPresetCreep(), false);
+  const cu = sc.estados.find(e => e.nombre === 'Cuero duro (poción)'), pi = sc.estados.find(e => e.nombre === 'Piel de cristal (poción)');
+  igual([cu && cu.escudoMagicoActual, !!(cu && cu.soloFisico), !!(cu && cu.soloEspecial), !!(cu && cu.seGasta), !!(cu && cu.finDia), !!(pi && pi.soloEspecial), !!(pi && pi.soloFisico)],
+    [15, true, false, true, true, true, false]);
 });
 prueba('cinturón (2026-10-05): el Portapergaminos (una ranura aparte con N pergaminos) y las ranuras exclusivas se llenan primero con lo suyo', () => {
   const perg = n => ({nombre: 'Pergamino de fuego', consumible: true, unidades: n}), poc = n => ({nombre: 'Poción de vida', consumible: true, unidades: n, curahp: 5});

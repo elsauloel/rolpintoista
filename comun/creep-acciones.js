@@ -233,6 +233,13 @@ const CreepAcciones = (() => {
       // P137: la Vida extra nuevo reemplaza al que tenía (antes se sumaba), igual que en personajes e invocaciones.
       nuevo.escudoMagico = num(h.efectoEscudo); nuevo.escudoMagicoActual = num(h.efectoEscudo);
     }
+    // 🧪 Los escudos de poción (2026-11-03, como en los personajes: ficha-habilidades.js): solo contra lo físico o lo especial, se van al
+    // gastarse, al pasar el día o al terminar el combate. Antes un creep los recibía sin esas marcas (Cuero duro paraba también la magia).
+    if(h.efectoSoloFisico) nuevo.soloFisico = true;
+    if(h.efectoSoloEspecial) nuevo.soloEspecial = true;
+    if(h.efectoSeGasta){ nuevo.seGasta = true; nuevo.sinRecarga = true; }
+    if(h.efectoFinDia) nuevo.finDia = true;
+    if(h.efectoFinCombate) nuevo.finCombate = true;
     // Ponerlo: la regla común (comun/combatiente.js, agregarEstado) — inmunidades (con la de jefe), Veneno que se acumula y,
     // si ya tiene uno igual, se renueva (P132).
     const r = Combatiente.agregarEstado(sc.estados, nuevo, sc);

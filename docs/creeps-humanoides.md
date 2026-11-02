@@ -71,6 +71,18 @@
   de hierro (Def +4, Res. crít. T6 +1, Eva −1) · Casco de cuero endurecido (Def +1, Res. crít. T4 +1); Def +5, sin Def. especial (su punto débil,
   con la Esp baja). Skills: Golpe fuerte (rápida, 1 SP, cd 2) · Romper armadura (lenta, 2 SP, cd 3). Consumible: Pergamino grupal de Furia de
   Combate (+1 Daño a él y su grupo, 3 turnos).
+  - **Atributos de nivel 1 rehechos** (dueño, 2026-11-03: «fue 9, con 7, agi 6, des 7, esp 4, para empezar»): **Fue 9 · Con 7 · Agi 6 · Des 7 ·
+    Esp 4** (vida 35). El creep cargado sigue con Con 8 · Des 6 hasta que el dueño diga «cargá».
+  - **Boceto completo, nivel 1 a 5** (2026-11-03). Atributos (Fue/Con/Agi/Des/Esp → vida): nv1 9/7/6/7/4 → 35 · nv2 10/8/7/7/4 → 40 · nv3
+    11/9/7/8/4 → 45 · nv4 12/10/8/8/4 → 50 · nv5 13/11/8/9/4 → 55.
+    | Nivel | Habilidad nueva | Pasiva | Equipo |
+    |---|---|---|---|
+    | 1 | Golpe fuerte · Romper armadura | — | Hacha, Cota de malla de hierro, Cofia |
+    | 2 | **Barrido** | **Hachazo que abre** 🆕 (+2 al daño contra quien tiene Armadura rota) | + 2 Comunes (grebas, brazales) |
+    | 3 | **Golpe demoledor** | — | el hacha, de Buena calidad |
+    | 4 | **Remate** | **Sed de batalla** 🆕 (cuando cae un rival, recupera 2 No2) | + la cota de Buena |
+    | 5 | **Partir en dos** 🆕 (con 3+ de Armadura rota, ignora toda la Defensa) | — | + la cofia de Buena |
+    Consumible: Pergamino grupal de Furia de Combate. Ojo: pega fuerte desde el nivel 1; medirlo contra un grupo real de cada nivel.
 - **L1 · Sangrador · Choque liviano · nivel 1** (aprobado 2026-11-02, cambiando las Calzas de cuero flexible por las Zapatillas de lona). Estrategia: abre heridas y las agranda; crece cuanto más dura la pelea.
   Atributos (33): Agi 10 · Des 8 · Con 6 · Fue 6 · Esp 3. Vida 30. Equipo (Común): Cuchilla del frigorífico (Tipo 6, +2 daño, Sangrado 25 %) ·
   Chaleco de cuero (Def +2) · Zapatillas de lona (Eva +1, Def. esp. +1, Ini −1). Skills: Golpe que sangra (rápida, 1 SP, cd 2) · Sal en la herida (lenta, 2 SP,
@@ -258,8 +270,11 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 > 2. **Y se define su nivel 1** (atributos, equipo, habilidades, consumible). Se pasa a la siguiente línea de la rotación (boceto + nivel 1), y así.
 > 3. Terminada la **ronda de nivel 1** de todas las líneas, se vuelve a la primera (el Escudero) y se define su **nivel 2**, repasando y ajustando el
 >    boceto sobre la marcha; después la ronda de nivel 2, la de 3…
+> **Las ideas nuevas (🆕) de los bocetos son para evaluar** (dueño, 2026-11-03: «tomo las ideas de pasivas y habilidades nuevas para evaluar, pero
+> voy a intentar diseñarlos con lo que ya está diseñado. En cada paso iré evaluando»): al definir cada nivel, primero se busca entre las habilidades
+> y pasivas que ya existen; una 🆕 se diseña solo si no hay nada que sirva.
 > Al crearlo en GM Tools se elige el nivel y aparece solo con lo de ese nivel (pendiente de programar). Las 6 líneas con el nivel 1 aprobado sin
-> boceto completo (Hachero, Maldito; el Sangrador y el Sanador, hechos el 2026-11-03; el Piromante ya tiene su escalado; el Escudero, hecho el 2026-11-03) necesitan el suyo.
+> boceto completo (Maldito; el Sangrador, el Sanador y el Hachero, hechos el 2026-11-03; el Piromante ya tiene su escalado; el Escudero, hecho el 2026-11-03) necesitan el suyo.
 
 0. **Antes**: la tanda de skills de Tanque (`diseno-roles-creep.md`).
 1. **Rotación**: un creep de un rol, después uno del siguiente: Warrior → Tanque → Híbrido → Liviano → Liviano → Rango → Mago → Support → Debuffer →

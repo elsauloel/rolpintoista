@@ -104,12 +104,24 @@ const InvCalculo = (() => {
   // o.soloEscudo: contra un disparo, solo un escudo (2026-10-09). Con un arco no se parrea.
   function defensa(inv, o){
     if(!inv) return null;
+    if(o && o.nombre){ const x = defensas(inv, o).find(d => d.nombre === o.nombre); if(x) return x; }   // 🛡 con la que eligió (2026-11-03)
     const a = armaDe(inv);
     return Combatiente.armaParaDefensa({arma: a.nombre ? {nombre: a.nombre, peso: a.peso} : null, natural: a.natural,
       arco: a.armaDeRango, soloEscudo: !!(o && o.soloEscudo),
       escudos: Combatiente.piezasParaParry(Combatiente.puestoSinArma(inv), slotDe, it => num(it.peso))});   // un báculo sí, un orbe no (2026-10-17)
   }
-  function bloqueoValor(inv){ const d = defensa(inv); return statValor(inv, 'bloqueo') + (d ? num(d.peso) : 0); }
+  // 🛡 Todo con lo que puede hacer Parry (2026-11-03, dueño: las mismas reglas para todos: con un arma o un escudo). El primero, el de siempre.
+  function defensas(inv, o){
+    if(!inv) return [];
+    const a = armaDe(inv), solo = !!(o && o.soloEscudo), lista = [];
+    if(a.nombre && !a.natural && !a.armaDeRango && !solo) lista.push({nombre: a.nombre, peso: a.peso});
+    Combatiente.piezasParaParry(Combatiente.puestoSinArma(inv), slotDe, it => num(it.peso))
+      .filter(e => e && e.nombre && !e.natural && (!solo || e.escudo !== false) && !lista.some(x => x.nombre === e.nombre)).forEach(e => lista.push(e));
+    if(!lista.length){ const d = defensa(inv, {soloEscudo: solo}); if(d) lista.push(d); }
+    // el id de la pieza (para que el duelo distinga «Parry con el arma» de «Parry con el escudo» y el Desarmar sepa qué se cae)
+    return lista.map(x => { const it = (inv.equipo || []).find(e => e && e.nombre === x.nombre && e.equipado !== false); return it && it.id ? {...x, id: it.id} : x; });
+  }
+  function bloqueoValor(inv, con){ const d = defensa(inv, con ? {nombre: con} : undefined); return statValor(inv, 'bloqueo') + (d ? num(d.peso) : 0); }
   function costoAtaque(inv){ return Combatiente.conExtenuado(inv.estados, costoAtaque0(inv)); }   // + Extenuado (2026-10-12)
   function costoAtaque0(inv){ const a = armaDe(inv); if(Combatiente.cargadaGratis(a, inv.ataquesTurno, inv.descargada)) return 0; return Math.max(0, Combatiente.costoConAhorro(Combatiente.costoAtaque(a.tipoDado, inv.ataquesTurno, a), a, inv.ataquesTurno) - Combatiente.ahorroArco(a, inv.ataquesTurno, inv.descargada, inv.ultimoPego)); }   // regla común (comun/combatiente.js)   // + Flecha en la cuerda / Encadenar (2026-10-11)
   function costoNitrosHab(inv, h){ const c = Combatiente.costoNitrosHab(h, () => costoAtaque(inv), IT2_INV.nitrosHabilidad); return String((h && h.nitrosCosto) ?? '').trim().toUpperCase() === 'ATAQUE' ? c : Combatiente.conExtenuado(inv.estados, c); }   // + Extenuado
@@ -181,7 +193,7 @@ const InvCalculo = (() => {
     return inv;
   }
 
-  return {IT2_INV, ATTR_IDS_INV, INV_STAT_EXCLUIR, INV_DERIVADOS_POR_ATTR, INV_STAT_ATTR, INV_STATS_TIRADA_IDS, INV_STATS_HAB,
+  return {defensas, IT2_INV, ATTR_IDS_INV, INV_STAT_EXCLUIR, INV_DERIVADOS_POR_ATTR, INV_STAT_ATTR, INV_STATS_TIRADA_IDS, INV_STATS_HAB,
     fuentesEquipo, modTotal, aportesMod, estadosArmadura, aporteArmadura, defensaEfectiva, critEfectivo, estadoActivo, statValor,
     nitrosMax, habAtaque, pesoArma, defensa, bloqueoValor, costoAtaque, costoNitrosHab, costoHabTxt, bloqueoHab, danoTxt, ataqueTxt, alcance,
     modsAfectanHp, actualizarHpMaxPorCon, migrar, regenPasivas};

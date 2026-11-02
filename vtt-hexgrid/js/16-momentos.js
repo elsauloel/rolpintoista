@@ -94,6 +94,7 @@ function momentoRecibido(id, d){
   if(d.tipo === 'provocado-brillo' && typeof provocadoBrilloRecibido === 'function') provocadoBrilloRecibido(d);   // 😤 (js/77)   // 😤 la bronca que estalla (js/51)
   if(d.tipo === 'fin-combate' && typeof finCombateMomento === 'function') finCombateMomento(id);   // 🏁 lo de fin de combate de cada uno (js/25)
   if(d.tipo === 'inicio-turno' && inicioTurnoMomento(id, d)) return;
+  if(d.tipo === 'malviaje' && typeof malviajeMomento === 'function' && malviajeMomento(id, d)) return;   // 🌺 la tirada del Malviaje, al afectado al centro (js/52, 2026-11-03)
   if(d.tipo === 'diablito' && typeof diablitoMomento === 'function' && diablitoMomento(id, d)) return;   // 😈 la Botella con un diablito (js/53)   // ▶ Empieza tu turno: al centro de su dueño (js/04)   // 🫳 el robo en sigilo (js/47): solo la víctima y el GM
   if(d.tipo === 'rayo' && d.datos && Array.isArray(d.datos.saltos)) rayoMomento(id, d);
   if(d.tipo === 'desarme' && d.datos && typeof desarmeRuleta === 'function') desarmeRuleta(id, d.datos);
@@ -144,7 +145,7 @@ function momentoRecibido(id, d){
   // `paraUids` (2026-10-08, el choque de un empujón): el mismo aviso al centro para varios (cada involucrado).
   const paraMi = d.datos && ((d.datos.paraUid && d.datos.paraUid === fbUsuario.uid) || (Array.isArray(d.datos.paraUids) && d.datos.paraUids.includes(fbUsuario.uid)));
   // (La tirada extra de una zona tiene su propio cartel, con el botón para tirar — js/66: el aviso genérico lo tapaba. 2026-10-22)
-  if(!chicoParaMi && paraMi && d.tipo !== 'zona-extra' && d.tipo !== 'mal-de-ojo' && (d.creadoPor !== fbUsuario.uid || d.datos.aviso)){ momentoAvisoCentro(id, d); return; }
+  if(!chicoParaMi && paraMi && d.tipo !== 'zona-extra' && d.tipo !== 'mal-de-ojo' && d.tipo !== 'malviaje' && (d.creadoPor !== fbUsuario.uid || d.datos.aviso)){ momentoAvisoCentro(id, d); return; }
   // La esquina: todo, salvo lo que esta pantalla ya sigue al centro.
   const mio = d.creadoPor === fbUsuario.uid && d.datos && d.datos.centro;
   if(d.tipo === 'oportunidad' && oporSoyDecisor(d)){ momentosFeed.delete(id); renderMomentosFeed(); return; }   // lo decide esta pantalla, al centro
@@ -155,7 +156,7 @@ function momentoRecibido(id, d){
   const ya = momentosFeed.get(id);
   // ▶ El inicio de turno sin aplicar queda (el GM tiene «Aplicar por él»); 🎲 la tirada extra de una zona, mientras espere algo (el GM tiene
   // «Tirar por él», «Que se aplique» y «Aplicar»: a los 14 s se borraba y el GM se quedaba sin el botón; 2026-10-22).
-  const largo = (d.tipo === 'inicio-turno' && d.estado === 'esperando') || (d.tipo === 'mal-de-ojo' && d.estado === 'esperando') || (d.tipo === 'zona-extra' && ['esperando', 'tirado', 'aplicar'].includes(d.estado));
+  const largo = (d.tipo === 'inicio-turno' && d.estado === 'esperando') || (d.tipo === 'malviaje' && d.estado !== 'listo') || (d.tipo === 'mal-de-ojo' && d.estado === 'esperando') || (d.tipo === 'zona-extra' && ['esperando', 'tirado', 'aplicar'].includes(d.estado));
   momentosFeed.set(id, {d, hasta: Date.now() + (largo ? 30 * 60 * 1000 : MOMENTO_DURA_MS), orden: ya ? ya.orden : ++momentosOrden});   // el más nuevo, arriba
   renderMomentosFeed();
 }

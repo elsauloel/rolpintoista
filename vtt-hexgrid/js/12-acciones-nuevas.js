@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261030lp2', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261028g', '../comun/creep-botonera.js?v=20261030cn2', '../comun/creep-acciones.js?v=20261103nit2', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261103nit'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261030lp2', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261028g', '../comun/creep-botonera.js?v=20261030cn2', '../comun/creep-acciones.js?v=20261103t2b', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261103t2b'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -149,10 +149,14 @@ async function acConsumir(sc, itemId){
   const it = (sc.cinturon || []).find(x => x.id === itemId);
   if(!it) return;
   let forzar = false;
-  if(CreepAcciones.faltanNitrosConsumir(sc)){
+  const negativo = Combatiente.defensaSinNo2(sc.nitros, CreepAcciones.costoConsumir());   // ⚖ ya en negativo: la regla, o hacerlo igual (2026-11-03)
+  if(negativo && !(await Combatiente.reglaNo2({nombre: sc.nombre, nitros: num(sc.nitros), accion: `usar ${it.nombre}`}))) return;
+  if(!negativo && CreepAcciones.faltanNitrosConsumir(sc)){
     if(!(await AvisoCombate.preguntar(`${sc.nombre} no tiene los No2 para usar ${it.nombre} (cuesta ${CreepAcciones.costoConsumir()}). ¿Usarlo igual? Gasta los que tenga.`, {icono: '⚠', titulo: 'Sin No2', si: 'Sí, usarlo'}))) return;
     forzar = true;
   }
+  const pSp = await CreepAcciones.preguntarPocionSp(sc, it);   // 💧 la poción de SP con cooldowns: a qué habilidad (2026-11-03)
+  if(pSp === null) return;
   if(it.trampaDatos){
     const glifo = it.trampaDatos.portal && it.trampaDatos.portal.colocador;   // 🌀 el Glifo de teletransporte: dos clics en el mapa (js/13)
     const t = glifo ? await (async () => { ac.host.hidden = true; const td = Combatiente.trampaDeHab({nombre: it.nombre, trampaColocar: {...it.trampaDatos, detectarMin: Combatiente.detectarMinDe(it.tier)}}, st => CreepCalculo.statValor(sc, st));
@@ -178,7 +182,7 @@ async function acConsumir(sc, itemId){
   const revive = it.revive ? await elegirCaidoParaRevivir({fichaId: ac.creepId, bando: 'creep', rango: num(it.revive.rango) || 5, pct: pctRevive, item: it.nombre}) : null;
   if(it.revive && !revive) return;
   let res = null;
-  const x = await acCambiar(c => { res = CreepAcciones.consumir(c, itemId, estadosPresetCreep(), forzar); return res; });
+  const x = await acCambiar(c => { res = CreepAcciones.consumir(c, itemId, estadosPresetCreep(), forzar, pSp); return res; });
   if(!x || !res) return;
   if(revive){
     try{ await revivirElegido(revive, pctRevive, sc.nombre); res.aviso += ` · ✚ revivió a ${revive.nombre}`; if(res.anuncio){ res.anuncio.resultado = [res.anuncio.resultado, `✚ revive a ${revive.nombre}`].filter(Boolean).join(' · '); res.anuncio.texto += ` · ✚ revive a ${revive.nombre}`; } }
@@ -249,7 +253,7 @@ function acAccionAca(b){
   }
   if(d.parrycreep){
     const id = ac.creepId;
-    acCambiar(c => CreepAcciones.pagarParry(c)).then(x => {
+    CreepAcciones.elegirParryCon(sc).then(con => con === null ? null : acCambiar(c => CreepAcciones.pagarParry(c))).then(x => {   // 🛡 con el arma o el escudo (2026-11-03)
       if(!x) return;
       if(x.deuda) Combatiente.avisarDeudaNo2(x.deuda);   // sin No2: queda en negativo (2026-10-06)
       acParry.add(id);   // si gana el Parry, sigue el Bloqueo

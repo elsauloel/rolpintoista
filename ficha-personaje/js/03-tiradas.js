@@ -124,7 +124,7 @@ let sobrepesoPendiente = null;
 function cerrarSobrepeso(){ sobrepesoPendiente = null; $('#scrim-sobrepeso').classList.remove('open'); }
 function sobrepesoElegir(pagar){
   const p = sobrepesoPendiente; if(!p) return;
-  if(pagar && !FichaAcciones.sobrepesoPagar(S, combateUi)) return;   // comun/ficha-acciones.js
+  if(pagar && !FichaAcciones.sobrepesoPagar(S, combateUi, () => sobrepesoElegir(true))) return;   // comun/ficha-acciones.js (⚖ en negativo: la regla, o hacerlo igual)
   cerrarSobrepeso();
   tirarValorStat(p.nombre, p.valor, 'eva', p.extra, pagar ? 'pagado' : 'penal', p.sobre);
 }

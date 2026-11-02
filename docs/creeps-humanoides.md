@@ -37,8 +37,10 @@
 
 - **T1 · Escudero · Tanque · nivel 1** (aprobado 2026-11-02, revisado el mismo día a fondo). Referencia: un grupo de nivel 1, no los personajes
   actuales. Estrategia: se planta adelante, provoca y aguanta; amenaza con la Demora del garrote (el que lo ignora pierde tiempo).
-  - Atributos (33): Con 11 · Fue 8 · Esp 6 · Des 5 · Agi 3. Vida 55. PdG 5 (pega de vez en cuando: dueño, «tiene que presentar algún tipo de
-    amenaza más allá de ser una bolsa de golpes»).
+  - Atributos (33): Con 11 · Fue 8 · Esp 5 · Des 4 · Agi 5. Vida 55. PdG 4 (pega de vez en cuando: dueño, «tiene que presentar algún tipo de
+    amenaza más allá de ser una bolsa de golpes»). **Ajuste del 2026-11-03, a revisar en el boceto**: Agi 3 → 5 (dueño: «sí») para que pueda
+    atacar con el garrote sin saltarse la regla (con Agi 3 tenía 3 No2 y el ataque cuesta 5); sale 1 de Des (PdG 5 → 4) y 1 de Esp (Provocar
+    tira PdG.Esp 5 en vez de 6). Antes: Con 11 · Fue 8 · Esp 6 · Des 5 · Agi 3.
   - Equipo (Común): Garrote de pastor (Tipo 10, Demora 33 %) · Escudo de caparazón de tortuga gigante (Def +1, Def. esp. +1, Bloqueo +1) ·
     Peto de hierro (Def +3) · Cofia de anillas sueltas (Def +1, Def. esp. +1, Res. crít. T4 +1). Total Def +5, Def. esp. +2 (dueño: «principalmente
     defensa física, pero algún tipo de defensa especial como plan secundario»).

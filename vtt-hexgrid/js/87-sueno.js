@@ -66,7 +66,8 @@ async function suenoSacudir(t){
     }else{
       pago = !!(await editarPersonajeMapa(x.fichaId, async S => {
         const no2 = num(S.nitros);
-        if(Combatiente.sinNo2Negativo && Combatiente.sinNo2Negativo(no2, 1)){ toast(`${quien} ${Combatiente.YA_NEGATIVO_TXT}`); return false; }   // ya en negativo: no
+        if(Combatiente.sinNo2Negativo && Combatiente.sinNo2Negativo(no2, 1) && !(Combatiente.reglaNo2 && await Combatiente.reglaNo2({nombre: quien, nitros: no2, accion: 'despertar a alguien'}))) return false;   // ya en negativo: la regla, o hacerlo igual (2026-11-03)
+        if(no2 < 0){ S.nitros = no2 - 1; return true; }   // ⚖ con la mesa: la deuda crece
         if(no2 < 1){
           const ok = await Confirmar.preguntar(`${quien} no tiene No2 para sacudirlo (cuesta 1, tiene ${fmt(no2)}). ¿Hacerlo igual? Queda en negativo.`, {titulo: '💤 Despertarlo', si: 'Hacerlo igual'});
           if(!ok) return false;

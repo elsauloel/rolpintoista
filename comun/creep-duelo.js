@@ -261,8 +261,11 @@ const CreepDuelo = (() => {
         // Parry con un arma o un escudo (regla del dueño, 2026-09-30); desde el 2026-10-21 también con un arma natural (va última).
         const disparo = Combatiente.contraDisparo(d), def = C().defensa(sc, {soloEscudo: disparo});   // contra un disparo, Parry solo con escudo
         if(Combatiente.stuneado(sc.estados)) return [{modo: 'evasion', etiqueta: '🏃 Evasión · Stun: 1', info: ['⚡ Stun: no puede hacer nada; su Evasión es 1']}];   // Stun (2026-10-06)
-        if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, escudo: def.nombre !== Combatiente.armaEnMano(sc).nombre, natural: def.nombre === Combatiente.armaEnMano(sc).nombre ? Combatiente.armaEnMano(sc).natural : !!def.natural, etiqueta: `${def.nombre === Combatiente.armaEnMano(sc).nombre ? '🗡' : '🛡'} Parry · ${def.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo: c, reglaNo2: Combatiente.defensaSinNo2(sc.nitros, c) ? {nombre: sc.nombre, nitros: num(sc.nitros), accion: 'Parry'} : null,
-          info: [`Parry 🎲 ${fx(C().statValor(sc, 'parry'), 'parry')}`, disparo ? 'si gana, el disparo queda parado (sin Bloqueo)' : `si gana, Bloqueo 🎲 ${fx(C().bloqueoValor(sc))}`, ...(c > num(sc.nitros) && num(sc.nitros) >= 0 ? ['⚠ sin No2: queda en negativo (se descuenta al recargar)'] : [])]});
+        if(def) C().defensas(sc, {soloEscudo: disparo}).forEach(x => {   // 🛡 una opción por arma y por escudo (2026-11-03: las mismas reglas que un personaje)
+          const esArma = x.nombre === Combatiente.armaEnMano(sc).nombre;
+          ops.push({modo: 'parry', itemId: x.id || x.nombre, itemNombre: x.nombre, escudo: !esArma, natural: esArma ? Combatiente.armaEnMano(sc).natural : !!x.natural, etiqueta: `${esArma ? '🗡' : '🛡'} Parry · ${x.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo: c, reglaNo2: Combatiente.defensaSinNo2(sc.nitros, c) ? {nombre: sc.nombre, nitros: num(sc.nitros), accion: 'Parry'} : null,
+            info: [`Parry 🎲 ${fx(C().statValor(sc, 'parry'), 'parry')}`, disparo ? 'si gana, el disparo queda parado (sin Bloqueo)' : `si gana, Bloqueo 🎲 ${fx(C().bloqueoValor(sc, x.nombre))}`, ...(c > num(sc.nitros) && num(sc.nitros) >= 0 ? ['⚠ sin No2: queda en negativo (se descuenta al recargar)'] : [])]});
+        });
         else if(disparo && C().defensa(sc)) ops.push(Combatiente.parryApagado({modo: 'parry', itemId: '', itemNombre: C().defensa(sc).nombre, etiqueta: `🗡 Parry · ${C().defensa(sc).nombre}`, costo: 0, info: []}, 'contra un disparo solo se parrea con escudo'));   // 🚫 (2026-10-29)
         // ⚔ Con el Contraataque (2026-10-27): si gana la Evasión o el Parry, puede contestar (el duelo pregunta «¿Contraataca?»).
         const ct = contraListo(sc);
@@ -312,7 +315,8 @@ const CreepDuelo = (() => {
       bloquear: d => {
         const sc = deLado(d.defensor);
         const firme = sc ? A().bloqueoFirmeCreep(sc) : 0;   // Bloqueo firme (2026-10-06)
-        if(sc) ui.publicar(sc, A().tirada(`${sc.nombre} · Bloqueo${firme ? ` (+${fmt(firme)} Bloqueo firme)` : ''}`, C().bloqueoValor(sc) + firme, sc, 'bloqueo'));
+        const con = d.defensa && d.defensa.itemNombre || '';   // 🛡 con lo que paró (2026-11-03)
+        if(sc) ui.publicar(sc, A().tirada(`${sc.nombre} · Bloqueo${con ? ` · ${con}` : ''}${firme ? ` (+${fmt(firme)} Bloqueo firme)` : ''}`, C().bloqueoValor(sc, con) + firme, sc, 'bloqueo'));
       },
       armaContra: d => {
         const sc = deLado(d.defensor);

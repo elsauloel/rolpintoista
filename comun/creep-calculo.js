@@ -443,10 +443,24 @@ const CreepCalculo = (() => {
   // o.soloEscudo: contra un disparo, solo un escudo (2026-10-09). Con un arco no se parrea.
   function defensa(sc, o){
     if(!sc) return null;
+    if(o && o.nombre){ const x = defensas(sc, o).find(d => d.nombre === o.nombre); if(x) return x; }   // 🛡 con la que eligió (2026-11-03)
     const a = armaDe(sc);
     return Combatiente.armaParaDefensa({arma: a.nombre ? {nombre: a.nombre, peso: a.peso} : null, natural: a.natural,
       arco: a.armaDeRango, soloEscudo: !!(o && o.soloEscudo),
       escudos: Combatiente.piezasParaParry(Combatiente.puestoSinArma(sc), slotDe, pesoPieza)});   // un báculo sí, un orbe no (2026-10-17)
+  }
+  /* 🛡 Todo con lo que puede hacer Parry (2026-11-03, dueño: «creeps, jugadores e invocaciones juegan con las mismas reglas, y pueden hacer parry con
+     armas o escudos»): su arma y su escudo (y lo otro que tenga en la mano), como un personaje elige con cuál. Lo natural, solo si no hay otra cosa.
+     → [{nombre, peso, escudo?, natural?}], el primero es el de siempre (defensa). */
+  function defensas(sc, o){
+    if(!sc) return [];
+    const a = armaDe(sc), solo = !!(o && o.soloEscudo), lista = [];
+    if(a.nombre && !a.natural && !a.armaDeRango && !solo) lista.push({nombre: a.nombre, peso: a.peso});
+    Combatiente.piezasParaParry(Combatiente.puestoSinArma(sc), slotDe, pesoPieza)
+      .filter(e => e && e.nombre && !e.natural && (!solo || e.escudo !== false) && !lista.some(x => x.nombre === e.nombre)).forEach(e => lista.push(e));
+    if(!lista.length){ const d = defensa(sc, {soloEscudo: solo}); if(d) lista.push(d); }
+    // el id de la pieza (para que el duelo distinga «Parry con el arma» de «Parry con el escudo» y el Desarmar sepa qué se cae)
+    return lista.map(x => { const it = (sc.equipo || []).find(e => e && e.nombre === x.nombre && e.equipado !== false); return it && it.id ? {...x, id: it.id} : x; });
   }
   // El peso de una pieza del equipo (2026-10-13): las equipadas antes no lo guardaban; si falta, el del catálogo con ese nombre.
   function pesoPieza(it){
@@ -454,7 +468,7 @@ const CreepCalculo = (() => {
     const c = typeof CATALOGO_BASE !== 'undefined' && it ? CATALOGO_BASE.find(x => x && x.nombre === it.nombre) : null;
     return c ? num(c.peso) : 0;
   }
-  function bloqueoValor(sc){ const d = defensa(sc); return statValor(sc, 'bloqueo') + (d ? num(d.peso) : 0); }
+  function bloqueoValor(sc, con){ const d = defensa(sc, con ? {nombre: con} : undefined); return statValor(sc, 'bloqueo') + (d ? num(d.peso) : 0); }   // `con`: el nombre de lo que paró (2026-11-03)
   // Fuerza del golpe (reglas del escudo, 2026-09-26): la tirada del atacante contra el Bloqueo del defensor = su Fuerza (con los estados activos) + el peso de su arma; la SUMA es el dado.
   function fuerzaGolpeValor(sc){ return num(sc.fue) + (sc.estados || []).filter(e => e.activo !== false).reduce((a, e) => a + (e.mods || []).filter(m => m.stat === 'fue').reduce((x, m) => x + num(m.val) * Math.max(1, num(e.stacks) || 1), 0), 0) + pesoArma(sc); }
   // Contraataque (regla a prueba, 2026-09-26): tras un Parry, siempre cuesta lo de un primer ataque y no suma al conteo de ataques del turno.
@@ -818,7 +832,7 @@ const CreepCalculo = (() => {
     return partes.length ? partes.join(' · ') : 'nada';
   }
 
-  return {migrarPielYMisiles, modoSP, spPct, spMax, spRegen, spActual, costoSpHab, especialesEnMano, especialDanoTxt, sinNadaEnMano, talisman, auraMiedo, estandartes, enLasManos, regenPasivas, masDanoElem, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
+  return {defensas, migrarPielYMisiles, modoSP, spPct, spMax, spRegen, spActual, costoSpHab, especialesEnMano, especialDanoTxt, sinNadaEnMano, talisman, auraMiedo, estandartes, enLasManos, regenPasivas, masDanoElem, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
     ARQUETIPOS, arquetiposAuto, arquetiposManual, arquetipos, arquetiposTxt, TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TIPOITEM_LABEL, STAT_LABEL, itemParaCreep, magiaDeItem, vaAlEquipo, nombreLimpio, tipoDe, oroSugerido, valorNatural,
     trofeo, despojosDePrecio, dropsResumen, dropsFijos,
     correrTiposTexto, migrarObjTipos, migrarCreepTipos, migrarObjEspecial, migrarHabPdg, migrarCreepEspecial, slotDe,

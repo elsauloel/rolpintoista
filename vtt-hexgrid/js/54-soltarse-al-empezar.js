@@ -115,14 +115,14 @@ function soltarAyudaMomento(id, d){
   });
 }
 // El aliado paga 1 No2 (puede quedar en −1, no si ya estaba en negativo) y tira su stat. → {total, nombre} o null si no pudo.
-async function zafarAyudaTirar(x, dt){
+async function zafarAyudaTirar(x, dt, permitido){   // permitido: ⚖ en negativo, la mesa dijo «hacerlo igual» (2026-11-03)
   const nombre = nombreDe(x), costo = 1;
-  let r = null, negativo = false;
+  let r = null, negativo = false, nitNeg = 0;
   try{
     if(x.tipo === 'creep'){
       const sc = (creepsPriv.get(String(x.fichaId)) || {}).sc;
       if(!sc) return null;
-      if(num(sc.nitros) < 0){ negativo = true; }
+      if(num(sc.nitros) < 0 && !permitido){ negativo = true; nitNeg = num(sc.nitros); }
       else{
         r = Combatiente.tirarStat(CreepCalculo.statValor(sc, dt.stat) + Math.max(0, num(CreepCalculo.modTotal(sc, 'soltarse'))), sc.estados, dt.stat);
         await modificarCreep(String(x.fichaId), c => { c.nitros = num(c.nitros) - costo; return {}; });
@@ -132,7 +132,7 @@ async function zafarAyudaTirar(x, dt){
       await editarPersonajeMapa(fichaId, S => {
         const inv = invId ? (S.invocaciones || []).find(i => i && i.id === invId) : null;
         if(invId && !inv) return false;
-        if(num(inv ? inv.nitros : S.nitros) < 0){ negativo = true; return false; }
+        if(num(inv ? inv.nitros : S.nitros) < 0 && !permitido){ negativo = true; nitNeg = num(inv ? inv.nitros : S.nitros); return false; }
         const valor = inv ? InvCalculo.statValor(inv, dt.stat) + Math.max(0, num(InvCalculo.modTotal(inv, 'soltarse')))
           : num(FichaCalculo.calcular(S).final[dt.stat]) + Math.max(0, num(FichaCalculo.calcular(S).final.soltarse));
         r = Combatiente.tirarStat(valor, inv ? inv.estados : S.efectos, dt.stat);
@@ -141,7 +141,10 @@ async function zafarAyudaTirar(x, dt){
       });
     }
   }catch(err){ console.error('Ayudar a zafar:', err); }
-  if(negativo){ toast(`${nombre} ya está en No2 negativos: no puede ayudar`); return null; }
+  if(negativo){   // ⚖ ya en negativo: la regla dice que no; la mesa puede decir «hacerlo igual» (2026-11-03)
+    if(typeof Combatiente !== 'undefined' && Combatiente.reglaNo2 && await Combatiente.reglaNo2({nombre, nitros: nitNeg, accion: 'ayudar a soltarse'})) return zafarAyudaTirar(x, dt, true);
+    return null;
+  }
   if(!r) return null;
   mesaPublicar(`${nombre} · Ayuda a ${dt.nombre} a zafarse · ${dt.etq}`, {...r, quien: nombre, ...(x.tipo === 'creep' ? {desde: 'gm'} : {ficha: x.fichaId})});
   return {total: num(r.total), nombre};

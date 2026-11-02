@@ -45,7 +45,7 @@ const InvAcciones = (() => {
       aviso = `${inv.nombre}: Parry ${gratis ? 'gratis (Parada fácil)' : `−${fmt(costo)} No2`} · quedan ${fmt(inv.nitros)}`;
     }
     const firme = statId === 'bloqueo' ? Combatiente.bloqueoFirme(st => I().modTotal(inv, st), num(inv.golpeTurno)) : 0;   // Bloqueo firme (2026-10-06)
-    const valor = statId === 'bloqueo' ? I().bloqueoValor(inv) + firme : I().statValor(inv, statId);
+    const valor = statId === 'bloqueo' ? I().bloqueoValor(inv, o && o.con) + firme : I().statValor(inv, statId);   // (o.con: con lo que paró, 2026-11-03)
     return {tirada: tirada(inv, etq(statId) + (firme ? ` (+${fmt(firme)} Bloqueo firme)` : ''), valor, statId), parry, aviso, cambio};
   }
   // El daño de su arma; mods: lo que suma un ataque con arreglos (dados y fijo). Los efectos al golpear los publica cada pantalla.

@@ -160,6 +160,13 @@ const Intercambio = (() => {
   /* 💸 No2 negativos (dueño, 2026-11-01: «si ya tenés nitros negativos, ahí no podés hacer ninguna acción que te siga restando»): con No2 en negativo,
      nada que cueste No2 —tampoco el «¿Hacerlo igual?»—. `negativo(S, costo)` → el aviso si se bloquea, o ''. */
   const negativo = (S, costo) => costo > 0 && num(S && S.nitros) < 0 ? `${nombreDe(S)} ${typeof Combatiente !== 'undefined' && Combatiente.YA_NEGATIVO_TXT ? Combatiente.YA_NEGATIVO_TXT : 'está en No2 negativos: no puede gastar más No2 hasta recargar'}` : '';
+  /* ⚖ (2026-11-03, dueño: «la regla se tiene que poder omitir»): en negativo, el cartel de la regla con «Respetar la regla» / «Hacerlo igual (discutilo
+     con la mesa)» (la línea roja va a la Mesa). → true si sigue (no estaba en negativo, o la mesa dijo que sí). */
+  async function reglaNeg(S, costo, accion){
+    if(!negativo(S, costo)) return true;
+    if(typeof Combatiente === 'undefined' || !Combatiente.reglaNo2){ if(host) host.toast(negativo(S, costo)); return false; }
+    return Combatiente.reglaNo2({nombre: nombreDe(S), nitros: num(S.nitros), accion});
+  }
   const sinCorreaTxt = it => FichaEquipo.esEscudo && FichaEquipo.esEscudo(it) ? 'no te queda una correa libre (un escudo va en la correa de la mochila, no en la vaina del cinturón)' : 'no te queda una vaina ni una correa libre';
   // 😵 El caído (dueño, 2026-11-01: «el caído no puede tomar la acción de dar o pedir… igual sí tiene que poder, pero te tiene que advertir: estás
   // inconsciente»): puede, con el cartel; sigue sin pagar No2.
@@ -173,8 +180,8 @@ const Intercambio = (() => {
   // Paga `costo` No2: si no alcanzan, pregunta (se puede igual, con la línea roja de la Mesa). → false si no quiso.
   // La pregunta es el cartel del juego (no el confirm() nativo), así que es async; cobrarNitros es el cobro solo, sin preguntar.
   async function pagarNitros(S, costo, hizo, sinPreguntar){
-    const neg = negativo(S, costo); if(neg){ if(host) host.toast(neg); return false; }   // ya en negativo: no (2026-11-01)
-    if(costo > 0 && num(S.nitros) < costo && !sinPreguntar && !(await preguntarNitros(S, costo))) return false;
+    if(!(await reglaNeg(S, costo, 'pasar algo'))) return false;   // ya en negativo: la regla, o hacerlo igual (2026-11-03)
+    if(costo > 0 && num(S.nitros) >= 0 && num(S.nitros) < costo && !sinPreguntar && !(await preguntarNitros(S, costo))) return false;
     cobrarNitros(S, costo, hizo);
     return true;
   }
@@ -182,6 +189,7 @@ const Intercambio = (() => {
   function cobrarNitros(S, costo, hizo){
     if(!(costo > 0)) return;
     if(typeof FichaAcciones !== 'undefined' && FichaAcciones.tormentaPj) FichaAcciones.tormentaPj(S, costo, 'pasar algo');   // ⛈ Atormentado
+    if(num(S.nitros) < 0){ S.nitros = num(S.nitros) - costo; return; }   // ⚖ ya en negativo y la mesa dijo que sí: la deuda crece (2026-11-03)
     if(num(S.nitros) < costo){
       const pagado = typeof FichaAcciones !== 'undefined' && FichaAcciones.gastoNitrosForzado ? FichaAcciones.gastoNitrosForzado(S, costo, hizo) : num(S.nitros);
       S.nitros = Math.max(0, num(S.nitros) - pagado);
@@ -210,8 +218,8 @@ const Intercambio = (() => {
       if(json.length > 200000) return 'El ítem es demasiado grande para mandarlo';
       const combate = !!(host && host.enCombate());
       const costo = combate ? costoEntrega(S, origenDe(f.key, f.it)) : 0;   // 💸 se cobra cuando lo acepte (reconciliar), no ahora
-      const neg = negativo(S, costo); if(neg) return neg;   // ya en negativo: no (2026-11-01)
-      if(costo > 0 && num(S.nitros) < costo && !(await Confirmar.preguntar(`Cuando lo acepte vas a pagar ${fmt(costo)} No2 y tenés ${fmt(num(S.nitros))}. ¿Ofrecérselo igual?`, {titulo: 'Sin No2', si: 'Ofrecer igual'}))) return 'cancelado';
+      if(!(await reglaNeg(S, costo, 'dar un ítem'))) return 'cancelado';   // ya en negativo: la regla, o hacerlo igual (2026-11-03)
+      if(costo > 0 && num(S.nitros) >= 0 && num(S.nitros) < costo && !(await Confirmar.preguntar(`Cuando lo acepte vas a pagar ${fmt(costo)} No2 y tenés ${fmt(num(S.nitros))}. ¿Ofrecérselo igual?`, {titulo: 'Sin No2', si: 'Ofrecer igual'}))) return 'cancelado';
       await ref.set({...base, tipo: 'item', nombre: String(f.it.nombre || '').slice(0, 80), json, cantidad: f.it.consumible ? k : 1, despojoNombre: origenDe(f.key, f.it)});   // despojoNombre: de dónde sale (cinturon | correa | inventario)
       const parte = separar(S, f, k);
       parte.reservado = ref.id; parte.reservadoPara = base.paraNombre;
@@ -270,8 +278,8 @@ const Intercambio = (() => {
         if(!['mano', 'equipar'].includes(destino) && !entraEnMochila(S, it)){ host.toast(`Mochila llena: ${p.nombre} no entra. Hacé lugar y aceptalo de nuevo.`); return false; }
       }
       const costo = combate ? costoRecibe(S, destino) : 0;   // 💸 lo suyo, al aceptar (2026-11-01)
-      { const neg = negativo(S, costo); if(neg){ host.toast(neg); return false; } }   // ya en negativo: no (2026-11-01)
-      if(costo > 0 && num(S.nitros) < costo && !(await preguntarNitros(S, costo))) return false;
+      if(!(await reglaNeg(S, costo, 'recibir un ítem'))) return false;   // ya en negativo: la regla, o hacerlo igual (2026-11-03)
+      if(costo > 0 && num(S.nitros) >= 0 && num(S.nitros) < costo && !(await preguntarNitros(S, costo))) return false;
       const ref = col('paquetes').doc(p.id);
       let ok = false;
       try{
@@ -427,8 +435,8 @@ const Intercambio = (() => {
     }
     const n = despojosDeItem(it0, k);
     if(!(await Confirmar.preguntar(`¿Convertir ${it0.nombre}${k > 1 ? ' ×' + fmt(k) : ''} en ${fmt(n)} despojos?${host.enCombate() ? ` En combate cuesta ${fmt(COSTO_DESPOJOS)} No2.` : ''} No se puede deshacer.`, {titulo: 'Convertir en despojos', icono: '♻', si: 'Convertir', peligro: true}))) return;
-    if(host.enCombate()){ const neg = negativo(S0, COSTO_DESPOJOS); if(neg){ host.toast(neg); return; } }   // ya en negativo: no (2026-11-01)
-    if(host.enCombate() && num(S0.nitros) < COSTO_DESPOJOS && !(await preguntarNitros(S0, COSTO_DESPOJOS))) return;   // sin No2: avisa y deja seguir (antes adentro de aDespojos)
+    if(host.enCombate() && !(await reglaNeg(S0, COSTO_DESPOJOS, 'hacer despojos'))) return;   // ya en negativo: la regla, o hacerlo igual (2026-11-03)
+    if(host.enCombate() && num(S0.nitros) >= 0 && num(S0.nitros) < COSTO_DESPOJOS && !(await preguntarNitros(S0, COSTO_DESPOJOS))) return;   // sin No2: avisa y deja seguir (antes adentro de aDespojos)
     let res = null;
     await hacer(fichaId, async S => { res = aDespojos(S, itemId, k); return !res.error; });
     if(res && res.error){ if(res.error !== 'cancelado') host.toast(res.error); return; }
@@ -444,8 +452,8 @@ const Intercambio = (() => {
      pedirAlforja: quien saca deja el pedido. pedidos(fichaId): la pantalla del dueño de la alforja lo entrega sola (saca la unidad y la manda en
      el json) o lo rechaza; la de quien lo pidió lo recibe, paga y lo anuncia. */
   async function pedirAlforja(S, miFicha, aliado, it){
-    { const neg = negativo(S, COSTO_ALFORJA); if(neg) return neg; }   // ya en negativo: no (2026-11-01)
-    if(num(S.nitros) < COSTO_ALFORJA && !(await preguntarNitros(S, COSTO_ALFORJA))) return 'cancelado';
+    if(!(await reglaNeg(S, COSTO_ALFORJA, 'sacar de la alforja'))) return 'cancelado';   // ya en negativo: la regla, o hacerlo igual (2026-11-03)
+    if(num(S.nitros) >= 0 && num(S.nitros) < COSTO_ALFORJA && !(await preguntarNitros(S, COSTO_ALFORJA))) return 'cancelado';
     await col('paquetes').add({tipo: 'pedido', nombre: String(it.nombre || '').slice(0, 80), json: '', itemId: it.id, cantidad: 1, despojo: '', despojoNombre: '',
       deFicha: aliado.id, deNombre: String(aliado.nombre || '').slice(0, 60), paraFicha: miFicha, paraNombre: nombreDe(S), creadoPor: fbUsuario.uid,
       uids: [...new Set([fbUsuario.uid, aliado.duenoUid || '', (fichas.find(f => f.id === miFicha) || {}).duenoUid || ''].filter(Boolean))],
@@ -527,8 +535,8 @@ const Intercambio = (() => {
     destino = ['mano', 'correa', 'equipar'].includes(destino) ? destino : 'mochila';
     if(!(await avisoInconsciente(S))) return 'cancelado';
     const costo = combate ? costoRecibe(S, destino) : 0;   // lo paga al recibirlo; acá solo avisa si no le van a alcanzar
-    { const neg = negativo(S, costo); if(neg) return neg; }   // ya en negativo: no (2026-11-01)
-    if(costo > 0 && num(S.nitros) < costo && !(await Confirmar.preguntar(`Cuando te lo dé vas a pagar ${fmt(costo)} No2 y tenés ${fmt(num(S.nitros))}. ¿Pedírselo igual?`, {titulo: 'Sin No2', si: 'Pedir igual'}))) return 'cancelado';
+    if(!(await reglaNeg(S, costo, 'pedir un ítem'))) return 'cancelado';   // ya en negativo: la regla, o hacerlo igual (2026-11-03)
+    if(costo > 0 && num(S.nitros) >= 0 && num(S.nitros) < costo && !(await Confirmar.preguntar(`Cuando te lo dé vas a pagar ${fmt(costo)} No2 y tenés ${fmt(num(S.nitros))}. ¿Pedírselo igual?`, {titulo: 'Sin No2', si: 'Pedir igual'}))) return 'cancelado';
     await col('paquetes').add({tipo: 'pedido', nombre: String(it.nombre || '').slice(0, 80), json: '', itemId: it.id, cantidad: 1, despojo: 'mano', despojoNombre: (['cinturon', 'correa'].includes(key) ? key : 'inventario') + '>' + destino,
       deFicha: aliado.id, deNombre: String(aliado.nombre || '').slice(0, 60), paraFicha: miFicha, paraNombre: nombreDe(S), creadoPor: fbUsuario.uid,
       uids: [...new Set([fbUsuario.uid, aliado.duenoUid || '', (fichas.find(f => f.id === miFicha) || {}).duenoUid || ''].filter(Boolean))],
@@ -545,8 +553,8 @@ const Intercambio = (() => {
       if(!(await avisoInconsciente(S))) return false;
       const origenP = origenDe(f.key, f.it);
       const costo = combate ? costoEntrega(S, origenP) : 0;   // 💸 lo suyo, al aceptar (2026-11-01)
-      { const neg = negativo(S, costo); if(neg){ host.toast(neg); return false; } }   // ya en negativo: no (2026-11-01)
-      if(costo > 0 && num(S.nitros) < costo && !(await preguntarNitros(S, costo))) return false;
+      if(!(await reglaNeg(S, costo, 'dar un ítem'))) return false;   // ya en negativo: la regla, o hacerlo igual (2026-11-03)
+      if(costo > 0 && num(S.nitros) >= 0 && num(S.nitros) < costo && !(await preguntarNitros(S, costo))) return false;
       const k = f.it.consumible ? 1 : undefined;
       const json = JSON.stringify(copia(f.it, k));
       if(json.length > 200000){ host.toast('El ítem es demasiado grande para mandarlo'); return false; }

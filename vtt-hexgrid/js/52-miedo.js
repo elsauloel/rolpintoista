@@ -195,29 +195,104 @@ function malviajePasoPrevio(t, e){
   const dif = malviajeDifDe(e);
   return {titulo: '🌺 Estás malviajando', texto: `Ves a todos como enemigos, aliados y rivales por igual. Al aplicar, tirás tu Res.Mt contra ${dif ? `el Ef.Esp de quien te lo puso (${fmt(dif)})` : 'el Ef.Esp de quien te lo puso (no se sabe: lo elige el GM, o ' + MALVIAJE_DIF_DEFECTO + ')'}: si ganás, este turno jugás normal (con el −2); si perdés, 1d6: 1–3 escapás, 4–6 atacás al más cercano.`};
 }
-// → {titulo, texto, resumen} o null (no está malviajando).
-async function malviajeInicioTirar(t, porGM, e){
+
+/* 🌺 El Malviaje al empezar el turno, presentado a los involucrados (dueño, 2026-11-03: «esta tirada debe presentarse a los involucrados. "fulano
+   está malviajando, tirá para bla bla bla", o "estás malviajando, tirá para resolver", apretar dado, tirar a mano… después se muestra la
+   resolución»). Un momento `malviaje` con fases: 'resm' (Res.Mt contra el Ef.Esp) → si no resiste, 'd6' (1–3 escapa, 4–6 ataca al más cercano)
+   → 'listo'. Al afectado (su dueño, o quien tiene 🎮 su control), al centro: «🎲 Tirar» o «✍ Tirar a mano». A los demás, un cartel abajo («Fulano
+   está malviajando…»; el GM puede tirar por él). La resolución, a todos. Las tiradas, a la Mesa (con los dados 3D). Lo que hace después (moverse
+   o atacar) lo ejecuta el jugador a mano. */
+async function malviajeAbrir(t, porGM, e, tokenId){
   e = e || malviajeEstadoDe(t);
-  if(!e) return null;
+  if(!e || !t) return null;
   let dif = malviajeDifDe(e), nota = '';
   if(!dif && porGM && typeof Confirmar !== 'undefined' && Confirmar.texto){
-    const v = await Confirmar.texto(`${nombreDe(t)} está malviajando: ¿contra qué Ef.Esp tira su Res.Mt? (el de quien le puso el Malviaje)`, {titulo: '🌺 Malviaje', icono: '🌺', valor: String(MALVIAJE_DIF_DEFECTO), si: 'Tirar'});
+    const v = await Confirmar.texto(`${nombreDe(t)} está malviajando: ¿contra qué Ef.Esp tira su Res.Mt? (el de quien le puso el Malviaje)`, {titulo: '🌺 Malviaje', icono: '🌺', valor: String(MALVIAJE_DIF_DEFECTO), si: 'Listo'});
     dif = Math.round(num(v));
   }
-  if(!dif){ dif = MALVIAJE_DIF_DEFECTO; nota = ' (no se sabía el Ef.Esp: se usó ' + MALVIAJE_DIF_DEFECTO + ')'; }
-  const quien = nombreDe(t), creep = t.tipo === 'creep';
-  const pub = async (origen, r) => { try{ await mesaPublicar(origen, {formula: r.formula, rolls: r.rolls, mod: r.mod, total: r.total, quien, ...(creep ? {desde: 'gm'} : {})}); }catch(err){} };
-  const f = formulaParaValor(trampaValorStat(t, 'resm'));
-  const r = f ? tirarDados(f.formula) : {formula: '0', rolls: [], mod: 0, total: 0};
-  await pub(`Res.Mt contra el Malviaje (Ef.Esp ${fmt(dif)})`, r);
-  if(num(r.total) >= dif){
-    const texto = `Res.Mt ${fmt(r.total)} contra ${fmt(dif)}${nota}: resistió. Este turno jugás normal (con el −2 del Malviaje contra cualquiera).`;
-    return {titulo: '🌺 Malviaje: resististe', texto, resumen: `🌺 resistió el Malviaje (${fmt(r.total)} contra ${fmt(dif)}): juega normal`};
+  if(!dif){ dif = MALVIAJE_DIF_DEFECTO; nota = ` (no se sabía el Ef.Esp: vale ${MALVIAJE_DIF_DEFECTO})`; }
+  const [fichaId] = String(t.fichaId || '').split(SEP_INVOCACION);
+  const f = fichasPub.get(fichaId);
+  const paraUid = (f && f.resumen && f.resumen.control) || t.duenoUid || (f && f.duenoUid) || '';
+  const quien = nombreDe(t);
+  await momentoAbrir({tipo: 'malviaje', icono: '🌺', titulo: `${quien} está malviajando`, estado: 'esperando',
+    resultado: `Tira su Res.Mt contra ${fmt(dif)}${nota} para resistir: si gana, juega normal (con el −2); si no, 1d6: 1–3 escapa, 4–6 ataca al más cercano.`,
+    datos: {tokenId: tokenId || t.id || '', quien, paraUid, dif, nota, fase: 'resm', oculto: !!(t.oculto || (typeof enSigilo === 'function' && enSigilo(t)))}});
+  return {titulo: '🌺 Malviajando', texto: `Ves a todos como enemigos. Ahora tirás tu Res.Mt contra ${fmt(dif)}${nota}, en tu cartel.`, resumen: '🌺 malviajando: tira para resolver'};
+}
+const malviajeVistos = new Set();
+function malviajeTextos(dt){
+  const quien = dt.quien || 'Alguien';
+  if(dt.fase === 'd6') return {
+    mio: `No resististe (Res.Mt ${fmt(num(dt.resm))} contra ${fmt(num(dt.dif))}). Tirá 1d6: 1–3 escapás (usá tu movimiento para alejarte de todos), 4–6 atacás al más cercano, aliado o rival.`,
+    otro: `${quien} no resistió (Res.Mt ${fmt(num(dt.resm))} contra ${fmt(num(dt.dif))}): tira 1d6. 1–3 escapa, 4–6 ataca al más cercano, aliado o rival.`};
+  return {
+    mio: `Ves a todos como enemigos, aliados y rivales por igual. Tirá tu Resistencia mental contra ${fmt(num(dt.dif))}${dt.nota || ''} para resolver: si ganás, este turno jugás normal (con el −2); si perdés, tirás 1d6 para ver si escapás o atacás.`,
+    otro: `${quien} ve a todos como enemigos. Tira su Resistencia mental contra ${fmt(num(dt.dif))}${dt.nota || ''} para resistir: si gana, juega normal (con el −2); si no, 1d6: escapa o ataca al más cercano.`};
+}
+function malviajeVeredicto(dt){
+  if(dt.resistio) return {tono: 'bueno', grande: '🌺 RESISTIÓ', chico: `Res.Mt ${fmt(num(dt.resm))} contra ${fmt(num(dt.dif))}: este turno juega normal (con el −2).`};
+  return {tono: 'malo', grande: dt.escapa ? '🌺 ESCAPA' : '🌺 ATACA AL MÁS CERCANO', chico: `Res.Mt ${fmt(num(dt.resm))} contra ${fmt(num(dt.dif))} · 1d6 = ${fmt(num(dt.d6))}: ${dt.escapa ? 'usa su movimiento para alejarse de todos' : 'ataca al más cercano, aliado o rival'}. ✋ Se hace a mano.`};
+}
+// Lo que llega del momento (js/16): al afectado, al centro; a los demás, un cartel abajo. → true si esta pantalla lo mostró al centro.
+function malviajeMomento(id, d){
+  const dt = d.datos || {};
+  const ms = d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now();
+  if(!fbUsuario || Date.now() - ms > 15 * 60 * 1000) return false;   // uno viejo, al abrir el mapa, no
+  const mio = dt.paraUid === fbUsuario.uid, clave = 'malviaje:' + id;
+  if(d.estado !== 'listo') malviajeVistos.add(id);
+  else if(!malviajeVistos.has(id)) return false;   // la resolución, solo a quien vio la tirada
+  if(mio){
+    if(d.estado === 'esperando'){
+      AvisoCombate.mostrar({clave, icono: '🌺', titulo: dt.fase === 'd6' ? 'Malviajando: ¿escapás o atacás?' : 'Estás malviajando', soloBoton: true, texto: malviajeTextos(dt).mio,
+        botones: [{texto: dt.fase === 'd6' ? '🎲 Tirar 1d6' : '🎲 Tirar Res.Mt', id: 'malviaje-tirar', alClic: () => { const b = document.getElementById('malviaje-tirar'); if(b) b.disabled = true; malviajeTirar(id, d, false, false); }},
+          {texto: '✍ Tirar a mano', sec: true, alClic: () => malviajeTirar(id, d, true, false)}]});
+    }else if(d.estado === 'listo') AvisoCombate.mostrar({clave, icono: '🌺', titulo: 'Malviajando', texto: d.resultado || '', soloBoton: true, veredicto: malviajeVeredicto(dt),
+      botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cerrar()}]});
+    return true;
   }
-  const d = tirarDados('1d6');
-  await pub('Malviaje: ¿escapa o ataca? (1–3 escapa, 4–6 ataca)', d);
-  const escapa = num(d.total) <= 3;
-  const que = escapa ? 'escapá: usá tu movimiento para alejarte de todos' : 'atacá al más cercano, aliado o rival';
-  const texto = `Res.Mt ${fmt(r.total)} contra ${fmt(dif)}${nota}: no resistió. 1d6 = ${fmt(d.total)} → ${que}. ✋ Lo hacés vos, a mano (el mapa no te mueve ni ataca solo).`;
-  return {titulo: `🌺 Malviaje: ${escapa ? 'escapás' : 'atacás al más cercano'}`, texto, resumen: `🌺 no resistió el Malviaje: ${escapa ? 'escapa (se aleja de todos)' : 'ataca al más cercano'}`};
+  if(dt.oculto && !soyGM) return false;
+  if(d.estado === 'esperando'){
+    AvisoCombate.cartel(clave, {icono: '🌺', titulo: `${dt.quien || 'Alguien'} está malviajando`, texto: malviajeTextos(dt).otro, posicion: 'abajo',
+      botones: soyGM ? [{texto: dt.fase === 'd6' ? '🎲 Tirar 1d6 por él' : '🎲 Tirar por él', alClic: () => malviajeTirar(id, d, false, true)}, {texto: '✍ A mano', sec: true, alClic: () => malviajeTirar(id, d, true, true)}, {texto: 'Ocultar', sec: true, alClic: () => AvisoCombate.cartel(clave, null)}]
+        : [{texto: 'Ocultar', sec: true, alClic: () => AvisoCombate.cartel(clave, null)}]});
+  }else if(d.estado === 'listo'){
+    AvisoCombate.cartel(clave, {icono: '🌺', titulo: d.titulo || 'Malviaje', texto: d.resultado || '', posicion: 'abajo', veredicto: malviajeVeredicto(dt),
+      botones: [{texto: 'Entendido', alClic: () => AvisoCombate.cartel(clave, null)}]});
+  }
+  return false;
+}
+// La tirada (su pantalla, o el GM por él): se toma con una transacción, para que no se tire dos veces. `aMano`: se escribe el número.
+async function malviajeTirar(id, d, aMano, porGM){
+  const dt = d.datos || {}, fase = dt.fase || 'resm';
+  let valor = null;
+  if(aMano){
+    const v = await Confirmar.texto(fase === 'd6' ? 'Escribí lo que salió en el 1d6 (1 a 6).' : `Escribí el total de la Resistencia mental (contra ${fmt(num(dt.dif))}).`, {titulo: '✍ Tirar a mano', icono: '🌺', valor: '', si: 'Listo'});
+    if(v === null || String(v).trim() === '') return;
+    valor = Math.round(num(v));
+    if(fase === 'd6' && (valor < 1 || valor > 6)){ toast('El 1d6 va de 1 a 6'); return; }
+  }
+  const ref = coleccionMomentos().doc(id);
+  let tomo = false;
+  try{ await fbDb.runTransaction(async tx => { const x = await tx.get(ref); if(x.exists && x.data().estado === 'esperando' && ((x.data().datos || {}).fase || 'resm') === fase){ tx.update(ref, {estado: 'tirando'}); tomo = true; } }); }
+  catch(err){ console.error('Malviaje: no se pudo tomar la tirada', err); }
+  if(!tomo){ toast('Esa tirada ya se hizo'); return; }
+  const t = tokens.get(dt.tokenId), quien = dt.quien || (t ? nombreDe(t) : '');
+  let r;
+  if(valor !== null) r = {formula: `${valor} (a mano)`, rolls: [], mod: valor, total: valor};
+  else if(fase === 'd6') r = tirarDados('1d6');
+  else{ const f = t ? formulaParaValor(trampaValorStat(t, 'resm')) : null; r = f ? tirarDados(f.formula) : {formula: '0', rolls: [], mod: 0, total: 0}; }
+  const por = porGM ? ' (lo tiró el GM)' : valor !== null ? ' (a mano)' : '';
+  try{ await mesaPublicar(fase === 'd6' ? `Malviaje: ¿escapa o ataca? (1–3 escapa, 4–6 ataca)${por}` : `Res.Mt contra el Malviaje (Ef.Esp ${fmt(num(dt.dif))})${por}`,
+    {formula: r.formula, rolls: r.rolls, mod: r.mod, total: r.total, quien}); }catch(err){}
+  if(fase === 'resm'){
+    if(num(r.total) >= num(dt.dif)) await momentoActualizar(id, {estado: 'listo', titulo: `${quien}: resistió el Malviaje`, 'datos.fase': 'listo', 'datos.resm': num(r.total), 'datos.resistio': true,
+      resultado: `🌺 Res.Mt ${fmt(num(r.total))} contra ${fmt(num(dt.dif))}${dt.nota || ''}: resistió. Este turno juega normal (con el −2 del Malviaje contra cualquiera).`});
+    else await momentoActualizar(id, {estado: 'esperando', titulo: `${quien} no resistió el Malviaje: tira 1d6`, 'datos.fase': 'd6', 'datos.resm': num(r.total),
+      resultado: `🌺 Res.Mt ${fmt(num(r.total))} contra ${fmt(num(dt.dif))}: no resistió. Ahora 1d6: 1–3 escapa, 4–6 ataca al más cercano.`});
+    return;
+  }
+  const escapa = num(r.total) <= 3;
+  await momentoActualizar(id, {estado: 'listo', titulo: `${quien}: ${escapa ? 'escapa' : 'ataca al más cercano'} (Malviaje)`, 'datos.fase': 'listo', 'datos.d6': num(r.total), 'datos.escapa': escapa,
+    resultado: `🌺 No resistió (Res.Mt ${fmt(num(dt.resm))} contra ${fmt(num(dt.dif))}). 1d6 = ${fmt(num(r.total))} → ${escapa ? 'escapa: usa su movimiento para alejarse de todos' : 'ataca al más cercano, aliado o rival'}. ✋ Lo hace el jugador, a mano.`});
 }

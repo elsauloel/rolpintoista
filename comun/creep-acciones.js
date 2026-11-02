@@ -35,17 +35,28 @@ const CreepAcciones = (() => {
     return tirada(`${sc.nombre} · ${d.label}`, C().statValor(sc, statId), sc, statId);
   }
   const esquivar = sc => tirada(`${sc.nombre} · Esquivar`, C().statValor(sc, 'eva'), sc, 'eva');
-  const parry = sc => tirada(`${sc.nombre} · Parry`, C().statValor(sc, 'parry'), sc, 'parry');
+  /* 🛡 Con qué para (2026-11-03, dueño: Parry con un arma o un escudo, como un personaje): con más de una, se elige (la pieza común Confirmar);
+     queda anotado para el Bloqueo que sigue. → el nombre, '' (no hay nada) o null (canceló). */
+  const PARRY_CON = new Map();
+  async function elegirParryCon(sc){
+    const lista = C().defensas(sc);
+    if(lista.length <= 1 || typeof Confirmar === 'undefined'){ const n = lista[0] ? lista[0].nombre : ''; PARRY_CON.set(sc.id, n); return n; }
+    const v = await Confirmar.elegir(`¿Con qué hace Parry ${sc.nombre}?`, {titulo: 'Parry', icono: '🛡',
+      opciones: lista.map(x => ({texto: `${x.escudo ? '🛡' : '🗡'} ${x.nombre}`, detalle: `si gana, Bloqueo con su peso (${fmt(num(x.peso))})`, valor: x.nombre}))});
+    if(v !== null) PARRY_CON.set(sc.id, v);
+    return v;
+  }
+  const parry = sc => { const con = PARRY_CON.get(sc.id) || ''; return tirada(`${sc.nombre} · Parry${con ? ` · ${con}` : ''}`, C().statValor(sc, 'parry'), sc, 'parry'); };
   const fuerzaGolpe = sc => tirada(`${sc.nombre} · Fuerza del golpe`, C().fuerzaGolpeValor(sc));
   // El Bloqueo solo después de un Parry (regla del dueño, 2026-09-30), con el arma o el escudo con que para.
   // Bloqueo firme (escudos de Buena calidad, 2026-10-06): +N contra el primer golpe que recibe en el turno (la marca `_golpe` la pone el daño).
   const bloqueoFirmeCreep = sc => Combatiente.bloqueoFirme(st => C().modTotal(sc, st), num((sc.usosEspecial || {})._golpe));
   function bloqueo(sc, parryPendiente){
-    const def = C().defensa(sc);
+    const con = PARRY_CON.get(sc.id) || '', def = C().defensa(sc, con ? {nombre: con} : undefined);   // 🛡 con lo que paró (2026-11-03)
     if(!def) return {error: `${sc.nombre}: ${Combatiente.SIN_ARMA_DEFENSA}`};
     if(!parryPendiente) return {error: `${sc.nombre}: ${Combatiente.BLOQUEO_SOLO_TRAS_PARRY}`};
     const firme = bloqueoFirmeCreep(sc);
-    return tirada(`${sc.nombre} · Bloqueo · ${def.nombre}${firme ? ` (+${fmt(firme)} Bloqueo firme)` : ''}`, C().bloqueoValor(sc) + firme, sc, 'bloqueo');
+    return tirada(`${sc.nombre} · Bloqueo · ${def.nombre}${firme ? ` (+${fmt(firme)} Bloqueo firme)` : ''}`, C().bloqueoValor(sc, def.nombre) + firme, sc, 'bloqueo');
   }
   // El daño de su arma (los efectos al golpear los publica cada pantalla después, con comun/efectos-golpe.js).
   function dano(sc){
@@ -292,8 +303,30 @@ const CreepAcciones = (() => {
   const consumiblesDe = cat => (cat || []).filter(it => it && it.tipoItem === 'consumibles' && !it.trofeo && !it.archivo)
     .map(it => ({id: it.id, nombre: it.nombre, tier: it.tier || ''})).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
   function faltanNitrosConsumir(sc){ return num(sc.nitros) < Combatiente.conExtenuado(sc.estados, costoConsumir()); }
+  /* 💧 Una poción de SP en un creep (2026-11-03, dueño: «los creeps también tienen el modo SP… cuando juegan con CD, sí, que le bajen 1 turno»): en modo
+     SP le devuelve SP como a un personaje; con cooldowns, le baja 1 turno de espera a una habilidad. → null (no es de SP) | {modo: 'sp'} |
+     {modo: 'cd', enEspera: [{i, nombre, cd}]} (i: el lugar de la habilidad en sc.habilidades). */
+  function spDeConsumible(sc, it){
+    if(!(num(it && it.curaspPct) > 0)) return null;
+    if(C().modoSP(sc)) return {modo: 'sp'};
+    return {modo: 'cd', enEspera: (sc.habilidades || []).map((h, i) => ({i, nombre: h && h.nombre || 'Habilidad', cd: num(h && h.cdActual)})).filter(x => x.cd > 0)};
+  }
+  /* La pregunta antes de gastarla (con la pieza común Confirmar): sin nada en espera, «¿usarla igual?»; con varias, cuál. → {habCd} | {} | null (no la usa). */
+  async function preguntarPocionSp(sc, it){
+    const p = spDeConsumible(sc, it);
+    if(!p || p.modo !== 'cd') return {};
+    const C2 = typeof Confirmar !== 'undefined' ? Confirmar : null;
+    if(!p.enEspera.length){
+      if(!C2) return {};
+      return (await C2.preguntar(`${sc.nombre} juega con cooldowns: ${it.nombre} le baja 1 turno de espera a una habilidad, pero no tiene nada en espera. ¿Usarla igual?`, {titulo: 'No tiene nada en espera', icono: '⏳', si: 'Usarla igual', no: 'No usarla'})) ? {} : null;
+    }
+    if(p.enEspera.length === 1 || !C2) return {habCd: p.enEspera[0].i};
+    const v = await C2.elegir(`${it.nombre}: ¿a qué habilidad de ${sc.nombre} le baja 1 turno de espera?`, {titulo: 'Bajar 1 turno de espera', icono: '⏳',
+      opciones: p.enEspera.map(x => ({texto: x.nombre, detalle: `en espera ${fmt(x.cd)} turno${x.cd === 1 ? '' : 's'} → ${fmt(x.cd - 1)}`, valor: String(x.i)}))});
+    return v === null ? null : {habCd: Number(v)};
+  }
   // Usar un consumible del cinturón: → {error} | {aviso, tiradas: [{origen, r}], trampa} (trampa: el ítem, para que la pantalla la coloque).
-  function consumir(sc, id, presets, forzar){
+  function consumir(sc, id, presets, forzar, o){
     const it = (sc.cinturon || []).find(x => x.id === id);
     if(!it || num(it.unidades) <= 0) return {error: 'Ese consumible ya no está'};
     // Saque rápido (2026-10-05): el primero del turno puede no costar (la chance se tira a la vista: va en las tiradas).
@@ -307,9 +340,10 @@ const CreepAcciones = (() => {
       saque = {sale, txt};
       if(sale) costo = 0;
     }
-    if(Combatiente.defensaSinNo2(sc.nitros, costo)) return {error: `${sc.nombre} ${Combatiente.YA_NEGATIVO_TXT}`};   // ya en negativo (2026-11-01)
-    if(costo > num(sc.nitros) && !forzar) return {error: `${sc.nombre}: no le alcanzan los No2 — usar ${it.nombre} cuesta ${fmt(costo)}`};
-    const pagado = Math.min(costo, Math.max(0, num(sc.nitros)));
+    if(Combatiente.defensaSinNo2(sc.nitros, costo)) return Combatiente.errorNo2(sc.nombre, sc.nitros, `usar ${it.nombre}`);   // ya en negativo (2026-11-01) · ⚖ la regla, o hacerlo igual (2026-11-03)
+    const deuda = costo > 0 && num(sc.nitros) < 0;   // ⚖ en negativo con el permiso de la mesa: paga y la deuda crece
+    if(costo > num(sc.nitros) && !forzar && !deuda) return {error: `${sc.nombre}: no le alcanzan los No2 — usar ${it.nombre} cuesta ${fmt(costo)}`};
+    const pagado = deuda ? costo : Math.min(costo, Math.max(0, num(sc.nitros)));
     sc.nitros = num(sc.nitros) - pagado;
     Combatiente.aplicarTormenta(sc, sc.estados, costo, {motivo: `usar ${it.nombre}`});
     const cargaMax = Math.max(1, num(it.cargaMax) || 1);
@@ -327,6 +361,21 @@ const CreepAcciones = (() => {
       sc.hp = Math.max(0, Math.min(tope, antes + entra));   // 🌑 con una herida que no deja curarse, la cura no entra
       partes.push(num(it.curahp) > 0 && !entra ? `❌ ${antes > 0 ? 'no se cura (Herida sombría o Sanguijuela)' : 'está caído: una cura no lo levanta'}` : `${num(it.curahp) >= 0 ? '+' : ''}${fmt(num(it.curahp) + boticario)} HP`);
     }
+    let spTxt = '';   // 💧 la poción de SP (2026-11-03)
+    const spc = spDeConsumible(sc, it);
+    if(spc && spc.modo === 'sp'){
+      const mx = C().spMax(sc), antes = C().spActual(sc);
+      sc.sp = Math.min(mx, antes + Math.ceil(mx * Math.min(100, num(it.curaspPct)) / 100));
+      partes.push(`+${fmt(sc.sp - antes)} SP`);
+    } else if(spc){
+      const elegida = o && o.habCd !== undefined ? spc.enEspera.find(x => x.i === Number(o.habCd)) : spc.enEspera[0];
+      if(elegida){
+        const h = sc.habilidades[elegida.i];
+        h.cdActual = Math.max(0, num(h.cdActual) - 1);
+        spTxt = `⏳ ${elegida.nombre}: espera ${fmt(elegida.cd)} → ${fmt(h.cdActual)}`;
+      } else spTxt = '⏳ no tenía nada en espera';
+      partes.push(spTxt);
+    }
     const ef = efectoDeHab(sc, it, presets);
     if(ef.estado){ if(C().modsAfectanHp(ef.estado.mods)) C().actualizarHpMaxPorCon(sc); partes.push(`${ef.estado.nombre}${ef.estado.permanente ? '' : ` (${fmt(ef.estado.turnos)} turnos)`}`); }
     if(ef.aviso) partes.push(ef.aviso);
@@ -341,7 +390,7 @@ const CreepAcciones = (() => {
     if(formula){ const r = tirarDados(formula); if(r) tiradas.push({origen: `${sc.nombre} · ${it.nombre}`, r}); }
     partes.push(`−${fmt(pagado)} No2${pagado < costo ? ' (no le alcanzaban)' : saque && saque.sale ? ' (Saque rápido)' : ''}`);
     // El anuncio para la Mesa y la Crónica: sin la vida del creep (es privada), con el estado que le dejó y el Saque rápido.
-    const publico = [ef.estado ? ef.estado.nombre : '', curados && curados.sacados.length ? `🩹 se le fue ${curados.sacados.join(', ')}` : '', saque ? saque.txt : ''].filter(Boolean).join(' · ');
+    const publico = [ef.estado ? ef.estado.nombre : '', spTxt, curados && curados.sacados.length ? `🩹 se le fue ${curados.sacados.join(', ')}` : '', saque ? saque.txt : ''].filter(Boolean).join(' · ');
     const anuncio = {titulo: `${sc.nombre} usó ${it.nombre}`, resultado: publico, texto: `🧪 ${sc.nombre} usó ${it.nombre}${publico ? ': ' + publico : ''}`, item: it.nombre, saqueSalio: !!(saque && saque.sale)};
     return {aviso: `${sc.nombre} usó ${it.nombre}: ${partes.join(' · ')}`, anuncio, tiradas: tiradas.filter(t => t && !t.error), forzado: pagado < costo ? {costo, tenia: pagado} : null,
       trampa: it.trampaDatos ? structuredClone(it) : null};
@@ -719,7 +768,7 @@ const CreepAcciones = (() => {
     if(h && num(p.cd) >= 0 && num(h.cdActual) !== num(p.cd)){ h.cdActual = num(p.cd); hechos.push('el cooldown'); }
     return hechos.join(', ');
   }
-  return {elegirVariante, conVariante, varianteTxt, devolverHab, confirmarSP,fenixCreep, bloqueoFirmeCreep, ESPERA_POR_SP, especialesCreep, costoEspecialCreep, habDeEspecialCreep, usarEspecialCreep, habEspecialParaTerminar, mantenimiento, inicioTurno, finTurno, reclamarMantenimiento, alCinturon, quitarDelCinturon, consumir, faltanNitrosConsumir, costoConsumir, colocarTrampaDeItem, consumiblesDe,
+  return {elegirVariante, conVariante, varianteTxt, devolverHab, confirmarSP,fenixCreep, bloqueoFirmeCreep, ESPERA_POR_SP, especialesCreep, costoEspecialCreep, habDeEspecialCreep, usarEspecialCreep, habEspecialParaTerminar, mantenimiento, inicioTurno, finTurno, reclamarMantenimiento, elegirParryCon, alCinturon, quitarDelCinturon, consumir, spDeConsumible, preguntarPocionSp, faltanNitrosConsumir, costoConsumir, colocarTrampaDeItem, consumiblesDe,
     tirada, usaUnaTirada, gastarUnaTirada, tiradaStat, esquivar, parry, fuerzaGolpe, bloqueo, dano, levantarse, tiradaSoltarse, aplicarSoltarse, pagarParry, pagarAtaque, tiradaAtaque, NOMBRE_ESPECIAL,
     costoAtaqueDe, devolverAtaque, faltanNitros, preguntaSinNitros, alertaSinNitros,
     FLAGS_ESTADO, habEtq, habEjecucion, ataqueDeHab, habTira, efectoDeHab, sobreSi, confirmarSilencio, preguntaVida, ejecutarHab, terminarHab, tiradaPrimeraHab, tiradaSegundaHab,

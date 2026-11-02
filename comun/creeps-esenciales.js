@@ -68,7 +68,7 @@
 
   // ---- Nivel 1 (aprobados por el dueño el 2026-11-02; detalle y porqués en docs/creeps-humanoides.md) ----
   // Atributos en el orden Con · Fue · Agi · Des · Esp (suman 33).
-  esencial({linea: 'T1', nombre: 'Escudero', rol: 'tanque', rolTxt: 'tanque', nivel: 1, atrib: [11, 8, 3, 5, 6],
+  esencial({linea: 'T1', nombre: 'Escudero', rol: 'tanque', rolTxt: 'tanque', nivel: 1, atrib: [11, 8, 5, 4, 5],
     equipo: ['Garrote de pastor', 'Escudo de caparazón de tortuga gigante', 'Peto de hierro', 'Cofia de anillas sueltas'],
     habilidades: ['Provocar', 'Piel de hierro'], consumibles: ['Poción de Cuero Duro', 'Poción de Piel de Cristal'],
     estrategia: 'Tanque. Se planta adelante, provoca al que más pega y aguanta; el garrote demora al que lo ignora.'});

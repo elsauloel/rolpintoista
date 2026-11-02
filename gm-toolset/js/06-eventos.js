@@ -218,12 +218,16 @@ document.addEventListener('click', async e => {
     if(it.duelo){ toast(`${it.nombre} se usa desde el mapa (⚔ Acciones del creep): ahí elegís a quién`); return; }   // 📜 un consumible con Ejecución (2026-10-20)
     (async () => {
       let forzar = false;
-      if(CreepAcciones.faltanNitrosConsumir(sc)){
+      const negativo = Combatiente.defensaSinNo2(sc.nitros, CreepAcciones.costoConsumir());   // ⚖ ya en negativo: la regla, o hacerlo igual (2026-11-03)
+      if(negativo && !(await Combatiente.reglaNo2({nombre: sc.nombre, nitros: num(sc.nitros), accion: `usar ${it.nombre}`}))) return;
+      if(!negativo && CreepAcciones.faltanNitrosConsumir(sc)){
         if(!(await Confirmar.preguntar(`${sc.nombre} no tiene los No2 para usar ${it.nombre} (cuesta ${CreepAcciones.costoConsumir()}). ¿Usarlo igual? Gasta los que tenga.`, {titulo: 'Sin No2', icono: '⚡', si: 'Usarlo igual'}))) return;
         forzar = true;
       }
+      const pSp = await CreepAcciones.preguntarPocionSp(sc, it);   // 💧 la poción de SP con cooldowns (2026-11-03)
+      if(pSp === null) return;
       if(it.trampaDatos){ const t = await CreepAcciones.colocarTrampaDeItem(sc.id, it, sc); toast(t.aviso); if(!t.ok) return; }
-      const res = CreepAcciones.consumir(sc, itemId, ESTADOS_PRESET_GM, forzar);
+      const res = CreepAcciones.consumir(sc, itemId, ESTADOS_PRESET_GM, forzar, pSp);
       if(res.error){ toast(res.error); return; }
       (res.tiradas || []).forEach(t => publicarTiradaCreep(t));
       if(res.anuncio) mesaLinea(res.anuncio.texto);   // el anuncio en la Mesa (la Crónica es del mapa)
@@ -281,8 +285,12 @@ document.addEventListener('click', async e => {
   if(b.dataset.parrycreep){
     const sc = S.creeps.find(s=>s.id===b.dataset.parrycreep);
     if(!sc) return;
+    if(!b.dataset.parryElegido){   // 🛡 con el arma o el escudo (2026-11-03): primero con qué, después el mismo clic
+      CreepAcciones.elegirParryCon(sc).then(con => { if(con === null) return; b.dataset.parryElegido = '1'; b.click(); delete b.dataset.parryElegido; });
+      return;
+    }
     const x = CreepAcciones.pagarParry(sc);   // comun/creep-acciones.js
-    if(x.error){ if(!Combatiente.errorReglaNo2(x, () => b.click())) toast(x.error); return; }   // ⚖ en negativo: la regla, o hacerlo igual (otro clic, con permiso)
+    if(x.error){ if(!Combatiente.errorReglaNo2(x, () => { b.dataset.parryElegido = '1'; b.click(); delete b.dataset.parryElegido; })) toast(x.error); return; }   // ⚖ en negativo: la regla, o hacerlo igual (otro clic, con permiso)
     if(x.deuda) Combatiente.avisarDeudaNo2(x.deuda);   // sin No2: queda en negativo (2026-10-06)
     parryPendienteCreep.add(sc.id);   // si gana el Parry, sigue el Bloqueo
     renderAll();

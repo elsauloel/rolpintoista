@@ -43,9 +43,9 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
 <script src="combatiente.js?v=20261103nit"></script>
-<script src="creep-calculo.js?v=20261103esen"></script>
+<script src="creep-calculo.js?v=20261103t2b"></script>
 <script src="creep-botonera.js"></script>
-<script src="creep-acciones.js?v=20261103nit2"></script>
+<script src="creep-acciones.js?v=20261103t2b"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
@@ -112,7 +112,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="skills-clase.js?v=20261102anula4"></script>
 <script src="creeps-base.js"></script>
 <script src="skills-creep-base.js?v=20261103esen"></script>
-<script src="creeps-esenciales.js?v=20261103esen"></script>
+<script src="creeps-esenciales.js?v=20261103t2b"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
 <script>
@@ -6545,6 +6545,33 @@ prueba('🎲 La tirada de un personaje ajeno en el duelo no lleva la cuenta de q
     igual([Duelo.quienDeLado({nombre: 'Prueba Uno', tipo: 'pj', uid: 'otro'}), Duelo.quienDeLado({nombre: 'Mía', tipo: 'pj', uid: 'yo'})],
       [{quien: 'Prueba Uno', jugador: 'Prueba Uno'}, {quien: 'Mía'}]);
   }finally{ window.fbUsuario = guardado; }
+});
+prueba('🛡 Un creep hace Parry con su arma o con su escudo, y el Bloqueo usa el peso de lo que paró (2026-11-03: las mismas reglas que un personaje)', () => {
+  const sc = structuredClone(CREEPS_BASE.find(c => c.pool === 'esencial' && c.nombre === 'Escudero').datos);
+  sc.id = 'esc-prueba';   // (sin normalizar: acá normalizar pasa los campos arma* de prueba al equipo)
+  const lista = CreepCalculo.defensas(sc), soloEsc = CreepCalculo.defensas(sc, {soloEscudo: true});
+  const b0 = CreepCalculo.statValor(sc, 'bloqueo');
+  const hk = CreepDuelo.hooks({creep: () => sc, cambiar: async () => null, publicar: () => {}, toast: () => {}, confirmar: () => true, soy: () => true, borrarParry: () => {}});
+  const ops = hk.opcionesDefensa({defensor: {ref: sc.id, tipo: 'creep'}, atacante: {}, ataque: {tipo: 'normal'}}).filter(o => o.modo === 'parry');
+  igual([lista.map(x => x.nombre).join(), soloEsc.map(x => x.nombre).join(), CreepCalculo.bloqueoValor(sc, 'Escudo de caparazón de tortuga gigante') - b0,
+    ops.map(o => o.itemNombre + ':' + o.escudo).join(), sc.agl, sc.des, sc.esp],
+    ['Garrote de pastor,Escudo de caparazón de tortuga gigante', 'Escudo de caparazón de tortuga gigante', 2,
+      'Garrote de pastor:false,Escudo de caparazón de tortuga gigante:true', 5, 4, 5]);
+});
+prueba('💧 Poción de SP en un creep (2026-11-03): en modo SP devuelve SP; con cooldowns baja 1 turno a la habilidad elegida, o avisa que no hay nada en espera', () => {
+  const pot = CATALOGO_BASE.find(i => i.nombre === 'Poción de SP menor');
+  const nuevo = () => { const sc = structuredClone(CREEPS_BASE.find(c => c.pool === 'esencial' && c.nombre === 'Piromante').datos); sc.id = 'pir'; sc.nitros = 5;
+    sc.cinturon = [{...structuredClone(pot), id: 'p1', unidades: 3, cargaActual: 1}]; return sc; };
+  const a = nuevo(); a.habilidades[0].cdActual = 4; a.habilidades[1].cdActual = 2;
+  const ra = CreepAcciones.consumir(a, 'p1', estadosPresetCreep(), false, {habCd: 1});
+  const b = nuevo(); b.habilidades.forEach(h => h.cdActual = 0);
+  const rb = CreepAcciones.consumir(b, 'p1', estadosPresetCreep(), false, {});
+  const c = nuevo(); c.modoSP = true; c.sp = 0;
+  const rc = CreepAcciones.consumir(c, 'p1', estadosPresetCreep(), false, {});
+  const max = CreepCalculo.spMax(c);
+  igual([a.habilidades.map(h => h.cdActual).join(), /Muro de fuego: espera 2 → 1/.test(ra.aviso), CreepAcciones.spDeConsumible(b, pot).enEspera.length, /no tenía nada en espera/.test(rb.aviso),
+    c.sp, /\+\d+ SP/.test(rc.aviso), CreepAcciones.spDeConsumible(a, CATALOGO_BASE.find(i => i.nombre === 'Poción de Cuero Duro'))],
+    ['4,1', true, 0, true, Math.ceil(max / 3), true, null]);
 });
 /* ---------- Resultado ---------- */
 Promise.all(pendientes).then(() => {

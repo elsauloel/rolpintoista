@@ -795,9 +795,9 @@ async function inicioTurnoAplicar(id, d, porGM){
     }
     const tp = tokens.get(dt.tokenId);
     if(dt.provocado && tp) provocadoAvisados.add(`${tp.fichaId}:${Math.round(num(iniciativa.paso))}`);   // 😤 ya estaba en este reporte
-    let mv = null;   // 🌺 malviajando: la tirada del inicio (js/52), antes de aplicar (el estado todavía está, aunque se termine este turno)
-    try{ mv = tp && dt.malviaje && typeof malviajeInicioTirar === 'function' ? await malviajeInicioTirar(tp, porGM, dt.malviaje) : null; }catch(err){ console.error('El Malviaje:', err); }
     await turnoDeToken(dt.tokenId, dt.clave, true);
+    let mv = null;   // 🌺 malviajando (js/52, 2026-11-03): la tirada se presenta en su propio cartel, a él y a los demás (con el estado de antes de aplicar)
+    try{ mv = tp && dt.malviaje && typeof malviajeAbrir === 'function' ? await malviajeAbrir(tp, porGM, dt.malviaje, dt.tokenId) : null; }catch(err){ console.error('El Malviaje:', err); }
     if(dt.provocaDe && tp && typeof provocadoBrilloPedir === 'function') provocadoBrilloPedir(dt.provocaDe, dt.provocaDeNombre, nombreDe(tp));
     const pasos = [...(dt.pasos || []).filter(x => !/^🌺 Estás malviajando/.test(x.titulo || '')), ...(mv ? [{titulo: mv.titulo, texto: mv.texto}] : []),
       {titulo: '✔ Aplicado', texto: `Ya se aplicó${porGM ? ' (lo aplicó el GM)' : ''}: los estados, la regeneración, la vida y los No2 quedaron como dice arriba.`}];

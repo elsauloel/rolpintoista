@@ -227,8 +227,8 @@ const InvDuelo = (() => {
         const disparo = Combatiente.contraDisparo(d), def = I().defensa(inv, {soloEscudo: disparo});   // contra un disparo, Parry solo con escudo
         if(Combatiente.stuneado(inv.estados)) return [{modo: 'evasion', etiqueta: '🏃 Evasión · Stun: 1', info: ['⚡ Stun: no puede hacer nada; su Evasión es 1']}];   // Stun (2026-10-06)
         if(!def && disparo && I().defensa(inv)) ops.push(Combatiente.parryApagado({modo: 'parry', itemId: '', itemNombre: I().defensa(inv).nombre, etiqueta: `🗡 Parry · ${I().defensa(inv).nombre}`, costo: 0, info: []}, 'contra un disparo solo se parrea con escudo'));   // 🚫 (2026-10-29)
-        if(def) ops.push({modo: 'parry', itemId: '', itemNombre: def.nombre, escudo: def.nombre !== Combatiente.armaEnMano(inv).nombre, natural: def.nombre === Combatiente.armaEnMano(inv).nombre ? Combatiente.armaEnMano(inv).natural : !!def.natural, etiqueta: `${def.nombre === Combatiente.armaEnMano(inv).nombre ? '🗡' : '🛡'} Parry · ${def.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo: c, reglaNo2: Combatiente.defensaSinNo2(inv.nitros, c) ? {nombre: inv.nombre, nitros: num(inv.nitros), accion: 'Parry'} : null,
-          info: [`Parry 🎲 ${fx(I().statValor(inv, 'parry'), 'parry', inv.estados)}`, disparo ? 'si gana, el disparo queda parado (sin Bloqueo)' : `si ganás, Bloqueo 🎲 ${fx(I().bloqueoValor(inv))}`, ...(c > num(inv.nitros) && num(inv.nitros) >= 0 ? ['⚠ sin No2: queda en negativo (se descuenta al recargar)'] : [])]});
+        if(def) I().defensas(inv, {soloEscudo: disparo}).forEach(def => ops.push({modo: 'parry', itemId: def.id || def.nombre, itemNombre: def.nombre, escudo: def.nombre !== Combatiente.armaEnMano(inv).nombre, natural: def.nombre === Combatiente.armaEnMano(inv).nombre ? Combatiente.armaEnMano(inv).natural : !!def.natural, etiqueta: `${def.nombre === Combatiente.armaEnMano(inv).nombre ? '🗡' : '🛡'} Parry · ${def.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo: c, reglaNo2: Combatiente.defensaSinNo2(inv.nitros, c) ? {nombre: inv.nombre, nitros: num(inv.nitros), accion: 'Parry'} : null,
+          info: [`Parry 🎲 ${fx(I().statValor(inv, 'parry'), 'parry', inv.estados)}`, disparo ? 'si gana, el disparo queda parado (sin Bloqueo)' : `si ganás, Bloqueo 🎲 ${fx(I().bloqueoValor(inv, def.nombre))}`, ...(c > num(inv.nitros) && num(inv.nitros) >= 0 ? ['⚠ sin No2: queda en negativo (se descuenta al recargar)'] : [])]}));   // 🛡 una por arma y por escudo (2026-11-03)
         return Combatiente.sinReaccionesNo2(ops, inv.estados);   // Expuesto (Degollar): sin Parry
       },
       defender: (d, modo) => {
@@ -245,7 +245,7 @@ const InvDuelo = (() => {
       // El Bloqueo con lo que hizo Parry (el duelo ya sabe que lo ganó).
       bloquear: d => {
         const inv = ui.inv(d.defensor);
-        if(inv) tirarStat(inv, 'bloqueo', {trasParry: true});
+        if(inv) tirarStat(inv, 'bloqueo', {trasParry: true, con: d.defensa && d.defensa.itemNombre || ''});   // 🛡 con lo que paró (2026-11-03)
       },
       armaContra: d => {
         const inv = ui.inv(d.defensor);

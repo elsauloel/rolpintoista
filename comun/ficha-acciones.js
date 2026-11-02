@@ -505,9 +505,15 @@ const FichaAcciones = (() => {
     return true;
   }
   // El cartel de sobrepeso, "Pagar 1 No2": devuelve false si no alcanzan (y no cierra el cartel).
-  function sobrepesoPagar(S, ui){
+  // `reintentar` (2026-11-03): ya en negativo, el cartel de la regla; con «Hacerlo igual», lo llama de nuevo (paga y la deuda crece).
+  function sobrepesoPagar(S, ui, reintentar){
     const pago = Combatiente.conExtenuado(S.efectos, 1);   // + Extenuado
-    if(Combatiente.defensaSinNo2(S.nitros, pago)){ ui.toast(`${((S.meta && S.meta.nombre) || 'Tu personaje').trim()} ${Combatiente.YA_NEGATIVO_TXT}`); return false; }   // ya en negativo (2026-10-23)
+    if(Combatiente.defensaSinNo2(S.nitros, pago)){   // ya en negativo (2026-10-23) · ⚖ la regla, o hacerlo igual (2026-11-03)
+      const nombre = ((S.meta && S.meta.nombre) || 'Tu personaje').trim();
+      if(typeof reintentar === 'function') Combatiente.reglaNo2({nombre, nitros: num(S.nitros), accion: 'la Evasión pagando el sobrepeso'}, reintentar);
+      else ui.toast(`${nombre} ${Combatiente.YA_NEGATIVO_TXT}`);
+      return false;
+    }
     S.nitros = num(S.nitros) - pago;   // una defensa: sin No2 queda en negativo, se descuenta en la próxima recarga (2026-10-06)
     tormentaPj(S, pago, 'esquivar con sobrepeso', ui);
     ui.cambio(['nitros', 'refresh']);

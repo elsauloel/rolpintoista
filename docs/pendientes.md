@@ -879,6 +879,11 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] **Manual** (`manual-usuario/notas`): grupos y tokens automáticos, botín, Despojar, Finalizar combate en el mapa, trampas automáticas, estados sobre otros, protección de jefe, botón 🎭 y grupos ↔ mapas, y una nota de casteo cuando estén las reglas.
 
 ## 4. Diseño pendiente
+- [ ] **🏹🛡 Equipo con ventaja contra proyectiles (dueño, 2026-11-02, diseñando el Piromante):** no hay piezas Comunes ni Buenas que den Evasión
+  contra disparos o Defensa contra proyectiles (el stat `evadisparo` existe, solo lo usa lo que vuela). Crear algunas (torso, capa, escudo liviano…),
+  pensadas sobre todo para casters y livianos.
+- [ ] **🔥 Talismán Común que potencie el fuego (dueño, 2026-11-02, Piromante):** hoy no hay ninguno (solo resistencias: Piedra de brasa; en Buena,
+  el Orbe del foco da PdG.Esp). Crear uno (p. ej. «+2 al daño de fuego» o «el fuego deja Quemadura más larga») y uno por elemento si tiene sentido.
 - [x] **📋 Pegar las reglas de Firestore (2026-11-01; pegadas por el dueño el 2026-11-02 — probado: un jugador recortó con el Pergamino de anulación una luz ajena del GM):** `firebase/firestore.rules` con el 💨 viento que recorta nubes y la 🚫 Anulación (recortar o borrar entera una zona ajena con creador o una luz: `esZonaMagica`/`esNube`, update y delete; 2026-11-02) (`esNube`, commit 6575a0d9) y 🚫 la Anulación que recorta zonas mágicas ajenas (`esZonaMagica`). Sin pegarlas, un jugador que despeja la nube de otro ve «a mano (faltan pegar las reglas)»; el GM ya puede.
 - [x] **😱💤 Sumar Pánico y Sueño a cosas que los den (dueño, 2026-11-01: «sumar algunos ítems o circunstancias que den pánico y que den sueño, que duerman»).** Hoy no los da
   nada (solo el selector de estados). Candidatos: el Grito de pánico (hoy da Miedo) → Pánico; algo que duerma (una flecha, un polvo, una habilidad de creep).

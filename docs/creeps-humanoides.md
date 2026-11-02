@@ -59,6 +59,9 @@
   Def. esp. +1, Res. crít. T4 +1, Vida +5) · Gorro de piel de salamandra (Def. esp. +1, Res. fuego +1, Res.Mt +1): Def +1 secundaria (dueño: «algo
   de defensa física, aunque sea secundaria»). Skills: Lengua de fuego (lenta; 2 No2 + SP = su Especial; cooldown 4, por programar: «costo alto ⇒
   cooldown alto») · Muro de fuego (lenta, 1 No2 + 3 SP, cd 3). Consumible: Poción de SP menor.
+- **Piromante: se queda con el nombre y solo fuego** (dueño, 2026-11-02, «sostengámoslo así»). Escalado propuesto: nv1 Lengua de fuego + Muro de
+  fuego · nv2 + Toque abrasador (+ pasiva de fuego) · nv3 + Bola de fuego · nv4 + Zona en llamas (+ 2.ª pasiva) · nv5 + Meteoro. Los otros
+  elementos van con los otros magos (Escarcha, Rayo, Arcano).
 - **Por programar (decidido 2026-11-02)**: **Piel de hierro escala con el nivel: +(3 + nivel)** a la Defensa y a la Def. especial (nivel 1: +4,
   nivel 3: +6 como hoy, nivel 5: +8); sigue +1 Res. a crítico y 2 turnos. Hoy es +6 fijo (de la tanda del 2026-10-27).
 - **T2 · Muralla con púas · Tanque · nivel 1** (aprobado 2026-11-02): Con 13 · Fue 8 · Esp 6 · Agi 3 · Des 3 (33), vida 65. Hacha con garfio

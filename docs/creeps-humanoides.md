@@ -277,6 +277,15 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 5 | **Lluvia de escarcha** | — | + el escudo de Buena |
   Consumible: Poción de SP menor (en modo cooldown, le baja 1 turno a una habilidad). Ojo: no hay ninguna habilidad de hielo rápida (como con el
   Piromante): en nivel 1, dos lentas y la varita.
+  - **Nivel 1 aprobado** (dueño, 2026-11-03: «le bajaría 2 de especial y le subiría 2 de destreza… si no tiene muy poco rango y queda muy vulnerable;
+    después, con los niveles, le vamos subiendo más el especial»): **Esp 12 · Con 8 · Agi 5 · Des 6 · Fue 2** (33), vida 45 (con la capa), 5 No2.
+    Equipo (las manos + 2 Comunes): **Varita de la ventisca** (flor 2d4 de hielo directo con dodge roll; suelo congelado 1 turno: Agilidad contra su
+    Ef.Esp o Sentado; charco vulnerable al rayo; 1 No2 + 4 SP o 5 No2) · **Escudo de cuero mojado** (Def +2, Res. hielo +1) · **Capa de viajero**
+    (Def.Esp +1, Res.Esp +1, Res. hielo +1, Vida +5) · **Anillo de escarcha** (+2 al daño de hielo): Defensa 2, Def.Esp 1. Skills: **Dardo helado**
+    (lenta, cd 4: 2d6 + ¼ Ef.Esp de hielo +2, Escarcha 1 y una más cada 5) · **Hálito polar** (lenta, cd 3: cono de 16, 2d4 + ¼ Ef.Esp +2 y
+    Escarcha). Consumible: Poción de SP menor. Sin cargar hasta que el dueño diga.
+  - **Atributos del boceto, rehechos** (Esp/Con/Agi/Des/Fue → vida, con la capa): nv1 12/8/5/6/2 → 45 · nv2 14/9/5/6/2 → 50 · nv3 16/9/6/6/2 → 50 ·
+    nv4 17/10/6/7/2 → 55 · nv5 19/10/7/7/2 → 55 (el Especial sube más desde el nivel 2).
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
@@ -353,7 +362,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | L3 | | | | | |
 | L4 | | | | | |
 | R2 | | | | | |
-| M2 | | | | | |
+| M2 | ✅ (2026-11-03) | | | | |
 | S2 | | | | | |
 | D2 | | | | | |
 | W3 | | | | | |

@@ -55,7 +55,7 @@
   const sinEtiqueta = t => t.replace(/\s*\(a mano\)/g, '').replace(/\(a mano,\s*/g, '(').replace(/,\s*a mano\)/g, ')').replace(/\s+/g, ' ').trim();
   // La descripción queda lista para usar: qué hace, qué está automatizado (con los números) y qué se resuelve a mano.
   // {T} en la descripción = el daño de la trampa según el nivel.
-  const textoHab = (sp, n) => sp.detalle.replace(/\{T\}/g, sp.trampa ? danoTxt(sp.trampa, n) : '');
+  const textoHab = (sp, n) => { const t = sp.detalle.replace(/\{T\}/g, sp.trampa ? danoTxt(sp.trampa, n) : ''); return sp.efecto && sp.efecto.masNivel ? detalleConNivel(t, sp.efecto, n) : t; };
   // Opciones de la trampa que coloca la habilidad, deducidas de la descripción: área "flor de diámetro 3 (7 casillas)" y cuántas pone.
   const opcionesTrampa = sp => ({
     radio: /flor de diámetro 3/i.test(sp.detalle) ? 1 : 0,
@@ -111,6 +111,10 @@
     const extra = [ap.turnos ? `${ap.turnos} turno${ap.turnos === 1 ? '' : 's'}` : '', ...mods, ap.hp ? `${ap.hp > 0 ? '+' : ''}${ap.hp} HP por turno` : ''].filter(Boolean);
     return ap.nombre + (extra.length ? ` (${extra.join(', ')})` : '');
   };
+  // 🛡 Un efecto que escala con el nivel (2026-11-03, la Piel de hierro: «+(3 + nivel)»): `efecto.masNivel` = los stats que suman el nivel a su
+  // valor base; `{N}` en su detalle se cambia por base + nivel del primero.
+  const modsConNivel = (ef, n) => { const m = {...(ef.mods || {})}; (ef.masNivel || []).forEach(k => { m[k] = (Number(m[k]) || 0) + n; }); return m; };
+  const detalleConNivel = (t, ef, n) => String(t || '').replace(/\{N\}/g, () => { const k = (ef.masNivel || [])[0]; return String((Number((ef.mods || {})[k]) || 0) + n); });
   function armarDetalle(sp, n, cd, lenta){
     const auto = [sp.no2 === 'ATAQUE' ? 'cuesta lo mismo que un ataque y cuenta como uno' : `cuesta ${sp.no2} No2`,
       `cooldown ${cd}${sp.spCosto !== undefined ? ` (con SP: ${sp.spCosto === 'esp' ? 'tanto SP como su Especial' : /^esp\+\d+$/.test(String(sp.spCosto)) ? `su Especial + ${String(sp.spCosto).slice(4)} SP` : sp.spCosto + ' SP'})` : ''}${lenta ? ' (habilidad lenta: el combate arranca con el cooldown activo)' : ''}`];
@@ -118,7 +122,7 @@
     if(sp.dano) auto.push(`tira ${danoTxt(sp.dano, n)} de daño`);
     if(sp.cura) auto.push(`se cura ${sp.cura * n} HP sin pasar de su máximo`);
     if(sp.efecto){
-      const ef = sp.efecto, mods = ef.mods || {};
+      const ef = sp.efecto, mods = modsConNivel(ef, n);
       const m = Object.keys(mods).map(k => `${mods[k] > 0 ? '+' : ''}${mods[k]} ${MOD_TXT[k] || k}`).join(', ');
       const dur = ef.turnos ? ` durante ${ef.turnos} turno${ef.turnos === 1 ? '' : 's'}` : ' hasta que se lo saquen';
       const hp = ef.hp ? `; ${ef.hp > 0 ? 'recupera' : 'pierde'} ${Math.abs(ef.hp)} HP por turno` : '';
@@ -199,8 +203,9 @@
       if(sp.efecto.hp) h.efectoHpTurno = sp.efecto.hp;
       if(sp.efecto.excK) h.efectoEscudo = sp.efecto.excK * n;   // Vida extra: HP que suma (se acumula con el que ya tenga)
       else if(Number(sp.efecto.escudo) > 0) h.efectoEscudo = Number(sp.efecto.escudo);   // 🛡 un número fijo, sin el nivel (el Escudo humano, 2026-10-27)
-      h.efectoDetalle = sp.efecto.detalle || sinEtiqueta(textoHab(sp, n));   // (2026-10-27: el estado con su propio texto, no el de toda la habilidad)
-      h.efectoMods = Object.keys(sp.efecto.mods || {}).map(stat => ({stat, val: sp.efecto.mods[stat]}));
+      h.efectoDetalle = detalleConNivel(sp.efecto.detalle, sp.efecto, n) || sinEtiqueta(textoHab(sp, n));   // (2026-10-27: el estado con su propio texto, no el de toda la habilidad)
+      const modsN = modsConNivel(sp.efecto, n);
+      h.efectoMods = Object.keys(modsN).map(stat => ({stat, val: modsN[stat]}));
     }
     return h;
   }

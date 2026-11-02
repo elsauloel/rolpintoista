@@ -104,7 +104,7 @@
       poolId: 'hab-' + slug(nombre) + '-' + lista.length, nombre,
       etiquetas: [...new Set([...etiquetas, lenta ? 'lenta' : 'rápida', ...razasTxt, ...rolesTxt, ...objTags, ...mecPuras, aMano ? 'con parte a mano' : 'toda automatizada',
         sp.auditada ? 'auditada' : 'sin auditar', ...(MECANICA[nombre] || [])])],   // ✅ la auditoría de 2026-10-20 (docs/auditoria-skills-creep.md): para filtrar
-      detalle: sp.detalle.replace(/\{T\}/g, '(daño según el nivel)'), datos: {sp, cd, lenta},
+      detalle: sp.detalle.replace(/\{T\}/g, '(daño según el nivel)').replace(/\+\{N\}/g, '+(3 + su nivel)').replace(/\{N\}/g, '(según el nivel)').replace(/ \(3 \+ su nivel\)( y \+1)/, '$1'), datos: {sp, cd, lenta},
     });
   }
 
@@ -221,9 +221,10 @@
     duelo: {objetivo: 'enemigo', tira: 'pdgmg', tiraBonoNivel: true, contra: ['resm'], alcance: 'rango', dano: false, efectos: [{nombre: 'Provocado', turnos: 2},
       {nombre: 'Desafiante', turnos: 2, polaridad: 'buff', detalle: 'Para quien provoca: +2 a la Defensa y +2 a la Defensa especial, 2 turnos.'}]}}, 'estados alterados');
   // 🛡 Piel de hierro (Piel resistente + Temple, un escalón arriba; dueño: «va así»).
-  H('Piel de hierro', 'T', '*', 't', 3, {detalle: 'Endurece el cuerpo como el hierro: +6 a la Defensa, +6 a la Defensa especial y +1 a la Resistencia a crítico de todo Tipo, 2 turnos.',
-    no2: 1, spCosto: 4, auditada: true, ataqueTxt: 'sobre sí: +6 Defensa, +6 Def. especial y +1 a la Resistencia a crítico de todo Tipo, 2 turnos',
-    efecto: {nombre: 'Piel de hierro', turnos: 2, mods: {def: 6, armadmg: 6, tipo1: 1, tipo2: 1, tipo3: 1, tipo4: 1, tipo5: 1}, detalle: 'Piel de hierro: +6 a la Defensa, +6 a la Defensa especial y +1 a la Resistencia a crítico de todo Tipo, 2 turnos.'}});
+  // (2026-11-02, dueño: «+6 puede ser mucho… quizás un +4» → «+(3 + nivel)»: nivel 1, +4; nivel 3, +6 como antes; nivel 5, +8. `masNivel`: CreepsBaseUtil.)
+  H('Piel de hierro', 'T', '*', 't', 3, {detalle: 'Endurece el cuerpo como el hierro: +{N} a la Defensa, +{N} a la Defensa especial (3 + su nivel) y +1 a la Resistencia a crítico de todo Tipo, 2 turnos.',
+    no2: 1, spCosto: 4, auditada: true, ataqueTxt: 'sobre sí: +(3 + su nivel) a la Defensa y a la Def. especial y +1 a la Resistencia a crítico de todo Tipo, 2 turnos',
+    efecto: {nombre: 'Piel de hierro', turnos: 2, mods: {def: 3, armadmg: 3, tipo1: 1, tipo2: 1, tipo3: 1, tipo4: 1, tipo5: 1}, masNivel: ['def', 'armadmg'], detalle: 'Piel de hierro: +{N} a la Defensa, +{N} a la Defensa especial y +1 a la Resistencia a crítico de todo Tipo, 2 turnos.'}});
   // 🛡 Blindaje (de clase, un escalón arriba; dueño: «está bien que sea más poderosa, pero solamente contra sí mismo»): Flash, absorbe 12.
   H('Blindaje', 'T', '*', 't', 2, {detalle: 'FLASH (en turno ajeno cuesta el doble). Solo sobre sí: un blindaje que absorbe 12 de daño de la próxima fuente de daño (si hace más, el resto entra normal).',
     no2: 0, spCosto: 1, flash: true, auditada: true, ataqueTxt: 'Flash: sobre sí, absorbe 12 de la próxima fuente de daño',
@@ -510,9 +511,10 @@
       detalle: 'Una ponzoña a un rival dentro de su Rango: tira su Probabilidad de Golpe especial contra la Evasión del objetivo; si pega, 2d6 más un cuarto de su Efecto especial de daño tóxico (lo frenan la Defensa especial y la resistencia al tóxico) y Veneno: 2 stacks, y uno más cada 5 de daño que entra.',
       duelo: {...MIS_BASE, tipoDano: 'tóxico', porDano: {estado: 'Veneno', cada: 5, mas1: true, base: 2}, efectos: []}},
   ];
-  MISILES.forEach(m => H(m.nombre, 'D', 'hdega', 'g', 2, {detalle: m.detalle, no2: 2, spCosto: 'esp', auditada: true, ataqueTxt: `${m.icono} un misil: ${m.que}`, duelo: m.duelo}));
+  // ⏳ (2026-11-02, dueño: «si tiene un alto coste… se tiene que traducir en cooldown»): los misiles son LENTAS, cooldown 4, sin arrancar en cooldown.
+  MISILES.forEach(m => H(m.nombre, 'D', 'hdega', 'g', 4, {detalle: m.detalle, no2: 2, spCosto: 'esp', disponibleAlInicio: true, auditada: true, ataqueTxt: `${m.icono} un misil: ${m.que}`, duelo: m.duelo}));
   // El Misil elemental: elige el elemento al lanzarlo (`variantes`, vtt-hexgrid/js/12); 1 No2 y 2 SP más. Sin elegir (fuera del mapa), el arcano.
-  H('Misil elemental', 'D', 'hdega', 'g', 2, {detalle: 'Un misil del elemento que elija al lanzarlo: ✨ arcano (directo), 🔥 fuego (Quemadura), ❄ hielo (Escarcha), ⚡ eléctrico (no se esquiva, salta y puede paralizar), 🧪 ácido (Armadura rota) o ☠ tóxico (Veneno). Hace lo mismo que el misil de ese elemento (Misil arcano, Lengua de fuego, Dardo helado, Centella, Mancha corrosiva o Ponzoña), pero cuesta 1 No2 y 2 SP más.',
+  H('Misil elemental', 'D', 'hdega', 'g', 4, {disponibleAlInicio: true, detalle: 'Un misil del elemento que elija al lanzarlo: ✨ arcano (directo), 🔥 fuego (Quemadura), ❄ hielo (Escarcha), ⚡ eléctrico (no se esquiva, salta y puede paralizar), 🧪 ácido (Armadura rota) o ☠ tóxico (Veneno). Hace lo mismo que el misil de ese elemento (Misil arcano, Lengua de fuego, Dardo helado, Centella, Mancha corrosiva o Ponzoña), pero cuesta 1 No2 y 2 SP más.',
     no2: 3, spCosto: 'esp+2', auditada: true, ataqueTxt: 'un misil del elemento que elija (arcano, fuego, hielo, eléctrico, ácido o tóxico)', duelo: MISILES[0].duelo,
     variantes: MISILES.map(m => ({clave: m.clave, nombre: m.nombre, icono: m.icono, que: m.que, duelo: m.duelo}))});
   H('Descarga eléctrica', 'DK', 'ea', 'g', 3, zO('Una descarga que deja al objetivo sin aliento: pierde 1 No2 (a mano).', 2, 'M'));

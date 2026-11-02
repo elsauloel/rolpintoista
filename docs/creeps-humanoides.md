@@ -33,6 +33,8 @@
 
 ### Aprobados
 
+> ✅ **Programados el 2026-11-03** en `comun/creeps-esenciales.js` (el pool esencial: «+ Creep» de GM Tools → pestaña «⭐ Pool esencial»): T1, M1, L1, S1, W1 (con los atributos revisados), D1. Equipo del catálogo por nombre, habilidades de fábrica con su costo y cooldown, consumibles en el cinturón.
+
 - **T1 · Escudero · Tanque · nivel 1** (aprobado 2026-11-02, revisado el mismo día a fondo). Referencia: un grupo de nivel 1, no los personajes
   actuales. Estrategia: se planta adelante, provoca y aguanta; amenaza con la Demora del garrote (el que lo ignora pierde tiempo).
   - Atributos (33): Con 11 · Fue 8 · Esp 6 · Des 5 · Agi 3. Vida 55. PdG 5 (pega de vez en cuando: dueño, «tiene que presentar algún tipo de
@@ -72,7 +74,7 @@
   Atrapasueños (Def. esp. +2, Res.Mt +3) · Casaca curtida de salteador (Def +1, Def. esp. +1, Ini +1, Percep. +2) · Capucha de lana del culto
   (Def. esp. +1, Res.Esp +1): Def +1, Def. esp. +4. Skills: Maldición de la coraza (lenta, 2 No2 + 3 SP, cd 3) · Aguja siniestra (lenta, 2 No2 +
   3 SP, cd 3). Consumible: Runa de debilidad (trampa). Falta una rápida de Debuffer (pendiente).
-- **Por programar (decidido 2026-11-02)**: **Piel de hierro escala con el nivel: +(3 + nivel)** a la Defensa y a la Def. especial (nivel 1: +4,
+- ✅ **Programado el 2026-11-03** (antes «Por programar»): **Piel de hierro escala con el nivel: +(3 + nivel)** a la Defensa y a la Def. especial (nivel 1: +4,
   nivel 3: +6 como hoy, nivel 5: +8); sigue +1 Res. a crítico y 2 turnos. Hoy es +6 fijo (de la tanda del 2026-10-27).
 - **T2 · Muralla con púas · Tanque · nivel 1** (aprobado 2026-11-02): Con 13 · Fue 8 · Esp 6 · Agi 3 · Des 3 (33), vida 65. Hacha con garfio
   (Tipo 8, Bloqueo +1, Derribar 25 %) · Puerta de granero (Def +2, Bloqueo +2, Eva −1) · Coraza de cuero hervido (Def +3, Res. crít. T4 +1,

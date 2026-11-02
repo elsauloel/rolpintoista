@@ -74,7 +74,7 @@ const Biblioteca = (() => {
       descripcion: d.descripcion || '', nivel: d.nivel, autorUid: d.autorUid, autorNombre: d.autorNombre || '', datos,
       // Lo de antes de la subida unificada ya había pasado por el dueño: cuenta como auditado.
       auditado: d.auditado !== false, version: Number(d.version) || 1, reemplaza: d.reemplaza || '',
-      editorNombre: d.editorNombre || '',
+      editorNombre: d.editorNombre || '', pool: (datos && datos.pool) || d.pool || 'campaña',
       fecha: ms(d.actualizado) || ms(d.creado) || 0};
   }
 
@@ -90,7 +90,7 @@ const Biblioteca = (() => {
   function entradasBase(opts){
     const armar = (b, archivado) => ({id: `base-${b.poolId}`, nombre: b.nombre, etiquetas: b.etiquetas || [],
       descripcion: b.detalle || '', nivel: b.nivel !== undefined ? b.nivel : b.jobCosto, autorUid: '', autorNombre: '', datos: b.datos || b, base: true,
-      auditado: true, version: 1, reemplaza: '', ...(archivado ? {archivado: true} : {})});
+      auditado: true, version: 1, reemplaza: '', pool: b.pool || 'campaña', ...(archivado ? {archivado: true} : {})});
     return [...(opts.base || []).map(b => armar(b, false)), ...(opts.baseArchivo || []).map(b => armar(b, true))];
   }
 
@@ -221,6 +221,8 @@ const Biblioteca = (() => {
       if(st && st.grupoAbierto && !e.target.closest('.bib-grupo')){ st.grupoAbierto = null; pintarChips(); }
     });
     q('bib-tabs').addEventListener('click', e => {
+      const p = e.target.closest('[data-bibpool]');
+      if(p){ estado[actual].pool = p.dataset.bibpool; estado[actual].filtros.clear(); pintar(); return; }
       const b = e.target.closest('[data-bibvista]'); if(!b) return;
       estado[actual].vista = b.dataset.bibvista;
       estado[actual].filtros.clear();
@@ -269,7 +271,13 @@ const Biblioteca = (() => {
 
   let actual = null;
 
-  function listaVista(st){
+  // ⭐🗺 Los dos pools de los creeps (dueño, 2026-11-02): el **esencial** (los genéricos humanoides, docs/creeps-humanoides.md) y el **de campaña**
+  // (lo demás: goblins, mineros, el culto, los escenarios viejos y lo que sube el grupo). `opts.pools`: la ventana los separa en dos pestañas.
+  const POOLS = [{id: 'esencial', txt: '⭐ Pool esencial', tit: 'Los genéricos humanoides, por rol y nivel: para armar una pelea rápido y cambiarles el nombre'},
+    {id: 'campaña', txt: '🗺 Pool de campaña', tit: 'Los que van saliendo al jugar (goblins, mineros, el culto…) y lo que sube el grupo'}];
+  const enPool = (st, l) => st.opts && st.opts.pools ? l.filter(e => (e.pool || 'campaña') === (st.pool || 'esencial')) : l;
+  function listaVista(st){ return enPool(st, listaVistaTodo(st)); }
+  function listaVistaTodo(st){
     if(st.vista === 'propuestas') return st.propuestas;
     if(st.vista === 'archivo') return st.oficial.filter(e => e.archivado);
     if(st.vista === 'sinauditar') return st.oficial.filter(e => !e.auditado && !e.archivado);
@@ -281,12 +289,15 @@ const Biblioteca = (() => {
     const q = id => document.getElementById(id);
     const sinAud = st.oficial.filter(e => !e.auditado && !e.archivado).length, nArch = st.oficial.filter(e => e.archivado).length;
     // Pestañas: todo / lo que falta auditar (la ven todos) / lo archivado / las propuestas del camino viejo (solo el dueño, si quedan).
-    q('bib-tabs').innerHTML = (sinAud || nArch || (esDueno() && st.propuestas.length))
+    const poolsHtml = st.opts && st.opts.pools ? `<div style="display:flex;gap:6px;flex-wrap:wrap;width:100%;margin-bottom:4px">${POOLS.map(p => {
+      const n = st.oficial.filter(e => !e.archivado && (e.pool || 'campaña') === p.id).length;
+      return `<button class="btn ${(st.pool || 'esencial') === p.id ? 'primary' : ''}" data-bibpool="${p.id}" title="${esc(p.tit)}">${p.txt} (${n})</button>`; }).join('')}</div>` : '';
+    q('bib-tabs').innerHTML = poolsHtml + ((sinAud || nArch || (esDueno() && st.propuestas.length))
       ? `<button class="btn ${st.vista === 'oficial' ? 'primary' : ''}" data-bibvista="oficial">Todo (${st.oficial.length - nArch})</button>
          ${sinAud ? `<button class="btn ${st.vista === 'sinauditar' ? 'primary' : ''}" data-bibvista="sinauditar">🔶 Sin auditar (${sinAud})</button>` : ''}
          ${nArch ? `<button class="btn ${st.vista === 'archivo' ? 'primary' : ''}" data-bibvista="archivo" title="Lo de antes, que ya no cuenta: se puede mirar y usar igual">📦 Archivadas (${nArch})</button>` : ''}
          ${esDueno() && st.propuestas.length ? `<button class="btn ${st.vista === 'propuestas' ? 'primary' : ''}" data-bibvista="propuestas">Propuestas viejas (${st.propuestas.length})</button>` : ''}`
-      : '';
+      : '');
     pintarChips();
     pintarLista();
   }
@@ -436,7 +447,7 @@ const Biblioteca = (() => {
     actual = tipo;
     estado[tipo] = estado[tipo] || {oficial: null, propuestas: [], vista: 'oficial', filtros: new Set(), texto: ''};
     const st = estado[tipo];
-    st.opts = opts; st.vista = 'oficial'; st.filtros.clear(); st.texto = ''; st.grupoAbierto = null;
+    st.opts = opts; st.vista = 'oficial'; st.filtros.clear(); st.texto = ''; st.grupoAbierto = null; if(opts.pools && !st.pool) st.pool = 'esencial';
     const q = id => document.getElementById(id);
     q('bib-titulo').textContent = `📚 ${opts.titulo || 'Biblioteca'}`;
     q('bib-buscar').value = '';

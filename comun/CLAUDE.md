@@ -1912,3 +1912,17 @@ versión parecida en más de una, es candidato a juntar.
   en el preset; lo mismo que el Pánico (−2 PdG/PdG.Esp y −2 daño común/especial, `miedoContra` de js/52, y doble No2 por casillero que termina a 3 o menos
   de otro sin alejarse, `miedoFuentes` → `floripondioOtros`) pero contra cualquiera que se vea, aliados incluidos. 2 turnos (decisión de Claude). Control
   mental (Res.Mt; GRUPOS_CC.mental y el grupo «mente» del Té de tilo), en `JEFE_INMUNE`. Ícono 🌺 sobre violeta (js/88). Nada lo da todavía (pendientes).
+
+- **⭐ `creeps-esenciales.js` — el pool esencial de creeps** (2026-11-03; diseño en `../docs/creeps-humanoides.md`): suma al final de `CREEPS_BASE` los
+  creeps genéricos humanoides aprobados por el dueño (por ahora los 6 de nivel 1: Escudero, Piromante, Sangrador, Sanador, Hachero y Maldito), con
+  `pool: 'esencial'`. Se arman con lo de fábrica: equipo del catálogo por nombre (`CreepCalculo.itemParaCreep`, puesto), consumibles en el cinturón y
+  habilidades de `HABILIDADES_CREEP_BASE` (las auditadas, `armarHabilidadDeCreep`). Va **después** de `catalogo.js`, `skills-creep-base.js`,
+  `creep-calculo.js` y `creeps-base.js` (en GM Tools, después del catálogo). Si falta una pieza, lo dice la consola y `CREEPS_ESENCIALES_FALTAN`.
+  **`biblioteca.js`, los dos pools** (`opts.pools`): las entradas llevan `pool` (`'esencial'` o `'campaña'`, por defecto campaña: lo de fábrica de antes
+  y lo subido por el grupo) y la ventana suma arriba las pestañas «⭐ Pool esencial» / «🗺 Pool de campaña» (`st.pool`). Lo usa el «+ Creep» de GM Tools.
+- **🛡 Un efecto de habilidad de creep que escala con el nivel** (2026-11-03, Piel de hierro «+(3 + nivel)»): `efecto.masNivel = ['def', 'armadmg']` suma el
+  nivel a esos mods al armarla (`creeps-base.js`, `modsConNivel`), y `{N}` en el texto se cambia por el número. `CreepCalculo.migrarPielYMisiles(sc)` pone al
+  día lo guardado: la Piel de hierro de +6 fijo pasa a +(3 + nivel), y los **misiles** (Lengua de fuego, Misil arcano, Dardo helado, Centella, Mancha
+  corrosiva, Ponzoña, Misil elemental) pasan a **lentas de cooldown 4** sin arrancar en cooldown (`disponibleAlInicio`; dueño, 2026-11-02: «costo alto ⇒
+  cooldown alto»).
+

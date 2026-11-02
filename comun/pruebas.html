@@ -43,7 +43,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
 <script src="combatiente.js?v=20261102anula5"></script>
-<script src="creep-calculo.js?v=20261101sueno"></script>
+<script src="creep-calculo.js?v=20261103esen"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261101jefe2"></script>
 <script src="creep-duelo.js"></script>
@@ -111,7 +111,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="pasivas.js"></script>
 <script src="skills-clase.js?v=20261102anula4"></script>
 <script src="creeps-base.js"></script>
-<script src="skills-creep-base.js?v=20261102anula4"></script>
+<script src="skills-creep-base.js?v=20261103esen"></script>
+<script src="creeps-esenciales.js?v=20261103esen"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
 <script>
@@ -6323,7 +6324,32 @@ prueba('🛡 Blindaje, Piel de hierro, Escudo humano, Interponerse y Arte de la 
   igual([!!r, barrera && (barrera.escudoMagico), CreepCalculo.modTotal(sc2, 'def') - def0, CreepCalculo.modTotal(sc2, 'armadmg'), CreepCalculo.critEfectivo(sc2, 2) - CreepCalculo.critEfectivo(creepPrueba(), 2),
     eh.efectoEscudo, ej.alcance, ej.efectos[0].nombre, ej.efectos[0].spec.turnos, ip.flash, ip.interponerse.distancia, Combatiente.flashPara(ag.duelo, 'pdg'), Combatiente.flashPara(ag.duelo, 'eva', 'parry'), ag.duelo.flash.bono,
     ESTADOS_PRESET.find(p => p.nombre === 'Interpuesto').unGolpe],
-    [true, 12, 6, 6, 1, 5, 3, 'Escudo humano', 2, true, 2, true, true, 3, true]);
+    [true, 12, 4, 4, 1, 5, 3, 'Escudo humano', 2, true, 2, true, true, 3, true]);   // (Piel de hierro de nivel 1: +4 desde el 2026-11-03)
+});
+prueba('🛡⏳ Piel de hierro +(3 + nivel) y los misiles lentos de cooldown 4 (2026-11-03); un creep guardado se pone al día', () => {
+  const ph = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Piel de hierro');
+  const val = (n, st) => armarHabilidadDeCreep(ph.datos, n).efectoMods.find(m => m.stat === st).val;
+  const mis = ['Misil arcano', 'Lengua de fuego', 'Dardo helado', 'Centella', 'Mancha corrosiva', 'Ponzoña', 'Misil elemental'].map(nm => {
+    const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === nm).datos, 2); return [h.cd, h.cdActual, !!h.cdArranca]; });
+  // Un creep de nivel 2 guardado con lo de antes: Piel de hierro +6 y una Lengua de fuego de cooldown 2.
+  const vieja = armarHabilidadDeCreep(ph.datos, 3), lf = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Lengua de fuego').datos, 2);
+  lf.cd = 2; lf.detalle = lf.detalle.replace(/cooldown 4/, 'cooldown 2');
+  const sc = {nombre: 'Viejo', nivel: 2, habilidades: [vieja, lf]};
+  const c1 = CreepCalculo.migrarPielYMisiles(sc), c2 = CreepCalculo.migrarPielYMisiles(sc);
+  igual([val(1, 'def'), val(1, 'armadmg'), val(3, 'def'), val(5, 'armadmg'), val(1, 'tipo3'), /\+4 a la Defensa/.test(armarHabilidadDeCreep(ph.datos, 1).detalle),
+    ...mis.map(m => m.join()), c1, sc.habilidades[0].efectoMods.find(m => m.stat === 'def').val, /\+5 a la Defensa/.test(sc.habilidades[0].efectoDetalle), sc.habilidades[1].cd, /cooldown 4/.test(sc.habilidades[1].detalle), c2],
+    [4, 4, 6, 8, 1, true, ...Array(7).fill('4,0,false'), true, 5, true, 4, true, false]);
+});
+prueba('⭐ El pool esencial (2026-11-03): los 6 de nivel 1, con su equipo, cinturón y habilidades de fábrica, y la biblioteca los separa', () => {
+  const es = CREEPS_BASE.filter(c => c.pool === 'esencial');
+  const d = n => es.find(c => c.nombre === n).datos;
+  const suma = x => x.con + x.fue + x.agl + x.des + x.esp;
+  igual([CREEPS_ESENCIALES_FALTAN.length, es.length, es.every(c => suma(c.datos) === 33 && c.datos.hp === c.datos.con * 5 && c.nivel === 1),
+    d('Escudero').equipo.map(i => i.nombre).join(), d('Escudero').cinturon.map(i => i.nombre).join(), d('Hachero').fue, d('Hachero').agl,
+    d('Piromante').habilidades.map(h => h.nombre + ':' + h.cd).join(), d('Escudero').habilidades[1].efectoMods.find(m => m.stat === 'def').val,
+    CREEPS_BASE.filter(c => c.pool !== 'esencial').length > 100],
+    [0, 6, true, 'Garrote de pastor,Escudo de caparazón de tortuga gigante,Peto de hierro,Cofia de anillas sueltas', 'Poción de Cuero Duro,Poción de Piel de Cristal', 9, 6,
+      'Lengua de fuego:4,Muro de fuego:3', 4, true]);
 });
 prueba('🔄 Las habilidades de clase siguen a su clase (P222, 2026-10-27): una copia vieja toma la versión nueva; una editada a mano después, no', () => {
   const base = CLASES_SKILLS.find(c => c.id === 'warrior').habilidades.find(x => x.id === 'warrior-contraataque');

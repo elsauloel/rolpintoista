@@ -102,6 +102,7 @@ document.addEventListener('click', async e => {
       alElegir: agregarCreepDeBiblioteca,
       alVer: verCreepDeBiblioteca,
       grupos: CREEPS_GRUPOS,
+      pools: true,   // ⭐🗺 el pool esencial y el de campaña (dueño, 2026-11-02)
     });
     return;
   }

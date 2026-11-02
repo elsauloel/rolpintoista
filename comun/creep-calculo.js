@@ -71,6 +71,33 @@ const CreepCalculo = (() => {
     });
   }
 
+  // 🛡⏳ (2026-11-03, decisiones del dueño del 2026-11-02): la Piel de hierro guardada con +6 fijo pasa a +(3 + su nivel) a la Defensa y a la
+  // Def. especial (nivel 3 queda igual), y los misiles guardados con cooldown 2 pasan a lentas de cooldown 4 (sin arrancar en cooldown). Una vez:
+  // lo que ya está al día no se toca. → true si cambió algo.
+  const MISILES_LENTOS = ['Misil arcano', 'Lengua de fuego', 'Dardo helado', 'Centella', 'Mancha corrosiva', 'Ponzoña', 'Misil elemental'];
+  function migrarPielYMisiles(sc){
+    let cambio = false;
+    const nivel = Math.max(1, Math.round(num(sc.nivel)) || 1), N = 3 + nivel;
+    (sc.habilidades || []).forEach(h => {
+      if(!h) return;
+      if(h.nombre === 'Piel de hierro' && Array.isArray(h.efectoMods)){
+        const def = h.efectoMods.find(m => m && m.stat === 'def'), esp = h.efectoMods.find(m => m && m.stat === 'armadmg');
+        if(def && esp && num(def.val) === 6 && num(esp.val) === 6 && N !== 6 && !h.pielNivel){
+          def.val = N; esp.val = N;
+          ['detalle', 'efectoDetalle'].forEach(k => { if(typeof h[k] === 'string') h[k] = h[k].replace(/\+6 a la Defensa, \+6 a la Defensa especial/g, `+${N} a la Defensa, +${N} a la Defensa especial`)
+            .replace(/\+6 Defensa, \+6 Def\. especial/g, `+${N} Defensa, +${N} Def. especial`); });
+          cambio = true;
+        }
+        if(!h.pielNivel){ h.pielNivel = true; cambio = true; }
+      }
+      if(MISILES_LENTOS.includes(h.nombre) && num(h.cd) === 2){
+        h.cd = 4; if(num(h.cdActual) > 4) h.cdActual = 4;
+        if(typeof h.detalle === 'string') h.detalle = h.detalle.replace(/cooldown 2\b/g, 'cooldown 4');
+        cambio = true;
+      }
+    });
+    return cambio;
+  }
   function migrarCreepEspecial(sc){
     if(sc.int !== undefined){
       if(sc.esp === undefined) sc.esp = sc.int;
@@ -594,6 +621,7 @@ const CreepCalculo = (() => {
     Combatiente.migrarAdrenalina(sc.habilidades);   // 💉 la Adrenalina de fábrica vieja (Hypeado) → la del jugador (2026-11-01)   // 🎰 al azar (1 SP) o eligiendo (2 SP) (2026-11-01)
     Combatiente.migrarLuzSanadora(sc.habilidades);   // ☀ Smite y Destello revelador: Luz sanadora; Lanza arcana y Destello revelador, los nombres nuevos (2026-10-31)
     Combatiente.ponerAlDiaItemsFabrica(sc.equipo);   // 🔄 ítems de fábrica que cambiaron (la Varita del destello, 2026-10-31)
+    migrarPielYMisiles(sc);   // 🛡 Piel de hierro +(3 + nivel) y ⏳ los misiles lentos, cooldown 4 (2026-11-03)
     sc.pasivas = Array.isArray(sc.pasivas) ? sc.pasivas : [];   // (2026-10-15)
     if(typeof estadosPresetCreep === 'function') Combatiente.sincronizarEstadosDePasivas(sc.estados, sc.pasivas, estadosPresetCreep());   // la pasiva que da un estado (2026-10-16)
     sc.cinturon = Array.isArray(sc.cinturon) ? sc.cinturon : [];   // consumibles a mano (2026-10-04)
@@ -790,7 +818,7 @@ const CreepCalculo = (() => {
     return partes.length ? partes.join(' · ') : 'nada';
   }
 
-  return {modoSP, spPct, spMax, spRegen, spActual, costoSpHab, especialesEnMano, especialDanoTxt, sinNadaEnMano, talisman, auraMiedo, estandartes, enLasManos, regenPasivas, masDanoElem, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
+  return {migrarPielYMisiles, modoSP, spPct, spMax, spRegen, spActual, costoSpHab, especialesEnMano, especialDanoTxt, sinNadaEnMano, talisman, auraMiedo, estandartes, enLasManos, regenPasivas, masDanoElem, pasivaComprasCreep, BASE_CINTURON, cinturonUsado, capCinturon, cinturonLibre, cuantasEntran, opcionesCinturon, IT2_CREEP, DADOS_ARMA, ESCALA_TIPOS, DERIVED_STATS, STATS_TIRADA_IDS, STAT_LOOKUP, DERIVADOS_POR_ATTR, ATTR_NOMBRE, SLOT_MAP,
     ARQUETIPOS, arquetiposAuto, arquetiposManual, arquetipos, arquetiposTxt, TIPOS_CRIATURA, TIPOS_CON_ARMA_NATURAL, TIPOITEM_LABEL, STAT_LABEL, itemParaCreep, magiaDeItem, vaAlEquipo, nombreLimpio, tipoDe, oroSugerido, valorNatural,
     trofeo, despojosDePrecio, dropsResumen, dropsFijos,
     correrTiposTexto, migrarObjTipos, migrarCreepTipos, migrarObjEspecial, migrarHabPdg, migrarCreepEspecial, slotDe,

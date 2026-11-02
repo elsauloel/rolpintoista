@@ -303,6 +303,12 @@
   invocación de un jugador, trampa mágica. **Arreglados**: el ítem que se duplicaba con el personaje abierto en el mapa y en la ficha suelta
   (`comun/intercambio.js`) y el texto de la deuda de No2 en el contraataque. **Quedan**: ❌ la Anulación sobre un portal ajeno (faltaban las
   reglas: agregadas, hay que pegarlas, y volver a probar); las pruebas de humo de los creeps esenciales en el mapa (Escudero, Piromante).
+- [x] **Tercera tanda, 2026-11-03** → [`reporte-pruebas-3-2026-11-03.md`](reporte-pruebas-3-2026-11-03.md) (capturas `t3p-1103-*`; 0 diferencias al
+  restaurar): ✅ 🌺 el Malviaje desde «▶ Empieza tu turno» (el cartel al afectado con 🎲 / ✍, el aviso a los demás con «Tirar por él» al GM, el 1d6 y la
+  resolución a todos; las dos ramas); ✅ ⚖ «Hacerlo igual» con No2 negativos al dar, recibir y pedir un ítem, ayudar a soltarse, despertar a alguien,
+  pagar el sobrepeso de la Evasión y el dodge roll. **Arreglados**: ayudar a soltar desde la Botonera (no tenía el cartel y no guardaba el No2) y el
+  dodge roll con «Hacerlo igual» (el clic en el cartel confirmaba la ruta antes de tiempo). **Queda**: el texto de la ventana 🤝 («en negativo no se
+  puede»); despertar siendo un creep en negativo no pregunta.
 - [x] **📌 Clavar a la pared — probado 2026-11-03 con clics** (GM con el Goblin ballestero, Jugador 1 con Prueba Uno, Jugador 2 con Prueba Dos):
   ✔ sin pared: lo empuja 3 en línea recta y nada más · ✔ con un Sólido detrás: 1 casillero, choque (4 de daño) e Inmovilizado 3 turnos con
   «se suelta con Fuerza contra 5» · ✔ contra un token: chocan los dos (3 y 5 de daño), sin clavar · ✔ soltarse perdiendo (1d3=3 contra 5) y

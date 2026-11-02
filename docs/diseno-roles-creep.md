@@ -845,7 +845,7 @@ Inmovilizado, Rengo, Desarmado; y, de personajes, Enyetar.
 
 **A. Bajar números**
 1. ✅ **Debilitar** — **Maldición debilitante** (2026-10-26, la de la clase: PdG.Esp contra Res.Esp; 1d6 siniestro, Debilitado 2 turnos y Lento 2 turnos; reemplaza a la vieja Debilitar a mano): el objetivo pega menos (Debilitado, que se apila).
-2. **Torpeza**: menos Probabilidad de Golpe.
+2. ✅ **Torpeza** — **Escalofrío** (definida 2026-11-03, sin programar; rápida de Debuffer, dueño: «Escalofrío también me gusta, sumemos ambas al pool»): PdG.Esp contra la Res.Mt de un rival en su Rango; si gana, **1d4 siniestro directo** (con su Herida sombría) y **−2 PdG** hasta el final de su próximo turno. **Rápida**: 1 No2 + 1 SP, o cooldown 2.
 3. ✅ **Exponer** ✦ — **Aguja del desamparo** (2026-10-24): un proyectil, su PdG.Esp contra la Evasión de un rival en su Rango; si pega, 1d6 arcano directo y
    Expuesto hasta su próximo turno (la Evasión a la mitad y sin reacciones que cuesten No2). 2 No2 y 3 SP, o cooldown 3.
 4. ✅ **Maldición de la coraza** ✦ (2026-10-24): su PdG.Esp contra la Res.Esp de un rival en su Rango; **Coraza maldita**, −2 Defensa y −2 Defensa
@@ -873,7 +873,7 @@ Inmovilizado, Rengo, Desarmado; y, de personajes, Enyetar.
 16. **Dominar**: el GM decide su próxima acción (a mano; muy caro).
 
 **D. Daño que dura**
-17. **Veneno a distancia**: un dardo o un hechizo que envenena.
+17. ✅ **Veneno a distancia** — **Espina tóxica** (definida 2026-11-03, sin programar; rápida de Debuffer, dueño: «tóxico también es patrimonio del debuffer… puede ser un dardo venenoso especial, no físico»; sale del Veneno de clase): una espina de energía tóxica, PdG.Esp contra la Evasión de un rival en su Rango; si pega, **1d4 tóxico directo** (le resta la Def. especial) y **Veneno 2**. **Rápida**: 1 No2 + 1 SP, o cooldown 2.
 18. **Plaga**: un veneno que al empezar su turno contagia al que tiene al lado.
 19. **Maldición que quema**: Quemadura que no se apaga con agua.
 

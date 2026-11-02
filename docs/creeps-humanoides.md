@@ -134,6 +134,8 @@
   - **Aguja siniestra pasa a rápida** (dueño, 2026-11-03, «vamos con esto»; **por programar**): cooldown 2 y más barata (1 No2 + 2 SP), mismo
     efecto (1d6 siniestro directo, −1 a todas las resistencias a crítico 2 turnos). Así el nivel 1 tiene una lenta fuerte (Maldición de la coraza)
     y una rápida que acompaña. Ninguna habilidad de Debuffer era rápida: se diseña además una rápida nueva (en curso).
+  - **Rápidas de Debuffer al pool** (dueño, 2026-11-03): **Escalofrío** (siniestro + −2 PdG) y **Espina tóxica** (tóxica + Veneno 2), definidas en
+    `diseno-roles-creep.md` (Debuffer, conceptos 2 y 17), sin programar. Candidatas: Escalofrío para el Maldito, Espina tóxica para el D2 Tóxico.
   - **Boceto completo, nivel 1 a 5** (2026-11-03, todo con lo que ya existe). Atributos (Esp/Con/Agi/Des/Fue → vida): nv1 13/8/6/4/2 → 40 ·
     nv2 14/9/7/4/2 → 45 · nv3 16/9/7/5/2 → 45 · nv4 17/10/8/5/2 → 50 · nv5 19/10/8/6/2 → 50.
     | Nivel | Habilidad nueva | Pasiva | Equipo |

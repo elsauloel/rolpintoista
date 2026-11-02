@@ -286,6 +286,12 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
     Escarcha). Consumible: Poción de SP menor. Sin cargar hasta que el dueño diga.
   - **Atributos del boceto, rehechos** (Esp/Con/Agi/Des/Fue → vida, con la capa): nv1 12/8/5/6/2 → 45 · nv2 14/9/5/6/2 → 50 · nv3 16/9/6/6/2 → 50 ·
     nv4 17/10/6/7/2 → 55 · nv5 19/10/7/7/2 → 55 (el Especial sube más desde el nivel 2).
+  - **Boceto nivel por nivel** (dueño, 2026-11-03: «me cierra»): nv2 Parpadeo + pasiva Potencia especial; + Polainas de cuero remendado y Botas de
+    caña alta (Def 4, Def.Esp 2) · nv3 Prisión de hielo; el escudo pasa a **Escudo de bronce con runas** (Buena: Def +2, Def.Esp +2, Res. hielo +1)
+    (Def 4, Def.Esp 4) · nv4 Ráfaga de viento + pasiva Temple mágico; la capa pasa a **Túnica del archivista** (Buena: SP +3, Def.Esp +2, Res.Mt +2,
+    Res.Esp +1, Percepción +2) (Def 4, Def.Esp 5; vida 50) · nv5 Lluvia de escarcha; + **Yelmo de bronce con runas** (Buena) (Def 5, Def.Esp 7). La
+    varita sigue siendo la de la ventisca (no hay una de hielo Buena que la mejore: la de la ráfaga helada repite la Ráfaga de viento). Vida 50 desde
+    el nivel 2 (frágil a propósito; alternativa: Coraza de bronce con runas en vez de la túnica).
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 

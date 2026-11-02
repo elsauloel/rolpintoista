@@ -293,6 +293,22 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
     varita sigue siendo la de la ventisca (no hay una de hielo Buena que la mejore: la de la ráfaga helada repite la Ráfaga de viento). Vida 50 desde
     el nivel 2 (frágil a propósito; alternativa: Coraza de bronce con runas en vez de la túnica).
 
+- **Regla (dueño, 2026-11-03): los creeps esenciales se diseñan para jugar con turnos de espera (cooldown)**, no en modo SP. En modo SP el SP sale del
+  Especial (× 3, recarga la mitad por turno, mínimo 1): los físicos, con Especial bajo, se quedarían sin habilidades. Por eso en los físicos el Especial
+  puede quedar bajo; el modo SP queda para magos y supports con mucho Especial.
+- **H1 · Embestidor · Híbrido** (boceto y nivel 1, 2026-11-03). Estrategia: cruza el campo y se lleva puesto a uno: corre, derriba y empuja; le
+  rompe la línea al grupo y llega a los de atrás. Atributos (dueño: «tengo miedo que con destreza tan baja me cueste pegar»; Con/Fue/Agi/Des/Esp →
+  vida, No2): **nv1 10/8/6/7/2 → 50, 6** · nv2 11/9/7/7/2 → 55, 8 (con Impulso) · nv3 12/10/7/8/2 → 60, 8 · nv4 13/11/8/8/2 → 80, 9 · nv5
+  14/12/8/9/2 → 90, 9. Nada de lo que usa tira Especial.
+  | Nivel | Habilidad nueva | Pasiva | Equipo |
+  |---|---|---|---|
+  | 1 | **Carga que derriba** (rápida, Flash: onda en cono, Fue +2 contra Con; 1 + la diferencia en No2 y la diferencia de daño; sin No2, Sentado) · **Takle** (lenta) | — | Hacha de verdugo de pueblo (Tipo 8, Derribar 50 %) · Chaleco de cuero · Anillo de Paso Fantasma (Def 2, Def.Esp 0) |
+  | 2 | **Golpe fuerte** (rápida: +1 dado) | **Impulso** (+1 No2) | + Cofia de anillas sueltas y Botas de cuero de vaca (Def 4, Def.Esp 1) |
+  | 3 | **Salto aplastante** (salta 3, Sentado a los pegados con Res.CC contra su Fuerza, ataque +2 de daño) | — | el hacha: Hacha del verdugo de la capital (Buena: 2 dados, Derribar 50 %) |
+  | 4 | **Aguante** | **Robustez** (+5 de vida) | el chaleco: Jubón de cuero tachonado (Buena) (Def 4, Def.Esp 3) |
+  | 5 | **Furia** | — | la cofia: Casco de bandas remachadas (Buena) + guantes Comunes (Def 5, Def.Esp 2) |
+  Consumible: Pergamino grupal de Paso Fantasma. Ojo: «Carga que derriba» no es una carga (es una onda en cono). Sin cargar hasta que el dueño diga.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4
@@ -355,7 +371,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | W1 | ✅ (2026-11-02) | | | | |
 | T1 | ✅ (2026-11-02) | | | | |
 | T2 | ✅ (2026-11-02) | | | | |
-| H1 | | | | | |
+| H1 | ✅ (2026-11-03) | | | | |
 | L1 | ✅ (2026-11-02) | | | | |
 | L2 | | | | | |
 | R1 | ✅ (2026-11-03) | | | | |

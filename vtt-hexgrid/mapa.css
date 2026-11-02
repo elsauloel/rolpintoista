@@ -652,7 +652,11 @@ aside{
 .dato{font-size:12.5px;margin-top:4px}
 .dato b{color:var(--brass);font-weight:500}
 .mapa-fila{border:1px solid var(--line);border-radius:var(--r);padding:8px 10px;margin-top:8px}
-.mapa-fila.viendo{border-color:var(--brass)}
+.mapa-fila.viendo{border:2px solid var(--brass);box-shadow:0 0 0 3px rgba(227,168,90,.15)}
+.mapa-viendo-tag{display:inline-block;font-size:9.5px;letter-spacing:.06em;background:var(--brass);color:#1d1714;border-radius:3px;padding:1px 5px;margin-left:6px;vertical-align:2px;font-weight:700}
+.mapa-fila .fila .btn.on{border-color:var(--brass);background:rgba(227,168,90,.18)}
+.mapa-fondo{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
+.mapa-fondo h3{font-size:11px;letter-spacing:.08em;color:var(--brass);margin:0;text-transform:uppercase}
 .mapa-fila.activo{background:rgba(76,184,106,.16);border-color:#4CB86A} /* el publicado, siempre arriba (js/09, renderMapasMenu) */
 .mapa-fila.activo .mapa-nombre b{color:#7BD88F}
 .mapa-uso{font-size:11px;color:var(--muted, #9A867E);margin-top:2px}

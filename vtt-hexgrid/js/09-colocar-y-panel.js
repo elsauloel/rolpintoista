@@ -853,6 +853,8 @@ function abrirEditarToken(id){
    Mapas guardados (ver, publicar, renombrar, borrar, cuántos creeps tiene y traer sus tokens, + Nuevo mapa) y el fondo del mapa que se está mirando.
    Vive en un menú al costado del botón, como el de 🎭 Tokens: la barra lateral (donde se ve la Mesa) no se usa para menús. */
 let mapasMenuFirma = '';
+// 🖼 (2026-11-03, maqueta aprobada por el dueño): el fondo se edita adentro de la tarjeta del mapa; acá, de cuál está abierto (solo en memoria).
+let mapasFondoAbierto = '';
 // «hoy», «ayer», «hace 3 días», «hace 2 semanas», «hace 4 meses».
 function haceTxt(ms){
   const dias = Math.floor((Date.now() - ms) / 864e5);
@@ -875,30 +877,40 @@ function renderMapasMenu(forzar){
   menu.hidden = !mapasMenuAbierto;
   boton.classList.toggle('activo', mapasMenuAbierto);
   if(!mapasMenuAbierto) return;
+  if(mapasFondoAbierto && mapasFondoAbierto !== mapaMostrado && mapasFondoAbierto !== mapaEligiendoGM) mapasFondoAbierto = '';   // pasó a ver otro mapa: se cierra
   if(!forzar && menu.contains(document.activeElement) && menu.innerHTML) return;   // no pisar lo que se está escribiendo
   // Arriba el publicado (en verde); después, del más usado últimamente al menos usado (mapaUsoMs, js/01).
   const filas = [MAPA_PRINCIPAL, ...[...mapasLista.keys()].filter(id => id !== MAPA_PRINCIPAL)]
     .sort((a, b) => mapaUsoMs(b) - mapaUsoMs(a))
     .map(id => {
-      const viendo = id === mapaMostrado, activo = id === mapaActivo;
+      const viendo = id === mapaMostrado, activo = id === mapaActivo, fondoAbierto = viendo && mapasFondoAbierto === id;
       return `<div class="mapa-fila${viendo ? ' viendo' : ''}${activo ? ' activo' : ''}">
-        <span class="mapa-nombre">${esc(nombreMapa(id))}${activo ? ' <b>· en juego</b>' : ''}</span>
+        <span class="mapa-nombre">${esc(nombreMapa(id))}${activo ? ' <b>· en juego</b>' : ''}${viendo ? ' <span class="mapa-viendo-tag">LO ESTÁS VIENDO</span>' : ''}</span>
         <div class="mapa-uso">${esc(mapaUsoTxt(id))}</div>
         <div class="fila" style="margin-top:4px">
           ${viendo ? '' : `<button type="button" class="btn" data-mapa-ver="${esc(id)}">Ver</button>`}
           ${activo ? '' : `<button type="button" class="btn primary" data-mapa-publicar="${esc(id)}">Publicar</button>`}
           <button type="button" class="btn" data-mapa-renombrar="${esc(id)}" title="Renombrar">✎</button>
+          <button type="button" class="btn${fondoAbierto ? ' on' : ''}" data-mapa-fondo="${esc(id)}" title="${viendo ? 'Fondo de este mapa' : 'Ver este mapa y editar su fondo'}">🖼</button>
           ${id === MAPA_PRINCIPAL ? '' : `<button type="button" class="btn peligro" data-mapa-borrar="${esc(id)}" title="Borrar">✕</button>`}
         </div>
+        ${fondoAbierto ? fondoMapaHtml(id) : ''}
         ${creepsDeMapaHtml(id)}
       </div>`;
     }).join('');
-  const casillas = fondo ? Math.round(fondo.ancho / ANCHO_CASILLA * 10) / 10 : 20;
   const html =
     '<div class="fila" style="margin:0 0 8px;justify-content:space-between"><h2>🗺 Mapas</h2><button type="button" class="btn primary" id="mapa-nuevo">+ Nuevo mapa</button></div>' +
-    '<p class="ayuda" style="margin-top:0">"Ver" cambia lo que estás mirando vos, para ir armándolo. "Publicar" cambia lo que ven los jugadores.</p>' +
-    filas +
-    '<div class="mm-sec"><h2>🖼 Fondo de este mapa</h2>' +
+    '<p class="ayuda" style="margin-top:0">"Ver" cambia lo que estás mirando vos, para ir armándolo. "Publicar" cambia lo que ven los jugadores. 🖼 edita el fondo de ese mapa.</p>' +
+    filas;
+  if(!forzar && html === mapasMenuFirma) return;
+  mapasMenuFirma = html;
+  menu.innerHTML = html;
+  conectarMapasMenu(menu);
+}
+// El bloque del fondo, adentro de la tarjeta del mapa que se está viendo (los mismos ids de siempre: #fondo-cargar, #fondo-ancho…).
+function fondoMapaHtml(id){
+  const casillas = fondo ? Math.round(fondo.ancho / ANCHO_CASILLA * 10) / 10 : 20;
+  return '<div class="mapa-fondo"><h3>🖼 Fondo de ' + esc(nombreMapa(id)) + '</h3>' +
     '<div class="fila" style="margin-top:8px">' +
       `<button type="button" class="btn primary" id="fondo-cargar">${fondo ? 'Cambiar imagen' : 'Cargar imagen'}</button>` +
       (fondo ? '<button type="button" class="btn peligro" id="fondo-quitar">Quitar</button>' : '') +
@@ -909,9 +921,15 @@ function renderMapasMenu(forzar){
         '<p class="ayuda" style="margin-top:6px">Con esa casilla tildada, arrastrar un lugar vacío mueve la imagen para acomodarla a la grilla. Destildala para volver a desplazar la vista.</p>'
       : '<p class="ayuda" style="margin-top:8px">La imagen se achica sola para que entre en la mesa. Todos la ven debajo de la grilla.</p>') +
     '</div>';
-  if(!forzar && html === mapasMenuFirma) return;
-  mapasMenuFirma = html;
-  menu.innerHTML = html;
+}
+function conectarMapasMenu(menu){
+  menu.querySelectorAll('[data-mapa-fondo]').forEach(b => b.onclick = () => {
+    const id = b.dataset.mapaFondo;
+    if(id !== mapaMostrado){ mapasFondoAbierto = id; verMapa(id); renderMapasMenu(true); return; }   // primero pasa a verlo
+    mapasFondoAbierto = mapasFondoAbierto === id ? '' : id;
+    if(!mapasFondoAbierto) moverFondo = false;
+    renderMapasMenu(true);
+  });
   menu.querySelectorAll('[data-mapa-ver]').forEach(b => b.onclick = () => verMapa(b.dataset.mapaVer));
   menu.querySelectorAll('[data-mapa-publicar]').forEach(b => b.onclick = () => publicarMapa(b.dataset.mapaPublicar));
   menu.querySelectorAll('[data-mapa-renombrar]').forEach(b => b.onclick = () => renombrarMapa(b.dataset.mapaRenombrar));
@@ -919,7 +937,7 @@ function renderMapasMenu(forzar){
   menu.querySelectorAll('[data-mapa-traer]').forEach(b => b.onclick = () => traerCreepsDelMapa(b.dataset.mapaTraer));
   menu.querySelectorAll('[data-mapa-botin]').forEach(b => b.onclick = () => abrirBotinEstimadoMapa(b.dataset.mapaBotin));
   $('#mapa-nuevo').onclick = crearMapa;
-  $('#fondo-cargar').onclick = () => $('#fondo-archivo').click();
+  if($('#fondo-cargar')) $('#fondo-cargar').onclick = () => $('#fondo-archivo').click();
   if($('#fondo-quitar')) $('#fondo-quitar').onclick = async () => {
     if(!(await Confirmar.preguntar('¿Quitar la imagen de fondo del mapa?', {titulo: 'Quitar fondo', si: 'Quitar', peligro: true}))) return;
     try{

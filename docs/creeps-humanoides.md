@@ -131,6 +131,19 @@
   3 SP, cd 3). Consumible: Runa de debilidad (trampa). Falta una rápida de Debuffer (pendiente).
 - ✅ **Programado el 2026-11-03** (antes «Por programar»): **Piel de hierro escala con el nivel: +(3 + nivel)** a la Defensa y a la Def. especial (nivel 1: +4,
   nivel 3: +6 como hoy, nivel 5: +8); sigue +1 Res. a crítico y 2 turnos. Hoy es +6 fijo (de la tanda del 2026-10-27).
+  - **Aguja siniestra pasa a rápida** (dueño, 2026-11-03, «vamos con esto»; **por programar**): cooldown 2 y más barata (1 No2 + 2 SP), mismo
+    efecto (1d6 siniestro directo, −1 a todas las resistencias a crítico 2 turnos). Así el nivel 1 tiene una lenta fuerte (Maldición de la coraza)
+    y una rápida que acompaña. Ninguna habilidad de Debuffer era rápida: se diseña además una rápida nueva (en curso).
+  - **Boceto completo, nivel 1 a 5** (2026-11-03, todo con lo que ya existe). Atributos (Esp/Con/Agi/Des/Fue → vida): nv1 13/8/6/4/2 → 40 ·
+    nv2 14/9/7/4/2 → 45 · nv3 16/9/7/5/2 → 45 · nv4 17/10/8/5/2 → 50 · nv5 19/10/8/6/2 → 50.
+    | Nivel | Habilidad nueva | Pasiva | Equipo |
+    |---|---|---|---|
+    | 1 | Maldición de la coraza · Aguja siniestra (rápida) | — | Varita del susurro, Atrapasueños, Casaca de salteador, Capucha del culto |
+    | 2 | **Aguja del desamparo** | **Puntería arcana** (+1 PdG.Esp) | + 2 Comunes |
+    | 3 | **Maldición debilitante** | — | la varita, de Buena calidad |
+    | 4 | **Extenuar** | **Potencia especial** (+1 Ef.Esp) | + el atrapasueños de Buena |
+    | 5 | **Anulación** | — | + la casaca de Buena |
+    Consumible: Runa de debilidad.
 - **T2 · Muralla con púas · Tanque · nivel 1** (aprobado 2026-11-02): Con 13 · Fue 8 · Esp 6 · Agi 3 · Des 3 (33), vida 65. Hacha con garfio
   (Tipo 8, Bloqueo +1, Derribar 25 %) · Puerta de granero (Def +2, Bloqueo +2, Eva −1) · Coraza de cuero hervido (Def +3, Res. crít. T4 +1,
   Res.CC +1). Skills: Coraza de púas (rápida) · Aguante (lenta). Consumible: poción de Cuero duro. Estrategia: castiga al que le pega; no persigue.
@@ -274,7 +287,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 > voy a intentar diseñarlos con lo que ya está diseñado. En cada paso iré evaluando»): al definir cada nivel, primero se busca entre las habilidades
 > y pasivas que ya existen; una 🆕 se diseña solo si no hay nada que sirva.
 > Al crearlo en GM Tools se elige el nivel y aparece solo con lo de ese nivel (pendiente de programar). Las 6 líneas con el nivel 1 aprobado sin
-> boceto completo (Maldito; el Sangrador, el Sanador y el Hachero, hechos el 2026-11-03; el Piromante ya tiene su escalado; el Escudero, hecho el 2026-11-03) necesitan el suyo.
+> boceto completo (todas hechas el 2026-11-03: el Escudero, el Sangrador, el Sanador, el Hachero y el Maldito; el Piromante ya tiene su escalado; el Escudero, hecho el 2026-11-03) necesitan el suyo.
 
 0. **Antes**: la tanda de skills de Tanque (`diseno-roles-creep.md`).
 1. **Rotación**: un creep de un rol, después uno del siguiente: Warrior → Tanque → Híbrido → Liviano → Liviano → Rango → Mago → Support → Debuffer →

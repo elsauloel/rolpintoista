@@ -258,6 +258,12 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
     | 4 | **Disparo señalador** | **Ojo crítico** (+1 Crítico frecuente) | + el chaleco de Buena |
     | 5 | **Flecha que atraviesa** | — | + las botas de Buena |
     Consumible: Flecha perforante (Común).
+  - **Nivel 1 aprobado** (dueño, 2026-11-03: «le pondría las botas de cuero de vaca. El resto ok»): Des 11 · Agi 7 · Con 7 · Fue 5 · Esp 3 (33),
+    vida 35, 7 No2. Equipo (Común): **Arco de la espera** (Tipo 4, 1 dado +1 de daño, Rango +3, Distancia ideal lejos: PdG +1, Respiración
+    contenida) · **Chaleco de cuero** (Def +2) · **Botas de cuero de vaca** (Def +1, Res. crít. T4 +1): Def +3, Def. esp. 0. Skills: **Tiro certero**
+    (rápida, cd 2: +1 PdG, Perfora 3, ignora 2 de Res. a crítico; lo de un disparo) · **Tiro a la cabeza** (lenta, cd 3: apunta; el próximo
+    disparo +2 PdG, Crítico frecuente +1 y potente +1; lo pierde si le hacen daño). Consumible: Flecha perforante. Juego: apunta, dispara con todo y
+    con lo que sobra el Tiro certero; si le llegan, se aleja (7 No2) y vuelve a disparar. Sin cargar hasta que el dueño diga.
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
@@ -324,7 +330,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | H1 | | | | | |
 | L1 | ✅ (2026-11-02) | | | | |
 | L2 | | | | | |
-| R1 | | | | | |
+| R1 | ✅ (2026-11-03) | | | | |
 | M1 | ✅ (2026-11-02) | | | | |
 | S1 | ✅ (2026-11-02) | | | | |
 | D1 | ✅ (2026-11-02) | | | | |

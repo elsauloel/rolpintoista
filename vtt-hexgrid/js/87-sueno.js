@@ -62,6 +62,8 @@ async function suenoSacudir(t){
   let pago = true;
   try{
     if(x.tipo === 'creep'){
+      const scN = num(((creepsPriv.get(x.fichaId) || {}).sc || {}).nitros);
+      if(Combatiente.sinNo2Negativo && Combatiente.sinNo2Negativo(scN, 1) && !(Combatiente.reglaNo2 && await Combatiente.reglaNo2({nombre: quien, nitros: scN, accion: 'despertar a alguien'}))) return;   // ya en negativo: la regla, o hacerlo igual (igual que un personaje, 2026-11-03)
       await modificarCreep(x.fichaId, sc => { sc.nitros = num(sc.nitros) - 1; });
     }else{
       pago = !!(await editarPersonajeMapa(x.fichaId, async S => {

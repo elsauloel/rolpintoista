@@ -2119,7 +2119,8 @@ async function anulaZona(id, el, celdas, efEsp, nombre, ta0, entera){
     if(c.resEsp === null){
       const mid = await momentoAbrir({tipo: 'anula-zona', icono: '🚫', titulo: `${nombre} contra ${nomZ}`, estado: 'esperando',
         datos: {elId: id, celdas: [...celdas], ta, nombre, ...(entera ? {entera: true} : {})}});
-      return mid ? {parte: `${nomZ}: tira contra ${c.nombre} (lo resuelve el GM)`} : {aMano: `${nomZ} (tirá Ef.Esp ${ta} contra la Res.Mt de ${c.nombre})`};
+      if(mid) mesaLinea(`🚫 ${nombre} contra ${nomZ}: tira contra ${c.nombre} (lo resuelve la pantalla del GM)`, 'recordatorio');
+      return mid ? {} : {aMano: `${nomZ} (tirá Ef.Esp ${ta} contra la Res.Mt de ${c.nombre})`};
     }
     const tr = (Combatiente.tirarStat(c.resEsp, [], 'resm') || {}).total || 0;
     if(ta <= tr){ mesaLinea(`🚫 ${nombre}: ${c.nombre} sostiene ${nomZ} (Res.Mt ${tr} contra Ef.Esp ${ta})`, 'recordatorio'); return {}; }
@@ -2191,7 +2192,8 @@ async function anularEn(celdas, yo, hab, rivales){
     try{ await ref.delete(); if(t.tipo === 'trampa') trampas++; else portales++; }
     catch(err){ console.error('Anulación: no se pudo', t.tipo, err); aMano.push(nom); }
   }
-  const efEsp = yo.tipo === 'creep' ? (() => { const sc = typeof creepPrivadoDe === 'function' ? creepPrivadoDe(yo.ref) : null; return sc ? CreepCalculo.statValor(sc, 'dmgesp') : 0; })()
+  // el mismo Ef.Esp que tira el duelo (anulaValor, de la Ejecución); si no vino, el de su ficha o su creep
+  const efEsp = Number.isFinite(Number(hab && hab.anulaValor)) && hab.anulaValor !== undefined ? num(hab.anulaValor) : yo.tipo === 'creep' ? (() => { const sc = typeof creepPrivadoDe === 'function' ? creepPrivadoDe(yo.ref) : null; return sc ? CreepCalculo.statValor(sc, 'dmgesp') : 0; })()
     : num((((fichasPub.get(String(yo.ref || '').split(SEP_INVOCACION)[0]) || {}).resumen) || {}).dmgesp);
   // 🚫 Una sola zona (2026-11-02, dueño: «si hay más de una zona en el área a la vez, hay que elegir contra cuál se tira»): la elige quien la usa; la
   // tirada es su Ef.Esp contra la Res.Mt de quien creó la zona (empate: gana el creador, como en las invocaciones); si gana, la zona pierde las casillas

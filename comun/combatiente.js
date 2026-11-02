@@ -1738,7 +1738,7 @@ const Combatiente = (() => {
       ...(c.danoSiempre ? {danoSiempre: true} : {}),   // ⚡ el daño entra siempre; la tirada es solo para los estados (Zap, 2026-10-25)
       ...(c.menosPorOrden ? {menosPorOrden: true} : {}),   // −1 a cada uno de los siguientes en la línea (2026-10-08, láser largo)
       ...(c.despeja ? {despeja: true} : {}),   // apaga el fuego y despeja la niebla que toca (2026-10-08, vendaval)
-      ...(c.anula ? {anula: true} : {}), ...(c.anulaDirigida ? {anulaDirigida: true} : {}),   // 🎯 dirigida (2026-11-02): un blanco; una zona, entera
+      ...(c.anula ? {anula: true, ...(o.stat ? {anulaValor: Math.round(nf(o.stat(c.tira || 'dmgesp')))} : {})} : {}), ...(c.anulaDirigida ? {anulaDirigida: true} : {}),   // (anulaValor: el Ef.Esp del duelo, para las zonas e invocaciones)   // 🎯 dirigida (2026-11-02): un blanco; una zona, entera
         // 🚫 Anulación (2026-11-01): además de los estados, lo mágico del área (zonas, trampas, el Ojo de Kicillof: js/13 anularEn)
       // ☀ El destello (2026-10-26, Luz para los suyos —hoy Destello revelador—, dueño: «un destello, ¡fum!, que sucede y no queda como área»): al lanzarse, a todos los rivales
       // de adentro el estado (Marcado: les saca el sigilo) sin tirada, y las trampas rivales de adentro quedan a la vista. Lo hace el mapa (js/13).

@@ -43,6 +43,10 @@
   de hierro (Def +4, Res. crít. T6 +1, Eva −1) · Casco de cuero endurecido (Def +1, Res. crít. T4 +1); Def +5, sin Def. especial (su punto débil,
   con la Esp baja). Skills: Golpe fuerte (rápida, 1 SP, cd 2) · Romper armadura (lenta, 2 SP, cd 3). Consumible: Pergamino grupal de Furia de
   Combate (+1 Daño a él y su grupo, 3 turnos).
+- **L1 · Sangrador · Choque liviano · nivel 1** (aprobado 2026-11-02). Estrategia: abre heridas y las agranda; crece cuanto más dura la pelea.
+  Atributos (33): Agi 10 · Des 8 · Con 6 · Fue 6 · Esp 3. Vida 30. Equipo (Común): Cuchilla del frigorífico (Tipo 6, +2 daño, Sangrado 25 %) ·
+  Chaleco de cuero (Def +2) · Calzas de cuero flexible (Eva +1). Skills: Golpe que sangra (rápida, 1 SP, cd 2) · Sal en la herida (lenta, 2 SP,
+  cd 3). Consumible: Óleo venenoso. Punto débil: vida 30 y Esp 3.
 - **Por programar (decidido 2026-11-02)**: **Piel de hierro escala con el nivel: +(3 + nivel)** a la Defensa y a la Def. especial (nivel 1: +4,
   nivel 3: +6 como hoy, nivel 5: +8); sigue +1 Res. a crítico y 2 turnos. Hoy es +6 fijo (de la tanda del 2026-10-27).
 - **T2 · Muralla con púas · Tanque · nivel 1** (aprobado 2026-11-02): Con 13 · Fue 8 · Esp 6 · Agi 3 · Des 3 (33), vida 65. Hacha con garfio
@@ -194,7 +198,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | T1 | ✅ (2026-11-02) | | | | |
 | T2 | ✅ (2026-11-02) | | | | |
 | H1 | | | | | |
-| L1 | | | | | |
+| L1 | ✅ (2026-11-02) | | | | |
 | L2 | | | | | |
 | R1 | | | | | |
 | M1 | | | | | |

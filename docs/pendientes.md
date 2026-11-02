@@ -895,6 +895,9 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] **🏹🛡 Equipo con ventaja contra proyectiles (dueño, 2026-11-02, diseñando el Piromante):** no hay piezas Comunes ni Buenas que den Evasión
   contra disparos o Defensa contra proyectiles (el stat `evadisparo` existe, solo lo usa lo que vuela). Crear algunas (torso, capa, escudo liviano…),
   pensadas sobre todo para casters y livianos.
+- [ ] **🤖 Creeps con IA (dueño, 2026-11-03): todo lo de proponer/armar creeps con IA queda para cuando esté en la compu** (no se prueba desde la nube).
+- [ ] **🐝 Invocaciones para creeps (dueño, 2026-11-03: «en principio no lo vamos a usar, pero debería existir»):** hoy los creeps solo llaman refuerzos
+  (creeps comunes). Queda para después de diseñar mejor la gestión de invocaciones de jugador; recién ahí se piensa la de los creeps.
 - [ ] **👁 Ojo de Kicillof como habilidad de Support (dueño, 2026-11-03: «sería interesante, habría que pensarlo en coste»):** hoy es solo el
   Pergamino de ojo. Pensar el costo (SP, No2, cooldown; probablemente lenta) y si dura menos o ve menos que el pergamino. A diseñar, no programar todavía.
 - [ ] **(ver «Talismanes elementales») 🔥 Talismán Común que potencie el fuego (dueño, 2026-11-02, Piromante):** hoy no hay ninguno (solo resistencias: Piedra de brasa; en Buena,

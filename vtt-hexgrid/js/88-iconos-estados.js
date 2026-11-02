@@ -32,6 +32,7 @@ const ICONOS_ESTADO = {
   'panico': {ic: '😱', fondo: '#7A1420'},
   'malviaje de floripondio': {ic: '🌺', fondo: '#5B2A86'},   // (2026-11-01) el Pánico contra todos: flor sobre violeta   // el mismo grito, sobre fondo rojo
   'confusion': {ic: '🌀'},
+  'escalofrio': {ic: '🥶'},   // (2026-11-03) la rápida siniestra del Debuffer: −2 PdG (salía con la inicial «E»)
   'provocado': {ic: '😤'},
   'silencio': {ic: '🤐'},
   'ceguera': {ic: '🙈'}, 'cegado': {ic: '🙈'}, 'cegada': {ic: '🙈'},

@@ -66,6 +66,6 @@ function iniciativaAvisarPuestos(orden, prisaIds, auto){
     Object.entries(porUid).forEach(([u, l]) => { porUidTxt[u] = l.join('\n'); });
     momentoAbrir({tipo: 'iniciativa-orden', icono: prisa.size ? '🏃' : '🎲', titulo: 'Terminó la ronda de iniciativa',
       resultado: cronica.length ? `Orden: ${cronica.join(' · ')}${prisa.size && auto ? ' (🏃 Prisa primero)' : ''}` : 'El orden de turnos quedó listo.',
-      estado: 'listo', datos: {paraUids, aviso: true, tituloAviso: '🎲 Terminó la ronda de iniciativa', porUid: porUidTxt}});
+      estado: 'listo', datos: {paraUids, aviso: true, tituloAviso: 'Terminó la ronda de iniciativa', porUid: porUidTxt}});
   }catch(err){ console.error('No se pudo avisar el orden de turnos:', err); }
 }

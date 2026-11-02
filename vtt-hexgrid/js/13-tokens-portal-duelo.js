@@ -1600,7 +1600,8 @@ function actualizarMuerteMapa(){
   const f = fid ? fichasPub.get(fid) : null;
   const r = f && f.resumen;
   if(r && num(r.hp) > 0) muerteIframe = null;   // ya está de pie
-  const m = (r && r.muerto && r.muerto.activo && num(r.hp) <= 0) ? r.muerto : (!soyGM ? muerteIframe : null);
+  // `r.muerto` es true/false (el objeto viejo con `activo` quedaba pisado en el resumen: 2026-11-03, el filtro no salía); los turnos, `muertoTurnos`.
+  const m = (r && r.muerto && num(r.hp) <= 0) ? (r.muerto.activo !== undefined ? r.muerto : {activo: true, turnos: num(r.muertoTurnos), definitivo: !!r.muertoDef}) : (!soyGM ? muerteIframe : null);
   const muerto = !!(m && m.activo);
   if(!muerto){ if(el) el.hidden = true; return; }
   if(!el){

@@ -741,13 +741,15 @@ async function inicioTurnoPendiente(tokenId, clave){
       const C = structuredClone(S);
       const est = () => (invId ? (((C.invocaciones || []).find(x => x && x.id === invId) || {}).estados) : C.efectos) || [];
       const antes = est().filter(e => e && e.activo !== false && !e.permanente && num(e.turnos) > 0).map(e => ({id: e.id, nombre: e.nombre, turnos: num(e.turnos)}));
+      const antesMalviaje = typeof esMalviaje === 'function' ? (est().find(esMalviaje) || null) : null;
       const r = FichaMantenimiento.inicioTurno(C, {fijarHp: v => FichaAcciones.fijarHp(C, v)}, clave, invId || '', conTurno, numero);
       if(!r) return false;
       const despues = new Map(est().map(e => [e.id, e]));
       const pv = est().find(e => e && e.activo !== false && /^Provocado/i.test(String(e.nombre || '')));   // 😤 sigue provocado este turno
+      const mvE = typeof esMalviaje === 'function' ? (est().find(esMalviaje) || antesMalviaje) : null;   // 🌺 malviajando (aunque se termine este turno)
       const tt = n => `${fmt(n)} turno${n === 1 ? '' : 's'}`;
       const humo = n => r.rep.some(l => /^Sahumerio/.test(l) && l.endsWith(`se llevó ${n}`));   // 🔮 lo sacó el Sahumerio, no se terminó
-      prev = {prov: pv ? {de: String(pv.provocaDe || ''), quien: String(pv.provocaDeNombre || '') || ((String(pv.detalle || '').match(/(?:ira dirigida contra|tiene que atacar a) ([^(.:]+)/) || [])[1] || '').trim()} : null, rep: r.rep, turnos: antes.map(a => { const e = despues.get(a.id); return e ? `${a.nombre}: ${tt(a.turnos)} → ${tt(num(e.turnos))}` : humo(a.nombre) ? `${a.nombre}: se lo llevó el humo` : `${a.nombre}: se termina`; })};
+      prev = {malviaje: mvE ? {nombre: mvE.nombre, floripondio: true, ...(malviajeDifDe(mvE) ? {efEsp: malviajeDifDe(mvE)} : {})} : null, prov: pv ? {de: String(pv.provocaDe || ''), quien: String(pv.provocaDeNombre || '') || ((String(pv.detalle || '').match(/(?:ira dirigida contra|tiene que atacar a) ([^(.:]+)/) || [])[1] || '').trim()} : null, rep: r.rep, turnos: antes.map(a => { const e = despues.get(a.id); return e ? `${a.nombre}: ${tt(a.turnos)} → ${tt(num(e.turnos))}` : humo(a.nombre) ? `${a.nombre}: se lo llevó el humo` : `${a.nombre}: se termina`; })};
       return false;   // solo mirar: no se guarda nada
     });
   }catch(err){ console.error('No se pudo calcular el inicio del turno:', err); return false; }
@@ -768,11 +770,12 @@ async function inicioTurnoPendiente(tokenId, clave){
     ...(otros.length ? [{titulo: 'Además', texto: otros.join(' · ')}] : []),
   ];
   if(!pasos.length) pasos.push({titulo: 'Lo que pasa al empezar', texto: 'Nada que cambie.'});
+  try{ const mv = prev.malviaje && typeof malviajePasoPrevio === 'function' ? malviajePasoPrevio(t, prev.malviaje) : null; if(mv) pasos.unshift(mv); }catch(err){ console.error('El Malviaje:', err); }   // 🌺 (js/52)
   if(prev.prov){ const q = prev.prov.quien || 'quien te provocó'; pasos.unshift({titulo: `😤 Estás provocado por ${q}`, texto: `${provocadoTexto(q)} ✋ Lo respeta quien juega (no lo frena el mapa).`}); }
   // 🔮 La Bola de cristal (2026-10-18): si hay algo oculto en su campo de visión, se anuncia acá (js/53).
   try{ if(!invId && typeof bolaCristalAviso === 'function'){ const b = bolaCristalAviso(t); if(b) pasos.push(b); } }catch(err){ console.error('La Bola de cristal:', err); }
   await momentoAbrir({tipo: 'inicio-turno', icono: '▶', titulo: `Empieza el turno de ${nombreDe(t)}`, estado: 'esperando',
-    resultado: 'Esperando que aplique el inicio de su turno…', datos: {tokenId, clave, paraUid, pasos,
+    resultado: 'Esperando que aplique el inicio de su turno…', datos: {tokenId, clave, paraUid, pasos, ...(prev.malviaje ? {malviaje: prev.malviaje} : {}),
       ...(prev.prov ? {provocado: true, ...(prev.prov.de ? {provocaDe: prev.prov.de, provocaDeNombre: prev.prov.quien} : {})} : {})}});
   return true;
 }
@@ -792,10 +795,13 @@ async function inicioTurnoAplicar(id, d, porGM){
     }
     const tp = tokens.get(dt.tokenId);
     if(dt.provocado && tp) provocadoAvisados.add(`${tp.fichaId}:${Math.round(num(iniciativa.paso))}`);   // 😤 ya estaba en este reporte
+    let mv = null;   // 🌺 malviajando: la tirada del inicio (js/52), antes de aplicar (el estado todavía está, aunque se termine este turno)
+    try{ mv = tp && dt.malviaje && typeof malviajeInicioTirar === 'function' ? await malviajeInicioTirar(tp, porGM, dt.malviaje) : null; }catch(err){ console.error('El Malviaje:', err); }
     await turnoDeToken(dt.tokenId, dt.clave, true);
     if(dt.provocaDe && tp && typeof provocadoBrilloPedir === 'function') provocadoBrilloPedir(dt.provocaDe, dt.provocaDeNombre, nombreDe(tp));
-    const pasos = [...(dt.pasos || []), {titulo: '✔ Aplicado', texto: `Ya se aplicó${porGM ? ' (lo aplicó el GM)' : ''}: los estados, la regeneración, la vida y los No2 quedaron como dice arriba.`}];
-    await momentoActualizar(id, {estado: 'listo', resultado: `✔ Se aplicó el inicio de su turno${porGM ? ' (lo aplicó el GM)' : ''}`, 'datos.pasos': pasos});
+    const pasos = [...(dt.pasos || []).filter(x => !/^🌺 Estás malviajando/.test(x.titulo || '')), ...(mv ? [{titulo: mv.titulo, texto: mv.texto}] : []),
+      {titulo: '✔ Aplicado', texto: `Ya se aplicó${porGM ? ' (lo aplicó el GM)' : ''}: los estados, la regeneración, la vida y los No2 quedaron como dice arriba.`}];
+    await momentoActualizar(id, {estado: 'listo', resultado: `✔ Se aplicó el inicio de su turno${porGM ? ' (lo aplicó el GM)' : ''}${mv ? ' · ' + mv.resumen : ''}`, 'datos.pasos': pasos});
   }catch(err){ console.error('No se pudo aplicar el inicio del turno:', err); toast('No se pudo aplicar el inicio del turno — mirá la consola'); }
   finally{ inicioAplicando.delete(id); }
 }
@@ -874,9 +880,10 @@ window.avisoDeudaNo2 = o => {
   // (2026-11-03, probado en el mapa) El contraataque y el ataque de oportunidad no son una defensa: se hacen igual porque son una reacción
   // fuera de turno y arrancó en 0 No2 o más (la regla del 2026-11-01).
   const reaccion = /contraataque|oportunidad/i.test(String(o.accion || ''));
-  AvisoCombate.mostrar({icono: '⚠', titulo: `${quien}: no tenés Nitros`, pasos: [{titulo: o.accion, texto: `Cuesta ${fmt(num(o.costo))} No2 y no te alcanzaban: igual se hace, porque ${reaccion ? 'es una reacción fuera de tu turno y no estabas en negativo' : 'es una defensa'}.`}],
+  const conMesa = num(o.quedan) + num(o.costo) < 0;   // ⚖ ya estaba en negativo: se hizo igual, con la mesa (2026-11-03)
+  AvisoCombate.mostrar({icono: '⚠', titulo: `${quien}: no tenés Nitros`, pasos: [{titulo: o.accion, texto: conMesa ? `Cuesta ${fmt(num(o.costo))} No2 y ya estabas en negativo: la regla dice que no, pero se hizo igual (lo decidió la mesa).` : `Cuesta ${fmt(num(o.costo))} No2 y no te alcanzaban: igual se hace, porque ${reaccion ? 'es una reacción fuera de tu turno y no estabas en negativo' : 'es una defensa'}.`}],
     veredicto: {tono: 'malo', grande: `${fmt(num(o.quedan))} No2`, chico: 'esa deuda se descuenta en tu próxima recarga'}});
-  momentoAbrir({tipo: 'deuda', icono: '⚠', titulo: `${quien} ${reaccion ? 'reaccionó' : 'se defendió'} sin Nitros`, resultado: `${o.accion}: quedó en ${fmt(num(o.quedan))} No2 (se descuenta en su próxima recarga).`,
+  momentoAbrir({tipo: 'deuda', icono: '⚠', titulo: conMesa ? `${quien} se saltó la regla de los No2 negativos (con la mesa)` : `${quien} ${reaccion ? 'reaccionó' : 'se defendió'} sin Nitros`, resultado: `${o.accion}: quedó en ${fmt(num(o.quedan))} No2 (se descuenta en su próxima recarga).`,
     estado: 'listo', datos: {centro: true}});
 };
 // ¿Ese token está haciendo el dodge roll? (puede quedar en No2 negativos al moverse)

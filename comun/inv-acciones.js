@@ -93,7 +93,7 @@ const InvAcciones = (() => {
     const costo = costoAtaqueDe(inv, tipo), tenia = Math.max(0, num(inv.nitros));
     if(Combatiente.defensaSinNo2(inv.nitros, costo)) return Combatiente.errorNo2(inv.nombre, inv.nitros, especial(tipo) ? 'el ' + NOMBRE_ESPECIAL[tipo].toLowerCase() : 'atacar');   // ya en negativo (2026-11-01) · ⚖
     const forzado = costo > num(inv.nitros) && !especial(tipo) ? {costo, tenia} : null;   // la oportunidad / el contraataque van a negativo
-    if(forzado && !forzar) return {error: `${inv.nombre}: no le alcanzan los Nitros — ${especial(tipo) ? 'el ' + NOMBRE_ESPECIAL[tipo].toLowerCase() : 'este ataque'} cuesta ${fmt(costo)} y tiene ${fmt(num(inv.nitros))}`};
+    if(forzado && !forzar && !Combatiente.permisoNo2()) return {error: `${inv.nombre}: no le alcanzan los Nitros — ${especial(tipo) ? 'el ' + NOMBRE_ESPECIAL[tipo].toLowerCase() : 'este ataque'} cuesta ${fmt(costo)} y tiene ${fmt(num(inv.nitros))}`};
     if(especial(tipo)){
       inv.nitros = num(inv.nitros) - costo;   // sin No2, queda en negativo (2026-11-01)
       Combatiente.avisarDeudaNo2({nombre: inv.nombre, accion: 'el ' + NOMBRE_ESPECIAL[tipo].toLowerCase(), costo, quedan: num(inv.nitros)});
@@ -102,7 +102,7 @@ const InvAcciones = (() => {
       return {forzado, paga: forzado ? tenia : costo, aviso: `${inv.nombre}: ${NOMBRE_ESPECIAL[tipo].toLowerCase()} −${fmt(forzado ? tenia : costo)} No2 ${forzado ? `(costaba ${fmt(costo)})` : '(lo de un primer ataque)'}${bono ? ` · PdG +${fmt(bono)} por ${tipo === 'contra' ? 'contraataque' : 'oportunidad'}` : ''}`};
     }
     const primero = num(inv.ataquesTurno) === 0;
-    inv.nitros = forzado ? 0 : num(inv.nitros) - costo;
+    inv.nitros = forzado ? Math.min(0, num(inv.nitros)) : num(inv.nitros) - costo;   // (en negativo, con «Hacerlo igual»: queda como estaba)
     Combatiente.aplicarTormenta(inv, inv.estados, costo, {motivo: 'atacar'});
     inv.ataquesTurno = num(inv.ataquesTurno) + 1;
     return {forzado, paga: forzado ? tenia : costo, aviso: `${inv.nombre}: -${fmt(forzado ? tenia : costo)} No2${forzado ? ` (costaba ${fmt(costo)})` : ''} · ${primero ? 'primer ataque del turno' : 'ataque extra'}`};

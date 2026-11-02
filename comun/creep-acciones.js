@@ -133,9 +133,9 @@ const CreepAcciones = (() => {
     if(Combatiente.defensaSinNo2(sc.nitros, costo)) return Combatiente.errorNo2(sc.nombre, sc.nitros, tipo === 'normal' ? 'atacar' : `el ${(NOMBRE_ESPECIAL[tipo] || 'Contraataque').toLowerCase()}`);   // ya en negativo (2026-11-01) · ⚖
     const forzado = costo > tenia && !especialTipo(tipo) ? {costo, tenia} : null;   // la oportunidad / el contraataque no se fuerzan: van a negativo
     if(tipo === 'normal'){
-      if(forzado && !forzar) return {error: `${sc.nombre}: no le alcanzan los No2 — este ataque cuesta ${fmt(costo)} y tiene ${fmt(num(sc.nitros))}`};
+      if(forzado && !forzar && !Combatiente.permisoNo2()) return {error: `${sc.nombre}: no le alcanzan los No2 — este ataque cuesta ${fmt(costo)} y tiene ${fmt(num(sc.nitros))}`};
       const primero = num(sc.ataquesTurno) === 0;
-      sc.nitros = forzado ? 0 : num(sc.nitros) - costo;
+      sc.nitros = forzado ? Math.min(0, num(sc.nitros)) : num(sc.nitros) - costo;   // (en negativo, con «Hacerlo igual»: queda como estaba, no vuelve a 0)
       Combatiente.aplicarTormenta(sc, sc.estados, costo, {motivo: 'atacar'});
       sc.ataquesTurno = num(sc.ataquesTurno) + 1;
       return {forzado, paga: forzado ? tenia : costo, aviso: `${sc.nombre}: −${fmt(forzado ? tenia : costo)} No2${forzado ? ` (costaba ${fmt(costo)})` : ''} · ${primero ? 'primer ataque del turno' : `ataque ${fmt(sc.ataquesTurno)} del turno`} · quedan ${fmt(sc.nitros)}`};

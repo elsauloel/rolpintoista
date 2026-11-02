@@ -175,3 +175,49 @@ async function auraResolver(id, pid){
     AvisoCombate.mostrar({...base, pasos: [paso1], botones: [{texto: '🎲 Tirar Res.Mt', alClic: tirar}], alCerrar: tirar});
   });
 }
+
+/* 🌺 Malviaje al empezar el turno (dueño, 2026-11-03: «al principio de cada turno… alguna tirada para que elija escapar o atacar al más cercano»;
+   aprobado: «tira su Res.Mt contra el Ef.Esp de quien se lo puso… si gana, ese turno juega normal (con el −2); si pierde, 1d6: 1–3 escapa, 4–6 ataca
+   al más cercano, aliado o rival… lo que hace después lo ejecuta el jugador a mano»). Va como un paso del «▶ Empieza tu turno» (js/04): avisa en el
+   cartel y, al aplicarlo, tira. La dificultad: el Ef.Esp guardado en el estado (`efEsp` / `malviajeDif` / `dif`); si no está, la elige el GM (si
+   aplica él) o vale MALVIAJE_DIF_DEFECTO. Las tiradas van a la Mesa; el resultado, al cartel y a la Crónica (el mismo momento). */
+const MALVIAJE_DIF_DEFECTO = 8;
+function malviajeEstadoDe(t){
+  return (typeof confusionEstadosDe === 'function' ? confusionEstadosDe(t) : [])
+    .find(e => e && e.activo !== false && (e.floripondio || /^mal ?viaje de floripondio$/i.test(String(e.nombre || '').trim()))) || null;
+}
+const malviajeDifDe = e => Math.round(num(e && (e.malviajeDif || e.efEsp || e.dif)));
+const esMalviaje = e => !!(e && e.activo !== false && (e.floripondio || /^mal ?viaje de floripondio$/i.test(String(e.nombre || '').trim())));
+// `e`: el estado (de la copia de la ficha que arma el inicio del turno, js/04; el resumen público puede venir atrasado). Sin él, el del token.
+function malviajePasoPrevio(t, e){
+  e = e || malviajeEstadoDe(t);
+  if(!e) return null;
+  const dif = malviajeDifDe(e);
+  return {titulo: '🌺 Estás malviajando', texto: `Ves a todos como enemigos, aliados y rivales por igual. Al aplicar, tirás tu Res.Mt contra ${dif ? `el Ef.Esp de quien te lo puso (${fmt(dif)})` : 'el Ef.Esp de quien te lo puso (no se sabe: lo elige el GM, o ' + MALVIAJE_DIF_DEFECTO + ')'}: si ganás, este turno jugás normal (con el −2); si perdés, 1d6: 1–3 escapás, 4–6 atacás al más cercano.`};
+}
+// → {titulo, texto, resumen} o null (no está malviajando).
+async function malviajeInicioTirar(t, porGM, e){
+  e = e || malviajeEstadoDe(t);
+  if(!e) return null;
+  let dif = malviajeDifDe(e), nota = '';
+  if(!dif && porGM && typeof Confirmar !== 'undefined' && Confirmar.texto){
+    const v = await Confirmar.texto(`${nombreDe(t)} está malviajando: ¿contra qué Ef.Esp tira su Res.Mt? (el de quien le puso el Malviaje)`, {titulo: '🌺 Malviaje', icono: '🌺', valor: String(MALVIAJE_DIF_DEFECTO), si: 'Tirar'});
+    dif = Math.round(num(v));
+  }
+  if(!dif){ dif = MALVIAJE_DIF_DEFECTO; nota = ' (no se sabía el Ef.Esp: se usó ' + MALVIAJE_DIF_DEFECTO + ')'; }
+  const quien = nombreDe(t), creep = t.tipo === 'creep';
+  const pub = async (origen, r) => { try{ await mesaPublicar(origen, {formula: r.formula, rolls: r.rolls, mod: r.mod, total: r.total, quien, ...(creep ? {desde: 'gm'} : {})}); }catch(err){} };
+  const f = formulaParaValor(trampaValorStat(t, 'resm'));
+  const r = f ? tirarDados(f.formula) : {formula: '0', rolls: [], mod: 0, total: 0};
+  await pub(`Res.Mt contra el Malviaje (Ef.Esp ${fmt(dif)})`, r);
+  if(num(r.total) >= dif){
+    const texto = `Res.Mt ${fmt(r.total)} contra ${fmt(dif)}${nota}: resistió. Este turno jugás normal (con el −2 del Malviaje contra cualquiera).`;
+    return {titulo: '🌺 Malviaje: resististe', texto, resumen: `🌺 resistió el Malviaje (${fmt(r.total)} contra ${fmt(dif)}): juega normal`};
+  }
+  const d = tirarDados('1d6');
+  await pub('Malviaje: ¿escapa o ataca? (1–3 escapa, 4–6 ataca)', d);
+  const escapa = num(d.total) <= 3;
+  const que = escapa ? 'escapá: usá tu movimiento para alejarte de todos' : 'atacá al más cercano, aliado o rival';
+  const texto = `Res.Mt ${fmt(r.total)} contra ${fmt(dif)}${nota}: no resistió. 1d6 = ${fmt(d.total)} → ${que}. ✋ Lo hacés vos, a mano (el mapa no te mueve ni ataca solo).`;
+  return {titulo: `🌺 Malviaje: ${escapa ? 'escapás' : 'atacás al más cercano'}`, texto, resumen: `🌺 no resistió el Malviaje: ${escapa ? 'escapa (se aleja de todos)' : 'ataca al más cercano'}`};
+}

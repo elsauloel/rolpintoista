@@ -871,9 +871,12 @@ function avisarFueraDeTurno(tokenId, b){
    Crónica. La deuda se descuenta en su próxima recarga. */
 window.avisoDeudaNo2 = o => {
   const quien = o.nombre || 'Sin nombre';
-  AvisoCombate.mostrar({icono: '⚠', titulo: `${quien}: no tenés Nitros`, pasos: [{titulo: o.accion, texto: `Cuesta ${fmt(num(o.costo))} No2 y no te alcanzaban: igual se hace, porque es una defensa.`}],
+  // (2026-11-03, probado en el mapa) El contraataque y el ataque de oportunidad no son una defensa: se hacen igual porque son una reacción
+  // fuera de turno y arrancó en 0 No2 o más (la regla del 2026-11-01).
+  const reaccion = /contraataque|oportunidad/i.test(String(o.accion || ''));
+  AvisoCombate.mostrar({icono: '⚠', titulo: `${quien}: no tenés Nitros`, pasos: [{titulo: o.accion, texto: `Cuesta ${fmt(num(o.costo))} No2 y no te alcanzaban: igual se hace, porque ${reaccion ? 'es una reacción fuera de tu turno y no estabas en negativo' : 'es una defensa'}.`}],
     veredicto: {tono: 'malo', grande: `${fmt(num(o.quedan))} No2`, chico: 'esa deuda se descuenta en tu próxima recarga'}});
-  momentoAbrir({tipo: 'deuda', icono: '⚠', titulo: `${quien} se defendió sin Nitros`, resultado: `${o.accion}: quedó en ${fmt(num(o.quedan))} No2 (se descuenta en su próxima recarga).`,
+  momentoAbrir({tipo: 'deuda', icono: '⚠', titulo: `${quien} ${reaccion ? 'reaccionó' : 'se defendió'} sin Nitros`, resultado: `${o.accion}: quedó en ${fmt(num(o.quedan))} No2 (se descuenta en su próxima recarga).`,
     estado: 'listo', datos: {centro: true}});
 };
 // ¿Ese token está haciendo el dodge roll? (puede quedar en No2 negativos al moverse)

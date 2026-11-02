@@ -322,18 +322,36 @@ const Intercambio = (() => {
   }
   // Del lado de quien ofreció: lo respondido se cierra (una sola pantalla, por la transacción) y lo que quedó sin aviso se libera.
   const reconciliando = new Set();
+  const sueltaDesde = new Map(), SUELTA_ESPERA_MS = 10000;   // reserva sin aviso → desde cuándo (ver abajo)
   async function reconciliar(fichaId){
     if(!host || reconciliando.has(fichaId)) return;
     const respondidos = paquetes.filter(p => p.tipo !== 'pedido' && p.deFicha === fichaId && p.estado !== 'pendiente');
     const S0 = host.leer(fichaId);
-    const sueltas = !S0 ? [] : desdeServidor ? ['inventario', 'cinturon'].flatMap(k => (S0[k] || []).filter(it => it && it.reservado && !paquetes.some(p => p.id === it.reservado))) : [];
+    const sueltas0 = !S0 ? [] : desdeServidor ? ['inventario', 'cinturon'].flatMap(k => (S0[k] || []).filter(it => it && it.reservado && !paquetes.some(p => p.id === it.reservado))) : [];
+    // 🔁 (2026-11-03, probado en el mapa: el mismo personaje abierto en el mapa y en la ficha suelta) Cuando el otro acepta, UNA pantalla cierra
+    // el aviso y saca el ítem; la otra ve la reserva sin aviso. Antes la liberaba al instante y, al guardar, el ítem volvía: quedaba duplicado
+    // (en los dos personajes). Ahora espera un rato (lo que tarda en llegarle la mochila ya guardada por la otra pantalla) y, antes de
+    // liberarla, mira la mochila guardada: si ahí ya no está, se entregó desde otra pantalla y acá también se saca.
+    const ahora = Date.now();
+    sueltas0.forEach(it => { if(!sueltaDesde.has(it.reservado)) sueltaDesde.set(it.reservado, ahora); });
+    const sueltas = sueltas0.filter(it => ahora - sueltaDesde.get(it.reservado) >= SUELTA_ESPERA_MS);
+    if(sueltas0.length > sueltas.length) setTimeout(() => revisar(), SUELTA_ESPERA_MS + 300);
     if(!respondidos.length && !sueltas.length) return;
     reconciliando.add(fichaId);
     try{
       // Una reserva sin aviso se mira contra el servidor antes de liberarla (puede ser de un aviso recién creado en otra pantalla).
-      const faltan = [];
+      const faltan = [], entregadas = new Set();
       for(const it of sueltas){
         try{ const d = await col('paquetes').doc(it.reservado).get(); if(!d.exists) faltan.push(it.reservado); }catch(e){}
+      }
+      if(faltan.length && typeof FichaGuardado !== 'undefined' && FichaGuardado.leer && typeof fbRutaCampana === 'function'){
+        try{
+          const l = await FichaGuardado.leer(fbDb, fbRutaCampana('fichas/' + fichaId)), g = l && l.datos;
+          if(g) sueltas.filter(it => faltan.includes(it.reservado)).forEach(it => {
+            const guardado = ['inventario', 'cinturon'].some(k => (g[k] || []).some(x => x && (x.reservado === it.reservado || (it.id && x.id === it.id))));
+            if(!guardado) entregadas.add(it.reservado);
+          });
+        }catch(e){ console.error('Intercambio: no se pudo mirar la mochila guardada', e); return; }   // sin mirarla, no se libera nada (se reintenta)
       }
       await host.con(fichaId, async S => {
         let hubo = false;
@@ -365,7 +383,7 @@ const Intercambio = (() => {
           else{ devolver(S, p); host.toast(`${p.paraNombre} no aceptó ${paqueteTxt(p)}: vuelve a ${p.deNombre}`); }
           hubo = true;
         }
-        faltan.forEach(id => { if(liberar(S, id)) hubo = true; });
+        faltan.forEach(id => { if(entregadas.has(id) ? quitarReservado(S, id) : liberar(S, id)) hubo = true; sueltaDesde.delete(id); });
         return hubo;
       });
     }finally{ reconciliando.delete(fichaId); }

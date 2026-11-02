@@ -1107,7 +1107,7 @@ async function confirmarRuta(){
 $('#ruta-no').onclick = cancelarRuta;
 // Con un movimiento marcado, un clic en cualquier otro lado lo confirma.
 document.addEventListener('pointerdown', e => {
-  if(!rutaPendiente || e.target.closest('#ruta-confirmar')) return;
+  if(!rutaPendiente || rutaPendiente.esperaRegla || e.target.closest('#ruta-confirmar')) return;   // (⚖ con el cartel de la regla de No2 abierto, no)
   confirmarRuta();
 }, true);
 

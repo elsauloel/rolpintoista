@@ -672,9 +672,11 @@ function rutaSoltada(a, t){
       // Solo se pregunta si el movimiento se pasa de los No2 que quedan.
       if(dodgeRegla){
         const rp = rutaPendiente;
+        rp.esperaRegla = true;   // mientras está el cartel, el clic en sus botones no confirma la ruta (js/08: «un clic en cualquier otro lado lo confirma»; 2026-11-03)
         Combatiente.reglaNo2({nombre: nombreDe(tokens.get(a.id)), nitros: num(a.costo.disponibles), accion: 'el dodge roll'}).then(ok => {
           if(rutaPendiente !== rp) return;
-          if(ok){ rp.dodge = true; confirmarRuta(); } else mostrarConfirmacionRuta();
+          rp.esperaRegla = false;
+          if(ok){ rp.dodge = true; confirmarRuta(); } else cancelarRuta();   // «Respetar la regla»: no se mueve
         });
       }
       else if(costoTotal > Math.max(0, a.costo.disponibles) && !dodge) mostrarConfirmacionRuta();
@@ -902,7 +904,7 @@ document.addEventListener('keydown', e => {
     pegarElemento();
     return;
   }
-  if(rutaPendiente && e.key === 'Enter'){ e.preventDefault(); confirmarRuta(); return; }
+  if(rutaPendiente && !rutaPendiente.esperaRegla && e.key === 'Enter'){ e.preventDefault(); confirmarRuta(); return; }
   if(rutaPendiente && e.key === 'Escape'){ cancelarRuta(); return; }
   if(moverLibre && e.key === 'Escape'){ activarMoverLibre(moverLibre); return; }
   if(herramientaActiva && e.key === 'Escape'){ desactivarHerramienta(); return; }

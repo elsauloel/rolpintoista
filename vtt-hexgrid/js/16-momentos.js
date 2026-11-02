@@ -94,6 +94,7 @@ function momentoRecibido(id, d){
   if(d.tipo === 'provocado-brillo' && typeof provocadoBrilloRecibido === 'function') provocadoBrilloRecibido(d);   // 😤 (js/77)   // 😤 la bronca que estalla (js/51)
   if(d.tipo === 'fin-combate' && typeof finCombateMomento === 'function') finCombateMomento(id);   // 🏁 lo de fin de combate de cada uno (js/25)
   if(d.tipo === 'inicio-turno' && inicioTurnoMomento(id, d)) return;
+  if(d.tipo === 'pergamino-grupal' && typeof pergaminoGrupalMomento === 'function') pergaminoGrupalMomento(id, d);   // 📜 Aplicar o a mano (js/25, 2026-11-03)
   if(d.tipo === 'malviaje' && typeof malviajeMomento === 'function' && malviajeMomento(id, d)) return;   // 🌺 la tirada del Malviaje, al afectado al centro (js/52, 2026-11-03)
   if(d.tipo === 'diablito' && typeof diablitoMomento === 'function' && diablitoMomento(id, d)) return;   // 😈 la Botella con un diablito (js/53)   // ▶ Empieza tu turno: al centro de su dueño (js/04)   // 🫳 el robo en sigilo (js/47): solo la víctima y el GM
   if(d.tipo === 'rayo' && d.datos && Array.isArray(d.datos.saltos)) rayoMomento(id, d);
@@ -145,7 +146,7 @@ function momentoRecibido(id, d){
   // `paraUids` (2026-10-08, el choque de un empujón): el mismo aviso al centro para varios (cada involucrado).
   const paraMi = d.datos && ((d.datos.paraUid && d.datos.paraUid === fbUsuario.uid) || (Array.isArray(d.datos.paraUids) && d.datos.paraUids.includes(fbUsuario.uid)));
   // (La tirada extra de una zona tiene su propio cartel, con el botón para tirar — js/66: el aviso genérico lo tapaba. 2026-10-22)
-  if(!chicoParaMi && paraMi && d.tipo !== 'zona-extra' && d.tipo !== 'mal-de-ojo' && d.tipo !== 'malviaje' && (d.creadoPor !== fbUsuario.uid || d.datos.aviso)){ momentoAvisoCentro(id, d); return; }
+  if(!chicoParaMi && paraMi && d.tipo !== 'zona-extra' && d.tipo !== 'mal-de-ojo' && d.tipo !== 'malviaje' && d.tipo !== 'pergamino-grupal' && (d.creadoPor !== fbUsuario.uid || d.datos.aviso)){ momentoAvisoCentro(id, d); return; }
   // La esquina: todo, salvo lo que esta pantalla ya sigue al centro.
   const mio = d.creadoPor === fbUsuario.uid && d.datos && d.datos.centro;
   if(d.tipo === 'oportunidad' && oporSoyDecisor(d)){ momentosFeed.delete(id); renderMomentosFeed(); return; }   // lo decide esta pantalla, al centro

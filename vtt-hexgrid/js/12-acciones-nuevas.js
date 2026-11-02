@@ -211,17 +211,7 @@ async function acEfectoAlGrupo(sc, it){
     ...((it.efectoMods || []).length ? {mods: it.efectoMods} : {}), ...(num(it.efectoHpTurno) ? {hp: num(it.efectoHpTurno)} : {}),
     ...(it.efectoDetalle ? {detalle: it.efectoDetalle} : {})};
   if(!spec.nombre || !soyGM) return;
-  const vistos = new Set([String(sc.id)]), nombres = [];
-  for(const [, t] of tokens){
-    if(!t || t.tipo !== 'creep' || !t.fichaId || vistos.has(String(t.fichaId))) continue;
-    vistos.add(String(t.fichaId));
-    let ok = false;
-    try{ await modificarCreep(t.fichaId, crudo => { if(num(crudo.hp) <= 0) return false; ok = EstadosAplicar.aplicarACreep(crudo, spec).ok; return ok; }); }
-    catch(err){ console.error('No se pudo pasar el estado a un creep aliado:', err); }
-    if(ok) nombres.push(nombreDe(t));
-  }
-  toast(nombres.length ? `📜 ${it.nombre}: también a ${nombres.join(', ')}` : `📜 ${it.nombre}: no hay aliados en el mapa`);
-  if(nombres.length && typeof mesaLinea === 'function') mesaLinea(`📜 ${it.nombre}: ${spec.nombre} ${spec.turnos} turnos también a ${nombres.join(', ')}`, 'recordatorio', sc.nombre);
+  await pergaminoGrupalRepartir({quien: sc.nombre, propio: sc.id, it, spec, aliados: 'creep'});   // 📜 solo los del orden de turnos, con aviso (js/25, 2026-11-03)
 }
 function acAccionAca(b){
   const d = b.dataset, sc = acCreep();

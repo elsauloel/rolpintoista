@@ -153,15 +153,58 @@ async function bnEfectoAlGrupo(fichaId, estado, it){
     ...((it.efectoMods || []).length ? {mods: it.efectoMods} : {}), ...(num(it.efectoHpTurno) ? {hp: num(it.efectoHpTurno)} : {}),
     ...(it.efectoDetalle ? {detalle: it.efectoDetalle} : {})};
   if(!spec.nombre) return;
-  const vistos = new Set([String(fichaId)]), nombres = [];
-  for(const [, t] of tokens){
-    if(!t || t.tipo !== 'pj' || !t.fichaId || vistos.has(String(t.fichaId)) || !t.duenoUid) continue;
+  const yo = [...tokens.values()].find(t => t && t.fichaId === fichaId);
+  await pergaminoGrupalRepartir({quien: yo ? nombreDe(yo) : 'Un aliado', propio: fichaId, it, spec, aliados: 'pj'});
+}
+/* 📜 El pergamino grupal, a quién le llega y cómo (dueño, 2026-11-03: «llega solo a los que están en el orden de turnos. Al ejecutarse, a cualquier
+   usuario cuyo personaje es afectado le aparece una notificación: fulanito usó tal pergamino, el efecto es este, botón aplicar o resolver a mano»).
+   Con un orden de turnos armado, solo a los aliados que están en él; sin orden (fuera de combate), a todos los aliados del mapa, como antes. A cada
+   uno, un momento «pergamino-grupal» (js/16): quien maneja a ese personaje (el GM, a sus creeps) ve el aviso con ✔ Aplicar / ✋ Resolver a mano. */
+function enOrdenDeTurnos(tokenId){   // null = no hay orden de turnos armado
+  const o = typeof iniciativa !== 'undefined' && iniciativa && Array.isArray(iniciativa.orden) ? iniciativa.orden : [];
+  if(!o.length) return null;
+  return o.some(x => x && String(x.id) === String(tokenId));
+}
+async function pergaminoGrupalRepartir({quien, propio, it, spec, aliados}){
+  const efecto = typeof EstadosAplicar !== 'undefined' && EstadosAplicar.texto ? EstadosAplicar.texto(spec) : `${spec.nombre} ${spec.turnos} turnos`;
+  const vistos = new Set([String(propio)]), nombres = [], fuera = [];
+  for(const [tid, t] of tokens){
+    if(!t || !t.fichaId || vistos.has(String(t.fichaId))) continue;
+    if(aliados === 'pj' ? (t.tipo !== 'pj' || !t.duenoUid) : t.tipo !== 'creep') continue;
     vistos.add(String(t.fichaId));
-    try{ await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec, origen: it.nombre}); nombres.push(nombreDe(t)); }
-    catch(err){ console.error('No se pudo pasar el estado a un aliado:', err); }
+    if(aliados === 'creep'){ const sc = typeof creepPrivadoDe === 'function' ? creepPrivadoDe(t.fichaId) : null; if(sc && num(sc.hp) <= 0) continue; }
+    if(enOrdenDeTurnos(t.id || tid) === false){ fuera.push(nombreDe(t)); continue; }
+    const f = aliados === 'pj' && typeof fichasPub !== 'undefined' ? fichasPub.get(String(t.fichaId).split(SEP_INVOCACION)[0]) : null;
+    const paraUid = aliados === 'pj' ? ((f && f.resumen && f.resumen.control) || t.duenoUid || '') : '';
+    await momentoAbrir({tipo: 'pergamino-grupal', icono: '📜', titulo: `${quien} usó ${it.nombre}`, estado: 'esperando',
+      resultado: `Para ${nombreDe(t)}: ${efecto}. Esperando «Aplicar» o «Resolver a mano»…`,
+      datos: {tokenId: t.id || tid, fichaId: t.fichaId, duenoUid: t.duenoUid || '', tipoAliado: aliados, paraUid, paraGM: aliados === 'creep', spec, efecto,
+        origen: it.nombre, quien, nombre: nombreDe(t)}});
+    nombres.push(nombreDe(t));
   }
-  toast(nombres.length ? `📜 ${it.nombre}: también a ${nombres.join(', ')}` : `📜 ${it.nombre}: no hay aliados en el mapa`);
-  if(nombres.length && typeof mesaLinea === 'function') mesaLinea(`📜 ${it.nombre}: ${spec.nombre} ${spec.turnos} turnos también a ${nombres.join(', ')}`);
+  const fueraTxt = fuera.length ? ` (no les llega a ${fuera.join(', ')}: no están en el orden de turnos)` : '';
+  toast(nombres.length ? `📜 ${it.nombre}: le llega el aviso a ${nombres.join(', ')}${fueraTxt}` : `📜 ${it.nombre}: no hay aliados ${enOrdenDeTurnos('') === null ? 'en el mapa' : 'en el orden de turnos'}${fueraTxt}`);
+  if(nombres.length && typeof mesaLinea === 'function') mesaLinea(`📜 ${quien} usó ${it.nombre}: ${efecto} — también a ${nombres.join(', ')} (cada uno lo aplica o lo resuelve a mano)${fueraTxt}`, 'recordatorio', aliados === 'creep' ? quien : undefined);
+}
+const pergGrupalVistos = new Set();
+function pergaminoGrupalMomento(id, d){
+  const dt = d.datos || {};
+  if(d.estado !== 'esperando' || pergGrupalVistos.has(id)) return;
+  if(dt.paraGM ? !soyGM : (!fbUsuario || dt.paraUid !== fbUsuario.uid)) return;
+  pergGrupalVistos.add(id);
+  const cerrar = (resultado, linea) => { AvisoCombate.cerrar(); momentoActualizar(id, {estado: 'listo', resultado}); if(linea && typeof mesaLinea === 'function') mesaLinea(linea, 'recordatorio'); };
+  AvisoCombate.mostrar({clave: 'perg-grupal:' + id, icono: '📜', titulo: d.titulo || 'Pergamino grupal',
+    texto: `${dt.quien || 'Un aliado'} usó ${dt.origen || 'un pergamino'}. Para ${dt.nombre || 'vos'}: ${dt.efecto || ''}`,
+    botones: [{texto: '✔ Aplicar', alClic: async () => {
+        let ok = false;
+        try{
+          if(dt.tipoAliado === 'creep') await modificarCreep(dt.fichaId, crudo => { ok = EstadosAplicar.aplicarACreep(crudo, dt.spec).ok; return ok; });
+          else{ await EstadosAplicar.encolarPj({fichaId: dt.fichaId, duenoUid: dt.duenoUid, spec: dt.spec, origen: dt.origen}); ok = true; }
+        }catch(err){ console.error('No se pudo aplicar el pergamino grupal:', err); }
+        cerrar(ok ? `✔ ${dt.nombre}: ${dt.efecto} (aplicado)` : `✖ ${dt.nombre}: no se pudo aplicar (${dt.efecto})`);
+      }},
+      {texto: '✋ Resolver a mano', sec: true, alClic: () => cerrar(`✋ ${dt.nombre}: lo resuelve a mano (${dt.efecto})`, `📜 ${dt.origen}: ${dt.nombre} lo resuelve a mano (${dt.efecto})`)}],
+    alCerrar: () => { pergGrupalVistos.delete(id); }});   // cerrado sin decidir: queda esperando en la Crónica
 }
 // 📜 «Hasta el fin del combate» (dueño, 2026-10-19): los pergaminos de todo el combate se van al «Finalizar combate» (también los viejos, por el nombre).
 const finDelCombate = e => !!e && (e.finCombate || (e.permanente && /\(pergamino\)\s*$|^Sangre de drag[oó]n/i.test(String(e.nombre || ''))));   // (+ la Sangre de dragón, 2026-10-20)

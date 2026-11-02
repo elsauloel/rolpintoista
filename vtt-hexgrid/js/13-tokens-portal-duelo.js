@@ -2028,13 +2028,21 @@ async function dueloEmpujar(d, n, clava){
   let c = {col: t.col, fila: t.fila}, pasos = 0;
   const ocupada = x => elementoSolidoEn(x.col, x.fila) || [...tokens.values()].some(y => y !== t && y.col === x.col && y.fila === x.fila);
   const pared = (a, b) => typeof paredCorta === 'function' && paredCorta(a, b);   // una pared dibujada también lo frena (2026-10-26, Clavar a la pared)
+  // 📌 En línea recta, lejos del tirador (2026-11-03, probando Clavar a la pared en el mapa): antes elegía cualquier casilla más lejana libre, así que
+  // rodeaba la pared o el token que tenía atrás y casi nunca chocaba. Ahora sigue la dirección tirador → empujado: en cada paso, la casilla vecina
+  // mejor alineada con esa dirección (si hay dos igual de alineadas, la que esté libre); si esa está tapada (un Sólido, una pared, un token), choca ahí.
+  const p0 = hexCentro(ta.col, ta.fila), p1 = hexCentro(t.col, t.fila);
+  let dx = p1.x - p0.x, dy = p1.y - p0.y; { const L = Math.hypot(dx, dy) || 1; dx /= L; dy /= L; }
+  const alin = (a, v) => { const pa = hexCentro(a.col, a.fila), pv = hexCentro(v.col, v.fila); const ex = pv.x - pa.x, ey = pv.y - pa.y, l = Math.hypot(ex, ey) || 1; return (ex * dx + ey * dy) / l; };
+  const adelante = x => { const vs = vecinosDeCasilla(x).filter(v => distanciaHex(v, ta) > distanciaHex(x, ta)).map(v => ({v, s: alin(x, v)})).sort((p, q) => q.s - p.s);
+    return vs.length ? vs.filter(o => o.s >= vs[0].s - 0.02).map(o => o.v) : []; };
   for(let i = 0; i < n; i++){
-    const sig = vecinosDeCasilla(c).filter(v => !ocupada(v) && !pared(c, v) && distanciaHex(v, ta) > distanciaHex(c, ta)).sort((p, q) => distanciaHex(q, ta) - distanciaHex(p, ta))[0];
+    const sig = adelante(c).find(v => !ocupada(v) && !pared(c, v));
     if(!sig) break;
     c = sig; pasos++;
   }
   // Contra qué chocó (2026-10-08, dueño: el aviso del daño de colisión, a todos los involucrados): el token que tapa el paso o algo sólido.
-  const contraQue = () => { const sig = vecinosDeCasilla(c).filter(v => distanciaHex(v, ta) > distanciaHex(c, ta)); return [...tokens.values()].find(y => y !== t && sig.some(v => v.col === y.col && v.fila === y.fila)) || null; };
+  const contraQue = () => { const sig = adelante(c); return [...tokens.values()].find(y => y !== t && sig.some(v => v.col === y.col && v.fila === y.fila)) || null; };
   if(!pasos){ const contra = contraQue(); momentoAbrir({tipo: 'empujon', icono: '💨', titulo, resultado: `No hay lugar para empujarlo: choca${contra ? ` contra ${nombreDe(contra)}` : ''} y queda donde está.`, estado: 'listo'}); const cl = await avisoColision(t, contra, n); const cv = clava && !contra ? await dueloClavar(d, clava) : ''; return {nota: `chocó sin moverse${cl ? ' · ' + cl : ''}${cv ? ' · ' + cv : ''}`}; }
   try{ await coleccionTokens().doc(d.defensor.tokenId).update({col: c.col, fila: c.fila, ruta: firebase.firestore.FieldValue.delete()}); }
   catch(err){ console.error('No se pudo empujar:', err); return {manual: true, nota: `empujalo ${pasos} casillas a mano`}; }

@@ -1977,3 +1977,7 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   con las casillas que quedan (`add` + `delete`; el id de la zona cambia). Lo usan: Varita del vendaval, Varita de la ráfaga helada (`despeja` en su
   duelo; las copias viejas se ponen al día con `Combatiente.ponerAlDiaItemsFabrica`) y la Ráfaga de viento de creep (`migrarLuzSanadora` le suma
   `despeja` a la guardada).
+
+- **💨 Empujones en línea recta** (2026-11-03, probando Clavar a la pared en el mapa): `dueloEmpujar` (js/13) sigue la dirección tirador → empujado
+  (la casilla vecina mejor alineada; si hay dos igual de alineadas, la libre). Antes elegía cualquier casilla más lejana libre y rodeaba la pared o
+  el token de atrás, así que Clavar a la pared casi nunca clavaba. Ahora, si lo que tiene atrás es un Sólido, una pared o un token, choca ahí.

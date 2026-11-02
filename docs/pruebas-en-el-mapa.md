@@ -281,7 +281,13 @@
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 
 ## Pendientes
-- [ ] **📌 Clavar a la pared, paso a paso con clics (dueño, 2026-11-02: «quiero que lo pruebes en el mapa paso a paso con los clics y que te
+- [x] **📌 Clavar a la pared — probado 2026-11-03 con clics** (GM con el Goblin ballestero, Jugador 1 con Prueba Uno, Jugador 2 con Prueba Dos):
+  ✔ sin pared: lo empuja 3 en línea recta y nada más · ✔ con un Sólido detrás: 1 casillero, choque (4 de daño) e Inmovilizado 3 turnos con
+  «se suelta con Fuerza contra 5» · ✔ contra un token: chocan los dos (3 y 5 de daño), sin clavar · ✔ soltarse perdiendo (1d3=3 contra 5) y
+  ganando con ayuda (3 + 3 de Prueba Dos = 6 contra 5) · ✔ la ayuda del aliado pegado («🤝 Sí, ayudar», 1 No2) · ✔ los 3 turnos bajan al terminar
+  cada turno (3→2→1) y se va solo · ✔ el +3 PdG se ve en la declaración del duelo · ✔ si esquiva, no empuja. **Bug arreglado**: el empujón rodeaba
+  la pared o el token que tenía atrás (elegía cualquier casilla más lejana libre) y casi nunca chocaba; ahora va en línea recta (js/13).
+  Original: **📌 Clavar a la pared, paso a paso con clics (dueño, 2026-11-02: «quiero que lo pruebes en el mapa paso a paso con los clics y que te
   garantice que funcione bien»; correr en la próxima tanda de pruebas, cuando el dueño diga «pasá las pruebas»).** Habilidad de creep de Rango
   (comun/skills-creep-base.js, `clava`, vtt-hexgrid/js/13). Casos: (1) sin pared detrás: empuja 3 y nada más; (2) con pared/Sólido/colisión a 1–2
   casillas: daño de colisión y Inmovilizado 3 turnos; (3) contra otro token: solo el choque, sin clavar; (4) al empezar su turno, soltarse con Fuerza

@@ -2099,16 +2099,16 @@ async function despejarEn(celdas, nombre){
    - el Ojo de Kicillof (una invocación etérea, lo único que lo afecta): se cierra.
    Lo propio del que la usa no se toca (las zonas y trampas de su bando, sus invocaciones). Lo que las reglas no dejan tocar (zonas o portales
    ajenos, sin pegar las reglas nuevas), queda a mano con aviso. */
-// 🚫 Quién creó una zona (colocadorDe, js/07) con su nombre y su Res.Esp (null si esta pantalla no la ve: un creep, si no es el GM).
+// 🚫 Quién creó una zona (colocadorDe, js/07) con su nombre y su Res.Mt (2026-11-02, dueño: la Anulación se resiste con la Res.Mt; el campo se sigue llamando resEsp) (null si esta pantalla no la ve: un creep, si no es el GM).
 function anulaCreador(el){
   const c = colocadorDe(el);
   if(!c || !c.ref) return null;
   if(c.tipo === 'creep'){
     const sc = soyGM && typeof creepPrivadoDe === 'function' ? creepPrivadoDe(c.ref) : null, pub = creepsPub.get(c.ref) || {};
-    return {tipo: 'creep', ref: c.ref, nombre: (sc && sc.nombre) || pub.nombre || 'un creep', resEsp: sc ? CreepCalculo.statValor(sc, 'resmg') : null};
+    return {tipo: 'creep', ref: c.ref, nombre: (sc && sc.nombre) || pub.nombre || 'un creep', resEsp: sc ? CreepCalculo.statValor(sc, 'resm') : null};
   }
   const f = fichasPub.get(String(c.ref).split(SEP_INVOCACION)[0]);
-  return {tipo: 'pj', ref: c.ref, nombre: (f && f.nombre) || 'un personaje', resEsp: num(((f || {}).resumen || {}).resmg)};
+  return {tipo: 'pj', ref: c.ref, nombre: (f && f.nombre) || 'un personaje', resEsp: num(((f || {}).resumen || {}).resm)};
 }
 // La tirada contra quien creó la zona y el recorte. `ta` (opcional): la tirada de Ef.Esp ya hecha (cuando la termina la pantalla del GM).
 async function anulaZona(id, el, celdas, efEsp, nombre, ta0, entera){
@@ -2119,11 +2119,11 @@ async function anulaZona(id, el, celdas, efEsp, nombre, ta0, entera){
     if(c.resEsp === null){
       const mid = await momentoAbrir({tipo: 'anula-zona', icono: '🚫', titulo: `${nombre} contra ${nomZ}`, estado: 'esperando',
         datos: {elId: id, celdas: [...celdas], ta, nombre, ...(entera ? {entera: true} : {})}});
-      return mid ? {parte: `${nomZ}: tira contra ${c.nombre} (lo resuelve el GM)`} : {aMano: `${nomZ} (tirá Ef.Esp ${ta} contra la Res.Esp de ${c.nombre})`};
+      return mid ? {parte: `${nomZ}: tira contra ${c.nombre} (lo resuelve el GM)`} : {aMano: `${nomZ} (tirá Ef.Esp ${ta} contra la Res.Mt de ${c.nombre})`};
     }
-    const tr = (Combatiente.tirarStat(c.resEsp, [], 'resmg') || {}).total || 0;
-    if(ta <= tr){ mesaLinea(`🚫 ${nombre}: ${c.nombre} sostiene ${nomZ} (Res.Esp ${tr} contra Ef.Esp ${ta})`, 'recordatorio'); return {}; }
-    tirada = ` (Ef.Esp ${ta} contra la Res.Esp ${tr} de ${c.nombre})`;
+    const tr = (Combatiente.tirarStat(c.resEsp, [], 'resm') || {}).total || 0;
+    if(ta <= tr){ mesaLinea(`🚫 ${nombre}: ${c.nombre} sostiene ${nomZ} (Res.Mt ${tr} contra Ef.Esp ${ta})`, 'recordatorio'); return {}; }
+    tirada = ` (Ef.Esp ${ta} contra la Res.Mt ${tr} de ${c.nombre})`;
   }
   try{
     // dirigida: la zona entera (todas sus casillas cuentan como «adentro»)
@@ -2146,7 +2146,7 @@ async function anulaRecortar(id, el, celdas){
   }
   return todas.length - quedan.length;
 }
-// El momento `anula-zona` (js/16): la pantalla del GM tira la Res.Esp del creep que creó la zona y recorta. Una sola vez.
+// El momento `anula-zona` (js/16): la pantalla del GM tira la Res.Mt del creep que creó la zona y recorta. Una sola vez.
 const anulaZonaHechos = new Set();
 async function anulaZonaMomento(id, d){
   if(!soyGM || !d || d.estado !== 'esperando' || anulaZonaHechos.has(id)) return;
@@ -2194,9 +2194,9 @@ async function anularEn(celdas, yo, hab, rivales){
   const efEsp = yo.tipo === 'creep' ? (() => { const sc = typeof creepPrivadoDe === 'function' ? creepPrivadoDe(yo.ref) : null; return sc ? CreepCalculo.statValor(sc, 'dmgesp') : 0; })()
     : num((((fichasPub.get(String(yo.ref || '').split(SEP_INVOCACION)[0]) || {}).resumen) || {}).dmgesp);
   // 🚫 Una sola zona (2026-11-02, dueño: «si hay más de una zona en el área a la vez, hay que elegir contra cuál se tira»): la elige quien la usa; la
-  // tirada es su Ef.Esp contra la Res.Esp de quien creó la zona (empate: gana el creador, como en las invocaciones); si gana, la zona pierde las casillas
+  // tirada es su Ef.Esp contra la Res.Mt de quien creó la zona (empate: gana el creador, como en las invocaciones); si gana, la zona pierde las casillas
   // que caen adentro (como el viento). Sin creador identificable (una luz suelta), sin tirada. Si el creador es un creep y esta pantalla no ve su
-  // Res.Esp (un jugador), lo resuelve la pantalla del GM (momento `anula-zona`, js/16).
+  // Res.Mt (un jugador), lo resuelve la pantalla del GM (momento `anula-zona`, js/16).
   if(zonasCand.length){
     const enArea = el => celdasDeElemento(el).filter(c => celdas.has(nbPack(c.col, c.fila))).length;
     let elegida = zonasCand[0];
@@ -2214,16 +2214,16 @@ async function anularEn(celdas, yo, hab, rivales){
   if(trampas) partes.push(`${trampas} trampa${trampas === 1 ? '' : 's'} mágica${trampas === 1 ? '' : 's'}`);
   if(portales) partes.push(`${portales} portal${portales === 1 ? '' : 'es'}`);
   // ✨ Las invocaciones de los rivales (dueño, 2026-11-01: «la tirada es contra la Res.Esp de quien controla la invocación»): el Ef.Esp de quien la usa
-  // contra la Res.Esp del invocador (su ficha); si no la resiste (empate: resiste), la invocación se va del mapa. Quedan fuera del duelo del área (js/13 lanzar).
+  // contra la Res.Mt del invocador (2026-11-02; antes Res.Esp) (su ficha); si no la resiste (empate: resiste), la invocación se va del mapa. Quedan fuera del duelo del área (js/13 lanzar).
   for(const t of (rivales || [])){
     if(etereoDe(t) || !(t.tipo === 'pj' && String(t.fichaId || '').includes(SEP_INVOCACION)) || !celdas.has(nbPack(t.col, t.fila))) continue;
-    const nom = nombreDe(t), duenoF = fichasPub.get(String(t.fichaId).split(SEP_INVOCACION)[0]), resEsp = num(((duenoF || {}).resumen || {}).resmg);
-    const a = Combatiente.tirarStat(efEsp, [], 'dmgesp'), r = Combatiente.tirarStat(resEsp, [], 'resmg');
+    const nom = nombreDe(t), duenoF = fichasPub.get(String(t.fichaId).split(SEP_INVOCACION)[0]), resEsp = num(((duenoF || {}).resumen || {}).resm);   // (2026-11-02: la Res.Mt del invocador)
+    const a = Combatiente.tirarStat(efEsp, [], 'dmgesp'), r = Combatiente.tirarStat(resEsp, [], 'resm');
     const ta = a ? a.total : 0, tr = r ? r.total : 0, quien = (duenoF && duenoF.nombre) || 'su invocador';
     if(ta > tr){
-      try{ await coleccionTokens().doc(t.id).delete(); partes.push(`${nom} (Ef.Esp ${ta} contra la Res.Esp ${tr} de ${quien}: se desvanece)`); if(soyGM && typeof temporalFueraDelOrden === 'function') await temporalFueraDelOrden(t.id); }
+      try{ await coleccionTokens().doc(t.id).delete(); partes.push(`${nom} (Ef.Esp ${ta} contra la Res.Mt ${tr} de ${quien}: se desvanece)`); if(soyGM && typeof temporalFueraDelOrden === 'function') await temporalFueraDelOrden(t.id); }
       catch(err){ console.error('Anulación: no se pudo sacar la invocación', err); aMano.push(`${nom} (se desvanece)`); }
-    }else mesaLinea(`🚫 ${nombre}: ${quien} sostiene a ${nom} (Res.Esp ${tr} contra Ef.Esp ${ta})`, 'recordatorio');
+    }else mesaLinea(`🚫 ${nombre}: ${quien} sostiene a ${nom} (Res.Mt ${tr} contra Ef.Esp ${ta})`, 'recordatorio');
   }
   // 👁 El Ojo de Kicillof: etéreo (no entra en el área de siempre), pero la anulación lo cierra.
   for(const t of (rivales || [])){

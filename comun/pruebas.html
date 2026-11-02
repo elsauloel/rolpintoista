@@ -109,9 +109,9 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
-<script src="skills-clase.js?v=20261102anula3"></script>
+<script src="skills-clase.js?v=20261102anula4"></script>
 <script src="creeps-base.js"></script>
-<script src="skills-creep-base.js?v=20261102anula3"></script>
+<script src="skills-creep-base.js?v=20261102anula4"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
 <script>
@@ -1426,7 +1426,7 @@ prueba('🚫 Anulación (2026-11-01, el Dispel Magic): qué estados son mágicos
       pg.tier, pg.precioCompra, pg.duelo.radio, pg.duelo.anula, pg.duelo.efectos[0].anula, !!ej.anula, !!lim.anula,
       Duelo.specDeEfecto({anula: true}).anula, Duelo.specDeEfecto(lim.efectos && lim.efectos[0] || {anula: true}).nombre],
     [true, true, true, true, true, false, false, false, false,
-      'area', 0, 'resmg', true, 2, 5, 4,
+      'area', 0, 'resm', true, 2, 5, 4,
       'Raro', 90, 2, true, true, true, true, true, 'Anulación']);
   // (2026-11-02, dueño: «no puede cancelar todos los estados, tiene que elegir uno»): los textos dicen uno, que elige quien la usa
   const anTxt = (HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Anulación').datos || {}).ataqueTxt || '';
@@ -1439,6 +1439,8 @@ prueba('🚫 Anulación (2026-11-01, el Dispel Magic): qué estados son mágicos
   igual([sj.nitrosCosto, sj.costo, sj.duelo.radio, !!ejj.anula, !!ejj.anulaDirigida, va.tier, va.especial.sp, va.especial.duelo.radio, va.especial.duelo.anula, va.especial.duelo.anulaDirigida,
       /zona/.test(pg.detalle) && /cre[oó]/.test(pg.detalle), !!pg.duelo.anulaDirigida, an.duelo.anulaDirigida, /entera/.test(an.detalle), /entera/.test(sj.detalle)],
     [1, '5', 0, true, true, 'Buena Calidad', 2, 0, true, true, true, false, true, true, true]);
+  // (2026-11-02, dueño): se resiste con la Res.Mt en los cuatro
+  igual([an.duelo.contra.join(), sj.duelo.contra.join(), va.especial.duelo.contra.join(), pg.duelo.contra.join(), /Resistencia especial/.test(pg.detalle + sj.detalle + va.detalle + an.detalle)], ['resm', 'resm', 'resm', 'resm', false]);
 });
 prueba('🌺 Malviaje de floripondio (2026-11-01): el Pánico contra todos; control mental; jefe inmune; lo cura el Té de tilo', () => {
   const e = ESTADOS_PRESET.find(x => x.nombre === 'Malviaje de floripondio');

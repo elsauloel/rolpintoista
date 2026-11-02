@@ -47,6 +47,7 @@ const LUZ_PRESETS = [[1, "Ceguera casi total"], [2, "Oscuridad"], [3, "Penumbra"
 const VISION_CUNA_CIEGA = 60;   // grados a cada lado de "atrás" que no se ven (120° en total)
 let nieblaActiva = false;
 let nieblaDescubierta = new Set();   // claves empaquetadas (col, fila)
+let nieblaEnteros = new Set();      // 👁 Se ve entero (2026-11-03): casillas de Sólidos que se ven completos (se pintan sin niebla; los tokens de adentro siguen sin verse)
 let nieblaVista = new Set();         // lo que ven ahora los personajes jugadores
 /* 👂 El oído (2026-10-15, regla del dueño): «si alguien se acerca por la espalda, el personaje lo escucha». Un rival a OIDO_RADIO casilleros o
    menos de un personaje se ve aunque esté en su punto ciego (o fuera de su visión por la luz), salvo que esté en sigilo (eso lo maneja el sigilo)
@@ -132,7 +133,7 @@ const CONO_LADO = 4;
 let solidosCache = {firma: '', set: new Set()};
 function solidosFirma(){
   let f = '';
-  elementos.forEach((el, id) => { if(el.solido) f += `${id}:${el.origen.col},${el.origen.fila},${el.rotacion},${el.celdas.length};`; });
+  elementos.forEach((el, id) => { if(el.solido) f += `${id}:${el.origen.col},${el.origen.fila},${el.rotacion},${el.celdas.length}${el.verEntero ? 'v' : ''};`; });
   return f + '|' + (typeof paredesFirma === 'function' ? paredesFirma() : '');   // las paredes de línea (js/34) también cambian lo que se ve
 }
 // Casillas ocupadas por elementos Sólidos (claves nbPack), recalculadas solo si cambian.

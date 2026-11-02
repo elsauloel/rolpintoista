@@ -363,7 +363,7 @@ function dibujarLienzo(){
   if(origenBorrador && herramientaActiva === 'elemento' && fbUsuario){
     listaElementos.push([ID_BORRADOR, {
       tipo: origenBorrador.tipo, origen: origenBorrador.origen, celdas: [...origenBorrador.celdas.values()], rotacion: 0,
-      color: elemColor, alfa: elemAlfa, solido: elemSolido, invisible: !!(soyGM && elemInvisible),
+      color: elemColor, alfa: elemAlfa, solido: elemSolido, invisible: !!(soyGM && elemInvisible), verEntero: !!(elemSolido && elemVerEntero),
       trampa: elemTrampa, trampaNombre: elemTrampaNombre, trampaDetalle: elemTrampaDetalle, disparada: false,
       imagen: elemImagen, imgZoom: 1, imgDX: 0, imgDY: 0, fijado: true, duenoUid: fbUsuario.uid,
     }]);
@@ -594,8 +594,9 @@ function dibujarLienzo(){
     const x0 = a.x - margen, y0 = a.y - margen, x1 = b.x + margen, y1 = b.y + margen;
     const abiertas = [], grises = [];
     const dentro = c => { const p = hexCentro(c.col, c.fila); return p.x >= x0 && p.x <= x1 && p.y >= y0 && p.y <= y1; };
-    nieblaDescubierta.forEach(k => { if(nieblaVista.has(k)) return; const c = nbUnpack(k); if(dentro(c)) grises.push(c); });
+    nieblaDescubierta.forEach(k => { if(nieblaVista.has(k) || nieblaEnteros.has(k)) return; const c = nbUnpack(k); if(dentro(c)) grises.push(c); });
     nieblaVista.forEach(k => { const c = nbUnpack(k); if(dentro(c)) abiertas.push(c); });
+    nieblaEnteros.forEach(k => { const c = nbUnpack(k); if(dentro(c)) abiertas.push(c); });   // 👁 un Sólido que se ve entero
     const trazarLista = lista => lista.forEach(c => { const p = hexCentro(c.col, c.fila); trazarHex(p.x, p.y); });
     // Negra: todo el cuadro menos las casillas descubiertas o a la vista.
     ctx.beginPath();

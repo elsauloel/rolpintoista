@@ -1986,3 +1986,11 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
 - **💨 Empujones en línea recta** (2026-11-03, probando Clavar a la pared en el mapa): `dueloEmpujar` (js/13) sigue la dirección tirador → empujado
   (la casilla vecina mejor alineada; si hay dos igual de alineadas, la libre). Antes elegía cualquier casilla más lejana libre y rodeaba la pared o
   el token de atrás, así que Clavar a la pared casi nunca clavaba. Ahora, si lo que tiene atrás es un Sólido, una pared o un token, choca ahí.
+
+- **👁 Sólidos que «se ven enteros»** (2026-11-03, dueño: «que se vea el carruaje también»): casilla **«👁 Se ve entero (carruaje, roca)»** en
+  Formas libres (solo con Sólido tildado; `elemVerEntero`, `localStorage` `elem-ver-entero`) y en el ⚙ de un Sólido ya creado; campo del elemento
+  `verEntero` (lo copian `escucharElementos`, Ctrl+C/V y el borrador). En `nieblaActualizar` (js/03), si alguna casilla de un Sólido con `verEntero`
+  está a la vista, el resto de sus casillas va a `nieblaEnteros` (js/02): se pintan sin niebla (`pintarNiebla`, js/05) y se suman a lo descubierto,
+  pero **no** entran en `nieblaVista`, así que lo de atrás sigue tapado (el Sólido corta la vista igual) y un token parado adentro no se ve. Sin
+  tildar (los de antes), opaco por dentro como siempre. Reglas nuevas (`verEntero` en `elementoValido`, `elementoCambioValido` y las dos listas de
+  update): hay que pegarlas; sin ellas, Guardar avisa «faltan publicar las reglas». Probado en «Claude · pruebas» (capturas `solido-1103-*`).

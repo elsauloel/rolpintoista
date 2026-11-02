@@ -716,7 +716,7 @@ service cloud.firestore {
       // solo lo puede prender o apagar el GM (al crear o después, desde ⚙️);
       // sirve con o sin Sólido. alfa 0 se permite (solo se ve el contorno).
       function elementoValido(d) {
-        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'niebla', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'fijado', 'duenoUid', 'creado', 'trampa', 'trampaNombre', 'trampaDetalle', 'portal', 'portalDestino', 'usoEn', 'fuego', 'fuegoDano', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo', 'trampaIgnoraDef', 'colision', 'turnos', 'venceMant', 'trampaItem', 'trampaFicha', 'zona', 'zonaNombre', 'zonaDano', 'zonaIgnoraDef', 'zonaEstado', 'zonaAmiga', 'zonaResistStat', 'zonaResistValor', 'zonaCasteadorRef', 'zonaCasteadorTipo', 'zonaResueltos', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaDanoDif', 'zonaDanoTipo', 'zonaTiraExtra', 'zonaNota', 'zonaTiraStat', 'zonaTiraValor', 'trampaDetectar', 'descubierta', 'trampaDejaZona', 'zonaTurnos', 'zonaAltura', 'zonaDirecto', 'zonaInmediata', 'zonaLuz', 'arma', 'armaNombre', 'armaDe', 'armaItem', 'acelerador', 'townPortal'])
+        return d.keys().hasOnly(['tipo', 'origen', 'celdas', 'rotacion', 'color', 'alfa', 'solido', 'invisible', 'verEntero', 'niebla', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'fijado', 'duenoUid', 'creado', 'trampa', 'trampaNombre', 'trampaDetalle', 'portal', 'portalDestino', 'usoEn', 'fuego', 'fuegoDano', 'trampaDano', 'trampaEstado', 'disparada', 'fuegoAmigo', 'trampaIgnoraDef', 'colision', 'turnos', 'venceMant', 'trampaItem', 'trampaFicha', 'zona', 'zonaNombre', 'zonaDano', 'zonaIgnoraDef', 'zonaEstado', 'zonaAmiga', 'zonaResistStat', 'zonaResistValor', 'zonaCasteadorRef', 'zonaCasteadorTipo', 'zonaResueltos', 'zonaEnMantenimiento', 'zonaCadaPaso', 'zonaDanoDif', 'zonaDanoTipo', 'zonaTiraExtra', 'zonaNota', 'zonaTiraStat', 'zonaTiraValor', 'trampaDetectar', 'descubierta', 'trampaDejaZona', 'zonaTurnos', 'zonaAltura', 'zonaDirecto', 'zonaInmediata', 'zonaLuz', 'arma', 'armaNombre', 'armaDe', 'armaItem', 'acelerador', 'townPortal'])
           && d.tipo in ['flor', 'linea', 'libre']
           && d.origen is map && d.origen.col is int && d.origen.fila is int
           && d.celdas is list && d.celdas.size() >= 2 && d.celdas.size() <= 6000 && d.celdas.size() % 2 == 0
@@ -725,6 +725,7 @@ service cloud.firestore {
           && d.alfa is int && d.alfa >= 0 && d.alfa <= 100
           && d.solido is bool
           && (!('invisible' in d) || d.invisible is bool)
+          && (!('verEntero' in d) || d.verEntero is bool)   // 👁 Se ve entero (2026-11-03)
           // Niebla de una varita (2026-10-05): tapa la vista (la dibuja y la aplica el mapa).
           && (!('niebla' in d) || d.niebla is bool)
           && (!('imagen' in d) || (d.imagen is string && d.imagen.size() < 130000))
@@ -808,6 +809,7 @@ service cloud.firestore {
           && d.alfa is int && d.alfa >= 0 && d.alfa <= 100
           && (!('fijado' in d) || d.fijado is bool)
           && (!('invisible' in d) || d.invisible is bool)
+          && (!('verEntero' in d) || d.verEntero is bool)   // 👁 Se ve entero (2026-11-03)
           && (!('imagen' in d) || (d.imagen is string && d.imagen.size() < 130000))
           && (!('imgZoom' in d) || (d.imgZoom is number && d.imgZoom >= 1 && d.imgZoom <= 6))
           && (!('imgDX' in d) || (d.imgDX is number && d.imgDX >= -10000 && d.imgDX <= 10000))
@@ -839,7 +841,7 @@ service cloud.firestore {
           && (!('colision' in request.resource.data) || request.resource.data.colision == false || esGM(c));
         allow update: if esMiembro(c) && (
           ((resource.data.duenoUid == request.auth.uid || esGM(c))
-            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'trampaEstado', 'trampaIgnoraDef', 'trampaDestino', 'fuegoDano', 'disparada', 'fuegoAmigo', 'turnos', 'venceMant', 'zonaResueltos', 'trampaDejaZona', 'zonaTurnos', 'trampaDetectar'])
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'verEntero', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'trampaEstado', 'trampaIgnoraDef', 'trampaDestino', 'fuegoDano', 'disparada', 'fuegoAmigo', 'turnos', 'venceMant', 'zonaResueltos', 'trampaDejaZona', 'zonaTurnos', 'trampaDetectar'])
             && elementoCambioValido(request.resource.data)
             && (request.resource.data.get('invisible', false) == resource.data.get('invisible', false) || esGM(c)))
           // Un rival que pisa una trampa la marca como disparada (solo ese campo).
@@ -971,7 +973,7 @@ service cloud.firestore {
             && (!('colision' in request.resource.data) || request.resource.data.colision == false || esGM(c));
           allow update: if esMiembro(c) && (
             ((resource.data.duenoUid == request.auth.uid || esGM(c))
-              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'trampaEstado', 'trampaIgnoraDef', 'trampaDestino', 'fuegoDano', 'disparada', 'fuegoAmigo', 'turnos', 'venceMant', 'zonaResueltos', 'trampaDejaZona', 'zonaTurnos', 'trampaDetectar'])
+              && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['origen', 'rotacion', 'fijado', 'color', 'alfa', 'invisible', 'verEntero', 'imagen', 'imgZoom', 'imgDX', 'imgDY', 'trampa', 'trampaNombre', 'trampaDetalle', 'trampaDano', 'trampaEstado', 'trampaIgnoraDef', 'trampaDestino', 'fuegoDano', 'disparada', 'fuegoAmigo', 'turnos', 'venceMant', 'zonaResueltos', 'trampaDejaZona', 'zonaTurnos', 'trampaDetectar'])
               && elementoCambioValido(request.resource.data)
               && (request.resource.data.get('invisible', false) == resource.data.get('invisible', false) || esGM(c)))
             || (resource.data.get('trampa', false) == true

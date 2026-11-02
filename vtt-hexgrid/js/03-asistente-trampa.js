@@ -574,7 +574,7 @@ function daVision(t){
 // se movió, y suma lo nuevo a lo descubierto. Se llama al empezar a dibujar.
 function nieblaActualizar(){
   if(!nieblaActiva){
-    if(nieblaVista.size || nieblaFantasmas.size || nieblaFirma){ nieblaVista = new Set(); nieblaOida = new Set(); nieblaOida1 = new Set(); nieblaFantasmas.clear(); nieblaFirma = ''; }
+    if(nieblaVista.size || nieblaFantasmas.size || nieblaFirma){ nieblaVista = new Set(); nieblaEnteros = new Set(); nieblaOida = new Set(); nieblaOida1 = new Set(); nieblaFantasmas.clear(); nieblaFirma = ''; }
     return;
   }
   const firma = [...tokens.entries()].map(([id, t]) => `${id}:${t.col},${t.fila},${t.rotacion || 0},${t.oculto ? 1 : 0},${t.tipo},${enSigilo(t) ? 1 : 0},${daVision(t) ? radioVisionDe(t) + '/' + luzPortadaDe(t) : 0}`).join('|') + '#' + solidosFirma() + '#' + nieblaSet().size + '#' + (typeof delatadosCeldas === 'function' ? delatadosCeldas().join(',') : '');
@@ -591,6 +591,18 @@ function nieblaActualizar(){
   });
   if(typeof delatadosCeldas === 'function') delatadosCeldas().forEach(k => vista.add(k));   // 🔦 la casilla desde donde atacó un creep, alumbrada (js/82)
   nieblaVista = vista;
+  // 👁 Se ve entero (2026-11-03, dueño: «que se vea el carruaje también»): un Sólido con `verEntero` del que se ve alguna casilla se
+  // descubre completo (sus casillas, para el dibujo y lo descubierto). No entra en `nieblaVista`: lo de atrás sigue tapado (el Sólido corta
+  // la vista igual) y un token parado adentro tampoco se ve (se ve la carrocería, no lo de adentro).
+  const enteros = new Set();
+  elementos.forEach(el => {
+    if(!el.solido || !el.verEntero) return;
+    const cs = celdasDeElemento(el).map(c => nbPack(c.col, c.fila));
+    if(!cs.some(k => vista.has(k))) return;
+    cs.forEach(k => { if(!vista.has(k)) enteros.add(k); });
+  });
+  nieblaEnteros = enteros;
+  if(enteros.size) enteros.forEach(k => { if(!nieblaDescubierta.has(k)) nieblaPendientes.add(k); });
   // 👂 Lo que se oye (2026-10-15): la flor de OIDO_RADIO alrededor de cada uno, para todos lados; las paredes y los Sólidos tapan.
   const oida = new Set(), oida1 = new Set(), solidosO = solidosSet(), paredesO = hayParedes();
   tokens.forEach(t => {

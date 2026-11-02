@@ -152,6 +152,7 @@ function renderHerramientaFlotante(){
       <input type="range" id="elem-alfa-slider" min="0" max="100" step="5" value="${elemAlfa}">
       ${imagenElementoOpcionHtml(elemImagen)}
       ${esTrampa ? '' : `<label class="tk-lapiz-check"><input type="checkbox" id="elem-solido-check"${elemSolido ? ' checked' : ''}> Sólido (bloquea el paso)</label>
+      ${elemSolido ? `<label class="tk-lapiz-check" title="Si ves una parte, se ve el objeto completo (un carruaje, una roca). Lo de atrás y lo de adentro siguen tapados. Sin tildar, opaco por dentro (una casa)."><input type="checkbox" id="elem-ver-entero-check"${elemVerEntero ? ' checked' : ''}> 👁 Se ve entero (carruaje, roca)</label>` : ''}
       ${soyGM ? `<label class="tk-lapiz-check"><input type="checkbox" id="elem-invisible-check"${elemInvisible ? ' checked' : ''}> Invisible para jugadores</label>` : ''}`}
       <label class="etiqueta" title="Para efectos que afectan un área durante X turnos: la forma se elimina sola al terminar el último turno (cuando el GM pasa el turno con ⟳ Mantenimiento)">Turnos que dura (opcional)</label>
       <input type="number" id="elem-turnos" min="0" max="99" step="1" value="${elemTurnos || ''}" placeholder="0 = sin límite" title="Vacío o 0: queda hasta que alguien la borre. N: se elimina sola al terminar el turno N (cada ⟳ Mantenimiento del GM cuenta un turno)">
@@ -351,6 +352,12 @@ $('#herramienta-flotante').addEventListener('change', e => {
   if(e.target.id === 'elem-trampa-amiga'){
     elemTrampaAmiga = e.target.checked;
     renderHerramientaFlotante();
+    return;
+  }
+  if(e.target.id === 'elem-ver-entero-check'){
+    elemVerEntero = e.target.checked;
+    try{ localStorage.setItem('elem-ver-entero', elemVerEntero ? '1' : ''); }catch(err){}
+    pedirDibujo();
     return;
   }
   if(e.target.id === 'elem-invisible-check'){

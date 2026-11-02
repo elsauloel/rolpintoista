@@ -317,6 +317,7 @@ function escucharElementos(){
         alfa: Math.max(0, Math.min(100, Number.isFinite(d.alfa) ? d.alfa : 45)),
         solido: d.solido === true,
         invisible: d.invisible === true,
+        verEntero: d.verEntero === true,   // 👁 Se ve entero (2026-11-03)
         niebla: d.niebla === true,   // la niebla de una varita (2026-10-05)
         imagen: typeof d.imagen === 'string' ? d.imagen : '',
         imgZoom: Math.max(1, Math.min(6, num(d.imgZoom) || 1)),
@@ -612,7 +613,7 @@ async function pegarElemento(){
   const destino = punteroMundo ? mundoAHex(punteroMundo.x, punteroMundo.y) : c.origen;
   const datos = {
     tipo: c.tipo, origen: {col: destino.col, fila: destino.fila}, celdas: c.celdas, rotacion: c.rotacion,
-    color: c.color, alfa: c.alfa, solido: !!c.solido, invisible: !!(soyGM && c.invisible), imagen: c.imagen || '',
+    color: c.color, alfa: c.alfa, solido: !!c.solido, invisible: !!(soyGM && c.invisible), ...(c.solido && c.verEntero ? {verEntero: true} : {}), imagen: c.imagen || '',
     imgZoom: c.imgZoom || 1, imgDX: c.imgDX || 0, imgDY: c.imgDY || 0, fijado: false,
     ...(c.trampa ? {trampa: true, trampaNombre: c.trampaNombre || '', trampaDetalle: c.trampaDetalle || '', disparada: false, fuegoAmigo: !!c.fuegoAmigo,
       trampaDano: c.trampaDano || '', ...(c.trampaIgnoraDef ? {trampaIgnoraDef: true} : {}), ...(c.trampaEstado ? {trampaEstado: c.trampaEstado} : {}), ...(c.trampaDestino ? {trampaDestino: c.trampaDestino} : {}),
@@ -644,7 +645,7 @@ async function guardarElemento(tipo, origen, celdasSet){
     await coleccionElementos().add({
       tipo, origen, celdas, rotacion: 0,
       color: elemColor, alfa: elemAlfa,
-      solido: elemSolido, invisible, imagen: elemImagen || '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: false,
+      solido: elemSolido, invisible, ...(elemSolido && elemVerEntero ? {verEntero: true} : {}), imagen: elemImagen || '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: false,
       ...(elemTurnos > 0 ? {turnos: elemTurnos, venceMant: Math.round(num(mantenimientoNumero)) + elemTurnos} : {}),
       ...(elemTrampa ? {trampa: true, trampaNombre: elemTrampaNombre.trim().slice(0, 40), trampaDetalle: elemTrampaDetalle.trim().slice(0, 200), disparada: false, fuegoAmigo: elemTrampaAmiga, trampaDano: trampaDanoValido(elemTrampaDano) ? elemTrampaDano.trim().slice(0, 12) : '', ...(elemTrampaIgnoraDef ? {trampaIgnoraDef: true} : {}), ...(trampaEstadoSpec() ? {trampaEstado: trampaEstadoSpec()} : {}), trampaDetectar: Math.max(1, Math.round(num(elemTrampaDetectar)) || 6)} : {}),
       ...(elemTrampa && elemTrampaTeleport && destinoParsear(elemTrampaDestino) ? {trampaDestino: elemTrampaDestino} : {}),
@@ -671,7 +672,7 @@ function elementoSolidoEn(col, fila){
 }
 async function moverElemento(id, cambios){
   try{ await coleccionElementos().doc(id).update(cambios); }
-  catch(err){ console.error('No se pudo mover el elemento:', err); toast('No se pudo mover'); }
+  catch(err){ console.error('No se pudo mover el elemento:', err); toast(err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore' : 'No se pudo mover'); }
 }
 async function borrarElemento(id){
   try{ await coleccionElementos().doc(id).delete(); }
@@ -704,7 +705,7 @@ function abrirEditorElemento(id){
   if(editandoElemento) cerrarEditorElemento(true);
   editandoElemento = {
     id,
-    original: {turnos: el.turnos, venceMant: el.venceMant, color: el.color, alfa: el.alfa, invisible: el.invisible, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY, trampa: el.trampa, trampaNombre: el.trampaNombre, trampaDetalle: el.trampaDetalle, disparada: el.disparada, fuegoAmigo: el.fuegoAmigo, fuegoDano: el.fuegoDano, trampaDano: el.trampaDano, trampaDestino: el.trampaDestino, trampaIgnoraDef: el.trampaIgnoraDef, trampaEstado: el.trampaEstado, tipo: el.tipo},
+    original: {turnos: el.turnos, venceMant: el.venceMant, color: el.color, alfa: el.alfa, invisible: el.invisible, verEntero: el.verEntero, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY, trampa: el.trampa, trampaNombre: el.trampaNombre, trampaDetalle: el.trampaDetalle, disparada: el.disparada, fuegoAmigo: el.fuegoAmigo, fuegoDano: el.fuegoDano, trampaDano: el.trampaDano, trampaDestino: el.trampaDestino, trampaIgnoraDef: el.trampaIgnoraDef, trampaEstado: el.trampaEstado, tipo: el.tipo},
   };
   renderEditorElemento();
 }
@@ -763,6 +764,7 @@ function renderEditorElemento(){
     <label class="etiqueta">Turnos que le quedan (0 = sin límite)</label>
     <input type="number" id="elem-edit-turnos" min="0" max="99" step="1" value="${el.venceMant !== null && el.venceMant !== undefined && mantenimientoNumero !== null ? Math.max(0, el.venceMant - mantenimientoNumero) : ''}" placeholder="sin límite" title="Se elimina sola al terminar el último turno (cada ⟳ Mantenimiento cuenta uno)">
     ${soyGM ? `<label class="tk-lapiz-check"><input type="checkbox" id="elem-edit-invisible"${el.invisible ? ' checked' : ''}> Invisible para jugadores</label>` : ''}
+    ${el.solido && !el.colision ? `<label class="tk-lapiz-check" title="Si ves una parte, se ve el objeto completo (un carruaje, una roca). Lo de atrás y lo de adentro siguen tapados."><input type="checkbox" id="elem-edit-ver-entero"${el.verEntero ? ' checked' : ''}> 👁 Se ve entero</label>` : ''}
     <label class="tk-lapiz-check"><input type="checkbox" id="elem-edit-trampa"${el.trampa ? ' checked' : ''}> Trampa (oculta a los rivales)</label>
     ${el.trampa ? `<div class="tk-lapiz-ayuda" style="margin-top:6px"><b>${esc(el.trampaNombre || 'Sin nombre')}</b><br>${esc((() => { let es = null; try{ es = el.trampaEstado ? JSON.parse(el.trampaEstado) : null; }catch(e){} return trampaResumenFrase(el.trampaNombre, trampaDanoValido(el.trampaDano) ? String(el.trampaDano).trim() : '', !!el.trampaIgnoraDef, es && es.nombre || '', es ? num(es.turnos) : 0, !!el.fuegoAmigo, el.trampaDestino || ''); })())}</div>
     <button type="button" class="btn primary" id="elem-edit-trampa-asistente" style="margin-top:6px;width:100%">🪄 Editar la trampa paso a paso</button>
@@ -790,7 +792,7 @@ function renderEditorElemento(){
     const conTurnos = el.venceMant !== null && el.venceMant !== undefined;
     const cambios = {turnos: conTurnos ? Math.max(1, el.turnos || 1) : firebase.firestore.FieldValue.delete(), venceMant: conTurnos ? el.venceMant : firebase.firestore.FieldValue.delete(),
       ...(el.fuego ? {fuegoDano: Math.max(1, Math.min(999, Math.round(num(el.fuegoDano)) || 5))} : {}),
-      color: el.color, alfa: el.alfa, invisible: !!el.invisible, imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY,
+      color: el.color, alfa: el.alfa, invisible: !!el.invisible, ...(el.solido ? {verEntero: !!el.verEntero} : {}), imagen: el.imagen, imgZoom: el.imgZoom, imgDX: el.imgDX, imgDY: el.imgDY,
       trampa: !!el.trampa, trampaNombre: String(el.trampaNombre || '').slice(0, 40), trampaDetalle: String(el.trampaDetalle || '').slice(0, 200), disparada: !!el.disparada, fuegoAmigo: !!el.fuegoAmigo,
       ...(el.trampa ? {trampaDano: trampaDanoValido(el.trampaDano) ? String(el.trampaDano).trim().slice(0, 12) : '', trampaIgnoraDef: !!el.trampaIgnoraDef, trampaDestino: String(el.trampaDestino || '').slice(0, 16), trampaEstado: String(el.trampaEstado || '').slice(0, 300),
         trampaDetectar: Math.max(1, Math.round(num(el.trampaDetectar)) || 6),
@@ -812,6 +814,8 @@ function renderEditorElemento(){
   if(inTurnos) inTurnos.oninput = () => { const n = Math.max(0, Math.min(99, Math.round(num(inTurnos.value)) || 0)); vivo(n > 0 ? {turnos: n, venceMant: Math.round(num(mantenimientoNumero)) + n} : {turnos: 0, venceMant: null}); };
   const chkInvisible = caja.querySelector('#elem-edit-invisible');
   if(chkInvisible) chkInvisible.onchange = () => vivo({invisible: chkInvisible.checked});
+  const chkVerEntero = caja.querySelector('#elem-edit-ver-entero');
+  if(chkVerEntero) chkVerEntero.onchange = () => { vivo({verEntero: chkVerEntero.checked}); nieblaFirma = ''; };
   const chkTrampa = caja.querySelector('#elem-edit-trampa');
   if(chkTrampa) chkTrampa.onchange = () => {
     vivo({trampa: chkTrampa.checked, disparada: false});

@@ -254,6 +254,7 @@ let elemTamano = 1;         // radio (flor) o largo (línea); libre lo ignora
 let elemColor = '#3F6FB0';
 let elemAlfa = 45;
 let elemSolido = false;
+let elemVerEntero = false;   // 👁 Se ve entero (2026-11-03): un Sólido que, si ves una parte, se ve completo (no lo de atrás ni lo de adentro)
 let elemInvisible = false;
 let elemTrampaEstado = '', elemTrampaEstadoTurnos = 0;   // estado automático de la trampa (nombre de un preset de EstadosAplicar) y cuántos turnos dura (0 = el del preset)
 let elemTrampaEstadoStacks = 0, elemTrampaEstadoHp = 0;   // sus stacks (Veneno) y su daño por turno (un estado propio, ej. Quemadura) — 2026-10-02
@@ -282,6 +283,7 @@ try{ elemTamano = parseInt(localStorage.getItem('elem-tamano'), 10) || elemTaman
 try{ elemColor = localStorage.getItem('elem-color') || elemColor; }catch(e){}
 try{ const a = parseInt(localStorage.getItem('elem-alfa'), 10); if(Number.isFinite(a)) elemAlfa = Math.max(0, Math.min(100, a)); }catch(e){}
 try{ elemSolido = localStorage.getItem('elem-solido') === '1'; }catch(e){}
+try{ elemVerEntero = localStorage.getItem('elem-ver-entero') === '1'; }catch(e){}
 try{ elemInvisible = localStorage.getItem('elem-invisible') === '1'; }catch(e){}
 
 /* ---------- Varios mapas guardados ----------
@@ -354,7 +356,7 @@ function cambiarMapaMostrado(nuevoId){
   trazos.clear(); trazoSeleccionado = null;
   elementos.clear(); elementoSeleccionado = null;
   pings.clear();
-  nieblaActiva = false; nieblaDescubierta = new Set(); nieblaVista = new Set(); nieblaOida = new Set(); nieblaOida1 = new Set(); nieblaFirma = ''; nieblaFantasmas.clear(); nieblaPendientes.clear();
+  nieblaActiva = false; nieblaDescubierta = new Set(); nieblaVista = new Set(); nieblaEnteros = new Set(); nieblaOida = new Set(); nieblaOida1 = new Set(); nieblaFirma = ''; nieblaFantasmas.clear(); nieblaPendientes.clear();
   giroLibre.clear();
   fondoPos = null; fondoImagen = ''; componerFondo();
   modoMapa = 'narrativo';

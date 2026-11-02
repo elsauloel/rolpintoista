@@ -895,6 +895,8 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
 - [ ] **🏹🛡 Equipo con ventaja contra proyectiles (dueño, 2026-11-02, diseñando el Piromante):** no hay piezas Comunes ni Buenas que den Evasión
   contra disparos o Defensa contra proyectiles (el stat `evadisparo` existe, solo lo usa lo que vuela). Crear algunas (torso, capa, escudo liviano…),
   pensadas sobre todo para casters y livianos.
+- [ ] **⭐ Pool esencial: elegir el nivel al crear (dueño, 2026-11-03):** al agregar un creep esencial, elegir nivel 1–5 y que salga solo con los
+  atributos, habilidades y equipo de ese nivel (cada línea guarda los 5 niveles). Programar cuando esté diseñada la primera línea completa (el Escudero).
 - [ ] **🤖 Creeps con IA (dueño, 2026-11-03): todo lo de proponer/armar creeps con IA queda para cuando esté en la compu** (no se prueba desde la nube).
 - [ ] **📖 Glosario (dueño, 2026-11-03): revisarlo en la compu, sobre la marcha** (no es trabajo para el teléfono).
 - [ ] **🐝 Invocaciones para creeps (dueño, 2026-11-03: «en principio no lo vamos a usar, pero debería existir»):** hoy los creeps solo llaman refuerzos

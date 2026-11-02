@@ -208,6 +208,13 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 
 ## Forma de trabajo
 
+> **Cambio del dueño (2026-11-03): cada línea se diseña ENTERA, de nivel 1 a 5, antes de pasar a la siguiente.** Una línea es un solo creep con un
+> solo nombre en todos los niveles (el Escudero es Escudero en el 1 y en el 5; no hay un nombre por nivel). Se arranca imaginándolo **en nivel 5**,
+> con todas sus habilidades y su estrategia completa, y desde ahí se baja: qué tiene sentido que tenga primero y qué suma en cada nivel. Al crearlo
+> en GM Tools se elige el nivel y aparece solo con los atributos, las habilidades y el equipo de ese nivel. La siguiente línea del mismo rol es otra
+> variedad, con otra estrategia (T2 Muralla con púas, T3 Guardaespaldas… son variedades, no niveles). Lo de abajo («nivel 2 en adelante, se recorren
+> las mismas líneas») queda reemplazado por esto. Las 6 líneas con el nivel 1 aprobado se completan de 2 a 5, empezando por el Escudero.
+
 0. **Antes**: la tanda de skills de Tanque (`diseno-roles-creep.md`).
 1. **Rotación**: un creep de un rol, después uno del siguiente: Warrior → Tanque → Híbrido → Liviano → Liviano → Rango → Mago → Support → Debuffer →
    (de nuevo) Warrior… Así, en cada vuelta salen 9 (dos livianos). Con 4 vueltas quedan los 36 de nivel 1.

@@ -2435,7 +2435,14 @@ const Duelo = (() => {
     try{ const m = typeof miembros !== 'undefined' && miembros && miembros.get ? miembros.get(l.uid) : null; if(m && m.nombre) return {jugador: String(m.nombre)}; }catch(e){}
     return {jugador: String(l.nombre)};
   };
-  const quienDeLado = l => !l || !l.nombre ? {} : l.tipo === 'creep' ? {quien: String(l.nombre), desde: 'gm'} : {quien: String(l.nombre), ...jugadorDeLado(l)};
+  /* Un creep (2026-11-03, prueba de humo: salía «Escudero (Jugador 1)» cuando la publicaba la pantalla del jugador): con la cuenta del GM entre
+     paréntesis, como las tiradas de GM Tools; si esta pantalla no la conoce, sin cuenta. */
+  const jugadorGM = () => {
+    if(typeof fbMiembro !== 'undefined' && fbMiembro && fbMiembro.gm) return {};
+    try{ const m = typeof miembros !== 'undefined' && miembros && miembros.values ? [...miembros.values()].find(x => x && x.gm) : null; if(m && m.nombre) return {jugador: String(m.nombre)}; }catch(e){}
+    return null;
+  };
+  const quienDeLado = l => !l || !l.nombre ? {} : l.tipo === 'creep' ? {quien: String(l.nombre), desde: 'gm', ...(jugadorGM() || {jugador: String(l.nombre)})} : {quien: String(l.nombre), ...jugadorDeLado(l)};
   const EstadosAplicarTexto = (spec, ef) => spec.cura ? `Curación de ${spec.cura} HP` : (typeof EstadosAplicar !== 'undefined' ? EstadosAplicar.texto(spec) : spec.nombre + (spec.stacks > 1 ? ` ×${spec.stacks}` : ''));   // EstadosAplicar.texto ya dice «×N» (2026-11-03: salía «Armadura rota ×2 ×2»)
 
   // Paso 5 · Daño: la tirada del arma, la cuenta y, cuando el GM lo aplica, el número grande y la vida.

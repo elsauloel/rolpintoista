@@ -99,7 +99,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261103nit"></script>
+<script src="duelo.js?v=20261103humo"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -6502,7 +6502,15 @@ prueba('🛡 El efecto del duelo dice «Armadura rota ×2» una sola vez (2026-1
 });
 prueba('🎲 La tirada de un creep en el duelo va a la Mesa con su nombre y en rojo, la publique quien la publique (2026-11-03: salía «Jugador 1»)', () => {
   igual([Duelo.quienDeLado({nombre: 'Goblin', tipo: 'creep'}), Duelo.quienDeLado({nombre: 'Rockardo', tipo: 'pj'}), Duelo.quienDeLado(null)],
-    [{quien: 'Goblin', desde: 'gm'}, {quien: 'Rockardo'}, {}]);
+    [{quien: 'Goblin', desde: 'gm', jugador: 'Goblin'}, {quien: 'Rockardo'}, {}]);
+});
+prueba('🎲 La tirada de un creep publicada desde la pantalla de un jugador lleva entre paréntesis la cuenta del GM, no la del jugador (2026-11-03: salía «Escudero (Jugador 1)»)', () => {
+  const antes = window.fbMiembro, habia = 'miembros' in window, m0 = window.miembros;
+  window.fbMiembro = {nombre: 'Jugador 1', gm: false}; window.miembros = new Map([['u1', {nombre: 'Jugador 1', gm: false}], ['u2', {nombre: 'La GM', gm: true}]]);
+  const a = Duelo.quienDeLado({nombre: 'Escudero', tipo: 'creep'});
+  window.fbMiembro = {nombre: 'La GM', gm: true}; const b = Duelo.quienDeLado({nombre: 'Escudero', tipo: 'creep'});
+  window.fbMiembro = antes; if(habia) window.miembros = m0; else delete window.miembros;
+  igual([a, b], [{quien: 'Escudero', desde: 'gm', jugador: 'La GM'}, {quien: 'Escudero', desde: 'gm'}]);
 });
 prueba('⚖ No2 negativos: la regla se puede saltar con la mesa — «Hacerlo igual» abre un permiso corto; el error lleva lo que hace falta para preguntar (2026-11-03)', () => {
   const antes = Combatiente.defensaSinNo2(-2, 1);

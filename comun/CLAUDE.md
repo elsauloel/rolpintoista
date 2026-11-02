@@ -1847,10 +1847,21 @@ versión parecida en más de una, es candidato a juntar.
 - **🎯 Débil / Resistente / Inmune en el token** (2026-11-01): lo dibuja y lo revela el mapa (`vtt-hexgrid/js/89-debil.js`, ver `vtt-hexgrid/CLAUDE.md`); usa `Combatiente.elementoDe`, `identidadElemento`, `ARMAS_ELEMENTALES` y `CreepCalculo.resElemental`. Lo descubierto de cada creep vive en `creeps/<id>.revelado`.
 - **🚫 Anulación** (2026-11-01, dueño: el «Dispel Magic»): efecto `anula: true` (el efecto `{nombre: 'Anulación', anula: true}` y la Ejecución `anula`),
   viaja como `disipar` (Combatiente.efectoDeHab, Duelo.limpiarHab / specDeEfecto, el asistente). En el duelo (vtt-hexgrid/js/13 dueloAplicarEfectoBase): al que
-  no resiste le saca TODOS los estados buenos mágicos (`Combatiente.ESTADOS_MAGICOS` + las Armas elementales + `magico: true`; no `derivado`), con reintentos
-  si la ficha se estaba guardando. Al lanzar el área (`anularEn`): zonas mágicas (luz o con `zonaCasteadorRef`, no nube ni fuego) recortadas, trampas
+  no resiste le saca UNO de sus estados buenos mágicos (`Combatiente.ESTADOS_MAGICOS` + las Armas elementales + `magico: true`; no `derivado`), el que elige quien
+  la usa (2026-11-02, dueño: «no puede cancelar todos, tiene que elegir uno»): al tocar «Aplicar», su pantalla abre la elección (`cfgEscuchar.antesDeAplicar`
+  → `ef.anulaElegido`, js/13 `anulaAntesDeAplicar`); si tiene uno solo, sale ese; sin elección guardada, elige la pantalla que aplica. Con reintentos
+  si la ficha se estaba guardando. Al lanzar el área (`anularEn`): UNA zona (2026-11-02, dueño: «si hay más de una zona hay que elegir contra cuál se tira;
+  sobre una nube de veneno, la resistencia es la Res.Esp de quien la invocó»): de las que tocan el área y tienen creador (`colocadorDe`: mágica, nube o
+  fuego de un hechizo) o son una luz, quien la usa elige una (`Confirmar.elegir`); Ef.Esp contra la Res.Esp del creador (`anulaCreador`; empate: el
+  creador; sin creador, sin tirada) y, si gana, la recorta (`anulaRecortar`, como el viento). Si el creador es un creep y la pantalla no es la del GM,
+  momento `anula-zona` (js/16 → `anulaZonaMomento` en la del GM, con la tirada ya hecha). Antes (2026-11-01): todas las zonas mágicas, sin nubes ni fuego. Trampas
   mágicas y portales del Mago afuera, el Ojo de Kicillof cerrado, y las invocaciones de los rivales: Ef.Esp de quien la usa contra la Res.Esp de su
   INVOCADOR (dueño); si no resiste (empate resiste), su token se va. Las invocaciones no entran en el duelo del área. Reglas: `esZonaMagica` (falta pegar).
+  🎯 DIRIGIDA y EN ÁREA (2026-11-02, dueño): la HABILIDAD (Debuffer de creep y de jugador `debuffer-anulacion`, 1 No2 + 5 SP —propuesta de Claude—) y la
+  Varita de la anulación (Buena, 80, 1 No2 + 2 SP o 3 No2: más barata por ser dirigida) son `anulaDirigida` (área de radio 0: una casilla en su Rango):
+  si en la casilla hay un rival, va contra él (un estado elegido; una invocación contra su invocador; el Ojo, se cierra) y no toca zonas; si no, contra
+  una zona de esa casilla (elige cuál si hay más de una; tirada contra su creador) y, si gana, se va ENTERA. El PERGAMINO es en área (diámetro 5): un
+  estado elegido por rival, invocaciones, el Ojo, y una zona elegida que pierde solo las casillas de adentro.
 - **☀ Luz sanadora** (2026-10-31, dueño: «vamos a atribuirle luz sanadora a la luz… depende del caso, 100, 25, 50»; el Smite, el mismo día, no: «al Smite no le vamos a poner luz sanadora, pero sí marcado» — `migrarLuzSanadora` se la saca al de creep guardado, `pct: 0`): campo genérico `luzSanadora: N` (%)
   en la Ejecución (`duelo`) de una habilidad, o en el efecto `danoMagico` de un estado de arma (el Arma luminosa). Quien pega se cura ese % de la vida
   que le sacó el golpe (después de resistencias y del ×1,5; para abajo, pero mínimo 1 si le sacó vida —dueño, 2026-11-01—; sin pasar su máximo, no da Vida extra); si le pega a varios (área,

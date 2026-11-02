@@ -1513,7 +1513,7 @@ function dueloElegirAreaMapa(msg){
     const enCono = h.cono ? conoDeArea(h) : h.linea ? new Set(h.linea) : null;   // el cono (Sonic Boom) o la línea (Varita láser): sus casillas
     if(hab.zonaQueda) dueloZonaQueda(hab, h, Math.max(1, radio), yo);   // lo que deja en el suelo (bola de fuego, ventisca)
     if(hab.destello) await destelloEn(h, radio, yo, hab, todos.filter(t => !t.oculto && !t.bajoTierra && !etereoDe(t) && !propio(t) && distanciaHex(h, t) <= radio && dueloEsRival(yo, t)));   // ☀ el destello (Destello revelador)
-    if(hab.anula) await anularEn(new Set(celdasFlor(Math.max(1, radio)).map(o => { const c0 = hexACubo(h); return nbPack(cuboACol(c0.q + o.dq, c0.r + o.dr), cuboAFila(c0.q + o.dq, c0.r + o.dr)); })), yo, hab, todos.filter(t => !propio(t) && dueloEsRival(yo, t)));   // 🚫 la Anulación: lo mágico del área
+    if(hab.anula) await anularEn(new Set(celdasFlor(hab.anulaDirigida ? 0 : Math.max(1, radio)).map(o => { const c0 = hexACubo(h); return nbPack(cuboACol(c0.q + o.dq, c0.r + o.dr), cuboAFila(c0.q + o.dq, c0.r + o.dr)); })), yo, hab, todos.filter(t => !propio(t) && dueloEsRival(yo, t)));   // 🚫 la Anulación: lo mágico del área
     if(hab.despeja) despejarEn(enCono || new Set(celdasFlor(Math.max(1, radio)).map(o => { const c0 = hexACubo(h); return nbPack(cuboACol(c0.q + o.dq, c0.r + o.dr), cuboAFila(c0.q + o.dq, c0.r + o.dr)); })), hab.nombre);   // el vendaval
     const objetivos = todos
       .filter(t => !iniciativaFueraDeJuego(t.id))   // 💀 un caído es un cuerpo esperando que lo revivan: ningún área lo alcanza (P225, dueño, 2026-10-27)
@@ -1527,6 +1527,7 @@ function dueloElegirAreaMapa(msg){
       .filter(t => !hab.conVista || lineaLibre(h, t, solidosSet()))   // la luz (Varita de la luz): todos los rivales que alcanza a ver, en sigilo o no (dueño, 2026-10-05)
       .sort((a, b) => h.linea ? distanciaHex(h, a) - distanciaHex(h, b) : 0)   // en la línea, del más cercano al más lejano (el láser largo pierde 1 por cada uno)
       .map(t => t.id);
+    if(!objetivos.length && hab.anula) return;   // 🚫 la Anulación ya resolvió lo suyo (zonas, invocaciones, el Ojo) en anularEn
     if(!objetivos.length){ toast(hab.conVista ? `💡 ${hab.nombre || 'La luz'}: no había ningún rival a su alcance` : 'No hay nadie adentro del área'); return; }
     let habArea = hab, objetivosArea = objetivos;
     if(hab.tormenta){ const t = tormentaRepartir(hab, objetivos); habArea = t.hab; objetivosArea = t.objetivos; if(!objetivosArea.length) return; }   // Tormenta arcana (js/44)
@@ -2092,49 +2093,128 @@ async function despejarEn(celdas, nombre){
   }else toast(`💨 ${quien}: no pudo despejar la nube — a mano (faltan pegar las reglas)`);
 }
 /* 🚫 La Anulación (2026-11-01, dueño: el «Dispel Magic»; los estados van por el duelo, `anula`): lo mágico que cae en el área, de los rivales:
-   - zonas mágicas (una luz —`zonaLuz`— o una zona que dejó una habilidad —`zonaCasteadorRef`—; no las nubes ni el fuego, que son físicos: eso es del
+   - (2026-11-02: UNA zona, la que elige quien la usa, con tirada contra su creador; ver anulaZona) zonas (una luz —`zonaLuz`— o una zona que dejó alguien —`zonaCasteadorRef`—; antes: no las nubes ni el fuego, que son físicos: eso es del
      viento): pierden las casillas que caen adentro, como el viento (forma libre; sin ninguna, se borra);
    - trampas mágicas (`magica` en su trampaEstado: glifos, runas, portales) y los portales del Mago (`portal`): se van del mapa;
    - el Ojo de Kicillof (una invocación etérea, lo único que lo afecta): se cierra.
    Lo propio del que la usa no se toca (las zonas y trampas de su bando, sus invocaciones). Lo que las reglas no dejan tocar (zonas o portales
    ajenos, sin pegar las reglas nuevas), queda a mano con aviso. */
+// 🚫 Quién creó una zona (colocadorDe, js/07) con su nombre y su Res.Esp (null si esta pantalla no la ve: un creep, si no es el GM).
+function anulaCreador(el){
+  const c = colocadorDe(el);
+  if(!c || !c.ref) return null;
+  if(c.tipo === 'creep'){
+    const sc = soyGM && typeof creepPrivadoDe === 'function' ? creepPrivadoDe(c.ref) : null, pub = creepsPub.get(c.ref) || {};
+    return {tipo: 'creep', ref: c.ref, nombre: (sc && sc.nombre) || pub.nombre || 'un creep', resEsp: sc ? CreepCalculo.statValor(sc, 'resmg') : null};
+  }
+  const f = fichasPub.get(String(c.ref).split(SEP_INVOCACION)[0]);
+  return {tipo: 'pj', ref: c.ref, nombre: (f && f.nombre) || 'un personaje', resEsp: num(((f || {}).resumen || {}).resmg)};
+}
+// La tirada contra quien creó la zona y el recorte. `ta` (opcional): la tirada de Ef.Esp ya hecha (cuando la termina la pantalla del GM).
+async function anulaZona(id, el, celdas, efEsp, nombre, ta0, entera){
+  const nomZ = el.zonaNombre || el.nombre || 'una zona', c = anulaCreador(el);
+  let tirada = '';
+  if(c){
+    const ta = ta0 !== undefined ? num(ta0) : ((Combatiente.tirarStat(efEsp, [], 'dmgesp') || {}).total || 0);
+    if(c.resEsp === null){
+      const mid = await momentoAbrir({tipo: 'anula-zona', icono: '🚫', titulo: `${nombre} contra ${nomZ}`, estado: 'esperando',
+        datos: {elId: id, celdas: [...celdas], ta, nombre, ...(entera ? {entera: true} : {})}});
+      return mid ? {parte: `${nomZ}: tira contra ${c.nombre} (lo resuelve el GM)`} : {aMano: `${nomZ} (tirá Ef.Esp ${ta} contra la Res.Esp de ${c.nombre})`};
+    }
+    const tr = (Combatiente.tirarStat(c.resEsp, [], 'resmg') || {}).total || 0;
+    if(ta <= tr){ mesaLinea(`🚫 ${nombre}: ${c.nombre} sostiene ${nomZ} (Res.Esp ${tr} contra Ef.Esp ${ta})`, 'recordatorio'); return {}; }
+    tirada = ` (Ef.Esp ${ta} contra la Res.Esp ${tr} de ${c.nombre})`;
+  }
+  try{
+    // dirigida: la zona entera (todas sus casillas cuentan como «adentro»)
+    const n = await anulaRecortar(id, el, entera ? new Set(celdasDeElemento(el).map(c => nbPack(c.col, c.fila))) : celdas);
+    return {parte: entera ? `${nomZ} entera (${n} casilla${n === 1 ? '' : 's'})${tirada}` : `${n} casilla${n === 1 ? '' : 's'} de ${nomZ}${tirada}`};
+  }catch(err){ console.error('Anulación: no se pudo recortar la zona', err); return {aMano: `${nomZ}${tirada}: sacale a mano las casillas del área`}; }
+}
+// Saca de la zona las casillas del área (como el viento, despejarEn); sin ninguna, se borra. → cuántas sacó.
+async function anulaRecortar(id, el, celdas){
+  const ref = coleccionElementos().doc(id);
+  const todas = celdasDeElemento(el), quedan = todas.filter(c => !celdas.has(nbPack(c.col, c.fila)));
+  const c0 = hexACubo(el.origen), nuevas = {tipo: 'libre', rotacion: 0, celdas: quedan.flatMap(c => { const k = hexACubo(c); return [k.q - c0.q, k.r - c0.r]; })};
+  try{ if(!quedan.length) await ref.delete(); else await ref.update(nuevas); }
+  catch(err){
+    // Sin las reglas nuevas pegadas (esZonaMagica / esNube) Firestore no deja recortar una zona ajena; el GM (o quien la puso) igual puede:
+    // la vuelve a crear con las casillas que quedan y borra la vieja (como el viento).
+    if(err.code !== 'permission-denied' || !(soyGM || (elementos.get(id) || {}).duenoUid === fbUsuario.uid)) throw err;
+    if(quedan.length){ const raw = (await ref.get()).data(); if(raw) await coleccionElementos().add({...raw, ...nuevas, duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp()}); }
+    await ref.delete();
+  }
+  return todas.length - quedan.length;
+}
+// El momento `anula-zona` (js/16): la pantalla del GM tira la Res.Esp del creep que creó la zona y recorta. Una sola vez.
+const anulaZonaHechos = new Set();
+async function anulaZonaMomento(id, d){
+  if(!soyGM || !d || d.estado !== 'esperando' || anulaZonaHechos.has(id)) return;
+  anulaZonaHechos.add(id);
+  let mia = false;
+  try{
+    await fbDb.runTransaction(async tx => {
+      const ref = coleccionMomentos().doc(id), doc = await tx.get(ref);
+      mia = doc.exists && doc.data().estado === 'esperando';
+      if(mia) tx.update(ref, {estado: 'listo', resultado: 'resuelto por el GM'});
+    });
+  }catch(err){ console.error('Anulación: no se pudo tomar el momento', err); return; }
+  if(!mia) return;
+  const x = d.datos || {}, el = elementos.get(x.elId);
+  if(!el){ mesaLinea(`🚫 ${x.nombre || 'La Anulación'}: la zona ya no estaba`, 'recordatorio'); return; }
+  const r = await anulaZona(x.elId, el, new Set((x.celdas || []).map(Number)), 0, x.nombre || 'La Anulación', x.ta, !!x.entera);
+  if(r.parte) mesaLinea(`🚫 ${x.nombre || 'La Anulación'} anuló ${r.parte}`, 'recordatorio');
+  if(r.aMano) toast(`🚫 ${x.nombre || 'La Anulación'}: a mano — ${r.aMano}`);
+}
 async function anularEn(celdas, yo, hab, rivales){
   const nombre = (hab && hab.nombre) || 'La Anulación', partes = [], aMano = [];
   const esDelBando = el => yo.tipo === 'creep' ? trampaEsDelGM(el) : !trampaEsDelGM(el);   // (js/07: manda quién la puso)
   const tocaArea = el => celdasDeElemento(el).some(c => celdas.has(nbPack(c.col, c.fila)));
-  const tareas = [];
+  const tareas = [], zonasCand = [];
+  // 🎯 Dirigida (2026-11-02, dueño: la habilidad y la varita, a un solo blanco): si en la casilla hay un rival (personaje, creep, invocación, el Ojo
+  // de Kicillof), va contra él (el estado lo saca el duelo; la invocación y el Ojo, más abajo) y no toca las zonas; si no, contra una zona de esa
+  // casilla, ENTERA. En área (el pergamino): todo lo del área y, de las zonas, solo las casillas de adentro.
+  const dirigida = !!(hab && hab.anulaDirigida);
+  const blancoToken = dirigida && (rivales || []).some(t => celdas.has(nbPack(t.col, t.fila)));
   elementos.forEach((el, id) => {
+    if(blancoToken) return;
     if(!tocaArea(el) || esDelBando(el)) return;
     if(el.trampa && trampaEsMagica(el)) tareas.push({id, tipo: 'trampa', el});
     else if(el.portal && !el.townPortal) tareas.push({id, tipo: 'portal', el});
-    else if(el.zona && (el.zonaLuz || el.zonaCasteadorRef) && !(typeof nubeColor === 'function' && nubeColor(el)) && !el.fuego && !/fuego/i.test(el.zonaDanoTipo || '')) tareas.push({id, tipo: 'zona', el});
+    // 🚫 Zonas (2026-11-02, dueño): cualquiera que dejó alguien (mágica, nube o gas, el fuego de un hechizo) o una luz; no la que no tiene creador
+    // (terreno puesto a mano, el fuego del mapa, una nube que puso el GM como terreno).
+    else if(el.zona && (colocadorDe(el) || el.zonaLuz)) zonasCand.push({id, el});
   });
   let zonas = 0, casillas = 0, trampas = 0, portales = 0;
   for(const t of tareas){
-    const ref = coleccionElementos().doc(t.id), nom = t.el.zonaNombre || t.el.nombre || (t.tipo === 'trampa' ? 'una trampa' : t.tipo === 'portal' ? 'un portal' : 'una zona');
-    try{
-      if(t.tipo === 'zona'){
-        const todas = celdasDeElemento(t.el), quedan = todas.filter(c => !celdas.has(nbPack(c.col, c.fila)));
-        const c0 = hexACubo(t.el.origen), nuevas = {tipo: 'libre', rotacion: 0, celdas: quedan.flatMap(c => { const k = hexACubo(c); return [k.q - c0.q, k.r - c0.r]; })};
-        try{ if(!quedan.length) await ref.delete(); else await ref.update(nuevas); }
-        catch(err){
-          // Sin las reglas nuevas pegadas (esZonaMagica, 2026-11-01) Firestore no deja recortar una zona ajena; el GM (o quien la puso) igual puede:
-          // la vuelve a crear con las casillas que quedan y borra la vieja (como el viento, despejarEn).
-          if(err.code !== 'permission-denied' || !(soyGM || (elementos.get(t.id) || {}).duenoUid === fbUsuario.uid)) throw err;
-          if(quedan.length){ const raw = (await ref.get()).data(); if(raw) await coleccionElementos().add({...raw, ...nuevas, duenoUid: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp()}); }
-          await ref.delete();
-        }
-        zonas++; casillas += todas.length - quedan.length;
-      }else{ await ref.delete(); if(t.tipo === 'trampa') trampas++; else portales++; }
-    }catch(err){ console.error('Anulación: no se pudo', t.tipo, err); aMano.push(nom); }
+    const ref = coleccionElementos().doc(t.id), nom = t.el.nombre || (t.tipo === 'trampa' ? 'una trampa' : 'un portal');
+    try{ await ref.delete(); if(t.tipo === 'trampa') trampas++; else portales++; }
+    catch(err){ console.error('Anulación: no se pudo', t.tipo, err); aMano.push(nom); }
   }
-  if(zonas) partes.push(`${casillas} casilla${casillas === 1 ? '' : 's'} de ${zonas} zona${zonas === 1 ? '' : 's'} mágica${zonas === 1 ? '' : 's'}`);
+  const efEsp = yo.tipo === 'creep' ? (() => { const sc = typeof creepPrivadoDe === 'function' ? creepPrivadoDe(yo.ref) : null; return sc ? CreepCalculo.statValor(sc, 'dmgesp') : 0; })()
+    : num((((fichasPub.get(String(yo.ref || '').split(SEP_INVOCACION)[0]) || {}).resumen) || {}).dmgesp);
+  // 🚫 Una sola zona (2026-11-02, dueño: «si hay más de una zona en el área a la vez, hay que elegir contra cuál se tira»): la elige quien la usa; la
+  // tirada es su Ef.Esp contra la Res.Esp de quien creó la zona (empate: gana el creador, como en las invocaciones); si gana, la zona pierde las casillas
+  // que caen adentro (como el viento). Sin creador identificable (una luz suelta), sin tirada. Si el creador es un creep y esta pantalla no ve su
+  // Res.Esp (un jugador), lo resuelve la pantalla del GM (momento `anula-zona`, js/16).
+  if(zonasCand.length){
+    const enArea = el => celdasDeElemento(el).filter(c => celdas.has(nbPack(c.col, c.fila))).length;
+    let elegida = zonasCand[0];
+    if(zonasCand.length > 1){
+      const id = await Confirmar.elegir(`${nombre}: hay más de una zona en el área. ¿Contra cuál se tira?`, {titulo: 'Anulación', icono: '🚫', no: 'Ninguna',
+        opciones: zonasCand.map(z => { const c = anulaCreador(z.el); return {valor: z.id, texto: z.el.zonaNombre || z.el.nombre || 'Zona', detalle: `${enArea(z.el)} casilla${enArea(z.el) === 1 ? '' : 's'} en el área · ${c ? 'la creó ' + c.nombre : 'sin creador'}`}; })});
+      elegida = id ? zonasCand.find(z => z.id === id) : null;
+    }
+    if(elegida){
+      const r = await anulaZona(elegida.id, elegida.el, celdas, efEsp, nombre, undefined, dirigida);
+      if(r.parte) partes.push(r.parte);
+      if(r.aMano) aMano.push(r.aMano);
+    }
+  }
   if(trampas) partes.push(`${trampas} trampa${trampas === 1 ? '' : 's'} mágica${trampas === 1 ? '' : 's'}`);
   if(portales) partes.push(`${portales} portal${portales === 1 ? '' : 'es'}`);
   // ✨ Las invocaciones de los rivales (dueño, 2026-11-01: «la tirada es contra la Res.Esp de quien controla la invocación»): el Ef.Esp de quien la usa
   // contra la Res.Esp del invocador (su ficha); si no la resiste (empate: resiste), la invocación se va del mapa. Quedan fuera del duelo del área (js/13 lanzar).
-  const efEsp = yo.tipo === 'creep' ? (() => { const sc = typeof creepPrivadoDe === 'function' ? creepPrivadoDe(yo.ref) : null; return sc ? CreepCalculo.statValor(sc, 'dmgesp') : 0; })()
-    : num((((fichasPub.get(String(yo.ref || '').split(SEP_INVOCACION)[0]) || {}).resumen) || {}).dmgesp);
   for(const t of (rivales || [])){
     if(etereoDe(t) || !(t.tipo === 'pj' && String(t.fichaId || '').includes(SEP_INVOCACION)) || !celdas.has(nbPack(t.col, t.fila))) continue;
     const nom = nombreDe(t), duenoF = fichasPub.get(String(t.fichaId).split(SEP_INVOCACION)[0]), resEsp = num(((duenoF || {}).resumen || {}).resmg);
@@ -2386,6 +2466,28 @@ async function cargaAlGolpeAbierto(t, tokenId, nombre){
   }
 }
 // El Desarmado (2026-10-07) deja el arma en el piso (js/27); con `vuela`, lejos (la Varita del desarme).
+// 🚫 Anulación (2026-11-02, dueño: «tiene que elegir uno»): la lista para elegir (con cuánto le queda) y la elección en la pantalla de quien la usa, al tocar
+// «Aplicar» (Duelo: cfgEscuchar.antesDeAplicar, js/14): {anulaElegido} para guardar en el efecto; {} si no hay nada que elegir (uno solo, o una
+// invocación); null si eligió «Ninguno» (no se pide la aplicación). Lee lo público del objetivo (estadoDe), que ven todas las pantallas.
+function anulaOpciones(lista){
+  const dur = e => (e.permanente ? 'sin límite' : num(e.turnos) > 0 ? `${fmt(num(e.turnos))} turno${num(e.turnos) === 1 ? '' : 's'}` : '')
+    + (num(e.stacks) > 1 ? ` · ×${fmt(num(e.stacks))}` : '') + (e.escudo !== undefined ? ` · escudo ${fmt(num(e.escudo))}` : '');
+  const vistos = new Set();
+  return lista.filter(e => e && !vistos.has(e.nombre) && vistos.add(e.nombre))
+    .map(e => ({valor: e.nombre, texto: e.nombre, detalle: [dur(e), String(e.detalle || '').slice(0, 90)].filter(Boolean).join(' — ')}));
+}
+async function anulaAntesDeAplicar(d, ef){
+  const spec = ef ? Duelo.specDeEfecto(ef) : null;
+  if(!spec || !spec.anula) return {};
+  const t = tokens.get(d.defensor && d.defensor.tokenId);
+  if(!t || (t.tipo === 'pj' && String(t.fichaId || '').includes(SEP_INVOCACION))) return {};
+  const est = estadoDe(t);
+  const lista = ((est && est.estados) || []).filter(e => e && Combatiente.esEstadoMagico(e) && e.activo !== false);
+  const ops = anulaOpciones(lista);
+  if(ops.length <= 1) return {};
+  const nom = await Confirmar.elegir(`${d.atacante.nombre || 'La Anulación'} anula: ¿qué estado mágico le saca a ${nombreDe(t)}?`, {titulo: 'Anulación', icono: '🚫', no: 'Ninguno', opciones: ops});
+  return nom ? {anulaElegido: String(nom)} : null;
+}
 async function dueloAplicarEfecto(d, ef){
   if(num(ef && ef.empuja) > 0) return dueloEmpujar(d, num(ef.empuja), ef.clava);   // el empujón no es un estado (2026-10-08)   // 📌 clava: si choca contra algo sólido (2026-10-26)
   const r = await dueloAplicarEfectoBase(d, ef);
@@ -2509,9 +2611,11 @@ async function dueloAplicarEfectoBase(d, ef){
     });
     return {nota: bajadas.length ? `−${n} al cooldown de ${bajadas.join(', ')}` : 'no tenía cooldowns activos'};
   }
-  // 🚫 Anulación (2026-11-01, dueño: el «Dispel Magic»): a quien no la resiste le saca TODOS sus estados buenos mágicos (Combatiente.esEstadoMagico; no
-  // lo del equipo ni las pasivas). Una invocación de un personaje no resiste la anulación: desaparece del mapa (su token se borra; en la ficha queda
-  // como estaba hasta que su dueño la vuelva a invocar). Lo aplica la pantalla que maneja al objetivo (el GM para los creeps).
+  // 🚫 Anulación (2026-11-01, dueño: el «Dispel Magic»): a quien no la resiste le saca UNO de sus estados buenos mágicos (Combatiente.esEstadoMagico; no
+  // lo del equipo ni las pasivas), el que elige quien la usa (2026-11-02, dueño: «no puede cancelar todos los estados, tiene que elegir uno»): lo eligió
+  // al tocar «Aplicar» (`ef.anulaElegido`, anulaAntesDeAplicar); si tiene uno solo, ese; si no quedó elegido, elige esta pantalla. Una invocación de un
+  // personaje no resiste la anulación: desaparece del mapa (su token se borra; en la ficha queda como estaba hasta que su dueño la vuelva a invocar).
+  // Lo aplica la pantalla que maneja al objetivo (el GM para los creeps).
   if(spec.anula){
     if(t.tipo === 'pj' && String(t.fichaId || '').includes(SEP_INVOCACION)){
       const nom = nombreDe(t);
@@ -2521,23 +2625,23 @@ async function dueloAplicarEfectoBase(d, ef){
       catch(err){ console.error('Anulación: no se pudo sacar la invocación', err); return {manual: true, nota: `sacá a ${nom} del mapa a mano (se desvanece)`}; }
     }
     const lista = ((vinculo(t) || {}).resumen || {}).estados || [];
-    const magicos = lista.filter(e => Combatiente.esEstadoMagico(e)).map(e => e.nombre);
+    const magicos = [...new Set(lista.filter(e => Combatiente.esEstadoMagico(e) && e.activo !== false).map(e => e.nombre))];
     if(!magicos.length) return {nota: 'no tenía ningún estado mágico para anular'};
-    // De a uno (la misma transacción que el ✕ del HUD, que no avisa si falla); si la ficha estaba guardándose a la vez (otra pantalla), se reintenta:
-    // después de cada vuelta se mira qué quedó.
-    const siguen = () => { const ahora = ((vinculo(t) || {}).resumen || {}).estados || []; return magicos.filter(nom => ahora.some(e => e && e.nombre === nom && e.activo !== false)); };
-    let faltan = magicos.slice();
-    for(let vuelta = 0; vuelta < 3 && faltan.length; vuelta++){
-      for(const nom of faltan){
-        const idx = (((vinculo(t) || {}).resumen || {}).estados || []).findIndex(e => e && e.nombre === nom && e.activo !== false);
-        if(idx >= 0) try{ await hudEstadoCambiar(t, idx, 'quitar'); }catch(err){ console.error('Anulación: no se pudo sacar', nom, err); }
-      }
-      await new Promise(r => setTimeout(r, 1500));
-      faltan = siguen();
+    let nom = ef && ef.anulaElegido && magicos.includes(ef.anulaElegido) ? ef.anulaElegido : magicos.length === 1 ? magicos[0] : '';
+    if(!nom && ef && ef.anulaElegido) return {nota: `ya no tenía ${ef.anulaElegido}`};
+    if(!nom){
+      nom = await Confirmar.elegir(`${d.atacante.nombre || 'La Anulación'} anula: ¿qué estado mágico le saca a ${nombreDe(t)}?`, {titulo: 'Anulación', icono: '🚫', no: 'Ninguno',
+        opciones: anulaOpciones(lista.filter(e => magicos.includes(e.nombre)))});
+      if(!nom) return {manual: true, nota: 'no se eligió ninguno: sacalo a mano si corresponde'};
     }
-    const sacados = magicos.filter(nom => !faltan.includes(nom));
-    return sacados.length === magicos.length ? {nota: `le anuló ${sacados.join(', ')}`}
-      : {manual: true, nota: `le anuló ${sacados.join(', ') || 'nada'}; sacale a mano ${magicos.filter(n => !sacados.includes(n)).join(', ')}`};
+    // La misma transacción que el ✕ del HUD (que no avisa si falla); si la ficha estaba guardándose a la vez (otra pantalla), se reintenta.
+    const sigue = () => ((((vinculo(t) || {}).resumen || {}).estados) || []).some(e => e && e.nombre === nom && e.activo !== false);
+    for(let vuelta = 0; vuelta < 3 && sigue(); vuelta++){
+      const idx = (((vinculo(t) || {}).resumen || {}).estados || []).findIndex(e => e && e.nombre === nom && e.activo !== false);
+      if(idx >= 0) try{ await hudEstadoCambiar(t, idx, 'quitar'); }catch(err){ console.error('Anulación: no se pudo sacar', nom, err); }
+      await new Promise(r => setTimeout(r, 1500));
+    }
+    return sigue() ? {manual: true, nota: `sacale a mano ${nom} (la anulación no pudo)`} : {nota: `le anuló ${nom}`};
   }
   // 🧿 Disipar (2026-10-25, el Debuffer; dueño: «el usuario de disipar elige cuál quitar»): sus estados buenos (no los que salen solos del equipo o las
   // pasivas) y quien lo usa elige uno. Lo aplica la pantalla del GM, que maneja a los creeps que hoy lo usan.

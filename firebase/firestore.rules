@@ -29,9 +29,10 @@ service cloud.firestore {
     }
     // 🚫 La Anulación (2026-11-01): una zona mágica (una luz, o la que dejó una habilidad: tiene quien la lanzó) que no es nube ni fuego; la puede
     // recortar o borrar cualquiera de la partida (la regla de abajo solo deja sacarle casillas, como al viento).
+    // 🚫 La Anulación (2026-11-02, dueño: «si hay más de una zona hay que elegir contra cuál se tira; sobre una nube de veneno, la resistencia es la
+    // de quien la invocó»): una luz o cualquier zona que dejó alguien (zonaCasteadorRef), sea mágica, de nube o de fuego de un hechizo. Solo recortar/borrar.
     function esZonaMagica(d) {
-      return d.get('zona', false) == true && !esNube(d) && d.get('fuego', false) != true
-        && !(d.get('zonaDanoTipo', '').matches('(?i).*fuego.*'))
+      return d.get('zona', false) == true
         && (d.get('zonaLuz', false) == true || d.get('zonaCasteadorRef', '') != '');
     }
     function esMiembro(c) {

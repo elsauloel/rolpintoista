@@ -792,7 +792,7 @@ const Duelo = (() => {
         ...(h.tormenta.cuenta && typeof h.tormenta.cuenta === 'object' ? {cuenta: Object.fromEntries(Object.entries(h.tormenta.cuenta).slice(0, 40).map(([k, v]) => [txtCorto(k, 40), Math.max(0, Math.min(40, Math.round(_num(v))))]))} : {}),
         ...(_num(h.tormenta.total) > 0 ? {total: Math.round(_num(h.tormenta.total))} : {})}} : {}),
       ...(h.reparte ? {reparte: {cada: txtCorto(h.reparte.cada || '1d4', 12), total: Math.min(6, Math.max(2, Math.round(_num(h.reparte.total)) || 2))}} : {}),   // misiles de a uno (Varita de misiles)
-      ...(h.menosPorOrden ? {menosPorOrden: true} : {}), ...(h.despeja ? {despeja: true} : {}), ...(h.anula ? {anula: true} : {}),   // el láser largo · el vendaval · 🚫 la Anulación
+      ...(h.menosPorOrden ? {menosPorOrden: true} : {}), ...(h.despeja ? {despeja: true} : {}), ...(h.anula ? {anula: true} : {}), ...(h.anulaDirigida ? {anulaDirigida: true} : {}),   // el láser largo · el vendaval · 🚫 la Anulación
       ...(h.destello ? {destello: {nombre: txtCorto(h.destello.nombre || 'Marcado', 30), turnos: Math.min(9, Math.max(1, Math.round(_num(h.destello.turnos)) || 2))}} : {}),   // ☀ el destello (Luz para los suyos, 2026-10-26)
       ...(h.riesgo ? {riesgo: {si: Math.min(20, Math.max(1, Math.round(_num(h.riesgo.si)) || 1)), dano: txtCorto(h.riesgo.dano || '2d4', 12), ...(h.riesgo.porCada ? {porCada: true} : {})}} : {}),   // la inestable
       ...(h.atrae ? {atrae: {casillas: Math.min(6, Math.max(1, Math.round(_num(h.atrae.casillas)) || 2)), contra: txtCorto(h.atrae.contra || 'fue', 12), tiraValor: _num(h.atrae.tiraValor)}} : {}),   // el gancho
@@ -1107,7 +1107,7 @@ const Duelo = (() => {
     if(_num(ef.cura) > 0) return {nombre: 'Curación', cura: Math.round(_num(ef.cura))};   // habilidades: cura sobre el objetivo
     if(ef.no2 !== undefined) return {nombre: 'Pierde No2', no2: Math.max(0, Math.round(_num(ef.no2))), no2Dif: !!ef.no2Dif, no2Sentado: !!ef.no2Sentado};   // Sonic Boom
     if(_num(ef.bajaCd) > 0) return {nombre: 'Baja cooldowns', bajaCd: Math.round(_num(ef.bajaCd)), ...(_num(ef.spRecupera) > 0 ? {spRecupera: Math.round(_num(ef.spRecupera))} : {})};   // 🥁 Redoble de tambores (2026-10-25): el mapa le baja los cooldowns
-    if(ef.anula) return {nombre: 'Anulación', anula: true};   // 🚫 Anulación (2026-11-01): todos sus estados buenos mágicos
+    if(ef.anula) return {nombre: 'Anulación', anula: true};   // 🚫 Anulación (2026-11-01; 2026-11-02: UNO, el que elige quien la usa)
     if(ef.disipar) return {nombre: 'Disipar', disipar: true};   // 🧿 Disipar (2026-10-25): quien lo usa elige qué estado bueno le saca
     if(ef.purga) return {nombre: 'Purga', purga: true};   // la purga (2026-10-07): el mapa saca el estado malo más reciente
     const n = String(ef.nombre || '').trim().toLowerCase();
@@ -2860,7 +2860,16 @@ const Duelo = (() => {
     const btt = f.querySelector('[data-ef-tirar-todos]');
     if(btt) btt.onclick = () => { btt.disabled = true; btt.textContent = 'Tirando…'; tirarEfectos(d.id).catch(err => { console.error(err); _toast('No se pudieron tirar los efectos'); }); };
     f.querySelectorAll('[data-ef-tirar]').forEach(b => b.onclick = () => { b.disabled = true; b.textContent = 'Tirando…'; tirarEfecto(d.id, Number(b.dataset.efTirar)).catch(err => { console.error(err); _toast('No se pudo tirar el efecto'); }); });
-    f.querySelectorAll('[data-ef-aplicar]').forEach(b => b.onclick = () => { b.disabled = true; marcarEfecto(d.id, Number(b.dataset.efAplicar), {aplicar: 'pedido'}).catch(err => { console.error(err); _toast('No se pudo pedir la aplicación'); }); });
+    // 🚫 (2026-11-02) Antes de pedir la aplicación, la pantalla de quien lo usa puede elegir algo (la Anulación: qué estado mágico le saca):
+    // cfgEscuchar.antesDeAplicar(d, ef) → cambios extra para el efecto ({anulaElegido}), {} si no hay nada que elegir, o null si se canceló.
+    f.querySelectorAll('[data-ef-aplicar]').forEach(b => b.onclick = async () => {
+      b.disabled = true;
+      const i = Number(b.dataset.efAplicar);
+      let extra = {};
+      if(cfgEscuchar.antesDeAplicar) try{ extra = await cfgEscuchar.antesDeAplicar(d, (d.efectos || [])[i]); }catch(err){ console.error(err); extra = {}; }
+      if(extra === null){ b.disabled = false; return; }
+      marcarEfecto(d.id, i, {...(extra || {}), aplicar: 'pedido'}).catch(err => { console.error(err); _toast('No se pudo pedir la aplicación'); });
+    });
     f.querySelectorAll('[data-ef-mano]').forEach(b => b.onclick = () => { b.disabled = true; marcarEfecto(d.id, Number(b.dataset.efMano), {aplicado: true, aplicar: '', nota: 'a mano'}).catch(err => console.error(err)); });
     const bft = f.querySelector('[data-ef-terminar]');
     if(bft) bft.onclick = () => terminarEfectos(d.id).catch(err => console.error(err));

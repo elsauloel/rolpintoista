@@ -1657,8 +1657,9 @@ const Combatiente = (() => {
     if(e && e.purga) return {nombre: 'Purga', caras: 1, exitos: 1, spec: null, purga: true, detalle: 'Le saca el estado malo más reciente.'};
     // 🧿 Disipar (2026-10-25, el Debuffer; dueño: «el usuario de disipar elige cuál quitar»): le saca uno de sus estados buenos; cuál, lo elige quien lo usa (js/13).
     if(e && e.disipar) return {nombre: 'Disipar', caras: 1, exitos: 1, spec: null, disipar: true, detalle: 'Le saca uno de sus estados buenos: lo elige quien lo usa.'};
-    // 🚫 Anulación (2026-11-01, dueño: el «Dispel Magic»): le saca TODOS sus estados buenos mágicos (Combatiente.esEstadoMagico); a una invocación, la hace desaparecer (js/13).
-    if(e && e.anula) return {nombre: 'Anulación', caras: 1, exitos: 1, spec: null, anula: true, detalle: 'Le saca todos sus estados buenos mágicos; una invocación desaparece.'};
+    // 🚫 Anulación (2026-11-01, dueño: el «Dispel Magic»): le saca UNO de sus estados buenos mágicos, el que elige quien la usa (2026-11-02, dueño: «no puede
+    // cancelar todos los estados, tiene que elegir uno»; Combatiente.esEstadoMagico); a una invocación, la hace desaparecer (js/13).
+    if(e && e.anula) return {nombre: 'Anulación', caras: 1, exitos: 1, spec: null, anula: true, detalle: 'Le saca uno de sus estados buenos mágicos, el que elija quien la usa; una invocación desaparece.'};
     // 🥁 Baja cooldowns (2026-10-25, el Support, Redoble de tambores): a un creep que trabaja con cooldown, −`bajaCd` a cada cooldown activo (js/13).
     if(e && nf(e.bajaCd) > 0) return {nombre: 'Baja cooldowns', caras: 1, exitos: 1, spec: null, bajaCd: Math.round(nf(e.bajaCd)),
       ...(nf(e.spRecupera) > 0 ? {spRecupera: Math.round(nf(e.spRecupera))} : {}),   // 🔋 Pila pila (2026-11-01): si trabaja con SP, recupera N SP
@@ -1737,7 +1738,8 @@ const Combatiente = (() => {
       ...(c.danoSiempre ? {danoSiempre: true} : {}),   // ⚡ el daño entra siempre; la tirada es solo para los estados (Zap, 2026-10-25)
       ...(c.menosPorOrden ? {menosPorOrden: true} : {}),   // −1 a cada uno de los siguientes en la línea (2026-10-08, láser largo)
       ...(c.despeja ? {despeja: true} : {}),   // apaga el fuego y despeja la niebla que toca (2026-10-08, vendaval)
-      ...(c.anula ? {anula: true} : {}),   // 🚫 Anulación (2026-11-01): además de los estados, lo mágico del área (zonas, trampas, el Ojo de Kicillof: js/13 anularEn)
+      ...(c.anula ? {anula: true} : {}), ...(c.anulaDirigida ? {anulaDirigida: true} : {}),   // 🎯 dirigida (2026-11-02): un blanco; una zona, entera
+        // 🚫 Anulación (2026-11-01): además de los estados, lo mágico del área (zonas, trampas, el Ojo de Kicillof: js/13 anularEn)
       // ☀ El destello (2026-10-26, Luz para los suyos —hoy Destello revelador—, dueño: «un destello, ¡fum!, que sucede y no queda como área»): al lanzarse, a todos los rivales
       // de adentro el estado (Marcado: les saca el sigilo) sin tirada, y las trampas rivales de adentro quedan a la vista. Lo hace el mapa (js/13).
       ...(c.objetivo === 'area' && c.destello ? {destello: {nombre: String(c.destello.nombre || 'Marcado'), turnos: Math.max(1, Math.round(nf(c.destello.turnos)) || 2)}} : {}),

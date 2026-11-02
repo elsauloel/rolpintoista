@@ -42,7 +42,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 </script>
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
-<script src="combatiente.js?v=20261101anula"></script>
+<script src="combatiente.js?v=20261102anula3"></script>
 <script src="creep-calculo.js?v=20261101sueno"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261101jefe2"></script>
@@ -99,7 +99,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261101anula"></script>
+<script src="duelo.js?v=20261102anula3"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -109,9 +109,9 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
-<script src="skills-clase.js?v=20261101adren"></script>
+<script src="skills-clase.js?v=20261102anula3"></script>
 <script src="creeps-base.js"></script>
-<script src="skills-creep-base.js?v=20261101anula"></script>
+<script src="skills-creep-base.js?v=20261102anula3"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
 <script>
@@ -1426,8 +1426,19 @@ prueba('🚫 Anulación (2026-11-01, el Dispel Magic): qué estados son mágicos
       pg.tier, pg.precioCompra, pg.duelo.radio, pg.duelo.anula, pg.duelo.efectos[0].anula, !!ej.anula, !!lim.anula,
       Duelo.specDeEfecto({anula: true}).anula, Duelo.specDeEfecto(lim.efectos && lim.efectos[0] || {anula: true}).nombre],
     [true, true, true, true, true, false, false, false, false,
-      'area', 2, 'resmg', true, 2, 5, 4,
+      'area', 0, 'resmg', true, 2, 5, 4,
       'Raro', 90, 2, true, true, true, true, true, 'Anulación']);
+  // (2026-11-02, dueño: «no puede cancelar todos los estados, tiene que elegir uno»): los textos dicen uno, que elige quien la usa
+  const anTxt = (HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Anulación').datos || {}).ataqueTxt || '';
+  const txt = [pg.detalle, an.detalle, anTxt].join(' ');
+  igual([/TODOS|todos sus estados/i.test(txt), /uno de sus estados/i.test(pg.detalle), /uno de sus estados/i.test(an.detalle), /elig/i.test(an.detalle)], [false, true, true, true]);
+  // La del Debuffer de jugador y la varita (2026-11-02): el mismo efecto; la varita, más chica
+  const sj = CLASES_SKILLS.flatMap(c => c.habilidades || []).find(x => x.id === 'debuffer-anulacion');
+  const va = CATALOGO_BASE.find(x => x.id === 'esp-buena-varita-de-la-anulacion');
+  const ejj = Duelo.limpiarHab(Combatiente.habEjecucion(sj, sj.duelo, {stat: () => 0, etq: s => s}));
+  igual([sj.nitrosCosto, sj.costo, sj.duelo.radio, !!ejj.anula, !!ejj.anulaDirigida, va.tier, va.especial.sp, va.especial.duelo.radio, va.especial.duelo.anula, va.especial.duelo.anulaDirigida,
+      /zona/.test(pg.detalle) && /cre[oó]/.test(pg.detalle), !!pg.duelo.anulaDirigida, an.duelo.anulaDirigida, /entera/.test(an.detalle), /entera/.test(sj.detalle)],
+    [1, '5', 0, true, true, 'Buena Calidad', 2, 0, true, true, true, false, true, true, true]);
 });
 prueba('🌺 Malviaje de floripondio (2026-11-01): el Pánico contra todos; control mental; jefe inmune; lo cura el Té de tilo', () => {
   const e = ESTADOS_PRESET.find(x => x.nombre === 'Malviaje de floripondio');
@@ -3709,13 +3720,13 @@ prueba('guantes de Buena calidad: el primer conjuro (−1 SP, solo el primer uso
   const t = Combatiente.trampaDeHab({nombre: 'Cepo', trampaColocar: {nombre: 'Cepo'}}, st => st === 'des' ? 5 : st === 'trampaoculta' ? 2 : 0);
   igual([primero, segundo, esp, t.detectar], [2, 3, 1, 7]);
 });
-prueba('armas especiales de Buena (2026-10-07): 37 (primera tanda, la Varita del caos Buena, grupo 1 sin el Manotazo y las tandas 1 a 4 del 2026-10-08), con su SP; la Bola de fuego mayor agarra aliados, la Sanguijuela drena la mitad, el báculo suma ¼ del Ef.Esp', () => {
+prueba('armas especiales de Buena (2026-10-07): 38 (primera tanda + la Varita de la anulación, 2026-11-02, la Varita del caos Buena, grupo 1 sin el Manotazo y las tandas 1 a 4 del 2026-10-08), con su SP; la Bola de fuego mayor agarra aliados, la Sanguijuela drena la mitad, el báculo suma ¼ del Ef.Esp', () => {
   const buenas = CATALOGO_BASE.filter(i => String(i.id).startsWith('esp-buena-'));
   const sc = creepPrueba({esp: 12});
   const plan = id => { const it = {...structuredClone(CATALOGO_BASE.find(x => x.id === id)), id: 'x'}; const h = CreepAcciones.habDeEspecialCreep(sc, it); return {h, e: Combatiente.habEjecucion(h, h.duelo, {})}; };
   const bola = plan('esp-buena-varita-de-la-bola-de-fuego-mayor').e, sang = plan('esp-buena-varita-sanguijuela').e, sabio = plan('esp-buena-baculo-del-sabio').h;
   igual([buenas.length, buenas.every(i => i.especial && /Cuesta \d No2/.test(i.detalle) && (i.especial.sp >= 1 || i.especial.spVidaPct > 0 || (i.especial.modos || []).length > 1)), !!bola.fuegoAmigo, bola.radio, sang.dano.drenaPct, sang.dano.directo, /^1d8\+\d+$/.test(sabio.tiradaExtra)],
-    [37, true, true, 2, 50, true, true]);
+    [38, true, true, 2, 50, true, true]);
 });
 prueba('Buenas, tanda 1 (2026-10-08): trampa portal + 2, báculo de sangre (10 % de la vida), inestable (riesgo), luz flotante (zona inmediata y luz)', () => {
   const cat = id => ({...structuredClone(CATALOGO_BASE.find(x => x.id === id)), id: 'x', equipado: true});

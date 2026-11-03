@@ -38,11 +38,14 @@ async function flashCreepAtacanteDelDuelo(){
     return d && d.atacante ? {tokenId: d.atacante.tokenId, danoTirado: !!d.dano} : null;
   }catch(err){ return null; }
 }
-// Lo que cuesta ahora: lo de la habilidad, el doble en turno ajeno (la regla del Flash).
+// Lo que cuesta ahora: lo de la habilidad; en turno ajeno, la regla del Flash (con SP el doble; con turnos de espera, un 50 % más).
 function flashCreepCosto(c){
   const ajeno = modoMapa === 'combate' && esSuTurno(c.id) === false;
-  const sp = CreepCalculo.modoSP(c.sc) ? CreepCalculo.costoSpHab(c.sc, c.h) : 0, cd = num(c.h.cd), k = ajeno ? 2 : 1;
-  return {ajeno, txt: CreepCalculo.modoSP(c.sc) ? `${fmt(sp * k)} SP` : `cooldown ${fmt(cd * k)}`};
+  const conSP = CreepCalculo.modoSP(c.sc), sp = conSP ? CreepCalculo.costoSpHab(c.sc, c.h) : 0, cd = num(c.h.cd);
+  // En turno ajeno (2026-11-03): con SP, el doble de SP; con turnos de espera, un 50 % más (Combatiente.cdFlash), no el doble.
+  return {ajeno, conSP, sp: ajeno ? sp * 2 : sp, cd: ajeno ? Combatiente.cdFlash(cd, false) : cd,
+    txt: conSP ? `${fmt(ajeno ? sp * 2 : sp)} SP` : `cooldown ${fmt(ajeno ? Combatiente.cdFlash(cd, false) : cd)}`,
+    ajenoTxt: ajeno ? (conSP ? ' (Flash en turno ajeno: el doble de SP)' : ' (Flash en turno ajeno: un 50 % más de espera)') : ''};
 }
 // 🦶 Una onda o un cono (el Pisotón, 2026-10-26): sale de él, no se le da a nadie.
 const flashCreepAlrededor = h => !!(h && h.duelo && (h.duelo.objetivo === 'onda' || h.duelo.objetivo === 'cono'));
@@ -83,7 +86,7 @@ async function abrirFlashCreep(){
     const k = flashCreepCosto(c), ataca = !!(duelo && objs.some(o => o.id === duelo.tokenId));
     const quien = flashCreepAlrededor(c.h) ? (c.h.duelo.objetivo === 'cono' ? 'en cono al frente' : 'alrededor suyo') : objs.length === 1 ? (objs[0].mismo ? 'a sí mismo' : nombreDe(objs[0].t)) : `${objs.length} objetivos posibles`;
     return {fila: true, texto: `${nombreDe(c.t)}: ${c.h.nombre}${ataca ? ' ⚔' : ''}`,
-      detalle: `${quien} · ${k.txt}${k.ajeno ? ' (Flash en turno ajeno: el doble)' : ''}`,
+      detalle: `${quien} · ${k.txt}${k.ajenoTxt}`,
       alClic: () => { AvisoCombate.cerrar(); if(objs.length === 1) flashCreepUsar(c, objs[0].id); else flashCreepElegirObjetivo(c, objs, duelo); }};
   });
   botones.push({texto: 'Cancelar', sec: true, alClic: () => AvisoCombate.cerrar()});

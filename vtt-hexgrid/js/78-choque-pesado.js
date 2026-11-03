@@ -47,14 +47,14 @@ async function interponerseUsar(c, objetivoId){
   }
   if(!dest){ AvisoCombate.mostrar({icono: '🛡', titulo: c.h.nombre, texto: `No hay una casilla libre al lado de ${aliado}: ${nom} no puede interponerse.`}); return; }
   const k = flashCreepCosto(c);
-  const ok = await AvisoCombate.preguntar(`${nom} salta al lado de ${aliado} y se come el golpe de ${quien}, con +2 a la Defensa contra ese golpe. Cuesta ${k.txt}${k.ajeno ? ' (Flash en turno ajeno: el doble)' : ''}.`,
+  const ok = await AvisoCombate.preguntar(`${nom} salta al lado de ${aliado} y se come el golpe de ${quien}, con +2 a la Defensa contra ese golpe. Cuesta ${k.txt}${k.ajenoTxt}.`,
     {icono: '🛡', titulo: `${nom}: ${c.h.nombre}`, si: 'Interponerse', no: 'Cancelar'});
   if(!ok) return;
   const sp = CreepCalculo.modoSP(c.sc), mult = k.ajeno ? 2 : 1;
   try{
     await modificarCreep(String(c.t.fichaId), sc => {
       const h = (sc.habilidades || []).find(x => x.id === c.h.id);
-      if(h){ if(sp) sc.sp = Math.max(0, CreepCalculo.spActual(sc) - CreepCalculo.costoSpHab(sc, h) * mult); else h.cdActual = num(h.cd) * mult; }
+      if(h){ if(sp) sc.sp = Math.max(0, CreepCalculo.spActual(sc) - CreepCalculo.costoSpHab(sc, h) * mult); else h.cdActual = k.ajeno ? Combatiente.cdFlash(num(h.cd), false) : num(h.cd); }   // (con turnos de espera, en turno ajeno: un 50 % más, 2026-11-03)
       EstadosAplicar.aplicarACreep(sc, {nombre: 'Interpuesto'});
       return {};
     });

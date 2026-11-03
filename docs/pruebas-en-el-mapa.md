@@ -335,6 +335,12 @@
   intentar arrastrar el token sale «No te podés mover ahora (Inmovilizado o Tropezado…)»; puede Levantarse y atacar desde ahí; al terminar su turno
   el Tropezado se va (el Sentado no, hasta levantarse). Pisado fuera de su turno (empujado): solo Sentado. Un aliado del creep le pasa por encima
   sin dispararlo. El GM puede moverlo igual con 🦶 Mover libre (M).
+- [x] ✅ **🛡 Interponerse: el cuadro del duelo cambia de defensor a la vista** (2026-11-03, probado con clics en «Claude · pruebas», GM + Prueba Uno;
+  dueño: «se cierra el duelo anterior y se abre un duelo nuevo para que sea claro visualmente»). Prueba Uno ataca al Goblin picapiedras → el GM ve
+  ✨ en la columna «Podés usar» del duelo → elige «Goblin tunelero (copia): Interponerse» → confirma → en las dos pantallas el cuadro vuelve volando
+  al Goblin picapiedras, pausa, y nace del Goblin tunelero con «🛡 Ahora le pega a Goblin tunelero (copia): se interpuso por Goblin picapiedras»;
+  el duelo sigue en el mismo paso. Arreglado de paso: el costo en turno ajeno decía «cooldown 6, el doble»; ahora un 50 % más (4), con SP el
+  doble de SP. Capturas en el scratchpad de la sesión (`interponerse-*.png`). Falta: verlo con la cuenta del dueño.
 - [ ] **💥 Las otras ondas — para que las revise el dueño en el mapa** (2026-11-03, dueño: «anotá en pendientes en el mapa revisar las animaciones»; antes: «aprobada la animación, avanzá con el resto»; `vtt-hexgrid/js/94-onda-fx.js`, variantes en
   `comun/fx-onda.js`): con 2 o 3 rivales pegados (o en el cono), en las pantallas del GM y de un jugador, y que el duelo se abra recién al terminar
   la onda: **Pisotón** de un creep (tierra, sacudida más fuerte, Pajaritos sobre el que no lo resistió) · **Nova arcana** de un creep (violeta,

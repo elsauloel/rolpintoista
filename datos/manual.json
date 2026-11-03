@@ -1,6 +1,6 @@
 {
  "titulo": "Manual — Rol Pintoísta",
- "actualizado": "2026-10-30T11:34:58Z",
+ "actualizado": "2026-11-03T15:06:48Z",
  "capitulos": [
   {
    "id": "empezar",
@@ -1882,7 +1882,7 @@
    ],
    "estado": "pendiente",
    "capitulo": "habilidades",
-   "cuerpo": "Maldiciones, venenos y control. Pool de [[Clases|clase]]. Sus maldiciones enfrentan **Especial contra Res. Mental** ([[Resistencias]]).\n\n**Skills del borrador:** Enyetar (repetir y quedarse con el más bajo), Confusión, Maldición debilitante (−1 a todas las tiradas), Maldición extenuante, Maldición tormentosa, Drenar vida, Balas de sangre, Transfusión sanguínea, [[Veneno]] y Nube tóxica (área que envenena).\n\n> [!question] Sin auditar\n> Ninguna automatizada todavía. Ojo: la página del Debuffer del PDF nuevo repetía la del Support; se usan las tarjetas de la versión anterior."
+   "cuerpo": "Maldiciones, venenos y control. Pool de [[Clases|clase]]. Sus maldiciones enfrentan **Especial contra Res. Mental** ([[Resistencias]]).\n\n**Skills del borrador:** Enyetar (repetir y quedarse con el más bajo), Confusión, Maldición debilitante (−1 a todas las tiradas), Maldición extenuante, Maldición tormentosa, Drenar vida, Balas de sangre, Transfusión sanguínea, [[Veneno]], Nube tóxica (área que envenena) y Sanguijuela (te llevás las curas de quien la tiene pegada).\n\n> [!question] Sin auditar\n> Ninguna automatizada todavía. Ojo: la página del Debuffer del PDF nuevo repetía la del Support; se usan las tarjetas de la versión anterior."
   },
   {
    "id": "inicio-y-partidas",

@@ -42,16 +42,16 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 </script>
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
-<script src="combatiente.js?v=20261103t4"></script>
+<script src="combatiente.js?v=20261103san"></script>
 <script src="creep-calculo.js?v=20261103t4"></script>
 <script src="creep-botonera.js"></script>
-<script src="creep-acciones.js?v=20261103t2b"></script>
+<script src="creep-acciones.js?v=20261103san"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
-<script src="estados-presets.js?v=20261103t4"></script>
-<script src="estados-aplicar.js"></script>
-<script src="recibidos.js"></script>
+<script src="estados-presets.js?v=20261103san"></script>
+<script src="estados-aplicar.js?v=20261103san"></script>
+<script src="recibidos.js?v=20261103san"></script>
 <script src="tokens-auto.js"></script>
 <script src="creeps-mapas.js"></script>
 <script src="paso-a-paso.js"></script>
@@ -65,7 +65,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-habilidades.js"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
-<script src="ficha-resumen.js"></script>
+<script src="ficha-resumen.js?v=20261103san"></script>
 <script src="ficha-sesion.js"></script>
 <script src="inv-calculo.js"></script>
 <script src="inv-botonera.js"></script>
@@ -73,8 +73,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js"></script>
-<script src="ficha-acciones.js"></script>
-<script src="ficha-mantenimiento.js"></script>
+<script src="ficha-acciones.js?v=20261103san"></script>
+<script src="ficha-mantenimiento.js?v=20261103san"></script>
 <script src="estado-preguntas.js"></script>
 <script src="asistente-estado.js"></script>
 <script src="asistente-trampa.js"></script>
@@ -111,9 +111,9 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
-<script src="skills-clase.js?v=20261102anula4"></script>
+<script src="skills-clase.js?v=20261103san"></script>
 <script src="creeps-base.js"></script>
-<script src="skills-creep-base.js?v=20261103t4"></script>
+<script src="skills-creep-base.js?v=20261103san"></script>
 <script src="creeps-esenciales.js?v=20261103t7"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -1362,13 +1362,49 @@ prueba('☀🌑 Luz y siniestro (2026-10-26): los elementos nuevos, su identidad
     tl.mult, tl.estado.nombre, tl2.mult, ts.mult, ts.estado, ts2.mult, ts2.estado.nombre,
     !!herida.sinCura, !!sang.sinCura, Combatiente.curaQueEntra(5, 4, [{nombre: 'Herida sombría', activo: true}]), Combatiente.curaQueEntra(5, 4, []), Combatiente.curaQueEntra(5, -3, [{sinCura: true}]),
     Combatiente.sinCura([{nombre: 'Sanguijuela'}])],
-    ['siniestro', 'luz', '', true, true, 1.5, 'Marcado', 1, 0, null, 1, 'Herida sombría', true, true, 0, 4, -3, true]);
+    ['siniestro', 'luz', '', true, true, 1.5, 'Marcado', 1, 0, null, 1, 'Herida sombría', true, false, 0, 4, -3, false]);   // 🪱 la Sanguijuela ya no es «sin cura» (2026-11-03)
 });
 prueba('🐛 Sanguijuela (Debuffer, 2026-10-26): PdG.Esp contra Evasión, 2d6 siniestro, se cura la mitad y queda pegada 4 turnos (Fuerza contra Ef.Esp)', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Sanguijuela'), h = armarHabilidadDeCreep(e.datos, 2);
   const ef = h.duelo.efectos[0];
   igual([h.duelo.tira, h.duelo.contra.join(','), h.duelo.danoFormula, h.duelo.tipoDano, !!h.duelo.drena, h.duelo.drenaPct, ef.nombre, ef.turnos, ef.soltar.stat, ef.soltar.difStat, h.cd, e.etiquetas.includes('debuffer')],
     ['pdgmg', 'eva', '2d6', 'siniestro', true, 50, 'Sanguijuela', 4, 'fue', 'dmgesp', 3, true]);
+});
+prueba('🪱 Sanguijuela (2026-11-03): la cura del portador se la lleva quien la lanzó — hasta su máximo, el resto Vida extra; caído, se pierde; la Herida sombría sigue bloqueando', () => {
+  const P = estadosPresetCreep().find(p => p.nombre === 'Sanguijuela');
+  const sang = EstadosAplicar.componer({nombre: 'Sanguijuela', chupaDe: 'creep:c9', chupaUid: '', chupaNombre: 'Ladrón'});
+  const robo = Combatiente.curaRobada(10, 12, [sang]);
+  const conHerida = Combatiente.curaRobada(10, 12, [sang, {nombre: 'Herida sombría', activo: true}]);
+  const r1 = Combatiente.repartoCuraRobada(30, 40, 15), r2 = Combatiente.repartoCuraRobada(40, 40, 8), r3 = Combatiente.repartoCuraRobada(0, 40, 8);
+  // Un creep lanzador en el mapa: lo que hace el aviso «Cura robada» (vtt-hexgrid/js/11, recibidosCreeps).
+  const sc = {id: 'c9', nombre: 'Ladrón', hp: 38, hpMax: 40, estados: [], equipo: []};
+  const rc = Combatiente.repartoCuraRobada(sc.hp, sc.hpMax, 7); sc.hp += rc.cura; if(rc.extra) EstadosAplicar.aplicarACreep(sc, {nombre: 'Vida extra', escudoMagico: rc.extra});
+  const ve = sc.estados.find(e => e.nombre === 'Vida extra');
+  igual([!!P.robaCura, !!P.sinCura, sang.chupaDe, sang.chupaNombre, robo && robo.monto, robo && robo.estado.chupaDe, Combatiente.curaQueEntra(10, 12, [sang]), Combatiente.curaQueEntra(10, 12, [{nombre: 'Sanguijuela', activo: true, sinCura: true}]),
+    conHerida, Combatiente.curaQueEntra(10, 12, [sang, {nombre: 'Herida sombría', activo: true}]), Combatiente.curaRobada(0, 12, [sang]), Combatiente.curaRobada(10, -3, [sang]),
+    [r1.cura, r1.extra, r1.perdida], [r2.cura, r2.extra], r3.perdida, sc.hp, ve && ve.escudoMagico, EstadosAplicar.limpiarSpec({nombre: 'Sanguijuela', chupaDe: 'pj:f1', chupaUid: 'u1', chupaNombre: 'Ana'}).chupaUid,
+    /se la lleva la Sanguijuela de Ladrón/.test(Combatiente.curaRobadaTxt(robo, 'Prueba'))],
+    [true, false, 'creep:c9', 'Ladrón', 12, 'creep:c9', 0, 0, null, 0, null, null, [10, 5, 0], [0, 8], 8, 40, 5, 'u1', true]);
+});
+prueba('🪱 Sanguijuela de clase (Debuffer, 2026-11-03): la puede aprender un personaje, y si la lanza un personaje la cura robada le entra a su ficha (y a su invocación)', () => {
+  const hab = CLASES_SKILLS.find(k => k.id === 'debuffer').habilidades.find(h => h.id === 'debuffer-sanguijuela');
+  const ef = hab.duelo.efectos[0];
+  const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S; S.attrs.con = 6;
+  const max = FichaCalculo.calcular(S).final.hpmax;
+  const ui = {cambio: () => {}, toast: () => {}, presets: estadosPresetFicha()};
+  S.hp = max - 4; FichaAcciones.aplicarEstadoRecibido(S, {nombre: 'Cura robada', vida: 10}, 'Sanguijuela', ui);
+  const lleno = S.hp === max, extra = (S.efectos || []).filter(e => e.nombre === 'Vida extra').reduce((a, e) => a + e.escudoMagico, 0);
+  const S2 = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S; S2.hp = 0;
+  FichaAcciones.aplicarEstadoRecibido(S2, {nombre: 'Cura robada', vida: 10}, 'Sanguijuela', ui);
+  // En el portador personaje: el estado que le llega guarda quién la lanzó (estadoDeSpec) y la cura de una poción no le entra.
+  const st = FichaAcciones.estadoDeSpec({nombre: 'Sanguijuela', turnos: 4, chupaDe: 'pj:f1', chupaUid: 'u1', chupaNombre: 'Ana'}, estadosPresetFicha());
+  // Una invocación lanzadora (Recibidos.estado, «fichaId~invId»).
+  const Si = {invocaciones: [{id: 'i1', nombre: 'Bicho', hp: 9, hpMax: 10, estados: []}]};
+  Recibidos.estado(Si, {data: () => ({fichaId: 'f1~i1', spec: JSON.stringify({nombre: 'Cura robada', vida: 4}), origen: 'Sanguijuela'})}, ui);
+  const inv = Si.invocaciones[0];
+  igual([hab.costo, hab.nitrosCosto, hab.duelo.tira, hab.duelo.contra.join(','), hab.duelo.danoFormula, hab.duelo.tipoDano, !!hab.duelo.drena, hab.duelo.drenaPct, ef.nombre, ef.turnos, ef.soltar.difStat,
+    hab.modo, lleno, extra, S2.hp, st.chupaDe, Combatiente.curaQueEntra(5, 9, [st]), Combatiente.curaRobada(5, 9, [st]).monto, inv.hp, inv.estados.find(e => e.nombre === 'Vida extra').escudoMagico],
+    ['3', 2, 'pdgmg', 'eva', '2d6', 'siniestro', true, 50, 'Sanguijuela', 4, 'dmgesp', 'auto', true, 6, 0, 'pj:f1', 0, 9, 10, 3]);
 });
 prueba('💪 Empuje (Support, 2026-10-26): Flash, Empower a un aliado; la tirada del creep que lo suma lo gasta', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Empuje'), h = armarHabilidadDeCreep(e.datos, 2);

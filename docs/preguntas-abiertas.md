@@ -1494,3 +1494,11 @@ lo de menos resta). Lo que no se definió queda como estaba: los puntos de atrib
 **Atributos y jefe (dueño, el mismo día: «los puntos de atributo además pueden sumar, aunque generalmente no los usamos; y el jefe da un 25 % más»):** el
 50 % del nivel se reparte entre los puntos de atributo del presupuesto (33 + 3 por nivel): cada punto de más suma esa parte (N3: 75 ÷ 39 ≈ 1,9) y cada
 uno de menos la resta; un jefe da el total × 1,25 (`XP_JEFE`).
+
+### P238 — 🪱 Sanguijuela: si quien la lanzó está caído o ya no está en el mapa, ¿qué pasa con la cura? (2026-11-03) ✅
+
+**Contexto:** desde el 2026-11-03 (dueño: «toda curación a alguien con una sanguijuela le va al debuffer. Y si tiene full vida, le va como vida extra»),
+la cura que recibiría el portador se la lleva quien lanzó la Sanguijuela. Caso borde: el lanzador está caído (0 de vida) o su token ya no está.
+**Decidido (dueño, 2026-11-03: «claro que la cura se pierde simplemente»):** la cura se pierde — al portador tampoco le entra. Programado
+(`Combatiente.repartoCuraRobada`: caído → `perdida`; un creep que ya no existe, el aviso lo descarta con una línea en la Mesa).
+

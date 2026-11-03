@@ -281,6 +281,11 @@
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 
 ## Pendientes
+- [ ] **🪱 Sanguijuela nueva (2026-11-03)**: ya no corta la cura, se la lleva quien la lanzó. Probar con clics: (1) un creep con Sanguijuela se la pega
+  a Prueba Uno; Prueba Uno toma una poción → no se cura, la Mesa dice «la cura se la lleva la Sanguijuela de…», y el creep sube (con el creep lleno,
+  Vida extra); (2) la Regeneración / la cura de turno del portador, igual; (3) Prueba Dos (Debuffer) aprende «Sanguijuela» de la clase y se la
+  pega a un creep: la poción del creep (o su cura de turno) le llega a Prueba Dos (aviso «Cura robada»); (4) lanzador caído: la cura se pierde;
+  (5) con Herida sombría además, no hay cura que robar.
 - [x] **Tanda de la noche del 2026-11-03** → [`reporte-pruebas-2026-11-03.md`](reporte-pruebas-2026-11-03.md): ✅ Anulación (habilidad de jugador,
   varita sobre rival y sobre casilla con zona, pergamino recortando); ✅ Malviaje (duelo y movimiento); ✅ jefe desde un duelo (Polvo de
   adormidera); ✅ Adrenalina se va a los 2 turnos; ✅ Perforante; ✅ DÉBIL A LA LUZ en área. **Quedan**: Anulación sobre invocación de creep,

@@ -197,10 +197,11 @@ const ESTADOS_PRESET = [
   // 🥶 Escalofrío (2026-11-03, dueño: la rápida siniestra del Debuffer): −2 a su PdG hasta el final de su próximo turno.
   {nombre:'Escalofrío', polaridad:'debuff', turnos:1, turnosCompletos:true, mods:[{stat:'pdg', val:-2}],
     detalle:'Un frío de sombra que le mete miedo en el cuerpo: −2 a su Probabilidad de Golpe hasta el final de su próximo turno. ⚙ Automatizado.'},
-  // 🐛 Sanguijuela (2026-10-26, dueño, la Sanguijuela del Mago): pegada 4 turnos; mientras está, no se cura. Se la arranca al empezar su turno con Fuerza
-  // contra el Efecto especial de quien la lanzó (el `soltar` lo trae el efecto de la habilidad).
-  {nombre:'Sanguijuela', polaridad:'debuff', turnos:4, sinCura:true, mods:[],
-    detalle:'Tiene una sanguijuela pegada: mientras esté, no se cura con nada. Dura 4 turnos; al empezar su turno puede arrancársela con Fuerza contra el Efecto especial de quien la lanzó. ⚙ Automatizado.'},
+  // 🐛 Sanguijuela (2026-10-26, dueño, la Sanguijuela del Mago): pegada 4 turnos. Se la arranca al empezar su turno con Fuerza contra el Efecto especial
+  // de quien la lanzó (el `soltar` lo trae el efecto de la habilidad). 🪱 (2026-11-03, dueño) Ya no bloquea la cura: toda cura que le entraría se la
+  // lleva quien la lanzó (`robaCura`; quién: `chupaDe`/`chupaUid`/`chupaNombre`), hasta su máximo y el resto como Vida extra (Combatiente.curaRobada).
+  {nombre:'Sanguijuela', polaridad:'debuff', turnos:4, robaCura:true, mods:[],
+    detalle:'Tiene una sanguijuela pegada: mientras esté, toda cura que reciba (poción, cura de un aliado, Regeneración, la de cada turno) no le entra a él: se la lleva quien la lanzó, hasta su vida máxima, y lo que sobra le queda como Vida extra. Dura 4 turnos; al empezar su turno puede arrancársela con Fuerza contra el Efecto especial de quien la lanzó. ⚙ Automatizado.'},
   // Sequía (2026-10-24, dueño: la Maldición de la sequía del Debuffer, «sólo corta las regeneraciones de SP y HP propias, no las externas»).
   {nombre:'Sequía', polaridad:'debuff', turnos:3, sequia:true,
     detalle:'Una maldición que lo seca por dentro: mientras dure no recupera vida ni SP por sí mismo al empezar el turno (sus pasivas de regeneración, la Regeneración de vida de su equipo, su SP Regen). Lo que le dan otros (una cura, la Regeneración de un aliado, una zona de curación) entra igual. ⚙ Automatizado.'},

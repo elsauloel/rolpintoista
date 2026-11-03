@@ -46,6 +46,7 @@ async function talRelicario(d, mato){
   if(!(n > 0) || !ta) return null;
   try{
     const r = await dueloCurar(ta, n);
+    if(r && r.robada) return {n};   // 🪱 se la llevó una Sanguijuela (ya quedó en la Mesa)
     const sube = Math.max(0, num(r.nuevo) - num(r.previo)), exc = num(r.excedente);
     const txt = [sube ? `se cura ${sube}` : '', exc ? `Vida extra ${exc}` : '', !sube && !exc ? 'ya estaba con la vida y la Vida extra al tope' : ''].filter(Boolean).join(' y ');
     try{ mesaLinea(`🩸 El Relicario de ${d.atacante.nombre} late por matar a ${d.defensor.nombre} con daño especial: ${txt}`, 'recordatorio'); }catch(err){}

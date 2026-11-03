@@ -1473,7 +1473,37 @@ const intercambioHostMapa = {
     return pjs.filter(t => t.fichaId !== id && distanciaHex({col: mio.col, fila: mio.fila}, {col: t.col, fila: t.fila}) <= 1).map(t => t.fichaId);
   },
 };
+/* 🪱 La cura que robó la Sanguijuela de un creep (2026-11-03): el aviso «Cura robada» con fichaId «creep:<id>» (EstadosAplicar.encolarCuraRobada) lo
+   aplica el mapa del GM: hasta su máximo como cura, el resto como Vida extra; caído, se pierde. */
+const curaRobadaCreepEnCurso = new Set();
+function recibidosCreeps(){
+  if(!soyGM) return;
+  (recibidosPend.estados || []).filter(d => /^creep:/.test(String(d.data().fichaId || ''))).forEach(d => {
+    if(curaRobadaCreepEnCurso.has(d.id)) return;
+    curaRobadaCreepEnCurso.add(d.id);
+    recibidosCola = recibidosCola.then(async () => {
+      if(!await Recibidos.tomar(d, true)) return;
+      const datos = d.data() || {}, id = String(datos.fichaId).slice(6);
+      let sp = null; try{ sp = JSON.parse(datos.spec || 'null'); }catch(e){}
+      if(!sp || sp.nombre !== 'Cura robada') return;
+      const m = Math.max(0, Math.round(num(sp.vida)));
+      let r = null, nombre = '';
+      try{
+        await modificarCreep(id, sc => {
+          nombre = sc.nombre || 'El creep';
+          r = Combatiente.repartoCuraRobada(num(sc.hp), num(sc.hpMax), m);
+          if(r.perdida) return;
+          sc.hp = num(sc.hp) + r.cura;
+          if(r.extra > 0) EstadosAplicar.aplicarACreep(sc, {nombre: 'Vida extra', escudoMagico: r.extra});
+        });
+      }catch(err){ console.error('Cura robada:', err); mesaLinea(`🪱 La Sanguijuela robó ${m} de vida para un creep que ya no está: se pierde`, 'recordatorio'); return; }
+      mesaLinea(r && r.perdida ? `🪱 ${nombre} está caído: la cura que robó su Sanguijuela (${m}) se pierde`
+        : `🪱 ${nombre} se queda con la cura que robó su Sanguijuela: +${m}${r && r.extra ? ` (${r.cura} de vida y ${r.extra} de Vida extra)` : ''}`, 'recordatorio');
+    }).catch(err => console.error('Cura robada:', err)).then(() => curaRobadaCreepEnCurso.delete(d.id));
+  });
+}
 function recibidosRevisar(){
+  recibidosCreeps();
   const ids = new Set([...recibidosPend.estados, ...recibidosPend.recompensas].map(d => String(d.data().fichaId || '').split(SEP_INVOCACION)[0]));
   ids.forEach(id => {
     if(!id || !bnManejo(id) || recibidosEnCurso.has(id)) return;

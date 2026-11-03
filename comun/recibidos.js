@@ -64,6 +64,15 @@ const Recibidos = (() => {
       return {inv};
     }
     if(sp.nombre === 'Revivir'){ ui.toast(`${origen ? origen + ' → ' : ''}${inv.nombre}: revivir una invocación va a mano`); return {}; }
+    if(sp.nombre === 'Cura robada'){   // 🪱 la Sanguijuela que lanzó la invocación (2026-11-03): hasta su máximo, el resto como Vida extra; caída, se pierde
+      const m = Math.max(0, Math.round(num(sp.vida))), antes = num(inv.hp);
+      const r = Combatiente.repartoCuraRobada(antes, num(inv.hpMax), m);
+      if(r.perdida){ ui.toast(`🪱 ${inv.nombre} está caída: la cura que robó su Sanguijuela se pierde`); return {}; }
+      inv.hp = antes + r.cura;
+      if(r.extra > 0) inv.estados = [...(inv.estados || []), Combatiente.estadoVidaExtra(r.extra, {id: uid(), detalle: 'Vida extra de la Sanguijuela: la cura que le robó a su presa, pasada del máximo.'})];
+      ui.toast(`🪱 ${origen ? origen + ' → ' : ''}${inv.nombre}: +${fmt(m)} de vida robada${r.extra ? ` (${fmt(r.extra)} de Vida extra)` : ''}`);
+      return {inv};
+    }
     if(sp.nombre === 'Gana No2'){   // 🧉 el Matelisto (2026-10-18): aunque pase su máximo (dueño)
       const antes = num(inv.nitros);
       inv.nitros = antes + Math.max(0, Math.round(num(sp.stacks)));

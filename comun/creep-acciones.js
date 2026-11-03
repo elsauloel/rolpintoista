@@ -185,7 +185,7 @@ const CreepAcciones = (() => {
   const uid = () => Math.random().toString(36).slice(2,9);
   const ATTR_LABELS = {con:'Con', fue:'Fue', agl:'Agi', des:'Des', esp:'Esp'};
   // (2026-11-01) 'apila' y 'turnosCompletos': sin ellos, un estado puesto a mano desde el selector no se acumulaba (Adrenalina ×2) ni duraba bien.
-  const FLAGS_ESTADO = ['apila', 'turnosCompletos', 'sinCura', 'fenix', 'pierdeAlDano', 'armaduraRota','silencio','confusion','lisiado','paralisis','esEscarcha','mitadPdgEva','inmovilizado','rengo','lento','cansado','exhausto','hypeado','sentado','excedenteVida','invulnerable','inmunidadCC','inmunidadMental','esMental','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','espejo','desarmado','ceguera','esCC','esVeneno','esSangrado','stun','expuesto','mitadEva','alEmpezarTurno','volador','sangraSp','aguante','vigilancia','golpeAnunciado','marcado','sequia','repetir','sueno','miedo','panico','esQuemadura','acelera','alTerminarTurno','extenuante','tormenta','unaTirada','unGolpe','sinRecarga','seGasta','etereo','golpePorTurnos','mareado'];   // (2026-11-01: faltaban; el selector ya copia todo el preset)   // repetir: la Ráfaga encadenada (2026-10-25), la Repetición del Shooter en un creep (vtt-hexgrid/js/35)   // marcado: el Rayo cargado (se lo ve en la niebla, 2026-10-24)   // aguante: el modo aguante (2026-10-21)   // golpeAnunciado: El que avisa no traiciona (2026-10-21)
+  const FLAGS_ESTADO = ['apila', 'turnosCompletos', 'sinCura', 'robaCura', 'fenix', 'pierdeAlDano', 'armaduraRota','silencio','confusion','lisiado','paralisis','esEscarcha','mitadPdgEva','inmovilizado','rengo','lento','cansado','exhausto','hypeado','sentado','excedenteVida','invulnerable','inmunidadCC','inmunidadMental','esMental','sangrePura','coagulacionExtrema','afortunado','blindado','espinas','espejo','desarmado','ceguera','esCC','esVeneno','esSangrado','stun','expuesto','mitadEva','alEmpezarTurno','volador','sangraSp','aguante','vigilancia','golpeAnunciado','marcado','sequia','repetir','sueno','miedo','panico','esQuemadura','acelera','alTerminarTurno','extenuante','tormenta','unaTirada','unGolpe','sinRecarga','seGasta','etereo','golpePorTurnos','mareado'];   // (2026-11-01: faltaban; el selector ya copia todo el preset)   // repetir: la Ráfaga encadenada (2026-10-25), la Repetición del Shooter en un creep (vtt-hexgrid/js/35)   // marcado: el Rayo cargado (se lo ve en la niebla, 2026-10-24)   // aguante: el modo aguante (2026-10-21)   // golpeAnunciado: El que avisa no traiciona (2026-10-21)
   const habEtq = stat => (C().STAT_LOOKUP[stat] && C().STAT_LOOKUP[stat].label) || ATTR_LABELS[stat] || stat;
   // La Ejecución de un creep: la misma regla que personajes e invocaciones (comun/combatiente.js, habEjecucion). Sin costo variable.
   function habEjecucion(sc, h){
@@ -358,8 +358,9 @@ const CreepAcciones = (() => {
       const boticario = num(it.curahp) > 0 ? num(C().modTotal(sc, 'boticario')) : 0;   // Mano de boticario (2026-10-05)
       const tope = num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, antes = num(sc.hp);
       const entra = Combatiente.curaQueEntra(antes, num(it.curahp) + boticario, sc.estados);
+      const robo = Combatiente.curaRobada(antes, num(it.curahp) + boticario, sc.estados);   // 🪱 la Sanguijuela se la lleva (2026-11-03)
       sc.hp = Math.max(0, Math.min(tope, antes + entra));   // 🌑 con una herida que no deja curarse, la cura no entra
-      partes.push(num(it.curahp) > 0 && !entra ? `❌ ${antes > 0 ? 'no se cura (Herida sombría o Sanguijuela)' : 'está caído: una cura no lo levanta'}` : `${num(it.curahp) >= 0 ? '+' : ''}${fmt(num(it.curahp) + boticario)} HP`);
+      partes.push(robo ? (typeof EstadosAplicar !== 'undefined' && EstadosAplicar.curaRobadaEnviar ? EstadosAplicar.curaRobadaEnviar(robo, sc.nombre) : Combatiente.curaRobadaTxt(robo, sc.nombre)) : num(it.curahp) > 0 && !entra ? `❌ ${antes > 0 ? 'no se cura (Herida sombría)' : 'está caído: una cura no lo levanta'}` : `${num(it.curahp) >= 0 ? '+' : ''}${fmt(num(it.curahp) + boticario)} HP`);
     }
     let spTxt = '';   // 💧 la poción de SP (2026-11-03)
     const spc = spDeConsumible(sc, it);
@@ -694,7 +695,9 @@ const CreepAcciones = (() => {
       if(rp > 0 && num(sc.hp) > 0){ d.hp += rp; rep.push(`Pasivas: +${rp} HP`); }
     }
     const dh = Combatiente.curaQueEntra(sc.hp, d.hp, sc.estados);
-    if(d.hp > 0 && !dh) rep.push(num(sc.hp) > 0 ? `🌑 ${Combatiente.SIN_CURA_TXT}` : 'Caído: la cura de este turno no lo levanta');
+    const robo = Combatiente.curaRobada(sc.hp, d.hp, sc.estados);   // 🪱 la Sanguijuela se la lleva (2026-11-03)
+    if(robo) rep.push((typeof EstadosAplicar !== 'undefined' && EstadosAplicar.curaRobadaEnviar ? EstadosAplicar.curaRobadaEnviar(robo, sc.nombre) : Combatiente.curaRobadaTxt(robo, sc.nombre)));
+    else if(d.hp > 0 && !dh) rep.push(num(sc.hp) > 0 ? `🌑 ${Combatiente.SIN_CURA_TXT}` : 'Caído: la cura de este turno no lo levanta');
     if(dh){ const antes = num(sc.hp); sc.hp = Math.max(0, Math.min(num(sc.hpMax), antes + dh)); rep.push(`HP total: ${antes} → ${sc.hp}`); }
     if(fenixCreep(sc)) rep.push(`🔥 Llama de Fénix: revive con ${sc.hp} HP y queda Titilando`);
     sc.nitros = Combatiente.recargarNo2(C().nitrosMax(sc), sc.nitros, sc.estados);

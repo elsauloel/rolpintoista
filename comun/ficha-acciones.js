@@ -403,8 +403,10 @@ const FichaAcciones = (() => {
       let curaNo = '';   // 🌑 la cura no entró (2026-10-26, visto en el mapa: con Sanguijuela el aviso decía «+25 HP» y la vida no subía)
       if(num(it.curahp)){
         const entra = Combatiente.curaQueEntra(S.hp, num(it.curahp) + boticario, S.efectos);
+        const robo = Combatiente.curaRobada(S.hp, num(it.curahp) + boticario, S.efectos);   // 🪱 la Sanguijuela se la lleva (2026-11-03)
         if(entra) ui.fijarHp(num(S.hp) + entra);
-        else if(num(it.curahp) > 0) curaNo = num(S.hp) > 0 ? 'no se cura (Herida sombría o Sanguijuela)' : 'está caído: una cura no lo levanta';   // 🌑 Herida sombría / Sanguijuela
+        else if(robo) curaNo = (typeof EstadosAplicar !== 'undefined' && EstadosAplicar.curaRobadaEnviar ? EstadosAplicar.curaRobadaEnviar(robo, ((S.meta && S.meta.nombre) || '').trim()) : Combatiente.curaRobadaTxt(robo, ((S.meta && S.meta.nombre) || '').trim()));
+        else if(num(it.curahp) > 0) curaNo = num(S.hp) > 0 ? 'no se cura (Herida sombría)' : 'está caído: una cura no lo levanta';   // 🌑 Herida sombría
       }
       const efecto = ui.efecto(it);
       // 📜 A todo el grupo (dueño, 2026-10-19: Buena Fortuna, Inmunidad a CC, Blindaje): el mismo estado a los aliados (el mapa los conoce).
@@ -1108,6 +1110,7 @@ const FichaAcciones = (() => {
     if(spec.marcadoPor){ draft.marcadoPor = spec.marcadoPor; draft.marcadoToken = spec.marcadoToken || ''; }
     if(spec.miedoDe){ draft.miedoDe = spec.miedoDe; draft.miedoDeNombre = spec.miedoDeNombre || ''; }
     if(spec.provocaDe){ draft.provocaDe = spec.provocaDe; draft.provocaDeNombre = spec.provocaDeNombre || ''; }   // 😤 Provocado por quién (2026-10-26)   // 😱 Miedo (2026-10-18): quién lo asustó
+    if(spec.chupaDe){ draft.chupaDe = spec.chupaDe; draft.chupaUid = spec.chupaUid || ''; draft.chupaNombre = spec.chupaNombre || ''; }   // 🪱 la Sanguijuela: quién la lanzó (2026-11-03)
     if(spec.resetea) draft.resetea = true;   // ☠ vuelve a esos stacks, no los suma (la Nube tóxica, 2026-10-26)
     if(spec.finCombate) draft.finCombate = true;   // 🩸 se va al «Finalizar combate» (el Relicario de sangre, 2026-10-27)
     return draft;
@@ -1184,9 +1187,24 @@ const FichaAcciones = (() => {
     if(spec.nombre === 'Transfusión'){
       const d = Math.round(num(spec.vida !== undefined ? spec.vida : spec.hp)), antes = num(S.hp), max = num(FichaCalculo.calcular(S).final.hpmax);
       const nuevo = d < 0 ? Math.max(Math.min(antes, 1), antes + d) : Math.min(max > 0 ? max : antes + d, antes + Combatiente.curaQueEntra(antes, d, S.efectos));
+      const robo = d > 0 ? Combatiente.curaRobada(antes, d, S.efectos) : null;   // 🪱 la Sanguijuela se la lleva (2026-11-03)
+      if(robo){ ui.toast((typeof EstadosAplicar !== 'undefined' && EstadosAplicar.curaRobadaEnviar ? EstadosAplicar.curaRobadaEnviar(robo, ((S.meta && S.meta.nombre) || '').trim()) : Combatiente.curaRobadaTxt(robo, ((S.meta && S.meta.nombre) || '').trim()))); return; }
       S.hp = nuevo;
       ui.cambio(['vitals', 'refresh']);
       ui.toast(`🩸 ${origen ? origen + ': ' : ''}${d < 0 ? 'diste' : 'recibiste'} ${fmt(Math.abs(nuevo - antes))} de vida (${fmt(antes)} → ${fmt(nuevo)})`);
+      return;
+    }
+    // 🪱 «Cura robada» (2026-11-03): la cura que se llevó una Sanguijuela que lanzó este personaje — hasta su máximo como cura, el resto como Vida
+    // extra (Combatiente.repartoCuraRobada). Caído: se pierde.
+    if(spec.nombre === 'Cura robada'){
+      const m = Math.max(0, Math.round(num(spec.vida))), antes = num(S.hp), max = num(FichaCalculo.calcular(S).final.hpmax);
+      const r = Combatiente.repartoCuraRobada(antes, max, m);
+      const quien = origen ? origen + ': ' : '';
+      if(r.perdida){ ui.toast(`🪱 ${quien}estás caído: la cura que robó tu Sanguijuela (${fmt(m)}) se pierde`); return; }
+      S.hp = antes + r.cura;
+      if(r.extra > 0) S.efectos = [...(S.efectos || []), Combatiente.estadoVidaExtra(r.extra, {id: uid(), detalle: 'Vida extra de la Sanguijuela: la cura que le robó a su presa, pasada del máximo.'})];
+      ui.cambio(['vitals', 'efectos', 'refresh']);
+      ui.toast(`🪱 ${quien}tu Sanguijuela te trajo ${fmt(m)} de vida${r.cura ? ` (${fmt(antes)} → ${fmt(S.hp)})` : ''}${r.extra ? ` · ${fmt(r.extra)} de Vida extra` : ''}`);
       return;
     }
     // 🫳 «Robo» (2026-10-14, vtt-hexgrid/js/47): un ladrón se llevó una unidad de este ítem del cinturón.

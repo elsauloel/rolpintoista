@@ -50,6 +50,7 @@ const EstadosAplicar = (() => {
     if(s.marca){ out.marca = String(s.marca).slice(0, 80); out.marcaNombre = String(s.marcaNombre || '').slice(0, 40); }   // y en quien marca, a quién
     if(s.miedoDe){ out.miedoDe = String(s.miedoDe).slice(0, 80); out.miedoDeNombre = String(s.miedoDeNombre || '').slice(0, 40); }
     if(s.provocaDe){ out.provocaDe = String(s.provocaDe).slice(0, 80); out.provocaDeNombre = String(s.provocaDeNombre || '').slice(0, 40); }   // 😤 Provocado por quién (2026-10-26)   // 😱 Miedo (2026-10-18): quién lo asustó
+    if(s.chupaDe){ out.chupaDe = String(s.chupaDe).slice(0, 120); out.chupaUid = String(s.chupaUid || '').slice(0, 80); out.chupaNombre = String(s.chupaNombre || '').slice(0, 40); }   // 🪱 la Sanguijuela: quién la lanzó (2026-11-03)
     if(s.muerdeA){ out.muerdeA = String(s.muerdeA).slice(0, 80); out.muerdeANombre = String(s.muerdeANombre || '').slice(0, 40); out.desde = Math.round(Number(s.desde) || 0); }   // 🦷 Mordiendo (2026-10-21): a quién tiene agarrado
     return out;
   }
@@ -76,6 +77,7 @@ const EstadosAplicar = (() => {
       ...(s.miedoDe ? {miedoDe: s.miedoDe, miedoDeNombre: s.miedoDeNombre} : {}),
       ...(s.provocaDe ? {provocaDe: s.provocaDe, provocaDeNombre: s.provocaDeNombre} : {}),
       ...(s.muerdeA ? {muerdeA: s.muerdeA, muerdeANombre: s.muerdeANombre, desde: s.desde} : {}),
+      ...(s.chupaDe ? {chupaDe: s.chupaDe, chupaUid: s.chupaUid, chupaNombre: s.chupaNombre} : {}),
       ...(s.resetea ? {resetea: true} : {}), ...(s.finCombate ? {finCombate: true} : {})};
   }
 
@@ -112,6 +114,29 @@ const EstadosAplicar = (() => {
     if(!s.polaridad && p.polaridad) s.polaridad = p.polaridad;
     return s;
   }
+  /* 🪱 La cura que se lleva la Sanguijuela (2026-11-03): un aviso «Cura robada» para quien la lanzó, en la misma cola de estados. A un personaje (o a una
+     invocación suya, «fichaId~invId») lo aplica su dueño (la ficha o el mapa: Recibidos.estado → «Cura robada»); a un creep, el mapa del GM
+     («creep:<id>», sin dueño: solo el GM lee esos avisos). `e` = el estado Sanguijuela (con `chupaDe`). → {ok, a} o {manual, motivo}. */
+  async function encolarCuraRobada(e, monto, origen){
+    const de = String((e && e.chupaDe) || ''), m = Math.max(0, Math.round(Number(monto) || 0));
+    if(!m) return {ok: false, motivo: 'no hay cura'};
+    if(!de || de.indexOf(':') < 0) return {manual: true, motivo: 'no se sabe quién lanzó la Sanguijuela: dásela a mano'};
+    const tipo = de.slice(0, de.indexOf(':')), id = de.slice(de.indexOf(':') + 1);
+    if(typeof fbDb === 'undefined' || !fbDb) return {manual: true, motivo: 'sin conexión: dásela a mano'};
+    await fbDb.collection(fbRutaCampana('estados')).add({
+      fichaId: tipo === 'creep' ? 'creep:' + id : id, duenoUid: tipo === 'creep' ? '' : String(e.chupaUid || ''),
+      spec: JSON.stringify({nombre: 'Cura robada', vida: m}), origen: String(origen || 'Sanguijuela').slice(0, 80), aplicada: false,
+      creado: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+    return {ok: true, a: String(e.chupaNombre || '')};
+  }
+  // Para avisarlo en cada pantalla: dispara el envío (sin esperar) y devuelve la línea para la Mesa o el reporte.
+  function curaRobadaEnviar(robo, quien){
+    if(!robo) return '';
+    encolarCuraRobada(robo.estado, robo.monto, `Sanguijuela · ${quien || ''}`.trim()).then(r => { if(r && r.manual && typeof toast === 'function') toast(`🪱 ${r.motivo}`); })
+      .catch(err => console.error('Sanguijuela: no se pudo mandar la cura', err));
+    return Combatiente.curaRobadaTxt(robo, quien);
+  }
   async function encolarPj(o){
     await fbDb.collection(fbRutaCampana('estados')).add({
       fichaId: String(o.fichaId), duenoUid: String(o.duenoUid), spec: JSON.stringify(limpiarSpec(conDatosDelPreset(o.spec))).slice(0, 600),
@@ -134,5 +159,5 @@ const EstadosAplicar = (() => {
     return s.nombre + (stacks ? ` ×${stacks}` : '') + (extra.length ? ` (${extra.join(', ')})` : '');
   }
 
-  return {DEBUFFS, BUFFS, presetPorNombre, conDatosDelPreset, limpiarSpec, esPreset, componer, bloqueadoCreep, aplicarACreep, encolarPj, texto};
+  return {DEBUFFS, BUFFS, presetPorNombre, conDatosDelPreset, limpiarSpec, esPreset, componer, bloqueadoCreep, aplicarACreep, encolarPj, encolarCuraRobada, curaRobadaEnviar, texto};
 })();

@@ -47,6 +47,8 @@ const FichaMantenimiento = (() => {
   }
   // La vida por fijarHp (para que el veneno que te deja en 0 active el Ankh antes de contar los turnos de muerte) y el reporte.
   function aplicarVida(S, ui, hpDelta, hpAntes, rep){
+    const robo = Combatiente.curaRobada(S.hp, hpDelta, S.efectos);   // 🪱 la Sanguijuela se la lleva (2026-11-03)
+    if(robo){ rep.push((typeof EstadosAplicar !== 'undefined' && EstadosAplicar.curaRobadaEnviar ? EstadosAplicar.curaRobadaEnviar(robo, ((S.meta && S.meta.nombre) || '').trim()) : Combatiente.curaRobadaTxt(robo, ((S.meta && S.meta.nombre) || '').trim()))); return; }
     if(hpDelta > 0 && !Combatiente.curaQueEntra(S.hp, hpDelta, S.efectos)){ rep.push(num(S.hp) > 0 ? `🌑 ${Combatiente.SIN_CURA_TXT}` : `Caído: la cura de este turno no lo levanta (hace falta revivirlo)`); return; }
     if(!hpDelta) return;
     ui.fijarHp(num(S.hp) + hpDelta);
@@ -92,7 +94,9 @@ const FichaMantenimiento = (() => {
       if(rp > 0 && num(inv.hp) > 0){ d.hp += rp; rep.push(`Pasivas: +${fmt(rp)} HP`); }
     }
     const dhInv = Combatiente.curaQueEntra(inv.hp, d.hp, inv.estados);
-    if(d.hp > 0 && !dhInv) rep.push(num(inv.hp) > 0 ? `🌑 ${Combatiente.SIN_CURA_TXT}` : 'Caída: la cura de este turno no la levanta');
+    const roboInv = Combatiente.curaRobada(inv.hp, d.hp, inv.estados);   // 🪱 (2026-11-03)
+    if(roboInv) rep.push((typeof EstadosAplicar !== 'undefined' && EstadosAplicar.curaRobadaEnviar ? EstadosAplicar.curaRobadaEnviar(roboInv, inv.nombre) : Combatiente.curaRobadaTxt(roboInv, inv.nombre)));
+    else if(d.hp > 0 && !dhInv) rep.push(num(inv.hp) > 0 ? `🌑 ${Combatiente.SIN_CURA_TXT}` : 'Caída: la cura de este turno no la levanta');
     if(dhInv){ const antes = num(inv.hp); inv.hp = Math.max(0, Math.min(num(inv.hpMax) || Infinity, antes + dhInv)); rep.push(`HP total: ${fmt(antes)} → ${fmt(inv.hp)}`); }
     // Sus turnos (dueño, 2026-10-30: «que cero turnos no borra un token de manera automática anymore, pero sí avisa»): al llegar a 0 no se duerme
     // sola; queda marcada (`turnosAgotados`) y el mapa le pregunta a su dueño: borrar el token, sumar turnos o resolverlo a mano (vtt-hexgrid/js/54).

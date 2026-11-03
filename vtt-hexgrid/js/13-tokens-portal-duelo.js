@@ -1680,6 +1680,8 @@ async function dueloDrenar(d, monto, opts){
   try{
     if(ta.tipo === 'creep'){
       const r = await modificarCreep(ta.fichaId, sc => {
+        const robo = Combatiente.curaRobada(num(sc.hp), monto, sc.estados);   // 🪱 con una Sanguijuela, lo drenado se lo lleva quien la lanzó (2026-11-03)
+        if(robo) return {previo: num(sc.hp), nuevo: num(sc.hp), robo};
         const previo = num(sc.hp), max = num(sc.hpMax) > 0 ? num(sc.hpMax) : previo + monto;
         sc.hp = Math.min(max, previo + Combatiente.curaQueEntra(previo, monto, sc.estados));   // 🌑 con una herida que no deja curarse, no se cura (2026-10-26)
         const sobra = monto - (sc.hp - previo), tope = Math.floor(max * pct / 100), antes = excedenteDe(sc.estados);
@@ -1687,14 +1689,17 @@ async function dueloDrenar(d, monto, opts){
         if(exc) EstadosAplicar.aplicarACreep(sc, {nombre: 'Vida extra', escudoMagico: exc});
         return {previo, nuevo: sc.hp, exc};
       });
+      if(r.robo){ const c = curaRobadaMapa(r, quien); return {quien, monto, hpAntes: r.previo, hpDespues: r.previo, nota: c.robada}; }
       return {quien, monto, hpAntes: r.previo, hpDespues: r.nuevo, ...(r.exc ? {excedente: r.exc} : {})};
     }
     if(String(ta.fichaId).includes(SEP_INVOCACION)){
       const r = await dueloCurarInv(ta, monto);
+      if(r.robada) return {quien, monto, hpAntes: num(r.previo), hpDespues: num(r.previo), nota: r.robada};
       const sobra = monto - (num(r.nuevo) - num(r.previo));
       return {quien, monto, hpAntes: num(r.previo), hpDespues: num(r.nuevo), ...(sobra > 0 && pct ? {nota: `lo que pasa del máximo (${sobra}), a mano`} : {})};
     }
     const r = await dueloCurar(ta, monto);
+    if(r.robada) return {quien, monto, hpAntes: num(r.previo), hpDespues: num(r.previo), nota: r.robada};
     const sobra = monto - (num(r.nuevo) - num(r.previo));
     const f = fichasPub.get(ta.fichaId), rs = (f && f.resumen) || {};
     const max = num(rs.hpMax) > 0 ? num(rs.hpMax) : num(r.nuevo), tope = Math.floor(max * pct / 100), antes = excedenteDe(rs.estados);
@@ -2359,11 +2364,12 @@ async function dueloCurar(t, n){
   n = Math.max(0, Math.round(num(n)));
   if(t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION)) return dueloCurarInv(t, n);
   if(t.tipo === 'creep'){
-    const res = await modificarCreep(t.fichaId, sc => { const previo = num(sc.hp); const tope = num(sc.hpMax) > 0 ? num(sc.hpMax) : previo + n; const sin = n > 0 && previo > 0 && Combatiente.sinCura(sc.estados); const entra = Combatiente.curaQueEntra(previo, n, sc.estados); sc.hp = Math.min(tope, previo + entra);
+    const res = await modificarCreep(t.fichaId, sc => { const previo = num(sc.hp); const robo = Combatiente.curaRobada(previo, n, sc.estados); if(robo) return {previo, nuevo: previo, robo}; const tope = num(sc.hpMax) > 0 ? num(sc.hpMax) : previo + n; const sin = n > 0 && previo > 0 && Combatiente.sinCura(sc.estados); const entra = Combatiente.curaQueEntra(previo, n, sc.estados); sc.hp = Math.min(tope, previo + entra);
       // 🩸 el Relicario de sangre (2026-10-27): lo que pasa del máximo, Vida extra hasta el fin del combate (+50 % como mucho)
       const exc = entra > 0 && num(sc.hpMax) > 0 && CreepCalculo.talisman(sc, 'relicario') > 0 ? Combatiente.excedenteConTope(sc.estados, previo + entra - tope, tope, Combatiente.RELICARIO_TOPE) : 0;
       if(exc > 0) sc.estados = [...(sc.estados || []), Combatiente.estadoVidaExtra(exc, {finCombate: true, detalle: 'Vida extra del Relicario de sangre: lo que la cura pasó del máximo. Se va al terminar el combate.'})];
       return {previo, nuevo: sc.hp, sin, exc}; });
+    if(res.robo) return curaRobadaMapa(res, nombreDe(t));
     return {previo: res.previo, nuevo: res.nuevo, ...(res.exc ? {excedente: res.exc} : {}), ...(n > 0 && res.previo <= 0 ? {caido: true} : {}), ...(res.sin ? {sinCura: true} : {})};
   }
   const base = fbDb.doc(fbRutaCampana(`fichas/${t.fichaId}`));
@@ -2376,7 +2382,9 @@ async function dueloCurar(t, n){
     const rs = ficha.data().resumen || {};
     const previo = num(datos.hp), tope = num(rs.hpMax) > 0 ? num(rs.hpMax) : previo + n;
     if(n > 0 && previo <= 0) return {previo, nuevo: previo, caido: true};   // una cura no levanta a un caído (Combatiente.curaQueEntra)
-    if(n > 0 && Combatiente.sinCura(rs.estados)) return {previo, nuevo: previo, sinCura: true};   // 🌑 Herida sombría / Sanguijuela (2026-10-26)
+    if(n > 0 && Combatiente.sinCura(rs.estados)) return {previo, nuevo: previo, sinCura: true};   // 🌑 Herida sombría (2026-10-26)
+    const robo = Combatiente.curaRobada(previo, n, rs.estados);   // 🪱 la Sanguijuela se la lleva (2026-11-03)
+    if(robo) return {previo, nuevo: previo, robo};
     datos.hp = Math.min(tope, previo + n);
     tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
     tx.update(base, {actualizado: ts, 'resumen.hp': datos.hp});
@@ -2384,6 +2392,7 @@ async function dueloCurar(t, n){
     const exc = num(rs.relicario) > 0 && num(rs.hpMax) > 0 ? Combatiente.excedenteConTope(rs.estados, previo + n - tope, tope, Combatiente.RELICARIO_TOPE) : 0;
     return {previo, nuevo: datos.hp, ...(exc ? {excedente: exc} : {})};
   }).then(async r => {
+    if(r && r.robo) return curaRobadaMapa(r, nombreDe(t));
     if(r && r.excedente) try{ await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: {nombre: 'Vida extra', escudoMagico: r.excedente, finCombate: true}, origen: 'Relicario de sangre'}); }catch(err){ console.error('Relicario de sangre:', err); }
     return r;
   });
@@ -2404,12 +2413,21 @@ async function dueloCurarInv(t, n){
     const previo = num(inv.hp), tope = num(inv.hpMax) > 0 ? num(inv.hpMax) : previo + n;
     if(n > 0 && previo <= 0) return {previo, nuevo: previo, caido: true};   // una cura no levanta a un caído
     if(n > 0 && Combatiente.sinCura(inv.estados)) return {previo, nuevo: previo, sinCura: true};   // 🌑 (2026-10-26)
+    const robo = Combatiente.curaRobada(previo, n, inv.estados);   // 🪱 la Sanguijuela se la lleva (2026-11-03)
+    if(robo) return {previo, nuevo: previo, robo};
     inv.hp = Math.min(tope, previo + n);
     const rs = ficha.data().resumen || {};
     tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
     tx.update(base, {actualizado: ts, 'resumen.invocaciones': (rs.invocaciones || []).map(i => i.id === invId ? {...i, hp: inv.hp} : i)});
     return {previo, nuevo: inv.hp};
-  });
+  }).then(r => r && r.robo ? curaRobadaMapa(r, nombreDe(t)) : r);
+}
+/* 🪱 La cura que se llevó una Sanguijuela (2026-11-03): se la manda a quien la lanzó (la cola de estados) y lo deja en la Mesa. → el resultado de
+   siempre con `sinCura` (para quien no sabe de esto: no se curó) y `robada` (el texto). */
+function curaRobadaMapa(r, quien){
+  const txt = EstadosAplicar.curaRobadaEnviar(r.robo, quien);
+  try{ mesaLinea(txt, 'recordatorio'); }catch(e){}
+  return {previo: r.previo, nuevo: r.previo, sinCura: true, robada: txt};
 }
 // Los stacks de veneno de más de quien atacó (Guantes del envenenador): un personaje o una invocación por su resumen; un creep, por su equipo.
 function venenistaDe(lado){
@@ -2427,11 +2445,12 @@ function dueloCuraMomento(d, t, n, r){
   const quien = d.atacante && d.atacante.nombre ? d.atacante.nombre : 'Alguien', a = t.oculto ? 'alguien' : nombreDe(t);
   const pj = t.tipo === 'pj', mismo = d.atacante && d.atacante.tokenId === d.defensor.tokenId;
   const titulo = mismo ? `${quien} se curó` : `${quien} curó a ${a}`;
-  const resultado = r.caido ? `No lo levanta: ${a} está caído (hace falta revivirlo)` : r.sinCura ? `No se cura: ${a} tiene una herida que no deja curarse` : `+${fmt(n)} de vida${pj ? ` (${fmt(r.previo)} → ${fmt(r.nuevo)})` : ''}`;
+  const resultado = r.caido ? `No lo levanta: ${a} está caído (hace falta revivirlo)` : r.robada ? r.robada : r.sinCura ? `No se cura: ${a} tiene una herida que no deja curarse` : `+${fmt(n)} de vida${pj ? ` (${fmt(r.previo)} → ${fmt(r.nuevo)})` : ''}`;
   momentoAbrir({tipo: 'cura', icono: '💚', titulo, resultado, estado: 'listo',
     datos: pj && t.duenoUid ? {paraUid: t.duenoUid, aviso: !mismo, boton: '💚 Aceptar',
       veredicto: r.caido ? {tono: 'neutro', grande: 'Caído', chico: 'Una cura no levanta a un caído: hace falta revivirlo'}
-        : r.sinCura ? {tono: 'neutro', grande: 'Sin cura', chico: 'Tenés una herida que no deja curarse (Herida sombría o Sanguijuela)'}
+        : r.robada ? {tono: 'neutro', grande: '🪱 Robada', chico: r.robada}
+        : r.sinCura ? {tono: 'neutro', grande: 'Sin cura', chico: 'Tenés una Herida sombría: no deja curarse'}
         : {tono: 'bueno', grande: `+${fmt(n)}`, chico: mismo ? `te curaste ${fmt(n)} de vida (${fmt(r.previo)} → ${fmt(r.nuevo)})` : `${quien} te curó ${fmt(n)} de vida (${fmt(r.previo)} → ${fmt(r.nuevo)})`}} : {}});
 }
 /* Un buff que no pasa desapercibido (2026-10-24, dueño: «aunque no se tire nada y se aplique directo, tiene que haber un anuncio: Fulanito te aplicó
@@ -2572,6 +2591,10 @@ async function dueloAplicarEfectoBase(d, ef){
     if(v) spec.soltar = {...spec.soltar, visual: v};
   }
   if(spec.nombre === 'Provocado' && !spec.provocaDe && d.atacante.tokenId){ spec.provocaDe = d.atacante.tokenId; spec.provocaDeNombre = String(d.atacante.nombre || '').slice(0, 40); }   // 😤 por quién (el Taunt: quien lo usó; Tirar la bronca ya lo trae, js/77)
+  if(spec.nombre === 'Sanguijuela' && !spec.chupaDe && d.atacante.tokenId){   // 🪱 quién la lanzó: la cura del portador se la lleva él (2026-11-03)
+    const ta = tokens.get(d.atacante.tokenId);
+    if(ta && ta.fichaId){ spec.chupaDe = `${ta.tipo === 'creep' ? 'creep' : 'pj'}:${ta.fichaId}`; spec.chupaUid = String(ta.duenoUid || ''); spec.chupaNombre = String(d.atacante.nombre || '').slice(0, 40); }
+  }
   if(spec.nombre === 'Miedo' && !spec.miedoDe && d.atacante.tokenId){ spec.miedoDe = d.atacante.tokenId; spec.miedoDeNombre = String(d.atacante.nombre || '').slice(0, 40); }   // 😱 a quién le tiene miedo
   if((spec.nombre === 'Mordido' || spec.nombre === 'Agarrado') && d.atacante.tokenId && typeof mordidaEmpezar === 'function') await mordidaEmpezar(d, spec);   // 🦷 quién lo tiene agarrado, y la bestia queda Mordiendo (js/54)
   // 🛡 Miti-Miti (Tanque, 2026-10-11): la marca queda en quien la usa, con a quién protege; el reparto del daño lo hace js/10 (mitiMitiDe).
@@ -2729,7 +2752,7 @@ async function dueloAplicarEfectoBase(d, ef){
     try{
       const r = await dueloCurar(t, spec.cura);
       dueloCuraMomento(d, t, spec.cura, r);
-      return {nota: r.caido ? Combatiente.CAIDO_TXT : r.sinCura ? Combatiente.SIN_CURA_TXT : `+${spec.cura} HP (${fmt(r.previo)} → ${fmt(r.nuevo)})`};
+      return {nota: r.caido ? Combatiente.CAIDO_TXT : r.robada ? r.robada : r.sinCura ? Combatiente.SIN_CURA_TXT : `+${spec.cura} HP (${fmt(r.previo)} → ${fmt(r.nuevo)})`};
     }
     catch(err){ console.error('No se pudo aplicar la cura del duelo:', err); return {manual: true, nota: 'no se pudo curar solo: aplicalo a mano'}; }
   }

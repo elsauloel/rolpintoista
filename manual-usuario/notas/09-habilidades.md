@@ -254,7 +254,7 @@ estado: pendiente
 +++
 Maldiciones, venenos y control. Pool de [[Clases|clase]]. Sus maldiciones enfrentan **Especial contra Res. Mental** ([[Resistencias]]).
 
-**Skills del borrador:** Enyetar (repetir y quedarse con el más bajo), Confusión, Maldición debilitante (−1 a todas las tiradas), Maldición extenuante, Maldición tormentosa, Drenar vida, Balas de sangre, Transfusión sanguínea, [[Veneno]] y Nube tóxica (área que envenena).
+**Skills del borrador:** Enyetar (repetir y quedarse con el más bajo), Confusión, Maldición debilitante (−1 a todas las tiradas), Maldición extenuante, Maldición tormentosa, Drenar vida, Balas de sangre, Transfusión sanguínea, [[Veneno]], Nube tóxica (área que envenena) y Sanguijuela (te llevás las curas de quien la tiene pegada).
 
 > [!question] Sin auditar
 > Ninguna automatizada todavía. Ojo: la página del Debuffer del PDF nuevo repetía la del Support; se usan las tarjetas de la versión anterior.

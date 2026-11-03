@@ -511,6 +511,9 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 5 | **Tirar la bronca** | — | + otra Buena |
   Consumible: Poción de HP. **Sin Transfusión sanguínea** (dueño eligió la opción A, 2026-11-03); la Transfusión quedó en el pool de creep del
   Support y del Debuffer para otros.
+  **Nivel 1 aprobado** (dueño, 2026-11-03: «vamos así»): Esp 12 · Con 9 · Agi 6 · Des 4 · Fue 2, vida 45, 6 No2, 36 SP (recupera 6); Varita de
+  los pilares + Escudo de madera forrado en lienzo · Chaleco de cuero · Escarpines de piel de cururú: Def 3, Def.Esp 2. Potencia (Flash, 2 SP) y
+  Arrojo (Flash, 3 SP). Consumible: Poción de HP. Sin cargar hasta que el dueño diga.
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
@@ -606,7 +609,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | L8 | | | | | |
 | R4 | | | | | |
 | M4 | ✅ (2026-11-03) | | | | |
-| S4 | boceto ✅ (2026-11-03) | | | | |
+| S4 | ✅ (2026-11-03) | | | | |
 | D4 | | | | | |
 
 ## Los creeps (cada uno se completa al diseñarlo)

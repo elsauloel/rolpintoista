@@ -758,7 +758,7 @@ crítico** (una común puede tener Crít. frecuente +1 **o** Crít. potente +2, 
 | 🆕 Sable de desfile | Iniciativa +1 · Parry +1 · Sangrado 25 % · 75 |
 | **Sin Sangrado** | |
 | Sable de milico | Iniciativa +1 · contraataque +1 · 60 |
-| Caronero | Parry +1 · Iniciativa +1 · 65 |
+| Facón largo (antes «Caronero», dueño 2026-11-03) | Parry +1 · Iniciativa +1 · 65 |
 | Espada del comisario | contraataque +3 · 65 |
 | Espada de la feria de Mataderos | +1 de daño · contraataque +1 · 65 |
 | Machete chaqueño | +1 dado amplificado · 80 |

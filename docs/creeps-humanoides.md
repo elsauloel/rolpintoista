@@ -618,7 +618,7 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   11/10/9/7/2 → 50, 7 · nv4 12/11/9/8/2 → 55, 8 · nv5 13/12/10/8/2 → 60, 8.
   | Nivel | Habilidad nueva | Pasiva | Equipo |
   |---|---|---|---|
-  | 1 | **Romper armadura** (lenta) · **Desarmar** (Flash) | — | **Caronero** (Tipo 6, Parry +1; nombre a cambiar) + escudo Común · 2 Comunes |
+  | 1 | **Romper armadura** (lenta) · **Desarmar** (Flash) | — | **Facón largo** (Tipo 6, Parry +1; ex «Caronero», renombrado por el dueño) + escudo Común · 2 Comunes |
   | 2 | **Remate** | **Guardia firme** | + 2 Comunes |
   | 3 | **Golpe que sigue** | — | **Espada del herrero** (Buena, Tipo 6) |
   | 4 | **Arte de la guerra** (Flash) | **Desvío hábil** | + una Buena |

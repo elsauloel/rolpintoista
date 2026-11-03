@@ -283,7 +283,7 @@
 ## Pendientes
 
 ### ▶ Para la próxima tanda de pruebas en el mapa (2026-11-03)
-- [ ] **🌿 Primer tick de una Regeneración pasa por el control de cura** (2026-11-03): a Prueba Uno con Herida sombría ponerle una Regeneración
+- [x] ✅ (2026-11-03b, [reporte-pruebas-pendientes-2026-11-03b.md](reporte-pruebas-pendientes-2026-11-03b.md): con Herida no entra; con Sanguijuela se la lleva el lanzador, +5 de Vida extra; el aviso de la poción no dice «Herida sombría: no se cura», solo no cura) **🌿 Primer tick de una Regeneración pasa por el control de cura** (2026-11-03): a Prueba Uno con Herida sombría ponerle una Regeneración
   (poción o «+ Estado») → no se cura nada en el momento y lo dice («Herida sombría: no se cura»). Con una Sanguijuela pegada (de un creep) →
   la primera cura no le entra a él: el creep lanzador la recibe («Cura robada»; si está lleno, como Vida extra). Lo mismo con un creep portador
   desde GM Tools.
@@ -291,43 +291,43 @@
 > Dueño, 2026-11-03: «Todas las cosas de programación que estamos cambiando en este momento y no han sido probadas en el mapa, ponelas pendientes
 > para cuando yo te diga: pasá las pruebas pendientes del mapa.» Se corren todas juntas cuando lo pida, con clics y capturas, en «Claude · pruebas».
 
-- [ ] **🧪 Poción de Regeneración menor (catálogo nuevo)**: comprarla o dársela a Prueba Uno con vida baja y tomarla: +5 por turno durante 3 turnos
+- [x] ✅ (2026-11-03b: +5 al empezar el turno siguiente, 3 → 2 turnos, solo a quien la toma; no vi el tercer tick ni que se vaya sola; en un creep, no llegué) **🧪 Poción de Regeneración menor (catálogo nuevo)**: comprarla o dársela a Prueba Uno con vida baja y tomarla: +5 por turno durante 3 turnos
   (15 en total), solo a él (a los aliados pegados, nada); que el estado se vaya solo al tercer turno. En un creep (Berserker de prueba): lo mismo.
-- [ ] **🔪 Facón de paisano (ahora Tipo 4, Sangrado 50 %, 55 de oro)**: en una ficha, el primer ataque cuesta 2 No2 (el siguiente 4), el daño es 1d4
+- [x] ✅ (2026-11-03b, en la ficha y la Botonera: 1.º ataque 2 No2, después 4; con el Sable del tahúr cada una su 1.º barato, 3 + 2; 1d4 + Daño; el efecto se tira con d2. En un creep, no llegué) **🔪 Facón de paisano (ahora Tipo 4, Sangrado 50 %, 55 de oro)**: en una ficha, el primer ataque cuesta 2 No2 (el siguiente 4), el daño es 1d4
   + su Daño y el pop-up del Sangrado tira con d2. En un creep con el Facón: lo mismo desde las Acciones. Con dos armas (sable + facón) en una ficha:
   cada una tiene su primer ataque barato (3 + 2).
-- [ ] **💧 Pool esencial con SP para los de Especial**: agregar desde «+ Creep → ⭐ Pool esencial» al Piromante, el Sanador y el Maldito → arrancan
+- [x] ✅ (2026-11-03b: Piromante y Maldito arrancan «Con SP · 42/42 y 39/39», cobran SP y no ponen cooldown; el Escudero, con cooldown. **Arreglado**: al cancelar con «No cuenta» no devolvía el SP si la barra estaba llena) **💧 Pool esencial con SP para los de Especial**: agregar desde «+ Creep → ⭐ Pool esencial» al Piromante, el Sanador y el Maldito → arrancan
   con la barra de SP llena (Esp × 3) y sus habilidades cobran SP, sin cooldown; el Escudero y el Hachero siguen con turnos de espera. Al empezar el
   turno recuperan Esp ÷ 2 de SP. El cambio a mano entre SP y cooldown (tarjeta de GM Tools y ⚡ Acciones) sigue andando.
-- [ ] **😮‍💨 Robar el aliento con 1 No2 + la diferencia**: un creep se la echa a Prueba Uno: pierde 1 No2 más la diferencia (antes 2); en 0, Sentado.
+- [x] ✅ (2026-11-03b: 5 contra 3 → perdió 3 No2; se repitió en el mismo turno; la guardada con 2 se puso al día sola) **😮‍💨 Robar el aliento con 1 No2 + la diferencia**: un creep se la echa a Prueba Uno: pierde 1 No2 más la diferencia (antes 2); en 0, Sentado.
   Un creep guardado con la versión vieja se pone al día solo (dice «pierde 1 No2»). Con SP, que se pueda repetir en el mismo turno.
-- [ ] **✨ Parpadeo a 4 SP**: un mago creep en modo SP lo usa en su turno → −4 SP; en turno ajeno (Flash) → −8 SP. Uno guardado con 2 se pone al día.
-- [ ] **💨 Aviso de oportunidad negada**: Prueba Uno pegado a un creep con Disparo y repliegue: el creep se reacomoda alejándose → a Prueba Uno le
+- [x] ✅ (2026-11-03b: −4 SP en su turno, −8 en turno ajeno; la guardada con 2 se puso al día. Visto: cancelar el destino con Esc no devuelve el SP) **✨ Parpadeo a 4 SP**: un mago creep en modo SP lo usa en su turno → −4 SP; en turno ajeno (Flash) → −8 SP. Uno guardado con 2 se pone al día.
+- [x] ✅ parcial (2026-11-03b: con Parpadeo, Disparo y repliegue y Hit and run, el cartel «Sin ataque de oportunidad» le sale a Prueba Uno y queda en la Mesa. **No llegué**: Bomba de humo, Salto, Takle, Dash, robo, el caso al revés y los casos sin aviso) **💨 Aviso de oportunidad negada**: Prueba Uno pegado a un creep con Disparo y repliegue: el creep se reacomoda alejándose → a Prueba Uno le
   sale al centro «X se alejó de Prueba Uno con Disparo y repliegue: no permite ataque de oportunidad» con «Entendido» (y no la pregunta de
   oportunidad); la línea queda en la Mesa. Lo mismo con: Hit and run, Bomba de humo, Parpadeo, Salto, la embestida (Takle), Dash (al que atraviesa
   no se le avisa: a ese le pega) y la huida de un robo. Al revés: Prueba Uno con un movimiento libre se aleja de un creep → el aviso le sale al GM.
   Sin aviso: un rival sin No2 para pagarla, uno con arco, o uno al que ya se le ofreció la oportunidad por esa misma salida y siguen pegados (no es
   un límite por ronda ni por turno: el único límite de ataques de oportunidad son los No2 — dueño, 2026-11-03; si se separan y se vuelven a pegar, es otra).
-- [ ] **⚡ Flash de un creep en turno ajeno: 50 % más de cooldown**: una habilidad Flash de cooldown 2 usada en el turno de un jugador queda en 3
+- [x] ✅ (2026-11-03b: Parpadeo cd 2 del Escudero en turno ajeno → espera 3, la Mesa «cooldown 3 en vez de 2»; con SP, el doble: 8) **⚡ Flash de un creep en turno ajeno: 50 % más de cooldown**: una habilidad Flash de cooldown 2 usada en el turno de un jugador queda en 3
   (cd 3 → 4, cd 4 → 6); en su propio turno, normal. La Mesa dice «cuesta más (cooldown X en vez de Y)». Con SP, sigue el doble.
-- [ ] **😤 Provocar de creep con PdG.Esp + su nivel**: el Escudero provoca a Prueba Uno: tira PdG.Esp + nivel contra la Res.Mt; Provocado y Desafiante.
+- [x] ✅ (2026-11-03b: «Tirar PdG.Esp · 1d4+1» contra Res.Mt; la guardada con Ef.Esp + 2 se puso al día) **😤 Provocar de creep con PdG.Esp + su nivel**: el Escudero provoca a Prueba Uno: tira PdG.Esp + nivel contra la Res.Mt; Provocado y Desafiante.
   Un creep guardado con «Ef.Esp + 2» se pone al día.
-- [ ] **⚡ Zap y Centella contra Res.CC**: el Mago del rayo le tira el Zap a Prueba Uno: el 1d4 no se esquiva y la Parálisis se resiste con Res.CC
+- [x] ✅ Zap (2026-11-03b: Prueba Uno tira «Res.CC»; la Centella no la probé) **⚡ Zap y Centella contra Res.CC**: el Mago del rayo le tira el Zap a Prueba Uno: el 1d4 no se esquiva y la Parálisis se resiste con Res.CC
   (no con Res.Esp); la Centella, igual. Un creep guardado con la versión vieja se pone al día.
-- [ ] **🔍 «Ver detalle del duelo» en un recuadro**: en la Mesa, el botón abre el pop-up (título, la frase y el paso a paso); se cierra con Aceptar,
+- [x] ✅ (2026-11-03b, GM y jugador: se cierra con Aceptar, ✕, Esc y clic afuera) **🔍 «Ver detalle del duelo» en un recuadro**: en la Mesa, el botón abre el pop-up (título, la frase y el paso a paso); se cierra con Aceptar,
   ✕, Esc o clic afuera. Desde el GM y desde un jugador.
 - [ ] **💰 Valor del botín y 📋 Ver el grupo** («Batalla terminada», paso Publicar): el valor si venden todo (½), si se despoja (¼) y lo que costaría
   comprarlo, por jugador; «📋 Ver el grupo» con lugares vacíos, stats, resistencias y debilidades.
-- [ ] **🗄 «+ Creep» con tres pestañas**: ⭐ Pool esencial, 🗺 Pool de campaña (sin los de fábrica sin auditar) y 🗄 Referencia (sin auditar).
-- [ ] **☁ Nubes y gases que se disipan**: al vencer, una nube (Nube tóxica, Gas adormecedor, niebla de la Bomba de humo) se va desvaneciendo en vez
+- [x] ✅ (2026-11-03b: ⭐ Pool esencial (7), 🗺 Pool de campaña (6), 🗄 Referencia (sin auditar) (269)) **🗄 «+ Creep» con tres pestañas**: ⭐ Pool esencial, 🗺 Pool de campaña (sin los de fábrica sin auditar) y 🗄 Referencia (sin auditar).
+- [x] ✅ (2026-11-03b, Nube tóxica: se agranda y se apaga en ~1,6 s) **☁ Nubes y gases que se disipan**: al vencer, una nube (Nube tóxica, Gas adormecedor, niebla de la Bomba de humo) se va desvaneciendo en vez
   de apagarse de golpe.
-- [ ] **🔔 Aviso de propuestas al dueño** (index.html, Partidas): con la cuenta del dueño, «Fulano propuso…» con lo sin auditar de la biblioteca.
-- [ ] **⭐ Co-GM desde la pantalla de Jugadores**: dar y sacar el GM a otro miembro; el dueño de la partida no se puede sacar.
-- [ ] **💨 Disparo y repliegue: primero se mueve (2026-11-03)**: un creep con la habilidad (el GM, desde las Acciones): (1) sale el cartel «se
+- [ ] ❌ (2026-11-03b: no se puede: hace falta la cuenta del dueño) **🔔 Aviso de propuestas al dueño** (index.html, Partidas): con la cuenta del dueño, «Fulano propuso…» con lo sin auditar de la biblioteca.
+- [ ] (2026-11-03b: la pantalla y el cartel de confirmación están; no lo di para no tocar permisos) **⭐ Co-GM desde la pantalla de Jugadores**: dar y sacar el GM a otro miembro; el dueño de la partida no se puede sacar.
+- [x] ✅ (2026-11-03b: el cartel, arrastrar gratis −0 No2, objetivo desde la casilla nueva, +2 al daño, sin cartel de alejarse después; no cobra dos veces) **💨 Disparo y repliegue: primero se mueve (2026-11-03)**: un creep con la habilidad (el GM, desde las Acciones): (1) sale el cartel «se
   reacomoda antes de disparar»; arrastrar el token 1–2 casilleros → no cobra No2 ni da ataque de oportunidad, y enseguida pide el objetivo desde
   la casilla nueva; el duelo suma +2 al daño y después NO aparece el cartel de alejarse; (2) «🏹 Disparar desde acá» sin moverse; (3) «✕ Cancelar»
   devuelve el ataque; (4) el Hit and run sigue igual (pega y después se aleja); (5) un creep guardado con la versión vieja se pone al día solo.
-- [ ] **🪱 Sanguijuela nueva (2026-11-03)**: ya no corta la cura, se la lleva quien la lanzó. Probar con clics: (1) un creep con Sanguijuela se la pega
+- [x] ✅ parcial (2026-11-03b: (1) la poción de Prueba Dos se la llevó el Maldito como 25 de Vida extra; (2) la Regeneración, +5; (4) lanzador caído: se pierde; (5) con Herida no hay cura. **No llegué**: (3) la de clase con Prueba Dos) **🪱 Sanguijuela nueva (2026-11-03)**: ya no corta la cura, se la lleva quien la lanzó. Probar con clics: (1) un creep con Sanguijuela se la pega
   a Prueba Uno; Prueba Uno toma una poción → no se cura, la Mesa dice «la cura se la lleva la Sanguijuela de…», y el creep sube (con el creep lleno,
   Vida extra); (2) la Regeneración / la cura de turno del portador, igual; (3) Prueba Dos (Debuffer) aprende «Sanguijuela» de la clase y se la
   pega a un creep: la poción del creep (o su cura de turno) le llega a Prueba Dos (aviso «Cura robada»); (4) lanzador caído: la cura se pierde;

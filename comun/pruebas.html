@@ -107,6 +107,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-lupa.js"></script>
 <script src="combate-fin.js"></script>
 <script src="grupo-botin.js"></script>
+<script src="aviso-propuestas.js"></script>
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
@@ -6615,6 +6616,17 @@ prueba('🛡 Provocar tira Ef.Esp + 2 (2026-11-03), el guardado se pone al día;
   igual([pr.duelo.tira, pr.duelo.tiraBono, !!pr.duelo.tiraBonoNivel, cambio, vieja[0].duelo.tira, vieja[0].duelo.tiraBono, 'tiraBonoNivel' in vieja[0].duelo, /Efecto especial \+ 2/.test(vieja[0].detalle),
     Combatiente.pisoDefensa(-2, maldita), Combatiente.pisoDefensa(-2, [{nombre: 'X', permiteNegativa: true}]), CreepCalculo.armadmgEfectiva(sc2)],
     ['dmgesp', 2, false, true, 'dmgesp', 2, false, true, 0, -2, 0]);
+});
+prueba('🔔 Aviso de propuestas al dueño (2026-11-03): cambio o incorporación, sin lo propio ni lo ya visto, lo más nuevo primero', () => {
+  const E = [
+    {id: 'a', tipo: 'creeps', nombre: 'Rata', autorUid: 'j1', autorNombre: 'Juan', auditado: false, creado: 300},
+    {id: 'b', tipo: 'skills', nombre: 'Golpe', autorUid: 'j2', autorNombre: 'Ana', auditado: false, reemplaza: 'base-golpe', creado: 200},
+    {id: 'c', tipo: 'items', nombre: 'Daga', autorUid: 'j1', autorNombre: 'Juan', editorUid: 'j2', editorNombre: 'Ana', auditado: false, creado: 50, actualizado: 400},
+    {id: 'd', tipo: 'creeps', nombre: 'Mío', autorUid: 'dueno', autorNombre: 'Saulo', auditado: false, creado: 500},
+    {id: 'e', tipo: 'creeps', nombre: 'Viejo', autorUid: 'j1', autorNombre: 'Juan', auditado: false, creado: 100},
+    {id: 'f', tipo: 'creeps', nombre: 'Auditado', autorUid: 'j1', autorNombre: 'Juan', auditado: true, creado: 600}];
+  const r = AvisoPropuestas.armar(E, {duenoUid: 'dueno', vistoHasta: 150, max: 2});
+  igual([r.lineas.map(l => l.texto), r.mas, r.ultima], [['Ana propuso un cambio a «Daga» (Ítem)', 'Juan propuso una incorporación: «Rata» (Creep)'], 1, 400]);
 });
 prueba('💧 Poción de SP en un creep (2026-11-03): en modo SP devuelve SP; con cooldowns baja 1 turno a la habilidad elegida, o avisa que no hay nada en espera', () => {
   const pot = CATALOGO_BASE.find(i => i.nombre === 'Poción de SP menor');

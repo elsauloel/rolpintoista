@@ -1935,3 +1935,11 @@ versión parecida en más de una, es candidato a juntar.
   «Quién cobra»): lugares de equipo con los **vacíos resaltados** (🔲), cinturón, stats, Res.Esp/Res.Mt/Res.CC, resistencia a crítico por Tipo y
   elementales (rojo lo más bajo del grupo, verde lo más alto), «▼ Débil en / ▲ Fuerte en» y el arma con su tipo de daño. Lee las fichas con
   `FichaGuardado.cargar` y usa `EscaneoGrupo.perfil` (carga solo lo que falte). Puras, con prueba: `slotsDe(S)` y `pistas(item, grupo)`.
+
+- **`aviso-propuestas.js`** (`AvisoPropuestas`, 2026-11-03, pedido del dueño: «cuando algún jugador publique algo nuevo… me tiene que aparecer
+  una notificación "fulano propuso un cambio" o "una incorporación"»): en la página de Partidas (`index.html`, `#aviso-propuestas`), **solo para la
+  cuenta del dueño del proyecto** (`BIBLIOTECA_DUENO_EMAIL_AVISO`, el mismo de `biblioteca.js` y de las reglas), un aviso con lo 🔶 sin auditar de cada
+  `biblioteca_<tipo>` (una consulta por colección, `auditado == false`, tope 50): «Fulano propuso un cambio a «X» (Creep)» (`reemplaza` o una edición)
+  o «… una incorporación: «X»», con la fecha y «Revisar →» a `datos/auditoria.html?tipo=…&id=…` (abre esa pestaña y esa entrada). Lo del propio dueño
+  no cuenta; últimas 10 y «y N más». «✔ Ya lo vi» guarda «visto hasta» **en este navegador** (localStorage `aviso-propuestas-visto`: sin reglas nuevas).
+  `armar(entradas, {duenoUid, vistoHasta, max})` es puro (en `pruebas.html`).

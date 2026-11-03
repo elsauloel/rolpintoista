@@ -182,6 +182,7 @@ select option{background:var(--panel)}
   <section id="vista-partidas" hidden>
     <h1>Partidas</h1>
     <p class="sub">Entrá a una partida o creá una nueva. Quien crea la partida es su GM; los que se unen son jugadores.</p>
+    <div id="aviso-propuestas"></div>   <!-- 🔔 lo nuevo sin auditar, solo para el dueño del proyecto (comun/aviso-propuestas.js, 2026-11-03) -->
     <div class="grid" id="lista-partidas"></div>
 
   </section>
@@ -324,6 +325,7 @@ select option{background:var(--panel)}
 <script src="comun/respaldo.js"></script>
 <script src="comun/menu-sitio.js?v=20261031home"></script>
 <script src="comun/paso-a-paso.js?v=20261010a"></script>
+<script src="comun/aviso-propuestas.js?v=20261103a"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
@@ -558,6 +560,7 @@ async function verPartidas(){
   try{
     await cargarPartidas();
     renderPartidas();
+    if(typeof AvisoPropuestas !== 'undefined') AvisoPropuestas.montar($('#aviso-propuestas')).catch(err => console.warn('Aviso de propuestas:', err));
   }catch(err){
     console.error('No se pudieron leer las partidas:', err);
     $('#lista-partidas').innerHTML = `<p class="error">${esc(textoError(err))}</p>`;

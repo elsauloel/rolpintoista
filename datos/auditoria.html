@@ -144,6 +144,9 @@ const TIPOS = [
 ];
 const TIPO = Object.fromEntries(TIPOS.map(t => [t.id, t]));
 const st = {tipo: '', soloSin: true, texto: '', entradas: [], viejas: [], abierto: {}, borrador: {}};
+// 🔔 Desde el aviso de propuestas de la página de inicio (2026-11-03): ?tipo=creeps&id=… abre esa pestaña y esa entrada.
+(() => { try{ const q = new URLSearchParams(location.search); const t = q.get('tipo'), id = q.get('id');
+  if(t && TIPO[t]) st.tipo = t; if(id) st.abierto[id] = true; }catch(e){} })();
 
 /* ---------- Los originales de fábrica (para comparar) ---------- */
 let basesCache = null;

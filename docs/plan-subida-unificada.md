@@ -299,3 +299,5 @@ los HTML) se retira.
 | 4 | Pasivas y trampas | ✅ 2026-09-29 — ver "Paso 4: cómo quedó" (incluye P123: una sola forma de trampa) |
 | 5 | Ítems (el más enredado: rama `main`, Excel, `importar_json.py`, catálogo copiado adentro de los HTML) | ✅ 2026-09-29 — ver "Paso 5: cómo quedó" |
 | 6 | **Una sola pantalla de auditoría** para todo lo subido: ver, comparar con el original, editar, aprobar o descartar | ✅ 2026-09-29 — `datos/auditoria.html`, ver "Paso 6: cómo quedó" |
+
+- **🔔 Aviso al dueño (2026-11-03)**: lo que sube el grupo (🔶 sin auditar) le aparece al dueño del proyecto en la página de Partidas, «Fulano propuso un cambio / una incorporación», con «Revisar →» a la auditoría (`comun/aviso-propuestas.js`). «Ya lo vi» se recuerda por navegador.

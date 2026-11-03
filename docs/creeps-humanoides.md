@@ -233,7 +233,7 @@ estuvimos trabajando para los skills». 4 de cada uno, como el resto, salvo que 
 | S1 | Sanador | Sanar, Oleada sanadora, Purificar, Luz para los suyos |
 | S2 | Abanderado: potencia al grupo | Estandarte de guerra, ¡A la carga!, Redoble de tambores |
 | S3 | Armero: arma elemental y bendiciones | Arma ígnea / helada / eléctrica, Bendecir el arma, Armas perforantes |
-| S4 | Protector: escudos y empuje | Envión, Coraza de púas, Velo espejado, Empuje |
+| S4 | Protector: escudos y empuje | Envión, Coraza de púas, Velo espejado, Potencia |
 | D1 | Maldito: bajar defensas | Maldición de la coraza, Maldición debilitante, Aguja siniestra |
 | D2 | Tóxico | Nube tóxica, Corroer, Maldición de la sequía |
 | D3 | Ladrón de fuerzas | Robar el aliento, Extenuar, sanguijuela |
@@ -331,7 +331,7 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   nv3 12/8/8/7/4 → 60, 7 · nv4 13/9/8/8/4 → 70, 8 · nv5 14/9/9/8/5 → 75, 8.
   | Nivel | Habilidad nueva | Pasiva | Equipo |
   |---|---|---|---|
-  | 1 | **Empuje** (rápida, Flash: +3 a la próxima tirada de un aliado) · **¡A la carga!** (lenta: aliados a 4, +2 PdG, PdG.Esp, daño y Ef.Esp 2 turnos) | — | **Lanza corta** (Tipo 4, +1 daño, Alcance +1) + **Estandarte del muro** (aliados pegados +1 Defensa) · Chaleco de cuero · Botas de caña alta (Def 3, Def.Esp 1) |
+  | 1 | **Potencia** (antes «Empuje»; rápida, Flash: +3 a la próxima tirada de un aliado) · **¡A la carga!** (lenta: aliados a 4, +2 PdG, PdG.Esp, daño y Ef.Esp 2 turnos) | — | **Lanza corta** (Tipo 4, +1 daño, Alcance +1) + **Estandarte del muro** (aliados pegados +1 Defensa) · Chaleco de cuero · Botas de caña alta (Def 3, Def.Esp 1) |
   | 2 | **Bendecir el arma** (rápida, Flash) | **Voluntad de hierro** (+2 Res.CC) | + 2 Comunes |
   | 3 | **Redoble de tambores** | — | el estandarte, de Buena calidad |
   | 4 | **Arenga** | **Robustez** (+5 de vida) | + el chaleco de Buena |
@@ -408,7 +408,7 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 1 | **Bendecir el arma** (rápida, Flash, 0 No2) · **Arma elemental** (lenta, 2 No2, su ataque del turno) | — | **Hacha del herrero de pueblo** (Tipo 8, Parry +1, Rompe armadura 33 %; 1d8 + 8) · Chaleco de cuero · Cofia de anillas sueltas (Def 3, Def.Esp 1) |
   | 2 | **Armas perforantes** | **Piel curtida** | + 2 Comunes |
   | 3 | **Ojo certero** | — | el arma: **Martillo de herrero** (Buena) |
-  | 4 | **Empuje** (rápida, Flash) | **Desvío hábil** (+1 Parry) | + un torso Bueno |
+  | 4 | **Potencia** (rápida, Flash) | **Desvío hábil** (+1 Parry) | + un torso Bueno |
   | 5 | **Señalar la presa** | — | + un yelmo Bueno |
   Consumible: Pergamino grupal de Furia de Combate. Ojo: el Arma elemental sobre un aliado que ya pega fuerte puede ser mucho en nivel 1.
 

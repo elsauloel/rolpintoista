@@ -2575,7 +2575,7 @@ async function dueloAplicarEfecto(d, ef){
 // su próxima tirada, y esa tirada lo gasta (js/37). Antes se sumaba a una tirada ya hecha.
 async function empowerAplicar(d, t, n){
   const nom = nombreDe(t), quien = d.atacante.nombre || 'Alguien';
-  // A un creep (el Empuje del Support, 2026-10-26: probándolo en el mapa quedaba «a mano»): el estado directo; su próxima tirada lo gasta (CreepAcciones).
+  // A un creep (la Potencia del Support —antes «Empuje»—, 2026-10-26: probándolo en el mapa quedaba «a mano»): el estado directo; su próxima tirada lo gasta (CreepAcciones).
   if(t && t.tipo === 'creep' && t.fichaId){
     try{
       let r = null;

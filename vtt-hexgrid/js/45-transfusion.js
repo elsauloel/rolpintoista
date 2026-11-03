@@ -48,3 +48,52 @@ async function transfusionAplicar(msg, da, recibe, n){
     mesaLinea(`🩸 ${msg.nombre}: no se pudo aplicar — a mano: ${nombreDe(da.t)} −${n} de vida, ${nombreDe(recibe.t)} +${n}`, 'alerta-roja');
   }
 }
+
+/* 🩸 La de un creep (Support, 2026-11-03, dueño: «habría que ponérselo también al pool de habilidades de creep»). La pantalla del GM: después de
+   cobrar, el GM toca quién da y quién recibe —dos creeps aliados (el que la usa puede ser uno), dentro de su Rango (si no, avisa y deja seguir)— y
+   cuánto (hasta su Especial: CreepAcciones.transfusionMax). La vida se escribe en cada creep (acCambiarCreep). Lo que recibe es una cura: con Herida
+   sombría no entra y con una Sanguijuela se la lleva quien la lanzó (CreepAcciones.transfusionRecibir). Con un personaje o una invocación, a mano. */
+function transfusionDeCreep(sc, h, alTerminar){
+  const fin = () => { if(typeof alTerminar === 'function') alTerminar(); };
+  const mio = [...tokens.entries()].find(([, x]) => x.tipo === 'creep' && x.fichaId === sc.id);
+  if(!mio){ toast(`${h.nombre}: ${sc.nombre} no tiene token en este mapa — pasá la vida a mano`); fin(); return; }
+  const yo = {ref: sc.id, tipo: 'creep', nombre: sc.nombre};
+  let rango = 0;
+  try{ rango = Math.round(num(rangoDeToken(mio[1]).rng)) || 0; }catch(e){}
+  const cancelar = motivo => { mesaLinea(`🩸 ${sc.nombre} · ${h.nombre}: ${motivo} (el costo ya se pagó)`, 'recordatorio'); fin(); };
+  const pedir = async paso => {
+    const c = await transfusionElegir(`<b>🩸 ${esc(h.nombre)} (${esc(sc.nombre)}): ${paso}</b> <span>clic sobre un creep aliado (o el mismo) a ${rango} casilleros o menos · Esc cancela</span>`);
+    if(!c) return null;
+    const e = [...tokens.entries()].find(([, x]) => x.col === c.col && x.fila === c.fila && !x.bajoTierra);
+    if(!e){ toast('Ahí no hay nadie: tocá un creep aliado'); return pedir(paso); }
+    if(dueloEsRival(yo, e[1])){ toast('Tiene que ser un aliado'); return pedir(paso); }
+    if(e[1].tipo !== 'creep'){ toast(`${nombreDe(e[1])} no es un creep: la Transfusión con un personaje o una invocación va a mano`); return null; }
+    if(rango && e[0] !== mio[0] && distanciaHex(mio[1], e[1]) > rango) toast(`${nombreDe(e[1])} está fuera de su Rango (${rango}): va igual, lo decide la mesa`);
+    return {id: e[0], t: e[1]};
+  };
+  (async () => {
+    const da = await pedir('¿quién da la vida?');
+    if(!da) return cancelar('se canceló');
+    const recibe = await pedir(`¿quién la recibe? (da: ${nombreDe(da.t)})`);
+    if(!recibe) return cancelar('se canceló');
+    if(recibe.id === da.id){ toast('Tienen que ser dos distintos'); return cancelar('era el mismo creep'); }
+    const scDa = creepPrivadoDe(da.t.fichaId), scRe = creepPrivadoDe(recibe.t.fichaId);
+    if(!scDa || !scRe) return cancelar('no se pudieron leer los creeps — pasala a mano');
+    const max = CreepAcciones.transfusionMax(sc, scDa, scRe);
+    if(max <= 0){ toast(num(scDa.hp) <= 1 ? `${nombreDe(da.t)} no tiene vida para dar` : `${nombreDe(recibe.t)} ya tiene la vida llena`); return cancelar('no había vida para pasar'); }
+    const opciones = [...new Set([5, 10, 15, 20].filter(v => v < max).concat(max))];
+    AvisoCombate.mostrar({clave: 'transfusion', icono: '🩸', titulo: `${h.nombre}: ¿cuánta vida?`,
+      texto: `De ${nombreDe(da.t)} (${fmt(num(scDa.hp))} de vida) a ${nombreDe(recibe.t)} (${fmt(num(scRe.hp))} de ${fmt(num(scRe.hpMax))}). Como mucho ${fmt(max)} (su Especial).`,
+      botones: [...opciones.map(v => ({texto: v === max ? `${v} (lo máximo)` : String(v), alClic: () => { AvisoCombate.cerrar(); transfusionCreepAplicar(sc, h, da, recibe, v).then(fin); }})),
+        {texto: 'Cancelar', sec: true, alClic: () => { AvisoCombate.cerrar(); cancelar('se canceló'); }}]});
+  })().catch(err => { console.error('Transfusión de creep:', err); cancelar('no se pudo — pasala a mano'); });
+}
+async function transfusionCreepAplicar(sc, h, da, recibe, n){
+  let dio = 0, r = null;
+  await acCambiarCreep(da.t.fichaId, c => { dio = CreepAcciones.transfusionDar(c, n); return {}; });
+  if(!(dio > 0)){ mesaLinea(`🩸 ${sc.nombre} · ${h.nombre}: no se pudo sacar la vida de ${nombreDe(da.t)} — a mano`, 'alerta-roja'); return; }
+  await acCambiarCreep(recibe.t.fichaId, c => { r = CreepAcciones.transfusionRecibir(c, dio, nombreDe(recibe.t)); return {}; });
+  const dest = r && r.robo ? r.txt : r && r.recibio > 0 ? `${nombreDe(recibe.t)} +${fmt(r.recibio)}` : `${nombreDe(recibe.t)}: ${(r && r.txt) || 'no recibió'}`;
+  mesaLinea(`🩸 ${sc.nombre} usa ${h.nombre}: ${nombreDe(da.t)} da ${fmt(dio)} de vida → ${dest}`, 'recordatorio');
+}
+

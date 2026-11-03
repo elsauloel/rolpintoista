@@ -2341,6 +2341,13 @@ const Combatiente = (() => {
       }
       // ✨ Parpadeo cuesta 4 SP (dueño, 2026-11-03; antes 2): el guardado en un creep se pone al día.
       if(h && h.nombre === 'Parpadeo' && h.blink && Number(h.spCosto) === 2){ h.spCosto = 4; cambio = true; }
+      // 💪 «Empuje» (el Empower del Support) pasa a llamarse «Potencia» (dueño, 2026-11-03: «es el paralelo del empower»). Solo la habilidad que da
+      // Empower: el efecto al golpear «Empuje» de las armas (empujar) no es esto.
+      if(h && h.nombre === 'Empuje' && h.duelo && typeof h.duelo === 'object' && Array.isArray(h.duelo.efectos) && h.duelo.efectos.some(e => e && e.nombre === 'Empower')){
+        h.nombre = 'Potencia';
+        if(typeof h.detalle === 'string') h.detalle = h.detalle.replace('Otro Empuje antes', 'Otra Potencia antes');
+        cambio = true;
+      }
       // 😮‍💨 Robar el aliento saca 1 No2 + la diferencia (dueño, 2026-11-03; antes 2 + la diferencia): la guardada se pone al día.
       if(h && h.nombre === 'Robar el aliento' && h.duelo && typeof h.duelo === 'object' && Array.isArray(h.duelo.efectos) && h.duelo.efectos.some(e => e && e.nombre === 'Pierde No2' && e.no2 === 2)){
         h.duelo.efectos.forEach(e => { if(e && e.nombre === 'Pierde No2' && e.no2 === 2) e.no2 = 1; });

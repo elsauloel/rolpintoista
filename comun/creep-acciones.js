@@ -21,7 +21,7 @@ const CreepAcciones = (() => {
     if(!r) return {error: `${nombre}: ${fmt(num(valor))} no se puede tirar con dados reales`};
     return {origen: nombre, r};
   }
-  // 💪 Lo que dura una sola tirada (Empower, `unaTirada`; el Empuje del Support, 2026-10-26): la tirada que lo sumó lo gasta, como en un personaje
+  // 💪 Lo que dura una sola tirada (Empower, `unaTirada`; la Potencia del Support —antes «Empuje»—, 2026-10-26): la tirada que lo sumó lo gasta, como en un personaje
   // (FichaAcciones.gastarUnaTirada). `r.estados` dice qué estados entraron en esa tirada. → true si lo gastó (cambia `sc`; guardarlo es de cada pantalla).
   function usaUnaTirada(sc, r){
     const emp = sc && Combatiente.unaTiradaDe(sc.estados);
@@ -312,6 +312,23 @@ const CreepAcciones = (() => {
     return {modo: 'cd', enEspera: (sc.habilidades || []).map((h, i) => ({i, nombre: h && h.nombre || 'Habilidad', cd: num(h && h.cdActual)})).filter(x => x.cd > 0)};
   }
   /* La pregunta antes de gastarla (con la pieza común Confirmar): sin nada en espera, «¿usarla igual?»; con varias, cuál. → {habCd} | {} | null (no la usa). */
+  /* 🩸 La Transfusión sanguínea de un creep (2026-11-03): cuánto puede pasar como mucho (su Especial; quien da queda con 1; quien recibe hasta su
+     máximo) y aplicarla sobre los dos creeps (objetos ya leídos). Lo que recibe es una cura (Combatiente.curaQueEntra / curaRobada): caído no se
+     levanta, con Herida sombría no entra y con Sanguijuela se la lleva quien la lanzó. → {dio, recibio, robo, txt}. */
+  function transfusionMax(sc, da, recibe){
+    const esp = Math.max(1, Math.round(num(C().statValor(sc, 'esp'))));
+    return Math.max(0, Math.min(esp, num(da.hp) - 1, Math.max(0, num(recibe.hpMax) - num(recibe.hp))));
+  }
+  function transfusionDar(da, n){ const antes = num(da.hp); da.hp = Math.max(Math.min(antes, 1), antes - Math.max(0, Math.round(num(n)))); return antes - da.hp; }
+  function transfusionRecibir(recibe, n, nombre){
+    const m = Math.max(0, Math.round(num(n))), antes = num(recibe.hp);
+    const robo = Combatiente.curaRobada(antes, m, recibe.estados);
+    if(robo) return {recibio: 0, robo, txt: (typeof EstadosAplicar !== 'undefined' && EstadosAplicar.curaRobadaEnviar ? EstadosAplicar.curaRobadaEnviar(robo, recibe.nombre || nombre || '') : Combatiente.curaRobadaTxt(robo, recibe.nombre || nombre || ''))};
+    const entra = Combatiente.curaQueEntra(antes, m, recibe.estados);
+    recibe.hp = Math.min(num(recibe.hpMax) > 0 ? num(recibe.hpMax) : antes + entra, antes + entra);
+    const recibio = recibe.hp - antes;
+    return {recibio, robo: null, txt: recibio > 0 ? '' : antes <= 0 ? 'está caído: no se levanta' : `🌑 ${Combatiente.SIN_CURA_TXT}`};
+  }
   async function preguntarPocionSp(sc, it){
     const p = spDeConsumible(sc, it);
     if(!p || p.modo !== 'cd') return {};
@@ -498,11 +515,11 @@ const CreepAcciones = (() => {
     const efecto = ef.estado;
     if(efecto && C().modsAfectanHp(efecto.mods)) C().actualizarHpMaxPorCon(sc);
     // Lo que todavía no anda para creeps o una ✨ sin la Ejecución armada: avisa y va como 💰.
-    const falta = modo === 'auto' && !h.trampaColocar && !h.refuerzos && !h.estandarte && !h.meteoro && !h.dash && !h.blink && !h.bombaHumo && !h.cebo && !h.provocarAliado ? Combatiente.ejecucionNoDisponible(h.duelo, 'creep') : '';   // 📣 refuerzos y 🚩 el estandarte: no llevan Ejecución
+    const falta = modo === 'auto' && !h.trampaColocar && !h.refuerzos && !h.estandarte && !h.meteoro && !h.dash && !h.blink && !h.bombaHumo && !h.cebo && !h.provocarAliado && !h.transfusion ? Combatiente.ejecucionNoDisponible(h.duelo, 'creep') : '';   // 📣 refuerzos y 🚩 el estandarte: no llevan Ejecución
     const auto = modo === 'auto' && !falta;
     const esZona = auto && h.duelo && typeof h.duelo === 'object' && h.duelo.objetivo === 'zona';
     // ✨ Solo sobre el creep y sin nada que tirar: se aplica directo, sin abrir el cuadro.
-    const directo = auto && !h.trampaColocar && !h.refuerzos && !h.estandarte && !h.meteoro && !h.dash && !h.blink && !h.bombaHumo && !h.cebo && !h.provocarAliado ? sobreSi(sc, h) : null;
+    const directo = auto && !h.trampaColocar && !h.refuerzos && !h.estandarte && !h.meteoro && !h.dash && !h.blink && !h.bombaHumo && !h.cebo && !h.provocarAliado && !h.transfusion ? sobreSi(sc, h) : null;
     return {costo: costo + Math.max(0, num(ex.no2)), costoSp, costoHp, efecto, aviso: [ef.aviso || '', malditoDano ? `🩸 Maldito: usar ${h.nombre || 'la habilidad'} le saca ${fmt(malditoDano)} de vida` : ''].filter(Boolean).join(' · '), falta, auto, esZona, directo, nitros: sc.nitros, malditoDano,
       ...(num(h.curaMasCon) > 0 ? {curaCon, hpAhora: sc.hp} : {}), ...(quitado ? {quitado} : {})};
   }
@@ -517,12 +534,13 @@ const CreepAcciones = (() => {
     if(h.excavar && !h.emerger && ui.excavar) ui.excavar(sc, h);   // 🕳 Bajo tierra (2026-10-13): el mapa mete el token bajo tierra (vtt-hexgrid/js/46); con `emerger` (la Excavar única, 2026-10-27) meterse lo resuelve el mapa antes de cobrar
     if(directo){ ui.mesaHabilidad(sc, h, directo.nota); ui.toast(`${h.nombre || 'Habilidad'} ejecutada sobre ${sc.nombre}${directo.hechos.length ? ' → ' + directo.hechos.join(' · ') : ''}${costoHp > 0 ? ` · −${fmt(costoHp)} HP` : ''}`); return; }
     // Una trampa se coloca en secreto: la habilidad no se anuncia en la Mesa (los jugadores no deben enterarse).
-    const hDuelo = (!auto || h.trampaColocar || esZona || h.refuerzos || h.estandarte || h.meteoro || h.dash || h.blink || h.bombaHumo || h.cebo || h.provocarAliado) ? null : ui.habDuelo(sc, h);   // habilidad dirigida: la contienda va en el cuadro del duelo
+    const hDuelo = (!auto || h.trampaColocar || esZona || h.refuerzos || h.estandarte || h.meteoro || h.dash || h.blink || h.bombaHumo || h.cebo || h.provocarAliado || h.transfusion) ? null : ui.habDuelo(sc, h);   // habilidad dirigida: la contienda va en el cuadro del duelo
     const esArma = auto && !h.trampaColocar && !h.dash && Combatiente.tipoEjecucion(h.duelo) === 'arma';   // ataque con arreglos: al duelo como un ataque
     if(esArma) ui.lanzarAtaque(sc, h);
     else if(h.trampaColocar) ui.colocarTrampa(sc, h, auto);
     else if(h.caos){ ui.mesaHabilidad(sc, h); if(ui.caos) ui.caos(sc, h); else ui.toast(`${h.nombre}: el objetivo se elige en el mapa (⚔ Acciones)`); }   // 🎲 la Varita del caos (2026-10-18)
     else if(auto && h.refuerzos){ ui.mesaHabilidad(sc, h); if(ui.refuerzos) ui.refuerzos(sc, h); else ui.toast(`${h.nombre}: los refuerzos se eligen desde el mapa (⚔ Acciones)`); }
+    else if(auto && h.transfusion){ ui.mesaHabilidad(sc, h); if(ui.transfusion) ui.transfusion(sc, h); else ui.toast(`${h.nombre}: quién da y quién recibe se eligen desde el mapa (⚔ Acciones)`); }   // 🩸 (2026-11-03, vtt-hexgrid/js/45)
     else if(auto && h.provocarAliado){ ui.mesaHabilidad(sc, h); if(ui.provocarAliado) ui.provocarAliado(sc, h); else ui.toast(`${h.nombre}: el aliado se elige desde el mapa (⚔ Acciones)`); }   // 😤 Tirar la bronca (2026-10-26, vtt-hexgrid/js/77)
     else if(auto && h.blink){ ui.mesaHabilidad(sc, h); if(ui.blink) ui.blink(sc, h); else ui.toast(`${h.nombre}: el salto se hace desde el mapa (⚔ Acciones)`); }
     else if(auto && h.bombaHumo){ ui.mesaHabilidad(sc, h); if(ui.bombaHumo) ui.bombaHumo(sc, h); else ui.toast(`${h.nombre}: el humo se hace desde el mapa (⚔ Acciones)`); }   // 💨 la Bomba de humo (vtt-hexgrid/js/57)   // ✨ el Parpadeo (2026-10-26, vtt-hexgrid/js/13 blinkDeHabilidad)
@@ -775,5 +793,5 @@ const CreepAcciones = (() => {
     tirada, usaUnaTirada, gastarUnaTirada, tiradaStat, esquivar, parry, fuerzaGolpe, bloqueo, dano, levantarse, tiradaSoltarse, aplicarSoltarse, pagarParry, pagarAtaque, tiradaAtaque, NOMBRE_ESPECIAL,
     costoAtaqueDe, devolverAtaque, faltanNitros, preguntaSinNitros, alertaSinNitros,
     FLAGS_ESTADO, habEtq, habEjecucion, ataqueDeHab, habTira, efectoDeHab, sobreSi, confirmarSilencio, preguntaVida, ejecutarHab, terminarHab, tiradaPrimeraHab, tiradaSegundaHab,
-    zonaDeHab, cdMod};
+    zonaDeHab, cdMod, transfusionMax, transfusionDar, transfusionRecibir};
 })();

@@ -73,7 +73,7 @@ function acPublicar(sc, t){
   if(t.error){ toast(t.error); return; }
   mesaPublicar(t.origen, {...t.r, quien: sc.nombre, desde: 'gm'});
   window.dispatchEvent(new CustomEvent('tirada-registrada', {detail: {origen: t.origen, r: t.r}}));
-  // 💪 Empower (el Empuje del Support, 2026-10-26): la tirada que lo sumó lo gasta.
+  // 💪 Empower (la Potencia del Support —antes «Empuje»—, 2026-10-26): la tirada que lo sumó lo gasta.
   if(sc.id && CreepAcciones.usaUnaTirada(sc, t.r)) modificarCreep(sc.id, c => { CreepAcciones.gastarUnaTirada(c, t.r); }).catch(err => console.error('Empower: no se pudo gastar', err));
 }
 // Cambia el creep en una transacción: `cambiar(sc)` recibe el creep al día (normalizado) y devuelve {error} o {aviso}. Si es un
@@ -559,6 +559,12 @@ function acHabUi(){
     refuerzos: (sc, h) => { ac.host.hidden = true; llamarRefuerzos(sc, h); },   // 📣 js/31
     estandarte: (sc, h) => { ac.host.hidden = true; plantarEstandarte(sc, h); },   // 🚩 js/73
     meteoro: (sc, h) => { ac.host.hidden = true; marcarMeteoro(sc, h); },   // ☄ js/74
+    // 🩸 la Transfusión sanguínea (2026-11-03, js/45): quién da, quién recibe y cuánto, entre los creeps aliados.
+    transfusion: (sc, h) => {
+      const id = ac && ac.creepId, reabrir = () => { if(ac && ac.creepId === id){ ac.host.hidden = false; acUbicar(); acDibujar(); } };
+      ac.host.hidden = true;
+      transfusionDeCreep(sc, h, reabrir);
+    },
     // 😤 Tirar la bronca (js/77): el aliado y el área alrededor de él.
     provocarAliado: (sc, h) => {
       const id = ac && ac.creepId, reabrir = () => { if(ac && ac.creepId === id){ ac.host.hidden = false; acUbicar(); acDibujar(); } };

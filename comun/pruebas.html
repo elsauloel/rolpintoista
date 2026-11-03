@@ -42,10 +42,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 </script>
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
-<script src="combatiente.js?v=20261103r1"></script>
+<script src="combatiente.js?v=20261103p1"></script>
 <script src="creep-calculo.js?v=20261103t4"></script>
 <script src="creep-botonera.js"></script>
-<script src="creep-acciones.js?v=20261103r1"></script>
+<script src="creep-acciones.js?v=20261103p1"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
@@ -113,7 +113,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="pasivas.js"></script>
 <script src="skills-clase.js?v=20261103san"></script>
 <script src="creeps-base.js"></script>
-<script src="skills-creep-base.js?v=20261103t9"></script>
+<script src="skills-creep-base.js?v=20261103p1"></script>
 <script src="creeps-esenciales.js?v=20261103t7"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -1423,8 +1423,8 @@ prueba('🪱 Sanguijuela de clase (Debuffer, 2026-11-03): la puede aprender un p
     hab.modo, lleno, extra, S2.hp, st.chupaDe, Combatiente.curaQueEntra(5, 9, [st]), Combatiente.curaRobada(5, 9, [st]).monto, inv.hp, inv.estados.find(e => e.nombre === 'Vida extra').escudoMagico],
     ['3', 2, 'pdgmg', 'eva', '2d6', 'siniestro', true, 50, 'Sanguijuela', 4, 'dmgesp', 'auto', true, 6, 0, 'pj:f1', 0, 9, 10, 3]);
 });
-prueba('💪 Empuje (Support, 2026-10-26): Flash, Empower a un aliado; la tirada del creep que lo suma lo gasta', () => {
-  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Empuje'), h = armarHabilidadDeCreep(e.datos, 2);
+prueba('💪 Potencia (antes «Empuje»; Support, 2026-10-26): Flash, Empower a un aliado; la tirada del creep que lo suma lo gasta', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Potencia'), h = armarHabilidadDeCreep(e.datos, 2);
   const P = estadosPresetCreep().find(p => p.nombre === 'Empower');
   const sc = {id: 'c1', nombre: 'Prueba', estados: [{...structuredClone(P), id: 'e1', activo: true}], equipo: []};
   const r = Combatiente.tirarStat(5, sc.estados, 'pdg');
@@ -1432,6 +1432,25 @@ prueba('💪 Empuje (Support, 2026-10-26): Flash, Empower a un aliado; la tirada
   const sc2 = {id: 'c2', estados: []}, r2 = Combatiente.tirarStat(5, [], 'pdg');
   igual([!!h.flash, h.duelo.objetivo, h.duelo.efectos[0].nombre, h.spCosto, h.cd, usa, gasto, sc.estados.length, CreepAcciones.gastarUnaTirada(sc2, r2), e.etiquetas.includes('support')],
     [true, 'aliado', 'Empower', 2, 2, true, true, 0, false, true]);
+  // la guardada con el nombre viejo se renombra; un «Empuje» que no da Empower (empujar) no
+  const vieja = structuredClone(h); vieja.nombre = 'Empuje'; vieja.detalle = vieja.detalle.replace('Otra Potencia antes', 'Otro Empuje antes');
+  const otra = {nombre: 'Empuje', duelo: {efectos: [{nombre: 'Empujar'}]}};
+  const habs = [vieja, otra]; Combatiente.migrarLuzSanadora(habs);
+  igual([habs[0].nombre, /Otra Potencia antes/.test(habs[0].detalle), habs[1].nombre, HABILIDADES_CREEP_BASE.some(x => x.nombre === 'Empuje')], ['Potencia', true, 'Empuje', false]);
+});
+prueba('🩸 Transfusión sanguínea de creep (Support, 2026-11-03): rápida, 1 No2 y 1 SP; hasta su Especial, quien da queda con 1, quien recibe hasta su máximo; es una cura (caído no, Herida sombría no, Sanguijuela se la lleva)', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Transfusión sanguínea'), h = armarHabilidadDeCreep(e.datos, 2);
+  const sc = {esp: 6, estados: [], equipo: []};
+  const a = {hp: 30, hpMax: 40, estados: []}, b = {hp: 10, hpMax: 40, estados: []};
+  const max1 = CreepAcciones.transfusionMax(sc, a, b);
+  const dio = CreepAcciones.transfusionDar(a, max1), r = CreepAcciones.transfusionRecibir(b, dio, 'B');
+  const pobre = {hp: 3, hpMax: 40, estados: []}, lleno = {hp: 38, hpMax: 40, estados: []};
+  const caido = {hp: 0, hpMax: 40, estados: []}, rc = CreepAcciones.transfusionRecibir(caido, 5, 'C');
+  const herido = {hp: 10, hpMax: 40, estados: [EstadosAplicar.componer({nombre: 'Herida sombría'})]}, rh = CreepAcciones.transfusionRecibir(herido, 5, 'H');
+  const chupado = {hp: 10, hpMax: 40, estados: [EstadosAplicar.componer({nombre: 'Sanguijuela', chupaDe: 'creep:c9', chupaUid: '', chupaNombre: 'Ladrón'})]}, rs = CreepAcciones.transfusionRecibir(chupado, 5, 'S');
+  igual([e.etiquetas.includes('support'), !!h.transfusion, h.modo, h.cd, h.spCosto, h.nitrosCosto, max1, a.hp, b.hp, r.recibio,
+    CreepAcciones.transfusionMax(sc, pobre, b), CreepAcciones.transfusionMax(sc, a, lleno), caido.hp, rc.recibio, herido.hp, rh.recibio, chupado.hp, !!rs.robo, rs.recibio],
+    [true, true, 'auto', 2, 1, 1, 6, 24, 16, 6, 2, 2, 0, 0, 10, 0, 10, true, 0]);
 });
 prueba('☠ Nube tóxica (Debuffer, 2026-10-26; +1 stack desde el 2026-10-31): zona de diámetro 3, 4 turnos, Ef.Esp contra Res.Esp, 2d4 tóxico directo y Veneno 3 (unaVez + sumaUno)', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Nube tóxica'), h = armarHabilidadDeCreep(e.datos, 2);

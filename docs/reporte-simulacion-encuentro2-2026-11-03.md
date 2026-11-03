@@ -201,3 +201,27 @@ ratas** (PdG 15 contra Evasión 5: con Ojo de asesino crítico ×2 o ×3 directo
 
 - La simulación sigue simplificando (no mide pasos ni la línea de tiro, una acción por turno, los jugadores no usan consumibles): es una guía.
 - Quedan en «Claude · pruebas»: el mapa, las tres copias a nivel 3 y los seis creeps copiados de El origen (con el daño de los dos duelos).
+
+### Variante pedida por el dueño: una sola rata y el Cristal recién en la ronda 2 (2026-11-03)
+
+Mismo grupo a nivel 3 y creeps reales; 2000 peleas. «Gana» = caen todos los creeps.
+
+| Variante | Rondas | Larry cae (ronda) | Bizzante cae (ronda) | Rockardo cae (ronda) | En pie del grupo | Creeps caídos (promedio) | Gana | Cae el grupo entero |
+|---|---|---|---|---|---|---|---|---|
+| **A** · 1 rata + Cristal en R2 | 3 | 100 % (R1 59 %, R2 40 %) | 80 % (sobre todo R3) | 24 % (R3) | 0,96 de 3 | 0,14 | 0 % | 24 % |
+| A | 4 | 100 % | 98 % (R3 62 %, R4 16 %) | 86 % (R4 59 %) | 0,17 | 0,24 | 0 % | 85 % |
+| **B** · A + ratas Des 10 (PdG 12) | 3 | 100 % (R1 50 %, R2 48 %) | 65 % (R3) | 15 % (R3) | 1,21 | 0,16 | 0 % | 14 % |
+| B | 4 | 100 % | 95 % | 72 % (R4) | 0,33 | 0,28 | 0 % | 71 % |
+| **C** · A + ratas sin Ojo crítico | 3 | 100 % (R1 44 %, R2 54 %) | 65 % (R3) | 12 % (R3) | 1,24 | 0,20 | 0 % | 11 % |
+| C | 4 | 100 % | 95 % | 75 % (R4) | 0,30 | 0,29 | 0 % | 74 % |
+
+Los creeps que llegan a caer son casi siempre el Rompehuesos (≈ 13 % en 4 rondas) o una rata (5–11 %); el Capataz, el Arquero y el Alquimista no caen.
+
+**Lectura**: ninguna de las dos combinaciones lo deja «duro pero ganable»: **en ninguna el grupo gana** (0 %), y con tiempo (4 rondas) termina cayendo
+entero 7 de cada 10 veces. La más suave es la **C** (una rata, Cristal en R2, ratas sin Ojo crítico), apenas mejor que la B. El problema ya no es solo
+la rata: **Larry cae el 100 % en las dos primeras rondas** porque lo apuntan el Arquero (Marca de caza y Ráfaga), el gancho del Rompehuesos y el Zap, y
+**el grupo no tiene daño para tumbar 300 de vida de creeps** (85 + 75 + 50 + 35 + 30) en 3–4 rondas. Para que sea ganable hace falta además bajar la
+cantidad o la vida de los creeps (por ejemplo, sacar al Arquero o al Alquimista, o que el Capataz escape a la mitad de su vida) y repartir los
+objetivos para que no vayan todos a Larry.
+
+(Simplificación conocida: con «una sola rata» la segunda queda en el mapa sin actuar, como en la primera vuelta; no cambia el resultado.)

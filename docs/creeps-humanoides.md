@@ -423,7 +423,7 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   ataque con cada arma cuesta la mitad, como un primer ataque del turno, y una puede ser mejor para atajar y la otra para pegar. **En los creeps
   eso no está programado** (atacan solo con el arma principal): pendiente en `pendientes.md`.
   **Nivel 1 aprobado** (dueño, 2026-11-03: «me cierra»): Fue 8 · Con 9 · Agi 6 · Des 8 · Esp 2, vida 45, 6 No2; Sable del tahúr (1d6 + 8,
-  Crítico frecuente +1) + **Facón de paisano, que pasa a Tipo 4** en el catálogo (1d4 + 8, Sangrado 25 %) · Chaleco de cuero · Botas de cuero de
+  Crítico frecuente +1) + **Facón de paisano, que pasa a Tipo 4** en el catálogo (1d4 + 8; y Sangrado 50 %, 55 de oro, dueño 2026-11-03) · Chaleco de cuero · Botas de cuero de
   vaca: Def 3, Def.Esp 0. Golpe desesperado (cd 2, con el sable) y Furia (cd 3, 2 No2). Consumible: Poción de Regeneración menor. Espada y facón
   (6 + 4) del nivel 1 al 4: con las dos gasta 5 y le sobra 1; dos espadas (6 + 6) en el 5, con 8 No2. Sin cargar hasta que el dueño diga.
 

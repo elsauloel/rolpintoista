@@ -613,6 +613,18 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   cuero de vaca: Def 3. Tiro certero (rápida) y Tiro a la rodilla (lenta). Alternativa anotada: un arco (Arco de cazador de pájaros) si pega poco.
   **Cargado** en el pool esencial (2026-11-03).
 
+- **H3 · Duelista pesado · Híbrido** (boceto aprobado 2026-11-03, dueño: «me cierra así»). Estrategia: te desarma (Desarmar, al ganar un Parry),
+  te rompe la armadura y te remata. Atributos (Fue/Con/Des/Agi/Esp → vida, No2): **nv1 9/9/8/5/2 → 45, 5** · nv2 10/10/8/6/2 → 50, 6 · nv3
+  11/10/9/7/2 → 50, 7 · nv4 12/11/9/8/2 → 55, 8 · nv5 13/12/10/8/2 → 60, 8.
+  | Nivel | Habilidad nueva | Pasiva | Equipo |
+  |---|---|---|---|
+  | 1 | **Romper armadura** (lenta) · **Desarmar** (Flash) | — | **Caronero** (Tipo 6, Parry +1; nombre a cambiar) + escudo Común · 2 Comunes |
+  | 2 | **Remate** | **Guardia firme** | + 2 Comunes |
+  | 3 | **Golpe que sigue** | — | **Espada del herrero** (Buena, Tipo 6) |
+  | 4 | **Arte de la guerra** (Flash) | **Desvío hábil** | + una Buena |
+  | 5 | **Golpe demoledor** | — | + otra Buena |
+  Arma de Tipo 6, no hacha: el Golpe que sigue son dos ataques (Tipo 6: 3 + 3 = 6 No2; Tipo 8: 8, no le alcanza). Consumible: Poción de Cuero Duro.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4
@@ -693,7 +705,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | D2 | | | | | |
 | W3 | ✅ (2026-11-03) | | | | |
 | T3 | ✅ (2026-11-03) | | | | |
-| H3 | | | | | |
+| H3 | boceto ✅ (2026-11-03) | | | | |
 | L5 | ✅ (2026-11-03) | | | | |
 | L6 | | | | | |
 | R3 | ✅ (2026-11-03) | | | | |

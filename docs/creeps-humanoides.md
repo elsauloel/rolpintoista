@@ -515,6 +515,19 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   los pilares + Escudo de madera forrado en lienzo · Chaleco de cuero · Escarpines de piel de cururú: Def 3, Def.Esp 2. Potencia (Flash, 2 SP) y
   Arrojo (Flash, 3 SP). Consumible: Poción de HP. Sin cargar hasta que el dueño diga.
 
+- **L4 · Hostigador con trampas · Choque liviano** (boceto aprobado 2026-11-03, dueño: «me cierra como ruta, después lo vamos a ir viendo en detalle
+  uno a uno»). Estrategia: pica, se va y te hace pisar algo: deja una trampa en el camino, pega y se aleja por arriba de ella; el que lo persigue
+  cae. (Se le sumaron las trampas para no repetir al R2 Hostigador a distancia.) Atributos (Des/Agi/Con/Fue/Esp → vida, No2): **nv1 10/8/7/6/2 →
+  35, 8** · nv2 11/8/8/7/2 → 40, 8 · nv3 12/9/8/8/2 → 40, 9 · nv4 13/9/9/9/2 → 45, 9 · nv5 14/10/10/9/2 → 50, 10.
+  | Nivel | Habilidad nueva | Pasiva | Equipo |
+  |---|---|---|---|
+  | 1 | **Cordón oculto** (rápida) · **Hit and run** (lenta; también el Envenenador nv4) | — | **Cortaplumas** (Tipo 4, +1 daño, Ini +2) · 2 Comunes livianas |
+  | 2 | **Tajo veloz** (también Envenenador nv2 y Asesino nv4) | **Pies ligeros** | + 2 Comunes |
+  | 3 | **Abrojos** | — | el arma, de Buena |
+  | 4 | **Polvo cegador** | **Puntería** | + una Buena |
+  | 5 | **Dash** | — | + otra Buena |
+  Consumible: Red de caza. Nivel 1 en detalle: más adelante («lo vamos a ir viendo uno a uno»).
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4
@@ -588,7 +601,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | T2 | | | | | |
 | H2 | ✅ (2026-11-03) | | | | |
 | L3 | | | | | |
-| L4 | | | | | |
+| L4 | boceto ✅ (2026-11-03) | | | | |
 | R2 | ✅ (2026-11-03) | | | | |
 | M2 | ✅ (2026-11-03) | | | | |
 | S2 | ✅ (2026-11-03) | | | | |

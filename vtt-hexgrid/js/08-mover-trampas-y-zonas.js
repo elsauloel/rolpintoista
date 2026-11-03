@@ -204,7 +204,8 @@ function nieblaDeshacer(seq0, pend0){
 let trampaPendiente = null;   // {tokenId, tipo: 'pisa' | 'cerca', id, el, celda, desde (la casilla anterior: hacia dónde caminaba)}
 const trampasAvisadas = new Set();   // 'token:trampa:casillero' que ya pidieron la tirada
 
-/* Quién dispara una trampa (dueño, 2026-10-19; reemplaza al criterio del 2026-09-25, «los aliados nunca»):
+/* Quién dispara una trampa — DESDE EL 2026-11-03 (dueño): solo los rivales de quien la puso, mecánica o mágica; el área sigue alcanzando a todos.
+   Lo de abajo es el criterio anterior (2026-10-19; reemplazaba al del 2026-09-25, «los aliados nunca»):
    · una MECÁNICA (un mecanismo que se construye con las manos) la dispara **cualquiera que la pise**: rivales, aliados y quien la puso;
    · una MÁGICA (`magica` en su trampaEstado), **solo los rivales** de quien la puso.
    El efecto alcanza a **todos los que estén en su área**, en las dos (`trampaAfectados`; el «fuego amigo» ya no es una opción de cada trampa).
@@ -217,7 +218,8 @@ function trampaEsRival(t, el){
   return trampaEsDelGM(el) ? t.tipo === 'pj' : t.tipo === 'creep';   // (js/07: manda quién la puso)
 }
 function trampaDispara(t, el){
-  if(el && el.trampa && !trampaEsMagica(el)) return true;
+  // (dueño, 2026-11-03: «las trampas solo las triggerean los rivales; los efectos de área sí tienen friendly fire»): mecánica o mágica, solo la
+  // dispara un rival de quien la puso; ya disparada, su efecto alcanza a todos los del área (trampaAfectados), aliados incluidos.
   return trampaEsRival(t, el);
 }
 function tokenPercepcionAumentada(t){

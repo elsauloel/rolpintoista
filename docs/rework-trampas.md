@@ -229,6 +229,7 @@ Reemplazan a las 72 de antes (24 × menor/normal/mayor). Común / Buena / Rara p
 - **Detectarla: siempre Percepción.** Desarmarla o disiparla: Destreza o Efecto especial según su origen (la trampa colocada guarda `magica`).
 - Por qué: con 1d8 de Percepción, contra 6 hay 38 % (50 % con Percepción aumentada); contra 8, 13 % (30 %); contra 10, 0 (10 %). Las de los creeps
   tramperos (Destreza 9–15) son casi invisibles sin una luz que revele lo oculto: a propósito.
+- **Desde el 2026-11-03 (dueño): solo la disparan los rivales de quien la puso (mecánica o mágica); el área, ya disparada, alcanza a todos (fuego amigo).** Lo anterior:
 - **Quién la dispara (dueño, 2026-10-19; reemplaza a «los aliados nunca» del 2026-09-25):** una **mecánica**, cualquiera que la pise (rivales,
   aliados y quien la puso); una **mágica**, solo los rivales. **El efecto alcanza a todos los del área**, en las dos (el «fuego amigo» dejó de ser una
   opción de cada trampa). Los aliados ven las trampas de su equipo. El cartel de arriba a la derecha y la ficha corta lo dicen.

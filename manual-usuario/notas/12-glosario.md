@@ -128,7 +128,7 @@ Todas las palabras y siglas del juego, con un enlace a la nota que las explica.
 
 | **Sigilo** | Estar oculto | [[Sigilo]] |
 
-| **Fuego amigo** | El efecto de una trampa de área (daño y estado) alcanza también a los aliados que estén dentro; lo físico y explosivo lo tiene, lo mágico distingue aliados de rivales. Los aliados nunca disparan una trampa | [[Trampas]] |
+| **Fuego amigo** | El efecto de área de una trampa ya disparada (daño y estado) alcanza también a los aliados que estén dentro. Una trampa la disparan solo los rivales de quien la puso: los aliados le pasan por encima sin dispararla | [[Trampas]] |
 
 | **Punto transitable a pie** | Una casilla del mapa donde un personaje podría pararse caminando: **no está ocupada por un Sólido ni por la Colisión del mapa** (paredes, columnas, obstáculos). No hace falta que haya un camino hasta ahí (es un teleport), pero la casilla en sí tiene que poder pisarse. El destino de una trampa de teleport tiene que ser uno | [[Trampas]] |
 

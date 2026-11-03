@@ -311,6 +311,24 @@ function componerFondo(){
     ancho: num(p.ancho) || ANCHO_CASILLA * 20,
   };
 }
+/* 🏷 El nombre guardado en el token sigue al del creep o el personaje (2026-11-03, dueño: un token decía «Goblin híbrido» y su creep ya se
+   llamaba «Goblin scout»). El token guarda su `nombre` al colocarse; si después se renombra el creep en GM Tools (o el personaje), el token
+   quedaba con el viejo: el dibujo y la Mesa usan el del creep (nombreDe), pero el panel del token, los buscadores y los scripts, el viejo.
+   La pantalla del GM pone al día el nombre de los tokens vinculados del mapa abierto. */
+const tokensNombreHecho = new Map();   // tokenId -> nombre ya escrito (para no repetir)
+function tokensSincronizarNombres(){
+  if(!soyGM || !fbDb || typeof coleccionTokens !== 'function' || typeof tokens === 'undefined') return;
+  tokens.forEach((t, id) => {
+    if(!t || !t.fichaId || !t.tipo) return;
+    const v = vinculo(t), nombre = v && v.nombre && v.nombre !== '?' ? String(v.nombre).slice(0, 40) : '';
+    if(!nombre || t.nombre === nombre || tokensNombreHecho.get(id) === nombre) return;
+    if(t.tipo !== 'creep' && t.tipo !== 'pj') return;
+    if(t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION)) return;   // las invocaciones guardan su propio nombre
+    tokensNombreHecho.set(id, nombre);
+    coleccionTokens().doc(id).update({nombre}).catch(err => { tokensNombreHecho.delete(id); console.error('No se pudo poner al día el nombre del token:', err); });
+  });
+}
+setInterval(() => { try{ tokensSincronizarNombres(); }catch(e){ console.error(e); } }, 5000);
 
 function escucharFondo(){
   cortarFondo1 = fbDb.doc(fbRutaCampana(rutaMapaEstado('fondo'))).onSnapshot(doc => {

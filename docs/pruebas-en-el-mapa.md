@@ -283,6 +283,12 @@
 ## Pendientes
 
 ### ▶ Para la próxima tanda de pruebas en el mapa (2026-11-03)
+- [x] ✅ **⚔⚔ Creep con dos armas** (2026-11-03, probado con clics por Claude en «Claude · pruebas», mapa «Clon origen», con el Goblin picapiedras
+  armado con Sable del tahúr + Facón de paisano y restaurado después, 0 diferencias): en ⚔ Acciones aparecen «Atacar con Sable del tahúr · 3 No2 ·
+  1.º ataque» y «Atacar con Facón de paisano · 2 No2 · 1.º ataque», y un «Daño ·…» por arma (1d6 + 9 / 1d4 + 9). Con el facón el duelo dice «con
+  Facón de paisano · Tipo 4» y descuenta 2; «Cancelar duelo → No cuenta» devolvió los 2 y la cuenta del facón. Con el sable pagó 3 y, contado, el
+  sable pasó a 6 y el facón siguió en 2. El Parry ofrece Sable, Escudo y Facón. **Falta**: el dueño, en la compu; el ataque de oportunidad y el
+  contraataque con la segunda arma (usan la que tenga en la mano); GM Tools (un «Atacar con…» por arma: se probó solo en el mapa).
 - [x] **⌨ Atajos de las habilidades y los consumibles** (2026-11-03, probado con clics por Claude en «Claude · pruebas», mapa «Clon origen»
   mirado por el GM, capturas `hotkeys-*` en /home/user/capturas): creep (Goblin picapiedras) → asignar 3 a Piel de hierro y ⇧1 a la Poción de
   Piel de Cristal, el 3 movido a Provocar se le saca a Piel de hierro, el 3 con el token seleccionado pregunta «¿Ejecutar Piel de hierro?» y con

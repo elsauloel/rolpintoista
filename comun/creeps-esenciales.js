@@ -49,6 +49,9 @@
     const n = c.nivel, k = slug(c.nombre);
     const [con, fue, agl, des, esp] = c.atrib;
     const hp = con * 5;
+    // 💧 Modo SP (dueño, 2026-11-03: «todos los que son con énfasis en especial van a trabajar con SP en vez de con cooldown»): el Especial es su
+    // atributo más alto (magos, debuffers, el Sanador). Los demás, con turnos de espera. `c.modoSP` lo fuerza para un lado o el otro.
+    const modoSP = c.modoSP !== undefined ? !!c.modoSP : esp >= Math.max(con, fue, agl, des);
     const datos = {
       nombre: c.nombre, nivel: n, color: ROL_COLOR[c.rol] || '#888888', hp, hpMax: hp, spd: 5, ataquesTurno: 0,
       con, fue, agl, des, esp, defensa: 0, armaduraTipo: '', crit: [0, 0, 0, 0, 0], equipoVivo: 1,
@@ -57,12 +60,12 @@
       habilidades: c.habilidades.map(h => hab(h, n)).filter(Boolean),
       estados: [], pasivas: [], notas: c.estrategia, escalaTipos: 2, imagen: '',
       tipoCriatura: 'humano', tipoCriaturaOtro: '', jefe: false, oroBase: oroHumano(n), armaNatural: false, trofeoEspecial: {nombre: '', precio: 0},
-      pool: 'esencial', linea: c.linea,
+      pool: 'esencial', linea: c.linea, ...(modoSP ? {modoSP: true} : {}),
     };
     window.CREEPS_BASE.push({
       poolId: 'esencial-' + c.linea.toLowerCase() + '-' + n + '-' + k, nombre: c.nombre, nivel: n, pool: 'esencial',
       etiquetas: ['esencial', c.rolTxt, 'nivel ' + n, 'humano'],
-      detalle: `${c.estrategia} Habilidades: ${c.habilidades.join(' · ')}. Consumible: ${c.consumibles.join(' y ')}.`, datos,
+      detalle: `${c.estrategia} Habilidades: ${c.habilidades.join(' · ')}${modoSP ? ' (con SP)' : ''}. Consumible: ${c.consumibles.join(' y ')}.`, datos,
     });
   }
 

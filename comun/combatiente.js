@@ -2277,6 +2277,12 @@ const Combatiente = (() => {
         if(typeof h.detalle === 'string' && !/despeja/.test(h.detalle)) h.detalle = h.detalle.trimEnd() + ' Además apaga el fuego y despeja la niebla, las nubes y los gases de las casillas del cono (si cubre media nube, se lleva solo esa mitad).';
         cambio = true;
       }
+      // ⚡ La Parálisis del Zap y de la Centella se resiste con Res.CC (dueño, 2026-11-03; antes Res.Esp): las guardadas se ponen al día.
+      if(h && (h.nombre === 'Zap' || h.nombre === 'Centella') && h.duelo && typeof h.duelo === 'object' && Array.isArray(h.duelo.contra) && h.duelo.contra.includes('resmg')){
+        h.duelo.contra = h.duelo.contra.map(c => c === 'resmg' ? 'rescc' : c);
+        ['detalle', 'ataqueTxt'].forEach(k => { if(typeof h[k] === 'string') h[k] = h[k].replace('su Resistencia especial contra la Probabilidad', 'su Resistencia al control (Res.CC) contra la Probabilidad').replace('contra la Resistencia especial del objetivo decide la Parálisis', 'contra la Resistencia al control (Res.CC) del objetivo decide la Parálisis').replace('PdG.Esp contra la Res.Esp; salta', 'PdG.Esp contra la Res.CC; salta'); });
+        cambio = true;
+      }
       // 🛡 Provocar tira PdG.Esp + su nivel, como el Taunt de clase (dueño, 2026-11-03: «al revés, quiero que el de creep tire PdG.Esp + nivel»; por unas
       // horas del mismo día fue Ef.Esp + 2): el guardado en un creep (con cualquiera de las dos) se pone al día.
       if(h && h.nombre === 'Provocar' && h.duelo && typeof h.duelo === 'object' && (h.duelo.tira === 'dmgesp' || !h.duelo.tiraBonoNivel)){

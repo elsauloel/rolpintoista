@@ -375,8 +375,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 4 | **Descarga arcana** | **Temple mágico** | el escudo: **Escudo de lenga del monasterio** (Buena) |
   | 5 | **Tormenta arcana** (arcana, a revisar) | — | + una Buena de torso |
   Consumible: Poción de SP menor.
-  - **Zap: la Parálisis se resiste con Res.CC** (dueño, 2026-11-03: «el 1d4 no se esquiva, pero la parálisis sí se resiste con resistencia al crowd
-    control»; hoy es Res.Esp contra su PdG.Esp). **Por programar** (pool + los creeps que ya la tienen, como el Capataz de El origen).
+  - **Zap y Centella: la Parálisis se resiste con Res.CC** (programado 2026-11-03; dueño: «el 1d4 no se esquiva, pero la parálisis sí se resiste con resistencia al crowd
+    control»; antes Res.Esp). Los creeps que ya la tienen se ponen al día solos.
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 

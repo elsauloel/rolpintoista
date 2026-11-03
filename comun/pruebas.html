@@ -1144,7 +1144,7 @@ prueba('🎆 Misiles elementales (Mago, 2026-10-25): uno por elemento y el Misil
   igual([hs.map(h => h.duelo.tipoDano).join(','), !!hs[0].duelo.danoDirecto, hs[1].duelo.efectos[0].nombre, hs[2].duelo.porDano.estado,
     ce.danoSiempre, ce.contra.join(','), ce.danoFormula, !!ce.cadena, ce.efectos[0].caras, hs[4].duelo.porDano.estado,
     Combatiente.stacksPorDano(12, pz), Combatiente.porDanoTxt(pz), el.variantes.length, el.nitrosCosto, CreepCalculo.costoSpHab(sc, el), CreepCalculo.costoSpHab(sc, hs[1]), !!HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Misil arcano' && /no falla/.test(x.datos.detalle || ''))],
-    ['arcano,fuego,hielo,eléctrico,ácido,tóxico', true, 'Quemadura', 'Escarcha', true, 'resmg', '1d6', true, 2, 'Armadura rota', 4, 'Veneno: 2, y uno más cada 5 de daño', 6, 3, 8, 6, false]);
+    ['arcano,fuego,hielo,eléctrico,ácido,tóxico', true, 'Quemadura', 'Escarcha', true, 'rescc', '1d6', true, 2, 'Armadura rota', 4, 'Veneno: 2, y uno más cada 5 de daño', 6, 3, 8, 6, false]);
 });
 prueba('🪶 Levitar (Support, 2026-10-25): Levitando 2 turnos completos (levitar 100, +3 Evasión, el primer casillero gratis)', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Levitar');
@@ -1546,12 +1546,12 @@ prueba('🤐 Tótem de silencio (Debuffer, 2026-10-25): el aura avisa solo a los
   if(antes) window.silencioDeLugar = antes; else delete window.silencioDeLugar;
   igual(r, [true, 3, 10, 4, true, true, '', '', '']);
 });
-prueba('⚡ Zap (Mago, 2026-10-25): no se esquiva, 1d4 eléctrico directo, Parálisis contra la Res.Esp y 50 % / 25 % en los saltos', () => {
+prueba('⚡ Zap (Mago, 2026-10-25): no se esquiva, 1d4 eléctrico directo, Parálisis contra la Res.CC (desde 2026-11-03) y 50 % / 25 % en los saltos', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Zap');
   const h = armarHabilidadDeCreep(e.datos, 2);
   const n = Duelo.limpiarHab(Combatiente.habEjecucion(h, h.duelo, {stat: () => 4})) || {};   // el camino real: la Ejecución → el duelo
   igual([h.duelo.contra.join(','), !!n.danoSiempre, h.duelo.danoFormula, h.duelo.danoDirecto, h.duelo.tipoDano, h.duelo.efectos[0].nombre, h.duelo.efectos[0].caras, h.duelo.cadena.paralisis.join(','), ((n.cadena || {}).paralisis || []).join(','), Combatiente.chanceDado(50).caras, Combatiente.chanceDado(25).caras, h.cd],
-    ['resmg', true, '1d4', true, 'eléctrico', 'Parálisis', undefined, '50,25', '50,25', 2, 4, 3]);
+    ['rescc', true, '1d4', true, 'eléctrico', 'Parálisis', undefined, '50,25', '50,25', 2, 4, 3]);
 });
 prueba('🛡 Armas perforantes (Support, 2026-10-25): 3 turnos, Perfora 3 y 3 contra la Defensa especial', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Armas perforantes');
@@ -6616,6 +6616,13 @@ prueba('🛡 Provocar tira PdG.Esp + su nivel (2026-11-03, como el Taunt; un rat
   igual([pr.duelo.tira, pr.duelo.tiraBono, !!pr.duelo.tiraBonoNivel, cambio, vieja[0].duelo.tira, vieja[0].duelo.tiraBono, 'tiraBonoNivel' in vieja[0].duelo, /Probabilidad de Golpe especial \+ su nivel/.test(vieja[0].detalle),
     Combatiente.pisoDefensa(-2, maldita), Combatiente.pisoDefensa(-2, [{nombre: 'X', permiteNegativa: true}]), CreepCalculo.armadmgEfectiva(sc2)],
     ['pdgmg', undefined, true, true, 'pdgmg', undefined, true, true, 0, -2, 0]);
+});
+prueba('⚡ La Parálisis del Zap y de la Centella se resiste con Res.CC (2026-11-03); las guardadas se ponen al día', () => {
+  const zap = chp('Zap', 3), cen = chp('Centella', 3);
+  const viejas = [{nombre: 'Zap', detalle: 'salvo que el objetivo la resista: su Resistencia especial contra la Probabilidad de Golpe especial', duelo: {contra: ['resmg']}}];
+  const cambio = Combatiente.migrarLuzSanadora(viejas);
+  igual([zap.duelo.contra, cen.duelo.contra, cambio, viejas[0].duelo.contra, /Res\.CC/.test(viejas[0].detalle)],
+    [['rescc'], ['rescc'], true, ['rescc'], true]);
 });
 prueba('🔔 Aviso de propuestas al dueño (2026-11-03): cambio o incorporación, sin lo propio ni lo ya visto, lo más nuevo primero', () => {
   const E = [

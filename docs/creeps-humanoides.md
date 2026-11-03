@@ -532,6 +532,20 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 5 | **Dash** | — | + otra Buena |
   Consumible: Red de caza. Nivel 1 en detalle: más adelante («lo vamos a ir viendo uno a uno»).
 
+- **D4 · Control mental y ceguera · Debuffer, con SP** (boceto y nivel 1 aprobados 2026-11-03, dueño: «lo confirmo como ruta»; «va»). Estrategia:
+  te saca el control: te ciega o te encandila (Destello, Cegar), te abre la mente (Punzada mental, −2 Res.Mt) y ahí te confunde, te asusta o te
+  duerme (todo eso se resiste con Res.Mt). Con daño (dueño: «yo le pondría algún tipo de daño»). Atributos (Esp/Con/Agi/Des/Fue → vida, No2, SP):
+  **nv1 12/9/6/4/2 → 45, 6, 36** · nv2 14/9/7/4/2 → 45, 7, 42 · nv3 15/10/7/5/2 → 50, 7, 45 · nv4 17/10/8/5/2 → 50, 8, 51 · nv5 18/11/8/6/2 → 55, 8, 54.
+  | Nivel | Habilidad nueva | Pasiva | Equipo |
+  |---|---|---|---|
+  | 1 | **Punzada mental** (rápida, nueva: 1d4 arcano directo y Mente abierta) · **Cegar** (lenta) | — | **Varita del destello** + **Botella con un diablito** · Chaleco de cuero · Capucha de lana del culto |
+  | 2 | **Confusión** | **Puntería arcana** | + 2 Comunes |
+  | 3 | **Grito espeluznante** | — | la varita, de Buena |
+  | 4 | **Tótem de silencio** | **Potencia especial** | + una Buena |
+  | 5 | **Polen somnífero** | — | + otra Buena |
+  **Nivel 1:** Esp 12 · Con 9 · Agi 6 · Des 4 · Fue 2, vida 45, 6 No2, 36 SP (recupera 6); Def 2, Def.Esp 1; todo su daño especial +2 (la
+  Botella; si sale un 1 en los dados, se quema 2). Consumible: Polvo de adormidera. Sin cargar hasta que el dueño diga.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4
@@ -627,7 +641,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | R4 | | | | | |
 | M4 | ✅ (2026-11-03) | | | | |
 | S4 | ✅ (2026-11-03) | | | | |
-| D4 | | | | | |
+| D4 | ✅ (2026-11-03) | | | | |
 
 ## Los creeps (cada uno se completa al diseñarlo)
 

@@ -406,7 +406,7 @@ function acDevolver(dev){
   if(!dev) return;
   if(typeof Duelo !== 'undefined' && Duelo.pagoHab) Duelo.pagoHab(dev.creepId, null);   // (ya se devolvió: el duelo no lo lleva)
   acCambiarCreep(dev.creepId, c => {
-    if(dev.sp > 0) c.sp = num(c.sp) + dev.sp;
+    if(dev.sp > 0) c.sp = Math.min(CreepCalculo.spMax(c), CreepCalculo.spActual(c) + dev.sp);   // (con la barra llena `sp` no está guardado: spActual)
     if(dev.nitros > 0) c.nitros = num(c.nitros) + dev.nitros;
     const h = (c.habilidades || []).find(x => x.id === dev.habId);
     if(h) h.cdActual = dev.cd;
@@ -712,7 +712,7 @@ async function acEjecutarHab(sc, habId){
       opciones: malos.map(e => ({valor: e.nombre, texto: e.nombre, detalle: [num(e.turnos) > 0 ? `${fmt(num(e.turnos))} turno${num(e.turnos) === 1 ? '' : 's'}` : '', String(e.detalle || '').slice(0, 90)].filter(Boolean).join(' — ')}))})) || '';
   }
   const id = sc.id;
-  const antes = {sp: num(sc.sp), nitros: num(sc.nitros), cd: num(h.cdActual)};   // ↩ para devolverlo si cancela al elegir el objetivo
+  const antes = {sp: CreepCalculo.spActual(sc), nitros: num(sc.nitros), cd: num(h.cdActual)};   // ↩ para devolverlo si cancela al elegir el objetivo (2026-11-03: spActual, no `sp` crudo: con la barra llena no está guardado y no se devolvía el SP)
   // ⚡ Una habilidad Flash del creep (`h.flash`, 2026-10-24, Bendecir el arma) en turno ajeno cuesta el doble (P136): el cooldown o el SP.
   const te = h.flash ? tokenEntradaCreep(sc.id) : null, doble = !!(te && modoMapa === 'combate' && esSuTurno(te[0]) === false);
   acCambiar(c => {
@@ -723,7 +723,7 @@ async function acEjecutarHab(sc, habId){
     if(!p) return;
     { const c = p.creep, hh = (c.habilidades || []).find(x => x.id === habId), cdNuevo = num(hh && hh.cdActual);
       ac.devolucion = {creepId: id, habId, habNombre: h.nombre || 'la habilidad', creep: sc.nombre || 'El creep', cd: antes.cd,
-        cdTxt: cdNuevo !== antes.cd ? 'el cooldown' : '', sp: Math.max(0, antes.sp - num(c.sp)), nitros: Math.max(0, antes.nitros - num(c.nitros))};
+        cdTxt: cdNuevo !== antes.cd ? 'el cooldown' : '', sp: Math.max(0, antes.sp - CreepCalculo.spActual(c)), nitros: Math.max(0, antes.nitros - num(c.nitros))};
       // ↩ Lo que cobró, para el duelo que arme (P233): si se cancela y no cuenta, se devuelve.
       if(typeof Duelo !== 'undefined' && Duelo.pagoHab) Duelo.pagoHab(id, {habId, nombre: h.nombre || '', no2: ac.devolucion.nitros, sp: ac.devolucion.sp, hp: num(p.costoHp), cd: cdNuevo !== antes.cd ? antes.cd : -1}); }
     if(p.aviso) toast(p.aviso);

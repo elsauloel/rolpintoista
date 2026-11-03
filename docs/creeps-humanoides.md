@@ -582,6 +582,18 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   efectividad»): nv2 la pasiva es **Guardia firme** (+1 Bloqueo, en vez de Desvío hábil) y nv4 la pieza Buena es el **Escudo triangular** (Def +2,
   Res. crít. T4 +1, Bloqueo +1, Parry +1) en lugar del broquel. **Cargado** en el pool esencial (2026-11-03).
 
+- **W3 · Martillero · Warrior** (boceto aprobado 2026-11-03, dueño: «me gusta», con un punto de Con a Des en cada nivel). Estrategia: golpes que
+  atontan y derriban: te deja sin turno (Demora, Pajaritos, Sentado); desordena la pelea. Atributos (Fue/Con/Des/Agi/Esp → vida, No2): **nv1
+  10/8/7/6/2 → 40, 6** · nv2 11/9/8/6/2 → 50 (Robustez), 6 · nv3 12/10/8/7/2 → 50, 7 · nv4 13/11/9/7/2 → 55, 7 · nv5 14/12/9/8/2 → 60, 8.
+  | Nivel | Habilidad nueva | Pasiva | Equipo |
+  |---|---|---|---|
+  | 1 | **Puño de roca** (rápida) · **Pisotón** (Flash, lenta) | — | **Martillo del herrero de pueblo** + escudo Común · 2 Comunes |
+  | 2 | **Golpe fuerte** | **Robustez** | + 2 Comunes |
+  | 3 | **Salto aplastante** | — | **Martillo de bola** (Buena, dos manos) |
+  | 4 | **Golpe brutal** | **Voluntad de hierro** | + una Buena |
+  | 5 | **Golpe demoledor** | — | + otra Buena |
+  Consumible: Pergamino grupal de Furia de Combate.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4
@@ -660,7 +672,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | M2 | ✅ (2026-11-03) | | | | |
 | S2 | ✅ (2026-11-03) | | | | |
 | D2 | | | | | |
-| W3 | | | | | |
+| W3 | boceto ✅ (2026-11-03) | | | | |
 | T3 | ✅ (2026-11-03) | | | | |
 | H3 | | | | | |
 | L5 | ✅ (2026-11-03) | | | | |

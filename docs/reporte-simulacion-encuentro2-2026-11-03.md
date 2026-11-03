@@ -133,3 +133,71 @@ AL FINAL: Rockardo 0/35 · Larry 0/20 · Bizzante 0/25 · Abeja Gorda 1/45 · Ab
 `sim-e2-01-armado-GM.png` (el armado) · `sim-e2-02-iniciativa-GM.png` · `sim-e2-03-aviso-orden-J1.png` · `sim-e2-04-acciones-rata-GM.png` ·
 `sim-e2-05-duelo-rata-larry-GM.png` · `sim-e2-06-duelo-rata-larry-fin-GM.png` · `sim-e2-07-duelo-rata-larry-J1.png` · `sim-e2-08-duelo-visto-por-J1.png` ·
 `sim-e2-09-tras-el-mordisco-GM.png`
+
+## Segunda vuelta (grupo a nivel 3, creeps reales) — 2026-11-03
+
+Con la cuenta de Claude ya co-GM de El origen, los creeps de «MINAS DUNGEON» se leyeron **tal cual los cargó el dueño** (solo lectura de Firestore, sin
+abrir GM Tools ni el mapa de El origen). Todo lo modificado está en «Claude · pruebas», mapa «Encuentro 2 (simulación)».
+
+### Qué se le sumó a cada personaje (copias, de nivel 2 a 3)
+
+| Personaje | Atributos (+3) | Pieza Buena | Habilidad | Pasiva | Queda |
+|---|---|---|---|---|---|
+| **Larry** | Con +2, Agi +1 (era el más frágil) | **Coraza rúnica** (Def +2, Def.Esp +2, Res.Esp +2, SP +3, Res.Mt +1): tapaba su Def.Esp 0 y su Res.Esp 4 | **Maldición debilitante** (−1 a todas las tiradas del rival, acumulable) | **Robustez** (+5 de vida) | Vida 35, Def 6, Def.Esp 2, Eva 5, Res.Esp 8, No2 5 |
+| **Rockardo** | Des +2, Con +1 (su problema era pegar: PdG 8) | **Guanteletes del mazo** (PdG con contundentes +1, Def +1, Bloqueo +1): su maza es contundente | **Taunt** (provocar: que los creeps vayan contra él y no contra Larry) | **Puntería** (+1 PdG) | Vida 40, Def 15, Def.Esp 0, PdG 11 (12 con la maza) |
+| **Bizzante** | Con +2, Des +1 | **Guantes de cuero reforzado** (Def +1, Def.Esp +1, Parry +1) | **Ojo de asesino** (+1 PdG, +2 de daño, +1 a los dos críticos) | **Pies ligeros** (+1 Evasión) | Vida 35, Def 6, Def.Esp 2, Eva 9, PdG 9 |
+
+Subidos con la experiencia (como lo hace la ficha) y con el presupuesto de atributos y Job justos (39 de 39; Job 8 de 9).
+
+### En qué diferían los creeps reales de la versión aproximada
+
+- **Goblin rompehuesos**: Con 13 · Fue 11 · Agi 6 · Des 8 (no 14/11/6/7), 85 de vida; **Martillo de carpintero** (no de herrero) y **Escudo fluorescente
+  de bronce**; cinturón: Poción de Ímpetu y Piel de Cristal mayor.
+- **Arquero del culto: fuego**: Con 7 · Fue 6 · Agi 8 · **Des 13** · Esp 5, 35 de vida, **PdG 14** (era 11); **Arco de emboscada** (no el de estopa);
+  pasiva **Impulso** (no Recuperación mental); **Mina explosiva** (no la del cazador); cinturón: 3 Flechas silbadoras y **Mina napalm**.
+- **Goblin Alquimista** (el Chamán): **Esp 15** (no 14), Des 7; cinturón: Poción de HP y **Pergamino de Escudo Arcano**; sin pasiva.
+- **Capataz del culto**: igual a lo definido; su tercera habilidad es **Grito de pánico** (en la copia se ve como Grito espeluznante, por la
+  puesta al día del nombre); cinturón con Town portal, Piel de Cristal mayor, Pergamino grupal de Reserva Ampliada y Runa de silencio.
+- **Ratas**: iguales a lo definido (PdG 15, Evasión 12, «Polvareda» como tercera habilidad, Chillido).
+
+### Lo que se jugó con clics
+
+- **Iniciativa**: modo combate, «Traer tokens», cada uno tiró la suya, **Ordenar** → cartel de Prisa → ✔ Aplicar: **Rockardo primero por la Prisa**
+  y cada jugador recibió su puesto. (En la prueba automática, el clic en el botón «Ordenar» no abrió el cartel; abierto con la misma función que llama
+  el botón. No se pudo confirmar si pasa con el mouse de verdad.)
+- **Rata → Larry** (Evasión): la mordida pegó, pero con la **Defensa 6 nueva le entró 1** (35 → 34). En la primera vuelta le había entrado 5 de 20.
+- **Rompehuesos → Rockardo** (Parry con la maza, Bloqueo, Fuerza del golpe): pasó el golpe, 1d10 + 11 contra Defensa 15: **le entró 1** (40 → 39).
+
+### Resultado (2000 peleas de 3 rondas, con los números reales y las mismas reglas simplificadas de la primera vuelta)
+
+| | Primera vuelta (nivel 2, creeps aproximados) | **Segunda vuelta (nivel 3, creeps reales)** |
+|---|---|---|
+| Larry cae | 100 %, casi siempre en la ronda 1 | **100 %**: la mitad en la ronda 1, la otra mitad en la 2 |
+| Bizzante cae | 100 % | **99 %**, casi siempre en la ronda 2 |
+| Rockardo cae | 99 % | **92 %**, casi siempre en la ronda 3 |
+| Creeps que caen | ninguno | casi ninguno (Rompehuesos 4 %, una rata 2–3 %) |
+| Personajes en pie al final | — | 0,08 de 3 |
+
+Variantes: **con una sola rata**, Larry 100 %, Bizzante 87 %, Rockardo 49 %; **sin el Cristal**, 100 / 96 / 61 %; **una rata, sin Cristal y sin Ojo de
+asesino**, Larry 100 %, Bizzante 29 %, Rockardo 2 % (1,7 personajes en pie de 3).
+
+**Lectura**: la subida de nivel ayuda (Rockardo aguanta una ronda más, Larry ya no cae siempre en la primera), pero **el encuentro sigue siendo
+casi seguro letal**. Lo que mata no es el daño de base (contra Defensa 6 las mordidas entran poco: se vio en los duelos), sino **los críticos de las
+ratas** (PdG 15 contra Evasión 5: con Ojo de asesino crítico ×2 o ×3 directo, que ignora la Defensa: 18–42 de una) y que **todos van contra Larry**
+(Marca de caza, mordida, Arrastrar, Zap). El grupo casi no les saca vida a los creeps en 3 rondas (el Rompehuesos tiene 85, el Capataz 75).
+
+### Recomendaciones de ajuste
+
+1. **Ratas**: es lo que más cambia el resultado. Bajarles la Destreza (13 → 10: PdG 12) o sacarles **Ojo crítico** (la pasiva): así dejan de critear
+   casi siempre a Larry. O una sola rata desde el principio y la otra con el Chillido.
+2. **El Cristal de la Grieta en la ronda 2**, no en la 1 (sin él Rockardo pasa de caer 92 % a 61 %).
+3. **Repartir los objetivos**: que el Arquero abra con Marca de caza sobre Rockardo o Bizzante, no sobre Larry, y que el Rompehuesos arrastre a
+   Bizzante; Larry (el que más daño en área hace con los Pedos) es el que el grupo necesita vivo.
+4. **Menos vida en los grandes** si se quiere que el grupo pueda ganar: hoy en 3 rondas no tumban a nadie. Por ejemplo el Rompehuesos sin el Anillo
+   de Vitalidad Extendida y el Capataz que intente escaparse con el Town portal antes (a la mitad de la vida).
+5. Con 1 + 2 + 3 juntos, la simulación queda cerca de «una pelea dura que se puede ganar» (la variante más suave: 1,7 de 3 en pie a la ronda 3).
+
+### Para tener en cuenta
+
+- La simulación sigue simplificando (no mide pasos ni la línea de tiro, una acción por turno, los jugadores no usan consumibles): es una guía.
+- Quedan en «Claude · pruebas»: el mapa, las tres copias a nivel 3 y los seis creeps copiados de El origen (con el daño de los dos duelos).

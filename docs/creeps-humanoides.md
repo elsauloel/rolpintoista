@@ -500,7 +500,7 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 5 | **Salto aplastante** | — | + otra Buena |
   Consumible: Poción de Cuero Duro. Golpe que sigue no entra: con Tipo 8 el segundo golpe no le alcanza con 6 No2.
   **Nivel 1 aprobado** (dueño, 2026-11-03: «va»): Fue 9 · Con 9 · Des 7 · Agi 6 · Esp 2, vida 45, 6 No2, con turnos de espera; Hacha de vikingo
-  (Tipo 8, 1d8 + 9, Derribar 25 %, Rompe armadura 33 %) + Rodela tachonada · Chaleco de cuero · Botas de cuero de vaca: Def 4, Def.Esp 1, Res.
+  (Tipo 8, 1d8 + 9; desde el 2026-11-03: +1 de daño y Rompe armadura 50 %, sin Derribar) + Rodela tachonada · Chaleco de cuero · Botas de cuero de vaca: Def 4, Def.Esp 1, Res.
   crít. T4 +2. Salto (lenta, cd 3) y Golpe fuerte (rápida, cd 2). Consumible: Poción de Cuero Duro. Sin cargar hasta que el dueño diga.
 
 - **S4 · Protector · Support, con SP** (boceto aprobado 2026-11-03, dueño: «la ruta me cierra, me resulta interesante»). Estrategia: juega en el

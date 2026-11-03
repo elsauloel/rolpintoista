@@ -378,6 +378,22 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   - **Zap y Centella: la Parálisis se resiste con Res.CC** (programado 2026-11-03; dueño: «el 1d4 no se esquiva, pero la parálisis sí se resiste con resistencia al crowd
     control»; antes Res.Esp). Los creeps que ya la tienen se ponen al día solos.
 
+- **M3 · Mago del rayo, nivel 1 aprobado** (2026-11-03): Esp 12 · Con 8 · Agi 5 · Des 6 · Fue 2, vida 40, 5 No2; Varita de chispa eléctrica +
+  Escudo de escamas de lagarto · Chaleco de cuero · Anillo de chispa (Def 3, Def.Esp 1, +2 eléctrico); Centella (lenta, cd 4, 2 No2) y Zap (lenta,
+  cd 3, 2 No2), las dos con la Parálisis contra Res.CC. Consumible: Poción de SP menor.
+- **L2 · Envenenador · Choque liviano** (boceto y nivel 1 aprobados 2026-11-03, dueño: «me cierra como concepto… algunas cuestiones se superponen,
+  lo vamos a ajustar nivel por nivel»; «va así»). Estrategia: cuerpo a cuerpo con una daga untada, acumula veneno, pega y se aleja. Atributos
+  (Des/Agi/Con/Fue/Esp → vida, No2): **nv1 10/9/7/5/2 → 35, 9** · nv2 11/9/8/6/2 → 40, 9 · nv3 12/10/8/7/2 → 40, 10 · nv4 13/10/9/8/2 → 45, 10 ·
+  nv5 14/11/10/8/2 → 50, 11.
+  | Nivel | Habilidad nueva | Pasiva | Equipo |
+  |---|---|---|---|
+  | 1 | **Estocada** (rápida: Perfora 2, +1 daño) · **Hoja envenenada** (lenta: Perfora 2, Veneno 3) | — | **Daga ritual** (Tipo 4, Veneno 2 siempre, Perfora 1; 1d4 + 5) · Chaleco de cuero · Guantes de agarre (Def 2, PdG +1) |
+  | 2 | **Tajo veloz** | **Perforante** | + 2 Comunes |
+  | 3 | **Golpe a la rodilla** | — | la daga: **Daga de la viuda verde** (Buena, Veneno 3 siempre) |
+  | 4 | **Hit and run** | **Pies ligeros** | + **Chaqueta del corredor** (Buena) |
+  | 5 | **Ráfaga de cortes** (efectos del arma ×3) | — | + una tercera Buena |
+  Consumible: Óleo venenoso. Ojo: Larry es inmune al veneno.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4
@@ -442,7 +458,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | T2 | ✅ (2026-11-02; rehecho 2026-11-03) | | | | |
 | H1 | ✅ (2026-11-03) | | | | |
 | L1 | ✅ (2026-11-02) | | | | |
-| L2 | | | | | |
+| L2 | ✅ (2026-11-03) | | | | |
 | R1 | ✅ (2026-11-03) | | | | |
 | M1 | ✅ (2026-11-02) | | | | |
 | S1 | ✅ (2026-11-02) | | | | |
@@ -462,7 +478,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | L5 | | | | | |
 | L6 | | | | | |
 | R3 | | | | | |
-| M3 | | | | | |
+| M3 | ✅ (2026-11-03) | | | | |
 | S3 | | | | | |
 | D3 | | | | | |
 | W4 | | | | | |

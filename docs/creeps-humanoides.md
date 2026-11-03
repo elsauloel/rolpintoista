@@ -42,6 +42,7 @@
 ### Aprobados
 
 > ✅ **Programados el 2026-11-03** en `comun/creeps-esenciales.js` (el pool esencial: «+ Creep» de GM Tools → pestaña «⭐ Pool esencial»): T1, M1, L1, S1, W1 (con los atributos revisados), D1. Equipo del catálogo por nombre, habilidades de fábrica con su costo y cooldown, consumibles en el cinturón.
+> ✅ **Programados también el 2026-11-03 (segunda tanda)**: R1, T2 (nivel 1 rehecho), M2, M3, M4, H1, H2, W2 (con las dos armas puestas; atacar con la segunda en creeps sigue pendiente), L2, L3, R2, S2, S3, S4, D2, D3, D4 — 23 en total. Los de Especial más alto (magos, debuffers, Sanador, Protector) arrancan con SP. L4 queda afuera (solo boceto).
 
 - **T1 · Escudero · Tanque · nivel 1** (aprobado 2026-11-02; **atributos y arma rehechos el 2026-11-03**, dueño: «dejarlo así»). Referencia: un grupo
   de nivel 1, no los personajes actuales. Estrategia: se planta adelante, provoca y aguanta; con el hacha le rompe la armadura al que lo ignora.

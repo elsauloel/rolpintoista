@@ -34,13 +34,21 @@ const Recibidos = (() => {
     const id = String(fichaId || '');
     return id ? (docs || []).filter(d => { const f = fichaDe(d); return f === id || f.startsWith(id + SEP); }) : [];
   }
+  /* 🐞 (2026-11-03, «No se pudo aplicar lo recibido: Missing or insufficient permissions» en la consola de los jugadores): si otra pantalla
+     ya lo tomó y lo BORRÓ (el GM con el 🎮 control, o su ficha), leerlo de nuevo choca con las reglas (un jugador solo lee los avisos que
+     existen y son suyos) y la transacción falla con permission-denied. Eso es «ya lo aplicó otro»: no se toma, sin error. */
   async function tomar(d, borrar){
-    return fbDb.runTransaction(async tx => {
-      const x = await tx.get(d.ref);
-      if(!x.exists || x.data().aplicada) return false;
-      if(borrar) tx.delete(d.ref); else tx.update(d.ref, {aplicada: true});
-      return true;
-    });
+    try{
+      return await fbDb.runTransaction(async tx => {
+        const x = await tx.get(d.ref);
+        if(!x.exists || x.data().aplicada) return false;
+        if(borrar) tx.delete(d.ref); else tx.update(d.ref, {aplicada: true});
+        return true;
+      });
+    }catch(err){
+      if(err && err.code === 'permission-denied') return false;   // ya lo tomó (y borró) otra pantalla
+      throw err;
+    }
   }
 
   /* ---------- Estados ---------- */

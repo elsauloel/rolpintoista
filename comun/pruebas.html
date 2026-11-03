@@ -54,7 +54,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-combate.js"></script>
 <script src="estados-presets.js?v=20261103t14"></script>
 <script src="estados-aplicar.js?v=20261103t12"></script>
-<script src="recibidos.js?v=20261103ve"></script>
+<script src="recibidos.js?v=20261103pm"></script>
 <script src="tokens-auto.js"></script>
 <script src="creeps-mapas.js"></script>
 <script src="paso-a-paso.js"></script>
@@ -5767,6 +5767,20 @@ prueba('con su fórmula, la zona sigue mandando la fórmula y no la diferencia',
 });
 
 /* ---------- Ficha lite (comun/ficha-lite.js, 2026-10-02) ---------- */
+prueba('🐞 Recibidos.tomar (2026-11-03): si otra pantalla ya borró el aviso (permission-denied al releerlo), no lo toma y no tira error', () => { const pp = fbFalsoCola.then(async () => {
+  const antes = typeof fbDb === 'undefined' ? undefined : fbDb;
+  const err = Object.assign(new Error('Missing or insufficient permissions.'), {code: 'permission-denied'});
+  try{
+    fbDb = {runTransaction: async () => { throw err; }};
+    const a = await Recibidos.tomar({ref: {}}, false);
+    fbDb = {runTransaction: async fn => fn({get: async () => ({exists: true, data: () => ({aplicada: false})}), update: () => {}, delete: () => {}})};
+    const b = await Recibidos.tomar({ref: {}}, false);
+    let c = 'sin error';
+    fbDb = {runTransaction: async () => { throw Object.assign(new Error('otro'), {code: 'unavailable'}); }};
+    try{ await Recibidos.tomar({ref: {}}, false); }catch(e){ c = e.code; }
+    igual([a, b, c], [false, true, 'unavailable']);
+  }finally{ fbDb = antes; }
+}); fbFalsoCola = pp.catch(() => {}); return pp; });
 grupo('Ficha lite');
 prueba('personaje: manos, Defensa y resistencias con su origen (una pieza rota va tachada)', () => {
   const S = fichaBotonera({inventario: [

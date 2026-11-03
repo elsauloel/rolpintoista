@@ -918,6 +918,10 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   suben el porcentaje con tope).
 - [ ] **🤖 Creeps con IA (dueño, 2026-11-03): todo lo de proponer/armar creeps con IA queda para cuando esté en la compu** (no se prueba desde la nube).
 - [ ] **📖 Glosario (dueño, 2026-11-03): revisarlo en la compu, sobre la marcha** (no es trabajo para el teléfono).
+- [ ] **⚔⚔ Creeps con dos armas (dueño, 2026-11-03, para el W2 Berserker):** como un personaje, que el creep elija con qué arma ataca y que
+  cada arma tenga su propio primer ataque a mitad de precio (hoy un creep ataca solo con el arma principal y lleva una sola cuenta de ataques
+  del turno: `comun/creep-acciones.js` pagarAtaque, `comun/creep-calculo.js` costoAtaque0 / armaDe). El Parry ya puede elegir pieza
+  (confirmarlo en el mapa con la segunda arma). Hacerlo junto con la carga de los esenciales.
 - [ ] **🐝 Invocaciones para creeps (dueño, 2026-11-03: «en principio no lo vamos a usar, pero debería existir»):** hoy los creeps solo llaman refuerzos
   (creeps comunes). Queda para después de diseñar mejor la gestión de invocaciones de jugador; recién ahí se piensa la de los creeps.
 - [ ] **👁 Ojo de Kicillof como habilidad de Support (dueño, 2026-11-03: «sería interesante, habría que pensarlo en coste»):** hoy es solo el

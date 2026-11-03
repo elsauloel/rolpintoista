@@ -408,6 +408,21 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 5 | **Señalar la presa** | — | + un yelmo Bueno |
   Consumible: Pergamino grupal de Furia de Combate. Ojo: el Arma elemental sobre un aliado que ya pega fuerte puede ser mucho en nivel 1.
 
+- **W2 · Berserker · Warrior** (boceto aprobado 2026-11-03; dueño: «me cierra como ruta», con Fue −2 y Des +2, espadas en vez del hacha y la
+  poción de regeneración chica). Estrategia: cuanto más herido, más peligroso; espadachín de dos armas que busca el crítico. Atributos
+  (Fue/Con/Agi/Des/Esp → vida, No2): **nv1 8/9/6/8/2 → 45, 6** · nv2 9/10/6/9/2 → 55 (con Robustez), 6 · nv3 10/11/7/9/2 → 60, 7 ·
+  nv4 11/12/7/10/2 → 75, 7 · nv5 12/13/8/10/2 → 80, 8.
+  | Nivel | Habilidad nueva | Pasiva | Equipo |
+  |---|---|---|---|
+  | 1 | **Golpe desesperado** (cd 2) · **Furia** (cd 3) | — | **Sable del tahúr** (Crítico frecuente +1) + **Facón de paisano** (Sangrado 25 %) · Chaleco de cuero · Botas de cuero de vaca |
+  | 2 | **Golpe fuerte** | **Robustez** (+5 de vida) | + 2 Comunes |
+  | 3 | **Aguante** | — | el sable: **Espada del Jefe de los Mil Caminos** (Buena: Crítico potente +3, Sangrado 33 %) + el Facón |
+  | 4 | **Golpe brutal** | **Voluntad de hierro** | + una pieza Buena |
+  | 5 | **Barrido** | — | el facón: **Espada larga** (Buena: PdG +1, Crítico potente +2) |
+  Consumible: **Poción de Regeneración menor** (nueva en el catálogo, 2026-11-03: 5 de vida por turno, 3 turnos). Dos armas (dueño): el primer
+  ataque con cada arma cuesta la mitad, como un primer ataque del turno, y una puede ser mejor para atajar y la otra para pegar. **En los creeps
+  eso no está programado** (atacan solo con el arma principal): pendiente en `pendientes.md`.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4
@@ -477,7 +492,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | M1 | ✅ (2026-11-02) | | | | |
 | S1 | ✅ (2026-11-02) | | | | |
 | D1 | ✅ (2026-11-02) | | | | |
-| W2 | | | | | |
+| W2 | boceto ✅ (2026-11-03) | | | | |
 | T2 | | | | | |
 | H2 | | | | | |
 | L3 | | | | | |

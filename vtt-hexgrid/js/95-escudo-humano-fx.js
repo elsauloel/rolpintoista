@@ -17,7 +17,7 @@ let escudoHumanoPrevios = new Map();   // clave 'guardián>protegido' → {A, B}
 const escudoHumanoPoco = () => { try{ return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){ return false; } };
 const escudoHumanoVe = t => !!t && (!t.oculto || soyGM) && (typeof tokenVisiblePorNiebla !== 'function' || tokenVisiblePorNiebla(t));
 const ESCUDO_HUMANO_MARCAS = ['Escudo humano', 'Miti-Miti'];
-function idDeToken(t){ for(const [id, x] of tokens) if(x === t) return id; return null; }
+// (idDeToken ya existe en js/04: declararlo de nuevo rompía la carga de todo este archivo — «Identifier 'idDeToken' has already been declared»)
 
 // Los pares activos, de los estados públicos: el guardián lleva la marca con `protege` = la ficha del protegido.
 function escudoHumanoPares(){

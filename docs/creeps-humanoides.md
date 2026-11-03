@@ -394,6 +394,20 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 5 | **Ráfaga de cortes** (efectos del arma ×3) | — | + una tercera Buena |
   Consumible: Óleo venenoso. Ojo: Larry es inmune al veneno.
 
+- **Regla nueva (dueño, 2026-11-03): el Flash de un creep en turno ajeno cuesta un 50 % más de cooldown** (para abajo, mínimo +1), no el doble; el
+  SP y la vida siguen al doble. Programado.
+- **S3 · Armero · Support** (boceto y nivel 1 aprobados 2026-11-03). Estrategia: el herrero del grupo: les mejora las armas a los suyos (elementos,
+  bendición, perforar, crítico) y pelea al lado. Atributos (Con/Fue/Des/Agi/Esp → vida, No2): **nv1 10/8/6/6/3 → 50, 6** · nv2 11/9/7/6/3 → 55, 6 ·
+  nv3 12/9/7/7/4 → 60, 7 · nv4 13/10/8/7/4 → 65, 7 · nv5 14/11/8/8/4 → 70, 8.
+  | Nivel | Habilidad nueva | Pasiva | Equipo |
+  |---|---|---|---|
+  | 1 | **Bendecir el arma** (rápida, Flash, 0 No2) · **Arma elemental** (lenta, 2 No2, su ataque del turno) | — | **Hacha del herrero de pueblo** (Tipo 8, Parry +1, Rompe armadura 33 %; 1d8 + 8) · Chaleco de cuero · Cofia de anillas sueltas (Def 3, Def.Esp 1) |
+  | 2 | **Armas perforantes** | **Piel curtida** | + 2 Comunes |
+  | 3 | **Ojo certero** | — | el arma: **Martillo de herrero** (Buena) |
+  | 4 | **Empuje** (rápida, Flash) | **Desvío hábil** (+1 Parry) | + un torso Bueno |
+  | 5 | **Señalar la presa** | — | + un yelmo Bueno |
+  Consumible: Pergamino grupal de Furia de Combate. Ojo: el Arma elemental sobre un aliado que ya pega fuerte puede ser mucho en nivel 1.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4
@@ -479,7 +493,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | L6 | | | | | |
 | R3 | | | | | |
 | M3 | ✅ (2026-11-03) | | | | |
-| S3 | | | | | |
+| S3 | ✅ (2026-11-03) | | | | |
 | D3 | | | | | |
 | W4 | | | | | |
 | T4 | | | | | |

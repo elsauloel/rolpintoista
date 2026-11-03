@@ -283,6 +283,11 @@
 ## Pendientes
 
 ### ▶ Para la próxima tanda de pruebas en el mapa (2026-11-03)
+
+- [x] ✅ **✋ Las dos manos de un creep en GM Tools** (2026-11-03, probado con clics en «Claude · pruebas» con un Hachero del pool, después borrado):
+  Equipar del fabricante → Facón de paisano pregunta «¿Dónde va?» (✋ En la otra mano / 🔁 Reemplazar Hacha) → en la otra mano quedan las dos;
+  Escudo de hierro macizo → «Las manos ocupadas: ¿qué guarda?» (Hacha / Facón) → guardó el Facón; Brazal de cuero tachonado (atado) entró sin
+  sacar nada. Falta: verlo en el mapa (las Acciones del creep con las dos armas armadas a mano).
 - [x] ✅ **⚔⚔ Creep con dos armas** (2026-11-03, probado con clics por Claude en «Claude · pruebas», mapa «Clon origen», con el Goblin picapiedras
   armado con Sable del tahúr + Facón de paisano y restaurado después, 0 diferencias): en ⚔ Acciones aparecen «Atacar con Sable del tahúr · 3 No2 ·
   1.º ataque» y «Atacar con Facón de paisano · 2 No2 · 1.º ataque», y un «Daño ·…» por arma (1d6 + 9 / 1d4 + 9). Con el facón el duelo dice «con

@@ -597,6 +597,18 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   pueblo (Tipo 10, 1d10 + 10, Parry +1, Pajaritos 33 %) + Escudo de cuero endurecido · Chaleco de cuero · Botas de cuero de vaca: Def 5, Res. crít.
   T4 +2. Puño de roca (rápida) y Pisotón (Flash, lenta). **Cargado** en el pool esencial (2026-11-03).
 
+- **R3 · Trabador · Rango** (boceto aprobado 2026-11-03, dueño: «la ruta del trabador me gusta»). Estrategia: frena y clava: no busca matar,
+  busca que no te muevas (Rengo, red, clavado contra la pared, Vigilancia); sus aliados te alcanzan. Atributos (Des/Con/Agi/Fue/Esp → vida, No2):
+  **nv1 11/8/6/6/2 → 40, 6** · nv2 12/9/6/7/2 → 45, 6 · nv3 13/9/7/8/2 → 45, 7 · nv4 14/10/7/9/2 → 50, 7 · nv5 15/11/8/9/2 → 55, 8.
+  | Nivel | Habilidad nueva | Pasiva | Equipo |
+  |---|---|---|---|
+  | 1 | **Tiro certero** (rápida) · **Tiro a la rodilla** (lenta) | — | **Ballesta del baqueano** (Lisiado 25 %, Perfora 1, Recarga 2) · 2 Comunes |
+  | 2 | **Red tendida** | **Puntería** | + 2 Comunes |
+  | 3 | **Clavar a la pared** | — | el arma, de Buena |
+  | 4 | **Mantener a raya** | **Vista de halcón** | + una Buena |
+  | 5 | **Vigilancia** | — | + otra Buena |
+  Consumible: Virote de red.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4
@@ -680,7 +692,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | H3 | | | | | |
 | L5 | ✅ (2026-11-03) | | | | |
 | L6 | | | | | |
-| R3 | | | | | |
+| R3 | boceto ✅ (2026-11-03) | | | | |
 | M3 | ✅ (2026-11-03) | | | | |
 | S3 | ✅ (2026-11-03) | | | | |
 | D3 | ✅ (2026-11-03) | | | | |

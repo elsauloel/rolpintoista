@@ -449,6 +449,18 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   1 SP) y Robar el aliento (2 No2, 3 SP), que **pasa a sacar 1 No2 + la diferencia** (dueño, mismo día; programado). Con SP puede repetir
   habilidades en el turno: «lo dejamos así». Consumible: Gas adormecedor. Sin cargar hasta que el dueño diga.
 
+- **R2 · Hostigador a distancia · Rango** (boceto aprobado 2026-11-03, dueño: «me cierra la ruta», con Agi 9 · Des 10). Estrategia: dispara y se
+  va; nunca está donde lo dejaste; al que lo persigue lo empuja, lo frena o lo deja rengo. Atributos (Agi/Des/Con/Fue/Esp → vida, No2):
+  **nv1 9/10/7/5/2 → 35, 9** · nv2 9/11/8/6/2 → 40, 9 · nv3 10/12/8/7/2 → 40, 10 · nv4 10/13/9/8/2 → 45, 10 · nv5 11/14/10/8/2 → 50, 11.
+  | Nivel | Habilidad nueva | Pasiva | Equipo |
+  |---|---|---|---|
+  | 1 | **Tiro certero** (rápida; también la tiene el Tirador) · **Disparo y repliegue** (lenta) | — | **Arco de tiro ligero** (Encadenar, Racha) · 2 Comunes livianas |
+  | 2 | **Mantener a raya** | **Pies ligeros** (+1 Eva) | + 2 Comunes |
+  | 3 | **Tiro a la rodilla** (de la línea del Trabador) | — | el arco: **Arco de la sombra** (Buena) |
+  | 4 | **Disparo señalador** (también el Tirador, nv4) | **Prisa** | + una Buena |
+  | 5 | **Ráfaga encadenada** | — | + otra Buena |
+  Consumible: **Flecha silbadora** (lo baja 1 lugar en el orden de turnos).
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4
@@ -523,7 +535,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | H2 | | | | | |
 | L3 | | | | | |
 | L4 | | | | | |
-| R2 | | | | | |
+| R2 | boceto ✅ (2026-11-03) | | | | |
 | M2 | ✅ (2026-11-03) | | | | |
 | S2 | ✅ (2026-11-03) | | | | |
 | D2 | | | | | |

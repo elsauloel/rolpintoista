@@ -130,6 +130,15 @@ Al seleccionar tu token aparecen controles flotantes: la **vida** (círculo rojo
 > [!tip] Atajos
 > El ícono ⌨ en el mapa muestra la lista de atajos.
 
+## Atajos de las habilidades y los consumibles
+En la **Botonera** (y en las ⚔ **Acciones** de un creep, para el GM), a la izquierda de cada habilidad y de cada consumible hay un
+cuadradito. Tocalo y apretá un número del **1 al 9 o el 0**: queda asignado (Supr o Backspace lo borra; Esc cancela). Un número va en
+una sola habilidad: si se lo ponés a otra, se le saca a la primera.
+- Con tu token seleccionado en el mapa, **el número** usa esa habilidad y **Shift + el número** ese consumible.
+- Antes pregunta: «¿Ejecutar *Nombre*?» (Enter = sí, Esc = no). Después es lo mismo que tocar su botón (si la Botonera estaba cerrada, se abre).
+- Los números son **de cada personaje** (y de cada creep), no tuyos: Clementino tiene los suyos y Rockardo los suyos.
+- No andan escribiendo en un campo, con un cartel abierto, eligiendo a quién atacar ni con un token que no es tuyo. Las invocaciones todavía no tienen.
+
 +++
 titulo: Tokens
 alias: [Token, HUD, Token vinculado, Creep token]

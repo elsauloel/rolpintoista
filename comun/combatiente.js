@@ -338,6 +338,21 @@ const Combatiente = (() => {
     if(!r || !r.ok || !r.estado || (r.que !== 'nuevo' && r.que !== 'renovado')) return {hp: 0, eventos: []};
     const d = dispararEstados([r.estado], {...(campos || {}), todos: estados});
     if(campos && campos.hpActual !== undefined && d.hp > 0 && n(campos.hpActual) <= 0) return {hp: 0, eventos: [...d.eventos, {tipo: 'caido', nombre: r.estado.nombre}]};
+    /* 🌑🪱 (2026-11-03, dueño: «sigamos tu propuesta»): la cura del primer tick (una Regeneración recién puesta) pasa por el mismo control que todas:
+       con Herida sombría no entra; con una Sanguijuela pegada se la lleva quien la lanzó (EstadosAplicar.curaRobadaEnviar, como los ticks de cada
+       turno). `campos.quien`: el nombre del que la recibe (para el aviso); `campos.enviarRobo === false`: no la manda (las pruebas). */
+    if(d.hp > 0){
+      const sinHp = evs => evs.filter(ev => !(ev && ev.tipo === 'hp' && n(ev.hp) > 0));
+      if(sinCura(estados)) return {hp: 0, eventos: [...sinHp(d.eventos), {tipo: 'sincura', nombre: r.estado.nombre, hp: d.hp}]};
+      const robo = curaRobada(campos && campos.hpActual !== undefined ? campos.hpActual : 1, d.hp, estados);
+      if(robo){
+        const quien = String((campos && campos.quien) || '').trim();
+        const enviar = !(campos && campos.enviarRobo === false) && typeof EstadosAplicar !== 'undefined' && EstadosAplicar.curaRobadaEnviar;
+        const txt = enviar ? EstadosAplicar.curaRobadaEnviar(robo, quien) : curaRobadaTxt(robo, quien);
+        if(enviar && typeof toast === 'function') try{ toast(txt); }catch(e){}
+        return {hp: 0, robo, eventos: [...sinHp(d.eventos), {tipo: 'robada', nombre: r.estado.nombre, hp: d.hp, txt}]};
+      }
+    }
     return d;
   }
   /* Una cura no levanta a un caído (dueño, 2026-10-06: «una poción de cura normal no revive a alguien inconsciente; tiene que ser un efecto
@@ -384,6 +399,8 @@ const Combatiente = (() => {
       if(ev.tipo === 'vence') return `${ev.nombre}: ${fmtN(ev.de)} → 0 turnos, se terminó`;
       if(ev.tipo === 'fin') return `${ev.nombre}: se terminó`;
       if(ev.tipo === 'caido') return `${ev.nombre}: no cura a un caído`;
+      if(ev.tipo === 'sincura') return `${ev.nombre}: ${SIN_CURA_TXT}`;
+      if(ev.tipo === 'robada') return `${ev.nombre}: ${ev.txt || 'la cura se la lleva la Sanguijuela'}`;
       return '';
     }).filter(Boolean);
   }

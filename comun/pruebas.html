@@ -42,15 +42,15 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 </script>
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
-<script src="combatiente.js?v=20261103t9"></script>
+<script src="combatiente.js?v=20261103r1"></script>
 <script src="creep-calculo.js?v=20261103t4"></script>
 <script src="creep-botonera.js"></script>
-<script src="creep-acciones.js?v=20261103san"></script>
+<script src="creep-acciones.js?v=20261103r1"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
 <script src="estados-presets.js?v=20261103san"></script>
-<script src="estados-aplicar.js?v=20261103san"></script>
+<script src="estados-aplicar.js?v=20261103r1"></script>
 <script src="recibidos.js?v=20261103san"></script>
 <script src="tokens-auto.js"></script>
 <script src="creeps-mapas.js"></script>
@@ -73,7 +73,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js"></script>
-<script src="ficha-acciones.js?v=20261103san"></script>
+<script src="ficha-acciones.js?v=20261103r1"></script>
 <script src="ficha-mantenimiento.js?v=20261103san"></script>
 <script src="estado-preguntas.js"></script>
 <script src="asistente-estado.js"></script>
@@ -1390,6 +1390,18 @@ prueba('🪱 Sanguijuela (2026-11-03): la cura del portador se la lleva quien la
     [r1.cura, r1.extra, r1.perdida], [r2.cura, r2.extra], r3.perdida, sc.hp, ve && ve.escudoMagico, EstadosAplicar.limpiarSpec({nombre: 'Sanguijuela', chupaDe: 'pj:f1', chupaUid: 'u1', chupaNombre: 'Ana'}).chupaUid,
     /se la lleva la Sanguijuela de Ladrón/.test(Combatiente.curaRobadaTxt(robo, 'Prueba'))],
     [true, false, 'creep:c9', 'Ladrón', 12, 'creep:c9', 0, 0, null, 0, null, null, [10, 5, 0], [0, 8], 8, 40, 5, 'u1', true]);
+});
+prueba('🌿 Primer tick de una Regeneración (2026-11-03): pasa por el control de cura — con Herida sombría no entra; con Sanguijuela se la lleva el lanzador', () => {
+  const reg = {nombre: 'Regeneración', activo: true, polaridad: 'buff', turnos: 3, hpTurno: 4};
+  const sang = EstadosAplicar.componer({nombre: 'Sanguijuela', chupaDe: 'creep:c9', chupaUid: '', chupaNombre: 'Ladrón'});
+  const herida = [{nombre: 'Herida sombría', activo: true}], chupado = [sang], limpio = [];
+  const dh = Combatiente.dispararAlAplicar(Combatiente.agregarEstado(herida, {...reg}), herida, {hp: 'hpTurno', hpActual: 10, enviarRobo: false});
+  const ds = Combatiente.dispararAlAplicar(Combatiente.agregarEstado(chupado, {...reg}), chupado, {hp: 'hpTurno', hpActual: 10, quien: 'Ana', enviarRobo: false});
+  const dl = Combatiente.dispararAlAplicar(Combatiente.agregarEstado(limpio, {...reg}), limpio, {hp: 'hpTurno', hpActual: 10, enviarRobo: false});
+  const rep = Combatiente.reporteTurno(ds.eventos).join(' | ');
+  igual([dh.hp, Combatiente.reporteTurno(dh.eventos).some(t => /Herida sombría/.test(t)), ds.hp, ds.robo && ds.robo.monto, ds.robo && ds.robo.estado.chupaDe,
+    /se la lleva la Sanguijuela de Ladrón/.test(rep), /\+4 HP/.test(rep), dl.hp],
+    [0, true, 0, 4, 'creep:c9', true, false, 4]);
 });
 prueba('🪱 Sanguijuela de clase (Debuffer, 2026-11-03): la puede aprender un personaje, y si la lanza un personaje la cura robada le entra a su ficha (y a su invocación)', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'debuffer').habilidades.find(h => h.id === 'debuffer-sanguijuela');

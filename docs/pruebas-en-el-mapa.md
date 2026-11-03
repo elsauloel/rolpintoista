@@ -283,6 +283,10 @@
 ## Pendientes
 
 ### ▶ Para la próxima tanda de pruebas en el mapa (2026-11-03)
+- [ ] **🌿 Primer tick de una Regeneración pasa por el control de cura** (2026-11-03): a Prueba Uno con Herida sombría ponerle una Regeneración
+  (poción o «+ Estado») → no se cura nada en el momento y lo dice («Herida sombría: no se cura»). Con una Sanguijuela pegada (de un creep) →
+  la primera cura no le entra a él: el creep lanzador la recibe («Cura robada»; si está lleno, como Vida extra). Lo mismo con un creep portador
+  desde GM Tools.
 
 > Dueño, 2026-11-03: «Todas las cosas de programación que estamos cambiando en este momento y no han sido probadas en el mapa, ponelas pendientes
 > para cuando yo te diga: pasá las pruebas pendientes del mapa.» Se corren todas juntas cuando lo pida, con clics y capturas, en «Claude · pruebas».
@@ -302,7 +306,8 @@
   sale al centro «X se alejó de Prueba Uno con Disparo y repliegue: no permite ataque de oportunidad» con «Entendido» (y no la pregunta de
   oportunidad); la línea queda en la Mesa. Lo mismo con: Hit and run, Bomba de humo, Parpadeo, Salto, la embestida (Takle), Dash (al que atraviesa
   no se le avisa: a ese le pega) y la huida de un robo. Al revés: Prueba Uno con un movimiento libre se aleja de un creep → el aviso le sale al GM.
-  Un rival que ya había usado su oportunidad, uno sin No2 o uno con arco, sin aviso.
+  Sin aviso: un rival sin No2 para pagarla, uno con arco, o uno al que ya se le ofreció la oportunidad por esa misma salida y siguen pegados (no es
+  un límite por ronda ni por turno: el único límite de ataques de oportunidad son los No2 — dueño, 2026-11-03; si se separan y se vuelven a pegar, es otra).
 - [ ] **⚡ Flash de un creep en turno ajeno: 50 % más de cooldown**: una habilidad Flash de cooldown 2 usada en el turno de un jugador queda en 3
   (cd 3 → 4, cd 4 → 6); en su propio turno, normal. La Mesa dice «cuesta más (cooldown X en vez de Y)». Con SP, sigue el doble.
 - [ ] **😤 Provocar de creep con PdG.Esp + su nivel**: el Escudero provoca a Prueba Uno: tira PdG.Esp + nivel contra la Res.Mt; Provocado y Desafiante.

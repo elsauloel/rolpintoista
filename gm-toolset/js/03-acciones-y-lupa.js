@@ -443,7 +443,7 @@ function activarEstadoPresetCreep(preset){
   if(r.que === 'yaLoTiene'){ toast(`${sc.nombre}: ${datos.nombre} ya lo tiene, no se acumula`); return; }
   if(modsAfectanHp(r.estado.mods)) actualizarHpMaxPorCon(sc);
   // Lo que se dispara (veneno, regeneración…) pega apenas se lo ponen (2026-10-06, P161).
-  const dis = Combatiente.dispararAlAplicar(r, sc.estados, {hp: 'hpTurno', resFuego: CreepCalculo.resElemental(sc, 'fuego'), hpActual: sc.hp});
+  const dis = Combatiente.dispararAlAplicar(r, sc.estados, {hp: 'hpTurno', resFuego: CreepCalculo.resElemental(sc, 'fuego'), hpActual: sc.hp, quien: sc.nombre});
   if(dis.hp) sc.hp = Math.max(0, Math.min(num(sc.hpMax) || Infinity, num(sc.hp) + dis.hp));
   renderAll();
   toast(`${sc.nombre}: ${textoEstadoAgregado(r, 'hpTurno')}${dis.hp ? ` · ya ${dis.hp < 0 ? 'sacó' : 'curó'} ${fmt(Math.abs(dis.hp))} HP` : ''}`);

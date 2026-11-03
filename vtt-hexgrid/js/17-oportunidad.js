@@ -96,7 +96,7 @@ function oporNegadaAvisar(t, id, ruta, motivo, excluir){
     const rivales = new Set(rivalesDe(t)), negados = [];
     for(const [rid, r] of tokens){
       if(rid === id || rid === excluir || !rivales.has(r) || r.oculto || r.bajoTierra || etereoDe(r) || !oporRivalVisible(r) || !oporPuede(r)) continue;
-      if(oportunidadUsadas.has(oporClave(id, rid))) continue;   // ya la había usado mientras seguían pegados
+      if(oportunidadUsadas.has(oporClave(id, rid))) continue;   // ya se le ofreció por esta misma salida y siguen pegados (no es un tope por ronda: el único límite son los No2)
       const c = {col: r.col, fila: r.fila};
       if(ruta.some((b, i) => i > 0 && distanciaHex(ruta[i - 1], c) === 1 && distanciaHex(b, c) !== 1)) negados.push([rid, r]);
     }

@@ -256,7 +256,7 @@ const CreepAcciones = (() => {
     const r = Combatiente.agregarEstado(sc.estados, nuevo, sc);
     if(!r.ok) return {estado: null, aviso: `${sc.nombre}: inmune ahora mismo (${r.motivo}) — ${nombre} no hizo efecto`};
     // Lo que se dispara (regeneración, veneno…) pega apenas se lo pone (2026-10-06, P161).
-    const dis = Combatiente.dispararAlAplicar(r, sc.estados, {hp: 'hpTurno', resFuego: C().resElemental(sc, 'fuego'), hpActual: sc.hp});
+    const dis = Combatiente.dispararAlAplicar(r, sc.estados, {hp: 'hpTurno', resFuego: C().resElemental(sc, 'fuego'), hpActual: sc.hp, quien: sc.nombre});
     if(dis.hp) sc.hp = Math.max(0, Math.min(num(sc.hpMax) || Infinity, num(sc.hp) + dis.hp));
     return {estado: r.estado, disparo: dis};
   }

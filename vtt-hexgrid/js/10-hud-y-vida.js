@@ -1536,7 +1536,7 @@ async function abrirEstadoNuevo(t){
     if(r.que === 'yaLoTiene'){ toast(`${quien}: ${nuevo.nombre} ya lo tiene, no se acumula`); return guardar; }
     if(inv && InvCalculo.modsAfectanHp(r.estado.mods)) InvCalculo.actualizarHpMaxPorCon(inv);
     // Lo que se dispara (veneno, regeneración…) pega apenas se lo ponen (2026-10-06, P161).
-    const dis = Combatiente.dispararAlAplicar(r, lista, {hp: 'hpturno', resFuego: num(inv ? InvCalculo.statValor(inv, 'resfuego') : FichaCalculo.calcular(S).final.resfuego), hpActual: inv ? inv.hp : S.hp});
+    const dis = Combatiente.dispararAlAplicar(r, lista, {hp: 'hpturno', resFuego: num(inv ? InvCalculo.statValor(inv, 'resfuego') : FichaCalculo.calcular(S).final.resfuego), hpActual: inv ? inv.hp : S.hp, quien});
     if(dis.hp){ if(inv) inv.hp = Math.max(0, Math.min(num(inv.hpMax) || Infinity, num(inv.hp) + dis.hp)); else mantFijarHp(S, num(S.hp) + dis.hp); }
     toast(`${quien}: ${SelectorEstados.textoAgregado(r, 'hpturno')}${dis.hp ? ` · ya ${dis.hp < 0 ? 'sacó' : 'curó'} ${fmt(Math.abs(dis.hp))} HP` : ''}`);
     return true;
@@ -1563,7 +1563,7 @@ async function abrirEstadoNuevoCreep(t){
       r = Combatiente.agregarEstado(sc.estados, SelectorEstados.estadoCreep(elegido.preset, idEstadoNuevo(), CreepAcciones.FLAGS_ESTADO), sc);   // (sc: el jefe con nombre e id, para el cartel de la Protección de jefe)
       if(r.ok && CreepCalculo.modsAfectanHp(r.estado.mods)) CreepCalculo.actualizarHpMaxPorCon(sc);
       // Lo que se dispara (veneno, regeneración…) pega apenas se lo ponen (2026-10-06, P161).
-      const dis = Combatiente.dispararAlAplicar(r, sc.estados, {hp: 'hpTurno', resFuego: CreepCalculo.resElemental(sc, 'fuego'), hpActual: sc.hp});
+      const dis = Combatiente.dispararAlAplicar(r, sc.estados, {hp: 'hpTurno', resFuego: CreepCalculo.resElemental(sc, 'fuego'), hpActual: sc.hp, quien: sc.nombre});
       if(dis.hp){ sc.hp = Math.max(0, Math.min(num(sc.hpMax) || Infinity, num(sc.hp) + dis.hp)); r.disparo = dis; }
     });
   }catch(err){ console.error('No se pudo poner el estado al creep:', err); toast('No se pudo poner el estado — mirá la consola'); return; }

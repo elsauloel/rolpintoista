@@ -1211,6 +1211,7 @@ function dibujarLienzo(){
   if(dibujarEfectosTeleport()) animando = true;
   if(typeof dibujarEfectosEmerger === 'function' && dibujarEfectosEmerger(z)) animando = true;   // 🕳 la tierra que salta al salir (js/46)
   if(typeof dibujarEfectosRayo === 'function' && dibujarEfectosRayo()) animando = true;
+  if(typeof dibujarEfectosOnda === 'function' && dibujarEfectosOnda(z)) animando = true;   // 💥 la onda del Shockwave (js/94)
   if(typeof dibujarEfectosTransfusion === 'function' && dibujarEfectosTransfusion(z)) animando = true;   // 🩸 el chorro de la Transfusión (js/92)   // la Descarga que salta (js/19)
   if(typeof dibujarEfectosExplosion === 'function' && dibujarEfectosExplosion()) animando = true;
   if(typeof dibujarEfectosRuleta === 'function' && dibujarEfectosRuleta()) animando = true;

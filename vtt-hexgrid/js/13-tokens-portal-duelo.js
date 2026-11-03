@@ -1261,6 +1261,9 @@ function dueloGrupoResuelto(d){
   coleccionAreas().doc(areaId).get().then(doc => {
     if(!doc.exists) return;
     const a = doc.data();
+    // 💫 El Shockwave: sobre quien no la resistió, el golpe y los pajaritos; sobre quien sí, un destello chico (js/94, 2026-11-03).
+    if(a.hab && a.hab.objetivo === 'onda' && typeof ondaFxEs === 'function' && ondaFxEs(a.hab) && d.defensor && d.defensor.tokenId)
+      ondaFxGolpePublicar(d.defensor.tokenId, d.resultado === 'pego' || d.resultado === 'mitad');
     if(a.estado !== 'en-curso' || num(a.indice) !== idx) return;   // ya avanzó por otra vía
     const siguiente = idx + 1, total = (a.objetivos || []).length;
     const reparte = a.hab && a.hab.reparte, quedan = reparte ? (num(reparte.total) || 2) - total : 0;   // los misiles: ¿queda alguno por tirar?
@@ -1551,6 +1554,8 @@ function dueloElegirAreaMapa(msg){
         casteador, hab: Duelo.limpiarHab(habArea), centro: {col: h.col, fila: h.fila, ...(h.cono ? {cono: true, rot: h.rot} : {}), ...(h.linea ? {linea: h.linea} : {})}, radio, objetivos: objetivosArea, duelos: [], indice: 0, estado: 'en-curso',
         creadoPor: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
       });
+      // 💥 La onda del Shockwave, para todas las pantallas (js/94, 2026-11-03).
+      if(hab.objetivo === 'onda' && mio && typeof ondaFxEs === 'function' && ondaFxEs(hab)) ondaFxPublicar(mio.id, radio, `${nombreDe(mio)}: ${String(hab.nombre || 'Shockwave').replace(/^[^\wÁÉÍÓÚáéíóúÑñ]+/, '')}`);
     }catch(err){
       console.error('No se pudo lanzar el hechizo de área:', err);
       toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (areas)' : 'No se pudo lanzar el hechizo de área: ' + String((err && err.message) || err).slice(0, 120));

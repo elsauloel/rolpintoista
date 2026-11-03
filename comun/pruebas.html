@@ -6561,6 +6561,17 @@ prueba('💪 Escudo atado al antebrazo (2026-11-03): no ocupa la mano (dos armas
     [0, 0, 0, 1, false, true, 'Buena Calidad:130:true,Buena Calidad:140:true,Raro:320:true', true,
       35, 10, 8, 'Cortaplumas,Chaleco de cuero,Calzas de cuero flexible', 'Cordón oculto,Hit and run', 'Red de caza', false]);
 });
+prueba('💪 Escudo atado al antebrazo en la ficha (2026-11-03, tanda e): con sable + facón puestos, equipar el brazal entra; un escudo común pide reemplazar; arma a dos manos + brazal entra', () => {
+  const cat = n => structuredClone(CATALOGO_BASE.find(i => i.nombre === n));
+  const armar = (puestos, sueltos) => FichaGuardado.completar(FichaGuardado.normalizar({attrs: {con: 3, fue: 3, agl: 3, des: 3, esp: 3}, nitros: 3,
+    inventario: [...puestos.map((n, k) => ({...cat(n), id: 'p' + k, equipado: true})), ...sueltos.map((n, k) => ({...cat(n), id: 's' + k, equipado: false}))]}).S);
+  const prob = (S, id) => { let lleno = null; FichaEquipo.equipar(S, id, {toast: () => {}, avisarSinNitros: () => {}, modoCombate: () => false, slotLleno: it => { lleno = it.nombre; return true; }, cambio: () => {}});
+    return [lleno, !!S.inventario.find(i => i.id === id).equipado]; };
+  const S1 = armar(['Sable del tahúr', 'Facón de paisano'], ['Brazal de cuero tachonado', 'Escudo de hierro macizo']);
+  const r1 = prob(S1, 's0'), r2 = prob(S1, 's1');
+  const S3 = armar(['Mazo de bombo'], ['Brazal de cuero tachonado']);
+  igual([r1, r2, prob(S3, 's0')], [[null, true], ['Escudo de hierro macizo', false], [null, true]]);
+});
 prueba('✋ Las dos manos de un creep (2026-11-03): ponerse una segunda arma no guarda la otra; 2 manos + escudo atado entran; dos armas + escudo común: hace lugar; varita + talismán', () => {
   const cat = n => structuredClone(CATALOGO_BASE.find(i => i.nombre === n));
   const pza = (it, id, eq) => ({...it, id, equipado: eq});

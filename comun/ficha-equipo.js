@@ -326,7 +326,7 @@ const FichaEquipo = (() => {
       const slotDef = SLOT_DEFS.find(sd => sd.cats.includes(it.tipoItem));
       if(slotDef){
         const usadoSinEste = slots(S).find(s => s.id === slotDef.id)?.usado || 0;
-        const propio = slotDef.peso ? (slotDef.peso[it.tipoItem] || 1) : 1;
+        const propio = pesoEnLugar(slotDef, it);   // 🐞 (2026-11-03, tanda e) el escudo atado al antebrazo ocupa 0: antes equipar lo contaba como 1 y pedía reemplazar
         if(usadoSinEste + propio > slotDef.max){
           if(ui.slotLleno(it)) return true;  // menú: Reemplazar o Comparar
           ui.toast(`No entra: ${slotDef.label} quedaría en ${fmt(usadoSinEste + propio)} / ${fmt(slotDef.max)}`);

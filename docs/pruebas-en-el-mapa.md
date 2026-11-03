@@ -303,7 +303,7 @@
   encienden), polvo y piedritas, una sacudida corta del mapa y la tarjeta en la Crónica. Al resolverse cada resistencia (Res.CC): sobre el que no la
   resistió, un estallido y estrellitas girando sobre la cabeza ~2,6 s; sobre el que la resistió, un destello chico (sin tarjeta). Ver que un creep
   oculto o en sigilo no se delata, que con «reducir movimiento» sale más corta y sin sacudida, y que el zoom y el paneo no la corren.
-- [ ] **💥 Las otras ondas** (2026-11-03, dueño: «aprobada la animación, avanzá con el resto»; `vtt-hexgrid/js/94-onda-fx.js`, variantes en
+- [ ] **💥 Las otras ondas — para que las revise el dueño en el mapa** (2026-11-03, dueño: «anotá en pendientes en el mapa revisar las animaciones»; antes: «aprobada la animación, avanzá con el resto»; `vtt-hexgrid/js/94-onda-fx.js`, variantes en
   `comun/fx-onda.js`): con 2 o 3 rivales pegados (o en el cono), en las pantallas del GM y de un jugador, y que el duelo se abra recién al terminar
   la onda: **Pisotón** de un creep (tierra, sacudida más fuerte, Pajaritos sobre el que no lo resistió) · **Nova arcana** de un creep (violeta,
   chispas, flechitas de empujón sobre el que no la esquivó) · **Sonic Boom** del Tanque y del creep (un abanico blanco hacia donde mira, polvo;

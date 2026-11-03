@@ -43,6 +43,7 @@ async function transfusionAplicar(msg, da, recibe, n){
     await EstadosAplicar.encolarPj({fichaId: da.t.fichaId, duenoUid: da.t.duenoUid, spec: {nombre: 'Transfusión', vida: -n, polaridad: 'debuff', detalle: `Dio ${n} de vida (${msg.nombre}).`}, origen: msg.nombre});
     await EstadosAplicar.encolarPj({fichaId: recibe.t.fichaId, duenoUid: recibe.t.duenoUid, spec: {nombre: 'Transfusión', vida: n, polaridad: 'buff', detalle: `Recibió ${n} de vida (${msg.nombre}).`}, origen: msg.nombre});
     mesaLinea(`🩸 ${msg.nombre}: ${nombreDe(da.t)} le pasa ${n} de vida a ${nombreDe(recibe.t)}`, 'recordatorio');
+    if(typeof transfusionFxPublicar === 'function') transfusionFxPublicar(da.id, recibe.id, `${nombreDe(da.t)} le pasa vida a ${nombreDe(recibe.t)}`, `${msg.nombre}: ${n} de vida`);   // 🩸 la animación, en todas las pantallas (js/92)
   }catch(err){
     console.error('No se pudo hacer la Transfusión:', err);
     mesaLinea(`🩸 ${msg.nombre}: no se pudo aplicar — a mano: ${nombreDe(da.t)} −${n} de vida, ${nombreDe(recibe.t)} +${n}`, 'alerta-roja');
@@ -95,5 +96,6 @@ async function transfusionCreepAplicar(sc, h, da, recibe, n){
   await acCambiarCreep(recibe.t.fichaId, c => { r = CreepAcciones.transfusionRecibir(c, dio, nombreDe(recibe.t)); return {}; });
   const dest = r && r.robo ? r.txt : r && r.recibio > 0 ? `${nombreDe(recibe.t)} +${fmt(r.recibio)}` : `${nombreDe(recibe.t)}: ${(r && r.txt) || 'no recibió'}`;
   mesaLinea(`🩸 ${sc.nombre} usa ${h.nombre}: ${nombreDe(da.t)} da ${fmt(dio)} de vida → ${dest}`, 'recordatorio');
+  if(typeof transfusionFxPublicar === 'function') transfusionFxPublicar(da.id, recibe.id, `${nombreDe(da.t)} le pasa vida a ${nombreDe(recibe.t)}`, `${h.nombre}: ${fmt(dio)} de vida`);   // 🩸 la animación (js/92)
 }
 

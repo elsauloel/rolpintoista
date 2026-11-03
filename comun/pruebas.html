@@ -42,6 +42,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 </script>
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
+<script src="fx-transfusion.js?v=20261103fx"></script>
 <script src="combatiente.js?v=20261103p1"></script>
 <script src="creep-calculo.js?v=20261103t4"></script>
 <script src="creep-botonera.js"></script>
@@ -6473,6 +6474,15 @@ prueba('💧 Pool esencial (2026-11-03): los de Especial como atributo principal
 prueba('🩸 Transfusión sanguínea de creep (2026-11-03): en el pool del Support y también en el del Debuffer', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Transfusión sanguínea');
   igual([e.etiquetas.includes('apoyo'), e.etiquetas.includes('debuffer'), e.etiquetas.includes('support')], [true, true, true]);
+});
+prueba('🩸 La animación de la Transfusión (2026-11-03): el chorro sale y llega justo a cada token, ondula (no es una línea recta) y es igual en todas las pantallas con la misma semilla', () => {
+  const A = {x: 0, y: 0}, B = {x: 300, y: 0}, F = FxTransfusion;
+  const c = F.curva(A, B, 500, 42, 40), c2 = F.curva(A, B, 500, 42, 40), c3 = F.curva(A, B, 900, 42, 40);
+  const desvio = Math.max(...c.map(q => Math.abs(q.y)));
+  const v0 = F.ventana(0), v1 = F.ventana(1), vm = F.ventana(0.5);
+  igual([c.length, c[0].x, c[0].y, c[40].x, Math.round(c[40].y * 1e6), desvio > 10, JSON.stringify(c) === JSON.stringify(c2), JSON.stringify(c) !== JSON.stringify(c3),
+    v0.cabeza, v0.cola, v1.cabeza, v1.cola, vm.cabeza === 1 && vm.cola > 0 && vm.cola < 1, F.gotitas(7, 5).length, JSON.stringify(F.gotitas(7, 5)) === JSON.stringify(F.gotitas(7, 5))],
+    [41, 0, 0, 300, 0, true, true, true, 0, 0, 1, 1, true, 5, true]);
 });
 prueba('🗄 Referencia (2026-11-03): los creeps de fábrica sin auditar salen del pool de campaña y van a «Referencia»', () => {
   const ref = CREEPS_BASE.filter(c => c.pool !== 'esencial' && Biblioteca.sinAuditarDeFabrica(c));

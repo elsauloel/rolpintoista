@@ -1943,3 +1943,4 @@ versión parecida en más de una, es candidato a juntar.
   o «… una incorporación: «X»», con la fecha y «Revisar →» a `datos/auditoria.html?tipo=…&id=…` (abre esa pestaña y esa entrada). Lo del propio dueño
   no cuenta; últimas 10 y «y N más». «✔ Ya lo vi» guarda «visto hasta» **en este navegador** (localStorage `aviso-propuestas-visto`: sin reglas nuevas).
   `armar(entradas, {duenoUid, vistoHasta, max})` es puro (en `pruebas.html`).
+- **`fx-transfusion.js`** (`FxTransfusion`, 2026-11-03) — la geometría de la animación de la Transfusión sanguínea, sin dibujar: `curva(a, b, ms, semilla, n)` (de A a B, arqueada y ondulante, que se mueve con el tiempo y vale 0 en las puntas), `ventana(p)` (qué tramo está en el aire), `grosor`, `gotitas(semilla, n)`, `puntoEn(pts, u)` y `rand(semilla)` (repetible: misma semilla, misma animación en todas las pantallas). La dibuja el mapa (`vtt-hexgrid/js/92-transfusion-fx.js`); probada en `pruebas.html`.

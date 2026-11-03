@@ -283,6 +283,10 @@
 ## Pendientes
 
 ### ▶ Para la próxima tanda de pruebas en el mapa (2026-11-03)
+- [ ] **🩸 La animación de la Transfusión sanguínea** (2026-11-03, `vtt-hexgrid/js/92-transfusion-fx.js`): Prueba Uno (Debuffer de clase) le pasa
+  vida a Prueba Dos → en las TRES pantallas (GM, J1, J2) se ve ~2 s un chorro de sangre ondulante de uno al otro, con gotitas que giran y un
+  salpicón al llegar, y su tarjeta en la Crónica. Lo mismo con la de un creep (GM: Acciones → Transfusión sanguínea, de un creep a otro). Con un
+  creep oculto o en la niebla para los jugadores: ellos no ven el chorro. Con zoom y paneo distintos, el chorro queda pegado a los tokens.
 - [x] ✅ (2026-11-03b, [reporte-pruebas-pendientes-2026-11-03b.md](reporte-pruebas-pendientes-2026-11-03b.md): con Herida no entra; con Sanguijuela se la lleva el lanzador, +5 de Vida extra; el aviso de la poción no dice «Herida sombría: no se cura», solo no cura) **🌿 Primer tick de una Regeneración pasa por el control de cura** (2026-11-03): a Prueba Uno con Herida sombría ponerle una Regeneración
   (poción o «+ Estado») → no se cura nada en el momento y lo dice («Herida sombría: no se cura»). Con una Sanguijuela pegada (de un creep) →
   la primera cura no le entra a él: el creep lanzador la recibe («Cura robada»; si está lleno, como Vida extra). Lo mismo con un creep portador

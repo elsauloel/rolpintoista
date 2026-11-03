@@ -949,6 +949,12 @@ las rodea como a un Sólido. Por un aliado se pasa, pero `rutaSoltada` no deja t
   humo) o una zona con `nubeColor` (js/50; nunca fuego). Lo engancha `escucharElementos` (js/07: el 'removed', y el 'modified' con menos casillas —
   moverla no deja fantasma) y lo dibuja js/05 (`nubesFantasmaDibujar`: las zonas debajo de los tokens, la niebla encima). El fantasma no es del juego:
   no se selecciona, no tapa la vista; solo lo que esa pantalla veía, y nada al cargar el mapa. Probado en «Claude · pruebas» desde Prueba Uno.
+- **🩸 La animación de la Transfusión** (2026-11-03, dueño: «un chorro de sangre que va de uno hacia el otro… gotitas que vayan girando… un
+  líquido flotando en el espacio»): `js/92-transfusion-fx.js` + la geometría en `comun/fx-transfusion.js`. Quien hace la Transfusión (js/45, de
+  jugador o de creep) publica un momento `transfusion` con `{de, a, semilla}`; cada pantalla (js/16 → `transfusionFxRecibido`) lo dibuja ~2,2 s
+  desde js/05 (`dibujarEfectosTransfusion`): un chorro ondulante de grosor variable (halo, cuerpo y brillo), la cabeza que tiembla, gotitas que
+  giran y algunas se sueltan, y un salpicón al llegar. Misma semilla = misma animación en todas. Si uno de los dos tokens no se ve en esa
+  pantalla, no se dibuja. Con «reducir movimiento», más corta y sin gotitas. Queda la tarjeta en la Crónica.
 - **Editar token en ventana emergente** (2026-09-21): "✎ Editar token" ya no usa la barra lateral; abre una ventana centrada (`#editar-token-capa`/`#editar-token-ventana`, mismo estilo que "Nuevo token") que se cierra con Volver, clic en el fondo, clic derecho fuera de un campo o Esc (`cerrarEditarToken`). La barra lateral queda solo con Mantenimiento y Finalizar combate.
 
 - **📏🔮 Visualizador de rango** (2026-09-22): dos botones cuadrados junto a 👓 lentes (`#btn-rango`, `#btn-rango-magico`), para cualquier jugador: muestran, con la misma superficie hexagonal que usan las auras (`dibujarAuraHex`), el área de **Rango** (de Destreza, azul) o **Rango de casteo** (de Especial, violeta) alrededor de **tu propio token** en el mapa. Los números salen de `resumen.rng`/`resumen.rangocasteo`, que la ficha ya calculaba pero no publicaba (`fichaResumen()`). Atajos: **R** prende/apaga el normal, **Shift+R** el mágico (Ctrl+R se descartó: el navegador lo usa para recargar la página). Es local a cada navegador, no se sincroniza ni queda guardado. Por ahora solo para el propio PJ del jugador — no hay botón equivalente para que el GM lo vea en un creep.

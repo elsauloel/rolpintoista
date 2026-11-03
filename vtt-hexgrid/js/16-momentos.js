@@ -99,6 +99,7 @@ function momentoRecibido(id, d){
   if(d.tipo === 'diablito' && typeof diablitoMomento === 'function' && diablitoMomento(id, d)) return;   // 😈 la Botella con un diablito (js/53)   // ▶ Empieza tu turno: al centro de su dueño (js/04)   // 🫳 el robo en sigilo (js/47): solo la víctima y el GM
   if(d.tipo === 'rayo' && d.datos && Array.isArray(d.datos.saltos)) rayoMomento(id, d);
   if(d.tipo === 'desarme' && d.datos && typeof desarmeRuleta === 'function') desarmeRuleta(id, d.datos);
+  if(d.tipo === 'transfusion' && typeof transfusionFxRecibido === 'function') transfusionFxRecibido(id, d);   // 🩸 el chorro de sangre (js/92, 2026-11-03)
   if(d.tipo === 'rodillo') rodilloMomento(id, d);   // 🎰 el rodillo de otro (el Arma elemental al azar, 2026-11-01)
   if(d.tipo === 'mal-de-ojo' && typeof malDeOjoMomento === 'function') malDeOjoMomento(id, d);   // 🧿 volver a tirar y quedarse con la peor (js/60)
   if(d.tipo === 'zona-extra' && typeof zonaExtraMomento === 'function') zonaExtraMomento(id, d);   // 🎲 la tirada extra de una zona, para quien la creó (js/66)   // 🤺 la ruleta de casillas (js/62)

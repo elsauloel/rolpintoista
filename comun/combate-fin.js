@@ -571,6 +571,15 @@ const CombateFin = (() => {
       cuerpo = `${botonGrupo}<div class="reporte-lista">
         <div class="reporte-fila reporte-fila-lista"><span class="reporte-nombre">🗡 Equipo</span><span class="reporte-xp">${eq.length ? esc(eq.map(i => i.nombre).join(', ')) : 'nada'}</span></div>
         <div class="reporte-fila reporte-fila-lista"><span class="reporte-nombre">🧪 Consumibles</span><span class="reporte-xp">${co.length ? esc(co.map(i => i.nombre).join(', ')) : 'nada'}</span></div>
+        ${(() => {   // 💰 Lo que vale el botín publicado (dueño, 2026-11-03: «el valor de cuánto DDE obtendrían looteando o vendiendo todo el botín»)
+          const precio = i => num(i.precioCompra !== undefined ? i.precioCompra : i.template && i.template.precioCompra);
+          const compra = items.reduce((a, i) => a + precio(i), 0);
+          if(!items.length || !compra) return '';
+          const venta = items.reduce((a, i) => a + Math.floor(precio(i) / 2), 0);
+          const desp = items.reduce((a, i) => a + num(K.despojosDePrecio(precio(i))), 0);
+          const n = rp.n || 0, cada = v => n ? ` · ~${fmt(Math.ceil(v / n))} c/u entre ${n}` : '';
+          return `<div class="reporte-fila reporte-fila-lista" title="Lo que vale lo que se publica: comprado en una tienda, vendido en una tienda (la mitad del precio de compra) o, lo que nadie toma, convertido en despojos (un cuarto)"><span class="reporte-nombre">💰 Valor del botín</span><span class="reporte-xp">Si venden todo: <b>~${fmt(venta)} DDE</b>${cada(venta)}<br><span class="hint" style="font-weight:400">si nadie toma nada y se despoja: ~${fmt(desp)} DDE${cada(desp)} · en una tienda costaría ${fmt(compra)} DDE</span></span></div>`;
+        })()}
         ${rp.despojosEquipo ? `<div class="reporte-fila reporte-fila-lista" title="${esc(ocultos(rep, r).map(o => `${o.i.nombre} (${o.i.origen}): ${fmt(o.valor)} despojos`).join('\n'))}"><span class="reporte-nombre">🧰 Equipo que no se ofrece</span><span class="reporte-xp">${esc(ocultos(rep, r).map(o => o.i.nombre).join(', '))} → ${fmt(rp.despojosEquipo)} despojos</span></div>` : ''}
         ${rp.porJugador.map(({j, xp, dde, despojos}) => `<div class="reporte-fila"><span class="reporte-nombre">${esc(j.nombre)}</span><span class="reporte-estado ${j.estado === 'en pie' ? 'escapo' : 'derrotado'}">${esc(j.estado)}</span><span class="reporte-xp">+${fmt(xp)} XP · +${fmt(dde)} DDE${despojos ? ` · +${fmt(despojos)} despojos` : ''}</span></div>`).join('') || '<div class="hint">Nadie cobra: elegí al menos un jugador (paso Doblones).</div>'}
       </div>`;

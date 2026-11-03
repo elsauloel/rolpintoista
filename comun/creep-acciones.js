@@ -796,7 +796,7 @@ const CreepAcciones = (() => {
     if(!c || !p) return '';
     const hechos = [];
     if(num(p.no2) > 0){ c.nitros = num(c.nitros) + num(p.no2); hechos.push(`${fmt(num(p.no2))} No2`); }
-    if(num(p.sp) > 0){ c.sp = Math.min(C().spMax(c), C().spActual(c) + num(p.sp)); hechos.push(`${fmt(num(p.sp))} SP`); }
+    if(num(p.sp) > 0 && C().modoSP(c)){ c.sp = Math.min(C().spMax(c), C().spActual(c) + num(p.sp)); hechos.push(`${fmt(num(p.sp))} SP`); }   // (con turnos de espera no hay SP que devolver: 2026-11-03)
     if(num(p.hp) > 0){ c.hp = num(c.hp) + num(p.hp); hechos.push(`${fmt(num(p.hp))} de vida`); }
     const h = (c.habilidades || []).find(x => x && x.id === p.habId);
     if(h && num(p.cd) >= 0 && num(h.cdActual) !== num(p.cd)){ h.cdActual = num(p.cd); hechos.push('el cooldown'); }

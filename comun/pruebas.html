@@ -48,7 +48,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="combatiente.js?v=20261103m2"></script>
 <script src="creep-calculo.js?v=20261103t20"></script>
 <script src="creep-botonera.js"></script>
-<script src="creep-acciones.js?v=20261103t20"></script>
+<script src="creep-acciones.js?v=20261103tf1"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
@@ -4451,6 +4451,11 @@ prueba('↩ P233 (2026-10-29): una habilidad de creep cancelada que no cuenta de
   sc.sp = 3;
   const txt = CreepAcciones.devolverHab(sc, {habId: 'h1', no2: 4, sp: 2, hp: 0, cd: 0});
   igual([num(sc.nitros), CreepCalculo.spActual(sc), sc.habilidades[0].cdActual, /4 No2/.test(txt) && /2 SP/.test(txt) && /cooldown/.test(txt)], [5, 5, 0, true]);
+});
+prueba('↩ (2026-11-03) un creep con turnos de espera que cancela una habilidad: no se le «devuelve SP» (no juega con SP), sí los No2 y la espera', () => {
+  const sc = creepPrueba({nivel: 2, nitros: 1, habilidades: [{id: 'h1', nombre: 'Takle', cd: 3, cdActual: 4}]});
+  const txt = CreepAcciones.devolverHab(sc, {habId: 'h1', no2: 2, sp: 6, hp: 0, cd: 0});
+  igual([num(sc.nitros), sc.sp === undefined, sc.habilidades[0].cdActual, /SP/.test(txt), /2 No2/.test(txt)], [3, true, 0, false, true]);
 });
 prueba('💧 Sin SP suficiente (2026-10-29): la habilidad del personaje se marca (pero se deja usar)', () => {
   const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;

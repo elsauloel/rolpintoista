@@ -46,10 +46,15 @@ const rutaTokenId = t => { for(const [id, x] of tokens) if(x === t) return id; r
 // ¿Le alcanzan los No2? (lo público; sin el dato, sí: mejor preguntar que perderlo)
 // Expuesto (Degollar, 2026-10-10): no reacciona con No2 — lo publica su resumen (un creep, `expuesto`; un personaje o invocación, en sus estados).
 const expuestoPub = rs => !!(rs && (rs.expuesto || (rs.estados || []).some(e => e && e.expuesto)));
+// 🪑 No puede atacar (2026-11-03, dueño: el aviso de oportunidad negada le salía a un rival Sentado): Sentado, Stun o Sueño, caído o muerto. Vale
+// para la oportunidad y para su aviso (oporNegadaAvisar): si no hubiera podido atacar, no se lo frena ni se le avisa.
+const oporNoPuedeAtacarPub = rs => !!rs && (!!rs.muerto || (rs.hp !== undefined && rs.hp !== null && num(rs.hp) <= 0)
+  || (Array.isArray(rs.estados) && (rs.estados.some(e => e && /^sentado$/i.test(String(e.nombre || '').trim())) || Combatiente.stuneado(rs.estados))));
 function oporPuede(r){
   const v = vinculo(r), rs = v && v.resumen;
   if(!rs) return true;
   if(expuestoPub(rs)) return false;
+  if(oporNoPuedeAtacarPub(rs)) return false;
   if(rs.sinOpor) return false;   // solo tiene un arco: con el arco no hay oportunidad (2026-10-09)
   if(r.tipo === 'creep') return rs.opor !== false;
   if(rs.oporCosto === undefined || rs.nitros === undefined || rs.nitros === null) return true;

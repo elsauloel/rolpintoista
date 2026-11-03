@@ -743,7 +743,9 @@ async function acEjecutarHab(sc, habId){
     if(!p) return;
     { const c = p.creep, hh = (c.habilidades || []).find(x => x.id === habId), cdNuevo = num(hh && hh.cdActual);
       ac.devolucion = {creepId: id, habId, habNombre: h.nombre || 'la habilidad', creep: sc.nombre || 'El creep', cd: antes.cd,
-        cdTxt: cdNuevo !== antes.cd ? 'el cooldown' : '', sp: Math.max(0, antes.sp - CreepCalculo.spActual(c)), nitros: Math.max(0, antes.nitros - num(c.nitros))};
+        cdTxt: cdNuevo !== antes.cd ? 'el cooldown' : '',
+        // (2026-11-03, tanda f: un creep con turnos de espera decía «se le devuelve 6 SP»: spActual sin SP guardado da el máximo y cambiaba al recalcular) — SP solo en modo SP.
+        sp: CreepCalculo.modoSP(c) ? Math.max(0, antes.sp - CreepCalculo.spActual(c)) : 0, nitros: Math.max(0, antes.nitros - num(c.nitros))};
       // ↩ Lo que cobró, para el duelo que arme (P233): si se cancela y no cuenta, se devuelve.
       if(typeof Duelo !== 'undefined' && Duelo.pagoHab) Duelo.pagoHab(id, {habId, nombre: h.nombre || '', no2: ac.devolucion.nitros, sp: ac.devolucion.sp, hp: num(p.costoHp), cd: cdNuevo !== antes.cd ? antes.cd : -1}); }
     if(p.aviso) toast(p.aviso);

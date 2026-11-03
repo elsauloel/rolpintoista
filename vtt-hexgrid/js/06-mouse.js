@@ -652,6 +652,16 @@ function rutaSoltada(a, t){
     const libre = dodgeLibreDe(a.id);   // 🪵 el dodge roll de Tronco de huída: se cierra al moverse
     const dodgeArco = libre && dodgeBanner.arco ? {...dodgeBanner} : null;
     const alejarseGratis = libre && dodgeBanner.alejarse ? num(dodgeBanner.alejarse) : 0;
+    // 💨 (2026-11-03, tanda f: si se arrastraba de más y no alcanzaban los No2, el cartel del movimiento libre se cerraba y se perdían los casilleros
+    // gratis) — un movimiento libre de N casilleros que no alcanza: no se mueve, el cartel sigue abierto y se puede volver a intentar más corto.
+    if(alejarseGratis > 0 && a.costo){
+      const c0 = costoRuta(a.ruta, a.costo.porCasillero, pasos, num(a.costo.gratis) + alejarseGratis, a.costo.recargo, a.costo.levita, a.costo.ext, a.costo.sprint, a.costo.miedo);
+      if(c0 > Math.max(0, num(a.costo.disponibles))){
+        visibles.delete(a.id); pedirDibujo();
+        toast(`💨 Te pasaste: ${alejarseGratis} casillero${alejarseGratis === 1 ? '' : 's'} son gratis y lo demás cuesta ${fmt(c0)} No2 (tenés ${fmt(Math.max(0, num(a.costo.disponibles)))}). Probá más corto: el cartel sigue abierto.`);
+        return;
+      }
+    }
     const alMoverAntes = libre && dodgeBanner.antes && typeof dodgeBanner.alMover === 'function' ? dodgeBanner.alMover : null;   // 💨 Disparo y repliegue (js/57): después de moverse, el disparo   // 💨 Picar y alejarse (js/57): los primeros N, gratis   // 🏹 Parry a distancia con arco: el dodge roll que habilita el contraataque
     const oportunidad = oportunidadEvaluarRuta(t, a.ruta);
     if(libre && typeof oporNegadaAvisar === 'function') oporNegadaAvisar(t, a.id, a.ruta, dodgeBanner.motivo);   // 💨 a quien se le niega la oportunidad, el aviso (js/17)

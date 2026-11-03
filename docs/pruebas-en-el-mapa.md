@@ -283,6 +283,13 @@
 ## Pendientes
 
 ### ▶ Para la próxima tanda de pruebas en el mapa (2026-11-03)
+- [x] **⌨ Atajos de las habilidades y los consumibles** (2026-11-03, probado con clics por Claude en «Claude · pruebas», mapa «Clon origen»
+  mirado por el GM, capturas `hotkeys-*` en /home/user/capturas): creep (Goblin picapiedras) → asignar 3 a Piel de hierro y ⇧1 a la Poción de
+  Piel de Cristal, el 3 movido a Provocar se le saca a Piel de hierro, el 3 con el token seleccionado pregunta «¿Ejecutar Piel de hierro?» y con
+  Enter la ejecuta (−4 SP, −1 No2), Shift+1 usa la poción, el 4 avisa «no tiene nada asignado», Esc no hace nada, escribiendo en la Tirada libre
+  el 3 se escribe; personaje (Prueba Dos con el control del GM) → asignar 3 y ⇧1, queda guardado en la ficha (Firestore), el 3 anuncia la
+  habilidad y Shift+1 consume la poción. Todo restaurado.
+- [ ] **⌨ Atajos: falta** un jugador de verdad (no el GM con el control) en su token del mapa publicado, y con la Botonera abierta.
 - [ ] **❤ Una sola Vida extra** (2026-11-03, P239): el Maldito lleno con la Sanguijuela pegada a un personaje; el personaje toma una Poción de HP y
   después una de Regeneración menor → el Maldito queda con **un solo** «Vida extra 30» (no 25 y 5), en el token, la ficha lite, GM Tools y la Mesa.
   Un personaje con el Relicario de sangre que ya tiene Vida extra y se cura de más → suma a la misma. Un personaje con dos «Vida extra» guardadas de

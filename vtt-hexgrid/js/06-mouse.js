@@ -101,7 +101,7 @@ lienzo.addEventListener('pointerdown', e => {
       if(rutaPendiente){
         // Ese clic confirmó el movimiento marcado: no empieza otro arrastre.
       }else if(costo && costo.porCasillero <= 0){
-        toast('No te podés mover ahora (Inmovilizado)');
+        toast('No te podés mover ahora (Inmovilizado o Tropezado: este turno no se mueve; si hace falta, el GM lo mueve con 🦶 Mover libre, tecla M)');
       }else{
         const v = visibles.get(id) || hexCentro(t.col, t.fila);
         arrastre = {id, x: v.x, y: v.y, dx: v.x - m.x, dy: v.y - m.y, inicioX: px, inicioY: py, movio: false,

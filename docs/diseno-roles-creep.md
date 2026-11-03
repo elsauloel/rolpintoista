@@ -639,7 +639,10 @@ Las invocaciones, igual (confirmado por el dueño).
   le pegan abrojos a los pies»): flor de 7 (fuera de la vista de los rivales; la dispara pisar cualquiera de las 7, alcanza a todos los de encima);
   **2d6+2 menos su Defensa**; **Rengo 2 turnos aunque la armadura pare el daño** (no pide lastimar); Res.CC contra la Destreza del creep, solo contra el
   Rengo; **quedan 3 turnos** y cada paso sobre ellos renueva el Rengo sin tirar (`renuevaPaso`, como la Brea). 2 No2 y 2 SP, o cooldown 3.
-- 🗡 **L3. Cordón oculto** — **definida** (dueño, 2026-10-27: «que se llame cordón oculto… al pisarlo se mueve uno para adelante y cae sentado. No se hace
+- 🗡 **L3. Cordón oculto** — **cambiada el 2026-11-03** (dueño: «si cae en la trampa, se tropieza, avanza un casillero y tira Agilidad… si gana, cae parado
+  y no pasa nada; si pierde, queda sentado y no se puede mover más… se puede parar si quiere, pero tiene que usar el resto de los nitros en ese lugar»):
+  avanza siempre y después la Agilidad contra la Destreza de quien lo puso (con el mínimo de una trampa comprada); si pierde, Sentado + **Tropezado**
+  (no se mueve más en ese turno; solo si lo pisó en su propio turno). Lo de abajo es la versión anterior. **Definida** (dueño, 2026-10-27: «que se llame cordón oculto… al pisarlo se mueve uno para adelante y cae sentado. No se hace
   daño. Y tiene que tirar agilidad para no caer sentado… si pierde, cae del otro lado de la trampa en la misma dirección en la que venía caminando y queda
   sentado. Tiene que ser barata porque el efecto es leve. Un nitro, un SP. Podemos ponerle 2 SP igual»): línea de 3 (fuera de la vista de los rivales);
   al pisarla tira **Agilidad** (contra la Destreza del creep, como las demás); si pierde, **avanza 1 casilla en la dirección en que venía** (cae del otro

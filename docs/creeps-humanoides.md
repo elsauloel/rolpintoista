@@ -526,7 +526,7 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   35, 8** · nv2 11/8/8/7/2 → 40, 8 · nv3 12/9/8/8/2 → 40, 9 · nv4 13/9/9/9/2 → 45, 9 · nv5 14/10/10/9/2 → 50, 10.
   | Nivel | Habilidad nueva | Pasiva | Equipo |
   |---|---|---|---|
-  | 1 | **Cordón oculto** (rápida) · **Hit and run** (lenta; también el Envenenador nv4) | — | **Cortaplumas** (Tipo 4, +1 daño, Ini +2) · 2 Comunes livianas |
+  | 1 | **Cordón oculto** (rápida; desde el 2026-11-03: tropieza y avanza una, Agilidad contra su Destreza, si pierde Sentado y sin moverse el resto del turno) · **Hit and run** (lenta; también el Envenenador nv4) | — | **Cortaplumas** (Tipo 4, +1 daño, Ini +2) · 2 Comunes livianas |
   | 2 | **Tajo veloz** (también Envenenador nv2 y Asesino nv4) | **Pies ligeros** | + 2 Comunes |
   | 3 | **Abrojos** | — | el arma, de Buena |
   | 4 | **Polvo cegador** | **Puntería** | + una Buena |

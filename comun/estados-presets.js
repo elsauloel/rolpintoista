@@ -213,6 +213,10 @@ const ESTADOS_PRESET = [
     detalle:'Una maldición le ablanda la armadura: −2 a su Defensa y −2 a su Defensa especial durante 3 turnos, contra todos. Si se la vuelven a poner, no se suma: vuelve a durar 3 turnos. ⚙ Automatizado.'},
   {nombre:'Expuesto', polaridad:'debuff', turnos:1, expuesto:true, mitadEva:true, alEmpezarTurno:true,
     detalle:'Quedó al descubierto: hasta que empieza su próximo turno, su Evasión se parte a la mitad (al resultado, para abajo) y no puede reaccionar con nada que cueste No2: ni Parry (y por lo tanto ni Bloqueo ni contraataque), ni ataque de oportunidad, ni dodge roll. ⚙ Automatizado: la Evasión, las defensas del duelo, la oportunidad y el dodge roll.'},
+  // 🪢 Tropezado (dueño, 2026-11-03, el Cordón oculto): no puede moverse más en este turno; puede levantarse y usar el resto de sus No2 ahí mismo.
+  // Es un Inmovilizado que se va solo al terminar su turno (`alTerminarTurno`, como el Acelerado).
+  {nombre:'Tropezado', polaridad:'debuff', turnos:1, inmovilizado:true, alTerminarTurno:true, mods:[],
+    detalle:'Tropezó con un cordón: no puede moverse más en este turno. Puede levantarse (si quedó Sentado) y usar el resto de sus No2 en ese lugar (atacar, habilidades, consumibles). Se va solo al terminar su turno.'},
   {nombre:'Sentado', polaridad:'debuff', permanente:true, turnos:0, sentado:true, esCC:true,
     detalle:'Está en el piso: su Evasión se parte a la mitad (al resultado de la tirada, redondeado hacia abajo), no puede atacar y no puede hacer dodge roll (✋ a mano). No vence solo: levantarse cuesta 1 No2 (botón Levantarse de la Botonera o de las Acciones del creep).'},
   // Desarmado (dueño, 2026-10-07, la Varita del manotazo): el arma cae al piso. Desde el 2026-10-22 no queda como estado (Combatiente.agregarEstado):

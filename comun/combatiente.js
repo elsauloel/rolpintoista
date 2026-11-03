@@ -2062,7 +2062,7 @@ const Combatiente = (() => {
       ['salvacion', 'soltar'].forEach(k => {
         if(!t[k] || !t[k].difStat) return;
         const d = Number(valorDe(t[k].difStat));
-        if(Number.isFinite(d)) out[k] = {...t[k], dif: Math.max(1, Math.round(n(t[k].difMin)), Math.round(d) + Math.round(n(t[k].difMas)))};   // `difMas`: + N (la trampa portal Buena: tu Ef.Esp + 2)
+        if(Number.isFinite(d)) out[k] = {...t[k], dif: Math.max(1, Math.round(n(t[k].difMin)), k === 'salvacion' ? Math.round(n(t.detectarMin)) : 0, Math.round(d) + Math.round(n(t[k].difMas)))};   // + el mínimo de una trampa comprada (por su calidad) también para la tirada que la evita (dueño, 2026-11-03: «la Destreza de quien la coloca, con un mínimo para las trampas compradas»)   // `difMas`: + N (la trampa portal Buena: tu Ef.Esp + 2)
       });
       // La zona que deja, con la misma dificultad (los Abrojos, 2026-10-27): `zonaResistDifStat` = de qué stat de quien la pone sale.
       if(t.zonaResistDifStat){ const d = Number(valorDe(t.zonaResistDifStat)); if(Number.isFinite(d)) out.zonaResistValor = Math.max(1, Math.round(d)); }
@@ -2416,6 +2416,13 @@ const Combatiente = (() => {
       if(h && h.nombre === 'Empuje' && h.duelo && typeof h.duelo === 'object' && Array.isArray(h.duelo.efectos) && h.duelo.efectos.some(e => e && e.nombre === 'Empower')){
         h.nombre = 'Potencia';
         if(typeof h.detalle === 'string') h.detalle = h.detalle.replace('Otro Empuje antes', 'Otra Potencia antes');
+        cambio = true;
+      }
+      // 🪢 El Cordón oculto nuevo (dueño, 2026-11-03): avanza siempre y tira Agilidad; si gana, cae parado; si pierde, Sentado y Tropezado.
+      if(h && h.nombre === 'Cordón oculto' && h.trampaColocar && typeof h.trampaColocar === 'object' && !(h.trampaColocar.salvacion && h.trampaColocar.salvacion.logra)){
+        h.detalle = 'Tiende un cordón a ras del piso, una línea de 4 casillas dentro de su Rango y fuera de la vista de los rivales (solo lo disparan sus rivales). El que lo pisa tropieza: avanza una casilla en la dirección en que venía (si hay lugar) y tira Agilidad contra la Destreza del pícaro. Si gana, cae parado y no pasa nada. Si pierde, queda Sentado y Tropezado: no puede moverse más en este turno (puede levantarse y usar el resto de sus No2 ahí mismo). No hace daño. Se detecta con Percepción contra su Destreza.';
+        h.ataqueTxt = 'un cordón de 4 casillas: el que lo pisa avanza una casilla y tira Agilidad contra su Destreza; si pierde, Sentado y sin moverse el resto del turno';
+        if(h.trampaColocar.salvacion) h.trampaColocar.salvacion = {...h.trampaColocar.salvacion, logra: 'cae parado'};
         cambio = true;
       }
       // 😮‍💨 Robar el aliento saca 1 No2 + la diferencia (dueño, 2026-11-03; antes 2 + la diferencia): la guardada se pone al día.

@@ -505,7 +505,23 @@ async function trampaPasoEmpuje(id, dt){
 }
 
 // 1 · Para esquivarla: la víctima tira su stat; recién con los dados quietos se anuncia.
+/* 🪢 El tropezón del Cordón oculto (2026-10-27; desde el 2026-11-03, dueño: «se tropieza, avanza un casillero y tira Agilidad»): cae una casilla más
+   allá, en la dirección en que venía, si está libre (sin token ni Sólido ni pared en el medio); si no, se queda donde está. → el texto. */
+async function trampaCaerAdelante(dt){
+  const x = tokens.get(dt.tokenId), c = dt.adelante;
+  if(!x || !c) return '';
+  const libre = !elementoSolidoEn(c.col, c.fila) && ![...tokens.values()].some(y => y !== x && y.col === c.col && y.fila === c.fila && !y.bajoTierra)
+    && !(typeof paredCorta === 'function' && paredCorta({col: x.col, fila: x.fila}, c));
+  if(!libre) return ' · tropieza, pero no hay lugar adelante: se queda donde está';
+  try{ await coleccionTokens().doc(dt.tokenId).update({col: c.col, fila: c.fila, ruta: firebase.firestore.FieldValue.delete()}); return ' · tropieza y avanza una casilla'; }
+  catch(err){ console.error('Cordón oculto: no se pudo mover', err); return ' · tropieza (corrélo una casilla a mano)'; }
+}
 async function trampaPasoSalva(id, dt){
+  // 🪢 El Cordón oculto: primero el tropezón (avanza una casilla), después la Agilidad.
+  if(dt.adelante && !dt.cayo){
+    const cayo = await trampaCaerAdelante(dt);
+    dt = {...dt, cayo: true, pasos: [...(dt.pasos || []), {titulo: 'Tropieza', texto: (cayo || ' · tropieza').replace(/^ · /, '')}]};
+  }
   const s = dt.salva, etq = trampaEtq(s), x = tokens.get(dt.tokenId);
   const estados = !x ? [] : x.tipo === 'creep' ? ((creepPrivadoDe(x.fichaId) || {}).estados || []) : (((fichasPub.get(String(x.fichaId).split(SEP_INVOCACION)[0]) || {}).resumen || {}).estados || []);
   const rd = x ? Combatiente.tirarStat(trampaValorStat(x, s.stat), estados, s.stat) : null;
@@ -660,17 +676,9 @@ async function trampaPasoInfo(id, dt){
 async function trampaPasoEstado(id, dt){
   const spec = trampaSpec(dt), x = tokens.get(dt.tokenId);
   let que = ' — aplicalo a mano', inmune = '', cayo = '';
-  // 🪢 El Cordón oculto (2026-10-27, dueño: «cae del otro lado de la trampa en la misma dirección en la que venía caminando y queda sentado»): antes de
-  // quedar Sentado, cae una casilla más allá, si está libre (sin token ni Sólido ni pared en el medio); si no, cae donde está.
-  if(dt.adelante && x){
-    const c = dt.adelante;
-    const libre = !elementoSolidoEn(c.col, c.fila) && ![...tokens.values()].some(y => y !== x && y.col === c.col && y.fila === c.fila && !y.bajoTierra)
-      && !(typeof paredCorta === 'function' && paredCorta({col: x.col, fila: x.fila}, c));
-    if(libre){
-      try{ await coleccionTokens().doc(dt.tokenId).update({col: c.col, fila: c.fila, ruta: firebase.firestore.FieldValue.delete()}); cayo = ' · tropieza y cae una casilla más allá'; }
-      catch(err){ console.error('Cordón oculto: no se pudo mover', err); cayo = ' · tropieza (corrélo una casilla a mano)'; }
-    }else cayo = ' · tropieza, pero no hay lugar adelante: cae donde está';
-  }
+  // 🪢 El Cordón oculto: el tropezón (una casilla más allá) ya pasó al empezar (trampaCaerAdelante, en el paso de la Agilidad); si no hubo
+  // tirada, pasa acá.
+  if(dt.adelante && x && !dt.cayo) cayo = await trampaCaerAdelante(dt);
   try{
     if(spec && x && x.tipo === 'creep' && x.fichaId && soyGM){
       await modificarCreep(x.fichaId, sc => { const r = EstadosAplicar.aplicarACreep(sc, spec); if(!r.ok) inmune = r.motivo || 'inmune'; });
@@ -680,6 +688,19 @@ async function trampaPasoEstado(id, dt){
       que = '';
     }
   }catch(err){ console.error('No se pudo aplicar el estado de la trampa:', err); }
+  // 🪢 Tropezado (dueño, 2026-11-03): el que perdió la Agilidad del Cordón no se mueve más en este turno (puede levantarse y usar el resto de sus
+  // No2 ahí). Solo si lo pisó en su propio turno; fuera de su turno (empujado, en el turno de otro) o sin orden de turnos, queda solo Sentado.
+  if(dt.adelante && x && !inmune){
+    const suyo = typeof esSuTurno === 'function' && esSuTurno(dt.tokenId) === true;
+    if(suyo){
+      const tr = {nombre: 'Tropezado'};
+      try{
+        if(x.tipo === 'creep' && x.fichaId && soyGM) await modificarCreep(x.fichaId, sc => { EstadosAplicar.aplicarACreep(sc, tr); });
+        else if(x.tipo === 'pj' && x.fichaId && x.duenoUid) await EstadosAplicar.encolarPj({fichaId: x.fichaId, duenoUid: x.duenoUid, spec: tr, origen: dt.nombreT});
+        cayo += ' · Tropezado: no se mueve más en este turno (puede levantarse y usar el resto de sus No2 ahí)';
+      }catch(err){ console.error('No se pudo poner Tropezado:', err); cayo += ' · no se mueve más en este turno (ponele Tropezado a mano)'; }
+    }else cayo += ' · fuera de su turno: solo Sentado';
+  }
   let texto = `${spec ? EstadosAplicar.texto(spec) : 'un estado'}${que}${cayo}`;
   const suelta = spec && !inmune ? Combatiente.textoSoltarse(spec) : '';
   if(suelta) texto += ` · Para salir, ${dt.creep ? 'en sus Acciones' : 'en la Botonera'}: ${suelta}`;

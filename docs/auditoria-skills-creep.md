@@ -180,6 +180,9 @@
   con su arma con **+2 dados** (la Defensa se resta una vez); **los efectos al golpear del arma se tiran tres veces** y **su Perfora vale en cada corte** (dueño: «perfora
   cada uno de los tres golpes»: con Perfora 1, cada corte asegura 1 que pasa la Defensa, así que pasan al menos 3). Lo de un ataque y **3 SP**, o cooldown 3. (Se descartó: tres duelos seguidos, con tres Evasiones.) **Para probar.**
 
+- ✅ **Cordón oculto, cambiado** (2026-11-03, dueño): tropieza, avanza una casilla y tira Agilidad contra la Destreza (mínimo de una comprada); si gana,
+  cae parado; si pierde, Sentado y Tropezado (no se mueve más en ese turno, si fue en el suyo). Las guardadas se ponen al día solas.
+
 ### Rango (desde el 2026-10-21)
 
 - ✅ **Vigilancia** (2026-10-21, dueño; una sola para bestias y humanoides, y sumada al **Shooter** como habilidad de clase): 1 No2 y 2 SP (o cooldown 3);

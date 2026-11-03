@@ -484,10 +484,13 @@
       detectarStat: 'des', salvacion: {stat: 'rescc', etq: 'Res.CC', dif: 7, que: 'efecto', difStat: 'des'}}});
   // 🗡 Cordón oculto: «al pisarlo se mueve uno para adelante y cae sentado. No se hace daño. Y tiene que tirar agilidad»; «3 SP y el largo… de 4»; y cómo se
   // ve: el cordón entre dos estacas, tenso (vtt-hexgrid/js/79).
-  H('Cordón oculto', 'K', 'hd', 'e', 2, {detalle: 'Tiende un cordón a ras del piso, una línea de 4 casillas dentro de su Rango y fuera de la vista de los rivales. Al pisarlo tira Agilidad contra la Destreza del pícaro: si pierde, tropieza, cae una casilla más allá en la dirección en que venía y queda Sentado. No hace daño. Se detecta con Percepción contra su Destreza.',
-    no2: 1, spCosto: 3, auditada: true, ataqueTxt: 'un cordón de 4 casillas: Agilidad contra su Destreza o cae una casilla más allá, Sentado',
+  // 🪢 (dueño, 2026-11-03: «si cae en la trampa, se tropieza, avanza un casillero y tira Agilidad… si gana, cae parado y no pasa nada; si pierde,
+  // queda Sentado y no se puede mover más… se puede parar, pero tiene que usar el resto de los nitros en ese lugar»): avanza siempre (antes de la
+  // tirada, js/19) y, si pierde, además de Sentado queda Tropezado (Inmovilizado hasta terminar su turno; solo si lo pisó en su propio turno).
+  H('Cordón oculto', 'K', 'hd', 'e', 2, {detalle: 'Tiende un cordón a ras del piso, una línea de 4 casillas dentro de su Rango y fuera de la vista de los rivales (solo lo disparan sus rivales). El que lo pisa tropieza: avanza una casilla en la dirección en que venía (si hay lugar) y tira Agilidad contra la Destreza del pícaro. Si gana, cae parado y no pasa nada. Si pierde, queda Sentado y Tropezado: no puede moverse más en este turno (puede levantarse y usar el resto de sus No2 ahí mismo). No hace daño. Se detecta con Percepción contra su Destreza.',
+    no2: 1, spCosto: 3, auditada: true, ataqueTxt: 'un cordón de 4 casillas: el que lo pisa avanza una casilla y tira Agilidad contra su Destreza; si pierde, Sentado y sin moverse el resto del turno',
     trampaColocar: {nombre: 'Cordón oculto', tipo: 'linea', tamano: 4, color: '#E8DDC2', alfa: 40, efecto: {area: 'pisador'}, estado: 'Sentado', amiga: true, altura: 'piso', adelante: true, visual: 'cordon',
-      detectarStat: 'des', salvacion: {stat: 'agl', etq: 'Agilidad', dif: 7, que: 'efecto', difStat: 'des'}}});
+      detectarStat: 'des', salvacion: {stat: 'agl', etq: 'Agilidad', dif: 7, que: 'efecto', difStat: 'des', logra: 'cae parado'}}});
   // 🗡 Polvo cegador: «va bien».
   H('Polvo cegador', 'K', 'hd', 'e', 3, {detalle: 'Esconde una bolsita de polvo (pimienta, ceniza) en una casilla, dentro de su Rango y fuera de la vista de los rivales. Al pisarla, el polvo se levanta en las 7 casillas de alrededor: Ceguera 1 turno a todos los de adentro (ven solo a 2 casillas, su Probabilidad de Golpe y su Probabilidad de Golpe especial a la mitad), que se resiste con Res.CC contra la Destreza del pícaro. Sin daño. Se detecta con Percepción contra su Destreza.',
     no2: 1, spCosto: 2, auditada: true, ataqueTxt: 'polvo en las 7 casillas: Ceguera 1 turno (Res.CC contra su Destreza)',

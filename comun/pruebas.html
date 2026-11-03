@@ -44,14 +44,14 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="critico.js"></script>
 <script src="fx-transfusion.js?v=20261103fx2"></script>
 <script src="fx-onda.js?v=20261103onda2"></script>
-<script src="combatiente.js?v=20261103t20"></script>
+<script src="combatiente.js?v=20261103t14"></script>
 <script src="creep-calculo.js?v=20261103t20"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261103t20"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
-<script src="estados-presets.js?v=20261103t13"></script>
+<script src="estados-presets.js?v=20261103t14"></script>
 <script src="estados-aplicar.js?v=20261103t12"></script>
 <script src="recibidos.js?v=20261103ve"></script>
 <script src="tokens-auto.js"></script>
@@ -116,7 +116,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="pasivas.js"></script>
 <script src="skills-clase.js?v=20261103t12"></script>
 <script src="creeps-base.js"></script>
-<script src="skills-creep-base.js?v=20261103t13"></script>
+<script src="skills-creep-base.js?v=20261103t14"></script>
 <script src="creeps-esenciales.js?v=20261103t13"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -6681,6 +6681,19 @@ prueba('🪤 Las 8 trampas de creep (2026-10-27): en el catálogo, auditadas, co
   igual([mal, red.salvacion.dif, red.soltar.dif, red.detectar, cepo.soltar.hiere, cepo.soltar.dif, abr.zonaResistValor, cor.salvacion.stat, cor.salvacion.dif, cor.tamano, cor.adelante, cor.visual,
     !!trp('Cebo').cebo, trp('Cebo').cebo.radio, HABILIDADES_CREEP_BASE.filter(x => x.nombre === 'Cebo').length],
     [[], 11, 11, 11, '1d6', 11, 11, 'agl', 11, 4, true, 'cordon', true, 4, 1]);
+});
+prueba('🪢 Cordón oculto nuevo (2026-11-03): Agilidad contra la Destreza (con el mínimo de una comprada); si gana, cae parado; si pierde, Sentado + Tropezado, que no deja moverse y se va al terminar su turno', () => {
+  const cor = Combatiente.trampaDeHab(trp('Cordón oculto', 1), st => ({des: 6})[st] || 0);
+  const comprada = Combatiente.trampaDeHab({nombre: 'X', trampaColocar: {...trp('Cordón oculto', 1).trampaColocar, detectarMin: 9}}, st => ({des: 6})[st] || 0);
+  const alta = Combatiente.trampaDeHab({nombre: 'X', trampaColocar: {...trp('Cordón oculto', 1).trampaColocar, detectarMin: 9}}, st => ({des: 12})[st] || 0);
+  const tr = ESTADOS_PRESET.find(x => x.nombre === 'Tropezado');
+  const est = [{...tr, activo: true}, {nombre: 'Sentado', sentado: true, permanente: true, activo: true}];
+  const fin = Combatiente.terminarTurnoEstados(est);
+  const vieja = {...trp('Cordón oculto', 1), detalle: 'viejo', trampaColocar: {...trp('Cordón oculto', 1).trampaColocar, salvacion: {stat: 'agl', dif: 7, que: 'efecto', difStat: 'des'}}};
+  const habs = [vieja]; Combatiente.migrarLuzSanadora(habs);
+  igual([cor.salvacion.stat, cor.salvacion.dif, cor.salvacion.logra, comprada.salvacion.dif, alta.salvacion.dif, cor.estado, cor.adelante, !!tr.inmovilizado, !!tr.alTerminarTurno,
+    fin.terminados.map(e => e.nombre).join(), fin.quedan.map(e => e.nombre).join(), habs[0].trampaColocar.salvacion.logra, /cae parado/.test(habs[0].detalle)],
+    ['agl', 6, 'cae parado', 9, 12, 'Sentado', true, true, true, 'Tropezado', 'Sentado', 'cae parado', true]);
 });
 prueba('🪤 Lo nuevo de una trampa viaja hasta el mapa (2026-10-27): Perfora, caer adelante, el dibujo del cordón, el «si falla, lastima» y entra en 300', () => {
   const t = Plantillas.trampaDesde(Combatiente.trampaDeHab(trp('Aguja en el piso', 3), st => ({des: 9})[st] || 0));

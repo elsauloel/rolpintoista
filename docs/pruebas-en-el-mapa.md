@@ -318,6 +318,12 @@
   también: un ataque normal (el atacante ve nacer el cuadro del defensor; el defensor, del atacante; el GM, del defensor); un creep en sigilo,
   oculto o fuera de la pantalla (sale del centro, sin delatarlo); minimizar y volver a abrir (sin animación); el Mal de ojo / Enyetar que reabre
   el duelo; un contraataque que abre otro duelo; con «reducir movimiento», solo un fundido.
+- [ ] **🪢 El Cordón oculto nuevo** (2026-11-03, `vtt-hexgrid/js/19-trampa-paso-a-paso.js`, estado «Tropezado»): un creep con el Cordón lo tiende;
+  en el turno de Prueba Uno, Prueba Uno camina sobre él → el movimiento se corta, avanza una casilla («Tropieza») y tira Agilidad contra la Destreza
+  del creep. Si gana: «lo resistió: cae parado», nada más, y puede volver a moverse con lo que le queda. Si pierde: Sentado + Tropezado 🪢; al
+  intentar arrastrar el token sale «No te podés mover ahora (Inmovilizado o Tropezado…)»; puede Levantarse y atacar desde ahí; al terminar su turno
+  el Tropezado se va (el Sentado no, hasta levantarse). Pisado fuera de su turno (empujado): solo Sentado. Un aliado del creep le pasa por encima
+  sin dispararlo. El GM puede moverlo igual con 🦶 Mover libre (M).
 - [ ] **💥 Las otras ondas — para que las revise el dueño en el mapa** (2026-11-03, dueño: «anotá en pendientes en el mapa revisar las animaciones»; antes: «aprobada la animación, avanzá con el resto»; `vtt-hexgrid/js/94-onda-fx.js`, variantes en
   `comun/fx-onda.js`): con 2 o 3 rivales pegados (o en el cono), en las pantallas del GM y de un jugador, y que el duelo se abra recién al terminar
   la onda: **Pisotón** de un creep (tierra, sacudida más fuerte, Pajaritos sobre el que no lo resistió) · **Nova arcana** de un creep (violeta,

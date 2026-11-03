@@ -902,7 +902,7 @@ juega con los demás parámetros (sin quedar por debajo); puede haber alguna con
 | 🆕 Hacha de bombero | Bloqueo +1 · Rompe armadura 33 % · 85 |
 | Hacha del clan (era copia) | Sangrado 25 % · Rompe armadura 33 % · 80 |
 | 🆕 Hachuela de cocina | Crít. potente +1 · Rompe armadura 33 % · 85 |
-| 🆕 Hacha de cotillón vikingo | Derribar 25 % · Rompe armadura 33 % · 85 |
+| 🆕 Hacha de vikingo (antes «de cotillón vikingo», dueño 2026-11-03) | Derribar 25 % · Rompe armadura 33 % · 85 |
 | 🆕 Hacha del herrero de pueblo | Parry +1 · Rompe armadura 33 % · 90 |
 | 🆕 Hacha de guardabosque | Rengo 20 % · Rompe armadura 33 % · 85 |
 | 🆕 Hacha de piedra | +1 · Bloqueo +1 · Rompe armadura 33 % · 100 |

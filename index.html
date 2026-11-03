@@ -285,7 +285,7 @@ select option{background:var(--panel)}
           </form>
         </div>
 
-        <div class="caja peligro" style="margin-top:12px">
+        <div class="caja peligro" id="caja-borrar-partida" style="margin-top:12px">
           <b>Borrar la partida</b>
           <p class="vacio" style="margin:6px 0 0">Borra todo para todos: personajes, creeps, mapa, tokens, tiradas y tiendas. No se puede deshacer.</p>
           <div class="fila"><button type="button" class="btn peligro" id="btn-borrar-partida">Borrar la partida…</button></div>
@@ -449,7 +449,7 @@ async function abrirNombres(){
   }
   cont.innerHTML = mias.map(p => `
     <form class="fila-nombre" data-partida="${esc(p.id)}">
-      <span class="partida">${esc(p.nombre)}<small>${p.miembro.gm ? 'Sos el GM' : 'Sos jugador'}</small></span>
+      <span class="partida">${esc(p.nombre)}<small>${p.miembro.gm ? (p.gmUid === fbUsuario.uid ? 'Sos el GM' : 'Sos co-GM') : 'Sos jugador'}</small></span>
       <input maxlength="40" required value="${esc(p.miembro.nombre)}" aria-label="Tu nombre en ${esc(p.nombre)}">
       <button type="submit" class="btn chico">Guardar</button>
     </form>`).join('') + '<div class="error" id="nombres-error"></div>';
@@ -541,7 +541,7 @@ function renderPartidas(){
       <span class="titulo">${esc(p.nombre)}</span>
       <span class="desc">GM: ${esc(p.gmNombre || '?')}${p.miembro ? ` · vos: ${esc(p.miembro.nombre)}` : ''}</span>
       ${p.miembro
-        ? (p.miembro.gm ? '<span class="tag gm">Sos el GM</span>' : '<span class="tag jugador">Sos jugador</span>') + (p.oferta ? '<span class="tag gm">ð Te ofrecen ser el GM</span>' : '')
+        ? (p.miembro.gm ? (p.gmUid === fbUsuario.uid ? '<span class="tag gm">Sos el GM</span>' : '<span class="tag gm">⭐ Sos co-GM</span>') : '<span class="tag jugador">Sos jugador</span>') + (p.oferta ? '<span class="tag gm">ð Te ofrecen ser el GM</span>' : '')
         : '<span class="tag">Unirse</span>'}
     </button>`).join('') +
     `<button type="button" class="tarjeta nueva" id="btn-nueva-partida">
@@ -647,7 +647,7 @@ async function irAPartida(id){
   }
   fbRecordarPartida(id);
   $('#partida-sub').textContent = miembro.gm
-    ? `Sos el GM, como ${miembro.nombre}.`
+    ? (p.gmUid === fbUsuario.uid ? `Sos el GM, como ${miembro.nombre}.` : `Sos co-GM, como ${miembro.nombre}. GM: ${p.gmNombre || '?'}.`)
     : `Jugás como ${miembro.nombre}. GM: ${p.gmNombre || '?'}.`;
   document.querySelectorAll('[data-herramienta]').forEach(a => {
     a.href = a.dataset.herramienta + '?partida=' + encodeURIComponent(id);
@@ -658,6 +658,7 @@ async function irAPartida(id){
   $('#herramientas').hidden = false;
   revisarOfertaGM(p, miembro);
   if(miembro.gm){
+    $('#caja-borrar-partida').hidden = p.gmUid !== fbUsuario.uid;   // ⭐ un co-GM no borra la partida (las reglas tampoco lo dejan)
     $('#in-renombrar').value = p.nombre;
     cerrarBorrar();
     cargarGestion();
@@ -794,19 +795,25 @@ function renderGestion(){
   const nombreFicha = f => esc(f.nombre || 'Sin nombre') + (f.resumen && f.resumen.nivel ? ` <small style="display:inline">· Lv ${esc(f.resumen.nivel)}</small>` : '');
   $('#gestion-jugadores').innerHTML = miembros.map(m => {
     const suyos = fichas.filter(f => f.duenoUid === m.uid).map(f => esc(f.nombre || 'Sin nombre'));
-    const detalle = m.gm ? 'GM' : (suyos.length ? `Personajes: ${suyos.join(', ')}` : 'Sin personajes');
+    // ⭐ Co-GM (dueño, 2026-11-03): además del dueño de la partida (gmUid) puede haber otros GM. El dueño es «GM»; los demás, «⭐ co-GM».
+    const duenoUid = fbPartida && fbPartida.gmUid, soyDueno = duenoUid === fbUsuario.uid, esDueno = m.uid === duenoUid;
+    const detalle = m.gm ? (esDueno ? 'GM (dueño de la partida)' : 'co-GM: ve y cambia todo, como el GM') : (suyos.length ? `Personajes: ${suyos.join(', ')}` : 'Sin personajes');
     const entro = fechaTxt(m.creado);
+    const coGm = m.uid === fbUsuario.uid || esDueno ? ''
+      : m.gm ? `<button type="button" class="btn chico" data-cogm="${esc(m.uid)}" data-cogm-quitar="1" title="Vuelve a ser jugador">Quitar co-GM</button>`
+      : `<button type="button" class="btn chico" data-cogm="${esc(m.uid)}" title="Va a poder ver y cambiar todo, como vos">⭐ Hacer co-GM</button>`;
     return `<div class="miembro">
       <span class="quien">${esc(m.nombre)}${m.uid === fbUsuario.uid ? ' (vos)' : ''}<small>${detalle}${entro ? ` · entró el ${esc(entro)}` : ''}</small></span>
-      ${m.gm ? '<span class="tag gm">GM</span>' : (gestion.traspaso && gestion.traspaso.aUid === m.uid
+      ${m.gm ? (esDueno ? '<span class="tag gm">GM</span>' : '<span class="tag gm">⭐ co-GM</span>') + coGm : (gestion.traspaso && gestion.traspaso.aUid === m.uid
         ? `<span class="tag">Oferta de GM pendiente</span><button type="button" class="btn chico" data-cancelar-gm="1">Cancelar oferta</button>`
-        : `<button type="button" class="btn chico" data-asignar-gm="${esc(m.uid)}" title="Pasarle el rol de Game Master (le llega una oferta que tiene que aceptar)">Asignar como GM</button>`)
-        + `<button type="button" class="btn chico peligro" data-sacar="${esc(m.uid)}">Sacar</button>`}
+        : (soyDueno ? `<button type="button" class="btn chico" data-asignar-gm="${esc(m.uid)}" title="Pasarle el rol de Game Master (le llega una oferta que tiene que aceptar)">Asignar como GM</button>` : ''))
+        + coGm + (esDueno ? '' : `<button type="button" class="btn chico peligro" data-sacar="${esc(m.uid)}">Sacar</button>`)}
     </div>`;
   }).join('') || '<p class="vacio">No hay nadie.</p>';
   $('#gestion-jugadores').querySelectorAll('[data-sacar]').forEach(b => b.onclick = () => sacarJugador(b.dataset.sacar, b));
   $('#gestion-jugadores').querySelectorAll('[data-asignar-gm]').forEach(b => b.onclick = () => ofrecerGM(b.dataset.asignarGm, b));
   $('#gestion-jugadores').querySelectorAll('[data-cancelar-gm]').forEach(b => b.onclick = () => cancelarOfertaGM(b));
+  $('#gestion-jugadores').querySelectorAll('[data-cogm]').forEach(b => b.onclick = () => cambiarCoGM(b.dataset.cogm, !b.dataset.cogmQuitar, b));
 
   // Pasar personajes: sirve cuando alguien cambió de cuenta o se fue.
   const jugadores = miembros.filter(m => !m.gm);
@@ -826,6 +833,27 @@ function renderGestion(){
   }).join('');
   $('#gestion-personajes').querySelectorAll('select[data-ficha]').forEach(s => s.onchange = () => pasarPersonaje(s));
   $('#gestion-personajes').querySelectorAll('[data-borrar-ficha]').forEach(b => b.onclick = () => borrarPersonajeGM(b.dataset.borrarFicha, b));
+}
+
+// ⭐ Co-GM (dueño, 2026-11-03: «darle a otra cuenta el rol de GM para trabajar con la información completa»): un GM le pone o le saca `gm` a
+// otro miembro. Las reglas no dejan tocar al dueño de la partida ni a uno mismo (firebase/firestore.rules, miembros).
+async function cambiarCoGM(uid, poner, boton){
+  const m = gestion.miembros.find(x => x.uid === uid);
+  if(!m) return;
+  const txt = poner
+    ? `¿Hacer co-GM a ${m.nombre}?\n\nVa a poder ver y cambiar todo, como vos: los creeps y sus fichas privadas, el mapa, el botín, la bitácora del GM… No puede borrar la partida ni sacarte a vos.`
+    : `¿Quitarle el co-GM a ${m.nombre}?\n\nVuelve a ser jugador: deja de ver lo privado del GM.`;
+  if(!await Confirmar.preguntar(txt, {titulo: poner ? '⭐ Hacer co-GM' : 'Quitar co-GM', si: poner ? 'Hacer co-GM' : 'Quitar', peligro: poner})) return;
+  $('#gestion-error').textContent = '';
+  boton.disabled = true;
+  try{
+    await fbDb.doc(fbRutaCampana(`miembros/${uid}`)).update({gm: !!poner});
+    await cargarGestion();
+  }catch(err){
+    console.error('No se pudo cambiar el co-GM:', err);
+    $('#gestion-error').textContent = /permission/i.test(String(err && (err.code || err.message))) ? 'Faltan pegar las reglas nuevas de Firestore (co-GM).' : textoError(err);
+    boton.disabled = false;
+  }
 }
 
 async function sacarJugador(uid, boton){

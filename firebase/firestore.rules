@@ -43,6 +43,12 @@ service cloud.firestore {
       return esMiembro(c)
         && get(/databases/$(database)/documents/campanas/$(c)/miembros/$(request.auth.uid)).data.gm == true;
     }
+    // ⭐ El dueño de la partida (campanas/<id>.gmUid). Con co-GM (2026-11-03) puede haber varios `gm: true` en miembros, pero dueño hay uno:
+    // solo él borra la partida, ofrece el traspaso y no se lo puede sacar ni echar.
+    function esDuenoPartida(c) {
+      return verificado()
+        && get(/databases/$(database)/documents/campanas/$(c)).data.gmUid == request.auth.uid;
+    }
 
     // Hay una oferta de traspaso del rol de GM dirigida a esta cuenta.
     function traspasoPara(c) {
@@ -55,7 +61,7 @@ service cloud.firestore {
       // Partida: {nombre, gmUid, gmNombre, creado}. Grupo cerrado de amigos:
       // cualquier cuenta confirmada ve todas las partidas y puede unirse.
       // Quien la crea queda como GM (en la misma operación crea su miembro
-      // con gm: true). Solo el GM la renombra o la borra.
+      // con gm: true). Solo el GM la renombra; la borra solo su dueño (gmUid; los co-GM no, 2026-11-03).
       allow read: if verificado();
       allow create: if verificado()
         && request.resource.data.keys().hasOnly(['nombre', 'gmUid', 'gmNombre', 'creado'])
@@ -85,11 +91,11 @@ service cloud.firestore {
           && request.resource.data.gmNombre.size() <= 40
           && getAfter(/databases/$(database)/documents/campanas/$(c)/miembros/$(request.auth.uid)).data.gm == true
           && !existsAfter(/databases/$(database)/documents/campanas/$(c)/traspaso/actual));
-      allow delete: if esGM(c);
+      allow delete: if esGM(c) && esDuenoPartida(c);   // ⭐ un co-GM no borra la partida (2026-11-03)
 
       // Miembro: {nombre, gm, creado}, uno por cuenta en cada partida. El
-      // nombre (apodo) lo elige cada uno al unirse. gm: true solo para quien
-      // creó la partida; nadie más puede dárselo.
+      // nombre (apodo) lo elige cada uno al unirse. gm: true para quien
+      // creó la partida y para los co-GM que un GM nombre (⭐ 2026-11-03).
       match /miembros/{uid} {
         allow read: if esMiembro(c) || (verificado() && request.auth.uid == uid);
         allow create: if verificado()
@@ -106,7 +112,7 @@ service cloud.firestore {
               && getAfter(/databases/$(database)/documents/campanas/$(c)).data.gmUid == request.auth.uid)
           );
         // Cada uno cambia su nombre; el GM puede cambiar el de cualquiera.
-        // Nadie cambia quién es GM.
+        // Quién es GM cambia solo con el traspaso o con ⭐ co-GM (abajo).
         allow update: if (verificado()
             && (request.auth.uid == uid || esGM(c))
             && request.resource.data.keys().hasOnly(['nombre', 'gm', 'creado'])
@@ -115,6 +121,13 @@ service cloud.firestore {
             && request.resource.data.nombre is string
             && request.resource.data.nombre.size() > 0
             && request.resource.data.nombre.size() <= 40)
+          // ⭐ Co-GM (dueño, 2026-11-03): un GM le da o le saca `gm` a OTRO miembro (solo cambia `gm`); nunca a sí mismo por acá ni al
+          // dueño de la partida (campanas/<id>.gmUid).
+          || (esGM(c)
+            && request.auth.uid != uid
+            && uid != get(/databases/$(database)/documents/campanas/$(c)).data.gmUid
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['gm'])
+            && request.resource.data.gm is bool)
           // Traspaso del rol de GM (solo cambia `gm`): quien recibe la oferta
           // pasa a gm: true y el GM que la hizo pasa a gm: false.
           || (traspasoPara(c)
@@ -122,8 +135,9 @@ service cloud.firestore {
             && ((request.auth.uid == uid && request.resource.data.gm == true)
               || (get(/databases/$(database)/documents/campanas/$(c)/traspaso/actual).data.deUid == uid
                 && request.resource.data.gm == false)));
-        // Irse de la partida, o que el GM saque a alguien.
-        allow delete: if verificado() && (request.auth.uid == uid || esGM(c));
+        // Irse de la partida, o que el GM saque a alguien (a quien es dueño de la partida no lo saca nadie más: ⭐ co-GM, 2026-11-03).
+        allow delete: if verificado() && (request.auth.uid == uid
+          || (esGM(c) && uid != get(/databases/$(database)/documents/campanas/$(c)).data.gmUid));
       }
 
       // Traspaso del rol de GM (index.html, "Jugadores"): una sola oferta a la
@@ -133,7 +147,7 @@ service cloud.firestore {
       // ser GM: ver campanas y miembros más arriba).
       match /traspaso/{doc} {
         allow read: if esMiembro(c);
-        allow create, update: if doc == 'actual' && esGM(c)
+        allow create, update: if doc == 'actual' && esGM(c) && esDuenoPartida(c)   // ⭐ el traspaso lo ofrece el dueño, no un co-GM
           && request.resource.data.keys().hasOnly(['aUid', 'aNombre', 'deUid', 'deNombre', 'creado'])
           && request.resource.data.deUid == request.auth.uid
           && request.resource.data.aUid is string

@@ -113,3 +113,6 @@
 - **En la compu**: Claude usa «Claude in Chrome» con dos perfiles (uno es GM en «Claude · pruebas» y jugador en El origen; el otro es GM en El
   origen y jugador en «Claude · pruebas»); mirar siempre con qué cuenta y rol está antes de escribir. Si una pestaña queda frizada, cerrarla y abrir
   otra. Al volver a la compu, **traer primero lo que se hizo en la nube** (`git pull`).
+- **Co-GM en El origen** (2026-11-03): desde el 2026-11-03 la cuenta de Claude puede ser co-GM de El origen: igual, ahí solo se lee salvo que el
+  dueño pida explícitamente cambiar algo. Ojo: abrir GM Tools o el mapa como GM escribe solo (historial, republicar tarjetas, poner al día creeps):
+  para solo mirar, leer Firestore directo con un script.

@@ -86,9 +86,26 @@ Todo cuelga de `campanas/{idCampana}`, para que cada campaña tenga lo suyo:
   anterior a false, y se borra la oferta (las reglas lo permiten solo así).
   Si rechaza, o el GM cancela, se borra. Una sola oferta a la vez.
 - `campanas/{id}/miembros/{uid}` — `{nombre, gm, creado}`. Uno por cuenta en
-  cada partida; `nombre` es el apodo elegido al unirse. `gm: true` solo lo
-  puede tener quien creó la partida; nadie cambia `gm` después. Cada uno
-  cambia su nombre o se va; el GM puede sacar a alguien.
+  cada partida; `nombre` es el apodo elegido al unirse. `gm: true` lo tiene
+  quien creó la partida (el dueño, `campanas.gmUid`) y los **⭐ co-GM**: desde
+  el 2026-11-03 (dueño: darle a la cuenta de Claude el rol de GM en El origen)
+  un GM le pone o le saca `gm` a OTRO miembro desde index.html → Jugadores
+  («⭐ Hacer co-GM» / «Quitar co-GM», `cambiarCoGM`); nunca a sí mismo ni al
+  dueño. Un co-GM ve y cambia todo como el GM (las reglas usan `esGM`), pero
+  **no borra la partida, no ofrece el traspaso y no puede sacar al dueño**
+  (`esDuenoPartida`). Cada uno cambia su nombre o se va; el GM puede sacar a
+  alguien (menos al dueño).
+  **Dos GM conectados a la vez**: lo que la pantalla del GM hace sola y va por
+  transacción no se duplica (Mantenimiento de creeps y personajes, la cascada
+  de un área, el resumen del duelo, el inicio de turno, los momentos); los
+  barridos (momentos, elementos vencidos, Mesa de más de 48 h) son borrados que
+  no molestan si corren dos veces. **Riesgos**: el 📜 Historial anota cada
+  cambio una vez por GM conectado (el «líder» es por navegador, así que con dos
+  GM las líneas salen dobles); y dos GM Tools abiertos guardan los creeps desde
+  su memoria: si los dos tocan el mismo creep, gana el último. Además, **abrir
+  GM Tools o el mapa como GM escribe solo** (republicar la tarjeta de un creep,
+  ponerlos al día, el historial…): para solo mirar una partida como co-GM,
+  leer Firestore directo, sin abrir esas pantallas.
 - `campanas/{id}/historial/{auto}` — `{uid, jugador, quien, tipo: 'vital'|'mant', texto, campo?, delta?, cuando}`
   (2026-09-24). El "📜 Historial" del GM ([`../comun/historial.js`](../comun/historial.js)): cambios de HP y SP,
   estados que aparecen o se terminan, y el reporte del Mantenimiento de los creeps. **Solo el GM lo lee, lo escribe

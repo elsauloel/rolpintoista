@@ -364,6 +364,20 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
 - **Primera vuelta de la ronda (boceto de 1 a 5) completa** (2026-11-03): los 12 lugares tienen boceto; con nivel 1 aprobado en detalle: Escudero,
   Piromante, Sangrador, Sanador, Hachero, Maldito, Tirador, Mago de escarcha, Embestidor y Abanderado; con el nivel 1 en detalle también el Asesino de las sombras y el Tóxico (2026-11-03). Sigue la segunda vuelta (T2 Muralla con púas, …) según el orden de la ronda.
 
+- **M3 · Mago del rayo · Mago** (boceto aprobado 2026-11-03, dueño: «me cierra como ruta»). Estrategia: el rayo salta (castiga al grupo que se
+  junta) y paraliza: corta turnos. Atributos como el Mago de escarcha (Esp/Con/Agi/Des/Fue → vida): nv1 12/8/5/6/2 → 40 · nv2 14/9/5/6/2 → 45 ·
+  nv3 16/9/6/6/2 → 45 · nv4 17/10/6/7/2 → 50 · nv5 19/10/7/7/2 → 50.
+  | Nivel | Habilidad nueva | Pasiva | Equipo |
+  |---|---|---|---|
+  | 1 | **Centella** · **Zap** (las dos lentas: no hay rayo rápido) | — | Varita de chispa eléctrica + Escudo de escamas de lagarto · Chaleco de cuero · Anillo de chispa |
+  | 2 | **Parpadeo** (rápida) | **Potencia especial** | + 2 Comunes |
+  | 3 | **Cadena de rayos** | — | la varita: **Varita del relámpago** (Buena) |
+  | 4 | **Descarga arcana** | **Temple mágico** | el escudo: **Escudo de lenga del monasterio** (Buena) |
+  | 5 | **Tormenta arcana** (arcana, a revisar) | — | + una Buena de torso |
+  Consumible: Poción de SP menor.
+  - **Zap: la Parálisis se resiste con Res.CC** (dueño, 2026-11-03: «el 1d4 no se esquiva, pero la parálisis sí se resiste con resistencia al crowd
+    control»; hoy es Res.Esp contra su PdG.Esp). **Por programar** (pool + los creeps que ya la tienen, como el Capataz de El origen).
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

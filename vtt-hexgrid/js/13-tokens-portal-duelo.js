@@ -204,6 +204,8 @@ function blinkDeHabilidad(msg){
   const tipoYo = msg.casteadorTipo === 'creep' ? 'creep' : 'pj';
   const yo = [...tokens.entries()].find(([, x]) => x.fichaId === msg.fichaId && x.tipo === tipoYo);
   const fin = () => { if(typeof msg.alTerminar === 'function') msg.alTerminar(); };
+  // ↩ Cancelar (Esc o clic derecho) al elegir a quién o adónde (dueño, 2026-11-03): `msg.alCancelar` devuelve lo cobrado (el SP, los No2, el cooldown).
+  const cancelar = () => { if(typeof msg.alCancelar === 'function') try{ msg.alCancelar(); }catch(err){ console.error('Blink: no se pudo devolver', err); } fin(); };
   if(!yo){ toast(`${msg.nombre || 'Blink'}: ${tipoYo === 'creep' ? 'el creep' : 'tu personaje'} no tiene token en el mapa`); fin(); return; }
   const dist = Math.max(1, Math.round(num(msg.distancia)) || 3), nom = msg.nombre ? esc(msg.nombre) + ': ' : '';
   if(!$('#botonera-capa').hidden) escapeABotonera();
@@ -224,7 +226,7 @@ function blinkDeHabilidad(msg){
       console.error('No se pudo hacer el blink:', err);
       toast(err && err.code === 'permission-denied' ? `No podés mover a ${nombreDe(t)}: que lo mueva su jugador o el GM (✋ a mano)` : 'No se pudo hacer el blink — revisá la consola');
     }
-  }, `<b>✨ ${nom}¿adónde ${msg.alFrente ? 'va' : 'salta'} ${esc(nombreDe(t))}?</b> <span>clic en una casilla libre a ${dist} o menos${msg.alFrente ? ', pegada a un rival' : ''} · Esc o clic derecho cancelan</span>`, true, fin);
+  }, `<b>✨ ${nom}¿adónde ${msg.alFrente ? 'va' : 'salta'} ${esc(nombreDe(t))}?</b> <span>clic en una casilla libre a ${dist} o menos${msg.alFrente ? ', pegada a un rival' : ''} · Esc o clic derecho cancelan</span>`, true, cancelar);
   if(msg.soloYo){ adonde(yo[0], yo[1]); return; }
   elegirDestino(h => {
     const e = [...tokens.entries()].find(([, x]) => x.col === h.col && x.fila === h.fila && !x.oculto);
@@ -241,7 +243,7 @@ function blinkDeHabilidad(msg){
       if((solidosSet().size || hayParedes()) && !lineaLibre(yo[1], t, solidosSet())){ toast(`No ves a ${nombreDe(t)}: hay algo sólido en el medio`); blinkDeHabilidad(msg); return; }
     }
     adonde(id, t);
-  }, `<b>✨ ${nom}¿a quién?</b> <span>clic sobre vos o sobre un aliado que ves · Esc o clic derecho cancelan</span>`, true);
+  }, `<b>✨ ${nom}¿a quién?</b> <span>clic sobre vos o sobre un aliado que ves · Esc o clic derecho cancelan</span>`, true, cancelar);
 }
 // 🎯 ¡Al frente! (2026-10-26, el Support): ya en su lugar, el estado del frente (+2 PdG y +2 Evasión hasta el final de su próximo turno), la zona de la
 // casilla de llegada (si es suya, esta pantalla) y el aviso (Crónica y Mesa).
@@ -1747,7 +1749,9 @@ async function dueloAplicarDano(d){
   const elHab = d.hab && d.hab.dano && num(dn.crudo) > 0 ? Combatiente.elementoDe(d.hab.dano.tipo) : '';
   const anilloHab = elHab && typeof talMasDanoElem === 'function' ? talMasDanoElem(d, elHab) : 0;
   // ☀🌑 La identidad de la luz y de lo siniestro (2026-10-26): ×1,5 la luz a no-muertos y demonios; lo siniestro, nada (Combatiente.identidadElemento).
-  const idHab0 = elHab && t ? Combatiente.identidadElemento(elHab, ((vinculo(t) || {}).tipoCriatura)) : null;
+  const idHab00 = elHab && t ? Combatiente.identidadElemento(elHab, ((vinculo(t) || {}).tipoCriatura)) : null;
+  // 🪱 `sinIdentidad` (la Sanguijuela, dueño 2026-11-03): el daño sigue siendo siniestro (×0 a no-muertos y demonios) pero no deja Herida sombría.
+  const idHab0 = idHab00 && d.hab.dano.sinIdentidad ? {...idHab00, estado: null} : idHab00;
   // 🌑 La Carga siniestra (2026-10-31): su Herida sombría dura 2 turnos (`identidadTurnos`), no 1.
   const idHab = idHab0 && idHab0.estado && num(d.hab.dano.identidadTurnos) > 0 ? {...idHab0, estado: {...idHab0.estado, turnos: num(d.hab.dano.identidadTurnos)}} : idHab0, multId = idHab ? idHab.mult : 1;
   const mult = critReal ? d.crit.mult : 1, crudo = Math.ceil(Math.max(0, num(dn.crudo) - menosDist + (magico ? botella : 0) + anilloHab) * multHab * multId), golpe = crudo * mult;

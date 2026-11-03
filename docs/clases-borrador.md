@@ -448,7 +448,7 @@ ya tenían este mismo formato (número azul, Maldición Esp / Res.M):
     La pregunta pendiente de `manual-usuario/notas/07-estados.md` — si reingresar ya envenenado suma 1 stack
     o los normales — sigue abierta; hoy, una vez envenenado, la zona ya no vuelve a tirar nada para esa
     persona, así que no llega a probarse.)*
-11. ✅ **Sanguijuela** — **SP:** 3. **No2:** 2. (La habilidad de creep del Debuffer, pasada a la clase por el dueño el 2026-11-03.) Tirás **PdG.Esp
+11. ✅ **Sanguijuela** — **SP:** 3. **No2:** 2. (La habilidad de creep del Debuffer, pasada a la clase por el dueño el 2026-11-03.) Tirás **PdG.Esp **2026-11-03 (dueño): ya no deja Herida sombría** (sigue siendo siniestro: lo frena la Res. siniestro; «ahora el efecto es similar pero diferente»).
     contra la Evasión** de un enemigo dentro de tu Rango; si pega, 2d6 de daño siniestro y te curás la mitad de lo que entró. Le queda pegada 4
     turnos: **toda cura que reciba se la lleva quien la lanzó** (hasta su vida máxima; lo que sobra, Vida extra; caído, se pierde). Se la arranca al
     empezar su turno con Fuerza contra tu Ef.Esp. *(`comun/skills-clase.js`, `debuffer-sanguijuela`.)*

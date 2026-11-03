@@ -131,8 +131,27 @@ const EstadosAplicar = (() => {
     return {ok: true, a: String(e.chupaNombre || '')};
   }
   // Para avisarlo en cada pantalla: dispara el envío (sin esperar) y devuelve la línea para la Mesa o el reporte.
+  /* 🪱 ¿Quien puso la Sanguijuela está caído o fuera del mapa? (dueño, 2026-11-03: que el jugador lo sepa en el momento). Solo se puede saber en el mapa
+     (sus tokens y lo que publican); sin mapa (la ficha suelta) → null y la cura se manda igual (la pantalla del lanzador la descarta si está caído).
+     → 'caido' | 'fuera' | null. */
+  function lanzadorPerdido(e){
+    const de = String((e && e.chupaDe) || '');
+    if(de.indexOf(':') < 0) return null;
+    const esCreep = de.slice(0, de.indexOf(':')) === 'creep', id = de.slice(de.indexOf(':') + 1);
+    let lista = null;
+    try{ lista = typeof tokens !== 'undefined' && tokens && typeof tokens.values === 'function' && typeof vinculo === 'function' ? [...tokens.values()] : null; }catch(err){ lista = null; }   // eslint-disable-line no-undef
+    if(!lista) return null;
+    const t = lista.find(x => x && x.fichaId === id && (x.tipo === 'creep') === esCreep);
+    if(!t) return 'fuera';
+    let r = null; try{ const v = vinculo(t); r = v && v.resumen; }catch(err){ r = null; }   // eslint-disable-line no-undef
+    if(!r) return null;
+    const hp = r.hpPct !== undefined && r.hpPct !== null ? Number(r.hpPct) : Number(r.hp);
+    return Number.isFinite(hp) && hp <= 0 ? 'caido' : null;
+  }
   function curaRobadaEnviar(robo, quien){
     if(!robo) return '';
+    const perdido = lanzadorPerdido(robo.estado);
+    if(perdido) return Combatiente.curaPerdidaTxt(robo, perdido);
     encolarCuraRobada(robo.estado, robo.monto, `Sanguijuela · ${quien || ''}`.trim()).then(r => { if(r && r.manual && typeof toast === 'function') toast(`🪱 ${r.motivo}`); })
       .catch(err => console.error('Sanguijuela: no se pudo mandar la cura', err));
     return Combatiente.curaRobadaTxt(robo, quien);
@@ -159,5 +178,5 @@ const EstadosAplicar = (() => {
     return s.nombre + (stacks ? ` ×${stacks}` : '') + (extra.length ? ` (${extra.join(', ')})` : '');
   }
 
-  return {DEBUFFS, BUFFS, presetPorNombre, conDatosDelPreset, limpiarSpec, esPreset, componer, bloqueadoCreep, aplicarACreep, encolarPj, encolarCuraRobada, curaRobadaEnviar, texto};
+  return {DEBUFFS, BUFFS, presetPorNombre, conDatosDelPreset, limpiarSpec, esPreset, componer, bloqueadoCreep, aplicarACreep, encolarPj, encolarCuraRobada, curaRobadaEnviar, lanzadorPerdido, texto};
 })();

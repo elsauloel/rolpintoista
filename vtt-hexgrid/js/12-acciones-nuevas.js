@@ -576,8 +576,11 @@ function acHabUi(){
       const id = ac && ac.creepId, reabrir = () => { if(ac && ac.creepId === id){ ac.host.hidden = false; acUbicar(); acDibujar(); } };
       ac.objetivoFijo = null; ac.host.hidden = true;
       const fr = !!(h.blink && h.blink.alFrente);   // 🎯 ¡Al frente! (2026-10-26): a un aliado, pegado a un rival
+      // ↩ Si cancela al elegir adónde (Esc), se le devuelve lo cobrado: SP, No2 y cooldown (dueño, 2026-11-03; visto en las pruebas del mapa).
+      const dev = ac && ac.devolucion && ac.devolucion.creepId === sc.id ? ac.devolucion : null;
       blinkDeHabilidad({fichaId: sc.id, casteadorTipo: 'creep', nombre: h.nombre, distancia: num(h.blink && h.blink.distancia) || 3, soloYo: !fr,
-        ...(fr ? {alFrente: true, estado: String(h.blink.estado || 'Al frente')} : {}), alTerminar: reabrir});
+        ...(fr ? {alFrente: true, estado: String(h.blink.estado || 'Al frente')} : {}), alTerminar: reabrir,
+        alCancelar: () => { if(ac && ac.devolucion === dev) ac.devolucion = null; acDevolver(dev); }});
     },
     // 💨 la Bomba de humo (2026-10-26, js/57): la niebla a sus pies, Sigilo y el movimiento libre.
     bombaHumo: (sc, h) => {

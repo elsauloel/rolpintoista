@@ -43,7 +43,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
 <script src="fx-transfusion.js?v=20261103fx"></script>
-<script src="combatiente.js?v=20261103p1"></script>
+<script src="combatiente.js?v=20261103t12"></script>
 <script src="creep-calculo.js?v=20261103t4"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261103p1"></script>
@@ -51,7 +51,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
 <script src="estados-presets.js?v=20261103san"></script>
-<script src="estados-aplicar.js?v=20261103r1"></script>
+<script src="estados-aplicar.js?v=20261103t12"></script>
 <script src="recibidos.js?v=20261103san"></script>
 <script src="tokens-auto.js"></script>
 <script src="creeps-mapas.js"></script>
@@ -100,7 +100,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261103t4"></script>
+<script src="duelo.js?v=20261103t12"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -112,9 +112,9 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
-<script src="skills-clase.js?v=20261103san"></script>
+<script src="skills-clase.js?v=20261103t12"></script>
 <script src="creeps-base.js"></script>
-<script src="skills-creep-base.js?v=20261103t11"></script>
+<script src="skills-creep-base.js?v=20261103t12"></script>
 <script src="creeps-esenciales.js?v=20261103t7"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -1375,6 +1375,30 @@ prueba('🐛 Sanguijuela (Debuffer, 2026-10-26): PdG.Esp contra Evasión, 2d6 si
   const ef = h.duelo.efectos[0];
   igual([h.duelo.tira, h.duelo.contra.join(','), h.duelo.danoFormula, h.duelo.tipoDano, !!h.duelo.drena, h.duelo.drenaPct, ef.nombre, ef.turnos, ef.soltar.stat, ef.soltar.difStat, h.cd, e.etiquetas.includes('debuffer')],
     ['pdgmg', 'eva', '2d6', 'siniestro', true, 50, 'Sanguijuela', 4, 'fue', 'dmgesp', 3, true]);
+});
+prueba('🪱 Sanguijuela sin Herida sombría (dueño, 2026-11-03): sigue siendo siniestro, pero el duelo lleva «sin identidad» (creep y clase); la guardada se pone al día', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Sanguijuela'), h = armarHabilidadDeCreep(e.datos, 2);
+  const x = Combatiente.habEjecucion(h, h.duelo, {stat: () => 0, etq: s => s});
+  const cl = CLASES_SKILLS.find(c => c.id === 'debuffer').habilidades.find(y => y.id === 'debuffer-sanguijuela');
+  const xc = Combatiente.habEjecucion(cl, cl.duelo, {stat: () => 0, etq: s => s});
+  const vieja = structuredClone(h); delete vieja.duelo.sinIdentidad; vieja.detalle = vieja.detalle.replace('; no deja Herida sombría', '');
+  const habs = [vieja]; Combatiente.migrarLuzSanadora(habs);
+  igual([x.dano.tipo, !!x.dano.sinIdentidad, xc.dano.tipo, !!xc.dano.sinIdentidad, /no deja Herida sombría/.test(h.detalle), /no deja Herida sombría/.test(cl.detalle),
+    !!habs[0].duelo.sinIdentidad, /no deja Herida sombría/.test(habs[0].detalle)], ['siniestro', true, 'siniestro', true, true, true, true, true]);
+});
+prueba('🪱 La cura que se pierde (dueño, 2026-11-03): con el lanzador caído o fuera del mapa, el aviso del portador lo dice', () => {
+  const robo = {estado: {nombre: 'Sanguijuela', chupaNombre: 'Maldito'}, monto: 25};
+  igual([Combatiente.curaPerdidaTxt(robo, 'caido'), Combatiente.curaPerdidaTxt(robo, 'fuera'), EstadosAplicar.lanzadorPerdido({chupaDe: 'creep:x'})],
+    ['🪱 La cura (+25) se pierde: quien te puso la Sanguijuela (Maldito) está caído', '🪱 La cura (+25) se pierde: quien te puso la Sanguijuela (Maldito) ya no está en el mapa', null]);
+});
+prueba('⚡ El texto del Flash de creep (dueño, 2026-11-03): con SP el doble de SP; con turnos de espera, un 50 % más — en las de fábrica y en las guardadas', () => {
+  const flash = HABILIDADES_CREEP_BASE.filter(x => /^FLASH/.test(String(x.datos && x.datos.sp && x.datos.sp.detalle || x.detalle || '')));
+  const viejoTxt = flash.filter(x => /turno ajeno cuesta el doble/.test(JSON.stringify(x)));
+  const par = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Parpadeo').datos, 2);
+  const vieja = structuredClone(par); vieja.detalle = vieja.detalle.replace(/en turno ajeno cuesta más: [^)]*\)/, 'en turno ajeno cuesta el doble)');
+  const habs = [vieja]; Combatiente.migrarLuzSanadora(habs);
+  igual([flash.length > 5, viejoTxt.map(x => x.nombre).join(), /con turnos de espera, un 50 % más/.test(par.detalle), /turno ajeno cuesta el doble/.test(vieja.detalle) ? 'sin migrar' : 'ok',
+    /con turnos de espera, un 50 % más/.test(habs[0].detalle)], [true, '', true, 'ok', true]);
 });
 prueba('🪱 Sanguijuela (2026-11-03): la cura del portador se la lleva quien la lanzó — hasta su máximo, el resto Vida extra; caído, se pierde; la Herida sombría sigue bloqueando', () => {
   const P = estadosPresetCreep().find(p => p.nombre === 'Sanguijuela');

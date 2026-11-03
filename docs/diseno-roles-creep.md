@@ -900,7 +900,7 @@ Inmovilizado, Rengo, Desarmado; y, de personajes, Enyetar.
 33. **Magia del caos**: a un rival, un debuff al azar, con riesgo de que salga al revés [Varita del caos].
 
 **I′. Del Mago** (2026-10-26)
-- ✅ **Sanguijuela** (pasó del Mago, dueño: «movemos la sanguijuela al debuffer»): su PdG.Esp contra la Evasión; 2d6 siniestro, se cura la mitad y queda pegada 4 turnos (Fuerza contra su Ef.Esp para arrancarla). **Corregida (dueño, 2026-11-03):** ya no corta la cura: «toda curación a alguien con una sanguijuela le va al debuffer. Y si tiene full vida, le va como vida extra» (caído o fuera del mapa, se pierde: P238). Desde el mismo día también es habilidad de la clase Debuffer.
+- ✅ **Sanguijuela** (pasó del Mago, dueño: «movemos la sanguijuela al debuffer»): su PdG.Esp contra la Evasión; 2d6 siniestro, se cura la mitad y queda pegada 4 turnos (Fuerza contra su Ef.Esp para arrancarla). **Corregida (dueño, 2026-11-03):** ya no corta la cura: «toda curación a alguien con una sanguijuela le va al debuffer. Y si tiene full vida, le va como vida extra» (caído o fuera del mapa, se pierde: P238). Desde el mismo día también es habilidad de la clase Debuffer. **2026-11-03 (dueño): ya no deja Herida sombría** (sigue siendo siniestro: lo frena la Res. siniestro; «ahora el efecto es similar pero diferente»).
 
 **H. Romper lo que lo protege** ✦
 28. ✅ **Disipar** (2026-10-25; dueño: «el usuario de disipar elige cuál quitar»): su PdG.Esp contra la Res.Esp de un rival en su Rango; si gana, le saca uno de sus estados buenos, el que elija quien lo usa (no lo del equipo ni las pasivas). 2 No2 y 3 SP, o cooldown 3.

@@ -765,6 +765,7 @@ const Duelo = (() => {
       ...(_num(h.dano.mult) > 1 ? {mult: Math.min(4, _num(h.dano.mult))} : {}), ...(h.dano.carga ? {carga: txtCorto(h.dano.carga, 20)} : {}),   // ✨ Carga Elemental (2026-10-13)
       ...(h.dano.porDano && typeof Combatiente !== 'undefined' && Combatiente.porDanoNorm(h.dano.porDano) ? {porDano: Combatiente.porDanoNorm(h.dano.porDano)} : {}),
       ...(_num(h.dano.identidadTurnos) > 0 ? {identidadTurnos: Math.min(9, Math.round(_num(h.dano.identidadTurnos)))} : {}),   // 🌑 la Carga siniestra (2026-10-31)
+      ...(h.dano.sinIdentidad ? {sinIdentidad: true} : {}),   // 🪱 la Sanguijuela: siniestro, pero sin Herida sombría (dueño, 2026-11-03)
       ...(_num(h.dano.luzSanadora) > 0 ? {luzSanadora: Math.min(100, Math.round(_num(h.dano.luzSanadora)))} : {}),   // ☀ Luz sanadora (2026-10-31)
       ...(h.dano.extra && String(h.dano.extra.formula || '').trim() ? {extra: {formula: txtCorto(h.dano.extra.formula, 20), tipo: txtCorto(h.dano.extra.tipo || 'fuego', 20)}} : {}),   // ☄ un segundo daño de otro tipo (el Meteoro, 2026-10-24: 4d6 físico + 2d6 de fuego)
       ...(_num(h.dano.perfora) > 0 ? {perfora: Math.min(5, Math.round(_num(h.dano.perfora)))} : {}),   // 🗡 la Perfora del arma (2026-10-27)

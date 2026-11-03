@@ -2942,3 +2942,14 @@ function sagradoContra(ataque, t){
   mesaLinea(`✨ ${ataque.hab.nombre} contra ${nombreDe(t)} (${tc}): lo sagrado le pega el doble (${formula})`, 'recordatorio');
   return {...ataque, hab: {...ataque.hab, nombre: ataque.hab.nombre, dano: {...ataque.hab.dano, formula}}};
 }
+
+/* 🎬 Dónde está un token en la pantalla, para que el cuadro del duelo nazca de él y vuelva a él (comun/duelo.js, dueño 2026-11-03). null si en
+   esta pantalla no se ve (oculto para un jugador, en la niebla, en sigilo: no se delata) o si quedó fuera de la vista: ahí el cuadro sale del centro. */
+window.dueloOrigenPantalla = tokenId => {
+  const t = typeof tokens !== 'undefined' && tokens.get ? tokens.get(tokenId) : null;
+  if(!t || (t.oculto && !soyGM) || (typeof tokenVisiblePorNiebla === 'function' && !tokenVisiblePorNiebla(t))) return null;
+  const c = hexCentro(t.col, t.fila), r = lienzo.getBoundingClientRect();
+  const x = r.left + c.x * vista.zoom + vista.x, y = r.top + c.y * vista.zoom + vista.y;
+  if(x < r.left || x > r.right || y < r.top || y > r.bottom) return null;
+  return {x, y};
+};

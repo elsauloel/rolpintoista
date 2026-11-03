@@ -303,6 +303,14 @@
   encienden), polvo y piedritas, una sacudida corta del mapa y la tarjeta en la Crónica. Al resolverse cada resistencia (Res.CC): sobre el que no la
   resistió, un estallido y estrellitas girando sobre la cabeza ~2,6 s; sobre el que la resistió, un destello chico (sin tarjeta). Ver que un creep
   oculto o en sigilo no se delata, que con «reducir movimiento» sale más corta y sin sacudida, y que el zoom y el paneo no la corren.
+- [ ] **🎬 El cuadro del duelo nace del token y vuelve a él — para que lo revise el dueño** (2026-11-03, dueño: «al abrirse un duelo… desde el
+  token con el que estás teniendo un duelo, se abra… algo chiquitito que se va agrandando… y cuando se termina, vuelve a ese token»;
+  `comun/duelo.js` + `window.dueloOrigenPantalla` en `vtt-hexgrid/js/13-tokens-portal-duelo.js`): Rockardo hace el Shockwave contra 2 o 3 creeps
+  pegados → en su pantalla el cuadro del primer duelo crece desde el token del primer creep (~0,4 s, con un anillo dorado que late sobre ese
+  token); al resolverse, el cuadro se achica y vuelve a ese creep (~0,3 s), una pausa corta y el siguiente crece desde el segundo creep. Ver
+  también: un ataque normal (el atacante ve nacer el cuadro del defensor; el defensor, del atacante; el GM, del defensor); un creep en sigilo,
+  oculto o fuera de la pantalla (sale del centro, sin delatarlo); minimizar y volver a abrir (sin animación); el Mal de ojo / Enyetar que reabre
+  el duelo; un contraataque que abre otro duelo; con «reducir movimiento», solo un fundido.
 - [ ] **💥 Las otras ondas — para que las revise el dueño en el mapa** (2026-11-03, dueño: «anotá en pendientes en el mapa revisar las animaciones»; antes: «aprobada la animación, avanzá con el resto»; `vtt-hexgrid/js/94-onda-fx.js`, variantes en
   `comun/fx-onda.js`): con 2 o 3 rivales pegados (o en el cono), en las pantallas del GM y de un jugador, y que el duelo se abra recién al terminar
   la onda: **Pisotón** de un creep (tierra, sacudida más fuerte, Pajaritos sobre el que no lo resistió) · **Nova arcana** de un creep (violeta,

@@ -103,7 +103,12 @@ const Duelo = (() => {
     const s = document.createElement('style');
     s.id = 'duelo-css';
     s.textContent = `
-#duelo-fondo{position:fixed;inset:0;z-index:99000;background:rgba(6,8,14,.78);display:flex;align-items:center;justify-content:center;padding:12px;font-family:inherit}
+#duelo-fondo,#duelo-fondo-sale{position:fixed;inset:0;z-index:99000;background:rgba(6,8,14,.78);display:flex;align-items:center;justify-content:center;padding:12px;font-family:inherit}
+#duelo-fondo-sale{pointer-events:none}
+.duelo-pulso{position:fixed;z-index:99001;width:0;height:0;pointer-events:none}
+.duelo-pulso::before,.duelo-pulso::after{content:'';position:absolute;left:-34px;top:-34px;width:68px;height:68px;border-radius:50%;border:3px solid #e3a85a;box-shadow:0 0 18px rgba(227,168,90,.8);animation:duelo-pulso .7s ease-out both}
+.duelo-pulso::after{animation-delay:.18s;border-color:#fff3d6}
+@keyframes duelo-pulso{0%{transform:scale(.35);opacity:1}100%{transform:scale(1.6);opacity:0}}
 #duelo-fondo.min{display:none}
 .duelo-caja{background:#151a26;color:#e9ecf4;border:1px solid #39435c;border-radius:16px;width:min(880px,100%);max-height:96vh;overflow:auto;box-shadow:0 18px 60px rgba(0,0,0,.6)}
 .duelo-cab{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2b3347;font-weight:800;font-size:18px;letter-spacing:.03em}
@@ -338,13 +343,14 @@ const Duelo = (() => {
   function avisarPagina(){ window.dispatchEvent(new Event('ep-cerrado')); }   // la Botonera/Acciones del mapa se fijan si quedó algo abierto
 
   function cerrar(){
+    const otroToken = actual && actual.otroToken;
     if(actual){
       descartados.add(actual.id);
       if(actual.baja) actual.baja();
     }
     actual = null;
     manual = {};
-    quitarFondo();
+    { const f = document.getElementById('duelo-fondo'); if(f && actual === null && f.dataset.entro) animarSalida(f, otroToken); else quitarFondo(); }   // 🎬 vuelve a su token
     dibujarChips();
     avisarPagina();
   }
@@ -1652,6 +1658,78 @@ const Duelo = (() => {
     anunciarMesa(anuncio);
   }
 
+  /* ---------- 🎬 El cuadro nace del token y vuelve a él (dueño, 2026-11-03: «al abrirse un duelo… desde el token del personaje o creep con el
+     que estás teniendo un duelo, se abra el duelo, algo chiquitito que se va agrandando… cuando se termina, se anime eso que vuelve a ese token»;
+     en un área, cada duelo sale del token de su objetivo). El token «del otro», según quién mira: el que ataca (o quien lo controla) ve nacer el
+     cuadro del defensor; el defensor, del atacante; el GM y los que miran, del defensor. La página dice dónde está ese token en pantalla con
+     window.dueloOrigenPantalla(tokenId) → {x, y} o null (el mapa: null si no se ve —oculto, niebla, sigilo— o está fuera de la pantalla); sin eso,
+     nace del centro. Con «reducir movimiento», solo un fundido. ---------- */
+  const ANIM_ABRIR = 380, ANIM_CERRAR = 300, ANIM_PAUSA = 200;
+  let esperarAbrirHasta = 0;   // en una cascada, el nuevo espera a que el anterior termine de volver a su token
+  const pocoMovimiento = () => { try{ return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }catch(e){ return false; } };
+  function ladoDelOtro(d){
+    if(!d) return null;
+    if(esMio(d.atacante)) return d.defensor || null;
+    if(esMio(d.defensor)) return d.atacante || null;
+    return d.defensor || null;
+  }
+  function origenDe(tokenId){
+    if(!tokenId || typeof window.dueloOrigenPantalla !== 'function') return null;
+    try{ const p = window.dueloOrigenPantalla(tokenId); return p && isFinite(p.x) && isFinite(p.y) ? {x: p.x, y: p.y} : null; }catch(e){ return null; }
+  }
+  // De dónde sale / adónde vuelve: transform-origin en el punto del token (relativo al cuadro, que ocupa toda la pantalla).
+  function puntoOrigen(f, p){
+    const r = f.getBoundingClientRect();
+    return p ? `${Math.round(p.x - r.left)}px ${Math.round(p.y - r.top)}px` : '50% 50%';
+  }
+  function pulsoEn(p){
+    if(!p || pocoMovimiento()) return;
+    const el = document.createElement('div');
+    el.className = 'duelo-pulso';
+    el.style.left = p.x + 'px'; el.style.top = p.y + 'px';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 1000);
+  }
+  function animarEntrada(f, tokenId){
+    if(!f || f.dataset.entro) return;
+    f.dataset.entro = '1';
+    const arrancar = () => {
+      if(!f.isConnected) return;
+      const p = origenDe(tokenId);
+      f.style.opacity = ''; f.style.pointerEvents = '';
+      if(typeof f.animate !== 'function'){ return; }
+      if(pocoMovimiento()){ f.animate([{opacity: 0}, {opacity: 1}], {duration: 180, easing: 'ease-out'}); return; }
+      f.style.transformOrigin = puntoOrigen(f, p);
+      pulsoEn(p);
+      f.style.pointerEvents = 'none';   // que un clic no caiga en el cuadro mientras crece
+      const an = f.animate([{transform: p ? 'scale(.04)' : 'scale(.85)', opacity: 0}, {transform: 'scale(1)', opacity: 1}],
+        {duration: ANIM_ABRIR, easing: 'cubic-bezier(.2,.8,.25,1)'});
+      an.onfinish = an.oncancel = () => { f.style.pointerEvents = ''; f.style.transformOrigin = ''; };
+    };
+    const falta = esperarAbrirHasta - performance.now();
+    if(falta > 0) setTimeout(arrancar, falta); else arrancar();
+  }
+  // Saca el cuadro animándolo de vuelta a su token. Se le cambia el id para que el próximo duelo arme el suyo sin pisarse.
+  function animarSalida(f, tokenId){
+    if(!f) return false;
+    if(f.classList.contains('min') || typeof f.animate !== 'function' || !f.dataset.entro){ f.remove(); return false; }
+    f.id = 'duelo-fondo-sale';
+    f.querySelectorAll('button,input,select,textarea').forEach(b => { b.disabled = true; });
+    const p = origenDe(tokenId);
+    const poco = pocoMovimiento();
+    const dur = poco ? 160 : ANIM_CERRAR;
+    let an;
+    if(poco) an = f.animate([{opacity: 1}, {opacity: 0}], {duration: dur, easing: 'ease-in', fill: 'forwards'});
+    else {
+      f.style.transformOrigin = puntoOrigen(f, p);
+      an = f.animate([{transform: 'scale(1)', opacity: 1}, {transform: p ? 'scale(.04)' : 'scale(.85)', opacity: 0}], {duration: dur, easing: 'cubic-bezier(.5,0,.75,.4)', fill: 'forwards'});
+    }
+    an.onfinish = an.oncancel = () => f.remove();
+    setTimeout(() => { if(f.isConnected) f.remove(); }, dur + 400);
+    esperarAbrirHasta = performance.now() + dur + (poco ? 60 : ANIM_PAUSA);
+    return true;
+  }
+
   /* ---------- el cuadro del duelo ---------- */
   function abrir(id){
     if(!disponible()) return;
@@ -1664,9 +1742,12 @@ const Duelo = (() => {
       return;
     }
     if(actual && actual.baja) actual.baja();
+    { const viejo = document.getElementById('duelo-fondo'); if(viejo) animarSalida(viejo, actual && actual.otroToken); }   // 🎬 el anterior vuelve a su token
     actual = null;
     const f = fondo();
     f.classList.remove('min');
+    f.style.opacity = '0'; f.style.pointerEvents = 'none';   // 🎬 aparece recién cuando llega el duelo, desde el token del otro
+    setTimeout(() => { if(f.isConnected && !f.dataset.entro) animarEntrada(f, actual && actual.id === id ? actual.otroToken : ''); }, 900);   // si tarda, desde el centro
     f.innerHTML = '<div class="duelo-caja"><div class="duelo-cab"><span>⚔ Duelo</span><div class="bt"><button type="button" data-min title="Minimizar">—</button></div></div><div class="duelo-cuerpo"><div class="duelo-nota">Abriendo…</div></div></div>';
     f.querySelector('[data-min]').onclick = minimizar;
     actual = {id, dato: null, baja: null, min: false};
@@ -1674,6 +1755,8 @@ const Duelo = (() => {
       if(!doc.exists){ _toast('Ese duelo ya no existe'); cerrar(); return; }
       if(!actual || actual.id !== id) return;
       actual.dato = {id, ...doc.data()};
+      if(!actual.otroToken){ const o = ladoDelOtro(actual.dato); actual.otroToken = (o && o.tokenId) || ''; }
+      { const f1 = document.getElementById('duelo-fondo'); if(f1 && !f1.dataset.entro) animarEntrada(f1, actual.otroToken); }
       // Primero ruedan los dados 3D y, cuando quedan a la vista, se muestra el resultado en el cuadro (no antes).
       const nRev = nReveal(actual.dato);
       if(actual.nRev === undefined){ actual.nRev = nRev; dibujar(); return; }   // al abrir un duelo que ya está avanzado no se espera nada

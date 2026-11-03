@@ -2314,6 +2314,12 @@ const Combatiente = (() => {
         ['detalle', 'ataqueTxt'].forEach(k => { if(typeof h[k] === 'string') h[k] = h[k].replace('su Resistencia especial contra la Probabilidad', 'su Resistencia al control (Res.CC) contra la Probabilidad').replace('contra la Resistencia especial del objetivo decide la Parálisis', 'contra la Resistencia al control (Res.CC) del objetivo decide la Parálisis').replace('PdG.Esp contra la Res.Esp; salta', 'PdG.Esp contra la Res.CC; salta'); });
         cambio = true;
       }
+      // 😮‍💨 Robar el aliento saca 1 No2 + la diferencia (dueño, 2026-11-03; antes 2 + la diferencia): la guardada se pone al día.
+      if(h && h.nombre === 'Robar el aliento' && h.duelo && typeof h.duelo === 'object' && Array.isArray(h.duelo.efectos) && h.duelo.efectos.some(e => e && e.nombre === 'Pierde No2' && e.no2 === 2)){
+        h.duelo.efectos.forEach(e => { if(e && e.nombre === 'Pierde No2' && e.no2 === 2) e.no2 = 1; });
+        ['detalle', 'ataqueTxt'].forEach(k => { if(typeof h[k] === 'string') h[k] = h[k].replace('pierde 2 No2 más la diferencia', 'pierde 1 No2 más la diferencia').replace('pierde 2 No2 + la diferencia', 'pierde 1 No2 + la diferencia'); });
+        cambio = true;
+      }
       // 🛡 Provocar tira PdG.Esp + su nivel, como el Taunt de clase (dueño, 2026-11-03: «al revés, quiero que el de creep tire PdG.Esp + nivel»; por unas
       // horas del mismo día fue Ef.Esp + 2): el guardado en un creep (con cualquiera de las dos) se pone al día.
       if(h && h.nombre === 'Provocar' && h.duelo && typeof h.duelo === 'object' && (h.duelo.tira === 'dmgesp' || !h.duelo.tiraBonoNivel)){

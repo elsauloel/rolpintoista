@@ -444,6 +444,10 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 5 | **Maldición tormentosa** (también la tiene el Tóxico en nv4) | — | + otra Buena |
   Consumible: **Gas adormecedor** (Cansado 2 turnos, nube de 3 turnos). **Sanguijuela con regla nueva** (dueño, 2026-11-03): ya no bloquea la
   cura: toda cura que recibe el portador se la lleva quien la lanzó (con la vida llena, como vida extra); también pasa al Debuffer de clase; si quien la lanzó está caído o no está en el mapa, la cura se pierde (dueño).
+  **Nivel 1 aprobado** (dueño, 2026-11-03), **con SP**: Esp 12 · Con 8 · Agi 7 · Des 4 · Fue 2, vida 40, 7 No2, 38 SP (recupera 6 por turno);
+  Varita arcana + Grimorio gastado (PdG.Esp +1, SP +2) · Chaleco de cuero · Vincha de cuero de mula ánima: Def 2, Def.Esp 1. Escalofrío (1 No2,
+  1 SP) y Robar el aliento (2 No2, 3 SP), que **pasa a sacar 1 No2 + la diferencia** (dueño, mismo día; programado). Con SP puede repetir
+  habilidades en el turno: «lo dejamos así». Consumible: Gas adormecedor. Sin cargar hasta que el dueño diga.
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
@@ -531,7 +535,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | R3 | | | | | |
 | M3 | ✅ (2026-11-03) | | | | |
 | S3 | ✅ (2026-11-03) | | | | |
-| D3 | boceto ✅ (2026-11-03) | | | | |
+| D3 | ✅ (2026-11-03) | | | | |
 | W4 | | | | | |
 | T4 | | | | | |
 | H4 | | | | | |

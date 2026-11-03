@@ -854,7 +854,7 @@ Inmovilizado, Rengo, Desarmado; y, de personajes, Enyetar.
 5b. ✅ **Punto débil** — **Aguja siniestra** (2026-10-26, el Punto débil de la clase: PdG.Esp contra Evasión; 1d6 siniestro directo y −1 a todas las resistencias a crítico 2 turnos).
 
 **B. Quitarle recursos**
-6. ✅ **Drenar No2** — **Robar el aliento** (2026-10-26: PdG.Esp contra Res.Esp; 1d6 siniestro y pierde 2 No2 + la diferencia, sin tope; en 0, Sentado): pierde No2 (y si queda en 0, Sentado, como el Sonic Boom).
+6. ✅ **Drenar No2** — **Robar el aliento** (2026-10-26: PdG.Esp contra Res.Esp; 1d6 siniestro y pierde 1 No2 + la diferencia (era 2 hasta el 2026-11-03, dueño), sin tope; en 0, Sentado): pierde No2 (y si queda en 0, Sentado, como el Sonic Boom).
 7. ✅ **Extenuar** (2026-10-25): PdG.Esp contra Res.Esp; 2d4 arcano y Extenuado 2 turnos (todo lo que cuesta No2 le cuesta 1 más).
 8. **Drenar SP**: pierde SP, y el debuffer quizás lo gana.
 9. ✅ **Atormentar** — **Maldición tormentosa** (2026-10-26, la de clase: PdG.Esp contra Res.Esp; 1d6 siniestro y Atormentado 3 turnos): cada acción que cuesta No2 le saca vida (Atormentado).

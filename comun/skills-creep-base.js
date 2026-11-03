@@ -791,12 +791,12 @@
     duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['resmg'], alcance: 'rango', dano: true, danoFormula: '1d6', tipoDano: 'siniestro',
       efectos: [{nombre: 'Atormentado', polaridad: 'debuff'}]}});
   // 😮‍💨 Auditada (dueño, 2026-10-26; Debuffer, «drenar No2», el 20 del rol: «vamos con robar el aliento»; «va sin tope»): su PdG.Esp contra la Res.Esp
-  // de un rival en su Rango; 1d6 siniestro y pierde 2 No2 + la diferencia entre las tiradas, sin tope (nunca baja de 0); en 0, Sentado (el «Pierde No2»
+  // de un rival en su Rango; 1d6 siniestro y pierde 1 No2 + la diferencia entre las tiradas (era 2 + la diferencia hasta el 2026-11-03, dueño), sin tope (nunca baja de 0); en 0, Sentado (el «Pierde No2»
   // del Sonic Boom, js/13). Costo de Claude: 2 No2 y 3 SP, o cooldown 3.
-  H('Robar el aliento', 'DX', '*', 'x', 3, {detalle: 'Le roba el aliento a un rival dentro de su Rango: tira su Probabilidad de Golpe especial contra la Resistencia especial del objetivo. Si gana, 1d6 de daño siniestro (lo frenan la Defensa especial y la Res. siniestro) y pierde 2 No2 más la diferencia entre las tiradas (nunca baja de 0); si se queda sin No2, cae Sentado.',
-    no2: 2, spCosto: 3, auditada: true, ataqueTxt: 'su PdG.Esp contra la Res.Esp; 1d6 siniestro y pierde 2 No2 + la diferencia (en 0, Sentado)',
+  H('Robar el aliento', 'DX', '*', 'x', 3, {detalle: 'Le roba el aliento a un rival dentro de su Rango: tira su Probabilidad de Golpe especial contra la Resistencia especial del objetivo. Si gana, 1d6 de daño siniestro (lo frenan la Defensa especial y la Res. siniestro) y pierde 1 No2 más la diferencia entre las tiradas (nunca baja de 0); si se queda sin No2, cae Sentado.',
+    no2: 2, spCosto: 3, auditada: true, ataqueTxt: 'su PdG.Esp contra la Res.Esp; 1d6 siniestro y pierde 1 No2 + la diferencia (en 0, Sentado)',
     duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['resmg'], alcance: 'rango', dano: true, danoFormula: '1d6', tipoDano: 'siniestro',
-      efectos: [{nombre: 'Pierde No2', no2: 2, no2Dif: true, no2Sentado: true}]}});
+      efectos: [{nombre: 'Pierde No2', no2: 1, no2Dif: true, no2Sentado: true}]}});
   // 🛡💀 Auditada (dueño, 2026-10-24; el Debuffer, «Maldición de la coraza»): reemplaza a la vieja Maldición (a mano). Su PdG.Esp contra la Res.Esp
   // de un rival en su Rango; si gana, Coraza maldita (−2 Defensa y −2 Defensa especial, 3 turnos): todos le pegan más. 2 No2 y 3 SP, o cooldown 3.
   H('Maldición de la coraza', 'X', '*', 'gx', 3, {detalle: 'Le maldice la armadura a un rival dentro de su Rango: tira su Probabilidad de Golpe especial contra la Resistencia especial del objetivo; si gana, queda con Coraza maldita (−2 a su Defensa y −2 a su Defensa especial durante 3 turnos, contra todos).',

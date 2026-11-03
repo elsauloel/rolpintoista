@@ -667,7 +667,10 @@ function rutaSoltada(a, t){
     }
     if(a.costo){
       const costoTotal = costoRuta(a.ruta, a.costo.porCasillero, pasos, num(a.costo.gratis) + alejarseGratis, a.costo.recargo, a.costo.levita, a.costo.ext, a.costo.sprint, a.costo.miedo);   // con el terreno lento (arena movediza), los pasos gratis y Lento
-      const dodge0 = enDodge(a.id) || (libre && !dodgeArco);   // el dodge roll: se hace aunque no alcancen los No2 (queda en negativo, 2026-10-06); el del arco, no
+      // el dodge roll: se hace aunque no alcancen los No2 (queda en negativo, 2026-10-06); el del arco, no. 🐞 (2026-11-03, tanda e: un creep quedó en −37
+      // después de la Bomba de humo) un movimiento libre de N casilleros (Hit and run, Bomba de humo, Disparo y repliegue: `alejarse`) NO es un dodge roll:
+      // los primeros N son gratis y lo que se pase se paga como cualquier movimiento (si no alcanzan los No2, se pregunta), no se deja ir a negativo.
+      const dodge0 = enDodge(a.id) || (libre && !dodgeArco && !(alejarseGratis > 0));
       const dodge = dodge0 && !Combatiente.defensaSinNo2(a.costo.disponibles, costoTotal);   // …salvo si ya estaba en negativo (2026-10-23)
       const dodgeRegla = dodge0 && !dodge;   // ⚖ ya en negativo: la regla dice que no; la mesa puede decir «hacerlo igual» (2026-11-03)
       rutaPendiente = {id: a.id, celdas: a.ruta, pasos, porCasillero: a.costo.porCasillero, ext: a.costo.ext, miedo: a.costo.miedo, costo: costoTotal, disponibles: a.costo.disponibles, oportunidad,

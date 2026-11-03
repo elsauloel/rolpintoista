@@ -78,6 +78,13 @@
 >   del «☁🧪» de abajo). Regla propuesta: en las partidas reales solo mirar salvo pedido; las pruebas, en «Claude · pruebas».
 > - [ ] **📋 Pegar las reglas de Firestore (2026-11-03): ⭐ co-GM** (un GM le da o le saca `gm` a otro miembro; el dueño no se puede sacar; solo el
 >   dueño borra la partida y ofrece el traspaso). Después: index.html → El origen → Jugadores → «⭐ Hacer co-GM» en la cuenta de Claude (la que es GM de «Claude · pruebas»).
+> - [ ] **⚖ Revisar en la compu el balance del Encuentro 2 de El origen (dueño, 2026-11-03: «dejá anotada la revisión del combate para cuando esté en
+>   la compu»).** Detalle en `docs/reporte-simulacion-encuentro2-2026-11-03.md` (simulaciones con el grupo a nivel 3 y los creeps reales). Tal como
+>   está, el grupo pierde casi siempre (Larry cae en la ronda 1–2). Opción recomendada (gana ~73 %, caen los 3 ~21 %, ~5 rondas): **sin Arquero, una
+>   rata, el Cristal en la ronda 2, el Capataz escapa a la mitad**, y **un nivel menos a los tres**: Rompehuesos (4→3) vida 85→40 y Defensa 6→3;
+>   Capataz (5→4) vida 75→30 y Defensa 7→4 (escapa a 15); Chamán (4→3) vida 50→25 y Defensa 5→3; Rata vida 30→20 y PdG 15→11 (también la del
+>   Chillido). Alternativas: más difícil / solo vida y Defensa / más fácil (sin Cristal, menos daño). Decidir cuál y aplicarla (a mano, o Claude
+>   como co-GM con permiso).
 > - [~] (2026-11-03: el dueño cargó Capataz, Rompehuesos —5.ª: Puño de roca—, dos Ratas y el Arquero, con cambios suyos sobre la marcha; falta confirmar el Chamán) **▶ AL RETOMAR EL ENCUENTRO 2 DE EL ORIGEN, RECORDARLE AL DUEÑO (2026-11-03, dueño: «cuando te diga de retomar la próxima pelea del origen,
 >   recordame que termine el arquero y avance con el chamán»)**: cargados por el dueño en MINAS DUNGEON: Capataz del culto, Goblin rompehuesos (le falta
 >   su **5.ª habilidad**, la elige él) y la Rata de galería (duplicada: dos ratas). **El Arquero del culto incendiario quedó a medio cargar**: terminarlo

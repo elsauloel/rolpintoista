@@ -335,7 +335,7 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 4 | **Tajo veloz** (+2 PdG, +2 de daño, Crítico frecuente +1) | **Paso ligero** | + **Ropas de sombra finas** (Buena: Def.Esp +2, Sigilo +2, Evasión +1) |
   | 5 | **Degollar** (+4 PdG, +7 de daño, +1/+1 a los críticos; termina su turno) | — | + una tercera pieza Buena |
   Consumible: Pergamino grupal de Paso Fantasma. Ojo: puede ser muy letal (críticos contra Evasión baja, como las ratas de la simulación del
-  Encuentro 2): medirlo al definir cada nivel. Nivel 1 por definir en detalle.
+  Encuentro 2): medirlo al definir cada nivel. **Nivel 1 en detalle** (2026-11-03): Punzón de hielo 1d4 + 6, ataque 2 No2; Ojo de asesino (rápida, cd 2, lo de un ataque) y Bomba de humo (lenta, cd 3, 3 No2); vida 30, 9 No2; Def 2, Def.Esp 1, Sigilo +1.
 
 - **D2 · Tóxico · Debuffer** (boceto aprobado 2026-11-03, dueño: «el tóxico va bien»). Estrategia: envenena el aire (nubes, espinas, miasma): el
   grupo se tiene que mover o se pudre adentro, y no se cura del todo. Atributos (Esp/Con/Agi/Des/Fue → vida; algo de Des por el Rango): nv1
@@ -347,10 +347,11 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 3 | **Maldición de la sequía** | — | la varita, de Buena calidad |
   | 4 | **Maldición tormentosa** | **Potencia especial** | + una Buena |
   | 5 | **Polen somnífero** (muy lenta) | — | + otra Buena |
-  Consumible: Óleo venenoso. Nivel 1 por definir en detalle.
+  **Nivel 1 aprobado** (dueño, 2026-11-03): Esp 12 · Con 8 · Agi 6 · Des 5 · Fue 2, vida 40, 6 No2; Varita de miasma + Piedra bezoar · Chaleco de
+  cuero · Escarpines de piel de cururú (Def 2, Def.Esp 1, Res. tóxico +3); Espina tóxica (rápida, cd 2, 1 No2) y Nube tóxica (lenta, cd 3, 1 No2).
+  Consumible: **Polvo de adormidera** (en vez del Óleo venenoso, que no usaba: casi no ataca con arma). Sin cargar hasta que el dueño diga.
 - **Primera vuelta de la ronda (boceto de 1 a 5) completa** (2026-11-03): los 12 lugares tienen boceto; con nivel 1 aprobado en detalle: Escudero,
-  Piromante, Sangrador, Sanador, Hachero, Maldito, Tirador, Mago de escarcha, Embestidor y Abanderado; falta el detalle de nivel 1 del Asesino de las
-  sombras y del Tóxico. Sigue la segunda vuelta (T2 Muralla con púas, …) según el orden de la ronda.
+  Piromante, Sangrador, Sanador, Hachero, Maldito, Tirador, Mago de escarcha, Embestidor y Abanderado; con el nivel 1 en detalle también el Asesino de las sombras y el Tóxico (2026-11-03). Sigue la segunda vuelta (T2 Muralla con púas, …) según el orden de la ronda.
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 

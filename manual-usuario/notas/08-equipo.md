@@ -58,6 +58,8 @@ estado: borrador
 +++
 Los escudos dan **[[Defensa]]** y **[[Resistencia a crítico]]**, a veces **[[Bloqueo]]** o **[[Parry]]**. Los hay de **una mano** (podés combinarlos con un arma) y de **dos manos** (más grandes: con uno equipado no llevás arma).
 
+**Atado al antebrazo** (desde el 2026-11-03): algunos escudos de una mano van sujetos al brazo y **no ocupan la mano**, así que se pueden llevar **con dos armas**. Atajan igual que cualquier escudo (Parry, Bloqueo, Golpe de escudo). Son de Buena calidad para arriba: *Brazal de cuero tachonado*, *Rodela de brazo del gladiador* y *Escudo de brazo del capitán*.
+
 > [!example] Del catálogo
 > *Tapa de tacho de basura* (Común, Def 3) · *Broquel de acero* (Raro, Parry +3) · *Muralla de acero* (Raro, dos manos, Def 12, Bloqueo +3, Movimiento −1) · *Baluarte del Último Bastión* (Legendario, dos manos, inmune a rotura de armadura).
 

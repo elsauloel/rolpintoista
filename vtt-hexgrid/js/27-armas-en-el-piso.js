@@ -327,7 +327,7 @@ async function bnLevantarArma(elId){
    → {equipar, soltar: [ids que dejan la mano]}. */
 function levantadoElegirCombatiente(x, it, quien){
   if(!Combatiente.vaEnLaMano(it)) return Promise.resolve({equipar: false, soltar: []});
-  const necesita = /_2m$/.test(String(it.tipoItem || '')) ? 2 : 1, libres = Combatiente.manosLibres(x), extra = Combatiente.COSTO_LEVANTAR_ARMA;
+  const necesita = Combatiente.manosQueOcupa(it), libres = Combatiente.manosLibres(x), extra = Combatiente.COSTO_LEVANTAR_ARMA;
   const enManos = Combatiente.equipoPuesto(x).filter(e => Combatiente.vaEnLaMano(e) && e.natural !== true);
   return new Promise(res => {
     let listo = false;

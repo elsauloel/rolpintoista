@@ -139,6 +139,10 @@
     equipo: ['Punzón de hielo', 'Chaleco de cuero', 'Botas de suela de goma'],
     habilidades: ['Ojo de asesino', 'Bomba de humo'], consumibles: ['Pergamino grupal de Paso Fantasma'],
     estrategia: 'Choque liviano. Desaparece, aparece por la espalda y busca el crítico: va al golpe único.'});
+  esencial({linea: 'L4', nombre: 'Hostigador con trampas', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [7, 6, 8, 10, 2],   // (2026-11-03, dueño: «ya terminamos el L4»)
+    equipo: ['Cortaplumas', 'Chaleco de cuero', 'Calzas de cuero flexible'],
+    habilidades: ['Cordón oculto', 'Hit and run'], consumibles: ['Red de caza'],
+    estrategia: 'Choque liviano. Pica, se va y te hace pisar algo: tiende un cordón, pega y se aleja por arriba; el que lo persigue tropieza.'});
   esencial({linea: 'R2', nombre: 'Hostigador a distancia', rol: 'rango', rolTxt: 'rango', nivel: 1, atrib: [7, 5, 9, 10, 2],
     equipo: ['Arco de tiro ligero', 'Chaleco de cuero', 'Escarpines de fieltro'],
     habilidades: ['Tiro certero', 'Disparo y repliegue'], consumibles: ['Flecha silbadora'],

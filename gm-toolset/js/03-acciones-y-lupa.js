@@ -529,7 +529,7 @@ function encuadrarMiniaturas(raiz){
 const CUPO_CUERPO_CREEP = 8;
 function manosOcupadasCreep(sc){
   const g = Combatiente.gruposDeEquipo(sc), a = Combatiente.armaPrincipal(sc);
-  const ocupa = it => !it || it.natural === true || it.equipado === false ? 0 : /_2m$/.test(String(it.tipoItem || '')) ? 2 : 1;
+  const ocupa = it => !it || it.equipado === false ? 0 : Combatiente.manosQueOcupa(it);   // (lo natural y el escudo atado al antebrazo, 0)
   return ocupa(a) + g.manos.reduce((s, it) => s + ocupa(it), 0);
 }
 

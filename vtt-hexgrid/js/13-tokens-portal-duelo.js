@@ -602,21 +602,21 @@ function trampaDeHabilidad(msg){
       // 🪤 Regla general (dueño, 2026-10-20): una trampa se coloca dentro del Rango de quien la pone y en una casilla que vea; si no, la vuelve a
       // pedir (como el Ojo de Kicillof y la Bombucha). Los pilares y el portal siguen con el aviso de siempre.
       if(!pilar && !portal){ const no = trampaFueraDeAlcance(msg, h); if(no){ toast(no); otra(i); return; } }
-      else{
-        // 👁 El portal también es una trampa: no a la vista de un rival (dueño, 2026-10-27; js/79). Los pilares, no.
-        const ve = portal && typeof trampaALaVista === 'function' ? trampaALaVista(msg, h) : '';
-        if(ve){ toast(`⚠ ${ve} mira esa casilla: una trampa no se coloca a la vista de un rival (fuera de su cono azul)`); otra(i); return; }
-        trampaAvisarAlcance(msg, h);
-      }
+      else trampaAvisarAlcance(msg, h);
+      // 👁 A la vista de un rival (dueño, 2026-11-03, js/79): se puede, pero la ve — Avanzar o Rechazar (vuelve a pedir la casilla). Los pilares, no.
+      let vista = {ok: true, vistos: []};
+      if(!pilar && typeof trampaConfirmarVista === 'function'){ vista = await trampaConfirmarVista(msg, h); if(!vista.ok){ toast('👁 Elegí otra casilla (o Esc para cancelar)'); otra(i); return; } }
       // 🪤 El límite (nivel + 1 por tipo, 2026-10-27, js/79): si ya está en el tope, elige cuál de las suyas se desarma; si cancela, no se coloca.
       if(!pilar && msg.fichaId && typeof trampaLimite === 'function' && !(await trampaLimite(msg, String(t.nombre || msg.nombre || '').trim()))){ toast(`🪤 ${msg.nombre}: no se colocó`); fin(); return; }
       try{
         if(pilar){
           if(!(await levantarPilar(h, t))){ otra(i); return; }   // casilla ocupada: la vuelve a pedir
-        }else if(portal){ portalElegirDestino(msg, t, h, portal); return; }
+        }else if(portal){ portalElegirDestino(msg, t, h, portal, vista); return; }
         else{
-          const r = await TokensAuto.colocarTrampas({fichaId: msg.fichaId, tipoToken: msg.tipoToken || 'pj', trampa: {...t, cant: 1}, mapaId: mapaMostrado, celda: {col: h.col, fila: h.fila}});
+          const r = await TokensAuto.colocarTrampas({fichaId: msg.fichaId, tipoToken: msg.tipoToken || 'pj', trampa: {...t, cant: 1}, mapaId: mapaMostrado, celda: {col: h.col, fila: h.fila},
+            ...(vista.vistos.length ? {descubierta: true} : {})});
           if(!r.colocadas){ toast(`🪤 ${msg.nombre}: no se pudo colocar`); return; }
+          if(vista.vistos.length && typeof trampaAnunciarVista === 'function') trampaAnunciarVista(msg, vista.vistos, t.nombre || msg.nombre);
           if(cant === 1) toast(`🪤 ${msg.nombre}: trampa colocada`);
         }
         puestas++;
@@ -634,9 +634,7 @@ function trampaFueraDeAlcance(msg, h){
   const rr = typeof rangoDeToken === 'function' ? rangoDeToken(mio) : null, rng = rr ? Math.round(num(rr.rng)) : 0, d = distanciaHex(mio, h);
   if(rng > 0 && d > rng) return `⚠ Esa casilla queda a ${d}: la trampa se coloca dentro de tu Rango (${fmt(rng)})`;
   if(!celdasVisionDe(mio).includes(nbPack(h.col, h.fila))) return '⚠ Esa casilla no la ves: la trampa se coloca en tu campo de visión';
-  // 👁 Ni a la vista de un rival (dueño, 2026-10-27): no en el cono de visión directa de ninguno que se vea (js/79).
-  const ve = typeof trampaALaVista === 'function' ? trampaALaVista(msg, h) : '';
-  if(ve) return `⚠ ${ve} mira esa casilla: una trampa no se coloca a la vista de un rival (fuera de su cono azul)`;
+  // 👁 A la vista de un rival ya no se bloquea acá (dueño, 2026-11-03): se pregunta Avanzar / Rechazar (trampaConfirmarVista, js/79).
   return '';
 }
 /* 🪤 Una trampa consumible (2026-10-20, dueño: la misma regla que todas): se elige la casilla con un clic, dentro del Rango y a la vista de quien
@@ -649,10 +647,14 @@ function trampaConsumibleEnMapa(msg){
     const pedir = () => elegirCasillaTrampa(msg, async h => {   // 🪤👁 con los conos de los rivales a la vista (js/79)
       const no = trampaFueraDeAlcance(msg, h);
       if(no){ toast(no); pedir(); return; }
+      // 👁 A la vista de un rival (dueño, 2026-11-03, js/79): Avanzar (la ve) o Rechazar (otra casilla).
+      const vista = typeof trampaConfirmarVista === 'function' ? await trampaConfirmarVista(msg, h) : {ok: true, vistos: []};
+      if(!vista.ok){ toast('👁 Elegí otra casilla (o Esc para cancelar: no se gasta)'); pedir(); return; }
       try{
         const r = await TokensAuto.colocarTrampas({fichaId: msg.fichaId, tipoToken: msg.tipoToken || 'pj', trampa: {...msg.trampa, cant: 1},
-          ...(msg.item ? {item: msg.item} : {}), mapaId: mapaMostrado, celda: {col: h.col, fila: h.fila}});
+          ...(msg.item ? {item: msg.item} : {}), mapaId: mapaMostrado, celda: {col: h.col, fila: h.fila}, ...(vista.vistos.length ? {descubierta: true} : {})});
         if(!r.colocadas){ toast(`🪤 ${nombre}: no se pudo colocar ahí — no se usó`); res(false); return; }
+        if(vista.vistos.length && typeof trampaAnunciarVista === 'function') trampaAnunciarVista(msg, vista.vistos, nombre);
         toast(`🪤 ${nombre}: trampa colocada`);
         res(true);
       }catch(err){ console.error('No se pudo colocar la trampa:', err); toast('No se pudo colocar la trampa — revisá la consola'); res(false); }
@@ -681,11 +683,14 @@ async function levantarPilar(h, t){
   return true;
 }
 // El destino del portal (Varita del portal): a `rango` casillas o menos de la casilla que lo dispara; la trampa guarda los dos puntos.
-function portalElegirDestino(msg, t, h, rango){
+function portalElegirDestino(msg, t, h, rango, vista){
   elegirDestino(async d => {
-    if(distanciaHex(h, d) > rango || (d.col === h.col && d.fila === h.fila)){ toast(`El destino tiene que estar a ${rango} casillas o menos del portal (y no en el mismo lugar)`); portalElegirDestino(msg, t, h, rango); return; }
+    if(distanciaHex(h, d) > rango || (d.col === h.col && d.fila === h.fila)){ toast(`El destino tiene que estar a ${rango} casillas o menos del portal (y no en el mismo lugar)`); portalElegirDestino(msg, t, h, rango, vista); return; }
     try{
-      const r = await TokensAuto.colocarTrampas({fichaId: msg.fichaId, tipoToken: msg.tipoToken || 'pj', trampa: {...t, cant: 1, portal: {rango, destino: d.col + ',' + d.fila}}, mapaId: mapaMostrado, celda: {col: h.col, fila: h.fila}});
+      const vistos = (vista && vista.vistos) || [];
+      const r = await TokensAuto.colocarTrampas({fichaId: msg.fichaId, tipoToken: msg.tipoToken || 'pj', trampa: {...t, cant: 1, portal: {rango, destino: d.col + ',' + d.fila}}, mapaId: mapaMostrado, celda: {col: h.col, fila: h.fila},
+        ...(vistos.length ? {descubierta: true} : {})});
+      if(r.colocadas && vistos.length && typeof trampaAnunciarVista === 'function') trampaAnunciarVista(msg, vistos, t.nombre || msg.nombre);
       toast(r.colocadas ? `🌀 ${msg.nombre}: portal colocado (lleva ${distanciaHex(h, d)} casillas más allá)` : `🌀 ${msg.nombre}: no se pudo colocar`);
     }catch(err){ console.error('No se pudo colocar el portal:', err); toast('No se pudo colocar el portal — revisá la consola'); }
   }, `<b>🌀 ${msg.nombre ? esc(msg.nombre) + ': ' : ''}elegí adónde lleva el portal</b> <span>clic en una casilla a ${rango} o menos de la trampa · Esc o clic derecho cancelan</span>`, false);
@@ -708,10 +713,15 @@ async function colocarGlifo(msg){
   });
   const lim = rango ? `a ${rango} o menos de ${esc(nombreDe(mio))} (su Rango)` : 'clic en el mapa';
   const fuera = c => { if(dentro(c)) return false; toast(`⚠ Esa casilla queda a ${distanciaHex(mio, c)}: tiene que estar dentro del Rango (${rango})`); return true; };
-  // 👁 El glifo es una trampa: no a la vista de un rival (dueño, 2026-10-27; js/79). El destino, sí puede verse.
-  const aLaVista = c => { const ve = typeof trampaALaVista === 'function' ? trampaALaVista(msg, c) : ''; if(ve) toast(`⚠ ${ve} mira esa casilla: una trampa no se coloca a la vista de un rival (fuera de su cono azul)`); return !!ve; };
-  const h = await pedir(`<b>🌀 ${esc(nombre)}: elegí la casilla del glifo</b> <span>${lim} · Esc o clic derecho cancelan</span>`, true, c => !fuera(c) && !aLaVista(c), true);
-  if(!h) return false;
+  // 👁 El glifo es una trampa: a la vista de un rival se puede, pero la ve (dueño, 2026-11-03; js/79): Avanzar o Rechazar (otra casilla). El destino, sí puede verse.
+  let h = null, vista = {ok: true, vistos: []};
+  for(;;){
+    h = await pedir(`<b>🌀 ${esc(nombre)}: elegí la casilla del glifo</b> <span>${lim} · Esc o clic derecho cancelan</span>`, true, c => !fuera(c), true);
+    if(!h) return false;
+    vista = typeof trampaConfirmarVista === 'function' ? await trampaConfirmarVista({...msg, trampa: {...t, cant: 1}}, h) : {ok: true, vistos: []};
+    if(vista.ok) break;
+    toast('👁 Elegí otra casilla (o Esc para cancelar)');
+  }
   const d = await pedir(`<b>🌀 ${esc(nombre)}: elegí adónde manda</b> <span>${lim} · Esc o clic derecho cancelan</span>`, false, c => {
     if(c.col === h.col && c.fila === h.fila){ toast('El destino no puede ser la misma casilla del glifo'); return false; }
     return !fuera(c);
@@ -719,7 +729,9 @@ async function colocarGlifo(msg){
   if(!d) return false;
   try{
     const r = await TokensAuto.colocarTrampas({fichaId: msg.fichaId, tipoToken: msg.tipoToken || 'pj', mapaId: mapaMostrado, celda: {col: h.col, fila: h.fila},
-      trampa: {...t, cant: 1, portal: {rango: Math.max(1, distanciaHex(h, d)), destino: d.col + ',' + d.fila}}, ...(msg.item ? {item: msg.item} : {})});
+      trampa: {...t, cant: 1, portal: {rango: Math.max(1, distanciaHex(h, d)), destino: d.col + ',' + d.fila}}, ...(msg.item ? {item: msg.item} : {}),
+      ...(vista.vistos.length ? {descubierta: true} : {})});
+    if(r.colocadas && vista.vistos.length && typeof trampaAnunciarVista === 'function') trampaAnunciarVista(msg, vista.vistos, nombre);
     toast(r.colocadas ? `🌀 ${nombre}: colocado (manda ${distanciaHex(h, d)} casillas más allá)` : `🌀 ${nombre}: no se pudo colocar`);
     return !!r.colocadas;
   }catch(err){ console.error('No se pudo colocar el glifo:', err); toast('No se pudo colocar el glifo — revisá la consola'); return false; }

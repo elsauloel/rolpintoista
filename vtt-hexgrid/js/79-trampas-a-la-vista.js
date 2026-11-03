@@ -1,4 +1,4 @@
-/* 🪤👁 Una trampa no se coloca a la vista de un enemigo (regla del dueño, 2026-10-27: «al momento de colocar una trampa, cuando aparece el mapa,
+/* 🪤👁 (Desde el 2026-11-03 se puede, pero la ve: trampaConfirmarVista, abajo.) Una trampa no se coloca a la vista de un enemigo (regla del dueño, 2026-10-27: «al momento de colocar una trampa, cuando aparece el mapa,
    deben aparecer los conos de visión, los mismos que se usan para el sigilo, porque una trampa no se puede poner en el campo de visión directa de
    un enemigo»). Mientras se elige la casilla de una trampa (de una habilidad, un consumible o el glifo), el mapa muestra el cono azul y la zona de
    alerta naranja de los rivales que quien la pone ve (como el 👓 de los lentes); una casilla dentro del cono de alguno no sirve: avisa y la vuelve a
@@ -22,12 +22,51 @@ function trampaALaVista(msg, h){
   const r = trampaRivalesALaVista(trampaTokenDe(msg)).find(x => zonasClaves(x).cono.has(nbPack(h.col, h.fila)));
   return r ? nombreDe(r) : '';
 }
+/* 👁 A la vista de un rival: se puede, pero la ve (dueño, 2026-11-03: «si alguno de sus casilleros queda dentro del cono de visión directo de un
+   enemigo, le debe aparecer una notificación: estás poniendo una trampa dentro del cono de visión de un enemigo, la va a ver, avanzar o rechazar»;
+   reemplaza al «no se coloca» del 2026-10-27). Se miran TODAS las casillas que va a ocupar (la línea del Cordón, la flor de los Abrojos…), con el
+   cono de los rivales que quien la pone ve (los que no se ven no cuentan: no se delatan). Avanzar → se coloca descubierta (la ve todo el mundo);
+   Rechazar → se vuelve a pedir la casilla (Esc sigue cancelando como siempre). */
+// Las casillas que va a ocupar una trampa puesta en `h` (la misma cuenta que TokensAuto.colocarTrampas: la línea sale hacia donde mira el token).
+function trampaCeldasPrevias(msg, h){
+  const mio = trampaTokenDe(msg);
+  let t = msg.trampa || {};
+  try{ if(typeof Plantillas !== 'undefined' && Plantillas.trampaDesde) t = Plantillas.trampaDesde(t) || t; }catch(e){}
+  const linea = t.tipo === 'linea' || t.forma === 'linea';
+  const frente = mio ? ((Math.round(num(mio.rotacion || 0) / 60) % 6) + 6) % 6 : 0;
+  const largo = Math.max(1, Math.min(20, Math.round(num(t.tamano || t.largo)) || 3));
+  const radio = linea ? 0 : (typeof Plantillas !== 'undefined' && Plantillas.radioDeTrampa ? Plantillas.radioDeTrampa(t) : Math.max(0, Math.round(num(t.radio))));
+  const celdas = linea ? Array.from({length: largo}, (_, i) => ({dq: 0, dr: i})) : celdasFlor(radio);
+  return celdasDeElemento({origen: {col: h.col, fila: h.fila}, celdas, rotacion: linea ? frente * 60 : 0});
+}
+// Los rivales (que se ven) que tienen alguna de esas casillas en su cono. → [tokens]
+function trampaQuienesVen(msg, celdas){
+  const claves = new Set((celdas || []).map(c => nbPack(c.col, c.fila)));
+  return trampaRivalesALaVista(trampaTokenDe(msg)).filter(r => [...zonasClaves(r).cono].some(k => claves.has(k)));
+}
+// → Promise<{ok, vistos: [nombres]}>: ok false = Rechazar.
+async function trampaConfirmarVista(msg, h){
+  const vistos = trampaQuienesVen(msg, trampaCeldasPrevias(msg, h)).map(r => nombreDe(r));
+  if(!vistos.length) return {ok: true, vistos: []};
+  const lista = vistos.length === 1 ? vistos[0] : vistos.slice(0, -1).join(', ') + ' y ' + vistos[vistos.length - 1];
+  const texto = `⚠ Estás poniendo la trampa dentro del cono de visión de ${lista}: la ${vistos.length === 1 ? 'va' : 'van'} a ver.\n\n¿Avanzar (queda a la vista) o Rechazar (elegís otra casilla)?`;
+  const si = typeof Confirmar !== 'undefined' ? await Confirmar.preguntar(texto, {titulo: 'Trampa a la vista de un rival', icono: '👁', si: 'Avanzar', no: 'Rechazar'}) : confirm(texto);
+  return si ? {ok: true, vistos} : {ok: false, vistos};
+}
+// La línea en la Mesa cuando se colocó igual, a la vista.
+function trampaAnunciarVista(msg, vistos, nombre){
+  if(!vistos || !vistos.length || !fbUsuario) return;
+  const mio = trampaTokenDe(msg), quien = mio ? nombreDe(mio) : String(msg.nombre || 'Alguien');
+  fbDb.collection(fbRutaCampana('tiradas')).add({uid: fbUsuario.uid, jugador: (fbMiembro && fbMiembro.nombre) || '', quien,
+    origen: `👁 ${quien} colocó una trampa a la vista de ${vistos.join(', ')}`, formula: `«${String(nombre || msg.nombre || 'Trampa').slice(0, 40)}»: la vieron, quedó descubierta`,
+    rolls: [], mod: 0, total: 0, desde: 'recordatorio', cuando: firebase.firestore.FieldValue.serverTimestamp()}).catch(err => console.error('Trampa a la vista (Mesa):', err));
+}
 // Pedir la casilla de una trampa con los conos a la vista; los apaga al elegir o al cancelar (si se vuelve a pedir, se prenden de nuevo).
 function elegirCasillaTrampa(msg, cb, texto, libre, alCancelar){
   const rivales = trampaRivalesALaVista(trampaTokenDe(msg));
   trampaConosRivales = rivales.length ? [...tokens.entries()].filter(([, x]) => rivales.includes(x)).map(([id]) => id) : null;
   const apagar = () => { trampaConosRivales = null; pedirDibujo(); };
-  elegirDestino(h => { apagar(); cb(h); }, texto + (rivales.length ? ' <span>· 👁 no a la vista de un rival (su cono azul)</span>' : ''), libre,
+  elegirDestino(h => { apagar(); cb(h); }, texto + (rivales.length ? ' <span>· 👁 el cono azul de un rival: si la ponés ahí, la ve</span>' : ''), libre,
     () => { apagar(); if(alCancelar) alCancelar(); });
 }
 /* 🪤 El límite de trampas de habilidad (regla del dueño, 2026-10-27: «un límite de trampas activas igual al nivel… más 1. Y eso por cada tipo de

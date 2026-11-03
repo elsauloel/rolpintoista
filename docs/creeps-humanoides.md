@@ -42,7 +42,7 @@
 ### Aprobados
 
 > ✅ **Programados el 2026-11-03** en `comun/creeps-esenciales.js` (el pool esencial: «+ Creep» de GM Tools → pestaña «⭐ Pool esencial»): T1, M1, L1, S1, W1 (con los atributos revisados), D1. Equipo del catálogo por nombre, habilidades de fábrica con su costo y cooldown, consumibles en el cinturón.
-> ✅ **Programados también el 2026-11-03 (segunda tanda)**: R1, T2 (nivel 1 rehecho), M2, M3, M4, H1, H2, W2 (con las dos armas puestas; atacar con la segunda en creeps sigue pendiente), L2, L3, R2, S2, S3, S4, D2, D3, D4 — 23 en total. Los de Especial más alto (magos, debuffers, Sanador, Protector) arrancan con SP. L4 queda afuera (solo boceto).
+> ✅ **Programados también el 2026-11-03 (segunda tanda)**: R1, T2 (nivel 1 rehecho), M2, M3, M4, H1, H2, W2 (con las dos armas puestas; atacar con la segunda en creeps sigue pendiente), L2, L3, R2, S2, S3, S4, D2, D3, D4 — 23 en total. Los de Especial más alto (magos, debuffers, Sanador, Protector) arrancan con SP. **L4 sumado el mismo día** (nivel 1 aprobado): 24 en total.
 
 - **T1 · Escudero · Tanque · nivel 1** (aprobado 2026-11-02; **atributos y arma rehechos el 2026-11-03**, dueño: «dejarlo así»). Referencia: un grupo
   de nivel 1, no los personajes actuales. Estrategia: se planta adelante, provoca y aguanta; con el hacha le rompe la armadura al que lo ignora.
@@ -531,7 +531,11 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 3 | **Abrojos** | — | el arma, de Buena |
   | 4 | **Polvo cegador** | **Puntería** | + una Buena |
   | 5 | **Dash** | — | + otra Buena |
-  Consumible: Red de caza. Nivel 1 en detalle: más adelante («lo vamos a ir viendo uno a uno»).
+  Consumible: Red de caza.
+  **Nivel 1 aprobado** (dueño, 2026-11-03: «ya terminamos el L4»): Des 10 · Agi 8 · Con 7 · Fue 6 · Esp 2, vida 35, 8 No2, turnos de espera;
+  Cortaplumas (Tipo 4, 1d4 + 7, Ini +2) · Chaleco de cuero · Calzas de cuero flexible: Def 2, Def.Esp 0, Eva +1. Cordón oculto (rápida, con la
+  regla nueva: tropieza, avanza 1 y tira Agilidad contra su Destreza; si pierde, Sentado y Tropezado: no se mueve más ese turno) y Hit and run
+  (lenta). Consumible: Red de caza. **Programado** en el pool esencial el 2026-11-03.
 
 - **D4 · Control mental y ceguera · Debuffer, con SP** (boceto y nivel 1 aprobados 2026-11-03, dueño: «lo confirmo como ruta»; «va»). Estrategia:
   te saca el control: te ciega o te encandila (Destello, Cegar), te abre la mente (Punzada mental, −2 Res.Mt) y ahí te confunde, te asusta o te
@@ -620,7 +624,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | T2 | | | | | |
 | H2 | ✅ (2026-11-03) | | | | |
 | L3 | | | | | |
-| L4 | boceto ✅ (2026-11-03) | | | | |
+| L4 | ✅ (2026-11-03) | | | | |
 | R2 | ✅ (2026-11-03) | | | | |
 | M2 | ✅ (2026-11-03) | | | | |
 | S2 | ✅ (2026-11-03) | | | | |

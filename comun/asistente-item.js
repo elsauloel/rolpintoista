@@ -542,7 +542,11 @@ const AsistenteItem = (() => {
         ? `Protege contra los críticos de ${crit.map(id => `<b>Tipo ${CRIT_TIPO[id]}</b> (+${f(modVal(d, id))})`).join(', ')}. ${crit.length < 5 ? 'Contra los demás Tipos no ayuda.' : ''}`
         : 'Sin resistencia a críticos: si el arma que te pega saca crítico, este ítem no lo frena.');
       if(d.tipoItem === 'escudo_2m') h += efecto('Ocupa <b>las dos manos</b>: con este escudo no se puede llevar arma.');
-      if(d.tipoItem === 'escudo_1m') h += efecto('Ocupa <b>una mano</b>: la otra queda para un arma.');
+      if(d.tipoItem === 'escudo_1m' && !d.orbe){   // 💪 Atado al antebrazo (2026-11-03, dueño): no ocupa la mano
+        h += campo('¿Cómo se lleva?', `<div class="aa-opciones">${op('antebrazo', '0', !d.antebrazo, '✋ En la mano')}${op('antebrazo', '1', !!d.antebrazo, '💪 Atado al antebrazo')}</div>`,
+          d.antebrazo ? '<b>No ocupa la mano</b>: se puede llevar con dos armas. Ataja (Parry, Bloqueo, Golpe de escudo) igual que cualquier escudo.' : 'Ocupa una mano, como cualquier escudo.');
+      }
+      if(d.tipoItem === 'escudo_1m') h += efecto(d.antebrazo && !d.orbe ? 'Atado al antebrazo: <b>no ocupa la mano</b> (las dos quedan para armas).' : 'Ocupa <b>una mano</b>: la otra queda para un arma.');
       if(cfg.conMano && d.tipoItem === 'escudo_1m') h += campoMano(d);
       if(/^armadura_/.test(d.tipoItem)) h += `<div class="aa-nota">Una armadura blanda y una rígida se pueden llevar a la vez; del resto de las piezas, una de cada una.</div>`;
     }
@@ -809,6 +813,7 @@ const AsistenteItem = (() => {
       if(grupoDe(d.tipoItem) === 'arma' && !n(d.peso)) d.peso = 1;
     }
     else if(ds.aaClase){ if(ds.aaClase === 'especial'){ d.especial = d.especial || ESPECIAL_NUEVA(); d.armaDeRango = false; } else delete d.especial; }
+    else if(ds.aaAntebrazo !== undefined){ if(ds.aaAntebrazo === '1') d.antebrazo = true; else delete d.antebrazo; }
     else if(ds.aaOrbe !== undefined){ if(ds.aaOrbe === '1') d.orbe = true; else { delete d.orbe; delete d.orbeResguardo; delete d.orbeSalvaje; delete d.orbeCustodio; delete d.orbeAbsorcion; } }
     else if(ds.aaSumaesp && d.especial){ if(ds.aaSumaesp === 'si') d.especial.sumaEspecial = true; else if(ds.aaSumaesp === 'mitad') d.especial.sumaEspecial = 0.5; else if(ds.aaSumaesp === 'cuarto') d.especial.sumaEspecial = 0.25; else delete d.especial.sumaEspecial; }
     else if(ds.aaEjec && d.especial){ abrirEjecucion(); return; }
@@ -983,7 +988,7 @@ const AsistenteItem = (() => {
   /* El ítem guardado = lo que había (`base`) con lo que devolvió el asistente (`d`) encima, SIN lo que el asistente sacó a propósito (2026-10-05):
      con `{...base, ...d}` a una varita le quedaba el Tipo 8 de fábrica (y con él, daño físico y Parry), y a un arma que dejó de ser especial, su
      hechizo. Todas las pantallas guardan con esto. */
-  const CONTROLADOS = ['especial', 'orbe', 'orbeResguardo', 'orbeSalvaje', 'orbeCustodio', 'orbeAbsorcion', 'tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', 'efectosGolpe',
+  const CONTROLADOS = ['especial', 'orbe', 'antebrazo', 'orbeResguardo', 'orbeSalvaje', 'orbeCustodio', 'orbeAbsorcion', 'tipoDado', 'danoFijo', 'danoAmplificado', 'armaDeRango', 'espalda', 'efectosGolpe',
     'ignoraResistCrit', 'sinParry', 'oporGratis', 'ahorroNitros', 'critD20', 'arco', 'ideal', 'tiroAlto', 'sinTiroAlto', 'recarga', 'perfora', 'apuntada', 'cargada', 'atraviesaEscudos', 'durExtra', 'durPorPeso',
     'tensar', 'largoAlcance', 'emboscada', 'matabestias', 'contraMarcado', 'espaldaDistancia', 'afinidad',
     'caida', 'apuntadaFirme', 'tiradorApoyo', 'remate', 'primerDisparo', 'puntaDiamante', 'remachadora', 'recuperable', 'cargador', 'carcajExtra', 'dobleCuerda', 'tiroRapido',

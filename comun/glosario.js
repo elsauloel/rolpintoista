@@ -81,6 +81,7 @@ const Glosario = (() => {
     {titulo: 'Si es crítico', re: 'Si es crítico', texto: '⚡ Si es crítico (Critical Matters): ese efecto solo entra si el golpe fue crítico.'},
     {titulo: 'seguro si es crítico', texto: 'Seguro si es crítico: con un golpe crítico, el efecto entra sin tirar.'},
     {titulo: 'siempre', re: '\\(siempre\\)', texto: 'Siempre: el efecto entra en todo golpe que pegue, sin tirar.'},
+    {titulo: 'Atado al antebrazo', re: '[Aa]tado al antebrazo', texto: 'Atado al antebrazo: el escudo va sujeto al brazo y no ocupa la mano, así que se puede llevar con dos armas. Ataja igual que cualquier escudo (Parry, Bloqueo, Golpe de escudo).'},
     {titulo: 'Resistente', re: 'Resistente(?: ×\\d+)?', texto: 'Resistente: aguanta más desgaste antes de romperse (+1 de durabilidad por cada ×).'},
     {titulo: 'Frágil', re: 'Frágil(?: ×\\d+)?', texto: 'Frágil: aguanta menos desgaste antes de romperse (−1 de durabilidad por cada ×).'},
     {titulo: 'Durabilidad', texto: 'Durabilidad: cuánto desgaste aguanta antes de romperse (3 por punto de Peso). Una pieza rota no da sus bonos y repararla cuesta el doble.'},

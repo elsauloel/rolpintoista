@@ -206,6 +206,7 @@ const TokensAuto = (() => {
         imagen: '', imgZoom: 1, imgDX: 0, imgDY: 0, fijado: false,
         trampa: true, trampaNombre: String(o.nombre || 'Trampa').slice(0, 40), trampaDetalle: cortar(o.detalle, tope),
         disparada: false, fuegoAmigo: !!o.fuegoAmigo, trampaDano: String(o.dano || '').slice(0, 12),
+        ...(o.descubierta ? {descubierta: true} : {}),   // 👁 colocada a la vista de un rival (2026-11-03, js/79): la ve todo el mundo
         ...(o.ignoraDef ? {trampaIgnoraDef: true} : {}),
         ...(Number.isFinite(Number(o.detectar)) && Number(o.detectar) >= 1 ? {trampaDetectar: Math.round(Number(o.detectar))} : {}),
         ...(o.item ? {trampaItem: String(o.item).slice(0, 4000), trampaFicha: String(o.fichaId || '').slice(0, 80)} : {}),   // trampa que salió de un consumible: al cerrar el botín, si no se disparó, se desarma (50 % de romperse) y, si aguanta, vuelve a su dueño

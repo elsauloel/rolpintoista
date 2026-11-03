@@ -310,6 +310,12 @@
   resistió, un estallido y estrellitas girando sobre la cabeza ~2,6 s; sobre el que la resistió, un destello chico (sin tarjeta). Ver que un creep
   oculto o en sigilo no se delata, que con «reducir movimiento» sale más corta y sin sacudida, y que el zoom y el paneo no la corren.
 - [ ] **🧠 Punzada mental** (2026-11-03, Debuffer de creep): un creep con la habilidad (⚔ Acciones) contra un jugador: su PdG.Esp contra la Res.Mt; si gana, 1d4 arcano directo (sin restar Def. especial) y el estado «Mente abierta» 🧠 (−2 Res.Mt) que se va al final del próximo turno del rival. Con modo SP: −1 No2 y −1 SP; con turnos de espera: espera 2. Después, una Confusión al mismo rival tiene que leer la Res.Mt con el −2.
+- [ ] **👁 Trampa a la vista de un rival** (2026-11-03, dueño: «avanzar o rechazar»; `vtt-hexgrid/js/79-trampas-a-la-vista.js`): un personaje con una
+  trampa de habilidad o un consumible de trampa (y un creep con el Cordón oculto, línea de 4) la pone con alguna casilla dentro del cono azul de un
+  rival que ve → cartel «Estás poniendo la trampa dentro del cono de visión de X: la va a ver» con Avanzar / Rechazar. Rechazar: vuelve a pedir la
+  casilla (Esc cancela como siempre; el consumible no se gasta). Avanzar: queda colocada y **descubierta** (en la pantalla del rival se ve) y la Mesa
+  dice «👁 X colocó una trampa a la vista de Y». Fuera de todo cono: sin cartel, como siempre. Un rival oculto / en sigilo / en la niebla no cuenta
+  ni se nombra. También el portal y el glifo.
 - [ ] **🎬 El cuadro del duelo nace del token y vuelve a él — para que lo revise el dueño en la compu (también la velocidad)** (2026-11-03, dueño: «al abrirse un duelo… desde el
   token con el que estás teniendo un duelo, se abra… algo chiquitito que se va agrandando… y cuando se termina, vuelve a ese token»;
   `comun/duelo.js` + `window.dueloOrigenPantalla` en `vtt-hexgrid/js/13-tokens-portal-duelo.js`): Rockardo hace el Shockwave contra 2 o 3 creeps
@@ -784,6 +790,12 @@
   **Probado el 2026-10-20 (Claude, «Test con claude elsaulo»):** el creep con Excavar y la Puñalada desde abajo del Kobold tunelero: se mete en la tierra, sale al lado de Silvia (+3 PdG por salir de abajo); con crítico, los efectos pasan a Rengo 2 turnos y Lisiado 1 turno (en vez del Rengo 1).
   «👁 Ver como jugador», abajo, en Probado).
 
+- [ ] **💪 Escudo atado al antebrazo** (2026-11-03, `Combatiente.manosQueOcupa`, `FichaEquipo.pesoEnLugar`): en una ficha, equipar Sable del
+  tahúr + Facón de paisano + Brazal de cuero tachonado → entran los tres (Manos 2/2) y el Parry ofrece el brazal; con un escudo común en vez del
+  brazal, no deja (o pide sacar algo). En un creep (GM Tools, editor), lo mismo: dos armas + el brazal, y «Manos 2/2» en la tarjeta. En el asistente
+  de ítems, un escudo de una mano muestra «¿Cómo se lleva? ✋ En la mano / 💪 Atado al antebrazo». El globo del glosario sobre «Atado al antebrazo».
+- [ ] **🪤 L4 Hostigador con trampas en «+ Creep»** (2026-11-03): aparece en «⭐ Pool esencial» (24); agregarlo: Cortaplumas, Chaleco de cuero,
+  Calzas de cuero flexible, Cordón oculto + Hit and run, Red de caza, vida 35, con turnos de espera.
 - [ ] **🩸 Transfusión sanguínea de creep (Support, 2026-11-03)**: un creep con la habilidad (⚔ Acciones → usarla): el GM toca quién da y quién recibe (dos creeps aliados, él puede ser uno; uno fuera de su Rango avisa y deja seguir; un personaje o una invocación: «a mano»), elige cuánto (como mucho su Especial; quien da queda con 1; quien recibe hasta su máximo) y la vida cambia en los dos; la Mesa dice «X da N de vida → Y +N». Con una Sanguijuela en quien recibe: se la lleva el lanzador. Con Herida sombría: no entra (la vida de quien dio sí se pierde).
 - [ ] **💪 Potencia (antes «Empuje»)**: un creep guardado con «Empuje» aparece como «Potencia» al abrirlo (GM Tools / mapa) y funciona igual (Empower +3).
 

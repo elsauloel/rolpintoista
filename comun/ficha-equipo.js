@@ -156,13 +156,18 @@ const FichaEquipo = (() => {
   };
 
   /* ---------- Los slots ---------- */
+  // Cuánto ocupa una pieza en su lugar: en las manos, lo de dos manos 2; un escudo atado al antebrazo, nada (2026-11-03: se lleva con dos armas).
+  function pesoEnLugar(sd, i){
+    if(sd.id === 'manos_arma' && i && i.antebrazo && /^escudo_/.test(String(i.tipoItem || ''))) return 0;
+    return sd.peso ? (sd.peso[i.tipoItem] || 1) : 1;
+  }
   function slots(S){
     const equipados = (S.inventario || []).filter(i => i.equipado);
     return SLOT_DEFS.map(sd => {
       let usado = 0;
       equipados.forEach(i => {
         if(!sd.cats.includes(i.tipoItem)) return;
-        usado += sd.peso ? (sd.peso[i.tipoItem] || 1) : 1;
+        usado += pesoEnLugar(sd, i);
       });
       return {...sd, usado};
     });
@@ -173,7 +178,7 @@ const FichaEquipo = (() => {
     const slotDef = SLOT_DEFS.find(sd => sd.cats.includes(item.tipoItem));
     if(!slotDef) return null;
     const usado = slots(S).find(s => s.id === slotDef.id)?.usado || 0;
-    const propio = slotDef.peso ? (slotDef.peso[item.tipoItem] || 1) : 1;
+    const propio = pesoEnLugar(slotDef, item);
     // Lo equipado en ese lugar (2026-10-22, dueño: Comparar no andaba con las armas): antes solo lo del mismo tipo exacto, así una varita de una mano
     // no se comparaba con la espada de dos manos que tenías puesta. Primero lo del mismo tipo, después lo demás del mismo lugar.
     const mismoLugar = (S.inventario || []).filter(i => i.equipado && slotDef.cats.includes(i.tipoItem));

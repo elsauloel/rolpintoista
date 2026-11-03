@@ -1515,3 +1515,12 @@ turnos más altos) y **se va al terminar el combate solo si todas se iban** (cri
 descanso: al descansar, la Vida extra queda en lo que tenía o en la del anillo, lo que sea más. **No se juntan** los escudos de los anillos del sereno
 y de la mañana (solo contra un tipo de daño) ni los escudos que no son Vida extra (Arrojo, Orbe de resguardo, Armadura mágica…). Las guardadas aparte
 se juntan solas al empezar el turno de quien las tiene.
+
+### P240 — 💪 ¿El escudo atado al antebrazo vale también con un arma a dos manos? (2026-11-03)
+
+**Contexto:** el dueño pidió el rasgo «Atado al antebrazo» para escudos (2026-11-03: «alguien que tiene dos armas no puede tener escudo, salvo la
+excepcionalidad de un escudo que se ate en el antebrazo… que sea bastante bueno»): el escudo no ocupa la mano, así que entra con dos armas. Quedó
+programado como «no ocupa la mano» en general (`Combatiente.manosQueOcupa`), así que **hoy también entra con un arma a dos manos**.
+**Pregunta:** ¿se deja así (dos manos + escudo atado) o se limita a las armas de una mano? Claude propuso «sí, porque va atado y no se agarra», pero
+el dueño todavía no lo decidió.
+

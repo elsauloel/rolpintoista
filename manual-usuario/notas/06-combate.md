@@ -464,6 +464,7 @@ Jugadores y GM pueden **poner trampas en el mapa**. Una trampa es un objeto de *
 
 ## Cómo funcionan
 - **Los rivales no la ven.** La ven solo su dueño y el GM hasta que se dispara. Armada se dibuja **ámbar con ⚠**; disparada, **roja con ✖** para todos.
+- **A la vista de un rival:** al colocarla se ven los conos azules de los rivales que ves. Si alguna de sus casillas cae en el cono de alguno, aparece un aviso («la va a ver»): **Avanzar** la coloca igual y queda **descubierta** (la ve todo el mundo, y la Mesa dice a la vista de quién); **Rechazar** te deja elegir otra casilla.
 - **Quién la dispara:** solo los rivales de quien la puso (los creeps, si la puso un jugador; los personajes, si la puso el GM). **Los aliados pueden pasarle por encima sin dispararla.** Pero una vez disparada, **su efecto de área alcanza a todos los que estén adentro, aliados incluidos** (fuego amigo).
 - Al soltar un movimiento, si algún casillero de la ruta pisa la trampa, **el movimiento se corta ahí** y aparece una línea roja en la [[La Mesa|Mesa]] con el nombre, quién la activó y qué hace.
 - **Daño automático:** si la trampa tiene una tirada de daño (por ejemplo, 2d6), el mapa la tira solo y se la aplica a quien la activó, restando su [[Defensa]]. En un área también daña a los creeps de adentro cuando mueve el GM; a los demás se les avisa en la Mesa. **Estados y tiradas para evitarla siguen a mano**, y el texto de cada trampa lo aclara.

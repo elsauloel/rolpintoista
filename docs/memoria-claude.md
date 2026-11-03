@@ -117,3 +117,4 @@
   dueño pida explícitamente cambiar algo. Ojo: abrir GM Tools o el mapa como GM escribe solo (historial, republicar tarjetas, poner al día creeps):
   para solo mirar, leer Firestore directo con un script.
 - **Creeps esenciales: SP o turnos de espera** (dueño, 2026-11-03): los de Especial como atributo principal (magos, debuffers, el Sanador) juegan con SP; el resto, con turnos de espera. Al diseñar uno de Especial, hacer las cuentas con SP.
+- **Creeps esenciales: no importa repetir habilidades** (dueño, 2026-11-03): lo que importa es que cada uno tenga identidad y estrategia propias (skills + stats + equipo) que exploten las mecánicas del juego. No marcar las superposiciones como problema.

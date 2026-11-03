@@ -22,6 +22,10 @@
   2 Mago · 3 Choque liviano · 4 Support · 5 Warrior · 6 Debuffer · y los que restan, alternando (de Claude): 7 Rango · 8 Mago · 9 Híbrido ·
   10 Support · 11 Choque liviano · 12 Debuffer. Cada uno **a fondo** (todo el texto: atributos, equipo, skills, consumible) antes de pasar al
   siguiente; no en horizontal («en la dispersión se terminan escapando detalles de diseño»).
+- **Repetir habilidades entre creeps no importa** (dueño, 2026-11-03): «lo prioritario es que cada creep esencial tenga su propia identidad y su
+  propia estrategia entre los skills, los stats y el equipo… siempre que tengan una identidad y una estrategia que valga la pena su existencia y
+  explote las mecánicas y las distintas posibilidades de estrategias que te propone el juego». Las «superposiciones» ya no son un problema a
+  marcar: lo que se cuida es la identidad y la estrategia de cada uno.
 - **SP o turnos de espera** (dueño, 2026-11-03: «todos los que son con énfasis en especial van a trabajar con SP en vez de con cooldown»): los
   que tienen el Especial como atributo principal (magos, debuffers, el Sanador) juegan **con SP** (SP = Esp × 3 + equipo; recupera Esp ÷ 2 por
   turno, mínimo 1); los demás, con turnos de espera. **Programado** en el pool esencial (`comun/creeps-esenciales.js`: modo SP si el Esp es el

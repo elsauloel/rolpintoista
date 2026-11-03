@@ -172,6 +172,15 @@
     habilidades: ['Punzada mental', 'Cegar'], consumibles: ['Polvo de adormidera'],
     estrategia: 'Debuffer. Te saca el control: te ciega, te abre la mente y te confunde. Con daño, para que no lo ignoren.'});
 
+  esencial({linea: 'T3', nombre: 'Guardaespaldas', rol: 'tanque', rolTxt: 'tanque', nivel: 1, atrib: [12, 5, 6, 7, 3],   // (2026-11-03, dueño: «me gusta, sí»)
+    equipo: ['Espada del comisario', 'Escudo de hierro macizo', 'Coraza de cuero hervido', 'Capucha de lana del culto'],
+    habilidades: ['Provocar', 'Escudo humano'], consumibles: ['Poción de Cuero Duro'],
+    estrategia: 'Tanque. Cuida a los suyos: marca a un protegido y se come la mitad de lo que le pegan; provoca al que va por él.'});
+  esencial({linea: 'L5', nombre: 'Duelista', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [7, 5, 8, 11, 2],   // (2026-11-03, dueño: «me parece bien»)
+    equipo: ['Sable del club de barrio', 'Broquel de esgrima', 'Chaleco de cuero', 'Escarpines de fieltro'],
+    habilidades: ['Finta', 'Golpe a la rodilla'], consumibles: ['Óleo venenoso'],
+    estrategia: 'Choque liviano. El esgrimista del mano a mano: lo frena con la rodilla, lo apura con Fintas que no se paran y ataja todo.'});
+
   if(faltan.length) console.warn('Creeps esenciales: no se encontró', faltan.join(', '));
   window.CREEPS_ESENCIALES_FALTAN = faltan;
 })();

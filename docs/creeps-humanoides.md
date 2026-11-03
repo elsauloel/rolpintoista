@@ -562,7 +562,7 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 3 | **Interponerse** (Flash) | — | el escudo, de Buena |
   | 4 | **Tirar la bronca** | **Robustez** | + una Buena |
   | 5 | **Desarmar** (Flash) | — | + otra Buena |
-  **Nivel 1:** vida 60, 6 No2, turnos de espera; Def 5, Def.Esp 1, Res. crít. T4 +2, Bloqueo +1. Consumible: Poción de Cuero Duro. Sin cargar.
+  **Nivel 1:** vida 60, 6 No2, turnos de espera; Def 5, Def.Esp 1, Res. crít. T4 +2, Bloqueo +1. Consumible: Poción de Cuero Duro. **Cargado** en el pool esencial (2026-11-03).
   Pedido del dueño: una animación del Escudo humano que muestre que el daño se reparte entre los dos (en diseño).
 
 - **L5 · Duelista · Choque liviano** (boceto aprobado 2026-11-03, dueño: «me gusta»). Estrategia: el esgrimista del mano a mano: busca a uno, ataja y
@@ -571,11 +571,16 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | Nivel | Habilidad nueva | Pasiva | Equipo |
   |---|---|---|---|
   | 1 | **Finta** (rápida) · **Golpe a la rodilla** (lenta) | — | **Sable del club de barrio** + **Broquel de esgrima** · 2 Comunes livianas |
-  | 2 | **Contraataque** (Flash) | **Desvío hábil** | + 2 Comunes |
+  | 2 | **Contraataque** (Flash) | **Guardia firme** (+1 Bloqueo) | + 2 Comunes |
   | 3 | **Estocada** | — | el sable, de Buena |
-  | 4 | **Arte de la guerra** (Flash) | **Ojo crítico** | + una Buena |
+  | 4 | **Arte de la guerra** (Flash) | **Ojo crítico** | **Escudo triangular** (Buena) en lugar del broquel |
   | 5 | **Ráfaga de cortes** | — | + otra Buena |
   Consumible: Óleo venenoso.
+  **Nivel 1 aprobado** (dueño, 2026-11-03): Des 11 · Agi 8 · Con 7 · Fue 5 · Esp 2, vida 35, 8 No2, turnos de espera; Sable del club de barrio
+  (Tipo 6, 1d6 + 5, Parry +1, PdG en contraataque +1, Sangrado 25 %) + Broquel de esgrima (Parry +2) · Chaleco de cuero · Escarpines de fieltro:
+  Def 2, Parry +3, Eva +1. **Más Bloqueo en la evolución** (dueño: «si tiene un Parry exitoso pero después no puede bloquear, baja su
+  efectividad»): nv2 la pasiva es **Guardia firme** (+1 Bloqueo, en vez de Desvío hábil) y nv4 la pieza Buena es el **Escudo triangular** (Def +2,
+  Res. crít. T4 +1, Bloqueo +1, Parry +1) en lugar del broquel. **Cargado** en el pool esencial (2026-11-03).
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
@@ -658,7 +663,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | W3 | | | | | |
 | T3 | ✅ (2026-11-03) | | | | |
 | H3 | | | | | |
-| L5 | boceto ✅ (2026-11-03) | | | | |
+| L5 | ✅ (2026-11-03) | | | | |
 | L6 | | | | | |
 | R3 | | | | | |
 | M3 | ✅ (2026-11-03) | | | | |

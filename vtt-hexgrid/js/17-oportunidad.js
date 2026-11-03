@@ -107,7 +107,7 @@ function oporNegadaAvisar(t, id, ruta, motivo, excluir){
       try{ mesaLinea(`💨 ${texto}`, 'recordatorio'); }catch(err){}
       try{ momentoAbrir({tipo: 'oportunidad-negada', icono: '💨', titulo: `${quien} se alejó de ${nombreDe(r)}`, resultado: 'No permite ataque de oportunidad', estado: 'listo',
         datos: {...(uid ? {paraUid: uid} : {}), aviso: true, boton: 'Entendido',
-          pasos: [{titulo: 'Sin ataque de oportunidad', texto: `${quien} se alejó de ${nombreDe(r)} con ${con}: no permite ataque de oportunidad. No hace falta preguntar: esta vez no se puede.`}]}}); }catch(err){}
+          pasos: [{titulo: 'Sin ataque de oportunidad', texto: `${quien} se alejó de ${nombreDe(r)} con ${con}: no permite ataque de oportunidad.`}]}}); }catch(err){}
     });
     return negados.map(([rid]) => rid);
   }catch(err){ console.error('No se pudo avisar la oportunidad negada:', err); return []; }

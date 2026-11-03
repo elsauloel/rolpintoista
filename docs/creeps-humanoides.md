@@ -623,7 +623,12 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 3 | **Golpe que sigue** | — | **Espada del herrero** (Buena, Tipo 6) |
   | 4 | **Arte de la guerra** (Flash) | **Desvío hábil** | + una Buena |
   | 5 | **Golpe demoledor** | — | + otra Buena |
-  Arma de Tipo 6, no hacha: el Golpe que sigue son dos ataques (Tipo 6: 3 + 3 = 6 No2; Tipo 8: 8, no le alcanza). Consumible: Poción de Cuero Duro.
+  Arma de Tipo 6, no hacha: el Golpe que sigue son dos ataques (Tipo 6: 3 + 3 = 6 No2; Tipo 8: 8, no le alcanza).
+  **Nivel 1 aprobado** (dueño, 2026-11-03: «va así»), con la ruta ajustada (Romper armadura y Desarmar eran las dos lentas): **nv1 Estocada
+  (rápida) · Desarmar (Flash)**; nv2 Romper armadura + Guardia firme; nv3 Golpe que sigue; nv4 Remate + Desvío hábil; nv5 Golpe demoledor (sale el
+  Arte de la guerra). Fue 9 · Con 9 · Des 8 · Agi 5 · Esp 2, vida 45, 5 No2; Facón largo (Tipo 6, 1d6 + 9, Parry +1) + Escudo de asalto (Def 2,
+  Parry +1) · Coraza de cuero hervido · Botas de cuero de vaca: Def 6, Parry +2. Consumible: **Pergamino grupal de Reflejo de Acero** (+1 Parry 3
+  turnos, para desarmar más). **Cargado** en el pool esencial (2026-11-03).
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
@@ -705,7 +710,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | D2 | | | | | |
 | W3 | ✅ (2026-11-03) | | | | |
 | T3 | ✅ (2026-11-03) | | | | |
-| H3 | boceto ✅ (2026-11-03) | | | | |
+| H3 | ✅ (2026-11-03) | | | | |
 | L5 | ✅ (2026-11-03) | | | | |
 | L6 | | | | | |
 | R3 | ✅ (2026-11-03) | | | | |

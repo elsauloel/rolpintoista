@@ -191,6 +191,11 @@
     habilidades: ['Tiro certero', 'Tiro a la rodilla'], consumibles: ['Virote de red'],
     estrategia: 'Rango. Frena y clava: no busca matar, busca que no te muevas; te deja rengo para que sus aliados te alcancen.'});
 
+  esencial({linea: 'H3', nombre: 'Duelista pesado', rol: 'hibrido', rolTxt: 'melee', nivel: 1, atrib: [9, 9, 5, 8, 2],   // (2026-11-03, dueño: «va así»)
+    equipo: ['Facón largo', 'Escudo de asalto', 'Coraza de cuero hervido', 'Botas de cuero de vaca'],
+    habilidades: ['Estocada', 'Desarmar'], consumibles: ['Pergamino grupal de Reflejo de Acero'],
+    estrategia: 'Híbrido. Te desarma cuando gana el Parry, te rompe la armadura y te remata: un muro que castiga al que se le acerca.'});
+
   if(faltan.length) console.warn('Creeps esenciales: no se encontró', faltan.join(', '));
   window.CREEPS_ESENCIALES_FALTAN = faltan;
 })();

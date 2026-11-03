@@ -336,6 +336,21 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   Consumible: Pergamino grupal de Paso Fantasma. Ojo: puede ser muy letal (críticos contra Evasión baja, como las ratas de la simulación del
   Encuentro 2): medirlo al definir cada nivel. Nivel 1 por definir en detalle.
 
+- **D2 · Tóxico · Debuffer** (boceto aprobado 2026-11-03, dueño: «el tóxico va bien»). Estrategia: envenena el aire (nubes, espinas, miasma): el
+  grupo se tiene que mover o se pudre adentro, y no se cura del todo. Atributos (Esp/Con/Agi/Des/Fue → vida; algo de Des por el Rango): nv1
+  12/8/6/5/2 → 40 · nv2 14/9/6/5/2 → 45 · nv3 15/9/7/6/2 → 45 · nv4 17/10/7/6/2 → 50 · nv5 18/10/8/7/2 → 50.
+  | Nivel | Habilidad nueva | Pasiva | Equipo |
+  |---|---|---|---|
+  | 1 | **Espina tóxica** (rápida) · **Nube tóxica** (lenta) | — | **Varita de miasma** (alcanza también a sus aliados) + **Piedra bezoar** (Res. tóxico +2, Veneno −1 stack) · Chaleco de cuero · Escarpines de piel de cururú (Def 2, Def.Esp 1, Res. tóxico +3) |
+  | 2 | **Corroer** | **Puntería arcana** | + 2 Comunes |
+  | 3 | **Maldición de la sequía** | — | la varita, de Buena calidad |
+  | 4 | **Maldición tormentosa** | **Potencia especial** | + una Buena |
+  | 5 | **Polen somnífero** (muy lenta) | — | + otra Buena |
+  Consumible: Óleo venenoso. Nivel 1 por definir en detalle.
+- **Primera vuelta de la ronda (boceto de 1 a 5) completa** (2026-11-03): los 12 lugares tienen boceto; con nivel 1 aprobado en detalle: Escudero,
+  Piromante, Sangrador, Sanador, Hachero, Maldito, Tirador, Mago de escarcha, Embestidor y Abanderado; falta el detalle de nivel 1 del Asesino de las
+  sombras y del Tóxico. Sigue la segunda vuelta (T2 Muralla con púas, …) según el orden de la ronda.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

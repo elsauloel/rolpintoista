@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261030lp2', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261103amp', '../comun/creep-botonera.js?v=20261030cn2', '../comun/creep-acciones.js?v=20261103t2b', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261103t4'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261030lp2', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261103amp', '../comun/creep-botonera.js?v=20261030cn2', '../comun/creep-acciones.js?v=20261103fl', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261103t4'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -727,7 +727,7 @@ async function acEjecutarHab(sc, habId){
       // ↩ Lo que cobró, para el duelo que arme (P233): si se cancela y no cuenta, se devuelve.
       if(typeof Duelo !== 'undefined' && Duelo.pagoHab) Duelo.pagoHab(id, {habId, nombre: h.nombre || '', no2: ac.devolucion.nitros, sp: ac.devolucion.sp, hp: num(p.costoHp), cd: cdNuevo !== antes.cd ? antes.cd : -1}); }
     if(p.aviso) toast(p.aviso);
-    if(doble) try{ mesaLinea(`⚡ ${p.creep.nombre || 'El creep'}: ${h.nombre || 'la habilidad'} en turno ajeno (Flash) — cuesta el doble (${CreepCalculo.modoSP(p.creep) ? `${fmt(p.costoSp)} SP` : `cooldown ${fmt(num(h.cd) * 2)}`})`, 'recordatorio'); }catch(err){}
+    if(doble) try{ mesaLinea(`⚡ ${p.creep.nombre || 'El creep'}: ${h.nombre || 'la habilidad'} en turno ajeno (Flash) — cuesta más (${CreepCalculo.modoSP(p.creep) ? `${fmt(p.costoSp)} SP, el doble` : `cooldown ${fmt(Combatiente.cdFlash(num(h.cd), false))} en vez de ${fmt(num(h.cd))}`})`, 'recordatorio'); }catch(err){}
     if(p.curaCon !== undefined) try{   // 💨 el Segundo aliento: nunca en silencio
       const txt = `${p.creep.nombre || 'El creep'} toma un segundo aliento: +${fmt(p.curaCon)} de vida${p.quitado ? ` y se saca ${p.quitado}` : ''} (una vez por combate).`;
       mesaLinea(`💨 ${txt}`, 'recordatorio');

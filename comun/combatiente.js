@@ -2034,11 +2034,14 @@ const Combatiente = (() => {
       ...(c.terminaTurno ? {terminaTurno: true} : {}), ...(c.soloCritico ? {soloCritico: true} : {}), ...(c.perforante ? {perforante: true} : {})};   // Proyectil perforante (2026-10-13): sigue al de atrás   // Headshot (2026-10-12): si no es crítico, falla   // Degollar (2026-10-10): al resolverse, termina el turno y pasa al final del orden
   }
   /* ⚡ Flash (P136, regla del dueño 2026-09-30): en el propio turno cuesta lo que dice la habilidad; en turno ajeno, EL DOBLE —
-     SP (personaje), cooldown (creep) y vida por igual, se use dentro del duelo o con el botón. `costo` = {sp, cd, hp};
+     SP (personaje) y vida; el cooldown de un creep, un 50 % más (mínimo +1; 2026-11-03), se use dentro del duelo o con el botón. `costo` = {sp, cd, hp};
      `o.spAjeno`: si la habilidad tiene cargado a mano otro SP para turno ajeno, manda ese. */
   function costoFlash(costo, turnoPropio, o){
     const c = costo || {}, k = turnoPropio ? 1 : 2;
-    const out = {sp: Math.max(0, nf(c.sp)) * k, cd: Math.max(0, nf(c.cd)) * k, hp: Math.max(0, nf(c.hp)) * k};
+    // ⏳ El cooldown de un creep, en turno ajeno: un 50 % más (para abajo, mínimo +1), no el doble (dueño, 2026-11-03: «el flash de creeps tiene que
+    // ser un 50 % más, redondeado hacia abajo con un mínimo de 1»). El SP y la vida siguen al doble.
+    const cd0 = Math.max(0, nf(c.cd));
+    const out = {sp: Math.max(0, nf(c.sp)) * k, cd: turnoPropio || !cd0 ? cd0 : cd0 + Math.max(1, Math.floor(cd0 / 2)), hp: Math.max(0, nf(c.hp)) * k};
     const aj = o && o.spAjeno;
     if(!turnoPropio && aj !== undefined && aj !== null && String(aj).trim() !== '') out.sp = Math.max(0, nf(aj));
     return out;

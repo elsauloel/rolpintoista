@@ -466,7 +466,7 @@ const CreepAcciones = (() => {
     const t = `${sc.nombre} tiene ${fmt(tiene)} de SP y ${h.nombre || 'la habilidad'} cuesta ${fmt(cuesta)}. ¿Usarla igual? (queda en 0)`;
     return typeof Confirmar !== 'undefined' ? Confirmar.preguntar(t, {titulo: 'No le alcanza el SP', icono: '💧', si: 'Usarla igual', no: 'No'}) : confirm(t);
   }
-  // `o.doble` (2026-10-24): una habilidad Flash usada en turno ajeno cuesta el doble — el cooldown o el SP (P136; lo decide el mapa, que sabe de quién es el turno).
+  // `o.doble` (2026-10-24): una habilidad Flash usada en turno ajeno cuesta más — el SP el doble; el cooldown, un 50 % más (mínimo +1; 2026-11-03) (P136; lo decide el mapa, que sabe de quién es el turno).
   function ejecutarHab(sc, h, presets, silencioOk, o = {}){
     const sil = Combatiente.preguntaSilencio(sc.estados, h, sc.nombre, sc.id);   // Silencio (2026-10-04): avisa y deja seguir (también el Tótem de silencio)
     if(sil && !silencioOk) return {error: `${sc.nombre}: en Silencio, no usó ${h.nombre || 'la habilidad'}`};
@@ -482,7 +482,7 @@ const CreepAcciones = (() => {
     const veces = o.doble ? 2 : 1, ex = o.extra || {};   // `o.extra` (2026-10-24, el largo del Muro de fuego): {sp, no2, cd} de más
     if(num(ex.no2) > 0) sc.nitros = num(sc.nitros) - num(ex.no2);
     if(C().modoSP(sc)){ costoSp = C().costoSpHab(sc, h) * veces + Math.max(0, num(ex.sp)); sc.sp = Math.max(0, C().spActual(sc) - costoSp); }
-    else h.cdActual = num(h.cd) * veces + Math.max(0, num(ex.cd));
+    else h.cdActual = (o.doble ? Combatiente.cdFlash(num(h.cd), false) : num(h.cd)) + Math.max(0, num(ex.cd));   // ⏳ en turno ajeno, un 50 % más (mínimo +1; 2026-11-03)
     const malditoDano = malditoCreep(sc, h);   // 🩸 Maldito: su cooldown en vida (2026-10-18)
     if(C().habAtaque(h)) sc.ataquesTurno = num(sc.ataquesTurno) + 1;  // cuenta como su ataque
     if(costoHp > 0) sc.hp = num(sc.hp) - costoHp;

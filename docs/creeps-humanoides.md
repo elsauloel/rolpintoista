@@ -427,6 +427,20 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   vaca: Def 3, Def.Esp 0. Golpe desesperado (cd 2, con el sable) y Furia (cd 3, 2 No2). Consumible: Poción de Regeneración menor. Espada y facón
   (6 + 4) del nivel 1 al 4: con las dos gasta 5 y le sobra 1; dos espadas (6 + 6) en el 5, con 8 No2. Sin cargar hasta que el dueño diga.
 
+- **D3 · Ladrón de fuerzas · Debuffer** (boceto aprobado 2026-11-03, dueño: «lo apruebo así»). Estrategia: le saca al rival lo que necesita para
+  pelear (los No2, la puntería, las curas, las bendiciones) y se queda con parte; elige al que más hace y lo deja sin aire. Atributos
+  (Esp/Con/Agi/Des/Fue → vida, No2; un punto más de Agi que los otros debuffers, por los No2): **nv1 12/8/7/4/2 → 40, 7** · nv2 14/9/7/4/2 → 45, 7 ·
+  nv3 15/9/8/5/2 → 45, 8 · nv4 17/10/8/5/2 → 50, 8 · nv5 18/10/9/6/2 → 50, 9.
+  | Nivel | Habilidad nueva | Pasiva | Equipo |
+  |---|---|---|---|
+  | 1 | **Escalofrío** (rápida) · **Robar el aliento** (lenta) | — | **Varita arcana** · 2 piezas Comunes de Def. especial |
+  | 2 | **Sanguijuela** | **Puntería arcana** | + 2 Comunes |
+  | 3 | **Extenuar** (también la tiene el Maldito en nv4) | — | la varita, de Buena calidad |
+  | 4 | **Disipar** | **Largo alcance arcano** | + una Buena |
+  | 5 | **Maldición tormentosa** (también la tiene el Tóxico en nv4; alternativa: Mal de ojo) | — | + otra Buena |
+  Consumible: **Gas adormecedor** (Cansado 2 turnos, nube de 3 turnos). **Sanguijuela con regla nueva** (dueño, 2026-11-03): ya no bloquea la
+  cura: toda cura que recibe el portador se la lleva quien la lanzó (con la vida llena, como vida extra); también pasa al Debuffer de clase.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4
@@ -513,7 +527,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | R3 | | | | | |
 | M3 | ✅ (2026-11-03) | | | | |
 | S3 | ✅ (2026-11-03) | | | | |
-| D3 | | | | | |
+| D3 | boceto ✅ (2026-11-03) | | | | |
 | W4 | | | | | |
 | T4 | | | | | |
 | H4 | | | | | |

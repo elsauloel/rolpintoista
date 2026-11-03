@@ -60,6 +60,7 @@
     (Def +1, Def. esp. +1, Bloqueo +1) · Peto de hierro (Def +3) · Cofia de anillas sueltas (Def +1, Def. esp. +1, Res. crít. T4 +1). Total Def +5,
     Def. esp. +2 (dueño: «principalmente defensa física, pero algún tipo de defensa especial como plan secundario»). Antes llevaba el Garrote de
     pastor (Tipo 10: el ataque costaba 5 y no le alcanzaba). Puede hacer Parry con el hacha o con el escudo (2026-11-03, para todos).
+  - **Provocar tira PdG.Esp + su nivel, como el Taunt de clase** (dueño, 2026-11-03: «al revés, quiero que el de creep tire PdG.Esp + nivel»; por unas horas fue Ef.Esp + 2).
   - **Provocar tira Ef.Esp + 2** (dueño, 2026-11-03: «para que pegue, lo que tiene que tirar es efecto especial más 2 como parte de la habilidad»;
     antes PdG.Esp + su nivel). Con Esp 4: 6 contra la Res.Mt del rival.
   - Skills: Provocar (rápida, 1 No2 + 2 SP, cd 2) · Piel de hierro (lenta, 1 No2 + 4 SP, cd 3).

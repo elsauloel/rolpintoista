@@ -217,9 +217,9 @@
   // 🛡 Provocar (2026-11-03, dueño: «para que pegue, lo que tiene que tirar es efecto especial más 2 como parte de la habilidad»: Ef.Esp + 2, ya no PdG.Esp + nivel;
   // los guardados se ponen al día con Combatiente.migrarLuzSanadora). (El Taunt, un escalón arriba; dueño: «PdG especial más nivel contra resistencia mental… el de creep además suma 2 de defensa y 2 de defensa
   // especial»): el Provocado de Tirar la bronca (con quién provoca, vtt-hexgrid/js/13) y Desafiante para él (js/13: el efecto va a quien provoca).
-  H('Provocar', 'K', '*', 't', 2, {detalle: 'Se le planta a un rival dentro de su Rango y lo llama: tira su Efecto especial + 2 contra la Resistencia mental del rival. Si gana, el rival queda Provocado por él 2 turnos (su turno es para ir contra él: atacarlo o usarle una habilidad hostil; si no llega, acercarse) y el creep queda Desafiante: +2 a la Defensa y +2 a la Defensa especial, 2 turnos.',
-    no2: 1, spCosto: 2, auditada: true, ataqueTxt: 'Ef.Esp + 2 contra la Res.Mt; Provocado 2 turnos, y él Desafiante (+2 Defensa y +2 Def. especial)',
-    duelo: {objetivo: 'enemigo', tira: 'dmgesp', tiraBono: 2, contra: ['resm'], alcance: 'rango', dano: false, efectos: [{nombre: 'Provocado', turnos: 2},
+  H('Provocar', 'K', '*', 't', 2, {detalle: 'Se le planta a un rival dentro de su Rango y lo llama: tira su Probabilidad de Golpe especial + su nivel contra la Resistencia mental del rival. Si gana, el rival queda Provocado por él 2 turnos (su turno es para ir contra él: atacarlo o usarle una habilidad hostil; si no llega, acercarse) y el creep queda Desafiante: +2 a la Defensa y +2 a la Defensa especial, 2 turnos.',
+    no2: 1, spCosto: 2, auditada: true, ataqueTxt: 'PdG.Esp + su nivel contra la Res.Mt; Provocado 2 turnos, y él Desafiante (+2 Defensa y +2 Def. especial)',
+    duelo: {objetivo: 'enemigo', tira: 'pdgmg', tiraBonoNivel: true, contra: ['resm'], alcance: 'rango', dano: false, efectos: [{nombre: 'Provocado', turnos: 2},   // PdG.Esp + nivel, como el Taunt de clase (dueño, 2026-11-03: «al revés»)
       {nombre: 'Desafiante', turnos: 2, polaridad: 'buff', detalle: 'Para quien provoca: +2 a la Defensa y +2 a la Defensa especial, 2 turnos.'}]}}, 'estados alterados');
   // 🛡 Piel de hierro (Piel resistente + Temple, un escalón arriba; dueño: «va así»).
   // (2026-11-02, dueño: «+6 puede ser mucho… quizás un +4» → «+(3 + nivel)»: nivel 1, +4; nivel 3, +6 como antes; nivel 5, +8. `masNivel`: CreepsBaseUtil.)

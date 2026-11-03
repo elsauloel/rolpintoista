@@ -2277,10 +2277,11 @@ const Combatiente = (() => {
         if(typeof h.detalle === 'string' && !/despeja/.test(h.detalle)) h.detalle = h.detalle.trimEnd() + ' Además apaga el fuego y despeja la niebla, las nubes y los gases de las casillas del cono (si cubre media nube, se lleva solo esa mitad).';
         cambio = true;
       }
-      // 🛡 Provocar tira Ef.Esp + 2 (dueño, 2026-11-03; antes PdG.Esp + su nivel): el guardado en un creep se pone al día.
-      if(h && h.nombre === 'Provocar' && h.duelo && typeof h.duelo === 'object' && h.duelo.tira === 'pdgmg'){
-        h.duelo.tira = 'dmgesp'; h.duelo.tiraBono = 2; delete h.duelo.tiraBonoNivel;
-        ['detalle', 'ataqueTxt'].forEach(k => { if(typeof h[k] === 'string') h[k] = h[k].replace('su Probabilidad de Golpe especial + su nivel', 'su Efecto especial + 2').replace('PdG.Esp + su nivel', 'Ef.Esp + 2'); });
+      // 🛡 Provocar tira PdG.Esp + su nivel, como el Taunt de clase (dueño, 2026-11-03: «al revés, quiero que el de creep tire PdG.Esp + nivel»; por unas
+      // horas del mismo día fue Ef.Esp + 2): el guardado en un creep (con cualquiera de las dos) se pone al día.
+      if(h && h.nombre === 'Provocar' && h.duelo && typeof h.duelo === 'object' && (h.duelo.tira === 'dmgesp' || !h.duelo.tiraBonoNivel)){
+        h.duelo.tira = 'pdgmg'; h.duelo.tiraBonoNivel = true; delete h.duelo.tiraBono;
+        ['detalle', 'ataqueTxt'].forEach(k => { if(typeof h[k] === 'string') h[k] = h[k].replace('su Efecto especial + 2', 'su Probabilidad de Golpe especial + su nivel').replace('Ef.Esp + 2', 'PdG.Esp + su nivel'); });
         cambio = true;
       }
       const rn = h && RENOMBRES_LUZ[h.nombre];

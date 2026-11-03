@@ -1549,13 +1549,18 @@ function dueloElegirAreaMapa(msg){
     if(!objetivos.length){ toast(hab.conVista ? `💡 ${hab.nombre || 'La luz'}: no había ningún rival a su alcance` : 'No hay nadie adentro del área'); return; }
     let habArea = hab, objetivosArea = objetivos;
     if(hab.tormenta){ const t = tormentaRepartir(hab, objetivos); habArea = t.hab; objetivosArea = t.objetivos; if(!objetivosArea.length) return; }   // Tormenta arcana (js/44)
+    // 💥 La onda del Shockwave, para todas las pantallas (js/94, 2026-11-03), y el duelo recién cuando se terminó de ver (dueño, el mismo día: «el
+    // menú del duelo se abrió antes de que se terminara de apreciar la animación. Dale un margen de algunos ms»).
+    const conOnda = hab.objetivo === 'onda' && mio && typeof ondaFxEs === 'function' && ondaFxEs(hab);
+    if(conOnda){
+      try{ ondaFxPublicar(mio.id, radio, `${nombreDe(mio)}: ${String(hab.nombre || 'Shockwave').replace(/^[^\wÁÉÍÓÚáéíóúÑñ]+/, '')}`); }catch(err){ console.error('No se pudo publicar la onda:', err); }
+      await new Promise(r => setTimeout(r, ((window.FxOnda && FxOnda.DURACION) || 1700) + 400));
+    }
     try{
       await coleccionAreas().add({
         casteador, hab: Duelo.limpiarHab(habArea), centro: {col: h.col, fila: h.fila, ...(h.cono ? {cono: true, rot: h.rot} : {}), ...(h.linea ? {linea: h.linea} : {})}, radio, objetivos: objetivosArea, duelos: [], indice: 0, estado: 'en-curso',
         creadoPor: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
       });
-      // 💥 La onda del Shockwave, para todas las pantallas (js/94, 2026-11-03).
-      if(hab.objetivo === 'onda' && mio && typeof ondaFxEs === 'function' && ondaFxEs(hab)) ondaFxPublicar(mio.id, radio, `${nombreDe(mio)}: ${String(hab.nombre || 'Shockwave').replace(/^[^\wÁÉÍÓÚáéíóúÑñ]+/, '')}`);
     }catch(err){
       console.error('No se pudo lanzar el hechizo de área:', err);
       toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (areas)' : 'No se pudo lanzar el hechizo de área: ' + String((err && err.message) || err).slice(0, 120));

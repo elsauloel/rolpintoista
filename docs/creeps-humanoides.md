@@ -439,11 +439,11 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   |---|---|---|---|
   | 1 | **Escalofrío** (rápida) · **Robar el aliento** (lenta) | — | **Varita arcana** · 2 piezas Comunes de Def. especial |
   | 2 | **Sanguijuela** | **Puntería arcana** | + 2 Comunes |
-  | 3 | **Extenuar** (también la tiene el Maldito en nv4) | — | la varita, de Buena calidad |
+  | 3 | **Mal de ojo** (Flash, 5 SP, el doble en turno ajeno; reemplaza a Extenuar, dueño 2026-11-03) | — | la varita, de Buena calidad |
   | 4 | **Disipar** | **Largo alcance arcano** | + una Buena |
-  | 5 | **Maldición tormentosa** (también la tiene el Tóxico en nv4; alternativa: Mal de ojo) | — | + otra Buena |
+  | 5 | **Maldición tormentosa** (también la tiene el Tóxico en nv4) | — | + otra Buena |
   Consumible: **Gas adormecedor** (Cansado 2 turnos, nube de 3 turnos). **Sanguijuela con regla nueva** (dueño, 2026-11-03): ya no bloquea la
-  cura: toda cura que recibe el portador se la lleva quien la lanzó (con la vida llena, como vida extra); también pasa al Debuffer de clase.
+  cura: toda cura que recibe el portador se la lleva quien la lanzó (con la vida llena, como vida extra); también pasa al Debuffer de clase; si quien la lanzó está caído o no está en el mapa, la cura se pierde (dueño).
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 

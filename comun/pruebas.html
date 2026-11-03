@@ -113,7 +113,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="pasivas.js"></script>
 <script src="skills-clase.js?v=20261103san"></script>
 <script src="creeps-base.js"></script>
-<script src="skills-creep-base.js?v=20261103p1"></script>
+<script src="skills-creep-base.js?v=20261103t11"></script>
 <script src="creeps-esenciales.js?v=20261103t7"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -6469,6 +6469,10 @@ prueba('💧 Pool esencial (2026-11-03): los de Especial como atributo principal
   const sp = es.filter(c => CreepCalculo.modoSP(c.datos)).map(c => c.nombre).sort().join();
   const p = es.find(c => c.nombre === 'Piromante').datos;
   igual([sp, CreepCalculo.spMax(p) >= 42, CreepCalculo.modoSP(es.find(c => c.nombre === 'Escudero').datos)], ['Maldito,Piromante,Sanador', true, false]);
+});
+prueba('🩸 Transfusión sanguínea de creep (2026-11-03): en el pool del Support y también en el del Debuffer', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Transfusión sanguínea');
+  igual([e.etiquetas.includes('apoyo'), e.etiquetas.includes('debuffer'), e.etiquetas.includes('support')], [true, true, true]);
 });
 prueba('🗄 Referencia (2026-11-03): los creeps de fábrica sin auditar salen del pool de campaña y van a «Referencia»', () => {
   const ref = CREEPS_BASE.filter(c => c.pool !== 'esencial' && Biblioteca.sinAuditarDeFabrica(c));

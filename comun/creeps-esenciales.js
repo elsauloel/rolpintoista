@@ -181,6 +181,11 @@
     habilidades: ['Finta', 'Golpe a la rodilla'], consumibles: ['Óleo venenoso'],
     estrategia: 'Choque liviano. El esgrimista del mano a mano: lo frena con la rodilla, lo apura con Fintas que no se paran y ataja todo.'});
 
+  esencial({linea: 'W3', nombre: 'Martillero', rol: 'warrior', rolTxt: 'melee', nivel: 1, atrib: [8, 10, 6, 7, 2],   // (2026-11-03, dueño: «sí»)
+    equipo: ['Martillo del herrero de pueblo', 'Escudo de cuero endurecido', 'Chaleco de cuero', 'Botas de cuero de vaca'],
+    habilidades: ['Puño de roca', 'Pisotón'], consumibles: ['Pergamino grupal de Furia de Combate'],
+    estrategia: 'Warrior. Golpes que atontan y derriban: te deja sin turno con Demora y Pajaritos; si lo rodean, Pisotón.'});
+
   if(faltan.length) console.warn('Creeps esenciales: no se encontró', faltan.join(', '));
   window.CREEPS_ESENCIALES_FALTAN = faltan;
 })();

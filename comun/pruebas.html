@@ -118,7 +118,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="skills-clase.js?v=20261103t12"></script>
 <script src="creeps-base.js"></script>
 <script src="skills-creep-base.js?v=20261103t14"></script>
-<script src="creeps-esenciales.js?v=20261103t15"></script>
+<script src="creeps-esenciales.js?v=20261103t16"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
@@ -6523,7 +6523,7 @@ prueba('⭐ El pool esencial (2026-11-03): los 24 de nivel 1 (7 + la tanda del m
     d('Escudero').equipo.map(i => i.nombre).join(), d('Escudero').cinturon.map(i => i.nombre).join(), d('Hachero').fue, d('Hachero').agl,
     d('Piromante').habilidades.map(h => h.nombre + ':' + h.cd).join(), d('Escudero').habilidades[1].efectoMods.find(m => m.stat === 'def').val,
     CREEPS_BASE.filter(c => c.pool !== 'esencial').length > 100],
-    [0, 26, true, 'Hacha de piedra,Escudo de caparazón de tortuga gigante,Peto de hierro,Cofia de anillas sueltas', 'Poción de Cuero Duro,Poción de Piel de Cristal', 9, 6,
+    [0, 27, true, 'Hacha de piedra,Escudo de caparazón de tortuga gigante,Peto de hierro,Cofia de anillas sueltas', 'Poción de Cuero Duro,Poción de Piel de Cristal', 9, 6,
       'Lengua de fuego:4,Muro de fuego:3', 4, true]);
 });
 prueba('💧 Pool esencial (2026-11-03): los de Especial como atributo principal arrancan en modo SP; los demás, con turnos de espera', () => {
@@ -6541,7 +6541,7 @@ prueba('⭐ Pool esencial, la tanda del 2026-11-03: atributos, equipo, habilidad
     eq('Berserker'), d('Berserker').equipo.every(i => i.equipado !== false), hb('Berserker'), cin('Berserker'),
     d('Muralla con púas').hp, d('Muralla con púas').agl, hb('Protector'), eq('Saltador'), hb('Control mental y ceguera'), d('Hostigador a distancia').agl, d('Hostigador a distancia').des,
     hb('Abanderado'), CreepCalculo.modoSP(d('Abanderado')), cin('Ladrón de fuerzas')],
-    ['D1,D2,D3,D4,H1,H2,L1,L2,L3,L4,L5,M1,M2,M3,M4,R1,R2,S1,S2,S3,S4,T1,T2,T3,W1,W2',
+    ['D1,D2,D3,D4,H1,H2,L1,L2,L3,L4,L5,M1,M2,M3,M4,R1,R2,S1,S2,S3,S4,T1,T2,T3,W1,W2,W3',
       'Sable del tahúr,Facón de paisano,Chaleco de cuero,Botas de cuero de vaca', true, 'Golpe desesperado,Furia', 'Poción de Regeneración menor',
       60, 5, 'Potencia,Arrojo', 'Hacha de vikingo,Rodela tachonada,Chaleco de cuero,Botas de cuero de vaca', 'Punzada mental,Cegar', 9, 10,
       'Potencia,¡A la carga!', false, 'Gas adormecedor']);

@@ -593,6 +593,9 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 4 | **Golpe brutal** | **Voluntad de hierro** | + una Buena |
   | 5 | **Golpe demoledor** | — | + otra Buena |
   Consumible: Pergamino grupal de Furia de Combate.
+  **Nivel 1 aprobado** (dueño, 2026-11-03: «sí»): Fue 10 · Con 8 · Des 7 · Agi 6 · Esp 2, vida 40, 6 No2, turnos de espera; Martillo del herrero de
+  pueblo (Tipo 10, 1d10 + 10, Parry +1, Pajaritos 33 %) + Escudo de cuero endurecido · Chaleco de cuero · Botas de cuero de vaca: Def 5, Res. crít.
+  T4 +2. Puño de roca (rápida) y Pisotón (Flash, lenta). **Cargado** en el pool esencial (2026-11-03).
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
@@ -672,7 +675,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | M2 | ✅ (2026-11-03) | | | | |
 | S2 | ✅ (2026-11-03) | | | | |
 | D2 | | | | | |
-| W3 | boceto ✅ (2026-11-03) | | | | |
+| W3 | ✅ (2026-11-03) | | | | |
 | T3 | ✅ (2026-11-03) | | | | |
 | H3 | | | | | |
 | L5 | ✅ (2026-11-03) | | | | |

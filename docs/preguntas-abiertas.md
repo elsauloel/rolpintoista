@@ -1526,3 +1526,8 @@ programado como «no ocupa la mano» en general (`Combatiente.manosQueOcupa`), a
 **Pregunta:** ¿se deja así (dos manos + escudo atado) o se limita a las armas de una mano? Claude propuso «sí, porque va atado y no se agarra», pero
 el dueño todavía no lo decidió.
 
+### P241 ✅ — 🪤 La dificultad de una trampa puesta por habilidad: ¿tirada al colocar o valor fijo? (2026-11-03)
+Hoy la dificultad es el **valor fijo** de la Destreza de quien la pone (las compradas, el mínimo por calidad: 7 / 9 / 11), y solo tira el que la pisa.
+Opciones: A) valor fijo; B) tirada al colocar; C) tirada al colocar con ventaja. **Decidido (dueño, 2026-11-03): la A, «vamos con la recomendación A»** —
+la trampa ya paga un costo con resultado incierto (puede que nadie la pise); el valor fijo compensa ese riesgo. No cambia nada del código.
+

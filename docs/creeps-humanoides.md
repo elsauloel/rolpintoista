@@ -551,6 +551,20 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Nivel 1:** Esp 12 · Con 9 · Agi 6 · Des 4 · Fue 2, vida 45, 6 No2, 36 SP (recupera 6); Def 2, Def.Esp 1; todo su daño especial +2 (la
   Botella; si sale un 1 en los dados, se quema 2). Consumible: Polvo de adormidera. Sin cargar hasta que el dueño diga.
 
+- **T3 · Guardaespaldas · Tanque** (boceto y nivel 1 aprobados 2026-11-03, dueño: «me cierra como ruta»; «me gusta, sí»). Estrategia: cuida a los
+  suyos: marca a un protegido (mago, jefe, Sanador) y se come la mitad de lo que le pegan, salta a interponerse, provoca y voltea con el escudo.
+  Atributos (Con/Des/Agi/Fue/Esp → vida, No2): **nv1 12/7/6/5/3 → 60, 6** · nv2 13/7/6/6/4 → 65, 6 · nv3 14/8/6/7/4 → 70, 6 · nv4 15/8/7/8/4 → 80
+  (Robustez), 7 · nv5 16/9/7/9/4 → 85, 7.
+  | Nivel | Habilidad nueva | Pasiva | Equipo |
+  |---|---|---|---|
+  | 1 | **Provocar** (rápida) · **Escudo humano** (lenta) | — | **Espada del comisario** (Tipo 6, PdG en contraataque +3) + **Escudo de hierro macizo** · **Coraza de cuero hervido** · **Capucha de lana del culto** |
+  | 2 | **Golpe de escudo** (rápida) | **Guardia firme** | + 2 Comunes |
+  | 3 | **Interponerse** (Flash) | — | el escudo, de Buena |
+  | 4 | **Tirar la bronca** | **Robustez** | + una Buena |
+  | 5 | **Desarmar** (Flash) | — | + otra Buena |
+  **Nivel 1:** vida 60, 6 No2, turnos de espera; Def 5, Def.Esp 1, Res. crít. T4 +2, Bloqueo +1. Consumible: Poción de Cuero Duro. Sin cargar.
+  Pedido del dueño: una animación del Escudo humano que muestre que el daño se reparte entre los dos (en diseño).
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4
@@ -630,7 +644,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | S2 | ✅ (2026-11-03) | | | | |
 | D2 | | | | | |
 | W3 | | | | | |
-| T3 | | | | | |
+| T3 | ✅ (2026-11-03) | | | | |
 | H3 | | | | | |
 | L5 | | | | | |
 | L6 | | | | | |

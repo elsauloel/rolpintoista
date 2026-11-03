@@ -651,9 +651,11 @@ function rutaSoltada(a, t){
     visibles.set(a.id, {x: a.x, y: a.y});
     const libre = dodgeLibreDe(a.id);   // 🪵 el dodge roll de Tronco de huída: se cierra al moverse
     const dodgeArco = libre && dodgeBanner.arco ? {...dodgeBanner} : null;
-    const alejarseGratis = libre && dodgeBanner.alejarse ? num(dodgeBanner.alejarse) : 0;   // 💨 Picar y alejarse (js/57): los primeros N, gratis   // 🏹 Parry a distancia con arco: el dodge roll que habilita el contraataque
+    const alejarseGratis = libre && dodgeBanner.alejarse ? num(dodgeBanner.alejarse) : 0;
+    const alMoverAntes = libre && dodgeBanner.antes && typeof dodgeBanner.alMover === 'function' ? dodgeBanner.alMover : null;   // 💨 Disparo y repliegue (js/57): después de moverse, el disparo   // 💨 Picar y alejarse (js/57): los primeros N, gratis   // 🏹 Parry a distancia con arco: el dodge roll que habilita el contraataque
     const oportunidad = oportunidadEvaluarRuta(t, a.ruta);
     if(libre){ dodgeBanner = null; renderDodgeBanner(); }
+    if(alMoverAntes) setTimeout(alMoverAntes, 450);   // (que el token ya esté en su casilla nueva al elegir el objetivo)
     if(dodgeArco){
       const at = tokens.get(dodgeArco.atacanteId), ini = a.ruta[0], fin = a.ruta[a.ruta.length - 1];
       const costo0 = a.costo ? costoRuta(a.ruta, a.costo.porCasillero, pasos, a.costo.gratis, a.costo.recargo, a.costo.levita, a.costo.ext, a.costo.sprint, a.costo.miedo) : 0;

@@ -42,7 +42,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 </script>
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
-<script src="combatiente.js?v=20261103t8"></script>
+<script src="combatiente.js?v=20261103dr"></script>
 <script src="creep-calculo.js?v=20261103t4"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261103san"></script>
@@ -113,7 +113,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="pasivas.js"></script>
 <script src="skills-clase.js?v=20261103san"></script>
 <script src="creeps-base.js"></script>
-<script src="skills-creep-base.js?v=20261103t8"></script>
+<script src="skills-creep-base.js?v=20261103dr"></script>
 <script src="creeps-esenciales.js?v=20261103t7"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -1510,10 +1510,15 @@ prueba('🔁 Ráfaga encadenada (Rango, 2026-10-25): Repitiendo con 3 disparos e
   const h = armarHabilidadDeCreep(e.datos, 2);
   igual([h.efectoNombre, h.efectoStacks, h.efectoTurnos, CreepAcciones.FLAGS_ESTADO.includes('repetir'), h.nitrosCosto, h.cd], ['Repitiendo', 3, 1, true, 0, 3]);
 });
-prueba('💨 Disparo y repliegue (Rango, 2026-10-26): un ataque con +2 al daño y después alejarse 2 gratis', () => {
+prueba('💨 Disparo y repliegue (Rango, 2026-10-26; 2026-11-03: primero se mueve): moverse 2 gratis ANTES y después un ataque con +2 al daño; la guardada se pone al día', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Disparo y repliegue'), h = armarHabilidadDeCreep(e.datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});
-  igual([h.duelo.modo, h.duelo.arma.fijo, a.alejarse, h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('rango'), e.etiquetas.includes('disparar y replegarse')], ['arma', 2, 2, 'ATAQUE', 2, 3, true, true]);
+  igual([h.duelo.modo, h.duelo.arma.fijo, a.moverAntes, a.alejarse, h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('rango'), e.etiquetas.includes('disparar y replegarse'), /^Se reacomoda y dispara/.test(h.detalle)],
+    ['arma', 2, 2, undefined, 'ATAQUE', 2, 3, true, true, true]);
+  const vieja = structuredClone(h); delete vieja.duelo.moverAntes; vieja.duelo.alejarse = 2; vieja.detalle = 'Dispara y se repliega: un ataque con su arma con +2 al daño; pegue o no, después se aleja hasta 2 casilleros, gratis (sin No2) y sin dar ataque de oportunidad.';
+  const habs = [vieja]; Combatiente.migrarLuzSanadora(habs);
+  const hit = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Hit and run').datos, 2);
+  igual([habs[0].duelo.moverAntes, habs[0].duelo.alejarse, /^Se reacomoda/.test(habs[0].detalle), Combatiente.ataqueConArreglos(hit, hit.duelo, {arma: {}}).alejarse], [2, undefined, true, 2]);
 });
 prueba('🏹 Flecha que atraviesa (Rango, 2026-10-25): un ataque con +2 al daño que sigue al de atrás (perforante)', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Flecha que atraviesa');

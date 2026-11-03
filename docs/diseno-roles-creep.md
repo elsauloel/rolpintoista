@@ -500,7 +500,7 @@ la emboscada, matabestias, la espalda a distancia, la recarga, el proyectil perf
 
 **C. Distancia y movimiento**
 10. **Retroceder y disparar**: se aleja uno o dos casilleros gratis y dispara.
-11. ✅ **Disparar y reposicionarse** — **Disparo y repliegue** (2026-10-26): un disparo con +2 al daño y, pegue o no, se aleja hasta 2 casilleros gratis y sin oportunidad.
+11. ✅ **Disparar y reposicionarse** — **Disparo y repliegue** (2026-10-26; **2026-11-03, dueño: «primero se mueve y después dispara»**): se mueve hasta 2 casilleros gratis y sin oportunidad (para cualquier lado; puede no moverse) y después dispara con +2 al daño.
 12. **Tiro en carrera**: se mueve y dispara sin perder la puntería.
 13. ✅ **Mantener a raya** ✦ (2026-10-25): un disparo con +2 al daño; si pega, lo empuja 2 casillas y queda Lento 2 turnos.
 

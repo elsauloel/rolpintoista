@@ -882,6 +882,9 @@ function habEsCura(hab){ const ef = (hab && hab.efectos) || []; return ef.length
 function dueloElegirObjetivoMapa(msg){
   const yo = msg.yo, ataque = msg.ataque;
   if(ataque && ataque.hab && (ataque.hab.objetivo === 'area' || ataque.hab.objetivo === 'onda' || ataque.hab.objetivo === 'cono' || ataque.hab.objetivo === 'linea')){ dueloElegirAreaMapa(msg); return; }   // hechizo de área: otro flujo (Paso 4/7)
+  // 💨 Disparo y repliegue (2026-11-03, dueño: «primero se mueve y después dispara»): antes de elegir el objetivo, el cartel del movimiento libre (js/57).
+  const nAntes = Math.round(num(ataque && (ataque.moverAntes || (ataque.hab && ataque.hab.moverAntes))));
+  if(nAntes > 0 && !msg.yaMovio && typeof moverAntesDeAtacar === 'function'){ moverAntesDeAtacar(msg, nAntes); return; }
   cerrarBotonera();   // esconde la capa (la ficha queda cargada, para tirar después)
   seleccion = null; hudCerrar(); pedirDibujo();   // se guarda el menú de botones que rodea al token propio mientras se elige
   const propio = t => t.fichaId === yo.ref && t.tipo === yo.tipo;
@@ -1328,6 +1331,14 @@ function renderDodgeBanner(){
     AvisoCombate.cartel('dodge', {icono: '🏹', titulo: `${dodgeBanner.nombre}: dodge roll para contraatacar`, posicion: 'abajo',
       texto: 'Con el arco, para contraatacar: arrastrá el token 1 o 2 casilleros, más lejos del atacante (tienen que alcanzarte los No2; sin ataque de oportunidad).',
       botones: [{texto: '✋ No contraataco', alClic: () => { dodgeBanner = null; renderDodgeBanner(); }}]});
+    return;
+  }
+  if(dodgeBanner.libre && dodgeBanner.antes){   // 💨 Disparo y repliegue (js/57): se mueve ANTES de disparar
+    const n = dodgeBanner.alejarse, sigue = dodgeBanner.alMover, cancela = dodgeBanner.alCancelar;
+    AvisoCombate.cartel('dodge', {icono: '💨', titulo: `${dodgeBanner.nombre} se reacomoda antes de disparar`, posicion: 'abajo',
+      texto: `Arrastrá el token hasta ${n} casillero${n === 1 ? '' : 's'}: gratis y sin ataque de oportunidad. Al soltarlo, elegís a quién disparar.`,
+      botones: [{texto: '🏹 Disparar desde acá', alClic: () => { dodgeBanner = null; renderDodgeBanner(); if(sigue) sigue(); }},
+        {texto: '✕ Cancelar', sec: true, alClic: () => { dodgeBanner = null; renderDodgeBanner(); if(cancela) cancela(); }}]});
     return;
   }
   if(dodgeBanner.libre && dodgeBanner.alejarse){   // 💨 Picar y alejarse (js/57)

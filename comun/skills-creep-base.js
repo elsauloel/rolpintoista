@@ -1215,11 +1215,12 @@
   // 🏹 Auditada (dueño, 2026-10-25; Rango, «volumen de fuego», el equivalente para creeps del Proyectil perforante del Shooter: «vamos con la que
   // atraviesa»): un disparo con su arma con +2 al daño (para que se sienta) que, pegue o no al primero, sigue derecho y le pega al primero que haya
   // detrás en su Rango, contra la misma tirada (`perforante`, vtt-hexgrid/js/42). Costo el del Shooter: el ataque y 2 SP, o cooldown 3.
-  // 💨 Auditada (dueño, 2026-10-26; Rango, «distancia y movimiento»: «el de repliegue»): el Hit and run del arquero. Un disparo con su arma con +2 al daño
-  // (para que se sienta) y, pegue o no, se aleja hasta 2 casilleros gratis y sin ataque de oportunidad (`alejarse`, vtt-hexgrid/js/57). Costo de Claude:
-  // el ataque y 2 SP, o cooldown 3.
-  H('Disparo y repliegue', 'DM', 'hd', 'r', 3, aA('Dispara y se repliega: un ataque con su arma con +2 al daño; pegue o no, después se aleja hasta 2 casilleros, gratis (sin No2) y sin dar ataque de oportunidad.',
-    {fijo: 2}, 'va al duelo como un ataque con +2 al daño; después, el cartel para alejarse hasta 2 casilleros gratis y sin ataque de oportunidad', 2, [], {alejarse: 2}));
+  // 💨 Auditada (dueño, 2026-10-26; Rango, «distancia y movimiento»: «el de repliegue»). **Desde el 2026-11-03 primero se mueve y después dispara**
+  // (dueño: «Primero se mueve y después dispara»): se reacomoda hasta 2 casilleros, gratis y sin ataque de oportunidad, para cualquier lado (alejarse,
+  // buscar la línea de tiro o la espalda; se puede saltear), y después un disparo con su arma con +2 al daño (`moverAntes`, vtt-hexgrid/js/57: el cartel
+  // del movimiento libre antes de elegir el objetivo). Antes era al revés (`alejarse`, como el Hit and run, que sigue igual). Costo: el ataque y 2 SP, o cooldown 3.
+  H('Disparo y repliegue', 'DM', 'hd', 'r', 3, aA('Se reacomoda y dispara: primero se mueve hasta 2 casilleros, gratis (sin No2) y sin dar ataque de oportunidad (puede no moverse); después, un ataque con su arma con +2 al daño.',
+    {fijo: 2}, 'primero el cartel para moverse hasta 2 casilleros gratis y sin ataque de oportunidad; después va al duelo como un ataque con +2 al daño', 2, [], {moverAntes: 2}));
   H('Flecha que atraviesa', 'D', 'hd', 'r', 3, aA('Un disparo que atraviesa: un ataque con su arma a distancia con +2 al daño; pegue o no al primero, sigue derecho por la misma línea y le pega al primero que haya detrás dentro de su Rango (aliado incluido; un Sólido o una pared lo frenan). El segundo se defiende contra la misma tirada y recibe el daño entero, sin los efectos especiales.',
     {fijo: 2}, 'va al duelo como un ataque con +2 al daño; sigue de largo y le pega al de atrás', 2, [], {perforante: true}));
   // 🏹 Auditada (dueño, 2026-10-25; Rango, «mantener a raya»: «bueno para mantener distancia, que es su fuerte»; «y que además sume algo de daño»): un

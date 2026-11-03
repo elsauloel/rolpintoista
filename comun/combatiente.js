@@ -2047,7 +2047,8 @@ const Combatiente = (() => {
       ...(c.punalada ? {punalada: c.punalada === 'trapera' ? 'trapera' : 'espalda'} : {}),
       ...(c.abrirHerida ? {abrirHerida: true} : {}), ...(c.remate ? {remate: true} : {}), ...(c.desesperado ? {desesperado: true} : {}),   // 🗡 Remate / Ir por el herido (2026-10-23): +dados según la vida del objetivo (vtt-hexgrid/js/69)
       ...(nf(c.manada) > 0 ? {manada: Math.min(5, Math.round(nf(c.manada)))} : {}),   // 👊 Patotear / Jauría (2026-10-21): +1 dado por aliado pegado al objetivo, hasta N (vtt-hexgrid/js/65)   // 🩸 Sal en la herida (2026-10-21): +2 dados si el objetivo ya sangra (vtt-hexgrid/js/64)   // 🗡 la puñalada (2026-10-21): el bono si está en la espalda (vtt-hexgrid/js/59)
-      ...(nf(c.alejarse) > 0 ? {alejarse: Math.min(4, Math.round(nf(c.alejarse)))} : {}),   // 💨 Picar y alejarse (2026-10-21): después del duelo, se aleja N casilleros gratis (vtt-hexgrid/js/57)   // 🐂 toma carrera (la Cornada, 2026-10-21): el mapa la hace al elegir el objetivo (vtt-hexgrid/js/55)
+      ...(nf(c.alejarse) > 0 ? {alejarse: Math.min(4, Math.round(nf(c.alejarse)))} : {}),
+      ...(nf(c.moverAntes) > 0 ? {moverAntes: Math.min(4, Math.round(nf(c.moverAntes)))} : {}),   // 💨 Disparo y repliegue (2026-11-03): ANTES de elegir el objetivo, se mueve N casilleros gratis (vtt-hexgrid/js/57)   // 💨 Picar y alejarse (2026-10-21): después del duelo, se aleja N casilleros gratis (vtt-hexgrid/js/57)   // 🐂 toma carrera (la Cornada, 2026-10-21): el mapa la hace al elegir el objetivo (vtt-hexgrid/js/55)
       // ⚔🛡 La tanda del Choque pesado (2026-10-27; vtt-hexgrid/js/78): `sigue` (Golpe que sigue: si lo deja en 0, ataca a otro pegado), `arrastra` (Arrastrar:
       // si pega, lo trae hasta quedar pegado), `cargaDerriba` (Carga que derriba: la carrera de hasta N; desde 3, Fuerza + X contra la Res.CC) y `escudoGolpe`
       // (Golpe de escudo: pega con el escudo como un arma de Tipo 10, tantos d10 como su peso + el Dmg).
@@ -2312,6 +2313,13 @@ const Combatiente = (() => {
       if(h && (h.nombre === 'Zap' || h.nombre === 'Centella') && h.duelo && typeof h.duelo === 'object' && Array.isArray(h.duelo.contra) && h.duelo.contra.includes('resmg')){
         h.duelo.contra = h.duelo.contra.map(c => c === 'resmg' ? 'rescc' : c);
         ['detalle', 'ataqueTxt'].forEach(k => { if(typeof h[k] === 'string') h[k] = h[k].replace('su Resistencia especial contra la Probabilidad', 'su Resistencia al control (Res.CC) contra la Probabilidad').replace('contra la Resistencia especial del objetivo decide la Parálisis', 'contra la Resistencia al control (Res.CC) del objetivo decide la Parálisis').replace('PdG.Esp contra la Res.Esp; salta', 'PdG.Esp contra la Res.CC; salta'); });
+        cambio = true;
+      }
+      // 💨 Disparo y repliegue: primero se mueve y después dispara (dueño, 2026-11-03; antes disparaba y se alejaba): la guardada se pone al día.
+      if(h && h.nombre === 'Disparo y repliegue' && h.duelo && typeof h.duelo === 'object' && nf(h.duelo.alejarse) > 0){
+        h.duelo.moverAntes = Math.round(nf(h.duelo.alejarse)); delete h.duelo.alejarse;
+        if(typeof h.detalle === 'string' && /^Dispara y se repliega/.test(h.detalle)) h.detalle = 'Se reacomoda y dispara: primero se mueve hasta 2 casilleros, gratis (sin No2) y sin dar ataque de oportunidad (puede no moverse); después, un ataque con su arma con +2 al daño.';
+        if(typeof h.ataqueTxt === 'string' && /después, el cartel para alejarse/.test(h.ataqueTxt)) h.ataqueTxt = 'primero el cartel para moverse hasta 2 casilleros gratis y sin ataque de oportunidad; después va al duelo como un ataque con +2 al daño';
         cambio = true;
       }
       // 😮‍💨 Robar el aliento saca 1 No2 + la diferencia (dueño, 2026-11-03; antes 2 + la diferencia): la guardada se pone al día.

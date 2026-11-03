@@ -281,6 +281,10 @@
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 
 ## Pendientes
+- [ ] **💨 Disparo y repliegue: primero se mueve (2026-11-03)**: un creep con la habilidad (el GM, desde las Acciones): (1) sale el cartel «se
+  reacomoda antes de disparar»; arrastrar el token 1–2 casilleros → no cobra No2 ni da ataque de oportunidad, y enseguida pide el objetivo desde
+  la casilla nueva; el duelo suma +2 al daño y después NO aparece el cartel de alejarse; (2) «🏹 Disparar desde acá» sin moverse; (3) «✕ Cancelar»
+  devuelve el ataque; (4) el Hit and run sigue igual (pega y después se aleja); (5) un creep guardado con la versión vieja se pone al día solo.
 - [ ] **🪱 Sanguijuela nueva (2026-11-03)**: ya no corta la cura, se la lleva quien la lanzó. Probar con clics: (1) un creep con Sanguijuela se la pega
   a Prueba Uno; Prueba Uno toma una poción → no se cura, la Mesa dice «la cura se la lleva la Sanguijuela de…», y el creep sube (con el creep lleno,
   Vida extra); (2) la Regeneración / la cura de turno del portador, igual; (3) Prueba Dos (Debuffer) aprende «Sanguijuela» de la clase y se la

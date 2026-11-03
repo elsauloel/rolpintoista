@@ -16,6 +16,23 @@ function alejarseResuelto(d){
   mesaLinea(`💨 ${nombre} se aleja: puede moverse hasta ${n} casillero${n === 1 ? '' : 's'}, gratis y sin ataque de oportunidad.`, 'recordatorio');
 }
 
+/* ---------- 💨 Disparo y repliegue: primero se mueve, después dispara (2026-11-03, dueño: «Primero se mueve y después dispara») ----------
+   Una Ejecución «con tu arma» con `moverAntes` (→ `ataque.moverAntes`): antes de elegir el objetivo (dueloElegirObjetivoMapa, js/13) sale el cartel del
+   movimiento libre (el mismo del Hit and run: hasta N casilleros gratis, sin ataque de oportunidad, para cualquier lado). Al soltar el token (js/06) o
+   con «🏹 Disparar desde acá» (sin moverse) sigue la elección del objetivo, ya desde la casilla nueva; «✕ Cancelar» cancela el ataque. */
+function moverAntesDeAtacar(msg, n){
+  const yo = msg.yo || {}, e = [...tokens.entries()].find(([, t]) => t.fichaId === yo.ref && t.tipo === yo.tipo);
+  const seguir = () => dueloElegirObjetivoMapa({...msg, yaMovio: true});
+  if(!e){ seguir(); return; }   // sin token propio: el flujo de siempre avisa
+  const [tid, t] = e, nombre = nombreDe(t);
+  try{ cerrarBotonera(); }catch(err){}
+  seleccionar(tid);
+  const cancelar = () => { if(msg.alCancelar){ msg.alCancelar(); return; } try{ MensajesMapa.alMarco($('#botonera-marco'), 'duelo-cancelado'); }catch(err){} };
+  dodgeBanner = {id: 'antes-' + Date.now(), tokenId: tid, nombre, libre: true, alejarse: n, antes: true, alMover: seguir, alCancelar: cancelar};
+  renderDodgeBanner();
+  mesaLinea(`💨 ${nombre} se reacomoda: puede moverse hasta ${n} casillero${n === 1 ? '' : 's'}, gratis y sin ataque de oportunidad, y después dispara.`, 'recordatorio');
+}
+
 /* ---------- 💨 Bomba de humo (2026-10-26, dueño; choque liviano y el Asalto: «me gusta mucho al punto de que la pondría en la clase también») ----------
    Revienta una bomba a sus pies: la niebla de una varita (crearNiebla, js/13: tapa la vista desde afuera) de `radio` (1 = diámetro 3) por `turnos`; entra
    en Sigilo aunque lo estén mirando (adentro de la niebla solo lo ve el que está pegado: ese lo detecta, como siempre); y el cartel del movimiento libre

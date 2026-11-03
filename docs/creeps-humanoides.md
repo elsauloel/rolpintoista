@@ -460,6 +460,10 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 4 | **Disparo señalador** (también el Tirador, nv4) | **Prisa** | + una Buena |
   | 5 | **Ráfaga encadenada** | — | + otra Buena |
   Consumible: **Flecha silbadora** (lo baja 1 lugar en el orden de turnos).
+  **Nivel 1 aprobado** (dueño, 2026-11-03): Agi 9 · Des 10 · Con 7 · Fue 5 · Esp 2, vida 35, 9 No2; Arco de tiro ligero · Chaleco de cuero ·
+  Escarpines de fieltro (Eva +1): Def 2, Def.Esp 0. Tiro certero (rápida, cd 2) y **Disparo y repliegue con el orden al revés: primero se mueve
+  hasta 2 casilleros gratis y sin oportunidad, después dispara con +2 al daño** (dueño, mismo día; en programación). Consumible: Flecha silbadora.
+  Sin cargar hasta que el dueño diga.
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
@@ -535,7 +539,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | H2 | | | | | |
 | L3 | | | | | |
 | L4 | | | | | |
-| R2 | boceto ✅ (2026-11-03) | | | | |
+| R2 | ✅ (2026-11-03) | | | | |
 | M2 | ✅ (2026-11-03) | | | | |
 | S2 | ✅ (2026-11-03) | | | | |
 | D2 | | | | | |

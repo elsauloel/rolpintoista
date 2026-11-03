@@ -465,6 +465,19 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   hasta 2 casilleros gratis y sin oportunidad, después dispara con +2 al daño** (dueño, mismo día; en programación). Consumible: Flecha silbadora.
   Sin cargar hasta que el dueño diga.
 
+- **M4 · Arcano · Mago, con SP** (boceto aprobado 2026-11-03, dueño: «me cierra como ruta»). Estrategia: control y movilidad: decide dónde
+  está cada uno (aparece, empuja, atrae, manda por un portal, atraviesa en línea); en nv5, la Tormenta arcana. Atributos (Esp/Con/Agi/Des/Fue →
+  vida, No2, SP): **nv1 12/8/6/5/2 → 40, 6, 36** · nv2 14/9/6/5/2 → 45, 6, 42 · nv3 15/9/7/6/2 → 45, 7, 45 · nv4 17/10/7/6/2 → 50, 7, 51 ·
+  nv5 18/10/8/7/2 → 50, 8, 54.
+  | Nivel | Habilidad nueva | Pasiva | Equipo |
+  |---|---|---|---|
+  | 1 | **Parpadeo** (Flash, 4 SP; dueño 2026-11-03) · **Nova arcana** | — | **Varita del gancho** + un talismán Común · 2 Comunes |
+  | 2 | **Lanza arcana** | **Largo alcance arcano** | + 2 Comunes |
+  | 3 | **Portal trampa** | — | la varita o el talismán, de Buena calidad |
+  | 4 | **Andanada arcana** | **Puntería arcana** | + una Buena |
+  | 5 | **Tormenta arcana** | — | + otra Buena |
+  Consumible: Poción de SP menor. Parpadeo también lo tienen M2 y M3 (nv2).
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4
@@ -558,7 +571,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | L7 | | | | | |
 | L8 | | | | | |
 | R4 | | | | | |
-| M4 | | | | | |
+| M4 | boceto ✅ (2026-11-03) | | | | |
 | S4 | | | | | |
 | D4 | | | | | |
 

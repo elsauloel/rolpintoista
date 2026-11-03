@@ -22,6 +22,10 @@
   2 Mago · 3 Choque liviano · 4 Support · 5 Warrior · 6 Debuffer · y los que restan, alternando (de Claude): 7 Rango · 8 Mago · 9 Híbrido ·
   10 Support · 11 Choque liviano · 12 Debuffer. Cada uno **a fondo** (todo el texto: atributos, equipo, skills, consumible) antes de pasar al
   siguiente; no en horizontal («en la dispersión se terminan escapando detalles de diseño»).
+- **SP o turnos de espera** (dueño, 2026-11-03: «todos los que son con énfasis en especial van a trabajar con SP en vez de con cooldown»): los
+  que tienen el Especial como atributo principal (magos, debuffers, el Sanador) juegan **con SP** (SP = Esp × 3 + equipo; recupera Esp ÷ 2 por
+  turno, mínimo 1); los demás, con turnos de espera. **Programado** en el pool esencial (`comun/creeps-esenciales.js`: modo SP si el Esp es el
+  atributo más alto); en GM Tools se puede cambiar a mano en cada creep.
 - **Rápidas, lentas y muy lentas** (dueño, 2026-11-02): **rápidas** = cooldown 2 · **lentas** = cooldown 3 o 4 · **muy lentas** = cooldown 3 o 4
   que **arrancan la pelea en cooldown**. El costo y el cooldown van juntos: lo caro es lento o muy lento.
 - **Pasivas en los niveles pares**: la primera en el **nivel 2** y una más en el **nivel 4** (dueño, 2026-11-02: «pueden aparecer a partir de nivel 2 y vuelven a aparecer una habilidad pasiva más en cada nivel par»; antes había dicho desde el 3). Refuerzan su estrategia.

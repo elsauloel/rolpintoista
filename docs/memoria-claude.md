@@ -116,3 +116,4 @@
 - **Co-GM en El origen** (2026-11-03): desde el 2026-11-03 la cuenta de Claude puede ser co-GM de El origen: igual, ahí solo se lee salvo que el
   dueño pida explícitamente cambiar algo. Ojo: abrir GM Tools o el mapa como GM escribe solo (historial, republicar tarjetas, poner al día creeps):
   para solo mirar, leer Firestore directo con un script.
+- **Creeps esenciales: SP o turnos de espera** (dueño, 2026-11-03): los de Especial como atributo principal (magos, debuffers, el Sanador) juegan con SP; el resto, con turnos de espera. Al diseñar uno de Especial, hacer las cuentas con SP.

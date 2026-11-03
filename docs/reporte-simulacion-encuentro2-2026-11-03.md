@@ -255,3 +255,66 @@ Lectura:
 - **Para que el encuentro sea ganable con tres PJ de nivel 3** hace falta, además de V2, bajar la vida o la defensa del Rompehuesos, o la del Capataz, o sacar al Alquimista.
 
 Nota: en esta corrida los PJ pueden atacar a cualquier creep (incluidos el Alquimista y el Capataz). En las anteriores tenían una lista de objetivos más corta, por eso los números de V1 cambian apenas.
+
+### Ajuste pedido por el dueño: bajar vida y Defensa (y quizás un nivel) sin quitar al Chamán
+
+Las pruebas parten de la versión 2:
+
+- sin Arquero;
+- una sola rata, sin Ojo crítico;
+- Cristal en la ronda 2;
+- el Capataz escapa a la mitad de su vida;
+- el Chamán (el Goblin Alquimista) sigue en la pelea.
+
+Cada pelea va hasta el final, con un tope de 8 rondas. Cada opción se corrió 2000 veces. Se probaron unas 650 combinaciones:
+
+- vida −10 a −40 y Defensa −1 a −3 al Rompehuesos y al Capataz;
+- vida y Defensa del Chamán;
+- vida y puntería de la rata;
+- bajar un nivel a uno, dos o los tres.
+
+**Corrección del simulador.** Hasta ahora, la rata que llega con el Chillido aparecía pero no atacaba, y nadie la atacaba. Como quedaba «en pie», el grupo nunca podía ganar. Ya está corregido: la rata llamada pelea y se le puede pegar. Esto hace la pelea un poco más difícil. Con el arreglo, la versión 2 sin cambios da:
+
+- el grupo gana el 5 %;
+- el grupo cae entero el 85 %.
+
+Antes daba 4 % y 71 %. Las tablas anteriores de este reporte se corrieron sin este arreglo.
+
+**Qué es «bajar un nivel» acá** (−3 atributos según su rol; la habilidad que pierde no estaba en la simulación):
+
+| Creep | Atributos | Vida | Efecto | Habilidad que pierde |
+|---|---|---|---|---|
+| Rompehuesos 4→3 | Fue −2, Con −1 | −5 | Su daño fijo baja 2 | Puño de roca |
+| Capataz 5→4 | Esp −2, Con −1 | −5 | PdG.Esp y Ef.Esp −2 | Hálito polar |
+| Chamán 4→3 | Esp −2, Con −1 | −5 | PdG.Esp y Ef.Esp −2 | Parpadeo |
+
+**Resultado principal.** Bajando solo vida y Defensa, el grupo gana como mucho un 55–60 %. Con eso, en un tercio de las peleas cae el grupo entero. Para entrar en la franja pedida hay que tocar también **el daño de la rata**: −4 a su PdG, como si tuviera Des 9. Ni así se baja de un 20 % de «cae el grupo entero»:
+
+- Las peleas se polarizan: o cae casi nadie, o caen los tres.
+- El que define es Larry. Cae temprano (R2–R3) por la rata, el Arrastrar del Rompehuesos y la Bola de fuego.
+- Cuando cae, los otros dos quedan en desventaja.
+
+Lo único que lo baja de 10 % fue sacar el Cristal de la Grieta y además recortar daño del Rompehuesos y del Chamán.
+
+| Opción | Rompehuesos (vida / Def) | Capataz (vida / Def) | Chamán (vida / Def) | Rata (vida / PdG) | Gana el grupo | Cae el grupo entero | Caen 0 / 1 / 2 PJ | Rondas (si gana) | Quién suele caer |
+|---|---|---|---|---|---|---|---|---|---|
+| Sin cambios (V2) | 85 / 6 | 75 / 7 | 50 / 5 | 30 / 15 | 5 % | 85 % | 3 / 6 / 7 % | 5,4 (6,2) | Larry 91 % (R2), Rockardo 96 %, Bizzante 86 % |
+| Más difícil: vida −30, Def −3, Rompehuesos un nivel menos | 50 / 3 | 45 / 4 | 30 / 3 | 20 / 11 | 60 % | 29 % | 37 / 22 / 13 % | 5,8 (5,5) | Larry 52 % (R2–R3), Rockardo 47 % (R5–R6) |
+| Solo vida y Defensa (sin bajar niveles) | 45 / 3 | 35 / 4 | 30 / 3 | 20 / 11 | 65 % | 27 % | 39 / 20 / 12 % | 5,6 (5,4) | Larry 52 %, Rockardo 44 % |
+| Vida/Def + Rompehuesos un nivel menos | 40 / 3 | 35 / 4 | 30 / 3 | 20 / 11 | 68 % | 24 % | 42 / 24 / 11 % | 5,6 (5,3) | Larry 49 %, Rockardo 39 % |
+| **Recomendada: vida/Def + un nivel menos a los tres** | **40 / 3** | **30 / 4** | **25 / 3** | **20 / 11** | **73 %** | **21 %** | **47 / 22 / 10 %** | **5,4 (5,1)** | **Larry 47 % (R2), Rockardo 33 %, Bizzante 24 %** |
+| Más fácil: la recomendada sin Cristal, Rompehuesos Fue −3 y Chamán PdG.Esp −4 | 40 / 3 | 30 / 4 | 25 / 3 | 20 / 11 | 84 % | 8 % | 59 / 24 / 8 % | 5,6 (5,2) | Larry 37 % (R2) |
+
+Cómo se llega a los números de la **recomendada**:
+
+- **Rompehuesos:** vida 85 → 40 (−40 y −5 del nivel), Def 6 → 3, Con 12, Fue 9 (daño fijo 9).
+- **Capataz:** vida 75 → 30 (−40 y −5), Def 7 → 4, PdG.Esp 14, Ef.Esp 14. Escapa al llegar a 15 de vida, cosa que pasa en el 43 % de las peleas.
+- **Chamán:** vida 50 → 25 (−20 y −5), Def 5 → 3, PdG.Esp 15, Ef.Esp 13.
+- **Rata** (también la que llega con el Chillido): vida 30 → 20, PdG 15 → 11.
+
+Lectura:
+
+- Con la recomendada, el grupo gana el 73 % en unas 5 rondas. Lo normal es que caiga **Larry** (en la R2) o nadie.
+- Todavía cae el grupo entero 1 de cada 5 peleas, así que no llega al «rara vez (< 10 %)». Para llegar hay que sacar el Cristal o recortar daño, como en la opción «más fácil». Pero esa opción ya gana el 84 %, por encima de la franja pedida.
+- Entre las dos opciones de igual tamaño, **bajar un nivel rinde más que solo vida/Def**: 73 % contra 65 % de victorias y 21 % contra 27 % de caída total, con menos recorte de vida.
+- El simulador es simple: los PJ no se curan, no se retiran ni usan acciones defensivas. En mesa, con esas decisiones, la caída total debería ser menor.

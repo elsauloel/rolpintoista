@@ -280,7 +280,10 @@ function cardCompactoHtml(sc){
 function habsMiniHtml(sc){
   const habs = sc.habilidades || [];
   if(!habs.length) return '';
-  return `<div class="habs-mini">${habs.map(h => {
+  // ⇄ Cooldown / SP en la tarjeta (dueño, 2026-11-03: «en GM Tools uno ya debe poder switchear entre CD y SP en cada creep»; antes solo en ⚡ Acciones)
+  const sp = CreepCalculo.modoSP(sc);
+  const llave = `<div class="habs-mini-modo" style="display:flex;justify-content:flex-end;margin:2px 0 4px"><button type="button" class="verbtn" data-modosp="${esc(sc.id)}" title="Cambiar cómo pagan sus habilidades: con cooldown (turnos de espera) o con SP (sin cooldown)">${sp ? `💧 Con SP · ${fmt(CreepCalculo.spActual(sc))}/${fmt(CreepCalculo.spMax(sc))} → pasar a cooldown` : '⏱ Con cooldown → pasar a SP'}</button></div>`;
+  return `${llave}<div class="habs-mini">${habs.map(h => {
     const bloqueo = bloqueoHabCreep(sc, h);
     const partes = [costoHabCreepTxt(sc, h)];
     if(num(h.cd) > 0) partes.push(`CD ${fmt(num(h.cd))}`);

@@ -565,6 +565,18 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Nivel 1:** vida 60, 6 No2, turnos de espera; Def 5, Def.Esp 1, Res. crít. T4 +2, Bloqueo +1. Consumible: Poción de Cuero Duro. Sin cargar.
   Pedido del dueño: una animación del Escudo humano que muestre que el daño se reparte entre los dos (en diseño).
 
+- **L5 · Duelista · Choque liviano** (boceto aprobado 2026-11-03, dueño: «me gusta»). Estrategia: el esgrimista del mano a mano: busca a uno, ataja y
+  devuelve, amaga y entra por donde no ataja; gana el uno contra uno. Atributos (Des/Agi/Con/Fue/Esp → vida, No2): **nv1 11/8/7/5/2 → 35, 8** · nv2
+  12/8/8/6/2 → 40, 8 · nv3 13/9/8/7/2 → 40, 9 · nv4 14/9/9/8/2 → 45, 9 · nv5 15/10/10/8/2 → 50, 10.
+  | Nivel | Habilidad nueva | Pasiva | Equipo |
+  |---|---|---|---|
+  | 1 | **Finta** (rápida) · **Golpe a la rodilla** (lenta) | — | **Sable del club de barrio** + **Broquel de esgrima** · 2 Comunes livianas |
+  | 2 | **Contraataque** (Flash) | **Desvío hábil** | + 2 Comunes |
+  | 3 | **Estocada** | — | el sable, de Buena |
+  | 4 | **Arte de la guerra** (Flash) | **Ojo crítico** | + una Buena |
+  | 5 | **Ráfaga de cortes** | — | + otra Buena |
+  Consumible: Óleo venenoso.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4
@@ -646,7 +658,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | W3 | | | | | |
 | T3 | ✅ (2026-11-03) | | | | |
 | H3 | | | | | |
-| L5 | | | | | |
+| L5 | boceto ✅ (2026-11-03) | | | | |
 | L6 | | | | | |
 | R3 | | | | | |
 | M3 | ✅ (2026-11-03) | | | | |

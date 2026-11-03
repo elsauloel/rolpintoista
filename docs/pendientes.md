@@ -922,6 +922,10 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   cada arma tenga su propio primer ataque a mitad de precio (hoy un creep ataca solo con el arma principal y lleva una sola cuenta de ataques
   del turno: `comun/creep-acciones.js` pagarAtaque, `comun/creep-calculo.js` costoAtaque0 / armaDe). El Parry ya puede elegir pieza
   (confirmarlo en el mapa con la segunda arma). Hacerlo junto con la carga de los esenciales.
+- [ ] **⚔ Pelea de prueba con los creeps esenciales — SOLO CUANDO EL DUEÑO DIGA «correla»** (dueño, 2026-11-03: «lo de la pelea para la prueba,
+  ponela pendiente, cuando yo te diga que lo corras, correla»). En «Claude · pruebas», con clics: varios esenciales del pool (los 24, en especial
+  los nuevos: Berserker con dos armas, Protector, Ladrón, Arcano, Saltador, Control mental, Hostigador con trampas) contra los personajes, con
+  capturas y reporte (qué tal juega cada uno, si su identidad se nota, números raros). No tocar «El origen de las especies».
 - [ ] **🐝 Invocaciones para creeps (dueño, 2026-11-03: «en principio no lo vamos a usar, pero debería existir»):** hoy los creeps solo llaman refuerzos
   (creeps comunes). Queda para después de diseñar mejor la gestión de invocaciones de jugador; recién ahí se piensa la de los creeps.
 - [ ] **👁 Ojo de Kicillof como habilidad de Support (dueño, 2026-11-03: «sería interesante, habría que pensarlo en coste»):** hoy es solo el

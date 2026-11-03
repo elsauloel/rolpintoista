@@ -283,6 +283,10 @@
 ## Pendientes
 
 ### ▶ Para la próxima tanda de pruebas en el mapa (2026-11-03)
+- [ ] **❤ Una sola Vida extra** (2026-11-03, P239): el Maldito lleno con la Sanguijuela pegada a un personaje; el personaje toma una Poción de HP y
+  después una de Regeneración menor → el Maldito queda con **un solo** «Vida extra 30» (no 25 y 5), en el token, la ficha lite, GM Tools y la Mesa.
+  Un personaje con el Relicario de sangre que ya tiene Vida extra y se cura de más → suma a la misma. Un personaje con dos «Vida extra» guardadas de
+  antes → al empezar su turno quedan en una. El Escudo del sereno / de la mañana siguen aparte.
 - [ ] **🪱 Sanguijuela sin Herida sombría** (2026-11-03): el Maldito (o un Debuffer de clase) le pega la Sanguijuela a un personaje: el daño es siniestro pero **no** aparece Herida sombría; una Poción de HP en ese mismo turno ya se la lleva el lanzador.
 - [ ] **🪱 La cura que se pierde, en la pantalla del jugador** (2026-11-03): con el lanzador caído (o sin token en el mapa), el jugador con la Sanguijuela toma una poción: su aviso dice «🪱 La cura (+N) se pierde: quien te puso la Sanguijuela (X) está caído» (o «ya no está en el mapa»). Desde la ficha suelta (sin el mapa abierto) no se puede saber: ahí la manda igual y la descarta la pantalla del lanzador.
 - [ ] **✨ Parpadeo cancelado con Esc devuelve lo cobrado** (2026-11-03): un creep con SP usa el Parpadeo y, al elegir adónde, Esc: vuelve el SP (y el cooldown si juega con turnos de espera), con el aviso «↩ … se le devolvió …». También con ¡Al frente!.

@@ -2383,7 +2383,7 @@ async function dueloCurar(t, n){
     const res = await modificarCreep(t.fichaId, sc => { const previo = num(sc.hp); const robo = Combatiente.curaRobada(previo, n, sc.estados); if(robo) return {previo, nuevo: previo, robo}; const tope = num(sc.hpMax) > 0 ? num(sc.hpMax) : previo + n; const sin = n > 0 && previo > 0 && Combatiente.sinCura(sc.estados); const entra = Combatiente.curaQueEntra(previo, n, sc.estados); sc.hp = Math.min(tope, previo + entra);
       // 🩸 el Relicario de sangre (2026-10-27): lo que pasa del máximo, Vida extra hasta el fin del combate (+50 % como mucho)
       const exc = entra > 0 && num(sc.hpMax) > 0 && CreepCalculo.talisman(sc, 'relicario') > 0 ? Combatiente.excedenteConTope(sc.estados, previo + entra - tope, tope, Combatiente.RELICARIO_TOPE) : 0;
-      if(exc > 0) sc.estados = [...(sc.estados || []), Combatiente.estadoVidaExtra(exc, {finCombate: true, detalle: 'Vida extra del Relicario de sangre: lo que la cura pasó del máximo. Se va al terminar el combate.'})];
+      if(exc > 0) sc.estados = Combatiente.sumarVidaExtra(sc.estados, exc, {finCombate: true});   // ❤ una sola Vida extra (2026-11-03)
       return {previo, nuevo: sc.hp, sin, exc}; });
     if(res.robo) return curaRobadaMapa(res, nombreDe(t));
     return {previo: res.previo, nuevo: res.nuevo, ...(res.exc ? {excedente: res.exc} : {}), ...(n > 0 && res.previo <= 0 ? {caido: true} : {}), ...(res.sin ? {sinCura: true} : {})};

@@ -343,11 +343,19 @@ const FichaMantenimiento = (() => {
     // 💍 El Anillo de la siesta (2026-10-19, dueño): cada descanso da Vida extra (no se recarga por turno; reemplaza a la que haya quedado del anterior).
     const veDescanso = (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i)).reduce((a, i) => Math.max(a, num(i.descansoVidaExtra)), 0);
     if(veDescanso > 0){
-      S.efectos = (S.efectos || []).filter(e => !(e && e.descansoAnillo));
       // (P227 ✅, 2026-10-28: es Vida extra de verdad —`excedenteVida`—: lo que se lleva cuenta como daño. Al descansar la vida ya quedó llena, así que
       // «te curás N y lo que sobra es Vida extra» son N de Vida extra.)
-      S.efectos.push({id: 'siesta' + Date.now().toString(36), nombre: 'Vida extra (Anillo de la siesta)', polaridad: 'buff', activo: true, permanente: true, sinRecarga: true, seGasta: true,
-        descansoAnillo: true, excedenteVida: true, escudoMagico: veDescanso, escudoMagicoActual: veDescanso, detalle: `Vida extra de ${veDescanso}: se gasta antes que tu vida y no se recarga. Vuelve con el próximo descanso (Anillo de la siesta).`});
+      // ❤ Una sola Vida extra (dueño, 2026-11-03): va a la misma que la de cualquier otra fuente. Como antes «reemplaza a la que quedó» (no se suma
+      // de descanso en descanso): la Vida extra queda en lo que tenía o en la del anillo, lo que sea más.
+      S.efectos = Combatiente.juntarVidaExtra([...(S.efectos || [])]);
+      const iVe = S.efectos.findIndex(Combatiente.esVidaExtraComun);
+      if(iVe < 0) S.efectos.push({...Combatiente.estadoVidaExtra(veDescanso, {id: 'siesta' + Date.now().toString(36)}), sinRecarga: true, seGasta: true, descansoAnillo: true});
+      else {
+        const ve = {...S.efectos[iVe]}, actual = num(ve.escudoMagicoActual ?? ve.escudoMagico);
+        if(actual < veDescanso){ ve.escudoMagico = veDescanso; ve.escudoMagicoActual = veDescanso; }
+        ve.permanente = true; ve.turnos = 0; delete ve.finCombate; ve.descansoAnillo = true;
+        S.efectos[iVe] = ve;
+      }
       lineas.push(`💍 Vida extra ${veDescanso} (Anillo de la siesta)`);
     }
     // 💍 El Anillo del escudo de la mañana (2026-10-19, dueño): cada descanso, Vida extra solo contra el daño especial (`soloEspecial`: el mapa la

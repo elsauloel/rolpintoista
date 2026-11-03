@@ -305,6 +305,7 @@ const Combatiente = (() => {
      (le toca el turno entero) y el siguiente sí. Al empezar: cuenta y después dispara lo que sigue (veneno, regeneración…). */
   function empezarTurnoEstados(estados, campos){
     const k = contarEstados(estados, campos, {alEmpezar: true});
+    juntarVidaExtra(k.quedan);   // ❤ las Vidas extra guardadas aparte (de antes del 2026-11-03) se juntan en una
     const d = dispararEstados(k.quedan, {...(campos || {}), todos: k.quedan});
     return {hp: d.hp, quedan: k.quedan, terminados: k.terminados, eventos: [...k.eventos, ...d.eventos]};
   }
@@ -1488,12 +1489,16 @@ const Combatiente = (() => {
     if(veneno) return {ok: true, que: nuevo.permanente ? 'yaLoTiene' : 'acumulado', estado: veneno};
     const sangrado = acumularSangrado(estados, nuevo);
     if(sangrado) return {ok: true, que: 'acumulado', estado: sangrado};
-    // Vida extra (dueño, 2026-10-07: «quiero que se sumen»): otra Vida extra no reemplaza a la que había — se suma, cada una con su duración
-    // (queda aparte en la lista; el daño se come primero la que vence antes). Antes (P137) reemplazaba.
-    if(nuevo.excedenteVida && n(nuevo.escudoMagico) > 0 && estados.some(e => e && e.excedenteVida && e.nombre === nuevo.nombre && e.activo !== false)){
-      if(nuevo.escudoMagicoActual === undefined) nuevo.escudoMagicoActual = n(nuevo.escudoMagico);
-      estados.push(nuevo);
-      return {ok: true, que: 'nuevo', sumado: true, estado: nuevo};
+    // Vida extra (dueño, 2026-10-07: «quiero que se sumen»; 2026-11-03: «un solo valor, venga de donde venga»): otra Vida extra común se suma
+    // a la que ya tiene, en el mismo estado (fundirVidaExtra: dura lo de la más larga). Los escudos de los anillos (soloEspecial / soloFisico) van aparte.
+    if(esVidaExtraComun(nuevo) && n(nuevo.escudoMagico) > 0){
+      juntarVidaExtra(estados);
+      const ya = estados.find(esVidaExtraComun);
+      if(ya){
+        if(nuevo.escudoMagicoActual === undefined) nuevo.escudoMagicoActual = n(nuevo.escudoMagico);
+        fundirVidaExtra(ya, nuevo);
+        return {ok: true, que: 'acumulado', sumado: true, estado: ya};
+      }
     }
     // Un estado que se apila (Debilitado, 2026-10-11): otra vez = un stack más y la duración vuelve a la del nuevo.
     if(nuevo.apila){
@@ -1998,6 +2003,44 @@ const Combatiente = (() => {
   }
   const estadoVidaExtra = (monto, o) => ({id: (o && o.id) || ('ve' + Date.now()), nombre: 'Vida extra', polaridad: 'buff', activo: true, permanente: true, turnos: 0, stacks: 1, excedenteVida: true,
     escudoMagico: Math.round(n(monto)), escudoMagicoActual: Math.round(n(monto)), ...(o && o.finCombate ? {finCombate: true} : {}), detalle: (o && o.detalle) || 'Vida de más: lo que una cura pasó del máximo.'});
+  /* ❤ Una sola Vida extra (dueño, 2026-11-03: «la vida extra debería ser la misma independientemente de su fuente… un valor que se muestra igual»):
+     la Vida extra común (`excedenteVida`, sin `soloEspecial` / `soloFisico`, que son los escudos de los anillos y van aparte) es UN estado por
+     combatiente: cada fuente (Relicario, Drenar vida, la Sanguijuela, el Anillo de la siesta, a mano…) suma a ese mismo «Vida extra N».
+     Al juntar: el total es la suma; dura lo de la más larga (permanente si alguna lo es; si no, los turnos más altos) y se va al terminar el
+     combate solo si todas las que se juntan se iban (`finCombate`). Antes (2026-10-07) cada una quedaba aparte, con su duración. */
+  const esVidaExtraComun = e => !!e && !!e.excedenteVida && e.activo !== false && !e.soloEspecial && !e.soloFisico;
+  const VIDA_EXTRA_DETALLE = 'Vida de más: se gasta antes que tu vida (lo que se lleva cuenta como daño) y no se recarga. Junta la que llega de cualquier lado.';
+  function fundirVidaExtra(ya, otro){
+    const monto = e => Math.max(0, Math.round(n(e.escudoMagicoActual ?? e.escudoMagico)));
+    const total = monto(ya) + monto(otro);
+    const perm = !!ya.permanente || !!otro.permanente;
+    ya.nombre = 'Vida extra'; ya.escudoMagico = total; ya.escudoMagicoActual = total; ya.activo = true;
+    ya.permanente = perm; ya.turnos = perm ? 0 : Math.max(n(ya.turnos), n(otro.turnos));
+    if(!(ya.finCombate && otro.finCombate)) delete ya.finCombate;
+    ['descansoAnillo', 'seGasta', 'sinRecarga'].forEach(k => { if(otro[k]) ya[k] = true; });
+    ya.detalle = VIDA_EXTRA_DETALLE;
+    return ya;
+  }
+  // Junta en una sola las Vidas extra comunes que haya (las guardadas de antes, varias aparte). Modifica `estados` y lo devuelve.
+  function juntarVidaExtra(estados){
+    if(!Array.isArray(estados)) return estados;
+    const comunes = estados.filter(esVidaExtraComun);
+    if(comunes.length < 2) return estados;
+    const [ya, ...resto] = comunes;
+    resto.forEach(o => fundirVidaExtra(ya, o));
+    for(let i = estados.length - 1; i >= 0; i--) if(resto.includes(estados[i])) estados.splice(i, 1);
+    return estados;
+  }
+  // Suma `monto` de Vida extra a la que ya tiene (o la crea). `o` como en estadoVidaExtra ({finCombate, detalle, id}). → un array nuevo.
+  function sumarVidaExtra(estados, monto, o){
+    const lista = Array.isArray(estados) ? [...estados] : [];
+    if(!(Math.round(n(monto)) > 0)) return lista;
+    const nuevo = estadoVidaExtra(monto, o);
+    const i = lista.findIndex(esVidaExtraComun);
+    if(i < 0){ lista.push(nuevo); return juntarVidaExtra(lista); }
+    lista[i] = fundirVidaExtra({...lista[i]}, nuevo);
+    return juntarVidaExtra(lista);
+  }
   const relicarioEnEquipo = inventario => (inventario || []).some(i => i && i.equipado && n(i.relicario) > 0 && !(i.dur !== undefined && n(i.dur) <= 0 && i.durable));
   function trampaDeHab(h, valorDe){
     const t = h && h.trampaColocar;
@@ -2642,7 +2685,7 @@ const Combatiente = (() => {
   }
   const habDeConsumible = it => it && it.duelo ? {id: 'cons:' + (it.id || it.nombre), nombre: it.nombre, detalle: String(it.detalle || '').split(' ⚙')[0].split(' ✋')[0].trim(), modo: 'auto',   // a la Mesa, solo lo que hace
     duelo: conMinimoDeCalidad(it.duelo, it.tier), tiradaStat: it.duelo.tira || 'dmgesp', tiradaExtra: String(it.dano || '').trim()} : null;
-  return {esSanguijuela, sanguijuelaDe, curaRobada, repartoCuraRobada, curaRobadaTxt, curaPerdidaTxt, permiteDefNegativa, pisoDefensa, ESTADOS_MAGICOS, esEstadoMagico, GRITO_ESPELUZNANTE, migrarGritoEspeluznante, JEFE_INMUNE, JEFE_UN_TURNO, ADRENALINA_CREEP, PILA_PILA, migrarAdrenalina, AZAR_ELEGIR, varianteAlAzar, elegirVarianteAzar, migrarArmaElementalAzar, sinNo2Negativo, LUZ_SANADORA_CREEP, migrarLuzSanadora, VENENO_POR_DANO, ARMAS_ELEMENTALES, ARMA_ELEMENTAL, armaElementalDuelo, armaElementalVariantes, migrarArmasElementales, ponerAlDiaItemsFabrica, anotarPagoDuelo, pagoDeDuelo, sirveParaEmerger, armaParaEmerger, parryApagado, sinParryDelAtaque, nombresContraDisparo, ESQUIVAR_TXT, PONER_ESCUDO_TXT, esRompeArmadura,GONDOLA_CATEGORIAS, categoriaGondola, utilPrimero, PACTO_VIDA_PCT, pactoVida, RELICARIO_TOPE, vidaExtraTotal, excedenteConTope, estadoVidaExtra, relicarioEnEquipo, desesperadoBonos, desesperadoTxt, identidadElemento, CRIATURAS_OSCURAS, sinCura, SIN_CURA_TXT, perforaDeEstados, presaValor, sinPresasDebiles, comoCeguera, CEGUERA_VISION, ciego, aDistancia, ciegoContraDistancia, CIEGO_DISTANCIA, habDeConsumible, efectoActivo, fenixActivo, revivirFenix, mareado, etereo, sequia, SOLO_BONO, soloBonoTxt, conFijo, gastarPasoFantasma, bezoar, conGauchito, GAUCHITO_STATS, talismanesDanoEsp, GRUPOS_CC, grupoCC, esMental, esControl, resisteCC, resisteCCEtq, columnasStats, piezasParaParry, sumaEspecialDe, sumaEspecialTxt, contraDeEjecucion, esHonda, alcanceHonda, alcanceArmaRango, HONDA_RANGO, porDanoNorm, stacksPorDano, porDanoTxt, CARGAS, cargable, conCarga, tormenta, danoTormenta, danoTormentaMover, golpeDirecto, cobroTormenta, tormentaTxt, avisarTormenta, aplicarTormenta, acelerado, gastarAcelerado, extenuado, conExtenuado, stacksCargaActiva, RASGOS_ARCO, LARGO_ALCANCE_MAX, TENSAR_NO2, largoAlcance, alcanceMaximo, afinidadEfectos, arcoRasgosTxt, lecturaTope, APUNTANDO, apuntandoX, caidaDano, recargaCosto, PUNTA_DIAMANTE_DEF, PUNTA_DIAMANTE_PERFORA, REMACHADORA_MAX, absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, unaTiradaDe, gastarUnaTirada, armaEnMano, TIPO_SIN_ARMA, sinArmaEnMano, armaPrincipal, equipoSinArma, esArmaDeMano, ponerArma, defDeItem, critDeItem, defDeEquipo, critDeEquipo, pasarEquipoVivo, equipoPuesto, puestoSinArma, equipoGuardado, vaEnLaMano, manosLibres, itemComoDePersonaje, gruposDeEquipo, ponerPieza, guardarPieza, sacarPieza, COSTO_SACAR_PIEZA, ataqueConSuArma, armaParaArreglos, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, REMATE_ESCALONES, remateDados, ATRAPA_VISUALES, atrapaDeNombre, atrapaDe, atrapaPub, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoLibres, ahorroArco, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, defensaSinNo2, YA_NEGATIVO_TXT, permitirNo2Negativo, permisoNo2, cerrarPermisoNo2, reglaNo2, reglaNo2Texto, REGLA_NO2_SI, REGLA_NO2_NO, errorNo2, errorReglaNo2, alertaReglaNo2, DETECTAR_MIN_TIER, detectarMinDe, conMinimoDeCalidad, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
+  return {esSanguijuela, sanguijuelaDe, curaRobada, repartoCuraRobada, curaRobadaTxt, curaPerdidaTxt, permiteDefNegativa, pisoDefensa, ESTADOS_MAGICOS, esEstadoMagico, GRITO_ESPELUZNANTE, migrarGritoEspeluznante, JEFE_INMUNE, JEFE_UN_TURNO, ADRENALINA_CREEP, PILA_PILA, migrarAdrenalina, AZAR_ELEGIR, varianteAlAzar, elegirVarianteAzar, migrarArmaElementalAzar, sinNo2Negativo, LUZ_SANADORA_CREEP, migrarLuzSanadora, VENENO_POR_DANO, ARMAS_ELEMENTALES, ARMA_ELEMENTAL, armaElementalDuelo, armaElementalVariantes, migrarArmasElementales, ponerAlDiaItemsFabrica, anotarPagoDuelo, pagoDeDuelo, sirveParaEmerger, armaParaEmerger, parryApagado, sinParryDelAtaque, nombresContraDisparo, ESQUIVAR_TXT, PONER_ESCUDO_TXT, esRompeArmadura,GONDOLA_CATEGORIAS, categoriaGondola, utilPrimero, PACTO_VIDA_PCT, pactoVida, RELICARIO_TOPE, vidaExtraTotal, excedenteConTope, estadoVidaExtra, relicarioEnEquipo, esVidaExtraComun, juntarVidaExtra, sumarVidaExtra, desesperadoBonos, desesperadoTxt, identidadElemento, CRIATURAS_OSCURAS, sinCura, SIN_CURA_TXT, perforaDeEstados, presaValor, sinPresasDebiles, comoCeguera, CEGUERA_VISION, ciego, aDistancia, ciegoContraDistancia, CIEGO_DISTANCIA, habDeConsumible, efectoActivo, fenixActivo, revivirFenix, mareado, etereo, sequia, SOLO_BONO, soloBonoTxt, conFijo, gastarPasoFantasma, bezoar, conGauchito, GAUCHITO_STATS, talismanesDanoEsp, GRUPOS_CC, grupoCC, esMental, esControl, resisteCC, resisteCCEtq, columnasStats, piezasParaParry, sumaEspecialDe, sumaEspecialTxt, contraDeEjecucion, esHonda, alcanceHonda, alcanceArmaRango, HONDA_RANGO, porDanoNorm, stacksPorDano, porDanoTxt, CARGAS, cargable, conCarga, tormenta, danoTormenta, danoTormentaMover, golpeDirecto, cobroTormenta, tormentaTxt, avisarTormenta, aplicarTormenta, acelerado, gastarAcelerado, extenuado, conExtenuado, stacksCargaActiva, RASGOS_ARCO, LARGO_ALCANCE_MAX, TENSAR_NO2, largoAlcance, alcanceMaximo, afinidadEfectos, arcoRasgosTxt, lecturaTope, APUNTANDO, apuntandoX, caidaDano, recargaCosto, PUNTA_DIAMANTE_DEF, PUNTA_DIAMANTE_PERFORA, REMACHADORA_MAX, absorberPct, explosivos, vencidosExplosivos, gastarCarga, cargaDeDuelo, cargaCritico, cargaTxt, estadoVisible, expuesto, sinReaccionesNo2, EXPUESTO_TXT, perforaPasa, cargadaGratis, esVarita, municionDe, esVirote, sirveLaMunicion, recargaDe, recargaTxt, RECARGA_NOMBRE, arcoLibresTxt, GRUPOS_CURA, grupoCuraDe, curaDeItem, curarEstados, textoCura, costoAtaqueLineas, diametro, casillasArea, areaTxt, diametroOpciones, especialesConModos, CAOS_ESTADOS, caosResultado, caosEstado, levantable, esDesarmado, COSTO_LEVANTAR_ARMA, curaTirada, ES_FORMULA_CURA, emergenciaCruza, pocionEmergencia, resElementalesHtml, curaQueEntra, CAIDO_TXT, vencerAlEmpezar, estadoTitilando, titila, pdgExtraArma, ahorroEspecial, aManoEspecial, ELEMENTOS, elementoDe, esMagicoTipo, frenaArmaduraMagica, ROLES, PESOS_ROL, ROL_DE_CLASE, repartirAtributos, mitadesDeTirada, aplicarMitades, estadosQueParten, tirarStat, afortunado, estadosQueAfectan, unaTiradaDe, gastarUnaTirada, armaEnMano, TIPO_SIN_ARMA, sinArmaEnMano, armaPrincipal, equipoSinArma, esArmaDeMano, ponerArma, defDeItem, critDeItem, defDeEquipo, critDeEquipo, pasarEquipoVivo, equipoPuesto, puestoSinArma, equipoGuardado, vaEnLaMano, manosLibres, itemComoDePersonaje, gruposDeEquipo, ponerPieza, guardarPieza, sacarPieza, COSTO_SACAR_PIEZA, ataqueConSuArma, armaParaArreglos, pasarTurnoEstados, empezarTurnoEstados, terminarTurnoEstados, dispararEstados, contarEstados, dispararAlAplicar, estadosEnMantenimiento, fijarMarcaTurno, reporteTurno, nitrosMax, costoPrimerAtaque, ATAQUE_ESPECIAL, statAtaqueEspecial, EVA_ESPECIAL, statEvaEspecial, evaExtraDuelo, retiradaPct, retiradaDado, retiradaTexto, chancePct, chanceDado, chanceTexto, ESTADOS_TRABA, esTraba, categoriaConsumible, ranurasCinturon, entranEnCinturon, preguntaSentado, preguntaSilencio, soltarNorm, REMATE_ESCALONES, remateDados, ATRAPA_VISUALES, atrapaDeNombre, atrapaDe, atrapaPub, estadoSoltable, textoSoltarse, tiradaSoltarse, hundirSiFalla, menuTipoAtaqueHtml, ignoraResistCritArma, esEfectoIgnora, RASGOS_ARMA, rasgosDeItem, IDEAL_DONDE, franjaIdeal, bonoIdeal, idealTxt, TIRO_ALTO_MIN, TIRO_ALTO_PDG, tieneTiroAlto, esArco, contraDisparo, sirveParaParry, dmgDelArma, dmgDelArmaTxt, ARCO_LIBRES, arcoLibres, ahorroArco, arcoMuyCerca, sirveDeOportunidad, armaDeCombatiente, ataqueDeArma, costoConAhorro, costoEspecial, costoAtaque, ataquesPosibles, costoParry, recargarNo2, avisarDeudaNo2, defensaSinNo2, YA_NEGATIVO_TXT, permitirNo2Negativo, permisoNo2, cerrarPermisoNo2, reglaNo2, reglaNo2Texto, REGLA_NO2_SI, REGLA_NO2_NO, errorNo2, errorReglaNo2, alertaReglaNo2, DETECTAR_MIN_TIER, detectarMinDe, conMinimoDeCalidad, stuneado, costoLevantarse, armaParaDefensa, SIN_ARMA_DEFENSA, BLOQUEO_SOLO_TRAS_PARRY, parryGratis, bloqueoFirme, esEscudo, orbeSalvaje,
     DUR_POR_PESO, DUR_MIN, esDurable, durPorPeso, durExtra, durBase, durMax, durTexto,
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad, sincronizarEstadosDePasivas, sangraPorSp,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,

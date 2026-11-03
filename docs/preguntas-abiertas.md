@@ -1502,3 +1502,16 @@ la cura que recibiría el portador se la lleva quien lanzó la Sanguijuela. Caso
 **Decidido (dueño, 2026-11-03: «claro que la cura se pierde simplemente»):** la cura se pierde — al portador tampoco le entra. Programado
 (`Combatiente.repartoCuraRobada`: caído → `perdida`; un creep que ya no existe, el aviso lo descarta con una línea en la Mesa).
 
+### P239 — ❤ Una sola Vida extra, venga de donde venga (2026-11-03) ✅
+
+**Contexto:** en la prueba del mapa, el Maldito lleno se robó dos curas (25 y 5) y le quedaron dos estados «Vida extra 25» y «Vida extra 5» (desde
+el 2026-10-07 cada Vida extra quedaba aparte, con su duración). Dueño: «la vida extra debería ser la misma independientemente si viene de la
+Sanguijuela o no… un valor que, independientemente de su fuente, debería mostrarse igual».
+**Decidido y programado** (`Combatiente.sumarVidaExtra` / `juntarVidaExtra` / la rama de Vida extra de `agregarEstado`): la Vida extra común es **un
+solo estado** «Vida extra N» por personaje, creep o invocación; toda fuente suma ahí (Relicario, Drenar vida, la Sanguijuela, Escudo arcano y los
+efectos que dan «Vida extra», el Anillo de la siesta, a mano). Al juntar dos: **dura lo de la más larga** (permanente si alguna lo es; si no, los
+turnos más altos) y **se va al terminar el combate solo si todas se iban** (criterio de Claude: la más simple que no hace perder vida de más). Los
+**topes** (+50 % del Relicario y del Drenar vida) se siguen midiendo sobre el total. El **Anillo de la siesta** sigue sin sumarse de descanso en
+descanso: al descansar, la Vida extra queda en lo que tenía o en la del anillo, lo que sea más. **No se juntan** los escudos de los anillos del sereno
+y de la mañana (solo contra un tipo de daño) ni los escudos que no son Vida extra (Arrojo, Orbe de resguardo, Armadura mágica…). Las guardadas aparte
+se juntan solas al empezar el turno de quien las tiene.

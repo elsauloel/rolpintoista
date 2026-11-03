@@ -10,7 +10,7 @@
    - `grosor(u, ms, semilla)`: el ancho relativo en cada punto (irregular, cambia con el tiempo).
    - `gotitas(semilla, n)`: los datos fijos de cada gotita (dónde va en el chorro, a qué distancia gira, a qué velocidad, si se desprende). */
 (function(raiz){
-  const DURACION = 2200;   // ms
+  const DURACION = 3300;   // ms (2026-11-03, dueño: «un poquito más lenta»; antes 2200)
   // Un generador chico y repetible (mulberry32): la misma semilla da siempre la misma animación en todas las pantallas.
   function rand(semilla){
     let s = (semilla >>> 0) || 1;
@@ -53,5 +53,18 @@
     const f = Math.max(0, Math.min(1, u)) * (pts.length - 1), i = Math.min(pts.length - 2, Math.floor(f)), k = f - i;
     return {x: pts[i].x + (pts[i + 1].x - pts[i].x) * k, y: pts[i].y + (pts[i + 1].y - pts[i].y) * k};
   }
-  raiz.FxTransfusion = {DURACION, rand, curva, ventana, grosor, gotitas, puntoEn};
+  /* ¿Cuánta vida pasa? (2026-11-03, dueño: «que uno pueda poner el número exacto, de entre 1 y el máximo… uno escribe el valor»): lo escrito →
+     {n} (un entero de 1 a max) o {error} (el aviso para volver a pedirlo). Lo usan la de jugador y la de creep (vtt-hexgrid/js/45). Vive acá porque
+     el mapa carga este archivo siempre (creep-acciones.js se carga recién al abrir las Acciones de un creep). */
+  function cantidad(txt, max){
+    max = Math.max(0, Math.floor(Number(max) || 0));
+    const t = String(txt == null ? '' : txt).trim().replace(',', '.');
+    if(!/^\d+(\.\d+)?$/.test(t)) return {error: `Escribí un número, de 1 a ${max}.`};
+    const v = Number(t);
+    if(!Number.isInteger(v)) return {error: `Tiene que ser un número entero, de 1 a ${max}.`};
+    if(v < 1) return {error: 'Como mínimo 1.'};
+    if(v > max) return {error: `Como mucho ${max}: escribiste ${v}.`};
+    return {n: v};
+  }
+  raiz.FxTransfusion = {DURACION, rand, curva, ventana, grosor, gotitas, puntoEn, cantidad};
 })(typeof window !== 'undefined' ? window : globalThis);

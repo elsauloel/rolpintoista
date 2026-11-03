@@ -69,7 +69,7 @@ const Recibidos = (() => {
       const r = Combatiente.repartoCuraRobada(antes, num(inv.hpMax), m);
       if(r.perdida){ ui.toast(`🪱 ${inv.nombre} está caída: la cura que robó su Sanguijuela se pierde`); return {}; }
       inv.hp = antes + r.cura;
-      if(r.extra > 0) inv.estados = [...(inv.estados || []), Combatiente.estadoVidaExtra(r.extra, {id: uid(), detalle: 'Vida extra de la Sanguijuela: la cura que le robó a su presa, pasada del máximo.'})];
+      if(r.extra > 0) inv.estados = Combatiente.sumarVidaExtra(inv.estados, r.extra, {id: uid()});   // ❤ una sola Vida extra (2026-11-03)
       ui.toast(`🪱 ${origen ? origen + ' → ' : ''}${inv.nombre}: +${fmt(m)} de vida robada${r.extra ? ` (${fmt(r.extra)} de Vida extra)` : ''}`);
       return {inv};
     }

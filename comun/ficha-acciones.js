@@ -147,7 +147,7 @@ const FichaAcciones = (() => {
     // queda como Vida extra (hasta +50 % del máximo, contando la que ya tiene); se va al «Finalizar combate». Una cura a alguien caído no entra.
     if(hpmax > 0 && antes > 0 && num(valor) > hpmax && Combatiente.relicarioEnEquipo(S.inventario)){
       const exc = Combatiente.excedenteConTope(S.efectos, num(valor) - Math.max(antes, hpmax), hpmax, Combatiente.RELICARIO_TOPE);
-      if(exc > 0) S.efectos = [...(S.efectos || []), Combatiente.estadoVidaExtra(exc, {finCombate: true, detalle: 'Vida extra del Relicario de sangre: lo que la cura pasó del máximo. Se va al terminar el combate.', id: uid()})];
+      if(exc > 0) S.efectos = Combatiente.sumarVidaExtra(S.efectos, exc, {finCombate: true, id: uid()});   // ❤ una sola Vida extra (2026-11-03)
     }
     S.hp = Math.max(0, Math.min(tope, num(valor)));
     if(antes > 0 && S.hp <= 0 && ultimoAlientoListo(S)) ultimoAlientoUsar(S);   // 💍 el Anillo del último aliento (2026-10-18)
@@ -1202,7 +1202,7 @@ const FichaAcciones = (() => {
       const quien = origen ? origen + ': ' : '';
       if(r.perdida){ ui.toast(`🪱 ${quien}estás caído: la cura que robó tu Sanguijuela (${fmt(m)}) se pierde`); return; }
       S.hp = antes + r.cura;
-      if(r.extra > 0) S.efectos = [...(S.efectos || []), Combatiente.estadoVidaExtra(r.extra, {id: uid(), detalle: 'Vida extra de la Sanguijuela: la cura que le robó a su presa, pasada del máximo.'})];
+      if(r.extra > 0) S.efectos = Combatiente.sumarVidaExtra(S.efectos, r.extra, {id: uid()});   // ❤ una sola Vida extra (2026-11-03)
       ui.cambio(['vitals', 'efectos', 'refresh']);
       ui.toast(`🪱 ${quien}tu Sanguijuela te trajo ${fmt(m)} de vida${r.cura ? ` (${fmt(antes)} → ${fmt(S.hp)})` : ''}${r.extra ? ` · ${fmt(r.extra)} de Vida extra` : ''}`);
       return;

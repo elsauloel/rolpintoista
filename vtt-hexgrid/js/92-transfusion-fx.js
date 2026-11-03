@@ -33,12 +33,14 @@ function transfusionFxEmpezar(de, a, semilla){
 const transfusionFxVe = t => !!t && (!t.oculto || soyGM) && (typeof tokenVisiblePorNiebla !== 'function' || tokenVisiblePorNiebla(t));
 
 // El dibujo (js/05, encima del piso, con los otros efectos). true mientras quede alguna en curso.
+// Las fases fijas (el pulso de salida, el apagado, el salpicón) se estiran con la duración (2026-11-03: de 2,2 s a 3,3 s); con poco movimiento, como antes.
+const transfusionFxEsc = fx => fx.poco ? 1 : fx.dur / 2200;
 function dibujarEfectosTransfusion(z){
   if(!TRANSFUSION_FX.length) return false;
   const ahora = performance.now();
   for(let i = TRANSFUSION_FX.length - 1; i >= 0; i--){
     const fx = TRANSFUSION_FX[i], ms = ahora - fx.t0;
-    if(ms >= fx.dur + 500){ TRANSFUSION_FX.splice(i, 1); continue; }
+    if(ms >= fx.dur + 500 * transfusionFxEsc(fx)){ TRANSFUSION_FX.splice(i, 1); continue; }
     const ta = tokens.get(fx.de), tb = tokens.get(fx.a);
     if(!transfusionFxVe(ta) || !transfusionFxVe(tb)) continue;
     const A = hexCentro(ta.col, ta.fila), B = hexCentro(tb.col, tb.fila);
@@ -47,15 +49,15 @@ function dibujarEfectosTransfusion(z){
   return TRANSFUSION_FX.length > 0;
 }
 function transfusionFxDibujarUna(fx, A, B, ms, z){
-  const F = FxTransfusion, p = Math.min(1, ms / fx.dur), {cabeza, cola} = F.ventana(p);
+  const F = FxTransfusion, p = Math.min(1, ms / fx.dur), {cabeza, cola} = F.ventana(p), esc = transfusionFxEsc(fx);
   const pts = F.curva(A, B, ms, fx.semilla, 56);
-  const apagar = ms > fx.dur ? Math.max(0, 1 - (ms - fx.dur) / 500) : 1;
+  const apagar = ms > fx.dur ? Math.max(0, 1 - (ms - fx.dur) / (500 * esc)) : 1;
   const base = HEX * 0.28;   // ancho máximo del chorro, en unidades del mapa
   ctx.save();
   ctx.lineCap = 'round'; ctx.lineJoin = 'round';
   // Un pulso oscuro en quien da (al principio): la sangre que sale.
-  if(ms < 700){
-    const k = ms / 700;
+  if(ms < 700 * esc){
+    const k = ms / (700 * esc);
     ctx.beginPath(); ctx.arc(A.x, A.y, HEX * (0.45 + 0.5 * k), 0, 2 * Math.PI);
     ctx.strokeStyle = `rgba(120,0,12,${0.55 * (1 - k)})`; ctx.lineWidth = 5 / z; ctx.stroke();
   }
@@ -84,7 +86,7 @@ function transfusionFxDibujarUna(fx, A, B, ms, z){
   }
   // Las gotitas: van con el chorro, giran a su alrededor y algunas se desprenden y se quedan flotando hacia afuera.
   fx.gotas.forEach((g, k) => {
-    const uMov = (g.u + ms * 0.00022) % 1;   // avanzan despacio a lo largo del chorro
+    const uMov = (g.u + ms * 0.00022 / esc) % 1;   // avanzan despacio a lo largo del chorro
     const vivo = uMov >= cola - 0.04 && uMov <= cabeza + 0.04;
     if(!vivo && !(g.suelta && p > 0.3)) return;
     const c = F.puntoEn(pts, Math.max(cola, Math.min(cabeza, uMov)));
@@ -102,7 +104,7 @@ function transfusionFxDibujarUna(fx, A, B, ms, z){
   });
   // Al llegar: un salpicón y un pulso rojo en quien recibe.
   if(cabeza >= 0.999){
-    const llegada = fx.dur * 0.45, k = Math.min(1, Math.max(0, (ms - llegada) / 900));
+    const llegada = fx.dur * 0.45, k = Math.min(1, Math.max(0, (ms - llegada) / (900 * esc)));
     ctx.beginPath(); ctx.arc(B.x, B.y, HEX * (0.5 + 0.7 * k), 0, 2 * Math.PI);
     ctx.strokeStyle = `rgba(200,20,40,${0.8 * (1 - k) * apagar})`; ctx.lineWidth = 4 / z; ctx.stroke();
     const g = ctx.createRadialGradient(B.x, B.y, 0, B.x, B.y, HEX * 0.8);

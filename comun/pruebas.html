@@ -42,8 +42,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 </script>
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
-<script src="fx-transfusion.js?v=20261103fx"></script>
-<script src="combatiente.js?v=20261103t12"></script>
+<script src="fx-transfusion.js?v=20261103fx2"></script>
+<script src="combatiente.js?v=20261103ve"></script>
 <script src="creep-calculo.js?v=20261103t4"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261103p1"></script>
@@ -52,7 +52,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-combate.js"></script>
 <script src="estados-presets.js?v=20261103san"></script>
 <script src="estados-aplicar.js?v=20261103t12"></script>
-<script src="recibidos.js?v=20261103san"></script>
+<script src="recibidos.js?v=20261103ve"></script>
 <script src="tokens-auto.js"></script>
 <script src="creeps-mapas.js"></script>
 <script src="paso-a-paso.js"></script>
@@ -74,8 +74,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js"></script>
-<script src="ficha-acciones.js?v=20261103r1"></script>
-<script src="ficha-mantenimiento.js?v=20261103san"></script>
+<script src="ficha-acciones.js?v=20261103ve"></script>
+<script src="ficha-mantenimiento.js?v=20261103ve"></script>
 <script src="estado-preguntas.js"></script>
 <script src="asistente-estado.js"></script>
 <script src="asistente-trampa.js"></script>
@@ -934,7 +934,27 @@ prueba('🛡/❤ P227 (2026-10-28): los anillos de la siesta, del sereno y del e
   FichaMantenimiento.descansar(S);
   const ve = S.efectos.filter(e => e.excedenteVida).map(e => [e.nombre, e.escudoMagico, !!e.soloFisico, !!e.soloEspecial]);
   igual([ve, /un escudo/.test(FichaCalculo.EXTRA ? (FichaCalculo.EXTRA.find(x => x.id === 'cascara') || {}).full : 'un escudo')],
-    [[['Vida extra (Anillo de la siesta)', 10, false, false], ['Escudo de la mañana', 8, false, true], ['Escudo del sereno', 8, true, false]], true]);
+    [[['Vida extra', 10, false, false], ['Escudo de la mañana', 8, false, true], ['Escudo del sereno', 8, true, false]], true]);
+});
+prueba('❤ Una sola Vida extra (2026-11-03): venga de donde venga, suma al mismo estado; dura lo de la más larga; las viejas aparte se juntan; los escudos de los anillos van aparte', () => {
+  // dos curas robadas de la Sanguijuela (25 y 5) → un solo «Vida extra 30»
+  let es = Combatiente.sumarVidaExtra([], 25, {id: 'a'}); es = Combatiente.sumarVidaExtra(es, 5, {id: 'b'});
+  const comunes = es => es.filter(Combatiente.esVidaExtraComun);
+  // del Relicario (se va al terminar el combate) + del preset a mano (permanente) → una sola, permanente
+  const sc = {estados: []};
+  sc.estados = Combatiente.sumarVidaExtra(sc.estados, 6, {finCombate: true});
+  EstadosAplicar.aplicarACreep(sc, {nombre: 'Vida extra', escudoMagico: 4});
+  const ve = comunes(sc.estados)[0];
+  // dos guardadas de antes, aparte, + un escudo de anillo: se juntan las dos al empezar el turno; el escudo queda aparte
+  const viejas = [{id: 'v1', nombre: 'Vida extra', activo: true, excedenteVida: true, escudoMagico: 25, escudoMagicoActual: 25, permanente: true, turnos: 0},
+    {id: 'v2', nombre: 'Vida extra', activo: true, excedenteVida: true, escudoMagico: 5, escudoMagicoActual: 5, turnos: 2},
+    {id: 'v3', nombre: 'Escudo del sereno', activo: true, excedenteVida: true, soloFisico: true, escudoMagico: 8, escudoMagicoActual: 8, permanente: true}];
+  const t = Combatiente.empezarTurnoEstados(viejas, {});
+  // el tope (Relicario, +50 %): cuenta el total que ya tiene
+  const exc = Combatiente.excedenteConTope(es, 20, 60, Combatiente.RELICARIO_TOPE);
+  igual([comunes(es).length, comunes(es)[0].escudoMagicoActual, comunes(sc.estados).length, ve.escudoMagicoActual, !!ve.permanente, !!ve.finCombate,
+    comunes(t.quedan).length, comunes(t.quedan)[0].escudoMagicoActual, t.quedan.filter(e => e.soloFisico).length, exc],
+    [1, 30, 1, 10, true, false, 1, 30, 1, 0]);
 });
 prueba('📋 Ver el grupo del botín (2026-11-03): los lugares vacíos y a quién le sirve cada pieza', () => {
   const S = {inventario: [{nombre: 'Espada', tipoItem: 'arma_1m', equipado: true}, {nombre: 'Chaleco', tipoItem: 'armadura_blanda', equipado: true, mods: [{stat: 'def', val: 2}]}]};
@@ -2402,11 +2422,11 @@ prueba('Invulnerable activo bloquea un debuff del consumo (y lo dice)', () => {
   const r = FichaHabilidades.aplicarEfectoDeConsumo(S, {efectoNombre: 'Veneno', efectoHpTurno: -2}, presetsDePrueba);
   igual([r.ok, r.motivo], [false, 'inmune']);
 });
-prueba('el escudo y los stacks propios del ítem pisan a los del preset; otra Vida extra se suma aparte (2026-10-07; antes renovaba, P132)', () => {
+prueba('el escudo y los stacks propios del ítem pisan a los del preset; otra Vida extra se suma a la misma (2026-11-03: una sola; antes aparte, y antes renovaba, P132)', () => {
   const S = {catalogo: [], efectos: []};
   FichaHabilidades.aplicarEfectoDeConsumo(S, {efectoNombre: 'Vida extra', efectoEscudo: 6, efectoTurnos: 2}, presetsDePrueba);
   const r2 = FichaHabilidades.aplicarEfectoDeConsumo(S, {efectoNombre: 'Vida extra', efectoEscudo: 9, efectoTurnos: 2}, presetsDePrueba);
-  igual([S.efectos.length, r2.estado.escudoMagico, r2.estado.escudoMagicoActual, S.efectos.map(e => e.escudoMagicoActual)], [2, 9, 9, [6, 9]]);
+  igual([S.efectos.length, r2.estado.escudoMagico, r2.estado.escudoMagicoActual, S.efectos.map(e => e.escudoMagicoActual)], [1, 15, 15, [15]]);
 });
 prueba('el catálogo completado después manda sobre la copia que ya tenía el ítem (configEfectoDe)', () => {
   const S = {catalogo: [{nombre: 'Poción vieja', efectoNombre: 'Regeneración', efectoHpTurno: 3}], efectos: []};
@@ -3684,7 +3704,7 @@ prueba('P137: «no vence» lo decide la habilidad si lo marca, si no el estado (
   const r3 = FichaHabilidades.aplicarEfectoDeConsumo(S, {nombre: 'Capa', efectoNombre: 'Sigilo'}, estadosPresetFicha());
   igual([r1.estado.permanente, r2.estado.permanente, r3.estado.permanente], [true, false, true]);
 });
-prueba('la Vida extra que da una habilidad se suma a la que había (2026-10-07; antes reemplazaba, P137), también en los creeps', () => {
+prueba('la Vida extra que da una habilidad se suma a la que había, en el mismo estado (2026-11-03; antes aparte, y antes reemplazaba, P137), también en los creeps', () => {
   const h = {id: 'd', nombre: 'Drenar', efectoNombre: 'Vida extra', efectoEscudo: 3};
   const sc = creepPrueba({habilidades: [h]});
   CreepAcciones.efectoDeHab(sc, Object.assign({}, h, {efectoEscudo: 5}), estadosPresetCreep());
@@ -3693,7 +3713,7 @@ prueba('la Vida extra que da una habilidad se suma a la que había (2026-10-07; 
   FichaHabilidades.aplicarEfectoDeConsumo(S, Object.assign({}, h, {efectoEscudo: 5}), estadosPresetFicha());
   const rf = FichaHabilidades.aplicarEfectoDeConsumo(S, h, estadosPresetFicha());
   const exc = l => l.filter(e => e.nombre === 'Vida extra').map(e => [e.escudoMagico, e.escudoMagicoActual]);
-  igual([exc(sc.estados), exc(S.efectos), !!r.estado, !!rf.ok], [[[5, 5], [3, 3]], [[5, 5], [3, 3]], true, true]);
+  igual([exc(sc.estados), exc(S.efectos), !!r.estado, !!rf.ok], [[[8, 8]], [[8, 8]], true, true]);
 });
 
 prueba('invocación: la Defensa suma los estados que la cambian (como un creep) y Armadura rota resta una sola vez', () => {
@@ -6507,6 +6527,11 @@ prueba('🩸 La animación de la Transfusión (2026-11-03): el chorro sale y lle
   igual([c.length, c[0].x, c[0].y, c[40].x, Math.round(c[40].y * 1e6), desvio > 10, JSON.stringify(c) === JSON.stringify(c2), JSON.stringify(c) !== JSON.stringify(c3),
     v0.cabeza, v0.cola, v1.cabeza, v1.cola, vm.cabeza === 1 && vm.cola > 0 && vm.cola < 1, F.gotitas(7, 5).length, JSON.stringify(F.gotitas(7, 5)) === JSON.stringify(F.gotitas(7, 5))],
     [41, 0, 0, 300, 0, true, true, true, 0, 0, 1, 1, true, 5, true]);
+});
+prueba('🩸 Transfusión: el número exacto (2026-11-03): de 1 al máximo, escrito; lo que no va avisa; la animación dura 3,3 s', () => {
+  const c = FxTransfusion.cantidad;
+  igual([c('7', 15).n, c(' 15 ', 15).n, c('1', 15).n, !!c('16', 15).error, !!c('0', 15).error, !!c('abc', 15).error, !!c('2.5', 15).error, !!c('', 15).error, /15/.test(c('20', 15).error), FxTransfusion.DURACION],
+    [7, 15, 1, true, true, true, true, true, true, 3300]);
 });
 prueba('🗄 Referencia (2026-11-03): los creeps de fábrica sin auditar salen del pool de campaña y van a «Referencia»', () => {
   const ref = CREEPS_BASE.filter(c => c.pool !== 'esencial' && Biblioteca.sinAuditarDeFabrica(c));

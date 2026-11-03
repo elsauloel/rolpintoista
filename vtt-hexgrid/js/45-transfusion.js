@@ -32,11 +32,20 @@ async function transfusionDeHabilidad(msg){
   const rd = (fichasPub.get(da.t.fichaId) || {}).resumen || {}, rr = (fichasPub.get(recibe.t.fichaId) || {}).resumen || {};
   const max = Math.min(Math.max(1, num(msg.max) || 20), Math.max(0, num(rd.hp) - 1), Math.max(0, num(rr.hpMax) - num(rr.hp)));
   if(max <= 0){ toast(num(rd.hp) <= 1 ? `${nombreDe(da.t)} no tiene vida para dar` : `${nombreDe(recibe.t)} ya tiene la vida llena`); mesaLinea(`🩸 ${msg.nombre}: no había vida para pasar`, 'recordatorio'); return; }
-  const opciones = [...new Set([5, 10, 15, 20].filter(v => v < max).concat(max))];
-  AvisoCombate.mostrar({clave: 'transfusion', icono: '🩸', titulo: `${msg.nombre}: ¿cuánta vida?`,
-    texto: `De ${nombreDe(da.t)} (${fmt(num(rd.hp))} de vida) a ${nombreDe(recibe.t)} (${fmt(num(rr.hp))} de ${fmt(num(rr.hpMax))}). Como mucho ${fmt(max)}.`,
-    botones: [...opciones.map(v => ({texto: v === max ? `${v} (lo máximo)` : String(v), alClic: () => { AvisoCombate.cerrar(); transfusionAplicar(msg, da, recibe, v); }})),
-      {texto: 'Cancelar', sec: true, alClic: () => { AvisoCombate.cerrar(); mesaLinea(`🩸 ${msg.nombre}: se canceló (el costo ya se pagó)`, 'recordatorio'); }}]});
+  const n = await transfusionPedirCantidad(`${msg.nombre}: ¿cuánta vida?`,
+    `De ${nombreDe(da.t)} (${fmt(num(rd.hp))} de vida) a ${nombreDe(recibe.t)} (${fmt(num(rr.hp))} de ${fmt(num(rr.hpMax))}).`, max);
+  if(n == null){ mesaLinea(`🩸 ${msg.nombre}: se canceló (el costo ya se pagó)`, 'recordatorio'); return; }
+  transfusionAplicar(msg, da, recibe, n);
+}
+/* 🩸 ¿Cuánta vida? (2026-11-03, dueño: «que uno pueda poner el número exacto, de entre 1 y el máximo… uno escribe el valor, no una opción de
+   múltiplos de 5»): un campo con el máximo ya escrito; si lo escrito no va (no es un número, menos de 1, más del máximo), avisa y lo vuelve a pedir.
+   → el número, o null si se cancela. */
+async function transfusionPedirCantidad(titulo, texto, max, aviso){
+  const txt = await Confirmar.texto(`${aviso ? '⚠ ' + aviso + ' ' : ''}${texto} Escribí cuánta: de 1 a ${fmt(max)}.`,
+    {titulo, icono: '🩸', valor: String(max), sugerencias: [...new Set([1, Math.ceil(max / 2), max])].filter(v => v >= 1).map(String), si: 'Pasar la vida', no: 'Cancelar', max: 4});
+  if(txt === null) return null;
+  const r = FxTransfusion.cantidad(txt, max);
+  return r.error ? transfusionPedirCantidad(titulo, texto, max, r.error) : r.n;
 }
 async function transfusionAplicar(msg, da, recibe, n){
   try{
@@ -82,11 +91,11 @@ function transfusionDeCreep(sc, h, alTerminar){
     if(!scDa || !scRe) return cancelar('no se pudieron leer los creeps — pasala a mano');
     const max = CreepAcciones.transfusionMax(sc, scDa, scRe);
     if(max <= 0){ toast(num(scDa.hp) <= 1 ? `${nombreDe(da.t)} no tiene vida para dar` : `${nombreDe(recibe.t)} ya tiene la vida llena`); return cancelar('no había vida para pasar'); }
-    const opciones = [...new Set([5, 10, 15, 20].filter(v => v < max).concat(max))];
-    AvisoCombate.mostrar({clave: 'transfusion', icono: '🩸', titulo: `${h.nombre}: ¿cuánta vida?`,
-      texto: `De ${nombreDe(da.t)} (${fmt(num(scDa.hp))} de vida) a ${nombreDe(recibe.t)} (${fmt(num(scRe.hp))} de ${fmt(num(scRe.hpMax))}). Como mucho ${fmt(max)} (su Especial).`,
-      botones: [...opciones.map(v => ({texto: v === max ? `${v} (lo máximo)` : String(v), alClic: () => { AvisoCombate.cerrar(); transfusionCreepAplicar(sc, h, da, recibe, v).then(fin); }})),
-        {texto: 'Cancelar', sec: true, alClic: () => { AvisoCombate.cerrar(); cancelar('se canceló'); }}]});
+    const n = await transfusionPedirCantidad(`${h.nombre}: ¿cuánta vida?`,
+      `De ${nombreDe(da.t)} (${fmt(num(scDa.hp))} de vida) a ${nombreDe(recibe.t)} (${fmt(num(scRe.hp))} de ${fmt(num(scRe.hpMax))}). Como mucho su Especial y lo que le falta a quien recibe.`, max);
+    if(n == null) return cancelar('se canceló');
+    await transfusionCreepAplicar(sc, h, da, recibe, n);
+    fin();
   })().catch(err => { console.error('Transfusión de creep:', err); cancelar('no se pudo — pasala a mano'); });
 }
 async function transfusionCreepAplicar(sc, h, da, recibe, n){

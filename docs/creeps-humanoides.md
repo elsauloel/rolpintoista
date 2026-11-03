@@ -150,6 +150,17 @@
 - **T2 · Muralla con púas · Tanque · nivel 1** (aprobado 2026-11-02): Con 13 · Fue 8 · Esp 6 · Agi 3 · Des 3 (33), vida 65. Hacha con garfio
   (Tipo 8, Bloqueo +1, Derribar 25 %) · Puerta de granero (Def +2, Bloqueo +2, Eva −1) · Coraza de cuero hervido (Def +3, Res. crít. T4 +1,
   Res.CC +1). Skills: Coraza de púas (rápida) · Aguante (lenta). Consumible: poción de Cuero duro. Estrategia: castiga al que le pega; no persigue.
+  - **Nivel 1 rehecho y boceto de 1 a 5** (dueño, 2026-11-03: «el creep va así»), con el criterio de tanques (Agi ≥ 5 para poder atacar):
+    Con/Des/Agi/Fue/Esp → vida, No2: **nv1 12/6/5/7/3 → 60, 5** (antes 13/3/3/8/6) · nv2 13/6/6/8/3 → 65, 6 · nv3 14/7/6/9/3 → 70, 6 · nv4
+    15/7/7/10/3 → 90, 7 · nv5 16/8/7/11/3 → 95, 7. Nivel 1: Def 5, Def.Esp 0; el hachazo cuesta 4 No2.
+    | Nivel | Habilidad nueva | Pasiva | Equipo |
+    |---|---|---|---|
+    | 1 | Coraza de púas (rápida) · Aguante (lenta) | — | Hacha con garfio · Puerta de granero · Coraza de cuero hervido |
+    | 2 | **Velo espejado** (Espejo: castiga la magia) | **Piel curtida** (+1 Def) | + 2 Comunes (cofia, botas) |
+    | 3 | **Blindaje** (rápida) | — | el escudo: **Escudo de pinchos** (Buena, Espinas) |
+    | 4 | **Segundo aliento** | **Robustez** (+5 de vida) | la coraza: **Pieles erizadas del berserker** (Buena, Espinas) |
+    | 5 | **Escudo humano** | — | el hacha: **Hacha de abordaje** (Buena) |
+    Pendiente de diseño: si las Espinas de varias fuentes se suman (ver `pendientes.md`); si no, en el nivel 4 va la Coraza de bronce con runas.
 
 ## La idea
 
@@ -414,7 +425,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 |---|---|---|---|---|---|
 | W1 | ✅ (2026-11-02) | | | | |
 | T1 | ✅ (2026-11-02) | | | | |
-| T2 | ✅ (2026-11-02) | | | | |
+| T2 | ✅ (2026-11-02; rehecho 2026-11-03) | | | | |
 | H1 | ✅ (2026-11-03) | | | | |
 | L1 | ✅ (2026-11-02) | | | | |
 | L2 | | | | | |

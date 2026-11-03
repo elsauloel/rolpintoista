@@ -76,7 +76,7 @@
 >   Variables: `ROL_GM_EMAIL`/`ROL_GM_CLAVE`, `ROL_J1_EMAIL`/`ROL_J1_CLAVE`, `ROL_J2_EMAIL`/`ROL_J2_CLAVE` (la de GM reemplaza a `ROL_EMAIL`). Con eso, desde la
 >   nube: leer las partidas (ej. confirmar que Ricardo tiene Prisa) y abrir el mapa en un navegador sin pantalla con capturas (cubre buena parte
 >   del «☁🧪» de abajo). Regla propuesta: en las partidas reales solo mirar salvo pedido; las pruebas, en «Claude · pruebas».
-> - [ ] **▶ AL RETOMAR EL ENCUENTRO 2 DE EL ORIGEN, RECORDARLE AL DUEÑO (2026-11-03, dueño: «cuando te diga de retomar la próxima pelea del origen,
+> - [~] (2026-11-03: el dueño cargó Capataz, Rompehuesos —5.ª: Puño de roca—, dos Ratas y el Arquero, con cambios suyos sobre la marcha; falta confirmar el Chamán) **▶ AL RETOMAR EL ENCUENTRO 2 DE EL ORIGEN, RECORDARLE AL DUEÑO (2026-11-03, dueño: «cuando te diga de retomar la próxima pelea del origen,
 >   recordame que termine el arquero y avance con el chamán»)**: cargados por el dueño en MINAS DUNGEON: Capataz del culto, Goblin rompehuesos (le falta
 >   su **5.ª habilidad**, la elige él) y la Rata de galería (duplicada: dos ratas). **El Arquero del culto incendiario quedó a medio cargar**: terminarlo
 >   (la ficha completa está en `docs/origen-goblins-cultistas.md`; arco: estopa u otra de las Buenas que se le pasaron). Después, el **Goblin chamán del

@@ -204,12 +204,20 @@ async function oportunidadSecretasPublicar(tokenId){
 function oporContinuar(e){
   const t = tokens.get(e.tokenId);
   if(!t || !e.resto || e.resto.length < 2) return;
+  // 🐞 (2026-11-03, pruebas en el mapa): si el token ya no está donde se frenó (lo movieron después, p. ej. el GM lo arrastró de nuevo), no se
+  // retoma el camino viejo: si no, el tramo viejo volvía a «alejarse» del rival y el cartel «Te alejás de…» reaparecía para siempre.
+  if(!oporSigueDondeSeFreno(t, e.resto)) return;
   const ruta = e.resto.map(c => ({col: c.col, fila: c.fila}));
   const fin = ruta[ruta.length - 1], pc = hexCentro(fin.col, fin.fila);
   rutaSoltada({id: e.tokenId, ruta, movio: true, libre: false, costo: costoMoverDe(t), x: pc.x, y: pc.y}, t);
   pedirDibujo();
 }
 
+// ¿El token sigue en la casilla donde se frenó (la primera del resto del camino)? (función pura, la usa oporContinuar)
+function oporSigueDondeSeFreno(t, resto){
+  const c = Array.isArray(resto) && resto[0];
+  return !!(t && c) && Math.round(num(t.col)) === Math.round(num(c.col)) && Math.round(num(t.fila)) === Math.round(num(c.fila));
+}
 // Llega o cambia un momento de oportunidad (lo llama momentoRecibido, js/16).
 function oporMomento(id, d){
   if(d.tipo !== 'oportunidad') return;

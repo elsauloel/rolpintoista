@@ -363,6 +363,7 @@ async function mitiMitiCobrar(t, prot, res){
     const m = num(res.r.mitiMiti);
     const rp = prot.tipo === 'creep' ? await danioCreep(prot, String(m), true, 0, 0) : await danioPj(prot, String(m), true, 0, 0);   // 🛡 el Escudo humano de un creep (2026-10-27)
     mesaLinea(`🛡 ${prot.tipo === 'creep' ? 'Escudo humano' : 'Miti-Miti'}: ${nombreDe(prot)} se lleva ${fmt(m)} del golpe a ${nombreDe(t)}, directo a la vida (${fmt(rp.previo)} → ${fmt(rp.nuevo)} HP)`);
+    if(typeof escudoHumanoGolpePublicar === 'function') escudoHumanoGolpePublicar(t, prot, num(res.r.recibido) + m, m).catch(err => console.error('Escudo humano (animación):', err));   // 🛡 (js/95, 2026-11-03)
   }catch(err){ console.error('No se pudo cobrar el Miti-Miti:', err); mesaLinea(`🛡 Miti-Miti: a ${nombreDe(prot)} le tocan ${fmt(num(res.r.mitiMiti))} de daño (✋ a mano: no se pudo aplicar solo)`); }
 }
 
@@ -1638,6 +1639,7 @@ async function hudEstadoCambiar(t, indice, accion, delta){
           const resumenEstados = inv.estados.filter(e => e && e.activo !== false && e.nombre).slice(0, 30).map(e => ({
             nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...(e.invulnerable ? {invulnerable: true} : {}), ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
             polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '', ...Combatiente.atrapaPub(e),   // 🕸 js/68
+            ...(e.protege ? {protege: String(e.protege).slice(0, 80), protegeNombre: String(e.protegeNombre || '').slice(0, 40)} : {}),   // 🛡 Miti-Miti: a quién protege (el lazo, js/95)
             detalle: String(e.detalle || '').slice(0, 200),
           }));
           cambios['resumen.invocaciones'] = (r.invocaciones || []).map(i => i.id === invId ? {...i, estados: resumenEstados} : i);
@@ -1646,6 +1648,7 @@ async function hudEstadoCambiar(t, indice, accion, delta){
           cambios['resumen.estados'] = datos.efectos.filter(e => e && e.activo !== false && e.nombre).slice(0, 30).map(e => ({
             nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...(e.invulnerable ? {invulnerable: true} : {}), ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
             polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '', ...Combatiente.atrapaPub(e),   // 🕸 js/68
+            ...(e.protege ? {protege: String(e.protege).slice(0, 80), protegeNombre: String(e.protegeNombre || '').slice(0, 40)} : {}),   // 🛡 Miti-Miti: a quién protege (el lazo, js/95)
             detalle: String(e.detalle || '').slice(0, 200),
           }));
         }

@@ -284,6 +284,16 @@
 
 ### ▶ Para la próxima tanda de pruebas en el mapa (2026-11-03)
 
+- [ ] **🛡 La animación del Escudo humano — para que la revise el dueño en la compu** (2026-11-03, `vtt-hexgrid/js/95-escudo-humano-fx.js` +
+  `comun/fx-escudo-humano.js`): un creep con Escudo humano sobre otro creep a 3 casillas o menos (y, aparte, un Tanque con Miti-Miti sobre un
+  personaje). En las pantallas del GM y de un jugador: mientras dura, el **lazo dorado** que respira entre los dos y el **reflejo metálico** que
+  barre el token del protegido cada ~3 s (con su borde dorado fino). Un jugador le pega al protegido: el destello, el número entero (−12) que se
+  parte (−6 queda; la esquirla dorada con −6 viaja por el lazo), el pulso dorado y el −6 en el guardián; el lazo brilla fuerte un instante.
+  Que el lazo desaparezca cortándose cuando vence el efecto o el guardián se aleja más de 3 casillas. Oculto o en la niebla para el jugador: no
+  ve el lazo (ni el golpe en ese token). Con «reducir movimiento»: sin respiración ni viaje, solo el destello y los números. Ojo: los creeps
+  publican ahora `protege` en sus estados públicos (GM Tools `creepPublico` y el mapa `modificarCreep`); un Escudo humano puesto antes recién se
+  ve cuando el creep se vuelve a publicar.
+
 - [x] ✅ **✋ Las dos manos de un creep en GM Tools** (2026-11-03, probado con clics en «Claude · pruebas» con un Hachero del pool, después borrado):
   Equipar del fabricante → Facón de paisano pregunta «¿Dónde va?» (✋ En la otra mano / 🔁 Reemplazar Hacha) → en la otra mano quedan las dos;
   Escudo de hierro macizo → «Las manos ocupadas: ¿qué guarda?» (Hacha / Facón) → guardó el Facón; Brazal de cuero tachonado (atado) entró sin

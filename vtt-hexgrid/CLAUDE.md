@@ -968,6 +968,13 @@ las rodea como a un Sólido. Por un aliado se pasa, pero `rutaSoltada` no deja t
   Remolino / Barrido / Coletazo (un tajo que gira; línea de corte) y Grito espeluznante (tres anillos; 😱). El momento `onda` lleva `variante` (y
   `ang`); `onda-golpe`, `variante` y `de` (quien la lanzó, para la dirección del empujón). Vale para `objetivo` 'onda' o 'cono'; el duelo espera a
   que termine (DURACION + 400 ms, `conOnda` en `dueloElegirAreaMapa`).
+- **🛡 La animación del Escudo humano** (2026-11-03, dueño: «que visualmente se entienda que el daño se está distribuyendo entre los dos
+  tokens»; «en el token de la persona protegida… un brillo, como un reflejo metálico de protección»): `js/95-escudo-humano-fx.js` + la geometría en
+  `comun/fx-escudo-humano.js` (vale también para el Miti-Miti de clase). Cada pantalla saca los pares de los estados públicos (`protege` en el
+  resumen del guardián: lo publican ahora el mapa `modificarCreep` js/09, GM Tools `creepPublico` y el resumen de un personaje) y dibuja desde js/05
+  (`dibujarEfectosEscudoHumano`) el lazo dorado que respira y el reflejo que barre al protegido. Cuando el mapa cobra el reparto (`mitiMitiCobrar`,
+  js/10) publica el momento `escudo-golpe` ({de, a, total, va}; js/16, sin tarjeta): destello, el número que se parte, la esquirla por el lazo y el
+  pulso en el guardián (~1,5 s). Al vencer, el lazo se corta y se apaga. No se dibuja lo que esa pantalla no ve; «reducir movimiento» sin viaje.
 - **Editar token en ventana emergente** (2026-09-21): "✎ Editar token" ya no usa la barra lateral; abre una ventana centrada (`#editar-token-capa`/`#editar-token-ventana`, mismo estilo que "Nuevo token") que se cierra con Volver, clic en el fondo, clic derecho fuera de un campo o Esc (`cerrarEditarToken`). La barra lateral queda solo con Mantenimiento y Finalizar combate.
 
 - **📏🔮 Visualizador de rango** (2026-09-22): dos botones cuadrados junto a 👓 lentes (`#btn-rango`, `#btn-rango-magico`), para cualquier jugador: muestran, con la misma superficie hexagonal que usan las auras (`dibujarAuraHex`), el área de **Rango** (de Destreza, azul) o **Rango de casteo** (de Especial, violeta) alrededor de **tu propio token** en el mapa. Los números salen de `resumen.rng`/`resumen.rangocasteo`, que la ficha ya calculaba pero no publicaba (`fichaResumen()`). Atajos: **R** prende/apaga el normal, **Shift+R** el mágico (Ctrl+R se descartó: el navegador lo usa para recargar la página). Es local a cada navegador, no se sincroniza ni queda guardado. Por ahora solo para el propio PJ del jugador — no hay botón equivalente para que el GM lo vea en un creep.

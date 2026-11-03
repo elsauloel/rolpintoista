@@ -101,6 +101,7 @@ function momentoRecibido(id, d){
   if(d.tipo === 'desarme' && d.datos && typeof desarmeRuleta === 'function') desarmeRuleta(id, d.datos);
   if(d.tipo === 'transfusion' && typeof transfusionFxRecibido === 'function') transfusionFxRecibido(id, d);   // 🩸 el chorro de sangre (js/92, 2026-11-03)
   if(d.tipo === 'onda' && typeof ondaFxRecibido === 'function') ondaFxRecibido(id, d);   // 💥 la onda del Shockwave (js/94, 2026-11-03)
+  if(d.tipo === 'escudo-golpe'){ if(typeof escudoHumanoGolpeRecibido === 'function') escudoHumanoGolpeRecibido(id, d); return; }   // 🛡 el golpe que se reparte (js/95): sin tarjeta
   if(d.tipo === 'onda-golpe'){ if(typeof ondaFxGolpeRecibido === 'function') ondaFxGolpeRecibido(id, d); return; }   // 💫 los pajaritos de quien no la resistió: sin tarjeta   // 🩸 el chorro de sangre (js/92, 2026-11-03)
   if(d.tipo === 'rodillo') rodilloMomento(id, d);   // 🎰 el rodillo de otro (el Arma elemental al azar, 2026-11-01)
   if(d.tipo === 'mal-de-ojo' && typeof malDeOjoMomento === 'function') malDeOjoMomento(id, d);   // 🧿 volver a tirar y quedarse con la peor (js/60)

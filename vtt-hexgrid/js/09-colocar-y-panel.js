@@ -630,6 +630,7 @@ async function modificarCreep(creepId, cambiar){
           ...(e.vigilancia ? {vigilancia: Math.max(1, Math.round(num(CreepCalculo.alcance(sc))))} : {}),   // 👁 Vigilancia: el alcance del disparo (js/58)
           ...Combatiente.atrapaPub(e),   // 🕸 la telaraña o la red, encima del token (js/68)
           ...(e.marcado ? {marcado: true} : {}),   // ⚡ brilla y se lo ve en la niebla (el Rayo cargado, 2026-10-24)
+          ...(e.protege ? {protege: String(e.protege).slice(0, 80)} : {}),   // 🛡 el Escudo humano: a quién protege (el lazo de js/95, para todas las pantallas)
           polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '',
         })),
       firma: hashGm(json) + '-' + parteImagen,

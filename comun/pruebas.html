@@ -44,6 +44,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="critico.js"></script>
 <script src="fx-transfusion.js?v=20261103fx2"></script>
 <script src="fx-onda.js?v=20261103onda2"></script>
+<script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="combatiente.js?v=20261103m2"></script>
 <script src="creep-calculo.js?v=20261103t20"></script>
 <script src="creep-botonera.js"></script>
@@ -6655,6 +6656,17 @@ prueba('⚔⚔ Creep con dos armas (2026-11-03): un primer ataque barato por arm
   const solo = CreepCalculo.normalizar(structuredClone(CREEPS_BASE.find(c => c.pool === 'esencial' && c.nombre === 'Hachero').datos));
   igual([antes, tras1, p2.paga, /^1d4/.test(dano), ataque.armaCreepId, trasDev, sc.armaActiva, CreepCalculo.costoAtaqueCon(sc, 'sable'), Combatiente.ataquesConArmaCreep(solo), Combatiente.armasDeMano(solo).length],
     [[3, 2, 'Sable del tahúr'], [3, 'sable', 6, 2], 2, true, 'facon', [2, 2, 6, 1], undefined, 3, 0, 1]);
+});
+prueba('🛡 Escudo humano, la animación (2026-11-03): el reparto igual que el mapa (mitad para arriba al guardián), el lazo no pisa los tokens, los tiempos del golpe y el reflejo', () => {
+  const F = FxEscudoHumano;
+  const p12 = F.partir(12), p7 = F.partir(7), p1 = F.partir(1), p0 = F.partir(0);
+  const pts = F.lazo({x: 0, y: 0}, {x: 100, y: 0}, 0, 20, 10);
+  const medio = F.puntoEn(pts, 0.5), f0 = F.fases(0), f500 = F.fases(500), f1200 = F.fases(1200), f1600 = F.fases(1600);
+  igual([p12.va, p12.queda, p7.va, p7.queda, p1.va, p1.queda, p0.va,
+    pts.length, Math.round(pts[0].x), Math.round(pts[pts.length - 1].x), Math.abs(medio.y) > 1,
+    f0.impacto, f0.entero, f0.partido, f500.partido, f500.viaje > 0, f1200.pulso !== null, f1600.fin,
+    F.reflejo(0, 0) === 0, F.reflejo(F.REFLEJO_DURA + 10, 0), F.respiro(0) > 0.2 && F.respiro(0) < 0.6],
+    [6, 6, 4, 3, 1, 0, 0, 11, 20, 80, true, 1, 1, false, true, true, true, true, true, null, true]);
 });
 prueba('🗄 Referencia (2026-11-03): los creeps de fábrica sin auditar salen del pool de campaña y van a «Referencia»', () => {
   const ref = CREEPS_BASE.filter(c => c.pool !== 'esencial' && Biblioteca.sinAuditarDeFabrica(c));

@@ -322,6 +322,20 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 5 | **Estandarte de guerra** (aliados a 3: +3 PdG y +5 de daño mientras siga en pie) | — | + la lanza de Buena |
   Consumible: Pergamino grupal de Furia de Combate. Piezas Buenas a elegir al definir cada nivel. Sin cargar hasta que el dueño diga.
 
+- **L3 · Asesino de las sombras · Choque liviano** (boceto aprobado 2026-11-03, dueño: «reemplazá la trapera por el tajo, resto ok»). Acento en
+  **Destreza y críticos** (la idea del dueño). Estrategia: desaparece, aparece por la espalda y busca el crítico; va al golpe único (el Sangrador gana
+  desangrando). Atributos (Des/Agi/Con/Fue/Esp → vida, No2): nv1 11/9/6/5/2 → 30, 9 · nv2 12/9/7/6/2 → 35, 9 · nv3 13/10/7/7/2 → 35, 10 · nv4
+  14/10/8/8/2 → 40, 10 · nv5 15/11/9/8/2 → 45, 11.
+  | Nivel | Habilidad nueva | Pasiva | Equipo |
+  |---|---|---|---|
+  | 1 | **Ojo de asesino** (rápida) · **Bomba de humo** (lenta: Sigilo aunque lo miren, 3 casillas gratis) | — | **Punzón de hielo** (Tipo 4, +1 daño, Crítico potente +2) · Chaleco de cuero · Botas de suela de goma (Def 2, Def.Esp 1, Sigilo +1) |
+  | 2 | **Finta** (rápida: no se puede parar) | **Ojo crítico** (+1 Crítico frecuente) | + 2 Comunes (guantes, capucha) |
+  | 3 | **Puñalada por la espalda** | — | el arma, de Buena calidad |
+  | 4 | **Tajo veloz** (+2 PdG, +2 de daño, Crítico frecuente +1) | **Paso ligero** | + **Ropas de sombra finas** (Buena: Def.Esp +2, Sigilo +2, Evasión +1) |
+  | 5 | **Degollar** (+4 PdG, +7 de daño, +1/+1 a los críticos; termina su turno) | — | + una tercera pieza Buena |
+  Consumible: Pergamino grupal de Paso Fantasma. Ojo: puede ser muy letal (críticos contra Evasión baja, como las ratas de la simulación del
+  Encuentro 2): medirlo al definir cada nivel. Nivel 1 por definir en detalle.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

@@ -44,6 +44,7 @@ function dashEjecutar(tokenId, o){
     const nom = nombreDe(t1);
     const fin = () => { if(typeof o.alTerminar === 'function') o.alTerminar(); };
     if(!cam.celdas.length){ toast(`💨 ${o.nombre || 'Dash'}: no hay lugar para avanzar hacia ese lado`); fin(); return; }
+    if(typeof oporNegadaAvisar === 'function') oporNegadaAvisar(t1, tokenId, [{col: t1.col, fila: t1.fila}, ...cam.celdas], o.nombre || 'Dash', cam.rival ? cam.rival[0] : '');   // 💨 sin oportunidad: el aviso (js/17)
     try{
       if(cam.rival){
         const [rid, rt] = cam.rival;

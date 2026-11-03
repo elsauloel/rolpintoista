@@ -42,7 +42,8 @@ async function saltoHab(mio, t, ataque, yo){
     }
     mesaLinea(`🦘 La mesa decidió que ${nom} sí puede saltarlo`, 'recordatorio');
   }
-  const k = distanciaHex(mio, caer);
+  const k = distanciaHex(mio, caer), desdeSalto = {col: mio.col, fila: mio.fila};
+  if(typeof oporNegadaAvisar === 'function') oporNegadaAvisar(mio, mio.id, [desdeSalto, ...lineaHex(mio, caer).filter(c => !(c.col === mio.col && c.fila === mio.fila))], ataque.habNombre || ataque.nombre || (corre ? 'la embestida' : 'el Salto'), t.id);   // 💨 sin oportunidad: el aviso (js/17)
   await coleccionTokens().doc(mio.id).update({col: caer.col, fila: caer.fila, rotacion: rotacionDePaso(hexCentro(caer.col, caer.fila), hexCentro(t.col, t.fila)), ruta: firebase.firestore.FieldValue.delete()});
   if(typeof marcarMovido === 'function') marcarMovido(mio.id);
   mio.col = caer.col; mio.fila = caer.fila;

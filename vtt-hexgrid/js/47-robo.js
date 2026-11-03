@@ -88,7 +88,7 @@ async function roboAplicar(d, t){
 function roboHuida(tid, nombre, id){
   if(!tid || !tokens.has(tid)) return;
   seleccionar(tid);
-  dodgeBanner = {id: id || ('robo' + Date.now()), tokenId: tid, nombre, libre: true, robo: true};
+  dodgeBanner = {id: id || ('robo' + Date.now()), tokenId: tid, nombre, libre: true, robo: true, motivo: 'la huida del robo'};
   renderDodgeBanner();
 }
 

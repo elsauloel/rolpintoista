@@ -216,6 +216,7 @@ function blinkDeHabilidad(msg){
     const desde = {col: t.col, fila: t.fila};
     try{
       await coleccionTokens().doc(id).update({col: h.col, fila: h.fila, ruta: firebase.firestore.FieldValue.delete()});
+      if(typeof oporNegadaAvisar === 'function') oporNegadaAvisar(t, id, [desde, {col: h.col, fila: h.fila}], msg.nombre || 'Parpadeo');   // 💨 sin oportunidad: el aviso (js/17)
       fin();
       if(msg.alFrente){ await blinkAlFrente(id, t, msg, desde, h); return; }
       momentoAbrir({tipo: 'blink', icono: '✨', titulo: `${msg.nombre || 'Blink'}: ${nombreDe(t)} salta`, resultado: `De donde estaba aparece ${distanciaHex(desde, h)} casilla${distanciaHex(desde, h) === 1 ? '' : 's'} más allá, en un parpadeo.`, estado: 'listo'});
@@ -1320,7 +1321,7 @@ function dueloDodgeLibre(d){
   seleccionar(d.defensor.tokenId);
   // 🏹 Parry a distancia con arco (2026-10-12): el dodge roll es obligatorio para contraatacar: 1 casillero más lejos del atacante, pagando sus No2.
   const arco = !!(d.contacto && d.contacto.dodgeArco);
-  dodgeBanner = {id: d.id, tokenId: d.defensor.tokenId, nombre: d.defensor.nombre, libre: true, ...(arco ? {arco: true, atacanteId: d.atacante.tokenId} : {})};
+  dodgeBanner = {id: d.id, tokenId: d.defensor.tokenId, nombre: d.defensor.nombre, libre: true, motivo: 'un dodge roll que no da ataque de oportunidad', ...(arco ? {arco: true, atacanteId: d.atacante.tokenId} : {})};
   renderDodgeBanner();
 }
 const dodgeLibreDe = id => !!(dodgeBanner && dodgeBanner.libre && dodgeBanner.tokenId === id);

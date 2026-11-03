@@ -2322,6 +2322,8 @@ const Combatiente = (() => {
         if(typeof h.ataqueTxt === 'string' && /después, el cartel para alejarse/.test(h.ataqueTxt)) h.ataqueTxt = 'primero el cartel para moverse hasta 2 casilleros gratis y sin ataque de oportunidad; después va al duelo como un ataque con +2 al daño';
         cambio = true;
       }
+      // ✨ Parpadeo cuesta 4 SP (dueño, 2026-11-03; antes 2): el guardado en un creep se pone al día.
+      if(h && h.nombre === 'Parpadeo' && h.blink && Number(h.spCosto) === 2){ h.spCosto = 4; cambio = true; }
       // 😮‍💨 Robar el aliento saca 1 No2 + la diferencia (dueño, 2026-11-03; antes 2 + la diferencia): la guardada se pone al día.
       if(h && h.nombre === 'Robar el aliento' && h.duelo && typeof h.duelo === 'object' && Array.isArray(h.duelo.efectos) && h.duelo.efectos.some(e => e && e.nombre === 'Pierde No2' && e.no2 === 2)){
         h.duelo.efectos.forEach(e => { if(e && e.nombre === 'Pierde No2' && e.no2 === 2) e.no2 = 1; });

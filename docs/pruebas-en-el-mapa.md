@@ -281,6 +281,43 @@
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 
 ## Pendientes
+
+### ▶ Para la próxima tanda de pruebas en el mapa (2026-11-03)
+
+> Dueño, 2026-11-03: «Todas las cosas de programación que estamos cambiando en este momento y no han sido probadas en el mapa, ponelas pendientes
+> para cuando yo te diga: pasá las pruebas pendientes del mapa.» Se corren todas juntas cuando lo pida, con clics y capturas, en «Claude · pruebas».
+
+- [ ] **🧪 Poción de Regeneración menor (catálogo nuevo)**: comprarla o dársela a Prueba Uno con vida baja y tomarla: +5 por turno durante 3 turnos
+  (15 en total), solo a él (a los aliados pegados, nada); que el estado se vaya solo al tercer turno. En un creep (Berserker de prueba): lo mismo.
+- [ ] **🔪 Facón de paisano (ahora Tipo 4, Sangrado 50 %, 55 de oro)**: en una ficha, el primer ataque cuesta 2 No2 (el siguiente 4), el daño es 1d4
+  + su Daño y el pop-up del Sangrado tira con d2. En un creep con el Facón: lo mismo desde las Acciones. Con dos armas (sable + facón) en una ficha:
+  cada una tiene su primer ataque barato (3 + 2).
+- [ ] **💧 Pool esencial con SP para los de Especial**: agregar desde «+ Creep → ⭐ Pool esencial» al Piromante, el Sanador y el Maldito → arrancan
+  con la barra de SP llena (Esp × 3) y sus habilidades cobran SP, sin cooldown; el Escudero y el Hachero siguen con turnos de espera. Al empezar el
+  turno recuperan Esp ÷ 2 de SP. El cambio a mano entre SP y cooldown (tarjeta de GM Tools y ⚡ Acciones) sigue andando.
+- [ ] **😮‍💨 Robar el aliento con 1 No2 + la diferencia**: un creep se la echa a Prueba Uno: pierde 1 No2 más la diferencia (antes 2); en 0, Sentado.
+  Un creep guardado con la versión vieja se pone al día solo (dice «pierde 1 No2»). Con SP, que se pueda repetir en el mismo turno.
+- [ ] **✨ Parpadeo a 4 SP**: un mago creep en modo SP lo usa en su turno → −4 SP; en turno ajeno (Flash) → −8 SP. Uno guardado con 2 se pone al día.
+- [ ] **💨 Aviso de oportunidad negada**: Prueba Uno pegado a un creep con Disparo y repliegue: el creep se reacomoda alejándose → a Prueba Uno le
+  sale al centro «X se alejó de Prueba Uno con Disparo y repliegue: no permite ataque de oportunidad» con «Entendido» (y no la pregunta de
+  oportunidad); la línea queda en la Mesa. Lo mismo con: Hit and run, Bomba de humo, Parpadeo, Salto, la embestida (Takle), Dash (al que atraviesa
+  no se le avisa: a ese le pega) y la huida de un robo. Al revés: Prueba Uno con un movimiento libre se aleja de un creep → el aviso le sale al GM.
+  Un rival que ya había usado su oportunidad, uno sin No2 o uno con arco, sin aviso.
+- [ ] **⚡ Flash de un creep en turno ajeno: 50 % más de cooldown**: una habilidad Flash de cooldown 2 usada en el turno de un jugador queda en 3
+  (cd 3 → 4, cd 4 → 6); en su propio turno, normal. La Mesa dice «cuesta más (cooldown X en vez de Y)». Con SP, sigue el doble.
+- [ ] **😤 Provocar de creep con PdG.Esp + su nivel**: el Escudero provoca a Prueba Uno: tira PdG.Esp + nivel contra la Res.Mt; Provocado y Desafiante.
+  Un creep guardado con «Ef.Esp + 2» se pone al día.
+- [ ] **⚡ Zap y Centella contra Res.CC**: el Mago del rayo le tira el Zap a Prueba Uno: el 1d4 no se esquiva y la Parálisis se resiste con Res.CC
+  (no con Res.Esp); la Centella, igual. Un creep guardado con la versión vieja se pone al día.
+- [ ] **🔍 «Ver detalle del duelo» en un recuadro**: en la Mesa, el botón abre el pop-up (título, la frase y el paso a paso); se cierra con Aceptar,
+  ✕, Esc o clic afuera. Desde el GM y desde un jugador.
+- [ ] **💰 Valor del botín y 📋 Ver el grupo** («Batalla terminada», paso Publicar): el valor si venden todo (½), si se despoja (¼) y lo que costaría
+  comprarlo, por jugador; «📋 Ver el grupo» con lugares vacíos, stats, resistencias y debilidades.
+- [ ] **🗄 «+ Creep» con tres pestañas**: ⭐ Pool esencial, 🗺 Pool de campaña (sin los de fábrica sin auditar) y 🗄 Referencia (sin auditar).
+- [ ] **☁ Nubes y gases que se disipan**: al vencer, una nube (Nube tóxica, Gas adormecedor, niebla de la Bomba de humo) se va desvaneciendo en vez
+  de apagarse de golpe.
+- [ ] **🔔 Aviso de propuestas al dueño** (index.html, Partidas): con la cuenta del dueño, «Fulano propuso…» con lo sin auditar de la biblioteca.
+- [ ] **⭐ Co-GM desde la pantalla de Jugadores**: dar y sacar el GM a otro miembro; el dueño de la partida no se puede sacar.
 - [ ] **💨 Disparo y repliegue: primero se mueve (2026-11-03)**: un creep con la habilidad (el GM, desde las Acciones): (1) sale el cartel «se
   reacomoda antes de disparar»; arrastrar el token 1–2 casilleros → no cobra No2 ni da ataque de oportunidad, y enseguida pide el objetivo desde
   la casilla nueva; el duelo suma +2 al daño y después NO aparece el cartel de alejarse; (2) «🏹 Disparar desde acá» sin moverse; (3) «✕ Cancelar»

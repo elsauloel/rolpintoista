@@ -686,7 +686,7 @@ líneas, zonas, el rayo en cadena y los charcos, los controles mentales.
     7. ✅ **Nova arcana** (2026-10-26: onda alrededor, PdG.Esp contra la Evasión de cada rival; 2d6 arcano y lo empuja 2).
   - **C. Control elemental:** 8. ✅ **Prisión de hielo** (2026-10-26: PdG.Esp contra Evasión, 2d4 de hielo e Inmovilizado hasta 2 turnos, se suelta con Fuerza contra su Ef.Esp, como la Red; 2 No2 y 3 SP, o cooldown 3). 9. ✅ **Ráfaga de viento** (2026-10-26: cono al frente, PdG.Esp contra la Evasión; 1d6 arcano, lo empuja 3 y queda Sentado).
     10. ✅ **Zap** (ex «Rayo paralizante», 2026-10-25: no se esquiva; 1d4 eléctrico directo y Parálisis salvo que la resista con Res.Esp; salta con la mitad, 50 % y 25 % de Parálisis).
-  - **D. El cuerpo del mago:** 11. **Escudo de maná** (un escudo que se paga con SP). 12. ✅ **Parpadeo** (2026-10-26: Flash, hasta 3 casillas a una libre, sin ataques de oportunidad; 2 SP o cooldown 2).
+  - **D. El cuerpo del mago:** 11. **Escudo de maná** (un escudo que se paga con SP). 12. ✅ **Parpadeo** (2026-10-26: Flash, hasta 3 casillas a una libre, sin ataques de oportunidad; 4 SP —era 2 hasta el 2026-11-03, dueño— o cooldown 2).
     13. **Contrahechizo** (Flash: al ver una habilidad de un personaje, la frena con su Res.Esp).
   - **E. Debilidad y sobrecarga:** 14. **Marca elemental** (el objetivo queda vulnerable a un elemento: Res. −2; se cruza con las debilidades por tipo de
     criatura, pendientes). 15. **Sobrecarga** ✦ (pega mucho más y se lastima o pierde SP). 16. **Robar maná** (le saca SP al objetivo y lo suma).

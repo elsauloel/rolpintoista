@@ -432,9 +432,9 @@
     duelo: {objetivo: 'onda', radio: 1, tira: 'pdgmg', contra: ['eva'], dano: true, danoFormula: '2d6', tipoDano: 'arcano',
       efectos: [{nombre: 'Empujón', empuja: 2, detalle: 'Lo empuja 2 casillas, lejos del mago.'}]}});
   // ✨ Auditada (dueño, 2026-10-26; el Mago, «el cuerpo del mago», Parpadeo: «vamos con el parpadeo»): Flash (el botón ✨ del GM; en turno ajeno, el doble):
-  // se teletransporta hasta 3 casillas, a una libre, sin ataques de oportunidad (blinkDeHabilidad, vtt-hexgrid/js/13). Costo de Claude: 2 SP, o cooldown 2.
+  // se teletransporta hasta 3 casillas, a una libre, sin ataques de oportunidad (blinkDeHabilidad, vtt-hexgrid/js/13). Costo: 4 SP (dueño, 2026-11-03; era 2, de Claude) —8 en turno ajeno—, o cooldown 2.
   H('Parpadeo', 'B', 'hdega', 'g', 2, {detalle: 'FLASH (se puede usar en cualquier momento; en turno ajeno cuesta el doble). Se teletransporta hasta 3 casillas, a una casilla libre, sin dar ataques de oportunidad: el mago que se zafa cuando lo acorralan.',
-    no2: 0, spCosto: 2, flash: true, auditada: true, ataqueTxt: 'Flash: se teletransporta hasta 3 casillas, sin ataques de oportunidad', blink: {distancia: 3, soloYo: true}});
+    no2: 0, spCosto: 4, flash: true, auditada: true, ataqueTxt: 'Flash: se teletransporta hasta 3 casillas, sin ataques de oportunidad', blink: {distancia: 3, soloYo: true}});
   // 🧊 Auditada (dueño, 2026-10-26; el Mago, «control elemental»: «la próxima ronda hacemos la prisión de hielo»): su PdG.Esp contra la Evasión de un rival
   // en su Rango; si pega, 2d4 de hielo e Inmovilizado (encerrado en hielo) hasta 2 turnos, que se suelta al empezar su turno con Fuerza contra el Ef.Esp
   // del mago (el `soltar` de la Red, con la ayuda de un aliado pegado). Costo de Claude: 2 No2 y 3 SP, o cooldown 3.

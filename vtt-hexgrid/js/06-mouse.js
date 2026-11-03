@@ -654,6 +654,7 @@ function rutaSoltada(a, t){
     const alejarseGratis = libre && dodgeBanner.alejarse ? num(dodgeBanner.alejarse) : 0;
     const alMoverAntes = libre && dodgeBanner.antes && typeof dodgeBanner.alMover === 'function' ? dodgeBanner.alMover : null;   // 💨 Disparo y repliegue (js/57): después de moverse, el disparo   // 💨 Picar y alejarse (js/57): los primeros N, gratis   // 🏹 Parry a distancia con arco: el dodge roll que habilita el contraataque
     const oportunidad = oportunidadEvaluarRuta(t, a.ruta);
+    if(libre && typeof oporNegadaAvisar === 'function') oporNegadaAvisar(t, a.id, a.ruta, dodgeBanner.motivo);   // 💨 a quien se le niega la oportunidad, el aviso (js/17)
     if(libre){ dodgeBanner = null; renderDodgeBanner(); }
     if(alMoverAntes) setTimeout(alMoverAntes, 450);   // (que el token ya esté en su casilla nueva al elegir el objetivo)
     if(dodgeArco){

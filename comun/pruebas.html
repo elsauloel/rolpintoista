@@ -42,7 +42,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 </script>
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
-<script src="combatiente.js?v=20261103dr"></script>
+<script src="combatiente.js?v=20261103t9"></script>
 <script src="creep-calculo.js?v=20261103t4"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261103san"></script>
@@ -113,7 +113,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="pasivas.js"></script>
 <script src="skills-clase.js?v=20261103san"></script>
 <script src="creeps-base.js"></script>
-<script src="skills-creep-base.js?v=20261103dr"></script>
+<script src="skills-creep-base.js?v=20261103t9"></script>
 <script src="creeps-esenciales.js?v=20261103t7"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -1195,9 +1195,11 @@ prueba('🏹 Tiro que derriba (Rango, 2026-10-26): un ataque normal; si pega, em
   igual([h.duelo.arma.fijo, h.duelo.arma.dados, (a.efectos || []).map(x => x.empuja || x.nombre).join(','), h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('rango')],
     [0, 0, '1,Sentado', 'ATAQUE', 2, 3, true]);
 });
-prueba('✨ Parpadeo (Mago, 2026-10-26): Flash, se teletransporta hasta 3 casillas (solo él)', () => {
+prueba('✨ Parpadeo (Mago, 2026-10-26; 4 SP desde el 2026-11-03): Flash, se teletransporta hasta 3 casillas (solo él); el guardado con 2 SP se pone al día', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Parpadeo'), h = armarHabilidadDeCreep(e.datos, 2);
-  igual([!!h.flash, h.blink.distancia, !!h.blink.soloYo, h.modo, h.spCosto, h.cd, e.etiquetas.includes('mago')], [true, 3, true, 'auto', 2, 2, true]);
+  igual([!!h.flash, h.blink.distancia, !!h.blink.soloYo, h.modo, h.spCosto, h.cd, e.etiquetas.includes('mago')], [true, 3, true, 'auto', 4, 2, true]);
+  const viejo = [{...structuredClone(h), spCosto: 2}]; Combatiente.migrarLuzSanadora(viejo);
+  igual(viejo[0].spCosto, 4);
 });
 prueba('🎯 Aguja siniestra (Debuffer, 2026-10-26): PdG.Esp contra Evasión, 1d6 siniestro directo y Punto débil (−1 a las resistencias a crítico)', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Aguja siniestra'), h = armarHabilidadDeCreep(e.datos, 2);

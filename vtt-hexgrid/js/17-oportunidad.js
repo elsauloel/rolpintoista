@@ -81,6 +81,37 @@ function oportunidadCorte(t, id, ruta){
   }
   return null;
 }
+/* 💨 Oportunidad negada (2026-11-03, dueño: «a la persona a la que se le niega la oportunidad de ataque de oportunidad le tiene que aparecer una
+   notificación: fulanito se alejó de vos con Disparo y repliegue. No permite ataque de oportunidad. Se le tiene que avisar para que no pregunte»).
+   Un movimiento que no da ataque de oportunidad (el cartel del movimiento libre —Hit and run, Disparo y repliegue, Bomba de humo, el dodge roll libre,
+   la huida del robo— al soltar el token, js/06; el Parpadeo / blink, js/13; el Salto y la embestida, js/55; el Dash, js/76): a cada rival que SÍ la
+   hubiera tenido (estaba pegado, deja de estarlo, le alcanzan los No2, no la había usado; lo mismo que mira oportunidadCorte) le llega el Aviso al
+   centro —a quien lo maneja: el GM si es un creep o tiene 🎮 el control— y queda la línea en la Mesa. Un rival que quien se mueve no ve (oculto, en
+   sigilo, en la niebla) no se nombra: no se avisa. `ruta` = las casillas, de la de salida a la de llegada (un teletransporte: [desde, hasta]);
+   `excluir` = el id de un rival que no cuenta (el que atraviesa un Dash: a ese le pega). */
+function oporNegadaAvisar(t, id, ruta, motivo, excluir){
+  try{
+    if(modoMapa !== 'combate' || !t || !Array.isArray(ruta) || ruta.length < 2) return [];
+    if(t.oculto || t.bajoTierra || etereoDe(t) || enSigilo(t)) return [];   // ahí tampoco había oportunidad
+    const rivales = new Set(rivalesDe(t)), negados = [];
+    for(const [rid, r] of tokens){
+      if(rid === id || rid === excluir || !rivales.has(r) || r.oculto || r.bajoTierra || etereoDe(r) || !oporRivalVisible(r) || !oporPuede(r)) continue;
+      if(oportunidadUsadas.has(oporClave(id, rid))) continue;   // ya la había usado mientras seguían pegados
+      const c = {col: r.col, fila: r.fila};
+      if(ruta.some((b, i) => i > 0 && distanciaHex(ruta[i - 1], c) === 1 && distanciaHex(b, c) !== 1)) negados.push([rid, r]);
+    }
+    const quien = nombreDe(t), con = String(motivo || 'un movimiento que no da ataque de oportunidad');
+    negados.forEach(([, r]) => {
+      const decide = oporDecide(r), uid = decide === 'gm' ? ((fbPartida && fbPartida.gmUid) || (soyGM ? fbUsuario.uid : '')) : decide;
+      const texto = `${quien} se alejó de ${nombreDe(r)} con ${con}: no permite ataque de oportunidad.`;
+      try{ mesaLinea(`💨 ${texto}`, 'recordatorio'); }catch(err){}
+      try{ momentoAbrir({tipo: 'oportunidad-negada', icono: '💨', titulo: `${quien} se alejó de ${nombreDe(r)}`, resultado: 'No permite ataque de oportunidad', estado: 'listo',
+        datos: {...(uid ? {paraUid: uid} : {}), aviso: true, boton: 'Entendido',
+          pasos: [{titulo: 'Sin ataque de oportunidad', texto: `${quien} se alejó de ${nombreDe(r)} con ${con}: no permite ataque de oportunidad. No hace falta preguntar: esta vez no se puede.`}]}}); }catch(err){}
+    });
+    return negados.map(([rid]) => rid);
+  }catch(err){ console.error('No se pudo avisar la oportunidad negada:', err); return []; }
+}
 // Quién decide por el rival: 'gm' (un creep, o un personaje con 🎮 el control del GM) o el uid del jugador dueño.
 function oporDecide(r){
   if(r.tipo === 'creep') return 'gm';

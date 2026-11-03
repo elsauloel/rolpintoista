@@ -11,7 +11,7 @@ function alejarseResuelto(d){
   if(!t) return;
   const nombre = d.atacante.nombre || nombreDe(t);
   seleccionar(tid);
-  dodgeBanner = {id: 'alejarse-' + d.id, tokenId: tid, nombre, libre: true, alejarse: n};
+  dodgeBanner = {id: 'alejarse-' + d.id, tokenId: tid, nombre, libre: true, alejarse: n, motivo: (d.ataque && d.ataque.habNombre) || 'Hit and run'};
   renderDodgeBanner();
   mesaLinea(`💨 ${nombre} se aleja: puede moverse hasta ${n} casillero${n === 1 ? '' : 's'}, gratis y sin ataque de oportunidad.`, 'recordatorio');
 }
@@ -28,7 +28,8 @@ function moverAntesDeAtacar(msg, n){
   try{ cerrarBotonera(); }catch(err){}
   seleccionar(tid);
   const cancelar = () => { if(msg.alCancelar){ msg.alCancelar(); return; } try{ MensajesMapa.alMarco($('#botonera-marco'), 'duelo-cancelado'); }catch(err){} };
-  dodgeBanner = {id: 'antes-' + Date.now(), tokenId: tid, nombre, libre: true, alejarse: n, antes: true, alMover: seguir, alCancelar: cancelar};
+  dodgeBanner = {id: 'antes-' + Date.now(), tokenId: tid, nombre, libre: true, alejarse: n, antes: true, alMover: seguir, alCancelar: cancelar,
+    motivo: (msg.ataque && (msg.ataque.habNombre || (msg.ataque.hab && msg.ataque.hab.nombre))) || 'Disparo y repliegue'};
   renderDodgeBanner();
   mesaLinea(`💨 ${nombre} se reacomoda: puede moverse hasta ${n} casillero${n === 1 ? '' : 's'}, gratis y sin ataque de oportunidad, y después dispara.`, 'recordatorio');
 }
@@ -57,7 +58,7 @@ async function bombaDeHumo(msg){
   try{ momentoAbrir({tipo: 'humo', icono: '💨', titulo: `${nom}: ${quien} se esfuma`, resultado: txt, estado: 'listo'}); }catch(err){}
   if(mover > 0){
     seleccionar(tid);
-    dodgeBanner = {id: 'humo-' + Date.now(), tokenId: tid, nombre: quien, libre: true, alejarse: mover};
+    dodgeBanner = {id: 'humo-' + Date.now(), tokenId: tid, nombre: quien, libre: true, alejarse: mover, motivo: nom};
     renderDodgeBanner();
   }
   if(typeof msg.alTerminar === 'function') msg.alTerminar();

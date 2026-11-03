@@ -297,6 +297,7 @@ function escucharElementos(){
   cortarElementosListener = coleccionElementos().onSnapshot(snap => {
     snap.docChanges().forEach(ch => {
       if(ch.type === 'removed'){
+        if(typeof nubeSeFue === 'function') try{ nubeSeFue(elementos.get(ch.doc.id), null); }catch(err){}   // ☁ la nube se disipa en vez de apagarse (js/91)
         elementos.delete(ch.doc.id);
         if(elementoSeleccionado === ch.doc.id) elementoSeleccionado = null;
         if(editandoElemento && editandoElemento.id === ch.doc.id) cerrarEditorElemento(false);
@@ -380,6 +381,8 @@ function escucharElementos(){
         trampaItem: typeof d.trampaItem === 'string' ? d.trampaItem : '',   // el consumible que la colocó (js/28: desarmarla la devuelve tal cual; 2026-10-24, no se copiaba)
         zonaTurnos: Math.max(1, Math.round(num(d.zonaTurnos)) || 3),
       });
+      // ☁ Una nube a la que el viento le sacó casillas: las que se fueron se disipan (js/91, 2026-11-03).
+      if(ch.type === 'modified' && previoElem && typeof nubeSeFue === 'function') try{ nubeSeFue(previoElem, elementos.get(ch.doc.id)); }catch(err){}
       // Trampa de teleport que se acaba de disparar: pulsos de luz violeta en el punto donde saltó y azul en el destino (2026-09-25).
       if(ch.type === 'modified' && previoElem && !previoElem.disparada && d.disparada === true && typeof d.trampaDestino === 'string' && destinoParsear(d.trampaDestino)){
         teleportEfecto(elementos.get(ch.doc.id));

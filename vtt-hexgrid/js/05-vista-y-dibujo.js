@@ -806,6 +806,7 @@ function dibujarLienzo(){
   if(typeof estoicoRevisar === 'function') estoicoRevisar();   // 🗿 Estoicismo: cuántos enemigos pegados tiene cada uno (js/85)
   if(typeof dibujarTuneles === 'function' && dibujarTuneles(z)) animando = true;   // 🕳 la estela del túnel, que aparece y se va de a una casilla (js/46)
   if(typeof dibujarPozos === 'function') dibujarPozos(z);   // 🕳 el pozo de los que están bajo tierra (js/46)
+  if(typeof nubesFantasmaDibujar === 'function' && nubesFantasmaDibujar(z, false)) animando = true;   // ☁ las nubes que se van disipando, debajo de los tokens (js/91)
   // Tokens.
   disposicion = calcularDisposicion();
   // Si el token seleccionado dejó de verse (niebla, sigilo), se suelta.
@@ -1000,6 +1001,7 @@ function dibujarLienzo(){
     ctx.globalAlpha = 1;
   });
   if(dibujarNieblaVarita(z)) animando = true;   // la niebla de una varita, encima de los tokens (2026-10-05)
+  if(typeof nubesFantasmaDibujar === 'function' && nubesFantasmaDibujar(z, true)) animando = true;   // ☁ la niebla que se va disipando (js/91)
 
   // Trazos del lápiz: los temporales se ven un rato y se desvanecen sobre
   // el final (los borra el que los ve, por eso conviene que se note antes

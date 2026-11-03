@@ -943,6 +943,12 @@ las rodea como a un Sólido. Por un aliado se pasa, pero `rutaSoltada` no deja t
   Quitar, Ancho + Aplicar, Arrastrar el fondo; los mismos ids de siempre, `fondoMapaHtml`/`conectarMapasMenu` en js/09). Si ese mapa no es el que el
   GM está viendo, primero pasa a verlo (`verMapa`). La tarjeta del que está viendo va con borde dorado y «LO ESTÁS VIENDO». Se cierra con 🖼 de nuevo
   o al pasar a ver otro mapa (`mapasFondoAbierto`, en memoria).
+- **☁ Las nubes se disipan** (2026-11-03, dueño: «todo lo que es nubes y gases… que el humo se disipe, que no haga tipo blink out»): `js/91-nubes-que-se-van.js`.
+  Cuando una nube o un gas se va del mapa (vence por turnos, lo borra el viento, la Anulación o alguien a mano) o el viento le saca casillas, cada
+  pantalla guarda una copia «fantasma» de lo que se fue y la dibuja ~1,8 s: se abre un poco y se desvanece. Nube = `niebla: true` (varita, Bomba de
+  humo) o una zona con `nubeColor` (js/50; nunca fuego). Lo engancha `escucharElementos` (js/07: el 'removed', y el 'modified' con menos casillas —
+  moverla no deja fantasma) y lo dibuja js/05 (`nubesFantasmaDibujar`: las zonas debajo de los tokens, la niebla encima). El fantasma no es del juego:
+  no se selecciona, no tapa la vista; solo lo que esa pantalla veía, y nada al cargar el mapa. Probado en «Claude · pruebas» desde Prueba Uno.
 - **Editar token en ventana emergente** (2026-09-21): "✎ Editar token" ya no usa la barra lateral; abre una ventana centrada (`#editar-token-capa`/`#editar-token-ventana`, mismo estilo que "Nuevo token") que se cierra con Volver, clic en el fondo, clic derecho fuera de un campo o Esc (`cerrarEditarToken`). La barra lateral queda solo con Mantenimiento y Finalizar combate.
 
 - **📏🔮 Visualizador de rango** (2026-09-22): dos botones cuadrados junto a 👓 lentes (`#btn-rango`, `#btn-rango-magico`), para cualquier jugador: muestran, con la misma superficie hexagonal que usan las auras (`dibujarAuraHex`), el área de **Rango** (de Destreza, azul) o **Rango de casteo** (de Especial, violeta) alrededor de **tu propio token** en el mapa. Los números salen de `resumen.rng`/`resumen.rangocasteo`, que la ficha ya calculaba pero no publicaba (`fichaResumen()`). Atajos: **R** prende/apaga el normal, **Shift+R** el mágico (Ctrl+R se descartó: el navegador lo usa para recargar la página). Es local a cada navegador, no se sincroniza ni queda guardado. Por ahora solo para el propio PJ del jugador — no hay botón equivalente para que el GM lo vea en un creep.

@@ -87,10 +87,14 @@ const Biblioteca = (() => {
   // Entradas incluidas en el código (opts.base): siempre están, aun sin Firebase.
   // `opts.baseArchivo` (2026-10-26, las habilidades de creep viejas): las de fábrica archivadas — siguen ahí (para comparar o volver a usar), pero
   // solo se ven en la pestaña «📦 Archivadas».
+  // 🗄 Los de fábrica sin auditar (dueño, 2026-11-03: «los que son viejos y sin auditar quitalos de la publicación pero dejalos a mano como
+  // referencia»): con `opts.pools` no van al pool de campaña sino a la pestaña «🗄 Referencia (sin auditar)». Uno se considera auditado si trae
+  // `auditado: true`; si no, «(auditar)» en el nombre o la etiqueta `auditar` lo dejan como referencia.
+  const sinAuditarDeFabrica = b => !!b && b.auditado !== true && (/\(auditar\)/i.test(String(b.nombre || '')) || (b.etiquetas || []).includes('auditar'));
   function entradasBase(opts){
     const armar = (b, archivado) => ({id: `base-${b.poolId}`, nombre: b.nombre, etiquetas: b.etiquetas || [],
       descripcion: b.detalle || '', nivel: b.nivel !== undefined ? b.nivel : b.jobCosto, autorUid: '', autorNombre: '', datos: b.datos || b, base: true,
-      auditado: true, version: 1, reemplaza: '', pool: b.pool || 'campaña', ...(archivado ? {archivado: true} : {})});
+      auditado: true, version: 1, reemplaza: '', pool: b.pool || (opts.pools && sinAuditarDeFabrica(b) ? 'referencia' : 'campaña'), ...(archivado ? {archivado: true} : {})});
     return [...(opts.base || []).map(b => armar(b, false)), ...(opts.baseArchivo || []).map(b => armar(b, true))];
   }
 
@@ -274,7 +278,8 @@ const Biblioteca = (() => {
   // ⭐🗺 Los dos pools de los creeps (dueño, 2026-11-02): el **esencial** (los genéricos humanoides, docs/creeps-humanoides.md) y el **de campaña**
   // (lo demás: goblins, mineros, el culto, los escenarios viejos y lo que sube el grupo). `opts.pools`: la ventana los separa en dos pestañas.
   const POOLS = [{id: 'esencial', txt: '⭐ Pool esencial', tit: 'Los genéricos humanoides, por rol y nivel: para armar una pelea rápido y cambiarles el nombre'},
-    {id: 'campaña', txt: '🗺 Pool de campaña', tit: 'Los que van saliendo al jugar (goblins, mineros, el culto…) y lo que sube el grupo'}];
+    {id: 'campaña', txt: '🗺 Pool de campaña', tit: 'Los que van saliendo al jugar (goblins, mineros, el culto…) y lo que sube el grupo'},
+    {id: 'referencia', txt: '🗄 Referencia (sin auditar)', tit: 'Los creeps viejos de fábrica, sin auditar: para tomar ideas; no forman parte del pool'}];
   const enPool = (st, l) => st.opts && st.opts.pools ? l.filter(e => (e.pool || 'campaña') === (st.pool || 'esencial')) : l;
   function listaVista(st){ return enPool(st, listaVistaTodo(st)); }
   function listaVistaTodo(st){
@@ -289,9 +294,11 @@ const Biblioteca = (() => {
     const q = id => document.getElementById(id);
     const sinAud = st.oficial.filter(e => !e.auditado && !e.archivado).length, nArch = st.oficial.filter(e => e.archivado).length;
     // Pestañas: todo / lo que falta auditar (la ven todos) / lo archivado / las propuestas del camino viejo (solo el dueño, si quedan).
-    const poolsHtml = st.opts && st.opts.pools ? `<div style="display:flex;gap:6px;flex-wrap:wrap;width:100%;margin-bottom:4px">${POOLS.map(p => {
+    const poolsHtml = st.opts && st.opts.pools ? `<div style="display:flex;gap:6px;flex-wrap:wrap;width:100%;flex:0 0 100%;margin-bottom:4px">${POOLS.map(p => {
       const n = st.oficial.filter(e => !e.archivado && (e.pool || 'campaña') === p.id).length;
-      return `<button class="btn ${(st.pool || 'esencial') === p.id ? 'primary' : ''}" data-bibpool="${p.id}" title="${esc(p.tit)}">${p.txt} (${n})</button>`; }).join('')}</div>` : '';
+      return `<button class="btn ${(st.pool || 'esencial') === p.id ? 'primary' : ''}" data-bibpool="${p.id}" title="${esc(p.tit)}">${p.txt} (${n})</button>`; }).join('')}</div>`
+      + (st.pool === 'referencia' ? `<div class="bib-referencia-aviso" style="width:100%;flex:0 0 100%;box-sizing:border-box;margin:2px 0 6px;padding:7px 10px;border:1px dashed #b08a4a;border-radius:6px;background:rgba(176,138,74,.12);font-size:13px">🗄 Para tomar ideas: no forman parte del pool; se auditan de a uno. (Se pueden agregar igual, a mano.)</div>` : '') : '';
+    if(st.opts && st.opts.pools) q('bib-tabs').style.flexWrap = 'wrap';   // (que el cartel de Referencia baje a su renglón)
     q('bib-tabs').innerHTML = poolsHtml + ((sinAud || nArch || (esDueno() && st.propuestas.length))
       ? `<button class="btn ${st.vista === 'oficial' ? 'primary' : ''}" data-bibvista="oficial">Todo (${st.oficial.length - nArch})</button>
          ${sinAud ? `<button class="btn ${st.vista === 'sinauditar' ? 'primary' : ''}" data-bibvista="sinauditar">🔶 Sin auditar (${sinAud})</button>` : ''}
@@ -718,6 +725,6 @@ const Biblioteca = (() => {
   }
   async function rechazarPropuesta(tipo, id){ await fbDb.collection(`propuestas_${tipo}`).doc(id).delete(); }
 
-  return {abrir, guardar, entrada, lista, versionNueva, avisoVersion, esDueno,
+  return {abrir, guardar, entrada, lista, versionNueva, avisoVersion, esDueno, sinAuditarDeFabrica,
     auditar, descartar, corregirComoDueno, propuestasViejas, aprobarPropuesta, rechazarPropuesta};
 })();

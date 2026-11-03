@@ -113,6 +113,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creeps-base.js"></script>
 <script src="skills-creep-base.js?v=20261103t4"></script>
 <script src="creeps-esenciales.js?v=20261103t4"></script>
+<script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
 <script>
@@ -6371,6 +6372,12 @@ prueba('⭐ El pool esencial (2026-11-03): los 6 de nivel 1, con su equipo, cint
     CREEPS_BASE.filter(c => c.pool !== 'esencial').length > 100],
     [0, 7, true, 'Hacha de piedra,Escudo de caparazón de tortuga gigante,Peto de hierro,Cofia de anillas sueltas', 'Poción de Cuero Duro,Poción de Piel de Cristal', 9, 6,
       'Lengua de fuego:4,Muro de fuego:3', 4, true]);
+});
+prueba('🗄 Referencia (2026-11-03): los creeps de fábrica sin auditar salen del pool de campaña y van a «Referencia»', () => {
+  const ref = CREEPS_BASE.filter(c => c.pool !== 'esencial' && Biblioteca.sinAuditarDeFabrica(c));
+  igual([ref.length > 100, CREEPS_BASE.filter(c => c.pool === 'esencial').some(c => Biblioteca.sinAuditarDeFabrica(c)),
+    Biblioteca.sinAuditarDeFabrica({nombre: 'Algo', etiquetas: ['auditar'], auditado: true}), Biblioteca.sinAuditarDeFabrica({nombre: 'Goblin (auditar)'})],
+    [true, false, false, true]);
 });
 prueba('🏹 El Tirador de precisión al pool esencial y el Hachero con sus atributos nuevos (2026-11-03)', () => {
   const d = n => CREEPS_BASE.find(c => c.pool === 'esencial' && c.nombre === n).datos;

@@ -496,3 +496,11 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   y existe también si solo hay piezas naturales («Trofeo de …»). En «Batalla terminada», lo que el GM destilda del equipo de un creep (el arma y las
   piezas; no el trofeo ni lo extra) se convierte en despojos (un cuarto del precio de compra, para arriba, la misma regla que lo que nadie toma del botín; dueño: «prefiero que aparezcan como despojos, no como oro» y «que las dos usen el mismo y que sea un cuarto»), repartidos entre los que cobran y pagados con la XP y el oro
   (`CombateFin.ocultos`, `rep.ocultosDespojos`, la casilla del paso Equipo; `despojos` de cada jugador en `combate/actual`; se ve en Equipo, en Publicar y en la ventana de la batalla).
+
+- **🗄 Tres pestañas en «+ Creep»** (2026-11-03, dueño: «los que son viejos y sin auditar quitalos de la publicación pero dejalos a mano como
+  referencia»): ⭐ Pool esencial · 🗺 Pool de campaña · **🗄 Referencia (sin auditar)**. Los creeps de fábrica de `comun/creeps-base.js` con «(auditar)»
+  en el nombre o la etiqueta `auditar` (hoy los 269) van a Referencia (`Biblioteca.sinAuditarDeFabrica`, `comun/biblioteca.js`), con un cartel «Para
+  tomar ideas: no forman parte del pool; se auditan de a uno»; se pueden agregar igual. El Pool de campaña queda con lo subido a Firebase
+  (`biblioteca_creeps`) y cualquier creep de fábrica que traiga `auditado: true`. **Cómo se suma un creep al Pool de campaña**: desde su ficha completa
+  (el ✎ de la tarjeta), el botón **📚 Biblioteca** de la cabecera (`data-bib`, `guardarCreepEnBiblioteca`): si lo sube el dueño del proyecto entra
+  auditado; si no, 🔶 sin auditar hasta que el dueño lo marca ✅. Va al de campaña salvo que sus datos digan `pool: 'esencial'`.

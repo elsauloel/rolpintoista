@@ -498,6 +498,20 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   (Tipo 8, 1d8 + 9, Derribar 25 %, Rompe armadura 33 %) + Rodela tachonada · Chaleco de cuero · Botas de cuero de vaca: Def 4, Def.Esp 1, Res.
   crít. T4 +2. Salto (lenta, cd 3) y Golpe fuerte (rápida, cd 2). Consumible: Poción de Cuero Duro. Sin cargar hasta que el dueño diga.
 
+- **S4 · Protector · Support, con SP** (boceto aprobado 2026-11-03, dueño: «la ruta me cierra, me resulta interesante»). Estrategia: juega en el
+  turno de los demás: protege a sus aliados con Flash en el momento justo (escudo, +3 a la defensa, sacar un estado) y desvía los golpes. Atributos
+  (Esp/Con/Agi/Des/Fue → vida, No2, SP): **nv1 12/9/6/4/2 → 45, 6, 36** · nv2 13/10/6/5/2 → 50, 6, 39 · nv3 15/10/7/5/2 → 50, 7, 45 ·
+  nv4 16/11/7/6/2 → 55, 7, 48 · nv5 18/11/8/6/2 → 55, 8, 54.
+  | Nivel | Habilidad nueva | Pasiva | Equipo |
+  |---|---|---|---|
+  | 1 | **Potencia** (Flash; la ex «Empuje», renombrada por el dueño: el Empower) · **Arrojo** (Flash) | — | una varita + escudo Común · 2 Comunes |
+  | 2 | **Coraza de púas** (también la Muralla T2) | **Largo alcance arcano** | + 2 Comunes |
+  | 3 | **Velo espejado** (también la Muralla T2) | — | el escudo, de Buena |
+  | 4 | **Purificar** (Flash) | **Potencia especial** | + una Buena |
+  | 5 | **Tirar la bronca** | — | + otra Buena |
+  Consumible: Poción de HP. **Transfusión sanguínea** (de la clase Debuffer) pasa al pool de creep (Support) para este creep (dueño, 2026-11-03):
+  falta elegir en qué nivel.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4
@@ -592,7 +606,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | L8 | | | | | |
 | R4 | | | | | |
 | M4 | ✅ (2026-11-03) | | | | |
-| S4 | | | | | |
+| S4 | boceto ✅ (2026-11-03) | | | | |
 | D4 | | | | | |
 
 ## Los creeps (cada uno se completa al diseñarlo)

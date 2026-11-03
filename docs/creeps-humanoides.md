@@ -608,6 +608,10 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 4 | **Mantener a raya** | **Vista de halcón** | + una Buena |
   | 5 | **Vigilancia** | — | + otra Buena |
   Consumible: Virote de red.
+  **Nivel 1 aprobado** (dueño, 2026-11-03: «vamos a probarlo con la ballesta»): Des 11 · Con 8 · Agi 6 · Fue 6 · Esp 2, vida 40, 6 No2, turnos de
+  espera; Ballesta del baqueano (1d4 + 2 —las ballestas no suman la Fuerza—, Perfora 1, Lisiado 25 %, Recarga 2) · Chaleco de cuero · Botas de
+  cuero de vaca: Def 3. Tiro certero (rápida) y Tiro a la rodilla (lenta). Alternativa anotada: un arco (Arco de cazador de pájaros) si pega poco.
+  **Cargado** en el pool esencial (2026-11-03).
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
@@ -692,7 +696,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | H3 | | | | | |
 | L5 | ✅ (2026-11-03) | | | | |
 | L6 | | | | | |
-| R3 | boceto ✅ (2026-11-03) | | | | |
+| R3 | ✅ (2026-11-03) | | | | |
 | M3 | ✅ (2026-11-03) | | | | |
 | S3 | ✅ (2026-11-03) | | | | |
 | D3 | ✅ (2026-11-03) | | | | |

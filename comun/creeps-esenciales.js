@@ -186,6 +186,11 @@
     habilidades: ['Puño de roca', 'Pisotón'], consumibles: ['Pergamino grupal de Furia de Combate'],
     estrategia: 'Warrior. Golpes que atontan y derriban: te deja sin turno con Demora y Pajaritos; si lo rodean, Pisotón.'});
 
+  esencial({linea: 'R3', nombre: 'Trabador', rol: 'rango', rolTxt: 'rango', nivel: 1, atrib: [8, 6, 6, 11, 2],   // (2026-11-03, dueño: «vamos a probarlo con la ballesta»)
+    equipo: ['Ballesta del baqueano', 'Chaleco de cuero', 'Botas de cuero de vaca'],
+    habilidades: ['Tiro certero', 'Tiro a la rodilla'], consumibles: ['Virote de red'],
+    estrategia: 'Rango. Frena y clava: no busca matar, busca que no te muevas; te deja rengo para que sus aliados te alcancen.'});
+
   if(faltan.length) console.warn('Creeps esenciales: no se encontró', faltan.join(', '));
   window.CREEPS_ESENCIALES_FALTAN = faltan;
 })();

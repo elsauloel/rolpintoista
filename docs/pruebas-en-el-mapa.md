@@ -298,11 +298,18 @@
 - [ ] **🪱 La cura que se pierde, en la pantalla del jugador** (2026-11-03): con el lanzador caído (o sin token en el mapa), el jugador con la Sanguijuela toma una poción: su aviso dice «🪱 La cura (+N) se pierde: quien te puso la Sanguijuela (X) está caído» (o «ya no está en el mapa»). Desde la ficha suelta (sin el mapa abierto) no se puede saber: ahí la manda igual y la descarta la pantalla del lanzador.
 - [ ] **✨ Parpadeo cancelado con Esc devuelve lo cobrado** (2026-11-03): un creep con SP usa el Parpadeo y, al elegir adónde, Esc: vuelve el SP (y el cooldown si juega con turnos de espera), con el aviso «↩ … se le devolvió …». También con ¡Al frente!.
 - [ ] **⚡ Texto del Flash** (2026-11-03): en la lupa de una habilidad Flash de un creep con turnos de espera, el texto dice «con SP, el doble de SP; con turnos de espera, un 50 % más».
-- [ ] **💥 La animación del Shockwave** (2026-11-03, `vtt-hexgrid/js/94-onda-fx.js` + `comun/fx-onda.js`): Rockardo (Tanque) usa Shockwave con
+- [x] ✅ **Probada por el dueño en el mapa** (2026-11-03, «aprobada la animación», con Rockardo; con el duelo que espera a que termine la onda). **💥 La animación del Shockwave** (2026-11-03, `vtt-hexgrid/js/94-onda-fx.js` + `comun/fx-onda.js`): Rockardo (Tanque) usa Shockwave con
   2 o 3 creeps pegados. En las pantallas del GM y de los jugadores: el golpe al piso, el anillo que sale hasta pasar las casillas de al lado (que se
   encienden), polvo y piedritas, una sacudida corta del mapa y la tarjeta en la Crónica. Al resolverse cada resistencia (Res.CC): sobre el que no la
   resistió, un estallido y estrellitas girando sobre la cabeza ~2,6 s; sobre el que la resistió, un destello chico (sin tarjeta). Ver que un creep
   oculto o en sigilo no se delata, que con «reducir movimiento» sale más corta y sin sacudida, y que el zoom y el paneo no la corren.
+- [ ] **💥 Las otras ondas** (2026-11-03, dueño: «aprobada la animación, avanzá con el resto»; `vtt-hexgrid/js/94-onda-fx.js`, variantes en
+  `comun/fx-onda.js`): con 2 o 3 rivales pegados (o en el cono), en las pantallas del GM y de un jugador, y que el duelo se abra recién al terminar
+  la onda: **Pisotón** de un creep (tierra, sacudida más fuerte, Pajaritos sobre el que no lo resistió) · **Nova arcana** de un creep (violeta,
+  chispas, flechitas de empujón sobre el que no la esquivó) · **Sonic Boom** del Tanque y del creep (un abanico blanco hacia donde mira, polvo;
+  gotitas verdes que caen sobre el que perdió No2) · **Remolino** del Warrior y **Barrido** / **Coletazo** de creep (un tajo que da la vuelta; una
+  línea de corte sobre el que pegó) · **Grito espeluznante** (tres anillos violetas que salen hasta su radio; 😱 sobre el que no lo resistió).
+  Sobre el que resistió, un destello chico del color de la onda.
 - [x] ✅ **Probada por el dueño en el mapa** (2026-11-03, «me gusta cómo quedó»: la versión lenta de ~3,3 s y la cantidad escrita a mano, con un personaje en «🩸 Prueba de la Transfusión»; falta la de un creep). **🩸 La animación de la Transfusión sanguínea** (2026-11-03, `vtt-hexgrid/js/92-transfusion-fx.js`): Prueba Uno (Debuffer de clase) le pasa
   vida a Prueba Dos → en las TRES pantallas (GM, J1, J2) se ve ~2 s un chorro de sangre ondulante de uno al otro, con gotitas que giran y un
   salpicón al llegar, y su tarjeta en la Crónica. Lo mismo con la de un creep (GM: Acciones → Transfusión sanguínea, de un creep a otro). Con un

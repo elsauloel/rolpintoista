@@ -1,7 +1,8 @@
 /* 💥 La onda que sale alrededor de quien golpea el piso (2026-11-03, dueño: el Shockwave «también tendría que tener algún tipo de animación
    acorde», como la de la Transfusión). Acá solo la geometría, sin el mapa (se prueba en comun/pruebas.html); el dibujo y el canal que la hace
    ver en todas las pantallas están en vtt-hexgrid/js/94-onda-fx.js.
-   Pieza pensada para cualquier «onda alrededor» (Pisotón, Onda de choque, Nova arcana…); hoy solo la usa el Shockwave. */
+   Pieza para cualquier «onda alrededor» (2026-11-03, dueño: «aprobada la animación, avanzá con el resto»): Shockwave, Pisotón, Nova arcana,
+   Sonic Boom (en cono), Remolino / Barrido / Coletazo (con giro) y el Grito espeluznante; cada una con su variante (colores y qué pasa). */
 (function(){
   const DURACION = 1700;              // ms de la onda (el anillo, el polvo y las piedritas)
   const PAJARITOS_MS = 2600;          // ms de las estrellitas sobre cada uno que no lo resistió
@@ -38,5 +39,40 @@
     }
     return out;
   }
-  window.FxOnda = {DURACION, PAJARITOS_MS, anillo, piedras, piedraEn, sacudida, estrellas};
+  /* Las variantes (colores en «r,g,b»; `golpe`: lo que se ve sobre quien no la resistió). Todas comparten el dibujo de js/94. */
+  const TIERRA = {fogonazo: '255,236,200', banda: '235,195,145', banda2: '255,225,180', frente: '255,170,70', brillo: '255,245,220',
+    casilla: '255,200,120', casillaBorde: '255,210,140', resiste: '170,215,255', piedras: 26, grietas: true, sacudida: 5, golpe: 'pajaritos'};
+  const VARIANTES = {
+    tierra: TIERRA,                                                                    // 💥 Shockwave
+    pisoton: {...TIERRA, piedras: 34, sacudida: 8},                                    // 🦶 Pisotón: más fuerte, también deja Pajaritos
+    arcana: {fogonazo: '235,215,255', banda: '140,80,220', banda2: '200,160,255', frente: '170,90,255', brillo: '245,230,255',
+      casilla: '180,120,255', casillaBorde: '205,160,255', resiste: '220,200,255', piedras: 0, chispas: 24, grietas: false, sacudida: 0, golpe: 'empuje'},   // ✨ Nova arcana
+    viento: {fogonazo: '245,250,255', banda: '205,225,240', banda2: '235,245,255', frente: '190,230,255', brillo: '255,255,255',
+      casilla: '210,235,255', casillaBorde: '230,245,255', resiste: '190,230,255', piedras: 20, soloPolvo: true, grietas: false, sacudida: 3, golpe: 'sentado', cono: true},   // 🔊 Sonic Boom
+    giro: {fogonazo: '255,245,230', banda: '210,210,225', banda2: '240,240,255', frente: '225,235,255', brillo: '255,255,255',
+      casilla: '220,225,245', casillaBorde: '235,240,255', resiste: '190,220,255', piedras: 0, grietas: false, sacudida: 0, golpe: 'corte', giro: true},   // 🌀 Remolino, Barrido
+    grito: {fogonazo: '220,190,240', banda: '90,40,110', banda2: '160,90,190', frente: '150,70,180', brillo: '225,190,245',
+      casilla: '150,90,180', casillaBorde: '180,120,210', resiste: '200,180,230', piedras: 0, grietas: false, sacudida: 2, golpe: 'miedo', anillos: 3},   // 😱 Grito espeluznante
+  };
+  const sinTildes = t => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  // La variante de una habilidad por su nombre (o `fxOnda` en la habilidad). null = no lleva la animación.
+  function varianteDe(nombre, fx){
+    if(fx && VARIANTES[fx]) return fx;
+    const n = sinTildes(nombre);
+    if(/shockwave/.test(n)) return 'tierra';
+    if(/pisoton/.test(n)) return 'pisoton';
+    if(/nova arcana/.test(n)) return 'arcana';
+    if(/sonic boom/.test(n)) return 'viento';
+    if(/remolino|barrido|coletazo/.test(n)) return 'giro';
+    if(/grito espeluznante|grito de panico/.test(n)) return 'grito';
+    return fx ? 'tierra' : null;
+  }
+  const variante = clave => VARIANTES[clave] || TIERRA;
+  // El ángulo (radianes, del mapa) hacia el centro de un conjunto de puntos {x, y} desde c: hacia dónde sale un cono.
+  function anguloHacia(c, puntos){
+    if(!puntos || !puntos.length) return Math.PI / 2;
+    let x = 0, y = 0; puntos.forEach(p => { x += p.x; y += p.y; });
+    return Math.atan2(y / puntos.length - c.y, x / puntos.length - c.x);
+  }
+  window.FxOnda = {DURACION, PAJARITOS_MS, anillo, piedras, piedraEn, sacudida, estrellas, VARIANTES, varianteDe, variante, anguloHacia};
 })();

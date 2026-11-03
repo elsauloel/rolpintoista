@@ -962,6 +962,12 @@ las rodea como a un Sólido. Por un aliado se pasa, pero `rutaSoltada` no deja t
   coordenadas; nada con «reducir movimiento»). Cuando cada rival resuelve su resistencia, el GM (`dueloGrupoResuelto`) publica `onda-golpe` ({a,
   cayo}), que va sin tarjeta (js/16 corta antes de la Crónica): sobre el que no la resistió, un estallido y estrellitas girando ~2,6 s; sobre el que
   sí, un destello chico. Dibuja desde js/05 (`dibujarEfectosOnda`); si el token no se ve en esa pantalla, no se dibuja.
+  **Las otras ondas** (2026-11-03, dueño: «aprobada la animación, avanzá con el resto»): la misma pieza, con variantes (`FxOnda.VARIANTES` /
+  `varianteDe(nombre)` en comun/fx-onda.js; `ondaFxVariante(hab)` en js/94): Shockwave (tierra), Pisotón (tierra más fuerte, Pajaritos), Nova arcana
+  (violeta, chispas; flechitas de empujón), Sonic Boom (en cono: un abanico hacia el centro de sus casillas, `ang`; gotitas verdes = No2 perdidos),
+  Remolino / Barrido / Coletazo (un tajo que gira; línea de corte) y Grito espeluznante (tres anillos; 😱). El momento `onda` lleva `variante` (y
+  `ang`); `onda-golpe`, `variante` y `de` (quien la lanzó, para la dirección del empujón). Vale para `objetivo` 'onda' o 'cono'; el duelo espera a
+  que termine (DURACION + 400 ms, `conOnda` en `dueloElegirAreaMapa`).
 - **Editar token en ventana emergente** (2026-09-21): "✎ Editar token" ya no usa la barra lateral; abre una ventana centrada (`#editar-token-capa`/`#editar-token-ventana`, mismo estilo que "Nuevo token") que se cierra con Volver, clic en el fondo, clic derecho fuera de un campo o Esc (`cerrarEditarToken`). La barra lateral queda solo con Mantenimiento y Finalizar combate.
 
 - **📏🔮 Visualizador de rango** (2026-09-22): dos botones cuadrados junto a 👓 lentes (`#btn-rango`, `#btn-rango-magico`), para cualquier jugador: muestran, con la misma superficie hexagonal que usan las auras (`dibujarAuraHex`), el área de **Rango** (de Destreza, azul) o **Rango de casteo** (de Especial, violeta) alrededor de **tu propio token** en el mapa. Los números salen de `resumen.rng`/`resumen.rangocasteo`, que la ficha ya calculaba pero no publicaba (`fichaResumen()`). Atajos: **R** prende/apaga el normal, **Shift+R** el mágico (Ctrl+R se descartó: el navegador lo usa para recargar la página). Es local a cada navegador, no se sincroniza ni queda guardado. Por ahora solo para el propio PJ del jugador — no hay botón equivalente para que el GM lo vea en un creep.

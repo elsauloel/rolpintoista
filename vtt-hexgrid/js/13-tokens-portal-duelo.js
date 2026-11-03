@@ -1262,8 +1262,8 @@ function dueloGrupoResuelto(d){
     if(!doc.exists) return;
     const a = doc.data();
     // 💫 El Shockwave: sobre quien no la resistió, el golpe y los pajaritos; sobre quien sí, un destello chico (js/94, 2026-11-03).
-    if(a.hab && a.hab.objetivo === 'onda' && typeof ondaFxEs === 'function' && ondaFxEs(a.hab) && d.defensor && d.defensor.tokenId)
-      ondaFxGolpePublicar(d.defensor.tokenId, d.resultado === 'pego' || d.resultado === 'mitad');
+    if(a.hab && (a.hab.objetivo === 'onda' || a.hab.objetivo === 'cono') && typeof ondaFxVariante === 'function' && ondaFxVariante(a.hab) && d.defensor && d.defensor.tokenId)
+      ondaFxGolpePublicar(d.defensor.tokenId, d.resultado === 'pego' || d.resultado === 'mitad', ondaFxVariante(a.hab), (a.casteador && a.casteador.tokenId) || (d.atacante && d.atacante.tokenId) || '');
     if(a.estado !== 'en-curso' || num(a.indice) !== idx) return;   // ya avanzó por otra vía
     const siguiente = idx + 1, total = (a.objetivos || []).length;
     const reparte = a.hab && a.hab.reparte, quedan = reparte ? (num(reparte.total) || 2) - total : 0;   // los misiles: ¿queda alguno por tirar?
@@ -1551,9 +1551,13 @@ function dueloElegirAreaMapa(msg){
     if(hab.tormenta){ const t = tormentaRepartir(hab, objetivos); habArea = t.hab; objetivosArea = t.objetivos; if(!objetivosArea.length) return; }   // Tormenta arcana (js/44)
     // 💥 La onda del Shockwave, para todas las pantallas (js/94, 2026-11-03), y el duelo recién cuando se terminó de ver (dueño, el mismo día: «el
     // menú del duelo se abrió antes de que se terminara de apreciar la animación. Dale un margen de algunos ms»).
-    const conOnda = hab.objetivo === 'onda' && mio && typeof ondaFxEs === 'function' && ondaFxEs(hab);
+    // Desde el 2026-11-03 también las otras ondas (Pisotón, Nova arcana, Remolino, Grito…) y el cono del Sonic Boom, cada una con su variante.
+    const ondaVar = (hab.objetivo === 'onda' || hab.objetivo === 'cono') && mio && typeof ondaFxVariante === 'function' ? ondaFxVariante(hab) : null;
+    const conOnda = !!ondaVar;
     if(conOnda){
-      try{ ondaFxPublicar(mio.id, radio, `${nombreDe(mio)}: ${String(hab.nombre || 'Shockwave').replace(/^[^\wÁÉÍÓÚáéíóúÑñ]+/, '')}`); }catch(err){ console.error('No se pudo publicar la onda:', err); }
+      let ang = null;
+      if(h.cono && enCono && enCono.size){ const C = hexCentro(mio.col, mio.fila); ang = FxOnda.anguloHacia(C, [...enCono].map(k => { const q = nbUnpack(k); return hexCentro(q.col, q.fila); })); }
+      try{ ondaFxPublicar(mio.id, radio, `${nombreDe(mio)}: ${String(hab.nombre || 'Shockwave').replace(/^[^\wÁÉÍÓÚáéíóúÑñ]+/, '')}`, {variante: ondaVar, ang}); }catch(err){ console.error('No se pudo publicar la onda:', err); }
       await new Promise(r => setTimeout(r, ((window.FxOnda && FxOnda.DURACION) || 1700) + 400));
     }
     try{

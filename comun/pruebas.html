@@ -43,7 +43,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
 <script src="fx-transfusion.js?v=20261103fx2"></script>
-<script src="fx-onda.js?v=20261103onda"></script>
+<script src="fx-onda.js?v=20261103onda2"></script>
 <script src="combatiente.js?v=20261103ve"></script>
 <script src="creep-calculo.js?v=20261103t4"></script>
 <script src="creep-botonera.js"></script>
@@ -6571,6 +6571,13 @@ prueba('💥 La onda del Shockwave (2026-11-03): el anillo crece y frena, las pi
   igual([F.anillo(0) < F.anillo(0.5), F.anillo(0.5) < F.anillo(1), Math.abs(F.anillo(1) - 1.1) < 1e-9, JSON.stringify(a) === JSON.stringify(b), a.length,
     ini.alfa, fin.h === 0 && fin.alfa === 0, medio.h > 0, F.sacudida(400, 3, 5).dx, F.estrellas(0, 4).length],
     [true, true, true, true, 12, 0, true, true, 0, 4]);
+});
+prueba('💥 Las otras ondas (2026-11-03): cada habilidad su variante, y el cono sale hacia donde están sus casillas', () => {
+  const F = FxOnda, v = n => F.varianteDe(n);
+  igual([v('Shockwave'), v('Pisotón'), v('✨ Nova arcana'), v('Sonic Boom'), v('Remolino'), v('Barrido'), v('Coletazo'), v('Grito espeluznante'), v('Bola de fuego'),
+    F.varianteDe('Algo', 'arcana'), F.variante('viento').cono, F.variante('nada') === F.VARIANTES.tierra,
+    Math.round(F.anguloHacia({x: 0, y: 0}, [{x: 3, y: 0}, {x: 5, y: 0}]) * 100), Math.round(F.anguloHacia({x: 0, y: 0}, [{x: 0, y: 4}]) * 100)],
+    ['tierra', 'pisoton', 'arcana', 'viento', 'giro', 'giro', 'giro', 'grito', null, 'arcana', true, true, 0, 157]);
 });
 prueba('🗄 Referencia (2026-11-03): los creeps de fábrica sin auditar salen del pool de campaña y van a «Referencia»', () => {
   const ref = CREEPS_BASE.filter(c => c.pool !== 'esencial' && Biblioteca.sinAuditarDeFabrica(c));

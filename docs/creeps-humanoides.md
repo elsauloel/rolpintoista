@@ -309,6 +309,19 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 5 | **Furia** | — | la cofia: Casco de bandas remachadas (Buena) + guantes Comunes (Def 5, Def.Esp 2) |
   Consumible: Pergamino grupal de Paso Fantasma. Ojo: «Carga que derriba» no es una carga (es una onda en cono). Sin cargar hasta que el dueño diga.
 
+- **S2 · Abanderado · Support** (boceto y nivel 1 aprobados, dueño 2026-11-03: «me copa»). Estrategia: el soldado que lleva la bandera; no cura,
+  hace pegar más a los suyos (grita, toca el tambor, planta el estandarte) y pelea con lanza al lado del grupo. Como juega con turnos de espera y
+  nada tira Especial, es soldado, no mago. Atributos (Con/Des/Fue/Agi/Esp → vida, No2): **nv1 10/7/7/6/3 → 50, 6** · nv2 11/8/7/7/3 → 55, 7 ·
+  nv3 12/8/8/7/4 → 60, 7 · nv4 13/9/8/8/4 → 70, 8 · nv5 14/9/9/8/5 → 75, 8.
+  | Nivel | Habilidad nueva | Pasiva | Equipo |
+  |---|---|---|---|
+  | 1 | **Empuje** (rápida, Flash: +3 a la próxima tirada de un aliado) · **¡A la carga!** (lenta: aliados a 4, +2 PdG, PdG.Esp, daño y Ef.Esp 2 turnos) | — | **Lanza corta** (Tipo 4, +1 daño, Alcance +1) + **Estandarte del muro** (aliados pegados +1 Defensa) · Chaleco de cuero · Botas de caña alta (Def 3, Def.Esp 1) |
+  | 2 | **Bendecir el arma** (rápida, Flash) | **Voluntad de hierro** (+2 Res.CC) | + 2 Comunes |
+  | 3 | **Redoble de tambores** | — | el estandarte, de Buena calidad |
+  | 4 | **Arenga** | **Robustez** (+5 de vida) | + el chaleco de Buena |
+  | 5 | **Estandarte de guerra** (aliados a 3: +3 PdG y +5 de daño mientras siga en pie) | — | + la lanza de Buena |
+  Consumible: Pergamino grupal de Furia de Combate. Piezas Buenas a elegir al definir cada nivel. Sin cargar hasta que el dueño diga.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4
@@ -385,7 +398,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | L4 | | | | | |
 | R2 | | | | | |
 | M2 | ✅ (2026-11-03) | | | | |
-| S2 | | | | | |
+| S2 | ✅ (2026-11-03) | | | | |
 | D2 | | | | | |
 | W3 | | | | | |
 | T3 | | | | | |

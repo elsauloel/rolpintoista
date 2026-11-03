@@ -477,6 +477,11 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 4 | **Andanada arcana** | **Puntería arcana** | + una Buena |
   | 5 | **Tormenta arcana** | — | + otra Buena |
   Consumible: Poción de SP menor. Parpadeo también lo tienen M2 y M3 (nv2).
+  **Nivel 1** (2026-11-03, dueño: «no hay que cambiar nada»): Esp 12 · Con 8 · Agi 6 · Des 5 · Fue 2, vida 40, 6 No2, 36 SP (recupera 6);
+  Varita del gancho + **Brújula del baqueano** (Ini +2 desde el 2026-11-03, sin lo de la niebla; primer casillero gratis) · Chaleco de cuero ·
+  Zapatillas de lona (Eva +1, Def.Esp +1, Ini −1): Def 2, Def.Esp 1, Eva +1, Ini +1. Parpadeo (4 SP) y Nova arcana (2 No2, 3 SP). Consumible:
+  Poción de SP menor. Dos maneras de jugarlo, sin cambiar nada: «entra, explota y sale» (Parpadeo + Nova + Parpadeo, 11 SP) o «gancho al que
+  está lejos» (lo trae y Nova). Sin cargar hasta que el dueño diga.
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
@@ -571,7 +576,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | L7 | | | | | |
 | L8 | | | | | |
 | R4 | | | | | |
-| M4 | boceto ✅ (2026-11-03) | | | | |
+| M4 | ✅ (2026-11-03) | | | | |
 | S4 | | | | | |
 | D4 | | | | | |
 

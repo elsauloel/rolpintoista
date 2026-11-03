@@ -137,7 +137,8 @@ const CreepCalculo = (() => {
   }
 
   // Lo que el creep tiene puesto y da bonos (su arma adentro; lo guardado no: paso 4).
-  const fuentesEquipo = sc => Combatiente.equipoPuesto(sc);
+  // ⚔⚔ Con dos armas, los bonos de la otra arma no cuentan: solo los de la que tiene en la mano ahora (como un personaje, 2026-11-03).
+  const fuentesEquipo = sc => { const a = Combatiente.armaPrincipal(sc); return Combatiente.equipoPuesto(sc).filter(it => !Combatiente.esArmaDeMano(it) || it === a); };
 
   // Suma los modificadores que apuntan a un stat puntual, vengan del equipo
   // puesto o de estados activos — mismo criterio que collectMods()+modTotal
@@ -414,8 +415,10 @@ const CreepCalculo = (() => {
 
   /* ---------- Costos ---------- */
   // Primer ataque del turno: Tipo ÷ 2 (redondeado para arriba); los demás, Tipo completo.
-  function costoAtaque(sc){ return Combatiente.conExtenuado(sc.estados, costoAtaque0(sc)); }   // + Extenuado (2026-10-12)
-  function costoAtaque0(sc){ const a = armaDe(sc); if(Combatiente.cargadaGratis(a, sc.ataquesTurno, sc.descargada)) return 0; return Math.max(0, Combatiente.costoConAhorro(Combatiente.costoAtaque(a.tipoDado, sc.ataquesTurno, a), a, sc.ataquesTurno) - Combatiente.ahorroArco(a, sc.ataquesTurno, sc.descargada, sc.ultimoPego)); }   // regla común (comun/combatiente.js)   // + Flecha en la cuerda / Encadenar (2026-10-11)
+  function costoAtaque(sc){ return Combatiente.conExtenuado(sc.estados, costoAtaque0(sc)); }
+  // ⚔⚔ Lo que costaría atacar con un arma puntual (las Acciones con dos armas: un «Atacar con…» por arma).
+  function costoAtaqueCon(sc, armaId){ return costoAtaque({...sc, armaActiva: armaId}); }   // + Extenuado (2026-10-12)
+  function costoAtaque0(sc){ const a = armaDe(sc), hechos = Combatiente.ataquesConArmaCreep(sc); if(Combatiente.cargadaGratis(a, hechos, sc.descargada)) return 0; return Math.max(0, Combatiente.costoConAhorro(Combatiente.costoAtaque(a.tipoDado, hechos, a), a, hechos) - Combatiente.ahorroArco(a, hechos, sc.descargada, sc.ultimoPego)); }   // regla común (comun/combatiente.js)   // + Flecha en la cuerda / Encadenar (2026-10-11)
   // Nitros de una habilidad: un número, o "ATAQUE" = lo que le cuesta un
   // ataque con su arma (Tipo ÷ 2 el primero del turno) y cuenta como ese ataque.
   function habAtaque(h){ return String((h && h.nitrosCosto) ?? "").trim().toUpperCase() === "ATAQUE"; }
@@ -847,6 +850,6 @@ const CreepCalculo = (() => {
     danoTxt, fuentesEquipo, modTotal, estadosArmadura, aporteArmadura, defensaEfectiva, armadmgEfectiva, resElemental, critEfectivo, critDeEstados,
     statValor, estadoActivo, aportesMod, origenesMod, conSigno, statOrigenTxt, armadmgOrigenTxt, ataqueTxt, ataqueOrigenTxt,
     defensaOrigenTxt, critOrigenTxt, armaduraOrigenTxt, modsAfectanHp, actualizarHpMaxPorCon, nitrosMax, actualizarNo2PorAgl,
-    costoAtaque, habAtaque, costoNitrosHab, habPartes, habTextoMesa, costoHabTxt, pesoArma, costoParry, defensa, bloqueoValor,
+    costoAtaque, costoAtaqueCon, habAtaque, costoNitrosHab, habPartes, habTextoMesa, costoHabTxt, pesoArma, costoParry, defensa, bloqueoValor,
     fuerzaGolpeValor, costoContraataque, costoOportunidad, oportunidadPosible, sinOportunidad, tarjetaPublica, nombreGenerico, presupuesto, presupuestoTxt, presupuestoHtml, alcance, modoHab, bloqueoHab, ESTADOS_NITROS_MIGRAR, normalizar};
 })();

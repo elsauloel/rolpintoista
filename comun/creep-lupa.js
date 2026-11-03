@@ -52,10 +52,11 @@ const CreepLupa = (() => {
     }
     if(tipo === 'atacar'){
       const tipoArma = Combatiente.armaEnMano(sc).tipoDado;
-      const hechos = num(sc.ataquesTurno);
+      const dosArmas = Combatiente.armasDeMano(sc).length > 1;   // ⚔⚔ con dos armas, la cuenta es por arma (2026-11-03)
+      const hechos = Combatiente.ataquesConArmaCreep(sc);
       const costo = K.costoAtaque(sc);
       let h = lupaFila(`Tipo del arma${Combatiente.armaEnMano(sc).nombre ? ` (${esc(Combatiente.armaEnMano(sc).nombre)})` : ''}: d${fmt(tipoArma)}`, fmt(tipoArma));
-      h += lupaFila('Ataques este turno', fmt(hechos));
+      h += lupaFila(dosArmas ? 'Ataques con esta arma este turno' : 'Ataques este turno', fmt(hechos));
       h += hechos === 0
         ? lupaFila(`Primer ataque: Tipo ÷ 2${tipoArma % 2 ? ', para arriba' : ''}`, `${fmt(costo)} No2`, 'lupa-total')
         : lupaFila('Ya atacó: Tipo completo', `${fmt(costo)} No2`, 'lupa-total');

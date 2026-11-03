@@ -161,9 +161,11 @@ const FichaLite = (() => {
   // si no hay, lo primero que va en la mano (una varita).
   const enMano = (it, slotDe) => ['escudo', 'mano'].includes(slotDe(it.tipoItem));
   const otraManoDe = (o, slotDe) => Combatiente.puestoSinArma(o).find(it => slotDe(it.tipoItem) === 'escudo') || Combatiente.puestoSinArma(o).find(it => enMano(it, slotDe)) || null;
-  function segundaMano(o, slotDe){
+  function segundaMano(o, slotDe, danoDe){
     const esc2 = otraManoDe(o, slotDe);
     if(!esc2) return {nombre: '', detalle: 'vacía', lineas: []};
+    // ⚔⚔ Una segunda arma (dos armas, 2026-11-03): con su daño, como la de la mano.
+    if(danoDe && Combatiente.esArmaDeMano(esc2) && esc2.id){ const o2 = {...o, armaActiva: esc2.id}; return manoGuardada(o2, danoDe(o2)); }
     if(slotDe(esc2.tipoItem) !== 'escudo'){
       const d = String(esc2.detalle || '').split('⚙')[0].trim();
       return {nombre: esc2.nombre || 'Arma', detalle: d.slice(0, 60) || 'en la mano', lineas: d ? [{txt: d}] : []};
@@ -188,7 +190,7 @@ const FichaLite = (() => {
     return {
       titulo: sc.nombre || 'Creep',
       subtitulo: [`Nivel ${fmt(num(sc.nivel) || 1)}`, sc.jefe ? 'jefe' : '', sc.raza].filter(Boolean).join(' · '),
-      manos: [manoGuardada(sc, C.danoTxt(sc, dmg)), segundaMano(sc, C.slotDe)],
+      manos: [manoGuardada(sc, C.danoTxt(sc, dmg)), segundaMano(sc, C.slotDe, o => C.danoTxt(o, C.statValor(o, 'dmg')))],
       defensa: lineasGuardadas(sc, C.defensaEfectiva(sc), sc.defensa, defItem, defEstado),
       crit: [0, 1, 2, 3, 4].map(i => lineasGuardadas(sc, C.critEfectivo(sc, i), (sc.crit || [])[i], modDe('tipo' + (i + 1)), () => 0)),
       equipo: equipoGuardado(sc, C.slotDe),

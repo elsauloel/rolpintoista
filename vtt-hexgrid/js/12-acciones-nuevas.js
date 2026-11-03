@@ -61,10 +61,13 @@ function acDibujar(){
    escribe con modificarCreep (transacción sobre su parte privada + resumen + firma: GM Tools, abierto en otra pestaña, se entera
    por la firma). El Parry que espera su Bloqueo vive acá (acParry), como en GM Tools. */
 var acParry = new Set();
+// ⚔⚔ Dos armas (2026-11-03): el arma recién elegida con «Atacar con…», hasta que la copia del creep la traiga (se guarda en `armaActiva`).
+let acArmaPendiente = null, acElegirArmaHecho = false;
 function acCreep(){
   const crudo = creepPrivadoDe(ac.creepId);
   if(!crudo) return null;
   const sc = CreepCalculo.normalizar(structuredClone(crudo));
+  if(acArmaPendiente && acArmaPendiente.creep === ac.creepId){ if(crudo.armaActiva === acArmaPendiente.id) acArmaPendiente = null; else sc.armaActiva = acArmaPendiente.id; }
   sc.id = ac.creepId;
   return sc;
 }
@@ -228,6 +231,13 @@ function acAccionAca(b){
   if(d.tirarstatcreep){ acPublicar(sc, CreepAcciones.tiradaStat(sc, d.tirarstatcreep.split(':')[1])); return true; }
   if(d.esquivarcreep){ acPublicar(sc, CreepAcciones.esquivar(sc)); return true; }
   if(d.fuerzacreep){ acPublicar(sc, CreepAcciones.fuerzaGolpe(sc)); return true; }
+  // ⚔⚔ Dos armas: «Atacar con…» y «Daño · …» dejan esa arma en la mano y siguen como siempre.
+  if((d.atacararma || d.danioarma) && !acElegirArmaHecho){
+    const armaId = d.atacararma || d.danioarma, creep = ac.creepId;
+    acArmaPendiente = {creep, id: armaId};
+    acCambiar(c => { c.armaActiva = armaId; return {ok: true}; }).then(() => { acElegirArmaHecho = true; try{ acAccionAca(b); } finally{ acElegirArmaHecho = false; } });
+    return true;
+  }
   if(d.daniocreep){
     const t = CreepAcciones.dano(sc);
     if(t){ acPublicar(sc, t); acEfectosAlPegar(sc); }

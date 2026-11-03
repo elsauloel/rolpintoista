@@ -196,6 +196,7 @@ document.addEventListener('click', async e => {
   if(b.dataset.atacarcreep || b.dataset.otroataquecreep){
     const sc = S.creeps.find(s=>s.id===(b.dataset.atacarcreep || b.dataset.otroataquecreep));
     if(!sc) return;
+    if(b.dataset.atacararma) sc.armaActiva = b.dataset.atacararma;   // ⚔⚔ dos armas: ataca con la elegida (2026-11-03)
     preguntarTipoAtaqueCreep(sc, !!b.dataset.otroataquecreep);   // Atacar = ataque normal; el otro botón, el menú (dueño, 2026-10-06)
     return;
   }
@@ -269,6 +270,7 @@ document.addEventListener('click', async e => {
   if(b.dataset.daniocreep){
     const sc = S.creeps.find(s=>s.id===b.dataset.daniocreep);
     if(!sc) return;
+    if(b.dataset.danioarma) sc.armaActiva = b.dataset.danioarma;   // ⚔⚔ el daño de esa arma
     const t = CreepAcciones.dano(sc);   // comun/creep-acciones.js
     if(t){
       registrarTirada(t.origen, t.r);

@@ -130,7 +130,7 @@ const CreepDuelo = (() => {
         if(campo === 'pdg'){
           const t = d.ataque.tipo === 'habilidad-arma' ? pdgDeArreglos(sc, d.ataque) : A().tiradaAtaque(sc, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo);
           const tipo = d.ataque.tipo, costo = tipo === 'oportunidad' ? C().costoOportunidad(sc) : tipo === 'contra' ? C().costoContraataque(sc) : C().costoAtaque(sc);
-          return {formula: formulaDe(t), ...L('atacar|'), costo: Combatiente.costoAtaqueLineas({tipoArma: Combatiente.armaEnMano(sc).tipoDado, arma: Combatiente.armaDeCombatiente(sc), hechos: num(sc.ataquesTurno), costo, tiene: num(sc.nitros), ataque: tipo})};
+          return {formula: formulaDe(t), ...L('atacar|'), costo: Combatiente.costoAtaqueLineas({tipoArma: Combatiente.armaEnMano(sc).tipoDado, arma: Combatiente.armaDeCombatiente(sc), hechos: Combatiente.ataquesConArmaCreep(sc), ...(Combatiente.armasDeMano(sc).length > 1 ? {porArma: true} : {}), costo, tiene: num(sc.nitros), ataque: tipo})};
         }
         if(campo === 'fuerza') return {formula: formulaDe(A().tirada('', C().fuerzaGolpeValor(sc))), ...L('stat|fue'), titulo: `${sc.nombre} · Fuerza del golpe`};
         if(campo === 'bloqueo') return {formula: formulaDe(A().tirada('', C().bloqueoValor(sc) + A().bloqueoFirmeCreep(sc), sc, 'bloqueo')), ...L('stat|bloqueo'), titulo: `${sc.nombre} · Bloqueo`};
@@ -164,7 +164,7 @@ const CreepDuelo = (() => {
       },
       // Un duelo cancelado que no cuenta como ataque (2026-10-15): el conteo y los No2, de vuelta. → los No2 devueltos.
       devolverHab: d => ui.cambiar(d.atacante.ref, c => CreepAcciones.devolverHab(c, d.ataque.pagoHab)),   // ↩ una habilidad que no cuenta (P233) → qué se devolvió
-      devolverAtaque: d => (!d.ataque || d.ataque.tipo === 'habilidad-arma') ? 0 : ui.cambiar(d.atacante.ref, c => CreepAcciones.devolverAtaque(c, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo, Combatiente.pagoDeDuelo(c, d.id))),
+      devolverAtaque: d => (!d.ataque || d.ataque.tipo === 'habilidad-arma') ? 0 : ui.cambiar(d.atacante.ref, c => CreepAcciones.devolverAtaque(c, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo, Combatiente.pagoDeDuelo(c, d.id), d.ataque.armaCreepId)),
       // 🏹 La flecha especial de un duelo cancelado antes de tirar, o que no cuenta (2026-10-28): vuelve al cinturón con su No2. → los No2 devueltos.
       devolverFlecha: d => {
         const v = d.ataque && d.ataque.flecha && d.ataque.flecha.vuelve;

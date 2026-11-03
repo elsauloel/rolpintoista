@@ -128,9 +128,18 @@ const CreepAcciones = (() => {
   const faltanNitros = (sc, tipo) => !especialTipo(tipo) && num(sc.nitros) >= 0 && costoAtaqueDe(sc, tipo) > num(sc.nitros);
   // Un duelo cancelado que no cuenta como ataque (2026-10-15): se descuenta del conteo y se devuelven los No2. → los No2 devueltos.
   // `pagado` (2026-10-28): lo que se pagó de verdad (Combatiente.pagoDeDuelo); sin él, el costo entero.
-  function devolverAtaque(sc, tipo, pagado){
-    if(tipo === 'normal') sc.ataquesTurno = Math.max(0, num(sc.ataquesTurno) - 1);
-    const costo = pagado !== null && pagado !== undefined ? Math.max(0, num(pagado)) : costoAtaqueDe(sc, tipo);
+  // ⚔⚔ La cuenta por arma (dos armas, 2026-11-03): sube o baja la del arma de la mano (`armaActiva`).
+  function contarConArma(sc, d){
+    if(Combatiente.armasDeMano(sc).length < 2) return;
+    const a = Combatiente.armaPrincipal(sc); if(!a || !a.id) return;
+    const m = {...(sc.ataquesArma || {})}; m[a.id] = Math.max(0, num(m[a.id]) + d); if(!m[a.id]) delete m[a.id];
+    sc.ataquesArma = m;
+  }
+  function devolverAtaque(sc, tipo, pagado, armaId){
+    if(armaId && Combatiente.armasDeMano(sc).some(it => it.id === armaId)) sc.armaActiva = armaId;   // lo de esa arma (dos armas)
+    const costo0 = pagado !== null && pagado !== undefined ? null : costoAtaqueDe(sc, tipo);   // (sin lo pagado: lo que costaba antes de descontarlo)
+    if(tipo === 'normal'){ sc.ataquesTurno = Math.max(0, num(sc.ataquesTurno) - 1); contarConArma(sc, -1); }
+    const costo = pagado !== null && pagado !== undefined ? Math.max(0, num(pagado)) : (tipo === 'normal' ? costoAtaqueDe(sc, tipo) : costo0);
     sc.nitros = num(sc.nitros) + costo;
     return costo;
   }
@@ -145,10 +154,13 @@ const CreepAcciones = (() => {
     const forzado = costo > tenia && !especialTipo(tipo) ? {costo, tenia} : null;   // la oportunidad / el contraataque no se fuerzan: van a negativo
     if(tipo === 'normal'){
       if(forzado && !forzar && !Combatiente.permisoNo2()) return {error: `${sc.nombre}: no le alcanzan los No2 — este ataque cuesta ${fmt(costo)} y tiene ${fmt(num(sc.nitros))}`};
-      const primero = num(sc.ataquesTurno) === 0;
+      const dosArmas = Combatiente.armasDeMano(sc).length > 1, conArma = dosArmas ? Combatiente.armaPrincipal(sc) : null;
+      const primero = Combatiente.ataquesConArmaCreep(sc) === 0;   // ⚔⚔ con dos armas, el primero con ESTA arma (2026-11-03)
       sc.nitros = forzado ? Math.min(0, num(sc.nitros)) : num(sc.nitros) - costo;   // (en negativo, con «Hacerlo igual»: queda como estaba, no vuelve a 0)
       Combatiente.aplicarTormenta(sc, sc.estados, costo, {motivo: 'atacar'});
       sc.ataquesTurno = num(sc.ataquesTurno) + 1;
+      contarConArma(sc, 1);
+      if(conArma) return {forzado, paga: forzado ? tenia : costo, armaId: conArma.id, aviso: `${sc.nombre}: −${fmt(forzado ? tenia : costo)} No2${forzado ? ` (costaba ${fmt(costo)})` : ''} · con ${conArma.nombre}: ${primero ? 'primer ataque con esta arma' : `ataque ${fmt(Combatiente.ataquesConArmaCreep(sc))} con esta arma`} · quedan ${fmt(num(sc.nitros))}`};
       return {forzado, paga: forzado ? tenia : costo, aviso: `${sc.nombre}: −${fmt(forzado ? tenia : costo)} No2${forzado ? ` (costaba ${fmt(costo)})` : ''} · ${primero ? 'primer ataque del turno' : `ataque ${fmt(sc.ataquesTurno)} del turno`} · quedan ${fmt(sc.nitros)}`};
     }
     const nombre = NOMBRE_ESPECIAL[tipo] || 'Contraataque';
@@ -690,6 +702,7 @@ const CreepAcciones = (() => {
   function inicioCreep(sc, mant){
     sc.descargada = num(sc.ataquesTurno) > 0;   // llega cargada (2026-10-10): si disparó este turno, el próximo no es gratis
     sc.ataquesTurno = 0;
+    sc.ataquesArma = {}; delete sc.armaActiva;   // ⚔⚔ dos armas: cada una vuelve a su primer ataque, y en la mano, la primera (2026-11-03)
     sc.usosEspecial = {};   // el No2 de las armas especiales vuelve a 1 (y los orbes, a su uso por turno); también la marca del primer golpe
     Object.keys(sc.esperaEspecial || {}).forEach(k => { sc.esperaEspecial[k] = Math.max(0, num(sc.esperaEspecial[k]) - 1); if(!sc.esperaEspecial[k]) delete sc.esperaEspecial[k]; });   // la espera de sus varitas
     sc.saqueUsado = false;   // Saque rápido: vuelve con el turno (2026-10-05)

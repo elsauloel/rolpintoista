@@ -55,6 +55,7 @@ const CreepBotonera = (() => {
     const lupaBotonHtml = (clave, cls) => o.lupa === false || typeof window.lupaBotonHtml !== 'function' ? '' : window.lupaBotonHtml(clave, cls);
     const {statValor, defensa, danoTxt, costoParry, costoAtaque, bloqueoHab, costoNitrosHab, costoHabTxt, defensaEfectiva, armadmgEfectiva, critEfectivo, nitrosMax, pesoArma, STAT_LOOKUP, STATS_TIRADA_IDS} = C();
     const costoAtaqueSc = costoAtaque(sc);
+    const dosArmas = Combatiente.armasDeMano(sc).length > 1 && !Combatiente.sinArmaEnMano(sc) ? Combatiente.armasDeMano(sc) : null;   // ⚔⚔
     const sinNitrosAtaque = num(sc.nitros) < costoAtaqueSc;
     const cualAtaque = num(sc.ataquesTurno) === 0 ? 'primer ataque del turno (Tipo ÷ 2)' : 'ataque extra (Tipo completo)';
 
@@ -71,8 +72,14 @@ const CreepBotonera = (() => {
     const defCreep = defensa(sc);
     const combate = [
       // Atacar sin No2 no se deshabilita (un botón deshabilitado no deja abrir la 🔍): al tocarlo avisa.
+      // ⚔⚔ Con dos armas (dueño, 2026-11-03), un «Atacar» y un «Daño» por arma, cada uno con su costo (su propio primer ataque a mitad de
+      // precio), como la Botonera del personaje. Tocar uno la deja en la mano (`armaActiva`) y ataca con ella.
+      ...(dosArmas ? dosArmas.flatMap(a => { const sa = {...sc, armaActiva: a.id}, c = C().costoAtaqueCon(sc, a.id), sinN = num(sc.nitros) < c, prim = Combatiente.ataquesConArmaCreep(sa) === 0, fa = formulasCombate(sa);
+        return [{stat:'pdg', nombre:`Atacar con ${a.nombre} · ${fmt(c)} No2${prim ? ' · 1.º ataque' : ''}`, dado: fa.pdg, sinNitros: sinN, lupa:'atacar', motivo: `${sinN ? 'Sin No2 · ' : ''}Cuesta ${fmt(c)} No2 · ${prim ? 'primer ataque con esta arma (Tipo ÷ 2)' : 'ya atacó con esta arma (Tipo completo)'}${a.id === (Combatiente.armaPrincipal(sc) || {}).id ? ' · en la mano' : ''}`, attr:`data-atacarcreep="${sc.id}" data-atacararma="${esc(a.id)}"`},
+          {nombre: `Daño · ${a.nombre}`, dado: danoTxt(sa, statValor(sa, 'dmg')), lupa:'danio', motivo: 'Sin costo', attr:`data-daniocreep="${sc.id}" data-danioarma="${esc(a.id)}"`}]; }) : [
       {stat:'pdg', nombre:`Atacar (PdG) · ${fmt(costoAtaqueSc)} No2`, dado: fc.pdg, sinNitros: sinNitrosAtaque, lupa:'atacar', motivo: `${sinNitrosAtaque ? 'Sin No2 · ' : ''}Cuesta ${fmt(costoAtaqueSc)} No2 · ${cualAtaque}`, attr:`data-atacarcreep="${sc.id}"`},
       {nombre: Combatiente.sinArmaEnMano(sc) ? 'Daño (sin arma)' : 'Daño Arma', dado: danoTxt(sc, statValor(sc, 'dmg')), lupa:'danio', motivo: Combatiente.sinArmaEnMano(sc) ? 'Sin costo · no tiene nada en la mano: 1d4 + su Daño' : 'Sin costo', attr:`data-daniocreep="${sc.id}"`},
+      ]),
       {stat:'eva', nombre:'Esquivar (Eva)', dado: Combatiente.stuneado(sc.estados) ? '1 (Stun)' : fc.eva, lupa:'stat|eva', motivo:'Sin costo', attr:`data-esquivarcreep="${sc.id}"`},
       // Parry y Bloqueo solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30): sin eso, o con un arma
       // natural, no aparecen (defensa).

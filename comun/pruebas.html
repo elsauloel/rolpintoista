@@ -44,10 +44,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="critico.js"></script>
 <script src="fx-transfusion.js?v=20261103fx2"></script>
 <script src="fx-onda.js?v=20261103onda2"></script>
-<script src="combatiente.js?v=20261103ve"></script>
-<script src="creep-calculo.js?v=20261103t4"></script>
+<script src="combatiente.js?v=20261103t20"></script>
+<script src="creep-calculo.js?v=20261103t20"></script>
 <script src="creep-botonera.js"></script>
-<script src="creep-acciones.js?v=20261103p1"></script>
+<script src="creep-acciones.js?v=20261103t20"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
@@ -102,7 +102,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261103t13"></script>
+<script src="duelo.js?v=20261103t20"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -6592,6 +6592,25 @@ prueba('💥 Las otras ondas (2026-11-03): cada habilidad su variante, y el cono
     F.varianteDe('Algo', 'arcana'), F.variante('viento').cono, F.variante('nada') === F.VARIANTES.tierra,
     Math.round(F.anguloHacia({x: 0, y: 0}, [{x: 3, y: 0}, {x: 5, y: 0}]) * 100), Math.round(F.anguloHacia({x: 0, y: 0}, [{x: 0, y: 4}]) * 100)],
     ['tierra', 'pisoton', 'arcana', 'viento', 'giro', 'giro', 'giro', 'grito', null, 'arcana', true, true, 0, 157]);
+});
+prueba('⚔⚔ Creep con dos armas (2026-11-03): un primer ataque barato por arma, el daño de cada una, cancelar devuelve lo de esa arma, y el turno nuevo las reinicia', () => {
+  const cat = n => ({...structuredClone(CATALOGO_BASE.find(i => i.nombre === n)), equipado: true});
+  const sc = CreepCalculo.normalizar(structuredClone(CREEPS_BASE.find(c => c.pool === 'esencial' && c.nombre === 'Hachero').datos));
+  delete sc.modoSP; sc.id = 'b2'; sc.nitros = 20;
+  sc.equipo = [{...cat('Sable del tahúr'), id: 'sable'}, {...cat('Facón de paisano'), id: 'facon'}, ...sc.equipo.filter(it => !Combatiente.esArmaDeMano(it))];
+  const antes = [CreepCalculo.costoAtaqueCon(sc, 'sable'), CreepCalculo.costoAtaqueCon(sc, 'facon'), Combatiente.armaEnMano(sc).nombre];
+  sc.armaActiva = 'sable'; const p1 = CreepAcciones.pagarAtaque(sc, 'normal');
+  const tras1 = [p1.paga, p1.armaId, CreepCalculo.costoAtaqueCon(sc, 'sable'), CreepCalculo.costoAtaqueCon(sc, 'facon')];
+  sc.armaActiva = 'facon'; const p2 = CreepAcciones.pagarAtaque(sc, 'normal');
+  const dano = CreepCalculo.danoTxt(sc, CreepCalculo.statValor(sc, 'dmg'));
+  const ataque = Combatiente.ataqueConSuArma(sc, 'normal');
+  sc.armaActiva = 'sable';   // (al cancelar el del facón, vuelve lo de esa arma aunque tenga el sable en la mano)
+  const dev = CreepAcciones.devolverAtaque(sc, 'normal', null, 'facon');
+  const trasDev = [dev, CreepCalculo.costoAtaqueCon(sc, 'facon'), CreepCalculo.costoAtaqueCon(sc, 'sable'), sc.ataquesTurno];
+  CreepAcciones.inicioTurno(sc, 'prueba-dos-armas', 0);
+  const solo = CreepCalculo.normalizar(structuredClone(CREEPS_BASE.find(c => c.pool === 'esencial' && c.nombre === 'Hachero').datos));
+  igual([antes, tras1, p2.paga, /^1d4/.test(dano), ataque.armaCreepId, trasDev, sc.armaActiva, CreepCalculo.costoAtaqueCon(sc, 'sable'), Combatiente.ataquesConArmaCreep(solo), Combatiente.armasDeMano(solo).length],
+    [[3, 2, 'Sable del tahúr'], [3, 'sable', 6, 2], 2, true, 'facon', [2, 2, 6, 1], undefined, 3, 0, 1]);
 });
 prueba('🗄 Referencia (2026-11-03): los creeps de fábrica sin auditar salen del pool de campaña y van a «Referencia»', () => {
   const ref = CREEPS_BASE.filter(c => c.pool !== 'esencial' && Biblioteca.sinAuditarDeFabrica(c));

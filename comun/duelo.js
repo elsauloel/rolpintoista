@@ -582,6 +582,7 @@ const Duelo = (() => {
           // Proyectil perforante (2026-10-13): `perforante` = al terminar, el mapa de quien disparó sigue al que está detrás (js/42);
           // `sinEfectos` = ese segundo golpe, sin los efectos especiales (ni del arma, ni de la flecha, ni del crítico).
           ...(cfg.ataque.perforante ? {perforante: true} : {}), ...(cfg.ataque.sinEfectos ? {sinEfectos: true} : {}),
+          ...(cfg.ataque.armaCreepId ? {armaCreepId: String(cfg.ataque.armaCreepId).slice(0, 80)} : {}),   // ⚔⚔ con cuál de sus dos armas ataca el creep (2026-11-03)
           ...(_num(cfg.ataque.rafaga) > 1 ? {rafaga: Math.min(3, Math.round(_num(cfg.ataque.rafaga)))} : {}),   // 🗡 Ráfaga de cortes (2026-10-21)
           ...(cfg.ataque.efectosNota ? {efectosNota: txtCorto(cfg.ataque.efectosNota, 200)} : {}),
           // ⚡ Critical Matters (2026-09-29): efectos/nota que solo cuentan si el golpe es crítico (ver

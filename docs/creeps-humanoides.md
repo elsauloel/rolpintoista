@@ -483,6 +483,18 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   Poción de SP menor. Dos maneras de jugarlo, sin cambiar nada: «entra, explota y sale» (Parpadeo + Nova + Parpadeo, 11 SP) o «gancho al que
   está lejos» (lo trae y Nova). Sin cargar hasta que el dueño diga.
 
+- **H2 · Saltador · Híbrido** (boceto aprobado 2026-11-03, dueño: «me cierra como ruta»). Estrategia: cae en el medio y barre: salta por encima de
+  la primera línea, se planta entre los de atrás y le pega a todos los que lo rodean. Atributos (Fue/Con/Des/Agi/Esp → vida, No2): **nv1 9/9/7/6/2 →
+  45, 6** · nv2 10/10/7/7/2 → 50, 7 · nv3 11/11/8/7/2 → 55, 7 · nv4 12/12/8/8/2 → 65 (Robustez), 8 · nv5 13/13/9/8/2 → 65, 8.
+  | Nivel | Habilidad nueva | Pasiva | Equipo |
+  |---|---|---|---|
+  | 1 | **Salto** (lenta) · **Golpe fuerte** (rápida) | — | **Hacha de vikingo** (renombrada, era «de cotillón vikingo») + escudo Común · 2 Comunes |
+  | 2 | **Barrido** | **Piel curtida** | + 2 Comunes |
+  | 3 | **Pisotón** | — | el hacha: **Hacha del aserrador** (Buena) |
+  | 4 | **Aguante** | **Robustez** | + una Buena |
+  | 5 | **Salto aplastante** | — | + otra Buena |
+  Consumible: Poción de Cuero Duro. Golpe que sigue no entra: con Tipo 8 el segundo golpe no le alcanza con 6 No2.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4
@@ -554,7 +566,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | D1 | ✅ (2026-11-02) | | | | |
 | W2 | ✅ (2026-11-03) | | | | |
 | T2 | | | | | |
-| H2 | | | | | |
+| H2 | boceto ✅ (2026-11-03) | | | | |
 | L3 | | | | | |
 | L4 | | | | | |
 | R2 | ✅ (2026-11-03) | | | | |

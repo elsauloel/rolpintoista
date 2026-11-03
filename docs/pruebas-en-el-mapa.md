@@ -304,6 +304,7 @@
   Facón de paisano · Tipo 4» y descuenta 2; «Cancelar duelo → No cuenta» devolvió los 2 y la cuenta del facón. Con el sable pagó 3 y, contado, el
   sable pasó a 6 y el facón siguió en 2. El Parry ofrece Sable, Escudo y Facón. **Falta**: el dueño, en la compu; el ataque de oportunidad y el
   contraataque con la segunda arma (usan la que tenga en la mano); GM Tools (un «Atacar con…» por arma: se probó solo en el mapa).
+  **2026-11-03f:** ✅ el **contraataque con la segunda arma**: el Goblin picapiedras con Sable + Facón (el facón en la mano) ganó la Evasión contra la Daga de Prueba Dos, «¿contraatacás a Prueba Dos?» → «Sí, contraatacar» → el duelo nuevo dice «con Facón de paisano · Tipo 4». Cancelado con «No cuenta».
   **2026-11-03c:** el Goblin híbrido con Sable del tahúr + Facón puestos con la regla nueva de las manos: en el mapa, «Atacar con Sable · 3» y «Atacar con Facón · 2»; atacó con el facón a Prueba Uno (1d4 + 8, Sangrado con d2) y después el facón pasó a 4 y el sable siguió en 3; el **ataque de oportunidad** cuando Prueba Uno se alejó usó el facón («descuenta 2 No2»). El contraataque no lo probé.
 - [x] **⌨ Atajos de las habilidades y los consumibles** (2026-11-03, probado con clics por Claude en «Claude · pruebas», mapa «Clon origen»
   mirado por el GM, capturas `hotkeys-*` en /home/user/capturas): creep (Goblin picapiedras) → asignar 3 a Piel de hierro y ⇧1 a la Poción de
@@ -316,9 +317,10 @@
   después una de Regeneración menor → el Maldito queda con **un solo** «Vida extra 30» (no 25 y 5), en el token, la ficha lite, GM Tools y la Mesa.
   Un personaje con el Relicario de sangre que ya tiene Vida extra y se cura de más → suma a la misma. Un personaje con dos «Vida extra» guardadas de
   antes → al empezar su turno quedan en una. El Escudo del sereno / de la mañana siguen aparte.
+  **2026-11-03f:** ✅ **Relicario de sangre**: Prueba Dos lleno (30/30) con el Relicario puesto tomó una Poción de HP → un solo «Vida extra 15» (el tope: 50 % de 30); otra poción → sigue en 15. ✅ **Dos «Vida extra» guardadas de antes** (5 y 4, puestas por código): al llegar la siguiente cura de más se juntaron en **una sola** (15, con el tope). (No lo probé al empezar el turno: se juntan también ahí.)
 - [x] ✅ (2026-11-03c: el Cultista (guardado con la versión vieja: se puso al día solo) se la pegó a Prueba Dos: daño siniestro, Sanguijuela/4 y **sin** Herida sombría; la Poción de HP de ese turno se la llevó el Cultista) **🪱 Sanguijuela sin Herida sombría** (2026-11-03): el Maldito (o un Debuffer de clase) le pega la Sanguijuela a un personaje: el daño es siniestro pero **no** aparece Herida sombría; una Poción de HP en ese mismo turno ya se la lleva el lanzador.
 - [x] ✅ (2026-11-03c: con el Cultista en 0, Prueba Dos tomó una Poción de HP: «❌ 🪱 La cura (+25) se pierde: quien te puso la Sanguijuela (Basilio, Cultista de la Grieta) está caído», y la Mesa igual) **🪱 La cura que se pierde, en la pantalla del jugador** (2026-11-03): con el lanzador caído (o sin token en el mapa), el jugador con la Sanguijuela toma una poción: su aviso dice «🪱 La cura (+N) se pierde: quien te puso la Sanguijuela (X) está caído» (o «ya no está en el mapa»). Desde la ficha suelta (sin el mapa abierto) no se puede saber: ahí la manda igual y la descarta la pantalla del lanzador.
-- [x] ✅ (2026-11-03c: Goblin picapiedras con SP, en turno ajeno: −8 SP; Esc al elegir adónde → «↩ … canceló Parpadeo — se le devolvió 8 SP», 15/15. ¡Al frente! no lo probé) **✨ Parpadeo cancelado con Esc devuelve lo cobrado** (2026-11-03): un creep con SP usa el Parpadeo y, al elegir adónde, Esc: vuelve el SP (y el cooldown si juega con turnos de espera), con el aviso «↩ … se le devolvió …». También con ¡Al frente!.
+- [x] ✅ (2026-11-03c: Goblin picapiedras con SP, en turno ajeno: −8 SP; Esc al elegir adónde → «↩ … canceló Parpadeo — se le devolvió 8 SP», 15/15. ¡Al frente! no lo probé; **2026-11-03f:** ✅ ¡Al frente! de un creep con turnos de espera, Esc al elegir a quién → «↩ Goblin picapiedras: canceló ¡Al frente! — se le devolvió el cooldown y 2 No2») **✨ Parpadeo cancelado con Esc devuelve lo cobrado** (2026-11-03): un creep con SP usa el Parpadeo y, al elegir adónde, Esc: vuelve el SP (y el cooldown si juega con turnos de espera), con el aviso «↩ … se le devolvió …». También con ¡Al frente!.
 - [x] ✅ (2026-11-03c: la lupa del Parpadeo de un creep dice «en turno ajeno cuesta más: con SP, el doble de SP; con turnos de espera, un 50 % más de espera, mínimo +1») **⚡ Texto del Flash** (2026-11-03): en la lupa de una habilidad Flash de un creep con turnos de espera, el texto dice «con SP, el doble de SP; con turnos de espera, un 50 % más».
 - [x] ✅ **Probada por el dueño en el mapa** (2026-11-03, «aprobada la animación», con Rockardo; con el duelo que espera a que termine la onda). **💥 La animación del Shockwave** (2026-11-03, `vtt-hexgrid/js/94-onda-fx.js` + `comun/fx-onda.js`): Rockardo (Tanque) usa Shockwave con
   2 o 3 creeps pegados. En las pantallas del GM y de los jugadores: el golpe al piso, el anillo que sale hasta pasar las casillas de al lado (que se
@@ -396,7 +398,7 @@
   (no con Res.Esp); la Centella, igual. Un creep guardado con la versión vieja se pone al día.
 - [x] ✅ (2026-11-03b, GM y jugador: se cierra con Aceptar, ✕, Esc y clic afuera) **🔍 «Ver detalle del duelo» en un recuadro**: en la Mesa, el botón abre el pop-up (título, la frase y el paso a paso); se cierra con Aceptar,
   ✕, Esc o clic afuera. Desde el GM y desde un jugador.
-- [ ] **💰 Valor del botín y 📋 Ver el grupo** («Batalla terminada», paso Publicar): el valor si venden todo (½), si se despoja (¼) y lo que costaría
+- [x] ✅ (2026-11-03f: GM → 🏁 Finalizar combate → «Batalla terminada»; «📋 Ver el grupo» abre «El grupo, para elegir el botín» con a quién le sirve cada pieza, lugares vacíos, stats, resistencias y debilidades; en «5. Publicar», «💰 Valor del botín: si venden todo ~417 DDE · ~42 c/u entre 10 · si se despoja ~215 · en una tienda costaría 835». Cerrado sin publicar) **💰 Valor del botín y 📋 Ver el grupo** («Batalla terminada», paso Publicar): el valor si venden todo (½), si se despoja (¼) y lo que costaría
   comprarlo, por jugador; «📋 Ver el grupo» con lugares vacíos, stats, resistencias y debilidades.
 - [x] ✅ (2026-11-03b: ⭐ Pool esencial (7), 🗺 Pool de campaña (6), 🗄 Referencia (sin auditar) (269)) **🗄 «+ Creep» con tres pestañas**: ⭐ Pool esencial, 🗺 Pool de campaña (sin los de fábrica sin auditar) y 🗄 Referencia (sin auditar).
 - [x] ✅ (2026-11-03b, Nube tóxica: se agranda y se apaga en ~1,6 s) **☁ Nubes y gases que se disipan**: al vencer, una nube (Nube tóxica, Gas adormecedor, niebla de la Bomba de humo) se va desvaneciendo en vez
@@ -1408,3 +1410,17 @@
   elementales y a crítico, igual. Arreglado el globo de la Defensa especial (restaba dos veces lo de los ítems). **🖼 La imagen completa**: Cancelar ·
   Elegir otra imagen · Encuadrar · ✔ Guardar; encuadrar vuelve a la ventana y Cancelar repone el encuadre de antes (probado con una imagen de prueba,
   después sacada). Falta «Elegir otra imagen» con una foto real (abre el selector de archivos).
+
+### Tanda f (2026-11-03) — los arreglos chicos, probados con clics
+- [x] ✅ **El aviso de oportunidad negada no le sale a quien no puede atacar** (`oporPuede`, js/17: Sentado, Stun, Sueño, caído o muerto): el Goblin
+  picapiedras saltó (Salto) desde al lado de Prueba Uno **Sentado** → a Prueba Uno no le apareció el cartel y no quedó línea en la Mesa. (Con
+  Prueba Dos de pie, la huida del robo sí lo avisó: abajo.)
+- [x] ✅ **Al cancelar con «No cuenta» una habilidad de un creep con turnos de espera** ya no dice «se le devuelve … SP»: el Takle del Goblin (en
+  turnos de espera) → «No cuenta · se le devuelve 2 No2, su cooldown»; quedó con sus 6 No2 y el Takle en 0. (Con SP, el Salto dice «4 No2, 2 SP».)
+- [x] ✅ **El movimiento libre que se pasa de los No2 no cierra el cartel**: Bomba de humo con 3 No2, arrastrar 10 casilleros → no se mueve, aviso
+  «💨 Te pasaste: 3 casilleros son gratis y lo demás cuesta 9 No2 (tenés 3). Probá más corto: el cartel sigue abierto.», el cartel sigue; arrastrar
+  3 → se mueve gratis (3 No2 igual) y el cartel se cierra.
+- [x] ✅ **La huida de un robo con el aviso de oportunidad negada**: el Goblin le robó una Poción de HP a Prueba Dos (una habilidad de prueba con el
+  efecto «Robo») y huyó 2 casilleros → a Prueba Dos: «💨 Goblin picapiedras se alejó de Prueba Dos con la huida del robo: no permite ataque de
+  oportunidad», con «Entendido», y la línea en la Mesa.
+

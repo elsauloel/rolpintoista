@@ -225,3 +225,33 @@ cantidad o la vida de los creeps (por ejemplo, sacar al Arquero o al Alquimista,
 objetivos para que no vayan todos a Larry.
 
 (Simplificación conocida: con «una sola rata» la segunda queda en el mapa sin actuar, como en la primera vuelta; no cambia el resultado.)
+
+### Variante pedida por el dueño: sin el Arquero y el Capataz escapa a la mitad de su vida
+
+Reglas de esta variante: el Arquero no está; cuando el Capataz llega a la mitad de su vida usa el Town portal y sale de la pelea. No cuenta como caído, pero ya no actúa.
+
+- **V1:** dos ratas, Cristal en la ronda 1.
+- **V2:** una sola rata, Cristal en la ronda 2 y ratas sin Ojo crítico.
+
+Son 2000 peleas por fila. «Hasta el final» significa que la pelea sigue hasta que cae un bando, con un tope de 8 rondas.
+
+| Variante | Rondas | Cae Larry | Cae Bizzante | Cae Rockardo | PJ en pie (de 3) | Creeps caídos | Gana el grupo | Cae el grupo entero | Escapa el Capataz | Rondas promedio |
+|---|---|---|---|---|---|---|---|---|---|---|
+| V1 | 3 | 98 % | 95 % | 75 % | 0,32 | 0,16 | 0 % | 75 % | 0 % | 3 |
+| V1 | 4 | 99 % | 99 % | 96 % | 0,06 | 0,22 | 0 % | 96 % | 0 % | 4 |
+| V1 | hasta el final | 99 % | 99 % | 100 % | 0,02 | 0,22 | 0 % | 99 % | 1 % | 3,3 |
+| V2 | 3 | 79 % | 13 % | 3 % | 2,05 | 0,48 | 0 % | 1 % | 0 % | 3 |
+| V2 | 4 | 85 % | 42 % | 39 % | 1,34 | 0,75 | 0 % | 24 % | 1 % | 4 |
+| V2 | hasta el final | 88 % | 72 % | 94 % | 0,46 | 1,11 | 4 % | 71 % | 11 % | 5,8 |
+
+Lectura:
+
+- **Sacar al Arquero no alcanza.** Con dos ratas y el Cristal en R1 (V1), el grupo cae entero casi siempre:
+  - Larry cae en R1–R2.
+  - Bizzante cae en R2–R3.
+  - Rockardo cae en R3–R4.
+- **V2 aguanta mucho más al principio.** Al final de la R3 quedan unos 2 de 3 en pie. Pero si la pelea sigue hasta el final, el grupo gana solo el 4 % y cae entero el 71 %.
+- **El Town portal casi no se usa.** El Capataz escapa como mucho el 11 % de las veces. Al grupo le falta daño para bajarle la mitad de la vida: casi todo el daño se va en la rata y el Rompehuesos.
+- **Para que el encuentro sea ganable con tres PJ de nivel 3** hace falta, además de V2, bajar la vida o la defensa del Rompehuesos, o la del Capataz, o sacar al Alquimista.
+
+Nota: en esta corrida los PJ pueden atacar a cualquier creep (incluidos el Alquimista y el Capataz). En las anteriores tenían una lista de objetivos más corta, por eso los números de V1 cambian apenas.

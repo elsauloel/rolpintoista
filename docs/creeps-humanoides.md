@@ -509,8 +509,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 3 | **Velo espejado** (también la Muralla T2) | — | el escudo, de Buena |
   | 4 | **Purificar** (Flash) | **Potencia especial** | + una Buena |
   | 5 | **Tirar la bronca** | — | + otra Buena |
-  Consumible: Poción de HP. **Transfusión sanguínea** (de la clase Debuffer) pasa al pool de creep (Support) para este creep (dueño, 2026-11-03):
-  falta elegir en qué nivel.
+  Consumible: Poción de HP. **Sin Transfusión sanguínea** (dueño eligió la opción A, 2026-11-03); la Transfusión quedó en el pool de creep del
+  Support y del Debuffer para otros.
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 

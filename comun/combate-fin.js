@@ -104,7 +104,8 @@ const CombateFin = (() => {
   function oroDeCreep(rep, sc){
     if(rep.oro[sc.id] === undefined){
       const base = num(sc.oroBase);
-      rep.oro[sc.id] = base > 0 ? Math.max(0, Math.round(base * (1 + (Math.random() * 0.4 - 0.2)))) : 0;
+      const tirado = base > 0 ? Math.max(0, Math.round(base * (1 + (Math.random() * 0.4 - 0.2)))) : 0;
+      rep.oro[sc.id] = typeof Combatiente !== 'undefined' && Combatiente.oroConRobos ? Combatiente.oroConRobos(tirado, sc) : tirado;   // 🫳 lo robado (2026-11-03)
     }
     return rep.oro[sc.id];
   }
@@ -816,7 +817,7 @@ const CombateFin = (() => {
     const filas = (creeps || []).filter(sc => !sc.recompensado).map(sc => {
       const items = itemsDeCreep(cat, sc).map(x => ({nombre: x.nombre, compra: num(x.precioCompra), venta: ventaDe(x.precioCompra), trofeo: !!x.trofeo,
         estimado: !!(x.template && x.template.estimado)}));
-      const oro = Math.max(0, num(sc.oroBase)), venta = items.reduce((a, i) => a + i.venta, 0), drop = dropEsperado(cat, sc);
+      const oro = typeof Combatiente !== 'undefined' && Combatiente.oroConRobos ? Combatiente.oroConRobos(num(sc.oroBase), sc) : Math.max(0, num(sc.oroBase)), venta = items.reduce((a, i) => a + i.venta, 0), drop = dropEsperado(cat, sc);
       return {nombre: K.nombreLimpio(sc), nivel: num(sc.nivel) || 1, jefe: !!sc.jefe, oro, items, venta, drop, xp: xpDeCreep(sc).total, total: oro + venta + drop.venta};
     });
     const suma = f => filas.reduce((a, x) => a + f(x), 0);

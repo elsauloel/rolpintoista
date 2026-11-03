@@ -34,6 +34,7 @@ const EstadosAplicar = (() => {
     if(s.polaridad) out.polaridad = s.polaridad;
     if(s.item) out.item = String(s.item).slice(0, 64);   // el ítem al que se le da el desgaste (nombre: 'Desgaste')
     if(s.secreto) out.secreto = true;   // 🫳 un robo en sigilo (2026-10-14): se descuenta callado y se avisa al empezar su turno
+    if(s.oro) out.oro = Math.max(0, Math.min(999, Math.round(Number(s.oro) || 0)));   // 🫳 el oro de un robo con el cinturón vacío (2026-11-03)
     if(s.stacks) out.stacks = Math.max(1, Math.min(20, Math.round(Number(s.stacks) || 1)));
     if(s.resetea) out.resetea = true;   // ☠ vuelve a esos stacks, no los suma (la Nube tóxica, 2026-10-26)
     if(s.finCombate) out.finCombate = true;   // 🩸 se va al «Finalizar combate» (la Vida extra del Relicario de sangre, 2026-10-27)

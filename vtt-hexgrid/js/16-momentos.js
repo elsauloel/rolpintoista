@@ -90,6 +90,7 @@ function rodilloMomento(id, d){
 const caosHechos = new Set();
 function momentoRecibido(id, d){
   if(d.tipo === 'robo-pedido'){ if(typeof roboMomento === 'function') roboMomento(id, d); return; }
+  if(d.tipo === 'robo-huida'){ if(typeof roboHuidaMomento === 'function') roboHuidaMomento(id, d); return; }   // 🫳 la huida de un personaje que robó (js/47, 2026-11-03)
   if(d.tipo === 'estallido' && d.datos && d.datos.explota && typeof explosionEmpezar === 'function') explosionEmpezar(d.datos.explota);
   if(d.tipo === 'provocado-brillo' && typeof provocadoBrilloRecibido === 'function') provocadoBrilloRecibido(d);   // 😤 (js/77)   // 😤 la bronca que estalla (js/51)
   if(d.tipo === 'fin-combate' && typeof finCombateMomento === 'function') finCombateMomento(id);   // 🏁 lo de fin de combate de cada uno (js/25)

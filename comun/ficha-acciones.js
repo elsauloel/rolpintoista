@@ -1208,6 +1208,40 @@ const FichaAcciones = (() => {
       return;
     }
     // 🫳 «Robo» (2026-10-14, vtt-hexgrid/js/47): un ladrón se llevó una unidad de este ítem del cinturón.
+    if(spec.nombre === 'Robo' && num(spec.oro) > 0 && !spec.item){   // 🫳 con el cinturón vacío se lleva oro (2026-11-03, dueño: «1d6 por nivel»)
+      const antes = Math.max(0, num(S.meta && S.meta.dde)), lleva = Math.min(antes, Math.round(num(spec.oro)));
+      if(!(lleva > 0)){ if(!spec.secreto) ui.toast(`🫳 ${origen ? origen + ' ' : ''}intentó robarte oro, pero no tenías`); return; }
+      S.meta.dde = Math.round((antes - lleva) * 100) / 100;
+      if(spec.secreto){ S.robosSinNotar = [...(Array.isArray(S.robosSinNotar) ? S.robosSinNotar : []), `${fmt(lleva)} DDE`].slice(-10); ui.cambio(['meta', 'cinturon', 'refresh']); return; }
+      ui.cambio(['meta', 'refresh']);
+      ui.toast(`🫳 ${origen || 'Alguien'} te robó ${fmt(lleva)} DDE (${fmt(antes)} → ${fmt(S.meta.dde)})`);
+      return;
+    }
+    // 🫳 «Robo ganado» (2026-11-03): este personaje le robó a un creep — una unidad de un ítem (al cinturón si hay lugar, si no a la mochila) u oro.
+    if(spec.nombre === 'Robo ganado'){
+      const quien = origen ? origen + ': ' : '';
+      if(num(spec.oro) > 0 && !spec.item){
+        const antes = num(S.meta && S.meta.dde);
+        S.meta.dde = Math.round((antes + num(spec.oro)) * 100) / 100;
+        ui.cambio(['meta', 'refresh']);
+        ui.toast(`🫳 ${quien}te llevaste ${fmt(num(spec.oro))} DDE (${fmt(antes)} → ${fmt(S.meta.dde)})`);
+        return;
+      }
+      if(!spec.item) return;
+      const cat = typeof CATALOGO_BASE !== 'undefined' ? CATALOGO_BASE.find(i => i && i.nombre === spec.item) : null;
+      const base = cat ? structuredClone(cat) : {nombre: String(spec.item), tipoItem: 'consumibles', consumible: true, detalle: 'Robado.'};
+      S.inventario = Array.isArray(S.inventario) ? S.inventario : [];
+      const c = {...base, id: uid(), unidades: 1, consumible: base.consumible !== false};
+      let donde = 'a la mochila';
+      S.inventario.push(c);
+      if(typeof FichaEquipo !== 'undefined' && FichaEquipo.cinturonLibre && FichaEquipo.cinturonLibre(S) > 0 && FichaEquipo.alCinturon(S, c, 1).movidas){
+        donde = 'al cinturón';
+        if(!(num(c.unidades) > 0)) S.inventario = S.inventario.filter(x => x !== c);
+      }
+      ui.cambio(['mochila', 'equipo', 'cinturon', 'refresh']);
+      ui.toast(`🫳 ${quien}te llevaste ${spec.item} (${donde})`);
+      return;
+    }
     if(spec.nombre === 'Robo'){
       const it = (S.cinturon || []).find(x => x && x.nombre === spec.item && num(x.unidades) > 0 && !x.reservado);
       if(!it){ if(!spec.secreto) ui.toast(`🫳 ${origen ? origen + ' ' : ''}intentó robarte ${spec.item || 'algo'}, pero ya no lo tenías`); return; }

@@ -10,7 +10,9 @@
    puede que estés flasheando», el ítem pasa callado y sigue en sigilo; la víctima se da cuenta al empezar su próximo turno («sentís el
    cinturón más liviano…», `robosSinNotar` → `roboAvisoNotado`). Si pierde: «¡juan pescó a X metiendo mano en su cinturón!» — pierde el
    sigilo y queda Marcado 2 turnos (js/03).
-   Hoy: un creep le roba a un personaje. Un personaje que le roba a un creep, y robar oro si no hay nada en el cinturón, pendientes. */
+   Desde el 2026-11-03 (dueño): también un personaje le roba a un creep (roboDeCreep: lo aplica el GM; a la ficha le llega «Robo ganado»), y con el
+   cinturón vacío se lleva oro, 1d6 × el nivel del ladrón (roboOro: `oroRobado` / `oroPerdido` del creep, que lee el botín). La huida paga el movimiento,
+   sin ataque de oportunidad; la de un personaje se le abre en su pantalla (momento `robo-huida`). La habilidad de fábrica: «Bolsillo ajeno». */
 const ROBO_HUIDA = 3;
 const esRobo = hab => !!(hab && (hab.efectos || []).some(e => e && /^robo$/i.test(String(e.nombre || (e.spec && e.spec.nombre) || '').trim())));
 // ¿Está en el punto ciego del otro? (como porLaEspalda, js/13, pero sin pedir sigilo)
@@ -33,7 +35,16 @@ function roboBono(ataque, mio, t){
 }
 // Qué se lleva: una unidad al azar del cinturón publicado, sin contar lo ya robado que su ficha todavía no descontó. → {nombre} | {nada} | {manual, nota}
 async function roboElegir(t){
-  if(t.tipo !== 'pj' || String(t.fichaId || '').includes(SEP_INVOCACION)) return {manual: true, nota: 'robarle a un creep o a una invocación, por ahora a mano'};
+  // 🫳 A un creep (2026-11-03, dueño: «personajes y creeps, no estaría mal»): una unidad al azar de su cinturón (lo lee el GM, que aplica el efecto).
+  if(t.tipo === 'creep'){
+    const sc = creepPrivadoDe(t.fichaId);
+    if(!sc) return {manual: true, nota: `no se ve el cinturón de ${nombreDe(t)}: el robo, a mano`};
+    const bolsa = (Array.isArray(sc.cinturon) ? sc.cinturon : []).flatMap(x => Array(Math.max(0, Math.min(20, Math.round(num(x && x.unidades))))).fill(x)).filter(x => x && x.nombre);
+    if(!bolsa.length) return {nada: true};
+    const x = bolsa[Math.floor(Math.random() * bolsa.length)];
+    return {nombre: String(x.nombre), id: x.id};
+  }
+  if(t.tipo !== 'pj' || String(t.fichaId || '').includes(SEP_INVOCACION)) return {manual: true, nota: 'robarle a una invocación, por ahora a mano'};
   const f = fichasPub.get(t.fichaId), cin = f && f.resumen && Array.isArray(f.resumen.cinturon) ? f.resumen.cinturon : null;
   if(!cin) return {manual: true, nota: `no se ve el cinturón de ${nombreDe(t)} (que abra su ficha una vez): el robo, a mano`};
   const bolsa = cin.flatMap(x => Array(Math.max(0, Math.min(20, Math.round(num(x && x.u))))).fill(String((x && x.n) || '')).filter(Boolean));
@@ -75,15 +86,75 @@ async function roboAplicar(d, t){
   const e = await roboElegir(t);
   if(e.manual) return e;
   if(e.nada){
-    momentoAbrir({tipo: 'robo', icono: '🫳', titulo: `${d.atacante.nombre} intentó robarle a ${nombreDe(t)}`, resultado: 'No tenía nada en el cinturón.', estado: 'listo'});
-    return {nota: `${nombreDe(t)} no tenía nada en el cinturón`};
+    // 💰 Con el cinturón vacío se lleva oro (2026-11-03, dueño: «si el cinturón está vacío, se lleva oro, 1d6 por nivel»).
+    const n = roboOroCuanto(d.atacante);
+    const mal = await roboOro(d.atacante, t, n, false);
+    if(mal) return mal;
+    momentoAbrir({tipo: 'robo', icono: '🫳', titulo: `${d.atacante.nombre} le robó a ${nombreDe(t)}`, resultado: `No tenía nada en el cinturón: se llevó oro (hasta ${n} DDE). Si lo atrapan, lo recuperan.`, estado: 'listo'});
+    roboHuidaDe(d.atacante, d.id);
+    return {nota: `le robó oro (1d6 × nivel: ${n} DDE)`};
   }
-  const mal = await roboPasar(d.atacante, t, e.nombre, false);
+  const mal = t.tipo === 'creep' ? await roboDeCreep(d.atacante, t, e) : await roboPasar(d.atacante, t, e.nombre, false);
   if(mal) return mal;
   momentoAbrir({tipo: 'robo', icono: '🫳', titulo: `${d.atacante.nombre} le robó a ${nombreDe(t)}`, resultado: `Se llevó: ${e.nombre}. Si lo atrapan, lo recuperan.`, estado: 'listo'});
-  roboHuida(d.atacante.tokenId, d.atacante.nombre, d.id);
+  roboHuidaDe(d.atacante, d.id);
   return {nota: `le robó ${e.nombre}`};
 }
+// 💰 Cuánto oro: 1d6 × el nivel del ladrón (un creep: su nivel; un personaje: el de su ficha).
+function roboOroCuanto(atacante){
+  let nivel = 1;
+  try{
+    if(atacante.tipo === 'creep'){ const sc = creepPrivadoDe(atacante.ref); nivel = Math.max(1, Math.round(num(sc && sc.nivel)) || 1); }
+    else{ const f = fichasPub.get(atacante.ref); nivel = Math.max(1, Math.round(num(f && f.resumen && f.resumen.nivel)) || 1); }
+  }catch(err){}
+  return Combatiente.roboOro ? Combatiente.roboOro(nivel) : (1 + Math.floor(Math.random() * 6)) * nivel;
+}
+// 💰 Pasa el oro: de un personaje (el aviso a su ficha, que descuenta lo que tenga) a un creep (`oroRobado`, vuelve en el botín), o de un creep
+// (`oroPerdido`, se le descuenta del botín) a un personaje (el aviso «Robo ganado»). `secreto`: el robado se entera al empezar su turno.
+async function roboOro(atacante, t, n, secreto){
+  try{
+    if(t.tipo === 'creep'){
+      await modificarCreep(t.fichaId, sc => { sc.oroPerdido = Math.max(0, num(sc.oroPerdido)) + n; return {}; });
+      await EstadosAplicar.encolarPj({fichaId: atacante.ref, duenoUid: atacante.uid || '', spec: {nombre: 'Robo ganado', oro: n}, origen: `le robaste a ${nombreDe(t)}`});
+      return null;
+    }
+    if(atacante.tipo === 'creep') await modificarCreep(atacante.ref, sc => { sc.oroRobado = Math.max(0, num(sc.oroRobado)) + n; return {}; });
+    await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: {nombre: 'Robo', oro: n, ...(secreto ? {secreto: true} : {})}, origen: atacante.nombre || 'Un ladrón'});
+    return null;
+  }catch(err){ console.error('No se pudo pasar el oro robado:', err); return {manual: true, nota: `el oro robado (${n} DDE), a mano`}; }
+}
+// 🫳 Un personaje le roba a un creep: se le saca la unidad al creep (lo hace el GM) y le llega a la ficha del personaje («Robo ganado»).
+async function roboDeCreep(atacante, t, e){
+  try{
+    await modificarCreep(t.fichaId, sc => {
+      const lista = Array.isArray(sc.cinturon) ? sc.cinturon : [];
+      const x = lista.find(i => i && (e.id ? i.id === e.id : i.nombre === e.nombre) && num(i.unidades) > 0) || lista.find(i => i && i.nombre === e.nombre && num(i.unidades) > 0);
+      if(x){ x.unidades = num(x.unidades) - 1; if(x.unidades <= 0) sc.cinturon = lista.filter(i => i !== x); }
+      return {};
+    });
+  }catch(err){ console.error('No se pudo sacar lo robado al creep:', err); return {manual: true, nota: `sacale ${e.nombre} al creep a mano`}; }
+  if(atacante.tipo === 'pj'){
+    try{ await EstadosAplicar.encolarPj({fichaId: atacante.ref, duenoUid: atacante.uid || '', spec: {nombre: 'Robo ganado', item: e.nombre}, origen: `le robaste a ${nombreDe(t)}`}); }
+    catch(err){ console.error('No se pudo dar lo robado:', err); return {manual: true, nota: `dale ${e.nombre} al ladrón a mano`}; }
+  }
+  return null;
+}
+// La huida de quien robó: si es un creep, en esta pantalla (la del GM); si es un personaje, en la de su dueño (un momento que le abre el cartel).
+// Paga el movimiento (dueño, 2026-11-03: «la huida no es gratis, pero no tiene ataque de oportunidad»).
+function roboHuidaDe(atacante, id){
+  if(atacante.tipo === 'creep' || (atacante.uid && fbUsuario && atacante.uid === fbUsuario.uid)){ roboHuida(atacante.tokenId, atacante.nombre, id); return; }
+  momentoAbrir({tipo: 'robo-huida', icono: '🫳', titulo: `${atacante.nombre} se escapa con lo robado`, estado: 'listo',
+    datos: {paraUid: atacante.uid || '', tokenId: atacante.tokenId, nombre: atacante.nombre || ''}});
+}
+function roboHuidaMomento(id, d){
+  const dt = d.datos || {};
+  if(!fbUsuario || dt.paraUid !== fbUsuario.uid || roboHuidasVistas.has(id)) return;
+  roboHuidasVistas.add(id);
+  const t0 = d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now();
+  if(Date.now() - t0 > 60000) return;
+  roboHuida(dt.tokenId, dt.nombre, id);
+}
+const roboHuidasVistas = new Set();
 // La huida: el cartel del dodge roll para el ladrón (en la pantalla que aplica el efecto: la del GM, que maneja al creep).
 function roboHuida(tid, nombre, id){
   if(!tid || !tokens.has(tid)) return;
@@ -156,11 +227,15 @@ async function roboResolver(id, percepcion){
     const e = t ? await roboElegir(t) : {manual: true, nota: 'la víctima ya no está en el mapa'};
     let nota = '';
     if(e.manual) nota = `✋ ${e.nota}.`;
-    else if(e.nada) nota = `No tenía nada en el cinturón: no se llevó nada.`;
+    else if(e.nada){
+      const n = roboOroCuanto(s.ladron), mal = await roboOro(s.ladron, t, n, true);
+      nota = mal ? `✋ ${mal.nota}.` : `No tenía nada en el cinturón: se llevó oro (hasta ${n} DDE). Sigue en sigilo; ${s.victima} se da cuenta al empezar su próximo turno.`;
+      if(!mal) e.oro = n;
+    }
     else{ const mal = await roboPasar(s.ladron, t, e.nombre, true); nota = mal ? `✋ ${mal.nota}.` : `Se llevó: ${e.nombre}. Sigue en sigilo; ${s.victima} se da cuenta al empezar su próximo turno.`; }
     s.resultado = `No lo vio (Percepción ${percepcion} contra Sigilo ${s.sigilo}). ${nota}`;
     await momentoActualizar(id, {estado: 'listo', resultado: 'flasheando', datos: {paraUid: (t && t.duenoUid) || '', victimaId: s.victimaId, pillado: false}});
-    if(e.nombre) roboHuida(s.ladron.tokenId, s.ladron.nombre, id);
+    if(e.nombre || e.oro) roboHuida(s.ladron.tokenId, s.ladron.nombre, id);
   }
   roboGMDibujar(id);
 }

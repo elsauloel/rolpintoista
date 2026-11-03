@@ -45,7 +45,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-transfusion.js?v=20261103fx2"></script>
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
-<script src="combatiente.js?v=20261103m2"></script>
+<script src="combatiente.js?v=20261103r1"></script>
 <script src="creep-calculo.js?v=20261103t20"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261103tf1"></script>
@@ -53,7 +53,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
 <script src="estados-presets.js?v=20261103t14"></script>
-<script src="estados-aplicar.js?v=20261103t12"></script>
+<script src="estados-aplicar.js?v=20261103r1"></script>
 <script src="recibidos.js?v=20261103pm"></script>
 <script src="tokens-auto.js"></script>
 <script src="creeps-mapas.js"></script>
@@ -76,7 +76,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js"></script>
-<script src="ficha-acciones.js?v=20261103ve"></script>
+<script src="ficha-acciones.js?v=20261103r1"></script>
 <script src="ficha-mantenimiento.js?v=20261103ve"></script>
 <script src="estado-preguntas.js"></script>
 <script src="asistente-estado.js"></script>
@@ -117,7 +117,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="pasivas.js"></script>
 <script src="skills-clase.js?v=20261103t12"></script>
 <script src="creeps-base.js"></script>
-<script src="skills-creep-base.js?v=20261103t14"></script>
+<script src="skills-creep-base.js?v=20261103r1"></script>
 <script src="creeps-esenciales.js?v=20261103t21"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -5903,7 +5903,7 @@ prueba('🌱 Las habilidades de los creeps de «El origen» entre las de fábric
   const h = armarHabilidadDeCreep(o.find(e => e.nombre === '¡Tu vieeeja!').datos, 7);
   igual([o.length, o.every(e => e.etiquetas.includes('sin auditar') && e.rol && e.concepto), h.nombre, !!h.duelo, o.some(e => e.nombre === 'Mal de ojo (El origen)'),
     HABILIDADES_CREEP_BASE.filter(e => e.nombre === 'Mal de ojo').length, new Set(HABILIDADES_CREEP_BASE.map(e => e.poolId)).size === HABILIDADES_CREEP_BASE.length],
-    [50, true, '¡Tu vieeeja!', true, true, 1, true]);   // 50: y el Mordisco infectado pasó a ser de fábrica   // 51 desde el 2026-10-25: se sacaron el Mordisco que lisia (duplicado) y el Corte profundo viejo
+    [49, true, '¡Tu vieeeja!', true, true, 1, true]);   // 49 (2026-11-03): el Bolsillo ajeno pasó a ser de fábrica   // 50: y el Mordisco infectado pasó a ser de fábrica   // 51 desde el 2026-10-25: se sacaron el Mordisco que lisia (duplicado) y el Corte profundo viejo
 });
 prueba('📣 ¡A la carga! y Arenga (Support, 2026-10-23): onda a los aliados a 4; +2 a lo ofensivo 2 turnos / Bendecido 3 turnos; auditadas; los gritos viejos salieron del pool', () => {
   const e = n => HABILIDADES_CREEP_BASE.find(x => x.nombre === n), a = armarHabilidadDeCreep(e('¡A la carga!').datos, 3), b = armarHabilidadDeCreep(e('Arenga').datos, 3);
@@ -6697,6 +6697,15 @@ prueba('🛡 Escudo humano, la animación (2026-11-03): el reparto igual que el 
     f0.impacto, f0.entero, f0.partido, f500.partido, f500.viaje > 0, f1200.pulso !== null, f1600.fin,
     F.reflejo(0, 0) === 0, F.reflejo(F.REFLEJO_DURA + 10, 0), F.respiro(0) > 0.2 && F.respiro(0) < 0.6],
     [6, 6, 4, 3, 1, 0, 0, 11, 20, 80, true, 1, 1, false, true, true, true, true, true, null, true]);
+});
+prueba('🫳 Bolsillo ajeno (2026-11-03): de fábrica en Choque liviano, Sigilo contra Percepción, lenta que arranca en espera, efecto Robo; el oro 1d6 × nivel y el botín', () => {
+  const e = HABILIDADES_CREEP_BASE.filter(x => x.nombre === 'Bolsillo ajeno');
+  const h = armarHabilidadDeCreep(e[0].datos, 1);
+  const x = Combatiente.habEjecucion(h, h.duelo, {stat: s => ({sigilo: 6})[s] || 0, etq: s => s});
+  igual([e.length, e[0].etiquetas.includes('choque liviano'), e[0].etiquetas.includes('robar'), x.tira.stat, x.contra.map(c => c.stat || c).join(), x.efectos[0].nombre, h.cd, num(h.cdActual) > 0 || !!h.arrancaEnCooldown,
+    Combatiente.roboOro(1, () => 0), Combatiente.roboOro(3, () => 0.99), Combatiente.roboOro(2, () => 0.5),
+    Combatiente.oroConRobos(10, {oroRobado: 6}), Combatiente.oroConRobos(10, {oroPerdido: 15}), Combatiente.oroConRobos(10, {})],
+    [1, true, true, 'sigilo', 'percepcion', 'Robo', 3, true, 1, 18, 8, 16, 0, 10]);
 });
 prueba('🗄 Referencia (2026-11-03): los creeps de fábrica sin auditar salen del pool de campaña y van a «Referencia»', () => {
   const ref = CREEPS_BASE.filter(c => c.pool !== 'esencial' && Biblioteca.sinAuditarDeFabrica(c));

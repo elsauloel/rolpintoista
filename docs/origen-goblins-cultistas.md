@@ -454,6 +454,7 @@ Propuesta (esperando el OK; skills auditadas salvo el Chillido, que sale de «Pl
   lagarto overo** (Def.Esp +1, Res. fuego +1).
 - **Skills (4)**: **Disparo señalador**, **Ráfaga encadenada** y **Vigilancia** (las de antes) y, en lugar de Tiro a la cabeza, **Mina del cazador**
   (2 No2, 3 SP, cd 3: mina oculta, 2d6+2 de fuego directo en las 7 casillas y Pajaritos; en una galería angosta corta el paso).
+- **Disparo señalador → «Marca de caza»** (dueño, 2026-11-03, cargándolo a mano): el mismo efecto, con ese nombre en este arquero.
 - Si se lo quiere a **nivel 4**: +3 atributos (Des 11, Con 9, Agi 10) y vuelve Tiro a la cabeza como quinta skill.
 
 ### 🔥🧪 Encuentro 2 — Goblin chamán del azufre (Mago: ácido y fuego), nivel 4 (dueño, 2026-10-31: «un chamán goblin elemental; quiero que use ácido, y puede ser fuego, hielo»)

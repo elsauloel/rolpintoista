@@ -112,7 +112,7 @@ function abrirBotoneraPrincipal(){
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
 const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261101correa', '../comun/ficha-botin.js?v=20261026zy', '../comun/generador-tiendas.js?v=20261028z', '../comun/filtro-catalogo.js?v=20261028z', '../comun/ficha-tienda.js?v=20261028x2', '../comun/ficha-mantenimiento.js?v=20261030it1', '../comun/ficha-calculo.js?v=20261028w', '../comun/ficha-combate.js?v=20261015d', '../comun/skills-clase.js?v=20261031ae', '../comun/ficha-habilidades.js?v=20261020q',
-  '../comun/catalogo.js?v=20261029t', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261029u', '../comun/ficha-sesion.js?v=20261020zu', '../comun/ficha-botonera.js?v=20261029z2', '../comun/ficha-resumen.js?v=20261103nit2', '../comun/inv-calculo.js?v=20261103t2b', '../comun/inv-botonera.js?v=20261023p8a', '../comun/inv-acciones.js?v=20261103t2b', '../comun/inv-duelo.js?v=20261103t4', '../comun/ficha-acciones.js?v=20261103t2b', '../comun/inv-habilidades.js?v=20261029z', '../comun/inv-lupa.js?v=20261015a',
+  '../comun/catalogo.js?v=20261029t', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261029u', '../comun/ficha-sesion.js?v=20261020zu', '../comun/ficha-botonera.js?v=20261103hk', '../comun/ficha-resumen.js?v=20261103nit2', '../comun/inv-calculo.js?v=20261103t2b', '../comun/inv-botonera.js?v=20261023p8a', '../comun/inv-acciones.js?v=20261103t2b', '../comun/inv-duelo.js?v=20261103t4', '../comun/ficha-acciones.js?v=20261103t2b', '../comun/inv-habilidades.js?v=20261029z', '../comun/inv-lupa.js?v=20261015a',
   '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261103t4', '../comun/lupa.js?v=20261030lp2', '../comun/ficha-lupa.js?v=20261030lp2'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
 /* El panel del costado es angosto (2026-10-02, pedido del dueño: "la botonera nueva se ve muy mal… cada bloque debe estar ubicado debajo del
@@ -201,7 +201,7 @@ function bnDibujar(){
   const cuerpo = bn.raiz.querySelector('#bn-contenido');
   if(!bn.S){ cuerpo.innerHTML = '<div class="modal catalogo-modal botonera-modal"><div class="body"><div class="hint">Cargando el personaje…</div></div></div>'; return; }
   if(bn.invId){ bnDibujarInv(cuerpo); return; }
-  const r = FichaBotonera.html(bn.S, {modoMapa, parryArmaPendiente: bn.parryPendiente || null, ...(typeof armasOpciones === 'function' ? armasOpciones(tokenDePj(bn.fichaId)) : {}), ...(typeof atrapadosOpciones === 'function' ? atrapadosOpciones(tokenDePj(bn.fichaId)) : {})});
+  const r = FichaBotonera.html(bn.S, {modoMapa, atajos: true, parryArmaPendiente: bn.parryPendiente || null, ...(typeof armasOpciones === 'function' ? armasOpciones(tokenDePj(bn.fichaId)) : {}), ...(typeof atrapadosOpciones === 'function' ? atrapadosOpciones(tokenDePj(bn.fichaId)) : {})});
   // 🗿 Estoicismo (js/85): la Defensa del encabezado con lo de este momento.
   const est = typeof estoicoAhora === 'function' ? estoicoAhora(tokenDePj(bn.fichaId)) : null;
   const def = est ? r.def.replace(/^Def (-?\d+)/, (x, d) => `Def ${num(d) + est.val}`) : r.def;
@@ -222,6 +222,7 @@ function bnDibujar(){
   </div>`;
   bnPintarColapsados();
   bn.host.scrollTop = scroll;
+  if(typeof atajoReponer === 'function') atajoReponer();   // ⌨ el cuadradito que espera su número (js/93)
 }
 /* Paso 4, etapa 4e (tanda 2): la Botonera de una invocación del personaje, dibujada con comun/inv-botonera.js (la misma de la
    ficha) a partir de la invocación que trae el personaje (S.invocaciones, al día con FichaSesion). Por ahora cada botón se lo

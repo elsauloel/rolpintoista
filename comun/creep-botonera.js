@@ -142,9 +142,11 @@ const CreepBotonera = (() => {
       return {id: h.id, nombre: h.nombre || 'Sin nombre', disabled: !!bloqueo, rojo: sinSp, motivo, attr:`data-ejecutar="${sc.id}:${h.id}"`, flash: Combatiente.esFlash(h), boton: botonHabTxt(h), segunda: botonSegundaHab(h, sc), cdHtml: C().modoSP(sc) ? '' : cdControlesHtml(sc, h)};
     });
 
+    // ⌨ Los atajos (2026-11-03, dueño): el cuadradito a la izquierda, solo si la pantalla lo pide (el mapa). comun/atajos.js
+    const at = o.atajos && typeof Atajos !== 'undefined' ? (sc.atajos || {}) : null;
     const filaHab = f => `
     <div class="accion-row">
-      <div class="accion-nombre">${esc(f.nombre)}</div>
+      ${at ? Atajos.cuadroHtml(at, 'hab', f.id) : ''}<div class="accion-nombre">${esc(f.nombre)}</div>
       <span class="hab-estado ${f.disabled || f.rojo?'cd':'ok'}">${esc(f.motivo)}</span>
       <button class="verbtn" data-verhabaccion="${sc.id}:${f.id}">Ver</button>
       ${lupaBotonHtml(`${sc.id}|hab|${f.id}`, 'mini')}
@@ -193,7 +195,7 @@ const CreepBotonera = (() => {
         <button type="button" class="btn chico" data-modosp="${esc(sc.id)}" title="Probar sus habilidades pagando con SP (sin cooldown) o con cooldown, como siempre">${C().modoSP(sc) ? `💧 Con SP · ${fmt(C().spActual(sc))}/${fmt(C().spMax(sc))} (recarga ${fmt(C().spRegen(sc))})` : '⏱ Con cooldown'} ⇄</button></div>
       <div class="botonera-list-grid">${filasHab.map(filaHab).join('')}</div>
     </div>
-    ${cinturonHtml(sc, o)}`;
+    ${cinturonHtml(sc, o)}${at ? `<style>${Atajos.CSS}</style>` : ''}`;
     return {titulo: sc.nombre, badge: `No2 ${fmt(num(sc.nitros))}/${fmt(nitrosMax(sc))}${C().modoSP(sc) ? ` · SP ${fmt(C().spActual(sc))}/${fmt(C().spMax(sc))}` : ''}`, html: cuerpo + Combatiente.FLASH_CSS};
   }
 
@@ -203,9 +205,10 @@ const CreepBotonera = (() => {
   function cinturonHtml(sc, opts){
     const o = opts || {}, usado = C().cinturonUsado(sc), cap = C().capCinturon(sc);
     const costo = Combatiente.conExtenuado(sc.estados, typeof FichaCalculo !== 'undefined' ? num(FichaCalculo.IT2.nitrosConsumirCinturon) || 1 : 1);   // + Extenuado
+    const at = o.atajos && typeof Atajos !== 'undefined' ? (sc.atajos || {}) : null;   // ⌨ los atajos (Shift + número)
     const filas = (sc.cinturon || []).map(it => `
       <div class="accion-row">
-        <div class="accion-nombre"><span${it.detalle ? ` title="${esc(it.detalle)}" style="text-decoration:underline dotted;cursor:help"` : ''}>${esc(it.nombre)}</span>${it.azar ? ' <span title="Su consumible al azar: si lo usa, lo suelta seguro; si no, con la chance de su tipo">🎲</span>' : ''} <span class="hint">×${fmt(num(it.unidades))}${num(it.curahp) ? ` · ${num(it.curahp) > 0 ? '+' : ''}${fmt(num(it.curahp))} HP` : ''}${it.efectoNombre ? ` · ${esc(it.efectoNombre)}` : ''}</span></div>
+        ${at ? Atajos.cuadroHtml(at, 'cons', it.id) : ''}<div class="accion-nombre"><span${it.detalle ? ` title="${esc(it.detalle)}" style="text-decoration:underline dotted;cursor:help"` : ''}>${esc(it.nombre)}</span>${it.azar ? ' <span title="Su consumible al azar: si lo usa, lo suelta seguro; si no, con la chance de su tipo">🎲</span>' : ''} <span class="hint">×${fmt(num(it.unidades))}${num(it.curahp) ? ` · ${num(it.curahp) > 0 ? '+' : ''}${fmt(num(it.curahp))} HP` : ''}${it.efectoNombre ? ` · ${esc(it.efectoNombre)}` : ''}</span></div>
         <button class="hab-ejecutar" data-cin-consumir="${sc.id}:${it.id}" ${num(sc.nitros) < costo ? 'title="No le alcanzan los No2: pregunta antes"' : ''}>Usar · ${fmt(costo)} No2</button>
         <button class="verbtn" data-cin-quitar="${sc.id}:${it.id}" title="Sacarlo del cinturón">✕</button>
       </div>`).join('');

@@ -5,7 +5,7 @@
    salen de la parte privada del creep que el mapa ya escucha (creepsPriv). Por ahora solo dibuja: cada botón se lo pide a GM
    Tools en el marco (mensaje 'acciones-delegar'), que lo toca como siempre; lo que abra (el menú de ataque, Ver, un cartel) sale
    encima, en la capa de siempre. Sin 🔍 todavía (la de los creeps vive en GM Tools: 4c). */
-const AC_PIEZAS = ['../comun/lupa.js?v=20261030lp2', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261103amp', '../comun/creep-botonera.js?v=20261030cn2', '../comun/creep-acciones.js?v=20261103fl', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261103t4'];
+const AC_PIEZAS = ['../comun/lupa.js?v=20261030lp2', '../comun/presets-gm.js?v=20261002a', '../comun/creep-lupa.js?v=20261103amp', '../comun/creep-botonera.js?v=20261103hk', '../comun/creep-acciones.js?v=20261103fl', '../comun/confirmar-turno.js?v=20261011a', '../comun/creep-duelo.js?v=20261103t4'];
 var ac = null;          // {creepId, host, raiz}
 var acCss = '';
 var acCargando = null;
@@ -39,7 +39,7 @@ function acDibujar(){
   // El catálogo para cargarle consumibles al cinturón (2026-10-04): llega con las piezas de la Botonera nueva.
   const consumibles = typeof CATALOGO_BASE !== 'undefined' ? CreepAcciones.consumiblesDe(CATALOGO_BASE) : null;
   if(!consumibles && typeof bnCargarPiezas === 'function' && !ac.cargandoCatalogo){ ac.cargandoCatalogo = true; bnCargarPiezas().then(() => acDibujar()).catch(() => {}); }
-  const r = CreepBotonera.html(sc, {parryPendiente: acParry.has(ac.creepId), consumibles, cinSel: ac.cinSel, ...(typeof armasOpciones === 'function' ? armasOpciones(tokenDeCreep(ac.creepId)) : {}), ...(typeof atrapadosOpciones === 'function' ? atrapadosOpciones(tokenDeCreep(ac.creepId)) : {})});
+  const r = CreepBotonera.html(sc, {atajos: true, parryPendiente: acParry.has(ac.creepId), consumibles, cinSel: ac.cinSel, ...(typeof armasOpciones === 'function' ? armasOpciones(tokenDeCreep(ac.creepId)) : {}), ...(typeof atrapadosOpciones === 'function' ? atrapadosOpciones(tokenDeCreep(ac.creepId)) : {})});
   const scroll = ac.host.scrollTop;
   cuerpo.innerHTML = `<div class="modal acciones-modal">
     <header>
@@ -53,6 +53,7 @@ function acDibujar(){
     <div class="body">${r.html}</div>
   </div>`;
   ac.host.scrollTop = scroll;
+  if(typeof atajoReponer === 'function') atajoReponer();   // ⌨ el cuadradito que espera su número (js/93)
   acVerCreepDibujar();   // el 🔍 Ver todo, si está abierto (A6a)
 }
 /* Paso 4c (tandas 1 y 2): lo que el mapa ya hace él mismo, con comun/creep-acciones.js — las tiradas de stats, Esquivar, Fuerza

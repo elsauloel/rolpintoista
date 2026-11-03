@@ -89,6 +89,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="escaneo-grupo.js"></script>
 <script src="trampas-base.js"></script>
 <script src="confirmar.js"></script>
+<script src="atajos.js"></script>
 <script src="pausa.js"></script>
 <script src="glosario.js"></script>
 <script src="item-corto.js"></script>
@@ -6532,6 +6533,36 @@ prueba('🩸 Transfusión: el número exacto (2026-11-03): de 1 al máximo, escr
   const c = FxTransfusion.cantidad;
   igual([c('7', 15).n, c(' 15 ', 15).n, c('1', 15).n, !!c('16', 15).error, !!c('0', 15).error, !!c('abc', 15).error, !!c('2.5', 15).error, !!c('', 15).error, /15/.test(c('20', 15).error), FxTransfusion.DURACION],
     [7, 15, 1, true, true, true, true, true, true, 3300]);
+});
+prueba('⌨ Atajos (2026-11-03): la tecla (Digit/Numpad, Shift = consumible, Ctrl/Alt no), asignar sin repetir, qué hace cada tecla', () => {
+  const T = (code, o = {}) => Atajos.teclaDe({code, ...o});
+  let at = Atajos.asignar({}, 'hab', 'h1', '3');
+  at = Atajos.asignar(at, 'hab', 'h2', '3');          // el 3 pasa a h2: h1 se queda sin número
+  at = Atajos.asignar(at, 'hab', 'h2', '5');          // h2 cambia de número: el 3 queda libre
+  at = Atajos.asignar(at, 'cons', 'cinturon:p1', '1');
+  const sinH9 = Atajos.limpiar(Atajos.asignar(at, 'hab', 'h9', '7'), (t, id) => id !== 'h9');
+  const existe = (t, id) => id !== 'borrada';
+  igual([JSON.stringify(T('Digit3')), JSON.stringify(T('Numpad0', {shiftKey: true})), T('Digit1', {ctrlKey: true}), T('KeyA'),
+    Atajos.numeroDe(at, 'hab', 'h1'), Atajos.numeroDe(at, 'hab', 'h2'), at.hab['3'], at.cons['1'],
+    JSON.stringify(Atajos.accion(at, {n: '5', shift: false}, existe)), JSON.stringify(Atajos.accion(at, {n: '1', shift: true}, existe)),
+    Atajos.accion(at, {n: '4', shift: false}, existe).vacio, Atajos.accion(Atajos.asignar(at, 'hab', 'borrada', '9'), {n: '9', shift: false}, existe).perdido,
+    sinH9.cambio, sinH9.at.hab['7'], Atajos.numeroDe(Atajos.quitar(at, 'hab', 'h2'), 'hab', 'h2'), Atajos.etiqueta('cons', '1')],
+    ['{"n":"3","shift":false}', '{"n":"0","shift":true}', null, null, '', '5', undefined, 'cinturon:p1',
+     '{"tipo":"hab","n":"5","id":"h2"}', '{"tipo":"cons","n":"1","id":"cinturon:p1"}', true, true, true, undefined, '', '⇧1']);
+});
+prueba('⌨ Atajos en la Botonera y en las Acciones (2026-11-03): el cuadradito solo si la pantalla lo pide, con el número guardado', () => {
+  const S = FichaGuardado.normalizar({}, {}).S; FichaGuardado.completar(S);
+  S.habilidades = [{id: 'hx', nombre: 'Golpe de prueba', costo: '1', nitrosCosto: 1}];
+  S.cinturon = [{id: 'px', nombre: 'Poción de prueba', consumible: true, unidades: 1, curahp: 5}];
+  S.meta.atajos = {hab: {'3': 'hx'}, cons: {'1': 'cinturon:px'}};
+  const con = FichaBotonera.html(S, {atajos: true, lupa: false}).html, sin = FichaBotonera.html(S, {lupa: false}).html;
+  const sc = CreepCalculo.normalizar(structuredClone(CREEPS_BASE.find(c => c.pool === 'esencial' && c.nombre === 'Escudero').datos)); sc.id = 'cx';
+  sc.habilidades.forEach((h, i) => { h.id = 'hc' + i; });   // (las del pool de fábrica todavía no traen id: se lo pone el juego al agregarlo)
+  const h0 = sc.habilidades[0].id; sc.atajos = {hab: {'2': h0}};
+  const cc = CreepBotonera.html(sc, {atajos: true, lupa: false}).html;
+  igual([/data-atajo="hab:hx"[^>]*>3</.test(con), /data-atajo="cons:cinturon:px"[^>]*>⇧1</.test(con), sin.includes('data-atajo'),
+    new RegExp(`data-atajo="hab:${h0}"[^>]*>2<`).test(cc), CreepBotonera.html(sc, {lupa: false}).html.includes('data-atajo')],
+    [true, true, false, true, false]);
 });
 prueba('🗄 Referencia (2026-11-03): los creeps de fábrica sin auditar salen del pool de campaña y van a «Referencia»', () => {
   const ref = CREEPS_BASE.filter(c => c.pool !== 'esencial' && Biblioteca.sinAuditarDeFabrica(c));

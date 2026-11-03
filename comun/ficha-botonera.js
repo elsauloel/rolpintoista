@@ -442,14 +442,18 @@ const FichaBotonera = (() => {
 
     const consumiblesCinturon = S.cinturon.filter(i => i.consumible && !i.flecha);
     const consumiblesMochila = S.inventario.filter(i => i.consumible && !i.flecha);   // las flechas especiales se disparan desde el carcaj (2026-10-09)
+    // ⌨ Los atajos (2026-11-03, dueño): el cuadradito a la izquierda (solo si la pantalla lo pide: el mapa). comun/atajos.js
+    const at = o.atajos && typeof Atajos !== 'undefined' ? ((S.meta && S.meta.atajos) || {}) : null;
+    const cuadro = (tipo, id) => at ? Atajos.cuadroHtml(at, tipo, id) : '';
     const filaConsumible = (i, key) => `<div class="cat-row bot-fila">
-    <div class="bot-fila-info"><div class="cat-nombre">${esc(i.nombre)}</div></div>
+    ${cuadro('cons', key + ':' + i.id)}<div class="bot-fila-info"><div class="cat-nombre">${esc(i.nombre)}</div></div>
     <div class="bot-fila-btns">
       <button class="mini" data-view="${key}:${i.id}">Ver</button>
       ${consumeButton(i, key, true, lupaBotonHtml, S)}
     </div>
   </div>`;
 
+    if(at) html += `<style>${Atajos.CSS}</style>`;
     html += `<div class="botonera-grid botonera-grid-even">
     <div class="botonera-caja">
       <div class="cat-grouphead botonera-caja-head" style="margin-top:0"><button type="button" class="colapsar-btn" data-colapsar="botonera-habilidades" title="Contraer/expandir">👁</button><span>Habilidades</span></div>
@@ -458,7 +462,7 @@ const FichaBotonera = (() => {
           const sinNitros = sinNitrosPara(S, i), sinSp = !sinNitros && sinSpPara(S, i);
           // Nombre y costo a la izquierda; Ver y Ejecutar siempre juntos a la derecha.
           return `<div class="cat-row bot-fila">
-            <div class="bot-fila-info">
+            ${cuadro('hab', i.id)}<div class="bot-fila-info">
               <div class="cat-nombre">${esc(i.nombre)}</div>
               ${costoHabilidadTxt(S, i) ? `<div class="bot-fila-costo${sinSp ? ' sin-sp' : ''}" title="${sinSp ? 'No te alcanza el SP: te avisa antes y la podés usar igual' : 'Lo que cuesta ejecutarla'}">${sinSp ? 'Sin SP · ' : ''}${esc(costoHabilidadTxt(S, i))}</div>` : ''}
             </div>

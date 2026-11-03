@@ -176,6 +176,48 @@ function ponerArmaEnCreep(sc, d){
   const antes = Combatiente.armaEnMano(sc);
   Combatiente.ponerArma(sc, {...d, natural: d.natural !== undefined ? d.natural === true : antes.natural});
 }
+/* ✋ Las dos manos de un creep (2026-11-03, dueño: «los creeps humanoides tienen dos manos, y en esas dos manos pueden tener armas o escudos o
+   armas especiales o talismanes, y escudos en el antebrazo»). Con un arma de verdad en la mano, al equiparle otra pregunta: ¿en la otra mano
+   (lleva las dos; la primera sigue siendo la principal) o reemplazando la que tiene? Después hace lugar si no le alcanzan las manos
+   (hacerLugarEnManosCreep). Sin arma (o con un arma natural de bestia), la pone como siempre. → true si la equipó. */
+async function equiparArmaCreepConManos(sc, d){
+  const antes = Combatiente.armaPrincipal(sc);
+  const real = antes && antes.nombre && antes.natural !== true;
+  let modo = 'reemplazar';
+  if(real){
+    modo = await Confirmar.elegir(`${sc.nombre || 'El creep'} tiene ${antes.nombre} en la mano. ¿Dónde va ${d.nombre || 'el arma'}?`, {titulo: '✋ Las dos manos', icono: '🗡', no: 'Cancelar',
+      opciones: [{valor: 'otra', texto: '✋ En la otra mano', detalle: `lleva las dos; ${antes.nombre} sigue siendo la principal`},
+        {valor: 'reemplazar', texto: `🔁 Reemplazar ${antes.nombre}`, detalle: 'la nueva queda en su lugar'}]});
+    if(!modo) return false;
+  }
+  if(modo === 'otra'){
+    const nuevo = Combatiente.sumarArmaEnMano(sc, {...d, natural: false});
+    if(!(await hacerLugarEnManosCreep(sc, nuevo))){ sc.equipo = sc.equipo.filter(e => e !== nuevo); return false; }
+    return true;
+  }
+  ponerArmaEnCreep(sc, d);
+  const nueva = Combatiente.armaPrincipal(sc);
+  if(nueva && !(await hacerLugarEnManosCreep(sc, nueva, true))) return true;   // (la que reemplazó ya se fue: igual queda equipada)
+  return true;
+}
+/* Si lo puesto en las manos pasa de 2 (lo natural y el escudo atado al antebrazo no cuentan), guarda lo que haga falta: si hay una sola cosa para
+   guardar, la guarda avisando; si hay varias, pregunta cuál. `obligado`: no se puede cancelar (ya se reemplazó algo). → false si el GM canceló. */
+async function hacerLugarEnManosCreep(sc, nuevo, obligado){
+  for(let r = Combatiente.sobraEnManos(sc, nuevo); r.exceso > 0; r = Combatiente.sobraEnManos(sc, nuevo)){
+    if(!r.candidatos.length) return true;
+    let elegido = r.candidatos[0];
+    if(r.candidatos.length > 1){
+      const id = await Confirmar.elegir(`${sc.nombre || 'El creep'} no tiene manos libres para ${nuevo.nombre || 'esto'}. ¿Qué guarda?`, {titulo: '✋ Las manos ocupadas', icono: '🎒', no: obligado ? 'Guardar lo último' : 'Cancelar',
+        opciones: r.candidatos.map(e => ({valor: e.id, texto: `🎒 Guardar ${e.nombre}`, detalle: 'queda guardado: no da bonos ni para'}))});
+      if(!id && !obligado) return false;
+      elegido = (id && r.candidatos.find(e => e.id === id)) || r.candidatos[r.candidatos.length - 1];   // (obligado y sin elegir: lo último de la mano)
+    }
+    elegido.equipado = false;
+    aplicarModsEquipo(sc, elegido.mods, -1);
+    toast(`🎒 ${elegido.nombre}: guardado (no le alcanzaban las manos)`);
+  }
+  return true;
+}
 // La marca «arma natural» (el formulario del creep): va en el ítem de su mano.
 function marcarArmaNatural(sc, si){
   const a = Combatiente.armaPrincipal(sc);
@@ -204,7 +246,7 @@ function ponerEquipoEnCreep(sc, d){
   const mods = (d.mods || []).filter(m => m.stat !== 'def');
   aplicarModsEquipo(sc, mods, 1);   // (la Defensa se suma en vivo: paso 3)
   sc.equipo = sc.equipo || [];
-  sc.equipo.push({id: uid(), nombre: d.nombre, tipoItem: d.tipoItem, def, peso: num(d.peso), mods, detalle: d.detalle || '', ...CreepCalculo.magiaDeItem(d)});   // peso: un escudo para con su peso (2026-10-13)
+  sc.equipo.push({id: uid(), nombre: d.nombre, tipoItem: d.tipoItem, def, peso: num(d.peso), mods, detalle: d.detalle || '', ...(d.antebrazo ? {antebrazo: true} : {}), ...CreepCalculo.magiaDeItem(d)});   // peso: un escudo para con su peso (2026-10-13)
   actualizarArmaduraTipo(sc);
   if(modsAfectanHp(mods)) actualizarHpMaxPorCon(sc);
 }
@@ -265,8 +307,8 @@ function abrirItemCustomGM(){
     onGuardar: (d, scId) => {
       const sc = S.creeps.find(s => s.id === scId);
       if(!sc){ toast('Elegí a qué creep equiparlo (paso 1), o publicalo con "Agregar al catálogo"'); return false; }
-      if(CreepCalculo.vaAlEquipo(d)) ponerEquipoEnCreep(sc, d);   // (una varita va al equipo)
-      else{ ponerArmaEnCreep(sc, d); if(Combatiente.armaEnMano(sc).natural) setTimeout(() => renombrarArmaNatural(sc.id), 0); }   // 🐾
+      if(CreepCalculo.vaAlEquipo(d)){ ponerEquipoEnCreep(sc, d); const nuevo = sc.equipo[sc.equipo.length - 1]; hacerLugarEnManosCreep(sc, nuevo, true).then(() => renderAll()); }   // (una varita va al equipo; ✋ hace lugar)
+      else equiparArmaCreepConManos(sc, d).then(ok => { if(ok && Combatiente.armaEnMano(sc).natural) setTimeout(() => renombrarArmaNatural(sc.id), 0); renderAll(); });   // ✋ 🐾
       toast(`${sc.nombre} equipado con ${d.nombre}`);
       registrarEvento(`✎ Ítem custom: ${sc.nombre} equipado con ${d.nombre}`);
       renderAll();

@@ -1516,7 +1516,9 @@ descanso: al descansar, la Vida extra queda en lo que tenía o en la del anillo,
 y de la mañana (solo contra un tipo de daño) ni los escudos que no son Vida extra (Arrojo, Orbe de resguardo, Armadura mágica…). Las guardadas aparte
 se juntan solas al empezar el turno de quien las tiene.
 
-### P240 — 💪 ¿El escudo atado al antebrazo vale también con un arma a dos manos? (2026-11-03)
+### P240 ✅ — 💪 ¿El escudo atado al antebrazo vale también con un arma a dos manos? (2026-11-03)
+
+**✅ Decidida (dueño, 2026-11-03): «Sí, un escudo puede ir con un arma de dos manos.»** Queda como está programado (no ocupa la mano).
 
 **Contexto:** el dueño pidió el rasgo «Atado al antebrazo» para escudos (2026-11-03: «alguien que tiene dos armas no puede tener escudo, salvo la
 excepcionalidad de un escudo que se ate en el antebrazo… que sea bastante bueno»): el escudo no ocupa la mano, así que entra con dos armas. Quedó

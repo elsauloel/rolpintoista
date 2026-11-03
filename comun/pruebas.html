@@ -44,7 +44,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="critico.js"></script>
 <script src="fx-transfusion.js?v=20261103fx2"></script>
 <script src="fx-onda.js?v=20261103onda2"></script>
-<script src="combatiente.js?v=20261103t14"></script>
+<script src="combatiente.js?v=20261103m2"></script>
 <script src="creep-calculo.js?v=20261103t20"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261103t20"></script>
@@ -3517,7 +3517,7 @@ prueba('🎒 Paso 7: en las manos / puesto / guardado — cambiar de arma, las m
   const tras1 = [Combatiente.armaEnMano(x).nombre, x.nitros, nombres(Combatiente.gruposDeEquipo(x).guardado)];
   const r2 = Combatiente.ponerPieza(x, 'c', CreepCalculo.slotDe);   // la capucha en la cabeza: guarda el yelmo
   const r3 = Combatiente.guardarPieza(x, 'g'), r4 = Combatiente.sacarPieza({...x, nitros: 0}, 'e', {combate: true});
-  igual([nombres(g0.manos), nombres(g0.puesto), nombres(g0.guardado), nombres(r1.aviso ? [] : [{nombre: r1.error}]), /guarda Espada y Rodela/.test(r1.aviso), tras1,
+  igual([nombres(g0.manos), nombres(g0.puesto), nombres(g0.guardado), nombres(r1.aviso ? [] : [{nombre: r1.error}]), /guarda (Espada y Rodela|Rodela y Espada)/.test(r1.aviso), tras1,
     nombres(r2.guardados), r3, !!r4.error],
     [['Garras', 'Rodela'], ['Yelmo'], ['Mandoble', 'Capucha'], [], true, ['Mandoble', 2, ['Espada', 'Rodela', 'Capucha']], ['Yelmo'], null, true]);
 });
@@ -6545,6 +6545,35 @@ prueba('💪 Escudo atado al antebrazo (2026-11-03): no ocupa la mano (dos armas
     L4.hp, L4.des, L4.agl, L4.equipo.map(i => i.nombre).join(), L4.habilidades.map(h => h.nombre).join(), L4.cinturon.map(i => i.nombre).join(), CreepCalculo.modoSP(L4)],
     [0, 0, 0, 1, false, true, 'Buena Calidad:130:true,Buena Calidad:140:true,Raro:320:true', true,
       35, 10, 8, 'Cortaplumas,Chaleco de cuero,Calzas de cuero flexible', 'Cordón oculto,Hit and run', 'Red de caza', false]);
+});
+prueba('✋ Las dos manos de un creep (2026-11-03): ponerse una segunda arma no guarda la otra; 2 manos + escudo atado entran; dos armas + escudo común: hace lugar; varita + talismán', () => {
+  const cat = n => structuredClone(CATALOGO_BASE.find(i => i.nombre === n));
+  const pza = (it, id, eq) => ({...it, id, equipado: eq});
+  // dos armas de una mano: la segunda, guardada, se pone sin guardar la primera (ponerPieza)
+  const a = {equipo: [pza(cat('Sable del tahúr'), 's', true), pza(cat('Facón de paisano'), 'f', false)]};
+  Combatiente.ponerPieza(a, 'f');
+  // sumarArmaEnMano: la segunda queda después de la principal
+  const b = {equipo: [pza(cat('Sable del tahúr'), 's', true)]};
+  const f2 = Combatiente.sumarArmaEnMano(b, cat('Facón de paisano'));
+  // dos manos + escudo atado
+  const c = {equipo: [pza(cat('Mazo de bombo'), 'm', true), pza(cat('Brazal de cuero tachonado'), 'b', true)]};
+  // dos armas + escudo común: ponerse el escudo guarda lo último de la mano
+  const d = {equipo: [pza(cat('Sable del tahúr'), 's', true), pza(cat('Facón de paisano'), 'f', true), pza(cat('Escudo de hierro macizo'), 'e', false)]};
+  const rd = Combatiente.ponerPieza(d, 'e');
+  const e2 = {equipo: [pza(cat('Sable del tahúr'), 's', true), pza(cat('Facón de paisano'), 'f', true)]};
+  e2.equipo.push(pza(cat('Escudo de hierro macizo'), 'e', true));
+  const so = Combatiente.sobraEnManos(e2, e2.equipo[2]);
+  const v = {equipo: [pza(cat('Varita del destello'), 'v', true), pza(cat('Botella con un diablito'), 't', true)]};
+  igual([a.equipo.filter(x => x.equipado).map(x => x.nombre).join(), Combatiente.armaPrincipal(a).nombre,
+    b.equipo.map(x => x.nombre).join(), !!f2.equipado, Combatiente.armaPrincipal(b).nombre,
+    Combatiente.manosLibres(c), c.equipo.every(x => x.equipado),
+    rd.guardados.length, d.equipo.filter(x => x.equipado).length, Combatiente.manosLibres(d),
+    so.exceso, so.candidatos.map(x => x.nombre).join(), Combatiente.manosLibres(v), v.equipo.every(x => x.equipado)],
+    ['Facón de paisano,Sable del tahúr', 'Facón de paisano',
+      'Sable del tahúr,Facón de paisano', true, 'Sable del tahúr',
+      0, true,
+      1, 2, 0,
+      1, 'Sable del tahúr,Facón de paisano', 0, true]);
 });
 prueba('🩸 Transfusión sanguínea de creep (2026-11-03): en el pool del Support y también en el del Debuffer', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Transfusión sanguínea');

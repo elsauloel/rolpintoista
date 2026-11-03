@@ -58,7 +58,9 @@ estado: borrador
 +++
 Los escudos dan **[[Defensa]]** y **[[Resistencia a crítico]]**, a veces **[[Bloqueo]]** o **[[Parry]]**. Los hay de **una mano** (podés combinarlos con un arma) y de **dos manos** (más grandes: con uno equipado no llevás arma).
 
-**Atado al antebrazo** (desde el 2026-11-03): algunos escudos de una mano van sujetos al brazo y **no ocupan la mano**, así que se pueden llevar **con dos armas**. Atajan igual que cualquier escudo (Parry, Bloqueo, Golpe de escudo). Son de Buena calidad para arriba: *Brazal de cuero tachonado*, *Rodela de brazo del gladiador* y *Escudo de brazo del capitán*.
+**Atado al antebrazo** (desde el 2026-11-03): algunos escudos de una mano van sujetos al brazo y **no ocupan la mano**, así que se pueden llevar **con dos armas** o **con un arma a dos manos**. Atajan igual que cualquier escudo (Parry, Bloqueo, Golpe de escudo). Son de Buena calidad para arriba: *Brazal de cuero tachonado*, *Rodela de brazo del gladiador* y *Escudo de brazo del capitán*.
+
+**Los creeps humanoides también tienen dos manos** (desde el 2026-11-03): en GM Tools, al equiparle un arma a un creep que ya tiene una, pregunta si va **en la otra mano** (lleva las dos; la primera sigue siendo la principal) o si **reemplaza** la que tiene. Si no le alcanzan las manos, guarda lo que haga falta (si hay varias cosas en la mano, pregunta cuál). Vale igual para escudos, varitas y talismanes.
 
 > [!example] Del catálogo
 > *Tapa de tacho de basura* (Común, Def 3) · *Broquel de acero* (Raro, Parry +3) · *Muralla de acero* (Raro, dos manos, Def 12, Bloqueo +3, Movimiento −1) · *Baluarte del Último Bastión* (Legendario, dos manos, inmune a rotura de armadura).

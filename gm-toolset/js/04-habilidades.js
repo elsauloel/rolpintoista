@@ -276,25 +276,27 @@ function quitarEquipoDeCreep(scId, equipoId){
   toast(`${item.nombre} quitado`);
 }
 
-function equiparItemEnCreep(idx){
+async function equiparItemEnCreep(idx){
   const sc = S.creeps.find(s => s.id === equipandoCreepId);
   const item = CATALOGO_EQUIPO[idx];
   if(!sc || !item) return;
-  if(CreepCalculo.vaAlEquipo(item)){   // (un arma especial va al equipo: no le cambia el arma)
+  $('#scrim-equipar-creep').classList.remove('open');
+  $('#scrim-item-aleatorio-gm').classList.remove('open');
+  if(CreepCalculo.vaAlEquipo(item)){   // (un arma especial, un escudo, un talismán… va al equipo: no le cambia el arma)
     const mods = structuredClone(item.mods || []);
     aplicarModsEquipo(sc, mods, 1);
     sc.equipo = sc.equipo || [];
-    sc.equipo.push({id: uid(), nombre: item.nombre, tipoItem: item.tipoItem, def: num(item.def), peso: num(item.peso), mods, detalle: item.detalle || '', ...CreepCalculo.magiaDeItem(item)});   // peso: un escudo para con su peso (2026-10-13)
+    const nuevo = {id: uid(), nombre: item.nombre, tipoItem: item.tipoItem, def: num(item.def), peso: num(item.peso), mods, detalle: item.detalle || '', ...(item.antebrazo ? {antebrazo: true} : {}), ...CreepCalculo.magiaDeItem(item)};   // peso: un escudo para con su peso (2026-10-13)
+    sc.equipo.push(nuevo);
+    if(!(await hacerLugarEnManosCreep(sc, nuevo))){ sc.equipo = sc.equipo.filter(e => e !== nuevo); aplicarModsEquipo(sc, mods, -1); renderAll(); toast('No se equipó'); return; }
     actualizarArmaduraTipo(sc);
     if(modsAfectanHp(mods)) actualizarHpMaxPorCon(sc);
     toast(`${sc.nombre} equipado con ${item.nombre}`);
   }else{
-    ponerArmaEnCreep(sc, item);   // 🗡 un ítem de su lista, en la mano (comun/combatiente.js, ponerArma)
+    if(!(await equiparArmaCreepConManos(sc, item))){ renderAll(); return; }   // ✋ en la otra mano o reemplazando (js/05)
     if(Combatiente.armaEnMano(sc).natural) setTimeout(() => renombrarArmaNatural(sc.id), 0);   // 🐾 una bestia: garras, colmillos… (js/05)
     toast(`${sc.nombre} equipado con ${item.nombre}`);
   }
-  $('#scrim-equipar-creep').classList.remove('open');
-  $('#scrim-item-aleatorio-gm').classList.remove('open');
   renderAll();
 }
 

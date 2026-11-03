@@ -106,6 +106,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-editor.js"></script>
 <script src="creep-lupa.js"></script>
 <script src="combate-fin.js"></script>
+<script src="grupo-botin.js"></script>
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
@@ -932,6 +933,18 @@ prueba('🛡/❤ P227 (2026-10-28): los anillos de la siesta, del sereno y del e
   const ve = S.efectos.filter(e => e.excedenteVida).map(e => [e.nombre, e.escudoMagico, !!e.soloFisico, !!e.soloEspecial]);
   igual([ve, /un escudo/.test(FichaCalculo.EXTRA ? (FichaCalculo.EXTRA.find(x => x.id === 'cascara') || {}).full : 'un escudo')],
     [[['Vida extra (Anillo de la siesta)', 10, false, false], ['Escudo de la mañana', 8, false, true], ['Escudo del sereno', 8, true, false]], true]);
+});
+prueba('📋 Ver el grupo del botín (2026-11-03): los lugares vacíos y a quién le sirve cada pieza', () => {
+  const S = {inventario: [{nombre: 'Espada', tipoItem: 'arma_1m', equipado: true}, {nombre: 'Chaleco', tipoItem: 'armadura_blanda', equipado: true, mods: [{stat: 'def', val: 2}]}]};
+  const sl = GrupoBotin.slotsDe(S);
+  const ver = id => { const x = sl.find(s => s.id === id); return [x.libre, x.puestos.join('+')]; };
+  const grupo = [{nombre: 'Larry', slots: sl}];
+  const casco = GrupoBotin.pistas({nombre: 'Casco', template: {tipoItem: 'cabeza', mods: [{stat: 'def', val: 1}]}}, grupo);
+  const peto = GrupoBotin.pistas({nombre: 'Jubón', template: {tipoItem: 'armadura_blanda', mods: [{stat: 'def', val: 3}, {stat: 'armadmg', val: 1}]}}, grupo);
+  const peor = GrupoBotin.pistas({nombre: 'Trapo', template: {tipoItem: 'armadura_blanda', mods: [{stat: 'def', val: 1}]}}, grupo);
+  const dos = GrupoBotin.pistas({nombre: 'Ballesta', template: {tipoItem: 'arma_2m'}}, grupo);
+  igual([ver('manos_arma'), ver('cabeza'), ver('torso_blanda'), casco, peto, peor, dos],
+    [[1, 'Espada'], [1, ''], [0, 'Chaleco'], ['🔲 llena Cabeza de Larry'], ['↑ Defensa +1 y Def. especial +1 para Larry'], [], []]);
 });
 prueba('⚔ El final del duelo en una frase (2026-10-28): lo que pasó, el daño y los estados', () => {
   const base = {atacante: {nombre: 'Fulano'}, defensor: {nombre: 'Mengano'}, ataque: {tipo: 'habilidad-arma', habNombre: 'Tiro a la rodilla', armaNombre: 'Arco'}};

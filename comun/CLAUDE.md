@@ -1926,3 +1926,12 @@ versión parecida en más de una, es candidato a juntar.
   corrosiva, Ponzoña, Misil elemental) pasan a **lentas de cooldown 4** sin arrancar en cooldown (`disponibleAlInicio`; dueño, 2026-11-02: «costo alto ⇒
   cooldown alto»).
 
+
+- **`grupo-botin.js`** (`GrupoBotin`, 2026-11-03, pedido del dueño: «un reporte de los jugadores… slots vacíos, resistencias y debilidades, sus stats; algo
+  que a simple vista ayude a elegir qué poner y qué no»): el botón **«📋 Ver el grupo»** de «⚔ Batalla terminada» (`CombateFin.vista`, pasos Equipo y
+  Publicar; `CombateFin.clic` con `data-rep-grupo` carga este archivo y llama `GrupoBotin.abrir({jugadores, items})`). Abre su propio recuadro en
+  `document.body` (z-index 100000, también sobre el recuadro aislado del mapa; ✕, Aceptar, Esc o clic afuera): arriba, **a quién le sirve cada pieza
+  del botín** (las iguales juntas, ×N: «🔲 llena Cabeza de: A, B», «↑ Defensa +1 para: C»); abajo, una tarjeta por personaje que cobra (los tildados en
+  «Quién cobra»): lugares de equipo con los **vacíos resaltados** (🔲), cinturón, stats, Res.Esp/Res.Mt/Res.CC, resistencia a crítico por Tipo y
+  elementales (rojo lo más bajo del grupo, verde lo más alto), «▼ Débil en / ▲ Fuerte en» y el arma con su tipo de daño. Lee las fichas con
+  `FichaGuardado.cargar` y usa `EscaneoGrupo.perfil` (carga solo lo que falte). Puras, con prueba: `slotsDe(S)` y `pistas(item, grupo)`.

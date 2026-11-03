@@ -540,9 +540,11 @@ const CombateFin = (() => {
       : '<div class="hint">Todavía no hay personajes en la partida.</div>';
 
     let cuerpo = '';
+    // 📋 Ver el grupo (2026-11-03, dueño: «que a simple vista ayude a elegir qué poner y qué no»): en Equipo y en Publicar.
+    const botonGrupo = `<div style="margin-bottom:8px"><button type="button" class="btn" data-rep-grupo title="Slots vacíos, stats, resistencias y debilidades de los que cobran, y a quién le sirve cada pieza del botín">📋 Ver el grupo</button></div>`;
     if(paso === 'equipo'){
       const eq = porCreep(i => !esConsumible(i), true);
-      cuerpo = `<label class="reporte-contar-escapados" style="margin-bottom:8px"><input type="checkbox" data-rep-ocultos${rep.ocultosDespojos !== false ? ' checked' : ''}> Lo que destildes del equipo de un creep se convierte en despojos: un cuarto de su precio de compra (como lo que nadie toma del botín), repartidos entre los que cobran${rp.despojosEquipo ? ` · ahora <b>${fmt(rp.despojosEquipo)} despojos</b>${rp.n ? ` (${fmt(rp.despojosCada)} c/u)` : ''}` : ''}</label>
+      cuerpo = `${botonGrupo}<label class="reporte-contar-escapados" style="margin-bottom:8px"><input type="checkbox" data-rep-ocultos${rep.ocultosDespojos !== false ? ' checked' : ''}> Lo que destildes del equipo de un creep se convierte en despojos: un cuarto de su precio de compra (como lo que nadie toma del botín), repartidos entre los que cobran${rp.despojosEquipo ? ` · ahora <b>${fmt(rp.despojosEquipo)} despojos</b>${rp.n ? ` (${fmt(rp.despojosCada)} c/u)` : ''}` : ''}</label>
         <div class="reporte-loot-lista">${eq || '<div class="hint">Ningún creep derrotado suelta equipo.</div>'}</div>
         <div style="display:flex;gap:6px;margin-top:8px"><input type="text" data-rep-extra-nombre placeholder="Ítem extra (nombre)" style="flex:1"><input type="number" min="0" data-rep-extra-precio placeholder="Precio" style="width:90px"><button type="button" class="btn" data-rep-extra-add>+ Sumar</button></div>`;
     }else if(paso === 'consumibles'){
@@ -566,7 +568,7 @@ const CombateFin = (() => {
         <div class="reporte-lista">${jugadoresHtml('xp')}</div>`;
     }else{
       const items = itemsPublicables(rep, r), eq = items.filter(i => !esConsumible(i)), co = items.filter(esConsumible);
-      cuerpo = `<div class="reporte-lista">
+      cuerpo = `${botonGrupo}<div class="reporte-lista">
         <div class="reporte-fila reporte-fila-lista"><span class="reporte-nombre">🗡 Equipo</span><span class="reporte-xp">${eq.length ? esc(eq.map(i => i.nombre).join(', ')) : 'nada'}</span></div>
         <div class="reporte-fila reporte-fila-lista"><span class="reporte-nombre">🧪 Consumibles</span><span class="reporte-xp">${co.length ? esc(co.map(i => i.nombre).join(', ')) : 'nada'}</span></div>
         ${rp.despojosEquipo ? `<div class="reporte-fila reporte-fila-lista" title="${esc(ocultos(rep, r).map(o => `${o.i.nombre} (${o.i.origen}): ${fmt(o.valor)} despojos`).join('\n'))}"><span class="reporte-nombre">🧰 Equipo que no se ofrece</span><span class="reporte-xp">${esc(ocultos(rep, r).map(o => o.i.nombre).join(', '))} → ${fmt(rp.despojosEquipo)} despojos</span></div>` : ''}
@@ -606,6 +608,18 @@ const CombateFin = (() => {
       return it ? {ver: it.template} : null;
     }
     if(d.repIr !== undefined){ rep.paso = d.repIr; return true; }   // 📋 los pasos
+    if(d.repGrupo !== undefined){   // 📋 Ver el grupo (2026-11-03, dueño): slots vacíos, stats, resistencias y debilidades de los que cobran (comun/grupo-botin.js)
+      const items = itemsPublicables(rep, generar(rep, creeps, cat));
+      const jugadores = (rep.jugadores || []).filter(j => j.incluido);
+      const ir = () => GrupoBotin.abrir({jugadores, items});
+      if(typeof GrupoBotin !== 'undefined') ir();
+      else{
+        const s = document.createElement('script'); s.src = '../comun/grupo-botin.js?v=20261103gb';
+        s.onload = ir; s.onerror = () => console.error('📋 No se pudo cargar grupo-botin.js');
+        document.head.appendChild(s);
+      }
+      return {abierto: true};
+    }
     if(d.repReset !== undefined){ if(rep.paso === 'experiencia') rep.xpPorJugador = null; else if(rep.paso === 'doblones') rep.ddePorJugador = null; else { rep.xpPorJugador = null; rep.ddePorJugador = null; } return true; }
     if(d.repReroll !== undefined){   // 🎲 otro consumible al azar, antes de publicar
       const r = generar(rep, creeps, cat);

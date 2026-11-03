@@ -51,7 +51,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
-<script src="estados-presets.js?v=20261103san"></script>
+<script src="estados-presets.js?v=20261103t13"></script>
 <script src="estados-aplicar.js?v=20261103t12"></script>
 <script src="recibidos.js?v=20261103ve"></script>
 <script src="tokens-auto.js"></script>
@@ -116,7 +116,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="pasivas.js"></script>
 <script src="skills-clase.js?v=20261103t12"></script>
 <script src="creeps-base.js"></script>
-<script src="skills-creep-base.js?v=20261103t12"></script>
+<script src="skills-creep-base.js?v=20261103t13"></script>
 <script src="creeps-esenciales.js?v=20261103t7"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -6608,6 +6608,14 @@ prueba('⚡🥶🧪 Debuffer (2026-11-03): la Aguja siniestra rápida (y los gua
     H('Escalofrío').etiquetas.includes('rápida'), H('Espina tóxica').etiquetas.includes('auditada')],
     [2, 1, 2, false, true, 2, 2, 1, 2, true, false, 2, 1, 'resm', 'siniestro', true, 'Escalofrío', 'pdg-2', true,
       2, 'eva', 'toxico', true, 'Veneno', 2, '{"stat":"resmg","contra":"dmgesp","valor":9}', 2, true, true]);
+});
+prueba('🧠 Punzada mental (Debuffer, 2026-11-03): rápida, PdG.Esp contra Res.Mt, 1d4 arcano directo y Mente abierta (−2 Res.Mt, hasta el final de su próximo turno)', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Punzada mental'), h = armarHabilidadDeCreep(e.datos, 1);
+  const pre = ESTADOS_PRESET.find(x => x.nombre === 'Mente abierta');
+  igual([h.duelo.tira, h.duelo.contra.join(), h.duelo.danoFormula, h.duelo.tipoDano, !!h.duelo.danoDirecto, h.duelo.efectos[0].nombre,
+    pre.polaridad, pre.mods[0].stat + pre.mods[0].val, !!pre.turnosCompletos, h.cd, h.nitrosCosto, h.spCosto,
+    e.etiquetas.includes('debuffer'), e.etiquetas.includes('rápida'), e.etiquetas.includes('auditada')],
+    ['pdgmg', 'resm', '1d4', 'arcano', true, 'Mente abierta', 'debuff', 'resm-2', true, 2, 1, 1, true, true, true]);
 });
 prueba('🔄 Las habilidades de clase siguen a su clase (P222, 2026-10-27): una copia vieja toma la versión nueva; una editada a mano después, no', () => {
   const base = CLASES_SKILLS.find(c => c.id === 'warrior').habilidades.find(x => x.id === 'warrior-contraataque');

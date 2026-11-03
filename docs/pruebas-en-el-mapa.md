@@ -303,6 +303,7 @@
   encienden), polvo y piedritas, una sacudida corta del mapa y la tarjeta en la Crónica. Al resolverse cada resistencia (Res.CC): sobre el que no la
   resistió, un estallido y estrellitas girando sobre la cabeza ~2,6 s; sobre el que la resistió, un destello chico (sin tarjeta). Ver que un creep
   oculto o en sigilo no se delata, que con «reducir movimiento» sale más corta y sin sacudida, y que el zoom y el paneo no la corren.
+- [ ] **🧠 Punzada mental** (2026-11-03, Debuffer de creep): un creep con la habilidad (⚔ Acciones) contra un jugador: su PdG.Esp contra la Res.Mt; si gana, 1d4 arcano directo (sin restar Def. especial) y el estado «Mente abierta» 🧠 (−2 Res.Mt) que se va al final del próximo turno del rival. Con modo SP: −1 No2 y −1 SP; con turnos de espera: espera 2. Después, una Confusión al mismo rival tiene que leer la Res.Mt con el −2.
 - [ ] **🎬 El cuadro del duelo nace del token y vuelve a él — para que lo revise el dueño en la compu (también la velocidad)** (2026-11-03, dueño: «al abrirse un duelo… desde el
   token con el que estás teniendo un duelo, se abra… algo chiquitito que se va agrandando… y cuando se termina, vuelve a ese token»;
   `comun/duelo.js` + `window.dueloOrigenPantalla` en `vtt-hexgrid/js/13-tokens-portal-duelo.js`): Rockardo hace el Shockwave contra 2 o 3 creeps

@@ -197,6 +197,9 @@ const ESTADOS_PRESET = [
   // 🥶 Escalofrío (2026-11-03, dueño: la rápida siniestra del Debuffer): −2 a su PdG hasta el final de su próximo turno.
   {nombre:'Escalofrío', polaridad:'debuff', turnos:1, turnosCompletos:true, mods:[{stat:'pdg', val:-2}],
     detalle:'Un frío de sombra que le mete miedo en el cuerpo: −2 a su Probabilidad de Golpe hasta el final de su próximo turno. ⚙ Automatizado.'},
+  // 🧠 Mente abierta (2026-11-03, dueño: la Punzada mental del Debuffer): −2 a la Res.Mt hasta el final de su próximo turno.
+  {nombre:'Mente abierta', polaridad:'debuff', turnos:1, turnosCompletos:true, mods:[{stat:'resm', val:-2}],
+    detalle:'Una punzada le dejó la mente abierta: −2 a su Resistencia mental hasta el final de su próximo turno. ⚙ Automatizado.'},
   // 🐛 Sanguijuela (2026-10-26, dueño, la Sanguijuela del Mago): pegada 4 turnos. Se la arranca al empezar su turno con Fuerza contra el Efecto especial
   // de quien la lanzó (el `soltar` lo trae el efecto de la habilidad). 🪱 (2026-11-03, dueño) Ya no bloquea la cura: toda cura que le entraría se la
   // lleva quien la lanzó (`robaCura`; quién: `chupaDe`/`chupaUid`/`chupaNombre`), hasta su máximo y el resto como Vida extra (Combatiente.curaRobada).

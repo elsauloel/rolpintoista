@@ -422,4 +422,5 @@
   centro en su Rango, a sus rivales: su Ef.Esp contra la Res.Mt de cada uno; al que no resiste, Sueño (2 turnos). Sin daño (si no, se despertaría al
   instante) y no se esquiva corriendo. Lenta: cooldown 4 (arranca en cooldown); con SP, 2 No2 y 4 SP (costo propuesto por Claude). No está asignada a
   ningún creep de fábrica (los de fábrica traen recetas «a mano» de creeps-base.js); se suma desde la biblioteca de habilidades.
+- ✅ **🧠 Punzada mental** (Debuffer, «abrir la mente», 2026-11-03; propuesta de Claude, dueño: «me gusta Punzada mental, la vamos a sumar al pool»): rápida, su **PdG.Esp contra la Res.Mt** de un rival en su Rango; si gana, **1d4 arcano directo** y **Mente abierta** (−2 Res.Mt hasta el final de su próximo turno). 1 No2 y 1 SP, o cooldown 2.
 - ⚡ **Texto del Flash de creep** (dueño, 2026-11-03): en turno ajeno, con SP cuesta el doble de SP; con turnos de espera, un 50 % más de espera (para abajo, mínimo +1). Corregido en todas las Flash de fábrica (Parpadeo, Potencia, Purificar, Bendecir el arma, Pisotón, Arte de la guerra, Blindaje, Sonic Boom, Mal de ojo, Pila pila) y en las guardadas.

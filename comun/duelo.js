@@ -111,6 +111,7 @@ const Duelo = (() => {
 @keyframes duelo-pulso{0%{transform:scale(.35);opacity:1}100%{transform:scale(1.6);opacity:0}}
 #duelo-fondo.min{display:none}
 .duelo-caja{background:#151a26;color:#e9ecf4;border:1px solid #39435c;border-radius:16px;width:min(880px,100%);max-height:96vh;overflow:auto;box-shadow:0 18px 60px rgba(0,0,0,.6)}
+.duelo-interpuesto{margin:0 0 12px;padding:10px 14px;border-radius:10px;background:rgba(227,168,90,.14);border:1px solid #e3a85a;color:#ffe2b0;font-weight:700;text-align:center}
 .duelo-cab{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid #2b3347;font-weight:800;font-size:18px;letter-spacing:.03em}
 .duelo-cab .bt{display:flex;gap:6px}
 .duelo-cab button{background:#232b40;border:0;color:#c7cee2;font-size:16px;cursor:pointer;border-radius:8px;padding:4px 10px}
@@ -1731,6 +1732,26 @@ const Duelo = (() => {
     return true;
   }
 
+  /* 🛡 El defensor cambió con el duelo abierto (Interponerse, vtt-hexgrid/js/78; dueño, 2026-11-03: «se cierra el duelo anterior y se abre un duelo
+     nuevo para que sea claro visualmente»). Es el mismo duelo por dentro (la tirada del atacante sigue), pero en todas las pantallas el cuadro vuelve
+     volando al token del que defendía, una pausa (el salto del que se interpone) y nace de nuevo desde su token. Sin cuadro a la vista (minimizado,
+     o todavía sin aparecer), solo se actualiza. */
+  const ANIM_SALTO = 260;
+  function cambioDeDefensor(tokViejo, tokNuevo){
+    if(!actual) return;
+    { const o = ladoDelOtro(actual.dato); actual.otroToken = (o && o.tokenId) || ''; }
+    const f = document.getElementById('duelo-fondo');
+    if(!f || !f.dataset.entro || f.classList.contains('min')) return;
+    if(!animarSalida(f, tokViejo)) return;
+    if(!pocoMovimiento()) esperarAbrirHasta += ANIM_SALTO;
+    const f2 = fondo();
+    f2.classList.remove('min');
+    f2.style.opacity = '0'; f2.style.pointerEvents = 'none';
+    f2.innerHTML = '<div class="duelo-caja"><div class="duelo-cab"><span>⚔ Duelo</span><div class="bt"><button type="button" data-min title="Minimizar">—</button></div></div><div class="duelo-cuerpo"><div class="duelo-nota">…</div></div></div>';
+    f2.querySelector('[data-min]').onclick = minimizar;
+    animarEntrada(f2, tokNuevo || actual.otroToken);
+  }
+
   /* ---------- el cuadro del duelo ---------- */
   function abrir(id){
     if(!disponible()) return;
@@ -1757,6 +1778,10 @@ const Duelo = (() => {
       if(!actual || actual.id !== id) return;
       actual.dato = {id, ...doc.data()};
       if(!actual.otroToken){ const o = ladoDelOtro(actual.dato); actual.otroToken = (o && o.tokenId) || ''; }
+      // 🛡 Cambió el defensor (Interponerse): el cuadro vuelve al que defendía y sale de nuevo del que se interpuso, como un duelo nuevo.
+      { const defTok = String((actual.dato.defensor && actual.dato.defensor.tokenId) || '');
+        if(actual.defTok === undefined) actual.defTok = defTok;
+        else if(defTok !== actual.defTok){ const viejo = actual.defTok; actual.defTok = defTok; cambioDeDefensor(viejo, defTok); } }
       { const f1 = document.getElementById('duelo-fondo'); if(f1 && !f1.dataset.entro) animarEntrada(f1, actual.otroToken); }
       // Primero ruedan los dados 3D y, cuando quedan a la vista, se muestra el resultado en el cuadro (no antes).
       const nRev = nReveal(actual.dato);
@@ -2825,6 +2850,7 @@ const Duelo = (() => {
     f.innerHTML = `<div class="duelo-caja">
       <div class="duelo-cab"><span>${d.hab ? '✨' : '⚔'} ${_esc(nombreAtaque)}</span><div class="bt"><button type="button" data-min title="Minimizar (queda el botón «${d.hab ? 'Ver ejecución' : 'Ver duelo'}»)">—</button>${enCurso(d) ? '' : '<button type="button" data-x title="Cerrar">✕</button>'}</div></div>
       <div class="duelo-cuerpo">
+        ${d.defensor && d.defensor.interpuesto ? `<div class="duelo-interpuesto">🛡 Ahora le pega a <b>${_esc(d.defensor.nombre)}</b>: se interpuso${d.defensor.interpuesto.aliado ? ` por ${_esc(d.defensor.interpuesto.aliado)}` : ''}</div>` : ''}
         <div class="duelo-paso"><h4><span class="n">1</span>Declaración</h4>
           <div class="duelo-vs">
             <div class="duelo-lado atq"><div class="rol">${d.hab ? 'Usa la habilidad' : 'Ataca'}</div><div class="nom">${_esc(d.atacante.nombre)}</div><div class="sub">${d.hab ? _esc(d.hab.nombre) + (d.hab.tira ? ' · tira ' + _esc(d.hab.tira.etq) : '') : (d.ataque.armaNombre ? 'con ' + _esc(d.ataque.armaNombre) : 'sin arma') + ' · Tipo ' + _fmt(_num(d.ataque.tipoDado)) + (modsTxt(d) ? ' · ' + (typeof Glosario !== 'undefined' ? Glosario.marcar(modsTxt(d)) : _esc(modsTxt(d))) : '')}</div></div>

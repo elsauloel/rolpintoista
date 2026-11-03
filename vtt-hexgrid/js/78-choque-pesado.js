@@ -61,7 +61,8 @@ async function interponerseUsar(c, objetivoId){
     if(dest.col !== c.t.col || dest.fila !== c.t.fila)
       await coleccionTokens().doc(c.id).update({col: dest.col, fila: dest.fila, rotacion: rotacionDePaso(hexCentro(dest.col, dest.fila), hexCentro(o.t.col, o.t.fila)), ruta: firebase.firestore.FieldValue.delete()});
     // El duelo sigue igual, pero ahora defiende él (las opciones de defensa se vuelven a calcular).
-    await fbDb.collection(fbRutaCampana('duelos')).doc(o.dueloId).update({defensor: {ref: String(c.t.fichaId), tipo: 'creep', nombre: String(nom).slice(0, 40), uid: String(c.t.duenoUid || ''), tokenId: c.id}});
+    await fbDb.collection(fbRutaCampana('duelos')).doc(o.dueloId).update({defensor: {ref: String(c.t.fichaId), tipo: 'creep', nombre: String(nom).slice(0, 40), uid: String(c.t.duenoUid || ''), tokenId: c.id,
+      interpuesto: {aliado: String(aliado).slice(0, 40), aliadoTokenId: o.id}}});   // 🛡 adentro de `defensor` (las reglas de Firestore no aceptan campos nuevos en el duelo): el cuadro lo muestra («Ahora le pega a…») y anima el cambio (comun/duelo.js)
     if(typeof Duelo !== 'undefined' && Duelo.olvidarOpciones) Duelo.olvidarOpciones(o.dueloId);
   }catch(err){ console.error('Interponerse:', err); toast(`${c.h.nombre}: no se pudo (${err.message || err}) — hacelo a mano`); return; }
   const txt = `${nom} salta al lado de ${aliado} y se mete en el golpe: ahora ${quien} le pega a ${nom}, que tiene +2 a la Defensa contra ese golpe (${k.txt}).`;

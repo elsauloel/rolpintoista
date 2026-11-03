@@ -912,6 +912,10 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   pensadas sobre todo para casters y livianos.
 - [ ] **⭐ Pool esencial: elegir el nivel al crear (dueño, 2026-11-03):** al agregar un creep esencial, elegir nivel 1–5 y que salga solo con los
   atributos, habilidades y equipo de ese nivel (cada línea guarda los 5 niveles). Programar cuando esté diseñada la primera línea completa (el Escudero).
+- [ ] **🦔 ¿Las Espinas de varias fuentes se acumulan? (dueño, 2026-11-03: «habría que evaluarlo, testearlo, ponerlo en pendientes de diseño»)**: la
+  Muralla con púas puede llevar Espinas de la Coraza de púas (habilidad), del Escudo de pinchos y de las Pieles erizadas del berserker. Ver qué hace hoy
+  el duelo (`dueloEspinas`, vtt-hexgrid/js/13: ¿1/4 una sola vez o por fuente?), probarlo en el mapa y decidir la regla (una sola vez, se suman, o
+  suben el porcentaje con tope).
 - [ ] **🤖 Creeps con IA (dueño, 2026-11-03): todo lo de proponer/armar creeps con IA queda para cuando esté en la compu** (no se prueba desde la nube).
 - [ ] **📖 Glosario (dueño, 2026-11-03): revisarlo en la compu, sobre la marcha** (no es trabajo para el teléfono).
 - [ ] **🐝 Invocaciones para creeps (dueño, 2026-11-03: «en principio no lo vamos a usar, pero debería existir»):** hoy los creeps solo llaman refuerzos

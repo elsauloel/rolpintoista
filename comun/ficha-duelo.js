@@ -145,7 +145,8 @@ const FichaDuelo = (() => {
         }
         if(campo === 'dano'){
           const a = arma || (FichaCombate.armasEquipadasConDano(S)[0] || {}).item || null;
-          return {formula: formulaDano(d, a), ...(a ? L('danio:' + a.id) : {titulo: 'Daño sin arma', html: ''})};
+          const ae = Combatiente.armaElementalDelGolpe(S.efectos, d.id, a ? {id: a.id, nombre: a.nombre} : null);   // 🔥 (2026-11-04): que se vea antes de tirar
+          return {formula: formulaDano(d, a) + (ae ? ` + ${ae.txt}` : ''), ...(a ? L('danio:' + a.id) : {titulo: 'Daño sin arma', html: ''})};
         }
         return null;
       },
@@ -156,7 +157,7 @@ const FichaDuelo = (() => {
         const S = getS();
         const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : null;
         // Un arma envenenada, un óleo: este ataque gasta una carga (pegue o no), recién cuando se pagó (cancelar no la gasta).
-        const gastar = () => { const gc = Combatiente.gastarCarga(S.efectos, d.id); if(gc.cambio) ui.cambio(['efectos']); if(gc.carga) ui.toast(Combatiente.cargaTxt(gc.carga)); };
+        const gastar = () => { const gc = Combatiente.gastarCarga(S.efectos, d.id, {id: arma ? arma.id : d.ataque.armaId, nombre: arma ? arma.nombre : d.ataque.armaNombre}); if(gc.cambio) ui.cambio(['efectos']); if(gc.carga) ui.toast(Combatiente.cargaTxt(gc.carga)); };
         if(d.ataque.tipo === 'habilidad-arma') gastar();   // (los No2 ya los cobró la habilidad)
         const uiA = {...ui, alPagar: paga => { gastar(); anotarPago(S, d.id, paga); }};
         if(d.ataque.tipo === 'habilidad-arma'){   // los No2 del ataque ya los cobró la habilidad: solo se tira el PdG (con lo que le suma)
@@ -170,7 +171,7 @@ const FichaDuelo = (() => {
       pagarManual: async d => {
         const S = getS();
         const arma = d.ataque.armaId ? S.inventario.find(x => x.id === d.ataque.armaId) || null : null;
-        const gastar = () => { const gc = Combatiente.gastarCarga(S.efectos, d.id); if(gc.cambio) ui.cambio(['efectos']); if(gc.carga) ui.toast(Combatiente.cargaTxt(gc.carga)); };
+        const gastar = () => { const gc = Combatiente.gastarCarga(S.efectos, d.id, {id: arma ? arma.id : d.ataque.armaId, nombre: arma ? arma.nombre : d.ataque.armaNombre}); if(gc.cambio) ui.cambio(['efectos']); if(gc.carga) ui.toast(Combatiente.cargaTxt(gc.carga)); };
         if(d.ataque.tipo === 'habilidad-arma'){ gastar(); return true; }
         const uiA = {...ui, alPagar: paga => { gastar(); anotarPago(S, d.id, paga); }, sinTirada: true};
         if(d.ataque.tipo === 'normal') await FichaAcciones.atacarConArma(S, arma, undefined, uiA); else await FichaAcciones.ataqueEspecialConArma(S, arma, d.ataque.tipo, undefined, uiA);
@@ -217,7 +218,7 @@ const FichaDuelo = (() => {
         const arma = armaDelInv(d.ataque.armaId);
         const f = statParaArma('crit', arma), p = statParaArma('critpot', arma);
         const conque = arma || (FichaCombate.armasEquipadasConDano(getS())[0] || {}).item || null;   // sin arma elegida: la principal (como el daño)
-        const cc = Combatiente.cargaCritico(getS().efectos, d.id);   // Ojo de asesino: el crítico de una carga
+        const cc = Combatiente.cargaCritico(getS().efectos, d.id, {id: d.ataque.armaId, nombre: d.ataque.armaNombre});   // Ojo de asesino: el crítico de una carga
         return {frecuente: (Number.isNaN(f) ? 0 : Math.max(0, Math.round(f))) + cc.crit, potente: (Number.isNaN(p) ? 0 : Math.max(0, Math.round(p))) + cc.critpot, cargaPdg: cc.pdg, cargaPdgNombre: cc.nombre, ignora: Combatiente.ignoraResistCritArma(conque), d20: Math.max(0, Math.round(num(conque && conque.critD20)))};
       },
       // 🛡 Blindado (2026-10-20): inmune a los golpes críticos.
@@ -244,7 +245,8 @@ const FichaDuelo = (() => {
         const formula = formulaDano(d, arma);
         const r = tirarDados(formula);
         if(r) FichaAcciones.gastarUnaTirada(S, r, ui, true);   // 💪 Empower: el +3 ya venía en el Daño; esta tirada lo gasta
-        if(r) ui.registrarTirada(`Daño · ${arma ? arma.nombre : 'sin arma'}`, r);
+        const ae = Combatiente.armaElementalDelGolpe(S.efectos, d.id, arma ? {id: arma.id, nombre: arma.nombre} : null);   // 🔥 el +1d6 del Arma elemental se tira aparte: que la Mesa lo diga
+        if(r) ui.registrarTirada(`Daño · ${arma ? arma.nombre : 'sin arma'}${ae ? ` + ${ae.corto} (aparte)` : ''}`, r);
       },
       // Moneda Re-Roll o 🃏 wildcard: ¿tengo? / usarla para reabrir una tirada del duelo (`con`: 'moneda' | 'wildcard').
       rerollInfo: d => {

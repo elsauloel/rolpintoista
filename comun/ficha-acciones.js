@@ -1088,7 +1088,8 @@ const FichaAcciones = (() => {
   // Un estado armado a partir de lo que manda una habilidad o una trampa ({nombre, turnos, mods, hp, stacks, escudoMagico…}):
   // el preset con ese nombre con los números de la habilidad encima (comun/combatiente.js, ajustarPreset), o uno propio.
   function estadoDeSpec(spec, presets){
-    const preset = FichaHabilidades.presetPorNombre(presets, spec.nombre);
+    // 🔥 «🔥 Arma ígnea: Lanza corta» (2026-11-04): el preset por el nombre de base, y el estado conserva su nombre con el arma.
+    const preset = FichaHabilidades.presetPorNombre(presets, spec.nombre) || (spec.armaDe ? FichaHabilidades.presetPorNombre(presets, Combatiente.baseNombreEstado(spec.nombre)) : null);
     let draft;
     if(preset){
       const {nombre, ...resto} = preset;
@@ -1115,6 +1116,7 @@ const FichaAcciones = (() => {
     if(spec.chupaDe){ draft.chupaDe = spec.chupaDe; draft.chupaUid = spec.chupaUid || ''; draft.chupaNombre = spec.chupaNombre || ''; }   // 🪱 la Sanguijuela: quién la lanzó (2026-11-03)
     if(spec.resetea) draft.resetea = true;   // ☠ vuelve a esos stacks, no los suma (la Nube tóxica, 2026-10-26)
     if(spec.finCombate) draft.finCombate = true;   // 🩸 se va al «Finalizar combate» (el Relicario de sangre, 2026-10-27)
+    if(spec.armaDe){ draft.armaDe = {...spec.armaDe}; draft.nombre = spec.nombre; }   // 🔥 el Arma elemental de un arma (2026-11-04)
     return draft;
   }
   function aplicarEstadoRecibido(S, spec, origen, ui){

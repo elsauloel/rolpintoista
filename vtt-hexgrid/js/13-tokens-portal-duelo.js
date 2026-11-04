@@ -1001,6 +1001,12 @@ function dueloElegirObjetivoMapa(msg){
         try{ await arrastrarDueloGancho(yo, mio, t, ataque); }catch(err){ console.error('Arrastrar: el enganche', err); }
         return;
       }
+      if(typeof armaElementalEsHab === 'function' && armaElementalEsHab(ataque)){   // 🔥 Arma elemental (js/97, 2026-11-04): sin duelo, al instante, en el arma que se elija
+        let ok = true;
+        try{ ok = await armaElementalDirecto(yo, mio, t, ataque); }catch(err){ console.error('Arma elemental', err); }
+        if(!ok){ pedir(); return; }
+        return;
+      }
       if(ataque && ataque.punalada && mio && typeof punaladaBonos === 'function'){   // 🗡 la puñalada (js/59): el bono si está en la espalda
         let r = null;
         try{ r = await punaladaBonos(mio, t, ataqueCarga || ataque, yo); }catch(err){ console.error('No se pudo ver la puñalada:', err); r = ataqueCarga || ataque; }

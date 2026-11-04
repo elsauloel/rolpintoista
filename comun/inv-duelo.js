@@ -67,7 +67,7 @@ const InvDuelo = (() => {
       ui.cambiar(() => {
         p = A().pagarAtaque(inv, forzar, tipo);
         if(p.error) return false;
-        if(dueloId){ const gc = Combatiente.gastarCarga(inv.estados || (inv.estados = []), dueloId); if(gc.carga) p.carga = gc.carga; }   // un arma envenenada: recién pagado
+        if(dueloId){ const gc = Combatiente.gastarCarga(inv.estados || (inv.estados = []), dueloId, (x => { const a = Combatiente.armaPrincipal(x); return a ? {id: a.id, nombre: a.nombre} : null; })(inv)); if(gc.carga) p.carga = gc.carga; }   // un arma envenenada: recién pagado
         if(dueloId) Combatiente.anotarPagoDuelo(inv, dueloId, p.paga);   // lo pagado de verdad, por si se cancela y no cuenta
         if(tipo !== 'oportunidad' && tipo !== 'contra') ui.parry.delete(inv.id);   // atacar cierra el Parry que esperaba su Bloqueo
       });
@@ -116,7 +116,7 @@ const InvDuelo = (() => {
         if(!inv) return;
         if(d.ataque.tipo === 'habilidad-arma' && (inv.estados || []).some(e => e && e.golpe)){   // un arma envenenada: los No2 ya los cobró la habilidad
           let gc = null;
-          ui.cambiar(() => { gc = Combatiente.gastarCarga(inv.estados, d.id); });
+          ui.cambiar(() => { gc = Combatiente.gastarCarga(inv.estados, d.id, (x => { const a = Combatiente.armaPrincipal(x); return a ? {id: a.id, nombre: a.nombre} : null; })(inv)); });
           if(gc && gc.carga) ui.toast(`${inv.nombre} · ${Combatiente.cargaTxt(gc.carga)}`);
         }
         if(d.ataque.tipo === 'habilidad-arma') publicar(A().tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg') + num(d.ataque && d.ataque.mods && d.ataque.mods.pdg) + Combatiente.pdgExtraArma(st => I().modTotal(inv, st), {tipoDado: Combatiente.armaEnMano(inv).tipoDado, armaDeRango: Combatiente.armaEnMano(inv).armaDeRango}), 'pdg'));
@@ -127,7 +127,7 @@ const InvDuelo = (() => {
         const inv = ui.inv(d.atacante);
         if(!inv) return true;
         if(d.ataque.tipo === 'habilidad-arma'){
-          if((inv.estados || []).some(e => e && e.golpe)){ let gc = null; ui.cambiar(() => { gc = Combatiente.gastarCarga(inv.estados, d.id); }); if(gc && gc.carga) ui.toast(`${inv.nombre} · ${Combatiente.cargaTxt(gc.carga)}`); }
+          if((inv.estados || []).some(e => e && e.golpe)){ let gc = null; ui.cambiar(() => { gc = Combatiente.gastarCarga(inv.estados, d.id, (x => { const a = Combatiente.armaPrincipal(x); return a ? {id: a.id, nombre: a.nombre} : null; })(inv)); }); if(gc && gc.carga) ui.toast(`${inv.nombre} · ${Combatiente.cargaTxt(gc.carga)}`); }
           return true;
         }
         return !!(await atacarSuelto(inv, d.ataque.tipo, d.id, true));
@@ -156,7 +156,7 @@ const InvDuelo = (() => {
       statsCritico: d => {
         const inv = ui.inv(d.atacante);
         const f = I().statValor(inv, 'crit'), p = I().statValor(inv, 'critpot');
-        const cc = Combatiente.cargaCritico(inv.estados, d.id);   // Ojo de asesino: el crítico de una carga
+        const cc = Combatiente.cargaCritico(inv.estados, d.id, (x => { const a = Combatiente.armaPrincipal(x); return a ? {id: a.id, nombre: a.nombre} : null; })(inv));   // Ojo de asesino: el crítico de una carga
         return {frecuente: (Number.isNaN(f) ? 0 : Math.max(0, Math.round(f))) + cc.crit, potente: (Number.isNaN(p) ? 0 : Math.max(0, Math.round(p))) + cc.critpot, cargaPdg: cc.pdg, cargaPdgNombre: cc.nombre,
           ignora: Combatiente.ignoraResistCritArma(Combatiente.armaDeCombatiente(inv)), d20: Math.max(0, Math.round(num(Combatiente.armaDeCombatiente(inv).critD20)))};
       },

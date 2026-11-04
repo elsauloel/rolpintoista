@@ -124,7 +124,8 @@ const ICONOS_FAMILIAS = [
   [/bendi|sagrad/, {ic: '✨', pol: 'buff'}],
 ];
 function iconoDeEstado(clave){
-  const def = ICONOS_ESTADO[clave] || ICONOS_ESTADO[clave.replace(/\s*\(.*\)\s*$/, '')];   // «Regeneración (túnica)» → el de Regeneración
+  const def = ICONOS_ESTADO[clave] || ICONOS_ESTADO[clave.replace(/\s*\(.*\)\s*$/, '')]   // «Regeneración (túnica)» → el de Regeneración
+    || ICONOS_ESTADO[clave.replace(/^[^a-zñ]+/, '').replace(/:.*$/, '').trim()];   // «🔥 arma ignea: lanza corta» → el de Arma ígnea
   if(def) return def;
   const fam = ICONOS_FAMILIAS.find(([re]) => re.test(clave));
   return fam ? fam[1] : null;

@@ -185,6 +185,8 @@ const FichaResumen = (() => {
       // nitros ≥ esto. Sin armas con daño, a mano limpia. Con el arco no hay oportunidad (2026-10-09): si solo tiene arcos, `sinOpor`.
       oporCosto: (() => { const armas = FichaCombate.armasEquipadasConDano(S).map(x => x.item).filter(Combatiente.sirveDeOportunidad); return Math.min(...(armas.length ? armas : [null]).map(a => FichaCombate.costoAtaqueEspecial(a, 'oportunidad', S))); })(),
       sinOpor: (() => { const armas = FichaCombate.armasEquipadasConDano(S).map(x => x.item); return armas.length > 0 && !armas.some(Combatiente.sirveDeOportunidad); })(),
+      // 🔥 Las armas en la mano, para elegir a cuál va el Arma elemental (2026-11-04, «la opción b»): [{id, nombre}] (sin escudos ni talismanes).
+      armasMano: (typeof FichaCombate !== 'undefined' && FichaCombate.armasEquipadasConDano ? FichaCombate.armasEquipadasConDano(S).map(a => a.item) : (S.inventario || [])).filter(i => i && i.equipado && Combatiente.esArmaDeMano(i) && !FichaCalculo.itemRoto(i)).map(i => ({id: String(i.id || ''), nombre: String(i.nombre || '').slice(0, 60)})).slice(0, 4),
       sinArma: FichaCombate.armasEquipadasConDano(S).length === 0 && !(S.inventario || []).some(i => i && i.equipado && i.especial),   // ✋ nada en la mano (paso 5): el mapa lo marca en el token (con una varita u otra arma especial, no: 2026-11-01, Larry con la Varita de granizo; igual que los creeps, CreepCalculo)
       costoMover: IT2().inmovilizadoBloqueaMover && estadoActivo(S, 'inmovilizado') ? 0 : costoMoverCasillero(S),
       extenuado: Combatiente.extenuado(S.efectos), tormenta: Combatiente.tormenta(S.efectos),   // ⛈ Atormentado: el mapa cobra la vida al moverse

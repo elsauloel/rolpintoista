@@ -71,7 +71,7 @@ const CreepDuelo = (() => {
     let carga = null;
     return ui.cambiar(ref, c => {
       const x = A().pagarAtaque(c, tipo, forzar);
-      if(x && !x.error && dueloId) carga = Combatiente.gastarCarga(c.estados || (c.estados = []), dueloId).carga;   // un arma envenenada: recién pagado
+      if(x && !x.error && dueloId) carga = Combatiente.gastarCarga(c.estados || (c.estados = []), dueloId, (cc => { const a = Combatiente.armaPrincipal(cc); return a ? {id: a.id, nombre: a.nombre} : null; })(c)).carga;   // 🔥 con el arma de la mano (2026-11-04)   // un arma envenenada: recién pagado
       if(x && !x.error && dueloId) Combatiente.anotarPagoDuelo(c, dueloId, x.paga);   // lo pagado de verdad, por si se cancela y no cuenta
       return x;
     }).then(x => {
@@ -134,7 +134,7 @@ const CreepDuelo = (() => {
         }
         if(campo === 'fuerza') return {formula: formulaDe(A().tirada('', C().fuerzaGolpeValor(sc))), ...L('stat|fue'), titulo: `${sc.nombre} · Fuerza del golpe`};
         if(campo === 'bloqueo') return {formula: formulaDe(A().tirada('', C().bloqueoValor(sc) + A().bloqueoFirmeCreep(sc), sc, 'bloqueo')), ...L('stat|bloqueo'), titulo: `${sc.nombre} · Bloqueo`};
-        if(campo === 'dano') return {formula: formulaDano(sc, d), ...L('danio|')};
+        if(campo === 'dano'){ const ae = Combatiente.armaElementalDelGolpe(sc.estados, d.id, (cc => { const a = Combatiente.armaPrincipal(cc); return a ? {id: a.id, nombre: a.nombre} : null; })(sc)); return {formula: formulaDano(sc, d) + (ae ? ` + ${ae.txt}` : ''), ...L('danio|')}; }   // 🔥 (2026-11-04)
         return null;
       },
       // El daño de una habilidad dirigida (duelo.js, tirarDanoHab) se publica a nombre del creep (2026-10-05: en el mapa no había cómo y se quedaba callado).
@@ -143,7 +143,7 @@ const CreepDuelo = (() => {
         const sc = deLado(d.atacante);
         if(!sc) return;
         if(d.ataque.tipo === 'habilidad-arma' && (sc.estados || []).some(e => e && e.golpe)){   // un arma envenenada: los No2 ya los cobró la habilidad
-          const gc = await ui.cambiar(d.atacante.ref, c => Combatiente.gastarCarga(c.estados || (c.estados = []), d.id));
+          const gc = await ui.cambiar(d.atacante.ref, c => Combatiente.gastarCarga(c.estados || (c.estados = []), d.id, (cc => { const a = Combatiente.armaPrincipal(cc); return a ? {id: a.id, nombre: a.nombre} : null; })(c)));
           if(gc && gc.carga) ui.toast(`${sc.nombre} · ${Combatiente.cargaTxt(gc.carga)}`);
         }
         if(d.ataque.tipo === 'habilidad-arma'){ ui.publicar(sc, pdgDeArreglos(sc, d.ataque)); return; }   // los No2 ya los cobró la habilidad
@@ -155,7 +155,7 @@ const CreepDuelo = (() => {
         if(!sc) return true;
         if(d.ataque.tipo === 'habilidad-arma'){   // los No2 ya los cobró la habilidad: solo lo que suma al golpe
           if((sc.estados || []).some(e => e && e.golpe)){
-            const gc = await ui.cambiar(d.atacante.ref, c => Combatiente.gastarCarga(c.estados || (c.estados = []), d.id));
+            const gc = await ui.cambiar(d.atacante.ref, c => Combatiente.gastarCarga(c.estados || (c.estados = []), d.id, (cc => { const a = Combatiente.armaPrincipal(cc); return a ? {id: a.id, nombre: a.nombre} : null; })(c)));
             if(gc && gc.carga) ui.toast(`${sc.nombre} · ${Combatiente.cargaTxt(gc.carga)}`);
           }
           return true;
@@ -184,7 +184,7 @@ const CreepDuelo = (() => {
       // Para el crítico: el Crítico frecuente y potente del creep y su Resistencia a crítico contra el Tipo del arma que lo ataca.
       statsCritico: d => {
         const sc = deLado(d.atacante);
-        const cc = sc ? Combatiente.cargaCritico(sc.estados, d.id) : {crit: 0, critpot: 0};   // Ojo de asesino: el crítico de una carga
+        const cc = sc ? Combatiente.cargaCritico(sc.estados, d.id, (cc => { const a = Combatiente.armaPrincipal(cc); return a ? {id: a.id, nombre: a.nombre} : null; })(sc)) : {crit: 0, critpot: 0};   // Ojo de asesino: el crítico de una carga
         return sc ? {frecuente: Math.max(0, Math.round(C().modTotal(sc, 'crit'))) + cc.crit, potente: Math.max(0, Math.round(C().modTotal(sc, 'critpot'))) + cc.critpot, cargaPdg: cc.pdg, cargaPdgNombre: cc.nombre,
           ignora: Combatiente.ignoraResistCritArma(Combatiente.armaDeCombatiente(sc)), d20: Math.max(0, Math.round(num(Combatiente.armaDeCombatiente(sc).critD20)))} : {frecuente: 0, potente: 0};
       },
@@ -206,7 +206,8 @@ const CreepDuelo = (() => {
         const sc = deLado(d.atacante);
         if(!sc) return;
         const r = tirarDados(formulaDano(sc, d));
-        if(r) ui.publicar(sc, {origen: `${sc.nombre} · Daño`, r});
+        const ae = Combatiente.armaElementalDelGolpe(sc.estados, d.id, (cc => { const a = Combatiente.armaPrincipal(cc); return a ? {id: a.id, nombre: a.nombre} : null; })(sc));   // 🔥 el +1d6 del Arma elemental va aparte: que la Mesa lo diga
+        if(r) ui.publicar(sc, {origen: `${sc.nombre} · Daño${ae ? ` + ${ae.corto} (aparte)` : ''}`, r});
       },
       // ⚡ Flash (P135): las reacciones del creep que sirven para esta tirada del duelo (se marcan antes de tirar) y su uso.
       flashOpciones: (d, campo) => {

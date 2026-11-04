@@ -21,7 +21,10 @@ const EstadosAplicar = (() => {
   const TODOS = typeof estadosPresetCreep === 'function' ? estadosPresetCreep() : [];
   const DEBUFFS = TODOS.filter(p => p.polaridad === 'debuff');
   const BUFFS = TODOS.filter(p => p.polaridad === 'buff');
-  const presetPorNombre = nombre => TODOS.find(p => p.nombre === nombre || (p.alias || []).includes(nombre));
+  // (2026-11-04) Un estado con el nombre del arma («🔥 Arma ígnea: Lanza corta») se encuentra por su nombre de base (Combatiente.baseNombreEstado).
+  const presetExacto = nombre => TODOS.find(p => p.nombre === nombre || (p.alias || []).includes(nombre));
+  const presetPorNombre = nombre => presetExacto(nombre) || (typeof Combatiente !== 'undefined' && Combatiente.baseNombreEstado && /: |^[^A-Za-zÁÉÍÓÚÑáéíóúñ]/.test(String(nombre || ''))
+    ? presetExacto(Combatiente.baseNombreEstado(nombre)) : undefined);
 
   function limpiarSpec(spec){
     const s = spec || {};
@@ -38,6 +41,7 @@ const EstadosAplicar = (() => {
     if(s.stacks) out.stacks = Math.max(1, Math.min(20, Math.round(Number(s.stacks) || 1)));
     if(s.resetea) out.resetea = true;   // ☠ vuelve a esos stacks, no los suma (la Nube tóxica, 2026-10-26)
     if(s.finCombate) out.finCombate = true;   // 🩸 se va al «Finalizar combate» (la Vida extra del Relicario de sangre, 2026-10-27)
+    if(s.armaDe && (s.armaDe.id || s.armaDe.nombre)) out.armaDe = {id: String(s.armaDe.id || '').slice(0, 80), nombre: String(s.armaDe.nombre || '').slice(0, 60)};   // 🔥 el arma del Arma elemental (2026-11-04)
     // Vida extra (2026-09-28): HP de una barra secundaria que absorbe daño antes que el HP real —
     // ver BUFFS. Un valor explícito manda sobre el del preset (se resuelve en `componer`).
     if(s.escudoMagico) out.escudoMagico = Math.max(0, Math.round(Number(s.escudoMagico) || 0));
@@ -79,7 +83,8 @@ const EstadosAplicar = (() => {
       ...(s.provocaDe ? {provocaDe: s.provocaDe, provocaDeNombre: s.provocaDeNombre} : {}),
       ...(s.muerdeA ? {muerdeA: s.muerdeA, muerdeANombre: s.muerdeANombre, desde: s.desde} : {}),
       ...(s.chupaDe ? {chupaDe: s.chupaDe, chupaUid: s.chupaUid, chupaNombre: s.chupaNombre} : {}),
-      ...(s.resetea ? {resetea: true} : {}), ...(s.finCombate ? {finCombate: true} : {})};
+      ...(s.resetea ? {resetea: true} : {}), ...(s.finCombate ? {finCombate: true} : {}),
+      ...(s.armaDe ? {armaDe: s.armaDe, nombre: s.nombre} : {})};   // 🔥 Arma elemental en un arma: su nombre con el arma («🔥 Arma ígnea: Lanza corta»)
   }
 
   // Inmunidades del que recibe el estado: la regla vive en comun/combatiente.js (la misma para ficha, gm-tools y mapa).

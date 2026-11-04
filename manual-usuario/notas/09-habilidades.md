@@ -244,6 +244,12 @@ Apoyo: curas, buffs y ayuda al equipo. Pool de [[Clases|clase]].
 
 **Skills del borrador:** Empower (+3 a una tirada), Blessing (+1 a todas 2 turnos), Heal (4 + 1d6 HP), Shield (absorbe 14), Acelerador (casilla que da +2 No2), Endurecimiento (Def 3, Res.Esp 3), Re-roll (repetir tiradas aliadas), Smite, Transferir SP y Adrenalina.
 
+**Arma elemental** (automatizada, 2026-11-04): le encantás un arma a un aliado (o la tuya) con un elemento, 🎰 al azar o ✋ eligiéndolo, por 3 turnos: cada golpe **con esa arma** que pega suma +1d6 de ese elemento (🔥 fuego ×1,5, ❄ hielo, ⚡ eléctrico, 🧪 ácido, ☠ tóxico, ☀ luz, 🌑 siniestro).
+- **No abre duelo**: al elegir a quién, el estado se pone al instante y quien lo recibe ve un aviso («🔥 Tu Lanza corta arde 3 turnos: +1d6 de fuego por golpe»).
+- **Va en un arma**: si tiene dos en la mano, elegís a cuál; el estado lleva su nombre («🔥 Arma ígnea: Lanza corta») y con la otra no suma.
+- **Se ve siempre**: en el cuadro del duelo antes de tirar el daño («+ 🔥 +1d6 fuego ×1,5»), en la tirada de la Mesa y en el detalle, en una sola cuenta: golpe menos Defensa, más el fuego directo, y el total.
+- Un ícono del elemento sobre el token mientras dura. Las que ya estaban puestas antes de este cambio (sin arma) siguen valiendo para cualquier arma hasta que vencen.
+
 > [!question] Sin auditar
 > Ninguna automatizada todavía.
 

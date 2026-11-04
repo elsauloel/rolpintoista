@@ -926,6 +926,10 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   ponela pendiente, cuando yo te diga que lo corras, correla»). En «Claude · pruebas», con clics: varios esenciales del pool (los 24, en especial
   los nuevos: Berserker con dos armas, Protector, Ladrón, Arcano, Saltador, Control mental, Hostigador con trampas) contra los personajes, con
   capturas y reporte (qué tal juega cada uno, si su identidad se nota, números raros). No tocar «El origen de las especies».
+- [ ] **🗡 Armas a dos manos de Tipo 6 Comunes** (2026-11-04, al armar la Tienda de inicio): no existe ninguna Común ni otra Buena además del
+  Espadón del capataz; la tienda de inicio queda con una sola en esa categoría. También hay pocas Comunes a dos manos de Tipo 4 y 8, báculos y
+  carcajes (se completan con Buenas). Diseñar algunas cuando el dueño quiera. La lista de consumibles esenciales (comun/generador-tiendas.js,
+  `CONSUMIBLES_ESENCIALES`) quedó aprobada «por ahora».
 - [ ] **🐝 Invocaciones para creeps (dueño, 2026-11-03: «en principio no lo vamos a usar, pero debería existir»):** hoy los creeps solo llaman refuerzos
   (creeps comunes). Queda para después de diseñar mejor la gestión de invocaciones de jugador; recién ahí se piensa la de los creeps.
 - [ ] **👁 Ojo de Kicillof como habilidad de Support (dueño, 2026-11-03: «sería interesante, habría que pensarlo en coste»):** hoy es solo el

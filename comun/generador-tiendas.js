@@ -361,9 +361,82 @@ const GeneradorTiendas = (() => {
       conTier: Object.fromEntries(TIERS.map(t => [t, Math.round(100 * (acc.conTier[t] || 0) / veces)]))};
   }
 
+  /* 🎒 La tienda de inicio de partida (dueño, 2026-11-04: «dos ítems de cada tipo… dos ítems de cada slot, y todos los consumibles esenciales. Es para
+     iniciar una partida, que todos tengan un catálogo amplio para iniciar su personaje como quieran»). Calidad Común; si una categoría no tiene 2
+     Comunes, se completa con la calidad más baja que haya y se avisa (`faltan` / `completado`). Todo va como «garantizado»: no se agota (cada jugador
+     compra lo suyo). Los consumibles esenciales, por nombre exacto (para sumar o sacar uno, esta lista). */
+  const CONSUMIBLES_ESENCIALES = ['Poción de HP', 'Poción de SP menor', 'Poción de Regeneración menor', 'Poción de Cuero Duro', 'Antídoto', 'Vendas',
+    'Té de tilo', 'Sales aromáticas', 'Ungüento de la Turca', 'Mate cebado', 'Cuerda (por metro)', 'Flecha balanceada', 'Virote perforante'];
+  const POR_CATEGORIA_INICIO = 2, TIERS_INICIO = 2;   // Común y, si falta, Buena
+  const esHondaIt = it => !!it.honda || /\bhonda\b/i.test(String(it.nombre || ''));
+  const esBallestaIt = it => num(it.recarga) > 0;
+  function categoriasInicio(cat){
+    const arma = (t, d) => it => it.tipoItem === t && parteDe(it) === 'arma' && num(it.tipoDado) === d;
+    const lista = [4, 6, 8, 10].map(d => ({id: 'arma1m-' + d, label: `Arma de una mano · Tipo ${d}`, es: arma('arma_1m', d)}));
+    // Las de dos manos: un renglón por cada Tipo que exista en el catálogo (Común o Buena).
+    [...new Set(cat.filter(it => publicable(it) && !it.legacy && it.tipoItem === 'arma_2m' && parteDe(it) === 'arma' && TIERS.indexOf(it.tier) <= 1).map(it => num(it.tipoDado)))]
+      .sort((a, b) => a - b).forEach(d => lista.push({id: 'arma2m-' + d, label: `Arma a dos manos · Tipo ${d}`, es: arma('arma_2m', d)}));
+    lista.push(
+      {id: 'arco', label: 'Arcos', es: it => parteDe(it) === 'distancia' && !!it.arco},
+      {id: 'ballesta', label: 'Ballestas', es: it => parteDe(it) === 'distancia' && !it.arco && esBallestaIt(it)},
+      {id: 'honda', label: 'Hondas', es: it => parteDe(it) === 'distancia' && !it.arco && !esBallestaIt(it) && esHondaIt(it)},
+      {id: 'varita', label: 'Varitas', es: it => parteDe(it) === 'especial' && it.tipoItem !== 'arma_2m'},
+      {id: 'baculo', label: 'Báculos', es: it => parteDe(it) === 'especial' && it.tipoItem === 'arma_2m'},
+      {id: 'talisman', label: 'Talismanes', es: it => parteDe(it) === 'orbe'},
+      {id: 'escudo', label: 'Escudos', es: it => parteDe(it) === 'escudo' && !it.antebrazo},
+      {id: 'cabeza', label: 'Cabeza', es: it => it.tipoItem === 'cabeza'},
+      {id: 'torso-blando', label: 'Torso (armadura blanda)', es: it => it.tipoItem === 'armadura_blanda'},
+      {id: 'torso-rigido', label: 'Torso (armadura rígida)', es: it => it.tipoItem === 'armadura_rigida'},
+      {id: 'manos', label: 'Manos', es: it => it.tipoItem === 'manos'},
+      {id: 'piernas', label: 'Piernas', es: it => it.tipoItem === 'piernas'},
+      {id: 'pies', label: 'Pies', es: it => it.tipoItem === 'pies'},
+      {id: 'cinturon', label: 'Cinturón', es: it => it.tipoItem === 'cinturon'},
+      {id: 'mochila', label: 'Mochila', es: it => it.tipoItem === 'mochila'},
+      {id: 'carcaj', label: 'Carcaj', es: it => it.tipoItem === 'carcaj'},
+      {id: 'anillo', label: 'Anillos', es: it => it.tipoItem === 'anillos'});
+    return lista;
+  }
+  // Los candidatos de una categoría, ordenados por calidad (Común primero): publicables, no clásicos ni trofeos.
+  function candidatosInicio(cat, c){ return cat.filter(it => publicable(it) && !it.legacy && !it.trofeo && c.es(it)); }
+  function elegirInicio(R, cands, n, usados){
+    const out = [];
+    for(let ti = 0; ti < TIERS_INICIO && out.length < n; ti++){   // (hasta Buena: es el inicio)
+      const libres = cands.filter(it => it.tier === TIERS[ti] && !usados.has(it.id));
+      while(out.length < n && libres.length){ const it = libres.splice(Math.floor(R() * libres.length), 1)[0]; usados.add(it.id); out.push(it); }
+    }
+    return out;
+  }
+  /* inicio({catalogo, azar}) → {tamano: 'inicio', items, garantizados (= items), plan: [{id, label, ids, completado (calidad de más), faltan}], esenciales,
+     esencialesFaltan}. */
+  function inicio(o){
+    const R = azarDe(o), cat = (o && o.catalogo) || [], usados = new Set(), plan = [], items = [];
+    categoriasInicio(cat).forEach(c => {
+      const elegidos = elegirInicio(R, candidatosInicio(cat, c), POR_CATEGORIA_INICIO, usados);
+      elegidos.forEach(it => items.push(it.id));
+      plan.push({id: c.id, label: c.label, ids: elegidos.map(it => it.id), completado: elegidos.some(it => it.tier !== 'Común'), faltan: POR_CATEGORIA_INICIO - elegidos.length});
+    });
+    const esenciales = [], esencialesFaltan = [];
+    CONSUMIBLES_ESENCIALES.forEach(nombre => {
+      const it = cat.find(x => x && x.nombre === nombre && !x.archivo);
+      if(it && !usados.has(it.id)){ usados.add(it.id); esenciales.push(it.id); } else if(!it) esencialesFaltan.push(nombre);
+    });
+    const todos = [...esenciales, ...items];
+    return {tamano: 'inicio', items: todos, garantizados: todos.slice(), plan, esenciales, esencialesFaltan};
+  }
+  // «🎲 Otro» en la tienda de inicio: otro de la misma categoría, sin repetir lo que ya está (Común si queda; si no, la calidad más baja que haya).
+  function otroInicio(o){
+    const R = azarDe(o), cat = o.catalogo || [], t = o.tienda || {};
+    const viejo = cat.find(it => it.id === o.id);
+    if(!viejo) return null;
+    const c = categoriasInicio(cat).find(c0 => c0.es(viejo));
+    if(!c) return null;
+    const usados = new Set([...(t.items || []), viejo.id]);
+    return elegirInicio(R, candidatosInicio(cat, c), 1, usados)[0] || null;
+  }
+
   // Cuántas veces repone una tienda publicada lo que le compran (una personalizada, como una aldea).
   const reservaDe = tamano => (TAMANOS[tamano] || TAMANOS.aldea).reserva;
 
   return {SECCIONES_EQUIPO, FIJO_AMBULANTE, FIJO_POR_TAMANO, resumenTamano, reservaDe, clasicos, gastable, gondolaDe, UNIDADES_GONDOLA, TIERS, CALIDAD_POR_NIVEL, SUERTE, TAMANOS, SECCIONES, SECCIONES_ORDEN, seccionDe, seccionesDe, PARTE_LABEL, DEFENSIVAS, ETIQUETAS, parteDe, etiquetasDe, esDeCaster, publicable,
-    tirarCalidad, nivelDe, generar, otro, simular};
+    tirarCalidad, nivelDe, generar, otro, simular, CONSUMIBLES_ESENCIALES, categoriasInicio, inicio, otroInicio};
 })();

@@ -260,6 +260,7 @@ input[type=checkbox]{width:auto}
       <div class="campo">
         <label for="f-tamano">Tamaño del vendedor</label>
         <select id="f-tamano">
+          <option value="inicio" title="Para arrancar la partida: 2 de cada tipo de arma y de cada lugar del cuerpo, Comunes, y los consumibles esenciales; no se agota">🎒 Tienda de inicio de partida</option>
           <option value="ambulante">Vendedor ambulante</option>
           <option value="pueblito" selected>Pueblito</option>
           <option value="aldea">Aldea</option>
@@ -402,7 +403,7 @@ input[type=checkbox]{width:auto}
 <script src="../comun/capas.js?v=20261005f9"></script>   <!-- la última ventana que se abre queda arriba -->
 <script src="../comun/efectos-golpe.js?v=20261031luz"></script>
 <script src="../comun/catalogo.js?v=20261103t20"></script>
-<script src="../comun/generador-tiendas.js?v=20261028z"></script>   <!-- la regla de cómo se arma una tienda (2026-10-06) -->
+<script src="../comun/generador-tiendas.js?v=20261104inicio"></script>   <!-- la regla de cómo se arma una tienda (2026-10-06) -->
 <script src="../comun/filtro-catalogo.js?v=20261103t3"></script>   <!-- el filtro del catálogo, uno para todos lados (2026-10-08) -->
 <script src="../comun/items-subidos.js?v=20261031cart"></script>
 <script src="../comun/plantillas.js?v=20261101azar"></script>
@@ -519,6 +520,7 @@ const TAMANOS = G.TAMANOS;
 const seccionesLabel = secs => (secs || []).map(k => G.SECCIONES[k] ? `${G.SECCIONES[k].icono} ${G.SECCIONES[k].label}` : '').filter(Boolean).join(' · ');
 const seccionesElegidas = () => [...document.querySelectorAll('#f-secciones [data-seccion]')].filter(c => c.checked).map(c => c.dataset.seccion);
 function nombreAutoTienda(tamano, secs){
+  if(tamano === 'inicio') return 'Tienda de inicio';
   const tamanoLabel = ((TAMANOS[tamano] || {}).label || '').toLowerCase();
   if(secs && secs.length === 1 && G.SECCIONES[secs[0]]) return tamano === 'ambulante' ? `${G.SECCIONES[secs[0]].label} ambulante` : `${G.SECCIONES[secs[0]].label} de ${tamanoLabel}`;
   return tamano === 'ambulante' ? 'Vendedor ambulante' : `Tienda de ${tamanoLabel}`;
@@ -586,6 +588,7 @@ function danoDe(item){
 function entero(min, max){ return min + Math.floor(Math.random() * (max - min + 1)); }
 
 function generarTienda(tamano, secciones, nivel){
+  if(tamano === 'inicio') return generarTiendaInicio();
   const r = G.generar({secciones, tamano, nivel, catalogo: CATALOGO});
   return {
     tamano: r.tamano,
@@ -603,9 +606,23 @@ function generarTienda(tamano, secciones, nivel){
   };
 }
 
+/* 🎒 La tienda de inicio de partida (dueño, 2026-11-04): 2 Comunes de cada tipo de arma y de cada lugar del cuerpo, más los consumibles esenciales
+   (G.CONSUMIBLES_ESENCIALES). Todo como «garantizado»: no se agota, cada jugador compra lo suyo. Las tres pestañas de equipo + la góndola. */
+function generarTiendaInicio(){
+  const r = G.inicio({catalogo: CATALOGO});
+  const avisos = r.plan.filter(p => p.faltan > 0 || p.completado).map(p => `${p.label}: ${p.faltan > 0 ? `solo ${p.ids.length}` : 'completado con Buena'}`);
+  if(r.esencialesFaltan.length) avisos.push(`no están en el catálogo: ${r.esencialesFaltan.join(', ')}`);
+  return {
+    tamano: 'inicio', tamanoLabel: 'Tienda de inicio de partida', secciones: G.SECCIONES_EQUIPO.slice(), categoriaLabel: seccionesLabel(G.SECCIONES_EQUIPO),
+    nivel: 1, nombre: 'Tienda de inicio', generado: new Date().toISOString(), ajustePrecio: 0,
+    garantizados: r.garantizados, gondola: [], items: r.items, avisoInicio: avisos.join(' · '),
+  };
+}
+
 /* 🧪 Simulador (2026-10-06): 200 tiendas con el tipo, tamaño y nivel elegidos → promedio y peor caso por parte, calidad y efecto escaso. */
 function simularTiendas(){
   const secciones = seccionesElegidas(), tamano = $('#f-tamano').value, nivel = Number($('#f-nivel').value) || 1;
+  if(tamano === 'inicio'){ toast('La tienda de inicio no se sortea: siempre trae 2 de cada tipo'); return; }
   if(!secciones.length){ toast('Tildá al menos una sección'); return; }
   const r = G.simular({secciones, tamano, nivel, catalogo: CATALOGO, veces: 200});
   const fila = (k, v, extra) => `<tr><td>${esc(k)}</td><td style="text-align:right">${fmt(v.prom)}</td><td style="text-align:right">${fmt(v.min)}–${fmt(v.max)}</td>${extra !== undefined ? `<td style="text-align:right">${extra}</td>` : '<td></td>'}</tr>`;
@@ -861,7 +878,8 @@ function agregarItem(id){
   if(tiendaActual.items.includes(id)){ toast('Ese ítem ya está en la tienda'); return; }
   const item = CATALOGO.find(it => it.id === id);
   tiendaActual.items.push(id);
-  if(item && G.gastable(item)){ tiendaActual.gondola = tiendaActual.gondola || []; tiendaActual.gondola.push(id); }   // un gastable va a la góndola
+  if(tiendaActual.tamano === 'inicio'){ tiendaActual.garantizados = tiendaActual.garantizados || []; tiendaActual.garantizados.push(id); }   // 🎒 en la de inicio, nada se agota
+  else if(item && G.gastable(item)){ tiendaActual.gondola = tiendaActual.gondola || []; tiendaActual.gondola.push(id); }   // un gastable va a la góndola
   tiendaCambio();
   renderAgregarLista();
   toast(`${item ? item.nombre : 'Ítem'} agregado`);
@@ -876,9 +894,11 @@ function rerollItem(id){
   const idx = tiendaActual.items.indexOf(id);
   const viejo = CATALOGO.find(it => it.id === id);
   if(idx < 0 || !viejo) return;
-  const nuevo = G.otro({tienda: tiendaActual, id, catalogo: CATALOGO});   // la misma parte, otra calidad con el nivel de la tienda, con la escasez
+  const inicio = tiendaActual.tamano === 'inicio';   // 🎒 en la de inicio: otro de la misma categoría (Común si queda)
+  const nuevo = inicio ? G.otroInicio({tienda: tiendaActual, id, catalogo: CATALOGO}) : G.otro({tienda: tiendaActual, id, catalogo: CATALOGO});   // la misma parte, otra calidad con el nivel de la tienda, con la escasez
   if(!nuevo){ toast(`No queda otro ítem de ${G.PARTE_LABEL[G.parteDe(viejo)] || 'esa parte'} para cambiar`); return; }
   tiendaActual.items[idx] = nuevo.id;
+  if((tiendaActual.garantizados || []).includes(id)) tiendaActual.garantizados = tiendaActual.garantizados.map(x => x === id ? nuevo.id : x);
   if((tiendaActual.gondola || []).includes(id)) tiendaActual.gondola = tiendaActual.gondola.map(x => x === id ? nuevo.id : x);
   tiendaCambio();
   renderAgregarLista();
@@ -1151,7 +1171,7 @@ async function generar(nueva){
   if(nueva && !(await confirmarDejarTienda())) return;
   const clave = $('#f-tamano').value;
   const secciones = seccionesElegidas();
-  if(!secciones.length){ toast('Tildá al menos una sección'); return; }
+  if(!secciones.length && clave !== 'inicio'){ toast('Tildá al menos una sección'); return; }
   const previa = tiendaActual;
   tiendaActual = generarTienda(clave, secciones, Number($('#f-nivel').value) || 1);
   if(previa && !nueva){   // Regenerar: conserva toda la configuración de la tienda (2026-10-06: antes se perdían venta, herrero, reparación y agregar gratis)
@@ -1160,6 +1180,7 @@ async function generar(nueva){
   }
   marcarAjuste();
   tiendaCambio();
+  actualizarHint();
   toast(`Tienda ${nueva ? 'generada' : 'regenerada'} · ${tiendaActual.items.length} ítems`);
 }
 
@@ -1184,6 +1205,16 @@ async function crearTiendaPersonalizada(){
 }
 
 function actualizarHint(){
+  const esInicio = $('#f-tamano').value === 'inicio';
+  document.querySelectorAll('#f-secciones input, #f-nivel').forEach(el => { el.disabled = esInicio; });
+  if(esInicio){
+    const n = G.categoriasInicio(CATALOGO).length;
+    $('#hint-tamano').textContent = `🎒 Tienda de inicio de partida: 2 ítems Comunes de cada una de ${n} categorías (armas de una mano de Tipo 4, 6, 8 y 10, las de dos manos de cada Tipo, ` +
+      `arcos, ballestas, hondas, varitas, báculos, talismanes, escudos y cada lugar del cuerpo: cabeza, torso blando y rígido, manos, piernas, pies, cinturón, mochila, carcaj y anillos) ` +
+      `y los consumibles esenciales (${G.CONSUMIBLES_ESENCIALES.join(', ')}). Nada se agota: cada jugador compra lo suyo. Si falta una Común, va una Buena. ` +
+      `🎲 en un ítem lo cambia por otro de su categoría.` + (tiendaActual && tiendaActual.avisoInicio ? ` ⚠ ${tiendaActual.avisoInicio}.` : '');
+    return;
+  }
   const secs = seccionesElegidas(), cfg = TAMANOS[$('#f-tamano').value], nivel = Number($('#f-nivel').value) || 1;
   const cal = G.CALIDAD_POR_NIVEL[G.nivelDe(nivel)];
   const fijos = ` más los ${G.clasicos(CATALOGO).length} clásicos, que van siempre (pociones, Antídoto, Vendas, Revive, Moneda Re-Roll, Polilla, Ankh…: lo marcado «legacy» hasta Raro)`;
@@ -1565,8 +1596,8 @@ function escucharGuardadas(){
 // Controles de arriba al tamaño y rubro de la tienda cargada.
 function sincronizarControles(){
   if(!tiendaActual) return;
-  if(TAMANOS[tiendaActual.tamano]) $('#f-tamano').value = tiendaActual.tamano;
-  if(tiendaActual.tamano !== 'personalizada'){ const secs = G.seccionesDe(tiendaActual); document.querySelectorAll('#f-secciones [data-seccion]').forEach(c => { c.checked = secs.includes(c.dataset.seccion); }); }
+  if(TAMANOS[tiendaActual.tamano] || tiendaActual.tamano === 'inicio') $('#f-tamano').value = tiendaActual.tamano;
+  if(tiendaActual.tamano !== 'personalizada' && tiendaActual.tamano !== 'inicio'){ const secs = G.seccionesDe(tiendaActual); document.querySelectorAll('#f-secciones [data-seccion]').forEach(c => { c.checked = secs.includes(c.dataset.seccion); }); }
   if(tiendaActual.nivel) $('#f-nivel').value = String(tiendaActual.nivel);
   marcarAjuste();
   actualizarHint();

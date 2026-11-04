@@ -237,6 +237,12 @@ equipo ya no tienen consumibles. La Talabartería garantiza una mochila y un cin
   - Se sacaron la «variedad garantizada», las familias por tamaño y los mínimos de las secciones (los cubre la base fija). El cartel del generador
     lo arma `GeneradorTiendas.resumenTamano`.
 
+### ✅ La tienda de inicio de partida (dueño, 2026-11-04)
+«Dos ítems de cada tipo… dos ítems de cada slot, y todos los consumibles esenciales. Es para iniciar una partida, que todos tengan un catálogo amplio
+para iniciar su personaje como quieran. Después seguimos con la lógica de pueblito, no pueblito, etc.» Programada: «🎒 Tienda de inicio de partida» en el
+tamaño del generador (`GeneradorTiendas.inicio` / `otroInicio` / `categoriasInicio`, `CONSUMIBLES_ESENCIALES`). 2 por categoría, Común (si falta,
+Buena; nunca más); todo «garantizado» (no se agota); secciones y nivel no aplican. La lista de esenciales es una propuesta de Claude: el dueño la corrige.
+
 ### ⬜ Ideas para «Luces y utilería» (dueño, 2026-10-08: «imaginemos cuerda, yesca y pedernal… ¿qué más?»; todavía no se carga nada)
 Lista de ideas propuesta en la conversación del 2026-10-08 (fuego, cuerda, terreno y cobertura, sigilo y engaño, oficio, señales). Se elige y
 diseña cuando el dueño lo retome, junto con la revisión de los consumibles.

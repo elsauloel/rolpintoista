@@ -69,7 +69,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-habilidades.js?v=20261104arr6"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
-<script src="ficha-resumen.js?v=20261104ae"></script>
+<script src="ficha-resumen.js?v=20261104pg1"></script>
 <script src="ficha-sesion.js"></script>
 <script src="inv-calculo.js"></script>
 <script src="inv-botonera.js"></script>
@@ -764,6 +764,15 @@ prueba('Maldición extenuante (Debuffer, 2026-10-12): Extenuado +1 No2 por stack
   igual([hab.costo, hab.nitrosCosto, ej.tira.stat, ej.contra.map(c => c.stat), lista[0].extenuante, base, uno, lista.length, lista[0].stacks, lista[0].turnos,
     CreepCalculo.costoAtaque(sc), Combatiente.extenuado(S.efectos), FichaBotonera.costoNitrosHab(S, {nitrosCosto: 1}), /Sin auditar/.test(hab.detalle), /Maldición extenuante \[3\]/.test(hab.original)],
     ['3', 2, 'pdgmg', ['resmg'], true, [4, 1, 1], [5, 2, 2, 5, 0], 1, 2, 1, 6, 2, 3, false, true]);
+});
+prueba('🔥 El resumen público lleva el Arma elemental (2026-11-04): el mapa ve a qué arma va y su dado («¿Con qué arma?» con 🔥)', () => {
+  const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
+  S.efectos = [{id: 'ae1', nombre: '🔥 Arma ígnea: Lanza corta', activo: true, turnos: 3, armaElemental: 'fuego', armaDe: {id: 'g-lanza', nombre: 'Lanza corta'},
+    golpe: {efectos: [{nombre: 'Fuego', dado: '1d6', mult: 1.5}]}}];
+  const est = FichaResumen.resumen(S).estados.find(e => /Arma ígnea/.test(e.nombre));
+  const conLanza = Combatiente.armaElementalDelGolpe(FichaResumen.resumen(S).estados, null, {id: 'g-lanza', nombre: 'Lanza corta'});
+  const conDaga = Combatiente.armaElementalDelGolpe(FichaResumen.resumen(S).estados, null, {id: 'n2-daga', nombre: 'Daga'});
+  igual([est.armaElemental, est.armaDe.id, est.golpe.efectos[0].dado, !!conLanza, /1d6 fuego/.test(conLanza && conLanza.txt), conDaga], ['fuego', 'g-lanza', '1d6', true, true, null]);
 });
 prueba('Re-roll (Support, 2026-10-12, absorbió a Afortunado): 2 SP (4 en turno ajeno), sin No2, sin tiradas, queda la mejor (🍀, aparte de la 🐈 de Enyetar)', () => {
   const sup = CLASES_SKILLS.find(k => k.id === 'support').habilidades;

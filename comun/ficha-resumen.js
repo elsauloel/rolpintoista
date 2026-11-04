@@ -221,6 +221,11 @@ const FichaResumen = (() => {
           ...(e.derivado ? {derivado: true} : {}), ...(e.confusion ? {confusion: true} : {}), ...(e.anillo ? {anillo: true} : {}), ...(e.impulso ? {impulso: e.impulso, impulsoVal: num(e.impulsoVal)} : {}),   // la Confusión: el mapa la tira (js/20)
           ...(e.espinas ? {espinas: true} : {}), ...(e.espejo ? {espejo: true} : {}), ...(e.ceguera ? {ceguera: true} : {}), ...(e.desarmado ? {desarmado: true} : {}),   // el mapa devuelve el daño aunque el estado tenga un nombre propio («Espinas (poción)»)
           ...(e.lento ? {lento: true} : {}),   // Lento: el primer casillero del turno cuesta el doble (el mapa, js/04)
+          // 🔥 Arma elemental (2026-11-04): el mapa la muestra en «¿Con qué arma?» y en la Botonera (Combatiente.armaElementalDelGolpe necesita la clave,
+          // el arma a la que va y el efecto del golpe).
+          ...(e.armaElemental ? {armaElemental: String(e.armaElemental).slice(0, 20),
+            ...(e.armaDe && (e.armaDe.id || e.armaDe.nombre) ? {armaDe: {id: String(e.armaDe.id || '').slice(0, 60), nombre: String(e.armaDe.nombre || '').slice(0, 60)}} : {}),
+            ...(e.golpe && Array.isArray(e.golpe.efectos) ? {golpe: {efectos: e.golpe.efectos.slice(0, 2).map(f => ({nombre: String((f && f.nombre) || '').slice(0, 30), ...(f && f.dado ? {dado: String(f.dado).slice(0, 10)} : {}), ...(f && num(f.mult) ? {mult: num(f.mult)} : {})}))}} : {})} : {}),
           ...(e.soltar && (e.soltar.ayuda || e.soltar.de) && Combatiente.soltarNorm(e.soltar) ? {soltar: Combatiente.soltarNorm(e.soltar)} : {}), ...Combatiente.atrapaPub(e),   // 🤝 un aliado pegado lo puede ayudar a soltarse (el mapa, js/54)
           ...(num(e.sprint) > 0 ? {sprint: num(e.sprint)} : {}),   // Sprint (Asalto, 2026-10-13): los casilleros pagos que le quedan
           ...(e.vigilancia ? {vigilancia: alcanceVigilancia(S)} : {}),   // 👁 Vigilancia (Shooter, 2026-10-21): el alcance de su arma a distancia (el mapa, js/58)

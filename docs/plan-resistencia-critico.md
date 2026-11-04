@@ -49,4 +49,10 @@ Respuestas del dueño a la medición (2026-11-04):
    la resistencia contra Tipos altos no sea tan rara (con la regla nueva ya no es OP). Que Tipo 8 y Tipo 10 aparezcan también en algunos ítems
    Comunes. Borrador de cantidades de slots: **Tipo 10 en 3 lugares**, **Tipo 8 en 5**, **Tipo 6 en 7**, **Tipo 4 en (casi) todos**; Tipo 12 por
    definir. Slots que hoy pueden dar resistencia: cabeza, torso (blanda / rígida), manos, piernas, pies, escudo, anillos, cinturón, talismán.
+8. **Slots por Tipo (decidido, dueño 2026-11-04):** **Tipo 4 en 8 slots · Tipo 6 en 6 · Tipo 8 en 4 · Tipo 10 en 2** (Tipo 12 sin definir). Un
+   **+2 de resistencia en un solo ítem es muy, muy infrecuente** y solo desde **Buena calidad**: para acumular resistencia hay que ocupar muchos
+   slots. Pocos ítems con más de +1; la aparición, más frecuente en los Tipos bajos y mucho más rara en los altos.
+9. **Precio:** «mantener el precio y ajustar los efectos para que el precio siga pagando un volumen de efectos similar». Res ×1 debería pesar
+   **un poco menos que Defensa +1** (de acuerdo con Claude); «+1 a todos los Tipos» también. Falta calcular cuánto pesaba antes y cuánto ahora,
+   proporcionalmente, por Tipo (en curso).
 

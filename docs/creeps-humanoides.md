@@ -630,6 +630,14 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   Parry +1) · Coraza de cuero hervido · Botas de cuero de vaca: Def 6, Parry +2. Consumible: **Pergamino grupal de Reflejo de Acero** (+1 Parry 3
   turnos, para desarmar más). **Cargado** en el pool esencial (2026-11-03).
 
+- **⏸ EN PAUSA desde el 2026-11-04** (dueño: «vamos a pausar el tema de los creeps esenciales. Cuando te diga que retomemos, me volvés a mandar lo
+  del Patotero para continuar»). Quedó presentado, sin respuesta, el boceto del **L6 · Patotero · Choque liviano**: la patota (pelea cuando tiene a
+  los suyos alrededor). Atributos (Des/Agi/Con/Fue/Esp → vida, No2): nv1 9/8/8/6/2 → 40, 8 · nv2 10/8/9/7/2 → 45, 8 · nv3 11/9/9/8/2 → 45, 9 · nv4
+  12/10/9/9/2 → 45, 10 · nv5 13/10/10/10/2 → 50, 10. Habilidades: nv1 **Finta** (rápida) · **Patotear** (lenta: +1 dado por aliado pegado al
+  rival, hasta +3); nv2 Golpe a la rodilla + Pies ligeros; nv3 Tajo de carnicero; nv4 Hit and run + Ojo crítico; nv5 Ráfaga de cortes. Equipo:
+  **Navaja del compadrito** (Tipo 6, Ini +3, Sangrado 25 %) · 2 Comunes livianas. Consumible: Pergamino grupal de Puntería Certera. Al retomar:
+  mandarle esto y preguntar si le cierra como ruta. Después quedan T4, W4, R4, H4, L7 y L8.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

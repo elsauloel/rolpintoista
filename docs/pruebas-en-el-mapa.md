@@ -284,6 +284,11 @@
 
 ### ▶ Para la próxima tanda de pruebas en el mapa (2026-11-03)
 
+- [ ] **✚ El GM revive un token caído (2026-11-04, dueño: «el GM al seleccionarlo vea entre sus botones uno para revivirlo, tanto para creeps como para
+  jugadores»)**: en el anillo de un token caído (creep, personaje o invocación), el ✚ (solo el GM) → «¿Con cuánta vida vuelve?» (25 / 50 / 100 % o un
+  número) → vuelve Titilando; un personaje deja de estar inconsciente. Verificado que el ✚ aparece solo si está caído (Basilio, en memoria); falta
+  apretarlo de verdad en un creep, un personaje y una invocación.
+
 - [ ] **🧮 La cuenta del daño ANTES de aplicar (2026-11-04, dueño: «el cuadro de la cuenta del daño debe aparecer antes del botón "aplicar el daño". Al
   aplicar uno ya debe saber cuánto va a ser»)**: en el paso 5 del duelo, la pantalla que puede aplicar (el defensor o el GM) muestra la cuenta completa
   (Defensa, escudos, Vida extra, Armadura arcana, Miti-Miti, el elemental del arma) y el total que va a entrar, antes del 💔 Aplicar; al aplicarlo tiene que

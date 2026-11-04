@@ -71,7 +71,7 @@ Respuestas del dueño a la medición (2026-11-04):
     T6 = ½; T8 = ¼; T10 = ¼; +1 a todos los Tipos = 2. Los precios se mantienen y se ajustan los efectos.
 12. **Bloqueo +1 = ¾** (dueño, 2026-11-04; Parry +1 y Def. especial +1 = 1). **Escudos: aprobados y cargados en el catálogo (24 escudos).**
     Cascos → [propuesta-res-critico-cascos.md](propuesta-res-critico-cascos.md): **aprobados y cargados** (6 cascos; el Bacinete de recluta queda con ×2 como
-    excepción; «morrión» renombrado). Torso blando → [propuesta-res-critico-torso-blando.md](propuesta-res-critico-torso-blando.md), **aprobado y cargado** (2026-11-04: Res. T6 +1 en 4 piezas acolchadas; el Gambesón de doble capa pasa a Def. especial +5 · Res. T6 ×2, opción B). Torso rígido → [propuesta-res-critico-torso-rigido.md](propuesta-res-critico-torso-rigido.md), **aprobado y cargado** (versión 2: 4 piezas; se permiten dos Tipos por pieza). Sigue: manos.
+    excepción; «morrión» renombrado). Torso blando → [propuesta-res-critico-torso-blando.md](propuesta-res-critico-torso-blando.md), **aprobado y cargado** (2026-11-04: Res. T6 +1 en 4 piezas acolchadas; el Gambesón de doble capa pasa a Def. especial +5 · Res. T6 ×2, opción B). Torso rígido → [propuesta-res-critico-torso-rigido.md](propuesta-res-critico-torso-rigido.md), **aprobado y cargado** (versión 2: 4 piezas; se permiten dos Tipos por pieza). Manos → [propuesta-res-critico-manos.md](propuesta-res-critico-manos.md), a revisar.
 13. **Paso 4, primera familia: escudos** → propuesta en [propuesta-res-critico-escudos.md](propuesta-res-critico-escudos.md) (2026-11-04), a revisar con el dueño.
 
 ## Al terminar todo el catálogo: actualizar El origen

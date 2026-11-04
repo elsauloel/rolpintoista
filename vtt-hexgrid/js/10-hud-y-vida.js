@@ -37,7 +37,7 @@ function hudDatos(t){
     sp: conSp ? sp : spCreep ? CreepCalculo.spActual(sc) : null, spMax: conSp ? spMax : spCreep ? CreepCalculo.spMax(sc) : null,
     no2: secreto ? null : (n ? n.valor : null), no2Max: secreto ? null : (n ? n.max : null),
     def: t.tipo === 'creep' ? (sc ? creepDefensaMapa(sc) : null) : (r.def === undefined ? null : num(r.def)),
-    estados: (v && v.resumen && v.resumen.estados) || [],
+    estados: hudEstadosConPrivado((v && v.resumen && v.resumen.estados) || [], t.tipo === 'creep' && soyGM ? sc : null),
     notas: (v && v.notas) || '',
     // El GM ve los nombres de verdad (de la ficha privada); los jugadores, lo publicado: de un creep vivo, solo qué es (2026-10-13).
     armaNombre: (t.tipo === 'creep' && soyGM && sc ? Combatiente.armaEnMano(sc).nombre : (v && v.armaNombre)) || '',
@@ -768,6 +768,16 @@ async function hudHpAplicar(t, texto){
 
 // La descripción del estado para el globo (dueño, 2026-11-04: «debe mostrarte la descripción del estado con hover»): la suya; si no trae
 // (los que pone una habilidad de creep, p. ej. Piel de hierro), la del preset con ese nombre; si tampoco, lo que hace armado de sus mods.
+// Lo publicado de un creep no trae la descripción ni los números (los jugadores no los ven); el GM sí: se los suma de la ficha privada, mismo orden (2026-11-04).
+function hudEstadosConPrivado(lista, sc){
+  if(!sc || !Array.isArray(sc.estados)) return lista;
+  const priv = sc.estados.filter(e => e && e.activo !== false && e.nombre);
+  return lista.map((e, i) => {
+    const p = priv[i];
+    if(!e || !p || String(p.nombre).slice(0, 60) !== String(e.nombre || '')) return e;
+    return {...e, ...(e.detalle ? {} : {detalle: p.detalle}), ...(e.mods ? {} : {mods: p.mods}), ...(e.hpturno !== undefined ? {} : {hpturno: p.hpTurno})};
+  });
+}
 function hudDetalleEstado(e){
   // (2026-11-04: la Piel de hierro decía +6 y sumaba +4 —escala con el nivel—): al texto se le suma lo que este estado suma de verdad, de sus mods.
   const reales = hudModsEstadoTxt(e);

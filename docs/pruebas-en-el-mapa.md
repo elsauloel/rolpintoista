@@ -290,8 +290,13 @@
   tiró de 21,12 a 21,14); el error de permisos con mapa y ficha abiertos (cada estado una vez, sin cartel); el robo en sigilo que lleva oro (300 →
   288) y el robo propio de un personaje (la Poción de Piel de Cristal pasó al cinturón); las Vidas extra viejas al empezar el turno — **había un
   error y se arregló**: quedaban 8 + 3 en vez de 8 (probado de nuevo con clics: una sola, 8).
-- [ ] **Tanda h, no llegué**: Arma elemental creep → creep, 💔 vida en 0 desde el mapa, Arma elemental en una invocación, y el arreglo de
-  «Arma elemental cobra antes de elegir a quién» (ver el reporte: dónde está el hueco).
+- [x] ✅ **Tanda i (2026-11-04, con clics en «Claude · pruebas»)**: cancelar con Esc la elección del objetivo devuelve lo cobrado — personaje
+  (Prueba Uno, Arma elemental: Fuego, 1 No2 + 3 SP de vuelta) y creep (Goblin picapiedras, 2 No2 + 2 SP de vuelta); Arma elemental creep → creep
+  (Goblin picapiedras a Goblin Scout: «🔥 Arma ígnea: Espada de la colimba», 3 turnos); el globo de Piel de hierro con «En este: Defensa +6 ·
+  Defensa especial +6…» (**arreglado de paso**: en el mapa, el GM no veía la descripción propia ni los números de los estados de un creep); el +2
+  de «recién arrastrado» ya no se suma al robo (sí a un ataque); 💔 vida en 0 con «2 · HP directo» sin pacto → inconsciente, 5 turnos, ✚ Revivir.
+  La góndola del generador de tiendas **no se rearmó** al reabrirlo (pueblito y tienda de inicio): no se pudo reproducir, no se cambió nada.
+- [ ] **Tanda i, no llegué**: Arma elemental en una invocación; 💔 vida en 0 con pacto y con el dueño desconectado.
 
 - [ ] **💔 Vida en 0 desde el mapa (2026-11-04, dueño: «Bizzante quedó en 0 HP —se puso −N en HP directo— y no se murió, ni se activó su pacto»)**:
   `vtt-hexgrid/js/98-vida-en-cero.js`. Con un personaje con 😇 Pacto, bajarle la vida a 0 con **2 · HP directo** → a los ~2 s revive con un cuarto de

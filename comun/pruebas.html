@@ -116,9 +116,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
-<script src="skills-clase.js?v=20261104ae"></script>
-<script src="creeps-base.js"></script>
-<script src="skills-creep-base.js?v=20261104g"></script>
+<script src="skills-clase.js?v=20261104ig"></script>
+<script src="armas-naturales-base.js?v=20261104ig"></script>
+<script src="creeps-base.js?v=20261104ig"></script>
+<script src="skills-creep-base.js?v=20261104ig"></script>
 <script src="creeps-esenciales.js?v=20261103t21"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -1363,11 +1364,19 @@ prueba('📦 Habilidades de creep (2026-10-26): el catálogo son solo las audita
     c.length + a.length === HABILIDADES_CREEP_BASE.length, a.some(e => e.etiquetas.includes('de El origen')), c.some(e => e.nombre === 'Takle'), a.some(e => e.nombre === 'Tackle')],
     [true, true, true, true, true, true, false]);
 });
-prueba('🎯 Tiro certero (Rango, 2026-10-26): +1 PdG, Perfora 3 e ignora 2 de Resistencia a crítico; lo de un ataque y 2 SP, o cooldown 2', () => {
+prueba('🎯 Tiro certero (Rango, 2026-10-26): +1 PdG, Perfora 3 y Crítico frecuente +2 (antes «ignora 2 de Resistencia a crítico»; dueño, 2026-11-04); lo de un ataque y 2 SP, o cooldown 2', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Tiro certero'), h = armarHabilidadDeCreep(e.datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {perfora: 1}});
-  igual([a.mods.pdg, a.perfora, a.mods.ignoraResistCrit, h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('rango'), e.etiquetas.includes('tiro certero')],
-    [1, 4, 2, 'ATAQUE', 2, 2, true, true]);
+  igual([a.mods.pdg, a.perfora, a.mods.ignoraResistCrit, a.mods.critBono, h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('rango'), e.etiquetas.includes('tiro certero')],
+    [1, 4, 0, 2, 'ATAQUE', 2, 2, true, true]);
+});
+prueba('«Ignora N de Resistencia a crítico» se reemplazó por Crítico frecuente (dueño, 2026-11-04): ningún ítem del catálogo, habilidad de creep o de clase de fábrica, ni arma natural, lo usa', () => {
+  const malo = o => /"ignoraResistCrit":[1-9]|"ignora":[1-9]|Ignora \d+ de Res|ignora \d+ de (la )?Resistencia a crítico/i.test(JSON.stringify(o));
+  const items = CATALOGO_BASE.filter(malo).map(i => i.nombre);
+  const habs = HABILIDADES_CREEP_BASE.filter(malo).map(h => h.nombre);
+  const clase = (typeof CLASES_SKILLS !== 'undefined' ? CLASES_SKILLS : []).filter(malo).map(h => h.nombre);
+  const nat = (typeof ARMAS_NATURALES_BASE !== 'undefined' ? ARMAS_NATURALES_BASE : []).filter(malo).map(h => h.nombre);
+  igual([items, habs, clase, nat], [[], [], [], []]);
 });
 prueba('☀ Destello revelador (antes Luz para los suyos; Support, 2026-10-26, rehecha: un destello): área de diámetro 5 sin dodge; Marcado 2 sin tirada; Ef.Esp contra Res.Esp, 1d8 de luz directo', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Destello revelador'), h = armarHabilidadDeCreep(e.datos, 2);

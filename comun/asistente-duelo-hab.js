@@ -210,7 +210,11 @@ const AsistenteDueloHab = (() => {
       modo: (ini && ini.modo) || 'hab', x: (ini && ini.x) || 'nitros',
       terminaTurno: !!(ini && ini.terminaTurno),   // Degollar (2026-10-10): al resolverse, termina el turno y pasa al final del orden
       flashEn: new Set(ini && ini.flash && Array.isArray(ini.flash.en) ? ini.flash.en : ['pdg', 'parry', 'bloqueo', 'dano']), flashBono: (ini && ini.flash && ini.flash.bono) || 2, flashDodge: !!(ini && ini.flash && ini.flash.dodge),
-      arma: {pdg: 0, pdgPorX: 0, dadosPorX: 0, fijo: 0, fijoPorX: 0, sinParry: false, ignoraResistCrit: 0, critBono: 0, critpotBono: 0, perfora: 0, ...((ini && ini.arma) || {})},
+      arma: (a => { const o = {pdg: 0, pdgPorX: 0, dadosPorX: 0, fijo: 0, fijoPorX: 0, sinParry: false, ignoraResistCrit: 0, critBono: 0, critpotBono: 0, perfora: 0, ...a};
+        // «Ignora N de Resistencia a crítico» ya no existe (dueño, 2026-11-04: «reemplazar Ignora por Crítico frecuente, así lo mantenemos más simple»):
+        // una habilidad vieja que lo traiga pasa esos N al Crítico frecuente al editarla.
+        if(Number(o.ignoraResistCrit) > 0){ o.critBono = (Number(o.critBono) || 0) + Number(o.ignoraResistCrit); o.ignoraResistCrit = 0; }
+        return o; })((ini && ini.arma) || {}),
       // Critical Matters (2026-09-29, pedido del dueño — Lisiar: "Crítico frecuente ×1... si es crítico, el
       // efecto pasa a -2 fijo"): SOLO tiene sentido en modo 'arma' (es el único que puede critear). Mismo
       // andamiaje que los Efectos de siempre (◎ Estado/💚 Cura + Personalizar), pero una lista APARTE
@@ -310,9 +314,7 @@ const AsistenteDueloHab = (() => {
       if(parte === 'def') return titulo('', 'La defensa de quien recibe el ataque', 'Como en cualquier ataque, elige Evasión o Parry antes de ver tu tirada.')
         + `<label class="op"><input type="checkbox" data-sinparry ${a.sinParry ? 'checked' : ''}> No se puede parrear (solo esquivar)</label>`;
       if(parte === 'crit') return titulo('', 'El crítico de este ataque', 'Suman solo para el crítico de este ataque puntual; no dejan ningún estado.')
-        + `<label class="op"><input type="checkbox" data-ignoraresistcrit-on ${a.ignoraResistCrit > 0 ? 'checked' : ''}> Ignora Resistencia a crítico</label>
-        ${a.ignoraResistCrit > 0 ? `<div class="fila"><span style="min-width:250px">¿Cuántos puntos ignora?</span><input type="number" min="1" style="width:80px" data-arma="ignoraResistCrit" value="${esc(a.ignoraResistCrit)}"></div>` : ''}
-        ${fila('critBono', '+ Crítico frecuente')}${fila('critpotBono', '+ Crítico potente')}${espalda}${fila('espaldaCritpot', '+ Crítico potente por la espalda')}`;
+        + `${fila('critBono', '+ Crítico frecuente')}${fila('critpotBono', '+ Crítico potente')}${espalda}${fila('espaldaCritpot', '+ Crítico potente por la espalda')}`;
       if(parte === 'dano') return titulo('', 'El daño de este ataque', 'El daño de tu arma, más lo que le suma la habilidad. «Por X» se multiplica por la X que elegís al usarla.')
         + `${fila('fijo', 'Daño fijo extra')}<div class="fila"><span style="min-width:250px">Dados de daño extra (ej. 1d6)</span><input type="text" style="width:80px" placeholder="1d6" data-arma-dados value="${esc(a.dadoExtra || '')}"></div>
         ${fila('dadosPorX', 'Dados extra por cada X (del Tipo del arma)')}${fila('fijoPorX', 'Daño fijo extra por cada X')}${xSel}
@@ -748,7 +750,6 @@ const AsistenteDueloHab = (() => {
       q('[data-x]', e => { st.x = e.target.value; });
       q('[data-sinparry]', e => { st.arma.sinParry = e.target.checked; });
       q('[data-terminaturno]', e => { st.terminaTurno = e.target.checked; });
-      q('[data-ignoraresistcrit-on]', e => { st.arma.ignoraResistCrit = e.target.checked ? 1 : 0; dibujar(); });
       f.querySelectorAll('[data-arma]').forEach(i => i.onchange = () => { st.arma[i.dataset.arma] = Number(i.value) || 0; });
       // Dados extra de otro tamaño que los del arma (2026-10-13, Picada del Kobold Rabioso: +1d6): «NdM», o vacío.
       f.querySelectorAll('[data-arma-dados]').forEach(i => i.onchange = () => { const v = String(i.value || '').trim().toLowerCase().replace(/\s+/g, ''); st.arma.dadoExtra = /^\d{1,2}d\d{1,3}$/.test(v) ? v : ''; if(v && !st.arma.dadoExtra) i.value = ''; });

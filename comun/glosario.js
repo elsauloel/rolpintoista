@@ -72,7 +72,7 @@ const Glosario = (() => {
     {titulo: 'Crítico potente', texto: 'Crítico potente: hace más fuerte el crítico (baja lo que hay que sacar en el d20 para ×2, ×3 y ×4), no lo hace más seguido.'},
     {titulo: 'PdG en oportunidad', texto: 'PdG en oportunidad: solo se suma en un ataque de oportunidad (cuando un rival se aleja de tu lado).'},
     {titulo: 'PdG en contraataque', texto: 'PdG en contraataque: solo se suma en un contraataque (después de ganar un Parry y un Bloqueo).'},
-    {titulo: 'Res. crítico', re: 'Res\\. crítico|Resistencia a crítico', texto: 'Resistencia a crítico: cuántos niveles de crítico se le restan al golpe de un arma de ese Tipo. Un arma que «ignora N de Res. crítico» le resta N a la del defensor.'},
+    {titulo: 'Res. crítico', re: 'Res\\. crítico|Resistencia a crítico', texto: 'Resistencia a crítico: sube en ese número la diferencia que hace falta para el crítico de un arma de ese Tipo, en cada nivel (Tipo 4 con Res. ×1: 5, 10, 15…). El Crítico frecuente la compensa punto por punto.'},
     {titulo: 'Por la espalda', texto: 'Por la espalda: cuenta solo si quien ataca está en sigilo y en el casillero justo de atrás del defensor (si lo ve, se da vuelta). ⚙ El mapa lo suma solo.'},
     {titulo: 'No se puede parrear', texto: 'No se puede parrear: contra esta arma el defensor solo puede esquivar.'},
     {titulo: 'Oportunidad sin No2', texto: 'Oportunidad sin No2: el ataque de oportunidad con esta arma no cuesta Nitros.'},

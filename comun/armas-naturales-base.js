@@ -32,7 +32,6 @@
     drena: p => ef('Drena vida', p, 'El creep se cura tanto HP como el daño que hizo (a mano).'),
     fuego: p => ef('Prende fuego', p, 'Prende fuego al objetivo: 1d8 de daño por cada stack de fuego (a mano).', '1d8'),
     ignora: p => ef('Ignora armadura', p, 'Si entra, el golpe ignora la Defensa del objetivo.'),
-    ign1: p => ef('Ignora 1 de Res. crítico', p, 'Al calcular el crítico, el objetivo tiene 1 menos de resistencia.'),
     ceguera: p => ef('Ceguera', p, 'El objetivo queda con Ceguera 1 turno (a mano).'),
   };
 
@@ -65,7 +64,7 @@
   N('Colmillos venenosos', 'colmillos', 0, false, 'perforante', [E.veneno(50)], 'Colmillos huecos que inyectan veneno.');
   N('Mordisco de presa', 'colmillos', 0, false, 'perforante', [E.agarrar(25)], 'Muerde y no suelta.');
   N('Colmillos sedientos', 'colmillos', 0, false, 'perforante', [E.drena(50)], 'Se alimenta de lo que muerde.');
-  N('Mandíbula trituradora', 'colmillos', 1, false, 'contundente', [E.rompe(25), E.ign1(100)], 'Una mandíbula que quiebra huesos y armaduras.');
+  N('Mandíbula trituradora', 'colmillos', 1, false, 'contundente', [E.rompe(25)], 'Una mandíbula que quiebra huesos y armaduras. Crítico frecuente +1.', [M('crit', 1)]);   // antes «Ignora 1 de Res. crítico» (dueño, 2026-11-04: Ignora → Crítico frecuente)
   N('Dientes de sierra', 'colmillos', 0, false, 'cortante', [E.sangrado(50)], 'Dientes en hilera que desgarran al morder.');
   N('Mordisco contagioso', 'colmillos', -1, false, 'perforante', [E.venenoSevero(25)], 'Una mordida sucia que se infecta.');
   N('Colmillos helados', 'colmillos', 0, false, 'elemental', [E.lisiar(25)], 'Dientes de hielo que dejan la carne dura.');
@@ -105,7 +104,7 @@
   N('Zarcillos', 'tentáculos', -1, false, 'contundente', [E.inmov(33)], 'Lianas que se enredan en las piernas.');
   N('Pinzas', 'pinzas', 0, false, 'cortante', [E.agarrar(33)], 'Pinzas que atrapan y aprietan.');
   N('Pinzas cortantes', 'pinzas', 0, false, 'cortante', [E.lisiar(25)], 'Pinzas que cortan tendones.');
-  N('Pico afilado', 'pico', 0, false, 'perforante', [E.ign1(100)], 'Picotazos precisos a los puntos débiles.');
+  N('Pico afilado', 'pico', 0, false, 'perforante', [], 'Picotazos precisos a los puntos débiles. Crítico frecuente +1.', [M('crit', 1)]);   // antes «Ignora 1 de Res. crítico»
   N('Pico perforante', 'pico', 0, false, 'perforante', [E.ignora(25)], 'Un pico que atraviesa la armadura.');
   N('Enjambre', 'enjambre', -1, false, 'perforante', [E.sangrado(50)], 'Cientos de picaduras a la vez.');
   N('Toque helado', 'toque', -1, false, 'elemental', [E.drena(50)], 'Un roce que congela la sangre.');

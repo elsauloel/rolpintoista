@@ -463,8 +463,10 @@ const AsistenteItem = (() => {
         ${d.armaDeRango ? arcoCampos() : ''}
         <div class="aa-fila">${campo('Primer ataque del turno: No2 de menos', `<input data-aa-c="ahorroNitros" type="number" step="1" min="0" value="${n(d.ahorroNitros) || 0}" style="max-width:110px">`)}
         ${campo('d20 de más en el crítico', `<input data-aa-c="critD20" type="number" step="1" min="0" value="${n(d.critD20) || 0}" style="max-width:110px">`)}</div></div>`;
-      h += `<div class="aa-fila">${campo('Ignora Resistencia a crítico', `<input data-aa-c="ignoraResistCrit" type="number" step="1" min="0" value="${n(d.ignoraResistCrit) || 0}" style="max-width:110px">`,
-        'Puntos de Resistencia a crítico del defensor que este arma no cuenta al calcular el crítico (el duelo los resta solo). Típico de estiletes y estoques, desde Raro.')}
+      // «Ignora Resistencia a crítico» se sacó (dueño, 2026-11-04: «reemplazar Ignora por Crítico frecuente, así lo mantenemos más simple»): solo aparece,
+      // para poder ponerlo en 0, en un arma vieja que todavía lo tenga; lo nuevo va como Crítico frecuente.
+      h += `<div class="aa-fila">${n(d.ignoraResistCrit) > 0 ? campo('Ignora Resistencia a crítico (ya no se usa)', `<input data-aa-c="ignoraResistCrit" type="number" step="1" min="0" value="${n(d.ignoraResistCrit) || 0}" style="max-width:110px">`,
+        'Ya no existe en el juego: ponelo en 0 y sumá esos puntos al Crítico frecuente del arma (contra alguien con resistencia es lo mismo).') : ''}
         ${campo('Perfora', `<input data-aa-c="perfora" type="number" step="1" min="0" max="5" value="${n(d.perfora) || 0}" style="max-width:110px">`,
           'Ignora esos puntos de la Defensa de quien recibe el golpe (no toda; con crítico no hace falta). Se suma a la de la flecha o el virote. La gracia de las ballestas; también en punzantes.')}</div>`;
       if(!d.armaDeRango){   // por la espalda (2026-10-03): solo si quien ataca está en sigilo y en el punto ciego del defensor; el mapa lo suma solo

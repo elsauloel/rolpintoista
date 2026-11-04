@@ -129,6 +129,7 @@ Al seleccionar tu token aparecen controles flotantes: la **vida** (círculo rojo
 
 > [!tip] Atajos
 > El ícono ⌨ en el mapa muestra la lista de atajos.
+> Con **A** atacás. Si tenés **dos o más armas** (o un arma y una varita), primero aparece **«⚔ ¿Con qué arma?»**, con cada arma, su Tipo, lo que cuesta ese ataque ahora y si tiene algo encima (🔥 Arma elemental). Esc cancela.
 
 ## Atajos de las habilidades y los consumibles
 En la **Botonera** (y en las ⚔ **Acciones** de un creep, para el GM), a la izquierda de cada habilidad y de cada consumible hay un

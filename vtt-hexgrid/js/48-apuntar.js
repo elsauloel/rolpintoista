@@ -51,7 +51,47 @@ async function atajoAtacar(){
       await new Promise(r => setTimeout(r, 100));
     }
   }
-  const b = raiz && raiz.querySelector(sel);
-  if(!b){ toast('No encontré el botón Atacar en la Botonera'); return; }
+  const botones = raiz ? [...raiz.querySelectorAll(sel)] : [];
+  if(!botones.length){ toast('No encontré el botón Atacar en la Botonera'); return; }
+  // ⚔ ¿Con qué arma? (dueño, 2026-11-04: «al estar equipado con dos armas, al apretar A para atacar, lo primero que debería ver el usuario es
+  // "¿con qué arma?"»). Hay un «Atacar» por arma en la Botonera (las de mano y las especiales, como una varita) o en las Acciones del creep: con
+  // más de uno, se pregunta; con uno, como antes.
+  const b = botones.length > 1 ? await atajoElegirArma(botones) : botones[0];
+  if(!b) return;
   b.click();
+}
+// El cartel «⚔ ¿Con qué arma?»: un botón por cada «Atacar» de la Botonera, con su nombre, Tipo, costo de ahora y lo que tenga encima (🔥).
+async function atajoElegirArma(botones){
+  const t = seleccion && tokens.get(seleccion);
+  let armas = [], estados = [];
+  try{
+    if(t && t.tipo === 'creep' && t.fichaId && typeof creepPrivadoDe === 'function'){
+      const sc = creepPrivadoDe(t.fichaId);
+      if(sc){ armas = Combatiente.armasDeMano(sc) || []; estados = sc.estados || []; }
+    }else if(t){
+      const v = typeof vinculo === 'function' ? vinculo(t) : null;
+      const f = typeof fichasPub !== 'undefined' && fichasPub.get ? fichasPub.get(String(t.fichaId || '').split('~')[0]) : null;
+      const r = (v && v.resumen) || (f && f.resumen);
+      armas = (r && r.armasMano) || []; estados = (r && r.estados) || [];
+    }
+  }catch(err){ console.error('¿Con qué arma?', err); }
+  const limpio = x => String(x || '').replace(/\s+/g, ' ').trim();
+  const opciones = botones.map((b, i) => {
+    const id = b.dataset.atacararma || b.dataset.arma || '';
+    const a = armas.find(x => x && String(x.id || '') === String(id));
+    const etiqueta = limpio(b.querySelector('.bt-label') ? b.querySelector('.bt-label').textContent : '');
+    const titulo = limpio(b.getAttribute('title') || b.textContent);
+    // nombre: el del arma si la encontramos; si no, lo que dice el botón («Atacar con X · …» → X)
+    const nombre = a ? a.nombre : (/con (.+?)( \(|$| ·)/.exec(titulo) || [])[1] || etiqueta.replace(/^.*?·\s*/, '') || etiqueta || 'Atacar';
+    const costo = limpio(b.querySelector('.bt-mod') ? b.querySelector('.bt-mod').textContent : '') || (/(\d+(?:,\d+)? No2(?: · 1\.º ataque)?)/.exec(etiqueta) || [])[1] || (/(\d+(?:,\d+)? No2(?: · 1\.º ataque)?)/.exec(titulo) || [])[1] || '';
+    // el Tipo: el del arma; si la ficha no lo publica, el del catálogo con ese nombre
+    const delCat = typeof CATALOGO_BASE !== 'undefined' && Array.isArray(CATALOGO_BASE) ? CATALOGO_BASE.find(x => x && x.nombre === nombre) : null;
+    const tipoDado = (a && a.tipoDado) || (delCat && delCat.tipoDado);
+    const tipo = /arma especial/.test(titulo) || (delCat && delCat.especial) ? 'arma especial' : tipoDado ? `Tipo ${tipoDado}` : '';
+    let fuego = '';
+    try{ const ae = a && Combatiente.armaElementalDelGolpe(estados, null, {id: a.id, nombre: a.nombre}); if(ae) fuego = ` · ${ae.txt || ae.corto || '🔥 Arma elemental'}`; }catch(e){}
+    return {valor: i, texto: `⚔ ${nombre}`, detalle: [tipo, costo].filter(Boolean).join(' · ') + fuego};
+  });
+  const i = await Confirmar.elegir('', {titulo: '¿Con qué arma?', icono: '⚔', opciones, no: 'Cancelar'});
+  return i === null || i === undefined ? null : botones[i];
 }

@@ -67,7 +67,8 @@ Respuestas del dueño a la medición (2026-11-04):
     Cada pieza da +1 contra un Tipo; el +2 en una pieza, muy raro y desde Buena; las de Tipos altos, más raras que las de Tipos bajos.
 11. **Pesos para el catálogo** (docs/peso-resistencia-critico.md, a confirmar con el dueño al revisar las piezas): Defensa +1 = 1; Res. T4 ×1 = 1;
     T6 = ½; T8 = ¼; T10 = ¼; +1 a todos los Tipos = 2. Los precios se mantienen y se ajustan los efectos.
-12. **Paso 4, primera familia: escudos** → propuesta en [propuesta-res-critico-escudos.md](propuesta-res-critico-escudos.md) (2026-11-04), a revisar con el dueño.
+12. **Bloqueo +1 = ¾** (dueño, 2026-11-04; Parry +1 y Def. especial +1 = 1). **Escudos Comunes: aprobados.**
+13. **Paso 4, primera familia: escudos** → propuesta en [propuesta-res-critico-escudos.md](propuesta-res-critico-escudos.md) (2026-11-04), a revisar con el dueño.
 
 ## ⏸ En pausa (2026-11-04): el dueño lo sigue en la compu
 «Vamos a pasar esta tarea; en la compu lo resuelvo, requiere más atención.» Dónde quedó: la propuesta de los **escudos**

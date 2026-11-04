@@ -1,6 +1,10 @@
 # Propuesta: escudos (rebalance de la Resistencia a crítico)
 
 Primera familia del paso 4 del [plan](plan-resistencia-critico.md). **Solo propuesta: no se cambió el catálogo.** Fecha: 2026-11-04.
+
+> **Decidido (dueño, 2026-11-04, en la compu):** los **6 Comunes** que cambian, aprobados («me cierran esos 6 comunes»). **Bloqueo +1 = ¾** (no 1:
+> solo sirve después de ganar un Parry; «estoy de acuerdo con revisar esto») → ver «Revisión por el Bloqueo a ¾», al final. Parry +1 y Def. especial +1
+> siguen valiendo 1. Falta: aprobar los Buenos (con la revisión del Bloqueo) y recién ahí se carga todo en el catálogo.
 Base: el mapa cerrado (el escudo puede dar resistencia contra Tipo 4, 6, 8 o 10; +1 contra un solo Tipo; el +2, muy raro y desde Buena; sin Tipo 12)
 y los pesos de [peso-resistencia-critico.md](peso-resistencia-critico.md).
 
@@ -121,3 +125,33 @@ y los pesos de [peso-resistencia-critico.md](peso-resistencia-critico.md).
 3. **¿Qué «peso viejo» vale?** Con la fórmula (Res. T4 = 3,2) casi todos los escudos con T4 parecerían haber perdido 2 puntos. Pero los precios del
    catálogo muestran que en la práctica se cobraban como ~1, así que la propuesta compensa según el precio, no según la fórmula.
 4. **El Tipo 10 en Común:** quedaron dos (Hierro macizo y Roble reforzado). Pesa ¼, así que no los vuelve muy fuertes.
+
+## Revisión por el Bloqueo a ¾ (2026-11-04)
+
+Con Bloqueo +1 = ¾, cada escudo pierde ¼ por punto de Bloqueo. Medida de lo que «paga» el precio: Común 60–65 ≈ 2, 80–90 ≈ 3; Buena 120 ≈ 4,
+130–140 ≈ 4½, 150 ≈ 5. Se corrigen solo los que quedan cortos por ½ o más (con la propuesta de arriba ya aplicada); los demás quedan dentro de ±¼.
+Criterio: si falta ¾, Defensa +1 (o Def. especial +1); si falta ½, algo de ½ (Resistente, una resistencia elemental, sacar un −1).
+
+**Comunes**
+| Escudo | Arreglo |
+|---|---|
+| Tabla de lavar (65) · Bloq +2 | + Resistente ×2 (1½ → 2) |
+| Rodela de madera (90) · Def +1 · Bloq +2 | + Resistente ×2 (2½ → 3) |
+| Escudo fluorescente (80) · Def.Esp +1 · Bloq +1 · Luz +2 | Luz +2 → Luz +4 (2¼ → 2¾) |
+| Escudo de hierro macizo (90) · Def +2 · Bloq +1 · Res. T10 +1 · Ini −1 (ya aprobado) | sin el Ini −1 (2½ → 3) |
+
+**Buenos**
+| Escudo | Arreglo |
+|---|---|
+| Rodela de brazo del gladiador (140) · Def +1 · Bloq +1 · Antebrazo | Def +1 → +2 (3¾ → 4¾) |
+| Escudo de acero laminado (150) · propuesta: Def +3 · Bloq +1 · Res. T8 · Resistente ×2 | Resistente ×2 → ×3 (4½ → 5) |
+| Escudo de escamas (150) · propuesta: Def +2 · Bloq +1 · Res. T6 · Def.Esp +1 | Def +2 → +3 (4¼ → 5¼) |
+| Escudo de puerta de fortín (130) · propuesta: Def +3 · Bloq +2 · Res. T8 · Eva −1 · Ini −1 | sin el Ini −1 (3¾ → 4¼) |
+| Escudo de corteza (150) · Def +2 · Def.Esp +1 · Bloq +2 · Res. T4 · Frágil ×4 | Frágil ×4 → ×3 (4½ → 5) |
+| Mantelete de asedio (130) · Def. a distancia +4 · Def +1 · Bloq +1 | Def +1 → +2 (3¾ → 4¾) |
+| Escudo de la falange (150) · Muro de escudos · Def +2 · Bloq +1 | Def +2 → +3 (4¼ → 5¼) |
+| Escudo de contención (140) · Bloqueo firme · Def +2 · Bloq +1 | Def +2 → +3 (3¾ → 4¾) |
+| Escudo de rebote (135) · Empujón · Def +2 · Bloq +1 | Def +2 → +3 (3¾ → 4¾) |
+| Escudo de cuero de búfalo (140) · propuesta: Def +2 · Bloq +2 · Res. T6 | + Resistente ×2 (4 → 4½) |
+| Rodela de hierro forjado (150) · propuesta: Def +3 · Bloq +1 · Res. T8 ×2 | + Def.Esp +1 (4¼ → 5¼) |
+| Rodela de roble herrada (140) · propuesta: Def +2 · Bloq +2 · Res. T10 | Def +2 → +3 (3¾ → 4¾) |

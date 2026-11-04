@@ -115,7 +115,7 @@ También hay **estados** para darlos con habilidades o a mano: **Crítico frecue
 Las armas de **Tipo 6** acentúan el crítico frecuente y las de **Tipo 4** el potente, pero ambas pueden usar las dos herramientas (es una guía, no una regla).
 
 ## Cómo se protege uno
-Con la [[Resistencia a crítico]]: **cada punto contra el Tipo del arma atacante te quita un nivel de crítico.** Un doble crítico contra 1 punto cuenta como crítico simple; un crítico simple contra 1 punto no es crítico.
+Con la [[Resistencia a crítico]]: **cada punto contra el Tipo del arma atacante le suma 1 al rango del crítico, en cada nivel.** Contra un arma Tipo 4, con resistencia ×1 hace falta una diferencia de 5 para el crítico (10 para el doble), y con ×2, de 6 (12 para el doble). Se compensa punto por punto con el Crítico frecuente del que ataca (Tipo 4, frecuente ×3 y resistencia ×1: 4 − 3 + 1 = 2), y el rango nunca baja de 2.
 
 Algunos ítems y estados lo anulan: el estado [[Invulnerable]] bloquea cualquier daño, y "Blindado" hace inmune a críticos.
 
@@ -133,7 +133,10 @@ estado: borrador
 +++
 La **resistencia a crítico** es un stat que da la armadura (y otros ítems) para **reducir los golpes críticos** de un cierto [[Daño y Tipo de arma|Tipo]] de arma. Hay cinco, una por Tipo: **4, 6, 8, 10 y 12**.
 
-**Cada punto de resistencia contra el Tipo del arma atacante te quita un nivel de [[Golpe crítico|crítico]].** Contra un doble crítico, 1 punto lo deja en crítico simple; contra un crítico simple, 1 punto lo anula.
+**Cada punto de resistencia contra el Tipo del arma atacante le suma 1 al rango del [[Golpe crítico|crítico]]**: al que te ataca le hace falta más diferencia entre su PdG y tu Evasión para cada nivel. Con resistencia a crítico Tipo 4 ×1, un arma Tipo 4 te hace crítico con diferencia 5 (en vez de 4) y doble crítico con 10; con ×2, con 6 y 12. El Crítico frecuente del que ataca la compensa punto por punto; el rango nunca baja de 2.
+
+> [!info] Cambió el 2026-11-04
+> Antes cada punto de resistencia quitaba un nivel entero de crítico (con Tipo 4 y ×1 hacía falta una diferencia de 8). Ahora suma 1 al rango.
 
 > [!example] En un ítem
 > "Resistencia a críticos tipo 4 y 6: +1" significa que, contra armas de Tipo 4 y de Tipo 6, tu resistencia vale +1.

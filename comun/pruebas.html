@@ -167,7 +167,10 @@ prueba('umbrales sin potente: 7 / 17 / 20', () => igual(Critico.umbrales(0), {do
 prueba('umbrales con potente 6: 1 / 14 / 18', () => igual(Critico.umbrales(6), {doble: 1, triple: 14, cuadruple: 18}));
 prueba('multiplicador: 17 sin potente → triple', () => igual(Critico.multiplicador(17, 0), 3));
 prueba('evaluar: PdG 12 vs Eva 4, Tipo 4 → nivel 2, 2d20', () => { const e = Critico.evaluar({pdg: 12, eva: 4, tipo: 4}); igual([e.nivel, e.dados], [2, 2]); });
-prueba('evaluar: la Resistencia a crítico resta d20', () => igual(Critico.evaluar({pdg: 12, eva: 4, tipo: 4, resistencia: 1}).dados, 1));
+prueba('evaluar: la Resistencia a crítico suma al rango (Tipo 4 ×1 → 5; 2026-11-04)', () => { const e = Critico.evaluar({pdg: 12, eva: 4, tipo: 4, resistencia: 1}); igual([e.rango, e.nivel, e.dados], [5, 1, 1]); });
+prueba('evaluar: Tipo 4 ×1 con diferencia 4 → no es crítico; con 5 sí; con 10, 2 d20', () => igual([Critico.evaluar({pdg: 8, eva: 4, tipo: 4, resistencia: 1}).critico, Critico.evaluar({pdg: 9, eva: 4, tipo: 4, resistencia: 1}).critico, Critico.evaluar({pdg: 14, eva: 4, tipo: 4, resistencia: 1}).dados], [false, true, 2]));
+prueba('evaluar: Tipo 4 ×2 → rango 6', () => igual(Critico.evaluar({pdg: 10, eva: 4, tipo: 4, resistencia: 2}).rango, 6));
+prueba('rango: frecuente y resistencia se compensan, mínimo 2 al final (4 − 3 + 1 = 2; 4 − 5 + 1 → 2)', () => igual([Critico.rango(4, 3, 1), Critico.rango(4, 5, 1), Critico.rango(4, 1, 2)], [2, 2, 5]));
 prueba('supercrítico: dos 20 naturales → ×8', () => igual(Critico.resultadoD20([20, 20], 0).mult, 8));
 prueba('supercrítico: tres 20 naturales → ×12', () => igual(Critico.resultadoD20([20, 20, 20], 0).mult, 12));
 prueba('supercrítico: un solo 20 sigue en ×4', () => igual(Critico.resultadoD20([20, 3], 0).mult, 4));
@@ -6198,8 +6201,9 @@ prueba('arma que ignora Resistencia a crítico: el duelo se la resta al defensor
   const sin = {pdg: {total: 15}, eva: {total: 3}, ataque: {tipoDado: 4, mods: {}}, critDatos: {frecuente: 0, potente: 0, resistencia: 3}};
   Duelo.entrarCritico(sin);
   const arma = {tipoItem: 'arma_1m', tipoDado: 4, peso: 1, danoFijo: 2, ignoraResistCrit: 2};
+  // (2026-11-04) con la resistencia en el rango: 12 de diferencia, rango 5 (R 1) → 2 d20; rango 7 (R 3) → 1 d20
   igual([ign, m.crit.resistencia, sin.crit.resistencia, m.crit.dados - sin.crit.dados, ItemCorto.armaEsencial(arma), /data-glo="Res. crítico"/.test(ItemCorto.grillaHtml(arma)),
-    Combatiente.ignoraResistCritArma(null)], [3, 1, 3, 2, 'Tipo 4 · 1 dado · +2 de daño · Ignora 2 de Res. crítico', true, 0]);
+    Combatiente.ignoraResistCritArma(null)], [3, 1, 3, 1, 'Tipo 4 · 1 dado · +2 de daño · Ignora 2 de Res. crítico', true, 0]);
 });
 
 prueba('armas: el efecto «solo si es crítico» entra solo con crítico; «Drena vida» no es un efecto sobre el golpeado: queda en el daño con su %', () => { const pp = fbFalsoCola.then(async () => {

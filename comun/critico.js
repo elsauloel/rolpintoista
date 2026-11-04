@@ -5,7 +5,9 @@
    Regla:
    - El "rango" del crítico es el Tipo del arma (4, 6, 8, 10 o 12). Crítico FRECUENTE ×F lo baja F puntos (mínimo 2).
    - Nivel del crítico N = (PdG − Evasión) ÷ rango, hacia abajo. N = 0: no hay crítico.
-   - La Resistencia a crítico del defensor contra ese Tipo resta R niveles: se tiran N − R d20 y vale el MEJOR. Con N − R ≤ 0 no hay crítico.
+   - La Resistencia a crítico ×R del defensor contra ese Tipo SUBE el rango R puntos, en cada nivel (2026-11-04, dueño: «si alguien tiene resistencia
+     a crítico tipo 4 ×1, para hacerle crítico tienen que hacerle una diferencia de 5, y de 6 si tuviera ×2»; antes restaba R niveles enteros).
+     Se compensa punto por punto con el Crítico frecuente y el mínimo de 2 va al final: rango = Tipo − F + R, mínimo 2. Se tiran N d20, vale el MEJOR.
    - El d20 da el multiplicador de TODO el daño del golpe: 7+ doble daño (×2), 17+ triple (×3), 20 cuádruple (×4); menos de 7, ×1.
      Crítico POTENTE ×P baja los umbrales: el doble 1 a 1 (7 − P, piso 1), el triple 1 cada 2 puntos, el cuádruple 1 cada 3.
    - El crítico IGNORA la armadura (la Defensa no se resta). Sin crítico, el daño es normal: daño − Defensa.
@@ -19,8 +21,8 @@ const Critico = (() => {
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
   const NOMBRE_MULT = {1: 'sin multiplicador', 2: 'doble daño', 3: 'triple daño', 4: 'cuádruple daño'};
 
-  // Rango del crítico: el Tipo, menos los puntos de Crítico frecuente (nunca baja de 2).
-  const rango = (tipo, frecuente) => Math.max(2, Math.round(num(tipo)) - Math.max(0, Math.round(num(frecuente))));
+  // Rango del crítico: el Tipo, menos los puntos de Crítico frecuente, más los de Resistencia a crítico del defensor (nunca baja de 2).
+  const rango = (tipo, frecuente, resistencia) => Math.max(2, Math.round(num(tipo)) - Math.max(0, Math.round(num(frecuente))) + Math.max(0, Math.round(num(resistencia))));
 
   // Umbrales del d20 con Crítico potente ×P. El doble daño baja 1 por punto (piso 1); el triple 1 cada 2; el cuádruple 1 cada 3.
   function umbrales(potente){
@@ -47,11 +49,11 @@ const Critico = (() => {
   // Nombre del multiplicador para mostrar ("doble daño"…; más de ×4 solo puede ser un supercrítico).
   const nombreMult = mult => NOMBRE_MULT[mult] || `SUPERCRÍTICO (${mult / 4} veintes naturales)`;
 
-  // ¿Hay crítico? Devuelve el rango efectivo, la diferencia, el nivel N y cuántos d20 se tiran (N − resistencia).
+  // ¿Hay crítico? Devuelve el rango efectivo (con la resistencia), la diferencia, el nivel N y cuántos d20 se tiran (N).
   function evaluar({pdg, eva, tipo, frecuente = 0, potente = 0, resistencia = 0}){
-    const r = rango(tipo, frecuente), diff = num(pdg) - num(eva);
+    const r = rango(tipo, frecuente, resistencia), diff = num(pdg) - num(eva);
     const nivel = diff > 0 ? Math.floor(diff / r) : 0;
-    const dados = Math.max(0, nivel - Math.max(0, Math.round(num(resistencia))));
+    const dados = nivel;   // la resistencia ya está en el rango (2026-11-04)
     return {rango: r, diferencia: diff, nivel, dados, critico: dados > 0, umbrales: umbrales(potente)};
   }
 
@@ -190,13 +192,12 @@ const Critico = (() => {
         <div id="cr-vista"></div>`;
       if(id === 'critico'){
         const e = ev(), u = e.umbrales;
-        const cab = `Diferencia PdG − Evasión: <b>${e.diferencia}</b> · rango del crítico: <b>${e.rango}</b>${e.rango !== num(v.tipo) ? ` (Tipo ${num(v.tipo)} con frecuente ×${num(v.frecuente)})` : ''}`;
+        const cab = `Diferencia PdG − Evasión: <b>${e.diferencia}</b> · rango del crítico: <b>${e.rango}</b>${e.rango !== num(v.tipo) ? ` (Tipo ${num(v.tipo)}${num(v.frecuente) ? ` − frecuente ${num(v.frecuente)}` : ''}${num(v.resistencia) ? ` + Resistencia a crítico ${num(v.resistencia)}` : ''}${num(v.tipo) - num(v.frecuente) + num(v.resistencia) < 2 ? ', mínimo 2' : ''})` : ''}`;
         let r;
         if(e.diferencia <= 0) r = `La PdG no supera a la Evasión: <b>no hay golpe</b> (se resuelve a mano) ni crítico.`;
-        else if(e.nivel === 0) r = `<b>No es crítico</b>: la diferencia no llega al rango.`;
-        else if(!e.critico) r = `Nivel del crítico ${e.nivel} − resistencia ${num(v.resistencia)}: la Resistencia a crítico del defensor <b>anula el crítico</b>.`;
+        else if(e.nivel === 0) r = `<b>No es crítico</b>: la diferencia no llega al rango${num(v.resistencia) ? ' (la Resistencia a crítico lo agranda)' : ''}.`;
         else{
-          r = `Nivel del crítico: <b>${e.nivel}</b>${num(v.resistencia) > 0 ? ` − resistencia ${num(v.resistencia)} = <b>${e.dados}</b>` : ''}.<br><b>Crítico${e.dados > 1 ? ` ×${e.dados}` : ''}</b>: se tiran <b>${e.dados}d20</b> y vale el mejor (con dos o más 20 naturales, supercrítico: cada 20 suma ×4). Doble daño con ${u.doble}+, triple con ${u.triple}+, cuádruple con ${u.cuadruple}+. Ignora la armadura.`;
+          r = `Nivel del crítico: <b>${e.nivel}</b>.<br><b>Crítico${e.dados > 1 ? ` ×${e.dados}` : ''}</b>: se tiran <b>${e.dados}d20</b> y vale el mejor (con dos o más 20 naturales, supercrítico: cada 20 suma ×4). Doble daño con ${u.doble}+, triple con ${u.triple}+, cuádruple con ${u.cuadruple}+. Ignora la armadura.`;
           if(tirada) r += `<br>d20: ${tirada.rolls.join(', ')} → ${tirada.supercritico ? `<b>¡${tirada.mult / 4} veintes naturales!</b>` : `mejor <b>${tirada.mejor}</b>`} → <b>${nombreMult(tirada.mult)}</b> (×${tirada.mult})`;
           else r += `<div class="cr-fila"><button type="button" id="cr-tirar" class="prim">🎲 Tirar ${e.dados}d20</button></div>`;
         }
@@ -221,7 +222,7 @@ const Critico = (() => {
       const c = fondo.querySelector('#cr-vista'); if(!c) return;
       if(v.pdg === '' || v.eva === ''){ c.innerHTML = ''; return; }
       const e = ev();
-      c.innerHTML = `<div class="cr-res">Diferencia: <b>${e.diferencia}</b> · rango <b>${e.rango}</b> → ${e.diferencia <= 0 ? 'no hay golpe' : e.critico ? `<b>crítico${e.dados > 1 ? ' ×' + e.dados : ''}</b>` : e.nivel > 0 ? 'la resistencia lo anula' : 'no es crítico'}</div>`;
+      c.innerHTML = `<div class="cr-res">Diferencia: <b>${e.diferencia}</b> · rango <b>${e.rango}</b> → ${e.diferencia <= 0 ? 'no hay golpe' : e.critico ? `<b>crítico${e.dados > 1 ? ' ×' + e.dados : ''}</b>` : 'no es crítico'}</div>`;
     }
 
     function validar(id){

@@ -70,11 +70,14 @@ const CreepBotonera = (() => {
 
     const fc = formulasCombate(sc);
     const defCreep = defensa(sc);
+    // ✋ A mano limpia, solo si no lleva ninguna arma, ni física ni especial (como la Botonera del personaje; 2026-11-04, dueño, con Basilio: «las armas
+    // especiales se tienen que considerar y tratar igual que un arma común… asume que el arma equipada va a ser usada»).
+    const soloEspecial = Combatiente.sinArmaEnMano(sc) && typeof CreepAcciones !== 'undefined' && CreepAcciones.especialesCreep && CreepAcciones.especialesCreep(sc).length > 0;
     const combate = [
       // Atacar sin No2 no se deshabilita (un botón deshabilitado no deja abrir la 🔍): al tocarlo avisa.
       // ⚔⚔ Con dos armas (dueño, 2026-11-03), un «Atacar» y un «Daño» por arma, cada uno con su costo (su propio primer ataque a mitad de
       // precio), como la Botonera del personaje. Tocar uno la deja en la mano (`armaActiva`) y ataca con ella.
-      ...(dosArmas ? dosArmas.flatMap(a => { const sa = {...sc, armaActiva: a.id}, c = C().costoAtaqueCon(sc, a.id), sinN = num(sc.nitros) < c, prim = Combatiente.ataquesConArmaCreep(sa) === 0, fa = formulasCombate(sa);
+      ...(soloEspecial ? [] : dosArmas ? dosArmas.flatMap(a => { const sa = {...sc, armaActiva: a.id}, c = C().costoAtaqueCon(sc, a.id), sinN = num(sc.nitros) < c, prim = Combatiente.ataquesConArmaCreep(sa) === 0, fa = formulasCombate(sa);
         return [{stat:'pdg', nombre:`Atacar con ${a.nombre} · ${fmt(c)} No2${prim ? ' · 1.º ataque' : ''}`, dado: fa.pdg, sinNitros: sinN, lupa:'atacar', motivo: `${sinN ? 'Sin No2 · ' : ''}Cuesta ${fmt(c)} No2 · ${prim ? 'primer ataque con esta arma (Tipo ÷ 2)' : 'ya atacó con esta arma (Tipo completo)'}${a.id === (Combatiente.armaPrincipal(sc) || {}).id ? ' · en la mano' : ''}`, attr:`data-atacarcreep="${sc.id}" data-atacararma="${esc(a.id)}"`},
           {nombre: `Daño · ${a.nombre}`, dado: danoTxt(sa, statValor(sa, 'dmg')), lupa:'danio', motivo: 'Sin costo', attr:`data-daniocreep="${sc.id}" data-danioarma="${esc(a.id)}"`}]; }) : [
       {stat:'pdg', nombre:`Atacar (PdG) · ${fmt(costoAtaqueSc)} No2`, dado: fc.pdg, sinNitros: sinNitrosAtaque, lupa:'atacar', motivo: `${sinNitrosAtaque ? 'Sin No2 · ' : ''}Cuesta ${fmt(costoAtaqueSc)} No2 · ${cualAtaque}`, attr:`data-atacarcreep="${sc.id}"`},

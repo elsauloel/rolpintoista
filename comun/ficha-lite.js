@@ -149,11 +149,11 @@ const FichaLite = (() => {
     const a = Combatiente.armaEnMano(o);   // 🗡 la puerta única (docs/plan-inventario-creeps.md)
     if(a.sinArma){
       // ✨ Sin arma física pero con un arma especial en la mano (una varita): esa es su arma (2026-11-04, dueño, con Basilio: «sigue teniendo problemas
-      // para reconocer a la varita como un arma»). Lo que pega a mano limpia queda como dato.
+      // para reconocer a la varita como un arma»; «las armas especiales se tienen que considerar y tratar igual que un arma común»).
       const esp = slotDe ? espEnMano(o, slotDe) : null;
       if(esp){
         const d = String(esp.detalle || '').split('⚙')[0].trim();
-        return {nombre: esp.nombre, detalle: `arma especial${esp.especial.dano ? ` · ${esp.especial.dano}` : ''}`, lineas: [...(d ? [{txt: d}] : []), {txt: `A mano limpia: ${danoTxt}`}]};
+        return {nombre: esp.nombre, detalle: `arma especial${esp.especial.dano ? ` · ${esp.especial.dano}` : ''}`, lineas: d ? [{txt: d}] : []};
       }
       return {nombre: '', detalle: `sin arma · ${danoTxt}`, lineas: []};   // ✋ pega sin arma (paso 5, P150)
     }

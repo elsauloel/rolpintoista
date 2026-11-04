@@ -149,7 +149,7 @@ function abrirHabClase(claseId, yaLeido){
       const costoTxt = costoHabilidadTxt({...h, automatizada: h.automatizada !== false});
       return `<div class="habs-grid-item">
         <div style="display:flex;justify-content:space-between;gap:8px"><b>${esc(h.nombre)}</b>
-        <button type="button" class="mini" data-habclase-agregar="${esCustomPool ? claseId : clase.id}:${h.id}" ${ya ? 'disabled' : ''}>${ya ? 'Ya la tenés' : 'Agregar'}</button></div>
+        <button type="button" class="mini agregar" data-habclase-agregar="${esCustomPool ? claseId : clase.id}:${h.id}" ${ya ? 'disabled' : ''}>${ya ? 'Ya la tenés' : 'Agregar'}</button></div>
         ${h._bib && h._bib.subida ? `<div class="hint" style="margin-top:2px">${h._bib.auditado ? '' : '<b style="color:#e0a040" title="La subió alguien del grupo y todavía no la revisó el dueño. Se puede usar igual.">🔶 sin auditar</b> · '}${h._bib.version > 1 ? `v${fmt(h._bib.version)} · ` : ''}subida por ${esc(h._bib.autor || 'alguien')}</div>` : ''}
         ${costoTxt ? `<div class="habs-grid-costo">${esc(costoTxt)}</div>` : ''}
         ${(h.etiquetas || []).length ? `<div class="hint" style="margin-top:2px">${h.etiquetas.map(esc).join(' · ')}</div>` : ''}

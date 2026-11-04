@@ -801,6 +801,10 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
 .mini.on{background:var(--bottle);border-color:var(--bottle);color:#EAF3E6}
 .mini.danger{color:var(--danger);border-color:rgba(212,87,78,.45)}
 .mini.danger:hover{background:var(--danger);border-color:var(--danger);color:#fff}
+/* El «Agregar» de las listas de habilidades (dueño, 2026-11-04: «tendría que destacar un poco más») */
+.mini.agregar{background:var(--copper);border-color:var(--copper);color:#180F08;font-weight:700;font-size:12px;padding:6px 14px;letter-spacing:.04em}
+.mini.agregar:hover{background:var(--brass);border-color:var(--brass);color:#180F08}
+.mini.agregar:disabled{background:transparent;border-color:var(--line);color:var(--muted);font-weight:400;font-size:10px;padding:2px 6px}
 [data-ed="efecto-preset-guardar"]{background:var(--copper);border-color:var(--copper);color:#180F08;font-weight:700}
 [data-ed="efecto-preset-guardar"]:hover{background:var(--brass);border-color:var(--brass)}
 .empty{font-family:"Space Mono",monospace;font-size:11px;color:var(--muted);padding:8px 2px}

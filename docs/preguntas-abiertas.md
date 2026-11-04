@@ -1279,6 +1279,7 @@ Casi siempre da igual (un creep pelea un combate). **A decidir:** ¿se libera al
 «Finalizar combate»: la pantalla del GM libera las habilidades de los creeps del mapa. Probado en el mapa con el Tanque (prueba).
 
 ### P224 — Arrastrar en una sola tirada (2026-10-27) ✅ decidida (2026-10-29)
+**Cambio (dueño, 2026-11-04): el enganche tira la Probabilidad de Golpe, no la Destreza** («no debe tirar Destreza sino PdG»). Lo de abajo que dice «Destreza» es la versión anterior.
 
 Lo definido decía «Destreza contra la Evasión; si lo engancha, lo arrastra y le pega con su arma con +2 PdG» (dos tiradas). Se programó en una sola: un
 ataque con su arma a 3 casillas o menos con +2 PdG (contra la Evasión o el Parry); si pega, lo trae y le hace el daño. **A confirmar** (o separarlo en dos).

@@ -999,7 +999,7 @@ function dueloElegirObjetivoMapa(msg){
       if(ataque && num(ataque.arrastra) > 0 && mio && typeof arrastrarLinea === 'function' && !(await arrastrarLinea(mio, t, ataque))){ pedir(); return; }   // 🪝 sin línea libre, no se tira
       if(ataque && num(ataque.arrastra) > 0 && mio && typeof arrastrarEnganche === 'function'){   // 🪝 Arrastrar (js/78, P224): primero el enganche; si no lo engancha, no hay golpe
         let r = true;
-        try{ r = await arrastrarEnganche(mio, t, ataque); }catch(err){ console.error('Arrastrar: el enganche', err); }
+        try{ r = (!soyGM && t.tipo === 'creep' && typeof arrastrarPedirGM === 'function') ? await arrastrarPedirGM(mio, t, ataque) : await arrastrarEnganche(mio, t, ataque); }catch(err){ console.error('Arrastrar: el enganche', err); }   // 🪝 un personaje contra un creep: lo resuelve el GM (2026-11-04)
         if(!r) return;
       }
       if(ataque && ataque.punalada && mio && typeof punaladaBonos === 'function'){   // 🗡 la puñalada (js/59): el bono si está en la espalda

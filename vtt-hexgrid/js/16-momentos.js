@@ -107,7 +107,8 @@ function momentoRecibido(id, d){
   if(d.tipo === 'rodillo') rodilloMomento(id, d);   // 🎰 el rodillo de otro (el Arma elemental al azar, 2026-11-01)
   if(d.tipo === 'mal-de-ojo' && typeof malDeOjoMomento === 'function') malDeOjoMomento(id, d);   // 🧿 volver a tirar y quedarse con la peor (js/60)
   if(d.tipo === 'zona-extra' && typeof zonaExtraMomento === 'function') zonaExtraMomento(id, d);   // 🎲 la tirada extra de una zona, para quien la creó (js/66)   // 🤺 la ruleta de casillas (js/62)
-  if(d.tipo === 'gancho' && typeof arrastreZonasMomento === 'function') arrastreZonasMomento(id, d);   // ⚖ Arrastrar: las zonas del camino, para el dueño (js/78)
+  if(d.tipo === 'gancho' && typeof arrastreZonasMomento === 'function') arrastreZonasMomento(id, d);
+  if(d.tipo === 'gancho-pedido' && typeof ganchoPedidoMomento === 'function') ganchoPedidoMomento(id, d).catch(err => console.error('Arrastrar (pedido):', err));   // 🪝 el gancho de un personaje contra un creep: lo resuelve el GM (js/78, 2026-11-04)   // ⚖ Arrastrar: las zonas del camino, para el dueño (js/78)
   if(d.tipo === 'confusion') confusionMomento(d);   // la tirada de Confusión del turno (js/20)
   if(d.tipo === 'soltar-ayuda' && typeof soltarAyudaMomento === 'function') soltarAyudaMomento(id, d);
   if(d.tipo === 'anula-zona' && typeof anulaZonaMomento === 'function') anulaZonaMomento(id, d);   // 🚫 la Anulación contra la zona de un creep (js/13, 2026-11-02)

@@ -2456,6 +2456,11 @@ const Combatiente = (() => {
         ['detalle', 'ataqueTxt'].forEach(k => { if(typeof h[k] === 'string') h[k] = h[k].replace('pierde 2 No2 más la diferencia', 'pierde 1 No2 más la diferencia').replace('pierde 2 No2 + la diferencia', 'pierde 1 No2 + la diferencia'); });
         cambio = true;
       }
+      // 🪝 Arrastrar engancha con la PdG, no con la Destreza (dueño, 2026-11-04): el texto guardado se pone al día (la tirada la hace el mapa, js/78).
+      if(h && h.nombre === 'Arrastrar' && ['detalle', 'ataqueTxt'].some(k => typeof h[k] === 'string' && /Destreza contra (la )?Evasión/.test(h[k]))){
+        ['detalle', 'ataqueTxt'].forEach(k => { if(typeof h[k] === 'string') h[k] = h[k].replace('Su Destreza contra la Evasión del rival', 'Su Probabilidad de Golpe contra la Evasión del rival').replace('Destreza contra Evasión', 'PdG contra Evasión'); });
+        cambio = true;
+      }
       // 🛡 Provocar tira PdG.Esp + su nivel, como el Taunt de clase (dueño, 2026-11-03: «al revés, quiero que el de creep tire PdG.Esp + nivel»; por unas
       // horas del mismo día fue Ef.Esp + 2): el guardado en un creep (con cualquiera de las dos) se pone al día.
       if(h && h.nombre === 'Provocar' && h.duelo && typeof h.duelo === 'object' && (h.duelo.tira === 'dmgesp' || !h.duelo.tiraBonoNivel)){

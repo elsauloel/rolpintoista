@@ -351,7 +351,7 @@ de creep · ≈ = hay una parecida · ⏸ = anotada para más adelante.
      este turno.»; dueño, 2026-10-27: «está bien que sea más poderosa, pero solamente contra sí mismo, no contra aliados»): **Flash** (botón
      instantáneo en el duelo); **absorbe 12 de daño** de la próxima fuente de daño de este turno, **solo sobre sí mismo**. 1 SP (2 en turno ajeno),
      o cooldown 2; sin No2. Combina con Interponerse (se mete en el golpe y lo absorbe) y con Escudo humano.
-  14. ⚖ **Arrastrar** (C16; dueño, 2026-10-27: «va así»): a un rival a **3 casillas o menos**: **Destreza contra la Evasión**; si lo engancha, lo
+  14. ⚖ **Arrastrar** (C16; dueño, 2026-10-27: «va así»): a un rival a **3 casillas o menos**: **PdG contra la Evasión** (era la Destreza; dueño, 2026-11-04: «no debe tirar Destreza sino PdG»; desde ese día también es de la clase Tanque); si lo engancha, lo
      **arrastra hasta quedar pegado** a él (no camina: sin No2 ni ataques de oportunidad; las trampas y zonas del camino **sí lo tocan**) y le pega
      con su arma con **+2 PdG**. Un ataque y 2 SP, o cooldown 2. Combina con Provocar, Golpe de escudo y Golpe que sigue.
 - **Cuenta** (2026-10-27): ✅ **⚔ 10 · 🛡 10 · ⚖ 10**, todas definidas. ✅ **Programadas y probadas en el mapa el mismo día** (reporte: `reporte-choque-pesado-2026-10-27.md`; dueño: «tocaría pasar a programar todas

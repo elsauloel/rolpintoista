@@ -210,6 +210,11 @@ Estados que define la clase:
     +1 dado del Tipo de su arma por golpe, **hasta su nivel + 1 dados** (dueño, 2026-10-23), a **1 SP por dado** (el precio del Golpe fuerte),
     más los No2 del ataque. Si no ataca en ese turno, lo pierde. ⚙ Automatizado en el mapa (`vtt-hexgrid/js/56-aguante.js`,
     `aguanteAtacarPj`; los golpes los cuenta la pantalla del GM; la revancha la deja `FichaMantenimiento` al empezar su turno).
+12. ✅ **Arrastrar** — **SP:** 2. **No2:** lo de un ataque. *(Nueva, 2026-11-04, dueño: «sumá Arrastrar a las de clase Tanque para jugadores»;
+    la misma del Choque pesado de los creeps.)* A un rival a 3 casillas o menos, con la línea libre: **PdG contra Evasión** para engancharlo
+    (dueño, 2026-11-04: «no debe tirar Destreza sino PdG»); si lo engancha, Constitución + Fuerza contra su Constitución para traerlo hasta
+    pegado (sin No2 ni oportunidad; trampas y zonas del camino lo tocan) y le pega con su arma con +2 PdG. ⚙ Automatizado en el mapa
+    (`vtt-hexgrid/js/78`; contra un creep, el enganche y el arrastre los resuelve la pantalla del GM: momento `gancho-pedido`).
 
 ## Mago ⏳
 

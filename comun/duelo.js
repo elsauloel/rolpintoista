@@ -514,6 +514,20 @@ const Duelo = (() => {
      dice 19 de daño menos X de defensa menos 8 de blindaje»): `dano.cuenta` la arma el mapa al aplicar (js/13), un renglón por cosa —{s: '' | '+' | '−' |
      '×' | '÷' | '=', txt, v, nota, f (el final)}—. En la Mesa, en una línea: «19 − Defensa 11 − Blindaje (escudo) 8 = 0 a la vida». */
   const tieneCuenta = dn => !!(dn && Array.isArray(dn.cuenta) && dn.cuenta.length);
+  /* 🧮 La vista previa de la cuenta (2026-11-04): una por duelo y tirada de daño (si cambia el daño, el crítico o la Defensa a mano, se vuelve a pedir).
+     Solo en la pantalla que puede aplicarlo (el defensor o el GM) y si el mapa da el gancho; si no, el cuadro queda como antes. */
+  const previas = new Map();
+  function previaDe(d){
+    if(!cfgEscuchar || typeof cfgEscuchar.previa !== 'function' || !d || !d.dano || !(esMio(d.defensor) || soyGM())) return null;
+    const dn = d.dano, clave = [d.id, dn.crudo, (dn.rolls || []).join('.'), d.crit && d.crit.mult, d.resultado, dn.defensaManual, dn.magico && dn.magico.total].join('|');
+    let p = previas.get(d.id);
+    if(p && p.clave === clave) return p;
+    p = {clave, listo: false, dato: null};
+    previas.set(d.id, p);
+    Promise.resolve().then(() => cfgEscuchar.previa(d)).then(x => { p.dato = x || null; }).catch(err => { console.error('La vista previa del daño:', err); p.dato = null; })
+      .finally(() => { p.listo = true; if(previas.get(d.id) === p && actual && actual.dato && actual.dato.id === d.id) dibujar(); });
+    return p;
+  }
   const cuentaTxt = dn => {
     if(!tieneCuenta(dn)) return '';
     let t = '';
@@ -2640,7 +2654,14 @@ const Duelo = (() => {
           : `de daño, menos ${tu} Defensa.`;
         // 🧮 (2026-10-28) Que se sepa que no es lo que entra: lo frenan la Defensa y lo demás, y al aplicarlo se ve la cuenta completa.
         const frenan = ignora && d.hab.dano.trueDamage ? '' : `<div class="duelo-danosub" style="font-size:12px;color:#9fb6e8;margin-top:6px">Esto es lo que tiró: antes de llegar a la vida lo ${crit ? 'frenan solo' : ignora ? 'frenan la Defensa especial, las resistencias' : 'frena la Defensa'}${crit ? (suyo ? ' tus escudos o tu Vida extra, si tenés' : ' sus escudos o su Vida extra, si tiene') : (suyo ? ' (y tus escudos o tu Vida extra, si tenés)' : ' (y sus escudos o su Vida extra, si tiene)')}. Al aplicarlo se ve la cuenta, renglón por renglón.</div>`;
-        cuerpo = tiro + `<div class="duelo-danobox${fuerte ? ' crit' : ''}"><div class="duelo-danonum${fuerte ? ' rojo' : ''}" style="font-size:72px">${_fmt(total)}</div>${fuerte ? '<div class="duelo-danosub rojo" style="font-size:20px">DERECHO A LA VIDA</div>' : ''}<div class="duelo-danosub" style="font-size:14px">${que}</div>${frenan}</div>${mgAntes}`
+        // 🧮 La cuenta ANTES de aplicar (2026-11-04, dueño: «el cuadro de la cuenta del daño debe aparecer antes del botón aplicar el daño; al aplicar uno
+        // ya debe saber cuánto va a ser»): la pide al mapa (cfgEscuchar.previa: la misma cuenta, sin escribir) la pantalla que puede aplicarlo.
+        const pv = previaDe(d);
+        const conPrevia = pv && pv.listo && pv.dato && tieneCuenta(pv.dato) && !pv.dato.manual;
+        const pvd = conPrevia ? pv.dato : null, pvTotal = pvd ? _num(pvd.recibido) + (magJunto(pvd) ? _num(pvd.magico.recibido) : 0) : 0;
+        cuerpo = tiro + (conPrevia
+          ? `<div class="duelo-danobox${fuerte ? ' crit' : ''}"><div class="duelo-danonum${fuerte ? ' rojo' : ''}" style="font-size:72px">${_fmt(pvTotal)}</div><div class="duelo-danosub" style="font-size:14px">de daño ${suyo ? 'te va a entrar a la vida' : `le va a entrar a la vida a ${_esc(d.defensor.nombre)}`}${magJunto(pvd) ? ` (${_fmt(pvd.recibido)} del golpe + ${magIcono(pvd.magico.tipo)} ${_fmt(pvd.magico.recibido)} de ${_esc(String(pvd.magico.tipo).toLowerCase())})` : ''}</div></div>${cuentaHtml(pvd)}<div class="duelo-mini">${_esc(d.defensor.nombre)}: <b>${_fmt(pvd.hpAntes)}</b> → <b>${_fmt(magJunto(pvd) ? pvd.magico.hpDespues : pvd.hpDespues)}</b> HP</div>`
+          : `<div class="duelo-danobox${fuerte ? ' crit' : ''}"><div class="duelo-danonum${fuerte ? ' rojo' : ''}" style="font-size:72px">${_fmt(total)}</div>${fuerte ? '<div class="duelo-danosub rojo" style="font-size:20px">DERECHO A LA VIDA</div>' : ''}<div class="duelo-danosub" style="font-size:14px">${que}</div>${pv && !pv.listo ? '<div class="duelo-danosub" style="font-size:12px;color:#9fb6e8;margin-top:6px">🧮 Calculando la cuenta…</div>' : frenan}</div>${mgAntes}`)
           + (suyo ? `<div style="text-align:center;margin-top:8px"><button type="button" data-dano-aceptar>💔 Aplicar el daño</button><div class="duelo-nota" style="margin-top:6px">⚙ Al tocarlo se descuenta solo de tu vida (y se ve cómo queda).</div></div>`
             : `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.defensor.nombre)} aplique el daño…</div>${soyGM() ? `<div style="text-align:center;margin-top:6px"><button type="button" class="sec" data-dano-aceptar>💔 Aplicar por ${_esc(d.defensor.nombre)}</button></div>` : ''}`);
       }else if(!dn.aplicado){

@@ -1758,7 +1758,11 @@ async function dueloDrenar(d, monto, opts){
   }
 }
 
-async function dueloAplicarDano(d){
+/* 🧮 `o.simular` (2026-11-04, dueño: «el cuadro de la cuenta del daño debe aparecer antes del botón "aplicar el daño". Al aplicar uno ya debe saber cuánto
+   va a ser»): la misma cuenta, sin escribir nada ni disparar efectos (Espinas, drenar, el rayo que salta…): la vista previa del duelo (cfgEscuchar.previa). Lo
+   que todavía no se sabe (el 1d6 del Orbe salvaje) no entra; el elemental del arma se cuenta como si los escudos no lo frenaran después del golpe. */
+async function dueloAplicarDano(d, o){
+  const simular = !!(o && o.simular);
   const dn = d.dano, t = tokens.get(d.defensor.tokenId);
   const critReal = d.resultado === 'pego' && d.crit && d.crit.critico;   // un crítico siempre ignora la Defensa, aunque el d20 no multiplique (×1)
   const magico = !!(d.hab && d.hab.dano && d.hab.dano.ignoraDef && d.resultado === 'pego');   // el daño mágico de una habilidad ignora la Defensa y no critica
@@ -1773,7 +1777,7 @@ async function dueloAplicarDano(d){
   // 🔥 Carga Elemental de fuego (2026-10-13): +50 % del daño tirado, para arriba (`hab.dano.mult`).
   let multHab = d.hab && d.hab.dano && num(d.hab.dano.mult) > 1 ? num(d.hab.dano.mult) : 1;
   // 🔮 El Orbe salvaje (js/53): con daño especial, una tirada de 1d6 (6: ×2 o ×3; 1: el mismo daño a quien atacó, después).
-  const salvaje = (magico || (dn.magico && num(dn.magico.total) > 0)) && typeof talSalvajeTirar === 'function' ? await talSalvajeTirar(d).catch(err => { console.error('El Orbe salvaje:', err); return null; }) : null;
+  const salvaje = !simular && (magico || (dn.magico && num(dn.magico.total) > 0)) && typeof talSalvajeTirar === 'function' ? await talSalvajeTirar(d).catch(err => { console.error('El Orbe salvaje:', err); return null; }) : null;
   if(salvaje && salvaje.mult > 1 && magico) multHab *= salvaje.mult;
   // 🔮 La Botella con un diablito (js/53): +N a todo tu daño especial (si hay el de la habilidad, ahí; si no, al del arma).
   const botella = typeof talismanDe === 'function' && (magico || (dn.magico && num(dn.magico.total) > 0)) ? talismanDe(d.atacante && tokens.get(d.atacante.tokenId), 'botella') : 0;
@@ -1813,7 +1817,7 @@ async function dueloAplicarDano(d){
   const resEl = elDano && !trueDmg ? (await resistenciasDe(t, elDano, invLeida)).res : 0;
   let freno = [...(menosDist ? [d.hab && d.hab.menosPorOrden ? `${menosDist} por los que tocó antes en la línea` : `la distancia ${menosDist}`] : []), ...(frenaAm && armadmg ? [`Defensa especial ${armadmg}`] : []), ...(resEl ? [Combatiente.resElementalTxt(elDano, resEl)] : [])].join(' − ');
   if(idHab && idHab.txt && multId === 1) freno = [freno, idHab.txt].filter(Boolean).join(' · ');   // ☀🌑 (lo que multiplica va en cargaMult)
-  if(elDano && !trueDmg && t.tipo === 'creep' && typeof debilRevelar === 'function' && (resEl || (idHab && idHab.mult === 0))) debilRevelar(t, elDano, {res: resEl, mult: idHab ? idHab.mult : 1}).catch(err => console.error('Revelar débil/resistente:', err));   // 🎯 (js/89)
+  if(!simular && elDano && !trueDmg && t.tipo === 'creep' && typeof debilRevelar === 'function' && (resEl || (idHab && idHab.mult === 0))) debilRevelar(t, elDano, {res: resEl, mult: idHab ? idHab.mult : 1}).catch(err => console.error('Revelar débil/resistente:', err));   // 🎯 (js/89)
   // 🏹 Perfora N (regla del dueño, 2026-10-10): N puntos del golpe pasan SIEMPRE, sin que los frene la Defensa; el resto va contra la Defensa como
   // siempre. O sea: recibe lo que pase la Defensa, pero nunca menos de N (ni más que el golpe). Con crítico no hace falta: ya ignora la Defensa entera.
   // (Antes, hasta el 2026-10-10, le restaba N a la Defensa: contra un tanque casi no servía.)
@@ -1842,14 +1846,65 @@ async function dueloAplicarDano(d){
   if(elDano === 'rayo' && typeof aguaRayo === 'function'){ const ag = aguaRayo(t, 'rayo', aplicar); if(ag.txt){ aplicar = ag.monto; freno = [freno, ag.txt].filter(Boolean).join(' · '); } }
   let desgaste = '';
   // (un Parry elegido a mano no dice con qué paró: `item: 'parry'` = el escudo puesto o la única pieza con la que se puede parar, 2026-10-29)
-  if(base.mitad && t.tipo === 'pj' && !String(t.fichaId).includes(SEP_INVOCACION) && d.defensa && (d.defensa.itemId || d.defensa.modo === 'parry')){
+  if(!simular && base.mitad && t.tipo === 'pj' && !String(t.fichaId).includes(SEP_INVOCACION) && d.defensa && (d.defensa.itemId || d.defensa.modo === 'parry')){
     try{ await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: {nombre: 'Desgaste', item: d.defensa.itemId || 'parry'}, origen: `${d.atacante.nombre} · Bloqueo perdido`}); desgaste = d.defensa.itemNombre || 'el objeto con el que paró'; }
     catch(err){ console.error('No se pudo pedir el desgaste del ítem:', err); }
   }
+    // 🧮 La cuenta del daño, renglón por renglón (2026-10-28, dueño: «decía 19 de daño y el siguiente paso mostraba 0… todo lo que esté frenando el daño
+    // tiene que estar comunicado muy claramente»): de la tirada a lo que entra a la vida, con cada cosa que lo frena en el medio. La dibuja el duelo.
+  const armarCuenta = res => {
+    const cuenta = [];
+    const R = (s, txt, v, nota, f) => cuenta.push({s, txt: String(txt || '').slice(0, 90), ...(v !== undefined && v !== null ? {v: num(v)} : {}), ...(nota ? {nota: String(nota).slice(0, 140)} : {}), ...(f ? {f: 1} : {})});
+    const manualNum = dn.defensaManual !== undefined && dn.defensaManual !== null && dn.defensaManual !== '' && dn.defensaManual !== 'no';
+    R('', 'Tirada de daño', num(dn.crudo));
+    if(menosDist) R('−', d.hab && d.hab.menosPorOrden ? 'por los que tocó antes en la línea' : 'por la distancia', menosDist);
+    if(habMagica && botella) R('+', 'la Botella con un diablito', botella);
+    if(anilloHab) R('+', `el anillo de ${elHab}`, anilloHab);
+    if(multTxt) R('=', multTxt, crudo);
+    else if(menosDist || (habMagica && botella) || anilloHab) R('=', 'el golpe', crudo);
+    if(mult > 1){ R('×', `crítico ×${mult}`, mult); R('=', 'el golpe', golpe); }
+    if(critReal) R('', 'Crítico: no se resta la Defensa');
+    else if(habMagica) R('', trueDmg ? 'True Damage: no lo frena nada' : directo ? 'Daño directo: no lo frena la Defensa ni la Defensa especial' : 'Daño especial: no se resta la Defensa; se resta la Defensa especial');
+    if(dn.defensaManual === 'no') R('', 'Defensa: no se resta (elegido a mano)');
+    else if(manualNum){ R('−', 'Defensa escrita a mano', Math.max(0, num(dn.defensaManual))); if(base.mitad) R('÷', 'Bloqueo perdido: pasa la mitad, para arriba', 2); }
+    else if(base.mitad){ R('−', 'Defensa', def); R('÷', 'Bloqueo perdido: pasa la mitad, para arriba', 2); }
+    else if(perfora && !crit) R('', `La Defensa (${def}) frenaba más: pasan ${perfora} por la Perfora`);
+    if(!crit && (base.mitad || perfora || manualNum)) R('=', 'pasa', aplicarSinAgua);
+    if(aplicar !== aplicarSinAgua) R('=', '💧 en el agua, el rayo ×1,5', aplicar);
+    const rr = res.r || {};
+    if(rr.invulnerable) R('', 'Invulnerable: el golpe no hace nada');
+    else{
+      (rr.defPartes || []).forEach(x => R('−', x.txt, x.v, x.nota));
+      if((rr.defPartes || []).length) R('=', num(rr.llega) > 0 ? (ignoraDef ? 'pasa' : 'pasa la Defensa') : (ignoraDef ? 'lo frena entero' : 'la Defensa lo frena entero'), rr.llega);
+      if(num(rr.arcano)) R('−', 'Armadura arcana (se queda con una parte)', rr.arcano);
+      (rr.capas || []).forEach(c => R('−', c.vida ? (/vida extra/i.test(c.nombre) ? `${c.nombre} (se la lleva a ella, no a la vida)` : `${c.nombre} (Vida extra: se la lleva a ella)`) : `${c.nombre} (escudo)`, c.v));
+      if(num(rr.mitiMiti)) R('−', `${rr.mitiMitiNombre || 'su protector'} se lleva la mitad (${rr.mitiMitiTxt || 'Miti-Miti'})`, rr.mitiMiti);
+      R('=', 'entra a la vida', rr.recibido, '', true);
+    }
+    return cuenta;
+  };
   try{
     const oD = {distancia: !!(d.ataque && d.ataque.rango), magico: !!(habMagica || elDano), reparte: true, ...(resEl ? {resTxt: `${elDano === 'rayo' ? 'Resistencia eléctrica' : `Resistencia a ${Combatiente.ELEMENTOS[elDano] ? Combatiente.ELEMENTOS[elDano].etq.replace('Res. ', '') : elDano}`}${resEl < 0 ? ' (vulnerable)' : ''}`} : {})};   // reparte: Miti-Miti (js/10)   // magico: el Orbe de absorción (js/26)   // la Defensa extra contra armas a distancia (torso blando, 2026-10-06)
+    if(simular) oD.simular = true;
     const res = esInv ? await danioInv(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD)
       : t.tipo === 'creep' ? await danioCreep(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD) : await danioPj(t, String(aplicar), ignoraDef, restaIgnorando, resEl, oD);
+    if(simular){   // 🧮 la vista previa: la cuenta y el elemental del arma, sin nada más
+      if(!res) return null;
+      let magicoP = null;
+      if(dn.magico && num(dn.magico.total) > 0 && !res.r.invulnerable){
+        const elMag = String(dn.magico.tipo || '').includes(' y ') ? '' : Combatiente.elementoDe(dn.magico.tipo);
+        const resMag = elMag ? (await resistenciasDe(t, elMag, invLeida)).res : 0;
+        const anilloMag = elMag && typeof talMasDanoElem === 'function' ? talMasDanoElem(d, elMag) : 0;
+        const idMag = elMag ? Combatiente.identidadElemento(elMag, ((vinculo(t) || {}).tipoCriatura)) : null;
+        const multMag = (num(dn.magico.mult) > 1 ? num(dn.magico.mult) : 1) * (idMag ? idMag.mult : 1);
+        const totMag = Math.ceil((num(dn.magico.total) + (habMagica ? 0 : botella) + anilloMag) * multMag);
+        const agM = typeof aguaRayo === 'function' ? aguaRayo(t, elMag, totMag) : {monto: totMag, txt: ''};
+        const recib = Math.max(0, num(agM.monto) - resMag);
+        magicoP = {...dn.magico, recibido: recib, hpAntes: num(res.nuevo), hpDespues: Math.max(0, num(res.nuevo) - recib), ...(resMag ? {resEl: Combatiente.resElementalTxt(elMag, resMag)} : {})};
+      }
+      return {...base, cuenta: armarCuenta(res), recibido: num(res.r.recibido), invulnerable: !!res.r.invulnerable, hpAntes: num(res.previo), hpDespues: num(res.nuevo),
+        ...(magicoP ? {magico: magicoP} : {}), previa: true};
+    }
     if((t.tipo === 'creep' || (t.tipo === 'pj' && !esInv)) && typeof aguanteSumar === 'function') aguanteSumar(t);   // 🛡 Aguante (js/56): un golpe más, aunque la armadura lo frene todo (creeps y, desde el 2026-10-23, el Tanque)
     const espinas = res.r.invulnerable ? null : await dueloEspinas(d, golpe, habMagica);   // el daño inflictido (con el multiplicador del crítico), antes de la Defensa; solo el físico
     // Daño elemental del arma o de la flecha (el daño híbrido): aparte, después del golpe — es DIRECTO (dueño, 2026-10-09): no resta la Defensa
@@ -1921,36 +1976,7 @@ async function dueloAplicarDano(d){
     if(!d.hab && d.ataque && d.ataque.flecha && (d.ataque.flecha.humo || d.ataque.flecha.luz || d.ataque.flecha.explota || d.ataque.flecha.clava)) await flechaAlPegar(d, !!res.r.invulnerable).catch(err => console.error('No se pudo aplicar el virote en el mapa:', err));
     if(d.hab && d.hab.atrae && !res.r.invulnerable) await dueloAtraer(d).catch(err => console.error('No se pudo atraer al objetivo:', err));   // el gancho
     if(d.hab && d.hab.riesgo && (dn.rolls || []).map(num).includes(num(d.hab.riesgo.si))) await dueloRiesgo(d).catch(err => console.error('No se pudo aplicar el riesgo:', err));   // la inestable
-    // 🧮 La cuenta del daño, renglón por renglón (2026-10-28, dueño: «decía 19 de daño y el siguiente paso mostraba 0… todo lo que esté frenando el daño
-    // tiene que estar comunicado muy claramente»): de la tirada a lo que entra a la vida, con cada cosa que lo frena en el medio. La dibuja el duelo.
-    const cuenta = [];
-    const R = (s, txt, v, nota, f) => cuenta.push({s, txt: String(txt || '').slice(0, 90), ...(v !== undefined && v !== null ? {v: num(v)} : {}), ...(nota ? {nota: String(nota).slice(0, 140)} : {}), ...(f ? {f: 1} : {})});
-    const manualNum = dn.defensaManual !== undefined && dn.defensaManual !== null && dn.defensaManual !== '' && dn.defensaManual !== 'no';
-    R('', 'Tirada de daño', num(dn.crudo));
-    if(menosDist) R('−', d.hab && d.hab.menosPorOrden ? 'por los que tocó antes en la línea' : 'por la distancia', menosDist);
-    if(habMagica && botella) R('+', 'la Botella con un diablito', botella);
-    if(anilloHab) R('+', `el anillo de ${elHab}`, anilloHab);
-    if(multTxt) R('=', multTxt, crudo);
-    else if(menosDist || (habMagica && botella) || anilloHab) R('=', 'el golpe', crudo);
-    if(mult > 1){ R('×', `crítico ×${mult}`, mult); R('=', 'el golpe', golpe); }
-    if(critReal) R('', 'Crítico: no se resta la Defensa');
-    else if(habMagica) R('', trueDmg ? 'True Damage: no lo frena nada' : directo ? 'Daño directo: no lo frena la Defensa ni la Defensa especial' : 'Daño especial: no se resta la Defensa; se resta la Defensa especial');
-    if(dn.defensaManual === 'no') R('', 'Defensa: no se resta (elegido a mano)');
-    else if(manualNum){ R('−', 'Defensa escrita a mano', Math.max(0, num(dn.defensaManual))); if(base.mitad) R('÷', 'Bloqueo perdido: pasa la mitad, para arriba', 2); }
-    else if(base.mitad){ R('−', 'Defensa', def); R('÷', 'Bloqueo perdido: pasa la mitad, para arriba', 2); }
-    else if(perfora && !crit) R('', `La Defensa (${def}) frenaba más: pasan ${perfora} por la Perfora`);
-    if(!crit && (base.mitad || perfora || manualNum)) R('=', 'pasa', aplicarSinAgua);
-    if(aplicar !== aplicarSinAgua) R('=', '💧 en el agua, el rayo ×1,5', aplicar);
-    const rr = res.r || {};
-    if(rr.invulnerable) R('', 'Invulnerable: el golpe no hace nada');
-    else{
-      (rr.defPartes || []).forEach(x => R('−', x.txt, x.v, x.nota));
-      if((rr.defPartes || []).length) R('=', num(rr.llega) > 0 ? (ignoraDef ? 'pasa' : 'pasa la Defensa') : (ignoraDef ? 'lo frena entero' : 'la Defensa lo frena entero'), rr.llega);
-      if(num(rr.arcano)) R('−', 'Armadura arcana (se queda con una parte)', rr.arcano);
-      (rr.capas || []).forEach(c => R('−', c.vida ? (/vida extra/i.test(c.nombre) ? `${c.nombre} (se la lleva a ella, no a la vida)` : `${c.nombre} (Vida extra: se la lleva a ella)`) : `${c.nombre} (escudo)`, c.v));
-      if(num(rr.mitiMiti)) R('−', `${rr.mitiMitiNombre || 'su protector'} se lleva la mitad (${rr.mitiMitiTxt || 'Miti-Miti'})`, rr.mitiMiti);
-      R('=', 'entra a la vida', rr.recibido, '', true);
-    }
+    const cuenta = armarCuenta(res);
     // `perfora`: solo si la Perfora mandó (pasaron esos N, la Defensa frenaba más): el duelo lo cuenta así.
     return {...base, desgaste, cuenta, defensa: crit ? restaIgnorando : def, ...(perfora ? {perfora} : {}), ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), ...(num(res.r.vida) > 0 ? {vidaAbs: num(res.r.vida)} : {}), invulnerable: !!res.r.invulnerable, ...(num(res.r.mitiMiti) > 0 ? {mitiMiti: num(res.r.mitiMiti), mitiMitiNombre: String(res.r.mitiMitiNombre || '').slice(0, 40), mitiMitiTxt: String(res.r.mitiMitiTxt || 'Miti-Miti').slice(0, 20)} : {}), hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(luzSanadora ? {luzSanadora} : {}), ...(magico ? {magico} : {}), ...(porDano ? {porDano} : {})};
   }catch(err){

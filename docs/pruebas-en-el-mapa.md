@@ -284,6 +284,12 @@
 
 ### ▶ Para la próxima tanda de pruebas en el mapa (2026-11-03)
 
+- [ ] **🧮 La cuenta del daño ANTES de aplicar (2026-11-04, dueño: «el cuadro de la cuenta del daño debe aparecer antes del botón "aplicar el daño". Al
+  aplicar uno ya debe saber cuánto va a ser»)**: en el paso 5 del duelo, la pantalla que puede aplicar (el defensor o el GM) muestra la cuenta completa
+  (Defensa, escudos, Vida extra, Armadura arcana, Miti-Miti, el elemental del arma) y el total que va a entrar, antes del 💔 Aplicar; al aplicarlo tiene que
+  dar lo mismo. (`dueloAplicarDano(d, {simular: true})` + `danioPj/Creep/Inv` con `o.simular`; `cfgEscuchar.previa` en comun/duelo.js.) Ver un golpe a un
+  personaje con escudo y uno a un creep. Probado solo el dibujo, con una cuenta inventada.
+
 - [ ] **💤 Invocaciones en la ficha (2026-11-04, dueño: «que este turno se pueda modificar a mano… un botón para desactivar, desinvocar, dormirlas…
   cuando llega a cero ese contador, debe preguntársele al jugador»)**: en el cuadro de la invocación, «Quedan» es un campo (escribir 5 → queda en 5);
   «💤 Desinvocar» (pregunta, la duerme y su token se va del mapa); con los turnos en 0 después de un Mantenimiento, la barra «⏳ Se le agotaron los

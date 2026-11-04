@@ -270,7 +270,9 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   const muro = ignoraDef ? null : muroDe(t);   // Muro de escudos (js/26): un aliado con escudo al lado
   const estoN = ignoraDef ? 0 : estoicoRivales(t).length;   // 🗿 Estoicismo (js/85): los rivales pegados, si tiene el estado
   const prot = o && o.reparte ? mitiMitiDe(t) : null;   // 🛡 el Escudo humano (2026-10-27): otro creep que se lleva la mitad
-  const res = await modificarCreep(t.fichaId, sc => {
+  /* 🧮 `o.simular` (2026-11-04, dueño: «la cuenta del daño debe aparecer antes del botón aplicar el daño»): la misma cuenta sobre una COPIA del creep,
+     sin escribir nada ni avisar (la vista previa del duelo, dueloAplicarDano con simular). */
+  const calcular = sc => {
     const viejoC = !num((sc.usosEspecial || {})._golpe);
     sc.usosEspecial = {...(sc.usosEspecial || {}), _golpe: 1};   // (se vacía en su Mantenimiento)
     const primero = primerGolpeDeRonda(sc, 'golpeRonda', viejoC);   // por ronda (2026-10-19)
@@ -298,7 +300,13 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
         if(golpeAcum >= golpeTope){ golpeCae = true; sc.estados.splice(j, 1); } } }
     const desperto = num(r.recibido) > 0 && typeof suenoQuitarDe === 'function' && suenoQuitarDe(sc.estados);   // 💤 el daño lo despierta (js/87)
     return {r, previo, nuevo: fenix ? 0 : sc.hp, bronca, fenix, hpFenix: sc.hp, punteria, golpeCae, golpeAcum, golpeTope, golpeHab, desperto};
-  });
+  };
+  if(o && o.simular){
+    const sc0 = creepPrivadoDe(t.fichaId);
+    if(!sc0) return null;
+    return {...calcular(structuredClone(sc0)), simulado: true};
+  }
+  const res = await modificarCreep(t.fichaId, calcular);
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
   if(res.desperto && typeof mesaLinea === 'function') mesaLinea(`💤 ${nombreDe(t)} se despertó: recibió daño`, 'recordatorio');
   if(res.fenix){
@@ -442,6 +450,7 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : num(rs.def) + extra) + num(restaExtra || 0), efectos, {...(o || {}), defPartes});
     mitiMitiPartir(r, prot);
     const previo = num(datos.hp);
+    if(o && o.simular) return {r, previo, nuevo: Math.max(0, previo - r.recibido), simulado: true};   // 🧮 la vista previa: sin escribir (2026-11-04)
     datos.hp = Math.max(0, previo - r.recibido);
     // 💍 El Anillo del último aliento (2026-10-18): una vez por día, el golpe que lo dejaría en 0 lo deja en 1 (comun/ficha-acciones.js, fijarHp).
     let aliento = false;
@@ -485,6 +494,7 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
       ...(pacto ? {'resumen.pacto': false, ...(fenix ? {} : {'resumen.estados': (estPub || rs.estados || []).concat([titPub])})} : {})});
     return {r, previo, nuevo: fenix || pacto ? 0 : datos.hp, absorbe, aliento, fenix, pacto, hpFenix: datos.hp, desperto};
   });
+  if(res && res.simulado) return res;
   if(res.desperto && typeof mesaLinea === 'function') mesaLinea(`💤 ${nombreDe(t)} se despertó: recibió daño`, 'recordatorio');
   if(res.aliento){
     const txt = `${nombreDe(t)} iba a caer, pero el Anillo del último aliento lo sostiene con 1 de vida (una vez por día)`;
@@ -549,6 +559,7 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : defensasDeInv(inv).def + extra) + num(restaExtra || 0), inv.estados, {...(o || {}), defPartes});
     mitiMitiPartir(r, prot);
     const previo = num(inv.hp);
+    if(o && o.simular) return {r, previo, nuevo: Math.max(0, previo - r.recibido), simulado: true};   // 🧮 la vista previa: sin escribir (2026-11-04)
     inv.hp = Math.max(0, previo - r.recibido);
     const rs = ficha.data().resumen || {};
     const desperto = num(r.recibido) > 0 && typeof suenoQuitarDe === 'function' && suenoQuitarDe(inv.estados);   // 💤 el daño lo despierta (js/87)
@@ -557,6 +568,7 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     tx.update(base, {actualizado: ts, 'resumen.invocaciones': (rs.invocaciones || []).map(i => i.id === invId ? {...i, hp: inv.hp, ...sinSueno(i)} : i)});
     return {r, previo, nuevo: inv.hp, desperto};
   });
+  if(res && res.simulado) return res;
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
   if(res.desperto && typeof mesaLinea === 'function') mesaLinea(`💤 ${nombreDe(t)} se despertó: recibió daño`, 'recordatorio');
   if(guarda && golpe > 0) guardianAviso(t, guarda);

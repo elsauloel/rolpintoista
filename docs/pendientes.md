@@ -930,6 +930,9 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   Espadón del capataz; la tienda de inicio queda con una sola en esa categoría. También hay pocas Comunes a dos manos de Tipo 4 y 8, báculos y
   carcajes (se completan con Buenas). Diseñar algunas cuando el dueño quiera. La lista de consumibles esenciales (comun/generador-tiendas.js,
   `CONSUMIBLES_ESENCIALES`) quedó aprobada «por ahora».
+- [ ] **🎯 PRIORIDAD: rebalancear la Resistencia a crítico** (dueño, 2026-11-04, regla nueva: suma al rango en vez de restar niveles) → el plan
+  paso a paso en [`plan-resistencia-critico.md`](plan-resistencia-critico.md). Reemplaza al viejo «demasiada Resistencia a crítico» (2026-10-10), que
+  se pensó con la regla vieja.
 - [ ] **🐝 Invocaciones para creeps (dueño, 2026-11-03: «en principio no lo vamos a usar, pero debería existir»):** hoy los creeps solo llaman refuerzos
   (creeps comunes). Queda para después de diseñar mejor la gestión de invocaciones de jugador; recién ahí se piensa la de los creeps.
 - [ ] **👁 Ojo de Kicillof como habilidad de Support (dueño, 2026-11-03: «sería interesante, habría que pensarlo en coste»):** hoy es solo el

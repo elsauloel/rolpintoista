@@ -68,3 +68,11 @@ Respuestas del dueño a la medición (2026-11-04):
 11. **Pesos para el catálogo** (docs/peso-resistencia-critico.md, a confirmar con el dueño al revisar las piezas): Defensa +1 = 1; Res. T4 ×1 = 1;
     T6 = ½; T8 = ¼; T10 = ¼; +1 a todos los Tipos = 2. Los precios se mantienen y se ajustan los efectos.
 12. **Paso 4, primera familia: escudos** → propuesta en [propuesta-res-critico-escudos.md](propuesta-res-critico-escudos.md) (2026-11-04), a revisar con el dueño.
+
+## ⏸ En pausa (2026-11-04): el dueño lo sigue en la compu
+«Vamos a pasar esta tarea; en la compu lo resuelvo, requiere más atención.» Dónde quedó: la propuesta de los **escudos**
+(docs/propuesta-res-critico-escudos.md) espera su revisión. Preguntas abiertas: (1) ¿Bloqueo +1, Parry +1 y Def. especial +1 pesan como Defensa +1?
+(Claude sugiere que el Bloqueo pese algo menos: solo sirve tras ganar un Parry); (2) ¿cierran los 6 Comunes que cambian?; después, los 9 Buenos,
+y recién entonces cargarlos. Siguen las demás familias (cascos, torso blando, torso rígido, manos, piernas, pies), después armas, habilidades,
+estados, pasivas y creeps. Ojo: el texto de la pasiva Temple todavía explica la regla vieja.
+

@@ -6503,7 +6503,7 @@ prueba('⚖ Carga que derriba, Arrastrar y Golpe que sigue (2026-10-27): lo que 
   const c = CreepAcciones.ataqueDeHab(sc, chp('Carga que derriba')), a = CreepAcciones.ataqueDeHab(sc, chp('Arrastrar')), g = CreepAcciones.ataqueDeHab(sc, chp('Golpe que sigue'));
   igual([c.embestidaHab, c.cargaDerriba, c.mods.pdg, a.arrastra, a.alcance, a.mods.pdg, g.sigue, g.mods.fijo], [true, 4, 0, 3, 3, 2, true, 2]);
 });
-prueba('🪝 Arrastrar (2026-11-04): de clase Tanque para jugadores (ataque + 2 SP, +2 PdG, arrastra 3 a 3 casillas) y engancha con la PdG (el texto de creep y la migración)', () => {
+prueba('🪝 Arrastrar (2026-11-04): de clase Tanque para jugadores (2 No2 fijos + 2 SP, +2 PdG, arrastra 3 a 3 casillas) y engancha con la PdG (el texto de creep y la migración)', () => {
   const pool = Object.values(CLASES_SKILLS).flatMap(c => c.skills || c.habilidades || []);
   const h = pool.find(x => x.id === 'tanque-arrastrar');
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {id: 'x', nombre: 'Maza', tipoDado: 6}, alcance: 3});
@@ -6512,7 +6512,7 @@ prueba('🪝 Arrastrar (2026-11-04): de clase Tanque para jugadores (ataque + 2 
   const habs = [vieja]; Combatiente.migrarLuzSanadora(habs);
   igual([!!h, h.costo, h.nitrosCosto, a.arrastra, a.alcance, a.mods.pdg, /Probabilidad de Golpe contra la Evasión/.test(cr.detalle), /Destreza contra/.test(cr.detalle),
     /Probabilidad de Golpe contra la Evasión/.test(habs[0].detalle), typeof FichaResumen.resumen(structuredClone(FichaGuardado.DEFAULT), {}).pdg],
-    [true, '2', 'ATAQUE', 3, 3, 2, true, false, true, 'number']);
+    [true, '2', 2, 3, 3, 2, true, false, true, 'number']);
 });
 prueba('⚖ Sonic Boom de creep (2026-10-27): cono, Fuerza +2 contra la Constitución, la diferencia de daño directo y «Pierde No2»', () => {
   const h = chp('Sonic Boom'), ej = CreepAcciones.habEjecucion(creepPrueba(), h);

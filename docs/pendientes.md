@@ -85,6 +85,12 @@
 >   Capataz (5→4) vida 75→30 y Defensa 7→4 (escapa a 15); Chamán (4→3) vida 50→25 y Defensa 5→3; Rata vida 30→20 y PdG 15→11 (también la del
 >   Chillido). Alternativas: más difícil / solo vida y Defensa / más fácil (sin Cristal, menos daño). Decidir cuál y aplicarla (a mano, o Claude
 >   como co-GM con permiso).
+> - [ ] **⏬ Ver la Demora animada en un duelo real (dueño, 2026-11-04: «anotá lo de ver la demora en pendientes cuando esté en la compu»).**
+>   Con un duelo abierto, aplicar una Demora y mirarlo desde dos pantallas (GM y un jugador): el duelo se achica hacia su token, la lista de turnos
+>   se despliega y los nombres se deslizan al orden nuevo (el demorado en rojo), y a los ~3 s el duelo vuelve a abrirse (commit 2439fc7a).
+> - [ ] **😇 Decidir quién cambia el Pacto (dueño, 2026-11-04: «la pregunta pendiente del pacto también va a quedar para cuando esté en la compu»).**
+>   Hoy el campo «😇 Pacto» (ficha, datos de identidad) lo cambia el jugador en su ficha y el GM con «✎ Editar como GM», aunque la ayuda dice que lo
+>   marca el GM. Pregunta: ¿solo el GM lo puede cambiar?
 > - [~] (2026-11-03: el dueño cargó Capataz, Rompehuesos —5.ª: Puño de roca—, dos Ratas y el Arquero, con cambios suyos sobre la marcha; falta confirmar el Chamán) **▶ AL RETOMAR EL ENCUENTRO 2 DE EL ORIGEN, RECORDARLE AL DUEÑO (2026-11-03, dueño: «cuando te diga de retomar la próxima pelea del origen,
 >   recordame que termine el arquero y avance con el chamán»)**: cargados por el dueño en MINAS DUNGEON: Capataz del culto, Goblin rompehuesos (le falta
 >   su **5.ª habilidad**, la elige él) y la Rata de galería (duplicada: dos ratas). **El Arquero del culto incendiario quedó a medio cargar**: terminarlo

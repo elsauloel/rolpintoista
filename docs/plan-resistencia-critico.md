@@ -55,4 +55,16 @@ Respuestas del dueño a la medición (2026-11-04):
 9. **Precio:** «mantener el precio y ajustar los efectos para que el precio siga pagando un volumen de efectos similar». Res ×1 debería pesar
    **un poco menos que Defensa +1** (de acuerdo con Claude); «+1 a todos los Tipos» también. Falta calcular cuánto pesaba antes y cuánto ahora,
    proporcionalmente, por Tipo (en curso).
+10. **El mapa de lugares por Tipo (cerrado, dueño 2026-11-04).** Cinturones y talismanes **no** dan resistencia a crítico (cinturón: gestión de
+    ítems, a lo sumo Defensa o resistencia elemental; talismán: otros efectos). Los anillos tampoco. Quedan 7 lugares:
+    | Tipo | Lugares |
+    |---|---|
+    | Tipo 4 | cabeza, torso blando, torso rígido, manos, piernas, pies, escudo (todos) |
+    | Tipo 6 | torso blando, torso rígido, manos, piernas, pies, escudo |
+    | Tipo 8 | torso rígido, manos, piernas, escudo |
+    | Tipo 10 | cabeza, escudo |
+    | Tipo 12 | **no existe** por ahora (a lo sumo, algún legendario excepcional; no se contempla al diseñar) |
+    Cada pieza da +1 contra un Tipo; el +2 en una pieza, muy raro y desde Buena; las de Tipos altos, más raras que las de Tipos bajos.
+11. **Pesos para el catálogo** (docs/peso-resistencia-critico.md, a confirmar con el dueño al revisar las piezas): Defensa +1 = 1; Res. T4 ×1 = 1;
+    T6 = ½; T8 = ¼; T10 = ¼; +1 a todos los Tipos = 2. Los precios se mantienen y se ajustan los efectos.
 

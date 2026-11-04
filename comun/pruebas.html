@@ -45,6 +45,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-transfusion.js?v=20261103fx2"></script>
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
+<script src="fx-gancho.js?v=20261104gancho"></script>
 <script src="combatiente.js?v=20261104c"></script>
 <script src="creep-calculo.js?v=20261103t20"></script>
 <script src="creep-botonera.js"></script>
@@ -6729,6 +6730,14 @@ prueba('🛡 Escudo humano, la animación (2026-11-03): el reparto igual que el 
     f0.impacto, f0.entero, f0.partido, f500.partido, f500.viaje > 0, f1200.pulso !== null, f1600.fin,
     F.reflejo(0, 0) === 0, F.reflejo(F.REFLEJO_DURA + 10, 0), F.respiro(0) > 0.2 && F.respiro(0) < 0.6],
     [6, 6, 4, 3, 1, 0, 0, 11, 20, 80, true, 1, 1, false, true, true, true, true, true, null, true]);
+});
+prueba('🪝 Arrastrar, la animación (2026-11-04): cuánto dura según cómo sale, en qué parte va, la cadena floja o tensa, los eslabones y el recorrido del arrastrado', () => {
+  const F = FxGancho, fa = F.tiempos('falla', 1, false), su = F.tiempos('suelta', 1, false), tr = F.tiempos('trae', 3, false), poco = F.tiempos('trae', 3, true);
+  const tensa = F.cadena({x: 0, y: 0}, {x: 100, y: 0}, 0, 0, 0, 10), floja = F.cadena({x: 0, y: 0}, {x: 100, y: 0}, 1, 0, 0, 10);
+  const cs = [{x: 0, y: 0}, {x: 10, y: 0}, {x: 20, y: 0}], v1 = F.volar({x: 0, y: 0}, {x: 100, y: 0}, 1);
+  igual([fa.total, su.total, tr.total, poco.total, F.fase(0, tr).fase, F.fase(600, tr).fase, F.fase(1000, tr).fase, F.fase(99999, tr).fase, F.fase(1000, fa).fase, fa.arrastra,
+    F.eslabones(tensa, 10).length, tensa[5].y, Math.abs(floja[5].y) > 5, F.recorrido(cs, 0).x, F.recorrido(cs, 0.5).x, F.recorrido(cs, 1).x, Math.round(v1.x), Math.round(v1.y)],
+    [1260, 1820, 2120, 848, 'lanza', 'engancha', 'arrastra', 'fin', 'vuelve', 0, 10, 0, true, 0, 10, 20, 100, 0]);
 });
 prueba('🫳 Bolsillo ajeno (2026-11-03): de fábrica en Choque liviano, Sigilo contra Percepción, lenta que arranca en espera, efecto Robo; el oro 1d6 × nivel y el botín', () => {
   const e = HABILIDADES_CREEP_BASE.filter(x => x.nombre === 'Bolsillo ajeno');

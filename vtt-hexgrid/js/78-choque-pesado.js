@@ -168,7 +168,10 @@ async function arrastrarEnganche(mio, t, ataque){
     engancha = rd.total > re.total;
   }
   const paraUid = t.tipo === 'pj' && t.duenoUid ? {paraUid: t.duenoUid} : {};
+  // 🪝 La animación (js/96, 2026-11-04): todas las pantallas ven volar el gancho; el aviso y el golpe esperan a que termine.
+  const fx = typeof ganchoFxPublicar === 'function' ? (res, celdas) => ganchoFxPublicar(mio.id, t.id, res, celdas).catch(err => console.error('Arrastrar: la animación', err)) : async () => {};
   if(!engancha){
+    await fx('falla');
     const txt = rd && re ? `${nom} le tira el gancho a ${obj} (PdG ${rd.total} contra su Evasión ${re.total}): no lo engancha. No hay golpe.` : `${nom} no engancha a ${obj}: no hay golpe.`;
     mesaLinea(`🪝 ${txt}`, 'recordatorio');
     momentoAbrir({tipo: 'gancho', icono: '🪝', titulo: `${hab}: ${nom} no engancha a ${obj}`, resultado: txt, estado: 'listo', datos: {aviso: true, boton: 'Entendido', ...paraUid}});
@@ -190,6 +193,7 @@ async function arrastrarEnganche(mio, t, ataque){
     if(conMio + rf.total === conObj) trae = await arrastrarDesempate(mio, t, hab, nom, obj, conObj);
   }
   if(!trae){
+    await fx('suelta');
     const txt = rf ? `${nom} engancha a ${obj} pero no lo puede traer (Constitución ${fmt(conMio)} + Fuerza ${rf.total} = ${fmt(conMio + rf.total)} contra su Constitución ${fmt(conObj)}). No pasa nada.` : `${nom} engancha a ${obj} pero no lo puede traer: no pasa nada.`;
     mesaLinea(`🪝 ${txt}`, 'recordatorio');
     momentoAbrir({tipo: 'gancho', icono: '🪝', titulo: `${hab}: ${nom} no puede traer a ${obj}`, resultado: txt, estado: 'listo', datos: {aviso: true, boton: 'Entendido', ...paraUid}});
@@ -260,7 +264,8 @@ async function arrastrarTraer(defId, atkId, hab, quien){
   if(!t || !ta) return null;
   const nom = nombreDe(t), titulo = `${hab}: ${quien} arrastra a ${nom}`;
   const im = chanceDe(t, 'inamovible');
-  if(im && Math.random() * 100 < im){ momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `Es Inamovible (${im} %): no se mueve.`, estado: 'listo'}); return null; }
+  const fx = (res, celdas) => typeof ganchoFxPublicar === 'function' ? ganchoFxPublicar(atkId, defId, res, celdas).catch(err => console.error('Arrastrar: la animación', err)) : Promise.resolve();
+  if(im && Math.random() * 100 < im){ await fx('suelta'); momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `Es Inamovible (${im} %): no se mueve.`, estado: 'listo'}); return null; }
   const ocupada = x => elementoSolidoEn(x.col, x.fila) || [...tokens.values()].some(y => y !== t && y.col === x.col && y.fila === x.fila && !y.bajoTierra);
   const pared = (a, b) => typeof paredCorta === 'function' && paredCorta(a, b);
   const ruta = [{col: t.col, fila: t.fila}];
@@ -270,13 +275,17 @@ async function arrastrarTraer(defId, atkId, hab, quien){
     if(!sig) break;
     c = sig; ruta.push(c);
   }
-  if(ruta.length < 2){ momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: distanciaHex(t, ta) <= 1 ? `Ya estaba pegado a ${quien}.` : 'No hay por dónde traerlo: queda donde está.', estado: 'listo'}); return null; }
+  if(ruta.length < 2){ await fx('suelta'); momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: distanciaHex(t, ta) <= 1 ? `Ya estaba pegado a ${quien}.` : 'No hay por dónde traerlo: queda donde está.', estado: 'listo'}); return null; }
   // La primera trampa del camino lo frena ahí y se dispara (como si la pisara).
   const tr = typeof trampasEvaluarRuta === 'function' ? trampasEvaluarRuta(defId, t, ruta, 0) : null;
   const corte = tr && tr.tipo === 'pisa' ? tr.indice : -1;
   const final = corte > 0 ? ruta.slice(0, corte + 1) : ruta, fin = final[final.length - 1], pasos = final.length - 1;
+  // 🪝 La cadena primero: vuela, engancha y se tensa; recién ahí se mueve el token (cada pantalla lo dibuja siguiendo la cadena, js/96).
+  const anim = fx('trae', final.map(x => ({col: x.col, fila: x.fila})));
+  if(typeof ganchoFxAntesDeArrastrar === 'function') await new Promise(r => setTimeout(r, ganchoFxAntesDeArrastrar(final)));
   try{ await coleccionTokens().doc(defId).update({col: fin.col, fila: fin.fila, ruta: firebase.firestore.FieldValue.delete()}); }
-  catch(err){ console.error('Arrastrar: no se pudo mover', err); momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `Traelo ${pasos} casillas a mano (no se pudo mover solo).`, estado: 'listo'}); return null; }
+  catch(err){ console.error('Arrastrar: no se pudo mover', err); await anim; momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `Traelo ${pasos} casillas a mano (no se pudo mover solo).`, estado: 'listo'}); return null; }
+  await anim;   // el aviso, la trampa y el golpe, cuando la cadena ya lo soltó
   const trampaTxt = corte > 0 ? ' En el camino pisa algo: se frena ahí.' : '';
   momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `Lo trae ${pasos} casillero${pasos === 1 ? '' : 's'} hacia ${quien} (no camina: sin No2 ni ataques de oportunidad).${trampaTxt}`, estado: 'listo',
     datos: {arrastre: {tokenId: defId, celdas: final.map(x => ({col: x.col, fila: x.fila}))}}});   // las zonas del camino: las revisa la pantalla de su dueño (arrastreZonasMomento)

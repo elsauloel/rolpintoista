@@ -284,6 +284,15 @@
 
 ### ▶ Para la próxima tanda de pruebas en el mapa (2026-11-03)
 
+- [ ] **🪝 La animación de Arrastrar — para que la revise el dueño en la compu** (2026-11-04, dueño: «a Arrastrar también sumarle una animación de
+  grappling hook, una cadena con un gancho…»; `vtt-hexgrid/js/96-gancho-fx.js` + `comun/fx-gancho.js`): un Tanque con Arrastrar contra un creep a 3
+  casillas, con el mapa del GM y el de un jugador abiertos a la vez. Tres casos: **no lo engancha** (el gancho vuela con la cadena colgando, pasa de
+  largo por el costado y vuelve floja) · **lo engancha pero no lo trae** (chispa al clavarse, la cadena se tensa, tiembla y se suelta) · **lo trae**
+  (chispa, se tensa y el creep se desliza casilla por casilla hasta quedar pegado, sin saltar; después la cadena lo suelta y el gancho vuelve). Mirar
+  que: se vea igual en las dos pantallas, siga al zoom y al paneo, no tape clics, el aviso o el cuadro del golpe aparezcan recién cuando termina, y que
+  si el creep está oculto o en la niebla para el jugador, el jugador no vea nada. Con una trampa en el camino: se frena ahí y la trampa salta después de
+  la animación. Capturas de referencia (dibujo sin Firebase): vuelo, engancha, arrastre a mitad de camino, no engancha, no lo puede traer.
+
 - [ ] **🛡 La animación del Escudo humano — para que la revise el dueño en la compu** (2026-11-03, `vtt-hexgrid/js/95-escudo-humano-fx.js` +
   `comun/fx-escudo-humano.js`): un creep con Escudo humano sobre otro creep a 3 casillas o menos (y, aparte, un Tanque con Miti-Miti sobre un
   personaje). En las pantallas del GM y de un jugador: mientras dura, el **lazo dorado** que respira entre los dos y el **reflejo metálico** que

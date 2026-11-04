@@ -277,6 +277,11 @@ function calcularDisposicion(){
     const c = hexCentro(fin.col, fin.fila);
     res.push({id: rutaPendiente.id, x: c.x, y: c.y, radio: HEX * 0.68, solo: true});
   }
+  // 🪝 Arrastrar (js/96): mientras la cadena lo trae, el token arrastrado se dibuja donde va la animación, no en su casilla nueva.
+  if(typeof ganchoFxPosToken === 'function') res.forEach(d => {
+    const p = ganchoFxPosToken(d.id);
+    if(p){ d.x = p.x; d.y = p.y; d.radio = HEX * 0.68; d.solo = true; d.gancho = true; }
+  });
   return res;
 }
 
@@ -818,7 +823,7 @@ function dibujarLienzo(){
   disposicion.forEach(d => {
     const t = tokens.get(d.id);
     let v = visibles.get(d.id);
-    if(!v || d.arrastrado){ v = {x: d.x, y: d.y}; visibles.set(d.id, v); }
+    if(!v || d.arrastrado || d.gancho){ v = {x: d.x, y: d.y}; visibles.set(d.id, v); }
     else{
       const dx = d.x - v.x, dy = d.y - v.y;
       if(Math.abs(dx) + Math.abs(dy) > 0.5){ v.x += dx * 0.25; v.y += dy * 0.25; animando = true; }
@@ -1214,6 +1219,7 @@ function dibujarLienzo(){
   if(typeof dibujarEfectosOnda === 'function' && dibujarEfectosOnda(z)) animando = true;   // 💥 la onda del Shockwave (js/94)
   if(typeof dibujarEfectosEscudoHumano === 'function' && dibujarEfectosEscudoHumano(z)) animando = true;   // 🛡 el lazo y el golpe repartido del Escudo humano (js/95)
   if(typeof dibujarEfectosTransfusion === 'function' && dibujarEfectosTransfusion(z)) animando = true;   // 🩸 el chorro de la Transfusión (js/92)   // la Descarga que salta (js/19)
+  if(typeof dibujarEfectosGancho === 'function' && dibujarEfectosGancho(z)) animando = true;   // 🪝 la cadena y el gancho de Arrastrar (js/96)
   if(typeof dibujarEfectosExplosion === 'function' && dibujarEfectosExplosion()) animando = true;
   if(typeof dibujarEfectosRuleta === 'function' && dibujarEfectosRuleta()) animando = true;
   if(typeof armasTitilan === 'function' && armasTitilan()) animando = true;   // ✨ lo que se puede levantar titila (js/27, 2026-10-22)   // 🤺 la ruleta del Desarmar (js/62)   // 💥 la trampa que explota (js/19)

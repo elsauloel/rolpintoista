@@ -975,6 +975,12 @@ las rodea como a un Sólido. Por un aliado se pasa, pero `rutaSoltada` no deja t
   (`dibujarEfectosEscudoHumano`) el lazo dorado que respira y el reflejo que barre al protegido. Cuando el mapa cobra el reparto (`mitiMitiCobrar`,
   js/10) publica el momento `escudo-golpe` ({de, a, total, va}; js/16, sin tarjeta): destello, el número que se parte, la esquirla por el lazo y el
   pulso en el guardián (~1,5 s). Al vencer, el lazo se corta y se apaga. No se dibuja lo que esa pantalla no ve; «reducir movimiento» sin viaje.
+- **🪝 La animación de Arrastrar** (2026-11-04, dueño: «una animación de grappling hook, una cadena con un gancho…»): `js/96-gancho-fx.js` + la
+  geometría y los tiempos en `comun/fx-gancho.js`. La pantalla que resuelve el enganche (js/78 `arrastrarEnganche`/`arrastrarTraer`, la del GM si el
+  rival es un creep) publica, ya con las tiradas hechas, el momento `gancho-fx` ({de, a, resultado 'falla'|'suelta'|'trae', celdas, semilla}; js/16,
+  sin tarjeta) y espera que termine antes del aviso, la trampa del camino o el golpe. 'trae': mueve el token recién cuando la cadena se tensa
+  (`ganchoFxAntesDeArrastrar`) y, mientras dura, `calcularDisposicion` (js/05) dibuja al arrastrado donde va la cadena (`ganchoFxPosToken`), sin saltar.
+  No se dibuja si uno de los dos no se ve en esa pantalla; «reducir movimiento»: más corta, sin temblor.
 - **Editar token en ventana emergente** (2026-09-21): "✎ Editar token" ya no usa la barra lateral; abre una ventana centrada (`#editar-token-capa`/`#editar-token-ventana`, mismo estilo que "Nuevo token") que se cierra con Volver, clic en el fondo, clic derecho fuera de un campo o Esc (`cerrarEditarToken`). La barra lateral queda solo con Mantenimiento y Finalizar combate.
 
 - **📏🔮 Visualizador de rango** (2026-09-22): dos botones cuadrados junto a 👓 lentes (`#btn-rango`, `#btn-rango-magico`), para cualquier jugador: muestran, con la misma superficie hexagonal que usan las auras (`dibujarAuraHex`), el área de **Rango** (de Destreza, azul) o **Rango de casteo** (de Especial, violeta) alrededor de **tu propio token** en el mapa. Los números salen de `resumen.rng`/`resumen.rangocasteo`, que la ficha ya calculaba pero no publicaba (`fichaResumen()`). Atajos: **R** prende/apaga el normal, **Shift+R** el mágico (Ctrl+R se descartó: el navegador lo usa para recargar la página). Es local a cada navegador, no se sincroniza ni queda guardado. Por ahora solo para el propio PJ del jugador — no hay botón equivalente para que el GM lo vea en un creep.

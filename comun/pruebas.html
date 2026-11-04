@@ -65,7 +65,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="catalogo.js"></script>
 <script src="generador-tiendas.js"></script>
 <script src="items-subidos.js"></script>
-<script src="ficha-habilidades.js"></script>
+<script src="ficha-habilidades.js?v=20261104e"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
 <script src="ficha-resumen.js?v=20261104c"></script>
@@ -76,7 +76,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js"></script>
-<script src="ficha-acciones.js?v=20261103r1"></script>
+<script src="ficha-acciones.js?v=20261104e"></script>
 <script src="ficha-mantenimiento.js?v=20261103ve"></script>
 <script src="estado-preguntas.js"></script>
 <script src="asistente-estado.js"></script>
@@ -6502,6 +6502,13 @@ prueba('⚖ Carga que derriba, Arrastrar y Golpe que sigue (2026-10-27): lo que 
   const sc = creepPrueba();
   const c = CreepAcciones.ataqueDeHab(sc, chp('Carga que derriba')), a = CreepAcciones.ataqueDeHab(sc, chp('Arrastrar')), g = CreepAcciones.ataqueDeHab(sc, chp('Golpe que sigue'));
   igual([c.embestidaHab, c.cargaDerriba, c.mods.pdg, a.arrastra, a.alcance, a.mods.pdg, g.sigue, g.mods.fijo], [true, 4, 0, 3, 3, 2, true, 2]);
+});
+prueba('🪝 Una habilidad que pega con el arma elige el arma aunque cueste No2 fijos (2026-11-04: Arrastrar a 2 No2; el golpe salía sin arma)', () => {
+  const pool = CLASES_SKILLS.flatMap(c => c.habilidades || []);
+  const base = pool.find(x => x.id === 'tanque-arrastrar');
+  const mia = {id: 'h1', nombre: 'Arrastrar', habClaseId: 'tanque-arrastrar', nitrosCosto: 2};   // sin duelo propio: lo toma de la clase
+  igual([FichaHabilidades.pegaConArma(base), FichaHabilidades.pegaConArma(mia), FichaHabilidades.nitrosAtaque(base), FichaHabilidades.pegaConArma({nombre: 'x', duelo: {modo: 'tirada'}})],
+    [true, true, false, false]);
 });
 prueba('🪝 Arrastrar (2026-11-04): de clase Tanque para jugadores (2 No2 fijos + 2 SP, +2 PdG, arrastra 3 a 3 casillas) y engancha con la PdG (el texto de creep y la migración)', () => {
   const pool = Object.values(CLASES_SKILLS).flatMap(c => c.skills || c.habilidades || []);

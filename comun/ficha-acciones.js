@@ -768,7 +768,9 @@ const FichaAcciones = (() => {
     }
     // Con costo de ataque: primero se elige el arma (si hay más de una).
     let arma = null;
-    if(FichaHabilidades.nitrosAtaque(it)){
+    // 🪝 Una habilidad que pega con el arma (`duelo.modo === 'arma'`) elige el arma aunque cueste No2 fijos (2026-11-04: Arrastrar pasó de «lo de un
+    // ataque» a 2 No2 fijos y el golpe salía «sin arma»). Solo «ATAQUE» la cuenta como el ataque del turno (registrarAtaqueDeHabilidad).
+    if(FichaHabilidades.nitrosAtaque(it) || FichaHabilidades.pegaConArma(it)){
       let opciones = FichaBotonera.armasParaHabilidad(S, it);
       if(it.soloRango && !opciones.some(o => o.arma)){ ui.toast(`${it.nombre} se usa con un arma a distancia en la mano`); return; }   // Headshot
       if(abajo === true){   // 🕳 saliendo de abajo de la tierra: solo un arma cuerpo a cuerpo de Tipo 4 a 10 (P231)

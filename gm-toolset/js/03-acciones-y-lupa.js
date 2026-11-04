@@ -141,6 +141,13 @@ function cardHtml(sc){
       ${((g, usadasMano, usadasCuerpo) => `
       <div>
         <div class="sect-label">Manos <span class="cupo-equipo${usadasMano > 2 ? ' pasado' : ''}" title="Cuántas manos ocupa lo que tiene en la mano (lo de dos manos cuenta 2; lo natural, nada)">${usadasMano}/2</span></div>
+        ${Combatiente.sinArmaEnMano(sc) && Combatiente.manosLibres(sc) < 2
+          /* ✋ Sin arma física pero con las manos ocupadas (una varita, un talismán…): no se muestra «Sin arma (nada en la mano)» como si fuera una
+             pieza (dueño, 2026-11-04: «aparece como "sin arma" y con una varita equipada, al mismo tiempo»); queda una nota chica con lo que pega a mano. */
+          ? `<div class="hint" style="margin-top:4px;display:flex;gap:6px;align-items:center;flex-wrap:wrap">✋ Sin arma física: a mano limpia pega <b>${danoTxt(sc)}</b> (desde sus Acciones).
+              <button class="rm" data-armanat="${sc.id}" title="Arma natural del catálogo (garras, colmillos, aguijón…)">🐾</button>
+              <button class="rm" data-editararma="${sc.id}" title="Ponerle un arma">✎</button></div>`
+          : `
         <div class="arma-compacta" style="margin-top:4px">
           <div class="arma-compacta-top">
             <span class="equipado-nombre">${Combatiente.armaEnMano(sc).nombre ? esc(Combatiente.armaEnMano(sc).nombre) : `<span class="hint">${Combatiente.armaEnMano(sc).sinArma ? '✋ Sin arma (nada en la mano)' : 'Sin nombre'}</span>`}</span>
@@ -153,6 +160,7 @@ function cardHtml(sc){
           <div class="arma-detalle">${Combatiente.armaEnMano(sc).detalle ? esc(Combatiente.armaEnMano(sc).detalle) : 'Sin efecto.'}</div>
           ${Combatiente.armaEnMano(sc).efectosGolpe.length ? `<div class="arma-detalle"><b>Al golpear:</b> ${esc(EfectosGolpe.resumenLista(Combatiente.armaEnMano(sc).efectosGolpe))}</div>` : ''}
         </div>
+        `}
         ${g.manos.length ? `<div class="equipo-list" style="margin-top:6px">${g.manos.map(it => equipoFila(it, false)).join('')}</div>` : ''}
       </div>
       <div>

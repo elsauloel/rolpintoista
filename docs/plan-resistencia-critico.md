@@ -65,6 +65,8 @@ Respuestas del dueño a la medición (2026-11-04):
     | Tipo 10 | cabeza, escudo |
     | Tipo 12 | **no existe** por ahora (a lo sumo, algún legendario excepcional; no se contempla al diseñar) |
     Cada pieza da +1 contra un Tipo; el +2 en una pieza, muy raro y desde Buena; las de Tipos altos, más raras que las de Tipos bajos.
+    **Cambio (dueño, 2026-11-04, al revisar el torso rígido):** desde **Común**, una misma pieza puede dar +1 contra **hasta dos Tipos distintos**
+    a la vez (cada Tipo en su lugar permitido). El +2 contra un mismo Tipo sigue siendo muy raro y desde Buena.
 11. **Pesos para el catálogo** (docs/peso-resistencia-critico.md, a confirmar con el dueño al revisar las piezas): Defensa +1 = 1; Res. T4 ×1 = 1;
     T6 = ½; T8 = ¼; T10 = ¼; +1 a todos los Tipos = 2. Los precios se mantienen y se ajustan los efectos.
 12. **Bloqueo +1 = ¾** (dueño, 2026-11-04; Parry +1 y Def. especial +1 = 1). **Escudos: aprobados y cargados en el catálogo (24 escudos).**

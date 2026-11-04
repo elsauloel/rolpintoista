@@ -1,6 +1,6 @@
 # Propuesta: torso rígido (rebalance de la Resistencia a crítico)
 
-Cuarta familia del paso 4 del [plan](plan-resistencia-critico.md). **Solo propuesta: no se cambió el catálogo.** Fecha: 2026-11-04.
+Cuarta familia del paso 4 del [plan](plan-resistencia-critico.md). **Solo propuesta: no se cambió el catálogo.** Pregunta 1 respondida (dueño, 2026-11-04): **una pieza puede dar +1 contra hasta dos Tipos, desde Común** → ver «Versión 2» al final. Fecha: 2026-11-04.
 Base: el mapa cerrado (el torso rígido puede dar resistencia contra **Tipo 4, 6 u 8**; +1 contra un solo Tipo; el +2, muy raro y desde Buena) y los
 pesos de las familias anteriores: Defensa +1 = 1 · Def. especial +1 = 1 · Res. T4 = 1 · Res. T6 = ½ · Res. T8 = ¼ · Res.CC +1 = ½ · Res.Esp +1 = 1 ·
 Vida +5 = ½ · resistencia elemental +1 = ½ · Iniciativa −1 = −½ · Evasión −1 = −½ · Sigilo −2 = −½ · Bloqueo +1 = ¾.
@@ -45,3 +45,13 @@ acero pulido, Media armadura de escudero (Buenas). Tipo 6: Cota de malla de hier
 2. ¿Te cierra pasar el **Peto de hierro viejo** a Tipo 8, para que haya un Tipo 8 Común?
 
 Nota para después: en **piernas** hay dos Buenas con dos Tipos (Perneras de escamas, Grebas de bandas articuladas); se decide con la pregunta 1.
+
+## Versión 2 (con la regla nueva: hasta dos Tipos por pieza, desde Común)
+
+| Pieza | Hoy (valor) → propuesta (valor) |
+|---|---|
+| **Peto de hierro viejo** (Común, 110) | Def +3 · Res. T6 (3½) → **Def +4 · Res. T6 · Res. T8** (4¾) — conserva el T6 y suma el Tipo 8 Común |
+| **Coraza de hierro batido** (Buena, 170) | Def +4 · Res. T4 · Res. T8 (5¼) → **Def +5 · Res. T4 · Res. T8** (6¼) |
+| **Brigantina remachada** (Buena, 200, liviana) | Def +3 · Res. T4 · Res. T8 · Vida +5 (4¾) → **Def +4 · Res. T4 · Res. T8 · Vida +5 · Res.CC +1** (6¼) |
+| **Coraza de láminas** (Buena, 200) | Def +4 · Res. T8 · Res.CC +1 · Vida +5 (5¼) → **Def +5 · Res. T8 · Res.CC +1 · Vida +10** (6¾) |
+| Armadura de placas, Armadura compuesta | **Quedan como están** (T4 + T6, valor 7½: bien). |

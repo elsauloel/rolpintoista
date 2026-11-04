@@ -1,6 +1,6 @@
 # Propuesta: manos (rebalance de la Resistencia a crítico)
 
-Quinta familia del paso 4 del [plan](plan-resistencia-critico.md). **Solo propuesta: no se cambió el catálogo.** Fecha: 2026-11-04.
+Quinta familia del paso 4 del [plan](plan-resistencia-critico.md). **✅ Aprobada y cargada (dueño, 2026-11-04: «Ok»): 3 guantes.** Fecha: 2026-11-04.
 Base: el mapa cerrado (las manos pueden dar resistencia contra **Tipo 4, 6 u 8**; +1 por Tipo, **hasta dos Tipos por pieza desde Común**; el +2,
 muy raro y desde Buena) y los pesos de siempre: Defensa +1 = 1 · Def. especial +1 = 1 · Parry +1 = 1 · Bloqueo +1 = ¾ · Res. T4 = 1 · Res. T6 = ½ ·
 Res. T8 = ¼ · Res.CC +1 = ½ · resistencia elemental +1 = ½ · Iniciativa −1 = −½.

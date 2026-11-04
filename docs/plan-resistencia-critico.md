@@ -71,7 +71,7 @@ Respuestas del dueño a la medición (2026-11-04):
     T6 = ½; T8 = ¼; T10 = ¼; +1 a todos los Tipos = 2. Los precios se mantienen y se ajustan los efectos.
 12. **Bloqueo +1 = ¾** (dueño, 2026-11-04; Parry +1 y Def. especial +1 = 1). **Escudos: aprobados y cargados en el catálogo (24 escudos).**
     Cascos → [propuesta-res-critico-cascos.md](propuesta-res-critico-cascos.md): **aprobados y cargados** (6 cascos; el Bacinete de recluta queda con ×2 como
-    excepción; «morrión» renombrado). Torso blando → [propuesta-res-critico-torso-blando.md](propuesta-res-critico-torso-blando.md), **aprobado y cargado** (2026-11-04: Res. T6 +1 en 4 piezas acolchadas; el Gambesón de doble capa pasa a Def. especial +5 · Res. T6 ×2, opción B). Torso rígido → [propuesta-res-critico-torso-rigido.md](propuesta-res-critico-torso-rigido.md), **aprobado y cargado** (versión 2: 4 piezas; se permiten dos Tipos por pieza). Manos → [propuesta-res-critico-manos.md](propuesta-res-critico-manos.md), a revisar.
+    excepción; «morrión» renombrado). Torso blando → [propuesta-res-critico-torso-blando.md](propuesta-res-critico-torso-blando.md), **aprobado y cargado** (2026-11-04: Res. T6 +1 en 4 piezas acolchadas; el Gambesón de doble capa pasa a Def. especial +5 · Res. T6 ×2, opción B). Torso rígido → [propuesta-res-critico-torso-rigido.md](propuesta-res-critico-torso-rigido.md), **aprobado y cargado** (versión 2: 4 piezas; se permiten dos Tipos por pieza). Manos → [propuesta-res-critico-manos.md](propuesta-res-critico-manos.md), **aprobado y cargado** (3 guantes; Tipo 8 en uno Común y uno Bueno). Sigue: piernas.
 13. **Paso 4, primera familia: escudos** → propuesta en [propuesta-res-critico-escudos.md](propuesta-res-critico-escudos.md) (2026-11-04), a revisar con el dueño.
 
 ## Al terminar todo el catálogo: actualizar El origen
@@ -80,5 +80,5 @@ de ítems que ya tienen los personajes y los creeps de «El origen de las especi
 macizo viejo, Res. T4). **No tocar El origen antes de que lo pida**; cuando lo pida, pasar sus copias a los valores nuevos del catálogo.
 
 ## ▶ Dónde quedó (2026-11-04)
-Escudos, cascos, torso blando y torso rígido aprobados y cargados. Siguen **manos**, piernas y pies, después armas, habilidades,
+Escudos, cascos, torso blando, torso rígido y manos aprobados y cargados. Siguen **piernas** y pies, después armas, habilidades,
 estados, pasivas y creeps. Ojo: el texto de la pasiva Temple todavía explica la regla vieja.

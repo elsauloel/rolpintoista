@@ -68,8 +68,13 @@ Respuestas del dueño a la medición (2026-11-04):
 11. **Pesos para el catálogo** (docs/peso-resistencia-critico.md, a confirmar con el dueño al revisar las piezas): Defensa +1 = 1; Res. T4 ×1 = 1;
     T6 = ½; T8 = ¼; T10 = ¼; +1 a todos los Tipos = 2. Los precios se mantienen y se ajustan los efectos.
 12. **Bloqueo +1 = ¾** (dueño, 2026-11-04; Parry +1 y Def. especial +1 = 1). **Escudos: aprobados y cargados en el catálogo (24 escudos).**
-    Siguen los cascos.
+    Siguen los cascos → [propuesta-res-critico-cascos.md](propuesta-res-critico-cascos.md) (2026-11-04), a revisar con el dueño.
 13. **Paso 4, primera familia: escudos** → propuesta en [propuesta-res-critico-escudos.md](propuesta-res-critico-escudos.md) (2026-11-04), a revisar con el dueño.
+
+## Al terminar todo el catálogo: actualizar El origen
+Dueño, 2026-11-04: «cuando terminemos de actualizar todo el catálogo, sí, te voy a pedir que actualices el origen en lo que venga al caso». Las copias
+de ítems que ya tienen los personajes y los creeps de «El origen de las especies» no cambian solas (ej.: el Guardaespaldas con el Escudo de hierro
+macizo viejo, Res. T4). **No tocar El origen antes de que lo pida**; cuando lo pida, pasar sus copias a los valores nuevos del catálogo.
 
 ## ⏸ En pausa (2026-11-04): el dueño lo sigue en la compu
 «Vamos a pasar esta tarea; en la compu lo resuelvo, requiere más atención.» Dónde quedó: la propuesta de los **escudos**

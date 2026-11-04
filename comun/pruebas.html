@@ -5017,12 +5017,12 @@ prueba('zona: la tabla «según la tirada extra» (Pedos Tóxicos, 2026-10-22): 
     Combatiente.efectoPorTirada(tabla, 20).caer, Combatiente.porTiradaTxt(tabla), z.zonaEstado && z.zonaEstado.porTirada.length, z.zonaNota, sin.zonaEstado, sin.zonaNota],
     [[7, 17, 20], true, {nombre: 'Pajaritos', turnos: 1}, null, 'Pajaritos', 'Stun', true, '7+ Pajaritos (1 turno) · 17+ Stun (1 turno) · 20+ cae (la vida a 0)', 3, '7+ Pajaritos (1 turno) · 17+ Stun (1 turno) · 20+ cae (la vida a 0)', null, '']);
 });
-prueba('pies: el resumen del personaje publica Pisada atenta, Inamovible, Recuperarse rápido y Reflejos de mangosta; y el catálogo tiene 32 pies Comunes (con las Zapatillas de pluma y las 4 de Defensa especial del 2026-10-07)', () => {
+prueba('pies: el resumen del personaje publica Pisada atenta, Inamovible, Recuperarse rápido y Reflejos de mangosta; y el catálogo tiene 32 pies Comunes (con las Zapatillas de pluma y las 4 de Defensa especial del 2026-10-07); desde el 2026-11-04 hay pies Comunes con Res. crítico Tipo 6 (dueño, rebalance de la Resistencia a crítico)', () => {
   const S = FichaGuardado.normalizar({}).S;
   S.inventario = [{id: 'p1', nombre: 'Botas de prueba', tipoItem: 'pies', equipado: true, mods: [{stat: 'pisadaatenta', val: 1}, {stat: 'inamovible', val: 33}, {stat: 'recuperarse', val: 50}, {stat: 'reflejos', val: 33}]}];
   const r = FichaResumen.resumen(S), L = CATALOGO_BASE.filter(i => i.tipoItem === 'pies' && i.tier === 'Común');
   igual([r.pisadaAtenta, r.inamovible, r.recuperarse, r.reflejos, L.length, L.every(i => (i.mods || []).every(m => m.stat !== 'def' || m.val <= 1)), L.some(i => (i.mods || []).some(m => m.stat === 'tipo2'))],
-    [true, 33, 50, 33, 32, true, false]);
+    [true, 33, 50, 33, 32, true, true]);
 });
 prueba('invocaciones iguales que todos (dueño, 2026-10-04): la ficha publica su costo de moverse (Rengo doble, Inmovilizado 0), Pasos gratis, las chances y Pisada atenta', () => {
   const S = FichaGuardado.normalizar({}).S;

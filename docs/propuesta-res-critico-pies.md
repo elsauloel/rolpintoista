@@ -1,6 +1,6 @@
 # Propuesta: pies (rebalance de la Resistencia a crítico)
 
-Séptima familia del paso 4 del [plan](plan-resistencia-critico.md), la última del equipo Común y Bueno. **Solo propuesta: no se cambió el catálogo.**
+Séptima familia del paso 4 del [plan](plan-resistencia-critico.md), la última del equipo Común y Bueno. **✅ Aprobada y cargada (2026-11-04)**, con un pedido del dueño: «aumentaría un poquito la cantidad, tanto del Tipo 4 como del Tipo 6». Además de las dos de la tabla: Botas de zapador (Común) y Botas de jinete (Buena) **+ Res. T6**; Botas de estibador (Común) y Botas de potro de doma (Buena) **+ Res. T4**. Quedan Tipo 4 en 4 + 4 y Tipo 6 en 2 + 2.
 Fecha: 2026-11-04. Base: el mapa cerrado (los pies pueden dar resistencia contra **Tipo 4 o 6**; hasta dos Tipos por pieza) y los pesos de siempre;
 al compensar, resistencias elementales antes que Res.CC (dueño, 2026-11-04).
 

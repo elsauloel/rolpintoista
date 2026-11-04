@@ -1,6 +1,6 @@
 # Propuesta: cascos (rebalance de la Resistencia a crítico)
 
-Segunda familia del paso 4 del [plan](plan-resistencia-critico.md). **Solo propuesta: no se cambió el catálogo.** Fecha: 2026-11-04.
+Segunda familia del paso 4 del [plan](plan-resistencia-critico.md). **✅ Aprobada y cargada en `comun/catalogo.js` (dueño, 2026-11-04: «seguimos»): 6 cascos.** Fecha: 2026-11-04.
 
 > **Renombrados** (dueño, 2026-11-04: «"morrión" es una palabra que casi nadie conoce acá»): Morrión de hierro → **Casco de hierro con
 > cresta**; Morrión de explorador → **Casco de explorador** (mismo `id`; ya cambiado en el catálogo).

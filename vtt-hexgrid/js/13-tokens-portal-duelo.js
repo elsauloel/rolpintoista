@@ -997,10 +997,9 @@ function dueloElegirObjetivoMapa(msg){
         if(!r){ pedir(); return; }
       }
       if(ataque && num(ataque.arrastra) > 0 && mio && typeof arrastrarLinea === 'function' && !(await arrastrarLinea(mio, t, ataque))){ pedir(); return; }   // 🪝 sin línea libre, no se tira
-      if(ataque && num(ataque.arrastra) > 0 && mio && typeof arrastrarEnganche === 'function'){   // 🪝 Arrastrar (js/78, P224): primero el enganche; si no lo engancha, no hay golpe
-        let r = true;
-        try{ r = (!soyGM && t.tipo === 'creep' && typeof arrastrarPedirGM === 'function') ? await arrastrarPedirGM(mio, t, ataque) : await arrastrarEnganche(mio, t, ataque); }catch(err){ console.error('Arrastrar: el enganche', err); }   // 🪝 un personaje contra un creep: lo resuelve el GM (2026-11-04)
-        if(!r) return;
+      if(ataque && num(ataque.arrastra) > 0 && mio && typeof arrastrarDueloGancho === 'function'){   // 🪝 Arrastrar (js/78, P224, 2026-11-04): el gancho es un duelo a la vista y la acción termina ahí (no hay golpe)
+        try{ await arrastrarDueloGancho(yo, mio, t, ataque); }catch(err){ console.error('Arrastrar: el enganche', err); }
+        return;
       }
       if(ataque && ataque.punalada && mio && typeof punaladaBonos === 'function'){   // 🗡 la puñalada (js/59): el bono si está en la espalda
         let r = null;
@@ -1079,6 +1078,7 @@ function dueloElegirObjetivoMapa(msg){
       }
       let ataqueFinal = ataque && ataque.hab && ataque.hab.sagrado && ataque.hab.dano ? sagradoContra(ataque, t) : (ataqueCarga || ataque);   // Smite: el doble contra un no-muerto o un demonio
       if(typeof roboBono === 'function') ataqueFinal = roboBono(ataqueFinal, mio, t);   // 🫳 Robar: +2 en sigilo o por la espalda (js/47)
+      if(typeof arrastreBonoUsar === 'function'){ try{ const ab = arrastreBonoUsar(mio, t, ataqueFinal, tiro); tiro = ab.tiro; ataqueFinal = ab.ataque; }catch(err){ console.error('No se pudo sumar el +2 del arrastre:', err); } }   // 🪝 recién arrastrado: +2 PdG (js/78)
       if(typeof roboSecretoSi === 'function' && roboSecretoSi(ataqueFinal, mio, t)){ roboSecretoIniciar(yo, ataqueFinal, mio, t); return; }   // 🫳 en sigilo: en secreto (js/47)
       let miedo = 0;
       let malviaje = false;
@@ -2579,6 +2579,7 @@ async function dueloTolera(d, ef){
     : {tirada: r.total, contra};
 }
 async function dueloAplicarEfecto(d, ef){
+  if(num(ef && ef.trae) > 0 && typeof dueloGanchoTraer === 'function') return dueloGanchoTraer(d);   // 🪝 el gancho de Arrastrar (js/78, 2026-11-04)
   if(num(ef && ef.empuja) > 0) return dueloEmpujar(d, num(ef.empuja), ef.clava);
   if(ef && ef.tolera){ const tl = await dueloTolera(d, ef); if(tl && tl.sinEfecto) return tl; }   // el empujón no es un estado (2026-10-08)   // 📌 clava: si choca contra algo sólido (2026-10-26)
   const r = await dueloAplicarEfectoBase(d, ef);

@@ -284,6 +284,13 @@
 
 ### ▶ Para la próxima tanda de pruebas en el mapa (2026-11-03)
 
+- [x] ✅ **🪝 Arrastrar, el flujo nuevo (2026-11-04, P224 redefinida; probado con clics en «Claude · pruebas», Prueba Uno + GM)**: el gancho sale
+  hacia el rival y se abre el duelo «Arrastrar: el gancho» (el jugador tira su PdG con su botón; el GM, la Evasión del goblin desde su cuadro). Engancha
+  (10 contra 1): el cuadro se aparta solo, el gancho trae al goblin de 3 casillas a pegado y el cuadro vuelve con «✔ Aplicado · lo arrastra hasta
+  dejarlo pegado»; la Crónica: «Lo enganchó y lo arrastró hasta dejarlo pegado». Empate (5 a 5): «el empate lo gana Goblin picapiedras», el gancho
+  vuelve y no se mueve. Después, «Atacar» al goblin: el duelo dice «recién arrastrado: +2 PdG» y la tirada «1d12 +2». Al revés (el goblin con la
+  Arrastrar de creep contra Prueba Uno): el GM tira la PdG, el jugador ve «🛡 Evasión» en su pantalla, y el GM lo arrastra hasta pegado. Ya no pide
+  arma (no hay golpe). Capturas: `arrastrar2-*.png` en el scratchpad de la sesión.
 - [ ] **🪝 La animación de Arrastrar — para que la revise el dueño en la compu** (2026-11-04, dueño: «a Arrastrar también sumarle una animación de
   grappling hook, una cadena con un gancho…»; `vtt-hexgrid/js/96-gancho-fx.js` + `comun/fx-gancho.js`): un Tanque con Arrastrar contra un creep a 3
   casillas, con el mapa del GM y el de un jugador abiertos a la vez. Tres casos: **no lo engancha** (el gancho vuela con la cadena colgando, pasa de

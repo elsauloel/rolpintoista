@@ -3,6 +3,8 @@
    Para que la vean TODAS las pantallas viaja como un momento sin tarjeta (js/16, tipo 'gancho-fx', con {de, a, resultado, celdas, semilla}).
    La publica la pantalla que resuelve el enganche (js/78 arrastrarEnganche / arrastrarTraer) cuando ya sabe cómo salió, y espera a que termine
    (`ganchoFxPublicar` devuelve la promesa) antes de seguir con el aviso o el golpe, así el duelo no la tapa.
+   El flujo (dueño, 2026-11-04): al elegir el objetivo sale el gancho ('sale': vuela hasta el rival y queda un instante), se abre el duelo, y según
+   cómo salió, 'falla' o 'trae' arrancan con el gancho ya junto al rival (`sinLanza`).
    - 'falla': el gancho vuela, pasa de largo y vuelve con la cadena floja.
    - 'suelta': engancha (chispa), la cadena se tensa, tiembla y se suelta.
    - 'trae': engancha, se tensa y el token del rival se DESLIZA por las casillas reales del arrastre (`celdas`): mientras dura, el dibujo del token
@@ -15,19 +17,19 @@ const ganchoFxVistos = new Set();
 const ganchoPocoMovimiento = () => { try{ return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){ return false; } };
 
 // → una promesa que se cumple cuando la animación terminó (para que quien la publica espere antes del aviso o el golpe).
-async function ganchoFxPublicar(deId, aId, resultado, celdas){
+async function ganchoFxPublicar(deId, aId, resultado, celdas, sinLanza, dueloId){
   if(typeof FxGancho === 'undefined' || !deId || !aId) return;
   const cel = Array.isArray(celdas) ? celdas.map(c => ({col: Math.round(num(c.col)), fila: Math.round(num(c.fila))})) : [];
-  const datos = {de: deId, a: aId, resultado: String(resultado || 'falla'), celdas: cel, semilla: Math.floor(Math.random() * 1e9)};
+  const datos = {de: deId, a: aId, resultado: String(resultado || 'falla'), celdas: cel, semilla: Math.floor(Math.random() * 1e9), ...(sinLanza ? {sinLanza: true} : {}), ...(dueloId ? {duelo: String(dueloId)} : {})};
   const id = typeof momentoAbrir === 'function' ? await momentoAbrir({tipo: 'gancho-fx', icono: '', titulo: '', estado: 'listo', datos}) : null;
   if(!id) ganchoFxEmpezar(datos);
-  const tt = FxGancho.tiempos(datos.resultado, Math.max(1, cel.length - 1), ganchoPocoMovimiento());
+  const tt = FxGancho.tiempos(datos.resultado, Math.max(1, cel.length - 1), ganchoPocoMovimiento(), !!sinLanza);
   await new Promise(r => setTimeout(r, tt.total + 120));
 }
 // Cuánto tarda en empezar a arrastrar (vuela, engancha y se tensa): js/78 mueve el token recién ahí, así nadie lo ve llegar antes que la cadena.
-function ganchoFxAntesDeArrastrar(celdas){
+function ganchoFxAntesDeArrastrar(celdas, sinLanza){
   if(typeof FxGancho === 'undefined') return 0;
-  const tt = FxGancho.tiempos('trae', Math.max(1, (celdas || []).length - 1), ganchoPocoMovimiento());
+  const tt = FxGancho.tiempos('trae', Math.max(1, (celdas || []).length - 1), ganchoPocoMovimiento(), !!sinLanza);
   return tt.lanza + tt.engancha + tt.tensa;
 }
 // Llega a cada pantalla (js/16). Una sola vez, y solo si es de recién.
@@ -43,7 +45,9 @@ function ganchoFxEmpezar(dt){
   const celdas = Array.isArray(dt.celdas) ? dt.celdas : [], poco = ganchoPocoMovimiento();
   const resultado = dt.resultado === 'trae' && celdas.length < 2 ? 'suelta' : String(dt.resultado || 'falla');
   GANCHO_FX.push({de: dt.de, a: dt.a, resultado, celdas, semilla: num(dt.semilla) || 1, poco, t0: performance.now(),
-    tt: FxGancho.tiempos(resultado, Math.max(1, celdas.length - 1), poco)});
+    tt: FxGancho.tiempos(resultado, Math.max(1, celdas.length - 1), poco, !!dt.sinLanza)});
+  // El cuadro del duelo del gancho se aparta mientras dura (si no, la tapa) y vuelve solo (2026-11-04).
+  if(dt.duelo && typeof Duelo !== 'undefined' && Duelo.apartar){ try{ Duelo.apartar(dt.duelo, GANCHO_FX[GANCHO_FX.length - 1].tt.total + 400); }catch(e){} }
   pedirDibujo();
 }
 const ganchoFxVe = t => !!t && (!t.oculto || soyGM) && (typeof tokenVisiblePorNiebla !== 'function' || tokenVisiblePorNiebla(t));
@@ -93,6 +97,8 @@ function ganchoFxDibujarUna(fx, ms, z, A, tb){
       const mas = {x: B0.x + dx / l * HEX * 1.1 - dy / l * HEX * 0.5, y: B0.y + dy / l * HEX * 1.1 + dx / l * HEX * 0.5};
       gancho = F.volar(B0, mas, f.k); flojo = 0.3 + 0.6 * f.k; angulo = Math.atan2(mas.y - B0.y, mas.x - B0.x);
     }else{ gancho = borde(B0, A); flojo = 0.3 * (1 - f.k); chispa = 1 - f.k; }
+  }else if(f.fase === 'tensa' && r === 'sale'){   // queda junto al rival, la cadena floja, y se desvanece (sigue el duelo)
+    gancho = borde(B0, A); flojo = 0.35; alfa = f.k > 0.6 ? (1 - f.k) / 0.4 : 1;
   }else if(f.fase === 'tensa'){
     gancho = borde(B0, A); flojo = 0; temblor = r === 'suelta' && !fx.poco ? 1 : 0.25;
   }else if(f.fase === 'arrastra'){

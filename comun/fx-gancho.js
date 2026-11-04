@@ -1,9 +1,10 @@
 /* 🪝 La animación de Arrastrar (2026-11-04, dueño: «a Arrastrar también sumarle una animación de grappling hook, una cadena con un gancho…»).
    Acá solo la geometría y los tiempos, sin dibujar (se prueba en comun/pruebas.html); la dibuja el mapa (vtt-hexgrid/js/96-gancho-fx.js) en
    coordenadas del mapa.
-   - `tiempos(resultado, pasos, poco)`: cuánto dura cada parte según cómo salió: 'falla' (no lo engancha: el gancho pasa de largo y la cadena vuelve
-     floja), 'suelta' (lo engancha pero no lo puede traer: la cadena se tensa, tiembla y se suelta) o 'trae' (lo engancha y lo arrastra `pasos`
-     casilleros). `poco`: «reducir movimiento» (todo más corto, sin temblor).
+   - `tiempos(resultado, pasos, poco, sinLanza)`: cuánto dura cada parte según cómo salió: 'sale' (el gancho vuela hasta el rival y queda ahí un
+     instante, mientras se abre el duelo: 2026-11-04, el flujo del dueño), 'falla' (no lo engancha: el gancho pasa de largo y la cadena vuelve
+     floja), 'suelta' (lo engancha pero no se mueve: la cadena se tensa, tiembla y se suelta) o 'trae' (lo engancha y lo arrastra `pasos`
+     casilleros). `poco`: «reducir movimiento» (todo más corto, sin temblor). `sinLanza`: el gancho ya salió (con 'sale'): arranca junto al rival.
    - `fase(ms, tt)`: en qué parte va → {fase: 'lanza'|'engancha'|'tensa'|'arrastra'|'vuelve'|'fin', k (0..1 dentro de esa parte)}.
    - `cadena(a, b, flojo, ms, temblor, n)`: los puntos de la cadena de a hasta b, con una panza de costado que depende de lo floja que esté
      (`flojo` 0 = tensa, 1 = muy floja) y, tensa, un temblor fino si `temblor` > 0. Puntos {x, y, u}.
@@ -11,11 +12,12 @@
    - `recorrido(celdas, k)`: la posición a lo largo de las casillas del arrastre (centros en px), k de 0 a 1.
    - `volar(a, b, k)`: la posición del gancho volando de a a b (con un arco suave), k de 0 a 1. */
 (function(raiz){
-  const LANZA = 520, ENGANCHA = 170, TENSA_TRAE = 260, TENSA_SUELTA = 650, POR_PASO = 230, VUELVE = 480, PASA_LARGO = 260;
-  function tiempos(resultado, pasos, poco){
+  const LANZA = 520, ENGANCHA = 170, TENSA_TRAE = 260, TENSA_SUELTA = 650, POR_PASO = 230, VUELVE = 480, PASA_LARGO = 260, ESPERA = 700;
+  function tiempos(resultado, pasos, poco, sinLanza){
     const k = poco ? 0.4 : 1, r = String(resultado || 'falla');
-    const t = {resultado: r, lanza: LANZA * k, engancha: 0, tensa: 0, arrastra: 0, vuelve: VUELVE * k};
-    if(r === 'falla'){ t.engancha = PASA_LARGO * k; }
+    const t = {resultado: r, lanza: sinLanza && r !== 'sale' ? 0 : LANZA * k, engancha: 0, tensa: 0, arrastra: 0, vuelve: VUELVE * k};
+    if(r === 'sale'){ t.tensa = ESPERA * k; t.vuelve = 0; }
+    else if(r === 'falla'){ t.engancha = PASA_LARGO * k; }
     else if(r === 'suelta'){ t.engancha = ENGANCHA * k; t.tensa = (poco ? 200 : TENSA_SUELTA); }
     else { t.engancha = ENGANCHA * k; t.tensa = TENSA_TRAE * k; t.arrastra = POR_PASO * k * Math.max(1, Math.round(Number(pasos) || 1)); }
     t.total = t.lanza + t.engancha + t.tensa + t.arrastra + t.vuelve;
@@ -73,5 +75,5 @@
     const dx = b.x - a.x, dy = b.y - a.y, l = Math.hypot(dx, dy) || 1, arco = Math.min(l * 0.12, 18) * Math.sin(Math.PI * e);
     return {x: a.x + dx * e - dy / l * arco, y: a.y + dy * e + dx / l * arco};
   }
-  raiz.FxGancho = {LANZA, ENGANCHA, TENSA_TRAE, TENSA_SUELTA, POR_PASO, VUELVE, PASA_LARGO, tiempos, fase, cadena, eslabones, recorrido, volar};
+  raiz.FxGancho = {LANZA, ENGANCHA, TENSA_TRAE, TENSA_SUELTA, POR_PASO, VUELVE, PASA_LARGO, ESPERA, tiempos, fase, cadena, eslabones, recorrido, volar};
 })(typeof window !== 'undefined' ? window : globalThis);

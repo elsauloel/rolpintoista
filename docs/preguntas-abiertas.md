@@ -1278,7 +1278,15 @@ Casi siempre da igual (un creep pelea un combate). **A decidir:** ¿se libera al
 **Decidido (dueño, 2026-10-27):** «se desbloquea al finalizar el combate». Hecho: `unaVezAlTerminar` (vtt-hexgrid/js/25), con lo demás de
 «Finalizar combate»: la pantalla del GM libera las habilidades de los creeps del mapa. Probado en el mapa con el Tanque (prueba).
 
-### P224 — Arrastrar en una sola tirada (2026-10-27) ✅ decidida (2026-10-29)
+### P224 — Arrastrar en una sola tirada (2026-10-27) ✅ decidida (2026-10-29) · 🔄 redefinida (2026-11-04)
+**Flujo nuevo (dueño, 2026-11-04; reemplaza todo lo de abajo):** «el arrastre es una acción en sí misma». (1) Ejecutar → elegir el objetivo a 3 casillas o
+menos, con la línea libre. (2) Sale la animación del gancho hacia el rival. (3) Se abre un duelo a la vista: quien la usa tira su **PdG** con su botón, el
+rival tira su **Evasión** (si es un creep, la tira el GM); empate: no engancha. (4) Si engancha, la animación del gancho arrastrándolo hasta dejarlo pegado;
+si no, el gancho vuelve. Fin de la acción. **Ya no hay tirada de Constitución + Fuerza** ni golpe incluido. (5) El siguiente ataque contra ese rival,
+en el mismo turno, tiene **+2 PdG**. Vale para la de clase (Tanque: 2 No2 fijos + 2 SP) y la de creep (sigue costando lo de un ataque, cooldown 2 o
+2 SP; el dueño todavía no decidió si pasa a 2 No2 fijos). Hecho en `vtt-hexgrid/js/78-choque-pesado.js` (`arrastrarDueloGancho`, `dueloGanchoTraer`,
+`arrastreBonoUsar`) y `comun/duelo.js` (el efecto `trae` y `empatePierde`).
+
 **Cambio (dueño, 2026-11-04): el enganche tira la Probabilidad de Golpe, no la Destreza** («no debe tirar Destreza sino PdG»). Lo de abajo que dice «Destreza» es la versión anterior.
 
 Lo definido decía «Destreza contra la Evasión; si lo engancha, lo arrastra y le pega con su arma con +2 PdG» (dos tiradas). Se programó en una sola: un

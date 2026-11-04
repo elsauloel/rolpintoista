@@ -9,7 +9,7 @@
       critDatos:{frecuente,potente,resistencia}|null (lo anota cada lado al tirar: el atacante su Crítico frecuente/potente, el defensor su Resistencia a crítico al Tipo),
       crit:{rango,diferencia,nivel,dados,critico,d20,mejor,mult}|null,
       dano:{crudo,formula,rolls,mod,reclamado,aplicado,mult,golpe,ignoraDef,mitad,defensa,recibido,absorbido,hpAntes,hpDespues,manual}|null,
-      efectos:[{nombre,caras,exitos,dado,detalle,stacks,requiereDano,res:{dado,exito,extra}|null,omitido,motivo,aplicar:''|'pedido'|'en-curso',aplicado,nota}]|null,
+      efectos:[{nombre,caras,exitos,dado,detalle,stacks,requiereDano,res:{dado,exito,extra}|null,omitido,motivo,aplicar:''|'pedido'|'pedido-gm'|'en-curso',aplicado,nota}]|null,
       contacto:{gana,dif,desempate,moneda}|null, bloq:{…}|null, empate:{par:'contacto'|'bloqueo', moneda?}|null,
       resultado: 'pego'|'fallo'|'bloqueado'|'mitad'|null, contra: id del contraataque|null, contraDe, creado, creadoPor}
    Pasos: 1 declaración → 2 contacto (PdG contra Evasión o Parry) → si el Parry gana, 3 Bloqueo (Fuerza del golpe contra Bloqueo):
@@ -370,6 +370,15 @@ const Duelo = (() => {
     f.classList.add('min');
     dibujarChips();
     avisarPagina();
+  }
+  /* 🪝 Apartar el cuadro de ESTE duelo mientras pasa algo en el mapa (2026-11-04: la animación del gancho de Arrastrar quedaba tapada por el cuadro):
+     si está abierto (no minimizado), se minimiza `ms` milisegundos y vuelve solo, salvo que mientras tanto lo hayan abierto o cerrado a mano. */
+  function apartar(id, ms){
+    const f = document.getElementById('duelo-fondo');
+    if(!actual || actual.id !== id || !f || actual.min || f.classList.contains('min')) return;
+    minimizar();
+    const yo = actual;
+    setTimeout(() => { if(actual === yo && actual.min) abrir(id); }, Math.max(300, Math.min(15000, Number(ms) || 0)));
   }
   document.addEventListener('keydown', e => {
     if(e.key !== 'Escape') return;
@@ -744,6 +753,7 @@ const Duelo = (() => {
       ...(_num(e.spRecupera) > 0 ? {spRecupera: Math.min(20, Math.round(_num(e.spRecupera)))} : {}),   // 🔋 Pila pila (2026-11-01)
       ...(_num(e.vuela) > 0 ? {vuela: Math.min(6, Math.round(_num(e.vuela)))} : {}),   // el arma vuela N casillas (la Varita del desarme)
       ...(_num(e.empuja) > 0 ? {empuja: Math.min(6, Math.round(_num(e.empuja)))} : {}),   // lo empuja N casillas (2026-10-08)
+      ...(_num(e.trae) > 0 ? {trae: Math.min(6, Math.round(_num(e.trae)))} : {}),   // 🪝 el gancho de Arrastrar: lo trae hasta pegado (2026-11-04)
       ...(e.clava ? {clava: {turnos: Math.min(6, Math.max(1, Math.round(_num(e.clava.turnos)) || 3))}} : {}),   // 📌 Clavar a la pared (2026-10-26)
       ...(typeof e.requiereDano === 'boolean' ? {requiereDano: e.requiereDano} : {}),   // 🛡 solo si el golpe hizo daño (el Golpe de escudo, 2026-10-27)
     })).filter(e => e.nombre);
@@ -797,7 +807,7 @@ const Duelo = (() => {
         ...(h.zonaQueda.soloRivales ? {soloRivales: true} : {})}} : {}),   // lo que deja en el suelo (bola de fuego, ventisca)
       ...(h.menosDistancia ? {menosDistancia: true} : {}),   // −1 por casillero después del primero (pelea cercana)
       // Tormenta arcana (2026-10-13): sin tirada, cada sub-duelo arranca en el dodge roll; `cuenta` = cuántos proyectiles le tocaron a cada token.
-      ...(h.soloDodge ? {soloDodge: true} : {}), ...(h.sinDodge ? {sinDodge: true} : {}),   // (un área sin dodge roll: la Luz cegadora)
+      ...(h.soloDodge ? {soloDodge: true} : {}), ...(h.sinDodge ? {sinDodge: true} : {}), ...(h.empatePierde ? {empatePierde: true} : {}),   // 🪝 empate: gana el objetivo (el gancho de Arrastrar, 2026-11-04)   // (un área sin dodge roll: la Luz cegadora)
       ...(h.meteoro ? {meteoro: true} : {}),   // ☄ el Meteoro (2026-10-24): cae del cielo, solo se esquiva con el dodge roll
       ...(h.tormenta ? {tormenta: {proyectiles: txtCorto(h.tormenta.proyectiles || '1d20', 12), cada: txtCorto(h.tormenta.cada || '1d4', 12),
         ...(h.tormenta.cuenta && typeof h.tormenta.cuenta === 'object' ? {cuenta: Object.fromEntries(Object.entries(h.tormenta.cuenta).slice(0, 40).map(([k, v]) => [txtCorto(k, 40), Math.max(0, Math.min(40, Math.round(_num(v))))]))} : {}),
@@ -987,10 +997,12 @@ const Duelo = (() => {
     if(m.fase === 'contacto' && m.pdg && m.eva){ par = 'contacto'; a = m.pdg; b = m.eva; }
     else if(m.fase === 'bloqueo' && m.fuerza && m.bloqueo){ par = 'bloqueo'; a = m.fuerza; b = m.bloqueo; }
     if(!par) return null;
-    const r = resolverPar(a, b);
+    let r = resolverPar(a, b);
+    // 🪝 Una habilidad con `empatePierde` (el gancho de Arrastrar, dueño 2026-11-04: «empate: no engancha»): en el contacto, empate = gana el objetivo.
+    if(par === 'contacto' && m.hab && m.hab.empatePierde && a.total === b.total) r = {gana: 'defensor', dif: 0, desempate: 'empatePierde'};
     if(r.empate){ m.estado = 'empate'; m.empate = {par}; return null; }
     cerrarPar(m, par, r);
-    return r.desempate === 'mas1' ? textoDesempate(m, par, r) : null;
+    return r.desempate === 'mas1' || r.desempate === 'empatePierde' ? textoDesempate(m, par, r) : null;
   }
 
   const nombresPar = (m, par) => par === 'contacto'
@@ -1004,6 +1016,7 @@ const Duelo = (() => {
       const conMas = r.gana === 'atacante' ? nb : na;
       return `⚖ Empate (${ta.total} a ${tb.total}) entre ${na} y ${nb}: gana ${ganador} porque ${conMas} llevaba un «+» fijo y la otra no`;
     }
+    if(r.desempate === 'empatePierde') return `⚖ Empate (${ta.total} a ${tb.total}) entre ${na} y ${nb}: en ${m.hab && m.hab.nombre || 'esta habilidad'}, el empate lo gana ${ganador}`;
     if(r.desempate === 'ppt') return `⚖ Empate (${ta.total} a ${tb.total}) entre ${na} y ${nb}: se jugó ✊ piedra, papel o tijera → gana ${ganador}`;
     const mo = r.moneda;
     const quien = mo.quien === 'atacante' ? m.atacante.nombre : m.defensor.nombre;
@@ -1121,6 +1134,7 @@ const Duelo = (() => {
     if(ef.anula) return {nombre: 'Anulación', anula: true};   // 🚫 Anulación (2026-11-01; 2026-11-02: UNO, el que elige quien la usa)
     if(ef.disipar) return {nombre: 'Disipar', disipar: true};   // 🧿 Disipar (2026-10-25): quien lo usa elige qué estado bueno le saca
     if(ef.purga) return {nombre: 'Purga', purga: true};   // la purga (2026-10-07): el mapa saca el estado malo más reciente
+    if(_num(ef.trae) > 0) return {nombre: 'Gancho', trae: Math.round(_num(ef.trae))};   // 🪝 Arrastrar (2026-11-04): el mapa del GM lo arrastra
     const n = String(ef.nombre || '').trim().toLowerCase();
     const st = Math.max(0, Math.round(_num(ef.stacks)));
     const tu = Math.max(0, Math.round(_num(ef.turnos)));   // turnos puestos en el efecto del arma (ej. Sangrado 2 turnos); 0 = los del estado
@@ -1181,11 +1195,12 @@ const Duelo = (() => {
       if(_num(e.spRecupera) > 0) o.spRecupera = Math.min(20, Math.round(_num(e.spRecupera)));   // 🔋 Pila pila (2026-11-01)
       if(_num(e.vuela) > 0) o.vuela = Math.min(6, Math.round(_num(e.vuela)));   // el arma vuela N casillas (la Expelliarmus, 2026-10-07)
       if(_num(e.empuja) > 0) o.empuja = Math.min(6, Math.round(_num(e.empuja)));   // lo empuja N casillas (2026-10-08)
+      if(_num(e.trae) > 0) o.trae = Math.min(6, Math.round(_num(e.trae)));   // 🪝 el gancho de Arrastrar (2026-11-04): entra siempre y lo aplica solo la pantalla del GM, sin botón
       if(e.clava) o.clava = {turnos: Math.min(6, Math.max(1, Math.round(_num(e.clava.turnos)) || 3))};   // 📌 Clavar a la pared (2026-10-26)
       if(e.seguroCritico && caras > 1) o.seguroCritico = true;
       if(e.soloCritico) o.soloCritico = true;
       o.requiereDano = requiereDanoDe(e);
-      o.res = null; o.omitido = false; o.motivo = ''; o.aplicar = ''; o.aplicado = false; o.nota = '';
+      o.res = null; o.omitido = false; o.motivo = ''; o.aplicar = o.trae ? 'pedido-gm' : ''; o.aplicado = false; o.nota = '';
       return o;
     }).filter(e => e.nombre);
   }
@@ -1461,7 +1476,8 @@ const Duelo = (() => {
           if(_num(dn.hpDespues) <= 0 && _num(dn.hpAntes) > 0) partes.push(`${D} cayó.`);
         }
       }
-      const est = (d.efectos || []).filter(ef => ef && ef.aplicado && !ef.omitido && !ef.sinEfecto).map(ef => (ef.spec && ef.spec.nombre) || ef.nombre).filter(Boolean);   // el estado que quedó (Rompe armadura → «Armadura rota», 2026-11-03)
+      if((d.efectos || []).some(ef => ef && _num(ef.trae) > 0 && ef.aplicado && !ef.omitido && !ef.sinEfecto)) partes.push('Lo enganchó y lo arrastró hasta dejarlo pegado.');   // 🪝 Arrastrar (2026-11-04)
+      const est = (d.efectos || []).filter(ef => ef && ef.aplicado && !ef.omitido && !ef.sinEfecto && !(_num(ef.trae) > 0)).map(ef => (ef.spec && ef.spec.nombre) || ef.nombre).filter(Boolean);   // el estado que quedó (Rompe armadura → «Armadura rota», 2026-11-03)
       if(est.length) partes.push(`Quedó con ${est.join(', ')}.`);
       if(!partes.length) partes.push(d.hab ? 'Funcionó.' : 'Le pegó.');
       fin = partes.join(' ');
@@ -1504,7 +1520,7 @@ const Duelo = (() => {
       if(!doc.exists) return;
       const m = {...doc.data()};
       const ef = (m.efectos || [])[i];
-      if(!ef || ef.aplicado || ef.aplicar !== 'pedido') return;
+      if(!ef || ef.aplicado || (ef.aplicar !== 'pedido' && ef.aplicar !== 'pedido-gm')) return;
       m.efectos = m.efectos.map((e, k) => k === i ? {...e, aplicar: 'en-curso'} : e);
       tx.update(ref, cambiosDe(m));
       mio = true;
@@ -2395,6 +2411,7 @@ const Duelo = (() => {
       const [na, nb, ta, tb] = nombresPar(d, par);
       const ganador = info.gana === 'atacante' ? d.atacante.nombre : d.defensor.nombre;
       if(info.desempate === 'mas1') motivos.push(`Se resolvió el empate (${_esc(par === 'contacto' ? 'contacto' : 'Bloqueo')}): gana ${_esc(ganador)} porque la otra tirada llevaba un «+» fijo y ella no.`);
+      else if(info.desempate === 'empatePierde') motivos.push(`Empate: en ${_esc((d.hab && d.hab.nombre) || 'esta habilidad')} el empate lo gana ${_esc(ganador)}.`);
       else if(info.desempate === 'polilla') motivos.push(`Empate después de la 🦋 Polilla mística: gana ${_esc(ganador)} (quien usa la Polilla pierde los empates).`);
       else if(info.desempate === 'ppt') motivos.push(`Se resolvió el empate (${par === 'contacto' ? 'contacto' : 'Bloqueo'}) con ✊ piedra, papel o tijera: gana ${_esc(ganador)}.`);
       else if(info.moneda) motivos.push(`Se resolvió el empate (${par === 'contacto' ? 'contacto' : 'Bloqueo'}) con par o impar: ${_esc(info.moneda.quien === 'atacante' ? d.atacante.nombre : d.defensor.nombre)} eligió ${info.moneda.eleccion}, salió ${info.moneda.resultado} (${info.moneda.resultado % 2 === 0 ? 'par' : 'impar'}) → gana ${_esc(ganador)}.`);
@@ -2516,7 +2533,7 @@ const Duelo = (() => {
       else if(ef.res || (!necesitaTiradaEf(ef) && siempreEf(ef))){
         const cab = ef.res ? `<div class="duelo-ef-res ok${nuevo ? ' nuevo' : ''}">✔ ¡FUNCIONÓ! ${siempreEf(ef) ? '' : `<span>(${ef.res.manual ? '✍ a mano' : `salió ${_fmt(ef.res.dado)} en 1d${_fmt(ef.caras)}`})</span>`}${ef.res && ef.res.extra ? ` <span>· ${_esc(ef.dado)} = <b>${_fmt(ef.res.extra.total)}</b></span>` : ''}</div>` : `<div class="duelo-ef-res ok">Entra siempre</div>`;
         let acc;
-        if(ef.aplicar === 'pedido' || ef.aplicar === 'en-curso') acc = `<div class="duelo-nota">Aplicando sobre ${_esc(spec && spec.nombre === 'Desafiante' ? d.atacante.nombre : d.defensor.nombre)}…</div>`;
+        if(ef.aplicar === 'pedido' || ef.aplicar === 'pedido-gm' || ef.aplicar === 'en-curso') acc = `<div class="duelo-nota">Aplicando sobre ${_esc(spec && spec.nombre === 'Desafiante' ? d.atacante.nombre : d.defensor.nombre)}…</div>`;
         else if(!puedeAtq) acc = `<div class="duelo-nota">esperando que ${_esc(d.atacante.nombre)} lo aplique…</div>`;
         else if(spec){
           // Los stacks de más que suma quien atacó (Guantes del envenenador, 2026-10-05): el botón ya dice cuántos van a llegar.
@@ -3623,7 +3640,9 @@ const Duelo = (() => {
           if(d.fase !== 'efectos' || !(soyGM() || esMio(d.defensor))) return;
           (d.efectos || []).forEach((ef, i) => {
             const clave = d.id + ':' + i;
-            if(ef.aplicar !== 'pedido' || ef.aplicado || aplicando.has(clave)) return;
+            // 'pedido-gm' (🪝 el gancho de Arrastrar, 2026-11-04): pedido desde el principio, sin botón, y solo lo toma la pantalla del GM (una con este
+            // código: una pestaña vieja, que solo conoce 'pedido', no lo reclama y lo deja «a mano»).
+            if((ef.aplicar !== 'pedido' && !(ef.aplicar === 'pedido-gm' && soyGM())) || ef.aplicado || aplicando.has(clave)) return;
             if(cfgEscuchar.aplicaSolo && !soyGM() && !cfgEscuchar.aplicaSolo(d, ef)) return;
             const sp = specDeEfecto(ef);
             if(sp && sp.nombre === 'Demora' && !cfgEscuchar.aplicaDemora) return;   // el orden de turnos lo mueve el mapa
@@ -3651,5 +3670,5 @@ const Duelo = (() => {
     }catch(e){ /* sin permiso o sin reglas nuevas: no pasa nada */ }
   }
 
-  return {textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, fraseResumen, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
+  return {textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, fraseResumen, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, apartar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
 })();

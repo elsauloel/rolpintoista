@@ -34,7 +34,7 @@ const FichaHabilidades = (() => {
   const spVariable = h => esCostoVariable(h && h.costo);
   const nitrosVariable = h => esCostoVariable(h && h.nitrosCosto) && !nitrosAtaque(h);
   // ¿Pega con el arma? (su Ejecución es un ataque con arma: `duelo.modo === 'arma'`). Entonces se elige el arma al usarla, cueste lo que cueste.
-  const pegaConArma = h => { const d = h && (typeof FichaBotonera !== 'undefined' && FichaBotonera.dueloDe ? FichaBotonera.dueloDe(h) : h.duelo); return !!(d && typeof d === 'object' && d.modo === 'arma'); };
+  const pegaConArma = h => { const d = h && (typeof FichaBotonera !== 'undefined' && FichaBotonera.dueloDe ? FichaBotonera.dueloDe(h) : h.duelo); return !!(d && typeof d === 'object' && d.modo === 'arma' && !(Number(d.arrastra) > 0)); };   // 🪝 Arrastrar no pega (2026-11-04): no pide arma
   // Vida en X (2026-10-13, Balas de sangre): pagás X de vida, elegida al ejecutar.
   const hpVariable = h => esCostoVariable(h && h.hpCosto);
   const habCostoVariable = h => spVariable(h) || nitrosVariable(h) || hpVariable(h);

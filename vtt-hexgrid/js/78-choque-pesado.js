@@ -148,123 +148,107 @@ async function arrastrarLinea(mio, t, ataque){
   mesaLinea(`🪝 ${nom} tiró ${hab} a ${obj} con la línea ${roza ? 'rozando' : 'tapada por'} ${tapa} (lo decidió la mesa)`, 'alerta-roja');
   return true;
 }
-/* ⚖ Arrastrar en dos tiempos (P224, dueño 2026-10-29: «vamos con la B», como estaba definido): antes del golpe, el ENGANCHE — la Probabilidad de Golpe (era la Destreza hasta el 2026-11-04) de quien
-   lo tira contra la Evasión del rival (empate: no lo engancha). Si lo engancha, lo trae hasta quedar pegado (aunque después falle el golpe) y sigue
-   el ataque con su arma con +2 PdG; si no, no pasa nada más (el ataque ya se gastó). Si ya estaba pegado, va directo al golpe. Lo llama
-   dueloElegirObjetivoMapa (js/13) antes de armar el duelo. → true: sigue el golpe (`t` queda en su casilla nueva); false: no hay golpe. */
-async function arrastrarEnganche(mio, t, ataque){
+/* 🪝 Arrastrar, el flujo del dueño (2026-11-04; reemplaza al de dos tiempos con Con + Fuerza, P224): «el arrastre es una acción en sí misma».
+   1. Ejecutar → elige el objetivo (a 3 casillas o menos, con la línea libre: arrastrarLinea).
+   2. Sale el gancho hacia el rival (la animación, todas las pantallas).
+   3. Un duelo común, a la vista (comun/duelo.js): quien la usa tira su PdG con su botón y el rival su Evasión (un creep: el GM desde su pantalla;
+      un personaje: su jugador). Empate: no engancha.
+   4. Si engancha: el efecto «🪝 Gancho» (`trae`) lo aplica la pantalla del GM (dueloGanchoTraer: la animación del gancho arrastrándolo hasta
+      dejarlo pegado). Si no: el gancho vuelve. Fin de la acción: no hay golpe; después hace lo que quiera.
+   5. Tras un arrastre exitoso, su siguiente ataque contra ESE rival, en este mismo turno, tiene +2 PdG (arrastreBonoUsar, lo suma js/13).
+   Antes (hasta hoy) el enganche lo tiraba una sola pantalla sin mostrar nada (dueño: «no me ofreció tirar la PdG, ni vi la tirada de Evasión del
+   rival»). → siempre false (no sigue ningún golpe). */
+async function arrastrarDueloGancho(yo, mio, t, ataque){
   const hab = ataque.habNombre || 'Arrastrar', nom = nombreDe(mio), obj = nombreDe(t);
-  if(distanciaHex(mio, t) <= 1) return true;
-  const deQuien = x => x.tipo === 'creep' ? {desde: 'gm'} : {ficha: String(x.fichaId || '').split(SEP_INVOCACION)[0]};
-  const rd = Combatiente.tirarStat(trampaValorStat(mio, 'pdg'), confusionEstadosDe(mio), 'pdg');   // PdG (dueño, 2026-11-04: «no debe tirar Destreza sino PdG»)
-  const re = Combatiente.tirarStat(trampaValorStat(t, 'eva'), confusionEstadosDe(t), 'eva');
-  let engancha;
-  if(!rd || !re){
-    engancha = await AvisoCombate.preguntar(`Tirá a mano la Probabilidad de Golpe de ${nom} contra la Evasión de ${obj} (empate: no lo engancha). ¿Lo enganchó?`, {icono: '🪝', titulo: hab, si: 'Lo enganchó', no: 'No'});
-  }else{
-    mesaPublicar(`🪝 ${nom} · ${hab} · PdG (para engancharlo)`, {...rd, quien: nom, ...deQuien(mio)});
-    mesaPublicar(`${obj} · Evasión (que no lo enganche)`, {...re, quien: obj, ...deQuien(t)});
-    if(typeof esperarDadosMapa === 'function') await esperarDadosMapa();
-    engancha = rd.total > re.total;
-  }
-  const paraUid = t.tipo === 'pj' && t.duenoUid ? {paraUid: t.duenoUid} : {};
-  // 🪝 La animación (js/96, 2026-11-04): todas las pantallas ven volar el gancho; el aviso y el golpe esperan a que termine.
-  const fx = typeof ganchoFxPublicar === 'function' ? (res, celdas) => ganchoFxPublicar(mio.id, t.id, res, celdas).catch(err => console.error('Arrastrar: la animación', err)) : async () => {};
-  if(!engancha){
-    await fx('falla');
-    const txt = rd && re ? `${nom} le tira el gancho a ${obj} (PdG ${rd.total} contra su Evasión ${re.total}): no lo engancha. No hay golpe.` : `${nom} no engancha a ${obj}: no hay golpe.`;
-    mesaLinea(`🪝 ${txt}`, 'recordatorio');
-    momentoAbrir({tipo: 'gancho', icono: '🪝', titulo: `${hab}: ${nom} no engancha a ${obj}`, resultado: txt, estado: 'listo', datos: {aviso: true, boton: 'Entendido', ...paraUid}});
+  const fx = (res, sinLanza, dueloId) => typeof ganchoFxPublicar === 'function' ? ganchoFxPublicar(mio.id, t.id, res, null, sinLanza, dueloId).catch(err => console.error('Arrastrar: la animación', err)) : Promise.resolve();
+  await fx('sale');
+  const gancho = {
+    nombre: `${hab}: el gancho`.slice(0, 60), objetivo: 'enemigo',
+    detalle: `${nom} le tira el gancho a ${obj}: su Probabilidad de Golpe contra la Evasión de ${obj} (empate: no lo engancha). Si lo engancha, lo arrastra hasta dejarlo pegado (no camina: sin No2 ni ataques de oportunidad; las trampas y zonas del camino sí lo tocan), y su siguiente ataque contra ${obj} en este turno tiene +2 PdG.`,
+    tira: {stat: 'pdg', etq: 'PdG'}, contra: [{modo: 'eva', stat: 'eva', etq: 'Evasión'}], dano: null, empatePierde: true,
+    efectos: [{nombre: 'Gancho', trae: Math.max(1, Math.round(num(ataque.arrastra)) || 3), detalle: 'Lo arrastra hasta dejarlo pegado (lo mueve la pantalla del GM)'}],
+  };
+  let id = null;
+  try{
+    id = await Duelo.crear({yo, ataque: {hab: gancho, habNombre: hab}}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio.id);
+  }catch(err){
+    console.error('Arrastrar: no se pudo abrir el duelo del gancho', err);
+    toast(`No se pudo abrir el duelo del gancho: tirá a mano la PdG de ${nom} contra la Evasión de ${obj}`);
     return false;
   }
-  if(rd && re) mesaLinea(`🪝 ${nom} engancha a ${obj} (PdG ${rd.total} contra su Evasión ${re.total})`, 'recordatorio');
-  // 💪 Y después tiene que poder traerlo (dueño, 2026-10-30: «su Constitución fija más una tirada de Fuerza contra la Constitución fija del rival;
-  // tiene que ganar para arrastrarlo… si tira el gancho pero pierde esa tirada, no pasa nada»). Empate: no lo trae.
-  const conMio = num(trampaValorStat(mio, 'con')), conObj = num(trampaValorStat(t, 'con'));
-  const rf = Combatiente.tirarStat(trampaValorStat(mio, 'fue'), confusionEstadosDe(mio), 'fue');
-  let trae;
-  if(!rf){
-    trae = await AvisoCombate.preguntar(`Tirá a mano: la Constitución de ${nom} (${fmt(conMio)}) + una tirada de su Fuerza, contra la Constitución de ${obj} (${fmt(conObj)}; empate: no lo trae). ¿Lo arrastró?`, {icono: '🪝', titulo: hab, si: 'Lo arrastró', no: 'No'});
-  }else{
-    mesaPublicar(`💪 ${nom} · ${hab} · Fuerza (para arrastrarlo: + su Constitución ${fmt(conMio)}, contra la Constitución de ${obj}, ${fmt(conObj)})`, {...rf, quien: nom, ...deQuien(mio)});
-    if(typeof esperarDadosMapa === 'function') await esperarDadosMapa();
-    trae = conMio + rf.total > conObj;
-    // ✊ Empate (dueño, 2026-10-30: «en caso de empate, piedra, papel o tijera»): entre quien maneja al que tira el gancho y el dueño del otro.
-    if(conMio + rf.total === conObj) trae = await arrastrarDesempate(mio, t, hab, nom, obj, conObj);
-  }
-  if(!trae){
-    await fx('suelta');
-    const txt = rf ? `${nom} engancha a ${obj} pero no lo puede traer (Constitución ${fmt(conMio)} + Fuerza ${rf.total} = ${fmt(conMio + rf.total)} contra su Constitución ${fmt(conObj)}). No pasa nada.` : `${nom} engancha a ${obj} pero no lo puede traer: no pasa nada.`;
-    mesaLinea(`🪝 ${txt}`, 'recordatorio');
-    momentoAbrir({tipo: 'gancho', icono: '🪝', titulo: `${hab}: ${nom} no puede traer a ${obj}`, resultado: txt, estado: 'listo', datos: {aviso: true, boton: 'Entendido', ...paraUid}});
-    return false;
-  }
-  if(rf) mesaLinea(`🪝 ${nom} arrastra a ${obj} (Constitución ${fmt(conMio)} + Fuerza ${rf.total} = ${fmt(conMio + rf.total)} contra su Constitución ${fmt(conObj)}): lo trae y le pega`, 'recordatorio');
-  const fin = await arrastrarTraer(t.id, mio.id, hab, nom);
-  if(fin){ t.col = fin.col; t.fila = fin.fila; }
-  return true;
-}
-/* 🪝 Arrastrar de un personaje contra un creep (Tanque de clase, 2026-11-04): el jugador no ve los números del creep (su Evasión, su Constitución) ni
-   puede mover su token; así que el enganche, el arrastre y el movimiento los hace la pantalla del GM (el mismo arrastrarEnganche), con un momento
-   «gancho-pedido» (esperandoGM → listo, con `datos.engancha` y la casilla nueva). La pantalla del jugador espera la respuesta y sigue con el golpe.
-   Si el GM no contesta en 90 s, se pregunta a mano. → true: sigue el golpe; false: no hay golpe. */
-async function arrastrarPedirGM(mio, t, ataque){
-  const hab = ataque.habNombre || 'Arrastrar', nom = nombreDe(mio), obj = nombreDe(t);
-  if(distanciaHex(mio, t) <= 1) return true;
-  const id = await momentoAbrir({tipo: 'gancho-pedido', icono: '🪝', titulo: `${hab}: ${nom} le tira el gancho a ${obj}`, estado: 'esperandoGM',
-    resultado: 'Lo resuelve la pantalla del GM…', datos: {atk: mio.id, def: t.id, hab: String(hab).slice(0, 60)}});
-  if(!id) return AvisoCombate.preguntar(`No se pudo pedirle el enganche al GM. Tirá a mano la Probabilidad de Golpe de ${nom} contra la Evasión de ${obj}, y si lo engancha, su Constitución + Fuerza contra la Constitución de ${obj}. ¿Lo enganchó y lo trajo?`, {icono: '🪝', titulo: hab, si: 'Sí', no: 'No'});
-  if(typeof toast === 'function') toast(`🪝 ${hab}: lo resuelve la pantalla del GM…`);
-  const r = await new Promise(resolve => {
+  if(!id) return false;
+  const fin = await new Promise(resolve => {
     let listo = false, quitar = null;
-    const fin = v => { if(listo) return; listo = true; try{ quitar && quitar(); }catch(e){} resolve(v); };
-    const reloj = setTimeout(() => fin(null), 90000);
-    quitar = coleccionMomentos().doc(id).onSnapshot(doc => {
+    const terminar = v => { if(listo) return; listo = true; try{ quitar && quitar(); }catch(e){} clearTimeout(reloj); resolve(v); };
+    const reloj = setTimeout(() => terminar({tiempo: true}), 15 * 60000);
+    quitar = fbDb.collection(fbRutaCampana('duelos')).doc(id).onSnapshot(doc => {
       const d = doc.exists ? doc.data() : null;
-      if(d && d.estado === 'listo' && d.datos && typeof d.datos.engancha === 'boolean'){ clearTimeout(reloj); fin(d.datos); }
-    }, () => {});
+      if(!d || d.estado === 'cancelado'){ terminar({cancelado: true}); return; }
+      const ef = (d.efectos || [])[0];
+      if(ef && (ef.aplicado || ef.omitido)){ terminar({engancha: true, trae: !!ef.aplicado && !ef.omitido && !ef.sinEfecto}); return; }
+      if(d.estado === 'resuelto' && d.resultado !== 'pego' && d.resultado !== 'mitad'){ terminar({engancha: false}); return; }
+      if(d.estado === 'resuelto' && !ef) terminar({engancha: d.resultado === 'pego', trae: false});
+    }, () => terminar({tiempo: true}));
   });
-  if(!r) return AvisoCombate.preguntar(`El GM no contestó el enganche de ${hab}. Resolvelo a mano con la mesa: ¿${nom} enganchó y trajo a ${obj}?`, {icono: '🪝', titulo: hab, si: 'Sí', no: 'No'});
-  if(r.engancha && r.fin && Number.isFinite(Number(r.fin.col))){ t.col = Number(r.fin.col); t.fila = Number(r.fin.fila); }
-  return r.engancha;
-}
-// La pantalla del GM: resuelve el pedido (una sola vez por pantalla; solo los recientes).
-const ganchoPedidosHechos = new Set();
-async function ganchoPedidoMomento(id, d){
-  if(!soyGM || !d || d.estado !== 'esperandoGM' || ganchoPedidosHechos.has(id) || !d.datos) return;
-  const cuando = d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now();
-  if(Date.now() - cuando > 60000) return;
-  ganchoPedidosHechos.add(id);
-  const a = tokens.get(d.datos.atk), t = tokens.get(d.datos.def);
-  if(!a || !t){ await momentoActualizar(id, {estado: 'listo', resultado: 'Uno de los dos ya no está en el mapa: no hay golpe.', datos: {...d.datos, engancha: false}}); return; }
-  const mio = {...a, id: d.datos.atk}, obj = {...t, id: d.datos.def};
-  let engancha = false;
-  try{ engancha = !!(await arrastrarEnganche(mio, obj, {habNombre: d.datos.hab || 'Arrastrar'})); }catch(err){ console.error('Arrastrar (pedido): el enganche', err); }
-  await momentoActualizar(id, {estado: 'listo', resultado: engancha ? 'Lo enganchó y lo trajo: sigue el golpe.' : 'No hay golpe.',
-    datos: {...d.datos, engancha, fin: {col: obj.col, fila: obj.fila}}});
-}
-// ✊ El empate del gancho: piedra, papel o tijera (comun/ppt.js) entre quien maneja a cada uno (un creep: el GM; un personaje: su dueño). Si los
-// dos son de la misma persona (o no hay juego), se pregunta a mano. → true si gana quien tira el gancho.
-async function arrastrarDesempate(mio, t, hab, nom, obj, valor){
-  const uidDe = x => x.tipo === 'creep' ? (fbPartida && fbPartida.gmUid) || (soyGM ? fbUsuario.uid : '') : (x.duenoUid || '');
-  const ua = uidDe(mio), ub = uidDe(t);
-  mesaLinea(`🪝 Empate en ${hab} (${fmt(valor)} a ${fmt(valor)}): se desempata con ✊ piedra, papel o tijera entre ${nom} y ${obj}`, 'recordatorio');
-  if(typeof PPT !== 'undefined' && PPT.desempate && ua && ub && ua !== ub && (ua === fbUsuario.uid || ub === fbUsuario.uid)){
-    try{
-      const r = await PPT.desempate({a: {uid: ua, nombre: nom}, b: {uid: ub, nombre: obj}, texto: `${hab}: ¿${nom} arrastra a ${obj}?`});
-      if(r.ganador === 'a' || r.ganador === 'b') return r.ganador === 'a';
-    }catch(err){ console.error('Empate del gancho:', err); }
+  if(fin.tiempo){ toast(`El duelo del gancho de ${hab} no terminó: resolvelo a mano con la mesa`); return false; }
+  if(fin.cancelado) return false;
+  if(!fin.engancha){
+    await fx('falla', true, id);
+    mesaLinea(`🪝 ${nom} le tira el gancho a ${obj}: no lo engancha.`, 'recordatorio');
+    return false;
   }
-  return AvisoCombate.preguntar(`Empate (${fmt(valor)} a ${fmt(valor)}): desempatá con piedra, papel o tijera a mano. ¿Ganó ${nom} (lo arrastra)?`, {icono: '✊', titulo: hab, si: `Ganó ${nom}`, no: `Ganó ${obj}`});
+  // ✔ Engancha (aunque ya estuviera pegado o no hubiera por dónde traerlo, el arrastre es exitoso): +2 PdG a su siguiente ataque contra él.
+  arrastreBonoPoner(mio, t);
+  mesaLinea(`🪝 ${nom}: su siguiente ataque contra ${obj} en este turno tiene +2 a la Probabilidad de Golpe.`, 'recordatorio');
+  return false;
+}
+// El efecto «🪝 Gancho» (`ef.trae`), en la pantalla del GM (aplicaSolo, js/14): el arrastre con su animación. → {nota} | {nota, sinEfecto}.
+async function dueloGanchoTraer(d){
+  const ta = d.atacante && tokens.get(d.atacante.tokenId), td = tokens.get(d.defensor.tokenId);
+  if(!ta || !td) return {manual: true, nota: 'uno de los dos ya no está en el mapa: traelo a mano'};
+  const hab = String((d.hab && d.hab.nombre) || 'Arrastrar').replace(/: el gancho$/, '');
+  const fin = await arrastrarTraer(d.defensor.tokenId, d.atacante.tokenId, hab, nombreDe(ta), d.id);
+  return {nota: fin ? 'lo arrastra hasta dejarlo pegado' : 'lo engancha, pero no se mueve (ya estaba pegado, no hay por dónde o es inamovible)'};
+}
+/* 💪 +2 PdG tras un arrastre exitoso (dueño, 2026-11-04: «el siguiente ataque después de un arrastre exitoso tiene +2 a la Probabilidad de Golpe, hasta
+   el final del turno»; «tiene que poner atacar contra ese token y tiene más 2»). Lo guarda la pantalla de quien arrastró (la que va a atacar): vale
+   para su primer ataque contra ese rival mientras siga el mismo paso del orden de turnos (al pasar el turno vence); sin orden de turnos, 10 minutos. */
+const arrastreBonos = new Map();   // id del token que arrastró → {contra, nombre, paso, hasta}
+const arrastrePaso = () => (typeof iniciativa !== 'undefined' && iniciativa && iniciativa.orden && iniciativa.orden.length) ? Math.round(num(iniciativa.paso)) : null;
+function arrastreBonoPoner(mio, t){
+  arrastreBonos.set(mio.id, {contra: t.id, nombre: nombreDe(t), paso: arrastrePaso(), hasta: Date.now() + 10 * 60000});
+}
+function arrastreBonoVigente(mioId){
+  const b = arrastreBonos.get(mioId);
+  if(!b) return null;
+  const paso = arrastrePaso();
+  if(b.paso !== null ? paso !== b.paso : (paso !== null || Date.now() > b.hasta)){ arrastreBonos.delete(mioId); return null; }
+  return b;
+}
+// Al atacar (js/13, dueloElegirObjetivoMapa): si es contra el que arrastró, +2 PdG y se gasta. → {tiro, ataque} con el bono sumado (o sin tocar).
+function arrastreBonoUsar(mio, t, ataque, tiro){
+  const b = mio && t && ataque ? arrastreBonoVigente(mio.id) : null;
+  if(!b || b.contra !== t.id || num(ataque.arrastra) > 0) return {tiro, ataque};
+  if(ataque.hab && !(['enemigo', 'area', 'cono', 'linea', 'onda'].includes(ataque.hab.objetivo) && ataque.hab.tira && ataque.hab.tira.stat)) return {tiro, ataque};
+  arrastreBonos.delete(mio.id);
+  mesaLinea(`🪝 ${nombreDe(mio)} ataca a ${b.nombre} recién arrastrado: +2 a la Probabilidad de Golpe.`, 'recordatorio');
+  if(ataque.hab){
+    const tr = ataque.hab.tira;
+    return {tiro, ataque: {...ataque, hab: {...ataque.hab, tira: {...tr, bono: num(tr.bono) + 2, etq: `${tr.etq || 'Tirada'} (+2 arrastrado)`.slice(0, 34)}}}};
+  }
+  const tr = tiro || {motivo: ''};
+  tr.pdg = num(tr.pdg) + 2;
+  tr.motivo = tr.motivo ? `${tr.motivo} y recién arrastrado` : 'recién arrastrado';
+  return {tiro: tr, ataque};
 }
 // Lo trae hasta quedar pegado a quien lo arrastra; las trampas del camino lo tocan (la primera que pisa lo frena ahí) y las zonas, también.
 // → la casilla donde quedó, o null si no se movió.
-async function arrastrarTraer(defId, atkId, hab, quien){
+async function arrastrarTraer(defId, atkId, hab, quien, dueloId){
   const t = tokens.get(defId), ta = tokens.get(atkId);
   if(!t || !ta) return null;
   const nom = nombreDe(t), titulo = `${hab}: ${quien} arrastra a ${nom}`;
   const im = chanceDe(t, 'inamovible');
-  const fx = (res, celdas) => typeof ganchoFxPublicar === 'function' ? ganchoFxPublicar(atkId, defId, res, celdas).catch(err => console.error('Arrastrar: la animación', err)) : Promise.resolve();
+  const fx = (res, celdas) => typeof ganchoFxPublicar === 'function' ? ganchoFxPublicar(atkId, defId, res, celdas, true, dueloId).catch(err => console.error('Arrastrar: la animación', err)) : Promise.resolve();
   if(im && Math.random() * 100 < im){ await fx('suelta'); momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `Es Inamovible (${im} %): no se mueve.`, estado: 'listo'}); return null; }
   const ocupada = x => elementoSolidoEn(x.col, x.fila) || [...tokens.values()].some(y => y !== t && y.col === x.col && y.fila === x.fila && !y.bajoTierra);
   const pared = (a, b) => typeof paredCorta === 'function' && paredCorta(a, b);
@@ -282,7 +266,7 @@ async function arrastrarTraer(defId, atkId, hab, quien){
   const final = corte > 0 ? ruta.slice(0, corte + 1) : ruta, fin = final[final.length - 1], pasos = final.length - 1;
   // 🪝 La cadena primero: vuela, engancha y se tensa; recién ahí se mueve el token (cada pantalla lo dibuja siguiendo la cadena, js/96).
   const anim = fx('trae', final.map(x => ({col: x.col, fila: x.fila})));
-  if(typeof ganchoFxAntesDeArrastrar === 'function') await new Promise(r => setTimeout(r, ganchoFxAntesDeArrastrar(final)));
+  if(typeof ganchoFxAntesDeArrastrar === 'function') await new Promise(r => setTimeout(r, ganchoFxAntesDeArrastrar(final, true)));
   try{ await coleccionTokens().doc(defId).update({col: fin.col, fila: fin.fila, ruta: firebase.firestore.FieldValue.delete()}); }
   catch(err){ console.error('Arrastrar: no se pudo mover', err); await anim; momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `Traelo ${pasos} casillas a mano (no se pudo mover solo).`, estado: 'listo'}); return null; }
   await anim;   // el aviso, la trampa y el golpe, cuando la cadena ya lo soltó

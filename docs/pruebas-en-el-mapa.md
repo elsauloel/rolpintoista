@@ -284,6 +284,16 @@
 
 ### ▶ Para la próxima tanda de pruebas en el mapa (2026-11-03)
 
+- [ ] **💔 Vida en 0 desde el mapa (2026-11-04, dueño: «Bizzante quedó en 0 HP —se puso −N en HP directo— y no se murió, ni se activó su pacto»)**:
+  `vtt-hexgrid/js/98-vida-en-cero.js`. Con un personaje con 😇 Pacto, bajarle la vida a 0 con **2 · HP directo** → a los ~2 s revive con un cuarto de
+  la vida, Titilando, y el 😇 queda gris (Aviso, Crónica y Mesa). Sin pacto (ni Fénix ni Ankh en el cinturón) → queda inconsciente (pantalla roja,
+  5 turnos, ✚ Revivir). Lo mismo con «Recibe daño» sin pacto (antes tampoco quedaba inconsciente). Lo hace la pantalla del dueño (o la del GM con 🎮 el
+  control): probar con el dueño conectado y con el dueño desconectado (tiene que pasar recién cuando entra).
+- [ ] **🔥🐝 Arma elemental en una invocación (2026-11-04, dueño: «al aplicarle Bizzante el arma elemental a sus abejas, no se cargaba sola»)**: en la
+  partida, la de las 03:00 (ácido, a Bizzante mismo, con la versión vieja que abría un duelo) quedó «a mano»; la de las 03:56 a la Abeja Diestra sí
+  llegó sola, pero la abeja no volvió a pegar con ella. Probar: Arma elemental a una invocación → el estado aparece en la invocación → la invocación
+  ataca y pega → «+1d6» en el daño y en «🧮 La cuenta del daño».
+
 - [ ] **🧮🔥 El daño del arma especial adentro de «La cuenta del daño» (2026-11-04, dueño, con captura de un Arquero del culto: «el daño del arma
   especial debería mostrarse en la ecuación general del daño»)**: con un arma con daño elemental (ácido, fuego…), el número grande es el TOTAL que
   entró (golpe + elemental) y la cuenta suma el elemental en un renglón («+ 🧪 Daño de Ácido 5 · 1d6 · directo») hasta «ENTRA A LA VIDA 13»; si hubo

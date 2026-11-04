@@ -2032,3 +2032,9 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   pero **no** entran en `nieblaVista`, así que lo de atrás sigue tapado (el Sólido corta la vista igual) y un token parado adentro no se ve. Sin
   tildar (los de antes), opaco por dentro como siempre. Reglas nuevas (`verEntero` en `elementoValido`, `elementoCambioValido` y las dos listas de
   update): hay que pegarlas; sin ellas, Guardar avisa «faltan publicar las reglas». Probado en «Claude · pruebas» (capturas `solido-1103-*`).
+
+- **💔 Vida en 0, venga de donde venga** (2026-11-04, dueño: «Bizzante quedó en 0 HP —HP directo— y no se murió, ni se activó su pacto»):
+  `js/98-vida-en-cero.js`. Cada segundo mira `fichasPub`: un personaje con `resumen.hp` 0 que no está `muerto` ni `muertoDef`, y que maneja esta
+  pantalla (`bnManejo`: el dueño, o el GM con 🎮 el control), pasa a los ~1,5 s por `editarPersonajeMapa` con `FichaAcciones.revisarAnkh` (Fénix,
+  Pacto, Ankh del cinturón) + `revisarMuerte` (inconsciente, 5 turnos), y lo anuncia. Antes eso solo lo hacía la ficha cuando su dueño tocaba algo;
+  «HP directo» (`cambiarVidaPj`) no revisaba nada y un golpe (`danioPj`) revisaba Pacto y Fénix pero no dejaba caído. Un intento cada 30 s como mucho.

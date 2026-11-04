@@ -145,9 +145,18 @@ const FichaLite = (() => {
     if(e.armaduraRota) return -st;
     return (e.mods || []).filter(m => m.stat === 'def').reduce((a, m) => a + num(m.val) * st, 0);
   };
-  function manoGuardada(o, danoTxt){
+  function manoGuardada(o, danoTxt, slotDe){
     const a = Combatiente.armaEnMano(o);   // 🗡 la puerta única (docs/plan-inventario-creeps.md)
-    if(a.sinArma) return {nombre: '', detalle: `sin arma · ${danoTxt}`, lineas: []};   // ✋ pega sin arma (paso 5, P150)
+    if(a.sinArma){
+      // ✨ Sin arma física pero con un arma especial en la mano (una varita): esa es su arma (2026-11-04, dueño, con Basilio: «sigue teniendo problemas
+      // para reconocer a la varita como un arma»). Lo que pega a mano limpia queda como dato.
+      const esp = slotDe ? espEnMano(o, slotDe) : null;
+      if(esp){
+        const d = String(esp.detalle || '').split('⚙')[0].trim();
+        return {nombre: esp.nombre, detalle: `arma especial${esp.especial.dano ? ` · ${esp.especial.dano}` : ''}`, lineas: [...(d ? [{txt: d}] : []), {txt: `A mano limpia: ${danoTxt}`}]};
+      }
+      return {nombre: '', detalle: `sin arma · ${danoTxt}`, lineas: []};   // ✋ pega sin arma (paso 5, P150)
+    }
     if(!a.nombre) return {nombre: '', detalle: 'sin arma', lineas: []};
     const lineas = [{txt: `Daño ${danoTxt}${a.armaDeRango ? ` (${Combatiente.dmgDelArmaTxt(a)})` : ''}`}];
     lineas.push({txt: `Peso ${fmt(a.peso)}`});
@@ -160,6 +169,9 @@ const FichaLite = (() => {
   // La otra mano de un creep o una invocación (2026-10-17, dueño: varitas, báculos, orbes y escudos son armas, no equipo): el primer escudo, o
   // si no hay, lo primero que va en la mano (una varita).
   const enMano = (it, slotDe) => ['escudo', 'mano'].includes(slotDe(it.tipoItem));
+  // ✨ El arma especial que hace de mano 1 cuando no hay arma física (no la de la otra mano).
+  const espEnMano = (o, slotDe) => Combatiente.armaEnMano(o).sinArma
+    ? Combatiente.puestoSinArma(o).find(it => it && it.especial && /^arma_/.test(String(it.tipoItem || '')) && it !== otraManoDe(o, slotDe)) || null : null;
   const otraManoDe = (o, slotDe) => Combatiente.puestoSinArma(o).find(it => slotDe(it.tipoItem) === 'escudo') || Combatiente.puestoSinArma(o).find(it => enMano(it, slotDe)) || null;
   function segundaMano(o, slotDe, danoDe){
     const esc2 = otraManoDe(o, slotDe);
@@ -175,8 +187,8 @@ const FichaLite = (() => {
     return {nombre: esc2.nombre || 'Escudo', detalle: num(esc2.def) ? `Defensa ${signo(num(esc2.def))}` : 'escudo', lineas};
   }
   function equipoGuardado(o, slotDe){
-    const otra = otraManoDe(o, slotDe);
-    return Combatiente.puestoSinArma(o).filter(it => it !== otra && !(slotDe(it.tipoItem) === 'escudo')).map(it => {
+    const otra = otraManoDe(o, slotDe), esp = espEnMano(o, slotDe);
+    return Combatiente.puestoSinArma(o).filter(it => it !== otra && it !== esp && !(slotDe(it.tipoItem) === 'escudo')).map(it => {
       const lineas = [];
       if(num(it.def)) lineas.push({txt: `Defensa ${signo(num(it.def))}`});
       const mt = modsTxt(it.mods);
@@ -190,7 +202,7 @@ const FichaLite = (() => {
     return {
       titulo: sc.nombre || 'Creep',
       subtitulo: [`Nivel ${fmt(num(sc.nivel) || 1)}`, sc.jefe ? 'jefe' : '', sc.raza].filter(Boolean).join(' · '),
-      manos: [manoGuardada(sc, C.danoTxt(sc, dmg)), segundaMano(sc, C.slotDe, o => C.danoTxt(o, C.statValor(o, 'dmg')))],
+      manos: [manoGuardada(sc, C.danoTxt(sc, dmg), C.slotDe), segundaMano(sc, C.slotDe, o => C.danoTxt(o, C.statValor(o, 'dmg')))],
       defensa: lineasGuardadas(sc, C.defensaEfectiva(sc), sc.defensa, defItem, defEstado),
       crit: [0, 1, 2, 3, 4].map(i => lineasGuardadas(sc, C.critEfectivo(sc, i), (sc.crit || [])[i], modDe('tipo' + (i + 1)), () => 0)),
       equipo: equipoGuardado(sc, C.slotDe),
@@ -207,7 +219,7 @@ const FichaLite = (() => {
     return {
       titulo: inv.nombre || 'Invocación',
       subtitulo: ['Invocación', duenoNombre ? `de ${duenoNombre}` : '', inv.activa === false ? 'dormida' : ''].filter(Boolean).join(' · '),
-      manos: [manoGuardada(inv, I.danoTxt(inv, dmg)), segundaMano(inv, slotDe)],
+      manos: [manoGuardada(inv, I.danoTxt(inv, dmg), slotDe), segundaMano(inv, slotDe)],
       // Armadura rota de una invocación cuenta por acumulación (como en InvCalculo.defensaEfectiva).
       defensa: lineasGuardadas(inv, I.defensaEfectiva(inv), inv.defensa, defItem, defEstado),
       crit: [0, 1, 2, 3, 4].map(i => lineasGuardadas(inv, I.critEfectivo(inv, i), (inv.crit || [])[i], modDe('tipo' + (i + 1)), () => 0)),

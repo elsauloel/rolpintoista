@@ -80,5 +80,5 @@ de ítems que ya tienen los personajes y los creeps de «El origen de las especi
 macizo viejo, Res. T4). **No tocar El origen antes de que lo pida**; cuando lo pida, pasar sus copias a los valores nuevos del catálogo.
 
 ## ▶ Dónde quedó (2026-11-04)
-Equipo Común y Bueno terminado (escudos, cascos, torso blando, torso rígido, manos, piernas y pies). Los Raros o mejores, aparte. Siguen las armas, después habilidades,
+Equipo Común y Bueno terminado (escudos, cascos, torso blando, torso rígido, manos, piernas y pies). Los Raros o mejores, aparte. Siguen las armas (Ignora → Frecuente hecho; frecuente desde Común hecho; las caras → [propuesta-armas-critico-caras.md](propuesta-armas-critico-caras.md), a revisar), después habilidades,
 estados, pasivas y creeps. Ojo: el texto de la pasiva Temple todavía explica la regla vieja.

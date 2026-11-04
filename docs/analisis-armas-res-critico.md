@@ -55,5 +55,5 @@ rango = Tipo del arma − Crítico frecuente + Resistencia del defensor (− lo 
    (El origen no se tocó). Prueba nueva en `comun/pruebas.html`: nada de fábrica usa Ignora.
 2. **Medir el frecuente y el potente** con la regla nueva (como se hizo con la resistencia: cuánto valen contra Defensa +1 / PdG +1), para saber si
    las armas con frecuente quedaron caras o baratas. → **Medido:** [medicion-critico-frecuente.md](medicion-critico-frecuente.md) (Frecuente +1 ≈ +1½ de daño en Tipo 4, +1¼ en 6, +1 en 8, +½ en 10; Potente +1 ≈ ¼; las armas que los tienen quedaron caras).
-3. **Revisar las armas Comunes y Buenas de Tipo 4 y 6 con frecuente o potente** con esos pesos (son pocas: ~20).
+3. **Revisar las armas Comunes y Buenas de Tipo 4 y 6 con frecuente o potente** con esos pesos (son pocas: ~20). → **Propuesta:** [propuesta-armas-critico-caras.md](propuesta-armas-critico-caras.md) (2026-11-04), a revisar.
 4. Raras y Excepcionales, aparte (como con el equipo).

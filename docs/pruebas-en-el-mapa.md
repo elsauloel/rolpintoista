@@ -1431,4 +1431,9 @@
   cartel de la huida le apareció a él. ⚠ El «Aplicar Robo» del duelo lo tomó otra pantalla de GM abierta (con código viejo, en otro mapa: «el token
   ya no está»); el efecto se aplicó después desde la pantalla del GM de la prueba. Falta: un personaje con una habilidad de robo propia, con clics,
   y el robo en secreto (en sigilo) con oro.
-
+- [x] ✅ **🪝 Arrastrar de la clase Tanque (2026-11-04, probada con clics en «Claude · pruebas»)**: Prueba Uno (con la habilidad de prueba) contra el
+  Goblin picapiedras a 3 casillas, desde la cuenta del jugador: el enganche lo resuelve la pantalla del GM (momento `gancho-pedido`). **Falla**: «PdG 3
+  contra su Evasión 7: no lo engancha. No hay golpe» (aviso al jugador). **Engancha**: «PdG 12 contra su Evasión 5», «Constitución 12 + Fuerza 8 = 20
+  contra su Constitución 11: lo trae y le pega», «lo trae 2 casilleros» y se abre el duelo «sin arma · Tipo 4 · +2 PdG». «Cancelar duelo → No
+  cuenta» devuelve 4 No2 y 2 SP. Restaurado (ficha y posición). Falta: el golpe entero (pagar y tirar), con trampas en el camino, y un creep que
+  arrastra con la PdG nueva.

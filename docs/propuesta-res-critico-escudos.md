@@ -4,7 +4,9 @@ Primera familia del paso 4 del [plan](plan-resistencia-critico.md). **Solo propu
 
 > **Decidido (dueño, 2026-11-04, en la compu):** los **6 Comunes** que cambian, aprobados («me cierran esos 6 comunes»). **Bloqueo +1 = ¾** (no 1:
 > solo sirve después de ganar un Parry; «estoy de acuerdo con revisar esto») → ver «Revisión por el Bloqueo a ¾», al final. Parry +1 y Def. especial +1
-> siguen valiendo 1. Falta: aprobar los Buenos (con la revisión del Bloqueo) y recién ahí se carga todo en el catálogo.
+> siguen valiendo 1. **Buenos y revisión del Bloqueo: aprobados. ✅ Cargado en `comun/catalogo.js` (2026-11-04): 24 escudos** (los 15 de la
+> propuesta + los 9 de la revisión del Bloqueo; Escudo de hierro macizo también sin el Iniciativa −1). Las copias que ya tienen personajes y creeps de
+> una partida no cambian solas (los creeps esenciales nuevos sí: toman la pieza del catálogo por nombre).
 Base: el mapa cerrado (el escudo puede dar resistencia contra Tipo 4, 6, 8 o 10; +1 contra un solo Tipo; el +2, muy raro y desde Buena; sin Tipo 12)
 y los pesos de [peso-resistencia-critico.md](peso-resistencia-critico.md).
 

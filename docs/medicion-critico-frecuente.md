@@ -89,6 +89,9 @@ Hoy el frecuente está en **3 Comunes (todas Tipo 6) y 5 Buenas**; en Tipo 4 no 
 
 ## Candidatas para que el frecuente aparezca desde Común (temáticas, mismo precio)
 
+> **✅ Aprobadas y cargadas (dueño, 2026-11-04, en la compu: «el resto me cierra»)**, las 7, con dos ajustes: la **Daga de cota** conserva el
+> Perfora 1 («queda así») y la **Estrella del alba** conserva el +1 de daño («dejale el daño»): Frecuente +1 además.
+
 | Tipo | Arma | Hoy | Propuesta | Balance |
 |---|---|---|---|---|
 | 4 | **Punzón de hielo** (Común, 80) | +1 daño · Potente +2 | **Frecuente +1** (sin el daño ni el potente) | 1½ → 1½ |

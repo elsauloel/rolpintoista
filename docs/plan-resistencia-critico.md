@@ -32,4 +32,5 @@
 
 ## Estado
 - [x] Paso 0: la regla nueva, programada (2026-11-04, 970ca52e).
-- [ ] Paso 1: inventario — en curso (2026-11-04).
+- [x] Paso 1: inventario (2026-11-04) → [`inventario-resistencia-critico.md`](inventario-resistencia-critico.md).
+- [ ] Paso 2: medición.

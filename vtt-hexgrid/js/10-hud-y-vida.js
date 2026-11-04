@@ -766,6 +766,23 @@ async function hudHpAplicar(t, texto){
   }
 }
 
+// La descripción del estado para el globo (dueño, 2026-11-04: «debe mostrarte la descripción del estado con hover»): la suya; si no trae
+// (los que pone una habilidad de creep, p. ej. Piel de hierro), la del preset con ese nombre; si tampoco, lo que hace armado de sus mods.
+function hudDetalleEstado(e){
+  const propio = String((e && e.detalle) || '').trim();
+  if(propio) return propio;
+  const nom = String((e && e.nombre) || '').trim().toLowerCase();
+  const pre = typeof ESTADOS_PRESET !== 'undefined' && Array.isArray(ESTADOS_PRESET) ? ESTADOS_PRESET.find(p => p && String(p.nombre || '').trim().toLowerCase() === nom) : null;
+  if(pre && String(pre.detalle || '').trim()) return String(pre.detalle).trim();
+  const etq = (typeof CreepCalculo !== 'undefined' && CreepCalculo.STAT_LABEL) || {};
+  const extra = {def: 'Defensa', armadmg: 'Def. especial', dmg: 'Daño', dmgesp: 'Ef.Esp', pdgmg: 'PdG.Esp', bloqueo: 'Bloqueo', percepcion: 'Percepción', sigilo: 'Sigilo', sp: 'SP máx.', hp: 'Vida máx.'};
+  const partes = (Array.isArray(e && e.mods) ? e.mods : []).filter(m => m && m.stat && num(m.val)).map(m => `${etq[m.stat] || extra[m.stat] || m.stat} ${num(m.val) > 0 ? '+' : ''}${fmt(num(m.val))}`);
+  if(num(e && e.escudo) || num(e && e.escudoMax)) partes.push(e.excedente ? `Vida extra ${fmt(num(e.escudo))}` : `Escudo ${fmt(num(e.escudo))}/${fmt(num(e.escudoMax))}`);
+  if(num(e && e.hpturno)) partes.push(`${num(e.hpturno) > 0 ? '+' : ''}${fmt(num(e.hpturno))} de vida por turno`);
+  if(!partes.length) return '';
+  const dura = e.permanente ? 'no vence' : num(e.turnos) ? `${fmt(num(e.turnos))} turno${num(e.turnos) === 1 ? '' : 's'}` : '';
+  return partes.join(' · ') + (dura ? ` (${dura})` : '');
+}
 function hudEstadosHtml(t, estados, puede){
   // El + abre el selector de estados de la ficha (o de gm-tools en creeps),
   // dentro del mapa, con sus presets y su mecánica.
@@ -774,7 +791,7 @@ function hudEstadosHtml(t, estados, puede){
   if(!estados.length) return '<div class="hud-globo"><h3>Estados alterados</h3><span style="color:var(--muted)">Ninguno activo.</span>' + agregar + '</div>';
   return '<div class="hud-globo"><h3>Estados alterados</h3>' + estados.map((e, i) => {
     const turnos = e.permanente ? "∞" : (num(e.turnos) ? fmt(num(e.turnos)) + "t" : "—");
-    const det = String(e.detalle || "").trim();
+    const det = hudDetalleEstado(e);
     return `<div class="hud-estado">
       <span style="width:9px;height:9px;border-radius:50%;background:${ESTADO_COLOR[e.polaridad] || ESTADO_COLOR['']};flex:none"></span>
       <span class="nom${det ? " con-tip" : ""}" tabindex="${det ? 0 : -1}" title="${esc(det || e.nombre)}">${esc(e.nombre)}</span>

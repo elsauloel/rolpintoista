@@ -6,7 +6,7 @@ y los pesos de [peso-resistencia-critico.md](peso-resistencia-critico.md).
 
 ## Resumen
 
-1. **Cambian 15 de los 61 escudos** (6 Comunes y 9 Buenos). Los otros 46 quedan igual: los que dan Res. Tipo 4 ya estaban bien pagados.
+1. **Cambian 15 de los 62 escudos** (6 Comunes, 9 Buenos y ningún Raro). Los otros 47 quedan igual: los que dan Res. Tipo 4 ya estaban bien pagados.
 2. **Lo más llamativo:** el catálogo, en la práctica, ya **cobraba la Res. Tipo 4 ×1 como una Defensa +1** (el Escudo de cuero endurecido, Def +2 ·
    Res T4, cuesta lo mismo que el Escudo de asalto, Def +2 · Parry +1). O sea, con la regla nueva esos escudos quedaron justos. Los que quedaron
    **muy flojos** son los de **Tipo 6, 8 y 10**: se cobraban como si valieran un punto entero y ahora valen ½ o ¼ (el peor: el Escudo de chapa

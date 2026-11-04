@@ -2491,6 +2491,12 @@ const Combatiente = (() => {
         if(h.trampaColocar.salvacion) h.trampaColocar.salvacion = {...h.trampaColocar.salvacion, logra: 'cae parado'};
         cambio = true;
       }
+      // 🪝 Arrastrar cuesta 2 No2 fijos (dueño, 2026-11-04), no lo de un ataque: la guardada se pone al día.
+      if(h && h.nombre === 'Arrastrar' && esCostoAtaque(h)){
+        h.nitrosCosto = 2; if('no2' in h) h.no2 = 2;
+        ['detalle', 'ataqueTxt'].forEach(k => { if(typeof h[k] === 'string' && !/2 No2 fijos/.test(h[k])) h[k] = h[k].replace(/\.?\s*$/, '') + (k === 'detalle' ? '. Cuesta 2 No2 fijos.' : ' · 2 No2 fijos'); });
+        cambio = true;
+      }
       // 😮‍💨 Robar el aliento saca 1 No2 + la diferencia (dueño, 2026-11-03; antes 2 + la diferencia): la guardada se pone al día.
       if(h && h.nombre === 'Robar el aliento' && h.duelo && typeof h.duelo === 'object' && Array.isArray(h.duelo.efectos) && h.duelo.efectos.some(e => e && e.nombre === 'Pierde No2' && e.no2 === 2)){
         h.duelo.efectos.forEach(e => { if(e && e.nombre === 'Pierde No2' && e.no2 === 2) e.no2 = 1; });

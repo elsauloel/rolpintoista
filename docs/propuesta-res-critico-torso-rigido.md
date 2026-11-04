@@ -1,6 +1,6 @@
 # Propuesta: torso rígido (rebalance de la Resistencia a crítico)
 
-Cuarta familia del paso 4 del [plan](plan-resistencia-critico.md). **Solo propuesta: no se cambió el catálogo.** Pregunta 1 respondida (dueño, 2026-11-04): **una pieza puede dar +1 contra hasta dos Tipos, desde Común** → ver «Versión 2» al final. Fecha: 2026-11-04.
+Cuarta familia del paso 4 del [plan](plan-resistencia-critico.md). **✅ Versión 2 aprobada y cargada (dueño, 2026-11-04: «Si»): 4 piezas.** Pregunta 1 respondida (dueño, 2026-11-04): **una pieza puede dar +1 contra hasta dos Tipos, desde Común** → ver «Versión 2» al final. Fecha: 2026-11-04.
 Base: el mapa cerrado (el torso rígido puede dar resistencia contra **Tipo 4, 6 u 8**; +1 contra un solo Tipo; el +2, muy raro y desde Buena) y los
 pesos de las familias anteriores: Defensa +1 = 1 · Def. especial +1 = 1 · Res. T4 = 1 · Res. T6 = ½ · Res. T8 = ¼ · Res.CC +1 = ½ · Res.Esp +1 = 1 ·
 Vida +5 = ½ · resistencia elemental +1 = ½ · Iniciativa −1 = −½ · Evasión −1 = −½ · Sigilo −2 = −½ · Bloqueo +1 = ¾.

@@ -69,7 +69,7 @@ Respuestas del dueño a la medición (2026-11-04):
     T6 = ½; T8 = ¼; T10 = ¼; +1 a todos los Tipos = 2. Los precios se mantienen y se ajustan los efectos.
 12. **Bloqueo +1 = ¾** (dueño, 2026-11-04; Parry +1 y Def. especial +1 = 1). **Escudos: aprobados y cargados en el catálogo (24 escudos).**
     Cascos → [propuesta-res-critico-cascos.md](propuesta-res-critico-cascos.md): **aprobados y cargados** (6 cascos; el Bacinete de recluta queda con ×2 como
-    excepción; «morrión» renombrado). Torso blando → [propuesta-res-critico-torso-blando.md](propuesta-res-critico-torso-blando.md), a revisar.
+    excepción; «morrión» renombrado). Torso blando → [propuesta-res-critico-torso-blando.md](propuesta-res-critico-torso-blando.md), **aprobado y cargado** (2026-11-04: Res. T6 +1 en 4 piezas acolchadas; el Gambesón de doble capa pasa a Def. especial +5 · Res. T6 ×2, opción B). Sigue: torso rígido.
 13. **Paso 4, primera familia: escudos** → propuesta en [propuesta-res-critico-escudos.md](propuesta-res-critico-escudos.md) (2026-11-04), a revisar con el dueño.
 
 ## Al terminar todo el catálogo: actualizar El origen
@@ -77,10 +77,6 @@ Dueño, 2026-11-04: «cuando terminemos de actualizar todo el catálogo, sí, te
 de ítems que ya tienen los personajes y los creeps de «El origen de las especies» no cambian solas (ej.: el Guardaespaldas con el Escudo de hierro
 macizo viejo, Res. T4). **No tocar El origen antes de que lo pida**; cuando lo pida, pasar sus copias a los valores nuevos del catálogo.
 
-## ⏸ En pausa (2026-11-04): el dueño lo sigue en la compu
-«Vamos a pasar esta tarea; en la compu lo resuelvo, requiere más atención.» Dónde quedó: la propuesta de los **escudos**
-(docs/propuesta-res-critico-escudos.md) espera su revisión. Preguntas abiertas: (1) ¿Bloqueo +1, Parry +1 y Def. especial +1 pesan como Defensa +1?
-(Claude sugiere que el Bloqueo pese algo menos: solo sirve tras ganar un Parry); (2) ¿cierran los 6 Comunes que cambian?; después, los 9 Buenos,
-y recién entonces cargarlos. Siguen las demás familias (cascos, torso blando, torso rígido, manos, piernas, pies), después armas, habilidades,
+## ▶ Dónde quedó (2026-11-04)
+Escudos, cascos y torso blando aprobados y cargados. Sigue el **torso rígido**; después manos, piernas y pies, después armas, habilidades,
 estados, pasivas y creeps. Ojo: el texto de la pasiva Temple todavía explica la regla vieja.
-

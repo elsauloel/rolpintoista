@@ -1,6 +1,6 @@
 # Propuesta: torso blando (rebalance de la Resistencia a crítico)
 
-Tercera familia del paso 4 del [plan](plan-resistencia-critico.md). **Solo propuesta: no se cambió el catálogo.** Fecha: 2026-11-04.
+Tercera familia del paso 4 del [plan](plan-resistencia-critico.md). **✅ Aprobada y cargada (2026-11-04)**: las 4 piezas con Res. T6 +1 y, en la pregunta 2, la opción B (Gambesón de doble capa → Def. especial +5 · Res. T6 ×2). Fecha: 2026-11-04.
 Base: el mapa cerrado (el torso blando puede dar resistencia contra **Tipo 4 o Tipo 6**; +1 contra un solo Tipo; el +2, muy raro y desde Buena) y los
 pesos de los escudos y los cascos (Defensa +1 = 1 · Res. T4 = 1 · Res. T6 = ½ · Def. especial +1 = 1 · Res.CC +1 = ½ · Vida +5 = ½ · Resistente ×2 = ½).
 

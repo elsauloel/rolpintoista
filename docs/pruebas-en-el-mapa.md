@@ -284,6 +284,12 @@
 
 ### ▶ Para la próxima tanda de pruebas en el mapa (2026-11-03)
 
+- [ ] **🧮🔥 El daño del arma especial adentro de «La cuenta del daño» (2026-11-04, dueño, con captura de un Arquero del culto: «el daño del arma
+  especial debería mostrarse en la ecuación general del daño»)**: con un arma con daño elemental (ácido, fuego…), el número grande es el TOTAL que
+  entró (golpe + elemental) y la cuenta suma el elemental en un renglón («+ 🧪 Daño de Ácido 5 · 1d6 · directo») hasta «ENTRA A LA VIDA 13»; si hubo
+  ×1,5 o resistencia elemental, un renglón «= el ácido, a la vida». Ya no salen aparte la línea del ácido ni el «🧮 En total». Probado con el
+  dibujo del paso 5 armado a mano (los números de la captura) y `pruebas.html` en verde; falta verlo en un duelo real del mapa.
+
 - [x] ✅ **🪝 Arrastrar, el flujo nuevo (2026-11-04, P224 redefinida; probado con clics en «Claude · pruebas», Prueba Uno + GM)**: el gancho sale
   hacia el rival y se abre el duelo «Arrastrar: el gancho» (el jugador tira su PdG con su botón; el GM, la Evasión del goblin desde su cuadro). Engancha
   (10 contra 1): el cuadro se aparta solo, el gancho trae al goblin de 3 casillas a pegado y el cuadro vuelve con «✔ Aplicado · lo arrastra hasta

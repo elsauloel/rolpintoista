@@ -528,9 +528,26 @@ const Duelo = (() => {
     });
     return t;
   };
+  /* 🔥 El daño del arma especial (ácido, fuego…), adentro de la cuenta (2026-11-04, dueño: «el daño del arma especial debería mostrarse en la ecuación
+     general del daño»): lo que entró del golpe pasa a ser un subtotal, se suma el elemental (con su resistencia o su × si los tuvo) y el final es el total. */
+  const cuentaConMag = dn => {
+    if(!magJunto(dn) || dn.invulnerable) return dn.cuenta;
+    const m = dn.magico, tipo = String(m.tipo || '').toLowerCase(), tot = _num(m.total), rec = _num(m.recibido);
+    const filas = [];
+    dn.cuenta.forEach(c => {
+      if(!c.f) return filas.push(c);
+      const ant = filas[filas.length - 1];   // «pasa la Defensa 8» y «del golpe, a la vida 8» dicen lo mismo: queda uno
+      if(ant && ant.s === '=' && _num(ant.v) === _num(c.v)) filas[filas.length - 1] = {...ant, txt: `${ant.txt} (del golpe, a la vida)`};
+      else filas.push({s: '=', txt: 'del golpe, a la vida', v: c.v});
+    });
+    filas.push({s: '+', txt: `${magIcono(m.tipo)} ${magTitulo(m.tipo)}`, v: tot, nota: `${m.formula || ''}${magMult(m)} · directo: no lo frena la Defensa`.replace(/^ · /, '')});
+    if(rec !== tot || _num(m.mult) > 1 || m.resEl) filas.push({s: '=', txt: `el ${tipo}, a la vida`, v: rec, nota: [_num(m.mult) > 1 ? `×${String(_num(m.mult)).replace('.', ',')}, para arriba` : '', m.resEl ? `− ${m.resEl}` : ''].filter(Boolean).join(' · ')});
+    filas.push({s: '=', txt: 'entra a la vida', v: _num(dn.recibido) + rec, f: 1});
+    return filas;
+  };
   function cuentaHtml(dn){
     if(!tieneCuenta(dn)) return '';
-    const filas = dn.cuenta.map(c => {
+    const filas = cuentaConMag(dn).map(c => {
       const v = c.v === undefined ? null : _num(c.v);
       const signo = c.s === '−' && v < 0 ? '+' : c.s;
       const val = v === null ? '' : c.s === '×' ? '×' + _fmt(v) : c.s === '÷' ? '÷' + _fmt(v) : _fmt(Math.abs(v));
@@ -2633,6 +2650,7 @@ const Duelo = (() => {
         if(dn.invulnerable) grande = `<div class="duelo-danonum inv">INVULNERABLE</div><div class="duelo-danosub">El golpe no hizo nada</div>`;
         else if(dn.manual) grande = `<div class="duelo-danonum">${_fmt(golpe)}</div><div class="duelo-danosub">de daño — <b>aplicalo a mano</b> (${_esc(dn.motivoManual || 'no se pudo aplicar solo')})</div>`;
         // 🧮 Con la cuenta: el número grande es lo que entró a la vida; cómo se llegó, abajo, renglón por renglón.
+        else if(tieneCuenta(dn) && magJunto(dn)) grande = `<div class="duelo-danonum${dn.ignoraDef ? ' rojo' : ''}">${_fmt(_num(dn.recibido) + _num(dn.magico.recibido))}</div><div class="duelo-danosub">de daño entró a la vida de ${_esc(d.defensor.nombre)} (${_fmt(dn.recibido)} del golpe + ${magIcono(dn.magico.tipo)} ${_fmt(dn.magico.recibido)} de ${_esc(String(dn.magico.tipo).toLowerCase())})</div>`;   // 🔥 (2026-11-04) el total
         else if(tieneCuenta(dn)) grande = `<div class="duelo-danonum${dn.ignoraDef ? ' rojo' : ''}">${_fmt(dn.recibido)}</div><div class="duelo-danosub">de daño entró a la vida de ${_esc(d.defensor.nombre)}</div>`;
         // (una habilidad física que sale crítica va por el renglón del crítico, el de abajo)
         else if(dn.ignoraDef && d.hab && !(d.crit && d.crit.critico)) grande = `<div class="duelo-danonum rojo">${_fmt(golpe)}</div><div class="duelo-danosub rojo">DERECHO A LA VIDA</div><div class="duelo-danosub">daño ${_esc(d.hab.dano ? d.hab.dano.tipo : 'mágico')}${dn.cargaMult ? ` · ${_esc(dn.cargaMult)}` : ''} · ignora la Defensa y no critica${dn.freno ? ` · lo frenan: ${_esc(dn.freno)} → entran ${_fmt(_num(dn.recibido) + _num(dn.absorbido))}` : ''}</div>`;
@@ -2641,15 +2659,16 @@ const Duelo = (() => {
         else grande = `<div class="duelo-danonum">${_fmt(dn.recibido)}</div><div class="duelo-danosub">de daño (${_fmt(dn.crudo)} − ${_esc(defTxt(dn))}${dn.freno ? ` − ${_esc(dn.freno)}` : ''})</div>`;
         const conCuenta = tieneCuenta(dn) && !dn.manual;
         const vida = dn.hpAntes !== undefined && dn.hpAntes !== null && dn.hpDespues !== undefined && dn.hpDespues !== null
-          ? conCuenta ? `<div class="duelo-mini">${_esc(d.defensor.nombre)}: <b>${_fmt(dn.hpAntes)}</b> → <b>${_fmt(dn.hpDespues)}</b> HP</div>`
+          ? conCuenta ? `<div class="duelo-mini">${_esc(d.defensor.nombre)}: <b>${_fmt(dn.hpAntes)}</b> → <b>${_fmt(magJunto(dn) && !dn.invulnerable ? dn.magico.hpDespues : dn.hpDespues)}</b> HP</div>`
           : `<div class="duelo-mini">${_esc(d.defensor.nombre)}: <b>${_fmt(dn.hpAntes)}</b> → <b>${_fmt(dn.hpDespues)}</b> HP${_num(dn.absorbido) ? ` · el escudo absorbió ${_fmt(dn.absorbido)}` : ''}${_num(dn.mitiMiti) > 0 ? ` · 🛡 ${_esc(dn.mitiMitiNombre || 'su protector')} se llevó ${_fmt(dn.mitiMiti)} (${_esc(dn.mitiMitiTxt || 'Miti-Miti')})` : ''}</div>` : '';
         const esp = dn.espinas ? `<div class="duelo-mini" style="color:#8fe3a9">🌵 Espinas: ${_esc(dn.espinas.quien || d.atacante.nombre)} recibe <b>${_fmt(dn.espinas.monto)}</b> de daño devuelto (1/4 del daño del golpe, directo a la vida)${dn.espinas.manual ? ' — <b>aplicalo a mano</b>' + (dn.espinas.motivo ? ' (' + _esc(dn.espinas.motivo) + ')' : '') : (dn.espinas.hpAntes !== undefined && dn.espinas.hpAntes !== null ? ` · ${_fmt(dn.espinas.hpAntes)} → ${_fmt(dn.espinas.hpDespues)} HP` : '')}</div>` : '';
         const ej = dn.espejo ? `<div class="duelo-mini" style="color:#c9b8ff">🪞 Espejo: ${_esc(dn.espejo.quien || d.atacante.nombre)} recibe <b>${_fmt(dn.espejo.monto)}</b> de daño devuelto (1/4 del daño especial, directo a la vida)${dn.espejo.manual ? ' — <b>aplicalo a mano</b>' + (dn.espejo.motivo ? ' (' + _esc(dn.espejo.motivo) + ')' : '') : (dn.espejo.hpAntes !== undefined && dn.espejo.hpAntes !== null ? ` · ${_fmt(dn.espejo.hpAntes)} → ${_fmt(dn.espejo.hpDespues)} HP` : '')}</div>` : '';
         const ls = dn.luzSanadora ? `<div class="duelo-mini" style="color:#8fe3a9">☀ Luz sanadora (${_fmt(dn.luzSanadora.pct)} %): ${_esc(dn.luzSanadora.quien || d.atacante.nombre)} se cura <b>${_fmt(dn.luzSanadora.monto)}</b>${dn.luzSanadora.manual ? ' — <b>aplicalo a mano</b>' + (dn.luzSanadora.motivo ? ' (' + _esc(dn.luzSanadora.motivo) + ')' : '') : (dn.luzSanadora.hpAntes !== undefined && dn.luzSanadora.hpAntes !== null ? ` · ${_fmt(dn.luzSanadora.hpAntes)} → ${_fmt(dn.luzSanadora.hpDespues)} HP` : '')}</div>` : '';
         const dr = dn.drena ? `<div class="duelo-mini" style="color:#8fe3a9">🩸 Drena: ${_esc(dn.drena.quien || d.atacante.nombre)} se cura <b>${_fmt(dn.drena.monto)}</b>${dn.drena.manual ? ' — <b>aplicalo a mano</b>' + (dn.drena.motivo ? ' (' + _esc(dn.drena.motivo) + ')' : '') : `${dn.drena.hpAntes !== undefined && dn.drena.hpAntes !== null ? ` · ${_fmt(dn.drena.hpAntes)} → ${_fmt(dn.drena.hpDespues)} HP` : ''}${_num(dn.drena.excedente) ? ` · Vida extra ${_fmt(dn.drena.excedente)}` : ''}${dn.drena.nota ? ' · ' + _esc(dn.drena.nota) : ''}`}</div>` : '';
-        const mg = dn.magico ? `<div class="duelo-mini" style="color:#9cc7ff">${magIcono(dn.magico.tipo)} ${_esc(magTitulo(dn.magico.tipo))}: <b>${_fmt(dn.magico.total)}</b> (${_esc(dn.magico.formula || '')})${_esc(magMult(dn.magico))} · ignora la Defensa, sin multiplicar${dn.magico.resEl ? ` · − ${_esc(dn.magico.resEl)}` : ''}${dn.magico.recibido !== undefined ? ` · recibió <b>${_fmt(dn.magico.recibido)}</b>` : ''}${dn.magico.hpDespues !== undefined ? ` · ${_fmt(dn.magico.hpAntes)} → ${_fmt(dn.magico.hpDespues)} HP` : ''}</div>` : '';
+        const magEnCuenta = conCuenta && magJunto(dn) && !dn.invulnerable;   // 🔥 (2026-11-04) ya está en la cuenta: sin la línea suelta ni el «En total»
+        const mg = dn.magico && !magEnCuenta ? `<div class="duelo-mini" style="color:#9cc7ff">${magIcono(dn.magico.tipo)} ${_esc(magTitulo(dn.magico.tipo))}: <b>${_fmt(dn.magico.total)}</b> (${_esc(dn.magico.formula || '')})${_esc(magMult(dn.magico))} · ignora la Defensa, sin multiplicar${dn.magico.resEl ? ` · − ${_esc(dn.magico.resEl)}` : ''}${dn.magico.recibido !== undefined ? ` · recibió <b>${_fmt(dn.magico.recibido)}</b>` : ''}${dn.magico.hpDespues !== undefined ? ` · ${_fmt(dn.magico.hpAntes)} → ${_fmt(dn.magico.hpDespues)} HP` : ''}</div>` : '';
         const pd = dn.porDano ? `<div class="duelo-mini" style="color:#9cc7ff">✨ ${_esc(dn.porDano.estado)} ×${_fmt(dn.porDano.stacks)} (por ${_fmt(dn.porDano.entro)} de daño${dn.porDano.regla ? ': ' + _esc(dn.porDano.regla) : ''})${dn.porDano.nota ? ' · ' + _esc(dn.porDano.nota) : ''}${dn.porDano.manual ? ' — <b>aplicalo a mano</b>' : ''}</div>` : '';
-        const tot = magJunto(dn) && !dn.manual && !dn.invulnerable ? `<div class="duelo-mini" style="font-weight:700">🧮 En total: ${_fmt(dn.recibido)} del golpe + ${magIcono(dn.magico.tipo)} ${_fmt(dn.magico.recibido)} de ${_esc(String(dn.magico.tipo).toLowerCase())} = <b>${_fmt(_num(dn.recibido) + _num(dn.magico.recibido))}</b> · ${_esc(d.defensor.nombre)}: ${_fmt(dn.hpAntes)} → ${_fmt(dn.magico.hpDespues)} HP</div>` : '';   // 🔥 (2026-11-04) que cierre la cuenta
+        const tot = magJunto(dn) && !dn.manual && !dn.invulnerable && !magEnCuenta ? `<div class="duelo-mini" style="font-weight:700">🧮 En total: ${_fmt(dn.recibido)} del golpe + ${magIcono(dn.magico.tipo)} ${_fmt(dn.magico.recibido)} de ${_esc(String(dn.magico.tipo).toLowerCase())} = <b>${_fmt(_num(dn.recibido) + _num(dn.magico.recibido))}</b> · ${_esc(d.defensor.nombre)}: ${_fmt(dn.hpAntes)} → ${_fmt(dn.magico.hpDespues)} HP</div>` : '';   // 🔥 (2026-11-04) que cierre la cuenta
         cuerpo = tiro + `<div class="duelo-danobox${dn.ignoraDef ? ' crit' : ''}">${grande}</div>${conCuenta && !dn.invulnerable ? cuentaHtml(dn) : ''}${vida}${mg}${tot}${pd}${esp}${ej}${dr}${ls}`;
       }
     }

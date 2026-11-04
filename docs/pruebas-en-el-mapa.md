@@ -1424,3 +1424,11 @@
   efecto «Robo») y huyó 2 casilleros → a Prueba Dos: «💨 Goblin picapiedras se alejó de Prueba Dos con la huida del robo: no permite ataque de
   oportunidad», con «Entendido», y la línea en la Mesa.
 
+- [x] ✅ **🫳 Bolsillo ajeno y el robo nuevo** (2026-11-03, con clics en «Claude · pruebas»): el Goblin (nivel 3) con la habilidad, pegado a Prueba
+  Dos → el duelo «Sigilo (+2 por la espalda) contra Percepción»; ganó 5 contra 3. Con el cinturón vacío se llevó **9 DDE** (1d6 × 3; 300 → 291 en la
+  ficha de Prueba Dos, con su aviso) y el Goblin quedó con `oroRobado` 9; con una Poción en el cinturón se llevó **la Poción** (al cinturón del
+  Goblin). **De personaje a creep**: Prueba Uno le robó la Poción de Piel de Cristal al Goblin → «te llevaste … (al cinturón)» en su pantalla y el
+  cartel de la huida le apareció a él. ⚠ El «Aplicar Robo» del duelo lo tomó otra pantalla de GM abierta (con código viejo, en otro mapa: «el token
+  ya no está»); el efecto se aplicó después desde la pantalla del GM de la prueba. Falta: un personaje con una habilidad de robo propia, con clics,
+  y el robo en secreto (en sigilo) con oro.
+

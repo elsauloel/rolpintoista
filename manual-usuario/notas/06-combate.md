@@ -396,6 +396,14 @@ Cuando estás en sigilo ves el mapa con un **filtro violáceo tenue**, y tus tir
 2. **Por una acción hostil:** cualquier acción con efecto directo sobre un enemigo (un ataque, una skill individual). Esto lo hace saber **el jugador a mano** (botón de la Botonera); el GM quita el estado del creep.
 3. Cuando te detectan, **aparecés donde te detectaron** y dejás una marca de tu última posición por **dos turnos**.
 
+## Robar
+
+Una habilidad que roba (la de los creeps es **Bolsillo ajeno**) se usa pegado al rival: tu **Sigilo contra su Percepción**, con **+2** si venís en
+sigilo o por la espalda. Si ganás, te llevás **una unidad al azar de su cinturón** (la podés usar; si te atrapan, vuelve en el botín). Si su cinturón
+está vacío, te llevás **oro: 1d6 × tu nivel**. Después te alejás hasta 3 casilleros **sin dar ataque de oportunidad, pero pagando el movimiento**.
+**En sigilo es en secreto**: el robado tira Percepción sin saber para qué y se da cuenta al empezar su turno; si te pesca, perdés el sigilo y
+quedás Marcado 2 turnos. Vale de creep a personaje y de personaje a creep.
+
 ## Detección
 Cada **paso que das dentro de la zona de alerta** de un enemigo provoca una **tirada de detección** ([[Campo de visión]]). Es manual: el mapa cuenta los pasos y avisa; la resuelve la mesa (en principio **Destreza del que se esconde contra Especial del que vigila**). También se puede **buscar a propósito**, igual de manual.
 

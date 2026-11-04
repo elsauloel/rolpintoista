@@ -74,6 +74,7 @@ const EstadoPreguntas = (() => {
     s.id = 'estado-preguntas-css';
     s.textContent = `
 .ep-c .ep-pregunta{font-size:16px;font-weight:600;margin:4px 0 10px}
+.ep-c .ep-detalle{font-size:13px;line-height:1.45;color:#B7A79E;background:rgba(255,255,255,.04);border-left:3px solid #6b5646;padding:8px 10px;border-radius:4px;margin:0 0 12px;white-space:pre-wrap}
 .ep-c input[type=number],.ep-c input[type=text]{width:100%;box-sizing:border-box;font-size:18px}
 .ep-c input:disabled{opacity:.4}
 .ep-c .ep-sin{display:flex;gap:8px;align-items:center;margin-top:12px;font-size:14px;cursor:pointer}
@@ -85,7 +86,8 @@ const EstadoPreguntas = (() => {
   function pedir(preset, cfg){
     const qs = preguntas(preset, cfg);
     if(!qs.length) return Promise.resolve(preset);
-    return preguntar({titulo: 'Estado alterado', nombre: preset.nombre}, qs, resp => aplicar(preset, resp, cfg));
+    // (dueño, 2026-11-04: «en la grilla no se lee el texto entero… en ese menú debe estar la descripción completa»)
+    return preguntar({titulo: 'Estado alterado', nombre: preset.nombre, detalle: String(preset.detalle || '').trim()}, qs, resp => aplicar(preset, resp, cfg));
   }
 
   // El cartelito genérico (2026-09-24): preguntas de a una con Siguiente/Atrás/Listo. cab = {titulo, nombre}. Cada pregunta:
@@ -130,7 +132,7 @@ const EstadoPreguntas = (() => {
         titulo: `${cab.titulo} · ${cab.nombre}`, crear: true, z: 99990, ancho: 640, textoCrear: '✔ Listo',
         pasos: qs.map((q, k) => ({id: q.clave, nombre: q.etiqueta || 'Pregunta ' + (k + 1), html: () => {
           const conCheckSin = q.turnos || q.sinLimite, marcado = conCheckSin && sin[q.clave];
-          return `<div class="ep-c"><div class="ep-pregunta">${esc(q.texto)}</div>
+          return `<div class="ep-c">${cab.detalle ? `<div class="ep-detalle">${esc(cab.detalle)}</div>` : ''}<div class="ep-pregunta">${esc(q.texto)}</div>
             ${q.tipo === 'texto'
               ? `<input type="text" id="ep-valor" placeholder="${esc(q.placeholder || 'Escribí acá')}" value="${esc(crudo[q.clave])}">`
               : `<input type="number" id="ep-valor" min="${q.min}" step="1" inputmode="numeric" placeholder="Escribí un número" value="${esc(crudo[q.clave])}"${marcado ? ' disabled' : ''}>`}

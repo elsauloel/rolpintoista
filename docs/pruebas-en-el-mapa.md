@@ -294,11 +294,15 @@
   llegó sola, pero la abeja no volvió a pegar con ella. Probar: Arma elemental a una invocación → el estado aparece en la invocación → la invocación
   ataca y pega → «+1d6» en el daño y en «🧮 La cuenta del daño».
 
-- [ ] **🧮🔥 El daño del arma especial adentro de «La cuenta del daño» (2026-11-04, dueño, con captura de un Arquero del culto: «el daño del arma
+- [x] **🧮🔥 El daño del arma especial adentro de «La cuenta del daño» (2026-11-04, dueño, con captura de un Arquero del culto: «el daño del arma
   especial debería mostrarse en la ecuación general del daño»)**: con un arma con daño elemental (ácido, fuego…), el número grande es el TOTAL que
   entró (golpe + elemental) y la cuenta suma el elemental en un renglón («+ 🧪 Daño de Ácido 5 · 1d6 · directo») hasta «ENTRA A LA VIDA 13»; si hubo
   ×1,5 o resistencia elemental, un renglón «= el ácido, a la vida». Ya no salen aparte la línea del ácido ni el «🧮 En total». Probado con el
-  dibujo del paso 5 armado a mano (los números de la captura) y `pruebas.html` en verde; falta verlo en un duelo real del mapa.
+  dibujo del paso 5 armado a mano (los números de la captura) y `pruebas.html` en verde. ✅ **Visto en un duelo real (2026-11-04g, «Claude ·
+  pruebas»)**: Prueba Dos con la Lanza corta encantada con Fuego (Arma elemental que le puso Prueba Uno) contra Goblin picapiedras: la cuenta mostró
+  «Tirada 7 − Defensa 9 = 0 · + 🔥 Daño de Fuego 1 (1d6 × 1,5 · directo) · = el fuego, a la vida 0 · ENTRA A LA VIDA 0», y la Mesa del GM «7 − Defensa
+  9 = 0 a la vida · 🔥 + 0 de fuego directo = 0 en total (18 → 18 HP)». El fuego no entró porque el escudo del goblin lo absorbió (lo dice el
+  cartelito, no la cuenta). Capturas `pend-1104g-11…12`.
 
 - [x] ✅ **🪝 Arrastrar, el flujo nuevo (2026-11-04, P224 redefinida; probado con clics en «Claude · pruebas», Prueba Uno + GM)**: el gancho sale
   hacia el rival y se abre el duelo «Arrastrar: el gancho» (el jugador tira su PdG con su botón; el GM, la Evasión del goblin desde su cuadro). Engancha

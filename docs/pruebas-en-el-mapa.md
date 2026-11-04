@@ -284,6 +284,13 @@
 
 ### ▶ Para la próxima tanda de pruebas en el mapa (2026-11-03)
 
+- [ ] **🗂 Registro del combate (2026-11-04, dueño: «un jugador estaba convencido de que el punto de partida no era como lo habíamos dejado, y no
+  teníamos un historial de movimientos o duelos»)** — **antes, pegar las reglas nuevas de Firestore**. GM: pasar el mapa a ⚔ combate → sale
+  «¿Empezás un registro nuevo?» (Empezar / Seguir con el mismo). Mover tokens → en el 📜 Historial, «🦶 se movió N casillas: de c·f a c·f (ronda R)»
+  (los jugadores, solo lo que ven). ⏸ Pausar con el mapa abierto → «📸 Foto de la pausa» con cada token (casilla, vida, SP, No2, estados). Los
+  botoncitos de arriba (Todo / Movimientos / Vida y estados / Fotos). «🆕 Registro nuevo» → aparece la raya «── el combate anterior ──». La Mesa ya
+  no se vacía a las 48 h.
+
 - [x] ✅ **Tanda h (2026-11-04, con clics en «Claude · pruebas»; detalle en el reporte de la tanda h)**:
   «Agregar» destacado (fondo cobre, negrita); el globo de Piel de hierro al pasar el mouse; el Cultista en GM Tools sin la fila «Sin arma» y con la
   nota; la Tienda de inicio (62 ítems, el jugador ve «nada se agota»); Arrastrar guardado con la versión vieja (se puso al día solo: 2 SP · 2 No2,

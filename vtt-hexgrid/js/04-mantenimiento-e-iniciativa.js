@@ -1176,6 +1176,7 @@ $('#modo-switch').onclick = async () => {
   const nuevo = modoMapa === 'combate' ? 'narrativo' : 'combate';
   try{
     await fbDb.doc(fbRutaCampana(rutaMapaEstado('modo'))).set({modo: nuevo, actualizado: firebase.firestore.FieldValue.serverTimestamp()});
+    if(nuevo === 'combate' && typeof Registro !== 'undefined') await Registro.recordar().catch(err => console.error('Registro: el recordatorio', err));   // 🗂 ¿registro nuevo? (2026-11-04)
     if(nuevo === 'combate') abrirEstadoDelGrupo('combate');   // 🩺 los turnos de los estados que traen, para ajustarlos (js/81)
   }catch(err){
     console.error('No se pudo cambiar el modo:', err);

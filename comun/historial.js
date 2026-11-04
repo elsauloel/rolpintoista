@@ -15,13 +15,14 @@
      el Mantenimiento, un ataque…) y los jugadores no escriben nada. Lo que no sabe es QUIÉN lo hizo.
    - Si el GM tiene varias pestañas abiertas, una sola registra (un "turno" en localStorage, historialEsLider) para no duplicar.
    - Si no hay ninguna página del GM abierta, no se registra nada: no hay servidor. Lo que pasa mientras nadie del GM mira, se pierde.
-   - Solo lo lee y lo borra el GM (reglas de Firestore). Se borra solo lo de más de 48 h, como las tiradas de la Mesa.
+   - Solo lo lee y lo borra el GM (reglas de Firestore). Se guarda este combate y el anterior (comun/registro.js, 2026-11-04; antes se borraba a las 48 h):
+     «🆕 Registro nuevo» del panel. Además, el mapa del GM anota los movimientos (tipo 'mov') y la foto al pausar (tipo 'foto'), vtt-hexgrid/js/99.
    - No aparece dentro de los iframes del mapa (Botonera, Acciones, Mantenimiento).
    Se carga después de sesion.js; mesa-historial.js llama a historialAlEntrar() cuando ya se entró a la partida.
    ========================================================= */
 
 const HIST_HORAS = 48;
-const HIST_MAX = 250;
+const HIST_MAX = 800;   // (2026-11-04: con los movimientos, más líneas por combate)
 const HIST_ID = Math.random().toString(36).slice(2);   // esta pestaña
 const histBase = {fichas: new Map(), creeps: new Map()};   // lo último que se vio, para saber qué cambió
 let histIniciado = false;
@@ -51,7 +52,7 @@ function historialRegistrar(tipo, quien, texto, campo, delta){
   if(!fbDb || !fbUsuario || !fbMiembro || !fbMiembro.gm || !texto) return;
   const d = {
     uid: fbUsuario.uid, jugador: String(fbMiembro.nombre || '').slice(0, 40),
-    quien: String(quien || '').slice(0, 60), tipo: tipo === 'mant' ? 'mant' : 'vital',
+    quien: String(quien || '').slice(0, 60), tipo: ['mant', 'mov', 'foto'].includes(tipo) ? tipo : 'vital',
     texto: String(texto).slice(0, 500),
     cuando: firebase.firestore.FieldValue.serverTimestamp(),
   };
@@ -175,7 +176,10 @@ async function histLimpiezaAutomatica(){
   try{ ultima = Number(localStorage.getItem(clave)) || 0; }catch(e){}
   if(Date.now() - ultima < 60 * 60 * 1000) return;
   try{ localStorage.setItem(clave, String(Date.now())); }catch(e){}
-  try{ await histBorrar(new Date(Date.now() - HIST_HORAS * 3600 * 1000)); }
+  try{
+    if(typeof Registro !== 'undefined'){ await Registro.borrarViejo('historial'); await Registro.borrarViejo('historial_jugadores'); }
+    else await histBorrar(new Date(Date.now() - HIST_HORAS * 3600 * 1000));
+  }
   catch(err){ console.error('No se pudo limpiar el historial viejo:', err); }
 }
 
@@ -208,6 +212,12 @@ function histEstilos(){
 #historial-panel .hp-sube{color:#8FD19A}
 #historial-panel .hp-mant{color:#B9A6E8}
 #historial-panel .hp-vacio{padding:18px 12px;color:#9A867E;text-align:center}
+#historial-panel .hp-ver{display:flex;gap:4px;flex-wrap:wrap;padding:6px 10px;border-bottom:1px solid #2A2126}
+#historial-panel .hp-ver button{background:none;border:1px solid #3B2E34;border-radius:12px;color:#9A867E;cursor:pointer;padding:2px 9px;font:inherit;font-size:11.5px}
+#historial-panel .hp-ver button.on{color:#1A1418;background:#E0A458;border-color:#E0A458}
+#historial-panel .hp-raya{padding:6px 10px;color:#9A867E;text-align:center;font-size:11.5px;letter-spacing:.04em;background:rgba(0,0,0,.25)}
+#historial-panel .hp-mov{color:#9fc4ff}
+#historial-panel .hp-foto{color:#ffd98a}
 /* lugar para el botón en la barra de cada herramienta (además del ☰ y la ⌂ de comun/menu-sitio.js) */
 html.hist-on body > header{padding-left:218px!important}   /* solo la barra de arriba de la página (2026-11-01: antes «header» a secas corría también los títulos de las tarjetas de la ficha y de las ventanas) */
 html.hist-on .accesos{padding-left:206px}
@@ -222,20 +232,33 @@ function histHora(ts){
   return hoy ? hm : d.toLocaleDateString('es-AR', {day: '2-digit', month: '2-digit'}) + ' ' + hm;
 }
 
+// Qué se ve (2026-11-04): todo, solo los movimientos, solo vida/SP/estados o solo las fotos de la pausa.
+let histVer = 'todo', histUltimos = null;
+const histEsDe = x => /^(📸|🦶)/.test(String(x.texto || '')) ? (String(x.texto).startsWith('📸') ? 'foto' : 'mov') : (x.tipo === 'mov' || x.tipo === 'foto' ? x.tipo : 'vital');
 function histDibujar(docs, filtro){
   const cont = document.getElementById('hp-lista');
   if(!cont) return;
   const f = String(filtro || '').trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');   // sin tildes (dueño, 2026-10-30)
   const filas = docs.map(d => d.data({serverTimestamps: 'estimate'}))
+    .filter(x => histVer === 'todo' || histEsDe(x) === histVer)
     .filter(x => !f || (x.quien + ' ' + x.texto).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '').includes(f));
   if(!filas.length){
     cont.innerHTML = `<div class="hp-vacio">${docs.length ? 'Nada coincide con lo que escribiste.' : 'Todavía no se registró nada. Se anota mientras tenés abierta alguna herramienta del GM.'}</div>`;
     return;
   }
+  // 🗂 La raya entre este combate y el anterior (comun/registro.js).
+  const desde = typeof Registro !== 'undefined' ? Registro.desde() : null;
+  let raya = false;
   cont.innerHTML = filas.map(x => {
-    const clase = x.tipo === 'mant' ? 'hp-mant' : x.campo === 'estado' ? '' : histNum(x.delta) < 0 ? 'hp-baja' : histNum(x.delta) > 0 ? 'hp-sube' : '';
-    return `<div class="hp-fila"><span class="hp-hora">${histEsc(histHora(x.cuando))}</span><span class="hp-quien" title="${histEsc(x.quien)}">${histEsc(x.quien)}</span><span class="hp-texto ${clase}">${histEsc(x.texto)}</span></div>`;
+    const fecha = x.cuando && x.cuando.toDate ? x.cuando.toDate() : null;
+    const sep = desde && !raya && fecha && fecha < desde ? (raya = true, '<div class="hp-raya">── el combate anterior ──</div>') : '';
+    return sep + histFila(x);
   }).join('');
+}
+function histFila(x){
+    const de = histEsDe(x);
+    const clase = x.tipo === 'mant' ? 'hp-mant' : de === 'mov' ? 'hp-mov' : de === 'foto' ? 'hp-foto' : x.campo === 'estado' ? '' : histNum(x.delta) < 0 ? 'hp-baja' : histNum(x.delta) > 0 ? 'hp-sube' : '';
+    return `<div class="hp-fila"><span class="hp-hora">${histEsc(histHora(x.cuando))}</span><span class="hp-quien" title="${histEsc(x.quien)}">${histEsc(x.quien)}</span><span class="hp-texto ${clase}">${histEsc(x.texto)}</span></div>`;
 }
 
 function histAbrir(panel, boton){
@@ -246,8 +269,13 @@ function histAbrir(panel, boton){
   let docs = [];
   const filtro = document.getElementById('hp-filtro');
   filtro.oninput = () => histDibujar(docs, filtro.value);
+  if(typeof Registro !== 'undefined' && !histAbrir.registro){   // una sola vez: la raya del combate anterior se mueve con el registro
+    histAbrir.registro = true;
+    Registro.escuchar(() => { if(!panel.hidden && histUltimos) histDibujar(histUltimos, filtro.value); });
+  }
   histCorte = fbDb.collection(fbRutaCampana(fbMiembro.gm ? 'historial' : 'historial_jugadores')).orderBy('cuando', 'desc').limit(HIST_MAX).onSnapshot(snap => {
     docs = snap.docs;
+    histUltimos = docs;
     histDibujar(docs, filtro.value);
   }, err => {
     console.error('Historial: no se pudo leer:', err);
@@ -273,20 +301,29 @@ function histArmarBoton(){
   panel.hidden = true;
   panel.innerHTML =
     '<div class="hp-cab"><b>📜 Historial</b><input id="hp-filtro" placeholder="Filtrar por nombre o texto…" autocomplete="off">' +
-    (fbMiembro.gm ? '<button type="button" id="hp-borrar" title="Borrar todo el historial">🗑</button>' : '') + '<button type="button" id="hp-cerrar" title="Cerrar">✕</button></div>' +
+    (fbMiembro.gm ? '<button type="button" id="hp-nuevo" title="Empezar un registro nuevo: lo de ahora pasa a ser «el combate anterior»; lo de antes de ese se borra">🆕 Registro nuevo</button>' : '') + '<button type="button" id="hp-cerrar" title="Cerrar">✕</button></div>' +
+    '<div class="hp-ver" id="hp-ver">' + [['todo', 'Todo'], ['mov', '🦶 Movimientos'], ['vital', '❤ Vida y estados'], ['foto', '📸 Fotos de la pausa']]
+      .map(([k, t]) => `<button type="button" data-hp-ver="${k}"${k === 'todo' ? ' class="on"' : ''}>${t}</button>`).join('') + '</div>' +
     '<div class="hp-lista" id="hp-lista"></div>';
   document.body.appendChild(boton);
   document.body.appendChild(panel);
   document.documentElement.classList.add('hist-on');
   boton.onclick = () => panel.hidden ? histAbrir(panel, boton) : histCerrar(panel, boton);
   panel.querySelector('#hp-cerrar').onclick = () => histCerrar(panel, boton);
-  const bBorrar = panel.querySelector('#hp-borrar');
-  if(bBorrar) bBorrar.onclick = async e => {
-    if(!(await Confirmar.preguntar('¿Borrar todo el historial?\n\nSe borra para siempre.', {titulo: 'Borrar historial', si: 'Borrar', peligro: true}))) return;
+  // 🆕 Empezar registro nuevo (2026-11-04, comun/registro.js; reemplaza al 🗑 que borraba todo).
+  const bNuevo = panel.querySelector('#hp-nuevo');
+  if(bNuevo) bNuevo.onclick = async e => {
     e.target.disabled = true;
-    try{ await histBorrar(null); }
-    catch(err){ console.error('No se pudo borrar el historial:', err); if(typeof toast === 'function') toast('No se pudo borrar el historial'); }
+    try{ if(typeof Registro !== 'undefined') await Registro.nuevo(); }
     finally{ e.target.disabled = false; }
+  };
+  panel.querySelector('#hp-ver').onclick = e => {
+    const b = e.target.closest('[data-hp-ver]');
+    if(!b) return;
+    histVer = b.dataset.hpVer;
+    panel.querySelectorAll('[data-hp-ver]').forEach(x => x.classList.toggle('on', x === b));
+    const f = document.getElementById('hp-filtro');
+    if(histUltimos) histDibujar(histUltimos, f ? f.value : '');
   };
   document.addEventListener('keydown', e => { if(e.key === 'Escape' && !panel.hidden && !e.defaultPrevented) histCerrar(panel, boton); });
 }

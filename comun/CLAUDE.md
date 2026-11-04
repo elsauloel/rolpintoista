@@ -1944,3 +1944,10 @@ versión parecida en más de una, es candidato a juntar.
   no cuenta; últimas 10 y «y N más». «✔ Ya lo vi» guarda «visto hasta» **en este navegador** (localStorage `aviso-propuestas-visto`: sin reglas nuevas).
   `armar(entradas, {duenoUid, vistoHasta, max})` es puro (en `pruebas.html`).
 - **`fx-transfusion.js`** (`FxTransfusion`, 2026-11-03) — la geometría de la animación de la Transfusión sanguínea, sin dibujar: `curva(a, b, ms, semilla, n)` (de A a B, arqueada y ondulante, que se mueve con el tiempo y vale 0 en las puntas), `ventana(p)` (qué tramo está en el aire), `grosor`, `gotitas(semilla, n)`, `puntoEn(pts, u)` y `rand(semilla)` (repetible: misma semilla, misma animación en todas las pantallas). La dibuja el mapa (`vtt-hexgrid/js/92-transfusion-fx.js`); probada en `pruebas.html`.
+
+- **`registro.js`** (`Registro`, 2026-11-04, dueño: «mantener un historial sin que se acumule al infinito»; «que siempre exista el botón empezar
+  registro nuevo, y un recordatorio al empezar un combate») — **el registro del combate**: `ajustes/registro = {desde, anteriorDesde, gmNombre,
+  actualizado}`. La Mesa (`tiradas`) y los dos historiales ya no se borran a las 48 h: queda **este combate y el anterior** (`Registro.corte()`; tope
+  de seguridad `REGISTRO_TOPE_DIAS` = 30). `Registro.nuevo()` (el «🆕 Registro nuevo» del 📜 Historial, que reemplazó al 🗑) y `Registro.recordar()`
+  (lo llama el mapa al pasar a ⚔ combate, js/04). El historial suma los tipos `mov` y `foto` (los anota el mapa del GM, `vtt-hexgrid/js/99-registro.js`),
+  los botoncitos Todo / 🦶 Movimientos / ❤ Vida y estados / 📸 Fotos y la raya «el combate anterior». Se carga antes de `mesa-historial.js`. Reglas nuevas.

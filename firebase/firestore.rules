@@ -211,7 +211,7 @@ service cloud.firestore {
         allow create: if esGM(c)
           && request.resource.data.keys().hasOnly(['uid', 'jugador', 'quien', 'tipo', 'texto', 'campo', 'delta', 'cuando'])
           && request.resource.data.uid == request.auth.uid
-          && request.resource.data.tipo in ['vital', 'mant']
+          && request.resource.data.tipo in ['vital', 'mant', 'mov', 'foto']   // 🦶 movimientos y 📸 la foto al pausar (2026-11-04, vtt-hexgrid/js/99)
           && request.resource.data.quien is string && request.resource.data.quien.size() <= 60
           && request.resource.data.texto is string && request.resource.data.texto.size() > 0 && request.resource.data.texto.size() <= 500
           && (!('campo' in request.resource.data) || (request.resource.data.campo is string && request.resource.data.campo.size() <= 10))
@@ -351,6 +351,11 @@ service cloud.firestore {
           || (esGM(c) && doc == 'pausa'
             && request.resource.data.keys().hasOnly(['pausada', 'desde', 'gmNombre', 'actualizado'])
             && request.resource.data.pausada is bool
+            && request.resource.data.gmNombre is string && request.resource.data.gmNombre.size() <= 40)
+          // 🗂 El registro del combate (2026-11-04, comun/registro.js): {desde, anteriorDesde, gmNombre, actualizado}, solo el GM.
+          || (esGM(c) && doc == 'registro'
+            && request.resource.data.keys().hasOnly(['desde', 'anteriorDesde', 'gmNombre', 'actualizado'])
+            && (request.resource.data.anteriorDesde == null || request.resource.data.anteriorDesde is timestamp)
             && request.resource.data.gmNombre is string && request.resource.data.gmNombre.size() <= 40);
       }
 

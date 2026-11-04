@@ -6,7 +6,8 @@
    - 🗑 en la cabecera de la Mesa (solo el GM): borra todas las tiradas
      de la partida. A todos se les vacía la Mesa al instante.
    - Borrado automático: cuando el GM entra a cualquiera de las tres
-     herramientas, se borran las tiradas de más de MESA_HISTORIAL_HORAS.
+     herramientas, se borran las tiradas de antes del combate anterior
+     (comun/registro.js, 2026-11-04; antes, las de más de 48 h).
      No hay servidor que lo haga solo; sin GM no hay sesión, así que
      alcanza con hacerlo al entrar. Como mucho una vez por hora por
      navegador, para no repetirlo en cada pestaña o iframe.
@@ -49,8 +50,9 @@ async function mesaLimpiezaAutomatica(){
   if(Date.now() - ultima < MESA_LIMPIEZA_CADA_MS) return;
   try{ localStorage.setItem(clave, String(Date.now())); }catch(e){}
   try{
-    const n = await mesaBorrarTiradas(new Date(Date.now() - MESA_HISTORIAL_HORAS * 3600 * 1000));
-    if(n) console.log(`Mesa: ${n} tiradas de más de ${MESA_HISTORIAL_HORAS} h borradas`);
+    // 🗂 (2026-11-04) Ya no a las 48 h: se guarda este combate y el anterior (comun/registro.js); sin el registro, lo de más de 48 h como antes.
+    const n = typeof Registro !== 'undefined' ? await Registro.borrarViejo('tiradas') : await mesaBorrarTiradas(new Date(Date.now() - MESA_HISTORIAL_HORAS * 3600 * 1000));
+    if(n) console.log(`Mesa: ${n} tiradas viejas borradas`);
   }catch(err){
     console.error('No se pudo limpiar el historial viejo de la Mesa:', err);
   }

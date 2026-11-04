@@ -28,9 +28,11 @@ function enPuntoCiego(atq, def){
 // El +2 del ladrón que viene en sigilo o por la espalda: una copia del ataque con la tirada corregida (o el mismo, si no corresponde).
 function roboBono(ataque, mio, t){
   if(!ataque || !esRobo(ataque.hab) || !ataque.hab.tira || !ataque.hab.tira.stat || !mio || !t) return ataque;
-  const porque = enSigilo(mio) ? 'en sigilo' : enPuntoCiego(mio, t) ? 'por la espalda' : '';
-  if(!porque) return ataque;
-  const tira = {...ataque.hab.tira, bono: num(ataque.hab.tira.bono) + 2, etq: `${ataque.hab.tira.etq || 'Tirada'} (+2 ${porque})`.slice(0, 30)};
+  // (dueño, 2026-11-03: «por la espalda y sigilo está bien que se sumen los bonos para el robo»): +2 en sigilo y +2 por la espalda, acumulables.
+  const motivos = [enSigilo(mio) ? 'sigilo' : '', enPuntoCiego(mio, t) ? 'espalda' : ''].filter(Boolean);
+  if(!motivos.length) return ataque;
+  const extra = 2 * motivos.length;
+  const tira = {...ataque.hab.tira, bono: num(ataque.hab.tira.bono) + extra, etq: `${ataque.hab.tira.etq || 'Tirada'} (+${extra} ${motivos.join(' y ')})`.slice(0, 34)};
   return {...ataque, hab: {...ataque.hab, tira}};
 }
 // Qué se lleva: una unidad al azar del cinturón publicado, sin contar lo ya robado que su ficha todavía no descontó. → {nombre} | {nada} | {manual, nota}

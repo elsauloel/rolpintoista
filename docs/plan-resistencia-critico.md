@@ -45,4 +45,8 @@ Respuestas del dueño a la medición (2026-11-04):
 5. **El crítico ignora la armadura:** «esa es la gracia». No se toca.
 6. **Grupo y creeps juntos**, porque el catálogo es el mismo para los dos. **Orden: primero el catálogo**; después armas, resistencias y
    habilidades — «todo lo vamos a tener que rebalancear y evaluar su peso real».
+7. **Más lugares para los Tipos altos** (dueño, 2026-11-04, «lo estoy parafraseando, después lo definimos bien»): ampliar un poco la P114 para que
+   la resistencia contra Tipos altos no sea tan rara (con la regla nueva ya no es OP). Que Tipo 8 y Tipo 10 aparezcan también en algunos ítems
+   Comunes. Borrador de cantidades de slots: **Tipo 10 en 3 lugares**, **Tipo 8 en 5**, **Tipo 6 en 7**, **Tipo 4 en (casi) todos**; Tipo 12 por
+   definir. Slots que hoy pueden dar resistencia: cabeza, torso (blanda / rígida), manos, piernas, pies, escudo, anillos, cinturón, talismán.
 

@@ -1,6 +1,6 @@
 # Propuesta: piernas (rebalance de la Resistencia a crítico)
 
-Sexta familia del paso 4 del [plan](plan-resistencia-critico.md). **Solo propuesta: no se cambió el catálogo.** Fecha: 2026-11-04.
+Sexta familia del paso 4 del [plan](plan-resistencia-critico.md). **✅ Aprobada y cargada (2026-11-04)**, con un cambio del dueño: «variá algunas de las resistencias al CC por resistencias elementales». Quedó: Grebas de acero templado **+ Res. fuego +1** y Perneras de malla **+ Res. hielo +1** (en vez de Res.CC); Canilleras de milicia y Quijotes de hierro, como en la tabla. Fecha: 2026-11-04.
 Base: el mapa cerrado (las piernas pueden dar resistencia contra **Tipo 4, 6 u 8**; +1 por Tipo, hasta dos Tipos por pieza desde Común; el +2, muy
 raro y desde Buena) y los pesos de siempre: Defensa +1 = 1 · Def. especial +1 = 1 · Res. T4 = 1 · Res. T6 = ½ · Res. T8 = ¼ · Res.CC +1 = ½ ·
 resistencia elemental +1 = ½ · Resistente ×2 = ½ · Evasión ±1 = ±½ (Evasión +1 entera en piezas de piernas livianas) · Sigilo −1 = −¼.

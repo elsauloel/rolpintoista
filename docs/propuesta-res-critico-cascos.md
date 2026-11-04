@@ -44,3 +44,5 @@ Capellina de hierro, Yelmo de nasal, Casco de bandas remachadas, Yelmo de vigía
    Iniciativa −1 ≈ 4; la Cofia de anillas sueltas, 60, ≈ 3). No se tocan acá (no es el tema del crítico); quedan anotados para el repaso general de
    precios de las armaduras.
 2. ¿Te parece bien el Campo de visión −1 en los yelmos cerrados (en vez de −2)? Con −2 pierden 1 punto entero y había que compensarlo con más Defensa.
+
+> **Cambio posterior (dueño, 2026-11-04, al revisar las piernas):** «variá algunas de las resistencias al CC por resistencias elementales, para que no se acumule tanto la Res.CC». Yelmo de cubo: Res.CC +1 → **Res. tóxico +1**; Yelmo cerrado de torneo: Res.CC +1 → **Res. hielo +1**. El Casco de hierro con cresta se queda con su Res.CC.

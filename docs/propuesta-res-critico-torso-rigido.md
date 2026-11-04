@@ -55,3 +55,5 @@ Nota para después: en **piernas** hay dos Buenas con dos Tipos (Perneras de esc
 | **Brigantina remachada** (Buena, 200, liviana) | Def +3 · Res. T4 · Res. T8 · Vida +5 (4¾) → **Def +4 · Res. T4 · Res. T8 · Vida +5 · Res.CC +1** (6¼) |
 | **Coraza de láminas** (Buena, 200) | Def +4 · Res. T8 · Res.CC +1 · Vida +5 (5¼) → **Def +5 · Res. T8 · Res.CC +1 · Vida +10** (6¾) |
 | Armadura de placas, Armadura compuesta | **Quedan como están** (T4 + T6, valor 7½: bien). |
+
+> **Cambio posterior (dueño, 2026-11-04, al revisar las piernas):** «variá algunas de las resistencias al CC por resistencias elementales, para que no se acumule tanto la Res.CC». Brigantina remachada: Res.CC +1 → **Res. ácido +1**.

@@ -30,3 +30,5 @@ estaban antes de la regla nueva: va a la revisión general de precios.
 
 ## Preguntas
 1. ¿Te cierran los tres cambios?
+
+> **Cambio posterior (dueño, 2026-11-04, al revisar las piernas):** «variá algunas de las resistencias al CC por resistencias elementales, para que no se acumule tanto la Res.CC». Manoplas de cota: Res.CC +1 → **Res. fuego +1**.

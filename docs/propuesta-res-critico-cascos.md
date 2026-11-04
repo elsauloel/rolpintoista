@@ -9,11 +9,11 @@ Base: el mapa cerrado (la cabeza puede dar resistencia contra **Tipo 4 o Tipo 10
 pesos de [peso-resistencia-critico.md](peso-resistencia-critico.md), con el Bloqueo a ¾ (no hay Bloqueo en cascos).
 
 ## Resumen
-1. **Cambian 7 de los 58 cascos Comunes y Buenos.** Los Raros y mejores se revisan aparte (como con los escudos).
+1. **Cambian 6 de los 58 cascos Comunes y Buenos** (el Bacinete de recluta queda como excepción, ver abajo). Los Raros y mejores se revisan aparte (como con los escudos).
 2. **Los de Tipo 4 quedan como están** (11): el catálogo ya cobraba ese punto como una Defensa +1, que es lo que vale con la regla nueva.
 3. **Los de Tipo 10 quedaron flojos** (6): se cobraban como un punto entero y ahora valen ¼. Dos, además, restan Campo de visión −2 (el Yelmo de
    herrero con nasal da, hoy, menos que nada).
-4. **El Bacinete de recluta** (Común) tenía Res. Tipo 4 ×2: el ×2 queda para Buena en adelante.
+4. **El Bacinete de recluta** (Común) tiene Res. Tipo 4 ×2: **queda así, como excepción** a «el ×2 desde Buena» (dueño, 2026-11-04).
 5. Quedan 11 cascos contra Tipo 4 (6 Comunes, 5 Buenos) y 6 contra Tipo 10 (2 Comunes, 4 Buenos), como antes: el Tipo 10 ya tenía Comunes.
 
 ## Pesos usados
@@ -29,7 +29,7 @@ pesos de [peso-resistencia-critico.md](peso-resistencia-critico.md), con el Bloq
 |---|---|
 | **Olla Essen heredada de la abuela** (Común, 60) | Res. T10 (¼) → **Defensa +1 · Res. T10 · Res. fuego +1 · Resistente ×2** (2¼). Hierro fundido: aguanta el fuego y los años. |
 | **Yelmo de herrero con nasal** (Común, 60) | Res. T10 · Visión −2 (−¾) → **Defensa +2 · Res. T10 · Visión −1** (1¾). |
-| **Bacinete de recluta** (Común, 50) | Defensa +1 · Res. T4 ×2 · Res.CC +1 · Iniciativa −1 (3) → **Defensa +2 · Res. T4 +1 · Res.CC +1 · Iniciativa −1** (3: el mismo peso, sin el ×2). |
+| ~~Bacinete de recluta~~ (Común, 50) | **Queda como está, con Res. T4 ×2: excepción** (dueño, 2026-11-04: «vamos a dejar el bacinete como está y común, como excepción»; es el ítem favorito de Bizzante). |
 | **Yelmo de cubo** (Buena, 85) | Defensa +2 · Res. T10 · Iniciativa −1 (1¾) → **Defensa +3 · Res. T10 · Res.CC +1 · Iniciativa −1** (3¼). |
 | **Yelmo cerrado de torneo** (Buena, 85) | Defensa +1 · Res. T10 · Visión −1 (¾) → **Defensa +3 · Res. T10 · Res.CC +1 · Visión −1** (3¼). |
 | **Casco de hierro con cresta** (ex Morrión de hierro, Buena, 100) | Res. T10 · Res.Mt +1 · Percepción +1 (1¼) → **Defensa +2 · Res. T10 · Res.CC +1 · Res.Mt +1 · Percepción +1** (3¾). |

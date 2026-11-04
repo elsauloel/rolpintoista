@@ -1,6 +1,10 @@
 # Propuesta: cascos (rebalance de la Resistencia a crítico)
 
 Segunda familia del paso 4 del [plan](plan-resistencia-critico.md). **Solo propuesta: no se cambió el catálogo.** Fecha: 2026-11-04.
+
+> **Renombrados** (dueño, 2026-11-04: «"morrión" es una palabra que casi nadie conoce acá»): Morrión de hierro → **Casco de hierro con
+> cresta**; Morrión de explorador → **Casco de explorador** (mismo `id`; ya cambiado en el catálogo).
+
 Base: el mapa cerrado (la cabeza puede dar resistencia contra **Tipo 4 o Tipo 10**; +1 contra un solo Tipo; el +2, muy raro y desde Buena) y los
 pesos de [peso-resistencia-critico.md](peso-resistencia-critico.md), con el Bloqueo a ¾ (no hay Bloqueo en cascos).
 
@@ -28,7 +32,7 @@ pesos de [peso-resistencia-critico.md](peso-resistencia-critico.md), con el Bloq
 | **Bacinete de recluta** (Común, 50) | Defensa +1 · Res. T4 ×2 · Res.CC +1 · Iniciativa −1 (3) → **Defensa +2 · Res. T4 +1 · Res.CC +1 · Iniciativa −1** (3: el mismo peso, sin el ×2). |
 | **Yelmo de cubo** (Buena, 85) | Defensa +2 · Res. T10 · Iniciativa −1 (1¾) → **Defensa +3 · Res. T10 · Res.CC +1 · Iniciativa −1** (3¼). |
 | **Yelmo cerrado de torneo** (Buena, 85) | Defensa +1 · Res. T10 · Visión −1 (¾) → **Defensa +3 · Res. T10 · Res.CC +1 · Visión −1** (3¼). |
-| **Morrión de hierro** (Buena, 100) | Res. T10 · Res.Mt +1 · Percepción +1 (1¼) → **Defensa +2 · Res. T10 · Res.CC +1 · Res.Mt +1 · Percepción +1** (3¾). |
+| **Casco de hierro con cresta** (ex Morrión de hierro, Buena, 100) | Res. T10 · Res.Mt +1 · Percepción +1 (1¼) → **Defensa +2 · Res. T10 · Res.CC +1 · Res.Mt +1 · Percepción +1** (3¾). |
 | **Casco de fundición** (Buena, 100) | Defensa +1 · Res. T10 · Visión −2 (¼) → **Defensa +3 · Res. T10 · Res. fuego +1 · Visión −1 · Resistente ×2** (3¾). |
 
 ## Los que no cambian (con resistencia)

@@ -204,6 +204,14 @@ function invCardHtml(inv){
       <span>No invocada — la ficha se guardó, lista para volver a invocar</span>
       <button class="inv-reinvocar" data-reinvocar="${inv.id}">Invocar</button>
     </div>` : ''}
+    ${!dormida && inv.turnosAgotados ? `<div class="inv-dormida-bar inv-agotada-bar">
+      <span>⏳ Se le agotaron los turnos. ¿Qué hacés?</span>
+      <span style="display:flex;gap:4px;flex-wrap:wrap">
+        <button class="inv-reinvocar" data-invagot="dormir:${inv.id}" title="Se va del mapa; la ficha queda guardada para volver a invocarla">💤 Desinvocar</button>
+        <button class="inv-reinvocar" data-invagot="sumar:${inv.id}" title="Sigue invocada: elegís cuántos turnos más">➕ Sumar turnos</button>
+        <button class="inv-reinvocar" data-invagot="mano:${inv.id}" title="Se queda con 0 turnos y no se vuelve a preguntar">✋ A mano</button>
+      </span>
+    </div>` : ''}
     <div class="inv-imgwrap">
       <button type="button" class="inv-imgpick" data-invimg="${inv.id}">
         ${inv.imagen ? `<img src="${inv.imagen}" alt="">` : `<span class="inv-imgempty">+<small>Imagen</small></span>`}
@@ -215,7 +223,7 @@ function invCardHtml(inv){
       <div class="inv-cooldownbox">
         <span class="cdl">Cooldown</span>
         <span class="cdn">Dura <input type="number" data-invf="cooldown" data-invid="${inv.id}" value="${inv.cooldown}" min="0" title="Cuántos turnos dura la invocación"> turnos ·</span>
-        <span class="cdn">${dormida ? 'Dormida' : `Quedan <b style="color:var(--brass)">${fmt(num(inv.cooldownActual))}</b>`}</span>
+        <span class="cdn">${dormida ? 'Dormida' : `Quedan <input type="number" data-invf="cooldownActual" data-invid="${inv.id}" value="${fmt(num(inv.cooldownActual))}" min="0" title="Cuántos turnos le quedan (se puede cambiar a mano)" style="color:var(--brass)">`}</span>
       </div>
       <div class="inv-vitalbar">
         <div class="inv-vitalmini hp">
@@ -231,6 +239,7 @@ function invCardHtml(inv){
         <button type="button" class="btn" data-editarinv="${inv.id}" style="flex:1">✎ Editar</button>
         <button type="button" class="btn primary" data-usarinv="${inv.id}" style="flex:1" ${dormida?'disabled':''}>▶ Usar</button>
       </div>
+      ${dormida ? '' : `<button type="button" class="btn" data-desinvocar="${inv.id}" style="width:100%;margin-top:6px" title="La duerme: se va del mapa y la ficha queda guardada para volver a invocarla">💤 Desinvocar</button>`}
     </div>
   </div>`;
 }

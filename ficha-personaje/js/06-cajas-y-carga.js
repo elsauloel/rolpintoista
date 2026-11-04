@@ -73,6 +73,7 @@ document.addEventListener('input', e => {
     if(t.type === 'checkbox'){ inv[campo] = t.checked; renderInvocaciones(); return; }
     inv[campo] = noNumericos.includes(campo) ? t.value : num(t.value);
     if(campo === 'cooldown') inv.cooldownActual = Math.min(num(inv.cooldownActual), num(inv.cooldown));
+    if(campo === 'cooldownActual'){ inv.cooldownActual = Math.max(0, Math.round(num(t.value))); if(inv.cooldownActual > 0) delete inv.turnosAgotados; }   // ⏳ a mano (2026-11-04)
     return;
   }
   if(t.dataset.invattr !== undefined && t.dataset.invid){
@@ -474,6 +475,32 @@ document.addEventListener('click', async e => {
     return;
   }
   if(b.dataset.dupinv){ duplicarInvocacion(b.dataset.dupinv); return; }
+  // 💤 Desinvocar / ⏳ turnos agotados (2026-11-04, dueño: «que este turno se pueda modificar a mano… un botón para desactivar, desinvocar, dormirlas…
+  // cuando llega a cero ese contador, debe preguntársele al jugador qué quiere hacer»). Lo mismo que pregunta el mapa (vtt-hexgrid/js/54): dormirla la saca
+  // del mapa (el vigilante de js/54 borra su token), sumar le da más turnos, a mano la deja en 0 sin volver a preguntar.
+  if(b.dataset.desinvocar || b.dataset.invagot){
+    const [op, id] = b.dataset.desinvocar ? ['dormir', b.dataset.desinvocar] : b.dataset.invagot.split(':');
+    const inv = S.invocaciones.find(x => x.id === id);
+    if(!inv) return;
+    if(op === 'dormir'){
+      if(b.dataset.desinvocar && !(await Confirmar.preguntar(`¿Desinvocar a ${inv.nombre || 'la invocación'}? Se va del mapa; la ficha queda guardada para volver a invocarla.`, {titulo: 'Desinvocar', icono: '💤', si: 'Desinvocar'}))) return;
+      inv.activa = false;
+      delete inv.turnosAgotados;
+      toast(`💤 ${inv.nombre} desinvocada`);
+    }else if(op === 'sumar'){
+      const txt = await Confirmar.texto(`¿Cuántos turnos más le das a ${inv.nombre}?`, {titulo: 'Sumar turnos', icono: '➕', valor: '1', sugerencias: ['1', '2', '3', '5'], si: 'Sumar', max: 3});
+      const n = Math.round(num(txt));
+      if(!(n > 0)) return;
+      inv.cooldownActual = num(inv.cooldownActual) + n;
+      delete inv.turnosAgotados;
+      try{ mesaLinea(`⏳ ${inv.nombre}: +${n} turno${n === 1 ? '' : 's'} de invocación`, 'recordatorio'); }catch(e){}
+    }else if(op === 'mano'){
+      delete inv.turnosAgotados;
+      try{ mesaLinea(`✋ ${inv.nombre}: se le agotaron los turnos, se resuelve a mano`, 'recordatorio'); }catch(e){}
+    }
+    renderInvocaciones();
+    return;
+  }
   if(b.dataset.reinvocar){
     const inv = S.invocaciones.find(x=>x.id===b.dataset.reinvocar);
     if(inv){

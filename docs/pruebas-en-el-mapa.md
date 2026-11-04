@@ -284,6 +284,11 @@
 
 ### ▶ Para la próxima tanda de pruebas en el mapa (2026-11-03)
 
+- [ ] **💤 Invocaciones en la ficha (2026-11-04, dueño: «que este turno se pueda modificar a mano… un botón para desactivar, desinvocar, dormirlas…
+  cuando llega a cero ese contador, debe preguntársele al jugador»)**: en el cuadro de la invocación, «Quedan» es un campo (escribir 5 → queda en 5);
+  «💤 Desinvocar» (pregunta, la duerme y su token se va del mapa); con los turnos en 0 después de un Mantenimiento, la barra «⏳ Se le agotaron los
+  turnos» con 💤 Desinvocar / ➕ Sumar turnos / ✋ A mano (lo mismo que ya preguntaba el mapa). Probado solo el dibujo del cuadro.
+
 - [ ] **🗂 Registro del combate (2026-11-04, dueño: «un jugador estaba convencido de que el punto de partida no era como lo habíamos dejado, y no
   teníamos un historial de movimientos o duelos»)** — **antes, pegar las reglas nuevas de Firestore**. GM: pasar el mapa a ⚔ combate → sale
   «¿Empezás un registro nuevo?» (Empezar / Seguir con el mismo). Mover tokens → en el 📜 Historial, «🦶 se movió N casillas: de c·f a c·f (ronda R)»

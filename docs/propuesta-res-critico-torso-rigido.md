@@ -29,7 +29,7 @@ Buena 170 ≈ 5¾, 185 ≈ 6–6½, 200 ≈ 6½–7½.
 | **Armadura de placas** (Buena, 185) | Def +6 · Res. T4 · Res. T6 · Res.CC +1 · Sigilo −2 (7½) → **Def +6 · Res. T4 · Res.CC +2 · Sigilo −2** (7½) |
 | **Armadura compuesta** (Buena, 200) | Def +5 · Res. T4 · Res. T6 · Vida +10 · Res.CC +1 · Evasión −1 (7½) → **Def +5 · Res. T4 · Vida +10 · Res.CC +2 · Evasión −1** (7½) |
 
-Quedarían: Tipo 4 en 5 Comunes y 9 Buenas; Tipo 6 en 2 Comunes y 1 Buena (Cota de malla fina); **Tipo 8 en 1 Común y 3 Buenas**.
+Quedarían: Tipo 4 en 6 Comunes y 9 Buenas; Tipo 6 en 2 Comunes y 1 Buena (Cota de malla fina); **Tipo 8 en 1 Común y 3 Buenas**.
 
 Si en la pregunta 1 se prefiere **dejar las dos resistencias**: Placas y Compuesta quedan como están; Hierro batido → Def +5 · Res. T8 · Res. T4
 (6¼); Brigantina → Def +4 · Res. T8 · Res. T4 · Vida +5 (5¾).

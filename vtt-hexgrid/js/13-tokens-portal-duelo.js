@@ -2932,9 +2932,10 @@ function demoraAviso(tokenId, caso, o){
       ? `${vos ? 'Terminó tu turno y, por la Demora, bajaste' : 'Terminó su turno y, por la Demora, bajó'} ${lug}: ${vos ? 'ahora estás' : 'ahora está'} ${o.hasta}.º en el orden de turnos.`
       : `${vos ? 'Bajás' : 'Baja'} ${lug} en el orden de turnos: ${vos ? 'ahora estás' : 'ahora está'} ${o.hasta}.º (${vos ? 'estabas' : 'estaba'} ${o.desde}.º).${o.yaJugo ? (vos ? ' Ya jugaste esta ronda: se nota en la próxima.' : ' Ya jugó esta ronda: se nota en la próxima.') : ''}`;
   const vos = !creep, titulo = caso === 'aplicada' ? `${quien} bajó en el orden de turnos (Demora)` : `${quien} fue demorado${por ? ` por ${por}` : ''}`;
-  if(creep){ momentoAbrir({tipo: 'demora', icono: '⏬', titulo, resultado: textos(false), estado: 'listo', datos: {chico: true}}); return; }
+  const anim = caso === 'al-terminar' ? {} : {demoraToken: tokenId, demoraMovio: true};   // ⏬ la lista de turnos animada en todas las pantallas (js/100)
+  if(creep){ momentoAbrir({tipo: 'demora', icono: '⏬', titulo, resultado: textos(false), estado: 'listo', datos: {chico: true, ...anim}}); return; }
   momentoAbrir({tipo: 'demora', icono: '⏬', titulo, resultado: textos(false), estado: 'listo',
-    datos: {...(para ? {paraUid: para} : {}), aviso: true, boton: 'Entendido',
+    datos: {...(para ? {paraUid: para} : {}), ...anim, aviso: true, boton: 'Entendido',
       pasos: [{titulo: vos ? (caso === 'aplicada' ? '⏬ Bajaste en el orden de turnos' : '⏬ Fuiste demorado') : `⏬ ${nombre} ${caso === 'aplicada' ? 'bajó en el orden de turnos' : 'fue demorado'}`, texto: textos(vos)}],
       veredicto: {tono: 'malo', grande: 'Demora', chico: caso === 'al-terminar' ? `baja ${lug} al terminar el turno` : `${o.hasta}.º en el orden de turnos`}}});
 }

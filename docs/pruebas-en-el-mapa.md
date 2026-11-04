@@ -284,6 +284,12 @@
 
 ### ▶ Para la próxima tanda de pruebas en el mapa (2026-11-03)
 
+- [ ] **⏬ La Demora animada (2026-11-04, dueño: «que se desplegara la lista de iniciativa, y se vea una animación de los nombres intercambiando
+  posiciones… si sucediera en el medio de un duelo, que el duelo se minimice brevemente… y al terminar la animación el duelo se vuelve a desplegar»)**:
+  `vtt-hexgrid/js/100-demora-animada.js`. Probado en «Claude · pruebas» cambiando el orden en memoria (la lista plegada se despliega, las filas se
+  deslizan con el demorado resaltado y vuelve a plegarse). Falta: una Demora real en un duelo (el cuadro se aparta hacia su token y vuelve), vista desde
+  dos pantallas.
+
 - [ ] **✚ El GM revive un token caído (2026-11-04, dueño: «el GM al seleccionarlo vea entre sus botones uno para revivirlo, tanto para creeps como para
   jugadores»)**: en el anillo de un token caído (creep, personaje o invocación), el ✚ (solo el GM) → «¿Con cuánta vida vuelve?» (25 / 50 / 100 % o un
   número) → vuelve Titilando; un personaje deja de estar inconsciente. Verificado que el ✚ aparece solo si está caído (Basilio, en memoria); falta

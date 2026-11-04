@@ -167,7 +167,7 @@ const ESTADOS_PRESET = [
   {nombre:'Desafiante', polaridad:'buff', turnos:2, mods:[{stat:'def', val:2}, {stat:'armadmg', val:2}],
     detalle:'Desafiante: provocó a un rival y lo espera plantado: +2 a la Defensa y +2 a la Defensa especial, 2 turnos (lo que dura el Provocado). ⚙ Automatizado.'},
   {nombre:'Piel de hierro', polaridad:'buff', turnos:2, mods:[{stat:'def', val:6}, {stat:'armadmg', val:6}, {stat:'tipo1', val:1}, {stat:'tipo2', val:1}, {stat:'tipo3', val:1}, {stat:'tipo4', val:1}, {stat:'tipo5', val:1}],
-    detalle:'Piel de hierro: +6 a la Defensa, +6 a la Defensa especial y +1 a la Resistencia a crítico de todo Tipo, 2 turnos. ⚙ Automatizado.'},
+    detalle:'Piel de hierro: +(3 + su nivel) a la Defensa y a la Defensa especial (nivel 1: +4; nivel 3: +6) y +1 a la Resistencia a crítico de todo Tipo, 2 turnos. ⚙ Automatizado.'},
   {nombre:'Interpuesto', polaridad:'buff', turnos:1, unGolpe:true, mods:[{stat:'def', val:2}],
     detalle:'Interpuesto: se metió en el golpe que iba para un aliado: +2 a la Defensa contra ese golpe (se va con el golpe, o al empezar su turno). ⚙ Automatizado.'},
   // Redoble (2026-10-25, dueño: el Support, «Redoble de tambores»): +2 a los No2 máximos durante su próximo turno completo (el No2 se recarga al

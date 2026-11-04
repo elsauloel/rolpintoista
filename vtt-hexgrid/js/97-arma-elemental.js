@@ -58,6 +58,7 @@ async function armaElementalDirecto(yo, mio, t, ataque){
   const efecto = `+${def.que.replace(/^\+/, '')} por golpe`;
   const mismo = mio && mio.id === t.id;
   const ok = r && !r.manual && !r.sinEfecto;
+  try{ if(yo && yo.ref && typeof Duelo !== 'undefined' && Duelo.pagoHab) Duelo.pagoHab(yo.ref, null); }catch(e){}   // ya se usó: no queda para devolver
   try{ mesaLinea(`${def.icono} ${quien} ${mismo ? 'encanta su' : `le encanta a ${nom} su`} ${arma ? queArma : 'arma'}: ${def.nombre.toLowerCase()} ${turnos} turnos — ${efecto}${ok ? '' : ` (${(r && r.nota) || 'a mano'})`}`, 'recordatorio'); }catch(e){}
   if(ok){
     const para = t.tipo === 'creep' ? (fbUsuario && fbUsuario.uid) : t.duenoUid;

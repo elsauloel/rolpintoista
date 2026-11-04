@@ -786,8 +786,31 @@ function bnElegirObjetivo(cfg, flechaId){
   const objetivoFijo = bn.objetivoFijo || null;   // 🐈‍⬛ Enyetar: el enemigo ya se eligió en su menú (js/38)
   bn.objetivoFijo = null;
   dueloElegirObjetivoMapa({yo: cfg.yo, ataque: fl ? {...atq, flecha: fl} : atq, objetivoFijo, conSuelto: !!cfg.suelto, alSuelto: () => { reabrir(); if(cfg.suelto) cfg.suelto(); },
-    alCancelar: () => { if(em && typeof acPreguntarVolverAbajo === 'function') acPreguntarVolverAbajo(em); },
+    alCancelar: () => { bnDevolverSiCancelo(cfg); if(em && typeof acPreguntarVolverAbajo === 'function') acPreguntarVolverAbajo(em); },
     ...(fl ? {alDisparar: () => bnDispararFlecha(fl.id, arma)} : {})});
+}
+/* ↩ Se canceló la elección del objetivo de una habilidad ya cobrada (2026-11-04, el Arma elemental: «cobra antes de elegir a quién y al cancelar no
+   devuelve»): se le devuelve lo que pagó (lo anotado en Duelo.pagoHab), con el aviso. El nombre se compara sin la variante («Arma elemental: Arma ígnea»). */
+const bnNombreBase = x => String(x || '').split(':')[0].trim().toLowerCase();
+function bnDevolverSiCancelo(cfg){
+  const atq = cfg && cfg.ataque, ref = cfg && cfg.yo && cfg.yo.ref;
+  if(!ref || typeof Duelo === 'undefined' || !Duelo.pagoHabTomar) return;
+  const nomHab = atq && (atq.habNombre || (atq.hab && atq.hab.nombre));
+  const p = Duelo.pagoHabTomar(ref);
+  if(!p || !nomHab || bnNombreBase(p.nombre) !== bnNombreBase(nomHab)) return;
+  const quien = (cfg.yo && cfg.yo.nombre) || 'Tu personaje';
+  editarPersonajeMapa(String(ref), S => {
+    const hechos = [];
+    if(num(p.no2) > 0){ S.nitros = num(S.nitros) + num(p.no2); hechos.push(`${fmt(num(p.no2))} No2`); }
+    if(num(p.sp) > 0){ S.spGastado = Math.max(0, num(S.spGastado) - num(p.sp)); hechos.push(`${fmt(num(p.sp))} SP`); }
+    if(num(p.hp) > 0){ S.hp = num(S.hp) + num(p.hp); hechos.push(`${fmt(num(p.hp))} de vida`); }
+    const k = 'hab:' + p.habId;
+    if(p.habId && S.ataquesArma && num(S.ataquesArma[k]) > 0) S.ataquesArma = {...S.ataquesArma, [k]: num(S.ataquesArma[k]) - 1};
+    const txt = `↩ ${quien}: canceló ${p.nombre || 'la habilidad'}${hechos.length ? ` — se le devolvió ${hechos.join(' y ')}` : ''}`;
+    toast(txt);
+    try{ mesaLinea(txt, 'recordatorio'); }catch(err){}
+    return true;
+  }).catch(err => console.error('No se pudo devolver lo cobrado:', err));
 }
 // La línea de una habilidad en la Mesa, a nombre del personaje (como mesaPublicarHabilidad de la ficha).
 function bnMesaHabilidad(nombre, detalle){

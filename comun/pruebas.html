@@ -53,7 +53,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
-<script src="estados-presets.js?v=20261103t14"></script>
+<script src="estados-presets.js?v=20261104i"></script>
 <script src="estados-aplicar.js?v=20261104ae"></script>
 <script src="recibidos.js?v=20261103pm"></script>
 <script src="tokens-auto.js"></script>
@@ -104,7 +104,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261104ae3"></script>
+<script src="duelo.js?v=20261104i"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -6791,6 +6791,11 @@ prueba('🫳 Bolsillo ajeno (2026-11-03): de fábrica en Choque liviano, Sigilo 
     Combatiente.roboOro(1, () => 0), Combatiente.roboOro(3, () => 0.99), Combatiente.roboOro(2, () => 0.5),
     Combatiente.oroConRobos(10, {oroRobado: 6}), Combatiente.oroConRobos(10, {oroPerdido: 15}), Combatiente.oroConRobos(10, {})],
     [1, true, true, 'sigilo', 'percepcion', 'Robo', 3, true, 1, 18, 8, 16, 0, 10]);
+});
+prueba('↩ Cancelar la elección del objetivo (2026-11-04): lo cobrado por la habilidad se puede tomar una vez para devolverlo', () => {
+  Duelo.pagoHab('pj-x', {habId: 'h1', nombre: 'Arma elemental', no2: 2, sp: 1, hp: 0, cd: -1});
+  const a = Duelo.pagoHabTomar('pj-x'), b = Duelo.pagoHabTomar('pj-x');
+  igual([a && a.no2, a && a.sp, a && a.nombre, b], [2, 1, 'Arma elemental', null]);
 });
 prueba('🗄 Referencia (2026-11-03): los creeps de fábrica sin auditar salen del pool de campaña y van a «Referencia»', () => {
   const ref = CREEPS_BASE.filter(c => c.pool !== 'esencial' && Biblioteca.sinAuditarDeFabrica(c));

@@ -589,6 +589,8 @@ const Duelo = (() => {
      enseguida lo lleva (`ataque.pagoHab`): si se cancela y no cuenta, quien maneja al atacante lo devuelve (gancho `devolverHab`). */
   const pagosHab = new Map();
   function pagoHab(ref, pago){ if(!ref) return; if(pago) pagosHab.set(String(ref), {...pago, cuando: Date.now()}); else pagosHab.delete(String(ref)); }
+  // ↩ Lo cobrado que todavía no llevó ningún duelo (se canceló la elección del objetivo, 2026-11-04): lo devuelve y lo borra; null si no hay o es viejo.
+  function pagoHabTomar(ref, maxMs){ if(!ref) return null; const p = pagosHab.get(String(ref)); pagosHab.delete(String(ref)); return p && Date.now() - _num(p.cuando) <= (maxMs || 10 * 60000) ? p : null; }
   const pagoHabTxt = p => [_num(p.no2) > 0 ? `${_fmt(_num(p.no2))} No2` : '', _num(p.sp) > 0 ? `${_fmt(_num(p.sp))} SP` : '', _num(p.hp) > 0 ? `${_fmt(_num(p.hp))} de vida` : '',
     _num(p.cd) >= 0 ? 'su cooldown' : ''].filter(Boolean).join(', ');
   // tokDef = un token del mapa ({id, nombre, tipo, fichaId, duenoUid}); miTokenId = el token del atacante (o ''); contraDe = id del duelo que se contraataca.
@@ -3696,5 +3698,5 @@ const Duelo = (() => {
     }catch(e){ /* sin permiso o sin reglas nuevas: no pasa nada */ }
   }
 
-  return {textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, fraseResumen, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, apartar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
+  return {textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, pagoHabTomar, fraseResumen, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, apartar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
 })();

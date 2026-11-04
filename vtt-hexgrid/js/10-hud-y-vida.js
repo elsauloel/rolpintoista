@@ -769,17 +769,23 @@ async function hudHpAplicar(t, texto){
 // La descripción del estado para el globo (dueño, 2026-11-04: «debe mostrarte la descripción del estado con hover»): la suya; si no trae
 // (los que pone una habilidad de creep, p. ej. Piel de hierro), la del preset con ese nombre; si tampoco, lo que hace armado de sus mods.
 function hudDetalleEstado(e){
+  // (2026-11-04: la Piel de hierro decía +6 y sumaba +4 —escala con el nivel—): al texto se le suma lo que este estado suma de verdad, de sus mods.
+  const reales = hudModsEstadoTxt(e);
   const propio = String((e && e.detalle) || '').trim();
-  if(propio) return propio;
   const nom = String((e && e.nombre) || '').trim().toLowerCase();
   const pre = typeof ESTADOS_PRESET !== 'undefined' && Array.isArray(ESTADOS_PRESET) ? ESTADOS_PRESET.find(p => p && String(p.nombre || '').trim().toLowerCase() === nom) : null;
-  if(pre && String(pre.detalle || '').trim()) return String(pre.detalle).trim();
+  const texto = propio || (pre && String(pre.detalle || '').trim()) || '';
+  if(texto) return reales ? `${texto}\nEn este: ${reales}.` : texto;
+  return hudModsEstadoTxt(e, true);
+}
+function hudModsEstadoTxt(e, conTodo){
   const etq = (typeof CreepCalculo !== 'undefined' && CreepCalculo.STAT_LABEL) || {};
   const extra = {def: 'Defensa', armadmg: 'Def. especial', dmg: 'Daño', dmgesp: 'Ef.Esp', pdgmg: 'PdG.Esp', bloqueo: 'Bloqueo', percepcion: 'Percepción', sigilo: 'Sigilo', sp: 'SP máx.', hp: 'Vida máx.'};
   const partes = (Array.isArray(e && e.mods) ? e.mods : []).filter(m => m && m.stat && num(m.val)).map(m => `${etq[m.stat] || extra[m.stat] || m.stat} ${num(m.val) > 0 ? '+' : ''}${fmt(num(m.val))}`);
   if(num(e && e.escudo) || num(e && e.escudoMax)) partes.push(e.excedente ? `Vida extra ${fmt(num(e.escudo))}` : `Escudo ${fmt(num(e.escudo))}/${fmt(num(e.escudoMax))}`);
   if(num(e && e.hpturno)) partes.push(`${num(e.hpturno) > 0 ? '+' : ''}${fmt(num(e.hpturno))} de vida por turno`);
   if(!partes.length) return '';
+  if(!conTodo) return partes.join(' · ');
   const dura = e.permanente ? 'no vence' : num(e.turnos) ? `${fmt(num(e.turnos))} turno${num(e.turnos) === 1 ? '' : 's'}` : '';
   return partes.join(' · ') + (dura ? ` (${dura})` : '');
 }

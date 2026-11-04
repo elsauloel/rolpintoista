@@ -229,7 +229,10 @@ function arrastreBonoVigente(mioId){
 function arrastreBonoUsar(mio, t, ataque, tiro){
   const b = mio && t && ataque ? arrastreBonoVigente(mio.id) : null;
   if(!b || b.contra !== t.id || num(ataque.arrastra) > 0) return {tiro, ataque};
-  if(ataque.hab && !(['enemigo', 'area', 'cono', 'linea', 'onda'].includes(ataque.hab.objetivo) && ataque.hab.tira && ataque.hab.tira.stat)) return {tiro, ataque};
+  // Solo un ATAQUE (2026-11-04: el +2 se sumaba también a la tirada del robo): con su arma, o una habilidad que tire la PdG física contra un rival;
+  // no un robo, ni una maldición o un hechizo (PdG.Esp, Ef.Esp…).
+  if(ataque.hab && !(['enemigo', 'area', 'cono', 'linea', 'onda'].includes(ataque.hab.objetivo) && ataque.hab.tira && ataque.hab.tira.stat === 'pdg'
+    && !(typeof esRobo === 'function' && esRobo(ataque.hab)))) return {tiro, ataque};
   arrastreBonos.delete(mio.id);
   mesaLinea(`🪝 ${nombreDe(mio)} ataca a ${b.nombre} recién arrastrado: +2 a la Probabilidad de Golpe.`, 'recordatorio');
   if(ataque.hab){

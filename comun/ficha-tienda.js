@@ -216,7 +216,7 @@ const FichaTienda = (() => {
     const pct = Number(t.ajustePrecio) || 0;
     const extra = pct ? ` · ${pct < 0 ? '-' : '+'}${Math.abs(pct)}%` : '';
     const pv = Number(t.ajusteVenta) || 0;
-    const sk = conStockActivo(st) && t.stock ? ` · piezas únicas: lo que se compra se repone (quedan ${Math.max(0, t.stock.reserva - t.stock.reposiciones)} reposiciones)` : '';
+    const sk = t.tamano === 'inicio' ? ' · 🎒 nada se agota: cada uno compra lo suyo' : conStockActivo(st) && t.stock ? ` · piezas únicas: lo que se compra se repone (quedan ${Math.max(0, t.stock.reserva - t.stock.reposiciones)} reposiciones)` : '';
     return `Tienda · ${t.tamanoLabel || 'vendedor'}${extra}${pv ? ` · venta ${pv < 0 ? '-' : '+'}${Math.abs(pv)}%` : ''}${sk}`;
   }
 

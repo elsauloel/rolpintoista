@@ -742,9 +742,9 @@ function itemCardHtml(item, esGarantizado){
     ${modsHtml && !item.detalle ? `<div class="cat-mods">${modsHtml}</div>` : ''}   <!-- la línea verde de bonos solo si no hay texto: repetía lo mismo (dueño, 2026-11-03) -->
     ${ItemCorto.grillaHtml(item)}
     <div class="cat-card-pie">
-      ${esGarantizado ? '<span class="cat-garantizado">Clásico · siempre</span>' : (tiendaActual.gondola || []).includes(item.id) ? `<span class="cat-garantizado" title="Gastable de la góndola: ${G.UNIDADES_GONDOLA} unidades al publicar">🧺 Góndola ×${G.UNIDADES_GONDOLA}</span>` : '<span></span>'}
+      ${esGarantizado && tiendaActual.tamano === 'inicio' ? '<span class="cat-garantizado" title="Tienda de inicio: no se agota, cada jugador compra lo suyo">🎒 No se agota</span>' : esGarantizado ? '<span class="cat-garantizado">Clásico · siempre</span>' : (tiendaActual.gondola || []).includes(item.id) ? `<span class="cat-garantizado" title="Gastable de la góndola: ${G.UNIDADES_GONDOLA} unidades al publicar">🧺 Góndola ×${G.UNIDADES_GONDOLA}</span>` : '<span></span>'}
       <span class="acciones">
-        ${esGarantizado ? '' : `<button type="button" class="iconbtn" data-reroll="${esc(item.id)}" title="Cambiar este ítem por otro del mismo rubro, sorteado con las rarezas de la tienda">🎲 Otro</button>`}
+        ${esGarantizado && !(tiendaActual.tamano === 'inicio' && !item.consumible) ? '' : `<button type="button" class="iconbtn" data-reroll="${esc(item.id)}" title="${tiendaActual.tamano === 'inicio' ? 'Cambiar este ítem por otro de su misma categoría (Común si queda)' : 'Cambiar este ítem por otro del mismo rubro, sorteado con las rarezas de la tienda'}">🎲 Otro</button>`}
         <button type="button" class="iconbtn" data-ver="${esc(item.id)}">Ver</button>
       </span>
     </div>

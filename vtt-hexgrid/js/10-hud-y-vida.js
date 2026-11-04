@@ -301,10 +301,11 @@ async function danioCreep(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     const desperto = num(r.recibido) > 0 && typeof suenoQuitarDe === 'function' && suenoQuitarDe(sc.estados);   // 💤 el daño lo despierta (js/87)
     return {r, previo, nuevo: fenix ? 0 : sc.hp, bronca, fenix, hpFenix: sc.hp, punteria, golpeCae, golpeAcum, golpeTope, golpeHab, desperto};
   };
-  if(o && o.simular){
-    const sc0 = creepPrivadoDe(t.fichaId);
+  if(o && o.simular){   // `o.sim`: seguir sobre lo que dejó un golpe simulado antes (el elemental del arma después del golpe)
+    const sc0 = o.sim || creepPrivadoDe(t.fichaId);
     if(!sc0) return null;
-    return {...calcular(structuredClone(sc0)), simulado: true};
+    const sc = o.sim ? sc0 : structuredClone(sc0);
+    return {...calcular(sc), simulado: true, sim: sc};
   }
   const res = await modificarCreep(t.fichaId, calcular);
   toast(golpeTexto(nombreDe(t), golpe, res.r, res.previo, res.nuevo));
@@ -436,7 +437,8 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     if(!parte.exists || !ficha.exists) throw new Error('La ficha todavía no se guardó en la mesa');
     const datos = JSON.parse(parte.data().json || '{}');
     const datosEf = partEf.exists ? JSON.parse(partEf.data().json || '{}') : null;
-    const efectos = datosEf && Array.isArray(datosEf.efectos) ? datosEf.efectos : (datos.efectos || []);
+    const efectos = o && o.simular && o.sim ? o.sim.efectos : datosEf && Array.isArray(datosEf.efectos) ? datosEf.efectos : (datos.efectos || []);
+    if(o && o.simular && o.sim) datos.hp = o.sim.hp;   // 🧮 seguir sobre lo que dejó el golpe simulado
     const efectosAntes = JSON.stringify(efectos);
     const rs = ficha.data().resumen || {};
     if(rs.def === undefined) throw new Error('SIN_DEF');
@@ -450,7 +452,7 @@ async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : num(rs.def) + extra) + num(restaExtra || 0), efectos, {...(o || {}), defPartes});
     mitiMitiPartir(r, prot);
     const previo = num(datos.hp);
-    if(o && o.simular) return {r, previo, nuevo: Math.max(0, previo - r.recibido), simulado: true};   // 🧮 la vista previa: sin escribir (2026-11-04)
+    if(o && o.simular) return {r, previo, nuevo: Math.max(0, previo - r.recibido), simulado: true, sim: {efectos, hp: Math.max(0, previo - r.recibido)}};   // 🧮 la vista previa: sin escribir (2026-11-04)
     datos.hp = Math.max(0, previo - r.recibido);
     // 💍 El Anillo del último aliento (2026-10-18): una vez por día, el golpe que lo dejaría en 0 lo deja en 1 (comun/ficha-acciones.js, fijarHp).
     let aliento = false;
@@ -547,7 +549,7 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     const [parte, ficha] = await Promise.all([tx.get(parteRef), tx.get(base)]);
     if(!parte.exists || !ficha.exists) throw new Error('La ficha todavía no se guardó en la mesa');
     const datos = JSON.parse(parte.data().json || '{}');
-    const inv = (datos.invocaciones || []).find(i => i && i.id === invId);
+    const inv = o && o.simular && o.sim ? o.sim : (datos.invocaciones || []).find(i => i && i.id === invId);   // 🧮 seguir sobre lo que dejó el golpe simulado
     if(!inv) throw new Error('La invocación ya no existe');
     if(!Array.isArray(inv.estados)) inv.estados = [];
     const viejoI = !num(inv.golpeTurno);
@@ -559,7 +561,7 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     const r = resolverGolpe(golpe, (ignoraDef ? num(restaIgnorando || 0) : defensasDeInv(inv).def + extra) + num(restaExtra || 0), inv.estados, {...(o || {}), defPartes});
     mitiMitiPartir(r, prot);
     const previo = num(inv.hp);
-    if(o && o.simular) return {r, previo, nuevo: Math.max(0, previo - r.recibido), simulado: true};   // 🧮 la vista previa: sin escribir (2026-11-04)
+    if(o && o.simular){ inv.hp = Math.max(0, previo - r.recibido); return {r, previo, nuevo: inv.hp, simulado: true, sim: inv}; }   // 🧮 la vista previa: sin escribir (2026-11-04)
     inv.hp = Math.max(0, previo - r.recibido);
     const rs = ficha.data().resumen || {};
     const desperto = num(r.recibido) > 0 && typeof suenoQuitarDe === 'function' && suenoQuitarDe(inv.estados);   // 💤 el daño lo despierta (js/87)

@@ -289,6 +289,10 @@
   (Defensa, escudos, Vida extra, Armadura arcana, Miti-Miti, el elemental del arma) y el total que va a entrar, antes del 💔 Aplicar; al aplicarlo tiene que
   dar lo mismo. (`dueloAplicarDano(d, {simular: true})` + `danioPj/Creep/Inv` con `o.simular`; `cfgEscuchar.previa` en comun/duelo.js.) Ver un golpe a un
   personaje con escudo y uno a un creep. Probado solo el dibujo, con una cuenta inventada.
+  **Ajuste (2026-11-04, dueño: «arreglá los dos»)**: (1) el elemental del arma en la previa se calcula sobre lo que dejó el golpe (escudos, Vida extra,
+  Armadura arcana, Miti-Miti) — verificado en el mapa de «Claude · pruebas» llamando al cálculo (Basilio con un escudo de 8: golpe 5 − Def 3 → 2 al
+  escudo, ácido 4 al escudo, entran 0; Rockardo: Def 11 frena el golpe, entran los 4 de ácido); (2) el **🔮 Orbe salvaje** se tira con la tirada de
+  daño (`dano.salvaje`, se anuncia ahí y se ve en el paso 5) y al aplicar se usa ese; falta verlo con un atacante que lleve el Orbe.
 
 - [ ] **💤 Invocaciones en la ficha (2026-11-04, dueño: «que este turno se pueda modificar a mano… un botón para desactivar, desinvocar, dormirlas…
   cuando llega a cero ese contador, debe preguntársele al jugador»)**: en el cuadro de la invocación, «Quedan» es un campo (escribir 5 → queda en 5);

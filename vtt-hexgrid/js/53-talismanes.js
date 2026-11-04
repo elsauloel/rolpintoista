@@ -84,18 +84,37 @@ async function talAlDanoEspecial(d){
   }
 }
 // El Orbe salvaje: la tirada (antes del daño). → {mult, propio, d, nombre} o null si quien atacó no lo lleva.
-async function talSalvajeTirar(d){
-  const ta = tokens.get(d.atacante.tokenId), eq = talEquipoDe(ta);
+// ¿Lleva un Orbe salvaje quien ataca? → {tipo: true | 'domado', nombre} o null.
+function talSalvajeTipo(d){
+  const ta = tokens.get(d.atacante && d.atacante.tokenId), eq = talEquipoDe(ta);
   if(!eq) return null;
   let tipo = null, nombre = '';
   if(eq.creep){ const o = Combatiente.equipoPuesto(eq.creep).find(i => i && i.orbeSalvaje === 'domado') || Combatiente.equipoPuesto(eq.creep).find(i => i && i.orbeSalvaje); if(o){ tipo = o.orbeSalvaje; nombre = o.nombre; } }
   else if(eq.resumen.orbeSalvaje){ tipo = eq.resumen.orbeSalvaje === 'domado' ? 'domado' : true; nombre = eq.resumen.orbeSalvajeNombre || 'Orbe salvaje'; }
-  if(!tipo) return null;
-  const dado = 1 + Math.floor(Math.random() * 6), x = Combatiente.orbeSalvaje({orbeSalvaje: tipo}, dado);
-  const txt = x.mult > 1 ? `¡el daño especial sale ${x.mult === 3 ? 'triple' : 'doble'}!` : x.propio ? `el mismo daño que le entre a ${d.defensor.nombre} le entra también a ${d.atacante.nombre}` : 'no pasa nada';
-  try{ await mesaPublicar(`${d.atacante.nombre} · ${nombre}`, {formula: '1d6', rolls: [dado], mod: 0, total: dado, quien: d.atacante.nombre, ...(ta && ta.tipo === 'creep' ? {desde: 'gm'} : {})}); }catch(err){}
-  try{ mesaLinea(`🔮 ${nombre} de ${d.atacante.nombre} (1d6 → ${dado}): ${txt}`, 'recordatorio'); }catch(err){}
-  return {mult: x.mult, propio: x.propio, d: dado, nombre};
+  return tipo ? {tipo, nombre} : null;
+}
+// El d6 (sin publicar) → {mult, propio, d, nombre} o null.
+function talSalvajeRodar(d){
+  const t = talSalvajeTipo(d);
+  if(!t) return null;
+  const dado = 1 + Math.floor(Math.random() * 6), x = Combatiente.orbeSalvaje({orbeSalvaje: t.tipo}, dado);
+  return {mult: x.mult, propio: x.propio, d: dado, nombre: t.nombre};
+}
+// La Mesa: el d6 y qué pasa.
+async function talSalvajeAnunciar(d, sv){
+  if(!sv) return;
+  const ta = tokens.get(d.atacante && d.atacante.tokenId);
+  const txt = sv.mult > 1 ? `¡el daño especial sale ${sv.mult === 3 ? 'triple' : 'doble'}!` : sv.propio ? `el mismo daño que le entre a ${d.defensor.nombre} le entra también a ${d.atacante.nombre}` : 'no pasa nada';
+  try{ await mesaPublicar(`${d.atacante.nombre} · ${sv.nombre}`, {formula: '1d6', rolls: [sv.d], mod: 0, total: sv.d, quien: d.atacante.nombre, ...(ta && ta.tipo === 'creep' ? {desde: 'gm'} : {})}); }catch(err){}
+  try{ mesaLinea(`🔮 ${sv.nombre} de ${d.atacante.nombre} (1d6 → ${sv.d}): ${txt}`, 'recordatorio'); }catch(err){}
+}
+/* 🔮 (2026-11-04, dueño, para que la cuenta del daño se vea bien ANTES de aplicarlo) El d6 se tira con la tirada de daño (comun/duelo.js, guardarDano,
+   con el gancho `orbeSalvaje` de Duelo.escuchar) y queda en `dano.salvaje`; al aplicar se usa ese. Si el daño se tiró en una pantalla sin el mapa, se tira
+   acá, al aplicar, como antes. */
+async function talSalvajeTirar(d){
+  const sv = talSalvajeRodar(d);
+  await talSalvajeAnunciar(d, sv);
+  return sv;
 }
 // El Orbe salvaje con 1: lo mismo que le entró al rival, directo a quien atacó.
 async function talSalvajePropio(d, entro, sal){

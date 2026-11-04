@@ -1758,6 +1758,13 @@ async function dueloDrenar(d, monto, opts){
   }
 }
 
+// 🧮 Lo que frenó el elemental del arma (escudos, Vida extra, Armadura arcana, Miti-Miti) en una línea, para la cuenta (2026-11-04).
+function magFrenos(r){
+  if(!r) return {};
+  const L = [...(num(r.arcano) ? [`Armadura arcana ${fmt(num(r.arcano))}`] : []), ...(r.capas || []).map(c => `${c.nombre} ${fmt(num(c.v))}`),
+    ...(num(r.mitiMiti) ? [`${r.mitiMitiNombre || 'su protector'} se lleva ${fmt(num(r.mitiMiti))}`] : [])];
+  return L.length ? {frenos: L.join(' · ').slice(0, 140)} : {};
+}
 /* 🧮 `o.simular` (2026-11-04, dueño: «el cuadro de la cuenta del daño debe aparecer antes del botón "aplicar el daño". Al aplicar uno ya debe saber cuánto
    va a ser»): la misma cuenta, sin escribir nada ni disparar efectos (Espinas, drenar, el rayo que salta…): la vista previa del duelo (cfgEscuchar.previa). Lo
    que todavía no se sabe (el 1d6 del Orbe salvaje) no entra; el elemental del arma se cuenta como si los escudos no lo frenaran después del golpe. */
@@ -1775,9 +1782,10 @@ async function dueloAplicarDano(d, o){
   const menosDist = (d.hab && d.hab.menosDistancia && ta0 && t ? Math.max(0, distanciaHex(ta0, t) - 1) : 0)
     + (d.hab && d.hab.menosPorOrden && d.grupo ? Math.max(0, Math.round(num(d.grupo.indice)) - 1) : 0);   // el láser largo: −1 a cada uno de los siguientes en la línea
   // 🔥 Carga Elemental de fuego (2026-10-13): +50 % del daño tirado, para arriba (`hab.dano.mult`).
-  let multHab = d.hab && d.hab.dano && num(d.hab.dano.mult) > 1 ? num(d.hab.dano.mult) : 1;
+  const multCarga = d.hab && d.hab.dano && num(d.hab.dano.mult) > 1 ? num(d.hab.dano.mult) : 1;
+  let multHab = multCarga;
   // 🔮 El Orbe salvaje (js/53): con daño especial, una tirada de 1d6 (6: ×2 o ×3; 1: el mismo daño a quien atacó, después).
-  const salvaje = !simular && (magico || (dn.magico && num(dn.magico.total) > 0)) && typeof talSalvajeTirar === 'function' ? await talSalvajeTirar(d).catch(err => { console.error('El Orbe salvaje:', err); return null; }) : null;
+  const salvaje = dn.salvaje ? {...dn.salvaje} : !simular && (magico || (dn.magico && num(dn.magico.total) > 0)) && typeof talSalvajeTirar === 'function' ? await talSalvajeTirar(d).catch(err => { console.error('El Orbe salvaje:', err); return null; }) : null;
   if(salvaje && salvaje.mult > 1 && magico) multHab *= salvaje.mult;
   // 🔮 La Botella con un diablito (js/53): +N a todo tu daño especial (si hay el de la habilidad, ahí; si no, al del arma).
   const botella = typeof talismanDe === 'function' && (magico || (dn.magico && num(dn.magico.total) > 0)) ? talismanDe(d.atacante && tokens.get(d.atacante.tokenId), 'botella') : 0;
@@ -1793,7 +1801,8 @@ async function dueloAplicarDano(d, o){
   const mult = critReal ? d.crit.mult : 1, crudo = Math.ceil(Math.max(0, num(dn.crudo) - menosDist + (magico ? botella : 0) + anilloHab) * multHab * multId), golpe = crudo * mult;
   // (☀🌑 el ×1,5 de la luz o el ×0 de lo siniestro van con lo que multiplica, no con lo que frena — 2026-10-26: decía «9 − la luz le pega ×1,5 = 9»)
   const sinId = Math.ceil(Math.max(0, num(dn.crudo) - menosDist + (magico ? botella : 0) + anilloHab) * multHab);
-  const multTxt = [multHab > 1 ? `${d.hab.dano.carga || 'Carga'}: ${fmt(Math.max(0, num(dn.crudo) - menosDist))} +${Math.round((multHab - 1) * 100)} % = ${fmt(sinId)}` : '', idHab && idHab.txt && multId !== 1 ? `${idHab.txt}: ${fmt(sinId)} → ${fmt(crudo)}` : ''].filter(Boolean).join(' · ');
+  const multEtq = [multCarga > 1 ? `${d.hab.dano.carga || 'Carga'} +${Math.round((multCarga - 1) * 100)} %` : '', salvaje && salvaje.mult > 1 && magico ? `🔮 ${salvaje.nombre} ×${salvaje.mult}` : ''].filter(Boolean).join(' · ');   // (el Orbe ya no se lee como «Carga», 2026-11-04)
+  const multTxt = [multHab > 1 ? `${multEtq}: ${fmt(Math.max(0, num(dn.crudo) - menosDist))} → ${fmt(sinId)}` : '', idHab && idHab.txt && multId !== 1 ? `${idHab.txt}: ${fmt(sinId)} → ${fmt(crudo)}` : ''].filter(Boolean).join(' · ');
   const base = {crudo, mult, golpe, ignoraDef: crit, mitad: d.resultado === 'mitad', ...(multTxt ? {cargaMult: multTxt} : {})};
   if(!t) return {...base, manual: true, motivoManual: 'el token ya no está en el mapa'};
   const esInv = t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION);
@@ -1898,9 +1907,13 @@ async function dueloAplicarDano(d, o){
         const idMag = elMag ? Combatiente.identidadElemento(elMag, ((vinculo(t) || {}).tipoCriatura)) : null;
         const multMag = (num(dn.magico.mult) > 1 ? num(dn.magico.mult) : 1) * (idMag ? idMag.mult : 1);
         const totMag = Math.ceil((num(dn.magico.total) + (habMagica ? 0 : botella) + anilloMag) * multMag);
-        const agM = typeof aguaRayo === 'function' ? aguaRayo(t, elMag, totMag) : {monto: totMag, txt: ''};
-        const recib = Math.max(0, num(agM.monto) - resMag);
-        magicoP = {...dn.magico, recibido: recib, hpAntes: num(res.nuevo), hpDespues: Math.max(0, num(res.nuevo) - recib), ...(resMag ? {resEl: Combatiente.resElementalTxt(elMag, resMag)} : {})};
+        const totMagS = Math.ceil((num(dn.magico.total) + (habMagica ? 0 : botella) + anilloMag) * (salvaje && !habMagica ? salvaje.mult : 1) * multMag);
+        const agM = typeof aguaRayo === 'function' ? aguaRayo(t, elMag, totMagS) : {monto: totMagS, txt: ''};
+        // sobre lo que dejó el golpe (los escudos, la Vida extra, la Armadura arcana, el Miti-Miti), como al aplicarlo
+        const oM = {magico: true, reparte: true, simular: true, sim: res.sim};
+        const rmS = esInv ? await danioInv(t, String(agM.monto), true, 0, resMag, oM) : t.tipo === 'creep' ? await danioCreep(t, String(agM.monto), true, 0, resMag, oM) : await danioPj(t, String(agM.monto), true, 0, resMag, oM);
+        magicoP = rmS ? {...dn.magico, recibido: num(rmS.r.recibido), hpAntes: num(rmS.previo), hpDespues: num(rmS.nuevo), ...(resMag ? {resEl: Combatiente.resElementalTxt(elMag, resMag)} : {}),
+          ...(salvaje && !habMagica && salvaje.mult > 1 ? {salvajeMult: salvaje.mult, salvajeNombre: salvaje.nombre} : {}), ...magFrenos(rmS.r)} : null;
       }
       return {...base, cuenta: armarCuenta(res), recibido: num(res.r.recibido), invulnerable: !!res.r.invulnerable, hpAntes: num(res.previo), hpDespues: num(res.nuevo),
         ...(magicoP ? {magico: magicoP} : {}), previa: true};
@@ -1925,7 +1938,8 @@ async function dueloAplicarDano(d, o){
       const agM = typeof aguaRayo === 'function' ? aguaRayo(t, elMag, totMag) : {monto: totMag, txt: ''};   // 💧 (js/50)
       const rm = esInv ? await danioInv(t, String(agM.monto), true, 0, resMag, {magico: true, reparte: true})
         : t.tipo === 'creep' ? await danioCreep(t, String(agM.monto), true, 0, resMag, {magico: true, reparte: true}) : await danioPj(t, String(agM.monto), true, 0, resMag, {magico: true, reparte: true});
-      magico = {...dn.magico, recibido: num(rm.r.recibido), hpAntes: num(rm.previo), hpDespues: num(rm.nuevo), ...(resMag ? {resEl: Combatiente.resElementalTxt(elMag, resMag)} : {})};
+      magico = {...dn.magico, recibido: num(rm.r.recibido), hpAntes: num(rm.previo), hpDespues: num(rm.nuevo), ...(resMag ? {resEl: Combatiente.resElementalTxt(elMag, resMag)} : {}),
+        ...(salvaje && !habMagica && salvaje.mult > 1 ? {salvajeMult: salvaje.mult, salvajeNombre: salvaje.nombre} : {}), ...magFrenos(rm.r)};
       if(idMag && idMag.estado && num(rm.r.recibido) > 0 && !rm.r.invulnerable) await dueloIdentidadEstado(d, elMag, idMag).catch(err => console.error('La identidad del elemento:', err));
     }
     // ⚡💧 El rayo corre por el agua (dueño, 2026-10-17): si el golpeado está en un charco, el mismo golpe eléctrico les llega a todos los que

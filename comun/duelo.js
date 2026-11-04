@@ -519,7 +519,7 @@ const Duelo = (() => {
   const previas = new Map();
   function previaDe(d){
     if(!cfgEscuchar || typeof cfgEscuchar.previa !== 'function' || !d || !d.dano || !(esMio(d.defensor) || soyGM())) return null;
-    const dn = d.dano, clave = [d.id, dn.crudo, (dn.rolls || []).join('.'), d.crit && d.crit.mult, d.resultado, dn.defensaManual, dn.magico && dn.magico.total].join('|');
+    const dn = d.dano, clave = [d.id, dn.crudo, (dn.rolls || []).join('.'), d.crit && d.crit.mult, d.resultado, dn.defensaManual, dn.magico && dn.magico.total, dn.salvaje && dn.salvaje.d].join('|');
     let p = previas.get(d.id);
     if(p && p.clave === clave) return p;
     p = {clave, listo: false, dato: null};
@@ -556,7 +556,8 @@ const Duelo = (() => {
       else filas.push({s: '=', txt: 'del golpe, a la vida', v: c.v});
     });
     filas.push({s: '+', txt: `${magIcono(m.tipo)} ${magTitulo(m.tipo)}`, v: tot, nota: `${m.formula || ''}${magMult(m)} · directo: no lo frena la Defensa`.replace(/^ · /, '')});
-    if(rec !== tot || _num(m.mult) > 1 || m.resEl) filas.push({s: '=', txt: `el ${tipo}, a la vida`, v: rec, nota: [_num(m.mult) > 1 ? `×${String(_num(m.mult)).replace('.', ',')}, para arriba` : '', m.resEl ? `− ${m.resEl}` : ''].filter(Boolean).join(' · ')});
+    if(rec !== tot || _num(m.mult) > 1 || m.resEl || m.frenos || _num(m.salvajeMult) > 1) filas.push({s: '=', txt: `el ${tipo}, a la vida`, v: rec, nota: [_num(m.mult) > 1 ? `×${String(_num(m.mult)).replace('.', ',')}, para arriba` : '',
+      _num(m.salvajeMult) > 1 ? `🔮 ${m.salvajeNombre || 'Orbe salvaje'} ×${_fmt(m.salvajeMult)}` : '', m.resEl ? `− ${m.resEl}` : '', m.frenos ? `− ${m.frenos}` : ''].filter(Boolean).join(' · ')});
     filas.push({s: '=', txt: 'entra a la vida', v: _num(dn.recibido) + rec, f: 1});
     return filas;
   };
@@ -1363,7 +1364,9 @@ const Duelo = (() => {
   // El atacante tiró el daño de su arma.
   async function guardarDano(id, r, efectos, o){
     const ref = col().doc(id);
+    let salvajeTirado = null, mFinal = null;
     await fbDb.runTransaction(async tx => {
+      salvajeTirado = null;
       const doc = await tx.get(ref);
       if(!doc.exists) return;
       const m = {...doc.data()};
@@ -1427,8 +1430,17 @@ const Duelo = (() => {
       // venga del arma o de la habilidad con la que se atacó (Ejecución «con tu arma», Critical Matters…). Solo hay crítico con un arma.
       if(m.crit && m.crit.critico) m.efectos = m.efectos.map(sangradoPermanente);
       // (La regla «un golpe crítico no rompe armadura» se sacó el 2026-10-23, dueño: «eso se borra». Un crítico rompe armadura como cualquier golpe.)
+      // 🔮 El Orbe salvaje se tira CON el daño (2026-11-04, dueño: que la cuenta se vea antes de aplicarlo): solo con daño especial (el de una habilidad
+      // que ignora la Defensa, o el elemental del arma); el mapa dice si quien ataca lo lleva (cfgEscuchar.orbeSalvaje) y lo usa al aplicar.
+      const especial = (m.hab && m.hab.dano && m.hab.dano.ignoraDef && m.resultado === 'pego') || (m.dano.magico && _num(m.dano.magico.total) > 0);
+      if(especial && typeof cfgEscuchar.orbeSalvaje === 'function'){
+        try{ const sv = cfgEscuchar.orbeSalvaje(m); if(sv){ m.dano.salvaje = {d: _num(sv.d), mult: _num(sv.mult) || 1, propio: !!sv.propio, nombre: String(sv.nombre || 'Orbe salvaje').slice(0, 40)}; salvajeTirado = m.dano.salvaje; } }
+        catch(err){ console.error('Duelo: el Orbe salvaje', err); }
+      }
+      mFinal = m;
       tx.update(ref, cambiosDe(m));
     });
+    if(salvajeTirado && mFinal && typeof cfgEscuchar.orbeSalvajeAnunciar === 'function') cfgEscuchar.orbeSalvajeAnunciar(mFinal, salvajeTirado);
   }
 
   // Los efectos que la habilidad le suma al golpe (2026-10-10, Tajear): los de siempre y, si fue crítico, los de ⚡ Critical Matters. Uno de
@@ -2640,6 +2652,7 @@ const Duelo = (() => {
       const tiro = `<div class="duelo-danotiro"><span class="t">🎲 Daño${arma}${defMan}</span><span class="n">${_fmt(dn.crudo)}</span>${dados ? `<span class="dados">${dados}</span>` : ''}<span class="f">${_esc(dn.formula || '')}</span></div>`;
       // ☄ El segundo daño (el fuego del Meteoro, o el elemental de un arma), a la vista también antes de aplicarlo (2026-10-24: no se veía hasta el final).
       const mgAntes = dn.magico ? `<div class="duelo-mini" style="color:#9cc7ff">${magIcono(dn.magico.tipo)} ${_esc(magTitulo(dn.magico.tipo))}: <b>${_fmt(dn.magico.total)}</b> (${_esc(dn.magico.formula || '')})${_esc(magMult(dn.magico))} · directo: no lo frena la Defensa ni se multiplica; sí la resistencia a ese elemento</div>` : '';
+      const svTxt = dn.salvaje ? `<div class="duelo-mini" style="color:#c9b8ff">🔮 ${_esc(dn.salvaje.nombre)} (1d6 → ${_fmt(dn.salvaje.d)}): ${_num(dn.salvaje.mult) > 1 ? `el daño especial sale ${_num(dn.salvaje.mult) === 3 ? 'triple' : 'doble'}` : dn.salvaje.propio ? `lo que le entre a ${_esc(d.defensor.nombre)} le entra también a ${_esc(d.atacante.nombre)}` : 'no pasa nada'}</div>` : '';
       if(!dn.aplicado && pideAceptar(d) && !dn.aceptado){
         // 💔 Lo que pasó, antes de descontarlo: «tanto de daño, menos tu Defensa» y el botón (el dueño) o la espera (el resto; el GM, «por él»).
         const ignora = d.hab && d.hab.dano && d.hab.dano.ignoraDef;
@@ -2659,7 +2672,7 @@ const Duelo = (() => {
         const pv = previaDe(d);
         const conPrevia = pv && pv.listo && pv.dato && tieneCuenta(pv.dato) && !pv.dato.manual;
         const pvd = conPrevia ? pv.dato : null, pvTotal = pvd ? _num(pvd.recibido) + (magJunto(pvd) ? _num(pvd.magico.recibido) : 0) : 0;
-        cuerpo = tiro + (conPrevia
+        cuerpo = tiro + svTxt + (conPrevia
           ? `<div class="duelo-danobox${fuerte ? ' crit' : ''}"><div class="duelo-danonum${fuerte ? ' rojo' : ''}" style="font-size:72px">${_fmt(pvTotal)}</div><div class="duelo-danosub" style="font-size:14px">de daño ${suyo ? 'te va a entrar a la vida' : `le va a entrar a la vida a ${_esc(d.defensor.nombre)}`}${magJunto(pvd) ? ` (${_fmt(pvd.recibido)} del golpe + ${magIcono(pvd.magico.tipo)} ${_fmt(pvd.magico.recibido)} de ${_esc(String(pvd.magico.tipo).toLowerCase())})` : ''}</div></div>${cuentaHtml(pvd)}<div class="duelo-mini">${_esc(d.defensor.nombre)}: <b>${_fmt(pvd.hpAntes)}</b> → <b>${_fmt(magJunto(pvd) ? pvd.magico.hpDespues : pvd.hpDespues)}</b> HP</div>`
           : `<div class="duelo-danobox${fuerte ? ' crit' : ''}"><div class="duelo-danonum${fuerte ? ' rojo' : ''}" style="font-size:72px">${_fmt(total)}</div>${fuerte ? '<div class="duelo-danosub rojo" style="font-size:20px">DERECHO A LA VIDA</div>' : ''}<div class="duelo-danosub" style="font-size:14px">${que}</div>${pv && !pv.listo ? '<div class="duelo-danosub" style="font-size:12px;color:#9fb6e8;margin-top:6px">🧮 Calculando la cuenta…</div>' : frenan}</div>${mgAntes}`)
           + (suyo ? `<div style="text-align:center;margin-top:8px"><button type="button" data-dano-aceptar>💔 Aplicar el daño</button><div class="duelo-nota" style="margin-top:6px">⚙ Al tocarlo se descuenta solo de tu vida (y se ve cómo queda).</div></div>`

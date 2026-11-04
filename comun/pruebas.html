@@ -46,7 +46,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261104g"></script>
+<script src="combatiente.js?v=20261104h"></script>
 <script src="creep-calculo.js?v=20261103t20"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261103tf1"></script>
@@ -966,11 +966,14 @@ prueba('❤ Una sola Vida extra (2026-11-03): venga de donde venga, suma al mism
     {id: 'v2', nombre: 'Vida extra', activo: true, excedenteVida: true, escudoMagico: 5, escudoMagicoActual: 5, turnos: 2},
     {id: 'v3', nombre: 'Escudo del sereno', activo: true, excedenteVida: true, soloFisico: true, escudoMagico: 8, escudoMagicoActual: 8, permanente: true}];
   const t = Combatiente.empezarTurnoEstados(viejas, {});
+  // y la lista original también queda junta (creep/ficha se quedan con ella si no terminó nada: antes quedaba 30 + 5 aparte)
+  const enLaOriginal = [comunes(viejas).length, comunes(viejas)[0].escudoMagicoActual];
   // el tope (Relicario, +50 %): cuenta el total que ya tiene
   const exc = Combatiente.excedenteConTope(es, 20, 60, Combatiente.RELICARIO_TOPE);
   igual([comunes(es).length, comunes(es)[0].escudoMagicoActual, comunes(sc.estados).length, ve.escudoMagicoActual, !!ve.permanente, !!ve.finCombate,
     comunes(t.quedan).length, comunes(t.quedan)[0].escudoMagicoActual, t.quedan.filter(e => e.soloFisico).length, exc],
     [1, 30, 1, 10, true, false, 1, 30, 1, 0]);
+  igual(enLaOriginal, [1, 30]);
 });
 prueba('📋 Ver el grupo del botín (2026-11-03): los lugares vacíos y a quién le sirve cada pieza', () => {
   const S = {inventario: [{nombre: 'Espada', tipoItem: 'arma_1m', equipado: true}, {nombre: 'Chaleco', tipoItem: 'armadura_blanda', equipado: true, mods: [{stat: 'def', val: 2}]}]};

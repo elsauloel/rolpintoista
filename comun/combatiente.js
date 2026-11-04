@@ -304,8 +304,10 @@ const Combatiente = (() => {
      turno se lo saca (terminarTurnoEstados) y su próximo inicio ya descuenta; si se lo pusieron fuera de su turno, su próximo inicio no descuenta
      (le toca el turno entero) y el siguiente sí. Al empezar: cuenta y después dispara lo que sigue (veneno, regeneración…). */
   function empezarTurnoEstados(estados, campos){
+    // ❤ las Vidas extra guardadas aparte (de antes del 2026-11-03) se juntan en una — sobre la lista que llega (2026-11-04): los que se quedan con
+    // ella cuando no terminó nada (creep, invocación, ficha) la tenían sumada en la primera y la otra seguía aparte → vida extra contada dos veces
+    juntarVidaExtra(estados);
     const k = contarEstados(estados, campos, {alEmpezar: true});
-    juntarVidaExtra(k.quedan);   // ❤ las Vidas extra guardadas aparte (de antes del 2026-11-03) se juntan en una
     const d = dispararEstados(k.quedan, {...(campos || {}), todos: k.quedan});
     return {hp: d.hp, quedan: k.quedan, terminados: k.terminados, eventos: [...k.eventos, ...d.eventos]};
   }

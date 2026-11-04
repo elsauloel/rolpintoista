@@ -284,6 +284,15 @@
 
 ### ▶ Para la próxima tanda de pruebas en el mapa (2026-11-03)
 
+- [x] ✅ **Tanda h (2026-11-04, con clics en «Claude · pruebas»; detalle en el reporte de la tanda h)**:
+  «Agregar» destacado (fondo cobre, negrita); el globo de Piel de hierro al pasar el mouse; el Cultista en GM Tools sin la fila «Sin arma» y con la
+  nota; la Tienda de inicio (62 ítems, el jugador ve «nada se agota»); Arrastrar guardado con la versión vieja (se puso al día solo: 2 SP · 2 No2,
+  tiró de 21,12 a 21,14); el error de permisos con mapa y ficha abiertos (cada estado una vez, sin cartel); el robo en sigilo que lleva oro (300 →
+  288) y el robo propio de un personaje (la Poción de Piel de Cristal pasó al cinturón); las Vidas extra viejas al empezar el turno — **había un
+  error y se arregló**: quedaban 8 + 3 en vez de 8 (probado de nuevo con clics: una sola, 8).
+- [ ] **Tanda h, no llegué**: Arma elemental creep → creep, 💔 vida en 0 desde el mapa, Arma elemental en una invocación, y el arreglo de
+  «Arma elemental cobra antes de elegir a quién» (ver el reporte: dónde está el hueco).
+
 - [ ] **💔 Vida en 0 desde el mapa (2026-11-04, dueño: «Bizzante quedó en 0 HP —se puso −N en HP directo— y no se murió, ni se activó su pacto»)**:
   `vtt-hexgrid/js/98-vida-en-cero.js`. Con un personaje con 😇 Pacto, bajarle la vida a 0 con **2 · HP directo** → a los ~2 s revive con un cuarto de
   la vida, Titilando, y el 😇 queda gris (Aviso, Crónica y Mesa). Sin pacto (ni Fénix ni Ankh en el cinturón) → queda inconsciente (pantalla roja,

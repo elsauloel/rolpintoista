@@ -34,3 +34,15 @@
 - [x] Paso 0: la regla nueva, programada (2026-11-04, 970ca52e).
 - [x] Paso 1: inventario (2026-11-04) → [`inventario-resistencia-critico.md`](inventario-resistencia-critico.md).
 - [x] Paso 2: medición (2026-11-04) → [`medicion-resistencia-critico.md`](medicion-resistencia-critico.md).
+
+## Criterios decididos (paso 3, en curso)
+Respuestas del dueño a la medición (2026-11-04):
+1. **Crítico sin resistencia:** «que sin resistencia, el crítico con armas Tipo 4 sea así de frecuente, está bien» (≈ 46 % a nivel 3 contra Evasión media).
+2. *(Pendiente: cuánto debe quitar cada punto de resistencia — se le volvió a explicar.)*
+3. **Los máximos del catálogo no son un parámetro:** «el catálogo es enorme y los personajes no tienen el dinero para comprarse todos esos ítems,
+   ni les aparecen en simultáneo». Para acotar el estaqueo: **ciertos slots del inventario para ciertos Tipos de resistencia** (P114).
+4. **Armas grandes casi sin crítico:** «es parte del balance propio del juego».
+5. **El crítico ignora la armadura:** «esa es la gracia». No se toca.
+6. **Grupo y creeps juntos**, porque el catálogo es el mismo para los dos. **Orden: primero el catálogo**; después armas, resistencias y
+   habilidades — «todo lo vamos a tener que rebalancear y evaluar su peso real».
+

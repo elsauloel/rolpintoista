@@ -1,5 +1,7 @@
 # Personajes de El origen y el rebalanceo del crítico (2026-11-05)
 
+> **✅ Aplicado en la partida (2026-11-05, dueño: «Todas»)**: las 7 habilidades — Lisiar (Estrella culona) potente +4; Backstab (Aurelius) crítico frecuente +1; Shockwave y Blindaje (Rockardo), Invi (Aurelius), Transfusión sanguínea (Larry) y Arma elemental (Bizzante) a la versión de la biblioteca, conservando lo propio de cada copia. Verificado releyendo. **Equipo**: las diferencias quedan como están (dueño: «las diferencias en equipo, dejémoslas como están»).
+
 **Solo lectura: no se escribió nada en la partida.** Dueño: «Sí, vamos con los personajes de jugadores». Mismo procedimiento que con los creeps
 ([reporte-creeps-origen-res-critico-2026-11-05.md](reporte-creeps-origen-res-critico-2026-11-05.md)). Respaldo completo de las 5 fichas (documento y
 todas sus partes) en el scratchpad de la sesión. Script listo: `/tmp/pw/origen-fichas-aplicar.js` (simula por defecto; `--escribir` escribe la parte

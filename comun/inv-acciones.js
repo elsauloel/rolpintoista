@@ -117,7 +117,7 @@ const InvAcciones = (() => {
     }).catch(err => console.error('No se pudo publicar la alerta de No2:', err));
   }
   const pdgExtraInv = inv => Combatiente.pdgExtraArma(st => I().modTotal(inv, st), {tipoDado: Combatiente.armaEnMano(inv).tipoDado, armaDeRango: Combatiente.armaEnMano(inv).armaDeRango});   // guantes (2026-10-05)
-  const tiradaAtaque = (inv, tipo) => especial(tipo) ? tirada(inv, `${NOMBRE_ESPECIAL[tipo]} (PdG)`, I().statValor(inv, 'pdg') + bonoEspecial(inv, tipo) + pdgExtraInv(inv), 'pdg')
+  const tiradaAtaque = (inv, tipo, bonoHab) => especial(tipo) ? tirada(inv, `${NOMBRE_ESPECIAL[tipo]} (PdG)`, I().statValor(inv, 'pdg') + bonoEspecial(inv, tipo) + pdgExtraInv(inv) + (Number(bonoHab) || 0), 'pdg')
     : tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg') + pdgExtraInv(inv), 'pdg');
 
   // El menú «¿Qué ataque es?» de una invocación (el mismo de personajes y creeps: Combatiente.menuTipoAtaqueHtml).

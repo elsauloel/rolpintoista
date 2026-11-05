@@ -58,7 +58,7 @@ const CreepDuelo = (() => {
   // suficientes pregunta «¿Atacar igual?» (2026-10-02: antes se rechazaba y el aviso quedaba en GM Tools, escondido en el mapa).
   // `ui.confirmar` puede devolver una promesa (el mapa: el cartel del juego, nunca un confirm() nativo, que congela la pestaña).
   // `sinTirada` (2026-10-21): el PdG elegido a mano — paga y gasta lo mismo, pero no tira (el número lo escribió alguien). → true si pagó.
-  async function atacarCon(ui, ref, tipo, dueloId, sinTirada){
+  async function atacarCon(ui, ref, tipo, dueloId, sinTirada, bonoHab){
     const sc = ui.creep(ref);
     if(!sc) return false;
     const qs = Combatiente.preguntaSentado(sc.estados, sc.nombre);   // Sentado no puede atacar (cualquier ataque): avisa y deja seguir
@@ -79,7 +79,7 @@ const CreepDuelo = (() => {
       if(carga) ui.toast(`${sc.nombre} · ${Combatiente.cargaTxt(carga)}`);
       A().alertaSinNitros(sc, tipo, x.forzado);
       if(tipo === 'normal') ui.borrarParry(ref);   // atacar cierra el Parry que esperaba su Bloqueo
-      if(!sinTirada) ui.publicar(sc, A().tiradaAtaque(ui.creep(ref) || sc, tipo));
+      if(!sinTirada) ui.publicar(sc, A().tiradaAtaque(ui.creep(ref) || sc, tipo, bonoHab));   // ⚔ +2 del Contraataque (2026-11-05: solo lo veía la lupa, la tirada no)
       ui.toast(x.aviso);
       return true;
     });
@@ -147,7 +147,7 @@ const CreepDuelo = (() => {
           if(gc && gc.carga) ui.toast(`${sc.nombre} · ${Combatiente.cargaTxt(gc.carga)}`);
         }
         if(d.ataque.tipo === 'habilidad-arma'){ ui.publicar(sc, pdgDeArreglos(sc, d.ataque)); return; }   // los No2 ya los cobró la habilidad
-        return atacarCon(ui, d.atacante.ref, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo, d.id);
+        return atacarCon(ui, d.atacante.ref, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo, d.id, false, d.ataque.contraHab ? 2 : 0);
       },
       // ✍ El PdG elegido a mano (2026-10-21, dueño: «las mismas reglas que el botón»): paga y gasta lo que suma al golpe, sin tirar. → false si se canceló.
       pagarManual: async d => {

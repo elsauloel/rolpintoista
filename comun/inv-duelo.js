@@ -55,7 +55,7 @@ const InvDuelo = (() => {
     // tipo: 'normal', 'oportunidad' o 'contra' (los dos últimos, como los creeps: lo de un primer ataque y el PdG especial de su arma).
     // `ui.confirmar` puede devolver una promesa (el mapa: el cartel del juego; un confirm() nativo congela la pestaña).
     // `sinTirada` (2026-10-21): el PdG elegido a mano — paga y gasta lo mismo, sin tirar. → true si pagó.
-    async function atacarSuelto(inv, tipo, dueloId, sinTirada){
+    async function atacarSuelto(inv, tipo, dueloId, sinTirada, bonoHab){
       const qs = Combatiente.preguntaSentado(inv.estados, inv.nombre);   // Sentado no puede atacar: avisa y deja seguir
       if(qs && !(await (ui.confirmar || (t => Confirmar.preguntar(t, {titulo: /Desarmad/.test(t) ? 'Desarmado' : 'Sentado', si: 'Atacar igual'})))(qs))) return false;
       const forzar = A().faltanNitros(inv, tipo);
@@ -74,7 +74,7 @@ const InvDuelo = (() => {
       if(p.error){ ui.toast(p.error); return false; }
       A().alertaSinNitros(inv, p.forzado, tipo);
       if(p.carga) ui.toast(`${inv.nombre} · ${Combatiente.cargaTxt(p.carga)}`);
-      if(!sinTirada) publicar(A().tiradaAtaque(inv, tipo));
+      if(!sinTirada) publicar(A().tiradaAtaque(inv, tipo, bonoHab));   // ⚔ +2 del Contraataque (2026-11-05)
       ui.toast(p.aviso);
       return true;
     }
@@ -98,7 +98,7 @@ const InvDuelo = (() => {
         if(campo === 'pdg'){
           const t = d.ataque.tipo === 'habilidad-arma'
             ? A().tirada(inv, 'PdG', I().statValor(inv, 'pdg') + num(d.ataque.mods && d.ataque.mods.pdg) + Combatiente.pdgExtraArma(st => I().modTotal(inv, st), {tipoDado: Combatiente.armaEnMano(inv).tipoDado, armaDeRango: Combatiente.armaEnMano(inv).armaDeRango}), 'pdg')
-            : A().tiradaAtaque(inv, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo);
+            : A().tiradaAtaque(inv, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo, d.ataque.contraHab ? 2 : 0);
           const tipo = d.ataque.tipo;
           return {formula: t && t.r ? t.r.formula : '', ...L('atacar:'), costo: Combatiente.costoAtaqueLineas({tipoArma: Combatiente.armaEnMano(inv).tipoDado, arma: Combatiente.armaDeCombatiente(inv), hechos: num(inv.ataquesTurno),
             costo: tipo === 'habilidad-arma' ? 0 : A().costoAtaqueDe(inv, tipo === 'normal' ? undefined : tipo), tiene: num(inv.nitros), ataque: tipo})};
@@ -120,7 +120,7 @@ const InvDuelo = (() => {
           if(gc && gc.carga) ui.toast(`${inv.nombre} · ${Combatiente.cargaTxt(gc.carga)}`);
         }
         if(d.ataque.tipo === 'habilidad-arma') publicar(A().tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg') + num(d.ataque && d.ataque.mods && d.ataque.mods.pdg) + Combatiente.pdgExtraArma(st => I().modTotal(inv, st), {tipoDado: Combatiente.armaEnMano(inv).tipoDado, armaDeRango: Combatiente.armaEnMano(inv).armaDeRango}), 'pdg'));
-        else return atacarSuelto(inv, d.ataque.tipo, d.id);
+        else return atacarSuelto(inv, d.ataque.tipo, d.id, false, d.ataque.contraHab ? 2 : 0);
       },
       // ✍ El PdG elegido a mano (2026-10-21): paga y gasta lo que suma al golpe, sin tirar. → false si se canceló.
       pagarManual: async d => {

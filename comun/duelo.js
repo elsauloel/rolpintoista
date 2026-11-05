@@ -38,6 +38,11 @@
    El GM (o el dueño) puede tirar «a mano» por quien no responde.
    Depende de sesion.js (fbDb, fbUsuario, fbMiembro, fbRutaCampana) y de las globals esc, num, fmt, toast, formulaParaValor de cada herramienta. */
 const Duelo = (() => {
+  /* 🔒 El daño nace «reclamado» por LIBRE (2026-11-05, segunda tanda de pruebas): una pantalla vieja del mapa del GM, abierta en otro mapa y sin
+     recargar, solo reclama un daño con `reclamado` vacío —con LIBRE lo saltea— y lo dejaba «el token ya no está en el mapa». Las de ahora lo
+     toman igual, y además solo la que ve a los dos (`veLados`). */
+  const LIBRE = 'libre';
+  const tomado = dano => !!(dano && dano.reclamado && dano.reclamado !== LIBRE);
   const MAPA_PRINCIPAL = '_principal';
   const VIGENCIA_MS = 30 * 60 * 1000;      // un duelo sin resolver deja de avisar a los 30 minutos
   const AUTOABRIR_MS = 60 * 1000;          // el cuadro se abre solo si el duelo es de hace menos de un minuto
@@ -971,7 +976,7 @@ const Duelo = (() => {
     // que el GM lo aplique, como si ya lo hubiera tirado.
     if(m.hab && m.hab.dano && m.hab.dano.diferencia){
       const dif = Math.max(0, Math.round(_num(m.contacto && m.contacto.dif)));
-      m.dano = {crudo: dif, formula: 'la diferencia', rolls: [], mod: 0, reclamado: '', aplicado: false};
+      m.dano = {crudo: dif, formula: 'la diferencia', rolls: [], mod: 0, reclamado: LIBRE, aplicado: false};
       m.efectos = aguaParalisis(m, normalizarEfectos(m.hab.efectos));
       entrarDano(m);
       return;
@@ -1446,7 +1451,7 @@ const Duelo = (() => {
       if(!doc.exists) return;
       const m = {...doc.data()};
       if(m.estado !== 'esperando' || m.fase !== 'dano' || m.dano) return;
-      m.dano = {crudo: Math.max(0, Math.round(_num(r.total))), formula: String(r.formula || '').slice(0, 60), rolls: (r.rolls || []).slice(0, 20).map(_num), mod: _num(r.mod), reclamado: '', aplicado: false};
+      m.dano = {crudo: Math.max(0, Math.round(_num(r.total))), formula: String(r.formula || '').slice(0, 60), rolls: (r.rolls || []).slice(0, 20).map(_num), mod: _num(r.mod), reclamado: LIBRE, aplicado: false};
       if(o && o.defensaManual !== undefined && o.defensaManual !== null) m.dano.defensaManual = o.defensaManual === 'no' ? 'no' : Math.max(0, Math.round(_num(o.defensaManual)));   // ✍ (2026-10-15)
       const be = m.ataque && m.ataque.espalda;   // por la espalda: el daño fijo del arma o la habilidad
       if(be && be.fijo) m.dano = {...m.dano, crudo: m.dano.crudo + be.fijo, mod: m.dano.mod + be.fijo, formula: `${m.dano.formula} +${be.fijo} espalda`.slice(0, 60)};
@@ -1683,7 +1688,7 @@ const Duelo = (() => {
       const doc = await tx.get(ref);
       if(!doc.exists) return;
       const m = {...doc.data()};
-      if(m.fase !== 'dano' || !m.dano || m.dano.aplicado || m.dano.reclamado) return;
+      if(m.fase !== 'dano' || !m.dano || m.dano.aplicado || tomado(m.dano)) return;
       if(pideAceptar(m) && !m.dano.aceptado) return;   // 💔 espera el OK de quien lo recibe
       m.dano = {...m.dano, reclamado: yo()};
       tx.update(ref, cambiosDe(m));
@@ -3827,8 +3832,10 @@ const Duelo = (() => {
       // El GM (en el mapa) aplica el daño al HP apenas el atacante lo tira.
       if(cfgEscuchar.aplicar && soyGM()){
         listaDuelos.forEach(d => {
-          if(d.fase !== 'dano' || !d.dano || d.dano.aplicado || d.dano.reclamado || aplicando.has(d.id)) return;
+          if(d.fase !== 'dano' || !d.dano || d.dano.aplicado || tomado(d.dano) || aplicando.has(d.id)) return;
           if(pideAceptar(d) && !d.dano.aceptado) return;   // 💔 el personaje que lo recibe todavía no tocó «Aplicar el daño»
+          // 👀 (2026-11-05, segunda tanda de pruebas) una pantalla del GM en OTRO mapa tampoco reclama el daño: lo dejaba «el token ya no está en el mapa».
+          if(cfgEscuchar.veLados && !cfgEscuchar.veLados(d)) return;
           aplicando.add(d.id);
           reclamarAplicacion(d.id).then(async mio => {
             if(!mio) return;

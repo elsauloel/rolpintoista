@@ -108,6 +108,13 @@
 >   después de un Bloqueo exitoso. (3) **La habilidad Contraataque** (clase y creep): **+2 a la PdG** y permite contraatacar **sin ganar el Bloqueo**,
 >   antes (al ganar la Evasión o el Parry). (4) **Una pasiva nueva, «Devolver gentileza»** (dueño) que habilita el contraataque **solo si ganás el Parry y el
 >   Bloqueo**, sin bonus. Vale para personajes, invocaciones y creeps.
+> - [ ] **🦘💨 Ver en el mapa el Salto y el Dash (2026-11-05, dueño: «anotar en pendientes de ver en el mapa ambas mecánicas»).** Hoy el **Salto**:
+>   se elige al rival con un clic y el mapa elige solo la casilla de caída (la libre más cercana pegada al rival, a 3 o menos); si el salto pasa por
+>   encima de un Sólido o una pared, pregunta a la mesa. **Pedido del dueño**: al elegir el Salto, mostrar el **área de todas las casillas donde puede
+>   caer**; los tokens en el medio no importan; si hay un **objeto sólido**, la advertencia «discutir con la mesa si se puede saltar» con **Aceptar /
+>   Cancelar**. El **Dash**: se elige una de las 6 direcciones con un clic, avanza 3 en línea recta gratis y sin oportunidad; puede atravesar a UN rival
+>   (avanza una más y le pega con +2 PdG y +1 Fuerza del golpe); lo frenan Sólidos, paredes y un segundo token; si el rival lo para con Parry o Bloqueo,
+>   se corta antes del rival. Repasar los dos en el mapa con el dueño.
 > - [x] (2026-11-05: hecho — `vtt-hexgrid/js/101-creeps-mapas-sync.js`, `gmReconciliarMapas` en GM Tools, reglas en `comun/creeps-mapas.js`; probado en «Claude · pruebas») **🔗 Tokens de creeps ↔ su mapa en GM Tools (2026-11-05, dueño: «los tokens y la ficha de los creeps de GM Tools deben estar vinculados…
 >   si se mueve una cosa de una a otra, debe suceder de manera pareja; la mayor parte del juego va a suceder a través del mapa»).** En espera de que
 >   termine la tarea del gancho de la compu (para no pisarse). Hoy GM Tools → mapa anda (Mover a…, Poner sus tokens); mapa → GM Tools no: crear un token

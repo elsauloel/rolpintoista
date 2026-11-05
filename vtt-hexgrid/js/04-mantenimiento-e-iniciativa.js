@@ -898,9 +898,9 @@ function ocultoParaMesa(tokenId){
 // solo al GM — un toast en su pantalla y la Crónica de él; los jugadores no lo ven (datos.soloGM, js/16).
 function avisarGMOcultoFueraDeTurno(t, accion){
   if(soyGM || typeof momentoAbrir !== 'function') return;
-  const gm = (fbPartida && fbPartida.gmUid) || '';
+  // (2026-11-05, dueño: «tiene que ser con una notificación, no puede quedar en la Mesa porque se traspapela»): el Aviso al centro, con «Entendido».
   momentoAbrir({tipo: 'fuera-de-turno', icono: '🙈', titulo: `${nombreDe(t)} (oculto) actúa fuera de su turno`, resultado: accion, estado: 'listo',
-    datos: {soloGM: true, chico: true, ...(gm ? {paraUid: gm} : {})}});
+    datos: {soloGM: true, aviso: true, boton: 'Entendido', veredicto: {tono: 'neutro', grande: 'Oculto, fuera de su turno', chico: `${nombreDe(t)}: ${accion}`}}});
 }
 function avisarFueraDeTurno(tokenId, b, libre){
   if(modoMapa !== 'combate' || esSuTurno(tokenId) !== false) return;
@@ -1434,9 +1434,8 @@ function activarMoverLibre(id){
   if(moverLibre && !soyGM){
     const t = tokens.get(id);
     if(t && typeof enSigilo === 'function' && enSigilo(t) && typeof momentoAbrir === 'function'){
-      const gm = (fbPartida && fbPartida.gmUid) || '';
       momentoAbrir({tipo: 'fuera-de-turno', icono: '🙈', titulo: `${nombreDe(t)} (en sigilo) entró en 🦶 Mover libre`, resultado: 'Se mueve sin gastar No2 mientras está en sigilo.', estado: 'listo',
-        datos: {soloGM: true, chico: true, ...(gm ? {paraUid: gm} : {})}});
+        datos: {soloGM: true, aviso: true, boton: 'Entendido', veredicto: {tono: 'neutro', grande: 'Mover libre en sigilo', chico: nombreDe(t)}}});
     }
   }
   if(moverLibre) toast('Mover libre: arrastrá el token o tocá la casilla de destino (Esc, clic derecho o el mismo botón lo apagan)');

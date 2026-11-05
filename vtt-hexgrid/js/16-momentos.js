@@ -159,7 +159,8 @@ function momentoRecibido(id, d){
   const chicoParaMi = d.datos && d.datos.chico && d.datos.paraUid && d.datos.paraUid === fbUsuario.uid;
   if(chicoParaMi && !momentosChicosVistos.has(id)){ momentosChicosVistos.add(id); toast(`${d.icono || ''} ${d.titulo}: ${d.resultado || ''}`.trim()); }
   // `paraUids` (2026-10-08, el choque de un empujón): el mismo aviso al centro para varios (cada involucrado).
-  const paraMi = d.datos && ((d.datos.paraUid && d.datos.paraUid === fbUsuario.uid) || (Array.isArray(d.datos.paraUids) && d.datos.paraUids.includes(fbUsuario.uid)));
+  const paraMi = d.datos && ((d.datos.paraUid && d.datos.paraUid === fbUsuario.uid) || (Array.isArray(d.datos.paraUids) && d.datos.paraUids.includes(fbUsuario.uid))
+    || (d.datos.soloGM && d.datos.aviso && soyGM));   // 🙈 el aviso solo para el GM: al centro, en cada pantalla de GM (2026-11-05)
   // (La tirada extra de una zona tiene su propio cartel, con el botón para tirar — js/66: el aviso genérico lo tapaba. 2026-10-22)
   if(!chicoParaMi && paraMi && d.tipo !== 'zona-extra' && d.tipo !== 'mal-de-ojo' && d.tipo !== 'malviaje' && d.tipo !== 'pergamino-grupal' && (d.creadoPor !== fbUsuario.uid || d.datos.aviso)){ momentoAvisoCentro(id, d); return; }
   // La esquina: todo, salvo lo que esta pantalla ya sigue al centro.

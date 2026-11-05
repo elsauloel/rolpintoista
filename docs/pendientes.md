@@ -56,6 +56,15 @@
 > «🛡 Muro de escudos (+2 Def)» mientras tengas al lado un aliado con escudo (solo informa; el golpe ya lo suma). **Zonas persistentes** → estado
 > derivado «⬡ En la <zona>» mientras estés adentro, que **explique qué te va a pasar y cuándo** (p. ej. «al empezar la ronda / al moverte adentro, tirás
 > Res.Esp: si perdés, Veneno ×3»), además del estado que ya te deja al entrar. **El miedo**: sin respuesta todavía (¿queda como está?).
+> 18) **🕵 Investigar por qué se vaciaron los tokens de «Mapa 1» en «Claude · pruebas»** (2026-11-05): a las 13:39 (Arg.) GM Tools mostraba 14 creeps
+> en el tablero de Mapa 1; a las 14:56 no quedaba ningún token (17 en la copia del 4/11: el Estandarte de Escarabajo de cobre, el Tótem de silencio de
+> Bruja del pantano, Tanque/Warrior/Ladrón/Tunelero/Chamán/Bosque (prueba), los 4 Goblins de prueba, Escarabajo de cobre y su copia, Bruja del pantano,
+> Coloso de mineral). Los creeps siguen existiendo. **Pista del dueño**: «borré de la lista de iniciativa algunos creeps que figuraban muertos, pero no
+> borré ningún token». Revisar qué hace el ✕ de la iniciativa (y la sincronización tokens↔GM Tools, el Mapa 1 como `mapas/_principal`), arreglarlo
+> para que no se repita, y **preguntarle al dueño** antes de devolver los 17 tokens a sus lugares (copia: scratchpad pg/FIN2.json).
+> 19) **Las 7 pruebas del mapa que no llegaron en la tercera tanda** (al final de la cola): Contraataque ganando el Parry aunque pierda el Bloqueo,
+> Devolver gentileza y el caso sin ninguna; el Salto de punta a punta (personaje y creep) y el Takle; la Mala sombra; Patotear; las ondas del agua vistas
+> desde otra pantalla; el Tótem de silencio; Apuntar y Marcar con el potente; el cuadro del duelo encima del gancho de Arrastrar.
 
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la

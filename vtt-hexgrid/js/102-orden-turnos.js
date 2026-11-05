@@ -143,7 +143,8 @@ async function ordenMufaPoner(d){
 }
 // Una tirada de un stat de un token (el valor publicado: la ficha o el creep), como las de las zonas. → {total, formula}
 function ordenTirarValor(valor){
-  const formula = formulaParaValor(Math.max(0, Math.round(num(valor))));
+  const fp = formulaParaValor(Math.max(0, Math.round(num(valor))));
+  const formula = typeof fp === 'string' ? fp : String((fp && fp.formula) || Math.max(0, Math.round(num(valor))));   // (2026-11-05: formulaParaValor da {formula}; la Mesa decía «[object Object]»)
   const r = tirarDados(formula);
   return {total: r ? num(r.total) : Math.max(0, Math.round(num(valor))), formula};
 }

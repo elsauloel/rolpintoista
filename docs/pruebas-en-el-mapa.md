@@ -1568,3 +1568,9 @@
   contra su Constitución 11: lo trae y le pega», «lo trae 2 casilleros» y se abre el duelo «sin arma · Tipo 4 · +2 PdG». «Cancelar duelo → No
   cuenta» devuelve 4 No2 y 2 SP. Restaurado (ficha y posición). Falta: el golpe entero (pagar y tirar), con trampas en el camino, y un creep que
   arrastra con la PdG nueva.
+- [ ] **🫨 Arrastrar → Desequilibrado (2026-11-05, dueño: «le da −2 a la Evasión a la persona arrastrada… hasta el final del turno de la persona que
+  ejecutó arrastrar»; reemplaza el +2 PdG).** Probado en «Claude · pruebas» desde la pantalla del GM, llamando a lo que corre al terminar el arrastre
+  (`desequilibradoPoner`, js/78) con Rockardo y el Goblin picapiedras: el «−2 EVA» flota sobre el token (capturas en el scratchpad de la sesión), el creep
+  queda con «Desequilibrado(1)» y su Evasión pasa de +1 a −1; `desequilibradosFinTurno(Rockardo)` se lo saca («recupera el equilibrio») y deja sus otros
+  estados. **Falta**: el flujo entero con el duelo del gancho (engancha → arrastra → al llegar, el −2 EVA), el ▶ Siguiente del GM al terminar el turno
+  de quien arrastró, y un personaje o una invocación como arrastrado (va por su ficha, `encolarPj`; al terminar el turno lo saca el mapa del GM).

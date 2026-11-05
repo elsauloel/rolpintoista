@@ -98,6 +98,10 @@
 >   (hoy hay que ir por los tres puntitos). (3) **Todo efecto de área que afecta a los tokens** (estandartes, auras, zonas…) se ve como **estado** mientras
 >   el token está adentro (circulito, lista de estados, ficha) y se va al salir: derivado de la posición, no guardado. Después: el ítem «⬡ Seleccionar un
 >   hexágono libre y ver qué lo afecta».
+> - [ ] **🎬 Animaciones para la mayor cantidad posible de habilidades (2026-11-05, dueño: «pensar animaciones para la mayor cantidad de
+>   habilidades de clase posibles y también los skills del pool de creeps»).** Ya tienen: Transfusión, las ondas (Shockwave, Pisotón, Nova, Sonic Boom,
+>   Remolino/Barrido/Coletazo con la espadita, Grito), Escudo humano, el gancho de Arrastrar, el «−2 EVA», el pulso del duelo. Primero una lista de
+>   ideas por habilidad (de clase y del pool de creeps), para elegir con el dueño; se programan de a tandas. Ver también «✨ Animaciones» (2026-10-10).
 > - [x] (2026-11-05: hecho — `vtt-hexgrid/js/101-creeps-mapas-sync.js`, `gmReconciliarMapas` en GM Tools, reglas en `comun/creeps-mapas.js`; probado en «Claude · pruebas») **🔗 Tokens de creeps ↔ su mapa en GM Tools (2026-11-05, dueño: «los tokens y la ficha de los creeps de GM Tools deben estar vinculados…
 >   si se mueve una cosa de una a otra, debe suceder de manera pareja; la mayor parte del juego va a suceder a través del mapa»).** En espera de que
 >   termine la tarea del gancho de la compu (para no pisarse). Hoy GM Tools → mapa anda (Mover a…, Poner sus tokens); mapa → GM Tools no: crear un token

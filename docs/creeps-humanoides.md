@@ -651,6 +651,12 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   hierro (Def +3) · Botas de cuero de vaca (Def +1, Res. crít. T4 +1). Consumible: Grasa de carpincho. Takle: automatizado y probado en el mapa
   (2026-10-26), pero su texto no lo dice: al programar, sumarle «⚙ Automatizado: …». Pisotón: Fuerza contra la Res.CC o la Evasión de cada rival
   pegado (elige el rival).
+  **Nivel 1 aprobado** (dueño, 2026-11-05: «lo probamos así»; sin el texto «⚙ Automatizado» en el Takle: «vamos a confiar en que lo está»).
+- **W4 · Verdugo · Warrior** (2026-11-05): avisa a quién va a ejecutar y lo remata. **Ruta aprobada** (dueño: «me cierra la ruta»): nv1–2 El que avisa
+  no traiciona · Remate · Golpe fuerte (el dueño elige al definir el nivel 1 cuáles dos van en el 1 y cuál en el 2) + pasiva **Sed de sangre** (nv2);
+  nv3 Furia (Hacha del verdugo de la capital, Buena); nv4 Golpe demoledor + **Robustez** (Guantes del verdugo, Buena); nv5 Golpe brutal. Nivel 1
+  propuesto: Fue 10 · Con 9 · Des 6 · Agi 6 · Esp 2 → vida 45, 6 No2; Hacha de verdugo de pueblo (Común, Tipo 8, Derribar 50 %) · Peto de hierro ·
+  Casco de cuero endurecido; consumible Poción de Ojo del Verdugo (Buena; a confirmar).
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 

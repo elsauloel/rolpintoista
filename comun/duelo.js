@@ -3853,6 +3853,9 @@ const Duelo = (() => {
             // 'pedido-gm', no sabía arrastrar y lo dejaba «a mano» sin moverlo (visto en Claude · pruebas). Solo lo toma el mapa del GM (`aplicaDemora`).
             if((ef.aplicar !== 'pedido' && !((ef.aplicar === 'pedido-gm' || ef.aplicar === 'pedido-mapa') && soyGM())) || ef.aplicado || aplicando.has(clave)) return;
             if(cfgEscuchar.aplicaSolo && !soyGM() && !cfgEscuchar.aplicaSolo(d, ef)) return;
+            // 👀 Una pantalla del GM que mira OTRO mapa no lo reclama (2026-11-05, visto probando Arrastrar en Claude · pruebas: otra pestaña del GM, en
+            // otro mapa, tomaba el gancho y lo dejaba «uno de los dos ya no está en el mapa: traelo a mano»). Lo toma la que ve a los dos.
+            if(soyGM() && cfgEscuchar.veLados && !cfgEscuchar.veLados(d)) return;
             const sp = specDeEfecto(ef);
             if(sp && sp.nombre === 'Demora' && !cfgEscuchar.aplicaDemora) return;   // el orden de turnos lo mueve el mapa
             if(_num(ef.trae) > 0 && !cfgEscuchar.aplicaDemora) return;   // 🪝 el gancho también (2026-11-05: la ficha o GM Tools de un GM lo reclamaban, no sabían arrastrar y quedaba «a mano», sin animación)

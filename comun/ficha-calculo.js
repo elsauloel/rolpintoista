@@ -99,6 +99,8 @@ const FichaCalculo = (() => {
     {id:'vainas', label:'Vainas', full:'Armas que podés llevar envainadas: se equipan o se guardan sin gastar No2'},
     {id:'correas', label:'Correas laterales', full:'Armas o escudos colgados de la mochila: se equipan o se guardan sin gastar No2'},
     {id:'bolsilloext', label:'Bolsillo exterior', full:'El primer consumible del turno sacado de la mochila cuesta 1 No2 en vez de 2'},
+    {id:'rescritmitad', label:'Mañas de sobreviviente', full:'Con la vida a la mitad o menos: + a la Resistencia a crítico contra todos los Tipos (se suma en el duelo)'},
+    {id:'rescritcuarto', label:'Contra las cuerdas', full:'Con la vida en menos de un cuarto: + a la Resistencia a crítico contra todos los Tipos (se suma en el duelo)'},
     {id:'pasossilenciosos', label:'Paso ligero', full:'Paso ligero: no te oyen acercarte por la espalda (se te ve recién al quedar pegado, sin darle tiempo a darse vuelta) y atacar por la espalda te suma +1 PdG más'},
     {id:'prisa', label:'Prisa', full:'Prisa: vas primero en el orden de turnos (antes que todos los que no la tienen); entre dos con Prisa decide la tirada de iniciativa'},
     {id:'morral', label:'Morral de cazador', full:'Los trofeos no ocupan ranuras de la mochila'},

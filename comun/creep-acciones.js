@@ -409,6 +409,7 @@ const CreepAcciones = (() => {
     const ef = efectoDeHab(sc, it, presets);
     if(ef.estado){ if(C().modsAfectanHp(ef.estado.mods)) C().actualizarHpMaxPorCon(sc); partes.push(`${ef.estado.nombre}${ef.estado.permanente ? '' : ` (${fmt(ef.estado.turnos)} turnos)`}`); }
     if(ef.aviso) partes.push(ef.aviso);
+    if(num(it.reparaArmRota) > 0){ const ar = Combatiente.repararArmRotaEstados(sc.estados, it.reparaArmRota); if(ar.r){ sc.estados = ar.estados; partes.push(`🔨 −${fmt(ar.r)} de Armadura rota`); } else partes.push('🔨 no tenía Armadura rota'); }   // Ungüento del herrero (2026-11-05)
     // Cura estados por grupo (P180).
     const curados = Combatiente.curaDeItem(it).length ? Combatiente.curarEstados(sc.estados, Combatiente.curaDeItem(it)) : null;
     if(curados){ if(curados.sacados.length){ sc.estados = curados.quedan; partes.push(`🩹 se le fue: ${curados.sacados.join(', ')}`); } else partes.push('🩹 no tenía nada que curar'); }

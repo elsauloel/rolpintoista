@@ -281,6 +281,10 @@
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 
 ## Pendientes
+- [ ] **🩹 Resistencia a crítico por la vida y 💢 en el cuadro (2026-11-05)**: en un duelo real, pegarle con Tipo 4 a un personaje con **Mañas de
+  sobreviviente** / **Contra las cuerdas** a la mitad o menos (y bajo ¼) de vida y ver que el rango sube; y a uno con **Punto débil** y ver el **💢**
+  violeta en el cuadro del crítico. Ya probado sin duelo: los ganchos del duelo con la ficha real de Prueba Uno y el cuadro dibujado aparte. Falta también
+  un **creep** usando el **Ungüento del herrero** (saca 1 stack de Armadura rota).
 
 - [ ] **🎯 Punto débil deja la resistencia a crítico en negativo (2026-11-05, dueño: «Punto débil, me parece bien lo que propones»).** Con la Aguja
   siniestra (o el Arma siniestra) dejar Punto débil a un rival **sin** resistencia y pegarle con un arma Tipo 4: en el cuadro del crítico del duelo la

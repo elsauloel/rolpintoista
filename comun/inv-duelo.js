@@ -165,7 +165,7 @@ const InvDuelo = (() => {
         const i = [4, 6, 8, 10, 12].indexOf(num(d.ataque.tipoDado));
         if(i < 0) return 0;
         const inv = ui.inv(d.defensor);
-        return num(InvCalculo.critEfectivo(inv, i));   // puede ser negativa con Punto débil (2026-11-05)   // con los estados (2026-10-12)
+        return num(InvCalculo.critEfectivo(inv, i)) + (inv ? Combatiente.resCritPorVida(I().statValor(inv, 'rescritmitad'), I().statValor(inv, 'rescritcuarto'), inv.hp, inv.hpMax) : 0);   // 🩹 Mañas / Contra las cuerdas   // puede ser negativa con Punto débil (2026-11-05)   // con los estados (2026-10-12)
       },
       efectosArma: d => {
         const inv = ui.inv(d.atacante);

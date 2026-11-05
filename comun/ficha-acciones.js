@@ -266,6 +266,22 @@ const FichaAcciones = (() => {
     return restaurar;
   }
   // Oleo reparador: quita Armadura rota si está activa (es permanente, no vence sola). Devuelve cuántas se quitaron.
+  /* 🔨 Ungüento del herrero (`reparaArmRota: N`, 2026-11-05): N puntos de Armadura rota de la pieza puesta más dañada (devuelve 1 de Defensa y 1 de
+     durabilidad por punto, como el óleo, pero en combate y sin elegir pieza). Si no hay pieza con Armadura rota, el estado viejo «Armadura rota». */
+  function repararArmRota(S, q){
+    const piezas = (S.inventario || []).filter(i => i && i.equipado && !FichaCalculo.itemRoto(i) && FichaCalculo.armRotaDe(i) > 0)
+      .sort((a, b) => FichaCalculo.armRotaDe(b) - FichaCalculo.armRotaDe(a));
+    const it = piezas[0];
+    if(it){
+      const r = Math.min(Math.max(0, Math.round(num(q))), FichaCalculo.armRotaDe(it));
+      it.armRota = FichaCalculo.armRotaDe(it) - r;
+      it.dur = Math.min(FichaCalculo.durMax(it), FichaCalculo.durActual(it) + r);
+      return r ? `🔨 ${it.nombre}: −${fmt(r)} de Armadura rota${it.armRota ? ` (le queda ×${fmt(it.armRota)})` : ''}` : '';
+    }
+    const e = Combatiente.repararArmRotaEstados(S.efectos, q);
+    if(e.r){ S.efectos = e.estados; return `🔨 −${fmt(e.r)} de Armadura rota`; }
+    return '🔨 no tenía Armadura rota';
+  }
   function repararArmadura(S){
     const antes = S.efectos.length;
     S.efectos = S.efectos.filter(e => e.nombre !== 'Armadura rota');
@@ -421,6 +437,7 @@ const FichaAcciones = (() => {
       ui.tirarExtra(it);
       const spRestaurado = restaurarSpDeConsumo(S, it);
       const reparados = it.nombre === 'Oleo reparador' ? repararArmadura(S) : 0;
+      const armRotaTxt = num(it.reparaArmRota) > 0 ? repararArmRota(S, it.reparaArmRota) : '';
       let reviveTxt = '';
       if(it.revive){
         const pct = Math.max(1, Math.min(100, num(it.revive.pct) || 50));
@@ -430,7 +447,7 @@ const FichaAcciones = (() => {
         } else reviveTxt = `✚ ✋ a mano: revivilo con ✚ Revivir en su ficha (${pct} % de su vida); desde el mapa se elige solo`;
       }
       const curadosTxt = curados ? (curados.sacados.length ? `🩹 se le fue: ${curados.sacados.join(', ')}` : '🩹 no tenía nada que curar') : '';
-      ui.cambio([key, ...(efecto || reparados || (curados && curados.sacados.length) ? ['efectos'] : []), ...(it.invocaTemporal ? ['invocaciones'] : []), 'vitals', 'nitros']);
+      ui.cambio([key, ...(armRotaTxt ? ['inventario'] : []), ...(efecto || reparados || armRotaTxt || (curados && curados.sacados.length) ? ['efectos'] : []), ...(it.invocaTemporal ? ['invocaciones'] : []), 'vitals', 'nitros']);
       const partes = [];
       if(curaNo) partes.push(`❌ ${curaNo}`);
       else if(it.curahp) partes.push(`${num(it.curahp)>=0?'+':''}${fmt(num(it.curahp) + boticario)} HP${boticario ? ` (+${fmt(boticario)} de Mano de boticario)` : ''}`);
@@ -439,6 +456,7 @@ const FichaAcciones = (() => {
       if(cargaMax > 1) partes.push(gastoUnidad ? 'última carga usada' : `carga ${carga}/${cargaMax}`);
       if(efecto) partes.push(`${efecto.nombre}${efecto.permanente ? '' : ` (${fmt(efecto.turnos)} turnos)`}`);
       if(reparados) partes.push(reparados > 1 ? 'armadura reparada por completo' : 'armadura reparada');
+      if(armRotaTxt) partes.push(armRotaTxt);
       if(reviveTxt) partes.push(reviveTxt);
       if(curadosTxt) partes.push(curadosTxt);
       ui.toast(`${it.nombre}: ${partes.join(' · ')}`);

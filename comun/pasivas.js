@@ -76,7 +76,15 @@ const PASIVAS_BASE = [
   {poolId: 'punteria', nombre: 'Puntería', jobCosto: 1, etiquetas: ['stat', 'ofensiva'],
    detalle: '+1 PdG (probabilidad de golpe).', mods: [{stat: 'pdg', val: 1}]},
   {poolId: 'ojo-critico', nombre: 'Ojo crítico', jobCosto: 1, etiquetas: ['stat', 'ofensiva'],
-   detalle: '+1 Crítico frecuente. ⚠ A revisar.', mods: [{stat: 'crit', val: 1}]},
+   detalle: '+1 Crítico frecuente.', mods: [{stat: 'crit', val: 1}]},   // (dueño, 2026-11-05: «le sacamos el revisar a ojo crítico»)
+  // 🛡 Resistencia a crítico (2026-11-05, dueño: «si no existe ninguna pasiva… que interactúe con la resistencia del crítico, ya diseñaría alguno»;
+  // docs/propuesta-pasivas-consumibles-res-critico.md). Las de la vida las suma el duelo al calcular el crítico (Combatiente.resCritPorVida).
+  {poolId: 'callo-de-batalla', nombre: 'Callo de batalla', jobCosto: 1, etiquetas: ['stat', 'defensiva'],
+   detalle: '+1 Res. crítico Tipo 4: de tanto ligarla, ya ni se mosquea. ⚙ Automatizado.', mods: [{stat: 'tipo1', val: 1}]},
+  {poolId: 'manas-de-sobreviviente', nombre: 'Mañas de sobreviviente', jobCosto: 1, etiquetas: ['defensiva'],
+   detalle: 'Con la vida a la mitad o menos: +1 Res. crítico contra todos los Tipos. ⚙ Automatizado: el duelo lo suma al calcular el crítico, mirando tu vida en ese momento.', mods: [{stat: 'rescritmitad', val: 1}]},
+  {poolId: 'contra-las-cuerdas', nombre: 'Contra las cuerdas', jobCosto: 1, etiquetas: ['defensiva'],
+   detalle: 'Con la vida en menos de un cuarto: +2 Res. crítico contra todos los Tipos (se suma a Mañas de sobreviviente). ⚙ Automatizado: el duelo lo suma al calcular el crítico, mirando tu vida en ese momento.', mods: [{stat: 'rescritcuarto', val: 2}]},
   {poolId: 'desvio-habil', nombre: 'Desvío hábil', jobCosto: 1, etiquetas: ['stat', 'defensiva'],
    detalle: '+1 Parry.', mods: [{stat: 'parry', val: 1}]},
   {poolId: 'punteria-arcana', nombre: 'Puntería arcana', jobCosto: 1, etiquetas: ['stat', 'ofensiva'],

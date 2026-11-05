@@ -227,8 +227,9 @@ const FichaDuelo = (() => {
       resistenciaCritico: d => {
         const i = [4, 6, 8, 10, 12].indexOf(num(d.ataque.tipoDado));
         if(i < 0) return 0;
-        const v = compute().final['tipo' + (i + 1)];
-        return Number.isNaN(v) ? 0 : Math.round(v);   // puede ser negativa con Punto débil (2026-11-05)
+        const c = compute(), v = c.final['tipo' + (i + 1)];
+        const vida = Combatiente.resCritPorVida(c.final.rescritmitad, c.final.rescritcuarto, getS().hp, c.final.hpmax);   // 🩹 Mañas / Contra las cuerdas
+        return (Number.isNaN(v) ? 0 : Math.round(v)) + vida;   // puede ser negativa con Punto débil (2026-11-05)
       },
       // Los efectos al golpear del arma que el duelo resuelve uno por uno.
       efectosArma: d => {

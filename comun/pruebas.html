@@ -46,10 +46,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261104h"></script>
+<script src="combatiente.js?v=20261105rc"></script>
 <script src="creep-calculo.js?v=20261103t20"></script>
 <script src="creep-botonera.js"></script>
-<script src="creep-acciones.js?v=20261103tf1"></script>
+<script src="creep-acciones.js?v=20261105rc"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
@@ -77,7 +77,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js"></script>
-<script src="ficha-acciones.js?v=20261104ae"></script>
+<script src="ficha-acciones.js?v=20261105rc"></script>
 <script src="ficha-mantenimiento.js?v=20261103ve"></script>
 <script src="estado-preguntas.js"></script>
 <script src="asistente-estado.js"></script>
@@ -105,7 +105,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261105pd"></script>
+<script src="duelo.js?v=20261105rc"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -178,6 +178,10 @@ prueba('🎯 Punto débil (2026-11-05, dueño): la resistencia puede quedar nega
   const sc = {crit: [0, 0, 0, 0, 0], estados: [{...P, activo: true}]};
   igual([Critico.rango(4, 0, -1), Critico.rango(4, 2, -1), CreepCalculo.critEfectivo(sc, 0), Critico.evaluar({pdg: 13, eva: 10, tipo: 4, resistencia: CreepCalculo.critEfectivo(sc, 0)}).nivel, Critico.evaluar({pdg: 13, eva: 10, tipo: 4, resistencia: 0}).nivel],
     [3, 2, -1, 1, 0]);
+});
+prueba('💢 El cuadro del crítico dibuja el Punto débil con el ícono del estado (dueño, 2026-11-05: «¿no le podríamos buscar algún emoji?»)', () => {
+  const h = Duelo.criticoVizHtml({crit: {rango: 3, nivel: 1, resistencia: -1}, ataque: {tipoDado: 4}, eva: {total: 10}, pdg: {total: 13}, defensa: {}});
+  igual([(h.match(/duelo-crit-cuad debil">💢</g) || []).length, />P</.test(h)], [2, false]);
 });
 prueba('supercrítico: dos 20 naturales → ×8', () => igual(Critico.resultadoD20([20, 20], 0).mult, 8));
 prueba('supercrítico: tres 20 naturales → ×12', () => igual(Critico.resultadoD20([20, 20, 20], 0).mult, 12));
@@ -2407,7 +2411,7 @@ prueba('📜 Regeneración y Escudo Especial nuevos, y los pergaminos grupales C
   const S = {catalogo: [], efectos: []};
   const reg = FichaHabilidades.aplicarEfectoDeConsumo(S, cat('Pergamino de Regeneración'), presetsDePrueba).estado;
   const esc = FichaHabilidades.aplicarEfectoDeConsumo(S, cat('Pergamino de Escudo Especial'), presetsDePrueba).estado;
-  const grupales = CATALOGO_BASE.filter(i => /^Pergamino grupal de /.test(i.nombre) && !i.archivo);
+  const grupales = CATALOGO_BASE.filter(i => /^Pergamino grupal de /.test(i.nombre) && !i.archivo && i.id !== 'perg-grupal-temple');   // el de Temple es Bueno (2026-11-05)
   const furia = cat('Pergamino grupal de Furia de Combate');
   igual([reg.hpturno, reg.turnos, !!cat('Pergamino de Regeneración').efectoParty, esc.escudoMagico, esc.recarga, esc.finCombate,
     grupales.length, grupales.every(i => i.tier === 'Común' && i.efectoParty && i.efectoTurnos === 3), furia.efectoMods,
@@ -2870,6 +2874,33 @@ prueba('una trampa consumible que no se pudo colocar no se gasta ni cobra', asyn
   const S = fichaBotonera({nitros: 5, inventario: [{id: 't', nombre: 'Trampa', consumible: true, unidades: 1, trampaDatos: {nombre: 'Púas'}}]}), reg = [];
   await FichaAcciones.consumir(S, 't', false, uiConsumo(S, reg, false));
   igual([S.nitros, S.inventario.length], [5, 1]);
+});
+prueba('🩹 Mañas de sobreviviente y Contra las cuerdas (2026-11-05, dueño): +1 a la mitad o menos, +2 más bajo un cuarto; se suman; en 0 o sin máximo, nada', () => {
+  const v = (h, M) => Combatiente.resCritPorVida(1, 2, h, M);
+  const P = id => PASIVAS_BASE.find(p => p.poolId === id);
+  const S = fichaBotonera({pasivas: [{...P('manas-de-sobreviviente')}, {...P('contra-las-cuerdas')}, {...P('callo-de-batalla')}]}), f = FichaCalculo.calcular(S).final;
+  igual([v(11, 20), v(10, 20), v(5, 20), v(4, 20), v(0, 20), v(5, 0), f.rescritmitad, f.rescritcuarto, f.tipo1 >= 1, /A revisar/.test(P('ojo-critico').detalle)],
+    [0, 1, 1, 3, 0, 0, 1, 2, true, false]);
+});
+prueba('🔨 Ungüento del herrero (2026-11-05): repara 1 punto de Armadura rota de la pieza puesta más dañada (Defensa y durabilidad) y da +1 Res. crítico Tipo 4 por 3 turnos; en un creep saca 1 stack', async () => {
+  const U = CATALOGO_BASE.find(i => i.id === 'cons-unguento-del-herrero'), A = CATALOGO_BASE.find(i => i.id === 'cat-armadura-mediana');
+  const pieza = {...structuredClone(A), id: 'a', equipado: true, armRota: 2};
+  pieza.dur = FichaCalculo.durMax(pieza) - 2;
+  const S = fichaBotonera({nitros: 5, inventario: [pieza, {...structuredClone(U), id: 'u'}]}), reg = [];
+  const durAntes = FichaCalculo.durActual(pieza);
+  await FichaAcciones.consumir(S, 'u', false, uiConsumo(S, reg));
+  const ef = S.efectos.find(e => e.nombre === 'Ungüento del herrero');
+  const cr = Combatiente.repararArmRotaEstados([{nombre: 'Armadura rota', activo: true, stacks: 2}, {nombre: 'Sangrado', activo: true}], 1);
+  const cr1 = Combatiente.repararArmRotaEstados([{nombre: 'Armadura rota', activo: true, stacks: 1}], 1);
+  igual([FichaCalculo.armRotaDe(pieza), FichaCalculo.durActual(pieza) - durAntes, !!ef, ef && (ef.mods || []).some(m => m.stat === 'tipo1' && m.val === 1), ef && ef.turnos, cr.r, cr.estados.map(e => e.nombre + (e.stacks || '')), cr1.estados.length],
+    [1, 1, true, true, 3, 1, ['Armadura rota1', 'Sangrado'], 0]);
+});
+prueba('🛡 Consumibles de resistencia a crítico (2026-11-05): Grasa de carpincho 5 turnos (T4 y T6), Pergamino de Temple / mayor hasta el fin del combate (+1 / +2 a todos), grupal 3 turnos, Aceite del punto débil frecuente +1 3 turnos; sin Tiza de sastre', () => {
+  const C = id => CATALOGO_BASE.find(i => i.id === id) || {};
+  const tipos = it => (it.efectoMods || []).filter(m => /^tipo/.test(m.stat)).map(m => m.stat + ':' + m.val).join(',');
+  igual([tipos(C('cons-grasa-de-carpincho')), C('cons-grasa-de-carpincho').efectoTurnos, C('perg-temple').efectoFinCombate, tipos(C('perg-temple-mayor')).split(',').length, (C('perg-temple-mayor').efectoMods || [])[0].val,
+    C('perg-grupal-temple').efectoParty && C('perg-grupal-temple').efectoTurnos, (C('cons-aceite-del-punto-debil').efectoMods || [])[0].stat, CATALOGO_BASE.some(i => /Tiza de sastre/.test(i.nombre))],
+    ['tipo1:1,tipo2:1', 5, true, 5, 2, 3, 'crit', false]);
 });
 prueba('curar a quien estaba inconsciente lo despierta; quedar en 0 lo desmaya (y el Ankh del cinturón lo revive)', () => {
   const S = fichaBotonera({hp: 0, muerto: {activo: true, turnos: 2, definitivo: false}});

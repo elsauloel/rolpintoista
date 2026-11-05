@@ -252,7 +252,7 @@ const Duelo = (() => {
 .duelo-crit-cuad.eva{background:#3b1820;border-color:#d95a6e;color:#ffe3e7}
 .duelo-crit-cuad.activo{background:#2d6cdf;border-color:#8db3ff;color:#fff}
 .duelo-crit-cuad.suelto{background:#12172a;border-color:#2b3347;color:#565f78}
-.duelo-crit-cuad.debil{background:#3a1f4a;border-color:#c58cff;color:#e6ccff;font-weight:900;font-size:10px;display:flex;align-items:center;justify-content:center}
+.duelo-crit-cuad.debil{background:#3a1f4a;border-color:#c58cff;color:#e6ccff;font-size:11px;line-height:1;display:flex;align-items:center;justify-content:center}   /* 💢 el ícono del estado Punto débil (dueño, 2026-11-05: «¿no le podríamos buscar algún emoji?») */
 .duelo-crit-cuad.res{background:#3a2f12;border-color:#ffd25a;color:#ffd25a;font-weight:900;font-size:10px;display:flex;align-items:center;justify-content:center}
 .duelo-crit-cuad.anulado{background:#2d6cdf;border-color:#8db3ff}
 .duelo-crit-cuad.anulado::after{content:'';position:absolute;inset:0;border-radius:3px;background:linear-gradient(135deg,transparent 44%,#ffd25a 47%,#ffd25a 53%,transparent 56%)}
@@ -2750,7 +2750,7 @@ const Duelo = (() => {
   // rango/resistencia). Arriba, el Tipo del arma en cuadrados: los que se pierden por Crítico frecuente quedan
   // atenuados, el resto (el rango real) queda entero. Abajo, la tirada de PdG completa (no la diferencia — el
   // dueño pidió ver el total real): lo que se come la Evasión/Parry en rojo con una «E», y lo que queda se agrupa
-  // de a «rango» — cada grupo entero es un nivel de crítico (azul); la Resistencia a crítico agranda el rango (cuadraditos «R»; el Punto débil lo achica, «P»); antes los que anulaba quedaban
+  // de a «rango» — cada grupo entero es un nivel de crítico (azul); la Resistencia a crítico agranda el rango (cuadraditos «R»; el Punto débil lo achica, «💢»); antes los que anulaba quedaban
   // tachados cuadradito por cuadradito (no con una línea por encima de todo el grupo); lo que sobra sin llegar a
   // un grupo entero queda gris, suelto. Las dos filas se reordenan de a 5 (pedido del dueño, para contar de un
   // vistazo) y abajo hay una leyenda con lo que significa cada color/símbolo.
@@ -2769,12 +2769,12 @@ const Duelo = (() => {
 
     // Fila del Rango: los cuadraditos que resta el Crítico frecuente van en verde con una «F» (pedido del dueño).
     // 🛡 La Resistencia a crítico (2026-11-04, dueño) suma cuadraditos «R» al rango; el frecuente los descuenta uno a uno (mínimo 2 al final).
-    // 🎯 Punto débil (2026-11-05): con resistencia negativa, los últimos cuadraditos del Tipo van tachados en violeta («P»): achican el rango.
+    // 🎯 Punto débil (2026-11-05): con resistencia negativa, los últimos cuadraditos del Tipo van en violeta con 💢 (el ícono del estado): achican el rango.
     const resistencia = Math.round(_num(c.resistencia)), resPos = Math.max(0, resistencia), debil = Math.max(0, -resistencia);
     const nFrec = Math.max(0, tipo + resistencia - rango);
     // Los que quedan llevan la mira (dueño, 2026-10-12: «los recuadros vacíos podrían estar con el ícono de la mira, el círculo con las cuatro rayitas»).
     const MIRA = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="4.6"/><path d="M8 1v3.2M8 11.8V15M1 8h3.2M11.8 8H15"/></svg>';
-    const filaTipo = deA5(Array.from({length: tipo + resPos}, (_, i) => i < nFrec ? cuad('frec', 'F') : i >= tipo ? cuad('res', 'R') : i >= tipo - debil ? cuad('debil', 'P') : cuad('mira', MIRA)));
+    const filaTipo = deA5(Array.from({length: tipo + resPos}, (_, i) => i < nFrec ? cuad('frec', 'F') : i >= tipo ? cuad('res', 'R') : i >= tipo - debil ? cuad('debil', '💢') : cuad('mira', MIRA)));
 
     // La tirada, agrupada de a «rango» (2026-09-28, el dueño volvió a este agrupado en vez de a 5: cada grupo
     // entero es un nivel de crítico, así se cuentan de un vistazo). Primero lo que come la Evasión/Parry (rojo,
@@ -2797,7 +2797,7 @@ const Duelo = (() => {
       evaTotal ? `${cuad('eva', 'E')}<span>= tirada de ${_esc(nombreDef2)}</span>` : '',
       `${cuad('activo')}<span>= cuenta para un nivel de crítico</span>`,
       resPos ? `${cuad('res', 'R')}<span>= Resistencia a crítico del defensor (Tipo ${_fmt(tipo)} ×${_fmt(resPos)}): agranda el rango</span>` : '',
-      debil ? `${cuad('debil', 'P')}<span>= Punto débil del defensor (−${_fmt(debil)}): achica el rango</span>` : '',
+      debil ? `${cuad('debil', '💢')}<span>= Punto débil del defensor (−${_fmt(debil)}): achica el rango</span>` : '',
       huboSuelto ? `${cuad('suelto')}<span>= no llega a completar un nivel</span>` : '',
     ].filter(Boolean).map(t => `<div class="duelo-crit-ref">${t}</div>`).join('');
 
@@ -3737,5 +3737,5 @@ const Duelo = (() => {
   }
 
   const abiertoId = () => actual && !actual.min ? actual.id : null;   // ⏬ el duelo abierto (no minimizado) en esta pantalla (la Demora animada, 2026-11-04)
-  return {abiertoId, textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, pagoHabTomar, fraseResumen, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, apartar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
+  return {criticoVizHtml, abiertoId, textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, pagoHabTomar, fraseResumen, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, apartar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
 })();

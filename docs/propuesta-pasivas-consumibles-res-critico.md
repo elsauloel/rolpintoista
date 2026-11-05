@@ -1,6 +1,16 @@
 # Propuesta: pasivas y consumibles para la Resistencia a crítico
 
-Parte del [plan](plan-resistencia-critico.md). **Solo propuesta: no se cambió nada del juego.** Fecha: 2026-11-05.
+Parte del [plan](plan-resistencia-critico.md). Fecha: 2026-11-05.
+
+> **✅ Cargado (dueño, 2026-11-05).** Pasivas: **Callo de batalla**, **Mañas de sobreviviente** y una nueva, **Contra las cuerdas** (dueño: «una que si
+> estás en menos de un cuarto de tu HP máximo, tenés más 2 a resistencia a todos los críticos»; 1 Job; se suma a Mañas: bajo ¼, +3). Las dos de la vida
+> las suma solo el duelo (`Combatiente.resCritPorVida`, stats `rescritmitad` / `rescritcuarto`). **Ojo crítico** sin el «⚠ a revisar». Consumibles:
+> **Grasa de carpincho** (5 turnos, no hasta el fin del combate), **Ungüento del herrero** (repara **1 punto** de Armadura rota de la pieza puesta más
+> dañada —Defensa y durabilidad— y +1 T4 por 3 turnos; en un creep saca 1 stack; `reparaArmRota`), **Pergamino de Temple** / **mayor** / **grupal**
+> y **Aceite del punto débil**. **No**: Aguante, Ensañado, Tiza de sastre. **Pendientes de respuesta**: Ojo para las grietas («¿no existe ya una
+> pasiva de +1 frecuente a secas?» → sí, Ojo crítico) y Cuero duro. El Punto débil en el cuadro del crítico se dibuja con 💢 (el ícono del estado).
+> Probado en «Claude · pruebas» con Prueba Uno: Ungüento (Armadura rota 2 → 1, durabilidad 4 → 5) y Grasa (estados de 3 y 5 turnos), Res. T4 6/15
+> de vida 2 → 4, Res. T8 con 3 de vida 3 y con la vida llena 0.
 Pedido del dueño: «si no existe ninguna pasiva ni ningún consumible que interactúe con la resistencia del crítico, de paso ya diseñaría alguno».
 
 ## Lo que ya hay

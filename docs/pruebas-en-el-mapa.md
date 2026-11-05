@@ -281,6 +281,10 @@
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 
 ## Pendientes
+- [ ] **⏬ La Demora, más lenta y clara (2026-11-05, dueño).** El cuadro del duelo vuela a su token (sin parpadeo), la lista de turnos brilla con «⏬ DEMORA»
+  al costado, un 👆 la toca, se despliega con el orden de antes, baja sola hasta el demorado si está lejos, el nombre se desliza a su lugar nuevo, queda
+  quieta un momento, se vuelve a plegar y el duelo vuelve a desplegarse desde su token. Probado en Claude · pruebas con un duelo viejo abierto y una
+  lista de 14; falta en un duelo real (y verlo desde otra pantalla a la vez).
 - [ ] **🎲 El d20 del crítico en 3D según el multiplicador (2026-11-05, dueño).** ×1: sin brillo, un 😞 sobre el dado; ×2: brillo dorado y pulso;
   ×3: además, estrellitas; ×4 o más: además, guirnaldas 🎊 y papelitos por toda la pantalla. Probado con tiradas sueltas en el mapa (los cuatro);
   falta verlo en un crítico de un duelo real (lo manda el duelo con `destacar: 'crit:N'`).

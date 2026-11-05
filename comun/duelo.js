@@ -410,12 +410,43 @@ const Duelo = (() => {
   }
   /* 🪝 Apartar el cuadro de ESTE duelo mientras pasa algo en el mapa (2026-11-04: la animación del gancho de Arrastrar quedaba tapada por el cuadro):
      si está abierto (no minimizado), se minimiza `ms` milisegundos y vuelve solo, salvo que mientras tanto lo hayan abierto o cerrado a mano. */
+  // (2026-11-05, dueño: «el menú del duelo hace un blink out que lo hace parecer casi un bug… debe replegarse a su token con una animación suave… y
+  // cuando termine todo, volver a desplegarse desde el token con una animación suave»): se repliega volando a su token y vuelve a nacer desde ahí.
+  // `ms` cuenta desde que se llama. → cuánto tarda en replegarse (para que quien lo llama espere antes de lo suyo); 0 si no había nada que apartar.
+  // `ms` > 0: vuelve solo a los `ms` (contados desde que se llama); sin `ms` (o 0), queda apartado hasta `volverApartado(id)`.
   function apartar(id, ms){
     const f = document.getElementById('duelo-fondo');
-    if(!actual || actual.id !== id || !f || actual.min || f.classList.contains('min')) return;
-    minimizar();
-    const yo = actual;
-    setTimeout(() => { if(actual === yo && actual.min) abrir(id); }, Math.max(300, Math.min(15000, Number(ms) || 0)));
+    if(!actual || actual.id !== id || !f || actual.min || f.classList.contains('min')) return 0;
+    const yo = actual, p = origenDe(actual.otroToken), poco = pocoMovimiento();
+    const dur = poco || typeof f.animate !== 'function' ? 0 : ANIM_CERRAR + 120;
+    yo.apartado = true;
+    if(dur){
+      f.style.transformOrigin = puntoOrigen(f, p);
+      f.style.pointerEvents = 'none';
+      const an = f.animate([{transform: 'scale(1)', opacity: 1}, {transform: p ? 'scale(.04)' : 'scale(.85)', opacity: 0}], {duration: dur, easing: 'cubic-bezier(.45,0,.6,1)', fill: 'forwards'});
+      an.onfinish = () => { if(actual === yo) minimizar(); an.cancel(); f.style.pointerEvents = ''; f.style.transformOrigin = ''; pulsoEn(p); };
+    }else minimizar();
+    if(Number(ms) > 0) setTimeout(() => volverApartado(id), Math.max(300, Math.min(20000, Number(ms))));
+    return dur || 1;
+  }
+  // El que se apartó vuelve a nacer desde su token (si nadie lo abrió, cerró o cambió mientras tanto).
+  function volverApartado(id){
+    if(!actual || actual.id !== id || !actual.apartado) return;
+    actual.apartado = false;
+    if(!actual.min) return;
+    const f2 = document.getElementById('duelo-fondo');
+    actual.min = false;
+    if(f2) f2.classList.remove('min');
+    dibujarChips();
+    avisarPagina();
+    if(!f2 || pocoMovimiento() || typeof f2.animate !== 'function') return;
+    const p2 = origenDe(actual.otroToken);
+    f2.style.transformOrigin = puntoOrigen(f2, p2);
+    f2.style.pointerEvents = 'none';
+    if(p2) pulsoEn(p2);
+    const an2 = f2.animate([{transform: p2 ? 'scale(.04)' : 'scale(.85)', opacity: 0}, {transform: 'scale(1)', opacity: 1}],
+      {duration: ANIM_ABRIR + 200, delay: p2 ? 450 : 0, easing: 'cubic-bezier(.2,.8,.25,1)', fill: 'backwards'});
+    an2.onfinish = an2.oncancel = () => { f2.style.pointerEvents = ''; f2.style.transformOrigin = ''; };
   }
   document.addEventListener('keydown', e => {
     if(e.key !== 'Escape') return;
@@ -3812,5 +3843,5 @@ const Duelo = (() => {
   }
 
   const abiertoId = () => actual && !actual.min ? actual.id : null;   // ⏬ el duelo abierto (no minimizado) en esta pantalla (la Demora animada, 2026-11-04)
-  return {criticoVizHtml, tablaCriticoHtml, abiertoId, textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, pagoHabTomar, fraseResumen, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, apartar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
+  return {criticoVizHtml, tablaCriticoHtml, abiertoId, textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, pagoHabTomar, fraseResumen, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, apartar, volverApartado, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
 })();

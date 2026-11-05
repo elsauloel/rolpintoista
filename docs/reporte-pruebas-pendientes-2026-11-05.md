@@ -29,3 +29,33 @@ sube nadie. Probado con tres pantallas: Jugador 1 eligió a Larry (12.º → 11.
 ## Sin probar
 Cambio de guardia con clics y la tirada de la Mufa en una ronda real; el duelo real con Punto débil 💢, Golpe brutal / Apuntar / marca, Mañas de
 sobreviviente y Contra las cuerdas, Grasa y Ungüento (y un creep con el Ungüento); el pulso y la espada del Remolino.
+
+# Segunda tanda (2026-11-05, con clics desde el mapa)
+
+Cuentas Jugador 1, Jugador 2 y GM en «Claude · pruebas». Lo tocado se respaldó antes y se restauró al final. El origen no se tocó.
+
+## Anduvo
+- **Toque de carga** desde la Botonera: cuesta 3 → 5 → 7 y el aliado sube un lugar (Prueba Dos, 13.º → 12.º), aplicado por la pantalla del GM.
+- **Cambio de guardia** con dos clics: el cambio se hace al empezar la ronda siguiente (Prueba Dos 8, Prueba Uno 11).
+- **Sed de sangre**: Prueba Uno mató a Basilio en la ronda 3 y subió 2 (11 → 9). En la ronda 2 no se pudo, porque ya había usado un efecto esa ronda (la regla de uno por ronda).
+- **Echar la mufa** a un aliado (directo) y a un rival (se resiste con Res.Mt). Al empezar la ronda se tira Res.Mt contra el Efecto especial: el picapiedras perdió y bajó 8.º → 9.º, con la animación de la lista.
+- **Duelo real** con **Punto débil 💢** + **Golpe brutal**: crítico ×3 con el cuadro nuevo.
+- **Grasa de carpincho** y **Ungüento del herrero** desde la Botonera. El Ungüento repara 1 de Armadura rota.
+- Un **creep** con el Ungüento desde ⚡ Acciones.
+- **Ficha lite**: Mañas / Contra las cuerdas con poca vida.
+
+## Falló y quedó arreglado
+- Una pestaña vieja del mapa del GM en otro mapa tomaba el Toque, el daño, la Mufa y el Cambio de guardia. Dejaba «el token ya no está…» o anotaba el cambio en su mapa. Ahora esos pedidos tienen nombres nuevos y solo los toma una pantalla que ve a los dos tokens (70090bb3, bdb2a5d8, 60a067bf, f84f540a).
+- La tirada de la Mufa salía con un valor fijo y la Mesa decía «[object Object]» (04de2e1b).
+- La ficha lite mostraba el Tipo 12, y con poca vida no sumaba Mañas ni Contra las cuerdas (ce68d298).
+- La Mesa no decía cuánta Armadura rota reparó el Ungüento (60f16a54).
+- **Remolino / áreas**: una pantalla del GM en otro mapa salteaba a los objetivos y el giro terminaba sin pegarle a nadie. Ahora el área guarda su mapa (c625f261). **Hay que recargar las pestañas del mapa.**
+
+## Sin probar
+- El Remolino después del arreglo: el pulso, el cuadro que se despliega y se pliega, y el siguiente rival.
+- Apuntar y Marcar con el potente nuevo.
+- El cuadro del duelo encima de la animación del gancho (`Duelo.apartar`).
+
+## Para el dueño
+- El Tipo 12 sigue apareciendo en el panel ⚡ Acciones de los creeps, en la lupa del creep y en la Botonera. Solo se sacó de la ficha lite. ¿Lo sacamos de todos lados?
+- Invocaciones: anotado lo que decidiste (al morir desaparece del mapa y quien la invocó la puede volver a invocar).

@@ -319,10 +319,19 @@
   ⛔ inmune y qué daño). Probado como GM en Claude · pruebas (Goblin Scout); falta verlo desde un jugador (solo lo revelado).
 - [ ] **⏬ Demora a quien ya está último (2026-11-05, dueño).** La fila intenta bajar, rebota contra el borde y aparece «⛔ Ya está último: no puede
   bajar» (también el Aviso/la Crónica). Probada la animación sola; falta en un duelo real.
-- [ ] **🩹 Resistencia a crítico por la vida y 💢 en el cuadro (2026-11-05)**: en un duelo real, pegarle con Tipo 4 a un personaje con **Mañas de
-  sobreviviente** / **Contra las cuerdas** a la mitad o menos (y bajo ¼) de vida y ver que el rango sube; y a uno con **Punto débil** y ver el **💢**
-  violeta en el cuadro del crítico. Ya probado sin duelo: los ganchos del duelo con la ficha real de Prueba Uno y el cuadro dibujado aparte. Falta también
-  un **creep** usando el **Ungüento del herrero** (saca 1 stack de Armadura rota).
+- [x] **🩹 Resistencia a crítico por la vida y 💢 en el cuadro (2026-11-05)** — probado con clics en Claude · pruebas (segunda tanda, 2026-11-05):
+  duelo real Prueba Uno → Goblin picapiedras con **Punto débil** y **Golpe brutal** (potente +3, frecuente +1): crítico ×3 y el **💢** violeta en el
+  cuadro nuevo. La ficha lite ya no muestra el Tipo 12 y suma **Mañas de sobreviviente / Contra las cuerdas** con la vida de ahora (antes decía 0).
+  **Grasa de carpincho** y **Ungüento del herrero** desde la Botonera: el estado y la resistencia suben, y el Ungüento repara 1 de Armadura rota del
+  peto (×2 → ×1, durabilidad 5 → 6); ahora también lo dice la Mesa. Un **creep** (picapiedras) usando el Ungüento desde ⚡ Acciones → cinturón:
+  Armadura rota 2 → 1, −1 No2.
+- [ ] **🌀 Remolino con dos rivales (2026-11-05, segunda tanda)**: se vio la espadita y la flor violeta, pero el área terminaba sin duelos: las áreas
+  son de toda la partida y una pestaña del GM en **otro mapa** salteaba a los objetivos que no veía. Arreglado (c625f261: el área guarda su mapa en
+  `centro.mapa` y solo la lleva el GM de ese mapa; sin huecos en `duelos`). **Falta volver a probarlo** con dos rivales al lado: pulso → cuadro que se
+  despliega → se pliega → pulso → siguiente rival. Hay que recargar las pestañas del mapa.
+- [ ] **🪝 El cuadro del duelo encima de la animación del gancho**: no llegué a revisarlo (¿usar `Duelo.apartar` en js/78 / js/96?).
+- **Invocaciones (dueño, 2026-11-05):** cuando una invocación muere desaparece del mapa, eso está bien; quien la invocó la puede volver a invocar.
+  No es un error a arreglar (el GM no necesita revivirla desde el anillo).
 
 - [ ] **🎯 Punto débil deja la resistencia a crítico en negativo (2026-11-05, dueño: «Punto débil, me parece bien lo que propones»).** Con la Aguja
   siniestra (o el Arma siniestra) dejar Punto débil a un rival **sin** resistencia y pegarle con un arma Tipo 4: en el cuadro del crítico del duelo la

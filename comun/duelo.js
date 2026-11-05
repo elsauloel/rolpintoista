@@ -356,7 +356,10 @@ const Duelo = (() => {
 .duelo-lista button:hover{border-color:#6b8fd6}
 .duelo-lista .tag{font-size:11px;color:#9aa4bd}
 #duelo-avisos{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:98000;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
-.duelo-chip{pointer-events:auto;background:#3b1820;color:#ffe3e7;border:2px solid #d95a6e;border-radius:999px;padding:9px 16px;font-size:14px;font-weight:700;cursor:pointer;box-shadow:0 8px 30px rgba(0,0,0,.5);animation:duelo-chip .5s ease-out both}
+.duelo-chip{pointer-events:auto;display:inline-flex;align-items:center;background:#3b1820;color:#ffe3e7;border:2px solid #d95a6e;border-radius:999px;padding:0;font-size:14px;font-weight:700;box-shadow:0 8px 30px rgba(0,0,0,.5);animation:duelo-chip .5s ease-out both;overflow:hidden}
+.duelo-chip-txt{background:none;border:0;color:inherit;font:inherit;padding:9px 10px 9px 16px;cursor:pointer;text-align:left}
+.duelo-chip-x{background:none;border:0;border-left:1px solid rgba(255,255,255,.18);color:inherit;font:inherit;font-size:13px;padding:9px 13px;cursor:pointer;opacity:.75}
+.duelo-chip-x:hover{opacity:1;background:rgba(255,255,255,.1)}
 .duelo-chip.res{background:#173f27;border-color:#4fce7c;color:#c9f5d6}
 @keyframes duelo-chip{0%{transform:translateY(30px) scale(.9);opacity:0}100%{transform:none;opacity:1}}
 @media(max-width:600px){.duelo-tiros{grid-template-columns:1fr}.duelo-vs{grid-template-columns:1fr}.duelo-vs .vs{display:none}}
@@ -3524,17 +3527,22 @@ const Duelo = (() => {
         : d.hab ? `✨ Ver ejecución: ${d.atacante.nombre} → ${d.defensor.nombre}` : `⚔ Ver duelo: ${d.atacante.nombre} → ${d.defensor.nombre}`;
       let el = chips.get(id);
       if(!el){
-        el = document.createElement('button');
-        el.type = 'button';
-        el.onclick = () => abrir(id);
+        // ✕ en la tira (2026-11-05, dueño: «quiero que este menú minimizado tenga un botón X para cerrarlo»): ver `chipCerrar`.
+        el = document.createElement('div');
+        el.innerHTML = '<button type="button" class="duelo-chip-txt"></button><button type="button" class="duelo-chip-x" aria-label="Cerrar">✕</button>';
+        el.querySelector('.duelo-chip-txt').onclick = () => abrir(id);
+        el.querySelector('.duelo-chip-x').onclick = e => { e.stopPropagation(); chipCerrar(el._duelo || {id}); };
         contenedorAvisos().appendChild(el);
         chips.set(id, el);
       }
+      el._duelo = d;
+      const btxt = el.querySelector('.duelo-chip-txt'), bx = el.querySelector('.duelo-chip-x');
       // Mientras un paso espera a los dados, el botón no lo adelanta (ni el «💥 Crítico» que viene después).
-      if(el.textContent && [...pasosEnEspera].some(k => k.startsWith(id + ':'))) return;
+      if(btxt.textContent && [...pasosEnEspera].some(k => k.startsWith(id + ':'))) return;
       el.className = 'duelo-chip' + (d.estado === 'resuelto' ? ' res' : '');
-      el.textContent = txt;
-      el.title = d.hab ? 'Ver la ejecución' : 'Ver el duelo';
+      btxt.textContent = txt;
+      btxt.title = d.hab ? 'Ver la ejecución' : 'Ver el duelo';
+      bx.title = enCurso(d) ? (d.hab ? 'Cancelar la ejecución' : 'Cancelar el duelo') : (d.hab ? 'Cerrar' : 'Terminar duelo');
     });
     // Hook opcional (2026-09-27, pedido del dueño): el mapa lo usa para hacer latir en el
     // lienzo a los dos tokens de cada duelo que quedó minimizado/de fondo para esta pantalla —
@@ -3569,6 +3577,24 @@ const Duelo = (() => {
     const que = d.hab ? (d.hab.nombre || 'la habilidad') : 'el duelo';
     if(typeof mesaLinea === 'function') mesaLinea(`✋ ${(d.atacante && d.atacante.nombre) || '¿?'} → ${(d.defensor && d.defensor.nombre) || '¿?'}: ${que} se terminó a mano; lo que falta se resuelve con la Mesa`, 'recordatorio');
   }
+  /* ✕ de la tira del duelo minimizado (2026-11-05, dueño: «si el duelo ya está terminado, que sea lo mismo que terminar duelo. Si está en curso, que avise
+     que estás cancelando el duelo, con las notificaciones pertinentes»). Terminado: lo mismo que «Terminar duelo» (se cierra en esta pantalla).
+     En curso: solo quien lo empezó o el GM (como el botón Cancelar del cuadro); pregunta, y si sigue, `cancelarDuelo` (con lo de devolver lo pagado),
+     la línea en la Mesa y el cuadro que se cierra solo en todas las pantallas. Los demás: un aviso de que no lo pueden cancelar. */
+  async function chipCerrar(d){
+    if(!d || !d.id) return;
+    if(!enCurso(d)){
+      if(actual && actual.id === d.id) cerrar();
+      else { descartados.add(d.id); dibujarChips(); avisarPagina(); }
+      return;
+    }
+    if(!(soyGM() || d.creadoPor === yo())){ _toast(`${d.hab ? 'La ejecución' : 'El duelo'} sigue en curso: solo quien ${d.hab ? 'la' : 'lo'} empezó o el GM ${d.hab ? 'la' : 'lo'} puede cancelar`); return; }
+    const que = d.hab ? `la ejecución de ${d.hab.nombre || 'la habilidad'}` : 'el duelo';
+    const txt = `⚠ ${que.charAt(0).toUpperCase() + que.slice(1)} entre ${(d.atacante && d.atacante.nombre) || '¿?'} y ${(d.defensor && d.defensor.nombre) || '¿?'} todavía está en curso.\n\nSi lo cerrás, se cancela para toda la mesa: lo que falta no se resuelve. ¿Cancelarlo?`;
+    const ok = typeof Confirmar !== 'undefined' && Confirmar.preguntar ? await Confirmar.preguntar(txt, {titulo: d.hab ? 'Cancelar la ejecución' : 'Cancelar el duelo', icono: '✖', si: 'Sí, cancelarlo', no: 'Volver'}) : confirm(txt);
+    if(!ok) return;
+    await cancelarDuelo(d);
+  }
   async function cancelarDuelo(d){
     const a = d.ataque || {}, especial = a.tipo === 'oportunidad' || a.tipo === 'contra';
     const pagado = !d.hab && a.tipo && a.tipo !== 'habilidad-arma' && d.pdg;
@@ -3596,7 +3622,12 @@ const Duelo = (() => {
     }
     // 🏹 La flecha especial (2026-10-28, dueño): se gasta al armar el duelo; si se cancela antes de tirar el PdG (o el ataque no cuenta), vuelve.
     const flecha = conFlecha && (!d.pdg || devolver);
-    col().doc(d.id).update({estado: 'cancelado', ...(devolver ? {resultado: 'devolver'} : flecha ? {resultado: 'devolver-flecha'} : {})}).catch(err => console.error(err));
+    try{ await col().doc(d.id).update({estado: 'cancelado', ...(devolver ? {resultado: 'devolver'} : flecha ? {resultado: 'devolver-flecha'} : {})}); }
+    catch(err){ console.error(err); _toast('No se pudo cancelar'); return false; }
+    // 📣 Que la mesa se entere (2026-11-05): quién lo canceló y entre quiénes era.
+    const que = d.hab ? (d.hab.nombre || 'la habilidad') : 'el duelo';
+    if(typeof mesaLinea === 'function') try{ mesaLinea(`✖ ${soyGM() ? 'El GM' : (d.atacante && d.atacante.nombre) || 'Alguien'} canceló ${que}: ${(d.atacante && d.atacante.nombre) || '¿?'} → ${(d.defensor && d.defensor.nombre) || '¿?'}`, 'recordatorio'); }catch(e){}
+    return true;
   }
   const devolviendo = new Set(), devolverIntentos = new Map();
   async function devolverSiToca(d){

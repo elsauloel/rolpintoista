@@ -281,6 +281,9 @@
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 
 ## Pendientes
+- [ ] **✕ en la tira del duelo minimizado (2026-11-05, dueño).** Terminado: la ✕ es «Terminar duelo» (probado en Claude · pruebas). **En curso**: quien
+  lo empezó o el GM ve «¿Cancelarlo?»; con Sí se cancela para todos (con la pregunta de devolver lo pagado, si corresponde), queda «✖ … canceló el duelo»
+  en la Mesa y el cuadro se cierra solo en las demás pantallas; otro jugador recibe un aviso de que no lo puede cancelar. Falta probar el caso en curso.
 - [ ] **⏬ La Demora, más lenta y clara (2026-11-05, dueño).** El cuadro del duelo vuela a su token (sin parpadeo), la lista de turnos brilla con «⏬ DEMORA»
   al costado, un 👆 la toca, se despliega con el orden de antes, baja sola hasta el demorado si está lejos, el nombre se desliza a su lugar nuevo, queda
   quieta un momento, se vuelve a plegar y el duelo vuelve a desplegarse desde su token. Probado en Claude · pruebas con un duelo viejo abierto y una

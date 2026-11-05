@@ -715,17 +715,23 @@ los niveles 2 a 5 completos (atributos, habilidad, pasiva, equipo concreto, cons
 
 ### ✅ W1 Hachero · ruta final, niveles 1 a 5 (aprobada 2026-11-05)
 - Dueño: «Partir en dos, reemplazarlo por alguna que sea del pool» → **Arte de la guerra**; «lo pondría en un nivel anterior» → opción A: Arte
-  de la guerra en el nivel 4 y Remate + Sed de sangre en el nivel 5. Casco del nivel 5: **Casco de bandas remachadas** (Def. esp. queda en 0:
+  de la guerra en el nivel 4 y Remate en el nivel 5; **Sed de sangre se queda en el nivel 4** (dueño: «Sed de sangre dejalo en nivel 4»). Casco del nivel 5: **Casco de bandas remachadas** (Def. esp. queda en 0:
   su punto débil, la magia, a propósito).
 | Nv | Fue/Con/Agi/Des/Esp · vida · No2 | Habilidad nueva | Pasiva nueva | Equipo |
 |---|---|---|---|---|
 | 1 | 9/7/6/7/4 · 35 · 6 | Pegar fuerte (cd 2) · Romper armadura (cd 3) | — | Hacha · Cota de malla de hierro · Cofia de anillas sueltas |
 | 2 | 10/8/7/7/4 · 40 · 7 | Barrido (cd 3) | Golpe fuerte (+1 Dmg) | + Grebas de cuero |
 | 3 | 11/9/7/8/4 · 45 · 7 | Golpe demoledor (cd 3, lenta) | — | Hacha → **Hacha de guerra ligera** (B) |
-| 4 | 12/10/8/8/4 · 55 · 8 | **Arte de la guerra** (Flash +3, cd 2) | — | Cota de hierro → **Cota de malla fina** (B) · + Guanteletes de hierro |
-| 5 | 13/11/8/9/4 · 65 · 8 | **Remate** (cd 3) | **Sed de sangre** | Cofia → **Casco de bandas remachadas** (B) · + Botas de estibador |
+| 4 | 12/10/8/8/4 · 55 · 8 | **Arte de la guerra** (Flash +3, cd 2) | **Sed de sangre** | Cota de hierro → **Cota de malla fina** (B) · + Guanteletes de hierro |
+| 5 | 13/11/8/9/4 · 65 · 8 | **Remate** (cd 3) | — | Cofia → **Casco de bandas remachadas** (B) · + Botas de estibador |
 Consumible en todos: Pergamino grupal de Furia de Combate. Nv5 (números del juego): Def 10 · daño fijo 16 · PdG/Parry 9/9 · Bloqueo 14 · Res.CC 12 ·
 Res. crít. T4/T6/T8 3/2/1 · Def. esp. 0 · Res.Mt 4. **Pendiente: cargarlo en el pool esencial (niveles 2 a 5).**
+
+### T1 Escudero · nivel 2 (aprobado 2026-11-05)
+- Atributos Con 13 · Fue 6 · Agi 6 · Des 7 · Esp 4 → vida 65, No2 6. Equipo: Hacha de piedra · Escudo de caparazón de tortuga gigante · Peto de
+  hierro · Cofia de anillas sueltas · **Grebas de cuero** (dueño: «solo con las grebas»). Habilidades: Provocar · Piel de hierro · **Golpe de
+  escudo** (cd 2, 5 No2). Pasiva: **Guardia firme** (+1 Bloqueo). Consumibles: Cuero Duro y Piel de Cristal.
+- Números (nv1 → nv2): Def 5 → 6 · Def. esp. 2 · Bloqueo 7 → 9 · Dmg 5 → 6 · Eva/Ini/Mov 5 → 6 · Res.Esp/Res.CC 12 → 13 · Res. crít. T4 1 → 2.
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 

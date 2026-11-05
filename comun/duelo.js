@@ -268,11 +268,40 @@ const Duelo = (() => {
 .duelo-d20s{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;align-items:center;margin:12px 0 8px}
 .duelo-d20{width:44px;height:44px;border-radius:10px;background:#12172a;border:1px solid #39435c;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:18px;color:#9aa4bd;position:relative}
 .duelo-d20.nuevo{animation:duelo-d20in .45s cubic-bezier(.2,1.6,.4,1) both}
+.duelo-d20.elegido{color:#e6ebf7;border-color:#8e98b4}   /* ×1: el dado que valió, sin brillo (dueño: «si es menos de 7, el dado queda normal») */
 .duelo-d20.mejor{width:58px;height:58px;font-size:28px;color:#fff3c9;background:radial-gradient(circle,#8a5a12,#4a2a08);border:2px solid #ffd25a;z-index:1;box-shadow:0 0 18px rgba(255,190,60,.7)}
 .duelo-d20.mejor::before,.duelo-d20.mejor::after{content:'';position:absolute;inset:-4px;border-radius:50%;border:2px solid #ffd25a;opacity:0;pointer-events:none;animation:duelo-onda 1.8s ease-out infinite}
 .duelo-d20.mejor::after{animation-delay:.9s}
 @keyframes duelo-onda{0%{transform:scale(.7);opacity:.95}100%{transform:scale(2.6);opacity:0}}
 @keyframes duelo-d20in{0%{transform:scale(0) rotate(-180deg);opacity:0}100%{transform:none;opacity:1}}
+/* 🎲 El d20 rueda en el cuadro y el resultado pega según lo que salió (2026-11-05, dueño: «esa animación es importante porque le da suspenso… si es
+   menos de 7, el dado queda normal; doble daño, un efecto que lo resalte un poco; mayor impacto para triple y mucho más impacto para el cuádruple») */
+.duelo-d20.rueda{color:#fff;border-color:#8db3ff;background:#1b2440;animation:duelo-d20rueda .18s linear infinite}
+@keyframes duelo-d20rueda{0%{transform:rotate(-8deg) scale(1)}50%{transform:rotate(8deg) scale(1.08)}100%{transform:rotate(-8deg) scale(1)}}
+.duelo-paso.crit-fx2 .duelo-crit-titulo{animation:duelo-fx2 1.1s ease-out both}
+.duelo-paso.crit-fx2 .duelo-d20.mejor{animation:duelo-d20in .45s cubic-bezier(.2,1.6,.4,1) both,duelo-fx2brillo 1.2s ease-out .3s 2}
+@keyframes duelo-fx2{0%{transform:scale(.6);opacity:0;text-shadow:none}50%{transform:scale(1.15);opacity:1;text-shadow:0 0 18px #ffd25a}100%{transform:none;text-shadow:0 0 6px rgba(255,210,90,.5)}}
+@keyframes duelo-fx2brillo{0%,100%{box-shadow:0 0 18px rgba(255,190,60,.7)}50%{box-shadow:0 0 34px 6px rgba(255,210,90,.95)}}
+.duelo-paso.crit-fx3{animation:duelo-sacudon .5s ease-out .15s both;position:relative}
+.duelo-paso.crit-fx3 .duelo-crit-titulo{animation:duelo-fx3 1.2s cubic-bezier(.2,1.6,.4,1) both;color:#ffb35a}
+.duelo-paso.crit-fx3 .duelo-d20.mejor{animation:duelo-d20in .45s cubic-bezier(.2,1.6,.4,1) both,duelo-fx3brillo .9s ease-out .35s 3;border-color:#ff9a3c}
+.duelo-paso.crit-fx3::after{content:'';position:absolute;left:50%;top:40%;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;border:4px solid #ff9a3c;pointer-events:none;animation:duelo-onda3 1s ease-out .2s both}
+@keyframes duelo-fx3{0%{transform:scale(.3) rotate(-6deg);opacity:0}60%{transform:scale(1.3) rotate(2deg);opacity:1;text-shadow:0 0 24px #ff9a3c}100%{transform:none;text-shadow:0 0 10px rgba(255,154,60,.6)}}
+@keyframes duelo-fx3brillo{0%,100%{box-shadow:0 0 18px rgba(255,140,40,.7)}50%{box-shadow:0 0 44px 10px rgba(255,120,30,.95)}}
+@keyframes duelo-onda3{0%{transform:scale(.2);opacity:1}100%{transform:scale(14);opacity:0}}
+@keyframes duelo-sacudon{0%,100%{transform:none}20%{transform:translate(-6px,2px)}40%{transform:translate(5px,-3px)}60%{transform:translate(-4px,2px)}80%{transform:translate(2px,-1px)}}
+.duelo-paso.crit-fx4{animation:duelo-sacudon4 .8s ease-out .1s both;position:relative}
+.duelo-paso.crit-fx4 .duelo-crit-titulo{animation:duelo-fx4 1.6s cubic-bezier(.2,1.6,.4,1) both;color:#ff5a4a;font-size:1.35em}
+.duelo-paso.crit-fx4 .duelo-d20.mejor{animation:duelo-d20in .45s cubic-bezier(.2,1.6,.4,1) both,duelo-fx4brillo .7s ease-out .3s 5;border-color:#ff5a4a;background:radial-gradient(circle,#c0301e,#4a0a08)}
+.duelo-paso.crit-fx4::before{content:'';position:absolute;inset:-40px;pointer-events:none;background:repeating-conic-gradient(from 0deg at 50% 40%,rgba(255,90,60,.35) 0 6deg,transparent 6deg 18deg);animation:duelo-rayos 1.8s ease-out both}
+.duelo-paso.crit-fx4::after{content:'';position:absolute;left:50%;top:40%;width:40px;height:40px;margin:-20px 0 0 -20px;border-radius:50%;border:6px solid #ff5a4a;pointer-events:none;animation:duelo-onda3 1.1s ease-out .15s both}
+#duelo-fondo.crit-flash::after{content:'';position:fixed;inset:0;pointer-events:none;background:radial-gradient(circle,rgba(255,240,200,.95),rgba(255,90,60,.5) 40%,transparent 75%);animation:duelo-flash .9s ease-out both;z-index:5}
+@keyframes duelo-flash{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+@keyframes duelo-fx4{0%{transform:scale(.2) rotate(-12deg);opacity:0}40%{transform:scale(1.6) rotate(4deg);opacity:1;text-shadow:0 0 40px #ff5a4a,0 0 80px #ffd25a}70%{transform:scale(.95)}100%{transform:none;text-shadow:0 0 14px rgba(255,90,74,.8)}}
+@keyframes duelo-fx4brillo{0%,100%{box-shadow:0 0 22px rgba(255,90,60,.8)}50%{box-shadow:0 0 60px 16px rgba(255,90,40,1)}}
+@keyframes duelo-rayos{0%{opacity:0;transform:rotate(0) scale(.6)}25%{opacity:1}100%{opacity:0;transform:rotate(40deg) scale(1.3)}}
+@keyframes duelo-sacudon4{0%,100%{transform:none}10%{transform:translate(-12px,4px) rotate(-1deg)}25%{transform:translate(11px,-6px) rotate(1deg)}40%{transform:translate(-9px,5px)}55%{transform:translate(7px,-3px)}70%{transform:translate(-4px,2px)}85%{transform:translate(2px,-1px)}}
+@media (prefers-reduced-motion: reduce){.duelo-paso[class*="crit-fx"],.duelo-paso[class*="crit-fx"] *{animation-duration:.01s!important}}
 .duelo-fin{text-align:center;border:2px solid #8db3ff;background:linear-gradient(180deg,#1b2a4a,#131c33);border-radius:14px;padding:16px 14px}
 .duelo-fin .grande{font-size:34px;font-weight:900;letter-spacing:.06em;color:#dbe7ff}
 .duelo-fin .chico{font-size:13px;color:#aab3ca;margin:4px 0 12px}
@@ -1869,7 +1898,7 @@ const Duelo = (() => {
       { const f1 = document.getElementById('duelo-fondo'); if(f1 && !f1.dataset.entro) animarEntrada(f1, actual.otroToken); }
       // Primero ruedan los dados 3D y, cuando quedan a la vista, se muestra el resultado en el cuadro (no antes).
       const nRev = nReveal(actual.dato);
-      if(actual.nRev === undefined){ actual.nRev = nRev; dibujar(); return; }   // al abrir un duelo que ya está avanzado no se espera nada
+      if(actual.nRev === undefined){ actual.nRev = nRev; if(actual.dato.crit && actual.dato.crit.d20) revelado[id + ':d20'] = true; dibujar(); return; }   // al abrir un duelo que ya está avanzado no se espera nada (ni rueda el d20 de nuevo)
       if(nRev > actual.nRev && typeof dadosActivos === 'function' && dadosActivos() && !document.hidden){
         if(!actual.reteniendo){
           actual.reteniendo = true;
@@ -2869,11 +2898,30 @@ const Duelo = (() => {
         + tablaCriticoHtml(c, d, 0)
         + `<div class="duelo-contra" style="text-align:center">${puede ? `<button type="button" data-critico>🎲 Tirar ${_fmt(c.dados)} d20</button>` : `<div class="espera duelo-nota">esperando que ${_esc(d.atacante.nombre)} tire el crítico…</div>`}</div>`
         + (puede ? manualCriticoHtml(d) : '');
+    }else if(!revelado[d.id + ':d20'] || revelado[d.id + ':d20'] === 'rueda'){
+      // 🎲 Primero ruedan en el cuadro (suspenso, haya o no dados 3D) y recién después el resultado, con su efecto (2026-11-05, dueño).
+      if(!revelado[d.id + ':d20']){
+        revelado[d.id + ':d20'] = 'rueda';
+        const t0 = Date.now(), DUR = 1300;
+        const tic = () => {
+          const els = document.querySelectorAll('#duelo-fondo .duelo-d20.rueda');
+          els.forEach(e => { e.textContent = String(1 + Math.floor(Math.random() * 20)); });
+          const k = (Date.now() - t0) / DUR;
+          if(k < 1) setTimeout(tic, 50 + 220 * k * k);   // cada vez más lento
+          else{ revelado[d.id + ':d20'] = 'fx'; if(actual && actual.dato && actual.dato.id === d.id) dibujar(); }
+        };
+        setTimeout(tic, 30);
+      }
+      cuerpo = titulo('posible', `🎲 Tirando ${c.d20.length > 1 ? `${_fmt(c.d20.length)} d20` : 'el d20'}…`)
+        + `<div class="duelo-d20s">${c.d20.map(() => `<div class="duelo-d20 rueda">${_fmt(1 + Math.floor(Math.random() * 20))}</div>`).join('')}</div>`
+        + viz + tablaCriticoHtml(c, d, 0);
     }else{
       // Los d20 como fichas: el más alto destaca con ondas concéntricas.
-      const nuevoD20 = !revelado[d.id + ':d20']; revelado[d.id + ':d20'] = true;
+      const nuevoD20 = revelado[d.id + ':d20'] === 'fx'; revelado[d.id + ':d20'] = true;
+      // 💥 El efecto según lo que salió: ×1 nada, ×2 un brillo, ×3 sacudón y onda, ×4 (y el supercrítico) destello, rayos y sacudón fuerte.
+      if(nuevoD20){ const nivel = c.supercritico || _num(c.mult) >= 4 ? 4 : _num(c.mult); fxCritico = nivel >= 2 ? nivel : 0; }
       const iMejor = c.d20.indexOf(c.mejor);
-      const fichas = `<div class="duelo-d20s">${c.d20.map((x, i) => `<div class="duelo-d20${(c.supercritico ? x === 20 : i === iMejor) ? ' mejor' : ''}${nuevoD20 ? ' nuevo' : ''}" style="animation-delay:${(i * 0.12).toFixed(2)}s">${_fmt(x)}</div>`).join('')}</div>`;
+      const fichas = `<div class="duelo-d20s">${c.d20.map((x, i) => `<div class="duelo-d20${(c.supercritico ? x === 20 : i === iMejor && _num(c.mult) > 1) ? ' mejor' : i === iMejor ? ' elegido' : ''}${nuevoD20 ? ' nuevo' : ''}" style="animation-delay:${(i * 0.12).toFixed(2)}s">${_fmt(x)}</div>`).join('')}</div>`;
       cuerpo = titulo('si', c.supercritico ? `🌟 ¡SUPERCRÍTICO! ×${_fmt(c.mult)} · ${_fmt(c.supercritico)} VEINTES NATURALES` : `💥 ¡CRÍTICO! ×${_fmt(c.mult)} · ${NOMBRE_MULT[c.mult]}`)
         + fichas
         + explica([c.supercritico
@@ -2882,8 +2930,11 @@ const Duelo = (() => {
         + viz
         + tablaCriticoHtml(c, d, c.mejor);
     }
-    return `<div class="duelo-paso"><h4><span class="n">4</span>Crítico</h4>${cuerpo}</div>`;
+    const fx = fxCritico; fxCritico = 0;
+    if(fx === 4) setTimeout(() => { const f = document.getElementById('duelo-fondo'); if(f){ f.classList.remove('crit-flash'); void f.offsetWidth; f.classList.add('crit-flash'); setTimeout(() => f.classList.remove('crit-flash'), 1000); } }, 60);
+    return `<div class="duelo-paso${fx ? ` crit-fx${fx}` : ''}"><h4><span class="n">4</span>Crítico</h4>${cuerpo}</div>`;
   }
+  let fxCritico = 0;   // (lo pone el render del resultado nuevo del d20; lo consume el return)
 
   // Cuántas revelaciones con dados tiene el duelo (el contacto, el Bloqueo, la moneda de un empate, los d20 del crítico,
   // el daño y cada efecto tirado): el cuadro espera a los dados 3D en cada una. La moneda es su propia revelación,

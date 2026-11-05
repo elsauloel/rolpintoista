@@ -292,6 +292,12 @@
 
 ### ▶ Para la próxima tanda de pruebas en el mapa (2026-11-03)
 
+- [ ] **🎲 El d20 del crítico con suspenso y efecto por resultado (2026-11-05, dueño: «se mostró el resultado de manera instantánea, sin la animación del
+  dado de 20… le sumaría efectos particulares para cada resultado»)**: en el paso 4 del duelo, «🎲 Tirando el d20…» con los números girando ~1,3 s y
+  recién ahí el resultado: ×1 el dado normal; ×2 brillo dorado; ×3 sacudón, rebote y onda naranja; ×4 y supercrítico destello de pantalla, rayos rojos y
+  sacudón fuerte. Probado el dibujo de los cuatro casos. Falta: verlo en un duelo real, y averiguar por qué esa vez no rodó el d20 en 3D (¿estaban
+  apagados los dados 3D o la pestaña en segundo plano?).
+
 - [ ] **💥 Crítico potente subido y el dibujo del crítico corregido (2026-11-05, dueño)**: probado en las pruebas automáticas y en la calculadora
   (capturas `critico-v2-*.png`). Falta en un duelo real: un **Apuntar** con X = 2 (el duelo tiene que mostrar Crítico potente +4), un golpe contra la
   **marca** del Shooter (potente +2), un **Golpe brutal** del Warrior (potente +3), y ver el cuadro con **Punto débil + frecuente 2** contra un Tipo 4 (la «F»

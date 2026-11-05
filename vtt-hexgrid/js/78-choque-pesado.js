@@ -223,7 +223,10 @@ function desequilibradosGuardar(m){ try{ localStorage.setItem(DESEQ_CLAVE(), JSO
 async function desequilibradoPoner(atkId, defId, hab){
   const t = tokens.get(defId);
   if(!t || !t.fichaId) return;
-  const spec = {nombre: 'Desequilibrado', turnos: 1, polaridad: 'debuff', mods: [{stat: 'eva', val: -2}],
+  // Con quien arrastró en el orden de turnos, no vence solo: lo saca el fin de SU turno (antes, con «1 turno», se iba en el Mantenimiento del arrastrado
+  // —p. ej. al empezar la ronda— antes de que terminara el turno de quien arrastró; visto en Claude · pruebas, 2026-11-05). Sin orden: 1 turno.
+  const enOrden = typeof iniciativa !== 'undefined' && iniciativa && Array.isArray(iniciativa.orden) && iniciativa.orden.some(o => o.id === atkId);
+  const spec = {nombre: 'Desequilibrado', ...(enOrden ? {permanente: true} : {turnos: 1}), polaridad: 'debuff', mods: [{stat: 'eva', val: -2}],
     detalle: `Lo arrastró ${nombreDe(tokens.get(atkId)) || 'alguien'} con ${hab || 'Arrastrar'}: −2 a la Evasión hasta el final de su turno.`};
   if(t.tipo === 'creep') await modificarCreep(t.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
   else await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec, origen: hab || 'Arrastrar'});

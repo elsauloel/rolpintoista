@@ -93,6 +93,11 @@
   («Claude · pruebas», «Renacuajos no binaries», «Test con claude elsaulo», «Test29-9»: crear, modificar y borrar libre, sin restaurar después).
   Al terminar: duelos con «Terminar duelo» (la ✕ solo esconde), carteles aceptados, menús cerrados, el mapa limpio. Si una tirada tiene que salir
   alta o baja: «✍ Elegir manualmente» con un número fijo.
+- **Ojo con los respaldos «restaurar todo» de una partida de prueba** (2026-11-05: se borraron los 17 tokens y el estado de «Mapa 1» de
+  «Claude · pruebas»): el primer mapa puede tener un documento en `mapas/_principal` (solo el nombre, si se lo renombró), pero sus tokens y su
+  estado viven en `tokens/` y `mapa/`. Un script que recorre `mapas/*` y guarda `mapas/<id>/tokens` bajo la clave `_principal` pisa lo de
+  `tokens/` con vacío, y al «restaurar» borra todo. Saltear `_principal` al recorrer `mapas`, y no borrar nunca una colección entera porque el
+  respaldo la tenga vacía.
 - **Sin el mapa disponible, no se prueba «por detrás»** (con funciones o datos simulados): se anota en `docs/pruebas-en-el-mapa.md` y se prueba
   apenas se pueda.
 

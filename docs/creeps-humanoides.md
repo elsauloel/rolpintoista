@@ -673,6 +673,11 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Sed de sangre**; nv5 Puñalada trapera. **Nivel 1 aprobado**: Des 10 · Agi 9 · Con 7 · Fue 5 · Esp 2 → vida 35, 9 No2, turnos de espera; **Facón de
   paisano** (Común, Tipo 4, Sangrado 50 %) · **Chaleco de cuero** (Def +2) · **Calzas de cuero flexible** (Eva +1). Consumible: **Aceite del punto
   débil** (Buena). Sin programar.
+- **L8 · Acróbata · Choque liviano** (2026-11-05, dueño: «me cierra la ruta y el nivel 1»): se mueve y corta; nunca se queda quieto. Ruta: nv1 **Salto**
+  (rápida) · **Tajo veloz**; nv2 Dash + **Pies ligeros**; nv3 Ráfaga de cortes (el arma, de Buena); nv4 Hit and run + **Paso ligero**; nv5 Puñalada por
+  la espalda. **Nivel 1 aprobado**: Agi 10 · Des 9 · Con 7 · Fue 5 · Esp 2 → vida 35, 10 No2, turnos de espera; **Sable del tahúr** (Común, Tipo 6,
+  +1 de daño, frecuente +1) · **Chaleco de cuero** (Def +2) · **Escarpines de fieltro** (Eva +1). Consumible: **Mate cebado**. Sin programar.
+  **Con esto se cierra la ronda de nivel 1** de las líneas que quedaban (T4, W4, R4, H4, L6, L7, L8).
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 

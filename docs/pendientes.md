@@ -44,8 +44,8 @@
 > sombra… uno le puede echar la mufa a un aliado y eso no suena bien: le echás un estado a un aliado, pero la sombra es lo que hace mal»). 8) **El
 > Salto**: el área de caída, **elegís el casillero** y, si desde ahí hay **más de un objetivo posible**, «Elegí el objetivo»; recién ahí el ataque.
 > 9) **Probar lo que quedó sin probar**: el Remolino después del arreglo (si el creep no tiene SP, cargarle SP a mano), Apuntar y Marcar con el potente
-> nuevo, el cuadro del duelo encima de la animación del gancho. 10) La pasiva nueva para el **support cuerpo a cuerpo** de los esenciales (a definir
-> con el dueño cuál y cuál pasiva). 11) **💧 El borde del charco de agua**: hoy se dibuja con semicírculos y parece una nube; tiene que ser una **ondulación**, como agua
+> nuevo, el cuadro del duelo encima de la animación del gancho. 10) ~~La pasiva para el support cuerpo a cuerpo~~ ✅ decidido (2026-11-05): el S2 Abanderado lleva **Marcar el ritmo** en nivel 2
+> y **Voluntad de hierro** en nivel 4 (sale Robustez); solo diseño, se carga con su nivel 2. 11) **💧 El borde del charco de agua**: hoy se dibuja con semicírculos y parece una nube; tiene que ser una **ondulación**, como agua
 > (dueño, 2026-11-05, visto en «Claude · pruebas»). 12) **Sacar el Tipo 12 de todos lados por ahora** (dueño, 2026-11-05: «sacalo de todos lados por ahora»): las Acciones de los creeps,
 > su lupa, la Botonera y cualquier otra pantalla que lo muestre (resistencias a crítico, Tipo de arma); la ficha lite ya no lo muestra. 13) **💧 Pasos en el agua**: al caminar por un charco o una zona de agua, cada paso deja **ondas** (ripples) que se abren y se
 > apagan detrás del token (dueño, 2026-11-05). 14) **🚩 Áreas como estados, caso por caso** (dueño: «lo revisaría caso a caso»): las zonas persistentes, el miedo y el Muro de escudos,

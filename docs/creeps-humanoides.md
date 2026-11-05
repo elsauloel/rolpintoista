@@ -337,9 +337,9 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | Nivel | Habilidad nueva | Pasiva | Equipo |
   |---|---|---|---|
   | 1 | **Potencia** (antes «Empuje»; rápida, Flash: +3 a la próxima tirada de un aliado) · **¡A la carga!** (lenta: aliados a 4, +2 PdG, PdG.Esp, daño y Ef.Esp 2 turnos) | — | **Lanza corta** (Tipo 4, +1 daño, Alcance +1) + **Estandarte del muro** (aliados pegados +1 Defensa) · Chaleco de cuero · Botas de caña alta (Def 3, Def.Esp 1) |
-  | 2 | **Bendecir el arma** (rápida, Flash) | **Voluntad de hierro** (+2 Res.CC) | + 2 Comunes |
+  | 2 | **Bendecir el arma** (rápida, Flash) | **Marcar el ritmo** (al empezar la ronda, sube 1 a un aliado pegado; dueño, 2026-11-05) | + 2 Comunes |
   | 3 | **Redoble de tambores** | — | el estandarte, de Buena calidad |
-  | 4 | **Arenga** | **Robustez** (+5 de vida) | + el chaleco de Buena |
+  | 4 | **Arenga** | **Voluntad de hierro** (+2 Res.CC; pasó del 2 al 4, sale Robustez — dueño, 2026-11-05) | + el chaleco de Buena |
   | 5 | **Estandarte de guerra** (aliados a 3: +3 PdG y +5 de daño mientras siga en pie) | — | + la lanza de Buena |
   Consumible: Pergamino grupal de Furia de Combate. Piezas Buenas a elegir al definir cada nivel. Sin cargar hasta que el dueño diga.
 

@@ -8,7 +8,7 @@
    - 🐈‍⬛ Mufa (estado del Debuffer, «Echar la mufa»): al empezar la ronda, los rivales de quien la lleva que están pegados a él tiran Res.Mt contra el
      Efecto especial de quien la echó; el que pierde baja 1.
    Reglas: nadie juega dos veces en la misma ronda; subir y bajar se cancelan; como mucho un efecto de orden por personaje y por ronda.
-   Todo lo escribe la pantalla del GM (es la que escribe el turno): si lo pide otra pantalla, va como un momento `orden-pedido` (estado
+   Todo lo escribe la pantalla del GM (es la que escribe el turno): si lo pide otra pantalla, va como un momento `orden-pedir` (antes `orden-pedido`: lo tomaban pantallas viejas del GM en otro mapa; estado
    'esperandoGM') que la pantalla del GM toma (js/16 → ordenPedidoDelGM). Lo que queda para la ronda que viene y la Mufa, en el documento de la
    iniciativa: `ordenPendientes` [{tipo: 'sube', id, n, por} | {tipo: 'cambio', a, b, por}], `ordenUsados` {ronda, ids}, `mufas` {portador: {de, esp, por}}. */
 
@@ -45,7 +45,7 @@ function ordenAvisar(c, por, motivo){
 async function ordenPedir(op){
   if(soyGM) return ordenEjecutar(op);
   if(typeof momentoAbrir !== 'function') return {manual: true, nota: 'que lo haga el GM a mano'};
-  await momentoAbrir({tipo: 'orden-pedido', icono: '🎺', titulo: op.por ? `${op.por}: el orden de turnos` : 'El orden de turnos', estado: 'esperandoGM', datos: {op, chico: true}});
+  await momentoAbrir({tipo: 'orden-pedir', icono: '🎺', titulo: op.por ? `${op.por}: el orden de turnos` : 'El orden de turnos', estado: 'esperandoGM', datos: {op, chico: true}});
   return {nota: 'lo acomoda la pantalla del GM en el orden de turnos'};
 }
 const ordenPedidosHechos = new Set();

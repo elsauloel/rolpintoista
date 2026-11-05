@@ -245,6 +245,10 @@ const Duelo = (() => {
 .duelo-crit-viz-tit:first-child{margin-top:0}
 .duelo-crit-fila{display:flex;flex-wrap:wrap;align-items:center}
 .duelo-crit-cinco{display:flex;gap:2px;margin:0 7px 4px 0}
+/* El marco del rango (2026-11-05, dueño: «un pequeño recuadro, finito, sutil, que agrupe la cantidad de cuadritos que son el valor final del rango»; y
+   el mismo marco en cada grupo de la tirada que hace un nivel: «este es el valor y esta es la cantidad de veces que salió»). */
+.duelo-crit-cinco.marco{gap:2px;padding:2px;border:1px solid rgba(255,210,90,.55);border-radius:6px;margin-right:6px;box-shadow:0 0 0 1px rgba(255,210,90,.08) inset}
+.duelo-crit-ref .marco-mini{display:inline-block;width:22px;height:14px;border:1px solid rgba(255,210,90,.55);border-radius:4px;flex:none}
 .duelo-crit-cuad{width:20px;height:20px;border-radius:4px;background:#1d2335;border:1px solid #39435c;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#9aa4bd;flex:none;position:relative}
 .duelo-crit-cuad.frec{background:#1f6b3a;border-color:#5fd08a;color:#e6ffee}
 .duelo-crit-cuad.frec.perdido{opacity:.35;text-decoration:line-through}   /* el frecuente que se pierde por el mínimo de 2 (2026-11-05) */
@@ -2780,8 +2784,12 @@ const Duelo = (() => {
     const frecTotal = Math.max(nFrec, Math.round(_num(c.frecuente))), frecPerdido = frecTotal - nFrec;
     // Los que quedan llevan la mira (dueño, 2026-10-12: «los recuadros vacíos podrían estar con el ícono de la mira, el círculo con las cuatro rayitas»).
     const MIRA = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="4.6"/><path d="M8 1v3.2M8 11.8V15M1 8h3.2M11.8 8H15"/></svg>';
-    const filaTipo = deA5([...Array.from({length: tipo + resPos}, (_, i) => i < nFrec ? cuad('frec', 'F') : i >= tipo ? cuad('res', 'R') : i >= tipo - debil ? cuad('debil', '💢') : cuad('mira', MIRA)),
-      ...Array.from({length: frecPerdido}, () => cuad('frec perdido', 'F'))]);
+    // El rango final (las miras y las «R») va junto y enmarcado (2026-11-05, dueño); lo que lo achica (F, 💢) queda afuera, antes.
+    const nMira = Math.max(0, tipo - nFrec - debil);
+    const marco = arr => `<div class="duelo-crit-cinco marco" title="Rango del crítico: ${_fmt(rango)}">${arr.join('')}</div>`;
+    const filaTipo = deA5(Array.from({length: nFrec}, () => cuad('frec', 'F'))) + deA5(Array.from({length: debil}, () => cuad('debil', '💢')))
+      + marco([...Array.from({length: nMira}, () => cuad('mira', MIRA)), ...Array.from({length: resPos}, () => cuad('res', 'R'))])
+      + deA5(Array.from({length: frecPerdido}, () => cuad('frec perdido', 'F')));
 
     // La tirada, agrupada de a «rango» (2026-09-28, el dueño volvió a este agrupado en vez de a 5: cada grupo
     // entero es un nivel de crítico, así se cuentan de un vistazo). Primero lo que come la Evasión/Parry (rojo,
@@ -2792,11 +2800,11 @@ const Duelo = (() => {
     for(let i = 0; i < nEva; i += 5) grupos.push(Array.from({length: Math.min(5, nEva - i)}, () => cuad('eva', 'E')));
     let quedan = Math.max(0, pdgTotal - evaTotal), huboSuelto = false;
     while(quedan >= rango){
-      grupos.push(Array.from({length: rango}, () => cuad('activo')));
+      grupos.push(Object.assign(Array.from({length: rango}, () => cuad('activo')), {marco: true}));
       quedan -= rango;
     }
     if(quedan > 0){ huboSuelto = true; grupos.push(Array.from({length: quedan}, () => cuad('suelto'))); }
-    const filaTirada = grupos.map(g => `<div class="duelo-crit-cinco">${g.join('')}</div>`).join('');
+    const filaTirada = grupos.map(g => `<div class="duelo-crit-cinco${g.marco ? ' marco' : ''}">${g.join('')}</div>`).join('');
 
     const leyenda = [
       `${cuad('mira', MIRA)}<span>= el rango del crítico: cuántos puntos de diferencia hacen falta para cada nivel</span>`,
@@ -2804,6 +2812,7 @@ const Duelo = (() => {
       frecPerdido ? `${cuad('frec perdido', 'F')}<span>= ${frecPerdido > 1 ? `${_fmt(frecPerdido)} puntos de frecuente se pierden` : '1 punto de frecuente se pierde'} por el mínimo de 2</span>` : '',
       evaTotal ? `${cuad('eva', 'E')}<span>= tirada de ${_esc(nombreDef2)}</span>` : '',
       `${cuad('activo')}<span>= cuenta para un nivel de crítico</span>`,
+      `<span class="marco-mini"></span><span>= el rango: arriba, su valor final; abajo, cada vez que tu tirada lo completa (un nivel de crítico)</span>`,
       resPos ? `${cuad('res', 'R')}<span>= Resistencia a crítico del defensor (Tipo ${_fmt(tipo)} ×${_fmt(resPos)}): agranda el rango</span>` : '',
       debil ? `${cuad('debil', '💢')}<span>= Punto débil del defensor (−${_fmt(debil)}): achica el rango</span>` : '',
       huboSuelto ? `${cuad('suelto')}<span>= no llega a completar un nivel</span>` : '',

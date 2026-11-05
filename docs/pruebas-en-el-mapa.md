@@ -1617,3 +1617,13 @@ ejecutar **Toque de carga** desde la Botonera (que el costo pase 3 → 5 → 7 y
 empezar la próxima ronda); **Cambio de guardia** con los dos clics (y que el cambio se haga al empezar la ronda); **Marcar el ritmo** y **Sed de
 sangre** en una ronda real (voltear a un rival con el golpe); **Echar la mufa** sobre un aliado (sin tirada) y sobre un rival (PdG.Esp contra Res.Mt),
 y al empezar la ronda las tiradas de Res.Mt contra el Ef.Esp de los rivales pegados; un jugador que lo pide (el momento `orden-pedido` que toma el GM).
+
+## ⏳ Pendiente de probar en el mapa (2026-11-05, cola: Contraataque, Mala sombra, Tipo 12)
+- [ ] **⚔ Contraataque con la habilidad**: un personaje con Contraataque gana la **Evasión** → «¿Contraatacás?» y el duelo nuevo suma **+2 PdG**; lo mismo
+  ganando el **Parry** aunque pierda el Bloqueo (pasa la mitad). Un creep con Contraataque, igual (antes +1).
+- [ ] **⚔ Devolver gentileza**: con la pasiva, ganar el Parry **y** el Bloqueo → «¿Contraatacás? (Devolver gentileza)», sin bonus; **sin** la pasiva ni la
+  habilidad, ganar el Parry y el Bloqueo **ya no ofrece** contraatacar.
+- [ ] **🌑 Mala sombra** (ex Mufa): ejecutarla desde la Botonera de un Debuffer; el estado se ve con el nombre nuevo y el ícono 🌑; al empezar la ronda la
+  Mesa dice «Mala sombra de …». Probado sin mapa: las pruebas automáticas y el texto (captura u-render.png).
+- [x] ✅ **Sin Tipo 12** en las Acciones de un creep (render de la Botonera del creep: Tipo 4/6/8/10). Falta mirarlo en la Botonera de un personaje y en
+  la lupa con el mapa abierto.

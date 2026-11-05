@@ -88,7 +88,7 @@ const PASIVAS_BASE = [
   // lugares»). Las mueve la pantalla del GM (vtt-hexgrid/js/102), con las reglas del orden (comun/orden-turnos.js): nadie juega dos veces, subir y bajar
   // se cancelan, uno por ronda.
   {poolId: 'marcar-el-ritmo', nombre: 'Marcar el ritmo', jobCosto: 1, etiquetas: ['utilidad'],
-   detalle: 'Al empezar cada ronda, un aliado pegado a vos (el que está más atrás en el orden de turnos) sube 1 lugar: vas marcando el paso y te sigue. ⚙ Automatizado: lo hace el mapa del GM al empezar la ronda (como mucho un efecto de orden por personaje y por ronda).', mods: [{stat: 'ritmo', val: 1}]},
+   detalle: 'Al empezar cada ronda, un aliado pegado a vos sube 1 lugar en el orden de turnos (si tenés varios al lado, elegís a cuál): vas marcando el paso y te sigue. ⚙ Automatizado: lo hace el mapa del GM al empezar la ronda (como mucho un efecto de orden por personaje y por ronda).', mods: [{stat: 'ritmo', val: 1}]},
   {poolId: 'sed-de-sangre', nombre: 'Sed de sangre', jobCosto: 1, etiquetas: ['ofensiva'],
    detalle: 'Cuando un rival cae por tu golpe, el subidón te pone primero en la fila: subís 2 lugares en el orden de turnos (si ya jugaste esta ronda, al empezar la próxima). ⚙ Automatizado: lo hace el mapa del GM cuando el golpe del duelo lo deja en 0.', mods: [{stat: 'sedsangre', val: 2}]},
   {poolId: 'manas-de-sobreviviente', nombre: 'Mañas de sobreviviente', jobCosto: 1, etiquetas: ['defensiva'],

@@ -396,7 +396,7 @@ verifica con 1d20: hasta DES×2 → 7+; hasta DES×3 → 17+; más de DES×3 →
 - **🔄 Cambio de guardia** (2026-11-05, dueño: «intercambiar la posición en la tabla entre dos aliados cualquiera, vos o no vos»; «a partir de la próxima
   ronda»): 4 SP, 1 No2, los dos con un clic en el mapa. ✅ cargada (`support-cambio-de-guardia`).
 - Reglas del orden (dueño, 2026-11-05): nadie juega dos veces en la misma ronda; subir y bajar se cancelan; como mucho un efecto de orden por personaje
-  y por ronda (`comun/orden-turnos.js`, vtt-hexgrid/js/102). Pasivas de cualquier clase: **Marcar el ritmo** (UN aliado pegado —el más atrás en el orden— sube 1 al empezar la
+  y por ronda (`comun/orden-turnos.js`, vtt-hexgrid/js/102). Pasivas de cualquier clase: **Marcar el ritmo** (UN aliado pegado sube 1 al empezar la ronda; con varios, elige el dueño de la pasiva —el GM si es un creep o si en 30 s nadie eligió—; dueño 2026-11-05: «vos elegís a cuál»; al empezar la
   ronda) y **Sed de sangre** (bloodlust: voltear a un rival te sube 2). La pasiva «Mala sombra» se descartó (dueño: «muy poderosa»).
 
 ## Debuffer ⏳

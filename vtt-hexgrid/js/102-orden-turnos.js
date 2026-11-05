@@ -2,7 +2,8 @@
    por estas habilidades, pasivas y estados (las reglas puras, en comun/orden-turnos.js):
    - 🎺 Toque de carga (Support): un aliado (o vos) sube 1 lugar. Si ya jugó esta ronda, sube al empezar la próxima.
    - 🔄 Cambio de guardia (Support): dos aliados cualesquiera cambian de lugar desde la próxima ronda.
-   - 🥁 Marcar el ritmo (pasiva): al empezar la ronda, UN aliado pegado a vos (el que está más atrás en el orden) sube 1.
+   - 🥁 Marcar el ritmo (pasiva): al empezar la ronda, UN aliado pegado a vos sube 1; si hay varios, elegís a cuál (`ritmoPedir`, momento
+     `ritmo-elegir`: al dueño de quien la tiene; el GM si es un creep, o por él si en 30 s nadie eligió).
    - 🩸 Sed de sangre (pasiva): cuando un rival cae por tu golpe, subís 2 (si ya jugaste, al empezar la próxima ronda).
    - 🐈‍⬛ Mufa (estado del Debuffer, «Echar la mufa»): al empezar la ronda, los rivales de quien la lleva que están pegados a él tiran Res.Mt contra el
      Efecto especial de quien la echó; el que pierde baja 1.
@@ -179,10 +180,10 @@ async function ordenInicioRonda(ordenIds){
   pend.filter(x => x.tipo === 'sube').forEach(p => anotar(p.id, Math.round(num(p.n)) || 1, p.por || 'de la ronda pasada'));
   for(const id of conRitmo){
     const t = tokens.get(id), k = ordenPasiva(t, 'ritmo', 'ritmo');
-    // UN solo aliado pegado (dueño, 2026-11-05: «no es todos los aliados, sino un aliado adyacente»): el que está más atrás en el orden.
+    // UN solo aliado pegado (dueño, 2026-11-05: «no es todos los aliados, sino un aliado adyacente»; «si tenés varios… vos elegís a cuál»).
     const pegados = ordenPegados(t, x => !dueloEsRival(t, x) && ordenIds.includes(idDeToken(x)));
-    const uno = pegados.sort((a, b) => ordenIds.indexOf(idDeToken(b)) - ordenIds.indexOf(idDeToken(a)))[0];
-    if(uno) anotar(uno, k, `Marcar el ritmo de ${ordenNombre(id)}`);
+    if(pegados.length === 1) anotar(pegados[0], k, `Marcar el ritmo de ${ordenNombre(id)}`);
+    else if(pegados.length > 1) setTimeout(() => ritmoPedir(id, pegados, k).catch(err => console.error('Marcar el ritmo:', err)), 2500);   // con la ronda ya guardada
   }
   for(const [port, m] of Object.entries(mufas)){
     const t = tokens.get(port);
@@ -202,5 +203,41 @@ async function ordenInicioRonda(ordenIds){
   }
   for(const s of r.saltados){ if(porQue.has(s.id)) lineas.push(`${ordenNombre(s.id)} no se mueve (${s.motivo}).`); }
   return {ordenIds: st.orden, lineas, cambios, usados, mufas};
+}
+// ---------- 🥁 Marcar el ritmo con varios aliados pegados: elige quien la tiene ----------
+// Lo abre la pantalla del GM al empezar la ronda; contesta el dueño del personaje (o el GM si es un creep, o por él si en 30 s nadie eligió).
+async function ritmoPedir(portador, cands, k){
+  if(typeof momentoAbrir !== 'function') return;
+  const t = tokens.get(portador), creep = !t || t.tipo === 'creep';
+  const f = !creep ? fichasPub.get(String(t.fichaId || '').split(SEP_INVOCACION)[0]) : null;
+  const paraUid = creep ? '' : ((f && f.resumen && f.resumen.control) || t.duenoUid || '');
+  await momentoAbrir({tipo: 'ritmo-elegir', icono: '🥁', titulo: `${ordenNombre(portador)} marca el ritmo`, resultado: 'elige a cuál de sus aliados pegados sube 1 lugar…',
+    estado: 'esperando', datos: {portador, cands, k: Math.max(1, Math.round(num(k)) || 1), paraUid, ronda: num(iniciativa.ronda), chico: true}});
+}
+const ritmoVistos = new Set();
+function ritmoElegirMomento(id, d){   // js/16 momentoRecibido, en cada pantalla
+  if(ritmoVistos.has(id) || d.estado !== 'esperando' || !d.datos) return;
+  ritmoVistos.add(id);
+  const t0 = d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now();
+  if(Date.now() - t0 > 120000) return;
+  const yo = fbUsuario && fbUsuario.uid, para = d.datos.paraUid || '';
+  if(para ? para === yo : soyGM) ritmoPreguntar(id, d);
+  else if(soyGM) setTimeout(async () => {   // el jugador no contestó (o no está conectado): elige el GM
+    try{ const s = await coleccionMomentos().doc(id).get(); if(s.exists && s.data().estado === 'esperando') ritmoPreguntar(id, s.data(), true); }catch(err){ console.error(err); }
+  }, 30000);
+}
+async function ritmoPreguntar(id, d, porOtro){
+  const x = d.datos, quien = ordenNombre(x.portador);
+  const v = await Confirmar.elegir(`🥁 ${quien} marca el ritmo: ¿a cuál de los aliados pegados sube ${x.k} lugar${x.k === 1 ? '' : 'es'} en el orden de turnos?${porOtro ? ' (No eligió nadie: elegís vos.)' : ''}`,
+    {titulo: 'Marcar el ritmo', icono: '🥁', opciones: x.cands.map(c => ({valor: c, texto: ordenNombre(c)})), no: 'No subir a nadie'});
+  let mio = false;
+  try{ await fbDb.runTransaction(async tx => { const ref = coleccionMomentos().doc(id), s = await tx.get(ref); if(!s.exists || s.data().estado !== 'esperando') return;
+    tx.update(ref, {estado: 'listo', resultado: v ? `sube ${ordenNombre(v)}` : 'no sube nadie'}); mio = true; }); }
+  catch(err){ console.error('Marcar el ritmo:', err); return; }
+  if(!mio){ toast('Ya eligió otro'); return; }
+  if(!v) return;
+  if(num(iniciativa.ronda) !== num(x.ronda)){ toast('La ronda ya pasó: no sube nadie'); return; }
+  const r = await ordenPedir({tipo: 'sube', id: v, n: x.k, por: 'Marcar el ritmo', motivo: `el ritmo de ${quien}`});
+  if(r && r.nota) toast(`🥁 ${ordenNombre(v)}: ${r.nota}`);
 }
 // (idDeToken: js/04)

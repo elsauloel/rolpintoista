@@ -802,7 +802,7 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   `cambioGuardiaMapa` → `cambio-guardia-habilidad` → dos clics (`cambioGuardiaDeHabilidad`) → pendiente; Sed de sangre = `dueloAplicarDano` (si quedó
   en 0) → `ordenSedDeSangre`; la Mufa = el estado entra como siempre y `ordenMufaPoner` anota quién la echó y su Ef.Esp. Al empezar la ronda
   (`iniciativaSiguiente`, js/04, antes de guardar la ronda nueva) `ordenInicioRonda`: los cambios de guardia, lo pendiente, Marcar el ritmo
-  (`resumen.ritmo`) y la Mufa (Res.Mt contra Ef.Esp, en la Mesa); después le da el turno al primero que puede jugar. Aviso/Crónica con `ordenAvisar`.
+  (`resumen.ritmo`; con varios aliados pegados, momento `ritmo-elegir` → `ritmoElegirMomento`: elige el dueño, o el GM por él a los 30 s) y la Mufa (Res.Mt contra Ef.Esp, en la Mesa); después le da el turno al primero que puede jugar. Aviso/Crónica con `ordenAvisar`.
 
 ## Pendiente (más adelante)
 

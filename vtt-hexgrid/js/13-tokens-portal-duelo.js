@@ -915,6 +915,10 @@ function dueloElegirObjetivoMapa(msg){
     }catch(err){ console.error('No se pudo abrir el duelo (uno mismo):', err); toast('No se pudo abrir el duelo: ' + String((err && err.message) || err)); }
     return;
   }
+  // 🦘 El Salto (2026-11-05, dueño): primero se elige dónde caer (js/105) y después, si hay varios rivales pegados, a quién; vuelve acá con
+  // msg.saltoHecho y msg.objetivoFijo. El Takle (`corre`) sigue como siempre.
+  { const cs = ataque && (ataque.saltoHab ? ataque : ataque.hab && ataque.hab.saltoHab ? ataque.hab : null);
+    if(cs && !cs.corre && !msg.saltoHecho && typeof saltoElegirCasilla === 'function'){ saltoElegirCasilla(msg, yo, ataque, cs); return; } }
   // Un objetivo ya elegido (2026-10-12, 🐈‍⬛ Enyetar: se eligió en su menú): el duelo se abre directo contra él.
   if(msg.objetivoFijo && tokens.get(msg.objetivoFijo)){
     const mio0 = [...tokens.entries()].map(([id, t]) => ({...t, id})).find(propio), t = tokens.get(msg.objetivoFijo);
@@ -922,7 +926,7 @@ function dueloElegirObjetivoMapa(msg){
     (async () => {
       // 💥 La carrera del Takle (2026-10-26, visto en el mapa: con el botón ✨ el objetivo viene elegido y se salteaba): corre hasta quedar pegado.
       const conSalto0 = ataque && (ataque.saltoHab ? ataque : ataque.hab && ataque.hab.saltoHab ? ataque.hab : null);
-      if(conSalto0 && typeof saltoHab === 'function'){
+      if(conSalto0 && !msg.saltoHecho && typeof saltoHab === 'function'){
         let r = null;
         try{ r = await saltoHab(mio0, {...t, id: msg.objetivoFijo}, conSalto0, yo); }catch(err){ console.error('No se pudo correr:', err); r = true; }
         if(!r){ if(msg.alCancelar) msg.alCancelar(); return; }
@@ -1016,7 +1020,7 @@ function dueloElegirObjetivoMapa(msg){
         if(!ataqueCarga){ pedir(); return; }
       }
       const conSalto = ataque && (ataque.saltoHab ? ataque : ataque.hab && ataque.hab.saltoHab ? ataque.hab : null);   // (una habilidad sin arma: el Takle, 2026-10-26)
-      if(conSalto && mio && typeof saltoHab === 'function'){   // 🦘 el Salto (js/55): cae al lado del objetivo · 💥 el Takle: corre hasta quedar pegado
+      if(conSalto && mio && !msg.saltoHecho && typeof saltoHab === 'function'){   // 🦘 el Salto (js/55): cae al lado del objetivo · 💥 el Takle: corre hasta quedar pegado
         let r = null;
         try{ r = await saltoHab(mio, t, conSalto, yo); }catch(err){ console.error('No se pudo saltar:', err); r = true; }
         if(!r){ pedir(); return; }

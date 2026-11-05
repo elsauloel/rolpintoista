@@ -804,6 +804,18 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   (`iniciativaSiguiente`, js/04, antes de guardar la ronda nueva) `ordenInicioRonda`: los cambios de guardia, lo pendiente, Marcar el ritmo
   (`resumen.ritmo`; con varios aliados pegados, momento `ritmo-elegir` → `ritmoElegirMomento`: elige el dueño, o el GM por él a los 30 s) y la Mufa (Res.Mt contra Ef.Esp, en la Mesa); después le da el turno al primero que puede jugar. Aviso/Crónica con `ordenAvisar`.
 
+- **🦘 El Salto eligiendo dónde caer** (2026-11-05, dueño: «uno debe poder elegir el casillero… si hay más de un objetivo posible… elegí el
+  objetivo»; «si hay algún objeto sólido, una advertencia de discutir con la mesa… con Aceptar o Cancelar»): `js/105-salto-casilla.js`.
+  `dueloElegirObjetivoMapa` (js/13), para un ataque con `saltoHab` que **no** sea el Takle (`corre`, que sigue por `saltoHab` de js/55), llama a
+  `saltoElegirCasilla(msg, yo, ataque, conSalto)`: se pintan las casillas libres a `saltoHab` o menos (la propia también, para atacar sin saltar si ya
+  está pegado; `saltoCasillaDibujar`, gancho en js/05) y laten más fuertes las que quedan pegadas a un rival visible (o al objetivo ya elegido) → clic
+  (`elegirDestino`; una casilla sin rival o fuera del área vuelve a pedir) → si la línea del salto cruza un Sólido o una pared, `AvisoCombate.preguntar`
+  «¿Se puede saltar?» Aceptar/Cancelar (Cancelar vuelve a elegir casilla) → mueve el token (sin No2 ni oportunidad, como antes), línea en la Mesa y
+  momento chico `salto`; Salto aplastante aplasta ahí (`saltoAplastar`) → un solo rival pegado: el duelo contra él; varios: «Elegí el objetivo» con
+  un clic → vuelve a `dueloElegirObjetivoMapa` con `msg.saltoHecho` + `msg.objetivoFijo` (los dos llamados a `saltoHab` de js/13 lo saltean). Sin
+  ninguna casilla útil: «¿Atacar igual sin saltar?». Esc o clic derecho cancelan sin cobrar (`msg.alCancelar`). Probado en «Claude · pruebas» con tokens
+  locales y las escrituras reemplazadas (capturas `v-salto-*`): Esc, el aviso del Sólido con Cancelar y Aceptar, y «Elegí el objetivo» con dos goblins.
+
 ## Pendiente (más adelante)
 
 Alcance y movimiento; niebla; tiradas desde el token.

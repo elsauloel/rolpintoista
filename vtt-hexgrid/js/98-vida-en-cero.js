@@ -70,20 +70,20 @@ function maxVidaDe(t){
   const r = ((vinculo(t) || {}).resumen) || {};
   return num(r.hpMax);
 }
-async function gmRevivirToken(t){
-  if(!soyGM || !tokenCaido(t)) return;
-  const nom = nombreDe(t), max = maxVidaDe(t);
-  const conPct = p => max > 0 ? `${p} % (${fmt(Math.max(1, Math.floor(max * p / 100)))} de ${fmt(max)})` : `${p} %`;
-  const op = await Confirmar.elegir(`¿Con cuánta vida vuelve ${nom}? Queda Titilando (invulnerable) hasta su próximo turno.`, {titulo: '✚ Revivir', icono: '✚', no: 'Cancelar', opciones: [
-    {valor: '25', texto: conPct(25)}, {valor: '50', texto: conPct(50)}, {valor: '100', texto: max > 0 ? `Toda (${fmt(max)})` : 'Toda'}, {valor: 'num', texto: '✍ Escribir cuánta'}]});
-  if(!op) return;
-  let val;
-  if(op === 'num'){
-    const txt = await Confirmar.texto(`¿Con cuánta vida vuelve ${nom}?`, {titulo: '✚ Revivir', icono: '✚', valor: String(max > 0 ? Math.max(1, Math.floor(max / 2)) : 1), si: 'Revivir', max: 4});
-    val = Math.round(num(txt));
-    if(!(val > 0)) return;
-  }else val = Math.max(1, Math.floor((max > 0 ? max : 1) * num(op) / 100));
-  if(max > 0) val = Math.min(val, max);
+// ¿Quién puede revivir este token? El GM, cualquiera; un jugador, su propio personaje o una invocación suya (2026-11-04, dueño: «el botón de
+// revivir desde el token también debe aparecer en la ficha propia de los jugadores»). Un creep, solo el GM.
+function puedeRevivirToken(t){
+  if(!t || !t.fichaId) return false;
+  if(soyGM) return true;
+  if(t.tipo !== 'pj' || !fbUsuario) return false;
+  const v = vinculo(t), ficha = String(t.fichaId).split(SEP_INVOCACION)[0];
+  return !!((v && v.duenoUid === fbUsuario.uid) || t.duenoUid === fbUsuario.uid || (typeof controloFicha === 'function' && controloFicha(ficha)));
+}
+async function revivirToken(t){
+  if(!puedeRevivirToken(t) || !tokenCaido(t)) return;
+  const nom = nombreDe(t), esInv = String(t.fichaId).includes(SEP_INVOCACION);
+  const val = await Revivir.elegirVida(nom, maxVidaDe(t), {titila: !esInv});
+  if(!val) return;
   try{
     if(t.tipo === 'creep'){
       await modificarCreep(t.fichaId, sc => {
@@ -91,7 +91,7 @@ async function gmRevivirToken(t){
         const e = typeof estadosPresetCreep === 'function' ? Combatiente.estadoTitilando(estadosPresetCreep()) : null;
         if(e){ sc.estados = sc.estados || []; Combatiente.agregarEstado(sc.estados, e); }
       });
-    }else if(String(t.fichaId).includes(SEP_INVOCACION)){
+    }else if(esInv){
       const [ficha, invId] = String(t.fichaId).split(SEP_INVOCACION);
       const ok = await editarPersonajeMapa(ficha, S => { const inv = (S.invocaciones || []).find(x => x && String(x.id) === String(invId)); if(!inv) return false; inv.hp = val; return true; });
       if(!ok) throw new Error('no se pudo escribir la ficha de su dueño');
@@ -100,9 +100,17 @@ async function gmRevivirToken(t){
       if(!ok) throw new Error('no se pudo escribir su ficha');
     }
   }catch(err){ console.error('Revivir:', err); toast(`No se pudo revivir a ${nom}: ${err.message || err}`); return; }
-  const txt = `✚ ${nom} vuelve con ${fmt(val)} de vida${t.tipo === 'creep' || !String(t.fichaId).includes(SEP_INVOCACION) ? ', Titilando hasta su próximo turno' : ''} (lo revivió el GM)`;
+  const txt = Revivir.texto(nom, val, {titila: !esInv, quien: soyGM ? 'gm' : 'dueno'});
   toast(txt);
   try{ mesaLinea(txt, 'recordatorio'); }catch(e){}
-  try{ momentoAbrir({tipo: 'buff', icono: '✚', titulo: `${nom} vuelve a pie`, resultado: txt, estado: 'listo', datos: t.tipo !== 'creep' && t.duenoUid ? {paraUid: t.duenoUid, aviso: true, boton: 'Entendido'} : {}}); }catch(e){}
+  try{ momentoAbrir({tipo: 'buff', icono: '✚', titulo: `${nom} vuelve a pie`, resultado: txt, estado: 'listo', datos: soyGM && t.tipo !== 'creep' && t.duenoUid ? {paraUid: t.duenoUid, aviso: true, boton: 'Entendido'} : {}}); }catch(e){}
   pedirDibujo();
+}
+const gmRevivirToken = revivirToken;   // el nombre de antes (js/10)
+// El ✚ de la pantalla de muerte del mapa (js/13): el mismo de arriba, con el token del personaje; sin token en este mapa, la ventana de antes.
+function revivirPersonajePropio(fichaId){
+  let t = null;
+  for(const x of tokens.values()) if(x.tipo === 'pj' && x.fichaId === fichaId){ t = x; break; }
+  if(t && tokenCaido(t)) return revivirToken(t);
+  return abrirRevivirMapa(fichaId);
 }

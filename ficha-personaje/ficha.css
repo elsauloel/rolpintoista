@@ -986,6 +986,9 @@ body:has(#scrim-presets.open) #scrim-view{z-index:65}
   box-shadow:0 4px 16px rgba(0,0,0,.45)
 }
 #btn-revivir:hover{background:#3a8068;border-color:#6FCB9F}
+/* ✚ Revivir abajo al centro, como en el mapa (2026-11-04): arriba a la izquierda lo tapaba el botón «📜 Historial» de los jugadores (el
+   `left:104px!important` de comun/menu-sitio.js). Este selector es más específico, así que gana aunque los dos lleven !important. */
+#overlay-muerte #btn-revivir{top:auto!important;bottom:26px;left:50%!important;transform:translateX(-50%);padding:11px 22px;font-size:14px}
 .muerte-centro{text-align:center;padding:0 24px}
 .muerte-label{
   font-family:"Space Mono",monospace;font-size:14px;letter-spacing:.1em;text-transform:uppercase;

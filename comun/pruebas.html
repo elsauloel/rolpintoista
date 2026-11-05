@@ -92,6 +92,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="escaneo-grupo.js"></script>
 <script src="trampas-base.js"></script>
 <script src="confirmar.js"></script>
+<script src="revivir.js?v=20261104rv"></script>
 <script src="atajos.js"></script>
 <script src="pausa.js"></script>
 <script src="glosario.js"></script>
@@ -7074,6 +7075,19 @@ prueba('🔔 Aviso de propuestas al dueño (2026-11-03): cambio o incorporación
     {id: 'f', tipo: 'creeps', nombre: 'Auditado', autorUid: 'j1', autorNombre: 'Juan', auditado: true, creado: 600}];
   const r = AvisoPropuestas.armar(E, {duenoUid: 'dueno', vistoHasta: 150, max: 2});
   igual([r.lineas.map(l => l.texto), r.mas, r.ultima], [['Ana propuso un cambio a «Daga» (Ítem)', 'Juan propuso una incorporación: «Rata» (Creep)'], 1, 400]);
+});
+prueba('✚ Revivir igual en todos lados (2026-11-04, dueño: «el botón de revivir desde el token también debe aparecer en la ficha propia de los jugadores»): 25 %, un número (sin pasar el máximo), cancelar, y el texto de la Mesa', async () => {
+  const falso = (op, txt) => ({elegir: async (q, o) => { falso.ops = o.opciones.map(x => x.valor); return op; }, texto: async () => txt});
+  const a = await Revivir.elegirVida('Larry', 40, {confirmar: falso('25')});          // 25 % de 40 = 10
+  const b = await Revivir.elegirVida('Larry', 40, {confirmar: falso('num', '99')});   // escribió 99: no pasa el máximo
+  const c = await Revivir.elegirVida('Larry', 40, {confirmar: falso(null)});          // canceló
+  const d = await Revivir.elegirVida('Larry', 40, {confirmar: falso('num', '0')});    // 0 no revive
+  const S = FichaGuardado.normalizar({}).S; S.hp = 0; S.muerto = {activo: true, turnos: 3, definitivo: false};
+  FichaAcciones.revivir(S, 7);
+  igual([a, b, c, d, falso.ops, Revivir.pct(0, 50), Revivir.texto('Larry', 10, {quien: 'dueno'}), Revivir.texto('Abeja', 3, {titila: false, quien: 'gm'}),
+    S.hp, S.muerto.activo, (S.efectos || []).some(e => e && e.activo !== false && /Titilando|Invulnerable/.test(e.nombre))],
+    [10, 40, null, null, ['25', '50', '100', 'num'], 1, '✚ Larry vuelve con 10 de vida, Titilando hasta su próximo turno (lo revivió su jugador)',
+     '✚ Abeja vuelve con 3 de vida (lo revivió el GM)', 7, false, true]);
 });
 prueba('💧 Poción de SP en un creep (2026-11-03): en modo SP devuelve SP; con cooldowns baja 1 turno a la habilidad elegida, o avisa que no hay nada en espera', () => {
   const pot = CATALOGO_BASE.find(i => i.nombre === 'Poción de SP menor');

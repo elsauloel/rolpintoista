@@ -294,6 +294,13 @@
   jugadores»)**: en el anillo de un token caído (creep, personaje o invocación), el ✚ (solo el GM) → «¿Con cuánta vida vuelve?» (25 / 50 / 100 % o un
   número) → vuelve Titilando; un personaje deja de estar inconsciente. Verificado que el ✚ aparece solo si está caído (Basilio, en memoria); falta
   apretarlo de verdad en un creep, un personaje y una invocación.
+- [ ] **✚ El jugador revive a su propio personaje, y el mismo ✚ en la ficha (2026-11-04, dueño: «el botón de revivir desde el token también debe
+  aparecer en la ficha propia de los jugadores»)**: el ✚ del anillo lo ve también el dueño del token (su personaje o una invocación suya; otro jugador no),
+  y el ✚ Revivir de la ficha y el de la pantalla de muerte del mapa hacen la misma pregunta (25 / 50 / toda / un número, `comun/revivir.js`) y avisan en
+  la Mesa. En la ficha el botón pasó abajo al centro (arriba a la izquierda lo tapaba «📜 Historial») y el cartel rojo ahora se cierra al revivir.
+  **Probado en «Claude · pruebas»** con Prueba Uno (J1): el ✚ del anillo (50 % → 7/15), el de la ficha (25 % → 3; toda → 15) y el de la pantalla de
+  muerte (50 % → 7), siempre Invulnerable (Titilando) y con la línea en la Mesa; el GM ve el ✚ y J2 no. Prueba Uno quedó restaurada. **Falta**: un
+  jugador reviviendo una invocación suya, y el GM con un creep y una invocación (el código del GM no cambió, solo se pasó a la pieza común).
 
 - [ ] **🧮 La cuenta del daño ANTES de aplicar (2026-11-04, dueño: «el cuadro de la cuenta del daño debe aparecer antes del botón "aplicar el daño". Al
   aplicar uno ya debe saber cuánto va a ser»)**: en el paso 5 del duelo, la pantalla que puede aplicar (el defensor o el GM) muestra la cuenta completa

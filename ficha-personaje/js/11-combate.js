@@ -540,11 +540,21 @@ function actualizarRevivirUI(){
   const {hpmax, val} = calcularHpRevivir();
   $('#revivir-preview').textContent = `Revive con ${fmt(val)} / ${fmt(hpmax)} HP`;
 }
-$('#btn-revivir').onclick = () => {
-  revivirModo = 'pct';
-  $('#f-revivir-pct').value = 50;
-  actualizarRevivirUI();
-  $('#scrim-revivir').classList.add('open');
+// ✚ Revivir (2026-11-04, dueño: «el botón de revivir desde el token también debe aparecer en la ficha propia de los jugadores»): la misma
+// pregunta que el ✚ del token en el mapa (comun/revivir.js: 25 %, 50 %, toda o un número), vuelve Titilando (FichaAcciones.revivir) y lo
+// avisa en la Mesa. La ventana vieja (#scrim-revivir, Por % / Valor neto) queda sin abrirse.
+$('#btn-revivir').onclick = async () => {
+  if(fichaVivo && fichaVivo.soloLectura && !fichaVivo.editaGM){ toast('Es de otro jugador: para revivirlo, «✎ Editar como GM» o el ✚ de su token en el mapa'); return; }
+  const nom = (S.meta && S.meta.nombre) || 'tu personaje';
+  const val = await Revivir.elegirVida(nom, FichaAcciones.hpRevivir(S, 'pct', 100).hpmax);
+  if(!val) return;
+  FichaAcciones.revivir(S, val);
+  $('#f-hp').value = S.hp;
+  refresh();
+  renderOverlayMuerte();   // revivir ya dejó S.muerto en pie: sin esto el cartel rojo de inconsciente quedaba abierto
+  const txt = Revivir.texto(nom, val, {quien: fichaVivo && fichaVivo.editaGM ? 'gm' : 'dueno'});
+  toast(txt);
+  try{ mesaLinea(txt, 'recordatorio'); }catch(e){}
 };
 $('#revivir-modo-pct').onclick = () => { revivirModo = 'pct'; actualizarRevivirUI(); };
 $('#revivir-modo-valor').onclick = () => { revivirModo = 'valor'; actualizarRevivirUI(); };

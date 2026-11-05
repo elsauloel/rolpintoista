@@ -462,7 +462,7 @@ const FichaAcciones = (() => {
       ui.toast(`${it.nombre}: ${partes.join(' · ')}`);
       // El anuncio (dueño, 2026-10-05: «se anuncia en el log y en la crónica»): una línea en la Mesa y, en el mapa, la Crónica para los demás.
       const quien = (S.meta && S.meta.nombre) || 'Alguien';
-      const publicas = [...(curaNo ? [`❌ ${curaNo}`] : it.curahp ? [`${num(it.curahp) >= 0 ? '+' : ''}${fmt(num(it.curahp) + boticario)} HP`] : []), ...(efecto ? [efecto.nombre] : []), ...(revive ? [`✚ revive a ${revive.nombre}`] : []), ...(curados && curados.sacados.length ? [`🩹 se le fue ${curados.sacados.join(', ')}`] : [])];
+      const publicas = [...(curaNo ? [`❌ ${curaNo}`] : it.curahp ? [`${num(it.curahp) >= 0 ? '+' : ''}${fmt(num(it.curahp) + boticario)} HP`] : []), ...(efecto ? [efecto.nombre] : []), ...(revive ? [`✚ revive a ${revive.nombre}`] : []), ...(curados && curados.sacados.length ? [`🩹 se le fue ${curados.sacados.join(', ')}`] : []), ...(armRotaTxt && !/no tenía/.test(armRotaTxt) ? [armRotaTxt] : [])];   // 🔨 el Ungüento también en la Mesa
       const resultado = [publicas.join(' · '), sac.saque ? sac.saque.txt : '', sac.alquimista ? '💍 Anillo del alquimista: no costó No2' : ''].filter(Boolean).join(' · ');
       const anuncio = {titulo: `${quien} usó ${it.nombre}`, resultado, texto: `🧪 ${quien} usó ${it.nombre}${resultado ? ': ' + resultado : ''}`, item: it.nombre, saqueSalio: !!(sac.saque && sac.saque.sale)};
       if(it.trampaDatos){}   // una trampa: ya la anunció TokensAuto (🎭 acción incierta para el rival, 2026-10-09)

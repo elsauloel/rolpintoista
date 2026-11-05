@@ -2,7 +2,7 @@
    por estas habilidades, pasivas y estados (las reglas puras, en comun/orden-turnos.js):
    - 🎺 Toque de carga (Support): un aliado (o vos) sube 1 lugar. Si ya jugó esta ronda, sube al empezar la próxima.
    - 🔄 Cambio de guardia (Support): dos aliados cualesquiera cambian de lugar desde la próxima ronda.
-   - 🥁 Marcar el ritmo (pasiva): al empezar la ronda, los aliados pegados a vos suben 1.
+   - 🥁 Marcar el ritmo (pasiva): al empezar la ronda, UN aliado pegado a vos (el que está más atrás en el orden) sube 1.
    - 🩸 Sed de sangre (pasiva): cuando un rival cae por tu golpe, subís 2 (si ya jugaste, al empezar la próxima ronda).
    - 🐈‍⬛ Mufa (estado del Debuffer, «Echar la mufa»): al empezar la ronda, los rivales de quien la lleva que están pegados a él tiran Res.Mt contra el
      Efecto especial de quien la echó; el que pierde baja 1.
@@ -179,7 +179,10 @@ async function ordenInicioRonda(ordenIds){
   pend.filter(x => x.tipo === 'sube').forEach(p => anotar(p.id, Math.round(num(p.n)) || 1, p.por || 'de la ronda pasada'));
   for(const id of conRitmo){
     const t = tokens.get(id), k = ordenPasiva(t, 'ritmo', 'ritmo');
-    ordenPegados(t, x => !dueloEsRival(t, x) && ordenIds.includes(idDeToken(x))).forEach(a => anotar(a, k, `Marcar el ritmo de ${ordenNombre(id)}`));
+    // UN solo aliado pegado (dueño, 2026-11-05: «no es todos los aliados, sino un aliado adyacente»): el que está más atrás en el orden.
+    const pegados = ordenPegados(t, x => !dueloEsRival(t, x) && ordenIds.includes(idDeToken(x)));
+    const uno = pegados.sort((a, b) => ordenIds.indexOf(idDeToken(b)) - ordenIds.indexOf(idDeToken(a)))[0];
+    if(uno) anotar(uno, k, `Marcar el ritmo de ${ordenNombre(id)}`);
   }
   for(const [port, m] of Object.entries(mufas)){
     const t = tokens.get(port);

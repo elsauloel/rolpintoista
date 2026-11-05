@@ -111,16 +111,29 @@ function aguaContornos(celdas){
   return lazos;
 }
 // Un lado ondulado: de a hacia b, corrido `adentro` hacia el centro de su casilla, con la onda en fase `fase`.
+/* 🌊 La orilla, más libre (2026-11-05, dueño: «esta superficie de agua tiene bordes demasiado regulares… un efecto menos regular, que no se aleje
+   demasiado de la forma original, pero más libre, total se suma la línea punteada»): además de la onda que corre, cada esquina de afuera se corre un
+   poco al azar (el azar sale de su posición: los dos lados que la comparten la mueven igual, así empalman) y cada lado tiene su propia forma fija, una
+   panza que sale o se mete y un desparejo, distintos en cada lado. La línea punteada (bordeHexPunteado) marca las casillas exactas. */
+function aguaEsquina(x, y){
+  const kx = Math.round(x * 2), ky = Math.round(y * 2);
+  const a = superficieAzar(kx, ky, 50) * Math.PI * 2, d = HEX * 0.17 * superficieAzar(kx, ky, 51);
+  return [x + Math.cos(a) * d, y + Math.sin(a) * d];
+}
 function aguaLado(l, amp, adentro, fase, primero){
-  const dx = l.b[0] - l.a[0], dy = l.b[1] - l.a[1], largo = Math.hypot(dx, dy) || 1;
+  const A = aguaEsquina(l.a[0], l.a[1]), B = aguaEsquina(l.b[0], l.b[1]);
+  const dx = B[0] - A[0], dy = B[1] - A[1], largo = Math.hypot(dx, dy) || 1;
   const mx = (l.a[0] + l.b[0]) / 2, my = (l.a[1] + l.b[1]) / 2;
   let nx = -dy / largo, ny = dx / largo;   // la normal, hacia afuera de la casilla
   if((mx - l.c.x) * nx + (my - l.c.y) * ny < 0){ nx = -nx; ny = -ny; }
-  const pasos = 14;
+  const kx = Math.round(mx * 2), ky = Math.round(my * 2), u = superficieAzar(kx, ky, 60), w = superficieAzar(kx, ky, 61), f = superficieAzar(kx, ky, 62);
+  const panza = HEX * (-0.08 + 0.36 * u * u), desparejo = HEX * 0.11 * (w - 0.5) * 2;   // la forma fija de este lado
+  const pasos = 16;
   for(let s = primero ? 0 : 1; s <= pasos; s++){
     const t = s / pasos, env = Math.sin(Math.PI * t);
-    const off = env * (amp * Math.sin(Math.PI * 2 * 1.5 * t - fase) - adentro);
-    const x = l.a[0] + dx * t + nx * off, y = l.a[1] + dy * t + ny * off;
+    const fija = panza * env + desparejo * Math.sin(Math.PI * 2 * t + f * 6.28) * env;
+    const off = fija + env * (amp * Math.sin(Math.PI * 2 * 1.5 * t - fase)) - adentro * (0.35 + 0.65 * env);
+    const x = A[0] + dx * t + nx * off, y = A[1] + dy * t + ny * off;
     if(primero && !s) ctx.moveTo(x, y); else ctx.lineTo(x, y);
   }
 }
@@ -153,6 +166,7 @@ function aguaDibujar(celdas, z){
   aguaTrazar(lazos, amp, 0, t * 1.6);
   ctx.lineJoin = 'round'; ctx.lineWidth = 2 / z;
   ctx.strokeStyle = `rgba(175,220,250,${(0.5 + 0.18 * Math.sin(t * 2.1)).toFixed(3)})`; ctx.stroke();
+  bordeHexPunteado(celdas, z, 'rgba(190,228,255,.5)');   // qué casillas están mojadas, exactas (2026-11-05)
 }
 /* 💧 Pasos en el agua (2026-11-05, dueño: «al caminar por un charco, cada paso deja ondas que se abren y se apagan detrás del token»). Solo dibujo, en
    cada pantalla: el listener de los tokens (js/09) avisa cuando otro token cambia de casilla (con su ruta, o de la casilla de antes a la nueva) y

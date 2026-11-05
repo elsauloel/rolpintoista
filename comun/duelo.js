@@ -9,7 +9,7 @@
       critDatos:{frecuente,potente,resistencia}|null (lo anota cada lado al tirar: el atacante su Crítico frecuente/potente, el defensor su Resistencia a crítico al Tipo),
       crit:{rango,diferencia,nivel,dados,critico,d20,mejor,mult}|null,
       dano:{crudo,formula,rolls,mod,reclamado,aplicado,mult,golpe,ignoraDef,mitad,defensa,recibido,absorbido,hpAntes,hpDespues,manual}|null,
-      efectos:[{nombre,caras,exitos,dado,detalle,stacks,requiereDano,res:{dado,exito,extra}|null,omitido,motivo,aplicar:''|'pedido'|'pedido-gm'|'pedido-mapa'|'en-curso',aplicado,nota}]|null,
+      efectos:[{nombre,caras,exitos,dado,detalle,stacks,requiereDano,res:{dado,exito,extra}|null,omitido,motivo,aplicar:''|'pedido'|'pedido-gm'|'pedido-mapa'|'pedido-lados'|'en-curso',aplicado,nota}]|null,
       contacto:{gana,dif,desempate,moneda}|null, bloq:{…}|null, empate:{par:'contacto'|'bloqueo', moneda?}|null,
       resultado: 'pego'|'fallo'|'bloqueado'|'mitad'|null, contra: id del contraataque|null, contraDe, creado, creadoPor}
    Pasos: 1 declaración → 2 contacto (PdG contra Evasión o Parry) → si el Parry gana, 3 Bloqueo (Fuerza del golpe contra Bloqueo):
@@ -1311,7 +1311,7 @@ const Duelo = (() => {
       if(e.seguroCritico && caras > 1) o.seguroCritico = true;
       if(e.soloCritico) o.soloCritico = true;
       o.requiereDano = requiereDanoDe(e);
-      o.res = null; o.omitido = false; o.motivo = ''; o.aplicar = o.trae ? 'pedido-mapa' : '';   // 🪝 (2026-11-05: 'pedido-mapa', que las pantallas viejas no conocen y no toman)
+      o.res = null; o.omitido = false; o.motivo = ''; o.aplicar = o.trae ? 'pedido-lados' : '';   // 🪝 (2026-11-05: 'pedido-mapa', que las pantallas viejas no conocen y no toman)
       o.aplicado = false; o.nota = '';
       return o;
     }).filter(e => e.nombre);
@@ -1648,7 +1648,7 @@ const Duelo = (() => {
       if(!doc.exists) return;
       const m = {...doc.data()};
       const ef = (m.efectos || [])[i];
-      if(!ef || ef.aplicado || (ef.aplicar !== 'pedido' && ef.aplicar !== 'pedido-gm' && ef.aplicar !== 'pedido-mapa')) return;
+      if(!ef || ef.aplicado || (ef.aplicar !== 'pedido' && ef.aplicar !== 'pedido-gm' && ef.aplicar !== 'pedido-mapa' && ef.aplicar !== 'pedido-lados')) return;
       m.efectos = m.efectos.map((e, k) => k === i ? {...e, aplicar: 'en-curso'} : e);
       tx.update(ref, cambiosDe(m));
       mio = true;
@@ -2668,7 +2668,7 @@ const Duelo = (() => {
       else if(ef.res || (!necesitaTiradaEf(ef) && siempreEf(ef))){
         const cab = ef.res ? `<div class="duelo-ef-res ok${nuevo ? ' nuevo' : ''}">✔ ¡FUNCIONÓ! ${siempreEf(ef) ? '' : `<span>(${ef.res.manual ? '✍ a mano' : `salió ${_fmt(ef.res.dado)} en 1d${_fmt(ef.caras)}`})</span>`}${ef.res && ef.res.extra ? ` <span>· ${_esc(ef.dado)} = <b>${_fmt(ef.res.extra.total)}</b></span>` : ''}</div>` : `<div class="duelo-ef-res ok">Entra siempre</div>`;
         let acc;
-        if(ef.aplicar === 'pedido' || ef.aplicar === 'pedido-gm' || ef.aplicar === 'pedido-mapa' || ef.aplicar === 'en-curso') acc = `<div class="duelo-nota">Aplicando sobre ${_esc(spec && spec.nombre === 'Desafiante' ? d.atacante.nombre : d.defensor.nombre)}…</div>`;
+        if(ef.aplicar === 'pedido' || ef.aplicar === 'pedido-gm' || ef.aplicar === 'pedido-mapa' || ef.aplicar === 'pedido-lados' || ef.aplicar === 'en-curso') acc = `<div class="duelo-nota">Aplicando sobre ${_esc(spec && spec.nombre === 'Desafiante' ? d.atacante.nombre : d.defensor.nombre)}…</div>`;
         else if(!puedeAtq) acc = `<div class="duelo-nota">esperando que ${_esc(d.atacante.nombre)} lo aplique…</div>`;
         else if(spec){
           // Los stacks de más que suma quien atacó (Guantes del envenenador, 2026-10-05): el botón ya dice cuántos van a llegar.
@@ -3204,7 +3204,10 @@ const Duelo = (() => {
       let extra = {};
       if(cfgEscuchar.antesDeAplicar) try{ extra = await cfgEscuchar.antesDeAplicar(d, (d.efectos || [])[i]); }catch(err){ console.error(err); extra = {}; }
       if(extra === null){ b.disabled = false; return; }
-      marcarEfecto(d.id, i, {...(extra || {}), aplicar: 'pedido'}).catch(err => { console.error(err); _toast('No se pudo pedir la aplicación'); });
+      // 🎺 Lo que mueve el orden de turnos lo escribe solo el mapa del GM: 'pedido-mapa', que las pantallas viejas (una pestaña sin recargar) no conocen
+      // y no toman (2026-11-05, pruebas: el Toque de carga quedaba «el token ya no está: aplicalo a mano» sin subir a nadie).
+      const spA = specDeEfecto((d.efectos || [])[i]), ordenA = spA && /^(Toque de carga|Sube en el orden|Al final del orden|Demora)$/.test(String(spA.nombre || ''));
+      marcarEfecto(d.id, i, {...(extra || {}), aplicar: ordenA ? 'pedido-lados' : 'pedido'}).catch(err => { console.error(err); _toast('No se pudo pedir la aplicación'); });
     });
     f.querySelectorAll('[data-ef-mano]').forEach(b => b.onclick = () => { b.disabled = true; marcarEfecto(d.id, Number(b.dataset.efMano), {aplicado: true, aplicar: '', nota: 'a mano'}).catch(err => console.error(err)); });
     const bft = f.querySelector('[data-ef-terminar]');
@@ -3851,7 +3854,9 @@ const Duelo = (() => {
             // código: una pestaña vieja, que solo conoce 'pedido', no lo reclama y lo deja «a mano»).
             // 'pedido-mapa' (2026-11-05): lo mismo, pero con un nombre que las pestañas viejas no conocen — una ficha del GM abierta desde antes tomaba
             // 'pedido-gm', no sabía arrastrar y lo dejaba «a mano» sin moverlo (visto en Claude · pruebas). Solo lo toma el mapa del GM (`aplicaDemora`).
-            if((ef.aplicar !== 'pedido' && !((ef.aplicar === 'pedido-gm' || ef.aplicar === 'pedido-mapa') && soyGM())) || ef.aplicado || aplicando.has(clave)) return;
+            // 'pedido-lados' (2026-11-05, segunda tanda de pruebas): lo mismo que 'pedido-mapa', con otro nombre — una pestaña del mapa del GM cargada
+            // entre el 'pedido-mapa' y el `veLados` (en otro mapa, sin esos tokens) lo tomaba y dejaba el Toque de carga o el gancho «a mano».
+            if((ef.aplicar !== 'pedido' && !((ef.aplicar === 'pedido-gm' || ef.aplicar === 'pedido-mapa' || ef.aplicar === 'pedido-lados') && soyGM())) || ef.aplicado || aplicando.has(clave)) return;
             if(cfgEscuchar.aplicaSolo && !soyGM() && !cfgEscuchar.aplicaSolo(d, ef)) return;
             // 👀 Una pantalla del GM que mira OTRO mapa no lo reclama (2026-11-05, visto probando Arrastrar en Claude · pruebas: otra pestaña del GM, en
             // otro mapa, tomaba el gancho y lo dejaba «uno de los dos ya no está en el mapa: traelo a mano»). Lo toma la que ve a los dos.

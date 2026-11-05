@@ -20,6 +20,15 @@
      grupo vinculado va a su mapa y uno sin vincular, a un mapa con su nombre (el que ya exista con ese nombre, o uno nuevo y vacío:
      decisión del dueño, 2026-10-02). Pone `sc.mapa`, saca `sc.grupo` y
      borra gm/gruposMapas. `vacios`: los grupos sin creeps que el GM había creado (también pasan a ser mapas). → {cambiados, creados}.
+   - 🔗 El token manda (2026-11-05, dueño: «los tokens y la ficha de los creeps de GM Tools deben estar vinculados… si se mueve una cosa de
+     una a otra, debe suceder de manera pareja; la mayor parte del juego va a suceder a través del mapa»):
+     `tokensPorCreep()` → Map creepId → Set de mapas donde tiene token (todos los mapas de la partida);
+     `correcciones(creeps, tokensPor, ids)` (pura) → {cambios: [{id, de, a}], dobles: [{id, mapas}]}: un creep con token en UN mapa queda en
+     ese mapa; con tokens en dos o más, se avisa (no se elige); sin token, se respeta su mapa (un creep preparado, todavía sin token);
+     `trasCambioDeToken(actual, conToken)` (pura) → el mapa nuevo o null: al aparecer un token, el creep queda en el único mapa donde tiene token
+     (con dos o más, null: se le pregunta al GM; sin token, null: sacar el token también se le pregunta al GM, js/101);
+     `quedarEn(creepId, mapaId)`: le saca sus tokens de los otros mapas (lo que elige el GM cuando aparece en dos) → cuántos sacó;
+     `textoDosMapas(nombre, nombresMapas)` (pura): la pregunta, con las palabras del dueño. Lo usan el mapa del GM (js/101) y GM Tools.
    Necesita sesion.js y tokens-auto.js.
    ========================================================= */
 const CreepsMapas = (() => {
@@ -133,5 +142,40 @@ const CreepsMapas = (() => {
     return {cambiados: conGrupo.length, creados};
   }
 
-  return {RESERVA, PRINCIPAL, ordenar, mapaDe, idsDeMapas, tokensDeCreep, mudarTokens, crearMapa, confirmarBorrado, borrarMapa, migrar};
+  async function tokensPorCreep(){
+    const ids = await idsDeMapas();
+    const snaps = await Promise.all(ids.map(id => fbDb.collection(fbRutaCampana(rutaTokens(id))).get()));
+    const por = new Map();
+    snaps.forEach((sn, i) => sn.docs.forEach(d => { const t = d.data(); if(t && t.tipo === 'creep' && t.fichaId){ if(!por.has(t.fichaId)) por.set(t.fichaId, new Set()); por.get(t.fichaId).add(ids[i]); } }));
+    return {por, ids: new Set(ids)};
+  }
+  function correcciones(creeps, tokensPor, ids){
+    const cambios = [], dobles = [];
+    (creeps || []).forEach(sc => {
+      if(!sc || !sc.id) return;
+      const con = [...((tokensPor && tokensPor.get(sc.id)) || [])].filter(m => !ids || ids.has(m));
+      if(con.length > 1){ dobles.push({id: sc.id, mapas: con}); return; }
+      if(con.length === 1){ const de = mapaDe(sc, ids); if(de !== con[0]) cambios.push({id: sc.id, de, a: con[0]}); }
+    });
+    return {cambios, dobles};
+  }
+  function trasCambioDeToken(actual, conToken){
+    const con = [...(conToken || [])];
+    return con.length === 1 && con[0] !== (actual || RESERVA) ? con[0] : null;   // dos o más: se pregunta; ninguno: no se toca
+  }
+  async function quedarEn(creepId, mapaId){
+    const fuera = (await tokensDeCreep(creepId)).filter(t => t.mapaId !== mapaId);
+    if(fuera.length){ const lote = fbDb.batch(); fuera.forEach(t => lote.delete(t.ref)); await lote.commit(); }
+    return fuera.length;
+  }
+  // «El Goblin aparece en dos mapas: «Mina» y «Bosque». Un creep puede estar en un solo lugar. ¿Dónde queda?» (dueño, 2026-11-05)
+  function textoDosMapas(nombre, nombres){
+    const q = (nombres || []).map(n => `«${n}»`);
+    const lista = q.length > 1 ? q.slice(0, -1).join(', ') + ' y ' + q[q.length - 1] : (q[0] || '');
+    const cuantos = q.length === 2 ? 'dos' : String(q.length);
+    return `El ${nombre} aparece en ${cuantos} mapas: ${lista}. Un creep puede estar en un solo lugar. ¿Dónde queda?`;
+  }
+
+  return {RESERVA, PRINCIPAL, ordenar, mapaDe, idsDeMapas, tokensDeCreep, mudarTokens, crearMapa, confirmarBorrado, borrarMapa, migrar,
+    tokensPorCreep, correcciones, trasCambioDeToken, quedarEn, textoDosMapas};
 })();

@@ -813,6 +813,7 @@ function arrancarEnVivo(){
   $('#btn-botonera-nueva').onclick = bnAlternar;
   escucharMiembros();
   escucharVinculables();
+  if(soyGM) setTimeout(() => { if(typeof creepsMapasReconciliar === 'function') creepsMapasReconciliar(); }, 6000);   // 🔗 cada creep en el mapa de su token (js/101, 2026-11-05)
   escucharMantenimiento();
   recibidosEscuchar();   // los estados y las recompensas que les llegan a mis personajes (B-8)
   if(typeof escucharDia === 'function') escucharDia();   // ⏳ Pasar de día (js/41, 2026-10-12)

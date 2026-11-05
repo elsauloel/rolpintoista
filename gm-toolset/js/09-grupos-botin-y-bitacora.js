@@ -226,6 +226,19 @@ async function gmMigrarGrupos(){
     renderAll();
     if(r.cambiados || r.creados) toast(`🗺 Los grupos pasaron a ser mapas: ${r.cambiados} creep(s) ubicados${r.creados ? ` · ${r.creados} mapa(s) nuevo(s)` : ''}`);
   }catch(err){ console.error('No se pudieron pasar los grupos a mapas:', err); }
+  gmReconciliarMapas();
+}
+// 🔗 Cada creep en el mapa de su token (2026-11-05, dueño: «los tokens y la ficha de los creeps de GM Tools deben estar vinculados… la mayor parte del
+// juego va a suceder a través del mapa»): al entrar el GM, los creeps cuyo mapa no coincide con el de su token pasan a ese mapa (el guardado de
+// siempre los sube). Los que tienen tokens en dos mapas los pregunta el mapa (vtt-hexgrid/js/101); acá solo se avisa.
+async function gmReconciliarMapas(){
+  try{
+    const {por, ids} = await CreepsMapas.tokensPorCreep();
+    const r = CreepsMapas.correcciones(creepsReales(), por, ids);
+    r.cambios.forEach(c => { const sc = S.creeps.find(x => x.id === c.id); if(sc) sc.mapa = c.a; });
+    if(r.cambios.length){ renderAll(); toast(`🔗 ${r.cambios.length} creep(s) pasaron al mapa donde está su token`); console.log('🔗 Creeps puestos en el mapa de su token:', r.cambios); }
+    if(r.dobles.length) toast(`🔗 ${r.dobles.map(d => nombreLimpioCreep(S.creeps.find(x => x.id === d.id) || {nombre: 'Un creep'})).join(', ')}: con token en más de un mapa. Abrí el mapa para elegir dónde queda.`);
+  }catch(err){ console.error('No se pudieron revisar los mapas de los creeps:', err); }
 }
 
 /* =========================================================

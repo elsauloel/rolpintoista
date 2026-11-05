@@ -108,7 +108,10 @@ async function borrarToken(id){
   if(!puedoBorrar(t)) return;
   if(!(await Confirmar.preguntar(`¿Sacar el token "${nombreDe(t)}" del mapa?`, {titulo: 'Sacar token', si: 'Sacar', peligro: true}))) return;
   try{
+    const mapa = mapaMostrado;
     await coleccionTokens().doc(id).delete();
+    // 🔗 Sacaste a un creep del tablero: ¿qué hacemos con él? (js/101, 2026-11-05)
+    if(soyGM && t && t.tipo === 'creep' && t.fichaId && typeof creepTokenSacado === 'function') creepTokenSacado(t.fichaId, mapa, nombreDe(t));
   }catch(err){
     console.error('No se pudo borrar el token:', err);
     toast('No se pudo borrar el token');
@@ -117,10 +120,16 @@ async function borrarToken(id){
 
 function escucharTokens(){
   escucharTokens.listo = false;
+  const mapaDeEsteListener = mapaMostrado;   // 🔗 de qué mapa son estos tokens (js/101)
   cortarTokensListener = coleccionTokens().onSnapshot(snap => {
     const nuevosInv = [];
     snap.docChanges().forEach(ch => {
       if(ch.type === 'added' && escucharTokens.listo && soyGM) nuevosInv.push(ch.doc.id);   // una invocación nueva entra al orden de turnos (P161)
+      // 🔗 Aparece el token de un creep en este mapa: GM Tools lo sigue (el creep queda en el mapa de su token; js/101, 2026-11-05).
+      if(escucharTokens.listo && soyGM && typeof creepMapaRevisar === 'function' && ch.type === 'added'){
+        const t = ch.doc.data();
+        if(t && t.tipo === 'creep' && t.fichaId) creepMapaRevisar(t.fichaId, mapaDeEsteListener);
+      }
       if(ch.type === 'removed'){
         tokens.delete(ch.doc.id); visibles.delete(ch.doc.id);
         if(seleccion === ch.doc.id) seleccion = null;

@@ -1581,3 +1581,9 @@
   queda con «Desequilibrado(1)» y su Evasión pasa de +1 a −1; `desequilibradosFinTurno(Rockardo)` se lo saca («recupera el equilibrio») y deja sus otros
   estados. **Falta**: el flujo entero con el duelo del gancho (engancha → arrastra → al llegar, el −2 EVA), el ▶ Siguiente del GM al terminar el turno
   de quien arrastró, y un personaje o una invocación como arrastrado (va por su ficha, `encolarPj`; al terminar el turno lo saca el mapa del GM).
+
+## 🔗 Tokens de creeps ↔ su mapa en GM Tools (2026-11-05)
+Probado en «Claude · pruebas» (GM): un creep sin token puesto en el mapa pasó a ese mapa; al sacarlo del tablero salió «Sacaste al … ¿Qué hacemos con
+él?» y «Guardarlo en la Reserva» lo dejó en la Reserva; al entrar salió la pregunta de un creep en dos mapas (el Escarabajo de cobre, «Mapa 1» y
+«Mazmorra de pruebas»: quedó sin contestar, para que el dueño elija). Falta ver: «Eliminarlo» y «Dejarlo en este mapa»; elegir un mapa en la pregunta
+de dos mapas; Ctrl+V y los refuerzos; GM Tools abierto al mismo tiempo (que tome el cambio por la firma).

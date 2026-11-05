@@ -57,7 +57,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="estados-aplicar.js?v=20261104ae"></script>
 <script src="recibidos.js?v=20261103pm"></script>
 <script src="tokens-auto.js"></script>
-<script src="creeps-mapas.js"></script>
+<script src="creeps-mapas.js?v=20261105sync"></script>
 <script src="paso-a-paso.js"></script>
 <script src="asistente-item.js"></script>
 <script src="asistente-duelo-hab.js"></script>
@@ -5522,6 +5522,26 @@ prueba('fin del combate: cada trampa consumible sin disparar tiene 50 % de rompe
     const vuelta = Object.entries(datos).find(([k]) => k.startsWith('recompensas/'));
     igual([r, Object.keys(datos).filter(k => k.startsWith('elementos/')), vuelta && vuelta[1].devolver, TokensAuto.ROMPE_AL_DESARMAR],
       [{total: 2, vuelven: 1, rotas: ['Trampa de oso menor']}, ['elementos/c'], ['{"nombre":"Red de caza"}'], 0.5]);
+  });
+});
+prueba('🔗 token ↔ creep (2026-11-05): con token en un solo mapa el creep queda en ese mapa; con tokens en dos, se pregunta; sin token, no se toca', () => {
+  const ids = new Set(['_principal', 'm1', 'm2']);
+  const por = new Map([['a', new Set(['m1'])], ['b', new Set(['m1', 'm2'])], ['c', new Set(['m2'])], ['e', new Set(['zz'])]]);
+  const creeps = [{id: 'a', mapa: ''}, {id: 'b', mapa: 'm1'}, {id: 'c', mapa: 'm2'}, {id: 'd', mapa: 'm1'}, {id: 'e', mapa: 'm2'}];
+  const r = CreepsMapas.correcciones(creeps, por, ids);
+  igual([r.cambios, r.dobles,
+    CreepsMapas.trasCambioDeToken('', ['m1']), CreepsMapas.trasCambioDeToken('m1', ['m1']), CreepsMapas.trasCambioDeToken('m1', ['m1', 'm2']), CreepsMapas.trasCambioDeToken('m1', []),
+    CreepsMapas.textoDosMapas('Goblin', ['Mina', 'Bosque']), CreepsMapas.textoDosMapas('Goblin', ['A', 'B', 'C'])],
+    [[{id: 'a', de: '', a: 'm1'}], [{id: 'b', mapas: ['m1', 'm2']}], 'm1', null, null, null,
+      'El Goblin aparece en dos mapas: «Mina» y «Bosque». Un creep puede estar en un solo lugar. ¿Dónde queda?',
+      'El Goblin aparece en 3 mapas: «A», «B» y «C». Un creep puede estar en un solo lugar. ¿Dónde queda?']);
+});
+prueba('🔗 quedarEn: al elegir dónde queda un creep con tokens en dos mapas, se le sacan los de los otros mapas', () => {
+  const datos = {'tokens/t1': {tipo: 'creep', fichaId: 'g'}, 'mapas/m2': {nombre: 'Bosque'}, 'mapas/m2/tokens/t2': {tipo: 'creep', fichaId: 'g'}, 'mapas/m2/tokens/t3': {tipo: 'creep', fichaId: 'otro'}};
+  return conFbFalso(datos, async () => {
+    const n = await CreepsMapas.quedarEn('g', 'm2');
+    const por = (await CreepsMapas.tokensPorCreep()).por;
+    igual([n, Object.keys(datos).filter(k => k.includes('tokens/')).sort(), [...por.get('g')]], [1, ['mapas/m2/tokens/t2', 'mapas/m2/tokens/t3'], ['m2']]);
   });
 });
 prueba('creeps por mapa: el orden de las pestañas y el mapa de un creep (si su mapa ya no existe, la Reserva)', () => {

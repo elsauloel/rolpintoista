@@ -504,3 +504,9 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   (`biblioteca_creeps`) y cualquier creep de fábrica que traiga `auditado: true`. **Cómo se suma un creep al Pool de campaña**: desde su ficha completa
   (el ✎ de la tarjeta), el botón **📚 Biblioteca** de la cabecera (`data-bib`, `guardarCreepEnBiblioteca`): si lo sube el dueño del proyecto entra
   auditado; si no, 🔶 sin auditar hasta que el dueño lo marca ✅. Va al de campaña salvo que sus datos digan `pool: 'esencial'`.
+
+- **🔗 El token manda: cada creep en el mapa de su token** (2026-11-05, dueño: «los tokens y la ficha de los creeps de GM Tools deben estar vinculados…
+  si se mueve una cosa de una a otra, debe suceder de manera pareja; la mayor parte del juego va a suceder a través del mapa»). Al entrar el GM,
+  `gmReconciliarMapas` (js/09, después de `gmMigrarGrupos`) pasa al mapa de su token a los creeps que estaban en otro (o en la Reserva) y avisa
+  cuántos; el guardado de siempre los sube. Si uno tiene tokens en dos mapas, solo avisa: la pregunta la hace el mapa (vtt-hexgrid/js/101). Un creep
+  sin token se respeta (preparado en un mapa). Lo que cambia el mapa le llega a GM Tools abierto por la firma. Reglas en `comun/creeps-mapas.js`.

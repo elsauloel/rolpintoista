@@ -785,6 +785,15 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   `../comun/prueba-dados.html` para elegir el estilo (por navegador, en
   `localStorage` 'dados3d'). No escribe nada en Firebase.
 
+- **🔗 El token de un creep y su mapa en GM Tools, vinculados** (2026-11-05, dueño: «los tokens y la ficha de los creeps de GM Tools deben estar
+  vinculados… la mayor parte del juego va a suceder a través del mapa»): `js/101-creeps-mapas-sync.js`, solo el GM. Al **aparecer** el token de un
+  creep en el mapa que mira (crearlo, 🎭, Ctrl+V, refuerzos…; `escucharTokens` js/09 → `creepMapaRevisar`), a los 2,5 s el creep queda en ese mapa
+  (`modificarCreep`). Si tiene tokens en **dos mapas**: «El <creep> aparece en dos mapas: «A» y «B». Un creep puede estar en un solo lugar. ¿Dónde
+  queda?» (un botón por mapa; en el otro se le saca el token, `CreepsMapas.quedarEn`). Al **sacar del tablero** su token (`borrarToken`) sin que le
+  quede otro: «Sacaste al <creep> del tablero. ¿Qué hacemos con él?» → 🗑 Eliminarlo (pide confirmación; se borra como en GM Tools) · 🎒 Guardarlo
+  en la Reserva · ⏸ Dejarlo en este mapa, fuera del tablero («Después» no toca nada). Al entrar el GM, `creepsMapasReconciliar` (6 s después de
+  arrancar) corrige los desfasados y pregunta por los que están en dos mapas. Un creep sin token se respeta. Probado en «Claude · pruebas».
+
 ## Pendiente (más adelante)
 
 Alcance y movimiento; niebla; tiradas desde el token.

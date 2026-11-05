@@ -119,7 +119,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
-<script src="skills-clase.js?v=20261105sombra"></script>
+<script src="skills-clase.js?v=20261105nube"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261104ig"></script>
 <script src="skills-creep-base.js?v=20261105r2"></script>
@@ -6683,6 +6683,11 @@ prueba('🔄 Cambio de guardia y 🎺 el costo del Toque de carga (2026-11-05): 
   S.efectos.push({nombre: 'Toques de carga', apila: true, stacks: 2, permanente: true, activo: true});
   igual([r.st.orden.join(''), r.usados.sort().join(''), otra.cambio, OrdenTurnos.costoToque(0), OrdenTurnos.costoToque(2), c0, FichaHabilidades.costoSpDe(S, h)],
     ['dbca', 'ad', null, 3, 7, 3, 7]);
+});
+prueba('☠ Nube tóxica (2026-11-05, dueño): la de los jugadores y la de los creeps tiran a los que ya están adentro cuando aparece', () => {
+  const pj = (typeof CLASES_SKILLS !== 'undefined' ? CLASES_SKILLS.flatMap(c => c.habilidades || []) : []).find(x => x && x.id === 'debuffer-nube-toxica');
+  const cr = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Nube tóxica');
+  igual([!!(pj && pj.duelo && pj.duelo.zonaInmediata), !!(cr && cr.datos.sp.duelo.zonaInmediata)], [true, true]);
 });
 prueba('⚔ Sed de batalla (2026-11-05): la pasiva está en el pool, para jugadores y creeps, y suma su stat (gana 3 No2 al voltear a un rival, aunque pase del máximo)', () => {
   const p = (typeof PASIVAS_BASE !== 'undefined' ? PASIVAS_BASE : []).find(x => x.nombre === 'Sed de batalla') || {};

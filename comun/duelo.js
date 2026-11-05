@@ -3209,10 +3209,9 @@ const Duelo = (() => {
       let extra = {};
       if(cfgEscuchar.antesDeAplicar) try{ extra = await cfgEscuchar.antesDeAplicar(d, (d.efectos || [])[i]); }catch(err){ console.error(err); extra = {}; }
       if(extra === null){ b.disabled = false; return; }
-      // 🎺 Lo que mueve el orden de turnos lo escribe solo el mapa del GM: 'pedido-mapa', que las pantallas viejas (una pestaña sin recargar) no conocen
-      // y no toman (2026-11-05, pruebas: el Toque de carga quedaba «el token ya no está: aplicalo a mano» sin subir a nadie).
-      const spA = specDeEfecto((d.efectos || [])[i]), ordenA = spA && /^(Toque de carga|Sube en el orden|Al final del orden|Demora)$/.test(String(spA.nombre || ''));
-      marcarEfecto(d.id, i, {...(extra || {}), aplicar: ordenA ? 'pedido-lados' : 'pedido'}).catch(err => { console.error(err); _toast('No se pudo pedir la aplicación'); });
+      // Desde la segunda tanda de pruebas (2026-11-05) todo efecto se pide como 'pedido-lados': lo de los demás lo toma la pantalla que ve a los
+      // dos (no una pestaña vieja en otro mapa, que solo conoce 'pedido' y lo dejaba «el token ya no está»: pasó con la Mufa).
+      marcarEfecto(d.id, i, {...(extra || {}), aplicar: 'pedido-lados'}).catch(err => { console.error(err); _toast('No se pudo pedir la aplicación'); });
     });
     f.querySelectorAll('[data-ef-mano]').forEach(b => b.onclick = () => { b.disabled = true; marcarEfecto(d.id, Number(b.dataset.efMano), {aplicado: true, aplicar: '', nota: 'a mano'}).catch(err => console.error(err)); });
     const bft = f.querySelector('[data-ef-terminar]');
@@ -3863,11 +3862,12 @@ const Duelo = (() => {
             // 'pedido-gm', no sabía arrastrar y lo dejaba «a mano» sin moverlo (visto en Claude · pruebas). Solo lo toma el mapa del GM (`aplicaDemora`).
             // 'pedido-lados' (2026-11-05, segunda tanda de pruebas): lo mismo que 'pedido-mapa', con otro nombre — una pestaña del mapa del GM cargada
             // entre el 'pedido-mapa' y el `veLados` (en otro mapa, sin esos tokens) lo tomaba y dejaba el Toque de carga o el gancho «a mano».
-            if((ef.aplicar !== 'pedido' && !((ef.aplicar === 'pedido-gm' || ef.aplicar === 'pedido-mapa' || ef.aplicar === 'pedido-lados') && soyGM())) || ef.aplicado || aplicando.has(clave)) return;
+            if((ef.aplicar !== 'pedido' && ef.aplicar !== 'pedido-lados' && !((ef.aplicar === 'pedido-gm' || ef.aplicar === 'pedido-mapa') && soyGM())) || ef.aplicado || aplicando.has(clave)) return;
+            if(_num(ef.trae) > 0 && ef.aplicar === 'pedido-lados' && !soyGM()) return;   // 🪝 el gancho, solo el mapa del GM
             if(cfgEscuchar.aplicaSolo && !soyGM() && !cfgEscuchar.aplicaSolo(d, ef)) return;
             // 👀 Una pantalla del GM que mira OTRO mapa no lo reclama (2026-11-05, visto probando Arrastrar en Claude · pruebas: otra pestaña del GM, en
             // otro mapa, tomaba el gancho y lo dejaba «uno de los dos ya no está en el mapa: traelo a mano»). Lo toma la que ve a los dos.
-            if(soyGM() && cfgEscuchar.veLados && !cfgEscuchar.veLados(d)) return;
+            if(cfgEscuchar.veLados && !cfgEscuchar.veLados(d)) return;
             const sp = specDeEfecto(ef);
             if(sp && sp.nombre === 'Demora' && !cfgEscuchar.aplicaDemora) return;   // el orden de turnos lo mueve el mapa
             if(_num(ef.trae) > 0 && !cfgEscuchar.aplicaDemora) return;   // 🪝 el gancho también (2026-11-05: la ficha o GM Tools de un GM lo reclamaban, no sabían arrastrar y quedaba «a mano», sin animación)

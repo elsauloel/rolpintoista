@@ -195,20 +195,58 @@ function ondaFxDibujarGiro(fx, C, ms, z){
   ctx.save();
   // La estela: arcos que se van apagando detrás de la hoja.
   ctx.globalCompositeOperation = 'lighter';
-  for(let k = 0; k < 18; k++){
+  // La estela empieza un poco detrás de la espada (antes, el arco más grueso de adelante se veía como un cuadrado en la punta).
+  for(let k = 1; k < 18; k++){
     const a = giro - k * 0.13, al = (1 - k / 18) * fade;
-    ctx.lineWidth = Math.max(2 / z, HEX * (0.5 - k * 0.024));
-    ctx.strokeStyle = rgba(k < 2 ? v.brillo : v.frente, (k < 2 ? 0.95 : 0.6) * al);
+    ctx.lineWidth = Math.max(2 / z, HEX * (0.48 - k * 0.024));
+    ctx.strokeStyle = rgba(k < 3 ? v.brillo : v.frente, (k < 3 ? 0.85 : 0.6) * al);
     ctx.beginPath(); ctx.arc(C.x, C.y, R, a - 0.14, a); ctx.stroke();
   }
-  // La punta de la hoja: un brillo.
-  const hx = C.x + Math.cos(giro) * R, hy = C.y + Math.sin(giro) * R, gl = ctx.createRadialGradient(hx, hy, 0, hx, hy, HEX * 0.55);
-  gl.addColorStop(0, rgba(v.brillo, 0.9 * fade)); gl.addColorStop(1, rgba(v.frente, 0));
-  ctx.fillStyle = gl; ctx.beginPath(); ctx.arc(hx, hy, HEX * 0.55, 0, 2 * Math.PI); ctx.fill();
+  // Un brillo suave donde corta la hoja.
+  const hx = C.x + Math.cos(giro) * R, hy = C.y + Math.sin(giro) * R, gl = ctx.createRadialGradient(hx, hy, 0, hx, hy, HEX * 0.6);
+  gl.addColorStop(0, rgba(v.brillo, 0.55 * fade)); gl.addColorStop(1, rgba(v.frente, 0));
+  ctx.fillStyle = gl; ctx.beginPath(); ctx.arc(hx, hy, HEX * 0.6, 0, 2 * Math.PI); ctx.fill();
+  ctx.globalCompositeOperation = 'source-over';
+  // 🗡 La espada que gira (2026-11-05, dueño: «en la punta tiene como una especie de cuadrado… reemplazarlo por una espadita que represente el arma»):
+  // la hoja apunta hacia afuera, con la empuñadura del lado de quien gira; una sola para todas las armas.
+  ondaFxEspada(C, giro, R, fade, v);
   // El aire que corta: un anillo tenue en todo el borde.
   ctx.lineWidth = Math.max(1 / z, HEX * 0.05);
   ctx.strokeStyle = rgba(v.banda2, 0.3 * fade); ctx.beginPath(); ctx.arc(C.x, C.y, R, 0, 2 * Math.PI); ctx.stroke();
   ctx.globalCompositeOperation = 'source-over';
+  ctx.restore();
+}
+// 🗡 Una espadita en el ángulo `ang`, con la punta en el radio R + un poco (coordenadas del mapa).
+function ondaFxEspada(C, ang, R, alfa, v){
+  const L = HEX * 1.4, ux = Math.cos(ang), uy = Math.sin(ang), nx = -uy, ny = ux;
+  const P = r => ({x: C.x + ux * r, y: C.y + uy * r});
+  const punta = P(R + L * 0.42), base = P(R - L * 0.5), guarda = P(R - L * 0.5), puno = P(R - L * 0.5 - HEX * 0.32), pomo = P(R - L * 0.5 - HEX * 0.4);
+  const w = HEX * 0.11;
+  ctx.save();
+  ctx.globalAlpha = Math.max(0, Math.min(1, alfa));
+  ctx.shadowColor = rgba(v.brillo, 0.9); ctx.shadowBlur = HEX * 0.35;
+  // La hoja: dos filos que se juntan en la punta, con un canal más claro.
+  ctx.beginPath();
+  ctx.moveTo(base.x + nx * w, base.y + ny * w);
+  ctx.lineTo(P(R + L * 0.22).x + nx * w * 0.85, P(R + L * 0.22).y + ny * w * 0.85);
+  ctx.lineTo(punta.x, punta.y);
+  ctx.lineTo(P(R + L * 0.22).x - nx * w * 0.85, P(R + L * 0.22).y - ny * w * 0.85);
+  ctx.lineTo(base.x - nx * w, base.y - ny * w);
+  ctx.closePath();
+  ctx.fillStyle = '#e9eef7'; ctx.fill();
+  ctx.shadowBlur = 0;
+  ctx.lineWidth = Math.max(0.8, HEX * 0.025); ctx.strokeStyle = 'rgba(40,48,66,.85)'; ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(base.x, base.y); ctx.lineTo(P(R + L * 0.3).x, P(R + L * 0.3).y);
+  ctx.strokeStyle = 'rgba(255,255,255,.9)'; ctx.lineWidth = Math.max(0.6, HEX * 0.03); ctx.stroke();
+  // La guarda (cruz), el puño y el pomo.
+  const gw = HEX * 0.34;
+  ctx.beginPath(); ctx.moveTo(guarda.x + nx * gw, guarda.y + ny * gw); ctx.lineTo(guarda.x - nx * gw, guarda.y - ny * gw);
+  ctx.lineCap = 'round'; ctx.lineWidth = HEX * 0.1; ctx.strokeStyle = '#3a2a10'; ctx.stroke();
+  ctx.lineWidth = HEX * 0.065; ctx.strokeStyle = '#d6aa4a'; ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(guarda.x, guarda.y); ctx.lineTo(puno.x, puno.y);
+  ctx.lineWidth = HEX * 0.09; ctx.strokeStyle = '#5a3a1e'; ctx.stroke();
+  ctx.beginPath(); ctx.arc(pomo.x, pomo.y, HEX * 0.075, 0, 2 * Math.PI); ctx.fillStyle = '#d6aa4a'; ctx.fill();
+  ctx.lineWidth = Math.max(0.6, HEX * 0.02); ctx.strokeStyle = '#3a2a10'; ctx.stroke();
   ctx.restore();
 }
 function ondaFxDibujarGolpe(g, C, ms, z, D){

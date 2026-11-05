@@ -281,6 +281,14 @@
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 
 ## Pendientes
+- [ ] **🎺🔄🥁🩸🐈‍⬛ El orden de turnos (2026-11-05).** Probado en Claude · pruebas:
+  ✔ Toque de carga: el costo sube a «5 SP (+2 por usarla seguida)»; ✔ **Marcar el ritmo con dos aliados pegados**: al empezar la ronda, al dueño le sale
+  «🥁 … marca el ritmo: ¿a cuál…?» con los dos y «No subir a nadie»; ✔ el que sube se mueve en la lista con la animación verde en las otras pantallas
+  («Larry sube… · Marcar el ritmo»); ✔ Cambio de guardia (queda para la ronda siguiente y ahí se cambian), Sed de sangre (sube 2) y la Mufa (se anota),
+  llamándolos desde la pantalla del GM. **Arreglado**: una pantalla del GM abierta en **otro mapa** tomaba el pedido y contestaba «no está en el orden de
+  turnos: a mano». **Falta**: Cambio de guardia con clics en los dos tokens, la Mufa con su tirada al empezar una ronda real, y verlo con el dueño.
+- [ ] **🔁 Sacar y pegar creeps entre el mapa y GM Tools (2026-11-05).** ✔ «Dejarlo en este mapa» (el creep queda sin token), Ctrl+V con «Sí, crear su
+  ficha / Solo el token», «Eliminarlo» con confirmación; ✔ en GM Tools «🎯 Poner en el tablero los que faltan» y «Ver en el tablero ↗». Falta verlo el dueño.
 - [ ] **📏 Fuera de alcance y ✨ Invulnerable al elegir el objetivo (2026-11-05, dueño).** Atacar a mano limpia (o con una habilidad con alcance) a
   alguien más lejos de lo que llega: «está fuera del alcance… ¿Proceder igual?»; elegir a un rival Titilando o Invulnerable: «no recibe daño ni
   debuffs… ¿Atacarlo igual?». Sin probar en el mapa (salen al hacer clic en el objetivo).
@@ -342,6 +350,9 @@
   jugadores»)**: en el anillo de un token caído (creep, personaje o invocación), el ✚ (solo el GM) → «¿Con cuánta vida vuelve?» (25 / 50 / 100 % o un
   número) → vuelve Titilando; un personaje deja de estar inconsciente. Verificado que el ✚ aparece solo si está caído (Basilio, en memoria); falta
   apretarlo de verdad en un creep, un personaje y una invocación.
+  · **2026-11-05 (Claude, clics en Claude · pruebas)**: ✔ el GM revivió al Goblin Scout al 50 % y quedó Titilando. Una **invocación** el GM no la puede
+  revivir desde el anillo: al morir su token se va del mapa («💀 desaparece: murió»), así que no hay anillo — la revive su dueño (ver abajo). ¿Así está bien?
+ 
 - [ ] **✚ El jugador revive a su propio personaje, y el mismo ✚ en la ficha (2026-11-04, dueño: «el botón de revivir desde el token también debe
   aparecer en la ficha propia de los jugadores»)**: el ✚ del anillo lo ve también el dueño del token (su personaje o una invocación suya; otro jugador no),
   y el ✚ Revivir de la ficha y el de la pantalla de muerte del mapa hacen la misma pregunta (25 / 50 / toda / un número, `comun/revivir.js`) y avisan en
@@ -349,6 +360,7 @@
   **Probado en «Claude · pruebas»** con Prueba Uno (J1): el ✚ del anillo (50 % → 7/15), el de la ficha (25 % → 3; toda → 15) y el de la pantalla de
   muerte (50 % → 7), siempre Invulnerable (Titilando) y con la línea en la Mesa; el GM ve el ✚ y J2 no. Prueba Uno quedó restaurada. **Falta**: un
   jugador reviviendo una invocación suya, y el GM con un creep y una invocación (el código del GM no cambió, solo se pasó a la pieza común).
+  · **2026-11-05**: ✔ Prueba Dos revivió a su invocación desde el ✚; ✔ el GM, un creep (ver arriba).
 
 - [ ] **🧮 La cuenta del daño ANTES de aplicar (2026-11-04, dueño: «el cuadro de la cuenta del daño debe aparecer antes del botón "aplicar el daño". Al
   aplicar uno ya debe saber cuánto va a ser»)**: en el paso 5 del duelo, la pantalla que puede aplicar (el defensor o el GM) muestra la cuenta completa

@@ -89,7 +89,7 @@
     estrategia: 'Support. Mantiene vivos a los suyos: cura, limpia estados y estira la pelea. Conviene acompañarlo de un tanque.'});
   esencial({linea: 'W1', nombre: 'Hachero', rol: 'warrior', rolTxt: 'melee', nivel: 1, atrib: [7, 9, 6, 7, 4],   // (2026-11-03, dueño: «fue 9, con 7, agi 6, des 7, esp 4»)
     equipo: ['Hacha', 'Cota de malla de hierro', 'Cofia de anillas sueltas'],
-    habilidades: ['Golpe fuerte', 'Romper armadura'], consumibles: ['Pergamino grupal de Furia de Combate'],
+    habilidades: ['Pegar fuerte', 'Romper armadura'], consumibles: ['Pergamino grupal de Furia de Combate'],
     estrategia: 'Warrior. Le rompe la armadura al que más se defiende y después lo castiga. Su punto débil: la magia.'});
   esencial({linea: 'D1', nombre: 'Maldito', rol: 'debuffer', rolTxt: 'debuffer', nivel: 1, atrib: [8, 2, 6, 4, 13],
     equipo: ['Varita del susurro', 'Atrapasueños', 'Casaca curtida de salteador', 'Capucha de lana del culto'],
@@ -125,7 +125,7 @@
     estrategia: 'Híbrido. Cruza el campo y se lleva puesto a uno: derriba y empuja, le rompe la línea al grupo y llega a los de atrás.'});
   esencial({linea: 'H2', nombre: 'Saltador', rol: 'hibrido', rolTxt: 'melee', nivel: 1, atrib: [9, 9, 6, 7, 2],
     equipo: ['Hacha de vikingo', 'Rodela tachonada', 'Chaleco de cuero', 'Botas de cuero de vaca'],
-    habilidades: ['Salto', 'Golpe fuerte'], consumibles: ['Poción de Cuero Duro'],
+    habilidades: ['Salto', 'Pegar fuerte'], consumibles: ['Poción de Cuero Duro'],
     estrategia: 'Híbrido. Salta por encima de la primera línea y cae entre los de atrás; ahí se planta y pega.'});
   esencial({linea: 'W2', nombre: 'Berserker', rol: 'warrior', rolTxt: 'melee', nivel: 1, atrib: [9, 8, 6, 8, 2],   // dos armas (el ataque con la segunda, pendiente de programar en creeps)
     equipo: ['Sable del tahúr', 'Facón de paisano', 'Chaleco de cuero', 'Botas de cuero de vaca'],
@@ -207,7 +207,7 @@
     estrategia: 'Tanque. Empuja, tira y demora: no aguanta como el Escudero, desordena al grupo rival y le corta los turnos.'});
   esencial({linea: 'W4', nombre: 'Verdugo', rol: 'warrior', rolTxt: 'melee', nivel: 1, atrib: [8, 10, 6, 7, 2],   // (dueño: «vamos con avisa y golpe fuerte»)
     equipo: ['Hacha de verdugo de pueblo', 'Peto de hierro', 'Casco de cuero endurecido'],
-    habilidades: ['El que avisa no traiciona', 'Golpe fuerte'], consumibles: ['Poción de Puntería Certera'],
+    habilidades: ['El que avisa no traiciona', 'Pegar fuerte'], consumibles: ['Poción de Puntería Certera'],
     estrategia: 'Warrior. Anuncia a quién va a ejecutar y descarga un golpe enorme que no se para; elige a su víctima y la termina.'});
   esencial({linea: 'R4', nombre: 'Hunter', rol: 'rango', rolTxt: 'rango', nivel: 1, atrib: [8, 6, 7, 10, 2],   // (dueño: «me cierra la ruta y el nivel 1»)
     equipo: ['Arco del rastreador', 'Chaleco de cuero', 'Sandalias de baqueano'],

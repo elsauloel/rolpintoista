@@ -52,7 +52,7 @@
   // 🧭 El rol en la batalla y el grupo de mecánica de las auditadas (dueño, 2026-10-21: «que el editor te diga qué rol cumple y te muestre los skills
   // agrupados por mecánica»; los grupos son los de docs/diseno-roles-creep.md). Se suman a las etiquetas para filtrar la biblioteca.
   const MECANICA = {
-    'Golpe fuerte': ['choque pesado', 'más daño'], 'Puño de roca': ['choque pesado', 'más daño'], 'Cornada': ['choque pesado', 'empujar'],
+    'Pegar fuerte': ['choque pesado', 'más daño'], 'Puño de roca': ['choque pesado', 'más daño'], 'Cornada': ['choque pesado', 'empujar'],
     'Mordisco feroz': ['choque pesado', 'atrapar'], 'Agarrón': ['choque pesado', 'atrapar'], 'Abrazo aplastante': ['choque pesado', 'atrapar'],
     'Aguante': ['choque pesado', 'guardia'],
     'Tajo veloz': ['choque liviano', 'golpe preciso'], 'Estocada': ['choque liviano', 'golpe preciso'], 'Zarpazo': ['choque liviano', 'golpe preciso'],
@@ -110,7 +110,7 @@
 
   /* ================= DAÑO CUERPO A CUERPO ================= */
   // Auditada (dueño, 2026-10-20): como el Amplificar daño del Warrior con X = 1 — +1 dado del Tipo de su arma, 1 SP (o cooldown 2).
-  H('Golpe fuerte', 'D', '*', 'mt', 2, aA('Un golpe cargado con todo el peso: un ataque con su arma que suma +1 dado del Tipo de su arma al daño.', {dados: 1},
+  H('Pegar fuerte', 'D', '*', 'mt', 2, aA('Un golpe cargado con todo el peso: un ataque con su arma que suma +1 dado del Tipo de su arma al daño.', {dados: 1},
     'va al duelo como un ataque (PdG contra Evasión o Parry, Bloqueo y crítico) con +1 dado del Tipo de su arma', 1));
   // Auditada (dueño, 2026-10-20, «la versión más afilada»): como la Carga del Warrior con X = 2, sin la carrera, más Crítico frecuente +1 (como
   // el Tajear del Asalto) — +2 PdG, +2 al daño y Crítico frecuente +1; 3 SP (o cooldown 3).

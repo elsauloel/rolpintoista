@@ -685,6 +685,16 @@ el R1, así) hasta completar todo lo que ya tenemos. Una vez completado, una ron
 variantes, si quedan ideas con potencial.» Orden (la rotación de siempre): W1 → T1 → H1 → L1 → L2 → R1 → M1 → S1 → D1 → W2 → T2 → … Por cada uno:
 los niveles 2 a 5 completos (atributos, habilidad, pasiva, equipo concreto, consumible), primero con lo que ya existe; una 🆕 solo si no hay nada.
 
+### W1 Hachero · nivel 2 (aprobado 2026-11-05)
+- 🔤 **Cambio de nombre** (dueño, 2026-11-05): la habilidad de creep «Golpe fuerte» (+1 dado del Tipo del arma) pasa a llamarse **«Pegar
+  fuerte»**, con los mismos efectos, en todo el pool (skills-creep-base.js; la usan W1, W4 y R4/H4 del pool esencial). La pasiva sigue siendo
+  **«Golpe fuerte»** (+1 Dmg). Los creeps ya guardados en las partidas conservan su copia con el nombre viejo.
+- Atributos Fue 10 · Con 8 · Agi 7 · Des 7 · Esp 4 → vida 40, No2 7. Equipo (Común): Hacha · Cota de malla de hierro · Cofia de anillas sueltas ·
+  **Grebas de cuero**. Habilidades: Pegar fuerte (cd 2) · Romper armadura (cd 3) · **Barrido** (cd 3). Pasiva: **Golpe fuerte** (+1 Dmg).
+  Consumible: Pergamino grupal de Furia de Combate.
+- Números del juego (nv1 → nv2): Dmg 9 → 11 · Def 5 → 6 · Eva/Ini/Mov 5/6/6 → 6/7/7 · Res.Esp/Res.CC 7/7 → 8/8 · Res. crít. T4/T6 1/1 → 2/1 ·
+  PdG 7 = 7 · Def. esp. 1 y Res.Mt 4 sin cambio (su punto débil, la magia).
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

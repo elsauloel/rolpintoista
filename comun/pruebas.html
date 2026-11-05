@@ -122,8 +122,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="skills-clase.js?v=20261105sombra"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261104ig"></script>
-<script src="skills-creep-base.js?v=20261105pat"></script>
-<script src="creeps-esenciales.js?v=20261105t7"></script>
+<script src="skills-creep-base.js?v=20261105r1"></script>
+<script src="creeps-esenciales.js?v=20261105r1"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
@@ -1110,8 +1110,8 @@ prueba('🙈 Ceguera nueva (2026-10-20): la mitad del PdG y del PdG.Esp (no la E
     (pre.mods || []).length, Combatiente.ciego([{nombre: 'Ceguera'}]), Combatiente.ciego([{nombre: 'Ceguera', activo: false}]), Combatiente.aplicarMitades(7, Combatiente.mitadesDeTirada(est, 'pdg'))],
     [1, 1, 0, 2, 0, true, false, 3]);
 });
-prueba('⚔ Golpe fuerte de creep y Golpe brutal (auditados 2026-10-20): +1 dado fijo del Tipo del arma; el Golpe brutal deja −2 a la Evasión', () => {
-  const a = Combatiente.ataqueConArreglos({nombre: 'Golpe fuerte'}, {modo: 'arma', arma: {dados: 1}}, {arma: {tipoDado: 8}});
+prueba('⚔ Pegar fuerte de creep y Golpe brutal (auditados 2026-10-20): +1 dado fijo del Tipo del arma; el Golpe brutal deja −2 a la Evasión', () => {
+  const a = Combatiente.ataqueConArreglos({nombre: 'Pegar fuerte'}, {modo: 'arma', arma: {dados: 1}}, {arma: {tipoDado: 8}});
   const gb = CLASES_SKILLS.find(c => c.id === 'warrior').habilidades.find(h => h.id === 'warrior-golpe-brutal');
   igual([a.mods.dados, gb.efectoNombre, gb.efectoTurnos, gb.efectoMods[0].stat, gb.efectoMods[0].val], [1, 'Guardia baja', 1, 'eva', -2]);
 });
@@ -6739,7 +6739,7 @@ prueba('⭐ Pool esencial, la tanda del 2026-11-05: los 7 nuevos de nivel 1 (L6,
   igual([nuevos.every(Boolean), nuevos.every(c => c.datos.equipo.length === 3 && c.datos.habilidades.length === 2 && c.datos.cinturon.length === 1),
     nuevos.some(c => CreepCalculo.modoSP(c.datos)), nuevos.find(c => c.nombre === 'Verdugo').datos.habilidades.map(h => h.nombre).join(),
     /Probabilidad de Golpe/.test(pat) && /sin tope/.test(pat) && !/hasta \+3/.test(pat)],
-    [true, true, false, 'El que avisa no traiciona,Golpe fuerte', true]);
+    [true, true, false, 'El que avisa no traiciona,Pegar fuerte', true]);
 });
 prueba('💧 Pool esencial (2026-11-03): los de Especial como atributo principal arrancan en modo SP; los demás, con turnos de espera', () => {
   const es = CREEPS_BASE.filter(c => c.pool === 'esencial');

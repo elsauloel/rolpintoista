@@ -107,8 +107,8 @@ const Duelo = (() => {
 #duelo-fondo-sale{pointer-events:none}
 /* El pulso va ENCIMA del cuadro (2026-11-05, dueño: «primero un pequeño pulso en el token… después se despliega el menú; y cuando se repliega, vuelve a aparecer ese pulso»). */
 .duelo-pulso{position:fixed;z-index:99990;width:0;height:0;pointer-events:none}
-.duelo-pulso::before,.duelo-pulso::after{content:'';position:absolute;left:-34px;top:-34px;width:68px;height:68px;border-radius:50%;border:3px solid #e3a85a;box-shadow:0 0 18px rgba(227,168,90,.8);animation:duelo-pulso .7s ease-out both}
-.duelo-pulso::after{animation-delay:.18s;border-color:#fff3d6}
+.duelo-pulso::before,.duelo-pulso::after{content:'';position:absolute;left:-34px;top:-34px;width:68px;height:68px;border-radius:50%;border:3px solid #e3a85a;box-shadow:0 0 18px rgba(227,168,90,.8);animation:duelo-pulso 1s ease-out both}
+.duelo-pulso::after{animation-delay:.25s;border-color:#fff3d6}
 @keyframes duelo-pulso{0%{transform:scale(.35);opacity:1}100%{transform:scale(1.6);opacity:0}}
 #duelo-fondo.min{display:none}
 .duelo-caja{background:#151a26;color:#e9ecf4;border:1px solid #39435c;border-radius:16px;width:min(880px,100%);max-height:96vh;overflow:auto;box-shadow:0 18px 60px rgba(0,0,0,.6)}
@@ -1745,7 +1745,9 @@ const Duelo = (() => {
      window.dueloOrigenPantalla(tokenId) → {x, y} o null (el mapa: null si no se ve —oculto, niebla, sigilo— o está fuera de la pantalla); sin eso,
      nace del centro. Con «reducir movimiento», solo un fundido. ---------- */
   // Un poco más lento (2026-11-05, dueño: «lo haría un poquito apenas más lento») y con el pulso antes de abrir y después de cerrar.
-  const ANIM_ABRIR = 520, ANIM_CERRAR = 420, ANIM_PAUSA = 260, PULSO_ANTES = 260, PULSO_DESPUES = 380;
+  // El pulso con su momento (2026-11-05, dueño, probando el Remolino: «primero el pulso; cuando termina, se despliega… se repliega, el pulso, y pasa al
+  // siguiente»): dura ~1,25 s (dos anillos de 1 s, el segundo a los 0,25 s); el cuadro crece cuando el pulso ya se apaga.
+  const ANIM_ABRIR = 520, ANIM_CERRAR = 420, ANIM_PAUSA = 200, PULSO_ANTES = 1150, PULSO_DESPUES = 1250;
   let esperarAbrirHasta = 0;   // en una cascada, el nuevo espera a que el anterior termine de volver a su token
   const pocoMovimiento = () => { try{ return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }catch(e){ return false; } };
   function ladoDelOtro(d){
@@ -1769,7 +1771,7 @@ const Duelo = (() => {
     el.className = 'duelo-pulso';
     el.style.left = p.x + 'px'; el.style.top = p.y + 'px';
     document.body.appendChild(el);
-    setTimeout(() => el.remove(), 1000);
+    setTimeout(() => el.remove(), 1400);
   }
   function animarEntrada(f, tokenId){
     if(!f || f.dataset.entro) return;

@@ -658,6 +658,11 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   partir de nivel 1»: vale para toda la ruta); Hacha de verdugo de pueblo (Común, Tipo 8, Derribar 50 %) · Peto de hierro ·
   Casco de cuero endurecido; consumible **Poción de Puntería Certera** (dueño: «el consumible, más de crítico frecuente le pondría uno de más de
   probabilidad de golpe»). Turnos de espera (Esp 2). **Nivel 1 aprobado** (2026-11-05).
+- **R4 · Hunter · Rango** (2026-11-05, dueño: «me cierra la ruta y el nivel 1»): trampas y marcar a la presa; prepara el terreno y deja que el grupo
+  cace. Ruta: nv1 **Disparo señalador** (rápida) · **Cepo del cazador** (lenta); nv2 Tiro que derriba + **Percepción aumentada**; nv3 Mina del
+  cazador (el arco, de Buena); nv4 Cebo + **Puntería**; nv5 Abanico. **Nivel 1 aprobado**: Des 10 · Con 8 · Agi 7 · Fue 6 · Esp 2 → vida 40, 7 No2,
+  turnos de espera; **Arco del rastreador** (Común, Tipo 4, Rango +3, 1d4 + 1 amplificado) · **Chaleco de cuero** (Def +2) · **Sandalias de baqueano**
+  (Pisada atenta, Res.CC +1). Consumible: **Trampa de oso**. Sin programar.
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 

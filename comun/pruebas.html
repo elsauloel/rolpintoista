@@ -122,7 +122,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="skills-clase.js?v=20261105sombra"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261104ig"></script>
-<script src="skills-creep-base.js?v=20261105r1"></script>
+<script src="skills-creep-base.js?v=20261105r2"></script>
 <script src="creeps-esenciales.js?v=20261105r1"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -1792,8 +1792,9 @@ prueba('🔨 Romper armadura (2026-10-21): las cuatro dejan Armadura rota (1 o d
   const a = n => { const h = ar(n); return Combatiente.ataqueConArreglos(h, h.duelo, {}); };
   const r = a('Romper armadura'), b = a('Arrancar la coraza'), g = a('Golpe demoledor'), m = a('Mandíbula trituradora');
   const ef = x => ((x.efectos || [])[0] || {}), st = x => Math.max(1, (ef(x).spec || {}).stacks || 1);
-  igual([ar('Romper armadura').cd, ar('Golpe demoledor').cd, ef(r).nombre, st(r), st(b), st(g), st(m), (g.mods || {}).dados, (r.mods || {}).dados || 0],
-    [3, 4, 'Armadura rota', 1, 1, 2, 2, 1, 0]);
+  // (2026-11-05, dueño: el Golpe demoledor pasa a 3 turnos de espera y arranca el combate esperando)
+  igual([ar('Romper armadura').cd, ar('Golpe demoledor').cd, ar('Golpe demoledor').cdActual, ef(r).nombre, st(r), st(b), st(g), st(m), (g.mods || {}).dados, (r.mods || {}).dados || 0],
+    [3, 3, 3, 'Armadura rota', 1, 1, 2, 2, 1, 0]);
 });
 prueba('⚡ Cadena de rayos de creep (2026-10-21): 2d4 eléctrico que salta y 20 % de Parálisis', () => {
   const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Cadena de rayos').datos, 2);

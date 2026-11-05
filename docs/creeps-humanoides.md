@@ -695,6 +695,16 @@ los niveles 2 a 5 completos (atributos, habilidad, pasiva, equipo concreto, cons
 - Números del juego (nv1 → nv2): Dmg 9 → 11 · Def 5 → 6 · Eva/Ini/Mov 5/6/6 → 6/7/7 · Res.Esp/Res.CC 7/7 → 8/8 · Res. crít. T4/T6 1/1 → 2/1 ·
   PdG 7 = 7 · Def. esp. 1 y Res.Mt 4 sin cambio (su punto débil, la magia).
 
+### W1 Hachero · nivel 3 (aprobado 2026-11-05)
+- ⏳ **Golpe demoledor, en el pool** (dueño): 3 turnos de espera (antes 4) y **arranca el combate esperando** (`arrancaEnCooldown`); el SP queda en 4.
+- 🔨 Regla (dueño): la Armadura rota de una habilidad es independiente de la del arma — si las dos se dan en el mismo golpe, **se suman**
+  (el motor ya acumula las acumulaciones en un solo estado).
+- Atributos Fue 11 · Con 9 · Agi 7 · Des 8 · Esp 4 → vida 45, No2 7. Equipo: **Hacha de guerra ligera** (Buena: Tipo 8, +2 daño, Rompe armadura
+  50 %; elegida en lugar de la Hacha de doble filo del boceto) · Cota de malla de hierro · Cofia de anillas sueltas · Grebas de cuero.
+  Habilidades: Pegar fuerte (cd 2) · Romper armadura (cd 3) · Barrido (cd 3) · **Golpe demoledor** (cd 3, lenta). Pasiva: Golpe fuerte (+1 Dmg).
+  Consumible: Pergamino grupal de Furia de Combate.
+- Números (nv2 → nv3): daño fijo 11 → 14 (Fue + hacha) · PdG/Parry 7/7 → 8/8 · Bloqueo 10 → 11 · Res.Esp/Res.CC 8/8 → 9/9 · Def 6 = 6.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

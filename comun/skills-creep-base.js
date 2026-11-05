@@ -903,8 +903,9 @@
     {}, 'un ataque con su arma; si pega, Armadura rota 1', 2, AR(1)));
   H('Arrancar la coraza', 'DX', 'b', 'mt', 3, aA(`Clava garras o colmillos en la armadura y tira: un ataque con su arma que, si pega, deja Armadura rota 1. ${AR_NOTA}`,
     {}, 'un ataque con su arma; si pega, Armadura rota 1', 2, AR(1)));
-  H('Golpe demoledor', 'DX', 'hdc', 'mt', 4, aA(`Un golpe con todo el peso: un ataque con su arma con +1 dado de su arma que, si pega, deja Armadura rota doble (2 acumulaciones). ${AR_NOTA}`,
-    {dados: 1}, 'un ataque con su arma con +1 dado; si pega, Armadura rota doble', 4, AR(2)));
+  // (2026-11-05, dueño: «al Golpe demoledor le vamos a poner 3 turnos y arranca el combate esperando»; el SP queda en 4)
+  H('Golpe demoledor', 'DX', 'hdc', 'mt', 3, {...aA(`Un golpe con todo el peso: un ataque con su arma con +1 dado de su arma que, si pega, deja Armadura rota doble (2 acumulaciones). ${AR_NOTA}`,
+    {dados: 1}, 'un ataque con su arma con +1 dado; si pega, Armadura rota doble', 4, AR(2)), arrancaEnCooldown: true});
   H('Mandíbula trituradora', 'DX', 'b', 'mt', 4, aA(`Muerde y tritura la armadura: un ataque con su arma con +1 dado de su arma que, si pega, deja Armadura rota doble (2 acumulaciones). ${AR_NOTA}`,
     {dados: 1}, 'un ataque con su arma con +1 dado; si pega, Armadura rota doble', 4, AR(2)));
   H('Veneno', 'X', 'bpdh', 'x', 3, tA('Envenena al objetivo: pierde 1d4 de vida por turno 3 turnos (a mano).', 2));

@@ -91,6 +91,13 @@
 > - [ ] **😇 Decidir quién cambia el Pacto (dueño, 2026-11-04: «la pregunta pendiente del pacto también va a quedar para cuando esté en la compu»).**
 >   Hoy el campo «😇 Pacto» (ficha, datos de identidad) lo cambia el jugador en su ficha y el GM con «✎ Editar como GM», aunque la ayuda dice que lo
 >   marca el GM. Pregunta: ¿solo el GM lo puede cambiar?
+> - [ ] **🔗 Tokens de creeps ↔ su mapa en GM Tools (2026-11-05, dueño: «los tokens y la ficha de los creeps de GM Tools deben estar vinculados…
+>   si se mueve una cosa de una a otra, debe suceder de manera pareja; la mayor parte del juego va a suceder a través del mapa»).** En espera de que
+>   termine la tarea del gancho de la compu (para no pisarse). Hoy GM Tools → mapa anda (Mover a…, Poner sus tokens); mapa → GM Tools no: crear un token
+>   vinculado, 🎭 traer tokens de creeps, Ctrl+C/V, refuerzos y sacar un token no actualizan `sc.mapa`. Plan: el mapa avisa en cada alta/baja de token de
+>   creep (`escucharTokens`, js/09 → js/101 nuevo) y al entrar el GM se reconcilian los desfasados. **Decisiones del dueño**: (1) tokens del mismo creep en
+>   dos mapas → avisar y **preguntarle al GM** en qué mapa queda; (2) al **borrar el token** de un creep → **preguntarle al GM** si la ficha también se
+>   borra, si pasa a la Reserva o si se queda en ese mapa sin token.
 > - [~] (2026-11-03: el dueño cargó Capataz, Rompehuesos —5.ª: Puño de roca—, dos Ratas y el Arquero, con cambios suyos sobre la marcha; falta confirmar el Chamán) **▶ AL RETOMAR EL ENCUENTRO 2 DE EL ORIGEN, RECORDARLE AL DUEÑO (2026-11-03, dueño: «cuando te diga de retomar la próxima pelea del origen,
 >   recordame que termine el arquero y avance con el chamán»)**: cargados por el dueño en MINAS DUNGEON: Capataz del culto, Goblin rompehuesos (le falta
 >   su **5.ª habilidad**, la elige él) y la Rata de galería (duplicada: dos ratas). **El Arquero del culto incendiario quedó a medio cargar**: terminarlo

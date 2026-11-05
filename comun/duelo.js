@@ -105,7 +105,8 @@ const Duelo = (() => {
     s.textContent = `
 #duelo-fondo,#duelo-fondo-sale{position:fixed;inset:0;z-index:99000;background:rgba(6,8,14,.78);display:flex;align-items:center;justify-content:center;padding:12px;font-family:inherit}
 #duelo-fondo-sale{pointer-events:none}
-.duelo-pulso{position:fixed;z-index:99001;width:0;height:0;pointer-events:none}
+/* El pulso va ENCIMA del cuadro (2026-11-05, dueño: «primero un pequeño pulso en el token… después se despliega el menú; y cuando se repliega, vuelve a aparecer ese pulso»). */
+.duelo-pulso{position:fixed;z-index:99990;width:0;height:0;pointer-events:none}
 .duelo-pulso::before,.duelo-pulso::after{content:'';position:absolute;left:-34px;top:-34px;width:68px;height:68px;border-radius:50%;border:3px solid #e3a85a;box-shadow:0 0 18px rgba(227,168,90,.8);animation:duelo-pulso .7s ease-out both}
 .duelo-pulso::after{animation-delay:.18s;border-color:#fff3d6}
 @keyframes duelo-pulso{0%{transform:scale(.35);opacity:1}100%{transform:scale(1.6);opacity:0}}
@@ -1743,7 +1744,8 @@ const Duelo = (() => {
      cuadro del defensor; el defensor, del atacante; el GM y los que miran, del defensor. La página dice dónde está ese token en pantalla con
      window.dueloOrigenPantalla(tokenId) → {x, y} o null (el mapa: null si no se ve —oculto, niebla, sigilo— o está fuera de la pantalla); sin eso,
      nace del centro. Con «reducir movimiento», solo un fundido. ---------- */
-  const ANIM_ABRIR = 380, ANIM_CERRAR = 300, ANIM_PAUSA = 200;
+  // Un poco más lento (2026-11-05, dueño: «lo haría un poquito apenas más lento») y con el pulso antes de abrir y después de cerrar.
+  const ANIM_ABRIR = 520, ANIM_CERRAR = 420, ANIM_PAUSA = 260, PULSO_ANTES = 260, PULSO_DESPUES = 380;
   let esperarAbrirHasta = 0;   // en una cascada, el nuevo espera a que el anterior termine de volver a su token
   const pocoMovimiento = () => { try{ return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }catch(e){ return false; } };
   function ladoDelOtro(d){
@@ -1779,10 +1781,13 @@ const Duelo = (() => {
       if(typeof f.animate !== 'function'){ return; }
       if(pocoMovimiento()){ f.animate([{opacity: 0}, {opacity: 1}], {duration: 180, easing: 'ease-out'}); return; }
       f.style.transformOrigin = puntoOrigen(f, p);
-      pulsoEn(p);
       f.style.pointerEvents = 'none';   // que un clic no caiga en el cuadro mientras crece
+      // Primero el pulso en el token; recién después el cuadro se despliega desde ahí (invisible mientras tanto).
+      const espera = p ? PULSO_ANTES : 0;
+      if(p){ pulsoEn(p); f.style.opacity = '0'; }
       const an = f.animate([{transform: p ? 'scale(.04)' : 'scale(.85)', opacity: 0}, {transform: 'scale(1)', opacity: 1}],
-        {duration: ANIM_ABRIR, easing: 'cubic-bezier(.2,.8,.25,1)'});
+        {duration: ANIM_ABRIR, delay: espera, easing: 'cubic-bezier(.2,.8,.25,1)', fill: 'backwards'});
+      f.style.opacity = '';
       an.onfinish = an.oncancel = () => { f.style.pointerEvents = ''; f.style.transformOrigin = ''; };
     };
     const falta = esperarAbrirHasta - performance.now();
@@ -1803,9 +1808,9 @@ const Duelo = (() => {
       f.style.transformOrigin = puntoOrigen(f, p);
       an = f.animate([{transform: 'scale(1)', opacity: 1}, {transform: p ? 'scale(.04)' : 'scale(.85)', opacity: 0}], {duration: dur, easing: 'cubic-bezier(.5,0,.75,.4)', fill: 'forwards'});
     }
-    an.onfinish = an.oncancel = () => f.remove();
+    an.onfinish = an.oncancel = () => { f.remove(); if(!poco) pulsoEn(p); };   // al replegarse sobre el token, el pulso otra vez
     setTimeout(() => { if(f.isConnected) f.remove(); }, dur + 400);
-    esperarAbrirHasta = performance.now() + dur + (poco ? 60 : ANIM_PAUSA);
+    esperarAbrirHasta = performance.now() + dur + (poco ? 60 : ANIM_PAUSA + (p ? PULSO_DESPUES : 0));
     return true;
   }
 

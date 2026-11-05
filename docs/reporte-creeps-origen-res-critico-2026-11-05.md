@@ -1,5 +1,7 @@
 # Creeps esenciales y de campaña con el rebalanceo del crítico (2026-11-05)
 
+> **✅ Aplicado en la partida (2026-11-05, dueño: «sí, aplicá los cambios en El origen»)**: los 10 cambios, verificados releyendo. Respaldo previo en el scratchpad de la sesión. Las dos dudas (Pechera acolchada del Goblin del bosque 1, Tiro certero del Goblin arquero del claro) siguen sin tocar.
+
 Pedido del dueño: «Sobre los creeps de referencia no vamos a gastar tiempo ni créditos… Vamos a trabajar sobre los creeps esenciales y los creeps de
 campaña. En esos aplicá los cambios que hagan falta de acuerdo a todos los cálculos y rediseños que hicimos hasta hoy.» Los de referencia
 (`comun/creeps-base.js`) no se tocan: se van a borrar.

@@ -129,8 +129,7 @@ function hudHtml(t){
    cambian ahí mismo: 1) "Recibe daño" (por defecto): se escribe el daño del
    golpe y se le resta la Defensa; 2) "HP directo": el número de siempre
    (valor, +5, -3) sin tener en cuenta la Defensa. */
-let hpRayo = false;   // ⚡ Rayo en cadena en "Recibe daño" (P118): daño directo y salta a los rivales cercanos
-let hpCritMult = 1;   // multiplicador de crítico de "Recibe daño" (1 = sin crítico; 2 doble daño, 3 triple, 4 cuádruple). Un crítico multiplica TODO el daño y NO resta la Defensa (Comun/critico.js).
+// (2026-11-05, dueño: «el multiplicador lo quitaría. También el botón de relámpago»): «Recibe daño» ya no tiene el ×2/×3/×4 ni el ⚡ Relámpago en cadena.
 let hpModo = 'danio';   // 'danio' | 'directo' (vuelve a 'danio' cada vez que se abre)
 
 function creepDefensaMapa(sc){ return CreepCalculo.defensaEfectiva(sc); }   // comun/creep-calculo.js
@@ -616,16 +615,9 @@ function hudHpHtml(t, d){
     <div class="hud-hp-expl">${danio
       ? (def === null
         ? 'No conozco su Defensa todavía (la ficha la publica al guardarse). Usá <b>2 · HP directo</b>.'
-        : hpRayo ? '<b>⚡ Relámpago</b>: daño eléctrico <b>directo a la vida</b> (no se resta la Defensa) y <b>salta</b> a otros del mismo bando hasta 3 casillas de distancia, una vez por objetivo, con la mitad del daño en cada salto (hacia abajo: con 1 ya no salta).'
-        : hpCritMult > 1 ? `<b>Crítico (×${hpCritMult})</b>: el daño se multiplica y <b>NO se resta la Defensa</b> (${fmt(def)}); lo que pasa baja su HP.`
-        : `Escribí el <b>daño del golpe</b>. Se le resta la Defensa (<b>${fmt(def)}</b>) y lo que pasa baja su HP.`)
-      : 'Cambia el HP <b>sin tener en cuenta la Defensa</b>. Un número lo fija; +5 cura y −3 baja directo.'}</div>
-    ${danio ? `<div class="hud-crit-fila" title="Si el golpe fue crítico, elegí el multiplicador que dio el d20: el daño se multiplica y NO se resta la Defensa">
-      ${[[1, 'Normal', 'Sin crítico'], [2, '×2', 'Doble daño'], [3, '×3', 'Triple daño'], [4, '×4', 'Cuádruple daño']].map(([k, r, t2]) => `<button type="button" class="hud-mini${hpCritMult === k ? ' activo' : ''}" data-hud-critmult="${k}" title="${t2}">${r}</button>`).join('')}
-      ${typeof Critico !== 'undefined' ? '<button type="button" class="hud-mini calc" data-hud-critcalc="1" title="Calculadora de crítico: PdG, Evasión, d20…">🎯</button>' : ''}
-    </div>` : ''}
-    ${danio ? `<div class="hud-crit-fila"><button type="button" class="hud-mini${hpRayo ? ' activo' : ''}" data-hud-rayo="1" title="Relámpago: daño eléctrico directo a la vida (no se resta la Defensa) que salta a otros del mismo bando hasta 3 casillas de distancia, una sola vez por objetivo, con la mitad del daño en cada salto (redondeado hacia arriba)">⚡ Relámpago en cadena</button></div>` : ''}
-    <input class="hud-hp-in" data-hud-hp-in inputmode="decimal" autocomplete="off" placeholder="${danio ? 'daño del golpe' : 'valor, +5 o −3'}">
+        : `Escribí el <b>daño del golpe</b>. Se le resta la Defensa (<b>${fmt(def)}</b>) y lo que pasa baja su HP.<br>Con un <b>+</b> adelante (<b>+10</b>) <b>suma vida</b>.`)
+      : 'Cambia el HP <b>sin tener en cuenta la Defensa</b>. Un número lo fija; <b>+5</b> suma y <b>−3</b> baja directo.'}${hayMax ? ' Si lo que sumás pasa del máximo, te pregunta si el sobrante va como <b>Vida extra</b>.' : ''}</div>
+    <input class="hud-hp-in" data-hud-hp-in inputmode="decimal" autocomplete="off" placeholder="${danio ? 'daño del golpe, o +N para sumar' : 'valor, +5 o −3'}">
     <div class="hud-hp-prev" data-hud-hp-prev></div>
     <div class="hud-hp-pie">Enter aplica · Esc cierra</div>
   </div>`;
@@ -647,28 +639,22 @@ function hudHpPrevia(t, d, texto){
   const crudo = String(texto || '').trim();
   if(!crudo) return '';
   const hp = num(d.hp);
+  if(/^\+/.test(crudo)){   // ➕ sumar vida, en los dos modos (2026-11-05)
+    const suma = leerValorVital(crudo, 0);
+    if(suma === null || suma <= 0) return 'Escribí +N (por ejemplo +10)';
+    const max = num(d.hpMax), nuevo = max > 0 ? Math.min(max, hp + suma) : hp + suma, sobra = max > 0 ? hp + suma - max : 0;
+    return `HP ${fmt(hp)} → ${fmt(nuevo)}${sobra > 0 ? ` · sobran ${fmt(sobra)} (te pregunta si van como Vida extra)` : ''}`;
+  }
   if(hpModo === 'directo'){
     const nuevo = leerValorVital(crudo, hp);
     if(nuevo === null) return 'Escribí un número, o +5 / −3';
     const tope = num(d.hpMax) > 0 ? Math.min(num(d.hpMax), nuevo) : nuevo;
     return `HP ${fmt(hp)} → ${fmt(Math.max(0, tope))}`;
   }
-  if(/^[+\-−]/.test(crudo)) return 'Para curar o ajustar sin Defensa, usá 2 · HP directo';
+  if(/^[\-−]/.test(crudo)) return 'Para bajarla sin Defensa, usá 2 · HP directo';
   const golpe = leerGolpe(crudo);
   if(golpe === null) return 'Escribí el daño del golpe (un número)';
   if(d.def === null || d.def === undefined) return '—';
-  if(hpRayo){   // rayo: directo a la vida + cadena
-    const r0 = resolverGolpe(golpe, 0, estadosPrevia(t, d));
-    if(r0.invulnerable) return 'Invulnerable: no recibe daño';
-    const cad = rayoCadena(seleccion, golpe);
-    return `⚡ ${fmt(golpe)} directo${previaAbs(r0)} → HP ${fmt(hp)} → ${fmt(Math.max(0, hp - r0.recibido))}` + (cad.length > 1 ? ` · salta a ${cad.slice(1).map(c => `${nombreDe(c.t)} ${c.dano}`).join(' → ')}` : ' · no hay a quién saltar');
-  }
-  if(hpCritMult > 1){   // crítico: todo el daño × multiplicador, sin restar la Defensa
-    const total = golpe * hpCritMult;
-    const rc = resolverGolpe(total, 0, estadosPrevia(t, d));
-    if(rc.invulnerable) return 'Invulnerable: no recibe daño';
-    return `${fmt(golpe)} × ${hpCritMult} = ${fmt(total)} (ignora la Defensa)${previaAbs(rc)} → HP ${fmt(hp)} → ${fmt(Math.max(0, hp - rc.recibido))}`;
-  }
   const est = estoicoDe(estadosPrevia(t, d), estoicoRivales(t).length);   // 🗿 Estoicismo (js/85): lo que suman los enemigos pegados
   const def = num(d.def) + (est ? est.val : 0);
   const r = resolverGolpe(golpe, def, estadosPrevia(t, d));
@@ -755,23 +741,42 @@ async function rayoCadenaAplicar(cadena, o){
   return hubo;
 }
 
+/* ➕ Sumar vida desde el menú (2026-11-05, dueño: «que este cuadro también se pueda usar para sumar hp, poniendo un + adelante»; «si…
+   supera el máximo, que aparezca una notificación que diga "tu tope es tal, cargar el sobrante como vida extra?" sí, no»). La vida sube hasta
+   el máximo (hudAplicar, como el +N de HP directo); si sobra y se elige Sí, el sobrante va a la Vida extra (la única, se junta con la que ya
+   tenga): a un creep, directo; a un personaje, por los estados recibidos (como el Drenar vida). Las invocaciones, sin Vida extra. */
+async function hudSumarVida(t, crudo){
+  const d = hudDatos(t), hp = num(d.hp), max = num(d.hpMax), suma = leerValorVital(crudo, 0);
+  if(suma === null || suma <= 0){ toast('Escribí +N (por ejemplo +10)'); return; }
+  const sobra = max > 0 && hp > 0 && !String(t.fichaId || '').includes(SEP_INVOCACION) ? Math.round(hp + suma - max) : 0;
+  let extra = 0;
+  if(sobra > 0){
+    const quien = t.tipo === 'creep' ? `de ${nombreDe(t)} ` : '';
+    extra = (await Confirmar.preguntar(`El tope de vida ${quien}es ${fmt(max)}: con +${fmt(suma)} sobran ${fmt(sobra)}.\n\n¿Cargar el sobrante como Vida extra?`,
+      {titulo: '❤ Pasa del máximo', icono: '❤', si: 'Sí', no: 'No'})) ? sobra : 0;
+  }
+  await hudAplicar('hp', crudo);
+  if(!extra) return;
+  try{
+    if(t.tipo === 'creep') await modificarCreep(t.fichaId, sc => { EstadosAplicar.aplicarACreep(sc, {nombre: 'Vida extra', escudoMagico: extra}); });
+    else await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: {nombre: 'Vida extra', escudoMagico: extra}, origen: 'Vida que pasó del máximo'});
+    toast(`❤ ${nombreDe(t)}: +${fmt(extra)} de Vida extra`);
+  }catch(err){ console.error('La Vida extra:', err); toast('No se pudo cargar la Vida extra: ' + (err.message || err)); }
+}
+
 async function hudHpAplicar(t, texto){
   if(!String(texto).trim()) return;
   try{
+    if(/^\+/.test(String(texto).trim())){ hudGlobo = ''; await hudSumarVida(t, String(texto).trim()); return; }
     if(hpModo === 'directo'){
       hudGlobo = '';
       await hudAplicar('hp', texto);
       return;
     }
-    if(/^[+\-−]/.test(String(texto).trim())){ toast('Para curar o ajustar sin Defensa, usá 2 · HP directo'); return; }
+    if(/^[\-−]/.test(String(texto).trim())){ toast('Para bajarla sin Defensa, usá 2 · HP directo'); return; }
     const idTok = seleccion, antes = vitalActual(t, 'hp');
     const golpe = leerGolpe(texto);
-    const crit = hpCritMult > 1 && golpe !== null;   // crítico: daño × multiplicador y directo (sin Defensa)
-    const txtDanio = crit ? String(golpe * hpCritMult) : texto;
-    const directo = crit || (hpRayo && golpe !== null);   // el rayo también va directo a la vida
-    const resH = t.tipo === 'creep' ? await danioCreep(t, txtDanio, directo) : await danioPj(t, txtDanio, directo, 0, 0, {reparte: true});   // reparte: Miti-Miti
-    const entroH = resH && resH.r ? num(resH.r.recibido) : golpe;   // salta la mitad de lo que entró (2026-10-13)
-    if(hpRayo && golpe !== null && entroH > 1) rayoCadenaAplicar(rayoCadena(idTok, entroH));   // salta a los cercanos (no espera: se avisa en la Mesa)
+    const resH = t.tipo === 'creep' ? await danioCreep(t, texto, false) : await danioPj(t, texto, false, 0, 0, {reparte: true});   // reparte: Miti-Miti
     vitalRegistrar(idTok, 'hp', antes);   // (Ctrl+Z devuelve el HP; un escudo que absorbió el golpe no se recarga)
     hudGlobo = '';
   }catch(err){
@@ -1171,7 +1176,7 @@ function hudConectar(t){
   hud.querySelectorAll('[data-hud-valor]').forEach(b => b.onclick = () => {
     // Vida: mini menu (recibir dano / HP directo). Las invocaciones siguen con el campo simple.
     if(b.dataset.hudValor === 'hp' && !(t.fichaId || '').includes(SEP_INVOCACION)){
-      if(hudGlobo === 'hp'){ hudGlobo = ''; } else { hudGlobo = 'hp'; hpModo = 'danio'; hpCritMult = 1; hpRayo = false; }
+      if(hudGlobo === 'hp'){ hudGlobo = ''; } else { hudGlobo = 'hp'; hpModo = 'danio'; }
       hudEditando = ''; pedirDibujo();
       return;
     }
@@ -1180,9 +1185,6 @@ function hudConectar(t){
   });
   // Mini menú de la vida: modos, campo con vista previa y Enter/Esc.
   hud.querySelectorAll('[data-hud-hpmodo]').forEach(b => b.onclick = () => { hpModo = b.dataset.hudHpmodo; pedirDibujo(); });
-  hud.querySelectorAll('[data-hud-rayo]').forEach(b => b.onclick = () => { hpRayo = !hpRayo; if(hpRayo) hpCritMult = 1; pedirDibujo(); });
-  hud.querySelectorAll('[data-hud-critmult]').forEach(b => b.onclick = () => { hpCritMult = Math.max(1, Math.min(4, num(b.dataset.hudCritmult))); pedirDibujo(); });
-  hud.querySelectorAll('[data-hud-critcalc]').forEach(b => b.onclick = () => { if(typeof Critico !== 'undefined') Critico.abrir({defensor: seleccion || ''}); });
   const campoHp = hud.querySelector('[data-hud-hp-in]');
   if(campoHp){
     const dHp = hudDatos(t);

@@ -2890,7 +2890,10 @@ async function dueloDemora(tokenId, lugares, por){
   const orden = iniciativa.orden.slice();
   const i = orden.findIndex(o => o.id === tokenId);
   if(i < 0) return {manual: true, nota: 'no está en el orden de turnos: a mano'};
-  if(i === orden.length - 1) return {nota: 'ya era el último del orden de turnos'};
+  if(i === orden.length - 1){   // (2026-11-05, dueño: «que muestre una animación donde el nombre intenta bajar, pero se choca con el borde»)
+    demoraAviso(tokenId, 'ultimo', {por});
+    return {nota: 'ya era el último del orden de turnos: no puede bajar más'};
+  }
   if(i === iniciativa.turno && !iniciativa.libre){
     const demoras = {...(iniciativa.demoras || {})};
     demoras[tokenId] = Math.round(num(demoras[tokenId])) + n;
@@ -2926,18 +2929,20 @@ function demoraAviso(tokenId, caso, o){
   // Un creep: solo la Crónica. El GM ya lo ve en el duelo («✔ Aplicado · baja…»), y un Aviso al centro le tapaba los otros efectos por aplicar.
   const para = creep ? '' : ((f && f.resumen && f.resumen.control) || t.duenoUid || '');
   // En segunda persona para el jugador («Fuiste demorado»); en tercera para la Crónica.
-  const textos = vos => caso === 'al-terminar'
+  const textos = vos => caso === 'ultimo'
+      ? `${vos ? 'Ya estabas' : 'Ya estaba'} último en el orden de turnos: ${vos ? 'no podés' : 'no puede'} bajar más.`
+    : caso === 'al-terminar'
       ? `${vos ? 'Es tu turno: cuando lo termines, bajás' : 'Es su turno: cuando lo termine, baja'} ${lug} en el orden de turnos.`
     : caso === 'aplicada'
       ? `${vos ? 'Terminó tu turno y, por la Demora, bajaste' : 'Terminó su turno y, por la Demora, bajó'} ${lug}: ${vos ? 'ahora estás' : 'ahora está'} ${o.hasta}.º en el orden de turnos.`
       : `${vos ? 'Bajás' : 'Baja'} ${lug} en el orden de turnos: ${vos ? 'ahora estás' : 'ahora está'} ${o.hasta}.º (${vos ? 'estabas' : 'estaba'} ${o.desde}.º).${o.yaJugo ? (vos ? ' Ya jugaste esta ronda: se nota en la próxima.' : ' Ya jugó esta ronda: se nota en la próxima.') : ''}`;
   const vos = !creep, titulo = caso === 'aplicada' ? `${quien} bajó en el orden de turnos (Demora)` : `${quien} fue demorado${por ? ` por ${por}` : ''}`;
-  const anim = caso === 'al-terminar' ? {} : {demoraToken: tokenId, demoraMovio: true};   // ⏬ la lista de turnos animada en todas las pantallas (js/100)
+  const anim = caso === 'al-terminar' ? {} : caso === 'ultimo' ? {demoraToken: tokenId, demoraChoca: true} : {demoraToken: tokenId, demoraMovio: true};   // ⏬ la lista de turnos animada en todas las pantallas (js/100)
   if(creep){ momentoAbrir({tipo: 'demora', icono: '⏬', titulo, resultado: textos(false), estado: 'listo', datos: {chico: true, ...anim}}); return; }
   momentoAbrir({tipo: 'demora', icono: '⏬', titulo, resultado: textos(false), estado: 'listo',
     datos: {...(para ? {paraUid: para} : {}), ...anim, aviso: true, boton: 'Entendido',
       pasos: [{titulo: vos ? (caso === 'aplicada' ? '⏬ Bajaste en el orden de turnos' : '⏬ Fuiste demorado') : `⏬ ${nombre} ${caso === 'aplicada' ? 'bajó en el orden de turnos' : 'fue demorado'}`, texto: textos(vos)}],
-      veredicto: {tono: 'malo', grande: 'Demora', chico: caso === 'al-terminar' ? `baja ${lug} al terminar el turno` : `${o.hasta}.º en el orden de turnos`}}});
+      veredicto: {tono: 'malo', grande: 'Demora', chico: caso === 'ultimo' ? 'ya estaba último: no baja' : caso === 'al-terminar' ? `baja ${lug} al terminar el turno` : `${o.hasta}.º en el orden de turnos`}}});
 }
 
 /* 💨 Arrojo (ex Envión, 2026-10-26, dueño: «sube en uno en la tabla de iniciativas»): sube `lugares` (1) en el orden de turnos. No pasa por encima del que tiene el

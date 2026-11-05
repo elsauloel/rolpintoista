@@ -64,3 +64,50 @@ function demoraAnimar(tokenId, momentoId){
     setTimeout(() => { if(estabaPlegada){ iniciativaPlegada = true; renderIniciativaSinAnim(); } }, DEMORA_TOTAL_MS - 400);
   }, idDuelo ? 450 : 0);
 }
+
+/* ⏬ Demorado, pero ya era el último (2026-11-05, dueño: «que no se saltee sino que muestre una animación donde el nombre intenta bajar, pero se
+   choca con el borde, y avise "ya está último, no puede bajar"»): mismo despliegue que la Demora (el duelo se aparta, la lista se abre y vuelve a
+   plegarse); la fila del demorado baja un poco, rebota contra el borde de abajo de la lista, tiembla, y debajo aparece el cartelito. */
+function demoraChoque(tokenId, momentoId){
+  if(momentoId){ if(demorasVistas.has(momentoId)) return; demorasVistas.add(momentoId); }
+  const caja = $('#iniciativa');
+  if(!caja) return;
+  const idDuelo = typeof Duelo !== 'undefined' && Duelo.abiertoId ? Duelo.abiertoId() : null;
+  if(idDuelo && Duelo.apartar) Duelo.apartar(idDuelo, DEMORA_TOTAL_MS);
+  const estabaPlegada = iniciativaPlegada;
+  setTimeout(() => {
+    iniciativaPlegada = false;
+    renderIniciativaSinAnim();
+    const f = iniFilas(caja).find(x => x.dataset.iniFila === tokenId);
+    if(!f){ if(estabaPlegada){ iniciativaPlegada = true; renderIniciativaSinAnim(); } return; }
+    f.style.position = 'relative'; f.style.zIndex = '2';
+    f.style.boxShadow = '0 0 0 2px #E27B72, 0 0 14px rgba(226,123,114,.7)';
+    const h = Math.max(10, Math.min(18, f.offsetHeight * 0.45));
+    if(f.animate) f.animate([
+      {transform: 'translateY(0)', offset: 0},
+      {transform: `translateY(${h}px)`, offset: 0.28, easing: 'cubic-bezier(.5,0,1,1)'},   // intenta bajar…
+      {transform: `translateY(${h * 0.35}px)`, offset: 0.42},                             // …choca y rebota
+      {transform: `translateY(${h * 0.7}px)`, offset: 0.52},
+      {transform: `translateX(-4px) translateY(${h * 0.5}px)`, offset: 0.6},               // tiembla
+      {transform: `translateX(4px) translateY(${h * 0.4}px)`, offset: 0.68},
+      {transform: 'translateX(-3px) translateY(2px)', offset: 0.76},
+      {transform: 'translateX(2px)', offset: 0.84},
+      {transform: 'translateY(0)', offset: 1},
+    ], {duration: 1300});
+    // El borde con el que choca: una línea roja que se enciende abajo de la lista.
+    const r = f.getBoundingClientRect();
+    const borde = document.createElement('div');
+    borde.style.cssText = `position:fixed;left:${r.left}px;width:${r.width}px;top:${r.bottom + 2}px;height:3px;border-radius:2px;background:#E27B72;`
+      + 'box-shadow:0 0 10px rgba(226,123,114,.9);opacity:0;pointer-events:none;z-index:70;transition:opacity .15s';
+    const cartel = document.createElement('div');
+    cartel.textContent = '⛔ Ya está último: no puede bajar';
+    cartel.style.cssText = `position:fixed;left:${r.left + r.width / 2}px;top:${r.bottom + 9}px;transform:translateX(-50%) translateY(-4px);white-space:nowrap;`
+      + 'background:rgba(20,16,20,.96);color:#F3C9C4;border:1px solid #E27B72;border-radius:8px;padding:4px 10px;font:600 12px "Space Grotesk",system-ui,sans-serif;'
+      + 'box-shadow:0 6px 18px rgba(0,0,0,.5);opacity:0;pointer-events:none;z-index:70;transition:opacity .25s, transform .25s';
+    document.body.append(borde, cartel);
+    setTimeout(() => { borde.style.opacity = '1'; }, 330);
+    setTimeout(() => { borde.style.opacity = '0'; cartel.style.opacity = '1'; cartel.style.transform = 'translateX(-50%)'; }, 560);
+    setTimeout(() => { cartel.style.opacity = '0'; f.style.boxShadow = ''; f.style.zIndex = ''; }, DEMORA_TOTAL_MS - 500);
+    setTimeout(() => { borde.remove(); cartel.remove(); if(estabaPlegada){ iniciativaPlegada = true; renderIniciativaSinAnim(); } }, DEMORA_TOTAL_MS - 250);
+  }, idDuelo ? 450 : 0);
+}

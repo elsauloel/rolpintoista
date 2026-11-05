@@ -135,6 +135,7 @@ function debilDibujar0(id, t, x, y, rad, z, debajo){
   if(!t) return debajo;
   // 1) La marca chiquita persistente (creeps).
   const marcas = debilMarcas(t);
+  if(!marcas.length) debilCajas.delete(id);
   if(marcas.length){
     const tam = Math.max(11 / z, rad * 0.24);
     ctx.save();
@@ -145,6 +146,9 @@ function debilDibujar0(id, t, x, y, rad, z, debajo){
     const total = anchos.reduce((a, b) => a + b, 0) + (piezas.length - 1) * 2 / z;
     let cx = x - total / 2;
     const cy = debajo + tam * 0.75;
+    const ahora = performance.now();
+    debilCajas.set(id, {x0: cx, x1: cx + total, y0: cy - tam * 0.72, y1: cy + tam * 0.72, cuando: ahora});   // para el cartelito al pasar el mouse
+    debilUltimoDibujo = ahora;
     piezas.forEach((p, i) => {
       const w = anchos[i];
       ctx.globalAlpha = p.sabido ? 1 : 0.45;
@@ -236,3 +240,58 @@ document.addEventListener('click', async e => {
     pedirDibujo();
   }catch(err){ console.error('No se pudo olvidar lo descubierto:', err); toast('No se pudo: ' + String((err && err.message) || err)); }
 }, true);
+
+/* 👆 Qué quiere decir la marca de abajo del token, al pasar el mouse (2026-11-05, dueño: «los iconitos debajo de los tokens asumo que son
+   resistencias y debilidades, pero es poco claro, les agregaría una explicación con hover»). Cada dibujo guarda dónde quedó la marca de cada
+   token (`debilCajas`, en coordenadas del mapa); vale solo la del último dibujo (un token que dejó de verse no deja su caja). */
+const debilCajas = new Map();   // tokenId → {x0, x1, y0, y1, cuando}
+let debilUltimoDibujo = 0;
+const DEBIL_DANO = {fuego: 'de fuego', hielo: 'de hielo', rayo: 'eléctrico', toxico: 'tóxico', acido: 'de ácido', luz: 'de luz', siniestro: 'siniestro'};
+let debilHoverId = null;
+function debilHoverCaja(){
+  let c = document.getElementById('hover-debil');
+  if(c) return c;
+  c = document.createElement('div');
+  c.id = 'hover-debil';
+  c.hidden = true;
+  c.style.cssText = 'position:fixed;z-index:61;max-width:320px;pointer-events:none;background:rgba(20,16,20,.96);color:#EDE6DF;border:1px solid #4A3C43;'
+    + 'border-radius:10px;padding:8px 10px;font:12px/1.35 "Space Grotesk",system-ui,sans-serif;box-shadow:0 8px 24px rgba(0,0,0,.5)';
+  document.body.appendChild(c);
+  return c;
+}
+function debilHoverHtml(t){
+  const marcas = debilMarcas(t);
+  if(!marcas.length) return '';
+  const que = {debil: 'le entra de más', resistente: 'le entra de menos', inmune: 'no le hace nada'};
+  const etq = {debil: 'Débil', resistente: 'Resistente', inmune: 'Inmune'};
+  const filas = marcas.map(m => `<div style="margin-top:5px${m.sabido ? '' : ';opacity:.6'}"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${DEBIL_COLOR[m.tipo]};margin-right:6px;vertical-align:1px"></span>`
+    + `${debilIcono(m.el)}${DEBIL_FLECHA[m.tipo]} <b>${etq[m.tipo]} ${DEBIL_NOMBRE[m.el]}</b>: el daño ${DEBIL_DANO[m.el]} ${que[m.tipo]}.`
+    + (m.sabido ? '' : ' <i style="color:#B7A99F">(los jugadores todavía no lo descubrieron)</i>') + '</div>').join('');
+  return `<div style="font-weight:700;color:#F0D27A">${esc(nombreDe(t))}</div>`
+    + `<div style="color:#B7A99F;font-size:11px">▼ débil · ▲ resistente · ⛔ inmune</div>${filas}`;
+}
+function debilHoverOcultar(){ debilHoverId = null; const c = document.getElementById('hover-debil'); if(c) c.hidden = true; }
+lienzo.addEventListener('pointermove', e => {
+  if(e.buttons){ debilHoverOcultar(); return; }
+  const {px, py} = posEvento(e);
+  const m = pantallaAMundo(px, py);
+  let id = null;
+  for(const [k, b] of debilCajas){
+    if(debilUltimoDibujo - b.cuando > 60 || !tokens.has(k)) continue;
+    if(m.x >= b.x0 && m.x <= b.x1 && m.y >= b.y0 && m.y <= b.y1){ id = k; break; }
+  }
+  if(!id){ if(debilHoverId) debilHoverOcultar(); return; }
+  const c = debilHoverCaja();
+  if(id !== debilHoverId){
+    const html = debilHoverHtml(tokens.get(id));
+    if(!html){ debilHoverOcultar(); return; }
+    c.innerHTML = html; debilHoverId = id;
+  }
+  c.hidden = false;
+  const w = c.offsetWidth, h = c.offsetHeight;
+  let x = e.clientX + 16, y = e.clientY + 16;
+  if(x + w > innerWidth - 8) x = e.clientX - w - 12;
+  if(y + h > innerHeight - 8) y = innerHeight - h - 8;
+  c.style.left = Math.max(8, x) + 'px'; c.style.top = Math.max(8, y) + 'px';
+});
+['pointerleave', 'pointerdown', 'wheel'].forEach(ev => lienzo.addEventListener(ev, debilHoverOcultar, {passive: true}));

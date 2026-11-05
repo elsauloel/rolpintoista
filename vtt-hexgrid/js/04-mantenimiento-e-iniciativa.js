@@ -976,7 +976,7 @@ function renderIniciativa(){
       const libre = !!libreArriba;
       return `<div class="ini-fila${(lib ? libre : i === iniciativa.turno) ? ' activo' : ''}${fuera ? ' fuera' : ''}${ya ? ' ya' : ''}" data-ini-fila="${esc(o.id)}" title="${esc(nombre)}${libre ? ' — turno libre (no pasa el turno)' : ''}${fuera ? ' — caído/derrotado: fuera del orden de turnos hasta que se recupere' : ''}${ya && i > base ? ' — ya jugó esta ronda: si le vuelve a tocar, el GM decide si actúa de nuevo' : ''}${soyGM ? ' · clic derecho: es su turno' : ''}">
         <span class="ini-ficha" style="border-color:${esc(color)}">${mini ? `<img src="${esc(mini)}" alt="">` : esc(inicial(nombre))}</span>
-        <span class="ini-nombre">${libre ? '⚡ ' : ''}${fuera ? '💀 ' : ''}${oculto ? '🙈 ' : ''}${t && enSigilo(t) && (soyGM || t.tipo !== 'creep') ? '🥷 ' : ''}${tokenTienePrisa(o.id) ? '<span title="Prisa: va primero en el orden de turnos, antes que los que no la tienen">🏃</span> ' : ''}${esc(nombre)}</span>`   // 🏃 (2026-11-05, dueño: que se vea por qué quedó arriba) +
+        <span class="ini-nombre">${libre ? '⚡ ' : ''}${fuera ? '💀 ' : ''}${oculto ? '🙈 ' : ''}${t && enSigilo(t) && (soyGM || t.tipo !== 'creep') ? '🥷 ' : ''}${tokenTienePrisa(o.id) ? '<span title="Prisa: va primero en el orden de turnos, antes que los que no la tienen">🏃</span> ' : ''}${esc(nombre)}</span>` +   // 🏃 (2026-11-05, dueño: que se vea por qué quedó arriba)
         (puede
           ? `<input class="ini-valor" type="number" step="1" value="${fmt(num(o.valor))}" data-ini-valor="${esc(o.id)}" title="Iniciativa">`
           : `<span class="ini-valor">${fmt(num(o.valor))}</span>`) +

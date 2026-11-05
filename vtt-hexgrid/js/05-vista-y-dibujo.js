@@ -803,6 +803,7 @@ function dibujarLienzo(){
     }
   }
 
+  if(typeof aguaOndasDibujar === 'function' && aguaOndasDibujar(z)) animando = true;   // 💧 las ondas de los pasos en el agua (js/50)
   if(typeof curaDibujarAuras === 'function' && curaDibujarAuras(z)) animando = true;   // ✨ las auras sanadoras, debajo de los tokens (js/70)
   if(typeof estandarteDibujar === 'function' && estandarteDibujar(z)) animando = true;   // 🚩 el aura de un estandarte de guerra (js/73)
   if(typeof hexInfoDibujar === 'function') hexInfoDibujar(z);

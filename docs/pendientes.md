@@ -45,9 +45,9 @@
 > Salto**: el área de caída, **elegís el casillero** y, si desde ahí hay **más de un objetivo posible**, «Elegí el objetivo»; recién ahí el ataque.
 > 9) **Probar lo que quedó sin probar**: el Remolino después del arreglo (si el creep no tiene SP, cargarle SP a mano), Apuntar y Marcar con el potente
 > nuevo, el cuadro del duelo encima de la animación del gancho. 10) ~~La pasiva para el support cuerpo a cuerpo~~ ✅ decidido (2026-11-05): el S2 Abanderado lleva **Marcar el ritmo** en nivel 2
-> y **Voluntad de hierro** en nivel 4 (sale Robustez); solo diseño, se carga con su nivel 2. 11) **💧 El borde del charco de agua**: hoy se dibuja con semicírculos y parece una nube; tiene que ser una **ondulación**, como agua
+> y **Voluntad de hierro** en nivel 4 (sale Robustez); solo diseño, se carga con su nivel 2. 11) ✅ (hecho 2026-11-05, `aguaDibujar` en `vtt-hexgrid/js/50-superficies.js`) **💧 El borde del charco de agua**: hoy se dibuja con semicírculos y parece una nube; tiene que ser una **ondulación**, como agua
 > (dueño, 2026-11-05, visto en «Claude · pruebas»). 12) ✅ (hecho 2026-11-05; queda solo en «+ Otro stat» de los editores y en las páginas de auditoría) **Sacar el Tipo 12 de todos lados por ahora** (dueño, 2026-11-05: «sacalo de todos lados por ahora»): las Acciones de los creeps,
-> su lupa, la Botonera y cualquier otra pantalla que lo muestre (resistencias a crítico, Tipo de arma); la ficha lite ya no lo muestra. 13) **💧 Pasos en el agua**: al caminar por un charco o una zona de agua, cada paso deja **ondas** (ripples) que se abren y se
+> su lupa, la Botonera y cualquier otra pantalla que lo muestre (resistencias a crítico, Tipo de arma); la ficha lite ya no lo muestra. 13) ✅ (hecho 2026-11-05, `aguaPasos` en `vtt-hexgrid/js/50-superficies.js`, solo dibujo: no escribe nada en Firebase) **💧 Pasos en el agua**: al caminar por un charco o una zona de agua, cada paso deja **ondas** (ripples) que se abren y se
 > apagan detrás del token (dueño, 2026-11-05). 14) **🚩 Áreas como estados, caso por caso** (dueño: «lo revisaría caso a caso»): las zonas persistentes, el miedo y el Muro de escudos,
 > que quedaron afuera del estado derivado. 15) **Probar el Tótem de silencio en el mapa** (solo se probó con la prueba automática).
 

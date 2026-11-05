@@ -1627,3 +1627,11 @@ y al empezar la ronda las tiradas de Res.Mt contra el Ef.Esp de los rivales pega
   Mesa dice «Mala sombra de …». Probado sin mapa: las pruebas automáticas y el texto (captura u-render.png).
 - [x] ✅ **Sin Tipo 12** en las Acciones de un creep (render de la Botonera del creep: Tipo 4/6/8/10). Falta mirarlo en la Botonera de un personaje y en
   la lupa con el mapa abierto.
+
+## Sin probar del 2026-11-05 (🦘 Salto con casilla, 💧 agua)
+
+- [ ] 🦘 **El Salto de verdad**, de punta a punta con un personaje (Botonera) y con un creep (Acciones): se probó con tokens de mentira y sin
+  escribir en Firebase; falta ver que el token se mueva para todos, el momento chico y que el duelo se abra contra el elegido. También el **Salto
+  aplastante** cayendo en una casilla elegida y el Takle (que no debería cambiar).
+- [ ] 💧 **Las ondas de los pasos vistas desde otra pantalla**: un jugador camina por un charco y el GM (y otro jugador) ven las ondas; con el token
+  oculto o en la niebla, el que no lo ve no ve las ondas.

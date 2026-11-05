@@ -1137,6 +1137,7 @@ async function moverToken(id, col, fila, celdas, levita){
     t.rutaJson = JSON.stringify(ruta);
     estelas.set(id, {celdas: celdas.slice(), hasta: Date.now() + ESTELA_MS});
   }
+  if(typeof aguaPasos === 'function') aguaPasos(id, celdas && celdas.length > 1 ? celdas : [{col, fila}]);   // 💧 ondas en el agua (js/50)
   // Al caminar, el token queda mirando hacia donde fue (el último paso); girar
   // a otro lado cuesta No2 (ver el handle ↻ del HUD).
   let rot;
@@ -1212,6 +1213,7 @@ async function moverTokenLibre(id, col, fila){
   const seq0 = nieblaSeq, pend0 = new Set(nieblaPendientes);
   t.col = col; t.fila = fila; t.rutaJson = '[]';
   estelas.delete(id);
+  if(typeof aguaPasos === 'function') aguaPasos(id, [{col, fila}]);   // 💧 ondas en el agua (js/50)
   renderPanel();
   pedirDibujo();
   try{

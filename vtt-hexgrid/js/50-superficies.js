@@ -75,20 +75,7 @@ function superficieDibujar(el, celdas, z){
     ctx.restore();
     return {anima: true, sinBorde: true};
   }
-  if(sup === 'agua'){
-    // Un charco: las casillas enteras (una sola mancha, sin las líneas de adentro) y, en cada lado de afuera, una panza redonda de tamaño
-    // al azar: el borde queda ondulado en vez de hexagonal.
-    trazarManchon(celdas, {radio: [0.42, 0.2], sale: [-0.05, 0.18]});
-    ctx.fillStyle = 'rgba(52,118,178,.5)'; ctx.fill();
-    // Algún brillo suelto sobre el agua.
-    ctx.fillStyle = 'rgba(190,225,250,.13)';
-    celdas.forEach(c => {
-      if(superficieAzar(c.col, c.fila, 40) < 0.45) return;
-      const p = hexCentro(c.col, c.fila), dx = (superficieAzar(c.col, c.fila, 41) - 0.5) * HEX * 0.8, dy = (superficieAzar(c.col, c.fila, 42) - 0.5) * HEX * 0.8;
-      ctx.beginPath(); ctx.ellipse(p.x + dx, p.y + dy, HEX * 0.32, HEX * 0.1, -0.35, 0, Math.PI * 2); ctx.fill();
-    });
-    return {anima: false, sinBorde: true};
-  }
+  if(sup === 'agua'){ aguaDibujar(celdas, z); return {anima: true, sinBorde: true}; }
   // ☁ Las nubes (dueño, 2026-10-17: «para nubes y para niebla, un borde irregular difuminado: verde para nubes tóxicas, o violeta, y gris para
   // neblina»): una zona que es un gas (tóxica, o por su nombre: gas, nube, humo, miasma, pedos, esporas, vapor) se dibuja como una mancha con el
   // borde desparejo y borroso, en vez de hexágonos.
@@ -96,6 +83,118 @@ function superficieDibujar(el, celdas, z){
   if(nube){ nubeDibujar(celdas, nube, z); return {anima: false, sinBorde: true}; }
   if(esFuego(el)){ fuegoDibujar(celdas, z); return {anima: true, sinBorde: true, fuego: true}; }
   return null;
+}
+/* 💧 El charco (2026-11-05, dueño: «el borde del charco parece una nube; tiene que ser una ondulación, como agua»). El contorno de afuera de las
+   casillas (los lados que no tocan otra casilla del charco, encadenados en lazos) con cada lado ondulado por una onda que corre despacio y vale
+   cero en las esquinas (así los lados empalman); adentro, la misma línea un poco más chica y más tenue, como la onda que viene detrás, y un brillo
+   que se mueve. El relleno es uno solo (sin líneas de adentro). */
+function aguaContornos(celdas){
+  const k = (x, y) => Math.round(x * 4) + ',' + Math.round(y * 4), mitad = new Map(), lados = [];
+  celdas.forEach(c => {
+    const p = hexCentro(c.col, c.fila);
+    for(let i = 0; i < 6; i++){
+      const [ax, ay] = ESQUINAS[i], [bx, by] = ESQUINAS[(i + 1) % 6];
+      const l = {a: [p.x + ax, p.y + ay], b: [p.x + bx, p.y + by], c: p};
+      const km = k((l.a[0] + l.b[0]) / 2, (l.a[1] + l.b[1]) / 2);
+      mitad.set(km, (mitad.get(km) || 0) + 1); l.km = km; lados.push(l);
+    }
+  });
+  const afuera = lados.filter(l => mitad.get(l.km) === 1), porInicio = new Map();
+  afuera.forEach(l => porInicio.set(k(l.a[0], l.a[1]), l));
+  const usados = new Set(), lazos = [];
+  for(const l0 of afuera){
+    if(usados.has(l0)) continue;
+    const lazo = []; let l = l0;
+    while(l && !usados.has(l)){ usados.add(l); lazo.push(l); l = porInicio.get(k(l.b[0], l.b[1])); }
+    lazos.push(lazo);
+  }
+  return lazos;
+}
+// Un lado ondulado: de a hacia b, corrido `adentro` hacia el centro de su casilla, con la onda en fase `fase`.
+function aguaLado(l, amp, adentro, fase, primero){
+  const dx = l.b[0] - l.a[0], dy = l.b[1] - l.a[1], largo = Math.hypot(dx, dy) || 1;
+  const mx = (l.a[0] + l.b[0]) / 2, my = (l.a[1] + l.b[1]) / 2;
+  let nx = -dy / largo, ny = dx / largo;   // la normal, hacia afuera de la casilla
+  if((mx - l.c.x) * nx + (my - l.c.y) * ny < 0){ nx = -nx; ny = -ny; }
+  const pasos = 14;
+  for(let s = primero ? 0 : 1; s <= pasos; s++){
+    const t = s / pasos, env = Math.sin(Math.PI * t);
+    const off = env * (amp * Math.sin(Math.PI * 2 * 1.5 * t - fase) - adentro);
+    const x = l.a[0] + dx * t + nx * off, y = l.a[1] + dy * t + ny * off;
+    if(primero && !s) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  }
+}
+function aguaTrazar(lazos, amp, adentro, fase){
+  ctx.beginPath();
+  lazos.forEach(lazo => { lazo.forEach((l, i) => aguaLado(l, amp, adentro, fase, i === 0)); ctx.closePath(); });
+}
+function aguaDibujar(celdas, z){
+  const lazos = aguaContornos(celdas), t = performance.now() / 1000, amp = HEX * 0.07;
+  aguaTrazar(lazos, amp, 0, t * 1.6);
+  ctx.fillStyle = 'rgba(52,118,178,.5)'; ctx.fill();
+  ctx.save();
+  ctx.clip();
+  // Brillos sueltos que se mecen.
+  celdas.forEach(c => {
+    if(superficieAzar(c.col, c.fila, 40) < 0.45) return;
+    const p = hexCentro(c.col, c.fila), dx = (superficieAzar(c.col, c.fila, 41) - 0.5) * HEX * 0.8, dy = (superficieAzar(c.col, c.fila, 42) - 0.5) * HEX * 0.8;
+    const a = 0.08 + 0.08 * Math.sin(t * 1.3 + superficieAzar(c.col, c.fila, 43) * 6.28);
+    ctx.fillStyle = `rgba(200,232,252,${a.toFixed(3)})`;
+    ctx.beginPath(); ctx.ellipse(p.x + dx + Math.sin(t * 0.7 + dy) * HEX * 0.05, p.y + dy, HEX * 0.32, HEX * 0.09, -0.35, 0, Math.PI * 2); ctx.fill();
+  });
+  // Las ondas de adentro, más tenues, con otra fase.
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  aguaTrazar(lazos, amp * 0.8, HEX * 0.16, t * 1.6 + 1.9);
+  ctx.lineWidth = 1.4 / z; ctx.strokeStyle = 'rgba(190,228,252,.32)'; ctx.stroke();
+  aguaTrazar(lazos, amp * 0.6, HEX * 0.3, t * 1.6 + 3.8);
+  ctx.lineWidth = 1.1 / z; ctx.strokeStyle = 'rgba(190,228,252,.16)'; ctx.stroke();
+  ctx.restore();
+  // La orilla: una línea clara que brilla de a ratos.
+  aguaTrazar(lazos, amp, 0, t * 1.6);
+  ctx.lineJoin = 'round'; ctx.lineWidth = 2 / z;
+  ctx.strokeStyle = `rgba(175,220,250,${(0.5 + 0.18 * Math.sin(t * 2.1)).toFixed(3)})`; ctx.stroke();
+}
+/* 💧 Pasos en el agua (2026-11-05, dueño: «al caminar por un charco, cada paso deja ondas que se abren y se apagan detrás del token»). Solo dibujo, en
+   cada pantalla: el listener de los tokens (js/09) avisa cuando otro token cambia de casilla (con su ruta, o de la casilla de antes a la nueva) y
+   moverToken/moverTokenLibre (js/07) cuando se mueve el propio. Por cada casilla del camino que es agua (y si el token la toca: levitando o volando
+   no), unos anillos que se abren desde el centro, uno detrás del otro al ritmo del paso. No se guarda nada en Firebase. */
+const aguaOndas = [];          // {id, x, y, t0}
+const aguaOndasVistas = new Map();   // id → 'ruta' recién dibujada (la propia vuelve del listener: no repetirla)
+const AGUA_ONDA_MS = 1700, AGUA_PASO_MS = 170;
+function aguaPasos(id, celdas){
+  const t = tokens.get(id);
+  if(!t || !celdas || !celdas.length || t.bajoTierra) return;
+  const clave = celdas.map(c => c.col + ',' + c.fila).join(';'), ya = aguaOndasVistas.get(id);
+  if(ya && ya.clave === clave && Date.now() - ya.ms < 4000) return;
+  aguaOndasVistas.set(id, {clave, ms: Date.now()});
+  const ahora = performance.now();
+  celdas.forEach((c, i) => {
+    if(!enAgua({...t, col: c.col, fila: c.fila})) return;
+    const p = hexCentro(c.col, c.fila);
+    aguaOndas.push({id, x: p.x, y: p.y, t0: ahora + i * AGUA_PASO_MS});
+  });
+  if(aguaOndas.length > 80) aguaOndas.splice(0, aguaOndas.length - 80);
+  pedirDibujo();
+}
+// → true mientras quede alguna onda por dibujar (js/05, debajo de los tokens).
+function aguaOndasDibujar(z){
+  if(!aguaOndas.length) return false;
+  const ahora = performance.now();
+  for(let i = aguaOndas.length - 1; i >= 0; i--) if(ahora - aguaOndas[i].t0 > AGUA_ONDA_MS + 600) aguaOndas.splice(i, 1);
+  ctx.save();
+  for(const o of aguaOndas){
+    const t = tokens.get(o.id);
+    if(t && ((t.oculto && !soyGM) || (typeof tokenVisiblePorNiebla === 'function' && !tokenVisiblePorNiebla(t)))) continue;
+    for(let k = 0; k < 3; k++){
+      const p = (ahora - o.t0 - k * 260) / AGUA_ONDA_MS;
+      if(p < 0 || p > 1) continue;
+      const r = HEX * (0.18 + 0.8 * p), a = (1 - p) * (0.75 - k * 0.18);
+      ctx.beginPath(); ctx.ellipse(o.x, o.y, r, r * 0.82, 0, 0, Math.PI * 2);
+      ctx.lineWidth = (2.2 - k * 0.5) * (1 - p * 0.5) / z; ctx.strokeStyle = `rgba(205,236,255,${a.toFixed(3)})`; ctx.stroke();
+    }
+  }
+  ctx.restore();
+  return true;
 }
 /* 🔥 Lo que arde (dueño, 2026-10-17: «para superficies incendiadas, buscate algún tipo de textura»): el terreno incendiado y las zonas de fuego.
    Una mancha de brasas (rojo oscuro, borde desparejo y un poco borroso), encima un resplandor naranja-amarillo por casilla que titila, y

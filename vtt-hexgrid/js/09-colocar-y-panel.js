@@ -147,6 +147,12 @@ function escucharTokens(){
         estelas.set(ch.doc.id, {celdas, hasta: Date.now() + ESTELA_MS});
         if(typeof contarCasilleros === 'function') contarCasilleros(ch.doc.id, celdas.length - 1);   // lo que se movió (Contra el que corre, js/35)
       }
+      // 💧 Pasos en el agua (js/50): las ondas por donde pasó (con ruta, el camino; si no, la casilla nueva).
+      if(ch.type === 'modified' && previo && typeof aguaPasos === 'function' && (previo.col !== Math.round(num(d.col)) || previo.fila !== Math.round(num(d.fila)))){
+        const nueva = {col: Math.round(num(d.col)), fila: Math.round(num(d.fila))};
+        if(ruta.length > 2 && previo.rutaJson !== rutaJson){ const cs = []; for(let i = 0; i + 1 < ruta.length; i += 2) cs.push({col: ruta[i], fila: ruta[i + 1]}); setTimeout(() => aguaPasos(ch.doc.id, cs), 0); }
+        else setTimeout(() => aguaPasos(ch.doc.id, [nueva]), 0);
+      }
       tokens.set(ch.doc.id, {
         rutaJson,
         nombre: String(d.nombre || '?'),

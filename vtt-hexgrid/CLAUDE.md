@@ -816,6 +816,15 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   ninguna casilla útil: «¿Atacar igual sin saltar?». Esc o clic derecho cancelan sin cobrar (`msg.alCancelar`). Probado en «Claude · pruebas» con tokens
   locales y las escrituras reemplazadas (capturas `v-salto-*`): Esc, el aviso del Sólido con Cancelar y Aceptar, y «Elegí el objetivo» con dos goblins.
 
+- **💧 El charco ondulado y las ondas de los pasos** (2026-11-05, dueño: «el borde del charco parece una nube; tiene que ser una ondulación, como
+  agua»; «cada paso deja ondas que se abren y se apagan detrás del token»), en `js/50-superficies.js`. `aguaDibujar` reemplaza al manchón de
+  semicírculos: `aguaContornos` encadena los lados de afuera de las casillas en lazos y `aguaLado` ondula cada lado con una onda que corre y vale cero
+  en las esquinas; adentro, dos ondas más chicas y tenues y brillos que se mecen; la orilla, una línea clara que late (ahora el agua anima). Los pasos:
+  `aguaPasos(id, celdas)` agrega anillos (`aguaOndas`, 3 por casilla, uno por paso cada 170 ms) en las casillas del camino que son agua y que el token
+  toca (`enAgua`: levitando o volando no; bajo tierra no); `aguaOndasDibujar` (gancho en js/05, debajo de los tokens) no los muestra si el token está
+  oculto para ese jugador o tapado por la niebla. Lo llaman `moverToken`/`moverTokenLibre` (js/07, la pantalla que mueve) y el listener de los tokens
+  (js/09, las demás: con la ruta, o la casilla nueva); no escribe nada nuevo en Firebase. Capturas `v-agua-*`, `v-pasos-*` (GM, todo local).
+
 ## Pendiente (más adelante)
 
 Alcance y movimiento; niebla; tiradas desde el token.

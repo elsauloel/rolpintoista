@@ -1693,3 +1693,12 @@ y al empezar la ronda las tiradas de Res.Mt contra el Ef.Esp de los rivales pega
 - [x] **A la vista, con Mover libre**: no se anuncia (como antes). p5-d-visible-libre-*.png.
 - Nota: un PJ **oculto** (el ojo del GM) no se le dibuja ni a su dueño, así que el jugador no lo puede arrastrar; el caso real es el sigilo.
 - Observación (ya estaba): al entrar en Mover libre estando en sigilo, la Mesa dice para todos «⚠ X (en sigilo) entró en Mover libre».
+
+### 2026-11-05 · 🙈 El aviso al GM, ahora al centro con «Entendido» (commits 3392fd1c y f190f0d4), con clics (GM, J1 y J2 en «Encuentro 2»)
+PJ de J1 en sigilo, modo combate, fuera de su turno. Todo restaurado después (foto antes, comparada después: igual; borrado el aviso de mapa publicado).
+- ✅ (a) J1 lo arrastra → al GM le aparece **al centro** «🙈 … (oculto) actúa fuera de su turno · se mueve», veredicto «Oculto, fuera de su turno» y
+  botón «Entendido» (al tocarlo se cierra). J1 solo ve su mensajito; J2 no ve nada (ni Aviso, ni Crónica, ni Mesa).
+- ✅ (b) J1 activa 🦶 Mover libre → al GM, al centro: «… (en sigilo) entró en 🦶 Mover libre» con «Entendido». La Mesa de J1 y J2 ya **no** muestra
+  «⚠ … (en sigilo) entró en Mover libre».
+- ✅ (c) se mueve con Mover libre → otro Aviso al centro al GM: «se mueve (con 🦶 Mover libre)». (En esta prueba la casilla caía en el cono de un goblin
+  y lo descubrió: eso es la detección de siempre, no el aviso.)

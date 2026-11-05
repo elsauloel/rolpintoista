@@ -98,6 +98,11 @@
 >   creep (`escucharTokens`, js/09 → js/101 nuevo) y al entrar el GM se reconcilian los desfasados. **Decisiones del dueño**: (1) tokens del mismo creep en
 >   dos mapas → avisar y **preguntarle al GM** en qué mapa queda; (2) al **borrar el token** de un creep → **preguntarle al GM** si la ficha también se
 >   borra, si pasa a la Reserva o si se queda en ese mapa sin token.
+>   **Textos (dueño, 2026-11-05: «sí, me cierra»)**: hablar del **creep**, no de «la ficha»; «ficha del creep» solo en el botón que abre sus datos
+>   («📜 Ver la ficha del Goblin»). Al borrar el token: «**Sacaste al <creep> del tablero. ¿Qué hacemos con él?**» → «🗑 **Eliminarlo**: se borra del
+>   todo, con su vida, su equipo y sus habilidades» · «🎒 **Guardarlo en la Reserva**: queda guardado para usarlo en otra escena» · «⏸ **Dejarlo en este
+>   mapa, fuera del tablero**: sigue siendo parte de esta escena y lo podés volver a poner cuando quieras». En dos mapas: «**El <creep> aparece en dos
+>   mapas: «A» y «B».** Un creep puede estar en un solo lugar. ¿Dónde queda?» → un botón por mapa (en el otro se saca su token).
 > - [~] (2026-11-03: el dueño cargó Capataz, Rompehuesos —5.ª: Puño de roca—, dos Ratas y el Arquero, con cambios suyos sobre la marcha; falta confirmar el Chamán) **▶ AL RETOMAR EL ENCUENTRO 2 DE EL ORIGEN, RECORDARLE AL DUEÑO (2026-11-03, dueño: «cuando te diga de retomar la próxima pelea del origen,
 >   recordame que termine el arquero y avance con el chamán»)**: cargados por el dueño en MINAS DUNGEON: Capataz del culto, Goblin rompehuesos (le falta
 >   su **5.ª habilidad**, la elige él) y la Rata de galería (duplicada: dos ratas). **El Arquero del culto incendiario quedó a medio cargar**: terminarlo

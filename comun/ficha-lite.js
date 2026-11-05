@@ -11,8 +11,9 @@ const FichaLite = (() => {
   const fmt = n => Number.isInteger(n) ? String(n) : String(Math.round(n * 100) / 100);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
   const signo = v => (v > 0 ? '+' : v < 0 ? '−' : '') + fmt(Math.abs(v));
-  const TIPOS = ['T4', 'T6', 'T8', 'T10', 'T12'];
-  const TIPOS_LARGO = ['armas Tipo 4 (d4)', 'armas Tipo 6 (d6)', 'armas Tipo 8 (d8)', 'armas Tipo 10 (d10)', 'armas Tipo 12 (d12)'];
+  // Sin Tipo 12 (2026-11-05, segunda tanda de pruebas; dueño: «la resistencia tipo 12 no existe por ahora»): la ficha lite mostraba la columna T12.
+  const TIPOS = ['T4', 'T6', 'T8', 'T10'];
+  const TIPOS_LARGO = ['armas Tipo 4 (d4)', 'armas Tipo 6 (d6)', 'armas Tipo 8 (d8)', 'armas Tipo 10 (d10)'];
   const SLOT_NOMBRE = {armadura: 'Armadura', cabeza: 'Cabeza', manos: 'Manos', piernas: 'Piernas', pies: 'Pies', cinturon: 'Cinturón',
     mochila: 'Mochila', accesorio: 'Accesorio', anillo: 'Anillo', cuello: 'Cuello', escudo: 'Escudo', mano: 'Mano', otro: 'Equipo'};
 
@@ -115,7 +116,11 @@ const FichaLite = (() => {
       subtitulo: [`Nivel ${fmt(num(meta.nivel) || 1)}`, meta.raza, meta.clase].filter(Boolean).join(' · '),
       manos: [manoPersonaje(S, m1, dmg), dosManos ? {nombre: '', detalle: 'ocupada (arma a dos manos)', lineas: []} : manoPersonaje(S, m2, dmg)],
       defensa: lineasFicha(S, c, 'def'),
-      crit: ['tipo1', 'tipo2', 'tipo3', 'tipo4', 'tipo5'].map(id => lineasFicha(S, c, id)),
+      // 🩹 Mañas de sobreviviente / Contra las cuerdas (2026-11-05): dependen de la vida de ahora; el duelo las suma y la ficha lite también.
+      crit: ['tipo1', 'tipo2', 'tipo3', 'tipo4'].map(id => { const x = lineasFicha(S, c, id);
+        const v = typeof Combatiente !== 'undefined' && Combatiente.resCritPorVida ? num(Combatiente.resCritPorVida(c.final.rescritmitad, c.final.rescritcuarto, S.hp, c.final.hpmax)) : 0;
+        if(v > 0 && Number.isFinite(x.valor)){ x.lineas.push({txt: 'Con poca vida (Mañas de sobreviviente / Contra las cuerdas)', val: v, nota: 'pasiva'}); x.valor += v; }
+        return x; }),
       equipo,
       estados: estadosLista(typeof FichaResumen !== 'undefined' ? FichaResumen.estadosTodos(S) : S.efectos),
       extras: [
@@ -204,7 +209,7 @@ const FichaLite = (() => {
       subtitulo: [`Nivel ${fmt(num(sc.nivel) || 1)}`, sc.jefe ? 'jefe' : '', sc.raza].filter(Boolean).join(' · '),
       manos: [manoGuardada(sc, C.danoTxt(sc, dmg), C.slotDe), segundaMano(sc, C.slotDe, o => C.danoTxt(o, C.statValor(o, 'dmg')))],
       defensa: lineasGuardadas(sc, C.defensaEfectiva(sc), sc.defensa, defItem, defEstado),
-      crit: [0, 1, 2, 3, 4].map(i => lineasGuardadas(sc, C.critEfectivo(sc, i), (sc.crit || [])[i], modDe('tipo' + (i + 1)), () => 0)),
+      crit: [0, 1, 2, 3].map(i => lineasGuardadas(sc, C.critEfectivo(sc, i), (sc.crit || [])[i], modDe('tipo' + (i + 1)), () => 0)),
       equipo: equipoGuardado(sc, C.slotDe),
       estados: estadosLista(sc.estados),
       extras: [{etq: ETQ_EXTRA.sigilo, valor: fmt(C.statValor(sc, 'sigilo')), lineas: []},
@@ -222,7 +227,7 @@ const FichaLite = (() => {
       manos: [manoGuardada(inv, I.danoTxt(inv, dmg), slotDe), segundaMano(inv, slotDe)],
       // Armadura rota de una invocación cuenta por acumulación (como en InvCalculo.defensaEfectiva).
       defensa: lineasGuardadas(inv, I.defensaEfectiva(inv), inv.defensa, defItem, defEstado),
-      crit: [0, 1, 2, 3, 4].map(i => lineasGuardadas(inv, I.critEfectivo(inv, i), (inv.crit || [])[i], modDe('tipo' + (i + 1)), () => 0)),
+      crit: [0, 1, 2, 3].map(i => lineasGuardadas(inv, I.critEfectivo(inv, i), (inv.crit || [])[i], modDe('tipo' + (i + 1)), () => 0)),
       equipo: equipoGuardado(inv, slotDe),
       estados: estadosLista(inv.estados),
       extras: [{etq: ETQ_EXTRA.sigilo, valor: fmt(I.statValor(inv, 'sigilo')), lineas: []},

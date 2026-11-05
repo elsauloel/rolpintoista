@@ -5,7 +5,7 @@
    - 🥁 Marcar el ritmo (pasiva): al empezar la ronda, UN aliado pegado a vos sube 1; si hay varios, elegís a cuál (`ritmoPedir`, momento
      `ritmo-elegir`: al dueño de quien la tiene; el GM si es un creep, o por él si en 30 s nadie eligió).
    - 🩸 Sed de sangre (pasiva): cuando un rival cae por tu golpe, subís 2 (si ya jugaste, al empezar la próxima ronda).
-   - 🐈‍⬛ Mufa (estado del Debuffer, «Echar la mufa»): al empezar la ronda, los rivales de quien la lleva que están pegados a él tiran Res.Mt contra el
+   - 🌑 Mala sombra (estado del Debuffer, la habilidad «Mala sombra»; antes «Mufa»): al empezar la ronda, los rivales de quien la lleva que están pegados a él tiran Res.Mt contra el
      Efecto especial de quien la echó; el que pierde baja 1.
    Reglas: nadie juega dos veces en la misma ronda; subir y bajar se cancelan; como mucho un efecto de orden por personaje y por ronda.
    Todo lo escribe la pantalla del GM (es la que escribe el turno): si lo pide otra pantalla, va como un momento `orden-pedir` (antes `orden-pedido`: lo tomaban pantallas viejas del GM en otro mapa; estado
@@ -131,7 +131,7 @@ async function ordenMufaAnotar(portador, de, esp, por){
   if(!portador) return {manual: true, nota: 'a mano'};
   const mufas = {...(iniciativa.mufas || {})};
   mufas[portador] = {de: String(de || ''), esp: Math.max(0, Math.round(num(esp))), por: String(por || '').slice(0, 40)};
-  if(!(await guardarIniciativa({mufas}))) return {manual: true, nota: 'no se pudo anotar la Mufa: al empezar la ronda, a mano'};
+  if(!(await guardarIniciativa({mufas}))) return {manual: true, nota: 'no se pudo anotar la Mala sombra: al empezar la ronda, a mano'};
   return {nota: 'al empezar cada ronda, los rivales pegados a quien la lleva tiran Res.Mt'};
 }
 // La llama dueloAplicarEfectoBase (js/13) cuando entra el estado Mufa.
@@ -165,7 +165,7 @@ async function ordenSedDeSangre(d){
 async function ordenInicioRonda(ordenIds){
   const pend = iniciativa.ordenPendientes || [];
   // Las Mufas que siguen: quien la lleva todavía tiene el estado.
-  const mufas = Object.fromEntries(Object.entries(iniciativa.mufas || {}).filter(([id]) => { const t = tokens.get(id); return t && ordenTieneEstado(t, 'Mufa'); }));
+  const mufas = Object.fromEntries(Object.entries(iniciativa.mufas || {}).filter(([id]) => { const t = tokens.get(id); return t && (ordenTieneEstado(t, 'Mala sombra') || ordenTieneEstado(t, 'Mufa')); }));   // (Mufa: el nombre viejo)
   const conRitmo = ordenIds.filter(id => ordenPasiva(tokens.get(id), 'ritmo', 'ritmo') > 0);
   if(!pend.length && !Object.keys(mufas).length && !conRitmo.length && !Object.keys(iniciativa.mufas || {}).length) return null;
   let st = {orden: ordenIds.slice(), turno: -1, actuaron: []}, usados = [];
@@ -194,8 +194,8 @@ async function ordenInicioRonda(ordenIds){
     for(const r of ordenPegados(t, x => dueloEsRival(t, x) && ordenIds.includes(idDeToken(x)))){
       const tr = tokens.get(r), res = ordenTirarValor(trampaValorStat(tr, 'resm')), ef = ordenTirarValor(m.esp);
       const pierde = res.total < ef.total;
-      mesaLinea(`🐈‍⬛ Mufa de ${ordenNombre(port)}: ${ordenNombre(r)} tira Res.Mt ${res.total} (${res.formula}) contra el Efecto especial ${ef.total} (${ef.formula})${m.por ? ` de ${m.por}` : ''} → ${pierde ? 'pierde: baja 1 lugar' : 'aguanta'}.`, 'recordatorio');
-      if(pierde) anotar(r, -1, `la Mufa de ${ordenNombre(port)}`);
+      mesaLinea(`🌑 Mala sombra de ${ordenNombre(port)}: ${ordenNombre(r)} tira Res.Mt ${res.total} (${res.formula}) contra el Efecto especial ${ef.total} (${ef.formula})${m.por ? ` de ${m.por}` : ''} → ${pierde ? 'pierde: baja 1 lugar' : 'aguanta'}.`, 'recordatorio');
+      if(pierde) anotar(r, -1, `la Mala sombra de ${ordenNombre(port)}`);
     }
   }
   const r = OrdenTurnos.aplicar(st, movs, usados);

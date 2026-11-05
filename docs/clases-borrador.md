@@ -401,7 +401,7 @@ verifica con 1d20: hasta DES×2 → 7+; hasta DES×3 → 17+; más de DES×3 →
 
 ## Debuffer ⏳
 
-- **🐈‍⬛ Echar la mufa** (2026-11-05, dueño: «se pueda colocar tanto sobre aliados como sobre rivales, pero que los rivales tiran resistencia mental…
+- **🐈‍⬛ Echar la mufa** (2026-11-05, dueño: «se pueda colocar tanto sobre aliados como sobre rivales, pero que los rivales tiran resistencia mental… **(Desde el 2026-11-05 se llama «Mala sombra», la habilidad y el estado; dueño: «le echás un estado a un aliado, pero la sombra es lo que hace mal». Lo guardado como «Mufa» se sigue leyendo.)**
   al empezar la ronda, quienes están afectados por la mufa deben tirar resistencia mental contra el efecto especial del debuffer»): 5 SP, 1 No2; a un
   aliado entra directo, un rival se resiste (PdG.Esp contra Res.Mt). Estado Mufa 2 turnos: al empezar cada ronda, los rivales de quien la lleva que
   están pegados a él tiran Res.Mt contra el Ef.Esp de quien la echó; el que pierde baja 1 lugar. ✅ cargada (`debuffer-echar-la-mufa`).

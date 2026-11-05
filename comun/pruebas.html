@@ -54,7 +54,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
-<script src="estados-presets.js?v=20261105orden"></script>
+<script src="estados-presets.js?v=20261105sombra"></script>
 <script src="estados-aplicar.js?v=20261104ae"></script>
 <script src="recibidos.js?v=20261103pm"></script>
 <script src="tokens-auto.js"></script>
@@ -119,7 +119,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
-<script src="skills-clase.js?v=20261105contra"></script>
+<script src="skills-clase.js?v=20261105sombra"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261104ig"></script>
 <script src="skills-creep-base.js?v=20261105contra"></script>
@@ -6683,10 +6683,10 @@ prueba('🔄 Cambio de guardia y 🎺 el costo del Toque de carga (2026-11-05): 
   igual([r.st.orden.join(''), r.usados.sort().join(''), otra.cambio, OrdenTurnos.costoToque(0), OrdenTurnos.costoToque(2), c0, FichaHabilidades.costoSpDe(S, h)],
     ['dbca', 'ad', null, 3, 7, 3, 7]);
 });
-prueba('🥁🩸🐈‍⬛ Las pasivas y la Mufa (2026-11-05): Marcar el ritmo y Sed de sangre suman su stat; Echar la mufa a un aliado entra sin tirar', () => {
+prueba('🥁🩸🌑 Las pasivas y la Mala sombra (2026-11-05, ex Mufa): Marcar el ritmo y Sed de sangre suman su stat; la Mala sombra a un aliado entra sin tirar', () => {
   const P = n => PASIVAS_BASE.find(x => x.nombre === n);
-  const hab = Duelo.limpiarHab({nombre: 'Echar la mufa', objetivo: 'cualquiera', aliadoDirecto: true, tira: {stat: 'pdgmg', etq: 'PdG.Esp'}, contra: [{modo: 'resm', stat: 'resm', etq: 'Res.Mt'}], dano: null, efectos: [{nombre: 'Mufa'}]});
-  const mufa = estadosPresetFicha().find(e => e.nombre === 'Mufa');
+  const hab = Duelo.limpiarHab({nombre: 'Mala sombra', objetivo: 'cualquiera', aliadoDirecto: true, tira: {stat: 'pdgmg', etq: 'PdG.Esp'}, contra: [{modo: 'resm', stat: 'resm', etq: 'Res.Mt'}], dano: null, efectos: [{nombre: 'Mufa'}]});
+  const mufa = estadosPresetFicha().find(e => e.nombre === 'Mala sombra') && !estadosPresetFicha().some(e => e.nombre === 'Mufa') && estadosPresetFicha().find(e => e.nombre === 'Mala sombra');
   igual([P('Marcar el ritmo').mods[0].stat, P('Sed de sangre').mods[0].val, hab.aliadoDirecto, hab.sinOposicion, mufa && mufa.turnos],
     ['ritmo', 2, true, false, 2]);
 });

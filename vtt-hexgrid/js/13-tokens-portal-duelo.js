@@ -2714,7 +2714,7 @@ async function dueloAplicarEfectoBase(d, ef){
   if(spec.nombre === 'Al final del orden') return alFinalDelOrden(d.defensor.tokenId, d.defensor.nombre, d.hab && d.hab.nombre);   // 💥 Takle (js/04)
   if(spec.nombre === 'Sube en el orden') return dueloAdelanto(d.defensor.tokenId, spec.stacks);   // 💨 Arrojo (ex Envión, 2026-10-26)
   if(spec.nombre === 'Toque de carga' && typeof ordenPedir === 'function') return ordenPedir({tipo: 'sube', id: d.defensor.tokenId, n: 1, por: (d.atacante && d.atacante.nombre ? `${d.atacante.nombre} · Toque de carga` : 'Toque de carga'), motivo: 'Toque de carga'});   // 🎺 (js/102, 2026-11-05)
-  if(spec.nombre === 'Mufa' && typeof ordenMufaPoner === 'function') await ordenMufaPoner(d).catch(err => console.error('La Mufa: no se pudo anotar', err));   // 🐈‍⬛ anota quién la echó y su Ef.Esp (js/102); el estado entra igual
+  if((spec.nombre === 'Mala sombra' || spec.nombre === 'Mufa') && typeof ordenMufaPoner === 'function') await ordenMufaPoner(d).catch(err => console.error('La Mufa: no se pudo anotar', err));   // 🐈‍⬛ anota quién la echó y su Ef.Esp (js/102); el estado entra igual
   if(spec.soltar && !spec.soltar.visual){   // 🕸 una copia vieja de la Red Nerubian o de Tela de araña: la telaraña sale del nombre (js/68)
     const v = Combatiente.atrapaDeNombre((d.hab && d.hab.nombre) || (d.ataque && (d.ataque.habNombre || d.ataque.nombre)) || '');
     if(v) spec.soltar = {...spec.soltar, visual: v};

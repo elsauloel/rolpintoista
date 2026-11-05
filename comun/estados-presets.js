@@ -224,8 +224,10 @@ const ESTADOS_PRESET = [
     detalle:'Lo arrastraron con un gancho y quedó a los tumbos: −2 a la Evasión. Se va al terminar el turno de quien lo arrastró.'},
   // 🐈‍⬛ Mufa (dueño, 2026-11-05, «Echar la mufa» del Debuffer; vtt-hexgrid/js/102). Puede llevarla un aliado o un rival: al empezar cada ronda, los
   // rivales de quien la lleva que están pegados a él tiran Res.Mt contra el Efecto especial de quien la echó; el que pierde baja 1 lugar en el orden.
-  {nombre:'Mufa', polaridad:'otro', turnos:2, mods:[],
-    detalle:'Le echaron la mufa: mientras le dure, al empezar cada ronda, los rivales que estén pegados a él tiran Res.Mt contra el Efecto especial de quien la echó; el que pierde baja 1 lugar en el orden de turnos. ⚙ Automatizado: lo resuelve el mapa del GM al empezar la ronda.'},
+  // 🌑 Se llama «Mala sombra» desde el mismo día (dueño: «uno le puede echar la mufa a un aliado y eso no suena bien… le echás un estado a un aliado,
+  // pero la sombra es lo que hace mal»). Lo guardado con el nombre viejo «Mufa» se sigue leyendo igual (js/13, js/102, js/88).
+  {nombre:'Mala sombra', polaridad:'otro', turnos:2, mods:[],
+    detalle:'Lleva una mala sombra: mientras le dure, al empezar cada ronda, los rivales que estén pegados a él tiran Res.Mt contra el Efecto especial de quien se la puso; el que pierde baja 1 lugar en el orden de turnos. ⚙ Automatizado: lo resuelve el mapa del GM al empezar la ronda.'},
   // 🎺 Toque de carga (dueño, 2026-11-05): cuántas veces lo usó en este combate; cada uso sube 2 SP el próximo (3, 5, 7…). Se va al «Finalizar combate».
   {nombre:'Toques de carga', polaridad:'otro', permanente:true, turnos:0, apila:true, stacks:1, finCombate:true, mods:[],
     detalle:'Cuántas veces tocaste el Toque de carga en este combate: cada vez cuesta 2 SP más que la anterior (3, 5, 7…). Se va solo al «Finalizar combate».'},

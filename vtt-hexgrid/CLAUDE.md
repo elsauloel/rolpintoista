@@ -800,7 +800,7 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   js/16). En la iniciativa: `ordenPendientes` (lo de la próxima ronda), `ordenUsados` {ronda, ids} y `mufas` {portador: {de, esp, por}} (los conserva
   `guardarIniciativa`; Ordenar y Limpiar los vacían). Toque de carga = el efecto «Toque de carga» del duelo (js/13 → `ordenSubir`); Cambio de guardia =
   `cambioGuardiaMapa` → `cambio-guardia-habilidad` → dos clics (`cambioGuardiaDeHabilidad`) → pendiente; Sed de sangre = `dueloAplicarDano` (si quedó
-  en 0) → `ordenSedDeSangre`; la Mufa = el estado entra como siempre y `ordenMufaPoner` anota quién la echó y su Ef.Esp. Al empezar la ronda
+  en 0) → `ordenSedDeSangre`; la Mufa = el estado entra como siempre y `ordenMufaPoner` anota quién la echó y su Ef.Esp. Al empezar la ronda **(Desde el 2026-11-05 se llama «Mala sombra», la habilidad y el estado; dueño: «le echás un estado a un aliado, pero la sombra es lo que hace mal». Lo guardado como «Mufa» se sigue leyendo.)**
   (`iniciativaSiguiente`, js/04, antes de guardar la ronda nueva) `ordenInicioRonda`: los cambios de guardia, lo pendiente, Marcar el ritmo
   (`resumen.ritmo`; con varios aliados pegados, momento `ritmo-elegir` → `ritmoElegirMomento`: elige el dueño, o el GM por él a los 30 s) y la Mufa (Res.Mt contra Ef.Esp, en la Mesa); después le da el turno al primero que puede jugar. Aviso/Crónica con `ordenAvisar`.
 

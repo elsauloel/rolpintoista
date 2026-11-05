@@ -52,7 +52,7 @@ const ICONOS_ESTADO = {
   'desarmado': {ic: '🫳'},
   // 😮‍💨 Cansancio y cuerpo
   'cansado': {ic: '😮‍💨'}, 'exhausto': {ic: '😮‍💨'}, 'extenuado': {ic: '😮‍💨'}, 'debilitado': {ic: '😮‍💨'},
-  'lisiado': {ic: '🦵'}, 'rengo': {ic: '🦵'}, 'sentado': {ic: '🦵'}, 'tropezado': {ic: '🪢'}, 'desequilibrado': {ic: '🫨'}, 'mufa': {ic: '🐈‍⬛'}, 'toques de carga': {ic: '🎺'},
+  'lisiado': {ic: '🦵'}, 'rengo': {ic: '🦵'}, 'sentado': {ic: '🦵'}, 'tropezado': {ic: '🪢'}, 'desequilibrado': {ic: '🫨'}, 'mufa': {ic: '🌑'}, 'mala sombra': {ic: '🌑'}, 'toques de carga': {ic: '🎺'},
   'mordido': {ic: '🦷'}, 'mordiendo': {ic: '🦷'}, 'agarrando': {ic: '✊'},
   'mareo de invocacion': {ic: '😵'},
   // 💀 Maldiciones

@@ -56,12 +56,47 @@ function hexInfoDatos(celda){
   return HexInfo.armar({items, recordada});
 }
 
-function hexInfoHtml(d, celda){
+// Plegado/desplegado (2026-11-05, dueño): sale plegado — solo el título, un contador y ▸ — y se acuerda la elección (localStorage).
+let hexInfoAbierto = false;
+try { hexInfoAbierto = localStorage.getItem('hex-info-abierto') === '1'; } catch(_){}
+const hexInfoVacio = d => d.items.length === 1 && d.items[0].titulo === 'Nada la afecta';
+function hexInfoLista(d){
   const fila = x => `<li class="hi-${esc(x.clase || 'otro')}${x.oculto ? ' hi-oculto' : ''}"><span class="hi-ico">${esc(x.icono)}</span>` +
     `<span class="hi-txt"><b>${esc(x.titulo)}</b>${x.oculto ? ' <em>👁 los jugadores no lo ven</em>' : ''}${x.detalle ? `<small>${esc(x.detalle)}</small>` : ''}</span></li>`;
-  return `<div class="hi-cab"><b>⬡ ${esc(d.titulo)}</b><span class="hi-coord">${celda.col} · ${celda.fila}</span>` +
-    `<button type="button" class="hi-cerrar" title="Cerrar (Esc)" aria-label="Cerrar">✕</button></div><ul>${d.items.map(fila).join('')}</ul>`;
+  return `<ul>${d.items.map(fila).join('')}</ul>`;
 }
+function hexInfoHtml(d, celda){
+  const vacio = hexInfoVacio(d), n = d.items.length;
+  const extra = vacio ? '<span class="hi-cuenta">Nada la afecta</span>'
+    : `<span class="hi-cuenta">${n} cosa${n === 1 ? '' : 's'}</span><button type="button" class="hi-toggle" aria-expanded="${hexInfoAbierto}" ` +
+      `title="${hexInfoAbierto ? 'Plegar' : 'Ver la descripción'}" aria-label="${hexInfoAbierto ? 'Plegar' : 'Ver la descripción'}">${hexInfoAbierto ? '▾' : '▸'}</button>`;
+  return `<div class="hi-cab"><b>⬡ ${esc(d.titulo)}</b>${extra}<span class="hi-coord">${celda.col} · ${celda.fila}</span>` +
+    `<button type="button" class="hi-cerrar" title="Cerrar (Esc)" aria-label="Cerrar">✕</button></div>${!vacio && hexInfoAbierto ? hexInfoLista(d) : ''}`;
+}
+
+// El globo: pasando el mouse por la casilla marcada sale la descripción completa al lado del cursor.
+let hexInfoGloboFirma = '';
+function hexInfoGlobo(){
+  let g = $('#hex-info-globo');
+  if(!g){ g = document.createElement('div'); g.id = 'hex-info-globo'; g.hidden = true; (lienzo.parentElement || document.body).appendChild(g); }
+  return g;
+}
+function hexInfoGloboOcultar(){ const g = $('#hex-info-globo'); if(g) g.hidden = true; hexInfoGloboFirma = ''; }
+lienzo.addEventListener('pointermove', e => {
+  if(!hexInfoCelda || e.buttons){ hexInfoGloboOcultar(); return; }
+  const {px, py} = posEvento(e), w = pantallaAMundo(px, py), c = mundoAHex(w.x, w.y);
+  if(c.col !== hexInfoCelda.col || c.fila !== hexInfoCelda.fila){ hexInfoGloboOcultar(); return; }
+  const g = hexInfoGlobo(), d = hexInfoDatos(hexInfoCelda);
+  const html = `<b class="hi-gtit">⬡ ${esc(d.titulo)}</b>${hexInfoLista(d)}`;
+  if(html !== hexInfoGloboFirma){ g.innerHTML = html; hexInfoGloboFirma = html; }
+  g.hidden = false;
+  const pr = g.offsetParent ? g.offsetParent.getBoundingClientRect() : {left: 0, top: 0, width: innerWidth, height: innerHeight};
+  let x = e.clientX - pr.left + 16, y = e.clientY - pr.top + 16;
+  if(x + g.offsetWidth > pr.width - 8) x = Math.max(8, e.clientX - pr.left - g.offsetWidth - 16);
+  if(y + g.offsetHeight > pr.height - 8) y = Math.max(8, pr.height - g.offsetHeight - 8);
+  g.style.left = x + 'px'; g.style.top = y + 'px';
+});
+lienzo.addEventListener('pointerleave', hexInfoGloboOcultar);
 
 function hexInfoMostrar(celda){
   hexInfoCelda = celda;
@@ -75,6 +110,7 @@ function hexInfoCerrar(){
   hexInfoFirma = '';
   const caja = $('#hex-info');
   if(caja) caja.hidden = true;
+  hexInfoGloboOcultar();
   dibujar();
 }
 // Lo vuelve a armar (cada medio segundo mientras está abierto: una zona que aparece o se va, un estandarte que llega) y lo ubica debajo de los
@@ -123,7 +159,15 @@ lienzo.addEventListener('pointerup', e => {
 document.addEventListener('pointerdown', e => {
   if(!hexInfoCelda) return;
   const caja = $('#hex-info');
-  if(caja && caja.contains(e.target)){ if(e.target.closest('.hi-cerrar')) hexInfoCerrar(); return; }
+  if(caja && caja.contains(e.target)){
+    if(e.target.closest('.hi-cerrar')) hexInfoCerrar();
+    else if(e.target.closest('.hi-toggle')){
+      hexInfoAbierto = !hexInfoAbierto;
+      try { localStorage.setItem('hex-info-abierto', hexInfoAbierto ? '1' : '0'); } catch(_){}
+      hexInfoFirma = ''; hexInfoRefrescar();
+    }
+    return;
+  }
   if(e.target !== lienzo) hexInfoCerrar();
 }, true);
 document.addEventListener('keydown', e => { if(e.key === 'Escape' && hexInfoCelda) hexInfoCerrar(); });

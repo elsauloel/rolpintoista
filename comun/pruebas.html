@@ -70,7 +70,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-habilidades.js?v=20261105orden"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
-<script src="ficha-resumen.js?v=20261105orden"></script>
+<script src="ficha-resumen.js?v=20261105batalla"></script>
 <script src="ficha-sesion.js"></script>
 <script src="inv-calculo.js"></script>
 <script src="inv-botonera.js"></script>
@@ -6683,6 +6683,13 @@ prueba('🔄 Cambio de guardia y 🎺 el costo del Toque de carga (2026-11-05): 
   S.efectos.push({nombre: 'Toques de carga', apila: true, stacks: 2, permanente: true, activo: true});
   igual([r.st.orden.join(''), r.usados.sort().join(''), otra.cambio, OrdenTurnos.costoToque(0), OrdenTurnos.costoToque(2), c0, FichaHabilidades.costoSpDe(S, h)],
     ['dbca', 'ad', null, 3, 7, 3, 7]);
+});
+prueba('⚔ Sed de batalla (2026-11-05): la pasiva está en el pool, para jugadores y creeps, y suma su stat (recupera 2 No2 al voltear a un rival)', () => {
+  const p = (typeof PASIVAS_BASE !== 'undefined' ? PASIVAS_BASE : []).find(x => x.nombre === 'Sed de batalla') || {};
+  const S = {pasivas: [{...p, id: 'p1'}]};
+  igual([p.jobCosto, (p.mods || [])[0] && p.mods[0].stat, (p.mods || [])[0] && p.mods[0].val, /No2/.test(p.detalle || ''),
+    typeof FichaCalculo !== 'undefined' && FichaCalculo.STATS ? !!FichaCalculo.STATS.find(x => x.id === 'sedbatalla') : true],
+    [1, 'sedbatalla', 2, true, true]);
 });
 prueba('🥁🩸🌑 Las pasivas y la Mala sombra (2026-11-05, ex Mufa): Marcar el ritmo y Sed de sangre suman su stat; la Mala sombra a un aliado entra sin tirar', () => {
   const P = n => PASIVAS_BASE.find(x => x.nombre === n);

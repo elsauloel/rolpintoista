@@ -154,10 +154,28 @@ async function ordenSedDeSangre(d){
   const atk = d.atacante && d.atacante.tokenId, def = d.defensor && d.defensor.tokenId;
   const ta = atk ? tokens.get(atk) : null, td = def ? tokens.get(def) : null;
   if(!ta || !td || !dueloEsRival(ta, td)) return;
+  sedDeBatalla(atk, ta, def).catch(err => console.error('Sed de batalla:', err));
   const n = ordenPasiva(ta, 'sedSangre', 'sedsangre');
   if(!(n > 0)) return;
   const r = await ordenPedir({tipo: 'sube', id: atk, n, por: 'Sed de sangre', motivo: `voltear a ${ordenNombre(def)}`});
   if(r && r.nota) mesaLinea(`🩸 Sed de sangre: ${ordenNombre(atk)} — ${r.nota}`, 'recordatorio');
+}
+
+// ---------- ⚔ Sed de batalla (pasiva, 2026-11-05): el rival cae por tu golpe → recuperás N No2, sin pasar del máximo ----------
+async function sedDeBatalla(atk, ta, def){
+  const n = ordenPasiva(ta, 'sedBatalla', 'sedbatalla');
+  if(!(n > 0)) return;
+  let antes = 0, despues = 0, hecho = false;
+  if(ta.tipo === 'creep' && typeof acCambiarCreep === 'function')
+    hecho = !!(await acCambiarCreep(ta.fichaId, c => { const max = CreepCalculo.nitrosMax(c); antes = num(c.nitros); c.nitros = Math.max(antes, Math.min(max, antes + n)); despues = c.nitros; return {ok: true}; }));
+  else if(typeof editarPersonajeMapa === 'function' && !String(ta.fichaId || '').includes(SEP_INVOCACION)){
+    const f = fichasPub.get(ta.fichaId), max = f && f.resumen && f.resumen.nitrosMax !== undefined ? num(f.resumen.nitrosMax) : Infinity;
+    hecho = !!(await editarPersonajeMapa(String(ta.fichaId), S => { antes = num(S.nitros); S.nitros = Math.max(antes, Math.min(max, antes + n)); despues = S.nitros; return true; }));
+  }
+  if(!hecho) return;
+  const txt = despues > antes ? `⚔ Sed de batalla: ${ordenNombre(atk)} volteó a ${ordenNombre(def)} y recupera ${fmt(despues - antes)} No2` : `⚔ Sed de batalla: ${ordenNombre(atk)} volteó a ${ordenNombre(def)}, pero ya tenía los No2 al máximo`;
+  toast(txt);
+  try{ mesaLinea(txt, 'recordatorio'); }catch(err){}
 }
 
 /* ---------- al empezar la ronda (js/04 iniciativaSiguiente, la pantalla del GM, antes de guardar la ronda nueva) ----------

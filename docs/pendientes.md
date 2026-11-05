@@ -102,6 +102,12 @@
 >   habilidades de clase posibles y también los skills del pool de creeps»).** Ya tienen: Transfusión, las ondas (Shockwave, Pisotón, Nova, Sonic Boom,
 >   Remolino/Barrido/Coletazo con la espadita, Grito), Escudo humano, el gancho de Arrastrar, el «−2 EVA», el pulso del duelo. Primero una lista de
 >   ideas por habilidad (de clase y del pool de creeps), para elegir con el dueño; se programan de a tandas. Ver también «✨ Animaciones» (2026-10-10).
+> - [ ] **⚔ Contraataque: reglas nuevas (2026-11-05, dueño; programar cuando terminen las tareas en curso).** (1) El **primer ataque del turno**
+>   cuesta la mitad de No2 y **los contraataques y ataques de oportunidad no cuentan**: son un contador aparte (hacer oportunidades en la ronda no le quita
+>   a tu turno su primer ataque a mitad de precio) — verificar que hoy funcione así. (2) **Se saca el contraataque libre** que hoy se habilita siempre
+>   después de un Bloqueo exitoso. (3) **La habilidad Contraataque** (clase y creep): **+2 a la PdG** y permite contraatacar **sin ganar el Bloqueo**,
+>   antes (al ganar la Evasión o el Parry). (4) **Una pasiva nueva** (nombre a definir) que habilita el contraataque **solo si ganás el Parry y el
+>   Bloqueo**, sin bonus. Vale para personajes, invocaciones y creeps.
 > - [x] (2026-11-05: hecho — `vtt-hexgrid/js/101-creeps-mapas-sync.js`, `gmReconciliarMapas` en GM Tools, reglas en `comun/creeps-mapas.js`; probado en «Claude · pruebas») **🔗 Tokens de creeps ↔ su mapa en GM Tools (2026-11-05, dueño: «los tokens y la ficha de los creeps de GM Tools deben estar vinculados…
 >   si se mueve una cosa de una a otra, debe suceder de manera pareja; la mayor parte del juego va a suceder a través del mapa»).** En espera de que
 >   termine la tarea del gancho de la compu (para no pisarse). Hoy GM Tools → mapa anda (Mover a…, Poner sus tokens); mapa → GM Tools no: crear un token

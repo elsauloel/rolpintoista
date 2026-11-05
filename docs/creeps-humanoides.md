@@ -663,6 +663,11 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   cazador (el arco, de Buena); nv4 Cebo + **Puntería**; nv5 Abanico. **Nivel 1 aprobado**: Des 10 · Con 8 · Agi 7 · Fue 6 · Esp 2 → vida 40, 7 No2,
   turnos de espera; **Arco del rastreador** (Común, Tipo 4, Rango +3, 1d4 + 1 amplificado) · **Chaleco de cuero** (Def +2) · **Sandalias de baqueano**
   (Pisada atenta, Res.CC +1). Consumible: **Trampa de oso**. Sin programar.
+- **H4 · Bruto que aguanta · Híbrido** (2026-11-05, dueño: «tanto la ruta como el nivel 1 me copan»): se la banca y devuelve; busca que le peguen.
+  Ruta: nv1 **Aguante** (lenta) · **Contraataque** (Flash); nv2 Golpe desesperado + **Robustez**; nv3 Piel de hierro (el arma, de Buena); nv4 Furia +
+  **Mañas de sobreviviente**; nv5 Golpe brutal. **Nivel 1 aprobado**: Con 10 · Fue 9 · Des 6 · Agi 6 · Esp 2 → vida 50, 6 No2, turnos de espera;
+  **Hachuela de camping** (Común, Tipo 8, Parry +1, Bloqueo +1) · **Pechera de hierro** (Def +4) · **Botas de cuero de vaca** (Def +1, Res. crít.
+  T4 +1): Def 5. Consumible: **Sales aromáticas**. Sin programar. Su Contraataque sigue las reglas nuevas (ver docs/pendientes.md, «⚔ Contraataque»).
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 

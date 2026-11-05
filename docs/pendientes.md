@@ -37,8 +37,8 @@
 
 > **📋 Cola de trabajo (2026-11-05, dueño: «cuando se termine lo que se está programando y lo que está en cola… agregar esta añadidura a la
 > cola»)**, en este orden: 1) la segunda tanda de pruebas del mapa (en curso); 2) 🚩 estandartes (globito, carnet, áreas como estados); 3) ⬡ la
-> información del hexágono; 4) ~~⚔ las reglas nuevas del Contraataque~~ ✅; 5) ~~🦘 el área de caída del Salto (ver el punto 8)~~ ✅; 6) **cargar
-> los creeps esenciales diseñados y sin cargar**: L6 Patotero, T4 Peleador de control, W4 Verdugo, R4 Hunter, H4 Bruto que aguanta, L7 Degollador, L8
+> información del hexágono; 4) ~~⚔ las reglas nuevas del Contraataque~~ ✅; 5) ~~🦘 el área de caída del Salto (ver el punto 8)~~ ✅; 6) ✅ (2026-11-05: los 36 en el pool, Patotear/Jauría con +1 PdG y sin tope) ~~**cargar
+> los creeps esenciales diseñados y sin cargar**~~: L6 Patotero, T4 Peleador de control, W4 Verdugo, R4 Hunter, H4 Bruto que aguanta, L7 Degollador, L8
 > Acróbata (nivel 1, `comun/creeps-esenciales.js`), con el cambio de Patotear y Jauría (+1 PdG con un aliado pegado, +1 dado por aliado sin tope).
 > **Sumados a la cola (dueño, 2026-11-05)**: 7) ✅ (hecho 2026-11-05) **🌑 Renombrar «Echar la mufa» / «Mufa»** a **«Mala sombra»** (habilidad y estado; dueño: «algo de la
 > sombra… uno le puede echar la mufa a un aliado y eso no suena bien: le echás un estado a un aliado, pero la sombra es lo que hace mal»). 8) ✅ (hecho 2026-11-05, `vtt-hexgrid/js/105-salto-casilla.js`) **El

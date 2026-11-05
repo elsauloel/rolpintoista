@@ -1059,7 +1059,7 @@ function dueloElegirObjetivoMapa(msg){
         try{ r = await desesperadoBonos(mio, ataqueCarga || ataque, yo); }catch(err){ console.error('No se pudo ver la vida propia:', err); r = ataqueCarga || ataque; }
         ataqueCarga = r || ataqueCarga;
       }
-      if(ataque && ataque.manada && mio && typeof patotaBonos === 'function'){   // 👊 Patotear / Jauría (js/65): +1 dado por aliado pegado al objetivo
+      if(ataque && ataque.manada && mio && typeof patotaBonos === 'function'){   // 👊 Patotear / Jauría (js/65): +1 PdG y +1 dado por aliado pegado al objetivo (sin tope)
         let r = null;
         try{ r = await patotaBonos(mio, t, ataqueCarga || ataque, yo); }catch(err){ console.error('No se pudo contar la patota:', err); r = ataqueCarga || ataque; }
         if(!r){ pedir(); return; }

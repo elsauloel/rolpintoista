@@ -1,9 +1,9 @@
 /* ---------- 👊 Patotear / 🐺 Jauría (2026-10-21, dueño; choque liviano, «manada») ----------
    Un ataque «con tu arma» con `manada` (Combatiente.ataqueConArreglos → `ataque.manada` = el tope). Al elegir el objetivo (dueloElegirObjetivoMapa,
-   js/13, después de la herida): +1 dado del Tipo de su arma por cada aliado suyo pegado al objetivo, hasta +3. Aliado = del mismo bando que quien
+   js/13, después de la herida): +1 dado del Tipo de su arma por cada aliado suyo pegado al objetivo, sin tope, y +1 PdG si hay al menos uno (dueño,
+   2026-11-05: «+1 a la probabilidad de golpe fijo si hay al menos un aliado pegado, y +1 al daño, pero sin tope»; antes, hasta +3 dados y sin PdG). Aliado = del mismo bando que quien
    ataca (creep con creep; personaje o invocación con personaje), con ficha, en el mapa, ni caído ni bajo tierra; quien ataca no se cuenta. Sin
    aliados al lado, avisa y deja atacar igual, como un ataque común. */
-const PATOTA_TOPE = 3;
 // Los aliados de quien ataca pegados al objetivo → [token].
 function patotaAliados(mio, t){
   const out = [];
@@ -26,10 +26,10 @@ async function patotaBonos(mio, t, ataque, yo){
       {icono: '👊', titulo: 'Solo, sin la patota', si: 'Atacar igual', no: 'Elegir otro'});
     return si ? ataque : null;
   }
-  const extra = Math.min(Math.max(1, Math.round(num(ataque.manada)) || PATOTA_TOPE), al.length);
+  const extra = al.length;   // sin tope (2026-11-05)
   const a = structuredClone(ataque);
-  a.mods = {...(a.mods || {}), dados: Math.max(0, Math.round(num(a.mods && a.mods.dados))) + extra};
-  const txt = `${hab} de ${nom}: ${al.length} aliado${al.length === 1 ? '' : 's'} rodea${al.length === 1 ? '' : 'n'} a ${quien} (${al.map(x => x.oculto ? 'alguien' : nombreDe(x)).join(', ')}) → +${extra} dado${extra === 1 ? '' : 's'} de su arma`;
+  a.mods = {...(a.mods || {}), dados: Math.max(0, Math.round(num(a.mods && a.mods.dados))) + extra, pdg: num(a.mods && a.mods.pdg) + 1};
+  const txt = `${hab} de ${nom}: ${al.length} aliado${al.length === 1 ? '' : 's'} rodea${al.length === 1 ? '' : 'n'} a ${quien} (${al.map(x => x.oculto ? 'alguien' : nombreDe(x)).join(', ')}) → +1 PdG y +${extra} dado${extra === 1 ? '' : 's'} de su arma`;
   try{ mesaLinea(`👊 ${txt}`, 'recordatorio'); }catch(err){}
   try{ momentoAbrir({tipo: 'patota', icono: '👊', titulo: txt, estado: 'listo', datos: {chico: true}}); }catch(err){}
   return a;

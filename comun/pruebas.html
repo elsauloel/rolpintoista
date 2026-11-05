@@ -47,7 +47,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261105contra"></script>
+<script src="combatiente.js?v=20261105pat"></script>
 <script src="creep-calculo.js?v=20261103t20"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261105contra"></script>
@@ -122,8 +122,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="skills-clase.js?v=20261105sombra"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261104ig"></script>
-<script src="skills-creep-base.js?v=20261105contra"></script>
-<script src="creeps-esenciales.js?v=20261103t21"></script>
+<script src="skills-creep-base.js?v=20261105pat"></script>
+<script src="creeps-esenciales.js?v=20261105t7"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
@@ -6729,8 +6729,17 @@ prueba('⭐ El pool esencial (2026-11-03): los 24 de nivel 1 (7 + la tanda del m
     d('Escudero').equipo.map(i => i.nombre).join(), d('Escudero').cinturon.map(i => i.nombre).join(), d('Hachero').fue, d('Hachero').agl,
     d('Piromante').habilidades.map(h => h.nombre + ':' + h.cd).join(), d('Escudero').habilidades[1].efectoMods.find(m => m.stat === 'def').val,
     CREEPS_BASE.filter(c => c.pool !== 'esencial').length > 100],
-    [0, 29, true, 'Hacha de piedra,Escudo de caparazón de tortuga gigante,Peto de hierro,Cofia de anillas sueltas', 'Poción de Cuero Duro,Poción de Piel de Cristal', 9, 6,
+    [0, 36, true, 'Hacha de piedra,Escudo de caparazón de tortuga gigante,Peto de hierro,Cofia de anillas sueltas', 'Poción de Cuero Duro,Poción de Piel de Cristal', 9, 6,
       'Lengua de fuego:4,Muro de fuego:3', 4, true]);
+});
+prueba('⭐ Pool esencial, la tanda del 2026-11-05: los 7 nuevos de nivel 1 (L6, T4, W4, R4, H4, L7, L8) se arman completos y con turnos de espera; Patotear +1 PdG y sin tope', () => {
+  const es = CREEPS_BASE.filter(c => c.pool === 'esencial');
+  const nuevos = ['Patotero', 'Peleador de control', 'Verdugo', 'Hunter', 'Bruto que aguanta', 'Degollador', 'Acróbata'].map(n => es.find(c => c.nombre === n));
+  const pat = (armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Patotear').datos, 1) || {}).detalle || '';
+  igual([nuevos.every(Boolean), nuevos.every(c => c.datos.equipo.length === 3 && c.datos.habilidades.length === 2 && c.datos.cinturon.length === 1),
+    nuevos.some(c => CreepCalculo.modoSP(c.datos)), nuevos.find(c => c.nombre === 'Verdugo').datos.habilidades.map(h => h.nombre).join(),
+    /Probabilidad de Golpe/.test(pat) && /sin tope/.test(pat) && !/hasta \+3/.test(pat)],
+    [true, true, false, 'El que avisa no traiciona,Golpe fuerte', true]);
 });
 prueba('💧 Pool esencial (2026-11-03): los de Especial como atributo principal arrancan en modo SP; los demás, con turnos de espera', () => {
   const es = CREEPS_BASE.filter(c => c.pool === 'esencial');
@@ -6747,7 +6756,7 @@ prueba('⭐ Pool esencial, la tanda del 2026-11-03: atributos, equipo, habilidad
     eq('Berserker'), d('Berserker').equipo.every(i => i.equipado !== false), hb('Berserker'), cin('Berserker'),
     d('Muralla con púas').hp, d('Muralla con púas').agl, hb('Protector'), eq('Saltador'), hb('Control mental y ceguera'), d('Hostigador a distancia').agl, d('Hostigador a distancia').des,
     hb('Abanderado'), CreepCalculo.modoSP(d('Abanderado')), cin('Ladrón de fuerzas')],
-    ['D1,D2,D3,D4,H1,H2,H3,L1,L2,L3,L4,L5,M1,M2,M3,M4,R1,R2,R3,S1,S2,S3,S4,T1,T2,T3,W1,W2,W3',
+    ['D1,D2,D3,D4,H1,H2,H3,H4,L1,L2,L3,L4,L5,L6,L7,L8,M1,M2,M3,M4,R1,R2,R3,R4,S1,S2,S3,S4,T1,T2,T3,T4,W1,W2,W3,W4',
       'Sable del tahúr,Facón de paisano,Chaleco de cuero,Botas de cuero de vaca', true, 'Golpe desesperado,Furia', 'Poción de Regeneración menor',
       60, 5, 'Potencia,Arrojo', 'Hacha de vikingo,Rodela tachonada,Chaleco de cuero,Botas de cuero de vaca', 'Punzada mental,Cegar', 9, 10,
       'Potencia,¡A la carga!', false, 'Gas adormecedor']);

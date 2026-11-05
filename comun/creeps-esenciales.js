@@ -196,6 +196,36 @@
     habilidades: ['Estocada', 'Desarmar'], consumibles: ['Pergamino grupal de Reflejo de Acero'],
     estrategia: 'Híbrido. Te desarma cuando gana el Parry, te rompe la armadura y te remata: un muro que castiga al que se le acerca.'});
 
+  // ---- La tanda del 2026-11-05 (nivel 1 aprobado por el dueño; detalle en docs/creeps-humanoides.md). Atrib: Con · Fue · Agi · Des · Esp.
+  esencial({linea: 'L6', nombre: 'Patotero', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [8, 6, 8, 9, 2],   // (dueño: «vamos a definir el nivel 1»; el Jubón en vez del chaleco)
+    equipo: ['Navaja del compadrito', 'Jubón de cuero curtido', 'Calzas de cuero flexible'],
+    habilidades: ['Finta', 'Patotear'], consumibles: ['Pergamino grupal de Puntería Certera'],
+    estrategia: 'Choque liviano. Pelea en patota: cuantos más de los suyos rodean al rival, más le pega.'});
+  esencial({linea: 'T4', nombre: 'Peleador de control', rol: 'tanque', rolTxt: 'tanque', nivel: 1, atrib: [9, 7, 7, 6, 4],   // (dueño: «lo probamos así»)
+    equipo: ['Mazo de carnicero', 'Peto de hierro', 'Botas de cuero de vaca'],
+    habilidades: ['Takle', 'Pisotón'], consumibles: ['Grasa de carpincho'],
+    estrategia: 'Tanque. Empuja, tira y demora: no aguanta como el Escudero, desordena al grupo rival y le corta los turnos.'});
+  esencial({linea: 'W4', nombre: 'Verdugo', rol: 'warrior', rolTxt: 'melee', nivel: 1, atrib: [8, 10, 6, 7, 2],   // (dueño: «vamos con avisa y golpe fuerte»)
+    equipo: ['Hacha de verdugo de pueblo', 'Peto de hierro', 'Casco de cuero endurecido'],
+    habilidades: ['El que avisa no traiciona', 'Golpe fuerte'], consumibles: ['Poción de Puntería Certera'],
+    estrategia: 'Warrior. Anuncia a quién va a ejecutar y descarga un golpe enorme que no se para; elige a su víctima y la termina.'});
+  esencial({linea: 'R4', nombre: 'Hunter', rol: 'rango', rolTxt: 'rango', nivel: 1, atrib: [8, 6, 7, 10, 2],   // (dueño: «me cierra la ruta y el nivel 1»)
+    equipo: ['Arco del rastreador', 'Chaleco de cuero', 'Sandalias de baqueano'],
+    habilidades: ['Disparo señalador', 'Cepo del cazador'], consumibles: ['Trampa de oso'],
+    estrategia: 'Rango. Prepara el terreno: pone trampas donde va a pasar el rival, marca a la presa y deja que el grupo la cace.'});
+  esencial({linea: 'H4', nombre: 'Bruto que aguanta', rol: 'hibrido', rolTxt: 'melee', nivel: 1, atrib: [10, 9, 6, 6, 2],   // (dueño: «me copan»)
+    equipo: ['Hachuela de camping', 'Pechera de hierro', 'Botas de cuero de vaca'],
+    habilidades: ['Aguante', 'Contraataque'], consumibles: ['Sales aromáticas'],
+    estrategia: 'Híbrido. Se la banca y devuelve: busca que le peguen, contesta cada vez que para un golpe y descarga lo que juntó.'});
+  esencial({linea: 'L7', nombre: 'Degollador', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [7, 5, 9, 10, 2],   // (dueño: «me cierra la ruta y el nivel 1»)
+    equipo: ['Facón de paisano', 'Chaleco de cuero', 'Calzas de cuero flexible'],
+    habilidades: ['Golpe que sangra', 'Remate'], consumibles: ['Aceite del punto débil'],
+    estrategia: 'Choque liviano. Abre la herida y la termina: va siempre por el más golpeado.'});
+  esencial({linea: 'L8', nombre: 'Acróbata', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [7, 5, 10, 9, 2],   // (dueño: «me cierra la ruta y el nivel 1»)
+    equipo: ['Sable del tahúr', 'Chaleco de cuero', 'Escarpines de fieltro'],
+    habilidades: ['Salto', 'Tajo veloz'], consumibles: ['Mate cebado'],
+    estrategia: 'Choque liviano. Se mueve y corta: salta encima de los de atrás, pega y se va; nunca se queda quieto.'});
+
   if(faltan.length) console.warn('Creeps esenciales: no se encontró', faltan.join(', '));
   window.CREEPS_ESENCIALES_FALTAN = faltan;
 })();

@@ -280,11 +280,13 @@
   [['Sal en la herida', 'hd', 'Va directo a donde duele'], ['Morder la herida', 'b', 'Huele la sangre y muerde ahí']].forEach(([nombre, razas, como]) =>
     H(nombre, 'DX', razas, 'me', 3, aA(`${como}: un ataque con su arma. Si el objetivo no sangra, si pega lo hace sangrar (Sangrado: 2 de daño por turno durante 2 turnos; con un golpe crítico, queda permanente). Si ya sangra, suma +2 dados del Tipo de su arma y, si pega, el sangrado sube (+1 al daño por turno).`,
       {}, 'va al duelo como un ataque (+2 dados si el objetivo ya sangra); si pega, Sangrado (o le sube el que tenía)', 2, SG, {abrirHerida: true})));
-  // 👊 Auditada (dueño, 2026-10-21; choque liviano, «manada»): +1 dado del Tipo de su arma por cada aliado suyo pegado al objetivo, hasta +3. Lo de un
+  // 👊 Auditada (dueño, 2026-10-21; choque liviano, «manada»): +1 dado del Tipo de su arma por cada aliado suyo pegado al objetivo. Lo de un
   // ataque y 2 SP, o cooldown 3. Los aliados los cuenta el mapa al elegir el objetivo (js/65).
+  // ✔ Auditada de nuevo (dueño, 2026-11-05: «+1 a la probabilidad de golpe fijo si hay al menos un aliado pegado, y +1 al daño, pero sin tope»):
+  // +1 PdG con al menos un aliado pegado y +1 dado por aliado, sin el tope de +3.
   [['Patotear', 'hd', 'Todos contra uno'], ['Jauría', 'b', 'Cazan en jauría']].forEach(([nombre, razas, como]) =>
-    H(nombre, 'D', razas, 'me', 3, aA(`${como}: un ataque con su arma que suma +1 dado del Tipo de su arma por cada aliado suyo que también esté pegado al objetivo (hasta +3). Él no se cuenta; tampoco un aliado caído o bajo tierra. Sin aliados al lado, va como un ataque común.`,
-      {}, 'va al duelo como un ataque: +1 dado por cada aliado pegado al objetivo (hasta +3)', 2, [], {manada: 3})));
+    H(nombre, 'D', razas, 'me', 3, aA(`${como}: un ataque con su arma que, si al menos un aliado suyo también está pegado al objetivo, suma +1 a la Probabilidad de Golpe y +1 dado del Tipo de su arma por cada aliado pegado (sin tope). Él no se cuenta; tampoco un aliado caído o bajo tierra. Sin aliados al lado, va como un ataque común. ⚙ Automatizado: el mapa cuenta los aliados al elegir el objetivo.`,
+      {}, 'va al duelo como un ataque: +1 PdG si hay al menos un aliado pegado al objetivo y +1 dado por cada uno (sin tope)', 2, [], {manada: 3})));
   H('Desgarro', 'DX', 'b', 'me', 3, aA('Arranca un pedazo de carne: un ataque con su arma con +2 al daño; si pega, deja Sangrado (2 de daño por turno durante 2 turnos; se acumula y, con un golpe crítico, queda permanente).',
     {fijo: 2}, 'va al duelo como un ataque con +2 al daño; si pega, Sangrado', 2, SG));
   H('Zarpa certera', 'DX', 'b', 'me', 3, aA('Un zarpazo directo a la yugular: un ataque con su arma con Crítico frecuente +1; si pega, deja Sangrado (2 de daño por turno durante 2 turnos; se acumula y, con un golpe crítico, queda permanente).',

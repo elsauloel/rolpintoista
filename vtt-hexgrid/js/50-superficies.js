@@ -120,31 +120,83 @@ function aguaEsquina(x, y){
   const a = superficieAzar(kx, ky, 50) * Math.PI * 2, d = HEX * 0.17 * superficieAzar(kx, ky, 51);
   return [x + Math.cos(a) * d, y + Math.sin(a) * d];
 }
-function aguaLado(l, amp, adentro, fase, primero){
-  const A = aguaEsquina(l.a[0], l.a[1]), B = aguaEsquina(l.b[0], l.b[1]);
-  const dx = B[0] - A[0], dy = B[1] - A[1], largo = Math.hypot(dx, dy) || 1;
-  const mx = (l.a[0] + l.b[0]) / 2, my = (l.a[1] + l.b[1]) / 2;
-  let nx = -dy / largo, ny = dx / largo;   // la normal, hacia afuera de la casilla
-  if((mx - l.c.x) * nx + (my - l.c.y) * ny < 0){ nx = -nx; ny = -ny; }
-  const kx = Math.round(mx * 2), ky = Math.round(my * 2), u = superficieAzar(kx, ky, 60), w = superficieAzar(kx, ky, 61), f = superficieAzar(kx, ky, 62);
-  const panza = HEX * (-0.08 + 0.36 * u * u), desparejo = HEX * 0.11 * (w - 0.5) * 2;   // la forma fija de este lado
-  const pasos = 16;
-  for(let s = primero ? 0 : 1; s <= pasos; s++){
-    const t = s / pasos, env = Math.sin(Math.PI * t);
-    const fija = panza * env + desparejo * Math.sin(Math.PI * 2 * t + f * 6.28) * env;
-    const off = fija + env * (amp * Math.sin(Math.PI * 2 * 1.5 * t - fase)) - adentro * (0.35 + 0.65 * env);
-    const x = A[0] + dx * t + nx * off, y = A[1] + dy * t + ny * off;
-    if(primero && !s) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-  }
+/* 🌊 La mancha redondeada (2026-11-05, dueño: «sigue manteniendo muchísimo la línea hexagonal… que los bordes generales de la mancha sean más
+   redondeados; no importa si se salen un poco, la superficie de efecto se marca con las líneas punteadas»). En vez de ondular cada lado del hexágono,
+   el contorno de afuera (con sus esquinas corridas al azar y una panza en cada lado) se vuelve a muestrear cada ~⅓ de casilla y se suaviza muchas
+   veces (promedia cada punto con sus vecinos) y se devuelve un poco hacia afuera, así desaparecen los dientes del hexágono y queda una mancha de orilla
+   redonda. Esa forma es fija (se guarda por charco); lo que corre es la onda, a lo largo de la orilla, con un número entero de ondas por vuelta. */
+const aguaFormas = new Map();
+function aguaForma(celdas){
+  const clave = celdas.map(c => c.col + ',' + c.fila).sort().join(';');
+  const ya = aguaFormas.get(clave);
+  if(ya) return ya;
+  const lazos = aguaContornos(celdas).map(lazo => {
+    const crudo = [];
+    lazo.forEach(l => {
+      const A = aguaEsquina(l.a[0], l.a[1]), mx = (l.a[0] + l.b[0]) / 2, my = (l.a[1] + l.b[1]) / 2;
+      let nx = -(l.b[1] - l.a[1]), ny = l.b[0] - l.a[0]; const n = Math.hypot(nx, ny) || 1; nx /= n; ny /= n;
+      if((mx - l.c.x) * nx + (my - l.c.y) * ny < 0){ nx = -nx; ny = -ny; }
+      const kx = Math.round(mx * 2), ky = Math.round(my * 2), panza = HEX * (0.05 + 0.3 * superficieAzar(kx, ky, 60));
+      crudo.push(A, [mx + nx * panza, my + ny * panza]);
+    });
+    // Remuestreo parejo (cada ~⅓ de casilla).
+    const paso = HEX * 0.33, pts = [];
+    for(let k = 0; k < crudo.length; k++){
+      const a = crudo[k], b = crudo[(k + 1) % crudo.length], d = Math.hypot(b[0] - a[0], b[1] - a[1]), m = Math.max(1, Math.round(d / paso));
+      for(let q = 0; q < m; q++) pts.push([a[0] + (b[0] - a[0]) * q / m, a[1] + (b[1] - a[1]) * q / m]);
+    }
+    // Suavizado: cada punto, hacia el promedio de sus vecinos, muchas veces.
+    const N = pts.length;
+    const area = q => q.reduce((a, p, k) => { const b = q[(k + 1) % q.length]; return a + p[0] * b[1] - b[0] * p[1]; }, 0) / 2;
+    const area0 = area(pts);
+    if(N >= 6) for(let it = 0; it < 36; it++) [0.5].forEach(f => {
+      const ant = pts.map(p => p.slice());
+      for(let k = 0; k < N; k++){
+        const a = ant[(k - 1 + N) % N], b = ant[(k + 1) % N], p = ant[k];
+        pts[k] = [p[0] + f * ((a[0] + b[0]) / 2 - p[0]), p[1] + f * ((a[1] + b[1]) / 2 - p[1])];
+      }
+    });
+    // Que no se achique: se agranda (desde su centro) hasta tener la misma superficie que antes de suavizar (un charco de una casilla, si no, quedaba chiquito).
+    const area1 = area(pts);
+    if(N >= 6 && area1 && area0 / area1 > 0){
+      const f = Math.sqrt(area0 / area1), cx = pts.reduce((a, p) => a + p[0], 0) / N, cy = pts.reduce((a, p) => a + p[1], 0) / N;
+      pts.forEach(p => { p[0] = cx + (p[0] - cx) * f; p[1] = cy + (p[1] - cy) * f; });
+    }
+    // La normal hacia afuera del agua: los lados de afuera se recorren siempre con el agua del mismo lado (aguaContornos), así que basta mirar uno.
+    const l0 = lazo[0], tx = l0.b[0] - l0.a[0], ty = l0.b[1] - l0.a[1], m0x = (l0.a[0] + l0.b[0]) / 2 - l0.c.x, m0y = (l0.a[1] + l0.b[1]) / 2 - l0.c.y;
+    const signo = (-ty * m0x + tx * m0y) >= 0 ? 1 : -1;
+    const nor = pts.map((p, k) => {
+      const a = pts[(k - 1 + N) % N], b = pts[(k + 1) % N]; let x = -(b[1] - a[1]) * signo, y = (b[0] - a[0]) * signo; const n = Math.hypot(x, y) || 1;
+      return [x / n, y / n];
+    });
+    // El suavizado achica un poco las puntas: se devuelve hacia afuera (que se salga un poco no importa: lo exacto es la línea punteada).
+    pts.forEach((p, k) => { p[0] += nor[k][0] * HEX * 0.1; p[1] += nor[k][1] * HEX * 0.1; });
+    let largo = 0; const s = pts.map((p, k) => { const v = largo; const b = pts[(k + 1) % N]; largo += Math.hypot(b[0] - p[0], b[1] - p[1]); return v; });
+    return {pts, nor, s, largo, ondas: Math.max(3, Math.round(largo / (HEX * 1.3)))};
+  });
+  if(aguaFormas.size > 60) aguaFormas.clear();
+  const forma = {lazos};
+  aguaFormas.set(clave, forma);
+  return forma;
 }
-function aguaTrazar(lazos, amp, adentro, fase){
+// La orilla (o una onda de adentro, corrida `adentro` hacia el agua), con la onda que corre en fase `fase`.
+function aguaTrazar(forma, amp, adentro, fase){
   ctx.beginPath();
-  lazos.forEach(lazo => { lazo.forEach((l, i) => aguaLado(l, amp, adentro, fase, i === 0)); ctx.closePath(); });
+  forma.lazos.forEach(L => {
+    const N = L.pts.length;
+    for(let k = 0; k <= N; k++){
+      const i = k % N, p = L.pts[i], n = L.nor[i], u = L.s[i] / L.largo;
+      const off = amp * Math.sin(Math.PI * 2 * L.ondas * u - fase) + amp * 0.45 * Math.sin(Math.PI * 2 * (L.ondas + 2) * u + fase * 0.7) - adentro;
+      const x = p[0] + n[0] * off, y = p[1] + n[1] * off;
+      if(!k) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+  });
 }
 function aguaDibujar(celdas, z){
-  const lazos = aguaContornos(celdas), t = performance.now() / 1000, amp = HEX * 0.07;
+  const lazos = aguaForma(celdas), t = performance.now() / 1000, amp = HEX * 0.06;
   aguaTrazar(lazos, amp, 0, t * 1.6);
-  ctx.fillStyle = 'rgba(52,118,178,.5)'; ctx.fill();
+  ctx.fillStyle = 'rgba(52,118,178,.58)'; ctx.fill();
   ctx.save();
   ctx.clip();
   // Brillos sueltos que se mecen.

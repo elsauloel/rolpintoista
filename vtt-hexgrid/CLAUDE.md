@@ -831,6 +831,10 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   toca (`enAgua`: levitando o volando no; bajo tierra no); `aguaOndasDibujar` (gancho en js/05, debajo de los tokens) no los muestra si el token está
   oculto para ese jugador o tapado por la niebla. Lo llaman `moverToken`/`moverTokenLibre` (js/07, la pantalla que mueve) y el listener de los tokens
   (js/09, las demás: con la ruta, o la casilla nueva); no escribe nada nuevo en Firebase. Capturas `v-agua-*`, `v-pasos-*` (GM, todo local).
+  **Mancha redondeada** (2026-11-05, dueño: «sigue manteniendo muchísimo la línea hexagonal… que los bordes generales sean más redondeados; no importa
+  si se salen un poco»): `aguaForma(celdas)` (guardada por charco) toma ese contorno, lo remuestrea, lo suaviza fuerte (promedio con los vecinos, 36 veces),
+  le devuelve la superficie que tenía y lo corre un poco afuera; `aguaTrazar(forma, amp, adentro, fase)` le pasa la onda a lo largo de la orilla. La
+  línea punteada sigue marcando las casillas exactas.
 
 ## Pendiente (más adelante)
 

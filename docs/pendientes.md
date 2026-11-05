@@ -47,7 +47,8 @@
 > nuevo, el cuadro del duelo encima de la animación del gancho. 10) La pasiva nueva para el **support cuerpo a cuerpo** de los esenciales (a definir
 > con el dueño cuál y cuál pasiva). 11) **💧 El borde del charco de agua**: hoy se dibuja con semicírculos y parece una nube; tiene que ser una **ondulación**, como agua
 > (dueño, 2026-11-05, visto en «Claude · pruebas»). 12) **Sacar el Tipo 12 de todos lados por ahora** (dueño, 2026-11-05: «sacalo de todos lados por ahora»): las Acciones de los creeps,
-> su lupa, la Botonera y cualquier otra pantalla que lo muestre (resistencias a crítico, Tipo de arma); la ficha lite ya no lo muestra.
+> su lupa, la Botonera y cualquier otra pantalla que lo muestre (resistencias a crítico, Tipo de arma); la ficha lite ya no lo muestra. 13) **💧 Pasos en el agua**: al caminar por un charco o una zona de agua, cada paso deja **ondas** (ripples) que se abren y se
+> apagan detrás del token (dueño, 2026-11-05).
 
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la

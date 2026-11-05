@@ -84,6 +84,13 @@ const PASIVAS_BASE = [
   // Cuero duro (dueño, 2026-11-05: «Cuero duro queda»).
   {poolId: 'cuero-duro', nombre: 'Cuero duro', jobCosto: 1, etiquetas: ['stat', 'defensiva'],
    detalle: '+1 Res. crítico Tipo 6 y +1 Res. crítico Tipo 8: el pellejo curtido aguanta los cortes y los hachazos. ⚙ Automatizado.', mods: [{stat: 'tipo2', val: 1}, {stat: 'tipo3', val: 1}]},
+  // 🥁 Orden de turnos (dueño, 2026-11-05: «marcar el ritmo como pasiva me gusta… es una pasiva, punto»; «bloodlust… cuando un rival cae por tu golpe sube 2
+  // lugares»). Las mueve la pantalla del GM (vtt-hexgrid/js/102), con las reglas del orden (comun/orden-turnos.js): nadie juega dos veces, subir y bajar
+  // se cancelan, uno por ronda.
+  {poolId: 'marcar-el-ritmo', nombre: 'Marcar el ritmo', jobCosto: 1, etiquetas: ['utilidad'],
+   detalle: 'Al empezar cada ronda, los aliados que estén pegados a vos suben 1 lugar en el orden de turnos: vas marcando el paso y te siguen. ⚙ Automatizado: lo hace el mapa del GM al empezar la ronda (como mucho un efecto de orden por personaje y por ronda).', mods: [{stat: 'ritmo', val: 1}]},
+  {poolId: 'sed-de-sangre', nombre: 'Sed de sangre', jobCosto: 1, etiquetas: ['ofensiva'],
+   detalle: 'Cuando un rival cae por tu golpe, el subidón te pone primero en la fila: subís 2 lugares en el orden de turnos (si ya jugaste esta ronda, al empezar la próxima). ⚙ Automatizado: lo hace el mapa del GM cuando el golpe del duelo lo deja en 0.', mods: [{stat: 'sedsangre', val: 2}]},
   {poolId: 'manas-de-sobreviviente', nombre: 'Mañas de sobreviviente', jobCosto: 1, etiquetas: ['defensiva'],
    detalle: 'Con la vida a la mitad o menos: +1 Res. crítico contra todos los Tipos. ⚙ Automatizado: el duelo lo suma al calcular el crítico, mirando tu vida en ese momento.', mods: [{stat: 'rescritmitad', val: 1}]},
   {poolId: 'contra-las-cuerdas', nombre: 'Contra las cuerdas', jobCosto: 1, etiquetas: ['defensiva'],

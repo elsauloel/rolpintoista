@@ -39,6 +39,7 @@ const MensajesMapa = (() => {
     'portal-habilidad': {de: 'ficha', a: 'mapa', que: 'elegir los dos puntos de un portal (`turnos`)'},
     'acelerador-habilidad': {de: 'ficha', a: 'mapa', que: 'elegir la casilla de un Acelerador (`turnos`, `no2`)'},
     'transfusion-habilidad': {de: 'ficha', a: 'mapa', que: 'Transfusión sanguínea: elegir quién da, quién recibe y cuánto (`max`)'},
+    'cambio-guardia-habilidad': {de: 'ficha', a: 'mapa', que: 'Cambio de guardia: elegir los dos aliados que cambian de lugar en el orden de turnos (desde la próxima ronda)'},
     'blink-habilidad':  {de: 'ficha', a: 'mapa', que: 'el blink: a quién (vos o un aliado que ves) y adónde (`distancia`)'},
     'bomba-humo-habilidad': {de: 'ficha', a: 'mapa', que: 'la Bomba de humo: la niebla a sus pies, Sigilo y el movimiento libre (`radio`, `turnos`, `mover`)'},
     'caos-habilidad':   {de: 'ficha', a: 'mapa', que: 'la Varita del caos: el objetivo, el d10 y el estado al azar (`caos`)'},

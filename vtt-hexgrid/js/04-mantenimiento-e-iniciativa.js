@@ -219,7 +219,7 @@ $('#btn-mantenimiento').onclick = async () => {
    lo ven. Se muestra solo en modo combate, flotante sobre el mapa y
    plegable, como el "Turn Order" de Roll20. */
 
-let iniciativa = {orden: [], turno: 0, ronda: 1, paso: 0, termino: null, actuaron: [], libre: null, empezados: [], demoras: {}, repite: null};
+let iniciativa = {orden: [], turno: 0, ronda: 1, paso: 0, termino: null, actuaron: [], libre: null, empezados: [], demoras: {}, repite: null, ordenPendientes: [], ordenUsados: null, mufas: {}};
 /* Turno libre (`libre: {id, vuelve}`, dueño 2026-10-15): el GM le dio el turno a alguien «de manera libre, sin contabilizar el paso del turno»
    (clic derecho en su nombre → Turno libre). Mientras dura, el turno es suyo (esSuTurno), pero no recargó ni bajó nada; con ▶ Siguiente el
    turno vuelve a `vuelve` (quien lo tenía), también sin recargar ni bajar nada. Ver iniciativaDarTurno. */
@@ -267,6 +267,10 @@ function escucharIniciativa(){
       empezados: Array.isArray(d.empezados) ? d.empezados.map(String) : [],
       repite: d.repite ? String(d.repite) : null,
       demoras: d.demoras && typeof d.demoras === 'object' ? Object.fromEntries(Object.entries(d.demoras).map(([k, v]) => [k, Math.max(0, Math.round(num(v)))]).filter(([, v]) => v > 0)) : {},
+      // 🎺🔄🐈‍⬛ El orden de turnos a favor o en contra (2026-11-05, js/102): lo que queda para la próxima ronda, quién ya tuvo su efecto en esta y las Mufas.
+      ordenPendientes: Array.isArray(d.ordenPendientes) ? d.ordenPendientes.filter(x => x && typeof x === 'object').slice(0, 30) : [],
+      ordenUsados: d.ordenUsados && typeof d.ordenUsados === 'object' ? {ronda: Math.round(num(d.ordenUsados.ronda)), ids: Array.isArray(d.ordenUsados.ids) ? d.ordenUsados.ids.map(String) : []} : null,
+      mufas: d.mufas && typeof d.mufas === 'object' ? d.mufas : {},
     };
     const cambioTurno = iniciativa.turno !== antesTurno || iniciativa.ronda !== antesRonda;
     if(cambioTurno) giroLibre.clear();   // avanzó el turno: acción de otro
@@ -296,11 +300,13 @@ async function guardarIniciativa(cambios){
     ...(iniciativa.termino ? {termino: iniciativa.termino} : {}),
     ...(iniciativa.libre ? {libre: iniciativa.libre} : {}),
     ...(iniciativa.repite ? {repite: iniciativa.repite} : {}),
+    ordenPendientes: iniciativa.ordenPendientes || [], mufas: iniciativa.mufas || {}, ...(iniciativa.ordenUsados ? {ordenUsados: iniciativa.ordenUsados} : {}),   // (js/102)
     ...cambios,
     actualizado: firebase.firestore.FieldValue.serverTimestamp(),
   };
   if(!datos.libre) delete datos.libre;
-  if(!datos.repite) delete datos.repite;   // `repite: null` = terminó el turno de más   // `libre: null` en los cambios = se terminó el turno libre
+  if(!datos.repite) delete datos.repite;
+  if(!datos.ordenUsados) delete datos.ordenUsados;   // `repite: null` = terminó el turno de más   // `libre: null` en los cambios = se terminó el turno libre
   try{
     await fbDb.doc(fbRutaCampana(rutaMapaEstado('iniciativa'))).set(datos);
     return true;
@@ -328,7 +334,7 @@ function tokenTienePrisa(id){
 function iniciativaPonerTodos(){
   const previos = new Map(iniciativa.orden.map(o => [o.id, o]));
   const lista = [...tokens.keys()].map(id => ({id, valor: num(previos.get(id) && previos.get(id).valor), oculto: !!(previos.get(id) && previos.get(id).oculto)}));
-  guardarIniciativa({orden: ordenarIniciativa(lista).map(o => o.oculto ? {id: o.id, valor: o.valor, oculto: true} : {id: o.id, valor: o.valor}), turno: 0, actuaron: [], empezados: [], demoras: {}, repite: null});
+  guardarIniciativa({orden: ordenarIniciativa(lista).map(o => o.oculto ? {id: o.id, valor: o.valor, oculto: true} : {id: o.id, valor: o.valor}), turno: 0, actuaron: [], empezados: [], demoras: {}, repite: null, ordenPendientes: [], ordenUsados: null, mufas: {}});
 }
 
 // Mover a mano una fila del orden de turnos (▲ ▼, solo GM): los dos cambian de lugar y nadie gana ni pierde su turno de la ronda (dueño,
@@ -509,18 +515,31 @@ async function iniciativaSiguiente(o){
       avisoDemora = {id: termina.id, lugares: j - k, desde: k + 1, hasta: j + 1};
     }
   }
+  // 🎺🔄🥁🐈‍⬛ Al empezar la ronda (2026-11-05, js/102): los Cambios de guardia, lo que quedó de la ronda pasada, Marcar el ritmo y la Mufa. Se
+  // acomoda antes de darle el turno al primero (nadie jugó todavía: el que quede arriba de los que pueden jugar es el que empieza).
+  let ordenRonda = null;
+  if(nuevaRonda && typeof ordenInicioRonda === 'function'){
+    try{ ordenRonda = await ordenInicioRonda(ordenFin.map(x => x.id)); }catch(err){ console.error('El orden al empezar la ronda:', err); }
+    if(ordenRonda){
+      ordenFin = ordenDeIds(ordenRonda.ordenIds, ordenFin);
+      let k = 0;
+      while(k < ordenFin.length - 1 && iniciativaFueraDeJuego(ordenFin[k].id)) k++;
+      turnoFin = k;
+    }
+  }
   // Los que demoraron su turno con ▼ ya lo habían empezado: al volverles a tocar no se repite el inicio. Ronda nueva: se vacía.
   const empezados = nuevaRonda ? [] : (iniciativa.empezados || []);
   const sigEmpezado = !nuevaRonda && !!orden[i] && empezados.includes(orden[i].id);
   const sinInicio = sigEmpezado || repite;   // su turno ya había empezado (o ya lo jugó): no se vuelve a contar el inicio
   const ok = await guardarIniciativa({...(o.orden || ordenFin !== orden ? {orden: ordenSerial(ordenFin)} : {}), turno: turnoFin, paso: pasoFin + 1, actuaron: [...ya], ...fin, ...(nuevaRonda ? {ronda} : {}), libre: null,
-    demoras, empezados: sigEmpezado ? empezados.filter(x => x !== orden[i].id) : empezados, repite: repite ? orden[i].id : null});
+    demoras, empezados: sigEmpezado ? empezados.filter(x => x !== orden[i].id) : empezados, repite: repite ? orden[i].id : null,
+    ...(ordenRonda ? {ordenPendientes: [], ordenUsados: {ronda, ids: ordenRonda.usados}, mufas: ordenRonda.mufas} : nuevaRonda ? {ordenPendientes: [], ordenUsados: null} : {})});
   if(!ok) return;
   if(notaDemora) mesaLinea(notaDemora, 'recordatorio');
   if(avisoDemora && typeof demoraAviso === 'function') demoraAviso(avisoDemora.id, 'aplicada', avisoDemora);   // ⏬ el Aviso (js/13)
   // La Crónica, para todos (dueño, 2026-10-06): «Empieza el turno de Fulano» sale enseguida (antes esperaba a que se procesara todo, ~5 s) y
   // después se le suman lo que pasó al terminar el anterior y al empezar el suyo.
-  const sig = orden[i] || {id: ''};
+  const sig = (ordenRonda ? ordenFin[turnoFin] : orden[i]) || {id: ''};   // (la ronda nueva pudo reacomodar el orden: js/102)
   const tSig = tokens.get(sig.id);
   // A quién se nombra (2026-10-09): un creep, si los jugadores ya lo conocen (js/29); un personaje, si no está en sigilo.
   const publico = (o, t) => !!t && !t.oculto && !(o && o.oculto) && (t.tipo === 'creep' ? creepConocido(t) : !enSigilo(t));
@@ -544,7 +563,12 @@ async function iniciativaSiguiente(o){
   if(sigEmpezado) lineas.push(`${nomSig || 'Sigue'}: retoma el turno que había demorado (no vuelve a recargar).`);
   else if(repite) lineas.push(`${nomSig || 'Alguien'} vuelve a actuar: ya había jugado esta ronda, así que no recarga ni cuenta turnos.`);
   const todas = [...lineas, ...lineasZonas, ...lineasInicio];
-  if(todas.length) momentoActualizar(await tarjeta, {'datos.lineas': todas.slice(0, 14)});
+  if(ordenRonda && ordenRonda.lineas.length){
+    ordenRonda.lineas.forEach(l => mesaLinea(l, 'recordatorio'));
+    (ordenRonda.cambios || []).filter(c => c.desde !== c.hasta).forEach(c => { if(typeof ordenAvisar === 'function') ordenAvisar(c, c.por || '', ''); });
+  }
+  const todasR = ordenRonda ? [...ordenRonda.lineas, ...todas] : todas;
+  if(todasR.length) momentoActualizar(await tarjeta, {'datos.lineas': todasR.slice(0, 14)});
 }
 /* ▶ Es su turno (dueño, 2026-10-15: «poder desde el máster cambiar el turno de a quién le toca… botón derecho sobre el nombre en la tabla de
    iniciativa… que te pregunte si se descuentan los cooldowns, si es como un turno normal de la ronda o es su turno de manera libre sin
@@ -1101,7 +1125,7 @@ function conectarIniciativa(){
   const siguiente = $('#ini-siguiente');
   if(siguiente) siguiente.onclick = () => iniciativaSiguiente();
   const limpiar = $('#ini-limpiar');
-  if(limpiar) limpiar.onclick = async () => { if(await Confirmar.preguntar('¿Vaciar el orden de turnos?', {titulo: 'Vaciar turnos', si: 'Vaciar', peligro: true})) guardarIniciativa({orden: [], turno: 0, ronda: 1, actuaron: [], empezados: [], demoras: {}, repite: null, libre: null}); };
+  if(limpiar) limpiar.onclick = async () => { if(await Confirmar.preguntar('¿Vaciar el orden de turnos?', {titulo: 'Vaciar turnos', si: 'Vaciar', peligro: true})) guardarIniciativa({orden: [], turno: 0, ronda: 1, actuaron: [], empezados: [], demoras: {}, repite: null, libre: null, ordenPendientes: [], ordenUsados: null, mufas: {}}); };
 }
 
 /* El orden de turnos flota sobre el mapa y se arrastra desde la cabecera (mismo

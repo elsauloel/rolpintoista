@@ -801,6 +801,7 @@ window.addEventListener('message', e => {
   if(e.data.tipo === 'portal-habilidad') portalDeHabilidad(e.data);
   if(e.data.tipo === 'acelerador-habilidad' && typeof aceleradorDeHabilidad === 'function') aceleradorDeHabilidad(e.data);
   if(e.data.tipo === 'transfusion-habilidad' && typeof transfusionDeHabilidad === 'function') transfusionDeHabilidad(e.data);
+  if(e.data.tipo === 'cambio-guardia-habilidad' && typeof cambioGuardiaDeHabilidad === 'function') cambioGuardiaDeHabilidad(e.data);   // 🔄 (js/102)
   if(e.data.tipo === 'blink-habilidad') blinkDeHabilidad(e.data);
   if(e.data.tipo === 'bomba-humo-habilidad') bombaDeHumo(e.data);   // 💨 (js/57)
   if(e.data.tipo === 'caos-habilidad') caosDeHabilidad(e.data);
@@ -2013,6 +2014,9 @@ async function dueloAplicarDano(d, o){
     if(!d.hab && d.ataque && d.ataque.flecha && (d.ataque.flecha.humo || d.ataque.flecha.luz || d.ataque.flecha.explota || d.ataque.flecha.clava)) await flechaAlPegar(d, !!res.r.invulnerable).catch(err => console.error('No se pudo aplicar el virote en el mapa:', err));
     if(d.hab && d.hab.atrae && !res.r.invulnerable) await dueloAtraer(d).catch(err => console.error('No se pudo atraer al objetivo:', err));   // el gancho
     if(d.hab && d.hab.riesgo && (dn.rolls || []).map(num).includes(num(d.hab.riesgo.si))) await dueloRiesgo(d).catch(err => console.error('No se pudo aplicar el riesgo:', err));   // la inestable
+    // 🩸 Sed de sangre (2026-11-05, js/102): si el golpe dejó al rival en 0, quien pegó sube en el orden de turnos.
+    if((num(res.previo) > 0 && num(res.nuevo) <= 0) || (magico && num(magico.hpAntes) > 0 && num(magico.hpDespues) <= 0))
+      if(typeof ordenSedDeSangre === 'function') ordenSedDeSangre(d).catch(err => console.error('Sed de sangre:', err));
     const cuenta = armarCuenta(res);
     // `perfora`: solo si la Perfora mandó (pasaron esos N, la Defensa frenaba más): el duelo lo cuenta así.
     return {...base, desgaste, cuenta, defensa: crit ? restaIgnorando : def, ...(perfora ? {perfora} : {}), ...(freno ? {freno} : {}), recibido: num(res.r.recibido), absorbido: num(res.r.absorbido), ...(num(res.r.vida) > 0 ? {vidaAbs: num(res.r.vida)} : {}), invulnerable: !!res.r.invulnerable, ...(num(res.r.mitiMiti) > 0 ? {mitiMiti: num(res.r.mitiMiti), mitiMitiNombre: String(res.r.mitiMitiNombre || '').slice(0, 40), mitiMitiTxt: String(res.r.mitiMitiTxt || 'Miti-Miti').slice(0, 20)} : {}), hpAntes: num(res.previo), hpDespues: num(res.nuevo), ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(luzSanadora ? {luzSanadora} : {}), ...(magico ? {magico} : {}), ...(porDano ? {porDano} : {})};
@@ -2698,6 +2702,8 @@ async function dueloAplicarEfectoBase(d, ef){
   if(spec.nombre === 'Demora') return dueloDemora(d.defensor.tokenId, spec.stacks, (d.atacante && d.atacante.nombre) || '');   // (stacks = cuántos lugares: el Cascotazo, Demora 2)
   if(spec.nombre === 'Al final del orden') return alFinalDelOrden(d.defensor.tokenId, d.defensor.nombre, d.hab && d.hab.nombre);   // 💥 Takle (js/04)
   if(spec.nombre === 'Sube en el orden') return dueloAdelanto(d.defensor.tokenId, spec.stacks);   // 💨 Arrojo (ex Envión, 2026-10-26)
+  if(spec.nombre === 'Toque de carga' && typeof ordenPedir === 'function') return ordenPedir({tipo: 'sube', id: d.defensor.tokenId, n: 1, por: (d.atacante && d.atacante.nombre ? `${d.atacante.nombre} · Toque de carga` : 'Toque de carga'), motivo: 'Toque de carga'});   // 🎺 (js/102, 2026-11-05)
+  if(spec.nombre === 'Mufa' && typeof ordenMufaPoner === 'function') await ordenMufaPoner(d).catch(err => console.error('La Mufa: no se pudo anotar', err));   // 🐈‍⬛ anota quién la echó y su Ef.Esp (js/102); el estado entra igual
   if(spec.soltar && !spec.soltar.visual){   // 🕸 una copia vieja de la Red Nerubian o de Tela de araña: la telaraña sale del nombre (js/68)
     const v = Combatiente.atrapaDeNombre((d.hab && d.hab.nombre) || (d.ataque && (d.ataque.habNombre || d.ataque.nombre)) || '');
     if(v) spec.soltar = {...spec.soltar, visual: v};

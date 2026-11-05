@@ -794,6 +794,16 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   en la Reserva · ⏸ Dejarlo en este mapa, fuera del tablero («Después» no toca nada). Al entrar el GM, `creepsMapasReconciliar` (6 s después de
   arrancar) corrige los desfasados y pregunta por los que están en dos mapas. Un creep sin token se respeta. Probado en «Claude · pruebas».
 
+- **🎺🔄🥁🩸🐈‍⬛ El orden de turnos a favor o en contra** (2026-11-05, dueño): `js/102-orden-turnos.js` + las reglas puras en `comun/orden-turnos.js`
+  (`OrdenTurnos.mover/aplicar/intercambiar/costoToque`: nadie juega dos veces, nadie pasa por encima del que tiene el turno, subir y bajar se cancelan,
+  uno por personaje y por ronda). Lo escribe la pantalla del GM (`ordenPedir` → si no es el GM, un momento `orden-pedido` que toma `ordenPedidoDelGM`,
+  js/16). En la iniciativa: `ordenPendientes` (lo de la próxima ronda), `ordenUsados` {ronda, ids} y `mufas` {portador: {de, esp, por}} (los conserva
+  `guardarIniciativa`; Ordenar y Limpiar los vacían). Toque de carga = el efecto «Toque de carga» del duelo (js/13 → `ordenSubir`); Cambio de guardia =
+  `cambioGuardiaMapa` → `cambio-guardia-habilidad` → dos clics (`cambioGuardiaDeHabilidad`) → pendiente; Sed de sangre = `dueloAplicarDano` (si quedó
+  en 0) → `ordenSedDeSangre`; la Mufa = el estado entra como siempre y `ordenMufaPoner` anota quién la echó y su Ef.Esp. Al empezar la ronda
+  (`iniciativaSiguiente`, js/04, antes de guardar la ronda nueva) `ordenInicioRonda`: los cambios de guardia, lo pendiente, Marcar el ritmo
+  (`resumen.ritmo`) y la Mufa (Res.Mt contra Ef.Esp, en la Mesa); después le da el turno al primero que puede jugar. Aviso/Crónica con `ordenAvisar`.
+
 ## Pendiente (más adelante)
 
 Alcance y movimiento; niebla; tiradas desde el token.

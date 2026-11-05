@@ -46,14 +46,14 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261105pot"></script>
+<script src="combatiente.js?v=20261105orden"></script>
 <script src="creep-calculo.js?v=20261103t20"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261105rc"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
-<script src="estados-presets.js?v=20261105deseq"></script>
+<script src="estados-presets.js?v=20261105orden"></script>
 <script src="estados-aplicar.js?v=20261104ae"></script>
 <script src="recibidos.js?v=20261103pm"></script>
 <script src="tokens-auto.js"></script>
@@ -66,10 +66,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="catalogo.js"></script>
 <script src="generador-tiendas.js"></script>
 <script src="items-subidos.js"></script>
-<script src="ficha-habilidades.js?v=20261104arr6"></script>
+<script src="ficha-habilidades.js?v=20261105orden"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
-<script src="ficha-resumen.js?v=20261104pg1"></script>
+<script src="ficha-resumen.js?v=20261105orden"></script>
 <script src="ficha-sesion.js"></script>
 <script src="inv-calculo.js"></script>
 <script src="inv-botonera.js"></script>
@@ -77,7 +77,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js"></script>
-<script src="ficha-acciones.js?v=20261105rc"></script>
+<script src="ficha-acciones.js?v=20261105orden"></script>
+<script src="orden-turnos.js?v=20261105orden"></script>
 <script src="ficha-mantenimiento.js?v=20261103ve"></script>
 <script src="estado-preguntas.js"></script>
 <script src="asistente-estado.js"></script>
@@ -105,7 +106,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261105pulso2"></script>
+<script src="duelo.js?v=20261105orden"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -117,7 +118,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
-<script src="skills-clase.js?v=20261105deseq"></script>
+<script src="skills-clase.js?v=20261105orden"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261104ig"></script>
 <script src="skills-creep-base.js?v=20261105deseq"></script>
@@ -6654,6 +6655,31 @@ prueba('🪝 Arrastrar, el flujo del dueño (2026-11-04): el gancho es un duelo 
   igual([hab.empatePierde, hab.tira.stat, hab.contra.map(x => x.modo), hab.efectos[0].trae, /Constitución/.test(h.detalle + cr.detalle), /Desequilibrado/.test(h.detalle), /Desequilibrado/.test(cr.detalle),
     /acción en sí misma/.test(h.detalle), sale.vuelve, sale.tensa > 0, trae.lanza, falla.lanza, FxGancho.tiempos('trae', 2, false).lanza > 0],
     [true, 'pdg', ['eva'], 3, false, true, true, true, 0, true, 0, 0, true]);   // desde el 2026-11-05 (dueño): Desequilibrado (−2 Evasión), ya no +2 PdG
+});
+prueba('🎺 Orden de turnos (2026-11-05): subir no pasa por encima del que juega; quien ya jugó no vuelve a jugar al bajar; subir y bajar se cancelan; uno por ronda', () => {
+  const st = {orden: ['a', 'b', 'c', 'd', 'e'], turno: 2, actuaron: ['a', 'b']};
+  const sube = OrdenTurnos.mover(st, 'e', 3), jugo = OrdenTurnos.mover(st, 'a', -4), suyo = OrdenTurnos.mover(st, 'c', 1);
+  const neto = OrdenTurnos.aplicar(st, [{id: 'e', delta: 1}, {id: 'e', delta: -1}], []), uno = OrdenTurnos.aplicar(st, [{id: 'e', delta: 1}], ['e']);
+  const ronda = OrdenTurnos.aplicar({orden: ['a', 'b', 'c'], turno: -1, actuaron: []}, [{id: 'c', delta: 2}, {id: 'b', delta: 1}], []);
+  igual([sube.st.orden.join(''), sube.st.turno, jugo.st.orden.join(''), jugo.st.actuaron.includes('a'), suyo.cambio, neto.cambios.length, uno.cambios.length, uno.saltados[0].motivo.includes('esta ronda'),
+      ronda.st.orden.join(''), ronda.usados.sort().join('')],
+    ['abced', 2, 'bcdea', true, null, 0, 0, true, 'cba', 'bc']);
+});
+prueba('🔄 Cambio de guardia y 🎺 el costo del Toque de carga (2026-11-05): intercambia dos, cuenta para los dos; 3, 5, 7… SP', () => {
+  const r = OrdenTurnos.intercambiar({orden: ['a', 'b', 'c', 'd'], turno: -1, actuaron: []}, 'a', 'd', []), otra = OrdenTurnos.intercambiar(r.st, 'a', 'b', r.usados);
+  const h = Object.values(CLASES_SKILLS).flatMap(c => c.skills || c.habilidades || []).find(x => x.id === 'support-toque-de-carga');
+  const S = FichaGuardado.normalizar({}).S;
+  const c0 = FichaHabilidades.costoSpDe(S, h);
+  S.efectos.push({nombre: 'Toques de carga', apila: true, stacks: 2, permanente: true, activo: true});
+  igual([r.st.orden.join(''), r.usados.sort().join(''), otra.cambio, OrdenTurnos.costoToque(0), OrdenTurnos.costoToque(2), c0, FichaHabilidades.costoSpDe(S, h)],
+    ['dbca', 'ad', null, 3, 7, 3, 7]);
+});
+prueba('🥁🩸🐈‍⬛ Las pasivas y la Mufa (2026-11-05): Marcar el ritmo y Sed de sangre suman su stat; Echar la mufa a un aliado entra sin tirar', () => {
+  const P = n => PASIVAS_BASE.find(x => x.nombre === n);
+  const hab = Duelo.limpiarHab({nombre: 'Echar la mufa', objetivo: 'cualquiera', aliadoDirecto: true, tira: {stat: 'pdgmg', etq: 'PdG.Esp'}, contra: [{modo: 'resm', stat: 'resm', etq: 'Res.Mt'}], dano: null, efectos: [{nombre: 'Mufa'}]});
+  const mufa = estadosPresetFicha().find(e => e.nombre === 'Mufa');
+  igual([P('Marcar el ritmo').mods[0].stat, P('Sed de sangre').mods[0].val, hab.aliadoDirecto, hab.sinOposicion, mufa && mufa.turnos],
+    ['ritmo', 2, true, false, 2]);
 });
 prueba('⚖ Sonic Boom de creep (2026-10-27): cono, Fuerza +2 contra la Constitución, la diferencia de daño directo y «Pierde No2»', () => {
   const h = chp('Sonic Boom'), ej = CreepAcciones.habEjecucion(creepPrueba(), h);

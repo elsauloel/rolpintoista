@@ -777,6 +777,8 @@ const Duelo = (() => {
     // 🚩 Bajo el estandarte (2026-10-24, el Estandarte de guerra del Support; lo calcula el mapa, vtt-hexgrid/js/73): +N al PdG (o PdG.Esp) y +N al daño.
     if(cfg.estandarte && (_num(cfg.estandarte.pdg) > 0 || _num(cfg.estandarte.dano) > 0)) inicial.ataque.estandarte = {pdg: Math.min(10, Math.max(0, Math.round(_num(cfg.estandarte.pdg)))), dano: Math.min(20, Math.max(0, Math.round(_num(cfg.estandarte.dano))))};
     if(_num(cfg.espaldaPdg) > 0 && !hab && !cfg.espalda){ inicial.ataque.porLaEspalda = true; inicial.ataque.espaldaPdg = Math.min(5, Math.round(_num(cfg.espaldaPdg))); }
+    // 🐈‍⬛ Sobre alguien de su mismo bando (personajes con personajes, creeps con creeps), sin tirada (Echar la mufa, 2026-11-05).
+    if(hab && hab.aliadoDirecto && (inicial.atacante.tipo === 'creep') === (inicial.defensor.tipo === 'creep')) hab.sinOposicion = true;
     if(hab){
       inicial.hab = hab;   // (la regla de Firestore tiene que conocer el campo `hab`)
       if(hab.soloDodge && cfg.grupo){ inicial.fase = 'dodge'; inicial.estado = 'esperando'; inicial.contacto = {gana: 'defensor', dif: 0, soloDodge: true}; }   // la Tormenta arcana: directo al dodge roll
@@ -903,6 +905,7 @@ const Duelo = (() => {
       ...((objetivo === 'onda' || objetivo === 'cono') && h.dodgeConEva ? {dodgeConEva: true} : {}),   // 🦶 el dodge roll solo si se defendió con la Evasión (el Pisotón)
       ...(objetivo === 'onda' && h.conVista ? {conVista: true} : {}),   // la luz: solo a los que ve (los sólidos la tapan)
       ...(objetivo === 'aliado' && h.conmigo ? {conmigo: true} : {}),   // un aliado o uno mismo (Heal, 2026-10-11)
+      ...(objetivo === 'cualquiera' && h.aliadoDirecto ? {aliadoDirecto: true} : {}),   // 🐈‍⬛ a un aliado le entra directo; un rival se resiste (Echar la mufa, 2026-11-05)
       ...(h.zonaQueda ? {zonaQueda: {turnos: Math.min(6, Math.max(1, Math.round(_num(h.zonaQueda.turnos)) || 1)), nombre: txtCorto(h.zonaQueda.nombre || '', 40),
         ...(h.zonaQueda.dano ? {dano: txtCorto(h.zonaQueda.dano, 12)} : {}), ...(h.zonaQueda.tipoDano ? {tipoDano: txtCorto(h.zonaQueda.tipoDano, 20)} : {}),
         ...(h.zonaQueda.estado ? {estado: {nombre: txtCorto(h.zonaQueda.estado.nombre || '', 40), ...(h.zonaQueda.estado.turnos ? {turnos: _num(h.zonaQueda.estado.turnos)} : {})}} : {}),

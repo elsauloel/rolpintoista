@@ -1587,3 +1587,12 @@ Probado en «Claude · pruebas» (GM): un creep sin token puesto en el mapa pas�
 él?» y «Guardarlo en la Reserva» lo dejó en la Reserva; al entrar salió la pregunta de un creep en dos mapas (el Escarabajo de cobre, «Mapa 1» y
 «Mazmorra de pruebas»: quedó sin contestar, para que el dueño elija). Falta ver: «Eliminarlo» y «Dejarlo en este mapa»; elegir un mapa en la pregunta
 de dos mapas; Ctrl+V y los refuerzos; GM Tools abierto al mismo tiempo (que tome el cambio por la firma).
+
+## 🎺 El orden de turnos a favor o en contra (2026-11-05)
+Probado en «Claude · pruebas» (GM, desde la consola del mapa, con la iniciativa restaurada al terminar): subir 1 a uno que todavía no jugó (Viejo Denai,
+11.º → 10.º, con la tarjeta de la Crónica «… sube en el orden de turnos · Toque de carga»); otra vez en la misma ronda no se mueve («ya tuvo su efecto
+de orden esta ronda»); el arranque de ronda simulado con un Cambio de guardia pendiente (1.º ↔ 12.º) y un «sube» pendiente. Falta ver en una partida:
+ejecutar **Toque de carga** desde la Botonera (que el costo pase 3 → 5 → 7 y se vaya al «Finalizar combate») y sobre un aliado que ya jugó (sube al
+empezar la próxima ronda); **Cambio de guardia** con los dos clics (y que el cambio se haga al empezar la ronda); **Marcar el ritmo** y **Sed de
+sangre** en una ronda real (voltear a un rival con el golpe); **Echar la mufa** sobre un aliado (sin tirada) y sobre un rival (PdG.Esp contra Res.Mt),
+y al empezar la ronda las tiradas de Res.Mt contra el Ef.Esp de los rivales pegados; un jugador que lo pide (el momento `orden-pedido` que toma el GM).

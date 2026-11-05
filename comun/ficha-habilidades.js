@@ -28,7 +28,8 @@ const FichaHabilidades = (() => {
   }
   // El SP que cuesta HOY (2026-10-11, Enfocado): el fijo + 1 por cada stack que ya tengas de `costoSube` (el estado que deja la habilidad),
   // mientras no se haya gastado. Así, usarla varias veces seguidas cuesta 1, 2, 3…
-  const spSube = (S, h) => h && h.costoSube && S ? Combatiente.stacksCargaActiva(S.efectos, h.costoSube) : 0;
+  // `costoSubePor` (2026-11-05, el Toque de carga: 3, 5, 7…): cuánto sube por cada stack (si no, 1).
+  const spSube = (S, h) => h && h.costoSube && S ? Combatiente.stacksCargaActiva(S.efectos, h.costoSube) * Math.max(1, Math.round(n(h.costoSubePor)) || 1) : 0;
   const costoSpDe = (S, h) => parseCostoSp(h && h.costo) + spSube(S, h);
   const nitrosAtaque = h => String((h && h.nitrosCosto) ?? '').trim().toUpperCase() === 'ATAQUE';
   const spVariable = h => esCostoVariable(h && h.costo);
@@ -50,7 +51,7 @@ const FichaHabilidades = (() => {
   const FLAGS_ESPECIALES = ['esCC', 'esVeneno', 'esSangrado', 'esQuemadura', 'afortunado', 'invulnerable',
     'inmunidadCC', 'inmunidadMental', 'esMental', 'sangrePura', 'coagulacionExtrema', 'blindado', 'espinas', 'espejo', 'desarmado', 'ceguera', 'mitadPdgEva',
     'lisiado', 'paralisis', 'silencio', 'confusion', 'esEscarcha', 'inmovilizado', 'rengo', 'lento', 'cansado', 'exhausto', 'hypeado', 'sentado',
-    'armaduraRota', 'escudoMagico', 'excedenteVida', 'forzarNitros', 'stun', 'expuesto', 'mitadEva', 'alEmpezarTurno', 'volador', 'sangraSp', 'fenix'];
+    'armaduraRota', 'escudoMagico', 'excedenteVida', 'forzarNitros', 'stun', 'expuesto', 'mitadEva', 'alEmpezarTurno', 'volador', 'sangraSp', 'fenix', 'apila'];   // apila: el contador del Toque de carga (2026-11-05)
   function flagsDePreset(presets, nombrePreset){
     const p = presetPorNombre(presets, (nombrePreset || '').trim());
     if(!p) return {};

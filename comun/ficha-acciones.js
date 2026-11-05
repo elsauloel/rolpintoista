@@ -1377,7 +1377,7 @@ const FichaAcciones = (() => {
     if(FichaBotonera.modoHab(it) !== 'auto'){ anunciarHabilidad(S, it, ui); tirarPrimeraDeHab(S, it, ui); return; }
     if(!FichaBotonera.dueloDe(it)){
       if(it.trampaColocar) return;   // una trampa sola: el anuncio y la casilla ya los maneja colocarTrampa
-      if(it.portalMapa || it.blink || it.bombaHumo || it.caos || it.aceleradorMapa || it.transfusionMapa){ ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); return; }   // los portales, el blink, el caos y el Acelerador: se anuncian y se eligen en el mapa
+      if(it.portalMapa || it.blink || it.bombaHumo || it.caos || it.aceleradorMapa || it.transfusionMapa || it.cambioGuardiaMapa){ ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); return; }   // los portales, el blink, el caos y el Acelerador: se anuncian y se eligen en el mapa
       if(it.invoca && it.invoca.invId){ ui.mesaHabilidad(it.nombre, it.detalle || it.efectoDetalle || ''); return; }   // solo invoca: se anuncia (la invocación ya la hizo invocarConHab)
       ui.toast(`${it.nombre}: todavía no tiene armada la ejecución paso a paso (✨) — se ejecutó como semiautomática`); anunciarHabilidad(S, it, ui); tirarPrimeraDeHab(S, it, ui); return;
     }
@@ -1441,6 +1441,12 @@ const FichaAcciones = (() => {
       const esp = Math.round(num(FichaCalculo.calcular(S).final.esp));
       try{ ui.alMapa('transfusion-habilidad', {fichaId: ui.yo().ref, nombre: h.nombre, max: Math.max(1, esp || num(h.transfusionMapa.max) || 20)}); }
       catch(err){ console.error('No se pudo avisar la Transfusión al mapa:', err); }
+      return;
+    }
+    // 🔄 Cambio de guardia (2026-11-05, Support): se eligen en el mapa los dos aliados que cambian de lugar en el orden de turnos (vtt-hexgrid/js/102).
+    if(h.cambioGuardiaMapa){
+      try{ ui.alMapa('cambio-guardia-habilidad', {fichaId: ui.yo().ref, nombre: h.nombre}); }
+      catch(err){ console.error('No se pudo avisar el Cambio de guardia al mapa:', err); }
       return;
     }
     // ⏩ El Acelerador (2026-10-12, Support): se elige la casilla en el mapa (vtt-hexgrid/js/40).

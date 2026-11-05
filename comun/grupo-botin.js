@@ -13,7 +13,7 @@ const GrupoBotin = (() => {
   const num = v => { const n = parseFloat(v); return Number.isFinite(n) ? n : 0; };
   const fmt = n => Number.isInteger(n) ? n : Math.round(n * 10) / 10;
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
-  const PIEZAS = ['../comun/ficha-calculo.js?v=20261105rc', '../comun/ficha-guardado.js?v=20261029u', '../comun/ficha-combate.js?v=20261015d', '../comun/escaneo-grupo.js?v=20261026d'];
+  const PIEZAS = ['../comun/ficha-calculo.js?v=20261105orden', '../comun/ficha-guardado.js?v=20261029u', '../comun/ficha-combate.js?v=20261015d', '../comun/escaneo-grupo.js?v=20261026d'];
   // Los lugares del cuerpo (los mismos de FichaEquipo.SLOT_DEFS; sin la mochila, el cinturón ni el carcaj, que no son de pelea).
   const SLOTS = [
     {id: 'manos_arma', label: 'Manos', cats: ['arma_1m', 'arma_2m', 'escudo_1m', 'escudo_2m'], max: 2, peso: {arma_1m: 1, arma_2m: 2, escudo_1m: 1, escudo_2m: 2}},

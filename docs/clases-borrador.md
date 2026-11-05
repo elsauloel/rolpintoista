@@ -390,7 +390,21 @@ verifica con 1d20: hasta DES×2 → 7+; hasta DES×3 → 17+; más de DES×3 →
     oculto. Todos lo ven, nadie le puede hacer nada y atraviesa todo. ⚙ Automatizado en el mapa. *(Nueva 2026-10-20, dueño: la del pergamino como
     skill del Support; `support-ojo-de-kicillof` en comun/skills-clase.js.)*
 
+- **🎺 Toque de carga** (2026-11-05, dueño: «trompetazo… la melodía que da inicio a las batallas»; «mueve de a una posición, cuesta 3 SP la primera vez
+  y 2 SP adicionales por cada vez que se vuelve a usar en el mismo combate»): un aliado a la vista dentro de tu Rango (o vos) sube 1 lugar en el orden;
+  3/5/7… SP (estado «Toques de carga», se va al Finalizar combate) y 1 No2. Si ya jugó, sube al empezar la próxima ronda. ✅ cargada (`support-toque-de-carga`).
+- **🔄 Cambio de guardia** (2026-11-05, dueño: «intercambiar la posición en la tabla entre dos aliados cualquiera, vos o no vos»; «a partir de la próxima
+  ronda»): 4 SP, 1 No2, los dos con un clic en el mapa. ✅ cargada (`support-cambio-de-guardia`).
+- Reglas del orden (dueño, 2026-11-05): nadie juega dos veces en la misma ronda; subir y bajar se cancelan; como mucho un efecto de orden por personaje
+  y por ronda (`comun/orden-turnos.js`, vtt-hexgrid/js/102). Pasivas de cualquier clase: **Marcar el ritmo** (los aliados pegados suben 1 al empezar la
+  ronda) y **Sed de sangre** (bloodlust: voltear a un rival te sube 2). La pasiva «Mala sombra» se descartó (dueño: «muy poderosa»).
+
 ## Debuffer ⏳
+
+- **🐈‍⬛ Echar la mufa** (2026-11-05, dueño: «se pueda colocar tanto sobre aliados como sobre rivales, pero que los rivales tiran resistencia mental…
+  al empezar la ronda, quienes están afectados por la mufa deben tirar resistencia mental contra el efecto especial del debuffer»): 5 SP, 1 No2; a un
+  aliado entra directo, un rival se resiste (PdG.Esp contra Res.Mt). Estado Mufa 2 turnos: al empezar cada ronda, los rivales de quien la lleva que
+  están pegados a él tiran Res.Mt contra el Ef.Esp de quien la echó; el que pierde baja 1 lugar. ✅ cargada (`debuffer-echar-la-mufa`).
 
 En el PDF nuevo la página del Debuffer repite las tarjetas del Support.
 **A confirmar:** usar las tarjetas del Debuffer de la versión anterior, que

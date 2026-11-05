@@ -102,6 +102,8 @@ const FichaCalculo = (() => {
     {id:'rescritmitad', label:'Mañas de sobreviviente', full:'Con la vida a la mitad o menos: + a la Resistencia a crítico contra todos los Tipos (se suma en el duelo)'},
     {id:'rescritcuarto', label:'Contra las cuerdas', full:'Con la vida en menos de un cuarto: + a la Resistencia a crítico contra todos los Tipos (se suma en el duelo)'},
     {id:'pasossilenciosos', label:'Paso ligero', full:'Paso ligero: no te oyen acercarte por la espalda (se te ve recién al quedar pegado, sin darle tiempo a darse vuelta) y atacar por la espalda te suma +1 PdG más'},
+    {id:'ritmo', label:'Marcar el ritmo', full:'Marcar el ritmo: al empezar la ronda, los aliados pegados a vos suben ese número de lugares en el orden de turnos'},
+    {id:'sedsangre', label:'Sed de sangre', full:'Sed de sangre: cuando un rival cae por tu golpe, subís ese número de lugares en el orden de turnos'},
     {id:'prisa', label:'Prisa', full:'Prisa: vas primero en el orden de turnos (antes que todos los que no la tienen); entre dos con Prisa decide la tirada de iniciativa'},
     {id:'morral', label:'Morral de cazador', full:'Los trofeos no ocupan ranuras de la mochila'},
     {id:'pasamanos', label:'Pasamanos', full:'En combate, pasarle a un aliado al lado algo del cinturón no cuesta No2'},

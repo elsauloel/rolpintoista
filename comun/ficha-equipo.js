@@ -457,7 +457,7 @@ const FichaEquipo = (() => {
       <div class="botonera-crit">
         <div class="botonera-crit-t">Resistencia a críticos</div>
         <div class="botonera-crit-grid">
-          ${TIPOS_IDS.map(id => `
+          ${TIPOS_IDS.filter(id => id !== 'tipo5').map(id => `
           <div class="botonera-tile bt-info" title="${esc(F()[id])} (no se tira)">
             ${lupa(`defensa:${id}`)}
             <span class="bt-label">${esc(L()[id])}</span><span class="bt-value">${Number.isNaN(cEq.final[id]) ? '?' : fmt(cEq.final[id])}</span>

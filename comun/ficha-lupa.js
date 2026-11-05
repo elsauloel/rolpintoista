@@ -295,7 +295,7 @@ const FichaLupa = (() => {
       if(ES_ARMA(it.tipoItem)) L.push(linea('Daño', FichaCombate.armaDanoTxt(it)));
       const defVal = defValorDe(it);
       if(defVal) L.push(linea('Defensa', `${defVal>0?'+':''}${fmt(defVal)}`));
-      TIPOS_IDS.forEach(tid => {
+      TIPOS_IDS.filter(tid => tid !== 'tipo5').forEach(tid => {   // sin el Tipo 12 (dueño, 2026-11-05: «sacalo de todos lados por ahora»)
         const v = getModVal(it, tid);
         if(v) L.push(linea(`Res. crítico ${STAT_LABEL[tid]}`, `${v>0?'+':''}${fmt(v)}`));
       });

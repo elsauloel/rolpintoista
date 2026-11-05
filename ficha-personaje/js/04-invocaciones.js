@@ -335,7 +335,7 @@ function invPasoHtml(id, inv){
     <button type="button" class="inv-addhab" data-additeminv="${inv.id}" style="margin-top:6px">+ Ítem</button>
     <div class="inv-editar-separador" style="margin-top:12px"><span>Resistencia a críticos</span></div>
     <div class="inv-critgrid">
-      ${['Tipo 4','Tipo 6','Tipo 8','Tipo 10','Tipo 12'].map((lbl,i) => `<div class="inv-critcell"><label>${lbl}</label><input type="number" data-invcrit="${i}" data-invid="${inv.id}" value="${inv.crit[i]}"></div>`).join('')}
+      ${['Tipo 4','Tipo 6','Tipo 8','Tipo 10'].map((lbl,i) => `<div class="inv-critcell"><label>${lbl}</label><input type="number" data-invcrit="${i}" data-invid="${inv.id}" value="${inv.crit[i]}"></div>`).join('')}
     </div>`;
   if(id === 'habilidades') return `
     <div class="inv-hablist">

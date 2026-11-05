@@ -187,7 +187,7 @@ const CreepBotonera = (() => {
           <div class="botonera-crit">
             <div class="botonera-crit-t">Resistencia a críticos</div>
             <div class="botonera-crit-grid">
-              ${[0, 1, 2, 3, 4].map(i => `
+              ${[0, 1, 2, 3].map(i => `
               <div class="botonera-tile bt-info" title="Resistencia a crítico Tipo ${4 + 2 * i} (no se tira)">
                 ${lupaBotonHtml(`${sc.id}|defensa|tipo${i + 1}`)}
                 <span class="bt-label">Tipo ${4 + 2 * i}</span><span class="bt-value">${fmt(critEfectivo(sc, i))}</span>

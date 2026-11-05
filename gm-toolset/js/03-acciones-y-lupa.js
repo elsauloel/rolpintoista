@@ -179,7 +179,7 @@ function cardHtml(sc){
       <div>
         <div class="sect-label">Res. a críticos</div>
         <div class="crit-grid" style="margin-top:4px">
-          ${['Tipo 4','Tipo 6','Tipo 8','Tipo 10','Tipo 12'].map((lbl,i) => num(sc.crit[i]) !== 0 || creepCritEfectivo(sc, i) !== 0   // 🛡 (paso 3: la base y lo que suma el equipo en vivo)
+          ${['Tipo 4','Tipo 6','Tipo 8','Tipo 10'].map((lbl,i) => num(sc.crit[i]) !== 0 || creepCritEfectivo(sc, i) !== 0   // 🛡 (paso 3: la base y lo que suma el equipo en vivo)
             ? `<div class="crit-cell"><label>${lbl}${totalModBadge(creepCritEfectivo(sc, i), sc.crit[i], creepArmaduraOrigenTxt(sc))}</label><input type="number" class="${totalModClase(creepCritEfectivo(sc, i), sc.crit[i])}" data-crit="${i}" data-id="${sc.id}" data-critmod="${fmt(creepCritEfectivo(sc, i) - num(sc.crit[i]))}" value="${fmt(creepCritEfectivo(sc, i))}"></div>`
             : '').join('')}
         </div>

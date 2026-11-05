@@ -268,7 +268,7 @@ const FiltroCatalogo = (() => {
       };
       const stats = [...new Set(items.flatMap(it => (it.mods || []).filter(m => m && m.stat && num(m.val) > 0).map(m => m.stat)))];
       sel('bono', 'Cualquier cosa', stats.filter(st => !esResCrit(st)).map(st => [st, (cfg.statLabel || statLabelDe)(st)]).sort((a, b) => a[1].localeCompare(b[1], 'es')));
-      sel('rescrit', 'Cualquiera', RES_CRIT.filter(([k]) => stats.includes(k)).map(([k, t]) => [k, `Contra Tipo ${t}`]));
+      sel('rescrit', 'Cualquiera', RES_CRIT.filter(([k]) => k !== 'tipo5' && stats.includes(k)).map(([k, t]) => [k, `Contra Tipo ${t}`]));
       const golpes = new Map();
       items.forEach(it => golpesDe(it).forEach(n => { const k = sinAcentos(n); if(!golpes.has(k)) golpes.set(k, n); }));
       sel('golpe', 'Cualquiera', [...golpes.values()].sort((a, b) => a.localeCompare(b, 'es')).map(n => [n, n]));

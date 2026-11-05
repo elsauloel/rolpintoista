@@ -121,7 +121,7 @@ const EscaneoGrupo = (() => {
     return `<style>${CSS}</style>
     <div class="eg-sec">Lectura rápida · puntos débiles</div><ul class="eg-lista">${l.debiles.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
     <div class="eg-sec">Lectura rápida · fortalezas</div><ul class="eg-lista">${l.fuertes.map(t => `<li>${esc(t)}</li>`).join('')}</ul>
-    ${tabla(ps, 'Resistencia a crítico (por Tipo de arma)', TIPOS.map((t, i) => col(ps, 'T' + t, p => p.rescrit[i])))}
+    ${tabla(ps, 'Resistencia a crítico (por Tipo de arma)', TIPOS.slice(0, 4).map((t, i) => col(ps, 'T' + t, p => p.rescrit[i])))}
     ${tabla(ps, 'Resistencias elementales (negativo = vulnerable)', ELEM.map(el => col(ps, ELEM_TXT[el], p => p.elem[el])))}
     ${tabla(ps, 'Defensas', [col(ps, 'Def', p => p.defensas.def, 'Defensa'), col(ps, 'Def.Esp', p => p.defensas.armadmg, 'Defensa especial'), col(ps, 'Eva', p => p.defensas.eva, 'Evasión'),
       col(ps, 'Parry', p => p.defensas.parry), col(ps, 'Bloq', p => p.defensas.bloqueo, 'Bloqueo'), col(ps, 'Res.Esp', p => p.defensas.resmg), col(ps, 'Res.CC', p => p.defensas.rescc),
@@ -137,7 +137,7 @@ const EscaneoGrupo = (() => {
     const l = lectura(ps);
     const fila = p => `- ${p.nombre} (nivel ${p.nivel}${p.clase ? ', ' + p.clase : ''}): atributos ${ATTR.map(([k, n]) => `${n} ${fmt(p.attrs[k])}`).join(', ')}; HP ${fmt(p.vida.hp)}; `
       + `Defensa ${fmt(p.defensas.def)}, Armadura mágica ${fmt(p.defensas.armadmg)}, Evasión ${fmt(p.defensas.eva)}, Res.Esp ${fmt(p.defensas.resmg)}, Res.CC ${fmt(p.defensas.rescc)}; `
-      + `resistencia a crítico T4/T6/T8/T10/T12 = ${p.rescrit.map(fmt).join('/')}; resistencias elementales ${ELEM.map(el => `${el} ${fmt(p.elem[el])}`).join(', ')}; `
+      + `resistencia a crítico T4/T6/T8/T10 = ${p.rescrit.slice(0, 4).map(fmt).join('/')}; resistencias elementales ${ELEM.map(el => `${el} ${fmt(p.elem[el])}`).join(', ')}; `
       + `ataque PdG ${fmt(p.ataque.pdg)}, PdG.Esp ${fmt(p.ataque.pdgEsp)}, Crít. frecuente ${fmt(p.ataque.crit)}, potente ${fmt(p.ataque.critpot)}; `
       + `armas: ${p.armas.length ? p.armas.map(a => `${a.nombre} Tipo ${a.tipo} ${a.dano}${a.efectos.length ? ' (' + a.efectos.join(', ') + ')' : ''}`).join('; ') : 'ninguna'}; `
       + `tipos de daño: ${Object.entries(p.danos).map(([k, n]) => `${DANO_TXT(k)} ×${n}`).join(', ') || 'solo físico'}.`;

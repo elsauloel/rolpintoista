@@ -193,7 +193,7 @@ const GeneradorTiendas = (() => {
   /* Escasez: las etiquetas de los efectos sensibles (se calculan de los bonos; no hay que cargar nada a mano). */
   const ETIQUETAS = {
     'Res. crítico Tipo 8': it => mod(it, 'tipo3') > 0,
-    'Res. crítico Tipo 10 o 12': it => mod(it, 'tipo4') > 0 || mod(it, 'tipo5') > 0,
+    'Res. crítico Tipo 10': it => mod(it, 'tipo4') > 0,
     'Evasión': it => mod(it, 'eva') > 0,
     'Iniciativa': it => mod(it, 'ini') > 0,
     'Sigilo': it => mod(it, 'sigilo') > 0,

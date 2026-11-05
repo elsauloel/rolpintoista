@@ -357,7 +357,7 @@ const AsistenteItem = (() => {
 
     if(paso.id === 'tipo'){
       titulo('¿De qué Tipo es el arma?', 'El Tipo decide tres cosas a la vez: <b>el dado de daño</b> (Tipo 6 = cada dado es un d6), <b>cuántos Nitros cuesta atacar</b> (el primer ataque del turno con esta arma cuesta la mitad del Tipo; los siguientes, el Tipo entero) y <b>contra qué resistencia a críticos choca</b>. Más Tipo = más daño por golpe, pero menos golpes por turno.');
-      h += `<div class="aa-tipos">${DADOS.map(t => `<button type="button" class="aa-tipo ${tipo === t ? 'activa' : ''}" data-aa-tipo="${t}">
+      h += `<div class="aa-tipos">${DADOS.filter(t => t !== 12 || tipo === 12).map(t => `<button type="button" class="aa-tipo ${tipo === t ? 'activa' : ''}" data-aa-tipo="${t}">
           <b>${t}</b><span>${e(TIPOS[t].nombre)} · d${t}</span>
           <small>${e(TIPOS[t].ejemplo)} · atacar: ${primer(t)} No2 el primero, ${t} los siguientes</small>
         </button>`).join('')}</div>`;
@@ -538,7 +538,7 @@ const AsistenteItem = (() => {
       h += campo('Defensa', `<input data-aa-mod1="def" type="number" step="1" value="${modVal(d, 'def')}" style="max-width:120px">`,
         p && p.def !== undefined ? `Hoy la Defensa ${e(q.de)} es ${f(n(p.def))}.` : '');
       h += `<div class="aa-campo"><label>Resistencia a críticos, por Tipo del arma que golpea</label>
-        <div class="aa-crit">${CRIT_IDS.map(id => `<div><label>Tipo ${CRIT_TIPO[id]}</label><input data-aa-mod1="${id}" type="number" step="1" value="${modVal(d, id)}"></div>`).join('')}</div></div>`;
+        <div class="aa-crit">${CRIT_IDS.filter(id => id !== 'tipo5' || modVal(d, id)).map(id => `<div><label>Tipo ${CRIT_TIPO[id]}</label><input data-aa-mod1="${id}" type="number" step="1" value="${modVal(d, id)}"></div>`).join('')}</div></div>`;
       const crit = CRIT_IDS.filter(id => modVal(d, id));
       h += efecto(crit.length
         ? `Protege contra los críticos de ${crit.map(id => `<b>Tipo ${CRIT_TIPO[id]}</b> (+${f(modVal(d, id))})`).join(', ')}. ${crit.length < 5 ? 'Contra los demás Tipos no ayuda.' : ''}`

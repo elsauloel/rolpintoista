@@ -644,6 +644,13 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Pergamino grupal de Puntería Certera**. **Patotear y Jauría cambian** (dueño: «+1 a la Probabilidad de Golpe fijo si hay al menos un aliado pegado,
   y +1 al daño, pero sin tope»): +1 PdG si hay al menos un aliado pegado al rival, y +1 dado de daño por cada aliado pegado, **sin el tope de +3**.
   **Sin programar** (dueño: «vamos dejándolos definidos»): se programa con el resto de los esenciales cuando el dueño lo pida.
+- **T4 · Peleador de control · Tanque** (2026-11-05): empuja, tira y demora; desordena al grupo rival. **Ruta aprobada**: nv1 Takle · Pisotón; nv2
+  Desarmar + Guardia firme; nv3 Puño de roca; nv4 Arrastrar + **Marcar el ritmo** (dueño: «le vamos a poner marcar el ritmo a nivel 4»); nv5 Barrido.
+  **Nivel 1 (en revisión)**: Con 9 · Fue 7 · Agi 7 · Des 6 · Esp 4 (dueño: «le bajaría un punto de constitución y le subiría uno de agilidad») → vida
+  45, 7 No2 (Takle 2 + el ataque del mazo 5 en el mismo turno). Mazo de carnicero (Común, Tipo 10, +1 de daño, frecuente +1, Demora 33 %) · Peto de
+  hierro (Def +3) · Botas de cuero de vaca (Def +1, Res. crít. T4 +1). Consumible: Grasa de carpincho. Takle: automatizado y probado en el mapa
+  (2026-10-26), pero su texto no lo dice: al programar, sumarle «⚙ Automatizado: …». Pisotón: Fuerza contra la Res.CC o la Evasión de cada rival
+  pegado (elige el rival).
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 

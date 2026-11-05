@@ -148,7 +148,9 @@ const CreepBotonera = (() => {
       if(num(h.cd) > 0 && !C().modoSP(sc)) partes.push(`CD ${fmt(num(h.cd))}`);   // (en modo SP no hay cooldown)
       // 💧 Sin SP suficiente en modo SP (dueño, 2026-10-29): en rojo, pero se deja ejecutar (avisa antes: CreepAcciones.confirmarSP).
       const sinSp = !bloqueo && C().modoSP(sc) && !(h.excavar && h.emerger) && C().spActual(sc) < C().costoSpHab(sc, h);
-      const motivo = bloqueo ? `${bloqueo} · ${partes.join(' · ')}` : sinSp ? `Sin SP · ${partes.join(' · ')}` : partes.join(' · ');
+      // 🚫 Lo que falta, con números (2026-11-05, dueño: «el botón ejecutar apagado no te dice por qué»).
+      const bloqueoTxt = bloqueo === 'Sin No2' ? `No2 insuficiente: cuesta ${fmt(costo)}, tiene ${fmt(num(sc.nitros))}` : bloqueo === 'Sin vida' ? `Vida insuficiente: cuesta ${fmt(num(h.hpCosto))}, tiene ${fmt(num(sc.hp))}` : bloqueo;
+      const motivo = bloqueo ? `${bloqueoTxt} · ${partes.join(' · ')}` : sinSp ? `Sin SP · ${partes.join(' · ')}` : partes.join(' · ');
       return {id: h.id, nombre: h.nombre || 'Sin nombre', disabled: !!bloqueo, rojo: sinSp, motivo, attr:`data-ejecutar="${sc.id}:${h.id}"`, flash: Combatiente.esFlash(h), boton: botonHabTxt(h), segunda: botonSegundaHab(h, sc), cdHtml: C().modoSP(sc) ? '' : cdControlesHtml(sc, h)};
     });
 
@@ -157,7 +159,7 @@ const CreepBotonera = (() => {
     const filaHab = f => `
     <div class="accion-row">
       ${at ? Atajos.cuadroHtml(at, 'hab', f.id) : ''}<div class="accion-nombre">${esc(f.nombre)}</div>
-      <span class="hab-estado ${f.disabled || f.rojo?'cd':'ok'}">${esc(f.motivo)}</span>
+      <span class="hab-estado ${f.disabled || f.rojo?'cd':'ok'}"${f.disabled && /insuficiente/.test(f.motivo) ? ' style="color:#ff8a80;font-weight:700"' : ''}>${esc(f.motivo)}</span>
       <button class="verbtn" data-verhabaccion="${sc.id}:${f.id}">Ver</button>
       ${lupaBotonHtml(`${sc.id}|hab|${f.id}`, 'mini')}
       <button class="hab-ejecutar${f.flash ? ' bt-flash' : ''}" ${f.attr} ${f.disabled?'disabled':''}${f.flash ? ' title="⚡ Flash: se puede usar en turno ajeno (cuesta el doble)"' : ''}>${f.boton || 'Ejecutar'}</button>

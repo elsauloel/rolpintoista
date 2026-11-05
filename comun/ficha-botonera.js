@@ -103,26 +103,41 @@ const FichaBotonera = (() => {
     return costo > 0 && costo > spLibre(S);
   }
   // Lo que cuesta ejecutar una habilidad, para verlo sin abrir la tarjeta. El costo en SP es texto libre.
-  function costoHabilidadTxt(S, h){
-    if(!habAutomatizada(h)) return '';
+  function costoHabilidadTxt(S, h){ return costoHabilidadPartes(S, h).map(x => x.txt).join(' · '); }
+  /* 🚫 Lo que falta, a la vista (2026-11-05, dueño: «en la botonera aparece el botón ejecutar apagado pero no te dice por qué… el valor que te impide la
+     acción debería aparecer en rojo y/o con un "insuficiente" entre paréntesis»): el mismo renglón del costo, con la parte que no alcanza en rojo y
+     «(insuficiente: tenés N)». `costoHabilidadFalta` arma el motivo para el cartel del botón. */
+  const ROJO_FALTA = 'color:#ff8a80;font-weight:700';
+  function costoHabilidadHtml(S, h){
+    return costoHabilidadPartes(S, h).map(x => x.falta ? `<span style="${ROJO_FALTA}">${esc(x.txt)} (insuficiente: tenés ${esc(x.falta)})</span>` : esc(x.txt)).join(' · ');
+  }
+  function costoHabilidadFalta(S, h){
+    const f = costoHabilidadPartes(S, h).filter(x => x.falta);
+    return f.length ? `No te alcanza: ${f.map(x => `${x.txt} (tenés ${x.falta})`).join(' · ')}` : '';
+  }
+  function costoHabilidadPartes(S, h){
+    if(!habAutomatizada(h)) return [];
     if(h.excavar && h.emerger && !h._costoExcavarAbajo){   // 🕳 los dos tiempos (2026-10-28)
       const arriba = [num(h.excavarNo2 !== undefined ? h.excavarNo2 : 1) ? `${fmt(num(h.excavarNo2 !== undefined ? h.excavarNo2 : 1))} No2` : '', num(h.excavarSp) ? `${fmt(num(h.excavarSp))} SP` : ''].filter(Boolean).join(' y ');
-      return `meterse: ${arriba || 'sin costo'} · salir atacando: ${costoHabilidadTxt(S, {...h, _costoExcavarAbajo: true})}`;
+      const fNo2 = num(S.nitros) < num(h.excavarNo2 !== undefined ? h.excavarNo2 : 1) ? `${fmt(num(S.nitros))} No2` : '';
+      return [{txt: `meterse: ${arriba || 'sin costo'}`, falta: fNo2}, {txt: `salir atacando: ${costoHabilidadTxt(S, {...h, _costoExcavarAbajo: true})}`}];
     }
-    const partes = [];
-    const nitros = costoNitrosHab(S, h);
-    if(Combatiente.esFlash(h)) partes.push('⚡ Flash (sin No2; el doble en turno ajeno)');   // un Flash nunca cobra No2 (P136)
-    else if(FichaHabilidades.nitrosAtaque(h)) partes.push(costoAtaqueHabTxt(S));
-    else if(FichaHabilidades.nitrosVariable(h)) partes.push("X No2");
-    else if(nitros) partes.push(`${fmt(nitros)} No2`);
+    const partes = [], P = (txt, falta) => partes.push({txt, falta: falta || ''});
+    const nitros = costoNitrosHab(S, h), tieneNo2 = num(S.nitros);
+    const faltaNo2 = !h._costoExcavarAbajo && nitros > tieneNo2 ? `${fmt(tieneNo2)} No2` : '';
+    if(Combatiente.esFlash(h)) P('⚡ Flash (sin No2; el doble en turno ajeno)');   // un Flash nunca cobra No2 (P136)
+    else if(FichaHabilidades.nitrosAtaque(h)) P(costoAtaqueHabTxt(S), faltaNo2);
+    else if(FichaHabilidades.nitrosVariable(h)) P("X No2");
+    else if(nitros) P(`${fmt(nitros)} No2`, faltaNo2);
     const costo = String(h.costo || '').trim();
+    const faltaSp = !h._costoExcavarAbajo && sinSpPara(S, h) ? `${fmt(Math.max(0, spLibre(S)))} SP` : '';
     const sube = FichaHabilidades.spSube(S, h);   // Enfocado: cada uso seguido cuesta 1 SP más
-    if(sube) partes.push(`${fmt(FichaHabilidades.costoSpDe(S, h))} SP (+${fmt(sube)} por usarla seguida)`);
-    else if(costo) partes.push(/sp|bono/i.test(costo) ? costo : `${costo} SP`);
-    if(FichaHabilidades.hpVariable(h)) partes.push('X HP');
-    else if(num(h.hpCosto) > 0) partes.push(`${fmt(num(h.hpCosto))} HP`);
-    if(num(h.curaHp) > 0) partes.push(`cura ${fmt(num(h.curaHp))} HP`);
-    return partes.join(' · ');
+    if(sube) P(`${fmt(FichaHabilidades.costoSpDe(S, h))} SP (+${fmt(sube)} por usarla seguida)`, faltaSp);
+    else if(costo) P(/sp|bono/i.test(costo) ? costo : `${costo} SP`, faltaSp);
+    if(FichaHabilidades.hpVariable(h)) P('X HP');
+    else if(num(h.hpCosto) > 0) P(`${fmt(num(h.hpCosto))} HP`, num(S.hp) <= num(h.hpCosto) ? `${fmt(num(S.hp))} de vida` : '');
+    if(num(h.curaHp) > 0) P(`cura ${fmt(num(h.curaHp))} HP`);
+    return partes;
   }
 
   /* ---------- Parry ---------- */
@@ -464,11 +479,11 @@ const FichaBotonera = (() => {
           return `<div class="cat-row bot-fila">
             ${cuadro('hab', i.id)}<div class="bot-fila-info">
               <div class="cat-nombre">${esc(i.nombre)}</div>
-              ${costoHabilidadTxt(S, i) ? `<div class="bot-fila-costo${sinSp ? ' sin-sp' : ''}" title="${sinSp ? 'No te alcanza el SP: te avisa antes y la podés usar igual' : 'Lo que cuesta ejecutarla'}">${sinSp ? 'Sin SP · ' : ''}${esc(costoHabilidadTxt(S, i))}</div>` : ''}
+              ${costoHabilidadTxt(S, i) ? `<div class="bot-fila-costo${sinSp ? ' sin-sp' : ''}" title="${esc(costoHabilidadFalta(S, i) || 'Lo que cuesta ejecutarla')}${sinSp ? ' — te avisa antes y la podés usar igual' : ''}">${costoHabilidadHtml(S, i)}</div>` : ''}
             </div>
             <div class="bot-fila-btns">
               <button class="mini" data-view="habilidades:${i.id}">Ver</button>
-              <button class="ejecutar-btn${habAutomatizada(i) ? ' con-lupa' : ''}${sinNitros?" sin-recursos":sinSp?" sin-sp":""}${Combatiente.esFlash(i) ? ' bt-flash' : ''}" data-ejecutar="${i.id}" ${sinNitros?'aria-disabled="true" title="No te alcanzan los recursos"':sinSp?'title="No te alcanza el SP: te avisa antes y la podés usar igual"':Combatiente.esFlash(i) ? 'title="⚡ Flash: se puede usar en turno ajeno (cuesta el doble)"' : ''}>${habAutomatizada(i) ? 'Ejecutar' + lupaBotonHtml(`habx:${i.id}`, "en-boton") : 'Anunciar'}</button>
+              <button class="ejecutar-btn${habAutomatizada(i) ? ' con-lupa' : ''}${sinNitros?" sin-recursos":sinSp?" sin-sp":""}${Combatiente.esFlash(i) ? ' bt-flash' : ''}" data-ejecutar="${i.id}" ${sinNitros?`aria-disabled="true" title="${esc(costoHabilidadFalta(S, i) || 'No te alcanzan los recursos')}"`:sinSp?'title="No te alcanza el SP: te avisa antes y la podés usar igual"':Combatiente.esFlash(i) ? 'title="⚡ Flash: se puede usar en turno ajeno (cuesta el doble)"' : ''}>${habAutomatizada(i) ? 'Ejecutar' + lupaBotonHtml(`habx:${i.id}`, "en-boton") : 'Anunciar'}</button>
               ${botonSegundaHab(i)}
             </div>
           </div>`;
@@ -499,7 +514,7 @@ const FichaBotonera = (() => {
   return {STATS_CON_TIRADA_IDS, TIPOS_IDS, PERCEPCION_DADO_SUBE, sinSpPara, spLibre, html, tiradaStat, tiradaPercepcion, tiradaPercepcionValor,
     spMaximo, nitrosMaximo, tienePercepcionAumentada, tieneSigilo, efectoSigilo, efectoSentado,
     statsConTirada, habStatTirable, habTieneSegundaTirada, botonSegundaHab, dueloDe, modoHab, habAutomatizada,
-    armasParaHabilidad, costoAtaqueMinimo, costoAtaqueHabTxt, costoNitrosHab, sinNitrosPara, costoHabilidadTxt,
+    armasParaHabilidad, costoAtaqueMinimo, costoAtaqueHabTxt, costoNitrosHab, sinNitrosPara, costoHabilidadTxt, costoHabilidadHtml, costoHabilidadFalta,
     costoParryTxt, costoConsumirNitros, consumeButton,
     inteligenciaAuto, inteligenciaManual, inteligenciaValor, inteligenciaBudget, nivelSocial, dadoCarasSocial,
     nivelSocialTxt, tiradaSocialTxt, filaSocialBotonera};

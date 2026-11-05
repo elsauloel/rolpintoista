@@ -82,7 +82,9 @@ const InvBotonera = (() => {
       return `<div class="cat-row bot-fila">
         <div class="bot-fila-info">
           <div class="cat-nombre">${esc(h.nombre||'Sin nombre')}</div>
-          <div class="bot-fila-costo">${esc(bloqueo || motivo)}</div>
+          <div class="bot-fila-costo">${bloqueo === 'Sin No2' || bloqueo === 'Sin vida'   // 🚫 lo que falta, en rojo y con números (2026-11-05, dueño)
+            ? `<span style="color:#ff8a80;font-weight:700">${esc(bloqueo === 'Sin No2' ? `No2 insuficiente: cuesta ${fmt(I.costoNitrosHab(inv, h))}, tiene ${fmt(num(inv.nitros))}` : `Vida insuficiente: cuesta ${fmt(num(h.hpCosto))}, tiene ${fmt(num(inv.hp))}`)}</span>${motivo ? ' · ' + esc(motivo) : ''}`
+            : esc(bloqueo || motivo)}</div>
         </div>
         <div class="bot-fila-btns">
           <button type="button" class="mini" data-verhabinv="${inv.id}:${h.id}">Ver</button>

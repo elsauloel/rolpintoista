@@ -16,7 +16,7 @@
    Ventana: Critico.abrir() — una calculadora para poner PdG, Evasión y el arma, tirar los d20 y publicar el resultado en la Mesa.
    ========================================================= */
 const Critico = (() => {
-  const TIPOS = [4, 6, 8, 10, 12];
+  const TIPOS = [4, 6, 8, 10, 12];   // el Tipo 12 no existe por ahora (dueño, 2026-11-04): el selector de la calculadora no lo ofrece (2026-11-05)
   const num = v => { const n = Number(String(v ?? '').replace(',', '.')); return Number.isFinite(n) ? n : 0; };
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]));
   const NOMBRE_MULT = {1: 'sin multiplicador', 2: 'doble daño', 3: 'triple daño', 4: 'cuádruple daño'};
@@ -183,7 +183,7 @@ const Critico = (() => {
     function cuerpo(id){
       if(id === 'arma') return `<div class="cr-preg">¿Con qué arma ataca?</div>
         <p>El <b>Tipo</b> del arma es el rango del crítico: cuanto más bajo, más fácil. Con <b>Crítico frecuente</b> el rango baja (mínimo 2); con <b>Crítico potente</b> los multiplicadores salen con menos en el d20. ${tieneAuto() ? '<b>Ya los completé</b> con lo que tiene equipado y activo (equipo, habilidades y estados): cambialos si hace falta.' : ''}</p>
-        <div class="cr-grid">${selFuente('atacante', '¿Quién ataca?', v.atacante)}<div class="cr-campo"><label for="cr-tipo">Tipo del arma</label><select id="cr-tipo">${TIPOS.map(t => `<option value="${t}"${num(v.tipo) === t ? ' selected' : ''}>Tipo ${t}</option>`).join('')}</select></div>
+        <div class="cr-grid">${selFuente('atacante', '¿Quién ataca?', v.atacante)}<div class="cr-campo"><label for="cr-tipo">Tipo del arma</label><select id="cr-tipo">${TIPOS.filter(t => t !== 12 || num(v.tipo) === 12).map(t => `<option value="${t}"${num(v.tipo) === t ? ' selected' : ''}>Tipo ${t}</option>`).join('')}</select></div>
         ${campo('frecuente', 'Crítico frecuente ×', v.frecuente, 'min="0"')}${campo('potente', 'Crítico potente ×', v.potente, 'min="0"')}</div>`;
       if(id === 'pdg') return `<div class="cr-preg">¿Cuánto sacó de PdG?</div>
         <p>La tirada de <b>probabilidad de golpe</b> del atacante, con todo sumado (el total que quedó en la Mesa).</p>
@@ -194,12 +194,12 @@ const Critico = (() => {
         <div id="cr-vista"></div>`;
       if(id === 'critico'){
         const e = ev(), u = e.umbrales;
-        const cab = `Diferencia PdG − Evasión: <b>${e.diferencia}</b> · rango del crítico: <b>${e.rango}</b>${e.rango !== num(v.tipo) ? ` (Tipo ${num(v.tipo)}${num(v.frecuente) ? ` − frecuente ${num(v.frecuente)}` : ''}${num(v.resistencia) > 0 ? ` + Resistencia a crítico ${num(v.resistencia)}` : num(v.resistencia) < 0 ? ` − Punto débil ${-num(v.resistencia)}` : ''}${num(v.tipo) - num(v.frecuente) + num(v.resistencia) < 2 ? ', mínimo 2' : ''})` : ''}`;
+        const cab = `Diferencia PdG − Evasión: <b>${e.diferencia}</b> · rango del crítico: <b>${e.rango}</b>${(e.rango !== num(v.tipo) || num(v.frecuente) || num(v.resistencia)) ? ` (Tipo ${num(v.tipo)}${num(v.frecuente) ? ` − frecuente ${num(v.frecuente)}` : ''}${num(v.resistencia) > 0 ? ` + Resistencia a crítico ${num(v.resistencia)}` : num(v.resistencia) < 0 ? ` − 💢 Punto débil ${-num(v.resistencia)}` : ''}${num(v.tipo) - num(v.frecuente) + num(v.resistencia) < 2 ? ', mínimo 2' : ''})` : ''}`;
         let r;
         if(e.diferencia <= 0) r = `La PdG no supera a la Evasión: <b>no hay golpe</b> (se resuelve a mano) ni crítico.`;
         else if(e.nivel === 0) r = `<b>No es crítico</b>: la diferencia no llega al rango${num(v.resistencia) > 0 ? ' (la Resistencia a crítico lo agranda)' : ''}.`;
         else{
-          r = `Nivel del crítico: <b>${e.nivel}</b>.<br><b>Crítico${e.dados > 1 ? ` ×${e.dados}` : ''}</b>: se tiran <b>${e.dados}d20</b> y vale el mejor (con dos o más 20 naturales, supercrítico: cada 20 suma ×4). Doble daño con ${u.doble}+, triple con ${u.triple}+, cuádruple con ${u.cuadruple}+. Ignora la armadura.`;
+          r = `Nivel del crítico: <b>${e.nivel}</b>.<br><b>Crítico${e.dados > 1 ? ` ×${e.dados}` : ''}</b>: se tiran <b>${e.dados}d20</b> y vale el mejor (con dos o más 20 naturales, supercrítico: cada 20 suma ×4). ${u.doble <= 1 ? 'Doble daño seguro' : `Doble daño con ${u.doble}+`}, triple con ${u.triple}+, cuádruple con ${u.cuadruple}+. Ignora la armadura.`;
           if(tirada) r += `<br>d20: ${tirada.rolls.join(', ')} → ${tirada.supercritico ? `<b>¡${tirada.mult / 4} veintes naturales!</b>` : `mejor <b>${tirada.mejor}</b>`} → <b>${nombreMult(tirada.mult)}</b> (×${tirada.mult})`;
           else r += `<div class="cr-fila"><button type="button" id="cr-tirar" class="prim">🎲 Tirar ${e.dados}d20</button></div>`;
         }

@@ -101,8 +101,8 @@ const ESTADOS_PRESET = [
     detalle:'Parálisis: PdG, Parry y Evasión a la mitad (redondeado hacia abajo) mientras dure, y recarga 1 No2 menos. Mezcla de Lisiado y Pajaritos, más suave que un Stun; cada stat se parte una sola vez (no se suma a Lisiado ni a Pajaritos sobre el mismo stat).'},
   {nombre:'Crítico frecuente', polaridad:'buff', turnos:2, mods:[{stat:'crit', val:1}],
     detalle:'Crítico frecuente +1: el rango del crítico baja 1 punto (un arma Tipo 4 hace crítico con diferencia 3; mínimo 2), y también la diferencia para el doble crítico. Editá el valor para darle más puntos. La duración la elige quien lo da.'},
-  {nombre:'Crítico potente', polaridad:'buff', turnos:2, mods:[{stat:'critpot', val:1}],
-    detalle:'Crítico potente +1: los umbrales del d20 bajan (doble daño desde 6, triple y cuádruple más lento: 1 de cada 2 y 1 de cada 3 puntos). Editá el valor para darle más puntos. La duración la elige quien lo da.'},
+  {nombre:'Crítico potente', polaridad:'buff', turnos:2, mods:[{stat:'critpot', val:2}],
+    detalle:'Crítico potente +2: los umbrales del d20 bajan (doble daño desde 5, triple y cuádruple más lento: 1 de cada 2 y 1 de cada 3 puntos). Editá el valor para darle más puntos. La duración la elige quien lo da.'},
   // Silencio (2026-10-04, dueño: la Runa de silencio automatizada): no puede usar habilidades que cuestan SP. Se avisa al ejecutarla y se deja seguir.
   {nombre:'Silencio', polaridad:'debuff', turnos:1, silencio:true, esCC:true,
     detalle:'Silenciado: no puede usar habilidades que cuestan SP mientras dure. ⚙ Automatizado: al ejecutar una habilidad con costo en SP, avisa (y deja seguir si la mesa lo decide).'},
@@ -143,10 +143,10 @@ const ESTADOS_PRESET = [
   // Sprint (Asalto, 2026-10-13): los próximos 3 casilleros que camina están pagos (solo paga los recargos: Rengo, terreno lento). Lo descuenta el mapa.
   {nombre:'Sprint', polaridad:'buff', turnos:1, sprint:3, alEmpezarTurno:true,
     detalle:'Los próximos 3 casilleros que camina en este turno ya están pagos: solo paga lo que sumen Rengo o el terreno lento, y alejarse de un rival le da su ataque de oportunidad. Se termina al empezar su próximo turno. ⚙ Automatizado en el mapa.'},
-  // Ojo certero (2026-10-24, dueño: el Support de los creeps): Crítico frecuente +2 y Crítico potente +2, dos turnos completos de quien lo recibe
+  // Ojo certero (2026-10-24, dueño: el Support de los creeps): Crítico frecuente +2 y Crítico potente +2 (+4 desde el 2026-11-05, dueño), dos turnos completos de quien lo recibe
   // (`turnosCompletos`: el turno en que se lo dan no cuenta, aunque sea el suyo; Combatiente.terminarTurnoEstados).
-  {nombre:'Ojo certero', polaridad:'buff', turnos:2, turnosCompletos:true, mods:[{stat:'crit', val:2}, {stat:'critpot', val:2}],
-    detalle:'Le afinan la puntería: Crítico frecuente +2 y Crítico potente +2 durante sus próximos 2 turnos completos (el turno en que se lo dan no cuenta). Si se lo vuelven a dar, no se suma: vuelve a durar 2 turnos. ⚙ Automatizado.'},
+  {nombre:'Ojo certero', polaridad:'buff', turnos:2, turnosCompletos:true, mods:[{stat:'crit', val:2}, {stat:'critpot', val:4}],
+    detalle:'Le afinan la puntería: Crítico frecuente +2 y Crítico potente +4 durante sus próximos 2 turnos completos (el turno en que se lo dan no cuenta). Si se lo vuelven a dar, no se suma: vuelve a durar 2 turnos. ⚙ Automatizado.'},
   // Levitando (2026-10-25, dueño: el Support, «Levitar»: «que esté flotando todo el tiempo mientras tenga el estado», «+3» —leído como Evasión— y «que el
   // primer casillero de movimiento no le cueste nitros»): `levitar` en 100 como Vuela (nunca toca el piso: ni terreno, ni zonas del suelo, ni trampas;
   // pasa por encima de los tokens: vtt-hexgrid/js/04), Evasión +3 y Pasos gratis +1. Sin `volador`: sí le entran Sentado y Rengo. 2 turnos completos.
@@ -369,8 +369,8 @@ const ESTADOS_PRESET = [
     detalle:'Carga un golpe a la vista de todos: en su próximo turno descarga un ataque con +3 dados del Tipo de su arma, que no se puede parrear y empuja 2 casillas (cuesta los No2 del ataque y 3 SP). Si su objetivo está pegado y se aleja, se lo come de oportunidad (los No2 de una oportunidad y los 3 SP). Si mientras lo carga le entran 10 de daño o más (sumando los golpes), se le cae el golpe. ⚙ Automatizado en el mapa.'},
   // 🎯 Apuntando a la cabeza (2026-10-21, dueño, el Tiro a la cabeza de los creeps): su próximo disparo +2 PdG, Crítico frecuente +1 y Crítico potente +1
   // (`apunta`, lo suma el mapa: vtt-hexgrid/js/35); se gasta al disparar y se pierde si le entra daño (`pierdeAlDano`, js/10).
-  {nombre:'Apuntando a la cabeza', polaridad:'buff', turnos:0, permanente:true, apunta:{pdg:2, crit:1, critpot:1}, pierdeAlDano:true,
-    detalle:'Apunta con calma: su próximo disparo con un arma a distancia suma +2 a la Probabilidad de Golpe, Crítico frecuente +1 y Crítico potente +1. Se gasta al disparar; si antes le hacen daño (que le llegue a la vida), pierde la puntería. ⚙ Automatizado en el mapa.'},
+  {nombre:'Apuntando a la cabeza', polaridad:'buff', turnos:0, permanente:true, apunta:{pdg:2, crit:1, critpot:3}, pierdeAlDano:true,
+    detalle:'Apunta con calma: su próximo disparo con un arma a distancia suma +2 a la Probabilidad de Golpe, Crítico frecuente +1 y Crítico potente +3. Se gasta al disparar; si antes le hacen daño (que le llegue a la vida), pierde la puntería. ⚙ Automatizado en el mapa.'},
   // 🎯 Presa (2026-10-21, dueño, el Disparo señalador; después, el Señalar la presa del Support): Evasión −1 (un mod: vale contra todo) y +2 al daño de
   // quien lo ataque siendo su rival (`presa`: lo suma el duelo, comun/duelo.js; lo detecta el mapa, vtt-hexgrid/js/13). Va junto con el Marcado.
   {nombre:'Presa', polaridad:'debuff', turnos:2, presa:2, mods:[{stat:'eva', val:-1}],

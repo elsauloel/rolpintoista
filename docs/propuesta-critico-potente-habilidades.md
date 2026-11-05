@@ -1,7 +1,7 @@
 # Propuesta: habilidades con Crítico potente, la calculadora del crítico y el dibujo del duelo
 
 Pedido del dueño (2026-11-05): «Revisemos las habilidades de crítico potente. Y de paso la calculadora del crítico y el dibujo del duelo».
-**Solo propuesta: no se cambió nada del juego.** Base: [medicion-critico-frecuente.md](medicion-critico-frecuente.md) y lo decidido en las armas
+**✅ Aprobada y cargada (dueño, 2026-11-05: «La revisión de crítico potente en skills. Sugerencias me parecen bien… también en estados y consumibles. Corregir los problemas que encontraste en la calculadora… dale potente más 3»)**: todas las subidas de la tabla (Golpe brutal del Warrior: **Potente +3**; Apuntar: +2X en el mapa, tope 6; Marcar: +2 en el mapa), el estado Crítico potente arranca en +2, las Mano Pesada +2/+4/+6, y los 6 detalles de la calculadora y del dibujo del duelo corregidos (la cuenta siempre a la vista, «doble daño seguro», sin Tipo 12, «− 💢 Punto débil», el frecuente que se pierde por el mínimo de 2 atenuado, sin fila ×1 cuando no puede salir). Base: [medicion-critico-frecuente.md](medicion-critico-frecuente.md) y lo decidido en las armas
 ([propuesta-armas-critico-caras.md](propuesta-armas-critico-caras.md)).
 
 ## Cuánto vale el potente

@@ -581,13 +581,13 @@ const Combatiente = (() => {
      objetivo (`frac` = vida / vida máxima, de 0 a 1): la mitad o menos +2, un cuarto o menos +3; si no, 0. */
   const REMATE_ESCALONES = [[0.25, 3], [0.5, 2]];
   const remateDados = frac => { const f = Number(frac); if(!Number.isFinite(f) || f <= 0) return 0; const e = REMATE_ESCALONES.find(([tope]) => f <= tope); return e ? e[1] : 0; };
-  /* 😤 Golpe desesperado (dueño, 2026-10-26, choque liviano, escalonado por la vida PROPIA): con más de la mitad, +1 a los dos críticos y +1 al daño; con
-     la mitad o menos, +2, +2 y +3; con un cuarto o menos, además +2 PdG. `frac`: la vida que le queda, de 0 a 1. */
+  /* 😤 Golpe desesperado (dueño, 2026-10-26, choque liviano, escalonado por la vida PROPIA): con más de la mitad, frecuente +1, potente +2 y +1 al daño;
+     con la mitad o menos, +2, +4 y +3; con un cuarto o menos, además +2 PdG (el potente al doble desde el 2026-11-05, dueño). `frac`: la vida que le queda, de 0 a 1. */
   function desesperadoBonos(frac){
     const f = Number(frac);
-    if(Number.isFinite(f) && f <= 0.25) return {critBono: 2, critpotBono: 2, fijo: 3, pdg: 2};
-    if(Number.isFinite(f) && f <= 0.5) return {critBono: 2, critpotBono: 2, fijo: 3, pdg: 0};
-    return {critBono: 1, critpotBono: 1, fijo: 1, pdg: 0};
+    if(Number.isFinite(f) && f <= 0.25) return {critBono: 2, critpotBono: 4, fijo: 3, pdg: 2};
+    if(Number.isFinite(f) && f <= 0.5) return {critBono: 2, critpotBono: 4, fijo: 3, pdg: 0};
+    return {critBono: 1, critpotBono: 2, fijo: 1, pdg: 0};
   }
   const desesperadoTxt = b => [b.pdg ? `+${b.pdg} PdG` : '', `+${b.critBono} Crítico frecuente`, `+${b.critpotBono} Crítico potente`, `+${b.fijo} al daño`].filter(Boolean).join(', ');
   const ATRAPA_VISUALES = ['telarana', 'red'];
@@ -1114,7 +1114,7 @@ const Combatiente = (() => {
     return p;
   }
   /* Apuntar (Shooter, 2026-10-11, decisiones del dueño): el estado «Apuntando» con X stacks (X SP y X No2, X ≤ 3) le suma al PRÓXIMO disparo con un
-     arma a distancia +X PdG y Crítico potente +X, aunque sea en otro turno (no vence: se gasta al disparar); se suma con Tensar. Lo hace el mapa (js/35). */
+     arma a distancia +X PdG y Crítico potente +2X (2026-11-05; tope +6), aunque sea en otro turno (no vence: se gasta al disparar); se suma con Tensar. Lo hace el mapa (js/35). */
   const APUNTANDO = 'Apuntando';
   const apuntandoX = estados => { const e = (estados || []).find(x => x && x.activo !== false && x.nombre === APUNTANDO); return e ? Math.max(1, Math.min(3, Math.round(n(e.stacks)) || 1)) : 0; };
   const lecturaTope = arma => !arma || !arma.lectura ? 0 : arma.lectura === true ? 3 : Math.max(0, Math.round(n(arma.lectura)));   // Lectura del viento: hasta +N

@@ -81,6 +81,9 @@ const PASIVAS_BASE = [
   // docs/propuesta-pasivas-consumibles-res-critico.md). Las de la vida las suma el duelo al calcular el crítico (Combatiente.resCritPorVida).
   {poolId: 'callo-de-batalla', nombre: 'Callo de batalla', jobCosto: 1, etiquetas: ['stat', 'defensiva'],
    detalle: '+1 Res. crítico Tipo 4: de tanto ligarla, ya ni se mosquea. ⚙ Automatizado.', mods: [{stat: 'tipo1', val: 1}]},
+  // Cuero duro (dueño, 2026-11-05: «Cuero duro queda»).
+  {poolId: 'cuero-duro', nombre: 'Cuero duro', jobCosto: 1, etiquetas: ['stat', 'defensiva'],
+   detalle: '+1 Res. crítico Tipo 6 y +1 Res. crítico Tipo 8: el pellejo curtido aguanta los cortes y los hachazos. ⚙ Automatizado.', mods: [{stat: 'tipo2', val: 1}, {stat: 'tipo3', val: 1}]},
   {poolId: 'manas-de-sobreviviente', nombre: 'Mañas de sobreviviente', jobCosto: 1, etiquetas: ['defensiva'],
    detalle: 'Con la vida a la mitad o menos: +1 Res. crítico contra todos los Tipos. ⚙ Automatizado: el duelo lo suma al calcular el crítico, mirando tu vida en ese momento.', mods: [{stat: 'rescritmitad', val: 1}]},
   {poolId: 'contra-las-cuerdas', nombre: 'Contra las cuerdas', jobCosto: 1, etiquetas: ['defensiva'],

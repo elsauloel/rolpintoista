@@ -247,6 +247,7 @@ const Duelo = (() => {
 .duelo-crit-cinco{display:flex;gap:2px;margin:0 7px 4px 0}
 .duelo-crit-cuad{width:20px;height:20px;border-radius:4px;background:#1d2335;border:1px solid #39435c;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#9aa4bd;flex:none;position:relative}
 .duelo-crit-cuad.frec{background:#1f6b3a;border-color:#5fd08a;color:#e6ffee}
+.duelo-crit-cuad.frec.perdido{opacity:.35;text-decoration:line-through}   /* el frecuente que se pierde por el mínimo de 2 (2026-11-05) */
 .duelo-crit-cuad svg{width:72%;height:72%;display:block}
 .duelo-crit-cuad.mira{color:#c9a24a}
 .duelo-crit-cuad.eva{background:#3b1820;border-color:#d95a6e;color:#ffe3e7}
@@ -2722,8 +2723,8 @@ const Duelo = (() => {
     const cambia = P > 0;
     const razones = cambia ? `<div class="duelo-nota" style="margin-top:6px">🔧 <b>Tabla modificada:</b> ${_esc(d.atacante.nombre)} tiene <b>Crítico potente ${_fmt(P)}</b>${_num(c.potente) ? ' (de su equipo, habilidades o estados)' : ''}. Cada punto baja <b>1</b> el número del doble daño (hasta un mínimo de 1), <b>1 cada 2 puntos</b> el del triple y <b>1 cada 3 puntos</b> el del cuádruple. Por eso: doble ${b.doble} → <b>${u.doble}</b>${P >= 2 ? `, triple ${b.triple} → <b>${u.triple}</b>` : ''}${P >= 3 ? `, cuádruple ${b.cuadruple} → <b>${u.cuadruple}</b>` : ''}.</div>` : `<div class="duelo-nota" style="margin-top:6px">Tabla base (sin Crítico potente).</div>`;
     return `<table class="duelo-tabla"><thead><tr><th>Multiplicador</th><th>Sale con el mejor d20 de…</th>${cambia ? '<th>Base</th>' : ''}</tr></thead><tbody>
-      ${filas.map((f, i) => `<tr class="${gano === i ? 'gano' : ''}${f[3] !== f[2] ? ' mod' : ''}"><td>${f[0]} · ${f[1]}</td><td><b>${f[3] >= 20 && i === 2 ? '20' : f[3] + ' o más'}</b>${f[3] !== f[2] ? ' ✎' : ''}</td>${cambia ? `<td>${f[2] >= 20 && i === 2 ? '20' : f[2] + ' o más'}</td>` : ''}</tr>`).join('')}
-      <tr class="${gano === -1 ? 'gano' : ''}"><td>×1 · sin multiplicador</td><td>menos de ${u.doble}</td>${cambia ? `<td>menos de ${b.doble}</td>` : ''}</tr></tbody></table>${razones}`;
+      ${filas.map((f, i) => `<tr class="${gano === i ? 'gano' : ''}${f[3] !== f[2] ? ' mod' : ''}"><td>${f[0]} · ${f[1]}</td><td><b>${f[3] >= 20 && i === 2 ? '20' : i === 0 && f[3] <= 1 ? 'siempre' : f[3] + ' o más'}</b>${f[3] !== f[2] ? ' ✎' : ''}</td>${cambia ? `<td>${f[2] >= 20 && i === 2 ? '20' : f[2] + ' o más'}</td>` : ''}</tr>`).join('')}
+      ${u.doble > 1 ? `<tr class="${gano === -1 ? 'gano' : ''}"><td>×1 · sin multiplicador</td><td>menos de ${u.doble}</td>${cambia ? `<td>menos de ${b.doble}</td>` : ''}</tr>` : ''}</tbody></table>${razones}`;   // con el doble seguro (potente 6+), la fila ×1 no puede salir (2026-11-05)
   }
 
   // Paso 4 · Crítico: la cuenta, los d20 y (si sale) la celebración.
@@ -2754,6 +2755,9 @@ const Duelo = (() => {
   // tachados cuadradito por cuadradito (no con una línea por encima de todo el grupo); lo que sobra sin llegar a
   // un grupo entero queda gris, suelto. Las dos filas se reordenan de a 5 (pedido del dueño, para contar de un
   // vistazo) y abajo hay una leyenda con lo que significa cada color/símbolo.
+  // La resistencia en los textos (2026-11-05, dueño: corregir lo que encontró la revisión): positiva, «+ Resistencia a crítico N»; negativa (Punto
+  // débil), «− 💢 Punto débil N».
+  const resCritTxt = r => { const x = Math.round(_num(r)); return x > 0 ? ` + Resistencia a crítico ${_fmt(x)}` : x < 0 ? ` − 💢 Punto débil ${_fmt(-x)}` : ''; };
   function criticoVizHtml(d){
     const c = d.crit;
     const tipo = Math.max(1, Math.round(_num(d.ataque.tipoDado)));
@@ -2772,9 +2776,12 @@ const Duelo = (() => {
     // 🎯 Punto débil (2026-11-05): con resistencia negativa, los últimos cuadraditos del Tipo van en violeta con 💢 (el ícono del estado): achican el rango.
     const resistencia = Math.round(_num(c.resistencia)), resPos = Math.max(0, resistencia), debil = Math.max(0, -resistencia);
     const nFrec = Math.max(0, tipo + resistencia - rango);
+    // El frecuente que choca con el mínimo de 2 (2026-11-05): se dibuja atenuado, al final de la fila, y la leyenda lo dice.
+    const frecTotal = Math.max(nFrec, Math.round(_num(c.frecuente))), frecPerdido = frecTotal - nFrec;
     // Los que quedan llevan la mira (dueño, 2026-10-12: «los recuadros vacíos podrían estar con el ícono de la mira, el círculo con las cuatro rayitas»).
     const MIRA = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8" cy="8" r="4.6"/><path d="M8 1v3.2M8 11.8V15M1 8h3.2M11.8 8H15"/></svg>';
-    const filaTipo = deA5(Array.from({length: tipo + resPos}, (_, i) => i < nFrec ? cuad('frec', 'F') : i >= tipo ? cuad('res', 'R') : i >= tipo - debil ? cuad('debil', '💢') : cuad('mira', MIRA)));
+    const filaTipo = deA5([...Array.from({length: tipo + resPos}, (_, i) => i < nFrec ? cuad('frec', 'F') : i >= tipo ? cuad('res', 'R') : i >= tipo - debil ? cuad('debil', '💢') : cuad('mira', MIRA)),
+      ...Array.from({length: frecPerdido}, () => cuad('frec perdido', 'F'))]);
 
     // La tirada, agrupada de a «rango» (2026-09-28, el dueño volvió a este agrupado en vez de a 5: cada grupo
     // entero es un nivel de crítico, así se cuentan de un vistazo). Primero lo que come la Evasión/Parry (rojo,
@@ -2793,7 +2800,8 @@ const Duelo = (() => {
 
     const leyenda = [
       `${cuad('mira', MIRA)}<span>= el rango del crítico: cuántos puntos de diferencia hacen falta para cada nivel</span>`,
-      nFrec ? `${cuad('frec', 'F')}<span>= Crítico frecuente (${_fmt(nFrec)}): se resta del Tipo y achica el rango</span>` : '',
+      frecTotal ? `${cuad('frec', 'F')}<span>= Crítico frecuente (${_fmt(frecTotal)}): se resta del Tipo y achica el rango</span>` : '',
+      frecPerdido ? `${cuad('frec perdido', 'F')}<span>= ${frecPerdido > 1 ? `${_fmt(frecPerdido)} puntos de frecuente se pierden` : '1 punto de frecuente se pierde'} por el mínimo de 2</span>` : '',
       evaTotal ? `${cuad('eva', 'E')}<span>= tirada de ${_esc(nombreDef2)}</span>` : '',
       `${cuad('activo')}<span>= cuenta para un nivel de crítico</span>`,
       resPos ? `${cuad('res', 'R')}<span>= Resistencia a crítico del defensor (Tipo ${_fmt(tipo)} ×${_fmt(resPos)}): agranda el rango</span>` : '',
@@ -2802,7 +2810,7 @@ const Duelo = (() => {
     ].filter(Boolean).map(t => `<div class="duelo-crit-ref">${t}</div>`).join('');
 
     return `<div class="duelo-crit-viz">
-      <div class="duelo-crit-viz-tit">Rango del crítico: Tipo ${_fmt(tipo)}${nFrec ? ` − Crítico frecuente ${_fmt(nFrec)}` : ''}${resistencia ? ` + Resistencia a crítico ${_fmt(resistencia)}` : ''}${tipo !== rango ? ` = ${_fmt(rango)}` : ''}</div>
+      <div class="duelo-crit-viz-tit">Rango del crítico: Tipo ${_fmt(tipo)}${frecTotal ? ` − Crítico frecuente ${_fmt(frecTotal)}` : ''}${resCritTxt(resistencia)}${tipo !== rango || frecTotal || resistencia ? ` = ${_fmt(rango)}${frecPerdido ? ' (mínimo 2)' : ''}` : ''}</div>
       <div class="duelo-crit-fila">${filaTipo}</div>
       <div class="duelo-crit-viz-tit">Tu tirada: PdG ${_fmt(pdgTotal)}${evaTotal ? ` − ${_esc(nombreDef2)} ${_fmt(evaTotal)}` : ''}</div>
       <div class="duelo-crit-fila">${filaTirada}</div>
@@ -2812,7 +2820,7 @@ const Duelo = (() => {
   function criticoHtml(d){
     const c = d.crit;
     const nombreDef = d.defensa && d.defensa.modo === 'parry' ? 'Parry' : 'Evasión';
-    const cuenta = `PdG ${_fmt(d.pdg.total)} − ${nombreDef} ${_fmt(d.eva.total)} = ${_fmt(c.diferencia)} · rango del crítico ${_fmt(c.rango)} (Tipo ${_fmt(_num(d.ataque.tipoDado))}${_num(c.frecuente) ? ' − Crít. frecuente ' + _fmt(c.frecuente) : ''}${_num(c.resistencia) ? ' + resistencia ' + _fmt(c.resistencia) : ''}) → nivel ${_fmt(c.nivel)}`;
+    const cuenta = `PdG ${_fmt(d.pdg.total)} − ${nombreDef} ${_fmt(d.eva.total)} = ${_fmt(c.diferencia)} · rango del crítico ${_fmt(c.rango)} (Tipo ${_fmt(_num(d.ataque.tipoDado))}${_num(c.frecuente) ? ' − Crít. frecuente ' + _fmt(c.frecuente) : ''}${resCritTxt(c.resistencia)}) → nivel ${_fmt(c.nivel)}`;
     // Lo primero que se lee es el veredicto en grande; la cuenta que lo explica va debajo, en renglones.
     const titulo = (clase, txt) => `<div class="duelo-crit-titulo ${clase}">${txt}</div>`;
     const explica = lineas => `<div class="duelo-crit-explica">${lineas.map(l => `<div>${_esc(l)}</div>`).join('')}</div>`;
@@ -2821,7 +2829,7 @@ const Duelo = (() => {
     const critpotBono = _num(d.ataque && d.ataque.mods && d.ataque.mods.critpotBono);
     const nombreHab = d.hab ? d.hab.nombre : d.ataque.habNombre || 'Esta habilidad';
     const lCuenta = [`PdG ${_fmt(d.pdg.total)} − ${nombreDef} ${_fmt(d.eva.total)} = ${_fmt(c.diferencia)} de diferencia`,
-      `Rango del crítico: ${_fmt(c.rango)} (Tipo ${_fmt(_num(d.ataque.tipoDado))}${_num(c.frecuente) ? ' − Crítico frecuente ' + _fmt(c.frecuente) : ''}${_num(c.resistencia) ? ' + Resistencia a crítico ' + _fmt(c.resistencia) : ''}${_num(d.ataque.tipoDado) - _num(c.frecuente) + _num(c.resistencia) < 2 ? ', mínimo 2' : ''})`,
+      `Rango del crítico: ${_fmt(c.rango)} (Tipo ${_fmt(_num(d.ataque.tipoDado))}${_num(c.frecuente) ? ' − Crítico frecuente ' + _fmt(c.frecuente) : ''}${resCritTxt(c.resistencia)}${_num(d.ataque.tipoDado) - _num(c.frecuente) + _num(c.resistencia) < 2 ? ', mínimo 2' : ''})`,
       ...(ignoraResistCrit ? [`${_esc(nombreHab)} ignora ${_fmt(ignoraResistCrit)} de Resistencia a crítico del defensor.`] : []),
       ...(critBono ? [`${_esc(nombreHab)} suma +${_fmt(critBono)} a tu Crítico frecuente, solo en esta tirada.`] : []),
       ...(critpotBono ? [`${_esc(nombreHab)} suma +${_fmt(critpotBono)} a tu Crítico potente, solo en esta tirada.`] : []),
@@ -2835,7 +2843,7 @@ const Duelo = (() => {
     if(!c.critico){
       cuerpo = titulo('no', c.blindado ? '🛡 CRÍTICO ANULADO' : '✘ NO ES CRÍTICO')
         + explica([c.blindado ? `🛡 ${(d.defensor && d.defensor.nombre) || 'El defensor'} tiene Blindado: el golpe iba a ser crítico, pero entra como uno normal.`
-          : `La diferencia (${_fmt(c.diferencia)}) no alcanza el rango del crítico (${_fmt(c.rango)}${_num(c.resistencia) ? `, que la Resistencia a crítico del defensor sube ${_fmt(c.resistencia)}` : ''}).`, ...lCuenta])
+          : `La diferencia (${_fmt(c.diferencia)}) no alcanza el rango del crítico (${_fmt(c.rango)}${_num(c.resistencia) > 0 ? `, que la Resistencia a crítico del defensor sube ${_fmt(c.resistencia)}` : _num(c.resistencia) < 0 ? `, que el 💢 Punto débil del defensor baja ${_fmt(-_num(c.resistencia))}` : ''}).`, ...lCuenta])
         + viz;
     }else if(!c.d20){
       const puede = esMio(d.atacante) || soyGM();
@@ -3737,5 +3745,5 @@ const Duelo = (() => {
   }
 
   const abiertoId = () => actual && !actual.min ? actual.id : null;   // ⏬ el duelo abierto (no minimizado) en esta pantalla (la Demora animada, 2026-11-04)
-  return {criticoVizHtml, abiertoId, textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, pagoHabTomar, fraseResumen, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, apartar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
+  return {criticoVizHtml, tablaCriticoHtml, abiertoId, textoEfecto: EstadosAplicarTexto, quienDeLado, pagoHab, pagoHabTomar, fraseResumen, olvidarOpciones, desarmeListo, marcarDesarme, marcarDodgeArco, tiradaSumable, enyetarTirada, estilos: inyectarCss, esperarDados, limpiarEspalda, guardarDano, entrarCritico, efectosDeHabilidad, reabrir, puedeReabrir, recibirRerollInfo, recibirFlash, recibirVista, conVistas, sumarATirada, opcionesHab, disponible, elegirObjetivo, crear, abrir, cerrar, minimizar, apartar, escuchar, recibirOpciones, specDeEfecto, resolverDodge, limpiarHab, pasosDe};
 })();

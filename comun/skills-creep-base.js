@@ -122,8 +122,9 @@
   H('Golpe aplastante', 'D', '*', 'mt', 4, zO('Un golpe devastador que casi no se puede esquivar.', 3, 'H'));
   H('Embestida', 'DK', 'b', 'mt', 3, zO('Carga con todo el cuerpo y empuja al objetivo un casillero (a mano).', 3, 'M'));
   // Auditada (dueño, 2026-10-21): salvaje — Crítico potente +2 y +1 al daño, 2 SP (o cooldown 2), como el Lisiar del Asalto sin la Lesión.
-  H('Zarpazo', 'D', 'b', 'me', 2, aA('Un zarpazo salvaje: un ataque con su arma con Crítico potente +2 (si sale el crítico, multiplica más) y +1 al daño.', {critpotBono: 2, fijo: 1},
-    'va al duelo como un ataque (PdG contra Evasión o Parry, Bloqueo y crítico) con Crítico potente +2 y +1 al daño', 2));
+  // ✔ Crítico potente revisado (dueño, 2026-11-05: «La revisión de crítico potente en skills. Sugerencias me parecen bien»): Potente +2 → +5.
+  H('Zarpazo', 'D', 'b', 'me', 2, aA('Un zarpazo salvaje: un ataque con su arma con Crítico potente +5 (si sale el crítico, multiplica más) y +1 al daño.', {critpotBono: 5, fijo: 1},
+    'va al duelo como un ataque (PdG contra Evasión o Parry, Bloqueo y crítico) con Crítico potente +5 y +1 al daño', 2));
   // Auditada (dueño, 2026-10-21): la que no suelta — si pega, el mordido y la bestia quedan trabados; al empezar su turno el mordido tira Fuerza contra
   // la Fuerza de la bestia (gratis) y, si no se suelta, el mordisco le vuelve a hacer daño; la bestia lo suelta al empezar su siguiente turno (js/54).
   H('Mordisco feroz', 'D', 'b', 'me', 3, aA('Una mordida profunda que no suelta: un ataque con su arma con +1 dado del Tipo de su arma. Si pega, el objetivo queda Mordido (no se mueve, y la bestia tampoco): al empezar su turno tira Fuerza contra la Fuerza de la bestia, gratis; si no se suelta, el mordisco le vuelve a hacer el mismo daño. La bestia lo suelta al empezar su siguiente turno.',
@@ -198,8 +199,9 @@
      10 ambiguas». Cada una un escalón arriba de la de clase. Lo que hace el mapa: vtt-hexgrid/js/78 (Interponerse, Golpe que sigue, Arrastrar, el
      derribo de la Carga) y js/55 (la carrera). */
   // ⚔ Golpe brutal (de clase, un escalón arriba; dueño: «+1 frecuente, +2 potente, +3 al daño»): queda en Guardia baja (−2 Evasión) hasta su próximo turno.
-  H('Golpe brutal', 'D', '*', 'm', 2, {...aA('Se juega todo en un golpe: un ataque con su arma con Crítico frecuente +1, Crítico potente +2 y +3 al daño. A cambio, queda en Guardia baja (−2 a la Evasión) hasta su próximo turno.',
-    {critBono: 1, critpotBono: 2, fijo: 3}, 'va al duelo como un ataque con Crítico frecuente +1, Crítico potente +2 y +3 al daño; queda en Guardia baja (−2 Evasión) hasta su próximo turno', 2, []),
+  // ✔ Crítico potente revisado (dueño, 2026-11-05: «La revisión de crítico potente en skills. Sugerencias me parecen bien»): Potente +2 → +4.
+  H('Golpe brutal', 'D', '*', 'm', 2, {...aA('Se juega todo en un golpe: un ataque con su arma con Crítico frecuente +1, Crítico potente +4 y +3 al daño. A cambio, queda en Guardia baja (−2 a la Evasión) hasta su próximo turno.',
+    {critBono: 1, critpotBono: 4, fijo: 3}, 'va al duelo como un ataque con Crítico frecuente +1, Crítico potente +4 y +3 al daño; queda en Guardia baja (−2 Evasión) hasta su próximo turno', 2, []),
     efecto: {nombre: 'Guardia baja', turnos: 1, mods: {eva: -2}, polaridad: 'debuff', detalle: 'Guardia baja: se jugó todo en el golpe — −2 a la Evasión hasta su próximo turno.'}});
   // ⚔ Arte de la guerra (de clase: «+2 fijo a una tirada de PG, Parry, Bloqueo o Daño»; dueño: «está bien el más 3, está bien el flash, pero que no sea
   // después de ver los dados»): el Flash del duelo, que se marca antes de tirar (comun/creep-duelo.js flashOpciones).
@@ -319,7 +321,8 @@
   H('Disparo señalador', 'DX', 'hd', 'r', 3, aA('Un disparo con su arma que señala a la presa: si pega, además del daño, el objetivo queda Presa 2 turnos (su Evasión baja 1 y todo el que lo ataca le hace +2 de daño) y Marcado (no se puede esconder y se lo ve aunque haya niebla).',
     {}, 'un ataque con su arma; si pega, Presa (Evasión −1, +2 al daño de todos) y Marcado 2 turnos', 2,
     [{nombre: 'Presa', turnos: 2}, {nombre: 'Marcado', turnos: 2}]));
-  H('Tiro a la cabeza', 'B', 'hd', 'r', 3, {detalle: 'Apunta con calma: este turno no dispara (es su ataque del turno) y queda Apuntando a la cabeza. Su próximo disparo con un arma a distancia, en este turno o más adelante, suma +2 a la Probabilidad de Golpe, Crítico frecuente +1 y Crítico potente +1; se gasta al disparar. Si antes le hacen daño (que le llegue a la vida), pierde la puntería.',
+  // ✔ Crítico potente revisado (dueño, 2026-11-05: «La revisión de crítico potente en skills. Sugerencias me parecen bien»): Potente +1 → +3.
+  H('Tiro a la cabeza', 'B', 'hd', 'r', 3, {detalle: 'Apunta con calma: este turno no dispara (es su ataque del turno) y queda Apuntando a la cabeza. Su próximo disparo con un arma a distancia, en este turno o más adelante, suma +2 a la Probabilidad de Golpe, Crítico frecuente +1 y Crítico potente +3; se gasta al disparar. Si antes le hacen daño (que le llegue a la vida), pierde la puntería.',
     no2: 1, spCosto: 2, auditada: true, cuentaComoAtaque: true, efecto: {nombre: 'Apuntando a la cabeza'}, anuncio: '{nombre} apunta con calma…'});
   // (El Escupitajo ácido pasó a ser la versión bestia de Corroer, 2026-10-25: más abajo, junto a ella.)
   H('Proyectil', 'D', '*', 'r', 2, aT('Lanza lo que tenga a mano.', 'L'));
@@ -730,8 +733,9 @@
   H('Armas perforantes', 'B', '*', 'a', 3, {detalle: 'Le enseña a un aliado (o a sí mismo) dentro de su Rango por dónde entrar: queda con Armas perforantes durante sus próximos 3 turnos completos (el turno en que se lo da no cuenta): en cada golpe que da, 3 puntos de daño pasan siempre la Defensa del rival y 3 pasan siempre su Defensa especial.',
     no2: 1, spCosto: 3, auditada: true, ataqueTxt: 'Armas perforantes (Perfora 3 contra la Defensa y 3 contra la Defensa especial), 3 turnos completos, a él o a un aliado en su Rango',
     duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', efectos: [{nombre: 'Armas perforantes'}]}});
-  H('Ojo certero', 'B', '*', 'a', 3, {detalle: 'Le afina la puntería a un aliado (o a sí mismo) dentro de su Rango: Crítico frecuente +2 y Crítico potente +2 durante sus próximos 2 turnos completos (el turno en que se lo da no cuenta).',
-    no2: 1, spCosto: 3, auditada: true, ataqueTxt: 'Crítico frecuente +2 y Crítico potente +2, 2 turnos completos, a él o a un aliado en su Rango',
+  // ✔ Crítico potente revisado (dueño, 2026-11-05: «La revisión de crítico potente en skills. Sugerencias me parecen bien»): Potente +2 → +4.
+  H('Ojo certero', 'B', '*', 'a', 3, {detalle: 'Le afina la puntería a un aliado (o a sí mismo) dentro de su Rango: Crítico frecuente +2 y Crítico potente +4 durante sus próximos 2 turnos completos (el turno en que se lo da no cuenta).',
+    no2: 1, spCosto: 3, auditada: true, ataqueTxt: 'Crítico frecuente +2 y Crítico potente +4, 2 turnos completos, a él o a un aliado en su Rango',
     duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', efectos: [{nombre: 'Ojo certero'}]}});
   // 💨 Auditada (dueño, 2026-10-26; Support: «un poco como el Shield. Otorga un escudo de 10 de HP que absorbe daño. Del tipo vida extra. Y además, sube en
   // uno en la tabla de iniciativas. Y tiene flash»; «dura hasta que se gaste. El escudo reemplaza, no se suma. Y el nombre envión me gusta»): Flash; a él o a
@@ -964,8 +968,9 @@
   // 🗡 Auditada (dueño, 2026-10-26; Choque liviano, «apuestas», el Degollar del Asalto: «vamos con Degollar»): un ataque con su arma con +4 PdG, +7 al
   // daño, Crítico frecuente +1 y potente +1; pegue o no, termina su turno y pasa al final del orden (`terminaTurno`, vtt-hexgrid/js/04) y queda Expuesto
   // hasta su próximo turno (el `efecto` sobre sí, al usarla). Costo de Claude: el ataque y 4 SP, o cooldown 4.
-  H('Degollar', 'D', 'hd', 'e', 4, {...aA('Un tajo devastador: un ataque con su arma con +4 a la Probabilidad de Golpe, +7 al daño, Crítico frecuente +1 y Crítico potente +1. Pegue o no, termina su turno y pasa al final del orden de turnos, y queda Expuesto hasta que empieza su próximo turno: su Evasión a la mitad y sin poder reaccionar con nada que cueste No2.',
-    {pdg: 4, fijo: 7, critBono: 1, critpotBono: 1}, 'va al duelo como un ataque con +4 PdG, +7 al daño y +1 a los dos críticos; termina su turno, pasa al final del orden y queda Expuesto', 4, [], {terminaTurno: true}),
+  // ✔ Crítico potente revisado (dueño, 2026-11-05: «La revisión de crítico potente en skills. Sugerencias me parecen bien»): Potente +1 → +3.
+  H('Degollar', 'D', 'hd', 'e', 4, {...aA('Un tajo devastador: un ataque con su arma con +4 a la Probabilidad de Golpe, +7 al daño, Crítico frecuente +1 y Crítico potente +3. Pegue o no, termina su turno y pasa al final del orden de turnos, y queda Expuesto hasta que empieza su próximo turno: su Evasión a la mitad y sin poder reaccionar con nada que cueste No2.',
+    {pdg: 4, fijo: 7, critBono: 1, critpotBono: 3}, 'va al duelo como un ataque con +4 PdG, +7 al daño y Crítico frecuente +1 y potente +3; termina su turno, pasa al final del orden y queda Expuesto', 4, [], {terminaTurno: true}),
     efecto: {nombre: 'Expuesto', turnos: 1, polaridad: 'debuff'}});
   // 💨 Auditada (dueño, 2026-10-26; Choque liviano, el Dash del Asalto: «el costo de nitros de ataque solo se cobra si el dash incluye un ataque… +2 al daño
   // al golpe… que atraviese un solo objetivo… si el ataque del dash es parreado o bloqueado con éxito, se interrumpe el movimiento: se queda en el casillero
@@ -979,13 +984,15 @@
   // 🤺 Auditada (dueño, 2026-10-26; Choque liviano, «finta»: la propuesta de Claude, «y además ponerle +1 al crítico frecuente y +1 al potente»): un ataque
   // con su arma con +2 al daño, Crítico frecuente +1 y potente +1, que no se puede parar (`sinParry`: ni Parry ni, por eso, Bloqueo; solo esquivar). Para
   // humanoides. Costo de Claude: el ataque y 2 SP, o cooldown 2.
-  H('Finta', 'D', 'hd', 'e', 2, aA('Amaga para un lado y pega por el otro: un ataque con su arma con +2 al daño, Crítico frecuente +1 y Crítico potente +1, que no se puede parar: el rival no puede usar Parry (ni, por eso, Bloqueo) contra este golpe; solo le queda esquivarlo.',
-    {fijo: 2, critBono: 1, critpotBono: 1, sinParry: true}, 'va al duelo como un ataque con +2 al daño y +1 a los dos críticos, que no se puede parar', 2, []));
+  // ✔ Crítico potente revisado (dueño, 2026-11-05: «La revisión de crítico potente en skills. Sugerencias me parecen bien»): Potente +1 → +3.
+  H('Finta', 'D', 'hd', 'e', 2, aA('Amaga para un lado y pega por el otro: un ataque con su arma con +2 al daño, Crítico frecuente +1 y Crítico potente +3, que no se puede parar: el rival no puede usar Parry (ni, por eso, Bloqueo) contra este golpe; solo le queda esquivarlo.',
+    {fijo: 2, critBono: 1, critpotBono: 3, sinParry: true}, 'va al duelo como un ataque con +2 al daño y Crítico frecuente +1 y potente +3, que no se puede parar', 2, []));
   // 👁 Auditada (dueño, 2026-10-26; Choque liviano, «buscar el crítico», el Ojo de asesino del Asalto: «al del creep le sumaría lo mismo que al del asalto»;
   // «no es un estado… es algo que se le suma a un ataque»): un ataque con su arma con +1 PdG, +2 al daño, Crítico frecuente +1 y potente +1. Costo el de la
   // clase: el ataque y 2 SP, o cooldown 2.
-  H('Ojo de asesino', 'D', '*', 'e', 2, aA('Fija la mirada en el punto débil y pega: un ataque con su arma con +1 a la Probabilidad de Golpe, +2 al daño, Crítico frecuente +1 y Crítico potente +1.',
-    {pdg: 1, fijo: 2, critBono: 1, critpotBono: 1}, 'va al duelo como un ataque con +1 PdG, +2 al daño y +1 a los dos críticos', 2, []));
+  // ✔ Crítico potente revisado (dueño, 2026-11-05: «La revisión de crítico potente en skills. Sugerencias me parecen bien»): Potente +1 → +3.
+  H('Ojo de asesino', 'D', '*', 'e', 2, aA('Fija la mirada en el punto débil y pega: un ataque con su arma con +1 a la Probabilidad de Golpe, +2 al daño, Crítico frecuente +1 y Crítico potente +3.',
+    {pdg: 1, fijo: 2, critBono: 1, critpotBono: 3}, 'va al duelo como un ataque con +1 PdG, +2 al daño y Crítico frecuente +1 y potente +3', 2, []));
   // 💨 Auditada (dueño, 2026-10-26; Choque liviano, «desaparecer en la pelea»: «me gusta mucho al punto de que la pondría en la clase también. Que se mueva
   // hasta 3 casillas gratis»; «3 SP y 3 nitros»): la niebla a sus pies (diámetro 3, 1 turno), Sigilo aunque lo vean y hasta 3 casillas gratis sin
   // oportunidad (vtt-hexgrid/js/57 bombaDeHumo). Cooldown 3.
@@ -1001,8 +1008,9 @@
   // 😤 Auditada (dueño, 2026-10-26; Choque liviano, «golpe desesperado», apuestas ✦): un ataque con su arma que crece cuanto menos vida le queda (vtt-hexgrid/js/69):
   // con más de la mitad, +1 a los dos críticos y +1 al daño; con la mitad o menos, +2, +2 y +3; con un cuarto o menos, además +2 PdG. Lo de un ataque y 3 SP,
   // o cooldown 2.
-  H('Golpe desesperado', 'D', '*', 'e', 2, aA('Un golpe con lo que le queda: un ataque con su arma que pega más cuanto menos vida tiene. Con más de la mitad de la vida: +1 a Crítico frecuente y a Crítico potente y +1 al daño. Con la mitad o menos: +2 a los dos críticos y +3 al daño. Con un cuarto o menos: además +2 a la Probabilidad de Golpe.',
-    {}, 'va al duelo como un ataque; según su vida, +1/+1/+1, +2/+2/+3 o, con un cuarto o menos, además +2 PdG', 3, [], {desesperado: true}));
+  // ✔ Crítico potente revisado (dueño, 2026-11-05: «La revisión de crítico potente en skills. Sugerencias me parecen bien»): el potente al doble (+2 / +4).
+  H('Golpe desesperado', 'D', '*', 'e', 2, aA('Un golpe con lo que le queda: un ataque con su arma que pega más cuanto menos vida tiene. Con más de la mitad de la vida: Crítico frecuente +1, Crítico potente +2 y +1 al daño. Con la mitad o menos: Crítico frecuente +2, Crítico potente +4 y +3 al daño. Con un cuarto o menos: además +2 a la Probabilidad de Golpe.',
+    {}, 'va al duelo como un ataque; según su vida, frecuente/potente/daño +1/+2/+1, +2/+4/+3 o, con un cuarto o menos, además +2 PdG', 3, [], {desesperado: true}));
   // 🦘 El Salto (dueño, 2026-10-21): salta hasta 3 casilleros (por encima de hasta 2) y cae al lado del objetivo, sin No2 ni ataque de oportunidad.
   H('Salto', 'DM', '*', 'e', 3, aA('Salta por encima de lo que haya (un salto de 1,5 metros de altura) y cae sobre el objetivo: se desplaza hasta 3 casilleros (salteando hasta 2) hasta quedar al lado, sin No2 ni ataque de oportunidad, y ataca con su arma con +1 a la Probabilidad de Golpe y Crítico frecuente +1. Saltar algo con colisión lo decide la mesa.',
     {pdg: 1, critBono: 1}, 'salta hasta quedar al lado (el mapa) y va al duelo como un ataque con +1 PdG y Crítico frecuente +1', 2, [], {salto: 3}));

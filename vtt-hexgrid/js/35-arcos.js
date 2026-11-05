@@ -40,10 +40,10 @@ function arcoEsBestia(t){
 // Los bonos de las mecánicas del arma contra ese objetivo → el tiro (o el mismo, si no suma nada).
 function arcoBonos(mio, t, ataque, tiro){
   if(!mio || !t || !ataque || !ataque.rango || ataque.hab) return tiro;
-  // 🎯 Apuntar (Shooter, 2026-10-11): +X PdG y Crítico potente +X en este disparo; el estado se gasta al disparar (arcoApuntarGastar, js/13).
+  // 🎯 Apuntar (Shooter, 2026-10-11): +X PdG y Crítico potente +2X en este disparo (2026-11-05, dueño: el potente al doble, tope +6); el estado se gasta al disparar (arcoApuntarGastar, js/13).
   const ax = Combatiente.apuntandoX(((vinculo(mio) || {}).resumen || {}).estados);
-  if(ax) tiro = arcoSumar(tiro, {pdg: ax, critpot: ax}, `apuntando (+${ax})`);
-  const apc = apuntaCreep(mio);   // 🎯 Tiro a la cabeza de un creep (2026-10-21): +2 PdG, Crítico frecuente +1 y potente +1
+  if(ax) tiro = arcoSumar(tiro, {pdg: ax, critpot: Math.min(6, 2 * ax)}, `apuntando (+${ax})`);
+  const apc = apuntaCreep(mio);   // 🎯 Tiro a la cabeza de un creep (2026-10-21): +2 PdG, Crítico frecuente +1 y potente +3 (2026-11-05)
   if(apc) tiro = arcoSumar(tiro, {pdg: num(apc.apunta.pdg), crit: num(apc.apunta.crit), critpot: num(apc.apunta.critpot)}, 'apuntando a la cabeza');
   tiro = repeticionBonos(mio, t, ataque, tiro);   // 🔁 Repetición (Shooter, 2026-10-13)
   const d = distanciaHex({col: mio.col, fila: mio.fila}, {col: t.col, fila: t.fila});

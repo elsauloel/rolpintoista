@@ -292,6 +292,10 @@
 
 ### ▶ Para la próxima tanda de pruebas en el mapa (2026-11-03)
 
+- [ ] **💥 Crítico potente subido y el dibujo del crítico corregido (2026-11-05, dueño)**: probado en las pruebas automáticas y en la calculadora
+  (capturas `critico-v2-*.png`). Falta en un duelo real: un **Apuntar** con X = 2 (el duelo tiene que mostrar Crítico potente +4), un golpe contra la
+  **marca** del Shooter (potente +2), un **Golpe brutal** del Warrior (potente +3), y ver el cuadro con **Punto débil + frecuente 2** contra un Tipo 4 (la «F»
+  atenuada que pierde el mínimo de 2 y el «− 💢 Punto débil 1» en el título) y la tabla con **potente 6** (sin fila ×1, «siempre»).
 - [ ] **⏬ La Demora animada (2026-11-04, dueño: «que se desplegara la lista de iniciativa, y se vea una animación de los nombres intercambiando
   posiciones… si sucediera en el medio de un duelo, que el duelo se minimice brevemente… y al terminar la animación el duelo se vuelve a desplegar»)**:
   `vtt-hexgrid/js/100-demora-animada.js`. Probado en «Claude · pruebas» cambiando el orden en memoria (la lista plegada se despliega, las filas se

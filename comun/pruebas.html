@@ -46,14 +46,14 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261105rc"></script>
+<script src="combatiente.js?v=20261105pot"></script>
 <script src="creep-calculo.js?v=20261103t20"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261105rc"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
-<script src="estados-presets.js?v=20261105pd"></script>
+<script src="estados-presets.js?v=20261105pot"></script>
 <script src="estados-aplicar.js?v=20261104ae"></script>
 <script src="recibidos.js?v=20261103pm"></script>
 <script src="tokens-auto.js"></script>
@@ -105,7 +105,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261105rc"></script>
+<script src="duelo.js?v=20261105pot"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -117,10 +117,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
-<script src="skills-clase.js?v=20261105pd"></script>
+<script src="skills-clase.js?v=20261105pot"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261104ig"></script>
-<script src="skills-creep-base.js?v=20261104ig"></script>
+<script src="skills-creep-base.js?v=20261105pot"></script>
 <script src="creeps-esenciales.js?v=20261103t21"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -182,6 +182,23 @@ prueba('🎯 Punto débil (2026-11-05, dueño): la resistencia puede quedar nega
 prueba('💢 El cuadro del crítico dibuja el Punto débil con el ícono del estado (dueño, 2026-11-05: «¿no le podríamos buscar algún emoji?»)', () => {
   const h = Duelo.criticoVizHtml({crit: {rango: 3, nivel: 1, resistencia: -1}, ataque: {tipoDado: 4}, eva: {total: 10}, pdg: {total: 13}, defensa: {}});
   igual([(h.match(/duelo-crit-cuad debil">💢</g) || []).length, />P</.test(h)], [2, false]);
+});
+prueba('💢 El dibujo del crítico (2026-11-05, dueño: «corregir los problemas que encontraste»): el Punto débil se escribe «− 💢 Punto débil», el frecuente que pierde el mínimo de 2 se dibuja atenuado y la leyenda dice el total; con el doble seguro no hay fila ×1', () => {
+  const h = Duelo.criticoVizHtml({crit: {rango: 2, nivel: 2, resistencia: -1, frecuente: 2}, ataque: {tipoDado: 4}, eva: {total: 10}, pdg: {total: 14}, defensa: {}});
+  const t6 = Duelo.tablaCriticoHtml({potente: 6}, {atacante: {nombre: 'A'}}, 0), t0 = Duelo.tablaCriticoHtml({potente: 0}, {atacante: {nombre: 'A'}}, 0);
+  igual([/− 💢 Punto débil 1/.test(h), /Resistencia a crítico -1/.test(h), (h.match(/frec perdido/g) || []).length, /Crítico frecuente \(2\)/.test(h), /se pierde por el mínimo de 2/.test(h),
+    /×1 · sin multiplicador/.test(t6), /siempre/.test(t6), /×1 · sin multiplicador/.test(t0)],
+    [true, false, 2, true, true, false, true, true]);
+});
+prueba('💥 Crítico potente subido (2026-11-05, dueño: «sugerencias me parecen bien»; Golpe brutal «dale potente más 3»): clase, creeps, estado y Mano Pesada', () => {
+  const cl = id => CLASES_SKILLS.flatMap(c => c.habilidades).find(h => h.id === id);
+  const cr = n => armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos, 2);
+  const est = n => estadosPresetCreep().find(p => p.nombre === n);
+  const pot = it => (CATALOGO_BASE.find(i => i.id === it).efectoMods.find(m => m.stat === 'critpot') || {}).val;
+  igual([cl('warrior-golpe-brutal').duelo.arma.critpotBono, cl('asalto-lisiar').duelo.arma.critpotBono, cl('shooter-headshot').duelo.arma.critpotBono,
+    cr('Zarpazo').duelo.arma.critpotBono, cr('Golpe brutal').duelo.arma.critpotBono, (est('Crítico potente').mods[0] || {}).val,
+    pot('pocion-mano-pesada'), pot('pocion-mano-pesada-mayor'), pot('pocion-mano-pesada-superior')],
+    [3, 4, 4, 5, 4, 2, 2, 4, 6]);
 });
 prueba('supercrítico: dos 20 naturales → ×8', () => igual(Critico.resultadoD20([20, 20], 0).mult, 8));
 prueba('supercrítico: tres 20 naturales → ×12', () => igual(Critico.resultadoD20([20, 20, 20], 0).mult, 12));
@@ -935,7 +952,7 @@ prueba('Headshot (Shooter, 2026-10-12): +2 PdG, +5, +1/+1 al crítico, «solo si
   const a = Combatiente.ataqueConArreglos(hab, hab.duelo, {arma: arco, alcance: 10, X: 0});
   const S = FichaGuardado.normalizar(structuredClone(FichaGuardado.DEFAULT)).S;
   igual([hab.costo, hab.nitrosCosto, hab.soloRango, a.soloCritico, a.mods.pdg, a.mods.fijo, a.mods.critBono, a.mods.critpotBono, FichaBotonera.armasParaHabilidad(S, hab).some(o => o.arma), /Sin auditar/.test(hab.detalle)],
-    ['4', 'ATAQUE', true, true, 2, 5, 1, 1, false, false]);
+    ['4', 'ATAQUE', true, true, 2, 5, 1, 4, false, false]);
 });
 prueba('Proyectil perforante (Shooter, 2026-10-13): 2 SP + el disparo, solo a distancia, «perforante» viaja al ataque, sin bonos', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'shooter').habilidades.find(h => h.id === 'shooter-proyectil-perforante');
@@ -1277,7 +1294,7 @@ prueba('👁 Ojo de asesino (Asalto y Choque liviano, 2026-10-26): un ataque con
   igual([h.duelo.modo, h.duelo.arma.pdg, h.duelo.arma.fijo, h.duelo.arma.critBono, h.duelo.arma.critpotBono, h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('choque liviano'),
     clase.duelo.modo, clase.duelo.arma.pdg, clase.duelo.arma.fijo, clase.duelo.arma.critBono, clase.duelo.arma.critpotBono, clase.nitrosCosto,
     m.duelo.modo, m.nitrosCosto, m.modo, estadosPresetFicha().some(p => p.nombre === 'Ojo de asesino')],
-    ['arma', 1, 2, 1, 1, 'ATAQUE', 2, 2, true, 'arma', 1, 2, 1, 1, 'ATAQUE', 'arma', 'ATAQUE', undefined, false]);
+    ['arma', 1, 2, 1, 3, 'ATAQUE', 2, 2, true, 'arma', 1, 2, 1, 3, 'ATAQUE', 'arma', 'ATAQUE', undefined, false]);
 });
 prueba('🦶 Pisotón (Choque pesado, 2026-10-26): Flash, onda de Fuerza contra Res.CC o Evasión; la diferencia de daño físico directo y Pajaritos 2', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Pisotón'), h = armarHabilidadDeCreep(e.datos, 2);
@@ -1290,7 +1307,7 @@ prueba('🤺 Finta (Choque liviano, 2026-10-26): +2 al daño, +1 a los dos crít
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Finta'), h = armarHabilidadDeCreep(e.datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});
   igual([h.duelo.arma.fijo, h.duelo.arma.critBono, h.duelo.arma.critpotBono, !!a.sinParry, h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('choque liviano')],
-    [2, 1, 1, true, 'ATAQUE', 2, 2, true]);
+    [2, 1, 3, true, 'ATAQUE', 2, 2, true]);
 });
 prueba('🏹 Abanico (Rango, 2026-10-26): cono al frente, su PdG contra la Evasión de cada uno, el daño de su arma; lo de un ataque y 3 SP, o cooldown 3', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Abanico'), h = armarHabilidadDeCreep(e.datos, 2);
@@ -1340,7 +1357,7 @@ prueba('😤 Golpe desesperado (Choque liviano, 2026-10-26): según la vida prop
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Golpe desesperado'), h = armarHabilidadDeCreep(e.datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}}), b = f => { const o = Combatiente.desesperadoBonos(f); return [o.critBono, o.critpotBono, o.fijo, o.pdg].join('/'); };
   igual([!!a.desesperado, b(0.9), b(0.5), b(0.3), b(0.25), b(0.1), h.nitrosCosto, h.spCosto, h.cd],
-    [true, '1/1/1/0', '2/2/3/0', '2/2/3/0', '2/2/3/2', '2/2/3/2', 'ATAQUE', 3, 2]);
+    [true, '1/2/1/0', '2/4/3/0', '2/4/3/0', '2/4/3/2', '2/4/3/2', 'ATAQUE', 3, 2]);
 });
 prueba('💥 Takle (Choque pesado, 2026-10-26): Flash, corre hasta 2 (saltoHab + corre), Con +2 contra Con, pierde 3 No2, empujado 2 y al final del orden', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Takle'), h = armarHabilidadDeCreep(e.datos, 2);
@@ -1417,7 +1434,7 @@ prueba('🗡 Degollar (Choque liviano, 2026-10-26): +4 PdG, +7 al daño, +1 a lo
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Degollar'), h = armarHabilidadDeCreep(e.datos, 2);
   const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});
   igual([h.duelo.modo, h.duelo.arma.pdg, h.duelo.arma.fijo, h.duelo.arma.critBono, h.duelo.arma.critpotBono, !!a.terminaTurno, h.efectoNombre, h.nitrosCosto, h.spCosto, h.cd, e.etiquetas.includes('choque liviano')],
-    ['arma', 4, 7, 1, 1, true, 'Expuesto', 'ATAQUE', 4, 4, true]);
+    ['arma', 4, 7, 1, 3, true, 'Expuesto', 'ATAQUE', 4, 4, true]);
 });
 prueba('☀🌑 Luz y siniestro (2026-10-26): los elementos nuevos, su identidad y la cura que no entra', () => {
   const tl = Combatiente.identidadElemento('luz', 'no-muerto'), tl2 = Combatiente.identidadElemento('luz', 'bestia');
@@ -1788,7 +1805,7 @@ prueba('🎯 Tiro a la cabeza (2026-10-21): el estado propio con su bono y que s
   const sc = {nombre: 'Arquero', nivel: 2, con: 3, esp: 2, nitros: 5, sp: 6, modoSP: true, estados: [], habilidades: [h], cooldowns: {}};
   const p = CreepAcciones.ejecutarHab(sc, h, estadosPresetCreep(), true);
   const e = sc.estados.find(x => x.nombre === 'Apuntando a la cabeza') || {};
-  igual([h.cd, h.cuentaComoAtaque, h.anuncio, !p.error, JSON.stringify(e.apunta), e.pierdeAlDano, e.permanente], [3, true, '{nombre} apunta con calma…', true, '{"pdg":2,"crit":1,"critpot":1}', true, true]);
+  igual([h.cd, h.cuentaComoAtaque, h.anuncio, !p.error, JSON.stringify(e.apunta), e.pierdeAlDano, e.permanente], [3, true, '{nombre} apunta con calma…', true, '{"pdg":2,"crit":1,"critpot":3}', true, true]);
 });
 prueba('🗡 Puñaladas (2026-10-21): un ataque con su arma que lleva la puñalada; Paso ligero', () => {
   const ar = n => armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos, 2);
@@ -2444,7 +2461,7 @@ prueba('🧪 Escudos de poción y Mano Pesada (2026-10-20): solo físico / espec
   FichaMantenimiento.descansar(D);
   igual([cuero.escudoMagico, cuero.soloFisico, !!cuero.soloEspecial, cuero.seGasta, cuero.finDia, ojo.escudoMagico, ojo.soloEspecial, aguante.escudoMagico, !!aguante.soloFisico,
     mano.mods.map(m => m.stat + m.val).join(), mano.turnos, D.efectos.filter(e => e.finDia).length, !!cat('Poción de Vitalidad Extendida').archivo],
-    [15, true, false, true, true, 25, true, 15, false, 'crit1,critpot3', 3, 0, true]);
+    [15, true, false, true, true, 25, true, 15, false, 'crit1,critpot6', 3, 0, true]);
 });
 prueba('🔥 Llama de Fénix (2026-10-20): un personaje o un creep que cae con la llama revive con toda la vida, Titilando', () => {
   const S = {...structuredClone(FichaGuardado.DEFAULT), catalogo: [], efectos: [], cinturon: []};
@@ -2874,6 +2891,11 @@ prueba('una trampa consumible que no se pudo colocar no se gasta ni cobra', asyn
   const S = fichaBotonera({nitros: 5, inventario: [{id: 't', nombre: 'Trampa', consumible: true, unidades: 1, trampaDatos: {nombre: 'Púas'}}]}), reg = [];
   await FichaAcciones.consumir(S, 't', false, uiConsumo(S, reg, false));
   igual([S.nitros, S.inventario.length], [5, 1]);
+});
+prueba('🛡 Cuero duro (2026-11-05, dueño: «Cuero duro queda»): +1 Res. crítico Tipo 6 y Tipo 8; Ojo para las grietas no existe', () => {
+  const P = id => PASIVAS_BASE.find(p => p.poolId === id);
+  const f0 = FichaCalculo.calcular(fichaBotonera({})).final, f = FichaCalculo.calcular(fichaBotonera({pasivas: [{...P('cuero-duro')}]})).final;
+  igual([P('cuero-duro').jobCosto, f.tipo2 - f0.tipo2, f.tipo3 - f0.tipo3, f.tipo1 - f0.tipo1, !!P('ojo-para-las-grietas')], [1, 1, 1, 0, false]);
 });
 prueba('🩹 Mañas de sobreviviente y Contra las cuerdas (2026-11-05, dueño): +1 a la mitad o menos, +2 más bajo un cuarto; se suman; en 0 o sin máximo, nada', () => {
   const v = (h, M) => Combatiente.resCritPorVida(1, 2, h, M);
@@ -4493,7 +4515,7 @@ prueba('Degollar (2026-10-10): +4 PdG, +7, +1/+1 al crítico, termina el turno; 
   igual([deg.costo, deg.nitrosCosto, at.mods.pdg, at.mods.fijo, at.mods.critBono, at.mods.critpotBono, at.terminaTurno, r && r.ok, e.nombre, e.expuesto, e.alEmpezarTurno,
     Combatiente.mitadesDeTirada(S.efectos, 'eva'), Combatiente.mitadesDeTirada(S.efectos, 'pdg'), Combatiente.estadosQueParten(S.efectos, 'eva').map(x => x.nombre),
     filtradas.filter(o => !o.motivoNo).map(o => o.modo), /Expuesto/.test((filtradas.find(o => o.modo === 'parry') || {}).motivoNo || ''), sinNada.length, Combatiente.expuesto(S.efectos), venc.quedan.length, /deja/i.test(deg.detalle) || /orden de turnos/.test(deg.detalle)],
-    ['7', 'ATAQUE', 4, 7, 1, 1, true, true, 'Expuesto', true, true, 1, 0, ['Expuesto'], ['evasion'], true, 2, true, 0, true]);
+    ['7', 'ATAQUE', 4, 7, 1, 3, true, true, 'Expuesto', true, true, 1, 0, ['Expuesto'], ['evasion'], true, 2, true, 0, true]);
 });
 prueba('🛡 Romper armadura de un arma de rango viaja en el ataque, para el escudo que lo pare (2026-10-29)', () => {
   const bal = {armaDeRango: true, tipoDado: 4, efectosGolpe: [{nombre: 'Rompe armadura', caras: 2, exitos: 1}, {nombre: 'Sangrado', caras: 1, exitos: 1}]};
@@ -6063,7 +6085,7 @@ prueba('🎯 Ojo certero (Support, 2026-10-24): Crítico frecuente +2 y potente 
   const sc = {nombre: 'B', estados: [], crit: 0, critpot: 0};
   EstadosAplicar.aplicarACreep(sc, Combatiente.efectoDeEjecucion(h.duelo.efectos[0]).spec);
   igual([h.duelo.objetivo, CreepCalculo.modTotal(sc, 'crit'), CreepCalculo.modTotal(sc, 'critpot'), dura(false), dura(true), e.datos.sp.no2, e.datos.sp.spCosto, e.datos.cd],
-    ['aliado', 2, 2, 2, 2, 1, 3, 3]);
+    ['aliado', 2, 4, 2, 2, 1, 3, 3]);
 });
 prueba('🏜 Maldición de la sequía (Debuffer, 2026-10-24): Sequía corta la regeneración propia (pasivas, equipo, SP) y no la Regeneración de otro', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Maldición de la sequía'), h = armarHabilidadDeCreep(e.datos, 3);
@@ -6527,7 +6549,7 @@ prueba('⚔ Golpe brutal (2026-10-27): el de creep +1 frecuente, +2 potente, +3 
   const h = chp('Golpe brutal'), a = h.duelo.arma;
   const gb = CLASES_SKILLS.find(c => c.id === 'warrior').habilidades.find(x => x.id === 'warrior-golpe-brutal').duelo.arma;
   igual([a.critBono, a.critpotBono, a.fijo, h.efectoNombre, h.efectoTurnos, h.efectoMods[0].stat, h.efectoMods[0].val, h.efectoPolaridad, gb.critBono, gb.critpotBono, gb.fijo],
-    [1, 2, 3, 'Guardia baja', 1, 'eva', -2, 'debuff', 1, 1, 2]);
+    [1, 4, 3, 'Guardia baja', 1, 'eva', -2, 'debuff', 1, 3, 2]);
 });
 prueba('😤 Provocar de creep (PdG.Esp + su nivel, como el Taunt, 2026-11-03) y Taunt de clase (2026-10-27, PdG.Esp + el nivel) contra la Res.Mt; el creep queda Desafiante (+2 Defensa y +2 Def. especial)', () => {
   const h = chp('Provocar', 3), sc = creepPrueba({nivel: 3});

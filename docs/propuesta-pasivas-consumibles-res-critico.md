@@ -7,8 +7,8 @@ Parte del [plan](plan-resistencia-critico.md). Fecha: 2026-11-05.
 > las suma solo el duelo (`Combatiente.resCritPorVida`, stats `rescritmitad` / `rescritcuarto`). **Ojo crítico** sin el «⚠ a revisar». Consumibles:
 > **Grasa de carpincho** (5 turnos, no hasta el fin del combate), **Ungüento del herrero** (repara **1 punto** de Armadura rota de la pieza puesta más
 > dañada —Defensa y durabilidad— y +1 T4 por 3 turnos; en un creep saca 1 stack; `reparaArmRota`), **Pergamino de Temple** / **mayor** / **grupal**
-> y **Aceite del punto débil**. **No**: Aguante, Ensañado, Tiza de sastre. **Pendientes de respuesta**: Ojo para las grietas («¿no existe ya una
-> pasiva de +1 frecuente a secas?» → sí, Ojo crítico) y Cuero duro. El Punto débil en el cuadro del crítico se dibuja con 💢 (el ícono del estado).
+> y **Aceite del punto débil**. **No**: Aguante, Ensañado, Tiza de sastre. **Ojo para las grietas: descartada** (dueño, 2026-11-05: «la quitamos»; ya existe Ojo crítico, +1 frecuente a secas). **Cuero duro: cargada**
+> (dueño: «Cuero duro queda»; 1 Job, +1 Res. crítico Tipo 6 y Tipo 8, se aplica sola). El Punto débil en el cuadro del crítico se dibuja con 💢 (el ícono del estado).
 > Probado en «Claude · pruebas» con Prueba Uno: Ungüento (Armadura rota 2 → 1, durabilidad 4 → 5) y Grasa (estados de 3 y 5 turnos), Res. T4 6/15
 > de vida 2 → 4, Res. T8 con 3 de vida 3 y con la vida llena 0.
 Pedido del dueño: «si no existe ninguna pasiva ni ningún consumible que interactúe con la resistencia del crítico, de paso ya diseñaría alguno».
@@ -30,9 +30,9 @@ Pasivas: Piel curtida (+1 Defensa) = 1 Job.
 | Pasiva | Qué hace | Job | Automático | Peso |
 |---|---|---|---|---|
 | **Callo de batalla** | +1 Res. crítico Tipo 4 («de tanto ligarla, ya ni se mosquea»). | 1 | ⚙ ya anda (bono fijo) | 1 |
-| **Cuero duro** | +1 Res. crítico Tipo 6 y +1 Tipo 8. | 1 | ⚙ ya anda (bono fijo) | ¾ |
+| **Cuero duro** ✅ cargada | +1 Res. crítico Tipo 6 y +1 Tipo 8. | 1 | ⚙ ya anda (bono fijo) | ¾ |
 | **Mañas de sobreviviente** | Con la vida a la mitad o menos: +1 Res. crítico contra todos los Tipos. | 1 | ⚙ a programar (el mapa ya sabe la vida); mientras, ✋ | ≈ 1 (2 × la mitad del tiempo) |
-| **Ojo para las grietas** | Contra un rival con Armadura rota: Crítico frecuente +1. | 1 | ⚙ a programar en el duelo (ya sabe los estados del rival) | ≈ 1 |
+| ~~**Ojo para las grietas**~~ (descartada) | Contra un rival con Armadura rota: Crítico frecuente +1. | 1 | ⚙ a programar en el duelo (ya sabe los estados del rival) | ≈ 1 |
 | **Aguante** | El primer crítico que recibís en cada combate baja un escalón (×3 → ×2; un ×2 entra como golpe normal, con la Defensa). | 2 | ⚙ a programar (se apoya en lo del Pergamino de Blindaje) | ≈ 2 |
 | **Ensañado** | Cuando hacés un crítico, el rival queda con **Punto débil** 1 turno (lo aprovechan tus aliados). | 2 | ⚙ a programar (efecto al hacer crítico) | ≈ 1½–2 |
 

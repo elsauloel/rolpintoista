@@ -3,7 +3,7 @@
    =========================================================
    Quien usa Marcar tiene el estado «Marcando» (con `marca` = el token marcado); el blanco, «Marcado» con `marcadoPor` = el token de quien
    lo marcó (lo arma js/13, dueloAplicarEfectoBase). Acá:
-   - marcaBonos(mio, t, ataque, tiro): al atacar a su marca, +1 PdG, +1 de daño, Crítico frecuente +1 y Crítico potente +1 (solo quien marcó).
+   - marcaBonos(mio, t, ataque, tiro): al atacar a su marca, +1 PdG, +1 de daño, Crítico frecuente +1 y Crítico potente +2 (solo quien marcó; el potente +2 desde el 2026-11-05, dueño).
      Al atacar a otro (un ataque, o una habilidad contra un rival), la marca se termina: se le saca «Marcando» (lo hace la pantalla de quien ataca).
    - marcaRevisar() (solo el GM, cada 2 s): a un creep marcado cuyo marcador ya no lo tiene como marca (atacó a otro, marcó a otro, se fue
      del mapa) le saca el Marcado.
@@ -19,7 +19,7 @@ function marcaBonos(mio, t, ataque, tiro){
   const idMio = mio.id || [...tokens.entries()].find(([, x]) => x === mio)?.[0], idT = t.id || [...tokens.entries()].find(([, x]) => x === t)?.[0];
   if(m.marca === idT){
     if(ataque.hab && !['enemigo', 'area', 'cono', 'linea', 'onda'].includes(ataque.hab.objetivo)) return tiro;   // una cura o un buff no cuenta
-    return arcoSumar(tiro, {pdg: 1, fijo: 1, crit: 1, critpot: 1}, `contra su marca`);
+    return arcoSumar(tiro, {pdg: 1, fijo: 1, crit: 1, critpot: 2}, `contra su marca`);
   }
   // Atacó a otro: la marca se termina (dueño: «sigue marcado hasta que ataque a un objetivo diferente»).
   const hostil = !ataque.hab || ['enemigo', 'area', 'cono', 'linea', 'onda'].includes(ataque.hab.objetivo);

@@ -91,6 +91,13 @@
 > - [ ] **😇 Decidir quién cambia el Pacto (dueño, 2026-11-04: «la pregunta pendiente del pacto también va a quedar para cuando esté en la compu»).**
 >   Hoy el campo «😇 Pacto» (ficha, datos de identidad) lo cambia el jugador en su ficha y el GM con «✎ Editar como GM», aunque la ayuda dice que lo
 >   marca el GM. Pregunta: ¿solo el GM lo puede cambiar?
+> - [ ] **🚩 Estandartes: ver qué hacen y sus áreas como estados (2026-11-05, dueño; después de la tanda de pruebas del mapa).** Nombres: **«objetos
+>   inertes»** para lo general (lo que pone una habilidad y no actúa) y **«estandartes»** para la mecánica del poste con efecto en área (el Estandarte de
+>   guerra, el Tótem de silencio y los que vengan). (1) Pasando el mouse por el **nombre** de arriba a la derecha o por el **token**, un globito con lo que
+>   hace (aura, efecto, vida); en las casillas del aura no hace falta. (2) Un inerte **no lleva la ficha lite**; el **carnet 🪪 directo en el primer anillo**
+>   (hoy hay que ir por los tres puntitos). (3) **Todo efecto de área que afecta a los tokens** (estandartes, auras, zonas…) se ve como **estado** mientras
+>   el token está adentro (circulito, lista de estados, ficha) y se va al salir: derivado de la posición, no guardado. Después: el ítem «⬡ Seleccionar un
+>   hexágono libre y ver qué lo afecta».
 > - [x] (2026-11-05: hecho — `vtt-hexgrid/js/101-creeps-mapas-sync.js`, `gmReconciliarMapas` en GM Tools, reglas en `comun/creeps-mapas.js`; probado en «Claude · pruebas») **🔗 Tokens de creeps ↔ su mapa en GM Tools (2026-11-05, dueño: «los tokens y la ficha de los creeps de GM Tools deben estar vinculados…
 >   si se mueve una cosa de una a otra, debe suceder de manera pareja; la mayor parte del juego va a suceder a través del mapa»).** En espera de que
 >   termine la tarea del gancho de la compu (para no pisarse). Hoy GM Tools → mapa anda (Mover a…, Poner sus tokens); mapa → GM Tools no: crear un token

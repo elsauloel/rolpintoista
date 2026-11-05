@@ -1215,7 +1215,7 @@ const Combatiente = (() => {
     return `<div class="hint">${e(o.nombre)}</div>
     ${b('normal', `⚔ Ataque normal — ${n(o.normal)} No2<br><span class="hint">${rc ? e(recargaTxt(rc)) : o.primero ? (o.primeroTxt || 'primer ataque del turno (Tipo ÷ 2)') : (o.siguienteTxt || 'Tipo completo (ya atacó este turno)')}</span>`)}
     ${b('oportunidad', `🏃 Ataque de oportunidad — ${n(o.especialOpor ?? o.especial)} No2<br><span class="hint">${o.especialOpor === 0 ? 'gratis con esta arma' : rc ? `lo de un primer disparo (Recarga ${rc})` : 'siempre Tipo ÷ 2'}; no suma al conteo de ataques</span>`)}
-    ${b('contra', `↩ Contraataque — ${n(o.especial)} No2<br><span class="hint">solo tras ganar un Parry y un Bloqueo; siempre Tipo ÷ 2; no suma al conteo de ataques</span>`)}`;
+    ${b('contra', `↩ Contraataque — ${n(o.especial)} No2<br><span class="hint">con la habilidad Contraataque o la pasiva Devolver gentileza; siempre Tipo ÷ 2; no suma al conteo de ataques</span>`)}`;
   }
   // `arma` (opcional): con Recarga, el disparo cuesta Recarga × (los ya hechos + 1).
   function costoAtaque(tipo, ataquesPrevios, arma){ const rc = recargaDe(arma); if(rc) return recargaCosto(arma, ataquesPrevios); return n(ataquesPrevios) === 0 ? costoPrimerAtaque(tipo) : n(tipo); }

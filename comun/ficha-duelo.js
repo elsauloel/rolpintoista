@@ -127,7 +127,7 @@ const FichaDuelo = (() => {
         if(campo === 'parry'){ const it = modo ? S.inventario.find(x => x.id === modo) : null; return {formula: f(statParaArma('parry', it), 'parry'), ...L('stat:parry')}; }
         if(campo === 'pdg'){
           const tipo = d.ataque.tipo;
-          const extra = tipo === 'habilidad-arma' ? num(d.ataque.mods && d.ataque.mods.pdg) : tipo === 'contra' ? statParaArma('pdgcontra', arma) : tipo === 'oportunidad' ? statParaArma('pdgopor', arma) : 0;
+          const extra = tipo === 'habilidad-arma' ? num(d.ataque.mods && d.ataque.mods.pdg) : tipo === 'contra' ? statParaArma('pdgcontra', arma) + (d.ataque.contraHab ? 2 : 0) : tipo === 'oportunidad' ? statParaArma('pdgopor', arma) : 0;
           const costo = tipo === 'oportunidad' || tipo === 'contra' ? FichaCombate.costoAtaqueEspecial(arma, tipo, S) : FichaCombate.costoAtaque(S, arma);
           return {formula: f(FichaCombate.pdgParaArma(S, arma).valor + (Number.isNaN(extra) ? 0 : extra), 'pdg'), ...L('atacar:' + (arma ? arma.id : '')),
             costo: Combatiente.costoAtaqueLineas({tipoArma: FichaCombate.tipoAtaque(arma), arma, hechos: FichaCombate.ataquesConArma(S, arma), costo, tiene: num(S.nitros), ataque: tipo, porArma: true})};
@@ -339,7 +339,8 @@ const FichaDuelo = (() => {
               arco ? 'si ganás, cuenta como Parry: para contraatacar, antes el dodge roll (alejarte 1 casillero, pagando sus No2)' : 'si ganás, cuenta como Parry: podés contraatacar']});
         });
         // ⚔ Contraataque (Warrior, 2026-10-13): con la habilidad, si esquiva con la Evasión puede contraatacar (2 SP + un primer ataque).
-        if((S.habilidades || []).some(x => x && x.contraEsquiva)) ops.filter(o => o.modo === 'evasion').forEach(o => { o.contraEsquiva = true; o.info = [...o.info, '⚔ si esquivás, podés contraatacar (Contraataque: 2 SP + un primer ataque), si lo alcanzás']; });
+        if((S.habilidades || []).some(x => x && x.contraEsquiva)) ops.filter(o => o.modo === 'evasion' || o.modo === 'parry' || o.modo === 'parrydist').forEach(o => { o.contraEsquiva = true; o.info = [...o.info, `⚔ si ganás ${o.modo === 'evasion' ? 'la Evasión' : 'el Parry'}, podés contraatacar con +2 PdG (Contraataque: 2 SP + un primer ataque), si lo alcanzás`]; });
+        if(num(compute().final.gentileza) > 0) ops.filter(o => o.modo === 'parry').forEach(o => { o.info = [...o.info, '⚔ si ganás el Parry y el Bloqueo, podés contraatacar (Devolver gentileza)']; });
         // Stun (2026-10-06): no puede hacer nada; si lo atacan, su Evasión es 1 (sin Parry ni pagar el sobrepeso).
         if(Combatiente.stuneado(S.efectos)) return [{modo: 'evasion', itemId: '', etiqueta: '🏃 Evasión · Stun: 1', motivoNo: '', info: ['⚡ Stun: no puede hacer nada; su Evasión es 1']}];
         return Combatiente.sinReaccionesNo2(ops, S.efectos);   // Expuesto (Degollar): sin Parry
@@ -397,6 +398,7 @@ const FichaDuelo = (() => {
       },
       // ⚔ Contraataque (Warrior, 2026-10-13, dueño): al esquivar, 2 SP (siempre: es en turno ajeno) — el No2 de un primer ataque lo cobra el
       // duelo nuevo al tirar el PdG. Sin límite, mientras alcancen los recursos: si falta SP o No2, no se contraataca. '' = cobrado.
+      contraPasiva: () => num(compute().final.gentileza) > 0,   // ⚔ Devolver gentileza (2026-11-05)
       contraEsquivaPagar: (d, armaC) => {
         const S = getS(), c = compute();
         if(!(S.habilidades || []).some(x => x && x.contraEsquiva)) return 'no tenés la habilidad Contraataque';

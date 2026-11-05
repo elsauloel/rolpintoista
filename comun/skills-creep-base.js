@@ -210,8 +210,8 @@
     duelo: {modo: 'flash', flash: {en: ['pdg', 'parry', 'bloqueo', 'dano'], bono: 3}}});
   // ⚔ Contraataque (de clase; dueño: «que no ataque gratis sin nitros, que gaste los nitros de un primer ataque»): al ganar la Evasión o el Parry, el duelo
   // pregunta «¿Contraataca?» (comun/creep-duelo.js); +1 PdG (CreepAcciones.bonoEspecial). Flash: su SP o su cooldown, al doble (es en turno ajeno).
-  H('Contraataque', 'D', '*', 'm', 2, {detalle: 'FLASH (en el turno de otro: cuesta el doble). Si gana la Evasión o el Parry contra un ataque cuerpo a cuerpo, le contesta al que lo atacó: un ataque con su arma con +1 a la Probabilidad de Golpe, que paga lo de un primer ataque y no cuenta como su ataque del turno. El duelo lo pregunta solo («¿Contraataca?»).',
-    no2: 0, spCosto: 2, auditada: true, contraEsquiva: true, ataqueTxt: 'al ganar la Evasión o el Parry: un contraataque con +1 PdG (lo de un primer ataque)'});
+  H('Contraataque', 'D', '*', 'm', 2, {detalle: 'FLASH (en el turno de otro: cuesta el doble). Si gana la Evasión o el Parry contra un ataque (sin esperar el Bloqueo), le contesta al que lo atacó: un ataque con su arma con +2 a la Probabilidad de Golpe, que paga lo de un primer ataque y no cuenta como su ataque del turno. ⚙ Automatizado: el duelo lo pregunta solo («¿Contraataca?»).',
+    no2: 0, spCosto: 2, auditada: true, contraEsquiva: true, ataqueTxt: 'al ganar la Evasión o el Parry: un contraataque con +2 PdG (lo de un primer ataque)'});
   // ⚔ Golpe que sigue ✦ (A5; dueño: «vamos así»): otro rival pegado (vtt-hexgrid/js/78). Cambio del dueño (2026-10-30): «me hace ruido que tenga que matar
   // para funcionar… si pega, pasa al siguiente. Es un golpe doble. Pero tiene que haber al menos dos adyacentes al atacante».
   H('Golpe que sigue', 'D', '*', 'm', 2, aA('Un golpe doble, para cuando tiene al menos dos rivales pegados: un ataque con su arma con +2 al daño y, si pega, ataca enseguida a otro rival pegado a él, pagando lo de un primer ataque (ese segundo golpe no vuelve a seguir).',

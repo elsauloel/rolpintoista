@@ -89,6 +89,10 @@ const PASIVAS_BASE = [
   // se cancelan, uno por ronda.
   {poolId: 'marcar-el-ritmo', nombre: 'Marcar el ritmo', jobCosto: 1, etiquetas: ['utilidad'],
    detalle: 'Al empezar cada ronda, un aliado pegado a vos sube 1 lugar en el orden de turnos (si tenés varios al lado, elegís a cuál): vas marcando el paso y te sigue. ⚙ Automatizado: lo hace el mapa del GM al empezar la ronda (como mucho un efecto de orden por personaje y por ronda).', mods: [{stat: 'ritmo', val: 1}]},
+  // ⚔ Devolver gentileza (dueño, 2026-11-05: «una habilidad pasiva que sí habilite el contraataque… tenés que ganar el parry y el bloqueo, y solo en
+  // ese contexto te permite contraatacar»). El contraataque libre tras un Bloqueo exitoso se fue: ahora hace falta esta pasiva o la habilidad Contraataque.
+  {poolId: 'devolver-gentileza', nombre: 'Devolver gentileza', jobCosto: 1, etiquetas: ['ofensiva', 'defensiva'],
+   detalle: 'Si ganás el Parry y el Bloqueo contra un golpe cuerpo a cuerpo, podés contraatacar al que te atacó: cuesta lo de un primer ataque y no cuenta como tu ataque del turno. Sin bonus (la habilidad Contraataque, en cambio, te deja contestar apenas ganás la Evasión o el Parry y suma +2 a la Probabilidad de Golpe). ⚙ Automatizado: el duelo te pregunta «¿Contraatacás?».', mods: [{stat: 'gentileza', val: 1}]},
   {poolId: 'sed-de-sangre', nombre: 'Sed de sangre', jobCosto: 1, etiquetas: ['ofensiva'],
    detalle: 'Cuando un rival cae por tu golpe, el subidón te pone primero en la fila: subís 2 lugares en el orden de turnos (si ya jugaste esta ronda, al empezar la próxima). ⚙ Automatizado: lo hace el mapa del GM cuando el golpe del duelo lo deja en 0.', mods: [{stat: 'sedsangre', val: 2}]},
   {poolId: 'manas-de-sobreviviente', nombre: 'Mañas de sobreviviente', jobCosto: 1, etiquetas: ['defensiva'],

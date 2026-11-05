@@ -37,7 +37,7 @@
 
 > **📋 Cola de trabajo (2026-11-05, dueño: «cuando se termine lo que se está programando y lo que está en cola… agregar esta añadidura a la
 > cola»)**, en este orden: 1) la segunda tanda de pruebas del mapa (en curso); 2) 🚩 estandartes (globito, carnet, áreas como estados); 3) ⬡ la
-> información del hexágono; 4) ⚔ las reglas nuevas del Contraataque (y la pasiva «Devolver gentileza»); 5) 🦘 el área de caída del Salto (ver el punto 8); 6) **cargar
+> información del hexágono; 4) ~~⚔ las reglas nuevas del Contraataque~~ ✅; 5) 🦘 el área de caída del Salto (ver el punto 8); 6) **cargar
 > los creeps esenciales diseñados y sin cargar**: L6 Patotero, T4 Peleador de control, W4 Verdugo, R4 Hunter, H4 Bruto que aguanta, L7 Degollador, L8
 > Acróbata (nivel 1, `comun/creeps-esenciales.js`), con el cambio de Patotear y Jauría (+1 PdG con un aliado pegado, +1 dado por aliado sin tope).
 > **Sumados a la cola (dueño, 2026-11-05)**: 7) **🌑 Renombrar «Echar la mufa» / «Mufa»** a **«Mala sombra»** (habilidad y estado; dueño: «algo de la
@@ -121,7 +121,7 @@
 >   habilidades de clase posibles y también los skills del pool de creeps»).** Ya tienen: Transfusión, las ondas (Shockwave, Pisotón, Nova, Sonic Boom,
 >   Remolino/Barrido/Coletazo con la espadita, Grito), Escudo humano, el gancho de Arrastrar, el «−2 EVA», el pulso del duelo. Primero una lista de
 >   ideas por habilidad (de clase y del pool de creeps), para elegir con el dueño; se programan de a tandas. Ver también «✨ Animaciones» (2026-10-10).
-> - [ ] **⚔ Contraataque: reglas nuevas (2026-11-05, dueño; programar cuando terminen las tareas en curso).** (1) El **primer ataque del turno**
+> - [x] (2026-11-05: hecho — duelo.js `contraPorHab`/`contraPorPasiva`, `ataque.contraHab` +2; pasiva en comun/pasivas.js, stat `gentileza`; el primer ataque ya iba aparte: los especiales no cuentan) **⚔ Contraataque: reglas nuevas (2026-11-05, dueño).** (1) El **primer ataque del turno**
 >   cuesta la mitad de No2 y **los contraataques y ataques de oportunidad no cuentan**: son un contador aparte (hacer oportunidades en la ronda no le quita
 >   a tu turno su primer ataque a mitad de precio) — verificar que hoy funcione así. (2) **Se saca el contraataque libre** que hoy se habilita siempre
 >   después de un Bloqueo exitoso. (3) **La habilidad Contraataque** (clase y creep): **+2 a la PdG** y permite contraatacar **sin ganar el Bloqueo**,

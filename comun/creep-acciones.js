@@ -120,7 +120,7 @@ const CreepAcciones = (() => {
   // PdG en contraataque (o en oportunidad): la regla universal (Combatiente.statAtaqueEspecial), venga de su arma, su equipo o sus estados.
   // ⚔ El Contraataque del creep (2026-10-27, dueño: «+1 PdG»): con la habilidad, su contraataque suma +1 más.
   const contraHab = sc => (sc.habilidades || []).some(h => h && h.contraEsquiva);
-  const bonoEspecial = (sc, tipo) => { const st = Combatiente.statAtaqueEspecial(tipo); return (st ? C().modTotal(sc, st) : 0) + (tipo === 'contra' && contraHab(sc) ? 1 : 0); };
+  const bonoEspecial = (sc, tipo) => { const st = Combatiente.statAtaqueEspecial(tipo); return st ? C().modTotal(sc, st) : 0; };   // (el +2 del Contraataque va en el duelo: `ataque.contraHab`, 2026-11-05)
   const costoAtaqueDe = (sc, tipo) => tipo === 'normal' ? C().costoAtaque(sc) : tipo === 'oportunidad' ? C().costoOportunidad(sc) : C().costoContraataque(sc);
   // 💸 (2026-11-01, dueño): el ataque de oportunidad y el contraataque, sin No2, se hacen igual y dejan en negativo (como una defensa): no se pregunta.
   // Ya en negativo no se pregunta tampoco: pagarAtaque lo frena con el aviso.
@@ -182,8 +182,8 @@ const CreepAcciones = (() => {
     }).catch(err => console.error('No se pudo publicar la alerta de No2:', err));
   }
   const pdgExtraCreep = sc => Combatiente.pdgExtraArma(st => C().modTotal(sc, st), {tipoDado: Combatiente.armaEnMano(sc).tipoDado, armaDeRango: Combatiente.armaEnMano(sc).armaDeRango});
-  function tiradaAtaque(sc, tipo){
-    const extra = pdgExtraCreep(sc);   // guantes: PdG con esa familia de armas o a distancia (2026-10-05)
+  function tiradaAtaque(sc, tipo, bonoHab){
+    const extra = pdgExtraCreep(sc) + (Number(bonoHab) || 0);   // guantes: PdG con esa familia de armas o a distancia (2026-10-05)
     if(tipo === 'normal') return tirada(`${sc.nombre} · PdG`, C().statValor(sc, 'pdg') + extra, sc, 'pdg');
     const nombre = NOMBRE_ESPECIAL[tipo] || 'Contraataque';
     return tirada(`${sc.nombre} · ${nombre} (PdG)`, C().statValor(sc, 'pdg') + bonoEspecial(sc, tipo) + extra, sc, 'pdg');

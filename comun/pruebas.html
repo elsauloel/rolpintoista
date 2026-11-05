@@ -47,10 +47,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261105orden"></script>
+<script src="combatiente.js?v=20261105contra"></script>
 <script src="creep-calculo.js?v=20261103t20"></script>
 <script src="creep-botonera.js"></script>
-<script src="creep-acciones.js?v=20261105rc"></script>
+<script src="creep-acciones.js?v=20261105contra"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
@@ -107,7 +107,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261105lados4"></script>
+<script src="duelo.js?v=20261105contra"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -119,10 +119,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
-<script src="skills-clase.js?v=20261105orden"></script>
+<script src="skills-clase.js?v=20261105contra"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261104ig"></script>
-<script src="skills-creep-base.js?v=20261105deseq"></script>
+<script src="skills-creep-base.js?v=20261105contra"></script>
 <script src="creeps-esenciales.js?v=20261103t21"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -6582,14 +6582,22 @@ prueba('😤 Provocar de creep (PdG.Esp + su nivel, como el Taunt, 2026-11-03) y
   igual([ej.tira.stat, ej.tira.bono, ej.contra.map(c => c.modo), ej.efectos.map(e => e.nombre), tj.tira.stat, tj.tira.bono, des.turnos, des.mods.map(m => `${m.stat}${m.val}`)],
     ['pdgmg', 3, ['resm'], ['Provocado', 'Desafiante'], 'pdgmg', 2, 2, ['def2', 'armadmg2']]);
 });
-prueba('⚔ Contraataque de creep (2026-10-27): marca la Evasión y el Parry; con la habilidad, su contraataque suma +1 PdG; el de clase es Flash y cuesta 1', () => {
+prueba('⚔ Contraataque de creep (2026-10-27; +2 PdG desde el 2026-11-05, va en el duelo con `contraHab`): marca la Evasión y el Parry; el de clase es Flash y cuesta 1', () => {
   const h = chp('Contraataque'), sc = creepPrueba({id: 'c1', habilidades: [h]}), sin = creepPrueba({id: 'c2'});
   const hk = CreepDuelo.hooks({creep: () => sc, cambiar: async () => ({}), publicar: () => {}, toast: () => {}, confirmar: () => true, soy: () => true, borrarParry: () => {}});
   const ops = hk.opcionesDefensa({id: 'd', defensor: {ref: 'c1'}, ataque: {tipo: 'normal'}});
-  const t1 = CreepAcciones.tiradaAtaque(sc, 'contra'), t0 = CreepAcciones.tiradaAtaque(sin, 'contra');
+  const t1 = CreepAcciones.tiradaAtaque(sc, 'contra', 2), t0 = CreepAcciones.tiradaAtaque(sin, 'contra');
   const cl = CLASES_SKILLS.find(c => c.id === 'warrior').habilidades.find(x => x.id === 'warrior-contraataque');
   igual([h.contraEsquiva, h.modo, ops.every(o => o.contraEsquiva), t1.r.formula !== t0.r.formula, cl.costo, cl.turnoAjenoSp, /FLASH/.test(cl.detalle)],
     [true, 'manual', true, true, '1', '2', true]);
+});
+prueba('⚔ Reglas del Contraataque (2026-11-05): sin habilidad ni pasiva no hay contraataque tras el Bloqueo; Devolver gentileza lo habilita en el creep', () => {
+  const pas = PASIVAS_BASE.find(p => p.poolId === 'devolver-gentileza');
+  const con = creepPrueba({id: 'c3', pasivas: [JSON.parse(JSON.stringify(pas))]}), sin = creepPrueba({id: 'c4'});
+  const hkCon = CreepDuelo.hooks({creep: () => con, cambiar: async () => ({}), publicar: () => {}, toast: () => {}, confirmar: () => true, soy: () => true, borrarParry: () => {}});
+  const hkSin = CreepDuelo.hooks({creep: () => sin, cambiar: async () => ({}), publicar: () => {}, toast: () => {}, confirmar: () => true, soy: () => true, borrarParry: () => {}});
+  const d = {defensor: {ref: 'x'}};
+  igual([!!pas, pas.mods[0].stat, hkCon.contraPasiva(d), hkSin.contraPasiva(d)], [true, 'gentileza', true, false]);
 });
 prueba('💨 Segundo aliento (2026-10-27): se cura 6 + su Constitución, le saca el debuff elegido y es una vez por combate', () => {
   const h = chp('Segundo aliento'), sc = creepPrueba({hp: 5, hpMax: 40, habilidades: [h], estados: [{id: 'r', nombre: 'Rengo', polaridad: 'debuff', turnos: 2, activo: true, mods: []}]});

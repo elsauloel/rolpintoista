@@ -128,7 +128,7 @@ const CreepDuelo = (() => {
         if(campo === 'eva'){ const ee = evaEsp(sc, d); return {formula: formulaDe(A().tirada('', C().statValor(sc, 'eva') + ee.val, scEva, 'eva', ee.fijo)), ...L('stat|eva')}; }
         if(campo === 'parry') return {formula: formulaDe(A().tirada('', C().statValor(sc, 'parry'), sc, 'parry')), ...L('stat|parry')};
         if(campo === 'pdg'){
-          const t = d.ataque.tipo === 'habilidad-arma' ? pdgDeArreglos(sc, d.ataque) : A().tiradaAtaque(sc, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo);
+          const t = d.ataque.tipo === 'habilidad-arma' ? pdgDeArreglos(sc, d.ataque) : A().tiradaAtaque(sc, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo, d.ataque.contraHab ? 2 : 0);
           const tipo = d.ataque.tipo, costo = tipo === 'oportunidad' ? C().costoOportunidad(sc) : tipo === 'contra' ? C().costoContraataque(sc) : C().costoAtaque(sc);
           return {formula: formulaDe(t), ...L('atacar|'), costo: Combatiente.costoAtaqueLineas({tipoArma: Combatiente.armaEnMano(sc).tipoDado, arma: Combatiente.armaDeCombatiente(sc), hechos: Combatiente.ataquesConArmaCreep(sc), ...(Combatiente.armasDeMano(sc).length > 1 ? {porArma: true} : {}), costo, tiene: num(sc.nitros), ataque: tipo})};
         }
@@ -274,6 +274,7 @@ const CreepDuelo = (() => {
         return Combatiente.sinReaccionesNo2(ops, sc.estados);   // Expuesto (Degollar): sin Parry
       },
       // ⚔ Cobrar el Contraataque al elegir «Sí» (su SP o su cooldown, al doble: es en turno ajeno). '' = cobrado.
+      contraPasiva: d => { const sc = deLado(d.defensor); return !!sc && C().modTotal(sc, 'gentileza') > 0; },   // ⚔ Devolver gentileza (2026-11-05)
       contraEsquivaPagar: async d => {
         const sc = deLado(d.defensor);
         if(!sc) return 'no se encontró el creep';

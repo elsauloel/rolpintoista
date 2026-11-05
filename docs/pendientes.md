@@ -37,9 +37,15 @@
 
 > **📋 Cola de trabajo (2026-11-05, dueño: «cuando se termine lo que se está programando y lo que está en cola… agregar esta añadidura a la
 > cola»)**, en este orden: 1) la segunda tanda de pruebas del mapa (en curso); 2) 🚩 estandartes (globito, carnet, áreas como estados); 3) ⬡ la
-> información del hexágono; 4) ⚔ las reglas nuevas del Contraataque (y la pasiva «Devolver gentileza»); 5) 🦘 el área de caída del Salto; 6) **cargar
+> información del hexágono; 4) ⚔ las reglas nuevas del Contraataque (y la pasiva «Devolver gentileza»); 5) 🦘 el área de caída del Salto (ver el punto 8); 6) **cargar
 > los creeps esenciales diseñados y sin cargar**: L6 Patotero, T4 Peleador de control, W4 Verdugo, R4 Hunter, H4 Bruto que aguanta, L7 Degollador, L8
 > Acróbata (nivel 1, `comun/creeps-esenciales.js`), con el cambio de Patotear y Jauría (+1 PdG con un aliado pegado, +1 dado por aliado sin tope).
+> **Sumados a la cola (dueño, 2026-11-05)**: 7) **🌑 Renombrar «Echar la mufa» / «Mufa»** a **«Mala sombra»** (habilidad y estado; dueño: «algo de la
+> sombra… uno le puede echar la mufa a un aliado y eso no suena bien: le echás un estado a un aliado, pero la sombra es lo que hace mal»). 8) **El
+> Salto**: el área de caída, **elegís el casillero** y, si desde ahí hay **más de un objetivo posible**, «Elegí el objetivo»; recién ahí el ataque.
+> 9) **Probar lo que quedó sin probar**: el Remolino después del arreglo (si el creep no tiene SP, cargarle SP a mano), Apuntar y Marcar con el potente
+> nuevo, el cuadro del duelo encima de la animación del gancho. 10) La pasiva nueva para el **support cuerpo a cuerpo** de los esenciales (a definir
+> con el dueño cuál y cuál pasiva).
 
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la

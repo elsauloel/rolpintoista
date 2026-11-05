@@ -1430,7 +1430,15 @@ function puedoMoverLibre(t){
 }
 function activarMoverLibre(id){
   moverLibre = moverLibre === id ? null : id;
-  if(moverLibre) sigiloAlertaRoja(tokens.get(id), 'entró en Mover libre', 'Se mueve sin gastar No2 mientras está en sigilo');
+  // 🙈 (2026-11-05, prueba en el mapa) Antes iba a la Mesa, a la vista de todos, y delataba al que está en sigilo: ahora le llega solo al GM.
+  if(moverLibre && !soyGM){
+    const t = tokens.get(id);
+    if(t && typeof enSigilo === 'function' && enSigilo(t) && typeof momentoAbrir === 'function'){
+      const gm = (fbPartida && fbPartida.gmUid) || '';
+      momentoAbrir({tipo: 'fuera-de-turno', icono: '🙈', titulo: `${nombreDe(t)} (en sigilo) entró en 🦶 Mover libre`, resultado: 'Se mueve sin gastar No2 mientras está en sigilo.', estado: 'listo',
+        datos: {soloGM: true, chico: true, ...(gm ? {paraUid: gm} : {})}});
+    }
+  }
   if(moverLibre) toast('Mover libre: arrastrá el token o tocá la casilla de destino (Esc, clic derecho o el mismo botón lo apagan)');
   lienzo.style.cursor = moverLibre ? 'crosshair' : 'default';
   pedirDibujo();

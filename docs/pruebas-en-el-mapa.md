@@ -284,7 +284,7 @@
 - [ ] **📏 Fuera de alcance y ✨ Invulnerable al elegir el objetivo (2026-11-05, dueño).** Atacar a mano limpia (o con una habilidad con alcance) a
   alguien más lejos de lo que llega: «está fuera del alcance… ¿Proceder igual?»; elegir a un rival Titilando o Invulnerable: «no recibe daño ni
   debuffs… ¿Atacarlo igual?». Sin probar en el mapa (salen al hacer clic en el objetivo).
-- [ ] **🪝 El gancho de Arrastrar con el GM con otras ventanas abiertas (2026-11-05, arreglado).** La ficha o GM Tools de un GM tomaban el arrastre y lo
+- [x] **🪝 El gancho de Arrastrar con el GM con otras ventanas abiertas (2026-11-05, arreglado; ✅ el dueño lo probó: «ya funciona bien el arrastre»).** La ficha o GM Tools de un GM tomaban el arrastre y lo
   dejaban «Aplicado · a mano» sin moverlo ni animarlo (visto con Rockardo contra Warrior en Claude · pruebas). Ahora va marcado `pedido-mapa`, que las
   pestañas viejas no conocen: lo toma solo el mapa del GM. ✅ Probado con clics en Claude · pruebas (Botonera → Arrastrar → Warrior a 3 casillas →
   PdG 10 contra Eva 1 → lo trajo pegado y quedó Desequilibrado). Falta que lo vea el dueño.

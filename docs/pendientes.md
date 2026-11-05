@@ -46,7 +46,8 @@
 > 9) **Probar lo que quedó sin probar**: el Remolino después del arreglo (si el creep no tiene SP, cargarle SP a mano), Apuntar y Marcar con el potente
 > nuevo, el cuadro del duelo encima de la animación del gancho. 10) La pasiva nueva para el **support cuerpo a cuerpo** de los esenciales (a definir
 > con el dueño cuál y cuál pasiva). 11) **💧 El borde del charco de agua**: hoy se dibuja con semicírculos y parece una nube; tiene que ser una **ondulación**, como agua
-> (dueño, 2026-11-05, visto en «Claude · pruebas»).
+> (dueño, 2026-11-05, visto en «Claude · pruebas»). 12) **Sacar el Tipo 12 de todos lados por ahora** (dueño, 2026-11-05: «sacalo de todos lados por ahora»): las Acciones de los creeps,
+> su lupa, la Botonera y cualquier otra pantalla que lo muestre (resistencias a crítico, Tipo de arma); la ficha lite ya no lo muestra.
 
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la

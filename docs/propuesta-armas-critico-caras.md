@@ -1,6 +1,6 @@
 # Propuesta: las armas con crítico que quedaron caras
 
-Paso 3 del [análisis de las armas](analisis-armas-res-critico.md). **Solo propuesta: no se cambió el catálogo.** Fecha: 2026-11-04.
+Paso 3 del [análisis de las armas](analisis-armas-res-critico.md). **✅ Aprobada y cargada (dueño, 2026-11-05: «está todo bien»)**: versión 1 + versión 2 (potente hasta +6 en Tipo 4 y 6) + Guantes del verdugo con **Potente +5** («manteneles el potente, ajustando el valor»). Tipo 8 y 10: el potente no importa; si un arma lo tiene y le hace falta, se reemplaza por otra cosa (en Común y Buena no hay ninguna). Fecha: 2026-11-04.
 Base: la medición de [medicion-critico-frecuente.md](medicion-critico-frecuente.md), con la moneda que eligió el dueño: **«+1 de daño fijo»**.
 
 ## Criterio

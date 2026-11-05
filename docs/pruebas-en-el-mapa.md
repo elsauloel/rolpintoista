@@ -282,6 +282,10 @@
 
 ## Pendientes
 
+- [ ] **🎯 Punto débil deja la resistencia a crítico en negativo (2026-11-05, dueño: «Punto débil, me parece bien lo que propones»).** Con la Aguja
+  siniestra (o el Arma siniestra) dejar Punto débil a un rival **sin** resistencia y pegarle con un arma Tipo 4: en el cuadro del crítico del duelo la
+  fila del rango tiene que mostrar un cuadradito violeta «P» y el rango en 3 (una diferencia de 3 ya es crítico). Probado solo en `comun/pruebas.html`.
+
 ### ▶ Para la próxima tanda de pruebas en el mapa (2026-11-03)
 
 - [ ] **⏬ La Demora animada (2026-11-04, dueño: «que se desplegara la lista de iniciativa, y se vea una animación de los nombres intercambiando

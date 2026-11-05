@@ -1,5 +1,11 @@
 # Propuesta: habilidades, estados y pasivas con Resistencia a crítico
 
+> **✅ Respuesta del dueño (2026-11-05) y lo hecho:** **Punto débil: opción A, hecha** — la resistencia a crítico puede quedar negativa
+> (`comun/critico.js` y las ventanas del duelo ya no la recortan a 0; el cuadro del crítico la muestra con cuadraditos violeta «P»; la calculadora acepta
+> negativos). **Textos corregidos**: Temple, Punto débil (habilidad del Debuffer y el estado), la calculadora del crítico. **«+1 a todos» queda como
+> está** («las dejaría así en principio»): no se cambiaron los números. Pasivas y consumibles de resistencia a crítico: el dueño pidió diseñar
+> algunos (propuesta aparte).
+
 Paso siguiente del [plan](plan-resistencia-critico.md), después del equipo y las armas. **Solo propuesta: no se cambió nada del juego.** Fecha: 2026-11-05.
 
 ## La cuenta

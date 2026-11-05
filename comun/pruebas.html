@@ -53,7 +53,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
-<script src="estados-presets.js?v=20261104i"></script>
+<script src="estados-presets.js?v=20261105pd"></script>
 <script src="estados-aplicar.js?v=20261104ae"></script>
 <script src="recibidos.js?v=20261103pm"></script>
 <script src="tokens-auto.js"></script>
@@ -105,7 +105,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261104i"></script>
+<script src="duelo.js?v=20261105pd"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -117,7 +117,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
-<script src="skills-clase.js?v=20261104ig"></script>
+<script src="skills-clase.js?v=20261105pd"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261104ig"></script>
 <script src="skills-creep-base.js?v=20261104ig"></script>
@@ -173,6 +173,12 @@ prueba('evaluar: la Resistencia a crítico suma al rango (Tipo 4 ×1 → 5; 2026
 prueba('evaluar: Tipo 4 ×1 con diferencia 4 → no es crítico; con 5 sí; con 10, 2 d20', () => igual([Critico.evaluar({pdg: 8, eva: 4, tipo: 4, resistencia: 1}).critico, Critico.evaluar({pdg: 9, eva: 4, tipo: 4, resistencia: 1}).critico, Critico.evaluar({pdg: 14, eva: 4, tipo: 4, resistencia: 1}).dados], [false, true, 2]));
 prueba('evaluar: Tipo 4 ×2 → rango 6', () => igual(Critico.evaluar({pdg: 10, eva: 4, tipo: 4, resistencia: 2}).rango, 6));
 prueba('rango: frecuente y resistencia se compensan, mínimo 2 al final (4 − 3 + 1 = 2; 4 − 5 + 1 → 2)', () => igual([Critico.rango(4, 3, 1), Critico.rango(4, 5, 1), Critico.rango(4, 1, 2)], [2, 2, 5]));
+prueba('🎯 Punto débil (2026-11-05, dueño): la resistencia puede quedar negativa y achica el rango (Tipo 4, −1 → 3; con frecuente 2 → 2 por el mínimo); un creep sin resistencia con Punto débil queda en −1 y una diferencia de 3 ya es crítico', () => {
+  const P = estadosPresetCreep().find(p => p.nombre === 'Punto débil');
+  const sc = {crit: [0, 0, 0, 0, 0], estados: [{...P, activo: true}]};
+  igual([Critico.rango(4, 0, -1), Critico.rango(4, 2, -1), CreepCalculo.critEfectivo(sc, 0), Critico.evaluar({pdg: 13, eva: 10, tipo: 4, resistencia: CreepCalculo.critEfectivo(sc, 0)}).nivel, Critico.evaluar({pdg: 13, eva: 10, tipo: 4, resistencia: 0}).nivel],
+    [3, 2, -1, 1, 0]);
+});
 prueba('supercrítico: dos 20 naturales → ×8', () => igual(Critico.resultadoD20([20, 20], 0).mult, 8));
 prueba('supercrítico: tres 20 naturales → ×12', () => igual(Critico.resultadoD20([20, 20, 20], 0).mult, 12));
 prueba('supercrítico: un solo 20 sigue en ×4', () => igual(Critico.resultadoD20([20, 3], 0).mult, 4));

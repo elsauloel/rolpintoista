@@ -5,7 +5,7 @@
    Regla:
    - El "rango" del crítico es el Tipo del arma (4, 6, 8, 10 o 12). Crítico FRECUENTE ×F lo baja F puntos (mínimo 2).
    - Nivel del crítico N = (PdG − Evasión) ÷ rango, hacia abajo. N = 0: no hay crítico.
-   - La Resistencia a crítico ×R del defensor contra ese Tipo SUBE el rango R puntos, en cada nivel (2026-11-04, dueño: «si alguien tiene resistencia
+   - La Resistencia a crítico ×R del defensor contra ese Tipo SUBE el rango R puntos, en cada nivel; con Punto débil R puede ser negativa y lo baja (2026-11-05) (2026-11-04, dueño: «si alguien tiene resistencia
      a crítico tipo 4 ×1, para hacerle crítico tienen que hacerle una diferencia de 5, y de 6 si tuviera ×2»; antes restaba R niveles enteros).
      Se compensa punto por punto con el Crítico frecuente y el mínimo de 2 va al final: rango = Tipo − F + R, mínimo 2. Se tiran N d20, vale el MEJOR.
    - El d20 da el multiplicador de TODO el daño del golpe: 7+ doble daño (×2), 17+ triple (×3), 20 cuádruple (×4); menos de 7, ×1.
@@ -22,7 +22,9 @@ const Critico = (() => {
   const NOMBRE_MULT = {1: 'sin multiplicador', 2: 'doble daño', 3: 'triple daño', 4: 'cuádruple daño'};
 
   // Rango del crítico: el Tipo, menos los puntos de Crítico frecuente, más los de Resistencia a crítico del defensor (nunca baja de 2).
-  const rango = (tipo, frecuente, resistencia) => Math.max(2, Math.round(num(tipo)) - Math.max(0, Math.round(num(frecuente))) + Math.max(0, Math.round(num(resistencia))));
+  // La resistencia puede ser NEGATIVA (Punto débil, 2026-11-05, dueño: «Punto débil, me parece bien lo que propones»): contra alguien sin
+  // resistencia, el Punto débil achica el rango como si el que le pega tuviera Crítico frecuente.
+  const rango = (tipo, frecuente, resistencia) => Math.max(2, Math.round(num(tipo)) - Math.max(0, Math.round(num(frecuente))) + Math.round(num(resistencia)));
 
   // Umbrales del d20 con Crítico potente ×P. El doble daño baja 1 por punto (piso 1); el triple 1 cada 2; el cuádruple 1 cada 3.
   function umbrales(potente){
@@ -122,7 +124,7 @@ const Critico = (() => {
     function cargarDefensor(){
       const f = fuente(v.defensor); if(!f) return;
       const i = TIPOS.indexOf(num(v.tipo));
-      if(Array.isArray(f.resistencias) && i >= 0) v.resistencia = Math.max(0, Math.round(num(f.resistencias[i])));
+      if(Array.isArray(f.resistencias) && i >= 0) v.resistencia = Math.round(num(f.resistencias[i]));
       if(f.defensa !== undefined && f.defensa !== null) v.defensa = Math.max(0, num(f.defensa));
     }
     cargarAtacante(); cargarDefensor();
@@ -187,15 +189,15 @@ const Critico = (() => {
         <p>La tirada de <b>probabilidad de golpe</b> del atacante, con todo sumado (el total que quedó en la Mesa).</p>
         <div class="cr-grid">${campo('pdg', 'PdG del atacante', v.pdg)}</div>`;
       if(id === 'eva') return `<div class="cr-preg">¿Cuánto sacó de Evasión el defensor?</div>
-        <p>Su tirada de <b>Evasión</b>. Su equipo puede tener <b>Resistencia a crítico</b> contra armas de Tipo ${num(v.tipo)}: cada punto le quita un nivel al crítico. ${fuente(v.defensor) ? '<b>Ya la completé</b> con la del defensor.' : ''}</p>
-        <div class="cr-grid">${selFuente('defensor', '¿Quién defiende?', v.defensor)}${campo('eva', 'Evasión del defensor', v.eva)}${campo('resistencia', `Resistencia a crítico (Tipo ${num(v.tipo)})`, v.resistencia, 'min="0"')}</div>
+        <p>Su tirada de <b>Evasión</b>. Su equipo puede tener <b>Resistencia a crítico</b> contra armas de Tipo ${num(v.tipo)}: cada punto le suma 1 a la diferencia que hace falta para cada nivel del crítico (con Punto débil puede quedar en negativo y la achica). ${fuente(v.defensor) ? '<b>Ya la completé</b> con la del defensor.' : ''}</p>
+        <div class="cr-grid">${selFuente('defensor', '¿Quién defiende?', v.defensor)}${campo('eva', 'Evasión del defensor', v.eva)}${campo('resistencia', `Resistencia a crítico (Tipo ${num(v.tipo)})`, v.resistencia, 'min="-5"')}</div>
         <div id="cr-vista"></div>`;
       if(id === 'critico'){
         const e = ev(), u = e.umbrales;
-        const cab = `Diferencia PdG − Evasión: <b>${e.diferencia}</b> · rango del crítico: <b>${e.rango}</b>${e.rango !== num(v.tipo) ? ` (Tipo ${num(v.tipo)}${num(v.frecuente) ? ` − frecuente ${num(v.frecuente)}` : ''}${num(v.resistencia) ? ` + Resistencia a crítico ${num(v.resistencia)}` : ''}${num(v.tipo) - num(v.frecuente) + num(v.resistencia) < 2 ? ', mínimo 2' : ''})` : ''}`;
+        const cab = `Diferencia PdG − Evasión: <b>${e.diferencia}</b> · rango del crítico: <b>${e.rango}</b>${e.rango !== num(v.tipo) ? ` (Tipo ${num(v.tipo)}${num(v.frecuente) ? ` − frecuente ${num(v.frecuente)}` : ''}${num(v.resistencia) > 0 ? ` + Resistencia a crítico ${num(v.resistencia)}` : num(v.resistencia) < 0 ? ` − Punto débil ${-num(v.resistencia)}` : ''}${num(v.tipo) - num(v.frecuente) + num(v.resistencia) < 2 ? ', mínimo 2' : ''})` : ''}`;
         let r;
         if(e.diferencia <= 0) r = `La PdG no supera a la Evasión: <b>no hay golpe</b> (se resuelve a mano) ni crítico.`;
-        else if(e.nivel === 0) r = `<b>No es crítico</b>: la diferencia no llega al rango${num(v.resistencia) ? ' (la Resistencia a crítico lo agranda)' : ''}.`;
+        else if(e.nivel === 0) r = `<b>No es crítico</b>: la diferencia no llega al rango${num(v.resistencia) > 0 ? ' (la Resistencia a crítico lo agranda)' : ''}.`;
         else{
           r = `Nivel del crítico: <b>${e.nivel}</b>.<br><b>Crítico${e.dados > 1 ? ` ×${e.dados}` : ''}</b>: se tiran <b>${e.dados}d20</b> y vale el mejor (con dos o más 20 naturales, supercrítico: cada 20 suma ×4). Doble daño con ${u.doble}+, triple con ${u.triple}+, cuádruple con ${u.cuadruple}+. Ignora la armadura.`;
           if(tirada) r += `<br>d20: ${tirada.rolls.join(', ')} → ${tirada.supercritico ? `<b>¡${tirada.mult / 4} veintes naturales!</b>` : `mejor <b>${tirada.mejor}</b>`} → <b>${nombreMult(tirada.mult)}</b> (×${tirada.mult})`;
@@ -265,7 +267,7 @@ const Critico = (() => {
       if(typeof mesaPublicar !== 'function' || e.nivel === 0){ if(typeof toast === 'function') toast('No hay crítico que publicar'); return; }
       const t = tirada && tirada.dados === e.dados ? tirada : null;
       const partes = [`PdG ${num(v.pdg)} − Evasión ${num(v.eva)} = ${e.diferencia} (rango ${e.rango})`];
-      if(!e.critico) partes.push('la Resistencia a crítico lo anula');
+      if(!e.critico) partes.push('no llega a un nivel de crítico');
       else if(t){
         partes.push(`${nombreMult(t.mult)} (×${t.mult})`);
         if(v.dano !== '') partes.push(`daño ${num(v.dano)} × ${t.mult} = ${num(v.dano) * t.mult}, ignora la Defensa`);

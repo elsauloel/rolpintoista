@@ -679,6 +679,12 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   +1 de daño, frecuente +1) · **Chaleco de cuero** (Def +2) · **Escarpines de fieltro** (Eva +1). Consumible: **Mate cebado**. Sin programar.
   **Con esto se cierra la ronda de nivel 1** de las líneas que quedaban (T4, W4, R4, H4, L6, L7, L8).
 
+## ▶ Ronda de niveles 2 a 5 (2026-11-05, dueño)
+«Los que ya están, vamos a ir agarrando uno por uno y a definir los niveles que siguen; uno dentro de cada rol (primero el W1, después el L1, después
+el R1, así) hasta completar todo lo que ya tenemos. Una vez completado, una ronda de diseño de cero para ampliar horizontalmente con nuevas tácticas y
+variantes, si quedan ideas con potencial.» Orden (la rotación de siempre): W1 → T1 → H1 → L1 → L2 → R1 → M1 → S1 → D1 → W2 → T2 → … Por cada uno:
+los niveles 2 a 5 completos (atributos, habilidad, pasiva, equipo concreto, consumible), primero con lo que ya existe; una 🆕 solo si no hay nada.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

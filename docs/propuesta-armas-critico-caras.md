@@ -58,3 +58,26 @@ Aparte (la recalibró la compu y no entra en esta tanda): el **Punzón de hielo*
 2. Con esto el Potente queda, entre las Comunes y Buenas, solo en la Daga de duelo, el Arco de puntería, la Espada de la guardia y la Flecha de aguja.
    ¿Lo dejamos ahí como sabor, o pasamos también esos **Potente +2 a Frecuente +1**?
 3. ¿Los Guantes del verdugo con Frecuente +1?
+
+## Versión 2: Tipo 4 y 6 con potente → más potente (dueño, 2026-11-05)
+Dueño: «en las armas de tipo 4 y 6 que tienen crítico potente y se quedan cortas, en vez de cambiarlo a frecuente, simplemente agregarle más puntos
+de bono de crítico potente hasta emparejar».
+
+Cuánto vale cada punto de potente (multiplicador promedio cuando hay crítico, 1 d20): P0 1,95 · P1 2,0 · P2 2,1 · P3 2,2 · P4 2,3 · P5 2,35 ·
+**P6 2,5** · P8 2,55 · P10 2,65. Hasta 6 cada punto vale ≈ ¼ de daño; **desde 6 el doble daño sale siempre** y cada punto de más vale la mitad.
+Por eso se propone **tope de Potente +6**, y lo que falte después, en daño.
+
+| Arma | Le falta | Hoy → propuesta |
+|---|---|---|
+| **Tenedor de asado** (C, T4) | 1 | Potente +1 → **Potente +5** |
+| **Chuza** (C, T4) | 1 | Potente +1 → **Potente +5** |
+| **Arco petizo** (C, T4) | 1 | Potente +1 → **Potente +5** |
+| **Ballesta de filo fino** (C, T4) | 1 | Potente +2 → **Potente +6** |
+| **Arco de pastor** (C, T4) | ½ | Potente +1 → **Potente +3** (conserva su +1 de daño) |
+| **Sable fino** (C, T6) | 1¾ | Potente +2 → **Potente +6 · + 1 de daño** |
+| **Puñal de sombra** (B, T4) | ½ | Potente +2 → **Potente +4** |
+| **Espada larga** (B, T6) | 1½ | Potente +2 → **Potente +6** (le queda ½ corto: dentro del redondeo) |
+| **Espada de la guardia** (B, T6) | 1½ | Potente +2 → **Potente +6** (conserva Parry +1; ½ corto, igual que la Espada larga) |
+| **Espada del Jefe de los Mil Caminos** (B, T6) | 2½ | Potente +3 → **Potente +6 · + 2 de daño** (conserva el Sangrado 33 %) |
+
+El resto de la tabla de arriba (las de frecuente, el Hacha de bombero, el Mazo de carnicero, el Punzón de hielo) sigue igual que en la versión 1.

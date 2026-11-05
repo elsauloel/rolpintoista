@@ -638,6 +638,9 @@ const CreepCalculo = (() => {
     while(crit.length < 5) crit.push(0);
     sc.crit = crit.slice(0, 5);
     sc.equipo = Array.isArray(sc.equipo) ? sc.equipo : [];
+    // 🔑 Cada pieza con su id (2026-11-05: la Bruja del pantano tenía piezas sin id —vaya a saber de qué carga vieja— y el 🎒 y la × de sus manos no
+    // hacían nada, porque buscan la pieza por el id). Se le da uno a la que no lo tenga; queda guardado la próxima vez que se guarde el creep.
+    sc.equipo.forEach(it => { if(it && typeof it === 'object' && (it.id === undefined || it.id === null || it.id === '')) it.id = 'eq' + Math.random().toString(36).slice(2, 9); });
     sc.estados = Array.isArray(sc.estados) ? sc.estados : [];
     sc.habilidades = Array.isArray(sc.habilidades) ? sc.habilidades : [];
     Combatiente.migrarArmasElementales(sc.habilidades);   // 🔥 las cinco Armas elementales de antes → una «Arma elemental» (2026-10-31)

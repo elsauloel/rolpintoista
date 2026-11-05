@@ -2961,6 +2961,12 @@ async function dueloAdelanto(tokenId, lugares){
   const [x] = orden.splice(i, 1); orden.splice(j, 0, x);
   const turno = activo ? Math.max(0, orden.findIndex(o => o.id === activo)) : iniciativa.turno;
   if(!(await guardarIniciativa({orden, turno}))) return {manual: true, nota: 'no se pudo mover en el orden de turnos: a mano'};
+  // ⏫ La misma animación que la Demora, para arriba (2026-11-05, dueño: «si hubiera algún efecto inverso a demora… debería aplicar la misma ruta de animación»).
+  { const t = tokens.get(tokenId);
+    if(t && typeof momentoAbrir === 'function'){
+      const publico = !t.oculto && (t.tipo === 'creep' ? creepConocido(t) : !enSigilo(t)), quien = publico ? nombreDe(t) : 'Alguien';
+      momentoAbrir({tipo: 'demora', icono: '⏫', titulo: `${quien} sube en el orden de turnos`, resultado: `Sube ${txt(i - j)}: ahora está ${j + 1}.º (estaba ${i + 1}.º).`,
+        estado: 'listo', datos: {chico: true, demoraToken: tokenId, adelantoMovio: true}}); } }
   return {nota: `sube ${txt(i - j)} en el orden de turnos (${i + 1}.º → ${j + 1}.º)${i < iniciativa.turno ? ': ya jugó esta ronda, le sirve para la próxima' : ''}`};
 }
 

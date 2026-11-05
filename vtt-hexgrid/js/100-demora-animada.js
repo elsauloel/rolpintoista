@@ -77,6 +77,9 @@ function demoraCss(){
     'letter-spacing:.06em;box-shadow:0 6px 18px rgba(0,0,0,.5),0 0 14px rgba(226,123,114,.45);white-space:nowrap}' +
     '.demora-cartel.der{transform:translate(-8px,-50%)}.demora-cartel.izq{transform:translate(calc(-100% + 8px),-50%)}' +
     '.demora-cartel.der.ver{opacity:1;transform:translate(0,-50%)}.demora-cartel.izq.ver{opacity:1;transform:translate(-100%,-50%)}' +
+    '#iniciativa.demora-atencion.demora-sube{animation-name:demora-brillo-sube}' +
+    '@keyframes demora-brillo-sube{0%,100%{box-shadow:0 10px 26px rgba(0,0,0,.55),0 0 0 1px rgba(127,220,134,.5)}50%{box-shadow:0 10px 26px rgba(0,0,0,.55),0 0 0 3px #7FDC86,0 0 26px 6px rgba(127,220,134,.5)}}' +
+    '.demora-cartel.sube{color:#CFF5D3;border-color:#7FDC86;box-shadow:0 6px 18px rgba(0,0,0,.5),0 0 14px rgba(127,220,134,.45)}' +
     '.demora-dedo{position:fixed;z-index:71;pointer-events:none;font-size:26px;opacity:0;transition:opacity .3s ease,transform .45s cubic-bezier(.3,.7,.4,1);filter:drop-shadow(0 3px 5px rgba(0,0,0,.6))}' +
     '.demora-onda{position:fixed;z-index:70;pointer-events:none;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;border:2px solid #F3C9C4;animation:demora-onda .7s ease-out forwards}' +
     '@keyframes demora-onda{0%{transform:scale(.4);opacity:1}100%{transform:scale(4);opacity:0}}';
@@ -95,23 +98,25 @@ function demoraScrollA(fila, arriba){
   return DEMORA_T.scroll;
 }
 
-function demoraAnimar(tokenId, momentoId){ demoraEncolar(tokenId, momentoId, false); }
-function demoraChoque(tokenId, momentoId){ demoraEncolar(tokenId, momentoId, true); }
-function demoraEncolar(tokenId, momentoId, choque){
+function demoraAnimar(tokenId, momentoId){ demoraEncolar(tokenId, momentoId, 'baja'); }
+function demoraChoque(tokenId, momentoId){ demoraEncolar(tokenId, momentoId, 'choque'); }
+function demoraSube(tokenId, momentoId){ demoraEncolar(tokenId, momentoId, 'sube'); }   // ⏫ el Arrojo (sube en el orden): la misma ruta, para arriba
+function demoraEncolar(tokenId, momentoId, modo){
   if(momentoId){ if(demorasVistas.has(momentoId)) return; demorasVistas.add(momentoId); }
-  demoraCola.push({tokenId, choque});
+  demoraCola.push({tokenId, modo});
   if(!demoraEnCurso) demoraSiguiente();
 }
 async function demoraSiguiente(){
   const x = demoraCola.shift();
   if(!x){ demoraEnCurso = false; return; }
   demoraEnCurso = true;
-  try{ await demoraSecuencia(x.tokenId, x.choque); }catch(err){ console.error('La animación de la Demora:', err); }
+  try{ await demoraSecuencia(x.tokenId, x.modo); }catch(err){ console.error('La animación de la Demora:', err); }
   demoraEnCurso = false;
   renderIniciativa();   // lo último que haya llegado mientras tanto
   if(demoraCola.length) setTimeout(demoraSiguiente, 300);
 }
-async function demoraSecuencia(tokenId, choque){
+async function demoraSecuencia(tokenId, modo){
+  const choque = modo === 'choque', sube = modo === 'sube';
   const caja = $('#iniciativa');
   if(!caja) return;
   demoraCss();
@@ -128,7 +133,9 @@ async function demoraSecuencia(tokenId, choque){
   const r0 = caja.getBoundingClientRect();
   const cartel = document.createElement('div');
   cartel.className = 'demora-cartel';
-  cartel.textContent = choque ? '⏬ DEMORA · ya está último' : '⏬ DEMORA';
+  cartel.textContent = choque ? '⏬ DEMORA · ya está último' : sube ? '⏫ SUBE EN EL ORDEN' : '⏬ DEMORA';
+  if(sube) cartel.classList.add('sube');
+  if(sube) caja.classList.add('demora-sube');
   // Al costado de la cabecera (a la derecha; si no entra, a la izquierda), así no tapa la lista cuando se despliega.
   const rcab = (document.getElementById('iniciativa-cab') || caja).getBoundingClientRect();
   cartel.style.top = (rcab.top + rcab.height / 2) + 'px';
@@ -163,7 +170,7 @@ async function demoraSecuencia(tokenId, choque){
   caja.animate && caja.animate([{opacity: .6}, {opacity: 1}], {duration: T('desplegar'), easing: 'ease-out'});
   await esperar(T('desplegar'));
   let fila = iniFilas(caja).find(f => f.dataset.iniFila === tokenId);
-  await esperar(demoraScrollA(fila, !choque));
+  await esperar(demoraScrollA(fila, !choque && !sube));
   if(!choque){
     // 5. Los nombres van del orden de antes al de ahora.
     const tops = new Map();
@@ -174,10 +181,10 @@ async function demoraSecuencia(tokenId, choque){
     iniOrdenClave = JSON.stringify((iniciativa.orden || []).map(o => o.id));
     iniIdsAhora = iniFilas(caja).map(f => f.dataset.iniFila);
     iniUltimo = iniCopia(iniciativa);
-    iniDeslizarDur(caja, f => tops.has(f.dataset.iniFila) ? tops.get(f.dataset.iniFila) : null, tokenId, T('mover'));
+    iniDeslizarDur(caja, f => tops.has(f.dataset.iniFila) ? tops.get(f.dataset.iniFila) : null, tokenId, T('mover'), sube);
     await esperar(T('mover') + 100);
     fila = iniFilas(caja).find(f => f.dataset.iniFila === tokenId);
-    await esperar(demoraScrollA(fila, false) ? T('seguir') : 0);
+    await esperar(demoraScrollA(fila, sube) ? T('seguir') : 0);
   }else{
     fila = iniFilas(caja).find(f => f.dataset.iniFila === tokenId);
     if(fila) await demoraChocar(fila, T('mover'));
@@ -185,7 +192,7 @@ async function demoraSecuencia(tokenId, choque){
   // 6. Quieta un momento y, si estaba plegada, se vuelve a plegar.
   cartel.classList.remove('ver');
   await esperar(T('quieta'));
-  caja.classList.remove('demora-atencion');
+  caja.classList.remove('demora-atencion', 'demora-sube');
   setTimeout(() => cartel.remove(), 600);
   if(estabaPlegada){ iniciativaPlegada = true; renderIniciativaSinAnim(); }
   await esperar(T('plegar'));
@@ -193,7 +200,7 @@ async function demoraSecuencia(tokenId, choque){
   if(idDuelo && vuelo && Duelo.volverApartado) Duelo.volverApartado(idDuelo);
 }
 // Como iniDeslizar, con otra duración (la Demora va más lenta que un cambio cualquiera).
-function iniDeslizarDur(caja, desde, resaltar, ms){
+function iniDeslizarDur(caja, desde, resaltar, ms, verde){
   iniFilas(caja).forEach(f => {
     const antes = desde(f);
     if(antes === null || antes === undefined) return;
@@ -201,7 +208,7 @@ function iniDeslizarDur(caja, desde, resaltar, ms){
     if(Math.abs(dy) < 1 && f.dataset.iniFila !== resaltar) return;
     f.style.transition = 'none';
     f.style.transform = `translateY(${dy}px)`;
-    if(f.dataset.iniFila === resaltar){ f.style.position = 'relative'; f.style.zIndex = '2'; f.style.boxShadow = '0 0 0 2px #E27B72, 0 0 14px rgba(226,123,114,.7)'; }
+    if(f.dataset.iniFila === resaltar){ f.style.position = 'relative'; f.style.zIndex = '2'; f.style.boxShadow = verde ? '0 0 0 2px #7FDC86, 0 0 14px rgba(127,220,134,.7)' : '0 0 0 2px #E27B72, 0 0 14px rgba(226,123,114,.7)'; }
     void f.offsetHeight;
     f.style.transition = `transform ${ms}ms cubic-bezier(.45,.05,.25,1), box-shadow 600ms`;
     f.style.transform = '';

@@ -281,6 +281,10 @@
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 
 ## Pendientes
+- [ ] **⏫ El Arrojo (sube en el orden) con la animación de la Demora, en verde (2026-11-05, dueño).** Probada la animación sola en Claude · pruebas;
+  falta con la habilidad de support en un duelo real (también deja una tarjeta en la Crónica).
+- [ ] **🎒 y × en las manos de un creep (2026-11-05, arreglado).** Había piezas sin id (la Bruja del pantano, el Escarabajo de cobre…) y esos botones no
+  hacían nada; ahora cada pieza recibe uno al cargar. Probado en GM Tools con la Bruja de Claude · pruebas (sin guardar). Ver que en El origen ande.
 - [ ] **✕ en la tira del duelo minimizado (2026-11-05, dueño).** Terminado: la ✕ es «Terminar duelo» (probado en Claude · pruebas). **En curso**: quien
   lo empezó o el GM ve «¿Cancelarlo?»; con Sí se cancela para todos (con la pregunta de devolver lo pagado, si corresponde), queda «✖ … canceló el duelo»
   en la Mesa y el cuadro se cierra solo en las demás pantallas; otro jugador recibe un aviso de que no lo puede cancelar. Falta probar el caso en curso.

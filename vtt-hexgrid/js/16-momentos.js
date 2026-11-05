@@ -106,6 +106,7 @@ function momentoRecibido(id, d){
   if(d.tipo === 'escudo-golpe'){ if(typeof escudoHumanoGolpeRecibido === 'function') escudoHumanoGolpeRecibido(id, d); return; }   // 🛡 el golpe que se reparte (js/95): sin tarjeta
   if(d.tipo === 'onda-golpe'){ if(typeof ondaFxGolpeRecibido === 'function') ondaFxGolpeRecibido(id, d); return; }   // 💫 los pajaritos de quien no la resistió: sin tarjeta   // 🩸 el chorro de sangre (js/92, 2026-11-03)
   if(d.tipo === 'demora' && d.datos && d.datos.demoraMovio && typeof demoraAnimar === 'function') demoraAnimar(d.datos.demoraToken, id);   // ⏬ la lista de turnos animada (js/100)
+  if(d.tipo === 'demora' && d.datos && d.datos.adelantoMovio && typeof demoraSube === 'function') demoraSube(d.datos.demoraToken, id);   // ⏫ sube en el orden (Arrojo): la misma animación
   if(d.tipo === 'demora' && d.datos && d.datos.demoraChoca && typeof demoraChoque === 'function') demoraChoque(d.datos.demoraToken, id);   // ⏬ ya era el último: se choca con el borde
   if(d.tipo === 'rodillo') rodilloMomento(id, d);   // 🎰 el rodillo de otro (el Arma elemental al azar, 2026-11-01)
   if(d.tipo === 'mal-de-ojo' && typeof malDeOjoMomento === 'function') malDeOjoMomento(id, d);   // 🧿 volver a tirar y quedarse con la peor (js/60)

@@ -161,21 +161,25 @@ async function ordenSedDeSangre(d){
   if(r && r.nota) mesaLinea(`🩸 Sed de sangre: ${ordenNombre(atk)} — ${r.nota}`, 'recordatorio');
 }
 
-// ---------- ⚔ Sed de batalla (pasiva, 2026-11-05): el rival cae por tu golpe → recuperás N No2, sin pasar del máximo ----------
+// ---------- ⚔ Sed de batalla (pasiva, 2026-11-05): el rival cae por tu golpe → ganás N No2 (3), aunque pases del máximo, y te avisa ----------
 async function sedDeBatalla(atk, ta, def){
   const n = ordenPasiva(ta, 'sedBatalla', 'sedbatalla');
   if(!(n > 0)) return;
-  let antes = 0, despues = 0, hecho = false;
+  let hecho = false;
   if(ta.tipo === 'creep' && typeof acCambiarCreep === 'function')
-    hecho = !!(await acCambiarCreep(ta.fichaId, c => { const max = CreepCalculo.nitrosMax(c); antes = num(c.nitros); c.nitros = Math.max(antes, Math.min(max, antes + n)); despues = c.nitros; return {ok: true}; }));
-  else if(typeof editarPersonajeMapa === 'function' && !String(ta.fichaId || '').includes(SEP_INVOCACION)){
-    const f = fichasPub.get(ta.fichaId), max = f && f.resumen && f.resumen.nitrosMax !== undefined ? num(f.resumen.nitrosMax) : Infinity;
-    hecho = !!(await editarPersonajeMapa(String(ta.fichaId), S => { antes = num(S.nitros); S.nitros = Math.max(antes, Math.min(max, antes + n)); despues = S.nitros; return true; }));
-  }
+    hecho = !!(await acCambiarCreep(ta.fichaId, c => { c.nitros = num(c.nitros) + n; return {ok: true}; }));
+  else if(typeof editarPersonajeMapa === 'function' && !String(ta.fichaId || '').includes(SEP_INVOCACION))
+    hecho = !!(await editarPersonajeMapa(String(ta.fichaId), S => { S.nitros = num(S.nitros) + n; return true; }));
   if(!hecho) return;
-  const txt = despues > antes ? `⚔ Sed de batalla: ${ordenNombre(atk)} volteó a ${ordenNombre(def)} y recupera ${fmt(despues - antes)} No2` : `⚔ Sed de batalla: ${ordenNombre(atk)} volteó a ${ordenNombre(def)}, pero ya tenía los No2 al máximo`;
-  toast(txt);
+  const quien = ordenNombre(atk), rival = ordenNombre(def);
+  const txt = `⚔ Sed de batalla: ${quien} volteó a ${rival} y gana ${fmt(n)} No2`;
   try{ mesaLinea(txt, 'recordatorio'); }catch(err){}
+  if(typeof momentoAbrir !== 'function'){ toast(txt); return; }
+  const para = ta.tipo === 'creep' ? '' : ((fichasPub.get(ta.fichaId) || {}).resumen || {}).control || ta.duenoUid || '';
+  try{
+    await momentoAbrir({tipo: 'buff', icono: '⚔', titulo: `Sed de batalla · ${quien}`, resultado: `Volteó a ${rival}: gana ${fmt(n)} No2 (puede pasar de su máximo).`, estado: 'listo',
+      datos: para ? {paraUid: para, aviso: true, boton: 'Entendido', veredicto: {tono: 'bueno', grande: `+${fmt(n)} No2`, chico: `⚔ Sed de batalla: volteaste a ${rival}`}} : {chico: true}});
+  }catch(err){ console.error('Sed de batalla: el aviso', err); toast(txt); }
 }
 
 /* ---------- al empezar la ronda (js/04 iniciativaSiguiente, la pantalla del GM, antes de guardar la ronda nueva) ----------

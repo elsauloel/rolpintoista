@@ -707,8 +707,8 @@ los niveles 2 a 5 completos (atributos, habilidad, pasiva, equipo concreto, cons
 
 ### W1 Hachero · nivel 4 (en revisión, 2026-11-05)
 - ⚔ **Sed de batalla, nueva pasiva en el pool** (dueño: «le dejamos Sed de sangre y sumamos Sed de batalla como pasiva, que la puedan elegir los
-  jugadores también»): cuando un rival cae por tu golpe, recuperás 2 No2 (sin pasar del máximo). 1 Job. Automatizada en el mapa
-  (vtt-hexgrid/js/102, junto a Sed de sangre). El W1 nivel 4 se queda con **Sed de sangre**.
+  jugadores también»): cuando un rival cae por tu golpe, ganás **3 No2, aunque pases del máximo**, y
+  te llega un aviso (dueño: «2 me parece muy poco para un punto de Job, y que suceda tan poco»). 1 Job. Automatizada en el mapa (vtt-hexgrid/js/102). El W1 nivel 4 se queda con **Sed de sangre**.
 - Propuesta: Fue 12 · Con 10 · Agi 8 · Des 8 · Esp 4 → vida 55 (50 + 5 de la cota), No2 8. Equipo: Hacha de guerra ligera (B) · **Cota de malla
   fina** (B) · Cofia de anillas sueltas · Grebas de cuero · **Guanteletes de hierro**. Habilidades: + **Remate** (cd 3). Pasivas: Golpe fuerte ·
   **Sed de sangre**. Números (nv3 → nv4): Def 6 → 8 · Eva 6 → 8 · Bloqueo 11 → 13 · daño fijo 14 → 15 · Res. crít. T4/T6/T8 2/1/0 → 2/2/1.

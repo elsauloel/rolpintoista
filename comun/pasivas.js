@@ -97,7 +97,7 @@ const PASIVAS_BASE = [
    detalle: 'Cuando un rival cae por tu golpe, el subidón te pone primero en la fila: subís 2 lugares en el orden de turnos (si ya jugaste esta ronda, al empezar la próxima). ⚙ Automatizado: lo hace el mapa del GM cuando el golpe del duelo lo deja en 0.', mods: [{stat: 'sedsangre', val: 2}]},
   // ⚔ Sed de batalla (dueño, 2026-11-05, del boceto del W1 Hachero: «sumamos Sed de batalla como pasiva, que la puedan elegir los jugadores también»).
   {poolId: 'sed-de-batalla', nombre: 'Sed de batalla', jobCosto: 1, etiquetas: ['ofensiva'],
-   detalle: 'Cuando un rival cae por tu golpe, el envión te devuelve el aire: recuperás 2 No2 (sin pasar de tu máximo). ⚙ Automatizado: lo hace el mapa cuando el golpe del duelo lo deja en 0.', mods: [{stat: 'sedbatalla', val: 2}]},
+   detalle: 'Cuando un rival cae por tu golpe, el envión te devuelve el aire: ganás 3 No2, aunque pases de tu máximo. ⚙ Automatizado: lo hace el mapa cuando el golpe del duelo lo deja en 0, y te avisa.', mods: [{stat: 'sedbatalla', val: 3}]},   // (2026-11-05, dueño: «más que 2 le pondría 3… puede ser superior al máximo»)
   {poolId: 'manas-de-sobreviviente', nombre: 'Mañas de sobreviviente', jobCosto: 1, etiquetas: ['defensiva'],
    detalle: 'Con la vida a la mitad o menos: +1 Res. crítico contra todos los Tipos. ⚙ Automatizado: el duelo lo suma al calcular el crítico, mirando tu vida en ese momento.', mods: [{stat: 'rescritmitad', val: 1}]},
   {poolId: 'contra-las-cuerdas', nombre: 'Contra las cuerdas', jobCosto: 1, etiquetas: ['defensiva'],

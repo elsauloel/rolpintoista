@@ -529,6 +529,8 @@ async function iniciativaSiguiente(o){
     estado: 'listo', datos: {lineas: [nomSig ? `Le toca a ${nomSig}${o.a ? ' (se lo dio el GM)' : ''}.` : 'Sigue el orden de turnos.']}});
   const lineas = [];
   if(termina && !terminaRepetido) lineas.push(...await finDeTurno(termina.id, `${mapaFin}:${pasoFin}`));
+  // 🫨 Al terminar el turno de quien arrastró, los que arrastró recuperan el equilibrio (js/78; dueño, 2026-11-05).
+  if(termina && typeof desequilibradosFinTurno === 'function') try{ lineas.push(...await desequilibradosFinTurno(termina.id)); }catch(err){ console.error('Desequilibrado:', err); }
   // Los caídos que se saltean: su turno pasa igual, sin jugar.
   for(const id of salteados.filter(x => x !== (orden[i] || {}).id)){
     const ini2 = await inicioDeTurno(id, `${mapaFin}:${pasoFin}:${id}`), fin2 = await finDeTurno(id, `${mapaFin}:${pasoFin}:${id}`);

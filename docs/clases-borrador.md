@@ -215,6 +215,9 @@ Estados que define la clase:
     (dueño, 2026-11-04: «no debe tirar Destreza sino PdG»); si lo engancha, Constitución + Fuerza contra su Constitución para traerlo hasta
     pegado (sin No2 ni oportunidad; trampas y zonas del camino lo tocan) y le pega con su arma con +2 PdG. ⚙ Automatizado en el mapa
     (`vtt-hexgrid/js/78`; contra un creep, el enganche y el arrastre los resuelve la pantalla del GM: momento `gancho-pedido`).
+    **Actualización (dueño, 2026-11-05):** sin golpe incluido ni +2 PdG; al llegar, el arrastrado queda **Desequilibrado: −2 a la Evasión hasta el
+    final del turno de quien lo arrastró** («que dure solamente hasta el final del turno de la persona que ejecutó arrastrar»), con un «−2 EVA» que
+    flota sobre su token. Costo de hoy: 2 SP y 2 No2 fijos.
 
 ## Mago ⏳
 

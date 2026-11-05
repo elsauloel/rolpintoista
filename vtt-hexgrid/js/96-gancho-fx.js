@@ -65,9 +65,58 @@ function ganchoFxPosToken(id){
   return null;
 }
 
+/* 🫨 «−2 EVA» flotando sobre el arrastrado al llegar (dueño, 2026-11-05: «que aparezca una animación sobre el token, un menos 2 EVA o algo así, para que
+   quede claro que fue al final del arrastre»). Momento sin tarjeta 'gancho-eva' ({a, texto}); lo publica la pantalla que pone el Desequilibrado
+   (js/78, cuando la cadena ya soltó). Sube un poco y se apaga en ~1,6 s; con «reducir movimiento», queda quieto y se apaga. */
+const GANCHO_EVA = [];   // {a, texto, t0, dur, poco}
+const ganchoEvaVistos = new Set();
+async function ganchoEvaPublicar(aId, texto){
+  if(!aId) return;
+  const datos = {a: aId, texto: String(texto || '−2 EVA').slice(0, 20)};
+  const id = typeof momentoAbrir === 'function' ? await momentoAbrir({tipo: 'gancho-eva', icono: '', titulo: '', estado: 'listo', datos}) : null;
+  if(!id) ganchoEvaEmpezar(datos);
+}
+function ganchoEvaRecibido(id, d){
+  if(!d || !d.datos || ganchoEvaVistos.has(id)) return;
+  ganchoEvaVistos.add(id);
+  const t = d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now();
+  if(Date.now() - t > 20000) return;
+  ganchoEvaEmpezar(d.datos);
+}
+function ganchoEvaEmpezar(dt){
+  if(!dt || !tokens.get(dt.a)) return;
+  GANCHO_EVA.push({a: dt.a, texto: String(dt.texto || '−2 EVA'), t0: performance.now(), dur: 1600, poco: ganchoPocoMovimiento()});
+  pedirDibujo();
+}
+function ganchoEvaDibujar(z){
+  const ahora = performance.now();
+  for(let i = GANCHO_EVA.length - 1; i >= 0; i--){
+    const fx = GANCHO_EVA[i], k = (ahora - fx.t0) / fx.dur;
+    if(k >= 1){ GANCHO_EVA.splice(i, 1); continue; }
+    const t = tokens.get(fx.a);
+    if(!ganchoFxVe(t)) continue;
+    const c = hexCentro(t.col, t.fila);
+    // Aparece de golpe (crece un poquito), sube ~0,7 casilla y se apaga en el último tercio.
+    const sube = fx.poco ? 0 : HEX * 0.7 * Math.min(1, k * 1.4), alfa = k < 0.65 ? 1 : Math.max(0, 1 - (k - 0.65) / 0.35);
+    const esc = fx.poco ? 1 : (k < 0.12 ? 0.6 + (k / 0.12) * 0.5 : k < 0.22 ? 1.1 - ((k - 0.12) / 0.1) * 0.1 : 1);
+    const px = Math.max(14 / z, HEX * 0.62) * esc;
+    ctx.save();
+    ctx.globalAlpha = alfa;
+    ctx.font = `900 ${px}px system-ui, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    const y = c.y - HEX * 1.05 - sube;
+    ctx.lineJoin = 'round'; ctx.lineWidth = Math.max(3 / z, px * 0.2); ctx.strokeStyle = 'rgba(20,6,8,.95)';
+    ctx.strokeText(fx.texto, c.x, y);
+    ctx.shadowColor = 'rgba(255,60,60,.8)'; ctx.shadowBlur = px * 0.5;
+    ctx.fillStyle = '#ff4d4d'; ctx.fillText(fx.texto, c.x, y);
+    ctx.restore();
+  }
+  return GANCHO_EVA.length > 0;
+}
+
 // El dibujo (js/05, encima de los tokens, con los otros efectos). true mientras quede alguna en curso.
 function dibujarEfectosGancho(z){
-  if(!GANCHO_FX.length) return false;
+  const eva = GANCHO_EVA.length ? ganchoEvaDibujar(z) : false;
+  if(!GANCHO_FX.length) return eva;
   const ahora = performance.now();
   for(let i = GANCHO_FX.length - 1; i >= 0; i--){
     const fx = GANCHO_FX[i], ms = ahora - fx.t0;
@@ -76,7 +125,7 @@ function dibujarEfectosGancho(z){
     if(!ganchoFxVe(ta) || !ganchoFxVe(tb)) continue;
     ganchoFxDibujarUna(fx, ms, z, hexCentro(ta.col, ta.fila), tb);
   }
-  return GANCHO_FX.length > 0;
+  return GANCHO_FX.length > 0 || GANCHO_EVA.length > 0;
 }
 function ganchoFxDibujarUna(fx, ms, z, A, tb){
   const F = FxGancho, f = F.fase(ms, fx.tt), r = fx.resultado;

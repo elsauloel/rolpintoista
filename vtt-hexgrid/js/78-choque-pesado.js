@@ -155,7 +155,8 @@ async function arrastrarLinea(mio, t, ataque){
       un personaje: su jugador). Empate: no engancha.
    4. Si engancha: el efecto «🪝 Gancho» (`trae`) lo aplica la pantalla del GM (dueloGanchoTraer: la animación del gancho arrastrándolo hasta
       dejarlo pegado). Si no: el gancho vuelve. Fin de la acción: no hay golpe; después hace lo que quiera.
-   5. Tras un arrastre exitoso, su siguiente ataque contra ESE rival, en este mismo turno, tiene +2 PdG (arrastreBonoUsar, lo suma js/13).
+   5. Tras un arrastre exitoso, el arrastrado queda Desequilibrado (−2 a la Evasión) hasta el final del turno de quien lo arrastró (dueño, 2026-11-05;
+      antes daba +2 PdG al siguiente ataque de quien arrastraba). Lo pone y lo saca la pantalla del GM (desequilibradoPoner / desequilibradosFinTurno).
    Antes (hasta hoy) el enganche lo tiraba una sola pantalla sin mostrar nada (dueño: «no me ofreció tirar la PdG, ni vi la tirada de Evasión del
    rival»). → siempre false (no sigue ningún golpe). */
 async function arrastrarDueloGancho(yo, mio, t, ataque){
@@ -164,7 +165,7 @@ async function arrastrarDueloGancho(yo, mio, t, ataque){
   await fx('sale');
   const gancho = {
     nombre: `${hab}: el gancho`.slice(0, 60), objetivo: 'enemigo',
-    detalle: `${nom} le tira el gancho a ${obj}: su Probabilidad de Golpe contra la Evasión de ${obj} (empate: no lo engancha). Si lo engancha, lo arrastra hasta dejarlo pegado (no camina: sin No2 ni ataques de oportunidad; las trampas y zonas del camino sí lo tocan), y su siguiente ataque contra ${obj} en este turno tiene +2 PdG.`,
+    detalle: `${nom} le tira el gancho a ${obj}: su Probabilidad de Golpe contra la Evasión de ${obj} (empate: no lo engancha). Si lo engancha, lo arrastra hasta dejarlo pegado (no camina: sin No2 ni ataques de oportunidad; las trampas y zonas del camino sí lo tocan) y ${obj} queda Desequilibrado: −2 a la Evasión hasta el final del turno de ${nom}.`,
     tira: {stat: 'pdg', etq: 'PdG'}, contra: [{modo: 'eva', stat: 'eva', etq: 'Evasión'}], dano: null, empatePierde: true,
     efectos: [{nombre: 'Gancho', trae: Math.max(1, Math.round(num(ataque.arrastra)) || 3), detalle: 'Lo arrastra hasta dejarlo pegado (lo mueve la pantalla del GM)'}],
   };
@@ -197,9 +198,7 @@ async function arrastrarDueloGancho(yo, mio, t, ataque){
     mesaLinea(`🪝 ${nom} le tira el gancho a ${obj}: no lo engancha.`, 'recordatorio');
     return false;
   }
-  // ✔ Engancha (aunque ya estuviera pegado o no hubiera por dónde traerlo, el arrastre es exitoso): +2 PdG a su siguiente ataque contra él.
-  arrastreBonoPoner(mio, t);
-  mesaLinea(`🪝 ${nom}: su siguiente ataque contra ${obj} en este turno tiene +2 a la Probabilidad de Golpe.`, 'recordatorio');
+  // ✔ Engancha: el Desequilibrado (−2 Evasión) lo pone la pantalla del GM al terminar el arrastre (dueloGanchoTraer).
   return false;
 }
 // El efecto «🪝 Gancho» (`ef.trae`), en la pantalla del GM (aplicaSolo, js/14): el arrastre con su animación. → {nota} | {nota, sinEfecto}.
@@ -207,52 +206,64 @@ async function dueloGanchoTraer(d){
   const ta = d.atacante && tokens.get(d.atacante.tokenId), td = tokens.get(d.defensor.tokenId);
   if(!ta || !td) return {manual: true, nota: 'uno de los dos ya no está en el mapa: traelo a mano'};
   const hab = String((d.hab && d.hab.nombre) || 'Arrastrar').replace(/: el gancho$/, '');
-  const fin = await arrastrarTraer(d.defensor.tokenId, d.atacante.tokenId, hab, nombreDe(ta), d.id);
-  return {nota: fin ? 'lo arrastra hasta dejarlo pegado' : 'lo engancha, pero no se mueve (ya estaba pegado, no hay por dónde o es inamovible)'};
+  const out = {};
+  const fin = await arrastrarTraer(d.defensor.tokenId, d.atacante.tokenId, hab, nombreDe(ta), d.id, out);
+  // 🫨 Al llegar (o si ya estaba pegado o no había por dónde): Desequilibrado. Un Inamovible no se tambalea.
+  if(!out.inamovible) await desequilibradoPoner(d.atacante.tokenId, d.defensor.tokenId, hab).catch(err => console.error('Arrastrar: el Desequilibrado', err));
+  return {nota: fin ? 'lo arrastra hasta dejarlo pegado: queda Desequilibrado (−2 Evasión)' : out.inamovible ? 'lo engancha, pero es Inamovible: no se mueve' : 'lo engancha, pero no se mueve (ya estaba pegado o no hay por dónde): queda Desequilibrado (−2 Evasión)'};
 }
-/* 💪 +2 PdG tras un arrastre exitoso (dueño, 2026-11-04: «el siguiente ataque después de un arrastre exitoso tiene +2 a la Probabilidad de Golpe, hasta
-   el final del turno»; «tiene que poner atacar contra ese token y tiene más 2»). Lo guarda la pantalla de quien arrastró (la que va a atacar): vale
-   para su primer ataque contra ese rival mientras siga el mismo paso del orden de turnos (al pasar el turno vence); sin orden de turnos, 10 minutos. */
-const arrastreBonos = new Map();   // id del token que arrastró → {contra, nombre, paso, hasta}
-const arrastrePaso = () => (typeof iniciativa !== 'undefined' && iniciativa && iniciativa.orden && iniciativa.orden.length) ? Math.round(num(iniciativa.paso)) : null;
-function arrastreBonoPoner(mio, t){
-  arrastreBonos.set(mio.id, {contra: t.id, nombre: nombreDe(t), paso: arrastrePaso(), hasta: Date.now() + 10 * 60000});
+/* 🫨 Desequilibrado (dueño, 2026-11-05: «le da −2 a la Evasión a la persona arrastrada, pero que sea un efecto que dure solamente hasta el final del
+   turno de la persona que ejecutó arrastrar; y que cuando se aplique… aparezca una animación sobre el token, un −2 EVA»). Reemplaza al +2 PdG de antes.
+   Lo pone la pantalla del GM (la que resuelve el gancho): a un creep directo, a un personaje o una invocación por su ficha (encolarPj). Queda anotado
+   quién arrastró a quién (en memoria y en localStorage, por partida) y, al terminar el turno de quien arrastró (iniciativaSiguiente, js/04), se le saca
+   a todos los que arrastró. Sin orden de turnos, o si esa anotación se perdió, vence solo como un estado de 1 turno. */
+const DESEQ_CLAVE = () => `desequilibrados:${typeof FB_CAMPANA !== 'undefined' ? FB_CAMPANA : ''}`;
+function desequilibradosLeer(){ try{ return JSON.parse(localStorage.getItem(DESEQ_CLAVE()) || '{}') || {}; }catch(e){ return {}; } }
+function desequilibradosGuardar(m){ try{ localStorage.setItem(DESEQ_CLAVE(), JSON.stringify(m)); }catch(e){} }
+async function desequilibradoPoner(atkId, defId, hab){
+  const t = tokens.get(defId);
+  if(!t || !t.fichaId) return;
+  const spec = {nombre: 'Desequilibrado', turnos: 1, polaridad: 'debuff', mods: [{stat: 'eva', val: -2}],
+    detalle: `Lo arrastró ${nombreDe(tokens.get(atkId)) || 'alguien'} con ${hab || 'Arrastrar'}: −2 a la Evasión hasta el final de su turno.`};
+  if(t.tipo === 'creep') await modificarCreep(t.fichaId, sc => EstadosAplicar.aplicarACreep(sc, spec));
+  else await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec, origen: hab || 'Arrastrar'});
+  const m = desequilibradosLeer();
+  m[atkId] = [...new Set([...(m[atkId] || []), defId])];
+  desequilibradosGuardar(m);
+  if(typeof ganchoEvaPublicar === 'function') ganchoEvaPublicar(defId, '−2 EVA');   // el «−2 EVA» flotando sobre el token, en todas las pantallas (js/96)
+  mesaLinea(`🫨 ${nombreDe(t)} queda Desequilibrado: −2 a la Evasión hasta el final del turno de ${nombreDe(tokens.get(atkId))}.`, 'recordatorio');
 }
-function arrastreBonoVigente(mioId){
-  const b = arrastreBonos.get(mioId);
-  if(!b) return null;
-  const paso = arrastrePaso();
-  if(b.paso !== null ? paso !== b.paso : (paso !== null || Date.now() > b.hasta)){ arrastreBonos.delete(mioId); return null; }
-  return b;
-}
-// Al atacar (js/13, dueloElegirObjetivoMapa): si es contra el que arrastró, +2 PdG y se gasta. → {tiro, ataque} con el bono sumado (o sin tocar).
-function arrastreBonoUsar(mio, t, ataque, tiro){
-  const b = mio && t && ataque ? arrastreBonoVigente(mio.id) : null;
-  if(!b || b.contra !== t.id || num(ataque.arrastra) > 0) return {tiro, ataque};
-  // Solo un ATAQUE (2026-11-04: el +2 se sumaba también a la tirada del robo): con su arma, o una habilidad que tire la PdG física contra un rival;
-  // no un robo, ni una maldición o un hechizo (PdG.Esp, Ef.Esp…).
-  if(ataque.hab && !(['enemigo', 'area', 'cono', 'linea', 'onda'].includes(ataque.hab.objetivo) && ataque.hab.tira && ataque.hab.tira.stat === 'pdg'
-    && !(typeof esRobo === 'function' && esRobo(ataque.hab)))) return {tiro, ataque};
-  arrastreBonos.delete(mio.id);
-  mesaLinea(`🪝 ${nombreDe(mio)} ataca a ${b.nombre} recién arrastrado: +2 a la Probabilidad de Golpe.`, 'recordatorio');
-  if(ataque.hab){
-    const tr = ataque.hab.tira;
-    return {tiro, ataque: {...ataque, hab: {...ataque.hab, tira: {...tr, bono: num(tr.bono) + 2, etq: `${tr.etq || 'Tirada'} (+2 arrastrado)`.slice(0, 34)}}}};
+// Al terminar el turno de `atkId` (js/04, iniciativaSiguiente, la pantalla del GM): se le saca el Desequilibrado a los que arrastró. → líneas para la Crónica.
+async function desequilibradosFinTurno(atkId){
+  const m = desequilibradosLeer(), ids = m[atkId];
+  if(!ids || !ids.length) return [];
+  delete m[atkId]; desequilibradosGuardar(m);
+  const lineas = [];
+  const sacar = lista => { const i = (lista || []).findIndex(e => e && /^Desequilibrado/i.test(String(e.nombre || ''))); if(i < 0) return false; lista.splice(i, 1); return true; };
+  for(const id of ids){
+    const t = tokens.get(id);
+    if(!t || !t.fichaId) continue;
+    try{
+      let saco = false;
+      if(t.tipo === 'creep') await modificarCreep(t.fichaId, sc => { saco = sacar(sc.estados); return saco; });
+      else {
+        const [fichaId, invId] = String(t.fichaId).split(SEP_INVOCACION);
+        await editarPersonajeMapa(fichaId, S => { saco = sacar(invId ? ((S.invocaciones || []).find(x => x && x.id === invId) || {}).estados : S.efectos); return saco; });
+      }
+      if(saco && !t.oculto && !enSigilo(t)) lineas.push(`${nombreDe(t)} recupera el equilibrio (se va el −2 a la Evasión).`);
+    }catch(err){ console.error('No se pudo sacar el Desequilibrado:', err); }
   }
-  const tr = tiro || {motivo: ''};
-  tr.pdg = num(tr.pdg) + 2;
-  tr.motivo = tr.motivo ? `${tr.motivo} y recién arrastrado` : 'recién arrastrado';
-  return {tiro: tr, ataque};
+  return lineas;
 }
 // Lo trae hasta quedar pegado a quien lo arrastra; las trampas del camino lo tocan (la primera que pisa lo frena ahí) y las zonas, también.
 // → la casilla donde quedó, o null si no se movió.
-async function arrastrarTraer(defId, atkId, hab, quien, dueloId){
+async function arrastrarTraer(defId, atkId, hab, quien, dueloId, out){
   const t = tokens.get(defId), ta = tokens.get(atkId);
   if(!t || !ta) return null;
   const nom = nombreDe(t), titulo = `${hab}: ${quien} arrastra a ${nom}`;
   const im = chanceDe(t, 'inamovible');
   const fx = (res, celdas) => typeof ganchoFxPublicar === 'function' ? ganchoFxPublicar(atkId, defId, res, celdas, true, dueloId).catch(err => console.error('Arrastrar: la animación', err)) : Promise.resolve();
-  if(im && Math.random() * 100 < im){ await fx('suelta'); momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `Es Inamovible (${im} %): no se mueve.`, estado: 'listo'}); return null; }
+  if(im && Math.random() * 100 < im){ if(out) out.inamovible = true; await fx('suelta'); momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `Es Inamovible (${im} %): no se mueve.`, estado: 'listo'}); return null; }
   const ocupada = x => elementoSolidoEn(x.col, x.fila) || [...tokens.values()].some(y => y !== t && y.col === x.col && y.fila === x.fila && !y.bajoTierra);
   const pared = (a, b) => typeof paredCorta === 'function' && paredCorta(a, b);
   const ruta = [{col: t.col, fila: t.fila}];

@@ -53,7 +53,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
-<script src="estados-presets.js?v=20261105pot"></script>
+<script src="estados-presets.js?v=20261105deseq"></script>
 <script src="estados-aplicar.js?v=20261104ae"></script>
 <script src="recibidos.js?v=20261103pm"></script>
 <script src="tokens-auto.js"></script>
@@ -117,10 +117,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
-<script src="skills-clase.js?v=20261105pot"></script>
+<script src="skills-clase.js?v=20261105deseq"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261104ig"></script>
-<script src="skills-creep-base.js?v=20261105pot"></script>
+<script src="skills-creep-base.js?v=20261105deseq"></script>
 <script src="creeps-esenciales.js?v=20261103t21"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -6626,14 +6626,14 @@ prueba('🪝 Arrastrar (2026-11-04): de clase Tanque para jugadores (2 No2 fijos
     /Probabilidad de Golpe contra la Evasión/.test(habs[0].detalle), typeof FichaResumen.resumen(structuredClone(FichaGuardado.DEFAULT), {}).pdg],
     [true, '2', 2, 3, 3, 0, true, false, true, 'number']);
 });
-prueba('🪝 Arrastrar, el flujo del dueño (2026-11-04): el gancho es un duelo (PdG contra Evasión) con el efecto «trae»; sin Con + Fuerza ni golpe; la animación sale antes', () => {
+prueba('🪝 Arrastrar, el flujo del dueño (2026-11-04): el gancho es un duelo (PdG contra Evasión) con el efecto «trae»; sin Con + Fuerza ni golpe; la animación sale antes; al llegar, Desequilibrado (2026-11-05)', () => {
   const hab = Duelo.limpiarHab({nombre: 'Arrastrar: el gancho', objetivo: 'enemigo', tira: {stat: 'pdg', etq: 'PdG'}, contra: [{modo: 'eva', stat: 'eva', etq: 'Evasión'}], dano: null, empatePierde: true,
     efectos: [{nombre: 'Gancho', trae: 3, detalle: 'lo arrastra'}]});
   const h = Object.values(CLASES_SKILLS).flatMap(c => c.skills || c.habilidades || []).find(x => x.id === 'tanque-arrastrar'), cr = chp('Arrastrar');
   const sale = FxGancho.tiempos('sale', 1, false), trae = FxGancho.tiempos('trae', 2, false, true), falla = FxGancho.tiempos('falla', 1, false, true);
-  igual([hab.empatePierde, hab.tira.stat, hab.contra.map(x => x.modo), hab.efectos[0].trae, /Constitución/.test(h.detalle + cr.detalle), /\+2 a la Probabilidad de Golpe/.test(h.detalle), /\+2 a la Probabilidad de Golpe/.test(cr.detalle),
+  igual([hab.empatePierde, hab.tira.stat, hab.contra.map(x => x.modo), hab.efectos[0].trae, /Constitución/.test(h.detalle + cr.detalle), /Desequilibrado/.test(h.detalle), /Desequilibrado/.test(cr.detalle),
     /acción en sí misma/.test(h.detalle), sale.vuelve, sale.tensa > 0, trae.lanza, falla.lanza, FxGancho.tiempos('trae', 2, false).lanza > 0],
-    [true, 'pdg', ['eva'], 3, false, true, true, true, 0, true, 0, 0, true]);
+    [true, 'pdg', ['eva'], 3, false, true, true, true, 0, true, 0, 0, true]);   // desde el 2026-11-05 (dueño): Desequilibrado (−2 Evasión), ya no +2 PdG
 });
 prueba('⚖ Sonic Boom de creep (2026-10-27): cono, Fuerza +2 contra la Constitución, la diferencia de daño directo y «Pierde No2»', () => {
   const h = chp('Sonic Boom'), ej = CreepAcciones.habEjecucion(creepPrueba(), h);
@@ -6935,6 +6935,16 @@ prueba('🪤 Las 8 trampas de creep (2026-10-27): en el catálogo, auditadas, co
   igual([mal, red.salvacion.dif, red.soltar.dif, red.detectar, cepo.soltar.hiere, cepo.soltar.dif, abr.zonaResistValor, cor.salvacion.stat, cor.salvacion.dif, cor.tamano, cor.adelante, cor.visual,
     !!trp('Cebo').cebo, trp('Cebo').cebo.radio, HABILIDADES_CREEP_BASE.filter(x => x.nombre === 'Cebo').length],
     [[], 11, 11, 11, '1d6', 11, 11, 'agl', 11, 4, true, 'cordon', true, 4, 1]);
+});
+prueba('🫨 Arrastrar (dueño, 2026-11-05): el arrastrado queda Desequilibrado, −2 a la Evasión, 1 turno de respaldo; ya no hay +2 PdG; el texto lo dice', () => {
+  const p = ESTADOS_PRESET.find(x => x.nombre === 'Desequilibrado');
+  const sc = {estados: []};
+  const r = EstadosAplicar.aplicarACreep(sc, {nombre: 'Desequilibrado', turnos: 1, polaridad: 'debuff', mods: [{stat: 'eva', val: -2}]});
+  const hab = CLASES_SKILLS.flatMap(c => c.habilidades).find(h => h.id === 'tanque-arrastrar');
+  const fin = Combatiente.terminarTurnoEstados(sc.estados);   // su propio fin de turno no lo saca (lo saca el fin del turno de quien arrastró, en el mapa)
+  igual([!!p, p && p.polaridad, p && JSON.stringify(p.mods), p && p.turnos, r.ok, CreepCalculo.modTotal(sc, 'eva'), fin.quedan.length,
+    !!hab && /Desequilibrado/.test(hab.detalle), !!hab && /\+2 a la Probabilidad de Golpe/.test(hab.detalle)],
+    [true, 'debuff', '[{"stat":"eva","val":-2}]', 1, true, -2, 1, true, false]);
 });
 prueba('🪢 Cordón oculto nuevo (2026-11-03): Agilidad contra la Destreza (con el mínimo de una comprada); si gana, cae parado; si pierde, Sentado + Tropezado, que no deja moverse y se va al terminar su turno', () => {
   const cor = Combatiente.trampaDeHab(trp('Cordón oculto', 1), st => ({des: 6})[st] || 0);

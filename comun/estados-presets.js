@@ -217,6 +217,11 @@ const ESTADOS_PRESET = [
   // Es un Inmovilizado que se va solo al terminar su turno (`alTerminarTurno`, como el Acelerado).
   {nombre:'Tropezado', polaridad:'debuff', turnos:1, inmovilizado:true, alTerminarTurno:true, mods:[],
     detalle:'Tropezó con un cordón: no puede moverse más en este turno. Puede levantarse (si quedó Sentado) y usar el resto de sus No2 en ese lugar (atacar, habilidades, consumibles). Se va solo al terminar su turno.'},
+  // 🪝 Desequilibrado (dueño, 2026-11-05, Arrastrar: «le da −2 a la Evasión a la persona arrastrada… dura solamente hasta el final del turno de la
+  // persona que ejecutó arrastrar»). Lo pone el mapa del GM al terminar el arrastre (js/78) y lo saca al terminar el turno de quien arrastró
+  // (desequilibradosFinTurno, js/78); sin orden de turnos, vence como cualquiera de 1 turno.
+  {nombre:'Desequilibrado', polaridad:'debuff', turnos:1, mods:[{stat:'eva', val:-2}],
+    detalle:'Lo arrastraron con un gancho y quedó a los tumbos: −2 a la Evasión. Se va al terminar el turno de quien lo arrastró.'},
   {nombre:'Sentado', polaridad:'debuff', permanente:true, turnos:0, sentado:true, esCC:true,
     detalle:'Está en el piso: su Evasión se parte a la mitad (al resultado de la tirada, redondeado hacia abajo), no puede atacar y no puede hacer dodge roll (✋ a mano). No vence solo: levantarse cuesta 1 No2 (botón Levantarse de la Botonera o de las Acciones del creep).'},
   // Desarmado (dueño, 2026-10-07, la Varita del manotazo): el arma cae al piso. Desde el 2026-10-22 no queda como estado (Combatiente.agregarEstado):

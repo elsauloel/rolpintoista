@@ -1084,7 +1084,6 @@ function dueloElegirObjetivoMapa(msg){
       }
       let ataqueFinal = ataque && ataque.hab && ataque.hab.sagrado && ataque.hab.dano ? sagradoContra(ataque, t) : (ataqueCarga || ataque);   // Smite: el doble contra un no-muerto o un demonio
       if(typeof roboBono === 'function') ataqueFinal = roboBono(ataqueFinal, mio, t);   // 🫳 Robar: +2 en sigilo o por la espalda (js/47)
-      if(typeof arrastreBonoUsar === 'function'){ try{ const ab = arrastreBonoUsar(mio, t, ataqueFinal, tiro); tiro = ab.tiro; ataqueFinal = ab.ataque; }catch(err){ console.error('No se pudo sumar el +2 del arrastre:', err); } }   // 🪝 recién arrastrado: +2 PdG (js/78)
       if(typeof roboSecretoSi === 'function' && roboSecretoSi(ataqueFinal, mio, t)){ roboSecretoIniciar(yo, ataqueFinal, mio, t); return; }   // 🫳 en sigilo: en secreto (js/47)
       let miedo = 0;
       let malviaje = false;

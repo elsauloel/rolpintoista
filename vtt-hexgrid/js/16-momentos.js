@@ -154,6 +154,8 @@ function momentoRecibido(id, d){
   // Lo que me toca a mí (el jugador dueño, cuando el GM toma o devuelve el control de su personaje): al centro, no en la esquina.
   // (datos.aviso: el Aviso de lo que le pasó, ej. una trampa — le llega aunque lo haya publicado su propia pantalla.)
   // Un aviso chico (2026-10-06, la Coraza del guardián): a quien le toca, un toast — y la Crónica sigue, como para todos.
+  // 🙈 Solo para el GM (2026-11-05: un token oculto que se mueve fuera de su turno): los jugadores no lo ven ni en la Crónica.
+  if(d.datos && d.datos.soloGM && !soyGM){ momentosFeed.delete(id); renderMomentosFeed(); return; }
   const chicoParaMi = d.datos && d.datos.chico && d.datos.paraUid && d.datos.paraUid === fbUsuario.uid;
   if(chicoParaMi && !momentosChicosVistos.has(id)){ momentosChicosVistos.add(id); toast(`${d.icono || ''} ${d.titulo}: ${d.resultado || ''}`.trim()); }
   // `paraUids` (2026-10-08, el choque de un empujón): el mismo aviso al centro para varios (cada involucrado).

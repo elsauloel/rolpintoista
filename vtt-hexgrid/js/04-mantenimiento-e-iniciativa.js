@@ -887,18 +887,37 @@ function fueraDeTurnoSoltar(texto){
 }
 window.mesaAntesDePublicar = texto => fueraDeTurnoSoltar(texto);
 window.mesaLlegaronMias = docs => docs.forEach(t => fueraDeTurnoSoltar(`${t.quien || ''} ${t.origen || ''} ${t.formula || ''}`));
-function avisarFueraDeTurno(tokenId, b){
+// 🙈 ¿Los demás no lo ven? (oculto, en sigilo o con su fila del orden escondida)
+function ocultoParaMesa(tokenId){
+  const t = tokens.get(tokenId);
+  if(!t) return false;
+  const fila0 = iniciativa.orden.find(o => o.id === tokenId);
+  return !!(t.oculto || (fila0 && fila0.oculto) || (typeof enSigilo === 'function' && enSigilo(t)));
+}
+// 🙈 (2026-11-05, dueño: «al GM se le tiene que notificar si un jugador mueve un token oculto fuera de su turno, inclusive con movimiento libre»):
+// solo al GM — un toast en su pantalla y la Crónica de él; los jugadores no lo ven (datos.soloGM, js/16).
+function avisarGMOcultoFueraDeTurno(t, accion){
+  if(soyGM || typeof momentoAbrir !== 'function') return;
+  const gm = (fbPartida && fbPartida.gmUid) || '';
+  momentoAbrir({tipo: 'fuera-de-turno', icono: '🙈', titulo: `${nombreDe(t)} (oculto) actúa fuera de su turno`, resultado: accion, estado: 'listo',
+    datos: {soloGM: true, chico: true, ...(gm ? {paraUid: gm} : {})}});
+}
+function avisarFueraDeTurno(tokenId, b, libre){
   if(modoMapa !== 'combate' || esSuTurno(tokenId) !== false) return;
   if(b && (b.dataset.botoneraaccion === 'otroataque' || b.classList.contains('bt-flash'))) return;
   const t = tokens.get(tokenId);
   if(!t) return;
   const fila = b && b.closest('.bot-fila, .accion-row, .cat-row');
-  const accion = !b ? 'se mueve' : ((fila && fila.querySelector('.cat-nombre, .accion-nombre')) || b.querySelector('.bt-label') || b).textContent.trim().replace(/\s+/g, ' ').slice(0, 60);
-  toast(`⏱ No es el turno de ${nombreDe(t)}: se puede igual y, si lo hace, queda en la Mesa`);
+  const accion = !b ? (libre ? 'se mueve (con 🦶 Mover libre)' : 'se mueve') : ((fila && fila.querySelector('.cat-nombre, .accion-nombre')) || b.querySelector('.bt-label') || b).textContent.trim().replace(/\s+/g, ' ').slice(0, 60);
   // 🙈 Un token oculto (o en sigilo, o con su fila del orden escondida) no se anuncia en la Mesa ni en la Crónica: los demás no lo ven
-  // (2026-11-05, prueba en el mapa: mover un creep oculto avisaba «X actúa fuera de su turno: se mueve» a los jugadores).
-  const fila0 = iniciativa.orden.find(o => o.id === tokenId);
-  if(t.oculto || (fila0 && fila0.oculto) || (typeof enSigilo === 'function' && enSigilo(t))) return;
+  // (2026-11-05, prueba en el mapa: mover un creep oculto avisaba «X actúa fuera de su turno: se mueve» a los jugadores). Pero el GM sí se entera.
+  if(ocultoParaMesa(tokenId)){
+    toast(`⏱ No es el turno de ${nombreDe(t)}: se puede igual${soyGM ? '' : '; como está oculto, solo le llega el aviso al GM'}`);
+    avisarGMOcultoFueraDeTurno(t, accion);
+    return;
+  }
+  if(libre) return;   // 🦶 el Mover libre de un token a la vista no se anuncia (como siempre)
+  toast(`⏱ No es el turno de ${nombreDe(t)}: se puede igual y, si lo hace, queda en la Mesa`);
   const p = {nombre: nombreDe(t), accion, hora: Date.now()};
   if(!b) fueraDeTurnoPublicar(p);   // moverse: ya se movió
   else fueraDeTurnoPendiente = p;

@@ -285,8 +285,9 @@
   alguien más lejos de lo que llega: «está fuera del alcance… ¿Proceder igual?»; elegir a un rival Titilando o Invulnerable: «no recibe daño ni
   debuffs… ¿Atacarlo igual?». Sin probar en el mapa (salen al hacer clic en el objetivo).
 - [ ] **🪝 El gancho de Arrastrar con el GM con otras ventanas abiertas (2026-11-05, arreglado).** La ficha o GM Tools de un GM tomaban el arrastre y lo
-  dejaban «Aplicado · a mano» sin moverlo ni animarlo (visto con Rockardo contra Warrior en Claude · pruebas). Ahora lo toma solo el mapa del GM: probar
-  con GM Tools abierto a la vez.
+  dejaban «Aplicado · a mano» sin moverlo ni animarlo (visto con Rockardo contra Warrior en Claude · pruebas). Ahora va marcado `pedido-mapa`, que las
+  pestañas viejas no conocen: lo toma solo el mapa del GM. ✅ Probado con clics en Claude · pruebas (Botonera → Arrastrar → Warrior a 3 casillas →
+  PdG 10 contra Eva 1 → lo trajo pegado y quedó Desequilibrado). Falta que lo vea el dueño.
 - [ ] **⏫ El Arrojo (sube en el orden) con la animación de la Demora, en verde (2026-11-05, dueño).** Probada la animación sola en Claude · pruebas;
   falta con la habilidad de support en un duelo real (también deja una tarjeta en la Crónica).
 - [ ] **🎒 y × en las manos de un creep (2026-11-05, arreglado).** Había piezas sin id (la Bruja del pantano, el Escarabajo de cobre…) y esos botones no

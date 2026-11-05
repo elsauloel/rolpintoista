@@ -1140,8 +1140,8 @@ async function dueloMisiles(yo, ataque, t1, mio){
     await coleccionAreas().add({
       casteador: {ref: String(yo.ref || ''), tipo: yo.tipo, nombre: String(yo.nombre || '').slice(0, 40), uid: (mio && mio.duenoUid) || fbUsuario.uid, tokenId: mio ? mio.id : ''},
       hab: Duelo.limpiarHab({...hab, dano: hab.dano ? {...hab.dano, formula: hab.reparte.cada} : hab.dano}),
-      centro: {col: mio ? mio.col : t1.col, fila: mio ? mio.fila : t1.fila, linea: [nbPack(t1.col, t1.fila)]}, radio: 0,
-      objetivos: [t1.id], duelos: [], indice: 0, estado: 'en-curso', creadoPor: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
+      centro: {col: mio ? mio.col : t1.col, fila: mio ? mio.fila : t1.fila, linea: [nbPack(t1.col, t1.fila)], mapa: mapaMostrado}, radio: 0,
+      objetivos: [t1.id], duelos: [], indice: 0, estado: AREA_EN_CURSO, creadoPor: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
     });
   }catch(err){ console.error('No se pudieron lanzar los misiles:', err); toast('No se pudieron lanzar los misiles — revisá la consola'); }
 }
@@ -1154,7 +1154,7 @@ function misilSiguiente(id, a){
     const t = [...tokens.entries()].map(([k, x]) => ({...x, id: k})).find(x => x.col === h.col && x.fila === h.fila && x.id !== a.casteador.tokenId && (!x.oculto || soyGM) && !x.bajoTierra && !tapadoPorNiebla(x));
     if(!t){ toast('Ahí no hay nadie: hacé clic sobre un rival'); misilesEligiendo.delete(id); misilSiguiente(id, a); return; }
     try{
-      await coleccionAreas().doc(id).update({objetivos: [...(a.objetivos || []), t.id], estado: 'en-curso',
+      await coleccionAreas().doc(id).update({objetivos: [...(a.objetivos || []), t.id], estado: AREA_EN_CURSO,
         centro: {...a.centro, linea: [...((a.centro && a.centro.linea) || []), nbPack(t.col, t.fila)]}});
     }catch(err){ console.error('No se pudo lanzar el misil:', err); toast('No se pudo lanzar el misil'); }
     misilesEligiendo.delete(id);
@@ -1193,20 +1193,29 @@ async function dueloVincularSiFalta(t){
     UNA sola vez en el primer objetivo y reusada contra la Evasión de cada uno de los siguientes —
     dicho por el dueño, 2026-09-27), estado:'en-curso'|'terminado', creadoPor, creado}. */
 function coleccionAreas(){ return fbDb.collection(fbRutaCampana('areas')); }
+/* 🗺 El área sabe en qué mapa nació (2026-11-05, probando el Remolino): las áreas son de toda la partida y una pantalla del GM en OTRO mapa no
+   encontraba a los objetivos → los salteaba («ya no está en el mapa») y el giro terminaba sin pegarle a nadie. Ahora el área guarda su mapa en
+   `centro.mapa` (las reglas de Firestore no dejan sumar campos sueltos) y las pantallas de otro mapa no la tocan ni la dibujan. Los estados
+   nuevos ('en-curso-mapa' / 'eligiendo-mapa') son para que una pestaña vieja, que no sabe del mapa, ni la vea; se siguen leyendo los de antes. */
+const AREA_EN_CURSO = 'en-curso-mapa', AREA_ELIGIENDO = 'eligiendo-mapa';
+const areaEnCurso = a => !!a && (a.estado === 'en-curso' || a.estado === AREA_EN_CURSO);
+const areaEligiendo = a => !!a && (a.estado === 'eligiendo' || a.estado === AREA_ELIGIENDO);
+const areaDeOtroMapa = a => !!(a && a.centro && a.centro.mapa && a.centro.mapa !== mapaMostrado);
 let areasActivas = new Map();   // id → datos, solo las 'en-curso' (dibujar el círculo; el GM además avanza la cascada)
 
 const AREA_ATASCADA_MS = 5 * 60 * 1000;   // si sigue 'en-curso' pasado esto, se cierra sola (ver más abajo)
 function escucharAreas(){
-  coleccionAreas().where('estado', 'in', ['en-curso', 'eligiendo']).onSnapshot(snap => {
+  coleccionAreas().where('estado', 'in', ['en-curso', 'eligiendo', AREA_EN_CURSO, AREA_ELIGIENDO]).onSnapshot(snap => {
     areasActivas.clear();
     snap.docs.forEach(doc => areasActivas.set(doc.id, doc.data()));
     pedirDibujo();
-    areasActivas.forEach((a, id) => { if(a.estado === 'eligiendo') misilSiguiente(id, a); });   // los misiles: el próximo lo elige quien los tira
+    areasActivas.forEach((a, id) => { if(areaEligiendo(a) && !areaDeOtroMapa(a)) misilSiguiente(id, a); });   // los misiles: el próximo lo elige quien los tira
     // Autocuración: si a un área en curso le falta el sub-duelo que le toca (recién creada, o
     // esta pestaña del GM no llegó a verlo antes), lo crea acá — cubre el primer objetivo y
     // cualquiera que se haya quedado a mitad de camino (ej. la pestaña del GM se cerró un instante).
     if(soyGM) areasActivas.forEach((a, id) => {
-      if(a.estado === 'en-curso' && !(a.duelos || [])[num(a.indice)]){ areaCrearSiguienteSubDuelo(id, a); return; }
+      if(areaDeOtroMapa(a)) return;   // 🗺 la lleva la pantalla del GM que está en ese mapa
+      if(areaEnCurso(a) && !(a.duelos || [])[num(a.indice)]){ areaCrearSiguienteSubDuelo(id, a); return; }
       // Seguro contra que se quede pegada para siempre (ej. un dodge roll que nadie llegó a resolver, o
       // un permiso que falló en el último paso): pasados AREA_ATASCADA_MS igual 'en-curso', se cierra sola
       // — el pedido del dueño (2026-09-27) es que un área nunca deje una marca permanente en el mapa.
@@ -1253,6 +1262,7 @@ async function areaCrearSiguienteSubDuelo(areaId, a){
         if(num(doc.data().indice) < idx) return 'tarde';
         if(num(doc.data().indice) !== idx) return 'no';
         duelos[idx] = 'reservado:' + fbUsuario.uid;
+        for(let i = 0; i < idx; i++) if(duelos[i] === undefined) duelos[i] = null;   // (un objetivo salteado dejaba un hueco: Firestore no guarda undefined)
         tx.update(ref, {duelos});
         return 'si';
       });
@@ -1277,6 +1287,7 @@ async function areaCrearSiguienteSubDuelo(areaId, a){
     const doc = await coleccionAreas().doc(areaId).get();
     if(!doc.exists) return;
     const duelos = (doc.data().duelos || []).slice(); duelos[idx] = dueloId;
+    for(let i = 0; i < idx; i++) if(duelos[i] === undefined) duelos[i] = null;
     await coleccionAreas().doc(areaId).update({duelos});
   }catch(err){ console.error('No se pudo anotar el sub-duelo en el área:', err); }
 }
@@ -1288,7 +1299,7 @@ function dueloGrupoCancelado(d){
   ref.get().then(doc => {
     if(!doc.exists) return;
     const a = doc.data();
-    if(a.estado !== 'en-curso' && a.estado !== 'eligiendo') return;
+    if(!areaEnCurso(a) && !areaEligiendo(a)) return;
     return ref.update({estado: 'terminado'}).then(() => {
       const quedan = Math.max(0, (a.objetivos || []).length - (num(d.grupo.indice) || 1));
       try{ mesaLinea(`✖ Se canceló ${(d.hab && d.hab.nombre) || 'el área'}${quedan ? ` (no alcanza a ${quedan === 1 ? 'el objetivo que faltaba' : `los ${quedan} objetivos que faltaban`})` : ''}`, 'recordatorio'); }catch(e){}
@@ -1306,10 +1317,10 @@ function dueloGrupoResuelto(d){
     // 💫 El Shockwave: sobre quien no la resistió, el golpe y los pajaritos; sobre quien sí, un destello chico (js/94, 2026-11-03).
     if(a.hab && (a.hab.objetivo === 'onda' || a.hab.objetivo === 'cono') && typeof ondaFxVariante === 'function' && ondaFxVariante(a.hab) && d.defensor && d.defensor.tokenId)
       ondaFxGolpePublicar(d.defensor.tokenId, d.resultado === 'pego' || d.resultado === 'mitad', ondaFxVariante(a.hab), (a.casteador && a.casteador.tokenId) || (d.atacante && d.atacante.tokenId) || '');
-    if(a.estado !== 'en-curso' || num(a.indice) !== idx) return;   // ya avanzó por otra vía
+    if(!areaEnCurso(a) || num(a.indice) !== idx) return;   // ya avanzó por otra vía
     const siguiente = idx + 1, total = (a.objetivos || []).length;
     const reparte = a.hab && a.hab.reparte, quedan = reparte ? (num(reparte.total) || 2) - total : 0;   // los misiles: ¿queda alguno por tirar?
-    const cambios = siguiente >= total ? (quedan > 0 ? {estado: 'eligiendo', indice: siguiente} : {estado: 'terminado'}) : {indice: siguiente};
+    const cambios = siguiente >= total ? (quedan > 0 ? {estado: AREA_ELIGIENDO, indice: siguiente} : {estado: 'terminado'}) : {indice: siguiente};
     if(!a.pdgCompartido && d.pdg && !reparte) cambios.pdgCompartido = d.pdg;   // (cada misil, con su propia tirada)
     return coleccionAreas().doc(areaId).update(cambios);
   }).catch(err => console.error('No se pudo avanzar la cascada del área:', err));
@@ -1604,7 +1615,7 @@ function dueloElegirAreaMapa(msg){
     }
     try{
       await coleccionAreas().add({
-        casteador, hab: Duelo.limpiarHab(habArea), centro: {col: h.col, fila: h.fila, ...(h.cono ? {cono: true, rot: h.rot} : {}), ...(h.linea ? {linea: h.linea} : {})}, radio, objetivos: objetivosArea, duelos: [], indice: 0, estado: 'en-curso',
+        casteador, hab: Duelo.limpiarHab(habArea), centro: {col: h.col, fila: h.fila, ...(h.cono ? {cono: true, rot: h.rot} : {}), ...(h.linea ? {linea: h.linea} : {}), mapa: mapaMostrado}, radio, objetivos: objetivosArea, duelos: [], indice: 0, estado: AREA_EN_CURSO,
         creadoPor: fbUsuario.uid, creado: firebase.firestore.FieldValue.serverTimestamp(),
       });
     }catch(err){

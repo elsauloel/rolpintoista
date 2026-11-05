@@ -637,6 +637,13 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   rival, hasta +3); nv2 Golpe a la rodilla + Pies ligeros; nv3 Tajo de carnicero; nv4 Hit and run + Ojo crítico; nv5 Ráfaga de cortes. Equipo:
   **Navaja del compadrito** (Tipo 6, Ini +3, Sangrado 25 %) · 2 Comunes livianas. Consumible: Pergamino grupal de Puntería Certera. Al retomar:
   mandarle esto y preguntar si le cierra como ruta. Después quedan T4, W4, R4, H4, L7 y L8.
+- **▶ Retomado (2026-11-05, dueño)** — **L6 Patotero**: ruta aprobada con un cambio («intercambiaría golpe a la rodilla y hit and run»): nv1 Finta
+  (rápida) · Patotear (lenta); **nv2 Hit and run** + Pies ligeros; nv3 Tajo de carnicero; **nv4 Golpe a la rodilla** + Ojo crítico; nv5 Ráfaga de cortes.
+  **Nivel 1 aprobado**: Des 9 · Agi 8 · Con 8 · Fue 6 · Esp 2, vida 40, 8 No2; **Navaja del compadrito** (Común, Tipo 6, Ini +3, Sangrado 25 %) ·
+  **Jubón de cuero curtido** (Def +3, Res. crít. T4 +1; el dueño lo prefirió al Chaleco de cuero) · **Calzas de cuero flexible** (Eva +1). Consumible:
+  **Pergamino grupal de Puntería Certera**. **Patotear y Jauría cambian** (dueño: «+1 a la Probabilidad de Golpe fijo si hay al menos un aliado pegado,
+  y +1 al daño, pero sin tope»): +1 PdG si hay al menos un aliado pegado al rival, y +1 dado de daño por cada aliado pegado, **sin el tope de +3**.
+  **Sin programar** (dueño: «vamos dejándolos definidos»): se programa con el resto de los esenciales cuando el dueño lo pida.
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 

@@ -787,7 +787,7 @@ function bnElegirObjetivo(cfg, flechaId){
   const objetivoFijo = bn.objetivoFijo || null;   // 🐈‍⬛ Enyetar: el enemigo ya se eligió en su menú (js/38)
   bn.objetivoFijo = null;
   dueloElegirObjetivoMapa({yo: cfg.yo, ataque: fl ? {...atq, flecha: fl} : atq, objetivoFijo, conSuelto: !!cfg.suelto, alSuelto: () => { reabrir(); if(cfg.suelto) cfg.suelto(); },
-    alCancelar: () => { bnDevolverSiCancelo(cfg); if(em && typeof acPreguntarVolverAbajo === 'function') acPreguntarVolverAbajo(em); },
+    alCancelar: () => { bnDevolverSiCancelo(cfg); if(em && typeof acPreguntarVolverAbajo === 'function') acPreguntarVolverAbajo(em); }, alSoloSalto: () => reabrir(),   // 🦘 saltó y no atacó (js/105)
     ...(fl ? {alDisparar: () => bnDispararFlecha(fl.id, arma)} : {})});
 }
 /* ↩ Se canceló la elección del objetivo de una habilidad ya cobrada (2026-11-04, el Arma elemental: «cobra antes de elegir a quién y al cancelar no

@@ -812,8 +812,15 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   (`elegirDestino`; una casilla sin rival o fuera del área vuelve a pedir) → si la línea del salto cruza un Sólido o una pared, `AvisoCombate.preguntar`
   «¿Se puede saltar?» Aceptar/Cancelar (Cancelar vuelve a elegir casilla) → mueve el token (sin No2 ni oportunidad, como antes), línea en la Mesa y
   momento chico `salto`; Salto aplastante aplasta ahí (`saltoAplastar`) → un solo rival pegado: el duelo contra él; varios: «Elegí el objetivo» con
-  un clic → vuelve a `dueloElegirObjetivoMapa` con `msg.saltoHecho` + `msg.objetivoFijo` (los dos llamados a `saltoHab` de js/13 lo saltean). Sin
-  ninguna casilla útil: «¿Atacar igual sin saltar?». Esc o clic derecho cancelan sin cobrar (`msg.alCancelar`). Probado en «Claude · pruebas» con tokens
+  un clic → vuelve a `dueloElegirObjetivoMapa` con `msg.saltoHecho` + `msg.objetivoFijo` (los dos llamados a `saltoHab` de js/13 lo saltean).
+  Esc o clic derecho **antes de caer** cancelan sin cobrar (`msg.alCancelar`).
+  **En dos tiempos** (2026-11-05, dueño: «al caer… te pregunta atacar… puede existir la ocasión en la que uno simplemente quiera saltar… dividiría
+  el costo»): se puede caer en **cualquier** casilla libre del área (no solo pegada a un rival) y, al caer (y después de aplastar, si es el aplastante),
+  siempre `AvisoCombate.preguntar` «¿Atacar?» → Sí: un rival pegado, el duelo directo; varios, «Elegí el objetivo» (Esc ahí = no ataca); el bono del
+  Salto viaja en el ataque como antes. No (o sin ningún rival pegado): `saltoSinAtacar` toma lo cobrado (`Duelo.pagoHabTomar(yo.ref)`, lo anota quien
+  ejecutó la habilidad) y devuelve **solo los No2** (los de «lo de un ataque») y la cuenta del ataque del turno — creep: `CreepAcciones.devolverAtaque`
+  con `acCambiarCreep`; personaje: `editarPersonajeMapa` + `FichaCombate.desregistrarAtaque` —; los turnos de espera / el SP de la habilidad quedan
+  cobrados. Línea en la Mesa «🦘 X saltó y no atacó…» y `msg.alSoloSalto` (js/11 y js/12: vuelve a mostrar la Botonera / las Acciones). El Takle no cambia. Probado en «Claude · pruebas» con tokens
   locales y las escrituras reemplazadas (capturas `v-salto-*`): Esc, el aviso del Sólido con Cancelar y Aceptar, y «Elegí el objetivo» con dos goblins.
 
 - **💧 El charco ondulado y las ondas de los pasos** (2026-11-05, dueño: «el borde del charco parece una nube; tiene que ser una ondulación, como

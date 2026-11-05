@@ -1644,3 +1644,7 @@ y al empezar la ronda las tiradas de Res.Mt contra el Ef.Esp de los rivales pega
   aplastante** cayendo en una casilla elegida y el Takle (que no debería cambiar).
 - [ ] 💧 **Las ondas de los pasos vistas desde otra pantalla**: un jugador camina por un charco y el GM (y otro jugador) ven las ondas; con el token
   oculto o en la niebla, el que no lo ve no ve las ondas.
+- [ ] 🦘 **El Salto en dos tiempos** (2026-11-05, cola 16): caer en una casilla **sin** rival al lado (salta y no ataca, sin preguntar); caer pegado
+  a uno → «¿Atacar?» → **No**: la Mesa dice «saltó y no atacó — se le devolvieron N No2» y el cooldown / SP de la habilidad sigue cobrado (mirar
+  los No2 y los turnos de espera del creep en sus Acciones, y los No2/SP del personaje en la Botonera); **Sí** con uno: el duelo directo con +1 PdG
+  y frecuente +1; **Sí** con dos: «Elegí el objetivo», y Esc ahí = no ataca (devuelve los No2). El aplastante: aplasta y después pregunta.

@@ -4,8 +4,10 @@
 // advertencia de discutir con la mesa si se puede saltar ese objeto o no, con Aceptar o Cancelar»).
 // Lo llama dueloElegirObjetivoMapa (js/13) antes de elegir el objetivo, para un ataque con `saltoHab` que no sea una carrera (el Takle, `corre`, sigue
 // por js/55 como siempre). Flujo: se pintan las casillas libres a `saltoHab` o menos (más fuertes las que quedan pegadas a un rival) → clic en una →
-// si la línea pasa por un Sólido o una pared, la pregunta a la mesa → cae (sin No2 ni oportunidad; el Salto aplastante aplasta ahí) → si hay un solo rival
-// pegado, va contra él; si hay varios, «Elegí el objetivo» con un clic → el duelo de siempre (msg.objetivoFijo + msg.saltoHecho). Esc cancela sin cobrar.
+// si la línea pasa por un Sólido o una pared, la pregunta a la mesa → cae (sin No2 ni oportunidad; el Salto aplastante aplasta ahí) → «¿Atacar?»
+// (2026-11-05, en dos tiempos: «uno simplemente quiera saltar y no seguir el ataque … dividiría el costo») → Sí: un solo rival pegado, va contra él;
+// varios, «Elegí el objetivo» → el duelo de siempre (msg.objetivoFijo + msg.saltoHecho), con el bono del Salto. No: saltó sin atacar, se devuelven los
+// No2 del ataque (saltoSinAtacar) y lo de la habilidad (turnos de espera o SP) queda cobrado. Esc antes de caer cancela todo sin cobrar (msg.alCancelar).
 let saltoCasillas = null;   // {libres: Set 'col,fila', conRival: Set, t0}
 
 function saltoCasillaDibujar(z){
@@ -47,20 +49,12 @@ async function saltoElegirCasilla(msg, yo, ataque, conSalto){
   }
   const terminar = () => { saltoCasillas = null; pedirDibujo(); };
   const cancelar = () => { terminar(); if(msg.alCancelar) msg.alCancelar(); };
-  if(!conRival.size){
-    const si = await AvisoCombate.preguntar(`No hay ninguna casilla a ${n} o menos donde caer pegado a ${fijo ? nombreDe(tokens.get(fijo)) : 'un rival'}. ¿Atacar igual sin saltar? (lo decide la mesa)`,
-      {icono: '🦘', titulo: 'Sin salto', si: 'Atacar igual', no: 'Cancelar'});
-    if(!si){ cancelar(); return; }
-    mesaLinea(`🦘 ${nom} ataca sin saltar (no había dónde caer; lo decidió la mesa)`, 'alerta-roja');
-    msg.saltoHecho = true; dueloElegirObjetivoMapa(msg); return;
-  }
   saltoCasillas = {libres, conRival, t0: performance.now()};
   cerrarBotonera(); seleccion = null; hudCerrar(); pedirDibujo();
-  const texto = `<b>🦘 ${esc(nom)}: elegí dónde caer</b> <span>las casillas marcadas fuerte quedan pegadas a un rival (salta hasta ${n}, por encima de los tokens) · Esc o clic derecho cancelan</span>`;
+  const texto = `<b>🦘 ${esc(nom)}: elegí dónde caer</b> <span>salta hasta ${n}, por encima de los tokens · las marcadas fuerte quedan pegadas a un rival · al caer te pregunta si atacás · Esc o clic derecho cancelan</span>`;
   const pedirCasilla = () => elegirDestino(async h => {
     const k = h.col + ',' + h.fila;
     if(!libres.has(k)){ toast(`Ahí no puede caer: elegí una casilla libre a ${n} o menos`); pedirCasilla(); return; }
-    if(!conRival.has(k)){ toast('Elegí una casilla pegada a un rival (las marcadas más fuerte)'); pedirCasilla(); return; }
     const salta = !(h.col === mio.col && h.fila === mio.fila);
     if(salta && choca(h)){   // por encima de algo sólido: lo decide la mesa
       const ok = await AvisoCombate.preguntar(`El salto de ${nom} pasa por encima de algo sólido (una pared o un objeto Sólido). El salto es de 1,5 metros de altura: discutilo con la mesa, ¿se puede saltar?`,
@@ -78,22 +72,53 @@ async function saltoElegirCasilla(msg, yo, ataque, conSalto){
       }catch(err){ console.error('El Salto: no se pudo mover el token', err); toast('No se pudo saltar: ' + String((err && err.message) || err)); if(msg.alCancelar) msg.alCancelar(); return; }
       if(typeof marcarMovido === 'function') marcarMovido(mio.id);
       mio.col = h.col; mio.fila = h.fila;
-      const txt = `${nom} salta ${k2} casillero${k2 === 1 ? '' : 's'} y cae ${rivales.length === 1 ? 'al lado de ' + nombreDe(rivales[0]) : 'en medio de sus rivales'}.`;
+      const txt = `${nom} salta ${k2} casillero${k2 === 1 ? '' : 's'} y cae${rivales.length === 1 ? ' al lado de ' + nombreDe(rivales[0]) : rivales.length ? ' en medio de sus rivales' : ''}.`;
       mesaLinea(`🦘 ${txt}`, 'recordatorio');
       if(typeof momentoAbrir === 'function') momentoAbrir({tipo: 'salto', icono: '🦘', titulo: `${nom} salta`, resultado: txt, estado: 'listo', datos: {chico: true}});
     }
-    if(conSalto.saltoAplasta && typeof saltoAplastar === 'function') await saltoAplastar(mio, yo);
+    if(conSalto.saltoAplasta && typeof saltoAplastar === 'function') await saltoAplastar(mio, yo);   // el aplastamiento al caer, ataque o no
+    // ⚔ En dos tiempos (dueño, 2026-11-05): al caer, siempre «¿Atacar?». No → saltó sin atacar: se le devuelven los No2 del ataque (lo de la habilidad,
+    // turnos de espera o SP, queda cobrado). Sí → un solo rival pegado: el duelo directo; varios: «Elegí el objetivo».
+    const sinAtacar = () => saltoSinAtacar(msg, yo, ataque, nom);
+    const vivos = rivales.filter(r => tokens.has(r.id));
+    if(!vivos.length){ toast(`${nom} no quedó pegado a ningún rival: saltó sin atacar`); sinAtacar(); return; }
+    const si = await AvisoCombate.preguntar(`${nom} cayó${vivos.length === 1 ? ' al lado de ' + nombreDe(vivos[0]) : ` pegado a ${vivos.length} rivales`}. ¿Atacar? (con el bono del salto)`,
+      {icono: '🦘', titulo: '¿Atacar?', si: 'Sí, atacar', no: 'No, solo saltar'});
+    if(!si){ sinAtacar(); return; }
     const atacar = r => { msg.saltoHecho = true; msg.objetivoFijo = r.id; dueloElegirObjetivoMapa(msg); };
-    if(rivales.length === 1){ atacar(rivales[0]); return; }
-    // Varios rivales pegados: «Elegí el objetivo».
-    saltoCasillas = {libres: new Set(rivales.map(r => r.col + ',' + r.fila)), conRival: new Set(rivales.map(r => r.col + ',' + r.fila)), t0: performance.now()};
+    if(vivos.length === 1){ atacar(vivos[0]); return; }
+    // Varios rivales pegados: «Elegí el objetivo» (cancelar acá = no atacar: el salto ya se hizo).
+    saltoCasillas = {libres: new Set(vivos.map(r => r.col + ',' + r.fila)), conRival: new Set(vivos.map(r => r.col + ',' + r.fila)), t0: performance.now()};
     pedirDibujo();
     const elegirRival = () => elegirDestino(h2 => {
-      const r = rivales.find(x => x.col === h2.col && x.fila === h2.fila);
+      const r = vivos.find(x => x.col === h2.col && x.fila === h2.fila);
       if(!r){ toast('Elegí a uno de los rivales marcados'); elegirRival(); return; }
       terminar(); atacar(r);
-    }, `<b>🦘 Elegí el objetivo</b> <span>clic en uno de los rivales marcados, pegados a ${esc(nom)} · Esc o clic derecho cancelan</span>`, true, () => { terminar(); if(msg.alCancelar) msg.alCancelar(); });
+    }, `<b>🦘 Elegí el objetivo</b> <span>clic en uno de los rivales marcados, pegados a ${esc(nom)} · Esc o clic derecho: no ataca</span>`, true, () => { terminar(); sinAtacar(); });
     elegirRival();
   }, texto, true, cancelar);
   pedirCasilla();
+}
+
+/* 🦘 Saltó y no ataca: lo de la habilidad (turnos de espera o SP) queda cobrado y se devuelven los No2 que se cobraron como «lo de un ataque» (y deja de
+   contar como el ataque del turno). Lo cobrado lo anotó quien ejecutó la habilidad en Duelo.pagoHab (comun/creep-acciones.js / comun/ficha-acciones.js). */
+async function saltoSinAtacar(msg, yo, ataque, nom){
+  const p = typeof Duelo !== 'undefined' && Duelo.pagoHabTomar ? Duelo.pagoHabTomar(yo.ref) : null;
+  const no2 = p ? Math.max(0, num(p.no2)) : 0;
+  let hecho = false;
+  try{
+    if(yo.tipo === 'creep' && typeof acCambiarCreep === 'function')
+      hecho = !!(await acCambiarCreep(yo.ref, c => { CreepAcciones.devolverAtaque(c, 'normal', no2, ataque && (ataque.armaCreepId || ataque.armaId)); return {ok: true}; }));
+    else if(typeof editarPersonajeMapa === 'function' && !String(yo.ref).includes(SEP_INVOCACION))
+      hecho = !!(await editarPersonajeMapa(String(yo.ref), S => {
+        if(no2 > 0) S.nitros = num(S.nitros) + no2;
+        const arma = ataque && ataque.armaId ? (S.inventario || []).find(x => x.id === ataque.armaId) || null : null;
+        FichaCombate.desregistrarAtaque(S, arma);
+        return true;
+      }));
+  }catch(err){ console.error('El Salto: no se pudo devolver lo del ataque', err); }
+  const txt = `🦘 ${nom} saltó y no atacó${hecho && no2 > 0 ? ` — se le devolvieron ${fmt(no2)} No2 del ataque (lo del salto queda cobrado)` : ''}`;
+  toast(txt);
+  try{ mesaLinea(txt, 'recordatorio'); }catch(err){}
+  if(msg.alSoloSalto) msg.alSoloSalto();
 }

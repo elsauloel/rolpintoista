@@ -456,7 +456,8 @@ function acElegirObjetivo(sc, ataque, suelto, alDisparar){
   const base = x => String(x || '').split(':')[0].trim().toLowerCase();
   const dev = ac.devolucion && nomHab && ac.devolucion.creepId === sc.id && base(ac.devolucion.habNombre) === base(nomHab) ? ac.devolucion : null;
   ac.devolucion = null;
-  dueloElegirObjetivoMapa({yo: {ref: sc.id, tipo: 'creep', nombre: sc.nombre}, ataque, objetivoFijo, conSuelto: true, alSuelto: () => { reabrir(); suelto(); }, alCancelar: () => { reabrir(); acDevolver(dev); acPreguntarVolverAbajo(em); },
+  dueloElegirObjetivoMapa({yo: {ref: sc.id, tipo: 'creep', nombre: sc.nombre}, ataque, objetivoFijo, conSuelto: true, alSuelto: () => { reabrir(); suelto(); }, alCancelar: () => { reabrir(); acDevolver(dev); acPreguntarVolverAbajo(em); }, alSoloSalto: () => reabrir(),   // 🦘 saltó y no atacó (js/105)
+   
     ...(alDisparar ? {alDisparar} : {})});   // 🏹 la flecha especial se gasta al disparar (2026-10-20)
 }
 

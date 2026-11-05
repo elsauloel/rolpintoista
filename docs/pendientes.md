@@ -106,13 +106,16 @@
 > - [ ] **😇 Decidir quién cambia el Pacto (dueño, 2026-11-04: «la pregunta pendiente del pacto también va a quedar para cuando esté en la compu»).**
 >   Hoy el campo «😇 Pacto» (ficha, datos de identidad) lo cambia el jugador en su ficha y el GM con «✎ Editar como GM», aunque la ayuda dice que lo
 >   marca el GM. Pregunta: ¿solo el GM lo puede cambiar?
-> - [ ] **🚩 Estandartes: ver qué hacen y sus áreas como estados (2026-11-05, dueño; después de la tanda de pruebas del mapa).** Nombres: **«objetos
+> - [x] **🚩 Estandartes: ver qué hacen y sus áreas como estados (2026-11-05, dueño; después de la tanda de pruebas del mapa).** Nombres: **«objetos
 >   inertes»** para lo general (lo que pone una habilidad y no actúa) y **«estandartes»** para la mecánica del poste con efecto en área (el Estandarte de
 >   guerra, el Tótem de silencio y los que vengan). (1) Pasando el mouse por el **nombre** de arriba a la derecha o por el **token**, un globito con lo que
 >   hace (aura, efecto, vida); en las casillas del aura no hace falta. (2) Un inerte **no lleva la ficha lite**; el **carnet 🪪 directo en el primer anillo**
 >   (hoy hay que ir por los tres puntitos). (3) **Todo efecto de área que afecta a los tokens** (estandartes, auras, zonas…) se ve como **estado** mientras
 >   el token está adentro (circulito, lista de estados, ficha) y se va al salir: derivado de la posición, no guardado. Después: el ítem «⬡ Seleccionar un
 >   hexágono libre y ver qué lo afecta».
+>   **Hecho (2026-11-05, `vtt-hexgrid/js/103-estandartes-info.js`):** globito sobre el token y sobre el nombre; el inerte sin ficha lite y con el carnet
+>   en el primer anillo; «🚩 Bajo el estandarte», «🤐 Silenciado (tótem)» y «✚ En el aura sanadora» como estados de área (marcados ⬡). Las zonas
+>   persistentes ya ponían su estado al entrar y no se duplican.
 > - [ ] **🎬 Animaciones para la mayor cantidad posible de habilidades (2026-11-05, dueño: «pensar animaciones para la mayor cantidad de
 >   habilidades de clase posibles y también los skills del pool de creeps»).** Ya tienen: Transfusión, las ondas (Shockwave, Pisotón, Nova, Sonic Boom,
 >   Remolino/Barrido/Coletazo con la espadita, Grito), Escudo humano, el gancho de Arrastrar, el «−2 EVA», el pulso del duelo. Primero una lista de

@@ -7219,6 +7219,40 @@ prueba('💧 Poción de SP en un creep (2026-11-03): en modo SP devuelve SP; con
     c.sp, /\+\d+ SP/.test(rc.aviso), CreepAcciones.spDeConsumible(a, CATALOGO_BASE.find(i => i.nombre === 'Poción de Cuero Duro'))],
     ['4,1', true, 0, true, Math.ceil(max / 3), true, null]);
 });
+prueba('🚩 Estandartes (2026-11-05): las áreas se ven como estados según dónde está parado el token (no se guardan, no suman dos veces)', async () => {
+  // El archivo del mapa (vtt-hexgrid/js/103) con lo que necesita de afuera, armado a mano: un tablero chiquito.
+  const src = await (await fetch('../vtt-hexgrid/js/103-estandartes-info.js', {cache: 'no-store'})).text();
+  const mundo = (tokens, gm) => new Function('tokens', 'soyGM', 'estandarteInfo', 'estandarteEnPie', 'distanciaHex', 'vinculo', 'auraCuraEnEstados', 'AURA_CURA_RADIO', 'estadoDe', 'num', 'esc', 'creepPrivadoDe',
+    src + '\nreturn {estadosDeArea, estadosDeAreaRef, estandarteTexto};')(
+    tokens, gm,
+    t => t.est || null, () => true,
+    (a, b) => Math.max(Math.abs(a.col - b.col), Math.abs(a.fila - b.fila)),
+    t => ({nombre: t.nombre, resumen: {hpPct: 60}}),
+    est => !!(est && est.aura), 5, t => t.estado || null, Number, x => String(x), () => null);
+  const tk = new Map([
+    ['est', {tipo: 'creep', fichaId: 'e1', nombre: 'Estandarte de guerra', col: 0, fila: 0, est: {radio: 2, pdg: 1, dano: 2, silencio: false}}],
+    ['tot', {tipo: 'creep', fichaId: 't1', nombre: 'Tótem de silencio', col: 10, fila: 0, est: {radio: 3, pdg: 0, dano: 0, silencio: true}}],
+    ['cura', {tipo: 'creep', fichaId: 'cu', nombre: 'Druida', col: 20, fila: 0, estado: {aura: true}}],
+    ['c1', {tipo: 'creep', fichaId: 'c1', nombre: 'Goblin', col: 1, fila: 1}],          // en el estandarte
+    ['c2', {tipo: 'creep', fichaId: 'c2', nombre: 'Orco', col: 5, fila: 0}],            // afuera de todo
+    ['pj', {tipo: 'personaje', fichaId: 'pj1', nombre: 'Larry', col: 8, fila: 0}],      // en el tótem (rival); también en el aura del estandarte, pero no es su aliado
+    ['pj2', {tipo: 'personaje', fichaId: 'pj2', nombre: 'Ana', col: 1, fila: 0}],
+    ['c3', {tipo: 'creep', fichaId: 'c3', nombre: 'Bruja', col: 12, fila: 0}],          // en el tótem de su bando: nada
+    ['c4', {tipo: 'creep', fichaId: 'c4', nombre: 'Lobo', col: 17, fila: 2}],           // en el aura sanadora
+    ['esc', {tipo: 'creep', fichaId: 'c5', nombre: 'Escondido', col: 0, fila: 1, oculto: true}],
+  ]);
+  const w = mundo(tk, false);
+  const nom = id => w.estadosDeArea(tk.get(id)).map(e => `${e.nombre}/${e.polaridad}/${e.derivado && e.area}`).join();
+  const det = w.estadosDeArea(tk.get('c1'))[0].detalle;
+  const txt = w.estandarteTexto('est', tk.get('est'));
+  igual([nom('c1'), nom('c2'), nom('pj'), nom('pj2'), nom('c3'), nom('c4'), nom('est'), nom('tot'), w.estadosDeAreaRef('c1').length, w.estadosDeAreaRef('nadie').length,
+    /\+1 a la Probabilidad de Golpe y \+2 al daño/.test(det), txt.titulo, txt.lineas[1], /Vida: 60 %/.test(txt.lineas[3]), w.estandarteTexto('c1', tk.get('c1'))],
+    ['Bajo el estandarte/buff/true', '', 'Silenciado (tótem)/debuff/true', '', '', 'En el aura sanadora/buff/true', '', '', 1, 0,
+     true, 'Estandarte de guerra', 'Aura: 2 casillas alrededor (diámetro 5).', true, null]);
+  // Al salir del aura, el estado se va solo (sale de la posición, no se guardó en ningún lado).
+  tk.get('c1').col = 4;
+  igual(nom('c1'), '');
+});
 /* ---------- Resultado ---------- */
 Promise.all(pendientes).then(() => {
 const malas = resultados.filter(r => !r.ok);

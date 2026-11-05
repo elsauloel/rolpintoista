@@ -121,6 +121,12 @@ function flDibujar(){
     const est = typeof estoicoAhora === 'function' ? estoicoAhora(estoicoToken(fl.tipo === 'creep' ? 'creep' : 'pj', fl.tipo === 'creep' ? fl.creepId : fl.clave)) : null;
     if(est && modelo.defensa) modelo.defensa = {valor: num(modelo.defensa.valor) + est.val,
       lineas: [...modelo.defensa.lineas, {txt: `Estoicismo: ${est.n} enemigo${est.n === 1 ? '' : 's'} pegado${est.n === 1 ? '' : 's'}, ahora`, val: est.val, nota: 'estado'}]};
+    // 🚩 Los estados de las áreas donde está parado (js/103): derivados de la posición, no se guardan.
+    if(typeof estadosDeAreaRef === 'function' && Array.isArray(modelo.estados)){
+      const ref = fl.tipo === 'creep' ? fl.creepId : fl.clave;
+      estadosDeAreaRef(ref).forEach(e => modelo.estados.push({nombre: e.nombre, datos: '⬡', pol: e.polaridad,
+        lineas: [{txt: e.detalle}, {txt: 'Viene de un área: se va al salir de ella'}]}));
+    }
   }catch(err){ console.error('Ficha lite:', err); aviso('No se pudo armar la ficha lite'); return; }
   cuerpo.innerHTML = FichaLite.html(modelo, botones);
 }

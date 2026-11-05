@@ -35,7 +35,9 @@ const ICONOS_ESTADO = {
   'escalofrio': {ic: '🥶'},   // (2026-11-03) la rápida siniestra del Debuffer: −2 PdG (salía con la inicial «E»)
   'mente abierta': {ic: '🧠'},   // (2026-11-03) la Punzada mental del Debuffer: −2 Res.Mt
   'provocado': {ic: '😤'},
-  'silencio': {ic: '🤐'},
+  'silencio': {ic: '🤐'}, 'silenciado': {ic: '🤐'},
+  // 🚩 Los estados de las áreas (js/103, 2026-11-05): se ven mientras el token está adentro.
+  'bajo el estandarte': {ic: '🚩'}, 'en el aura sanadora': {ic: '✚'},
   'ceguera': {ic: '🙈'}, 'cegado': {ic: '🙈'}, 'cegada': {ic: '🙈'},
   'deslumbrado': {ic: '😵‍💫'},
   'inmovilizado': {ic: '⛓️'}, 'agarrado': {ic: '⛓️'},
@@ -135,7 +137,7 @@ function iconoDeEstado(clave){
 function iconosLista(id, t, est){
   const vistos = new Map();
   (est.estados || []).forEach(e => {
-    if(!e || !e.nombre || e.derivado || e.activo === false) return;
+    if(!e || !e.nombre || (e.derivado && !e.area) || e.activo === false) return;   // (los de un área sí: js/103)
     const k = iconosNorm(e.nombre);
     if(k === 'sigilo' && !(typeof enSigilo === 'function' && enSigilo(t))) return;
     if(!vistos.has(k)) vistos.set(k, e);
@@ -156,6 +158,8 @@ function iconosEstadosDibujar(id, t, est, x, y, rad, z){
   // ✋ Nada en la mano (dueño, 2026-11-01: «que la mano se ubique como el resto de los estados»): un circulito más, borde gris, al final de la ronda,
   // solo en modo combate (como la marca de antes, js/05).
   const mano = modoMapa === 'combate' && typeof tokenSinArma === 'function' && tokenSinArma(t);
+  const deArea = typeof estadosDeArea === 'function' ? estadosDeArea(t) : [];
+  if(deArea.length) est = {...(est || {}), estados: [...((est && est.estados) || []), ...deArea]};
   if((!est || !est.estados || !est.estados.length) && !mano) return res;
   const lista = iconosLista(id, t, est || {estados: []});
   if(mano) lista.push({clave: '__mano', e: {nombre: 'Nada en la mano'}});

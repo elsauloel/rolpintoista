@@ -1911,6 +1911,18 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   por un estado con `hpmax`). Lo público lleva `estandarteRadio/Pdg/Dano` (`CreepCalculo.tarjetaPublica`, leído en js/09). `estandarteBonus(mio)` → `{pdg,
   dano}` para un creep a `radio` o menos de uno en pie; js/13 y js/17 lo pasan a `Duelo.crear({estandarte})`. La pantalla del GM saca los rotos (token y
   ficha). El aura, `estandarteDibujar(z)` desde js/05.
+- **🚩 Estandartes: qué hacen y sus áreas como estados** (2026-11-05, dueño; `js/103-estandartes-info.js`). Nombres para el usuario: **«objetos inertes»**
+  (lo general, `esInerte` de js/73) y **«estandartes»** (el poste con aura: Estandarte de guerra, Tótem de silencio). (1) `estandarteTexto(id, t)` arma el
+  globito `#inerte-globo` (aura con radio y diámetro, efecto, vida: el GM ve hp/hpMax, el resto el % público); sale al pasar el mouse por el token o
+  por `#token-etiqueta` con el estandarte seleccionado (el cartel tiene `pointer-events: none`, así que se mira el rectángulo desde el mousemove del
+  lienzo). (2) Un inerte no abre ficha lite (`abrirFichaDeToken` muestra la tarjeta) y su carnet 🪪 va en el primer anillo del HUD (el GM conserva ⋯).
+  (3) `estadosDeArea(t)` → `[{nombre, polaridad, detalle, derivado: true, area: true}]` **según la posición, sin guardar**: «Bajo el estandarte» (creep
+  aliado en el aura de uno en pie que no es tótem; el mejor), «Silenciado (tótem)» (bando distinto dentro del tótem), «En el aura sanadora» (creep a
+  `AURA_CURA_RADIO` o menos de otro con Aura sanadora, js/70). Se suman al final de `hudDatos(t).estados` (marca ⬡ sin botones, así no corre los
+  índices de edición), a los circulitos (js/88: `iconosEstadosDibujar`; `iconosLista` deja pasar `derivado` si es `area`) y a la ficha lite (js/15,
+  `estadosDeAreaRef(ref)`). Son informativos: el bono lo sigue sumando `estandarteBonus` en el duelo y el silencio `silencioDeLugar`. No se agregan:
+  las zonas persistentes (ya ponen su estado al entrar), el miedo (es un estado propio) ni el Muro de escudos (adyacencia en el golpe). Prueba pura en
+  comun/pruebas.html (carga el archivo con `fetch` y le arma un tablero a mano).
 - **☄ El Meteoro** (2026-10-24, Mago; antes «Lluvia de meteoros»; `js/74-meteoro.js`): `marcarMeteoro(sc, h)` (desde `ui.meteoro` de js/12) pide el centro dentro del Rango y guarda
   `sc.meteoro = {col, fila, radio, fisico, fuego, paso, mant}`; lo público lleva `meteoroCol/Fila/Radio` (la sombra, `meteoroDibujar` desde js/05). La pantalla del GM
   la hace caer (`meteoroCaer`) al empezar el próximo turno del creep (o el próximo cambio de ronda sin orden): el momento «estallido» y

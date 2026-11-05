@@ -829,3 +829,12 @@ input[type=file]{display:none}
 .editar-creep-pie button{padding:9px 18px;font-weight:700;cursor:pointer}
 #scrim-editar-creep .editar-creep-modal .card{padding-bottom:84px}   /* (lugar adentro para los botones: al final no tapan nada) */
 #scrim-editar-creep.open + .editar-creep-pie{display:flex}
+
+/* 🗺 Mapas del tablero (2026-11-05, dueño): el rótulo de las pestañas, «📡 en juego», el mapa que el GM está mirando y dónde está cada creep. */
+.mapas-rotulo{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:0 0 6px}
+.mapas-rotulo b{font-size:13px;letter-spacing:.04em}
+.mapas-rotulo .hint{font-size:12px}
+.mapa-en-juego{font-size:10.5px;color:#7fe0a2;font-weight:700;letter-spacing:.02em}
+.btn.mapa-tab-viendo{box-shadow:0 0 0 2px #e0b84a}
+.mapa-fila{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
+.mapa-estado{font-size:11.5px;color:var(--paper);white-space:nowrap}

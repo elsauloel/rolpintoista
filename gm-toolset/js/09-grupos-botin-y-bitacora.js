@@ -32,14 +32,22 @@ function renderMapasBarra(){
   if(mapasGMListos && pestanaMapa !== PESTANA_TODOS && pestanaMapa !== CreepsMapas.RESERVA && !mapas.some(m => m.id === pestanaMapa)) pestanaMapa = PESTANA_TODOS;   // ese mapa se borró
   const reales = creepsReales();
   const cuenta = id => reales.filter(sc => id === PESTANA_TODOS || mapaDeCreepGM(sc) === id).length;
-  const tab = (id, texto, titulo) => `<button type="button" class="btn${pestanaMapa === id ? ' primary' : ''}" data-mapa-tab="${esc(id)}" style="padding:4px 10px;font-size:12.5px"${titulo ? ` title="${esc(titulo)}"` : ''}>${esc(texto)} <span class="hint">${cuenta(id)}</span></button>`;
+  // Que se lea que las pestañas son los mapas del tablero (2026-11-05, dueño: «que sea más claro que los grupos donde están los creeps son un
+  // reflejo de los mapas del tablero»): el rótulo, «📡 en juego» (el publicado), un borde en el que el GM está mirando en el mapa y la Reserva explicada.
+  const viendo = mapaViendoGM();
+  const tab = (id, texto, titulo, extra) => `<button type="button" class="btn${pestanaMapa === id ? ' primary' : ''}${id === viendo && id !== PESTANA_TODOS && id !== CreepsMapas.RESERVA ? ' mapa-tab-viendo' : ''}" data-mapa-tab="${esc(id)}" style="padding:4px 10px;font-size:12.5px"${titulo ? ` title="${esc(titulo)}"` : ''}>${esc(texto)}${extra || ''} <span class="hint">${cuenta(id)}</span></button>`;
   const enUnMapa = pestanaMapa !== PESTANA_TODOS && pestanaMapa !== CreepsMapas.RESERVA;
-  caja.innerHTML = `<div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 10px">
-      ${tab(PESTANA_TODOS, 'Todos')}${mapas.map(m => tab(m.id, '🗺 ' + m.nombre)).join('')}${tab(CreepsMapas.RESERVA, '🎒 Reserva', 'Los creeps que todavía no están en ningún mapa')}
+  const faltan = enUnMapa ? reales.filter(sc => mapaDeCreepGM(sc) === pestanaMapa && !enTablero(sc)).length : 0;
+  const tituloMapa = m => `El mapa «${m.nombre}» del tablero: acá están sus creeps${m.id === mapaActivoGM ? ' · es el que ven los jugadores ahora' : ''}${m.id === viendo ? ' · es el que estás mirando en el mapa' : ''}`;
+  caja.innerHTML = `<div class="mapas-rotulo"><b>🗺 Mapas del tablero</b><span class="hint">Cada pestaña es un mapa del tablero: acá ves sus creeps. Si mudás un creep a otro mapa, su token se muda con él.</span></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0 0 10px">
+      ${tab(PESTANA_TODOS, 'Todos los creeps')}${mapas.map(m => tab(m.id, '🗺 ' + m.nombre, tituloMapa(m), m.id === mapaActivoGM ? ' <span class="mapa-en-juego">📡 en juego</span>' : '')).join('')}${tab(CreepsMapas.RESERVA, '🎒 Reserva', 'Los creeps guardados, que no están en ningún mapa del tablero', ' <span class="hint" style="font-size:11px">guardados, en ningún mapa</span>')}
       <button type="button" class="btn ghost" data-mapa-nuevo="1" style="padding:4px 10px;font-size:12.5px" title="Crear un mapa nuevo (un escenario de combate); aparece también en 🗺 Mapas del mapa">＋ Mapa</button>
       ${enUnMapa ? `<span style="margin-left:auto;display:flex;gap:6px;align-items:center">
         <button type="button" class="btn" data-mapa-estimado="1" title="Cuánto oro van a sacar aproximadamente si derrotan a todos los creeps de este mapa: su oro y la venta de lo que sueltan">💰 Botín estimado</button>
-        <button type="button" class="btn primary" data-mapa-tokens="1" title="Pone en «${esc(nombreDeMapaGM(pestanaMapa))}» un token oculto por cada creep de este mapa que todavía no tenga, en fila, en el centro de la vista">🎯 Poner sus tokens (${cuenta(pestanaMapa)})</button>
+        <button type="button" class="btn ghost" data-mapa-ver="1" title="Abre el mapa «${esc(nombreDeMapaGM(pestanaMapa))}» en otra pestaña, para vos (no cambia lo que ven los jugadores)">Ver en el tablero ↗</button>
+        ${faltan ? `<button type="button" class="btn primary" data-mapa-tokens="1" title="Pone en «${esc(nombreDeMapaGM(pestanaMapa))}» un token oculto por cada creep de este mapa que todavía no está en el tablero, en fila, en el centro de la vista">🎯 Poner en el tablero los que faltan (${faltan})</button>`
+          : `<button type="button" class="btn" disabled title="Todos los creeps de este mapa ya tienen su token en el tablero">✔ Todos en el tablero</button>`}
         ${pestanaMapa !== CreepsMapas.PRINCIPAL ? `<button type="button" class="btn ghost" data-mapa-borrar="1" title="Borra «${esc(nombreDeMapaGM(pestanaMapa))}» con todo lo que tiene en el mapa (tokens y dibujos). Sus creeps no se borran: pasan a la Reserva">🗑 Borrar mapa</button>` : ''}</span>` : ''}
     </div>${enUnMapa ? estimadoCajaHtml(reales.filter(sc => mapaDeCreepGM(sc) === pestanaMapa)) : ''}`;
 }
@@ -97,7 +105,46 @@ function mapasGMEscuchar(){
     snap.docs.forEach(d => mapasGM.set(d.id, {nombre: String(d.data().nombre || 'Mapa').slice(0, 40), creadoMs: d.data().creado && d.data().creado.toMillis ? d.data().creado.toMillis() : 0}));
     mapasGMListos = true;
     renderAll();
+    tokensGMEscuchar();
   }, err => console.error('Error escuchando la lista de mapas:', err));
+  if(fbMiembro && fbMiembro.gm) fbDb.doc(fbRutaCampana('mapa/activo')).onSnapshot(sn => {
+    const id = (sn.exists && sn.data().mapaId) || CreepsMapas.PRINCIPAL;
+    if(id !== mapaActivoGM){ mapaActivoGM = id; renderMapasBarra(); }
+  }, err => console.error('Error escuchando el mapa publicado:', err));
+}
+/* 🟢 / ⏸ ¿Está en el tablero? (2026-11-05, dueño: los tokens y los creeps de GM Tools van juntos): los tokens de creeps de cada mapa, en vivo.
+   Solo se redibuja si cambia QUÉ creeps tienen token en un mapa (mover un token no redibuja nada). */
+let mapaActivoGM = CreepsMapas.PRINCIPAL;
+const tokensGM = new Map(), tokensGMEsc = new Map();
+function tokensGMEscuchar(){
+  if(!fbDb || !fbMiembro || !fbMiembro.gm) return;
+  const ids = new Set(mapasOrdenadosGM().map(m => m.id));
+  for(const [id, corte] of tokensGMEsc) if(!ids.has(id)){ try{ corte(); }catch(e){} tokensGMEsc.delete(id); tokensGM.delete(id); }
+  ids.forEach(id => {
+    if(tokensGMEsc.has(id)) return;
+    const ruta = id === CreepsMapas.PRINCIPAL ? 'tokens' : `mapas/${id}/tokens`;
+    tokensGMEsc.set(id, fbDb.collection(fbRutaCampana(ruta)).onSnapshot(sn => {
+      const set = new Set();
+      sn.docs.forEach(d => { const t = d.data(); if(t && t.tipo === 'creep' && t.fichaId) set.add(t.fichaId); });
+      const antes = tokensGM.get(id), firma = x => [...x].sort().join('|');
+      tokensGM.set(id, set);
+      if(!antes || firma(antes) !== firma(set)) renderAll();
+    }, err => console.error('Error escuchando los tokens del mapa', id, err)));
+  });
+}
+const tokensListosGM = id => tokensGM.has(id);
+function enTablero(sc){ const m = mapaDeCreepGM(sc); return m !== CreepsMapas.RESERVA && !!(tokensGM.get(m) && tokensGM.get(m).has(sc.id)); }
+// El mapa que el GM está mirando en el mapa (el mapa lo guarda en `mapa-viendo`; sin eso, sigue al publicado).
+function mapaViendoGM(){
+  let v = null; try{ v = localStorage.getItem('mapa-viendo'); }catch(e){}
+  return v && (v === CreepsMapas.PRINCIPAL || mapasGM.has(v)) ? v : mapaActivoGM;
+}
+window.addEventListener('storage', e => { if(e.key === 'mapa-viendo') renderMapasBarra(); });
+// «Ver en el tablero ↗»: el mapa en otra pestaña, mirando ese mapa (solo el GM; no publica nada).
+function verMapaEnTablero(id){
+  try{ localStorage.setItem('mapa-viendo', id); }catch(e){}
+  window.open('../vtt-hexgrid/mapa.html?partida=' + encodeURIComponent(FB_CAMPANA), '_blank');
+  renderMapasBarra();
 }
 // ¿Crear su token? (2026-10-09, pedido del dueño: «si ya están en un mapa y no está creado el token, al agregarlo que pregunte»). Se llama al
 // crear, duplicar o agregar un creep: si quedó en un mapa (no en la Reserva), pregunta y lo pone oculto en ese mapa (TokensAuto.crear se
@@ -120,8 +167,8 @@ function ofrecerTokenEnMapa(sc){
 }
 async function crearTokensDelMapa(){
   if(!fbDb || !fbMiembro || !fbMiembro.gm){ toast('Sin conexión con la partida como GM'); return; }
-  const mapaId = pestanaMapa, lista = creepsReales().filter(sc => mapaDeCreepGM(sc) === mapaId);
-  if(!lista.length){ toast('Ese mapa no tiene creeps'); return; }
+  const mapaId = pestanaMapa, lista = creepsReales().filter(sc => mapaDeCreepGM(sc) === mapaId && !enTablero(sc));   // solo los que faltan
+  if(!lista.length){ toast(`Todos los creeps de «${nombreDeMapaGM(mapaId)}» ya están en el tablero`); return; }
   try{
     const r = await TokensAuto.crear(lista.map(sc => ({nombre: nombreLimpioCreep(sc), color: sc.color, tipo: 'creep', fichaId: sc.id, oculto: true})), {mapaId});
     toast(r.creados ? `🎯 ${r.creados} token(s) en «${nombreDeMapaGM(mapaId)}», ocultos a los jugadores${r.salteados ? ` · ${r.salteados} ya estaban` : ''}` : `Todos los creeps de «${nombreDeMapaGM(mapaId)}» ya tienen su token`);
@@ -165,6 +212,7 @@ document.addEventListener('click', async e => {
   if(b.dataset.mapaTab !== undefined){ fijarPestanaMapa(b.dataset.mapaTab); return; }
   if(b.dataset.mapaNuevo){ const id = await pedirMapaNuevo(); if(id) fijarPestanaMapa(id); return; }
   if(b.dataset.mapaTokens){ crearTokensDelMapa(); return; }
+  if(b.dataset.mapaVer){ verMapaEnTablero(pestanaMapa); return; }
   if(b.dataset.mapaEstimado){ abrirBotinEstimado(); return; }
   if(b.dataset.mapaBorrar){ borrarMapaGM(pestanaMapa); return; }
 });
@@ -200,21 +248,29 @@ document.addEventListener('change', async e => {
   const sc = S.creeps.find(s => s.id === t.dataset.mapaCreep);
   if(!sc) return;
   let destino = t.value;
+  if(destino === '__mudar') return;
   if(destino === '__nuevo'){
     await pedirMapaNuevo(sc.id);   // si lo deja marcado, el asistente ya lo muda
     renderAll(); return;
   }
   moverCreepAMapa(sc, destino);
 });
-// «🗺 Mover a…»: el mapa del creep, para mudarlo. compacto: el de la tarjeta; si no, el de la ficha completa.
+// Dónde está el creep y «Mudar a…» (2026-11-05, dueño: que se lea que el mapa es el del tablero): «📍 <Mapa> · 🟢 en el tablero» (tiene su
+// token) o «⏸ fuera del tablero», o «🎒 En la Reserva»; al lado, el desplegable para mudarlo (con su token). compacto: el de la tarjeta.
+function mapaEstadoTxt(sc){
+  const actual = mapaDeCreepGM(sc);
+  if(actual === CreepsMapas.RESERVA) return '🎒 En la Reserva';
+  return `📍 ${nombreDeMapaGM(actual)}${!tokensListosGM(actual) ? '' : enTablero(sc) ? ' · 🟢 en el tablero' : ' · ⏸ fuera del tablero'}`;
+}
 function mapaSelectHtml(sc, compacto){
   const actual = mapaDeCreepGM(sc);
-  const ops = [...mapasOrdenadosGM(), {id: CreepsMapas.RESERVA, nombre: '🎒 Reserva'}]
-    .map(m => `<option value="${esc(m.id)}"${m.id === actual ? ' selected' : ''}>${esc(m.id === CreepsMapas.RESERVA ? m.nombre : '🗺 ' + m.nombre)}</option>`).join('')
+  const ops = '<option value="__mudar" selected>Mudar a…</option>'
+    + [...mapasOrdenadosGM(), {id: CreepsMapas.RESERVA, nombre: '🎒 Reserva'}].filter(m => m.id !== actual)
+      .map(m => `<option value="${esc(m.id)}">${esc(m.id === CreepsMapas.RESERVA ? m.nombre : '🗺 ' + m.nombre)}</option>`).join('')
     + '<option value="__nuevo">＋ mapa nuevo…</option>';
-  return compacto
-    ? `<select class="mapa-creep" data-mapa-creep="${sc.id}" title="En qué mapa está: elegí otro para mudarlo (su token se muda con él)">${ops}</select>`
-    : `<div class="mini-f" style="margin-bottom:8px"><label>Mapa (elegí otro para mudarlo, con su token)</label><select data-mapa-creep="${sc.id}">${ops}</select></div>`;
+  const estado = `<span class="mapa-estado" title="${actual === CreepsMapas.RESERVA ? 'Guardado: no está en ningún mapa del tablero' : enTablero(sc) ? 'Su token está en este mapa del tablero' : 'Está en este mapa, pero todavía sin token en el tablero'}">${esc(mapaEstadoTxt(sc))}</span>`;
+  const sel = `<select class="mapa-creep" data-mapa-creep="${sc.id}" title="Mudarlo a otro mapa del tablero (su token se muda con él) o a la Reserva">${ops}</select>`;
+  return compacto ? `${estado}${sel}` : `<div class="mini-f" style="margin-bottom:8px"><label>En el tablero</label><div class="mapa-fila">${estado}${sel}</div></div>`;
 }
 // Los grupos viejos pasan a ser mapas, una vez (comun/creeps-mapas.js, migrar): al entrar el GM, con los creeps ya leídos.
 async function gmMigrarGrupos(){

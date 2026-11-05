@@ -510,3 +510,12 @@ creep. Lo usa el botón 📜 del token de un creep vinculado en el mapa.
   `gmReconciliarMapas` (js/09, después de `gmMigrarGrupos`) pasa al mapa de su token a los creeps que estaban en otro (o en la Reserva) y avisa
   cuántos; el guardado de siempre los sube. Si uno tiene tokens en dos mapas, solo avisa: la pregunta la hace el mapa (vtt-hexgrid/js/101). Un creep
   sin token se respeta (preparado en un mapa). Lo que cambia el mapa le llega a GM Tools abierto por la firma. Reglas en `comun/creeps-mapas.js`.
+
+- **🗺 Las pestañas se leen como los mapas del tablero** (2026-11-05, dueño: «que sea más claro que los grupos donde están los creeps son un reflejo de
+  los mapas del tablero»; aprobó la propuesta: «me cierra»): rótulo «🗺 Mapas del tablero» con su explicación; el mapa publicado lleva «📡 en juego» y
+  el que el GM está mirando en el mapa, un borde dorado (`mapaViendoGM`: el `mapa-viendo` que guarda el mapa en este navegador, o el publicado); la
+  Reserva dice «guardados, en ningún mapa». Cada creep muestra «📍 <Mapa> · 🟢 en el tablero / ⏸ fuera del tablero» o «🎒 En la Reserva» y el
+  desplegable «Mudar a…» (`mapaEstadoTxt`, `mapaSelectHtml`). Los tokens de creeps de cada mapa se escuchan en vivo (`tokensGMEscuchar`, `enTablero`;
+  solo se redibuja si cambia quién tiene token). «🎯 Poner en el tablero los que faltan (N)» crea solo los que no tienen token (sin ninguno:
+  «✔ Todos en el tablero»). «Ver en el tablero ↗» abre el mapa en otra pestaña mirando ese mapa (`verMapaEnTablero`, sin publicar). Título:
+  «Creeps de la partida»; «Todos los creeps».

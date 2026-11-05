@@ -281,9 +281,14 @@
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 
 ## Pendientes
+- [ ] **🎲 El d20 del crítico en 3D según el multiplicador (2026-11-05, dueño).** ×1: sin brillo, un 😞 sobre el dado; ×2: brillo dorado y pulso;
+  ×3: además, estrellitas; ×4 o más: además, guirnaldas 🎊 y papelitos por toda la pantalla. Probado con tiradas sueltas en el mapa (los cuatro);
+  falta verlo en un crítico de un duelo real (lo manda el duelo con `destacar: 'crit:N'`).
 - [ ] **❤ Menú de vida del token: sumar con + y la Vida extra (2026-11-05, dueño).** En «1 · Recibe daño» ya no están el ×2/×3/×4 ni el ⚡ Relámpago.
   Escribir **+10** suma vida (en los dos modos); con un **+** que pasa del máximo tiene que preguntar «El tope de vida es N… ¿Cargar el sobrante como
   Vida extra?»: con Sí, el personaje (o el creep) queda al máximo y con esa Vida extra en sus estados. Probada solo la vista previa (Claude · pruebas).
+  **Las invocaciones** ahora tienen el mismo menú (Recibe daño con su Defensa, HP directo, +N y la Vida extra): sin probar, porque en Claude · pruebas
+  no queda ninguna invocación viva de un jugador de prueba.
 - [ ] **👆 La marca de débil/resistente de un creep, con el mouse encima (2026-11-05, dueño).** Un cartelito explica cada ícono (▼ débil, ▲ resistente,
   ⛔ inmune y qué daño). Probado como GM en Claude · pruebas (Goblin Scout); falta verlo desde un jugador (solo lo revelado).
 - [ ] **⏬ Demora a quien ya está último (2026-11-05, dueño).** La fila intenta bajar, rebota contra el borde y aparece «⛔ Ya está último: no puede

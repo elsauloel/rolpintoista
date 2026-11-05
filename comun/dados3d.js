@@ -277,6 +277,15 @@ function dadosEstilosOnda(){
     // 🐈‍⬛ La mala (2026-10-12, Enyetar, dueño: «al revés del dorado: violeta o rojo, con sangre o rayos violetas, algo que dé mala vibra»).
     '.dados3d-onda.mala{border-color:#A020F0;box-shadow:0 0 18px rgba(150,20,255,.95),inset 0 0 12px rgba(210,10,40,.85);animation-duration:1.15s}' +
     '.dados3d-rayo{position:absolute;font-size:34px;margin:-20px 0 0 -14px;opacity:0;pointer-events:none;filter:hue-rotate(215deg) saturate(2.2) drop-shadow(0 0 8px rgba(160,40,255,1));animation:dados3d-rayo 1.3s steps(1) infinite}' +
+    // 🎲 El d20 del crítico según el multiplicador (2026-11-05, dueño): ×1 un emoji triste; ×3 estrellitas; ×4 o más, fiesta.
+    '.dados3d-triste{position:absolute;font-size:46px;margin:-80px 0 0 -23px;opacity:0;pointer-events:none;filter:drop-shadow(0 4px 8px rgba(0,0,0,.6));animation:dados3d-triste 2.6s ease-in-out forwards}' +
+    '@keyframes dados3d-triste{0%{opacity:0;transform:translateY(-10px) scale(.8)}25%{opacity:1;transform:translateY(0) scale(1)}70%{opacity:1;transform:translateY(6px) rotate(-6deg)}100%{opacity:0;transform:translateY(14px) rotate(-8deg)}}' +
+    '.dados3d-estrella{position:absolute;margin:-12px 0 0 -12px;opacity:0;pointer-events:none;filter:drop-shadow(0 0 6px rgba(255,210,90,1));animation:dados3d-estrella 1.5s ease-in-out infinite}' +
+    '@keyframes dados3d-estrella{0%{opacity:0;transform:scale(.2) rotate(0)}35%{opacity:1;transform:scale(1.15) rotate(90deg)}70%{opacity:.85;transform:scale(.8) rotate(160deg)}100%{opacity:0;transform:scale(.2) rotate(220deg)}}' +
+    '.dados3d-confeti{position:absolute;top:-20px;width:9px;height:14px;border-radius:2px;pointer-events:none;animation:dados3d-confeti linear forwards}' +
+    '@keyframes dados3d-confeti{0%{transform:translate(0,0) rotate(0)}100%{transform:translate(var(--dx),calc(100vh + 40px)) rotate(var(--rot))}}' +
+    '.dados3d-guirnalda{position:absolute;left:0;right:0;top:-6px;height:60px;pointer-events:none;display:flex;justify-content:space-around;font-size:30px;opacity:0;animation:dados3d-guirnalda 2.8s ease-out forwards}' +
+    '@keyframes dados3d-guirnalda{0%{opacity:0;transform:translateY(-50px)}18%{opacity:1;transform:translateY(8px)}28%{transform:translateY(0)}80%{opacity:1}100%{opacity:0}}' +
     '@keyframes dados3d-rayo{0%{opacity:0}8%{opacity:1}12%{opacity:.15}16%{opacity:1}26%{opacity:0}100%{opacity:0}}' +
     '.dados3d-gota{position:absolute;font-size:18px;margin:-10px 0 0 -9px;opacity:0;pointer-events:none;animation:dados3d-gota 1.7s ease-in infinite}' +
     '@keyframes dados3d-gota{0%{opacity:0;transform:translateY(-6px) scale(.6)}20%{opacity:1}100%{opacity:0;transform:translateY(48px) scale(1)}}';
@@ -291,6 +300,15 @@ function dadosDestacar(c, notacion, cual){
   const lista = c.caja.diceList || [];
   if(!vals.length || lista.length < vals.length) return;
   const nuevos = lista.slice(-vals.length);
+  const crit = /^crit:(\d{1,2})$/.exec(String(cual));
+  if(crit){   // el d20 del crítico: el más alto, con el efecto de su multiplicador
+    const die = nuevos[vals.indexOf(Math.max(...vals))];
+    dadosEstilosOnda();
+    if(c.destacado) c.destacado.cancelar();
+    const f = Number(crit[1]) <= 1 ? dadosTriste(c, die) : dadosDestacarDado(c, die, false, Number(crit[1]));
+    c.destacado = {cancelar: () => { if(f) f(); }};
+    return;
+  }
   const malo = String(cual).startsWith('malo:'), cual2 = malo ? String(cual).slice(5) : cual;   // 'malo:…' = la animación de mala vibra (Enyetar)
   const idx = cual2 === 'max' ? [vals.indexOf(Math.max(...vals))] : String(cual2).replace(/^idx:/, '').split(',').map(n => parseInt(n, 10)).filter(n => n >= 0 && n < nuevos.length);
   if(!idx.length) return;
@@ -300,7 +318,26 @@ function dadosDestacar(c, notacion, cual){
   c.destacado = {cancelar: () => cancelar.forEach(f => f())};
 }
 const dadosDestacarMayor = (c, notacion) => dadosDestacar(c, notacion, 'max');
-function dadosDestacarDado(c, die, malo){
+// Dónde cae `die` en la pantalla, dentro de su capa: {x, y} en px.
+function dadosEnPantalla(c, die){
+  const cam = c.caja.camera;
+  cam.updateMatrixWorld();
+  const v = die.position.clone().project(cam), r = c.capa.getBoundingClientRect();
+  return {x: (v.x * 0.5 + 0.5) * r.width, y: (-v.y * 0.5 + 0.5) * r.height};
+}
+// ×1 (el d20 no alcanzó a multiplicar): sin brillo; un 😞 aparece sobre el dado y se va.
+function dadosTriste(c, die){
+  if(!die || !die.position) return null;
+  const p = dadosEnPantalla(c, die);
+  const e = document.createElement('div');
+  e.className = 'dados3d-triste'; e.textContent = '😞';
+  e.style.left = p.x + 'px'; e.style.top = p.y + 'px';
+  c.capa.appendChild(e);
+  const t = setTimeout(() => e.remove(), 2700);
+  return () => { clearTimeout(t); e.remove(); };
+}
+// `mult` (el d20 del crítico): 2 brillo dorado y pulso; 3, además, estrellitas; 4 o más, además, guirnaldas y papelitos por toda la pantalla.
+function dadosDestacarDado(c, die, malo, mult){
   if(!die || !die.position || !die.scale) return null;
   // Materiales propios (los de la librería se comparten entre dados del mismo tipo).
   const orig = die.material;
@@ -315,7 +352,31 @@ function dadosDestacarDado(c, die, malo){
   const v = p0.clone().project(cam), r = c.capa.getBoundingClientRect();
   const centro = document.createElement('div');
   centro.style.cssText = `position:absolute;left:${(v.x * 0.5 + 0.5) * r.width}px;top:${(-v.y * 0.5 + 0.5) * r.height}px;width:0;height:0;pointer-events:none`;
-  for(let i = 0; i < 3; i++){ const o = document.createElement('div'); o.className = 'dados3d-onda' + (malo ? ' mala' : ''); o.style.animationDelay = (i * (malo ? 0.38 : 0.5)) + 's'; centro.appendChild(o); }
+  for(let i = 0; i < (mult === 2 ? 2 : 3); i++){ const o = document.createElement('div'); o.className = 'dados3d-onda' + (malo ? ' mala' : ''); o.style.animationDelay = (i * (malo ? 0.38 : mult === 2 ? 0.8 : 0.5)) + 's'; centro.appendChild(o); }
+  const fiesta = [];
+  if(mult >= 3){   // ✨ estrellitas alrededor
+    [[-62, -38, 0, 26, '✨'], [58, -48, .3, 22, '⭐'], [-50, 46, .6, 20, '⭐'], [66, 30, .15, 26, '✨'], [0, -74, .45, 18, '✨'], [-80, 4, .75, 18, '⭐'], [80, -6, .9, 16, '✨']]
+      .slice(0, mult >= 4 ? 7 : 5).forEach(([x, y, d, tam, ch]) => { const e = document.createElement('div'); e.className = 'dados3d-estrella'; e.textContent = ch;
+        e.style.left = x + 'px'; e.style.top = y + 'px'; e.style.fontSize = tam + 'px'; e.style.animationDelay = d + 's'; centro.appendChild(e); });
+  }
+  if(mult >= 4){   // 🎉 guirnaldas arriba y papelitos que caen por toda la pantalla
+    const capa = document.createElement('div');
+    capa.style.cssText = 'position:absolute;inset:0;overflow:hidden;pointer-events:none';
+    const g = document.createElement('div'); g.className = 'dados3d-guirnalda'; g.textContent = '🎊 🎉 🎊 🎉 🎊 🎉 🎊';
+    capa.appendChild(g);
+    const colores = ['#FFD25A', '#E27B72', '#7FDC86', '#6EC3FF', '#C792EA', '#FFFFFF'];
+    for(let i = 0; i < 70; i++){
+      const p = document.createElement('div'); p.className = 'dados3d-confeti';
+      p.style.left = (Math.random() * 100) + '%';
+      p.style.background = colores[i % colores.length];
+      p.style.setProperty('--dx', Math.round((Math.random() - 0.5) * 160) + 'px');
+      p.style.setProperty('--rot', Math.round(360 + Math.random() * 720) * (Math.random() < .5 ? -1 : 1) + 'deg');
+      p.style.animationDuration = (1.6 + Math.random() * 1.3).toFixed(2) + 's';
+      p.style.animationDelay = (Math.random() * 0.7).toFixed(2) + 's';
+      capa.appendChild(p);
+    }
+    c.capa.appendChild(capa); fiesta.push(capa);
+  }
   if(malo){   // rayos violetas que titilan alrededor y gotas de sangre que caen
     [[-46, -40, 0], [44, -30, .45], [-30, 40, .85], [50, 34, .25]].forEach(([x, y, d]) => { const r = document.createElement('div'); r.className = 'dados3d-rayo'; r.textContent = '⚡';
       r.style.left = x + 'px'; r.style.top = y + 'px'; r.style.animationDelay = d + 's'; r.style.transform = `rotate(${x < 0 ? -18 : 18}deg)`; centro.appendChild(r); });
@@ -325,7 +386,7 @@ function dadosDestacarDado(c, die, malo){
   c.capa.appendChild(centro);
   let vivo = true;
   const t0 = performance.now();
-  const fin = () => { vivo = false; centro.remove(); };
+  const fin = () => { vivo = false; centro.remove(); fiesta.forEach(f => f.remove()); };
   const paso = ahora => {
     if(!vivo) return;
     const k = Math.min(1, (ahora - t0) / 800), c1 = 1.70158, c3 = c1 + 1;

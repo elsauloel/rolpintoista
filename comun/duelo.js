@@ -1056,7 +1056,7 @@ const Duelo = (() => {
       entrarDano(m);
       tx.update(ref, cambiosDe(m));
       const NOMBRE_MULT = {1: 'sin multiplicador: el d20 no alcanzó a multiplicar', 2: 'doble daño', 3: 'triple daño', 4: 'cuádruple daño'};
-      publicar = {origen: `${m.atacante.nombre} · Crítico (${n}d20${man.length ? ', a mano' : ''})`, r: {formula: `${n}d20${man.length ? ' (manual)' : ''}`, rolls, mod: 0, total: mejor, destacar: 'max', ...quienDeLado(m.atacante)}};
+      publicar = {origen: `${m.atacante.nombre} · Crítico (${n}d20${man.length ? ', a mano' : ''})`, r: {formula: `${n}d20${man.length ? ' (manual)' : ''}`, rolls, mod: 0, total: mejor, destacar: 'crit:' + Math.min(99, Math.round(_num(mult))), ...quienDeLado(m.atacante)}};
       anuncio = res.supercritico
         ? `🌟 ¡SUPERCRÍTICO! ${m.atacante.nombre} contra ${m.defensor.nombre}: ${res.veintes} veintes naturales, ×${mult}, ignora la Defensa`
         : `💥 ¡CRÍTICO! ${m.atacante.nombre} contra ${m.defensor.nombre}: ×${mult} (${NOMBRE_MULT[mult]}), ignora la Defensa`;

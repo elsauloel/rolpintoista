@@ -601,7 +601,25 @@ async function resistenciasDe(t, el, inv){
   return {res: el ? num(r['res' + el]) : 0, armadmg: Math.max(0, num(r.armadmg))};   // negativa = vulnerable (2026-10-06)
 }
 
+/* 🐝 Las invocaciones, con el mismo menú de vida (2026-11-05, dueño: «las invocaciones juegan con las mismas reglas que creeps y jugadores… el resto de
+   las reglas deben aplicar igual»): su Defensa no viene en el resumen, así que al abrir el menú se lee su ficha (`invDeToken`) y se guarda acá. */
+const hpInvDef = new Map();   // tokenId → Defensa de la invocación
+const esTokenInv = t => !!t && String(t.fichaId || '').includes(SEP_INVOCACION);
+function hpDatos(t){
+  const d = hudDatos(t);
+  if(esTokenInv(t) && (d.def === null || d.def === undefined)){
+    const id = [...tokens].find(([, x]) => x === t)?.[0];
+    if(id && hpInvDef.has(id)) return {...d, def: hpInvDef.get(id)};
+  }
+  return d;
+}
+function hpInvCargarDef(id, t){
+  if(!esTokenInv(t)) return;
+  invDeToken(t).then(inv => { if(inv){ hpInvDef.set(id, defensasDeInv(inv).def); pedirDibujo(); } }).catch(err => console.error('La Defensa de la invocación:', err));
+}
+
 function hudHpHtml(t, d){
+  d = hpDatos(t);
   const danio = hpModo === 'danio';
   const def = d.def === null || d.def === undefined ? null : d.def;
   const hayMax = d.hpMax !== null && d.hpMax !== undefined && num(d.hpMax) > 0;
@@ -616,8 +634,8 @@ function hudHpHtml(t, d){
       ? (def === null
         ? 'No conozco su Defensa todavía (la ficha la publica al guardarse). Usá <b>2 · HP directo</b>.'
         : `Escribí el <b>daño del golpe</b>. Se le resta la Defensa (<b>${fmt(def)}</b>) y lo que pasa baja su HP.<br>Con un <b>+</b> adelante (<b>+10</b>) <b>suma vida</b>.`)
-      : 'Cambia el HP <b>sin tener en cuenta la Defensa</b>. Un número lo fija; <b>+5</b> suma y <b>−3</b> baja directo.'}${hayMax ? ' Si lo que sumás pasa del máximo, te pregunta si el sobrante va como <b>Vida extra</b>.' : ''}</div>
-    <input class="hud-hp-in" data-hud-hp-in inputmode="decimal" autocomplete="off" placeholder="${danio ? 'daño del golpe, o +N para sumar' : 'valor, +5 o −3'}">
+      : 'Cambia el HP <b>sin tener en cuenta la Defensa</b>. Un número lo fija; <b>+5</b> suma y <b>−3</b> baja directo.'}</div>
+    <input class="hud-hp-in" data-hud-hp-in inputmode="decimal" autocomplete="off" placeholder="${danio ? 'daño, o +N para sumar' : 'valor, +5 o −3'}">
     <div class="hud-hp-prev" data-hud-hp-prev></div>
     <div class="hud-hp-pie">Enter aplica · Esc cierra</div>
   </div>`;
@@ -746,9 +764,9 @@ async function rayoCadenaAplicar(cadena, o){
    el máximo (hudAplicar, como el +N de HP directo); si sobra y se elige Sí, el sobrante va a la Vida extra (la única, se junta con la que ya
    tenga): a un creep, directo; a un personaje, por los estados recibidos (como el Drenar vida). Las invocaciones, sin Vida extra. */
 async function hudSumarVida(t, crudo){
-  const d = hudDatos(t), hp = num(d.hp), max = num(d.hpMax), suma = leerValorVital(crudo, 0);
+  const d = hpDatos(t), hp = num(d.hp), max = num(d.hpMax), suma = leerValorVital(crudo, 0);
   if(suma === null || suma <= 0){ toast('Escribí +N (por ejemplo +10)'); return; }
-  const sobra = max > 0 && hp > 0 && !String(t.fichaId || '').includes(SEP_INVOCACION) ? Math.round(hp + suma - max) : 0;
+  const sobra = max > 0 && hp > 0 ? Math.round(hp + suma - max) : 0;
   let extra = 0;
   if(sobra > 0){
     const quien = t.tipo === 'creep' ? `de ${nombreDe(t)} ` : '';
@@ -759,6 +777,12 @@ async function hudSumarVida(t, crudo){
   if(!extra) return;
   try{
     if(t.tipo === 'creep') await modificarCreep(t.fichaId, sc => { EstadosAplicar.aplicarACreep(sc, {nombre: 'Vida extra', escudoMagico: extra}); });
+    else if(esTokenInv(t)){
+      const [ficha, invId] = String(t.fichaId).split(SEP_INVOCACION);
+      const ok = await editarPersonajeMapa(ficha, S => { const inv = (S.invocaciones || []).find(x => x && String(x.id) === String(invId)); if(!inv) return false;
+        inv.estados = Combatiente.sumarVidaExtra(Array.isArray(inv.estados) ? inv.estados : [], extra); return true; });
+      if(!ok) throw new Error('no se pudo escribir la ficha de su dueño');
+    }
     else await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: {nombre: 'Vida extra', escudoMagico: extra}, origen: 'Vida que pasó del máximo'});
     toast(`❤ ${nombreDe(t)}: +${fmt(extra)} de Vida extra`);
   }catch(err){ console.error('La Vida extra:', err); toast('No se pudo cargar la Vida extra: ' + (err.message || err)); }
@@ -776,7 +800,7 @@ async function hudHpAplicar(t, texto){
     if(/^[\-−]/.test(String(texto).trim())){ toast('Para bajarla sin Defensa, usá 2 · HP directo'); return; }
     const idTok = seleccion, antes = vitalActual(t, 'hp');
     const golpe = leerGolpe(texto);
-    const resH = t.tipo === 'creep' ? await danioCreep(t, texto, false) : await danioPj(t, texto, false, 0, 0, {reparte: true});   // reparte: Miti-Miti
+    const resH = t.tipo === 'creep' ? await danioCreep(t, texto, false) : esTokenInv(t) ? await danioInv(t, texto, false, 0, 0, {reparte: true}) : await danioPj(t, texto, false, 0, 0, {reparte: true});   // reparte: Miti-Miti
     vitalRegistrar(idTok, 'hp', antes);   // (Ctrl+Z devuelve el HP; un escudo que absorbió el golpe no se recarga)
     hudGlobo = '';
   }catch(err){
@@ -1175,8 +1199,8 @@ function hudConectar(t){
   const hud = $('#hud');
   hud.querySelectorAll('[data-hud-valor]').forEach(b => b.onclick = () => {
     // Vida: mini menu (recibir dano / HP directo). Las invocaciones siguen con el campo simple.
-    if(b.dataset.hudValor === 'hp' && !(t.fichaId || '').includes(SEP_INVOCACION)){
-      if(hudGlobo === 'hp'){ hudGlobo = ''; } else { hudGlobo = 'hp'; hpModo = 'danio'; }
+    if(b.dataset.hudValor === 'hp'){
+      if(hudGlobo === 'hp'){ hudGlobo = ''; } else { hudGlobo = 'hp'; hpModo = 'danio'; if(seleccion) hpInvCargarDef(seleccion, t); }
       hudEditando = ''; pedirDibujo();
       return;
     }
@@ -1187,7 +1211,7 @@ function hudConectar(t){
   hud.querySelectorAll('[data-hud-hpmodo]').forEach(b => b.onclick = () => { hpModo = b.dataset.hudHpmodo; pedirDibujo(); });
   const campoHp = hud.querySelector('[data-hud-hp-in]');
   if(campoHp){
-    const dHp = hudDatos(t);
+    const dHp = hpDatos(t);
     const previa = hud.querySelector('[data-hud-hp-prev]');
     campoHp.oninput = () => { previa.textContent = hudHpPrevia(t, dHp, campoHp.value); };
     campoHp.onkeydown = e => {

@@ -1619,8 +1619,17 @@ sangre** en una ronda real (voltear a un rival con el golpe); **Echar la mufa** 
 y al empezar la ronda las tiradas de Res.Mt contra el Ef.Esp de los rivales pegados; un jugador que lo pide (el momento `orden-pedido` que toma el GM).
 
 ## ⏳ Pendiente de probar en el mapa (2026-11-05, cola: Contraataque, Mala sombra, Tipo 12)
-- [ ] **⚔ Contraataque con la habilidad**: un personaje con Contraataque gana la **Evasión** → «¿Contraatacás?» y el duelo nuevo suma **+2 PdG**; lo mismo
-  ganando el **Parry** aunque pierda el Bloqueo (pasa la mitad). Un creep con Contraataque, igual (antes +1).
+- [x] **🌀 Remolino de Rockardo, con clics** (2026-11-05, tercera tanda; SP cargado a mano a 15 y devuelto): el giro con la espadita (~0,6 s), el pulso
+  del área, se despliega el cuadro; PdG 10 contra Eva 4, daño 2d10+11 = 24 − 6 = 18 (goblin 85 → 67); el cuadro se pliega, se ve el mapa, pulso, y
+  el segundo cuadro para la Rata de la grieta con el mismo PdG («ya tiró»). Entre el fin del giro y el primer pulso pasan ~2,7 s. Capturas
+  p3-remolino-r00607.png, p3-remolino-r04438-c.png, p3-remolino-r05752.png, p3-remolino-s06489-s.png.
+- [x] **⚔ Contraataque con la habilidad, por la Evasión** (2026-11-05, tercera tanda, con clics; GM): Rockardo (copia) ataca al Goblin rompehuesos
+  (con Contraataque puesto a mano). La Evasión del goblin avisa «⚔ si gana, puede contraatacar»; con PdG 2 contra Eva 4 → «FALLÓ… ⚔ Esquivaste:
+  ¿contraatacás…? (Contraataque) · Sí / No»; con «Sí» se abre el duelo «⚔ Contraataque» del goblin con su Martillo. **Falló y se arregló**: la lupa
+  mostraba el +2 pero la tirada que paga el creep salía sin él (1d8, mod 0); ahora el +2 entra en la tirada real (creeps e invocaciones, `?v=20261105c2`).
+  Capturas p3-contra-1-eva.png, p3-contra-2-duelo-nuevo.png.
+- [ ] **⚔ Contraataque**: falta ver de nuevo la tirada con el +2 en una partida (ya arreglado), ganar el **Parry** perdiendo el Bloqueo, y un personaje
+  (no creep) con la habilidad.
 - [ ] **⚔ Devolver gentileza**: con la pasiva, ganar el Parry **y** el Bloqueo → «¿Contraatacás? (Devolver gentileza)», sin bonus; **sin** la pasiva ni la
   habilidad, ganar el Parry y el Bloqueo **ya no ofrece** contraatacar.
 - [ ] **🌑 Mala sombra** (ex Mufa): ejecutarla desde la Botonera de un Debuffer; el estado se ve con el nombre nuevo y el ícono 🌑; al empezar la ronda la

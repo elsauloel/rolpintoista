@@ -59,3 +59,17 @@ Cuentas Jugador 1, Jugador 2 y GM en «Claude · pruebas». Lo tocado se respald
 ## Para el dueño
 - El Tipo 12 sigue apareciendo en el panel ⚡ Acciones de los creeps, en la lupa del creep y en la Botonera. Solo se sacó de la ficha lite. ¿Lo sacamos de todos lados?
 - Invocaciones: anotado lo que decidiste (al morir desaparece del mapa y quien la invocó la puede volver a invocar).
+
+
+## Tercera tanda (2026-11-05, con clics de verdad en «Claude · pruebas»)
+
+Todo lo tocado se volvió a dejar como estaba (fotos antes/después; El origen sin tocar).
+
+- **🌀 Remolino de Rockardo — anduvo.** El giro con la espadita, el pulso, el cuadro que se despliega, pega (el goblin perdió 18), se pliega, pulso de
+  nuevo y el cuadro del segundo rival con el mismo PdG. (Para el jugador no aparecía el botón de tirar: era porque esa copia de Rockardo estaba en
+  🎮 control del GM — no es una falla.)
+- **⚔ Contraataque por la Evasión — falló y se arregló.** El aviso y la pregunta «¿Contraatacás?» salen bien y el duelo nuevo se abre, pero el +2 a la
+  PdG solo se veía en la lupa: la tirada real del creep salía sin él. Ya entra (creeps e invocaciones).
+- **Sin Tipo 12 — anduvo** en la Botonera de un personaje (Rockardo: Tipo 4/6/8/10).
+- **No llegué:** Contraataque ganando el Parry y Devolver gentileza; Salto de punta a punta; Mala sombra; Patotear; ondas del agua desde otra pantalla;
+  Tótem de silencio; Apuntar/Marcar con el potente; el cuadro del duelo sobre el gancho de Arrastrar.

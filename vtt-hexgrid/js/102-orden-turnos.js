@@ -51,6 +51,9 @@ async function ordenPedir(op){
 const ordenPedidosHechos = new Set();
 async function ordenPedidoDelGM(id, d){   // la pantalla del GM (js/16 momentoRecibido)
   if(!soyGM || ordenPedidosHechos.has(id)) return;
+  // Los momentos son de la partida, no del mapa: una pantalla del GM abierta en OTRO mapa no lo toma (no tiene esos tokens ni ese orden).
+  const op = (d && d.datos && d.datos.op) || {};
+  if(![op.id, op.a, op.b, op.portador].filter(Boolean).every(x => tokens.has(x))) return;
   ordenPedidosHechos.add(id);
   const ref = coleccionMomentos().doc(id);
   let tomado = false;
@@ -217,6 +220,7 @@ async function ritmoPedir(portador, cands, k){
 const ritmoVistos = new Set();
 function ritmoElegirMomento(id, d){   // js/16 momentoRecibido, en cada pantalla
   if(ritmoVistos.has(id) || d.estado !== 'esperando' || !d.datos) return;
+  if(!tokens.has(d.datos.portador)) return;   // una pantalla abierta en otro mapa no pregunta
   ritmoVistos.add(id);
   const t0 = d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now();
   if(Date.now() - t0 > 120000) return;

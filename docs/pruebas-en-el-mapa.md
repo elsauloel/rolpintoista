@@ -1653,3 +1653,34 @@ y al empezar la ronda las tiradas de Res.Mt contra el Ef.Esp de los rivales pega
   Nube tóxica tirada de verdad (el circulito ⬡ y, al pasar el mouse / en el globo de estados y en la ficha lite, el texto «Al entrar y en cada
   Mantenimiento… tira Res.Esp…»), que se vaya al salir, que el jugador no vea el de una zona oculta, y el Escudo de la falange de verdad (que se
   vaya al separarse del compañero).
+
+## ✅ Cuarta tanda (2026-11-05, Claude, «Claude · pruebas», mapa «Encuentro 2», con clics; todo restaurado después)
+- [x] **⚔ Contraataque (habilidad), ganando el Parry y perdiendo el Bloqueo**: ofrece «¿contraatacás? (Contraataque)»; con «Sí» el duelo nuevo tira
+  1d10 = PdG 8 + 2 (el +2 ya entra en la tirada real). Captura p4-contra-a-parry-pierde-bloqueo.png.
+- [x] **⚔ Devolver gentileza** (pasiva en el goblin, sin la habilidad): ganando el Parry y el Bloqueo → «Ganaste el Parry y el Bloqueo: ¿contraatacás?
+  (Devolver gentileza)»; el duelo nuevo va sin bonus (1d8 = su PdG). Ganando con la Evasión, no ofrece nada. Captura p4-contra-b-gentileza.png.
+- [x] **Sin pasiva ni habilidad**: ganando Parry y Bloqueo, «¡BLOQUEADO!» y nada más. Captura p4-contra-c-sin-nada.png.
+- [x] **🦘 Salto de un creep** (Goblin rompehuesos, Acciones): cae pegado → «¿Atacar?» → No: «saltó y no atacó — se le devolvieron 5 No2», No2 20 →
+  20 y turnos de espera 3 (quedan cobrados); cae pegado a 3 → Sí → «Elegí el objetivo» → duelo con +1 PdG y frecuente +1; cae sin rival al lado →
+  no pregunta y devuelve los No2. **Personaje** (habilidad de prueba en la Botonera): sin rival → devuelve los 5 No2, el SP (2) queda cobrado, J1 ve
+  el token en el lugar nuevo; con un rival → «¿Atacar?» → Sí → duelo con +1 PdG y frecuente +1. **Takle**: igual que antes (corre 2, sin preguntar,
+  Con contra Con). Capturas p4-salto-*.png, p4-takle-*.png.
+- [x] **🌑 Mala sombra**: a un rival, PdG.Esp contra Res.Mt y el estado; a un aliado, directo («no hay nada que resistir»), y el jugador dueño lo ve
+  en su pantalla. Al empezar la ronda: «Mala sombra de Goblin: Rockardo tira Res.Mt 3 contra el Efecto especial 4 → pierde: baja 1 lugar» y el orden
+  cambia. Capturas p4-mala-sombra-*.png.
+- [x] **👊 Patotear** con dos aliados pegados al objetivo: «+1 PdG · +2 dados de daño». Capturas p4-patotear-*.png.
+- [x] **💧 Ondas del agua desde otra pantalla**: el GM arrastra un goblin por un charco y J1 ve las ondas; con el token oculto, J1 no ve ni el token ni
+  las ondas. Capturas p4-agua-J1-*.png. **Falló y se arregló**: mover un token **oculto** fuera de su turno anunciaba a todos «X actúa fuera de su
+  turno: se mueve» (Mesa y Crónica). Ahora no se anuncia si el token está oculto, en sigilo o con su fila del orden escondida (js/04).
+- [x] **🤐 Tótem de silencio**: el Capataz lo clava (elige casilla en su Rango); dentro del aura, una habilidad con SP pregunta «Silencio… ¿Usar igual?»
+  y el personaje muestra «Silenciado (tótem)». Capturas p4-totem-*.png.
+- [x] **🎯 Apuntar ×2 y Marcar con el potente**: disparo con arco al marcado → «+3 PdG, Crítico frecuente +1, Crítico potente +6, +1 de daño».
+  Captura p4-apuntar-marcar-critico.png.
+- [x] **🪝 El cuadro del duelo y el gancho**: en la pantalla del jugador el cuadro se esconde mientras corre la animación y vuelve al terminar.
+  Captura p4-gancho-J1-02035.png.
+- [x] **⬡ Nube tóxica de verdad**: el ⬡ y el texto en el goblin adentro (GM y J1); al salir se va. **Falló y se arregló**: con la nube invisible para
+  los jugadores, J1 igual veía «En la zona: Nube tóxica» en el goblin; ahora una zona que esa pantalla no ve no se muestra como estado (js/103).
+  Observación (no es error, es como dice el texto): la Nube no le pega al que ya estaba adentro al tirarla; recién al entrar o en el Mantenimiento.
+- [x] **🛡 Escudo de la falange de verdad**: «Muro de escudos (+2 Def)» con un aliado con escudo al lado, el 🛡 sobre el token en la pantalla del
+  jugador, y se va al separarse. Captura p4-falange-1-J1.png.
+- Sin probar: un **personaje** (no creep) con la habilidad Contraataque.

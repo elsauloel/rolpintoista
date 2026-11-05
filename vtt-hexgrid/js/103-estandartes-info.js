@@ -123,6 +123,9 @@ function zonasComoEstados(t){
   const k = t.col + ',' + t.fila, out = [], vistos = new Set();
   elementos.forEach(el => {
     if(!el || !el.zona || (el.oculto && !soyGM) || !zonaAplicaA(el, t)) return;
+    // 🙈 Una zona que esta pantalla no ve (invisible para los jugadores, o una trampa que todavía no saltó) no se anuncia como estado
+    // (2026-11-05, prueba en el mapa: la Nube tóxica invisible igual le aparecía al jugador como «En la zona: Nube tóxica»).
+    if(typeof puedeVerElemento === 'function' && !puedeVerElemento(el)) return;
     const sup = typeof superficieSpec === 'function' ? superficieSpec(el) : null;
     if(sup && sup.superficie && !sup.nombre && !sup.tiraPaso) return;   // el agua: no le hace nada
     if(!zonaCeldasSet(el).has(k)) return;

@@ -895,6 +895,10 @@ function avisarFueraDeTurno(tokenId, b){
   const fila = b && b.closest('.bot-fila, .accion-row, .cat-row');
   const accion = !b ? 'se mueve' : ((fila && fila.querySelector('.cat-nombre, .accion-nombre')) || b.querySelector('.bt-label') || b).textContent.trim().replace(/\s+/g, ' ').slice(0, 60);
   toast(`⏱ No es el turno de ${nombreDe(t)}: se puede igual y, si lo hace, queda en la Mesa`);
+  // 🙈 Un token oculto (o en sigilo, o con su fila del orden escondida) no se anuncia en la Mesa ni en la Crónica: los demás no lo ven
+  // (2026-11-05, prueba en el mapa: mover un creep oculto avisaba «X actúa fuera de su turno: se mueve» a los jugadores).
+  const fila0 = iniciativa.orden.find(o => o.id === tokenId);
+  if(t.oculto || (fila0 && fila0.oculto) || (typeof enSigilo === 'function' && enSigilo(t))) return;
   const p = {nombre: nombreDe(t), accion, hora: Date.now()};
   if(!b) fueraDeTurnoPublicar(p);   // moverse: ya se movió
   else fueraDeTurnoPendiente = p;

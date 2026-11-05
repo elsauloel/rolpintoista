@@ -63,7 +63,7 @@
 > borré ningún token». Revisar qué hace el ✕ de la iniciativa (y la sincronización tokens↔GM Tools, el Mapa 1 como `mapas/_principal`), arreglarlo
 > para que no se repita. **Devolver los 17 tokens a sus lugares** (copia: scratchpad pg/FIN2.json): **autorizado por el dueño** (2026-11-05: «volvé a
 > poner los 17 tokens cuando termines con la cola de pendientes de programación») → al final de la cola, después del punto 19.
-> 19) **Las 7 pruebas del mapa que no llegaron en la tercera tanda** (al final de la cola): Contraataque ganando el Parry aunque pierda el Bloqueo,
+> 19) ✅ (hecho 2026-11-05, cuarta tanda: todo probado con clics; dos arreglos chicos — ver `pruebas-en-el-mapa.md`) **Las 7 pruebas del mapa que no llegaron en la tercera tanda** (al final de la cola): Contraataque ganando el Parry aunque pierda el Bloqueo,
 > Devolver gentileza y el caso sin ninguna; el Salto de punta a punta (personaje y creep) y el Takle; la Mala sombra; Patotear; las ondas del agua vistas
 > desde otra pantalla; el Tótem de silencio; Apuntar y Marcar con el potente; el cuadro del duelo encima del gancho de Arrastrar.
 

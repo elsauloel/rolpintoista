@@ -6,7 +6,8 @@
 //     afecta a los tokens se ve como estado mientras el token está adentro»: `estadosDeArea(t)` arma esos estados a partir de la posición (no se
 //     guardan): los muestran los circulitos (js/88), el globo de estados del HUD (js/10) y la ficha lite (js/15). Son informativos: el bono del
 //     estandarte lo sigue sumando el duelo (`estandarteBonus`), el silencio lo sigue preguntando `silencioDeLugar` y el aura sanadora la sigue curando
-//     js/70; esto no suma nada dos veces.
+//     js/70; esto no suma nada dos veces. (2026-11-05, cola 17) También «🛡 Muro de escudos (+N Def)» (js/26 `muroDe`) y «⬡ En la zona: <nombre>»
+//     mientras está adentro de una zona persistente que le aplica, con qué le va a pasar y cuándo (`zonaEstadoDetalle`).
 
 // La vida de un inerte: el GM ve los números (su ficha privada); el resto, el porcentaje público.
 function inerteVida(id, t){
@@ -61,6 +62,75 @@ function estadosDeArea(t){
     if(cura) out.push({nombre: 'En el aura sanadora', polaridad: 'buff', derivado: true, area: true,
       detalle: `Dentro del aura sanadora de ${cura}: se cura en cada pulso. Se va al salir del aura.`});
   }
+  // 🛡 Muro de escudos (2026-11-05, dueño, cola 17): quien lleva el Escudo de la falange (`muroescudos`, js/26 `muroDe`) con un aliado con escudo al
+  // lado. Solo informa: el +Defensa lo suma el golpe (js/26) como siempre.
+  if(typeof muroDe === 'function'){
+    let m = null; try{ m = muroDe(t); }catch(err){}
+    if(m) out.push({nombre: `Muro de escudos (+${m.val} Def)`, polaridad: 'buff', derivado: true, area: true,
+      detalle: `Junto a ${m.nombre}, que lleva escudo: +${m.val} a la Defensa contra cada golpe (Escudo de la falange). Se va si deja de tener al lado un aliado con escudo.`});
+  }
+  // ⬡ Las zonas persistentes (2026-11-05, dueño, cola 17: «que esté el iconito de estás en una nube tóxica y uno pueda ver qué implica… al llegar tal
+  // momento se te va a aplicar tal efecto»): mientras está adentro, un estado que explica qué le va a pasar y cuándo. Lo que la zona le deja (el
+  // Veneno…) sigue entrando como siempre (js/08); esto no tira ni aplica nada.
+  out.push(...zonasComoEstados(t));
+  return out;
+}
+// Las celdas de cada zona, guardadas mientras el elemento no cambie (esto corre en cada cuadro del dibujo).
+const zonaCeldasCache = new WeakMap();
+function zonaCeldasSet(el){
+  let c = zonaCeldasCache.get(el);
+  if(!c){ c = new Set(celdasDeElemento(el).map(x => x.col + ',' + x.fila)); zonaCeldasCache.set(el, c); }
+  return c;
+}
+// Qué le pasa a `t` en la zona `el`, en palabras: cuándo, qué tira contra qué y qué le deja. → texto
+function zonaEstadoDetalle(el, t){
+  const nomZ = el.zonaNombre || 'la zona';
+  if(typeof zonaCuraDe === 'function' && zonaCuraDe(el)) return `Adentro de ${nomZ}: se cura en cada pulso de la zona. Se va al salir.`;
+  const spec = typeof zonaSpecDe === 'function' ? zonaSpecDe(el) : {};
+  const sup = typeof superficieSpec === 'function' ? superficieSpec(el) : null;
+  const lbl = st => (typeof ZONA_STAT_LABEL !== 'undefined' && ZONA_STAT_LABEL[st]) || st;
+  const que = [...(spec && spec.nombre ? [typeof EstadosAplicar !== 'undefined' && EstadosAplicar.texto ? EstadosAplicar.texto(spec) : spec.nombre] : []),
+    ...(el.zonaDanoDif ? [`daño (la diferencia de las tiradas${el.zonaDano ? ' + ' + el.zonaDano : ''})`] : el.zonaDano ? [`${el.zonaDano} de daño${el.zonaDanoTipo ? ' ' + el.zonaDanoTipo : ''}`] : [])].join(' y ');
+  // Cuándo.
+  let cuando;
+  if((sup && sup.tiraPaso) || spec.tiraPaso) cuando = 'En cada paso que dé adentro';
+  else {
+    const partes = [el.trampa ? 'al detonar y al entrar' : el.zonaCadaPaso ? 'al entrar (aunque solo la cruce)' : 'al entrar'];
+    if(el.zonaEnMantenimiento !== false) partes.push('en cada Mantenimiento (al pasar de ronda) mientras siga adentro');
+    else partes.push('no mientras se queda quieto adentro');
+    cuando = partes.join(' y ');
+    cuando = cuando[0].toUpperCase() + cuando.slice(1);
+  }
+  // Qué tira.
+  let tira = '';
+  if(el.zonaResistStat){
+    const contra = el.zonaTiraStat && Number.isFinite(el.zonaTiraValor) ? `una tirada de ${lbl(el.zonaTiraStat)} de la zona (${el.zonaTiraValor}; el empate gana la zona)`
+      : Number.isFinite(el.zonaResistValor) ? String(el.zonaResistValor) : '';
+    tira = `tira ${lbl(el.zonaResistStat)}${contra ? ' contra ' + contra : ''}: si no resiste, ${que || 'le pasa lo que deja la zona'}`;
+  }else tira = que ? `le pasa: ${que}` : 'nada que tirar';
+  const lineas = [`${cuando}, ${tira}.`];
+  if(spec.nombre && (spec.sumaUno || spec.resetea)) lineas.push(`Si ya tiene ${spec.nombre}, en vez de tirar le suma 1 stack.`);
+  else if(spec.nombre && spec.unaVez) lineas.push(`Una vez que tiene ${spec.nombre}, la zona ya no le vuelve a tirar.`);
+  if(spec.nombre && spec.renuevaPaso) lineas.push(`Con ${spec.nombre} puesto, cada paso adentro se lo renueva.`);
+  if(typeof alturaDe === 'function' && alturaDe(el) === 'piso') lineas.push('Es del piso: volando o levitando no lo toca.');
+  const turnos = Math.round(num(el.turnos));
+  if(turnos > 0) lineas.push(`La zona dura ${turnos} turno${turnos === 1 ? '' : 's'} más.`);
+  lineas.push('Este aviso se va al salir de la zona.');
+  return lineas.join(' ');
+}
+function zonasComoEstados(t){
+  if(typeof elementos === 'undefined' || typeof zonaAplicaA !== 'function' || !t.fichaId) return [];
+  const k = t.col + ',' + t.fila, out = [], vistos = new Set();
+  elementos.forEach(el => {
+    if(!el || !el.zona || (el.oculto && !soyGM) || !zonaAplicaA(el, t)) return;
+    const sup = typeof superficieSpec === 'function' ? superficieSpec(el) : null;
+    if(sup && sup.superficie && !sup.nombre && !sup.tiraPaso) return;   // el agua: no le hace nada
+    if(!zonaCeldasSet(el).has(k)) return;
+    const nomZ = el.zonaNombre || 'zona';
+    if(vistos.has(nomZ)) return;
+    vistos.add(nomZ);
+    out.push({nombre: `En la zona: ${nomZ}`, polaridad: el.zonaAmiga && !el.zonaDano && !el.zonaDanoDif ? 'buff' : 'debuff', derivado: true, area: true, detalle: zonaEstadoDetalle(el, t)});
+  });
   return out;
 }
 // Lo mismo, a partir de la ficha (para la ficha lite: `ref` = el fichaId del token).

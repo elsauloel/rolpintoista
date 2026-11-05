@@ -52,7 +52,7 @@
 > que quedaron afuera del estado derivado. 15) ⏳ (no se llegó en la tercera tanda, 2026-11-05) **Probar el Tótem de silencio en el mapa** (solo se probó con la prueba automática). 16) ✅ (hecho 2026-11-05, `vtt-hexgrid/js/105-salto-casilla.js` `saltoSinAtacar`; falta probarlo en el mapa, ver docs/pruebas-en-el-mapa.md) **🦘 El Salto, en dos tiempos** (dueño, 2026-11-05): al caer, **siempre pregunta «¿Atacar?»**; con Sí, si hay un solo rival
 > pegado se abre el ataque directo, si hay varios «Elegí el objetivo», y el ataque lleva el bono propio del Salto (+1 PdG, frecuente +1). Se puede
 > **saltar sin atacar**. El **costo se divide**: primero el salto (lo de la habilidad), después el ataque (sus No2, solo si ataca). Personajes y creeps.
-> 17) **⬡ Áreas como estados, lo decidido caso por caso** (dueño, 2026-11-05): **Muro de escudos del Escudo de la falange** → estado derivado
+> 17) ✅ (hecho 2026-11-05, `vtt-hexgrid/js/103-estandartes-info.js` `zonasComoEstados` / `zonaEstadoDetalle` y el Muro con `muroDe`; probado con tokens de mentira, falta con una zona de verdad: docs/pruebas-en-el-mapa.md) **⬡ Áreas como estados, lo decidido caso por caso** (dueño, 2026-11-05): **Muro de escudos del Escudo de la falange** → estado derivado
 > «🛡 Muro de escudos (+2 Def)» mientras tengas al lado un aliado con escudo (solo informa; el golpe ya lo suma). **Zonas persistentes** → estado
 > derivado «⬡ En la <zona>» mientras estés adentro, que **explique qué te va a pasar y cuándo** (p. ej. «al empezar la ronda / al moverte adentro, tirás
 > Res.Esp: si perdés, Veneno ×3»), además del estado que ya te deja al entrar. **El miedo**: sin respuesta todavía (¿queda como está?).

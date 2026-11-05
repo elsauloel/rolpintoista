@@ -38,6 +38,7 @@ const ICONOS_ESTADO = {
   'silencio': {ic: '🤐'}, 'silenciado': {ic: '🤐'},
   // 🚩 Los estados de las áreas (js/103, 2026-11-05): se ven mientras el token está adentro.
   'bajo el estandarte': {ic: '🚩'}, 'en el aura sanadora': {ic: '✚'},
+  'muro de escudos': {ic: '🛡️'}, 'en la zona': {ic: '⬡'},   // (2026-11-05, cola 17: «Muro de escudos (+2 Def)», «En la zona: Nube tóxica»)
   'ceguera': {ic: '🙈'}, 'cegado': {ic: '🙈'}, 'cegada': {ic: '🙈'},
   'deslumbrado': {ic: '😵‍💫'},
   'inmovilizado': {ic: '⛓️'}, 'agarrado': {ic: '⛓️'},

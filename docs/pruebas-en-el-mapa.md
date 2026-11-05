@@ -1648,3 +1648,8 @@ y al empezar la ronda las tiradas de Res.Mt contra el Ef.Esp de los rivales pega
   a uno → «¿Atacar?» → **No**: la Mesa dice «saltó y no atacó — se le devolvieron N No2» y el cooldown / SP de la habilidad sigue cobrado (mirar
   los No2 y los turnos de espera del creep en sus Acciones, y los No2/SP del personaje en la Botonera); **Sí** con uno: el duelo directo con +1 PdG
   y frecuente +1; **Sí** con dos: «Elegí el objetivo», y Esc ahí = no ataca (devuelve los No2). El aplastante: aplasta y después pregunta.
+- [ ] ⬡ **Áreas como estados, de verdad** (2026-11-05, cola 17): se probó con tokens y una nube de mentira (sin escribir en Firebase; capturas
+  `z-estados-*`): el ⬡ sobre los dos goblins de la nube y el 🛡 sobre el personaje con el Escudo de la falange junto a uno con escudo. Falta: una
+  Nube tóxica tirada de verdad (el circulito ⬡ y, al pasar el mouse / en el globo de estados y en la ficha lite, el texto «Al entrar y en cada
+  Mantenimiento… tira Res.Esp…»), que se vaya al salir, que el jugador no vea el de una zona oculta, y el Escudo de la falange de verdad (que se
+  vaya al separarse del compañero).

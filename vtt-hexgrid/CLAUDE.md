@@ -1948,8 +1948,16 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   aliado en el aura de uno en pie que no es tótem; el mejor), «Silenciado (tótem)» (bando distinto dentro del tótem), «En el aura sanadora» (creep a
   `AURA_CURA_RADIO` o menos de otro con Aura sanadora, js/70). Se suman al final de `hudDatos(t).estados` (marca ⬡ sin botones, así no corre los
   índices de edición), a los circulitos (js/88: `iconosEstadosDibujar`; `iconosLista` deja pasar `derivado` si es `area`) y a la ficha lite (js/15,
-  `estadosDeAreaRef(ref)`). Son informativos: el bono lo sigue sumando `estandarteBonus` en el duelo y el silencio `silencioDeLugar`. No se agregan:
-  las zonas persistentes (ya ponen su estado al entrar), el miedo (es un estado propio) ni el Muro de escudos (adyacencia en el golpe). Prueba pura en
+  `estadosDeAreaRef(ref)`). Son informativos: el bono lo sigue sumando `estandarteBonus` en el duelo y el silencio `silencioDeLugar`. **Desde el 2026-11-05 (cola 17, dueño:
+  «que esté el iconito de estás en una nube tóxica y uno pueda ver qué implica… al llegar tal momento se te va a aplicar tal efecto»)** también:
+  «Muro de escudos (+N Def)» (🛡, buff) para quien tiene `muroescudos` (Escudo de la falange) mientras `muroDe(t)` (js/26) encuentre un aliado con
+  escudo al lado — solo informa, el +Defensa lo sigue sumando el golpe — y «En la zona: <nombre>» (⬡) por cada zona persistente que le aplica
+  (`zonaAplicaA`, js/08) y tiene su casilla adentro (`zonasComoEstados`; celdas en caché por elemento, `zonaCeldasSet`): `zonaEstadoDetalle(el, t)`
+  explica cuándo (al entrar / aunque solo la cruce `zonaCadaPaso` / en cada paso las superficies / en cada Mantenimiento si `zonaEnMantenimiento` no
+  es false), qué tira contra qué (`zonaResistStat` contra `zonaResistValor` o contra la tirada de la zona `zonaTiraStat`), qué le deja (estado con
+  `EstadosAplicar.texto`, daño), el «+1 stack» (`sumaUno`), el `unaVez`, si es del piso y los turnos que le quedan. El agua sin efecto no cuenta;
+  la zona oculta solo la ve el GM. Lo que la zona deja (el Veneno…) sigue entrando como siempre. Íconos en js/88 (`'muro de escudos'`,
+  `'en la zona'`). No se agrega el miedo (es un estado propio; el dueño todavía no decidió). Prueba pura en
   comun/pruebas.html (carga el archivo con `fetch` y le arma un tablero a mano).
 - **☄ El Meteoro** (2026-10-24, Mago; antes «Lluvia de meteoros»; `js/74-meteoro.js`): `marcarMeteoro(sc, h)` (desde `ui.meteoro` de js/12) pide el centro dentro del Rango y guarda
   `sc.meteoro = {col, fila, radio, fisico, fuego, paso, mant}`; lo público lleva `meteoroCol/Fila/Radio` (la sombra, `meteoroDibujar` desde js/05). La pantalla del GM

@@ -1684,3 +1684,12 @@ y al empezar la ronda las tiradas de Res.Mt contra el Ef.Esp de los rivales pega
 - [x] **🛡 Escudo de la falange de verdad**: «Muro de escudos (+2 Def)» con un aliado con escudo al lado, el 🛡 sobre el token en la pantalla del
   jugador, y se va al separarse. Captura p4-falange-1-J1.png.
 - Sin probar: un **personaje** (no creep) con la habilidad Contraataque.
+
+### 2026-11-05 · 🙈 Token oculto fuera de turno: aviso solo al GM (commit bfc5e6d1), con clics (GM, J1 y J2 en «Encuentro 2»)
+- [x] **En sigilo, arrastrando** (Rockardo (copia) de J1, fuera de su turno): al GM le llega el toast y la Crónica «🙈 … (oculto) actúa fuera de su
+  turno: se mueve»; J1 ve su toast «… como está oculto, solo le llega el aviso al GM»; J2 no ve nada (ni Crónica ni Mesa). p5-a-sigilo-arrastra-*.png.
+- [x] **En sigilo, con 🦶 Mover libre**: igual, con «se mueve (con 🦶 Mover libre)». p5-b-sigilo-libre-*.png.
+- [x] **A la vista, arrastrando**: sigue saliendo para todos «⏱ … actúa fuera de su turno: se mueve». p5-c-visible-*.png.
+- [x] **A la vista, con Mover libre**: no se anuncia (como antes). p5-d-visible-libre-*.png.
+- Nota: un PJ **oculto** (el ojo del GM) no se le dibuja ni a su dueño, así que el jugador no lo puede arrastrar; el caso real es el sigilo.
+- Observación (ya estaba): al entrar en Mover libre estando en sigilo, la Mesa dice para todos «⚠ X (en sigilo) entró en Mover libre».

@@ -705,13 +705,27 @@ los niveles 2 a 5 completos (atributos, habilidad, pasiva, equipo concreto, cons
   Consumible: Pergamino grupal de Furia de Combate.
 - Números (nv2 → nv3): daño fijo 11 → 14 (Fue + hacha) · PdG/Parry 7/7 → 8/8 · Bloqueo 10 → 11 · Res.Esp/Res.CC 8/8 → 9/9 · Def 6 = 6.
 
-### W1 Hachero · nivel 4 (en revisión, 2026-11-05)
+### W1 Hachero · nivel 4 (aprobado 2026-11-05; ⚠ reordenado, ver «Ruta final» abajo)
 - ⚔ **Sed de batalla, nueva pasiva en el pool** (dueño: «le dejamos Sed de sangre y sumamos Sed de batalla como pasiva, que la puedan elegir los
   jugadores también»): cuando un rival cae por tu golpe, ganás **3 No2, aunque pases del máximo**, y
   te llega un aviso (dueño: «2 me parece muy poco para un punto de Job, y que suceda tan poco»). 1 Job. Automatizada en el mapa (vtt-hexgrid/js/102). El W1 nivel 4 se queda con **Sed de sangre**.
 - Propuesta: Fue 12 · Con 10 · Agi 8 · Des 8 · Esp 4 → vida 55 (50 + 5 de la cota), No2 8. Equipo: Hacha de guerra ligera (B) · **Cota de malla
   fina** (B) · Cofia de anillas sueltas · Grebas de cuero · **Guanteletes de hierro**. Habilidades: + **Remate** (cd 3). Pasivas: Golpe fuerte ·
   **Sed de sangre**. Números (nv3 → nv4): Def 6 → 8 · Eva 6 → 8 · Bloqueo 11 → 13 · daño fijo 14 → 15 · Res. crít. T4/T6/T8 2/1/0 → 2/2/1.
+
+### ✅ W1 Hachero · ruta final, niveles 1 a 5 (aprobada 2026-11-05)
+- Dueño: «Partir en dos, reemplazarlo por alguna que sea del pool» → **Arte de la guerra**; «lo pondría en un nivel anterior» → opción A: Arte
+  de la guerra en el nivel 4 y Remate + Sed de sangre en el nivel 5. Casco del nivel 5: **Casco de bandas remachadas** (Def. esp. queda en 0:
+  su punto débil, la magia, a propósito).
+| Nv | Fue/Con/Agi/Des/Esp · vida · No2 | Habilidad nueva | Pasiva nueva | Equipo |
+|---|---|---|---|---|
+| 1 | 9/7/6/7/4 · 35 · 6 | Pegar fuerte (cd 2) · Romper armadura (cd 3) | — | Hacha · Cota de malla de hierro · Cofia de anillas sueltas |
+| 2 | 10/8/7/7/4 · 40 · 7 | Barrido (cd 3) | Golpe fuerte (+1 Dmg) | + Grebas de cuero |
+| 3 | 11/9/7/8/4 · 45 · 7 | Golpe demoledor (cd 3, lenta) | — | Hacha → **Hacha de guerra ligera** (B) |
+| 4 | 12/10/8/8/4 · 55 · 8 | **Arte de la guerra** (Flash +3, cd 2) | — | Cota de hierro → **Cota de malla fina** (B) · + Guanteletes de hierro |
+| 5 | 13/11/8/9/4 · 65 · 8 | **Remate** (cd 3) | **Sed de sangre** | Cofia → **Casco de bandas remachadas** (B) · + Botas de estibador |
+Consumible en todos: Pergamino grupal de Furia de Combate. Nv5 (números del juego): Def 10 · daño fijo 16 · PdG/Parry 9/9 · Bloqueo 14 · Res.CC 12 ·
+Res. crít. T4/T6/T8 3/2/1 · Def. esp. 0 · Res.Mt 4. **Pendiente: cargarlo en el pool esencial (niveles 2 a 5).**
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
@@ -772,7 +786,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 
 | Línea | Nivel 1 | Nivel 2 | Nivel 3 | Nivel 4 | Nivel 5 |
 |---|---|---|---|---|---|
-| W1 | ✅ (2026-11-02) | | | | |
+| W1 | ✅ (2026-11-02) | ✅ (2026-11-05) | ✅ (2026-11-05) | ✅ (2026-11-05) | ✅ (2026-11-05) |
 | T1 | ✅ (2026-11-02) | | | | |
 | T2 | ✅ (2026-11-02; rehecho 2026-11-03) | | | | |
 | H1 | ✅ (2026-11-03) | | | | |

@@ -19,13 +19,13 @@ const Revivir = (() => {
     const tope = n(max);
     const conPct = p => tope > 0 ? `${p} % (${f(pct(tope, p))} de ${f(tope)})` : `${p} %`;
     const titila = o.titila !== false ? ' Queda Titilando (invulnerable) hasta su próximo turno.' : '';
-    const op = await Cf.elegir(`¿Con cuánta vida vuelve ${nombre}?${titila}`, {titulo: '✚ Revivir', icono: '✚', no: 'Cancelar', opciones: [
+    const op = await Cf.elegir(`¿Con cuánta vida vuelve ${nombre}?${titila}`, {titulo: 'Revivir', icono: '✚', no: 'Cancelar', opciones: [
       {valor: '25', texto: conPct(25)}, {valor: '50', texto: conPct(50)}, {valor: '100', texto: tope > 0 ? `Toda (${f(tope)})` : 'Toda'},
       {valor: 'num', texto: '✍ Escribir cuánta'}]});
     if(!op) return null;
     let val;
     if(op === 'num'){
-      const txt = await Cf.texto(`¿Con cuánta vida vuelve ${nombre}?`, {titulo: '✚ Revivir', icono: '✚',
+      const txt = await Cf.texto(`¿Con cuánta vida vuelve ${nombre}?`, {titulo: 'Revivir', icono: '✚',
         valor: String(tope > 0 ? Math.max(1, Math.floor(tope / 2)) : 1), si: 'Revivir', max: 4});
       val = Math.round(n(txt));
       if(!(val > 0)) return null;

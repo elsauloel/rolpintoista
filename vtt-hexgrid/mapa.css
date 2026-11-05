@@ -765,3 +765,10 @@ body.con-ruta .toast{bottom:auto;top:74px}
 .desplegable-lista .pj-inactivo .pj-nombre{text-decoration:line-through}
 /* La lista de 👥 Personajes se abre hacia la izquierda (2026-10-16): el botón está pegado al borde derecho y los ✓/💤 y ✕ quedaban afuera. */
 #personajes-lista{left:auto;right:0}
+
+/* ✚ Revivir que se distinga (dueño, 2026-11-05: «fondo verde, algún tipo de animación… como solo aparece cuando estás muerto, para que se distinga»):
+   el ✚ del anillo del token y el de la pantalla de muerte, verdes y latiendo con un halo. */
+#hud [data-hud-boton="revivir"]{background:#2E8B66!important;border-color:#6FCB9F!important;color:#fff!important;font-weight:700;animation:revivir-latido 1.6s ease-in-out infinite}
+#muerte-mapa-revivir{background:#2E8B66!important;border-color:#6FCB9F!important;animation:revivir-latido 1.6s ease-in-out infinite}
+@keyframes revivir-latido{0%,100%{box-shadow:0 0 0 0 rgba(79,168,140,.75),0 4px 16px rgba(0,0,0,.45);filter:brightness(1)}50%{box-shadow:0 0 0 9px rgba(79,168,140,0),0 0 24px 6px rgba(111,203,159,.6);filter:brightness(1.18)}}
+@media (prefers-reduced-motion:reduce){#muerte-mapa-revivir,#hud [data-hud-boton="revivir"]{animation:none!important}}

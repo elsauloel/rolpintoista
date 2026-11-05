@@ -364,11 +364,15 @@
 >   de viento (creep). **Pegar las reglas** (`firebase/firestore.rules`, «El viento que despeja» con `zona`) para que lo haga un jugador sobre una nube
 >   ajena; sin pegarlas, el GM igual puede (la vuelve a crear con las casillas que quedan). Idea: un empujón de viento de un solo objetivo podría
 >   despejar las casillas por donde pasa el empujado (no se hizo).
-> - [ ] **⬡ Seleccionar un hexágono libre y ver qué lo afecta (2026-10-26, dueño: «que uno pueda seleccionar un hexágono libre y que donde hoy muestra… el
+> - [x] **⬡ Seleccionar un hexágono libre y ver qué lo afecta (2026-10-26; hecho 2026-11-05, dueño: «que uno pueda seleccionar un hexágono libre y que donde hoy muestra… el
 >   nombre, que diga hexágono libre… si ese hexágono está siendo afectado por algún efecto público, por ejemplo, algún aura, algún muro, alguna zona… que te
 >   permita ver también los distintos efectos aplicados a ese hexágono. Déjalo en pendientes y después lo desarrollamos»):** un clic en una casilla sin token
 >   la selecciona; el cartel de arriba a la derecha (`#token-etiqueta`, el del token seleccionado) dice «Hexágono libre» y lista lo público que la toca:
 >   auras, zonas (con su estado y turnos), muros y Sólidos, fuego, hielo o agua, la luz, una trampa ya vista… Solo lo que esa pantalla puede ver.
+>   **Cómo quedó** (`vtt-hexgrid/js/104-hex-info.js` + `comun/hex-info.js`): un clic quieto en una casilla sin token y sin herramienta abre el
+>   cartel «⬡ Hexágono libre / bloqueado» debajo del nombre, con una línea e ícono por cosa (zonas, auras de estandarte / tótem / aura sanadora,
+>   trampas que ves, fuego, hielo, agua, Sólidos, paredes, portales, nubes, luces, el arma en el piso, el Acelerador, la luz de la escena). Con niebla,
+>   una casilla sin explorar dice solo «Sin explorar». Esc, ✕ o un clic afuera lo cierran. Ver vtt-hexgrid/CLAUDE.md.
 > - [x] (2026-10-31, descartada por el dueño: «redundante con la del Debuffer», la Aguja siniestra) **🗡🌑 Arma sombría, habilidad de Support para creeps.**
 > - [x] **💉 Adrenalina y 🔋 Pila pila, Support (2026-11-01, hecho):** el dueño mantuvo la **Adrenalina del jugador** (auditada y automatizada: estado Adrenalina, +1 Des/Fue/Agi 2 turnos, acumulable, 5 SP, solo en tu turno) y la llevó a creeps (1 No2 + 5 SP o cooldown 4, reemplaza a la vieja de Hypeado). La idea 13 (+PdG y −2 cooldowns o +4 SP) se hizo aparte como **Pila pila** (nombre del dueño): +2 PdG hasta el final de su próximo turno, Flash, 1 No2 y 2 SP o cooldown 3. Ver `docs/diseno-roles-creep.md` (idea 13). Queda ver si Pila pila se adapta al jugador.
 > - [ ] **🐾 Nombres para las versiones «bestia» de algunas habilidades de creep (2026-10-25, dueño: «anotá en pendientes buscar nombres para las versiones

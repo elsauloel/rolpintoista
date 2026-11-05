@@ -805,6 +805,7 @@ function dibujarLienzo(){
 
   if(typeof curaDibujarAuras === 'function' && curaDibujarAuras(z)) animando = true;   // ✨ las auras sanadoras, debajo de los tokens (js/70)
   if(typeof estandarteDibujar === 'function' && estandarteDibujar(z)) animando = true;   // 🚩 el aura de un estandarte de guerra (js/73)
+  if(typeof hexInfoDibujar === 'function') hexInfoDibujar(z);   // ⬡ la casilla elegida para ver qué la afecta (js/104)
   if(typeof meteoroDibujar === 'function' && meteoroDibujar(z)) animando = true;   // ☄ la sombra de un meteoro por caer (js/74)
   if(typeof flechitasRevisar === 'function') flechitasRevisar();   // ⬆⬇ los estados nuevos de cada token, para las flechitas (js/75)
   if(typeof iconosLimpiar === 'function') iconosLimpiar();   // 🫧 el orden de los íconos de estados de los tokens que ya no están (js/88)

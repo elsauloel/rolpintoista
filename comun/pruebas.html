@@ -45,6 +45,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-transfusion.js?v=20261103fx2"></script>
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
+<script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
 <script src="combatiente.js?v=20261105orden"></script>
 <script src="creep-calculo.js?v=20261103t20"></script>
@@ -7254,6 +7255,61 @@ prueba('🚩 Estandartes (2026-11-05): las áreas se ven como estados según dó
   igual(nom('c1'), '');
 });
 /* ---------- Resultado ---------- */
+grupo('⬡ Qué afecta a una casilla (comun/hex-info.js, 2026-11-05)');
+prueba('casilla sin nada: «Hexágono libre» y «Nada la afecta»', () => {
+  const d = HexInfo.armar({items: []});
+  igual(d.titulo, 'Hexágono libre'); igual(d.items.map(x => x.titulo), ['Nada la afecta']);
+});
+prueba('sin explorar: solo eso, aunque traiga cosas', () => {
+  const d = HexInfo.armar({sinExplorar: true, items: HexInfo.describir({fuego: true, fuegoDano: 7})});
+  igual(d.titulo, 'Hexágono sin explorar'); igual(d.items.length, 1); igual(d.items[0].icono, '🌫');
+});
+prueba('zona con estado, daño y turnos que quedan', () => {
+  const [x] = HexInfo.describir({zona: true, zonaNombre: 'Nube tóxica', zonaEstado: JSON.stringify({nombre: 'Veneno', stacks: 3}), zonaDano: '1d6', zonaDanoTipo: 'Tóxico'}, {quedan: 2});
+  igual(x.icono, '🌫'); igual(x.titulo, 'Zona · Nube tóxica');
+  cierto(/aplica Veneno/i.test(x.detalle) && /1d6 de daño de Tóxico/.test(x.detalle) && /Quedan 2 turnos/.test(x.detalle), x.detalle);
+});
+prueba('un turno: «Queda 1 turno»', () => {
+  const [x] = HexInfo.describir({fuego: true, fuegoDano: 5}, {quedan: 1});
+  cierto(/Queda 1 turno\./.test(x.detalle), x.detalle); igual(x.icono, '🔥');
+});
+prueba('superficies: hielo y charco de agua (js/50)', () => {
+  igual(HexInfo.describir({zona: true, zonaEstado: '{"superficie":"hielo","tiraPaso":true}'})[0].titulo, 'Hielo');
+  igual(HexInfo.describir({zona: true, zonaEstado: '{"superficie":"agua"}'})[0].icono, '💧');
+});
+prueba('trampa armada y detonada; el ⚙ del detalle se corta', () => {
+  const [a] = HexInfo.describir({trampa: true, trampaNombre: 'Cepo', trampaDetalle: 'Muerde la pierna. ⚙ datos internos'});
+  igual(a.titulo, 'Trampa armada · Cepo'); igual(a.detalle, 'Muerde la pierna.');
+  igual(HexInfo.describir({trampa: true, disparada: true})[0].icono, '💥');
+});
+prueba('sólido y colisión bloquean: «Hexágono bloqueado», primero en la lista', () => {
+  const items = [...HexInfo.describir({zona: true, zonaNombre: 'Z'}), ...HexInfo.describir({solido: true})];
+  const d = HexInfo.armar({items});
+  igual(d.titulo, 'Hexágono bloqueado'); igual(d.items[0].titulo, 'Sólido');
+  igual(HexInfo.describir({colision: true, solido: true}).map(x => x.titulo), ['Pared del mapa']);
+});
+prueba('forma común transitable y el aviso de invisible para jugadores', () => {
+  const [x] = HexInfo.describir({tipo: 'flor'}, {oculto: true});
+  igual(x.titulo, 'Forma transitable'); igual(x.oculto, true);
+});
+prueba('portal, Town portal, nube, luz, arma y Acelerador', () => {
+  igual(HexInfo.describir({portal: true})[0].titulo, 'Portal');
+  igual(HexInfo.describir({townPortal: true, portal: true})[0].titulo, 'Town portal');
+  igual(HexInfo.describir({niebla: true})[0].icono, '☁');
+  igual(HexInfo.describir({zona: true, zonaLuz: true})[0].icono, '💡');
+  igual(HexInfo.describir({arma: true, armaNombre: 'Hacha'})[0].titulo, 'Hacha');
+  cierto(/2 No2/.test(HexInfo.describir({acelerador: 2})[0].detalle));
+});
+prueba('sin repetidos, ordenado, y «Fuera de la vista» al final', () => {
+  const aura = {icono: '🚩', titulo: 'Aura de X', detalle: 'd', clase: 'aura', orden: 6};
+  const d = HexInfo.armar({items: [aura, ...HexInfo.describir({fuego: true}), aura], recordada: true});
+  igual(d.items.map(x => x.icono), ['🔥', '🚩', '👁']);
+});
+prueba('zonaEstado roto no rompe', () => {
+  igual(HexInfo.describir({zona: true, zonaEstado: '{roto'})[0].titulo, 'Zona · efecto persistente');
+  igual(HexInfo.describir(null), []);
+});
+
 Promise.all(pendientes).then(() => {
 const malas = resultados.filter(r => !r.ok);
 const res = document.getElementById('resumen');

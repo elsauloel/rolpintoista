@@ -2069,3 +2069,19 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   pantalla (`bnManejo`: el dueño, o el GM con 🎮 el control), pasa a los ~1,5 s por `editarPersonajeMapa` con `FichaAcciones.revisarAnkh` (Fénix,
   Pacto, Ankh del cinturón) + `revisarMuerte` (inconsciente, 5 turnos), y lo anuncia. Antes eso solo lo hacía la ficha cuando su dueño tocaba algo;
   «HP directo» (`cambiarVidaPj`) no revisaba nada y un golpe (`danioPj`) revisaba Pacto y Fénix pero no dejaba caído. Un intento cada 30 s como mucho.
+- **⬡ Qué afecta a una casilla** (2026-11-05, dueño: «que uno pueda seleccionar un hexágono libre y que donde hoy muestra… el nombre, que diga hexágono
+  libre… y los distintos efectos aplicados a ese hexágono»; `js/104-hex-info.js` + `comun/hex-info.js`). **Gesto**: un clic quieto (se mueve menos de 5 px)
+  en una casilla **sin token**, sin herramienta prendida (`herramientaActiva`), sin estar eligiendo un destino (`elegirDestinoCb`), colocando un token
+  (`colocando`), en Mover libre ni creando una forma, y sin Alt/Ctrl/Shift. Si en la casilla hay un elemento, se selecciona como siempre (js/06) y además
+  sale el cartel. No toca js/06: escucha `pointerdown`/`pointerup` del lienzo en captura, así el paneo, el ping (clic derecho), mover, las herramientas y
+  la elección de objetivos siguen igual. Se cierra con Esc, el ✕, un clic afuera del lienzo, un clic en un token o seleccionando uno. **El cartel**
+  (`#hex-info`, mismo estilo que `#token-etiqueta`/`#elemento-etiqueta`, debajo de ellos) se rearma cada 0,5 s mientras está abierto y la casilla se
+  marca en el lienzo con un borde dorado punteado (`hexInfoDibujar`, gancho en js/05). Título «Hexágono libre», «Hexágono bloqueado» (Sólido o pared) o
+  «Hexágono sin explorar». **Qué lista**: los elementos que la cubren y `puedeVerElemento` deja ver (las trampas ajenas sin descubrir no; un invisible
+  solo el GM o su dueño, marcado «👁 los jugadores no lo ven», igual que una trampa del GM sin descubrir), con los turnos que les quedan (la misma cuenta
+  que el ⏳ de js/05); las auras de estandarte y tótem (`estandarteInfo`, js/73/103) y el aura sanadora (js/70) de tokens que esa pantalla ve (ocultos y
+  tapados por la niebla, no); y, con niebla de guerra y una luz distinta de la normal, la luz de la escena. Con la niebla aplicada (jugadores, o el GM
+  «como jugador»), una casilla que nunca se vio dice solo «🌫 Sin explorar» y una ya vista que ahora nadie mira suma «👁 Fuera de la vista».
+  `HexInfo.describir(el, {quedan, oculto})` y `HexInfo.armar({items, sinExplorar, recordada})` son puras (pruebas en `comun/pruebas.html`): un elemento
+  nuevo con efecto se cuenta sumando su línea en `describir`. Probado en «Claude · pruebas» como GM y J1 (capturas `hex-GM-*`, `hex-J1-*`): el jugador no
+  ve la trampa del GM ni la forma invisible.

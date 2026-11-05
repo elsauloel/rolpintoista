@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="mapa.css?v=20261105rv">
+<link rel="stylesheet" href="mapa.css?v=20261105hex">
 </head>
 <body>
 <header>
@@ -49,13 +49,14 @@
       <span class="combo"><kbd>Ctrl</kbd> + <kbd>B</kbd></span><span>Abrir o cerrar la bitácora</span>
       <span class="combo"><kbd>Ctrl</kbd> + <kbd>L</kbd></span><span>Modo lentes: ver los conos de detección (prender / apagar)</span>
       <kbd>Enter</kbd><span>Crear la forma en borrador · confirmar un movimiento</span>
-      <kbd>Esc</kbd><span>Cancelar y salir: herramienta, borrador, Mover libre, colocar un token, menús, Botonera</span>
+      <kbd>Esc</kbd><span>Cancelar y salir: herramienta, borrador, Mover libre, colocar un token, menús, Botonera, el cartel ⬡ de una casilla</span>
       <kbd>Supr</kbd><span>Borrar el token, dibujo o forma seleccionado</span>
     </span>
     <b class="atajos-titulo">Con el mouse</b>
     <span class="atajos">
       <kbd>Clic en un token</kbd><span>Su menú de combate: vida, SP, No2, estados y Botonera; el ⋯ abre el resto (ficha, tarjeta, ajustes, mover libre, equipo) y el ↩ vuelve</span>
       <kbd>Clic der.</kbd><span>Ping para todos · salir de la herramienta activa · cancelar un arrastre o colocar un token</span>
+      <kbd>Clic en una casilla</kbd><span>⬡ Sin token y sin herramienta: qué la afecta (zonas, auras, trampas que ves, terreno, fuego, agua, portales…). <kbd>Esc</kbd> o un clic afuera lo cierra</span>
       <kbd>Rueda</kbd><span>Zoom</span>
       <kbd>Arrastrar</kbd><span>Mover el token, o desplazar el mapa si arrastrás el fondo</span>
     </span>
@@ -108,6 +109,7 @@
     <div id="hud" hidden></div>
     <div id="token-etiqueta" hidden></div>
     <div id="elemento-etiqueta" hidden></div>
+    <div id="hex-info" hidden></div>
     <div id="colocando-aviso" hidden></div>
     <div id="lentes-aviso" hidden>👓 Seleccioná un token para ver su zona de riesgo, o tocá 👁 (debajo del 👓) para ver todas.</div>
     <div id="ruta-confirmar" hidden>
@@ -270,7 +272,7 @@
 <script src="js/02-modo-niebla-sigilo.js?v=20261103entero"></script>
 <script src="js/03-asistente-trampa.js?v=20261103entero"></script>
 <script src="js/04-mantenimiento-e-iniciativa.js?v=20261105orden"></script>
-<script src="js/05-vista-y-dibujo.js?v=20261105area"></script>
+<script src="js/05-vista-y-dibujo.js?v=20261105hex"></script>
 <script src="js/06-mouse.js?v=20261103tf1"></script>
 <script src="js/07-tokens-y-elementos.js?v=20261103fade"></script>
 <script src="js/08-mover-trampas-y-zonas.js?v=20261103t13"></script>
@@ -372,6 +374,8 @@
 <script src="js/101-creeps-mapas-sync.js?v=20261105sync"></script>   <!-- 🔗 El token de un creep y su mapa en GM Tools, vinculados (2026-11-05) -->
 <script src="js/102-orden-turnos.js?v=20261105mufa"></script>   <!-- 🎺🔄🥁🩸🐈‍⬛ Toque de carga, Cambio de guardia, Marcar el ritmo, Sed de sangre y la Mufa (2026-11-05) -->
 <script src="js/103-estandartes-info.js?v=20261105est"></script>   <!-- 🚩 Estandartes: qué hacen (globito) y sus áreas como estados (2026-11-05) -->
+<script src="../comun/hex-info.js?v=20261105hex"></script>
+<script src="js/104-hex-info.js?v=20261105hex"></script>   <!-- ⬡ Clic en una casilla: qué la afecta (2026-11-05) -->
 <script src="js/93-atajos.js?v=20261103hk"></script>
 <script src="../comun/rodillo.js?v=20261018b"></script>
 </body>

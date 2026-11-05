@@ -84,3 +84,4 @@ Equipo Común y Bueno terminado (escudos, cascos, torso blando, torso rígido, m
 estados, pasivas y creeps. Ojo: el texto de la pasiva Temple todavía explica la regla vieja.
 Pasivas y consumibles nuevos para la Resistencia a crítico (no había ninguno; dueño: «de paso ya diseñaría alguno») → [propuesta-pasivas-consumibles-res-critico.md](propuesta-pasivas-consumibles-res-critico.md), a revisar.
 Habilidades → [propuesta-res-critico-habilidades.md](propuesta-res-critico-habilidades.md): **Punto débil puede dejar la resistencia en negativo (hecho, 2026-11-05)**, textos de la regla vieja corregidos, «+1 a todos» se queda como está.
+Habilidades con Crítico potente, calculadora del crítico y dibujo del duelo → [propuesta-critico-potente-habilidades.md](propuesta-critico-potente-habilidades.md) (2026-11-05), a revisar.

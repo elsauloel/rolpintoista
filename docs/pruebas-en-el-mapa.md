@@ -281,6 +281,12 @@
   empujado por casillero que le faltó, menos su Defensa; contra otro token → cada uno, la Constitución del otro. Mirar la Mesa, la Crónica y el Anuncio.
 
 ## Pendientes
+- [ ] **📏 Fuera de alcance y ✨ Invulnerable al elegir el objetivo (2026-11-05, dueño).** Atacar a mano limpia (o con una habilidad con alcance) a
+  alguien más lejos de lo que llega: «está fuera del alcance… ¿Proceder igual?»; elegir a un rival Titilando o Invulnerable: «no recibe daño ni
+  debuffs… ¿Atacarlo igual?». Sin probar en el mapa (salen al hacer clic en el objetivo).
+- [ ] **🪝 El gancho de Arrastrar con el GM con otras ventanas abiertas (2026-11-05, arreglado).** La ficha o GM Tools de un GM tomaban el arrastre y lo
+  dejaban «Aplicado · a mano» sin moverlo ni animarlo (visto con Rockardo contra Warrior en Claude · pruebas). Ahora lo toma solo el mapa del GM: probar
+  con GM Tools abierto a la vez.
 - [ ] **⏫ El Arrojo (sube en el orden) con la animación de la Demora, en verde (2026-11-05, dueño).** Probada la animación sola en Claude · pruebas;
   falta con la habilidad de support en un duelo real (también deja una tarjeta en la Crónica).
 - [ ] **🎒 y × en las manos de un creep (2026-11-05, arreglado).** Había piezas sin id (la Bruja del pantano, el Escarabajo de cobre…) y esos botones no

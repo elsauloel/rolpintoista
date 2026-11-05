@@ -3849,6 +3849,7 @@ const Duelo = (() => {
             if(cfgEscuchar.aplicaSolo && !soyGM() && !cfgEscuchar.aplicaSolo(d, ef)) return;
             const sp = specDeEfecto(ef);
             if(sp && sp.nombre === 'Demora' && !cfgEscuchar.aplicaDemora) return;   // el orden de turnos lo mueve el mapa
+            if(_num(ef.trae) > 0 && !cfgEscuchar.aplicaDemora) return;   // 🪝 el gancho también (2026-11-05: la ficha o GM Tools de un GM lo reclamaban, no sabían arrastrar y quedaba «a mano», sin animación)
             aplicando.add(clave);
             reclamarEfecto(d.id, i).then(async mio => {
               if(!mio) return;

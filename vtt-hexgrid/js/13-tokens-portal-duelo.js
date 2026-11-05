@@ -981,6 +981,30 @@ function dueloElegirObjetivoMapa(msg){
         if(!(await AvisoCombate.preguntar(`${nombreDe(t)} no califica para ${hab}: ${cal.motivo || 'no cumple la condición'}. ¿Atacarlo igual, como un ataque común?`,
           {icono: '🎯', titulo: 'No califica', si: 'Atacarlo igual', no: 'Elegir otro'}))){ pedir(); return; }
       }
+      // 📏 Fuera de alcance (2026-11-05, dueño: «seleccioné a alguien que no estaba a su alcance, pues era un ataque melée, y no hubo ninguna interferencia…
+      // notificar "el objetivo está fuera del alcance…, ¿proceder igual?"»): avisa y deja seguir. No con lo que se acerca solo (Salto, Takle, Cornada, el gancho).
+      { const mio0 = todos.find(propio);
+        const seAcerca = ataque && (ataque.saltoHab || (ataque.hab && ataque.hab.saltoHab) || ataque.embestidaHab || num(ataque.arrastra) > 0);
+        const alc = ataque && ataque.rango && !ataque.hab ? Combatiente.alcanceMaximo(ataque, ataque.alcance) : ataque && ataque.alcance;
+        const n = Math.round(num(alc));
+        if(mio0 && !seAcerca && n > 0 && t !== mio0 && !(t.col === mio0.col && t.fila === mio0.fila)){
+          const dist = distanciaHex({col: mio0.col, fila: mio0.fila}, {col: t.col, fila: t.fila});
+          if(dist > n){
+            const que = ataque.hab ? `de ${ataque.habNombre || ataque.hab.nombre || 'la habilidad'}` : ataque.rango ? 'de tu disparo' : 'de tu ataque';
+            const cas = k => `${fmt(k)} casilla${k === 1 ? '' : 's'}`;
+            if(!(await AvisoCombate.preguntar(`${nombreDe(t)} está fuera del alcance ${que}: está a ${cas(dist)} y llega a ${cas(n)}${!ataque.hab && !ataque.rango && n === 1 ? ' (cuerpo a cuerpo: tiene que estar pegado)' : ''}.\n\n¿Proceder igual?`,
+              {icono: '📏', titulo: 'Fuera de alcance', si: 'Proceder igual', no: 'Elegir otro'}))){ pedir(); return; }
+          }
+        } }
+      // ✨ Invulnerable / Titilando (2026-11-05, dueño: «seleccioné como objetivo a un personaje "titilando/invulnerable", y también me dejó proceder como
+      // si nada»): a un rival que no recibe daño ni debuffs se le avisa antes; a un aliado (una cura, un buff), no.
+      if(objetivoTipo !== 'aliado' && !(ataque && ataque.hab && ataque.hab.sinOposicion)){
+        let est = [];
+        try{ est = ((hudDatos(t) || {}).estados || []).filter(e => e && e.activo !== false); }catch(e){}
+        const inv = est.find(e => e.invulnerable || e.titilando || /^titilando/i.test(String(e.nombre || '')));
+        if(inv && !(await AvisoCombate.preguntar(`${nombreDe(t)} está ${/titil/i.test(String(inv.nombre || '')) || inv.titilando ? 'Titilando (invulnerable)' : `invulnerable (${inv.nombre})`}: no recibe daño ni debuffs${/titil/i.test(String(inv.nombre || '')) || inv.titilando ? ' hasta que empiece su próximo turno' : ' mientras le dure'}.\n\n¿Atacarlo igual?`,
+          {icono: '✨', titulo: 'Es invulnerable', si: 'Atacarlo igual', no: 'Elegir otro'}))){ pedir(); return; }
+      }
       dueloAvisoObjetivoOcultar();
       try{ t = await dueloVincularSiFalta(t); }catch(err){ console.error('No se pudo vincular el token al creep:', err); }
       const mio = todos.find(propio);

@@ -90,6 +90,10 @@ function superficieDibujar(el, celdas, z){
    que se mueve. El relleno es uno solo (sin líneas de adentro). */
 function aguaContornos(celdas){
   const k = (x, y) => Math.round(x * 4) + ',' + Math.round(y * 4), mitad = new Map(), lados = [];
+  // Sin casillas repetidas (2026-11-06, prueba en el mapa: una forma con una casilla dos veces contaba sus lados como «de adentro» y el charco
+  // se partía en pedazos).
+  const vistas = new Set();
+  celdas = celdas.filter(c => { const q = c.col + ',' + c.fila; if(vistas.has(q)) return false; vistas.add(q); return true; });
   celdas.forEach(c => {
     const p = hexCentro(c.col, c.fila);
     for(let i = 0; i < 6; i++){

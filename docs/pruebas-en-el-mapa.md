@@ -1639,16 +1639,16 @@ y al empezar la ronda las tiradas de Res.Mt contra el Ef.Esp de los rivales pega
 
 ## Sin probar del 2026-11-05 (🦘 Salto con casilla, 💧 agua)
 
-- [ ] 🦘 **El Salto de verdad**, de punta a punta con un personaje (Botonera) y con un creep (Acciones): se probó con tokens de mentira y sin
+- [x] (probado en la cuarta tanda, 2026-11-05: creep y personaje, Takle) 🦘 **El Salto de verdad**, de punta a punta con un personaje (Botonera) y con un creep (Acciones): se probó con tokens de mentira y sin
   escribir en Firebase; falta ver que el token se mueva para todos, el momento chico y que el duelo se abra contra el elegido. También el **Salto
   aplastante** cayendo en una casilla elegida y el Takle (que no debería cambiar).
-- [ ] 💧 **Las ondas de los pasos vistas desde otra pantalla**: un jugador camina por un charco y el GM (y otro jugador) ven las ondas; con el token
+- [x] (probado en la cuarta tanda, 2026-11-05, y otra vez en la del 2026-11-06) 💧 **Las ondas de los pasos vistas desde otra pantalla**: un jugador camina por un charco y el GM (y otro jugador) ven las ondas; con el token
   oculto o en la niebla, el que no lo ve no ve las ondas.
-- [ ] 🦘 **El Salto en dos tiempos** (2026-11-05, cola 16): caer en una casilla **sin** rival al lado (salta y no ataca, sin preguntar); caer pegado
+- [x] (probado en la cuarta tanda, 2026-11-05) 🦘 **El Salto en dos tiempos** (2026-11-05, cola 16): caer en una casilla **sin** rival al lado (salta y no ataca, sin preguntar); caer pegado
   a uno → «¿Atacar?» → **No**: la Mesa dice «saltó y no atacó — se le devolvieron N No2» y el cooldown / SP de la habilidad sigue cobrado (mirar
   los No2 y los turnos de espera del creep en sus Acciones, y los No2/SP del personaje en la Botonera); **Sí** con uno: el duelo directo con +1 PdG
   y frecuente +1; **Sí** con dos: «Elegí el objetivo», y Esc ahí = no ataca (devuelve los No2). El aplastante: aplasta y después pregunta.
-- [ ] ⬡ **Áreas como estados, de verdad** (2026-11-05, cola 17): se probó con tokens y una nube de mentira (sin escribir en Firebase; capturas
+- [x] (probado en la cuarta tanda, 2026-11-05: nube real, zona oculta arreglada, falange real) ⬡ **Áreas como estados, de verdad** (2026-11-05, cola 17): se probó con tokens y una nube de mentira (sin escribir en Firebase; capturas
   `z-estados-*`): el ⬡ sobre los dos goblins de la nube y el 🛡 sobre el personaje con el Escudo de la falange junto a uno con escudo. Falta: una
   Nube tóxica tirada de verdad (el circulito ⬡ y, al pasar el mouse / en el globo de estados y en la ficha lite, el texto «Al entrar y en cada
   Mantenimiento… tira Res.Esp…»), que se vaya al salir, que el jugador no vea el de una zona oculta, y el Escudo de la falange de verdad (que se
@@ -1683,7 +1683,7 @@ y al empezar la ronda las tiradas de Res.Mt contra el Ef.Esp de los rivales pega
   Observación (no es error, es como dice el texto): la Nube no le pega al que ya estaba adentro al tirarla; recién al entrar o en el Mantenimiento.
 - [x] **🛡 Escudo de la falange de verdad**: «Muro de escudos (+2 Def)» con un aliado con escudo al lado, el 🛡 sobre el token en la pantalla del
   jugador, y se va al separarse. Captura p4-falange-1-J1.png.
-- Sin probar: un **personaje** (no creep) con la habilidad Contraataque.
+- [x] (probado el 2026-11-06, ver abajo) Un **personaje** (no creep) con la habilidad Contraataque.
 
 ### 2026-11-05 · 🙈 Token oculto fuera de turno: aviso solo al GM (commit bfc5e6d1), con clics (GM, J1 y J2 en «Encuentro 2»)
 - [x] **En sigilo, arrastrando** (Rockardo (copia) de J1, fuera de su turno): al GM le llega el toast y la Crónica «🙈 … (oculto) actúa fuera de su
@@ -1702,3 +1702,22 @@ PJ de J1 en sigilo, modo combate, fuera de su turno. Todo restaurado después (f
   «⚠ … (en sigilo) entró en Mover libre».
 - ✅ (c) se mueve con Mover libre → otro Aviso al centro al GM: «se mueve (con 🦶 Mover libre)». (En esta prueba la casilla caía en el cono de un goblin
   y lo descubrió: eso es la detección de siempre, no el aviso.)
+
+### 2026-11-06 · ⚔ Sed de batalla, ☠ Nube tóxica de jugador, Contraataque de un personaje, 💧 charco redondo (con clics: GM, J1 y J2 en «Encuentro 2»)
+Foto antes y restaurado después (comparado: igual; borrada la nube de prueba). Capturas `p7-*.png` en el scratchpad.
+- [x] **⚔ Sed de batalla de un personaje**: Larry (copia) de J1 (pasiva puesta para la prueba) voltea a una Rata con la Varita de granizo → No2 4 → **7**
+  (su máximo es 5: pasa del máximo), a **J1 le aparece al centro** «⚔ Sed de batalla · Larry (copia)» con «+3 No2 · volteaste a Rata de la grieta» y
+  «Entendido», y queda en la Mesa de todos. p7-sb-3-aviso-J1.png.
+- [x] **⚔ Sed de batalla de un creep** + **🩸 Sed de sangre**: el Goblin rompehuesos (las dos pasivas, de prueba) voltea a Bizzante (copia) → No2 5 → **8**
+  (máximo 7) y sube 2 lugares en el orden (7.º → 5.º). El aviso del creep va como tarjeta chica en la Crónica (la ven todos) y en la Mesa; **no** es un
+  Aviso al centro para el GM (así está programado: `chico` sin destinatario). p7-sb-5-gob-GM.png.
+- [x] **☠ Nube tóxica del Debuffer de los jugadores** (commit c91ee853): Larry la tira sobre el Goblin rompehuesos → **al aparecer** el GM ya tiene
+  «🎲 Tirar Res.Esp para resistir Veneno»; perdió → Veneno ×3. Al pasar de ronda: «Veneno 3 → 4 (ya estaba envenenado: la nube le suma 1 stack, sin
+  tirada)» con Aplicar / Resolver a mano → Veneno ×4. p7-nube-2-tirar-GM.png, p7-nube-10-stack-GM.png.
+- [x] **⚔ Contraataque de un personaje**: el Goblin ataca a Larry (con la habilidad de Warrior, de prueba); J1 gana la Evasión → «Esquivaste:
+  ¿contraatacás a Goblin rompehuesos? (Contraataque)»; «Sí, contraatacar» abre el duelo nuevo con los papeles al revés (PdG 5 + 2 → 1d6+1) y cobra
+  los 2 SP (60 → 58). p7-ca-3-J1.png, p7-ca-4-contra-J1.png.
+- [x] **💧 El charco redondo en la pantalla de un jugador** (commit 0b1eada4) y las ondas al cruzarlo desde las otras (J2 y GM las registran).
+  **Falló y se arregló**: una forma con una casilla repetida partía el charco en pedazos (los lados de esa casilla contaban como «de adentro»); ahora
+  `aguaContornos` saca las repetidas (js/50). p7-agua-0-J1-orilla.png.
+

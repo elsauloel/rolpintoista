@@ -1721,3 +1721,12 @@ Foto antes y restaurado después (comparado: igual; borrada la nube de prueba). 
   **Falló y se arregló**: una forma con una casilla repetida partía el charco en pedazos (los lados de esa casilla contaban como «de adentro»); ahora
   `aguaContornos` saca las repetidas (js/50). p7-agua-0-J1-orilla.png.
 
+
+## 🛡 Escudos elementales de muestra en «Mapa 1» (2026-11-06, a pedido del dueño: «un token para cada efecto, así cuando llego voy y lo miro; dejalos corriendo»)
+- Quedan **puestos a propósito, con 99 turnos** (para que no se venzan al pasar turnos), en 7 creeps de «Mapa 1» de «Claude · pruebas»:
+  Escarabajo de cobre (auditar) (copia) = 🧪 ácido · Estandarte de Escarabajo de cobre = ☠ tóxico · Tótem de silencio de Bruja del pantano = ☀ luz ·
+  Bosque (prueba) = 🌑 siniestro · Tunelero (prueba) = ❄ hielo (pegado a «asd») · Goblin de prueba 4 = 🔥 fuego (oculto: lo ve solo el GM) ·
+  Tanque (prueba) = ⚡ eléctrico (pegado a Clementino). Solo había 4 creeps aislados a la vista; Tunelero y Tanque tienen un vecino: **si se pasan turnos
+  o se mueven, el anillo los quema** (es lo que hace la habilidad).
+- No se movió nada ni se tocó la iniciativa. Los estados llevan `escudoMuestra: true`.
+- **Para sacarlos**: `node /tmp/pw/escudos-mapa1.js --sacar` (solo saca esos estados) o, a mano, ✕ en el globo de estados de cada token.

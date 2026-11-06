@@ -2606,11 +2606,18 @@ function venenistaDe(lado){
 /* Una cura que no pasa desapercibida (2026-10-07, dueño: «que tenga su momento: "fulano te curó X", con ACEPTAR; y para el resto, en la
    Crónica»). La cura ya entró; a quien la recibió (el dueño del personaje) le aparece el Aviso al centro, y los demás la ven en la Crónica.
    De un creep no se cuenta la vida que le queda (es del GM). */
-function dueloCuraMomento(d, t, n, r){
+// 💚 Lo que suma a cada cura la pasiva Manos de curandero de quien cura (creep: su stat; personaje: su resumen; invocación: nada).
+function curaMasDe(ta){
+  if(!ta) return 0;
+  if(ta.tipo === 'creep'){ const sc = typeof creepPrivadoDe === 'function' ? creepPrivadoDe(ta.fichaId) : null; return sc ? Math.max(0, num(CreepCalculo.modTotal(sc, 'curamas'))) : 0; }
+  if(String(ta.fichaId || '').includes(SEP_INVOCACION)) return 0;
+  const f = fichasPub.get(ta.fichaId); return f && f.resumen ? Math.max(0, num(f.resumen.curaMas)) : 0;
+}
+function dueloCuraMomento(d, t, n, r, mas){
   const quien = d.atacante && d.atacante.nombre ? d.atacante.nombre : 'Alguien', a = t.oculto ? 'alguien' : nombreDe(t);
   const pj = t.tipo === 'pj', mismo = d.atacante && d.atacante.tokenId === d.defensor.tokenId;
   const titulo = mismo ? `${quien} se curó` : `${quien} curó a ${a}`;
-  const resultado = r.caido ? `No lo levanta: ${a} está caído (hace falta revivirlo)` : r.robada ? r.robada : r.sinCura ? `No se cura: ${a} tiene una herida que no deja curarse` : `+${fmt(n)} de vida${pj ? ` (${fmt(r.previo)} → ${fmt(r.nuevo)})` : ''}`;
+  const resultado = r.caido ? `No lo levanta: ${a} está caído (hace falta revivirlo)` : r.robada ? r.robada : r.sinCura ? `No se cura: ${a} tiene una herida que no deja curarse` : `+${fmt(n)} de vida${mas ? ` (con +${fmt(mas)} de Manos de curandero)` : ''}${pj ? ` (${fmt(r.previo)} → ${fmt(r.nuevo)})` : ''}`;
   momentoAbrir({tipo: 'cura', icono: '💚', titulo, resultado, estado: 'listo',
     datos: pj && t.duenoUid ? {paraUid: t.duenoUid, aviso: !mismo, boton: '💚 Aceptar',
       veredicto: r.caido ? {tono: 'neutro', grande: 'Caído', chico: 'Una cura no levanta a un caído: hace falta revivirlo'}
@@ -2918,9 +2925,11 @@ async function dueloAplicarEfectoBase(d, ef){
   }
   if(spec.cura){
     try{
-      const r = await dueloCurar(t, spec.cura);
-      dueloCuraMomento(d, t, spec.cura, r);
-      return {nota: r.caido ? Combatiente.CAIDO_TXT : r.robada ? r.robada : r.sinCura ? Combatiente.SIN_CURA_TXT : `+${spec.cura} HP (${fmt(r.previo)} → ${fmt(r.nuevo)})`};
+      // 💚 Manos de curandero (2026-11-06): quien cura (el que usó la habilidad o el arma) suma lo de su pasiva a cada cura.
+      const mas = curaMasDe(d.atacante && d.atacante.tokenId ? tokens.get(d.atacante.tokenId) : null), cura = Math.round(num(spec.cura)) + mas;
+      const r = await dueloCurar(t, cura);
+      dueloCuraMomento(d, t, cura, r, mas);
+      return {nota: r.caido ? Combatiente.CAIDO_TXT : r.robada ? r.robada : r.sinCura ? Combatiente.SIN_CURA_TXT : `+${cura} HP${mas ? ` (${fmt(spec.cura)} + ${fmt(mas)} de Manos de curandero)` : ''} (${fmt(r.previo)} → ${fmt(r.nuevo)})`};
     }
     catch(err){ console.error('No se pudo aplicar la cura del duelo:', err); return {manual: true, nota: 'no se pudo curar solo: aplicalo a mano'}; }
   }

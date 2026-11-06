@@ -1541,3 +1541,11 @@ Hoy la dificultad es el **valor fijo** de la Destreza de quien la pone (las comp
 Opciones: A) valor fijo; B) tirada al colocar; C) tirada al colocar con ventaja. **Decidido (dueño, 2026-11-03): la A, «vamos con la recomendación A»** —
 la trampa ya paga un costo con resultado incierto (puede que nadie la pise); el valor fijo compensa ese riesgo. No cambia nada del código.
 
+
+### P242 — 💚 Manos de curandero: ¿suma también a las curas por turno? (2026-11-06)
+La pasiva **Manos de curandero** (dueño, 2026-11-06: «+1 me parece muy poco, probemos +5») suma **+5 a cada cura directa** que da quien la tiene:
+las curas de habilidades y armas que pasan por el duelo (Sanar, Oleada sanadora —+5 a cada curado—, Purificar, la Varita de cura y las curas de
+clase con `cura`) y las que se hace él mismo (el Segundo aliento, la cura sobre sí). **No** suma (por ahora) a las curas **por turno**:
+Regeneración, Bálsamo, el Círculo de sanación y el Aura sanadora (cada pulso), ni a la Transfusión (no es una cura: pasa vida) ni a las pociones.
+**Pregunta para el dueño:** ¿las curas por turno también deberían llevar el +5 (en cada pulso, o solo en el primero)? Hoy, con +5 en cada pulso,
+un Aura sanadora de 4 pulsos daría +20 por aliado.

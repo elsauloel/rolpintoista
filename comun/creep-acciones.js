@@ -517,11 +517,12 @@ const CreepAcciones = (() => {
     const malditoDano = malditoCreep(sc, h);   // 🩸 Maldito: su cooldown en vida (2026-10-18)
     if(C().habAtaque(h)) sc.ataquesTurno = num(sc.ataquesTurno) + 1;  // cuenta como su ataque
     if(costoHp > 0) sc.hp = num(sc.hp) - costoHp;
-    if(num(h.curaHp) > 0) sc.hp = Math.min(num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, num(sc.hp) + num(h.curaHp));   // cura sobre sí mismo
+    const curaMas = Math.max(0, num(C().modTotal(sc, 'curamas')));   // 💚 Manos de curandero (2026-11-06): +5 a cada cura que da, también sobre sí mismo
+    if(num(h.curaHp) > 0) sc.hp = Math.min(num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, num(sc.hp) + num(h.curaHp) + curaMas);   // cura sobre sí mismo
     // 💨 El Segundo aliento (2026-10-27, dueño: «que quite cualquier debuff»): se cura N + su Constitución, le saca el debuff que se eligió antes de cobrar
     // (`o.quitar`, el nombre; lo pregunta el mapa) y queda usada para este combate (`unaVez`).
     let curaCon = 0, quitado = '';
-    if(num(h.curaMasCon) > 0){ const antes = num(sc.hp); sc.hp = Math.min(num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, antes + num(h.curaMasCon) + Math.max(0, num(C().statValor(sc, 'con')))); curaCon = sc.hp - antes; }
+    if(num(h.curaMasCon) > 0){ const antes = num(sc.hp); sc.hp = Math.min(num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, antes + num(h.curaMasCon) + Math.max(0, num(C().statValor(sc, 'con'))) + curaMas); curaCon = sc.hp - antes; }
     if(h.quitaDebuff && o.quitar){ const i = (sc.estados || []).findIndex(e => e && e.nombre === o.quitar && e.polaridad === 'debuff'); if(i >= 0){ quitado = sc.estados[i].nombre; sc.estados.splice(i, 1); } }
     if(h.unaVez) h.unaVezUsada = true;
     const ef = efectoDeHab(sc, h, presets);

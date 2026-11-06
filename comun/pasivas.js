@@ -98,6 +98,9 @@ const PASIVAS_BASE = [
   // ⚔ Sed de batalla (dueño, 2026-11-05, del boceto del W1 Hachero: «sumamos Sed de batalla como pasiva, que la puedan elegir los jugadores también»).
   {poolId: 'sed-de-batalla', nombre: 'Sed de batalla', jobCosto: 1, etiquetas: ['ofensiva'],
    detalle: 'Cuando un rival cae por tu golpe, el envión te devuelve el aire: ganás 3 No2, aunque pases de tu máximo (los de más no se pierden al empezar tu turno: la recarga solo sube hasta el máximo, nunca baja). ⚙ Automatizado: lo hace el mapa cuando el golpe del duelo lo deja en 0, y te avisa.', mods: [{stat: 'sedbatalla', val: 3}]},   // (2026-11-05, dueño: «más que 2 le pondría 3… puede ser superior al máximo»)
+  // 💚 Manos de curandero (dueño, 2026-11-06: «una pasiva que cada cura… +1 me parece muy poco, probemos +5»).
+  {poolId: 'manos-de-curandero', nombre: 'Manos de curandero', jobCosto: 1, etiquetas: ['utilidad'],
+   detalle: 'Cada cura que das cura 5 de vida más (a cada uno que curás: con una cura en área, +5 a cada uno). Vale para las curas directas —habilidades, varitas y armas que curan, también sobre vos—; no para las que curan por turno (Regeneración, zonas y auras de curación) ni para la Transfusión. ⚙ Automatizado: el duelo y el mapa la suman solos.', mods: [{stat: 'curamas', val: 5}]},
   {poolId: 'manas-de-sobreviviente', nombre: 'Mañas de sobreviviente', jobCosto: 1, etiquetas: ['defensiva'],
    detalle: 'Con la vida a la mitad o menos: +1 Res. crítico contra todos los Tipos. ⚙ Automatizado: el duelo lo suma al calcular el crítico, mirando tu vida en ese momento.', mods: [{stat: 'rescritmitad', val: 1}]},
   {poolId: 'contra-las-cuerdas', nombre: 'Contra las cuerdas', jobCosto: 1, etiquetas: ['defensiva'],

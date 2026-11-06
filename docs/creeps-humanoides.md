@@ -819,6 +819,13 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
   **Meteoro**. Pasivas: Potencia especial · Puntería arcana.
 - Números (nv4 → nv5): Def 3 → 5 (7 a distancia) · crít. T4 1 → 2 · PdG.Esp 18 → 19 · Ef.Esp 18 → 19 · SP 51 → 54 · Res. fuego 2 → 1.
 
+### S1 Sanador · nivel 2 (aprobado 2026-11-06, cargado en el pool)
+- Atributos Con 9 · Fue 3 · Agi 7 · Des 4 · Esp 13 → vida 50 (45 + peto 5), No2 7, SP 39. Equipo: Varita de cura · Orbe de luz · Peto de cuero de
+  lampalagua · Botas de caña alta de estanciero · **Casco de cuero endurecido** (Def +1, crít. T4 +1: contra las flechas). Habilidades: Sanar ·
+  Purificar · **Oleada sanadora**. Pasiva: **Manos de curandero** (nueva, 2026-11-06: +5 a cada cura a uno; +2 en área y por turno; también pociones y
+  pergaminos). Ideas del dueño para los niveles 3 y 4: «algo más de support, que pueda cambiar el orden de turnos, o daño de luz que se sostenga con la
+  sanación; el 4, algo un poquito mejor».
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

@@ -116,6 +116,12 @@
     equipo: ['Varita de cura', 'Orbe de luz', 'Peto de cuero de lampalagua', 'Botas de caña alta de estanciero'],
     habilidades: ['Sanar', 'Purificar'], consumibles: ['Pergamino de Regeneración menor'],
     estrategia: 'Support. Mantiene vivos a los suyos: cura, limpia estados y estira la pelea. Conviene acompañarlo de un tanque.'});
+  // S1 Sanador (niveles 2 en adelante, de a uno desde el 2026-11-06; en modo SP). Nv2: Oleada sanadora y la pasiva nueva Manos de curandero.
+  const S1 = {linea: 'S1', nombre: 'Sanador', rol: 'support', rolTxt: 'apoyo', consumibles: ['Pergamino de Regeneración menor'],
+    estrategia: 'Support. Mantiene vivos a los suyos: cura, limpia estados y estira la pelea. Conviene acompañarlo de un tanque.'};
+  esencial({...S1, nivel: 2, atrib: [9, 3, 7, 4, 13],
+    equipo: ['Varita de cura', 'Orbe de luz', 'Peto de cuero de lampalagua', 'Botas de caña alta de estanciero', 'Casco de cuero endurecido'],
+    habilidades: ['Sanar', 'Purificar', 'Oleada sanadora'], pasivas: ['Manos de curandero']});
   esencial({linea: 'W1', nombre: 'Hachero', rol: 'warrior', rolTxt: 'melee', nivel: 1, atrib: [7, 9, 6, 7, 4],   // (2026-11-03, dueño: «fue 9, con 7, agi 6, des 7, esp 4»)
     equipo: ['Hacha', 'Cota de malla de hierro', 'Cofia de anillas sueltas'],
     habilidades: ['Pegar fuerte', 'Romper armadura'], consumibles: ['Pergamino grupal de Furia de Combate'],

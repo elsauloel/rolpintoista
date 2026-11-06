@@ -2607,12 +2607,15 @@ function venenistaDe(lado){
    Crónica»). La cura ya entró; a quien la recibió (el dueño del personaje) le aparece el Aviso al centro, y los demás la ven en la Crónica.
    De un creep no se cuenta la vida que le queda (es del GM). */
 // 💚 Lo que suma a cada cura la pasiva Manos de curandero de quien cura (creep: su stat; personaje: su resumen; invocación: nada).
-function curaMasDe(ta){
+// `area` (2026-11-06): una cura en área o por turno suma lo de área (+2), no lo de a uno (+5).
+function curaMasDe(ta, area){
   if(!ta) return 0;
-  if(ta.tipo === 'creep'){ const sc = typeof creepPrivadoDe === 'function' ? creepPrivadoDe(ta.fichaId) : null; return sc ? Math.max(0, num(CreepCalculo.modTotal(sc, 'curamas'))) : 0; }
+  if(ta.tipo === 'creep'){ const sc = typeof creepPrivadoDe === 'function' ? creepPrivadoDe(ta.fichaId) : null; return sc ? Math.max(0, num(CreepCalculo.modTotal(sc, area ? 'curamasarea' : 'curamas'))) : 0; }
   if(String(ta.fichaId || '').includes(SEP_INVOCACION)) return 0;
-  const f = fichasPub.get(ta.fichaId); return f && f.resumen ? Math.max(0, num(f.resumen.curaMas)) : 0;
+  const f = fichasPub.get(ta.fichaId); return f && f.resumen ? Math.max(0, num(area ? f.resumen.curaMasArea : f.resumen.curaMas)) : 0;
 }
+// ¿El duelo es de un área (la Oleada sanadora: un sub-duelo por objetivo)?
+const dueloEsArea = d => !!(d && (d.grupo || (d.hab && /^(area|onda|cono|zona)$/.test(String(d.hab.objetivo || '')))));
 function dueloCuraMomento(d, t, n, r, mas){
   const quien = d.atacante && d.atacante.nombre ? d.atacante.nombre : 'Alguien', a = t.oculto ? 'alguien' : nombreDe(t);
   const pj = t.tipo === 'pj', mismo = d.atacante && d.atacante.tokenId === d.defensor.tokenId;
@@ -2926,12 +2929,17 @@ async function dueloAplicarEfectoBase(d, ef){
   if(spec.cura){
     try{
       // 💚 Manos de curandero (2026-11-06): quien cura (el que usó la habilidad o el arma) suma lo de su pasiva a cada cura.
-      const mas = curaMasDe(d.atacante && d.atacante.tokenId ? tokens.get(d.atacante.tokenId) : null), cura = Math.round(num(spec.cura)) + mas;
+      const mas = curaMasDe(d.atacante && d.atacante.tokenId ? tokens.get(d.atacante.tokenId) : null, dueloEsArea(d)), cura = Math.round(num(spec.cura)) + mas;
       const r = await dueloCurar(t, cura);
       dueloCuraMomento(d, t, cura, r, mas);
       return {nota: r.caido ? Combatiente.CAIDO_TXT : r.robada ? r.robada : r.sinCura ? Combatiente.SIN_CURA_TXT : `+${cura} HP${mas ? ` (${fmt(spec.cura)} + ${fmt(mas)} de Manos de curandero)` : ''} (${fmt(r.previo)} → ${fmt(r.nuevo)})`};
     }
     catch(err){ console.error('No se pudo aplicar la cura del duelo:', err); return {manual: true, nota: 'no se pudo curar solo: aplicalo a mano'}; }
+  }
+  // 💚 Manos de curandero (2026-11-06): una cura por turno que da (Regeneración del Bálsamo…) cura lo de área (+2) más en cada turno.
+  if(num(spec.hpTurno) > 0 || num(spec.hp) > 0){
+    const masT = curaMasDe(d.atacante && d.atacante.tokenId ? tokens.get(d.atacante.tokenId) : null, true);
+    if(masT > 0){ if(spec.hpTurno !== undefined) spec.hpTurno = num(spec.hpTurno) + masT; else spec.hp = num(spec.hp) + masT; }
   }
   // Guantes del envenenador (2026-10-05): los venenos que pone quien atacó llevan esos stacks de más (un turno más y 1 de daño más por turno).
   const vn = /veneno/i.test(String(spec.nombre || '')) ? venenistaDe(d.atacante) : 0;

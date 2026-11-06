@@ -83,7 +83,11 @@ const FichaHabilidades = (() => {
     const preset = presetPorNombre(presets, nombrePresetEfectivo);
     if(estaBloqueadoElDebuff(S, preset)) return {ok: false, motivo: 'inmune', nombre};
     const turnos = n(src.efectoTurnos);
-    const hpturno = n(src.efectoHpTurno);
+    let curaArea = 0;   // 💚 Manos de curandero: +2 por turno a una regeneración suya (2026-11-06)
+    if(n(src.efectoHpTurno) > 0 && typeof FichaCalculo !== 'undefined' && (S.pasivas || []).some(p => p && p.mods && p.mods.some(m => m && m.stat === 'curamasarea'))){
+      try{ curaArea = Math.max(0, n(((FichaCalculo.calcular(S) || {}).final || {}).curamasarea)); }catch(err){ curaArea = 0; }
+    }
+    const hpturno = n(src.efectoHpTurno) + curaArea;
     const permanente = Combatiente.efectoPermanente(src, preset);   // P137: la casilla de la habilidad/ítem, o lo del estado
     const mods = (src.efectoMods || []).filter(m => m && m.stat).map(m => ({stat: m.stat, val: n(m.val)}));
     // El estado se queda solo en la lista: sin una descripción propia hay que acordarse de qué ítem salió. Si el

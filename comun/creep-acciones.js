@@ -239,7 +239,7 @@ const CreepAcciones = (() => {
     const preset = (presets || []).find(p => p.nombre === nombre || (p.alias || []).includes(nombre));
     const turnos = num(h.efectoTurnos);
     const stacks = Math.max(1, num(h.efectoStacks) || 1);
-    const hpTurno = num(h.efectoHpTurno);
+    const hpTurno = num(h.efectoHpTurno) + (num(h.efectoHpTurno) > 0 ? Math.max(0, num(C().modTotal(sc, 'curamasarea'))) : 0);   // 💚 Manos de curandero: +2 por turno a una regeneración suya (2026-11-06)
     const polaridad = h.efectoPolaridad || (preset ? preset.polaridad : 'otro');
     const detalle = h.efectoDetalle || '';
     const mods = structuredClone(h.efectoMods || []);
@@ -384,7 +384,7 @@ const CreepAcciones = (() => {
     if(num(it.unidades) <= 0) sc.cinturon = sc.cinturon.filter(x => x !== it);
     const partes = [];
     if(num(it.curahp)){
-      const boticario = num(it.curahp) > 0 ? num(C().modTotal(sc, 'boticario')) : 0;   // Mano de boticario (2026-10-05)
+      const boticario = num(it.curahp) > 0 ? num(C().modTotal(sc, 'boticario')) + Math.max(0, num(C().modTotal(sc, 'curamas'))) : 0;   // Mano de boticario (2026-10-05) · 💚 Manos de curandero, +5 a la poción (2026-11-06)
       const tope = num(sc.hpMax) > 0 ? num(sc.hpMax) : Infinity, antes = num(sc.hp);
       const entra = Combatiente.curaQueEntra(antes, num(it.curahp) + boticario, sc.estados);
       const robo = Combatiente.curaRobada(antes, num(it.curahp) + boticario, sc.estados);   // 🪱 la Sanguijuela se la lleva (2026-11-03)

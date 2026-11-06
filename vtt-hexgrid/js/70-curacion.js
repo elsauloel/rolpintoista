@@ -28,17 +28,17 @@ function curaMomento(hechos, tokenId){
 }
 const tokenDeRef = (ref, tipo) => { for(const [id, t] of tokens) if(t.fichaId === ref && t.tipo === tipo) return id; return null; };
 // La cura a cada aliado de la lista: un número fijo (o, si la habilidad trae una fórmula, una tirada para todos). Mesa y Crónica.
-async function curaPulso(titulo, quien, formula, lista, nro, total){
+async function curaPulso(titulo, quien, formula, lista, nro, total, mas){   // `mas`: Manos de curandero de quien la creó (+2 por pulso, 2026-11-06)
   let r;
   if(/^\d+$/.test(formula)) r = {total: parseInt(formula, 10)};
   else{ r = tirarDados(formula); if(!r) return; try{ await mesaPublicar(titulo, {...r, quien, desde: soyGM ? 'gm' : undefined}); }catch(err){} }
   curaBurbujas(lista);   // 🫧 las burbujitas sobre cada uno que cura (abajo)
   const curados = [];
   for(const [, t] of lista){
-    try{ const res = await dueloCurar(t, r.total); if(res && !res.caido && res.nuevo > res.previo) curados.push(`${t.oculto ? 'alguien' : nombreDe(t)} +${res.nuevo - res.previo}`); }
+    try{ const res = await dueloCurar(t, r.total + Math.max(0, num(mas))); if(res && !res.caido && res.nuevo > res.previo) curados.push(`${t.oculto ? 'alguien' : nombreDe(t)} +${res.nuevo - res.previo}`); }
     catch(err){ console.error('No se pudo curar:', err); }
   }
-  const txt = `💚 ${titulo} (${nro}/${total}): ${r.total} de vida${curados.length ? ' → ' + curados.join(', ') : ' (no había aliados heridos adentro)'}`;
+  const txt = `💚 ${titulo} (${nro}/${total}): ${r.total + Math.max(0, num(mas))} de vida${num(mas) > 0 ? ` (${r.total} + ${num(mas)} de Manos de curandero)` : ''}${curados.length ? ' → ' + curados.join(', ') : ' (no había aliados heridos adentro)'}`;
   try{ mesaLinea(txt, 'recordatorio'); }catch(err){}
   try{ momentoAbrir({tipo: 'curacion', icono: '💚', titulo: txt, estado: 'listo', datos: {chico: true}}); }catch(err){}
 }
@@ -65,7 +65,8 @@ async function zonaCuraRevisar(elId, el){
   const cs = celdasDeElemento(el), dentro = ([, t]) => cs.some(c => c.col === t.col && c.fila === t.fila);
   const lista = curaAliados(el.zonaCasteadorRef, el.zonaCasteadorTipo).filter(dentro);
   const quien = el.zonaCasteadorTipo === 'creep' ? ((creepsPub.get(el.zonaCasteadorRef) || {}).nombre || '') : ((fichasPub.get(el.zonaCasteadorRef) || {}).nombre || '');
-  await curaPulso(el.zonaNombre || 'Zona de curación', quien, zc.cura, lista, hechos.length + 1, zc.pulsos);
+  const casterId = tokenDeRef(el.zonaCasteadorRef, el.zonaCasteadorTipo);
+  await curaPulso(el.zonaNombre || 'Zona de curación', quien, zc.cura, lista, hechos.length + 1, zc.pulsos, typeof curaMasDe === 'function' && casterId ? curaMasDe(tokens.get(casterId), true) : 0);
 }
 // 🟢 El aura de un creep (solo el GM): al activarla y al empezar cada turno suyo (o cada ronda), mientras tenga el estado, hasta 4.
 async function auraCuraRevisar(tokenId, t){
@@ -89,7 +90,7 @@ async function auraCuraRevisar(tokenId, t){
   }catch(err){ console.error('Aura sanadora:', err); return; }
   if(!nro) return;
   const lista = curaAliados(t.fichaId, 'creep').filter(([, x]) => distanciaHex({col: t.col, fila: t.fila}, {col: x.col, fila: x.fila}) <= AURA_CURA_RADIO);
-  await curaPulso(`${AURA_CURA_NOMBRE} de ${sc.nombre || nombreDe(t)}`, sc.nombre || '', AURA_CURA, lista, nro, AURA_CURA_PULSOS);
+  await curaPulso(`${AURA_CURA_NOMBRE} de ${sc.nombre || nombreDe(t)}`, sc.nombre || '', AURA_CURA, lista, nro, AURA_CURA_PULSOS, typeof curaMasDe === 'function' ? curaMasDe(t, true) : 0);
 }
 // El aura dibujada, sin el cartel de «Token guardado».
 function editarTokenCallado(id, cambios){ coleccionTokens().doc(id).update(cambios).catch(err => console.error('No se pudo dibujar el aura:', err)); }

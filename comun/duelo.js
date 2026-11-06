@@ -2701,7 +2701,11 @@ const Duelo = (() => {
           try{ extra = cfgEscuchar.stacksExtra ? Math.max(0, Math.round(_num(cfgEscuchar.stacksExtra(d, spec)))) : 0; }catch(err){ extra = 0; }
           const pre = ((typeof EstadosAplicar !== 'undefined' && EstadosAplicar.DEBUFFS) || []).find(x => x.nombre === spec.nombre) || {};
           const base = Math.max(1, _num(spec.stacks) || _num(pre.stacks) || 1);
-          const txt = extra ? `${spec.nombre} ×${base + extra} (${base} + ${extra} del envenenador)` : EstadosAplicarTexto(spec, ef);
+          let curaExtra = 0;   // 💚 Manos de curandero (2026-11-06): el botón ya dice la cura con lo suyo
+          const regen = !spec.cura && (_num(spec.hp) > 0 || _num(spec.hpTurno) > 0);   // (una cura por turno: el Bálsamo)
+          try{ curaExtra = (spec.cura || regen) && cfgEscuchar.curaExtra ? Math.max(0, Math.round(_num(cfgEscuchar.curaExtra(d, spec)))) : 0; }catch(err){ curaExtra = 0; }
+          const txt = extra ? `${spec.nombre} ×${base + extra} (${base} + ${extra} del envenenador)` : curaExtra && spec.cura ? `Curación de ${spec.cura} + ${curaExtra} HP (Manos de curandero)`
+            : curaExtra ? `${EstadosAplicarTexto(spec, ef)} + ${curaExtra} por turno de Manos de curandero` : EstadosAplicarTexto(spec, ef);
           const quien = spec.nombre === 'Desafiante' ? d.atacante.nombre : d.defensor.nombre;   // 😤 el Desafiante es de quien provoca (2026-10-27)
           acc = `<button type="button" data-ef-aplicar="${i}">✔ Aplicar ${_esc(txt)} sobre ${_esc(quien)}</button>`;
         }

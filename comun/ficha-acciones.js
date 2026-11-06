@@ -415,7 +415,7 @@ const FichaAcciones = (() => {
       // el clamp contra hpmax lo bajaría igual (con la ficha recién
       // abierta hpmax es 0 y eso mataba al personaje de una).
       // Mano de boticario (2026-10-05): suma a lo que cura una poción.
-      const boticario = num(it.curahp) > 0 ? num(FichaCalculo.calcular(S).final.boticario) : 0;
+      const boticario = num(it.curahp) > 0 ? num(FichaCalculo.calcular(S).final.boticario) + Math.max(0, num(FichaCalculo.calcular(S).final.curamas)) : 0;   // · 💚 Manos de curandero, +5 a la poción (2026-11-06)
       let curaNo = '';   // 🌑 la cura no entró (2026-10-26, visto en el mapa: con Sanguijuela el aviso decía «+25 HP» y la vida no subía)
       if(num(it.curahp)){
         const entra = Combatiente.curaQueEntra(S.hp, num(it.curahp) + boticario, S.efectos);
@@ -450,7 +450,7 @@ const FichaAcciones = (() => {
       ui.cambio([key, ...(armRotaTxt ? ['inventario'] : []), ...(efecto || reparados || armRotaTxt || (curados && curados.sacados.length) ? ['efectos'] : []), ...(it.invocaTemporal ? ['invocaciones'] : []), 'vitals', 'nitros']);
       const partes = [];
       if(curaNo) partes.push(`❌ ${curaNo}`);
-      else if(it.curahp) partes.push(`${num(it.curahp)>=0?'+':''}${fmt(num(it.curahp) + boticario)} HP${boticario ? ` (+${fmt(boticario)} de Mano de boticario)` : ''}`);
+      else if(it.curahp) partes.push(`${num(it.curahp)>=0?'+':''}${fmt(num(it.curahp) + boticario)} HP${boticario ? ` (+${fmt(boticario)} : Mano de boticario o Manos de curandero)` : ''}`);
       if(spRestaurado) partes.push(`+${fmt(spRestaurado)} SP`);
       partes.push(`-${costoNitros} No2${sac.saque && sac.saque.sale ? ' (Saque rápido)' : sac.bolsillo ? ' (Bolsillo exterior)' : sac.alquimista ? ' (Anillo del alquimista)' : ''}`);
       if(cargaMax > 1) partes.push(gastoUnidad ? 'última carga usada' : `carga ${carga}/${cargaMax}`);

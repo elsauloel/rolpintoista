@@ -51,7 +51,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="combatiente.js?v=20261106rayo"></script>
 <script src="creep-calculo.js?v=20261106piel"></script>
 <script src="creep-botonera.js"></script>
-<script src="creep-acciones.js?v=20261106curandero"></script>
+<script src="creep-acciones.js?v=20261106manos2"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
@@ -68,10 +68,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="catalogo.js"></script>
 <script src="generador-tiendas.js"></script>
 <script src="items-subidos.js"></script>
-<script src="ficha-habilidades.js?v=20261105orden"></script>
+<script src="ficha-habilidades.js?v=20261106manos2"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
-<script src="ficha-resumen.js?v=20261106curandero"></script>
+<script src="ficha-resumen.js?v=20261106manos2"></script>
 <script src="ficha-sesion.js"></script>
 <script src="inv-calculo.js"></script>
 <script src="inv-botonera.js"></script>
@@ -79,7 +79,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js"></script>
-<script src="ficha-acciones.js?v=20261106escudo3"></script>
+<script src="ficha-acciones.js?v=20261106manos2"></script>
 <script src="orden-turnos.js?v=20261105orden"></script>
 <script src="ficha-mantenimiento.js?v=20261103ve"></script>
 <script src="estado-preguntas.js"></script>
@@ -108,7 +108,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261106otro"></script>
+<script src="duelo.js?v=20261106manos3"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -6741,6 +6741,10 @@ prueba('💚 Manos de curandero (2026-11-06, dueño: «probemos +5»): la pasiva
   const sc = {pasivas: [{...p, id: 'p1', compras: 1}], equipo: [], estados: []};
   igual([p.jobCosto, (p.mods || [])[0] && p.mods[0].stat, CreepCalculo.modTotal(sc, 'curamas'), !!(FichaCalculo.STAT_LABEL || {}).curamas],
     [1, 'curamas', 5, true]);
+  // (2026-11-06, dueño: «+5 en curas directas o individuales y +2 en curas en área y regeneraciones; también pociones y pergaminos»)
+  const sc2 = {...sc, nombre: 'C', hp: 10, hpMax: 40, cinturon: []};
+  const ef = typeof CreepAcciones !== 'undefined' && CreepAcciones.efectoDeHab ? CreepAcciones.efectoDeHab(sc2, {efectoNombre: 'Regeneración', efectoHpTurno: 4, efectoTurnos: 3}, ESTADOS_PRESET) : null;
+  igual([CreepCalculo.modTotal(sc, 'curamasarea'), !!(FichaCalculo.STAT_LABEL || {}).curamasarea, ef && ef.estado ? ef.estado.hpTurno : 6], [2, true, 6]);
 });
 prueba('⚔ Sed de batalla (2026-11-05): la pasiva está en el pool, para jugadores y creeps, y suma su stat (gana 3 No2 al voltear a un rival, aunque pase del máximo)', () => {
   const p = (typeof PASIVAS_BASE !== 'undefined' ? PASIVAS_BASE : []).find(x => x.nombre === 'Sed de batalla') || {};

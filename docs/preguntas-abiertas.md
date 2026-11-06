@@ -1542,7 +1542,11 @@ Opciones: A) valor fijo; B) tirada al colocar; C) tirada al colocar con ventaja.
 la trampa ya paga un costo con resultado incierto (puede que nadie la pise); el valor fijo compensa ese riesgo. No cambia nada del código.
 
 
-### P242 — 💚 Manos de curandero: ¿suma también a las curas por turno? (2026-11-06)
+### ✅ P242 — 💚 Manos de curandero: ¿suma también a las curas por turno? (2026-11-06) — RESUELTA
+**✅ Decisión del dueño (2026-11-06): «+5 en curas directas o individuales y +2 en curas en área y regeneraciones; y que también aplique a
+pergaminos y a pociones».** Aplicado: a uno (Sanar, Purificar, varitas/armas que curan, Segundo aliento, una poción) +5; en área (la Oleada,
+cada curado de un sub-duelo de área) y por turno (cada pulso del Círculo y del Aura sanadora, cada turno de una Regeneración que da —el Bálsamo, un
+pergamino de Regeneración, también a cada aliado del pergamino de grupo—) +2. La Transfusión, no. Texto viejo de la pregunta:
 La pasiva **Manos de curandero** (dueño, 2026-11-06: «+1 me parece muy poco, probemos +5») suma **+5 a cada cura directa** que da quien la tiene:
 las curas de habilidades y armas que pasan por el duelo (Sanar, Oleada sanadora —+5 a cada curado—, Purificar, la Varita de cura y las curas de
 clase con `cura`) y las que se hace él mismo (el Segundo aliento, la cura sobre sí). **No** suma (por ahora) a las curas **por turno**:

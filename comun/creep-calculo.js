@@ -401,6 +401,28 @@ const CreepCalculo = (() => {
     const estabaFull = num(sc.hp) >= num(sc.hpMax);
     sc.hpMax = nuevoHpMax;
     sc.hp = estabaFull ? nuevoHpMax : Math.min(num(sc.hp), nuevoHpMax);
+    sc.hpEquipo = modTotal(sc, 'hpmax');   // lo que ya quedó sumado (vidaAlDia)
+  }
+  /* ❤ La vida que dan el equipo, los estados y las pasivas, en vivo (2026-11-06, dueño: «la vida que dan los ítems tiene que aplicar a los creeps del
+     mismo modo que a los jugadores y a las invocaciones»). `hpMax` sigue siendo la vida máxima guardada (la que ven y usan todos, y la que el GM puede
+     escribir a mano); `hpEquipo` anota cuánto de Vida +N del equipo/estados/pasivas ya trae sumado. Si eso cambia (se pone o se saca una pieza, vence
+     un estado, una plantilla que nunca lo sumó), se corrige la diferencia: a vida llena sigue llena; si no, solo se recorta lo que se pase.
+     La primera vez (sin `hpEquipo`): si su máximo ya es exactamente Con × 5 + lo del equipo, lo traía sumado; si no, no (le suma lo del equipo). */
+  function vidaAlDia(sc){
+    if(!sc) return sc;
+    const m = modTotal(sc, 'hpmax');
+    if(sc.hpEquipo === undefined || sc.hpEquipo === null || !Number.isFinite(Number(sc.hpEquipo))){
+      const conEf = num(sc.con) + modTotal(sc, 'con');
+      sc.hpEquipo = m !== 0 && num(sc.hpMax) === conEf * 5 + m ? m : 0;
+    }
+    const dif = m - num(sc.hpEquipo);
+    if(dif){
+      const antes = num(sc.hpMax), lleno = num(sc.hp) >= antes && antes > 0;
+      sc.hpMax = Math.max(0, antes + dif);
+      sc.hp = lleno ? sc.hpMax : Math.min(num(sc.hp), sc.hpMax);
+    }
+    sc.hpEquipo = m;
+    return sc;
   }
   function nitrosMax(sc){
     // Natural = Agilidad efectiva + bonos a Nitros (los viejos de Movimiento y Acciones máx. cuentan como No2); los estados
@@ -691,6 +713,7 @@ const CreepCalculo = (() => {
     if(sc.nitros === undefined || sc.nitros === null) sc.nitros = nitrosMax(sc);
     if(sc.ataquesTurno === undefined) sc.ataquesTurno = 0;
     delete sc.compacto;  // la tarjeta ya no se despliega: se edita en una ventana
+    vidaAlDia(sc);   // ❤ la Vida +N del equipo, los estados y las pasivas (2026-11-06)
     return sc;
   }
 
@@ -852,7 +875,7 @@ const CreepCalculo = (() => {
     correrTiposTexto, migrarObjTipos, migrarCreepTipos, migrarObjEspecial, migrarHabPdg, migrarCreepEspecial, slotDe,
     danoTxt, fuentesEquipo, modTotal, estadosArmadura, aporteArmadura, defensaEfectiva, armadmgEfectiva, resElemental, critEfectivo, critDeEstados,
     statValor, estadoActivo, aportesMod, origenesMod, conSigno, statOrigenTxt, armadmgOrigenTxt, ataqueTxt, ataqueOrigenTxt,
-    defensaOrigenTxt, critOrigenTxt, armaduraOrigenTxt, modsAfectanHp, actualizarHpMaxPorCon, nitrosMax, actualizarNo2PorAgl,
+    defensaOrigenTxt, critOrigenTxt, armaduraOrigenTxt, modsAfectanHp, actualizarHpMaxPorCon, vidaAlDia, nitrosMax, actualizarNo2PorAgl,
     costoAtaque, costoAtaqueCon, habAtaque, costoNitrosHab, habPartes, habTextoMesa, costoHabTxt, pesoArma, costoParry, defensa, bloqueoValor,
     fuerzaGolpeValor, costoContraataque, costoOportunidad, oportunidadPosible, sinOportunidad, tarjetaPublica, nombreGenerico, presupuesto, presupuestoTxt, presupuestoHtml, alcance, modoHab, bloqueoHab, ESTADOS_NITROS_MIGRAR, normalizar};
 })();

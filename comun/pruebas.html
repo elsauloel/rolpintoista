@@ -48,7 +48,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
 <script src="combatiente.js?v=20261106no2"></script>
-<script src="creep-calculo.js?v=20261103t20"></script>
+<script src="creep-calculo.js?v=20261106vida"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261106no2"></script>
 <script src="creep-duelo.js"></script>
@@ -123,7 +123,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261104ig"></script>
 <script src="skills-creep-base.js?v=20261105r2"></script>
-<script src="creeps-esenciales.js?v=20261106niveles"></script>
+<script src="creeps-esenciales.js?v=20261106vida"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
@@ -6691,6 +6691,26 @@ prueba('☠ Nube tóxica (2026-11-05, dueño): la de los jugadores y la de los c
   const cr = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Nube tóxica');
   igual([!!(pj && pj.duelo && pj.duelo.zonaInmediata), !!(cr && cr.datos.sp.duelo.zonaInmediata)], [true, true]);
 });
+prueba('❤ La vida del equipo en los creeps (2026-11-06, dueño): en vivo, sin sumarse dos veces; a vida llena sigue llena', () => {
+  const cota = CATALOGO_BASE.find(x => x && x.nombre === 'Cota de malla fina' && !x.archivo);
+  const pz = () => ({...CreepCalculo.itemParaCreep(cota), id: 'c1', equipado: true});
+  // Un creep de plantilla (Con 8 → 40) que nunca sumó la cota: gana +5 y, lleno, queda lleno.
+  const a = CreepCalculo.normalizar({nombre: 'A', con: 8, fue: 5, agl: 5, des: 5, esp: 5, hp: 40, hpMax: 40, equipo: [pz()]});
+  const a2 = CreepCalculo.normalizar(structuredClone(a));   // otra vez: no suma de nuevo
+  // Herido: el máximo sube, la vida actual no cambia.
+  const b = CreepCalculo.normalizar({nombre: 'B', con: 8, fue: 5, agl: 5, des: 5, esp: 5, hp: 20, hpMax: 40, equipo: [pz()]});
+  // Uno que ya la traía sumada (Con × 5 + 5): no cambia.
+  const c = CreepCalculo.normalizar({nombre: 'C', con: 8, fue: 5, agl: 5, des: 5, esp: 5, hp: 45, hpMax: 45, equipo: [pz()]});
+  // Se saca la pieza: baja 5 (lleno sigue lleno).
+  const d = structuredClone(a2); d.equipo = []; CreepCalculo.vidaAlDia(d);
+  // Un jefe con vida a mano (300) y la cota: 305.
+  const e = CreepCalculo.normalizar({nombre: 'E', con: 8, fue: 5, agl: 5, des: 5, esp: 5, hp: 300, hpMax: 300, equipo: [pz()]});
+  const es = CREEPS_BASE.filter(x => x.pool === 'esencial');
+  const vida = (n, lv) => (es.find(x => x.nombre === n && x.nivel === lv) || {datos: {}}).datos.hpMax;
+  const piro = CreepCalculo.normalizar(structuredClone(es.find(x => x.nombre === 'Hachero' && x.nivel === 5).datos));
+  igual([a.hpMax, a.hp, a2.hpMax, b.hpMax, b.hp, c.hpMax, d.hpMax, d.hp, e.hpMax, vida('Hachero', 5), vida('Hachero', 1), piro.hpMax],
+    [45, 45, 45, 45, 20, 45, 40, 40, 305, 65, 35, 65]);
+});
 prueba('⚔ Sed de batalla (2026-11-05): la pasiva está en el pool, para jugadores y creeps, y suma su stat (gana 3 No2 al voltear a un rival, aunque pase del máximo)', () => {
   const p = (typeof PASIVAS_BASE !== 'undefined' ? PASIVAS_BASE : []).find(x => x.nombre === 'Sed de batalla') || {};
   const S = {pasivas: [{...p, id: 'p1'}]};
@@ -6740,7 +6760,7 @@ prueba('⭐ El pool esencial (2026-11-03): los 24 de nivel 1 (7 + la tanda del m
   const es = CREEPS_BASE.filter(c => c.pool === 'esencial' && c.nivel === 1);   // (los niveles 2 a 5, aparte: 2026-11-06)
   const d = n => es.find(c => c.nombre === n).datos;
   const suma = x => x.con + x.fue + x.agl + x.des + x.esp;
-  igual([CREEPS_ESENCIALES_FALTAN.length, es.length, es.every(c => suma(c.datos) === 33 && c.datos.hp === c.datos.con * 5 && c.nivel === 1),
+  igual([CREEPS_ESENCIALES_FALTAN.length, es.length, es.every(c => suma(c.datos) === 33 && c.datos.hp === c.datos.con * 5 + CreepCalculo.modTotal(c.datos, 'hpmax') && c.nivel === 1),
     d('Escudero').equipo.map(i => i.nombre).join(), d('Escudero').cinturon.map(i => i.nombre).join(), d('Hachero').fue, d('Hachero').agl,
     d('Piromante').habilidades.map(h => h.nombre + ':' + h.cd).join(), d('Escudero').habilidades[1].efectoMods.find(m => m.stat === 'def').val,
     CREEPS_BASE.filter(c => c.pool !== 'esencial').length > 100],

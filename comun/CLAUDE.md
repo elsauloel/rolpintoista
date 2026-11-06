@@ -1952,3 +1952,10 @@ versión parecida en más de una, es candidato a juntar.
   (lo llama el mapa al pasar a ⚔ combate, js/04). El historial suma los tipos `mov` y `foto` (los anota el mapa del GM, `vtt-hexgrid/js/99-registro.js`),
   los botoncitos Todo / 🦶 Movimientos / ❤ Vida y estados / 📸 Fotos y la raya «el combate anterior». Se carga antes de `mesa-historial.js`. Reglas nuevas.
 - **`hex-info.js`** (`HexInfo`, 2026-11-05) — **⬡ qué afecta a una casilla del mapa**, los textos: `describir(el, {quedan, oculto})` → las líneas `{icono, titulo, detalle, clase, orden}` de un elemento (zona y su estado/daño, hielo, agua, luz, trampa, fuego, Sólido, pared, portal, nube, arma en el piso, Acelerador) y `armar({items, sinExplorar, recordada})` → `{titulo, items}` (ordenado, sin repetidos). Qué se ve lo decide el mapa (`vtt-hexgrid/js/104-hex-info.js`). Pruebas en `pruebas.html`.
+
+- **❤ La vida del equipo en los creeps** (2026-11-06, dueño: «la vida que dan los ítems tiene que aplicar a los creeps del mismo modo que a los
+  jugadores y a las invocaciones»): `CreepCalculo.vidaAlDia(sc)` — `hpMax` sigue siendo la vida máxima guardada (la que el GM puede escribir a mano) y
+  `hpEquipo` anota cuánto de Vida +N (equipo, estados, pasivas como Robustez) ya trae sumado; si cambia, corrige la diferencia (lleno sigue lleno; si
+  no, solo recorta). La primera vez: si el máximo es exactamente Con × 5 + lo del equipo, lo traía; si no, se lo suma. La llaman `normalizar` (o sea
+  GM Tools en cada dibujo y el mapa al leer un creep), `modificarCreep` del mapa después de cada cambio, y `actualizarHpMaxPorCon` deja `hpEquipo` al
+  día. Los esenciales arrancan con Con × 5 y `vidaAlDia` les suma el equipo en todos los niveles.

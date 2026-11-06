@@ -68,9 +68,11 @@
       tipoCriatura: 'humano', tipoCriaturaOtro: '', jefe: false, oroBase: oroHumano(n), armaNatural: false, trofeoEspecial: {nombre: '', precio: 0},
       pool: 'esencial', linea: c.linea, ...(modoSP ? {modoSP: true} : {}),
     };
-    // La vida con lo que suma el equipo (la Cota de malla fina, el Casco de bandas remachadas: Vida +5), desde el nivel 2: así se diseñó la ronda
-    // de niveles (2026-11-05). Los de nivel 1 quedan como se aprobaron (vida = Con × 5), aunque alguno lleve una pieza con Vida.
-    if(n > 1 && typeof CreepCalculo !== 'undefined' && CreepCalculo.actualizarHpMaxPorCon) CreepCalculo.actualizarHpMaxPorCon(datos);
+    // ❤ La vida con lo que suma el equipo (Cota de malla fina, Casco de bandas remachadas: Vida +5), en todos los niveles (2026-11-06, dueño: la vida
+    // de los ítems vale para los creeps igual que para los jugadores): la base es Con × 5 y `CreepCalculo.vidaAlDia` le suma el equipo (y lo anota en
+    // `hpEquipo`, así no se suma dos veces). Piromante, Sanador y Mago de escarcha de nivel 1 pasan a tener +5.
+    datos.hpEquipo = 0;
+    if(typeof CreepCalculo !== 'undefined' && CreepCalculo.vidaAlDia) CreepCalculo.vidaAlDia(datos);
     window.CREEPS_BASE.push({
       poolId: 'esencial-' + c.linea.toLowerCase() + '-' + n + '-' + k, nombre: c.nombre, nivel: n, pool: 'esencial',
       etiquetas: ['esencial', c.rolTxt, 'nivel ' + n, 'humano'],

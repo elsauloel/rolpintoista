@@ -641,6 +641,7 @@ async function modificarCreep(creepId, cambiar){
     if(!priv.exists || !pub.exists) throw new Error('El creep ya no existe');
     const sc = CreepCalculo.normalizar(JSON.parse(priv.data().json || '{}'));   // 🗡 convertido (paso 8): lo que se guarda queda en la forma nueva
     const resultado = cambiar(sc);
+    CreepCalculo.vidaAlDia(sc);   // ❤ si el cambio tocó el equipo o un estado con Vida +N (2026-11-06)
     const hpMax = num(sc.hpMax);
     const json = JSON.stringify(sc);
     // La firma es hash(creep)-hash(imagen); la imagen no cambia.

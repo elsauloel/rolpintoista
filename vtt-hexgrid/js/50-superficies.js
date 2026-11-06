@@ -176,6 +176,20 @@ function aguaForma(celdas){
     // El suavizado achica un poco las puntas: se devuelve hacia afuera (que se salga un poco no importa: lo exacto es la línea punteada).
     pts.forEach((p, k) => { p[0] += nor[k][0] * HEX * 0.1; p[1] += nor[k][1] * HEX * 0.1; });
     let largo = 0; const s = pts.map((p, k) => { const v = largo; const b = pts[(k + 1) % N]; largo += Math.hypot(b[0] - p[0], b[1] - p[1]); return v; });
+    // 🌊 Ondulación amplia (2026-11-06, dueño: «de lejos se ve muy redondo… una ondulación más amplia para que no se vea tan redondo»): unos pocos
+    // lóbulos grandes y fijos a lo largo de la orilla (entrantes y salientes de casi media casilla), distintos en cada charco (salen de su posición).
+    const c0 = celdas[0] || {col: 0, fila: 0}, az = q => superficieAzar(c0.col, c0.fila, 70 + q);
+    const k1 = Math.max(2, Math.round(largo / (HEX * 3.2))), k2 = k1 + 2 + Math.floor(az(1) * 3), f1 = az(2) * 6.28, f2 = az(3) * 6.28;
+    const amp1 = Math.min(HEX * 0.3, largo * 0.025), amp2 = amp1 * 0.5;   // un charco chico ondula menos (si no, quedaba con puntas)
+    pts.forEach((p, k) => {
+      const u = s[k] / largo, o = amp1 * Math.sin(Math.PI * 2 * k1 * u + f1) + amp2 * Math.sin(Math.PI * 2 * k2 * u + f2);
+      p[0] += nor[k][0] * o; p[1] += nor[k][1] * o;
+    });
+    // (las normales, de nuevo, sobre la orilla ondulada)
+    pts.forEach((p, k) => {
+      const a = pts[(k - 1 + N) % N], b = pts[(k + 1) % N]; let x = -(b[1] - a[1]) * signo, y = (b[0] - a[0]) * signo; const n = Math.hypot(x, y) || 1;
+      nor[k] = [x / n, y / n];
+    });
     return {pts, nor, s, largo, ondas: Math.max(3, Math.round(largo / (HEX * 1.3)))};
   });
   if(aguaFormas.size > 60) aguaFormas.clear();

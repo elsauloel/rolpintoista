@@ -767,6 +767,12 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
   · Chaleco de cuero · Anillo de Paso Fantasma · Cofia de anillas sueltas · Botas de cuero de vaca. Habilidades: + **Salto aplastante** (cd 4, lenta).
 - Números (nv2 → nv3): dados del hacha 1 → 2 · Dmg 9 → 10 · PdG/Parry 7 → 8 · Bloqueo 9 → 10 · Res.Esp/Res.CC 11 → 12.
 
+### H1 Embestidor · nivel 4 (aprobado 2026-11-06, cargado en el pool)
+- Atributos Con 13 · Fue 11 · Agi 8 · Des 8 · Esp 2 → vida 80 (65 + jubón 10 + Robustez 5), No2 9. Equipo: Hacha del verdugo de la capital (B) ·
+  **Jubón de cuero tachonado** (B: Def +2, Def. esp. +2, crít. T4 +2, Vida +10) · Anillo de Paso Fantasma · Cofia · Botas de cuero de vaca.
+  Habilidades: + **Aguante**. Pasivas: Impulso · **Robustez**.
+- Números (nv3 → nv4): vida 60 → 80 · No2 8 → 9 · Def 4 = 4 · Def. esp. 1 → 3 · Dmg 10 → 11 · Bloqueo 10 → 11 · Eva/Ini/Mov 7 → 8 · crít. T4 2 → 4.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

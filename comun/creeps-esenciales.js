@@ -144,6 +144,9 @@
   esencial({...H1, nivel: 3, atrib: [12, 10, 7, 8, 2],
     equipo: ['Hacha del verdugo de la capital', 'Chaleco de cuero', 'Anillo de Paso Fantasma', 'Cofia de anillas sueltas', 'Botas de cuero de vaca'],
     habilidades: ['Carga que derriba', 'Takle', 'Pegar fuerte', 'Salto aplastante'], pasivas: ['Impulso']});
+  esencial({...H1, nivel: 4, atrib: [13, 11, 8, 8, 2],
+    equipo: ['Hacha del verdugo de la capital', 'Jubón de cuero tachonado', 'Anillo de Paso Fantasma', 'Cofia de anillas sueltas', 'Botas de cuero de vaca'],
+    habilidades: ['Carga que derriba', 'Takle', 'Pegar fuerte', 'Salto aplastante', 'Aguante'], pasivas: ['Impulso', 'Robustez']});
   esencial({linea: 'H2', nombre: 'Saltador', rol: 'hibrido', rolTxt: 'melee', nivel: 1, atrib: [9, 9, 6, 7, 2],
     equipo: ['Hacha de vikingo', 'Rodela tachonada', 'Chaleco de cuero', 'Botas de cuero de vaca'],
     habilidades: ['Salto', 'Pegar fuerte'], consumibles: ['Poción de Cuero Duro'],

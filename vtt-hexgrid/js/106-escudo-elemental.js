@@ -158,7 +158,14 @@ function escudoRayos(c, R, ms, sem, z, poco){
   });
 }
 function escudoBrasas(c, R, ms, sem, z, poco, celdas){
-  if(typeof fuegoDibujar === 'function') fuegoDibujar(celdas, z);
+  // (2026-11-06, dueño: «muestra la casilla donde está parado… también roja; que haya cierto espacio que connote que eso gira alrededor del token y
+  // no lo afecta»): el fuego se recorta con un hueco redondo alrededor del portador (un poco más grande que su casilla), así su lugar queda limpio.
+  if(typeof fuegoDibujar === 'function'){
+    ctx.save();
+    ctx.beginPath(); ctx.rect(c.x - HEX * 4, c.y - HEX * 4, HEX * 8, HEX * 8); ctx.arc(c.x, c.y, HEX * 1.12, 0, Math.PI * 2, true); ctx.clip('evenodd');
+    fuegoDibujar(celdas, z);
+    ctx.restore();
+  }
   const F = FxEscudoElemental;
   ctx.save(); ctx.globalCompositeOperation = 'lighter';
   F.orbitas(sem, 18).forEach(o => {

@@ -308,13 +308,54 @@ function bordeHexPunteado(celdas, z, color){
   ctx.strokeStyle = color; ctx.lineWidth = 1.4 / z; ctx.stroke();
   ctx.restore();
 }
+// ⚡ El manchón borroso del fuego (2026-11-06, rendimiento): el desenfoque se hace UNA vez por forma y zoom, en un lienzo aparte, y después se pega
+// en cada cuadro (antes se desenfocaba en cada cuadro). Hasta 40 formas guardadas.
+const fuegoManchones = new Map();
+function fuegoManchon(celdas, z){
+  const esc = z * (typeof dpr === 'number' ? dpr : 1), zq = Math.round(esc * 8) / 8;
+  const clave = celdas.map(c => c.col + ',' + c.fila).join(';') + '|' + zq;
+  let m = fuegoManchones.get(clave);
+  if(m) return m;
+  const cs = celdas.map(c => hexCentro(c.col, c.fila)), mx = HEX * 1.6;
+  const x0 = Math.min(...cs.map(p => p.x)) - mx, y0 = Math.min(...cs.map(p => p.y)) - mx, x1 = Math.max(...cs.map(p => p.x)) + mx, y1 = Math.max(...cs.map(p => p.y)) + mx;
+  const w = Math.max(1, Math.ceil((x1 - x0) * zq)), h = Math.max(1, Math.ceil((y1 - y0) * zq));
+  if(w * h > 4e6) return null;   // (una forma enorme: se dibuja como antes)
+  const lz = document.createElement('canvas'); lz.width = w; lz.height = h;
+  const g = lz.getContext('2d');
+  g.setTransform(zq, 0, 0, zq, -x0 * zq, -y0 * zq);
+  g.filter = `blur(${Math.max(1, HEX * 0.08 * zq).toFixed(1)}px)`;
+  const set = new Set(celdas.map(c => c.col + ',' + c.fila)), o = {radio: [0.42, 0.22], sale: [-0.04, 0.2]};
+  g.beginPath();
+  celdas.forEach(c => { const p = hexCentro(c.col, c.fila); g.moveTo(p.x + ESQUINAS[0][0], p.y + ESQUINAS[0][1]); for(let i = 1; i < 6; i++) g.lineTo(p.x + ESQUINAS[i][0], p.y + ESQUINAS[i][1]); g.closePath(); });
+  celdas.forEach(c => {   // (las mismas panzas que trazarManchon)
+    const p = hexCentro(c.col, c.fila);
+    for(let i = 0; i < 6; i++){
+      const [ax, ay] = ESQUINAS[i], [bx, by] = ESQUINAS[(i + 1) % 6], mx2 = (ax + bx) / 2, my2 = (ay + by) / 2;
+      const v = mundoAHex(p.x + mx2 * 2, p.y + my2 * 2);
+      if(v && set.has(v.col + ',' + v.fila)) continue;
+      const u = superficieAzar(c.col, c.fila, 20 + i), ww = superficieAzar(c.col, c.fila, 30 + i);
+      const sale = HEX * (o.sale[0] + o.sale[1] * ww), r = HEX * (o.radio[0] + o.radio[1] * u), d = Math.hypot(mx2, my2);
+      const cx = p.x + mx2 + mx2 / d * sale, cy = p.y + my2 + my2 / d * sale;
+      g.moveTo(cx + r, cy); g.arc(cx, cy, r, 0, Math.PI * 2);
+    }
+  });
+  g.fillStyle = 'rgba(120,28,8,.55)'; g.fill();
+  m = {lz, x0, y0, w: (x1 - x0), h: (y1 - y0)};
+  if(fuegoManchones.size > 40) fuegoManchones.clear();
+  fuegoManchones.set(clave, m);
+  return m;
+}
 function fuegoDibujar(celdas, z){
   const s = performance.now() / 1000, lista = celdas.slice(0, 120);
   ctx.save();
-  ctx.filter = `blur(${Math.max(1, HEX * 0.08 * z * (typeof dpr === 'number' ? dpr : 1)).toFixed(1)}px)`;
-  trazarManchon(celdas, {radio: [0.42, 0.22], sale: [-0.04, 0.2]});
-  ctx.fillStyle = 'rgba(120,28,8,.55)'; ctx.fill();
-  ctx.filter = 'none';
+  const man = celdas.length <= 400 ? fuegoManchon(celdas, z) : null;
+  if(man) ctx.drawImage(man.lz, man.x0, man.y0, man.w, man.h);
+  else{
+    ctx.filter = `blur(${Math.max(1, HEX * 0.08 * z * (typeof dpr === 'number' ? dpr : 1)).toFixed(1)}px)`;
+    trazarManchon(celdas, {radio: [0.42, 0.22], sale: [-0.04, 0.2]});
+    ctx.fillStyle = 'rgba(120,28,8,.55)'; ctx.fill();
+    ctx.filter = 'none';
+  }
   ctx.globalCompositeOperation = 'lighter';
   lista.forEach(c => {
     const p = hexCentro(c.col, c.fila);

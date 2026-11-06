@@ -95,10 +95,49 @@ const ESCUDO_LIQUIDO = {
   acido: {halo: 'rgba(40,120,0,', cuerpo: ['rgba(140,230,20,', 'rgba(180,255,60,', 'rgba(100,200,10,'], brillo: 'rgba(235,255,150,', gota: 'rgba(150,240,30,', gotaBrillo: 'rgba(240,255,190,'},
   toxico: {halo: 'rgba(55,10,85,', cuerpo: ['rgba(130,50,190,', 'rgba(170,90,230,', 'rgba(95,25,150,'], brillo: 'rgba(220,170,255,', gota: 'rgba(145,60,205,', gotaBrillo: 'rgba(230,200,255,'},
 };
+/* ⚡ Rendimiento (2026-11-06, dueño: «con todas las animaciones cargadas al mismo tiempo se pone lento»). Lo caro era el `ctx.filter = blur()`
+   puesto ANTES de decenas de trazos (el navegador desenfoca cada trazo por separado) y un degradado nuevo por partícula en cada cuadro. Ahora:
+   - lo borroso (la nube de la ventisca, el humo de lo siniestro) se dibuja sin filtro en un lienzo chico fuera de pantalla, a baja resolución, se
+     desenfoca UNA vez ese lienzo chico y se pega agrandado (`escudoCapaBorrosa`);
+   - los brillos (brasas, motas de luz) son una imagen de degradado hecha una sola vez y pegada con su transparencia (`escudoBrillo`);
+   - el líquido usa menos puntos por chorro; un escudo fuera de la vista no se dibuja; y con muchos escudos a la vez o con el zoom lejos, menos
+     partículas (`escudoCant`). La animación del escudo va a ~30 cuadros por segundo si no hay otra cosa animándose (`animarLento`, js/05). */
+const escudoSprites = new Map();
+function escudoBrillo(centro, borde){   // una imagen de 64 px: un punto que brilla, del color `centro` al `borde` transparente
+  const k = centro + '|' + borde;
+  let im = escudoSprites.get(k);
+  if(!im){
+    im = document.createElement('canvas'); im.width = im.height = 64;
+    const g = im.getContext('2d'), gr = g.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gr.addColorStop(0, centro); gr.addColorStop(1, borde);
+    g.fillStyle = gr; g.fillRect(0, 0, 64, 64);
+    escudoSprites.set(k, im);
+  }
+  return im;
+}
+const escudoCapas = [];   // lienzos chicos reusados (dos por capa: el dibujo y el desenfocado)
+function escudoCapaLienzo(i){ if(!escudoCapas[i]) escudoCapas[i] = document.createElement('canvas'); return escudoCapas[i]; }
+// Dibuja `fn(g)` (en coordenadas del mapa) en un lienzo chico a 1/`baja` de la resolución de pantalla, lo desenfoca una vez (`blurPx`, en píxeles
+// del lienzo chico) y lo pega agrandado en el mapa: una sola operación de desenfoque, sobre pocos píxeles.
+function escudoCapaBorrosa(c, lado, z, baja, blurPx, fn){
+  const esc = Math.max(0.05, z * (typeof dpr === 'number' ? dpr : 1) / baja), tam = Math.max(8, Math.ceil(lado * esc));
+  const a = escudoCapaLienzo(0), b = escudoCapaLienzo(1);
+  if(a.width !== tam){ a.width = a.height = tam; b.width = b.height = tam; }
+  const ga = a.getContext('2d'), gb = b.getContext('2d');
+  ga.setTransform(1, 0, 0, 1, 0, 0); ga.clearRect(0, 0, tam, tam);
+  ga.setTransform(esc, 0, 0, esc, -(c.x - lado / 2) * esc, -(c.y - lado / 2) * esc);
+  fn(ga);
+  gb.setTransform(1, 0, 0, 1, 0, 0); gb.clearRect(0, 0, tam, tam);
+  gb.filter = `blur(${Math.max(0.6, blurPx).toFixed(1)}px)`; gb.drawImage(a, 0, 0); gb.filter = 'none';
+  ctx.save(); ctx.imageSmoothingEnabled = true; ctx.drawImage(b, c.x - lado / 2, c.y - lado / 2, lado, lado); ctx.restore();
+}
+// Cuántas partículas: todas con pocos escudos y de cerca; menos con muchos o con el zoom lejos (de lejos no se distinguen).
+let escudoFactor = 1;
+const escudoCant = n => Math.max(4, Math.round(n * escudoFactor));
 function escudoLiquido(c, R, ms, sem, z, k, poco){
   const F = FxEscudoElemental, pal = ESCUDO_LIQUIDO[k], base = HEX * 0.36;
   ctx.save(); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-  F.chorros(c, R, ms, sem, {cuantos: 2, largo: 0.36, poco}).forEach((pts, ci) => {
+  F.chorros(c, R, ms, sem, {cuantos: 2, largo: 0.36, puntos: escudoFactor < 1 ? 16 : 22, poco}).forEach((pts, ci) => {
     [[2.3, pal.halo + '0.22)', 0], [1, pal.cuerpo[ci % 3] + '0.92)', 0], [0.55, pal.cuerpo[(ci + 1) % 3] + '0.55)', 0.18], [0.3, pal.brillo + '0.6)', -0.35]].forEach(([mult, color, corr]) => {
       for(let j = 1; j < pts.length; j++){
         const q0 = pts[j - 1], q1 = pts[j], w = Math.max(0.3, base * F.grosor(q1.u, ms, sem + ci) * mult);
@@ -108,7 +147,7 @@ function escudoLiquido(c, R, ms, sem, z, k, poco){
       }
     });
   });
-  F.gotas(sem, 20).forEach((g, i) => {
+  F.gotas(sem, escudoCant(20)).forEach((g, i) => {
     const p = F.posGota(g, c, R, ms, poco);
     if(p.alfa <= 0.02) return;
     const r = HEX * p.r * (0.85 + 0.15 * Math.sin(ms / 90 + i));
@@ -125,17 +164,17 @@ function escudoCopo(x, y, r, ang, a){
 }
 function escudoVentisca(c, R, ms, sem, z, poco){
   const F = FxEscudoElemental;
-  ctx.save();
-  ctx.filter = `blur(${Math.max(1.5, HEX * 0.14 * z * (typeof dpr === 'number' ? dpr : 1)).toFixed(1)}px)`;
-  F.chorros(c, R, ms, sem, {cuantos: 3, largo: 0.3, poco}).forEach(pts => {
-    for(let j = 1; j < pts.length; j++){
-      const q0 = pts[j - 1], q1 = pts[j];
-      ctx.beginPath(); ctx.moveTo(q0.x, q0.y); ctx.lineTo(q1.x, q1.y);
-      ctx.strokeStyle = `rgba(215,238,252,${(0.28 * F.grosor(q1.u, ms, sem)).toFixed(3)})`; ctx.lineWidth = HEX * 0.75 * F.grosor(q1.u, ms, sem + 3); ctx.lineCap = 'round'; ctx.stroke();
-    }
+  escudoCapaBorrosa(c, R * 3.3, z, 3, HEX * 0.14 * z * (typeof dpr === 'number' ? dpr : 1) / 3, g => {
+    g.lineCap = 'round';
+    F.chorros(c, R, ms, sem, {cuantos: 3, largo: 0.3, puntos: 20, poco}).forEach(pts => {
+      for(let j = 1; j < pts.length; j++){
+        const q0 = pts[j - 1], q1 = pts[j];
+        g.beginPath(); g.moveTo(q0.x, q0.y); g.lineTo(q1.x, q1.y);
+        g.strokeStyle = `rgba(215,238,252,${(0.28 * F.grosor(q1.u, ms, sem)).toFixed(3)})`; g.lineWidth = HEX * 0.75 * F.grosor(q1.u, ms, sem + 3); g.stroke();
+      }
+    });
   });
-  ctx.restore();
-  F.orbitas(sem, 26).forEach((o, i) => {
+  F.orbitas(sem, escudoCant(26)).forEach((o, i) => {
     const p = F.posOrbita(o, c, R, ms * 1.4, poco), r = HEX * p.r * 0.9, a = 0.45 + 0.5 * p.titila;
     if(i % 3 === 0){ ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.ang); ctx.fillStyle = `rgba(200,235,255,${a.toFixed(2)})`; ctx.beginPath(); ctx.moveTo(0, -r * 1.3); ctx.lineTo(r * 0.5, 0); ctx.lineTo(0, r * 1.3); ctx.lineTo(-r * 0.5, 0); ctx.closePath(); ctx.fill(); ctx.restore(); }   // un cristalito
     else escudoCopo(p.x, p.y, r, p.ang + ms * 0.002, a);
@@ -151,7 +190,7 @@ function escudoRayos(c, R, ms, sem, z, poco){
       ctx.strokeStyle = color; ctx.lineWidth = ancho / z; ctx.lineJoin = 'round'; ctx.stroke();
     });
   });
-  F.orbitas(sem, 14).forEach(o => {
+  F.orbitas(sem, escudoCant(14)).forEach(o => {
     const p = F.posOrbita(o, c, R, ms * 1.8, poco);
     if(p.titila < 0.45) return;
     ctx.fillStyle = `rgba(255,245,160,${(p.titila).toFixed(2)})`; ctx.beginPath(); ctx.arc(p.x, p.y, HEX * 0.035, 0, Math.PI * 2); ctx.fill();
@@ -168,12 +207,12 @@ function escudoBrasas(c, R, ms, sem, z, poco, celdas){
   }
   const F = FxEscudoElemental;
   ctx.save(); ctx.globalCompositeOperation = 'lighter';
-  F.orbitas(sem, 18).forEach(o => {
-    const p = F.posOrbita(o, c, R, ms, poco), r = HEX * (0.05 + p.r * 0.6);
-    const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 2.2);
-    g.addColorStop(0, `rgba(255,220,120,${(0.6 + 0.4 * p.titila).toFixed(2)})`); g.addColorStop(1, 'rgba(255,90,0,0)');
-    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, r * 2.2, 0, Math.PI * 2); ctx.fill();
+  const im = escudoBrillo('rgba(255,220,120,1)', 'rgba(255,90,0,0)');
+  F.orbitas(sem, escudoCant(18)).forEach(o => {
+    const p = F.posOrbita(o, c, R, ms, poco), r = HEX * (0.05 + p.r * 0.6) * 2.2;
+    ctx.globalAlpha = 0.6 + 0.4 * p.titila; ctx.drawImage(im, p.x - r, p.y - r, r * 2, r * 2);
   });
+  ctx.globalAlpha = 1;
   ctx.restore();
 }
 function escudoLuz(c, R, ms, sem, z, poco){
@@ -183,27 +222,27 @@ function escudoLuz(c, R, ms, sem, z, poco){
   const g = ctx.createRadialGradient(c.x, c.y, R * 0.6, c.x, c.y, R * 1.35);
   g.addColorStop(0, 'rgba(255,230,150,0)'); g.addColorStop(0.5, `rgba(255,225,140,${(0.16 + 0.08 * pul).toFixed(3)})`); g.addColorStop(1, 'rgba(255,220,120,0)');
   ctx.fillStyle = g; ctx.beginPath(); ctx.arc(c.x, c.y, R * 1.35, 0, Math.PI * 2); ctx.fill();
-  F.orbitas(sem, 24).forEach(o => {
-    const p = F.posOrbita(o, c, R, ms, poco), r = HEX * (0.03 + p.r * 0.5);
-    const gg = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 3);
-    gg.addColorStop(0, `rgba(255,248,210,${(0.55 + 0.45 * p.titila).toFixed(2)})`); gg.addColorStop(1, 'rgba(255,210,90,0)');
-    ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(p.x, p.y, r * 3, 0, Math.PI * 2); ctx.fill();
+  const im = escudoBrillo('rgba(255,248,210,1)', 'rgba(255,210,90,0)');
+  F.orbitas(sem, escudoCant(24)).forEach(o => {
+    const p = F.posOrbita(o, c, R, ms, poco), r = HEX * (0.03 + p.r * 0.5) * 3;
+    ctx.globalAlpha = 0.55 + 0.45 * p.titila; ctx.drawImage(im, p.x - r, p.y - r, r * 2, r * 2);
   });
+  ctx.globalAlpha = 1;
   ctx.restore();
 }
 function escudoSombra(c, R, ms, sem, z, poco){
   const F = FxEscudoElemental;
-  ctx.save();
-  ctx.filter = `blur(${Math.max(1.5, HEX * 0.1 * z * (typeof dpr === 'number' ? dpr : 1)).toFixed(1)}px)`;
-  F.chorros(c, R, ms, sem, {cuantos: 4, largo: 0.24, poco}).forEach((pts, ci) => {
-    for(let j = 1; j < pts.length; j++){
-      const q0 = pts[j - 1], q1 = pts[j], w = HEX * 0.42 * F.grosor(q1.u, ms, sem + ci);
-      ctx.beginPath(); ctx.moveTo(q0.x, q0.y); ctx.lineTo(q1.x, q1.y); ctx.lineCap = 'round';
-      ctx.strokeStyle = ci % 2 ? 'rgba(20,6,28,0.55)' : 'rgba(80,30,110,0.45)'; ctx.lineWidth = w; ctx.stroke();
-    }
+  escudoCapaBorrosa(c, R * 3.3, z, 3, HEX * 0.1 * z * (typeof dpr === 'number' ? dpr : 1) / 3, g => {
+    g.lineCap = 'round';
+    F.chorros(c, R, ms, sem, {cuantos: 4, largo: 0.24, puntos: 20, poco}).forEach((pts, ci) => {
+      for(let j = 1; j < pts.length; j++){
+        const q0 = pts[j - 1], q1 = pts[j], w = HEX * 0.42 * F.grosor(q1.u, ms, sem + ci);
+        g.beginPath(); g.moveTo(q0.x, q0.y); g.lineTo(q1.x, q1.y);
+        g.strokeStyle = ci % 2 ? 'rgba(20,6,28,0.55)' : 'rgba(80,30,110,0.45)'; g.lineWidth = w; g.stroke();
+      }
+    });
   });
-  ctx.restore();
-  F.orbitas(sem, 12).forEach(o => {
+  F.orbitas(sem, escudoCant(12)).forEach(o => {
     const p = F.posOrbita(o, c, R, ms * 0.8, poco);
     ctx.fillStyle = `rgba(150,90,200,${(0.25 + 0.35 * p.titila).toFixed(2)})`; ctx.beginPath(); ctx.arc(p.x, p.y, HEX * 0.035, 0, Math.PI * 2); ctx.fill();
   });
@@ -212,9 +251,19 @@ function escudoElementalDibujar(z){
   const ps = escudoPortadores();
   if(!ps.length || typeof FxEscudoElemental === 'undefined') return false;
   const ms = performance.now(), poco = escudoPoco(), R = HEX * 1.42;
+  // La parte del mapa que se ve (con un margen de 3 casillas): lo de afuera no se dibuja.
+  const ancho = lienzo.clientWidth || 0, alto = lienzo.clientHeight || 0, x0 = -vista.x / z - HEX * 3, y0 = -vista.y / z - HEX * 3, x1 = (ancho - vista.x) / z + HEX * 3, y1 = (alto - vista.y) / z + HEX * 3;
+  let visibles = 0;
+  const lista = [];
   for(const p of ps){
     if((p.t.oculto && !soyGM) || (typeof tokenVisiblePorNiebla === 'function' && !tokenVisiblePorNiebla(p.t))) continue;
-    const celdas = escudoAnilloDe(p.t), c = (typeof posicionesDibujo !== 'undefined' && posicionesDibujo && posicionesDibujo.get && posicionesDibujo.get(p.id)) || hexCentro(p.t.col, p.t.fila);
+    const c = (typeof posicionesDibujo !== 'undefined' && posicionesDibujo && posicionesDibujo.get && posicionesDibujo.get(p.id)) || hexCentro(p.t.col, p.t.fila);
+    if(ancho && (c.x < x0 || c.x > x1 || c.y < y0 || c.y > y1)) continue;
+    visibles++; lista.push({p, c});
+  }
+  escudoFactor = Math.min(1, z < 0.6 ? 0.5 : z < 0.9 ? 0.75 : 1, visibles > 4 ? 0.6 : visibles > 2 ? 0.8 : 1);
+  for(const {p, c} of lista){
+    const celdas = escudoAnilloDe(p.t);
     const sem = FxEscudoElemental.semillaDe(p.id), k = p.def.clave;
     const [r, g, b] = ESCUDO_COLOR[k] || [200, 200, 200];
     if(k !== 'fuego' && typeof bordeHexPunteado === 'function') bordeHexPunteado(celdas, z, `rgba(${r},${g},${b},.5)`);   // dónde quema exactamente
@@ -227,6 +276,7 @@ function escudoElementalDibujar(z){
       else escudoSombra(c, R, ms, sem, z, poco);
     }catch(err){ console.error('Escudo elemental: el dibujo', err); }
   }
+  if(typeof pedirAnimacionLenta === 'function'){ pedirAnimacionLenta(); return false; }   // ~30 cuadros por segundo (js/05)
   return true;
 }
 

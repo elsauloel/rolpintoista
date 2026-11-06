@@ -69,12 +69,18 @@ function ajustarTamano(){
 /* ---------- Dibujo ---------- */
 
 let dibujoPedido = false;
+// ⚡ Animación decorativa a ~30 cuadros por segundo (2026-11-06: el Escudo elemental): lo que solo adorna llama a `pedirAnimacionLenta()` en vez
+// de devolver true; si nada más se está animando, el próximo cuadro se pide a los 33 ms (en vez del siguiente cuadro de la pantalla, ~16 ms).
+let animarLento = false, animarLentoTimer = 0;
+function pedirAnimacionLenta(){ animarLento = true; }
 function pedirDibujo(){
   if(dibujoPedido) return;
   dibujoPedido = true;
   requestAnimationFrame(() => {
     dibujoPedido = false;
+    animarLento = false;
     if(dibujar()) pedirDibujo();
+    else if(animarLento && !animarLentoTimer) animarLentoTimer = setTimeout(() => { animarLentoTimer = 0; pedirDibujo(); }, 33);
   });
 }
 

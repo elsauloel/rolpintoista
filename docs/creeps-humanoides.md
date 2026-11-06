@@ -744,6 +744,12 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
 - Números (nv2 → nv3): Def 6 → 8 · Bloqueo 9 → 10 · PdG/Parry 7 → 8 · Dmg 6 → 7 · Res.Esp/Res.CC 13 → 14 · Res. crít. T6 0 → 1.
 - ✅ **T1 niveles 2 y 3 cargados en el pool esencial el 2026-11-06** (`comun/creeps-esenciales.js`).
 
+### T1 Escudero · nivel 4 (aprobado 2026-11-06, cargado en el pool)
+- Atributos Con 15 · Fue 8 · Agi 7 · Des 8 · Esp 4 → vida 80 (75 + 5 de la armadura), No2 7. Equipo: Hacha de piedra · Escudo de escamas (B) ·
+  **Media armadura de escudero** (B: Def +5, crít. T4 +1, Bloqueo +1, Res.CC +1, Vida +5) · Cofia de anillas sueltas · Grebas de cuero. Habilidades:
+  + **Interponerse**. Pasivas: Guardia firme · **Devolver gentileza** (en lugar de «Cortar el paso» 🆕, que no existe).
+- Números (nv3 → nv4): Def 8 → 10 · Bloqueo 10 → 12 · Dmg 7 → 8 · Eva/Ini/Mov 6 → 7 · Res.CC 14 → 16 · Res.Esp 14 → 15 · crít. T4 2 → 3.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

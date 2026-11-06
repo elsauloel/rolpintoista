@@ -264,6 +264,9 @@
   esencial({...T1, nivel: 3, atrib: [14, 7, 6, 8, 4],
     equipo: ['Hacha de piedra', 'Escudo de escamas', 'Peto de hierro', 'Cofia de anillas sueltas', 'Grebas de cuero'],
     habilidades: ['Provocar', 'Piel de hierro', 'Golpe de escudo', 'Aguante'], pasivas: ['Guardia firme']});
+  esencial({...T1, nivel: 4, atrib: [15, 8, 7, 8, 4],   // (aprobado 2026-11-06: Interponerse, Devolver gentileza, Media armadura de escudero)
+    equipo: ['Hacha de piedra', 'Escudo de escamas', 'Media armadura de escudero', 'Cofia de anillas sueltas', 'Grebas de cuero'],
+    habilidades: ['Provocar', 'Piel de hierro', 'Golpe de escudo', 'Aguante', 'Interponerse'], pasivas: ['Guardia firme', 'Devolver gentileza']});
 
   if(faltan.length) console.warn('Creeps esenciales: no se encontró', faltan.join(', '));
   window.CREEPS_ESENCIALES_FALTAN = faltan;

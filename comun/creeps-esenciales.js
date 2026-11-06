@@ -135,6 +135,12 @@
     equipo: ['Hacha de verdugo de pueblo', 'Chaleco de cuero', 'Anillo de Paso Fantasma'],
     habilidades: ['Carga que derriba', 'Takle'], consumibles: ['Pergamino grupal de Paso Fantasma'],
     estrategia: 'Híbrido. Cruza el campo y se lleva puesto a uno: derriba y empuja, le rompe la línea al grupo y llega a los de atrás.'});
+  // H1 Embestidor (niveles 2 en adelante, aprobados de a uno desde el 2026-11-06).
+  const H1 = {linea: 'H1', nombre: 'Embestidor', rol: 'hibrido', rolTxt: 'melee', consumibles: ['Pergamino grupal de Paso Fantasma'],
+    estrategia: 'Híbrido. Cruza el campo y se lleva puesto a uno: derriba y empuja, le rompe la línea al grupo y llega a los de atrás.'};
+  esencial({...H1, nivel: 2, atrib: [11, 9, 7, 7, 2],
+    equipo: ['Hacha de verdugo de pueblo', 'Chaleco de cuero', 'Anillo de Paso Fantasma', 'Cofia de anillas sueltas', 'Botas de cuero de vaca'],
+    habilidades: ['Carga que derriba', 'Takle', 'Pegar fuerte'], pasivas: ['Impulso']});
   esencial({linea: 'H2', nombre: 'Saltador', rol: 'hibrido', rolTxt: 'melee', nivel: 1, atrib: [9, 9, 6, 7, 2],
     equipo: ['Hacha de vikingo', 'Rodela tachonada', 'Chaleco de cuero', 'Botas de cuero de vaca'],
     habilidades: ['Salto', 'Pegar fuerte'], consumibles: ['Poción de Cuero Duro'],

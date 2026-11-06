@@ -756,6 +756,12 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
   humano** (en lugar de «Muro de escudos» del boceto; el del pool con ese nombre está sin auditar y es otra cosa). Pasivas: Guardia firme · Devolver gentileza.
 - Números (nv4 → nv5): Def 10 → 11 · Bloqueo 12 → 13 · PdG/Parry 8 → 9 · Res.CC 16 → 17 · Res.Esp 15 → 16 · crít. T4 3 → 4 · daño fijo 9 = 9.
 
+### H1 Embestidor · nivel 2 (aprobado 2026-11-06, cargado en el pool)
+- Atributos Con 11 · Fue 9 · Agi 7 · Des 7 · Esp 2 → vida 55, No2 8 (con Impulso). Equipo: Hacha de verdugo de pueblo · Chaleco de cuero · Anillo de
+  Paso Fantasma · **Cofia de anillas sueltas** · **Botas de cuero de vaca**. Habilidades: Carga que derriba · Takle · **Pegar fuerte**. Pasiva: **Impulso**.
+- Números (nv1 → nv2): No2 6 → 8 · Def 2 → 4 · Def. esp. 0 → 1 · Dmg 8 → 9 · Bloqueo 8 → 9 · Eva/Ini/Mov 6 → 7 · crít. T4 0 → 2. (La Carga que
+  derriba ya no es una onda en cono: es una carrera de hasta 4 casillas, +1 PdG y +1 daño por casilla.)
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

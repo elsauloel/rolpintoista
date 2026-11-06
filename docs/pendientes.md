@@ -70,6 +70,13 @@
 > Devolver gentileza y el caso sin ninguna; el Salto de punta a punta (personaje y creep) y el Takle; la Mala sombra; Patotear; las ondas del agua vistas
 > desde otra pantalla; el Tótem de silencio; Apuntar y Marcar con el potente; el cuadro del duelo encima del gancho de Arrastrar.
 
+> **🔥 Cómo costear el daño mágico de los creeps (2026-11-06, abierto; dueño: «no me termina de cerrar… me haría rediseñar todas las armas
+> mágicas y las skills mágicas; quizás le pondría un valor fijo»).** Hallazgo: con el Piromante nv3 (Esp 16, Ef.Esp 17) la Lengua de fuego hace ≈ 13
+> por 16 SP y la Bola de fuego ≈ 13 a cada uno por 16 SP, mientras el Mago jugador hace con 16 SP un Rayo mágico ≈ 34½ directo, y con 4 SP un Orbe
+> arcano ≈ 10½ a cada uno. Opciones vistas: (a) ½ Ef.Esp en los de a uno y ¼ en los de área; (b) X = el SP que paga es el daño (2d6 + X a uno,
+> 2d6 + X/2 en área; hay que programar el X para creeps); (c) **valor fijo** de SP y de daño, solo para los hechizos de creep (no toca armas ni
+> clase). Mientras tanto quedan como están (2d6 + ¼ Ef.Esp, SP = su Especial).
+
 > **🖥 Para cuando el dueño está en la compu** (2026-10-15, dueño: «hay pendientes generales y otros exclusivos de cuando estoy en la compu;
 > cuando te diga "estoy en la compu", fijate qué pendientes tengo para hacer desde acá»). Lo que necesita al dueño sentado: decisiones con boceto a la
 > vista, probar con su cuenta, pegar reglas.

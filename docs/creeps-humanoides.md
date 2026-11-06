@@ -812,6 +812,13 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
   Habilidades: + **Escudo elemental** (nueva, vtt-hexgrid/js/106; en lugar de Misil/Arma elemental). Pasivas: Potencia especial · **Puntería arcana**.
 - Números (nv3 → nv4): Def 1 → 3 (5 a distancia) · Eva 6 → 8 · PdG.Esp 16 → 18 · Ef.Esp 17 → 18 · Def. esp. 3 → 1 · Res. fuego 1 → 2.
 
+### M1 Piromante · nivel 5 (aprobado 2026-11-06, cargado en el pool) — ✅ línea M1 completa
+- Atributos Con 11 · Fue 2 · Agi 7 · Des 7 · Esp 18 → vida 65 (55 + kevlar 5 + casco 5), No2 7, SP 54 (regen 9). Equipo: Varita del chorro de lava (B) ·
+  Chaleco de kevlar (B) · **Casco de bandas remachadas** (B; dueño: el Turbante no, «la visión al creep no le da ninguna ventaja», el GM ve todo el mapa)
+  · Botella con un diablito · Escarpines de fieltro · **Mitones del primer conjuro** (−1 SP al primer uso de la varita en el turno). Habilidades: +
+  **Meteoro**. Pasivas: Potencia especial · Puntería arcana.
+- Números (nv4 → nv5): Def 3 → 5 (7 a distancia) · crít. T4 1 → 2 · PdG.Esp 18 → 19 · Ef.Esp 18 → 19 · SP 51 → 54 · Res. fuego 2 → 1.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4
@@ -878,7 +885,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | L1 | ✅ (2026-11-02) | | | | |
 | L2 | ✅ (2026-11-03) | | | | |
 | R1 | ✅ (2026-11-03) | | | | |
-| M1 | ✅ (2026-11-02) | | | | |
+| M1 | ✅ (2026-11-02) | ✅ (2026-11-06) | ✅ (2026-11-06) | ✅ (2026-11-06) | ✅ (2026-11-06) |
 | S1 | ✅ (2026-11-02) | | | | |
 | D1 | ✅ (2026-11-02) | | | | |
 | W2 | ✅ (2026-11-03) | | | | |

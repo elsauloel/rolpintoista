@@ -105,6 +105,9 @@
   esencial({...M1, nivel: 4, atrib: [10, 2, 7, 6, 17],
     equipo: ['Varita del chorro de lava', 'Botella con un diablito', 'Chaleco de kevlar', 'Gorro de piel de salamandra', 'Escarpines de fieltro'],
     habilidades: ['Lengua de fuego', 'Muro de fuego', 'Parpadeo', 'Bola de fuego', 'Escudo elemental'], pasivas: ['Potencia especial', 'Puntería arcana']});
+  esencial({...M1, nivel: 5, atrib: [11, 2, 7, 7, 18],   // (aprobado 2026-11-06: Meteoro; Casco de bandas remachadas —el Turbante no: «la visión al creep no le da ventaja»— y Mitones del primer conjuro)
+    equipo: ['Varita del chorro de lava', 'Botella con un diablito', 'Chaleco de kevlar', 'Casco de bandas remachadas', 'Escarpines de fieltro', 'Mitones del primer conjuro'],
+    habilidades: ['Lengua de fuego', 'Muro de fuego', 'Parpadeo', 'Bola de fuego', 'Escudo elemental', 'Meteoro'], pasivas: ['Potencia especial', 'Puntería arcana']});
   esencial({linea: 'L1', nombre: 'Sangrador', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [6, 6, 10, 8, 3],
     equipo: ['Cuchilla del frigorífico', 'Chaleco de cuero', 'Zapatillas de lona'],
     habilidades: ['Golpe que sangra', 'Sal en la herida'], consumibles: ['Óleo venenoso'],

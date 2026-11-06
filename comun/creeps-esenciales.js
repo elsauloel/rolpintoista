@@ -239,8 +239,8 @@
     estrategia: 'Choque liviano. Se mueve y corta: salta encima de los de atrás, pega y se va; nunca se queda quieto.'});
 
   // ---- Niveles 2 a 5 (la ronda del 2026-11-05: uno por rol, nivel por nivel; detalle y números en docs/creeps-humanoides.md) ----
-  // W1 Hachero (ruta final aprobada 2026-11-05; Arte de la guerra en lugar de «Partir en dos»). En el nivel 4, Golpe fuerte otra vez (+1 al daño) en lugar
-  // de Sed de sangre (dueño, 2026-11-06: las pasivas que se activan cuando cae un rival no van para creeps: «le pondría más uno al daño y ya»).
+  // W1 Hachero (ruta final aprobada 2026-11-05; Arte de la guerra en lugar de «Partir en dos»). En el nivel 4, Piel curtida (+1 Defensa) en lugar
+  // de Sed de sangre (dueño, 2026-11-06: «si ya tenía Golpe fuerte… la que da más defensa») (dueño, 2026-11-06: las pasivas que se activan cuando cae un rival no van para creeps: «le pondría más uno al daño y ya»).
   const W1 = {linea: 'W1', nombre: 'Hachero', rol: 'warrior', rolTxt: 'melee', consumibles: ['Pergamino grupal de Furia de Combate'],
     estrategia: 'Warrior. Le rompe la armadura al que más se defiende y después lo castiga. Su punto débil: la magia.'};
   esencial({...W1, nivel: 2, atrib: [8, 10, 7, 7, 4],
@@ -251,10 +251,10 @@
     habilidades: ['Pegar fuerte', 'Romper armadura', 'Barrido', 'Golpe demoledor'], pasivas: ['Golpe fuerte']});
   esencial({...W1, nivel: 4, atrib: [10, 12, 8, 8, 4],
     equipo: ['Hacha de guerra ligera', 'Cota de malla fina', 'Cofia de anillas sueltas', 'Grebas de cuero', 'Guanteletes de hierro'],
-    habilidades: ['Pegar fuerte', 'Romper armadura', 'Barrido', 'Golpe demoledor', 'Arte de la guerra'], pasivas: ['Golpe fuerte ×2']});
+    habilidades: ['Pegar fuerte', 'Romper armadura', 'Barrido', 'Golpe demoledor', 'Arte de la guerra'], pasivas: ['Golpe fuerte', 'Piel curtida']});
   esencial({...W1, nivel: 5, atrib: [11, 13, 8, 9, 4],
     equipo: ['Hacha de guerra ligera', 'Cota de malla fina', 'Casco de bandas remachadas', 'Grebas de cuero', 'Guanteletes de hierro', 'Botas de estibador'],
-    habilidades: ['Pegar fuerte', 'Romper armadura', 'Barrido', 'Golpe demoledor', 'Arte de la guerra', 'Remate'], pasivas: ['Golpe fuerte ×2']});
+    habilidades: ['Pegar fuerte', 'Romper armadura', 'Barrido', 'Golpe demoledor', 'Arte de la guerra', 'Remate'], pasivas: ['Golpe fuerte', 'Piel curtida']});
   // T1 Escudero (niveles 2 y 3 aprobados 2026-11-05/06; Aguante en lugar de «Plantarse»).
   const T1 = {linea: 'T1', nombre: 'Escudero', rol: 'tanque', rolTxt: 'tanque', consumibles: ['Poción de Cuero Duro', 'Poción de Piel de Cristal'],
     estrategia: 'Tanque. Se planta adelante, provoca al que más pega y aguanta; con el escudo lo tira y lo demora.'};

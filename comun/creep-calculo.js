@@ -188,6 +188,8 @@ const CreepCalculo = (() => {
     let v = num(sc.defensa) + (num(sc.equipoVivo) >= 1 ? Combatiente.defDeEquipo(sc) : 0);   // 🛡 la base + lo equipado (paso 3; un creep sin convertir la trae sumada)
     // Bonos de Defensa de los estados (ej. Piel de escoria): se suman por stack.
     (sc.estados || []).forEach(es => { if(es.activo === false) return; const st = Math.max(1, num(es.stacks) || 1); (es.mods || []).forEach(m => { if(m.stat === 'def') v += num(m.val) * st; }); });
+    // (2026-11-06) Las pasivas que dan Defensa (Piel curtida) también: antes la Defensa de un creep no las miraba.
+    (sc.pasivas || []).forEach(p => { const c = pasivaComprasCreep(p); (p.mods || []).forEach(m => { if(m.stat === 'def') v += num(m.val) * c; }); });
     v -= rota;
     return Math.max(0, v);
   }

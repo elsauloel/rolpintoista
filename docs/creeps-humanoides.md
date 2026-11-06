@@ -733,6 +733,12 @@ Res. crít. T4/T6/T8 3/2/1 · Def. esp. 0 · Res.Mt 4. **Pendiente: cargarlo en 
   escudo** (cd 2, 5 No2). Pasiva: **Guardia firme** (+1 Bloqueo). Consumibles: Cuero Duro y Piel de Cristal.
 - Números (nv1 → nv2): Def 5 → 6 · Def. esp. 2 · Bloqueo 7 → 9 · Dmg 5 → 6 · Eva/Ini/Mov 5 → 6 · Res.Esp/Res.CC 12 → 13 · Res. crít. T4 1 → 2.
 
+### T1 Escudero · nivel 3 (aprobado 2026-11-06)
+- Atributos Con 14 · Fue 7 · Agi 6 · Des 8 · Esp 4 → vida 70, No2 6. Equipo: Hacha de piedra · **Escudo de escamas** (B: Def +3, Bloqueo +1,
+  crít. T6 +1, Def. esp. +1, peso 3 → Golpe de escudo 3d10) · Peto de hierro · Cofia de anillas sueltas · Grebas de cuero. Habilidades: Provocar ·
+  Piel de hierro · Golpe de escudo · **Aguante** (en lugar de «Plantarse» 🆕 del boceto, que no existe). Pasiva: Guardia firme.
+- Números (nv2 → nv3): Def 6 → 8 · Bloqueo 9 → 10 · PdG/Parry 7 → 8 · Dmg 6 → 7 · Res.Esp/Res.CC 13 → 14 · Res. crít. T6 0 → 1.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

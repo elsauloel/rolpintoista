@@ -773,6 +773,17 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
   Habilidades: + **Aguante**. Pasivas: Impulso · **Robustez**.
 - Números (nv3 → nv4): vida 60 → 80 · No2 8 → 9 · Def 4 = 4 · Def. esp. 1 → 3 · Dmg 10 → 11 · Bloqueo 10 → 11 · Eva/Ini/Mov 7 → 8 · crít. T4 2 → 4.
 
+### H1 Embestidor · nivel 5 — ⏸ en pausa (dueño, 2026-11-06: «dejemos el Embestidor para más adelante»)
+- Propuesta pendiente: Con 14 · Fue 12 · Agi 8 · Des 9 · Esp 2 → vida 90; + **Furia**; Cofia → **Casco de bandas remachadas** (B) · + **Guanteletes de
+  hierro** (Ini −1: ofrecer otra pieza de manos si molesta). Def 6 · Def. esp. 2 · PdG 9 · Bloqueo 13.
+
+### M1 Piromante · nivel 2 (aprobado 2026-11-06, cargado en el pool)
+- Ruta nueva (dueño, 2026-11-06): nv2 **Parpadeo** + Potencia especial (en lugar de «Toque abrasador», sin auditar) · nv3 **Bola de fuego** · nv4 una
+  2.ª pasiva + Misil elemental o Arma elemental · nv5 **Meteoro**. Atributos (Con/Fue/Agi/Des/Esp): nv2 8/2/6/5/15.
+- Nv2: vida 45 (40 + campera), No2 6, SP 45 (regen 7). Equipo: Varita de la bola de fuego · Botella con un diablito · Campera de cuero con tachas ·
+  Gorro de piel de salamandra · **Babuchas bordadas del adivino**. Habilidades: Lengua de fuego · Muro de fuego · **Parpadeo** (Flash, 4 SP; en turno
+  ajeno, el doble). Pasiva: **Potencia especial** (+1 Ef.Esp). Números (nv1 → nv2): PdG.Esp 14 → 15 · Ef.Esp 14 → 16 · Def. esp. 2 → 3 · Res.Mt 15 → 17.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

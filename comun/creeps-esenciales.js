@@ -91,6 +91,12 @@
     equipo: ['Varita de la bola de fuego', 'Botella con un diablito', 'Campera de cuero con tachas', 'Gorro de piel de salamandra'],
     habilidades: ['Lengua de fuego', 'Muro de fuego'], consumibles: ['Poción de SP menor'],
     estrategia: 'Mago de fuego. Controla el terreno: levanta un muro de llamas que corta el paso y quema de a uno a los que se acercan.'});
+  // M1 Piromante (niveles 2 en adelante, de a uno desde el 2026-11-06; en modo SP). Nv2: Parpadeo (en lugar de «Toque abrasador», sin auditar).
+  const M1 = {linea: 'M1', nombre: 'Piromante', rol: 'mago', rolTxt: 'mágico', consumibles: ['Poción de SP menor'],
+    estrategia: 'Mago de fuego. Controla el terreno: levanta un muro de llamas que corta el paso y quema de a uno a los que se acercan.'};
+  esencial({...M1, nivel: 2, atrib: [8, 2, 6, 5, 15],
+    equipo: ['Varita de la bola de fuego', 'Botella con un diablito', 'Campera de cuero con tachas', 'Gorro de piel de salamandra', 'Babuchas bordadas del adivino'],
+    habilidades: ['Lengua de fuego', 'Muro de fuego', 'Parpadeo'], pasivas: ['Potencia especial']});
   esencial({linea: 'L1', nombre: 'Sangrador', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [6, 6, 10, 8, 3],
     equipo: ['Cuchilla del frigorífico', 'Chaleco de cuero', 'Zapatillas de lona'],
     habilidades: ['Golpe que sangra', 'Sal en la herida'], consumibles: ['Óleo venenoso'],

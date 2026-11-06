@@ -814,6 +814,16 @@ dueño); sí puede crear uno nuevo a nombre de otro jugador (ver arriba).
   momento chico `salto`; Salto aplastante aplasta ahí (`saltoAplastar`) → un solo rival pegado: el duelo contra él; varios: «Elegí el objetivo» con
   un clic → vuelve a `dueloElegirObjetivoMapa` con `msg.saltoHecho` + `msg.objetivoFijo` (los dos llamados a `saltoHab` de js/13 lo saltean).
   Esc o clic derecho **antes de caer** cancelan sin cobrar (`msg.alCancelar`).
+
+- **🛡 Escudo elemental** (2026-11-06, dueño; reglas en `../docs/creeps-humanoides.md`, M1 nivel 4): `js/106-escudo-elemental.js`. `dueloElegirObjetivoMapa`
+  (js/13) lo desvía a `escudoElementalDirecto` (sin tirada: pone el estado con `escudoDe` y `escudoEsp`, línea en la Mesa y un momento). El anillo
+  (6 casillas, `escudoAnilloDe`) lo dibuja cada pantalla desde js/05 (`escudoElementalDibujar`, un estilo por elemento, solo si el portador se ve).
+  Las quemaduras: `escudoRevisar` (cada 700 ms) compara los pares portador–vecino con los de antes: un par nuevo quema; al cambiar el turno, quema al
+  que empieza pegado. Los primeros 9 s después de cargar solo anota. **Una sola pantalla resuelve cada víctima** (`escudoResuelvoYo`: creep → el GM;
+  personaje o invocación → quien tiene el 🎮 control, si no su dueño; antes un personaje controlado por el GM se quemaba dos veces) y una vez por ronda
+  (`escudoQuemados`). `escudoQuemar`: 1d6 con resistencia elemental, identidad y ×1,5 del fuego, directo (`magico`); los efectos con Res.Esp contra el
+  Ef.Esp guardado (no tira si el elemento no tiene efecto, como el fuego). Probado con clics en «Claude · pruebas», «Encuentro 2» (GM, J1, J2):
+  entrar al anillo, el inicio de turno, una sola quemadura por víctima, el portador no se quema; capturas `p8-escudo-*`.
   **En dos tiempos** (2026-11-05, dueño: «al caer… te pregunta atacar… puede existir la ocasión en la que uno simplemente quiera saltar… dividiría
   el costo»): se puede caer en **cualquier** casilla libre del área (no solo pegada a un rival) y, al caer (y después de aplastar, si es el aplastante),
   siempre `AvisoCombate.preguntar` «¿Atacar?» → Sí: un rival pegado, el duelo directo; varios, «Elegí el objetivo» (Esc ahí = no ataca); el bono del

@@ -806,6 +806,7 @@ function dibujarLienzo(){
   if(typeof aguaOndasDibujar === 'function' && aguaOndasDibujar(z)) animando = true;   // 💧 las ondas de los pasos en el agua (js/50)
   if(typeof curaDibujarAuras === 'function' && curaDibujarAuras(z)) animando = true;   // ✨ las auras sanadoras, debajo de los tokens (js/70)
   if(typeof estandarteDibujar === 'function' && estandarteDibujar(z)) animando = true;   // 🚩 el aura de un estandarte de guerra (js/73)
+  if(typeof escudoElementalDibujar === 'function' && escudoElementalDibujar(z)) animando = true;   // 🛡 el anillo del Escudo elemental, que sigue al token (js/106)
   if(typeof hexInfoDibujar === 'function') hexInfoDibujar(z);
   if(typeof saltoCasillaDibujar === 'function' && saltoCasillaDibujar(z)) animando = true;   // 🦘 dónde puede caer el Salto (js/105)   // ⬡ la casilla elegida para ver qué la afecta (js/104)
   if(typeof meteoroDibujar === 'function' && meteoroDibujar(z)) animando = true;   // ☄ la sombra de un meteoro por caer (js/74)

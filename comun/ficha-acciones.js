@@ -1131,6 +1131,7 @@ const FichaAcciones = (() => {
     if(spec.marcadoPor){ draft.marcadoPor = spec.marcadoPor; draft.marcadoToken = spec.marcadoToken || ''; }
     if(spec.miedoDe){ draft.miedoDe = spec.miedoDe; draft.miedoDeNombre = spec.miedoDeNombre || ''; }
     if(spec.provocaDe){ draft.provocaDe = spec.provocaDe; draft.provocaDeNombre = spec.provocaDeNombre || ''; }   // 😤 Provocado por quién (2026-10-26)   // 😱 Miedo (2026-10-18): quién lo asustó
+    if(spec.escudoDe || spec.escudoEsp){ draft.escudoDe = spec.escudoDe || ''; draft.escudoEsp = Math.round(Number(spec.escudoEsp) || 0); }   // 🛡 Escudo elemental (2026-11-06)
     if(spec.chupaDe){ draft.chupaDe = spec.chupaDe; draft.chupaUid = spec.chupaUid || ''; draft.chupaNombre = spec.chupaNombre || ''; }   // 🪱 la Sanguijuela: quién la lanzó (2026-11-03)
     if(spec.resetea) draft.resetea = true;   // ☠ vuelve a esos stacks, no los suma (la Nube tóxica, 2026-10-26)
     if(spec.finCombate) draft.finCombate = true;   // 🩸 se va al «Finalizar combate» (el Relicario de sangre, 2026-10-27)

@@ -1944,6 +1944,12 @@ versión parecida en más de una, es candidato a juntar.
   no cuenta; últimas 10 y «y N más». «✔ Ya lo vi» guarda «visto hasta» **en este navegador** (localStorage `aviso-propuestas-visto`: sin reglas nuevas).
   `armar(entradas, {duenoUid, vistoHasta, max})` es puro (en `pruebas.html`).
 - **`fx-transfusion.js`** (`FxTransfusion`, 2026-11-03) — la geometría de la animación de la Transfusión sanguínea, sin dibujar: `curva(a, b, ms, semilla, n)` (de A a B, arqueada y ondulante, que se mueve con el tiempo y vale 0 en las puntas), `ventana(p)` (qué tramo está en el aire), `grosor`, `gotitas(semilla, n)`, `puntoEn(pts, u)` y `rand(semilla)` (repetible: misma semilla, misma animación en todas las pantallas). La dibuja el mapa (`vtt-hexgrid/js/92-transfusion-fx.js`); probada en `pruebas.html`.
+- **`fx-escudo-elemental.js`** (`FxEscudoElemental`, 2026-11-06) — la geometría del anillo del Escudo elemental, sin dibujar y repetible por
+  semilla: `chorros` (líquido que gira y salpica afuera, para ácido y tóxico), `grosor`, `gotas`/`posGota`, `orbitas`/`posOrbita`, `semillaDe`, `rand`.
+  La dibuja `vtt-hexgrid/js/106-escudo-elemental.js`; probada en `pruebas.html`. Los datos del Escudo viven en `combatiente.js`
+  (`ESCUDOS_ELEMENTALES` con `resiste` por elemento, `ESCUDO_ELEMENTAL`, `escudoElementalDuelo`, `escudoElementalVariantes`, `escudoElementalDe`;
+  `agregarEstado` reemplaza un escudo por otro); los estados, en `estados-presets.js` (`escudoElemental: <clave>`); `escudoDe`/`escudoEsp` (quién lo
+  puso y su Ef.Esp) pasan por `estados-aplicar.js` y `ficha-acciones.js` y salen en los resúmenes públicos (para que todos vean el anillo de un creep).
 
 - **`registro.js`** (`Registro`, 2026-11-04, dueño: «mantener un historial sin que se acumule al infinito»; «que siempre exista el botón empezar
   registro nuevo, y un recordatorio al empezar un combate») — **el registro del combate**: `ajustes/registro = {desde, anteriorDesde, gmNombre,

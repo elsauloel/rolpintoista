@@ -43,19 +43,20 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="tiradas.js"></script>
 <script src="critico.js"></script>
 <script src="fx-transfusion.js?v=20261103fx2"></script>
+<script src="fx-escudo-elemental.js?v=20261106escudo"></script>
 <script src="fx-onda.js?v=20261103onda2"></script>
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261106no2"></script>
+<script src="combatiente.js?v=20261106escudo3"></script>
 <script src="creep-calculo.js?v=20261106piel"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261106no2"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
-<script src="estados-presets.js?v=20261105sombra"></script>
-<script src="estados-aplicar.js?v=20261104ae"></script>
+<script src="estados-presets.js?v=20261106escudo3"></script>
+<script src="estados-aplicar.js?v=20261106escudo3"></script>
 <script src="recibidos.js?v=20261103pm"></script>
 <script src="tokens-auto.js"></script>
 <script src="creeps-mapas.js?v=20261105sync"></script>
@@ -70,7 +71,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-habilidades.js?v=20261105orden"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
-<script src="ficha-resumen.js?v=20261105batalla"></script>
+<script src="ficha-resumen.js?v=20261106escudo3"></script>
 <script src="ficha-sesion.js"></script>
 <script src="inv-calculo.js"></script>
 <script src="inv-botonera.js"></script>
@@ -78,7 +79,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js"></script>
-<script src="ficha-acciones.js?v=20261105ung"></script>
+<script src="ficha-acciones.js?v=20261106escudo3"></script>
 <script src="orden-turnos.js?v=20261105orden"></script>
 <script src="ficha-mantenimiento.js?v=20261103ve"></script>
 <script src="estado-preguntas.js"></script>
@@ -122,8 +123,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="skills-clase.js?v=20261105nube"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261104ig"></script>
-<script src="skills-creep-base.js?v=20261105r2"></script>
-<script src="creeps-esenciales.js?v=20261106m13"></script>
+<script src="skills-creep-base.js?v=20261106escudo3"></script>
+<script src="creeps-esenciales.js?v=20261106escudo3"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
@@ -6710,6 +6711,25 @@ prueba('❤ La vida del equipo en los creeps (2026-11-06, dueño): en vivo, sin 
   const piro = CreepCalculo.normalizar(structuredClone(es.find(x => x.nombre === 'Hachero' && x.nivel === 5).datos));
   igual([a.hpMax, a.hp, a2.hpMax, b.hpMax, b.hp, c.hpMax, d.hpMax, d.hp, e.hpMax, vida('Hachero', 5), vida('Hachero', 1), piro.hpMax],
     [45, 45, 45, 45, 20, 45, 40, 40, 305, 65, 35, 65]);
+});
+prueba('🛡 Escudo elemental (2026-11-06): 7 elementos en paralelo con el Arma elemental, el ácido sin tirada, la habilidad de creep y el estado que reemplaza al anterior', () => {
+  const E = Combatiente.ESCUDOS_ELEMENTALES, h = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Escudo elemental');
+  const fuego = Combatiente.escudoElementalDe('Escudo ígneo'), acido = E.find(x => x.clave === 'acido');
+  const estados = [];
+  Combatiente.agregarEstado(estados, {...EstadosAplicar.componer({nombre: 'Escudo helado', escudoEsp: 14, escudoDe: 'tok1'})});
+  Combatiente.agregarEstado(estados, {...EstadosAplicar.componer({nombre: 'Escudo ígneo', escudoEsp: 15, escudoDe: 'tok1'})});
+  const a = h && armarHabilidadDeCreep(h.datos, 4);
+  igual([E.length, fuego && fuego.clave, acido.resiste, E.filter(x => x.resiste).length, E.every(x => !!EstadosAplicar.presetPorNombre(x.estado) && !!EstadosAplicar.presetPorNombre(x.arma)),
+    !!h, h && h.datos.sp.auditada, a && a.spCosto, a && a.cd, h && h.datos.sp.variantes.length, h && h.datos.sp.azarElegir.sp,
+    estados.filter(x => x.escudoElemental).map(x => x.nombre + ':' + x.escudoEsp + ':' + x.turnos).join()],
+    [7, 'fuego', false, 6, true, true, true, 4, 3, 7, 1, 'Escudo ígneo:15:2']);
+  // La geometría del giro: la misma semilla da lo mismo; cambia con el tiempo; las gotas que salpican se alejan.
+  const F = FxEscudoElemental, c = {x: 0, y: 0}, s = F.semillaDe('tokenX');
+  const p1 = F.chorros(c, 50, 1000, s), p2 = F.chorros(c, 50, 1000, s), p3 = F.chorros(c, 50, 1600, s);
+  const g = F.gotas(s, 20).find(x => x.salpica), lejos = q => Math.hypot(q.x, q.y);
+  igual([JSON.stringify(p1) === JSON.stringify(p2), JSON.stringify(p1) !== JSON.stringify(p3), p1.length, p1[0].length,
+    !!g && lejos(F.posGota(g, c, 50, g.periodo * 0.8 - g.fase + g.periodo * 10)) > lejos(F.posGota(g, c, 50, g.periodo * 0.05 - g.fase + g.periodo * 10)), !!g && F.posGota(g, c, 50, 500, true).alfa === 1],
+    [true, true, 2, 41, true, true]);
 });
 prueba('⚔ Sed de batalla (2026-11-05): la pasiva está en el pool, para jugadores y creeps, y suma su stat (gana 3 No2 al voltear a un rival, aunque pase del máximo)', () => {
   const p = (typeof PASIVAS_BASE !== 'undefined' ? PASIVAS_BASE : []).find(x => x.nombre === 'Sed de batalla') || {};

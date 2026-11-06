@@ -55,6 +55,7 @@ const EstadosAplicar = (() => {
     if(s.marca){ out.marca = String(s.marca).slice(0, 80); out.marcaNombre = String(s.marcaNombre || '').slice(0, 40); }   // y en quien marca, a quién
     if(s.miedoDe){ out.miedoDe = String(s.miedoDe).slice(0, 80); out.miedoDeNombre = String(s.miedoDeNombre || '').slice(0, 40); }
     if(s.provocaDe){ out.provocaDe = String(s.provocaDe).slice(0, 80); out.provocaDeNombre = String(s.provocaDeNombre || '').slice(0, 40); }   // 😤 Provocado por quién (2026-10-26)   // 😱 Miedo (2026-10-18): quién lo asustó
+    if(s.escudoDe || s.escudoEsp){ out.escudoDe = String(s.escudoDe || '').slice(0, 80); out.escudoEsp = Math.max(0, Math.min(99, Math.round(Number(s.escudoEsp) || 0))); }   // 🛡 Escudo elemental: quién lo tiró y su Ef.Esp (2026-11-06)
     if(s.chupaDe){ out.chupaDe = String(s.chupaDe).slice(0, 120); out.chupaUid = String(s.chupaUid || '').slice(0, 80); out.chupaNombre = String(s.chupaNombre || '').slice(0, 40); }   // 🪱 la Sanguijuela: quién la lanzó (2026-11-03)
     if(s.muerdeA){ out.muerdeA = String(s.muerdeA).slice(0, 80); out.muerdeANombre = String(s.muerdeANombre || '').slice(0, 40); out.desde = Math.round(Number(s.desde) || 0); }   // 🦷 Mordiendo (2026-10-21): a quién tiene agarrado
     return out;
@@ -83,6 +84,7 @@ const EstadosAplicar = (() => {
       ...(s.provocaDe ? {provocaDe: s.provocaDe, provocaDeNombre: s.provocaDeNombre} : {}),
       ...(s.muerdeA ? {muerdeA: s.muerdeA, muerdeANombre: s.muerdeANombre, desde: s.desde} : {}),
       ...(s.chupaDe ? {chupaDe: s.chupaDe, chupaUid: s.chupaUid, chupaNombre: s.chupaNombre} : {}),
+      ...(s.escudoDe || s.escudoEsp ? {escudoDe: s.escudoDe, escudoEsp: s.escudoEsp} : {}),
       ...(s.resetea ? {resetea: true} : {}), ...(s.finCombate ? {finCombate: true} : {}),
       ...(s.armaDe ? {armaDe: s.armaDe, nombre: s.nombre} : {})};   // 🔥 Arma elemental en un arma: su nombre con el arma («🔥 Arma ígnea: Lanza corta»)
   }

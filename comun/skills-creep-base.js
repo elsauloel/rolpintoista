@@ -920,6 +920,12 @@
   H('Arma elemental', 'B', '*', 'a', 3, {detalle: Combatiente.ARMA_ELEMENTAL.detalle, azarElegir: {...Combatiente.AZAR_ELEGIR},
     no2: 2, spCosto: 1, auditada: true, cuentaComoAtaque: true, ataqueTxt: Combatiente.ARMA_ELEMENTAL.ataqueTxt,
     duelo: duAE(ARMAS_ELEM[0].estado), variantes: Combatiente.armaElementalVariantes()});
+  // 🛡 Auditada (dueño, 2026-11-06, el Piromante nivel 4: «Escudo de fuego… lo invoca sobre un aliado o sobre un rival… lo rodea de un círculo de fuego
+  // que hace daño a quien ocupe ese casillero»; «que lo siga»; y en paralelo con el Arma elemental): al azar 2 No2 y 4 SP (o cooldown 3); eligiendo el
+  // elemento, 1 SP más (o cooldown 4) — `azarElegir`. El anillo lo resuelve el mapa (vtt-hexgrid/js/106-escudo-elemental.js).
+  H('Escudo elemental', 'B', '*', 'ga', 3, {detalle: Combatiente.ESCUDO_ELEMENTAL.detalle, azarElegir: {...Combatiente.AZAR_ELEGIR},
+    no2: 2, spCosto: 4, auditada: true, cuentaComoAtaque: true, ataqueTxt: Combatiente.ESCUDO_ELEMENTAL.ataqueTxt,
+    duelo: Combatiente.escudoElementalDuelo(Combatiente.ESCUDOS_ELEMENTALES[0].estado), variantes: Combatiente.escudoElementalVariantes()}, 'aliados,un enemigo');
   // 🧿 Auditada (dueño, 2026-10-21; el Debuffer, «maleficios»): el Enyetar de los personajes, para creeps, con Flash (en turno ajeno, el doble) y el botón
   // 🧿 del GM (vtt-hexgrid/js/60). Los números, los del Enyetar: 5 SP (sin No2) o cooldown 3.
   H('Mal de ojo', 'X', '*', 'gx', 3, {detalle: 'FLASH. Después de que un personaje tira (a la vista, dentro de su Rango), le echa el mal de ojo: el personaje vuelve a hacer esa tirada y se queda con la más baja, y el duelo se vuelve a resolver. Una vez por tirada. En turno ajeno cuesta más: con SP, el doble de SP; con turnos de espera, un 50 % más de espera (mínimo +1). El GM la usa desde el botón 🧿 (arriba, o al costado del duelo abierto).',

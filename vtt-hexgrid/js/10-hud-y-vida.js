@@ -1721,6 +1721,7 @@ async function hudEstadoCambiar(t, indice, accion, delta){
           const resumenEstados = inv.estados.filter(e => e && e.activo !== false && e.nombre).slice(0, 30).map(e => ({
             nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...(e.invulnerable ? {invulnerable: true} : {}), ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
             polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '', ...Combatiente.atrapaPub(e),   // 🕸 js/68
+            ...(e.escudoElemental ? {escudoElemental: String(e.escudoElemental).slice(0, 20), escudoEsp: Math.round(Number(e.escudoEsp) || 0), escudoDe: String(e.escudoDe || '').slice(0, 80)} : {}),   // 🛡 Escudo elemental (js/106): el Ef.Esp de quien lo tiró
             ...(e.protege ? {protege: String(e.protege).slice(0, 80), protegeNombre: String(e.protegeNombre || '').slice(0, 40)} : {}),   // 🛡 Miti-Miti: a quién protege (el lazo, js/95)
             detalle: String(e.detalle || '').slice(0, 200),
           }));
@@ -1730,6 +1731,7 @@ async function hudEstadoCambiar(t, indice, accion, delta){
           cambios['resumen.estados'] = datos.efectos.filter(e => e && e.activo !== false && e.nombre).slice(0, 30).map(e => ({
             nombre: String(e.nombre).slice(0, 60), turnos: num(e.turnos), permanente: !!e.permanente, ...(e.invulnerable ? {invulnerable: true} : {}), ...((e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0) ? {escudo: num(e.escudoMagicoActual ?? e.escudoMagico), ...(e.excedenteVida ? {excedente: true, ...(e.excedenteTope ? {tope: num(e.excedenteTope)} : {})} : {escudoMax: num(e.escudoMagico)})} : {}), ...(e.armaduraRota ? {armaduraRota: true, stacks: Math.max(1, num(e.stacks) || 1)} : {}),
             polaridad: e.polaridad === 'buff' || e.polaridad === 'debuff' ? e.polaridad : '', ...Combatiente.atrapaPub(e),   // 🕸 js/68
+            ...(e.escudoElemental ? {escudoElemental: String(e.escudoElemental).slice(0, 20), escudoEsp: Math.round(Number(e.escudoEsp) || 0), escudoDe: String(e.escudoDe || '').slice(0, 80)} : {}),   // 🛡 Escudo elemental (js/106): el Ef.Esp de quien lo tiró
             ...(e.protege ? {protege: String(e.protege).slice(0, 80), protegeNombre: String(e.protegeNombre || '').slice(0, 40)} : {}),   // 🛡 Miti-Miti: a quién protege (el lazo, js/95)
             detalle: String(e.detalle || '').slice(0, 200),
           }));

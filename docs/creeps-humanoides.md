@@ -790,6 +790,21 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
   de salamandra · Babuchas del adivino. Habilidades: + **Bola de fuego**. Números (nv2 → nv3): PdG.Esp 15 → 16 · Ef.Esp 16 → 17 · Res.Mt 17 → 18.
 - ⏸ El costo y el daño de sus hechizos (¼ Ef.Esp, SP = Especial) quedan abiertos: ver «🔥 Cómo costear el daño mágico de los creeps» en pendientes.
 
+### M1 Piromante · nivel 4 — preparado, SIN cargar (2026-11-06)
+- En `comun/creeps-esenciales.js`, comentado («⏸ PREPARADO y sin cargar»): se carga cuando el dueño lo apruebe. Atributos Con 10 · Fue 2 · Agi 7 ·
+  Des 6 · Esp 17. Equipo: Varita del chorro de lava · Botella con un diablito · Poncho de espejitos · Gorro de piel de salamandra · Babuchas del
+  adivino. Habilidades: Lengua de fuego · Muro de fuego · Parpadeo · Bola de fuego · **Escudo elemental**. Pasivas: Potencia especial · Puntería arcana.
+- **🛡 Escudo elemental** (dueño, 2026-11-06; empezó como «Escudo de fuego»): sobre un aliado, sobre sí mismo o sobre un rival a Rango; entra
+  directo, sin tirada (como el Arma elemental). Al azar 2 No2 + 4 SP; eligiendo el elemento, +1 SP; cooldown 3 (+1 eligiendo). Un anillo en las 6
+  casillas de al lado que **sigue al portador** 2 turnos: quema con 1d6 del elemento (con lo de cada elemento: los mismos presets del Arma elemental)
+  a quien entra, a quien le llega el anillo o a quien empieza su turno pegado. Una vez por ronda por víctima y por anillo; nunca al portador. Estados:
+  Escudo ígneo / helado / eléctrico / ácido / venenoso / luminoso / siniestro; uno nuevo reemplaza al anterior.
+  - **Resistir** (dueño): el daño es directo (solo la resistencia elemental lo frena); los **efectos** del elemento se resisten con la Res.Esp de la
+    víctima contra el Ef.Esp del lanzador (guardado en el estado al ponerlo). Si resiste, solo el daño. Es un dato por elemento (`resiste`): por
+    ahora sí en todos **salvo el ácido** (la Armadura rota entra siempre). **El resto se revisa elemento por elemento con el dueño.**
+  - Dibujo: el elemento gira alrededor del portador (fuego = las llamitas del Muro de fuego, eléctrico = rayos en zigzag, hielo = ventisca,
+    ácido y tóxico = líquido como la Transfusión). **Luz y siniestro: propuesta de Claude, a confirmar por el dueño.**
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

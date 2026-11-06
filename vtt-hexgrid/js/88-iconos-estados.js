@@ -93,6 +93,7 @@ const ICONOS_ESTADO = {
   'ojo certero': {ic: '👁️'}, 'enfocado': {ic: '👁️'}, 'apuntando a la cabeza': {ic: '👁️'}, 'golpe anunciado': {ic: '👁️'},
   'armas perforantes': {ic: '🗡️'}, 'perforante': {ic: '🗡️'},
   // ⚔ Armas con algo (el elemento)
+  'escudo igneo': {ic: '🛡'}, 'escudo helado': {ic: '🛡'}, 'escudo electrico': {ic: '🛡'}, 'escudo acido': {ic: '🛡'}, 'escudo venenoso': {ic: '🛡'}, 'escudo luminoso': {ic: '🛡'}, 'escudo siniestro': {ic: '🛡'},   // 🛡 Escudo elemental (js/106)
   'arma ignea': {ic: '🔥'}, 'arma helada': {ic: '❄️'}, 'arma electrica': {ic: '⚡'},
   'arma acida': {ic: '🧪'}, 'arma venenosa': {ic: '🧪'}, 'arma envenenada': {ic: '🧪'}, 'oleo venenoso': {ic: '🧪'}, 'oleo venenoso concentrado': {ic: '🧪'},
   'arma luminosa': {ic: '☀️'}, 'arma siniestra': {ic: '🌑'}, 'arma bendecida': {ic: '✨'},

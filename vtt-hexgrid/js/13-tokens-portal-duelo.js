@@ -1030,6 +1030,10 @@ function dueloElegirObjetivoMapa(msg){
         try{ await arrastrarDueloGancho(yo, mio, t, ataque); }catch(err){ console.error('Arrastrar: el enganche', err); }
         return;
       }
+      if(typeof escudoElementalEsHab === 'function' && escudoElementalEsHab(ataque)){   // 🛡 Escudo elemental (js/106, 2026-11-06): sin duelo, al instante
+        try{ await escudoElementalDirecto(yo, mio, t, ataque); }catch(err){ console.error('Escudo elemental', err); }
+        return;
+      }
       if(typeof armaElementalEsHab === 'function' && armaElementalEsHab(ataque)){   // 🔥 Arma elemental (js/97, 2026-11-04): sin duelo, al instante, en el arma que se elija
         let ok = true;
         try{ ok = await armaElementalDirecto(yo, mio, t, ataque); }catch(err){ console.error('Arma elemental', err); }

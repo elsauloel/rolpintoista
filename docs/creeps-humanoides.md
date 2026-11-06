@@ -714,6 +714,9 @@ los niveles 2 a 5 completos (atributos, habilidad, pasiva, equipo concreto, cons
   **Sed de sangre**. Números (nv3 → nv4): Def 6 → 8 · Eva 6 → 8 · Bloqueo 11 → 13 · daño fijo 14 → 15 · Res. crít. T4/T6/T8 2/1/0 → 2/2/1.
 
 ### ✅ W1 Hachero · ruta final, niveles 1 a 5 (aprobada 2026-11-05)
+- 🔄 (2026-11-06, dueño) Las pasivas que se activan cuando cae un rival (Sed de sangre, Sed de batalla) **no van para creeps**: «está bueno para
+  jugadores, pero no para creeps». En el nivel 4 del Hachero, en lugar de Sed de sangre, **Golpe fuerte otra vez** («más uno al daño y ya»): daño fijo
+  16 en el nivel 4 y 17 en el 5.
 - Dueño: «Partir en dos, reemplazarlo por alguna que sea del pool» → **Arte de la guerra**; «lo pondría en un nivel anterior» → opción A: Arte
   de la guerra en el nivel 4 y Remate en el nivel 5; **Sed de sangre se queda en el nivel 4** (dueño: «Sed de sangre dejalo en nivel 4»). Casco del nivel 5: **Casco de bandas remachadas** (Def. esp. queda en 0:
   su punto débil, la magia, a propósito).
@@ -722,7 +725,7 @@ los niveles 2 a 5 completos (atributos, habilidad, pasiva, equipo concreto, cons
 | 1 | 9/7/6/7/4 · 35 · 6 | Pegar fuerte (cd 2) · Romper armadura (cd 3) | — | Hacha · Cota de malla de hierro · Cofia de anillas sueltas |
 | 2 | 10/8/7/7/4 · 40 · 7 | Barrido (cd 3) | Golpe fuerte (+1 Dmg) | + Grebas de cuero |
 | 3 | 11/9/7/8/4 · 45 · 7 | Golpe demoledor (cd 3, lenta) | — | Hacha → **Hacha de guerra ligera** (B) |
-| 4 | 12/10/8/8/4 · 55 · 8 | **Arte de la guerra** (Flash +3, cd 2) | **Sed de sangre** | Cota de hierro → **Cota de malla fina** (B) · + Guanteletes de hierro |
+| 4 | 12/10/8/8/4 · 55 · 8 | **Arte de la guerra** (Flash +3, cd 2) | **Golpe fuerte ×2** (+1 Dmg más; antes Sed de sangre) | Cota de hierro → **Cota de malla fina** (B) · + Guanteletes de hierro |
 | 5 | 13/11/8/9/4 · 65 · 8 | **Remate** (cd 3) | — | Cofia → **Casco de bandas remachadas** (B) · + Botas de estibador |
 Consumible en todos: Pergamino grupal de Furia de Combate. Nv5 (números del juego): Def 10 · daño fijo 16 · PdG/Parry 9/9 · Bloqueo 14 · Res.CC 12 ·
 Res. crít. T4/T6/T8 3/2/1 · Def. esp. 0 · Res.Mt 4. ✅ **Cargado en el pool esencial (niveles 2 a 5) el 2026-11-06** (`comun/creeps-esenciales.js`; la vida suma

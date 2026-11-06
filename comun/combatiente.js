@@ -2353,7 +2353,9 @@ const Combatiente = (() => {
   // Lo que queda igual si resiste: nada por ahora (2026-11-06: por un rato el hielo dejaba Escarcha 1 de mínimo; el dueño corrigió: «si resiste
   // el efecto, no entra nada de Escarcha»). Queda el dato por si algún elemento lo necesita.
   const ESCUDO_MINIMO = {};
-  const ESCUDOS_ELEMENTALES = ARMAS_ELEMENTALES.map(a => ({clave: a.clave, estado: ESCUDOS_NOMBRE[a.clave], arma: a.estado, nombre: a.nombre, icono: a.icono, resiste: ESCUDO_RESISTE[a.clave] !== false, minimo: ESCUDO_MINIMO[a.clave] || 0,
+  // Con qué se resiste el efecto (por defecto Res.Esp; dueño, 2026-11-06: «la Parálisis del eléctrico se resiste con resistencia crowd control»).
+  const ESCUDO_RESISTE_STAT = {rayo: 'rescc'};
+  const ESCUDOS_ELEMENTALES = ARMAS_ELEMENTALES.map(a => ({clave: a.clave, estado: ESCUDOS_NOMBRE[a.clave], arma: a.estado, nombre: a.nombre, icono: a.icono, resiste: ESCUDO_RESISTE[a.clave] !== false, minimo: ESCUDO_MINIMO[a.clave] || 0, resisteStat: ESCUDO_RESISTE_STAT[a.clave] || 'resmg',
     que: a.que.replace(/^\+/, '').replace('se cura lo que le saca', 'quien lleva el escudo se cura lo que le saca') + ' a quien quede pegado'}));
   const ESCUDO_ELEMENTAL = {
     nombre: 'Escudo elemental',

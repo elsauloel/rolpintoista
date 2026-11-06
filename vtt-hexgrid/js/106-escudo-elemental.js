@@ -372,11 +372,11 @@ async function escudoQuemar(pid, vid, motivo){
       const hayEfecto = !!(idE && idE.estado) || !!ef.porDano || efs.some(x => x && !x.danoMagico && num(x.caras) > 0);   // (el fuego solo quema: no hay nada que resistir)
       if(recibido > 0 && def.resiste && hayEfecto){
         const tirar = v0 => { const fp = formulaParaValor(Math.max(0, Math.round(num(v0)))), f = typeof fp === 'string' ? fp : String((fp && fp.formula) || Math.max(0, Math.round(num(v0)))); const r = tirarDados(f); return {total: r ? num(r.total) : Math.max(0, Math.round(num(v0))), formula: f, r}; };
-        const tE = tirar(num(e.estado.escudoEsp)), tV = tirar(typeof trampaValorStat === 'function' ? trampaValorStat(v, 'resmg') : 0);
+        const tE = tirar(num(e.estado.escudoEsp)), tV = tirar(typeof trampaValorStat === 'function' ? trampaValorStat(v, def.resisteStat || 'resmg') : 0);
         try{ mesaPublicar(`${def.estado} de ${quienP} · Ef.Esp`, {formula: tE.formula, rolls: tE.r ? tE.r.rolls : [], mod: tE.r ? tE.r.mod : 0, total: tE.total, quien: `${def.estado} de ${quienP}`}); }catch(err){}
-        try{ mesaPublicar(`${quienV} · Res.Esp`, {formula: tV.formula, rolls: tV.r ? tV.r.rolls : [], mod: tV.r ? tV.r.mod : 0, total: tV.total}); }catch(err){}
+        try{ mesaPublicar(`${quienV} · ${def.resisteStat === 'rescc' ? 'Res.CC' : 'Res.Esp'}`, {formula: tV.formula, rolls: tV.r ? tV.r.rolls : [], mod: tV.r ? tV.r.mod : 0, total: tV.total}); }catch(err){}
         resistio = tV.total > tE.total;
-        partes.push(`${resistio ? 'resistió' : 'no resistió'} el efecto (Res.Esp ${tV.total} contra Ef.Esp ${tE.total})`);
+        partes.push(`${resistio ? 'resistió' : 'no resistió'} el efecto (${def.resisteStat === 'rescc' ? 'Res.CC' : 'Res.Esp'} ${tV.total} contra Ef.Esp ${tE.total})`);
       }
       if(rm && rm.r && !rm.r.invulnerable && recibido > 0){
         if(ef.cadena) await dueloCadena(d, recibido).catch(err => console.error('Escudo: el salto del rayo', err));

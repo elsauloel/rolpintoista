@@ -750,6 +750,12 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
   + **Interponerse**. Pasivas: Guardia firme · **Devolver gentileza** (en lugar de «Cortar el paso» 🆕, que no existe).
 - Números (nv3 → nv4): Def 8 → 10 · Bloqueo 10 → 12 · Dmg 7 → 8 · Eva/Ini/Mov 6 → 7 · Res.CC 14 → 16 · Res.Esp 14 → 15 · crít. T4 2 → 3.
 
+### T1 Escudero · nivel 5 (aprobado 2026-11-06, cargado en el pool) — ✅ línea T1 completa
+- Atributos Con 16 · Fue 9 · Agi 7 · Des 9 · Esp 4 → vida 85, No2 7. Equipo: **Hacha del forjador** (B: Tipo 8, Bloqueo +1, Rompe armadura 50 %) ·
+  Escudo de escamas (B) · Media armadura de escudero (B) · Cofia de anillas sueltas · Grebas de cuero · **Botas de estibador**. Habilidades: + **Escudo
+  humano** (en lugar de «Muro de escudos» del boceto; el del pool con ese nombre está sin auditar y es otra cosa). Pasivas: Guardia firme · Devolver gentileza.
+- Números (nv4 → nv5): Def 10 → 11 · Bloqueo 12 → 13 · PdG/Parry 8 → 9 · Res.CC 16 → 17 · Res.Esp 15 → 16 · crít. T4 3 → 4 · daño fijo 9 = 9.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4
@@ -810,7 +816,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | Línea | Nivel 1 | Nivel 2 | Nivel 3 | Nivel 4 | Nivel 5 |
 |---|---|---|---|---|---|
 | W1 | ✅ (2026-11-02) | ✅ (2026-11-05) | ✅ (2026-11-05) | ✅ (2026-11-05) | ✅ (2026-11-05) |
-| T1 | ✅ (2026-11-02) | | | | |
+| T1 | ✅ (2026-11-02) | ✅ (2026-11-05) | ✅ (2026-11-06) | ✅ (2026-11-06) | ✅ (2026-11-06) |
 | T2 | ✅ (2026-11-02; rehecho 2026-11-03) | | | | |
 | H1 | ✅ (2026-11-03) | | | | |
 | L1 | ✅ (2026-11-02) | | | | |

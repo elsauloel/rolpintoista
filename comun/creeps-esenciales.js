@@ -267,6 +267,9 @@
   esencial({...T1, nivel: 4, atrib: [15, 8, 7, 8, 4],   // (aprobado 2026-11-06: Interponerse, Devolver gentileza, Media armadura de escudero)
     equipo: ['Hacha de piedra', 'Escudo de escamas', 'Media armadura de escudero', 'Cofia de anillas sueltas', 'Grebas de cuero'],
     habilidades: ['Provocar', 'Piel de hierro', 'Golpe de escudo', 'Aguante', 'Interponerse'], pasivas: ['Guardia firme', 'Devolver gentileza']});
+  esencial({...T1, nivel: 5, atrib: [16, 9, 7, 9, 4],   // (aprobado 2026-11-06: Escudo humano en lugar de «Muro de escudos»; Hacha del forjador)
+    equipo: ['Hacha del forjador', 'Escudo de escamas', 'Media armadura de escudero', 'Cofia de anillas sueltas', 'Grebas de cuero', 'Botas de estibador'],
+    habilidades: ['Provocar', 'Piel de hierro', 'Golpe de escudo', 'Aguante', 'Interponerse', 'Escudo humano'], pasivas: ['Guardia firme', 'Devolver gentileza']});
 
   if(faltan.length) console.warn('Creeps esenciales: no se encontró', faltan.join(', '));
   window.CREEPS_ESENCIALES_FALTAN = faltan;

@@ -805,6 +805,13 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
   - Dibujo: el elemento gira alrededor del portador (fuego = las llamitas del Muro de fuego, eléctrico = rayos en zigzag, hielo = ventisca,
     ácido y tóxico = líquido como la Transfusión). **Luz y siniestro: propuesta de Claude, a confirmar por el dueño.**
 
+### M1 Piromante · nivel 4 (aprobado 2026-11-06, cargado en el pool)
+- Atributos Con 10 · Fue 2 · Agi 7 · Des 6 · Esp 17 → vida 55 (50 + kevlar 5), No2 7, SP 51. Equipo: Varita del chorro de lava (B) · Botella con un
+  diablito · **Chaleco de kevlar** (B: Def +3, +2 a distancia, crít. T4 +1, Vida +5, Res. fuego +1) · Gorro de piel de salamandra · **Escarpines de
+  fieltro** (Eva +1). Dueño: «no me enfocaría en ponerle Defensa especial a un mago… protección contra rango» (antes, Poncho de espejitos y Babuchas).
+  Habilidades: + **Escudo elemental** (nueva, vtt-hexgrid/js/106; en lugar de Misil/Arma elemental). Pasivas: Potencia especial · **Puntería arcana**.
+- Números (nv3 → nv4): Def 1 → 3 (5 a distancia) · Eva 6 → 8 · PdG.Esp 16 → 18 · Ef.Esp 17 → 18 · Def. esp. 3 → 1 · Res. fuego 1 → 2.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

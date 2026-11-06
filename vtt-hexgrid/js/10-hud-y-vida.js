@@ -152,6 +152,8 @@ function creepArmadmgMapa(sc){ return CreepCalculo.armadmgEfectiva(sc); }
 function resolverGolpe(golpe, defensa, efectos, o){
   const activos = (efectos || []).filter(e => e && e.activo !== false);
   if(activos.some(e => e.invulnerable)) return {recibido: 0, invulnerable: true, defensa, absorbido: 0};
+  // ✍ `o.directoVida` (2026-11-06, el «Otro valor» del duelo): el número ya es lo que entra a la vida — sin Defensa, Armadura arcana ni escudos.
+  if(o && o.directoVida){ const v = Math.max(0, golpe); return {recibido: v, absorbido: 0, defensa: 0, llega: v}; }
   let recibido = Math.max(0, golpe - defensa);
   // 🗡 Perfora N (`o.perfora`, 2026-10-27: las trampas que perforan, la Aguja): N puntos pasan siempre la Defensa (Combatiente.perforaPasa).
   const perfora = o && num(o.perfora) > 0 ? Combatiente.perforaPasa(golpe, defensa, Math.min(num(o.perfora), golpe)) : 0;

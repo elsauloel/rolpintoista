@@ -1667,6 +1667,12 @@ versión parecida en más de una, es candidato a juntar.
   (el defensor no es un creep) → el GM no reclama ni aplica el daño hasta que `dano.aceptado` (`aceptarDano`, el botón `[data-dano-aceptar]`
   del paso 5: «💔 Aplicar el daño» para el dueño o quien tiene 🎮 el control, «💔 Aplicar por …» para el GM). En las trampas, el paso
   `dano-aplicar` (vtt-hexgrid/js/19).
+  **✍ Otro valor** (2026-11-06, dueño: «la opción de aplicar a mano un valor diferente al que te sugiere el duelo»): al lado de «💔 Aplicar…» un botón
+  chico abre un campo con lo que sugiere el duelo (la vista previa; si no hay, el total). «Aplicar este valor» → `aceptarDano(id, valor, sugerido)` guarda
+  `dano.aMano = {valor, sugerido}`; el mapa del GM (`dueloAplicarDano`, js/13) lo aplica TAL CUAL, directo a la vida (`danio*` con `o.directoVida`:
+  sin Defensa, Armadura arcana ni escudos; Invulnerable sigue mandando; el elemental del arma no se suma aparte) y con ese número calcula Espinas,
+  Espejo, Drena, Luz sanadora, el estado por daño, el salto del rayo, la identidad del elemento y Sed de sangre. Cuadro y Mesa: «✍ se aplicó a mano: N
+  (el duelo sugería S)». Probado con clics en «Claude · pruebas» (J1 a su personaje, el GM por un creep).
 
 - **El Ef.Esp de un arma especial, para arriba** (2026-10-17, dueño, con el Báculo de escarcha): `Combatiente.sumaEspecialDe(dmgesp, sumaEspecial)`
   (true = entero, 0.5 = la mitad, 0.25 = un cuarto: los seis báculos) redondea **para arriba** y lo usan personajes y creeps; `sumaEspecialTxt`.

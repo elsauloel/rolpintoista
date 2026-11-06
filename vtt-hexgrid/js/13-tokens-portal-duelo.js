@@ -1849,6 +1849,37 @@ async function dueloAplicarDano(d, o){
   const base = {crudo, mult, golpe, ignoraDef: crit, mitad: d.resultado === 'mitad', ...(multTxt ? {cargaMult: multTxt} : {})};
   if(!t) return {...base, manual: true, motivoManual: 'el token ya no está en el mapa'};
   const esInv = t.tipo === 'pj' && String(t.fichaId).includes(SEP_INVOCACION);
+  // ✍ «Otro valor» (2026-11-06, dueño): quien recibe (o el GM por él) escribió lo que ENTRA A LA VIDA. Se aplica tal cual (sin Defensa, escudos ni
+  // resistencias; Invulnerable sigue mandando) y lo que depende del daño (Espinas, Espejo, Drena, Luz sanadora, el estado por daño, el salto del
+  // rayo, la identidad del elemento, Sed de sangre) se calcula con ese número. El daño elemental del arma ya va adentro: no se suma aparte.
+  if(dn.aMano && !simular){
+    const N = Math.max(0, Math.round(num(dn.aMano.valor))), sug = Math.max(0, Math.round(num(dn.aMano.sugerido)));
+    try{
+      if(esInv && typeof bnCargarPiezas === 'function') await bnCargarPiezas();
+      const oM = {directoVida: true, magico: habMagica || !!(dn.magico && num(dn.magico.total) > 0)};
+      const res = esInv ? await danioInv(t, String(N), true, 0, 0, oM) : t.tipo === 'creep' ? await danioCreep(t, String(N), true, 0, 0, oM) : await danioPj(t, String(N), true, 0, 0, oM);
+      const inv = !!res.r.invulnerable, entro = inv ? 0 : num(res.r.recibido), perdio = Math.max(0, num(res.previo) - num(res.nuevo));
+      if(!inv && (t.tipo === 'creep' || (t.tipo === 'pj' && !esInv)) && typeof aguanteSumar === 'function') aguanteSumar(t);
+      const espinas = inv ? null : await dueloEspinas(d, N, habMagica);
+      const espejo = inv ? null : await dueloEspejo(d, habMagica || (dn.magico && num(dn.magico.total) > 0) ? N : 0);
+      const drena = d.hab && d.hab.dano && d.hab.dano.drena ? await dueloDrenar(d, num(d.hab.dano.drenaPct) > 0 ? Math.ceil(perdio * num(d.hab.dano.drenaPct) / 100) : perdio)
+        : !d.hab && num(dn.drenaPct) > 0 ? await dueloDrenar(d, Math.ceil(perdio * num(dn.drenaPct) / 100)) : null;
+      const lsPct = d.hab ? num(d.hab.dano && d.hab.dano.luzSanadora) : num(dn.magico && dn.magico.luzSanadora);
+      const lsMonto = lsPct > 0 && perdio > 0 && !inv ? Math.max(1, Math.floor(perdio * Math.min(100, lsPct) / 100)) : 0;
+      const luzSanadora = lsMonto > 0 ? {...(await dueloDrenar(d, lsMonto, {sinExtra: true})), pct: Math.min(100, lsPct)} : null;
+      const porDano = inv || !entro ? null : d.hab && d.hab.dano && d.hab.dano.porDano ? await dueloPorDano(d, entro).catch(() => null)
+        : !d.hab && dn.magico && dn.magico.porDano ? await dueloPorDano(d, entro, dn.magico.porDano).catch(() => null) : null;
+      if(idHab && idHab.estado && entro > 0 && !(d.contacto && d.contacto.resistioEstado)) await dueloIdentidadEstado(d, elHab, idHab).catch(err => console.error('La identidad del elemento:', err));
+      if(entro > 1 && ((d.hab && d.hab.cadena) || (!d.hab && dn.magico && dn.magico.cadena))) await dueloCadena(d, entro).catch(err => console.error('No se pudo hacer saltar el rayo:', err));
+      if(num(res.previo) > 0 && num(res.nuevo) <= 0 && typeof ordenSedDeSangre === 'function') ordenSedDeSangre(d).catch(err => console.error('Sed de sangre:', err));
+      const cuenta = [{s: '', txt: 'El duelo sugería', v: sug}, inv ? {s: '', txt: 'Invulnerable: el golpe no hace nada'} : {s: '=', txt: '✍ se aplicó a mano: entra a la vida', v: entro, f: 1}];
+      return {...base, cuenta, aMano: {valor: N, sugerido: sug}, defensa: 0, recibido: entro, absorbido: 0, invulnerable: inv, hpAntes: num(res.previo), hpDespues: num(res.nuevo),
+        ...(espinas ? {espinas} : {}), ...(espejo ? {espejo} : {}), ...(drena ? {drena} : {}), ...(luzSanadora ? {luzSanadora} : {}), ...(porDano ? {porDano} : {})};
+    }catch(err){
+      console.error('No se pudo aplicar el daño a mano:', err);
+      return {...base, manual: true, golpe: N, motivoManual: 'no se pudo aplicar el valor escrito'};
+    }
+  }
   let def = 0, armadmg = 0, invLeida = null;
   if(esInv){   // 4e: su Defensa y su Defensa especial, de sus datos (comun/inv-calculo.js, que se carga si hace falta)
     try{

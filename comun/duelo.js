@@ -53,6 +53,7 @@ const Duelo = (() => {
   let actual = null;         // {id, dato, baja, min} — el duelo abierto (o minimizado) en el cuadro
   let revelado = {};         // id:clave → true: ya se animó en esta pestaña
   let manual = {};           // clave → valor tipeado a mano
+  const otroValorAbierto = new Set();   // ✍ «Otro valor» del «💔 Aplicar el daño» abierto, por duelo (2026-11-06)
   const manualAbierto = new Set();   // ✍ «Elegir manualmente» abierto en un paso ('duelo:campo', 2026-10-15)
   let descartados = new Set();
   let autoAbiertos = new Set();
@@ -1675,14 +1676,24 @@ const Duelo = (() => {
      de la sesión en «El origen de las especies»: «como GM, parrié con un creep, el bloqueo falló y pasó la mitad del daño, pero nunca me apareció
      el anuncio "te entró X daño — aplicar"»): el GM lo aplica con su clic. */
   const pideAceptar = d => !!(d && d.defensor);
-  async function aceptarDano(id){
+  // ✍ El botón chico «Otro valor» y, abierto, el campo con lo que sugiere el duelo ya escrito (lo que entra a la vida).
+  function otroValorHtml(d, sugerido){
+    const sug = Math.max(0, Math.round(_num(sugerido)));
+    if(!otroValorAbierto.has(d.id)) return ` <button type="button" class="sec" data-dano-otro data-sug="${sug}" style="font-size:13px;padding:6px 12px;margin-left:6px">✍ Otro valor</button>`;
+    return `<div class="duelo-man" style="justify-content:center;margin-top:8px">✍ Le entra a la vida: <input type="number" min="0" data-dano-valor value="${_esc(manual['otro:' + d.id] !== undefined ? manual['otro:' + d.id] : String(sug))}" style="width:70px">`
+      + ` <button type="button" data-dano-valor-ok data-sug="${sug}">Aplicar este valor</button> <button type="button" class="sec" data-dano-otro-no>✕</button></div>`
+      + `<div class="duelo-nota" style="margin-top:4px">El duelo sugiere ${_fmt(sug)}. Lo que escribas entra directo a la vida (sin restar Defensa ni escudos); lo que depende del daño se calcula con ese número.</div>`;
+  }
+  /* ✍ «Otro valor» (2026-11-06, dueño: «la instancia de aplicar el daño… la opción de aplicar a mano un valor diferente al que te sugiere el
+     duelo»): `aMano = {valor, sugerido}` = lo que ENTRA A LA VIDA, tal cual (el mapa no le resta nada; lo que depende del daño se calcula con eso). */
+  async function aceptarDano(id, valor, sugerido){
     const ref = col().doc(id);
     await fbDb.runTransaction(async tx => {
       const doc = await tx.get(ref);
       if(!doc.exists) return;
       const m = {...doc.data()};
       if(m.fase !== 'dano' || !m.dano || m.dano.aplicado || m.dano.aceptado) return;
-      m.dano = {...m.dano, aceptado: yo()};
+      m.dano = {...m.dano, aceptado: yo(), ...(valor !== undefined && valor !== null ? {aMano: {valor: Math.max(0, Math.round(_num(valor))), sugerido: Math.max(0, Math.round(_num(sugerido)))}} : {})};
       tx.update(ref, cambiosDe(m));
     });
   }
@@ -1725,13 +1736,14 @@ const Duelo = (() => {
       const dn = m.dano, crit = m.resultado === 'pego' && m.crit && m.crit.critico;
       anuncio = dn.manual ? `⚔ ${m.atacante.nombre} le pegó a ${m.defensor.nombre}${crit ? ' con crítico ×' + m.crit.mult : ''}: ${dn.golpe} de daño (aplicalo a mano)`
         : dn.invulnerable ? `⚔ ${m.atacante.nombre} → ${m.defensor.nombre}: Invulnerable, el golpe no hizo nada`
+        : dn.aMano ? `✍ ${m.atacante.nombre} → ${m.defensor.nombre}: se aplicó a mano: ${_fmt(dn.aMano.valor)} de daño (el duelo sugería ${_fmt(dn.aMano.sugerido)}) (${dn.hpAntes} → ${dn.hpDespues} HP)`
         : tieneCuenta(dn) ? `${crit ? '💥' : dn.mitad ? '⚠' : '⚔'} ${m.atacante.nombre} → ${m.defensor.nombre}: ${cuentaTxt(dn)} (${dn.hpAntes} → ${dn.hpDespues} HP)`
         : crit ? `💥 ${m.atacante.nombre} → ${m.defensor.nombre}: ${dn.golpe} de daño (×${m.crit.mult}) derecho a la vida (${dn.hpAntes} → ${dn.hpDespues} HP)`
         : dn.mitad ? `⚠ ${m.atacante.nombre} → ${m.defensor.nombre}: pasó la mitad: ${dn.recibido} de daño (${dn.hpAntes} → ${dn.hpDespues} HP)`
         // El daño especial (ignora la Defensa): lo que lo frena va en `freno` (Defensa especial, Res. elemental) — no se repite como «Defensa» (2026-10-07).
         : dn.ignoraDef ? `⚔ ${m.atacante.nombre} → ${m.defensor.nombre}: ${dn.crudo}${dn.cargaMult ? ` (${dn.cargaMult})` : ''}${dn.freno ? ` − ${dn.freno}` : ''} = ${dn.recibido} de daño, directo a la vida (${dn.hpAntes} → ${dn.hpDespues} HP)`
         : `⚔ ${m.atacante.nombre} → ${m.defensor.nombre}: ${dn.crudo} − ${defTxt(dn)}${dn.freno ? ` − ${dn.freno}` : ''} = ${dn.recibido} de daño (${dn.hpAntes} → ${dn.hpDespues} HP)`;
-      if(magJunto(dn) && !dn.manual && !dn.invulnerable) anuncio += ` · ${magIcono(dn.magico.tipo)} + ${dn.magico.recibido} de ${String(dn.magico.tipo).toLowerCase()} directo = ${_fmt(_num(dn.recibido) + _num(dn.magico.recibido))} en total (${dn.hpAntes} → ${dn.magico.hpDespues} HP)`;   // 🔥 el elemental del arma en la misma cuenta (2026-11-04)
+      if(magJunto(dn) && !dn.manual && !dn.invulnerable && !dn.aMano) anuncio += ` · ${magIcono(dn.magico.tipo)} + ${dn.magico.recibido} de ${String(dn.magico.tipo).toLowerCase()} directo = ${_fmt(_num(dn.recibido) + _num(dn.magico.recibido))} en total (${dn.hpAntes} → ${dn.magico.hpDespues} HP)`;   // 🔥 el elemental del arma en la misma cuenta (2026-11-04)
       if(_num(dn.mitiMiti) > 0 && !dn.manual && !tieneCuenta(dn)) anuncio += ` · 🛡 ${dn.mitiMitiNombre || 'su protector'} se llevó ${_num(dn.mitiMiti)} (${dn.mitiMitiTxt || 'Miti-Miti'})`;   // Miti-Miti (Tanque, 2026-10-11): lo que se llevó el protector
     });
     anunciarMesa(anuncio);
@@ -2769,8 +2781,8 @@ const Duelo = (() => {
         cuerpo = tiro + svTxt + (conPrevia
           ? `<div class="duelo-danobox${fuerte ? ' crit' : ''}"><div class="duelo-danonum${fuerte ? ' rojo' : ''}" style="font-size:72px">${_fmt(pvTotal)}</div><div class="duelo-danosub" style="font-size:14px">de daño ${suyo ? 'te va a entrar a la vida' : `le va a entrar a la vida a ${_esc(d.defensor.nombre)}`}${magJunto(pvd) ? ` (${_fmt(pvd.recibido)} del golpe + ${magIcono(pvd.magico.tipo)} ${_fmt(pvd.magico.recibido)} de ${_esc(String(pvd.magico.tipo).toLowerCase())})` : ''}</div></div>${cuentaHtml(pvd)}<div class="duelo-mini">${_esc(d.defensor.nombre)}: <b>${_fmt(pvd.hpAntes)}</b> → <b>${_fmt(magJunto(pvd) ? pvd.magico.hpDespues : pvd.hpDespues)}</b> HP</div>`
           : `<div class="duelo-danobox${fuerte ? ' crit' : ''}"><div class="duelo-danonum${fuerte ? ' rojo' : ''}" style="font-size:72px">${_fmt(total)}</div>${fuerte ? '<div class="duelo-danosub rojo" style="font-size:20px">DERECHO A LA VIDA</div>' : ''}<div class="duelo-danosub" style="font-size:14px">${que}</div>${pv && !pv.listo ? '<div class="duelo-danosub" style="font-size:12px;color:#9fb6e8;margin-top:6px">🧮 Calculando la cuenta…</div>' : frenan}</div>${mgAntes}`)
-          + (suyo ? `<div style="text-align:center;margin-top:8px"><button type="button" data-dano-aceptar>💔 Aplicar el daño</button><div class="duelo-nota" style="margin-top:6px">⚙ Al tocarlo se descuenta solo de tu vida (y se ve cómo queda).</div></div>`
-            : `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.defensor.nombre)} aplique el daño…</div>${soyGM() ? `<div style="text-align:center;margin-top:6px"><button type="button" class="sec" data-dano-aceptar>💔 Aplicar por ${_esc(d.defensor.nombre)}</button></div>` : ''}`);
+          + (suyo ? `<div style="text-align:center;margin-top:8px"><button type="button" data-dano-aceptar>💔 Aplicar el daño</button>${otroValorHtml(d, conPrevia ? pvTotal : total)}<div class="duelo-nota" style="margin-top:6px">⚙ Al tocarlo se descuenta solo de tu vida (y se ve cómo queda).</div></div>`
+            : `<div class="espera duelo-nota" style="text-align:center">esperando que ${_esc(d.defensor.nombre)} aplique el daño…</div>${soyGM() ? `<div style="text-align:center;margin-top:6px"><button type="button" class="sec" data-dano-aceptar>💔 Aplicar por ${_esc(d.defensor.nombre)}</button>${otroValorHtml(d, conPrevia ? pvTotal : total)}</div>` : ''}`);
       }else if(!dn.aplicado){
         cuerpo = tiro + `<div class="duelo-mini">${crit ? `×${mult} = <b>${_fmt(dn.crudo * mult)}</b> derecho a la vida…` : 'Calculando lo que pasa con la Defensa…'}</div>${mgAntes}
           <div class="duelo-nota" style="text-align:center">${soyGM() ? 'Aplicando el daño al HP…' : 'El GM aplica el daño al HP.'}</div>
@@ -2780,6 +2792,7 @@ const Duelo = (() => {
         let grande;
         if(dn.invulnerable) grande = `<div class="duelo-danonum inv">INVULNERABLE</div><div class="duelo-danosub">El golpe no hizo nada</div>`;
         else if(dn.manual) grande = `<div class="duelo-danonum">${_fmt(golpe)}</div><div class="duelo-danosub">de daño — <b>aplicalo a mano</b> (${_esc(dn.motivoManual || 'no se pudo aplicar solo')})</div>`;
+        else if(dn.aMano) grande = `<div class="duelo-danonum">${_fmt(dn.recibido)}</div><div class="duelo-danosub">de daño entró a la vida de ${_esc(d.defensor.nombre)} · <b>✍ se aplicó a mano</b> (el duelo sugería ${_fmt(dn.aMano.sugerido)})</div>`;
         // 🧮 Con la cuenta: el número grande es lo que entró a la vida; cómo se llegó, abajo, renglón por renglón.
         else if(tieneCuenta(dn) && magJunto(dn)) grande = `<div class="duelo-danonum${dn.ignoraDef ? ' rojo' : ''}">${_fmt(_num(dn.recibido) + _num(dn.magico.recibido))}</div><div class="duelo-danosub">de daño entró a la vida de ${_esc(d.defensor.nombre)} (${_fmt(dn.recibido)} del golpe + ${magIcono(dn.magico.tipo)} ${_fmt(dn.magico.recibido)} de ${_esc(String(dn.magico.tipo).toLowerCase())})</div>`;   // 🔥 (2026-11-04) el total
         else if(tieneCuenta(dn)) grande = `<div class="duelo-danonum${dn.ignoraDef ? ' rojo' : ''}">${_fmt(dn.recibido)}</div><div class="duelo-danosub">de daño entró a la vida de ${_esc(d.defensor.nombre)}</div>`;
@@ -3228,6 +3241,20 @@ const Duelo = (() => {
     if(bdt) bdt.onclick = () => { bdt.disabled = true; bdt.textContent = 'Tirando…'; enviar(d.atacante, {tipo: 'duelo-tirar', id: d.id, campo: 'dano', flash: flashSel[d.id + ':dano'] || ''}); setTimeout(() => { if(actual && actual.dato && !actual.dato.dano) dibujar(); }, 8000); };
     const bac = f.querySelector('[data-dano-aceptar]');
     if(bac) bac.onclick = () => { bac.disabled = true; bac.textContent = 'Aplicando…'; aceptarDano(d.id).catch(err => { console.error(err); _toast('No se pudo aplicar el daño'); bac.disabled = false; }); };
+    const bot = f.querySelector('[data-dano-otro]');
+    if(bot) bot.onclick = () => { otroValorAbierto.add(d.id); dibujar(); setTimeout(() => { const i = document.querySelector('#duelo-fondo [data-dano-valor]'); if(i){ i.focus(); i.select(); } }, 30); };
+    const bon = f.querySelector('[data-dano-otro-no]');
+    if(bon) bon.onclick = () => { otroValorAbierto.delete(d.id); delete manual['otro:' + d.id]; dibujar(); };
+    const biv = f.querySelector('[data-dano-valor]');
+    if(biv) biv.oninput = () => { manual['otro:' + d.id] = biv.value; };
+    const bok = f.querySelector('[data-dano-valor-ok]');
+    if(bok) bok.onclick = () => {
+      const txt = String((biv && biv.value) || '').trim();
+      if(!/^\d+$/.test(txt)){ _toast('Escribí un número entero (0 o más)'); return; }
+      bok.disabled = true; bok.textContent = 'Aplicando…';
+      aceptarDano(d.id, Number(txt), _num(bok.dataset.sug)).then(() => { otroValorAbierto.delete(d.id); delete manual['otro:' + d.id]; })
+        .catch(err => { console.error(err); _toast('No se pudo aplicar el daño'); bok.disabled = false; });
+    };
     const bam = f.querySelector('[data-aplicar-mano]');
     if(bam) bam.onclick = () => { const v = Math.max(0, Math.round(_num((f.querySelector('[data-manual="recibido"]') || {}).value))); guardarAplicacion(d.id, {manual: true, golpe: v, recibido: v, mult: 1, crudo: d.dano.crudo, motivoManual: 'lo aplicó el GM a mano'}).catch(err => console.error(err)); };
     const bcr = f.querySelector('[data-critico]');

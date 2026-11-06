@@ -762,6 +762,11 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
 - Números (nv1 → nv2): No2 6 → 8 · Def 2 → 4 · Def. esp. 0 → 1 · Dmg 8 → 9 · Bloqueo 8 → 9 · Eva/Ini/Mov 6 → 7 · crít. T4 0 → 2. (La Carga que
   derriba ya no es una onda en cono: es una carrera de hasta 4 casillas, +1 PdG y +1 daño por casilla.)
 
+### H1 Embestidor · nivel 3 (aprobado 2026-11-06, cargado en el pool)
+- Atributos Con 12 · Fue 10 · Agi 7 · Des 8 · Esp 2 → vida 60, No2 8. Equipo: **Hacha del verdugo de la capital** (B: Tipo 8, 2 dados, Derribar 50 %)
+  · Chaleco de cuero · Anillo de Paso Fantasma · Cofia de anillas sueltas · Botas de cuero de vaca. Habilidades: + **Salto aplastante** (cd 4, lenta).
+- Números (nv2 → nv3): dados del hacha 1 → 2 · Dmg 9 → 10 · PdG/Parry 7 → 8 · Bloqueo 9 → 10 · Res.Esp/Res.CC 11 → 12.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

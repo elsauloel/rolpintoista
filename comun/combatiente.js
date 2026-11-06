@@ -2350,8 +2350,9 @@ const Combatiente = (() => {
   // se resiste… va a ser como un círculo de un líquido»): si el efecto del elemento (no el daño) se resiste con la Res.Esp de quien se quema contra el
   // Ef.Esp de quien tiró el escudo. Se revisan caso por caso: por ahora todos sí, salvo el ácido.
   const ESCUDO_RESISTE = {fuego: true, hielo: true, rayo: true, acido: false, toxico: true, luz: true, siniestro: true};
-  // Lo que queda igual si resiste (dueño, 2026-11-06, el hielo: «el daño entra, el efecto se resiste, con un mínimo de un nitro»): Escarcha 1 (−1 No2).
-  const ESCUDO_MINIMO = {hielo: 1};
+  // Lo que queda igual si resiste: nada por ahora (2026-11-06: por un rato el hielo dejaba Escarcha 1 de mínimo; el dueño corrigió: «si resiste
+  // el efecto, no entra nada de Escarcha»). Queda el dato por si algún elemento lo necesita.
+  const ESCUDO_MINIMO = {};
   const ESCUDOS_ELEMENTALES = ARMAS_ELEMENTALES.map(a => ({clave: a.clave, estado: ESCUDOS_NOMBRE[a.clave], arma: a.estado, nombre: a.nombre, icono: a.icono, resiste: ESCUDO_RESISTE[a.clave] !== false, minimo: ESCUDO_MINIMO[a.clave] || 0,
     que: a.que.replace(/^\+/, '').replace('se cura lo que le saca', 'quien lleva el escudo se cura lo que le saca') + ' a quien quede pegado'}));
   const ESCUDO_ELEMENTAL = {

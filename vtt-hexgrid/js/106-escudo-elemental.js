@@ -336,7 +336,7 @@ async function escudoQuemar(pid, vid, motivo){
           partes.push(ls && !ls.manual ? `☀ ${quienP} se cura ${cura}` : `☀ ${quienP} se cura ${cura} (a mano)`);
         }
       }
-      // ❄ Aunque resista, el hielo le deja lo mínimo (Escarcha 1 = −1 No2; dueño, 2026-11-06).
+      // Aunque resista, lo mínimo de un elemento con `minimo` (hoy ninguno: el hielo, si resiste, no deja nada de Escarcha — dueño, 2026-11-06).
       if(rm && rm.r && !rm.r.invulnerable && recibido > 0 && resistio && def.minimo > 0 && ef.porDano){
         const r = await dueloAplicarEfecto(d, {nombre: ef.porDano.estado, spec: {nombre: ef.porDano.estado, stacks: def.minimo, ...(num(ef.porDano.turnos) > 0 ? {turnos: num(ef.porDano.turnos)} : {})}}).catch(() => null);
         partes.push(`igual ${ef.porDano.estado} ×${def.minimo} (el mínimo)${r && r.manual ? ' (a mano)' : ''}`);

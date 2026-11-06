@@ -784,6 +784,12 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
   Gorro de piel de salamandra · **Babuchas bordadas del adivino**. Habilidades: Lengua de fuego · Muro de fuego · **Parpadeo** (Flash, 4 SP; en turno
   ajeno, el doble). Pasiva: **Potencia especial** (+1 Ef.Esp). Números (nv1 → nv2): PdG.Esp 14 → 15 · Ef.Esp 14 → 16 · Def. esp. 2 → 3 · Res.Mt 15 → 17.
 
+### M1 Piromante · nivel 3 (aprobado 2026-11-06, cargado en el pool)
+- Atributos Con 9 · Fue 2 · Agi 6 · Des 6 · Esp 16 → vida 50, No2 6, SP 48 (regen 8). Equipo: **Varita del chorro de lava** (B: camino de 4 casillas,
+  1d4 de fuego y arde 2 turnos, aliados incluidos; 1 No2 + 3 SP) en lugar de la de la bola de fuego · Botella con un diablito · Campera · Gorro de piel
+  de salamandra · Babuchas del adivino. Habilidades: + **Bola de fuego**. Números (nv2 → nv3): PdG.Esp 15 → 16 · Ef.Esp 16 → 17 · Res.Mt 17 → 18.
+- ⏸ El costo y el daño de sus hechizos (¼ Ef.Esp, SP = Especial) quedan abiertos: ver «🔥 Cómo costear el daño mágico de los creeps» en pendientes.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

@@ -97,6 +97,9 @@
   esencial({...M1, nivel: 2, atrib: [8, 2, 6, 5, 15],
     equipo: ['Varita de la bola de fuego', 'Botella con un diablito', 'Campera de cuero con tachas', 'Gorro de piel de salamandra', 'Babuchas bordadas del adivino'],
     habilidades: ['Lengua de fuego', 'Muro de fuego', 'Parpadeo'], pasivas: ['Potencia especial']});
+  esencial({...M1, nivel: 3, atrib: [9, 2, 6, 6, 16],   // (aprobado 2026-11-06: Bola de fuego; la Varita del chorro de lava en lugar de la de la bola de fuego)
+    equipo: ['Varita del chorro de lava', 'Botella con un diablito', 'Campera de cuero con tachas', 'Gorro de piel de salamandra', 'Babuchas bordadas del adivino'],
+    habilidades: ['Lengua de fuego', 'Muro de fuego', 'Parpadeo', 'Bola de fuego'], pasivas: ['Potencia especial']});
   esencial({linea: 'L1', nombre: 'Sangrador', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [6, 6, 10, 8, 3],
     equipo: ['Cuchilla del frigorífico', 'Chaleco de cuero', 'Zapatillas de lona'],
     habilidades: ['Golpe que sangra', 'Sal en la herida'], consumibles: ['Óleo venenoso'],

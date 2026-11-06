@@ -41,6 +41,12 @@
     if(!e){ faltan.push('habilidad: ' + nombre); return null; }
     return typeof armarHabilidadDeCreep === 'function' ? armarHabilidadDeCreep(e.datos, n) : null;
   }
+  // Una pasiva del pool (comun/pasivas.js, por nombre), como las lleva un creep (`sc.pasivas`, CreepCalculo las suma una vez).
+  function pasiva(nombre, k){
+    const p = (typeof PASIVAS_BASE !== 'undefined' ? PASIVAS_BASE : []).find(x => x && x.nombre === nombre);
+    if(!p){ faltan.push('pasiva: ' + nombre); return null; }
+    return {...structuredClone(p), id: 'ese-' + k + '-' + slug(nombre), compras: 1};
+  }
   const ROL_COLOR = {rango: '#3E8E7E', tanque: '#5B7FA6', warrior: '#B34A3A', hibrido: '#A0522D', liviano: '#8B5A2B', mago: '#D9662B', support: '#4CB86A', debuffer: '#7A3E9D'};
   // Oro de un humano (como los de fábrica: 5n² + 10n).
   const oroHumano = n => 5 * n * n + 10 * n;
@@ -58,14 +64,17 @@
       equipo: c.equipo.map(x => pieza(x, k)).filter(Boolean),
       cinturon: c.consumibles.map(x => consumible(x, k)).filter(Boolean),
       habilidades: c.habilidades.map(h => hab(h, n)).filter(Boolean),
-      estados: [], pasivas: [], notas: c.estrategia, escalaTipos: 2, imagen: '',
+      estados: [], pasivas: (c.pasivas || []).map(x => pasiva(x, k)).filter(Boolean), notas: c.estrategia, escalaTipos: 2, imagen: '',
       tipoCriatura: 'humano', tipoCriaturaOtro: '', jefe: false, oroBase: oroHumano(n), armaNatural: false, trofeoEspecial: {nombre: '', precio: 0},
       pool: 'esencial', linea: c.linea, ...(modoSP ? {modoSP: true} : {}),
     };
+    // La vida con lo que suma el equipo (la Cota de malla fina, el Casco de bandas remachadas: Vida +5), desde el nivel 2: así se diseñó la ronda
+    // de niveles (2026-11-05). Los de nivel 1 quedan como se aprobaron (vida = Con × 5), aunque alguno lleve una pieza con Vida.
+    if(n > 1 && typeof CreepCalculo !== 'undefined' && CreepCalculo.actualizarHpMaxPorCon) CreepCalculo.actualizarHpMaxPorCon(datos);
     window.CREEPS_BASE.push({
       poolId: 'esencial-' + c.linea.toLowerCase() + '-' + n + '-' + k, nombre: c.nombre, nivel: n, pool: 'esencial',
       etiquetas: ['esencial', c.rolTxt, 'nivel ' + n, 'humano'],
-      detalle: `${c.estrategia} Habilidades: ${c.habilidades.join(' · ')}${modoSP ? ' (con SP)' : ''}. Consumible: ${c.consumibles.join(' y ')}.`, datos,
+      detalle: `${c.estrategia} Habilidades: ${c.habilidades.join(' · ')}${modoSP ? ' (con SP)' : ''}.${c.pasivas && c.pasivas.length ? ` Pasivas: ${c.pasivas.join(' · ')}.` : ''} Consumible: ${c.consumibles.join(' y ')}.`, datos,
     });
   }
 
@@ -225,6 +234,32 @@
     equipo: ['Sable del tahúr', 'Chaleco de cuero', 'Escarpines de fieltro'],
     habilidades: ['Salto', 'Tajo veloz'], consumibles: ['Mate cebado'],
     estrategia: 'Choque liviano. Se mueve y corta: salta encima de los de atrás, pega y se va; nunca se queda quieto.'});
+
+  // ---- Niveles 2 a 5 (la ronda del 2026-11-05: uno por rol, nivel por nivel; detalle y números en docs/creeps-humanoides.md) ----
+  // W1 Hachero (ruta final aprobada 2026-11-05: Sed de sangre en el nivel 4; Arte de la guerra en lugar de «Partir en dos»).
+  const W1 = {linea: 'W1', nombre: 'Hachero', rol: 'warrior', rolTxt: 'melee', consumibles: ['Pergamino grupal de Furia de Combate'],
+    estrategia: 'Warrior. Le rompe la armadura al que más se defiende y después lo castiga. Su punto débil: la magia.'};
+  esencial({...W1, nivel: 2, atrib: [8, 10, 7, 7, 4],
+    equipo: ['Hacha', 'Cota de malla de hierro', 'Cofia de anillas sueltas', 'Grebas de cuero'],
+    habilidades: ['Pegar fuerte', 'Romper armadura', 'Barrido'], pasivas: ['Golpe fuerte']});
+  esencial({...W1, nivel: 3, atrib: [9, 11, 7, 8, 4],
+    equipo: ['Hacha de guerra ligera', 'Cota de malla de hierro', 'Cofia de anillas sueltas', 'Grebas de cuero'],
+    habilidades: ['Pegar fuerte', 'Romper armadura', 'Barrido', 'Golpe demoledor'], pasivas: ['Golpe fuerte']});
+  esencial({...W1, nivel: 4, atrib: [10, 12, 8, 8, 4],
+    equipo: ['Hacha de guerra ligera', 'Cota de malla fina', 'Cofia de anillas sueltas', 'Grebas de cuero', 'Guanteletes de hierro'],
+    habilidades: ['Pegar fuerte', 'Romper armadura', 'Barrido', 'Golpe demoledor', 'Arte de la guerra'], pasivas: ['Golpe fuerte', 'Sed de sangre']});
+  esencial({...W1, nivel: 5, atrib: [11, 13, 8, 9, 4],
+    equipo: ['Hacha de guerra ligera', 'Cota de malla fina', 'Casco de bandas remachadas', 'Grebas de cuero', 'Guanteletes de hierro', 'Botas de estibador'],
+    habilidades: ['Pegar fuerte', 'Romper armadura', 'Barrido', 'Golpe demoledor', 'Arte de la guerra', 'Remate'], pasivas: ['Golpe fuerte', 'Sed de sangre']});
+  // T1 Escudero (niveles 2 y 3 aprobados 2026-11-05/06; Aguante en lugar de «Plantarse»).
+  const T1 = {linea: 'T1', nombre: 'Escudero', rol: 'tanque', rolTxt: 'tanque', consumibles: ['Poción de Cuero Duro', 'Poción de Piel de Cristal'],
+    estrategia: 'Tanque. Se planta adelante, provoca al que más pega y aguanta; con el escudo lo tira y lo demora.'};
+  esencial({...T1, nivel: 2, atrib: [13, 6, 6, 7, 4],
+    equipo: ['Hacha de piedra', 'Escudo de caparazón de tortuga gigante', 'Peto de hierro', 'Cofia de anillas sueltas', 'Grebas de cuero'],
+    habilidades: ['Provocar', 'Piel de hierro', 'Golpe de escudo'], pasivas: ['Guardia firme']});
+  esencial({...T1, nivel: 3, atrib: [14, 7, 6, 8, 4],
+    equipo: ['Hacha de piedra', 'Escudo de escamas', 'Peto de hierro', 'Cofia de anillas sueltas', 'Grebas de cuero'],
+    habilidades: ['Provocar', 'Piel de hierro', 'Golpe de escudo', 'Aguante'], pasivas: ['Guardia firme']});
 
   if(faltan.length) console.warn('Creeps esenciales: no se encontró', faltan.join(', '));
   window.CREEPS_ESENCIALES_FALTAN = faltan;

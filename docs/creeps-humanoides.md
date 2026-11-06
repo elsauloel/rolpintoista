@@ -725,7 +725,8 @@ los niveles 2 a 5 completos (atributos, habilidad, pasiva, equipo concreto, cons
 | 4 | 12/10/8/8/4 · 55 · 8 | **Arte de la guerra** (Flash +3, cd 2) | **Sed de sangre** | Cota de hierro → **Cota de malla fina** (B) · + Guanteletes de hierro |
 | 5 | 13/11/8/9/4 · 65 · 8 | **Remate** (cd 3) | — | Cofia → **Casco de bandas remachadas** (B) · + Botas de estibador |
 Consumible en todos: Pergamino grupal de Furia de Combate. Nv5 (números del juego): Def 10 · daño fijo 16 · PdG/Parry 9/9 · Bloqueo 14 · Res.CC 12 ·
-Res. crít. T4/T6/T8 3/2/1 · Def. esp. 0 · Res.Mt 4. **Pendiente: cargarlo en el pool esencial (niveles 2 a 5).**
+Res. crít. T4/T6/T8 3/2/1 · Def. esp. 0 · Res.Mt 4. ✅ **Cargado en el pool esencial (niveles 2 a 5) el 2026-11-06** (`comun/creeps-esenciales.js`; la vida suma
+la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
 
 ### T1 Escudero · nivel 2 (aprobado 2026-11-05)
 - Atributos Con 13 · Fue 6 · Agi 6 · Des 7 · Esp 4 → vida 65, No2 6. Equipo: Hacha de piedra · Escudo de caparazón de tortuga gigante · Peto de
@@ -738,6 +739,7 @@ Res. crít. T4/T6/T8 3/2/1 · Def. esp. 0 · Res.Mt 4. **Pendiente: cargarlo en 
   crít. T6 +1, Def. esp. +1, peso 3 → Golpe de escudo 3d10) · Peto de hierro · Cofia de anillas sueltas · Grebas de cuero. Habilidades: Provocar ·
   Piel de hierro · Golpe de escudo · **Aguante** (en lugar de «Plantarse» 🆕 del boceto, que no existe). Pasiva: Guardia firme.
 - Números (nv2 → nv3): Def 6 → 8 · Bloqueo 9 → 10 · PdG/Parry 7 → 8 · Dmg 6 → 7 · Res.Esp/Res.CC 13 → 14 · Res. crít. T6 0 → 1.
+- ✅ **T1 niveles 2 y 3 cargados en el pool esencial el 2026-11-06** (`comun/creeps-esenciales.js`).
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 

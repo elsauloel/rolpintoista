@@ -123,7 +123,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261104ig"></script>
 <script src="skills-creep-base.js?v=20261105r2"></script>
-<script src="creeps-esenciales.js?v=20261105r1"></script>
+<script src="creeps-esenciales.js?v=20261106niveles"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
@@ -6735,7 +6735,7 @@ prueba('🛡⏳ Piel de hierro +(3 + nivel) y los misiles lentos de cooldown 4 (
     [4, 4, 6, 8, 1, true, ...Array(7).fill('4,0,false'), true, 5, true, 4, true, false]);
 });
 prueba('⭐ El pool esencial (2026-11-03): los 24 de nivel 1 (7 + la tanda del mismo día + el L4), con su equipo, cinturón y habilidades de fábrica, y la biblioteca los separa', () => {
-  const es = CREEPS_BASE.filter(c => c.pool === 'esencial');
+  const es = CREEPS_BASE.filter(c => c.pool === 'esencial' && c.nivel === 1);   // (los niveles 2 a 5, aparte: 2026-11-06)
   const d = n => es.find(c => c.nombre === n).datos;
   const suma = x => x.con + x.fue + x.agl + x.des + x.esp;
   igual([CREEPS_ESENCIALES_FALTAN.length, es.length, es.every(c => suma(c.datos) === 33 && c.datos.hp === c.datos.con * 5 && c.nivel === 1),
@@ -6744,6 +6744,17 @@ prueba('⭐ El pool esencial (2026-11-03): los 24 de nivel 1 (7 + la tanda del m
     CREEPS_BASE.filter(c => c.pool !== 'esencial').length > 100],
     [0, 36, true, 'Hacha de piedra,Escudo de caparazón de tortuga gigante,Peto de hierro,Cofia de anillas sueltas', 'Poción de Cuero Duro,Poción de Piel de Cristal', 9, 6,
       'Lengua de fuego:4,Muro de fuego:3', 4, true]);
+});
+prueba('⭐ Pool esencial, niveles 2 a 5 (2026-11-06): W1 Hachero 2–5 y T1 Escudero 2–3, con sus pasivas y la vida del equipo; los números del diseño', () => {
+  const C = CreepCalculo, d = (n, nv) => CREEPS_BASE.find(c => c.pool === 'esencial' && c.nombre === n && c.nivel === nv).datos;
+  const w5 = d('Hachero', 5), w4 = d('Hachero', 4), t3 = d('Escudero', 3);
+  igual([CREEPS_ESENCIALES_FALTAN.length, CREEPS_BASE.filter(c => c.pool === 'esencial' && c.nivel > 1).map(c => c.datos.linea + c.nivel).join(),
+    w5.hpMax, C.defensaEfectiva(w5), C.statValor(w5, 'pdg'), C.statValor(w5, 'bloqueo'), C.statValor(w5, 'rescc'), C.armadmgEfectiva(w5), w5.habilidades.map(h => h.nombre).join(),
+    w4.pasivas.map(p => p.nombre).join(), C.statValor(w4, 'dmg'), w4.hpMax,
+    C.defensaEfectiva(t3), C.statValor(t3, 'bloqueo'), t3.pasivas.map(p => p.nombre).join(), t3.habilidades.find(h => h.nombre === 'Golpe demoledor') === undefined,
+    d('Hachero', 3).habilidades.find(h => h.nombre === 'Golpe demoledor').cdActual],
+    [0, 'W12,W13,W14,W15,T12,T13', 65, 10, 9, 14, 12, 0, 'Pegar fuerte,Romper armadura,Barrido,Golpe demoledor,Arte de la guerra,Remate',
+      'Golpe fuerte,Sed de sangre', 13, 55, 8, 10, 'Guardia firme', true, 3]);
 });
 prueba('⭐ Pool esencial, la tanda del 2026-11-05: los 7 nuevos de nivel 1 (L6, T4, W4, R4, H4, L7, L8) se arman completos y con turnos de espera; Patotear +1 PdG y sin tope', () => {
   const es = CREEPS_BASE.filter(c => c.pool === 'esencial');
@@ -6762,7 +6773,7 @@ prueba('💧 Pool esencial (2026-11-03): los de Especial como atributo principal
     [['Arcano', 'Control mental y ceguera', 'Ladrón de fuerzas', 'Mago de escarcha', 'Mago del rayo', 'Maldito', 'Piromante', 'Protector', 'Sanador', 'Tóxico'].sort().join(), true, false]);
 });
 prueba('⭐ Pool esencial, la tanda del 2026-11-03: atributos, equipo, habilidades y consumibles de los nuevos', () => {
-  const es = CREEPS_BASE.filter(c => c.pool === 'esencial');
+  const es = CREEPS_BASE.filter(c => c.pool === 'esencial' && c.nivel === 1);
   const d = n => es.find(c => c.nombre === n).datos;
   const eq = n => d(n).equipo.map(i => i.nombre).join(), hb = n => d(n).habilidades.map(h => h.nombre).join(), cin = n => d(n).cinturon.map(i => i.nombre).join();
   igual([es.map(c => c.datos.linea).sort().join(),

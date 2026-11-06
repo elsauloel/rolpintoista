@@ -1253,6 +1253,9 @@ const Combatiente = (() => {
   // `estados` (2026-10-08, dueño): con Parálisis recarga 1 No2 menos.
   const paralizado = estados => activos(estados).some(e => e.paralisis);
   function recargarNo2(max, actual, estados){
+    // (2026-11-06, dueño: «los nitros al principio del turno se recargan si están por debajo del máximo, pero si están por encima del máximo, no se
+    // bajan»; p. ej. los de más de Sed de batalla): por encima del máximo, se quedan como están.
+    if(Number.isFinite(Number(max)) && n(actual) > n(max)) return n(actual);
     const base = n(actual) < 0 ? n(max) + n(actual) : n(max);
     return paralizado(estados) ? Math.min(base, Math.max(base - 1, Math.min(0, base))) : base;
   }

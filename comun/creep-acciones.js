@@ -765,9 +765,9 @@ const CreepAcciones = (() => {
   function mantenimiento(sc, numero){   // `numero` = el de ese Mantenimiento (sin él, se aplica siempre, como antes)
     if(numero !== undefined && !Combatiente.estadosEnMantenimiento(sc.finTurnoEn, numero)) return {rep: [], enCooldown: 0, hpAplicado: 0, vencidos: 0, enTurno: true};
     // Lo que se dispara va antes de recargar No2 (un Stun que vence ya no los topea): dispara, cuenta y recién ahí No2.
-    const deuda = Math.min(0, num(sc.nitros));
-    const a = inicioCreep(sc, true), b = finCreep(sc, true);
-    sc.nitros = Combatiente.recargarNo2(C().nitrosMax(sc), deuda, sc.estados);
+    const previo = num(sc.nitros), deuda = Math.min(0, previo);
+    const a = inicioCreep(sc, true), b = finCreep(sc, true), max = C().nitrosMax(sc);
+    sc.nitros = Combatiente.recargarNo2(max, previo > max ? previo : deuda, sc.estados);   // (2026-11-06) los de más de su máximo no se bajan
     return {rep: [...a.rep, ...b.rep], enCooldown: a.enCooldown, hpAplicado: a.hpAplicado, vencidos: b.vencidos};
   }
   // El turno propio de un creep en el orden de turnos (2026-10-06, P161). `clave` = «mapa:paso:…»; si ya se aplicó → null. `numero` = el

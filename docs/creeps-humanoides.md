@@ -429,7 +429,7 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 1 | **Golpe desesperado** (cd 2) · **Furia** (cd 3) | — | **Sable del tahúr** (Crítico frecuente +1) + **Facón de paisano** (Sangrado 25 %) · Chaleco de cuero · Botas de cuero de vaca |
   | 2 | **Pegar fuerte** (la habilidad que antes se llamaba «Golpe fuerte») | **Robustez** (+5 de vida) | + 2 Comunes |
   | 3 | **Aguante** | — | el sable: **Espada del Jefe de los Mil Caminos** (Buena: Crítico potente +3, Sangrado 33 %) + el Facón |
-  | 4 | **Golpe brutal** | **Voluntad de hierro** | + una pieza Buena |
+  | 4 | **Golpe brutal** | ~~Voluntad de hierro~~ → **Regeneración** (dueño, 2026-11-07) | + una pieza Buena |
   | 5 | **Barrido** | — | el facón: **Espada larga** (Buena: PdG +1, Crítico potente +2) |
   Consumible: **Poción de Regeneración menor** (nueva en el catálogo, 2026-11-03: 5 de vida por turno, 3 turnos). Dos armas (dueño): el primer
   ataque con cada arma cuesta la mitad, como un primer ataque del turno, y una puede ser mejor para atajar y la otra para pegar. **En los creeps
@@ -448,6 +448,13 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   33 %) · Facón de paisano · Chaleco de cuero · Botas de cuero de vaca · Casco de cuero endurecido · Anillo maldito del berserker. Habilidades:
   Golpe desesperado · Furia · Pegar fuerte · + **Aguante**. Pasiva: Robustez. Consumible: Poción de Regeneración menor. Vida 55 · No2 7 · Def 4 ·
   PdG 9 · Daño 12 · Eva 7 · Ini 7 · Mov 7.
+  **nv4 aprobado y cargado (2026-11-07):** Fue 11 · Con 12 · Agi 7 · Des 10 · Esp 2 (el punto de Destreza prometido). Equipo: el Chaleco sale y
+  entran las **Pieles erizadas del berserker** (Buena: Def +2 · Def.Esp +1 · Vida +10 · Res. hielo +1 · Espinas, ¼ del golpe cuerpo a cuerpo) ·
+  Espada del Jefe de los Mil Caminos · Facón de paisano · Botas de cuero de vaca · Casco de cuero endurecido · Anillo maldito del berserker.
+  Habilidades: … · + **Golpe brutal**. Pasivas: Robustez · + **Regeneración** (3 de vida por turno) **en lugar de Voluntad de hierro**, elección del
+  dueño (2026-11-07: «la nueva pasiva quiero que sea regeneración»). Consumible: Poción de Regeneración menor. Vida 70 · No2 7 · Def 4 ·
+  Def.Esp 1 · PdG 10 · Daño 13 · Res.CC 12. La Regeneración de una pasiva ya la cobraban los creeps al empezar su turno
+  (`comun/creep-acciones.js`, «Pasivas: +3 HP»); probado en el mapa.
 
 - **D3 · Ladrón de fuerzas · Debuffer** (boceto aprobado 2026-11-03, dueño: «lo apruebo así»). Estrategia: le saca al rival lo que necesita para
   pelear (los No2, la puntería, las curas, las bendiciones) y se queda con parte; elige al que más hace y lo deja sin aire. Atributos
@@ -1014,7 +1021,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | M1 | ✅ (2026-11-02) | ✅ (2026-11-06) | ✅ (2026-11-06) | ✅ (2026-11-06) | ✅ (2026-11-06) |
 | S1 | ✅ (2026-11-02) | ✅ (2026-11-06) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |
 | D1 | ✅ (2026-11-02) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |
-| W2 | ✅ (2026-11-03) | ✅ (2026-11-07) | ✅ (2026-11-07) | | |
+| W2 | ✅ (2026-11-03) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) | |
 | H2 | ✅ (2026-11-03) | | | | |
 | L3 | ✅ (2026-11-03) | | | | |
 | L4 | ✅ (2026-11-03) | | | | |

@@ -1793,3 +1793,17 @@ las Botas de repartidor, la Chaqueta del corredor, la Capa del torero…). Respa
 - ✔ Después, Hoja envenenada (el mismo golpe trae los dos venenos: el de la daga y el de la habilidad, dos botones «Aplicar Veneno ×3»): 3 → **6** → **9**.
   El Veneno se suma entero (stacks + stacks) y dura tantos turnos como stacks (`acumularVeneno`, comun/combatiente.js).
 - Partida respaldada antes y restaurada después; «Encuentro 2» ya no figura como mapa activo. Capturas `p18-veneno-*`.
+
+### 2026-11-07 · ☠ Anillo del pantano + Ráfaga de cortes, y el caso «Rockardo (copia)» (con clics: GM, J1 y J2 en «Encuentro 2»)
+- ✔ **Anillo del pantano + Ráfaga de cortes** (L2 Envenenador nv5): el Goblin rompehuesos con la Daga de la viuda verde y el anillo le hace una Ráfaga
+  al Capataz del culto → tres botones «Aplicar Veneno ×4 (3 + 1 del envenenador)», uno por corte → el cuadro muestra ×4 → ahora ×8 → ahora ×12, y el
+  Capataz queda con **Veneno 12**. Captura `p19-rafaga-anillo`.
+- 🔎 **El caso de Rockardo (copia)** (la prueba anterior: «ni el daño ni el veneno llegaron a la ficha»): **no es un error**, eran dos cosas del juego.
+  1. Rockardo (copia) tiene **Defensa 15** y la daga pega 1d4 + 11 (12 a 15): el golpe entra entero en la Defensa → 0 de daño. Y el Veneno de la daga
+     solo entra si el golpe lastima: el cuadro lo dice («✘ No entra: el golpe no hizo daño (la armadura lo absorbió)»). Captura `p19-rockardo-veneno`.
+  2. Rockardo (copia) es un **personaje controlado por el GM** (`resumen.control`): por eso J1 no tenía botones para defenderse; los tiene el GM. Bien así.
+- ✔ Con daño que pasa la Defensa (✍ Otro valor), el daño y el **Veneno 4** llegan a la ficha de Rockardo (copia) (la ficha guardada: hp y estados). Su
+  ítem de emergencia lo levantó a 10 con Invulnerable 1 (lo normal de ese ítem).
+- ✔ **Juego real, defiende J1**: el goblin le pega a Larry (copia) (de J1, no controlado por el GM): J1 ve los botones de Evasión, defiende y toca él
+  «💔 Aplicar el daño» → la vida baja en la ficha (35 → 0, crítico). El veneno no entra: Larry es inmune a lo tóxico.
+- Partida respaldada antes y restaurada después; «Encuentro 2» ya no figura como mapa activo.

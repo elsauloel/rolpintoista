@@ -1786,3 +1786,10 @@ las Botas de repartidor, la Chaqueta del corredor, la Capa del torero…). Respa
   OPORTUNIDAD) 1d8 → 3». Capturas `p17-gm-opor-1/2`.
 - ✔ **Ataque normal**: Rockardo (J1) ataca al mismo goblin con «Atacar (PdG)» → la Evasión ofrece «1d6», sin el +2. Captura `p17-gm-normal-1`.
 - Pruebas automáticas nuevas: L1 Sangrador nv5 y L2 Envenenador nv2 (Calzas de escapista): +2 solo contra la oportunidad, 0 en ataque normal y contraataque.
+
+### 2026-11-07 · ☠ Cómo se suma el Veneno: Daga de la viuda verde + Hoja envenenada (con clics, GM en «Encuentro 2»)
+- El Goblin rompehuesos con la **Daga de la viuda verde** (Veneno 3 siempre) y la **Hoja envenenada** le pega al Capataz del culto.
+- ✔ Golpe común con la daga: el Capataz queda con **Veneno 3**.
+- ✔ Después, Hoja envenenada (el mismo golpe trae los dos venenos: el de la daga y el de la habilidad, dos botones «Aplicar Veneno ×3»): 3 → **6** → **9**.
+  El Veneno se suma entero (stacks + stacks) y dura tantos turnos como stacks (`acumularVeneno`, comun/combatiente.js).
+- Partida respaldada antes y restaurada después; «Encuentro 2» ya no figura como mapa activo. Capturas `p18-veneno-*`.

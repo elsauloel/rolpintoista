@@ -1,0 +1,142 @@
+# Talismanes (la otra mano) — ideas para más adelante
+
+> **Estado (2026-10-18):** en curso. El dueño eligió de la lluvia de ideas (ver «Elegidos», abajo); faltan P205–P207 (P204, P208 y P209 ya están; el Miedo nuevo y el aura de la Calavera ya funcionan en el mapa, falta cargar la Calavera al catálogo) y los
+> números por calidad. Antes (2026-10-07): en espera. El dueño: «muchas ideas me gustan, pero requieren cierta atención y ajuste; vamos de menos a más».
+> Se retoma cuando el dueño diga «sigamos con los talismanes». Mientras tanto, solo se consolidan los **orbes** que ya existen (Defensa
+> especial + resistencias elementales). Ver `docs/rework-defensa.md` («La otra mano»).
+
+**La idea (dueño, 2026-10-07):** lo que va en la otra mano no es solo un orbe: es **un objeto con absoluta libertad de diseño** — lo más
+vinculado a la magia y a lo esotérico, pero puede ser un farol que da visibilidad, la cabeza reducida de un jíbaro con efectos de brujería,
+un feto de llama como ofrenda a la Pachamama… cualquier cosa. **Se llaman talismanes.** Pueden dar **cualquier resistencia elemental** (el
+comodín para balancear lo que falte en otros slots), pueden ser **ofensivos** y **potenciadores elementales** («+X al daño de fuego»), y van a
+ser una gran herramienta para balancear el equipo en general. Los orbes son un tipo de talismán.
+
+Ojo: en los efectos de caster el dueño eligió la Afinidad como «+1 a todo el daño mágico», no a un elemento; un potenciador de un elemento
+en un talismán sería la excepción (a decidir).
+
+## Lluvia de ideas (2026-10-07, sin filtrar)
+
+**Luz, vista y lo oculto**
+| Idea | Qué hace |
+|---|---|
+| M1 Farol | Luz portada +2 · Visión +1 |
+| M2 Bola de cristal | Ve lo oculto +2 (a 2 casillas ves sin tirar lo que está en sigilo y las trampas escondidas) · Percepción +1 |
+| M3 Calavera con vela | Luz +1; los que te ven de cerca tiran Res.Mt o quedan con Miedo leve |
+| M4 Brújula del baqueano | Iniciativa +1 · no te afecta la niebla (ves a 2 adentro) |
+
+**Brujería y folclore**
+| Idea | Qué hace |
+|---|---|
+| M5 Cabeza reducida de jíbaro | Una vez por turno, al pegar con una varita: Maldición (se le critica más fácil) · Res.Mt +2 |
+| M6 Feto de llama (ofrenda a la Pachamama) | Regeneración de vida +1 · Res. tóxico +1 |
+| M7 Estampita del Gauchito Gil (con cinta roja) | Afortunado una vez por combate · Defensa especial +1 |
+| M8 Ekeko | Al final del combate, el oro sale 20 % más · Ranuras de mochila |
+| M9 Muñeco vudú | Marcás a un rival; lo que le hagas le pega +1 |
+| M10 Atrapasueños | Inmune a Sueño y a Pajaritos · Res.Mt +1 |
+| M11 Ruda macho en maceta | No te pueden Marcar · Res.Esp +1 |
+| M12 Huesos de adivinar | Una vez por combate, sabés si la tirada del rival va a ser alta o baja |
+| M13 Sahumerio de palo santo | Al empezar tu turno, 25 % de sacarte un estado malo; humo leve alrededor |
+| M14 Campana de bronce | Una vez por combate, despertás a los aliados a 2 (les saca Sueño, Pajaritos o Confusión) |
+
+**Defensa y resistencias**
+| Idea | Qué hace |
+|---|---|
+| M15 Piedras de elemento | Brasa, escarcha, tormenta, pantano, corrosiva: Defensa especial y su resistencia |
+| M16 Piedra bezoar | Res. tóxico +2 y una vez por combate te saca el Veneno |
+| M17 Espejito de bolsillo | 25 % de devolver 1 o 2 del daño especial que recibís |
+| M18 Orbe de cuarzo opaco | Defensa especial +3, puro |
+| M19 Contrahechizo | Una vez por combate anulás un efecto especial si ganás tu Ef.Esp contra el suyo |
+| O2 Orbe cambiante | Al empezar el combate elegís un elemento: +1 (Común) o +2 (Buena) |
+| O3 Orbe que se carga | Cuando te pega su elemento, tu próxima varita de ese elemento suma +1d4 |
+| O6 Segunda oportunidad | Una vez por combate repetís una tirada de Res.Esp o Res.CC perdida |
+| O9 Amortiguador | Si no esquivás un área, recibís la mitad |
+| O10 Cáscara | Vida extra 5 al empezar el combate |
+| O15 Anclaje | Inamovible contra empujes y atracciones mágicas |
+
+**Ofensivos y potenciadores**
+| Idea | Qué hace |
+|---|---|
+| M20 Brasa en un frasco (uno por elemento) | +1 al daño de fuego que hacés |
+| M21 Grimorio gastado | PdG.Esp +1 · SP máximo +2 |
+| M22 Frasco de tormenta | Tus relámpagos saltan una casilla más lejos |
+| M23 Piedra de afilar arcana | La primera varita de daño directo del turno suma +1 |
+| M24 Cuerno de toro | Las varitas de empuje mueven 1 más |
+| M25 Botella con un diablito | +1d4 a una varita una vez por turno; con un 1 te quema a vos |
+| O11 De la calma | Si no te moviste en el turno, +1 SP |
+| O12 De sangre | Al matar con una varita, +1 de vida |
+| O16 Guía | +1 PdG.Esp contra objetivos Marcados |
+
+**Para todos**
+| Idea | Qué hace |
+|---|---|
+| M26 Mate con termo | Una vez por combate, recuperás 1 No2 |
+| M27 Pata de conejo | Una vez por combate, repetís una tirada propia |
+| M28 Estandarte chico | Los aliados al lado tuyo, +1 Res.CC |
+| M29 Bolsa de sal gruesa | Una línea de sal que los no-muertos y los espíritus no cruzan por 2 turnos |
+
+Reservado para otros slots (no va en talismanes): el ahorro en varitas (cinturón), el Rango de casteo (afuera por ahora), usar varitas sin
+salir del sigilo (cabeza, desde Raro).
+
+## Elegidos (dueño, 2026-10-18)
+
+Lo que el dueño marcó de la lista, con sus cambios. Lo que no nombró queda afuera por ahora (ver al final).
+
+**Sin preguntas («sí» o con el cambio ya dicho)**
+| Talismán | Qué hace |
+|---|---|
+| Farol | Luz portada +2 · Visión +1 |
+| Cabeza reducida de jíbaro (P208) | Ef.Esp +1 · Res.Mt +2 · la primera vez en cada turno que pegás con una varita, el objetivo queda Maldito (2 turnos) |
+| Calavera con vela (P204, P209) | Luz portada +2 · Visión +1 · Defensa especial +2 · aura espeluznante de 3 casillas alrededor tuyo: el rival que entra tira Res.Mt o queda con Miedo (moverse hacia vos le cuesta 2 No2 por casillero, y contra vos tiene −1 PdG y −1 daño, comunes y especiales) |
+| Bola de cristal | Te avisa que hay algo oculto dentro de tu campo de visión (un rival en sigilo, una trampa escondida), sin decir dónde ni revelarlo · Percepción +1 |
+| Brújula del baqueano | Iniciativa +1 · Pasos gratis +1 · la niebla no te tapa la vista (ves a través de una nube de niebla; no la niebla de guerra; a mano) |
+| Feto de llama (ofrenda a la Pachamama) | Regeneración de vida +1 · Res. tóxico +1 |
+| Ekeko | +20 % de oro al final del combate (solo tu parte) · +3 ranuras de mochila |
+| Sahumerio de palo santo | Al empezar tu turno, 25 % (4 en d4) de sacarte un estado malo, al azar entre los que tengas |
+| Campana de bronce | Una vez por combate, 1 No2: a los aliados a 2 casillas o menos les saca Pajaritos y Confusión (y Sueño, si algún día existe) |
+| Estatuilla del Gauchito Gil (P205) | Defensa especial +2 · la primera tirada de PdG (o PdG.Esp), Evasión o Parry de cada ronda se tira como Afortunado: dos veces, la mejor |
+| Atrapasueños (P207) | Defensa especial +2 · Res.Mt +3 |
+| Muñeco vudú (P206) | PdG.Esp +1 · la primera vez en cada turno que pegás con una varita, el objetivo queda Debilitado 1 turno |
+| Piedras de elemento (brasa, escarcha, tormenta, pantano, corrosiva) | Resistencia a su elemento +3 como mínimo (Común +3; las de más calidad, más) |
+| Piedra bezoar | Res. tóxico +2 · cada vez que te ponen Veneno, entra con 1 stack menos |
+| Espejito de bolsillo | Le devolvés a quien te pegó el 20 % (para arriba) del daño especial que te entró, mínimo 1 (dueño: sin dado) |
+| Cruz de plata (ex Contrahechizo) | Res.Esp +2 (toda tirada con tu resistencia especial); una vez por ronda, cuando resistís uno, quien te lo tiró queda con ese mismo efecto 1 turno (rebota) · Buena, 140 |
+| ~~Brasa en un frasco~~ → **anillos** (dueño: poco efecto para una mano): Anillo de brasa, de escarcha, de chispa, de miasma, de ácido | +2 al daño de su elemento · Común, 50 |
+| Grimorio gastado | PdG.Esp +1 · SP máximo +2 |
+| ~~Frasco de tormenta~~ → **Anillo de tormenta** | El salto eléctrico, de 4 a 5 casillas · Común, 60 |
+| Botella con un diablito | +2 a todo tu daño especial; si en los dados de ese daño sale algún 1, el diablito te quema 2 de fuego (cartel con «Aplicar») |
+| Relicario de sangre (antes «De sangre») | Cada vez que matás con daño especial, Vida extra 10 |
+| Matelisto Taragüí (antes «Mate con termo») | La ronda de mate: una vez por ronda, en tu turno, le pasás el mate a un aliado al lado tuyo y recupera 2 No2 · Buena, 130 |
+| Estandartes (4 versiones) | Los aliados al lado tuyo: Firmeza +2 Res.CC · Templanza +3 Res.Mt · Muro +1 Defensa · Amparo +1 Defensa especial |
+
+**Con preguntas (P204–P208 en `preguntas-abiertas.md`)**
+| Talismán | Lo que dijo el dueño |
+|---|---|
+
+**Quedan afuera por ahora** (no los eligió): Ruda macho, Huesos de adivinar, Orbe de cuarzo opaco, Orbe cambiante, Orbe que se carga,
+Segunda oportunidad, Amortiguador, Cáscara, Anclaje, Piedra de afilar arcana, Cuerno de toro, De la calma, Guía, Pata de conejo, Bolsa de sal gruesa.
+
+**Cargados al catálogo (2026-10-18):** 34 ítems `tal-*` en `comun/catalogo.js` (con `orbe` y `talisman`: no parrean, van al Bazar arcano); calidades y precios con el OK del dueño. Lo especial no automatizado dice ✋ A mano; la Calavera ya funciona sola. Las Piedras, las Brasas y los Estandartes van uno por elemento o versión.
+
+**Automatizados (2026-10-18):** la Calavera (aura y Miedo, vtt-hexgrid/js/52), el Espejito y el Relicario (en el duelo, vtt-hexgrid/js/53), la Cabeza reducida y el Muñeco vudú (el efecto viaja con cada varita, `Combatiente.efectosVarita`, y entra una vez por turno, js/53) y la Estatuilla del Gauchito (`Combatiente.conGauchito`, en las tiradas de un personaje; un creep, a mano). Más los que solo dan stats fijos. Después (mismo día): la Botella (con cartel «Aplicar»), los anillos elementales (+2 al daño de su elemento), el Anillo de tormenta (salto a 5), el Sahumerio (al empezar el turno, personajes) y el Ekeko (+20 % en el reparto). La Campana y el Matelisto, con su botón en la Botonera (js/53 talismanAccion; «Gana No2» nuevo en lo que recibe un personaje). La Bola de cristal (se anuncia con el inicio del turno, js/04 + js/53) y los Estandartes (estado «🚩 …» a los aliados al lado, desde la pantalla del GM; «Quitar estado» nuevo en lo que recibe un personaje). Y por último (dueño): la Piedra bezoar (cada Veneno entra con 1 stack menos: `Combatiente.bezoar`), la Brújula (+1 Pasos gratis; ver a través de la niebla queda a mano) y la Cruz de plata, ex Contrahechizo (Res.Esp +2 y, una vez por ronda, al resistir con Res.Esp una habilidad especial, sus estados le rebotan 1 turno a quien la tiró: hook `habResistida` del duelo, js/53). **Todos los talismanes quedan automatizados**, salvo la niebla de la Brújula. Límites conocidos: los talismanes «de daño especial» (Botella, Orbe salvaje, Cabeza, Vudú, Espejito, anillos…) se disparan cuando el daño pasa por el duelo, no con una zona ni una trampa; la Estatuilla del Gauchito, el Sahumerio y la Bola de cristal funcionan solos en personajes (en un creep, a mano); el Ekeko, solo en el reparto de los jugadores; la Cruz de plata y los Estandartes necesitan la pantalla del GM abierta. La Cruz de plata, probada en el mapa (2026-10-18): Silvia resiste una Maldición de prueba y al creep le rebota Pajaritos 1 turno.
+
+**Para cargarlos al catálogo (2026-10-18, visto probando la Calavera):** un talismán va en la otra mano, pero **no sirve para parrear**. Probando
+con una Calavera armada como escudo de una mano, el duelo la ofrecía como Parry. Al cargarlos, marcarlos como los orbes (`orbe: true`) o con
+una marca propia de talismán que `Combatiente.piezasParaParry` y `armasYEscudosParaParry` dejen afuera.
+
+## Disparadores de los orbes y talismanes «de varita» (dueño, 2026-10-18, en curso)
+
+- **Orbe salvaje (Común):** con cualquier daño especial (varita, habilidad, flecha elemental), no solo con varita. d6: 1 te hace 1 de daño a vos; 6, doble.
+- **Orbe salvaje domado (Buena):** igual de amplio. d6: 1 te hace 1 de daño a vos; 5 nada; **6, el triple**.
+- **Orbe del custodio:** se activa cuando quien lo lleva gana una tirada de PdG.Esp (su Vida extra 2). Decidido: cada PdG.Esp que gana, y la Vida extra va para él o para cualquier aliado dentro de su Rango.
+- **Orbe de resguardo (decidido):** al ganar una tirada de PdG.Esp, una vez por turno (dueño: «usar algo especial» abarca los skills de Warrior, que no tienen nada que ver con el caster; el límite tiene que ser claro).
+- **Botella con un diablito (decidido, opción a):** +2 a todo tu daño especial; si en los dados de ese daño sale algún 1, el diablito te quema 2 (directo). Sin tirada ni decisión extra. Programada (vtt-hexgrid/js/53).
+- **Cabeza reducida y Muñeco vudú (decidido):** con el daño especial, una vez por turno. **Maldito en un creep** (mientras no gaste SP): cada habilidad que usa le saca tanta vida como su cooldown.
+- **Orbe salvaje (decidido):** con 1, el daño que le hacés al rival te lo hacés también a vos (los dos).
+- **Programado (2026-10-18):** el salvaje, el domado, el custodio, la Cabeza, el Vudú y el Maldito de los creeps (vtt-hexgrid/js/53, comun/creep-acciones.js). El Orbe de resguardo también (al ganar el PdG.Esp).
+
+**El efecto de un talismán como pasiva de un creep (2026-10-18, dueño):** para que un creep tenga lo de un talismán sin soltarlo como botín, se le
+pone una pasiva propia (no del pool) con el mismo campo que el ítem. Funcionan así: `masDanoElem` (el +N a un elemento: `CreepCalculo.masDanoElem`),
+`auraMiedo` (el aura de la Calavera: `CreepCalculo.auraMiedo`) y `estandarte`, que además puede llevar `rango` (sin él, al lado:
+`CreepCalculo.estandartes`). Los demás (Espejito, Bezoar…) todavía leen solo el equipo: sumarlos igual si hace falta. Usado en el Chamán del
+cristal, El ocultista y el Kobold hongero (ver `bosque.md`).
+

@@ -1,0 +1,398 @@
+# Rework de las armas de rango — hoja de debate
+
+> Arrancó el 2026-10-09. Base: lo decidido el 2026-09-26 en [`rework-armas.md`](rework-armas.md) (Rango = identidad de la familia, tope por
+> calidad, menos daño que las cuerpo a cuerpo, pólvora con las de rango, arcos a dos manos, sin munición ni recarga por ahora) y cómo está hoy el
+> código (ataque igual que cuerpo a cuerpo, el daño no suma Fuerza, el Rango marca a quién alcanzás pero no bloquea). Para debatir con el grupo.
+
+## Lo que dijo el dueño (2026-10-09)
+
+- **Arcos: suman la Fuerza.** A evaluar si toda o con un límite (por ejemplo, la mitad).
+- **Ballestas y revólveres: no suman Fuerza.**
+- Cada familia necesita su **identidad** y después un **balance**, pensado **en contraste con las varitas**.
+- **La ballesta es una especie de varita física:** como las varitas de daño directo, pero **sin** daño directo (no ignoran la armadura). Por eso
+  pueden llevar **un daño fijo más alto**.
+- **Revólveres (pólvora):** ¿cómo se distinguen? Idea: los proyectiles que no son de fuego se esquivan normal; **los de fuego (pólvora) quizás no
+  se esquivan**: la dificultad la pone el arma para apuntar («una falla contra…»). A pensar conceptualmente y charlar con los colegas.
+
+## Propuesta de Claude, para debatir
+
+### Arcos — «la fuerza del brazo»
+- Suman tu Dmg (Fuerza) **hasta un tope que trae el arco: su «Tensión»** (arco corto Tensión 2, arco largo 4, legendario 6). Así el arco premia
+  al personaje fuerte, pero un arco flojo no rinde como un hacha aunque el que lo tense sea muy fuerte. Es un número del ítem: sirve para
+  diseñar por calidad y por precio.
+- Alternativa más simple: **la mitad de tu Dmg** (redondeo hacia arriba, como los buffs).
+- Se esquivan con Evasión, como siempre. Parry: solo con **escudo** (una espada no para una flecha).
+- Identidad: **mucho Rango** y efectos de punta (Envenenar, Prende fuego, Sangrado).
+
+### Ballestas — «la varita física»
+- **No suman Fuerza.** Daño = dados chicos + **daño fijo alto** (una ballesta Común 1d6 + 3; la de asedio 2d6 + 5…). Pegan parejo: poca varianza.
+- **No ignoran la armadura** (a diferencia de la varita de daño directo): la Defensa se resta como a cualquier golpe.
+- **Recarga como las varitas:** el primer disparo del turno cuesta 1 No2 y cada disparo más en el turno, +1 (el mismo `costoEspecial` de las
+  varitas, sin SP). Ese es su freno, y su parecido con la varita.
+- Identidad: **certeza y penetración** (las mejores, «Ignora N de Resistencia a crítico»; Rompe armadura como excepción).
+- Se esquivan con Evasión; Parry solo con escudo, igual que las flechas.
+
+### Pólvora (pistolas, revólveres, arcabuces, trabucos) — «no se esquiva, se apunta»
+- **No suman Fuerza.**
+- **El defensor no tira Evasión** (no hay Parry). En cambio, el tirador tira su **PdG contra la dificultad de apuntar** del arma, que **sube con la
+  distancia**: hasta su «distancia certera» una dificultad baja, y más lejos cada tramo la sube. Esto **rescata la regla vieja del manual**
+  («Distancia certera»: seguro hasta tu Destreza; más lejos 1d20 con 7+, 17+, 20), que hoy no hace nada en el programa.
+- La Defensa se resta normal. El **crítico** sale de la diferencia entre el PdG y la dificultad (como hoy con la Evasión).
+- Identidad: **ignorar la agilidad del rival** (son buenas contra los evasivos y malas a lo lejos) y daño alto con **Rango corto o medio**; control
+  en las mejores (Aturdir, Derribar).
+- Freno posible (más adelante): pocos disparos y recargar (un revólver de 6, el arcabuz de 1). Necesitaría munición o cargas: hoy no existe.
+
+### Hondas y cerbatanas (a decidir)
+- **Honda:** es fuerza de brazo → ¿como el arco (suma con su Tensión)?
+- **Cerbatana:** no suma Fuerza, daño mínimo; lo suyo es el efecto (Veneno), como una varita de efecto.
+
+## Preguntas para el grupo
+
+1. Arcos: ¿Tensión del arco (un tope por arco) o la mitad de la Fuerza?
+2. Ballestas: ¿la recarga como las varitas (No2 que sube por disparo en el turno) les cierra como freno?
+3. Pólvora: ¿no se esquiva y se tira contra la dificultad del arma, que sube con la distancia? ¿Rescatamos la tabla de la «Distancia certera»?
+4. Parry contra proyectiles: ¿solo con escudo? (hoy se puede parrear cualquier disparo, con cualquier arma).
+5. ¿Hondas como arcos y cerbatanas como varitas de efecto?
+6. Disparar con un enemigo pegado (en contacto): ¿se puede?, ¿con penalidad?, ¿le da un ataque de oportunidad?
+7. ¿Lo que se interpone (sólidos, otros tokens) tapa el disparo? ¿Cobertura?
+
+## 2026-10-09 · Arcos: los topes (Tensión) y el Parry
+
+**Decidido (dueño):**
+- **Arcos con tope**: suman la Fuerza hasta un tope del arco. El tope tiene que quedar como **un equivalente de la Fuerza promedio** de ese nivel.
+- **Parry contra flechas: solo con escudo**, nunca con un arma. **A distancia no hay contraataque.**
+- **Ideas a balancear (dueño):** con escudo, quizás un bonus para parar un proyectil; con la Evasión común, quizás alguna dificultad.
+
+**Datos para pensar el tope** (reparto sugerido de atributos por rol, 33 puntos a nivel 1 y +3 por nivel; `Combatiente.PESOS_ROL`):
+- Fuerza a nivel 1: Warrior ~10 · Tanque ~9 · Asalto ~6 · Shooter, Mago, Support y Debuffer ~3. Promedio de las siete clases: ~5.
+- Por nivel, el Warrior suma ~0,9 de Fuerza y el Shooter ~0,3: a nivel 5, Warrior ~14, Shooter ~4–5; promedio ~7.
+- Un golpe cuerpo a cuerpo suma **toda** la Fuerza (Dmg = Fuerza): un Warrior nivel 1 con una espada Común (1d6 + 1) pega 1d6 + 11 (≈ 14,5).
+- Un arco hoy no suma nada: el Arco corto (1d6) pega ≈ 3,5, y contra una Defensa de 4 casi no entra.
+
+**Propuesta: Tensión por calidad ≈ Fuerza promedio de esa franja de nivel** (la calidad sigue al nivel en las tiendas):
+Común 4 · Buena 5 · Raro 6 · Excepcional 7 · Legendario 8. El arco suma **tu Fuerza, hasta su Tensión**.
+
+Qué pasa con cada uno (nivel 1, Arco corto 1d6, Tensión 4):
+- **Shooter (Fuerza 3):** 1d6 + 3 ≈ 6,5. Suma toda su Fuerza: el tope no lo toca.
+- **Asalto (Fuerza 6):** 1d6 + 4 ≈ 7,5. Pierde 2 puntos contra el cuerpo a cuerpo.
+- **Warrior (Fuerza 10):** 1d6 + 4 ≈ 7,5. Pierde 6: con espada pega ≈ 14,5.
+
+**Ventajas del tope (Tensión):**
+- El arco nunca pega como un hacha: el que tiene mucha Fuerza sigue rindiendo más cuerpo a cuerpo (el rango tiene su precio, como pediste).
+- Es un número **del ítem**: crece con la calidad, se puede vender un «arco de guerra» de Tensión alta, y se calcula en la calculadora del catálogo.
+- El que no es fuerte (el Shooter) no pierde nada: su arco rinde igual en sus manos que en las de un Warrior hasta el tope.
+- Contra la Defensa: sumar algo fijo hace que la flecha entre (hoy un 1d6 suelto contra Defensa 4 casi no hace nada).
+
+**Desventajas:**
+- Un número más en cada arco (otra cosa que explicar).
+- El Warrior con arco «desperdicia» Fuerza (es a propósito, pero puede sentirse raro).
+- **Ojo:** como el Shooter tiene poca Fuerza, sumar Fuerza beneficia más a los fuertes que al tirador. Si el arco tiene que ser el arma del Shooter,
+  su daño tiene que venir también de otro lado (dados del arco, Destreza, habilidades).
+
+**Comparación con la mitad de la Fuerza** (la otra opción): sin número nuevo, pero crece sin límite con el personaje (un Warrior nivel 5 con Fuerza 14
+suma 7 con cualquier arco, también con uno Común) y al Shooter le da casi nada (Fuerza 3 → +2).
+
+**Pendiente:** la balanza «persona con arco contra persona con arma» (daño esperado por turno contra Defensas típicas, cuánto se expone cada uno,
+cuánto cuesta en No2 acercarse) y los números del escudo y la Evasión contra proyectiles.
+
+## 2026-10-09 · Los obstáculos tapan los disparos (decidido)
+
+**Decidido (dueño):** los obstáculos del mapa **interceptan los proyectiles**. La línea de tiro sale **del tirador**, no de lo que ve el grupo: aunque
+el jugador vea al objetivo por la visión de un aliado, si hay un obstáculo en el medio el personaje **no** puede dispararle.
+
+**Cómo se tiene que ver al atacar con un arco (pedido del dueño, a probar en el mapa):** tu Rango; los objetivos posibles, bien marcados; los que
+no se pueden, marcados aparte (fuera de Rango, o tapados por un obstáculo, aunque se vean); y los obstáculos que los tapan.
+
+**Lo que ya existe y sirve de base:** el visualizador de Rango (📏, tecla R) ya recorta el área con la línea de visión (`dibujarRangoConVision`,
+`lineaLibre` + `solidosSet()`: los Sólidos y la Colisión tapan); al elegir objetivo, el mapa hace brillar a los que están a tu alcance
+(`dueloResaltarObjetivos`), pero hoy **no mira los obstáculos ni bloquea** a uno que esté fuera de Rango.
+
+**Abierto:** ¿los otros tokens (aliados o rivales en el medio) también tapan, o solo los obstáculos? ¿Algo deja disparar por encima (tiro con
+comba, la skill del Shooter)?
+
+## 2026-10-09 · Arcos: críticos, dos manos y distancia mínima (dueño)
+
+- **Todos los arcos son Tipo 4.** El que optimice el arco va a cargar Destreza y jugar al **crítico**: el Tipo 4 es el de rango de crítico más chico
+  (más niveles de crítico por cada punto que le sacás a la defensa). Contrapeso natural: **la Resistencia a crítico Tipo 4 es la más frecuente**
+  en las armaduras. Y el crítico multiplica **todo** el daño (también lo que suma la Tensión) y **no resta la Defensa**: el arco pega poco de base
+  y mucho cuando critea.
+- **La palanca de balance: la penalidad a la Evasión contra proyectiles.** Cada punto que se le resta a la Evasión del objetivo es un punto más de
+  diferencia para el crítico (con rango 2, cada 2 puntos = un nivel más). Por eso conviene arrancar chico (por ejemplo −1) y medirlo.
+- **Siempre a dos manos:** no hay escudo, orbe ni nada en la otra mano (sin Parry de escudo contra proyectiles para el arquero). El **peso** del arco
+  depende del arco, de su calidad, su tamaño y su Tensión.
+- **Distancia mínima:** el arco no ataca cuerpo a cuerpo; tiene que haber **al menos 2 casilleros libres entre el arquero y el objetivo** (el
+  objetivo a 3 casilleros o más).
+
+**Decidido (dueño):** con un enemigo encima, el arquero **se aleja** (y se come el ataque de oportunidad) **o cambia de arma** (en combate cuesta
+No2). **No se puede pegar con el arco.** La distancia mínima de ballestas y pólvora se evalúa cuando les toque; ahora, solo arcos.
+
+## 2026-10-09 · Decidido para arrancar (dueño)
+
+- **Daño del arco: los dados del arco + la mitad de tu Fuerza, redondeada para arriba.** Se descartó el tope (Tensión): encasillaba a los arcos y daba
+  casi igual quién los agarrara. Con la mitad, importa quién lo usa y el arco pega siempre menos que el arma cuerpo a cuerpo de esa misma persona.
+- **Costo en No2: como cualquier arma** (Tipo 4: 2 el primer ataque del turno, 4 los siguientes), para arrancar.
+- **Evasión −X contra flechas**: esquivar una flecha es más difícil. El arco pega menos de base pero juega más al crítico. **Cuánto, es la duda.**
+- Orden de trabajo: primero la mecánica; los efectos permitidos van al final (sirven para balancear los puntos al diseñar cada arco).
+- El texto para compartir con el grupo está en la conversación del 2026-10-09 (resumen de esta hoja).
+
+## 2026-10-09 · Escudo contra flechas y lo que tapa el disparo (dueño)
+
+- **Escudo:** de base **no** tiene bonus para parar proyectiles (para con su Parry normal). Un bonus contra proyectiles es una **variable de diseño**:
+  un rasgo que puede traer un escudo puntual.
+- **Los tokens que están en el medio (aliados o rivales) también tapan el disparo**, igual que los obstáculos.
+- **Tirar por encima / tiro con comba:** no es de base; es una **variable de diseño** (un rasgo de un arco o una habilidad, como la del Shooter).
+
+## 2026-10-09 · Idea del dueño: el «sweet spot» de cada arco
+- **Por defecto, los arcos no tienen penalidad a la Evasión.** En cambio, **cada arco tiene su sweet spot**: una distancia (o dos, o más) donde tiene
+  ventaja: **+PdG** (o el rival −Evasión: para pegar y para el crítico es lo mismo, cuenta la diferencia). Ej.: «a 7 u 8 casilleros, +2 PdG».
+- Propuesta de Claude para debatir: se expresa como **+PdG** (es tu tirada; no toca la Evasión mínima de 1 ni el Stun); el sweet spot va **dentro
+  de tu Rango y nunca a menos de 3** (la distancia mínima); el mapa lo **muestra al apuntar** (un anillo de otro color, con quién cae adentro) y lo
+  **suma solo** al crear el duelo (como la Embestida). Variables de diseño por arco: dónde está (corto 3–4, largo 7–8), cuán ancho (1, 2 o 3
+  casilleros) y cuánto da (+1 a +3); la calidad sube el ancho o el bono.
+- Balance (a medir): si el arquero tira desde su sweet spot más o menos la mitad de las veces, un +2 equivale en promedio a un +1 fijo, pero lo tiene
+  que ganar ubicándose (gasta No2 en moverse) y el rival lo puede sacar de ahí acercándose o tapando la línea. Con el arco Tipo 4 (rango de
+  crítico 4), +2 de diferencia es medio nivel de crítico más en promedio.
+
+## 2026-10-09 · Base de los arcos, consolidada para probar (dueño)
+- **Sin penalidad a la Evasión** por defecto (distorsiona el balance): un arma a distancia común y silvestre, hasta charlarlo con el grupo.
+- **El sweet spot no es la regla:** queda como **bono / mecánica a testear** en algunos arcos (puede romper el juego).
+- **Dados: 1 o 2 dados de Tipo 4 en cualquier calidad** (lore: una flecha no se hace más pesada); la calidad se paga con lo demás, si los puntos dan.
+- **El Arco de guerra** (suma la Fuerza entera) es una idea para un arco de calidad alta; no define la base.
+- Orden: cerrar y probar los arcos (números y mapa) → después hondas, cerbatanas y efectos permitidos.
+
+## 2026-10-09 · Números: arquero contra guerrero (simulación con las reglas del juego)
+Reparto sugerido de atributos (33 + 3 por nivel), Defensas de la curva por nivel, crítico y Defensa como en el duelo. Nivel 1: Guerrero Fue 10,
+Agi 4, Des 6, HP 45, Def 8, Res T4 2 / T6 1, espada 1d6+1. Arquero Fue 3, Agi 8, Des 11, HP 30, Def 4, Res T4 1, arco Nd4 + 2 (mitad de Fuerza).
+- **La espada del guerrero al arquero:** acierta ~38 % (Des 6 contra Eva 8) y hace ~4 por golpe, un golpe por turno.
+- **El arco al guerrero pesado (Def 8): acierta ~89 %, pero no le hace daño.** 1d4+2 nunca pasa la Defensa 8; 2d4+2, ~0,2 por flecha. El crítico no
+  aparece: con rango 4 y Res T4 2 hace falta ganar por 12, y el PdG del arquero llega como mucho a 11.
+- Contra un rival medio (Def 6, Res T4 1): ~0,9 (1d4) a ~2,2 (2d4) por flecha. A nivel 5 (Def 10–14, Res T4 2–3), casi cero en todos los casos.
+- **Palancas medidas (daño por flecha, contra el guerrero pesado / un rival medio, nivel 1, arco 2d4+2):** como hoy 0,2 / 2,2 · la flecha **ignora
+  la mitad de la Defensa** 2,7 / 4,2 · **Crítico frecuente +2** 5,4 / 7,5 · las dos 6,8 / 8,5. A nivel 5 solo el Crítico frecuente se sostiene
+  (4,3 / 6,3).
+- **Lectura:** con la Defensa que resta entera, el daño chico no entra, y la Resistencia a Tipo 4 (la más abundante) apaga el crítico del Tipo 4. No
+  es solo de los arcos: el mismo arquero con una espada tampoco le hace daño al guerrero. A decidir antes de probar en el mapa.
+
+## 2026-10-09 · Parry, dos manos y lo que quedó para más adelante (dueño)
+- **Con un arco no se parrea** (programado: `Combatiente.sirveParaParry`, `armaParaDefensa` con `arco`). **Un disparo** (flecha, virote, bala:
+  cualquier ataque con un arma de rango) **se esquiva igual (Evasión), pero con un arma no se para: solo con un escudo** (programado: `Combatiente.contraDisparo`; el duelo lo aclara).
+- **El arco es siempre a dos manos** (el asistente de ítems lo pone solo). Con el arco en las manos no hay otra arma; tener otra y «sostener» el
+  arco sin usarlo («blandirlo o sostenerlo») **no se programa**: casi no va a pasar, queda para más adelante.
+- **Más peso para pagar otros efectos** (idea del dueño para la lluvia de ideas): ojo, el Peso es la cantidad de dados, así que un arco más
+  pesado tira más dados. Para cargar más sin cambiar el daño haría falta separar el peso de los dados (hoy no se puede: los dados = Peso +
+  amplificados). Si se quiere usar, se decide al diseñar los arcos.
+- **El arco y el sigilo**: ver P184 (disparar rompe el sigilo, solo el primero es sorpresa, la Evasión 1 solo de cerca).
+
+## 2026-10-09 · Arcos Tipo 4 y Tipo 6 (dueño, cambia «todos los arcos son Tipo 4»)
+- **El Tipo es el dado:** un arco que tira d6 es Tipo 6; no se separa el Tipo del dado («si no, un poco que se rompe»). Para acercarse a un d6 sin
+  romper la paridad, un arco Tipo 4 puede llevar daño fijo (1d4+1 ≈ 1d6). Más dados: sí; d8: no, por ahora.
+- Quedan dos familias: **Tipo 4, el arco liviano** (juega al crítico) y **Tipo 6, el arco largo** (más parejo). La escalera por calidad, medida con
+  `herramientas/balance_combate.py`, está en [`balance-combate.md`](balance-combate.md) (paso 3).
+
+## 2026-10-09 · Línea de tiro, tiro alto y distancia ideal (dueño; programado)
+- **Línea de tiro** (todas las armas de rango): al apuntar se dibuja una línea recta; la tapan los obstáculos Sólidos y **cualquier token, aliados
+  incluidos**. Si algo la tapa o la línea apenas **roza** una casilla ocupada, aparece el aviso y **lo decide la mesa**.
+- **Tiro alto**: por encima de los tokens (no de los muros), con el objetivo a 4 o más y **PdG −2**. «Probemos.» **Es la mecánica de firma de
+  todos los arcos** (dueño, 2026-10-09): un arco que no la tenga lleva **«Sin tiro alto»**, una debilidad que lo abarata (`sinTiroAlto`; en la
+  calculadora resta lo que vale). Otra arma de rango la tiene solo si la trae (`tiroAlto`).
+- **Distancia ideal (sweet spot)**: variable de diseño de cada arco — **dónde** (cerca, a media distancia, lejos, o una franja fija; con su ancho) y
+  **qué da** (PdG, Crítico frecuente, Crítico potente, daño fijo, ignorar Resistencia; «se pueden habilitar infinidad de efectos»). El balance:
+  ubicarse cuesta No2 y el rival se puede mover.
+- **Comba** (doblar alrededor de un obstáculo): el dueño la piensa — P185, sin programar.
+- **Parar un disparo con escudo no lleva tirada de Bloqueo** (dueño, 2026-10-09): parar con escudo es como esquivar, pero cuesta el No2 del Parry;
+  si el Parry gana, el disparo queda parado (programado en `comun/duelo.js`: resultado «bloqueado», sin fase de Bloqueo ni contraataque).
+- **Lo próximo, después de ultimar los arcos: las ballestas** (dueño: «gran parte del terreno está preparado… tenemos los mecanismos para hacer
+  testeos de balance»). Su casa de diseño: Rompe armadura; los virotes, Perfora.
+
+## 2026-10-10 · Ballestas: idea del dueño para el freno («más lenta») — en debate
+
+- **Dueño:** «la ballesta puede ser un poco más lenta: que el primer ataque cueste 2 en lugar de 1 y el segundo cueste 4, por ejemplo. Todo
+  está por debatir.» Es decir: **el doble de lo que cobra un arma común** (hoy el primer ataque cuesta Tipo ÷ 2 y los siguientes, el Tipo).
+- Compite con la propuesta anterior (pregunta 2: recarga «como las varitas», 1 No2 y +1 por cada disparo más en el turno). Diferencia: la de
+  las varitas deja disparar varias veces barato; la del dueño hace que la ballesta sea **un disparo fuerte por turno** y un segundo, caro.
+- A decidir: (a) cuál de las dos; (b) si «el doble» es fijo o un número del ítem («Recarga N»: No2 de más por disparo, para diseñar por
+  calidad: la de mano, Recarga 0–1; la pesada, 2; la de asedio, 3); (c) cuánto daño fijo compensa ese costo (se prueba con
+  `herramientas/balance_combate.py`).
+
+## 2026-10-10 · Ballestas: las formas de cobrar, medidas (Claude, para decidir)
+
+Premisa (dueño): **la ballesta no suma Fuerza: el daño se lo da el arma**; ninguna idea de costo está descartada, se elige por balance.
+Medición: `balance_combate.py` (script de prueba aparte), ballesta Tipo 6, el Shooter contra un blanco medio, daño por turno, comparado con su
+arco largo «bueno» de la escalera (1d6+1 / 3d6 / 3d6+3, más la mitad de su Fuerza) y con su mejor arma cuerpo a cuerpo.
+
+| Cobro | Disparos por turno (Shooter) | Lo que pasa |
+|---|---|---|
+| Como arma (Tipo ÷ 2 y después el Tipo: 3, 6) | 1–2 | Con el daño fijo de hoy (3/4/5) se cae a casi 0 desde nivel 3 |
+| Como varita (1, 2, 3…) | 3–4 | Para no pasarse, cada disparo tiene que pegar poco; un disparo chico **no pasa la armadura** (la varita sí, porque ignora la Defensa). Nivel 5: 3,6 contra el arco 5,5; contra el pesado, 0 |
+| **«Lenta» (2, 4, 6…)** — la idea del dueño | 2 | Pocos disparos fuertes: el que pasa la armadura. Con la escalera de abajo, **≈ el arco y el cuerpo a cuerpo** a nivel 3 y 5 (5,2 / 4,7 / 4,9 y 5,9 / 5,5 / 5,9); a nivel 1 un poco arriba (134 %) |
+
+**Escalera propuesta (Tipo 6, cobro «lenta»):** Común 1d6+1 · Buena 2d6+4 a 2d6+6 · Rara 2d6+7 a 2d6+9. **El daño fijo tiene que crecer con la
+calidad** al ritmo de la Defensa (≈ +3 cada dos niveles): es lo que reemplaza a la Fuerza.
+
+> **Cambió la regla (dueño, 2026-10-10):** «un punto de daño ignora la armadura, no es que te baja la armadura». Perfora N = **N puntos del
+> golpe pasan siempre la Defensa**; el resto va contra ella. O sea: el daño nunca es menos de N, pero contra poca armadura no suma nada. Lo de
+> abajo (medido con la regla vieja, que le restaba N a la Defensa) ya no vale: falta volver a medir lo que vale la Perfora en la calculadora
+> (`PERFORA_VALOR`) y revisar las armas, virotes y flechas que la llevan.
+
+**Perfora en los virotes:** contra la armadura, cada punto de Perfora rinde **igual que +1 de daño fijo** (medido: fijo 4 + Perfora 2 = fijo 6),
+pero **no se multiplica en el crítico**. Sirve para darle a la ballesta lo «anti-armadura» sin inflar el crítico; en la calculadora se cobra un
+poco menos que el daño fijo (la propuesta de 0,8 se sostiene).
+
+**El que tiene Fuerza sale perdiendo con la ballesta** (a propósito: es el arma del que no la tiene). El problema del «mono-Destreza» sigue siendo
+general (no de la ballesta).
+
+## 2026-10-10 · Ballestas: diseño desde cero (borrador para el OK del dueño)
+
+> Dueño: «avancemos con el diseño… lo que hay en el catálogo puede servir de referencia, pero estamos inventando todo de cero».
+
+### 1. La base (las reglas de todas las ballestas)
+- **No suman Fuerza:** el daño es el del arma (dados + daño fijo). El daño fijo crece con la calidad, al ritmo de la Defensa (≈ Defensa media − 4).
+- **Recarga N** (número del ítem): el disparo cuesta **N No2, 2N el segundo del turno, 3N el tercero…**
+  - **Recarga 2 = la ballesta común** (2, 4, 6…: la idea «lenta» del dueño, la que mide bien).
+  - **Recarga 1 = de repetición** (1, 2, 3…: la referencia de las varitas): muchos tiros chicos; **medido: un tiro chico no pasa la armadura** (nivel 3
+    y 5, casi 0 contra un blanco medio). Solo sirve con daño fijo alto o contra lo liviano: rasgo de una ballesta puntual, a medir.
+  - **Recarga 3 = de asedio** (3, 6, 9…): un tiro por turno casi siempre, muy fuerte.
+- **Tipo 6** de base (el Tipo es el dado). Tipo 8 solo en las pesadas de calidad alta: **medido, el Tipo 8 es muy volátil** (la resistencia a Tipo 8
+  es escasa: a nivel 3 una de asedio 2d8+6 rinde 3–4 veces el arco), así que va con Recarga 3 y se mide antes.
+- **Una mano** las «de mano» (dejan llevar escudo u otra arma: por eso pegan menos); **dos manos** las demás.
+- **Sin tiro alto** (es la firma del arco). Se esquiva con Evasión; se para solo con escudo (lo de todos los disparos).
+- **Rango:** un poco menos que el arco de su calidad (Común 3 · Buena 4 · Rara 5 · Excepcional 5–6 · Legendaria 6–7).
+- **Identidad:** pasar la armadura. **Perfora** (en los virotes y en alguna ballesta) y **Rompe armadura** (en las buenas).
+
+### 2. Lo que hay hoy (solo referencia)
+| Nombre | Calidad | Manos | Daño | Rango | Extra | $ |
+|---|---|---|---|---|---|---|
+| Ballesta de mano | Buena | 1 | 1d6+1 | 3 | — | 130 |
+| Ballesta de almenara · del arbusto | Buena | 1 | 1d6+1 | 3 | copias de la de mano | 130 |
+| Ballesta de repetición | Buena | 1 | 1d6+2 | 4 | — | 110 |
+| Ballesta pesada | Rara | 2 | 2d8+2 | 5 | Rompe armadura 25 % | 260 |
+| Ballesta de asedio | Rara | 2 | 2d8 | 5 | Rompe armadura 50 % | 300 |
+
+Lectura: sin Fuerza, ninguna pasa la armadura desde nivel 3 (daño fijo 0–2); tres son la misma; no hay Común.
+
+### 3. La lista nueva (borrador; números de la escalera medida, precios con la calculadora cuando se programe)
+| Calidad | Nombre | Manos | Daño | Recarga | Rango | Lo suyo |
+|---|---|---|---|---|---|---|
+| Común | Ballesta de mano | 1 | 1d6 | 2 | 3 | Una mano: escudo o daga en la otra |
+| Común | Ballesta de cazador | 2 | 1d6+1 | 2 | 3 | La base |
+| Común | Ballesta de estribo | 2 | 1d6+3 | 3 | 3 | Lenta y más fuerte |
+| Buena | Ballesta de mano reforzada | 1 | 2d6+3 | 2 | 3 | Una mano |
+| Buena | Ballesta de guardia | 2 | 2d6+5 | 2 | 4 | La base |
+| Buena | Ballesta de fortín | 2 | 2d6+4 | 2 | 4 | Perfora 1 |
+| Rara | Ballesta de guerra | 2 | 2d6+8 | 2 | 5 | La base |
+| Rara | Ballesta pesada | 2 | 2d6+9 | 3 | 5 | Rompe armadura 50 % |
+| Rara | Ballesta de repetición | 2 | 2d6+6 | 1 | 4 | Muchos tiros (a medir) |
+| Excepcional | Ballesta de asedio | 2 | 2d8+11 | 3 | 6 | Tipo 8 · Rompe armadura · Peso alto |
+| Excepcional | Ballesta del alguacil | 1 | 2d6+9 | 2 | 5 | Una mano · Perfora 2 |
+| Legendaria | (a inventar) | 2 | 3d6+13 | 2 | 7 | Un rasgo único |
+
+### 4. A decidir con el dueño
+1. ¿**Recarga N** como número de cada ballesta (1 rápida, 2 común, 3 de asedio)?
+2. **Virotes:** ¿munición como las flechas (un «carcaj de virotes», virotes especiales con Perfora como marca) o la ballesta los trae y no se cuentan?
+3. **Disparar con un enemigo pegado:** el arco no puede (distancia mínima). ¿La ballesta sí (se apunta y se dispara), con el ataque de oportunidad
+   normal si después se aleja?
+4. Lo que hay que programar después del OK: que la ballesta no sume Fuerza (`Combatiente.dmgDelArma`), el cobro de la Recarga, la ballesta en la
+   calculadora (su daño fijo reemplaza a la Fuerza: un descuento como el del arco), y reemplazar las del catálogo.
+
+## 2026-10-10 · Ballestas: decidido (dueño) y medición de Recarga 1 y 3
+**Decidido:** cobro **2, 4, 6** como regla de la ballesta común (se priorizó el balance antes que no tener una regla aparte; 2, 4, 4 «como el arco»
+se midió y queda en el filo: con el mismo daño se pasa ~60 %, con un tercio menos se desploma). **Recarga 1 / 2 / 3** (rápida, común, de asedio)
+«probemos si dan los números». **Virotes:** comunes, que no se cuentan, y **especiales**, como las flechas (se comparten mecánicas: espacio de
+diseño). **Con un enemigo pegado, la ballesta sí puede disparar.**
+
+**Medición** (Shooter y Asalto contra el blanco medio y el pesado, % de lo mejor que tienen entre su arco y su cuerpo a cuerpo):
+- **Recarga 3 (asedio): da.** Común 1d6+4 · Buena 2d6+7 · Rara 2d6+10 rinden ~100–140 % contra el medio y **mejor que todo contra el pesado**
+  (lo que se busca: el tiro que pasa la armadura). Para el que tiene poca Agilidad es la mejor (un solo disparo, pero entero).
+- **Recarga 1 (rápida): da solo en el filo.** Cada disparo pega apenas por encima de la armadura: +2 de daño fijo pasa de 35 % a 115 % (nivel 3,
+  1d6+6 → 1d6+8), y **contra el pesado hace 0 en todos los niveles**. Funciona como ballesta «contra lo liviano» con daño fijo alto (Común 1d6 ·
+  Buena 1d6+8 · Rara 2d6+7), pero es muy sensible: va como rasgo de **una** ballesta puntual, no como familia, y se prueba en el mapa.
+
+**Consulta del dueño (2026-10-10): ¿y si el arco no pudiera pegar al lado, pero sí a 2?** (hoy: objetivo a 3 o más). El daño por turno no
+cambia (la herramienta no mide distancias); cambia la táctica: con un enemigo pegado, alejarse **1 casillero en vez de 2** (1 No2 menos; el ataque
+de oportunidad se come igual), y un enemigo a 2 ya no tapa el tiro. Para el Shooter casi nunca cambia la cantidad de flechas por turno (le
+sobra 1 No2 para otra cosa). Queda la diferencia con la ballesta (que dispara pegada). Sin decidir.
+- **Decidido y programado (dueño, 2026-10-10): el arco no pega al casillero de al lado, pero a 2 sí** (1 casillero libre en el medio:
+  `Combatiente.ARCO_LIBRES = 1`; la «distancia ideal cerca» arranca en 2).
+
+## 2026-10-10 · Ballestas: programado y la lista para el OK
+**Programado (en el sitio):** el rasgo **Recarga N** de las armas de rango que no son arco (`Combatiente.recargaDe`: el disparo cuesta N, 2N, 3N…;
+el de oportunidad, N), en el cobro de personajes, creeps e invocaciones, el «?» del costo en el duelo y el menú «¿Qué ataque es?»; el asistente
+de ítems pregunta la Recarga (Sin / 1 rápida / 2 común / 3 de asedio); el glosario la explica; **los virotes** son flechas con `flecha.virote`:
+van en el mismo carcaj y con una ballesta la ventana ofrece «¿Qué virote?» (solo virotes); comprar una ballesta trae el carcaj, como el arco. La
+calculadora cobra la ballesta como el arco (×0,7; Recarga 3 ×0,9) y su casa es Rompe armadura. No suma Dmg (ya era así).
+
+**La lista** (Tipo 6 salvo aclaración; daño = dados + fijo; calidad y precio de `calculadora_armas.py`):
+| Calidad | Ballesta | Manos | Daño | Recarga | Rango | Lo suyo | $ |
+|---|---|---|---|---|---|---|---|
+| Común | de mano | 1 | 1d6 | 2 | 3 | Una mano | 55 |
+| Común | de cazador | 2 | 1d6+1 | 2 | 3 | La base | 55 |
+| Común | de estribo | 2 | 1d6+4 | 3 | 3 | Lenta y fuerte | 80 |
+| Buena | de mano reforzada | 1 | 2d6+3 | 2 | 3 | Una mano | 120 |
+| Buena | de guardia | 2 | 2d6+4 | 2 | 4 | La base | 140 |
+| Buena | de fortín | 2 | 2d6+3 | 2 | 4 | Rompe armadura 25 % | 160 |
+| Buena | de tranquera | 2 | 2d6+6 | 3 | 3 | Lenta y fuerte | 140 |
+| Rara | de guerra | 2 | 2d6+8 | 2 | 5 | La base | 290 |
+| Rara | pesada | 2 | 2d6+8 | 3 | 5 | Rompe armadura 50 % | 350 |
+| Rara | de repetición | 2 | 2d6+6 | 1 | 4 | Rápida (a probar) | 190 |
+| Rara | de mano del duelista | 1 | 2d6+6 | 2 | 4 | Una mano · el primer disparo cuesta 1 menos | 400 |
+| Excepcional | de asedio | 2 | 2d8+11 (Tipo 8) | 3 | 6 | Rompe armadura 50 % | 500 |
+| Excepcional | del alguacil | 1 | 2d6+10 | 2 | 5 | Una mano · PdG +1 | 850 |
+| Excepcional | de la frontera | 2 | 3d6+11 | 2 | 6 | Crítico frecuente +1 | 1300 |
+| Legendaria | Cruz del Sur | 2 | 3d6+14 | 2 | 7 | Rompe armadura 50 % · el primer disparo cuesta 1 menos | 3300 |
+
+**Virotes** (mismo molde que las flechas; la marca de la casa es la Perfora):
+| Calidad | Virote | Qué hace | No2 extra | $ |
+|---|---|---|---|---|
+| Común | perforante | Perfora 2 | 0 | 15 |
+| Común | marcador | Marcado 2 turnos | 0 | 15 |
+| Común | de punta roma | Derribar (queda Sentado) | 1 | 20 |
+| Buena | rompe-corazas | Rompe armadura (1 stack) | 1 | 40 |
+| Buena | envenenado | Perfora 2 + Veneno ×3 | 1 | 45 |
+| Buena | incendiario · de escarcha · de ácido · relámpago | Los mismos que las flechas | 1 | 40–45 |
+| Rara | de acero templado | Perfora 3 · PdG +1 | 1 | 80 |
+| Rara | de punta de diamante | Perfora 5 (pasan siempre 5 de daño) | 2 | 120 |
+| Rara | de fuego vivo · de hielo negro · de tormenta | Los mismos que las flechas | 2–3 | 100–150 |
+
+**Quedan para una tanda con mapa** (necesitan código nuevo): llega cargada, apuntada, a quemarropa, atraviesa escudos, la ballesta de muralla y
+los virotes explosivo, de humo, de luz, de clavo y de rebote. El garfio con soga, como utilería de la Talabartería.
+**Después del OK:** reemplazar las 6 ballestas viejas del catálogo por esta lista, sumar los virotes y probar en el mapa (Recarga y «¿Qué virote?»).
+
+## 2026-10-10 · Ballestas y virotes: en el catálogo (dueño: «más variedad, con efectos propios y compartidos»; «los virotes, inventátelos»)
+**33 ballestas** (`bal-*`, 7 Comunes, 9 Buenas, 8 Raras, 6 Excepcionales, 3 Legendarias) y **24 virotes** (`virote-*`, 6 Comunes, 10 Buenos, 8
+Raros) en `comun/catalogo.js`; las 6 ballestas viejas quedaron archivadas. Generadas con un script que calcula la calidad y el precio con
+`calculadora_armas.py` (todas caen en su calidad). Efectos: Rompe armadura (la casa), Lisiado, Sangrado, Envenenar, Veneno severo, Derribar,
+Demora, Prende fuego, Rengo, eléctrico; rasgos: una mano, Recarga 1/2/3, Ignora Res. crítico, oportunidad sin No2, primer disparo −1 No2,
+Crítico frecuente, PdG, y **a quemarropa** (la distancia ideal en una franja de 1–2 casillas, que ya existía). Lista y textos: ver el catálogo
+(`bal-` y `virote-`).
+
+## 2026-10-10 · El Rango como bono (Comunes, dueño)
+**Decidido:** el +N de Rango de un arma de rango es **un bono** (cuenta para la calidad: 0,75 por +1; de +1 a +5 en Común) y **mucho menos
+frecuente**: «la mayoría de los personajes que se enfocan en esas armas ya tienen Destreza suficiente» → **~1/3** de los arcos y ballestas lo traen.
+**Hecho en Común:** arcos con Rango, 2 de 7 (cazador de pájaros +5, rastreador +3); ballestas, 3 de 8 (de cazador +3, de estribo +3, del
+baqueano +4). A las que lo perdieron, otro bono o un efecto más seguido (Arco corto +1 de daño, de pastor Crítico potente +1, de liebrero
+Iniciativa +2, de tiro ligero PdG +1; ballesta de mano Iniciativa +2, del matrero Veneno 33 %, dentado Sangrado 33 %, quemarropa +4 pegado,
+calderero Rompe armadura 33 %); el Arco de rama quedó pelado y más barato. Las de Buena para arriba, todavía como estaban.
+
+## 2026-10-11 · Arcos Comunes auditados (dueño)
+Medidos con `balance_combate.py` (el arco del Shooter contra su mejor cuerpo a cuerpo, blanco medio, nivel 1; la meta de Común es 74–106 %): Arco
+corto 150 % · rastreador 109 % · pastor 96 % · tiro ligero 93 % · rama 72 % · cazador de pájaros 70 % · liebrero 65 % (lo que no mide la herramienta:
+Rango, Crítico potente, distancia ideal, Iniciativa, ahorro de No2, Lisiado). **Cambios (OK del dueño):** Arco corto 2d4+1 → **2d4** (~109 %, el
+arco común de referencia; precio 50 → 40); Arco de liebrero 1d4+1 → **1d4+2** (~91 %; 60 → 75). Los otros cinco, como estaban. Después: lluvia de
+ideas de mecánicas de arco (el dueño siente que son más acotadas que las de cuerpo a cuerpo) — ver `ideas-arcos-flechas.md`.
+
+## 2026-10-11 · Ballestas: medidas de nuevo, con las reglas reales (Común y Buena; dueño: «las raras para arriba, ignoralas»)
+`balance_combate.py` no modelaba la Recarga (cobraba como un arma: 3 y 6) ni la Perfora nueva (N pasan siempre): las medidas anteriores estaban
+corridas. Ahora sí (`--bal-recarga`, `--bal-perfora`), y `herramientas/balance_ballestas.py` barre la escalera. Shooter, ballesta ÷ su mejor cuerpo a
+cuerpo, blanco medio (banda buscada: 74–106 %), 8000 tiradas:
+
+| Calidad | Lo que mide |
+|---|---|
+| Común (nivel 1) | **1d6 pelado = 103 %** · 1d6+1 = 130 % · 1d6 Perfora 1 = 127 % · Perfora 2 = 137 % · con Recarga 3: 1d6+2 = 82 %, 1d6+3 = 100 % |
+| Buena (nivel 3) | 2d6+3 = 32 % · 2d6+4 = 52 % · **2d6+5 = 82 %** · 3d6+1 = 72 % · **3d6+2 = 98 %** · 2d6+2 Perfora 2 = 72 % · 2d6+2 Perfora 3 = 106 % |
+
+**Lo que pasa:** a nivel 1 la Recarga 2 deja al Shooter disparar dos veces (2 + 4 = 6 de sus 8 No2) y con la espada pega una (3 + 6 = 9): con un
+1d6 pelado ya está en el techo, y casi todas las Comunes del catálogo (Perfora o daño fijo) quedan en 120–190 %. A nivel 3 la Defensa media es 10:
+lo que no llega a ~12 de promedio rebota, y casi todas las Buenas (2d6+0…+2, Perfora 1–2) quedan en 4–70 %. La Perfora rinde ~1,3 de daño fijo a
+nivel 1 y ~1,5 a nivel 3. La Recarga 3 solo cambia algo a nivel 1 (a nivel 3 el Shooter dispara dos veces igual).
+**La calculadora:** cobra 1d6 pelado como 1,5 puntos (debería rondar 7) y 3d6+2 como 7,9 (debería rondar 11). Hay que decidir la escalera antes de
+calibrarla (ver la pregunta al dueño).

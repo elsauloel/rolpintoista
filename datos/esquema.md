@@ -5,13 +5,14 @@ No es exhaustivo: para el detalle completo de un campo, la fuente de verdad
 siempre es el código (`SCHEMA`/`DEFAULT` en `ficha-personaje/ficha.html`,
 `nuevoCreep()` en `gm-toolset/gm-tools.html`).
 
-## Ítem de catálogo — `datos/catalogo.json`
+## Ítem de catálogo — `comun/catalogo.js`
 
-El formato central: lo produce `datos/catalogo-editor.html` o
-`assets/catalogo.xlsx`, y de ahí lo consumen (con distinto recorte cada
-una) `ficha-personaje/ficha.html`, `gm-toolset/gm-tools.html` y
-`gm-toolset/vendor-generator.html`. Ver [`herramientas/catalogo_comun.py`](../herramientas/catalogo_comun.py)
-para la lógica de corrección/escritura.
+El catálogo de fábrica (`CATALOGO_BASE`, un ítem por renglón, desde 2026-09-29; antes `datos/catalogo.json` + Excel +
+copias adentro de los HTML). Lo escribe `datos/catalogo-editor.html` (o una conversación, con
+[`herramientas/catalogo_comun.py`](../herramientas/catalogo_comun.py)) y lo cargan la ficha, GM Tools (que arma su forma
+con `itemParaCreep`) y el generador de tiendas. Lo que suben jugadores y GM vive en Firebase (`biblioteca_items`) con la
+misma forma y se suma con `comun/items-subidos.js` (id `usr-<id>`, o el id del de fábrica si es una corrección). Campos
+que usan las herramientas (los que no aplican se omiten):
 
 ```jsonc
 {
@@ -21,14 +22,22 @@ para la lógica de corrección/escritura.
   "imagen": "data:image/...",     // base64, opcional — solo ficha.html la conserva
   "tipoItem": "arma_1m",          // ver lista de categorías más abajo
   "peso": 1,                      // en armas, además: cantidad de dados de daño
-  "ranuras": 1,                   // ranuras que ocupa en la mochila si no está equipado
+  "ranuras": 1,                   // ranuras que ocupa en la mochila si no está equipado: mínimo 1 (P158; `sinRanura: true` = no ocupa)
   "precioCompra": 90,
+  "durPorPeso": 4,                // opcional (armas, escudos y armaduras): puntos de durabilidad por punto de Peso; sin él, 3.
+                                  // Durabilidad total = max(3, durPorPeso × Peso) (comun/combatiente.js, durMax). Variable de diseño.
+                                  // En la mochila de un personaje, cada copia guarda además `dur` (lo que le queda) y, las
+                                  // piezas de armadura, `armRota`: eso es de esa copia y no viaja al subir al catálogo.
 
   // Solo si tipoItem empieza con "arma_":
-  "tipoDado": 4,                  // 2, 4, 6, 8 o 10
+  "tipoDado": 6,                  // 4, 6, 8, 10 o 12 (antes 2..10: ver escalaTipos)
   "danoFijo": 0,
   "danoAmplificado": 0,           // dados extra sin sumar peso (2 + amplificado = dados totales)
   "armaDeRango": false,           // si true, el botón Daño Arma no le suma el stat Dmg
+  "efectosGolpe": [               // opcional: se recuerdan (y tiran) al tirar el Daño
+    {"nombre": "Envenenar", "caras": 2, "exitos": 1,   // exitos en 1d(caras); caras 1 = siempre
+     "dado": "", "detalle": "Aplicale Veneno al objetivo."}  // dado: tirada extra si entra
+  ],
 
   // Solo si tipoItem === "consumibles":
   "consumible": true,
@@ -49,6 +58,8 @@ para la lógica de corrección/escritura.
                                    // Vacío = el estado es solo un cartel (recordatorio manual).
 
   "legacy": false,                // cuenta para el piso de ítems clásicos del Alquimista
+  "soloBotin": true,              // opcional (2026-09-30): equipo con nombre propio de un creep; se consigue derrotándolo,
+                                  // se usa y se vende, pero no sale en las tiendas generadas ni en el catálogo abierto de la ficha
   "mods": [{"stat": "pdg", "val": 1}],  // se suman al stat mientras esté equipado
   "detalle": "Texto que lee el jugador"
 }
@@ -63,10 +74,26 @@ distintos); cabeza/manos/piernas/pies fusionaron sus versiones
 cada una (ver `SLOT_DEFS` en ficha.html).
 
 **Stats válidos en `mods`/`efectoMods`** (si no está en esta lista, el
-importador lo descarta): `con`, `fue`, `agl`, `des`, `int`, `def`, `dmg`,
-`bloqueo`, `eva`, `ini`, `mov`, `rng`, `pdg`, `crit`, `parry`, `pdgmg`,
+importador lo descarta): `con`, `fue`, `agl`, `des`, `esp`, `def`, `dmg`,
+`bloqueo`, `eva`, `ini`, `mov`, `rng`, `pdg`, `crit`, `parry`, `percepcion`, `pdgmg`,
 `resm`, `bonos`, `rangocasteo`, `rescc`, `hpmax`, `crgmax`, `accionesmax`,
-`tipo1`..`tipo5` (resistencia a crítico por tipo de dado de arma).
+`tipo1`..`tipo5` (resistencia a crítico contra armas Tipo 4, 6, 8, 10 y 12; los ids
+quedaron de cuando la escala era 2..10).
+
+**Escala de Tipos (+2):** los Tipos de arma pasaron de 2/4/6/8/10 a
+4/6/8/10/12 (`datos/catalogo.json` ya está convertido). Las fichas y los
+creeps llevan `escalaTipos: 2`; los que no la tienen son de antes y se
+convierten solos al abrirlos (`migrarEstadoTipos` en la ficha,
+`migrarCreepTipos` en gm-tools): `tipoDado`/`armaTipo` +2 y los números de
+"resistencia a críticos tipo N" / "T2 P1" en los textos. Los ítems creados
+a mano en una tienda llevan la marca cada uno.
+
+**Iteración 2 (pendiente en el catálogo):** Bonos pasó a SP y Acciones +
+Movimiento a Nitros. El catálogo todavía usa los nombres viejos; la ficha
+los convierte en memoria al abrirse (`migrarEstadoIt2`): `bonos` → `sp`
+(× `IT2.spPorBono`), `mov` y `accionesmax` → `nitros`, `curabonosPct` →
+`curaspPct`, `accionesCosto` → `nitrosCosto`, `forzarAccionesMax` →
+`forzarNitros`. Los creeps de gm-tools siguen con el esquema viejo.
 
 **Qué recorta cada consumidor:**
 - `ficha-personaje/ficha.html` — copia completa, con imagen.
@@ -96,10 +123,10 @@ la misma forma:
 }
 ```
 
-Los presets (`EFECTOS_PRESET` en ficha.html, `ESTADOS_PRESET_GM` en
-gm-tools.html) están duplicados a mano entre los dos archivos — no hay
-sincronización automática entre ellos todavía. Si agregás un estado nuevo,
-sumalo en los dos lados.
+Los presets estándar viven en una sola lista, `comun/estados-presets.js`
+(desde el 2026-09-29): la ficha la usa como `EFECTOS_PRESET` (campos
+`hpturno`/`stacksturno`) y gm-tools como `ESTADOS_PRESET_GM` (forma de creep,
+`hpTurno`/`stacksTurno`). Un estado nuevo se suma solo ahí.
 
 ## Tarjeta de tablero — lo que arma cada uno para el panel de combate
 
@@ -122,7 +149,7 @@ creeps al vuelo, no la sube a ningún lado) producen la misma forma, que
 ## Personaje — `datos/personajes/*.json`
 
 Formato completo de `S` en `ficha-personaje/ficha.html`: `meta` (nombre,
-raza, clase, nivel...), `attrs` (con/fue/agl/des/int base), `formulas`
+raza, clase, nivel...), `attrs` (con/fue/agl/des/esp base), `formulas`
 (cómo se derivan los stats secundarios desde los atributos), `inventario`/
 `cinturon`/`equipo` (ítems propios del personaje — no confundir con el
 catálogo: estos son instancias, cada uno puede tener mods propios, estar
@@ -133,8 +160,11 @@ completa — es el único lugar que no se desactualiza solo.
 ## Creep — estado en memoria de `gm-toolset/gm-tools.html`
 
 Estructuralmente análogo al personaje pero más simple: `attrs` planos
-(con/fue/agl/des/int), un arma única (`armaTipo`/`armaPeso`/`armaFijo`/
-`armaAmplificado`/`armaDeRango`, mismo significado que en el catálogo),
+(con/fue/agl/des/esp), un arma única (`armaTipo`/`armaPeso`/`armaFijo`/
+`armaAmplificado`/`armaDeRango`, mismo significado que en el catálogo;
+`armaNombre`/`armaDetalle`; `armaMods` = bonos del arma, que suman igual que
+los del equipo; `armaEfectos` = efectos al golpear, como `efectosGolpe`; `armaManos` = `arma_1m`/`arma_2m`, solo para cuando se
+publica al catálogo),
 `equipo` (ítems tomados del catálogo), `estados` (ver arriba),
 `habilidades`. No se persiste como archivo individual — vive en el
 `gm-creeps.json` que baja "Guardar todo" (nunca se sube al repo) y en el
@@ -160,23 +190,29 @@ La arma `gm-toolset/vendor-generator.html`, la lee
 Solo guarda ids — el nombre, la imagen y los stats de cada ítem salen del
 catálogo embebido en la ficha, no viajan en este archivo.
 
-## Manual del jugador — `datos/reglas.json`
+## Manual — `datos/manual.json`
 
-Estructura independiente, no comparte forma con lo anterior (es contenido
-de texto, no datos de partida):
+Lo genera `herramientas/compilar_manual.py` a partir de los archivos de texto
+de `manual-usuario/notas/` (uno por capítulo). Es contenido, no datos de
+partida:
 
 ```jsonc
 {
-  "titulo": "Manual del jugador — Piratas en el espacio",
-  "actualizado": "2026-08-14T...",
-  "capitulos": [
-    {"id": "...", "titulo": "Combate", "secciones": [
-      {"id": "...", "titulo": "Cómo funciona el daño", "contenido": "texto plano..."}
-    ]}
-  ]
+  "titulo": "Manual — Rol Pintoísta",
+  "actualizado": "2026-09-20T...",
+  "capitulos": [{"id": "combate", "titulo": "Combate", "icono": "⚔️", "resumen": "...", "orden": 5}],
+  "notas": [{
+    "id": "nitros-no2", "titulo": "Nitros (No2)",
+    "alias": ["No2", "Nitro"], "tags": ["recursos", "combate"],
+    "estado": "confirmado",        // confirmado | borrador | pendiente
+    "capitulo": "recursos",
+    "cuerpo": "Markdown con [[enlaces]] y > [!callouts]"
+  }]
 }
 ```
 
-`contenido` es texto plano: línea en blanco separa párrafos, una línea que
-empieza con `"- "` se renderiza como ítem de lista. Ver
-`manual-usuario/CLAUDE.md`.
+`datos/reglas.json` es el borrador viejo del manual (capítulos → secciones):
+queda como archivo histórico, ya no lo lee nada.
+
+- **`auditado`** (2026-10-20, dueño): la fecha en que el ítem pasó por una auditoría con el dueño (la primera: las pociones, P212). Lo que no lo
+  tiene queda para revisar después. Solo informativo: no cambia nada en el juego.

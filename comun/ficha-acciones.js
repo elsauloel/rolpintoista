@@ -601,7 +601,7 @@ const FichaAcciones = (() => {
   }
   // Daño del arma (con lo que suma el stat Daño) y sus efectos al golpear.
   function tirarDanoDeArma(S, it, ui){
-    const dmg = FichaCalculo.calcular(S).final.dmg;
+    const dmg = FichaCombate.dmgParaArma(S, it);   // sin los bonos de daño de la otra arma (2026-11-07)
     const r = tirarDados(FichaCombate.armaDanoTxt(it, dmg));
     if(!r) return;
     gastarUnaTirada(S, r, ui, true);   // 💪 el +3 ya venía en el Daño
@@ -1333,7 +1333,7 @@ const FichaAcciones = (() => {
     const c = FichaCalculo.calcular(S);
     const a = arma || ((FichaCombate.armasEquipadasConDano(S)[0] || {}).item) || null;
     return Combatiente.habEjecucion(it, FichaBotonera.dueloDe(it), {stat: s => c.final[s], etq: s => FichaCalculo.STAT_LABEL[s] || s, X: xDeHab(it, xSp, xNitros),
-      armaDano: a ? FichaCombate.armaDanoTxt(a, c.final.dmg) : '', armaPerfora: a ? num(a.perfora) : 0, nivel: num(S.meta && S.meta.nivel) || 1});   // nivel: el Taunt (PdG.Esp + nivel, 2026-10-27)
+      armaDano: a ? FichaCombate.armaDanoTxt(a, FichaCombate.dmgParaArma(S, a, c)) : '', armaPerfora: a ? num(a.perfora) : 0, nivel: num(S.meta && S.meta.nivel) || 1});   // nivel: el Taunt (PdG.Esp + nivel, 2026-10-27)
   }
   // Ataque con arma hecho con una habilidad (`duelo.modo === 'arma'`): el ataque con arreglos (comun/combatiente.js).
   function ataqueDeHabArma(S, it, arma, xSp, xNitros, ui){

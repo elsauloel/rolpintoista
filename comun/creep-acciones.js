@@ -54,7 +54,7 @@ const CreepAcciones = (() => {
     if(v !== null) PARRY_CON.set(sc.id, v);
     return v;
   }
-  const parry = sc => { const con = PARRY_CON.get(sc.id) || ''; return tirada(`${sc.nombre} · Parry${con ? ` · ${con}` : ''}`, C().statValor(sc, 'parry'), sc, 'parry'); };
+  const parry = sc => { const con = PARRY_CON.get(sc.id) || ''; return tirada(`${sc.nombre} · Parry${con ? ` · ${con}` : ''}`, C().parryValor(sc, con), sc, 'parry'); };   // los bonos de Parry de esa pieza (2026-11-07)
   const fuerzaGolpe = sc => tirada(`${sc.nombre} · Fuerza del golpe`, C().fuerzaGolpeValor(sc));
   // El Bloqueo solo después de un Parry (regla del dueño, 2026-09-30), con el arma o el escudo con que para.
   // Bloqueo firme (escudos de Buena calidad, 2026-10-06): +N contra el primer golpe que recibe en el turno (la marca `_golpe` la pone el daño).

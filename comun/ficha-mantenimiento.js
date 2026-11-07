@@ -79,6 +79,7 @@ const FichaMantenimiento = (() => {
     inv.descargada = num(inv.ataquesTurno) > 0;
     inv.nitros = Combatiente.recargarNo2(InvCalculo.nitrosMax(inv), inv.nitros, inv.estados);
     inv.ataquesTurno = 0;
+    inv.ataquesArma = {}; delete inv.armaActiva;   // ⚔⚔ dos armas: cada una vuelve a su primer ataque, y en la mano, la primera (2026-11-07)
     inv.golpeTurno = 0;   // la Defensa contra el primer golpe vuelve a valer
     inv.parryTurno = 0;   // y la Parada fácil (escudos de Buena calidad, 2026-10-06)
     inv.habilidades.forEach(h => { if(num(h.cdActual) > 0) h.cdActual = Math.max(0, num(h.cdActual) - 1); });

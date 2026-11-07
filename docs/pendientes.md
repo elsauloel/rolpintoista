@@ -1026,6 +1026,13 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   cada arma tenga su propio primer ataque a mitad de precio (hoy un creep ataca solo con el arma principal y lleva una sola cuenta de ataques
   del turno: `comun/creep-acciones.js` pagarAtaque, `comun/creep-calculo.js` costoAtaque0 / armaDe). El Parry ya puede elegir pieza
   (confirmarlo en el mapa con la segunda arma). Hacerlo junto con la carga de los esenciales.
+- [x] ✅ **Hecho el 2026-11-07. ⚔⚔ Los bonos de cada arma, con esa arma, para todos (dueño, 2026-11-07: «es un buen momento para programar el
+  ataque con dos armas… que esté programado en general para jugadores, para creeps, para invocaciones, para todo»).** Regla en
+  `docs/guia-de-diseno.md` («Los bonos de cada arma, con esa arma»). Ya estaba: el ataque con dos armas de personajes y creeps (2026-11-03/04) y
+  el PdG/crítico por arma. Se sumó: el **Parry y el Bloqueo de creeps e invocaciones** con los bonos de la pieza elegida (antes, los del arma
+  de la mano; y la segunda arma salía marcada como escudo en el duelo), la **Iniciativa** de cualquier arma siempre (en los creeps solo
+  contaba la de la mano), el **Daño** del personaje sin el bono de daño de la otra arma, y las **invocaciones con dos armas** (un «Atacar con…»
+  y un «Daño ·…» por arma, primer ataque barato por arma, se reinicia al empezar su turno; antes sumaban los bonos de las dos armas en todo).
 - [ ] **⚔ Pelea de prueba con los creeps esenciales — SOLO CUANDO EL DUEÑO DIGA «correla»** (dueño, 2026-11-03: «lo de la pelea para la prueba,
   ponela pendiente, cuando yo te diga que lo corras, correla»). En «Claude · pruebas», con clics: varios esenciales del pool (los 24, en especial
   los nuevos: Berserker con dos armas, Protector, Ladrón, Arcano, Saltador, Control mental, Hostigador con trampas) contra los personajes, con

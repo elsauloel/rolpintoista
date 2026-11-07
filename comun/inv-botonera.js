@@ -23,7 +23,7 @@ const InvBotonera = (() => {
     const lupaBotonHtml = (clave, cls) => o.lupa === false || typeof window.lupaBotonHtml !== 'function' ? '' : window.lupaBotonHtml(clave, cls);
     const costoAtaque = I.costoAtaque(inv);
     const sinNitrosAtaque = num(inv.nitros) < costoAtaque;
-    const cualAtaque = num(inv.ataquesTurno) === 0 ? 'primer ataque del turno (Tipo ÷ 2)' : 'ataque extra (Tipo completo)';
+    const cualAtaque = Combatiente.ataquesConArmaCreep(inv) === 0 ? 'primer ataque del turno (Tipo ÷ 2)' : 'ataque extra (Tipo completo)';
     const titulo = inv.nombre, badge = `No2 ${fmt(num(inv.nitros))}/${fmt(I.nitrosMax(inv))}`;
 
     const tileStat = id => `
@@ -37,13 +37,19 @@ const InvBotonera = (() => {
 
     const f = v => { const x = formulaParaValor(v); return x ? x.formula : ''; };
     const defInv = I.defensa(inv);
+    // ⚔⚔ Con dos armas (dueño, 2026-11-07, como los creeps): un «Atacar con…» y un «Daño ·…» por arma, cada uno con su costo (su propio primer ataque a
+    // mitad de precio) y su PdG (los bonos de ataque de esa arma). Tocar uno la deja en la mano (`armaActiva`) y ataca con ella.
+    const armasMano = Combatiente.armasDeMano(inv), dosArmas = armasMano.length > 1 ? armasMano : null;
     const combate = [
+      ...(dosArmas ? dosArmas.flatMap(a => { const ia = {...inv, armaActiva: a.id}, c = I.costoAtaqueCon(inv, a.id), sinN = num(inv.nitros) < c, prim = Combatiente.ataquesConArmaCreep(ia) === 0;
+        return [{stat:'pdg', nombre:`Atacar con ${a.nombre} · ${fmt(c)} No2${prim ? ' · 1.º ataque' : ''}`, dado: f(I.statValor(ia,'pdg')), sinNitros: sinN, clave:`inv:${inv.id}:atacar`, motivo:`${sinN?'Sin No2 · ':''}Cuesta ${fmt(c)} No2 · ${prim ? 'primer ataque con esta arma (Tipo ÷ 2)' : 'ya atacó con esta arma (Tipo completo)'}${a.id === (Combatiente.armaPrincipal(inv) || {}).id ? ' · en la mano' : ''}`, attr:`data-invatacar="${inv.id}" data-atacararma="${esc(a.id)}"`},
+          {nombre:`Daño · ${a.nombre}`, dado: I.danoTxt(ia, I.statValor(ia,'dmg')), clave:`inv:${inv.id}:danio`, motivo:'Sin costo', attr:`data-invdanio="${inv.id}" data-danioarma="${esc(a.id)}"`}]; }) : [
       {stat:'pdg', nombre:`Atacar (PdG) · ${fmt(costoAtaque)} No2`, dado: f(I.statValor(inv,'pdg')), sinNitros: sinNitrosAtaque, clave:`inv:${inv.id}:atacar`, motivo:`${sinNitrosAtaque?'Sin No2 · ':''}Cuesta ${fmt(costoAtaque)} No2 · ${cualAtaque}`, attr:`data-invatacar="${inv.id}"`},
-      {nombre:'Daño Arma', dado: I.danoTxt(inv, I.statValor(inv,'dmg')), clave:`inv:${inv.id}:danio`, motivo:'Sin costo', attr:`data-invdanio="${inv.id}"`},
+      {nombre:'Daño Arma', dado: I.danoTxt(inv, I.statValor(inv,'dmg')), clave:`inv:${inv.id}:danio`, motivo:'Sin costo', attr:`data-invdanio="${inv.id}"`}]),
       {stat:'eva', nombre:'Esquivar (Eva)', dado: Combatiente.stuneado(inv.estados) ? '1 (Stun)' : f(I.statValor(inv,'eva')), clave:`inv:${inv.id}:stat:eva`, motivo:'Sin costo', attr:`data-invtirarstat="${inv.id}:eva"`},
       // Parry y Bloqueo solo con un arma de verdad o un escudo (regla del dueño, 2026-09-30): sin eso, o con un arma
       // natural, no aparecen (I.defensa).
-      ...(defInv ? [{stat:'parry', nombre:`Parry · ${fmt(Combatiente.costoParry())} No2`, dado: f(I.statValor(inv,'parry')), sinNitros: num(inv.nitros) < Combatiente.costoParry(), clave:`inv:${inv.id}:stat:parry`, motivo:`${num(inv.nitros) < Combatiente.costoParry() ? 'Sin No2 · ' : ''}Cuesta ${fmt(Combatiente.costoParry())} No2 · con ${defInv.nombre}`, attr:`data-invtirarstat="${inv.id}:parry"`},
+      ...(defInv ? [{stat:'parry', nombre:`Parry · ${fmt(Combatiente.costoParry())} No2`, dado: f(I.parryValor(inv)), sinNitros: num(inv.nitros) < Combatiente.costoParry(), clave:`inv:${inv.id}:stat:parry`, motivo:`${num(inv.nitros) < Combatiente.costoParry() ? 'Sin No2 · ' : ''}Cuesta ${fmt(Combatiente.costoParry())} No2 · con ${defInv.nombre}`, attr:`data-invtirarstat="${inv.id}:parry"`},
         o.parryPendiente
           ? {stat:'bloqueo', nombre:`Bloqueo · ${defInv.nombre}`, dado: f(I.bloqueoValor(inv)), clave:`inv:${inv.id}:stat:bloqueo`, motivo:`Tras el Parry · sin costo · su Bloqueo + el Peso de ${defInv.nombre} (${fmt(num(defInv.peso))}) es el dado`, attr:`data-invtirarstat="${inv.id}:bloqueo"`}
           // Apagado hasta el Parry, pero muestra lo que tiraría (para decidir entre Parry y Evasión).

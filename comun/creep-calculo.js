@@ -137,17 +137,18 @@ const CreepCalculo = (() => {
   }
 
   // Lo que el creep tiene puesto y da bonos (su arma adentro; lo guardado no: paso 4).
-  // ⚔⚔ Con dos armas, los bonos de la otra arma no cuentan: solo los de la que tiene en la mano ahora (como un personaje, 2026-11-03).
-  const fuentesEquipo = sc => { const a = Combatiente.armaPrincipal(sc); return Combatiente.equipoPuesto(sc).filter(it => !Combatiente.esArmaDeMano(it) || it === a); };
+  // ⚔⚔ Con dos armas (2026-11-03; regla general del dueño, 2026-11-07): los bonos de ataque de un arma cuentan solo con esa arma (la de la mano);
+  // los de Parry y Bloqueo, solo con la pieza con la que ataja (`pieza`); el resto (Iniciativa, Evasión, Defensa…), siempre. Combatiente.fuentesParaStat.
+  const fuentesEquipo = (sc, statId, pieza) => Combatiente.fuentesParaStat(sc, statId, pieza);
 
   // Suma los modificadores que apuntan a un stat puntual, vengan del equipo
   // puesto o de estados activos — mismo criterio que collectMods()+modTotal
   // en ficha.html, para que un ítem con "bloqueo +N" o un estado que suba
   // Fuerza afecten al creep de verdad y no solo la Res. a crítico.
-  function modTotal(sc, statId){
+  function modTotal(sc, statId, pieza){
     let total = 0;
     // Un «+Rango de casteo» viejo suma al Rango (2026-10-07: el rango lo da la Destreza, siempre).
-    fuentesEquipo(sc).forEach(it => (it.mods||[]).forEach(m => { if(m.stat === statId || (statId === 'rng' && m.stat === 'rangocasteo')) total += num(m.val); }));
+    fuentesEquipo(sc, statId, pieza).forEach(it => (it.mods||[]).forEach(m => { if(m.stat === statId || (statId === 'rng' && m.stat === 'rangocasteo')) total += num(m.val); }));
     (typeof Combatiente !== 'undefined' && Combatiente.sinPresasDebiles ? Combatiente.sinPresasDebiles(sc.estados||[]) : (sc.estados||[])).forEach(es => {   // (dos Presas: solo la más fuerte, 2026-10-25)
       if(es.activo === false) return;
       const stacks = Math.max(1, num(es.stacks)||1);
@@ -243,7 +244,7 @@ const CreepCalculo = (() => {
   // tienen ya su propio botón en la caja de Combate.
   const STATS_TIRADA_IDS = ['con', 'fue', 'agl', 'des', 'esp', 'resmg', 'rescc', 'ini', 'pdgmg', 'dmgesp', 'resm', 'percepcion', 'sigilo'];
   const STAT_LOOKUP = Object.fromEntries(DERIVED_STATS.map(d => [d.id, d]));
-  function statValor(sc, statId){
+  function statValor(sc, statId, pieza){   // pieza: con qué ataja (Parry/Bloqueo), su id, nombre o el ítem
     const d = STAT_LOOKUP[statId];
     if(!d) return 0;
     if(Combatiente.SOLO_BONO.includes(statId)) return modTotal(sc, statId);   // bonos de regla: no salen de la Destreza (2026-10-20)
@@ -253,7 +254,7 @@ const CreepCalculo = (() => {
     // atributo base tirado directo (statId === d.attr) no hay que sumar el
     // mod dos veces.
     let v = num(sc[d.attr]) + modTotal(sc, d.attr);
-    if(statId !== d.attr) v += modTotal(sc, statId);
+    if(statId !== d.attr) v += modTotal(sc, statId, pieza);
     // Pajaritos (PdG/Eva) y Lisiado (PdG/Parry) ya no achican el stat: parten el resultado de la tirada (mitadesDeTirada, en tirarValorStat).
     if(statId === 'resmg' && sc.jefe) v += 1;   // protección de jefe: +1 Res.Esp (la tirada contra los debuffs)
     if(statId === 'mov'){
@@ -267,9 +268,9 @@ const CreepCalculo = (() => {
     return (sc.estados || []).some(e => e.activo !== false && e[flag]);
   }
   // Cada fuente (equipo o estado activo) que le suma a un stat, con su valor.
-  function aportesMod(sc, statId){
+  function aportesMod(sc, statId, pieza){
     const out = [];
-    fuentesEquipo(sc).forEach(it => {
+    fuentesEquipo(sc, statId, pieza).forEach(it => {
       const v = (it.mods||[]).filter(m => m.stat === statId).reduce((a, m) => a + num(m.val), 0);
       if(v) out.push({nombre: it.nombre || '(sin nombre)', val: v, tipo: 'equipado'});
     });
@@ -284,7 +285,7 @@ const CreepCalculo = (() => {
   // Nombres de los estados activos que aportan un mod a ese stat, para
   // poder mostrar "de dónde sale" al tocar el indicador +/-.
   function origenesMod(sc, statId){
-    const deEquipo = fuentesEquipo(sc)
+    const deEquipo = fuentesEquipo(sc, statId)
       .filter(it => (it.mods||[]).some(m => m.stat === statId))
       .map(it => it.nombre || '(sin nombre)');
     const deEstados = (typeof Combatiente !== 'undefined' && Combatiente.sinPresasDebiles ? Combatiente.sinPresasDebiles(sc.estados||[]) : (sc.estados||[]))
@@ -310,7 +311,7 @@ const CreepCalculo = (() => {
   function armadmgOrigenTxt(sc){
     const L = [];
     let deItems = 0;
-    fuentesEquipo(sc).forEach(it => {
+    fuentesEquipo(sc, 'armadmg').forEach(it => {
       const v = (it.mods || []).filter(m => m.stat === 'armadmg').reduce((a, m) => a + num(m.val), 0);
       if(!v) return;
       deItems += v;
@@ -478,7 +479,7 @@ const CreepCalculo = (() => {
   // o.soloEscudo: contra un disparo, solo un escudo (2026-10-09). Con un arco no se parrea.
   function defensa(sc, o){
     if(!sc) return null;
-    if(o && o.nombre){ const x = defensas(sc, o).find(d => d.nombre === o.nombre); if(x) return x; }   // 🛡 con la que eligió (2026-11-03)
+    if(o && o.nombre){ const x = defensas(sc, o).find(d => d.nombre === o.nombre || (d.id && d.id === o.nombre)); if(x) return x; }   // 🛡 con la que eligió (2026-11-03; por nombre o id)
     const a = armaDe(sc);
     return Combatiente.armaParaDefensa({arma: a.nombre ? {nombre: a.nombre, peso: a.peso} : null, natural: a.natural,
       arco: a.armaDeRango, soloEscudo: !!(o && o.soloEscudo),
@@ -503,7 +504,9 @@ const CreepCalculo = (() => {
     const c = typeof CATALOGO_BASE !== 'undefined' && it ? CATALOGO_BASE.find(x => x && x.nombre === it.nombre) : null;
     return c ? num(c.peso) : 0;
   }
-  function bloqueoValor(sc, con){ const d = defensa(sc, con ? {nombre: con} : undefined); return statValor(sc, 'bloqueo') + (d ? num(d.peso) : 0); }   // `con`: el nombre de lo que paró (2026-11-03)
+  function bloqueoValor(sc, con){ const d = defensa(sc, con ? {nombre: con} : undefined); return statValor(sc, 'bloqueo', d && (d.id || d.nombre)) + (d ? num(d.peso) : 0); }   // `con`: el nombre de lo que paró (2026-11-03); sus bonos de Bloqueo, solo los de esa pieza (2026-11-07)
+  // 🛡 El Parry con una pieza puntual (dueño, 2026-11-07: los bonos de Parry de un arma o un escudo, solo al atajar con esa pieza). Sin `con`, la de siempre.
+  function parryValor(sc, con){ const d = defensa(sc, con ? {nombre: con} : undefined); return statValor(sc, 'parry', d && (d.id || d.nombre)); }
   // Fuerza del golpe (reglas del escudo, 2026-09-26): la tirada del atacante contra el Bloqueo del defensor = su Fuerza (con los estados activos) + el peso de su arma; la SUMA es el dado.
   function fuerzaGolpeValor(sc){ return num(sc.fue) + (sc.estados || []).filter(e => e.activo !== false).reduce((a, e) => a + (e.mods || []).filter(m => m.stat === 'fue').reduce((x, m) => x + num(m.val) * Math.max(1, num(e.stacks) || 1), 0), 0) + pesoArma(sc); }
   // Contraataque (regla a prueba, 2026-09-26): tras un Parry, siempre cuesta lo de un primer ataque y no suma al conteo de ataques del turno.
@@ -878,6 +881,6 @@ const CreepCalculo = (() => {
     danoTxt, fuentesEquipo, modTotal, estadosArmadura, aporteArmadura, defensaEfectiva, armadmgEfectiva, resElemental, critEfectivo, critDeEstados,
     statValor, estadoActivo, aportesMod, origenesMod, conSigno, statOrigenTxt, armadmgOrigenTxt, ataqueTxt, ataqueOrigenTxt,
     defensaOrigenTxt, critOrigenTxt, armaduraOrigenTxt, modsAfectanHp, actualizarHpMaxPorCon, vidaAlDia, nitrosMax, actualizarNo2PorAgl,
-    costoAtaque, costoAtaqueCon, habAtaque, costoNitrosHab, habPartes, habTextoMesa, costoHabTxt, pesoArma, costoParry, defensa, bloqueoValor,
+    costoAtaque, costoAtaqueCon, habAtaque, costoNitrosHab, habPartes, habTextoMesa, costoHabTxt, pesoArma, costoParry, defensa, bloqueoValor, parryValor,
     fuerzaGolpeValor, costoContraataque, costoOportunidad, oportunidadPosible, sinOportunidad, tarjetaPublica, nombreGenerico, presupuesto, presupuestoTxt, presupuestoHtml, alcance, modoHab, bloqueoHab, ESTADOS_NITROS_MIGRAR, normalizar};
 })();

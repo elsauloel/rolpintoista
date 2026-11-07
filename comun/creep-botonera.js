@@ -22,7 +22,7 @@ const CreepBotonera = (() => {
     return {
       pdg: f(C().statValor(sc, 'pdg'), 'pdg'),
       eva: f(C().statValor(sc, 'eva'), 'eva'),
-      parry: f(C().statValor(sc, 'parry'), 'parry'),
+      parry: f(C().parryValor(sc), 'parry'),   // con la pieza de siempre (sus bonos de Parry, solo los de esa: 2026-11-07)
       bloqueo: f(C().bloqueoValor(sc)),
       fuerza: f(C().fuerzaGolpeValor(sc)),
     };

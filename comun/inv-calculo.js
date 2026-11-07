@@ -31,13 +31,13 @@ const InvCalculo = (() => {
   // en INV_STATS_TIRADA_IDS) — mismos que ofrece gm-tools para un creep.
   const INV_STATS_HAB = ['resmg','rescc','bloqueo','eva','ini','pdg','parry','pdgmg','dmgesp','resm'];
 
-  function fuentesEquipo(inv){ return FichaResumen.invFuentesEquipo(inv); }   // comun/ficha-resumen.js
-  function modTotal(inv, statId){ return FichaResumen.invModTotal(inv, statId); }
+  function fuentesEquipo(inv, statId, pieza){ return FichaResumen.invFuentesEquipo(inv, statId, pieza); }   // comun/ficha-resumen.js
+  function modTotal(inv, statId, pieza){ return FichaResumen.invModTotal(inv, statId, pieza); }
   // Cada fuente (equipo o estado activo) que le suma a un stat, con su valor
   // — para la 🔍 (de dónde sale cada tirada).
-  function aportesMod(inv, statId){
+  function aportesMod(inv, statId, pieza){
     const out = [];
-    fuentesEquipo(inv).forEach(it => {
+    fuentesEquipo(inv, statId, pieza).forEach(it => {
       const v = (it.mods||[]).filter(m => m.stat === statId).reduce((a, m) => a + num(m.val), 0);
       if(v) out.push({nombre: it.nombre || '(sin nombre)', val: v});
     });
@@ -84,11 +84,11 @@ const InvCalculo = (() => {
   function estadoActivo(inv, flag){
     return (inv.estados || []).some(e => e.activo !== false && e[flag]);
   }
-  function statValor(inv, statId){
+  function statValor(inv, statId, pieza){   // pieza: con qué ataja (Parry/Bloqueo), su id, nombre o el ítem (2026-11-07)
     if(Combatiente.SOLO_BONO.includes(statId)) return modTotal(inv, statId);   // bonos de regla: no salen de la Destreza (2026-10-20; antes el duelo se la sumaba al crítico)
     const attr = INV_STAT_ATTR[statId] || statId;
     let v = num(inv[attr]) + modTotal(inv, attr);
-    if(statId !== attr) v += modTotal(inv, statId);
+    if(statId !== attr) v += modTotal(inv, statId, pieza);
     return v;
   }
   function nitrosMax(inv){ return FichaResumen.invNitrosMax(inv); }
@@ -104,7 +104,7 @@ const InvCalculo = (() => {
   // o.soloEscudo: contra un disparo, solo un escudo (2026-10-09). Con un arco no se parrea.
   function defensa(inv, o){
     if(!inv) return null;
-    if(o && o.nombre){ const x = defensas(inv, o).find(d => d.nombre === o.nombre); if(x) return x; }   // 🛡 con la que eligió (2026-11-03)
+    if(o && o.nombre){ const x = defensas(inv, o).find(d => d.nombre === o.nombre || (d.id && d.id === o.nombre)); if(x) return x; }   // 🛡 con la que eligió (2026-11-03; por nombre o id)
     const a = armaDe(inv);
     return Combatiente.armaParaDefensa({arma: a.nombre ? {nombre: a.nombre, peso: a.peso} : null, natural: a.natural,
       arco: a.armaDeRango, soloEscudo: !!(o && o.soloEscudo),
@@ -121,9 +121,14 @@ const InvCalculo = (() => {
     // el id de la pieza (para que el duelo distinga «Parry con el arma» de «Parry con el escudo» y el Desarmar sepa qué se cae)
     return lista.map(x => { const it = (inv.equipo || []).find(e => e && e.nombre === x.nombre && e.equipado !== false); return it && it.id ? {...x, id: it.id} : x; });
   }
-  function bloqueoValor(inv, con){ const d = defensa(inv, con ? {nombre: con} : undefined); return statValor(inv, 'bloqueo') + (d ? num(d.peso) : 0); }
+  function bloqueoValor(inv, con){ const d = defensa(inv, con ? {nombre: con} : undefined); return statValor(inv, 'bloqueo', d && (d.id || d.nombre)) + (d ? num(d.peso) : 0); }   // sus bonos de Bloqueo, solo los de esa pieza (2026-11-07)
+  // 🛡 El Parry con una pieza puntual (dueño, 2026-11-07). Sin `con`, la de siempre.
+  function parryValor(inv, con){ const d = defensa(inv, con ? {nombre: con} : undefined); return statValor(inv, 'parry', d && (d.id || d.nombre)); }
   function costoAtaque(inv){ return Combatiente.conExtenuado(inv.estados, costoAtaque0(inv)); }   // + Extenuado (2026-10-12)
-  function costoAtaque0(inv){ const a = armaDe(inv); if(Combatiente.cargadaGratis(a, inv.ataquesTurno, inv.descargada)) return 0; return Math.max(0, Combatiente.costoConAhorro(Combatiente.costoAtaque(a.tipoDado, inv.ataquesTurno, a), a, inv.ataquesTurno) - Combatiente.ahorroArco(a, inv.ataquesTurno, inv.descargada, inv.ultimoPego)); }   // regla común (comun/combatiente.js)   // + Flecha en la cuerda / Encadenar (2026-10-11)
+  // ⚔⚔ Con dos armas (dueño, 2026-11-07: «para todo», como los creeps): cada arma paga su propio primer ataque (Combatiente.ataquesConArmaCreep).
+  function costoAtaque0(inv){ const a = armaDe(inv), hechos = Combatiente.ataquesConArmaCreep(inv); if(Combatiente.cargadaGratis(a, hechos, inv.descargada)) return 0; return Math.max(0, Combatiente.costoConAhorro(Combatiente.costoAtaque(a.tipoDado, hechos, a), a, hechos) - Combatiente.ahorroArco(a, hechos, inv.descargada, inv.ultimoPego)); }
+  // Lo que costaría atacar con un arma puntual (un «Atacar con…» por arma).
+  function costoAtaqueCon(inv, armaId){ return costoAtaque({...inv, armaActiva: armaId}); }   // regla común (comun/combatiente.js)   // + Flecha en la cuerda / Encadenar (2026-10-11)
   function costoNitrosHab(inv, h){ const c = Combatiente.costoNitrosHab(h, () => costoAtaque(inv), IT2_INV.nitrosHabilidad); return String((h && h.nitrosCosto) ?? '').trim().toUpperCase() === 'ATAQUE' ? c : Combatiente.conExtenuado(inv.estados, c); }   // + Extenuado
   function costoHabTxt(inv, h){
     const n = costoNitrosHab(inv, h);
@@ -195,6 +200,6 @@ const InvCalculo = (() => {
 
   return {defensas, IT2_INV, ATTR_IDS_INV, INV_STAT_EXCLUIR, INV_DERIVADOS_POR_ATTR, INV_STAT_ATTR, INV_STATS_TIRADA_IDS, INV_STATS_HAB,
     fuentesEquipo, modTotal, aportesMod, estadosArmadura, aporteArmadura, defensaEfectiva, critEfectivo, estadoActivo, statValor,
-    nitrosMax, habAtaque, pesoArma, defensa, bloqueoValor, costoAtaque, costoNitrosHab, costoHabTxt, bloqueoHab, danoTxt, ataqueTxt, alcance,
+    nitrosMax, habAtaque, pesoArma, defensa, bloqueoValor, parryValor, costoAtaque, costoAtaqueCon, costoNitrosHab, costoHabTxt, bloqueoHab, danoTxt, ataqueTxt, alcance,
     modsAfectanHp, actualizarHpMaxPorCon, migrar, regenPasivas};
 })();

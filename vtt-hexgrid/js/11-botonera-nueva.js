@@ -277,6 +277,7 @@ function bnInvAca(b){
   const inv = (bn.S.invocaciones || []).find(x => x && x.id === ref.split(':')[0]);
   if(!inv){ toast('Esa invocación ya no está'); return true; }
   InvCalculo.migrar(inv);   // como la ficha al dibujarla (una vieja puede no tener todos los campos)
+  if((d.invatacar && d.atacararma) || (d.invdanio && d.danioarma)) InvAcciones.ponerArma(inv, d.atacararma || d.danioarma);   // ⚔⚔ con cuál de sus dos armas (2026-11-07)
   if(!bn.invParry) bn.invParry = new Set();
   if(d.invtirarstat){
     const ui = bnUi(FichaGuardado.partes(bn.S));
@@ -611,7 +612,7 @@ function bnCombateUi(){
     elegirArma: (tipo, armas) => {
       const dmg = FichaCalculo.calcular(bn.S).final.dmg;
       bn.raiz.querySelector('#bn-arma-lista').innerHTML = (tipo === 'dano' ? '' : `<div class="hint">${tipo === 'parry' ? 'Parry: siempre cuesta 1 No2, sea cual sea el arma o escudo que elijas.' : tipo === 'fuerza' ? 'Fuerza del golpe: tu Fuerza + el peso del arma que elijas; esa suma es el dado (contra el Bloqueo del defensor).' : 'Bloqueo: tu Bloqueo + el peso del arma o escudo que elijas; esa suma es el dado que tirás. (Después de un Parry se usa el mismo, solo.)'}</div>`) +
-        armas.map(a => `<button class="btn" data-bn-arma="${tipo}:${a.item.id}" style="width:100%">${a.mano ? `Mano ${a.mano}: ` : ''}${esc(a.item.nombre)} — ${tipo === 'dano' ? esc(FichaCombate.armaDanoTxt(a.item, dmg)) : tipo === 'parry' ? `${fmt(Combatiente.costoParry())} No2` : `+${fmt(num(a.item.peso))} de peso`}</button>`).join('');
+        armas.map(a => `<button class="btn" data-bn-arma="${tipo}:${a.item.id}" style="width:100%">${a.mano ? `Mano ${a.mano}: ` : ''}${esc(a.item.nombre)} — ${tipo === 'dano' ? esc(FichaCombate.armaDanoTxt(a.item, FichaCombate.dmgParaArma(bn.S, a.item))) : tipo === 'parry' ? `${fmt(Combatiente.costoParry())} No2` : `+${fmt(num(a.item.peso))} de peso`}</button>`).join('');
       bnAbrirCartel('bn-elegir-arma');
     },
     // Los efectos al golpear del arma (comun/efectos-golpe.js): recordar y tirar, no aplicar — igual que la ficha.

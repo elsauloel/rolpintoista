@@ -146,7 +146,7 @@ const FichaLupa = (() => {
     if(tipo === 'danio'){
       const arma = S.inventario.find(i => i.id === ref);
       if(!arma) return {titulo: 'Daño', html: lupaNota('No tenés un arma con daño equipada.')};
-      const dmg = Number.isNaN(c.final.dmg) ? 0 : c.final.dmg;
+      const dmg = FichaCombate.dmgParaArma(S, arma, c);   // sin los bonos de daño de la otra arma (2026-11-07)
       let h = lupaFila('Peso del arma (cantidad de dados)', fmt(Math.max(1, num(arma.peso) || 1)));
       if(num(arma.danoAmplificado) > 0) h += lupaFila('Daño amplificado (dados extra)', lupaSigno(num(arma.danoAmplificado)));
       h += lupaFila('Tipo (caras del dado)', `d${fmt(num(arma.tipoDado) || 8)}`);

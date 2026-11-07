@@ -42,7 +42,7 @@
 ### Aprobados
 
 > ✅ **Programados el 2026-11-03** en `comun/creeps-esenciales.js` (el pool esencial: «+ Creep» de GM Tools → pestaña «⭐ Pool esencial»): T1, M1, L1, S1, W1 (con los atributos revisados), D1. Equipo del catálogo por nombre, habilidades de fábrica con su costo y cooldown, consumibles en el cinturón.
-> ✅ **Programados también el 2026-11-03 (segunda tanda)**: R1, T2 (nivel 1 rehecho), M2, M3, M4, H1, H2, W2 (con las dos armas puestas; atacar con la segunda en creeps sigue pendiente), L2, L3, R2, S2, S3, S4, D2, D3, D4 — 23 en total. Los de Especial más alto (magos, debuffers, Sanador, Protector) arrancan con SP. **L4 sumado el mismo día** (nivel 1 aprobado): 24 en total.
+> ✅ **Programados también el 2026-11-03 (segunda tanda)**: R1, T2 (nivel 1 rehecho), M2, M3, M4, H1, H2, W2 (con las dos armas puestas; atacar con la segunda en creeps, hecho el 2026-11-03), L2, L3, R2, S2, S3, S4, D2, D3, D4 — 23 en total. Los de Especial más alto (magos, debuffers, Sanador, Protector) arrancan con SP. **L4 sumado el mismo día** (nivel 1 aprobado): 24 en total.
 
 - **T1 · Escudero · Tanque · nivel 1** (aprobado 2026-11-02; **atributos y arma rehechos el 2026-11-03**, dueño: «dejarlo así»). Referencia: un grupo
   de nivel 1, no los personajes actuales. Estrategia: se planta adelante, provoca y aguanta; con el hacha le rompe la armadura al que lo ignora.
@@ -437,7 +437,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 5 | **Barrido** | — | el facón: **Espada larga** (Buena: PdG +1, Crítico potente +2) |
   Consumible: **Poción de Regeneración menor** (nueva en el catálogo, 2026-11-03: 5 de vida por turno, 3 turnos). Dos armas (dueño): el primer
   ataque con cada arma cuesta la mitad, como un primer ataque del turno, y una puede ser mejor para atajar y la otra para pegar. **En los creeps
-  eso no está programado** (atacan solo con el arma principal): pendiente en `pendientes.md`.
+  eso no estaba programado**; **hecho el 2026-11-03** (eligen con qué arma atacan), y desde el 2026-11-07 los bonos de cada arma cuentan solo con
+  esa arma (el PdG, el crítico, el daño; el Parry y el Bloqueo, con la pieza que ataja; la Iniciativa, siempre), como los personajes.
   **Nivel 1 aprobado** (dueño, 2026-11-03: «me cierra»): Fue 8 · Con 9 · Agi 6 · Des 8 · Esp 2, vida 45, 6 No2; Sable del tahúr (1d6 + 8,
   Crítico frecuente +1) + **Facón de paisano, que pasa a Tipo 4** en el catálogo (1d4 + 8; y Sangrado 50 %, 55 de oro, dueño 2026-11-03) · Chaleco de cuero · Botas de cuero de
   vaca: Def 3, Def.Esp 0. Golpe desesperado (cd 2, con el sable) y Furia (cd 3, 2 No2). Consumible: Poción de Regeneración menor. Espada y facón

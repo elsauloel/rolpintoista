@@ -45,7 +45,7 @@ const InvAcciones = (() => {
       aviso = `${inv.nombre}: Parry ${gratis ? 'gratis (Parada fácil)' : `−${fmt(costo)} No2`} · quedan ${fmt(inv.nitros)}`;
     }
     const firme = statId === 'bloqueo' ? Combatiente.bloqueoFirme(st => I().modTotal(inv, st), num(inv.golpeTurno)) : 0;   // Bloqueo firme (2026-10-06)
-    const valor = statId === 'bloqueo' ? I().bloqueoValor(inv, o && o.con) + firme : I().statValor(inv, statId);   // (o.con: con lo que paró, 2026-11-03)
+    const valor = statId === 'bloqueo' ? I().bloqueoValor(inv, o && o.con) + firme : statId === 'parry' ? I().parryValor(inv, o && o.con) : I().statValor(inv, statId);   // (o.con: con lo que para, 2026-11-03; sus bonos de Parry/Bloqueo, solo los de esa pieza: 2026-11-07)
     return {tirada: tirada(inv, etq(statId) + (firme ? ` (+${fmt(firme)} Bloqueo firme)` : ''), valor, statId), parry, aviso, cambio};
   }
   // El daño de su arma; mods: lo que suma un ataque con arreglos (dados y fijo). Los efectos al golpear los publica cada pantalla.
@@ -80,8 +80,21 @@ const InvAcciones = (() => {
   const faltanNitros = (inv, tipo) => !especial(tipo) && num(inv.nitros) >= 0 && costoAtaqueDe(inv, tipo) > num(inv.nitros);
   // Un duelo cancelado que no cuenta como ataque (2026-10-15): el conteo y los No2, de vuelta. → los No2 devueltos.
   // `pagado` (2026-10-28): lo que se pagó de verdad (Combatiente.pagoDeDuelo); sin él, el costo entero.
-  function devolverAtaque(inv, tipo, pagado){
-    if(!especial(tipo)) inv.ataquesTurno = Math.max(0, num(inv.ataquesTurno) - 1);
+  // ⚔⚔ Dos armas (dueño, 2026-11-07, como los creeps): `armaActiva` = con cuál ataca; cada una lleva su cuenta (`ataquesArma`, su primer ataque a
+  // mitad de precio). Se vacían al empezar su turno (FichaMantenimiento, invInicio).
+  function ponerArma(inv, armaId){
+    if(!armaId || !Combatiente.armasDeMano(inv).some(it => it.id === armaId) || inv.armaActiva === armaId) return false;
+    inv.armaActiva = armaId; return true;
+  }
+  function contarConArma(inv, d){
+    if(Combatiente.armasDeMano(inv).length < 2) return;
+    const a = Combatiente.armaPrincipal(inv); if(!a || !a.id) return;
+    const m = {...(inv.ataquesArma || {})}; m[a.id] = Math.max(0, num(m[a.id]) + d); if(!m[a.id]) delete m[a.id];
+    inv.ataquesArma = m;
+  }
+  function devolverAtaque(inv, tipo, pagado, armaId){
+    ponerArma(inv, armaId);   // lo de esa arma (dos armas)
+    if(!especial(tipo)){ inv.ataquesTurno = Math.max(0, num(inv.ataquesTurno) - 1); contarConArma(inv, -1); }
     const costo = pagado !== null && pagado !== undefined ? Math.max(0, num(pagado)) : costoAtaqueDe(inv, tipo);
     inv.nitros = num(inv.nitros) + costo;
     return costo;
@@ -101,10 +114,13 @@ const InvAcciones = (() => {
       const bono = bonoEspecial(inv, tipo);
       return {forzado, paga: forzado ? tenia : costo, aviso: `${inv.nombre}: ${NOMBRE_ESPECIAL[tipo].toLowerCase()} −${fmt(forzado ? tenia : costo)} No2 ${forzado ? `(costaba ${fmt(costo)})` : '(lo de un primer ataque)'}${bono ? ` · PdG +${fmt(bono)} por ${tipo === 'contra' ? 'contraataque' : 'oportunidad'}` : ''}`};
     }
-    const primero = num(inv.ataquesTurno) === 0;
+    const conArma = Combatiente.armasDeMano(inv).length > 1 ? Combatiente.armaPrincipal(inv) : null;
+    const primero = Combatiente.ataquesConArmaCreep(inv) === 0;   // ⚔⚔ con dos armas, el primero con ESTA arma (2026-11-07)
     inv.nitros = forzado ? Math.min(0, num(inv.nitros)) : num(inv.nitros) - costo;   // (en negativo, con «Hacerlo igual»: queda como estaba)
     Combatiente.aplicarTormenta(inv, inv.estados, costo, {motivo: 'atacar'});
     inv.ataquesTurno = num(inv.ataquesTurno) + 1;
+    contarConArma(inv, 1);
+    if(conArma) return {forzado, paga: forzado ? tenia : costo, armaId: conArma.id, aviso: `${inv.nombre}: -${fmt(forzado ? tenia : costo)} No2${forzado ? ` (costaba ${fmt(costo)})` : ''} · con ${conArma.nombre}: ${primero ? 'primer ataque con esta arma' : 'ataque extra con esta arma'}`};
     return {forzado, paga: forzado ? tenia : costo, aviso: `${inv.nombre}: -${fmt(forzado ? tenia : costo)} No2${forzado ? ` (costaba ${fmt(costo)})` : ''} · ${primero ? 'primer ataque del turno' : 'ataque extra'}`};
   }
   function alertaSinNitros(inv, forzado, tipo){
@@ -121,7 +137,7 @@ const InvAcciones = (() => {
     : tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg') + pdgExtraInv(inv), 'pdg');
 
   // El menú «¿Qué ataque es?» de una invocación (el mismo de personajes y creeps: Combatiente.menuTipoAtaqueHtml).
-  const menuTipoAtaque = (inv, attr) => Combatiente.menuTipoAtaqueHtml({nombre: inv.nombre, arma: Combatiente.armaDeCombatiente(inv), normal: I().costoAtaque(inv), primero: num(inv.ataquesTurno) === 0,
+  const menuTipoAtaque = (inv, attr) => Combatiente.menuTipoAtaqueHtml({nombre: inv.nombre, arma: Combatiente.armaDeCombatiente(inv), normal: I().costoAtaque(inv), primero: Combatiente.ataquesConArmaCreep(inv) === 0,
     especial: costoAtaqueDe(inv, 'contra'), especialOpor: costoAtaqueDe(inv, 'oportunidad'), attr, ref: inv.id});
   /* Levantarse (Sentado) y Soltarse (trampas de Atrapar): 2026-10-03, «las reglas de combate aplican a creeps, personajes e invocaciones
      por igual». Levantarse cuesta lo mismo que a un personaje (FichaCalculo.IT2.nitrosLevantarse). Soltarse: primero la tirada (una sola
@@ -152,5 +168,5 @@ const InvAcciones = (() => {
     const hundio = Combatiente.hundirSiFalla((inv.estados || []).find(e => e === t.est || (t.est.id && e.id === t.est.id)), t);
     return {aviso: `${inv.nombre} ${t.ok ? 'se soltó' : 'no se soltó'} (${t.r ? t.r.total : '—'} contra ${t.s.dif}) · −${fmt(t.s.no2)} No2${hundio ? ` · se hundió más: +${t.s.hunde} turno${t.s.hunde === 1 ? '' : 's'}` : ''}`};
   }
-  return {devolverAtaque, levantarse, tiradaSoltarse, aplicarSoltarse, tirada, tirarStat, dano, ataqueDuelo, pagarAtaque, tiradaAtaque, faltanNitros, preguntaSinNitros, alertaSinNitros, bonoEspecial, costoAtaqueDe, menuTipoAtaque};
+  return {ponerArma, devolverAtaque, levantarse, tiradaSoltarse, aplicarSoltarse, tirada, tirarStat, dano, ataqueDuelo, pagarAtaque, tiradaAtaque, faltanNitros, preguntaSinNitros, alertaSinNitros, bonoEspecial, costoAtaqueDe, menuTipoAtaque};
 })();

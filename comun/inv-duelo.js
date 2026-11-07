@@ -55,7 +55,8 @@ const InvDuelo = (() => {
     // tipo: 'normal', 'oportunidad' o 'contra' (los dos últimos, como los creeps: lo de un primer ataque y el PdG especial de su arma).
     // `ui.confirmar` puede devolver una promesa (el mapa: el cartel del juego; un confirm() nativo congela la pestaña).
     // `sinTirada` (2026-10-21): el PdG elegido a mano — paga y gasta lo mismo, sin tirar. → true si pagó.
-    async function atacarSuelto(inv, tipo, dueloId, sinTirada, bonoHab){
+    async function atacarSuelto(inv, tipo, dueloId, sinTirada, bonoHab, armaId){
+      if(armaId) A().ponerArma(inv, armaId);   // ⚔⚔ con cuál de sus dos armas (el ataque del duelo lo trae, 2026-11-07)
       const qs = Combatiente.preguntaSentado(inv.estados, inv.nombre);   // Sentado no puede atacar: avisa y deja seguir
       if(qs && !(await (ui.confirmar || (t => Confirmar.preguntar(t, {titulo: /Desarmad/.test(t) ? 'Desarmado' : 'Sentado', si: 'Atacar igual'})))(qs))) return false;
       const forzar = A().faltanNitros(inv, tipo);
@@ -94,17 +95,17 @@ const InvDuelo = (() => {
         }
         if(campo === 'contra') return modo ? {formula: F(num(I().statValor(inv, modo)), modo, modo === 'eva'), ...L('stat:' + modo)} : null;
         if(campo === 'eva'){ const ee = evaEsp(inv, d); return {formula: Combatiente.conFijo(F(I().statValor(inv, 'eva') + ee.val, 'eva', true), ee), ...L('stat:eva')}; }
-        if(campo === 'parry') return {formula: F(I().statValor(inv, 'parry'), 'parry'), ...L('stat:parry')};
+        if(campo === 'parry') return {formula: F(I().parryValor(inv, modo || ''), 'parry'), ...L('stat:parry')};   // modo = la pieza (itemId), 2026-11-07
         if(campo === 'pdg'){
           const t = d.ataque.tipo === 'habilidad-arma'
             ? A().tirada(inv, 'PdG', I().statValor(inv, 'pdg') + num(d.ataque.mods && d.ataque.mods.pdg) + Combatiente.pdgExtraArma(st => I().modTotal(inv, st), {tipoDado: Combatiente.armaEnMano(inv).tipoDado, armaDeRango: Combatiente.armaEnMano(inv).armaDeRango}), 'pdg')
             : A().tiradaAtaque(inv, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo, d.ataque.contraHab ? 2 : 0);
           const tipo = d.ataque.tipo;
-          return {formula: t && t.r ? t.r.formula : '', ...L('atacar:'), costo: Combatiente.costoAtaqueLineas({tipoArma: Combatiente.armaEnMano(inv).tipoDado, arma: Combatiente.armaDeCombatiente(inv), hechos: num(inv.ataquesTurno),
+          return {formula: t && t.r ? t.r.formula : '', ...L('atacar:'), costo: Combatiente.costoAtaqueLineas({tipoArma: Combatiente.armaEnMano(inv).tipoDado, arma: Combatiente.armaDeCombatiente(inv), hechos: Combatiente.ataquesConArmaCreep(inv), ...(Combatiente.armasDeMano(inv).length > 1 ? {porArma: true} : {}),
             costo: tipo === 'habilidad-arma' ? 0 : A().costoAtaqueDe(inv, tipo === 'normal' ? undefined : tipo), tiene: num(inv.nitros), ataque: tipo})};
         }
         if(campo === 'fuerza') return {formula: F(I().statValor(inv, 'fue') + I().pesoArma(inv), 'fue'), ...L('stat:fue'), titulo: `${inv.nombre} · Fuerza del golpe`};
-        if(campo === 'bloqueo') return {formula: F(I().bloqueoValor(inv), 'bloqueo'), ...L('stat:bloqueo'), titulo: `${inv.nombre} · Bloqueo`};
+        if(campo === 'bloqueo') return {formula: F(I().bloqueoValor(inv, d.defensa && d.defensa.itemNombre || ''), 'bloqueo'), ...L('stat:bloqueo'), titulo: `${inv.nombre} · Bloqueo`};
         if(campo === 'dano'){ const t = A().dano(inv, d.ataque.tipo === 'habilidad-arma' ? (d.ataque.mods || {}) : null); return {formula: t && t.r ? t.r.formula : '', ...L('danio:')}; }
         return null;
       },
@@ -120,7 +121,7 @@ const InvDuelo = (() => {
           if(gc && gc.carga) ui.toast(`${inv.nombre} · ${Combatiente.cargaTxt(gc.carga)}`);
         }
         if(d.ataque.tipo === 'habilidad-arma') publicar(A().tirada(inv, 'Atacar (PdG)', I().statValor(inv, 'pdg') + num(d.ataque && d.ataque.mods && d.ataque.mods.pdg) + Combatiente.pdgExtraArma(st => I().modTotal(inv, st), {tipoDado: Combatiente.armaEnMano(inv).tipoDado, armaDeRango: Combatiente.armaEnMano(inv).armaDeRango}), 'pdg'));
-        else return atacarSuelto(inv, d.ataque.tipo, d.id, false, d.ataque.contraHab ? 2 : 0);
+        else return atacarSuelto(inv, d.ataque.tipo, d.id, false, d.ataque.contraHab ? 2 : 0, d.ataque.armaCreepId);
       },
       // ✍ El PdG elegido a mano (2026-10-21): paga y gasta lo que suma al golpe, sin tirar. → false si se canceló.
       pagarManual: async d => {
@@ -130,7 +131,7 @@ const InvDuelo = (() => {
           if((inv.estados || []).some(e => e && e.golpe)){ let gc = null; ui.cambiar(() => { gc = Combatiente.gastarCarga(inv.estados, d.id, (x => { const a = Combatiente.armaPrincipal(x); return a ? {id: a.id, nombre: a.nombre} : null; })(inv)); }); if(gc && gc.carga) ui.toast(`${inv.nombre} · ${Combatiente.cargaTxt(gc.carga)}`); }
           return true;
         }
-        return !!(await atacarSuelto(inv, d.ataque.tipo, d.id, true));
+        return !!(await atacarSuelto(inv, d.ataque.tipo, d.id, true, 0, d.ataque.armaCreepId));
       },
       // Un duelo cancelado que no cuenta como ataque (2026-10-15): el conteo y los No2, de vuelta. → los No2 devueltos.
       // ↩ Una habilidad cancelada que no cuenta (P233, 2026-10-29): los No2, la vida y el cooldown. → qué se devolvió.
@@ -149,7 +150,7 @@ const InvDuelo = (() => {
         const inv = ui.inv(d.atacante);
         if(!inv || !d.ataque || d.ataque.tipo === 'habilidad-arma') return 0;
         let costo = 0;
-        ui.cambiar(() => { costo = InvAcciones.devolverAtaque(inv, d.ataque.tipo, Combatiente.pagoDeDuelo(inv, d.id)); });
+        ui.cambiar(() => { costo = InvAcciones.devolverAtaque(inv, d.ataque.tipo, Combatiente.pagoDeDuelo(inv, d.id), d.ataque.armaCreepId); });
         return costo;
       },
       // Las invocaciones siguen las mismas reglas que los creeps.
@@ -227,14 +228,15 @@ const InvDuelo = (() => {
         const disparo = Combatiente.contraDisparo(d), def = I().defensa(inv, {soloEscudo: disparo});   // contra un disparo, Parry solo con escudo
         if(Combatiente.stuneado(inv.estados)) return [{modo: 'evasion', etiqueta: '🏃 Evasión · Stun: 1', info: ['⚡ Stun: no puede hacer nada; su Evasión es 1']}];   // Stun (2026-10-06)
         if(!def && disparo && I().defensa(inv)) ops.push(Combatiente.parryApagado({modo: 'parry', itemId: '', itemNombre: I().defensa(inv).nombre, etiqueta: `🗡 Parry · ${I().defensa(inv).nombre}`, costo: 0, info: []}, 'contra un disparo solo se parrea con escudo'));   // 🚫 (2026-10-29)
-        if(def) I().defensas(inv, {soloEscudo: disparo}).forEach(def => ops.push({modo: 'parry', itemId: def.id || def.nombre, itemNombre: def.nombre, escudo: def.nombre !== Combatiente.armaEnMano(inv).nombre, natural: def.nombre === Combatiente.armaEnMano(inv).nombre ? Combatiente.armaEnMano(inv).natural : !!def.natural, etiqueta: `${def.nombre === Combatiente.armaEnMano(inv).nombre ? '🗡' : '🛡'} Parry · ${def.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo: c, reglaNo2: Combatiente.defensaSinNo2(inv.nitros, c) ? {nombre: inv.nombre, nitros: num(inv.nitros), accion: 'Parry'} : null,
-          info: [`Parry 🎲 ${fx(I().statValor(inv, 'parry'), 'parry', inv.estados)}`, disparo ? 'si gana, el disparo queda parado (sin Bloqueo)' : `si ganás, Bloqueo 🎲 ${fx(I().bloqueoValor(inv, def.nombre))}`, ...(c > num(inv.nitros) && num(inv.nitros) >= 0 ? ['⚠ sin No2: queda en negativo (se descuenta al recargar)'] : [])]}));   // 🛡 una por arma y por escudo (2026-11-03)
+        const esArmaInv = x => !x.escudo && Combatiente.armasDeMano(inv).some(a => a.nombre === x.nombre);   // ⚔⚔ la segunda arma también es arma (2026-11-07)
+        if(def) I().defensas(inv, {soloEscudo: disparo}).forEach(def => ops.push({modo: 'parry', itemId: def.id || def.nombre, itemNombre: def.nombre, escudo: !esArmaInv(def), natural: !!def.natural || (esArmaInv(def) && !!(Combatiente.armasDeMano(inv).find(a => a.nombre === def.nombre) || {}).natural), etiqueta: `${esArmaInv(def) ? '🗡' : '🛡'} Parry · ${def.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo: c, reglaNo2: Combatiente.defensaSinNo2(inv.nitros, c) ? {nombre: inv.nombre, nitros: num(inv.nitros), accion: 'Parry'} : null,
+          info: [`Parry 🎲 ${fx(I().parryValor(inv, def.id || def.nombre), 'parry', inv.estados)}`, disparo ? 'si gana, el disparo queda parado (sin Bloqueo)' : `si ganás, Bloqueo 🎲 ${fx(I().bloqueoValor(inv, def.nombre))}`, ...(c > num(inv.nitros) && num(inv.nitros) >= 0 ? ['⚠ sin No2: queda en negativo (se descuenta al recargar)'] : [])]}));   // 🛡 una por arma y por escudo (2026-11-03)
         return Combatiente.sinReaccionesNo2(ops, inv.estados);   // Expuesto (Degollar): sin Parry
       },
-      defender: (d, modo) => {
+      defender: (d, modo, itemId) => {
         const inv = ui.inv(d.defensor);
         if(!inv) return;
-        if(modo === 'parry') tirarStat(inv, 'parry');
+        if(modo === 'parry') tirarStat(inv, 'parry', {con: itemId || ''});   // 🛡 con la que eligió (2026-11-07)
         else { const ee = evaEsp(inv, d); publicar(A().tirada({...inv, estados: Combatiente.ciegoContraDistancia(d, inv.estados)}, ee.txt ? `Evasión (${ee.txt})` : 'Evasión', I().statValor(inv, 'eva') + ee.val, 'eva', ee.fijo)); Combatiente.gastarPasoFantasma(d, ee); }   // 🙈 ciego contra un ataque a distancia: la mitad
       },
       // La Fuerza del golpe del atacante contra el Bloqueo del defensor (Fue + peso de su arma).

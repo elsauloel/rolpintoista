@@ -46,7 +46,7 @@ async function vigilanciaArmasDe(r){
   const armas = FichaCombate.armasEquipadasConDano(S).map(x => x.item).filter(a => a && a.armaDeRango);
   return armas.map(arma => ({arma, costo: FichaCombate.costoAtaque(arma, S)})).filter(x => x.costo <= disponibles)
     .map(({arma, costo}) => ({nombre: arma.nombre, costo, yo: {ref: fichaId, tipo: 'pj', nombre},
-      detalle: [`Daño ${FichaCombate.armaDanoTxt(arma, calc.final.dmg)}`, typeof ItemCorto !== 'undefined' ? ItemCorto.armaEsencial(arma) : ''].filter(Boolean).join(' · '),
+      detalle: [`Daño ${FichaCombate.armaDanoTxt(arma, FichaCombate.dmgParaArma(S, arma, calc))}`, typeof ItemCorto !== 'undefined' ? ItemCorto.armaEsencial(arma) : ''].filter(Boolean).join(' · '),
       ataque: {tipo: 'normal', armaId: arma.id, armaNombre: arma.nombre, tipoDado: FichaCombate.tipoAtaque(arma), rango: true, alcance: FichaCombate.alcanceDeArma(S, arma), ...Combatiente.ataqueDeArma(arma)}}));
 }
 // Se le va la vigilancia (disparó): un creep directo; un personaje, por aviso a su pantalla.

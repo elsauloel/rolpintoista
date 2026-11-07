@@ -48,10 +48,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261107carancho5"></script>
-<script src="creep-calculo.js?v=20261106piel"></script>
+<script src="combatiente.js?v=20261107dosarmas"></script>
+<script src="creep-calculo.js?v=20261107dosarmas"></script>
 <script src="creep-botonera.js"></script>
-<script src="creep-acciones.js?v=20261107carancho5"></script>
+<script src="creep-acciones.js?v=20261107dosarmas"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
@@ -71,7 +71,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-habilidades.js?v=20261106manos2"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
-<script src="ficha-resumen.js?v=20261107carancho5"></script>
+<script src="ficha-resumen.js?v=20261107dosarmas"></script>
 <script src="ficha-sesion.js"></script>
 <script src="inv-calculo.js"></script>
 <script src="inv-botonera.js"></script>
@@ -79,9 +79,9 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="inv-duelo.js"></script>
 <script src="inv-habilidades.js"></script>
 <script src="inv-lupa.js"></script>
-<script src="ficha-acciones.js?v=20261107milagro"></script>
+<script src="ficha-acciones.js?v=20261107dosarmas"></script>
 <script src="orden-turnos.js?v=20261105orden"></script>
-<script src="ficha-mantenimiento.js?v=20261103ve"></script>
+<script src="ficha-mantenimiento.js?v=20261107dosarmas"></script>
 <script src="estado-preguntas.js"></script>
 <script src="asistente-estado.js"></script>
 <script src="asistente-trampa.js"></script>
@@ -7096,6 +7096,46 @@ prueba('⚔⚔ Creep con dos armas (2026-11-03): un primer ataque barato por arm
   igual([antes, tras1, p2.paga, /^1d4/.test(dano), ataque.armaCreepId, trasDev, sc.armaActiva, CreepCalculo.costoAtaqueCon(sc, 'sable'), Combatiente.ataquesConArmaCreep(solo), Combatiente.armasDeMano(solo).length],
     [[3, 2, 'Sable del tahúr'], [3, 'sable', 6, 2], 2, true, 'facon', [2, 2, 6, 1], undefined, 3, 0, 1]);
 });
+prueba('⚔⚔ Los bonos de cada arma, con esa arma (dueño, 2026-11-07): creep con dos armas — PdG y PdG en contraataque de la de la mano; Parry y Bloqueo de la pieza con la que ataja; la Iniciativa de las dos siempre; la segunda arma no es un escudo en el duelo', () => {
+  const cat = n => ({...CreepCalculo.itemParaCreep(structuredClone(CATALOGO_BASE.find(i => i.nombre === n && !i.archivo))), equipado: true});
+  const sc = CreepCalculo.normalizar(structuredClone(CREEPS_BASE.find(c => c.pool === 'esencial' && c.nombre === 'Hachero').datos));
+  delete sc.modoSP; sc.id = 'w2x'; sc.nitros = 20;
+  sc.equipo = [{...cat('Sable de caballería'), id: 'sable'}, {...cat('Hoz de cosecha'), id: 'hoz'}, ...sc.equipo.filter(it => !Combatiente.esArmaDeMano(it) && !/^escudo_/.test(it.tipoItem || ''))];
+  const sinArmas = {...sc, equipo: sc.equipo.filter(it => !Combatiente.esArmaDeMano(it))};
+  const base = st => CreepCalculo.statValor(sinArmas, st);
+  sc.armaActiva = 'sable';
+  const conSable = [CreepCalculo.statValor(sc, 'pdg') - base('pdg'), CreepCalculo.modTotal(sc, 'pdgcontra') - CreepCalculo.modTotal(sinArmas, 'pdgcontra'), CreepCalculo.statValor(sc, 'ini') - base('ini')];
+  sc.armaActiva = 'hoz';
+  const conHoz = [CreepCalculo.statValor(sc, 'pdg') - base('pdg'), CreepCalculo.modTotal(sc, 'pdgcontra') - CreepCalculo.modTotal(sinArmas, 'pdgcontra'), CreepCalculo.statValor(sc, 'ini') - base('ini')];
+  const parry = [CreepCalculo.parryValor(sc, 'Sable de caballería') - base('parry'), CreepCalculo.parryValor(sc, 'hoz') - base('parry')];
+  const hk = CreepDuelo.hooks({creep: () => sc, cambiar: async () => null, publicar: () => {}, toast: () => {}, confirmar: () => true, soy: () => true, borrarParry: () => {}});
+  const ops = hk.opcionesDefensa({defensor: {ref: sc.id, tipo: 'creep'}, atacante: {}, ataque: {tipo: 'normal'}}).filter(o => o.modo === 'parry');
+  igual([conSable, conHoz, parry, ops.map(o => o.itemNombre + ':' + o.escudo).sort().join()],
+    [[1, 0, 2], [0, 1, 2], [1, 0], 'Hoz de cosecha:false,Sable de caballería:false']);
+});
+prueba('⚔⚔ Invocación con dos armas (dueño, 2026-11-07, como los creeps): un Atacar por arma con su primer ataque barato, el PdG de cada una, el Parry de la pieza, y el turno nuevo las reinicia', () => {
+  const cat = (n, id) => ({...structuredClone(CATALOGO_BASE.find(i => i.nombre === n && !i.archivo)), id, equipado: true});
+  const inv = InvCalculo.migrar({id: 'inv1', nombre: 'Golem', con: 8, fue: 6, agl: 6, des: 6, esp: 2, hp: 40, hpMax: 40, nitros: 20,
+    equipo: [cat('Sable de caballería', 'sable'), cat('Hoz de cosecha', 'hoz')]});
+  const antes = [InvCalculo.costoAtaqueCon(inv, 'sable'), InvCalculo.costoAtaqueCon(inv, 'hoz')];
+  const pdg = id => InvCalculo.statValor({...inv, armaActiva: id}, 'pdg');
+  const difPdg = pdg('sable') - pdg('hoz');
+  InvAcciones.ponerArma(inv, 'sable'); const p1 = InvAcciones.pagarAtaque(inv, false, 'normal');
+  const tras = [p1.armaId, InvCalculo.costoAtaqueCon(inv, 'sable'), InvCalculo.costoAtaqueCon(inv, 'hoz')];
+  const ataque = (InvAcciones.ponerArma(inv, 'hoz'), InvAcciones.ataqueDuelo(inv, 'normal'));
+  const dev = InvAcciones.devolverAtaque(inv, 'normal', null, 'sable');
+  const html = InvBotonera.html(inv, {lupa: false}).html;
+  const parry = InvCalculo.parryValor(inv, 'Sable de caballería') - InvCalculo.parryValor(inv, 'hoz');
+  igual([antes, difPdg, tras, ataque.armaCreepId, dev > 0, inv.armaActiva, (html.match(/Atacar con /g) || []).length, parry],
+    [[3, 3], 1, ['sable', 6, 3], 'hoz', true, 'sable', 2, 1]);
+});
+prueba('⚔⚔ Personaje: el Daño con un arma no suma el bono de daño de la otra (dueño, 2026-11-07); la Iniciativa de un arma cuenta siempre', () => {
+  const S = fichaDePrueba({inventario: [
+    {id: 'a', nombre: 'Maza', tipoItem: 'arma_1m', tipoDado: 6, peso: 1, equipado: true, mods: [{stat: 'dmg', val: 2}, {stat: 'ini', val: 1}]},
+    {id: 'b', nombre: 'Daga', tipoItem: 'arma_1m', tipoDado: 4, peso: 1, equipado: true, mods: []}]});
+  const c = FichaCalculo.calcular(S), a = S.inventario[0], b = S.inventario[1];
+  igual([FichaCombate.dmgParaArma(S, a) - FichaCombate.dmgParaArma(S, b), c.final.ini - FichaCalculo.calcular(fichaDePrueba({inventario: [b]})).final.ini], [2, 1]);
+});
 prueba('🛡 Escudo humano, la animación (2026-11-03): el reparto igual que el mapa (mitad para arriba al guardián), el lazo no pisa los tokens, los tiempos del golpe y el reflejo', () => {
   const F = FxEscudoHumano;
   const p12 = F.partir(12), p7 = F.partir(7), p1 = F.partir(1), p0 = F.partir(0);
@@ -7376,7 +7416,8 @@ prueba('🛡 Un creep hace Parry con su arma o con su escudo, y el Bloqueo usa e
   const ops = hk.opcionesDefensa({defensor: {ref: sc.id, tipo: 'creep'}, atacante: {}, ataque: {tipo: 'normal'}}).filter(o => o.modo === 'parry');
   igual([lista.map(x => x.nombre).join(), soloEsc.map(x => x.nombre).join(), CreepCalculo.bloqueoValor(sc, 'Escudo de caparazón de tortuga gigante') - b0,
     ops.map(o => o.itemNombre + ':' + o.escudo).join(), sc.agl, sc.des, sc.esp],
-    ['Hacha de piedra,Escudo de caparazón de tortuga gigante', 'Escudo de caparazón de tortuga gigante', 2,
+    // (2026-11-07, dueño: los bonos de Bloqueo de una pieza, solo con esa: con el escudo, +2 de peso pero sin el +1 de Bloqueo del hacha → +1 sobre lo de siempre)
+    ['Hacha de piedra,Escudo de caparazón de tortuga gigante', 'Escudo de caparazón de tortuga gigante', 1,
       'Hacha de piedra:false,Escudo de caparazón de tortuga gigante:true', 5, 7, 4]);
 });
 prueba('🛡 Provocar tira PdG.Esp + su nivel (2026-11-03, como el Taunt; un rato fue Ef.Esp + 2), el guardado se pone al día; la Defensa y la Def. especial no bajan de 0 salvo «permiteNegativa»', () => {

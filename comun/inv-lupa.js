@@ -35,7 +35,7 @@ const InvLupa = (() => {
     if(tipo === 'stat') return {titulo: `${inv.nombre} · ${FichaCalculo.STAT_LABEL[ref]||ref}`, html: stat(inv, ref) + sinCosto};
     if(tipo === 'atacar'){
       const tipoArma = Combatiente.armaEnMano(inv).tipoDado;
-      const hechos = num(inv.ataquesTurno);
+      const hechos = Combatiente.ataquesConArmaCreep(inv);   // ⚔⚔ con dos armas, los de la de la mano (2026-11-07)
       const costo = I.costoAtaque(inv);
       let h = lupaFila(`Tipo del arma${Combatiente.armaEnMano(inv).nombre ? ` (${esc(Combatiente.armaEnMano(inv).nombre)})` : ''}: d${fmt(tipoArma)}`, fmt(tipoArma));
       h += lupaFila('Ataques este turno', fmt(hechos));

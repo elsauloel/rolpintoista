@@ -564,6 +564,10 @@ document.addEventListener('click', async e => {
     verHabInv(invId, habId);
     return;
   }
+  if((b.dataset.invatacar && b.dataset.atacararma) || (b.dataset.invdanio && b.dataset.danioarma)){   // ⚔⚔ con cuál de sus dos armas (2026-11-07)
+    const inv = (S.invocaciones || []).find(x => x && x.id === (b.dataset.invatacar || b.dataset.invdanio));
+    if(inv) InvAcciones.ponerArma(inv, b.dataset.atacararma || b.dataset.danioarma);
+  }
   if(b.dataset.invatacar){ invAtacar(b.dataset.invatacar); return; }
   if(b.dataset.invotroataque){ invAtacar(b.dataset.invotroataque, true); return; }
   if(b.dataset.invdanio){ invDanio(b.dataset.invdanio); return; }

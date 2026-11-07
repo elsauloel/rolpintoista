@@ -63,6 +63,7 @@ const FichaLite = (() => {
     const dos = i.tipoItem === 'arma_2m' || i.tipoItem === 'escudo_2m';
     const def = (i.mods || []).filter(m => m.stat === 'def').reduce((a, m) => a + num(m.val), 0);
     const partes = [];
+    if(esArma) dmg = FichaCombate.dmgParaArma(S, i);   // sin los bonos de daño de la otra arma (2026-11-07)
     if(esArma){ partes.push(FichaCombate.armaDanoTxt(i, dmg)); partes.push(`Tipo ${fmt(num(i.tipoDado) || 8)}`); }
     else if(def) partes.push(`Defensa ${signo(def)}`);
     if(dos) partes.push('a dos manos');

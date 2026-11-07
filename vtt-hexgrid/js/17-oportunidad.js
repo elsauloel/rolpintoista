@@ -332,7 +332,7 @@ async function oporArmasDe(r){
   return (lista.length ? lista : [null]).map(arma => ({arma, costo: FichaCombate.costoAtaqueEspecial(arma, 'oportunidad', S)}))
     .filter(x => !x.costo || disponibles >= 0)   // sin No2 va a negativo; ya en negativo, no (2026-11-01)
     .map(({arma, costo}) => ({nombre: arma ? arma.nombre : 'sin arma', costo, yo: {ref: fichaId, tipo: 'pj', nombre},
-      detalle: arma ? [`Daño ${FichaCombate.armaDanoTxt(arma, calc.final.dmg)}`, typeof ItemCorto !== 'undefined' ? ItemCorto.armaEsencial(arma) : ''].filter(Boolean).join(' · ') : 'A mano limpia',
+      detalle: arma ? [`Daño ${FichaCombate.armaDanoTxt(arma, FichaCombate.dmgParaArma(S, arma, calc))}`, typeof ItemCorto !== 'undefined' ? ItemCorto.armaEsencial(arma) : ''].filter(Boolean).join(' · ') : 'A mano limpia',
       ataque: {tipo: 'oportunidad', armaId: arma ? arma.id : '', armaNombre: arma ? arma.nombre : '', tipoDado: FichaCombate.tipoAtaque(arma), rango: !!(arma && arma.armaDeRango), alcance: FichaCombate.alcanceDeArma(S, arma), ...Combatiente.ataqueDeArma(arma)}}));
 }
 async function oporAtacar(a){

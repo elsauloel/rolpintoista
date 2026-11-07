@@ -83,6 +83,8 @@ const FichaCombate = (() => {
     if(!excluidos.length || Number.isNaN(c.final[statId])) return c.final[statId];
     return c.base[statId] + c.modTotal[statId] - excluidos.reduce((a, m) => a + m.val, 0);
   }
+  // ⚔⚔ El Dmg al pegar con ESA arma (dueño, 2026-11-07: los bonos de ataque de un arma, solo con esa): sin los bonos de daño de la otra arma.
+  const dmgParaArma = (S, arma, c) => { const v = statParaArma(S, 'dmg', arma, c); return Number.isNaN(v) ? 0 : v; };
   // El Bloqueo: tu Bloqueo (de Fuerza, con su equipo) MÁS el peso del arma o escudo; esa suma es el dado.
   const bloqueoValor = (S, arma, c) => statParaArma(S, 'bloqueo', arma, c) + (arma ? num(arma.peso) : 0);
   // Hasta dónde llega: de rango, su Rango (mínimo 1); cuerpo a cuerpo, 1 + lo que el arma sume al Rango.
@@ -132,6 +134,6 @@ const FichaCombate = (() => {
   }
 
   return {desregistrarAtaque, TIPO_SIN_ARMA, danoSinArmaTxt, esArma, esMano, asignarManos, armaDanoTxt, armasEquipadasConDano, armasYEscudosParaParry,
-    esArmaEnMano, esEnMano, pdgParaArma, STATS_DEFENSA_POR_ITEM, statParaArma, bloqueoValor, alcanceDeArma, formulasCombate,
+    esArmaEnMano, esEnMano, pdgParaArma, STATS_DEFENSA_POR_ITEM, statParaArma, dmgParaArma, bloqueoValor, alcanceDeArma, formulasCombate,
     claveAtaque, tipoAtaque, ataquesConArma, costoAtaque, costoAtaqueEspecial, registrarAtaque};
 })();

@@ -126,14 +126,14 @@ const CreepDuelo = (() => {
         const scEva = {...sc, estados: Combatiente.ciegoContraDistancia(d, sc.estados)};   // 🙈 ciego contra un ataque a distancia
         if(campo === 'contra') return modo ? {formula: formulaDe(A().tirada('', habStat(sc, modo), modo === 'eva' ? scEva : sc, modo)), ...L('stat|' + modo)} : null;
         if(campo === 'eva'){ const ee = evaEsp(sc, d); return {formula: formulaDe(A().tirada('', C().statValor(sc, 'eva') + ee.val, scEva, 'eva', ee.fijo)), ...L('stat|eva')}; }
-        if(campo === 'parry') return {formula: formulaDe(A().tirada('', C().statValor(sc, 'parry'), sc, 'parry')), ...L('stat|parry')};
+        if(campo === 'parry') return {formula: formulaDe(A().tirada('', C().parryValor(sc, modo || ''), sc, 'parry')), ...L('stat|parry')};   // modo = la pieza (itemId), 2026-11-07
         if(campo === 'pdg'){
           const t = d.ataque.tipo === 'habilidad-arma' ? pdgDeArreglos(sc, d.ataque) : A().tiradaAtaque(sc, d.ataque.tipo === 'normal' ? 'normal' : d.ataque.tipo, d.ataque.contraHab ? 2 : 0);
           const tipo = d.ataque.tipo, costo = tipo === 'oportunidad' ? C().costoOportunidad(sc) : tipo === 'contra' ? C().costoContraataque(sc) : C().costoAtaque(sc);
           return {formula: formulaDe(t), ...L('atacar|'), costo: Combatiente.costoAtaqueLineas({tipoArma: Combatiente.armaEnMano(sc).tipoDado, arma: Combatiente.armaDeCombatiente(sc), hechos: Combatiente.ataquesConArmaCreep(sc), ...(Combatiente.armasDeMano(sc).length > 1 ? {porArma: true} : {}), costo, tiene: num(sc.nitros), ataque: tipo})};
         }
         if(campo === 'fuerza') return {formula: formulaDe(A().tirada('', C().fuerzaGolpeValor(sc))), ...L('stat|fue'), titulo: `${sc.nombre} · Fuerza del golpe`};
-        if(campo === 'bloqueo') return {formula: formulaDe(A().tirada('', C().bloqueoValor(sc) + A().bloqueoFirmeCreep(sc), sc, 'bloqueo')), ...L('stat|bloqueo'), titulo: `${sc.nombre} · Bloqueo`};
+        if(campo === 'bloqueo') return {formula: formulaDe(A().tirada('', C().bloqueoValor(sc, d.defensa && d.defensa.itemNombre || '') + A().bloqueoFirmeCreep(sc), sc, 'bloqueo')), ...L('stat|bloqueo'), titulo: `${sc.nombre} · Bloqueo`};
         if(campo === 'dano'){ const ae = Combatiente.armaElementalDelGolpe(sc.estados, d.id, (cc => { const a = Combatiente.armaPrincipal(cc); return a ? {id: a.id, nombre: a.nombre} : null; })(sc)); return {formula: formulaDano(sc, d) + (ae ? ` + ${ae.txt}` : ''), ...L('danio|')}; }   // 🔥 (2026-11-04)
         return null;
       },
@@ -263,9 +263,9 @@ const CreepDuelo = (() => {
         const disparo = Combatiente.contraDisparo(d), def = C().defensa(sc, {soloEscudo: disparo});   // contra un disparo, Parry solo con escudo
         if(Combatiente.stuneado(sc.estados)) return [{modo: 'evasion', etiqueta: '🏃 Evasión · Stun: 1', info: ['⚡ Stun: no puede hacer nada; su Evasión es 1']}];   // Stun (2026-10-06)
         if(def) C().defensas(sc, {soloEscudo: disparo}).forEach(x => {   // 🛡 una opción por arma y por escudo (2026-11-03: las mismas reglas que un personaje)
-          const esArma = x.nombre === Combatiente.armaEnMano(sc).nombre;
-          ops.push({modo: 'parry', itemId: x.id || x.nombre, itemNombre: x.nombre, escudo: !esArma, natural: esArma ? Combatiente.armaEnMano(sc).natural : !!x.natural, etiqueta: `${esArma ? '🗡' : '🛡'} Parry · ${x.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo: c, reglaNo2: Combatiente.defensaSinNo2(sc.nitros, c) ? {nombre: sc.nombre, nitros: num(sc.nitros), accion: 'Parry'} : null,
-            info: [`Parry 🎲 ${fx(C().statValor(sc, 'parry'), 'parry')}`, disparo ? 'si gana, el disparo queda parado (sin Bloqueo)' : `si gana, Bloqueo 🎲 ${fx(C().bloqueoValor(sc, x.nombre))}`, ...(c > num(sc.nitros) && num(sc.nitros) >= 0 ? ['⚠ sin No2: queda en negativo (se descuenta al recargar)'] : [])]});
+          const esArma = !x.escudo && Combatiente.armasDeMano(sc).some(a => a.nombre === x.nombre);   // ⚔⚔ la segunda arma también es arma, no escudo (2026-11-07)
+          ops.push({modo: 'parry', itemId: x.id || x.nombre, itemNombre: x.nombre, escudo: !esArma, natural: !!x.natural || (esArma && !!(Combatiente.armasDeMano(sc).find(a => a.nombre === x.nombre) || {}).natural), etiqueta: `${esArma ? '🗡' : '🛡'} Parry · ${x.nombre}${gratis ? ' · gratis (Parada fácil)' : ''}`, costo: c, reglaNo2: Combatiente.defensaSinNo2(sc.nitros, c) ? {nombre: sc.nombre, nitros: num(sc.nitros), accion: 'Parry'} : null,
+            info: [`Parry 🎲 ${fx(C().parryValor(sc, x.id || x.nombre), 'parry')}`, disparo ? 'si gana, el disparo queda parado (sin Bloqueo)' : `si gana, Bloqueo 🎲 ${fx(C().bloqueoValor(sc, x.nombre))}`, ...(c > num(sc.nitros) && num(sc.nitros) >= 0 ? ['⚠ sin No2: queda en negativo (se descuenta al recargar)'] : [])]});
         });
         else if(disparo && C().defensa(sc)) ops.push(Combatiente.parryApagado({modo: 'parry', itemId: '', itemNombre: C().defensa(sc).nombre, etiqueta: `🗡 Parry · ${C().defensa(sc).nombre}`, costo: 0, info: []}, 'contra un disparo solo se parrea con escudo'));   // 🚫 (2026-10-29)
         // ⚔ Con el Contraataque (2026-10-27): si gana la Evasión o el Parry, puede contestar (el duelo pregunta «¿Contraataca?»).
@@ -292,7 +292,7 @@ const CreepDuelo = (() => {
         ui.toast(`⚔ ${sc.nombre}: ${ct.h.nombre} (Flash en turno ajeno: ${C().modoSP(sc) ? `−${fmt(C().costoSpHab(sc, ct.h) * 2)} SP` : `cooldown ${fmt(num(ct.h.cd) * 2)}`})`);
         return '';
       },
-      defender: (d, modo) => {
+      defender: (d, modo, itemId) => {
         const sc = deLado(d.defensor);
         if(!sc) return;
         if(modo === 'parry'){
@@ -301,7 +301,8 @@ const CreepDuelo = (() => {
             if(!x) return;
             if(x.error){ if(!Combatiente.errorReglaNo2(x, pagar)) ui.toast(x.error); return; }   // ⚖ en negativo: la regla, o hacerlo igual
             if(x.deuda) Combatiente.avisarDeudaNo2(x.deuda);
-            ui.publicar(sc, A().tirada(`${sc.nombre} · Parry`, C().statValor(sc, 'parry'), sc, 'parry'));
+            const con = C().defensa(sc, itemId ? {nombre: itemId} : undefined);   // 🛡 con la que eligió: sus bonos de Parry, solo los de esa pieza (2026-11-07)
+            ui.publicar(sc, A().tirada(`${sc.nombre} · Parry${con && itemId ? ` · ${con.nombre}` : ''}`, C().parryValor(sc, itemId || ''), sc, 'parry'));
             ui.toast(x.aviso);
           });
           return pagar();

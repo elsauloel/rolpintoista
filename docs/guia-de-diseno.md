@@ -182,6 +182,19 @@ Parry → Bloqueo → durabilidad hay tres ejes para jugar con la calidad de un 
 Los bonos a Parry y a Bloqueo ya son accesos rápidos del paso "Bonos" del asistente para la categoría Defensa. **Cada uno con lo
 suyo** (P129, dueño 2026-09-30): el bono de un escudo cuenta al parar o bloquear con ese escudo, y el de un arma, con esa arma.
 
+## Los bonos de cada arma, con esa arma — para todos (dueño, 2026-11-07)
+Regla general, igual para **personajes, creeps e invocaciones** (dueño: «los bonos de más una probabilidad de golpe que te da un arma
+aplica solo para esa arma… para jugadores, para creeps, para invocaciones, para todo»). Lo que da una pieza de la mano se reparte en tres:
+- **Bonos de ataque** (PdG, Crítico frecuente y potente, Daño, PdG en contraataque y en oportunidad, Rango/Alcance; y lo que el arma trae
+  suelto: Perfora, efectos al golpear…): **solo al atacar con esa arma**. Con dos armas se elige con cuál se ataca (cada una paga su propio
+  primer ataque a mitad de precio).
+- **Parry y Bloqueo** (dueño, 2026-11-07): **solo al atajar con esa pieza** (arma o escudo). Si hay más de una con qué atajar, se elige,
+  como se elige el arma con la que se ataca. (Amplía P129 a creeps e invocaciones.)
+- **Todo lo demás cuenta siempre**, tenga en la mano lo que tenga: la **Iniciativa** (dueño, 2026-11-07: «no es algo que afecta el ataque,
+  sino que es algo que afecta solo al principio del combate»), la Evasión, la Defensa, la resistencia a crítico…
+Código: `Combatiente.STATS_DEL_ARMA` / `STATS_DE_LA_PIEZA` / `fuentesParaStat` (creeps e invocaciones) y `FichaCombate.statParaArma`
+(personajes). Las invocaciones atacan con dos armas como los creeps desde el 2026-11-07 (`armaActiva`, `ataquesArma`).
+
 ## Máximo de Resistencia a crítico acumulable con el catálogo actual (medido 2026-09-27)
 Pedido del dueño (log «A desarrollar»): cuánto se puede acumular de Resistencia a crítico por Tipo con un ítem en cada slot, eligiendo la mejor pieza de cada uno del catálogo de hoy (889 ítems; slots: cabeza, armadura blanda, armadura rígida, manos, piernas, pies, escudo y 2 anillos; el arma no aporta).
 | Tipo | Máximo | Desglose |

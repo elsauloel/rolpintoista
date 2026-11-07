@@ -62,10 +62,12 @@ const FichaResumen = (() => {
   }
 
   /* ---------- No2 máximo de una invocación (js/04) ---------- */
-  const invFuentesEquipo = inv => Combatiente.equipoPuesto(inv);   // (el arma va en su equipo; lo guardado no da bonos)
-  function invModTotal(inv, statId){
+  // (el arma va en su equipo; lo guardado no da bonos). ⚔⚔ Con dos armas (dueño, 2026-11-07): los bonos de ataque de un arma, solo con esa (la de la
+  // mano, `armaActiva`); los de Parry y Bloqueo, solo con la pieza con la que ataja (`pieza`); el resto, siempre (Combatiente.fuentesParaStat).
+  const invFuentesEquipo = (inv, statId, pieza) => statId ? Combatiente.fuentesParaStat(inv, statId, pieza) : Combatiente.equipoPuesto(inv);
+  function invModTotal(inv, statId, pieza){
     let total = 0;
-    invFuentesEquipo(inv).forEach(it => (it.mods||[]).forEach(m => { if(m.stat === statId) total += num(m.val); }));
+    invFuentesEquipo(inv, statId, pieza).forEach(it => (it.mods||[]).forEach(m => { if(m.stat === statId) total += num(m.val); }));
     (typeof Combatiente !== 'undefined' && Combatiente.sinPresasDebiles ? Combatiente.sinPresasDebiles(inv.estados||[]) : (inv.estados||[])).forEach(es => {   // (dos Presas: solo la más fuerte, 2026-10-25)
       if(es.activo === false) return;
       const stacks = Math.max(1, num(es.stacks)||1);

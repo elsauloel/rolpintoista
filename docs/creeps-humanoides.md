@@ -902,6 +902,8 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
   malo encima. Corrección del dueño el mismo día: vale para **cualquier tirada de Probabilidad de Golpe, armas y hechizos** (PdG y PdG.Esp). En un
   hechizo de área cuenta objetivo por objetivo (la tirada compartida no arrastra el +1 del primero). No cuentan los estados que arma la ficha sola
   (Sobrepeso). En el cuadro del duelo se ve «🦅 +1 Ojo de carancho» en la declaración y en la tirada.
+  **La Armadura rota tampoco cuenta** (dueño, 2026-11-07: «técnicamente es un efecto sobre la armadura y no sobre el jugador»; el comportamiento
+  ya la dejaba afuera).
 
 ### L1 Sangrador · nivel 5 (aprobado 2026-11-07, cargado) — ✅ línea L1 completa
 - Agi 14 · Des 12 · Con 8 · Fue 8 · Esp 3 → vida 40, No2 14. Equipo: Hoz de cosecha · Chaqueta del acróbata · **Botas de mensajero** (B: Eva +2
@@ -909,6 +911,13 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
   agarre** (PdG +1). Habilidades: + **Corte en la arteria** (contra uno que ya sangra, Crítico frecuente +2 y con crítico el Sangrado queda
   permanente). Pasivas: Ojo crítico · Ojo de carancho. PdG 13 (14 con Ojo de carancho) · Daño 8 · Def 2 · Def. esp. 4 (baja de 5: se van las
   Zapatillas; el dueño lo acepta) · Eva 16 · Ini 16 · Mov 14. La Evasión +2 contra oportunidad de las botas está automatizada (probada en el mapa).
+
+### L2 Envenenador · nivel 3 (aprobado 2026-11-07, cargado)
+- Des 12 · Agi 10 · Con 8 · Fue 7 · Esp 2 → vida 40, No2 10. Equipo: **Daga de la viuda verde** (B: Tipo 4, Veneno 3 siempre, sin Perfora; en
+  lugar de la Daga ritual) · Chaleco de cuero · Guantes de agarre · Zuecos de boticario · Calzas de escapista. Habilidades: Estocada · Hoja
+  envenenada · Tajo veloz · + **Golpe a la rodilla** (si pega, Rengo 2 turnos). Pasiva: Escurridizo. Consumible: Óleo venenoso. PdG 13 · Daño 7 ·
+  Def 3 · Eva 10 (12 contra oportunidad) · Ini 10 · Mov 10. Ojo: sin la Perfora 1 de la daga ritual, contra mucha Defensa el veneno de la daga a
+  veces no entra (el dueño lo acepta).
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
@@ -974,7 +983,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | T2 | ✅ (2026-11-02; rehecho 2026-11-03) | | | | |
 | H1 | ✅ (2026-11-03) | | | | |
 | L1 | ✅ (2026-11-02) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |
-| L2 | ✅ (2026-11-03) | ✅ (2026-11-07) | | | |
+| L2 | ✅ (2026-11-03) | ✅ (2026-11-07) | ✅ (2026-11-07) | | |
 | R1 | ✅ (2026-11-03) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |
 | M1 | ✅ (2026-11-02) | ✅ (2026-11-06) | ✅ (2026-11-06) | ✅ (2026-11-06) | ✅ (2026-11-06) |
 | S1 | ✅ (2026-11-02) | ✅ (2026-11-06) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |

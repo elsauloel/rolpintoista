@@ -243,6 +243,9 @@
   esencial({...L2, nivel: 2, atrib: [8, 6, 9, 11, 2],   // (aprobado 2026-11-07: Tajo veloz; pasiva Escurridizo en lugar de Perforante, que se pisaba con la Estocada; + Zuecos y Calzas de escapista)
     equipo: ['Daga ritual', 'Chaleco de cuero', 'Guantes de agarre', 'Zuecos de boticario', 'Calzas de escapista'],
     habilidades: ['Estocada', 'Hoja envenenada', 'Tajo veloz'], pasivas: ['Escurridizo']});
+  esencial({...L2, nivel: 3, atrib: [8, 7, 10, 12, 2],   // (aprobado 2026-11-07: Golpe a la rodilla; la daga pasa a la Daga de la viuda verde, Veneno 3 siempre, sin Perfora)
+    equipo: ['Daga de la viuda verde', 'Chaleco de cuero', 'Guantes de agarre', 'Zuecos de boticario', 'Calzas de escapista'],
+    habilidades: ['Estocada', 'Hoja envenenada', 'Tajo veloz', 'Golpe a la rodilla'], pasivas: ['Escurridizo']});
   esencial({linea: 'L3', nombre: 'Asesino de las sombras', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [6, 5, 9, 11, 2],
     equipo: ['Punzón de hielo', 'Chaleco de cuero', 'Botas de suela de goma'],
     habilidades: ['Ojo de asesino', 'Bomba de humo'], consumibles: ['Pergamino grupal de Paso Fantasma'],

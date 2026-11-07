@@ -826,6 +826,13 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
   pergaminos). Ideas del dueño para los niveles 3 y 4: «algo más de support, que pueda cambiar el orden de turnos, o daño de luz que se sostenga con la
   sanación; el 4, algo un poquito mejor».
 
+### S1 Sanador · niveles 3 y 4 (aprobados 2026-11-07)
+- Nv3 (cargado): Con 10 · Fue 3 · Agi 7 · Des 4 · Esp 15 → vida 55, No2 7, SP 45. Equipo: **Varita de cura mayor** (B: 2d8) · Orbe de luz · Peto de
+  cuero de lampalagua · **Escarpines de fieltro** (en lugar de las Botas de caña alta) · Casco de cuero endurecido. Habilidades: + **Smite** (luz, no se
+  esquiva, Marcado, Luz sanadora 50 %). Def 2 · Def. esp. 4 · Eva 8 · PdG.Esp/Ef.Esp 15.
+- Nv4: Con 11 · Fue 3 · Agi 8 · Des 4 · Esp 16 → vida 60, No2 8, SP 48. Equipo: el Peto → **Chaleco de kevlar** (B). Habilidades: + **Cambio de
+  guardia** (versión de creep, a programar). Def 4 (6 a distancia) · Def. esp. 2 · Eva 9 · crít. T4 2.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

@@ -122,6 +122,9 @@
   esencial({...S1, nivel: 2, atrib: [9, 3, 7, 4, 13],
     equipo: ['Varita de cura', 'Orbe de luz', 'Peto de cuero de lampalagua', 'Botas de caña alta de estanciero', 'Casco de cuero endurecido'],
     habilidades: ['Sanar', 'Purificar', 'Oleada sanadora'], pasivas: ['Manos de curandero']});
+  esencial({...S1, nivel: 3, atrib: [10, 3, 7, 4, 15],   // (aprobado 2026-11-06/07: Smite; Varita de cura mayor; Escarpines en lugar de las Botas)
+    equipo: ['Varita de cura mayor', 'Orbe de luz', 'Peto de cuero de lampalagua', 'Escarpines de fieltro', 'Casco de cuero endurecido'],
+    habilidades: ['Sanar', 'Purificar', 'Oleada sanadora', 'Smite'], pasivas: ['Manos de curandero']});
   esencial({linea: 'W1', nombre: 'Hachero', rol: 'warrior', rolTxt: 'melee', nivel: 1, atrib: [7, 9, 6, 7, 4],   // (2026-11-03, dueño: «fue 9, con 7, agi 6, des 7, esp 4»)
     equipo: ['Hacha', 'Cota de malla de hierro', 'Cofia de anillas sueltas'],
     habilidades: ['Pegar fuerte', 'Romper armadura'], consumibles: ['Pergamino grupal de Furia de Combate'],

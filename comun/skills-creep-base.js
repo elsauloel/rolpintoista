@@ -839,8 +839,9 @@
   // poquito de debuff»; «un dado de 6 de daño directo, se esquiva con evasión»): su PdG.Esp contra la Evasión de un rival en su Rango; si pega, 1d6 arcano
   // directo (no lo frena la Defensa especial) y Expuesto hasta que empiece el próximo turno del objetivo. Prepara el golpe de los demás. Daño fijo (no suma
   // el Ef.Esp, P216): costo como la Maldición de la coraza.
-  H('Aguja del desamparo', 'DX', '*', 'gx', 3, {detalle: 'Le clava una aguja de energía a un rival dentro de su Rango: tira su Probabilidad de Golpe especial contra la Evasión del objetivo; si pega, 1d6 de daño arcano directo (no lo frena la Defensa especial) y lo deja Expuesto hasta que empiece su próximo turno: su Evasión vale la mitad y no puede reaccionar con nada que cueste No2 (ni Parry, ni Bloqueo, ni ataque de oportunidad, ni dodge roll). Abre la puerta para que los demás le peguen.',
-    no2: 2, spCosto: 3, auditada: true, ataqueTxt: 'su PdG.Esp contra la Evasión; si pega, 1d6 arcano directo y Expuesto hasta su próximo turno',
+  // (2026-11-07, dueño: «a la Aguja del desamparo le subiría el costo, a 4 o inclusive 5 SP» → 5 SP; con turnos de espera, 4 y lenta)
+  H('Aguja del desamparo', 'DX', '*', 'gx', 4, {detalle: 'Le clava una aguja de energía a un rival dentro de su Rango: tira su Probabilidad de Golpe especial contra la Evasión del objetivo; si pega, 1d6 de daño arcano directo (no lo frena la Defensa especial) y lo deja Expuesto hasta que empiece su próximo turno: su Evasión vale la mitad y no puede reaccionar con nada que cueste No2 (ni Parry, ni Bloqueo, ni ataque de oportunidad, ni dodge roll). Abre la puerta para que los demás le peguen.',
+    no2: 2, spCosto: 5, auditada: true, ataqueTxt: 'su PdG.Esp contra la Evasión; si pega, 1d6 arcano directo y Expuesto hasta su próximo turno',
     duelo: {objetivo: 'enemigo', tira: 'pdgmg', contra: ['eva'], alcance: 'rango', dano: true, danoFormula: '1d6', danoDirecto: true, tipoDano: 'arcano', efectos: [{nombre: 'Expuesto'}]}});
   // 🚫 Auditada (dueño, 2026-11-01; el Debuffer, el «Dispel Magic» con nombre propio: «Anulación me gusta, todo el resto va bien»): una onda que deshace
   // la magia de sus rivales en una flor de diámetro 5 en su Rango: su Ef.Esp contra la Res.Esp de cada uno; al que no resiste le saca TODOS sus estados

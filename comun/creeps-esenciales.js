@@ -137,6 +137,13 @@
     habilidades: ['Maldición de la coraza', 'Aguja siniestra'], consumibles: ['Runa de debilidad'],
     estrategia: 'Debuffer. Les baja las defensas a los rivales para que todos los suyos peguen más; la varita no se esquiva y puede silenciar.'});
 
+  // D1 Maldito (niveles 2 en adelante, de a uno desde el 2026-11-07; en modo SP). Ruta nueva (dueño): nv2 Maldición debilitante · nv3 Escalofrío ·
+  // nv4 Aguja del desamparo (5 SP) + Potencia especial · nv5 Anulación (Extenuar, afuera).
+  const D1 = {linea: 'D1', nombre: 'Maldito', rol: 'debuffer', rolTxt: 'debuffer', consumibles: ['Runa de debilidad'],
+    estrategia: 'Debuffer. Les baja las defensas a los rivales para que todos los suyos peguen más; la varita no se esquiva y puede silenciar.'};
+  esencial({...D1, nivel: 2, atrib: [9, 2, 7, 4, 14],
+    equipo: ['Varita del susurro', 'Atrapasueños', 'Casaca curtida de salteador', 'Capucha de lana del culto', 'Casco de cuero endurecido'],
+    habilidades: ['Maldición de la coraza', 'Aguja siniestra', 'Maldición debilitante'], pasivas: ['Puntería arcana']});
   esencial({linea: 'R1', nombre: 'Tirador de precisión', rol: 'rango', rolTxt: 'rango', nivel: 1, atrib: [7, 5, 7, 11, 3],   // (aprobado 2026-11-03)
     equipo: ['Arco de la espera', 'Chaleco de cuero', 'Botas de cuero de vaca'],
     habilidades: ['Tiro certero', 'Tiro a la cabeza'], consumibles: ['Flecha perforante'],

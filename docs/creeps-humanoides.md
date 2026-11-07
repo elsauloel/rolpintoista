@@ -834,6 +834,13 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
   guardia** (versión de creep, programada 2026-11-07: 1 No2 + 4 SP o cooldown 3; el GM elige los dos creeps con un clic, vtt-hexgrid/js/102). Def 4
   (6 a distancia) · Def. esp. 2 · Eva 9 · crít. T4 2. **Cargado en el pool (2026-11-07).**
 
+### D1 Maldito · ruta nueva y nivel 2 (aprobados 2026-11-07, nivel 2 cargado)
+- Ruta (dueño): nv2 **Maldición debilitante** · nv3 **Escalofrío** · nv4 **Aguja del desamparo** + Potencia especial · nv5 Anulación. **Extenuar**, afuera.
+  La **Aguja del desamparo** sube a **5 SP** (antes 3; con turnos de espera, 4 y lenta), en el pool para todos los creeps.
+- Nv2: Con 9 · Fue 2 · Agi 7 · Des 4 · Esp 14 → vida 45, No2 7, SP 42. Equipo: Varita del susurro · Atrapasueños · Casaca de salteador · Capucha del
+  culto · **Casco de cuero endurecido**. Habilidades: Maldición de la coraza · Aguja siniestra · **Maldición debilitante**. Pasiva: **Puntería arcana**.
+  PdG.Esp 13 → 15 · Ef.Esp 13 → 14 · Def 1 → 2 · crít. T4 0 → 1.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

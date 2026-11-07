@@ -1730,3 +1730,12 @@ Foto antes y restaurado después (comparado: igual; borrada la nube de prueba). 
   o se mueven, el anillo los quema** (es lo que hace la habilidad).
 - No se movió nada ni se tocó la iniciativa. Los estados llevan `escudoMuestra: true`.
 - **Para sacarlos**: `node /tmp/pw/escudos-mapa1.js --sacar` (solo saca esos estados) o, a mano, ✕ en el globo de estados de cada token.
+
+## 2026-11-07 · 🐝 Turnos agotados de las abejas
+
+- [x] En «Claude · pruebas», «Encuentro 2 (simulación)»: la Abeja Diestra y la Abeja Gorda de Bizzante (copia) (con el control 🎮 del GM) tenían la marca
+  de turnos agotados y el cartel volvía cada minuto. A pedido del dueño («poné Borrar token») se eligió **🗑 Borrar token** en el cartel del mapa para
+  las dos (/tmp/pw/abejas-borrar2.js): sus tokens se fueron y ya no queda ninguna invocación agotada (/tmp/pw/abejas-leer.js).
+- [x] **«Después» ahora vuelve a preguntar una vez por ronda** (js/54, dueño: «mejorar lo de Después, una vez por ronda»): con un token de invocación de
+  mentira (local, sin escribir): pregunta → «Después» → a los 6 s y a los 66 s no vuelve → al cambiar la ronda vuelve a preguntar. Capturas
+  `despues-1-pregunta.png`, `despues-2-ronda-nueva.png`.

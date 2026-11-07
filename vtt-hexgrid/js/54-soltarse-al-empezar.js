@@ -396,8 +396,13 @@ setInterval(() => {
 /* ⏳ Turnos agotados (dueño, 2026-10-30: «que no sea automatizado… aparezca una notificación: los turnos de tu invocación se agotaron. Y borrar
    token, sumar turnos, resolver a mano, que lo decida el propietario»): el Mantenimiento ya no la duerme sola (comun/ficha-mantenimiento.js), la
    marca `turnosAgotados`; acá, en la pantalla de quien la maneja (su dueño, o el GM con 🎮 el control), se pregunta qué hacer. Borrar la duerme
-   (y el vigilante de arriba saca su token); sumar le da más turnos; a mano la deja en 0 sin volver a preguntar. «Después» vuelve a preguntar en un rato. */
+   (y el vigilante de arriba saca su token); sumar le da más turnos; a mano la deja en 0 sin volver a preguntar. «Después» vuelve a preguntar una vez
+   por ronda (dueño, 2026-11-07: antes volvía al minuto y molestaba en el medio del turno de otro): al empezar la próxima ronda de la iniciativa o
+   con el próximo Mantenimiento, lo que pase primero. */
 const turnosAgotadosPreguntando = new Set();
+const turnosAgotadosDespues = new Map();   // tokenId → {ronda, mant} de cuando dijo «Después»
+const turnosAgotadosMomento = () => ({ronda: (typeof iniciativa !== 'undefined' && iniciativa) ? Math.round(num(iniciativa.ronda)) : 0,
+  mant: typeof mantenimientoNumero !== 'undefined' && mantenimientoNumero !== null ? Math.round(num(mantenimientoNumero)) : 0});
 setInterval(() => {
   if(typeof tokens === 'undefined' || !fbUsuario || typeof Confirmar === 'undefined') return;
   tokens.forEach((t, id) => {
@@ -406,9 +411,14 @@ setInterval(() => {
     if(!r.turnosAgotados || r.muerto || r.dormida) return;
     const [ficha, invId] = String(t.fichaId).split(SEP_INVOCACION);
     if(!(typeof bnManejo === 'function' && bnManejo(ficha))) return;
+    const ya = turnosAgotadosDespues.get(id), ahora = turnosAgotadosMomento();
+    if(ya && ya.ronda === ahora.ronda && ya.mant === ahora.mant) return;   // dijo «Después» en esta ronda: hasta la próxima, nada
+    turnosAgotadosDespues.delete(id);
     turnosAgotadosPreguntando.add(id);
-    turnosAgotadosPreguntar(t, ficha, invId).then(decidio => setTimeout(() => turnosAgotadosPreguntando.delete(id), decidio ? 5000 : 60000))
-      .catch(err => { console.error('Turnos agotados:', err); setTimeout(() => turnosAgotadosPreguntando.delete(id), 60000); });
+    turnosAgotadosPreguntar(t, ficha, invId).then(decidio => {
+      if(!decidio) turnosAgotadosDespues.set(id, turnosAgotadosMomento());
+      setTimeout(() => turnosAgotadosPreguntando.delete(id), 5000);
+    }).catch(err => { console.error('Turnos agotados:', err); turnosAgotadosDespues.set(id, turnosAgotadosMomento()); setTimeout(() => turnosAgotadosPreguntando.delete(id), 5000); });
   });
 }, 1500);
 async function turnosAgotadosPreguntar(t, ficha, invId){   // → true si decidió algo

@@ -831,7 +831,8 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
   cuero de lampalagua · **Escarpines de fieltro** (en lugar de las Botas de caña alta) · Casco de cuero endurecido. Habilidades: + **Smite** (luz, no se
   esquiva, Marcado, Luz sanadora 50 %). Def 2 · Def. esp. 4 · Eva 8 · PdG.Esp/Ef.Esp 15.
 - Nv4: Con 11 · Fue 3 · Agi 8 · Des 4 · Esp 16 → vida 60, No2 8, SP 48. Equipo: el Peto → **Chaleco de kevlar** (B). Habilidades: + **Cambio de
-  guardia** (versión de creep, a programar). Def 4 (6 a distancia) · Def. esp. 2 · Eva 9 · crít. T4 2.
+  guardia** (versión de creep, programada 2026-11-07: 1 No2 + 4 SP o cooldown 3; el GM elige los dos creeps con un clic, vtt-hexgrid/js/102). Def 4
+  (6 a distancia) · Def. esp. 2 · Eva 9 · crít. T4 2. **Cargado en el pool (2026-11-07).**
 
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 

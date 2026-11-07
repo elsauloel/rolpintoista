@@ -529,11 +529,11 @@ const CreepAcciones = (() => {
     const efecto = ef.estado;
     if(efecto && C().modsAfectanHp(efecto.mods)) C().actualizarHpMaxPorCon(sc);
     // Lo que todavía no anda para creeps o una ✨ sin la Ejecución armada: avisa y va como 💰.
-    const falta = modo === 'auto' && !h.trampaColocar && !h.refuerzos && !h.estandarte && !h.meteoro && !h.dash && !h.blink && !h.bombaHumo && !h.cebo && !h.provocarAliado && !h.transfusion ? Combatiente.ejecucionNoDisponible(h.duelo, 'creep') : '';   // 📣 refuerzos y 🚩 el estandarte: no llevan Ejecución
+    const falta = modo === 'auto' && !h.trampaColocar && !h.refuerzos && !h.estandarte && !h.meteoro && !h.dash && !h.blink && !h.bombaHumo && !h.cebo && !h.provocarAliado && !h.transfusion && !h.cambioGuardia ? Combatiente.ejecucionNoDisponible(h.duelo, 'creep') : '';   // 📣 refuerzos y 🚩 el estandarte: no llevan Ejecución
     const auto = modo === 'auto' && !falta;
     const esZona = auto && h.duelo && typeof h.duelo === 'object' && h.duelo.objetivo === 'zona';
     // ✨ Solo sobre el creep y sin nada que tirar: se aplica directo, sin abrir el cuadro.
-    const directo = auto && !h.trampaColocar && !h.refuerzos && !h.estandarte && !h.meteoro && !h.dash && !h.blink && !h.bombaHumo && !h.cebo && !h.provocarAliado && !h.transfusion ? sobreSi(sc, h) : null;
+    const directo = auto && !h.trampaColocar && !h.refuerzos && !h.estandarte && !h.meteoro && !h.dash && !h.blink && !h.bombaHumo && !h.cebo && !h.provocarAliado && !h.transfusion && !h.cambioGuardia ? sobreSi(sc, h) : null;
     return {costo: costo + Math.max(0, num(ex.no2)), costoSp, costoHp, efecto, aviso: [ef.aviso || '', malditoDano ? `🩸 Maldito: usar ${h.nombre || 'la habilidad'} le saca ${fmt(malditoDano)} de vida` : ''].filter(Boolean).join(' · '), falta, auto, esZona, directo, nitros: sc.nitros, malditoDano,
       ...(num(h.curaMasCon) > 0 ? {curaCon, hpAhora: sc.hp} : {}), ...(quitado ? {quitado} : {})};
   }
@@ -548,13 +548,14 @@ const CreepAcciones = (() => {
     if(h.excavar && !h.emerger && ui.excavar) ui.excavar(sc, h);   // 🕳 Bajo tierra (2026-10-13): el mapa mete el token bajo tierra (vtt-hexgrid/js/46); con `emerger` (la Excavar única, 2026-10-27) meterse lo resuelve el mapa antes de cobrar
     if(directo){ ui.mesaHabilidad(sc, h, directo.nota); ui.toast(`${h.nombre || 'Habilidad'} ejecutada sobre ${sc.nombre}${directo.hechos.length ? ' → ' + directo.hechos.join(' · ') : ''}${costoHp > 0 ? ` · −${fmt(costoHp)} HP` : ''}`); return; }
     // Una trampa se coloca en secreto: la habilidad no se anuncia en la Mesa (los jugadores no deben enterarse).
-    const hDuelo = (!auto || h.trampaColocar || esZona || h.refuerzos || h.estandarte || h.meteoro || h.dash || h.blink || h.bombaHumo || h.cebo || h.provocarAliado || h.transfusion) ? null : ui.habDuelo(sc, h);   // habilidad dirigida: la contienda va en el cuadro del duelo
+    const hDuelo = (!auto || h.trampaColocar || esZona || h.refuerzos || h.estandarte || h.meteoro || h.dash || h.blink || h.bombaHumo || h.cebo || h.provocarAliado || h.transfusion || h.cambioGuardia) ? null : ui.habDuelo(sc, h);   // habilidad dirigida: la contienda va en el cuadro del duelo
     const esArma = auto && !h.trampaColocar && !h.dash && Combatiente.tipoEjecucion(h.duelo) === 'arma';   // ataque con arreglos: al duelo como un ataque
     if(esArma) ui.lanzarAtaque(sc, h);
     else if(h.trampaColocar) ui.colocarTrampa(sc, h, auto);
     else if(h.caos){ ui.mesaHabilidad(sc, h); if(ui.caos) ui.caos(sc, h); else ui.toast(`${h.nombre}: el objetivo se elige en el mapa (⚔ Acciones)`); }   // 🎲 la Varita del caos (2026-10-18)
     else if(auto && h.refuerzos){ ui.mesaHabilidad(sc, h); if(ui.refuerzos) ui.refuerzos(sc, h); else ui.toast(`${h.nombre}: los refuerzos se eligen desde el mapa (⚔ Acciones)`); }
     else if(auto && h.transfusion){ ui.mesaHabilidad(sc, h); if(ui.transfusion) ui.transfusion(sc, h); else ui.toast(`${h.nombre}: quién da y quién recibe se eligen desde el mapa (⚔ Acciones)`); }   // 🩸 (2026-11-03, vtt-hexgrid/js/45)
+    else if(auto && h.cambioGuardia){ ui.mesaHabilidad(sc, h); if(ui.cambioGuardia) ui.cambioGuardia(sc, h); else ui.toast(`${h.nombre}: los dos se eligen desde el mapa (⚔ Acciones)`); }   // 🔄 (2026-11-07, vtt-hexgrid/js/102)
     else if(auto && h.provocarAliado){ ui.mesaHabilidad(sc, h); if(ui.provocarAliado) ui.provocarAliado(sc, h); else ui.toast(`${h.nombre}: el aliado se elige desde el mapa (⚔ Acciones)`); }   // 😤 Tirar la bronca (2026-10-26, vtt-hexgrid/js/77)
     else if(auto && h.blink){ ui.mesaHabilidad(sc, h); if(ui.blink) ui.blink(sc, h); else ui.toast(`${h.nombre}: el salto se hace desde el mapa (⚔ Acciones)`); }
     else if(auto && h.bombaHumo){ ui.mesaHabilidad(sc, h); if(ui.bombaHumo) ui.bombaHumo(sc, h); else ui.toast(`${h.nombre}: el humo se hace desde el mapa (⚔ Acciones)`); }   // 💨 la Bomba de humo (vtt-hexgrid/js/57)   // ✨ el Parpadeo (2026-10-26, vtt-hexgrid/js/13 blinkDeHabilidad)

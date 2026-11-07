@@ -51,7 +51,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="combatiente.js?v=20261106rayo"></script>
 <script src="creep-calculo.js?v=20261106piel"></script>
 <script src="creep-botonera.js"></script>
-<script src="creep-acciones.js?v=20261106manos2"></script>
+<script src="creep-acciones.js?v=20261107guardia"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
@@ -122,9 +122,9 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="pasivas.js"></script>
 <script src="skills-clase.js?v=20261105nube"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
-<script src="creeps-base.js?v=20261104ig"></script>
-<script src="skills-creep-base.js?v=20261106escudo3"></script>
-<script src="creeps-esenciales.js?v=20261107s13"></script>
+<script src="creeps-base.js?v=20261107guardia"></script>
+<script src="skills-creep-base.js?v=20261107guardia"></script>
+<script src="creeps-esenciales.js?v=20261107guardia"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
@@ -6731,6 +6731,13 @@ prueba('🛡 Escudo elemental (2026-11-06): 7 elementos en paralelo con el Arma 
     !!g && lejos(F.posGota(g, c, 50, g.periodo * 0.8 - g.fase + g.periodo * 10)) > lejos(F.posGota(g, c, 50, g.periodo * 0.05 - g.fase + g.periodo * 10)), !!g && F.posGota(g, c, 50, 500, true).alfa === 1],
     [true, true, 2, 41, true, true]);
 });
+prueba('🔄 Cambio de guardia de creep (2026-11-07): en el pool, auditada, 1 No2 + 4 SP o cooldown 3, y va al mapa (no al duelo); el S1 Sanador nivel 4 la lleva', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Cambio de guardia' && x.datos.sp.auditada);
+  const h = armarHabilidadDeCreep(e.datos, 4);
+  const s4 = CREEPS_BASE.find(c => c.pool === 'esencial' && c.nombre === 'Sanador' && c.nivel === 4).datos;
+  igual([!!e, h.cd, h.spCosto, !!h.cambioGuardia, h.modo, s4.habilidades.map(x => x.nombre).includes('Cambio de guardia'), CreepCalculo.defensaEfectiva(s4), s4.hpMax],
+    [true, 3, 4, true, 'auto', true, 4, 60]);
+});
 prueba('❄ Escudo helado (2026-11-06, dueño): el daño entra, la Escarcha se resiste (si resiste, nada de Escarcha); el ácido no se resiste', () => {
   const E = n => Combatiente.ESCUDOS_ELEMENTALES.find(x => x.clave === n);
   igual([E('hielo').resiste, E('hielo').minimo, E('acido').resiste, E('fuego').minimo], [true, 0, false, 0]);
@@ -6810,7 +6817,7 @@ prueba('⭐ Pool esencial, niveles 2 a 5 (2026-11-06): W1 Hachero 2–5 y T1 Esc
     w4.pasivas.map(p => p.nombre).join(), C.statValor(w4, 'dmg'), w4.hpMax,
     C.defensaEfectiva(t3), C.statValor(t3, 'bloqueo'), t3.pasivas.map(p => p.nombre).join(), t3.habilidades.find(h => h.nombre === 'Golpe demoledor') === undefined,
     d('Hachero', 3).habilidades.find(h => h.nombre === 'Golpe demoledor').cdActual],
-    [0, 'M12,M13,M14,M15,S12,S13,H12,H13,H14,W12,W13,W14,W15,T12,T13,T14,T15', 65, 11, 9, 14, 12, 0, 'Pegar fuerte,Romper armadura,Barrido,Golpe demoledor,Arte de la guerra,Remate',
+    [0, 'M12,M13,M14,M15,S12,S13,S14,H12,H13,H14,W12,W13,W14,W15,T12,T13,T14,T15', 65, 11, 9, 14, 12, 0, 'Pegar fuerte,Romper armadura,Barrido,Golpe demoledor,Arte de la guerra,Remate',
       'Golpe fuerte,Piel curtida', 13, 55, 8, 10, 'Guardia firme', true, 3]);
   const t4 = d('Escudero', 4);   // (aprobado 2026-11-06)
   igual([t4.hpMax, C.defensaEfectiva(t4), C.statValor(t4, 'bloqueo'), C.statValor(t4, 'rescc'), t4.pasivas.map(p => p.nombre).join(), t4.habilidades.map(h => h.nombre).join()],

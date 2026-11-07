@@ -103,17 +103,19 @@ async function ordenCambioPendiente(a, b, por){
   return {nota: 'cambian de lugar al empezar la próxima ronda'};
 }
 // Lo pide quien usó la habilidad (su ficha → el mapa): se eligen los dos aliados con un clic, como la Transfusión (js/45).
+// (2026-11-07) También la de un creep (`msg.creepId`, desde sus Acciones, js/12): sus aliados son los otros creeps.
 async function cambioGuardiaDeHabilidad(msg){
-  const yo = [...tokens.entries()].find(([, t]) => t.fichaId === msg.fichaId && t.tipo === 'pj');
-  if(!yo){ toast(`${msg.nombre}: tu token no está en el mapa — cambialos a mano`); return; }
+  const deCreep = !!msg.creepId, tipoYo = deCreep ? 'creep' : 'pj';
+  const yo = [...tokens.entries()].find(([, t]) => t.fichaId === (deCreep ? msg.creepId : msg.fichaId) && t.tipo === tipoYo);
+  if(!yo){ toast(`${msg.nombre}: ${deCreep ? 'el creep no tiene token en este mapa' : 'tu token no está en el mapa'} — cambialos a mano`); return; }
   let rango = 0;
   try{ rango = Math.round(num(rangoDeToken(yo[1]).rng)) || 0; }catch(e){}
   const elegir = texto => new Promise(res => elegirDestino(c => res(c), texto, true, () => res(null)));
   const pedir = async paso => {
-    const c = await elegir(`<b>🔄 ${esc(msg.nombre)}: ${paso}</b> <span>clic sobre un aliado (vos también) a ${rango} casilleros o menos · Esc cancela</span>`);
+    const c = await elegir(`<b>🔄 ${esc(msg.nombre)}: ${paso}</b> <span>clic sobre ${deCreep ? 'un creep aliado (él también)' : 'un aliado (vos también)'} a ${rango} casilleros o menos · Esc cancela</span>`);
     if(!c) return null;
-    const e = [...tokens.entries()].find(([, t]) => t.col === c.col && t.fila === c.fila && t.tipo === 'pj');
-    if(!e){ toast('Ahí no hay un aliado: elegí uno de tu equipo'); return pedir(paso); }
+    const e = [...tokens.entries()].find(([, t]) => t.col === c.col && t.fila === c.fila && t.tipo === tipoYo);
+    if(!e){ toast(deCreep ? 'Ahí no hay un creep aliado' : 'Ahí no hay un aliado: elegí uno de tu equipo'); return pedir(paso); }
     if(!iniciativa.orden.some(o => o.id === e[0])){ toast(`${nombreDe(e[1])} no está en el orden de turnos`); return pedir(paso); }
     if(rango && distanciaHex(yo[1], e[1]) > rango) toast(`${nombreDe(e[1])} está fuera de tu Rango (${rango}): va igual, lo decide la mesa`);
     return e[0];

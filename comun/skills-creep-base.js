@@ -676,6 +676,10 @@
   // otro (él puede ser cualquiera de los dos), los dos en su Rango, hasta su Especial; quien da queda con al menos 1; quien recibe no pasa su máximo ni
   // se levanta de caído. Lo que recibe es una cura: con Herida sombría no entra y con una Sanguijuela se la lleva quien la lanzó (Combatiente.curaRobada).
   // El mapa elige quién da, quién recibe y cuánto (vtt-hexgrid/js/45, transfusionDeCreep). Costo el de la clase: 1 No2 y 1 SP, o cooldown 2 (rápida).
+  // 🔄 Cambio de guardia (dueño, 2026-11-07, para el S1 Sanador nivel 4: la versión de creep de la del Support de los jugadores). Costo coherente con
+  // la de clase (4 SP y 1 No2) y con el resto de creeps: 1 No2 + 4 SP en modo SP, o cooldown 3 (rápida). El mapa elige los dos con un clic (js/102).
+  H('Cambio de guardia', 'B', '*', 'a', 3, {detalle: 'Elige dos aliados cualesquiera dentro de su Rango (él puede ser uno de los dos): intercambian sus lugares en el orden de turnos a partir de la próxima ronda. Cuenta como el efecto de orden de la ronda de los dos (como mucho uno por ronda). ⚙ Automatizado en el mapa: el GM elige los dos creeps con un clic y el cambio lo hace al empezar la próxima ronda. ✋ A mano: con un personaje o una invocación.',
+    no2: 1, spCosto: 4, auditada: true, cambioGuardia: {}, ataqueTxt: 'dos aliados en su Rango intercambian su lugar en el orden de turnos desde la próxima ronda'});
   H('Transfusión sanguínea', 'C', '*', 'ax', 2, {detalle: 'Le pasa vida de un aliado a otro (él puede ser cualquiera de los dos), los dos dentro de su Rango: elige quién da, quién recibe y cuánto, hasta su Especial. Quien da queda con al menos 1 de vida; quien recibe no pasa su máximo y, si está caído, no se levanta. ⚙ Automatizado en el mapa (entre creeps): se eligen los dos con un clic y la vida se aplica sola. ✋ A mano: con un personaje o una invocación de por medio.',
     no2: 1, spCosto: 1, auditada: true, transfusion: {max: 'esp'}, ataqueTxt: 'pasa vida de un aliado a otro en su Rango (hasta su Especial)'});
   // 💉 Auditada (dueño, 2026-11-01: «mantener la Adrenalina del jugador y adaptarla para creeps»; reemplaza a la vieja de fábrica, Hypeado +1 No2 máximo):

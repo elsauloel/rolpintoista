@@ -882,6 +882,11 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
   oportunidad, Levitar 2) · **Cofia de anillas sueltas** · Guantes de agarre · **Rodilleras de caparazón de tatú carreta** (dueño: «¿y algo de Def. esp.?»;
   el carcaj no: los creeps no llevan cuenta de flechas). Habilidades: + **Flecha que atraviesa**. Def 5 (7 a distancia) · Def. esp. 2 · PdG 17 · Eva 9.
 
+### L1 Sangrador · nivel 2 (aprobado 2026-11-07, cargado)
+- Agi 11 · Des 9 · Con 7 · Fue 6 · Esp 3 → vida 35, No2 11. Equipo: Cuchilla del frigorífico · Chaleco de cuero · Zapatillas de lona · **Cofia de anillas
+  sueltas**. Habilidades: Golpe que sangra · Sal en la herida · **Tajo al tendón** (nueva, en lugar de Corte profundo, que salió del pool). Pasiva:
+  **Escurridizo** (nueva, en lugar de «Olfato de sangre»). PdG 9 · Eva 12 · Def 3 · Def. esp. 2. En el boceto, **Paso atrás** reemplaza a «Reflejos» (nv4).
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

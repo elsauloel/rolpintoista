@@ -112,6 +112,12 @@
     equipo: ['Cuchilla del frigorífico', 'Chaleco de cuero', 'Zapatillas de lona'],
     habilidades: ['Golpe que sangra', 'Sal en la herida'], consumibles: ['Óleo venenoso'],
     estrategia: 'Choque liviano. Abre heridas y vuelve para agrandarlas: crece cuanto más dura la pelea. Frágil y esquivo.'});
+  // L1 Sangrador (niveles 2 en adelante, de a uno desde el 2026-11-07).
+  const L1 = {linea: 'L1', nombre: 'Sangrador', rol: 'liviano', rolTxt: 'asalto', consumibles: ['Óleo venenoso'],
+    estrategia: 'Choque liviano. Abre heridas y vuelve para agrandarlas: crece cuanto más dura la pelea. Frágil y esquivo.'};
+  esencial({...L1, nivel: 2, atrib: [7, 6, 11, 9, 3],   // (aprobado 2026-11-07: Tajo al tendón en lugar de Corte profundo; pasiva Escurridizo; + Cofia)
+    equipo: ['Cuchilla del frigorífico', 'Chaleco de cuero', 'Zapatillas de lona', 'Cofia de anillas sueltas'],
+    habilidades: ['Golpe que sangra', 'Sal en la herida', 'Tajo al tendón'], pasivas: ['Escurridizo']});
   esencial({linea: 'S1', nombre: 'Sanador', rol: 'support', rolTxt: 'apoyo', nivel: 1, atrib: [8, 3, 6, 4, 12],
     equipo: ['Varita de cura', 'Orbe de luz', 'Peto de cuero de lampalagua', 'Botas de caña alta de estanciero'],
     habilidades: ['Sanar', 'Purificar'], consumibles: ['Pergamino de Regeneración menor'],

@@ -854,6 +854,11 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
   Clase (Support de los jugadores): 2 No2 + 10 SP, **una vez por combate** (avisa y deja usarla igual; se libera con «Finalizar combate»). No la lleva
   el Sanador del pool (el nivel 5 quedó con el Círculo de sanación).
 
+### D1 Maldito · nivel 4 (aprobado 2026-11-07, cargado)
+- Con 10 · Fue 2 · Agi 8 · Des 5 · Esp 17 → vida 55 (50 + capa 5), No2 8, SP 51. Equipo: Varita de la grieta (B) · **Capa de escamas de pez espejo** (B:
+  Def +2, Def. esp. +1, Res.CC +1, crít. T4 +1, Vida +5, Espejo) en lugar de la Casaca · Atrapasueños · Capucha del culto · Casco. Habilidades: + **Aguja
+  del desamparo** (5 SP). Pasivas: Puntería arcana · **Potencia especial**. PdG.Esp 18 · Ef.Esp 18 · Def 3 · Eva 8.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

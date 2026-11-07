@@ -150,6 +150,9 @@
   esencial({...D1, nivel: 3, atrib: [9, 2, 7, 5, 16],   // (aprobado 2026-11-07: Escalofrío; Varita de la grieta en lugar de la del susurro)
     equipo: ['Varita de la grieta', 'Atrapasueños', 'Casaca curtida de salteador', 'Capucha de lana del culto', 'Casco de cuero endurecido'],
     habilidades: ['Maldición de la coraza', 'Aguja siniestra', 'Maldición debilitante', 'Escalofrío'], pasivas: ['Puntería arcana']});
+  esencial({...D1, nivel: 4, atrib: [10, 2, 8, 5, 17],   // (aprobado 2026-11-07: Aguja del desamparo, Potencia especial; Capa de escamas de pez espejo en lugar de la Casaca)
+    equipo: ['Varita de la grieta', 'Atrapasueños', 'Capa de escamas de pez espejo', 'Capucha de lana del culto', 'Casco de cuero endurecido'],
+    habilidades: ['Maldición de la coraza', 'Aguja siniestra', 'Maldición debilitante', 'Escalofrío', 'Aguja del desamparo'], pasivas: ['Puntería arcana', 'Potencia especial']});
   esencial({linea: 'R1', nombre: 'Tirador de precisión', rol: 'rango', rolTxt: 'rango', nivel: 1, atrib: [7, 5, 7, 11, 3],   // (aprobado 2026-11-03)
     equipo: ['Arco de la espera', 'Chaleco de cuero', 'Botas de cuero de vaca'],
     habilidades: ['Tiro certero', 'Tiro a la cabeza'], consumibles: ['Flecha perforante'],

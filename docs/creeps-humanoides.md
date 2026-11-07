@@ -841,6 +841,10 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
   culto · **Casco de cuero endurecido**. Habilidades: Maldición de la coraza · Aguja siniestra · **Maldición debilitante**. Pasiva: **Puntería arcana**.
   PdG.Esp 13 → 15 · Ef.Esp 13 → 14 · Def 1 → 2 · crít. T4 0 → 1.
 
+### D1 Maldito · nivel 3 (aprobado 2026-11-07, cargado)
+- Con 9 · Fue 2 · Agi 7 · Des 5 · Esp 16 → vida 45, No2 7, SP 48. Equipo: **Varita de la grieta** (B: 1d6 arcano y −2 Def 2 turnos; se esquiva) en lugar
+  de la del susurro · Atrapasueños · Casaca de salteador · Capucha del culto · Casco de cuero endurecido. Habilidades: + **Escalofrío**. PdG.Esp 17 · Ef.Esp 16.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

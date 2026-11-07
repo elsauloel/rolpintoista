@@ -197,6 +197,11 @@
     equipo: ['Hacha con garfio', 'Puerta de granero', 'Coraza de cuero hervido'],
     habilidades: ['Coraza de púas', 'Aguante'], consumibles: ['Poción de Cuero Duro'],
     estrategia: 'Tanque. Castiga al que le pega: púas, aguante y un hachazo con garfio. No persigue: se planta.'});
+  const T2 = {linea: 'T2', nombre: 'Muralla con púas', rol: 'tanque', rolTxt: 'tanque', consumibles: ['Poción de Cuero Duro'],
+    estrategia: 'Tanque. Castiga al que le pega: púas, aguante y un hachazo con garfio. No persigue: se planta.'};
+  esencial({...T2, nivel: 2, atrib: [13, 8, 6, 6, 3],   // (aprobado 2026-11-07: Velo espejado; pasiva Piel curtida; + Cofia y Botas de cuero de vaca; dueño: del nv3 en adelante, subirle la Probabilidad de Golpe)
+    equipo: ['Hacha con garfio', 'Puerta de granero', 'Coraza de cuero hervido', 'Cofia de anillas sueltas', 'Botas de cuero de vaca'],
+    habilidades: ['Coraza de púas', 'Aguante', 'Velo espejado'], pasivas: ['Piel curtida']});
   esencial({linea: 'M2', nombre: 'Mago de escarcha', rol: 'mago', rolTxt: 'mágico', nivel: 1, atrib: [8, 2, 5, 6, 12],
     equipo: ['Varita de la ventisca', 'Escudo de cuero mojado', 'Capa de viajero', 'Anillo de escarcha'],
     habilidades: ['Dardo helado', 'Hálito polar'], consumibles: ['Poción de SP menor'],

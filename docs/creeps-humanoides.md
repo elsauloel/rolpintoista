@@ -170,6 +170,10 @@
     | 4 | **Segundo aliento** | **Robustez** (+5 de vida) | la coraza: **Pieles erizadas del berserker** (Buena, Espinas) |
     | 5 | **Escudo humano** | — | el hacha: **Hacha de abordaje** (Buena) |
     Pendiente de diseño: si las Espinas de varias fuentes se suman (ver `pendientes.md`); si no, en el nivel 4 va la Coraza de bronce con runas.
+  - **nv2 aprobado y cargado (2026-11-07):** Con 13 · Fue 8 · Agi 6 · Des 6 · Esp 3. Equipo: Hacha con garfio · Puerta de granero · Coraza de
+    cuero hervido · + **Cofia de anillas sueltas** · + **Botas de cuero de vaca**. Habilidades: Coraza de púas · Aguante · + **Velo espejado**.
+    Pasiva: **Piel curtida**. Consumible: Poción de Cuero Duro. Vida 65 · No2 6 · Def 8 · Def.Esp 1 · Bloqueo 11 · PdG 6. **Dueño: del nivel 3 en
+    adelante, subirle la Probabilidad de Golpe** (PdG 6 es poco).
 
 ## La idea
 
@@ -1013,7 +1017,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 |---|---|---|---|---|---|
 | W1 | ✅ (2026-11-02) | ✅ (2026-11-05) | ✅ (2026-11-05) | ✅ (2026-11-05) | ✅ (2026-11-05) |
 | T1 | ✅ (2026-11-02) | ✅ (2026-11-05) | ✅ (2026-11-06) | ✅ (2026-11-06) | ✅ (2026-11-06) |
-| T2 | ✅ (2026-11-02; rehecho 2026-11-03) | | | | |
+| T2 | ✅ (2026-11-02; rehecho 2026-11-03) | ✅ (2026-11-07) | | | |
 | H1 | ✅ (2026-11-03) | | | | |
 | L1 | ✅ (2026-11-02) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |
 | L2 | ✅ (2026-11-03) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |

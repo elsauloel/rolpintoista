@@ -128,6 +128,9 @@
   esencial({...S1, nivel: 4, atrib: [11, 3, 8, 4, 16],   // (aprobado 2026-11-07: Cambio de guardia —versión de creep—; el Peto → Chaleco de kevlar)
     equipo: ['Varita de cura mayor', 'Orbe de luz', 'Chaleco de kevlar', 'Escarpines de fieltro', 'Casco de cuero endurecido'],
     habilidades: ['Sanar', 'Purificar', 'Oleada sanadora', 'Smite', 'Cambio de guardia'], pasivas: ['Manos de curandero']});
+  esencial({...S1, nivel: 5, atrib: [12, 3, 8, 4, 18],   // (aprobado 2026-11-07: Círculo de sanación —no el Milagro, que va al pool y a la clase—; Orbe de la reserva; Guantes de cuero grueso)
+    equipo: ['Varita de cura mayor', 'Orbe de la reserva', 'Chaleco de kevlar', 'Escarpines de fieltro', 'Casco de cuero endurecido', 'Guantes de cuero grueso'],
+    habilidades: ['Sanar', 'Purificar', 'Oleada sanadora', 'Smite', 'Cambio de guardia', 'Círculo de sanación'], pasivas: ['Manos de curandero']});
   esencial({linea: 'W1', nombre: 'Hachero', rol: 'warrior', rolTxt: 'melee', nivel: 1, atrib: [7, 9, 6, 7, 4],   // (2026-11-03, dueño: «fue 9, con 7, agi 6, des 7, esp 4»)
     equipo: ['Hacha', 'Cota de malla de hierro', 'Cofia de anillas sueltas'],
     habilidades: ['Pegar fuerte', 'Romper armadura'], consumibles: ['Pergamino grupal de Furia de Combate'],

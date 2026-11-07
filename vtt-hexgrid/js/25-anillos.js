@@ -415,6 +415,13 @@ async function cueroTrollAlTerminar(){
 /* 💨 «Una vez por combate» (P223, dueño, 2026-10-27: «se desbloquea al finalizar el combate»): el GM libera las habilidades de los creeps del mapa
    que ya la usaron (el Segundo aliento). */
 async function unaVezAlTerminar(){
+  // Los personajes que maneja esta pantalla (el Milagro del Support, 2026-11-07): cada uno libera lo suyo.
+  for(const [, t] of tokens){
+    if(!t || t.tipo !== 'pj' || !t.fichaId || String(t.fichaId).includes(SEP_INVOCACION)) continue;
+    if(typeof bnManejo !== 'function' || !bnManejo(t.fichaId)) continue;
+    try{ await editarPersonajeMapa(t.fichaId, S => { let c = false; (S.habilidades || []).forEach(h => { if(h && h.unaVezUsada){ delete h.unaVezUsada; c = true; } }); return c; }); }
+    catch(err){ console.error('No se pudo liberar el «una vez por combate» de un personaje:', err); }
+  }
   if(!soyGM) return;
   for(const [id, e] of creepsPriv){
     if(!e || !e.sc || !(e.sc.habilidades || []).some(h => h && h.unaVezUsada)) continue;

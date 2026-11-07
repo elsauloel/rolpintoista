@@ -845,6 +845,15 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
 - Con 9 · Fue 2 · Agi 7 · Des 5 · Esp 16 → vida 45, No2 7, SP 48. Equipo: **Varita de la grieta** (B: 1d6 arcano y −2 Def 2 turnos; se esquiva) en lugar
   de la del susurro · Atrapasueños · Casaca de salteador · Capucha del culto · Casco de cuero endurecido. Habilidades: + **Escalofrío**. PdG.Esp 17 · Ef.Esp 16.
 
+### S1 Sanador · nivel 5 (aprobado 2026-11-07, cargado en el pool) — ✅ línea S1 completa
+- Atributos Con 12 · Fue 3 · Agi 8 · Des 4 · Esp 18 → vida 65, SP con el **Orbe de la reserva** (SP +5). Equipo: Varita de cura mayor (B) · **Orbe de la
+  reserva** (B) · Chaleco de kevlar (B) · Escarpines de fieltro · Casco de cuero endurecido · **Guantes de cuero grueso** (Def +1). Habilidades: + **Círculo
+  de sanación** (en lugar del «Milagro» del boceto). Pasiva: Manos de curandero.
+- ✨ **Milagro** (nueva, 2026-11-07, dueño: «me gusta la terminología… la sumaría como skill de creep y de support»): diámetro 5 (19 casillas) en su
+  Rango; cada aliado adentro (él incluido) se cura 2d8 y se saca el estado malo más reciente; caídos, nada. Creep: 2 No2 + 10 SP, o espera 5 y lenta.
+  Clase (Support de los jugadores): 2 No2 + 10 SP, **una vez por combate** (avisa y deja usarla igual; se libera con «Finalizar combate»). No la lleva
+  el Sanador del pool (el nivel 5 quedó con el Círculo de sanación).
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

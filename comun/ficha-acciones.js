@@ -779,6 +779,9 @@ const FichaAcciones = (() => {
     // Una vez por turno (2026-10-13, Sprint): avisa y deja seguir (lo decide la mesa). El conteo vive en S.ataquesArma, que vacía el turno.
     if(it.unaVezPorTurno && !forzar && num((S.ataquesArma || {})['hab:' + it.id]) > 0
       && !(await (ui.confirmar || (txt => Confirmar.preguntar(txt, {titulo: it.nombre})))(`${it.nombre} se usa una vez por turno, y ya la usaste en este. ¿Usarla igual?`))) return;
+    // ✨ Una vez por combate (2026-11-07, el Milagro del Support): avisa y deja seguir (lo decide la mesa); se libera con «Finalizar combate».
+    if(it.unaVez && it.unaVezUsada && !forzar
+      && !(await (ui.confirmar || (txt => Confirmar.preguntar(txt, {titulo: it.nombre})))(`${it.nombre} se usa una vez por combate, y ya la usaste en este. ¿Usarla igual?`))) return;
     // Costo en vida: hace falta que sobre vida después de pagarlo.
     if(num(it.hpCosto) > 0 && num(S.hp) <= num(it.hpCosto)){
       ui.toast(`No te alcanza la vida — ${it.nombre} cuesta ${fmt(num(it.hpCosto))} HP y tenés ${fmt(num(S.hp))}`);
@@ -828,6 +831,7 @@ const FichaAcciones = (() => {
     // ↩ Lo que cobró, para el duelo que arme (P233, 2026-10-29): si se cancela y no cuenta, se devuelve (FichaDuelo.devolverHab).
     try{ const yoRef = ui.yo && ui.yo() && ui.yo().ref; if(yoRef && typeof Duelo !== 'undefined' && Duelo.pagoHab) Duelo.pagoHab(yoRef, {habId: it.id, nombre: it.nombre || '', no2: Math.max(0, no2Antes - num(S.nitros)), sp: costoSp, hp: num(it.hpCosto), cd: -1}); }catch(e){}
     if(it.unaVezPorTurno) S.ataquesArma = {...(S.ataquesArma || {}), ['hab:' + it.id]: num((S.ataquesArma || {})['hab:' + it.id]) + 1};
+    if(it.unaVez) it.unaVezUsada = true;
     const costoHp = num(it.hpCosto);
     if(costoHp > 0) ui.fijarHp(num(S.hp) - costoHp);
     const curaHp = num(it.curaHp);

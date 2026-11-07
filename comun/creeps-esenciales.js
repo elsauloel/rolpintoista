@@ -166,6 +166,9 @@
   esencial({...R1, nivel: 2, atrib: [8, 6, 7, 12, 3],   // (aprobado 2026-11-07: Vigilancia, Puntería; Casco de cuero endurecido y Guantes de agarre)
     equipo: ['Arco de la espera', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de agarre'],
     habilidades: ['Tiro certero', 'Tiro a la cabeza', 'Vigilancia'], pasivas: ['Puntería']});
+  esencial({...R1, nivel: 3, atrib: [8, 7, 8, 13, 3],   // (aprobado 2026-11-07: Tiro al arma; Arco de puntería en lugar del Arco de la espera)
+    equipo: ['Arco de puntería', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de agarre'],
+    habilidades: ['Tiro certero', 'Tiro a la cabeza', 'Vigilancia', 'Tiro al arma'], pasivas: ['Puntería']});
 
   // ---- La tanda del 2026-11-03 (nivel 1 aprobado por el dueño; detalle y porqués en docs/creeps-humanoides.md). Atrib: Con · Fue · Agi · Des · Esp.
   // Los de Especial más alto juegan con SP (regla de arriba); los físicos, con turnos de espera.

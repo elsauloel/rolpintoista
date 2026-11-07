@@ -887,6 +887,10 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
   sueltas**. Habilidades: Golpe que sangra · Sal en la herida · **Tajo al tendón** (nueva, en lugar de Corte profundo, que salió del pool). Pasiva:
   **Escurridizo** (nueva, en lugar de «Olfato de sangre»). PdG 9 · Eva 12 · Def 3 · Def. esp. 2. En el boceto, **Paso atrás** reemplaza a «Reflejos» (nv4).
 
+### L1 Sangrador · nivel 3 (aprobado 2026-11-07, cargado)
+- Agi 12 · Des 10 · Fue 7 · Con 7 · Esp 3 → vida 35, No2 12. Equipo: **Hoz de cosecha** (B: Tipo 6, +1 daño, Ini +2, Sangrado 75 %) en lugar de la
+  Cuchilla · Chaleco · Zapatillas de lona · Cofia. Habilidades: + **Ráfaga de cortes**. Ini 13 · Eva 13 · PdG 10.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

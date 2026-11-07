@@ -118,6 +118,9 @@
   esencial({...L1, nivel: 2, atrib: [7, 6, 11, 9, 3],   // (aprobado 2026-11-07: Tajo al tendón en lugar de Corte profundo; pasiva Escurridizo; + Cofia)
     equipo: ['Cuchilla del frigorífico', 'Chaleco de cuero', 'Zapatillas de lona', 'Cofia de anillas sueltas'],
     habilidades: ['Golpe que sangra', 'Sal en la herida', 'Tajo al tendón'], pasivas: ['Escurridizo']});
+  esencial({...L1, nivel: 3, atrib: [7, 7, 12, 10, 3],   // (aprobado 2026-11-07: Ráfaga de cortes; Hoz de cosecha en lugar de la Cuchilla)
+    equipo: ['Hoz de cosecha', 'Chaleco de cuero', 'Zapatillas de lona', 'Cofia de anillas sueltas'],
+    habilidades: ['Golpe que sangra', 'Sal en la herida', 'Tajo al tendón', 'Ráfaga de cortes'], pasivas: ['Escurridizo']});
   esencial({linea: 'S1', nombre: 'Sanador', rol: 'support', rolTxt: 'apoyo', nivel: 1, atrib: [8, 3, 6, 4, 12],
     equipo: ['Varita de cura', 'Orbe de luz', 'Peto de cuero de lampalagua', 'Botas de caña alta de estanciero'],
     habilidades: ['Sanar', 'Purificar'], consumibles: ['Pergamino de Regeneración menor'],

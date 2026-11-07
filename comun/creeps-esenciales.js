@@ -124,6 +124,9 @@
   esencial({...L1, nivel: 4, atrib: [8, 7, 13, 11, 3],   // (aprobado 2026-11-07: Paso atrás; Chaqueta del acróbata; Ojo crítico y Ojo de carancho en lugar de Escurridizo)
     equipo: ['Hoz de cosecha', 'Chaqueta del acróbata', 'Zapatillas de lona', 'Cofia de anillas sueltas'],
     habilidades: ['Golpe que sangra', 'Sal en la herida', 'Tajo al tendón', 'Ráfaga de cortes', 'Paso atrás'], pasivas: ['Ojo crítico', 'Ojo de carancho']});
+  esencial({...L1, nivel: 5, atrib: [8, 8, 14, 12, 3],   // (aprobado 2026-11-07: Corte en la arteria; Botas de mensajero en lugar de las Zapatillas; + Grebas de cuero y Guantes de agarre)
+    equipo: ['Hoz de cosecha', 'Chaqueta del acróbata', 'Botas de mensajero', 'Cofia de anillas sueltas', 'Grebas de cuero', 'Guantes de agarre'],
+    habilidades: ['Golpe que sangra', 'Sal en la herida', 'Tajo al tendón', 'Ráfaga de cortes', 'Paso atrás', 'Corte en la arteria'], pasivas: ['Ojo crítico', 'Ojo de carancho']});
   esencial({linea: 'S1', nombre: 'Sanador', rol: 'support', rolTxt: 'apoyo', nivel: 1, atrib: [8, 3, 6, 4, 12],
     equipo: ['Varita de cura', 'Orbe de luz', 'Peto de cuero de lampalagua', 'Botas de caña alta de estanciero'],
     habilidades: ['Sanar', 'Purificar'], consumibles: ['Pergamino de Regeneración menor'],
@@ -234,6 +237,12 @@
     equipo: ['Daga ritual', 'Chaleco de cuero', 'Guantes de agarre'],
     habilidades: ['Estocada', 'Hoja envenenada'], consumibles: ['Óleo venenoso'],
     estrategia: 'Choque liviano. Pega con una daga untada, acumula veneno y se aleja.'});
+  // L2 Envenenador (niveles 2 en adelante, de a uno desde el 2026-11-07).
+  const L2 = {linea: 'L2', nombre: 'Envenenador', rol: 'liviano', rolTxt: 'asalto', consumibles: ['Óleo venenoso'],
+    estrategia: 'Choque liviano. Pega con una daga untada, acumula veneno y se aleja.'};
+  esencial({...L2, nivel: 2, atrib: [8, 6, 9, 11, 2],   // (aprobado 2026-11-07: Tajo veloz; pasiva Escurridizo en lugar de Perforante, que se pisaba con la Estocada; + Zuecos y Calzas de escapista)
+    equipo: ['Daga ritual', 'Chaleco de cuero', 'Guantes de agarre', 'Zuecos de boticario', 'Calzas de escapista'],
+    habilidades: ['Estocada', 'Hoja envenenada', 'Tajo veloz'], pasivas: ['Escurridizo']});
   esencial({linea: 'L3', nombre: 'Asesino de las sombras', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [6, 5, 9, 11, 2],
     equipo: ['Punzón de hielo', 'Chaleco de cuero', 'Botas de suela de goma'],
     habilidades: ['Ojo de asesino', 'Bomba de humo'], consumibles: ['Pergamino grupal de Paso Fantasma'],

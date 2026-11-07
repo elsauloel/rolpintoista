@@ -397,11 +397,14 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | Nivel | Habilidad nueva | Pasiva | Equipo |
   |---|---|---|---|
   | 1 | **Estocada** (rápida: Perfora 2, +1 daño) · **Hoja envenenada** (lenta: Perfora 2, Veneno 3) | — | **Daga ritual** (Tipo 4, Veneno 2 siempre, Perfora 1; 1d4 + 5) · Chaleco de cuero · Guantes de agarre (Def 2, PdG +1) |
-  | 2 | **Tajo veloz** | **Perforante** | + 2 Comunes |
+  | 2 | **Tajo veloz** | **Escurridizo** (dueño, 2026-11-07: en lugar de Perforante, que se pisaba con la Estocada) | + Zuecos de boticario · Calzas de escapista |
   | 3 | **Golpe a la rodilla** | — | la daga: **Daga de la viuda verde** (Buena, Veneno 3 siempre) |
   | 4 | **Hit and run** | **Pies ligeros** | + **Chaqueta del corredor** (Buena) |
   | 5 | **Ráfaga de cortes** (efectos del arma ×3) | — | + una tercera Buena |
   Consumible: Óleo venenoso. Ojo: Larry es inmune al veneno.
+  **nv2 aprobado y cargado (2026-11-07):** Des 11 · Agi 9 · Con 8 · Fue 6 · Esp 2. Equipo: Daga ritual · Chaleco de cuero · Guantes de agarre ·
+  **Zuecos de boticario** · **Calzas de escapista** (Evasión +2 solo contra el ataque de oportunidad, automatizado: el mismo stat que las Botas de
+  mensajero). Habilidades: Estocada · Hoja envenenada · **Tajo veloz**. Pasiva: **Escurridizo**. Consumible: Óleo venenoso.
 
 - **Regla nueva (dueño, 2026-11-03): el Flash de un creep en turno ajeno cuesta un 50 % más de cooldown** (para abajo, mínimo +1), no el doble; el
   SP y la vida siguen al doble. Programado.
@@ -900,6 +903,13 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
   hechizo de área cuenta objetivo por objetivo (la tirada compartida no arrastra el +1 del primero). No cuentan los estados que arma la ficha sola
   (Sobrepeso). En el cuadro del duelo se ve «🦅 +1 Ojo de carancho» en la declaración y en la tirada.
 
+### L1 Sangrador · nivel 5 (aprobado 2026-11-07, cargado) — ✅ línea L1 completa
+- Agi 14 · Des 12 · Con 8 · Fue 8 · Esp 3 → vida 40, No2 14. Equipo: Hoz de cosecha · Chaqueta del acróbata · **Botas de mensajero** (B: Eva +2
+  contra oportunidad, Levitar 2; en lugar de las Zapatillas de lona) · Cofia · **Grebas de cuero** (Def +1, Res. crítico Tipo 4 +1) · **Guantes de
+  agarre** (PdG +1). Habilidades: + **Corte en la arteria** (contra uno que ya sangra, Crítico frecuente +2 y con crítico el Sangrado queda
+  permanente). Pasivas: Ojo crítico · Ojo de carancho. PdG 13 (14 con Ojo de carancho) · Daño 8 · Def 2 · Def. esp. 4 (baja de 5: se van las
+  Zapatillas; el dueño lo acepta) · Eva 16 · Ini 16 · Mov 14. La Evasión +2 contra oportunidad de las botas está automatizada (probada en el mapa).
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4
@@ -963,8 +973,8 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | T1 | ✅ (2026-11-02) | ✅ (2026-11-05) | ✅ (2026-11-06) | ✅ (2026-11-06) | ✅ (2026-11-06) |
 | T2 | ✅ (2026-11-02; rehecho 2026-11-03) | | | | |
 | H1 | ✅ (2026-11-03) | | | | |
-| L1 | ✅ (2026-11-02) | | | | |
-| L2 | ✅ (2026-11-03) | | | | |
+| L1 | ✅ (2026-11-02) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |
+| L2 | ✅ (2026-11-03) | ✅ (2026-11-07) | | | |
 | R1 | ✅ (2026-11-03) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |
 | M1 | ✅ (2026-11-02) | ✅ (2026-11-06) | ✅ (2026-11-06) | ✅ (2026-11-06) | ✅ (2026-11-06) |
 | S1 | ✅ (2026-11-02) | ✅ (2026-11-06) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |

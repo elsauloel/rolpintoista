@@ -1776,3 +1776,13 @@ Respaldo antes y partida restaurada después.
 - ✔ Sin estado malo, nada: contra Bizzante (copia) el bono da 0. Visto y arreglado en la prueba: el Sobrepeso de Bizzante (un estado que arma la
   ficha sola) contaba como estado malo → ya no cuenta.
 
+
+### 2026-11-07 · 👢 Evasión contra oportunidad (Botas de mensajero; con clics en «Encuentro 2», GM y J1)
+
+Ya estaba automatizada (`Combatiente.evaExtraDuelo`, para creeps, personajes e invocaciones: el stat `evaopor`, el mismo de las Calzas de escapista,
+las Botas de repartidor, la Chaqueta del corredor, la Capa del torero…). Respaldo antes y partida restaurada después.
+- ✔ **Ataque de oportunidad**: el Goblin rompehuesos con las Botas de mensajero se aleja de Rockardo (copia) → «¿Ataque de oportunidad?» → Sí → en el
+  cuadro del duelo, la defensa del goblin ofrece «Evasión 🎲 1d8 (con +2 contra oportunidad)» (su Evasión es 6) y la tirada sale «EVASIÓN (+2 CONTRA
+  OPORTUNIDAD) 1d8 → 3». Capturas `p17-gm-opor-1/2`.
+- ✔ **Ataque normal**: Rockardo (J1) ataca al mismo goblin con «Atacar (PdG)» → la Evasión ofrece «1d6», sin el +2. Captura `p17-gm-normal-1`.
+- Pruebas automáticas nuevas: L1 Sangrador nv5 y L2 Envenenador nv2 (Calzas de escapista): +2 solo contra la oportunidad, 0 en ataque normal y contraataque.

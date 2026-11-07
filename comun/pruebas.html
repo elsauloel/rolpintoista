@@ -124,7 +124,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261107guardia"></script>
 <script src="skills-creep-base.js?v=20261107carancho5"></script>
-<script src="creeps-esenciales.js?v=20261107l13"></script>
+<script src="creeps-esenciales.js?v=20261107l22"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
@@ -6878,7 +6878,7 @@ prueba('⭐ Pool esencial, niveles 2 a 5 (2026-11-06): W1 Hachero 2–5 y T1 Esc
     w4.pasivas.map(p => p.nombre).join(), C.statValor(w4, 'dmg'), w4.hpMax,
     C.defensaEfectiva(t3), C.statValor(t3, 'bloqueo'), t3.pasivas.map(p => p.nombre).join(), t3.habilidades.find(h => h.nombre === 'Golpe demoledor') === undefined,
     d('Hachero', 3).habilidades.find(h => h.nombre === 'Golpe demoledor').cdActual],
-    [0, 'M12,M13,M14,M15,L12,L13,L14,S12,S13,S14,S15,D12,D13,D14,D15,R12,R13,R14,R15,H12,H13,H14,W12,W13,W14,W15,T12,T13,T14,T15', 65, 11, 9, 14, 12, 0, 'Pegar fuerte,Romper armadura,Barrido,Golpe demoledor,Arte de la guerra,Remate',
+    [0, 'M12,M13,M14,M15,L12,L13,L14,L15,S12,S13,S14,S15,D12,D13,D14,D15,R12,R13,R14,R15,H12,H13,H14,L22,W12,W13,W14,W15,T12,T13,T14,T15', 65, 11, 9, 14, 12, 0, 'Pegar fuerte,Romper armadura,Barrido,Golpe demoledor,Arte de la guerra,Remate',
       'Golpe fuerte,Piel curtida', 13, 55, 8, 10, 'Guardia firme', true, 3]);
   const t4 = d('Escudero', 4);   // (aprobado 2026-11-06)
   igual([t4.hpMax, C.defensaEfectiva(t4), C.statValor(t4, 'bloqueo'), C.statValor(t4, 'rescc'), t4.pasivas.map(p => p.nombre).join(), t4.habilidades.map(h => h.nombre).join()],
@@ -6903,6 +6903,20 @@ prueba('🦅 Ojo de carancho (2026-11-07): +1 al PdG o al PdG.Esp contra un riva
     CreepCalculo.modTotal(l4, 'ojocarancho'), l4.pasivas.map(p => p.nombre).join(), FichaCalculo.STAT_LABEL.ojocarancho],
     [true, 1, 'true,true,true,true', 'false,false,false,false,false', 1, 'Ojo crítico,Ojo de carancho', 'Ojo de carancho']);
   igual([l4.hpMax, CreepCalculo.defensaEfectiva(l4), CreepCalculo.statValor(l4, 'pdg'), CreepCalculo.statValor(l4, 'eva'), CreepCalculo.critEfectivo(l4, 0), l4.habilidades.length], [40, 1, 11, 16, 1, 5]);
+});
+prueba('🩸 L1 Sangrador nivel 5 (2026-11-07): Corte en la arteria y las Botas de mensajero (+2 a la Evasión solo contra el ataque de oportunidad)', () => {
+  const C = CreepCalculo, l5 = CREEPS_BASE.find(c => c.pool === 'esencial' && c.nombre === 'Sangrador' && c.nivel === 5).datos;
+  const ee = tipo => Combatiente.evaExtraDuelo({ataque: {tipo}}, st => C.modTotal(l5, st));
+  igual([l5.hpMax, C.nitrosMax(l5), C.defensaEfectiva(l5), C.armadmgEfectiva(l5), C.statValor(l5, 'pdg'), C.statValor(l5, 'eva'), C.statValor(l5, 'ini'),
+    l5.habilidades.map(h => h.nombre).pop(), l5.equipo.length, ee('oportunidad').val, ee('oportunidad').txt, ee('normal').val, ee('contra').val],
+    [40, 14, 2, 4, 13, 16, 16, 'Corte en la arteria', 6, 2, '+2 contra oportunidad', 0, 0]);
+});
+prueba('🧪 L2 Envenenador nivel 2 (2026-11-07): Tajo veloz, Escurridizo y las Calzas de escapista (+2 a la Evasión solo contra el ataque de oportunidad)', () => {
+  const C = CreepCalculo, l2 = CREEPS_BASE.find(c => c.pool === 'esencial' && c.nombre === 'Envenenador' && c.nivel === 2).datos;
+  const ee = tipo => Combatiente.evaExtraDuelo({ataque: {tipo}}, st => C.modTotal(l2, st));
+  igual([l2.equipo.length, l2.habilidades.map(h => h.nombre).join(), l2.pasivas.map(p => p.nombre).join(), (l2.cinturon || []).map(c => c.nombre).join(),
+    ee('oportunidad').val, ee('normal').val, ee('contra').val],
+    [5, 'Estocada,Hoja envenenada,Tajo veloz', 'Escurridizo', 'Óleo venenoso', 2, 0, 0]);
 });
 prueba('⭐ Pool esencial, la tanda del 2026-11-05: los 7 nuevos de nivel 1 (L6, T4, W4, R4, H4, L7, L8) se arman completos y con turnos de espera; Patotear +1 PdG y sin tope', () => {
   const es = CREEPS_BASE.filter(c => c.pool === 'esencial');

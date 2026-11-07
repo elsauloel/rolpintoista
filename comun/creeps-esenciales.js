@@ -233,6 +233,11 @@
     equipo: ['Sable del tahúr', 'Facón de paisano', 'Chaleco de cuero', 'Botas de cuero de vaca'],
     habilidades: ['Golpe desesperado', 'Furia'], consumibles: ['Poción de Regeneración menor'],
     estrategia: 'Warrior. Cuanto más herido, más peligroso: sable y facón, busca el crítico y no se cuida.'});
+  const W2 = {linea: 'W2', nombre: 'Berserker', rol: 'warrior', rolTxt: 'melee', consumibles: ['Poción de Regeneración menor'],
+    estrategia: 'Warrior. Cuanto más herido, más peligroso: sable y facón, busca el crítico y no se cuida.'};
+  esencial({...W2, nivel: 2, atrib: [10, 9, 6, 9, 2],   // (aprobado 2026-11-07: Pegar fuerte; pasiva Robustez, que compensa el −5 de vida del Anillo maldito del berserker; + Casco de cuero endurecido y el anillo)
+    equipo: ['Sable del tahúr', 'Facón de paisano', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Anillo maldito del berserker'],
+    habilidades: ['Golpe desesperado', 'Furia', 'Pegar fuerte'], pasivas: ['Robustez']});
   esencial({linea: 'L2', nombre: 'Envenenador', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [7, 5, 9, 10, 2],
     equipo: ['Daga ritual', 'Chaleco de cuero', 'Guantes de agarre'],
     habilidades: ['Estocada', 'Hoja envenenada'], consumibles: ['Óleo venenoso'],
@@ -249,6 +254,9 @@
   esencial({...L2, nivel: 4, atrib: [9, 7, 11, 13, 2],   // (aprobado 2026-11-07: Hit and run, Pies ligeros; Fue queda en 7 y sube Agi; Chaqueta del corredor; Perneras de cuero hervido en lugar de las Calzas de escapista)
     equipo: ['Daga de la viuda verde', 'Chaqueta del corredor', 'Guantes de agarre', 'Zuecos de boticario', 'Perneras de cuero hervido'],
     habilidades: ['Estocada', 'Hoja envenenada', 'Tajo veloz', 'Golpe a la rodilla', 'Hit and run'], pasivas: ['Escurridizo', 'Pies ligeros']});
+  esencial({...L2, nivel: 5, atrib: [10, 7, 12, 14, 2],   // (aprobado 2026-11-07: Ráfaga de cortes + Anillo del pantano; fuerte a propósito, dueño: «así probamos cómo balancear algo que se puede llegar a romper por balance»; el Veneno se suma entero: una Ráfaga deja 12 stacks ≈ 78 de daño en el tiempo)
+    equipo: ['Daga de la viuda verde', 'Chaqueta del corredor', 'Guantes de agarre', 'Zuecos de boticario', 'Perneras de cuero hervido', 'Anillo del pantano'],
+    habilidades: ['Estocada', 'Hoja envenenada', 'Tajo veloz', 'Golpe a la rodilla', 'Hit and run', 'Ráfaga de cortes'], pasivas: ['Escurridizo', 'Pies ligeros']});
   esencial({linea: 'L3', nombre: 'Asesino de las sombras', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [6, 5, 9, 11, 2],
     equipo: ['Punzón de hielo', 'Chaleco de cuero', 'Botas de suela de goma'],
     habilidades: ['Ojo de asesino', 'Bomba de humo'], consumibles: ['Pergamino grupal de Paso Fantasma'],

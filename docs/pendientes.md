@@ -77,6 +77,12 @@
 > (los auditados del pool), decidir cuáles tienen versión bestia y con qué nombre/sabor (mordida, zarpa, cornada…), poner al día las gemelas viejas y
 > crear las que falten. Después de la ronda de niveles 2 a 5 de los creeps esenciales.
 
+> **☠ Balance del veneno acumulable (Envenenador nv5) (2026-11-07, abierto; dueño: «dejá el nivel 5 así potente, así probamos cómo balancear algo
+> que se puede llegar a romper por balance»).** El Veneno se suma entero y dura tantos turnos como stacks (1 de daño por stack, baja uno por turno:
+> N stacks ≈ N·(N+1)/2 de daño). El L2 Envenenador nv5 (Daga de la viuda verde, Veneno 3 siempre + Anillo del pantano, +1 stack por veneno) deja 12
+> stacks con una Ráfaga de cortes (≈ 78 de daño en el tiempo) y 8 con la Hoja envenenada (≈ 36), encima de lo que ya tuviera. Ideas a evaluar: tope de
+> stacks, que el veneno nuevo no sume sino que renueve, que la Ráfaga aplique el veneno una sola vez, o subirle el costo. Probarlo en una pelea.
+
 > **🔥 Cómo costear el daño mágico de los creeps (2026-11-06, abierto; dueño: «no me termina de cerrar… me haría rediseñar todas las armas
 > mágicas y las skills mágicas; quizás le pondría un valor fijo»).** Hallazgo: con el Piromante nv3 (Esp 16, Ef.Esp 17) la Lengua de fuego hace ≈ 13
 > por 16 SP y la Bola de fuego ≈ 13 a cada uno por 16 SP, mientras el Mago jugador hace con 16 SP un Rayo mágico ≈ 34½ directo, y con 4 SP un Orbe

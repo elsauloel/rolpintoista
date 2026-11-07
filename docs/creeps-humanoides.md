@@ -208,7 +208,7 @@ estuvimos trabajando para los skills». 4 de cada uno, como el resto, salvo que 
 | Línea | Estilo | Skills candidatas (del catálogo auditado) |
 |---|---|---|
 | W1 | Hachero: romper la armadura y castigarla | Romper armadura, Golpe fuerte, Golpe demoledor, Remate, Barrido |
-| W2 | Berserker: cuanto más herido, más peligroso | Furia, Golpe desesperado, Aguante, Golpe fuerte |
+| W2 | Berserker: cuanto más herido, más peligroso | Furia, Golpe desesperado, Aguante, Pegar fuerte |
 | W3 | Martillero: golpes que atontan y derriban | Puño de roca, Pisotón, Salto aplastante, Golpe fuerte |
 | W4 | Verdugo: el golpe anunciado y el remate | El que avisa no traiciona, Remate, Golpe demoledor, Furia |
 | T1 | Escudero: escudo, aguantar y desarmar | Aguante, Desarmar, Pisotón |
@@ -393,14 +393,14 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
 - **L2 · Envenenador · Choque liviano** (boceto y nivel 1 aprobados 2026-11-03, dueño: «me cierra como concepto… algunas cuestiones se superponen,
   lo vamos a ajustar nivel por nivel»; «va así»). Estrategia: cuerpo a cuerpo con una daga untada, acumula veneno, pega y se aleja. Atributos
   (Des/Agi/Con/Fue/Esp → vida, No2): **nv1 10/9/7/5/2 → 35, 9** · nv2 11/9/8/6/2 → 40, 9 · nv3 12/10/8/7/2 → 40, 10 · nv4 13/10/9/8/2 → 45, 10 ·
-  nv5 por definir (dueño, 2026-11-07: prefiere subir Agilidad en vez de Fuerza; el nv4 quedó Des 13 · Agi 11 · Con 9 · Fue 7).
+  nv4 13/11/9/7/2 → 45, 11 · nv5 14/12/10/7/2 → 50, 12 (dueño, 2026-11-07: sube Agilidad en vez de Fuerza).
   | Nivel | Habilidad nueva | Pasiva | Equipo |
   |---|---|---|---|
   | 1 | **Estocada** (rápida: Perfora 2, +1 daño) · **Hoja envenenada** (lenta: Perfora 2, Veneno 3) | — | **Daga ritual** (Tipo 4, Veneno 2 siempre, Perfora 1; 1d4 + 5) · Chaleco de cuero · Guantes de agarre (Def 2, PdG +1) |
   | 2 | **Tajo veloz** | **Escurridizo** (dueño, 2026-11-07: en lugar de Perforante, que se pisaba con la Estocada) | + Zuecos de boticario · Calzas de escapista |
   | 3 | **Golpe a la rodilla** | — | la daga: **Daga de la viuda verde** (Buena, Veneno 3 siempre) |
   | 4 | **Hit and run** | **Pies ligeros** | + **Chaqueta del corredor** (Buena) |
-  | 5 | **Ráfaga de cortes** (efectos del arma ×3) | — | + una tercera Buena |
+  | 5 | **Ráfaga de cortes** (efectos del arma ×3) | — | + **Anillo del pantano** (Buena) |
   Consumible: Óleo venenoso. Ojo: Larry es inmune al veneno.
   **nv2 aprobado y cargado (2026-11-07):** Des 11 · Agi 9 · Con 8 · Fue 6 · Esp 2. Equipo: Daga ritual · Chaleco de cuero · Guantes de agarre ·
   **Zuecos de boticario** · **Calzas de escapista** (Evasión +2 solo contra el ataque de oportunidad, automatizado: el mismo stat que las Botas de
@@ -427,7 +427,7 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | Nivel | Habilidad nueva | Pasiva | Equipo |
   |---|---|---|---|
   | 1 | **Golpe desesperado** (cd 2) · **Furia** (cd 3) | — | **Sable del tahúr** (Crítico frecuente +1) + **Facón de paisano** (Sangrado 25 %) · Chaleco de cuero · Botas de cuero de vaca |
-  | 2 | **Golpe fuerte** | **Robustez** (+5 de vida) | + 2 Comunes |
+  | 2 | **Pegar fuerte** (la habilidad que antes se llamaba «Golpe fuerte») | **Robustez** (+5 de vida) | + 2 Comunes |
   | 3 | **Aguante** | — | el sable: **Espada del Jefe de los Mil Caminos** (Buena: Crítico potente +3, Sangrado 33 %) + el Facón |
   | 4 | **Golpe brutal** | **Voluntad de hierro** | + una pieza Buena |
   | 5 | **Barrido** | — | el facón: **Espada larga** (Buena: PdG +1, Crítico potente +2) |
@@ -438,6 +438,10 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   Crítico frecuente +1) + **Facón de paisano, que pasa a Tipo 4** en el catálogo (1d4 + 8; y Sangrado 50 %, 55 de oro, dueño 2026-11-03) · Chaleco de cuero · Botas de cuero de
   vaca: Def 3, Def.Esp 0. Golpe desesperado (cd 2, con el sable) y Furia (cd 3, 2 No2). Consumible: Poción de Regeneración menor. Espada y facón
   (6 + 4) del nivel 1 al 4: con las dos gasta 5 y le sobra 1; dos espadas (6 + 6) en el 5, con 8 No2. Sin cargar hasta que el dueño diga.
+  **nv2 aprobado y cargado (2026-11-07):** Fue 9 · Con 10 · Agi 6 · Des 9 · Esp 2. Equipo: Sable del tahúr + Facón de paisano · Chaleco de cuero ·
+  Botas de cuero de vaca · + **Casco de cuero endurecido** · + **Anillo maldito del berserker** (Daño +2 · Vida −5). Habilidades: Golpe desesperado ·
+  Furia · + **Pegar fuerte**. Pasiva: **Robustez** (+5 de vida). Consumible: Poción de Regeneración menor. Vida **50** (no 55 como decía el plan:
+  la Robustez compensa el −5 del Anillo maldito) · No2 6 · Def 4 · PdG 9 · Daño 11.
 
 - **D3 · Ladrón de fuerzas · Debuffer** (boceto aprobado 2026-11-03, dueño: «lo apruebo así»). Estrategia: le saca al rival lo que necesita para
   pelear (los No2, la puntería, las curas, las bendiciones) y se queda con parte; elige al que más hace y lo deja sin aire. Atributos
@@ -925,6 +929,16 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
   Chaqueta del corredor ya da Evasión +2 contra oportunidad). Habilidades: + **Hit and run**. Pasivas: Escurridizo · + **Pies ligeros** (Eva +1).
   Consumible: Óleo venenoso. Vida 45 · No2 11 · Def 2 · Def. esp. 2 · PdG 14 · Daño 7 · Eva 14 · Ini 11 · Mov 11.
 
+### L2 Envenenador · nivel 5 (aprobado 2026-11-07, cargado) — ✅ línea L2 completa · ⚠ fuerte a propósito
+- Des 14 · Agi 12 · Con 10 · Fue 7 · Esp 2 → vida 50, No2 12. Equipo: Daga de la viuda verde · Chaqueta del corredor · Guantes de agarre ·
+  Zuecos de boticario · Perneras de cuero hervido · + **Anillo del pantano** (B: cada Veneno que pone entra con 1 stack más). Habilidades: + **Ráfaga
+  de cortes** (los efectos del arma ×3). Pasivas: Escurridizo · Pies ligeros. Consumible: Óleo venenoso. PdG 15 · Daño 7 · Eva 15 (17 contra
+  oportunidad) · Ini 12 · Mov 12.
+- **El Veneno se suma entero** (probado en el mapa 2026-11-07) y dura tantos turnos como stacks, perdiendo uno por turno: con el anillo, un golpe
+  común deja 4 (≈ 10 de daño en el tiempo), la Hoja envenenada 8 (≈ 36) y **una Ráfaga de cortes 12 (≈ 78)**, encima de lo que ya tuviera.
+  **Queda así a propósito** (dueño, 2026-11-07: «así probamos cómo balancear algo que se puede llegar a romper por balance»): a estudiar en la ronda de
+  balance (`pendientes.md`).
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4
@@ -989,12 +1003,12 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | T2 | ✅ (2026-11-02; rehecho 2026-11-03) | | | | |
 | H1 | ✅ (2026-11-03) | | | | |
 | L1 | ✅ (2026-11-02) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |
-| L2 | ✅ (2026-11-03) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) | |
+| L2 | ✅ (2026-11-03) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |
 | R1 | ✅ (2026-11-03) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |
 | M1 | ✅ (2026-11-02) | ✅ (2026-11-06) | ✅ (2026-11-06) | ✅ (2026-11-06) | ✅ (2026-11-06) |
 | S1 | ✅ (2026-11-02) | ✅ (2026-11-06) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |
 | D1 | ✅ (2026-11-02) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |
-| W2 | ✅ (2026-11-03) | | | | |
+| W2 | ✅ (2026-11-03) | ✅ (2026-11-07) | | | |
 | H2 | ✅ (2026-11-03) | | | | |
 | L3 | ✅ (2026-11-03) | | | | |
 | L4 | ✅ (2026-11-03) | | | | |

@@ -1841,3 +1841,16 @@ Para el Berserker nivel 4 (W2), que lleva la pasiva **Regeneración** (3 de vida
 dejó en 20/35; el GM tocó «▶ Siguiente» (de Rockardo (copia) al Arquero) → el aviso «Empieza el turno de Arquero del culto: fuego · Pasivas: +3 HP» y
 la vida quedó en **23/35**. Ya estaba programado (`comun/creep-acciones.js`, `regenPasivas`); no hubo que cambiar código. Prueba automática nueva con el
 Berserker nv4 del pool (40 → 43). Captura `p21-03-siguiente`.
+
+## ✅ Los bonos de cada arma, con esa arma (2026-11-07, Claude, «Claude · pruebas», mapa «Encuentro 2», con clics: GM y J1; todo restaurado, 0 diferencias)
+
+Regla del dueño (`docs/guia-de-diseno.md`, «Los bonos de cada arma, con esa arma»). Al Goblin rompehuesos se le pusieron el **Sable de caballería**
+(PdG +1, Parry +1) y la **Hoz de cosecha** (Iniciativa +2, PdG en contraataque +1); a Larry (copia), de J1, las mismas dos.
+- **Creep, Acciones**: «Atacar con Sable de caballería · 1d8+1» y «Atacar con Hoz de cosecha · 1d8» (el +1 solo con el sable); la Iniciativa, 8 con
+  cualquiera de las dos en la mano (la +2 de la hoz cuenta siempre).
+- **Creep, la A**: «¿Con qué arma?» con las dos; con el sable el duelo dice «Pagar y tirar PdG · 1d8+1», con la hoz «· 1d8».
+- **Creep atajando** (Larry le pega al goblin): el GM ve **🗡 Parry · Sable de caballería 1d8+1** y **🗡 Parry · Hoz de cosecha 1d8** (las dos como
+  arma, ya no la segunda como escudo); eligió el sable y la tirada salió «1d8+1 → 2 + 1», y el Bloqueo «· Sable de caballería».
+- **Personaje (J1)**: la A pregunta «¿Con qué arma?»; con el sable «Pagar y tirar PdG · 1d6», con la hoz «· 1d4+1» (el +1 solo con el sable).
+- Las invocaciones con dos armas quedaron con prueba automática (no había ninguna invocación armada en la partida para probarla con clics).
+Capturas `p22-01` a `p22-10`.

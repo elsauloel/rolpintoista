@@ -246,6 +246,9 @@
   esencial({...L2, nivel: 3, atrib: [8, 7, 10, 12, 2],   // (aprobado 2026-11-07: Golpe a la rodilla; la daga pasa a la Daga de la viuda verde, Veneno 3 siempre, sin Perfora)
     equipo: ['Daga de la viuda verde', 'Chaleco de cuero', 'Guantes de agarre', 'Zuecos de boticario', 'Calzas de escapista'],
     habilidades: ['Estocada', 'Hoja envenenada', 'Tajo veloz', 'Golpe a la rodilla'], pasivas: ['Escurridizo']});
+  esencial({...L2, nivel: 4, atrib: [9, 7, 11, 13, 2],   // (aprobado 2026-11-07: Hit and run, Pies ligeros; Fue queda en 7 y sube Agi; Chaqueta del corredor; Perneras de cuero hervido en lugar de las Calzas de escapista)
+    equipo: ['Daga de la viuda verde', 'Chaqueta del corredor', 'Guantes de agarre', 'Zuecos de boticario', 'Perneras de cuero hervido'],
+    habilidades: ['Estocada', 'Hoja envenenada', 'Tajo veloz', 'Golpe a la rodilla', 'Hit and run'], pasivas: ['Escurridizo', 'Pies ligeros']});
   esencial({linea: 'L3', nombre: 'Asesino de las sombras', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [6, 5, 9, 11, 2],
     equipo: ['Punzón de hielo', 'Chaleco de cuero', 'Botas de suela de goma'],
     habilidades: ['Ojo de asesino', 'Bomba de humo'], consumibles: ['Pergamino grupal de Paso Fantasma'],

@@ -393,7 +393,7 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
 - **L2 · Envenenador · Choque liviano** (boceto y nivel 1 aprobados 2026-11-03, dueño: «me cierra como concepto… algunas cuestiones se superponen,
   lo vamos a ajustar nivel por nivel»; «va así»). Estrategia: cuerpo a cuerpo con una daga untada, acumula veneno, pega y se aleja. Atributos
   (Des/Agi/Con/Fue/Esp → vida, No2): **nv1 10/9/7/5/2 → 35, 9** · nv2 11/9/8/6/2 → 40, 9 · nv3 12/10/8/7/2 → 40, 10 · nv4 13/10/9/8/2 → 45, 10 ·
-  nv5 14/11/10/8/2 → 50, 11.
+  nv5 por definir (dueño, 2026-11-07: prefiere subir Agilidad en vez de Fuerza; el nv4 quedó Des 13 · Agi 11 · Con 9 · Fue 7).
   | Nivel | Habilidad nueva | Pasiva | Equipo |
   |---|---|---|---|
   | 1 | **Estocada** (rápida: Perfora 2, +1 daño) · **Hoja envenenada** (lenta: Perfora 2, Veneno 3) | — | **Daga ritual** (Tipo 4, Veneno 2 siempre, Perfora 1; 1d4 + 5) · Chaleco de cuero · Guantes de agarre (Def 2, PdG +1) |
@@ -919,6 +919,12 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
   Def 3 · Eva 10 (12 contra oportunidad) · Ini 10 · Mov 10. Ojo: sin la Perfora 1 de la daga ritual, contra mucha Defensa el veneno de la daga a
   veces no entra (el dueño lo acepta).
 
+### L2 Envenenador · nivel 4 (aprobado 2026-11-07, cargado)
+- Des 13 · Agi 11 · Con 9 · Fue 7 · Esp 2 → vida 45, No2 11 (dueño: la Fuerza queda en 7 y sube la Agilidad). Equipo: Daga de la viuda verde ·
+  **Chaqueta del corredor** (B) · Guantes de agarre · Zuecos de boticario · **Perneras de cuero hervido** (en lugar de las Calzas de escapista: la
+  Chaqueta del corredor ya da Evasión +2 contra oportunidad). Habilidades: + **Hit and run**. Pasivas: Escurridizo · + **Pies ligeros** (Eva +1).
+  Consumible: Óleo venenoso. Vida 45 · No2 11 · Def 2 · Def. esp. 2 · PdG 14 · Daño 7 · Eva 14 · Ini 11 · Mov 11.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4
@@ -983,7 +989,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | T2 | ✅ (2026-11-02; rehecho 2026-11-03) | | | | |
 | H1 | ✅ (2026-11-03) | | | | |
 | L1 | ✅ (2026-11-02) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |
-| L2 | ✅ (2026-11-03) | ✅ (2026-11-07) | ✅ (2026-11-07) | | |
+| L2 | ✅ (2026-11-03) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) | |
 | R1 | ✅ (2026-11-03) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |
 | M1 | ✅ (2026-11-02) | ✅ (2026-11-06) | ✅ (2026-11-06) | ✅ (2026-11-06) | ✅ (2026-11-06) |
 | S1 | ✅ (2026-11-02) | ✅ (2026-11-06) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |

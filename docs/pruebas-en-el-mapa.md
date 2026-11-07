@@ -1834,3 +1834,10 @@ después (también se borró `mapa/mantenimiento`, que dejó el cambio de ronda,
 - Ojo para las próximas pruebas: un servidor de pruebas de una tanda anterior (`/tmp/pw/p19`) seguía abierto con GM, J1 y J2 en la misma partida y con
   el código de antes; también tomaba pedidos de aplicar (por eso en una pasada salió ×3, ×4, ×3). Se cerró. Antes de probar, revisar que no quede
   ninguno corriendo.
+
+## ✅ Regeneración de una pasiva en un creep (2026-11-07, Claude, «Claude · pruebas», mapa «Encuentro 2», con clics; todo restaurado, 0 diferencias)
+
+Para el Berserker nivel 4 (W2), que lleva la pasiva **Regeneración** (3 de vida por turno). Al Arquero del culto: fuego se le sumó la pasiva y se lo
+dejó en 20/35; el GM tocó «▶ Siguiente» (de Rockardo (copia) al Arquero) → el aviso «Empieza el turno de Arquero del culto: fuego · Pasivas: +3 HP» y
+la vida quedó en **23/35**. Ya estaba programado (`comun/creep-acciones.js`, `regenPasivas`); no hubo que cambiar código. Prueba automática nueva con el
+Berserker nv4 del pool (40 → 43). Captura `p21-03-siguiente`.

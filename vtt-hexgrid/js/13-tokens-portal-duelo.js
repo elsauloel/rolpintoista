@@ -2947,7 +2947,8 @@ async function dueloAplicarEfectoBase(d, ef){
   if(spec.cura){
     try{
       // 💚 Manos de curandero (2026-11-06): quien cura (el que usó la habilidad o el arma) suma lo de su pasiva a cada cura.
-      const mas = curaMasDe(d.atacante && d.atacante.tokenId ? tokens.get(d.atacante.tokenId) : null, dueloEsArea(d)), cura = Math.round(num(spec.cura)) + mas;
+      // 🧪 (2026-11-07) Con lo que calculó la pantalla de quien cura (`ef.curaExtra`, comun/duelo.js): la de quien recibe no lee un creep.
+      const mas = ef && ef.curaExtra !== undefined ? Math.max(0, num(ef.curaExtra)) : curaMasDe(d.atacante && d.atacante.tokenId ? tokens.get(d.atacante.tokenId) : null, dueloEsArea(d)), cura = Math.round(num(spec.cura)) + mas;
       const r = await dueloCurar(t, cura);
       dueloCuraMomento(d, t, cura, r, mas);
       return {nota: r.caido ? Combatiente.CAIDO_TXT : r.robada ? r.robada : r.sinCura ? Combatiente.SIN_CURA_TXT : `+${cura} HP${mas ? ` (${fmt(spec.cura)} + ${fmt(mas)} de Manos de curandero)` : ''} (${fmt(r.previo)} → ${fmt(r.nuevo)})`};
@@ -2956,11 +2957,14 @@ async function dueloAplicarEfectoBase(d, ef){
   }
   // 💚 Manos de curandero (2026-11-06): una cura por turno que da (Regeneración del Bálsamo…) cura lo de área (+2) más en cada turno.
   if(num(spec.hpTurno) > 0 || num(spec.hp) > 0){
-    const masT = curaMasDe(d.atacante && d.atacante.tokenId ? tokens.get(d.atacante.tokenId) : null, true);
+    const masT = ef && ef.curaExtra !== undefined ? Math.max(0, num(ef.curaExtra)) : curaMasDe(d.atacante && d.atacante.tokenId ? tokens.get(d.atacante.tokenId) : null, true);
     if(masT > 0){ if(spec.hpTurno !== undefined) spec.hpTurno = num(spec.hpTurno) + masT; else spec.hp = num(spec.hp) + masT; }
   }
   // Guantes del envenenador (2026-10-05): los venenos que pone quien atacó llevan esos stacks de más (un turno más y 1 de daño más por turno).
-  const vn = /veneno/i.test(String(spec.nombre || '')) ? venenistaDe(d.atacante) : 0;
+  // 🧪 (2026-11-07, el Envenenador contra un personaje en manos de su jugador): si el pedido trae los stacks de más que calculó la pantalla de
+  // quien atacó (`ef.stacksExtra`, comun/duelo.js), van esos — la pantalla del jugador que defiende puede aplicar el efecto y no lee el equipo
+  // privado de un creep (le daba 0: llegaba Veneno ×3 en vez de ×4). Sin el dato (un pedido viejo), se calcula acá como antes.
+  const vn = /veneno/i.test(String(spec.nombre || '')) ? (ef && ef.stacksExtra !== undefined ? Math.max(0, Math.round(num(ef.stacksExtra))) : venenistaDe(d.atacante)) : 0;
   if(vn > 0){
     const base = Math.max(1, num(spec.stacks) || num(((EstadosAplicar.DEBUFFS || []).find(x => x.nombre === spec.nombre) || {}).stacks) || 1);
     spec.stacks = base + vn;

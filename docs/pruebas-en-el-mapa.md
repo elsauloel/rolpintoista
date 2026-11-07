@@ -1807,3 +1807,30 @@ las Botas de repartidor, la Chaqueta del corredor, la Capa del torero…). Respa
 - ✔ **Juego real, defiende J1**: el goblin le pega a Larry (copia) (de J1, no controlado por el GM): J1 ve los botones de Evasión, defiende y toca él
   «💔 Aplicar el daño» → la vida baja en la ficha (35 → 0, crítico). El veneno no entra: Larry es inmune a lo tóxico.
 - Partida respaldada antes y restaurada después; «Encuentro 2» ya no figura como mapa activo.
+
+### 2026-11-07 · ☠ El Envenenador contra un personaje en manos de su jugador, con crítico forzado (con clics: GM, J1 y J2 en «Encuentro 2»)
+Pedido del dueño: «pasale el control de Rockardo a jugador 1… y forzá las tiradas para que le entre un crítico». Respaldo antes y partida restaurada
+después (también se borró `mapa/mantenimiento`, que dejó el cambio de ronda, y «Encuentro 2» ya no figura como mapa activo).
+- Preparación: el GM le **devolvió el control** de Rockardo (copia) a su jugador (👓 → «↩ Devolver el control», el botón de siempre) y el Goblin
+  rompehuesos pasó a tener todo el L2 Envenenador nv5 (Daga de la viuda verde, Anillo del pantano, sus seis habilidades; PdG 15, Daño 7).
+- ✔ **Golpe común con crítico** (PdG forzado a 30 con ✍ Elegir manualmente): J1 ve los botones de Evasión y se defiende desde su pantalla; ¡Crítico ×3!
+  → el cuadro dice en las dos pantallas «Crítico: no se resta la Defensa» (Rockardo tiene Defensa 15) → 8 × 3 = **24 a la vida** (40 → 16). J1 toca él
+  «💔 Aplicar el daño» y la ficha baja. Capturas `p20-4-dano-gm/j1`.
+- 🐞 **Error encontrado y arreglado: llegaba Veneno ×3 en vez de ×4.** El botón decía «Aplicar Veneno ×4 (3 + 1 del envenenador)», pero el pedido
+  de aplicar lo toma la pantalla del GM **o la del que defiende** (`esMio(d.defensor)`, comun/duelo.js), y con Rockardo en manos de J1 lo tomaba la
+  de J1, que no puede leer el equipo privado de un creep: el +1 del Anillo del pantano le daba 0. (Con Rockardo en manos del GM, la prueba anterior,
+  no pasaba.) Arreglo: lo que suma quien lo usa (los stacks de veneno de más; también la cura de más de Manos de curandero, por el mismo camino) se
+  calcula en la pantalla de quien lo usa al tocar «Aplicar» y viaja con el pedido (`stacksExtra` / `curaExtra` del efecto); quien lo aplique usa
+  esos números (vtt-hexgrid/js/13 `dueloAplicarEfectoBase`). Después del arreglo: **Veneno ×4** en la ficha. Captura `p20-5-veneno-j1`.
+- ✔ El Veneno pega **apenas entra** (la regla de `dispararAlAplicar`): 16 → 12.
+- ✔ **Al empezar su turno** (▶ Siguiente toda la ronda; los «Empieza tu turno» de los personajes del GM los acepta el GM): a J1 le aparece su
+  «▶ Empieza tu turno» con «Veneno: 4 → 3 turnos · Veneno: −3 HP (3 stacks) · Regeneración (pasiva): +3 HP»; J1 toca Aplicar → queda en 12 con
+  Veneno 3, y la Mesa lo publica. Captura `p20-7-empieza-turno-j1`.
+- ✔ **Ráfaga de cortes con crítico** (40 de vida): ×3, 14 × 3 = 42 → 0. El **ítem de emergencia** lo levanta a 10 con **Invulnerable** 1 turno, y los
+  tres Veneno ×4 que manda el GM después no entran: J1 ve «Inmune ahora mismo (Invulnerable) — Veneno no te afectó». (Los efectos se aplican después
+  del daño: antes de «Aplicar el daño» el duelo todavía no está en la fase de efectos.) Capturas `p20-14/15/16-*`.
+- ✔ **Ráfaga de cortes con crítico ×2** (26 → 14): los tres cortes llegan como **Veneno ×4** cada uno → la ficha de Rockardo queda con **Veneno 12**
+  (4 → 8 → 12; el primero pega 4 al entrar: 14 → 10). J1 ve «recibiste Veneno (×12)». Capturas `p20-17-rafaga3-gm/j1`.
+- Ojo para las próximas pruebas: un servidor de pruebas de una tanda anterior (`/tmp/pw/p19`) seguía abierto con GM, J1 y J2 en la misma partida y con
+  el código de antes; también tomaba pedidos de aplicar (por eso en una pasada salió ×3, ×4, ×3). Se cerró. Antes de probar, revisar que no quede
+  ninguno corriendo.

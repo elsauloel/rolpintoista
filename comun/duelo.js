@@ -3252,9 +3252,18 @@ const Duelo = (() => {
       let extra = {};
       if(cfgEscuchar.antesDeAplicar) try{ extra = await cfgEscuchar.antesDeAplicar(d, (d.efectos || [])[i]); }catch(err){ console.error(err); extra = {}; }
       if(extra === null){ b.disabled = false; return; }
+      // 🧪 Lo que suma quien lo usa (los stacks de veneno de más del Anillo del pantano o los Guantes del envenenador; la cura de más de Manos de
+      // curandero) se calcula ACÁ, en la pantalla de quien lo usa, y viaja con el pedido (2026-11-07, prueba del Envenenador contra Rockardo en
+      // manos de J1: el efecto lo aplicó la pantalla del jugador que defendía, que no puede leer el equipo privado de un creep, y llegó Veneno ×3
+      // en vez de ×4). Quien lo aplique usa estos números; sin ellos (un pedido viejo), los calcula él como antes.
+      const ef0 = (d.efectos || [])[i], sp0 = ef0 ? specDeEfecto(ef0) : null, congelado = {};
+      if(sp0){
+        try{ if(cfgEscuchar.stacksExtra && /veneno/i.test(String(sp0.nombre || ''))) congelado.stacksExtra = Math.max(0, Math.round(_num(cfgEscuchar.stacksExtra(d, sp0)))); }catch(err){}
+        try{ if(cfgEscuchar.curaExtra && (sp0.cura || _num(sp0.hp) > 0 || _num(sp0.hpTurno) > 0)) congelado.curaExtra = Math.max(0, Math.round(_num(cfgEscuchar.curaExtra(d, sp0)))); }catch(err){}
+      }
       // Desde la segunda tanda de pruebas (2026-11-05) todo efecto se pide como 'pedido-lados': lo de los demás lo toma la pantalla que ve a los
       // dos (no una pestaña vieja en otro mapa, que solo conoce 'pedido' y lo dejaba «el token ya no está»: pasó con la Mufa).
-      marcarEfecto(d.id, i, {...(extra || {}), aplicar: 'pedido-lados'}).catch(err => { console.error(err); _toast('No se pudo pedir la aplicación'); });
+      marcarEfecto(d.id, i, {...congelado, ...(extra || {}), aplicar: 'pedido-lados'}).catch(err => { console.error(err); _toast('No se pudo pedir la aplicación'); });
     });
     f.querySelectorAll('[data-ef-mano]').forEach(b => b.onclick = () => { b.disabled = true; marcarEfecto(d.id, Number(b.dataset.efMano), {aplicado: true, aplicar: '', nota: 'a mano'}).catch(err => console.error(err)); });
     const bft = f.querySelector('[data-ef-terminar]');

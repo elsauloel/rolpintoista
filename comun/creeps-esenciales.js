@@ -160,6 +160,12 @@
     equipo: ['Arco de la espera', 'Chaleco de cuero', 'Botas de cuero de vaca'],
     habilidades: ['Tiro certero', 'Tiro a la cabeza'], consumibles: ['Flecha perforante'],
     estrategia: 'Francotirador. Se queda lejos, apunta y cada disparo busca el crítico o pasar la armadura; si le llegan encima, se aleja y vuelve a disparar.'});
+  // R1 Tirador de precisión (niveles 2 en adelante, de a uno desde el 2026-11-07).
+  const R1 = {linea: 'R1', nombre: 'Tirador de precisión', rol: 'rango', rolTxt: 'rango', consumibles: ['Flecha perforante'],
+    estrategia: 'Francotirador. Se queda lejos, apunta y cada disparo busca el crítico o pasar la armadura; si le llegan encima, se aleja y vuelve a disparar.'};
+  esencial({...R1, nivel: 2, atrib: [8, 6, 7, 12, 3],   // (aprobado 2026-11-07: Vigilancia, Puntería; Casco de cuero endurecido y Guantes de agarre)
+    equipo: ['Arco de la espera', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de agarre'],
+    habilidades: ['Tiro certero', 'Tiro a la cabeza', 'Vigilancia'], pasivas: ['Puntería']});
 
   // ---- La tanda del 2026-11-03 (nivel 1 aprobado por el dueño; detalle y porqués en docs/creeps-humanoides.md). Atrib: Con · Fue · Agi · Des · Esp.
   // Los de Especial más alto juegan con SP (regla de arriba); los físicos, con turnos de espera.

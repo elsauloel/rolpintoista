@@ -864,6 +864,11 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
   al primer daño especial de cada turno) en lugar del Atrapasueños · Capa de escamas de pez espejo (B) · Capucha del culto · Casco · **Guantes de cuero
   grueso**. Habilidades: + **Anulación**. PdG.Esp 21 · Ef.Esp 20 · Def 4 · Def. esp. 2.
 
+### R1 Tirador de precisión · nivel 2 (aprobado 2026-11-07, cargado)
+- Des 12 · Con 8 · Agi 7 · Fue 6 · Esp 3 → vida 40, No2 7. Equipo: Arco de la espera · Chaleco de cuero · Botas de cuero de vaca · **Casco de cuero
+  endurecido** · **Guantes de agarre** (PdG +1; dueño: «los de agarre»). Habilidades: + **Vigilancia**. Pasiva: **Puntería**. PdG 11 → 14 · Def 3 → 4 ·
+  crít. T4 1 → 2.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

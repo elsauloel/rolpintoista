@@ -1739,3 +1739,21 @@ Foto antes y restaurado después (comparado: igual; borrada la nube de prueba). 
 - [x] **«Después» ahora vuelve a preguntar una vez por ronda** (js/54, dueño: «mejorar lo de Después, una vez por ronda»): con un token de invocación de
   mentira (local, sin escribir): pregunta → «Después» → a los 6 s y a los 66 s no vuelve → al cambiar la ronda vuelve a preguntar. Capturas
   `despues-1-pregunta.png`, `despues-2-ronda-nueva.png`.
+
+### 2026-11-07 · 🗡 Tajo al tendón, Corte en la arteria, Paso atrás, Escurridizo y Cambiar de lugar (con clics: GM, J1 y J2 en «Encuentro 2»)
+
+Respaldo antes y partida restaurada después (también se borró el `mapa/activo` y `mapa/usos` que dejó publicar «Encuentro 2»).
+- ✔ **Tajo al tendón**: el Goblin rompehuesos le pega a Rockardo (copia). Con la armadura frenando todo, no entra nada (después de la prueba, el
+  Tendón cortado también pide daño, como el Sangrado). Con un crítico: Sangrado permanente + Tendón cortado. Caminando sin sangrar: no pierde vida;
+  sangrando, 2 casillas = −2 de vida (una línea 🦵 por casilla en la Mesa). Capturas `p14-tendon-*`.
+- ✔ **Corte en la arteria** contra Bizzante (copia) que ya sangraba (2 turnos): la declaración dice «Crítico frecuente +2» y el rango del crítico
+  baja de 10 a 8; con el crítico, el Sangrado quedó permanente. Capturas `p14-arteria-*`.
+- ✔ **Paso atrás**: Flash del goblin (en turno ajeno, cooldown 3 en vez de 2); una Rata lo ataca, la Evasión (d8 en vez de d6) gana, sale el aviso
+  «Tenés Paso atrás activo», «Dar un paso», clic en la casilla: se mueve 1 sin gastar No2 y la Mesa avisa que no hubo oportunidad. El estado se gastó
+  con esa tirada. Capturas `p14-paso-*`.
+- ✔ **Escurridizo** en Bizzante (copia) (con el 🎮 control del GM, el aviso le salió al GM): la Rata le erra, aviso «Sos escurridizo», paso de 1
+  casilla pagando 1 No2, sin oportunidad. Capturas `p14-escurridizo-*`.
+- ✔ **Cambiar de lugar**: el goblin le pega a Bizzante y quedan cada uno en la casilla del otro. Captura `p14-cambio-1-intercambiados`.
+- ⏳ **Pendiente**: el caso Inamovible de Cambiar de lugar (hace falta un rival con Botas de estibador) y el aviso de Escurridizo en la pantalla del
+  jugador mismo (sin control del GM). El código es el mismo camino que el Arrastrar/empujón (Inamovible) y que el Escudo elemental (quién recibe).
+- Visto en la prueba y arreglado: el cuadro del duelo tapaba el mapa al elegir la casilla del paso → ahora se minimiza solo.

@@ -2135,3 +2135,10 @@ adentro — usar `e.composedPath()[0]` (así se arregló el "clic en el fondo ci
   `HexInfo.describir(el, {quedan, oculto})` y `HexInfo.armar({items, sinExplorar, recordada})` son puras (pruebas en `comun/pruebas.html`): un elemento
   nuevo con efecto se cuenta sumando su línea en `describir`. Probado en «Claude · pruebas» como GM y J1 (capturas `hex-GM-*`, `hex-J1-*`): el jugador no
   ve la trampa del GM ni la forma invisible.
+
+- **🦵🩸👣🦎🔄 La tanda del choque liviano** (2026-11-07, dueño): `js/107-liviano.js`. Tendón cortado (`tendonAlMoverse`, desde `confirmarRuta` js/08:
+  1 de vida directa por casilla mientras sangre); Corte en la arteria (`arteriaBonos`, desde `dueloElegirObjetivoMapa` js/13 →
+  `Combatiente.arteriaAtaque`); Paso atrás y Escurridizo (`pasoTrasEvasion`, gancho `evasionGanada` de `Duelo.escuchar` en js/14: aviso al centro para
+  quien maneja el token, casilla con un clic pintada como las del Salto, minimiza el duelo; Paso atrás gratis con `moverToken`, Escurridizo por
+  `confirmarRuta` con `oportunidad: []`); Cambiar de lugar (`cambiarLugarResuelto`, gancho `disparoResuelto`, solo la pantalla del GM, Inamovible
+  primero). Detalle en `../docs/auditoria-skills-creep.md`.

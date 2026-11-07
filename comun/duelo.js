@@ -85,6 +85,8 @@ const Duelo = (() => {
   // 🪵 Un dodge roll de Tronco de huída en un golpe directo (2026-10-10): cfgEscuchar.dodgeLibre(d), en la pantalla de quien esquivó.
   const dodgeLibreAvisado = new Set();
   let dodgeLibrePrimera = true;
+  const evasionAvisada = new Set();   // 👣🦎 el Paso atrás / Escurridizo: cfgEscuchar.evasionGanada(d), una vez por duelo
+  let evasionPrimera = true;
   let bloqueadoPrimera = true, desarmadoPrimera = true;
   let grupoAvisado = new Set();   // ids de sub-duelos de área ya avisados a cfgEscuchar.grupoResuelto (no avisar dos veces)
   const grupoCanceladoAvisado = new Set();   // …y a cfgEscuchar.grupoCancelado (2026-10-25)
@@ -757,6 +759,7 @@ const Duelo = (() => {
     }
     if(_num(cfg.ataque.alejarse) > 0 && !hab) inicial.ataque.alejarse = Math.min(4, Math.round(_num(cfg.ataque.alejarse)));   // 💨 Picar y alejarse (2026-10-21)
     if(cfg.ataque.atraviesaEscudos && !hab) inicial.ataque.atraviesaEscudos = true;
+    if(cfg.ataque.cambiaLugar && !hab) inicial.ataque.cambiaLugar = true;   // 🔄 Cambiar de lugar (2026-11-07): si pega, el mapa del GM los cambia de lugar (vtt-hexgrid/js/107)
     if(Array.isArray(cfg.ataque.rompeEscudo) && cfg.ataque.rompeEscudo.length && !hab)   // 🛡 Romper armadura del arma de rango: si lo paran con un escudo (el mapa, js/26)
       inicial.ataque.rompeEscudo = cfg.ataque.rompeEscudo.slice(0, 3).map(e => ({nombre: txtCorto(e.nombre || 'Rompe armadura', 40), caras: Math.max(1, Math.min(20, Math.round(_num(e.caras)) || 1)), exitos: Math.max(1, Math.min(20, Math.round(_num(e.exitos)) || 1)), stacks: Math.max(1, Math.min(5, Math.round(_num(e.stacks)) || 1))}));
     if(cfg.ataque.puntaDiamante && !hab) inicial.ataque.puntaDiamante = true;   // contra Defensa 12 o más, Perfora +2 (el mapa, 2026-10-11)
@@ -1162,7 +1165,7 @@ const Duelo = (() => {
   // Anota la tirada de `campo` ('pdg'|'eva'|'fuerza'|'bloqueo'); si ya está el otro del par, lo resuelve en la misma transacción.
   async function guardarTiro(id, campo, r, defensa, extra){
     const tiro = {total: campo === 'eva' ? Math.max(1, Math.round(_num(r.total))) : Math.round(_num(r.total)), formula: String(r.formula || '').slice(0, 60), rolls: (r.rolls || []).slice(0, 20).map(_num), mod: _num(r.mod),
-      ...(r.nota ? {nota: String(r.nota).slice(0, 60)} : {}), ...(r.dodge ? {dodge: true} : {})};   // (dodge: un Flash con dodge roll, Tronco de huída) · lo que se sumó a la tirada (2026-10-04: «+2 contra oportunidad»): se ve en el cuadro y en la Mesa
+      ...(r.nota ? {nota: String(r.nota).slice(0, 60)} : {}), ...(r.dodge ? {dodge: true} : {}), ...(r.paso ? {paso: true} : {})};   // (dodge: un Flash con dodge roll, Tronco de huída) · lo que se sumó a la tirada (2026-10-04: «+2 contra oportunidad»): se ve en el cuadro y en la Mesa
     const fase = (campo === 'pdg' || campo === 'eva') ? 'contacto' : 'bloqueo';
     const ref = col().doc(id);
     let anuncio = '', par = null;
@@ -3407,6 +3410,8 @@ const Duelo = (() => {
     // Una Evasión contra oportunidad / contra contraataque (2026-10-04): la página la etiqueta «Evasión (+2 contra oportunidad)»; el duelo guarda esa nota.
     const notaEsp = String(det.origen || '').match(/\(([+−-]\s*\d+\s+(?:contra |Pasos de baile)[^)]*)\)/);   // y Pasos de baile
     if(notaEsp) rr = {...r, nota: notaEsp[1]};
+    // 👣 El Paso atrás (2026-11-07): la Evasión que lo sumó lo anota en el duelo; si gana, el mapa de quien esquivó pregunta «¿Paso atrás?» (js/107).
+    if(campo === 'eva' && (r.estados || []).some(e => e && e.n === 'Paso atrás')) rr = {...rr, paso: true};
     if(flash && _num(flash.bono)){   // el Flash suma un «+» fijo a la tirada (y cuenta como tal en el desempate)
       rr = {...r, mod: _num(r.mod) + _num(flash.bono), total: _num(r.total) + _num(flash.bono), formula: String(r.formula || '') + ` +${_num(flash.bono)} ⚡`,
         ...(flash.dodge && campo === 'eva' ? {dodge: true} : {})};   // Tronco de huída (2026-10-10): si gana la Evasión, dodge roll
@@ -3812,6 +3817,17 @@ const Duelo = (() => {
         });
       }
       dodgeLibrePrimera = false;
+      // 👣🦎 Ganó la Evasión (2026-11-07: el Paso atrás y la pasiva Escurridizo): en la pantalla de quien esquivó, el mapa decide si ofrece el paso (js/107).
+      if(cfgEscuchar.evasionGanada){
+        listaDuelos.forEach(d => {
+          if(d.estado !== 'resuelto' || d.resultado !== 'fallo' || !d.contacto || d.contacto.gana !== 'defensor' || !d.eva || evasionAvisada.has(d.id)) return;
+          if(d.defensa && d.defensa.modo && !/^(eva|evasion)$/.test(d.defensa.modo)) return;   // (parar con Parry o con escudo no es esquivar)
+          evasionAvisada.add(d.id);
+          if(!evasionPrimera) try{ cfgEscuchar.evasionGanada(d); }   // (quién lo recibe lo decide el mapa: quien maneja ese token, también con el 🎮 control)
+          catch(err){ console.error('Duelo: evasionGanada', err); }
+        });
+      }
+      evasionPrimera = false;
       if(cfgEscuchar.flechaErrada){
         listaDuelos.forEach(d => {
           if(d.estado !== 'resuelto' || !d.ataque || !d.ataque.flecha || !['fallo', 'bloqueado'].includes(d.resultado) || flechaAvisada.has(d.id)) return;

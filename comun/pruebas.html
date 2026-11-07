@@ -48,14 +48,14 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261106rayo"></script>
+<script src="combatiente.js?v=20261107liv2"></script>
 <script src="creep-calculo.js?v=20261106piel"></script>
 <script src="creep-botonera.js"></script>
-<script src="creep-acciones.js?v=20261107guardia"></script>
+<script src="creep-acciones.js?v=20261107liv2"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
-<script src="estados-presets.js?v=20261106rayo"></script>
+<script src="estados-presets.js?v=20261107liv2"></script>
 <script src="estados-aplicar.js?v=20261106escudo3"></script>
 <script src="recibidos.js?v=20261103pm"></script>
 <script src="tokens-auto.js"></script>
@@ -71,7 +71,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-habilidades.js?v=20261106manos2"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
-<script src="ficha-resumen.js?v=20261106manos2"></script>
+<script src="ficha-resumen.js?v=20261107liv2"></script>
 <script src="ficha-sesion.js"></script>
 <script src="inv-calculo.js"></script>
 <script src="inv-botonera.js"></script>
@@ -108,7 +108,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261106manos3"></script>
+<script src="duelo.js?v=20261107liv2"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -123,7 +123,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="skills-clase.js?v=20261107milagro"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261107guardia"></script>
-<script src="skills-creep-base.js?v=20261107milagro"></script>
+<script src="skills-creep-base.js?v=20261107liv2"></script>
 <script src="creeps-esenciales.js?v=20261107r15"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -1139,8 +1139,9 @@ prueba('🐂 Cornada (2026-10-21): +1 PdG, +1 al daño, empuja 1 y toma carrera'
 prueba('🩸 Las cuatro variantes del Sangrado, humanoide y bestia (2026-10-21)', () => {
   const v = n => { const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos, 2); const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});
     return [a.perfora || 0, a.mods.fijo, a.mods.critBono, a.efectos[0].spec.nombre, a.efectos[0].spec.turnos, h.spCosto].join('/'); };
-  igual(['Golpe que sangra', 'Zarpazo desgarrador', 'Corte profundo', 'Colmillos que perforan', 'Tajo brutal', 'Desgarro', 'Corte certero', 'Zarpa certera'].map(v),
-    ['0/0/0/Sangrado/2/1', '0/0/0/Sangrado/2/1', '1/0/0/Sangrado/2/2', '1/0/0/Sangrado/2/2', '0/2/0/Sangrado/2/2', '0/2/0/Sangrado/2/2', '0/0/1/Sangrado/2/2', '0/0/1/Sangrado/2/2']);
+  // (2026-11-07: el Corte profundo salió del pool y el Tajo brutal y el Corte certero se reemplazaron por el Tajo al tendón y el Corte en la arteria)
+  igual(['Golpe que sangra', 'Zarpazo desgarrador', 'Colmillos que perforan', 'Desgarro', 'Zarpa certera'].map(v),
+    ['0/0/0/Sangrado/2/1', '0/0/0/Sangrado/2/1', '1/0/0/Sangrado/2/2', '0/2/0/Sangrado/2/2', '0/0/1/Sangrado/2/2']);
 });
 prueba('🩸 La versión fuerte del Sangrado: Tajo de carnicero y Destripar (2026-10-21)', () => {
   const v = n => { const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos, 2); const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});
@@ -6768,6 +6769,57 @@ prueba('⚔ Sed de batalla (2026-11-05): la pasiva está en el pool, para jugado
   igual([p.jobCosto, (p.mods || [])[0] && p.mods[0].stat, (p.mods || [])[0] && p.mods[0].val, /No2/.test(p.detalle || ''),
     typeof FichaCalculo !== 'undefined' && FichaCalculo.STATS ? !!FichaCalculo.STATS.find(x => x.id === 'sedbatalla') : true],
     [1, 'sedbatalla', 3, true, true]);
+});
+prueba('🦵🩸 La tanda del choque liviano (2026-11-07): el Tajo al tendón y el Corte en la arteria reemplazan al Tajo brutal y al Corte certero; el Corte profundo sale del pool', () => {
+  const nom = n => HABILIDADES_CREEP_BASE.find(x => x.nombre === n);
+  igual(['Corte profundo', 'Tajo brutal', 'Corte certero'].map(n => !!nom(n)), [false, false, false]);
+  const h = n => armarHabilidadDeCreep(nom(n).datos, 2), at = n => Combatiente.ataqueConArreglos(h(n), h(n).duelo, {arma: {}});
+  const tt = at('Tajo al tendón'), ca = at('Corte en la arteria');
+  const tend = EstadosAplicar.componer(tt.efectos[1].spec);
+  igual([tt.efectos.map(e => e.spec.nombre).join('+') + (tt.efectos[1].requiereDano ? ' (con daño)' : ''), tend.tendonCortado, tend.permanente, h('Tajo al tendón').spCosto, h('Tajo al tendón').cd, nom('Tajo al tendón').etiquetas.includes('auditada')],
+    ['Sangrado+Tendón cortado (con daño)', true, true, 2, 3, true]);
+  // Corte en la arteria: la marca viaja en el ataque; contra uno que sangra, Crítico frecuente +2 y el Sangrado pasa a «solo con crítico»
+  const art = Combatiente.arteriaAtaque(ca);
+  igual([ca.arteria, ca.efectos[0].spec.nombre, h('Corte en la arteria').spCosto, h('Corte en la arteria').cd, art.mods.critBono, art.efectos.length, art.critico.efectos[0].spec.nombre, ca.efectos.length],
+    [true, 'Sangrado', 2, 3, 2, 0, 'Sangrado', 1]);
+  const sc = {nombre: 'Ladrón', armaNombre: 'Daga', armaTipo: 4, modoSP: true, esp: 3, estados: [], habilidades: [h('Corte en la arteria'), h('Cambiar de lugar')], equipo: []};
+  igual([!!CreepAcciones.ataqueDeHab(sc, sc.habilidades[0]).arteria, !!CreepAcciones.ataqueDeHab(sc, sc.habilidades[1]).cambiaLugar], [true, true]);
+});
+prueba('🦵 Tendón cortado (2026-11-07): dura lo que el Sangrado — se va cuando no le queda ninguno', () => {
+  const P = n => ({...structuredClone(estadosPresetCreep().find(p => p.nombre === n)), activo: true});
+  const corto = [{...P('Sangrado'), permanente: false, turnos: 1}, P('Tendón cortado')];
+  const k1 = Combatiente.contarEstados(corto);
+  const largo = [P('Sangrado'), P('Tendón cortado')];
+  const k2 = Combatiente.contarEstados(largo);
+  const solo = Combatiente.contarEstados([P('Tendón cortado')]);
+  igual([k1.quedan.length, k1.terminados.map(e => e.nombre).sort().join(','), k2.quedan.map(e => e.nombre).join(','), solo.quedan.length], [0, 'Sangrado,Tendón cortado', 'Sangrado,Tendón cortado', 0]);
+});
+prueba('👣 Paso atrás (2026-11-07): Flash sobre sí, +2 a la próxima Evasión; esa tirada lo gasta (otra tirada no) y el duelo lo anota', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Paso atrás'), h = armarHabilidadDeCreep(e.datos, 2);
+  const P = estadosPresetCreep().find(p => p.nombre === 'Paso atrás');
+  const sc = {id: 'c1', nombre: 'Prueba', estados: [{...structuredClone(P), id: 'e1', activo: true}], equipo: []};
+  const rp = Combatiente.tirarStat(5, sc.estados, 'pdg'), re = Combatiente.tirarStat(5, sc.estados, 'eva');
+  const usaP = CreepAcciones.usaUnaTirada(sc, rp), gastaP = CreepAcciones.gastarUnaTirada(sc, rp), quedan = sc.estados.length;
+  const usaE = CreepAcciones.usaUnaTirada(sc, re), gastaE = CreepAcciones.gastarUnaTirada(sc, re);
+  igual([!!h.flash, h.duelo.objetivo, h.duelo.efectos[0].nombre, h.spCosto, h.cd, P.mods[0].stat, P.mods[0].val, P.unaEvasion, usaP, gastaP, quedan,
+    re.estados.some(x => x.n === 'Paso atrás'), re.mod - rp.mod >= 0, usaE, gastaE, sc.estados.length, e.etiquetas.includes('auditada')],
+    [true, 'uno mismo', 'Paso atrás', 2, 2, 'eva', 2, true, false, false, 1, true, true, true, true, 0, true]);
+  // con Empower y Paso atrás, una Evasión gasta los dos
+  const E = estadosPresetCreep().find(p => p.nombre === 'Empower');
+  const sc2 = {id: 'c2', estados: [{...structuredClone(P), id: 'a', activo: true}, {...structuredClone(E), id: 'b', activo: true}]};
+  const r2 = Combatiente.tirarStat(5, sc2.estados, 'eva');
+  igual([CreepAcciones.gastarUnaTirada(sc2, r2), sc2.estados.length], [true, 0]);
+});
+prueba('🦎 Escurridizo (2026-11-07): la pasiva está en el pool, para jugadores y creeps, y suma su stat', () => {
+  const p = PASIVAS_BASE.find(x => x.nombre === 'Escurridizo') || {};
+  igual([p.jobCosto, (p.mods || [])[0] && p.mods[0].stat, (p.mods || [])[0] && p.mods[0].val, /cuerpo a cuerpo/.test(p.detalle || ''), /No2/.test(p.detalle || ''),
+    typeof FichaCalculo !== 'undefined' && FichaCalculo.STATS ? !!FichaCalculo.STATS.find(x => x.id === 'escurridizo') : true],
+    [1, 'escurridizo', 1, true, true, true]);
+});
+prueba('🔄 Cambiar de lugar (2026-11-07): un ataque con su arma que lleva la marca del cambio, 2 SP, cooldown 3', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Cambiar de lugar'), h = armarHabilidadDeCreep(e.datos, 2);
+  const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});
+  igual([a.cambiaLugar, h.spCosto, h.cd, /Inamovible/.test(h.detalle), e.etiquetas.includes('auditada'), e.etiquetas.includes('reposicionar')], [true, 2, 3, true, true, true]);
 });
 prueba('🥁🩸🌑 Las pasivas y la Mala sombra (2026-11-05, ex Mufa): Marcar el ritmo y Sed de sangre suman su stat; la Mala sombra a un aliado entra sin tirar', () => {
   const P = n => PASIVAS_BASE.find(x => x.nombre === n);

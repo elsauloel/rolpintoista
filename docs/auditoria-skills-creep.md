@@ -432,3 +432,32 @@
   ningún creep de fábrica (los de fábrica traen recetas «a mano» de creeps-base.js); se suma desde la biblioteca de habilidades.
 - ✅ **🧠 Punzada mental** (Debuffer, «abrir la mente», 2026-11-03; propuesta de Claude, dueño: «me gusta Punzada mental, la vamos a sumar al pool»): rápida, su **PdG.Esp contra la Res.Mt** de un rival en su Rango; si gana, **1d4 arcano directo** y **Mente abierta** (−2 Res.Mt hasta el final de su próximo turno). 1 No2 y 1 SP, o cooldown 2.
 - ⚡ **Texto del Flash de creep** (dueño, 2026-11-03): en turno ajeno, con SP cuesta el doble de SP; con turnos de espera, un 50 % más de espera (para abajo, mínimo +1). Corregido en todas las Flash de fábrica (Parpadeo, Potencia, Purificar, Bendecir el arma, Pisotón, Arte de la guerra, Blindaje, Sonic Boom, Mal de ojo, Pila pila) y en las guardadas.
+
+### 🗡 La tanda del choque liviano (dueño, 2026-11-07)
+
+Pedido del dueño: «me gusta atajo al tendón y me gusta corte en la arteria. Al corte profundo simplemente la quitaría»; «paso atrás que sea si
+esquiva… sin gastar nitros y sin dar ataque de oportunidad»; «vamos a crear una pasiva que sea algo parecido, pero un poco menos fuerte»; «cambiar de
+lugar me parece bárbaro». Todas ✅ auditadas, con ⚙ Automatizado. Código del mapa: `vtt-hexgrid/js/107-liviano.js`. Pruebas: `comun/pruebas.html`.
+
+- ✅ **🦵 Tajo al tendón** (reemplaza al **Tajo brutal**, en el mismo lugar del pool): un ataque con su arma; si pega (y hace daño), el Sangrado de
+  siempre (2 por turno, 2 turnos, se acumula; con crítico, permanente) y el estado **Tendón cortado**: mientras sangre, cada casilla que camina le saca
+  1 de vida, directo (lo cobra el mapa al confirmar el movimiento, como el Atormentado; `tendonAlMoverse`). Dura lo que el Sangrado: cuando no le queda
+  ninguno, se va (`Combatiente.contarEstados`). Lo de un ataque y 2 SP, o cooldown 3. Un movimiento forzado (empujón, Cambiar de lugar) no lo cobra.
+- ✅ **🩸 Corte en la arteria** (reemplaza al **Corte certero**): un ataque con su arma (`arteria`). Al elegir el objetivo, si ya sangra: Crítico
+  frecuente +2 y el Sangrado del golpe pasa a «solo con crítico» (`Combatiente.arteriaAtaque`), que entra permanente y hace permanente el que ya tenía.
+  Si no sangraba: el ataque de siempre que deja Sangrado al pegar. Lo de un ataque y 2 SP, o cooldown 3.
+- 🗑 **Corte profundo**: sale del pool. Los creeps guardados conservan su copia. Antes de sacarlo se miró (solo lectura) quién usaba las tres viejas:
+  en «El origen de las especies», **Ladronzuelo del monte (copia)** tiene «Corte profundo» (no se tocó); en «Claude · pruebas» y en
+  `comun/creeps-base.js`, ninguno (solo un comentario).
+- ✅ **👣 Paso atrás** (nueva, rápida): FLASH sobre sí (las reglas de siempre del Flash en turno ajeno), estado **Paso atrás**: +2 a su próxima
+  tirada de Evasión (`unaEvasion`: esa tirada lo gasta, `CreepAcciones.gastarUnaTirada`). Si esquiva con esa tirada, aviso al centro para quien lo
+  maneja: «🦶 Tenés Paso atrás activo: ¿querés dar un paso?» → la casilla con un clic: 1 casilla, sin No2 y sin ataques de oportunidad. 0 No2, 2 SP
+  o cooldown 2. (Como cualquier +Evasión de un estado, el +2 sube el stat: Evasión 6 → 8, el dado pasa de d6 a d8.)
+- ✅ **🦎 Escurridizo** (pasiva, 1 Job, jugadores y creeps; `comun/pasivas.js`, stat `escurridizo`): al ganar la Evasión contra un golpe cuerpo a
+  cuerpo, aviso «🦶 Sos escurridizo: ¿querés dar un paso?» → 1 casilla sin ataques de oportunidad, pagando el No2 de ese paso como siempre. Sin el
+  +2. Si tiene las dos, gana Paso atrás (gratis). El aviso le llega a quien maneja el token (el GM para un creep; para un personaje, quien tiene el 🎮
+  control o, si no, su dueño) y no frena el duelo de los demás. Estando Expuesto, no (no reacciona con No2).
+- ✅ **🔄 Cambiar de lugar** (nueva): un ataque con su arma (`cambiaLugar`); si pega, la pantalla del GM los cambia de casilla (sin ataques de
+  oportunidad para nadie). Si el rival es Inamovible (Botas de estibador…), tira esa chance: si le sale, no se mueve nadie. Lo de un ataque y 2 SP,
+  o cooldown 3.
+- No se hicieron las versiones de bestia (a pedido).

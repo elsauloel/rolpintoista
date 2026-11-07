@@ -23,11 +23,19 @@ const CreepAcciones = (() => {
   }
   // 💪 Lo que dura una sola tirada (Empower, `unaTirada`; la Potencia del Support —antes «Empuje»—, 2026-10-26): la tirada que lo sumó lo gasta, como en un personaje
   // (FichaAcciones.gastarUnaTirada). `r.estados` dice qué estados entraron en esa tirada. → true si lo gastó (cambia `sc`; guardarlo es de cada pantalla).
-  function usaUnaTirada(sc, r){
-    const emp = sc && Combatiente.unaTiradaDe(sc.estados);
-    return !!(emp && r && (r.estados || []).some(e => e && emp.nombres.includes(e.n)));
-  }
-  const gastarUnaTirada = (sc, r) => usaUnaTirada(sc, r) && Combatiente.gastarUnaTirada(sc.estados);
+  // 👣 (2026-11-07) Lo mismo con lo que dura una sola Evasión (`unaEvasion`, el Paso atrás): la tirada que lo sumó (su +2 va en los mods de 'eva') lo gasta.
+  const nombresDe = r => (r && r.estados || []).map(e => e && e.n).filter(Boolean);
+  const usaEmpower = (sc, r) => { const emp = sc && Combatiente.unaTiradaDe(sc.estados), ns = nombresDe(r); return !!(emp && emp.nombres.some(n => ns.includes(n))); };
+  const usaEvasion = (sc, r) => { const ns = nombresDe(r); return !!(sc && Combatiente.unaEvasionDe(sc.estados).some(e => ns.includes(e.nombre))); };
+  function usaUnaTirada(sc, r){ return !!(r && (usaEmpower(sc, r) || usaEvasion(sc, r))); }
+  const gastarUnaTirada = (sc, r) => {
+    if(!usaUnaTirada(sc, r)) return false;
+    const emp = usaEmpower(sc, r), eva = usaEvasion(sc, r);
+    let hubo = false;
+    if(emp) hubo = Combatiente.gastarUnaTirada(sc.estados) || hubo;
+    if(eva) hubo = Combatiente.gastarUnaEvasion(sc.estados) || hubo;
+    return hubo;
+  };
   // Una de las Tiradas de stats de las Acciones (null si el stat no existe).
   function tiradaStat(sc, statId){
     const d = C().STAT_LOOKUP[statId];

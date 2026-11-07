@@ -137,6 +137,15 @@ const ESTADOS_PRESET = [
   // tirada (FichaAcciones.tirarValorStat y el daño; las que tira el mapa, js/37 mesaTrasPublicar). Otro Empower antes de tirar = un stack más (+6).
   {nombre:'Empower', polaridad:'buff', turnos:0, permanente:true, stacks:1, apila:true, unaTirada:true, mods:[{stat:'pdg', val:3}, {stat:'pdgmg', val:3}, {stat:'eva', val:3}, {stat:'parry', val:3}, {stat:'bloqueo', val:3}, {stat:'dmg', val:3}, {stat:'dmgesp', val:3}, {stat:'resmg', val:3}, {stat:'resm', val:3}, {stat:'rescc', val:3}, {stat:'percepcion', val:3}, {stat:'sigilo', val:3}, {stat:'ini', val:3}],
     detalle:'+3 a su próxima tirada (ataque, defensa, daño, Fuerza del golpe, resistencias, Percepción, Sigilo, Iniciativa…), +3 más por cada Empower que se sume antes de tirar. Esa tirada lo gasta. ⚙ Automatizado. ✋ A mano: una tirada que no sale de un stat (un dado fijo de una habilidad) no lo usa ni lo gasta.'},
+  // 👣 Paso atrás (la habilidad de creep, 2026-11-07, dueño: «te da más 2 de evasión para tu próxima tirada de evasión, y si esquiva te permite moverte
+  // un casillero sin gastar nitros y sin dar ataque de oportunidad»): `unaEvasion` — lo gasta la próxima tirada de Evasión (vtt-hexgrid/js/107); si esa
+  // tirada gana, aparece el aviso «¿Querés dar un paso?».
+  {nombre:'Paso atrás', polaridad:'buff', turnos:0, permanente:true, unaEvasion:true, pasoAtras:true, mods:[{stat:'eva', val:2}],
+    detalle:'+2 a su próxima tirada de Evasión; esa tirada lo gasta. Si esquiva con ella, puede moverse 1 casilla sin gastar No2 y sin dar ataques de oportunidad. ⚙ Automatizado: al esquivar aparece el aviso «¿Querés dar un paso?» y la casilla se elige con un clic.'},
+  // 🦵 Tendón cortado (el Tajo al tendón, 2026-11-07): mientras sangre, cada casilla que se mueve le saca 1 de vida, directo (lo cobra el mapa al moverse,
+  // vtt-hexgrid/js/107). Dura lo que el Sangrado: cuando no le queda ninguno, se va (Combatiente.contarEstados).
+  {nombre:'Tendón cortado', polaridad:'debuff', turnos:0, permanente:true, tendonCortado:true,
+    detalle:'Mientras sangre, cada casilla que se mueva le cuesta 1 de vida (daño directo: no lo frena la armadura). Se va cuando deja de sangrar. ⚙ Automatizado: el mapa le cobra la vida al moverse.'},
   // Repitiendo (Shooter, 2026-10-13): X disparos encadenados con la misma arma al mismo blanco; el 2.º +1 PdG y +1 dado, el 3.º +2 y +2. Lo cuenta el mapa.
   {nombre:'Repitiendo', polaridad:'buff', turnos:1, stacks:1, repetir:true, alEmpezarTurno:true,
     detalle:'Encadena disparos iguales (misma arma, mismo blanco): el 2.º suma +1 PdG y +1 dado de daño, el 3.º +2 y +2. Cada disparo paga sus No2. Cambiar de arma o de blanco corta la cadena; se termina al empezar su próximo turno. ⚙ Automatizado en el mapa.'},

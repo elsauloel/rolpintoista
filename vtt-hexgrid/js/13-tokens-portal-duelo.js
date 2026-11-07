@@ -1046,6 +1046,12 @@ function dueloElegirObjetivoMapa(msg){
         if(!r){ pedir(); return; }
         ataqueCarga = r;
       }
+      if(ataque && ataque.arteria && typeof arteriaBonos === 'function'){   // 🩸 Corte en la arteria (js/107): si ya sangra, Crítico frecuente +2 y el Sangrado solo con crítico
+        let r = null;
+        try{ r = await arteriaBonos(mio, t, ataqueCarga || ataque, yo); }catch(err){ console.error('No se pudo ver la arteria:', err); r = ataqueCarga || ataque; }
+        if(!r){ pedir(); return; }
+        ataqueCarga = r;
+      }
       if(ataque && ataque.abrirHerida && typeof heridaBonos === 'function'){   // 🩸 Sal en la herida (js/64): +2 dados si ya sangra
         let r = null;
         try{ r = await heridaBonos(mio, t, ataqueCarga || ataque, yo); }catch(err){ console.error('No se pudo ver la herida:', err); r = ataqueCarga || ataque; }

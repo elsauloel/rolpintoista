@@ -1083,6 +1083,7 @@ async function confirmarRuta(){
     const quedan = esCreep ? await gastarNitrosCreep(t.fichaId, costo) : await gastarNitros(t.fichaId, costo);
     if(p.dodge && quedan < 0) Combatiente.avisarDeudaNo2({nombre: nombreDe(t), accion: 'el dodge roll', costo, quedan});
     if(cm && num(cm.tormenta) > 0) tormentaAlMoverse(t, p.pasos, num(cm.tormenta));   // ⛈ Atormentado: 1 de vida por stack cada 2 casillas
+    if(typeof tendonAlMoverse === 'function') tendonAlMoverse(t, p.pasos).catch(err => console.error('Tendón cortado:', err));   // 🦵 Tendón cortado: 1 de vida por casilla mientras sangre (js/107)
     pasosGratisUsar(p.id, num(p.gratis));   // los primeros casilleros de este turno ya se usaron
     if(num(p.sprint) > 0) sprintUsar(t, num(p.sprint));   // Sprint: los casilleros pagos que se usaron
     levitarUsar(p.id, num(p.levita));   // los casilleros levitados de este turno ya se usaron (2026-10-06)

@@ -98,6 +98,10 @@ const PASIVAS_BASE = [
   // ⚔ Sed de batalla (dueño, 2026-11-05, del boceto del W1 Hachero: «sumamos Sed de batalla como pasiva, que la puedan elegir los jugadores también»).
   {poolId: 'sed-de-batalla', nombre: 'Sed de batalla', jobCosto: 1, etiquetas: ['ofensiva'],
    detalle: 'Cuando un rival cae por tu golpe, el envión te devuelve el aire: ganás 3 No2, aunque pases de tu máximo (los de más no se pierden al empezar tu turno: la recarga solo sube hasta el máximo, nunca baja). ⚙ Automatizado: lo hace el mapa cuando el golpe del duelo lo deja en 0, y te avisa.', mods: [{stat: 'sedbatalla', val: 3}]},   // (2026-11-05, dueño: «más que 2 le pondría 3… puede ser superior al máximo»)
+  // 🦎 Escurridizo (dueño, 2026-11-07: «vamos a crear una pasiva que sea algo parecido [al Paso atrás], pero un poco menos fuerte»): sin el +2 y pagando
+  // el No2 del paso. Lo ofrece el mapa de quien esquivó (vtt-hexgrid/js/107-liviano.js).
+  {poolId: 'escurridizo', nombre: 'Escurridizo', jobCosto: 1, etiquetas: ['defensiva'],
+   detalle: 'Cuando ganás la Evasión contra un ataque cuerpo a cuerpo, podés moverte 1 casilla sin dar ataques de oportunidad, pagando el No2 de ese paso como siempre. ⚙ Automatizado: al esquivar te aparece el aviso «¿Querés dar un paso?» y la casilla se elige con un clic.', mods: [{stat: 'escurridizo', val: 1}]},
   // 💚 Manos de curandero (dueño, 2026-11-06: «una pasiva que cada cura… +1 me parece muy poco, probemos +5»; el mismo día: «+5 en curas directas o
   // individuales y +2 en curas en área y regeneraciones; y que también aplique a pergaminos y a pociones»).
   {poolId: 'manos-de-curandero', nombre: 'Manos de curandero', jobCosto: 1, etiquetas: ['utilidad'],

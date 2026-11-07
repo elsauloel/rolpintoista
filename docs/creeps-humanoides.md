@@ -859,6 +859,11 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
   Def +2, Def. esp. +1, Res.CC +1, crít. T4 +1, Vida +5, Espejo) en lugar de la Casaca · Atrapasueños · Capucha del culto · Casco. Habilidades: + **Aguja
   del desamparo** (5 SP). Pasivas: Puntería arcana · **Potencia especial**. PdG.Esp 18 · Ef.Esp 18 · Def 3 · Eva 8.
 
+### D1 Maldito · nivel 5 (aprobado 2026-11-07, cargado) — ✅ línea D1 completa
+- Con 10 · Fue 2 · Agi 8 · Des 6 · Esp 19 → vida 55, No2 8, SP 57. Equipo: Varita de la grieta (B) · **Muñeco vudú** (B: PdG.Esp +1 y Debilitado 1 turno
+  al primer daño especial de cada turno) en lugar del Atrapasueños · Capa de escamas de pez espejo (B) · Capucha del culto · Casco · **Guantes de cuero
+  grueso**. Habilidades: + **Anulación**. PdG.Esp 21 · Ef.Esp 20 · Def 4 · Def. esp. 2.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4
@@ -926,8 +931,8 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | L2 | ✅ (2026-11-03) | | | | |
 | R1 | ✅ (2026-11-03) | | | | |
 | M1 | ✅ (2026-11-02) | ✅ (2026-11-06) | ✅ (2026-11-06) | ✅ (2026-11-06) | ✅ (2026-11-06) |
-| S1 | ✅ (2026-11-02) | | | | |
-| D1 | ✅ (2026-11-02) | | | | |
+| S1 | ✅ (2026-11-02) | ✅ (2026-11-06) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |
+| D1 | ✅ (2026-11-02) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |
 | W2 | ✅ (2026-11-03) | | | | |
 | H2 | ✅ (2026-11-03) | | | | |
 | L3 | ✅ (2026-11-03) | | | | |

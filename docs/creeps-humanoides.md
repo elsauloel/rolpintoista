@@ -891,6 +891,15 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
 - Agi 12 · Des 10 · Fue 7 · Con 7 · Esp 3 → vida 35, No2 12. Equipo: **Hoz de cosecha** (B: Tipo 6, +1 daño, Ini +2, Sangrado 75 %) en lugar de la
   Cuchilla · Chaleco · Zapatillas de lona · Cofia. Habilidades: + **Ráfaga de cortes**. Ini 13 · Eva 13 · PdG 10.
 
+### L1 Sangrador · nivel 4 (aprobado 2026-11-07, cargado)
+- Agi 13 · Des 11 · Con 8 · Fue 7 · Esp 3 → vida 40. Equipo: Hoz de cosecha · **Chaqueta del acróbata** (en lugar del Chaleco; la Def. esp. queda
+  como su punto débil) · Zapatillas de lona · Cofia. Habilidades: + **Paso atrás**. Pasivas: **Ojo crítico** y **Ojo de carancho** (las dos nuevas;
+  sale Escurridizo). PdG 11 · Eva 16 · Def 1 · Crítico frecuente en 1 (de la tabla del duelo, índice 0).
+- **Ojo de carancho** (pasiva nueva, 1 Job, también para jugadores): +1 a la Probabilidad de Golpe contra cualquier rival que tenga algún estado
+  malo encima. Corrección del dueño el mismo día: vale para **cualquier tirada de Probabilidad de Golpe, armas y hechizos** (PdG y PdG.Esp). En un
+  hechizo de área cuenta objetivo por objetivo (la tirada compartida no arrastra el +1 del primero). No cuentan los estados que arma la ficha sola
+  (Sobrepeso). En el cuadro del duelo se ve «🦅 +1 Ojo de carancho» en la declaración y en la tirada.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

@@ -1097,6 +1097,8 @@ function dueloElegirObjetivoMapa(msg){
       try{ tiro = marcaBonos(mio, t, ataque, tiro); }catch(err){ console.error('No se pudo sumar la marca:', err); }   // 🎯 Marcar (js/36)
       let espalda = false, embestida = 0, espaldaPdg = 0;
       try{ espalda = porLaEspalda(mio, t); espaldaPdg = espalda ? 0 : espaldaBono(mio, t, ataque); }catch(err){ console.error('No se pudo ver si es por la espalda:', err); }   // nunca traba el ataque
+      let carancho = 0;
+      try{ carancho = caranchoBono(mio, t); }catch(err){ console.error('No se pudo ver el Ojo de carancho:', err); }
       try{ if(!(ataque && ataque.hab)) embestida = embestidaDe(mio, t); }catch(err){ console.error('No se pudo ver la embestida:', err); }
       let quieto = 0, primeraSangre = 0;
       try{ quieto = quietoDe(mio, ataque); primeraSangre = primeraSangreDe(mio, ataque); }catch(err){ console.error('No se pudieron ver los anillos del ataque:', err); }
@@ -1131,7 +1133,7 @@ function dueloElegirObjetivoMapa(msg){
       try{ presa = presaContra(mio, t); }catch(err){ console.error('No se pudo ver la presa:', err); }   // 🎯 el defensor está señalado: +2 al daño
       let estandarte = null;
       try{ estandarte = typeof estandarteBonus === 'function' ? estandarteBonus(mio, yo) : null; }catch(err){ console.error('No se pudo ver el estandarte:', err); }   // 🚩 bajo el estandarte de un aliado (js/73)
-      Duelo.crear({yo, ataque: ataqueFinal, espalda, espaldaPdg, embestida, quieto, primeraSangre, tiro, flecha, miedo, ...(malviaje ? {malviaje} : {}), presa, ...(estandarte ? {estandarte} : {})}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
+      Duelo.crear({yo, ataque: ataqueFinal, espalda, espaldaPdg, ...(carancho ? {carancho} : {}), embestida, quieto, primeraSangre, tiro, flecha, miedo, ...(malviaje ? {malviaje} : {}), presa, ...(estandarte ? {estandarte} : {})}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
         .catch(err => { console.error('No se pudo abrir el duelo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + String((err && err.message) || err).slice(0, 120)); });
     }, `<b>${ataque && ataque.hab ? '✨ ' + esc(ataque.hab.nombre) + ': elegí el objetivo' : '⚔ ' + esc(yo.nombre || 'Atacar') + ': elegí a quién atacás'}</b> <span>clic sobre el token · Esc o clic derecho cancelan${nEnAlcance ? ' · ✨ brillan los que están a tu alcance (' + (minimo ? `de ${minimo} a ` : '') + Math.round(num(ataque.alcance)) + ' casillero' + (Math.round(num(ataque.alcance)) === 1 ? '' : 's') + ')' : conArco ? ` · 🏹 el arco necesita ${Combatiente.arcoLibresTxt(ataque)} en el medio` : ''}${mioTiro ? ' · la línea muestra si el tiro pasa' : ''}${nIdeal ? ' · 💠 en celeste, tu distancia ideal (' + esc(Combatiente.idealTxt(ataque.ideal)) + ')' : ''}</span>`, true, cancelado);
     // Sin nadie a tiro con un arco (2026-10-09): se dice por qué — su alcance no llega a la distancia mínima, o no hay nadie en esa franja.
@@ -1290,7 +1292,8 @@ async function areaCrearSiguienteSubDuelo(areaId, a){
     // objetivo en adelante, `a.pdgCompartido` (capturado del primero al resolverse, ver dueloGrupoResuelto) llega
     // precargado — este sub-duelo solo le pide la Evasión a ESTE objetivo, contra esa misma tirada.
     dueloId = await Duelo.crear({yo: a.casteador, ataque: {tipo: 'habilidad', hab: tormentaHabDe(a.hab, tokenId), alcance: 0}, grupo: {id: areaId, indice: idx + 1, total: Math.max(objetivos.length, num(a.hab && a.hab.reparte && a.hab.reparte.total))}, pdgCompartido: a.pdgCompartido || null,
-      presa: a.hab && a.hab.dano ? (() => { try{ return presaContra(tokens.get(a.casteador.tokenId), t); }catch(err){ return 0; } })() : 0},   // 🎯 la Presa también en un área o una línea (2026-10-25, la Lanza de luz, hoy Lanza arcana)
+      presa: a.hab && a.hab.dano ? (() => { try{ return presaContra(tokens.get(a.casteador.tokenId), t); }catch(err){ return 0; } })() : 0,
+      carancho: (() => { try{ const c = tokens.get(a.casteador.tokenId); return c ? caranchoBono(c, t) : 0; }catch(err){ return 0; } })()},   // 🦅 Ojo de carancho, objetivo por objetivo   // 🎯 la Presa también en un área o una línea (2026-10-25, la Lanza de luz, hoy Lanza arcana)
       {id: tokenId, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, a.casteador.tokenId, '');
   }catch(err){   // (que se pueda reintentar: se libera la reserva)
     console.error('No se pudo crear el sub-duelo del área:', err); areaSubDueloCreando.delete(clave);
@@ -1546,6 +1549,15 @@ function porLaEspalda(atq, def){
 function espaldaBono(atq, def, ataque){
   if(!atq || !def || (ataque && ataque.hab) || !enCunaCiega(atq, def)) return 0;
   return 1 + (pasosSilenciosos(atq) ? 1 : 0);
+}
+// 🦅 Ojo de carancho (2026-11-07, dueño): +1 PdG si quien ataca tiene la pasiva y el defensor algún estado malo activo (Combatiente.conEstadoMalo).
+// La pasiva: un personaje la publica en su resumen; la de un creep la ve el GM en su ficha privada (ordenPasiva, js/102). Vale para el PdG y el PdG.Esp (armas y hechizos); si la habilidad no tira ninguno de los dos, duelo.js no la suma.
+function caranchoBono(atq, def){
+  if(!atq || !def || !dueloEsRival(atq, def) || typeof ordenPasiva !== 'function') return 0;
+  const val = num(ordenPasiva(atq, 'ojoCarancho', 'ojocarancho'));
+  if(!(val > 0)) return 0;
+  const e = estadoDe(def);
+  return e && Combatiente.conEstadoMalo(e.estados) ? Math.round(val) : 0;
 }
 // ¿`atq` está en el punto ciego de `def`? La misma cuña de la visión (VISION_CUNA_CIEGA a cada lado de atrás; las diagonales de atrás se ven).
 function enCunaCiega(atq, def){

@@ -107,6 +107,7 @@ const FichaCalculo = (() => {
     {id:'curamas', label:'Manos de curandero', full:'Manos de curandero: cada cura a uno solo que das cura ese número de vida más'},
     {id:'curamasarea', label:'Manos de curandero (área)', full:'Manos de curandero: cada cura en área o por turno que das cura ese número de vida más a cada uno'},
     {id:'escurridizo', label:'Escurridizo', full:'Escurridizo: si ganás la Evasión contra un golpe cuerpo a cuerpo, podés moverte 1 casilla sin dar ataques de oportunidad (pagando su No2)'},
+    {id:'ojocarancho', label:'Ojo de carancho', full:'Ojo de carancho: + ese número a la Probabilidad de Golpe (PdG o PdG.Esp, armas y hechizos) contra un rival que tenga algún estado malo encima'},
     {id:'sedbatalla', label:'Sed de batalla', full:'Sed de batalla: cuando un rival cae por tu golpe, ganás ese número de No2 (aunque pases de tu máximo)'},
     {id:'sedsangre', label:'Sed de sangre', full:'Sed de sangre: cuando un rival cae por tu golpe, subís ese número de lugares en el orden de turnos'},
     {id:'prisa', label:'Prisa', full:'Prisa: vas primero en el orden de turnos (antes que todos los que no la tienen); entre dos con Prisa decide la tirada de iniciativa'},

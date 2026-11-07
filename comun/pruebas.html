@@ -48,14 +48,14 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261107liv2"></script>
+<script src="combatiente.js?v=20261107carancho5"></script>
 <script src="creep-calculo.js?v=20261106piel"></script>
 <script src="creep-botonera.js"></script>
-<script src="creep-acciones.js?v=20261107liv2"></script>
+<script src="creep-acciones.js?v=20261107carancho5"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
-<script src="estados-presets.js?v=20261107liv2"></script>
+<script src="estados-presets.js?v=20261107carancho5"></script>
 <script src="estados-aplicar.js?v=20261106escudo3"></script>
 <script src="recibidos.js?v=20261103pm"></script>
 <script src="tokens-auto.js"></script>
@@ -71,7 +71,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="ficha-habilidades.js?v=20261106manos2"></script>
 <script src="ficha-guardado.js"></script>
 <script src="ficha-botonera.js"></script>
-<script src="ficha-resumen.js?v=20261107liv2"></script>
+<script src="ficha-resumen.js?v=20261107carancho5"></script>
 <script src="ficha-sesion.js"></script>
 <script src="inv-calculo.js"></script>
 <script src="inv-botonera.js"></script>
@@ -108,7 +108,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261107liv2"></script>
+<script src="duelo.js?v=20261107carancho5"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -123,7 +123,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="skills-clase.js?v=20261107milagro"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261107guardia"></script>
-<script src="skills-creep-base.js?v=20261107liv2"></script>
+<script src="skills-creep-base.js?v=20261107carancho5"></script>
 <script src="creeps-esenciales.js?v=20261107l13"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -6878,7 +6878,7 @@ prueba('⭐ Pool esencial, niveles 2 a 5 (2026-11-06): W1 Hachero 2–5 y T1 Esc
     w4.pasivas.map(p => p.nombre).join(), C.statValor(w4, 'dmg'), w4.hpMax,
     C.defensaEfectiva(t3), C.statValor(t3, 'bloqueo'), t3.pasivas.map(p => p.nombre).join(), t3.habilidades.find(h => h.nombre === 'Golpe demoledor') === undefined,
     d('Hachero', 3).habilidades.find(h => h.nombre === 'Golpe demoledor').cdActual],
-    [0, 'M12,M13,M14,M15,L12,L13,S12,S13,S14,S15,D12,D13,D14,D15,R12,R13,R14,R15,H12,H13,H14,W12,W13,W14,W15,T12,T13,T14,T15', 65, 11, 9, 14, 12, 0, 'Pegar fuerte,Romper armadura,Barrido,Golpe demoledor,Arte de la guerra,Remate',
+    [0, 'M12,M13,M14,M15,L12,L13,L14,S12,S13,S14,S15,D12,D13,D14,D15,R12,R13,R14,R15,H12,H13,H14,W12,W13,W14,W15,T12,T13,T14,T15', 65, 11, 9, 14, 12, 0, 'Pegar fuerte,Romper armadura,Barrido,Golpe demoledor,Arte de la guerra,Remate',
       'Golpe fuerte,Piel curtida', 13, 55, 8, 10, 'Guardia firme', true, 3]);
   const t4 = d('Escudero', 4);   // (aprobado 2026-11-06)
   igual([t4.hpMax, C.defensaEfectiva(t4), C.statValor(t4, 'bloqueo'), C.statValor(t4, 'rescc'), t4.pasivas.map(p => p.nombre).join(), t4.habilidades.map(h => h.nombre).join()],
@@ -6892,6 +6892,17 @@ prueba('⭐ Pool esencial, niveles 2 a 5 (2026-11-06): W1 Hachero 2–5 y T1 Esc
   igual([d('Piromante', 2).hpMax, CreepCalculo.modoSP(d('Piromante', 2)), C.statValor(d('Piromante', 2), 'dmgesp'), C.armadmgEfectiva(d('Piromante', 2))], [45, true, 16, 3]);   // (M1 nv2, 2026-11-06)
   igual([d('Embestidor', 4).hpMax, C.nitrosMax(d('Embestidor', 4)), C.armadmgEfectiva(d('Embestidor', 4))], [80, 9, 3]);   // (nv4, 2026-11-06: jubón +10, Robustez +5)
   igual([h2.hpMax, C.nitrosMax(h2), C.defensaEfectiva(h2), C.armadmgEfectiva(h2), h2.habilidades.map(h => h.nombre).join()], [55, 8, 4, 1, 'Carga que derriba,Takle,Pegar fuerte']);
+});
+prueba('🦅 Ojo de carancho (2026-11-07): +1 al PdG o al PdG.Esp contra un rival con algún estado malo (armas y hechizos); el L1 Sangrador nivel 4 la trae', () => {
+  const C = Combatiente, pas = PASIVAS_BASE.find(p => p.nombre === 'Ojo de carancho');
+  const malos = [[{nombre: 'Sangrado', stacks: 2}], [{nombre: 'Lo que sea', polaridad: 'debuff'}], [{nombre: 'Torpe', mods: [{stat: 'agl', val: -1}]}], [{nombre: '🩸 Sangrado: 2', turnos: 2}]];
+  const buenos = [[], [{nombre: 'Sangrado', activo: false}], [{nombre: 'Furia', polaridad: 'buff', mods: [{stat: 'pdg', val: -1}]}], [{nombre: 'Afortunado'}], [{nombre: 'Sobrepeso', polaridad: 'debuff', derivado: true}]];
+  const l4 = CREEPS_BASE.find(c => c.pool === 'esencial' && c.nombre === 'Sangrador' && c.nivel === 4).datos;
+  const S = {pasivas: [{...pas, compras: 1}]};
+  igual([!!pas, pas.jobCosto, malos.map(C.conEstadoMalo).join(), buenos.map(C.conEstadoMalo).join(),
+    CreepCalculo.modTotal(l4, 'ojocarancho'), l4.pasivas.map(p => p.nombre).join(), FichaCalculo.STAT_LABEL.ojocarancho],
+    [true, 1, 'true,true,true,true', 'false,false,false,false,false', 1, 'Ojo crítico,Ojo de carancho', 'Ojo de carancho']);
+  igual([l4.hpMax, CreepCalculo.defensaEfectiva(l4), CreepCalculo.statValor(l4, 'pdg'), CreepCalculo.statValor(l4, 'eva'), CreepCalculo.critEfectivo(l4, 0), l4.habilidades.length], [40, 1, 11, 16, 1, 5]);
 });
 prueba('⭐ Pool esencial, la tanda del 2026-11-05: los 7 nuevos de nivel 1 (L6, T4, W4, R4, H4, L7, L8) se arman completos y con turnos de espera; Patotear +1 PdG y sin tope', () => {
   const es = CREEPS_BASE.filter(c => c.pool === 'esencial');

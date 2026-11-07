@@ -1764,3 +1764,15 @@ Respaldo antes y partida restaurada después (también se borró el `mapa/activo
   «sos escurridizo» le sale a J1 y no al GM; J1 da el paso (1 casilla, paga su No2) y la Mesa avisa que no hubo oportunidad. Capturas
   `p14-escurridizo-j1-*`.
 - Visto en la prueba y arreglado: el cuadro del duelo tapaba el mapa al elegir la casilla del paso → ahora se minimiza solo.
+
+### 2026-11-07 · 🦅 Ojo de carancho (con clics: GM, J1 y J2 en «Encuentro 2»)
+
+Respaldo antes y partida restaurada después.
+- ✔ **Con el arma**: el Goblin rompehuesos (pasiva de prueba) le pega a Rockardo (copia) con Sangrado: la declaración dice «🦅 +1 Ojo de carancho
+  (el rival tiene un estado malo)» y la tirada «1d8 +1 Ojo de carancho → 8 + 1» (también en la pantalla de J1). Capturas `p16-carancho-1-*`.
+- ✔ **Con un hechizo**: el mismo goblin con Lengua de fuego (PdG.Esp) contra Rockardo: «1d4 +1 Ojo de carancho». Capturas `p16-carancho-2-*`.
+- ✔ **De un jugador, hechizo de área**: Larry (copia) de J1 con la pasiva, Varita de granizo sobre la Rata de la grieta con Sangrado: +1. Con el
+  goblin (sin estados malos) también adentro del área: el goblin sin el +1 (12), la Rata con la misma tirada +1 (13). Capturas `p16-carancho-3-*` y `-4-*`.
+- ✔ Sin estado malo, nada: contra Bizzante (copia) el bono da 0. Visto y arreglado en la prueba: el Sobrepeso de Bizzante (un estado que arma la
+  ficha sola) contaba como estado malo → ya no cuenta.
+

@@ -744,7 +744,7 @@ const Duelo = (() => {
     // cascada; cada objetivo tira su Evasión individualmente contra esa MISMA tirada. `cfg.pdgCompartido` (la tirada
     // ya resuelta del primer objetivo) llega precargada acá, así que este sub-duelo arranca con el contacto ya
     // "medio hecho" — nada más pide la Evasión de este objetivo (mismo camino que cuando un lado tira antes que el otro).
-    if(cfg.pdgCompartido) inicial.pdg = limpiarTiro(cfg.pdgCompartido);
+    if(cfg.pdgCompartido) inicial.pdg = limpiarTiro(sinCarancho(cfg.pdgCompartido));   // (sin el Ojo de carancho del primero: cada objetivo suma el suyo, más abajo)
     // Embestida (piernas, 2026-10-06): el mapa la calcula (`cfg.embestida`, PdG) y se suma al PdG al guardarlo, como por la espalda.
     if(_num(cfg.embestida) > 0 && !hab) inicial.ataque.embestida = Math.min(10, Math.round(_num(cfg.embestida)));
     // Anillos (2026-10-06): Pulso quieto / Foco (`quieto`, al PdG o al PdG.Esp de quien ataca) y Primera sangre (`primeraSangre`, al daño si pega).
@@ -794,6 +794,9 @@ const Duelo = (() => {
     if(_num(cfg.presa) > 0) inicial.ataque.presa = Math.min(5, Math.round(_num(cfg.presa)));   // 🎯 el defensor es la Presa (2026-10-21): +2 al daño
     // 🚩 Bajo el estandarte (2026-10-24, el Estandarte de guerra del Support; lo calcula el mapa, vtt-hexgrid/js/73): +N al PdG (o PdG.Esp) y +N al daño.
     if(cfg.estandarte && (_num(cfg.estandarte.pdg) > 0 || _num(cfg.estandarte.dano) > 0)) inicial.ataque.estandarte = {pdg: Math.min(10, Math.max(0, Math.round(_num(cfg.estandarte.pdg)))), dano: Math.min(20, Math.max(0, Math.round(_num(cfg.estandarte.dano))))};
+    // 🦅 Ojo de carancho (2026-11-07): el defensor tiene algún estado malo y quien ataca tiene la pasiva: +N al PdG o al PdG.Esp (lo calcula el mapa; con el arma o con una habilidad que tire cualquiera de los dos; dueño, 2026-11-07: «armas y hechizos»).
+    if(_num(cfg.carancho) > 0 && (!hab || (hab.tira && ['pdg', 'pdgmg'].includes(hab.tira.stat)))) inicial.ataque.carancho = Math.min(3, Math.round(_num(cfg.carancho)));
+    if(inicial.pdg && _num(inicial.ataque.carancho) > 0){ const k = inicial.ataque.carancho, p0 = inicial.pdg; inicial.pdg = {...p0, total: p0.total + k, mod: p0.mod + k, formula: `${p0.formula} +${k} Ojo de carancho`.slice(0, 90)}; }   // la tirada compartida de un área, contra este objetivo
     if(_num(cfg.espaldaPdg) > 0 && !hab && !cfg.espalda){ inicial.ataque.porLaEspalda = true; inicial.ataque.espaldaPdg = Math.min(5, Math.round(_num(cfg.espaldaPdg))); }
     // 🐈‍⬛ Sobre alguien de su mismo bando (personajes con personajes, creeps con creeps), sin tirada (Echar la mufa, 2026-11-05).
     if(hab && hab.aliadoDirecto && (inicial.atacante.tipo === 'creep') === (inicial.defensor.tipo === 'creep')) hab.sinOposicion = true;
@@ -835,6 +838,7 @@ const Duelo = (() => {
       const pe = [d.ataque.sorpresa ? 'desde el sigilo, la defensa vale 1' : '', _num(d.ataque.espaldaPdg) > 0 ? `+${_fmt(d.ataque.espaldaPdg)} PdG` : '', d.ataque.espalda ? espaldaTxt(d.ataque.espalda) : ''].filter(Boolean).join(', ');
       t.push(`🗡 por la espalda${pe ? ': ' + pe : ''}`);
     }
+    if(d.ataque && _num(d.ataque.carancho) > 0) t.push(`🦅 +${_fmt(d.ataque.carancho)} Ojo de carancho (el rival tiene un estado malo)`);
     if(d.ataque && _num(d.ataque.presa) > 0) t.push(`🎯 contra la presa: +${_fmt(d.ataque.presa)} al daño`);
     if(d.ataque && d.ataque.desarme) t.push(`🤺 ${d.ataque.desarme.quien || ''} intenta desarmar (si gana el Bloqueo, el otro pierde lo que tiene en la mano)`);
     if(d.ataque && _num(d.ataque.miedo) > 0) t.push(`${d.ataque.malviaje ? '🌺 malviajando' : '😱 con miedo'}: −${_fmt(d.ataque.miedo)} PdG y −${_fmt(d.ataque.miedo)} de daño`);
@@ -896,6 +900,13 @@ const Duelo = (() => {
   function limpiarTiro(r){
     if(!r) return null;
     return {total: Math.round(_num(r.total)), formula: txtCorto(r.formula, 60), rolls: (Array.isArray(r.rolls) ? r.rolls : []).slice(0, 20).map(_num), mod: _num(r.mod)};
+  }
+  // 🦅 La tirada compartida de un área (o de un tiro que atraviesa) llega con el Ojo de carancho del primer objetivo: se le saca, y cada uno suma el suyo.
+  function sinCarancho(p){
+    const mm = p && / \+(\d+) Ojo de carancho/.exec(String(p.formula || ''));
+    if(!mm) return p;
+    const k = Number(mm[1]) || 0;
+    return {...p, total: p.total - k, mod: _num(p.mod) - k, formula: String(p.formula).replace(mm[0], '')};
   }
   function limpiarHab(h){
     if(!h || !h.nombre) return null;
@@ -1184,6 +1195,8 @@ const Duelo = (() => {
       if(be && be.pdg) m.pdg = {...tiro, total: tiro.total + be.pdg, mod: tiro.mod + be.pdg, formula: `${tiro.formula} +${be.pdg} espalda`.slice(0, 60)};
       const bep = campo === 'pdg' && m.ataque ? _num(m.ataque.espaldaPdg) : 0;   // 🗡 ataque por la espalda (la regla general, 2026-10-15)
       if(bep > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + bep, mod: p0.mod + bep, formula: `${p0.formula} +${bep} espalda`.slice(0, 60)}; }
+      const cca = campo === 'pdg' && m.ataque ? _num(m.ataque.carancho) : 0;   // 🦅 Ojo de carancho: el defensor tiene algún estado malo
+      if(cca > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + cca, mod: p0.mod + cca, formula: `${p0.formula} +${cca} Ojo de carancho`.slice(0, 90)}; }
       const emb = campo === 'pdg' && m.ataque ? _num(m.ataque.embestida) : 0;   // la Embestida de las piernas
       if(emb > 0){ const p0 = m.pdg; m.pdg = {...p0, total: p0.total + emb, mod: p0.mod + emb, formula: `${p0.formula} +${emb} embestida`.slice(0, 60)}; }
       const qto = campo === 'pdg' && m.ataque ? _num(m.ataque.quieto) : 0;   // Pulso quieto / Foco (anillos)
@@ -3084,7 +3097,7 @@ const Duelo = (() => {
         ${d.defensor && d.defensor.interpuesto ? `<div class="duelo-interpuesto">🛡 Ahora le pega a <b>${_esc(d.defensor.nombre)}</b>: se interpuso${d.defensor.interpuesto.aliado ? ` por ${_esc(d.defensor.interpuesto.aliado)}` : ''}</div>` : ''}
         <div class="duelo-paso"><h4><span class="n">1</span>Declaración</h4>
           <div class="duelo-vs">
-            <div class="duelo-lado atq"><div class="rol">${d.hab ? 'Usa la habilidad' : 'Ataca'}</div><div class="nom">${_esc(d.atacante.nombre)}</div><div class="sub">${d.hab ? _esc(d.hab.nombre) + (d.hab.tira ? ' · tira ' + _esc(d.hab.tira.etq) : '') : (d.ataque.armaNombre ? 'con ' + _esc(d.ataque.armaNombre) : 'sin arma') + ' · Tipo ' + _fmt(_num(d.ataque.tipoDado)) + (modsTxt(d) ? ' · ' + (typeof Glosario !== 'undefined' ? Glosario.marcar(modsTxt(d)) : _esc(modsTxt(d))) : '')}</div></div>
+            <div class="duelo-lado atq"><div class="rol">${d.hab ? 'Usa la habilidad' : 'Ataca'}</div><div class="nom">${_esc(d.atacante.nombre)}</div><div class="sub">${d.hab ? _esc(d.hab.nombre) + (d.hab.tira ? ' · tira ' + _esc(d.hab.tira.etq) : '') + (_num(d.ataque && d.ataque.carancho) > 0 ? ` · 🦅 +${_fmt(d.ataque.carancho)} Ojo de carancho (el rival tiene un estado malo)` : '') : (d.ataque.armaNombre ? 'con ' + _esc(d.ataque.armaNombre) : 'sin arma') + ' · Tipo ' + _fmt(_num(d.ataque.tipoDado)) + (modsTxt(d) ? ' · ' + (typeof Glosario !== 'undefined' ? Glosario.marcar(modsTxt(d)) : _esc(modsTxt(d))) : '')}</div></div>
             <div class="vs">VS</div>
             <div class="duelo-lado def"><div class="rol">${d.hab ? (d.hab.sinOposicion ? 'Objetivo' : 'Se resiste') : 'Defiende'}</div><div class="nom">${_esc(d.defensor.nombre)}</div><div class="sub">${d.defensor.tipo === 'creep' ? 'creep' : 'personaje'}${d.defensa ? ' · ' + _esc(nombreDefensa(d)) : ''}</div></div>
           </div></div>

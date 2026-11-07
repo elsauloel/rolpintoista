@@ -77,6 +77,10 @@ const PASIVAS_BASE = [
    detalle: '+1 PdG (probabilidad de golpe).', mods: [{stat: 'pdg', val: 1}]},
   {poolId: 'ojo-critico', nombre: 'Ojo crítico', jobCosto: 1, etiquetas: ['stat', 'ofensiva'],
    detalle: '+1 Crítico frecuente.', mods: [{stat: 'crit', val: 1}]},   // (dueño, 2026-11-05: «le sacamos el revisar a ojo crítico»)
+  // 🦅 Ojo de carancho (dueño, 2026-11-07, del boceto del L1 Sangrador nivel 4: «una pasiva general: +1 PdG contra cualquier rival con algún
+  // debuff… sube la probabilidad de golpe, el stat probabilidad de golpe»). Corrección del mismo día: «a cualquier tirada que use Probabilidad de Golpe, armas y hechizos» (PdG y PdG.Esp).
+  {poolId: 'ojo-de-carancho', nombre: 'Ojo de carancho', jobCosto: 1, etiquetas: ['ofensiva'],
+   detalle: '+1 a la Probabilidad de Golpe (PdG con armas y PdG.Esp con hechizos) contra cualquier rival que tenga algún estado malo encima (Sangrado, Veneno, Rengo, Armadura rota…): el carancho huele al que está flojo. ⚙ Automatizado: el duelo lo suma solo y se ve «+1 Ojo de carancho» en la tirada.', mods: [{stat: 'ojocarancho', val: 1}]},
   // 🛡 Resistencia a crítico (2026-11-05, dueño: «si no existe ninguna pasiva… que interactúe con la resistencia del crítico, ya diseñaría alguno»;
   // docs/propuesta-pasivas-consumibles-res-critico.md). Las de la vida las suma el duelo al calcular el crítico (Combatiente.resCritPorVida).
   {poolId: 'callo-de-batalla', nombre: 'Callo de batalla', jobCosto: 1, etiquetas: ['stat', 'defensiva'],

@@ -442,6 +442,12 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   Botas de cuero de vaca · + **Casco de cuero endurecido** · + **Anillo maldito del berserker** (Daño +2 · Vida −5). Habilidades: Golpe desesperado ·
   Furia · + **Pegar fuerte**. Pasiva: **Robustez** (+5 de vida). Consumible: Poción de Regeneración menor. Vida **50** (no 55 como decía el plan:
   la Robustez compensa el −5 del Anillo maldito) · No2 6 · Def 4 · PdG 9 · Daño 11.
+  **nv3 aprobado y cargado (2026-11-07):** Fue 10 · Con 11 · Agi 7 · Des 9 · Esp 2. Sube Agilidad y no Destreza (dueño: «más allá de la evasión
+  y la iniciativa, me importan los nitros de la agilidad»; en el nv4 le sube un punto de Destreza). Equipo: el sable sale y entra la **Espada del
+  Jefe de los Mil Caminos** (Buena: Tipo 6, 1 dado, +2 de daño, **Crítico potente +6** —en el catálogo es +6, no +3 como decía el plan—, Sangrado
+  33 %) · Facón de paisano · Chaleco de cuero · Botas de cuero de vaca · Casco de cuero endurecido · Anillo maldito del berserker. Habilidades:
+  Golpe desesperado · Furia · Pegar fuerte · + **Aguante**. Pasiva: Robustez. Consumible: Poción de Regeneración menor. Vida 55 · No2 7 · Def 4 ·
+  PdG 9 · Daño 12 · Eva 7 · Ini 7 · Mov 7.
 
 - **D3 · Ladrón de fuerzas · Debuffer** (boceto aprobado 2026-11-03, dueño: «lo apruebo así»). Estrategia: le saca al rival lo que necesita para
   pelear (los No2, la puntería, las curas, las bendiciones) y se queda con parte; elige al que más hace y lo deja sin aire. Atributos
@@ -1008,7 +1014,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | M1 | ✅ (2026-11-02) | ✅ (2026-11-06) | ✅ (2026-11-06) | ✅ (2026-11-06) | ✅ (2026-11-06) |
 | S1 | ✅ (2026-11-02) | ✅ (2026-11-06) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |
 | D1 | ✅ (2026-11-02) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |
-| W2 | ✅ (2026-11-03) | ✅ (2026-11-07) | | | |
+| W2 | ✅ (2026-11-03) | ✅ (2026-11-07) | ✅ (2026-11-07) | | |
 | H2 | ✅ (2026-11-03) | | | | |
 | L3 | ✅ (2026-11-03) | | | | |
 | L4 | ✅ (2026-11-03) | | | | |

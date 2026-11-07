@@ -238,6 +238,9 @@
   esencial({...W2, nivel: 2, atrib: [10, 9, 6, 9, 2],   // (aprobado 2026-11-07: Pegar fuerte; pasiva Robustez, que compensa el −5 de vida del Anillo maldito del berserker; + Casco de cuero endurecido y el anillo)
     equipo: ['Sable del tahúr', 'Facón de paisano', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Anillo maldito del berserker'],
     habilidades: ['Golpe desesperado', 'Furia', 'Pegar fuerte'], pasivas: ['Robustez']});
+  esencial({...W2, nivel: 3, atrib: [11, 10, 7, 9, 2],   // (aprobado 2026-11-07: Aguante; la Espada del Jefe de los Mil Caminos en lugar del sable; sube Agi y no Des: «me importan los nitros de la agilidad»; en el nv4, +1 Des)
+    equipo: ['Espada del Jefe de los Mil Caminos', 'Facón de paisano', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Anillo maldito del berserker'],
+    habilidades: ['Golpe desesperado', 'Furia', 'Pegar fuerte', 'Aguante'], pasivas: ['Robustez']});
   esencial({linea: 'L2', nombre: 'Envenenador', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [7, 5, 9, 10, 2],
     equipo: ['Daga ritual', 'Chaleco de cuero', 'Guantes de agarre'],
     habilidades: ['Estocada', 'Hoja envenenada'], consumibles: ['Óleo venenoso'],

@@ -70,6 +70,13 @@
 > Devolver gentileza y el caso sin ninguna; el Salto de punta a punta (personaje y creep) y el Takle; la Mala sombra; Patotear; las ondas del agua vistas
 > desde otra pantalla; el Tótem de silencio; Apuntar y Marcar con el potente; el cuadro del duelo encima del gancho de Arrastrar.
 
+> **🐾 Adaptar a bestia los «skills esenciales» (2026-11-07, dueño: «cuando terminemos esto y tengamos tiempo, encarar la adaptación a bestia de la
+> gran parte de los skills de creep que ya tenemos auditados, que vamos a llamar skills esenciales»).** Hoy algunas habilidades tienen su gemela de bestia
+> (Colmillos que perforan, Desgarro, Zarpa certera, Destripar, Morder la herida…) y otras no; y las humanoides se van rehaciendo (2026-11-07: Tajo brutal →
+> Tajo al tendón, Corte certero → Corte en la arteria, sale Corte profundo) **sin tocar todavía las de bestia**. Tarea: recorrer los skills esenciales
+> (los auditados del pool), decidir cuáles tienen versión bestia y con qué nombre/sabor (mordida, zarpa, cornada…), poner al día las gemelas viejas y
+> crear las que falten. Después de la ronda de niveles 2 a 5 de los creeps esenciales.
+
 > **🔥 Cómo costear el daño mágico de los creeps (2026-11-06, abierto; dueño: «no me termina de cerrar… me haría rediseñar todas las armas
 > mágicas y las skills mágicas; quizás le pondría un valor fijo»).** Hallazgo: con el Piromante nv3 (Esp 16, Ef.Esp 17) la Lengua de fuego hace ≈ 13
 > por 16 SP y la Bola de fuego ≈ 13 a cada uno por 16 SP, mientras el Mago jugador hace con 16 SP un Rayo mágico ≈ 34½ directo, y con 4 SP un Orbe

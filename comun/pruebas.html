@@ -124,7 +124,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261107guardia"></script>
 <script src="skills-creep-base.js?v=20261107milagro"></script>
-<script src="creeps-esenciales.js?v=20261107r14"></script>
+<script src="creeps-esenciales.js?v=20261107r15"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
@@ -6826,7 +6826,7 @@ prueba('⭐ Pool esencial, niveles 2 a 5 (2026-11-06): W1 Hachero 2–5 y T1 Esc
     w4.pasivas.map(p => p.nombre).join(), C.statValor(w4, 'dmg'), w4.hpMax,
     C.defensaEfectiva(t3), C.statValor(t3, 'bloqueo'), t3.pasivas.map(p => p.nombre).join(), t3.habilidades.find(h => h.nombre === 'Golpe demoledor') === undefined,
     d('Hachero', 3).habilidades.find(h => h.nombre === 'Golpe demoledor').cdActual],
-    [0, 'M12,M13,M14,M15,S12,S13,S14,S15,D12,D13,D14,D15,R12,R13,R14,H12,H13,H14,W12,W13,W14,W15,T12,T13,T14,T15', 65, 11, 9, 14, 12, 0, 'Pegar fuerte,Romper armadura,Barrido,Golpe demoledor,Arte de la guerra,Remate',
+    [0, 'M12,M13,M14,M15,S12,S13,S14,S15,D12,D13,D14,D15,R12,R13,R14,R15,H12,H13,H14,W12,W13,W14,W15,T12,T13,T14,T15', 65, 11, 9, 14, 12, 0, 'Pegar fuerte,Romper armadura,Barrido,Golpe demoledor,Arte de la guerra,Remate',
       'Golpe fuerte,Piel curtida', 13, 55, 8, 10, 'Guardia firme', true, 3]);
   const t4 = d('Escudero', 4);   // (aprobado 2026-11-06)
   igual([t4.hpMax, C.defensaEfectiva(t4), C.statValor(t4, 'bloqueo'), C.statValor(t4, 'rescc'), t4.pasivas.map(p => p.nombre).join(), t4.habilidades.map(h => h.nombre).join()],
@@ -6834,6 +6834,7 @@ prueba('⭐ Pool esencial, niveles 2 a 5 (2026-11-06): W1 Hachero 2–5 y T1 Esc
   const t5 = d('Escudero', 5);   // (aprobado 2026-11-06)
   igual([t5.hpMax, C.defensaEfectiva(t5), C.statValor(t5, 'bloqueo'), C.statValor(t5, 'rescc'), t5.habilidades.length, t5.equipo.length], [85, 11, 13, 17, 6, 6]);
   const h2 = d('Embestidor', 2);   // (aprobado 2026-11-06)
+  igual([d('Tirador de precisión', 5).hpMax, C.defensaEfectiva(d('Tirador de precisión', 5)), C.armadmgEfectiva(d('Tirador de precisión', 5)), C.statValor(d('Tirador de precisión', 5), 'pdg')], [55, 5, 2, 17]);   // (R1 nv5, 2026-11-07)
   igual([d('Piromante', 5).hpMax, C.defensaEfectiva(d('Piromante', 5)), C.critEfectivo(d('Piromante', 5), 0), d('Piromante', 5).habilidades.length], [65, 5, 2, 6]);   // (M1 nv5, 2026-11-06)
   igual([d('Piromante', 4).hpMax, C.defensaEfectiva(d('Piromante', 4)), C.statValor(d('Piromante', 4), 'pdgmg'), C.statValor(d('Piromante', 4), 'eva')], [55, 3, 18, 8]);   // (M1 nv4, 2026-11-06)
   igual([d('Piromante', 2).hpMax, CreepCalculo.modoSP(d('Piromante', 2)), C.statValor(d('Piromante', 2), 'dmgesp'), C.armadmgEfectiva(d('Piromante', 2))], [45, true, 16, 3]);   // (M1 nv2, 2026-11-06)

@@ -172,6 +172,9 @@
   esencial({...R1, nivel: 4, atrib: [9, 8, 8, 14, 3],   // (aprobado 2026-11-07: Disparo señalador, Ojo crítico; Chaleco de kevlar)
     equipo: ['Arco de puntería', 'Chaleco de kevlar', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Guantes de agarre'],
     habilidades: ['Tiro certero', 'Tiro a la cabeza', 'Vigilancia', 'Tiro al arma', 'Disparo señalador'], pasivas: ['Puntería', 'Ojo crítico']});
+  esencial({...R1, nivel: 5, atrib: [10, 8, 9, 15, 3],   // (aprobado 2026-11-07: Flecha que atraviesa; Botas de mensajero; Cofia y Rodilleras de tatú por algo de Def. esp.)
+    equipo: ['Arco de puntería', 'Chaleco de kevlar', 'Botas de mensajero', 'Cofia de anillas sueltas', 'Guantes de agarre', 'Rodilleras de caparazón de tatú carreta'],
+    habilidades: ['Tiro certero', 'Tiro a la cabeza', 'Vigilancia', 'Tiro al arma', 'Disparo señalador', 'Flecha que atraviesa'], pasivas: ['Puntería', 'Ojo crítico']});
 
   // ---- La tanda del 2026-11-03 (nivel 1 aprobado por el dueño; detalle y porqués en docs/creeps-humanoides.md). Atrib: Con · Fue · Agi · Des · Esp.
   // Los de Especial más alto juegan con SP (regla de arriba); los físicos, con turnos de espera.

@@ -877,6 +877,11 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
 - Des 14 · Con 9 · Agi 8 · Fue 8 · Esp 3 → vida 50 (45 + kevlar 5), No2 8. Equipo: Arco de puntería (B) · **Chaleco de kevlar** (B) · Botas de cuero de
   vaca · Casco · Guantes de agarre. Habilidades: + **Disparo señalador**. Pasivas: Puntería · **Ojo crítico**. Def 5 (7 a distancia) · PdG 16 · crít. T4 3.
 
+### R1 Tirador de precisión · nivel 5 (aprobado 2026-11-07, cargado) — ✅ línea R1 completa
+- Des 15 · Con 10 · Agi 9 · Fue 8 · Esp 3 → vida 55, No2 9. Equipo: Arco de puntería (B) · Chaleco de kevlar (B) · **Botas de mensajero** (B: Eva +2 contra
+  oportunidad, Levitar 2) · **Cofia de anillas sueltas** · Guantes de agarre · **Rodilleras de caparazón de tatú carreta** (dueño: «¿y algo de Def. esp.?»;
+  el carcaj no: los creeps no llevan cuenta de flechas). Habilidades: + **Flecha que atraviesa**. Def 5 (7 a distancia) · Def. esp. 2 · PdG 17 · Eva 9.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4
@@ -942,7 +947,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 | H1 | ✅ (2026-11-03) | | | | |
 | L1 | ✅ (2026-11-02) | | | | |
 | L2 | ✅ (2026-11-03) | | | | |
-| R1 | ✅ (2026-11-03) | | | | |
+| R1 | ✅ (2026-11-03) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |
 | M1 | ✅ (2026-11-02) | ✅ (2026-11-06) | ✅ (2026-11-06) | ✅ (2026-11-06) | ✅ (2026-11-06) |
 | S1 | ✅ (2026-11-02) | ✅ (2026-11-06) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |
 | D1 | ✅ (2026-11-02) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |

@@ -77,6 +77,8 @@ const Duelo = (() => {
   const remachaAvisada = new Set();
   const disparoAvisado = new Set();
   let disparoPrimera = true;
+  const contactoAvisado = new Set();   // 🔄 contactoGanado (2026-11-07)
+  let contactoPrimera = true;
   const pdgEspAvisado = new Set();   // 🔮 el Orbe del custodio (2026-10-18)
   let pdgEspPrimera = true;
   const resistidaAvisada = new Set();   // 🔮 el Contrahechizo (2026-10-18)
@@ -3859,6 +3861,14 @@ const Duelo = (() => {
           if(!disparoPrimera && (esMio(d.atacante) || (soyGM() && d.atacante && d.atacante.tipo === 'creep'))) try{ cfgEscuchar.disparoResuelto(d); }catch(err){ console.error('Duelo: disparoResuelto', err); }
         });
         disparoPrimera = false;
+      }
+      if(cfgEscuchar.contactoGanado && soyGM()){   // 🔄 un ataque que acaba de pegar (ganó el contacto), antes del daño: la pantalla del GM (Cambiar de lugar, 2026-11-07)
+        listaDuelos.forEach(d => {
+          if(!d.contacto || d.contacto.gana !== 'atacante' || !d.ataque || d.hab || d.estado === 'cancelado' || contactoAvisado.has(d.id)) return;
+          contactoAvisado.add(d.id);
+          if(!contactoPrimera) try{ cfgEscuchar.contactoGanado(d); }catch(err){ console.error('Duelo: contactoGanado', err); }
+        });
+        contactoPrimera = false;
       }
       if(cfgEscuchar.remachadoraErro && soyGM()){   // 🎯 la Remachadora (2026-10-11): errar o que la bloqueen vuelve la cuenta a 0
         listaDuelos.forEach(d => {

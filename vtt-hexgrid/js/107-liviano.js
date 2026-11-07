@@ -6,7 +6,7 @@
 //   · 👣 Paso atrás / 🦎 Escurridizo: ganó la Evasión (cfgEscuchar.evasionGanada, comun/duelo.js) → en la pantalla de quien esquivó, la pregunta
 //     y la casilla con un clic (las casillas libres pegadas, pintadas como las del Salto, js/105). El Paso atrás: gratis y sin oportunidad. El
 //     Escurridizo (solo contra un golpe cuerpo a cuerpo): sin oportunidad, pagando el No2 del paso como siempre (confirmarRuta).
-//   · 🔄 Cambiar de lugar (`ataque.cambiaLugar`): si pega, la pantalla del GM (el creep ataca; el hook disparoResuelto, js/14) los cambia de casilla,
+//   · 🔄 Cambiar de lugar (`ataque.cambiaLugar`): apenas pega (contactoGanado, antes del daño; si no llegó, disparoResuelto) la pantalla del GM los cambia de casilla con la animación de abajo,
 //     sin ataques de oportunidad. Un Inamovible tira su chance primero (como el empujón): si le sale, no se mueve nadie.
 
 const esSangradoEstado = e => !!e && e.activo !== false && (e.esSangrado || /^sangrado$/i.test(String(e.nombre || '').trim()));
@@ -128,7 +128,8 @@ function pasoElegirCasilla(tid, modo, quien){
 const cambioHecho = new Set();
 async function cambiarLugarResuelto(d){
   if(!d || !d.ataque || !d.ataque.cambiaLugar || cambioHecho.has(d.id)) return;
-  if(d.resultado !== 'pego' && d.resultado !== 'mitad') return;
+  // Apenas gana el contacto (contactoGanado, antes del daño: el duelo se aparta, se cruzan y el duelo vuelve para el daño) o, si eso no llegó, al terminar.
+  if(!(d.contacto && d.contacto.gana === 'atacante' && d.estado !== 'resuelto') && d.resultado !== 'pego' && d.resultado !== 'mitad') return;
   if(!soyGM){ return; }   // mueve el token del rival: lo hace la pantalla del GM
   cambioHecho.add(d.id);
   const ida = d.atacante && d.atacante.tokenId, idd = d.defensor && d.defensor.tokenId;
@@ -144,10 +145,87 @@ async function cambiarLugarResuelto(d){
     return;
   }
   const a0 = {col: ta.col, fila: ta.fila}, d0 = {col: td.col, fila: td.fila};
+  // 🎞 La animación (dueño, 2026-11-07): el duelo se aparta, los dos se deslizan cruzándose en arco, y el duelo vuelve solo.
+  cambioFxPublicar(ida, idd, a0, d0, d.id).catch(err => console.error('Cambiar de lugar: la animación', err));
+  await new Promise(r => setTimeout(r, 150));   // (que la animación arranque antes de que lleguen las casillas nuevas: así no salta)
   // Sin ataques de oportunidad para nadie: es un movimiento forzado (moverToken no los evalúa); el aviso, a quien se le niega (js/17).
   await moverToken(idd, a0.col, a0.fila, [d0, a0]);
   await moverToken(ida, d0.col, d0.fila, [a0, d0]);
   const txt = `${na} y ${nd} cambian de lugar (sin ataques de oportunidad).`;
   mesaLinea(`🔄 ${txt}`, 'recordatorio');
   try{ momentoAbrir({tipo: 'cambio', icono: '🔄', titulo, resultado: txt, estado: 'listo', datos: {chico: true}}); }catch(err){}
+}
+
+/* 🎞 La animación de Cambiar de lugar (dueño, 2026-11-07: «se minimiza el duelo, se ve la animación fluida de las dos fichas intercambiando de lugar,
+   se vuelve a desplegar el duelo y continúa»). Momento sin tarjeta 'cambio-fx' ({a, b, pa, pb, duelo}): lo publica la pantalla del GM apenas pega (contactoGanado, comun/duelo.js, antes del daño) y lo
+   dibujan todas (js/16 → cambioFxRecibido). Mientras dura, calcularDisposicion (js/05) dibuja cada token sobre un arco de su casilla vieja a la nueva
+   (`cambioFxPosToken`, arcos opuestos para que no se pisen) y queda una estela dorada. El duelo se aparta (Duelo.apartar) y vuelve solo al terminar.
+   Lo que esta pantalla no ve (oculto, niebla, sigilo) no deja estela. «Reducir movimiento»: corta. */
+const CAMBIO_FX = [];
+const cambioFxVistos = new Set();
+const cambioPoco = () => { try{ return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){ return false; } };
+async function cambioFxPublicar(a, b, pa, pb, dueloId){
+  const datos = {a, b, pa: {col: pa.col, fila: pa.fila}, pb: {col: pb.col, fila: pb.fila}, ...(dueloId ? {duelo: String(dueloId)} : {})};
+  const id = typeof momentoAbrir === 'function' ? await momentoAbrir({tipo: 'cambio-fx', icono: '', titulo: '', estado: 'listo', datos}).catch(() => null) : null;
+  if(!id) cambioFxEmpezar(datos);
+}
+function cambioFxRecibido(id, d){
+  if(!d || !d.datos || cambioFxVistos.has(id)) return;
+  cambioFxVistos.add(id);
+  const t = d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now();
+  if(Date.now() - t > 20000) return;
+  cambioFxEmpezar(d.datos);
+}
+function cambioFxEmpezar(dt){
+  if(!dt || !tokens.get(dt.a) || !tokens.get(dt.b)) return;
+  if(CAMBIO_FX.some(f => f.a === dt.a && f.b === dt.b && performance.now() - f.t0 < f.dur)) return;
+  const poco = cambioPoco(), dur = poco ? 320 : 950, espera = poco ? 0 : 380;   // (espera: que el duelo termine de achicarse)
+  CAMBIO_FX.push({a: dt.a, b: dt.b, pa: hexCentro(dt.pa.col, dt.pa.fila), pb: hexCentro(dt.pb.col, dt.pb.fila), t0: performance.now() + espera, dur, poco});
+  if(dt.duelo && typeof Duelo !== 'undefined' && Duelo.apartar){ try{ Duelo.apartar(dt.duelo, espera + dur + 450); }catch(e){} }
+  pedirDibujo();
+}
+const cambioSuave = k => k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+function cambioPunto(fx, desde, hasta, k, lado){
+  const dx = hasta.x - desde.x, dy = hasta.y - desde.y, l = Math.hypot(dx, dy) || 1;
+  const arco = (fx.poco ? 0 : HEX * 0.78) * Math.sin(Math.PI * k) * lado;
+  return {x: desde.x + dx * k - dy / l * arco, y: desde.y + dy * k + dx / l * arco};
+}
+// Dónde se dibuja el token mientras dura (o null: donde está). Antes de arrancar, en su casilla vieja.
+function cambioFxPosToken(id){
+  const ahora = performance.now();
+  for(const fx of CAMBIO_FX){
+    if(id !== fx.a && id !== fx.b) continue;
+    const ms = ahora - fx.t0;
+    if(ms >= fx.dur) continue;
+    const k = cambioSuave(Math.max(0, ms) / fx.dur);
+    return id === fx.a ? cambioPunto(fx, fx.pa, fx.pb, k, 1) : cambioPunto(fx, fx.pb, fx.pa, k, 1);
+  }
+  return null;
+}
+function dibujarEfectosCambio(z){
+  if(!CAMBIO_FX.length) return false;
+  const ahora = performance.now();
+  const ve = id => { const t = tokens.get(id); return !!t && (!t.oculto || soyGM) && (typeof tokenVisiblePorNiebla !== 'function' || tokenVisiblePorNiebla(t)); };
+  ctx.save(); ctx.globalCompositeOperation = 'lighter';
+  for(let i = CAMBIO_FX.length - 1; i >= 0; i--){
+    const fx = CAMBIO_FX[i], ms = ahora - fx.t0;
+    if(ms >= fx.dur + 250){ CAMBIO_FX.splice(i, 1); continue; }
+    if(ms < 0 || fx.poco) continue;
+    const kNow = Math.min(1, ms / fx.dur), apaga = ms > fx.dur ? 1 - (ms - fx.dur) / 250 : 1;
+    [[fx.a, fx.pa, fx.pb], [fx.b, fx.pb, fx.pa]].forEach(([id, desde, hasta]) => {
+      if(!ve(id)) return;
+      for(let j = 1; j <= 9; j++){   // la estela: puntos que quedan atrás y se apagan
+        const k = kNow - j * 0.045;
+        if(k <= 0) break;
+        const p = cambioPunto(fx, desde, hasta, cambioSuave(k), 1), a = (0.55 - j * 0.05) * apaga;
+        if(a <= 0) continue;
+        const r = HEX * (0.34 - j * 0.025);
+        const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r);
+        g.addColorStop(0, `rgba(255,230,150,${a.toFixed(3)})`); g.addColorStop(1, 'rgba(255,170,60,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.fill();
+      }
+    });
+  }
+  ctx.restore();
+  return CAMBIO_FX.length > 0;
 }

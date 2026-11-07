@@ -1754,6 +1754,13 @@ Respaldo antes y partida restaurada después (también se borró el `mapa/activo
 - ✔ **Escurridizo** en Bizzante (copia) (con el 🎮 control del GM, el aviso le salió al GM): la Rata le erra, aviso «Sos escurridizo», paso de 1
   casilla pagando 1 No2, sin oportunidad. Capturas `p14-escurridizo-*`.
 - ✔ **Cambiar de lugar**: el goblin le pega a Bizzante y quedan cada uno en la casilla del otro. Captura `p14-cambio-1-intercambiados`.
-- ⏳ **Pendiente**: el caso Inamovible de Cambiar de lugar (hace falta un rival con Botas de estibador) y el aviso de Escurridizo en la pantalla del
-  jugador mismo (sin control del GM). El código es el mismo camino que el Arrastrar/empujón (Inamovible) y que el Escudo elemental (quién recibe).
+- ✔ (2026-11-07, segunda tanda) **Cambiar de lugar con animación**: apenas pega (al ganar el contacto, antes del daño), el duelo se minimiza solo en
+  todas las pantallas, las dos fichas se cruzan en arco con una estela (~1 s) y el duelo vuelve a abrirse en el paso del daño. Capturas
+  `p15-cambio2-j1-*` (cuadros de la animación en J1), `p15-cambio2-gm-1-301ms` (duelo minimizado) y `p15-cambio2-gm-despues` (duelo de vuelta).
+  Visto: al quedar el goblin detrás de Rockardo sale el aviso «Pasos a tu espalda» (¿darse vuelta?), como cualquier movimiento por la espalda.
+- ✔ **Cambiar de lugar contra un Inamovible** (Rockardo con Botas de ancla de prueba, 50 %; el azar del GM forzado en cada caso): cuando sale la chance,
+  nadie se mueve y la Mesa dice «es Inamovible (50 %): no se mueve nadie»; cuando no sale, se cambian con la animación. Botas sacadas al final.
+- ✔ **Escurridizo en la pantalla del jugador** (Larry (copia) de J1, sin 🎮 control del GM, pasiva de prueba): la Rata le erra, el aviso
+  «sos escurridizo» le sale a J1 y no al GM; J1 da el paso (1 casilla, paga su No2) y la Mesa avisa que no hubo oportunidad. Capturas
+  `p14-escurridizo-j1-*`.
 - Visto en la prueba y arreglado: el cuadro del duelo tapaba el mapa al elegir la casilla del paso → ahora se minimiza solo.

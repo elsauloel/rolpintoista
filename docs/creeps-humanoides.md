@@ -873,6 +873,10 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
 - Des 13 · Agi 8 · Con 8 · Fue 7 · Esp 3 → vida 40, No2 8. Equipo: **Arco de puntería** (B: Rango +5, Crítico potente +2) en lugar del Arco de la espera ·
   Chaleco · Botas de cuero de vaca · Casco · Guantes de agarre. Habilidades: + **Tiro al arma**. PdG 15 · Eva/Ini/Mov 8.
 
+### R1 Tirador de precisión · nivel 4 (aprobado 2026-11-07, cargado)
+- Des 14 · Con 9 · Agi 8 · Fue 8 · Esp 3 → vida 50 (45 + kevlar 5), No2 8. Equipo: Arco de puntería (B) · **Chaleco de kevlar** (B) · Botas de cuero de
+  vaca · Casco · Guantes de agarre. Habilidades: + **Disparo señalador**. Pasivas: Puntería · **Ojo crítico**. Def 5 (7 a distancia) · PdG 16 · crít. T4 3.
+
 ## Equipo por nivel — criterio del dueño (2026-10-27, reemplaza la propuesta de abajo)
 
 «El nivel 1 puede ser un arma, o un arma y un escudo, o un arma y un talismán, o algo de dos manos. Y dos piezas equipables comunes. En nivel 2, 4

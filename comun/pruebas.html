@@ -48,8 +48,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261107dosarmas"></script>
-<script src="creep-calculo.js?v=20261107dosarmas"></script>
+<script src="combatiente.js?v=20261108espinas"></script>
+<script src="creep-calculo.js?v=20261108espinas"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261107dosarmas"></script>
 <script src="creep-duelo.js"></script>
@@ -6916,6 +6916,16 @@ prueba('🦅 Ojo de carancho (2026-11-07): +1 al PdG o al PdG.Esp contra un riva
     CreepCalculo.modTotal(l4, 'ojocarancho'), l4.pasivas.map(p => p.nombre).join(), FichaCalculo.STAT_LABEL.ojocarancho],
     [true, 1, 'true,true,true,true', 'false,false,false,false,false', 1, 'Ojo crítico,Ojo de carancho', 'Ojo de carancho']);
   igual([l4.hpMax, CreepCalculo.defensaEfectiva(l4), CreepCalculo.statValor(l4, 'pdg'), CreepCalculo.statValor(l4, 'eva'), CreepCalculo.critEfectivo(l4, 0), l4.habilidades.length], [40, 1, 11, 16, 1, 5]);
+});
+prueba('🌵 Las Espinas no se suman (dueño, 2026-11-08): varias fuentes devuelven 1/4 una sola vez; la pieza puesta de un creep también cuenta', () => {
+  const C = Combatiente, cat = n => CATALOGO_BASE.find(i => i.nombre === n && !i.archivo);
+  const escudo = {...CreepCalculo.itemParaCreep(cat('Escudo de pinchos')), equipado: true}, pieles = {...CreepCalculo.itemParaCreep(cat('Pieles erizadas del berserker')), equipado: true};
+  const poncho = {...CreepCalculo.itemParaCreep(cat('Poncho de espejitos')), equipado: true};
+  const coraza = [{nombre: 'Espinas', espinas: true, turnos: 3}], dos = [{nombre: 'Espinas', espinas: true}, {nombre: 'Espinas (poción)', espinas: true}];
+  const E = (est, eq) => C.devuelveDano(est, eq, 'espinas', 'Espinas'), J = (est, eq) => C.devuelveDano(est, eq, 'espejo', 'Espejo');
+  igual([escudo.equipoEstadoPreset, E([], [escudo]), E(coraza, [escudo, pieles]), E(dos, []), E([], [{...escudo, equipado: false}]), E([], []), E([{nombre: 'Espinas', espinas: true, activo: false}], []),
+    J([], [poncho]), J([], [escudo]), E([], [poncho]), C.montoDevuelto(13), C.montoDevuelto(12), C.montoDevuelto(0)],
+    ['Espinas', true, true, true, false, false, false, true, false, false, 4, 3, 0]);
 });
 prueba('🩸 L1 Sangrador nivel 5 (2026-11-07): Corte en la arteria y las Botas de mensajero (+2 a la Evasión solo contra el ataque de oportunidad)', () => {
   const C = CreepCalculo, l5 = CREEPS_BASE.find(c => c.pool === 'esencial' && c.nombre === 'Sangrador' && c.nivel === 5).datos;

@@ -780,6 +780,8 @@ const CreepCalculo = (() => {
       if(it.flecha) o.flecha = structuredClone(it.flecha); }   // la munición (2026-10-19): el botín la reconoce (flechas para el arco, virotes para la ballesta)
     const otros = (it.mods || []).filter(m => m.stat !== 'def');
     if(otros.length) o.mods = structuredClone(otros);
+    // 🌵 El estado que da la pieza mientras está puesta (Espinas del Escudo de pinchos, Espejo del Poncho…; 2026-11-08: antes se perdía en un creep).
+    ['equipoEstadoNombre', 'equipoEstadoPreset', 'equipoEstadoDetalle', 'equipoEstadoHpTurno'].forEach(k => { if(it[k]) o[k] = it[k]; });
     o.detalle = it.detalle || '';
     if(it.descripcionNarrativa) o.descripcionNarrativa = it.descripcionNarrativa;
     return o;

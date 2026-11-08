@@ -1737,15 +1737,16 @@ function actualizarMuerteMapa(){
 async function dueloTieneEstado(d, flag, nombre){
   const td = tokens.get(d.defensor.tokenId);
   if(!td) return false;
-  const con = l => (l || []).some(e => e && e.activo !== false && (e[flag] || e.nombre === nombre));
-  if(td.tipo === 'creep'){ const sc = creepPrivadoDe(td.fichaId); return !!(sc && con(sc.estados)); }
+  // 🌵 Una sola vez aunque haya varias fuentes (dueño, 2026-11-08: «las espinas no se suman»): Combatiente.devuelveDano solo dice sí o no.
+  const con = (l, eq) => Combatiente.devuelveDano(l, eq, flag, nombre);
+  if(td.tipo === 'creep'){ const sc = creepPrivadoDe(td.fichaId); return !!(sc && con(sc.estados, sc.equipo)); }   // el creep: también la pieza puesta (Escudo de pinchos…)
   // Una invocación (2026-10-02, paso 4 etapa 4e): sus estados, de la parte `invocaciones` de su dueño.
-  if(String(td.fichaId).includes(SEP_INVOCACION)){ const inv = await invDeToken(td); return !!(inv && con(inv.estados)); }
+  if(String(td.fichaId).includes(SEP_INVOCACION)){ const inv = await invDeToken(td); return !!(inv && con(inv.estados, inv.equipo)); }
   const f = fichasPub.get(td.fichaId);
-  return !!(f && f.resumen && con(f.resumen.estados));
+  return !!(f && f.resumen && con(f.resumen.estados));   // la ficha ya trae el estado de la pieza en sus estados
 }
 async function dueloDevolverDano(d, base, flag, nombre){
-  const monto = Math.ceil(num(base) / 4);
+  const monto = Combatiente.montoDevuelto(base);   // 1/4, una vez
   try{
     if(!(await dueloTieneEstado(d, flag, nombre))) return null;
     const ta = tokens.get(d.atacante.tokenId);

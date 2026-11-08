@@ -2881,6 +2881,17 @@ const Combatiente = (() => {
       return {desde, estado};
     }).filter(Boolean).sort((a, b) => a.desde - b.desde).slice(0, 6);
   }
+  /* 🌵🪞 Devolver daño (Espinas y Espejo). Dueño, 2026-11-08: «las espinas no se suman»: tenga las fuentes que tenga (la Coraza de púas, el Escudo
+     de pinchos, las Pieles erizadas, el Aura de espinas, una poción…), un golpe devuelve 1/4 UNA sola vez. Lo mismo el Espejo (Velo espejado, Poncho
+     de espejitos…), que ya funcionaba así. `estados`: los del combatiente; `equipo`: lo que tiene puesto (un creep o una invocación, que no reciben
+     el estado de la pieza como una ficha: se mira el `equipoEstadoPreset`/`equipoEstadoNombre` de la pieza). */
+  const DEVUELVE_FRACCION = 4;
+  function devuelveDano(estados, equipo, flag, nombre){
+    const enEstados = (estados || []).some(e => e && e.activo !== false && (e[flag] || e.nombre === nombre));
+    const enEquipo = (equipo || []).some(i => i && i.equipado !== false && (i.equipoEstadoPreset === nombre || String(i.equipoEstadoNombre || '').trim() === nombre));
+    return enEstados || enEquipo;
+  }
+  const montoDevuelto = base => Math.ceil(nf(base) / DEVUELVE_FRACCION);
   const efectoPorTirada = (tabla, total) => porTiradaNorm(tabla).filter(f => f.desde <= nf(total)).pop() || null;
   const porTiradaFilaTxt = f => f.caer ? 'cae (la vida a 0)' : `${f.estado.nombre}${f.estado.permanente ? ' (no vence)' : nf(f.estado.turnos) > 0 ? ` (${f.estado.turnos} turno${f.estado.turnos === 1 ? '' : 's'})` : ''}${nf(f.estado.stacks) > 0 ? ` ×${f.estado.stacks}` : ''}`;
   const porTiradaTxt = tabla => porTiradaNorm(tabla).map(f => `${f.desde}+ ${porTiradaFilaTxt(f)}`).join(' · ');
@@ -2908,5 +2919,5 @@ const Combatiente = (() => {
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad, sincronizarEstadosDePasivas, sangraPorSp,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,
     formulaDanoHab, zonaDeHab, trampaDeHab, ataqueConArreglos, esFlash, FLASH_CSS, flashPara, cdFlash, costoFlash,
-    porTiradaNorm, efectoPorTirada, porTiradaFilaTxt, porTiradaTxt};
+    porTiradaNorm, efectoPorTirada, porTiradaFilaTxt, porTiradaTxt, DEVUELVE_FRACCION, devuelveDano, montoDevuelto};
 })();

@@ -1860,3 +1860,10 @@ Capturas `p22-01` a `p22-10`.
 el equipo y las habilidades del Berserker nivel 5. La A ofrece las dos espadas; las Acciones muestran «Atacar con Espada del Jefe… 🎲 1d10» y
 «Atacar con Espada larga 🎲 1d10+1». En el duelo contra Rockardo (copia): con la del Jefe «Pagar y tirar PdG · 1d10», con la larga «· 1d10+1»
 (el +1 solo con la Espada larga). Capturas `p23-w25-jefe` y `p23-w25-larga`.
+
+### Las Espinas no se suman (2026-11-08)
+«Claude · pruebas», «Encuentro 2» (respaldo antes, restaurado y comparado después: igual, salvo `delatados`, que el mapa recalcula solo). Al Capataz
+del culto (creep) se le puso el Escudo de pinchos y el estado Espinas (como la Coraza de púas): dos fuentes. El Goblin rompehuesos le pegó cuerpo a
+cuerpo con 30 de daño: «🌵 Espinas: Goblin rompehuesos recibe 8 de daño devuelto» (1/4 de 30, una sola vez; 85 → 77). Sin el estado, solo con el
+escudo, 20 de daño: devuelve 5 (77 → 72). Antes del arreglo, un creep con solo la pieza no devolvía nada (`itemParaCreep` perdía el estado de la
+pieza). Capturas `p24-06-cuadro-espinas` y `p24-07-solo-escudo`.

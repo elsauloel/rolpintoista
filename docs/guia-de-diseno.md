@@ -89,7 +89,7 @@ Para cada efecto de arma, cada familia lo tiene en uno de tres niveles:
 
 **Estados sobre el golpeado o el objetivo** (existen; ver Estados en el manual): Veneno, Veneno severo, Sangrado, Armadura rota, Lisiado, Inmovilizado, Rengo, Pajaritos,
 Stun, Cansado, Exhausto, Escarcha, Sentado.
-**Estados a favor**: Regeneración, Hypeado, Invulnerable, Inmunidad a CC, Espinas (daño físico cuerpo a cuerpo), **Espejo** (su pareja: 1/4 del daño especial, a cualquier distancia), Barrera / Escudo especial (con máximo, se recarga), **Excedente de vida** (HP por encima del máximo, sin tope ni recarga),
+**Estados a favor**: Regeneración, Hypeado, Invulnerable, Inmunidad a CC, Espinas (daño físico cuerpo a cuerpo; **no se suman**, dueño 2026-11-08: con varias fuentes —habilidad, escudo, coraza, poción— el golpe devuelve 1/4 una sola vez, así que dos fuentes en el mismo combatiente se desperdician), **Espejo** (su pareja: 1/4 del daño especial, a cualquier distancia; tampoco se suma), Barrera / Escudo especial (con máximo, se recarga), **Excedente de vida** (HP por encima del máximo, sin tope ni recarga),
 Afortunado, Sangre pura, Coagulación extrema, Blindado, Sigilo.
 **Efectos de arma al golpear** (se recuerdan y se tiran, no se aplican solos): Rompe armadura, Envenenar, Sangrado, Aturdir, Derribar, Agarrar, Prende fuego, Drena vida.
 **Sobre el mapa**: formas y terreno (con turnos y Colisión), trampas (con daño, estado, fuego amigo del efecto y **teleport**), sigilo (cono y zona de alerta), niebla y visión, auras, ping.

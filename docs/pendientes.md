@@ -1016,7 +1016,7 @@ sobre vos) y Drenar vida (diferencia + drena, tope 50 %). Probado en vivo desde 
   pensadas sobre todo para casters y livianos.
 - [ ] **⭐ Pool esencial: elegir el nivel al crear (dueño, 2026-11-03):** al agregar un creep esencial, elegir nivel 1–5 y que salga solo con los
   atributos, habilidades y equipo de ese nivel (cada línea guarda los 5 niveles). Programar cuando esté diseñada la primera línea completa (el Escudero).
-- [ ] **🦔 ¿Las Espinas de varias fuentes se acumulan? (dueño, 2026-11-03: «habría que evaluarlo, testearlo, ponerlo en pendientes de diseño»)**: la
+- [x] ✅ **Resuelto el 2026-11-08 (dueño: «las espinas no se suman»): un golpe devuelve 1/4 una sola vez, tenga las fuentes que tenga** (`Combatiente.devuelveDano`; el duelo ya lo hacía así). De paso, un creep o una invocación ahora sí devuelven con la pieza puesta (Escudo de pinchos, Pieles erizadas, Poncho de espejitos…): antes `itemParaCreep` perdía el estado de la pieza y solo contaban sus estados. El dueño pidió reemplazar las fuentes que se pisan en los creeps (la Muralla con púas). **🦔 ¿Las Espinas de varias fuentes se acumulan? (dueño, 2026-11-03: «habría que evaluarlo, testearlo, ponerlo en pendientes de diseño»)**: la
   Muralla con púas puede llevar Espinas de la Coraza de púas (habilidad), del Escudo de pinchos y de las Pieles erizadas del berserker. Ver qué hace hoy
   el duelo (`dueloEspinas`, vtt-hexgrid/js/13: ¿1/4 una sola vez o por fuente?), probarlo en el mapa y decidir la regla (una sola vez, se suman, o
   suben el porcentaje con tope).

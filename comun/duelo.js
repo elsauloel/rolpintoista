@@ -2437,6 +2437,7 @@ const Duelo = (() => {
         if(!d.hab && h && h.efectosArma) efectos = efectosArmaDe(d, h);
       }catch(err){}
       if(!d.hab) efectos = [...efectos, ...efectosDeHabilidad(d)];
+      r = await flashManual(d, campo, r, lado, '');   // ⚡ (2026-11-08) el Flash marcado también vale con la tirada escrita a mano
       if(typeof mesaPublicar === 'function'){ try{ mesaPublicar(`${lado.nombre} · ${etiqueta} (manual)`, r); }catch(err){} }
       guardarDano(d.id, r, efectos, {defensaManual}).catch(err => { console.error(err); _toast('No se pudo anotar la tirada en el duelo'); });
       return;
@@ -2449,7 +2450,29 @@ const Duelo = (() => {
       try{ ok = typeof window.dueloDesarmar === 'function' && await window.dueloDesarmar(d.id, campo === 'fuerza' ? 'atacante' : 'defensor'); }catch(err){ console.error('Desarmar:', err); }
       if(!ok){ manualAbierto.add(k); dibujar(); return; }
     }
+    r = await flashManual(d, campo, r, lado, campo === 'eva' ? modo : '');   // ⚡ (2026-11-08) el Flash marcado también vale con la tirada escrita a mano
     guardarTiro(d.id, campo, r, defensa, await extraManual(d, campo)).catch(err => { console.error(err); _toast('No se pudo anotar la tirada en el duelo'); });
+  }
+  /* ⚡ El Flash marcado con la tirada escrita a mano (cola de pruebas 4, 2026-11-08: el Hachero marcó «Arte de la guerra +3», eligió el PdG a mano
+     y el +3 no se sumó ni se cobró). Lo mismo que con el botón de tirar: la página del que tira cobra el Flash (flashUsar) y el bono se suma a la
+     tirada escrita. Si esta página no maneja a ese lado, avisa y sigue sin el Flash. */
+  async function flashManual(d, campo, r, lado, modo){
+    const k = d.id + ':' + campo, habId = flashSel[k];
+    if(!habId) return r;
+    delete flashSel[k]; delete flashOps[k]; flashPedidas.delete(k);
+    let h = null;
+    try{
+      if(cfgEscuchar.hooksLocal){ h = cfgEscuchar.hooksLocal(lado); if(h && typeof h.then === 'function') h = await h; }
+      const H = hooks();
+      if(!h && H && H.soy && H.soy(lado)) h = H;
+    }catch(err){ h = null; }
+    if(!h || !h.flashUsar){ _toast('El Flash no se pudo cobrar desde esta pantalla: se anota la tirada sin él'); return r; }
+    let flash = null;
+    try{ flash = await h.flashUsar(d, campo, modo || '', habId); }catch(err){ console.error('Duelo: Flash con tirada a mano', err); }
+    if(!flash || !_num(flash.bono)){ if(!flash) _toast('No se usó el Flash: se anota la tirada sin él'); return r; }
+    anunciarMesa(`⚡ ${flash.etq || 'Flash'}: +${_num(flash.bono)} a ${ETQ_FLASH[campo === 'eva' ? 'eva' : campo] || 'la tirada'} (${flash.quien || 'un jugador'})`);
+    return {...r, mod: _num(r.mod) + _num(flash.bono), total: _num(r.total) + _num(flash.bono), formula: String(r.formula || '') + ` +${_num(flash.bono)} ⚡`,
+      ...(flash.dodge && campo === 'eva' ? {dodge: true} : {})};
   }
 
   // El «?» que explica Esquivar, Parry y Bloqueo (comun/modificadores-tirada.js; si la página no lo carga, no aparece).

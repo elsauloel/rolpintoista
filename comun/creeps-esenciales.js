@@ -198,16 +198,21 @@
     habilidades: ['Coraza de púas', 'Aguante'], consumibles: ['Poción de Cuero Duro'],
     estrategia: 'Tanque. Castiga al que le pega: púas, aguante y un hachazo con garfio. No persigue: se planta.'});
   const T2 = {linea: 'T2', nombre: 'Muralla con púas', rol: 'tanque', rolTxt: 'tanque', consumibles: ['Poción de Cuero Duro'],
-    estrategia: 'Tanque. Castiga al que le pega: púas, aguante y un hachazo con garfio. No persigue: se planta.'};
+    estrategia: 'Tanque. Castiga al que le pega: púas para el que pega de cerca, velo para el que tira magia; provoca para que le peguen a él y no persigue: se planta.'};
   esencial({...T2, nivel: 2, atrib: [13, 8, 6, 6, 3],   // (aprobado 2026-11-07: Velo espejado; pasiva Piel curtida; + Cofia y Botas de cuero de vaca; dueño: del nv3 en adelante, subirle la Probabilidad de Golpe)
     equipo: ['Hacha con garfio', 'Puerta de granero', 'Coraza de cuero hervido', 'Cofia de anillas sueltas', 'Botas de cuero de vaca'],
     habilidades: ['Coraza de púas', 'Aguante', 'Velo espejado'], pasivas: ['Piel curtida']});
-  esencial({...T2, nivel: 3, atrib: [14, 8, 6, 8, 3],   // (aprobado 2026-11-08: Blindaje; los dos puntos de Destreza a la PdG; las Espinas no se suman: el Mantelete de asedio en lugar del Escudo de pinchos del plan)
+  // Orden nuevo (dueño, 2026-11-08: «espinas y provocar van muy bien para un tanque»): nv1 Coraza de púas + Aguante · nv2 Velo espejado · nv3 Provocar ·
+  // nv4 Blindaje · nv5 Escudo humano; sale Segundo aliento. Del nv3 en adelante, un punto de Fuerza pasa a Especial (Provocar tira PdG.Esp + nivel contra Res.Mt).
+  esencial({...T2, nivel: 3, atrib: [14, 7, 6, 8, 4],   // (aprobado 2026-11-08: Provocar; los dos puntos de Destreza a la PdG; las Espinas no se suman: el Mantelete de asedio en lugar del Escudo de pinchos del plan)
     equipo: ['Hacha con garfio', 'Mantelete de asedio', 'Coraza de cuero hervido', 'Cofia de anillas sueltas', 'Botas de cuero de vaca'],
-    habilidades: ['Coraza de púas', 'Aguante', 'Velo espejado', 'Blindaje'], pasivas: ['Piel curtida']});
-  esencial({...T2, nivel: 4, atrib: [15, 8, 7, 9, 3],   // (aprobado 2026-11-08: Segundo aliento; pasiva Robustez; la Coraza de bronce con runas en lugar de las Pieles erizadas del plan —las Espinas no se suman—; el punto a Destreza y no a Fuerza, para seguir subiendo la PdG)
+    habilidades: ['Coraza de púas', 'Aguante', 'Velo espejado', 'Provocar'], pasivas: ['Piel curtida']});
+  esencial({...T2, nivel: 4, atrib: [15, 7, 7, 9, 4],   // (aprobado 2026-11-08: Blindaje; pasiva Robustez; la Coraza de bronce con runas en lugar de las Pieles erizadas del plan —las Espinas no se suman—)
     equipo: ['Hacha con garfio', 'Mantelete de asedio', 'Coraza de bronce con runas', 'Cofia de anillas sueltas', 'Botas de cuero de vaca'],
-    habilidades: ['Coraza de púas', 'Aguante', 'Velo espejado', 'Blindaje', 'Segundo aliento'], pasivas: ['Piel curtida', 'Robustez']});
+    habilidades: ['Coraza de púas', 'Aguante', 'Velo espejado', 'Provocar', 'Blindaje'], pasivas: ['Piel curtida', 'Robustez']});
+  esencial({...T2, nivel: 5, atrib: [16, 8, 7, 10, 4],   // (aprobado 2026-11-08: Escudo humano; el Hacha de abordaje en lugar del Hacha con garfio)
+    equipo: ['Hacha de abordaje', 'Mantelete de asedio', 'Coraza de bronce con runas', 'Cofia de anillas sueltas', 'Botas de cuero de vaca'],
+    habilidades: ['Coraza de púas', 'Aguante', 'Velo espejado', 'Provocar', 'Blindaje', 'Escudo humano'], pasivas: ['Piel curtida', 'Robustez']});
   esencial({linea: 'M2', nombre: 'Mago de escarcha', rol: 'mago', rolTxt: 'mágico', nivel: 1, atrib: [8, 2, 5, 6, 12],
     equipo: ['Varita de la ventisca', 'Escudo de cuero mojado', 'Capa de viajero', 'Anillo de escarcha'],
     habilidades: ['Dardo helado', 'Hálito polar'], consumibles: ['Poción de SP menor'],

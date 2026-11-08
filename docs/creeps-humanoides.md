@@ -186,6 +186,17 @@
     (Buena: Defensa +3 · Defensa especial +3 · Res. rayo +1 · Vida +10). Equipo: Hacha con garfio · Mantelete de asedio · **Coraza de bronce con
     runas** · Cofia de anillas sueltas · Botas de cuero de vaca. Habilidades: … · + **Segundo aliento**. Pasivas: Piel curtida · + **Robustez**.
     Consumible: Poción de Cuero Duro. Vida 90 · No2 7 · PdG 9 · Def 8 (12 contra armas a distancia) · Def.Esp 4 · Bloqueo con el escudo 9 · Eva 7.
+  - **Orden nuevo de habilidades y T2 completa (dueño, 2026-11-08: «espinas y provocar van muy bien para un tanque»):** nv1 Coraza de púas +
+    Aguante · nv2 + Velo espejado · nv3 + **Provocar** · nv4 + **Blindaje** · nv5 + **Escudo humano**. **Sale Segundo aliento** (queda tanque puro:
+    aguanta, provoca y castiga, no se cura). **Del nv3 en adelante, un punto de Fuerza pasa a Especial** (Provocar tira PdG.Esp + nivel contra la
+    Res.Mt; dueño: «un puntito más de especial», sacado de Fuerza a sugerencia). El daño que se lleva por Escudo humano no activa sus Espinas (regla
+    del dueño, 2026-11-08). Los nv3 y nv4 de arriba quedan reemplazados por estos (Con/Fue/Agi/Des/Esp):
+    | Nivel | Atributos | Habilidad nueva | Equipo nuevo | Vida | No2 | PdG | PdG.Esp | Daño | Def (a distancia) | Def.Esp | Bloqueo escudo / hacha | Eva | Res.CC | Res.Mt |
+    |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+    | 3 | 14/7/6/8/4 | Provocar | Mantelete de asedio | 70 | 6 | 8 | 4 | 7 | 8 (12) | 1 | 12 / 9 | 6 | 14 | 4 |
+    | 4 | 15/7/7/9/4 | Blindaje | Coraza de bronce con runas | 90 | 7 | 9 | 4 | 7 | 8 (12) | 4 | 12 / 9 | 7 | 15 | 4 |
+    | 5 | 16/8/7/10/4 | Escudo humano | **Hacha de abordaje** (Buena: Bloqueo +2, Derribar 33 %, Resistente ×2) | 95 | 7 | 10 | 4 | 8 | 8 (12) | 4 | 13 / 11 | 7 | 16 | 4 |
+    (Bloqueo con el peso de la pieza incluido, como lo calcula `CreepCalculo.bloqueoValor`.) Provocar en el nv3 tira 4 + 3 = 7 contra la Res.Mt.
 
 ## La idea
 
@@ -1035,7 +1046,7 @@ Cada pieza se elige porque hace algo con sus skills (un hacha con Rompe armadura
 |---|---|---|---|---|---|
 | W1 | ✅ (2026-11-02) | ✅ (2026-11-05) | ✅ (2026-11-05) | ✅ (2026-11-05) | ✅ (2026-11-05) |
 | T1 | ✅ (2026-11-02) | ✅ (2026-11-05) | ✅ (2026-11-06) | ✅ (2026-11-06) | ✅ (2026-11-06) |
-| T2 | ✅ (2026-11-02; rehecho 2026-11-03) | ✅ (2026-11-07) | | | |
+| T2 | ✅ (2026-11-02; rehecho 2026-11-03) | ✅ (2026-11-07) | ✅ (2026-11-08; rehecho con Provocar) | ✅ (2026-11-08; rehecho con Blindaje) | ✅ (2026-11-08) |
 | H1 | ✅ (2026-11-03) | | | | |
 | L1 | ✅ (2026-11-02) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |
 | L2 | ✅ (2026-11-03) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) | ✅ (2026-11-07) |

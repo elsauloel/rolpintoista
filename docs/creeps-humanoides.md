@@ -565,6 +565,15 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   Def 9 (+3 contra el primer golpe de cada turno), Eva 8, Res.CC 14. El torso Bueno es la **Coraza de primera línea** (Def +4, +3 contra el primer
   golpe del turno, Res.CC +1, Vida +10) en lugar del Chaleco de cuero; las Pieles erizadas se descartaron para que no se parezca al Berserker.
   Habilidad nueva: **Aguante** (los dados se descargan también con las habilidades de ataque; en el Barrido, solo al primer rival). Pasiva: **Robustez**.
+  **✅ Línea completa (2026-11-08). Orden nuevo de las habilidades** (dueño, 2026-11-08: «nivel 2 va a entrar pisotón. Nivel 3 aguante. Nivel 4
+  dash. Nivel 5 barrido»): nv1 **Salto** y **Pegar fuerte** · nv2 **Pisotón** · nv3 **Aguante** · nv4 **Dash** · nv5 **Barrido** (el Salto aplastante
+  del plan no entra: el Dash le da la salida). Los niveles 2 a 4 se recargaron con ese orden; atributos, equipo y pasivas, como estaban.
+  Estrategia: entra saltando por encima de la primera línea, pisotea y aguanta si lo rodean, sale con el Dash o saltando (el Salto puede caer en
+  cualquier casilla libre y no atacar: paga 1 No2), y en el nv5 barre a todos los que lo rodean.
+  **Nivel 5 aprobado y cargado** (dueño, 2026-11-08): Fue 12 · Con 13 · Des 10 · Agi 8 · Esp 2, vida 80, 8 No2, PdG 10, Daño 12 con 2 dados, Def 9,
+  Res.CC 15. La tercera Buena: **Grebas del carnero** (en lugar de las Polainas: Def +1, Res.CC +1 y Embestida +2 —+2 PdG al primer ataque del turno
+  si los últimos 2 pasos fueron en línea recta hasta el rival; regla del dueño: **el Salto y el Dash no cuentan como pasos**; en la cola de pruebas).
+  Habilidad nueva: **Barrido**.
 
 - **S4 · Protector · Support, con SP** (boceto aprobado 2026-11-03, dueño: «la ruta me cierra, me resulta interesante»). Estrategia: juega en el
   turno de los demás: protege a sus aliados con Flash en el momento justo (escudo, +3 a la defensa, sacar un estado) y desvía los golpes. Atributos

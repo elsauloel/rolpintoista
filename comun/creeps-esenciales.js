@@ -246,16 +246,20 @@
     habilidades: ['Salto', 'Pegar fuerte'], consumibles: ['Poción de Cuero Duro'],
     estrategia: 'Híbrido. Salta por encima de la primera línea y cae entre los de atrás; ahí se planta y pega.'});
   const H2 = {linea: 'H2', nombre: 'Saltador', rol: 'hibrido', rolTxt: 'melee', consumibles: ['Poción de Cuero Duro'],
-    estrategia: 'Híbrido. Salta por encima de la primera línea y cae entre los de atrás; ahí se planta y barre a todos los que lo rodean.'};
-  esencial({...H2, nivel: 2, atrib: [10, 9, 7, 8, 2],   // (aprobado 2026-11-08: Barrido y Piel curtida; + Casco de cuero endurecido y Polainas de cuero remendado; un punto de Fuerza pasó a Destreza, dueño: «un poco de destreza… no agilidad»)
+    estrategia: 'Híbrido. Entra saltando por encima de la primera línea y cae entre los de atrás; si lo rodean, pisotea y aguanta; sale con el Dash o saltando, y en el último nivel barre a todos los que lo rodean.'};
+  // Orden de las habilidades (dueño, 2026-11-08): nv1 Salto y Pegar fuerte · nv2 Pisotón · nv3 Aguante · nv4 Dash · nv5 Barrido.
+  esencial({...H2, nivel: 2, atrib: [10, 9, 7, 8, 2],   // (aprobado 2026-11-08: Pisotón y Piel curtida —el Barrido pasó al nv5—; + Casco de cuero endurecido y Polainas de cuero remendado; un punto de Fuerza pasó a Destreza, dueño: «un poco de destreza… no agilidad»)
     equipo: ['Hacha de vikingo', 'Rodela tachonada', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Polainas de cuero remendado'],
-    habilidades: ['Salto', 'Pegar fuerte', 'Barrido'], pasivas: ['Piel curtida']});
-  esencial({...H2, nivel: 3, atrib: [11, 10, 7, 9, 2],   // (aprobado 2026-11-08: Pisotón; el hacha pasa a la del aserrador, Buena: 2 dados, Rompe armadura 33 %, Derribar 25 %)
+    habilidades: ['Salto', 'Pegar fuerte', 'Pisotón'], pasivas: ['Piel curtida']});
+  esencial({...H2, nivel: 3, atrib: [11, 10, 7, 9, 2],   // (aprobado 2026-11-08: Aguante —antes Pisotón, que pasó al nv2—; el hacha pasa a la del aserrador, Buena: 2 dados, Rompe armadura 33 %, Derribar 25 %)
     equipo: ['Hacha del aserrador', 'Rodela tachonada', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Polainas de cuero remendado'],
-    habilidades: ['Salto', 'Pegar fuerte', 'Barrido', 'Pisotón'], pasivas: ['Piel curtida']});
-  esencial({...H2, nivel: 4, atrib: [12, 11, 8, 9, 2],   // (aprobado 2026-11-08: Aguante y Robustez; el torso Bueno es la Coraza de primera línea —las Pieles erizadas se descartaron para que no se parezca al Berserker—)
+    habilidades: ['Salto', 'Pegar fuerte', 'Pisotón', 'Aguante'], pasivas: ['Piel curtida']});
+  esencial({...H2, nivel: 4, atrib: [12, 11, 8, 9, 2],   // (aprobado 2026-11-08: Dash —antes Aguante, que pasó al nv3— y Robustez; el torso Bueno es la Coraza de primera línea —las Pieles erizadas se descartaron para que no se parezca al Berserker—)
     equipo: ['Hacha del aserrador', 'Rodela tachonada', 'Coraza de primera línea', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Polainas de cuero remendado'],
-    habilidades: ['Salto', 'Pegar fuerte', 'Barrido', 'Pisotón', 'Aguante'], pasivas: ['Piel curtida', 'Robustez']});
+    habilidades: ['Salto', 'Pegar fuerte', 'Pisotón', 'Aguante', 'Dash'], pasivas: ['Piel curtida', 'Robustez']});
+  esencial({...H2, nivel: 5, atrib: [13, 12, 8, 10, 2],   // (aprobado 2026-11-08: Barrido; la tercera Buena son las Grebas del carnero —Embestida +2 PdG si los últimos 2 pasos fueron en línea recta; el Salto y el Dash no cuentan—)
+    equipo: ['Hacha del aserrador', 'Rodela tachonada', 'Coraza de primera línea', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Grebas del carnero'],
+    habilidades: ['Salto', 'Pegar fuerte', 'Pisotón', 'Aguante', 'Dash', 'Barrido'], pasivas: ['Piel curtida', 'Robustez']});
   esencial({linea: 'W2', nombre: 'Berserker', rol: 'warrior', rolTxt: 'melee', nivel: 1, atrib: [9, 8, 6, 8, 2],   // dos armas (el ataque con la segunda, pendiente de programar en creeps)
     equipo: ['Sable del tahúr', 'Facón de paisano', 'Chaleco de cuero', 'Botas de cuero de vaca'],
     habilidades: ['Golpe desesperado', 'Furia'], consumibles: ['Poción de Regeneración menor'],

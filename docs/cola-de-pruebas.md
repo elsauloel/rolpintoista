@@ -24,6 +24,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 14. [ ] **Línea T2 · Muralla con púas, niveles 1 a 5** (Provocar, Velo espejado, Mantelete contra disparos, Escudo humano sin Espinas).
 15. [ ] **Línea H2 · Saltador** (cuando esté completa).
 16. [ ] **Milagro con 3d8** (2026-11-08): la cura pasó de 2d8 a 3d8, una sola tirada para todos los aliados del área; ver que la tirada y el texto digan 3d8.
+17. [ ] **Barrido armado por un jugador para su invocación** (2026-11-08): en el armado de la habilidad de la invocación (✨ Ejecución → «Ataque con mi arma» → la tarjeta de la PdG) tildar «🌀 Giro (como el Barrido)»; usarlo en el mapa: elegir el primero, el orden, el pulso y el duelo de cada rival.
 
 Cada línea nueva que se termine de diseñar se suma al final.
 

@@ -100,6 +100,9 @@ que se despliega desde ahí, el duelo, y el cuadro que se repliega antes del sig
 corta el giro, «Terminar a mano» deja ese golpe a la mesa y sigue. El **Remolino** del Warrior (dueño: «que sea prácticamente lo mismo visualmente que
 el barrido») hace lo mismo, con su paso de más antes de pegar: alcanza a los de las dos casillas y el orden se toma alrededor de donde quedó.
 (`vtt-hexgrid/js/108-barrido.js`; las habilidades llevan `barrido` y el Remolino `barridoPaso`.)
+**Cualquiera puede armar un giro** (dueño, 2026-11-08: «que se pueda poner un barrido a una invocación»): en la ✨ Ejecución de una habilidad,
+«Ataque con mi arma» → la tarjeta de la PdG → «🌀 Giro (como el Barrido)». Vale para el personaje, su invocación, el GM y el editor de creeps
+(`comun/asistente-duelo-hab.js`, guarda `barrido: true`; el `giro` del Remolino —su paso de más— se conserva al editarlo).
 **🛡 Aguante con habilidades de ataque** (dueño, 2026-11-08: «que se pueda sumar a otros skills que estén incluidos en un ataque, como pegar fuerte.
 Todos los skills que van como ensamblados al ataque, si vienen con el bono del aguante, se deben sumar»): cualquier habilidad que es un ataque con el
 arma descarga los dados del Aguante sumados a los suyos (Pegar fuerte con 3 golpes contados: +1 dado de la habilidad y +3 del Aguante), con el mismo

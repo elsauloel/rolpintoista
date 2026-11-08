@@ -209,6 +209,10 @@ const AsistenteDueloHab = (() => {
       ondaDodge: !!(ini && ini.ondaDodge),   // la onda deja dodge roll a quien gana (2026-10-02, Daño en área)   // hechizo de área (Paso 4/7 del casteo): radio del área, en casilleros
       modo: (ini && ini.modo) || 'hab', x: (ini && ini.x) || 'nitros',
       terminaTurno: !!(ini && ini.terminaTurno),   // Degollar (2026-10-10): al resolverse, termina el turno y pasa al final del orden
+      // 🌀 Giro (2026-11-08, dueño: «que se pueda poner un barrido a una invocación»): el ataque con el arma le pega a cada rival al lado, uno por uno
+      // (el Barrido de los creeps: vtt-hexgrid/js/108). Lo arman jugadores (para su personaje o su invocación), el GM y el editor de creeps.
+      barrido: !!(ini && ini.barrido),
+      barridoPaso: !!(ini && ini.barrido && ini.giro),   // el Remolino: el giro con el paso de más (se conserva al editarlo; no se elige acá)
       flashEn: new Set(ini && ini.flash && Array.isArray(ini.flash.en) ? ini.flash.en : ['pdg', 'parry', 'bloqueo', 'dano']), flashBono: (ini && ini.flash && ini.flash.bono) || 2, flashDodge: !!(ini && ini.flash && ini.flash.dodge),
       arma: (a => { const o = {pdg: 0, pdgPorX: 0, dadosPorX: 0, fijo: 0, fijoPorX: 0, sinParry: false, ignoraResistCrit: 0, critBono: 0, critpotBono: 0, perfora: 0, ...a};
         // «Ignora N de Resistencia a crítico» ya no existe (dueño, 2026-11-04: «reemplazar Ignora por Crítico frecuente, así lo mantenemos más simple»):
@@ -322,6 +326,7 @@ const AsistenteDueloHab = (() => {
       return titulo('', 'El PdG de este ataque', 'Se juega como un ataque normal con tu arma. Los No2 del ataque ya los cobra la habilidad.')
         + `${fila('pdg', '+ a la PdG (fijo)')}${fila('pdgPorX', '+ a la PdG por cada X')}${xSel}
         <label class="op"><input type="checkbox" data-terminaturno ${st.terminaTurno ? 'checked' : ''}> Al resolverse, termina tu turno y pasás al final del orden de turnos (Degollar)</label>
+        <label class="op"><input type="checkbox" data-barrido ${st.barrido ? 'checked' : ''}> 🌀 Giro (como el Barrido): le pega a cada rival que tenés al lado, uno por uno — elegís al primero y sigue en el sentido de las agujas del reloj; con cada uno es un ataque entero (su tirada, su defensa, su crítico y los efectos del arma)</label>
         ${espalda}${fila('espaldaPdg', '+ PdG por la espalda')}`;
     }
     /* ---------- Lo que se edita al tocar cada botón del cuadro (2026-10-15, docs/plan-editor-ejecucion.md) ----------
@@ -750,6 +755,7 @@ const AsistenteDueloHab = (() => {
       q('[data-x]', e => { st.x = e.target.value; });
       q('[data-sinparry]', e => { st.arma.sinParry = e.target.checked; });
       q('[data-terminaturno]', e => { st.terminaTurno = e.target.checked; });
+      q('[data-barrido]', e => { st.barrido = e.target.checked; });
       f.querySelectorAll('[data-arma]').forEach(i => i.onchange = () => { st.arma[i.dataset.arma] = Number(i.value) || 0; });
       // Dados extra de otro tamaño que los del arma (2026-10-13, Picada del Kobold Rabioso: +1d6): «NdM», o vacío.
       f.querySelectorAll('[data-arma-dados]').forEach(i => i.onchange = () => { const v = String(i.value || '').trim().toLowerCase().replace(/\s+/g, ''); st.arma.dadoExtra = /^\d{1,2}d\d{1,3}$/.test(v) ? v : ''; if(v && !st.arma.dadoExtra) i.value = ''; });
@@ -916,7 +922,7 @@ const AsistenteDueloHab = (() => {
         }
         const efs = st.efectos.filter(e => e.cura !== undefined ? curaValida(e.cura) : e.nombre).map(mapEfectoOut);
         if(st.modo === 'arma'){
-          const o2 = {modo: 'arma', objetivo: 'enemigo', x: st.x, arma: {...st.arma}, efectos: efs, ...(st.terminaTurno ? {terminaTurno: true} : {})};
+          const o2 = {modo: 'arma', objetivo: 'enemigo', x: st.x, arma: {...st.arma}, efectos: efs, ...(st.terminaTurno ? {terminaTurno: true} : {}), ...(st.barrido ? {barrido: true, ...(st.barridoPaso ? {giro: true} : {})} : {})};   // (sin `giro`: en el duelo de un arma eso es el paso de más del Remolino)
           if(st.efectosNotaOn && st.efectosNota.trim()) o2.efectosNota = st.efectosNota.trim();
           if(st.alcance !== 'auto'){ o2.alcance = st.alcance; if(st.alcance === 'fijo') o2.alcanceN = st.alcanceN; }
           // ⚡ Critical Matters: solo se manda si está tildado Y tiene algo cargado (si se destilda, o se deja

@@ -7,7 +7,7 @@
 // si la línea pasa por un Sólido o una pared, la pregunta a la mesa → cae (sin No2 ni oportunidad; el Salto aplastante aplasta ahí) → «¿Atacar?»
 // (2026-11-05, en dos tiempos: «uno simplemente quiera saltar y no seguir el ataque … dividiría el costo») → Sí: un solo rival pegado, va contra él;
 // varios, «Elegí el objetivo» → el duelo de siempre (msg.objetivoFijo + msg.saltoHecho), con el bono del Salto. No: saltó sin atacar, se devuelven los
-// No2 del ataque (saltoSinAtacar) y lo de la habilidad (turnos de espera o SP) queda cobrado. Esc antes de caer cancela todo sin cobrar (msg.alCancelar).
+// No2 del ataque menos 1 (saltoSinAtacar; desde el 2026-11-08 saltar sin atacar cuesta 1 No2) y lo de la habilidad (turnos de espera o SP) queda cobrado. Esc antes de caer cancela todo sin cobrar (msg.alCancelar).
 let saltoCasillas = null;   // {libres: Set 'col,fila', conRival: Set, t0}
 
 function saltoCasillaDibujar(z){
@@ -77,7 +77,7 @@ async function saltoElegirCasilla(msg, yo, ataque, conSalto){
       if(typeof momentoAbrir === 'function') momentoAbrir({tipo: 'salto', icono: '🦘', titulo: `${nom} salta`, resultado: txt, estado: 'listo', datos: {chico: true}});
     }
     if(conSalto.saltoAplasta && typeof saltoAplastar === 'function') await saltoAplastar(mio, yo);   // el aplastamiento al caer, ataque o no
-    // ⚔ En dos tiempos (dueño, 2026-11-05): al caer, siempre «¿Atacar?». No → saltó sin atacar: se le devuelven los No2 del ataque (lo de la habilidad,
+    // ⚔ En dos tiempos (dueño, 2026-11-05): al caer, siempre «¿Atacar?». No → saltó sin atacar: se le devuelven los No2 del ataque menos 1 (lo de la habilidad,
     // turnos de espera o SP, queda cobrado). Sí → un solo rival pegado: el duelo directo; varios: «Elegí el objetivo».
     const sinAtacar = () => saltoSinAtacar(msg, yo, ataque, nom);
     const vivos = rivales.filter(r => tokens.has(r.id));
@@ -104,7 +104,9 @@ async function saltoElegirCasilla(msg, yo, ataque, conSalto){
    contar como el ataque del turno). Lo cobrado lo anotó quien ejecutó la habilidad en Duelo.pagoHab (comun/creep-acciones.js / comun/ficha-acciones.js). */
 async function saltoSinAtacar(msg, yo, ataque, nom){
   const p = typeof Duelo !== 'undefined' && Duelo.pagoHabTomar ? Duelo.pagoHabTomar(yo.ref) : null;
-  const no2 = p ? Math.max(0, num(p.no2)) : 0;
+  // 🦘 Saltar sin atacar cuesta 1 No2 (dueño, 2026-11-08: «si elige no atacar, igual se le cobra un nitro»): se devuelve lo del ataque menos 1
+  // (nunca se cobra más de lo que costaba el ataque). Vale para todo lo que salta con este código (Salto, Salto aplastante, el armado de un jugador).
+  const pagado = p ? Math.max(0, num(p.no2)) : 0, no2 = Math.max(0, pagado - 1), cobra = pagado - no2;
   let hecho = false;
   try{
     if(yo.tipo === 'creep' && typeof acCambiarCreep === 'function')
@@ -117,7 +119,7 @@ async function saltoSinAtacar(msg, yo, ataque, nom){
         return true;
       }));
   }catch(err){ console.error('El Salto: no se pudo devolver lo del ataque', err); }
-  const txt = `🦘 ${nom} saltó y no atacó${hecho && no2 > 0 ? ` — se le devolvieron ${fmt(no2)} No2 del ataque (lo del salto queda cobrado)` : ''}`;
+  const txt = `🦘 ${nom} saltó y no atacó${hecho ? ` — el salto le costó ${fmt(cobra)} No2${no2 > 0 ? ` (se le devolvieron ${fmt(no2)} del ataque)` : ''}; el cooldown o el SP quedan cobrados` : ''}`;
   toast(txt);
   try{ mesaLinea(txt, 'recordatorio'); }catch(err){}
   if(msg.alSoloSalto) msg.alSoloSalto();

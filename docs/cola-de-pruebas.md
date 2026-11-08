@@ -24,6 +24,8 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 15. [ ] **Línea H2 · Saltador** (cuando esté completa).
 16. [ ] **Milagro con 3d8** (2026-11-08): la cura pasó de 2d8 a 3d8, una sola tirada para todos los aliados del área; ver que la tirada y el texto digan 3d8.
 17. [ ] **Barrido armado por un jugador para su invocación** (2026-11-08): en el armado de la habilidad de la invocación (✨ Ejecución → «Ataque con mi arma» → la tarjeta de la PdG) tildar «🌀 Giro (como el Barrido)»; usarlo en el mapa: elegir el primero, el orden, el pulso y el duelo de cada rival.
+18. [ ] **Grebas del carnero: la Embestida** (2026-11-08): caminando 2 pasos en línea recta hasta el rival, el primer ataque del turno suma +2 PdG; regla del dueño: **el Salto y el Dash no cuentan como pasos en línea recta** (si cuentan, arreglarlo).
+19. [ ] **Inamovible (Botas de estibador)**: que un empujón tire su 33 % (no se pudo probar en las líneas W1 y T1: no hubo empujones).
 
 Cada línea nueva que se termine de diseñar se suma al final.
 

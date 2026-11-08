@@ -559,6 +559,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   pasó a Destreza; dueño: «le subiría un poco de destreza… pero no agilidad»), vida 50, 7 No2, PdG 8, Daño 9, Def 7, Def.Esp 1, Eva 7, Res.CC 11.
   + **Casco de cuero endurecido** y **Polainas de cuero remendado** (Def +1, Res.CC +1). Habilidad nueva: **Barrido** (rehecho el mismo día: un
   ataque completo por rival, ver `guia-de-diseno.md`). Pasiva: **Piel curtida**. «Golpe fuerte» del plan es hoy «Pegar fuerte».
+  **Nivel 3 aprobado y cargado** (dueño, 2026-11-08): Fue 10 · Con 11 · Des 9 · Agi 7 · Esp 2, vida 55, 7 No2, PdG 9, Daño 10 con 2 dados.
+  El hacha pasa a la **Hacha del aserrador** (Buena: Tipo 8, 2 dados, Rompe armadura 33 %, Derribar 25 %). Habilidad nueva: **Pisotón** (Flash).
 
 - **S4 · Protector · Support, con SP** (boceto aprobado 2026-11-03, dueño: «la ruta me cierra, me resulta interesante»). Estrategia: juega en el
   turno de los demás: protege a sus aliados con Flash en el momento justo (escudo, +3 a la defensa, sacar un estado) y desvía los golpes. Atributos

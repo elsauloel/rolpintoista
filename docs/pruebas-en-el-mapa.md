@@ -1878,3 +1878,22 @@ ataques) sí devuelve Espinas. En «Claude · pruebas», «Encuentro 2» (respal
 - Veneno 4 al Capataz (con Espinas): al empezar su turno perdió 4 (187 → 183) y el goblin no recibió nada.
 - Escudo humano: el Capataz (con Espinas) protegía al goblin; Rockardo le pegó al goblin 26 − 6 = 20: 10 al goblin, 10 al Capataz (183 → 173) y
   nada de vuelta a Rockardo (siguió en 5). Captura `p25-18-escudo-humano`.
+
+### 🌀 Barrido y Remolino: un ataque por rival; 🛡 Aguante con habilidades; ⚠ el aviso de durabilidad (2026-11-08)
+Probado por Claude con clics en «Claude · pruebas», «Encuentro 2» (GM, J1, J2; la partida respaldada antes y restaurada después; capturas `p26-*`,
+`barrido-*`, `aguante-*`, `remolino-*`, `durabilidad-*` en la carpeta de trabajo).
+- **Barrido** del Goblin rompehuesos con tres personajes al lado: «🌀 Barrido: elegí el primer rival», brillan los tres; elegido Rockardo (izquierda), el
+  orden fue Rockardo → Larry (derecha) → Bizzante (abajo), el sentido de la hoja. Tres duelos seguidos, uno por rival, cada uno con su tirada:
+  Rockardo **atajó** con el escudo y ganó el Bloqueo (bloqueado); Larry **esquivó** (J1, Evasión); a Bizzante le pegó con **crítico** (+1 por la
+  espalda, de su duelo), 35 → 18, y se tiró el efecto del arma (Demora 33 %). Cada cuadro se replegó y el siguiente nació del token del rival.
+  «Terminar a mano» en un golpe deja ese a la mesa y el giro sigue; «Cancelar duelo» corta el giro (la Mesa lo dice).
+- **Aguante con el Barrido**: el cartel «… Barrido suma +2d10 (en el giro, solo al primer rival)»; el primer duelo con +2 dados, el segundo con 0;
+  Aguante quedó con +2 turnos de cooldown.
+- **Aguante con Pegar fuerte**: «… Pegar fuerte suma +3d10»; el duelo salió con +4 dados (1 de la habilidad y 3 del aguante).
+- **Remolino** (J1, Rockardo con la habilidad de clase): «¿te movés en el giro?» → se movió una casilla → «elegí el primer rival» con los dos de las
+  dos posiciones (el Goblin, pegado a la de salida, y el Capataz, a la de llegada) → Capataz esquivó, al Goblin le pegó con crítico y se aplicó la
+  Demora de su mazo. Sin el aviso de «fuera de alcance» para el de la casilla de salida.
+- **Aviso de durabilidad** (el texto del dueño): en la pantalla de J1, la Túnica de sanador con 2 de durabilidad: un punto de Armadura rota → el cartel
+  «⚠ Advertencia: a Túnica de sanador le queda 1 punto de durabilidad. Un punto más de Armadura rota la rompe…»; otro → «¡ROTO!»; el desgaste común
+  → el aviso abajo «… Un punto más de desgaste la rompe…». (Estos tres, con la función de la ficha sobre una copia del personaje, sin guardar.)
+- **Falta**: verlo el dueño; el Coletazo de una bestia (mismo camino, con el empujón) y una invocación con dos armas haciendo un Barrido.

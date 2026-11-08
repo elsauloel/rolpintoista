@@ -1897,3 +1897,18 @@ Probado por Claude con clics en «Claude · pruebas», «Encuentro 2» (GM, J1, 
   «⚠ Advertencia: a Túnica de sanador le queda 1 punto de durabilidad. Un punto más de Armadura rota la rompe…»; otro → «¡ROTO!»; el desgaste común
   → el aviso abajo «… Un punto más de desgaste la rompe…». (Estos tres, con la función de la ficha sobre una copia del personaje, sin guardar.)
 - **Falta**: verlo el dueño; el Coletazo de una bestia (mismo camino, con el empujón) y una invocación con dos armas haciendo un Barrido.
+
+## 🦎 Cola de pruebas · 1: el Coletazo de una bestia (2026-11-08, Claude, «Claude · pruebas» / «Encuentro 2», GM + J1 + J2 con clics; restaurado y comparado con el respaldo: idéntico)
+
+- **Coletazo** de la Rata de la grieta (bestia, Dientes infecciosos: Veneno 3 al 50 %, seguro con crítico) con Bizzante (abajo), Rockardo (izquierda)
+  y Larry (derecha) al lado: se cobró una vez (−2 No2, cooldown 3), «🌀 Coletazo: elegí el primer rival», brillaron los tres. Elegido Bizzante, el
+  orden fue **Bizzante → Rockardo → Larry**, el sentido de las agujas del reloj (la Mesa: «Coletazo — Bizzante → Rockardo → Larry»). Con cada uno, el
+  pulso y el cuadro desplegado desde su token, su propia tirada y su defensa:
+  - Bizzante (Evasión): le pegó con **crítico ×2** (16 a la vida), **Veneno ×3** y **Empujón**: pasó de 6,26 a 6,27, lejos de la rata.
+  - Rockardo (Evasión): **crítico ×3** (21), Veneno ×3 y Empujón: de 5,25 a 4,26.
+  - Larry (J1 eligió Evasión desde su pantalla): **esquivó** (PdG 1 contra 2) → sin daño, sin efectos y sin empujón.
+- **Empujón contra un token**: con Rockardo justo detrás de Larry, otro Coletazo (un solo rival al lado) → crítico ×3 (24) y el empujón **chocó**
+  («Larry salió despedido y chocó contra Rockardo… 1 Constitución cada uno, menos la Defensa»: 5 − 6 y 4 − 15, los dos 0) y Larry quedó en su casilla.
+  El choque se tiró **una sola vez** aunque el botón «Aplicar Empujón» se apretó dos veces (antes y después del daño). El Veneno contra Larry, inmune: no entró.
+- Sin errores nuevos. Capturas: `cola-01-*` (elegir el primero, el pulso, el cuadro desplegado, el primer golpe, J1 defendiendo, el esquive, el choque).
+- Nota aparte (no es del Coletazo): la ficha de Larry (copia) ya tenía 34 de vida en el respaldo y 35 en su resumen; al tocarla el resumen se puso al día (34).

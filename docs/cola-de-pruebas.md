@@ -12,7 +12,6 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## En cola
 
-1. [ ] **Coletazo de una bestia** con el Barrido nuevo (un ataque entero por rival, orden y animación) y su empujón.
 2. [ ] **Barrido hecho por una invocación** (el mismo recorrido rival por rival).
 3. [ ] **Milagro, versión de clase** (jugador): nunca se probó en el mapa.
 4. [ ] **Línea W1 · Hachero, niveles 1 a 5**: ponerlos en el mapa y hacerlos pelear un poco; que cada habilidad y pasiva funcione en juego.
@@ -32,4 +31,5 @@ Cada línea nueva que se termine de diseñar se suma al final.
 
 ## Hechas
 
-(ninguna todavía)
+- [x] **Coletazo de una bestia** (2026-11-08): un ataque entero por rival en el sentido de las agujas del reloj, pulso y cuadro desde cada token,
+  críticos, Veneno y Empujón al que pega, nada al que esquiva; el empujón contra un token choca una sola vez. Sin errores. Detalle en `pruebas-en-el-mapa.md`.

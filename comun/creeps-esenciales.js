@@ -205,6 +205,9 @@
   esencial({...T2, nivel: 3, atrib: [14, 8, 6, 8, 3],   // (aprobado 2026-11-08: Blindaje; los dos puntos de Destreza a la PdG; las Espinas no se suman: el Mantelete de asedio en lugar del Escudo de pinchos del plan)
     equipo: ['Hacha con garfio', 'Mantelete de asedio', 'Coraza de cuero hervido', 'Cofia de anillas sueltas', 'Botas de cuero de vaca'],
     habilidades: ['Coraza de púas', 'Aguante', 'Velo espejado', 'Blindaje'], pasivas: ['Piel curtida']});
+  esencial({...T2, nivel: 4, atrib: [15, 8, 7, 9, 3],   // (aprobado 2026-11-08: Segundo aliento; pasiva Robustez; la Coraza de bronce con runas en lugar de las Pieles erizadas del plan —las Espinas no se suman—; el punto a Destreza y no a Fuerza, para seguir subiendo la PdG)
+    equipo: ['Hacha con garfio', 'Mantelete de asedio', 'Coraza de bronce con runas', 'Cofia de anillas sueltas', 'Botas de cuero de vaca'],
+    habilidades: ['Coraza de púas', 'Aguante', 'Velo espejado', 'Blindaje', 'Segundo aliento'], pasivas: ['Piel curtida', 'Robustez']});
   esencial({linea: 'M2', nombre: 'Mago de escarcha', rol: 'mago', rolTxt: 'mágico', nivel: 1, atrib: [8, 2, 5, 6, 12],
     equipo: ['Varita de la ventisca', 'Escudo de cuero mojado', 'Capa de viajero', 'Anillo de escarcha'],
     habilidades: ['Dardo helado', 'Hálito polar'], consumibles: ['Poción de SP menor'],
@@ -242,7 +245,7 @@
     habilidades: ['Golpe desesperado', 'Furia'], consumibles: ['Poción de Regeneración menor'],
     estrategia: 'Warrior. Cuanto más herido, más peligroso: sable y facón, busca el crítico y no se cuida.'});
   const W2 = {linea: 'W2', nombre: 'Berserker', rol: 'warrior', rolTxt: 'melee', consumibles: ['Poción de Regeneración menor'],
-    estrategia: 'Warrior. Cuanto más herido, más peligroso: sable y facón, busca el crítico y no se cuida.'};
+    estrategia: 'Warrior. Cuanto más herido, más peligroso: espada y facón (en el nv5, dos espadas), busca el crítico y no se cuida.'};
   esencial({...W2, nivel: 2, atrib: [10, 9, 6, 9, 2],   // (aprobado 2026-11-07: Pegar fuerte; pasiva Robustez, que compensa el −5 de vida del Anillo maldito del berserker; + Casco de cuero endurecido y el anillo)
     equipo: ['Sable del tahúr', 'Facón de paisano', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Anillo maldito del berserker'],
     habilidades: ['Golpe desesperado', 'Furia', 'Pegar fuerte'], pasivas: ['Robustez']});

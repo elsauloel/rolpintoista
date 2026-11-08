@@ -181,6 +181,11 @@
     Botas de cuero de vaca. Habilidades: … · + **Blindaje**. Pasiva: Piel curtida. Consumible: Poción de Cuero Duro. Vida 70 · No2 6 · PdG 8 ·
     Parry 8 · Def 8 (12 contra armas a distancia) · Eva 6 · **Bloqueo con el escudo 9** (Fue 8 + 1 del Mantelete; el +1 de Bloqueo del hacha ya
     no cuenta al bloquear con el escudo, por la regla de los bonos por arma del 2026-11-07).
+  - **nv4 aprobado y cargado (2026-11-08):** Con 15 · Fue 8 · Agi 7 · **Des 9** · Esp 3 (el punto va a Destreza y no a Fuerza, para seguir subiendo
+    la PdG). Como las Espinas no se suman, la coraza del plan (**Pieles erizadas del berserker**) se cambia por la **Coraza de bronce con runas**
+    (Buena: Defensa +3 · Defensa especial +3 · Res. rayo +1 · Vida +10). Equipo: Hacha con garfio · Mantelete de asedio · **Coraza de bronce con
+    runas** · Cofia de anillas sueltas · Botas de cuero de vaca. Habilidades: … · + **Segundo aliento**. Pasivas: Piel curtida · + **Robustez**.
+    Consumible: Poción de Cuero Duro. Vida 90 · No2 7 · PdG 9 · Def 8 (12 contra armas a distancia) · Def.Esp 4 · Bloqueo con el escudo 9 · Eva 7.
 
 ## La idea
 

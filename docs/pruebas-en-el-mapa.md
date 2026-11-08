@@ -1975,3 +1975,33 @@ Probado por Claude con clics en «Claude · pruebas», «Encuentro 2» (GM, J1, 
 - **Botas de estibador** (nv5): Inamovible 33 en el creep (no hubo empujón para tirarla).
 - Capturas: `cola-04-*` (Acciones con el Demoledor en cooldown, Arte de la guerra con la tirada a mano, el cartel de rotura que vio J1, el Barrido, el
   Golpe demoledor, el Remate, el pergamino).
+
+## 🛡 Cola de pruebas · 5: la línea T1 · Escudero, niveles 1 a 5 (2026-11-08, Claude, «Claude · pruebas» / «Encuentro 2», GM + J1 + J2 con clics; restaurado y comparado con el respaldo: idéntico)
+
+- **Armado, como el GM:** GM Tools → «Encuentro 2» → «+ Creep» → ⭐ Pool esencial → «Agregar» Escudero Lv 1 a Lv 5 → «Crear token»; renombrados
+  Escudero 1 a 5 y puestos al lado de Rockardo, Larry y Bizzante (copias). La Rata de la grieta se acercó para hacer de aliado.
+- **Números en el mapa = la prueba de niveles** (vida/No2/Def/Def.Esp/PdG/Daño/Bloqueo/Parry/Eva/Res.CC): nv1 60/5/5/2/7/5/7/7/5/12 ·
+  nv2 65/6/6/2/7/6/9/7/6/13 · nv3 70/6/8/2/8/7/10/8/6/14 · nv4 80/7/10/2/8/8/12/8/7/16 · nv5 85/7/11/2/9/9/13/9/7/17. Guardia firme (+1 Bloqueo)
+  desde el nv2; Devolver gentileza desde el nv4; Botas de estibador en el nv5 (Inamovible 33; no hubo empujón para tirarla).
+- **Golpe de escudo** (nv2 → Larry, J1 se defendió con Evasión): «no se puede parrear», 2d10 + 6 (el escudo de peso 2), crítico ×2 (36) y, como
+  pasó daño, Sentado y Demora (ya era el último del orden: no bajó más).
+- **Piel de hierro** (nv1): +4 a la Defensa y a la Defensa especial (3 + su nivel) y +1 a la Res. a crítico de todo Tipo, 2 turnos; cooldown 3.
+- **Provocar** (nv1 → Bizzante): 1d4+1 contra Res.Mt, empate, par o impar, se resistió. (nv5 → Bizzante): ganó; Bizzante Provocado 2 turnos y el
+  Escudero Desafiante (+2/+2) 2 turnos.
+- **Poción de Cuero Duro** (nv1, 1 No2): estado «Cuero duro (poción)», se gastó del cinturón.
+- **Parry y Bloqueo por pieza** (Rockardo → nv3): el duelo ofrece «Parry · Hacha de piedra» (Bloqueo 1d10) y «Parry · Escudo de escamas»
+  (Bloqueo 1d12): cada pieza con lo suyo.
+- **Aguante** (nv3): contó 1 golpe (el crítico de Rockardo); al empezar su turno, `aguanteListo` 1. Con **Golpe de escudo** salió el cartel «Modo
+  aguante: … Golpe de escudo suma +1d10. Cuesta +1 turno de cooldown de Aguante» → el daño fue «3d10 + 7 + 1d10»; cooldown de Aguante 2 → 3.
+- **Devolver gentileza** (Rockardo → nv4, Parry con el escudo y Bloqueo ganados): «⚔ Ganaste el Parry y el Bloqueo: ¿contraatacás…? (Devolver
+  gentileza)» → «Sí, contraatacar» abrió un duelo nuevo con los papeles al revés: el Escudero con el Hacha de piedra (crítico, y su Rompe armadura).
+- **Interponerse** (Rockardo → la Rata; el nv5 tenía Espinas): botón ✨ «Escudero: Interponerse · Rata de la grieta» → «Escudero salta al lado de
+  Rata de la grieta y se come el golpe… con +2 a la Defensa» → «🛡 Ahora le pega a Escudero». Le entraron 18 y **sus Espinas devolvieron 5** a
+  Rockardo (10 → 5), como decidió el dueño.
+- **Escudo humano** (nv5 sobre la Rata, + escudo de 5; Rockardo → la Rata, crítico ×2 de 36): la Rata 30 → 12, el Escudero 67 → 54 (13 + los 5 del
+  escudo), y **Rockardo no recibió Espinas** (siguió en 5).
+- **Hacha del forjador** (nv5 → Bizzante): crítico ×2 (28) y se tiró su «50 % de Armadura rota» (salió 1 en d2: no entró).
+- Del armado de la prueba, no del juego: al renombrar el creep solo en su parte privada, el duelo y la lista del ✨ lo seguían llamando «Escudero»
+  (sin el número); el Interponerse se eligió por orden.
+- Capturas: `cola-05-*` (Provocar que funcionó, el Parry por pieza, el cartel del Aguante con Golpe de escudo, Devolver gentileza, el botón del
+  Interponerse, Interponerse con Espinas, Escudo humano sin Espinas).

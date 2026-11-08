@@ -1037,7 +1037,7 @@ const FichaAcciones = (() => {
   // Aviso al quedar en 1 punto y al romperse: cartel y una línea en la Mesa para todos.
   function durAviso(S, i, ui){
     const a = FichaCalculo.durActual(i), quien = ((S.meta && S.meta.nombre) || '').trim();
-    const txt = a <= 0 ? `💥 ${i.nombre} se rompió: sigue ocupando el lugar pero no da ningún efecto hasta que se repare` : a === 1 ? `⚠ ${i.nombre} está a punto de romperse (queda 1 punto de durabilidad)` : '';
+    const txt = a <= 0 ? `💥 ${i.nombre} se rompió: sigue ocupando el lugar pero no da ningún efecto hasta que se repare` : a === 1 ? `⚠ Advertencia: a ${i.nombre} le queda 1 punto de durabilidad. Un punto más de desgaste la rompe: deja de dar Defensa y se desactivan todos sus demás efectos hasta que la reparen.` : '';
     if(!txt) return;
     ui.toast(txt);
     try{ ui.recordatorios([{nombre: `🔧 ${quien ? quien + ': ' : ''}${txt}`, detalle: ''}]); }catch(e){}
@@ -1070,7 +1070,7 @@ const FichaAcciones = (() => {
       const lin = [`Baja ${fmt(r.n)} la durabilidad: le queda${act === 1 ? '' : 'n'} ${fmt(act)} de ${fmt(max)}.`];
       if(FichaCalculo.pierdeDefPorRotura(it)) lin.push(`Baja ${fmt(r.n)} la Defensa que da: de ${fmt(r.defAntes)} a ${fmt(defDePieza(it))}, hasta que lo reparen.`);
       if(act <= 0) lin.push('💥 La durabilidad llegó a 0: está ROTO. Sigue ocupando su lugar, pero no da ningún efecto (ni Defensa ni bonos) hasta repararlo.');
-      else if(act === 1) lin.push('⚠ Le queda 1 punto: el próximo lo rompe del todo.');
+      else if(act === 1) lin.push(`⚠ Advertencia: a ${it.nombre} le queda 1 punto de durabilidad. Un punto más de Armadura rota la rompe: deja de dar Defensa y se desactivan todos sus demás efectos hasta que la reparen.`);
       return {titulo: `${esc ? '🛡' : '💥'} ${it.nombre}${esc ? ' (abollado)' : ''}`, texto: lin.join('\n')};
     });
     pasos.push({titulo: 'Para tener en cuenta', texto: 'Si la durabilidad de una pieza llega a 0, se rompe y también se anulan los demás efectos que da. Se repara fuera de combate: el herrero de una tienda, el talento de reparar o un Óleo reparador.'});

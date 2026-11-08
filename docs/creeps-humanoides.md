@@ -555,6 +555,10 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Nivel 1 aprobado** (dueño, 2026-11-03: «va»): Fue 9 · Con 9 · Des 7 · Agi 6 · Esp 2, vida 45, 6 No2, con turnos de espera; Hacha de vikingo
   (Tipo 8, 1d8 + 9; desde el 2026-11-03: +1 de daño y Rompe armadura 50 %, sin Derribar) + Rodela tachonada · Chaleco de cuero · Botas de cuero de vaca: Def 4, Def.Esp 1, Res.
   crít. T4 +2. Salto (lenta, cd 3) y Golpe fuerte (rápida, cd 2). Consumible: Poción de Cuero Duro. Sin cargar hasta que el dueño diga.
+  **Nivel 2 aprobado y cargado** (dueño, 2026-11-08: «lo del saltador me parece bien»): Fue 9 · Con 10 · Des 8 · Agi 7 · Esp 2 (un punto de Fuerza
+  pasó a Destreza; dueño: «le subiría un poco de destreza… pero no agilidad»), vida 50, 7 No2, PdG 8, Daño 9, Def 7, Def.Esp 1, Eva 7, Res.CC 11.
+  + **Casco de cuero endurecido** y **Polainas de cuero remendado** (Def +1, Res.CC +1). Habilidad nueva: **Barrido** (rehecho el mismo día: un
+  ataque completo por rival, ver `guia-de-diseno.md`). Pasiva: **Piel curtida**. «Golpe fuerte» del plan es hoy «Pegar fuerte».
 
 - **S4 · Protector · Support, con SP** (boceto aprobado 2026-11-03, dueño: «la ruta me cierra, me resulta interesante»). Estrategia: juega en el
   turno de los demás: protege a sus aliados con Flash en el momento justo (escudo, +3 a la defensa, sacar un estado) y desvía los golpes. Atributos

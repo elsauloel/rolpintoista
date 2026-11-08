@@ -245,6 +245,11 @@
     equipo: ['Hacha de vikingo', 'Rodela tachonada', 'Chaleco de cuero', 'Botas de cuero de vaca'],
     habilidades: ['Salto', 'Pegar fuerte'], consumibles: ['Poción de Cuero Duro'],
     estrategia: 'Híbrido. Salta por encima de la primera línea y cae entre los de atrás; ahí se planta y pega.'});
+  const H2 = {linea: 'H2', nombre: 'Saltador', rol: 'hibrido', rolTxt: 'melee', consumibles: ['Poción de Cuero Duro'],
+    estrategia: 'Híbrido. Salta por encima de la primera línea y cae entre los de atrás; ahí se planta y barre a todos los que lo rodean.'};
+  esencial({...H2, nivel: 2, atrib: [10, 9, 7, 8, 2],   // (aprobado 2026-11-08: Barrido y Piel curtida; + Casco de cuero endurecido y Polainas de cuero remendado; un punto de Fuerza pasó a Destreza, dueño: «un poco de destreza… no agilidad»)
+    equipo: ['Hacha de vikingo', 'Rodela tachonada', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Polainas de cuero remendado'],
+    habilidades: ['Salto', 'Pegar fuerte', 'Barrido'], pasivas: ['Piel curtida']});
   esencial({linea: 'W2', nombre: 'Berserker', rol: 'warrior', rolTxt: 'melee', nivel: 1, atrib: [9, 8, 6, 8, 2],   // dos armas (el ataque con la segunda, pendiente de programar en creeps)
     equipo: ['Sable del tahúr', 'Facón de paisano', 'Chaleco de cuero', 'Botas de cuero de vaca'],
     habilidades: ['Golpe desesperado', 'Furia'], consumibles: ['Poción de Regeneración menor'],

@@ -1912,3 +1912,23 @@ Probado por Claude con clics en «Claude · pruebas», «Encuentro 2» (GM, J1, 
   El choque se tiró **una sola vez** aunque el botón «Aplicar Empujón» se apretó dos veces (antes y después del daño). El Veneno contra Larry, inmune: no entró.
 - Sin errores nuevos. Capturas: `cola-01-*` (elegir el primero, el pulso, el cuadro desplegado, el primer golpe, J1 defendiendo, el esquive, el choque).
 - Nota aparte (no es del Coletazo): la ficha de Larry (copia) ya tenía 34 de vida en el respaldo y 35 en su resumen; al tocarla el resumen se puso al día (34).
+
+## 🐝 Cola de pruebas · 2: el Barrido hecho por una invocación (2026-11-08, Claude, «Claude · pruebas» / «Encuentro 2», GM + J2 con clics; restaurado y comparado con el respaldo: idéntico)
+
+- **Armado**: la **Abeja Gorda** de Bizzante (copia) (invocación de J2, 45 de vida). En el editor de habilidades de una invocación **no hay forma de
+  armarle un giro** (el paso a paso no tiene la opción «Barrido»), así que se le copió el **Barrido de creep** tal cual (`modo: 'arma'`, `barrido: true`)
+  y un **Hacha de vikingo** (Rompe armadura 50 %), desde la ficha (Bizzante estaba en manos del GM; después el GM le devolvió el control a J2).
+  Token de la abeja en 20,18 con el Capataz (izquierda), la Rata de la grieta (arriba), el Goblin rompehuesos (derecha) y Rockardo (copia), aliado, abajo.
+- J2 abrió la Botonera de la abeja (⚡ del token) → «Barrido · 4 No2 (como un ataque) · CD 3» → Ejecutar. Salió el «Mareo de invocación» (recién
+  llega: no actúa) con «Hacerlo igual (lo decide la mesa)»; con eso, **se cobró una sola vez** (10 → 6 No2) y «🌀 Barrido: elegí el primer rival»:
+  brillaron **los tres creeps**, no Rockardo (aliado).
+- Elegido el Capataz, el orden fue **Capataz → Rata → Goblin**, en el sentido de las agujas del reloj (la Mesa: «Abeja Gorda: Barrido — Capataz del
+  culto → Rata de la grieta → Goblin rompehuesos»). Con cada uno, el pulso en su token y el cuadro desplegado desde ahí, su propia tirada de PdG y
+  su defensa (el GM eligió por los creeps):
+  - **Capataz** (Evasión 5 contra PdG 20): **crítico ×4**, 7 × 4 = 28 a la vida (75 → 47) y **Rompe armadura** (salió 2 en d2) → Armadura rota.
+  - **Rata** (Parry 5 contra PdG 1, después Bloqueo 7 contra Fuerza del golpe 2): **bloqueado**, sin daño.
+  - **Goblin** (Evasión 6 contra PdG 1): **esquivó**, sin daño.
+- Sin errores nuevos. Capturas: `cola-02-*` (la Botonera de la abeja, elegir el primero, el pulso, el cuadro desplegado, el golpe al Capataz, el Parry de la
+  rata, el esquive del goblin).
+- **Para el dueño**: hoy un jugador no le puede dar Barrido (ni otro giro) a su invocación desde la ficha; si hace falta, sumar la opción al editor.
+

@@ -897,6 +897,11 @@ function objetivoCalifica(ataque, t){
 function habEsCura(hab){ const ef = (hab && hab.efectos) || []; return ef.length > 0 && ef.every(e => e && e.cura); }
 function dueloElegirObjetivoMapa(msg){
   const yo = msg.yo, ataque = msg.ataque;
+  // 🛡 El aguante también se descarga con una habilidad que es un ataque con el arma (dueño, 2026-11-08: «todos los skills que van como ensamblados
+  // al ataque, si vienen con el bono del aguante, se deben sumar»): el cartel, el cobro y los dados de más (js/56); después vuelve acá.
+  if(ataque && ataque.tipo === 'habilidad-arma' && !msg.aguanteHecho && typeof aguanteParaHabilidad === 'function' && aguanteParaHabilidad(msg)) return;
+  // 🌀 El Barrido / Coletazo (dueño, 2026-11-08): se elige el primer rival y sigue un ataque por cada uno al lado, en el sentido del giro (js/108).
+  if(ataque && ataque.barrido && !msg.barridoObjetivo && typeof barridoIniciar === 'function'){ barridoIniciar(msg); return; }
   if(ataque && ataque.hab && (ataque.hab.objetivo === 'area' || ataque.hab.objetivo === 'onda' || ataque.hab.objetivo === 'cono' || ataque.hab.objetivo === 'linea')){ dueloElegirAreaMapa(msg); return; }   // hechizo de área: otro flujo (Paso 4/7)
   // 💨 Disparo y repliegue (2026-11-03, dueño: «primero se mueve y después dispara»): antes de elegir el objetivo, el cartel del movimiento libre (js/57).
   const nAntes = Math.round(num(ataque && (ataque.moverAntes || (ataque.hab && ataque.hab.moverAntes))));
@@ -967,9 +972,10 @@ function dueloElegirObjetivoMapa(msg){
     $('#botonera-capa').hidden = false; ubicarBotoneraCapa();
     try{ MensajesMapa.alMarco($('#botonera-marco'), 'duelo-suelto'); }catch(e){}
   };
+  let autoUsado = false;   // 🌀 un golpe del Barrido: el objetivo ya viene elegido (msg.barridoObjetivo); si algo pide «elegir otro», se saltea
   const pedir = () => {
-    resaltar();
-    elegirDestino(async h => {
+    if(!msg.barridoObjetivo) resaltar();
+    const alElegir = async h => {
       const todos = [...tokens.entries()].map(([id, t]) => ({...t, id}));   // los tokens del mapa no traen su id adentro: es la clave del Map
       const conmigo = !!(ataque && ataque.hab && ataque.hab.objetivo === 'aliado' && ataque.hab.conmigo);   // «un aliado o vos mismo» (Heal, 2026-10-11)
       const cand = todos.filter(t => t.col === h.col && t.fila === h.fila && (conmigo || !propio(t)) && (!t.oculto || soyGM) && !t.bajoTierra && !etereoDe(t) && !tapadoPorNiebla(t));   // la niebla: no se apunta adentro
@@ -992,7 +998,7 @@ function dueloElegirObjetivoMapa(msg){
         const seAcerca = ataque && (ataque.saltoHab || (ataque.hab && ataque.hab.saltoHab) || ataque.embestidaHab || num(ataque.arrastra) > 0);
         const alc = ataque && ataque.rango && !ataque.hab ? Combatiente.alcanceMaximo(ataque, ataque.alcance) : ataque && ataque.alcance;
         const n = Math.round(num(alc));
-        if(mio0 && !seAcerca && n > 0 && t !== mio0 && !(t.col === mio0.col && t.fila === mio0.fila)){
+        if(mio0 && !seAcerca && !msg.barridoObjetivo && n > 0 && t !== mio0 && !(t.col === mio0.col && t.fila === mio0.fila)){
           const dist = distanciaHex({col: mio0.col, fila: mio0.fila}, {col: t.col, fila: t.fila});
           if(dist > n){
             const que = ataque.hab ? `de ${ataque.habNombre || ataque.hab.nombre || 'la habilidad'}` : ataque.rango ? 'de tu disparo' : 'de tu ataque';
@@ -1134,8 +1140,17 @@ function dueloElegirObjetivoMapa(msg){
       let estandarte = null;
       try{ estandarte = typeof estandarteBonus === 'function' ? estandarteBonus(mio, yo) : null; }catch(err){ console.error('No se pudo ver el estandarte:', err); }   // 🚩 bajo el estandarte de un aliado (js/73)
       Duelo.crear({yo, ataque: ataqueFinal, espalda, espaldaPdg, ...(carancho ? {carancho} : {}), embestida, quieto, primeraSangre, tiro, flecha, miedo, ...(malviaje ? {malviaje} : {}), presa, ...(estandarte ? {estandarte} : {})}, {id: t.id, nombre: nombreDe(t), tipo: t.tipo, fichaId: t.fichaId, duenoUid: t.duenoUid}, mio ? mio.id : '')
-        .catch(err => { console.error('No se pudo abrir el duelo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + String((err && err.message) || err).slice(0, 120)); });
-    }, `<b>${ataque && ataque.hab ? '✨ ' + esc(ataque.hab.nombre) + ': elegí el objetivo' : '⚔ ' + esc(yo.nombre || 'Atacar') + ': elegí a quién atacás'}</b> <span>clic sobre el token · Esc o clic derecho cancelan${nEnAlcance ? ' · ✨ brillan los que están a tu alcance (' + (minimo ? `de ${minimo} a ` : '') + Math.round(num(ataque.alcance)) + ' casillero' + (Math.round(num(ataque.alcance)) === 1 ? '' : 's') + ')' : conArco ? ` · 🏹 el arco necesita ${Combatiente.arcoLibresTxt(ataque)} en el medio` : ''}${mioTiro ? ' · la línea muestra si el tiro pasa' : ''}${nIdeal ? ' · 💠 en celeste, tu distancia ideal (' + esc(Combatiente.idealTxt(ataque.ideal)) + ')' : ''}</span>`, true, cancelado);
+        .then(id => { if(msg.alDuelo) msg.alDuelo(id); })   // 🌀 el Barrido espera que se resuelva para pasar al siguiente (js/108)
+        .catch(err => { console.error('No se pudo abrir el duelo:', err); toast(err && err.code === 'permission-denied' ? 'No se pudo: faltan publicar las reglas nuevas de Firestore (duelos)' : 'No se pudo abrir el duelo: ' + String((err && err.message) || err).slice(0, 120)); if(msg.alSaltear) msg.alSaltear(); });
+    };
+    if(msg.barridoObjetivo){
+      const tt = tokens.get(msg.barridoObjetivo);
+      if(autoUsado || !tt){ if(msg.alSaltear) msg.alSaltear(); return; }
+      autoUsado = true;
+      alElegir({col: tt.col, fila: tt.fila}).catch(err => { console.error('Barrido: no se pudo atacar a ese rival', err); if(msg.alSaltear) msg.alSaltear(); });
+      return;
+    }
+    elegirDestino(alElegir, `<b>${ataque && ataque.hab ? '✨ ' + esc(ataque.hab.nombre) + ': elegí el objetivo' : '⚔ ' + esc(yo.nombre || 'Atacar') + ': elegí a quién atacás'}</b> <span>clic sobre el token · Esc o clic derecho cancelan${nEnAlcance ? ' · ✨ brillan los que están a tu alcance (' + (minimo ? `de ${minimo} a ` : '') + Math.round(num(ataque.alcance)) + ' casillero' + (Math.round(num(ataque.alcance)) === 1 ? '' : 's') + ')' : conArco ? ` · 🏹 el arco necesita ${Combatiente.arcoLibresTxt(ataque)} en el medio` : ''}${mioTiro ? ' · la línea muestra si el tiro pasa' : ''}${nIdeal ? ' · 💠 en celeste, tu distancia ideal (' + esc(Combatiente.idealTxt(ataque.ideal)) + ')' : ''}</span>`, true, cancelado);
     // Sin nadie a tiro con un arco (2026-10-09): se dice por qué — su alcance no llega a la distancia mínima, o no hay nadie en esa franja.
     const sinTiro = conArco && !nEnAlcance ? (num(ataque.alcance) < minimo ? `🏹 tu alcance (${Math.round(num(ataque.alcance))}) no llega a los ${minimo} casilleros que necesita el arco: si disparás igual, lo decide la mesa`
       : `🏹 nadie a tiro: el arco necesita ${Combatiente.arcoLibresTxt(ataque)} en el medio y llega hasta ${Math.round(num(ataque.alcance))}`) : '';

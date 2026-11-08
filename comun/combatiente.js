@@ -2242,6 +2242,7 @@ const Combatiente = (() => {
       ...(nf(c.rafaga) > 1 ? {rafaga: Math.min(3, Math.round(nf(c.rafaga)))} : {}),   // 🗡 Ráfaga de cortes (2026-10-21): los efectos del arma y su Perfora, ×N (comun/duelo.js)
       ...(c.punalada ? {punalada: c.punalada === 'trapera' ? 'trapera' : 'espalda'} : {}),
       ...(c.abrirHerida ? {abrirHerida: true} : {}), ...(c.arteria ? {arteria: true} : {}), ...(c.cambiaLugar ? {cambiaLugar: true} : {}),   // 🩸🔄 Corte en la arteria / Cambiar de lugar (2026-11-07, vtt-hexgrid/js/107)
+      ...(c.barrido ? {barrido: true, ...(c.giro ? {barridoPaso: true} : {})} : {}),   // 🌀 Barrido / Coletazo (2026-11-08): un ataque por cada rival al lado, uno por uno (vtt-hexgrid/js/108)
       ...(c.remate ? {remate: true} : {}), ...(c.desesperado ? {desesperado: true} : {}),   // 🗡 Remate / Ir por el herido (2026-10-23): +dados según la vida del objetivo (vtt-hexgrid/js/69)
       ...(nf(c.manada) > 0 ? {manada: Math.min(99, Math.round(nf(c.manada)))} : {}),   // 👊 Patotear / Jauría (2026-10-21): +1 dado por aliado pegado al objetivo, sin tope desde el 2026-11-05, y +1 PdG (vtt-hexgrid/js/65)   // 🩸 Sal en la herida (2026-10-21): +2 dados si el objetivo ya sangra (vtt-hexgrid/js/64)   // 🗡 la puñalada (2026-10-21): el bono si está en la espalda (vtt-hexgrid/js/59)
       ...(nf(c.alejarse) > 0 ? {alejarse: Math.min(4, Math.round(nf(c.alejarse)))} : {}),
@@ -2900,8 +2901,9 @@ const Combatiente = (() => {
   /* 🌀 La excepción del Barrido (dueño, 2026-11-08: «El barrido es un giro que cuenta como varios ataques. Así que si alguien con espinas es afectado
      por barrido, en ese caso puntual sí devuelve el daño»): el giro con el arma (Barrido, y el Coletazo de las bestias, la misma familia) sí devuelve
      las Espinas de cada uno al que lastima. El Espejo no (es daño físico). `hab.giro` (skills-creep-base, oB) o, para los creeps guardados antes, el nombre. */
-  const GIROS = ['Barrido', 'Coletazo'];
-  const esGiro = hab => !!(hab && (hab.giro || GIROS.includes(String(hab.nombre || '').trim())));
+  const GIROS = ['Barrido', 'Coletazo', 'Remolino'];   // (el Remolino del Warrior, la misma familia desde el 2026-11-08)
+  // (por el nombre: el Remolino también lleva `giro` —el paso de más— y no es de la excepción; desde el 2026-11-08 el Barrido ya no es un área)
+  const esGiro = hab => !!(hab && GIROS.includes(String(hab.nombre || '').trim()));
   function devuelveElGolpe(d, cual){
     if(!d) return false;
     if(d.grupo && !(d.hab && d.hab.reparte) && !(cual === 'espinas' && esGiro(d.hab))) return false;

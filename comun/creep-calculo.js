@@ -71,6 +71,25 @@ const CreepCalculo = (() => {
     });
   }
 
+  // 🌀 El Barrido y el Coletazo guardados como un área (la onda con una sola tirada) pasan a la versión nueva (dueño, 2026-11-08: un ataque con su arma
+  // por cada rival al lado, uno por uno): se arman de nuevo desde la biblioteca, conservando su cooldown en curso. → true si cambió algo.
+  function migrarBarrido(sc){
+    let cambio = false;
+    if(typeof window === 'undefined' || typeof window.armarHabilidadDeCreep !== 'function' || !Array.isArray(window.HABILIDADES_CREEP_BASE)) return false;
+    (sc.habilidades || []).forEach((h, i) => {
+      if(!h || !['Barrido', 'Coletazo'].includes(h.nombre) || !h.duelo || h.duelo.objetivo !== 'onda') return;
+      const e = window.HABILIDADES_CREEP_BASE.find(x => x.nombre === h.nombre && x.datos && x.datos.sp && x.datos.sp.auditada);
+      if(!e) return;
+      const nuevo = window.armarHabilidadDeCreep(e.datos, sc.nivel);
+      if(!nuevo || !nuevo.duelo || nuevo.duelo.objetivo === 'onda') return;
+      if(h.id !== undefined) nuevo.id = h.id;
+      if(h.cdActual !== undefined) nuevo.cdActual = h.cdActual;
+      sc.habilidades[i] = nuevo;
+      cambio = true;
+    });
+    return cambio;
+  }
+
   // 🛡⏳ (2026-11-03, decisiones del dueño del 2026-11-02): la Piel de hierro guardada con +6 fijo pasa a +(3 + su nivel) a la Defensa y a la
   // Def. especial (nivel 3 queda igual), y los misiles guardados con cooldown 2 pasan a lentas de cooldown 4 (sin arrancar en cooldown). Una vez:
   // lo que ya está al día no se toca. → true si cambió algo.
@@ -676,6 +695,7 @@ const CreepCalculo = (() => {
     Combatiente.migrarAdrenalina(sc.habilidades);   // 💉 la Adrenalina de fábrica vieja (Hypeado) → la del jugador (2026-11-01)   // 🎰 al azar (1 SP) o eligiendo (2 SP) (2026-11-01)
     Combatiente.migrarLuzSanadora(sc.habilidades);   // ☀ Smite y Destello revelador: Luz sanadora; Lanza arcana y Destello revelador, los nombres nuevos (2026-10-31)
     Combatiente.ponerAlDiaItemsFabrica(sc.equipo);   // 🔄 ítems de fábrica que cambiaron (la Varita del destello, 2026-10-31)
+    migrarBarrido(sc);   // 🌀 el Barrido / Coletazo de antes (un área) → un ataque por rival (2026-11-08)
     migrarPielYMisiles(sc);   // 🛡 Piel de hierro +(3 + nivel) y ⏳ los misiles lentos, cooldown 4 (2026-11-03)
     sc.pasivas = Array.isArray(sc.pasivas) ? sc.pasivas : [];   // (2026-10-15)
     if(typeof estadosPresetCreep === 'function') Combatiente.sincronizarEstadosDePasivas(sc.estados, sc.pasivas, estadosPresetCreep());   // la pasiva que da un estado (2026-10-16)

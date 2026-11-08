@@ -137,9 +137,13 @@
     {pdg: 1, fijo: 1}, 'va al duelo como un ataque con +1 PdG y +1 al daño (más 1 de cada por casillero de carrera); si pega, lo empuja', 2,
     [{nombre: 'Empujón', empuja: 1, detalle: 'Lo empuja 1 casilla, lejos de la bestia.'}], {embestida: true}));
   // 🦎 Auditada (dueño, 2026-10-21; choque pesado, «barrido»): el Barrido de las bestias, y además empuja 1.
-  H('Coletazo', 'DA', 'bc', 'mt', 3, oB('Da un giro con la cola y le pega a todos los rivales que tiene al lado (la flor de diámetro 3, 7 casillas, a su alrededor; él no se cuenta). A cada uno que no le gana le hace el daño de su arma (sus dados más su Dmg), menos su Defensa, y lo empuja 1 casillero lejos de él; si choca contra algo, recibe además el daño de colisión. Tira su Probabilidad de Golpe una sola vez, contra la Evasión de cada uno; quien gana su Evasión no recibe nada (sin dodge roll). Cuenta como su ataque del turno.',
-    'su PdG, una vez, contra la Evasión de cada uno al lado; el daño de su arma y empuja 1 a quien no le gana',
-    [{nombre: 'Empujón', empuja: 1, detalle: 'Lo empuja 1 casilla, lejos de la bestia.'}]));
+  // 🌀 Coletazo y Barrido, rehechos (dueño, 2026-11-08: «a fines prácticos es como si fueran múltiples ataques continuados uno de otro y van a aplicar las
+  // mismas reglas de un ataque… solo que el contexto del ataque, el inicio, es el barrido»): un ataque con su arma contra cada rival que tiene al lado,
+  // uno por uno, cada uno con su tirada, su defensa, su crítico y los efectos del arma. Se elige el primero y sigue en el sentido del giro (el de la
+  // animación: el de las agujas del reloj). La cascada la arma el mapa (vtt-hexgrid/js/108-barrido.js, `barrido`). Se paga una vez: es su ataque del turno.
+  H('Coletazo', 'DA', 'bc', 'mt', 3, aA('Da un giro con la cola y le pega a cada rival que tiene al lado, uno por uno: elige al primero y el giro sigue en el sentido de las agujas del reloj. Con cada uno es un ataque común con su arma: su propia tirada de Probabilidad de Golpe, el rival se defiende como siempre (Evasión, Parry o Bloqueo), puede ser crítico y se aplican los efectos de su arma; al que le pega, además, lo empuja 1 casillero lejos de él (si choca contra algo, recibe el daño de colisión). Todo el giro cuenta como su ataque del turno.',
+    {}, 'un ataque con su arma contra cada rival al lado, uno por uno (su tirada, su defensa, su crítico y los efectos del arma); al que le pega, lo empuja 1', 2,
+    [{nombre: 'Empujón', empuja: 1, detalle: 'Lo empuja 1 casilla, lejos de la bestia.'}], {barrido: true}));
   H('Golpe doble', 'D', '*', 'me', 3, zO('Dos ataques seguidos: se tira el daño dos veces (a mano la segunda).', 3, 'M'));
   // 🗡 Auditada (dueño, 2026-10-23; choque pesado, «remate», escalonado): un ataque con su arma; si el objetivo tiene la mitad de la vida o menos,
   // +2 dados del Tipo de su arma; un cuarto o menos, +3. Lo de un ataque y 2 SP, o cooldown 3. La vida la mira el mapa al elegir el objetivo (js/69).
@@ -189,8 +193,8 @@
     {perfora: 1, critBono: 1}, 'va al duelo como un ataque con Perfora 1 y Crítico frecuente +1; si pega, Sangrado fuerte (3 por turno, 3 turnos)', 4, SGF));
   // (Golpe de escudo, la vieja a mano: la reemplaza la de la tanda del Choque pesado, 2026-10-27.)
   // 🌀 Auditada (dueño, 2026-10-21; choque pesado, «barrido»): castiga a quien lo rodea. El daño se tira en cada duelo de la cascada (dueño: «así como está»).
-  H('Barrido', 'DA', 'hd', 'mt', 3, oB('Gira con su arma y le pega a todos los rivales que tiene al lado (la flor de diámetro 3, 7 casillas, a su alrededor; él no se cuenta). A cada uno que no le gana le hace el daño de su arma (sus dados más su Dmg), menos su Defensa. Tira su Probabilidad de Golpe una sola vez, contra la Evasión de cada uno; quien gana su Evasión no recibe nada (sin dodge roll). Cuenta como su ataque del turno.',
-    'su PdG, una vez, contra la Evasión de cada uno al lado; el daño de su arma a quien no le gana'));
+  H('Barrido', 'DA', 'hd', 'mt', 3, aA('Gira con su arma y le pega a cada rival que tiene al lado, uno por uno: elige al primero y el giro sigue en el sentido de las agujas del reloj. Con cada uno es un ataque común con su arma: su propia tirada de Probabilidad de Golpe, el rival se defiende como siempre (Evasión, Parry o Bloqueo), puede ser crítico y se aplican los efectos de su arma (romper armadura, derribar, sangrado…). Todo el giro cuenta como su ataque del turno.',
+    {}, 'un ataque con su arma contra cada rival al lado, uno por uno (su tirada, su defensa, su crítico y los efectos del arma)', 2, [], {barrido: true}));
   H('Torbellino de acero', 'DA', 'hd', 'm', 5, zO('Gira sobre sí mismo golpeando a todos los adyacentes (a mano).', 4, 'H'));
   // 🦶 Auditada (dueño, 2026-10-26; Choque pesado, «pisotón» y «aturdir», el Shockwave del Tanque, un escalón arriba): FLASH (el botón ✨ del GM; en turno ajeno,
   // el doble). Una onda alrededor: su Fuerza contra cada rival pegado, que elige cómo defenderse: Res.CC (si gana, nada) o Evasión (si gana, el dodge roll:

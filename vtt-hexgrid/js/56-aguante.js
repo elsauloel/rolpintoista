@@ -104,3 +104,80 @@ async function aguanteAtacarPj(arma){
     conSuelto: true, alSuelto: () => { reabrir(); FichaAcciones.tirarValorStat(S, arma ? `PdG · ${arma.nombre}` : 'PdG', FichaCombate.pdgParaArma(S, arma).valor, 'pdg', undefined, undefined, undefined, bnCombateUi()); }, alCancelar: () => {}});
   return true;
 }
+
+/* 🛡 El aguante con una habilidad que es un ataque con el arma (dueño, 2026-11-08: «que se pueda sumar a otros skills que estén incluidos en un ataque,
+   como pegar fuerte. Todos los skills que van como ensamblados al ataque, si vienen con el bono del aguante, se deben sumar»). Lo llama
+   dueloElegirObjetivoMapa (js/13) antes de elegir el objetivo, para personajes (la Botonera nueva) y creeps: si quien ataca tiene golpes contados,
+   sale el cartel de modo aguante; los dados se suman a los de la habilidad (Pegar fuerte: +1 de la habilidad y +N del aguante) y se cobran como
+   siempre (1 SP por dado; en modo cooldown, +1 turno de cooldown de Aguante por dado), además de lo que cuesta la habilidad. En el Barrido, los
+   dados van solo al primer rival (dueño, 2026-11-08; js/108 los saca de los siguientes con `aguanteDados`). → true si se hace cargo. */
+function aguanteParaHabilidad(msg){
+  const yo = msg.yo, atq = msg.ataque;
+  if(!yo || !atq || String(atq.habNombre || '') === 'Aguante') return false;
+  if(yo.tipo === 'creep'){
+    const sc = typeof creepPrivadoDe === 'function' ? creepPrivadoDe(yo.ref) : null;
+    if(!sc || !(num(sc.aguanteListo) > 0)) return false;
+    aguanteHabCreep(msg, sc).catch(err => { console.error('Aguante: no se pudo sumar a la habilidad', err); dueloElegirObjetivoMapa({...msg, aguanteHecho: true}); });
+    return true;
+  }
+  if(yo.tipo === 'pj' && typeof bn !== 'undefined' && bn && bn.S && bn.fichaId === yo.ref && num(bn.S.aguanteListo) > 0 && typeof bnPuedeGuardar === 'function' && bnPuedeGuardar()){
+    aguanteHabPj(msg).catch(err => { console.error('Aguante: no se pudo sumar a la habilidad', err); dueloElegirObjetivoMapa({...msg, aguanteHecho: true}); });
+    return true;
+  }
+  return false;
+}
+// El ataque de la habilidad con los dados del aguante (y cuántos son, para que el Barrido se los saque a los rivales que siguen).
+function aguanteSumarDados(atq, dados, tipoD){
+  const txt = ` 🛡 Modo aguante: +${dados}d${tipoD} por los golpes que recibió.`;
+  return {...atq, mods: {...(atq.mods || {}), dados: num(atq.mods && atq.mods.dados) + dados}, aguanteDados: dados,
+    ...(atq.habDetalle ? {habDetalle: String(atq.habDetalle + txt).slice(0, 600)} : {})};
+}
+function aguanteCartelHab(quien, nombreHab, golpes, dados, tope, conTope, tipoD, costo, barrido, spCorto){
+  return `${quien} está en modo aguante: recibió ${golpes} golpe${golpes === 1 ? '' : 's'}, así que ${nombreHab} suma +${dados}d${tipoD}`
+    + `${barrido ? ' (en el giro, solo al primer rival)' : ''}${conTope < golpes ? ` (el tope es su nivel + 1: ${tope})` : ''}${dados < conTope ? ` (${spCorto} alcanza para ${dados})` : ''}.`
+    + ` Cuesta ${costo}, además de lo que cuesta la habilidad.`;
+}
+function aguanteCancelarHab(msg){
+  if(msg.alCancelar){ msg.alCancelar(); return; }
+  try{ MensajesMapa.alMarco($('#botonera-marco'), 'duelo-cancelado'); }catch(e){}
+}
+async function aguanteHabCreep(msg, sc){
+  const atq = msg.ataque, golpes = Math.round(num(sc.aguanteListo)), enSP = CreepCalculo.modoSP(sc);
+  const tope = aguanteTope(sc), conTope = Math.min(golpes, tope);
+  const dados = enSP ? Math.min(conTope, Math.max(0, Math.floor(CreepCalculo.spActual(sc)))) : conTope;
+  const tipoD = num(atq.tipoDado) || Combatiente.armaEnMano(sc).tipoDado;
+  const costo = enSP ? `${dados} SP` : `+${dados} turno${dados === 1 ? '' : 's'} de cooldown de Aguante`;
+  const nombreHab = atq.habNombre || 'la habilidad';
+  if(!(await AvisoCombate.preguntar(aguanteCartelHab(sc.nombre, nombreHab, golpes, dados, tope, conTope, tipoD, costo, !!atq.barrido, 'el SP le'),
+    {icono: '🛡', titulo: 'Modo aguante', si: `${nombreHab} con el aguante`, no: 'Cancelar'}))){ aguanteCancelarHab(msg); return; }
+  await modificarCreep(String(sc.id || msg.yo.ref), c => {
+    if(dados){
+      if(CreepCalculo.modoSP(c)) c.sp = Math.max(0, CreepCalculo.spActual(c) - dados);
+      else{ const h = (c.habilidades || []).find(z => z && z.nombre === 'Aguante'); if(h) h.cdActual = Math.round(num(h.cdActual)) + dados; }
+    }
+    c.aguanteListo = 0;
+    return {};
+  });
+  const txt = `${sc.nombre} descarga el aguante en ${nombreHab}: +${dados}d${tipoD} (${costo}).`;
+  mesaLinea(`🛡 ${txt}`, 'recordatorio');
+  if(typeof momentoAbrir === 'function') momentoAbrir({tipo: 'aguante', icono: '🛡', titulo: `${sc.nombre} descarga el aguante`, resultado: txt, estado: 'listo', datos: {chico: true}});
+  dueloElegirObjetivoMapa({...msg, ataque: dados ? aguanteSumarDados(atq, dados, tipoD) : atq, aguanteHecho: true});
+}
+async function aguanteHabPj(msg){
+  const S = bn.S, atq = msg.ataque, golpes = Math.round(num(S.aguanteListo));
+  const nombre = ((S.meta && S.meta.nombre) || 'Personaje').trim();
+  const tope = Math.max(1, Math.round(num(S.meta && S.meta.nivel)) + 1), conTope = Math.min(golpes, tope);
+  const spLibre = Math.max(0, Math.floor(FichaBotonera.spMaximo(S, FichaCalculo.calcular(S)) - num(S.spGastado)));
+  const dados = Math.min(conTope, spLibre), tipoD = num(atq.tipoDado) || 6;
+  const nombreHab = atq.habNombre || 'la habilidad';
+  if(!(await AvisoCombate.preguntar(aguanteCartelHab(nombre, nombreHab, golpes, dados, tope, conTope, tipoD, `${dados} SP`, !!atq.barrido, 'el SP te'),
+    {icono: '🛡', titulo: 'Modo aguante', si: `${nombreHab} con el aguante`, no: 'Cancelar'}))){ aguanteCancelarHab(msg); return; }
+  const antes = FichaGuardado.partes(S);
+  if(dados) FichaAcciones.gastarSp(S, dados, {fijarHp: v => mantFijarHp(S, v), toast}, 'Aguante');
+  S.aguanteListo = 0;
+  bnUi(antes).cambio();
+  const txt = `${nombre} descarga el aguante en ${nombreHab}: +${dados}d${tipoD} (${dados} SP).`;
+  mesaLinea(`🛡 ${txt}`, 'recordatorio');
+  if(typeof momentoAbrir === 'function') momentoAbrir({tipo: 'aguante', icono: '🛡', titulo: `${nombre} descarga el aguante`, resultado: txt, estado: 'listo', datos: {chico: true}});
+  dueloElegirObjetivoMapa({...msg, ataque: dados ? aguanteSumarDados(atq, dados, tipoD) : atq, aguanteHecho: true});
+}

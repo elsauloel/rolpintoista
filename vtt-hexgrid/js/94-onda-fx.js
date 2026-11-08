@@ -56,7 +56,7 @@ function ondaFxEmpezar(de, radio, semilla, clave, ang){
   const poco = ondaPocoMovimiento(), v = FxOnda.variante(clave);
   const n = poco ? 0 : (v.piedras || v.chispas || 0);
   ONDA_FX.push({de, radio, semilla, t0: performance.now(), dur: poco ? 900 : FxOnda.DURACION, poco, piedras: FxOnda.piedras(semilla, n), v, clave: clave || 'tierra',
-    ang: v.cono ? (Number.isFinite(ang) ? ang : Math.PI / 2) : null});
+    ang: v.cono ? (Number.isFinite(ang) ? ang : Math.PI / 2) : v.giro && Number.isFinite(ang) ? ang : null});   // 🌀 el giro del Barrido arranca en el primer rival (2026-11-08)
   if(!poco && v.sacudida && ondaFxVe(tokens.get(de))) ondaSacudir(semilla, v.sacudida);
   pedirDibujo();
 }
@@ -191,7 +191,8 @@ function ondaFxDibujarUna(fx, C, ms, z){
 // 🌀 El giro (Remolino, Barrido, Coletazo): un tajo brillante que da una vuelta entera alrededor de quien gira, con su estela.
 function ondaFxDibujarGiro(fx, C, ms, z){
   const v = fx.v, p = Math.min(1, ms / fx.dur), fade = 1 - Math.pow(p, 2);
-  const R = HEX * SQ3 * Math.max(1, fx.radio), giro = -Math.PI / 2 + p * 2 * Math.PI * 1.15;
+  // Gira en el sentido de las agujas del reloj (en pantalla, el ángulo crece): el mismo orden en que el Barrido pasa de un rival al siguiente (js/108).
+  const R = HEX * SQ3 * Math.max(1, fx.radio), giro = (Number.isFinite(fx.ang) ? fx.ang : -Math.PI / 2) + p * 2 * Math.PI * 1.15;
   ctx.save();
   // La estela: arcos que se van apagando detrás de la hoja.
   ctx.globalCompositeOperation = 'lighter';

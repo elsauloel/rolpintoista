@@ -1854,3 +1854,9 @@ Regla del dueño (`docs/guia-de-diseno.md`, «Los bonos de cada arma, con esa ar
 - **Personaje (J1)**: la A pregunta «¿Con qué arma?»; con el sable «Pagar y tirar PdG · 1d6», con la hoz «· 1d4+1» (el +1 solo con el sable).
 - Las invocaciones con dos armas quedaron con prueba automática (no había ninguna invocación armada en la partida para probarla con clics).
 Capturas `p22-01` a `p22-10`.
+
+### Berserker nivel 5: la Probabilidad de Golpe de cada espada (2026-11-08)
+«Claude · pruebas», «Encuentro 2» (respaldo antes, restaurado y comparado después: idéntico). Al Goblin rompehuesos se le pusieron los atributos,
+el equipo y las habilidades del Berserker nivel 5. La A ofrece las dos espadas; las Acciones muestran «Atacar con Espada del Jefe… 🎲 1d10» y
+«Atacar con Espada larga 🎲 1d10+1». En el duelo contra Rockardo (copia): con la del Jefe «Pagar y tirar PdG · 1d10», con la larga «· 1d10+1»
+(el +1 solo con la Espada larga). Capturas `p23-w25-jefe` y `p23-w25-larga`.

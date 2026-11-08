@@ -202,6 +202,9 @@
   esencial({...T2, nivel: 2, atrib: [13, 8, 6, 6, 3],   // (aprobado 2026-11-07: Velo espejado; pasiva Piel curtida; + Cofia y Botas de cuero de vaca; dueño: del nv3 en adelante, subirle la Probabilidad de Golpe)
     equipo: ['Hacha con garfio', 'Puerta de granero', 'Coraza de cuero hervido', 'Cofia de anillas sueltas', 'Botas de cuero de vaca'],
     habilidades: ['Coraza de púas', 'Aguante', 'Velo espejado'], pasivas: ['Piel curtida']});
+  esencial({...T2, nivel: 3, atrib: [14, 8, 6, 8, 3],   // (aprobado 2026-11-08: Blindaje; los dos puntos de Destreza a la PdG; las Espinas no se suman: el Mantelete de asedio en lugar del Escudo de pinchos del plan)
+    equipo: ['Hacha con garfio', 'Mantelete de asedio', 'Coraza de cuero hervido', 'Cofia de anillas sueltas', 'Botas de cuero de vaca'],
+    habilidades: ['Coraza de púas', 'Aguante', 'Velo espejado', 'Blindaje'], pasivas: ['Piel curtida']});
   esencial({linea: 'M2', nombre: 'Mago de escarcha', rol: 'mago', rolTxt: 'mágico', nivel: 1, atrib: [8, 2, 5, 6, 12],
     equipo: ['Varita de la ventisca', 'Escudo de cuero mojado', 'Capa de viajero', 'Anillo de escarcha'],
     habilidades: ['Dardo helado', 'Hálito polar'], consumibles: ['Poción de SP menor'],
@@ -249,6 +252,9 @@
   esencial({...W2, nivel: 4, atrib: [12, 11, 7, 10, 2],   // (aprobado 2026-11-07: Golpe brutal; +1 Des como se dijo en el nv3; las Pieles erizadas del berserker en lugar del Chaleco; pasiva Regeneración en lugar de Voluntad de hierro, elección del dueño)
     equipo: ['Espada del Jefe de los Mil Caminos', 'Facón de paisano', 'Pieles erizadas del berserker', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Anillo maldito del berserker'],
     habilidades: ['Golpe desesperado', 'Furia', 'Pegar fuerte', 'Aguante', 'Golpe brutal'], pasivas: ['Robustez', 'Regeneración']});
+  esencial({...W2, nivel: 5, atrib: [13, 12, 8, 10, 2],   // (aprobado 2026-11-08: Barrido; la Espada larga en lugar del Facón, como segunda arma — ya con los bonos por arma: PdG 11 con ella, 10 con la del Jefe)
+    equipo: ['Espada del Jefe de los Mil Caminos', 'Espada larga', 'Pieles erizadas del berserker', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Anillo maldito del berserker'],
+    habilidades: ['Golpe desesperado', 'Furia', 'Pegar fuerte', 'Aguante', 'Golpe brutal', 'Barrido'], pasivas: ['Robustez', 'Regeneración']});
   esencial({linea: 'L2', nombre: 'Envenenador', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [7, 5, 9, 10, 2],
     equipo: ['Daga ritual', 'Chaleco de cuero', 'Guantes de agarre'],
     habilidades: ['Estocada', 'Hoja envenenada'], consumibles: ['Óleo venenoso'],

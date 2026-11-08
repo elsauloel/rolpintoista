@@ -174,6 +174,13 @@
     cuero hervido · + **Cofia de anillas sueltas** · + **Botas de cuero de vaca**. Habilidades: Coraza de púas · Aguante · + **Velo espejado**.
     Pasiva: **Piel curtida**. Consumible: Poción de Cuero Duro. Vida 65 · No2 6 · Def 8 · Def.Esp 1 · Bloqueo 11 · PdG 6. **Dueño: del nivel 3 en
     adelante, subirle la Probabilidad de Golpe** (PdG 6 es poco).
+  - **nv3 aprobado y cargado (2026-11-08):** Con 14 · Fue 8 · Agi 6 · **Des 8** · Esp 3 (los dos puntos de Destreza van a la PdG, decisión del
+    dueño). **Las Espinas no se suman** (dueño, 2026-11-08): la Coraza de púas queda como su única fuente de Espinas, así que el **Escudo de pinchos**
+    del plan se cambia por el **Mantelete de asedio** (Buena: Defensa +2 · Bloqueo +1 · Defensa contra armas a distancia +4), y en el nv4 también
+    se reemplazan las Pieles erizadas. Equipo: Hacha con garfio · **Mantelete de asedio** · Coraza de cuero hervido · Cofia de anillas sueltas ·
+    Botas de cuero de vaca. Habilidades: … · + **Blindaje**. Pasiva: Piel curtida. Consumible: Poción de Cuero Duro. Vida 70 · No2 6 · PdG 8 ·
+    Parry 8 · Def 8 (12 contra armas a distancia) · Eva 6 · **Bloqueo con el escudo 9** (Fue 8 + 1 del Mantelete; el +1 de Bloqueo del hacha ya
+    no cuenta al bloquear con el escudo, por la regla de los bonos por arma del 2026-11-07).
 
 ## La idea
 
@@ -460,6 +467,11 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   dueño (2026-11-07: «la nueva pasiva quiero que sea regeneración»). Consumible: Poción de Regeneración menor. Vida 70 · No2 7 · Def 4 ·
   Def.Esp 1 · PdG 10 · Daño 13 · Res.CC 12. La Regeneración de una pasiva ya la cobraban los creeps al empezar su turno
   (`comun/creep-acciones.js`, «Pasivas: +3 HP»); probado en el mapa.
+  **nv5 aprobado y cargado (2026-11-08) — W2 completo:** Fue 12 · Con 13 · Agi 8 · Des 10 · Esp 2. Equipo: el Facón sale y entra la **Espada larga**
+  (Buena: Tipo 6, 1 dado, PdG +1, Crítico potente +6) como segunda arma, ya con los bonos por arma (dueño: «va la espada del berserker»):
+  Espada del Jefe de los Mil Caminos · Espada larga · Pieles erizadas del berserker · Botas de cuero de vaca · Casco de cuero endurecido · Anillo
+  maldito del berserker. Habilidades: … · + **Barrido**. Pasivas: Robustez · Regeneración. Consumible: Poción de Regeneración menor. Vida 75 ·
+  No2 8 · Def 4 · Daño 14 · Eva 8 · **PdG 10 con la Espada del Jefe, 11 con la Espada larga** (probado en el mapa: «Atacar con…» 1d10 y 1d10+1).
 
 - **D3 · Ladrón de fuerzas · Debuffer** (boceto aprobado 2026-11-03, dueño: «lo apruebo así»). Estrategia: le saca al rival lo que necesita para
   pelear (los No2, la puntería, las curas, las bendiciones) y se queda con parte; elige al que más hace y lo deja sin aire. Atributos

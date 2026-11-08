@@ -1949,3 +1949,29 @@ Probado por Claude con clics en «Claude · pruebas», «Encuentro 2» (GM, J1, 
   No se publicó la ventana de la batalla para no repartir experiencia en la partida de prueba.
 - **Para el dueño:** la tirada de 2d8 es **una sola para todos** (los tres se curaron 7). El texto dice «cada uno se cura 2d8»: ¿una tirada por aliado o
   una para todos? Sin errores. Capturas: `cola-03-*` (Botonera, el área, el primer duelo, J2 mirando, el último aplicado, el aviso de la segunda vez).
+
+
+## 🪓 Cola de pruebas · 4: la línea W1 · Hachero, niveles 1 a 5 (2026-11-08, Claude, «Claude · pruebas» / «Encuentro 2», GM + J1 + J2 con clics; restaurado y comparado con el respaldo: idéntico)
+
+- **Armado, como el GM:** GM Tools → pestaña «Encuentro 2» → «+ Creep» → ⭐ Pool esencial → «Agregar» en Hachero Lv 1 a Lv 5 → «Crear token» (quedan
+  ocultos en 0,0). Se renombraron Hachero 1 a 5 (el token toma el nombre del creep), se mostraron y se pusieron al lado de Rockardo, Larry y Bizzante
+  (copias). Para darles un turno nuevo sin armar el orden de turnos se usó `CreepAcciones.inicioTurno` (lo mismo que hace su turno).
+- **Números en el mapa = la prueba de niveles** (vida/No2/Def/Def.Esp/PdG/Daño/Bloqueo/Parry/Eva/Res.CC/Res. crít. T4): nv1 35/6/5/1/7/9/9/7/5/7/1 ·
+  nv2 40/7/6/1/7/11/10/7/6/8/2 · nv3 45/7/6/1/8/12/11/8/6/9/2 · nv4 55/8/9/1/8/13/13/8/8/10/2 · nv5 65/8/11/0/9/14/14/9/8/12/3. La vida del equipo y
+  Piel curtida (nv4) ya están adentro; Golpe fuerte (pasiva) se ve en el Daño (Fue 10 → Daño 11 en el nv2).
+- **Pegar fuerte** (nv1 → Rockardo, GM): «1d8 + 9 + 1d8» (+1 dado); salió crítico ×2 y el ítem de emergencia lo dejó en 10 con Invulnerable.
+- **Golpe demoledor arranca en cooldown:** en las Acciones del nv4, «Cooldown · 3 turno(s)»; con tres turnos del nv3 bajó 3 → 2 → 1 → 0.
+- **Romper armadura + el arma se suman** (nv4 con Hacha de guerra ligera → Larry, J1): dos «✔ Aplicar Armadura rota ×1» (la habilidad y el 50 % del
+  hacha, que salió). J1 vio el cartel «Hachero 4 te rompió Coraza rúnica» (8 de 9, Defensa de 2 a 1). **Golpe demoledor** (nv3 → Bizzante): «1d8 + 14
+  + 1d8», ×2 de la habilidad y ×1 del hacha: tres acumulaciones.
+- **Arte de la guerra** (nv4, Flash en el duelo): se ofrece «⚡ Arte de la guerra +3» antes de tirar. **Error encontrado y arreglado:** con la tirada
+  escrita a mano («✍ Elegir manualmente») el Flash marcado no se cobraba ni sumaba (salía «6 (manual) + 6»). Ahora `usarManual` (comun/duelo.js,
+  `flashManual`) hace lo mismo que el botón de tirar: pregunta «¿es su turno?», cobra (cooldown 2) y suma: «6 (manual) +3 ⚡ = 9».
+- **Barrido** (nv2 en 10,25, al lado de Rockardo, Larry caído y Bizzante): brillaron los dos en pie (el caído no); Bizzante esquivó (empate, desempate
+  con par o impar); en Rockardo saltó «Es invulnerable, ¿atacarlo igual?» y siguió: Parry con el escudo perdido, «1d8 + 11» (Invulnerable: 0).
+- **Remate** (nv5 → Bizzante con 16 de 35): «+2 dados de daño» en la declaración, «1d8 + 16 + 2d8». Lo bajó a 0 y su ítem de emergencia lo levantó.
+- **Consumible** (nv1, Pergamino grupal de Furia de Combate, 1 No2): «✔ Aplicar» → Furia de Combate 3 turnos, Daño 9 → 10, el cinturón quedó vacío.
+  El aviso del grupo les llega a los creeps del orden de turnos (los otros Hacheros no estaban en el orden: armado de la prueba).
+- **Botas de estibador** (nv5): Inamovible 33 en el creep (no hubo empujón para tirarla).
+- Capturas: `cola-04-*` (Acciones con el Demoledor en cooldown, Arte de la guerra con la tirada a mano, el cartel de rotura que vio J1, el Barrido, el
+  Golpe demoledor, el Remate, el pergamino).

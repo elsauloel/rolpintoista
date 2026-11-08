@@ -1932,3 +1932,20 @@ Probado por Claude con clics en «Claude · pruebas», «Encuentro 2» (GM, J1, 
   rata, el esquive del goblin).
 - **Para el dueño**: hoy un jugador no le puede dar Barrido (ni otro giro) a su invocación desde la ficha; si hace falta, sumar la opción al editor.
 
+
+## ✨ Cola de pruebas · 3: el Milagro, versión de clase (2026-11-08, Claude, «Claude · pruebas» / «Encuentro 2», GM + J1 + J2 con clics; restaurado y comparado con el respaldo: idéntico)
+
+- **Armado:** a Larry (copia), de J1, se le sumó el Milagro del pool del Support (`habDeClase('support','support-milagro')`: 2 No2 · 10 SP). Larry en 20/35 con
+  Debilitado; Bizzante (copia), de J2, en 15/35 con Sangrado y después Veneno; Rockardo (copia) en 25/40 con Debilitado (y su Invulnerable del pacto);
+  **Prueba Uno caído** (0 de vida, con Veneno) y el **Goblin rompehuesos** (creep, 60/85) adentro de la misma flor, centrada en 10,24.
+- **Al apretar Ejecutar** (Botonera de J1): «🌀 Milagro: marcá el centro del área (diámetro 5, 19 casillas)»; clic en el centro → un duelo por aliado,
+  uno detrás del otro: **Larry → Bizzante → Rockardo**. Cada cuadro: «Purga · siempre» y «Curación 2d8 = 7», con «✔ Aplicar» de cada uno. J2 veía el
+  de Bizzante con «esperando que Larry (copia) lo aplique».
+- **Resultado:** Larry 20 → 27 y le sacó Debilitado; Bizzante 15 → 22 y le sacó **Veneno** (el más reciente; el Sangrado quedó); Rockardo 25 → 32 y le
+  sacó Debilitado (el Invulnerable, que es bueno, quedó). **Prueba Uno (caído) y el Goblin no entraron**: ni cura ni purga.
+- **Costo:** No2 de Larry 5 → 3 y SP gastado 0 → 10. Queda marcada `unaVezUsada`.
+- **Una vez por combate:** al apretarla de nuevo, «Milagro se usa una vez por combate, y ya la usaste en este. ¿Usarla igual?» (Sí / Cancelar).
+  La liberación (`unaVezAlTerminar`, la que corre al publicar «Finalizar combate») se probó llamándola en la pantalla de J1: `unaVezUsada` volvió a false.
+  No se publicó la ventana de la batalla para no repartir experiencia en la partida de prueba.
+- **Para el dueño:** la tirada de 2d8 es **una sola para todos** (los tres se curaron 7). El texto dice «cada uno se cura 2d8»: ¿una tirada por aliado o
+  una para todos? Sin errores. Capturas: `cola-03-*` (Botonera, el área, el primer duelo, J2 mirando, el último aplicado, el aviso de la segunda vez).

@@ -253,6 +253,9 @@
   esencial({...H2, nivel: 3, atrib: [11, 10, 7, 9, 2],   // (aprobado 2026-11-08: Pisotón; el hacha pasa a la del aserrador, Buena: 2 dados, Rompe armadura 33 %, Derribar 25 %)
     equipo: ['Hacha del aserrador', 'Rodela tachonada', 'Chaleco de cuero', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Polainas de cuero remendado'],
     habilidades: ['Salto', 'Pegar fuerte', 'Barrido', 'Pisotón'], pasivas: ['Piel curtida']});
+  esencial({...H2, nivel: 4, atrib: [12, 11, 8, 9, 2],   // (aprobado 2026-11-08: Aguante y Robustez; el torso Bueno es la Coraza de primera línea —las Pieles erizadas se descartaron para que no se parezca al Berserker—)
+    equipo: ['Hacha del aserrador', 'Rodela tachonada', 'Coraza de primera línea', 'Botas de cuero de vaca', 'Casco de cuero endurecido', 'Polainas de cuero remendado'],
+    habilidades: ['Salto', 'Pegar fuerte', 'Barrido', 'Pisotón', 'Aguante'], pasivas: ['Piel curtida', 'Robustez']});
   esencial({linea: 'W2', nombre: 'Berserker', rol: 'warrior', rolTxt: 'melee', nivel: 1, atrib: [9, 8, 6, 8, 2],   // dos armas (el ataque con la segunda, pendiente de programar en creeps)
     equipo: ['Sable del tahúr', 'Facón de paisano', 'Chaleco de cuero', 'Botas de cuero de vaca'],
     habilidades: ['Golpe desesperado', 'Furia'], consumibles: ['Poción de Regeneración menor'],

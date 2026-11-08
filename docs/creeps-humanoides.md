@@ -561,6 +561,10 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   ataque completo por rival, ver `guia-de-diseno.md`). Pasiva: **Piel curtida**. «Golpe fuerte» del plan es hoy «Pegar fuerte».
   **Nivel 3 aprobado y cargado** (dueño, 2026-11-08): Fue 10 · Con 11 · Des 9 · Agi 7 · Esp 2, vida 55, 7 No2, PdG 9, Daño 10 con 2 dados.
   El hacha pasa a la **Hacha del aserrador** (Buena: Tipo 8, 2 dados, Rompe armadura 33 %, Derribar 25 %). Habilidad nueva: **Pisotón** (Flash).
+  **Nivel 4 aprobado y cargado** (dueño, 2026-11-08: «vamos con la coraza»): Fue 11 · Con 12 · Des 9 · Agi 8 · Esp 2, vida 75, 8 No2, PdG 9, Daño 11,
+  Def 9 (+3 contra el primer golpe de cada turno), Eva 8, Res.CC 14. El torso Bueno es la **Coraza de primera línea** (Def +4, +3 contra el primer
+  golpe del turno, Res.CC +1, Vida +10) en lugar del Chaleco de cuero; las Pieles erizadas se descartaron para que no se parezca al Berserker.
+  Habilidad nueva: **Aguante** (los dados se descargan también con las habilidades de ataque; en el Barrido, solo al primer rival). Pasiva: **Robustez**.
 
 - **S4 · Protector · Support, con SP** (boceto aprobado 2026-11-03, dueño: «la ruta me cierra, me resulta interesante»). Estrategia: juega en el
   turno de los demás: protege a sus aliados con Flash en el momento justo (escudo, +3 a la defensa, sacar un estado) y desvía los golpes. Atributos

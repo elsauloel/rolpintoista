@@ -716,6 +716,7 @@ const Duelo = (() => {
           // Proyectil perforante (2026-10-13): `perforante` = al terminar, el mapa de quien disparó sigue al que está detrás (js/42);
           // `sinEfectos` = ese segundo golpe, sin los efectos especiales (ni del arma, ni de la flecha, ni del crítico).
           ...(cfg.ataque.perforante ? {perforante: true} : {}), ...(cfg.ataque.sinEfectos ? {sinEfectos: true} : {}),
+          ...(cfg.ataque.secundario ? {secundario: true} : {}),   // 🌵🪞 el rebote o el que siguió de largo: ni Espinas ni Espejo (dueño, 2026-11-08)
           ...(cfg.ataque.armaCreepId ? {armaCreepId: String(cfg.ataque.armaCreepId).slice(0, 80)} : {}),   // ⚔⚔ con cuál de sus dos armas ataca el creep (2026-11-03)
           ...(_num(cfg.ataque.rafaga) > 1 ? {rafaga: Math.min(3, Math.round(_num(cfg.ataque.rafaga)))} : {}),   // 🗡 Ráfaga de cortes (2026-10-21)
           ...(cfg.ataque.efectosNota ? {efectosNota: txtCorto(cfg.ataque.efectosNota, 200)} : {}),
@@ -932,7 +933,8 @@ const Duelo = (() => {
       ...(h.danoSiempre && dano && t && contra.length ? {danoSiempre: true} : {}),   // ⚡ el daño entra siempre; la tirada es solo para los estados (Zap)
       ...((objetivo === 'onda' || objetivo === 'cono') && h.dodge ? {dodge: true} : {}),
       ...((objetivo === 'onda' || objetivo === 'cono') && h.dodgeConEva ? {dodgeConEva: true} : {}),   // 🦶 el dodge roll solo si se defendió con la Evasión (el Pisotón)
-      ...(objetivo === 'onda' && h.conVista ? {conVista: true} : {}),   // la luz: solo a los que ve (los sólidos la tapan)
+      ...(objetivo === 'onda' && h.conVista ? {conVista: true} : {}),
+      ...(objetivo === 'onda' && h.giro ? {giro: true} : {}),   // 🌀 el Barrido: un giro con el arma, sí devuelve Espinas (dueño, 2026-11-08)   // la luz: solo a los que ve (los sólidos la tapan)
       ...(objetivo === 'aliado' && h.conmigo ? {conmigo: true} : {}),   // un aliado o uno mismo (Heal, 2026-10-11)
       ...(objetivo === 'cualquiera' && h.aliadoDirecto ? {aliadoDirecto: true} : {}),   // 🐈‍⬛ a un aliado le entra directo; un rival se resiste (Echar la mufa, 2026-11-05)
       ...(h.zonaQueda ? {zonaQueda: {turnos: Math.min(6, Math.max(1, Math.round(_num(h.zonaQueda.turnos)) || 1)), nombre: txtCorto(h.zonaQueda.nombre || '', 40),

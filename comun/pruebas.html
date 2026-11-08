@@ -48,14 +48,14 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261108espinas"></script>
+<script src="combatiente.js?v=20261108giro"></script>
 <script src="creep-calculo.js?v=20261108espinas"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261107dosarmas"></script>
 <script src="creep-duelo.js"></script>
 <script src="ficha-calculo.js"></script>
 <script src="ficha-combate.js"></script>
-<script src="estados-presets.js?v=20261107carancho5"></script>
+<script src="estados-presets.js?v=20261108giro"></script>
 <script src="estados-aplicar.js?v=20261106escudo3"></script>
 <script src="recibidos.js?v=20261103pm"></script>
 <script src="tokens-auto.js"></script>
@@ -108,7 +108,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="efectos-golpe.js?v=20261031luz"></script>
 <script src="confirmar-turno.js"></script>
 <script src="ficha-duelo.js"></script>
-<script src="duelo.js?v=20261107carancho5"></script>
+<script src="duelo.js?v=20261108giro"></script>
 <script src="aviso-combate.js"></script>
 <script src="lupa.js"></script>
 <script src="ficha-lupa.js"></script>
@@ -120,10 +120,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
-<script src="skills-clase.js?v=20261107milagro"></script>
+<script src="skills-clase.js?v=20261108giro"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261107guardia"></script>
-<script src="skills-creep-base.js?v=20261107carancho5"></script>
+<script src="skills-creep-base.js?v=20261108giro"></script>
 <script src="creeps-esenciales.js?v=20261108c"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -6926,6 +6926,25 @@ prueba('🌵 Las Espinas no se suman (dueño, 2026-11-08): varias fuentes devuel
   igual([escudo.equipoEstadoPreset, E([], [escudo]), E(coraza, [escudo, pieles]), E(dos, []), E([], [{...escudo, equipado: false}]), E([], []), E([{nombre: 'Espinas', espinas: true, activo: false}], []),
     J([], [poncho]), J([], [escudo]), E([], [poncho]), C.montoDevuelto(13), C.montoDevuelto(12), C.montoDevuelto(0)],
     ['Espinas', true, true, true, false, false, false, true, false, false, 4, 3, 0]);
+});
+prueba('🌵🪞 Espinas y Espejo devuelven solo el golpe directo (dueño, 2026-11-08): ni un área, ni lo que siguió de largo o rebotó; el Barrido sí devuelve Espinas', () => {
+  const C = Combatiente, D = C.devuelveElGolpe;
+  const solo = {ataque: {tipo: 'arma'}}, habUno = {ataque: {tipo: 'habilidad', rango: true}, hab: {nombre: 'Varita'}};
+  const area = {ataque: {tipo: 'habilidad', rango: true}, hab: {nombre: 'Bola de fuego'}, grupo: {id: 'a1', indice: 2, total: 3}};
+  const barrido = {ataque: {tipo: 'habilidad', rango: true}, hab: {nombre: 'Barrido', objetivo: 'onda', giro: true}, grupo: {id: 'a2', indice: 1, total: 2}};
+  const coletazoViejo = {ataque: {tipo: 'habilidad', rango: true}, hab: {nombre: 'Coletazo', objetivo: 'onda'}, grupo: {id: 'a4', indice: 1, total: 2}};
+  const ondaOtra = {ataque: {tipo: 'habilidad', rango: true}, hab: {nombre: 'Pisotón', objetivo: 'onda'}, grupo: {id: 'a5', indice: 1, total: 2}};
+  const misil = {ataque: {tipo: 'habilidad', rango: true}, hab: {nombre: 'Misiles', reparte: {cada: '1d4', total: 3}}, grupo: {id: 'a3', indice: 1, total: 3}};
+  const rebote = {ataque: {tipo: 'habilidad-arma', secundario: true}}, sigue = {ataque: {tipo: 'habilidad-arma', rango: true, sinEfectos: true, secundario: true}};
+  const txt = n => ESTADOS_PRESET.find(e => e.nombre === n).detalle;
+  const cat = n => CATALOGO_BASE.find(i => i.nombre === n && !i.archivo).detalle;
+  const oB = HABILIDADES_CREEP_BASE.find(h => h.nombre === 'Barrido').datos;
+  igual([D(barrido, 'espinas'), D(coletazoViejo, 'espinas'), D(barrido, 'espejo'), D(ondaOtra, 'espinas'), D(area, 'espinas'), !!(oB.duelo && oB.duelo.giro) || !!(oB.sp && oB.sp.duelo && oB.sp.duelo.giro)],
+    [true, true, false, false, false, true]);
+  igual([D(solo), D(habUno), D(area), D(barrido), D(misil), D(rebote), D(sigue), D(null),
+    /Solo un golpe directo/.test(txt('Espinas')), /Solo un ataque directo/.test(txt('Espejo')), /también en un área/.test(txt('Espejo')),
+    /Solo un golpe directo/.test(cat('Escudo de pinchos')), /Solo un ataque directo/.test(cat('Poncho de espejitos'))],
+    [true, true, false, false, true, false, false, false, true, true, false, true, true]);
 });
 prueba('🩸 L1 Sangrador nivel 5 (2026-11-07): Corte en la arteria y las Botas de mensajero (+2 a la Evasión solo contra el ataque de oportunidad)', () => {
   const C = CreepCalculo, l5 = CREEPS_BASE.find(c => c.pool === 'esencial' && c.nombre === 'Sangrador' && c.nivel === 5).datos;

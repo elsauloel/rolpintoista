@@ -1733,7 +1733,8 @@ function actualizarMuerteMapa(){
    (el daño del golpe con el multiplicador del crítico, ANTES de restar la Defensa: lo resista o no la armadura), directo a la vida. Solo si el golpe hizo daño (no si el defensor era
    Invulnerable). Lo aplica el mapa del GM, como el resto del daño del duelo. Desde el 2026-10-07 solo el daño físico: el especial lo devuelve el Espejo.
    Espejo (dueño, 2026-10-07): el mismo 1/4 del daño ESPECIAL que recibe (el de una habilidad o arma especial que ignora la Defensa, y el daño elemental
-   de un arma), antes de la Defensa especial, a cualquier distancia — también en un área (cada objetivo con Espejo devuelve lo suyo). */
+   de un arma), antes de la Defensa especial, a cualquier distancia. Desde el 2026-11-08 (dueño) ni las Espinas ni el Espejo devuelven un área, un
+   golpe que siguió de largo ni nada indirecto (veneno, sangrado, trampas, zonas, el salto del rayo): Combatiente.devuelveElGolpe. */
 async function dueloTieneEstado(d, flag, nombre){
   const td = tokens.get(d.defensor.tokenId);
   if(!td) return false;
@@ -1762,12 +1763,15 @@ async function dueloDevolverDano(d, base, flag, nombre){
   }
 }
 async function dueloEspinas(d, golpe, especial){
-  if(especial || (d.ataque && d.ataque.rango)) return null;
+  // 🌀 el Barrido (un giro con el arma) va al duelo como una habilidad (`rango`), pero es cuerpo a cuerpo: sí devuelve (dueño, 2026-11-08)
+  if(especial || (d.ataque && d.ataque.rango && !Combatiente.esGiro(d.hab))) return null;
+  if(!Combatiente.devuelveElGolpe(d, 'espinas')) return null;   // 🌵 un área o un golpe que siguió de largo: no (dueño, 2026-11-08)
   if(!(d.resultado === 'pego' || d.resultado === 'mitad') || !(num(golpe) > 0)) return null;
   return dueloDevolverDano(d, golpe, 'espinas', 'Espinas');
 }
 async function dueloEspejo(d, especial){
   if(!(num(especial) > 0)) return null;
+  if(!Combatiente.devuelveElGolpe(d, 'espejo')) return null;   // 🪞 un área (una Bola de fuego, un cono, la Tormenta…): no (dueño, 2026-11-08)
   return dueloDevolverDano(d, especial, 'espejo', 'Espejo');
 }
 

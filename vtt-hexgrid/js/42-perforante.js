@@ -59,7 +59,7 @@ async function perforanteResuelto(d){
   try{
     await Duelo.crear({yo: {ref: d.atacante.ref, tipo: d.atacante.tipo, nombre: d.atacante.nombre, uid: d.atacante.uid},
       ataque: {tipo: 'habilidad-arma', habNombre: `${nombre} (atravesó a ${blanco})`, armaId: a.armaId || '', armaNombre: a.armaNombre || '', tipoDado: num(a.tipoDado),
-        rango: !!a.rango, sinParry: !!a.sinParry, mods: {pdg: 0, dados: num(a.mods && a.mods.dados), fijo: num(a.mods && a.mods.fijo)}, efectos: [], sinEfectos: true,
+        rango: !!a.rango, sinParry: !!a.sinParry, mods: {pdg: 0, dados: num(a.mods && a.mods.dados), fijo: num(a.mods && a.mods.fijo)}, efectos: [], sinEfectos: true, secundario: true,
         ...(num(a.perfora) > 0 ? {perfora: num(a.perfora)} : {})},
       pdgCompartido: d.pdg, carancho: (() => { try{ const c = tokens.get(idA); return c ? caranchoBono(c, otro) : 0; }catch(err){ return 0; } })()},   // 🦅 (js/13)
       {id: sig.id, nombre: nombreOtro, tipo: otro.tipo, fichaId: otro.fichaId, duenoUid: otro.duenoUid}, idA);

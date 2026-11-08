@@ -2892,6 +2892,22 @@ const Combatiente = (() => {
     return enEstados || enEquipo;
   }
   const montoDevuelto = base => Math.ceil(nf(base) / DEVUELVE_FRACCION);
+  /* 🌵🪞 Solo el golpe directo se devuelve (dueño, 2026-11-08: «a un daño de área o un daño de veneno no lo afectan las espinas. Las espinas lo afectan los
+     golpes directos, un ataque con el daño del arma. Todo lo que es daño indirecto, venenos o efectos de área o lo que sea, eso no se devuelve ni con
+     espinas ni con espejos»). `d`: el duelo. No: un sub-duelo de un área (onda, flor, cono, línea, la Tormenta: `d.grupo`) —salvo los misiles que se
+     reparten, que son disparos de a uno a quien se eligió (`hab.reparte`)— ni un golpe que siguió de largo o rebotó a otro (`ataque.secundario`).
+     Los venenos, sangrados, trampas, zonas y el salto del rayo ni pasan por acá (no son un duelo). */
+  /* 🌀 La excepción del Barrido (dueño, 2026-11-08: «El barrido es un giro que cuenta como varios ataques. Así que si alguien con espinas es afectado
+     por barrido, en ese caso puntual sí devuelve el daño»): el giro con el arma (Barrido, y el Coletazo de las bestias, la misma familia) sí devuelve
+     las Espinas de cada uno al que lastima. El Espejo no (es daño físico). `hab.giro` (skills-creep-base, oB) o, para los creeps guardados antes, el nombre. */
+  const GIROS = ['Barrido', 'Coletazo'];
+  const esGiro = hab => !!(hab && (hab.giro || GIROS.includes(String(hab.nombre || '').trim())));
+  function devuelveElGolpe(d, cual){
+    if(!d) return false;
+    if(d.grupo && !(d.hab && d.hab.reparte) && !(cual === 'espinas' && esGiro(d.hab))) return false;
+    if(d.ataque && d.ataque.secundario) return false;
+    return true;
+  }
   const efectoPorTirada = (tabla, total) => porTiradaNorm(tabla).filter(f => f.desde <= nf(total)).pop() || null;
   const porTiradaFilaTxt = f => f.caer ? 'cae (la vida a 0)' : `${f.estado.nombre}${f.estado.permanente ? ' (no vence)' : nf(f.estado.turnos) > 0 ? ` (${f.estado.turnos} turno${f.estado.turnos === 1 ? '' : 's'})` : ''}${nf(f.estado.stacks) > 0 ? ` ×${f.estado.stacks}` : ''}`;
   const porTiradaTxt = tabla => porTiradaNorm(tabla).map(f => `${f.desde}+ ${porTiradaFilaTxt(f)}`).join(' · ');
@@ -2919,5 +2935,5 @@ const Combatiente = (() => {
     escudoParsear, acumularVeneno, acumularSangrado, agregarEstado, ajustarPreset, efectoPermanente, inmunidad, sincronizarEstadosDePasivas, sangraPorSp,
     marcadoEn, resElementalTxt, modoHab, tipoEjecucion, sustituirX, esCostoAtaque, costoNitrosHab, bloqueoHab, alcanceHab, efectoDeEjecucion, habEjecucion, sobreSiSinTiradas, ejecucionNoDisponible,
     formulaDanoHab, zonaDeHab, trampaDeHab, ataqueConArreglos, esFlash, FLASH_CSS, flashPara, cdFlash, costoFlash,
-    porTiradaNorm, efectoPorTirada, porTiradaFilaTxt, porTiradaTxt, DEVUELVE_FRACCION, devuelveDano, montoDevuelto};
+    porTiradaNorm, efectoPorTirada, porTiradaFilaTxt, porTiradaTxt, DEVUELVE_FRACCION, devuelveDano, montoDevuelto, devuelveElGolpe, esGiro, GIROS};
 })();

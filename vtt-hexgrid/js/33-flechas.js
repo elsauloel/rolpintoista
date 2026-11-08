@@ -174,7 +174,7 @@ async function viroteRebota(d){
   const a = d.ataque;
   try{
     await Duelo.crear({yo: {ref: d.atacante.ref, tipo: d.atacante.tipo, nombre: d.atacante.nombre},
-      ataque: {tipo: 'habilidad-arma', habNombre: `Rebote del ${fl.nombre}`, armaId: a.armaId || '', armaNombre: a.armaNombre || '', tipoDado: num(a.tipoDado), mods: {pdg: -2}, efectos: fl.efectos || []},
+      ataque: {tipo: 'habilidad-arma', habNombre: `Rebote del ${fl.nombre}`, armaId: a.armaId || '', armaNombre: a.armaNombre || '', tipoDado: num(a.tipoDado), mods: {pdg: -2}, efectos: fl.efectos || [], secundario: true},
       flecha: {nombre: `${fl.nombre} (rebote)`, efectos: fl.efectos || [], perfora: num(fl.perfora)}},
       {id: otro.id, nombre: nombreDe(otro), tipo: otro.tipo, fichaId: otro.fichaId, duenoUid: otro.duenoUid}, idA);
     return true;

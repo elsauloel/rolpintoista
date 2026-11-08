@@ -40,7 +40,7 @@
   // cada uno, el daño de su arma (dados + Dmg) a quien no le gana; sin dodge roll. Lo de un ataque y 2 SP, o cooldown 3; es su ataque del turno.
   // (Sin `cuentaComoAtaque`: cobrar «lo de un ataque» ya lo cuenta como su ataque del turno; con las dos, contaba dos. Probado en el mapa, 2026-10-21.)
   const oB = (detalle, ataqueTxt, efectos) => ({detalle, no2: 'ATAQUE', spCosto: 2, auditada: true, ataqueTxt,
-    duelo: {objetivo: 'onda', radio: 1, tira: 'pdg', contra: ['eva'], dano: true, danoArma: true, tipoDano: 'fisico', ignoraDano: false, efectos: efectos || []}});
+    duelo: {objetivo: 'onda', radio: 1, tira: 'pdg', contra: ['eva'], dano: true, danoArma: true, tipoDano: 'fisico', ignoraDano: false, giro: true, efectos: efectos || []}});   // giro: devuelve Espinas (dueño, 2026-11-08)
   const slug = t => t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
   // Estado del juego sobre sí mismo (preset de GM Tools: Sigilo, Invulnerable, Espinas…). turnos 0 = hasta que se lo saquen.
@@ -736,10 +736,10 @@
   // 🌵🪞 Auditadas (dueño, 2026-10-24: «un buff que le da a un aliado Espinas y otro que le da Espejo», concepto «devolver el daño» del Support): los
   // presets de siempre, ya automatizados en el duelo (vtt-hexgrid/js/13: dueloEspinas / dueloEspejo), a él o a un aliado en su Rango, como el Bálsamo.
   // Costos propuestos por Claude: 1 No2 y 2 SP, o cooldown 3; 3 turnos.
-  H('Coraza de púas', 'B', '*', 'a', 3, {detalle: 'Le cubre la piel de púas a un aliado (o a sí mismo) dentro de su Rango: durante 3 turnos, cada ataque cuerpo a cuerpo que recibe le devuelve al atacante un cuarto del golpe (antes de la Defensa, redondeado para arriba), directo a la vida (Espinas).',
+  H('Coraza de púas', 'B', '*', 'a', 3, {detalle: 'Le cubre la piel de púas a un aliado (o a sí mismo) dentro de su Rango: durante 3 turnos, cada ataque cuerpo a cuerpo que recibe le devuelve al atacante un cuarto del golpe (antes de la Defensa, redondeado para arriba), directo a la vida (Espinas). Solo un golpe directo: un área, un veneno, una trampa o cualquier daño indirecto no se devuelve.',
     no2: 1, spCosto: 2, auditada: true, ataqueTxt: 'Espinas 3 turnos a él o a un aliado en su Rango',
     duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', efectos: [{nombre: 'Espinas', turnos: 3}]}});
-  H('Velo espejado', 'B', '*', 'a', 3, {detalle: 'Envuelve a un aliado (o a sí mismo) dentro de su Rango en un velo que refleja la magia: durante 3 turnos, cada ataque de daño especial que recibe (varita, báculo, habilidad o el daño elemental de un arma, a cualquier distancia) le devuelve al que lo tiró un cuarto de ese daño (redondeado para arriba), directo a la vida (Espejo).',
+  H('Velo espejado', 'B', '*', 'a', 3, {detalle: 'Envuelve a un aliado (o a sí mismo) dentro de su Rango en un velo que refleja la magia: durante 3 turnos, cada ataque de daño especial que recibe (varita, báculo, habilidad o el daño elemental de un arma, a cualquier distancia) le devuelve al que lo tiró un cuarto de ese daño (redondeado para arriba), directo a la vida (Espejo). Solo un ataque directo a él: un área, un veneno, una trampa o cualquier daño indirecto no se devuelve.',
     no2: 1, spCosto: 2, auditada: true, ataqueTxt: 'Espejo 3 turnos a él o a un aliado en su Rango',
     duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', efectos: [{nombre: 'Espejo', turnos: 3}]}});
   // ✨ Auditada (dueño, 2026-10-24: «vamos con bendecir el arma, que tenga flash»; concepto 2 del Support): Flash — en turno ajeno cuesta el doble

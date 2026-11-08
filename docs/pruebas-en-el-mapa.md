@@ -1867,3 +1867,14 @@ del culto (creep) se le puso el Escudo de pinchos y el estado Espinas (como la C
 cuerpo con 30 de daño: «🌵 Espinas: Goblin rompehuesos recibe 8 de daño devuelto» (1/4 de 30, una sola vez; 85 → 77). Sin el estado, solo con el
 escudo, 20 de daño: devuelve 5 (77 → 72). Antes del arreglo, un creep con solo la pieza no devolvía nada (`itemParaCreep` perdía el estado de la
 pieza). Capturas `p24-06-cuadro-espinas` y `p24-07-solo-escudo`.
+
+### Espinas y Espejo: solo el golpe directo; el Barrido sí (2026-11-08)
+Regla del dueño (2026-11-08): ni las Espinas ni el Espejo devuelven un área, un veneno ni nada indirecto; el Barrido (un giro que cuenta como varios
+ataques) sí devuelve Espinas. En «Claude · pruebas», «Encuentro 2» (respaldo antes, restaurado después y comparado: idéntico):
+- Golpe con el arma del Goblin rompehuesos al Capataz del culto (Espinas): 20 de daño → «🌵 Espinas: … recibe 5» (85 → 80). Captura `p25-05-golpe-directo`.
+- Barrido del goblin a Rockardo (copia) con Espinas y Espejo: 24 → «🌵 Espinas: … recibe 6» (80 → 74). Captura `p25-09-barrido-espinas`.
+- Bola de fuego (área) del goblin a Rockardo con Espinas y Espejo: le entraron 12 y no volvió nada (el goblin siguió en 74). Captura `p25-13-bola-0`.
+- Lengua de fuego (un solo objetivo, especial) a Rockardo con Espejo: 12 → «🪞 Espejo: … recibe 3» (74 → 71). Captura `p25-14-lengua-espejo`.
+- Veneno 4 al Capataz (con Espinas): al empezar su turno perdió 4 (187 → 183) y el goblin no recibió nada.
+- Escudo humano: el Capataz (con Espinas) protegía al goblin; Rockardo le pegó al goblin 26 − 6 = 20: 10 al goblin, 10 al Capataz (183 → 173) y
+  nada de vuelta a Rockardo (siguió en 5). Captura `p25-18-escudo-humano`.

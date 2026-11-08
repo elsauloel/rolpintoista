@@ -913,7 +913,8 @@ la del equipo desde el nivel 2; las pasivas salen de `comun/pasivas.js`).
   reserva** (B) · Chaleco de kevlar (B) · Escarpines de fieltro · Casco de cuero endurecido · **Guantes de cuero grueso** (Def +1). Habilidades: + **Círculo
   de sanación** (en lugar del «Milagro» del boceto). Pasiva: Manos de curandero.
 - ✨ **Milagro** (nueva, 2026-11-07, dueño: «me gusta la terminología… la sumaría como skill de creep y de support»): diámetro 5 (19 casillas) en su
-  Rango; cada aliado adentro (él incluido) se cura 2d8 y se saca el estado malo más reciente; caídos, nada. Creep: 2 No2 + 10 SP, o espera 5 y lenta.
+  Rango; cada aliado adentro (él incluido) se cura **3d8, una sola tirada para todos** (dueño, 2026-11-08: «que cure 3 dados de 8… es una
+  tirada para todos»; antes 2d8) y se saca el estado malo más reciente; caídos, nada. Creep: 2 No2 + 10 SP, o espera 5 y lenta.
   Clase (Support de los jugadores): 2 No2 + 10 SP, **una vez por combate** (avisa y deja usarla igual; se libera con «Finalizar combate»). No la lleva
   el Sanador del pool (el nivel 5 quedó con el Círculo de sanación).
 

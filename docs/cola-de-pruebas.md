@@ -23,6 +23,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 13. [ ] **Línea W2 · Berserker, niveles 1 a 5** (con las dos espadas en el 5 y las Pieles erizadas).
 14. [ ] **Línea T2 · Muralla con púas, niveles 1 a 5** (Provocar, Velo espejado, Mantelete contra disparos, Escudo humano sin Espinas).
 15. [ ] **Línea H2 · Saltador** (cuando esté completa).
+16. [ ] **Milagro con 3d8** (2026-11-08): la cura pasó de 2d8 a 3d8, una sola tirada para todos los aliados del área; ver que la tirada y el texto digan 3d8.
 
 Cada línea nueva que se termine de diseñar se suma al final.
 

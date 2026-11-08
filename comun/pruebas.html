@@ -120,10 +120,10 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="creep-editor.js"></script>
 <script src="ficha-lite.js"></script>
 <script src="pasivas.js"></script>
-<script src="skills-clase.js?v=20261108barrido"></script>
+<script src="skills-clase.js?v=20261108milagro"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261107guardia"></script>
-<script src="skills-creep-base.js?v=20261108barrido"></script>
+<script src="skills-creep-base.js?v=20261108milagro"></script>
 <script src="creeps-esenciales.js?v=20261108h24"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -6762,14 +6762,16 @@ prueba('💚 Manos de curandero (2026-11-06, dueño: «probemos +5»): la pasiva
   const ef = typeof CreepAcciones !== 'undefined' && CreepAcciones.efectoDeHab ? CreepAcciones.efectoDeHab(sc2, {efectoNombre: 'Regeneración', efectoHpTurno: 4, efectoTurnos: 3}, ESTADOS_PRESET) : null;
   igual([CreepCalculo.modTotal(sc, 'curamasarea'), !!(FichaCalculo.STAT_LABEL || {}).curamasarea, ef && ef.estado ? ef.estado.hpTurno : 6], [2, true, 6]);
 });
-prueba('✨ Milagro (2026-11-07, dueño): de creep (lenta, diámetro 5, 2d8 y saca el último estado malo, 2 No2 + 10 SP) y de clase del Support (una vez por combate); el Sanador nv5 lleva el Círculo de sanación', () => {
+prueba('✨ Milagro (2026-11-07, dueño; 3d8 desde el 2026-11-08, una tirada para todos): de creep (lenta, diámetro 5, 3d8 y saca el último estado malo, 2 No2 + 10 SP) y de clase del Support (una vez por combate); el Sanador nv5 lleva el Círculo de sanación', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Milagro');
   const h = armarHabilidadDeCreep(e.datos, 5);
   const c = CLASES_SKILLS.flatMap(k => k.habilidades || []).find(x => x && x.id === 'support-milagro');
   const s5 = CREEPS_BASE.find(x => x.pool === 'esencial' && x.nombre === 'Sanador' && x.nivel === 5).datos;
   igual([e.datos.lenta, h.cd, h.spCosto, h.duelo.radio, h.duelo.aliados, JSON.stringify(h.duelo.efectos), !!(c && c.unaVez), c && c.costo, c && c.duelo.radio,
     s5.habilidades.map(x => x.nombre).includes('Círculo de sanación'), s5.habilidades.map(x => x.nombre).includes('Milagro'), CreepCalculo.spMax(s5) > 54],
-    [true, 5, 10, 2, true, '[{"purga":true},{"cura":"2d8"}]', true, '10', 2, true, false, true]);
+    [true, 5, 10, 2, true, '[{"purga":true},{"cura":"3d8"}]', true, '10', 2, true, false, true]);
+  igual([JSON.stringify(c.duelo.efectos), /3d8/.test(c.detalle) && /una sola tirada para todos/.test(c.detalle), /una sola tirada para todos/.test(JSON.stringify(e.datos))],
+    ['[{"purga":true},{"cura":"3d8"}]', true, true]);
 });
 prueba('⚔ Sed de batalla (2026-11-05): la pasiva está en el pool, para jugadores y creeps, y suma su stat (gana 3 No2 al voltear a un rival, aunque pase del máximo)', () => {
   const p = (typeof PASIVAS_BASE !== 'undefined' ? PASIVAS_BASE : []).find(x => x.nombre === 'Sed de batalla') || {};

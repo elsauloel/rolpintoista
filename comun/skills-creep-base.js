@@ -724,10 +724,10 @@
     no2: 2, spCosto: 4, auditada: true, ataqueTxt: 'cura 1d6+4 a cada aliado de una flor de 7 en su Rango',
     duelo: {objetivo: 'area', radio: 1, aliados: true, tira: '', contra: [], alcance: 'rango', efectos: [{cura: '1d6+4'}]}});
   // ✨ Milagro (dueño, 2026-11-07: «me gusta la terminología… la programaría y la sumaría como skill de creep y de support»): la gran cura del Sanador.
-  // Diámetro 5 (19 casillas), 2d8 y le saca el último estado malo a cada aliado de adentro (el motor de la Oleada + el de Purificar). Lenta (5).
-  H('Milagro', 'CA', '*', 'a', 5, {detalle: 'Un milagro que cierra las heridas y limpia a todos: elige una flor de diámetro 5 (19 casillas) dentro de su Rango y cada uno de sus aliados adentro (él incluido) se cura 2d8 y se saca su estado malo más reciente. Sobre alguien caído no hace nada (no lo levanta).',
-    no2: 2, spCosto: 10, auditada: true, ataqueTxt: 'cura 2d8 y le saca el estado malo más reciente a cada aliado de una flor de 19 en su Rango',
-    duelo: {objetivo: 'area', radio: 2, aliados: true, tira: '', contra: [], alcance: 'rango', efectos: [{purga: true}, {cura: '2d8'}]}});
+  // Diámetro 5 (19 casillas), 3d8 (2026-11-08, dueño: «que cure 3 dados de 8… es una tirada para todos») y le saca el último estado malo a cada aliado de adentro (el motor de la Oleada + el de Purificar). Lenta (5).
+  H('Milagro', 'CA', '*', 'a', 5, {detalle: 'Un milagro que cierra las heridas y limpia a todos: elige una flor de diámetro 5 (19 casillas) dentro de su Rango y cura 3d8 a cada uno de sus aliados adentro (él incluido) —una sola tirada para todos: todos se curan lo mismo— y a cada uno le saca su estado malo más reciente. Sobre alguien caído no hace nada (no lo levanta).',
+    no2: 2, spCosto: 10, auditada: true, ataqueTxt: 'cura 3d8 (una tirada para todos) y le saca el estado malo más reciente a cada aliado de una flor de 19 en su Rango',
+    duelo: {objetivo: 'area', radio: 2, aliados: true, tira: '', contra: [], alcance: 'rango', efectos: [{purga: true}, {cura: '3d8'}]}});
   H('Bálsamo', 'C', '*', 'a', 3, {detalle: 'Un bálsamo que sigue curando: él o un aliado dentro de su Rango recupera 4 de vida al empezar cada uno de sus próximos 3 turnos (Regeneración). Sobre alguien caído no levanta.',
     no2: 1, spCosto: 2, auditada: true, ataqueTxt: 'Regeneración 4 por turno, 3 turnos, a él o a un aliado en su Rango',
     duelo: {objetivo: 'aliado', conmigo: true, tira: '', contra: [], alcance: 'rango', efectos: [{nombre: 'Regeneración', turnos: 3, hp: 4}]}});

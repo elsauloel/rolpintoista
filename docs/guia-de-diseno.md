@@ -267,3 +267,15 @@ Pedido del dueño (log «A desarrollar»): cuánto se puede acumular de Resisten
   `resolverGolpe` del mapa y el golpe directo). Quedan: los que se renuevan cada turno a propósito (`recarga`), la Armadura arcana (absorbe y
   explota al terminar) y los que además dan otra cosa (mods, Invulnerable, el Escudo elemental). Los de los anillos de descanso vuelven en el
   próximo descanso.
+
+## Trampas de área: se disparan en toda su área (dueño, 2026-11-09)
+«Aplicale a todas las trampas la misma regla de la red»: si una trampa hace efecto en un área, **el disparo y el efecto ocupan las mismas casillas**:
+pisar cualquiera de ellas la dispara y alcanza a todos los que estén encima. Primero la Red (Red de caza y Red tendida, `b4e3b4c2`); después el
+resto (2026-11-09): Mina del cazador y Polvo cegador (creeps) y, del catálogo, Gas adormecedor, Gas somnífero, Nube de veneno, Petardo trampa,
+Mina explosiva, Cartucho enterrado, Barril de pólvora, Lluvia de cascotes, Géiser de fuego, Niebla de confusión y Espejo de discordia. Todas
+pasan a flor de 7 casillas (`tipo: 'flor', tamano: 1, efecto: {area: 'trampa'}`); los gases que quedan como nube siguen en esas 7. No queda
+ninguna trampa con `efecto.area: 'flor'` (una prueba automática lo vigila). Las de una sola casilla (`pisador`: cepos, agujas, portales) siguen igual.
+
+## La lava (Varita del chorro de lava): aprobada la tercera versión (dueño, 2026-11-09: «así me gusta, la lava»)
+Commit `90398810` (`vtt-hexgrid/js/50-superficies.js`): borde negro nítido de líquido espeso; la costra del borde partida en placas negras con
+juntas rojas que laten, grandes pegadas al borde y cada vez más chicas y separadas hacia el centro, que queda rojo y liso con llamitas y chispas.

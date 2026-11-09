@@ -123,8 +123,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="skills-clase.js?v=20261108milagro"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261107guardia"></script>
-<script src="skills-creep-base.js?v=20261109red"></script>
-<script src="creeps-esenciales.js?v=20261109l43"></script>
+<script src="skills-creep-base.js?v=20261109trampas"></script>
+<script src="creeps-esenciales.js?v=20261109l45"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
@@ -5058,14 +5058,14 @@ prueba('Silencio (habilidades con SP: avisa) · Pierde SP (Succión arcana) · M
     napalm.danoZona, napalm.dejaZona, napalm.elemento, succ.pierdeSp, JSON.parse(TokensAuto.estadoJson(null, {stat: 'resmg', dif: 9, que: 'efecto'}, null, null, '', 0, {pierdeSp: '2d6'})).pierdeSp],
     [true, 'Orco está en Silencio: no puede usar habilidades que cuestan SP. ¿Usar Rayo igual?', '', '', true, true, '1d6', true, 'fuego', '2d6', '2d6']);
 });
-prueba('portal (rango 8, lo elige quien la puso), dardos (el veneno solo si lastima), gases (disparo en línea de 3, nube en la flor de 7) y explosivas', () => {
+prueba('portal (rango 8, lo elige quien la puso), dardos (el veneno solo si lastima), gases (desde el 2026-11-09: trampa en flor de 7 que se dispara en cualquiera de sus casillas) y explosivas', () => {
   const td = n => CATALOGO_BASE.find(i => i.nombre === n).trampaDatos;
   const portal = td('Portal cósmico'), dardos = td('Dardos envenenados'), som = td('Gas somnífero'), barril = td('Barril de pólvora');
   const j = JSON.parse(TokensAuto.estadoJson({nombre: 'Veneno', stacks: 3}, null, null, {area: 'flor', radio: 1, centro: 'trampa'}, '', 0, {portal: {rango: 8}, requiereDano: true}));
   igual([portal.portal, portal.efectoManual || '', dardos.dano, dardos.requiereDano, som.tipo, som.tamano, som.efecto, barril.dano, barril.salvacion.stat, barril.salvacion.que,
     j.portal, j.requiereDano, j.efecto, TokensAuto.efectoNorm({area: 'flor', radio: 1}),
     ItemCorto.trampaFilas(portal).find(f => f[0] === 'Teletransporta')[1], ItemCorto.trampaFilas(dardos).some(f => f[0] === 'Si lastima')],
-    [{rango: 8}, '', '1d6+3', true, 'linea', 3, {area: 'flor', radio: 1, centro: 'trampa'}, '4d6', 'rescc', 'efecto',
+    [{rango: 8}, '', '1d6+3', true, 'flor', 1, {area: 'trampa'}, '4d6', 'rescc', 'efecto',
       {rango: 8}, true, {area: 'flor', radio: 1, centro: 'trampa'}, {area: 'flor', radio: 1}, 'quien la pone elige adónde lo manda, hasta 8 casillas', true]);
 });
 prueba('Brea pegajosa: cada paso sobre ella renueva el Rengo (renuevaPaso viaja en el JSON de la trampa y se ve en la ficha corta)', () => {
@@ -6935,7 +6935,7 @@ prueba('⭐ Pool esencial, niveles 2 a 5 (2026-11-06): W1 Hachero 2–5 y T1 Esc
     w4.pasivas.map(p => p.nombre).join(), C.statValor(w4, 'dmg'), w4.hpMax,
     C.defensaEfectiva(t3), C.statValor(t3, 'bloqueo'), t3.pasivas.map(p => p.nombre).join(), t3.habilidades.find(h => h.nombre === 'Golpe demoledor') === undefined,
     d('Hachero', 3).habilidades.find(h => h.nombre === 'Golpe demoledor').cdActual],
-    [0, 'M12,M13,M14,M15,L12,L13,L14,L15,S12,S13,S14,S15,D12,D13,D14,D15,R12,R13,R14,R15,T22,T23,T24,T25,H12,H13,H14,H22,H23,H24,H25,W22,W23,W24,W25,L22,L23,L24,L25,L32,L33,L34,L35,L42,L43,W12,W13,W14,W15,T12,T13,T14,T15', 65, 11, 9, 14, 12, 0, 'Pegar fuerte,Romper armadura,Barrido,Golpe demoledor,Arte de la guerra,Remate',
+    [0, 'M12,M13,M14,M15,L12,L13,L14,L15,S12,S13,S14,S15,D12,D13,D14,D15,R12,R13,R14,R15,T22,T23,T24,T25,H12,H13,H14,H22,H23,H24,H25,W22,W23,W24,W25,L22,L23,L24,L25,L32,L33,L34,L35,L42,L43,L44,L45,W12,W13,W14,W15,T12,T13,T14,T15', 65, 11, 9, 14, 12, 0, 'Pegar fuerte,Romper armadura,Barrido,Golpe demoledor,Arte de la guerra,Remate',
       'Golpe fuerte,Piel curtida', 13, 55, 8, 10, 'Guardia firme', true, 3]);
   const t4 = d('Escudero', 4);   // (aprobado 2026-11-06)
   igual([t4.hpMax, C.defensaEfectiva(t4), C.statValor(t4, 'bloqueo'), C.statValor(t4, 'rescc'), t4.pasivas.map(p => p.nombre).join(), t4.habilidades.map(h => h.nombre).join()],
@@ -7322,6 +7322,14 @@ prueba('🕸 La red se dispara en sus 7 casillas (dueño, 2026-11-09: «que el t
   const it = CATALOGO_BASE.find(x => x && x.id === 'trampa-red-de-caza'), td = it.trampaDatos;
   igual([tc.tipo, tc.tamano, tc.efecto.area, td.tipo, td.tamano, td.efecto.area, /pisar cualquiera de las 7/.test(it.detalle), /cualquiera de las 7/.test(h.detalle || '')],
     ['flor', 1, 'trampa', 'flor', 1, 'trampa', true, true]);
+});
+prueba('🪤 Todas las trampas de área se disparan en toda su área (dueño, 2026-11-09: «aplicale a todas las trampas la misma regla de la red»)', () => {
+  const malas = [];
+  CATALOGO_BASE.forEach(x => { const td = x && x.trampaDatos; if(td && td.efecto && td.efecto.area === 'flor') malas.push(x.nombre); });
+  HABILIDADES_CREEP_CATALOGO.forEach(e => { let h = null; try{ h = armarHabilidadDeCreep(e.datos, 3); }catch(err){} const t = h && h.trampaColocar; if(t && t.efecto && t.efecto.area === 'flor') malas.push(e.nombre); });
+  const mina = Combatiente.trampaDeHab(trp('Mina del cazador', 3), () => 11), polvo = Combatiente.trampaDeHab(trp('Polvo cegador', 3), () => 11);
+  const gas = CATALOGO_BASE.find(x => x && x.nombre === 'Gas somnífero').trampaDatos;
+  igual([malas, mina.tamano, mina.efecto.area, polvo.tamano, polvo.efecto.area, gas.tipo, gas.tamano, gas.efecto.area], [[], 1, 'trampa', 1, 'trampa', 'flor', 1, 'trampa']);
 });
 prueba('🫨 Arrastrar (dueño, 2026-11-05): el arrastrado queda Desequilibrado, −2 a la Evasión, 1 turno de respaldo; ya no hay +2 PdG; el texto lo dice', () => {
   const p = ESTADOS_PRESET.find(x => x.nombre === 'Desequilibrado');

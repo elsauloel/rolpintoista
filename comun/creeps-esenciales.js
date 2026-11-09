@@ -328,6 +328,12 @@
   esencial({...L4, nivel: 3, atrib: [8, 8, 9, 12, 2],   // (aprobado 2026-11-09: Abrojos; el arma Buena: Aguja de corsario, 2 dados, PdG +1, Perfora 1)
     equipo: ['Aguja de corsario', 'Chaleco de cuero', 'Calzas de cuero flexible', 'Escarpines de fieltro', 'Capucha de emboscada'],
     habilidades: ['Cordón oculto', 'Hit and run', 'Tajo veloz', 'Abrojos'], pasivas: ['Pies ligeros']});
+  esencial({...L4, nivel: 4, atrib: [9, 9, 9, 13, 2],   // (aprobado 2026-11-09: Polvo cegador, Puntería; la Buena en las manos: Guantes del estoque, y se queda el Chaleco)
+    equipo: ['Aguja de corsario', 'Chaleco de cuero', 'Calzas de cuero flexible', 'Escarpines de fieltro', 'Capucha de emboscada', 'Guantes del estoque'],
+    habilidades: ['Cordón oculto', 'Hit and run', 'Tajo veloz', 'Abrojos', 'Polvo cegador'], pasivas: ['Pies ligeros', 'Puntería']});
+  esencial({...L4, nivel: 5, atrib: [10, 9, 10, 14, 2],   // (aprobado 2026-11-09: Dash; la tercera Buena en los pies: Botas del desertor, Retirada limpia 50 %)
+    equipo: ['Aguja de corsario', 'Chaleco de cuero', 'Calzas de cuero flexible', 'Botas del desertor', 'Capucha de emboscada', 'Guantes del estoque'],
+    habilidades: ['Cordón oculto', 'Hit and run', 'Tajo veloz', 'Abrojos', 'Polvo cegador', 'Dash'], pasivas: ['Pies ligeros', 'Puntería']});
   esencial({linea: 'R2', nombre: 'Hostigador a distancia', rol: 'rango', rolTxt: 'rango', nivel: 1, atrib: [7, 5, 9, 10, 2],
     equipo: ['Arco de tiro ligero', 'Chaleco de cuero', 'Escarpines de fieltro'],
     habilidades: ['Tiro certero', 'Disparo y repliegue'], consumibles: ['Flecha silbadora'],

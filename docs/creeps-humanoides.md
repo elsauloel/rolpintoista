@@ -635,6 +635,13 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Nivel 3 aprobado y cargado** (dueño, 2026-11-09: «va así»): Des 12 · Agi 9 · Con 8 · Fue 8 · Esp 2 → vida 40, 9 No2, PdG 13, Daño 8 + 2 dados,
   Def 3, Eva 12, Ini 9 (pierde el Ini +2 del Cortaplumas); el arma Buena: **Aguja de corsario** (Tipo 4, 2 dados, PdG +1, Perfora 1; elegida sobre
   la Daga de Capitán por los 2 dados); habilidad nueva **Abrojos** (7 casillas, 2d6+2 y Rengo, quedan 3 turnos).
+  **Nivel 4 aprobado y cargado** (dueño, 2026-11-09: «el hostigador va con los guantes»): Des 13 · Agi 9 · Con 9 · Fue 9 · Esp 2 → vida 45, 9 No2,
+  PdG 15 (16 con la Aguja: los Guantes suman con punzantes, Tipo 4), Daño 9 + 2 dados, Def 3, Def.Esp 0, Eva 12, Ini 9. La Buena va en las manos
+  (**Guantes del estoque**: PdG con punzantes +1, PdG en oportunidad +1) y se queda el Chaleco (la Capa del explorador bajaba la Defensa a 1).
+  Habilidad nueva **Polvo cegador** (desde el 2026-11-09 se dispara en cualquiera de sus 7 casillas); pasiva **Puntería** (+1 PdG).
+  **Nivel 5 aprobado y cargado — L4 completa** (dueño, 2026-11-09): Des 14 · Agi 9 · Con 10 · Fue 10 · Esp 2 → vida 50, 10 No2, PdG 16 (17 con
+  la Aguja), Daño 9 + 2 dados, Def 4, Eva 12, Ini 10. La tercera Buena en los pies: **Botas del desertor** (Retirada limpia 50 %, Defensa +1)
+  en lugar de los Escarpines; habilidad nueva **Dash**.
 
 - **D4 · Control mental y ceguera · Debuffer, con SP** (boceto y nivel 1 aprobados 2026-11-03, dueño: «lo confirmo como ruta»; «va»). Estrategia:
   te saca el control: te ciega o te encandila (Destello, Cegar), te abre la mente (Punzada mental, −2 Res.Mt) y ahí te confunde, te asusta o te

@@ -17,6 +17,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 Cada línea nueva que se termine de diseñar se suma al final.
 29. [ ] **Trampas: aviso al colocarla a la vista de un rival (todas las formas de colocar) y campos de visión de los rivales mientras se coloca** (2026-11-09): al elegir la casilla con un clic (habilidad, consumible, glifo) ya estaba; nuevo: al **arrastrar** una trampa propia sin disparar (las que quedan al lado del token: ficha suelta, GM Tools, habilidad a mano) se ven los conos de los rivales y, al soltarla en el cono de uno, Avanzar (queda descubierta) o Rechazar (vuelve a donde estaba). Y el botón **«👁 Ver campo de visión de los rivales (Ctrl + L)»**, que late arriba mientras un token propio está en sigilo: prende y apaga los conos de los rivales; al salir del sigilo se va.
+30. [ ] **Red: se dispara al pisar cualquiera de las 7 casillas** (2026-11-09, dueño: «que el trigger y el efecto sean igual»): la Red de caza (consumible) y la Red tendida (habilidad de creep) ahora son una trampa en flor de 7 casillas que se dispara al pisar cualquiera; ver que se dibuje en las 7, que la Percepción la descubra y que la red caiga sobre todos los que estén encima.
 
 ## Hechas
 

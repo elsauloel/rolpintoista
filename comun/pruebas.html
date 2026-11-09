@@ -123,7 +123,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="skills-clase.js?v=20261108milagro"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261107guardia"></script>
-<script src="skills-creep-base.js?v=20261109finta"></script>
+<script src="skills-creep-base.js?v=20261109red"></script>
 <script src="creeps-esenciales.js?v=20261109l42"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
@@ -7316,6 +7316,12 @@ prueba('🪤 Las 8 trampas de creep (2026-10-27): en el catálogo, auditadas, co
   igual([mal, red.salvacion.dif, red.soltar.dif, red.detectar, cepo.soltar.hiere, cepo.soltar.dif, abr.zonaResistValor, cor.salvacion.stat, cor.salvacion.dif, cor.tamano, cor.adelante, cor.visual,
     !!trp('Cebo').cebo, trp('Cebo').cebo.radio, HABILIDADES_CREEP_BASE.filter(x => x.nombre === 'Cebo').length],
     [[], 11, 11, 11, '1d6', 11, 11, 'agl', 11, 4, true, 'cordon', true, 4, 1]);
+});
+prueba('🕸 La red se dispara en sus 7 casillas (dueño, 2026-11-09: «que el trigger y el efecto sean igual»): Red tendida y Red de caza, flor de 1 y efecto en la trampa', () => {
+  const h = trp('Red tendida', 3), tc = Combatiente.trampaDeHab(h, () => 11);
+  const it = CATALOGO_BASE.find(x => x && x.id === 'trampa-red-de-caza'), td = it.trampaDatos;
+  igual([tc.tipo, tc.tamano, tc.efecto.area, td.tipo, td.tamano, td.efecto.area, /pisar cualquiera de las 7/.test(it.detalle), /cualquiera de las 7/.test(h.detalle || '')],
+    ['flor', 1, 'trampa', 'flor', 1, 'trampa', true, true]);
 });
 prueba('🫨 Arrastrar (dueño, 2026-11-05): el arrastrado queda Desequilibrado, −2 a la Evasión, 1 turno de respaldo; ya no hay +2 PdG; el texto lo dice', () => {
   const p = ESTADOS_PRESET.find(x => x.nombre === 'Desequilibrado');

@@ -1227,7 +1227,7 @@ function mesaAlAccionNueva(docs){
   // 👻 Paso fantasma: una tirada suya que no sea su Evasión es otra acción: se corta su cadena de pasos seguidos.
   docs.forEach(d => {
     const x = d.data() || {};
-    if(sistema.includes(x.desde) || !x.quien || /evasi/i.test(String(x.origen || ''))) return;
+    if(sistema.includes(x.desde) || !x.quien || /evasi|esquiv/i.test(String(x.origen || ''))) return;   // (2026-11-09, cola 25: la tirada de las Acciones dice «Esquivar (Eva)»)
     tokens.forEach((t, id) => { if(nombreDe(t) === x.quien || t.nombre === x.quien) pasoFantasmaCortar(id); });
   });
 }

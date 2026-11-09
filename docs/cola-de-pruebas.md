@@ -27,6 +27,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 19. [ ] **Inamovible (Botas de estibador)**: que un empujón tire su 33 % (no se pudo probar en las líneas W1 y T1: no hubo empujones).
 20. [ ] **Salto sin atacar cobra 1 No2** (2026-11-08): al caer, «No, solo saltar» (o caer sin rival pegado) devuelve los No2 del ataque menos 1; el cooldown o el SP quedan cobrados. También el Salto aplastante (mismo código). Y el Saltador H2 con el orden nuevo (nv2 Pisotón, nv3 Aguante, nv4 Dash, nv5 Barrido) en la línea 15.
 21. [ ] **Finta sin crítico** (2026-11-09): un ataque con +2 al daño que no se puede parar (solo esquivar), sin Crítico frecuente ni potente de más; probarla con el Asesino de las sombras nivel 2.
+22. [ ] **Paso Fantasma con Carga y Takle (y no con Salto ni Dash)** (2026-11-09): con el Anillo de Paso Fantasma, una Carga o un Takle de 3 casillas o más carga el +3 a la próxima Evasión (en la pantalla del que corre y en la del que defiende); un Salto o un Dash, no; moverse 6 no da más que +3.
 
 Cada línea nueva que se termine de diseñar se suma al final.
 

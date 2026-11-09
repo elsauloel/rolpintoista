@@ -214,6 +214,14 @@ aplica solo para esa arma… para jugadores, para creeps, para invocaciones, par
 Código: `Combatiente.STATS_DEL_ARMA` / `STATS_DE_LA_PIEZA` / `fuentesParaStat` (creeps e invocaciones) y `FichaCombate.statParaArma`
 (personajes). Las invocaciones atacan con dos armas como los creeps desde el 2026-11-07 (`armaActiva`, `ataquesArma`).
 
+## Paso fantasma: qué movimiento cuenta (dueño, 2026-11-09)
+
+El Paso fantasma (Anillo de Paso Fantasma, stat `pasofantasma`) suma su valor fijo a la **próxima** tirada de Evasión después de moverse 3 casilleros
+o más, y se gasta al tirarla. **No se acumula**: moverse 6 da lo mismo que moverse 3. **Cuentan** caminar, la **Carga** (Carga que derriba) y el
+**Takle** (dueño: «la carga y el tackle, sí»); **no cuentan** el **Salto** ni el **Dash** («el salto y el dash no deben cargarlo al anillo»). La carrera
+manda su ruta al token (`carreraRuta`, vtt-hexgrid/js/55-carrera.js), como al caminar: la cuentan esta pantalla y las demás (js/09), y también suma a
+«Contra el que corre» de los arcos. El Salto, el Dash y los empujones no mandan ruta.
+
 ## Máximo de Resistencia a crítico acumulable con el catálogo actual (medido 2026-09-27)
 Pedido del dueño (log «A desarrollar»): cuánto se puede acumular de Resistencia a crítico por Tipo con un ítem en cada slot, eligiendo la mejor pieza de cada uno del catálogo de hoy (889 ítems; slots: cabeza, armadura blanda, armadura rígida, manos, piernas, pies, escudo y 2 anillos; el arma no aporta).
 | Tipo | Máximo | Desglose |

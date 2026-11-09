@@ -12,6 +12,20 @@
    donde cayó tiran Res.CC contra su Fuerza; quien no llega queda Sentado. Si ya está al lado, ataca sin saltar; si no llega o no hay dónde caer, avisa y
    deja atacar igual. → true para seguir, null para elegir otro. */
 // 💥 `ataque.corre` (2026-10-26, el Takle): no salta, corre — no pasa por encima de paredes ni Sólidos (esas casillas no sirven), y los textos dicen «corre».
+// 🏃 La carrera cuenta como moverse (dueño, 2026-11-09: «la carga y el tackle, sí»; el Salto y el Dash, no): las casillas que corrió suman al Paso
+// fantasma del anillo (y a «Contra el que corre») como al caminar. La ruta va al token (las demás pantallas la cuentan al verla, js/09); en esta se
+// cuenta acá y se marca como ya vista para no contarla dos veces. → la ruta plana para Firestore.
+function carreraRuta(mio, celdas){
+  const cs = celdas.filter((c, i) => !i || c.col !== celdas[i - 1].col || c.fila !== celdas[i - 1].fila);
+  const plana = cs.slice(-RUTA_MAX_CELDAS).flatMap(c => [c.col, c.fila]);
+  if(cs.length > 1){
+    if(typeof contarCasilleros === 'function') contarCasilleros(mio.id, cs.length - 1);
+    const t = tokens.get(mio.id);
+    if(t) t.rutaJson = JSON.stringify(plana);
+    if(typeof estelas !== 'undefined') estelas.set(mio.id, {celdas: cs.slice(), hasta: Date.now() + ESTELA_MS});
+  }
+  return plana;
+}
 async function saltoHab(mio, t, ataque, yo){
   const n = Math.round(num(ataque.saltoHab)), dist = distanciaHex(mio, t), nom = nombreDe(mio), obj = nombreDe(t), corre = !!ataque.corre;
   if(dist <= 1){ if(ataque.saltoAplasta) await saltoAplastar(mio, yo); return true; }
@@ -44,7 +58,8 @@ async function saltoHab(mio, t, ataque, yo){
   }
   const k = distanciaHex(mio, caer), desdeSalto = {col: mio.col, fila: mio.fila};
   if(typeof oporNegadaAvisar === 'function') oporNegadaAvisar(mio, mio.id, [desdeSalto, ...lineaHex(mio, caer).filter(c => !(c.col === mio.col && c.fila === mio.fila))], ataque.habNombre || ataque.nombre || (corre ? 'la embestida' : 'el Salto'), t.id);   // 💨 sin oportunidad: el aviso (js/17)
-  await coleccionTokens().doc(mio.id).update({col: caer.col, fila: caer.fila, rotacion: rotacionDePaso(hexCentro(caer.col, caer.fila), hexCentro(t.col, t.fila)), ruta: firebase.firestore.FieldValue.delete()});
+  await coleccionTokens().doc(mio.id).update({col: caer.col, fila: caer.fila, rotacion: rotacionDePaso(hexCentro(caer.col, caer.fila), hexCentro(t.col, t.fila)),
+    ruta: corre ? carreraRuta(mio, [desdeSalto, ...lineaHex(desdeSalto, caer)]) : firebase.firestore.FieldValue.delete()});   // 🏃 el Takle corre: cuenta para el Paso fantasma (el Salto, no)
   if(typeof marcarMovido === 'function') marcarMovido(mio.id);
   mio.col = caer.col; mio.fila = caer.fila;
   const txt = corre ? `${nom} corre ${k} casillero${k === 1 ? '' : 's'} (gratis, sin ataques de oportunidad) y se le tira encima a ${obj}.` : `${nom} salta ${k} casillero${k === 1 ? '' : 's'} y cae al lado de ${obj}.`;
@@ -119,7 +134,8 @@ async function cargaEmbestida(mio, t, ataque, yo){
     {icono: '🐂', titulo: 'Sin No2 para la carrera', si: 'Correr igual', no: 'Elegir otro'}))) return null;
   const fin = camino[camino.length - 1];
   await modificarCreep(String(mio.fichaId), c => { c.nitros = Math.max(0, num(c.nitros) - costo); return {}; });
-  await coleccionTokens().doc(mio.id).update({col: fin.col, fila: fin.fila, rotacion: rotacionDePaso(hexCentro(fin.col, fin.fila), hexCentro(t.col, t.fila)), ruta: firebase.firestore.FieldValue.delete()});
+  await coleccionTokens().doc(mio.id).update({col: fin.col, fila: fin.fila, rotacion: rotacionDePaso(hexCentro(fin.col, fin.fila), hexCentro(t.col, t.fila)),
+    ruta: carreraRuta(mio, [{col: mio.col, fila: mio.fila}, ...camino])});   // 🏃 la Carga corre: cuenta para el Paso fantasma
   if(typeof marcarMovido === 'function') marcarMovido(mio.id);
   mio.col = fin.col; mio.fila = fin.fila;   // (lo que sigue —la espalda, el miedo— lo mira desde donde quedó)
   const b = n + 1;

@@ -425,7 +425,7 @@ function escudoDadoCartel(info, alTomar){
 async function escudoPedirDado(info, tz){
   if(escudoTiroMio(tz)){
     const mid = await momentoAbrir({tipo: 'escudo-dado', icono: info.icono, titulo: `🎲 ${tz.gm ? 'El GM' : tz.nombre} tira el ${info.dado} del ${info.escudo.toLowerCase()} (${info.quienV})`, estado: 'tirando',
-      datos: {chico: true, local: true}}).catch(() => null);
+      datos: {chico: true, local: true, vid: info.vid || '', pid: info.pid || '', respaldo: !!info.respaldo}}).catch(() => null);
     return {r: await escudoDadoCartel(info, null), mid};
   }
   const mid = await momentoAbrir({tipo: 'escudo-dado', icono: '⏳', titulo: `⏳ Esperando que ${tz.gm ? 'el GM' : tz.nombre} tire el dado del ${info.escudo.toLowerCase()} de ${info.quienP} (${info.quienV})`,
@@ -442,6 +442,11 @@ async function escudoPedirDado(info, tz){
 // Llega un momento `escudo-dado` (js/16).
 function escudoDadoMomento(id, d){
   const dt = d.datos || {};
+  if(dt.vid && dt.pid){   // 🧯 de quién es (para el respaldo del GM: ver escudoRespaldoGM)
+    const msv = d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now(), kv = dt.pid + '|' + dt.vid;
+    escudoVistosPar.set(kv, Math.max(escudoVistosPar.get(kv) || 0, msv));
+    if(dt.respaldo) escudoRespaldoPar.set(kv, Math.max(escudoRespaldoPar.get(kv) || 0, msv));
+  }
   if(dt.local) return;
   const espera = escudoDadoEsperan.get(id);
   if(espera && (d.estado === 'tirado' || d.estado === 'mano')){
@@ -485,16 +490,32 @@ function escudoDadoMostrar(){
 }
 
 // Quema a `vid` con el escudo de `pid` (si esta pantalla resuelve a la víctima). Uno por vez (la tirada espera al que la tira).
+/* 🧯 El respaldo del GM (2026-11-09, el dueño probando solo como GM: «sigue sin pedirme la tirada del daño»): la víctima es un personaje y la
+   resuelve la pantalla de su dueño; si esa pantalla no está abierta, no pasaba nada. Ahora el GM, a los 6 s, mira si la pantalla del dueño abrió
+   el momento `escudo-dado` de ese par; si no, lo resuelve él (con la tirada a la vista, como siempre). La pantalla del dueño que llega tarde ve el
+   momento del respaldo y no lo repite. */
+const escudoVistosPar = new Map(), escudoRespaldoPar = new Map();   // «portador|víctima» → cuándo se vio el último momento (de cualquiera / del respaldo)
+const ESCUDO_RESPALDO_MS = 6000;
+function escudoRespaldoGM(pid, vid, motivo){
+  const t0 = Date.now(), k = pid + '|' + vid;
+  setTimeout(() => {
+    if((escudoVistosPar.get(k) || 0) >= t0 - 3000) return;   // la pantalla del dueño ya lo tomó
+    if(!tokens.has(pid) || !tokens.has(vid)) return;
+    escudoQuemarFila = escudoQuemarFila.then(() => escudoQuemarYa(pid, vid, motivo, true)).catch(err => console.error('Escudo elemental (respaldo del GM):', err));
+  }, ESCUDO_RESPALDO_MS);
+}
 function escudoQuemar(pid, vid, motivo){
   const v = tokens.get(vid);
+  if(v && pid !== vid && !escudoResuelvoYo(v) && soyGM && v.tipo !== 'creep') escudoRespaldoGM(pid, vid, motivo);
   if(!v || pid === vid || !escudoResuelvoYo(v)) return Promise.resolve();
   escudoQuemarFila = escudoQuemarFila.then(() => escudoQuemarYa(pid, vid, motivo)).catch(err => console.error('Escudo elemental:', err));
   return escudoQuemarFila;
 }
-async function escudoQuemarYa(pid, vid, motivo){
+async function escudoQuemarYa(pid, vid, motivo, respaldo){
   const p = tokens.get(pid), v = tokens.get(vid);
   if(!p || !v || pid === vid) return;
-  if(!escudoResuelvoYo(v)) return;   // lo resuelve UNA pantalla: la de quien maneja a la víctima (el GM sus creeps)
+  if(!respaldo && !escudoResuelvoYo(v)) return;
+  if(!respaldo && Date.now() - (escudoRespaldoPar.get(pid + '|' + vid) || 0) < 20000) return;   // 🧯 ya lo resolvió el GM por respaldo   // lo resuelve UNA pantalla: la de quien maneja a la víctima (el GM sus creeps)
   if(typeof etereoDe === 'function' && etereoDe(v)) return;
   if(typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(vid)) return;
   const e = escudoDe(p);
@@ -513,7 +534,8 @@ async function escudoQuemarYa(pid, vid, motivo){
   try{
     // 🎲 La tirada: la hace quien maneja a quien tiró el escudo (ver arriba). Cerrar el cartel sin tirar = a mano.
     const dadoF = ef.dado || '1d6';
-    const info = {dado: dadoF, icono: def.icono, escudo: def.estado, nombreEl: def.nombre.toLowerCase(), que: def.que || '', clave: el, quienP, quienV, motivo, gm: false};
+    const info = {dado: dadoF, icono: def.icono, escudo: def.estado, nombreEl: def.nombre.toLowerCase(), que: def.que || '', clave: el, quienP, quienV, motivo, gm: false,
+      vid, pid, respaldo: !!respaldo};
     const tz = escudoTirador(e, p);
     info.gm = !!tz.gm;
     const pedido = await escudoPedirDado(info, tz);

@@ -929,6 +929,7 @@ function bnAccionAca(b){
     if(typeof menuTirada === 'function'){ const tid = [...tokens.entries()].find(([, t]) => t.fichaId === bn.fichaId); if(tid){ cerrarBotonera(); menuTirada(tid[0]); return true; } }
     if(it && it.desarmar && typeof window.abrirDesarmar === 'function'){ cerrarBotonera(); window.abrirDesarmar(); return true; }   // 🤺 Desarmar (Warrior, 2026-10-21): como el botón instantáneo
     if(!bnHabAca(it) || !bnPuedeGuardar()) return false;
+    if(typeof elegirDestinoCb !== 'undefined' && elegirDestinoCb) elegirDestinoCancelar();   // ↩ otra habilidad esperando el objetivo: se cancela (y se devuelve) antes (2026-11-09)
     FichaAcciones.ejecutarHabilidad(bn.S, it.id, undefined, false, bnHabUi());
     return true;
   }

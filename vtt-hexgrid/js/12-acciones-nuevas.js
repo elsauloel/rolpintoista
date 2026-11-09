@@ -712,6 +712,9 @@ async function acExcavarMeterse(sc, h, tokenId){
 }
 async function acEjecutarHab(sc, habId){
   const h = (sc.habilidades || []).find(x => x.id === habId);
+  // ↩ Si quedó pendiente elegir el objetivo de otra habilidad (2026-11-09, cola de pruebas 12: se volvió a apretar «Ejecutar» sin elegir; se cobraba
+  // dos veces y al cancelar se devolvía una sola), primero se cancela esa, como con Esc: se le devuelve lo cobrado.
+  if(typeof elegirDestinoCb !== 'undefined' && elegirDestinoCb) elegirDestinoCancelar();
   if(!h) return;
   const modo = CreepCalculo.modoHab(h);
   if(h.interponerse){ AvisoCombate.mostrar({icono: '🛡', titulo: h.nombre || 'Interponerse', texto: `${h.nombre || 'Interponerse'} se usa cuando atacan a un aliado a ${fmt(num(h.interponerse.distancia) || 2)} casillas o menos: aparece el botón ✨ arriba (y en «Podés usar» del duelo), antes de que el aliado elija cómo defenderse.`}); return; }   // 🛡 (js/78)
@@ -752,10 +755,12 @@ async function acEjecutarHab(sc, habId){
       opciones: malos.map(e => ({valor: e.nombre, texto: e.nombre, detalle: [num(e.turnos) > 0 ? `${fmt(num(e.turnos))} turno${num(e.turnos) === 1 ? '' : 's'}` : '', String(e.detalle || '').slice(0, 90)].filter(Boolean).join(' — ')}))})) || '';
   }
   const id = sc.id;
-  const antes = {sp: CreepCalculo.spActual(sc), nitros: num(sc.nitros), cd: num(h.cdActual)};   // ↩ para devolverlo si cancela al elegir el objetivo (2026-11-03: spActual, no `sp` crudo: con la barra llena no está guardado y no se devolvía el SP)
+  let antes = {sp: CreepCalculo.spActual(sc), nitros: num(sc.nitros), cd: num(h.cdActual)};   // ↩ para devolverlo si cancela al elegir el objetivo (2026-11-03: spActual, no `sp` crudo: con la barra llena no está guardado y no se devolvía el SP)
   // ⚡ Una habilidad Flash del creep (`h.flash`, 2026-10-24, Bendecir el arma) en turno ajeno cuesta el doble (P136): el cooldown o el SP.
   const te = h.flash ? tokenEntradaCreep(sc.id) : null, doble = !!(te && modoMapa === 'combate' && esSuTurno(te[0]) === false);
   acCambiar(c => {
+    // (2026-11-09) lo de antes, del creep que lee la transacción (no del que se tenía al apretar): si justo se devolvió lo de otra habilidad cancelada, ya está adentro.
+    { const hh0 = (c.habilidades || []).find(x => x.id === habId); antes = {sp: CreepCalculo.spActual(c), nitros: num(c.nitros), cd: num(hh0 && hh0.cdActual)}; }
     const p = CreepAcciones.ejecutarHab(c, (c.habilidades || []).find(x => x.id === habId), estadosPresetCreep(), true, {doble, ...(largo || (variante && variante._extra) ? {extra: {sp: num(largo && largo.extra.sp) + num(variante && variante._extra && variante._extra.sp), no2: num(largo && largo.extra.no2), cd: num(largo && largo.extra.cd) + num(variante && variante._extra && variante._extra.cd)}} : {}), ...(quitar ? {quitar} : {})});
     if(!p.error) p.creep = c;   // el creep ya cambiado (con el estado propio, si lo hubo), para lo que sigue
     return p;

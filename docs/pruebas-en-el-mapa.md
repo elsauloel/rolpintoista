@@ -2399,3 +2399,23 @@ el control con «↩ Devolver el control»; mientras el GM lo tiene, la ficha de
 - **Finta**: declaración «+2 de daño fijo · no se puede parrear»; Parry con escudo y con mazo apagados; con PdG 14 contra Evasión 3, rango del
   crítico 11 = Tipo 10 + 1, sin bonos de la Finta. Capturas `cola-21-1/2/3`.
 
+### Cola 22 y 23 · Anillo de Paso Fantasma (2026-11-09)
+«Claude · pruebas», «Encuentro 2», con orden de turnos (Larry (copia), Goblin rompehuesos, Capataz del culto, Rockardo (copia)); el anillo en Larry
+(jugador 1) y en el Goblin, más Carga que derriba, Takle, Salto y Dash. Respaldo antes; restaurado y comparado después (idéntico; se borraron el mapa
+activo, los usos y el documento de Mantenimiento que creó la prueba).
+- **Larry, 3 casillas caminando** → «listo» en las tres pantallas. El Capataz le tiró la Varita del relámpago: la Evasión de Larry salía «1d4+1»,
+  **sin el +3** (error). **Arreglado:** contra una habilidad que se esquiva con Evasión ahora suma el fijo («1d4+1+3»; en la Mesa, «Evasión (+3 Paso
+  fantasma)») y se gasta (`Combatiente.fantasmaEvaHab` en `habTirar`, `habValor` y la vista «contra» de comun/ficha-duelo.js, creep-duelo.js e
+  inv-duelo.js; prueba automática). Capturas `cola-22-1-varita-con-paso-fantasma`, `cola-22-2-evasion-tirada`.
+- **Goblin, en su turno (ronda 1):** Salto de 3 sin atacar → nada; Dash de 3 → nada; 2 casillas y después 1 → nada; **6 casillas** → listo, y la
+  Evasión contra la varita salió «1d6+3» (**+3, no +6**; captura `cola-23-1-goblin-6-pasos-+3`); tirada → gastado; otro movimiento de 3 en la misma
+  ronda → **no lo vuelve a dar**.
+- **Se vence:** en la pantalla del jugador 1 el bono del Goblin seguía «listo» (no se gastó ahí) y al empezar el turno del Goblin en la ronda 2 quedó en
+  nada. En la ronda 2, **Carga** de 3 → listo (GM, J1, J2; captura `cola-22-2-carga`); sin usarlo, al empezar su turno en la ronda 3 → vencido.
+- **Takle:** su receta corre 2 → 2 casillas contadas, sin bono (no llega a 3). Con la carrera de la copia de prueba llevada a 3 → listo en las tres
+  pantallas (la Mesa: «corre 3 casilleros»; captura `cola-22-3-takle`).
+- **A tener en cuenta (no es un error de la regla):** el estado «listo / gastado» vive en cada pantalla. Se gasta en la que tira la Evasión (la del
+  jugador para su personaje, la del GM para un creep); las otras lo siguen viendo listo hasta que empieza el turno del que lleva el anillo. Si el GM
+  tirara la Evasión de un personaje que ya la tiró el jugador en la misma ronda, se la sumaría de nuevo. Recargar la página borra el estado.
+- **Invocación:** no se probó (no había una con el anillo a mano).
+

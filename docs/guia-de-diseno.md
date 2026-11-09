@@ -229,6 +229,8 @@ una vez por ronda… si empieza su turno con este +3 activo… se desactiva… e
 - Se activa **una sola vez por ventana**: desde que empieza su turno hasta que empieza el siguiente (con orden de turnos; sin orden, el Mantenimiento).
   Si en esa ventana ya se activó (aunque lo haya gastado), otro movimiento largo no lo vuelve a dar.
 - Si empieza su turno sin haberlo usado, se vence.
+- **Cualquier tirada de Evasión** (arreglado el 2026-11-09, cola de pruebas 22/23): también la que se tira contra una habilidad que se esquiva con
+  Evasión (una varita, un hechizo dirigido): suma el fijo y se gasta igual (`Combatiente.fantasmaEvaHab`). Antes solo valía contra un ataque con arma.
 - Código: `pasoFantasmaVentana` / `pasoFantasmaDe` / `pasoFantasmaMovio` en vtt-hexgrid/js/07 (la ventana sale del orden de turnos que ven todas las
   pantallas: `actuaron`, `empezados` y el turno actual).
 

@@ -12,13 +12,23 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## En cola
 
-22. [ ] **Paso Fantasma con Carga y Takle (y no con Salto ni Dash)** (2026-11-09): con el Anillo de Paso Fantasma, una Carga o un Takle de 3 casillas o más carga el +3 a la próxima Evasión (en la pantalla del que corre y en la del que defiende); un Salto o un Dash, no; moverse 6 no da más que +3.
-23. [ ] **Paso Fantasma: una vez por ronda, 3 pasos seguidos, se vence al empezar su turno** (2026-11-09): 3 casilleros o más en un mismo movimiento (caminar, Carga o Takle) → +3 a la próxima Evasión; dos movimientos cortos (2 y 1) no lo dan; una sola vez de su turno a su turno siguiente (otro movimiento largo en la misma ronda no lo vuelve a dar); si empieza su turno sin usarlo, se vence. (Lo del **Salto aplastante disponible al empezar** ya se comprobó en la 20.)
+(vacía: las 23 pruebas están hechas)
 
 Cada línea nueva que se termine de diseñar se suma al final.
 
 ## Hechas
 
+- [x] **Paso Fantasma con Carga y Takle (y no con Salto ni Dash)** (2026-11-09): en «Encuentro 2», el Goblin con el anillo: la **Carga**
+  corrió 3 → +3 listo en las tres pantallas (GM, J1, J2); el **Takle** corre 2 (su receta): no llega a 3 y no lo carga (las 2 casillas sí se cuentan
+  como movidas); con la carrera llevada a 3 en la copia de prueba, sí lo carga. **Salto** de 3 y **Dash** de 3: no lo cargan. Caminar 6 da **+3**,
+  no +6 (la Evasión del Goblin salió «1d6+3»). Sin errores en esto.
+- [x] **Paso Fantasma: una vez por ronda, 3 pasos seguidos, se vence al empezar su turno** (2026-11-09): con orden de turnos (Larry, Goblin,
+  Capataz, Rockardo). **2 + 1 casillas no lo dan**; 3 seguidas sí (Larry, jugador 1, y el Goblin); **una vez por ronda**: después de gastarlo, otro
+  movimiento de 3 en la misma ronda no lo vuelve a dar; **se vence**: sin usarlo, al empezar el turno del Goblin en la ronda siguiente quedó en nada.
+  **Había un error y está arreglado:** contra una **habilidad que se esquiva con Evasión** (una varita, un hechizo dirigido) el +3 no se sumaba: la
+  Evasión de Larry contra la Varita del relámpago salía «1d4+1». Ahora sale «1d4+1+3», la tirada dice «Evasión (+3 Paso fantasma)» y se gasta;
+  igual para creeps e invocaciones (`Combatiente.fantasmaEvaHab`, en `habTirar`, `habValor` y la vista «contra» de ficha-duelo, creep-duelo e
+  inv-duelo; prueba automática nueva).
 - [x] **Inamovible (Botas de estibador)** (2026-11-09): el Capataz con las botas (33 %) recibió una Cornada (Empujón 1). **Había un error:** la chance
   se tiraba en silencio (si salía, una línea en la Crónica; si no, nada). **Arreglado** (commit `0794daa2`): ahora sale el cartel «🦶 Inamovible» con
   el botón «🎲 Tirar 1d6», la tirada en la Mesa y la Crónica, también en Arrastrar, el gancho que atrae y Cambiar de lugar. Probado las dos veces:

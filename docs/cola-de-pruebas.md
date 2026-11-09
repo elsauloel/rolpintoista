@@ -12,16 +12,25 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## En cola
 
-27. [ ] **Línea L3 · Asesino de las sombras, niveles 1 a 5** (Ojo de asesino, Bomba de humo y Sigilo, Finta nueva, Puñalada por la espalda, Dash a la espalda, Degollar con Expuesto, Paso ligero, Puñal de sombra en sigilo, Bombacha de cuatrero).
-28. [ ] **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).
+28. [ ] (en espera: hasta que el dueño pegue las reglas de Firestore) **Paso Fantasma guardado en la partida: mismo estado en todas las pantallas, se gasta una sola vez, sobrevive a recargar la página** (2026-11-09; antes, pegar las reglas nuevas de Firestore del campo `pf`).
 
 Cada línea nueva que se termine de diseñar se suma al final.
-29. [ ] **Trampas: aviso al colocarla a la vista de un rival (todas las formas de colocar) y campos de visión de los rivales mientras se coloca** (2026-11-09): al elegir la casilla con un clic (habilidad, consumible, glifo) ya estaba; nuevo: al **arrastrar** una trampa propia sin disparar (las que quedan al lado del token: ficha suelta, GM Tools, habilidad a mano) se ven los conos de los rivales y, al soltarla en el cono de uno, Avanzar (queda descubierta) o Rechazar (vuelve a donde estaba). Y el botón **«👁 Ver campo de visión de los rivales (Ctrl + L)»**, que late arriba mientras un token propio está en sigilo: prende y apaga los conos de los rivales; al salir del sigilo se va.
 30. [ ] **Red: se dispara al pisar cualquiera de las 7 casillas** (2026-11-09, dueño: «que el trigger y el efecto sean igual»): la Red de caza (consumible) y la Red tendida (habilidad de creep) ahora son una trampa en flor de 7 casillas que se dispara al pisar cualquiera; ver que se dibuje en las 7, que la Percepción la descubra y que la red caiga sobre todos los que estén encima.
 31. [ ] **Trampas de área: se disparan al pisar cualquier casilla de su área** (2026-11-09): Mina del cazador, Polvo cegador, Gas adormecedor, Gas somnífero, Nube de veneno, Petardo trampa, Mina explosiva, Cartucho enterrado, Barril de pólvora, Lluvia de cascotes, Géiser de fuego, Niebla de confusión y Espejo de discordia (flor de 7; disparo y efecto en las mismas casillas; el dibujo y la Percepción en las 7).
 32. [ ] **Línea L4 · Hostigador con trampas, niveles 1 a 5.**
 
 ## Hechas
+
+- [x] **Línea L3 · Asesino de las sombras, niveles 1 a 5** (2026-11-09): números iguales a la prueba de niveles (vida 30/35/35/40/45, PdG 11/13/15/16/17);
+  Ojo de asesino (crítico ×3), Bomba de humo (Sigilo con rivales mirando, 3 casillas gratis arrastrando, sin No2), Puñalada por la espalda desde el
+  sigilo (Evasión del rival vale 1, +2 PdG y +2 de daño del Puñal: PdG 7 contra 1, 1d4+1d4+8+2 = 15 ×3 = 45), Degollar (arranca en cooldown 4;
+  Expuesto), Dash a través de Larry, Paso ligero (+2 por la espalda), Finta sin Parry, Retirada limpia de la Bombacha (cartel 1d2) y el pergamino.
+  Sin errores de juego. Detalle en `pruebas-en-el-mapa.md`.
+- [x] **Trampas a la vista de un rival al arrastrarlas y botón de visión en sigilo** (2026-11-09): GM (trampa de un creep) y J1 (trampa de su
+  personaje): mientras se arrastra se ven los conos de los rivales; al soltar en un cono, Avanzar (queda descubierta, la ven todos, línea en la
+  Mesa) o Rechazar (vuelve a su casilla). El botón «👁 Ver campo de visión de los rivales (Ctrl + L)» aparece latiendo con un token propio en
+  sigilo (GM: un creep; J1: Rockardo), prende/apaga con clic y con Ctrl + L, y se va al salir del sigilo. **Arreglado:** el botón quedaba encima
+  de «Pasar de día» del panel derecho; ahora va debajo de los lentes, dentro del mapa.
 
 - [x] **Finta: +2 PdG y +1 al daño, sin Parry** (2026-11-09): el Goblin con la Finta contra Rockardo (copia): la declaración dice «+2 PdG · +1 de
   daño fijo · no se puede parrear»; los dos Parry de Rockardo (escudo y mazo) apagados («Finta no se deja parrear (sí esquivar)»); el daño

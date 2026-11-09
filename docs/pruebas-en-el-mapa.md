@@ -2437,3 +2437,40 @@ los usos y el documento de Mantenimiento.
   Duro (15) → golpe de 32 → «el escudo absorbió 15 · se gastó Cuero duro (poción)», fuera de la lista en GM y J1. Capturas `cola-26-1-barrera-se-gasto`,
   `cola-26-2-escudo-especial-se-gasto`, `cola-26-3-cuero-duro-se-gasto`.
 - De la prueba: al usar Blindaje, un clic de más usó el Town portal del Capataz (sin colocar portal); la restauración lo devolvió.
+
+## ✅ Cola 27 · Línea L3 · Asesino de las sombras, niveles 1 a 5 (2026-11-09, «Claude · pruebas» / «Encuentro 2»)
+
+Los cinco niveles agregados desde GM Tools → Pool esencial → «Crear token». Respaldo antes; restaurado y comparado después (idéntico; sin mapa
+activo ni usos; zonas y trampas de la prueba borradas).
+- **Números** = prueba de niveles: vida 30/35/35/40/45, PdG 11/13/15/16/17, Evasión 9/9/10/11/12, Sigilo 12/14/15/18/20, Degollar en cooldown 4 al aparecer.
+- **Ojo de asesino** (nv1 → Larry, J1 esquivó desde su pantalla): +1 PdG, +2 daño, Crítico frecuente 2 y potente +3 en el cálculo; crítico ×3.
+- **Bomba de humo** (nv5 al lado de Rockardo, que lo miraba): humo de 7 casillas, entra en Sigilo igual, 3 No2; el cartel «se aleja» deja moverlo
+  arrastrando (no con un clic en la casilla) y el paso no gastó No2. Captura `cola-27-1-bomba-movio`.
+- **Combo: Puñalada por la espalda saliendo del sigilo** (nv5 en la cuña ciega de Rockardo): «🗡 por la espalda: desde el sigilo, la defensa vale
+  1, +2 PdG, +2 de daño». Tirada real: PdG 2d8+1 +2 = **7** contra Evasión que valió **1**; crítico ×3; daño 1d4+1d4+8 +2 = **15 × 3 = 45**
+  (Rockardo 40 → 0; su ítem de emergencia lo dejó en 10, Invulnerable). Captura `cola-27-2-punalada-espalda`.
+- **Degollar** (nv5 contra Bizzante): +4 PdG, +7 de daño, Crítico frecuente +1 y potente +3; cobró 4 No2, cooldown 4, quedó **Expuesto**. Empató
+  4 a 4 y Bizzante ganó el par o impar. «Pasa al final del orden»: no se pudo ver, los Asesinos no estaban en el orden de turnos.
+- **Dash** (nv4 a través de Larry): «sin ataque de oportunidad» al salir de al lado de Rockardo; le pegó a Larry con crítico ×2 (7 → 0) y siguió
+  hasta el final del camino (2 casillas detrás de Larry: termina «detrás», no siempre pegado a su espalda). Contra un creep no atraviesa (es aliado).
+- **Paso ligero** (nv4 en la espalda de Rockardo, sin sigilo): «🗡 por la espalda: +2 PdG». Captura `cola-27-5-paso-ligero-espalda`.
+- **Finta** (nv2): +2 PdG, +1 de daño, los dos Parry de Bizzante apagados.
+- **Bombacha de cuatrero** (nv5 sin sigilo, alejándose de Bizzante): cartel «🦵 Retirada limpia 50 % · Tirar 1d2» → 2: «¡Retirada limpia!». En
+  sigilo no aparece (el rival no lo ve: no hay oportunidad). Capturas `cola-27-6-retirada-limpia`, `cola-27-6b-retirada-resultado`.
+- **Pergamino grupal de Paso Fantasma**: +1 Evasión 3 turnos y el aviso a los creeps del orden.
+- Para mirar (no se tocó): después de atacar desde el sigilo (Puñalada, Degollar) el Asesino siguió con el estado Sigilo.
+
+## ✅ Cola 29 · Trampas a la vista y botón de visión en sigilo (2026-11-09)
+
+- **GM:** una trampa de un creep (sin disparar, de su bando) arrastrada: mientras se arrastra se ven los conos de Bizzante y Rockardo
+  (`cola-trampas-1-arrastrando-conos`); al soltarla en el cono de Rockardo, «Trampa a la vista de un rival» (`cola-trampas-2-pregunta-gm`).
+  Rechazar → volvió a su casilla; Avanzar → quedó en la casilla nueva, descubierta (la ven J1 y J2) y la Mesa dice «la vieron, quedó descubierta».
+- **J1:** una trampa de su personaje: los conos de los creeps que ve mientras la arrastra (`cola-trampas-4-arrastrando-j1`), la pregunta
+  nombrando al que la ve (`cola-trampas-5-pregunta-j1`); Rechazar la devolvió. El GM no ve esa trampa.
+- **Botón en sigilo:** GM con un creep en sigilo y J1 con Rockardo en sigilo: aparece latiendo «👁 Ver campo de visión de los rivales (Ctrl + L)»;
+  clic → «Ocultar…» y los conos a la vista; Ctrl + L lo alterna; al sacar el sigilo el botón se va y apaga los conos. Capturas
+  `cola-trampas-6/7` (GM) y `cola-trampas-8/9` (J1).
+- **Arreglado:** el botón salía a la derecha de los lentes y quedaba encima de «Pasar de día» del panel del GM; ahora va debajo de los lentes,
+  alineado a su derecha, dentro del mapa (`vtt-hexgrid/mapa.css`).
+- Nota de la prueba: un personaje que entra en Sigilo a la vista de un rival queda descubierto al instante (Marcado); para probar el botón con J1
+  hubo que llevar a Rockardo fuera de los conos.

@@ -399,6 +399,11 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   Def 1, Def.Esp 3, Evasión 11, Sigilo +4; **Ropas de sombra finas** (Buena: Def.Esp +2, Sigilo +2, Evasión +1) en lugar del Chaleco de cuero;
   pasiva **Paso ligero**. Habilidad nueva: **Dash** en lugar del Tajo veloz del plan, que se pisaba con la Finta nueva (+2 PdG, +1 al daño): el Dash
   atraviesa a un rival y lo deja del otro lado, a su espalda, y también le sirve para escapar.
+  **Nivel 5 aprobado — línea L3 completa** (dueño, 2026-11-09: «me cierra el asesino nivel 5»): Des 15 · Agi 11 · Con 9 · Fue 8 · Esp 2 → vida 45,
+  11 No2, PdG 17, Daño 8, Def 1, Def.Esp 3, Evasión 12, Sigilo +5; tercera Buena: **Bombacha de cuatrero** (piernas: Retirada limpia 50 %, Sigilo +1);
+  habilidad nueva **Degollar** (lenta, cd 4: +4 PdG, +7 de daño, Crítico frecuente +1 y potente +3; termina su turno, pasa al final del orden y
+  queda Expuesto). **Muy letal, para estudiar en la ronda de balance:** Degollar por la espalda saliendo del sigilo llega a PdG 25 y 1 dado + 17
+  de daño (ver `pendientes.md`).
 
 - **D2 · Tóxico · Debuffer** (boceto aprobado 2026-11-03, dueño: «el tóxico va bien»). Estrategia: envenena el aire (nubes, espinas, miasma): el
   grupo se tiene que mover o se pudre adentro, y no se cura del todo. Atributos (Esp/Con/Agi/Des/Fue → vida; algo de Des por el Rango): nv1

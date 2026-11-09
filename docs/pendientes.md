@@ -83,6 +83,11 @@
 > stacks con una Ráfaga de cortes (≈ 78 de daño en el tiempo) y 8 con la Hoja envenenada (≈ 36), encima de lo que ya tuviera. Ideas a evaluar: tope de
 > stacks, que el veneno nuevo no sume sino que renueve, que la Ráfaga aplique el veneno una sola vez, o subirle el costo. Probarlo en una pelea.
 
+> **🗡 Letalidad del Asesino de las sombras nv5 (2026-11-09, abierto; para la ronda de balance).** Degollar por la espalda saliendo del sigilo
+> (Puñal de sombra +2 PdG y +2 de daño en sigilo, Paso ligero) llega a PdG 25 y 1 dado + 17 de daño, con Crítico frecuente +2 y potente +7: tumba a
+> casi cualquier personaje de un golpe. El precio: termina su turno, pasa al final del orden y queda Expuesto (Def 1, Evasión a la mitad). Idea a
+> evaluar: que el +2 de sigilo del Puñal no se sume con Degollar. Probarlo en una pelea.
+
 > **🔥 Cómo costear el daño mágico de los creeps (2026-11-06, abierto; dueño: «no me termina de cerrar… me haría rediseñar todas las armas
 > mágicas y las skills mágicas; quizás le pondría un valor fijo»).** Hallazgo: con el Piromante nv3 (Esp 16, Ef.Esp 17) la Lengua de fuego hace ≈ 13
 > por 16 SP y la Bola de fuego ≈ 13 a cada uno por 16 SP, mientras el Mago jugador hace con 16 SP un Rayo mágico ≈ 34½ directo, y con 4 SP un Orbe

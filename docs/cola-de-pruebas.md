@@ -12,7 +12,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 ## En cola
 
-(vacía)
+27. [ ] **Línea L3 · Asesino de las sombras, niveles 1 a 5** (Ojo de asesino, Bomba de humo y Sigilo, Finta nueva, Puñalada por la espalda, Dash a la espalda, Degollar con Expuesto, Paso ligero, Puñal de sombra en sigilo, Bombacha de cuatrero).
 
 Cada línea nueva que se termine de diseñar se suma al final.
 

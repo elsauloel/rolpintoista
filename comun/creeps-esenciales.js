@@ -313,6 +313,9 @@
   esencial({...L3, nivel: 4, atrib: [8, 8, 10, 14, 2],   // (aprobado 2026-11-09: Dash en lugar del Tajo veloz, que se pisaba con la Finta nueva; Ropas de sombra finas)
     equipo: ['Puñal de sombra', 'Ropas de sombra finas', 'Botas de suela de goma', 'Guantes de agarre', 'Capucha de emboscada'],
     habilidades: ['Ojo de asesino', 'Bomba de humo', 'Finta', 'Puñalada por la espalda', 'Dash'], pasivas: ['Ojo crítico', 'Paso ligero']});
+  esencial({...L3, nivel: 5, atrib: [9, 8, 11, 15, 2],   // (aprobado 2026-11-09: Degollar y la Bombacha de cuatrero; muy letal, para la ronda de balance)
+    equipo: ['Puñal de sombra', 'Ropas de sombra finas', 'Botas de suela de goma', 'Guantes de agarre', 'Capucha de emboscada', 'Bombacha de cuatrero'],
+    habilidades: ['Ojo de asesino', 'Bomba de humo', 'Finta', 'Puñalada por la espalda', 'Dash', 'Degollar'], pasivas: ['Ojo crítico', 'Paso ligero']});
   esencial({linea: 'L4', nombre: 'Hostigador con trampas', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [7, 6, 8, 10, 2],   // (2026-11-03, dueño: «ya terminamos el L4»)
     equipo: ['Cortaplumas', 'Chaleco de cuero', 'Calzas de cuero flexible'],
     habilidades: ['Cordón oculto', 'Hit and run'], consumibles: ['Red de caza'],

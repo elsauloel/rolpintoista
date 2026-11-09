@@ -2046,3 +2046,37 @@ Probado por Claude con clics en «Claude · pruebas», «Encuentro 2» (GM, J1, 
   tiene una animación en curso, la columna queda escondida y se vuelve a acomodar cuando termina. Probado: durante todo el apartar/volver la columna
   queda en x 1410 (afuera, a la derecha), escondida mientras el cuadro crece y visible al terminar. Capturas `cola-06b-2-despues-durante` y
   `cola-06b-3-despues`.
+
+## 🩸 Cola de pruebas · 7: la línea L1 · Sangrador, niveles 1 a 5 (2026-11-09, Claude, «Claude · pruebas» / «Encuentro 2», GM + J1 + J2 con clics; restaurado y comparado con el respaldo: idéntico)
+
+- **Armado, como el GM:** GM Tools → «Encuentro 2» → «+ Creep» → ⭐ Pool esencial → «Agregar» Sangrador Lv 1 a Lv 5 → «Crear token»; renombrados
+  Sangrador 1 a 5 y puestos al lado de Rockardo, Larry y Bizzante (copias).
+- **Números en el mapa = la prueba de niveles** (vida/No2/Def/Def.Esp/PdG/Daño/Parry/Eva/Ini/Res.CC): nv1 30/10/2/1/8/6/8/11/9/6 ·
+  nv2 35/11/3/2/9/6/9/12/10/7 · nv3 35/12/3/2/10/7/10/13/13/7 · nv4 40/13/1/5/11/7/11/16/14/8 · nv5 40/14/2/4/13/8/12/16/16/8. Habilidades y pasivas
+  como en `creeps-humanoides.md` (Escurridizo en el 2 y el 3; Ojo crítico y Ojo de carancho en el 4 y el 5). Cambiar de lugar no es de esta línea.
+- **Golpe que sangra** (nv1 → Larry, J1 con Evasión): pegó con crítico (×1, ignora la Defensa) y «✔ Aplicar Sangrado»: Larry quedó con Sangrado
+  permanente (sin turnos).
+- **Sal en la herida** (nv2 → Larry, que ya sangraba): la declaración dice «+2 dados de daño»; crítico ×3 y Larry a 0.
+- **Tajo al tendón** (nv3 → Bizzante): Sangrado 2 turnos y Tendón cortado. Al mover a Bizzante una casilla: «1 − Defensa 0 → 1 de daño (26 → 25)».
+- **Ráfaga de cortes** (nv3 → Rockardo): «🗡 3 cortes: los efectos del arma se tiran 3 veces» y «+2 dados de daño»; se tiraron tres 1d4 del
+  Sangrado 75 % de la Hoz de cosecha y salieron los tres: tres «✔ Aplicar Sangrado (2 turnos)»; en la ficha, un Sangrado con 4 de acumulación.
+- **Corte en la arteria + Ojo de carancho + Ojo crítico** (nv5 → Bizzante, que sangraba): la declaración muestra «Crítico frecuente +2» y «🦅 +1
+  Ojo de carancho (el rival tiene un estado malo)»; la tirada «20 (manual) +1 Ojo de carancho = 21»; el rango del crítico «Tipo 6 − Crítico frecuente
+  3» (1 de Ojo crítico + 2 de la habilidad). Crítico ×3 (el daño se aplicó a mano: 3, con «✍ Otro valor») y el Sangrado de Bizzante quedó
+  **permanente**. Mesa: «Bizzante (copia) ya sangra → Crítico frecuente +2; con un crítico, su Sangrado queda permanente».
+  - ⚠ Para el dueño: la primera vez fue contra Rockardo, que quedó en 0 y su ítem de emergencia lo dejó **Invulnerable**: el duelo dice «le llegó
+    a su ficha: Sangrado» en los dos Sangrados, pero la ficha no los sumó (el Invulnerable no deja entrar estados malos: quedó con su Sangrado de
+    antes, 2 turnos). El juego hizo lo correcto; el texto del duelo del GM no avisa que lo frenó el Invulnerable (el jugador sí lo ve en su ficha).
+- **Paso atrás** (nv4, Flash desde el ✨ del GM, «Sangrador 4: Paso atrás · a sí mismo · cooldown 2», con el duelo de Rockardo abierto): la Evasión
+  pasó de 2d8 a «1d8+1d10» (+2). La primera vez no le alcanzó (4 contra 5) y el estado se gastó igual (es para la próxima tirada). La segunda esquivó
+  (14 contra 1) → «🦶 Sangrador 4: tenés Paso atrás activo. ¿Querés dar un paso? (gratis, sin No2 ni ataque de oportunidad)» → «Dar un paso» → clic
+  en la casilla: 11,23 → 10,23 con los No2 iguales (13).
+- **Escurridizo** (nv3, Bizzante le erró): «🦶 Sangrador 3: sos escurridizo. ¿Querés dar un paso? (sin ataque de oportunidad; pagás el No2 del paso)»
+  → 10,24 → 9,23, «se escurre · −1 No2». A Rockardo, que quedaba al lado, le salió «Sin ataque de oportunidad… con Escurridizo».
+- **Botas de mensajero** (nv5 se aleja de Bizzante): el GM eligió «Sí, atacar» con el Machete y la defensa del Sangrador ofrece «🏃 Evasión 🎲
+  1d8+1d10 (con +2 contra oportunidad)»; esquivó. El ataque de oportunidad corta el movimiento («resolvé el duelo y después seguí tu turno»), como
+  siempre. Levitar 2 en el mapa (`statPiesDe` 2; los dos primeros casilleros del turno ya se habían usado).
+- **Óleo venenoso** (nv2, desde sus Acciones, 1 No2): estado «Óleo venenoso» con 1 carga y el cinturón vacío.
+- Capturas: `cola-07-0-en-el-mapa`, `cola-07-1-golpe-que-sangra`, `cola-07-2-sal-en-la-herida`, `cola-07-3-tendon-cortado`, `cola-07-4-rafaga-efectos`,
+  `cola-07-5-arteria-carancho` (la declaración), `cola-07-6-arteria-critico`, `cola-07-7-paso-atras` (el «¿Querés dar un paso?»),
+  `cola-07-8-escurridizo`, `cola-07-9-botas-oportunidad`.

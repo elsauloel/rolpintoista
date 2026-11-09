@@ -543,6 +543,9 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   Escarpines de fieltro (Eva +1): Def 2, Def.Esp 0. Tiro certero (rápida, cd 2) y **Disparo y repliegue con el orden al revés: primero se mueve
   hasta 2 casilleros gratis y sin oportunidad, después dispara con +2 al daño** (dueño, mismo día; en programación). Consumible: Flecha silbadora.
   Sin cargar hasta que el dueño diga.
+  **Nivel 2 aprobado** (dueño, 2026-11-09: «me cierra el hostigador»): Des 11 · Agi 9 · Con 8 · Fue 6 · Esp 2; + Guantes de agarre (PdG +1) y Cofia
+  de anillas sueltas (Def +1, Def.Esp +1, Res. crít. T4 +1); Mantener a raya (empuja 2 y Lento 2 turnos) y Pies ligeros. Vida 40, No2 9, PdG 12,
+  Daño 6, Def 3, Def.Esp 1, Eva 11. Programado (R22 en la prueba de niveles).
 
 - **M4 · Arcano · Mago, con SP** (boceto aprobado 2026-11-03, dueño: «me cierra como ruta»). Estrategia: control y movilidad: decide dónde
   está cada uno (aparece, empuja, atrae, manda por un portal, atraviesa en línea); en nv5, la Tormenta arcana. Atributos (Esp/Con/Agi/Des/Fue →

@@ -248,6 +248,15 @@ una vez por ronda… si empieza su turno con este +3 activo… se desactiva… e
   Necesita las reglas de Firestore del campo `pf` (firebase/firestore.rules, `tokenValido`); sin ellas, cada pantalla cuenta por su lado como antes.
   Código: `pasoFantasmaAplicar` y `pasoFantasmaReglas` (js/07), `pasoFantasmaRemoto` (js/09).
 
+## Atacar saca del Sigilo (dueño, 2026-11-09)
+
+«Claro, atacar lo saca del sigilo». Cualquier ataque contra un rival —con el arma, una habilidad de ataque, un disparo, un hechizo o una varita—
+saca del Sigilo a quien ataca, salvo que la habilidad diga lo contrario (`mantieneSigilo: true`; hoy ninguna lo usa). El orden: el bono de atacar
+desde el sigilo (la defensa vale 1, el +2 del Puñal de sombra, la Puñalada por la espalda) se cuenta en ese golpe, que ya quedó guardado al declararlo,
+y apenas se declara el atacante sale del sigilo (sin Marcado: no lo descubrieron, se mostró). En un giro (Barrido, Remolino) solo el primer rival lleva
+el bono. No cuenta: un duelo contra un aliado o sobre sí mismo, ni el robo (a escondidas, js/47). Código: `vtt-hexgrid/js/109-atacar-saca-sigilo.js`
+(mira los duelos nuevos de la partida; lo hace la pantalla que creó el duelo).
+
 ## Máximo de Resistencia a crítico acumulable con el catálogo actual (medido 2026-09-27)
 Pedido del dueño (log «A desarrollar»): cuánto se puede acumular de Resistencia a crítico por Tipo con un ítem en cada slot, eligiendo la mejor pieza de cada uno del catálogo de hoy (889 ítems; slots: cabeza, armadura blanda, armadura rígida, manos, piernas, pies, escudo y 2 anillos; el arma no aporta).
 | Tipo | Máximo | Desglose |

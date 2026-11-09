@@ -2112,3 +2112,43 @@ Probado por Claude con clics en «Claude · pruebas», «Encuentro 2» (GM, J1, 
 - **El veneno se suma entero:** Bizzante 2 → 5 → 8; Rockardo 5 → 10.
 - Capturas: `cola-08-0-en-el-mapa`, `cola-08-1-estocada`, `cola-08-2-tajo-veloz-viuda`, `cola-08-3-hit-and-run-cartel`, `cola-08-4-escurridizo`,
   `cola-08-5-rafaga-veneno-x4`, `cola-08-6-invulnerable-no-entro`, `cola-08-7-chaqueta-oportunidad`, `cola-08-8-oleo-venenoso`.
+
+## 🏹 Cola de pruebas · 9: la línea R1 · Tirador de precisión, niveles 1 a 5 (2026-11-09, Claude, «Claude · pruebas» / «Encuentro 2», GM + J1 + J2 con clics; restaurado y comparado con el respaldo: idéntico)
+
+- **Armado, como el GM:** GM Tools → «Encuentro 2» → «+ Creep» → ⭐ Pool esencial → «Agregar» Tirador de precisión Lv 1 a Lv 5 → «Crear token»;
+  renombrados Tirador 1 a 5, a 4 casillas de Rockardo y Bizzante (copias).
+- **Números en el mapa = la prueba de niveles** (vida/No2/Def/Def.Esp/PdG/Daño/Rango/Eva/Ini/Crít. frecuente): nv1 35/7/3/0/11/5/14/7/7/0 ·
+  nv2 40/7/4/0/14/6/15/7/7/0 · nv3 40/8/4/0/15/7/18/8/8/0 · nv4 50/8/5/0/16/8/19/8/8/1 · nv5 55/9/5/2/17/8/20/9/9/1. (La Evasión contra oportunidad y el
+  Levitar de las Botas de mensajero no se ven en ese número: los suma el duelo y el mapa.)
+- **¿Qué flecha?:** todo disparo pregunta «Flecha común (sin costo) / Flecha especial»: la común no se gasta (los creeps no cuentan flechas).
+- **Tiro certero** (nv1 → Rockardo): «+1 PdG · Crítico frecuente +2 · perfora 3»; crítico ×1, ignora la Defensa (40 → 33).
+- **Tiro a la cabeza** (nv2): queda «Apuntando a la cabeza»; el disparo siguiente a Bizzante: «🏹 apuntando a la cabeza y respiración contenida: +4
+  PdG, Crítico frecuente +1, Crítico potente +3» (la respiración contenida es del Arco de la espera), crítico ×3, y el estado se gastó.
+- **Vigilancia** (nv2): queda «Vigilancia» (alcance 15). Bizzante se movió una casilla → se frenó, Mesa «👁 Bizzante se mueve en la mira de Tirador
+  2», cartel «¿Dispara?» → «Sí, disparar» → «🏹 desde la vigilancia: +2 PdG»; la vigilancia se fue.
+- **Tiro al arma** (nv3 → Rockardo): «+2 PdG», crítico, «✔ Aplicar Desarmado»: el Mazo del juez quedó en el piso, 2 casillas al lado.
+- **Disparo señalador** (nv4 → Larry, que se defendió desde J1): «Aplicar Presa (2 turnos, −1 Eva)» y «Aplicar Marcado (2 turnos)» → Larry con
+  Presa/2 y Marcado/2. Después, la Flecha que atraviesa contra él: «🎯 contra la presa: +2 al daño».
+- **Ojo crítico** (nv4 y nv5): el rango del crítico muestra «Crítico frecuente 1».
+- **Flecha que atraviesa** (nv5 → Rockardo, con la Rata 2 detrás y Espinas 3 turnos): primer duelo crítico ×3; la Mesa «atravesó a Rockardo y sigue
+  hacia Rata de la grieta. 2: misma tirada de PdG, daño entero, sin efectos especiales»; el segundo duelo con la misma tirada (12): a la Rata, 26.
+  **El Tirador quedó en 55: las Espinas no devolvieron nada al segundo.**
+- **Botas de mensajero** (nv5 se aleja de Bizzante): «Sí, atacar» con el Machete; la defensa del Tirador «🏃 Evasión 🎲 1d10+1 (con +2 contra
+  oportunidad)» y el duelo «EVASIÓN (+2 CONTRA OPORTUNIDAD)». (El que se alejaba no sigue su camino después del ataque: «resolvé el duelo y después
+  seguí tu turno como quieras», como está programado.)
+- **Flecha perforante** (consumible, nv1): «Flecha especial ▾» → «Flecha perforante ×1 · Perfora 1»; en el duelo «🏹 Flecha perforante · perfora 1»;
+  el cinturón quedó vacío al crear el duelo.
+- **🐞 Arreglado 1, «¿Qué flecha?» cerrado con la ✕:** una habilidad de disparo (Tiro certero) cobra antes de preguntar la flecha (No2 7 → 3,
+  cooldown 2); cerrar esa ventana sin elegir no devolvía nada. Ahora se devuelve, como al cancelar la elección del objetivo (`acElegirFlecha` js/12 y
+  `bnElegirFlecha` js/11, con `alCancelar`). Comprobado: 7 → 3 → ✕ → 7, cooldown 0.
+- **🐞 Arreglado 2, la Mesa y el Invulnerable:** con Bizzante Invulnerable (su ítem de emergencia), el Disparo señalador decía en el duelo «no entró:
+  está Invulnerable» (el arreglo de la prueba 8) pero la Mesa «Quedó con Presa, Marcado». Ahora la Mesa dice «No le entró Presa, Marcado (está
+  Invulnerable)» (`comun/duelo.js`).
+- **🐞 Arreglado 3, el crítico del segundo objetivo:** el segundo duelo de la Flecha que atraviesa no se vuelve a tirar y perdía el Crítico frecuente
+  que anota el atacante al tirar (Ojo crítico: rango 4 en vez de 3). Ahora viaja con la tirada (`critCompartido`, `comun/duelo.js` y js/42); la
+  Resistencia a crítico sigue siendo la del nuevo defensor. Comprobado: rango 3 (Tipo 4 − 1).
+- **Sin probar en juego:** el Levitar 2 de las Botas de mensajero (no había terreno lento en el camino); los Guantes de agarre, la Cofia, el Chaleco de
+  kevlar y las Rodilleras de tatú carreta solo por los números.
+- Capturas: `cola-09-0-en-el-mapa`, `cola-09-1-tiro-certero`, `cola-09-2-tiro-a-la-cabeza`, `cola-09-3-vigilancia`, `cola-09-4-tiro-al-arma`,
+  `cola-09-4b-arma-en-el-piso`, `cola-09-5-disparo-senalador`, `cola-09-5c-presa-marcado`, `cola-09-6-atraviesa-primero`,
+  `cola-09-7-atraviesa-segundo-sin-espinas`, `cola-09-8-botas-oportunidad`, `cola-09-9-flecha-especial`.

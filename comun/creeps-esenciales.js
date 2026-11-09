@@ -307,6 +307,9 @@
   esencial({...L3, nivel: 2, atrib: [7, 6, 9, 12, 2],   // (aprobado 2026-11-09: Finta, sin crítico desde ese día; pasiva Ojo crítico; + Guantes de agarre y Capucha de emboscada)
     equipo: ['Punzón de hielo', 'Chaleco de cuero', 'Botas de suela de goma', 'Guantes de agarre', 'Capucha de emboscada'],
     habilidades: ['Ojo de asesino', 'Bomba de humo', 'Finta'], pasivas: ['Ojo crítico']});
+  esencial({...L3, nivel: 3, atrib: [7, 7, 10, 13, 2],   // (aprobado 2026-11-09: Puñalada por la espalda; el arma pasa a Buena: Puñal de sombra)
+    equipo: ['Puñal de sombra', 'Chaleco de cuero', 'Botas de suela de goma', 'Guantes de agarre', 'Capucha de emboscada'],
+    habilidades: ['Ojo de asesino', 'Bomba de humo', 'Finta', 'Puñalada por la espalda'], pasivas: ['Ojo crítico']});
   esencial({linea: 'L4', nombre: 'Hostigador con trampas', rol: 'liviano', rolTxt: 'asalto', nivel: 1, atrib: [7, 6, 8, 10, 2],   // (2026-11-03, dueño: «ya terminamos el L4»)
     equipo: ['Cortaplumas', 'Chaleco de cuero', 'Calzas de cuero flexible'],
     habilidades: ['Cordón oculto', 'Hit and run'], consumibles: ['Red de caza'],

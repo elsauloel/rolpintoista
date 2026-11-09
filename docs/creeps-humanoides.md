@@ -391,6 +391,10 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   Ojo de asesino): queda +2 al daño y no se puede parar; es el golpe contra el que ataja bien, y el Ojo de asesino el que busca el crítico (también la
   usan L5 Duelista y L6 Patotero en su nivel 1). **Ajuste** (dueño, 2026-11-09, «+2 a la pdg, +1 al daño»): la Finta queda **+2 a la
   Probabilidad de Golpe y +1 al daño**, sin Parry ni Bloqueo, sin bonos de crítico (vale también para el Duelista y el Patotero). Ojo: el **Punzón de hielo** tiene en el catálogo **Crítico frecuente +1** (el plan decía Crítico potente +2).
+  **Nivel 3 aprobado** (dueño, 2026-11-09: «me cierra»): Des 13 · Agi 10 · Con 7 · Fue 7 · Esp 2 → vida 35, 10 No2, PdG 15, Daño 7, Def 3,
+  Def.Esp 1, Evasión 10; el arma pasa a Buena: **Puñal de sombra** (Tipo 4, PdG +1, Crítico potente +4, por la espalda en sigilo +2 PdG y +2 de daño)
+  en lugar del Punzón de hielo; habilidad nueva **Puñalada por la espalda**; sin pasiva nueva. Combo: Bomba de humo → Puñalada desde el sigilo
+  (PdG 19, 2 dados + 9, Crítico frecuente +2 y potente +4). Muy letal contra Evasión baja: medirlo en la ronda de balance.
 
 - **D2 · Tóxico · Debuffer** (boceto aprobado 2026-11-03, dueño: «el tóxico va bien»). Estrategia: envenena el aire (nubes, espinas, miasma): el
   grupo se tiene que mover o se pudre adentro, y no se cura del todo. Atributos (Esp/Con/Agi/Des/Fue → vida; algo de Des por el Rango): nv1

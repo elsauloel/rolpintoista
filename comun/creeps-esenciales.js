@@ -366,10 +366,14 @@
   esencial({...R2, nivel: 5, atrib: [9, 8, 12, 14, 2],   // (aprobado 2026-11-09, dueño: «me cierra el nivel cinco»; los Guantes de cetrero: PdG a distancia +2)
     equipo: ['Arco de la sombra', 'Chaleco de kevlar', 'Escarpines de fieltro', 'Guantes de cetrero', 'Cofia de anillas sueltas'],
     habilidades: ['Tiro certero', 'Disparo y repliegue', 'Mantener a raya', 'Tiro a la rodilla', 'Disparo señalador', 'Ráfaga encadenada'], pasivas: ['Pies ligeros', 'Escurridizo']});
-  esencial({linea: 'S2', nombre: 'Abanderado', rol: 'support', rolTxt: 'apoyo', nivel: 1, atrib: [10, 7, 6, 7, 3],
+  const S2 = {linea: 'S2', nombre: 'Abanderado', rol: 'support', rolTxt: 'apoyo', consumibles: ['Pergamino grupal de Furia de Combate'],
+    estrategia: 'Support. El soldado de la bandera: no cura, hace pegar más a los suyos y pelea con lanza al lado del grupo.'};
+  esencial({...S2, nivel: 1, atrib: [10, 7, 6, 7, 3],
     equipo: ['Lanza corta', 'Estandarte del muro', 'Chaleco de cuero', 'Botas de caña alta de estanciero'],
-    habilidades: ['Potencia', '¡A la carga!'], consumibles: ['Pergamino grupal de Furia de Combate'],
-    estrategia: 'Support. El soldado de la bandera: no cura, hace pegar más a los suyos y pelea con lanza al lado del grupo.'});
+    habilidades: ['Potencia', '¡A la carga!']});
+  esencial({...S2, nivel: 2, atrib: [11, 7, 7, 8, 3],   // (aprobado 2026-11-09: Bendecir el arma, Marcar el ritmo; + Cofia de anillas sueltas y Guantes de agarre)
+    equipo: ['Lanza corta', 'Estandarte del muro', 'Chaleco de cuero', 'Botas de caña alta de estanciero', 'Cofia de anillas sueltas', 'Guantes de agarre'],
+    habilidades: ['Potencia', '¡A la carga!', 'Bendecir el arma'], pasivas: ['Marcar el ritmo']});
   esencial({linea: 'S3', nombre: 'Armero', rol: 'support', rolTxt: 'apoyo', nivel: 1, atrib: [10, 8, 6, 6, 3],
     equipo: ['Hacha del herrero de pueblo', 'Chaleco de cuero', 'Cofia de anillas sueltas'],
     habilidades: ['Bendecir el arma', 'Arma elemental'], consumibles: ['Pergamino grupal de Furia de Combate'],

@@ -394,6 +394,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 4 | **Arenga** | **Voluntad de hierro** (+2 Res.CC; pasó del 2 al 4, sale Robustez — dueño, 2026-11-05) | + el chaleco de Buena |
   | 5 | **Estandarte de guerra** (aliados a 3: +3 PdG y +5 de daño mientras siga en pie) | — | + la lanza de Buena |
   Consumible: Pergamino grupal de Furia de Combate. Piezas Buenas a elegir al definir cada nivel. Sin cargar hasta que el dueño diga.
+  - **Nivel 2 aprobado y cargado** (dueño, 2026-11-09: «me cierra»): Con 11 · Des 8 · Agi 7 · Fue 7 · Esp 3; + Cofia de anillas sueltas y Guantes de
+    agarre; Bendecir el arma (Flash) y la pasiva Marcar el ritmo. Vida 55, No2 7, PdG 9, Daño 7, Def 4, Def.Esp 2, Eva 7 (con cooldown, no SP).
 
 - **L3 · Asesino de las sombras · Choque liviano** (boceto aprobado 2026-11-03, dueño: «reemplazá la trapera por el tajo, resto ok»). Acento en
   **Destreza y críticos** (la idea del dueño). Estrategia: desaparece, aparece por la espalda y busca el crítico; va al golpe único (el Sangrador gana

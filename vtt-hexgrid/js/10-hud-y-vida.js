@@ -40,6 +40,8 @@ function hudDatos(t){
     // 🚩 + los estados de las áreas donde está parado (js/103: derivados, no se guardan; al final, para no correr los índices de los reales).
     estados: hudEstadosConPrivado((v && v.resumen && v.resumen.estados) || [], t.tipo === 'creep' && soyGM ? sc : null).concat(typeof estadosDeArea === 'function' ? estadosDeArea(t) : []),
     notas: (v && v.notas) || '',
+    vidaExtra: hp === null ? 0 : ((v && v.resumen && v.resumen.estados) || [])
+      .filter(e => e && e.activo !== false && e.excedente).reduce((s, e) => s + Math.max(0, num(e.escudo)), 0),   // ❤+ la Vida extra (excedente), para el círculo de vida
     // El GM ve los nombres de verdad (de la ficha privada); los jugadores, lo publicado: de un creep vivo, solo qué es (2026-10-13).
     armaNombre: (t.tipo === 'creep' && soyGM && sc ? Combatiente.armaEnMano(sc).nombre : (v && v.armaNombre)) || '',
     armaNatural: !!(v && v.armaNatural),
@@ -63,7 +65,13 @@ function hudHtml(t){
       return `<span class="hud-in-caja"><input class="hud-in" data-hud-in="${clave}" style="border-color:${color}" inputmode="decimal" placeholder="${fmt(valor)}" title="${esc(cuanto)} · escribí el valor, o +5 / -3, y apretá Enter">`
         + `<span class="hud-in-max" style="color:${color}">${fmt(valor)}${hayMax ? ` / ${fmt(maximo)} máx.` : ''}</span></span>`;
     }
-    return `<button type="button" class="hud-circulo" data-hud-valor="${clave}" style="border-color:${color}" ${puede ? '' : 'disabled'} title="${esc(cuanto)} · ${puede ? 'clic para cambiar' : pausaSoloMirar() ? 'partida en pausa: desde el mapa no se cambia (en tu ficha sí)' : 'solo lo cambia su dueño'}">${fmt(valor)}${hayMax ? `<span class="hud-max">/${fmt(maximo)}</span>` : ''}</button>`;
+    // ❤+ La vida con la Vida extra (dueño, 2026-11-09: «el valor total de la vida, incluida la extra, se debe mostrar en el circulito rojo. Debería
+    // decir 103/30»): el número grande es vida + Vida extra (lo que hay que sacarle para tirarlo), el «/máximo» sigue siendo el máximo a secas. Solo la
+    // Vida extra (es vida); los escudos (🛡, una barra aparte) siguen en su chip. Se edita la vida a secas (el clic abre el mismo campo de siempre).
+    const extra = clave === 'hp' ? num(d.vidaExtra) : 0;
+    const mostrado = extra > 0 ? num(valor) + extra : valor;
+    const cuantoX = extra > 0 ? `${cuanto} + Vida extra ${fmt(extra)} = ${fmt(mostrado)}` : cuanto;
+    return `<button type="button" class="hud-circulo${extra > 0 ? ' con-extra' : ''}" data-hud-valor="${clave}" style="border-color:${color}" ${puede ? '' : 'disabled'} title="${esc(cuantoX)} · ${puede ? 'clic para cambiar' : pausaSoloMirar() ? 'partida en pausa: desde el mapa no se cambia (en tu ficha sí)' : 'solo lo cambia su dueño'}">${fmt(mostrado)}${hayMax ? `<span class="hud-max">/${fmt(maximo)}</span>` : ''}</button>`;
   };
   const icono = (clave, simbolo, titulo, activo) =>
     `<button type="button" class="hud-circulo icono${activo ? ' abierto' : ''}" data-hud-boton="${clave}" title="${titulo}">${simbolo}</button>`;

@@ -26,6 +26,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 20. [ ] **Salto sin atacar cobra 1 No2** (2026-11-08): al caer, «No, solo saltar» (o caer sin rival pegado) devuelve los No2 del ataque menos 1; el cooldown o el SP quedan cobrados. También el Salto aplastante (mismo código). Y el Saltador H2 con el orden nuevo (nv2 Pisotón, nv3 Aguante, nv4 Dash, nv5 Barrido) en la línea 15.
 21. [ ] **Finta sin crítico** (2026-11-09): un ataque con +2 al daño que no se puede parar (solo esquivar), sin Crítico frecuente ni potente de más; probarla con el Asesino de las sombras nivel 2.
 22. [ ] **Paso Fantasma con Carga y Takle (y no con Salto ni Dash)** (2026-11-09): con el Anillo de Paso Fantasma, una Carga o un Takle de 3 casillas o más carga el +3 a la próxima Evasión (en la pantalla del que corre y en la del que defiende); un Salto o un Dash, no; moverse 6 no da más que +3.
+23. [ ] **Paso Fantasma: una vez por ronda, 3 pasos seguidos, se vence al empezar su turno** (2026-11-09): 3 casilleros o más en un mismo movimiento (caminar, Carga o Takle) → +3 a la próxima Evasión; dos movimientos cortos (2 y 1) no lo dan; una sola vez de su turno a su turno siguiente (otro movimiento largo en la misma ronda no lo vuelve a dar); si empieza su turno sin usarlo, se vence. Y el **Salto aplastante arranca el combate disponible** (cooldown 4).
 
 Cada línea nueva que se termine de diseñar se suma al final.
 

@@ -117,6 +117,12 @@ const CreepCalculo = (() => {
         if(typeof h.detalle === 'string') h.detalle = h.detalle.replace(/cuesta 2 No2/g, 'cuesta 1 No2').replace(/cooldown 3 \(con SP: 3 SP\)/g, 'cooldown 2 (con SP: 2 SP)');
         h.agujaRapida = true; cambio = true;
       }
+      // 🦘 El Salto aplastante arranca disponible (dueño, 2026-11-09: «que tenga cooldown 4, pero que empiece disponible»). Una vez (`saltoApDisp`).
+      if(h.nombre === 'Salto aplastante' && !h.saltoApDisp){
+        if(h.cdArranca){ delete h.cdArranca; if(num(h.cdActual) === num(h.cd)) h.cdActual = 0; }
+        if(typeof h.detalle === 'string') h.detalle = h.detalle.replace(/ \(habilidad lenta: el combate arranca con el cooldown activo\)/g, '');
+        h.saltoApDisp = true; cambio = true;
+      }
       if(MISILES_LENTOS.includes(h.nombre) && num(h.cd) === 2){
         h.cd = 4; if(num(h.cdActual) > 4) h.cdActual = 4;
         if(typeof h.detalle === 'string') h.detalle = h.detalle.replace(/cooldown 2\b/g, 'cooldown 4');

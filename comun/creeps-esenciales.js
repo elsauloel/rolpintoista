@@ -225,7 +225,7 @@
     equipo: ['Varita del gancho', 'Brújula del baqueano', 'Chaleco de cuero', 'Zapatillas de lona'],
     habilidades: ['Parpadeo', 'Nova arcana'], consumibles: ['Poción de SP menor'],
     estrategia: 'Mago de control y movilidad. Decide dónde está cada uno: aparece, empuja con la Nova, atrae con el gancho y se va.'});
-  esencial({linea: 'H1', nombre: 'Embestidor', rol: 'hibrido', rolTxt: 'melee', nivel: 1, atrib: [10, 8, 6, 7, 2],
+  esencial({linea: 'H1', nombre: 'Embestidor', rol: 'hibrido', rolTxt: 'melee', nivel: 1, atrib: [10, 7, 7, 7, 2],   // (2026-11-09, dueño: «bajale la fuerza»: Fue −1, Agi +1 → 7 No2, ataca y corre 3)
     equipo: ['Hacha de verdugo de pueblo', 'Chaleco de cuero', 'Anillo de Paso Fantasma'],
     habilidades: ['Carga que derriba', 'Takle'], consumibles: ['Pergamino grupal de Paso Fantasma'],
     estrategia: 'Híbrido. Cruza el campo y se lleva puesto a uno: derriba y empuja, le rompe la línea al grupo y llega a los de atrás.'});

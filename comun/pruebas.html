@@ -48,8 +48,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261108barrido"></script>
-<script src="creep-calculo.js?v=20261108barrido"></script>
+<script src="combatiente.js?v=20261109pfs"></script>
+<script src="creep-calculo.js?v=20261109pfs"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261107dosarmas"></script>
 <script src="creep-duelo.js"></script>
@@ -123,8 +123,8 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="skills-clase.js?v=20261108milagro"></script>
 <script src="armas-naturales-base.js?v=20261104ig"></script>
 <script src="creeps-base.js?v=20261107guardia"></script>
-<script src="skills-creep-base.js?v=20261109finta"></script>
-<script src="creeps-esenciales.js?v=20261109l32"></script>
+<script src="skills-creep-base.js?v=20261109pfs"></script>
+<script src="creeps-esenciales.js?v=20261109pfs"></script>
 <script src="biblioteca.js?v=20261103ref"></script>
 <script src="asistente-personaje.js"></script>
 <script src="buscar-estados.js"></script>
@@ -1183,6 +1183,15 @@ prueba('🦘 Salto y Salto aplastante (2026-10-21)', () => {
   const v = n => { const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === n).datos, 2); const a = Combatiente.ataqueConArreglos(h, h.duelo, {arma: {}});
     return [a.saltoHab, !!a.saltoAplasta, a.mods.pdg, a.mods.critBono, a.mods.fijo, a.efectos.length, h.spCosto].join('/'); };
   igual(['Salto', 'Salto aplastante'].map(v), ['3/false/1/1/0/0/2', '3/true/0/0/2/0/3']);
+});
+prueba('🦘 Salto aplastante: cooldown 4, pero arranca disponible (2026-11-09)', () => {
+  const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Salto aplastante'), h = armarHabilidadDeCreep(e.datos, 3);
+  const viejo = {nombre: 'Salto aplastante', cd: 4, cdActual: 4, cdArranca: true, detalle: 'X; cooldown 4 (con SP: 3 SP) (habilidad lenta: el combate arranca con el cooldown activo); Y'};
+  const sc = {nombre: 'Viejo', nivel: 3, habilidades: [viejo]};
+  CreepCalculo.migrarPielYMisiles(sc);
+  const emb = CREEPS_BASE.find(c => c.pool === 'esencial' && c.nombre === 'Embestidor' && (c.datos || c).nivel === 1), d1 = emb.datos || emb;
+  igual([h.cd, h.cdActual, !!h.cdArranca, /arranca con el cooldown/.test(h.detalle), e.etiquetas.includes('lenta'), viejo.cdActual, !!viejo.cdArranca, /lenta/.test(viejo.detalle),
+    CreepCalculo.nitrosMax(d1), d1.fue], [4, 0, false, false, false, 0, false, false, 7, 7]);   // y el Embestidor nv1: Fue 7, Agi 7 → 7 No2 (dueño, 2026-11-09)
 });
 prueba('👁 Vigilancia (2026-10-21): el estado, la del creep y la del Shooter', () => {
   const h = armarHabilidadDeCreep(HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Vigilancia').datos, 2);

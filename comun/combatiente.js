@@ -485,8 +485,9 @@ const Combatiente = (() => {
     const tokenId = d && d.defensor && d.defensor.tokenId;
     const movio = !!tokenId && typeof window !== 'undefined' && typeof window.mapaSeMovio === 'function' && window.mapaSeMovio(tokenId);
     if(movio){ const v = n(valorDe('pasosbaile')); if(v){ val += v; partes.push(`${fmtN(v)} Pasos de baile`); } }
-    // Paso fantasma (anillo; dueño, 2026-10-19): si se movió 3 casilleros o más (desde la última vez que lo usó), su PRÓXIMA Evasión suma. Lo sabe
-    // el mapa (window.mapaPasoFantasma); se gasta al tirar esa Evasión (gastarPasoFantasma, desde el `defender` de cada duelo).
+    // Paso fantasma (anillo; dueño, 2026-10-19; una vez por ronda desde el 2026-11-09): si se movió 3 casilleros o más seguidos, su PRÓXIMA Evasión
+    // suma; se activa una vez de su turno a su turno siguiente y se vence al empezar su turno. Lo sabe el mapa (window.mapaPasoFantasma, js/07); se
+    // gasta al tirar esa Evasión (gastarPasoFantasma, desde el `defender` de cada duelo).
     // Es un valor FIJO que se suma después del dado (dueño, 2026-10-19: «que el +3 sea un valor fijo que se sume»): va en `fijo`, no en `val`.
     let fantasma = false, fijo = 0;
     const cargado = !!tokenId && typeof window !== 'undefined' && typeof window.mapaPasoFantasma === 'function' && window.mapaPasoFantasma(tokenId);

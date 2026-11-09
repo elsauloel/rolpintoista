@@ -1107,12 +1107,38 @@ const casillerosRonda = new Map();   // tokenId → {ronda: casilleros}
 // La ronda: la del orden de turnos si hay (la misma con la que se sabe quién ya jugó; el Mantenimiento llega un instante después); si no, el Mantenimiento.
 const rondaDeCasilleros = () => (iniciativa.orden || []).length ? 'i' + Math.round(num(iniciativa.ronda)) : 'm' + Math.round(num(mantenimientoNumero));
 const rondaAnterior = r => r[0] + (Number(r.slice(1)) - 1);
-const pasoFantasmaCarga = new Map();   // tokenId → casilleros movidos desde la última vez que usó el Paso fantasma (anillo, 2026-10-19)
-window.mapaPasoFantasma = id => (pasoFantasmaCarga.get(id) || 0) >= 3;
-window.mapaPasoFantasmaGastar = id => { pasoFantasmaCarga.set(id, 0); };
+/* 👻 Paso fantasma (anillo; dueño, 2026-11-09: «una vez por ronda… siempre que dé tres pasos consecutivos, obtiene +3 a la evasión para su siguiente
+   tirada… si empieza su turno con este +3 activo, se desactiva… es una ronda completa desde su turno hasta su siguiente turno»).
+   - Pasos consecutivos = 3 casillas o más en UN mismo movimiento (una ruta: caminar, la Carga o el Takle; el Salto y el Dash no dejan ruta y no cuentan).
+     Dos movimientos cortos (2 y después 1) no suman.
+   - Se activa una sola vez por «ventana»: desde que empieza su turno hasta que empieza el siguiente (con orden de turnos; sin orden, el Mantenimiento).
+   - El bono sirve para su próxima tirada de Evasión; si no lo usó y empieza su turno, se vence. No se acumula (moverse 6 da lo mismo).
+   La ventana se deduce del orden de turnos, que ven todas las pantallas: su turno ya empezó en esta ronda si está en `actuaron` o `empezados`, o si es
+   el turno de ahora o uno anterior. */
+const pasoFantasmaEstado = new Map();   // tokenId → {v: ventana, listo, disparado}
+function pasoFantasmaVentana(id){
+  const orden = iniciativa.orden || [], i = orden.findIndex(o => o && o.id === id);
+  if(!orden.length || i < 0) return 'm' + Math.round(num(mantenimientoNumero));
+  const r = Math.round(num(iniciativa.ronda));
+  const empezo = (iniciativa.actuaron || []).includes(id) || (iniciativa.empezados || []).includes(id) || i <= num(iniciativa.turno);
+  return 'i' + (empezo ? r : r - 1);
+}
+function pasoFantasmaDe(id){
+  const v = pasoFantasmaVentana(id);
+  let e = pasoFantasmaEstado.get(id);
+  if(!e || e.v !== v){ e = {v, listo: false, disparado: false}; pasoFantasmaEstado.set(id, e); }   // empezó su turno: lo que no usó se vence
+  return e;
+}
+function pasoFantasmaMovio(id, pasos){
+  const e = pasoFantasmaDe(id);
+  if(e.disparado || !(pasos >= 3)) return;
+  e.listo = true; e.disparado = true;
+}
+window.mapaPasoFantasma = id => pasoFantasmaDe(id).listo;
+window.mapaPasoFantasmaGastar = id => { pasoFantasmaDe(id).listo = false; };
 function contarCasilleros(id, pasos){
   if(!(pasos > 0)) return;
-  pasoFantasmaCarga.set(id, (pasoFantasmaCarga.get(id) || 0) + pasos);
+  pasoFantasmaMovio(id, pasos);
   const r = rondaDeCasilleros(), m = casillerosRonda.get(id) || {}, nuevo = {[r]: (m[r] || 0) + pasos};
   if(m[rondaAnterior(r)]) nuevo[rondaAnterior(r)] = m[rondaAnterior(r)];
   casillerosRonda.set(id, nuevo);

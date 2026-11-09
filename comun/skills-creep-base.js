@@ -83,7 +83,7 @@
   function H(nombre, fn, razas, roles, cd, spBase, mec){
     const sp = {nombre, ...spBase};
     if(sp.magico === undefined && roles.includes('g')) sp.magico = true;   // rol mágico: pega con PdG.Esp
-    const lenta = cd >= 4 || sp.arrancaEnCooldown === true;   // (2026-10-24, el Meteoro: «cooldown 3, pero que empiece activado, tipo lento»)
+    const lenta = (cd >= 4 && !sp.disponibleAlInicio) || sp.arrancaEnCooldown === true;   // (2026-10-24, el Meteoro: «cooldown 3, pero que empiece activado, tipo lento»; `disponibleAlInicio`: cooldown 4 pero arranca disponible)
     const frases = sp.detalle.split(/(?<=[.!?])\s+/);
     const aMano = U.hayManual(sp);
     const etiquetas = [...fn].map(c => FN[c]).filter(Boolean), razasTxt = [...razas].map(c => RZ[c]).filter(Boolean), rolesTxt = [...roles].map(c => RO[c]).filter(Boolean);
@@ -1056,9 +1056,9 @@
   // (2026-11-08, dueño: el texto al día — cae en cualquier casilla libre a 3 o menos y pregunta «¿Atacar?»; «si elige no atacar, igual se le cobra un nitro»)
   H('Salto', 'DM', '*', 'e', 3, aA('Salta por encima de lo que haya (un salto de 1,5 metros de altura): elige cualquier casilla libre a 3 o menos y cae ahí, por encima de los tokens (pasar por encima de algo sólido lo decide la mesa), sin gastar No2 de movimiento ni dar ataques de oportunidad. Al caer pregunta «¿Atacar?»: si sí, ataca con su arma a un rival pegado con +1 a la Probabilidad de Golpe y Crítico frecuente +1; si no, solo saltó: paga 1 No2 y el cooldown o el SP quedan cobrados. Sirve para entrar y también para salir.',
     {pdg: 1, critBono: 1}, 'elige dónde caer (cualquier casilla libre a 3 o menos, el mapa) y pregunta «¿Atacar?»: sí, va al duelo como un ataque con +1 PdG y Crítico frecuente +1 contra un rival pegado; no, solo salta y paga 1 No2', 2, [], {salto: 3}));
-  H('Salto aplastante', 'DMK', '*', 'mt', 4, aA('Salta y cae con todo el peso (un salto de 1,5 metros de altura): elige cualquier casilla libre a 3 o menos y cae ahí, por encima de los tokens (pasar por encima de algo sólido lo decide la mesa), sin gastar No2 de movimiento ni dar ataques de oportunidad. Al caer, los rivales pegados tiran Res.CC contra su Fuerza: quien no llega queda Sentado. Después pregunta «¿Atacar?»: si sí, ataca con su arma a un rival pegado con +2 al daño; si no, paga 1 No2 y el cooldown o el SP quedan cobrados.',
+  H('Salto aplastante', 'DMK', '*', 'mt', 4, {...aA('Salta y cae con todo el peso (un salto de 1,5 metros de altura): elige cualquier casilla libre a 3 o menos y cae ahí, por encima de los tokens (pasar por encima de algo sólido lo decide la mesa), sin gastar No2 de movimiento ni dar ataques de oportunidad. Al caer, los rivales pegados tiran Res.CC contra su Fuerza: quien no llega queda Sentado. Después pregunta «¿Atacar?»: si sí, ataca con su arma a un rival pegado con +2 al daño; si no, paga 1 No2 y el cooldown o el SP quedan cobrados.',
     {fijo: 2}, 'elige dónde caer (el mapa); los de al lado tiran Res.CC contra su Fuerza o quedan Sentados; «¿Atacar?»: sí, va al duelo como un ataque con +2 al daño; no, paga 1 No2', 3,
-    [], {salto: 3, aplasta: true}));
+    [], {salto: 3, aplasta: true}), disponibleAlInicio: true});   // cooldown 4, pero arranca el combate disponible (dueño, 2026-11-09: «que tenga cooldown 4, pero que empiece disponible»)
   // 👁 Vigilancia (dueño, 2026-10-21; el rango, una sola para bestias y humanoides): 1 No2 y 2 SP (o cooldown 3); es su ataque del turno. Hasta su próximo turno,
   // el primer rival que se mueva dentro del alcance de su arma, a la vista y con línea de tiro, recibe un disparo (vtt-hexgrid/js/58).
   H('Vigilancia', 'BK', '*', 'r', 3, {detalle: 'Se queda atento con el arma lista (es su ataque del turno): hasta que empiece su próximo turno, el primer rival que se mueva dentro del alcance de su arma, a la vista y con línea de tiro libre, se frena ahí y recibe un disparo con +2 a la Probabilidad de Golpe (un duelo normal, que paga los No2 de un ataque). Quien ya estaba adentro, solo si se mueve. Un solo disparo; si lo deja pasar, sigue vigilando.',

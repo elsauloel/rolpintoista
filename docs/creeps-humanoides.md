@@ -346,7 +346,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   puede quedar bajo; el modo SP queda para magos y supports con mucho Especial.
 - **H1 · Embestidor · Híbrido** (boceto y nivel 1, 2026-11-03). Estrategia: cruza el campo y se lleva puesto a uno: corre, derriba y empuja; le
   rompe la línea al grupo y llega a los de atrás. Atributos (dueño: «tengo miedo que con destreza tan baja me cueste pegar»; Con/Fue/Agi/Des/Esp →
-  vida, No2): **nv1 10/8/6/7/2 → 50, 6** · nv2 11/9/7/7/2 → 55, 8 (con Impulso) · nv3 12/10/7/8/2 → 60, 8 · nv4 13/11/8/8/2 → 80, 9 · nv5
+  vida, No2): **nv1 10/7/7/7/2 → 50, 7** (antes 10/8/6/7/2 → 6 No2: no le alcanzaba para atacar —4— y correr 3 —3—; dueño, 2026-11-09:
+  «bajale la fuerza»: Fue −1, Agi +1) · nv2 11/9/7/7/2 → 55, 8 (con Impulso) · nv3 12/10/7/8/2 → 60, 8 · nv4 13/11/8/8/2 → 80, 9 · nv5
   14/12/8/9/2 → 90, 9. Nada de lo que usa tira Especial.
   | Nivel | Habilidad nueva | Pasiva | Equipo |
   |---|---|---|---|
@@ -355,6 +356,8 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   | 3 | **Salto aplastante** (salta 3, Sentado a los pegados con Res.CC contra su Fuerza, ataque +2 de daño) | — | el hacha: Hacha del verdugo de la capital (Buena: 2 dados, Derribar 50 %) |
   | 4 | **Aguante** | **Robustez** (+5 de vida) | el chaleco: Jubón de cuero tachonado (Buena) (Def 4, Def.Esp 3) |
   | 5 | **Furia** | — | la cofia: Casco de bandas remachadas (Buena) + guantes Comunes (Def 5, Def.Esp 2) |
+  **Salto aplastante** (2026-11-09, dueño): cooldown 4, pero **arranca el combate disponible** (`disponibleAlInicio`; los creeps guardados se ponen
+  al día solos).
   Consumible: Pergamino grupal de Paso Fantasma. Ojo: «Carga que derriba» no es una carga (es una onda en cono). Sin cargar hasta que el dueño diga.
 
 - **S2 · Abanderado · Support** (boceto y nivel 1 aprobados, dueño 2026-11-03: «me copa»). Estrategia: el soldado que lleva la bandera; no cura,

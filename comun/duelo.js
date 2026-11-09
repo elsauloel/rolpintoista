@@ -1404,7 +1404,7 @@ const Duelo = (() => {
       cerrarSiListo(m);
       tx.update(ref, cambiosDe(m));
       if(aMano){ anuncio = `✍ ${ef.nombre} de ${m.atacante.nombre} sobre ${m.defensor.nombre}, a mano: ${r.exito ? 'funcionó' : 'no funcionó'}`; return; }
-      if(!siempreEf(ef)) publicar = {origen: `${m.atacante.nombre} · ${ef.nombre} ${pctEf(ef)}%`, r: {formula: `1d${ef.caras}`, rolls: [r.dado], mod: 0, total: r.dado, ...(r.exito ? {destacar: 'idx:0'} : {}), ...quienDeLado(m.atacante)}};
+      if(!siempreEf(ef)) publicar = {origen: `${m.atacante.nombre} · ${ef.nombre} ${pctEf(ef)}%`, r: {formula: `1d${ef.caras}`, rolls: [r.dado], mod: 0, total: r.dado, ...(r.exito ? {destacar: 'idx:0'} : ef.porTirada ? {destacar: 'crit:1'} : {}), ...quienDeLado(m.atacante)}};   // 😞 el 1d20 con tabla (Pedos/Nube) que no alcanzó ningún renglón: la carita triste del dado (dueño, 2026-11-09)
       anuncio = r.exito ? `✔ ${ef.nombre}${siempreEf(ef) ? '' : ' (' + pctEf(ef) + '%)'} de ${m.atacante.nombre} sobre ${m.defensor.nombre}: ${siempreEf(ef) ? '' : 'salió ' + r.dado + ' → '}${r.txt ? r.txt : '¡FUNCIONÓ!'}${r.extra ? ' · ' + ef.dado + ' = ' + r.extra.total : ''}`
         : `✘ ${ef.nombre} (${pctEf(ef)}%) de ${m.atacante.nombre} sobre ${m.defensor.nombre}: salió ${r.dado} → no funcionó`;
     });
@@ -1441,7 +1441,7 @@ const Duelo = (() => {
           r.dado = 1 + Math.floor(Math.random() * ef.caras);
           r.exito = r.dado >= ef.caras - ef.exitos + 1;
           if(ef.porTirada) porTiradaResolver(ef, r);
-          dados.push({caras: ef.caras, dado: r.dado, exito: r.exito});
+          dados.push({caras: ef.caras, dado: r.dado, exito: r.exito, tabla: !!ef.porTirada});
         }
         if(r.exito && ef.dado && typeof tirarDados === 'function'){
           const x = tirarDados(ef.dado);
@@ -1457,7 +1457,7 @@ const Duelo = (() => {
       // Los dados que funcionaron brillan en 3D como el d20 del crítico (2026-10-04, dueño): `destacar: 'idx:…'`.
       const ok = dados.map((x, k) => x.exito ? k : -1).filter(k => k >= 0);
       if(dados.length) publicar = {origen: `${m.atacante.nombre} · Efectos del golpe`, r: {formula: dados.map(x => `1d${x.caras}`).join('+'), rolls: dados.map(x => x.dado), mod: 0, total: dados.reduce((a, x) => a + x.dado, 0),
-        ...(ok.length ? {destacar: 'idx:' + ok.join(',')} : {}), ...quienDeLado(m.atacante)}};
+        ...(ok.length ? {destacar: 'idx:' + ok.join(',')} : dados.length === 1 && dados[0].tabla ? {destacar: 'crit:1'} : {}), ...quienDeLado(m.atacante)}};   // 😞 (2026-11-09)
       anuncio = `🎲 Efectos de ${m.atacante.nombre} sobre ${m.defensor.nombre}: ${partes.join(' · ')}`;
     });
     if(publicar && typeof mesaPublicar === 'function'){ try{ mesaPublicar(publicar.origen, publicar.r); }catch(err){} }

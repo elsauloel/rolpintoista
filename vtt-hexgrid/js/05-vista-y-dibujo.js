@@ -207,14 +207,26 @@ function dibujarNieblaVarita(z){
   const nb = nieblaSet();
   if(!nb.size) return false;
   const s = performance.now() / 1000;
+  // ☁ La niebla recién puesta se expande desde el centro, como las demás nubes (2026-11-09, js/112): sus casillas salen del dibujo quieto hasta
+  // que termina (si otra niebla ya las tapaba, quedan tapadas).
+  let fija = nb, crece = [];
+  if(typeof zonaDueloExpandiendo === 'function'){
+    elementos.forEach(el => { if(el.niebla){ const k = zonaDueloExpandiendo(el); if(k !== null) crece.push({el, k, celdas: celdasDeElemento(el)}); } });
+    if(crece.length){
+      const quietas = new Set();
+      elementos.forEach(el => { if(el.niebla && !crece.some(c => c.el === el)) celdasDeElemento(el).forEach(c => quietas.add(nbPack(c.col, c.fila))); });
+      fija = quietas;
+    }
+  }
   ctx.save();
-  if(typeof nubeDibujar === 'function') nubeDibujar([...nb].map(nbUnpack), NUBE_GRIS, z);   // ☁ con el borde desparejo y borroso (js/50, 2026-10-17)
+  crece.forEach(c => zonaDueloExpansionDibujar(c.el, c.celdas, NUBE_GRIS, z, c.k, {gris: true}));
+  if(typeof nubeDibujar === 'function'){ if(fija.size) nubeDibujar([...fija].map(nbUnpack), NUBE_GRIS, z); }   // ☁ con el borde desparejo y borroso (js/50, 2026-10-17)
   else{
     ctx.beginPath();
-    nb.forEach(k => { const c = nbUnpack(k), h = hexCentro(c.col, c.fila); trazarHex(h.x, h.y); });
+    fija.forEach(k => { const c = nbUnpack(k), h = hexCentro(c.col, c.fila); trazarHex(h.x, h.y); });
     ctx.fillStyle = 'rgba(200,205,216,.62)'; ctx.fill();
   }
-  nb.forEach(k => {
+  fija.forEach(k => {
     const c = nbUnpack(k), h = hexCentro(c.col, c.fila), f = (Math.sin(s * 0.7 + c.col * 1.3 + c.fila * 0.7) + 1) / 2;
     ctx.beginPath();
     ctx.arc(h.x + Math.cos(s * 0.5 + c.fila) * HEX * 0.25, h.y + Math.sin(s * 0.4 + c.col) * HEX * 0.2, HEX * (0.45 + 0.2 * f), 0, Math.PI * 2);

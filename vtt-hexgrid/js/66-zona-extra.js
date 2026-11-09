@@ -93,7 +93,7 @@ async function zonaExtraTirar(id, d, porGM){
   const r = tirarDados(dt.tira);
   if(!r){ toast(`No se pudo tirar ${dt.tira}: tiralo a mano`); await momentoActualizar(id, {estado: 'esperando'}); return; }
   try{ if(dt.nota) mesaConTexto(dt.nota); await mesaPublicar(`${dt.zona} contra ${dt.quien}${porGM ? ' (lo tiró el GM)' : ''}`, {formula: r.formula || dt.tira, rolls: r.rolls, mod: r.mod, total: r.total, quien: dt.casteador}); }catch(err){}
-  const fila = Combatiente.efectoPorTirada(dt.porTirada, r.total);
+  const fila = Combatiente.efectoPorTirada(dt.porTirada, r.total, (r.rolls || []).reduce((x, y) => x + (Number(y) || 0), 0));   // el «20 natural» mira solo el dado
   const alCerrar = () => { zonaExtraAbierto = null; setTimeout(zonaExtraMostrar, 300); };
   if(!fila){
     const resultado = `🎲 ${dt.tira}: ${r.total}${dt.nota ? ` — ${dt.nota}` : ''}${(dt.porTirada || []).length ? ' → nada' : ''}`;
@@ -153,7 +153,7 @@ async function zonaExtraAplicar(id, d, porGM){
   try{
     if(o.tipo === 'creep'){
       await modificarCreep(o.ref, sc => {
-        if(fila.caer){ sc.hp = 0; return; }
+        if(fila.caer){ if(sc.jefe) throw new Error('🛡 Protección de jefe: no cae ni muere'); sc.hp = 0; return; }
         const r = EstadosAplicar.aplicarACreep(sc, {...fila.estado});
         if(r && r.ok === false) throw new Error(r.motivo || 'no entró');
       });
@@ -164,7 +164,7 @@ async function zonaExtraAplicar(id, d, porGM){
         else await EstadosAplicar.encolarPj({fichaId: o.ref, duenoUid: o.uid, spec: {...fila.estado}, origen});
       }else{
         const ok = await editarPersonajeMapa(fichaId, S => {
-          if(fila.caer){ FichaAcciones.fijarHp(S, 0); FichaAcciones.revisarMuerte(S); return true; }
+          if(fila.caer){ FichaAcciones.fijarHp(S, 0); FichaAcciones.revisarMuerte(S); if(fila.muere) S.muerto = {activo: true, turnos: 0, definitivo: true}; return true; }
           const nombre = ((S.meta && S.meta.nombre) || '').trim();
           const ui = {presets: estadosPresetFicha(), cambio: () => {}, toast: m => toast(m),
             recordatorios: lista => (lista || []).forEach(x => x && x.nombre && mesaLinea(`${x.nombre}${x.detalle ? ' — ' + x.detalle : ''}`, 'recordatorio', nombre))};
@@ -174,7 +174,7 @@ async function zonaExtraAplicar(id, d, porGM){
         if(ok === null) throw new Error('no pude abrir su ficha');
       }
     }
-    hecho = fila.caer ? `${dt.quien} cae (la vida a 0)` : `${dt.quien}: ${txt}`;
+    hecho = fila.muere ? `${dt.quien} muere` : fila.caer ? `${dt.quien} cae (la vida a 0)` : `${dt.quien}: ${txt}`;
   }catch(err){
     console.error('Zona: no se pudo aplicar lo de la tirada', err);
     hecho = `${dt.quien}: ${txt} — no se pudo aplicar (${err && err.message || err}); va a mano`;

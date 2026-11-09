@@ -491,7 +491,7 @@ const AsistenteDueloHab = (() => {
       const filas = st.danoExtraEfectos;
       let h = `<div class="adh-portirada"><div class="nota" style="margin:6px 0 4px">Según lo que salga, se aplica solo (con su Anuncio): vale el renglón más alto que alcance la tirada.</div>`;
       filas.forEach((f, i) => {
-        const que = f.caer ? '💀 cae (la vida a 0)' : f.estado && f.estado.nombre ? `◎ ${esc(f.estado.nombre)}${Number(f.estado.turnos) > 0 ? ` · ${f.estado.turnos} turno${Number(f.estado.turnos) === 1 ? '' : 's'}` : f.estado.permanente ? ' · no vence' : ''}${Number(f.estado.stacks) > 0 ? ` ×${f.estado.stacks}` : ''}` : '';
+        const que = f.caer ? `💀 ${f.muere ? "muere (un jefe no)" : "cae (la vida a 0)"}${f.natural ? " · solo el dado natural" : ""}` : f.estado && f.estado.nombre ? `◎ ${esc(f.estado.nombre)}${Number(f.estado.turnos) > 0 ? ` · ${f.estado.turnos} turno${Number(f.estado.turnos) === 1 ? '' : 's'}` : f.estado.permanente ? ' · no vence' : ''}${Number(f.estado.stacks) > 0 ? ` ×${f.estado.stacks}` : ''}` : '';
         h += `<div class="fila"><span>desde</span><input type="number" min="1" style="width:60px" data-pt-desde="${i}" value="${esc(f.desde)}"><span>→</span>`;
         if(f.caer || (f.estado && f.estado.nombre && f.estado.deCatalogo)) h += `<b>${que}</b>`;
         else h += `<input type="text" style="width:130px" data-pt-nombre="${i}" placeholder="estado" value="${esc(f.estado ? f.estado.nombre : '')}"><span>turnos</span><input type="number" min="0" style="width:60px" data-pt-turnos="${i}" value="${esc(f.estado ? f.estado.turnos || '' : '')}">`;

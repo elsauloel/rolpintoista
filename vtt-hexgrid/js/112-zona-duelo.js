@@ -8,10 +8,12 @@
    (#zona-banner, js/08): cada vez que le toca a alguien (la primera tanda, alguien que entra, la ronda que pasa con alguien adentro) se arma una
    tanda de la cascada de las áreas (`coleccionAreas`, js/13) con esos tokens, y el mapa del GM abre un duelo por token, de a uno, con el mismo
    cuadro que todas las habilidades (late el token, se despliega el cuadro, las tiradas adentro, se pliega y sigue el próximo):
-   - la tirada de quien la creó (su Ef.Esp de cuando la tiró, `zonaTiraValor` → la fórmula de `hab.tira`) se tira de nuevo en cada duelo
-     (`hab.tiraCadaUno`: no se comparte la primera). Desde el 2026-11-09 (dueño: «la tirada apareció sola… nunca apreté el botón») la tira con su
-     botón quien maneja a quien la creó (el jugador, o el GM por un creep), con los dados y la Mesa como cualquier duelo; si no está, el GM la tira
-     a mano. Cada afectado tira su resistencia desde la pantalla de quien lo maneja. (`zonaDueloTirada` quedó sin usar.)
+   - la tirada de quien la creó (su Ef.Esp de cuando la tiró, `zonaTiraValor` → la fórmula de `hab.tira`) se tira UNA sola vez (dueño, 2026-11-09:
+     «la tirada debe ser la misma para todos. Tira Ef.Esp una sola vez»): en el primer duelo la tira con su botón quien maneja a quien la creó (el
+     jugador, o el GM por un creep; si no está, el GM con «🎲 Tirar a mano»), y ese valor queda en el área (`pdgCompartido`, dueloGrupoResuelto,
+     js/13) para los demás duelos de la tanda; las tandas de después (quien entra, la ronda que pasa) lo buscan con `zonaDueloTiradaGuardada`.
+     El cuadro lo dice: «Ef.Esp de Larry: 9 (una tirada para todos)». Cada afectado tira su resistencia desde la pantalla de quien lo maneja.
+     (`zonaDueloTirada` quedó sin usar.)
    - ☠ La Nube tóxica de los creeps (2026-11-09) usa lo mismo, con la expansión desde el punto marcado; el estado que entra se anota en
      zonaResueltos (`zonaDueloAnotar`) para que su «envenenado: +1 stack» siga igual;
    - si no resiste, el daño es la diferencia, del tipo de la zona (tóxico), menos la Defensa especial (`ignoraDef`), como siempre;
@@ -27,10 +29,19 @@ const zonaEsDuelo = el => !!(el && el.zona && zonaSpecDe(el).duelo);
 
 /* ---------- la nube que se expande ---------- */
 // La ve aparecer esta pantalla (js/07): si es recién puesta (la escritura propia, o creada hace unos segundos), arranca la expansión.
+// ☁ Desde el 2026-11-09 (dueño: «todas las nubes que son en área, al seleccionarla deben aparecer con la misma animación, desde el centro hacia
+// afuera») vale para cualquier nube: la zona con duelo, toda zona que se dibuja como gas (`nubeColor`, js/50: Nube tóxica, Nube de veneno, Gas
+// adormecedor, Bomba de humo, Niebla de confusión, vapor…) y la niebla de la varita o de la Bomba de humo (`niebla`, js/05).
+function zonaDueloEsNube(d){
+  if(!d) return false;
+  if(d.niebla === true) return true;
+  if(d.zona !== true) return false;
+  let e = {}; try{ e = JSON.parse(d.zonaEstado || '{}') || {}; }catch(err){}
+  return !!e.duelo || (typeof nubeColor === 'function' && !!nubeColor(d));
+}
 function zonaDueloVista(id, d, pendiente){
   if(zonaDueloInicio.has(id)) return;
-  let e = {}; try{ e = JSON.parse(d.zonaEstado || '{}') || {}; }catch(err){}
-  if(!e.duelo) return;
+  if(!zonaDueloEsNube(d)) return;
   const ms = d.creado && typeof d.creado.toMillis === 'function' ? d.creado.toMillis() : null;
   const nueva = ms === null ? !!pendiente : Date.now() - ms < 6000;
   zonaDueloInicio.set(id, nueva ? performance.now() : 0);
@@ -45,8 +56,11 @@ function zonaDueloExpandiendo(el){
   return Math.max(0, k);
 }
 // La mancha de siempre (nubeDibujar, js/50), agrandándose desde el centro, con bocanadas que se abren en el frente (violeta y verde).
-function zonaDueloExpansionDibujar(el, celdas, color, z, k){
-  const C = hexCentro(el.origen.col, el.origen.fila);
+function zonaDueloExpansionDibujar(el, celdas, color, z, k, opc){
+  // El centro: el de la flor; una forma libre o una línea, desde el medio de sus casillas.
+  let C = hexCentro(el.origen.col, el.origen.fila);
+  if(el.tipo && el.tipo !== 'flor' && celdas.length){ let x = 0, y = 0; celdas.forEach(c => { const p = hexCentro(c.col, c.fila); x += p.x; y += p.y; }); C = {x: x / celdas.length, y: y / celdas.length}; }
+  const gris = !!(opc && opc.gris);
   const e = (1 - Math.cos(Math.PI * k)) / 2;   // arranca suave, se abre y frena al llegar
   const s = 0.12 + 0.88 * e;
   let R = 0; celdas.forEach(c => { const p = hexCentro(c.col, c.fila); R = Math.max(R, Math.hypot(p.x - C.x, p.y - C.y)); });
@@ -64,13 +78,39 @@ function zonaDueloExpansionDibujar(el, celdas, color, z, k){
     const d = frente * (0.82 + 0.12 * Math.sin(t * 2.1 + i * 1.7));
     const x = C.x + Math.cos(a) * d, y = C.y + Math.sin(a) * d, r = HEX * (0.55 + 0.3 * superficieAzar(el.origen.col + i, el.origen.fila, 77)) * (0.6 + 0.6 * e);
     const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-    const verde = i % 3 === 1;
-    g.addColorStop(0, verde ? `rgba(160,225,100,${(0.6 * apaga).toFixed(2)})` : `rgba(205,160,255,${(0.6 * apaga).toFixed(2)})`);
-    g.addColorStop(0.55, verde ? `rgba(120,190,70,${(0.3 * apaga).toFixed(2)})` : `rgba(160,105,215,${(0.32 * apaga).toFixed(2)})`);
-    g.addColorStop(1, 'rgba(150,95,200,0)');
+    // Las bocanadas toman el color de la nube: violeta y verde lo tóxico (como los Pedos), verde el veneno, gris la niebla y el humo, blanco el talco.
+    const [c1, c2] = zonaDueloBocanadas(color, gris, i);
+    g.addColorStop(0, `rgba(${c1},${(0.6 * apaga).toFixed(2)})`);
+    g.addColorStop(0.55, `rgba(${c2},${(0.32 * apaga).toFixed(2)})`);
+    g.addColorStop(1, `rgba(${c2},0)`);
     ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
   }
   ctx.restore();
+}
+
+function zonaDueloBocanadas(color, gris, i){
+  const VIOLETA = ['205,160,255', '160,105,215'], VERDE = ['160,225,100', '120,190,70'];
+  if(gris || (typeof NUBE_GRIS !== 'undefined' && color === NUBE_GRIS)) return ['236,239,246', '200,205,216'];
+  if(typeof NUBE_HUMO !== 'undefined' && color === NUBE_HUMO) return ['110,110,118', '70,70,78'];
+  if(typeof NUBE_TALCO !== 'undefined' && color === NUBE_TALCO) return ['255,255,252', '238,236,228'];
+  if(typeof NUBE_TOXICA !== 'undefined' && color === NUBE_TOXICA) return i % 3 === 1 ? VIOLETA : VERDE;
+  return i % 3 === 1 ? VERDE : VIOLETA;
+}
+
+/* ---------- la tirada de quien la creó, una para todos ---------- */
+const zonaDueloTiradas = new Map();   // zonaId → la tirada (en la pantalla del GM, que arma las tandas)
+function zonaDueloTiradaAnotar(zonaId, pdg){ if(zonaId && pdg) zonaDueloTiradas.set(zonaId, pdg); }
+// → la tirada que ya hizo quien creó la zona (en una tanda anterior), o null si todavía no tiró.
+async function zonaDueloTiradaGuardada(zonaId){
+  if(!zonaId) return null;
+  if(zonaDueloTiradas.has(zonaId)) return zonaDueloTiradas.get(zonaId);
+  try{
+    const q = await coleccionAreas().where('hab.zonaId', '==', zonaId).get();
+    let mejor = null, cuando = -1;
+    q.forEach(doc => { const a = doc.data(); const ms = a.creado && a.creado.toMillis ? a.creado.toMillis() : 0; if(a.pdgCompartido && ms > cuando){ mejor = a.pdgCompartido; cuando = ms; } });
+    if(mejor) zonaDueloTiradas.set(zonaId, mejor);
+    return mejor;
+  }catch(err){ console.error('Zona: no se pudo leer la tirada guardada', err); return null; }
 }
 
 /* ---------- las tandas de duelos ---------- */
@@ -100,7 +140,7 @@ function zonaDueloHab(el){
   const detalle = `${el.zonaNombre || 'La zona'}: ${etqTira} de quien la tiró contra tu ${etqRes}. Si no resistís, ${dano ? (dano.diferencia ? `la diferencia como daño ${el.zonaDanoTipo ? String(el.zonaDanoTipo).toLowerCase() : ''}${dano.ignoraDef && !dano.directo ? ' (menos la Defensa especial)' : ''}` : `${dano.formula} de daño`) : 'lo que deja'}${efectos.some(x => x.porTirada) ? ` y ${el.zonaTiraExtra}: ${Combatiente.porTiradaTxt(tabla)}` : ''}.`;
   return {nombre: el.zonaNombre || 'Zona', objetivo: 'area', radio: 2,
     tira: f ? {formula: f.formula, etq: etqTira} : {stat: tiraStat, etq: etqTira},
-    contra: [{modo: resStat, stat: resStat, etq: etqRes}], dano, efectos, sinDodge: true, tiraCadaUno: true, zonaId: el.id, detalle: detalle.slice(0, 600)};
+    contra: [{modo: resStat, stat: resStat, etq: etqRes}], dano, efectos, sinDodge: true, zonaId: el.id, detalle: detalle.slice(0, 600)};
 }
 // Ordena los tokens en sentido horario alrededor del centro, empezando por el más cercano.
 function zonaDueloOrdenar(el, ids){
@@ -201,17 +241,47 @@ function zonaDueloTirada(a, t){
   return tiro;
 }
 // «Cae» (el 20): la vida a 0, como lo hacía la tirada extra de la zona (js/66). Lo aplica la pantalla que aplica los efectos del duelo.
-async function zonaDueloCaer(t, d){
-  const nom = nombreDe(t);
+/* 💀 El «cae» de la tabla (el desmayo: la vida a 0) o, con `muere` (dueño, 2026-11-09, el 20 natural de los Pedos: «dice desmayo pero en realidad
+   muere»), la muerte de verdad: un personaje queda muerto del todo (`S.muerto.definitivo`, como cuando se le acaban los turnos de inconsciente:
+   sin Revivir), una invocación y un creep con la vida en 0 (para un creep, eso ya es derrotado: no tiene un «inconsciente» aparte). Un jefe no
+   llega acá: lo frena `zonaDueloJefe`. */
+async function zonaDueloCaer(t, d, spec){
+  const nom = nombreDe(t), muere = !!(spec && spec.muere);
+  const aMano = {manual: true, nota: muere ? `${nom} muere: ponele la vida en 0 y marcalo muerto a mano` : `${nom} cae: ponele la vida en 0 a mano`};
   try{
     if(t.tipo === 'creep'){ await modificarCreep(t.fichaId, sc => { sc.hp = 0; }); }
     else if(String(t.fichaId || '').includes(SEP_INVOCACION)){ await cambiarVidaPj({fichaId: t.fichaId}, null, '0'); }
     else{
-      const ok = await editarPersonajeMapa(t.fichaId, S => { FichaAcciones.fijarHp(S, 0); FichaAcciones.revisarMuerte(S); return true; });
-      if(ok === null) return {manual: true, nota: `${nom} cae: ponele la vida en 0 a mano`};
+      const ok = await editarPersonajeMapa(t.fichaId, S => {
+        FichaAcciones.fijarHp(S, 0); FichaAcciones.revisarMuerte(S);
+        if(muere) S.muerto = {activo: true, turnos: 0, definitivo: true};   // muerto del todo (comun/ficha-mantenimiento.js contarMuerte)
+        return true;
+      });
+      if(ok === null) return aMano;
     }
-    return {nota: `💀 ${nom} se desmaya (la vida a 0)`};
-  }catch(err){ console.error('Zona con duelo: no se pudo desmayar', err); return {manual: true, nota: `${nom} cae: ponele la vida en 0 a mano`}; }
+    return {nota: muere ? `💀 ${nom} muere` : `💀 ${nom} se desmaya (la vida a 0)`};
+  }catch(err){ console.error('Zona con duelo: no se pudo aplicar el «cae»', err); return aMano; }
+}
+/* 🛡 Protección de jefe contra la tabla (dueño, 2026-11-09: «el boss protection debe prevenir esta muerte»; «también previene el stun»): a un creep
+   jefe el renglón que le toca no le aplica si es caer / morir o un estado del que el jefe es inmune (Combatiente.JEFE_INMUNE: Stun, Sueño…); le toca
+   el renglón más alto de abajo que sí le aplica (en los Pedos: Pajaritos, que el jefe recibe por 1 turno), o nada. → null si no es un jefe o el
+   renglón le aplica; si no, {spec (el de reemplazo, o null), nota}. */
+async function zonaDueloEsJefe(t){
+  if(!t || t.tipo !== 'creep' || !t.fichaId) return false;
+  const e = typeof creepsPriv !== 'undefined' ? creepsPriv.get(t.fichaId) : null;
+  if(e && e.sc) return !!e.sc.jefe;
+  try{ const doc = await fbDb.doc(fbRutaCampana(`creeps/${t.fichaId}/privado/ficha`)).get(); return !!(doc.exists && (JSON.parse(doc.data().json || '{}') || {}).jefe); }
+  catch(err){ return false; }
+}
+const zonaDueloJefeFrena = f => !f || f.caer || (f.estado && Combatiente.JEFE_INMUNE.includes(String(f.estado.nombre || '').trim().toLowerCase()));
+async function zonaDueloJefe(t, ef, spec){
+  if(!ef || !ef.porTirada || !spec) return null;
+  const fila = spec.caer ? {caer: true} : {estado: spec};
+  if(!zonaDueloJefeFrena(fila) || !(await zonaDueloEsJefe(t))) return null;
+  const tabla = Combatiente.porTiradaNorm(ef.porTirada), hasta = ef.res && Number.isFinite(Number(ef.res.dado)) ? Number(ef.res.dado) : 999;
+  const resp = tabla.filter(f => f.desde <= hasta && !zonaDueloJefeFrena(f)).pop() || null;
+  const base = '🛡 Protección de jefe: sin Stun ni muerte', nota = `${base}${resp ? ` · le queda ${Combatiente.porTiradaFilaTxt(resp)}` : ' · no le pasa nada'}`;
+  return {spec: resp ? {...resp.estado} : null, nota, base};
 }
 
 // ☠ La Nube tóxica de los creeps (2026-11-09): el estado de la zona entró por el duelo → se anota en zonaResueltos, como lo hacía el cartel (js/08),

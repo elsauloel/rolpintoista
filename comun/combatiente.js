@@ -2117,6 +2117,8 @@ const Combatiente = (() => {
     // ☠ La Nube tóxica de los creeps (dueño, 2026-11-09: «sí», que resuelva un duelo por cada uno como los Pedos): con duelo por token y la
     // expansión desde el punto marcado (no nace en el creep). Las copias guardadas sin la marca se reconocen por el nombre (solo la del creep).
     const nubeCreep = o.tipo === 'creep' && /^nube t[oó]xica$/i.test(String(h.nombre || '').trim());
+    // 💀 El 20 de los Pedos (dueño, 2026-11-09): muere, y solo con el 20 natural. Las copias guardadas antes traen «20 cae»: se leen como el pool.
+    if(pedos && Array.isArray(c.danoExtraEfectos)) c = {...c, danoExtraEfectos: c.danoExtraEfectos.map(f => f && f.caer && nf(f.desde) >= 20 ? {...f, muere: true, natural: true} : f)};
     const enMi = !!(c.zonaEnMi || pedos), conDuelo = !!(c.zonaDuelo || pedos || nubeCreep);
     return {tipo: 'zona-persistente-habilidad', fichaId: o.fichaId, casteadorTipo: o.tipo, nombre: h.nombre,
       ...(enMi ? {zonaEnMi: true} : {}), ...(conDuelo ? {zonaDuelo: true} : {}),
@@ -2909,14 +2911,16 @@ const Combatiente = (() => {
     return tabla.map(f => {
       if(!f || !Number.isFinite(Number(f.desde))) return null;
       const desde = Math.max(1, Math.round(Number(f.desde)));
-      if(f.caer) return {desde, caer: true};
+      const nat = f.natural ? {natural: true} : {};   // 🎲 solo el dado natural (dueño, 2026-11-09: «sólo un 20 natural, ningún bono externo cuenta»)
+      // 💀 `muere` (dueño, 2026-11-09, el 20 de los Pedos: «dice desmayo pero en realidad muere»): la muerte de verdad, no el desmayo; un jefe no muere.
+      if(f.caer || f.muere) return {desde, caer: true, ...(f.muere ? {muere: true} : {}), ...nat};
       const e = f.estado && typeof f.estado === 'object' ? f.estado : null;
       if(!e || !String(e.nombre || '').trim()) return null;
       const estado = {nombre: String(e.nombre).trim().slice(0, 40)};
       if(nf(e.turnos) > 0) estado.turnos = Math.round(nf(e.turnos));
       if(nf(e.stacks) > 0) estado.stacks = Math.round(nf(e.stacks));
       if(e.permanente) estado.permanente = true;
-      return {desde, estado};
+      return {desde, estado, ...nat};
     }).filter(Boolean).sort((a, b) => a.desde - b.desde).slice(0, 6);
   }
   /* 🌵🪞 Devolver daño (Espinas y Espejo). Dueño, 2026-11-08: «las espinas no se suman»: tenga las fuentes que tenga (la Coraza de púas, el Escudo
@@ -2947,9 +2951,10 @@ const Combatiente = (() => {
     if(d.ataque && d.ataque.secundario) return false;
     return true;
   }
-  const efectoPorTirada = (tabla, total) => porTiradaNorm(tabla).filter(f => f.desde <= nf(total)).pop() || null;
-  const porTiradaFilaTxt = f => f.caer ? 'cae (la vida a 0)' : `${f.estado.nombre}${f.estado.permanente ? ' (no vence)' : nf(f.estado.turnos) > 0 ? ` (${f.estado.turnos} turno${f.estado.turnos === 1 ? '' : 's'})` : ''}${nf(f.estado.stacks) > 0 ? ` ×${f.estado.stacks}` : ''}`;
-  const porTiradaTxt = tabla => porTiradaNorm(tabla).map(f => `${f.desde}+ ${porTiradaFilaTxt(f)}`).join(' · ');
+  // `natural`: el dado tal cual salió (sin la Polilla, el Re-roll ni el Empower). Un renglón con `natural` solo mira ese; los demás, el total.
+  const efectoPorTirada = (tabla, total, natural) => porTiradaNorm(tabla).filter(f => f.desde <= nf(f.natural && natural != null ? natural : total)).pop() || null;
+  const porTiradaFilaTxt = f => f.muere ? 'muere' : f.caer ? 'cae (la vida a 0)' : `${f.estado.nombre}${f.estado.permanente ? ' (no vence)' : nf(f.estado.turnos) > 0 ? ` (${f.estado.turnos} turno${f.estado.turnos === 1 ? '' : 's'})` : ''}${nf(f.estado.stacks) > 0 ? ` ×${f.estado.stacks}` : ''}`;
+  const porTiradaTxt = tabla => porTiradaNorm(tabla).map(f => `${f.desde}${f.natural ? ' natural' : '+'} ${porTiradaFilaTxt(f)}`).join(' · ');
   /* 📜 Un consumible con su Ejecución ✨ (2026-10-20, la Red Nerubian: «habría que modificar sobre el duelo»): `it.duelo` es la misma Ejecución de una
      habilidad o de una varita. Se arma una habilidad de un uso (automática) y sigue el camino de siempre: elegir el objetivo, el cuadro del duelo, los
      efectos. Lo usan FichaAcciones.consumir (personaje) y las Acciones de un creep (vtt-hexgrid/js/12). */

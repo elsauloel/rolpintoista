@@ -1326,11 +1326,10 @@ async function areaCrearSiguienteSubDuelo(areaId, a){
     // El casteador tira su PdG.Esp/PdG UNA SOLA VEZ para toda la cascada (dicho por el dueño, 2026-09-27): del 2do
     // objetivo en adelante, `a.pdgCompartido` (capturado del primero al resolverse, ver dueloGrupoResuelto) llega
     // precargado — este sub-duelo solo le pide la Evasión a ESTE objetivo, contra esa misma tirada.
-    // 💨 Una zona con duelo (js/112): la tirada de quien la creó (su Ef.Esp de cuando la creó) se tira acá, de nuevo contra cada uno.
-    // (dueño, 2026-11-09: «la tirada que sacó 9 apareció sola, yo controlando a Larry nunca apreté el botón»): ya no se tira sola — en cada
-    // sub-duelo de la zona, quien la creó (su jugador, o el GM por un creep) tira con su botón, con los dados y la Mesa como cualquier duelo;
-    // `tiraCadaUno` sigue impidiendo que se comparta la primera tirada. Si no está conectado, el GM la tira a mano (el «🎲 Tirar a mano» del duelo).
-    const pdgZona = null;
+    // 💨 Una zona con duelo (js/112; dueño, 2026-11-09: «la tirada debe ser la misma para todos. Tira Ef.Esp una sola vez»): no se tira sola —
+    // la primera vez quien la creó (su jugador, o el GM por un creep) tira con su botón (si no está, el GM con «🎲 Tirar a mano») y vale para todos;
+    // en las tandas de después (alguien entra, pasa la ronda) se usa la que ya tiró, guardada en las áreas anteriores de la misma zona.
+    const pdgZona = !a.pdgCompartido && a.hab && a.hab.zonaId && typeof zonaDueloTiradaGuardada === 'function' ? await zonaDueloTiradaGuardada(a.hab.zonaId) : null;
     dueloId = await Duelo.crear({yo: a.casteador, ataque: {tipo: 'habilidad', hab: tormentaHabDe(a.hab, tokenId), alcance: 0}, grupo: {id: areaId, indice: idx + 1, total: Math.max(objetivos.length, num(a.hab && a.hab.reparte && a.hab.reparte.total))}, pdgCompartido: pdgZona || a.pdgCompartido || null,
       presa: a.hab && a.hab.dano ? (() => { try{ return presaContra(tokens.get(a.casteador.tokenId), t); }catch(err){ return 0; } })() : 0,
       carancho: (() => { try{ const c = tokens.get(a.casteador.tokenId); return c ? caranchoBono(c, t) : 0; }catch(err){ return 0; } })()},   // 🦅 Ojo de carancho, objetivo por objetivo   // 🎯 la Presa también en un área o una línea (2026-10-25, la Lanza de luz, hoy Lanza arcana)
@@ -1378,6 +1377,7 @@ function dueloGrupoResuelto(d){
     const siguiente = idx + 1, total = (a.objetivos || []).length;
     const reparte = a.hab && a.hab.reparte, quedan = reparte ? (num(reparte.total) || 2) - total : 0;   // los misiles: ¿queda alguno por tirar?
     const cambios = siguiente >= total ? (quedan > 0 ? {estado: AREA_ELIGIENDO, indice: siguiente} : {estado: 'terminado'}) : {indice: siguiente};
+    if(a.hab && a.hab.zonaId && d.pdg && typeof zonaDueloTiradaAnotar === 'function') zonaDueloTiradaAnotar(a.hab.zonaId, a.pdgCompartido || d.pdg);   // 💨 la de la zona, para las tandas de después
     if(!a.pdgCompartido && d.pdg && !reparte && !(a.hab && a.hab.tiraCadaUno)) cambios.pdgCompartido = d.pdg;   // (💨 una zona con duelo: tira de nuevo contra cada uno, js/112)   // (cada misil, con su propia tirada)
     return coleccionAreas().doc(areaId).update(cambios);
   }).catch(err => console.error('No se pudo avanzar la cascada del área:', err));
@@ -2833,7 +2833,16 @@ async function dueloAplicarEfectoBase(d, ef){
   const t = tokens.get(d.defensor.tokenId);
   if(!t) return {manual: true, nota: 'el token ya no está: aplicalo a mano'};
   if(typeof talismanUnaVez === 'function' && !talismanUnaVez(d, ef)) return {nota: 'el talismán ya lo hizo este turno'};   // 🔮 la Cabeza reducida, el Muñeco vudú (js/53)
-  if(spec.caer && typeof zonaDueloCaer === 'function') return zonaDueloCaer(t, d);
+  if(ef.porTirada && t.tipo === 'creep' && typeof zonaDueloJefe === 'function'){   // 🛡 un jefe: ni muere ni queda con Stun (js/112)
+    const j = await zonaDueloJefe(t, ef, spec);
+    if(j){
+      try{ mesaLinea(`${nombreDe(t)} · ${j.nota}`, 'recordatorio'); }catch(e){}
+      if(!j.spec) return {nota: j.nota, sinEfecto: true};
+      const r = await dueloAplicarEfectoBase(d, {...ef, spec: j.spec, porTirada: null});
+      return {...(r || {}), nota: r && r.nota ? `${j.base} · ${r.nota}` : j.nota};
+    }
+  }
+  if(spec.caer && typeof zonaDueloCaer === 'function') return zonaDueloCaer(t, d, spec);
   if(d.hab && d.hab.zonaId && typeof zonaDueloAnotar === 'function') zonaDueloAnotar(d.hab.zonaId, d.defensor.tokenId, spec.nombre);   // ☠ la Nube tóxica (js/112): anota que ya lo envenenó   // 💨 el 20 de los Pedos Tóxicos: se desmaya (js/112)
   if(spec.nombre === 'Demora') return dueloDemora(d.defensor.tokenId, spec.stacks, (d.atacante && d.atacante.nombre) || '');   // (stacks = cuántos lugares: el Cascotazo, Demora 2)
   if(spec.nombre === 'Al final del orden') return alFinalDelOrden(d.defensor.tokenId, d.defensor.nombre, d.hab && d.hab.nombre);   // 💥 Takle (js/04)

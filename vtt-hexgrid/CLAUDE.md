@@ -1010,6 +1010,11 @@ las rodea como a un Sólido. Por un aliado se pasa, pero `rutaSoltada` no deja t
   humo) o una zona con `nubeColor` (js/50; nunca fuego). Lo engancha `escucharElementos` (js/07: el 'removed', y el 'modified' con menos casillas —
   moverla no deja fantasma) y lo dibuja js/05 (`nubesFantasmaDibujar`: las zonas debajo de los tokens, la niebla encima). El fantasma no es del juego:
   no se selecciona, no tapa la vista; solo lo que esa pantalla veía, y nada al cargar el mapa. Probado en «Claude · pruebas» desde Prueba Uno.
+- **☁ Las nubes aparecen expandiéndose** (2026-11-09, dueño: «todas las nubes que son en área… desde el centro hacia afuera»): la contracara de lo
+  anterior. Toda nube recién puesta (zona con duelo, zona con `nubeColor` —Nube tóxica, de veneno, Gas adormecedor, humo, Niebla de confusión,
+  vapor…— y la niebla `niebla: true` de la varita o la Bomba de humo) se abre desde el centro ~2,2 s con bocanadas de su color
+  (`zonaDueloVista`/`zonaDueloExpansionDibujar`, js/112; la niebla en `dibujarNieblaVarita`, js/05). Los Pedos, además: una sola tirada de Ef.Esp
+  para todos los duelos de la nube (`zonaDueloTiradaGuardada`), el 20 natural mata (`muere`) y Protección de jefe lo frena (`zonaDueloJefe`).
 - **🩸 La animación de la Transfusión** (2026-11-03, dueño: «un chorro de sangre que va de uno hacia el otro… gotitas que vayan girando… un
   líquido flotando en el espacio»): `js/92-transfusion-fx.js` + la geometría en `comun/fx-transfusion.js`. Quien hace la Transfusión (js/45, de
   jugador o de creep) publica un momento `transfusion` con `{de, a, semilla}`; cada pantalla (js/16 → `transfusionFxRecibido`) lo dibuja ~3,3 s (2026-11-03, dueño: «un poquito más lenta»; antes 2,2 s; las fases fijas se estiran con `transfusionFxEsc`)

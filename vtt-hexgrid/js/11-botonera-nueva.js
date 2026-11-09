@@ -111,7 +111,7 @@ function abrirBotoneraPrincipal(){
    FichaDuelo, FichaLupa); solo el Editar del Ver le pide el editor a la ficha, que se carga escondida recién ahí (bnAlMarco).
    Las piezas se cargan recién al usarla: con el interruptor apagado no cambia nada. */
 const BN_CLAVE = 'botonera-nueva-prueba';
-const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261105sin12', '../comun/ficha-botin.js?v=20261026zy', '../comun/generador-tiendas.js?v=20261105sin12', '../comun/filtro-catalogo.js?v=20261105sin12', '../comun/ficha-tienda.js?v=20261028x2', '../comun/ficha-mantenimiento.js?v=20261030it1', '../comun/ficha-calculo.js?v=20261109cad', '../comun/ficha-combate.js?v=20261015d', '../comun/skills-clase.js?v=20261109nube', '../comun/ficha-habilidades.js?v=20261106manos2',
+const BN_PIEZAS = ['../comun/tiradas-propias.js?v=20261009a', '../comun/ficha-stats.js?v=20261020b', '../comun/ficha-equipo.js?v=20261105sin12', '../comun/ficha-botin.js?v=20261026zy', '../comun/generador-tiendas.js?v=20261105sin12', '../comun/filtro-catalogo.js?v=20261105sin12', '../comun/ficha-tienda.js?v=20261028x2', '../comun/ficha-mantenimiento.js?v=20261030it1', '../comun/ficha-calculo.js?v=20261109cad', '../comun/ficha-combate.js?v=20261015d', '../comun/skills-clase.js?v=20261109muere', '../comun/ficha-habilidades.js?v=20261106manos2',
   '../comun/catalogo.js?v=20261109trampas', '../comun/items-subidos.js?v=20261010a', '../comun/ficha-guardado.js?v=20261029u', '../comun/ficha-sesion.js?v=20261020zu', '../comun/ficha-botonera.js?v=20261109vig', '../comun/ficha-resumen.js?v=20261109pa', '../comun/inv-calculo.js?v=20261103t2b', '../comun/inv-botonera.js?v=20261109vig', '../comun/inv-acciones.js?v=20261105c2', '../comun/inv-duelo.js?v=20261109pfhab2', '../comun/ficha-acciones.js?v=20261107milagro', '../comun/inv-habilidades.js?v=20261029z', '../comun/inv-lupa.js?v=20261015a',
   '../comun/confirmar-turno.js?v=20261011a', '../comun/ficha-duelo.js?v=20261109pfhab2', '../comun/lupa.js?v=20261030lp2', '../comun/ficha-lupa.js?v=20261109vig'];
 const BN_FUENTES = 'https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,900&display=swap';
@@ -1867,7 +1867,7 @@ function bnRerollDibujar(){
    (comun/ficha-editor.js: el mismo formulario, el paso a paso de las habilidades, el asistente de ítems, la trampa y la Ejecución ✨),
    adentro del recuadro de la Botonera nueva (#bn-editor). Guardar pasa por bnUi (las partes que cambiaron y el resumen). Los estados de
    la lista (para "estado al usar" y para la Ejecución) se eligen con el selector común (comun/selector-estados.js). */
-const ED_PIEZAS = ['../comun/ficha-editor.js?v=20261109rgiro', '../comun/asistente-item.js?v=20261105sin12', '../comun/asistente-duelo-hab.js?v=20261109rgiro'];
+const ED_PIEZAS = ['../comun/ficha-editor.js?v=20261109rgiro', '../comun/asistente-item.js?v=20261105sin12', '../comun/asistente-duelo-hab.js?v=20261109muere'];
 let bnTipoItemResolver = null;
 // op.comoGM: el GM sin el control (el ⚙ de un estado del HUD, como hacía la ficha con "Editar como GM"). → true si se abrió.
 async function bnEditar(key, id, op = {}){

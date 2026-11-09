@@ -883,9 +883,10 @@ const Duelo = (() => {
   const porTiradaDe = e => { const t = e && e.porTirada && typeof Combatiente !== 'undefined' && Combatiente.porTiradaNorm ? Combatiente.porTiradaNorm(e.porTirada) : []; return t.length ? t : null; };
   // Lo que sale en el dado de un efecto con tabla: funciona si alcanza algún renglón, y el estado es el de ese renglón.
   function porTiradaResolver(ef, r){
-    const fila = Combatiente.efectoPorTirada(ef.porTirada, r.dado);
+    // 🎲 El dado del cuadro es el natural (ningún bono lo toca): el renglón «20 natural» de los Pedos (dueño, 2026-11-09) mira solo ese.
+    const fila = Combatiente.efectoPorTirada(ef.porTirada, r.dado, r.dado);
     r.exito = !!fila;
-    if(fila){ ef.spec = fila.caer ? {nombre: 'Desmayo', caer: true} : {...fila.estado}; r.txt = String(Combatiente.porTiradaFilaTxt(fila)).slice(0, 60); }
+    if(fila){ ef.spec = fila.muere ? {nombre: 'Muerte', caer: true, muere: true} : fila.caer ? {nombre: 'Desmayo', caer: true} : {...fila.estado}; r.txt = String((fila.natural ? `${r.dado} natural: ` : '') + Combatiente.porTiradaFilaTxt(fila)).slice(0, 60); }
   }
   function limpiarEfectos(lista){
     return (Array.isArray(lista) ? lista : []).slice(0, 8).map(e => ({
@@ -2512,6 +2513,13 @@ const Duelo = (() => {
     const desarma = fase === 'bloqueo' && d.ataque && d.ataque.desarme && d.ataque.desarme.lado === ladoN;   // 🤺 esta tirada vale como Desarmar
     const etiqueta = campo === 'eva' ? nombreDefensa(d) : (campo === 'pdg' && d.hab) ? etqTira(d) : desarma ? `🤺 Desarmar (${ETIQ[campo]})` : ETIQ[campo];
     const parCompleto = !!(tiro && d[otro]);
+    // 💨 Una zona con duelo por token (los Pedos, la Nube tóxica; dueño, 2026-11-09: «la tirada debe ser la misma para todos. Tira Ef.Esp una sola
+    // vez»): quien la creó tira una vez y ese valor vale en el duelo de cada uno (y en los de quien entra después o sigue adentro). Se ve a la vista.
+    const unaParaTodos = campo === 'pdg' && tiro && d.grupo && d.hab && d.hab.zonaId;
+    if(unaParaTodos){
+      const linea = `${etqTira(d)} de ${lado.nombre}: ${_fmt(tiro.total)} (una tirada para todos)`;
+      return `<div class="duelo-tiro${esNuevo && parCompleto ? ' nuevo' : ''}"><div class="que">${_esc(linea)}</div><div class="num">${_fmt(tiro.total)}</div><div class="det">${_esc(tiro.formula || '')}${tiro.rolls && tiro.rolls.length ? ' → ' + tiro.rolls.join(' + ') : ''}</div></div>`;
+    }
     if(parCompleto) return numerosHtml(tiro, esNuevo, etiqueta, lado.nombre);
     if(tiro){
       // Quien tiró ve SU propia tirada mientras espera al otro (para el resto queda secreta hasta que tiren los dos).

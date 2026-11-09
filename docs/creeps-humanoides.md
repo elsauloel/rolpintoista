@@ -344,6 +344,12 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
     del Escudo de cuero mojado y del Escudo de bronce con runas del boceto (dueño, 2026-11-09: «quizás en el nivel 3 podemos pensar en algún talismán
     que le sea útil»). **La varita sigue siendo la de la ventisca**: la de la ráfaga helada se descartó porque repite la Ráfaga de viento del nivel 4.
     Pierde Defensa (de 3 a 1) al soltar el escudo; lo compensa el escudo de 3 del orbe en cada hechizo que pega.
+  - **Nivel 4 aprobado y cargado** (dueño, 2026-11-09: «va con kevlar»): Esp 17 · Con 10 · Agi 6 · Des 7 · Fue 2, vida 55 (50 + 5 del chaleco), 6 No2,
+    **SP 51** (+8 por turno), PdG.Esp 17, Ef.Esp 18, **Def 4 (6 contra armas a distancia)**, Def.Esp 1, Eva 7, Res.Esp 11, Res.Mt 17. Suma **Ráfaga de
+    viento** (2 No2, 3 SP: cono de 16, PdG.Esp contra la Evasión de cada rival; 1d6 arcano, lo empuja 3 y queda Sentado; sin fuego amigo) y la pasiva
+    **Temple mágico** (+1 Res.Esp). **El torso Bueno es el Chaleco de kevlar** (Def +3, +2 contra armas a distancia, Vida +5, Res. crít. T4 +1, Res.
+    fuego +1) en lugar de la Túnica del archivista del boceto, por la regla del dueño de que a los magos se los protege contra el rango; sale la
+    Capa de viajero.
   - **Atributos del boceto, rehechos** (Esp/Con/Agi/Des/Fue → vida, con la capa): nv1 12/8/5/6/2 → 45 · nv2 14/9/5/6/2 → 50 · nv3 16/9/6/6/2 → 50 ·
     nv4 17/10/6/7/2 → 55 · nv5 19/10/7/7/2 → 55 (el Especial sube más desde el nivel 2).
   - **Boceto nivel por nivel** (dueño, 2026-11-03: «me cierra»): nv2 Parpadeo + pasiva Potencia especial; + Polainas de cuero remendado y Botas de

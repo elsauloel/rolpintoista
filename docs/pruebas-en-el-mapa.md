@@ -2326,3 +2326,37 @@ Probado por Claude con clics en «Claude · pruebas», «Encuentro 2» (GM, J1, 
   creep que lee la transacción (antes, del que se tenía al apretar, que todavía no tenía la devolución). Probado: 6/39 → apretar → 5/37 → apretar
   otra vez → 5/37 → Esc → 6/39 «se le devolvió 2 SP y 1 No2». Lo mismo en la Botonera de un personaje.
 - Las 826 pruebas automáticas pasan. Capturas `cola-12-*` en el scratchpad.
+
+## 🦘 Cola de pruebas · 15 (y 18): la línea H2 · Saltador, niveles 1 a 5, y la Embestida de las Grebas del carnero (2026-11-09, Claude, «Claude · pruebas» / «Encuentro 2», GM + J1 + J2 con clics; restaurado y comparado con el respaldo: idéntico)
+
+- **Cómo:** GM Tools → «+ Creep» → ⭐ Pool esencial → Saltador Lv 1 a 5 → «Crear token»; renombrados Saltador 1–5. Números en el mapa = prueba de
+  niveles: vida 45/50/55/75/80, No2 6/7/7/8/8, PdG 7/8/9/9/10, Daño 9/9/10/11/12, Def 4/7/7/9/9, Res.CC 9/11/12/14/15; habilidades en el orden
+  nuevo (nv1 Salto y Pegar fuerte, nv2 Pisotón, nv3 Aguante, nv4 Dash, nv5 Barrido).
+- **Salto atacando** (nv1 → Rockardo): pinta 34 casillas (las pegadas a un rival, más fuertes); clic en una pegada a Rockardo → «¿Atacar? (con el
+  bono del salto)» → «Sí, atacar» → la declaración dice «+1 PdG · Crítico frecuente +1» y el rango del crítico lo toma; el hacha tiró su Rompe armadura.
+- **Salto sin atacar, para salir** (nv1, pegado a Rockardo, a una casilla libre lejos de todos): No2 6 → 2 al apretar (lo de un ataque, 4) → al caer
+  sin rival pegado: «🦘 Saltador 1 saltó y no atacó — el salto le costó 1 No2 (se le devolvieron 3 del ataque); el cooldown o el SP quedan cobrados»
+  → **5**; cooldown 3. Rockardo no tuvo ataque de oportunidad.
+- **Pisotón** (nv2, pegado a Larry y Bizzante; «sin costo», Flash): un duelo por rival. Larry (J1, desde su pantalla) eligió Evasión, pagó la
+  penalidad (−3) y perdió: 5 de daño directo (34 → 29) y **Pajaritos 2 turnos**. Bizzante eligió Res.CC: empate 6 a 6, se desempató con par o impar y
+  ganó Bizzante: no le pasó nada.
+- **Aguante** (nv3): Def 7 → 9 y Def. esp. 1 → 3, −1 No2; Bizzante le pegó un crítico (55 → 37) → «golpes 1»; al empezar su turno, aguanteListo 1;
+  Pegar fuerte → cartel «Saltador está en modo aguante: recibió 1 golpe, así que Pegar fuerte suma +1d8. Cuesta +1 turno de cooldown de Aguante» →
+  «Pegar fuerte con el aguante» → la declaración dice «+2 dados de daño» (1 de la habilidad y 1 del aguante).
+- **Dash** (nv4, a dos casillas de Rockardo en línea): cobró 1 No2; el clic de la dirección → se para antes de Rockardo y abre el duelo («+2 PdG»,
+  cobra lo de un ataque, 4 No2); Rockardo esquivó y el Saltador **terminó detrás de él**, 4 casillas más allá («💨 Dash: Saltador 4 pasa de largo y
+  termina detrás de Rockardo»).
+- **Barrido** (nv5, pegado a Larry, Bizzante y Rockardo): «elegí el primer rival» → Larry → la Mesa: «🌀 Barrido — Larry → Bizzante → Rockardo»; un
+  duelo por rival con su tirada (PdG 9 contra Bizzante, 8 contra Rockardo…), su defensa (Larry y Bizzante desde las pantallas de los jugadores) y
+  los efectos del hacha en cada uno (contra Rockardo salió el Rompe armadura 33 %, el Derribar 25 % no).
+- **Coraza de primera línea** (Rockardo → Saltador 5): «22 − Defensa 9 − Defensa contra el primer golpe de la ronda 3 = 10 a la vida (80 → 70)».
+- **Poción de Cuero Duro** (nv1, «Usar · 1 No2»): «Cuero duro (poción)» y salió del cinturón.
+- **Embestida de las Grebas del carnero** (nv5; la prueba 18 de la cola):
+  - caminando 2 pasos en línea recta hasta Larry (ruta 13,27 → 12,27 → 11,26, Larry en 10,26) y «Atacar (PdG)»: la declaración dice
+    «🐂 embestida: +2 PdG» y la tirada «1d10 +2 embestida → 4 + 2»;
+  - caminando 2 en línea recta y después **Dash** hasta quedar pegado a Bizzante: embestida 0, la declaración sin el +2;
+  - caminando 2 en línea recta y después **Salto** («No, solo saltar») pegado a Bizzante: embestida 0.
+  Ya funcionaba con la regla del dueño (el Salto y el Dash mueven el token sin ruta y la Embestida mira la última ruta caminada). No hubo que tocar código.
+- Sin probar en juego: Piel curtida, Robustez, Rodela, Casco, Polainas (solo en los números).
+- En la prueba, al apretar botones de la defensa de Larry se gastó por error su 🃏 Wildcard; la restauración lo devolvió.
+- Sin errores. Capturas `cola-15-*` en el scratchpad.

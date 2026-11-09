@@ -483,7 +483,7 @@ const FichaBotonera = (() => {
             </div>
             <div class="bot-fila-btns">
               <button class="mini" data-view="habilidades:${i.id}">Ver</button>
-              <button class="ejecutar-btn${habAutomatizada(i) ? ' con-lupa' : ''}${sinNitros?" sin-recursos":sinSp?" sin-sp":""}${Combatiente.esFlash(i) ? ' bt-flash' : ''}" data-ejecutar="${i.id}" ${sinNitros?`aria-disabled="true" title="${esc(costoHabilidadFalta(S, i) || 'No te alcanzan los recursos')}"`:sinSp?'title="No te alcanza el SP: te avisa antes y la podés usar igual"':Combatiente.esFlash(i) ? 'title="⚡ Flash: se puede usar en turno ajeno (cuesta el doble)"' : ''}>${habAutomatizada(i) ? 'Ejecutar' + lupaBotonHtml(`habx:${i.id}`, "en-boton") : 'Anunciar'}</button>
+              <button class="ejecutar-btn${habAutomatizada(i) ? ' con-lupa' : ''}${sinNitros?" sin-recursos":sinSp?" sin-sp":""}${Combatiente.esFlash(i) ? ' bt-flash' : ''}" data-ejecutar="${i.id}" ${typeof TipEjecutar !== 'undefined' ? TipEjecutar.attrs(i.nombre, i.detalle || i.descripcion) : ''} ${sinNitros?`aria-disabled="true" title="${esc(costoHabilidadFalta(S, i) || 'No te alcanzan los recursos')}"`:sinSp?'title="No te alcanza el SP: te avisa antes y la podés usar igual"':Combatiente.esFlash(i) ? 'title="⚡ Flash: se puede usar en turno ajeno (cuesta el doble)"' : ''}>${habAutomatizada(i) ? 'Ejecutar' + lupaBotonHtml(`habx:${i.id}`, "en-boton") : 'Anunciar'}</button>
               ${botonSegundaHab(i)}
             </div>
           </div>`;

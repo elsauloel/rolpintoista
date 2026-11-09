@@ -94,7 +94,7 @@ const InvBotonera = (() => {
         </div>
         <div class="bot-fila-btns">
           <button type="button" class="mini" data-verhabinv="${inv.id}:${h.id}">Ver</button>
-          <button type="button" class="ejecutar-btn con-lupa${bloqueo?' sin-recursos':''}${Combatiente.esFlash(h) ? ' bt-flash' : ''}" data-ejecutarhabinv="${inv.id}:${h.id}" ${bloqueo?`aria-disabled="true" title="${esc(bloqueo)}"`:''}>${FichaBotonera.modoHab(h) === 'manual' ? 'Anunciar' : 'Ejecutar'}${lupaBotonHtml(`inv:${inv.id}:hab:${h.id}`, 'en-boton')}</button>
+          <button type="button" class="ejecutar-btn con-lupa${bloqueo?' sin-recursos':''}${Combatiente.esFlash(h) ? ' bt-flash' : ''}" data-ejecutarhabinv="${inv.id}:${h.id}" ${typeof TipEjecutar !== 'undefined' ? TipEjecutar.attrs(h.nombre, h.detalle) : ''} ${bloqueo?`aria-disabled="true" title="${esc(bloqueo)}"`:''}>${FichaBotonera.modoHab(h) === 'manual' ? 'Anunciar' : 'Ejecutar'}${lupaBotonHtml(`inv:${inv.id}:hab:${h.id}`, 'en-boton')}</button>
           ${botonSegundaHab(inv, h)}
         </div>
       </div>`;

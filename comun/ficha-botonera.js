@@ -255,6 +255,24 @@ const FichaBotonera = (() => {
   }
 
   /* ---------- La Botonera ---------- */
+  // 📝 El texto vigente de una habilidad de personaje (2026-11-09, dueño: los Pedos Tóxicos cambiaron y la copia de Larry seguía con el texto viejo
+  // en el globo de «Ejecutar» y en «Ver»). Una copia que vino del pool (`habClaseId`) ya se pone al día sola (FichaGuardado.migrarHabsDeClase). Las
+  // copias hechas a mano que el juego reconoce POR EL NOMBRE para su comportamiento (Combatiente.zonaDeHab) muestran también el texto del pool, para
+  // que lo que se lee coincida con lo que hace. Solo las de esta lista: el resto de lo escrito a mano se respeta tal cual.
+  const HAB_POR_NOMBRE = [{re: /^pedos t[oó]xicos$/i, id: 'custom-pedos-toxicos'}];
+  function habDelPool(id){
+    const pools = [...(typeof CLASES_SKILLS !== 'undefined' ? CLASES_SKILLS.flatMap(c => (c && c.habilidades) || []) : []),
+      ...(typeof SKILLS_CUSTOM !== 'undefined' ? SKILLS_CUSTOM : [])];
+    return pools.find(b => b && b.id === id) || null;
+  }
+  function detalleVigente(h){
+    if(!h) return '';
+    const propio = h.detalle || h.descripcion || '';
+    if(h.habClaseId) return propio;
+    const m = HAB_POR_NOMBRE.find(x => x.re.test(String(h.nombre || '').trim()));
+    const b = m ? habDelPool(m.id) : null;
+    return b && b.detalle ? b.detalle : propio;
+  }
   function html(S, o){
     o = o || {};
     const modoMapa = o.modoMapa || 'combate';
@@ -483,7 +501,7 @@ const FichaBotonera = (() => {
             </div>
             <div class="bot-fila-btns">
               <button class="mini" data-view="habilidades:${i.id}">Ver</button>
-              <button class="ejecutar-btn${habAutomatizada(i) ? ' con-lupa' : ''}${sinNitros?" sin-recursos":sinSp?" sin-sp":""}${Combatiente.esFlash(i) ? ' bt-flash' : ''}" data-ejecutar="${i.id}" ${typeof TipEjecutar !== 'undefined' ? TipEjecutar.attrs(i.nombre, i.detalle || i.descripcion) : ''} ${sinNitros?`aria-disabled="true" title="${esc(costoHabilidadFalta(S, i) || 'No te alcanzan los recursos')}"`:sinSp?'title="No te alcanza el SP: te avisa antes y la podés usar igual"':Combatiente.esFlash(i) ? 'title="⚡ Flash: se puede usar en turno ajeno (cuesta el doble)"' : ''}>${habAutomatizada(i) ? 'Ejecutar' + lupaBotonHtml(`habx:${i.id}`, "en-boton") : 'Anunciar'}</button>
+              <button class="ejecutar-btn${habAutomatizada(i) ? ' con-lupa' : ''}${sinNitros?" sin-recursos":sinSp?" sin-sp":""}${Combatiente.esFlash(i) ? ' bt-flash' : ''}" data-ejecutar="${i.id}" ${typeof TipEjecutar !== 'undefined' ? TipEjecutar.attrs(i.nombre, detalleVigente(i)) : ''} ${sinNitros?`aria-disabled="true" title="${esc(costoHabilidadFalta(S, i) || 'No te alcanzan los recursos')}"`:sinSp?'title="No te alcanza el SP: te avisa antes y la podés usar igual"':Combatiente.esFlash(i) ? 'title="⚡ Flash: se puede usar en turno ajeno (cuesta el doble)"' : ''}>${habAutomatizada(i) ? 'Ejecutar' + lupaBotonHtml(`habx:${i.id}`, "en-boton") : 'Anunciar'}</button>
               ${botonSegundaHab(i)}
             </div>
           </div>`;
@@ -511,7 +529,7 @@ const FichaBotonera = (() => {
     return {html, nitros: badgeNitros, sp: badgeSp, def: badgeDef};
   }
 
-  return {STATS_CON_TIRADA_IDS, TIPOS_IDS, PERCEPCION_DADO_SUBE, sinSpPara, spLibre, html, tiradaStat, tiradaPercepcion, tiradaPercepcionValor,
+  return {detalleVigente, HAB_POR_NOMBRE, STATS_CON_TIRADA_IDS, TIPOS_IDS, PERCEPCION_DADO_SUBE, sinSpPara, spLibre, html, tiradaStat, tiradaPercepcion, tiradaPercepcionValor,
     spMaximo, nitrosMaximo, tienePercepcionAumentada, tieneSigilo, efectoSigilo, efectoSentado,
     statsConTirada, habStatTirable, habTieneSegundaTirada, botonSegundaHab, dueloDe, modoHab, habAutomatizada,
     armasParaHabilidad, costoAtaqueMinimo, costoAtaqueHabTxt, costoNitrosHab, sinNitrosPara, costoHabilidadTxt, costoHabilidadHtml, costoHabilidadFalta,

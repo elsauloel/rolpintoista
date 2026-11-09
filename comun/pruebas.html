@@ -7680,6 +7680,14 @@ prueba('sin repetidos, ordenado, y «Fuera de la vista» al final', () => {
   const d = HexInfo.armar({items: [aura, ...HexInfo.describir({fuego: true}), aura], recordada: true});
   igual(d.items.map(x => x.icono), ['🔥', '🚩', '👁']);
 });
+prueba('📝 Texto vigente: una copia a mano de los Pedos Tóxicos muestra el texto del pool; lo demás, lo suyo (2026-11-09)', () => {
+  const pool = SKILLS_CUSTOM.find(b => b.id === 'custom-pedos-toxicos');
+  const vieja = {nombre: 'Pedos Tóxicos', detalle: 'Marcás un punto en el mapa y aparece una nube tóxica…'};
+  const otra = {nombre: 'Mi pedo propio', detalle: 'lo escribí yo'};
+  const deClase = {nombre: 'Pedos Tóxicos', habClaseId: 'custom-pedos-toxicos', detalle: 'copia del pool'};
+  igual([FichaBotonera.detalleVigente(vieja) === pool.detalle, /centrada en vos/.test(FichaBotonera.detalleVigente(vieja)),
+    FichaBotonera.detalleVigente(otra), FichaBotonera.detalleVigente(deClase)], [true, true, 'lo escribí yo', 'copia del pool']);
+});
 prueba('zonaEstado roto no rompe', () => {
   igual(HexInfo.describir({zona: true, zonaEstado: '{roto'})[0].titulo, 'Zona · efecto persistente');
   igual(HexInfo.describir(null), []);

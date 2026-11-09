@@ -147,6 +147,8 @@ function escucharTokens(){
         estelas.set(ch.doc.id, {celdas, hasta: Date.now() + ESTELA_MS});
         if(typeof contarCasilleros === 'function') contarCasilleros(ch.doc.id, celdas.length - 1);   // lo que se movió (Contra el que corre, js/35)
       }
+      // 👻 Cambió de casilla sin camino nuevo (el Salto, el Dash, un empujón, el Mover libre): corta la cadena de pasos seguidos del Paso fantasma (js/07).
+      else if(ch.type === 'modified' && previo && (previo.col !== Math.round(num(d.col)) || previo.fila !== Math.round(num(d.fila))) && typeof pasoFantasmaCortar === 'function') pasoFantasmaCortar(ch.doc.id);
       // 💧 Pasos en el agua (js/50): las ondas por donde pasó (con ruta, el camino; si no, la casilla nueva).
       if(ch.type === 'modified' && previo && typeof aguaPasos === 'function' && (previo.col !== Math.round(num(d.col)) || previo.fila !== Math.round(num(d.fila)))){
         const nueva = {col: Math.round(num(d.col)), fila: Math.round(num(d.fila))};

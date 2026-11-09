@@ -224,8 +224,13 @@ manda su ruta al token (`carreraRuta`, vtt-hexgrid/js/55-carrera.js), como al ca
 
 **Una vez por ronda (dueño, 2026-11-09):** «siempre que dé tres pasos consecutivos, obtiene +3 a la evasión para su siguiente tirada. Esto se activa
 una vez por ronda… si empieza su turno con este +3 activo… se desactiva… es una ronda completa desde su turno hasta su siguiente turno».
-- **Pasos consecutivos** = 3 casilleros o más en **un mismo movimiento** (una sola ruta: caminar hasta un destino, la Carga o el Takle). Dos
-  movimientos cortos seguidos (2 y después 1) no suman.
+- **Pasos consecutivos** (corregido por el dueño, 2026-11-09: «si da 1 paso y después 2, pero sin hacer otra acción en el medio, sí suma el bono»)
+  = 3 casilleros o más caminados (o corridos con la Carga o el Takle) **sin otra acción en el medio**, aunque sean varios movimientos: 1 + 2 suman 3.
+  La cuenta se corta con cualquier otra acción suya: una tirada suya en la Mesa (atacar, una habilidad, Parry, Bloqueo, consumir, el daño…; su
+  **Evasión no corta**: esquivar no es elegir hacer algo) y con un cambio de casilla sin camino (el Salto, el Dash, un empujón, el Mover libre del
+  GM). El **Salto y el Dash** no suman y además **cortan** la cuenta, porque son una acción. Código: `cadena` en `pasoFantasmaDe`,
+  `pasoFantasmaCortar` (js/07, desde `mesaAlAccionNueva`) y el listener de los tokens (js/09). La tirada se reconoce por el nombre de quien tira
+  (`quien`): dos tokens con el mismo nombre cortan juntos.
 - Se activa **una sola vez por ventana**: desde que empieza su turno hasta que empieza el siguiente (con orden de turnos; sin orden, el Mantenimiento).
   Si en esa ventana ya se activó (aunque lo haya gastado), otro movimiento largo no lo vuelve a dar.
 - Si empieza su turno sin haberlo usado, se vence.

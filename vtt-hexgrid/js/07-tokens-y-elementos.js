@@ -1109,8 +1109,11 @@ const rondaDeCasilleros = () => (iniciativa.orden || []).length ? 'i' + Math.rou
 const rondaAnterior = r => r[0] + (Number(r.slice(1)) - 1);
 /* 👻 Paso fantasma (anillo; dueño, 2026-11-09: «una vez por ronda… siempre que dé tres pasos consecutivos, obtiene +3 a la evasión para su siguiente
    tirada… si empieza su turno con este +3 activo, se desactiva… es una ronda completa desde su turno hasta su siguiente turno»).
-   - Pasos consecutivos = 3 casillas o más en UN mismo movimiento (una ruta: caminar, la Carga o el Takle; el Salto y el Dash no dejan ruta y no cuentan).
-     Dos movimientos cortos (2 y después 1) no suman.
+   - Pasos consecutivos (dueño, 2026-11-09: «si da 1 paso y después 2, pero sin hacer otra acción en el medio, sí suma el bono») = 3 casillas o más
+     caminadas (o corridas con la Carga o el Takle) sin otra acción en el medio, aunque sean varios movimientos: 1 + 2 suman 3. La cuenta (`cadena`) se
+     corta con cualquier otra acción suya (una tirada suya en la Mesa: atacar, una habilidad, Parry, Bloqueo, consumir…; su Evasión no, porque esquivar
+     no es elegir hacer algo) y con un desplazamiento sin camino (el Salto, el Dash, un empujón, el Mover libre del GM): el Salto y el Dash no suman y
+     además cortan la cadena, porque son una acción.
    - Se activa una sola vez por «ventana»: desde que empieza su turno hasta que empieza el siguiente (con orden de turnos; sin orden, el Mantenimiento).
    - El bono sirve para su próxima tirada de Evasión; si no lo usó y empieza su turno, se vence. No se acumula (moverse 6 da lo mismo).
    La ventana se deduce del orden de turnos, que ven todas las pantallas: su turno ya empezó en esta ronda si está en `actuaron` o `empezados`, o si es
@@ -1126,14 +1129,18 @@ function pasoFantasmaVentana(id){
 function pasoFantasmaDe(id){
   const v = pasoFantasmaVentana(id);
   let e = pasoFantasmaEstado.get(id);
-  if(!e || e.v !== v){ e = {v, listo: false, disparado: false}; pasoFantasmaEstado.set(id, e); }   // empezó su turno: lo que no usó se vence
+  if(!e || e.v !== v){ e = {v, listo: false, disparado: false, cadena: 0}; pasoFantasmaEstado.set(id, e); }   // empezó su turno: lo que no usó se vence
   return e;
 }
 function pasoFantasmaMovio(id, pasos){
   const e = pasoFantasmaDe(id);
-  if(e.disparado || !(pasos >= 3)) return;
+  e.cadena = num(e.cadena) + pasos;   // los pasos seguidos, aunque vengan de varios movimientos
+  if(e.disparado || !(e.cadena >= 3)) return;
   e.listo = true; e.disparado = true;
 }
+// Otra acción del token (o un desplazamiento sin camino): se corta la cadena de pasos seguidos (lo ya ganado, `listo`, no se toca).
+function pasoFantasmaCortar(id){ const e = pasoFantasmaEstado.get(id); if(e) e.cadena = 0; }
+window.mapaPasoFantasmaCortar = pasoFantasmaCortar;
 window.mapaPasoFantasma = id => pasoFantasmaDe(id).listo;
 window.mapaPasoFantasmaGastar = id => { pasoFantasmaDe(id).listo = false; };
 function contarCasilleros(id, pasos){
@@ -1215,7 +1222,14 @@ function cerrarGirosLibres(exceptoId){
 // Llega una tirada nueva a la Mesa (comun/mesa.js): un ataque, una habilidad, una tirada
 // cualquiera cuenta como acción; los avisos del sistema (sigilo, alerta, turno) no.
 function mesaAlAccionNueva(docs){
-  if(docs.some(d => !['recordatorio', 'alerta', 'alerta-roja', 'mantenimiento', 'reporte'].includes(d.data().desde))) giroLibre.clear();
+  const sistema = ['recordatorio', 'alerta', 'alerta-roja', 'mantenimiento', 'reporte'];
+  if(docs.some(d => !sistema.includes(d.data().desde))) giroLibre.clear();
+  // 👻 Paso fantasma: una tirada suya que no sea su Evasión es otra acción: se corta su cadena de pasos seguidos.
+  docs.forEach(d => {
+    const x = d.data() || {};
+    if(sistema.includes(x.desde) || !x.quien || /evasi/i.test(String(x.origen || ''))) return;
+    tokens.forEach((t, id) => { if(nombreDe(t) === x.quien || t.nombre === x.quien) pasoFantasmaCortar(id); });
+  });
 }
 function abrirGiroLibre(id, celdas){
   // Desde 2026-09-24 girar no cuesta No2 (COSTO_GIRO_NO2 = 0): ya no hace falta abrir un "giro gratis" después de moverse.

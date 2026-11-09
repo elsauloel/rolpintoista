@@ -16,6 +16,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
     sin bonos de crítico.
 
 Cada línea nueva que se termine de diseñar se suma al final.
+25. [ ] **Paso Fantasma: pasos seguidos aunque sean en varios movimientos (1 + 2), se corta con otra acción** (2026-11-09): 1 paso, después 2 sin hacer nada en el medio → +3; 1 paso, atacar o una habilidad, 2 pasos → nada; un Salto o un Dash en el medio también corta.
 
 ## Hechas
 

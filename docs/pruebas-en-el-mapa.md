@@ -2195,3 +2195,37 @@ Probado por Claude con clics en «Claude · pruebas», «Encuentro 2» (GM, J1, 
 - Capturas: `cola-10-0-en-el-mapa`, `cola-10-1-lengua-de-fuego`, `cola-10-2-muro-de-fuego`, `cola-10-2-muro-cruza`, `cola-10-3-parpadeo`,
   `cola-10-4-bola-espejo`, `cola-10-4b-diablito`, `cola-10-5a-lava`, `cola-10-6a-rodillo`, `cola-10-6-escudo-elemental`, `cola-10-7a-meteoro-sombra`,
   `cola-10-7b-meteoro-cae`, `cola-10-7-meteoro`, `cola-10-8-kevlar`, `cola-10-9-pocion-sp`.
+
+## 💚 Cola de pruebas · 11: la línea S1 · Sanador, niveles 1 a 5 (2026-11-09, Claude, «Claude · pruebas» / «Encuentro 2», GM + J1 + J2 con clics; restaurado y comparado con el respaldo: idéntico)
+
+- **Armado, como el GM:** GM Tools → «Encuentro 2» → «+ Creep» → ⭐ Pool esencial → «Agregar» Sanador Lv 1 a Lv 5 → «Crear token»; renombrados
+  Sanador 1 a 5 (en el creep público y en el token) y puestos a 2 casillas del Capataz del culto (aliado); el Capataz y algunos Sanadores, heridos.
+- **Números en el mapa = la prueba de niveles** (vida/No2/SP máx/recarga/Def/Def.Esp/PdG.Esp/Eva/Ini): nv1 45/6/36/6/2/5/12/6/6 · nv2 50/7/39/6/3/5/13/7/7 ·
+  nv3 55/7/45/7/2/4/15/8/7 · nv4 60/8/48/8/4/2/16/9/8 · nv5 65/8/59/9/5/1/18/9/8. Todos en modo SP; Oleada sanadora y Círculo arrancan en cooldown (4).
+- **Sanar** (nv1, sin Manos de curandero → Capataz): «Cura 1d6+4: [5] = 9», 30 → 39. **Con Manos** (nv2): «Aplicar Curación de 9 + 5 HP (Manos de
+  curandero)», 39 → 53.
+- **Purificar** (nv2, Flash): dos efectos en el duelo, «Purga» (le sacó el Veneno) y «Curación de 5 + 5 HP (Manos de curandero)», 53 → 63. Fuera del
+  orden de turnos no cobró el doble.
+- **Oleada sanadora** (nv2, centro en el Sanador 3): una sola tirada (1d6+4 = 10) y un duelo por cada aliado adentro, cada uno «10 + 2 HP (Manos de
+  curandero)» (Sanador 4, 3 y 5: +12 cada uno). El Sanador 2 quedó afuera de la flor (no se curó: está bien).
+- **Varita de cura** (nv1): 1d10 (salió 2). **Varita de cura mayor** (nv3): «2d8: [5, 7] = 12» + 5 de Manos = 17 (42 → 59); 1 No2 y 3 SP.
+- **Smite** (nv3 → Rockardo): Ef.Esp 13 contra Res.Esp 1, «2d4 → 5 de daño directo: no lo frena la Defensa ni la Defensa especial» (40 → 35),
+  «☀ Luz sanadora (50 %): Sanador 3 se cura 2» y Rockardo quedó Marcado 1 turno.
+- **Cambio de guardia** (nv4): «el primero» (Capataz) → «el segundo» (Goblin rompehuesos), el aviso «cambian de lugar al empezar la próxima ronda»;
+  al pasar la ronda con «▶ Siguiente», el orden quedó Capataz 6.º y Goblin 7.º (antes 7.º y 6.º).
+- **Círculo de sanación** (nv5): «elegí dónde cae» → la zona (diámetro 5, 4 turnos); al ponerla +6 (4 + 2 de Manos) a los cinco aliados de adentro;
+  como el Sanador 5 no está en el orden de turnos, el segundo pulso fue en el Mantenimiento de la ronda siguiente: otra vez +6 a cada uno.
+- **Pergamino de Regeneración menor** (el consumible): «Regeneración menor (pergamino), 3 turnos» al que lo usa (+5 enseguida; con Manos de
+  curandero, el Sanador 3, +7) y el aviso a cada creep aliado del orden de turnos (los Sanadores, fuera del orden, no: lo dice el toast).
+- **🐞 Arreglado: los avisos del pergamino a los creeps aliados.** Llegan todos juntos a la pantalla del GM y el cartel muestra uno solo: cada uno
+  nuevo sacaba al anterior sin cerrarlo y de seis se veía solo el último (los otros cinco quedaban «esperando» en la Crónica, sin cartel; en la prueba
+  del Hachero no se vio porque no había orden de turnos). Ahora van en fila (`vtt-hexgrid/js/25-anillos.js`, pergaminoGrupalMomento): se aplicaron
+  los seis, uno detrás del otro.
+- **Sin probar en juego:** el Chaleco de kevlar (ya probado con el Piromante), los Escarpines, el Orbe de la reserva, los Guantes y el Casco: solo por
+  los números. No volvieron a aparecer los carteles sueltos de la ficha en la pantalla de J1 (lo que se vio una vez en la prueba 10).
+- **De la prueba, no del juego:** al mover los tokens con el código para armar la prueba salió «Pasos a tu espalda» (Rockardo oye a un Sanador):
+  es el aviso de siempre al pasar por la espalda. En el mapa quedó el Mazo del juez en el piso, de una prueba anterior (no es un token ni está en el
+  respaldo); se dejó como estaba. Se borró la zona del Círculo de sanación.
+- Capturas: `cola-11-0-en-el-mapa`, `cola-11-1-sanar-manos`, `cola-11-2-purificar`, `cola-11-3-oleada`, `cola-11-4-varita-mayor-manos`,
+  `cola-11-5-smite`, `cola-11-6-cambio-de-guardia`, `cola-11-6b-orden-nuevo`, `cola-11-7-circulo`, `cola-11-8-pergamino-aviso`.
+

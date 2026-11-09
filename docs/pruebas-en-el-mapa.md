@@ -2230,6 +2230,43 @@ Probado por Claude con clics en «Claude · pruebas», «Encuentro 2» (GM, J1, 
   `cola-11-5-smite`, `cola-11-6-cambio-de-guardia`, `cola-11-6b-orden-nuevo`, `cola-11-7-circulo`, `cola-11-8-pergamino-aviso`.
 
 
+## 🛡 Cola de pruebas · 14: la línea T2 · Muralla con púas, niveles 1 a 5 (2026-11-09, Claude, «Claude · pruebas» / «Encuentro 2», GM + J1 + J2 con clics; restaurado y comparado con el respaldo: idéntico)
+
+- **Cómo:** GM Tools → «+ Creep» → ⭐ Pool esencial → Muralla con púas Lv 1 a 5 → «Crear token»; renombradas Muralla 1–5, pegadas a Rockardo,
+  Larry y Bizzante. Para el Velo espejado se sumó un Piromante nv3 del pool (el que tira). Números en el mapa = prueba de niveles: vida
+  60/65/70/90/95, No2 5/6/6/7/7, Def 5/8/8/8/8, Def. esp. 0/1/1/4/4, PdG 6/6/8/9/10, PdG.Esp 3/3/4/4/4, Eva 4/5/6/7/7, Res.CC 12–16, Res.Mt 3/3/4/4/4.
+- **Coraza de púas** (nv1 sobre sí): Espinas 3 turnos. Rockardo (Mazo, 25) → Muralla 1: 40 → 33, **1/4 para arriba = 7**. También sobre un
+  aliado (nv2 → Muralla 4): Espinas 3 turnos en la 4.
+- **Escudo humano** (nv5 → Muralla 4, con la Coraza de púas puesta en la 5): «Escudo humano 2 turnos» y el escudo de 5. Rockardo le metió un
+  crítico ×2 de 48 a la Muralla 4: **24 a la 4** (79 → 55) y **24 a la 5** (5 del escudo + 19: 95 → 76). **Rockardo no recibió Espinas** (33 → 33).
+- **Velo espejado** (nv2 sobre sí): Espejo 3 turnos. Lengua de fuego del Piromante (8, a uno solo): 6 a la vida y **🪞 Espejo: Piromante recibe
+  2** (50 → 48). Con el Espejo puesto en Larry (Velo de la Muralla 3), la **Bola de fuego** (área) le bajó 10 a Larry y **el Piromante no recibió nada**.
+- **Provocar** (nv3, PdG.Esp 4 + nivel 3 = 1d6+1 contra la Res.Mt): la primera vez Bizzante lo resistió (5 contra 6); la segunda, «Provocado (2
+  turnos)» en Bizzante y la Muralla **Desafiante** (+2 Defensa y +2 Def. esp.: Defensa 8 → 10 en el golpe siguiente).
+- **Blindaje** (nv4, Flash): «Barrera (2 turnos, 🛡12)». Un crítico de Rockardo de 44: «Crítico: no se resta la Defensa · − Barrera (escudo) 12 =
+  32 a la vida» (55 → 23). (Con una varita de granizo que la Defensa frenaba entera, la Barrera no se gastó: bien.)
+- **Aguante** (nv1): +2 Defensa y +2 Def. esp. (5 → 7, 0 → 2); un golpe de Rockardo contado; al empezar su turno «aguanteListo 1»; Atacar → cartel
+  «Modo aguante: … suma +1d8. Cuesta +1 turno de cooldown» → el ataque salió **1d8+1d8+7**. Se tiró el **Derribar 25 %** del hacha (no salió).
+- **Mantelete de asedio** (nv5, varita de granizo de Larry desde la pantalla del J1, área en 10,28): «− Defensa 8 − **Defensa contra armas a
+  distancia 4** = la Defensa lo frena entero». Cuerpo a cuerpo (Rockardo → Muralla 4) solo resta la Defensa 8.
+- **Bloqueo por pieza** (Bizzante → Muralla 3, Provocado): la defensa ofrece «Parry · Hacha con garfio … si gana, Bloqueo 1d8+1» y «Parry ·
+  Mantelete de asedio … si gana, Bloqueo 1d12»; con el Mantelete ganó el Parry y bloqueó con 1d12.
+- **Poción de Cuero Duro** (nv2): «Cuero duro (poción)», escudo de 15 solo contra el daño físico; salió del cinturón (−1 No2).
+- **Arreglo 1 · los carteles sueltos de la Botonera** (los «carteles de la ficha sin formato» que se vieron una vez en la prueba 10): cuando el duelo
+  le pide algo a un personaje cuya Botonera no está abierta (acá, «Tenés sobrepeso» al elegir la Evasión de Larry y de Bizzante), el recuadro se
+  mostraba **sin su estilo** y con **todos** sus carteles a la vista (Tienda, Vender, Reparación, Batalla terminada, Comparar, Sin Nitros…), y el
+  que había que contestar quedaba perdido entre ellos. Ahora se pone el estilo, se muestra **solo ese cartel** y, al cerrarse, el recuadro se
+  vuelve a esconder (`bnAbrirCartel`, `bnPonerCss`, `bnSoloCartel` en `vtt-hexgrid/js/11-botonera-nueva.js`). Captura `cola-14-4-sobrepeso-arreglado`.
+- **Arreglo 2 · una elección pisada sin devolver:** con una habilidad de un creep esperando su objetivo (Provocar de la Muralla 4: −1 No2 y cooldown
+  2), si se empezaba otra elección —el GM apretaba Atacar con Rockardo— la primera se perdía **sin devolver lo cobrado**. Ahora `elegirDestino`
+  (`vtt-hexgrid/js/02-modo-niebla-sigilo.js`) cancela la anterior como con Esc: «Muralla con púas canceló Provocar — se le devolvió el cooldown y
+  1 No2» (no2 7 → 6 → 7, cooldown 2 → 0).
+- **Para mirar (no se tocó):** un escudo ya gastado (el de 5 del Escudo humano, la Barrera del Blindaje) queda en la lista de estados con 0 hasta
+  que se le terminan los turnos. El nombre de la Muralla en el duelo sale «Muralla con púas» aunque el token se renombró (es cómo se armó la prueba).
+- Sin probar en juego: el Derribar 33 % del Hacha de abordaje (nv5) y la Robustez (solo en los números).
+- Capturas: `cola-14-1-espinas-golpe`, `cola-14-2-escudo-humano`, `cola-14-3-velo-espejado`, `cola-14-4-sobrepeso-arreglado`, `cola-14-5-provocar`,
+  `cola-14-6-blindaje`, `cola-14-7-aguante`, `cola-14-8-aguante-golpe`, `cola-14-9-bloqueo-escudo`, `cola-14-10-pocion`.
+
 ## 🪓 Cola de pruebas · 13: la línea W2 · Berserker, niveles 1 a 5 (2026-11-09, Claude, «Claude · pruebas» / «Encuentro 2», GM + J1 + J2 con clics; restaurado y comparado con el respaldo: idéntico)
 
 - **Cómo:** GM Tools → «+ Creep» → ⭐ Pool esencial → Berserker Lv 1 a 5 → «Crear token»; renombrados Berserker 1–5, pegados a Rockardo, Larry y

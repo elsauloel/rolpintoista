@@ -1952,7 +1952,7 @@ const Combatiente = (() => {
       // defiende con la Evasión y la gana tiene que salir con el dodge roll; con la resistencia, ganarla alcanza.
       ...((c.objetivo === 'onda' || c.objetivo === 'cono') && c.dodgeConEva ? {dodgeConEva: true} : {}),
       ...(c.objetivo === 'area' && c.sinDodge ? {sinDodge: true} : {}),   // un área que no se esquiva corriendo (la Luz cegadora, 2026-10-20: un destello se resiste, no se esquiva)   // la onda o el cono que deja dodge roll (Daño en área, Ráfaga arcana)
-      ...(c.objetivo === 'aliado' && c.conmigo ? {conmigo: true} : {}),   // un aliado o uno mismo (Heal del Support, 2026-10-11)
+      ...((c.objetivo === 'aliado' || c.objetivo === 'cualquiera') && c.conmigo ? {conmigo: true} : {}),   // un aliado o uno mismo (Heal del Support, 2026-10-11; «cualquiera», el Escudo elemental, 2026-11-09)
       ...(c.objetivo === 'cualquiera' && c.aliadoDirecto ? {aliadoDirecto: true} : {}),   // 🐈‍⬛ a un aliado le entra sin tirar (Echar la mufa, 2026-11-05)
       ...(c.objetivo === 'enemigo' && nf(c.salto) > 0 ? {saltoHab: Math.min(5, Math.round(nf(c.salto))), ...(c.corre ? {corre: true} : {})} : {}),   // 💥 el Takle (2026-10-26): corre hasta quedar pegado, gratis (vtt-hexgrid/js/55)
       ...(c.objetivo === 'onda' && c.conVista ? {conVista: true} : {}),

@@ -942,7 +942,7 @@ const Duelo = (() => {
       ...((objetivo === 'onda' || objetivo === 'cono') && h.dodgeConEva ? {dodgeConEva: true} : {}),   // 🦶 el dodge roll solo si se defendió con la Evasión (el Pisotón)
       ...(objetivo === 'onda' && h.conVista ? {conVista: true} : {}),
       ...(objetivo === 'onda' && h.giro ? {giro: true} : {}),   // 🌀 el Barrido: un giro con el arma, sí devuelve Espinas (dueño, 2026-11-08)   // la luz: solo a los que ve (los sólidos la tapan)
-      ...(objetivo === 'aliado' && h.conmigo ? {conmigo: true} : {}),   // un aliado o uno mismo (Heal, 2026-10-11)
+      ...((objetivo === 'aliado' || objetivo === 'cualquiera') && h.conmigo ? {conmigo: true} : {}),   // un aliado o uno mismo (Heal, 2026-10-11; «cualquiera»: el Escudo elemental, 2026-11-09)
       ...(objetivo === 'cualquiera' && h.aliadoDirecto ? {aliadoDirecto: true} : {}),   // 🐈‍⬛ a un aliado le entra directo; un rival se resiste (Echar la mufa, 2026-11-05)
       ...(h.zonaQueda ? {zonaQueda: {turnos: Math.min(6, Math.max(1, Math.round(_num(h.zonaQueda.turnos)) || 1)), nombre: txtCorto(h.zonaQueda.nombre || '', 40),
         ...(h.zonaQueda.dano ? {dano: txtCorto(h.zonaQueda.dano, 12)} : {}), ...(h.zonaQueda.tipoDano ? {tipoDano: txtCorto(h.zonaQueda.tipoDano, 20)} : {}),

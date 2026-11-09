@@ -48,7 +48,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261109pfs"></script>
+<script src="combatiente.js?v=20261109conmigo"></script>
 <script src="creep-calculo.js?v=20261109pfs"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261107dosarmas"></script>
@@ -6762,6 +6762,11 @@ prueba('🛡 Escudo elemental (2026-11-06): 7 elementos en paralelo con el Arma 
   igual([JSON.stringify(p1) === JSON.stringify(p2), JSON.stringify(p1) !== JSON.stringify(p3), p1.length, p1[0].length,
     !!g && lejos(F.posGota(g, c, 50, g.periodo * 0.8 - g.fase + g.periodo * 10)) > lejos(F.posGota(g, c, 50, g.periodo * 0.05 - g.fase + g.periodo * 10)), !!g && F.posGota(g, c, 50, 500, true).alfa === 1],
     [true, true, 2, 41, true, true]);
+});
+prueba('🛡 Escudo elemental sobre sí mismo (cola de pruebas 10, 2026-11-09): «cualquiera» con conmigo lo conserva (antes solo «aliado»), «enemigo» no', () => {
+  const e = Combatiente.habEjecucion({nombre: 'Escudo elemental'}, Combatiente.escudoElementalDuelo('Escudo ígneo'));
+  const r = Combatiente.habEjecucion({nombre: 'X'}, {objetivo: 'enemigo', conmigo: true, tira: '', contra: [], efectos: []});
+  igual([e.objetivo, !!e.conmigo, !!r.conmigo], ['cualquiera', true, false]);
 });
 prueba('🔄 Cambio de guardia de creep (2026-11-07): en el pool, auditada, 1 No2 + 4 SP o cooldown 3, y va al mapa (no al duelo); el S1 Sanador nivel 4 la lleva', () => {
   const e = HABILIDADES_CREEP_BASE.find(x => x.nombre === 'Cambio de guardia' && x.datos.sp.auditada);

@@ -2229,3 +2229,33 @@ Probado por Claude con clics en «Claude · pruebas», «Encuentro 2» (GM, J1, 
 - Capturas: `cola-11-0-en-el-mapa`, `cola-11-1-sanar-manos`, `cola-11-2-purificar`, `cola-11-3-oleada`, `cola-11-4-varita-mayor-manos`,
   `cola-11-5-smite`, `cola-11-6-cambio-de-guardia`, `cola-11-6b-orden-nuevo`, `cola-11-7-circulo`, `cola-11-8-pergamino-aviso`.
 
+
+## 💀 Cola de pruebas · 12: la línea D1 · Maldito, niveles 1 a 5 (2026-11-09, Claude, «Claude · pruebas» / «Encuentro 2», GM + J1 + J2 con clics; restaurado y comparado con el respaldo: idéntico)
+
+- **Limpieza antes:** el «Mazo del juez» tirado en el piso de «Encuentro 2» (de la prueba 9, Tiro al arma) era una copia: Rockardo (copia) lo
+  tiene equipado en su ficha (la restauración de la prueba 9 se lo devolvió, pero el respaldo no guarda los objetos del mapa). Se borró del mapa.
+- **Cómo:** GM Tools → «+ Creep» → ⭐ Pool esencial → Maldito Lv 1 a 5 → «Crear token»; renombrados Maldito 1–5, a 3–5 casillas de Rockardo,
+  Bizzante y Larry. Números en el mapa = prueba de niveles: vida 40/45/45/55/55, No2 6/7/7/8/8, SP 39/42/48/51/57, PdG.Esp 13/15/17/18/21,
+  Def 1/2/2/3/4, Def. esp. 4/4/4/4/2, todos en modo SP. Aguja del desamparo y Anulación arrancan en cooldown (lentas).
+- **Maldición de la coraza** (nv1 → Rockardo, GM): PdG.Esp contra Res.Esp → «✔ Aplicar Coraza maldita (3 turnos, −2 Defensa, −2 Def. especial)».
+- **Aguja siniestra** (nv1 → Bizzante): PdG.Esp contra Evasión (no se parrea) → 1d6 directo (35 → 31), Herida sombría y Punto débil 2 turnos (−1 a
+  todas las resistencias a crítico).
+- **Varita del susurro** (nv2 → Larry, que se defendió desde la pantalla del J1): «PdG.Esp 1d6+1d8+1» (con Puntería arcana) contra la Res.Esp de
+  Larry → 4 directo (34 → 30) y el Silencio 25 % salió (4 en d4) → Silencio 1 turno. Avisó «fuera de alcance» (5 casillas, llega a 4) y dejó seguir.
+- **Maldición debilitante** (nv2 → Rockardo): 1d6 que sí frena la Defensa especial (40 → 34), Debilitado 2 turnos y Lento 2 turnos.
+- **Escalofrío** (nv3 → Bizzante): PdG.Esp contra Res.Mt → 1d4 directo y Escalofrío (−2 PdG) 1 turno.
+- **Varita de la grieta** (nv3 → Rockardo): PdG.Esp contra Evasión (con el Debilitado, 1d6) → Grieta (−2 Defensa) 2 turnos.
+- **Aguja del desamparo** (nv4 → Larry, J1): cobró **−5 SP** y −2 No2; Larry quedó **Expuesto**. Después, contra otra habilidad, su defensa
+  decía «Evasión 1d4+1 ÷2» y no ofrecía Parry.
+- **Capa de escamas de pez espejo** (nv4): el Maldito 3 le hizo un Escalofrío (directo, a un solo blanco) → «🪞 Espejo: Maldito 3 recibe 1 de daño
+  devuelto» (45 → 44). (El área contra el Espejo ya se probó en la prueba 10: no devuelve.)
+- **Muñeco vudú** (nv5, Varita de la grieta → Bizzante): además de la Grieta, «Muñeco vudú: Bizzante queda Debilitado 1 turno».
+- **Anulación** (nv5 → Rockardo con Bendecido y Escudo especial puestos para la prueba): Ef.Esp contra Res.Mt → al aplicar sale «¿qué estado
+  mágico le saca?» con los dos y «Ninguno» → Escudo especial → «le anuló Escudo especial»; la Bendición quedó.
+- **Runa de debilidad** (consumible del nv1): «Usar · 1 No2» → elegir la casilla en el Rango → aviso «Trampa a la vista de un rival» (el cono de
+  Rockardo) → Avanzar → la trampa quedó en el mapa y salió del cinturón.
+- 🐞 **Arreglado (commit 1cdd3f16):** con una habilidad esperando el objetivo, volver a abrir las Acciones y apretar «Ejecutar» otra vez cobraba de
+  nuevo (6 → 5 → 4 No2) y Esc devolvía una sola. Ahora la pendiente se cancela primero, como con Esc, y lo que se devuelve después se calcula del
+  creep que lee la transacción (antes, del que se tenía al apretar, que todavía no tenía la devolución). Probado: 6/39 → apretar → 5/37 → apretar
+  otra vez → 5/37 → Esc → 6/39 «se le devolvió 2 SP y 1 No2». Lo mismo en la Botonera de un personaje.
+- Las 826 pruebas automáticas pasan. Capturas `cola-12-*` en el scratchpad.

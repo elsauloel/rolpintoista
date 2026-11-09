@@ -89,7 +89,7 @@ async function flechaSalto(d, totalMag){
   const cadena0 = conDano ? rayoCadena(id, num(totalMag)) : rayoCadena(id, Math.pow(2, n + 1)).map(c => ({...c, dano: 0})).slice(0, 1 + n);
   const cadena = conDano && cadena0.length > 1 ? [cadena0[0], ...(await rayoCadenaAplicar(cadena0, {callado: true}))] : cadena0;
   if(cadena.length < 2){ mesaLinea(`⚡ ${flLa(fl)} de ${d.atacante.nombre} no tuvo a quién saltar (nadie a 4 casillas o menos${conDano ? ', o no le quedó daño' : ''})`, 'recordatorio'); return; }
-  const partes = [];
+  const partes = [], estadosDe = {};
   for(let i = 1; i < cadena.length; i++){
     const c = cadena[i], nom = c.t.oculto ? 'Alguien' : nombreDe(c.t);
     let txt = nom + (c.dano ? ` (${c.dano} de daño eléctrico${c.entro !== undefined && c.entro !== c.dano ? ` → le entraron ${c.entro}` : ''})` : '');
@@ -104,6 +104,7 @@ async function flechaSalto(d, totalMag){
             {nombre: 'Parálisis', caras: 1, exitos: 1, dado: '', detalle: 'Parálisis 1 turno (el salto de la flecha).', spec: {nombre: 'Parálisis', turnos: 1}});
           if(r && r.manual) txt += ' (aplicala a mano)';
           else if(r && /no entró/.test(String(r.nota || ''))) txt += ` (${r.nota})`;
+          if(!(r && !r.manual && /no entró/.test(String(r.nota || '')))) estadosDe[c.id] = ['Parálisis'];
         }catch(err){ console.error('No se pudo paralizar en el salto:', err); txt += ' (aplicala a mano)'; }
       }
     }
@@ -111,8 +112,14 @@ async function flechaSalto(d, totalMag){
   }
   const saltos = cadena.slice(1).map((c, i) => ({desde: cadena[i].id, hacia: c.id}));
   const resultado = partes.join(' → ');
-  momentoAbrir({tipo: 'rayo', icono: '⚡', titulo: `${fl.nombre}: salta`, estado: 'listo', datos: {saltos}, resultado});
-  mesaLinea(`⚡ ${flLa(fl)} de ${d.atacante.nombre} saltó: ${resultado}`, 'recordatorio');
+  // 🔢 (2026-11-09) el «−X», «¡Parálisis!» y el reporte, como todo rayo que salta (js/110)
+  if(typeof rayoFxPublicar === 'function' && conDano){
+    rayoFxPublicar({titulo: `${fl.nombre}: salta`, icono: '⚡', fuente: `${flLa(fl)} de ${d.atacante.nombre}`, resultado,
+      golpe: {id, entro: num(totalMag)}, saltos: cadena.slice(1).map((c, i) => ({id: c.id, desde: cadena[i].id, dano: c.dano, entro: c.entro, antes: c.antes, despues: c.despues, estados: estadosDe[c.id] || []}))});
+  }else{
+    momentoAbrir({tipo: 'rayo', icono: '⚡', titulo: `${fl.nombre}: salta`, estado: 'listo', datos: {saltos}, resultado});
+    mesaLinea(`⚡ ${flLa(fl)} de ${d.atacante.nombre} saltó: ${resultado}`, 'recordatorio');
+  }
 }
 
 /* 🏹 LOS VIROTES QUE HACEN ALGO EN EL MAPA (2026-10-10, dueño: «la tanda de ballestas que necesita el mapa»; docs/ideas-ballestas.md).

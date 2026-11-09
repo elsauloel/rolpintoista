@@ -70,9 +70,11 @@ function ganchoFxPosToken(id){
    (js/78, cuando la cadena ya soltó). Sube un poco y se apaga en ~1,6 s; con «reducir movimiento», queda quieto y se apaga. */
 const GANCHO_EVA = [];   // {a, texto, t0, dur, poco}
 const ganchoEvaVistos = new Set();
-async function ganchoEvaPublicar(aId, texto){
+async function ganchoEvaPublicar(aId, texto, o){   // o (2026-11-09, el Escudo elemental): {retraso ms, dur ms, fila (0, 1…: uno arriba del otro)}
   if(!aId) return;
-  const datos = {a: aId, texto: String(texto || '−2 EVA').slice(0, 20)};
+  o = o || {};
+  const datos = {a: aId, texto: String(texto || '−2 EVA').slice(0, 20), ...(num(o.retraso) > 0 ? {retraso: Math.round(num(o.retraso))} : {}),
+    ...(num(o.dur) > 0 ? {dur: Math.round(num(o.dur))} : {}), ...(num(o.fila) > 0 ? {fila: Math.round(num(o.fila))} : {})};
   const id = typeof momentoAbrir === 'function' ? await momentoAbrir({tipo: 'gancho-eva', icono: '', titulo: '', estado: 'listo', datos}) : null;
   if(!id) ganchoEvaEmpezar(datos);
 }
@@ -85,7 +87,8 @@ function ganchoEvaRecibido(id, d){
 }
 function ganchoEvaEmpezar(dt){
   if(!dt || !tokens.get(dt.a)) return;
-  GANCHO_EVA.push({a: dt.a, texto: String(dt.texto || '−2 EVA'), t0: performance.now(), dur: 1600, poco: ganchoPocoMovimiento()});
+  GANCHO_EVA.push({a: dt.a, texto: String(dt.texto || '−2 EVA'), t0: performance.now() + Math.max(0, num(dt.retraso)), dur: num(dt.dur) > 0 ? num(dt.dur) : 1600,
+    fila: Math.max(0, Math.round(num(dt.fila))), poco: ganchoPocoMovimiento()});
   pedirDibujo();
 }
 function ganchoEvaDibujar(z){
@@ -93,6 +96,7 @@ function ganchoEvaDibujar(z){
   for(let i = GANCHO_EVA.length - 1; i >= 0; i--){
     const fx = GANCHO_EVA[i], k = (ahora - fx.t0) / fx.dur;
     if(k >= 1){ GANCHO_EVA.splice(i, 1); continue; }
+    if(k < 0) continue;   // todavía no le toca (el retraso: sincronizado con el rayo)
     const t = tokens.get(fx.a);
     if(!ganchoFxVe(t)) continue;
     const c = hexCentro(t.col, t.fila);
@@ -103,7 +107,7 @@ function ganchoEvaDibujar(z){
     ctx.save();
     ctx.globalAlpha = alfa;
     ctx.font = `900 ${px}px system-ui, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    const y = c.y - HEX * 1.05 - sube;
+    const y = c.y - HEX * 1.05 - sube - num(fx.fila) * px * 1.15;
     ctx.lineJoin = 'round'; ctx.lineWidth = Math.max(3 / z, px * 0.2); ctx.strokeStyle = 'rgba(20,6,8,.95)';
     ctx.strokeText(fx.texto, c.x, y);
     ctx.shadowColor = 'rgba(255,60,60,.8)'; ctx.shadowBlur = px * 0.5;

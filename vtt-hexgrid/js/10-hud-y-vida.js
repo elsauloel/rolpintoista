@@ -752,7 +752,7 @@ async function rayoCadenaAplicar(cadena, o){
     if(dano0 < 1) break;
     const agua = typeof aguaRayo === 'function' ? aguaRayo(s.t, 'rayo', dano0) : {monto: dano0, txt: ''}, dano = agua.monto;   // 💧 en el agua, ×1,5 (js/50)
     const nombre = s.t.oculto ? 'Alguien' : nombreDe(s.t);
-    let ok = false, entro = dano, resTxt = '';
+    let ok = false, entro = dano, resTxt = '', antes = null, despues = null;
     try{
       const esInv = s.t.tipo === 'pj' && String(s.t.fichaId).includes(SEP_INVOCACION);
       const puede = s.t.fichaId && (s.t.tipo === 'creep' ? soyGM : (soyGM || puedoMover(s.t)));   // personajes e invocaciones: el GM también (2026-10-05)
@@ -761,10 +761,11 @@ async function rayoCadenaAplicar(cadena, o){
         if(res) resTxt = ` − ${Combatiente.resElementalTxt('rayo', res)}`;
         const r = s.t.tipo === 'creep' ? await danioCreep(s.t, String(dano), true, 0, res, {magico: true}) : esInv ? await danioInv(s.t, String(dano), true, 0, res, {magico: true}) : await danioPj(s.t, String(dano), true, 0, res, {magico: true});
         entro = r && r.r ? num(r.r.recibido) : Math.max(0, dano - res);
+        if(r && r.previo !== undefined){ antes = num(r.previo); despues = num(r.nuevo); }   // la vida antes y después (el reporte del rayo, js/110)
         ok = true;
       }
     }catch(err){ console.error('No se pudo aplicar el salto del rayo:', err); }
-    hubo.push({id: s.id, t: s.t, dano, entro});
+    hubo.push({id: s.id, t: s.t, dano, entro, antes, despues});
     (ok ? hechos : manual).push(`${nombre}: ${dano}${resTxt}${ok && entro !== dano ? ` → ${entro}` : ''}`);
     prev = entro;
   }

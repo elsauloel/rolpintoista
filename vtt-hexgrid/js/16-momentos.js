@@ -73,6 +73,7 @@ function rayoMomento(id, d){
   rayosVistos.add(id);
   const t = d.creado && d.creado.toMillis ? d.creado.toMillis() : Date.now();
   if(Date.now() - t > 20000 || typeof rayoSaltoEfecto !== 'function') return;
+  if((d.datos.flotan || d.datos.reporte) && typeof rayoFxReproducir === 'function'){ rayoFxReproducir(d.datos); return; }   // 🔢 el «−X», los estados y el reporte (js/110)
   d.datos.saltos.forEach((s, i) => setTimeout(() => rayoSaltoEfecto(s.desde, s.hacia), i * 450));
 }
 /* 🎰 El rodillo que giró otra pantalla (2026-11-01, el Arma elemental al azar; Combatiente.elegirVarianteAzar): las demás lo ven girar una vez (solo si

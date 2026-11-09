@@ -9,7 +9,7 @@
 //    empezar su turno ahí — 1d6 de ese elemento con lo suyo: el mismo golpe que el Arma elemental del mismo elemento (sus presets en
 //    comun/estados-presets.js: ×1,5 del fuego, Escarcha / Armadura rota / Veneno por daño, el salto y la Parálisis del eléctrico, la Luz sanadora —la
 //    cura se la lleva el PORTADOR— y Herida sombría + Punto débil de lo siniestro), con las mismas piezas del duelo (resistenciasDe, danio*,
-//    dueloPorDano, dueloCadena, dueloIdentidadEstado, dueloDrenar). Una vez por ronda por víctima y por anillo; nunca a quien lo lleva.
+//    dueloPorDano, dueloCadena, dueloIdentidadEstado, dueloDrenar). Cada vez que entra (salir y volver a entrar quema otra vez; moverse adentro, no) y al empezar su turno pegado; nunca a quien lo lleva.
 //    El daño es directo; el EFECTO del elemento se resiste con la Res.Esp de la víctima contra el Ef.Esp de quien tiró el escudo (`escudoEsp`, guardado
 //    en el estado al ponerlo), salvo los elementos con `resiste: false` (el ácido: la Armadura rota entra siempre) — dueño, 2026-11-06, caso por caso.
 //    Lo resuelve la pantalla de la víctima (como las zonas: el GM sus creeps, cada jugador lo suyo — zonaEsMia).
@@ -46,7 +46,7 @@ async function escudoElementalDirecto(yo, mio, t, ataque){
     const para = t.tipo === 'creep' ? '' : t.duenoUid;
     try{
       momentoAbrir({tipo: 'buff', icono: def.icono, titulo: mismo ? `${quien} se rodea de un ${def.estado.toLowerCase()}` : `${quien} rodea a ${nomVis} de un ${def.estado.toLowerCase()}`,
-        resultado: `${def.icono} Un anillo de ${def.nombre.toLowerCase()} lo sigue ${turnos} turnos: ${def.que}, una vez por ronda.`, estado: 'listo',
+        resultado: `${def.icono} Un anillo de ${def.nombre.toLowerCase()} lo sigue ${turnos} turnos: ${def.que}, cada vez que alguien entra al anillo o empieza su turno pegado.`, estado: 'listo',
         datos: para ? {paraUid: para, aviso: true, boton: 'Entendido', veredicto: {tono: 'neutro', grande: nombre, chico: `Un anillo de ${def.nombre.toLowerCase()} te rodea ${turnos} turnos: quema a quien quede pegado (a vos no).`}} : {}});
     }catch(err){ console.error('Escudo elemental: el aviso', err); }
     escudoRevisar();   // a los que ya estaban pegados les llega ahora
@@ -281,10 +281,9 @@ function escudoElementalDibujar(z){
 }
 
 // ---------- quién queda pegado, y cuándo quema ----------
-const escudoQuemados = new Set();          // «portador|víctima|ronda»: una vez por ronda por víctima y por anillo (cada pantalla, lo suyo)
 let escudoPares = null;                    // los pares «portador|víctima» pegados la última vez que se miró (null = todavía no se miró)
 let escudoTurnoVisto = null;               // «ronda|turno» la última vez
-const escudoDesde = Date.now();
+let escudoDesde = Date.now(), escudoMapaVisto = null;   // desde cuándo se mira este mapa (los primeros 9 s solo anota)
 const escudoRonda = () => Math.round(num(iniciativa && iniciativa.orden && iniciativa.orden.length ? iniciativa.ronda : mantenimientoNumero)) || 0;
 function escudoParesAhora(){
   const pares = new Set();
@@ -297,14 +296,19 @@ function escudoParesAhora(){
   }
   return pares;
 }
-// Lo mira cada tanto (y cuando se pone un escudo): los pares nuevos queman (entró, le llegó el anillo o se lo pusieron); el que empieza su turno
-// pegado, también. Al cargar el mapa solo anota (no quema a los que ya estaban).
+// Lo mira cada tanto (y cuando se pone un escudo): los pares nuevos queman (entró, le llegó el anillo o se lo pusieron); y el que empieza su turno
+// pegado (dueño, 2026-11-09: «cuando un personaje entra a un escudo, se aplica el daño. Si llega a salir y volver a entrar, se vuelve a activar. Los
+// pasos dentro del escudo, una vez adentro, no lo activan»; y el inicio de turno se mantiene). Sin «una vez por ronda». Al abrir el mapa, nada.
 function escudoRevisar(){
+  // Al abrir el mapa o pasar a ver otro, no quema: solo anota durante 9 s (dueño, 2026-11-09: «al abrir o cargar el mapa, nada»). Así tampoco quema
+  // cuando los estados del portador llegan un poco después que los tokens.
+  const mapaAhora = typeof mapaMostrado !== 'undefined' ? mapaMostrado : '';
+  if(mapaAhora !== escudoMapaVisto){ escudoMapaVisto = mapaAhora; escudoDesde = Date.now(); escudoPares = null; escudoTurnoVisto = null; }
   const ahora = escudoParesAhora();
   const recien = Date.now() - escudoDesde < 9000;
   if(escudoPares && !recien) for(const k of ahora) if(!escudoPares.has(k)){ const [pid, vid] = k.split('|'); escudoQuemar(pid, vid, 'entra'); }
   escudoPares = ahora;
-  // El que empieza su turno pegado a un anillo.
+  // ▶ El que EMPIEZA SU TURNO pegado a un anillo también se quema (dueño, 2026-11-09: se mantiene, junto con entrar).
   const tv = iniciativa && iniciativa.orden && iniciativa.orden.length ? `${iniciativa.ronda}|${iniciativa.turno}` : null;
   if(tv && tv !== escudoTurnoVisto){
     const primera = escudoTurnoVisto === null;
@@ -333,9 +337,6 @@ async function escudoQuemar(pid, vid, motivo){
   if(typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(vid)) return;
   const e = escudoDe(p);
   if(!e) return;
-  const clave = `${pid}|${vid}|${escudoRonda()}`;
-  if(escudoQuemados.has(clave)) return;
-  escudoQuemados.add(clave);
   const def = e.def, el = def.clave;
   const arma = EstadosAplicar.presetPorNombre(def.arma) || {};
   const efs = (arma.golpe && Array.isArray(arma.golpe.efectos)) ? arma.golpe.efectos : [];
@@ -344,7 +345,8 @@ async function escudoQuemar(pid, vid, motivo){
   const d = {id: 'escudo-' + Date.now(), efectos: [],
     atacante: {nombre: nombreDe(p), tokenId: pid, tipo: p.tipo, ref: String(p.fichaId || ''), uid: p.duenoUid || ''},
     defensor: {nombre: nombreDe(v), tokenId: vid, tipo: v.tipo, ref: String(v.fichaId || ''), uid: v.duenoUid || ''}};
-  const partes = [];
+  const partes = [], estadosV = [], notasV = [], extraFx = [];
+  let saltosFx = [], antesV = null, despuesV = null, recibidoV = 0;
   try{
     const tir = tirarDados(ef.dado || '1d6');
     const dado = tir ? tir.total : 0;
@@ -355,7 +357,7 @@ async function escudoQuemar(pid, vid, motivo){
     const mult = (num(ef.mult) > 1 ? num(ef.mult) : 1) * (idE ? idE.mult : 1);
     let monto = Math.ceil(dado * mult);
     const ag = typeof aguaRayo === 'function' ? aguaRayo(v, el, monto) : null;
-    if(ag && ag.txt){ monto = ag.monto; partes.push(ag.txt); }
+    if(ag && ag.txt){ monto = ag.monto; partes.push(ag.txt); notasV.push(`${ag.txt} (está parado en el agua).`); }
     partes.push(`${ef.dado || '1d6'}: ${dado}${mult !== 1 ? ` × ${String(mult).replace('.', ',')} = ${monto}` : ''}`);
     try{ mesaPublicar(`${def.icono} ${def.estado} de ${quienP} → ${quienV}`, {formula: ef.dado || '1d6', rolls: tir ? tir.rolls : [], mod: 0, total: dado, quien: `${def.estado} de ${quienP}`}); }catch(err){}
     let recibido = 0, perdio = 0;
@@ -364,6 +366,9 @@ async function escudoQuemar(pid, vid, motivo){
       const rm = v.tipo === 'creep' ? await danioCreep(v, String(monto), true, 0, resEl, o) : await (esInv ? danioInv : danioPj)(v, String(monto), true, 0, resEl, o);
       recibido = rm && rm.r ? num(rm.r.recibido) : 0;
       perdio = rm ? Math.max(0, num(rm.previo) - num(rm.nuevo)) : 0;
+      recibidoV = recibido;
+      if(rm && rm.previo !== undefined){ antesV = num(rm.previo); despuesV = num(rm.nuevo); }
+      if(rm && rm.r && rm.r.invulnerable) notasV.push('Está Invulnerable: no le hizo nada.');
       partes.push(`${recibido} de daño de ${def.nombre.toLowerCase()}${resEl ? ` (− ${Combatiente.resElementalTxt(el, resEl)})` : ''}`);
       if(v.tipo === 'creep' && typeof debilRevelar === 'function' && (resEl || (idE && idE.mult === 0))) debilRevelar(v, el, {res: resEl, mult: idE ? idE.mult : 1}).catch(() => {});
       // 🛡 El efecto del elemento (no el daño, ni el salto del rayo, ni la cura de la luz) se resiste: la Res.Esp de quien se quema contra el Ef.Esp
@@ -377,36 +382,48 @@ async function escudoQuemar(pid, vid, motivo){
         try{ mesaPublicar(`${quienV} · ${def.resisteStat === 'rescc' ? 'Res.CC' : 'Res.Esp'}`, {formula: tV.formula, rolls: tV.r ? tV.r.rolls : [], mod: tV.r ? tV.r.mod : 0, total: tV.total}); }catch(err){}
         resistio = tV.total > tE.total;
         partes.push(`${resistio ? 'resistió' : 'no resistió'} el efecto (${def.resisteStat === 'rescc' ? 'Res.CC' : 'Res.Esp'} ${tV.total} contra Ef.Esp ${tE.total})`);
+        notasV.push(`${resistio ? 'Resistió' : 'No resistió'} el efecto: ${def.resisteStat === 'rescc' ? 'Res.CC' : 'Res.Esp'} ${tV.total} contra Ef.Esp ${tE.total}.`);
       }
       if(rm && rm.r && !rm.r.invulnerable && recibido > 0){
         // ⚡ El salto del escudo (dueño, 2026-11-09): nunca a los que ya reciben el golpe del anillo; solo a los de afuera del escudo.
         const delAnillo = [pid, ...[...escudoParesAhora()].filter(k => k.startsWith(pid + '|')).map(k => k.split('|')[1])];   // (y nunca al que lleva el escudo)
-        if(ef.cadena) await dueloCadena(d, recibido, {excluir: delAnillo}).catch(err => console.error('Escudo: el salto del rayo', err));
+        if(ef.cadena){ const cad = await dueloCadena(d, recibido, {excluir: delAnillo, sinPublicar: true}).catch(err => { console.error('Escudo: el salto del rayo', err); return null; });
+          if(cad){ saltosFx = cad.saltos || []; extraFx.push(...(cad.extra || [])); } }
         if(num(ef.luzSanadora) > 0 && perdio > 0){
           const cura = Math.max(1, Math.floor(perdio * Math.min(100, num(ef.luzSanadora)) / 100));
           const ls = await dueloDrenar(d, cura, {sinExtra: true}).catch(() => null);
           partes.push(ls && !ls.manual ? `☀ ${quienP} se cura ${cura}` : `☀ ${quienP} se cura ${cura} (a mano)`);
+          extraFx.push(ls && !ls.manual ? `☀ ${quienP} se cura ${cura}.` : `☀ ${quienP} se cura ${cura} (a mano).`);
         }
       }
       // Aunque resista, lo mínimo de un elemento con `minimo` (hoy ninguno: el hielo, si resiste, no deja nada de Escarcha — dueño, 2026-11-06).
       if(rm && rm.r && !rm.r.invulnerable && recibido > 0 && resistio && def.minimo > 0 && ef.porDano){
         const r = await dueloAplicarEfecto(d, {nombre: ef.porDano.estado, spec: {nombre: ef.porDano.estado, stacks: def.minimo, ...(num(ef.porDano.turnos) > 0 ? {turnos: num(ef.porDano.turnos)} : {})}}).catch(() => null);
         partes.push(`igual ${ef.porDano.estado} ×${def.minimo} (el mínimo)${r && r.manual ? ' (a mano)' : ''}`);
+        estadosV.push(ef.porDano.estado);
       }
       if(rm && rm.r && !rm.r.invulnerable && recibido > 0 && !resistio){
-        if(idE && idE.estado) await dueloIdentidadEstado(d, el, idE).catch(err => console.error('Escudo: la identidad del elemento', err));
-        if(ef.porDano){ const pd = await dueloPorDano(d, recibido, ef.porDano).catch(err => { console.error('Escudo: el estado por daño', err); return null; }); if(pd) partes.push(`${pd.estado} ×${pd.stacks}`); }
+        if(idE && idE.estado){ await dueloIdentidadEstado(d, el, idE).catch(err => console.error('Escudo: la identidad del elemento', err)); if(idE.estado.nombre) estadosV.push(idE.estado.nombre); }
+        if(ef.porDano){ const pd = await dueloPorDano(d, recibido, ef.porDano).catch(err => { console.error('Escudo: el estado por daño', err); return null; }); if(pd){ partes.push(`${pd.estado} ×${pd.stacks}`); estadosV.push(pd.estado); } }
         // ⚡ La Parálisis del eléctrico (la del Arma eléctrica: su chance, a la vista).
         for(const ch of efs.filter(x => x && !x.danoMagico && num(x.caras) > 0)){
           const caras = Math.round(num(ch.caras)), exitos = Math.round(num(ch.exitos)) || 1, sale = 1 + Math.floor(Math.random() * caras), entra = sale > caras - exitos;
           partes.push(`${ch.nombre} ${Math.round(exitos * 100 / caras)} % (1d${caras}: ${sale}) → ${entra ? 'entra' : 'no'}`);
-          if(entra) await dueloAplicarEfecto(d, {nombre: ch.nombre, spec: {nombre: ch.nombre, ...(num(ch.turnos) > 0 ? {turnos: num(ch.turnos)} : {})}}).catch(err => console.error('Escudo: la Parálisis', err));
+          notasV.push(`${ch.nombre} ${Math.round(exitos * 100 / caras)} %: salió ${sale} en 1d${caras} → ${entra ? 'entra' : 'no entra'}.`);
+          if(entra){ const ra = await dueloAplicarEfecto(d, {nombre: ch.nombre, spec: {nombre: ch.nombre, ...(num(ch.turnos) > 0 ? {turnos: num(ch.turnos)} : {})}}).catch(err => { console.error('Escudo: la Parálisis', err); return null; });
+            if(!(ra && !ra.manual && /no entró/.test(String(ra.nota || '')))) estadosV.push(ch.nombre); }
         }
       }
     }else partes.push('sin daño');
   }catch(err){ console.error('Escudo elemental: no se pudo aplicar', err); partes.push('aplicalo a mano: 1d6 del elemento'); }
-  const cuando = motivo === 'turno' ? 'empieza su turno pegado al' : 'queda pegado al';
-  const txt = `${def.icono} ${quienV} ${cuando} ${def.estado.toLowerCase()} de ${quienP}: ${partes.join(' · ')}`;
-  try{ mesaLinea(txt, 'recordatorio'); }catch(e){}
-  try{ momentoAbrir({tipo: 'zona', icono: def.icono, titulo: `${quienV} se quema con el ${def.estado.toLowerCase()} de ${quienP}`, resultado: partes.join(' · '), estado: 'listo', datos: {chico: true}}); }catch(e){}
+  // 🔢 Lo que se ve (dueño, 2026-11-09): el «−X» rojo sobre cada uno, «¡Parálisis!», el reporte al terminar y una línea clara en la Mesa (js/110).
+  const txt = `${def.icono} ${quienV} ${motivo === 'turno' ? 'empieza su turno pegado al' : 'entra al'} ${def.estado.toLowerCase()} de ${quienP}: ${partes.join(' · ')}`;
+  if(typeof rayoFxPublicar === 'function' && recibidoV > 0){
+    try{ rayoFxPublicar({titulo: `${def.estado} de ${quienP}`, icono: def.icono, fuente: `${def.estado} de ${quienP}`, resultado: partes.join(' · '),
+      golpe: {id: vid, entro: recibidoV, antes: antesV, despues: despuesV, estados: estadosV, notas: notasV, etiqueta: motivo === 'turno' ? 'empieza su turno en el anillo' : 'entra al anillo'}, saltos: saltosFx, extra: extraFx}); }
+    catch(err){ console.error('Escudo: el reporte', err); try{ mesaLinea(txt, 'recordatorio'); }catch(e){} }
+  }else{
+    try{ mesaLinea(txt, 'recordatorio'); }catch(e){}
+    try{ momentoAbrir({tipo: 'zona', icono: def.icono, titulo: `${quienV} se quema con el ${def.estado.toLowerCase()} de ${quienP}`, resultado: partes.join(' · '), estado: 'listo', datos: {chico: true}}); }catch(e){}
+  }
 }

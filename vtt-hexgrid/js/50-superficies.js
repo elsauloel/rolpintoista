@@ -756,7 +756,7 @@ async function aguaConduceRayo(d, t, entro){
   if(cadena.length < 2) return [];
   const hubo = await rayoCadenaAplicar(cadena, {callado: true});
   if(!hubo.length) return [];
-  const lineas = [];
+  const lineas = [], estadosDe = {};
   for(const s of hubo){
     const nombre = s.t.oculto ? 'Alguien' : nombreDe(s.t);
     let txt = `${nombre}: ${s.dano}${s.entro !== s.dano ? ` → ${s.entro}` : ''}`;
@@ -764,13 +764,19 @@ async function aguaConduceRayo(d, t, entro){
       const caras = Math.max(1, Math.round(num(ef.caras)) || 1), ex0 = Math.max(1, Math.round(num(ef.exitos)) || 1);
       const exitos = /💧/.test(String(ef.detalle || '')) ? ex0 : Math.min(caras, ex0 * 2);
       if(Math.floor(Math.random() * caras) >= exitos) continue;
-      try{ const rr = await dueloAplicarEfecto({...d, defensor: {...d.defensor, tokenId: s.id, nombre}}, ef); txt += ` · Parálisis${rr && rr.manual ? ' (a mano)' : ''}`; }
+      try{ const rr = await dueloAplicarEfecto({...d, defensor: {...d.defensor, tokenId: s.id, nombre}}, ef); txt += ` · Parálisis${rr && rr.manual ? ' (a mano)' : ''}`; if(!(rr && !rr.manual && /no entró/.test(String(rr.nota || '')))) estadosDe[s.id] = ['Parálisis']; }
       catch(err){ txt += ' · Parálisis (a mano)'; }
     }
     lineas.push(txt);
   }
   const resumen = `El golpe eléctrico corre por el agua del charco (cada uno, la mitad del anterior × 1,5): ${lineas.join(' → ')}`;
-  try{ momentoAbrir({tipo: 'rayo', icono: '⚡', titulo: 'El rayo corre por el agua', estado: 'listo', resultado: resumen, datos: {saltos: [tid, ...hubo.map(h => h.id)].slice(0, -1).map((de, i) => ({desde: de, hacia: hubo[i].id}))}}); }catch(err){}
-  try{ alertaRojaAnonima('⚡💧 El rayo corre por el agua', resumen); }catch(err){}
+  const desdes = [tid, ...hubo.map(h => h.id)];
+  if(typeof rayoFxPublicar === 'function'){   // 🔢 (2026-11-09) el «−X», «¡Parálisis!» y el reporte (js/110)
+    try{ rayoFxPublicar({titulo: '💧 El rayo corre por el agua', icono: '⚡', fuente: 'El rayo por el agua', resultado: resumen, golpe: {id: tid, entro: num(entro), etiqueta: 'golpe (parado en el agua)'},
+      saltos: hubo.map((h, i) => ({id: h.id, desde: desdes[i], dano: h.dano, entro: h.entro, antes: h.antes, despues: h.despues, estados: estadosDe[h.id] || []}))}); }catch(err){ console.error('El reporte del rayo en el agua:', err); }
+  }else{
+    try{ momentoAbrir({tipo: 'rayo', icono: '⚡', titulo: 'El rayo corre por el agua', estado: 'listo', resultado: resumen, datos: {saltos: desdes.slice(0, -1).map((de, i) => ({desde: de, hacia: hubo[i].id}))}}); }catch(err){}
+    try{ alertaRojaAnonima('⚡💧 El rayo corre por el agua', resumen); }catch(err){}
+  }
   return lineas;
 }

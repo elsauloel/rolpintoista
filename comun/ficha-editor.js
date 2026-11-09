@@ -214,7 +214,7 @@ const FichaEditor = (() => {
   // Resumen de una ejecución paso a paso, en una línea (para el editor y la tarjeta).
   function resumenEjecucionHab(c){
     if(!c || typeof c !== 'object') return '';
-    if(c.modo === 'arma') return 'ataque con tu arma';
+    if(c.modo === 'arma') return c.barrido ? 'ataque con tu arma · 🌀 giro: a cada rival que tenés al lado, uno por uno' : 'ataque con tu arma';   // (2026-11-09: el resumen nombra el giro)
     if(c.modo === 'flash') return 'flash';
     const OBJ = {enemigo: 'a un enemigo', aliado: 'a un aliado', 'uno mismo': 'sobre vos', area: 'en un área', onda: 'onda alrededor tuyo', zona: 'zona persistente'};
     const tira = c.tiraFormula ? (c.tiraEtiqueta || 'tirada propia') : c.tira ? (STAT_LABEL()[c.tira] || c.tira) : '';

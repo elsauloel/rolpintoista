@@ -569,7 +569,7 @@ const AsistenteDueloHab = (() => {
       const arma = st.modo === 'arma';
       const vis = objetivoVisto();
       // 1 · Declaración
-      const atqSub = arma ? 'con su arma' : `${esc(cfg.nombre || '')}${!st.tiraNinguna ? ' · tira ' + esc(tiraTxt()) : ''}`;
+      const atqSub = arma ? (st.barrido ? 'con su arma · 🌀 giro: a cada rival al lado, uno por uno' : 'con su arma') : `${esc(cfg.nombre || '')}${!st.tiraNinguna ? ' · tira ' + esc(tiraTxt()) : ''}`;
       const defRol = arma ? 'Defiende' : (sinContacto() || (!esAreaObj(st.objetivo) && st.objetivo !== 'zona' && st.contraModo !== 'stats')) ? 'Objetivo' : 'Se resiste';
       const defNom = arma ? 'Un enemigo' : st.objetivo === 'zona' ? 'Un área que queda' : corto((OBJETIVOS.find(o => o[0] === vis) || ['', vis])[1]);
       const defSub = arma ? (st.alcance === 'auto' ? 'al alcance de tu arma' : st.alcance === 'fijo' ? `a ${st.alcanceN} casilleros o menos` : corto((ESPACIAL.find(x => x[0] === st.alcance) || ['', ''])[1]).toLowerCase()) : dondeTxt();

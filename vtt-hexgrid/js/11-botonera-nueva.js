@@ -1867,7 +1867,7 @@ function bnRerollDibujar(){
    (comun/ficha-editor.js: el mismo formulario, el paso a paso de las habilidades, el asistente de ítems, la trampa y la Ejecución ✨),
    adentro del recuadro de la Botonera nueva (#bn-editor). Guardar pasa por bnUi (las partes que cambiaron y el resumen). Los estados de
    la lista (para "estado al usar" y para la Ejecución) se eligen con el selector común (comun/selector-estados.js). */
-const ED_PIEZAS = ['../comun/ficha-editor.js?v=20261015k', '../comun/asistente-item.js?v=20261105sin12', '../comun/asistente-duelo-hab.js?v=20261108giro'];
+const ED_PIEZAS = ['../comun/ficha-editor.js?v=20261109rgiro', '../comun/asistente-item.js?v=20261105sin12', '../comun/asistente-duelo-hab.js?v=20261109rgiro'];
 let bnTipoItemResolver = null;
 // op.comoGM: el GM sin el control (el ⚙ de un estado del HUD, como hacía la ficha con "Editar como GM"). → true si se abrió.
 async function bnEditar(key, id, op = {}){

@@ -752,6 +752,9 @@
   de rayo»). Su duda: si dos personajes están pegados al que lleva el escudo, los dos reciben el golpe inicial **y además** el salto del rayo, y
   quizás sea mucho. **Regla propuesta (sin decidir):** quien recibe el golpe inicial del escudo no puede ser objetivo del salto; el salto va solo a
   los de afuera del escudo. Decidir después de probarlo.
+- [ ] **Pegar las reglas nuevas de Firestore en la consola** (2026-11-09): `firebase/firestore.rules` suma el campo `pf` de los tokens (el estado
+  del Anillo de Paso Fantasma guardado en la partida). Hasta pegarlas, cada pantalla cuenta por su lado como antes. Después, correr la prueba 28 de
+  la cola.
 
 ## 🧪 De las pruebas en el mapa del 2026-10-27 (la tanda del Choque pesado; reporte: `reporte-choque-pesado-2026-10-27.md`)
 

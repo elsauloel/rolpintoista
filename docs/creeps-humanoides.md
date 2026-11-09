@@ -546,6 +546,9 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Nivel 2 aprobado** (dueño, 2026-11-09: «me cierra el hostigador»): Des 11 · Agi 9 · Con 8 · Fue 6 · Esp 2; + Guantes de agarre (PdG +1) y Cofia
   de anillas sueltas (Def +1, Def.Esp +1, Res. crít. T4 +1); Mantener a raya (empuja 2 y Lento 2 turnos) y Pies ligeros. Vida 40, No2 9, PdG 12,
   Daño 6, Def 3, Def.Esp 1, Eva 11. Programado (R22 en la prueba de niveles).
+  **Nivel 3 aprobado** (dueño, 2026-11-09: «me cierra»): Des 12 · Agi 10 · Con 8 · Fue 7 · Esp 2; el arco pasa a **Arco de la sombra** (Buena:
+  1 dado + 1 amplificado, Rango +4, Emboscada: Crítico frecuente +1, Espalda a distancia: +2 PdG y +1 de daño); habilidad nueva **Tiro a la
+  rodilla** (Rengo 2 turnos). Vida 40, No2 10, PdG 13, Daño 7, Def 3, Def.Esp 1, Eva 12. Programado (R23 en la prueba de niveles).
 
 - **M4 · Arcano · Mago, con SP** (boceto aprobado 2026-11-03, dueño: «me cierra como ruta»). Estrategia: control y movilidad: decide dónde
   está cada uno (aparece, empuja, atrae, manda por un portal, atraviesa en línea); en nv5, la Tormenta arcana. Atributos (Esp/Con/Agi/Des/Fue →

@@ -343,6 +343,9 @@
   esencial({...R2, nivel: 2, atrib: [8, 6, 9, 11, 2],   // (aprobado 2026-11-09: Mantener a raya, Pies ligeros; + Guantes de agarre y Cofia de anillas sueltas)
     equipo: ['Arco de tiro ligero', 'Chaleco de cuero', 'Escarpines de fieltro', 'Guantes de agarre', 'Cofia de anillas sueltas'],
     habilidades: ['Tiro certero', 'Disparo y repliegue', 'Mantener a raya'], pasivas: ['Pies ligeros']});
+  esencial({...R2, nivel: 3, atrib: [8, 7, 10, 12, 2],   // (aprobado 2026-11-09: Tiro a la rodilla; el arco, Arco de la sombra)
+    equipo: ['Arco de la sombra', 'Chaleco de cuero', 'Escarpines de fieltro', 'Guantes de agarre', 'Cofia de anillas sueltas'],
+    habilidades: ['Tiro certero', 'Disparo y repliegue', 'Mantener a raya', 'Tiro a la rodilla'], pasivas: ['Pies ligeros']});
   esencial({linea: 'S2', nombre: 'Abanderado', rol: 'support', rolTxt: 'apoyo', nivel: 1, atrib: [10, 7, 6, 7, 3],
     equipo: ['Lanza corta', 'Estandarte del muro', 'Chaleco de cuero', 'Botas de caña alta de estanciero'],
     habilidades: ['Potencia', '¡A la carga!'], consumibles: ['Pergamino grupal de Furia de Combate'],

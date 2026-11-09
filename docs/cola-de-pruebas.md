@@ -17,6 +17,7 @@ Estado: `[ ]` en cola · `[~]` corriendo · `[x]` hecha (con el resultado en una
 
 Cada línea nueva que se termine de diseñar se suma al final.
 25. [ ] **Paso Fantasma: pasos seguidos aunque sean en varios movimientos (1 + 2), se corta con otra acción** (2026-11-09): 1 paso, después 2 sin hacer nada en el medio → +3; 1 paso, atacar o una habilidad, 2 pasos → nada; un Salto o un Dash en el medio también corta.
+26. [ ] **Escudos gastados desaparecen al llegar a 0** (dueño, 2026-11-09): un Shield, el Blindaje, una poción de Cuero Duro o el escudo de 5 del Escudo humano se van de la lista apenas se vacían (personaje, creep e invocación, y del resumen público); la Armadura arcana sigue explotando.
 
 ## Hechas
 

@@ -174,7 +174,9 @@ function resolverGolpe(golpe, defensa, efectos, o){
     if(tomado > 0) capasUso.push({nombre: String(c.nombre || (c.excedenteVida ? 'Vida extra' : 'Escudo')).slice(0, 40), v: tomado, ...(c.excedenteVida ? {vida: true} : {})});
     if(c.excedenteVida) vida += tomado;   // 🛡/❤ (P227, 2026-10-27): lo que se lleva la Vida extra es daño; lo que se come un escudo, no
   });
-  return {recibido, absorbido, defensa, llega, ...(vida ? {vida} : {}), ...(perfora ? {perfora} : {}), ...(ab.tomado ? {arcano: ab.tomado} : {}),
+  // 🛡 El escudo que llegó a 0 se va de la lista ahí mismo (dueño, 2026-11-09; Combatiente.quitarEscudosGastados).
+  const escudosFuera = Array.isArray(efectos) ? Combatiente.quitarEscudosGastados(efectos) : [];
+  return {recibido, absorbido, defensa, llega, ...(escudosFuera.length ? {escudosFuera} : {}), ...(vida ? {vida} : {}), ...(perfora ? {perfora} : {}), ...(ab.tomado ? {arcano: ab.tomado} : {}),
     ...(capasUso.length ? {capas: capasUso} : {}), ...(o && Array.isArray(o.defPartes) ? {defPartes: o.defPartes} : {})};
 }
 
@@ -190,6 +192,7 @@ function golpeTexto(nombre, golpe, r, previo, nuevo){
   if(num(r.perfora) > 0) extra.push(`pasa${num(r.perfora) > 1 ? 'n' : ''} ${fmt(r.perfora)} por la Perfora`);
   if(num(r.absorbido) - num(r.arcano) - num(r.vida) > 0) extra.push(`el escudo absorbió ${fmt(num(r.absorbido) - num(r.arcano) - num(r.vida))}`);   // 🛡 (P227: el escudo y la Vida extra, aparte)
   if(num(r.vida) > 0) extra.push(`la Vida extra se llevó ${fmt(r.vida)}`);
+  if(Array.isArray(r.escudosFuera) && r.escudosFuera.length) extra.push(`se gastó ${r.escudosFuera.join(', ')}`);
   const suf = extra.length ? ` · ${extra.join(' · ')}` : '';
   if(r.invulnerable) return `${nombre}: Invulnerable, el golpe de ${fmt(golpe)} no hizo nada`;
   if(r.recibido <= 0 && !r.absorbido) return `${nombre}: golpe de ${fmt(golpe)} · Defensa ${fmt(r.defensa)} lo frenó entero`;
@@ -421,13 +424,14 @@ async function cosechaSiMuere(t, res){
 function escudosAlResumen(pub, efectos){
   const conEscudo = efectos.filter(e => e && e.activo !== false && (e.escudoMagicoActual !== undefined || num(e.escudoMagico) > 0));
   const usados = new Set();
+  // 🛡 Un escudo que ya no está en la ficha (se gastó y se fue, 2026-11-09) sale también del resumen público.
   return pub.map(x => {
     if(!x || x.escudo === undefined) return x;
     const e = conEscudo.find(y => y.nombre === x.nombre && !usados.has(y));
-    if(!e) return x;
+    if(!e) return null;
     usados.add(e);
     return {...x, escudo: num(e.escudoMagicoActual ?? e.escudoMagico)};
-  });
+  }).filter(Boolean);
 }
 async function danioPj(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
   const golpe = leerGolpe(texto);
@@ -575,7 +579,10 @@ async function danioInv(t, texto, ignoraDef, restaIgnorando, restaExtra, o){
     const desperto = num(r.recibido) > 0 && typeof suenoQuitarDe === 'function' && suenoQuitarDe(inv.estados);   // 💤 el daño lo despierta (js/87)
     const sinSueno = i => desperto && Array.isArray(i.estados) ? {estados: i.estados.filter(x => !(x && SUENO_RE.test(String(x.nombre || '').trim())))} : {};
     tx.set(parteRef, {json: JSON.stringify(datos), actualizado: ts});
-    tx.update(base, {actualizado: ts, 'resumen.invocaciones': (rs.invocaciones || []).map(i => i.id === invId ? {...i, hp: inv.hp, ...sinSueno(i)} : i)});
+    // 🛡 Los escudos que se gastaron (2026-11-09) salen también de los estados públicos de la invocación.
+    const sinEscudos = i => { const f = r.escudosFuera || []; if(!f.length || !Array.isArray(i.estados)) return {}; const base0 = sinSueno(i).estados || i.estados;
+      return {estados: base0.filter(x => !(x && x.escudo !== undefined && f.includes(x.nombre)))}; };
+    tx.update(base, {actualizado: ts, 'resumen.invocaciones': (rs.invocaciones || []).map(i => i.id === invId ? {...i, hp: inv.hp, ...sinSueno(i), ...sinEscudos(i)} : i)});
     return {r, previo, nuevo: inv.hp, desperto};
   });
   if(res && res.simulado) return res;

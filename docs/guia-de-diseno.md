@@ -253,3 +253,10 @@ Pedido del dueño (log «A desarrollar»): cuánto se puede acumular de Resisten
 - **Sigilo y Carga valen 1,5 por punto** (dueño, 2026-10-06). El Sigilo abre los ataques por la espalda (PdG y Crítico potente): mucho potencial de
   romper con críticos. La Carga anula la contra del peso y deja llevar armas más pesadas (más dados) sin sobrepeso. Lo «ruidoso» (Sigilo negativo)
   sigue devolviendo poco (0,5 por punto): al que lleva placas casi no le importa.
+
+- **🛡 Escudos gastados** (dueño, 2026-11-09: «los escudos gastados que llegan a 0, quiero que desaparezcan»): un estado que es solo un escudo
+  (Vida extra, Escudo especial, Shield, Arrojo, Barrera/Blindaje, pociones de Cuero Duro, Piel de Cristal y del Aguante, Cáscara protectora, el
+  escudo de 5 del Escudo humano) se saca de la lista apenas llega a 0, sin esperar sus turnos (`Combatiente.quitarEscudosGastados`, lo llama
+  `resolverGolpe` del mapa y el golpe directo). Quedan: los que se renuevan cada turno a propósito (`recarga`), la Armadura arcana (absorbe y
+  explota al terminar) y los que además dan otra cosa (mods, Invulnerable, el Escudo elemental). Los de los anillos de descanso vuelven en el
+  próximo descanso.

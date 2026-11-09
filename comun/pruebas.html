@@ -48,7 +48,7 @@ function esc(s){ return String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;',
 <script src="fx-escudo-humano.js?v=20261103eh"></script>
 <script src="hex-info.js?v=20261105hex"></script>
 <script src="fx-gancho.js?v=20261104arr6"></script>
-<script src="combatiente.js?v=20261109pfhab2"></script>
+<script src="combatiente.js?v=20261109escgas"></script>
 <script src="creep-calculo.js?v=20261109pfs"></script>
 <script src="creep-botonera.js"></script>
 <script src="creep-acciones.js?v=20261107dosarmas"></script>
@@ -839,8 +839,8 @@ prueba('Maldición tormentosa (Debuffer, 2026-10-12): Atormentado saca vida al p
   S.hp = 15; S.efectos = [{...lista[0], stacks: 1}];
   const rPj = FichaAcciones.tormentaPj(S, 3, 'atacar');
   igual([hab.costo, hab.nitrosCosto, ej.tira.stat, ej.contra.map(c => c.stat), lista[0].tormenta, lista[0].turnos, lista.length, uno, dos,
-    sc.nitros, sc.hp, sc.estados[1].escudoMagicoActual, inv.hp, rInv.invulnerable, S.hp, rPj.recibido, /Sin auditar/.test(hab.detalle), /Por cada acción/.test(hab.original)],
-    ['5', 2, 'pdgmg', ['resmg'], true, 3, 1, [2, 0, 0, 0, 2], [3, 1, 4], 6, 18, 0, 10, true, 13, 2, false, true]);
+    sc.nitros, sc.hp, sc.estados.length, inv.hp, rInv.invulnerable, S.hp, rPj.recibido, /Sin auditar/.test(hab.detalle), /Por cada acción/.test(hab.original)],
+    ['5', 2, 'pdgmg', ['resmg'], true, 3, 1, [2, 0, 0, 0, 2], [3, 1, 4], 6, 18, 1, 10, true, 13, 2, false, true]);
 });
 prueba('Empower (Support, 2026-10-12): 2 SP (4 en turno ajeno, turnoAjenoSp) (4 en turno ajeno), sin No2, a vos o a un aliado en tu Rango, sin tiradas: el efecto Empower', () => {
   const hab = CLASES_SKILLS.find(k => k.id === 'support').habilidades.find(h => h.id === 'support-empower');
@@ -4505,6 +4505,16 @@ prueba('Armadura arcana (2026-10-10): absorbe el 50 % de cada golpe (para arriba
   igual([aa.costo, aa.nitrosCosto, aa.duelo.efectos[0].nombre, [g1.recibido, g1.tomado], [g2.recibido, g2.tomado], [g3.recibido, g3.tomado], [g4.recibido, g4.tomado], est[0].absorbido,
     venc.map(x => [x.nombre, x.absorbido, x.radio, x.directo]), sigue.length, /class="glo"/.test(marcado), !!Glosario.def('Daño directo')],
     ['5', 3, 'Armadura arcana', [3, 4], [4, 5], [5, 1], [5, 0], 10, [['Armadura arcana', 10, 1, true]], 0, true, true]);
+});
+prueba('Escudos gastados (dueño, 2026-11-09): el escudo que llega a 0 se va de la lista; los que se renuevan, la Armadura arcana y los que dan algo más quedan', () => {
+  const pre = estadosPresetFicha(), de = (nombre, extra) => ({...structuredClone(pre.find(p => p.nombre === nombre)), id: nombre, activo: true, ...(extra || {})});
+  const est = [de('Shield', {escudoMagicoActual: 14}), de('Vida extra', {escudoMagico: 5, escudoMagicoActual: 5}), de('Armadura arcana'),
+    {id: 'r', nombre: 'Escudo que se renueva', activo: true, escudoMagico: 3, escudoMagicoActual: 3, recarga: true},
+    {id: 'm', nombre: 'Escudo con bono', activo: true, escudoMagico: 2, escudoMagicoActual: 2, mods: [{stat: 'def', val: 1}]}];
+  const fuera0 = Combatiente.quitarEscudosGastados(est);   // nada en 0 todavía
+  est.forEach(e => { if(e.escudoMagicoActual !== undefined) e.escudoMagicoActual = 0; if(e.excedenteVida) e.escudoMagico = 0; });
+  const fuera = Combatiente.quitarEscudosGastados(est);
+  igual([fuera0, fuera, est.map(e => e.nombre)], [[], ['Shield', 'Vida extra'], ['Armadura arcana', 'Escudo que se renueva', 'Escudo con bono']]);
 });
 prueba('Los óleos del Bazar (2026-10-10): consumirlo deja el estado con sus cargas; van a la góndola del Bazar', () => {
   const S = FichaGuardado.normalizar({}).S;

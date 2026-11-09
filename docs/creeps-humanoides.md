@@ -632,6 +632,9 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Nivel 2 aprobado** (dueño, 2026-11-09: «el hostigador con trampas me cierra»): Des 11 · Agi 8 · Con 8 · Fue 7 · Esp 2 → vida 40, 8 No2,
   PdG 11, Daño 7, Def 3, Eva 11; + Escarpines de fieltro (Eva +1) y Capucha de emboscada (Def +1, Sigilo +1); Tajo veloz (acá no se pisa con nada:
   el L4 no tiene la Finta); pasiva Pies ligeros. Cargado (`const L4`).
+  **Nivel 3 aprobado y cargado** (dueño, 2026-11-09: «va así»): Des 12 · Agi 9 · Con 8 · Fue 8 · Esp 2 → vida 40, 9 No2, PdG 13, Daño 8 + 2 dados,
+  Def 3, Eva 12, Ini 9 (pierde el Ini +2 del Cortaplumas); el arma Buena: **Aguja de corsario** (Tipo 4, 2 dados, PdG +1, Perfora 1; elegida sobre
+  la Daga de Capitán por los 2 dados); habilidad nueva **Abrojos** (7 casillas, 2d6+2 y Rengo, quedan 3 turnos).
 
 - **D4 · Control mental y ceguera · Debuffer, con SP** (boceto y nivel 1 aprobados 2026-11-03, dueño: «lo confirmo como ruta»; «va»). Estrategia:
   te saca el control: te ciega o te encandila (Destello, Cegar), te abre la mente (Punzada mental, −2 Res.Mt) y ahí te confunde, te asusta o te

@@ -325,6 +325,9 @@
   esencial({...L4, nivel: 2, atrib: [8, 7, 8, 11, 2],   // (aprobado 2026-11-09: Tajo veloz, Pies ligeros; + Escarpines de fieltro y Capucha de emboscada)
     equipo: ['Cortaplumas', 'Chaleco de cuero', 'Calzas de cuero flexible', 'Escarpines de fieltro', 'Capucha de emboscada'],
     habilidades: ['Cordón oculto', 'Hit and run', 'Tajo veloz'], pasivas: ['Pies ligeros']});
+  esencial({...L4, nivel: 3, atrib: [8, 8, 9, 12, 2],   // (aprobado 2026-11-09: Abrojos; el arma Buena: Aguja de corsario, 2 dados, PdG +1, Perfora 1)
+    equipo: ['Aguja de corsario', 'Chaleco de cuero', 'Calzas de cuero flexible', 'Escarpines de fieltro', 'Capucha de emboscada'],
+    habilidades: ['Cordón oculto', 'Hit and run', 'Tajo veloz', 'Abrojos'], pasivas: ['Pies ligeros']});
   esencial({linea: 'R2', nombre: 'Hostigador a distancia', rol: 'rango', rolTxt: 'rango', nivel: 1, atrib: [7, 5, 9, 10, 2],
     equipo: ['Arco de tiro ligero', 'Chaleco de cuero', 'Escarpines de fieltro'],
     habilidades: ['Tiro certero', 'Disparo y repliegue'], consumibles: ['Flecha silbadora'],

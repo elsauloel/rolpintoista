@@ -549,6 +549,11 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
   **Nivel 3 aprobado** (dueño, 2026-11-09: «me cierra»): Des 12 · Agi 10 · Con 8 · Fue 7 · Esp 2; el arco pasa a **Arco de la sombra** (Buena:
   1 dado + 1 amplificado, Rango +4, Emboscada: Crítico frecuente +1, Espalda a distancia: +2 PdG y +1 de daño); habilidad nueva **Tiro a la
   rodilla** (Rengo 2 turnos). Vida 40, No2 10, PdG 13, Daño 7, Def 3, Def.Esp 1, Eva 12. Programado (R23 en la prueba de niveles).
+  **Nivel 4 aprobado** (dueño, 2026-11-09, con dos cambios sobre la propuesta: «el punto que le pusiste a constitución, yo se lo pondría a
+  agilidad» y «la pasiva que sea escurridizo», en lugar de Prisa): Des 13 · Agi 11 · Con 8 · Fue 8 · Esp 2; el torso pasa a **Chaleco de kevlar**
+  (Buena: Def +3, +2 contra armas a distancia, Res. crít. T4 +1, Vida +5, Res. fuego +1); habilidad nueva **Disparo señalador** (Presa y
+  Marcado 2 turnos); pasiva **Escurridizo**. Vida 45, No2 11, PdG 14, Daño 8, Def 4 (6 contra armas a distancia), Def.Esp 1, Eva 13, Ini 11,
+  Mov 11. Programado (R24 en la prueba de niveles).
 
 - **M4 · Arcano · Mago, con SP** (boceto aprobado 2026-11-03, dueño: «me cierra como ruta»). Estrategia: control y movilidad: decide dónde
   está cada uno (aparece, empuja, atrae, manda por un portal, atraviesa en línea); en nv5, la Tormenta arcana. Atributos (Esp/Con/Agi/Des/Fue →

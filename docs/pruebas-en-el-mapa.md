@@ -2230,6 +2230,36 @@ Probado por Claude con clics en «Claude · pruebas», «Encuentro 2» (GM, J1, 
   `cola-11-5-smite`, `cola-11-6-cambio-de-guardia`, `cola-11-6b-orden-nuevo`, `cola-11-7-circulo`, `cola-11-8-pergamino-aviso`.
 
 
+## 🪓 Cola de pruebas · 13: la línea W2 · Berserker, niveles 1 a 5 (2026-11-09, Claude, «Claude · pruebas» / «Encuentro 2», GM + J1 + J2 con clics; restaurado y comparado con el respaldo: idéntico)
+
+- **Cómo:** GM Tools → «+ Creep» → ⭐ Pool esencial → Berserker Lv 1 a 5 → «Crear token»; renombrados Berserker 1–5, pegados a Rockardo, Larry y
+  Bizzante. Números en el mapa = prueba de niveles: vida 45/50/55/70/75, No2 6/6/7/7/8, Def 3/4/4/4/4, PdG 8/9/9/10/10, Daño 8/11/12/13/14 (el
+  Anillo maldito: Daño +2 y Vida −5, que la Robustez compensa; las Pieles erizadas: Vida +10 en el 4 y el 5).
+- **Golpe desesperado** (nv1 → Rockardo, vida llena): «+1 de daño fijo · Crítico frecuente +1 · Crítico potente +2». Con el nv1 en 10/45 (un cuarto
+  o menos) → Bizzante: «+2 PdG · +3 de daño fijo · Crítico frecuente +2 · Crítico potente +4» (el dado de PdG pasó a 1d10).
+- **Furia** (nv2): Enfurecido 2 turnos, −2 No2; PdG 9 → 12, Daño 11 → 15, Evasión 6 → 4, Defensa 4 → 2.
+- **Pegar fuerte** (nv2 enfurecido → Larry, que se defendió desde la pantalla del J1): «+1 dado de daño», PdG 1d12 (con la Furia); 34 → 21.
+- **Aguante** (nv3): dos golpes de Bizzante contados («golpes 2»); al empezar su turno, aguanteListo 2; Pegar fuerte → cartel «Modo aguante: …Pegar
+  fuerte suma +2d6. Cuesta +2 turnos de cooldown de Aguante» → «Pegar fuerte con el aguante» → la declaración dice «+3 dados de daño» (1 de la
+  habilidad + 2 del aguante); el cooldown del Aguante subió +2.
+- **Parry con dos armas** (Bizzante → nv3): la defensa ofrece «Parry · Espada del Jefe…» y «Parry · Facón de paisano», cada una con lo suyo.
+- **Golpe brutal** (nv4 → Rockardo): «+3 de daño fijo · Crítico frecuente +1 · Crítico potente +4», crítico ×3; el Berserker quedó en **Guardia
+  baja** 1 turno, y en el ataque siguiente su Evasión salía 1d4+1 (antes 1d6+1). El Sangrado 33 % de la Espada del Jefe se tiró en los efectos.
+- **Pieles erizadas (Espinas en un creep):** Rockardo le pegó al nv4 (crítico ×4, 88) → «🌵 Espinas: Rockardo recibe 22 de daño devuelto (1/4 del
+  daño del golpe)». Rockardo estaba Invulnerable (su ítem de emergencia), así que 40 → 40.
+- **Regeneración** (nv5 en 50/75, empezar su turno): «Pasivas: +3 HP · HP total: 50 → 53».
+- **Dos espadas** (nv5): las Acciones muestran «Atacar con Espada del Jefe… · 3 No2 · 1.º ataque» y «Atacar con Espada larga · 3 No2 · 1.º ataque»
+  (Daño 1d6+16 / 1d6+14). Con la Espada larga → Bizzante: PdG **1d10+1** (11); después la Espada larga pasó a 6 No2 y la del Jefe siguió a 3 (su
+  propio primer ataque). Con la del Jefe → Larry (J1): PdG **1d10** (10), y se tiró su Sangrado 33 %.
+- **Barrido con el aguante** (nv5, dos golpes cargados, rodeado por Rockardo, Bizzante y Larry): cartel «Barrido suma +2d6 (en el giro, solo al
+  primer rival)» → «Barrido con el aguante» → «elegí el primer rival (3)» → Rockardo: «+2 dados de daño», paró con el escudo y no alcanzó (40 → 29,
+  Sangrado de la espada); Bizzante (sin dados de más): 35 → 22; Larry (J1, sin dados de más): 35 → 23. Se cobró una sola vez (−3 No2).
+- **Facón de paisano** (nv2, «Atacar con Facón de paisano · 2 No2 · 1.º ataque» → Larry): crítico, y se tiró su Sangrado 50 % (no salió).
+- **Poción de Regeneración menor** (nv2 en 30): «Usar · 1 No2» → Regeneración (poción) 3 turnos, 30 → 35, −1 No2.
+- Para la prueba se cambió la vida y los estados de las copias con el mapa (`editarPersonajeMapa`): con la ficha suelta, las pantallas de los
+  jugadores la volvían a pisar con lo que tenían cargado.
+- Sin errores.
+
 ## 💀 Cola de pruebas · 12: la línea D1 · Maldito, niveles 1 a 5 (2026-11-09, Claude, «Claude · pruebas» / «Encuentro 2», GM + J1 + J2 con clics; restaurado y comparado con el respaldo: idéntico)
 
 - **Limpieza antes:** el «Mazo del juez» tirado en el piso de «Encuentro 2» (de la prueba 9, Tiro al arma) era una copia: Rockardo (copia) lo

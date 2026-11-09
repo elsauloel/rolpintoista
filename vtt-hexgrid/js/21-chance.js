@@ -54,6 +54,18 @@ async function chanceCartel(o){
   });
 }
 
+/* ---------- Inamovible ante un empujón, un arrastre o un cambio de lugar (2026-11-09, cola de pruebas 19) ----------
+   Antes se tiraba en silencio (Math.random): si salía, solo una línea en la Crónica; si no, nada. La regla de las chances (arriba) es que se vea:
+   el cartel con el d6, la Mesa y la Crónica, en la pantalla que resuelve el empujón. → Promise<bool> (true = no se mueve). */
+async function inamovibleSale(t, pct, que){
+  const quien = nombreDe(t);
+  return chanceCartel({clave: 'inamovible', icono: '🦶', titulo: 'Inamovible', mecanica: 'Inamovible', pct, t,
+    paso1: {titulo: `${que || 'Lo quieren mover'}`, texto: `${quien} es Inamovible ${Combatiente.chanceTexto(pct)}: si sale, no se mueve.`},
+    momento: `${quien} intenta no moverse (Inamovible)`,
+    exito: {grande: '¡NO SE MUEVE!', chico: 'Inamovible', cronica: '…¡salió! No se mueve.', mesa: `🦶 ${quien}: Inamovible — no se mueve`},
+    fallo: {grande: 'LO MUEVEN', chico: 'Inamovible no salió', cronica: '…no salió: lo mueven.', mesa: `🦶 ${quien}: Inamovible no salió — lo mueven`}});
+}
+
 /* ---------- Recuperarse rápido (2026-10-04, pies) ----------
    Cuando a un token que maneja esta pantalla le aparece Inmovilizado, Rengo, Sentado o Lento (con turnos), y tiene Recuperarse rápido, se le abre
    el cartel de la chance: si sale, ese estado arranca con 1 turno menos (si le quedaba 1, se termina). Un creep, en sus datos; un personaje, con

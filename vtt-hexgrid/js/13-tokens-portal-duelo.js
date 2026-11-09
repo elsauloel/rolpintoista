@@ -2234,7 +2234,7 @@ async function dueloEmpujar(d, n, clava){
   if(!ta) return {manual: true, nota: `empujalo ${n} casillas a mano`};
   const nom = nombreDe(t), titulo = `${d.hab ? d.hab.nombre : 'Empujón'}: empuja a ${nom}`;
   const im = chanceDe(t, 'inamovible');
-  if(im && Math.random() * 100 < im){ momentoAbrir({tipo: 'empujon', icono: '💨', titulo, resultado: `Es Inamovible (${im} %): no se mueve.`, estado: 'listo'}); return {nota: 'Inamovible: no se movió'}; }
+  if(im && await inamovibleSale(t, im, titulo)) return {nota: 'Inamovible: no se movió'};   // el cartel con el d6 (js/21; antes era en silencio)
   let c = {col: t.col, fila: t.fila}, pasos = 0;
   const ocupada = x => elementoSolidoEn(x.col, x.fila) || [...tokens.values()].some(y => y !== t && y.col === x.col && y.fila === x.fila);
   const pared = (a, b) => typeof paredCorta === 'function' && paredCorta(a, b);   // una pared dibujada también lo frena (2026-10-26, Clavar a la pared)
@@ -2516,7 +2516,7 @@ async function dueloAtraer(d){
   const cuenta = `Fuerza ${fF ? fF.formula : '0'} → ${rF.total} contra Ef.Esp ${fE ? fE.formula : '0'} → ${rE.total}`;
   if(rF.total >= rE.total){ momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `${cuenta}: se planta y no lo mueve.`, estado: 'listo'}); return; }
   const im = chanceDe(t, 'inamovible');
-  if(im && Math.random() * 100 < im){ momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `${cuenta}: pierde, pero es Inamovible (${im} %): no se mueve.`, estado: 'listo'}); return; }
+  if(im && await inamovibleSale(t, im, `${titulo} ${cuenta}: pierde`)) return;   // el cartel con el d6 (js/21)
   let c = {col: t.col, fila: t.fila}, pasos = 0;
   const ocupada = x => elementoSolidoEn(x.col, x.fila) || [...tokens.values()].some(y => y !== t && y.col === x.col && y.fila === x.fila);
   for(let i = 0; i < a.casillas && distanciaHex(c, ta) > 1; i++){

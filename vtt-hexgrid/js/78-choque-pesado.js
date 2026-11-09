@@ -266,7 +266,7 @@ async function arrastrarTraer(defId, atkId, hab, quien, dueloId, out){
   const nom = nombreDe(t), titulo = `${hab}: ${quien} arrastra a ${nom}`;
   const im = chanceDe(t, 'inamovible');
   const fx = (res, celdas) => typeof ganchoFxPublicar === 'function' ? ganchoFxPublicar(atkId, defId, res, celdas, true, dueloId).catch(err => console.error('Arrastrar: la animación', err)) : Promise.resolve();
-  if(im && Math.random() * 100 < im){ if(out) out.inamovible = true; await fx('suelta'); momentoAbrir({tipo: 'gancho', icono: '🪝', titulo, resultado: `Es Inamovible (${im} %): no se mueve.`, estado: 'listo'}); return null; }
+  if(im && await inamovibleSale(t, im, titulo)){ if(out) out.inamovible = true; await fx('suelta'); return null; }   // el cartel con el d6 (js/21)
   const ocupada = x => elementoSolidoEn(x.col, x.fila) || [...tokens.values()].some(y => y !== t && y.col === x.col && y.fila === x.fila && !y.bajoTierra);
   const pared = (a, b) => typeof paredCorta === 'function' && paredCorta(a, b);
   const ruta = [{col: t.col, fila: t.fila}];

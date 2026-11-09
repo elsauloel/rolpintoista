@@ -138,7 +138,7 @@ async function cambiarLugarResuelto(d){
   if(!ta || !td){ toast(`${hab}: uno de los dos ya no está en el mapa, cambialos a mano`); return; }
   const na = nombreDe(ta), nd = nombreDe(td), titulo = `${hab}: ${na} y ${nd}`;
   const im = typeof chanceDe === 'function' ? chanceDe(td, 'inamovible') : 0;
-  if(im && Math.random() * 100 < im){
+  if(im && await inamovibleSale(td, im, titulo)){   // el cartel con el d6 (js/21)
     const txt = `${nd} es Inamovible (${im} %): no se mueve nadie.`;
     mesaLinea(`🔄 ${titulo} — ${txt}`, 'recordatorio');
     try{ momentoAbrir({tipo: 'cambio', icono: '🔄', titulo, resultado: txt, estado: 'listo'}); }catch(err){}

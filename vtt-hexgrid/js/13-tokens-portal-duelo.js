@@ -3006,7 +3006,13 @@ async function dueloAplicarEfectoBase(d, ef){
   // rotura va a las piezas de armadura (el escudo, solo con Parry o Bloqueo, que llegan con `item`).
   if(spec.nombre === 'Armadura rota' && !spec.item && !String(t.fichaId).includes(SEP_INVOCACION) && !(await pjTieneArmadura(t.fichaId)))
     return {nota: 'Rompe armadura: no tiene efecto, no tiene armadura puesta', sinEfecto: true};
+  // 🛡 (2026-11-09, la cola de pruebas: el GM leía «le llegó a su ficha: Sangrado» de un personaje que estaba Invulnerable y no lo recibió):
+  // con lo que publica la ficha (sus estados), si algo lo frena (Invulnerable, Inmunidad a CC, Sangre pura…) el duelo lo dice. El aviso igual
+  // viaja (la ficha decide con lo suyo, por si lo publicado está atrasado).
+  let frena = '';
+  try{ frena = Combatiente.inmunidad(structuredClone(((vinculo(t) || {}).resumen || {}).estados || []), EstadosAplicar.componer(unico), null) || ''; }catch(e){ frena = ''; }
   for(let i = 0; i < veces; i++) await EstadosAplicar.encolarPj({fichaId: t.fichaId, duenoUid: t.duenoUid, spec: unico, origen: `${d.atacante.nombre} · ${ef.nombre}`});
+  if(frena) return {nota: `no entró: ${frena === 'Invulnerable' ? 'está Invulnerable' : frena === 'Marcado' ? 'está Marcado' : 'lo frena ' + frena} (${EstadosAplicar.texto(unico)}${veces > 1 ? ` ×${veces}` : ''} no le hizo efecto)`};
   return {nota: 'le llegó a su ficha: ' + EstadosAplicar.texto(unico) + (veces > 1 ? ` ×${veces}` : '')};
 }
 // ¿Tiene puesta alguna pieza de armadura que se pueda romper? (lee la ficha una vez; ante la duda, sí: la ficha avisa igual)

@@ -10,6 +10,7 @@
 //    comun/estados-presets.js: ×1,5 del fuego, Escarcha / Armadura rota / Veneno por daño, el salto y la Parálisis del eléctrico, la Luz sanadora —la
 //    cura se la lleva el PORTADOR— y Herida sombría + Punto débil de lo siniestro), con las mismas piezas del duelo (resistenciasDe, danio*,
 //    dueloPorDano, dueloCadena, dueloIdentidadEstado, dueloDrenar). Cada vez que entra (salir y volver a entrar quema otra vez; moverse adentro, no) y al empezar su turno pegado; nunca a quien lo lleva.
+//    Solo a los del bando contrario a quien TIRÓ el escudo (sin fuego amigo, dueño 2026-11-09), salvo el agua: el salto del rayo por un charco llega a todos.
 //    El daño es directo; el EFECTO del elemento se resiste con la Res.Esp de la víctima contra el Ef.Esp de quien tiró el escudo (`escudoEsp`, guardado
 //    en el estado al ponerlo), salvo los elementos con `resiste: false` (el ácido: la Armadura rota entra siempre) — dueño, 2026-11-06, caso por caso.
 //    Lo resuelve la pantalla de la víctima (como las zonas: el GM sus creeps, cada jugador lo suyo — zonaEsMia).
@@ -79,7 +80,7 @@ function escudoPortadores(){
   tokens.forEach((t, id) => {
     if(typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(id)) return;   // 💀 un caído no sostiene el escudo
     const e = escudoDe(t);
-    if(e) out.push({id, t, def: e.def});
+    if(e) out.push({id, t, def: e.def, estado: e.estado});
   });
   return out;
 }
@@ -285,12 +286,24 @@ let escudoPares = null;                    // los pares «portador|víctima» pe
 let escudoTurnoVisto = null;               // «ronda|turno» la última vez
 let escudoDesde = Date.now(), escudoMapaVisto = null;   // desde cuándo se mira este mapa (los primeros 9 s solo anota)
 const escudoRonda = () => Math.round(num(iniciativa && iniciativa.orden && iniciativa.orden.length ? iniciativa.ronda : mantenimientoNumero)) || 0;
+// 🤝 Sin fuego amigo (dueño, 2026-11-09: «que los escudos no tengan friendly fire, salvo con la situación del agua. Independientemente de dónde
+// casteás vos el escudo, solo afecta a los del bando opuesto»): el anillo quema solo a los del bando contrario a QUIEN LO TIRÓ (`escudoDe` del estado,
+// el token que lo lanzó), se lo haya puesto a sí mismo, a un aliado o a un rival. Bandos: creeps contra personajes e invocaciones. Si quien lo tiró ya
+// no está en el mapa (o un escudo viejo sin ese dato), se toma el bando del que lo lleva. La excepción es el agua: el salto del rayo por un charco
+// (rayoCadena, js/10) conduce a todos los que estén parados en él, aliados incluidos.
+const escudoBando = t => t && t.tipo === 'creep' ? 'creep' : 'pj';
+function escudoBandoLanzador(p){
+  const cid = p && p.estado && p.estado.escudoDe ? String(p.estado.escudoDe) : '';
+  const c = cid ? tokens.get(cid) : null;
+  return escudoBando(c || (p && p.t));
+}
 function escudoParesAhora(){
   const pares = new Set();
   for(const p of escudoPortadores()){
-    const anillo = escudoAnilloDe(p.t);
+    const anillo = escudoAnilloDe(p.t), bandoL = escudoBandoLanzador(p);
     tokens.forEach((v, vid) => {
       if(vid === p.id || !v.fichaId) return;
+      if(escudoBando(v) === bandoL) return;   // 🤝 a los del bando de quien lo tiró, nada (salvo el agua, por el salto del rayo)
       if(anillo.some(c => c.col === v.col && c.fila === v.fila)) pares.add(`${p.id}|${vid}`);
     });
   }
@@ -337,6 +350,7 @@ async function escudoQuemar(pid, vid, motivo){
   if(typeof iniciativaFueraDeJuego === 'function' && iniciativaFueraDeJuego(vid)) return;
   const e = escudoDe(p);
   if(!e) return;
+  if(escudoBando(v) === escudoBandoLanzador({t: p, estado: e.estado})) return;   // 🤝 sin fuego amigo (ver escudoParesAhora)
   const def = e.def, el = def.clave;
   const arma = EstadosAplicar.presetPorNombre(def.arma) || {};
   const efs = (arma.golpe && Array.isArray(arma.golpe.efectos)) ? arma.golpe.efectos : [];

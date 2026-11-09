@@ -123,6 +123,18 @@ sus Espinas devuelven como siempre (a diferencia del Escudo humano, que reparte 
 **Recursos y números**: HP, SP, No2 (Nitros), Defensa y resistencias a crítico, Movimiento, Rango (de la Destreza: también el de lo especial; el Rango de casteo se fue el 2026-10-07), Crg.Max (Sobrepeso), Iniciativa.
 **Reglas de tirada**: ventaja (Afortunado), mitades (Pajaritos, Lisiado), Bloqueo / Parry / Esquivar, redondeo (buffs hacia arriba, debuffs hacia abajo).
 
+**⚡ A quién salta el rayo** (dueño, 2026-11-09: «vamos a dejarlo así»; `rayoCadena`, vtt-hexgrid/js/10-hud-y-vida.js): **fuera del agua**, solo a los
+del bando del PRIMER golpeado (creeps → creeps; personajes e invocaciones → personajes): en la práctica, los rivales de quien tira el rayo. **En el agua**,
+a cualquiera parado en el mismo charco, de cualquier bando y a cualquier distancia dentro del charco (primero los del charco), y a cada mojado ×1,5.
+Al salir del charco sigue buscando el bando del primer golpeado (no el del último).
+
+**🤝 El Escudo elemental no tiene fuego amigo** (dueño, 2026-11-09: «hagamos que los escudos no tengan friendly fire, salvo con la situación del agua.
+Independientemente de dónde casteás vos el escudo, solo afecta a los del bando opuesto»): el anillo (al entrar o al empezar el turno pegado) solo
+quema a los del bando contrario a **quien tiró el escudo** (`escudoDe` del estado), se lo haya puesto a sí mismo, a un aliado o a un rival; si quien
+lo tiró ya no está en el mapa, se toma el bando del que lo lleva. Vale para todos los elementos. **La excepción es el agua**: el salto del rayo del
+escudo eléctrico por un charco conduce a todos los que estén parados en él, aliados incluidos (los demás elementos no usan el agua). Al que lleva el
+escudo nunca le llega, y el salto tampoco va a quien ya recibió el golpe del anillo.
+
 ## 3. Cómo usar esta guía al diseñar
 1. Elegí a qué familia pertenece lo que estás haciendo y mirá su **mecánica de casa** (§1): empezá por ahí.
 2. Si querés salirte, hacelo a propósito y que sea **excepcional** (un ítem raro, una skill especial), no la norma de la familia.

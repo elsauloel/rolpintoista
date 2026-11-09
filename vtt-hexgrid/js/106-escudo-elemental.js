@@ -379,7 +379,9 @@ async function escudoQuemar(pid, vid, motivo){
         partes.push(`${resistio ? 'resistió' : 'no resistió'} el efecto (${def.resisteStat === 'rescc' ? 'Res.CC' : 'Res.Esp'} ${tV.total} contra Ef.Esp ${tE.total})`);
       }
       if(rm && rm.r && !rm.r.invulnerable && recibido > 0){
-        if(ef.cadena) await dueloCadena(d, recibido).catch(err => console.error('Escudo: el salto del rayo', err));
+        // ⚡ El salto del escudo (dueño, 2026-11-09): nunca a los que ya reciben el golpe del anillo; solo a los de afuera del escudo.
+        const delAnillo = [...escudoParesAhora()].filter(k => k.startsWith(pid + '|')).map(k => k.split('|')[1]);
+        if(ef.cadena) await dueloCadena(d, recibido, {excluir: delAnillo}).catch(err => console.error('Escudo: el salto del rayo', err));
         if(num(ef.luzSanadora) > 0 && perdio > 0){
           const cura = Math.max(1, Math.floor(perdio * Math.min(100, num(ef.luzSanadora)) / 100));
           const ls = await dueloDrenar(d, cura, {sinExtra: true}).catch(() => null);

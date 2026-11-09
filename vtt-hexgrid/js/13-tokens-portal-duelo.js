@@ -2134,10 +2134,10 @@ async function dueloPorDano(d, entro, p0){
 // Los saltos del rayo: al más cercano del mismo bando que el golpeado, la mitad de lo que entró cada salto (rayoCadena / rayoCadenaAplicar, js/10),
 // todas las veces que pueda (regla general del 2026-10-13: ya no hay tope de `saltos`); se ve el rayo saltando en el mapa (rayoSaltoEfecto, js/19)
 // y se aplica lo que este cliente puede (el GM, todos; lo demás, en la Mesa).
-async function dueloCadena(d, entro){
+async function dueloCadena(d, entro, o){   // o.excluir: a quiénes no salta (el Escudo elemental de rayo: los del anillo)
   const id = d.defensor && d.defensor.tokenId;
   if(!id || !tokens.get(id)) return;
-  const c = (d.hab && d.hab.cadena) || {}, cadena0 = rayoCadena(id, entro, typeof talismanDe === 'function' ? talismanDe(tokens.get(d.atacante.tokenId), 'saltoMas') : 0);   // 💍 el Anillo de tormenta
+  const c = (d.hab && d.hab.cadena) || {}, cadena0 = rayoCadena(id, entro, typeof talismanDe === 'function' ? talismanDe(tokens.get(d.atacante.tokenId), 'saltoMas') : 0, {excluir: (o && o.excluir) || []});   // 💍 el Anillo de tormenta
   if(cadena0.length < 2) return;
   const hubo = await rayoCadenaAplicar(cadena0);
   if(!hubo.length) return;

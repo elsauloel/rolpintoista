@@ -715,7 +715,8 @@ function rayoCadena(idInicial, dano, mas, o){
   const charco = x => mojado(x) && typeof charcoCeldas === 'function' ? charcoCeldas(x) : null;
   const multAgua = typeof AGUA_MULT_RAYO !== 'undefined' ? AGUA_MULT_RAYO : 1.5;
   const cadena = [{id: idInicial, t: t0, dano: Math.max(0, Math.ceil(num(dano)))}];
-  const usados = new Set([idInicial]);
+  // `o.excluir` (2026-11-09, dueño: el Escudo elemental de rayo): ids a los que el salto NO puede ir (los que ya recibieron el golpe del anillo).
+  const usados = new Set([idInicial, ...((o.excluir || []).map(String))]);
   let actual = t0, d = cadena[0].dano;
   for(let i = 0; i < 12; i++){
     let mejor = null, mejorDist = Infinity, mejorAgua = false;

@@ -350,6 +350,10 @@ Si una skill tira un atributo (el Takle tira Constitución, el Pisotón Fuerza, 
     **Temple mágico** (+1 Res.Esp). **El torso Bueno es el Chaleco de kevlar** (Def +3, +2 contra armas a distancia, Vida +5, Res. crít. T4 +1, Res.
     fuego +1) en lugar de la Túnica del archivista del boceto, por la regla del dueño de que a los magos se los protege contra el rango; sale la
     Capa de viajero.
+  - **Nivel 5 aprobado y cargado — M2 completa** (dueño, 2026-11-09): Esp 19 · Con 10 · Agi 7 · Des 7 · Fue 2, vida 55, 7 No2, **SP 57** (+9 por
+    turno), PdG.Esp 19, Ef.Esp 20, **Def 5 (7 contra armas a distancia)**, Def.Esp 3, Eva 8, Res.Esp 12, Res.Mt 19, Res.CC 11. Suma **Lluvia de
+    escarcha** (4 No2 y tanto SP como su Especial: área de diámetro 5, 19 casillas; 2d4 + ¼ Ef.Esp de hielo; suelo congelado 2 turnos y después
+    charco; con fuego amigo) y la tercera Buena en la cabeza: el **Yelmo de bronce con runas** (Def +1, Def.Esp +2, Res. fuego +1, Res.Esp +1).
   - **Atributos del boceto, rehechos** (Esp/Con/Agi/Des/Fue → vida, con la capa): nv1 12/8/5/6/2 → 45 · nv2 14/9/5/6/2 → 50 · nv3 16/9/6/6/2 → 50 ·
     nv4 17/10/6/7/2 → 55 · nv5 19/10/7/7/2 → 55 (el Especial sube más desde el nivel 2).
   - **Boceto nivel por nivel** (dueño, 2026-11-03: «me cierra»): nv2 Parpadeo + pasiva Potencia especial; + Polainas de cuero remendado y Botas de

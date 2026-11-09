@@ -22,6 +22,7 @@ Cada línea nueva que se termine de diseñar se suma al final.
 34. [ ] **Percepción aumentada: sin punto ciego en la espalda para el sigilo** (2026-11-09): un token en sigilo pegado a la espalda de alguien con la pasiva le da la tirada de detección (la casilla de atrás cuenta como zona de alerta); sin la pasiva, sigue siendo punto ciego. Probar con un personaje, un creep y una invocación.
 35. [ ] **Línea R2 · Hostigador a distancia, niveles 1 a 5.**
 36. [ ] **Orbe de resguardo mayor en un creep (Mago de escarcha nv3): al ganar una tirada de PdG.Esp, Escudo especial de 3 hasta su próximo turno, una vez por turno** (2026-11-09, el dueño pidió probarlo en el mapa).
+37. [ ] **Línea M2 · Mago de escarcha, niveles 1 a 5.**
 
 ## Hechas
 

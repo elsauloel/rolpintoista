@@ -228,6 +228,9 @@
   esencial({...M2, nivel: 4, atrib: [10, 2, 6, 7, 17],   // (aprobado 2026-11-09: Ráfaga de viento + Temple mágico; el torso Bueno es el Chaleco de kevlar, no la Túnica del archivista: «a los magos, protección contra rango»)
     equipo: ['Varita de la ventisca', 'Orbe de resguardo mayor', 'Chaleco de kevlar', 'Anillo de escarcha', 'Polainas de cuero remendado', 'Escarpines de fieltro'],
     habilidades: ['Dardo helado', 'Hálito polar', 'Parpadeo', 'Prisión de hielo', 'Ráfaga de viento'], pasivas: ['Potencia especial', 'Temple mágico']});
+  esencial({...M2, nivel: 5, atrib: [10, 2, 7, 7, 19],   // (aprobado 2026-11-09: Lluvia de escarcha + el Yelmo de bronce con runas en la cabeza; M2 completa)
+    equipo: ['Varita de la ventisca', 'Orbe de resguardo mayor', 'Chaleco de kevlar', 'Anillo de escarcha', 'Polainas de cuero remendado', 'Escarpines de fieltro', 'Yelmo de bronce con runas'],
+    habilidades: ['Dardo helado', 'Hálito polar', 'Parpadeo', 'Prisión de hielo', 'Ráfaga de viento', 'Lluvia de escarcha'], pasivas: ['Potencia especial', 'Temple mágico']});
   esencial({linea: 'M3', nombre: 'Mago del rayo', rol: 'mago', rolTxt: 'mágico', nivel: 1, atrib: [8, 2, 5, 6, 12],
     equipo: ['Varita de chispa eléctrica', 'Escudo de escamas de lagarto', 'Chaleco de cuero', 'Anillo de chispa'],
     habilidades: ['Centella', 'Zap'], consumibles: ['Poción de SP menor'],

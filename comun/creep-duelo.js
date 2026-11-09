@@ -124,7 +124,7 @@ const CreepDuelo = (() => {
           return t.stat ? {formula: formulaDe(A().tirada('', habStat(sc, t.stat) + num(t.bono), sc, t.stat)), ...L('stat|' + t.stat)} : null;
         }
         const scEva = {...sc, estados: Combatiente.ciegoContraDistancia(d, sc.estados)};   // 🙈 ciego contra un ataque a distancia
-        if(campo === 'contra') return modo ? {formula: formulaDe(A().tirada('', habStat(sc, modo), modo === 'eva' ? scEva : sc, modo)), ...L('stat|' + modo)} : null;
+        if(campo === 'contra') return modo ? {formula: modo === 'eva' ? Combatiente.conFijo(formulaDe(A().tirada('', habStat(sc, modo), scEva, modo)), Combatiente.fantasmaEvaHab(d, st => num(C().modTotal(sc, st)))) : formulaDe(A().tirada('', habStat(sc, modo), sc, modo)), ...L('stat|' + modo)} : null;   // 👻 + el Paso fantasma
         if(campo === 'eva'){ const ee = evaEsp(sc, d); return {formula: formulaDe(A().tirada('', C().statValor(sc, 'eva') + ee.val, scEva, 'eva', ee.fijo)), ...L('stat|eva')}; }
         if(campo === 'parry') return {formula: formulaDe(A().tirada('', C().parryValor(sc, modo || ''), sc, 'parry')), ...L('stat|parry')};   // modo = la pieza (itemId), 2026-11-07
         if(campo === 'pdg'){
@@ -237,14 +237,17 @@ const CreepDuelo = (() => {
         // Tirada personalizada (la fórmula llega lista desde habEjecucion): se tira y se anuncia, como en la ficha.
         if(c.formula){ const r = tirarDados(c.formula); if(r) ui.publicar(sc, {origen: nombre, r}); else ui.toast(`No se pudo tirar «${c.etq}»: la fórmula «${c.formula}» no es válida (revisá la habilidad)`); return; }
         if(!c.stat) return;
-        ui.publicar(sc, A().tirada(nombre, habStat(sc, c.stat) + num(c.bono), quien !== 'atacante' && c.stat === 'eva' ? {...sc, estados: Combatiente.ciegoContraDistancia(d, sc.estados)} : sc, c.stat));   // 🙈
+        const pf = quien !== 'atacante' && c.stat === 'eva' ? Combatiente.fantasmaEvaHab(d, st => num(C().modTotal(sc, st))) : {};   // 👻 el Paso fantasma
+        ui.publicar(sc, A().tirada(pf.txt ? `${nombre} (${pf.txt})` : nombre, habStat(sc, c.stat) + num(c.bono), quien !== 'atacante' && c.stat === 'eva' ? {...sc, estados: Combatiente.ciegoContraDistancia(d, sc.estados)} : sc, c.stat, pf.fijo));   // 🙈
+        Combatiente.gastarPasoFantasma(d, pf);
       },
       habValor: (d, quien, stat) => {
         const sc = deLado(quien === 'atacante' ? d.atacante : d.defensor);
         if(!sc) return '';
         const v = habStat(sc, stat), f = formulaParaValor(v);
         const est = quien !== 'atacante' ? Combatiente.ciegoContraDistancia(d, sc.estados) : sc.estados;   // las mitades (🙈 ciego de lejos…)
-        return f ? f.formula + ' ÷2'.repeat(Combatiente.mitadesDeTirada(est, stat)) : fmt(num(v));
+        const pf = quien !== 'atacante' && stat === 'eva' ? Combatiente.fantasmaEvaHab(d, st => num(C().modTotal(sc, st))) : {};   // 👻 el Paso fantasma
+        return f ? Combatiente.conFijo(f.formula, pf) + ' ÷2'.repeat(Combatiente.mitadesDeTirada(est, stat)) : fmt(num(v));
       },
       // ¿El creep objetivo de una habilidad dirigida puede parriar ahora? (2026-09-29, misma regla que un ataque
       // normal, P121: sin arma no hay Parry.)

@@ -93,7 +93,7 @@ const InvDuelo = (() => {
           if(t.formula) return {formula: t.formula, titulo: t.etq || '', html: ''};
           return t.stat ? {formula: F(num(I().statValor(inv, t.stat)) + num(t.bono), t.stat), ...L('stat:' + t.stat)} : null;
         }
-        if(campo === 'contra') return modo ? {formula: F(num(I().statValor(inv, modo)), modo, modo === 'eva'), ...L('stat:' + modo)} : null;
+        if(campo === 'contra') return modo ? {formula: modo === 'eva' ? Combatiente.conFijo(F(num(I().statValor(inv, modo)), modo, true), Combatiente.fantasmaEvaHab(d, st => num(I().modTotal(inv, st)))) : F(num(I().statValor(inv, modo)), modo, false), ...L('stat:' + modo)} : null;   // 👻 + el Paso fantasma
         if(campo === 'eva'){ const ee = evaEsp(inv, d); return {formula: Combatiente.conFijo(F(I().statValor(inv, 'eva') + ee.val, 'eva', true), ee), ...L('stat:eva')}; }
         if(campo === 'parry') return {formula: F(I().parryValor(inv, modo || ''), 'parry'), ...L('stat:parry')};   // modo = la pieza (itemId), 2026-11-07
         if(campo === 'pdg'){
@@ -206,14 +206,17 @@ const InvDuelo = (() => {
         // Tirada personalizada: la fórmula ya viene resuelta; acá solo se tira y se anuncia.
         if(c.formula){ const r = tirarDados(c.formula); if(r) ui.registrar(nombre, r); else ui.toast(`No se pudo tirar «${c.etq}»: la fórmula «${c.formula}» no es válida (revisá la habilidad)`); return; }
         if(!c.stat) return;
-        publicar(A().tirada(quien !== 'atacante' && c.stat === 'eva' ? {...inv, estados: Combatiente.ciegoContraDistancia(d, inv.estados)} : inv, nombre, num(I().statValor(inv, c.stat)) + num(c.bono), c.stat));   // 🙈
+        const pf = quien !== 'atacante' && c.stat === 'eva' ? Combatiente.fantasmaEvaHab(d, st => num(I().modTotal(inv, st))) : {};   // 👻 el Paso fantasma
+        publicar(A().tirada(quien !== 'atacante' && c.stat === 'eva' ? {...inv, estados: Combatiente.ciegoContraDistancia(d, inv.estados)} : inv, pf.txt ? `${nombre} (${pf.txt})` : nombre, num(I().statValor(inv, c.stat)) + num(c.bono), c.stat, pf.fijo));   // 🙈
+        Combatiente.gastarPasoFantasma(d, pf);
       },
       habValor: (d, quien, stat) => {
         const inv = ui.inv(quien === 'atacante' ? d.atacante : d.defensor);
         const v = I().statValor(inv, stat);
         const f = formulaParaValor(num(v));
         const est = inv && quien !== 'atacante' ? Combatiente.ciegoContraDistancia(d, inv.estados) : (inv && inv.estados);   // las mitades (🙈 ciego de lejos…)
-        return f ? f.formula + ' ÷2'.repeat(Combatiente.mitadesDeTirada(est, stat)) : fmt(num(v));
+        const pf = inv && quien !== 'atacante' && stat === 'eva' ? Combatiente.fantasmaEvaHab(d, st => num(I().modTotal(inv, st))) : {};   // 👻 el Paso fantasma
+        return f ? Combatiente.conFijo(f.formula, pf) + ' ÷2'.repeat(Combatiente.mitadesDeTirada(est, stat)) : fmt(num(v));
       },
       puedeParry: d => { const inv = ui.inv(d.defensor); return !!I().defensa(inv) && !Combatiente.expuesto(inv && inv.estados); },   // arma de verdad o escudo (2026-09-30)
       // Cómo puede defenderse (elige a ciegas): Evasión, o Parry con su arma o un escudo (siempre 1 No2).

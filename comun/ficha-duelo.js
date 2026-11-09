@@ -122,7 +122,7 @@ const FichaDuelo = (() => {
           if(t.formula) return {formula: t.formula, titulo: t.etq || '', html: ''};
           return t.stat ? {formula: f(num(c.final[t.stat]) + num(t.bono), t.stat), ...L('stat:' + t.stat)} : null;
         }
-        if(campo === 'contra') return modo ? {formula: f(num(c.final[modo]), modo, modo === 'eva' ? ciegoEva : null), ...L('stat:' + modo)} : null;
+        if(campo === 'contra') return modo ? {formula: modo === 'eva' ? Combatiente.conFijo(f(num(c.final[modo]), modo, ciegoEva), Combatiente.fantasmaEvaHab(d, st => num(c.final[st]))) : f(num(c.final[modo]), modo, null), ...L('stat:' + modo)} : null;   // 👻 + el Paso fantasma
         if(campo === 'eva'){ const ee = evaEsp(d); return {formula: Combatiente.conFijo(f(num(c.final.eva) + ee.val, 'eva', ciegoEva), ee), ...L('stat:eva')}; }
         if(campo === 'parry'){ const it = modo ? S.inventario.find(x => x.id === modo) : null; return {formula: f(statParaArma('parry', it), 'parry'), ...L('stat:parry')}; }
         if(campo === 'pdg'){
@@ -290,15 +290,19 @@ const FichaDuelo = (() => {
         const v = Math.max(num(compute().final[c.stat]), num(c.min));   // 📜 el mínimo de calidad de un pergamino (2026-10-23)
         // 🙈 Ciego contra un hechizo dirigido de lejos (2026-10-20): su Evasión, a la mitad.
         const S = getS(), conCiego = quien !== 'atacante' && c.stat === 'eva' ? Combatiente.ciegoContraDistancia(d, S.efectos) : S.efectos;
-        if(conCiego !== S.efectos){ const orig = S.efectos; S.efectos = conCiego; try{ tirarValorStat(nombre, num(v) + num(c.bono), c.stat); }finally{ S.efectos = orig; } return; }
-        tirarValorStat(nombre, num(v) + num(c.bono), c.stat);
+        const pf = quien !== 'atacante' && c.stat === 'eva' ? Combatiente.fantasmaEvaHab(d, st => num(compute().final[st])) : {};   // 👻 el Paso fantasma
+        const nom = pf.txt ? `${nombre} (${pf.txt})` : nombre;
+        if(conCiego !== S.efectos){ const orig = S.efectos; S.efectos = conCiego; try{ tirarValorStat(nom, num(v) + num(c.bono), c.stat, pf.fijo); }finally{ S.efectos = orig; } Combatiente.gastarPasoFantasma(d, pf); return; }
+        tirarValorStat(nom, num(v) + num(c.bono), c.stat, pf.fijo);
+        Combatiente.gastarPasoFantasma(d, pf);
       },
       // «Cuánto tirarías»: la fórmula de dados de ese stat (para el botón de defensa).
       habValor: (d, quien, stat) => {
         const t = quien === 'atacante' && d.hab && d.hab.tira, v = Math.max(num(compute().final[stat]), t && t.stat === stat ? num(t.min) : 0);
         const f = formulaParaValor(num(v));
         const est = quien !== 'atacante' ? Combatiente.ciegoContraDistancia(d, getS().efectos) : getS().efectos;   // las mitades (Pajaritos, 🙈 ciego de lejos…)
-        return f ? f.formula + ' ÷2'.repeat(Combatiente.mitadesDeTirada(est, stat)) : fmt(num(v));
+        const pf = quien !== 'atacante' && stat === 'eva' ? Combatiente.fantasmaEvaHab(d, st => num(compute().final[st])) : {};   // 👻 «1d4+1» → «1d4+1+3»
+        return f ? Combatiente.conFijo(f.formula, pf) + ' ÷2'.repeat(Combatiente.mitadesDeTirada(est, stat)) : fmt(num(v));
       },
       // ¿El objetivo de una habilidad dirigida puede parriar ahora? (sin arma ni escudo equipado, no hay Parry.)
       puedeParry: d => armasYEscudosParaParry().length > 0 && !Combatiente.expuesto(getS().efectos),   // Expuesto (Degollar): sin Parry
